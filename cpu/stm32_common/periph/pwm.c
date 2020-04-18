@@ -52,13 +52,13 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     /* reset configuration and CC channels */
     dev(pwm)->CR1 = 0;
     dev(pwm)->CR2 = 0;
-    for (unsigned i = 0; i < TIMER_CHAN; ++i) {
+    for (unsigned i = 0; i < TIMER_CHANNELS; ++i) {
         dev(pwm)->CCR[i] = 0;
     }
 
     /* configure the used pins */
     unsigned i = 0;
-    while ((i < TIMER_CHAN) && (pwm_config[pwm].chan[i].pin != GPIO_UNDEF)) {
+    while ((i < TIMER_CHANNELS) && (pwm_config[pwm].chan[i].pin != GPIO_UNDEF)) {
         gpio_init(pwm_config[pwm].chan[i].pin, GPIO_OUT);
         gpio_init_af(pwm_config[pwm].chan[i].pin, pwm_config[pwm].af);
         i++;
@@ -103,7 +103,7 @@ uint8_t pwm_channels(pwm_t pwm)
     assert(pwm < PWM_NUMOF);
 
     unsigned i = 0;
-    while ((i < TIMER_CHAN) && (pwm_config[pwm].chan[i].pin != GPIO_UNDEF)) {
+    while ((i < TIMER_CHANNELS) && (pwm_config[pwm].chan[i].pin != GPIO_UNDEF)) {
         i++;
     }
     return (uint8_t)i;
@@ -112,7 +112,7 @@ uint8_t pwm_channels(pwm_t pwm)
 void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
 {
     assert((pwm < PWM_NUMOF) &&
-           (channel < TIMER_CHAN) &&
+           (channel < TIMER_CHANNELS) &&
            (pwm_config[pwm].chan[channel].pin != GPIO_UNDEF));
 
     /* norm value to maximum possible value */
