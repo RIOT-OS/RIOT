@@ -5,6 +5,9 @@ endif
 # All SAM0 based CPUs provide PM
 USEMODULE += pm_layered
 
+# the timer implements timer_set_periodic()
+FEATURES_PROVIDED += periph_timer_periodic
+
 # include sam0 common periph drivers
 USEMODULE += sam0_common_periph
 
