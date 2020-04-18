@@ -130,6 +130,11 @@ typedef uint16_t gpio_t;
 #define PERIPH_TIMER_PROVIDES_SET
 
 /**
+ * @brief   Number of maximal available timer channels
+ */
+#define TIMER_CHANNELS      (1U)
+
+/**
  * @brief   number of usable power modes
  */
 #define PM_NUM_MODES    (1U)
