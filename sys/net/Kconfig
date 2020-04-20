@@ -4,13 +4,40 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menu "Networking"
+
+menuconfig NETWORKING
+    bool "Networking"
+
+if NETWORKING
+
+choice
+    bool "Select network stack"
+
+    config MOD_GNRC
+        bool "GNRC"
+        depends on MOD_GNRC_NETAPI
+        depends on MOD_GNRC_NETIF
+        depends on MOD_GNRC_PKTBUF
+        select MOD_GNRC_NETIF_HDR
+        select MOD_GNRC_NETREG
+
+    config MOD_LWIP
+        bool "LWIP"
+
+    config MOD_EMB6
+        bool "emb6"
+
+    config MOD_OPENTHREAD
+        bool "OpenThread"
+
+endchoice
+
+rsource "gnrc/Kconfig"
 
 rsource "application_layer/Kconfig"
 rsource "credman/Kconfig"
-rsource "gnrc/Kconfig"
 rsource "netif/Kconfig"
 rsource "sock/Kconfig"
 rsource "link_layer/Kconfig"
 
-endmenu # Networking
+endif # NETWORKING

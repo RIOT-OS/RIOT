@@ -4,8 +4,12 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menu "GNRC Network stack"
-    depends on MODULE_GNRC
+
+menuconfig GNRC_STACK
+    bool "GNRC Network stack"
+    select HAVE_STACK_NETIF
+
+if GNRC_STACK
 
 rsource "application_layer/dhcpv6/Kconfig"
 rsource "link_layer/gomach/Kconfig"
@@ -13,11 +17,13 @@ rsource "link_layer/lorawan/Kconfig"
 rsource "link_layer/lwmac/Kconfig"
 rsource "link_layer/mac/Kconfig"
 rsource "netif/Kconfig"
+rsource "network_layer/Kconfig"
 rsource "network_layer/ipv6/Kconfig"
 rsource "network_layer/sixlowpan/Kconfig"
+rsource "pkt/Kconfig"
 rsource "pktbuf/Kconfig"
 rsource "pktdump/Kconfig"
 rsource "routing/rpl/Kconfig"
 rsource "transport_layer/tcp/Kconfig"
 
-endmenu # GNRC Network Stack
+endif # GNRC_STACK
