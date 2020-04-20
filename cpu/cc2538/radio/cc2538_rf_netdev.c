@@ -371,7 +371,13 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                           (CC2538_CORR_VAL_MAX - CC2538_CORR_VAL_MIN);
     }
 
-    RFCORE_SFR_RFST = ISFLUSHRX;
+    /* Check for overflow of the rx fifo */
+    if (RFCORE->XREG_FSMSTAT1bits.FIFOP != 0 &&
+        RFCORE->XREG_FSMSTAT1bits.FIFO == 0)
+    {
+        DEBUG_PRINT("cc2538_rf: RXFIFO Overflow\n");
+        RFCORE_SFR_RFST = ISFLUSHRX;
+    }
 
     return pkt_len;
 }
