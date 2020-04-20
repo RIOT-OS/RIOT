@@ -461,6 +461,7 @@ ifneq (,$(filter modbus_rtu,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
   FEATURES_REQUIRED += periph_gpio
   USEMODULE += xtimer
+  USEMODULE += checksum
 endif
 
 ifneq (,$(filter mma8x5x,$(USEMODULE)))

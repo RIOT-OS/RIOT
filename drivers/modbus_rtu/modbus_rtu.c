@@ -1,5 +1,5 @@
 /*
-  todo: set state hi/low tx pin on transfer
+  todo: disble pin and set state hi/low tx pin on transfer
   todo: use RTS if exist 
   todo: timeout beetwen byte
   todo: overflow buffer
@@ -7,8 +7,10 @@
     prepare_request,
     send, poll,
     modbus_rtu_send_request
-  todo: add timer between end prev
+  todo: add timer between request
   fixme: then slave copy message in buffer and on uart receive byte
+  todo: add crc16
+
 */
 
 #include "modbus_rtu.h"
@@ -21,6 +23,7 @@
 #include "thread.h"
 #include "periph/gpio.h"
 #include "msg.h"
+#include "checksum/ucrc16.h"
 
 enum MESSAGE {
   ID = 0,  //!< ID field
@@ -34,6 +37,8 @@ enum MESSAGE {
 
 #define lowByte(w) ((uint8_t)((w)&0xff))
 #define highByte(w) ((uint8_t)((w) >> 8))
+
+#define calcCRC(buffer, size) (ucrc16_calc_le(buffer, size, 0xA001, 0xFFFF))
 
 static inline void enamdle_trasmit(modbus_rtu_t *modbus);
 static inline void disamdle_trasmit(modbus_rtu_t *modbus);
@@ -77,6 +82,7 @@ int modbus_rtu_send_request(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
     return -1;
   }
   send(modbus);
+  modbus->_size_buffer = 0;
 
   msg_t msg;
   if (xtimer_msg_receive_timeout(&msg, modbus->timeout) < 0) {
@@ -84,6 +90,9 @@ int modbus_rtu_send_request(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
   } else {
     // receive aswer
     while (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) >= 0) {
+    }
+    if (calcCRC(modbus->_buffer, modbus->_size_buffer) != 0) {
+      return -1;
     }
     modbus->_size_buffer = 0;
     return 0;
@@ -114,12 +123,6 @@ static inline int prepare_request(modbus_rtu_t *modbus) {
   return 0;
 }
 
-static inline void send(modbus_rtu_t *modbus) {
-  enamdle_trasmit(modbus);
-  uart_write(modbus->uart, modbus->_buffer, modbus->_size_buffer);
-  disamdle_trasmit(modbus);
-}
-
 int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
   modbus->_pid = thread_getpid();
   modbus->_msg = message;
@@ -127,7 +130,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
 
   while (1) {
     msg_receive(&msg);
-    printf("slave id: %u\n", modbus->_buffer[ID]);
+    // printf("slave id: %u\n", modbus->_buffer[ID]);
     if (modbus->_buffer[ID] != modbus->id) {
       // wait the end of transfer for other slave
       while (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) >= 0) {
@@ -138,7 +141,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
     modbus->_msg->id = modbus->_buffer[ID];
 
     //  6 is minimal size of request
-    while (modbus->_size_buffer < 6) {
+    while (modbus->_size_buffer < 8) {
       if (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) < 0) {
         goto error;
       }
@@ -147,10 +150,13 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
     switch (modbus->_buffer[FUNC]) {
     case MB_FC_READ_COILS:
     case MB_FC_READ_DISCRETE_INPUT:
-      return -1;
+      goto error;
       break;
     case MB_FC_READ_REGISTERS:
     case MB_FC_READ_INPUT_REGISTER:
+      if (calcCRC(modbus->_buffer, 8) != 0) {
+        goto error;
+      }
       modbus->_msg->addr = ((modbus->_buffer[ADD_HI]) << 8) | modbus->_buffer[ADD_LO];
       modbus->_msg->count = ((modbus->_buffer[NB_HI]) << 8) | modbus->_buffer[NB_LO];
       break;
@@ -184,7 +190,7 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message
     modbus->_buffer[1] = modbus->_msg->count * 2;
     modbus->_size_buffer = 2 + modbus->_buffer[1];
     memcpy(modbus->_buffer + 2, modbus->_msg->regs, modbus->_size_buffer);
-    printf("buff size: %u \n", modbus->_size_buffer);
+    // printf("buff size: %u \n", modbus->_size_buffer);
     break;
   default:
     return -1;
@@ -193,6 +199,17 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message
   send(modbus);
   modbus->_size_buffer = 0;
   return 0;
+}
+
+static inline void send(modbus_rtu_t *modbus) {
+  uint16_t crc = calcCRC(modbus->_buffer, modbus->_size_buffer);
+  modbus->_buffer[modbus->_size_buffer] = lowByte(crc);
+  modbus->_size_buffer++;
+  modbus->_buffer[modbus->_size_buffer] = highByte(crc);
+  modbus->_size_buffer++;
+  enamdle_trasmit(modbus);
+  uart_write(modbus->uart, modbus->_buffer, modbus->_size_buffer);
+  disamdle_trasmit(modbus);
 }
 
 static inline void enamdle_trasmit(modbus_rtu_t *modbus) {
