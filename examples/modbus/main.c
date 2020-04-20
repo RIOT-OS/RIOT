@@ -11,18 +11,19 @@
 #define SLAVE_ID 1
 #define BAUDRATE 115200
 
-static char stack_master[THREAD_STACKSIZE_DEFAULT];
+static char stack_master[400];
 static kernel_pid_t pid_master;
 static modbus_rtu_t master;
-static uint16_t regs_master[10];
+static uint16_t regs_master1[10];
+static uint16_t regs_master2[10];
 static modbus_rtu_message_t message_master = {
     .id = SLAVE_ID,
     .func = MB_FC_READ_REGISTERS,
     .addr = 0,
-    .regs = regs_master,
+    .regs = regs_master1,
     .count = 10};
 
-static char stack_slave[THREAD_STACKSIZE_DEFAULT];
+static char stack_slave[400];
 static kernel_pid_t pid_slave;
 static modbus_rtu_t slave;
 static uint16_t regs_slave[10];
@@ -47,13 +48,31 @@ static void *thread_master(void *arg __attribute__((unused))) {
 
   while (1) {
     xtimer_usleep(master._rx_timeout * 3);
-    // puts("try request");
+    srand(xtimer_now_usec());
+    for (uint8_t i = 0; i < message_master.count; i++) {
+      regs_master1[i] = rand();
+    }
+    puts("try request write");
+    message_master.regs = regs_master1;
+    message_master.func = MB_FC_WRITE_REGISTERS;
     res = modbus_rtu_send_request(&master, &message_master);
     assert(message_slave.count == message_master.count);
-    if (res || memcmp(message_master.regs, message_slave.regs, message_master.count * 2) != 0) {
-      printf("fail request %d\n", res);
+    if (res) {
+      printf("fail request write %d\n", res);
     } else {
       // puts("ok request");
+
+      xtimer_usleep(master._rx_timeout * 3);
+      puts("try request read");
+      message_master.regs = regs_master2;
+      message_master.func = MB_FC_READ_REGISTERS;
+      res = modbus_rtu_send_request(&master, &message_master);
+      assert(message_slave.count == message_master.count);
+      if (res || memcmp(regs_master1, regs_master2, message_master.count * 2) != 0) {
+        printf("fail request read %d\n", res);
+      } else {
+        // puts("ok request");
+      }
     }
   }
   return NULL;
@@ -84,12 +103,12 @@ static void *thread_slave(void *arg __attribute__((unused))) {
       assert(message_slave.addr == message_master.addr);
       assert(message_slave.count == message_master.count);
       assert(message_slave.regs == regs_slave);
-      srand(xtimer_now_usec());
-      for (uint8_t i = 0; i < message_slave.count; i++) {
-        message_slave.regs[i] = rand();
+      res = modbus_rtu_send_response(&slave, &message_slave);
+      if (res) {
+        puts("fail response");
+      } else {
+        // puts("ok poll");
       }
-      modbus_rtu_send_response(&slave, &message_slave);
-      // puts("ok poll");
     }
   }
 

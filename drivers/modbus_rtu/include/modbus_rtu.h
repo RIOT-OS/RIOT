@@ -17,7 +17,7 @@ enum MB_FC {
   MB_FC_WRITE_COIL = 5,               /*!< FCT=5 -> write single coil or output */
   MB_FC_WRITE_REGISTER = 6,           /*!< FCT=6 -> write single register */
   MB_FC_WRITE_MULTIPLE_COILS = 15,    /*!< FCT=15 -> write multiple coils or outputs */
-  MB_FC_WRITE_MULTIPLE_REGISTERS = 16 /*!< FCT=16 -> write multiple registers */
+  MB_FC_WRITE_REGISTERS = 16 /*!< FCT=16 -> write multiple registers */
 };
 
 //! Максимальный размер пакета протокола Modbus RTU.
