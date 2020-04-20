@@ -66,6 +66,8 @@ extern "C" {
 #define CC2538_CORR_VAL_MAX         (110U)
 #define CC2538_CORR_VAL_MASK        (0x7F)
 
+#define CC2538_CRC_BIT_MASK         (0x80)
+
 #define CC2538_RSSI_OFFSET          (-73)  /**< Signal strength offset value */
 #define CC2538_RF_SENSITIVITY       (-97)  /**< dBm typical, normal conditions */
 
