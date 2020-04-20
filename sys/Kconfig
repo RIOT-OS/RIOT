@@ -7,6 +7,7 @@
 menu "System"
 
 rsource "auto_init/Kconfig"
+rsource "div/Kconfig"
 rsource "isrpipe/Kconfig"
 rsource "iolist/Kconfig"
 rsource "net/Kconfig"
@@ -14,6 +15,7 @@ rsource "pm_layered/Kconfig"
 rsource "random/Kconfig"
 rsource "tsrb/Kconfig"
 rsource "usb/Kconfig"
+rsource "xtimer/Kconfig"
 
 rsource "Kconfig.newlib"
 rsource "Kconfig.stdio"

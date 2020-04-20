@@ -1,0 +1,25 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MOD_XTIMER
+    bool "Xtimer"
+    select MOD_PERIPH_TIMER if HAS_PERIPH_TIMER && !MOD_XTIMER_ON_ZTIMER
+    depends on HAS_PERIPH_TIMER && !MOD_XTIMER_ON_ZTIMER || MOD_XTIMER_ON_ZTIMER
+    select MOD_DIV if !MOD_ZTIMER_XTIMER_COMPAT
+    help
+        Include Xtimer module. Xtimer requires a low-level timer implementation
+        that can be provided either by a peripheral timer or the Ztimer module
+        when MOD_XTIMER_ON_ZTIMER is enabled.
+
+if MOD_XTIMER
+
+config MOD_AUTO_INIT_XTIMER
+    bool "Auto-init Xtimer"
+    default y if MOD_AUTO_INIT
+    depends on !MOD_ZTIMER_XTIMER_COMPAT
+
+endif # MOD_XTIMER
