@@ -1,7 +1,4 @@
 /*
-  todo: disble pin and set state hi/low tx pin on transfer
-  todo: use RTS if exist 
-  todo: timeout beetwen byte
   todo: overflow buffer
   todo: add code error: 
     prepare_request,
@@ -10,6 +7,7 @@
   todo: add timer between request
   fixme: then slave copy message in buffer and on uart receive byte
   todo: add crc16
+  todo: send exeption
 
 */
 
@@ -48,25 +46,16 @@ static inline void disamdle_trasmit(modbus_rtu_t *modbus);
 static inline void send(modbus_rtu_t *modbus);
 static inline int prepare_request(modbus_rtu_t *modbus);
 static inline int get_response(modbus_rtu_t *modbus);
-static void rx_cb_master(void *arg, uint8_t data);
-static void rx_cb_slave(void *arg, uint8_t data);
+static void rx_cb(void *arg, uint8_t data);
 
 int modbus_rtu_init(modbus_rtu_t *modbus) {
-  int err;
-  if (modbus->id == 0) {
-    err = uart_init(modbus->uart, modbus->baudrate, rx_cb_master, modbus);
-    // uint8_t ms[] = "mas";
-    // uart_write(modbus->uart, ms, 3);
-  } else {
-    err = uart_init(modbus->uart, modbus->baudrate, rx_cb_slave, modbus);
-    // uint8_t ms[] = "sla";
-    // uart_write(modbus->uart, ms, 3);
-  }
+  int err = uart_init(modbus->uart, modbus->baudrate, rx_cb, modbus);
   if (err != UART_OK) {
     return err;
   }
-  if (modbus->pin_tx_enable) {
-    gpio_init(modbus->pin_tx_enable, GPIO_OUT);
+  if (modbus->pin_tx) {
+    gpio_init(modbus->pin_tx, GPIO_OUT);
+    gpio_write(modbus->pin_tx, !modbus->pin_tx_enable);
   }
   // usec in sec / byte per second * 1.5
   modbus->_rx_timeout = 1000000 / (modbus->baudrate / 10) * 1.5;
@@ -83,7 +72,7 @@ int modbus_rtu_send_request(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
   modbus->_msg = message;
   modbus->_pid = thread_getpid();
   if (prepare_request(modbus) != 0) {
-    return -11;
+    return -1;
   }
   send(modbus);
   modbus->_size_buffer = 0;
@@ -221,7 +210,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
     case MB_FC_WRITE_REGISTERS:; // some magick
       // (id + func + addr + count + size) + size of regs + crc
       uint8_t size = 7 + modbus->_buffer[BYTE_CNT] + 2;
-        // thread_stack_print();
+      // thread_stack_print();
       while (modbus->_size_buffer < size) {
         if (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) < 0) {
           goto error;
@@ -295,15 +284,18 @@ static inline void send(modbus_rtu_t *modbus) {
 }
 
 static inline void enamdle_trasmit(modbus_rtu_t *modbus) {
-  // gpio_write
-  gpio_set(modbus->pin_tx_enable);
+  if (modbus->pin_tx) {
+    gpio_write(modbus->pin_tx, modbus->pin_tx_enable);
+  }
 }
 
 static inline void disamdle_trasmit(modbus_rtu_t *modbus) {
-  gpio_clear(modbus->pin_tx_enable);
+  if (modbus->pin_tx) {
+    gpio_write(modbus->pin_tx, !modbus->pin_tx_enable);
+  }
 }
 
-static void rx_cb_master(void *arg, uint8_t data) {
+static void rx_cb(void *arg, uint8_t data) {
   static msg_t msg;
   modbus_rtu_t *modbus = (modbus_rtu_t *)arg;
   // printf("rx_cb: %x\n", data);
@@ -311,17 +303,6 @@ static void rx_cb_master(void *arg, uint8_t data) {
   if (modbus->_msg == NULL) {
     return;
   }
-
-  modbus->_buffer[modbus->_size_buffer] = data;
-  modbus->_size_buffer++;
-
-  msg_send(&msg, modbus->_pid);
-}
-
-static void rx_cb_slave(void *arg, uint8_t data) {
-  static msg_t msg;
-  modbus_rtu_t *modbus = (modbus_rtu_t *)arg;
-  // printf("%x_", data);
 
   modbus->_buffer[modbus->_size_buffer] = data;
   modbus->_size_buffer++;

@@ -35,7 +35,8 @@ static void init_master(void) {
   master.baudrate = BAUDRATE;
   master.timeout = 1000000;
   master.id = 0;
-  master.pin_tx_enable = GPIO_PIN(PORT_A, 1);
+  master.pin_tx = GPIO_PIN(PORT_A, 1);
+  master.pin_tx_enable = 0;
 
   if (modbus_rtu_init(&master)) {
     puts("fail UART init");
@@ -82,7 +83,8 @@ static void init_slave(void) {
   slave.uart = UART_DEV(0);
   slave.baudrate = BAUDRATE;
   slave.id = SLAVE_ID;
-  slave.pin_tx_enable = GPIO_PIN(PORT_B, 15);
+  slave.pin_tx = GPIO_PIN(PORT_B, 15);
+  master.pin_tx_enable = 0;
 
   if (modbus_rtu_init(&slave)) {
     puts("fail UART init");
