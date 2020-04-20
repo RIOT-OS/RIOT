@@ -568,7 +568,7 @@ void dose_setup(dose_t *ctx, const dose_params_t *params)
      * We have to ensure it is above the XTIMER_BACKOFF. Otherwise state
      * transitions are triggered from another state transition setting up the
      * timeout. */
-    ctx->timeout_base = DOSE_TIMEOUT_USEC;
+    ctx->timeout_base = CONFIG_DOSE_TIMEOUT_USEC;
     if (ctx->timeout_base < xtimer_usec_from_ticks(min_timeout)) {
         ctx->timeout_base = xtimer_usec_from_ticks(min_timeout);
     }
