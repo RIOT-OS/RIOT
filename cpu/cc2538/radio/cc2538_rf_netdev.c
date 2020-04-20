@@ -323,13 +323,6 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             return -ENODATA;
         }
 
-        /* CRC check */
-        if (!(rfcore_peek_rx_fifo(pkt_len) & 0x80)) {
-            /* CRC failed; discard packet */
-            RFCORE_SFR_RFST = ISFLUSHRX;
-            return -ENODATA;
-        }
-
         if (len > 0) {
             /* GNRC wants us to drop the packet */
             RFCORE_SFR_RFST = ISFLUSHRX;
@@ -346,6 +339,13 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     int8_t rssi_val = rfcore_read_byte() + CC2538_RSSI_OFFSET;
     uint8_t crc_corr_val = rfcore_read_byte();
+
+    /* CRC check */
+    if (!(crc_corr_val & CC2538_CRC_BIT_MASK)) {
+        /* CRC failed; discard packet */
+        RFCORE_SFR_RFST = ISFLUSHRX;
+        return -ENODATA;
+    }
 
     if (info != NULL && RFCORE->XREG_RSSISTATbits.RSSI_VALID) {
         netdev_ieee802154_rx_info_t *radio_info = info;
