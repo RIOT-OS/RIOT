@@ -52,6 +52,7 @@ KCONFIG_EDITED_CONFIG = $(GENERATED_DIR)/.editedconfig
 
 # Add configurations to merge, in ascendent priority (i.e. a file overrides the
 # previous ones)
+MERGE_SOURCES += $(wildcard $(RIOTBOARD)/$(BOARD)/board.config)
 MERGE_SOURCES += $(wildcard $(KCONFIG_APP_CONFIG))
 MERGE_SOURCES += $(wildcard $(KCONFIG_APP_CONFIG).$(BOARD))
 MERGE_SOURCES += $(wildcard $(KCONFIG_USER_CONFIG))
