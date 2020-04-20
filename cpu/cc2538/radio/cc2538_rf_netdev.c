@@ -347,7 +347,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         return -ENODATA;
     }
 
-    if (info != NULL && RFCORE->XREG_RSSISTATbits.RSSI_VALID) {
+    if (info != NULL) {
         netdev_ieee802154_rx_info_t *radio_info = info;
 
         RFCORE_ASSERT(rssi_val > CC2538_RF_SENSITIVITY);
