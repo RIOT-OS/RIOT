@@ -26,11 +26,11 @@
  * @brief       Configuration data and startup code for the kernel
  */
 
- /**
-  * @defgroup    core_sync Thread Synchronization
-  * @ingroup     core
-  * @brief       Thread synchronization mechanisms of the kernel
-  */
+/**
+ * @defgroup    core_sync Thread Synchronization
+ * @ingroup     core
+ * @brief       Thread synchronization mechanisms of the kernel
+ */
 
 /**
  * @defgroup    core_macros Common Macros
