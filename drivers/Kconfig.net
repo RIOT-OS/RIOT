@@ -6,6 +6,7 @@
 
 menu "Network Device Drivers"
 rsource "cc110x/Kconfig"
+rsource "dose/Kconfig"
 rsource "mrf24j40/Kconfig"
 source "$(RIOTCPU)/nrf52/radio/nrf802154/Kconfig"
 endmenu # Network Device Drivers
