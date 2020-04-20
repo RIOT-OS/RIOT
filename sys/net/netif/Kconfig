@@ -1,0 +1,17 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config MOD_NETIF
+    bool "Network Interface"
+    help
+        Common network interface API. This allows access to network interfaces
+        regardless of the network stack implementation.
+
+config HAVE_STACK_NETIF
+    bool
+    help
+        Indicates that there is a network stack present which implements the
+        Netif API.
