@@ -1,0 +1,104 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MOD_AT86RF2XX
+    bool "AT86RF2XX radio driver"
+    default y if HAVE_AT86RF2XX && MOD_NETDEV_DEFAULT
+    depends on MOD_NETIF
+    depends on MOD_XTIMER
+    depends on MOD_IEEE802154
+    depends on MOD_NETDEV_IEEE802154
+    select MOD_LUID
+
+if MOD_AT86RF2XX
+
+config MOD_AUTO_INIT_AT86RF2XX
+    bool "Auto-init AT86RF2XX driver"
+    default y if MOD_AUTO_INIT
+
+# TODO: Add missing supported models
+choice AT86RF2XX_MODEL
+    bool "Select device model"
+    default MOD_AT86RF212B if HAVE_AT86RF212B
+    default MOD_AT86RF231 if HAVE_AT86RF231
+    default MOD_AT86RF232 if HAVE_AT86RF232
+    default MOD_AT86RF233 if HAVE_AT86RF233
+
+config MOD_AT86RF212B
+    bool "AT86RF212B"
+    depends on HAS_PERIPH_GPIO && HAS_PERIPH_GPIO_IRQ && HAS_PERIPH_SPI
+    select MOD_PERIPH_GPIO
+    select MOD_PERIPH_GPIO_IRQ
+    select MOD_PERIPH_SPI
+
+config MOD_AT86RF231
+    bool "AT86RF231"
+    depends on HAS_PERIPH_GPIO && HAS_PERIPH_GPIO_IRQ && HAS_PERIPH_SPI
+    select AT86RF2XX_MODEL_SELECTED
+    select MOD_PERIPH_GPIO
+    select MOD_PERIPH_GPIO_IRQ
+    select MOD_PERIPH_SPI
+
+config MOD_AT86RF232
+    bool "AT86RF232"
+    depends on HAS_PERIPH_GPIO && HAS_PERIPH_GPIO_IRQ && HAS_PERIPH_SPI
+    select AT86RF2XX_MODEL_SELECTED
+    select MOD_PERIPH_GPIO
+    select MOD_PERIPH_GPIO_IRQ
+    select MOD_PERIPH_SPI
+
+config MOD_AT86RF233
+    bool "AT86RF233"
+    depends on HAS_PERIPH_GPIO && HAS_PERIPH_GPIO_IRQ && HAS_PERIPH_SPI
+    select AT86RF2XX_MODEL_SELECTED
+    select MOD_PERIPH_GPIO
+    select MOD_PERIPH_GPIO_IRQ
+    select MOD_PERIPH_SPI
+
+endchoice
+
+config AT86RF2XX_MODEL_SELECTED
+    bool
+    help
+        Indicates that a radio model has been selected.
+
+comment "No radio model is selected. Please check hardware dependencies."
+    depends on !AT86RF2XX_MODEL_SELECTED
+
+endif # MOD_AT86RF2XX
+
+config HAVE_AT86RF2XX
+    bool
+    select HAVE_RADIO_IEEE802154
+    select HAVE_RADIO_IEEE802154_OQPSK
+    help
+        Indicates that a radio of the AT86RF2XX family is present.
+
+## Radio variant symbols
+config HAVE_AT86RF212B
+    bool
+    select HAVE_AT86RF2XX
+    help
+        Indicates that a radio AT86RF212B is present.
+
+config HAVE_AT86RF231
+    bool
+    select HAVE_AT86RF2XX
+    help
+        Indicates that a radio AT86RF231 is present.
+
+config HAVE_AT86RF232
+    bool
+    select HAVE_AT86RF2XX
+    help
+        Indicates that a radio AT86RF232 is present.
+
+config HAVE_AT86RF233
+    bool
+    select HAVE_AT86RF2XX
+    help
+        Indicates that a radio AT86RF233 is present.

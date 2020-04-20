@@ -5,7 +5,14 @@
 # directory for more details.
 
 menu "Network Device Drivers"
+
+config MOD_NETDEV_DEFAULT
+    bool "Enable default network device on the platform"
+    default y
+    depends on NETWORKING
+
 rsource "at86rf215/Kconfig"
+rsource "at86rf2xx/Kconfig"
 rsource "cc110x/Kconfig"
 rsource "dose/Kconfig"
 rsource "ethos/Kconfig"
@@ -17,3 +24,8 @@ rsource "rn2xx3/Kconfig"
 rsource "slipdev/Kconfig"
 source "$(RIOTCPU)/nrf52/radio/nrf802154/Kconfig"
 endmenu # Network Device Drivers
+
+config HAVE_RADIO_IEEE802154
+    bool
+    help
+        Indicates that an IEEE 802.15.4 compatible radio is present.
