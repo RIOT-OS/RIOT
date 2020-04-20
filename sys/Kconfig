@@ -8,6 +8,7 @@ menu "System"
 
 rsource "auto_init/Kconfig"
 rsource "div/Kconfig"
+rsource "fmt/Kconfig"
 rsource "isrpipe/Kconfig"
 rsource "iolist/Kconfig"
 rsource "luid/Kconfig"
