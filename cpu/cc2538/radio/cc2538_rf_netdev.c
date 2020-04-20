@@ -310,8 +310,17 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
         /* Make sure pkt_len is sane */
         if (pkt_len > CC2538_RF_MAX_DATA_LEN) {
+            DEBUG_PRINT("cc2538_rf: pkt_len > CC2538_RF_MAX_DATA_LEN\n");
             RFCORE_SFR_RFST = ISFLUSHRX;
             return -EOVERFLOW;
+        }
+
+        /* Make sure pkt_len is not too short.
+         * There are at least 2 bytes (FCS). */
+        if (pkt_len < IEEE802154_FCS_LEN) {
+            DEBUG_PRINT("cc2538_rf: pkt_len < IEEE802154_FCS_LEN\n");
+            RFCORE_SFR_RFST = ISFLUSHRX;
+            return -ENODATA;
         }
 
         /* CRC check */
