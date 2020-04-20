@@ -299,6 +299,12 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     size_t pkt_len;
 
     if (buf == NULL) {
+        /* Check that the last byte of a new frame has been received */
+        if (RFCORE->XREG_FSMSTAT1bits.FIFOP == 0) {
+            DEBUG_PRINT("cc2538_rf: Frame has not finished being received\n");
+            return -EAGAIN;
+        }
+
         /* GNRC wants to know how much data we've got for it */
         pkt_len = rfcore_read_byte();
 
@@ -329,11 +335,11 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     rfcore_read_fifo(buf, pkt_len);
 
+    int8_t rssi_val = rfcore_read_byte() + CC2538_RSSI_OFFSET;
+    uint8_t crc_corr_val = rfcore_read_byte();
+
     if (info != NULL && RFCORE->XREG_RSSISTATbits.RSSI_VALID) {
-        uint8_t corr_val;
-        int8_t rssi_val;
         netdev_ieee802154_rx_info_t *radio_info = info;
-        rssi_val = rfcore_read_byte() + CC2538_RSSI_OFFSET;
 
         RFCORE_ASSERT(rssi_val > CC2538_RF_SENSITIVITY);
 
@@ -341,7 +347,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
          * received packet */
         radio_info->rssi = -CC2538_RF_SENSITIVITY + rssi_val;
 
-        corr_val = rfcore_read_byte() & CC2538_CORR_VAL_MASK;
+        uint8_t corr_val = crc_corr_val & CC2538_CORR_VAL_MASK;
 
         if (corr_val < CC2538_CORR_VAL_MIN) {
             corr_val = CC2538_CORR_VAL_MIN;
