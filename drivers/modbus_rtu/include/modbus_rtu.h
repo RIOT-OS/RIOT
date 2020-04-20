@@ -1,6 +1,7 @@
 #pragma once
 #include "periph/uart.h"
 #include "thread.h"
+#include "mutex.h"
 
 enum MB_FC {
   MB_FC_NONE = 0,                  /*!< null operator */
@@ -46,6 +47,7 @@ typedef struct {
   uint32_t timeout;       // while slave start response; us
   uint8_t _buffer[MODBUS_RTU_PACKET_SIZE_MAX];
   uint8_t _size_buffer;
+  mutex_t _mutex_buffer;
   uint32_t _rx_timeout;       // beetwen byte; us
   modbus_rtu_message_t *_msg; // now process
   kernel_pid_t _pid;          // who get messege
