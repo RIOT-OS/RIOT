@@ -35,6 +35,9 @@ enum MESSAGE {
   BYTE_CNT //!< byte counter
 };
 
+// bytes with crc16
+#define MIN_SIZE_REQUEST (8)
+
 #define lowByte(w) ((uint8_t)((w)&0xff))
 #define highByte(w) ((uint8_t)((w) >> 8))
 
@@ -44,6 +47,7 @@ static inline void enamdle_trasmit(modbus_rtu_t *modbus);
 static inline void disamdle_trasmit(modbus_rtu_t *modbus);
 static inline void send(modbus_rtu_t *modbus);
 static inline int prepare_request(modbus_rtu_t *modbus);
+static inline int get_response(modbus_rtu_t *modbus);
 static void rx_cb_master(void *arg, uint8_t data);
 static void rx_cb_slave(void *arg, uint8_t data);
 
@@ -84,20 +88,7 @@ int modbus_rtu_send_request(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
   send(modbus);
   modbus->_size_buffer = 0;
 
-  msg_t msg;
-  if (xtimer_msg_receive_timeout(&msg, modbus->timeout) < 0) {
-    return -1; // timeout; no has answer
-  } else {
-    // receive aswer
-    while (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) >= 0) {
-    }
-    if (calcCRC(modbus->_buffer, modbus->_size_buffer) != 0) {
-      return -1;
-    }
-    modbus->_size_buffer = 0;
-    return 0;
-  }
-  return 0;
+  return get_response(modbus);
 }
 
 static inline int prepare_request(modbus_rtu_t *modbus) {
@@ -123,6 +114,55 @@ static inline int prepare_request(modbus_rtu_t *modbus) {
   return 0;
 }
 
+static inline int get_response(modbus_rtu_t *modbus) {
+  msg_t msg;
+  if (xtimer_msg_receive_timeout(&msg, modbus->timeout) < 0) {
+    return -1; // timeout; no has answer
+  } else {
+    // start aswer
+    if (modbus->_buffer[ID] != modbus->_msg->id) {
+      return -2; // invalid id
+    }
+
+    while (modbus->_size_buffer < MIN_SIZE_REQUEST) {
+      if (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) < 0) {
+        return -3;
+      }
+    }
+
+    if (modbus->_buffer[FUNC] != modbus->_msg->func) {
+      return -4;
+    }
+    switch (modbus->_buffer[FUNC]) {
+    case MB_FC_READ_COILS:
+    case MB_FC_READ_DISCRETE_INPUT:
+      return -5;
+      break;
+    case MB_FC_READ_REGISTERS:
+    case MB_FC_READ_INPUT_REGISTER:; // some magick
+      // id + func + size + data[size] + crc16
+      uint8_t size = 3 + modbus->_buffer[2] + 2;
+      while (modbus->_size_buffer < size) {
+        if (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) < 0) {
+          return -6;
+        }
+      }
+      if (calcCRC(modbus->_buffer, modbus->_size_buffer) != 0) {
+        return -7;
+      }
+      memcpy(modbus->_msg->regs, modbus->_buffer + 3, modbus->_buffer[2]);
+      modbus->_msg->count = modbus->_buffer[2] >> 1;
+      break;
+    default:
+      return -8;
+      break;
+    }
+
+    modbus->_size_buffer = 0;
+    return 0;
+  }
+}
+
 int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
   modbus->_pid = thread_getpid();
   modbus->_msg = message;
@@ -141,7 +181,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
     modbus->_msg->id = modbus->_buffer[ID];
 
     //  6 is minimal size of request
-    while (modbus->_size_buffer < 8) {
+    while (modbus->_size_buffer < MIN_SIZE_REQUEST) {
       if (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) < 0) {
         goto error;
       }
@@ -179,7 +219,8 @@ OK:
 
 int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
   modbus->_msg = message;
-  modbus->_buffer[0] = modbus->_msg->func;
+  modbus->_buffer[ID] = modbus->_msg->id;
+  modbus->_buffer[FUNC] = modbus->_msg->func;
   switch (modbus->_msg->func) {
   case MB_FC_READ_COILS:
   case MB_FC_READ_DISCRETE_INPUT:
@@ -187,9 +228,9 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message
     break;
   case MB_FC_READ_REGISTERS:
   case MB_FC_READ_INPUT_REGISTER:
-    modbus->_buffer[1] = modbus->_msg->count * 2;
-    modbus->_size_buffer = 2 + modbus->_buffer[1];
-    memcpy(modbus->_buffer + 2, modbus->_msg->regs, modbus->_size_buffer);
+    modbus->_buffer[2] = modbus->_msg->count * 2; // calc size for send
+    modbus->_size_buffer = 3 + modbus->_buffer[2];
+    memcpy(modbus->_buffer + 3, modbus->_msg->regs, modbus->_size_buffer);
     // printf("buff size: %u \n", modbus->_size_buffer);
     break;
   default:

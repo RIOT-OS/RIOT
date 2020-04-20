@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "modbus_rtu.h"
 #include "periph/gpio.h"
@@ -21,6 +22,13 @@ static modbus_rtu_message_t message_master = {
     .regs = regs_master,
     .count = 10};
 
+static char stack_slave[THREAD_STACKSIZE_DEFAULT];
+static kernel_pid_t pid_slave;
+static modbus_rtu_t slave;
+static uint16_t regs_slave[10];
+static modbus_rtu_message_t message_slave = {
+    .regs = regs_slave};
+
 static void init_master(void) {
   master.uart = UART_DEV(2);
   master.baudrate = BAUDRATE;
@@ -41,21 +49,15 @@ static void *thread_master(void *arg __attribute__((unused))) {
     xtimer_usleep(master._rx_timeout * 3);
     // puts("try request");
     res = modbus_rtu_send_request(&master, &message_master);
-    if (res) {
-      puts("fail request");
+    assert(message_slave.count == message_master.count);
+    if (res || memcmp(message_master.regs, message_slave.regs, message_master.count * 2) != 0) {
+      printf("fail request %d\n", res);
     } else {
       // puts("ok request");
     }
   }
   return NULL;
 }
-
-static char stack_slave[THREAD_STACKSIZE_DEFAULT];
-static kernel_pid_t pid_slave;
-static modbus_rtu_t slave;
-static uint16_t regs_slave[10];
-static modbus_rtu_message_t message_slave = {
-    .regs = regs_slave};
 
 static void init_slave(void) {
   slave.uart = UART_DEV(0);
@@ -82,6 +84,10 @@ static void *thread_slave(void *arg __attribute__((unused))) {
       assert(message_slave.addr == message_master.addr);
       assert(message_slave.count == message_master.count);
       assert(message_slave.regs == regs_slave);
+      srand(xtimer_now_usec());
+      for (uint8_t i = 0; i < message_slave.count; i++) {
+        message_slave.regs[i] = rand();
+      }
       modbus_rtu_send_response(&slave, &message_slave);
       // puts("ok poll");
     }
