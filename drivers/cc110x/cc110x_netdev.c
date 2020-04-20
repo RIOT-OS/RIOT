@@ -348,7 +348,7 @@ static int cc110x_init(netdev_t *netdev)
      * cc110x_full_calibration
      */
     retval = cc110x_apply_config(dev, dev->params.config, dev->params.channels,
-                                 CC110X_DEFAULT_CHANNEL);
+                                 CONFIG_CC110X_DEFAULT_CHANNEL);
     if (retval) {
         gpio_irq_disable(dev->params.gdo0);
         gpio_irq_disable(dev->params.gdo2);
