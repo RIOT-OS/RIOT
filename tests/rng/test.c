@@ -412,10 +412,6 @@ void test_speed(uint32_t duration)
     /* collect samples as long as timer has not expired */
     unsigned running = 1;
     xtimer_t xt = {
-        .start_time = 0,
-        .long_start_time = 0,
-        .offset = 0,
-        .long_offset = 0,
         .callback = cb_speed_timeout,
         .arg = &running,
     };
@@ -446,10 +442,6 @@ void test_speed_range(uint32_t duration, uint32_t low_thresh, uint32_t high_thre
     /* collect samples as long as timer has not expired */
     unsigned running = 1;
     xtimer_t xt = {
-        .start_time = 0,
-        .long_start_time = 0,
-        .offset = 0,
-        .long_offset = 0,
         .callback = cb_speed_timeout,
         .arg = &running,
     };

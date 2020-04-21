@@ -295,3 +295,26 @@ void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout)
     xtimer_set64(t, timeout);
 }
 #endif
+
+uint64_t xtimer_left_usec(const xtimer_t *timer)
+{
+    unsigned state = irq_disable();
+    /* ensure we're working on valid data by making a local copy of timer */
+    xtimer_t t = *timer;
+    uint64_t now_us = xtimer_now_usec64();
+    irq_restore(state);
+
+    uint64_t start_us = _xtimer_usec_from_ticks64(
+        ((uint64_t)t.long_start_time << 32) | t.start_time);
+    uint64_t target_us = start_us + _xtimer_usec_from_ticks64(
+        ((uint64_t)t.long_offset) << 32 | t.offset);
+
+    /* Let's assume that 64bit won't overflow anytime soon. There'd be >580
+     * years when counting nanoseconds. With microseconds, there are 580000
+     * years of space in 2**64... */
+    if (now_us > target_us) {
+        return 0;
+    }
+
+    return target_us - now_us;
+}
