@@ -124,8 +124,8 @@ static void _notify_link_speed(usbus_cdcecm_device_t *cdcecm)
     notification->setup.index = cdcecm->iface_ctrl.idx;
     notification->setup.length = 8;
 
-    notification->down = USBUS_CDC_ECM_CONFIG_SPEED_DOWNSTREAM;
-    notification->up = USBUS_CDC_ECM_CONFIG_SPEED_UPSTREAM;
+    notification->down = CONFIG_USBUS_CDC_ECM_CONFIG_SPEED_DOWNSTREAM;
+    notification->up = CONFIG_USBUS_CDC_ECM_CONFIG_SPEED_UPSTREAM;
     usbdev_ep_ready(cdcecm->ep_ctrl->ep,
                     sizeof(usb_desc_cdcecm_speed_t));
     cdcecm->notif = USBUS_CDCECM_NOTIF_SPEED;
