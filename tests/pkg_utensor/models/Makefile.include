@@ -1,5 +1,5 @@
 # Use an immediate variable to evaluate `MAKEFILE_LIST` now
-USEMODULE_INCLUDES_models := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
+USEMODULE_INCLUDES_models := $(MAKEFILEDIR)
 USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_models)
 
 CXXEXFLAGS += -Wno-unused-parameter
