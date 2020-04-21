@@ -75,7 +75,7 @@ extern "C" {
 
 /**
  * @name FXOS8700 configuration
- * Note that another fxos8700 operation option, FXOS8700_USE_ACC_RAW_VALUES,
+ * Note that another fxos8700 operation option, CONFIG_FXOS8700_USE_ACC_RAW_VALUES,
  * need to be set according to the application purposes
  * @{
  */

@@ -44,11 +44,11 @@ extern "C" {
 /**
  * @brief   Default raw value mode for accelerator
  *
- * If set to 0, measurements will be converted to mg.
- * If set to 1, raw adc readings will be returned.
+ * Set this to 1 to return raw ADC readings. Otherwise measurements
+ * will be converted to mg.
  */
-#ifndef FXOS8700_USE_ACC_RAW_VALUES
-#define FXOS8700_USE_ACC_RAW_VALUES (0)
+#ifdef DOXYGEN
+#define CONFIG_FXOS8700_USE_ACC_RAW_VALUES
 #endif
 /** @} */
 
