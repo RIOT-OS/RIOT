@@ -53,9 +53,9 @@ int modbus_rtu_init(modbus_rtu_t *modbus) {
   if (err != UART_OK) {
     return err;
   }
-  if (modbus->pin_tx) {
-    gpio_init(modbus->pin_tx, GPIO_OUT);
-    gpio_write(modbus->pin_tx, !modbus->pin_tx_enable);
+  if (modbus->pin_rts) {
+    gpio_init(modbus->pin_rts, GPIO_OUT);
+    gpio_write(modbus->pin_rts, !modbus->pin_rts_enable);
   }
   mutex_init(&(modbus->_mutex_buffer));
   // usec in sec / byte per second * 1.5
@@ -266,7 +266,6 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message
     modbus->_buffer[2] = modbus->_msg->count * 2; // calc size for send
     modbus->_size_buffer = 3 + modbus->_buffer[2];
     memcpy(modbus->_buffer + 3, modbus->_msg->regs, modbus->_size_buffer);
-    // printf("buff size: %u \n", modbus->_size_buffer);
     break;
   case MB_FC_WRITE_REGISTERS:
     modbus->_buffer[ADD_HI] = highByte(modbus->_msg->addr);
@@ -298,14 +297,14 @@ static inline void send(modbus_rtu_t *modbus) {
 }
 
 static inline void enamdle_trasmit(modbus_rtu_t *modbus) {
-  if (modbus->pin_tx) {
-    gpio_write(modbus->pin_tx, modbus->pin_tx_enable);
+  if (modbus->pin_rts) {
+    gpio_write(modbus->pin_rts, modbus->pin_rts_enable);
   }
 }
 
 static inline void disamdle_trasmit(modbus_rtu_t *modbus) {
-  if (modbus->pin_tx) {
-    gpio_write(modbus->pin_tx, !modbus->pin_tx_enable);
+  if (modbus->pin_rts) {
+    gpio_write(modbus->pin_rts, !modbus->pin_rts_enable);
   }
 }
 

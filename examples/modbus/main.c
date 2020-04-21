@@ -35,8 +35,8 @@ static void init_master(void) {
   master.baudrate = BAUDRATE;
   master.timeout = 1000000;
   master.id = 0;
-  master.pin_tx = GPIO_PIN(PORT_A, 1);
-  master.pin_tx_enable = 0;
+  master.pin_rts = GPIO_PIN(PORT_A, 1);
+  master.pin_rts_enable = 0;
 
   if (modbus_rtu_init(&master)) {
     puts("fail UART init");
@@ -57,7 +57,7 @@ static void *thread_master(void *arg __attribute__((unused))) {
     message_master.regs = regs_master1;
     message_master.func = MB_FC_WRITE_REGISTERS;
     res = modbus_rtu_send_request(&master, &message_master);
-    assert(message_slave.count == message_master.count);
+    // assert(message_slave.count == message_master.count);
     if (res) {
       printf("fail request write %d\n", res);
     } else {
@@ -68,7 +68,7 @@ static void *thread_master(void *arg __attribute__((unused))) {
       message_master.regs = regs_master2;
       message_master.func = MB_FC_READ_REGISTERS;
       res = modbus_rtu_send_request(&master, &message_master);
-      assert(message_slave.count == message_master.count);
+      // assert(message_slave.count == message_master.count);
       if (res || memcmp(regs_master1, regs_master2, message_master.count * 2) != 0) {
         printf("fail request read %d\n", res);
       } else {
@@ -83,8 +83,8 @@ static void init_slave(void) {
   slave.uart = UART_DEV(0);
   slave.baudrate = BAUDRATE;
   slave.id = SLAVE_ID;
-  slave.pin_tx = GPIO_PIN(PORT_B, 15);
-  master.pin_tx_enable = 0;
+  slave.pin_rts = GPIO_PIN(PORT_B, 15);
+  slave.pin_rts_enable = 1;
 
   if (modbus_rtu_init(&slave)) {
     puts("fail UART init");
