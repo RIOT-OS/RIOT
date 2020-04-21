@@ -734,10 +734,14 @@ void gcoap_register_listener(gcoap_listener_t *listener);
 /**
  * @brief   Initializes a CoAP request PDU on a buffer.
  *
+ * If @p code is COAP_CODE_EMPTY, prepares a complete "CoAP ping" 4 byte empty
+ * message request, ready to send.
+ *
  * @param[out] pdu      Request metadata
  * @param[out] buf      Buffer containing the PDU
  * @param[in] len       Length of the buffer
- * @param[in] code      Request code, one of COAP_METHOD_XXX
+ * @param[in] code      Request code, one of COAP_METHOD_XXX or COAP_CODE_EMPTY
+ *                      to ping
  * @param[in] path      Resource path, may be NULL
  *
  * @pre @p path must start with `/` if not NULL

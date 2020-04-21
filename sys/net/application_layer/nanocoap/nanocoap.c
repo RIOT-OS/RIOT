@@ -69,6 +69,15 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     pkt->payload = NULL;
     pkt->payload_len = 0;
 
+    if (len < sizeof(coap_hdr_t)) {
+        DEBUG("msg too short\n");
+        return -EBADMSG;
+    }
+    else if ((coap_get_code_raw(pkt) == 0) && (len > sizeof(coap_hdr_t))) {
+        DEBUG("empty msg too long\n");
+        return -EBADMSG;
+    }
+
     /* token value (tkl bytes) */
     if (coap_get_token_len(pkt)) {
         pkt->token = pkt_pos;

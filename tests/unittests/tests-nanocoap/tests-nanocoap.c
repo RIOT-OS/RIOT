@@ -713,6 +713,38 @@ static void test_nanocoap__options_get_opaque(void)
     TEST_ASSERT_EQUAL_INT(-ENOENT, optlen);
 }
 
+/*
+ * Validates empty message parsing.
+ */
+static void test_nanocoap__empty(void)
+{
+    /* first four bytes are valid empty msg; include 5th byte for test */
+    static uint8_t pkt_data[] = {
+        0x40, 0x00, 0xAB, 0xCD, 0x00
+    };
+
+    uint16_t msgid = 0xABCD;
+
+    coap_pkt_t pkt;
+    int res = coap_parse(&pkt, pkt_data, 4);
+
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(0, coap_get_code_raw(&pkt));
+    TEST_ASSERT_EQUAL_INT(msgid, coap_get_id(&pkt));
+    TEST_ASSERT_EQUAL_INT(0, coap_get_token_len(&pkt));
+    TEST_ASSERT_EQUAL_INT(0, pkt.payload_len);
+
+    /* too short */
+    memset(&pkt, 0, sizeof(coap_pkt_t));
+    res = coap_parse(&pkt, pkt_data, 3);
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, res);
+
+    /* too long */
+    memset(&pkt, 0, sizeof(coap_pkt_t));
+    res = coap_parse(&pkt, pkt_data, 5);
+    TEST_ASSERT_EQUAL_INT(-EBADMSG, res);
+}
+
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -736,6 +768,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__server_reply_simple_con),
         new_TestFixture(test_nanocoap__server_option_count_overflow_check),
         new_TestFixture(test_nanocoap__server_option_count_overflow),
+        new_TestFixture(test_nanocoap__empty),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);

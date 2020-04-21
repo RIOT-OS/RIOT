@@ -150,16 +150,29 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
             return;
         }
 
-        if (pdu.hdr->code == COAP_CODE_EMPTY) {
-            DEBUG("gcoap: empty messages not handled yet\n");
-            return;
-        }
-
         /* validate class and type for incoming */
         switch (coap_get_code_class(&pdu)) {
-        /* incoming request */
+        /* incoming request or empty */
         case COAP_CLASS_REQ:
-            if (coap_get_type(&pdu) == COAP_TYPE_NON
+            if (coap_get_code_raw(&pdu) == COAP_CODE_EMPTY) {
+                /* ping request */
+                if (coap_get_type(&pdu) == COAP_TYPE_CON) {
+                    coap_hdr_set_type(pdu.hdr, COAP_TYPE_RST);
+
+                    ssize_t bytes = sock_udp_send(sock, _listen_buf,
+                                                  sizeof(coap_hdr_t), &remote);
+                    if (bytes <= 0) {
+                        DEBUG("gcoap: ping response failed: %d\n", (int)bytes);
+                    }
+                } else if (coap_get_type(&pdu) == COAP_TYPE_NON) {
+                    DEBUG("gcoap: empty NON msg\n");
+                }
+                else {
+                    goto empty_as_response;
+                }
+            }
+            /* normal request */
+            else if (coap_get_type(&pdu) == COAP_TYPE_NON
                     || coap_get_type(&pdu) == COAP_TYPE_CON) {
                 size_t pdu_len = _handle_req(&pdu, _listen_buf, sizeof(_listen_buf),
                                              &remote);
@@ -175,6 +188,10 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
                 DEBUG("gcoap: illegal request type: %u\n", coap_get_type(&pdu));
             }
             break;
+
+empty_as_response:
+            DEBUG("gcoap: empty ack/reset not handled yet\n");
+            return;
 
         /* incoming response */
         case COAP_CLASS_SUCCESS:
@@ -640,22 +657,28 @@ int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
     pdu->hdr = (coap_hdr_t *)buf;
 
     /* generate token */
+    uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
+    ssize_t res;
+    if (code) {
 #if CONFIG_GCOAP_TOKENLEN
-    uint8_t token[CONFIG_GCOAP_TOKENLEN];
-    for (size_t i = 0; i < CONFIG_GCOAP_TOKENLEN; i += 4) {
-        uint32_t rand = random_uint32();
-        memcpy(&token[i],
-               &rand,
-               (CONFIG_GCOAP_TOKENLEN - i >= 4) ? 4 : CONFIG_GCOAP_TOKENLEN - i);
-    }
-    uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
-    ssize_t res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &token[0],
-                                 CONFIG_GCOAP_TOKENLEN, code, msgid);
+        uint8_t token[CONFIG_GCOAP_TOKENLEN];
+        for (size_t i = 0; i < CONFIG_GCOAP_TOKENLEN; i += 4) {
+            uint32_t rand = random_uint32();
+            memcpy(&token[i],
+                   &rand,
+                   (CONFIG_GCOAP_TOKENLEN - i >= 4) ? 4 : CONFIG_GCOAP_TOKENLEN - i);
+        }
+        res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, &token[0],
+                             CONFIG_GCOAP_TOKENLEN, code, msgid);
 #else
-    uint16_t msgid = (uint16_t)atomic_fetch_add(&_coap_state.next_message_id, 1);
-    ssize_t res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, NULL,
-                                 CONFIG_GCOAP_TOKENLEN, code, msgid);
+        res = coap_build_hdr(pdu->hdr, COAP_TYPE_NON, NULL,
+                             CONFIG_GCOAP_TOKENLEN, code, msgid);
 #endif
+    }
+    else {
+        /* ping request */
+        res = coap_build_hdr(pdu->hdr, COAP_TYPE_CON, NULL, 0, code, msgid);
+    }
 
     coap_pkt_init(pdu, buf, len - CONFIG_GCOAP_REQ_OPTIONS_BUF, res);
     if (path != NULL) {
