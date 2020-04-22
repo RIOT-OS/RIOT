@@ -4,6 +4,10 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+menu "Actuator Device Drivers"
+rsource "motor_driver/Kconfig"
+endmenu # Actuator Device Drivers
+
 menu "Network Device Drivers"
 rsource "at86rf215/Kconfig"
 rsource "cc110x/Kconfig"
