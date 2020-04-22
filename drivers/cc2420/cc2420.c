@@ -214,7 +214,9 @@ int cc2420_rx(cc2420_t *dev, uint8_t *buf, size_t max_len, void *info)
 
         if (info != NULL) {
             netdev_ieee802154_rx_info_t *radio_info = info;
-            radio_info->crc_valid = (crc_corr & CC2420_CRCCOR_CRC_MASK);
+            if(crc_corr & CC2420_CRCCOR_CRC_MASK) {
+                radio_info->flags |= NETDEV_RX_INFO_FLAGS_CRC_VALID;
+            }
             radio_info->rssi = CC2420_RSSI_OFFSET + rssi;
             radio_info->lqi = crc_corr & CC2420_CRCCOR_COR_MASK;
         }
