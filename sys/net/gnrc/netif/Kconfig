@@ -4,13 +4,24 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_GNRC_NETIF
-    bool "Configure GNRC network interface"
-    depends on MODULE_GNRC_NETIF
+menuconfig MOD_GNRC_NETIF
+    bool "GNRC Network Interface"
+    default y
+    select MOD_L2UTIL
+    select MOD_FMT
+    select MOD_NETIF
+    select HAVE_NETSTATS_L2
     help
-        Configure GNRC network interface using Kconfig.
+        This module implements the Network Interface for the GNRC stack.
 
-if KCONFIG_MODULE_GNRC_NETIF
+if MOD_GNRC_NETIF
+
+config MOD_AUTO_INIT_GNRC_NETIF
+    bool "Auto-init GNRC Network Interface"
+    default y if MOD_AUTO_INIT
+    select MOD_GNRC_NETIF_INIT_DEVS
+
+menu "Interfaces options"
 
 config GNRC_NETIF_MSG_QUEUE_SIZE_EXP
     int "Exponent for the message queue size for network interface threads (as 2^n)"
@@ -42,10 +53,17 @@ config GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
 
 config GNRC_NETIF_NONSTANDARD_6LO_MTU
     bool "Enable usage of non standard MTU for 6LoWPAN network interfaces"
-    depends on MODULE_GNRC_NETIF_6LO
+    depends on MOD_GNRC_NETIF_6LO
     help
         Enables the usage of non standard MTU for 6LoWPAN network interfaces.
         This is non compliant with RFC 4944 and might not be supported by other
         implementations.
 
-endif # KCONFIG_MODULE_GNRC_NETIF
+endmenu # Interfaces options"
+
+rsource "hdr/Kconfig"
+rsource "init_devs/Kconfig"
+
+# include particular technologies
+rsource "ieee802154/Kconfig"
+endif # MOD_GNRC_NETIF
