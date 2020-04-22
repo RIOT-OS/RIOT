@@ -5,5 +5,7 @@
 # directory for more details.
 #
 
-rsource "icmpv6/Kconfig"
-rsource "ipv6/Kconfig"
+config MOD_ICMPV6
+    bool
+    help
+        Stack-independent ICMPv6 functionalities.
