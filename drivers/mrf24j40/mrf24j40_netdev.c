@@ -136,7 +136,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             radio_info->rssi = mrf24j40_dbm_from_reg(rssi_scalar);
             /* the driver currently does not support Packet Error Mode 
                so only packets with valid crc are accepted */
-            radio_info->crc_valid = 1;
+            radio_info->flags |= NETDEV_RX_INFO_FLAGS_CRC_VALID;
         }
         res = pkt_len;
     }
