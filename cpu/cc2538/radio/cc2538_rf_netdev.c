@@ -365,7 +365,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             corr_val = CC2538_CORR_VAL_MAX;
         }
 
-        radio_info->crc_valid = 1;
+        radio_info->flags |= NETDEV_RX_INFO_FLAGS_CRC_VALID;
         /* Interpolate the correlation value between 0 - 255
          * to provide an LQI value */
         radio_info->lqi = 255 * (corr_val - CC2538_CORR_VAL_MIN) /
