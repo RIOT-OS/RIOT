@@ -230,7 +230,9 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
         crc = (rx_status & AT86RF2XX_PHY_RSSI_MASK__RX_CRC_VALID);
         at86rf2xx_fb_stop(dev);
 #endif
-        radio_info->crc_valid = crc;
+        if (crc) {
+            radio_info->flags |= NETDEV_RX_INFO_FLAGS_CRC_VALID;
+        }
         radio_info->rssi = RSSI_BASE_VAL + ed;
         DEBUG("[at86rf2xx] LQI:%d high is good, RSSI:%d high is either good or"
               "too much interference.\n", radio_info->lqi, radio_info->rssi);
