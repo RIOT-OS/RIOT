@@ -1,0 +1,14 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+config MOD_GNRC_NETIF_IEEE802154
+    bool "GNRC IEEE 802.15.4 interface"
+    default HAVE_RADIO_IEEE802154
+    depends on MOD_NETDEV_IEEE802154
+    help
+        Control IEEE 802.15.4 interfaces when using GNRC stack. This will be
+        enabled by default when a compatible device is found and the stack is
+        being used.
