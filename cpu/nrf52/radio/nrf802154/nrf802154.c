@@ -403,7 +403,7 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
              * match real world performance better */
             radio_info->rssi = (int16_t)hwlqi + ED_RSSIOFFS;
             /* Only frames with CRCSTATUS == CRCOK are processed */
-            radio_info->crc_valid = 1;
+            radio_info->flags |= NETDEV_RX_INFO_FLAGS_CRC_VALID;
         }
     }
 
