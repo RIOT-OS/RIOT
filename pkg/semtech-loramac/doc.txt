@@ -126,8 +126,6 @@
  *         loramac.rx_data.payload[loramac.rx_data.payload_len] = 0;
  *         printf("Data received: %s, port: %d\n",
  *                (char *)loramac.rx_data.payload, loramac.rx_data.port);
- *         }
- *
  *     }
  *     return NULL;
  * }
