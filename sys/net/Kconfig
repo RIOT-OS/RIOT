@@ -38,6 +38,7 @@ rsource "application_layer/Kconfig"
 rsource "credman/Kconfig"
 rsource "crosslayer/Kconfig"
 rsource "netif/Kconfig"
+rsource "network_layer/Kconfig"
 rsource "sock/Kconfig"
 rsource "link_layer/Kconfig"
 
