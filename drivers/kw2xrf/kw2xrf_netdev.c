@@ -195,7 +195,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     if (info != NULL) {
         netdev_ieee802154_rx_info_t *radio_info = info;
         /* MKW2XDM_PHY_CTRL2_CRC_MSK is set so only valid CRC frames are reported */
-        radio_info->crc_valid = 1;
+        radio_info->flags |= NETDEV_RX_INFO_FLAGS_CRC_VALID;
         radio_info->lqi = ((uint8_t*)buf)[pkt_len];
         radio_info->rssi = kw2xrf_get_rssi(radio_info->lqi);
     }
