@@ -5,5 +5,9 @@
 # directory for more details.
 #
 
-rsource "addr/Kconfig"
-rsource "hdr/Kconfig"
+config MOD_IPV6_HDR
+    bool "IPv6 header functionalities"
+    select MOD_IPV6_ADDR
+    select MOD_INET_CSUM
+    help
+        Stack-independent module with IPv6 header functionalities.
