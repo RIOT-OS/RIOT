@@ -24,6 +24,7 @@
 #include "periph_cpu.h"
 #include "f4/cfg_clock_100_8_1.h"
 #include "cfg_i2c1_pb8_pb9.h"
+#include "cfg_rtt_default.h"
 #include "cfg_timer_tim5.h"
 #include "cfg_usb_otg_fs.h"
 
@@ -217,8 +218,9 @@ static const spi_conf_t spi_config[] = {
  * @name    RTT configuration
  * @{
  */
+#ifndef RTT_FREQUENCY
 #define RTT_FREQUENCY       (4096)
-#define RTT_MAX_VALUE       (0xffff)
+#endif
 /** @} */
 
 #ifdef __cplusplus
