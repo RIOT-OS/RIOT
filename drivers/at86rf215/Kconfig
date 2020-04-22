@@ -1,0 +1,41 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_MODULE_AT86RF215
+    bool "Configure AT86RF215 driver"
+    depends on MODULE_AT86RF215
+    help
+        Configure the AT86RF215 driver using Kconfig.
+
+if KCONFIG_MODULE_AT86RF215
+
+config AT86RF215_USE_CLOCK_OUTPUT
+    bool "Enable clock output"
+    help
+        Enable this to enable the clock output pin of the AT86RF215 chip.
+        This way it can be used as a clock source in place of a separate crystal.
+        You also have to enable this if you want to measure the clock frequency
+        for trimming. After proper trim value is applied this may be disabled
+        if not used otherwise.
+        By Default it is turned off to save energy.
+
+config AT86RF215_TRIM_VAL_EN
+    bool "Enable crystal oscillator trimming"
+    help
+        Enable crystal oscillator trimming.
+
+config AT86RF215_TRIM_VAL
+    int "Trim value for the crystal oscillator"
+    range 0 15
+    default 0
+    depends on AT86RF215_TRIM_VAL_EN
+    help
+        Each increment adds 300nF capacitance between the crystal oscillator pins
+        TCXO and XTAL2.Tweak the value until the measured clock output matches
+        26 MHz the best.
+        For more information Refer Table 6-25 TRIM in Datasheet
+
+endif # KCONFIG_MODULE_AT86RF215

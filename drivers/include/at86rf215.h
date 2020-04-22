@@ -71,11 +71,11 @@ typedef void (*at86rf215_batmon_cb_t)(void *arg);
  *          as a clock source on the board.
  *          Otherwise it is turned off to save energy.
  */
-#ifndef AT86RF215_USE_CLOCK_OUTPUT
-#define AT86RF215_USE_CLOCK_OUTPUT      (0)
+#ifdef DOXYGEN
+#define CONFIG_AT86RF215_USE_CLOCK_OUTPUT
 #endif
 
-#if defined(DOXYGEN) && !defined(AT86RF215_TRIM_VAL)
+#if defined(DOXYGEN) && !defined(CONFIG_AT86RF215_TRIM_VAL)
 /**
  * @brief   Trim value for the external crystal oscillator.
  *
@@ -84,11 +84,11 @@ typedef void (*at86rf215_batmon_cb_t)(void *arg);
  *
  *          Range: 0..15
  *
- *          Use in conjunction with @see AT86RF215_USE_CLOCK_OUTPUT and a frequency
+ *          Use in conjunction with @see CONFIG_AT86RF215_USE_CLOCK_OUTPUT and a frequency
  *          meter connected to the clock output pin of the AT86RF215.
  *          Tweak the value until the measured clock output matches 26 MHz the best.
  */
-#define AT86RF215_TRIM_VAL              (0)
+#define CONFIG_AT86RF215_TRIM_VAL              (0)
 #endif
 /** @} */
 
