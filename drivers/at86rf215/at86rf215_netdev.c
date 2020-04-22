@@ -183,8 +183,9 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     if (info != NULL) {
         netdev_ieee802154_rx_info_t *radio_info = info;
         radio_info->rssi = (int8_t) at86rf215_reg_read(dev, dev->RF->RG_EDV);
-        radio_info->crc_valid = at86rf215_reg_read(dev, dev->BBC->RG_PC) & \
-            PC_FCSOK_MASK;
+        if (at86rf215_reg_read(dev, dev->BBC->RG_PC) & PC_FCSOK_MASK) {
+            radio_info->flags |= NETDEV_RX_INFO_FLAGS_CRC_VALID;
+        }
     }
 
     return pkt_len;
