@@ -76,7 +76,9 @@ static netdev_event_t cc110x_rx_done(cc110x_t *dev)
 
     /* Allthough there is a CRC_OK bit the dirver currently drops all frames
        with invalid CRC */
-    dev->rx_info.crc_valid = (uint8_t)lqi_crc & 0x80;
+    if ((uint8_t)lqi_crc & 0x80) {
+        dev->rx_info.flags |= NETDEV_RX_INFO_FLAGS_CRC_VALID;
+    }
 
     /* Use the formula in section 17.3 on page 44 in the data sheet to obtain
      * the correct RSSI value in dBm.
