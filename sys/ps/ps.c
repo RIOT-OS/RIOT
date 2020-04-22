@@ -40,6 +40,7 @@ static const char *state_names[] = {
     [STATUS_ZOMBIE] = "zombie",
     [STATUS_MUTEX_BLOCKED] = "bl mutex",
     [STATUS_RECEIVE_BLOCKED] = "bl rx",
+    [STATUS_RECEIVE_BUS_BLOCKED] = "bl rx bus",
     [STATUS_SEND_BLOCKED] = "bl send",
     [STATUS_REPLY_BLOCKED] = "bl reply",
     [STATUS_FLAG_BLOCKED_ANY] = "bl anyfl",

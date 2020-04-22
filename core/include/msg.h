@@ -363,6 +363,47 @@ int msg_reply_int(msg_t *m, msg_t *reply);
 int msg_avail(void);
 
 /**
+ * @brief Receive a message from the global message bus.
+ *
+ * This function blocks until an event of a matching type was posted on the bus.
+ *
+ * @param[out] m    Pointer to preallocated ``msg_t`` structure, must not be
+ *                  NULL.
+ * @param[in] array An array of event types types to listen to
+ * @param[in] len   Number of array elements
+ *
+ */
+void msg_bus_receive(msg_t *m, const uint16_t *array, uint8_t len);
+
+/**
+ * @brief Receive a message of ``type`` from the global message bus.
+ *
+ * This function blocks until an event of a matching type was posted on the bus.
+ *
+ * @param[out] m    Pointer to preallocated ``msg_t`` structure, must not be
+ *                  NULL.
+ * @param[in] type  The message type to listen to.
+ *
+ */
+static inline void msg_bus_receive_single(msg_t *m, uint16_t type) {
+    msg_bus_receive(m, &type, 1);
+}
+
+/**
+ * @brief Post an event of ``type`` to the global message bus.
+ *
+ * The function will wake up all threads waiting for a message of
+ * type @p type.
+ *
+ * @param[in] type  The message type to send.
+ * @param[in] arg   Optional message argument.
+ *
+ * @return          The number of threads that received the message.
+ *
+ */
+int msg_bus_post(uint16_t type, void *arg);
+
+/**
  * @brief Initialize the current thread's message queue.
  *
  * @pre @p num **MUST BE A POWER OF TWO!**

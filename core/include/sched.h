@@ -105,6 +105,7 @@ typedef enum {
     STATUS_SLEEPING,                /**< sleeping                                 */
     STATUS_MUTEX_BLOCKED,           /**< waiting for a locked mutex               */
     STATUS_RECEIVE_BLOCKED,         /**< waiting for a message                    */
+    STATUS_RECEIVE_BUS_BLOCKED,     /**< waiting for a broadcast message          */
     STATUS_SEND_BLOCKED,            /**< waiting for message to be delivered      */
     STATUS_REPLY_BLOCKED,           /**< waiting for a message response           */
     STATUS_FLAG_BLOCKED_ANY,        /**< waiting for any flag from flag_mask      */
