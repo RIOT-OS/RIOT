@@ -25,7 +25,7 @@ else ifeq ($(RIOT_TERMINAL),miniterm)
   TERMPROG  ?= miniterm.py
   # The RIOT shell will still transmit back a CRLF, but at least with --eol LF
   # we avoid sending two lines on every "enter".
-  TERMFLAGS ?= --eol LF "$(PORT)" "$(BAUD)"
+  TERMFLAGS ?= --eol LF "$(PORT)" "$(BAUD)" $(MINITERMFLAGS)
 else ifeq ($(RIOT_TERMINAL),jlink)
   TERMPROG = $(RIOTTOOLS)/jlink/jlink.sh
   TERMFLAGS = term-rtt
