@@ -1,0 +1,13 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MOD_GNRC_NDP
+    bool "IPv6 Neighbor Discovery support"
+    default y
+    depends on MOD_GNRC_ICMPV6
+    depends on MOD_GNRC_NETIF
+    depends on MOD_GNRC_IPV6_NIB
