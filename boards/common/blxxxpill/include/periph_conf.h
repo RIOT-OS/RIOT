@@ -66,8 +66,6 @@ extern "C" {
 #define ADC_CONFIG {                                     \
     { .dev = 0, .pin = GPIO_PIN(PORT_A, 0), .chan = 0 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_A, 1), .chan = 1 }, \
-    { .dev = 0, .pin = GPIO_PIN(PORT_A, 2), .chan = 2 }, \
-    { .dev = 0, .pin = GPIO_PIN(PORT_A, 3), .chan = 3 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_A, 4), .chan = 4 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_A, 5), .chan = 5 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_A, 6), .chan = 6 }, \
@@ -80,7 +78,7 @@ extern "C" {
     { .dev = 0, .pin = GPIO_UNDEF, .chan = 17 },         \
 }
 
-#define ADC_NUMOF           12
+#define ADC_NUMOF           10
 /** @} */
 
 /**
