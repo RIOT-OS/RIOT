@@ -36,6 +36,7 @@ rsource "gnrc/Kconfig"
 
 rsource "application_layer/Kconfig"
 rsource "credman/Kconfig"
+rsource "crosslayer/Kconfig"
 rsource "netif/Kconfig"
 rsource "sock/Kconfig"
 rsource "link_layer/Kconfig"
