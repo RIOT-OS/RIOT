@@ -233,6 +233,16 @@ typedef struct {
 #define PERIPH_I2C_NEED_WRITE_REG
 /** @} */
 
+/**
+ * Enable yday and wday calculation in rtc_normalize().
+ * Those fields are used by the RTC.
+ * @{
+ */
+#if defined(MODULE_PERIPH_RTC) && !defined(RTC_NORMALIZE_COMPAT)
+#define RTC_NORMALIZE_COMPAT    (1)
+#endif
+/* @} */
+
 #ifdef __cplusplus
 }
 #endif
