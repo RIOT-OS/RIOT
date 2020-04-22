@@ -132,7 +132,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_netif_hdr_t *hdr = netif_snip->data;
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
-            if (rx_info.crc_valid) {
+            if (rx_info.flags & NETDEV_RX_INFO_FLAGS_CRC_VALID) {
                 hdr->flags |= GNRC_NETIF_HDR_FLAGS_CRC_VALID;
             }
             gnrc_netif_hdr_set_netif(hdr, netif);
@@ -195,7 +195,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
-            if (rx_info.crc_valid) {
+            if (rx_info.flags & NETDEV_RX_INFO_FLAGS_CRC_VALID) {
                 hdr->flags |= GNRC_NETIF_HDR_FLAGS_CRC_VALID;
             }
             gnrc_netif_hdr_set_netif(hdr, netif);
