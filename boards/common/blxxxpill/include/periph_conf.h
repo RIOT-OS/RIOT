@@ -66,14 +66,16 @@ extern "C" {
 #define ADC_CONFIG {                                     \
     { .dev = 0, .pin = GPIO_PIN(PORT_A, 0), .chan = 0 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_A, 1), .chan = 1 }, \
-    { .dev = 0, .pin = GPIO_PIN(PORT_A, 2), .chan = 2 }, \
-    { .dev = 0, .pin = GPIO_PIN(PORT_A, 3), .chan = 3 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_A, 4), .chan = 4 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_A, 5), .chan = 5 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_A, 6), .chan = 6 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_A, 7), .chan = 7 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_B, 0), .chan = 8 }, \
     { .dev = 0, .pin = GPIO_PIN(PORT_B, 1), .chan = 9 }, \
+    /* ADC Temperature channel */                        \
+    { .dev = 0, .pin = GPIO_UNDEF, .chan = 16 },         \
+    /* ADC VREF channel */                               \
+    { .dev = 0, .pin = GPIO_UNDEF, .chan = 17 },         \
 }
 
 #define ADC_NUMOF           10

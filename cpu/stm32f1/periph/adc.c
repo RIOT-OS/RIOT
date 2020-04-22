@@ -57,10 +57,25 @@ static inline void prep(adc_t line)
 {
     mutex_lock(&locks[adc_config[line].dev]);
     periph_clk_en(APB2, (RCC_APB2ENR_ADC1EN << adc_config[line].dev));
+
+    /* enable the ADC module */
+    dev(line)->CR2 |= ADC_CR2_ADON;
+
+    /* check if this channel is an internal ADC channel, if so
+     * enable the internal temperature and Vref */
+    if (adc_config[line].chan == 16 || adc_config[line].chan == 17) {
+        dev(line)->CR2 |= ADC_CR2_TSVREFE;
+    }
 }
 
 static inline void done(adc_t line)
 {
+    /* disable the internal temperature and Vref */
+    dev(line)->CR2 &= ~ADC_CR2_TSVREFE;
+
+    /* disable the ADC module */
+    dev(line)->CR2 &= ~ADC_CR2_ADON;
+
     periph_clk_dis(APB2, (RCC_APB2ENR_ADC1EN << adc_config[line].dev));
     mutex_unlock(&locks[adc_config[line].dev]);
 }
@@ -78,7 +93,9 @@ int adc_init(adc_t line)
     prep(line);
 
     /* configure the pin */
-    gpio_init_analog(adc_config[line].pin);
+    if (adc_config[line].pin != GPIO_UNDEF) {
+        gpio_init_analog(adc_config[line].pin);
+    }
     /* set clock prescaler to get the maximal possible ADC clock value */
     for (clk_div = 2; clk_div < 8; clk_div += 2) {
         if ((CLOCK_CORECLOCK / clk_div) <= MAX_ADC_SPEED) {
@@ -87,9 +104,6 @@ int adc_init(adc_t line)
     }
     RCC->CFGR &= ~(RCC_CFGR_ADCPRE);
     RCC->CFGR |= ((clk_div / 2) - 1) << 14;
-
-    /* enable the ADC module */
-    dev(line)->CR2 |= ADC_CR2_ADON;
 
     /* resets the selected ADC calibration registers */
     dev(line)->CR2 |= ADC_CR2_RSTCAL;
@@ -109,15 +123,11 @@ int adc_init(adc_t line)
     /* start sampling from software */
     dev(line)->CR2 |= ADC_CR2_EXTTRIG | ADC_CR2_EXTSEL;
 
-    /* check if this channel is an internal ADC channel, if so
-     * enable the internal temperature and Vref */
+    /* check if the internal channels are configured to use ADC1 */
     if (adc_config[line].chan == 16 || adc_config[line].chan == 17) {
-        /* check if the internal channels are configured to use ADC1 */
         if (dev(line) != ADC1) {
             return -3;
         }
-
-        dev(line)->CR2 |= ADC_CR2_TSVREFE;
     }
 
     /* free the device again */
