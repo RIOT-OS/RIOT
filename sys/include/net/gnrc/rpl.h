@@ -338,11 +338,11 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
  */
 #define CONFIG_GNRC_RPL_DAO_DELAY_LONG     (60000UL)
 #endif
-#ifndef GNRC_RPL_DAO_DELAY_DEFAULT
+#ifndef CONFIG_GNRC_RPL_DAO_DELAY_DEFAULT
 /**
  * @brief Default delay for DAOs in milli seconds
  */
-#define GNRC_RPL_DAO_DELAY_DEFAULT  (1000UL)
+#define CONFIG_GNRC_RPL_DAO_DELAY_DEFAULT  (1000UL)
 #endif
 #ifndef GNRC_RPL_DAO_DELAY_JITTER
 /**
