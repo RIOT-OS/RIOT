@@ -69,8 +69,8 @@ extern "C" {
  * If set to 0x45 the ADDR PIN should be connected to VDD.
  * For more information on SerialBus Address, refer section 7.3.4.1 in datasheet.
  */
-#ifndef OPT3001_I2C_ADDRESS
-#define OPT3001_I2C_ADDRESS   (0x45)
+#ifndef CONFIG_OPT3001_I2C_ADDRESS
+#define CONFIG_OPT3001_I2C_ADDRESS   (0x45)
 #endif
 
 /**
@@ -79,8 +79,8 @@ extern "C" {
  * If set to 0x0000, the conversion time will be 100ms.
  * If set to 0x0800, the conversion time will be 800ms
  */
-#ifndef OPT3001_CONVERSION_TIME
-#define OPT3001_CONVERSION_TIME   OPT3001_CONVERSION_TIME_800_MS
+#ifndef CONFIG_OPT3001_CONVERSION_TIME
+#define CONFIG_OPT3001_CONVERSION_TIME   OPT3001_CONVERSION_TIME_800_MS
 #endif
 /** @} */
 
