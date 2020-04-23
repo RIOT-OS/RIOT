@@ -101,6 +101,7 @@
 
 #include <string.h>
 #include <stdint.h>
+#include "kernel_defines.h"
 #include "net/gnrc.h"
 #include "net/gnrc/ipv6.h"
 #include "net/ipv6/addr.h"
@@ -216,6 +217,17 @@ extern "C" {
 #define GNRC_RPL_MOP_NON_STORING_MODE    (0x01)
 #define GNRC_RPL_MOP_STORING_MODE_NO_MC  (0x02)
 #define GNRC_RPL_MOP_STORING_MODE_MC     (0x03)
+
+/* translate Kconfig options to final value */
+#if IS_ACTIVE(CONFIG_GNRC_RPL_MOP_NO_DOWNWARD_ROUTES)
+#define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_NO_DOWNWARD_ROUTES
+#elif IS_ACTIVE(CONFIG_GNRC_RPL_MOP_NON_STORING_MODE)
+#define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_NON_STORING_MODE
+#elif IS_ACTIVE(CONFIG_GNRC_RPL_MOP_STORING_MODE_NO_MC)
+#define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_STORING_MODE_NO_MC
+#elif IS_ACTIVE(CONFIG_GNRC_RPL_MOP_STORING_MODE_MC)
+#define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_STORING_MODE_MC
+#endif
 
 /** default MOP set on compile time */
 #ifndef GNRC_RPL_DEFAULT_MOP
