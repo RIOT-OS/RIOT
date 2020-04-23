@@ -66,7 +66,7 @@
  *   The standard behaviour is to request a DODAG_CONF and join
  *   only a DODAG once a DODAG_CONF is received.
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
+ *   CFLAGS += -DCONFIG_GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - Set interface for auto-initialization if more than one

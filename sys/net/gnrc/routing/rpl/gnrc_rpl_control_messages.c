@@ -790,15 +790,16 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
         }
 
         if (!(included_opts & (((uint32_t) 1) << GNRC_RPL_OPT_DODAG_CONF))) {
-#ifndef GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
-            DEBUG("RPL: DIO without DODAG_CONF option - remove DODAG and request new DIO\n");
-            gnrc_rpl_instance_remove(inst);
-            gnrc_rpl_send_DIS(NULL, src, NULL, 0);
-            return;
-#else
-            DEBUG("RPL: DIO without DODAG_CONF option - use default trickle parameters\n");
-            gnrc_rpl_send_DIS(NULL, src, NULL, 0);
-#endif
+            if (!IS_ACTIVE(CONFIG_GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN)) {
+                DEBUG("RPL: DIO without DODAG_CONF option - remove DODAG and request new DIO\n");
+                gnrc_rpl_instance_remove(inst);
+                gnrc_rpl_send_DIS(NULL, src, NULL, 0);
+                return;
+            }
+            else {
+                DEBUG("RPL: DIO without DODAG_CONF option - use default trickle parameters\n");
+                gnrc_rpl_send_DIS(NULL, src, NULL, 0);
+            }
         }
 
         /* if there was no address created manually or by a PIO on the interface,
