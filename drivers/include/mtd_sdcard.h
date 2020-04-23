@@ -58,23 +58,23 @@ typedef struct {
  *          so enable this feature to ensure overriding the data.
  */
 #ifdef DOXYGEN
-#define MTD_SDCARD_ERASE
+#define CONFIG_MTD_SDCARD_ERASE
 #endif
 /** @} */
 
 /**
  * @brief   Enable Skip SDCard Erase
  * @note    SDCards handle sector erase internally so it's
- * possible to directly write to the card without erasing
- * the sector first.
- * Attention: an erase call will therefore NOT touch the content,
- * so disable this feature to ensure overriding the data.
- * 
- *  * @deprecated Use inverse @ref GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE instead.
- *             Will be removed after 2020.10 release.
+ *          possible to directly write to the card without erasing
+ *          the sector first.
+ *          Attention: an erase call will therefore NOT touch the content,
+ *          so disable this feature to ensure overriding the data.
+ *
+ *          @deprecated Use inverse @ref CONFIG_MTD_SDCARD_ERASE instead.
+ *          Will be removed after 2021.01 release.
  */
 #ifndef MTD_SDCARD_SKIP_ERASE
-#if IS_ACTIVE(MTD_SDCARD_ERASE)
+#if IS_ACTIVE(CONFIG_MTD_SDCARD_ERASE)
 #define MTD_SDCARD_SKIP_ERASE (0)
 #else
 #define MTD_SDCARD_SKIP_ERASE (1)
