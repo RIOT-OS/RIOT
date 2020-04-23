@@ -15,4 +15,5 @@ endmenu # Network Device Drivers
 menu "Sensor Device Drivers"
 rsource "ads101x/Kconfig"
 rsource "hdc1000/Kconfig"
+rsource "mma8x5x/Kconfig"
 endmenu # Sensor Device Drivers
