@@ -335,8 +335,8 @@ void gnrc_rpl_long_delay_dao(gnrc_rpl_dodag_t *dodag)
 {
     evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->dao_event);
     ((evtimer_event_t *)&(dodag->dao_event))->offset = random_uint32_range(
-        GNRC_RPL_DAO_DELAY_LONG,
-        GNRC_RPL_DAO_DELAY_LONG + GNRC_RPL_DAO_DELAY_JITTER
+        CONFIG_GNRC_RPL_DAO_DELAY_LONG,
+        CONFIG_GNRC_RPL_DAO_DELAY_LONG + GNRC_RPL_DAO_DELAY_JITTER
     );
     evtimer_add_msg(&gnrc_rpl_evtimer, &dodag->dao_event, gnrc_rpl_pid);
     dodag->dao_counter = 0;
