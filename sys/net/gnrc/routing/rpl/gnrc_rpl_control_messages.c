@@ -34,9 +34,7 @@
 #endif
 
 #include "net/gnrc/rpl.h"
-#ifndef GNRC_RPL_WITHOUT_VALIDATION
 #include "gnrc_rpl_internal/validation.h"
-#endif
 
 #ifdef MODULE_GNRC_RPL_P2P
 #include "net/gnrc/rpl/p2p_structs.h"
@@ -504,13 +502,11 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
     eui64_t iid;
     *included_opts = 0;
 
-#ifndef GNRC_RPL_WITHOUT_VALIDATION
-    if (!gnrc_rpl_validation_options(msg_type, inst, opt, len)) {
-        return false;
+    if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_VALIDATION)){
+        if (!gnrc_rpl_validation_options(msg_type, inst, opt, len)) {
+            return false;
+        }
     }
-#else
-    (void) msg_type;
-#endif
 
     while(l < len) {
         switch(opt->type) {
@@ -681,11 +677,11 @@ void gnrc_rpl_recv_DIS(gnrc_rpl_dis_t *dis, kernel_pid_t iface, ipv6_addr_t *src
     gnrc_rpl_netstats_rx_DIS(&gnrc_rpl_netstats, len, (dst && !ipv6_addr_is_multicast(dst)));
 #endif
 
-#ifndef GNRC_RPL_WITHOUT_VALIDATION
-    if (!gnrc_rpl_validation_DIS(dis, len)) {
-        return;
+    if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_VALIDATION)) {
+        if (!gnrc_rpl_validation_DIS(dis, len)) {
+            return;
+        }
     }
-#endif
 
     if (ipv6_addr_is_multicast(dst)) {
         for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
@@ -731,11 +727,11 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
     gnrc_rpl_netstats_rx_DIO(&gnrc_rpl_netstats, len, (dst && !ipv6_addr_is_multicast(dst)));
 #endif
 
-#ifndef GNRC_RPL_WITHOUT_VALIDATION
-    if (!gnrc_rpl_validation_DIO(dio, len)) {
-        return;
+    if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_VALIDATION)) {
+        if (!gnrc_rpl_validation_DIO(dio, len)) {
+            return;
+        }
     }
-#endif
 
     len -= (sizeof(gnrc_rpl_dio_t) + sizeof(icmpv6_hdr_t));
 
@@ -1148,11 +1144,11 @@ void gnrc_rpl_recv_DAO(gnrc_rpl_dao_t *dao, kernel_pid_t iface, ipv6_addr_t *src
     gnrc_rpl_instance_t *inst = NULL;
     gnrc_rpl_dodag_t *dodag = NULL;
 
-#ifndef GNRC_RPL_WITHOUT_VALIDATION
-    if (!gnrc_rpl_validation_DAO(dao, len)) {
-        return;
+    if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_VALIDATION)) {
+        if (!gnrc_rpl_validation_DAO(dao, len)) {
+            return;
+        }
     }
-#endif
 
     gnrc_rpl_opt_t *opts = (gnrc_rpl_opt_t *) (dao + 1);
 
@@ -1216,11 +1212,11 @@ void gnrc_rpl_recv_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack, kernel_pid_t iface, ipv6
     gnrc_rpl_netstats_rx_DAO_ACK(&gnrc_rpl_netstats, len, (dst && !ipv6_addr_is_multicast(dst)));
 #endif
 
-#ifndef GNRC_RPL_WITHOUT_VALIDATION
-    if (!gnrc_rpl_validation_DAO_ACK(dao_ack, len, dst)) {
-        return;
+    if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_VALIDATION)) {
+        if (!gnrc_rpl_validation_DAO_ACK(dao_ack, len, dst)) {
+            return;
+        }
     }
-#endif
 
     if ((inst = gnrc_rpl_instance_get(dao_ack->instance_id)) == NULL) {
         DEBUG("RPL: DAO-ACK with unknown instance id (%d) received\n", dao_ack->instance_id);

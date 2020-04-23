@@ -79,7 +79,7 @@
  *   This validation can be disabled in case the involved RPL implementations
  *   are known to produce valid messages.
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   CFLAGS += -DGNRC_RPL_WITHOUT_VALIDATION
+ *   CFLAGS += -DCONFIG_GNRC_RPL_WITHOUT_VALIDATION
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @{
