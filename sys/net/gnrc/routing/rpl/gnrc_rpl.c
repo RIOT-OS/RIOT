@@ -353,7 +353,8 @@ void _dao_handle_send(gnrc_rpl_dodag_t *dodag)
         return;
     }
 #endif
-    if ((dodag->dao_ack_received == false) && (dodag->dao_counter < GNRC_RPL_DAO_SEND_RETRIES)) {
+    if ((dodag->dao_ack_received == false) &&
+        (dodag->dao_counter < CONFIG_GNRC_RPL_DAO_SEND_RETRIES)) {
         dodag->dao_counter++;
         gnrc_rpl_send_DAO(dodag->instance, NULL, dodag->default_lifetime);
         evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->dao_event);

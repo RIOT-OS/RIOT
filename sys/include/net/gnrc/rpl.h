@@ -326,8 +326,8 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
         </a>
  * @{
  */
-#ifndef GNRC_RPL_DAO_SEND_RETRIES
-#define GNRC_RPL_DAO_SEND_RETRIES   (4)
+#ifndef CONFIG_GNRC_RPL_DAO_SEND_RETRIES
+#define CONFIG_GNRC_RPL_DAO_SEND_RETRIES   (4)
 #endif
 #ifndef GNRC_RPL_DAO_ACK_DELAY
 #define GNRC_RPL_DAO_ACK_DELAY      (3000UL)
