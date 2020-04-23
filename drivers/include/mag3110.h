@@ -65,8 +65,8 @@ enum {
  * The address depends on part number of MAG3110.
  * For more information on SerialBus Address, refer Table 1 in Technical datasheet(MAG3110).
  */
-#ifndef MAG3110_I2C_ADDRESS
-#define MAG3110_I2C_ADDRESS             0x0E
+#ifndef CONFIG_MAG3110_I2C_ADDRESS
+#define CONFIG_MAG3110_I2C_ADDRESS             0x0E
 #endif
 /** @} */
 
