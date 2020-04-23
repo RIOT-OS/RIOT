@@ -5,11 +5,9 @@
 # directory for more details.
 #
 
-menu "Network layer"
-
-rsource "icmpv6/Kconfig"
-rsource "ipv6/Kconfig"
-rsource "ndp/Kconfig"
-rsource "sixlowpan/Kconfig"
-
-endmenu # Network layer
+config MOD_GNRC_ICMPV6
+    bool "ICMPv6 support"
+    default y
+    depends on MOD_GNRC_IPV6
+    select MOD_ICMPV6
+    select MOD_INET_CSUM
