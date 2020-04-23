@@ -44,6 +44,7 @@
 
 #include <stdint.h>
 #include "periph/i2c.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,6 +80,12 @@ extern "C" {
  * If set to 0x0000, the conversion time will be 100ms.
  * If set to 0x0800, the conversion time will be 800ms
  */
+#if IS_ACTIVE(CONFIG_OPT3001_CONVERSION_TIME_100)
+#define CONFIG_OPT3001_CONVERSION_TIME   OPT3001_CONVERSION_TIME_100_MS
+#elif IS_ACTIVE(CONFIG_OPT3001_CONVERSION_TIME_800)
+#define CONFIG_OPT3001_CONVERSION_TIME   OPT3001_CONVERSION_TIME_800_MS
+#endif
+
 #ifndef CONFIG_OPT3001_CONVERSION_TIME
 #define CONFIG_OPT3001_CONVERSION_TIME   OPT3001_CONVERSION_TIME_800_MS
 #endif
