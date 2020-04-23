@@ -746,7 +746,7 @@ static void test_nanocoap__empty(void)
 }
 
 /*
- * Test adding a path from an unterminated string
+ * Test adding a path from an unterminated string.
  */
 static void test_nanocoap__add_path_unterminated_string(void)
 {
