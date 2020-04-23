@@ -149,7 +149,7 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, k
     dodag->dio_min = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN;
     dodag->dio_redun = CONFIG_GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT;
     dodag->default_lifetime = CONFIG_GNRC_RPL_DEFAULT_LIFETIME;
-    dodag->lifetime_unit = GNRC_RPL_LIFETIME_UNIT;
+    dodag->lifetime_unit = CONFIG_GNRC_RPL_LIFETIME_UNIT;
     dodag->node_status = GNRC_RPL_NORMAL_NODE;
     dodag->dao_seq = GNRC_RPL_COUNTER_INIT;
     dodag->dtsn = 0;

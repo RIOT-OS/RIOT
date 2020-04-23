@@ -126,7 +126,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
     dodag->dio_min = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN;
     dodag->dio_redun = CONFIG_GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT;
     dodag->default_lifetime = CONFIG_GNRC_RPL_DEFAULT_LIFETIME;
-    dodag->lifetime_unit = GNRC_RPL_LIFETIME_UNIT;
+    dodag->lifetime_unit = CONFIG_GNRC_RPL_LIFETIME_UNIT;
     dodag->version = GNRC_RPL_COUNTER_INIT;
     dodag->grounded = GNRC_RPL_GROUNDED;
     dodag->node_status = GNRC_RPL_ROOT_NODE;
