@@ -4,15 +4,26 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menu "IPv6"
 
-menuconfig KCONFIG_MODULE_GNRC_IPV6
-    bool "Configure GNRC IPv6 module"
-    depends on MODULE_GNRC_IPV6
-    help
-        Configure GNRC IPv6 module using Kconfig.
+menuconfig MOD_GNRC_IPV6
+    bool "IPv6 support"
+    default y
+    depends on MOD_GNRC_IPV6_NIB
+    depends on MOD_GNRC_IPV6_HDR
+    depends on MOD_GNRC_NETIF
+    select MOD_INET_CSUM
+    select MOD_IPV6_ADDR
+    select HAVE_NETSTATS_IPV6
 
-if KCONFIG_MODULE_GNRC_IPV6
+if MOD_GNRC_IPV6
+
+config MOD_AUTO_INIT_GNRC_IPV6
+    bool "Auto-init GNRC IPv6"
+    default y if MOD_AUTO_INIT
+
+config MOD_GNRC_IPV6_ROUTER
+    bool "IPv6 router features"
+    default y
 
 config GNRC_IPV6_MSG_QUEUE_SIZE_EXP
     int "Exponent for the message queue size used for the IPv6 thread (as 2^n)"
@@ -22,11 +33,10 @@ config GNRC_IPV6_MSG_QUEUE_SIZE_EXP
         represents the exponent of 2^n, which will be used as the size of
         the queue.
 
-endif # KCONFIG_MODULE_GNRC_IPV6
+endif # MOD_GNRC_IPV6
 
 rsource "blacklist/Kconfig"
 rsource "ext/frag/Kconfig"
+rsource "hdr/Kconfig"
 rsource "nib/Kconfig"
 rsource "whitelist/Kconfig"
-
-endmenu # IPv6
