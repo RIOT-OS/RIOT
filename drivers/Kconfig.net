@@ -16,3 +16,7 @@ menu "Sensor Device Drivers"
 rsource "ads101x/Kconfig"
 rsource "hdc1000/Kconfig"
 endmenu # Sensor Device Drivers
+
+menu "Storage Device Drivers"
+rsource "mtd_sdcard/Kconfig"
+endmenu # Storage Device Drivers
