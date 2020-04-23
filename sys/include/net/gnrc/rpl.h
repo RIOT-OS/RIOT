@@ -49,7 +49,7 @@
  *
  * - Exclude Prefix Information Options from DIOs
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   CFLAGS += -DGNRC_RPL_WITHOUT_PIO
+ *   CFLAGS += -DCONFIG_GNRC_RPL_WITHOUT_PIO
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - Modify trickle parameters
@@ -667,20 +667,21 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ip
  */
 uint8_t gnrc_rpl_gen_instance_id(bool local);
 
-#ifndef GNRC_RPL_WITHOUT_PIO
 /**
  * @brief (De-)Activate the transmission of Prefix Information Options within DIOs
- *        for a particular DODAG
+ *        for a particular DODAG. This function has no effect if
+ *        CONFIG_GNRC_RPL_WITHOUT_PIO is set.
  *
  * @param[in] dodag             Pointer to the DODAG
  * @param[in] status            true for activating PIOs and false for deactivating them
  */
 static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
 {
-    dodag->dio_opts = (dodag->dio_opts & ~GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) |
-                      (status << GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT);
+    if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_PIO)) {
+        dodag->dio_opts = (dodag->dio_opts & ~GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) |
+                          (status << GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT);
+    }
 }
-#endif
 
 #ifdef __cplusplus
 }

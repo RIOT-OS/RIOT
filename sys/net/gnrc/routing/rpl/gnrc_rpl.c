@@ -16,6 +16,7 @@
  */
 
 #include <string.h>
+#include "kernel_defines.h"
 
 #include "net/icmpv6.h"
 #include "net/ipv6.h"
@@ -132,9 +133,10 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, ipv6_addr_t *dodag_
     dodag->node_status = GNRC_RPL_ROOT_NODE;
     dodag->my_rank = GNRC_RPL_ROOT_RANK;
     dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_DODAG_CONF;
-#ifndef GNRC_RPL_WITHOUT_PIO
-    dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO;
-#endif
+
+    if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_PIO)) {
+        dodag->dio_opts |= GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO;
+    }
 
     trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
                   (1 << dodag->dio_min), dodag->dio_interval_doubl,
