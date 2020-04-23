@@ -42,6 +42,25 @@
 extern "C" {
 #endif
 
+/**
+ * @def     RTT_FREQUENCY
+ *
+ * @brief   The desired frequency for the RTT
+ */
+#ifdef DOXYGEN
+#define RTT_FREQUENCY
+#endif
+
+/**
+ * @def     RTT_MAX_VALUE
+ *
+ * @brief   The maximum value for the RTT counter, must be (2^n - 1)
+ *
+ */
+#ifdef DOXYGEN
+#define RTT_MAX_VALUE
+#endif
+
 #ifndef RTT_FREQUENCY
 /* Allow mock-RTT for unit tests */
 #ifdef MOCK_RTT_FREQUENCY
