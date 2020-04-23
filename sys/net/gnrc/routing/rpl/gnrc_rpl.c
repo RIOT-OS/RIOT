@@ -358,7 +358,7 @@ void _dao_handle_send(gnrc_rpl_dodag_t *dodag)
         dodag->dao_counter++;
         gnrc_rpl_send_DAO(dodag->instance, NULL, dodag->default_lifetime);
         evtimer_del(&gnrc_rpl_evtimer, (evtimer_event_t *)&dodag->dao_event);
-        ((evtimer_event_t *)&(dodag->dao_event))->offset = GNRC_RPL_DAO_ACK_DELAY;
+        ((evtimer_event_t *)&(dodag->dao_event))->offset = CONFIG_GNRC_RPL_DAO_ACK_DELAY;
         evtimer_add_msg(&gnrc_rpl_evtimer, &dodag->dao_event, gnrc_rpl_pid);
     }
     else if (dodag->dao_ack_received == false) {
