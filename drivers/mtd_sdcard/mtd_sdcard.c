@@ -24,6 +24,7 @@
 #include "mtd_sdcard.h"
 #include "sdcard_spi.h"
 #include "sdcard_spi_internal.h"
+#include "kernel_defines.h"
 
 #include <inttypes.h>
 #include <errno.h>
@@ -103,11 +104,12 @@ static int mtd_sdcard_erase(mtd_dev_t *dev,
     (void)addr;
     (void)size;
 
-#if MTD_SDCARD_SKIP_ERASE == 1
-    return 0;
-#else
-    return -ENOTSUP; /* explicit erase currently not supported */
-#endif
+    if (!IS_ACTIVE(CONFIG_MTD_SDCARD_ERASE)) {
+        return 0;
+    }
+    else {
+        return -ENOTSUP; /* explicit erase currently not supported */
+    }
 }
 
 static int mtd_sdcard_power(mtd_dev_t *dev, enum mtd_power_state power)
