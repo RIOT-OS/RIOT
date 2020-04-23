@@ -22,4 +22,5 @@ rsource "ads101x/Kconfig"
 rsource "hdc1000/Kconfig"
 rsource "mag3110/Kconfig"
 rsource "mma8x5x/Kconfig"
+rsource "opt3001/Kconfig"
 endmenu # Sensor Device Drivers
