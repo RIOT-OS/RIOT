@@ -1,0 +1,23 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_MODULE_MOTOR_DRIVER
+    bool "Configure the DC Motor driver"
+    depends on MODULE_MOTOR_DRIVER
+    help
+        Configure the DC Motor driver using Kconfig.
+
+if KCONFIG_MODULE_MOTOR_DRIVER
+
+config MOTOR_DRIVER_MAX
+    int "Maximum number of motors"
+    default 2
+    help
+        Maximum number of motors depends on the H-bridge.
+        The value should not exceed the number of PWM channels
+        Default value is set to 2.
+
+endif # KCONFIG_MODULE_MOTOR_DRIVER
