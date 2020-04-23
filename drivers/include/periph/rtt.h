@@ -42,16 +42,42 @@
 extern "C" {
 #endif
 
-#ifndef RTT_FREQUENCY
+/**
+ * @def     RTT_FREQUENCY
+ *
+ * @brief   The desired frequency for the RTT
+ */
+#ifdef DOXYGEN
+#define RTT_FREQUENCY
+#endif
 
+/**
+ * @def     RTT_MAX_VALUE
+ *
+ * @brief   The maximum value for the RTT counter, must be (2^n - 1)
+ *
+ */
+#ifdef DOXYGEN
+#define RTT_MAX_VALUE
+#endif
+
+#ifndef RTT_FREQUENCY
 /* Allow mock-RTT for unit tests */
 #ifdef MOCK_RTT_FREQUENCY
 #define RTT_FREQUENCY MOCK_RTT_FREQUENCY
+#else
+#warning "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the number of ticks " \
+         "per second for the current architecture."
+#endif
+#endif
+
+#ifndef RTT_MAX_VALUE
+/* Allow mock-RTT for unit tests */
+#ifdef MOCK_RTT_MAX_VALUE
 #define RTT_MAX_VALUE MOCK_RTT_MAX_VALUE
 #else
-
-#warning "RTT_FREQUENCY undefined. Set RTT_FREQUENCY to the number of ticks" \
-         "per second for the current architecture."
+#warning "RTT_MAX_VALUE is undefined. Set RTT_MAX_VALUE to the maximum value " \
+         "for the RTT counter, ensure it is (2^n - 1)."
 #endif
 #endif
 
