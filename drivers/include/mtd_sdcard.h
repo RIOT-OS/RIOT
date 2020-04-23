@@ -26,6 +26,7 @@
 
 #include "sdcard_spi.h"
 #include "mtd.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -49,17 +50,36 @@ typedef struct {
  * @{
  */
 /**
+ * @brief   Enable SDCard Erase
+ * @note    SDCards handle sector erase internally so it's
+ *          possible to directly write to the card without erasing
+ *          the sector first.
+ *          Attention: an erase call will therefore NOT touch the content,
+ *          so enable this feature to ensure overriding the data.
+ */
+#ifdef DOXYGEN
+#define MTD_SDCARD_ERASE
+#endif
+/** @} */
+
+/**
  * @brief   Enable Skip SDCard Erase
  * @note    SDCards handle sector erase internally so it's
  * possible to directly write to the card without erasing
  * the sector first.
  * Attention: an erase call will therefore NOT touch the content,
  * so disable this feature to ensure overriding the data.
+ * 
+ *  * @deprecated Use inverse @ref GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE instead.
+ *             Will be removed after 2020.10 release.
  */
 #ifndef MTD_SDCARD_SKIP_ERASE
+#if IS_ACTIVE(MTD_SDCARD_ERASE)
+#define MTD_SDCARD_SKIP_ERASE (0)
+#else
 #define MTD_SDCARD_SKIP_ERASE (1)
 #endif
-/** @} */
+#endif
 
 /**
  * @brief   sdcard device operations table for mtd
