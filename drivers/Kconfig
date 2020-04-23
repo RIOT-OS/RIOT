@@ -12,6 +12,8 @@ endmenu # Actuator Device Drivers
 
 rsource "Kconfig.net"
 
+rsource "periph_common/Kconfig"
+
 menu "Sensor Device Drivers"
 rsource "ads101x/Kconfig"
 rsource "fxos8700/Kconfig"
@@ -22,6 +24,8 @@ rsource "opt3001/Kconfig"
 rsource "sps30/Kconfig"
 endmenu # Sensor Device Drivers
 
-rsource "periph_common/Kconfig"
+menu "Storage Device Drivers"
+rsource "mtd_sdcard/Kconfig"
+endmenu # Storage Device Drivers
 
 endmenu # Drivers
