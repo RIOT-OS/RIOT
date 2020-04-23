@@ -249,7 +249,7 @@ bool gnrc_rpl_parent_remove(gnrc_rpl_parent_t *parent)
 void gnrc_rpl_cleanup_start(gnrc_rpl_dodag_t *dodag)
 {
     evtimer_del((evtimer_t *)(&gnrc_rpl_evtimer), (evtimer_event_t *)&dodag->instance->cleanup_event);
-    ((evtimer_event_t *)&(dodag->instance->cleanup_event))->offset = GNRC_RPL_CLEANUP_TIME;
+    ((evtimer_event_t *)&(dodag->instance->cleanup_event))->offset = CONFIG_GNRC_RPL_CLEANUP_TIME;
     dodag->instance->cleanup_event.msg.type = GNRC_RPL_MSG_TYPE_INSTANCE_CLEANUP;
     evtimer_add_msg(&gnrc_rpl_evtimer, &dodag->instance->cleanup_event, gnrc_rpl_pid);
 }

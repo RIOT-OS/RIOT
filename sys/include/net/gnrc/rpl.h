@@ -355,8 +355,8 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /**
  * @brief Cleanup interval in milliseconds.
  */
-#ifndef GNRC_RPL_CLEANUP_TIME
-#define GNRC_RPL_CLEANUP_TIME (5 * MS_PER_SEC)
+#ifndef CONFIG_GNRC_RPL_CLEANUP_TIME
+#define CONFIG_GNRC_RPL_CLEANUP_TIME (5 * MS_PER_SEC)
 #endif
 
 /**

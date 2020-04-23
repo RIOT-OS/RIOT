@@ -149,7 +149,7 @@ void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent);
 
 /**
  * @brief Removes the dodag state of @p dodag after
- * GNRC_RPL_CLEANUP_TIME milliseconds
+ * CONFIG_GNRC_RPL_CLEANUP_TIME milliseconds
  *
  * @param[in] dodag     Pointer to the DODAG
  */
