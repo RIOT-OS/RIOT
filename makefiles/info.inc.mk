@@ -155,3 +155,6 @@ info-toolchains-supported:
 
 check-toolchain-supported:
 	@exit $(if $(filter $(TOOLCHAIN),$(filter-out $(TOOLCHAINS_BLACKLIST),$(TOOLCHAINS_SUPPORTED))),0,1)
+
+info-kconfig-deps:
+	@$(PYTHON) $(RIOTTOOLS)/kconfig_dependencies/kconfig_dependencies.py -k $(RIOTBASE)/Kconfig
