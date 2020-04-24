@@ -22,11 +22,11 @@
 #include <errno.h>
 #include <string.h>
 
-#include "random.h"
 #include "ethos.h"
 #include "periph/uart.h"
 #include "tsrb.h"
 #include "irq.h"
+#include "luid.h"
 
 #include "net/netdev.h"
 #include "net/netdev/eth.h"
@@ -67,13 +67,7 @@ void ethos_setup(ethos_t *dev, const ethos_params_t *params)
     tsrb_init(&dev->inbuf, params->buf, params->bufsize);
     mutex_init(&dev->out_mutex);
 
-    uint32_t a = random_uint32();
-    memcpy(dev->mac_addr, (char*)&a, 4);
-    a = random_uint32();
-    memcpy(dev->mac_addr+4, (char*)&a, 2);
-
-    dev->mac_addr[0] &= (0x2);      /* unset globally unique bit */
-    dev->mac_addr[0] &= ~(0x1);     /* set unicast bit*/
+    luid_get_eui48((eui48_t *) &dev->mac_addr);
 
     uart_init(params->uart, params->baudrate, ethos_isr, (void*)dev);
 
