@@ -60,6 +60,15 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Real time counter configuration
+ * @{
+ */
+#ifndef RTT_FREQUENCY
+#define RTT_FREQUENCY       (16384)      /* in Hz */
+#endif
+/** @} */
+
+/**
  * @name    ADC configuration
  * @{
  */
