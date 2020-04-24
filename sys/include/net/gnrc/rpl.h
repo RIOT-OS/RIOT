@@ -496,8 +496,8 @@ extern netstats_rpl_t gnrc_rpl_netstats;
 /**
  * @brief Number of DIS retries before parent times out
  */
-#ifndef GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES
-#define GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES (3)
+#ifndef CONFIG_GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES
+#define CONFIG_GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES (3)
 #endif
 
 /**
