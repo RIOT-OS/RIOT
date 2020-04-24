@@ -138,8 +138,8 @@ extern "C" {
 /**
  * @brief   Default message queue size to use for the RPL thread.
  */
-#ifndef GNRC_RPL_MSG_QUEUE_SIZE
-#define GNRC_RPL_MSG_QUEUE_SIZE (8U)
+#ifndef CONFIG_GNRC_RPL_MSG_QUEUE_SIZE
+#define CONFIG_GNRC_RPL_MSG_QUEUE_SIZE (8U)
 #endif
 
 /**
