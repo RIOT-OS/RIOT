@@ -37,9 +37,9 @@
  *
  * If the application defines several interfaces (@ref gnrc_netif_highlander()
  * returns false), then RPL will be initialized on the interface
- * `GNRC_RPL_DEFAULT_NETIF`.
- * Your application is responsible for setting `GNRC_RPL_DEFAULT_NETIF` to a
- * valid interface PID, e.g. via `CFLAGS`.
+ * `CONFIG_GNRC_RPL_DEFAULT_NETIF`.
+ * Your application is responsible for setting `CONFIG_GNRC_RPL_DEFAULT_NETIF`
+ * to a valid interface PID, e.g. via `CFLAGS` or menuconfig.
  *
  * Initializing RPL on multiple interfaces automatically is currently not supported.
  * Call `gnrc_rpl_init()` manually from your application for the desired interfaces in this case.
@@ -72,7 +72,7 @@
  * - Set interface for auto-initialization if more than one
  *   interface exists (@ref gnrc_netif_highlander() returns false)
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   CFLAGS += -DGNRC_RPL_DEFAULT_NETIF=6
+ *   CFLAGS += -DCONFIG_GNRC_RPL_DEFAULT_NETIF=6
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - By default, all incoming control messages get checked for validation.
@@ -503,8 +503,8 @@ extern netstats_rpl_t gnrc_rpl_netstats;
 /**
  * @brief Default network interface for GNRC RPL
  */
-#ifndef GNRC_RPL_DEFAULT_NETIF
-#define GNRC_RPL_DEFAULT_NETIF (KERNEL_PID_UNDEF)
+#ifndef CONFIG_GNRC_RPL_DEFAULT_NETIF
+#define CONFIG_GNRC_RPL_DEFAULT_NETIF (KERNEL_PID_UNDEF)
 #endif
 
 /**
