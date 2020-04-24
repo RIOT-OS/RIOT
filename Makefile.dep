@@ -927,6 +927,8 @@ ifneq (,$(filter usbus_cdc_ecm,$(USEMODULE)))
 endif
 
 ifneq (,$(filter usbus_cdc_acm_uart,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_uart
+  FEATURES_OPTIONAL += periph_uart_modecfg
   USEMODULE += usbus_cdc_acm
   USEMODULE += isrpipe
 endif

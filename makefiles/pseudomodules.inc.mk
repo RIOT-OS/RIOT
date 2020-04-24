@@ -98,6 +98,7 @@ PSEUDOMODULES += stdio_ethos
 PSEUDOMODULES += stdio_cdc_acm
 PSEUDOMODULES += stdio_uart_rx
 PSEUDOMODULES += suit_transport_%
+PSEUDOMODULES += usbus_cdc_acm_uart
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += zptr
 PSEUDOMODULES += ztimer%
