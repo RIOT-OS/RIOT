@@ -38,7 +38,7 @@ static usbus_t usbus;
  * Reduced by 3 for the control endpoint and the two endpoints used by the *
  * STDIO CDC ACM module. Divided by two as each CDC ACM function requires  *
  * two endpoints in each direction                                         */
-#define USB_ACM_MAX     ((USBDEV_NUM_ENDPOINTS - 3U)/2U)
+#define USB_ACM_MAX     ((USBDEV_NUM_ENDPOINTS - 1U)/2U)
 /* Determine the number of USB to UART functions possible */
 #define NUMOF_ACM       MIN(USB_ACM_MAX, UART_NUMOF)
 
@@ -54,10 +54,6 @@ static void _init_usb(void)
 
     /* Initialize basic usbus struct, don't start the thread yet */
     usbus_init(&usbus, usbdev);
-
-    /* Start the cdc acm functionality */
-    void usb_cdc_acm_stdio_init(usbus_t *usbus);
-    usb_cdc_acm_stdio_init(&usbus);
 
     /* Instantiate the threads */
     for(unsigned i = 0; i < NUMOF_ACM; i++) {
@@ -77,8 +73,4 @@ static void _init_usb(void)
 int main(void)
 {
     _init_usb();
-
-    char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-    return 0;
 }
