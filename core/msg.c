@@ -25,6 +25,7 @@
 #include <assert.h>
 #include "sched.h"
 #include "msg.h"
+#include "msg_bus.h"
 #include "list.h"
 #include "thread.h"
 #if MODULE_CORE_THREAD_FLAGS
@@ -211,6 +212,9 @@ static int _msg_send_oneway(msg_t *m, kernel_pid_t target_pid)
         *target_message = *m;
 
         sched_set_status(target, STATUS_PENDING);
+
+        /* Interrupts are disabled here, we can set / re-use
+           sched_context_switch_request. */
         sched_context_switch_request = 1;
 
         return 1;
@@ -230,6 +234,37 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
     res = _msg_send_oneway(m, target_pid);
 
     return res;
+}
+
+int msg_send_bus(msg_t *m, msg_bus_t *bus)
+{
+    const bool in_irq = irq_is_in();
+    const uint32_t event_mask = (1 << (m->type & 0x1F));
+    int count = 0;
+
+    m->sender_pid = in_irq ? KERNEL_PID_ISR : sched_active_pid;
+
+    unsigned state = irq_disable();
+
+    for (list_node_t *e = bus->subs.next; e; e = e->next) {
+        msg_bus_entry_t *subscriber = container_of(e, msg_bus_entry_t, next);
+
+        if ((subscriber->event_mask & event_mask) == 0) {
+            continue;
+        }
+
+        if (_msg_send_oneway(m, subscriber->pid) > 0) {
+            ++count;
+        }
+    }
+
+    irq_restore(state);
+
+    if (sched_context_switch_request && !in_irq) {
+        thread_yield_higher();
+    }
+
+    return count;
 }
 
 int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
