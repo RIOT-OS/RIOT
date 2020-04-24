@@ -88,7 +88,7 @@ bool gnrc_rpl_instance_add(uint8_t instance_id, gnrc_rpl_instance_t **inst)
         (*inst)->id = instance_id;
         (*inst)->state = 1;
         (*inst)->max_rank_inc = GNRC_RPL_DEFAULT_MAX_RANK_INCREASE;
-        (*inst)->min_hop_rank_inc = GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
+        (*inst)->min_hop_rank_inc = CONFIG_GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
         (*inst)->dodag.parents = NULL;
         (*inst)->cleanup_event.msg.content.ptr = (*inst);
         return true;
@@ -388,7 +388,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
     if (gnrc_rpl_instance_add(instance_id, &inst)) {
         inst->of = (gnrc_rpl_of_t *) gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
         inst->mop = mop;
-        inst->min_hop_rank_inc = GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
+        inst->min_hop_rank_inc = CONFIG_GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
         inst->max_rank_inc = GNRC_RPL_DEFAULT_MAX_RANK_INCREASE;
     }
     else if (inst == NULL) {

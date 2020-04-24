@@ -181,8 +181,8 @@ extern "C" {
  *          RFC 6550, section 17
  *      </a>
  */
-#ifndef GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE
-#define GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE (256)
+#ifndef CONFIG_GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE
+#define CONFIG_GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE (256)
 #endif
 
 /**
@@ -403,7 +403,7 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /**
  * @brief Rank of the root node
  */
-#define GNRC_RPL_ROOT_RANK (GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE)
+#define GNRC_RPL_ROOT_RANK (CONFIG_GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE)
 
 /**
  *  @brief  DIS ICMPv6 code
