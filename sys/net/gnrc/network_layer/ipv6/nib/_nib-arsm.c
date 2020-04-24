@@ -37,9 +37,9 @@ void _snd_ns(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
     gnrc_pktsnip_t *ext_opt = NULL;
 
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
-    _nib_dr_entry_t *dr = _nib_drl_get_dr();
-
     assert(netif != NULL);
+    _nib_dr_entry_t *dr = _nib_drl_get(NULL, netif->pid);
+
     /* add ARO based on interface */
     if ((src != NULL) && gnrc_netif_is_6ln(netif) &&
         (_nib_onl_get_if(dr->next_hop) == (unsigned)netif->pid) &&
