@@ -180,11 +180,11 @@ extern "C" {
  * This value is for the response to the *initial* confirmable message. The
  * timeout doubles for subsequent retries. To avoid synchronization of resends
  * across hosts, the actual timeout is chosen randomly between
- * @ref COAP_ACK_TIMEOUT and
- * (@ref COAP_ACK_TIMEOUT * @ref COAP_RANDOM_FACTOR_1000 / 1000).
+ * @ref CONFIG_COAP_ACK_TIMEOUT and
+ * (@ref CONFIG_COAP_ACK_TIMEOUT * @ref CONFIG_COAP_RANDOM_FACTOR_1000 / 1000).
  */
-#ifndef COAP_ACK_TIMEOUT
-#define COAP_ACK_TIMEOUT        (2U)
+#ifndef CONFIG_COAP_ACK_TIMEOUT
+#define CONFIG_COAP_ACK_TIMEOUT        (2U)
 #endif
 
 /**
@@ -194,15 +194,15 @@ extern "C" {
  * ([RFC 7252, section 4.2](https://tools.ietf.org/html/rfc7252#section-4.2))
  * multiplied by 1000, to avoid floating point arithmetic.
  *
- * See @ref COAP_ACK_TIMEOUT
+ * See @ref CONFIG_COAP_ACK_TIMEOUT
  */
-#ifndef COAP_RANDOM_FACTOR_1000
-#define COAP_RANDOM_FACTOR_1000      (1500)
+#ifndef CONFIG_COAP_RANDOM_FACTOR_1000
+#define CONFIG_COAP_RANDOM_FACTOR_1000      (1500)
 #endif
 
 /** @brief   Maximum number of retransmissions for a confirmable request */
-#ifndef COAP_MAX_RETRANSMIT
-#define COAP_MAX_RETRANSMIT     (4)
+#ifndef CONFIG_COAP_MAX_RETRANSMIT
+#define CONFIG_COAP_MAX_RETRANSMIT     (4)
 #endif
 /** @} */
 /** @} */
