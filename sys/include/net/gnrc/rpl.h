@@ -188,8 +188,8 @@ extern "C" {
 /**
  * @brief   Maximum rank increase
  */
-#ifndef GNRC_RPL_DEFAULT_MAX_RANK_INCREASE
-#define GNRC_RPL_DEFAULT_MAX_RANK_INCREASE (0)
+#ifndef CONFIG_GNRC_RPL_DEFAULT_MAX_RANK_INCREASE
+#define CONFIG_GNRC_RPL_DEFAULT_MAX_RANK_INCREASE (0)
 #endif
 
 /**
