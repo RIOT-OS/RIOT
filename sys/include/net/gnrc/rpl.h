@@ -205,8 +205,8 @@ extern "C" {
 /**
  * @brief   Default Instance ID
  */
-#ifndef GNRC_RPL_DEFAULT_INSTANCE
-#define GNRC_RPL_DEFAULT_INSTANCE (0)
+#ifndef CONFIG_GNRC_RPL_DEFAULT_INSTANCE
+#define CONFIG_GNRC_RPL_DEFAULT_INSTANCE (0)
 #endif
 
 /**

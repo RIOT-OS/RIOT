@@ -371,7 +371,7 @@ void _dao_handle_send(gnrc_rpl_dodag_t *dodag)
 uint8_t gnrc_rpl_gen_instance_id(bool local)
 {
     mutex_lock(&_inst_id_mutex);
-    uint8_t instance_id = GNRC_RPL_DEFAULT_INSTANCE;
+    uint8_t instance_id = CONFIG_GNRC_RPL_DEFAULT_INSTANCE;
 
     if (local) {
         instance_id = ((_instance_id++) | GNRC_RPL_INSTANCE_ID_MSB);

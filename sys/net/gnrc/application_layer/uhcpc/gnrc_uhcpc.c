@@ -188,11 +188,11 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime,
 #ifdef MODULE_GNRC_RPL
     gnrc_rpl_init(gnrc_wireless_interface);
     gnrc_rpl_instance_t *inst = gnrc_rpl_instance_get(
-                                    GNRC_RPL_DEFAULT_INSTANCE);
+                                    CONFIG_GNRC_RPL_DEFAULT_INSTANCE);
     if (inst) {
         gnrc_rpl_instance_remove(inst);
     }
-    gnrc_rpl_root_init(GNRC_RPL_DEFAULT_INSTANCE, (ipv6_addr_t*)prefix, false,
+    gnrc_rpl_root_init(CONFIG_GNRC_RPL_DEFAULT_INSTANCE, (ipv6_addr_t*)prefix, false,
                        false);
 #endif
     LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix %s/%u\n",
