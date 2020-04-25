@@ -210,7 +210,7 @@ int btree_insert(btree_t *btree, btree_node_t *new, uint32_t key)
 
 btree_node_t *btree_remove(btree_t *btree, uint32_t key)
 {
-    btree_node_t *balance_start;
+    btree_node_t *balance_start = NULL;
     btree_node_t *d = _find_key(btree->start, &balance_start, key);
 
     if (d == NULL) {
