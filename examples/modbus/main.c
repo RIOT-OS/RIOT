@@ -18,7 +18,6 @@ static uint16_t regs_master1[10];
 static uint16_t regs_master2[10];
 static modbus_rtu_message_t message_master = {
     .id = SLAVE_ID,
-    .func = MB_FC_READ_REGISTERS,
     .addr = 0,
     .regs = regs_master1,
     .count = 10};
@@ -53,24 +52,47 @@ static void *thread_master(void *arg __attribute__((unused))) {
     for (uint8_t i = 0; i < message_master.count; i++) {
       regs_master1[i] = rand();
     }
-    puts("try request write");
+    puts("try MB_FC_WRITE_REGISTERS");
     message_master.regs = regs_master1;
     message_master.func = MB_FC_WRITE_REGISTERS;
     res = modbus_rtu_send_request(&master, &message_master);
     // assert(message_slave.count == message_master.count);
     if (res) {
-      printf("fail request write %d\n", res);
+      printf("fai lMB_FC_WRITE_REGISTERS %d\n", res);
     } else {
       // puts("ok request");
 
       xtimer_usleep(master._rx_timeout * 3);
-      puts("try request read");
+      puts("try MB_FC_READ_REGISTERS");
       message_master.regs = regs_master2;
       message_master.func = MB_FC_READ_REGISTERS;
       res = modbus_rtu_send_request(&master, &message_master);
       // assert(message_slave.count == message_master.count);
       if (res || memcmp(regs_master1, regs_master2, message_master.count * 2) != 0) {
-        printf("fail request read %d\n", res);
+        printf("fail MB_FC_READ_REGISTERS %d\n", res);
+      } else {
+        // puts("ok request");
+      }
+    }
+
+    puts("try MB_FC_WRITE_COILS");
+    message_master.regs = regs_master1;
+    message_master.func = MB_FC_WRITE_COILS;
+    res = modbus_rtu_send_request(&master, &message_master);
+    // assert(message_slave.count == message_master.count);
+    if (res) {
+      printf("fail MB_FC_WRITE_COILS %d\n", res);
+    } else {
+      // puts("ok request");
+
+      xtimer_usleep(master._rx_timeout * 3);
+      puts("try MB_FC_READ_COILS");
+      message_master.regs = regs_master2;
+      message_master.func = MB_FC_READ_COILS;
+      res = modbus_rtu_send_request(&master, &message_master);
+      // assert(message_slave.count == message_master.count);
+      if (res || memcmp(regs_master1, regs_master2, message_master.count / 8 + 1) != 0) {
+        printf("fail MB_FC_READ_COILS %d\n", res);
       } else {
         // puts("ok request");
       }

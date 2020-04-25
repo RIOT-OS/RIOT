@@ -20,15 +20,15 @@
  * @brief Modbus functions
  */
 enum MB_FC {
-  MB_FC_NONE = 0,                  /**< null operator */
-  MB_FC_READ_COILS = 1,            /**< FCT=1 -> read coils or digital outputs */
-  MB_FC_READ_DISCRETE_INPUT = 2,   /**< FCT=2 -> read digital inputs */
-  MB_FC_READ_REGISTERS = 3,        /**< FCT=3 -> read registers or analog outputs */
-  MB_FC_READ_INPUT_REGISTER = 4,   /**< FCT=4 -> read analog inputs */
-  MB_FC_WRITE_COIL = 5,            /**< FCT=5 -> write single coil or output */
-  MB_FC_WRITE_REGISTER = 6,        /**< FCT=6 -> write single register */
-  MB_FC_WRITE_MULTIPLE_COILS = 15, /**< FCT=15 -> write multiple coils or outputs */
-  MB_FC_WRITE_REGISTERS = 16       /**< FCT=16 -> write multiple registers */
+  MB_FC_NONE = 0,                /**< null operator */
+  MB_FC_READ_COILS = 1,          /**< FCT=1 -> read coils or digital outputs */
+  MB_FC_READ_DISCRETE_INPUT = 2, /**< FCT=2 -> read digital inputs */
+  MB_FC_READ_REGISTERS = 3,      /**< FCT=3 -> read registers or analog outputs */
+  MB_FC_READ_INPUT_REGISTER = 4, /**< FCT=4 -> read analog inputs */
+  MB_FC_WRITE_COIL = 5,          /**< FCT=5 -> write single coil or output */
+  MB_FC_WRITE_REGISTER = 6,      /**< FCT=6 -> write single register */
+  MB_FC_WRITE_COILS = 15,        /**< FCT=15 -> write multiple coils or outputs */
+  MB_FC_WRITE_REGISTERS = 16     /**< FCT=16 -> write multiple registers */
 };
 
 //! Максимальный размер пакета протокола Modbus RTU.
@@ -53,8 +53,8 @@ typedef struct {
   uint8_t id;     /**< ID of slave, on response not use */
   uint8_t func;   /**< function code */
   uint16_t addr;  /**< Starting Address */
-  uint16_t count; /**< Quantity of Registers */
-  uint16_t *regs; /**< Registers */
+  uint16_t count; /**< Quantity of Registers or byte or bits */
+  uint16_t *regs; /**< Registers or byte or bits*/
 } modbus_rtu_message_t;
 
 /**
