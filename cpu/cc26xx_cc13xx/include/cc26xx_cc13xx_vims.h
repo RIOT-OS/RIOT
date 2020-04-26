@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 /**
- * FLASH registers
+ * @brief   FLASH registers
  */
 typedef struct {
     reg32_t __reserved1[7]; /**< meh */
@@ -172,30 +172,43 @@ typedef struct {
     reg32_t FCFG_B0_SSIZE0; /**< FMC flash bank 0 sector size */
 } flash_regs_t;
 
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
-#define FLASH_BASEADDR                           0x40030000 /**< base address of FLASH memory */
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
+/**
+ * @brief   FLASH base address
+ */
+#define FLASH_BASEADDR       (PERIPH_BASE + 0x30000)
 /*@}*/
-
-#define FLASH                                ((flash_regs_t *)(FLASH_BASEADDR + 0x4)) /**< FLASH register bank */
-
 
 /**
- * VIMS registers
+ * @brief   FLASH register bank
+ */
+#define FLASH                ((flash_regs_t *) (FLASH_BASEADDR))
+
+/**
+ * @brief   VIMS registers
  */
 typedef struct {
-    reg32_t STAT; /**< status */
-    reg32_t CTL; /**< control */
+    reg32_t STAT; /**< Status */
+    reg32_t CTL; /**< Control */
 } vims_regs_t;
 
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
-#define VIMS_BASE                           0x40034000 /**< base address of VIMS memory */
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
+/**
+ * @brief   VIMS base address
+ */
+#define VIMS_BASE            (PERIPH_BASE + 0x34000)
 /*@}*/
 
-#define VIMS                                ((vims_regs_t *)(VIMS_BASE + 0x4)) /**< VIMS register bank */
+/**
+ * @brief   VIMS register bank
+ */
+#define VIMS                 ((vims_regs_t *) (VIMS_BASE))
 
 /**
  * @brief   VIMS register values
