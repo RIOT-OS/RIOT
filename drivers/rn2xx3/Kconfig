@@ -1,0 +1,23 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_MODULE_RN2XX3
+    bool "Configure RN2XX3 driver"
+    depends on MODULE_RN2XX3
+    help
+        Configure the RN2XX3 driver using Kconfig.
+
+if KCONFIG_MODULE_RN2XX3
+
+config RN2XX3_DEFAULT_SLEEP
+    int "Sleep duration in milliseconds [ms]"
+    range 100 $(UINT32_MAX)
+    default 5000
+    help
+        Set the sleep duration (in ms).
+        The value should be greater than RN2XX3_SLEEP_MIN (100 ms)
+
+endif # KCONFIG_MODULE_RN2XX3
