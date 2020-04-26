@@ -201,39 +201,47 @@ static const uart_conf_t uart_config[] = {
 #define PWM_0_EN            1
 #define PWM_1_EN            0
 #define PWM_2_EN            0
-#define PWM_MAX_CHANNELS    2
-/* for compatibility with test application */
-#define PWM_0_CHANNELS      PWM_MAX_CHANNELS
-#define PWM_1_CHANNELS      PWM_MAX_CHANNELS
-#define PWM_2_CHANNELS      PWM_MAX_CHANNELS
+
+#if PWM_0_EN
+/* PWM0 channels */
+static const pwm_conf_chan_t pwm_chan0_config[] = {
+    /* GPIO pin, MUX value, TCC channel */
+    { GPIO_PIN(PA, 12), GPIO_MUX_E, 0 },
+    { GPIO_PIN(PA, 13), GPIO_MUX_E, 1 },
+};
+#endif
+#if PWM_1_EN
+/* PWM1 channels */
+static const pwm_conf_chan_t pwm_chan1_config[] = {
+    /* GPIO pin, MUX value, TCC channel */
+    { GPIO_PIN(PB, 12), GPIO_MUX_E, 0 },
+    { GPIO_PIN(PB, 13), GPIO_MUX_E, 1 },
+};
+#endif
+#if PWM_2_EN
+/* PWM2 channels */
+static const pwm_conf_chan_t pwm_chan2_config[] = {
+    /* GPIO pin, MUX value, TCC channel */
+    { GPIO_PIN(PB, 02), GPIO_MUX_E, 0 },
+    { GPIO_PIN(PB, 03), GPIO_MUX_E, 1 },
+};
+#endif
 
 /* PWM device configuration */
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
-    {TCC2, {
-        /* GPIO pin, MUX value, TCC channel */
-        { GPIO_PIN(PA, 12), GPIO_MUX_E, 0 },
-        { GPIO_PIN(PA, 13), GPIO_MUX_E, 1 },
-    }},
+    {TCC2, pwm_chan0_config, ARRAY_SIZE(pwm_chan0_config)},
 #endif
 #if PWM_1_EN
-    {TC4, {
-        /* GPIO pin, MUX value, TCC channel */
-        { GPIO_PIN(PB, 12), GPIO_MUX_E, 0 },
-        { GPIO_PIN(PB, 13), GPIO_MUX_E, 1 },
-    }}
+    {TC4, pwm_chan1_config, ARRAY_SIZE(pwm_chan1_config)},
 #endif
 #if PWM_2_EN
-    {TC6, {
-        /* GPIO pin, MUX value, TCC channel */
-        { GPIO_PIN(PB, 02), GPIO_MUX_E, 0 },
-        { GPIO_PIN(PB, 03), GPIO_MUX_E, 1 },
-    }}
+    {TC6, pwm_chan2_config, ARRAY_SIZE(pwm_chan2_config)},
 #endif
 };
 
 /* number of devices that are actually defined */
-#define PWM_NUMOF           (3U)
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 /**
