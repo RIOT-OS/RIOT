@@ -36,7 +36,7 @@ extern "C" {
  * @name    Power mode configuration
  * @{
  */
-#define PM_NUM_MODES        (4)
+#define PM_NUM_MODES        (3)
 /** @} */
 
 /**
