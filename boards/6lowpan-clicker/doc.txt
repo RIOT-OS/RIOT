@@ -1,7 +1,7 @@
 /**
-@defgroup    boards_pic32-clicker MikroE PIC32 Clicker
+@defgroup    boards_6lowpan-clicker MikroE 6LoWPAN Clicker
 @ingroup     boards
-@brief       Support for the MikroE PIC32 Clicker
+@brief       Support for the MikroE 6LoWPAN Clicker
 
 ## Overview
 
@@ -86,7 +86,7 @@ There are two ways to flash the MCU:
 
 ## Supported Toolchains
 
-For using the pic32-clicker board we strongly recommend the usage of the
+For using the 6lowpan-clicker board we strongly recommend the usage of the
 [Codescape GNU Tools](https://codescape.mips.com) toolchain.
 
 

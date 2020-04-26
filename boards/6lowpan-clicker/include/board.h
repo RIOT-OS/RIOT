@@ -9,16 +9,16 @@
  */
 
 /**
- * @ingroup     boards_pic32-clicker
+ * @ingroup     boards_6lowpan-clicker
  * @details
  * see:
- * http://www.mikroe.com/pic32/pic32mx-clicker/
+ * https://www.mikroe.com/clicker-6lowpan
  * For more information on the board.
  *
  * @{
  *
  * @file
- * @brief       board configuration for the MikroE PIC32 Clicker
+ * @brief       board configuration for the MikroE 6LoWPAN Clicker
  *
  * @author      Neil Jones <Neil.Jones@imgtec.com>
  */
