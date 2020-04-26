@@ -45,6 +45,10 @@ extern "C" {
  *
  * @pre Needs to be power of two and `<= INT_MAX`
  */
+#ifdef CONFIG_SLIPDEV_BUFSIZE_EXP
+#define CONFIG_SLIPDEV_BUFSIZE (1<<CONFIG_SLIPDEV_BUFSIZE_EXP)
+#endif
+
 #ifndef CONFIG_SLIPDEV_BUFSIZE
 #define CONFIG_SLIPDEV_BUFSIZE (2048U)
 #endif
