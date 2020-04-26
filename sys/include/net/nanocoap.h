@@ -78,6 +78,7 @@
 #define NET_NANOCOAP_H
 
 #include <assert.h>
+#include <errno.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -1510,6 +1511,21 @@ static inline void coap_payload_advance_bytes(coap_pkt_t *pkt, size_t len)
  * @returns      < 0 on error
  */
 ssize_t coap_payload_put_bytes(coap_pkt_t *pkt, const void *data, size_t len);
+
+/**
+ * @brief Add a single character to the payload data of the CoAP request
+ *
+ * This function is used to add single characters to a CoAP payload data. It
+ * checks whether the character can be added to the buffer and ignores if the
+ * payload area is already exhausted.
+ *
+ * @param[out]   pkt        pkt to add payload to
+ * @param[in]    c          character to write
+ *
+ * @returns      number of payload bytes added on success (always one)
+ * @returns      < 0 on error
+ */
+ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c);
 
 /**
  * @brief   Create CoAP reply (convenience function)
