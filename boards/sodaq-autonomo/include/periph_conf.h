@@ -149,33 +149,37 @@ static const adc_conf_chan_t adc_channels[] = {
  */
 #define PWM_0_EN            1
 #define PWM_1_EN            1
-#define PWM_MAX_CHANNELS    3
-/* for compatibility with test application */
-#define PWM_0_CHANNELS      PWM_MAX_CHANNELS
-#define PWM_1_CHANNELS      PWM_MAX_CHANNELS
+
+#if PWM_0_EN
+/* PWM0 channels */
+static const pwm_conf_chan_t pwm_chan0_config[] = {
+    /* GPIO pin, MUX value, TCC channel */
+    { GPIO_PIN(PA, 6), GPIO_MUX_E, 0 },
+    { GPIO_PIN(PA, 7), GPIO_MUX_E, 1 },
+};
+#endif
+#if PWM_1_EN
+/* PWM1 channels */
+static const pwm_conf_chan_t pwm_chan1_config[] = {
+    /* GPIO pin, MUX value, TCC channel */
+    { GPIO_PIN(PA, 16), GPIO_MUX_F, 0 },
+    { GPIO_PIN(PA, 18), GPIO_MUX_F, 2 },
+    { GPIO_PIN(PA, 19), GPIO_MUX_F, 3 }
+};
+#endif
 
 /* PWM device configuration */
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
-    {TCC1, {
-        /* GPIO pin, MUX value, TCC channel */
-        { GPIO_PIN(PA, 6), GPIO_MUX_E, 0 },
-        { GPIO_PIN(PA, 7), GPIO_MUX_E, 1 },
-        { GPIO_UNDEF, (gpio_mux_t)0, 2 }
-    }},
+    {TCC1, pwm_chan0_config, ARRAY_SIZE(pwm_chan0_config)},
 #endif
 #if PWM_1_EN
-    {TCC0, {
-        /* GPIO pin, MUX value, TCC channel */
-        { GPIO_PIN(PA, 16), GPIO_MUX_F, 0 },
-        { GPIO_PIN(PA, 18), GPIO_MUX_F, 2 },
-        { GPIO_PIN(PA, 19), GPIO_MUX_F, 3 }
-    }}
+    {TCC0, pwm_chan1_config, ARRAY_SIZE(pwm_chan1_config)},
 #endif
 };
 
 /* number of devices that are actually defined */
-#define PWM_NUMOF           (2U)
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 /**
