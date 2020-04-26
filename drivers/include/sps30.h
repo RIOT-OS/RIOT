@@ -144,8 +144,8 @@ typedef enum {
  *            suboptimal wiring.
  *
  */
-#ifndef SPS30_ERROR_RETRY
-#define SPS30_ERROR_RETRY    (500U)
+#ifndef CONFIG_SPS30_ERROR_RETRY
+#define CONFIG_SPS30_ERROR_RETRY    (500U)
 #endif
 /** @} */
 
