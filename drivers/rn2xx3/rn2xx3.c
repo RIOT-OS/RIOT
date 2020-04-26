@@ -171,7 +171,7 @@ int rn2xx3_init(rn2xx3_t *dev)
     dev->sleep_timer.callback = _sleep_timer_cb;
     dev->sleep_timer.arg = dev;
 
-    rn2xx3_sys_set_sleep_duration(dev, RN2XX3_DEFAULT_SLEEP);
+    rn2xx3_sys_set_sleep_duration(dev, CONFIG_RN2XX3_DEFAULT_SLEEP);
 
     /* sending empty command to clear uart buffer */
     if (rn2xx3_write_cmd(dev) == RN2XX3_TIMEOUT) {
