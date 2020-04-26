@@ -45,8 +45,8 @@ extern "C" {
  *
  * @pre Needs to be power of two and `<= INT_MAX`
  */
-#ifndef SLIPDEV_BUFSIZE
-#define SLIPDEV_BUFSIZE (2048U)
+#ifndef CONFIG_SLIPDEV_BUFSIZE
+#define CONFIG_SLIPDEV_BUFSIZE (2048U)
 #endif
 /** @} */
 
@@ -88,7 +88,7 @@ typedef struct {
     netdev_t netdev;                        /**< parent class */
     slipdev_params_t config;                /**< configuration parameters */
     tsrb_t inbuf;                           /**< RX buffer */
-    uint8_t rxmem[SLIPDEV_BUFSIZE];         /**< memory used by RX buffer */
+    uint8_t rxmem[CONFIG_SLIPDEV_BUFSIZE];  /**< memory used by RX buffer */
     /**
      * @brief   Device state
      * @see     [Device state definitions](@ref drivers_slipdev_states)
