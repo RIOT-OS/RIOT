@@ -20,7 +20,7 @@ else
   IFACE ?= tap0
   ETHOS_BAUDRATE ?= 115200
   CFLAGS += -DETHOS_BAUDRATE=$(ETHOS_BAUDRATE)
-  TERMPROG ?= sudo sh $(RIOTBASE)/dist/tools/ethos/ethos
+  TERMPROG ?= sudo $(RIOTBASE)/dist/tools/ethos/ethos
   TERMFLAGS ?= $(IFACE) $(PORT) $(ETHOS_BAUDRATE)
   TERMDEPS += ethos
 endif
