@@ -141,14 +141,6 @@ static int _send_pkt(nimble_netif_conn_t *conn, gnrc_pktsnip_t *pkt)
     return num_bytes;
 }
 
-static int _netif_send_iter(nimble_netif_conn_t *conn,
-                            int handle, void *arg)
-{
-    (void)handle;
-    _send_pkt(conn, (gnrc_pktsnip_t *)arg);
-    return 0;
-}
-
 static int _netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     assert(pkt->type == GNRC_NETTYPE_NETIF);
@@ -160,9 +152,12 @@ static int _netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     /* if packet is bcast or mcast, we send it to every connected node */
     if (hdr->flags &
         (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-        nimble_netif_conn_foreach(NIMBLE_NETIF_L2CAP_CONNECTED,
-                                  _netif_send_iter, pkt->next);
-        res = (int)gnrc_pkt_len(pkt->next);
+        int handle = nimble_netif_conn_get_next(NIMBLE_NETIF_CONN_INVALID,
+                                                NIMBLE_NETIF_L2CAP_CONNECTED);
+        while (handle != NIMBLE_NETIF_CONN_INVALID) {
+            res = _send_pkt(nimble_netif_conn_get(handle), pkt->next);
+            handle = nimble_netif_conn_get_next(handle, NIMBLE_NETIF_L2CAP_CONNECTED);
+        }
     }
     /* send unicast */
     else {
