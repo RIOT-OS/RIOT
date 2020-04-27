@@ -1,0 +1,2 @@
+core/.*\.c
+core/include/.*\.h
