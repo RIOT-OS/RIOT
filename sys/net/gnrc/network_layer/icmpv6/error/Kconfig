@@ -5,12 +5,6 @@
 # directory for more details.
 #
 
-config MOD_GNRC_ICMPV6
-    bool "ICMPv6 support"
-    default y
-    depends on MOD_GNRC_IPV6
-    select MOD_ICMPV6
-    select MOD_INET_CSUM
-
-rsource "echo/Kconfig"
-rsource "error/Kconfig"
+config MOD_GNRC_ICMPV6_ERROR
+    bool "ICMPv6 error messages support"
+    depends on MOD_GNRC_ICMPV6
