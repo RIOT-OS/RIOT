@@ -465,11 +465,12 @@ _nib_dr_entry_t *_nib_drl_iter(const _nib_dr_entry_t *last);
 /**
  * @brief   Gets a default router by IPv6 address and interface
  *
- * @pre     `(router_addr != NULL)`
+ * @pre     `(router_addr != NULL) || (iface != 0)`
  *
- * @param[in] router_addr   The address of a default router. Must not be NULL.
+ * @param[in] router_addr   The address of a default router. May be NULL for
+ *                          any address, but then @p iface must not be NULL.
  * @param[in] iface         The interface to the node. May be 0 for any
- *                          interface.
+ *                          interface, but then @p router_addr must not be NULL.
  *
  * @return  The NIB entry for node with @p router_addr and @p iface onsuccess.
  * @return  NULL, if there is no such entry.

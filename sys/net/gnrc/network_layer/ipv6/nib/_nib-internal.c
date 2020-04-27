@@ -403,13 +403,15 @@ _nib_dr_entry_t *_nib_drl_iter(const _nib_dr_entry_t *last)
 
 _nib_dr_entry_t *_nib_drl_get(const ipv6_addr_t *router_addr, unsigned iface)
 {
+    assert((router_addr != NULL) || (iface != 0));
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
         _nib_dr_entry_t *def_router = &_def_routers[i];
         _nib_onl_entry_t *node = def_router->next_hop;
 
         if ((node != NULL) &&
-            (_nib_onl_get_if(node) == iface) &&
-            (ipv6_addr_equal(router_addr, &node->ipv6))) {
+            ((iface == 0) || (_nib_onl_get_if(node) == iface)) &&
+            ((router_addr == NULL) ||
+             ipv6_addr_equal(router_addr, &node->ipv6))) {
             /* It is linked to the default router list so it *should* be set */
             assert(node->mode & _DRL);
             return def_router;
