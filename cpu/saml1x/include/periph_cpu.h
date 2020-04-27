@@ -62,6 +62,16 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 /** @} */
 
+/**
+ * @brief   The MCU has a 10 bit DAC
+ */
+#define DAC_RES_BITS        (10)
+
+/**
+ * @brief   The MCU has one DAC Output.
+ */
+#define DAC_NUMOF           (1)
+
 #ifdef __cplusplus
 }
 #endif
