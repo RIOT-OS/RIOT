@@ -174,7 +174,7 @@ static inline bool _is_valid(const gnrc_netif_t *netif, int idx)
 void _handle_rereg_address(const ipv6_addr_t *addr)
 {
     gnrc_netif_t *netif = gnrc_netif_get_by_ipv6_addr(addr);
-    _nib_dr_entry_t *router = _nib_drl_get_dr();
+    _nib_dr_entry_t *router = _nib_drl_get(NULL, netif->pid);
     const bool router_reachable = (router != NULL) &&
                                   _is_reachable(router->next_hop);
 
