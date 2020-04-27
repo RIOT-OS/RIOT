@@ -1,0 +1,23 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_MODULE_PN532
+    bool "Configure PN532 driver"
+    depends on MODULE_PN532
+    help
+        Configure the PN532 driver using Kconfig.
+
+if KCONFIG_MODULE_PN532
+
+config PN532_BUFFER_LEN
+    int "Internal buffer size"
+    default 64
+    help
+        The internal buffer is used while reading and writing to PN532 Device.
+        For large NDEF files, the buffer size may be increased.
+        Otherwise the files may be written in chunks.
+
+endif # KCONFIG_MODULE_PN532

@@ -84,8 +84,8 @@ typedef struct {
  * files are to be written this size shall be increased. Otherwise the files
  * can be written in chunks.
  */
-#ifndef PN532_BUFFER_LEN
-#define PN532_BUFFER_LEN     (64)
+#ifndef CONFIG_PN532_BUFFER_LEN
+#define CONFIG_PN532_BUFFER_LEN     (64)
 #endif
 /** @} */
 
