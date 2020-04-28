@@ -425,7 +425,6 @@ static unsigned _newline(unsigned threshold, unsigned line_thresh)
     return line_thresh;
 }
 
-
 static unsigned _netif_list_flag(netif_t *iface, netopt_t opt, char *str,
                                  unsigned line_thresh)
 {
@@ -693,7 +692,7 @@ static void _netif_list(netif_t *iface)
 #endif
     res = netif_get_opt(iface, NETOPT_SRC_LEN, 0, &u16, sizeof(u16));
     if (res >= 0) {
-        printf("Source address length: %" PRIu16 , u16);
+        printf("Source address length: %" PRIu16, u16);
         line_thresh++;
     }
     line_thresh = _newline(0U, line_thresh);
@@ -1014,7 +1013,7 @@ static int _netif_set_lw_key(netif_t *iface, netopt_t opt, char *key_str)
 
     size_t key_len = fmt_hex_bytes(key, key_str);
     size_t expected_len;
-    switch(opt) {
+    switch (opt) {
         case NETOPT_LORAWAN_APPKEY:
         case NETOPT_LORAWAN_APPSKEY:
         case NETOPT_LORAWAN_NWKSKEY:
@@ -1375,7 +1374,7 @@ static uint8_t _get_prefix_len(char *addr)
 
 static int _netif_link(netif_t *iface, netopt_enable_t en)
 {
-    if(netif_set_opt(iface, NETOPT_LINK, 0, &en, sizeof(en)) < 0) {
+    if (netif_set_opt(iface, NETOPT_LINK, 0, &en, sizeof(en)) < 0) {
         printf("error: unable to set link %s\n", en == NETOPT_ENABLE ? "up" : "down");
         return 1;
     }
