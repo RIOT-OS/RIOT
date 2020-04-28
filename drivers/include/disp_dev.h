@@ -56,7 +56,7 @@ typedef struct {
      * @param[in] y2    Bottom coordinate
      * @param[in] color Array of color to map to the display
      */
-    void (*map)(disp_dev_t *dev,
+    void (*map)(const disp_dev_t *dev,
                 uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,
                 const uint16_t *color);
 
@@ -67,7 +67,7 @@ typedef struct {
      *
      * @return              Height in pixels
      */
-    uint16_t (*height)(disp_dev_t *dev);
+    uint16_t (*height)(const disp_dev_t *dev);
 
     /**
      * @brief   Get the width of the display device
@@ -76,14 +76,14 @@ typedef struct {
      *
      * @return              Width in pixels
      */
-    uint16_t (*width)(disp_dev_t *dev);
+    uint16_t (*width)(const disp_dev_t *dev);
 
     /**
      * @brief   Get the color depth of the display device
      *
      * @return              The color depth
      */
-    uint8_t (*color_depth)(disp_dev_t *dev);
+    uint8_t (*color_depth)(const disp_dev_t *dev);
 
     /**
      * @brief   Invert the display device colors
@@ -91,7 +91,7 @@ typedef struct {
      * @param[in] dev       Network device descriptor
      * @param[in] invert    Invert mode (true if invert, false otherwise)
      */
-    void (*set_invert)(disp_dev_t *dev, bool invert);
+    void (*set_invert)(const disp_dev_t *dev, bool invert);
 } disp_dev_driver_t;
 
 /**
@@ -111,9 +111,9 @@ struct disp_dev {
  * @param[in] y2    Bottom coordinate
  * @param[in] color Array of color to map to the display
  */
-void disp_dev_map(disp_dev_t *dev,
-                 uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,
-                 const uint16_t *color);
+void disp_dev_map(const disp_dev_t *dev,
+                  uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,
+                  const uint16_t *color);
 
 /**
  * @brief   Get the height of the display device
@@ -122,7 +122,7 @@ void disp_dev_map(disp_dev_t *dev,
  *
  * @return              Height in pixels
  */
-uint16_t disp_dev_height(disp_dev_t *dev);
+uint16_t disp_dev_height(const disp_dev_t *dev);
 
 /**
  * @brief   Get the width of the display device
@@ -131,14 +131,14 @@ uint16_t disp_dev_height(disp_dev_t *dev);
  *
  * @return              Width in pixels
  */
-uint16_t disp_dev_width(disp_dev_t *dev);
+uint16_t disp_dev_width(const disp_dev_t *dev);
 
 /**
  * @brief   Get the color depth of the display device
  *
  * @return              The color depth
  */
-uint8_t disp_dev_color_depth(disp_dev_t *dev);
+uint8_t disp_dev_color_depth(const disp_dev_t *dev);
 
 /**
  * @brief   Invert the display device colors
@@ -146,7 +146,7 @@ uint8_t disp_dev_color_depth(disp_dev_t *dev);
  * @param[in] dev       Pointer to the display device
  * @param[in] invert    Invert mode (true if invert, false otherwise)
  */
-void disp_dev_set_invert(disp_dev_t *dev, bool invert);
+void disp_dev_set_invert(const disp_dev_t *dev, bool invert);
 
 /**
  * @brief   Enable the backlight pin

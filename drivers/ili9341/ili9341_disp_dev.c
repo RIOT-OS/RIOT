@@ -31,20 +31,20 @@
 #define ILI9341_DISP_COLOR_DEPTH    (16U)
 #endif
 
-static void _ili9341_map(disp_dev_t *dev, uint16_t x1, uint16_t x2,
+static void _ili9341_map(const disp_dev_t *dev, uint16_t x1, uint16_t x2,
                   uint16_t y1, uint16_t y2, const uint16_t *color)
 {
     ili9341_t *ili9341 = (ili9341_t *)dev;
     ili9341_pixmap(ili9341, x1, x2, y1, y2, color);
 }
 
-static uint16_t _ili9341_height(disp_dev_t *disp_dev)
+static uint16_t _ili9341_height(const disp_dev_t *disp_dev)
 {
     (void)disp_dev;
     return ILI9341_DISP_DEV_HEIGHT;
 }
 
-static uint16_t _ili9341_width(disp_dev_t *disp_dev)
+static uint16_t _ili9341_width(const disp_dev_t *disp_dev)
 {
     const ili9341_t *dev = (ili9341_t *)disp_dev;
     assert(dev);
@@ -52,13 +52,13 @@ static uint16_t _ili9341_width(disp_dev_t *disp_dev)
     return dev->params->lines;
 }
 
-static uint8_t _ili9341_color_depth(disp_dev_t *disp_dev)
+static uint8_t _ili9341_color_depth(const disp_dev_t *disp_dev)
 {
     (void)disp_dev;
     return ILI9341_DISP_COLOR_DEPTH;
 }
 
-static void _ili9341_set_invert(disp_dev_t *disp_dev, bool invert)
+static void _ili9341_set_invert(const disp_dev_t *disp_dev, bool invert)
 {
     const ili9341_t *dev = (ili9341_t *)disp_dev;
 
