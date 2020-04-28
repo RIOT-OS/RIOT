@@ -7,21 +7,20 @@
  */
 
 /**
- * @defgroup    usb_cdc_acm   CDC - USB communications device class
- * @ingroup     usb_cdc
- * @brief       Generic USB CDC defines and helpers
+ * @defgroup    usbus_cdc_acm_uart USBUS CDC ACM - USBUS CDC ACM - UART
+ * @ingroup     usbus_cdc_acm
+ * @brief       USB CDC ACM to UART functionality
  *
  * @{
  *
  * @file
- * @brief       Definition for USB CDC interfaces
+ * @brief       Definition for USB CDC ACM to UART functionality
  *
- * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef USB_USBUS_CDC_ACM_UART
-#define USB_USBUS_CDC_ACM_UART
+#ifndef USB_USBUS_CDC_ACM_UART_H
+#define USB_USBUS_CDC_ACM_UART_H
 
 #include "periph/uart.h"
 #include "isrpipe.h"
@@ -32,7 +31,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Local buffer for UART data
+ * @brief Size of the local buffer for UART data
  */
 #ifndef USBUS_CDC_ACM_UART_BUF_SIZE
 #define USBUS_CDC_ACM_UART_BUF_SIZE 128
@@ -78,5 +77,5 @@ void usbus_cdc_acm_uart_init(usbus_t *usbus,
 }
 #endif
 
-#endif /* USB_USBUS_CDC_ACM_UART */
+#endif /* USB_USBUS_CDC_ACM_UART_H */
 /** @} */
