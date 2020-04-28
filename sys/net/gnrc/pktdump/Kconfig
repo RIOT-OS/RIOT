@@ -1,16 +1,23 @@
 # Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_GNRC_PKTDUMP
-    bool "Configure GNRC Packet Dump"
-    depends on MODULE_GNRC_PKTDUMP
-    help
-        Configure the GNRC_PKTDUMP using Kconfig.
 
-if KCONFIG_MODULE_GNRC_PKTDUMP
+menuconfig MOD_GNRC_PKTDUMP
+    bool "GNRC packet dump"
+    depends on MOD_OD
+    depends on MOD_GNRC_PKTBUF
+    help
+        Dump network packets to STDOUT for debugging.
+
+if MOD_GNRC_PKTDUMP
+
+config MOD_AUTO_INIT_GNRC_PKTDUMP
+    bool "Auto-init GNRC packet dump module"
+    default y if MOD_AUTO_INIT
 
 config GNRC_PKTDUMP_MSG_QUEUE_SIZE_EXP
     int "Exponent for the queue size (resulting in the queue size 2^n)"
@@ -20,4 +27,4 @@ config GNRC_PKTDUMP_MSG_QUEUE_SIZE_EXP
         represents the exponent of 2^n, which will be used as the size of
         the queue.
 
-endif # KCONFIG_MODULE_GNRC_PKTDUMP
+endif # MOD_GNRC_PKTDUMP
