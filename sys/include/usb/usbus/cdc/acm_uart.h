@@ -28,7 +28,7 @@
 #include "usb/usbus/cdc/acm.h"
 
 #ifdef __cplusplus
-extern "c" {
+extern "C" {
 #endif
 
 /**
@@ -47,12 +47,12 @@ extern "c" {
  * @brief usbus CDC ACM to UART handler struct
  */
 typedef struct {
-    usbus_cdcacm_device_t cdcacm;                /**< CDC ACM USB function */
-    uint8_t buf[USBUS_CDC_ACM_UART_BUF_SIZE];    /**< uart receive buffer  */
-    uint8_t acmbuf[USBUS_CDC_ACM_UART_BUF_SIZE]; /**< USB receive buffer   */
-    isrpipe_t usb2uart;                          /**< isrpipe to uart      */
-    uint32_t baud;                               /**< Current baud rate    */
-    uart_t uart;                                 /**< UART device handler  */
+    usbus_cdcacm_device_t cdcacm;                   /**< CDC ACM USB function */
+    uint8_t buf[USBUS_CDC_ACM_UART_BUF_SIZE];       /**< uart receive buffer  */
+    uint8_t acmbuf[USBUS_CDC_ACM_UART_BUF_SIZE];    /**< USB receive buffer   */
+    isrpipe_t usb2uart;                             /**< isrpipe to uart      */
+    uint32_t baud;                                  /**< Current baud rate    */
+    uart_t uart;                                    /**< UART device handler  */
 } usbus_cdc_acm_uart_device_t;
 
 /**
@@ -79,3 +79,4 @@ void usbus_cdc_acm_uart_init(usbus_t *usbus,
 #endif
 
 #endif /* USBUS_CDC_ACM_UART */
+/** @} */

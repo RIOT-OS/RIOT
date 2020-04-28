@@ -25,7 +25,7 @@
 #ifdef PERIPH_UART_MODECFG
 static int _acm2uart_bits(uint8_t bits, uart_data_bits_t *conv)
 {
-    switch(bits) {
+    switch (bits) {
         case 5:
             *conv = UART_DATA_BITS_5;
             break;
@@ -46,7 +46,7 @@ static int _acm2uart_bits(uint8_t bits, uart_data_bits_t *conv)
 
 static int _acm2uart_parity(uint8_t parity, uart_parity_t *conv)
 {
-    switch(parity) {
+    switch (parity) {
         case USB_CDC_ACM_CODING_PARITY_NONE:
             *conv = UART_PARITY_NONE;
             break;
@@ -70,7 +70,7 @@ static int _acm2uart_parity(uint8_t parity, uart_parity_t *conv)
 
 static int _acm2uart_stop(uint8_t stop, uart_stop_bits_t *conv)
 {
-    switch(stop) {
+    switch (stop) {
         case USB_CDC_ACM_CODING_STOP_BITS_1:
             *conv = UART_STOP_BITS_1;
             break;
@@ -86,15 +86,16 @@ static int _acm2uart_stop(uint8_t stop, uart_stop_bits_t *conv)
 
 static void _rx_cb(void *arg, uint8_t data)
 {
-    usbus_cdc_acm_uart_device_t *acmuart = (usbus_cdc_acm_uart_device_t*)arg;
+    usbus_cdc_acm_uart_device_t *acmuart = (usbus_cdc_acm_uart_device_t *)arg;
+
     usbus_cdc_acm_submit(&acmuart->cdcacm, &data, 1);
     if (data == '\n') {
         usbus_cdc_acm_flush(&acmuart->cdcacm);
     }
 }
 
-static int _coding_cb(usbus_cdcacm_device_t *cdcacm, uint32_t baud, uint8_t bits,
-                      uint8_t parity, uint8_t stop)
+static int _coding_cb(usbus_cdcacm_device_t *cdcacm, uint32_t baud,
+                      uint8_t bits, uint8_t parity, uint8_t stop)
 {
     usbus_cdc_acm_uart_device_t *acmuart =
         container_of(cdcacm, usbus_cdc_acm_uart_device_t, cdcacm);
@@ -104,12 +105,14 @@ static int _coding_cb(usbus_cdcacm_device_t *cdcacm, uint32_t baud, uint8_t bits
     uart_parity_t uparity = UART_PARITY_NONE;
     uart_stop_bits_t ustop = UART_STOP_BITS_1;
     if (_acm2uart_bits(bits, &ubits) < 0 ||
-            _acm2uart_parity(parity, &uparity) < 0 ||
-            _acm2uart_stop(stop, &ustop) < 0) {
+        _acm2uart_parity(parity, &uparity) < 0 ||
+        _acm2uart_stop(stop, &ustop) < 0) {
         return -1;
     }
 #else
-    if (bits != 8 || parity != USB_CDC_ACM_CODING_PARITY_NONE || stop != USB_CDC_ACM_CODING_STOP_BITS_1) {
+    if (bits != 8 ||
+        parity != USB_CDC_ACM_CODING_PARITY_NONE ||
+        stop != USB_CDC_ACM_CODING_STOP_BITS_1) {
         return -1;
     }
 #endif
@@ -128,7 +131,7 @@ static int _coding_cb(usbus_cdcacm_device_t *cdcacm, uint32_t baud, uint8_t bits
 }
 
 void _submit_pipe(usbus_cdcacm_device_t *cdcacm,
-                           uint8_t *data, size_t len)
+                  uint8_t *data, size_t len)
 {
     usbus_cdc_acm_uart_device_t *acmuart =
         container_of(cdcacm, usbus_cdc_acm_uart_device_t, cdcacm);
@@ -140,8 +143,9 @@ void _submit_pipe(usbus_cdcacm_device_t *cdcacm,
 
 void *_thread(void *arg)
 {
-    usbus_cdc_acm_uart_device_t *acmuart = (usbus_cdc_acm_uart_device_t*)arg;
-    while(1) {
+    usbus_cdc_acm_uart_device_t *acmuart = (usbus_cdc_acm_uart_device_t *)arg;
+
+    while (1) {
         uint8_t uartbuf[16];
         size_t bytes = isrpipe_read(&acmuart->usb2uart,
                                     uartbuf, sizeof(uartbuf));
@@ -152,7 +156,7 @@ void *_thread(void *arg)
 
 void usbus_cdc_acm_uart_init(usbus_t *usbus,
                              usbus_cdc_acm_uart_device_t *acmuart, uart_t uart,
-                             char *stack, size_t stacksize, char* name)
+                             char *stack, size_t stacksize, char *name)
 {
     acmuart->uart = uart;
     isrpipe_init(&acmuart->usb2uart, acmuart->buf,
@@ -161,6 +165,6 @@ void usbus_cdc_acm_uart_init(usbus_t *usbus,
     usbus_cdc_acm_init(usbus, &acmuart->cdcacm, _submit_pipe, _coding_cb,
                        acmuart->acmbuf, USBUS_CDC_ACM_UART_BUF_SIZE);
 
-    thread_create(stack, stacksize, USBUS_PRIO+1, THREAD_CREATE_STACKTEST,
-                            _thread, (void *)acmuart, name);
+    thread_create(stack, stacksize, USBUS_PRIO + 1, THREAD_CREATE_STACKTEST,
+                  _thread, (void *)acmuart, name);
 }
