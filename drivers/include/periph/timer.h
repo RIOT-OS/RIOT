@@ -35,12 +35,20 @@
 
 #include <limits.h>
 
+#include "periph_conf.h"
 #include "periph_cpu.h"
 /** @todo remove dev_enums.h include once all platforms are ported to the updated periph interface */
 #include "periph/dev_enums.h"
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+ * @brief   The Timer implementation must define the number of channels the timer has.
+ */
+#ifndef TIMER_CHANNEL_NUMOF
+#error "Timer implementations have to provide the number of channels as CPP macro TIMER_CHANNEL_NUMOF"
 #endif
 
 /**
