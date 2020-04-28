@@ -1,7 +1,7 @@
 ifeq (,$(KINETIS_SERIES))
   # Parse parameters from CPU_MODEL using the kinetis-info.mk script in the same
   # directory as this Makefile.
-  include $(MAKEFILEDIR)/kinetis-info.mk
+  include $(LAST_MAKEFILEDIR)/kinetis-info.mk
 endif
 
 # "The Vector table must be naturally aligned to a power of two whose alignment
