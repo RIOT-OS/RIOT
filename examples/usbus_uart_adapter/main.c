@@ -33,12 +33,12 @@ static char _stack[USBUS_STACKSIZE];
 
 static usbus_t usbus;
 
-#define MIN(a,b)        (((a) < (b)) ? a : b)
+#define MIN(a, b)        (((a) < (b)) ? a : b)
 /* Max number of USB to UART functions.                                    *
- * Reduced by 3 for the control endpoint and the two endpoints used by the *
- * STDIO CDC ACM module. Divided by two as each CDC ACM function requires  *
- * two endpoints in each direction                                         */
-#define USB_ACM_MAX     ((USBDEV_NUM_ENDPOINTS - 1U)/2U)
+* Reduced by 3 for the control endpoint and the two endpoints used by the *
+* STDIO CDC ACM module. Divided by two as each CDC ACM function requires  *
+* two endpoints in each direction                                         */
+#define USB_ACM_MAX     ((USBDEV_NUM_ENDPOINTS - 1U) / 2U)
 /* Determine the number of USB to UART functions possible */
 #define NUMOF_ACM       MIN(USB_ACM_MAX, UART_NUMOF)
 
@@ -50,13 +50,14 @@ static void _init_usb(void)
 {
     /* Get driver context */
     usbdev_t *usbdev = usbdev_get_ctx(0);
+
     assert(usbdev);
 
     /* Initialize basic usbus struct, don't start the thread yet */
     usbus_init(&usbus, usbdev);
 
     /* Instantiate the threads */
-    for(unsigned i = 0; i < NUMOF_ACM; i++) {
+    for (unsigned i = 0; i < NUMOF_ACM; i++) {
         static const char basename[] = "uart: ";
         memcpy(_cdc_acm_uart_name[i], basename, sizeof(basename));
         fmt_u32_dec(&_cdc_acm_uart_name[i][strlen(basename)], i);
