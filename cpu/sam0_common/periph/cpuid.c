@@ -21,7 +21,6 @@
  */
 
 #include <stdint.h>
-#include <string.h>
 
 #include "periph/cpuid.h"
 
@@ -39,6 +38,10 @@
 
 void cpuid_get(void *id)
 {
-    uint32_t addr[] = { WORD0, WORD1, WORD2, WORD3 };
-    memcpy(id, &addr[0], CPUID_LEN);
+    uint32_t *_id = id;
+
+    _id[0] = WORD0;
+    _id[1] = WORD1;
+    _id[2] = WORD2;
+    _id[3] = WORD3;
 }
