@@ -19,41 +19,42 @@
  */
 
 #include <assert.h>
+#include <stdbool.h>
 #include <inttypes.h>
 
 #include "disp_dev.h"
 
-void disp_dev_map(disp_dev_t *dev,
-                 uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,
-                 const uint16_t *color)
+void disp_dev_map(const disp_dev_t *dev,
+                  uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,
+                  const uint16_t *color)
 {
     assert(dev);
 
     dev->driver->map(dev, x1, x2, y1, y2, color);
 }
 
-uint16_t disp_dev_height(disp_dev_t *dev)
+uint16_t disp_dev_height(const disp_dev_t *dev)
 {
     assert(dev);
 
     return dev->driver->height(dev);
 }
 
-uint16_t disp_dev_width(disp_dev_t *dev)
+uint16_t disp_dev_width(const disp_dev_t *dev)
 {
     assert(dev);
 
     return dev->driver->width(dev);
 }
 
-uint8_t disp_dev_color_depth(disp_dev_t *dev)
+uint8_t disp_dev_color_depth(const disp_dev_t *dev)
 {
     assert(dev);
 
     return dev->driver->color_depth(dev);
 }
 
-void disp_dev_set_invert(disp_dev_t *dev, bool invert)
+void disp_dev_set_invert(const disp_dev_t *dev, bool invert)
 {
     assert(dev);
 
