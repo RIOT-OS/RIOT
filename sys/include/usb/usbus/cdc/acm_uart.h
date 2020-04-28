@@ -20,8 +20,8 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  */
 
-#ifndef USBUS_CDC_ACM_UART
-#define USBUS_CDC_ACM_UART
+#ifndef USB_USBUS_CDC_ACM_UART
+#define USB_USBUS_CDC_ACM_UART
 
 #include "periph/uart.h"
 #include "isrpipe.h"
@@ -78,5 +78,5 @@ void usbus_cdc_acm_uart_init(usbus_t *usbus,
 }
 #endif
 
-#endif /* USBUS_CDC_ACM_UART */
+#endif /* USB_USBUS_CDC_ACM_UART */
 /** @} */
