@@ -68,7 +68,7 @@ typedef uint32_t gpio_t;
 /**
  * @brief   We use 3 channels for each defined timer
  */
-#define TIMER_CHANNELS      (3)
+#define TIMER_CHANNEL_NUMOF      (3)
 
 /**
  * @brief   The RTT width is fixed to 32-bit

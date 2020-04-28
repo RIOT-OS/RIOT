@@ -132,7 +132,7 @@ typedef uint16_t gpio_t;
 /**
  * @brief   Number of maximal available timer channels
  */
-#define TIMER_CHANNELS      (1U)
+#define TIMER_CHANNEL_NUMOF      (1U)
 
 /**
  * @brief   number of usable power modes

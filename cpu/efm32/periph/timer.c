@@ -111,7 +111,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
     TIMER_TypeDef *tim;
 
-    if (channel < 0 || channel >= TIMER_CHANNELS) {
+    if (channel < 0 || channel >= TIMER_CHANNEL_NUMOF) {
         return -1;
     }
 
@@ -153,7 +153,7 @@ void TIMER_0_ISR(void)
 {
     TIMER_TypeDef *tim = timer_config[0].timer.dev;
 
-    for (int i = 0; i < TIMER_CHANNELS; i++) {
+    for (int i = 0; i < TIMER_CHANNEL_NUMOF; i++) {
         if (tim->IF & (TIMER_IF_CC0 << i)) {
             tim->CC[i].CTRL = _TIMER_CC_CTRL_MODE_OFF;
             tim->IFC = (TIMER_IFC_CC0 << i);

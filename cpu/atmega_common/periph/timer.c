@@ -132,7 +132,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (channel >= TIMER_CHANNELS) {
+    if (channel >= TIMER_CHANNEL_NUMOF) {
         return -1;
     }
 
@@ -145,7 +145,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
 int timer_clear(tim_t tim, int channel)
 {
-    if (channel >= TIMER_CHANNELS) {
+    if (channel >= TIMER_CHANNEL_NUMOF) {
         return -1;
     }
 

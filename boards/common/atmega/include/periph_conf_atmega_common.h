@@ -106,7 +106,7 @@ extern "C" {
 #ifndef TIMER_NUMOF
 #if defined(CPU_ATMEGA32U4)
     #define TIMER_NUMOF         (2U)
-    #define TIMER_CHANNELS      (3)
+    #define TIMER_CHANNEL_NUMOF (3)
 
     #define TIMER_0             MEGA_TIMER1
     #define TIMER_0_MASK        &TIMSK1
@@ -123,7 +123,7 @@ extern "C" {
     #define TIMER_1_ISRC        TIMER3_COMPC_vect
 #elif defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2)
     #define TIMER_NUMOF         (3U)
-    #define TIMER_CHANNELS      (3)
+    #define TIMER_CHANNEL_NUMOF (3)
 
     #define TIMER_0             MEGA_TIMER4
     #define TIMER_0_MASK        &TIMSK4
@@ -147,7 +147,7 @@ extern "C" {
     #define TIMER_2_ISRC        TIMER1_COMPC_vect
 #elif defined(CPU_ATMEGA328P)
     #define TIMER_NUMOF         (1U)
-    #define TIMER_CHANNELS      (2)
+    #define TIMER_CHANNEL_NUMOF (2)
 
     #define TIMER_0             MEGA_TIMER1
     #define TIMER_0_MASK        &TIMSK1
@@ -156,7 +156,7 @@ extern "C" {
     #define TIMER_0_ISRB        TIMER1_COMPB_vect
 #elif defined(CPU_ATMEGA1284P)
     #define TIMER_NUMOF         (2U)
-    #define TIMER_CHANNELS      (2)
+    #define TIMER_CHANNEL_NUMOF (2)
 
     #define TIMER_0             MEGA_TIMER1
     #define TIMER_0_MASK        &TIMSK1
@@ -171,7 +171,7 @@ extern "C" {
     #define TIMER_1_ISRB        TIMER3_COMPB_vect
 #elif defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA1281)
     #define TIMER_NUMOF         (2U)
-    #define TIMER_CHANNELS      (3)
+    #define TIMER_CHANNEL_NUMOF (3)
 
     #define TIMER_0             MEGA_TIMER1
     #define TIMER_0_MASK        &TIMSK1

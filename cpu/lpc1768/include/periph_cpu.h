@@ -68,7 +68,7 @@ typedef enum {
 /**
  * @brief   Number of available timer channels
  */
-#define TIMER_CHANNELS      (4U)
+#define TIMER_CHANNEL_NUMOF      (4U)
 
 /**
  * @brief   CPU provides own pm_off() function

@@ -38,7 +38,7 @@ extern "C" {
 /**
  * @brief   All timers for the STM32F1 have 4 CC channels
  */
-#define TIMER_CHANNELS      (4U)
+#define TIMER_CHANNEL_NUMOF (4U)
 
 /**
  * @brief   All timers have a width of 16-bit

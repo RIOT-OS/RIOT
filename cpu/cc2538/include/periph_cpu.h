@@ -293,7 +293,7 @@ typedef struct {
 /**
  * @brief   Number of maximal available timer channels
  */
-#define TIMER_CHANNELS      (2U)
+#define TIMER_CHANNEL_NUMOF (2U)
 
 #ifndef DOXYGEN
 /**
