@@ -142,7 +142,7 @@ static int _rx_tx_data(const sps30_t *dev, uint16_t ptr_addr,
                        uint8_t *data, size_t len, bool read)
 {
     int res = 0;
-    unsigned retr = SPS30_ERROR_RETRY;
+    unsigned retr = CONFIG_SPS30_ERROR_RETRY;
 
     if (i2c_acquire(dev->p.i2c_dev) != 0) {
         LOG_ERROR("could not acquire I2C bus %d\n", dev->p.i2c_dev);
