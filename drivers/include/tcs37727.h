@@ -47,10 +47,12 @@ extern "C"
  * @{
  */
 /**
- * @brief   Default RGBC integration time.
+ * @brief   Default RGBC integration time in microseconds.
+ *
+ * Refer section "RGBC Time Register" in datasheet for more information.
  */
-#ifndef TCS37727_ATIME_DEFAULT
-#define TCS37727_ATIME_DEFAULT  200000
+#ifndef CONFIG_TCS37727_ATIME_DEFAULT
+#define CONFIG_TCS37727_ATIME_DEFAULT  200000
 #endif
 /** @} */
 
