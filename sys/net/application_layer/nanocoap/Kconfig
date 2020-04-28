@@ -7,6 +7,7 @@
 
 # Nanocoap provides CoAP functionalities
 config MODULE_NANOCOAP
+    bool
     select HAS_PROTOCOL_COAP
 
 menuconfig KCONFIG_MODULE_NANOCOAP
