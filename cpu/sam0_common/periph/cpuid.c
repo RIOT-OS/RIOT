@@ -39,6 +39,8 @@
 
 void cpuid_get(void *id)
 {
+    /* Use memcpy to prevent unaligned access, which is not supported on
+     * cortex-m0+, to id */
     uint32_t addr[] = { WORD0, WORD1, WORD2, WORD3 };
     memcpy(id, &addr[0], CPUID_LEN);
 }
