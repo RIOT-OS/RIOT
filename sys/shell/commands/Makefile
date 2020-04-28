@@ -8,6 +8,9 @@ endif
 ifneq (,$(filter mci,$(USEMODULE)))
   SRC += sc_disk.c
 endif
+ifneq (,$(filter periph_pm,$(USEMODULE)))
+  SRC += sc_pm.c
+endif
 ifneq (,$(filter ps,$(USEMODULE)))
   SRC += sc_ps.c
 endif

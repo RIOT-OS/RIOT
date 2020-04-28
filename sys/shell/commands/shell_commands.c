@@ -34,6 +34,10 @@ extern int _id_handler(int argc, char **argv);
 extern int _heap_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_PERIPH_PM
+extern int _pm_handler(int argc, char **argv);
+#endif
+
 #ifdef MODULE_PS
 extern int _ps_handler(int argc, char **argv);
 #endif
@@ -179,6 +183,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_HEAP_CMD
     {"heap", "Prints heap statistics.", _heap_handler},
+#endif
+#ifdef MODULE_PERIPH_PM
+    { "pm", "interact with layered PM subsystem", _pm_handler },
 #endif
 #ifdef MODULE_PS
     {"ps", "Prints information about running threads.", _ps_handler},

@@ -7,6 +7,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega1284p \
     atmega328p \
+    blackpill \
+    bluepill \
     calliope-mini \
     chronos \
     derfmega128 \

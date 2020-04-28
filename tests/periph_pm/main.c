@@ -33,6 +33,9 @@
 #endif
 #include "pm_layered.h"
 #endif
+
+extern int _pm_handler(int argc, char **argv);
+
 #include "shell.h"
 
 #ifndef BTN0_INT_FLANK
@@ -40,10 +43,14 @@
 #endif
 
 #ifdef MODULE_PM_LAYERED
-static int check_mode(int argc, char **argv)
+
+extern volatile pm_blocker_t pm_blocker; /* sys/pm_layered/pm.c */
+
+#ifdef MODULE_PERIPH_RTC
+static int check_mode_duration(int argc, char **argv)
 {
-    if (argc < 2) {
-        printf("Usage: %s <power mode>\n", argv[0]);
+    if (argc != 3) {
+        printf("Usage: %s <power mode> <duration (s)>\n", argv[0]);
         return -1;
     }
 
@@ -60,17 +67,6 @@ static int parse_mode(char *argv)
     }
 
     return mode;
-}
-
-#ifdef MODULE_PERIPH_RTC
-static int check_mode_duration(int argc, char **argv)
-{
-    if (argc != 3) {
-        printf("Usage: %s <power mode> <duration (s)>\n", argv[0]);
-        return -1;
-    }
-
-    return 0;
 }
 
 static int parse_duration(char *argv)
@@ -91,97 +87,7 @@ static void cb_rtc(void *arg)
 
     pm_block(level);
 }
-#endif /* MODULE_PERIPH_RTC */
-#endif /* MODULE_PM_LAYERED */
 
-static int cmd_off(int argc, char **argv)
-{
-    (void) argc;
-    (void) argv;
-
-    puts("CPU will turn off.");
-    fflush(stdout);
-
-    pm_off();
-
-    return 0;
-}
-
-static int cmd_reboot(int argc, char **argv)
-{
-    (void) argc;
-    (void) argv;
-
-    puts("CPU will reboot.");
-    fflush(stdout);
-
-    pm_reboot();
-
-    return 0;
-}
-
-#ifdef MODULE_PM_LAYERED
-static int cmd_block(int argc, char **argv)
-{
-    if (check_mode(argc, argv) != 0) {
-        return 1;
-    }
-
-    int mode = parse_mode(argv[1]);
-
-    if (mode < 0) {
-        return 1;
-    }
-
-    printf("Blocking power mode %d.\n", mode);
-    fflush(stdout);
-
-    pm_block(mode);
-
-    return 0;
-}
-
-static int cmd_set(int argc, char **argv)
-{
-    if (check_mode(argc, argv) != 0) {
-        return 1;
-    }
-
-    int mode = parse_mode(argv[1]);
-
-    if (mode < 0) {
-        return 1;
-    }
-
-    printf("CPU will enter power mode %d.\n", mode);
-    fflush(stdout);
-
-    pm_set(mode);
-
-    return 0;
-}
-
-static int cmd_unblock(int argc, char **argv)
-{
-    if (check_mode(argc, argv) != 0) {
-        return 1;
-    }
-
-    int mode = parse_mode(argv[1]);
-
-    if (mode < 0) {
-        return 1;
-    }
-
-    printf("Unblocking power mode %d.\n", mode);
-    fflush(stdout);
-
-    pm_unblock(mode);
-
-    return 0;
-}
-
-#ifdef MODULE_PERIPH_RTC
 static int cmd_unblock_rtc(int argc, char **argv)
 {
     if (check_mode_duration(argc, argv) != 0) {
@@ -192,6 +98,11 @@ static int cmd_unblock_rtc(int argc, char **argv)
     int duration = parse_duration(argv[2]);
 
     if (mode < 0 || duration < 0) {
+        return 1;
+    }
+
+    if (pm_blocker.val_u8[mode] == 0) {
+        printf("Mode %d is already unblocked.\n", mode);
         return 1;
     }
 
@@ -224,15 +135,8 @@ static void btn_cb(void *ctx)
  * @brief   List of shell commands for this example.
  */
 static const shell_command_t shell_commands[] = {
-    { "off", "turn off", cmd_off },
-    { "reboot", "reboot", cmd_reboot },
-#ifdef MODULE_PM_LAYERED
-    { "block", "block power mode", cmd_block },
-    { "set", "set power mode", cmd_set },
-    { "unblock", "unblock power mode", cmd_unblock },
-#ifdef MODULE_PERIPH_RTC
-    { "unblock_rtc", "temporary unblock power mode", cmd_unblock_rtc },
-#endif
+#if defined MODULE_PM_LAYERED && defined MODULE_PERIPH_RTC
+    { "unblock_rtc", "temporarily unblock power mode", cmd_unblock_rtc },
 #endif
     { NULL, NULL, NULL }
 };
@@ -251,6 +155,13 @@ int main(void)
            "save more power, but may require an event/interrupt to wake up\n"
            "the CPU. Reset the CPU if needed.\n",
            PM_NUM_MODES - 1);
+
+    /* In case the system boots into an unresponsive shell, at least display
+     * the state of PM blockers so that the user will know which power mode has
+     * been entered and is presumably responsible for the unresponsive shell.
+     */
+    _pm_handler(2, (char *[]){"pm", "show"});
+
 #else
     puts("This application allows you to test the CPU power management.\n"
          "Layered support is not unavailable for this CPU. Reset the CPU if\n"

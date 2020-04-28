@@ -50,6 +50,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief Power Management mode blocker typedef
+ */
+typedef union {
+    uint32_t val_u32;                   /**< power mode blockers u32 */
+    uint8_t val_u8[PM_NUM_MODES];       /**< power mode blockers u8 */
+} pm_blocker_t;
+
+/**
  * @brief   Block a power mode
  *
  * @param[in]   mode      power mode to block
