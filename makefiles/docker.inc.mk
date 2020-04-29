@@ -251,11 +251,11 @@ DOCKER_VOLUMES_AND_ENV += $(if $(wildcard $(GIT_CACHE_DIR)),-e 'GIT_CACHE_DIR=$(
 DOCKER_VOLUMES_AND_ENV += $(call docker_volumes_mapping,$(EXTERNAL_MODULE_DIRS),$(DOCKER_BUILD_ROOT)/external,)
 DOCKER_OVERRIDE_CMDLINE += $(call docker_cmdline_mapping,EXTERNAL_MODULE_DIRS,$(DOCKER_BUILD_ROOT)/external,)
 
-# Remap 'BOARDSDIR' if it is external
-DOCKER_VOLUMES_AND_ENV += $(call docker_volumes_mapping,$(BOARDSDIR),,boards)
+# Remap 'EXTERNAL_BOARD_DIRS' if they are external
+DOCKER_VOLUMES_AND_ENV += $(call docker_volumes_mapping,$(EXTERNAL_BOARD_DIRS),$(DOCKER_BUILD_ROOT)/external,)
 # Value is overridden from command line if it is not the default value
 # This allows handling even if the value is set in the 'Makefile'.
-DOCKER_OVERRIDE_CMDLINE += $(if $(findstring $(RIOTBOARD),$(BOARDSDIR)),,$(call docker_cmdline_mapping,BOARDSDIR,,boards))
+DOCKER_OVERRIDE_CMDLINE += $(call docker_cmdline_mapping,EXTERNAL_BOARD_DIRS,$(DOCKER_BUILD_ROOT)/external,)
 
 # External module directories sanity check:
 #

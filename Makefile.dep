@@ -2,7 +2,7 @@
 -include $(APPDIR)/Makefile.board.dep
 
 # include board dependencies
--include $(BOARDSDIR)/$(BOARD)/Makefile.dep
+-include $(BOARDDIR)/Makefile.dep
 
 # include cpu dependencies
 -include $(RIOTCPU)/$(CPU)/Makefile.dep

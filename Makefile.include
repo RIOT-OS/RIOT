@@ -32,24 +32,24 @@ include $(RIOT_MAKEFILES_GLOBAL_PRE)
 -include Makefile.local
 
 # set undefined variables
-RIOTBASE       ?= $(_riotbase)
-RIOTCPU        ?= $(RIOTBASE)/cpu
-# Deprecated to set RIOTBOARD, use BOARDSDIR
-RIOTBOARD      ?= $(RIOTBASE)/boards
-BOARDSDIR      ?= $(RIOTBOARD)
-RIOTMAKE       ?= $(RIOTBASE)/makefiles
-RIOTPKG        ?= $(RIOTBASE)/pkg
-RIOTTOOLS      ?= $(RIOTBASE)/dist/tools
-RIOTPROJECT    ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
-GITCACHE       ?= $(RIOTTOOLS)/git/git-cache
-GIT_CACHE_DIR  ?= $(HOME)/.gitcache
-BUILD_DIR      ?= $(RIOTBASE)/build
-APPDIR         ?= $(CURDIR)
-BINDIRBASE     ?= $(APPDIR)/bin
-BINDIR         ?= $(BINDIRBASE)/$(BOARD)
-PKGDIRBASE     ?= $(BINDIRBASE)/pkg/$(BOARD)
-DLCACHE        ?= $(RIOTTOOLS)/dlcache/dlcache.sh
-DLCACHE_DIR    ?= $(RIOTBASE)/.dlcache
+RIOTBASE            ?= $(_riotbase)
+RIOTCPU             ?= $(RIOTBASE)/cpu
+# Deprecated to set RIOTBOARD, use EXTERNAL_BOARD_DIRS
+RIOTBOARD           ?= $(RIOTBASE)/boards
+EXTERNAL_BOARD_DIRS ?=
+RIOTMAKE            ?= $(RIOTBASE)/makefiles
+RIOTPKG             ?= $(RIOTBASE)/pkg
+RIOTTOOLS           ?= $(RIOTBASE)/dist/tools
+RIOTPROJECT         ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
+GITCACHE            ?= $(RIOTTOOLS)/git/git-cache
+GIT_CACHE_DIR       ?= $(HOME)/.gitcache
+BUILD_DIR           ?= $(RIOTBASE)/build
+APPDIR              ?= $(CURDIR)
+BINDIRBASE          ?= $(APPDIR)/bin
+BINDIR              ?= $(BINDIRBASE)/$(BOARD)
+PKGDIRBASE          ?= $(BINDIRBASE)/pkg/$(BOARD)
+DLCACHE             ?= $(RIOTTOOLS)/dlcache/dlcache.sh
+DLCACHE_DIR         ?= $(RIOTBASE)/.dlcache
 
 # include CI info such as BOARD_INSUFFICIENT_MEMORY, if existing
 -include Makefile.ci
@@ -76,34 +76,52 @@ __OVERRIDE_DIRECTORY_VARIABLES := $(__DIRECTORY_VARIABLES)
 # Use absolute paths in recursive "make" even if overridden on command line.
 MAKEOVERRIDES += $(foreach v,$(__OVERRIDE_DIRECTORY_VARIABLES),$(v)=$($(v)))
 
+# Setting EXTERNAL_BOARD_DIRS as command line argument is too messy to handle:
+# Even when every path in EXTERNAL_BOARD_DIRS is turned into an absolute path
+# using override, sub-makes will still get the original value. Using
+# MAKEOVERRIDES has issues with spaces in the values, which are used as
+# separator in EXTERNAL_BOARD_DIRS. So we just enforce setting the value
+# either in a Makefile, or as environment variable.
+ifeq ($(origin EXTERNAL_BOARD_DIRS),command line)
+  # In Docker absolute paths are always given, so only fail when not in docker
+  ifeq ($(INSIDE_DOCKER),0)
+    $(error EXTERNAL_BOARD_DIRS must be passed as environment variable, and not as command line argument)
+  endif
+endif
+
 # Deprecation of configuring 'RIOTBOARD'
 ifneq ($(abspath $(RIOTBASE)/boards),$(abspath $(RIOTBOARD)))
-  $(warning overriding RIOTBOARD for external boards is deprecated, please use an absolute BOARDSDIR)
+  $(warning overriding RIOTBOARD for external boards is deprecated, use EXTERNAL_BOARD_DIRS instead)
   override RIOTBOARD      := $(abspath $(RIOTBOARD))
   __DIRECTORY_VARIABLES += RIOTBOARD
 endif
 
+ifneq (,$(BOARDSDIR))
+  # Only warn users, not the CI.
+  ifneq ($(RIOT_CI_BUILD),1)
+    $(warning Using BOARDSDIR is deprecated use EXTERNAL_BOARD_DIRS instead)
+    $(info EXTERNAL_BOARD_DIRS can contain multiple folders separated by space)
+  endif
+  EXTERNAL_BOARD_DIRS += $(BOARDSDIR)
+endif
+
 # Make all paths absolute.
-override RIOTBASE       := $(abspath $(RIOTBASE))
-override RIOTCPU        := $(abspath $(RIOTCPU))
-override RIOTMAKE       := $(abspath $(RIOTMAKE))
-override RIOTPKG        := $(abspath $(RIOTPKG))
-override RIOTTOOLS      := $(abspath $(RIOTTOOLS))
-override RIOTPROJECT    := $(abspath $(RIOTPROJECT))
-override GITCACHE       := $(abspath $(GITCACHE))
-override APPDIR         := $(abspath $(APPDIR))
-override BUILD_DIR      := $(abspath $(BUILD_DIR))
-override BINDIRBASE     := $(abspath $(BINDIRBASE))
-override BINDIR         := $(abspath $(BINDIR))
-override PKGDIRBASE     := $(abspath $(PKGDIRBASE))
-override DLCACHE_DIR    := $(abspath $(DLCACHE_DIR))
-
-# Keep standard make behavior for new variables
-__DIRECTORY_VARIABLES += \
-  BOARDSDIR \
-  #
-
-BOARDSDIR               := $(abspath $(BOARDSDIR))
+override RIOTBASE               := $(abspath $(RIOTBASE))
+override RIOTCPU                := $(abspath $(RIOTCPU))
+override RIOTMAKE               := $(abspath $(RIOTMAKE))
+override RIOTPKG                := $(abspath $(RIOTPKG))
+override RIOTTOOLS              := $(abspath $(RIOTTOOLS))
+override RIOTPROJECT            := $(abspath $(RIOTPROJECT))
+override GITCACHE               := $(abspath $(GITCACHE))
+override APPDIR                 := $(abspath $(APPDIR))
+override BUILD_DIR              := $(abspath $(BUILD_DIR))
+override BINDIRBASE             := $(abspath $(BINDIRBASE))
+override BINDIR                 := $(abspath $(BINDIR))
+override PKGDIRBASE             := $(abspath $(PKGDIRBASE))
+override DLCACHE_DIR            := $(abspath $(DLCACHE_DIR))
+EXTERNAL_BOARD_DIRS             := $(foreach dir,\
+                                             $(EXTERNAL_BOARD_DIRS),\
+                                             $(abspath $(dir)))
 
 # Ensure that all directories are set and don't contain spaces.
 ifneq (, $(filter-out 1, $(foreach v,$(__DIRECTORY_VARIABLES),$(words $($(v))))))
@@ -168,18 +186,21 @@ else
 
 all: link
 
-# Include Board and CPU configuration, if BOARD is not found in BOARDSDIR
-# e.g. when set by the environment fallback to searching in RIOTBOARD
-ifeq (,$(wildcard $(BOARDSDIR)/$(BOARD)/.))
-  ifneq ($(RIOTBOARD),$(BOARDSDIR))
-    # The specified board $(BOARD) was not found in $(BOARDSDIR) fallback to RIOTBOARD
-    BOARDSDIR = $(RIOTBOARD)
-  endif
-  ifeq ($(RIOTBOARD),$(BOARDSDIR))
-    ifeq (,$(wildcard $(BOARDSDIR)/$(BOARD)/.))
-      $(error The specified board $(BOARD) does not exist.)
-    endif
-  endif
+# Folders to search: First the external boards, than the official
+BOARDSDIRS := $(EXTERNAL_BOARD_DIRS) $(RIOTBOARD)
+
+# Take the first folder in $(BOARDSDIRS) that contains a folder named $(BOARD)
+BOARDDIR := $(word 1,$(foreach dir,$(BOARDSDIRS),$(wildcard $(dir)/$(BOARD)/.)))
+# Sanitize folder
+BOARDDIR := $(abspath $(BOARDDIR))
+
+# Also provide BOARDSDIR for compatibility and for accessing common folders
+# (e.g. include $(BOARDSDIR)/common/external_common/Makefile.dep)
+BOARDSDIR := $(dir $(BOARDDIR))
+
+ifeq (,$(BOARDDIR))
+  $(info Folders searched for the board: $(BOARDSDIRS))
+  $(error The specified board $(BOARD) does not exist.)
 endif
 
 include $(RIOTMAKE)/info.inc.mk
@@ -341,8 +362,8 @@ include $(RIOTMAKE)/pseudomodules.inc.mk
 include $(RIOTMAKE)/defaultmodules.inc.mk
 
 # Include Board and CPU configuration
-INCLUDES += $(addprefix -I,$(wildcard $(BOARDSDIR)/$(BOARD)/include))
-include $(BOARDSDIR)/$(BOARD)/Makefile.include
+INCLUDES += $(addprefix -I,$(wildcard $(BOARDDIR)/include))
+include $(BOARDDIR)/Makefile.include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 

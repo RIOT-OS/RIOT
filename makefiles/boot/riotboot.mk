@@ -79,7 +79,7 @@ riotboot/flash-bootloader: riotboot/bootloader/flash
 riotboot/bootloader/%:
 	$(Q)/usr/bin/env -i \
 		QUIET=$(QUIET) PATH=$(PATH)\
-		BOARDSDIR=$(BOARDSDIR) BOARD=$(BOARD)\
+		EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" BOARD=$(BOARD)\
 		DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID)\
 			$(MAKE) --no-print-directory -C $(RIOTBOOT_DIR) $*
 

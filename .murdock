@@ -230,7 +230,6 @@ compile() {
     # sanity checks
     [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board:\$toolchain)"
     [ ! -d "$appdir" ] && error "$0: compile: error: application directory \"$appdir\" doesn't exist"
-    [ ! -d "boards/$board" ] && error "$0: compile: error: board directory \"boards/$board\" doesn't exist"
 
     # compile
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \

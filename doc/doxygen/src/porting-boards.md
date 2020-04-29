@@ -226,9 +226,10 @@ All `BOARD`s in RIOT reside in `RIOTBOARD` (`RIOTBOARD` being a make variable
 set to `$(RIOTBOARD)/boards`).
 
 If one wants to use a `BOARD` outside of `RIOTBOARD`, the way to go is setting
-the `BOARDSDIR` variable to the path to the directory containing your external
-boards, e.g.: `BOARDSDIR=/home/external-boards/` (this would commonly be done
-in your application `Makefile` or your environment).
+the `EXTERNAL_BOARD_DIRS` variable to the path to the directory containing your
+external boards, e.g.: `EXTERNAL_BOARD_DIRS=/home/external-boards/` (this would
+commonly be done in your application `Makefile` or your environment). You can
+specify multiple directories separated by spaces.
 
 ```
 /home/
