@@ -26,6 +26,7 @@ config GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP
 
 rsource "ctx/Kconfig"
 rsource "frag/Kconfig"
+rsource "iphc/Kconfig"
 rsource "nd/Kconfig"
 
 endif # MOD_GNRC_SIXLOWPAN
