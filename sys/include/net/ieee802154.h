@@ -94,7 +94,38 @@ extern "C" {
 #define IEEE802154_CHANNEL_MAX          (26U)   /**< Maximum channel for 2.4 GHz band */
 /** @} */
 
-#define IEEE802154_FRAME_LEN_MAX        (127U)  /**< maximum frame length */
+#define IEEE802154_FRAME_LEN_MAX        (127U)  /**< maximum 802.15.4 frame length */
+#define IEEE802154G_FRAME_LEN_MAX      (2047U)  /**< maximum 802.15.4g-2012 frame length */
+
+/**
+ * For the SUN PHYs, the value is 1 ms expressed in symbol periods, rounded
+ * up to the next integer number of symbol periods using the ceiling() function.
+ *
+ * 802.15.4g, Table 70 (p. 43)
+ */
+#define IEEE802154G_ATURNAROUNDTIME_US (1 * US_PER_MS)
+
+/**
+ * @brief   802.15.4 PHY modes
+ */
+enum {
+    IEEE802154_PHY_DISABLED,        /**< PHY disabled, no mode selected */
+    IEEE802154_PHY_BPSK,            /**< Binary Phase Shift Keying */
+    IEEE802154_PHY_ASK,             /**< Amplitude-Shift Keying */
+    IEEE802154_PHY_OQPSK,           /**< Offset Quadrature Phase-Shift Keying */
+    IEEE802154_PHY_MR_OQPSK,        /**< Multi-Rate Offset Quadrature Phase-Shift Keying */
+    IEEE802154_PHY_MR_OFDM,         /**< Multi-Rate Orthogonal Frequency-Division Multiplexing */
+    IEEE802154_PHY_MR_FSK           /**< Multi-Rate Frequency Shift Keying */
+};
+
+/**
+ * @brief   802.15.4 forward error correction schemes
+ */
+enum {
+    IEEE802154_FEC_NONE,            /**< no forward error correction */
+    IEEE802154_FEC_NRNSC,           /**< non-recursive and non-systematic code */
+    IEEE802154_FEC_RSC              /**< recursive and systematic code */
+};
 
 /**
  * @brief   Special address definitions

@@ -652,6 +652,31 @@ typedef enum {
     NETOPT_LORAWAN_MIN_RX_SYMBOL,
 
     /**
+     * @brief   (uint8_t) 802.15.4 PHY mode
+     */
+    NETOPT_IEEE802154_PHY,
+
+    /**
+     * @brief   (uint8_t) legacy O-QPSK Rate Mode
+     */
+    NETOPT_OQPSK_RATE,
+
+    /**
+     * @brief   (uint8_t) MR-O-QPSK Chip Rate (kchip/s)
+     */
+    NETOPT_MR_OQPSK_CHIPS,
+
+    /**
+     * @brief   (uint8_t) MR-O-QPSK Rate Mode
+     */
+    NETOPT_MR_OQPSK_RATE,
+
+    /**
+     * @brief   (uint8_t) PHY Channel Spacing (kHz)
+     */
+    NETOPT_CHANNEL_SPACING,
+
+    /**
      * @brief   (uint8_t*) phy layer syncword
      */
     NETOPT_SYNCWORD,

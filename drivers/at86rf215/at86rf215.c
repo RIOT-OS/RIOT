@@ -17,7 +17,6 @@
  * @}
  */
 
-
 #include "luid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
@@ -145,8 +144,13 @@ if (!IS_ACTIVE(CONFIG_AT86RF215_USE_CLOCK_OUTPUT)){
 
     at86rf215_reg_write(dev, dev->BBC->RG_AMCS, reg);
 
-    /* set compatibility with first-gen 802.15.4 devices */
-    at86rf215_configure_legacy_OQPSK(dev, 0);
+    if (AT86RF215_DEFAULT_PHY_MODE == IEEE802154_PHY_OQPSK) {
+        at86rf215_configure_legacy_OQPSK(dev, 0);
+    }
+    if (AT86RF215_DEFAULT_PHY_MODE == IEEE802154_PHY_MR_OQPSK) {
+        at86rf215_configure_OQPSK(dev, AT86RF215_DEFAULT_MR_OQPSK_CHIPS,
+                                       AT86RF215_DEFAULT_MR_OQPSK_RATE);
+    }
 
     /* set default channel */
     at86rf215_set_chan(dev, dev->netdev.chan);

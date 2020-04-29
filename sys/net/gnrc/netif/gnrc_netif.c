@@ -374,6 +374,9 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                 case NETOPT_SRC_LEN:
                     _update_l2addr_from_dev(netif);
                     break;
+                case NETOPT_IEEE802154_PHY:
+                    gnrc_netif_ipv6_init_mtu(netif);
+                    break;
                 case NETOPT_STATE:
                     if (*((netopt_state_t *)opt->data) == NETOPT_STATE_RESET) {
                         _configure_netdev(netif->dev);

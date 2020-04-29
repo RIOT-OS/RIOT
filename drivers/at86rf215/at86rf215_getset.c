@@ -114,6 +114,18 @@ uint16_t at86rf215_get_channel_spacing(at86rf215_t *dev) {
     return 25 * at86rf215_reg_read(dev, dev->RF->RG_CS);
 }
 
+uint8_t at86rf215_get_phy_mode(at86rf215_t *dev)
+{
+    switch (at86rf215_reg_read(dev, dev->BBC->RG_PC) & PC_PT_MASK) {
+    case 0x1: return IEEE802154_PHY_MR_FSK;
+    case 0x2: return IEEE802154_PHY_MR_OFDM;
+    case 0x3: return at86rf215_OQPSK_is_legacy(dev)
+                ? IEEE802154_PHY_OQPSK
+                : IEEE802154_PHY_MR_OQPSK;
+    default:  return IEEE802154_PHY_DISABLED;
+    }
+}
+
 uint16_t at86rf215_get_pan(const at86rf215_t *dev, uint8_t filter)
 {
     if (filter > 3) {
