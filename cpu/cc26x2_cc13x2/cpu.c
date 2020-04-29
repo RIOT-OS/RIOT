@@ -33,6 +33,9 @@ void cpu_init(void)
     /* initialize the Cortex-M core */
     cortexm_init();
 
+    /* trim device */
+    setup_trim_device();
+
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
     stdio_init();
 
