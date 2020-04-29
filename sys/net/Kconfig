@@ -43,4 +43,38 @@ rsource "sock/Kconfig"
 rsource "link_layer/Kconfig"
 rsource "transport_layer/Kconfig"
 
+menuconfig MOD_NETSTATS
+    bool "Network statistics"
+
+if MOD_NETSTATS
+
+config MOD_NETSTATS_L2
+    bool "Layer 2 statistics"
+    depends on HAVE_NETSTATS_L2
+
+config MOD_NETSTATS_IPV6
+    bool "IPv6 statistics"
+    depends on HAVE_NETSTATS_IPV6
+
+config MOD_NETSTATS_RPL
+    bool "RPL routing statistics"
+    depends on HAVE_NETSTATS_RPL
+
+endif # MOD_NETSTATS
+
+config HAVE_NETSTATS_L2
+    bool
+    help
+        Indicates that a module provides Layer 2 statistics
+
+config HAVE_NETSTATS_IPV6
+    bool
+    help
+        Indicates that a module provides IPv6 statistics
+
+config HAVE_NETSTATS_RPL
+    bool
+    help
+        Indicates that a module provides RPL statistics
+
 endif # NETWORKING
