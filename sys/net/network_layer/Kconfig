@@ -7,3 +7,4 @@
 
 rsource "icmpv6/Kconfig"
 rsource "ipv6/Kconfig"
+rsource "sixlowpan/Kconfig"

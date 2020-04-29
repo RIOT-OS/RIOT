@@ -5,16 +5,16 @@
 # directory for more details.
 #
 
-menuconfig KCONFIG_MODULE_GNRC_SIXLOWPAN
-    bool "Configure GNRC 6LoWPAN"
-    depends on MODULE_GNRC_SIXLOWPAN
-    help
-        Configure GNRC 6LoWPAN module using Kconfig.
+menuconfig MOD_GNRC_SIXLOWPAN
+    bool "6LoWPAN support"
+    default HAVE_RADIO_IEEE802154 if MOD_GNRC_IPV6
+    select MOD_SIXLOWPAN
 
-if KCONFIG_MODULE_GNRC_SIXLOWPAN
+if MOD_GNRC_SIXLOWPAN
 
-rsource "frag/Kconfig"
-rsource "nd/Kconfig"
+config MOD_AUTO_INIT_GNRC_SIXLOWPAN
+    bool "Auto-init GNRC 6LoWPAN"
+    default MOD_AUTO_INIT
 
 config GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP
     int "Exponent for the message queue size for the 6LoWPAN thread (as 2^n)"
@@ -24,4 +24,7 @@ config GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP
         represents the exponent of 2^n, which will be used as the size of
         the queue.
 
-endif # KCONFIG_MODULE_GNRC_SIXLOWPAN
+rsource "frag/Kconfig"
+rsource "nd/Kconfig"
+
+endif # MOD_GNRC_SIXLOWPAN
