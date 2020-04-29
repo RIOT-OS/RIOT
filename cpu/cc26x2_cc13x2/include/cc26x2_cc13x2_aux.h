@@ -217,6 +217,17 @@ typedef struct {
     reg32_t SWPWRPROF; /**< Software Power Profiler */
 } aux_sysif_regs_t;
 
+
+/**
+ * @brief   AUX_SYSIF register values
+ * @{
+ */
+#define AUX_SYSIF_OPMODEREQ_REQ_PDLP 0x00000003
+#define AUX_SYSIF_OPMODEREQ_REQ_PDA  0x00000002
+#define AUX_SYSIF_OPMODEREQ_REQ_LP   0x00000001
+#define AUX_SYSIF_OPMODEREQ_REQ_A    0x00000000
+/** @} */
+
 /**
  * @ingroup cpu_specific_peripheral_memory_map
  * @{
@@ -231,6 +242,21 @@ typedef struct {
  * @brief   AUX_SYSIF register bank
  */
 #define AUX_SYSIF            ((aux_sysif_regs_t *) (AUX_SYSIF_BASE))
+
+/**
+ * @brief   AUX_SYSIF functions
+ * @{
+ */
+/**
+ * @brief    Changes the AUX operational mode
+ *
+ * @note Only this function should be used to change the operational mode,
+ * because it needs to be done in order.
+ *
+ * @param[in] target_opmode The opmode we want to change to.
+ */
+void aux_sysif_opmode_change(uint32_t target_opmode);
+/** @} */
 
 /**
  * @brief   AUX_TIMER01 registers
