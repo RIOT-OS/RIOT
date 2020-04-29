@@ -15,11 +15,12 @@ FILES=$(changed_files | grep -xf "$WHITELIST" | grep -xvf "$BLACKLIST")
 check () {
     for F in $FILES
     do
-        OUT="$(uncrustify -c "$UNCRUSTIFY_CFG" -f "$RIOTBASE/$F" --check 2> /dev/null)"
-        if [ "$OUT" ] ; then
+        uncrustify -c "$UNCRUSTIFY_CFG" -f "$RIOTBASE/$F" \
+            --check > /dev/null 2>&1 || {
+            echo "file $F needs to be uncrustified."
             echo "Please run 'dist/tools/uncrustify/uncrustify.sh'"
             exit 1
-        fi
+        }
     done
     echo "All files are uncrustified!"
 }
