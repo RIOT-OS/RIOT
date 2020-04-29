@@ -5,11 +5,20 @@
 # directory for more details.
 #
 
-menuconfig KCONFIG_MODULE_GNRC_RPL
-    bool "Configure RPL routing protocol"
-    depends on MODULE_GNRC_RPL
+menuconfig MOD_GNRC_RPL
+    bool "RPL routing support"
+    depends on MOD_EVTIMER
+    depends on MOD_GNRC_ICMPV6
+    depends on MOD_GNRC_IPV6_NIB
+    depends on MOD_TRICKLE
+    depends on MOD_XTIMER
+    select HAVE_NETSTATS_RPL
 
-if KCONFIG_MODULE_GNRC_RPL
+if MOD_GNRC_RPL
+
+config MOD_AUTO_INIT_GNRC_RPL
+    bool "Auto-init RPL routing"
+    default MOD_AUTO_INIT
 
 menu "Trickle parameters"
 
@@ -151,4 +160,4 @@ config GNRC_RPL_MSG_QUEUE_SIZE_EXP
         represents the exponent of 2^n, which will be used as the size of
         the queue.
 
-endif # KCONFIG_MODULE_GNRC_RPL
+endif # MOD_GNRC_RPL
