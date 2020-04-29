@@ -146,6 +146,18 @@ typedef enum IRQn
 #define PERIPH_BASE_NONBUF 0x60000000 /**< Peripheral base address (nonbuf) */
 /*@}*/
 
+/**
+ * @brief   ADI master instruction offsets
+ * @{
+ */
+#define ADI_DIR            0x00000000
+#define ADI_SET            0x00000010
+#define ADI_CLR            0x00000020
+#define ADI_MASK4B         0x00000040
+#define ADI_MASK8B         0x00000060
+#define ADI_MASK16B        0x00000080
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

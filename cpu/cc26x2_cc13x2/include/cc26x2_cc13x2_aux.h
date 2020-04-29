@@ -417,6 +417,35 @@ typedef struct {
 } adi_4_aux_regs_t;
 
 /**
+ * @brief   ADI_4_AUX registers using masked 8-bit access
+ */
+typedef struct {
+    reg8_m8_t MUX0; /**< Multiplexer 0 */
+    reg8_m8_t MUX1; /**< Multiplexer 1 */
+    reg8_m8_t MUX2; /**< Multiplexer 2 */
+    reg8_m8_t MUX3; /**< Multiplexer 3 */
+    reg8_m8_t ISRC; /**< Current Source */
+    reg8_m8_t COMP; /**< Comparator */
+    reg8_m8_t MUX4; /**< Multiplexer 4 */
+    reg8_m8_t ADC0; /**< ADC Control 0 */
+    reg8_m8_t ADC1; /**< ADC Control 1 */
+    reg8_m8_t ADCREF0; /**< ADC Reference 0 */
+    reg8_m8_t ADCREF1; /**< ADC Reference 1 */
+    reg8_m8_t __reserved1[0x3]; /**< Reserved */
+    reg8_m8_t LPMBIAS; /**< Internal */
+} adi_4_aux_regs_m8_t;
+
+/**
+ * @brief   ADI_4_AUX register values
+ * @{
+ */
+#define ADI_4_AUX_COMP_LPM_BIAS_WIDTH_TRIM_m 0x00000038
+#define ADI_4_AUX_COMP_LPM_BIAS_WIDTH_TRIM_s 3
+#define ADI_4_AUX_LPMBIAS_LPM_TRIM_IOUT_m    0x0000003F
+#define ADI_4_AUX_LPMBIAS_LPM_TRIM_IOUT_s    0
+/** @} */
+
+/**
  * @ingroup cpu_specific_peripheral_memory_map
  * @{
  */
@@ -424,12 +453,20 @@ typedef struct {
  * @brief   ADI_4_AUX base address
  */
 #define ADI_4_AUX_BASE       (PERIPH_BASE + 0xCB000)
+/**
+ * @brief   ADI_4_AUX base address for masked 8-bit access
+ */
+#define ADI_4_AUX_BASE_M8    (ADI_4_AUX_BASE + ADI_MASK8B)
 /** @} */
 
 /**
  * @brief   ADI_4_AUX register bank
  */
 #define ADI_4_AUX            ((adi_4_aux_regs_t *) (ADI_4_AUX_BASE))
+/**
+ * @brief   ADI_4_AUX register bank
+ */
+#define ADI_4_AUX_M8         ((adi_4_aux_regs_m8_t *) (ADI_4_AUX_BASE_M8))
 
 /**
  * @brief   Semamphore used for ADDI
