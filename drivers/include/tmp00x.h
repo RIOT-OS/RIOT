@@ -103,15 +103,15 @@ extern "C"
  * I2C Address depends on the state of ADR0 and ADR1 Pins
  * For more information, please refer to section 7.3.6.2 of TMP007 datasheet (SBOS685B).
  */
-#ifndef TMP00X_I2C_ADDRESS
-#define TMP00X_I2C_ADDRESS         (0x40)
+#ifndef CONFIG_TMP00X_I2C_ADDRESS
+#define CONFIG_TMP00X_I2C_ADDRESS         (0x40)
 #endif
 
 /**
  * @brief   Default Conversion Time in us
  */
-#ifndef TMP00X_CONVERSION_TIME
-#define TMP00X_CONVERSION_TIME     (1E6)
+#ifndef CONFIG_TMP00X_CONVERSION_TIME
+#define CONFIG_TMP00X_CONVERSION_TIME     (1E6)
 #endif
 
 /**
@@ -119,11 +119,11 @@ extern "C"
  *
  * If set to 0, the device will be always-on
  * If set to 1, the device will be put in low power mode between measurements.
- * This adds a @c TMP00X_CONVERSION_TIME us delay to each measurement call
+ * This adds a @c CONFIG_TMP00X_CONVERSION_TIME us delay to each measurement call
  * for bringing the device out of standby.
  */
-#ifndef TMP00X_USE_LOW_POWER
-#define TMP00X_USE_LOW_POWER (0)
+#ifndef CONFIG_TMP00X_USE_LOW_POWER
+#define CONFIG_TMP00X_USE_LOW_POWER (0)
 #endif
 
 /**
@@ -132,8 +132,8 @@ extern "C"
  * If set to 0, measurements will be converted to Celsius.
  * If set to 1, raw adc readings will be returned.
  */
-#ifndef TMP00X_USE_RAW_VALUES
-#define TMP00X_USE_RAW_VALUES (0)
+#ifndef CONFIG_TMP00X_USE_RAW_VALUES
+#define CONFIG_TMP00X_USE_RAW_VALUES (0)
 #endif
 /** @} */
 

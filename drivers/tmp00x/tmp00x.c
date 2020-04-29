@@ -211,7 +211,7 @@ int tmp00x_read_temperature(const tmp00x_t *dev, int16_t *ta, int16_t *to)
     if (tmp00x_set_active(dev)) {
         return TMP00X_ERROR;
     }
-    xtimer_usleep(TMP00X_CONVERSION_TIME);
+    xtimer_usleep(CONFIG_TMP00X_CONVERSION_TIME);
 #endif
 
 int ret;
