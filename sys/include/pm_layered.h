@@ -83,6 +83,15 @@ void pm_unblock(unsigned mode);
  */
 void pm_set(unsigned mode);
 
+/**
+ * @brief   Get currently blocked PM modes
+ *
+ * @return  The current blocker state
+ *
+ * This function atomically retrieves the currently blocked PM modes.
+ */
+pm_blocker_t pm_get_blocker(void);
+
 #ifdef __cplusplus
 }
 #endif
