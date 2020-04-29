@@ -1,0 +1,21 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_MODULE_FXOS8700
+    bool "Configure FXOS8700 driver"
+    depends on MODULE_FXOS8700
+    help
+        Configure the FXOS8700 driver using Kconfig.
+
+if KCONFIG_MODULE_FXOS8700
+
+config FXOS8700_USE_ACC_RAW_VALUES
+    bool "Enable raw ADC readings"
+    help
+        Enable this to return raw ADC readings.
+        By default measurements are converted to mg.
+
+endif # KCONFIG_MODULE_FXOS8700

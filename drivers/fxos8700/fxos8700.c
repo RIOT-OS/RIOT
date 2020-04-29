@@ -18,6 +18,7 @@
 #include "periph/i2c.h"
 #include "xtimer.h"
 #include "fxos8700.h"
+#include "kernel_defines.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -161,34 +162,35 @@ int fxos8700_read(const fxos8700_t* dev, fxos8700_measurement_t* acc,
 
     /* Read accelerometer */
     if (acc) {
-#if FXOS8700_USE_ACC_RAW_VALUES
-        acc->x = (int16_t) ((data[0] << 8) | data[1]) >> 2;
-        acc->y = (int16_t) ((data[2] << 8) | data[3]) >> 2;
-        acc->z = (int16_t) ((data[4] << 8) | data[5]) >> 2;
-#else
-        int32_t acc_raw_x = (int16_t) ((data[0] << 8) | data[1]) >> 2;
-        int32_t acc_raw_y = (int16_t) ((data[2] << 8) | data[3]) >> 2;
-        int32_t acc_raw_z = (int16_t) ((data[4] << 8) | data[5]) >> 2;
-        switch(dev->p.acc_range) {
-            case FXOS8700_REG_XYZ_DATA_CFG_FS__2G:
-                acc->x = (int16_t) ((acc_raw_x * 244) / 100);
-                acc->y = (int16_t) ((acc_raw_y * 244) / 100);
-                acc->z = (int16_t) ((acc_raw_z * 244) / 100);
-                break;
-            case FXOS8700_REG_XYZ_DATA_CFG_FS__4G:
-                acc->x = (int16_t) ((acc_raw_x * 488) / 1000);
-                acc->y = (int16_t) ((acc_raw_y * 488) / 1000);
-                acc->z = (int16_t) ((acc_raw_z * 488) / 1000);
-                break;
-            case FXOS8700_REG_XYZ_DATA_CFG_FS__8G:
-                acc->x = (int16_t) ((acc_raw_x * 976) / 1000);
-                acc->y = (int16_t) ((acc_raw_y * 976) / 1000);
-                acc->z = (int16_t) ((acc_raw_z * 976) / 1000);
-                break;
-            default:
-                return FXOS8700_NODEV;
+        if (IS_ACTIVE(CONFIG_FXOS8700_USE_ACC_RAW_VALUES)) {
+            acc->x = (int16_t) ((data[0] << 8) | data[1]) >> 2;
+            acc->y = (int16_t) ((data[2] << 8) | data[3]) >> 2;
+            acc->z = (int16_t) ((data[4] << 8) | data[5]) >> 2;
         }
-#endif
+        else {
+            int32_t acc_raw_x = (int16_t) ((data[0] << 8) | data[1]) >> 2;
+            int32_t acc_raw_y = (int16_t) ((data[2] << 8) | data[3]) >> 2;
+            int32_t acc_raw_z = (int16_t) ((data[4] << 8) | data[5]) >> 2;
+            switch(dev->p.acc_range) {
+                case FXOS8700_REG_XYZ_DATA_CFG_FS__2G:
+                    acc->x = (int16_t) ((acc_raw_x * 244) / 100);
+                    acc->y = (int16_t) ((acc_raw_y * 244) / 100);
+                    acc->z = (int16_t) ((acc_raw_z * 244) / 100);
+                    break;
+                case FXOS8700_REG_XYZ_DATA_CFG_FS__4G:
+                    acc->x = (int16_t) ((acc_raw_x * 488) / 1000);
+                    acc->y = (int16_t) ((acc_raw_y * 488) / 1000);
+                    acc->z = (int16_t) ((acc_raw_z * 488) / 1000);
+                    break;
+                case FXOS8700_REG_XYZ_DATA_CFG_FS__8G:
+                    acc->x = (int16_t) ((acc_raw_x * 976) / 1000);
+                    acc->y = (int16_t) ((acc_raw_y * 976) / 1000);
+                    acc->z = (int16_t) ((acc_raw_z * 976) / 1000);
+                    break;
+                default:
+                    return FXOS8700_NODEV;
+             }
+         }
     }
     /* Read magnetometer */
     if (mag) {
