@@ -83,7 +83,7 @@ typedef struct {
 #define DDI_0_OSC_CTL0_XOSC_HF_POWER_MODE       0x00000800
 #define DDI_0_OSC_CTL0_RCOSC_LF_TRIMMED         0x00001000
 #define DDI_0_OSC_CTL0_HPOSC_MODE_EN            0x00004000
-#define DDI_0_OSC_CTL0_DCDC_SRC_SEL             0x01000000
+#define DDI_0_OSC_CTL0_CLK_DCDC_SRC_SEL_m       0x01000000
 #define DDI_0_OSC_CTL0_DOUBLER_RESET_DURATION   0x02000000
 #define DDI_0_OSC_CTL0_DOUBLER_START_DURATION   0x0C000000
 #define DDI_0_OSC_CTL0_BYPASS_RCOSC_LF_CLK_QUAL 0x10000000
@@ -121,13 +121,13 @@ typedef struct {
 #define DDI_0_OSC_M16        ((ddi0_osc_regs_m16_t *) (DDI0_OSC_BASE_M16))
 
 /**
-* AON_PMCTL registers
-*/
+ * @brief    AON_PMCTL registers
+ */
 typedef struct {
-   reg32_t __reserved1; /**< meh */
+   reg32_t __reserved1; /**< Reserved */
    reg32_t AUXSCECLK; /**< AUX SCE management */
    reg32_t RAMCFG; /**< RAM configuration */
-   reg32_t __reserved2; /**< meh */
+   reg32_t __reserved2; /**< Reserved */
    reg32_t PWRCTL; /**< Power management control */
    reg32_t PWRSTAT; /**< Power status */
    reg32_t SHUTDOWN; /**< Shutdown control */
@@ -136,18 +136,41 @@ typedef struct {
    reg32_t OSCCFG; /**< Oscillator configuration */
    reg32_t RESETCTL; /**< Reset control */
    reg32_t SLEEPCTL; /**< Reset control */
-   reg32_t __reserved3; /**< meh */
+   reg32_t __reserved3; /**< Reserved */
    reg32_t JTAGCFG; /**< JTAG configuration */
+   reg32_t __reserved4; /**< Reserved */
    reg32_t JTAGUSERCODE; /**< JTAG USERCODE */
 } aon_pmctl_regs_t;
 
-/** @ingroup cpu_specific_peripheral_memory_map
+/**
+ * @brief   AON_PMTCTL register values
  * @{
  */
-#define AON_PMCTL_BASE       0x40090000 /**< AON_PMCTL base address */
-/*@}*/
+#define AON_PMCTL_SLEEPCTL_IO_PAD_SLEEP_DIS 0x00000001
+#define AON_PMCTL_RESETCTL_BOOT_DET_1_CLR_m 0x02000000
+#define AON_PMCTL_RESETCTL_BOOT_DET_0_CLR_m 0x01000000
+#define AON_PMCTL_RESETCTL_BOOT_DET_1_SET_m 0x00020000
+#define AON_PMCTL_RESETCTL_BOOT_DET_0_SET_m 0x00010000
+#define AON_PMCTL_RESETCTL_BOOT_DET_1_m     0x00002000
+#define AON_PMCTL_RESETCTL_BOOT_DET_0_m     0x00001000
+#define AON_PMCTL_RESETCTL_BOOT_DET_0_s     12
+#define AON_PMCTL_RESETCTL_MCU_WARM_RESET_m 0x00000010
+/** @} */
 
-#define AON_PMCTL ((aon_pmctl_regs_t *) (AON_PMCTL_BASE)) /**< AON_PMCTL register bank */
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
+/**
+ * @brief   AON_PMCTL base address
+ */
+#define AON_PMCTL_BASE       (PERIPH_BASE + 0x90000)
+/** @} */
+
+/**
+ * @brief   AON_PMCTL register bank
+ */
+#define AON_PMCTL            ((aon_pmctl_regs_t *) (AON_PMCTL_BASE))
 
 /**
  * AON_RTC registers
