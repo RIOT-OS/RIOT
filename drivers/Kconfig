@@ -25,6 +25,7 @@ rsource "mag3110/Kconfig"
 rsource "mma8x5x/Kconfig"
 rsource "opt3001/Kconfig"
 rsource "sps30/Kconfig"
+rsource "tcs37727/Kconfig"
 endmenu # Sensor Device Drivers
 
 menu "Storage Device Drivers"
