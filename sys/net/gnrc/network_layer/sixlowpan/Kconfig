@@ -24,6 +24,7 @@ config GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP
         represents the exponent of 2^n, which will be used as the size of
         the queue.
 
+rsource "ctx/Kconfig"
 rsource "frag/Kconfig"
 rsource "nd/Kconfig"
 
