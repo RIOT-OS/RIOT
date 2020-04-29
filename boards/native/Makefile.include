@@ -73,7 +73,15 @@ ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
   PORT ?= tap0
 endif
 
-TERMFLAGS := $(PORT) $(TERMFLAGS)
+# Configure default eeprom file
+EEPROM_FILE ?= $(BINDIR)/native.eeprom
+
+# set the eeprom file flags only when the periph_eeprom feature is used.
+# NOTE: This can be turned into normal conditional syntax once #9913 is fixed
+EEPROM_FILE_FLAGS = $(if $(filter periph_eeprom,$(FEATURES_USED)),--eeprom $(EEPROM_FILE),)
+TERMFLAGS += $(EEPROM_FILE_FLAGS)
+
+TERMFLAGS += $(PORT)
 
 ASFLAGS =
 ifeq ($(shell basename $(DEBUGGER)),lldb)
