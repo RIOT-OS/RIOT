@@ -41,5 +41,6 @@ rsource "netif/Kconfig"
 rsource "network_layer/Kconfig"
 rsource "sock/Kconfig"
 rsource "link_layer/Kconfig"
+rsource "transport_layer/Kconfig"
 
 endif # NETWORKING
