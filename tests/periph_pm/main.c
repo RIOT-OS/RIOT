@@ -44,8 +44,6 @@ extern int _pm_handler(int argc, char **argv);
 
 #ifdef MODULE_PM_LAYERED
 
-extern volatile pm_blocker_t pm_blocker; /* sys/pm_layered/pm.c */
-
 #ifdef MODULE_PERIPH_RTC
 static int check_mode_duration(int argc, char **argv)
 {
@@ -101,6 +99,7 @@ static int cmd_unblock_rtc(int argc, char **argv)
         return 1;
     }
 
+    pm_blocker_t pm_blocker = pm_get_blocker();
     if (pm_blocker.val_u8[mode] == 0) {
         printf("Mode %d is already unblocked.\n", mode);
         return 1;

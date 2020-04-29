@@ -36,7 +36,7 @@
 /**
  * @brief Global variable for keeping track of blocked modes
  */
-volatile pm_blocker_t pm_blocker = { .val_u32 = PM_BLOCKER_INITIAL };
+static volatile pm_blocker_t pm_blocker = { .val_u32 = PM_BLOCKER_INITIAL };
 
 void pm_set_lowest(void)
 {
@@ -77,6 +77,11 @@ void pm_unblock(unsigned mode)
     unsigned state = irq_disable();
     pm_blocker.val_u8[mode]--;
     irq_restore(state);
+}
+
+pm_blocker_t pm_get_blocker(void)
+{
+    return pm_blocker;
 }
 
 #ifndef PROVIDES_PM_LAYERED_OFF
