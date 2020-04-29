@@ -28,7 +28,6 @@
 #ifdef MODULE_PM_LAYERED
 #include "pm_layered.h"
 
-extern volatile pm_blocker_t pm_blocker; /* sys/pm_layered/pm.c */
 #endif /* MODULE_PM_LAYERED */
 
 static void _print_usage(void) {
@@ -107,6 +106,7 @@ static int cmd_unblock(char *arg)
         return 1;
     }
 
+    pm_blocker_t pm_blocker = pm_get_blocker();
     if (pm_blocker.val_u8[mode] == 0) {
         printf("Mode %d is already unblocked.\n", mode);
         return 1;
@@ -125,6 +125,7 @@ static int cmd_show(char *arg)
     (void)arg;
     uint8_t lowest_allowed_mode = 0;
 
+    pm_blocker_t pm_blocker = pm_get_blocker();
     for (unsigned i = 0; i < PM_NUM_MODES; i++) {
         printf("mode %u blockers: %u \n", i, pm_blocker.val_u8[i]);
         if (pm_blocker.val_u8[i]) {
