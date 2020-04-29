@@ -22,6 +22,7 @@
  * @}
  */
 
+#include "cpu.h"
 #include "periph/pm.h"
 
 #define ENABLE_DEBUG (0)
@@ -34,18 +35,26 @@ void pm_set(unsigned mode)
             /* Everything except battery backup is powered down */
             DEBUG_PUTS("pm_set(): setting Deep Power Down mode.");
             PCON |= PM_DEEP_POWERDOWN;
+
+            /* CPU will reset on wake-up */
+
             break;
         case 1:
             /* PLL & Flash are powered down */
             DEBUG_PUTS("pm_set(): setting Power Down mode.");
-            /* PCON |= PM_POWERDOWN; */
-            PCON |= PM_IDLE; /* fixme */
+            PCON |= PM_POWERDOWN;
+
+            cpu_init_pll();
+            cpu_init_mam();
+
             break;
         case 2:
             /* PLL is powered down */
             DEBUG_PUTS("pm_set(): setting Sleep mode.");
-            /* PCON |= PM_SLEEP; */
-            PCON |= PM_IDLE; /* fixme */
+            PCON |= PM_SLEEP;
+
+            cpu_init_pll();
+
             break;
         default: /* Falls through */
         case 3:
