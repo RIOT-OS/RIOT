@@ -127,6 +127,17 @@ typedef struct {
 } fcfg_regs_t;
 
 /**
+ * @brief   FCFG1 register values
+ * @{
+ */
+#define FCFG1_DAC_BIAS_CNF_LPM_TRIM_IOUT_m       0x0003F000
+#define FCFG1_DAC_BIAS_CNF_LPM_TRIM_IOUT_s       12
+#define FCFG1_DAC_BIAS_CNF_LPM_BIAS_WIDTH_TRIM_m 0x00000E00
+#define FCFG1_DAC_BIAS_CNF_LPM_BIAS_WIDTH_TRIM_s 9
+#define FCFG1_DAC_BIAS_CNF_LPM_BIAS_BACKUP_EN    0x00000100
+/** @} */
+
+/**
  * @ingroup cpu_specific_peripheral_memory_map
  * @{
  */
