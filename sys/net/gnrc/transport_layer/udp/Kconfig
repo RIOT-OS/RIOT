@@ -1,0 +1,19 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MOD_GNRC_UDP
+    bool "UDP support"
+    select MOD_INET_CSUM
+    select MOD_UDP
+
+if MOD_GNRC_UDP
+
+config MOD_AUTO_INIT_GNRC_UDP
+    bool "Auto-init GNRC UDP"
+    default MOD_AUTO_INIT
+
+endif # MOD_GNRC_UDP

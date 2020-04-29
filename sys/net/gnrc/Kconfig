@@ -26,6 +26,6 @@ rsource "pkt/Kconfig"
 rsource "pktbuf/Kconfig"
 rsource "pktdump/Kconfig"
 rsource "routing/rpl/Kconfig"
-rsource "transport_layer/tcp/Kconfig"
+rsource "transport_layer/Kconfig"
 
 endif # GNRC_STACK
