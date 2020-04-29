@@ -27,7 +27,29 @@ extern "C" {
 #endif
 
 typedef volatile uint8_t reg8_t;
+typedef volatile uint16_t reg16_t;
 typedef volatile uint32_t reg32_t;
+
+/**
+ * @brief   Masked 8-bit register
+ */
+typedef struct {
+    reg8_t LOW; /**< Low 4-bit half */
+    reg8_t HIGH; /**< High 4-bit half */
+} reg8_m4_t;
+
+/**
+ * @brief   Masked 8-bit register
+ */
+typedef reg16_t reg8_m8_t;
+
+/**
+ * @brief   Masked 32-bit register
+ */
+typedef struct {
+    reg32_t LOW; /**< Low 16-bit half */
+    reg32_t HIGH; /**< High 16-bit half */
+} reg32_m16_t;
 
 /** @addtogroup CC13x2_cmsis CMSIS Definitions */
 /*@{*/

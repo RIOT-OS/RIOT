@@ -48,6 +48,30 @@ typedef struct {
 } ddi0_osc_regs_t;
 
 /**
+ * @brief   DDI_0_OSC registers with masked 16-bit access
+ */
+typedef struct {
+    reg32_m16_t CTL0; /**< Control 0 */
+    reg32_m16_t CTL1; /**< Control 1 */
+    reg32_m16_t RADCEXTCFG; /**< RADC External Configuration */
+    reg32_m16_t AMPCOMPCTL; /**< Amplitude Compensation Control */
+    reg32_m16_t AMPCOMPTH1; /**< Amplitude Compensation Threshold 1 */
+    reg32_m16_t AMPCOMPTH2; /**< Amplitude Compensation Threshold 2 */
+    reg32_m16_t ANABYPASSVAL1; /**< Analog Bypass Values 1 */
+    reg32_m16_t ANABYPASSVAL2; /**< Internal */
+    reg32_m16_t ATESTCTL; /**< Analog Test Control */
+    reg32_m16_t ADCDOUBLERNANOAMPCTL; /**< ADC Doubler Nanoamp Control */
+    reg32_m16_t XOSCHFCTL; /**< XOSCHF Control */
+    reg32_m16_t LFOSCCTL; /**< Low Frequency Oscillator Control */
+    reg32_m16_t RCOSCHFCTL; /**< RCOSCHF Control */
+    reg32_m16_t RCOSCMFCTL; /**< RCOSC_MF Control */
+    reg32_m16_t __reserved1; /**< Reserved */
+    reg32_m16_t STAT0; /**< Status 0 */
+    reg32_m16_t STAT1; /**< Status 1 */
+    reg32_m16_t STAT2; /**< Status 2 */
+} ddi0_osc_regs_m16_t;
+
+/**
  * @brief   DDI_0_OSC register values
  * @{
  */
@@ -71,16 +95,30 @@ typedef struct {
  * @ingroup cpu_cc26x2_cc13x2_peripheral_memory_map
  * @{
  */
+#define DDI_DIR              0x00000000
+#define DDI_SET              0x00000080
+#define DDI_CLR              0x00000100
+#define DDI_MASK4B           0x00000200
+#define DDI_MASK8B           0x00000300
+#define DDI_MASK16B          0x00000400
 /**
  * @brief   DDI0_OSC base address
  */
 #define DDI0_OSC_BASE        (PERIPH_BASE + 0xCA000)
+/**
+ * @brief   DDI0_OSC 16-bit masked access base address
+ */
+#define DDI0_OSC_BASE_M16    (DDI0_OSC_BASE + DDI_MASK16B)
 /** @} */
 
 /**
  * @brief   DDI_0_OSC register bank
  */
 #define DDI_0_OSC            ((ddi0_osc_regs_t *) (DDI0_OSC_BASE))
+/**
+ * @brief   DDI_0_OSC 16-bit masked access register bank
+ */
+#define DDI_0_OSC_M16        ((ddi0_osc_regs_m16_t *) (DDI0_OSC_BASE_M16))
 
 /**
 * AON_PMCTL registers
