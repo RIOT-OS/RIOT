@@ -4,10 +4,6 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menu "Actuator Device Drivers"
-rsource "motor_driver/Kconfig"
-endmenu # Actuator Device Drivers
-
 menu "Network Device Drivers"
 rsource "at86rf215/Kconfig"
 rsource "cc110x/Kconfig"
@@ -17,13 +13,3 @@ rsource "pn532/Kconfig"
 rsource "slipdev/Kconfig"
 source "$(RIOTCPU)/nrf52/radio/nrf802154/Kconfig"
 endmenu # Network Device Drivers
-
-menu "Sensor Device Drivers"
-rsource "ads101x/Kconfig"
-rsource "fxos8700/Kconfig"
-rsource "hdc1000/Kconfig"
-rsource "mag3110/Kconfig"
-rsource "mma8x5x/Kconfig"
-rsource "opt3001/Kconfig"
-rsource "sps30/Kconfig"
-endmenu # Sensor Device Drivers
