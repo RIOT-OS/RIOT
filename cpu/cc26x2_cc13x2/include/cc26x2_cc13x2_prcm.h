@@ -23,57 +23,64 @@
 extern "C" {
 #endif
 
-
 /**
- * DDI_0_OSC registers
+ * @brief   DDI_0_OSC registers
  */
 typedef struct {
-    reg32_t CTL0; /**< control 0 */
-    reg32_t CTL1; /**< control 1 */
-    reg32_t RADCEXTCFG; /**< RADC external config */
-    reg32_t AMPCOMPCTL; /**< amplitude compensation control */
-    reg32_t AMPCOMPTH1; /**< amplitude compensation threshold 1 */
-    reg32_t AMPCOMPTH2; /**< amplitude compensation threshold 2 */
-    reg32_t ANABYPASSVAL1; /**< analog bypass values 1 */
-    reg32_t ANABYPASSVAL2; /**< analog bypass values 2 */
-    reg32_t ATESTCTL; /**< analog test control */
-    reg32_t ADCDOUBLERNANOAMPCTL; /**< ADC doubler nanoamp control */
-    reg32_t XOSCHFCTL; /**< XOSCHF control */
-    reg32_t LFOSCCTL; /**< low frequency oscillator control */
-    reg32_t RCOSCHFCTL; /**< RCOSCHF control */
-    reg32_t RCOSCHMCTL; /**< RCOSCHM control */
-    reg32_t STAT0; /**< status 0 */
-    reg32_t STAT1; /**< status 1 */
-    reg32_t STAT2; /**< status 2 */
+    reg32_t CTL0; /**< Control 0 */
+    reg32_t CTL1; /**< Control 1 */
+    reg32_t RADCEXTCFG; /**< RADC External Configuration */
+    reg32_t AMPCOMPCTL; /**< Amplitude Compensation Control */
+    reg32_t AMPCOMPTH1; /**< Amplitude Compensation Threshold 1 */
+    reg32_t AMPCOMPTH2; /**< Amplitude Compensation Threshold 2 */
+    reg32_t ANABYPASSVAL1; /**< Analog Bypass Values 1 */
+    reg32_t ANABYPASSVAL2; /**< Internal */
+    reg32_t ATESTCTL; /**< Analog Test Control */
+    reg32_t ADCDOUBLERNANOAMPCTL; /**< ADC Doubler Nanoamp Control */
+    reg32_t XOSCHFCTL; /**< XOSCHF Control */
+    reg32_t LFOSCCTL; /**< Low Frequency Oscillator Control */
+    reg32_t RCOSCHFCTL; /**< RCOSCHF Control */
+    reg32_t RCOSCMFCTL; /**< RCOSC_MF Control */
+    reg32_t __reserved1; /**< Reserved */
+    reg32_t STAT0; /**< Status 0 */
+    reg32_t STAT1; /**< Status 1 */
+    reg32_t STAT2; /**< Status 2 */
 } ddi0_osc_regs_t;
 
 /**
  * @brief   DDI_0_OSC register values
  * @{
  */
-#define DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL              0x00000001
-#define DDI_0_OSC_CTL0_SCLK_LF_SRC_SEL              0x0000000C
-#define DDI_0_OSC_CTL0_ACLK_TDC_SRC_SEL             0x00000180
-#define DDI_0_OSC_CTL0_CLK_LOSS_EN                  0x00000200 /* enable clock loss detection */
-#define DDI_0_OSC_CTL0_XOSC_LF_DIG_BYPASS           0x00000400 /* bypass XOSC_LF and use digital input clock from AON foor xosx_lf (precuations in datasheet) */
-#define DDI_0_OSC_CTL0_XOSC_HF_POWER_MODE           0x00000800
-#define DDI_0_OSC_CTL0_RCOSC_LF_TRIMMED             0x00001000
-#define DDI_0_OSC_CTL0_HPOSC_MODE_EN                0x00004000
-#define DDI_0_OSC_CTL0_DCDC_SRC_SEL                 0x01000000
-#define DDI_0_OSC_CTL0_DOUBLER_RESET_DURATION       0x02000000
-#define DDI_0_OSC_CTL0_DOUBLER_START_DURATION       0x0C000000
-#define DDI_0_OSC_CTL0_BYPASS_RCOSC_LF_CLK_QUAL     0x10000000
-#define DDI_0_OSC_CTL0_BYPASS_XOSC_LF_CLK_QUAL      0x20000000
-#define DDI_0_OSC_CTL0_XTAL_IS_24M                  0x80000000
+#define DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL          0x00000001
+#define DDI_0_OSC_CTL0_SCLK_LF_SRC_SEL          0x0000000C
+#define DDI_0_OSC_CTL0_ACLK_TDC_SRC_SEL         0x00000180
+#define DDI_0_OSC_CTL0_CLK_LOSS_EN              0x00000200
+#define DDI_0_OSC_CTL0_XOSC_LF_DIG_BYPASS       0x00000400
+#define DDI_0_OSC_CTL0_XOSC_HF_POWER_MODE       0x00000800
+#define DDI_0_OSC_CTL0_RCOSC_LF_TRIMMED         0x00001000
+#define DDI_0_OSC_CTL0_HPOSC_MODE_EN            0x00004000
+#define DDI_0_OSC_CTL0_DCDC_SRC_SEL             0x01000000
+#define DDI_0_OSC_CTL0_DOUBLER_RESET_DURATION   0x02000000
+#define DDI_0_OSC_CTL0_DOUBLER_START_DURATION   0x0C000000
+#define DDI_0_OSC_CTL0_BYPASS_RCOSC_LF_CLK_QUAL 0x10000000
+#define DDI_0_OSC_CTL0_BYPASS_XOSC_LF_CLK_QUAL  0x20000000
+#define DDI_0_OSC_CTL0_XTAL_IS_24M              0x80000000
 /** @} */
 
-/** @ingroup cpu_cc26x2_cc13x2_peripheral_memory_map
-  * @{
-  */
-#define DDI0_OSC_BASE       0x400CA000 /**< DDI0_OSC base address */
-/*@}*/
+/**
+ * @ingroup cpu_cc26x2_cc13x2_peripheral_memory_map
+ * @{
+ */
+/**
+ * @brief   DDI0_OSC base address
+ */
+#define DDI0_OSC_BASE        (PERIPH_BASE + 0xCA000)
+/** @} */
 
-#define DDI_0_OSC ((ddi0_osc_regs_t *) (DDI0_OSC_BASE)) /**< DDI_0_OSC register bank */
+/**
+ * @brief   DDI_0_OSC register bank
+ */
+#define DDI_0_OSC            ((ddi0_osc_regs_t *) (DDI0_OSC_BASE))
 
 /**
 * AON_PMCTL registers
