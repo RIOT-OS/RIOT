@@ -43,14 +43,14 @@ static inline void pllfeed(void)
  * @brief   Enabling MAM and setting number of clocks used for Flash memory fetch
  * @internal
  */
-static inline void init_mam(void)
+void cpu_init_mam(void)
 {
     MAMCR  = 0x0000;
     MAMTIM = 0x0003;
     MAMCR  = 0x0002;
 }
 
-static void init_clks1(void)
+void cpu_init_pll(void)
 {
     /* Disconnect PLL */
     PLLCON &= ~0x0002;
@@ -88,10 +88,7 @@ static void init_clks1(void)
 
     /* Set clock divider to 4 (value+1) */
     CCLKCFG = CL_CPU_DIV - 1;           /* Fcpu = 72 MHz */
-}
 
-static void init_clks2(void)
-{
     /* Wait for the PLL to lock to set frequency */
     while (!(PLLSTAT & BIT26));
 
@@ -114,7 +111,6 @@ void cpu_init_clks(void)
 {
     watchdog_init();
     PCONP = PCRTC; /* switch off everything except RTC */
-    init_clks1();
-    init_clks2();
-    init_mam();
+    cpu_init_pll();
+    cpu_init_mam();
 }
