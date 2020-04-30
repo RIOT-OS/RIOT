@@ -49,8 +49,8 @@
  * For more information on SerialBus Address, refer Section 5.1.1
  * I2C Operation on datasheet.
  */
-#ifndef L3G4200D_DEFAULT_ADDRESS
-#define L3G4200D_DEFAULT_ADDRESS        0x68
+#ifndef CONFIG_L3G4200D_DEFAULT_ADDRESS
+#define CONFIG_L3G4200D_DEFAULT_ADDRESS        0x68
 #endif
 /** @} */
 
