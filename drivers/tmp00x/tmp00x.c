@@ -32,10 +32,12 @@
 #include "periph/i2c.h"
 #include "tmp00x.h"
 #include "tmp00x_regs.h"
-#if TMP00X_USE_LOW_POWER
+#include "byteorder.h"
+#include "kernel_defines.h"
+
+#if IS_ACTIVE(CONFIG_TMP00X_USE_LOW_POWER)
 #include "xtimer.h"
 #endif
-#include "byteorder.h"
 
 #define ENABLE_DEBUG                (0)
 #include "debug.h"
@@ -202,12 +204,12 @@ int tmp00x_read_temperature(const tmp00x_t *dev, int16_t *ta, int16_t *to)
 {
 
     uint16_t drdy;
-#if (!TMP00X_USE_RAW_VALUES)
+#if (!IS_ACTIVE(CONFIG_TMP00X_USE_RAW_VALUES))
     int16_t rawtemp, rawvolt;
     float tamb, tobj;
 #endif
 
-#if TMP00X_USE_LOW_POWER
+#if IS_ACTIVE(CONFIG_TMP00X_USE_LOW_POWER)
     if (tmp00x_set_active(dev)) {
         return TMP00X_ERROR;
     }
@@ -215,13 +217,13 @@ int tmp00x_read_temperature(const tmp00x_t *dev, int16_t *ta, int16_t *to)
 #endif
 
 int ret;
-#if TMP00X_USE_RAW_VALUES
+#if IS_ACTIVE(CONFIG_TMP00X_USE_RAW_VALUES)
     if ((ret = tmp00x_read(dev, to, ta, &drdy)) < 0) {
         return ret;
     }
 
     if (!drdy) {
-#if TMP00X_USE_LOW_POWER
+#if IS_ACTIVE(CONFIG_TMP00X_USE_LOW_POWER)
         tmp00x_set_standby(dev);
 #endif
         return -TMP00X_ERROR;
@@ -232,7 +234,7 @@ int ret;
     }
 
     if (!drdy) {
-#if TMP00X_USE_LOW_POWER
+#if IS_ACTIVE(CONFIG_TMP00X_USE_LOW_POWER)
         tmp00x_set_standby(dev);
 #endif
         return -TMP00X_ERROR;
@@ -243,11 +245,11 @@ int ret;
     *to = (int16_t)(tobj*100);
 #endif
 
-#if TMP00X_USE_LOW_POWER
-    if (tmp00x_set_standby(dev)) {
-        return -TMP00X_ERROR;
+    if (IS_ACTIVE(CONFIG_TMP00X_USE_LOW_POWER)) {
+        if (tmp00x_set_standby(dev)) {
+            return -TMP00X_ERROR;
+        }
     }
-#endif
 
     return TMP00X_OK;
 }

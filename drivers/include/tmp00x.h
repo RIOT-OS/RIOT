@@ -83,6 +83,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "periph/i2c.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -111,29 +112,29 @@ extern "C"
  * @brief   Default Conversion Time in us
  */
 #ifndef CONFIG_TMP00X_CONVERSION_TIME
-#define CONFIG_TMP00X_CONVERSION_TIME     (1E6)
+#define CONFIG_TMP00X_CONVERSION_TIME                   (1E6)
 #endif
 
 /**
  * @brief   Default low power mode
  *
- * If set to 0, the device will be always-on
- * If set to 1, the device will be put in low power mode between measurements.
- * This adds a @c CONFIG_TMP00X_CONVERSION_TIME us delay to each measurement call
- * for bringing the device out of standby.
+ * Set this to 1 to put the device in low power mode between measurements
+ * otherwise the device will always be on.
+ * Enabling this adds a @c CONFIG_TMP00X_CONVERSION_TIME us delay to each
+ * measurement call for bringing the device out of standby.
  */
-#ifndef CONFIG_TMP00X_USE_LOW_POWER
-#define CONFIG_TMP00X_USE_LOW_POWER (0)
+#ifdef DOXYGEN
+#define CONFIG_TMP00X_USE_LOW_POWER
 #endif
 
 /**
  * @brief   Default raw value mode
  *
- * If set to 0, measurements will be converted to Celsius.
- * If set to 1, raw adc readings will be returned.
+ * Set this to 1 to return raw adc readings otherwise
+ * measurements will be converted to Celsius.
  */
-#ifndef CONFIG_TMP00X_USE_RAW_VALUES
-#define CONFIG_TMP00X_USE_RAW_VALUES (0)
+#ifdef DOXYGEN
+#define CONFIG_TMP00X_USE_RAW_VALUES
 #endif
 /** @} */
 
