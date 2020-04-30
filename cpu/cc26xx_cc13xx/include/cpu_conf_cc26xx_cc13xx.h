@@ -28,6 +28,7 @@
 #include "cc26xx_cc13xx_ccfg.h"
 #include "cc26xx_cc13xx_gpio.h"
 #include "cc26xx_cc13xx_gpt.h"
+#include "cc26xx_cc13xx_hard_api.h"
 #include "cc26xx_cc13xx_i2c.h"
 #include "cc26xx_cc13xx_ioc.h"
 #include "cc26xx_cc13xx_rfc.h"
