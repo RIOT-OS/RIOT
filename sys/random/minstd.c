@@ -39,13 +39,13 @@
 
 static uint32_t _seed = 1;
 
-int rand_minstd(void)
+int32_t rand_minstd(void)
 {
     uint32_t hi = div_u32_by_44488(_seed);
     uint32_t lo = div_u32_mod_44488(_seed);
-    uint32_t test = (a * lo) - (r * hi);
+    int32_t test = (a * lo) - (r * hi);
 
-    if(test > 0) {
+    if (test > 0) {
         _seed = test;
     }
     else {
@@ -61,7 +61,7 @@ uint32_t random_uint32(void)
      * so run it two times to get 32bits */
     uint16_t A = (rand_minstd() >> 15);
     uint16_t B = (rand_minstd() >> 15);
-    return  (((uint32_t)A) << 16) | B;
+    return (((uint32_t)A) << 16) | B;
 }
 
 void random_init(uint32_t val)
