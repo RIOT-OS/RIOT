@@ -44,8 +44,8 @@ extern "C" {
  * For more information on SerialBus Address, refer Section I2C
  * Interface on Page 3 of datasheet.
  */
-#ifndef ISL29020_DEFAULT_ADDRESS
-#define ISL29020_DEFAULT_ADDRESS        0x44
+#ifndef CONFIG_ISL29020_DEFAULT_ADDRESS
+#define CONFIG_ISL29020_DEFAULT_ADDRESS        0x44
 #endif
 /** @} */
 
