@@ -101,8 +101,10 @@ extern "C"
 /**
  * @brief   Default Address
  *
- * I2C Address depends on the state of ADR0 and ADR1 Pins
- * For more information, please refer to section 7.3.6.2 of TMP007 datasheet (SBOS685B).
+ * TMP006/TMP007 allows for up to 8 devices on a single bus. The address value
+ * depends on the state of ADR0 and ADR1 pins. Default value (0x40) corresponds
+ * to ADR0 and ADR1 pins tied to GND. For more information refer to the 'Serial
+ * Bus Address' section in the datasheet.
  */
 #ifndef CONFIG_TMP00X_I2C_ADDRESS
 #define CONFIG_TMP00X_I2C_ADDRESS         (0x40)
@@ -110,7 +112,23 @@ extern "C"
 
 /**
  * @brief   Default Conversion Time in us
+ *
+ * The duration of the analog-to-digital(A/D) conversion is determined by the
+ * conversion rate bits CR0, CR1 and CR2. For more information refer to the
+ * datasheet.
  */
+#if IS_ACTIVE(CONFIG_TMP00X_CONVERSION_TIME_0_25S)
+#define CONFIG_TMP00X_CONVERSION_TIME                   (25E4)
+#elif IS_ACTIVE(CONFIG_TMP00X_CONVERSION_TIME_0_5S)
+#define CONFIG_TMP00X_CONVERSION_TIME                   (5E5)
+#elif IS_ACTIVE(CONFIG_TMP00X_CONVERSION_TIME_1S)
+#define CONFIG_TMP00X_CONVERSION_TIME                   (1E6)
+#elif IS_ACTIVE(CONFIG_TMP00X_CONVERSION_TIME_2S)
+#define CONFIG_TMP00X_CONVERSION_TIME                   (2E6)
+#elif IS_ACTIVE(CONFIG_TMP00X_CONVERSION_TIME_4S)
+#define CONFIG_TMP00X_CONVERSION_TIME                   (4E6)
+#endif
+
 #ifndef CONFIG_TMP00X_CONVERSION_TIME
 #define CONFIG_TMP00X_CONVERSION_TIME                   (1E6)
 #endif
@@ -130,8 +148,8 @@ extern "C"
 /**
  * @brief   Default raw value mode
  *
- * Set this to 1 to return raw adc readings otherwise
- * measurements will be converted to Celsius.
+ * Set this to 1 to return raw adc readings otherwise measurements will be
+ * converted to Celsius.
  */
 #ifdef DOXYGEN
 #define CONFIG_TMP00X_USE_RAW_VALUES
