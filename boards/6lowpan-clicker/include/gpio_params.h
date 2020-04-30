@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_pic32-wifire
+ * @ingroup     boards_6lowpan-clicker
  * @{
  *
  * @file

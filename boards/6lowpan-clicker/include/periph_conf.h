@@ -9,11 +9,11 @@
  */
 
 /**
- * @ingroup     boards_pic32-clicker
+ * @ingroup     boards_6lowpan-clicker
  * @{
  *
  * @file
- * @brief       peripheral configuration for the MikroE PIC32 Clicker
+ * @brief       peripheral configuration for the MikroE 6LoWPAN Clicker
  *
  * @author      Neil Jones <Neil.Jones@imgtec.com>
  */
