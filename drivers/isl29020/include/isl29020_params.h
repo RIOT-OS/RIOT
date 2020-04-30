@@ -35,7 +35,7 @@ extern "C" {
 #define ISL29020_PARAM_I2C              I2C_DEV(0)
 #endif
 #ifndef ISL29020_PARAM_ADDR
-#define ISL29020_PARAM_ADDR             (0x44)
+#define ISL29020_PARAM_ADDR             (CONFIG_ISL29020_DEFAULT_ADDRESS)
 #endif
 #ifndef ISL29020_PARAM_RANGE
 #define ISL29020_PARAM_RANGE            (ISL29020_RANGE_16K)
