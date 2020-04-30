@@ -46,8 +46,8 @@ extern "C" {
  * The address depends on part number of SDO1, SDO2 and CSB3.
  * For more information on SerialBus Address, refer section 11.2 in datasheet.
  */
-#ifndef BMX055_MAG_ADDR_DEFAULT
-#define BMX055_MAG_ADDR_DEFAULT  (0x10U)
+#ifndef CONFIG_BMX055_MAG_ADDR_DEFAULT
+#define CONFIG_BMX055_MAG_ADDR_DEFAULT  (0x10U)
 #endif
 
 /**
@@ -56,8 +56,8 @@ extern "C" {
  * The address depends on part number of SDO1, SDO2 and CSB3.
  * For more information on SerialBus Address, refer section 11.2 in datasheet.
  */
-#ifndef BMX055_ACC_ADDR_DEFAULT
-#define BMX055_ACC_ADDR_DEFAULT  (0x18U)
+#ifndef CONFIG_BMX055_ACC_ADDR_DEFAULT
+#define CONFIG_BMX055_ACC_ADDR_DEFAULT  (0x18U)
 #endif
 
 /**
@@ -66,8 +66,8 @@ extern "C" {
  * The address depends on part number of SDO1, SDO2 and CSB3.
  * For more information on SerialBus Address, refer section 11.2 in datasheet.
  */
-#ifndef BMX055_GYRO_ADDR_DEFAULT
-#define BMX055_GYRO_ADDR_DEFAULT (0x68U)
+#ifndef CONFIG_BMX055_GYRO_ADDR_DEFAULT
+#define CONFIG_BMX055_GYRO_ADDR_DEFAULT (0x68U)
 #endif
 /** @} */
 
