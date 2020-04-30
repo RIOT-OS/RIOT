@@ -35,6 +35,7 @@ PSEUDOMODULES += gnrc_netif_events
 PSEUDOMODULES += gnrc_pktbuf_cmd
 PSEUDOMODULES += gnrc_netif_cmd_%
 PSEUDOMODULES += gnrc_netif_dedup
+PSEUDOMODULES += gnrc_nettype_%
 PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
 PSEUDOMODULES += gnrc_sixlowpan_default
