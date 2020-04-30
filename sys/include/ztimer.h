@@ -513,6 +513,41 @@ extern ztimer_clock_t *const ZTIMER_USEC;
  */
 extern ztimer_clock_t *const ZTIMER_MSEC;
 
+/**
+ * @brief   Base ztimer for the microsecond clock (ZTIMER_USEC)
+ *
+ * This ztimer will reference the counter device object at the end of the
+ * chain of ztimer_clock_t for ZTIMER_USEC.
+ *
+ * If the base counter device object's frequency (CONFIG_ZTIMER_USEC_BASE_FREQ)
+ * is not 1MHz then ZTIMER_USEC will be converted on top of this one. Otherwise
+ * they will reference the same ztimer_clock.
+ *
+ * To avoid chained conversions its better to base new ztimer_clock on top of
+ * ZTIMER_USEC_BASE running at CONFIG_ZTIMER_USEC_BASE_FREQ.
+ *
+ */
+extern ztimer_clock_t *const ZTIMER_USEC_BASE;
+
+/**
+ * @brief   Base ztimer for the millisecond clock (ZTIMER_MSEC)
+ *
+ * This ztimer will reference the counter device object at the end of the
+ * chain of ztimer_clock_t for ZTIMER_MSEC.
+ *
+ * If ztimer_periph_rtt is not used then ZTIMER_MSEC_BASE will reference the
+ * same base as ZTIMER_USEC_BASE.
+ *
+ * If the base counter device object's frequency (CONFIG_ZTIMER_MSEC_BASE_FREQ)
+ * is not 1KHz then ZTIMER_MSEC will be converted on top of this one. Otherwise
+ * they will reference the same ztimer_clock.
+ *
+ * To avoid chained conversions its better to base new ztimer_clock on top of
+ * ZTIMER_MSEC_BASE running at CONFIG_ZTIMER_MSEC_BASE_FREQ.
+ *
+ */
+extern ztimer_clock_t *const ZTIMER_MSEC_BASE;
+
 #ifdef __cplusplus
 extern "C" {
 #endif

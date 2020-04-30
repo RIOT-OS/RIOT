@@ -97,6 +97,7 @@
 #if MODULE_ZTIMER_USEC
 #  if CONFIG_ZTIMER_USEC_TYPE_PERIPH_TIMER
 static ztimer_periph_timer_t _ztimer_periph_timer_usec = { .min = CONFIG_ZTIMER_USEC_MIN };
+ztimer_clock_t *const ZTIMER_USEC_BASE = &_ztimer_periph_timer_usec.super;
 #    if CONFIG_ZTIMER_USEC_FREQ == FREQ_1MHZ
 ztimer_clock_t *const ZTIMER_USEC = &_ztimer_periph_timer_usec.super;
 #    elif CONFIG_ZTIMER_USEC_FREQ == 250000LU
@@ -113,20 +114,22 @@ ztimer_clock_t *const ZTIMER_USEC = &_ztimer_convert_frac_usec.super.super;
 #endif
 
 #if MODULE_ZTIMER_MSEC
-#  if MODULE_PERIPH_RTT
+#  if MODULE_ZTIMER_PERIPH_RTT
 static ztimer_periph_rtt_t _ztimer_periph_timer_rtt_msec;
-#  define ZTIMER_RTT_INIT (&_ztimer_periph_timer_rtt_msec)
+ztimer_clock_t *const ZTIMER_MSEC_BASE = &_ztimer_periph_timer_rtt_msec;
+#  define ZTIMER_RTT_INIT (ZTIMER_MSEC_BASE)
 #    if RTT_FREQUENCY!=FREQ_1KHZ
 static ztimer_convert_frac_t _ztimer_convert_frac_msec;
 ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_convert_frac_msec.super.super;
 #  define ZTIMER_MSEC_CONVERT_LOWER_FREQ    RTT_FREQUENCY
 #  define ZTIMER_MSEC_CONVERT_LOWER         (&_ztimer_periph_timer_rtt_msec)
 #    else
-ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_periph_timer_rtt_msec.super;
+ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_periph_timer_rtt_msec;
 #    endif
 #  elif MODULE_ZTIMER_USEC
 static ztimer_convert_frac_t _ztimer_convert_frac_msec;
 ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_convert_frac_msec.super.super;
+ztimer_clock_t *const ZTIMER_MSEC_BASE = &_ztimer_periph_timer_usec.super;
 #    if CONFIG_ZTIMER_USEC_FREQ < FREQ_1MHZ
 #      define ZTIMER_MSEC_CONVERT_LOWER         ZTIMER_USEC_CONVERT_LOWER
 #      define ZTIMER_MSEC_CONVERT_LOWER_FREQ    CONFIG_ZTIMER_USEC_FREQ
