@@ -56,18 +56,18 @@ void cpu_init_pll(void)
     PLLCON &= ~0x0002;
     pllfeed();
 
-    while (PLLSTAT & BIT25);            /* wait until PLL is disconnected before
+    while (PLLSTAT & BIT25) {}          /* wait until PLL is disconnected before
                                          * disabling - deadlock otherwise */
     /* Disable PLL */
     PLLCON &= ~0x0001;
     pllfeed();
 
-    while (PLLSTAT & BIT24);            /* wait until PLL is disabled */
+    while (PLLSTAT & BIT24) {}          /* wait until PLL is disabled */
 
     SCS |= 0x10;                        /* main OSC between 15MHz and 24MHz (more stable in tests) */
     SCS |= 0x20;                        /* Enable main OSC */
 
-    while (!(SCS & 0x40));              /* Wait until main OSC is usable */
+    while (!(SCS & 0x40)) {}            /* Wait until main OSC is usable */
 
 #ifdef XTAL_HZ
     /* select main OSC (XTAL_HZ) as the PLL clock source */
@@ -90,14 +90,14 @@ void cpu_init_pll(void)
     CCLKCFG = CL_CPU_DIV - 1;           /* Fcpu = 72 MHz */
 
     /* Wait for the PLL to lock to set frequency */
-    while (!(PLLSTAT & BIT26));
+    while (!(PLLSTAT & BIT26)) {}
 
     /* Connect the PLL as the clock source */
     PLLCON = 0x0003;
     pllfeed();
 
     /* Check connect bit status */
-    while (!(PLLSTAT & BIT25));
+    while (!(PLLSTAT & BIT25)) {}
 }
 
 static void watchdog_init(void)
