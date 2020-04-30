@@ -646,7 +646,7 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
 }
 #endif
 
-#endif /* MODULE_XTIMER_ON_ZTIMER */
+#endif /* MODULE_ZTIMER_XTIMER_COMPAT */
 
 /** @} */
 #endif /* XTIMER_H */
