@@ -51,21 +51,9 @@ extern "C" {
  */
 #define PRINTF_BUFSIZ 256
 
-/**
- * @brief   Memory marked with this attribute is retained during deep sleep
- *          and initialized with 0 on cold boot.
- */
-#define BACKUP_RAM      __attribute__((section(".rtc.bss")))
-
-/**
- * @brief   Memory marked with this attribute is retained during deep sleep
- *          and initialized with user provided data on cold boot.
- */
-#define BACKUP_RAM_DATA __attribute__((section(".rtc.data")))
-
 #ifdef __cplusplus
 }
-#endif /* CPU_CONF_H */
+#endif
 
 #endif /* CPU_CONF_H */
 /** @} */

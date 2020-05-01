@@ -43,6 +43,14 @@ extern "C" {
 #endif
 #endif /* ICACHE_FLASH */
 
+#ifndef RTC_BSS_ATTR
+#define RTC_BSS_ATTR __attribute__((section(".rtc.bss")))
+#endif
+
+#ifndef RTC_DATA_ATTR
+#define RTC_DATA_ATTR __attribute__((section(".rtc.data")))
+#endif
+
 /** Print out a message that function is not yet implementd */
 #define NOT_YET_IMPLEMENTED()     LOG_INFO("%s not yet implemented\n", __func__)
 /** Print out a message that function is not supported */

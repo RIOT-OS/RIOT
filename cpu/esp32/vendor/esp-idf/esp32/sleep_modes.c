@@ -367,8 +367,6 @@ esp_err_t esp_light_sleep_start(void)
     /*
      * We don't need to advance the system timer in RIOT. If module
      * `esp_rtc_timer` is used, the system timer uses directly the RTC timer.
-     * Otherwise is updated automatically from the RTC timer when
-     * `esp_set_time_from_rtc` is called after.
      */
     // FRC1 has been clock gated for the duration of the sleep, correct for that.
     uint64_t rtc_ticks_at_end = rtc_time_get();
@@ -386,10 +384,10 @@ esp_err_t esp_light_sleep_start(void)
     if (time_diff > 0) {
         esp_timer_impl_advance(time_diff);
     }
+    esp_set_time_from_rtc();
 #else
     (void)frc_time_at_start;
 #endif
-    esp_set_time_from_rtc();
 
 #ifndef RIOT_VERSION
     esp_timer_impl_unlock();

@@ -28,12 +28,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Memory marked with this attribute is retained during deep sleep
- */
-#define BACKUP_RAM      __attribute__((section(".rtc.bss")))
-#define BACKUP_RAM_DATA __attribute__((section(".rtc.data")))
-
-/**
  * @brief   Length of the CPU_ID in octets
  */
 #define CPUID_LEN           (4U)
