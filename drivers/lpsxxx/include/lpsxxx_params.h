@@ -37,7 +37,7 @@ extern "C" {
 #define LPSXXX_PARAM_I2C                I2C_DEV(0)
 #endif
 #ifndef LPSXXX_PARAM_ADDR
-#define LPSXXX_PARAM_ADDR               (LPSXXX_DEFAULT_ADDRESS)
+#define LPSXXX_PARAM_ADDR               (CONFIG_LPSXXX_DEFAULT_ADDRESS)
 #endif
 #ifndef LPSXXX_PARAM_RATE
 #define LPSXXX_PARAM_RATE               (LPSXXX_DEFAULT_RATE)

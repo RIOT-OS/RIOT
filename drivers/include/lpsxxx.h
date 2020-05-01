@@ -48,8 +48,8 @@ extern "C" {
  * pad is connected to power supply, I2C address is 0x5C.
  * Refer to 'I2C Operation' section on the datasheet
  */
-#ifndef LPSXXX_DEFAULT_ADDRESS
-#define LPSXXX_DEFAULT_ADDRESS  (0x5d)
+#ifndef CONFIG_LPSXXX_DEFAULT_ADDRESS
+#define CONFIG_LPSXXX_DEFAULT_ADDRESS  (0x5d)
 #endif
 /** @} */
 
