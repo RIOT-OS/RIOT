@@ -29,6 +29,16 @@ extern "C" {
 extern uintptr_t __stack_start;     /**< end of user stack memory space */
 
 /**
+ * @brief Initialize the phase lock loop oscillator
+ */
+void cpu_init_pll(void);
+
+/**
+ * @brief Initialize the Memory Acceleration Module
+ */
+void cpu_init_mam(void);
+
+/**
  * @brief Scale lpc2387 cpu speed
  */
 void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale);
