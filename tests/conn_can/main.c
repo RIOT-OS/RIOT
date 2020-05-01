@@ -67,6 +67,7 @@ static void print_usage(void)
 {
     puts("test_can list");
     puts("test_can send ifnum can_id [B1 [B2 [B3 [B4 [B5 [B6 [B7 [B8]]]]]]]]");
+    puts("test_can sendrtr ifnum can_id lenght(0..8)");
     printf("test_can recv ifnum user_id timeout can_id1 [can_id2..can_id%d]\n", MAX_FILTER);
     puts("test_can close user_id");
 #ifdef MODULE_CAN_ISOTP
@@ -101,7 +102,7 @@ static int _list(int argc, char **argv) {
     return 0;
 }
 
-static int _send(int argc, char **argv)
+static int _send(int argc, char **argv, bool rtr)
 {
     if (argc < 5) {
         print_usage();
@@ -114,15 +115,28 @@ static int _send(int argc, char **argv)
         return 1;
     }
 
-    frame.can_id = strtoul(argv[3], NULL, 16);
-    frame.can_dlc = argc - 4;
+    if (rtr) {
+        frame.can_id = CAN_RTR_FLAG | strtoul(argv[3], NULL, 16);
+        frame.can_dlc = strtoul(argv[4], NULL, 10);
+    } else {
+        frame.can_id = strtoul(argv[3], NULL, 16);
+        frame.can_dlc = argc - 4;
+    }
     if (frame.can_dlc > 8) {
         puts("Invalid length");
         return 1;
     }
-    for (int i = 0; i < frame.can_dlc; i++) {
-        frame.data[i] = strtol(argv[4 + i], NULL, 16);
+
+    if (rtr) {
+        for (int i = 0; i < frame.can_dlc; i++) {
+            frame.data[i] = 0x0;
+        }
+    } else {
+        for (int i = 0; i < frame.can_dlc; i++) {
+            frame.data[i] = strtol(argv[4 + i], NULL, 16);
+        }
     }
+
     conn_can_raw_t conn;
     conn_can_raw_create(&conn, NULL, 0, ifnum, 0);
     int ret = conn_can_raw_send(&conn, &frame, 0);
@@ -498,7 +512,10 @@ static int _can_handler(int argc, char **argv)
         return _list(argc, argv);
     }
     else if (strncmp(argv[1], "send", 5) == 0) {
-        return _send(argc, argv);
+        return _send(argc, argv, false);
+    }
+    else if (strncmp(argv[1], "sendrtr", 8) == 0) {
+        return _send(argc, argv, true);
     }
     else if (strncmp(argv[1], "recv", 5) == 0) {
         return _receive(argc, argv);

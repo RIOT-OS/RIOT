@@ -78,6 +78,14 @@ To send a raw CAN frame, id 0x100 with 2 bytes of data 01 02 on interface 0:
 test_can send 0 100 01 02
 ```
 
+To send a raw CAN remote request frame, id 0x100 on interface 0 and datalenght 7:
+```
+test_can sendrtr 0 100 7
+```
+A remote request frame has a NULL payload but can have a specific data length code (DLC).
+Valid DLC val: 0..8
+
+
 Two threads are launched to enable receiving frames. To receive raw CAN frames,
 ids 0x100 and 0x500 with thread 0 on interface 1, with 10s timeout:
 ```
