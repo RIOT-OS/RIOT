@@ -27,7 +27,29 @@ extern "C" {
 #endif
 
 typedef volatile uint8_t reg8_t;
+typedef volatile uint16_t reg16_t;
 typedef volatile uint32_t reg32_t;
+
+/**
+ * @brief   Masked 8-bit register
+ */
+typedef struct {
+    reg8_t LOW; /**< Low 4-bit half */
+    reg8_t HIGH; /**< High 4-bit half */
+} reg8_m4_t;
+
+/**
+ * @brief   Masked 8-bit register
+ */
+typedef reg16_t reg8_m8_t;
+
+/**
+ * @brief   Masked 32-bit register
+ */
+typedef struct {
+    reg32_t LOW; /**< Low 16-bit half */
+    reg32_t HIGH; /**< High 16-bit half */
+} reg32_m16_t;
 
 /** @addtogroup CC13x2_cmsis CMSIS Definitions */
 /*@{*/
@@ -122,7 +144,21 @@ typedef enum IRQn
 #define FLASH_BASE         0x00000000 /**< FLASH base address */
 #define PERIPH_BASE        0x40000000 /**< Peripheral base address */
 #define PERIPH_BASE_NONBUF 0x60000000 /**< Peripheral base address (nonbuf) */
+#define ROM_API_TABLE      ((uint32_t *) 0x10000180) /**< ROM API table */
+
 /*@}*/
+
+/**
+ * @brief   ADI master instruction offsets
+ * @{
+ */
+#define ADI_DIR            0x00000000
+#define ADI_SET            0x00000010
+#define ADI_CLR            0x00000020
+#define ADI_MASK4B         0x00000040
+#define ADI_MASK8B         0x00000060
+#define ADI_MASK16B        0x00000080
+/** @} */
 
 #ifdef __cplusplus
 }

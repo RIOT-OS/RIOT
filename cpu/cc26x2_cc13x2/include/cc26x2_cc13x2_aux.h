@@ -217,6 +217,17 @@ typedef struct {
     reg32_t SWPWRPROF; /**< Software Power Profiler */
 } aux_sysif_regs_t;
 
+
+/**
+ * @brief   AUX_SYSIF register values
+ * @{
+ */
+#define AUX_SYSIF_OPMODEREQ_REQ_PDLP 0x00000003
+#define AUX_SYSIF_OPMODEREQ_REQ_PDA  0x00000002
+#define AUX_SYSIF_OPMODEREQ_REQ_LP   0x00000001
+#define AUX_SYSIF_OPMODEREQ_REQ_A    0x00000000
+/** @} */
+
 /**
  * @ingroup cpu_specific_peripheral_memory_map
  * @{
@@ -231,6 +242,21 @@ typedef struct {
  * @brief   AUX_SYSIF register bank
  */
 #define AUX_SYSIF            ((aux_sysif_regs_t *) (AUX_SYSIF_BASE))
+
+/**
+ * @brief   AUX_SYSIF functions
+ * @{
+ */
+/**
+ * @brief    Changes the AUX operational mode
+ *
+ * @note Only this function should be used to change the operational mode,
+ * because it needs to be done in order.
+ *
+ * @param[in] target_opmode The opmode we want to change to.
+ */
+void aux_sysif_opmode_change(uint32_t target_opmode);
+/** @} */
 
 /**
  * @brief   AUX_TIMER01 registers
@@ -391,6 +417,35 @@ typedef struct {
 } adi_4_aux_regs_t;
 
 /**
+ * @brief   ADI_4_AUX registers using masked 8-bit access
+ */
+typedef struct {
+    reg8_m8_t MUX0; /**< Multiplexer 0 */
+    reg8_m8_t MUX1; /**< Multiplexer 1 */
+    reg8_m8_t MUX2; /**< Multiplexer 2 */
+    reg8_m8_t MUX3; /**< Multiplexer 3 */
+    reg8_m8_t ISRC; /**< Current Source */
+    reg8_m8_t COMP; /**< Comparator */
+    reg8_m8_t MUX4; /**< Multiplexer 4 */
+    reg8_m8_t ADC0; /**< ADC Control 0 */
+    reg8_m8_t ADC1; /**< ADC Control 1 */
+    reg8_m8_t ADCREF0; /**< ADC Reference 0 */
+    reg8_m8_t ADCREF1; /**< ADC Reference 1 */
+    reg8_m8_t __reserved1[0x3]; /**< Reserved */
+    reg8_m8_t LPMBIAS; /**< Internal */
+} adi_4_aux_regs_m8_t;
+
+/**
+ * @brief   ADI_4_AUX register values
+ * @{
+ */
+#define ADI_4_AUX_COMP_LPM_BIAS_WIDTH_TRIM_m 0x00000038
+#define ADI_4_AUX_COMP_LPM_BIAS_WIDTH_TRIM_s 3
+#define ADI_4_AUX_LPMBIAS_LPM_TRIM_IOUT_m    0x0000003F
+#define ADI_4_AUX_LPMBIAS_LPM_TRIM_IOUT_s    0
+/** @} */
+
+/**
  * @ingroup cpu_specific_peripheral_memory_map
  * @{
  */
@@ -398,12 +453,20 @@ typedef struct {
  * @brief   ADI_4_AUX base address
  */
 #define ADI_4_AUX_BASE       (PERIPH_BASE + 0xCB000)
+/**
+ * @brief   ADI_4_AUX base address for masked 8-bit access
+ */
+#define ADI_4_AUX_BASE_M8    (ADI_4_AUX_BASE + ADI_MASK8B)
 /** @} */
 
 /**
  * @brief   ADI_4_AUX register bank
  */
 #define ADI_4_AUX            ((adi_4_aux_regs_t *) (ADI_4_AUX_BASE))
+/**
+ * @brief   ADI_4_AUX register bank
+ */
+#define ADI_4_AUX_M8         ((adi_4_aux_regs_m8_t *) (ADI_4_AUX_BASE_M8))
 
 /**
  * @brief   Semamphore used for ADDI

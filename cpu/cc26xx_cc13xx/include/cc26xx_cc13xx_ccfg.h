@@ -54,7 +54,11 @@ typedef struct {
  * @brief   CCFG register values
  * @{
  */
-#define CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM 0x00000004
+#define CCFG_MODE_CONF_1_ALT_DCDC_IPEAK_s            16
+#define CCFG_MODE_CONF_VDDR_EXT_LOAD                 0x02000000
+#define CCFG_MODE_CONF_VDDS_BOD_LEVEL                0x01000000
+#define CCFG_SIZE_AND_DIS_FLAGS_DIS_GPRAM            0x00000004
+#define CCFG_SIZE_AND_DIS_FLAGS_DIS_ALT_DCDC_SETTING 0x00000002
 /** @} */
 
 /**
