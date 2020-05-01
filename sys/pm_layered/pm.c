@@ -87,8 +87,9 @@ pm_blocker_t pm_get_blocker(void)
 #ifndef PROVIDES_PM_LAYERED_OFF
 void pm_off(void)
 {
-    pm_blocker.val_u32 = 0;
-    pm_set_lowest();
-    while(1) {}
+    irq_disable();
+    while(1) {
+        pm_set(0);
+    }
 }
 #endif
