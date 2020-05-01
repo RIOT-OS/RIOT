@@ -224,6 +224,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Disables interaction with pm_layered for a clock
+ */
+#define ZTIMER_CLOCK_NO_REQUIRED_PM_MODE (UINT8_MAX)
+
+/**
  * @brief ztimer_base_t forward declaration
  */
 typedef struct ztimer_base ztimer_base_t;
@@ -296,6 +301,9 @@ struct ztimer_clock {
     uint32_t max_value;             /**< maximum relative timer value       */
     uint32_t lower_last;            /**< timer value at last now() call     */
     ztimer_now_t checkpoint;        /**< cumulated time at last now() call  */
+#endif
+#if MODULE_PM_LAYERED || DOXYGEN
+    uint8_t required_pm_mode;       /**< min. pm mode required for the clock to run */
 #endif
 };
 
@@ -373,16 +381,6 @@ int ztimer_msg_receive_timeout(ztimer_clock_t *clock, msg_t *msg,
 
  /* created with dist/tools/define2u16.py */
 #define MSG_ZTIMER 0xc83e   /**< msg type used by ztimer_msg_receive_timeout */
-
-/*
- * @brief ztimer_now() for extending timers
- *
- * @internal
- *
- * @param[in]   clock          ztimer clock to operate on
- * @return  Current count on the clock @p clock
- */
-ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock);
 
 /**
  * @brief ztimer_now() for extending timers
