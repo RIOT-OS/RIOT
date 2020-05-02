@@ -230,13 +230,13 @@ static const pwm_conf_chan_t pwm_chan2_config[] = {
 /* PWM device configuration */
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
-    {TCC2, pwm_chan0_config, ARRAY_SIZE(pwm_chan0_config)},
+    {TCC_CONFIG(TCC2), pwm_chan0_config, ARRAY_SIZE(pwm_chan0_config), SAM0_GCLK_MAIN},
 #endif
 #if PWM_1_EN
-    {TC4, pwm_chan1_config, ARRAY_SIZE(pwm_chan1_config)},
+    {TCC_CONFIG(TC4), pwm_chan1_config, ARRAY_SIZE(pwm_chan1_config), SAM0_GCLK_MAIN},
 #endif
 #if PWM_2_EN
-    {TC6, pwm_chan2_config, ARRAY_SIZE(pwm_chan2_config)},
+    {TCC_CONFIG(TC6), pwm_chan2_config, ARRAY_SIZE(pwm_chan2_config), SAM0_GCLK_MAIN},
 #endif
 };
 
