@@ -151,7 +151,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     f_real = (CLOCK_CORECLOCK / (scale * res));
 
     /* configure the used pins */
-    for (unsigned i = 0; i < PWM_MAX_CHANNELS; i++) {
+    for (unsigned i = 0; i < pwm_config[dev].chan_numof; i++) {
         if (pwm_config[dev].chan[i].pin != GPIO_UNDEF) {
             gpio_init(pwm_config[dev].chan[i].pin, GPIO_OUT);
             gpio_init_mux(pwm_config[dev].chan[i].pin, pwm_config[dev].chan[i].mux);
@@ -195,12 +195,12 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
 uint8_t pwm_channels(pwm_t dev)
 {
-    return ARRAY_SIZE(pwm_config[dev].chan);
+    return pwm_config[dev].chan_numof;
 }
 
 void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 {
-    if ((channel >= PWM_MAX_CHANNELS) ||
+    if ((channel >= pwm_config[dev].chan_numof) ||
         (pwm_config[dev].chan[channel].pin == GPIO_UNDEF)) {
         return;
     }

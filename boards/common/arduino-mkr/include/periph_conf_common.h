@@ -128,18 +128,20 @@ static const tc32_conf_t timer_config[] = {
  * @{
  */
 #define PWM_0_EN            1
-#define PWM_MAX_CHANNELS    (2U)
-/* for compatibility with test application */
-#define PWM_0_CHANNELS      PWM_MAX_CHANNELS
+
+#if PWM_0_EN
+/* PWM0 channels */
+static const pwm_conf_chan_t pwm_chan0_config[] = {
+    /* GPIO pin, MUX value, TCC channel */
+    { GPIO_PIN(PA, 10), GPIO_MUX_F, 2 },    /* ~2 */
+    { GPIO_PIN(PA, 11), GPIO_MUX_F, 3 },    /* ~3 */
+};
+#endif
 
 /* PWM device configuration */
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
-    {TCC0, {
-        /* GPIO pin, MUX value, TCC channel */
-        { GPIO_PIN(PA, 10), GPIO_MUX_F, 2 },    /* ~2 */
-        { GPIO_PIN(PA, 11), GPIO_MUX_F, 3 },    /* ~3 */
-    }}
+    {TCC0, pwm_chan0_config, ARRAY_SIZE(pwm_chan0_config)},
 #endif
 };
 

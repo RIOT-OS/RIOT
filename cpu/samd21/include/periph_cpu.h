@@ -84,7 +84,8 @@ typedef struct {
  */
 typedef struct {
     Tcc *dev;                   /**< TCC device to use */
-    pwm_conf_chan_t chan[3];    /**< channel configuration */
+    const pwm_conf_chan_t *chan;/**< channel configuration */
+    const uint8_t chan_numof;   /**< number of channels */
 } pwm_conf_t;
 
 /**
