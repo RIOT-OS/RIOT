@@ -242,6 +242,19 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
         .gclk_src = SAM0_GCLK_48MHZ,
     }
 };
+/** @} */
+
+/**
+ * @name DAC configuration
+ * @{
+ */
+                            /* Must not exceed 12 MHz */
+#define DAC_CLOCK           SAM0_GCLK_8MHZ
+                            /* Use external reference voltage on PA03 */
+                            /* (You have to manually connect PA03 with Vcc) */
+                            /* Internal reference only gives 1V */
+#define DAC_VREF            DAC_CTRLB_REFSEL_VREFPU
+/** @} */
 
 #ifdef __cplusplus
 }

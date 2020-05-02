@@ -69,6 +69,16 @@ enum {
  */
 #define SPI_HWCS(x)     (UINT_MAX - 1)
 
+/**
+ * @brief   The MCU has a 12 bit DAC
+ */
+#define DAC_RES_BITS        (12)
+
+/**
+ * @brief   The MCU has two DAC outputs.
+ */
+#define DAC_NUMOF           (2)
+
 #ifdef __cplusplus
 }
 #endif

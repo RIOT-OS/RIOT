@@ -165,6 +165,15 @@ static const adc_conf_chan_t adc_channels[] = {
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)
 /** @} */
 
+/**
+ * @name DAC configuration
+ * @{
+ */
+#define DAC_CLOCK           SAM0_GCLK_32KHZ
+                            /* use Vcc as reference voltage */
+#define DAC_VREF            DAC_CTRLB_REFSEL_AVCC
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
