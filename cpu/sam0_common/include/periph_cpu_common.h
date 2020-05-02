@@ -213,6 +213,24 @@ typedef struct {
 } uart_conf_t;
 
 /**
+ * @brief   PWM channel configuration data structure
+ */
+typedef struct {
+    gpio_t pin;                 /**< GPIO pin */
+    gpio_mux_t mux;             /**< pin function multiplex value */
+    uint8_t chan;               /**< TCC channel to use */
+} pwm_conf_chan_t;
+
+/**
+ * @brief   PWM device configuration data structure
+ */
+typedef struct {
+    Tcc *dev;                   /**< TCC device to use */
+    const pwm_conf_chan_t *chan;/**< channel configuration */
+    const uint8_t chan_numof;   /**< number of channels */
+} pwm_conf_t;
+
+/**
  * @brief   Available values for SERCOM SPI MISO pad selection
  */
 typedef enum {
