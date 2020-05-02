@@ -129,6 +129,12 @@ static int prepare(spiffs_desc_t *fs_desc)
     mtd_dev_t *dev = SPIFFS_MTD_DEV;
 #endif
 
+    int res = mtd_init(dev);
+
+    if (res) {
+        return res;
+    }
+
     fs_desc->config.hal_read_f = _dev_read;
     fs_desc->config.hal_write_f = _dev_write;
     fs_desc->config.hal_erase_f = _dev_erase;
@@ -149,7 +155,7 @@ static int prepare(spiffs_desc_t *fs_desc)
     fs_desc->config.phys_erase_block = dev->page_size * dev->pages_per_sector;
 #endif
 
-    return mtd_init(dev);
+    return 0;
 }
 
 static int _format(vfs_mount_t *mountp)
