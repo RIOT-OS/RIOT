@@ -33,6 +33,7 @@
 #include "soc/rtc_cntl_struct.h"
 #include "soc/timer_group_reg.h"
 #include "soc/timer_group_struct.h"
+#include "sdk_conf.h"
 #include "xtensa/xtensa_api.h"
 
 #ifdef MODULE_ESP_IDF_HEAP
@@ -96,6 +97,18 @@ static int _no_sys_func(struct _reent *r)
     r->_errno = ENOSYS;
     return -1;
 }
+
+extern int _printf_float(struct _reent *rptr,
+                         void *pdata,
+                         FILE * fp,
+                         int (*pfunc) (struct _reent *, FILE *,
+                                       _CONST char *, size_t len),
+                         va_list * ap);
+
+extern int _scanf_float(struct _reent *rptr,
+                        void *pdata,
+                        FILE *fp,
+                        va_list *ap);
 
 static struct syscall_stub_table s_stub_table =
 {
