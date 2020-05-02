@@ -75,8 +75,12 @@ typedef struct {
  * @brief   DDI_0_OSC register values
  * @{
  */
-#define DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL          0x00000001
-#define DDI_0_OSC_CTL0_SCLK_LF_SRC_SEL          0x0000000C
+#define DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL_m        0x00000001
+#define DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL_s        0
+#define DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL_XOSC     0x00000001
+#define DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL_RCOSC    0x00000000
+#define DDI_0_OSC_CTL0_SCLK_LF_SRC_SEL_m        0x0000000C
+#define DDI_0_OSC_CTL0_SCLK_LF_SRC_SEL_s        2
 #define DDI_0_OSC_CTL0_ACLK_TDC_SRC_SEL         0x00000180
 #define DDI_0_OSC_CTL0_CLK_LOSS_EN              0x00000200
 #define DDI_0_OSC_CTL0_XOSC_LF_DIG_BYPASS       0x00000400
@@ -89,6 +93,11 @@ typedef struct {
 #define DDI_0_OSC_CTL0_BYPASS_RCOSC_LF_CLK_QUAL 0x10000000
 #define DDI_0_OSC_CTL0_BYPASS_XOSC_LF_CLK_QUAL  0x20000000
 #define DDI_0_OSC_CTL0_XTAL_IS_24M              0x80000000
+#define DDI_0_OSC_STAT0_PENDINGSCLKHFSWITCHING  0x00000001
+#define DDI_0_OSC_STAT0_SCLK_HF_SRC_m           0x10000000
+#define DDI_0_OSC_STAT0_SCLK_HF_SRC_s           28
+#define DDI_0_OSC_STAT0_SCLK_LF_SRC_m           0x60000000
+#define DDI_0_OSC_STAT0_SCLK_LF_SRC_s           29
 /** @} */
 
 /**
@@ -119,6 +128,28 @@ typedef struct {
  * @brief   DDI_0_OSC 16-bit masked access register bank
  */
 #define DDI_0_OSC_M16        ((ddi0_osc_regs_m16_t *) (DDI0_OSC_BASE_M16))
+
+/**
+ * @brief   SCLK_HF oscillators.
+ * @{
+ */
+#define OSC_RCOSC_HF         0x00000000 /**< Internal HF RC oscillator */
+#define OSC_XOSC_HF          0x00000001 /**< External HF crystal oscillator */
+/** @} */
+
+/**
+ * @brief    DDI_0_OSC functions
+ * @{
+ */
+/**
+ * @brief   Switch the high frequency clock.
+ *
+ * @note This function will not return until the clock source has been switched.
+ *
+ * @param[in] osc The oscillator to use.
+ */
+void osc_hf_source_switch(uint32_t osc);
+/** @} */
 
 /**
  * @brief    AON_PMCTL registers

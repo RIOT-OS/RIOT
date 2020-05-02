@@ -40,6 +40,7 @@ static const uint8_t _opmode_to_order[4] = {
     OPMODE_PDA_ORDER,
     OPMODE_PDLP_ORDER
 };
+
 /** Array to map an order to an operation mode, used to get the next operation
  * mode. This is because we need to change the operation in ordered steps */
 static const uint8_t _order_to_opmode[4] = {
