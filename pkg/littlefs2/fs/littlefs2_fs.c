@@ -132,6 +132,12 @@ static int prepare(littlefs_desc_t *fs)
     mutex_init(&fs->lock);
     mutex_lock(&fs->lock);
 
+    int ret = mtd_init(fs->dev);
+
+    if (ret) {
+        return ret;
+    }
+
     memset(&fs->fs, 0, sizeof(fs->fs));
 
     if (!fs->config.block_count) {
@@ -169,7 +175,7 @@ static int prepare(littlefs_desc_t *fs)
     fs->config.prog_buffer = fs->prog_buf;
 #endif
 
-    return mtd_init(fs->dev);
+    return 0;
 }
 
 static int _format(vfs_mount_t *mountp)
