@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "exti_config.h"
+#include "timer_config.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -213,21 +214,54 @@ typedef struct {
 } uart_conf_t;
 
 /**
+ * @brief   Common configuration for timer devices
+ */
+typedef struct {
+#ifdef REV_TCC
+    Tcc *dev;                   /**< TCC device to use */
+#endif
+#ifdef MCLK
+    volatile uint32_t *mclk;    /**< Pointer to MCLK->APBxMASK.reg */
+    uint32_t mclk_mask;         /**< MCLK_APBxMASK bits to enable Timer */
+#else
+    uint32_t pm_mask;           /**< PM_APBCMASK bits to enable Timer */
+#endif
+    uint16_t gclk_id;           /**< TCn_GCLK_ID */
+} tcc_cfg_t;
+
+/**
+ * @brief   Static initializer for timer configuration
+ */
+#ifdef MCLK
+#define TCC_CONFIG(tim)                   { \
+        .dev       = tim,                   \
+        .mclk      = MCLK_ ## tim,          \
+        .mclk_mask = MCLK_ ## tim ## _MASK, \
+        .gclk_id   = tim ## _GCLK_ID,     }
+#else
+#define TCC_CONFIG(tim)                   { \
+        .dev       = tim,                   \
+        .pm_mask   = PM_APBCMASK_ ## tim,   \
+        .gclk_id   = tim ## _GCLK_ID,     }
+#endif
+
+/**
  * @brief   PWM channel configuration data structure
  */
 typedef struct {
-    gpio_t pin;                 /**< GPIO pin */
-    gpio_mux_t mux;             /**< pin function multiplex value */
-    uint8_t chan;               /**< TCC channel to use */
+    gpio_t pin;             /**< GPIO pin */
+    gpio_mux_t mux;         /**< pin function multiplex value */
+    uint8_t chan;           /**< TCC channel to use */
 } pwm_conf_chan_t;
 
 /**
  * @brief   PWM device configuration data structure
  */
 typedef struct {
-    Tcc *dev;                   /**< TCC device to use */
-    const pwm_conf_chan_t *chan;/**< channel configuration */
-    const uint8_t chan_numof;   /**< number of channels */
+    tcc_cfg_t tim;                  /**< timer configuration */
+    const pwm_conf_chan_t *chan;    /**< channel configuration */
+    uint8_t chan_numof;             /**< number of channels */
+    uint8_t gclk_src;               /**< GCLK source which clocks TIMER */
 } pwm_conf_t;
 
 /**
