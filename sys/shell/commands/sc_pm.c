@@ -149,6 +149,11 @@ static int cmd_off(char *arg)
 
 int _pm_handler(int argc, char **argv)
 {
+    if (argc < 2) {
+        _print_usage();
+        return 1;
+    }
+
 #ifdef MODULE_PM_LAYERED
     if (!strcmp(argv[1], "show")) {
         if (argc != 2) {
@@ -182,8 +187,6 @@ int _pm_handler(int argc, char **argv)
 
         return cmd_set(argv[2]);
     }
-#else
-    (void)argc;
 #endif /* MODULE_PM_LAYERED */
 
     if (!strcmp(argv[1], "off")) {
