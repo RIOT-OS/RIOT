@@ -1,7 +1,0 @@
-CPU_ARCH = cortex-m3
-CPU_FAM  = stm32f2
-
-FEATURES_PROVIDED += periph_hwrng
-FEATURES_PROVIDED += cortexm_mpu
-
--include $(RIOTCPU)/stm32_common/Makefile.features

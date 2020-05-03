@@ -1,2 +1,0 @@
-include $(RIOTCPU)/stm32_common/Makefile.include
-include $(RIOTMAKE)/arch/cortexm.inc.mk
