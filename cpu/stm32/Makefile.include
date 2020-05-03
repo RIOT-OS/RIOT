@@ -4,7 +4,7 @@ CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 LINKER_SCRIPT ?= stm32.ld
 
 # Include riotboot specific variables
--include $(RIOTCPU)/stm32/$(CPU_FAM)_riotboot.mk
+include $(RIOTCPU)/stm32/stm32_riotboot.mk
 
 # Compute ROM_LEN and RAM_LEN
 include $(RIOTCPU)/stm32/stm32_mem_lengths.mk
