@@ -917,10 +917,6 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
 #include "candev_stm32.h"
 #endif
 
-#ifdef MODULE_PERIPH_USBDEV
-#include "usbdev_stm32.h"
-#endif
-
 /**
  * @brief STM32 Ethernet configuration mode
  */
