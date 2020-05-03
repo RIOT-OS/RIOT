@@ -936,6 +936,30 @@ ssize_t coap_opt_finish(coap_pkt_t *pkt, uint16_t flags)
     return pkt->payload - (uint8_t *)pkt->hdr;
 }
 
+ssize_t coap_payload_put_bytes(coap_pkt_t *pkt, const void *data, size_t len)
+{
+    if (pkt->payload_len < len) {
+        return -ENOSPC;
+    }
+
+    memcpy(pkt->payload, data, len);
+    coap_payload_advance_bytes(pkt, len);
+
+    return len;
+}
+
+ssize_t coap_payload_put_char(coap_pkt_t *pkt, char c)
+{
+    if (pkt->payload_len < 1) {
+        return -ENOSPC;
+    }
+
+    *pkt->payload++ = c;
+    pkt->payload_len--;
+
+    return 1;
+}
+
 void coap_block_object_init(coap_block1_t *block, size_t blknum, size_t blksize,
                             int more)
 {
