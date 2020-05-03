@@ -1,0 +1,11 @@
+# All stm32 families provide pm support
+USEMODULE += pm_layered
+
+# include stm32 common periph drivers
+USEMODULE += periph stm32_vectors
+
+ifneq (,$(filter periph_usbdev,$(FEATURES_USED)))
+  USEMODULE += xtimer
+endif
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

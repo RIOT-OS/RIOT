@@ -1,0 +1,55 @@
+include $(RIOTCPU)/stm32/stm32_info.mk
+
+FEATURES_PROVIDED += cpu_$(CPU_FAM)
+FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += puf_sram
+FEATURES_PROVIDED += periph_uart_modecfg
+FEATURES_PROVIDED += periph_wdt
+
+ifneq (,$(filter $(CPU_FAM),stm32f0 stm32f1 stm32f3 stm32l0 stm32l1 stm32l4 stm32wb))
+  ifeq (,$(filter nucleo-f031k6,$(BOARD)))
+    FEATURES_PROVIDED += periph_flashpage
+    FEATURES_PROVIDED += periph_flashpage_raw
+  endif
+endif
+
+ifneq (,$(filter $(CPU_FAM),stm32l0 stm32l1))
+  FEATURES_PROVIDED += periph_eeprom
+endif
+
+ifeq (stm32f1,$(CPU_FAM))
+  FEATURES_CONFLICT += periph_rtc:periph_rtt
+  FEATURES_CONFLICT_MSG += "On the STM32F1, the RTC and RTT map to the same hardware peripheral."
+endif
+
+ifneq (,$(filter $(CPU_FAM),stm32f2 stm32f4 stm32f7 stm32l0 stm32l4 stm32wb))
+  FEATURES_PROVIDED += periph_hwrng
+endif
+
+# the granularity of provided feature definition for STMs is currently by CPU
+# sub-family (e.g., stm32f[1234]). Unfortunately, only some of e.g., the
+# stm32f4 have an RNG peripheral. As during evaluation of the features , no
+# CPU variable is available, we need to filter by board.
+#
+BOARDS_WITHOUT_HWRNG += nucleo-f401re
+BOARDS_WITHOUT_HWRNG += nucleo-f411re
+BOARDS_WITHOUT_HWRNG += nucleo-f446re
+BOARDS_WITHOUT_HWRNG += nucleo-f446ze
+BOARDS_WITHOUT_HWRNG += nucleo-l031k6
+
+ifneq (,$(filter $(BOARDS_WITHOUT_HWRNG),$(BOARD)))
+  FEATURES_PROVIDED := $(filter-out periph_hwrng,$(FEATURES_PROVIDED))
+endif
+
+ifneq (,$(filter $(CPU_FAM),stm32f2 stm32f4 stm32f7 stm32l1 stm32l4))
+  FEATURES_PROVIDED += cortexm_mpu
+endif
+
+# only some stm32f3 and stm32l0 have an MPU
+STM32_WITH_MPU += stm32f303re stm32f303vc stm32f303ze stm32l052t8
+ifneq (,$(filter $(CPU_MODEL),$(STM32_WITH_MPU)))
+  FEATURES_PROVIDED += cortexm_mpu
+endif
+
+include $(RIOTCPU)/cortexm_common/Makefile.features

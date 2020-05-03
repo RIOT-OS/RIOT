@@ -1,0 +1,48 @@
+CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
+
+# For stm32 cpu's we use the generic stm32.ld linker script
+LINKER_SCRIPT ?= stm32.ld
+
+# Include riotboot specific variables
+-include $(RIOTCPU)/stm32/$(CPU_FAM)_riotboot.mk
+
+# Compute ROM_LEN and RAM_LEN
+include $(RIOTCPU)/stm32/stm32_mem_lengths.mk
+KB := 1024
+ROM_LEN_K := $(shell echo $(ROM_LEN) | sed 's/K//')
+
+ifeq (stm32wb55rg,$(CPU_MODEL))
+  # adjust RAM_LEN and ROM_LEN according to CPU2 RAM_LEN and ROM_LEN
+  RAM_LEN_K := $(shell echo $(RAM_LEN) | sed 's/K//')
+  CPU2_RAM_LEN_K := $(shell echo $(CPU2_RAM_LEN) | sed 's/K//')
+  RAM_LEN := $(shell echo $$(( ($(RAM_LEN_K) - $(CPU2_RAM_LEN_K) ) ))K)
+
+  CPU2_ROM_LEN_K := $(shell echo $(CPU2_ROM_LEN) | sed 's/K//')
+  FLASHSIZE := $(shell echo $$(( ($(ROM_LEN_K) - $(CPU2_ROM_LEN_K) )* $(KB) )) )
+  ROM_LEN := $(shell echo $$(( ($(ROM_LEN_K) - $(CPU2_ROM_LEN_K) ) ))K)
+else
+  FLASHSIZE := $(shell echo $$(( $(ROM_LEN_K) * $(KB) )) )
+endif
+
+# Get CPU_LINE_ variable
+-include $(RIOTCPU)/stm32/$(CPU_FAM)_line.mk
+CPU_LINE ?= $(shell echo $(CPU_MODEL) | cut -c -9 | tr 'a-z-' 'A-Z_')xx
+
+# Set CFLAGS
+CFLAGS += -D$(CPU_LINE) -DCPU_LINE_$(CPU_LINE)
+CFLAGS += -DSTM32_FLASHSIZE=$(FLASHSIZE)U
+
+info-stm32:
+	@$(COLOR_ECHO) "CPU: $(CPU_MODEL)"
+	@$(COLOR_ECHO) "\tLine: $(CPU_LINE)"
+	@$(COLOR_ECHO) "\tPin count:\t$(STM32_PINS)"
+	@$(COLOR_ECHO) "\tROM size:\t$(ROM_LEN) ($(FLASHSIZE) Bytes)"
+	@$(COLOR_ECHO) "\tRAM size:\t$(RAM_LEN)"
+
+ifneq (,$(CCMRAM_LEN))
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)
+endif
+
+VECTORS_O ?= $(BINDIR)/stm32_vectors/vectors_$(subst stm32,,$(CPU_FAM)).o
+
+include $(RIOTMAKE)/arch/cortexm.inc.mk
