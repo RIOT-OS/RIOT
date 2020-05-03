@@ -25,7 +25,7 @@ else
 endif
 
 # Get CPU_LINE_ variable
--include $(RIOTCPU)/stm32/$(CPU_FAM)_line.mk
+include $(RIOTCPU)/stm32/stm32_line.mk
 CPU_LINE ?= $(shell echo $(CPU_MODEL) | cut -c -9 | tr 'a-z-' 'A-Z_')xx
 
 # Set CFLAGS
