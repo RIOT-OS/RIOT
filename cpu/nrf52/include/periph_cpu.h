@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015-2018 Freie Universität Berlin
+ *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief           nRF52 specific definitions for handling peripherals
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author          Philipp-Alexander Blum <philipp-blum@jakiku.de>
  */
 
 #ifndef PERIPH_CPU_H
@@ -42,7 +44,7 @@ extern "C" {
 #define SPI_SCKSEL          (dev(bus)->PSEL.SCK)
 #define SPI_MOSISEL         (dev(bus)->PSEL.MOSI)
 #define SPI_MISOSEL         (dev(bus)->PSEL.MISO)
-#ifndef CPU_MODEL_NRF52840XXAA
+#ifdef CPU_MODEL_NRF52832XXAA
 #define UART_IRQN           (UARTE0_UART0_IRQn)
 #endif
 /** @} */
@@ -161,12 +163,13 @@ typedef struct {
     gpio_t pin[PWM_CHANNELS];           /**< PWM out pins */
 } pwm_conf_t;
 
-#ifdef CPU_MODEL_NRF52840XXAA
+#if defined(CPU_MODEL_NRF52811XXAA) || defined(CPU_MODEL_NRF52840XXAA)
 /**
  * @brief   Structure for UART configuration data
  */
 typedef struct {
-    NRF_UARTE_Type *dev;    /**< UART with EasyDMA device base register address */
+    NRF_UARTE_Type *dev;    /**< UART with EasyDMA device base
+                             * register address */
     gpio_t rx_pin;          /**< RX pin */
     gpio_t tx_pin;          /**< TX pin */
 #ifdef MODULE_PERIPH_UART_HW_FC

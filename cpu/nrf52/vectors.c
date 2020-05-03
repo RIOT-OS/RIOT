@@ -1,11 +1,11 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
+ *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-
 
 /**
  * @ingroup     cpu_nrf52
@@ -15,6 +15,7 @@
  * @brief       nRF52 interrupt vector definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * @}
  */
@@ -34,6 +35,7 @@ void dummy_handler(void) {
 WEAK_DEFAULT void isr_power_clock(void);
 WEAK_DEFAULT void isr_radio(void);
 WEAK_DEFAULT void isr_uart0(void);
+WEAK_DEFAULT void isr_spi0(void);
 WEAK_DEFAULT void isr_spi0_twi0(void);
 WEAK_DEFAULT void isr_spi1_twi1(void);
 WEAK_DEFAULT void isr_nfct(void);
@@ -96,8 +98,43 @@ WEAK_DEFAULT void isr_pwm3(void);
 extern void SWI2_EGU2_IRQHandler(void);
 #endif
 
+#if defined(CPU_MODEL_NRF52811XXAA)
 /* CPU specific interrupt vector table */
 ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
+    isr_power_clock,       /* power_clock */
+    isr_radio,             /* radio */
+    isr_uart0,             /* uart0 */
+    isr_spi1_twi1,         /* spi1_twi1 */
+    isr_spi0,              /* spi 0 */
+    (0UL),                 /* reserved */
+    isr_gpiote,            /* gpiote */
+    isr_saadc,             /* adc */
+    isr_timer0,            /* timer0 */
+    isr_timer1,            /* timer1 */
+    isr_timer2,            /* timer2 */
+    isr_rtc0,              /* rtc0 */
+    isr_temp,              /* temp */
+    isr_rng,               /* rng */
+    isr_ecb,               /* ecb */
+    isr_ccm_aar,           /* ccm_aar */
+    isr_wdt,               /* wdt */
+    isr_rtc1,              /* rtc1 */
+    isr_qdec,              /* qdec */
+    isr_lpcomp,            /* lpcomp */
+    isr_swi0,              /* swi0 */
+    isr_swi1,              /* swi1 */
+    isr_swi3,              /* swi3 */
+    isr_swi4,              /* swi4 */
+    isr_swi5,              /* swi5 */
+    (0UL),                 /* reserved */
+    (0UL),                 /* reserved */
+    isr_pwm0,              /* pwm 0 */
+    isr_pdm,               /* pdm */
+};
+#else
+/* CPU specific interrupt vector table */
+ISR_VECTOR(1)
+const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_power_clock,       /* power_clock */
     isr_radio,             /* radio */
     isr_uart0,             /* uart0 */
@@ -132,8 +169,8 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_timer4,            /* timer 4 */
     isr_pwm0,              /* pwm 0 */
     isr_pdm,               /* pdm */
-    (0UL),                  /* reserved */
-    (0UL),                  /* reserved */
+    (0UL),                 /* reserved */
+    (0UL),                 /* reserved */
     isr_mwu,               /* mwu */
     isr_pwm1,              /* pwm 1 */
     isr_pwm2,              /* pwm 2 */
@@ -151,3 +188,4 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_pwm3,              /* pwm3 */
 #endif
 };
+#endif
