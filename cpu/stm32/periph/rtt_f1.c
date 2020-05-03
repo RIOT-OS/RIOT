@@ -7,12 +7,12 @@
  */
 
 /**
- * @ingroup     cpu_stm32f1
+ * @ingroup     cpu_stm32
  * @ingroup     drivers_periph_rtt
  * @{
  *
  * @file
- * @brief       Low-level RTT driver implementation
+ * @brief       Low-level RTT driver implementation for STM32F1
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  *

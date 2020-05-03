@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     cpu_stm32f1
+ * @ingroup     cpu_stm32
  * @{
  * @file
- * @brief       Low-level RTC driver implementation
+ * @brief       Low-level RTC driver implementation for STM32F1
  *
  * @author      Alexei Bezborodov <alexeibv+riotos@narod.ru>
  * @}

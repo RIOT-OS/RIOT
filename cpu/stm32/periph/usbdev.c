@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup cpu_stm32_common_usbdev
+ * @ingroup cpu_stm32_usbdev
  * @{
  * @file
  * @brief   Low level USB interface functions for the stm32 FS/HS devices

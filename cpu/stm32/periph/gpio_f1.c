@@ -7,12 +7,12 @@
  */
 
 /**
- * @ingroup     cpu_stm32f1
+ * @ingroup     cpu_stm32
  * @ingroup     drivers_periph_gpio
  * @{
  *
  * @file
- * @brief       Low-level GPIO driver implementation
+ * @brief       Low-level GPIO driver implementation for STM32F1
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>

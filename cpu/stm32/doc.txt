@@ -1,15 +1,13 @@
 /**
- * @defgroup        cpu_stm32_common STM32 common
+ * @defgroup        cpu_stm32 STM32
  * @ingroup         cpu
- * @brief           STM32 common code and definitions
+ * @brief           All STM32 families code and definitions
  *
- * This module contains all common code and definition to all STM32 cpu
- * families supported by RIOT: @ref cpu_stm32f0, @ref cpu_stm32l0,
- * @ref cpu_stm32f1, @ref cpu_stm32f2, @ref cpu_stm32f3, @ref cpu_stm32f4,
- * @ref cpu_stm32l4, @ref cpu_stm32f7.
+ * This module contains all code and definition to all STM32 cpu
+ * families supported by RIOT: F0, F1, F2, F3, F4, F7, L0, L4 and WB.
  *
  * STM32Fx Clock configuration
- * =================================
+ * ===========================
  *
  * stm32fx cpus share clock configuration code and macro.
  * It can be configured as described here.

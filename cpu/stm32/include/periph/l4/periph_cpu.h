@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup         cpu_stm32l4
+ * @ingroup         cpu_stm32
  * @{
  *
  * @file
- * @brief           CPU specific definitions for internal peripheral handling
+ * @brief           STM32L4 CPU specific definitions for internal peripheral handling
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  *

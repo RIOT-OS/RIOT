@@ -8,11 +8,11 @@
  */
 
 /**
- * @ingroup     cpu_stm32f2
+ * @ingroup     cpu_stm32
  * @{
  *
  * @file
- * @brief       Interrupt vector definitions
+ * @brief       Interrupt vector definitions for STM32F2
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Nick v. IJzendoorn <nijzendoorn@engineering-spirit.nl>

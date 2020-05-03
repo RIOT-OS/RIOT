@@ -7,8 +7,8 @@
  */
 
 /**
- * @defgroup    cpu_stm32_common_usbdev stm32 USB OTG FS/HS peripheral
- * @ingroup     cpu_stm32_common
+ * @defgroup    cpu_stm32_usbdev stm32 USB OTG FS/HS peripheral
+ * @ingroup     cpu_stm32
  * @brief       USB interface functions for the stm32 class devices
  *
  * @{

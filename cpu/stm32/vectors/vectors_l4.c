@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_stm32l4
+ * @ingroup     cpu_stm32
  * @{
  *
  * @file
- * @brief       Interrupt vector definitions
+ * @brief       Interrupt vector definitions for STM32L4
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *

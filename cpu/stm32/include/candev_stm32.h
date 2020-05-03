@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_stm32_common
+ * @ingroup     cpu_stm32
  * @ingroup     drivers_can
  * @defgroup    candev_stm32 STM32 CAN controller
  * @brief       STM32 CAN controller driver (bxCAN)

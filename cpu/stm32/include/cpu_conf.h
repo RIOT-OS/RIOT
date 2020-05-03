@@ -8,9 +8,7 @@
  */
 
 /**
- * @defgroup        cpu_stm32f0 STM32F0
- * @brief           STM32F0 specific code
- * @ingroup         cpu
+ * @ingroup         cpu_stm32
  * @{
  *
  * @file

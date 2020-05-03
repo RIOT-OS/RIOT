@@ -8,11 +8,11 @@
  */
 
 /**
- * @ingroup         cpu_stm32l0
+ * @ingroup         cpu_stm32
  * @{
  *
  * @file
- * @brief           CPU specific definitions for internal peripheral handling
+ * @brief           STM32L0 CPU specific definitions for internal peripheral handling
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author          Alexandre Abadie <alexandre.abadie@inria.fr>

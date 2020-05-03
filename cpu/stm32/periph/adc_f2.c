@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_stm32f2
+ * @ingroup     cpu_stm32
  * @ingroup     drivers_periph_adc
  * @{
  *

@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup         cpu_stm32wb
+ * @ingroup         cpu_stm32
  * @{
  *
  * @file
- * @brief           CPU specific definitions for internal peripheral handling
+ * @brief           STM32WB CPU specific definitions for internal peripheral handling
  *
  * @author          Francisco Molina <francois-xavier.molina@inria.fr>
  *

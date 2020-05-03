@@ -10,7 +10,7 @@
  */
 
 /**
- * @ingroup     cpu_stm32_common
+ * @ingroup     cpu_stm32
  * @{
  * @file
  * @brief       Low-level RTC driver implementation
