@@ -141,7 +141,7 @@ static const pwm_conf_chan_t pwm_chan0_config[] = {
 /* PWM device configuration */
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
-    {TCC0, pwm_chan0_config, ARRAY_SIZE(pwm_chan0_config)},
+    {TCC_CONFIG(TCC0), pwm_chan0_config, ARRAY_SIZE(pwm_chan0_config), SAM0_GCLK_MAIN},
 #endif
 };
 
