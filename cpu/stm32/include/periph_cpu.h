@@ -35,6 +35,8 @@
 #include "periph/f4/periph_cpu.h"
 #elif defined(CPU_FAM_STM32F7)
 #include "periph/f7/periph_cpu.h"
+#elif defined(CPU_FAM_STM32G0)
+#include "periph/g0/periph_cpu.h"
 #elif defined(CPU_FAM_STM32G4)
 #include "periph/g4/periph_cpu.h"
 #elif defined(CPU_FAM_STM32L0)
@@ -61,7 +63,8 @@ extern "C" {
 #define CLOCK_LSI           (37000U)
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
       defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L4) || \
-      defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4)
+      defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
+      defined(CPU_FAM_STM32G0)
 #define CLOCK_LSI           (32000U)
 #else
 #error "error: LSI clock speed not defined for your target CPU"
@@ -167,10 +170,10 @@ typedef enum {
     APB1,           /**< APB1 bus */
     APB2,           /**< APB2 bus */
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4)
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
     APB12,          /**< AHB1 bus, second register */
 #endif
-#if defined(CPU_FAM_STM32L0)
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32G0)
     AHB,            /**< AHB bus */
     IOP,            /**< IOP bus */
 #elif defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F1) || \
@@ -686,7 +689,7 @@ typedef enum {
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4)
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
     I2C_SPEED_FAST_PLUS,    /**< fast plus mode: ~1Mbit/s */
 #endif
 } i2c_speed_t;
@@ -719,8 +722,8 @@ typedef struct {
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32L4) ||  defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4)
+    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
 /**
  * @brief   Structure for I2C timing register settings
  *

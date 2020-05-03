@@ -64,6 +64,15 @@ config CPU_FAM_F7
     select HAS_CORTEXM_MPU
     select HAS_PERIPH_HWRNG
 
+config CPU_FAM_G0
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M0PLUS
+    select HAS_CPU_STM32G0
+    select HAS_CORTEXM_MPU
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_RAW
+
 config CPU_FAM_G4
     bool
     select CPU_STM32
@@ -279,6 +288,11 @@ config CPU_MODEL_STM32F769NI
     bool
     select CPU_FAM_F7
 
+# STM32G0
+config CPU_MODEL_STM32G070RB
+    bool
+    select CPU_FAM_G0
+
 # STM32G4
 config CPU_MODEL_STM32G474RE
     bool
@@ -414,6 +428,11 @@ config HAS_CPU_STM32F7
     help
         Indicates that the cpu being used belongs to the 'stm32f7' family.
 
+config HAS_CPU_STM32G0
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32g0' family.
+
 config HAS_CPU_STM32G4
     bool
     help
@@ -452,6 +471,7 @@ config CPU_FAM
     default "f3" if CPU_FAM_F3
     default "f4" if CPU_FAM_F4
     default "f7" if CPU_FAM_F7
+    default "g0" if CPU_FAM_G0
     default "g4" if CPU_FAM_G4
     default "l0" if CPU_FAM_L0
     default "l1" if CPU_FAM_L1
@@ -507,6 +527,9 @@ config CPU_MODEL
     default "stm32f746zg" if CPU_MODEL_STM32F746ZG
     default "stm32f767zi" if CPU_MODEL_STM32F767ZI
     default "stm32f769ni" if CPU_MODEL_STM32F769NI
+
+    # STM32G0
+    default "stm32g070rb" if CPU_MODEL_STM32G070RB
 
     # STM32G4
     default "stm32g474re" if CPU_MODEL_STM32G474RE

@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Implementation of STM32 clock configuration for the G4 family
+ * @brief       Implementation of STM32 clock configuration for the G0 and G4 families
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @}
@@ -25,21 +25,42 @@
 #error "HSE is selected as input clock source but CLOCK_HSE is not set"
 #endif
 
+#if defined(CPU_FAM_STM32G0)
+#define PLL_M_MIN                   (1)
+#define PLL_M_MAX                   (8)
+#define PLL_N_MIN                   (8)
+#define PLL_N_MAX                   (86)
+#define PLL_R_MIN                   (2)
+#define PLL_R_MAX                   (8)
+#else /* CPu_FAM_STM32G4 */
+#define PLL_M_MIN                   (1)
+#define PLL_M_MAX                   (16)
+#define PLL_N_MIN                   (8)
+#define PLL_N_MAX                   (127)
+#define PLL_R_MIN                   (1)
+#define PLL_R_MAX                   (8)
+#endif
+
 #if CLOCK_USE_PLL
-#if (CLOCK_PLL_M < 1 || CLOCK_PLL_M > 16)
+#if (CLOCK_PLL_M < PLL_M_MIN || CLOCK_PLL_M > PLL_M_MAX)
 #error "PLL configuration: PLL M value is out of range"
 #endif
 #define PLL_M                       ((CLOCK_PLL_M - 1) << RCC_PLLCFGR_PLLM_Pos)
 
-#if (CLOCK_PLL_N < 8 || CLOCK_PLL_N > 127)
+#if (CLOCK_PLL_N < PLL_N_MIN || CLOCK_PLL_N > PLL_N_MAX)
 #error "PLL configuration: PLL N value is out of range"
 #endif
 #define PLL_N                       (CLOCK_PLL_N << RCC_PLLCFGR_PLLN_Pos)
 
-#if (CLOCK_PLL_R < 1 || CLOCK_PLL_R > 8)
+#if (CLOCK_PLL_R < PLL_R_MIN || CLOCK_PLL_R > PLL_R_MAX)
 #error "PLL configuration: PLL R value is out of range"
 #endif
+
+#if defined(CPU_FAM_STM32G0)
+#define PLL_R                       ((CLOCK_PLL_R - 1) << RCC_PLLCFGR_PLLR_Pos)
+#else /* CPU_FAM_STM32G4 */
 #define PLL_R                       (((CLOCK_PLL_R >> 1) - 1) << RCC_PLLCFGR_PLLR_Pos)
+#endif
 
 #if CLOCK_HSE
 #define PLL_IN                      CLOCK_HSE
@@ -48,9 +69,25 @@
 #define PLL_IN                      CLOCK_HSI
 #define PLL_SRC                     RCC_PLLCFGR_PLLSRC_HSI
 #endif
+
 #endif /* CLOCK_USE_PLL */
 
+#if defined(CPU_FAM_STM32G0)
+#define RCC_CFGR_SW_HSI             (0)
+#define RCC_CFGR_SW_HSE             (RCC_CFGR_SW_0)
+#define RCC_CFGR_SW_PLL             (RCC_CFGR_SW_1)
+#endif
+
 /** Determine the required flash wait states from the core clock frequency */
+#if defined(CPU_FAM_STM32G0)
+#if CLOCK_CORECLOCK >= 48000000
+#define FLASH_WAITSTATES            (FLASH_ACR_LATENCY_1)   /* 2 wait states */
+#elif CLOCK_CORECLOCK >= 24000000
+#define FLASH_WAITSTATES            (FLASH_ACR_LATENCY_0)   /* 1 wait states */
+#else
+#define FLASH_WAITSTATES            (0)                     /* 0 wait states */
+#endif
+#else /* CPU_FAM_STM32G4 */
 #if CLOCK_AHB >= 136
 #define FLASH_WAITSTATES            (FLASH_ACR_LATENCY_4WS) /* 4 ws */
 #elif CLOCK_AHB >= 102
@@ -62,6 +99,7 @@
 #else
 #define FLASH_WAITSTATES            (0)                     /* 0 ws */
 #endif
+#endif /* CPU_FAM_STM32G4 */
 
 void stmclk_init_sysclk(void)
 {
@@ -75,13 +113,22 @@ void stmclk_init_sysclk(void)
 
     /* use HSI as system clock while we do any further configuration and
      * configure the AHB and APB clock dividers as configured by the board */
+#if defined(CPU_FAM_STM32G0)
+    RCC->CFGR = (RCC_CFGR_SW_HSI | CLOCK_AHB_DIV | CLOCK_APB1_DIV);
+#elif defined(CPU_FAM_STM32G4)
     RCC->CFGR = (RCC_CFGR_SW_HSI | CLOCK_AHB_DIV | CLOCK_APB1_DIV | CLOCK_APB2_DIV);
+#endif
     while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI) {}
 
+#if defined(CPU_FAM_STM32G0)
+    /* we enable instruction cache, pre-fetch, and we set the required flash wait states */
+    FLASH->ACR |= (FLASH_ACR_ICEN | FLASH_ACR_PRFTEN | FLASH_WAITSTATES);
+#elif defined(CPU_FAM_STM32G4)
     /* we enable I+D caches, pre-fetch, and we set the actual number of
      * needed flash wait states */
     FLASH->ACR |= (FLASH_ACR_ICEN | FLASH_ACR_DCEN | FLASH_ACR_PRFTEN |
                    FLASH_WAITSTATES);
+#endif
 
     /* disable all active clocks except HSI -> resets the clk configuration */
     RCC->CR = RCC_CR_HSION;
