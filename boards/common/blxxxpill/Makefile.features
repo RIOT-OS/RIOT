@@ -1,4 +1,4 @@
-CPU = stm32f1
+CPU = stm32
 
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc

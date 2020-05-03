@@ -1,5 +1,5 @@
 ## the cpu to build for
-CPU = stm32l1
+CPU = stm32
 CPU_MODEL = stm32l151cb
 
 # Put defined MCU peripherals here (in alphabetical order)
