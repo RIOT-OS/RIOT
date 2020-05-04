@@ -114,6 +114,11 @@ void gnrc_netif_init_devs(void)
         auto_init_cc2538_rf();
     }
 
+    if (IS_USED(MODULE_CC26X2_CC13X2_RF)) {
+        extern void auto_init_cc26x2_cc13x2_rf(void);
+        auto_init_cc26x2_cc13x2_rf();
+    }
+
     if (IS_USED(MODULE_XBEE)) {
         extern void auto_init_xbee(void);
         auto_init_xbee();
