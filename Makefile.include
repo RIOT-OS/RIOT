@@ -403,6 +403,7 @@ ifneq (1,$(TEST_KCONFIG))
 endif
 
 KCONFIG_MODULES := $(call lowercase,$(patsubst CONFIG_MOD_%,%,$(filter CONFIG_MOD_%,$(.VARIABLES))))
+KCONFIG_PACKAGES := $(call lowercase,$(patsubst CONFIG_PKG_%,%,$(filter CONFIG_PKG_%,$(.VARIABLES))))
 
 ifeq (1,$(TEST_KCONFIG))
   $(info === [ATTENTION] Testing Kconfig dependency modelling ===)
