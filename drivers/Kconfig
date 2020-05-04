@@ -14,6 +14,7 @@ rsource "Kconfig.net"
 
 menu "Sensor Device Drivers"
 rsource "ads101x/Kconfig"
+rsource "bmx055/Kconfig"
 rsource "fxos8700/Kconfig"
 rsource "hdc1000/Kconfig"
 rsource "mag3110/Kconfig"

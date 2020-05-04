@@ -1,0 +1,42 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_MODULE_BMX055
+    bool "Configure BMX055 driver"
+    depends on MODULE_BMX055
+    help
+        Configure the BMX055 driver using Kconfig.
+
+if KCONFIG_MODULE_BMX055
+
+config BMX055_MAG_ADDR_DEFAULT
+    hex "I2C Address of magnetometer"
+    range 0x10 0x13
+    default 0x10
+    help
+        The address depends on the state of SDO1, SDO2 and CSB3 pins.
+        For more information refer to the section 'Inter-Integrated
+        Circuit (I²C)' in the datasheet.
+
+config BMX055_ACC_ADDR_DEFAULT
+    hex "I2C Address of accelerometer"
+    range 0x18 0x19
+    default 0x18
+    help
+        The address depends on the state of SDO1, SDO2 and CSB3 pins.
+        For more information refer to the section 'Inter-Integrated
+        Circuit (I²C)' in the datasheet.
+
+config BMX055_GYRO_ADDR_DEFAULT
+    hex "I2C Address of gyroscope"
+    range 0x68 0x69
+    default 0x68
+    help
+        The address depends on the state of SDO1, SDO2 and CSB3 pins.
+        For more information refer to the section 'Inter-Integrated
+        Circuit (I²C)' in the datasheet.
+
+endif # KCONFIG_MODULE_BMX055

@@ -43,31 +43,34 @@ extern "C" {
 /**
  * @brief Magnetometer default address
  *
- * The address depends on part number of SDO1, SDO2 and CSB3.
- * For more information on SerialBus Address, refer section 11.2 in datasheet.
+ * The address depends on the state of SDO1, SDO2 and CSB3 pins.
+ * For more information refer to the section 'Inter-Integrated
+ * Circuit (I²C)' in the datasheet.
  */
-#ifndef BMX055_MAG_ADDR_DEFAULT
-#define BMX055_MAG_ADDR_DEFAULT  (0x10U)
+#ifndef CONFIG_BMX055_MAG_ADDR_DEFAULT
+#define CONFIG_BMX055_MAG_ADDR_DEFAULT  (0x10U)
 #endif
 
 /**
  * @brief Accelerometer default address
  *
- * The address depends on part number of SDO1, SDO2 and CSB3.
- * For more information on SerialBus Address, refer section 11.2 in datasheet.
+ * The address depends on the state of SDO1, SDO2 and CSB3 pins.
+ * For more information refer to the section 'Inter-Integrated
+ * Circuit (I²C)' in the datasheet.
  */
-#ifndef BMX055_ACC_ADDR_DEFAULT
-#define BMX055_ACC_ADDR_DEFAULT  (0x18U)
+#ifndef CONFIG_BMX055_ACC_ADDR_DEFAULT
+#define CONFIG_BMX055_ACC_ADDR_DEFAULT  (0x18U)
 #endif
 
 /**
  * @brief Gyroscope default address
  *
- * The address depends on part number of SDO1, SDO2 and CSB3.
- * For more information on SerialBus Address, refer section 11.2 in datasheet.
+ * The address depends on the state of SDO1, SDO2 and CSB3 pins.
+ * For more information refer to the section 'Inter-Integrated
+ * Circuit (I²C)' in the datasheet.
  */
-#ifndef BMX055_GYRO_ADDR_DEFAULT
-#define BMX055_GYRO_ADDR_DEFAULT (0x68U)
+#ifndef CONFIG_BMX055_GYRO_ADDR_DEFAULT
+#define CONFIG_BMX055_GYRO_ADDR_DEFAULT (0x68U)
 #endif
 /** @} */
 
