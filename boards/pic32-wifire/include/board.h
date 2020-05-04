@@ -70,6 +70,17 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Button pin configuration
+ * @{
+ */
+#define BTN0_PIN            GPIO_PIN(PORT_A, 5)
+#define BTN0_MODE           GPIO_IN
+
+#define BTN1_PIN            GPIO_PIN(PORT_A, 4)
+#define BTN1_MODE           GPIO_IN
+/** @} */
+
+/**
  * @brief   Board level initialization
  */
 void board_init(void);

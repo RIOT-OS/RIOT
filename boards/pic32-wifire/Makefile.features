@@ -2,6 +2,5 @@ CPU = mips_pic32mz
 CPU_MODEL = p32mz2048efg100
 
 # Put defined MCU peripherals here (in alphabetical order)
-FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart

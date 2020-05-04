@@ -41,6 +41,16 @@ static const saul_gpio_params_t saul_gpio_params[] =
         .pin = LED2_PIN,
         .mode = GPIO_OUT,
     },
+    {
+        .name  = "T1",
+        .pin   = BTN0_PIN,
+        .mode  = BTN0_MODE,
+    },
+    {
+        .name  = "T2",
+        .pin   = BTN1_PIN,
+        .mode  = BTN1_MODE,
+    },
 };
 
 #ifdef __cplusplus
