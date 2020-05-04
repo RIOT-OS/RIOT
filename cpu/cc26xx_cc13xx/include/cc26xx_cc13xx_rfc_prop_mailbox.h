@@ -28,7 +28,7 @@ extern "C" {
  * @{
  */
 /**
- * @enum    Operation finished normally
+ * @brief   Operation finished normally
  */
 enum {
     RFC_PROP_DONE_OK            = 0x3400,   /**< Operation ended normally */

@@ -34,17 +34,17 @@ typedef struct {
     uint8_t *curr_entry; /**< Pointer to the data entry to be used */
     uint8_t *last_entry; /**< Last entry of the queue, NULL is queue is
                               circular */
-} __attribute__ ((aligned (4))) rfc_data_queue_t;
+} rfc_data_queue_t;
 
 /**
  * @brief   Data entry status
  */
 typedef enum {
-    RFC_DATA_ENTRY_PENDING = 0, /**< Entry not yet used */
-    RFC_DATA_ENTRY_ACTIVE = 1, /**< Entry in use by radio CPU */
-    RFC_DATA_ENTRY_BUSY = 2, /**< Entry being updated */
-    RFC_DATA_ENTRY_FINISHED = 3, /**< Radio CPU is finished accessing the
-                                      entry */
+    RFC_DATA_ENTRY_PENDING = 0,   /**< Entry not yet used */
+    RFC_DATA_ENTRY_ACTIVE = 1,    /**< Entry in use by radio CPU */
+    RFC_DATA_ENTRY_BUSY = 2,      /**< Entry being updated */
+    RFC_DATA_ENTRY_FINISHED = 3,  /**< Radio CPU is finished accessing the
+                                       entry */
     RFC_DATA_ENTRY_UNFINISHED = 4 /**< Radio CPU is finished accessing the
                                        entry, but packet could not be
                                        finished */
@@ -54,10 +54,10 @@ typedef enum {
  * @brief   Data entry type
  */
 typedef enum {
-    RFC_DATA_ENTRY_TYPE_GEN  = 0, /**< General type: Tx entry or single element
-                                       Rx entry */
-    RFC_DATA_ENTRY_TYPE_MULTI = 1, /**< Multi-element Rx entry type */
-    RFC_DATA_ENTRY_TYPE_PTR = 2, /**< Pointer entry type */
+    RFC_DATA_ENTRY_TYPE_GEN  = 0,   /**< General type: Tx entry or single
+                                         element Rx entry */
+    RFC_DATA_ENTRY_TYPE_MULTI = 1,  /**< Multi-element Rx entry type */
+    RFC_DATA_ENTRY_TYPE_PTR = 2,    /**< Pointer entry type */
     RFC_DATA_ENTRY_TYPE_PARTIAL = 3 /**< Partial read entry type */
 } rfc_data_entry_type_t;
 
@@ -81,7 +81,7 @@ typedef struct {
    uint16_t length; /**< For pointer entries: Number of bytes in the data buffer
                          pointed to. For other entries: Number of bytes
                          following this length field */
-} __attribute__ ((aligned (4))) rfc_data_entry_t;
+} rfc_data_entry_t;
 
 /**
  * @brief   Data entry general
@@ -96,12 +96,11 @@ typedef struct {
                          following this length field */
    uint8_t data; /**< First byte of the data array to be received or
                       transmitted */
-} __attribute__ ((aligned (4))) rfc_data_entry_general_t;
+} rfc_data_entry_general_t;
 
 #ifdef __cplusplus
 } /* end of extern "C" */
 #endif
 
 #endif /* CC26XX_CC13XX_RFC_QUEUE_H */
-
-/*@}*/
+/** @} */

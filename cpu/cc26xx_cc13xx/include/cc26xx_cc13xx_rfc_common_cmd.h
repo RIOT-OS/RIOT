@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 #include "cc26xx_cc13xx_rfc_mailbox.h"
+#include "cc26xx_cc13xx_rfc_queue.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -91,7 +92,7 @@ typedef struct {
                                TX mode */
         uint8_t ref_freq:6; /**< 0h = Use default reference frequenc, others =
                                  Use reference frequency 48 MHz */
-    } synth_conf;
+    } synth_conf; /**< Synthesizer configuration */
     uint8_t __dummy0; /**< Reserved, always write 0 */
     uint8_t __dummy1; /**< Reserved */
     uint8_t __dummy2; /**< Reserved */
@@ -145,7 +146,9 @@ typedef struct {
  * @{
  */
 #define RFC_CMD_SYNC_START_RAT (0x080A) /**< CMD_SYNC_STOP_RAT command ID */
-//! Synchrously Start Radio Timer Command
+/**
+ * @brief   Synchrously Start Radio Timer Command
+ */
 typedef struct {
     uint16_t command_no; /**< The command ID number */
     uint16_t status; /**< An integer telling the status of the command. */
@@ -173,6 +176,20 @@ typedef struct  {
    uint16_t command_no; /**< The command ID number */
    uint16_t tx_power; /**< New TX power setting */
 } rfc_cmd_set_tx_power_t;
+
+/**
+ * @brief   CMD_CLEAR_RX
+ * @{
+ */
+#define RFC_CMD_CLEAR_RX (0x0008)
+/**
+ * @brief   Clear all RX Queue Entries
+ */
+typedef struct {
+   uint16_t command_no; /**< The command ID number */
+   uint16_t __dummy0; /**< Padding */
+   rfc_data_queue_t *queue; /**< Pointer to the queue structure to be cleared */
+} rfc_cmd_clear_rx_t;
 /** @} */
 
 #ifdef __cplusplus
