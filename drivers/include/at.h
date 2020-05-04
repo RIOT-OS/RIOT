@@ -40,6 +40,7 @@
 #include "isrpipe.h"
 #include "periph/uart.h"
 #include "clist.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,10 +59,24 @@ extern "C" {
 #endif
 
 /**
+ * @brief Disable echo after an AT command is sent.
+ */
+#ifdef DOXYGEN
+#define AT_SEND_SKIP_ECHO
+#endif
+
+/**
  * @brief Enable/disable the expected echo after an AT command is sent.
+ * 
+ * @deprecated Use inverse @ref AT_SEND_SKIP_ECHO instead.
+ * Will be removed after 2021.01 release.
  */
 #ifndef AT_SEND_ECHO
+#if IS_ACTIVE(AT_SEND_SKIP_ECHO)
+#define AT_SEND_ECHO 0
+#else
 #define AT_SEND_ECHO 1
+#endif
 #endif
 
 /**
