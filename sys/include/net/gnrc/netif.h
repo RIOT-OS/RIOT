@@ -30,6 +30,9 @@
 
 #include "kernel_types.h"
 #include "msg.h"
+#ifdef MODULE_GNRC_NETIF_BUS
+#include "msg_bus.h"
+#endif
 #include "event.h"
 #include "net/ipv6/addr.h"
 #include "net/gnrc/netapi.h"
@@ -65,6 +68,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Per-Interface Event Message Busses
+ */
+typedef enum {
+    GNRC_NETIF_BUS_NUMOF
+} gnrc_netif_bus_t;
+
+/**
  * @brief   Operations to an interface
  */
 typedef struct gnrc_netif_ops gnrc_netif_ops_t;
@@ -87,8 +97,11 @@ typedef struct {
     gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */
 #endif
 #if IS_USED(MODULE_GNRC_NETIF_MAC) || defined(DOXYGEN)
-    gnrc_netif_mac_t mac;                  /**< @ref net_gnrc_mac component */
+    gnrc_netif_mac_t mac;                   /**< @ref net_gnrc_mac component */
 #endif  /* IS_USED(MODULE_GNRC_NETIF_MAC) || defined(DOXYGEN) */
+#if IS_USED(MODULE_GNRC_NETIF_BUS) || DOXYGEN
+    msg_bus_t bus[GNRC_NETIF_BUS_NUMOF];    /**< Event Message Bus */
+#endif
     /**
      * @brief   Flags for the interface
      *
@@ -565,6 +578,23 @@ static inline int gnrc_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {
     return gnrc_netapi_send(netif->pid, pkt);
 }
+
+#if defined(MODULE_GNRC_NETIF_BUS) || DOXYGEN
+/**
+ * @brief   Get a message bus of a given @ref gnrc_netif_t interface.
+ *
+ * @param netif         pointer to the interface
+ * @param type          GNRC message bus [type](@ref gnrc_netif_bus_t)
+ *
+ * @return              the message bus for the interface
+ */
+static inline msg_bus_t* gnrc_netif_get_bus(gnrc_netif_t *netif,
+                                            gnrc_netif_bus_t type)
+{
+    assert(type < GNRC_NETIF_BUS_NUMOF);
+    return &netif->bus[type];
+}
+#endif /* MODULE_GNRC_NETIF_BUS */
 
 #ifdef __cplusplus
 }

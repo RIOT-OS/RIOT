@@ -67,6 +67,11 @@ int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
                     "more than one interface is being registered.\n");
         assert(netif_iter(NULL) == NULL);
     }
+#ifdef MODULE_GNRC_NETIF_BUS
+    for (int i = 0; i < GNRC_NETIF_BUS_NUMOF; ++i) {
+        msg_bus_init(&netif->bus[i]);
+    }
+#endif
     rmutex_init(&netif->mutex);
     netif->ops = ops;
     netif_register((netif_t*) netif);
