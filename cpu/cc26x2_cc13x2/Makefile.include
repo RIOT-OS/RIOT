@@ -7,3 +7,5 @@ RAM_LEN ?= 80K
 
 include ${RIOTCPU}/cc26xx_cc13xx/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk
+
+INCLUDES += -I$(RIOTCPU)/cc26x2_cc13x2/include/vendor
