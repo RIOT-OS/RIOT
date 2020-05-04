@@ -19,8 +19,8 @@
  */
 
 
-#ifndef _IRQ_ARCH_H
-#define _IRQ_ARCH_H
+#ifndef IRQ_ARCH_H
+#define IRQ_ARCH_H
 
 #include <stdint.h>
 #include "cpu_conf.h"
@@ -35,6 +35,7 @@ extern "C" {
 static inline __attribute__((always_inline)) unsigned int irq_disable(void)
 {
     uint32_t mask = __get_PRIMASK();
+
     __disable_irq();
     return mask;
 }
@@ -45,8 +46,10 @@ static inline __attribute__((always_inline)) unsigned int irq_disable(void)
 static inline __attribute__((always_inline)) __attribute__((used)) unsigned int
 irq_enable(void)
 {
+    unsigned result = __get_PRIMASK();
+
     __enable_irq();
-    return __get_PRIMASK();
+    return result;
 }
 
 /**
@@ -70,5 +73,5 @@ static inline __attribute__((always_inline)) int irq_is_in(void)
 }
 #endif
 
-#endif /* _IRQ_ARCH_H */
+#endif /* IRQ_ARCH_H */
 /** @} */
