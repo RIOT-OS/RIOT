@@ -485,6 +485,23 @@ void ztimer_update_head_offset(ztimer_clock_t *clock);
  */
 void ztimer_init(void);
 
+/**
+ * @brief   Initialize possible ztimer extension intermediate timer
+ *
+ * This will basically just set a timer to (clock->max_value >> 1), *if*
+ * max_value is not UINT32_MAX.
+ *
+ * This is called automatically by all ztimer backends and extension modules.
+ *
+ * @internal
+ */
+static inline void ztimer_init_extend(ztimer_clock_t *clock)
+{
+    if (clock->max_value < UINT32_MAX) {
+        clock->ops->set(clock, clock->max_value >> 1);
+    }
+}
+
 /* default ztimer virtual devices */
 /**
  * @brief   Default ztimer microsecond clock
