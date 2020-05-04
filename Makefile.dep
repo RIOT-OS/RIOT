@@ -951,7 +951,7 @@ ifneq (,$(filter cord_lc,$(USEMODULE)))
   USEMODULE += clif
 endif
 
-ifneq (,$(filter tlsf-malloc,$(USEMODULE)))
+ifneq (,$(filter tlsf_malloc,$(USEMODULE)))
   USEPKG += tlsf
 endif
 
