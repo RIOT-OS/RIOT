@@ -54,6 +54,13 @@ void luid_get(void *buf, size_t len)
     ((uint8_t *)buf)[0] ^= lastused++;
 }
 
+void luid_get_lb(void *buf, size_t len)
+{
+    luid_base(buf, len);
+
+    ((uint8_t *)buf)[len - 1] ^= lastused++;
+}
+
 void luid_custom(void *buf, size_t len, int gen)
 {
     luid_base(buf, len);
