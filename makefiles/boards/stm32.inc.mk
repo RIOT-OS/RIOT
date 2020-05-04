@@ -1,6 +1,6 @@
 PROGRAMMER ?= openocd
 
-PROGRAMMERS_SUPPORTED := bmp dfu-util openocd stm32flash
+PROGRAMMERS_SUPPORTED := bmp dfu-util openocd stm32flash jlink
 
 ifeq (,$(filter $(PROGRAMMER), $(PROGRAMMERS_SUPPORTED)))
   $(error Programmer $(PROGRAMMER) not supported)
@@ -35,6 +35,11 @@ endif
 
 ifeq (bmp,$(PROGRAMMER))
   include $(RIOTMAKE)/tools/bmp.inc.mk
+endif
+
+ifeq (jlink,$(PROGRAMMER))
+  JLINK_DEVICE ?= $(CPU_MODEL)
+  include $(RIOTMAKE)/tools/jlink.inc.mk
 endif
 
 ifeq (dfu-util,$(PROGRAMMER))
