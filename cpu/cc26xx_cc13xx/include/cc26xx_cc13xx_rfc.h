@@ -74,46 +74,47 @@ typedef enum {
 
 /**
  * @brief   RFCPEIEN/RFCPEIFG/RFCPEISL interrupt flags
+ * @{
  */
-typedef enum {
-    CPE_IRQ_COMMAND_DONE         = (1 << 0),
-    CPE_IRQ_LAST_COMMAND_DONE    = (1 << 1),
-    CPE_IRQ_FG_COMMAND_DONE      = (1 << 2),
-    CPE_IRQ_LAST_FG_COMMAND_DONE = (1 << 3),
-    CPE_IRQ_TX_DONE              = (1 << 4),
-    CPE_IRQ_TX_ACK               = (1 << 5),
-    CPE_IRQ_TX_CTRL              = (1 << 6),
-    CPE_IRQ_TX_CTRL_ACK          = (1 << 7),
-    CPE_IRQ_TX_CTRL_ACK_ACK      = (1 << 8),
-    CPE_IRQ_TX_RETRANS           = (1 << 9),
-    CPE_IRQ_TX_ENTRY_DONE        = (1 << 10),
-    CPE_IRQ_TX_BUFFER_CHANGED    = (1 << 11),
+#define CPE_IRQ_COMMAND_DONE         (1 << 0)
+#define CPE_IRQ_LAST_COMMAND_DONE    (1 << 1)
+#define CPE_IRQ_LAST_COMMAND_DONE_s  (1)
+#define CPE_IRQ_FG_COMMAND_DONE      (1 << 2)
+#define CPE_IRQ_LAST_FG_COMMAND_DONE (1 << 3)
+#define CPE_IRQ_TX_DONE              (1 << 4)
+#define CPE_IRQ_TX_ACK               (1 << 5)
+#define CPE_IRQ_TX_CTRL              (1 << 6)
+#define CPE_IRQ_TX_CTRL_ACK          (1 << 7)
+#define CPE_IRQ_TX_CTRL_ACK_ACK      (1 << 8)
+#define CPE_IRQ_TX_RETRANS           (1 << 9)
+#define CPE_IRQ_TX_ENTRY_DONE        (1 << 10)
+#define CPE_IRQ_TX_BUFFER_CHANGED    (1 << 11)
 #ifdef CPU_VARIANT_X2
-    CPE_IRQ_COMMAND_STARTED      = (1 << 12),
-    CPE_IRQ_FG_COMMAND_STARTED   = (1 << 13),
+#define CPE_IRQ_COMMAND_STARTED      (1 << 12)
+#define CPE_IRQ_FG_COMMAND_STARTED   (1 << 13)
 #else
-    CPE_IRQ_IRQ12                = (1 << 12),
-    CPE_IRQ_IRQ13                = (1 << 13),
+#define CPE_IRQ_IRQ12                (1 << 12)
+#define CPE_IRQ_IRQ13                (1 << 13)
 #endif
-    CPE_IRQ_IRQ14                = (1 << 14),
-    CPE_IRQ_IRQ15                = (1 << 15),
-    CPE_IRQ_RX_OK                = (1 << 16),
-    CPE_IRQ_RX_NOK               = (1 << 17),
-    CPE_IRQ_RX_IGNORED           = (1 << 18),
-    CPE_IRQ_RX_EMPTY             = (1 << 19),
-    CPE_IRQ_RX_CTRL              = (1 << 20),
-    CPE_IRQ_RX_CTRL_ACK          = (1 << 21),
-    CPE_IRQ_RX_BUF_FULL          = (1 << 22),
-    CPE_IRQ_RX_ENTRY_DONE        = (1 << 23),
-    CPE_IRQ_RX_DATA_WRITTEN      = (1 << 24),
-    CPE_IRQ_RX_N_DATA_WRITTEN    = (1 << 25),
-    CPE_IRQ_RX_ABORTED           = (1 << 26),
-    CPE_IRQ_IRQ27                = (1 << 27),
-    CPE_IRQ_SYNTH_NO_LOCK        = (1 << 28),
-    CPE_IRQ_MODULES_UNLOCKED     = (1 << 29),
-    CPE_IRQ_BOOT_DONE            = (1 << 30),
-    CPE_IRQ_INTERNAL_ERROR       = (1 << 31),
-} rf_cpe_irq_t;
+#define CPE_IRQ_IRQ14                (1 << 14)
+#define CPE_IRQ_IRQ15                (1 << 15)
+#define CPE_IRQ_RX_OK                (1 << 16)
+#define CPE_IRQ_RX_NOK               (1 << 17)
+#define CPE_IRQ_RX_IGNORED           (1 << 18)
+#define CPE_IRQ_RX_EMPTY             (1 << 19)
+#define CPE_IRQ_RX_CTRL              (1 << 20)
+#define CPE_IRQ_RX_CTRL_ACK          (1 << 21)
+#define CPE_IRQ_RX_BUF_FULL          (1 << 22)
+#define CPE_IRQ_RX_ENTRY_DONE        (1 << 23)
+#define CPE_IRQ_RX_DATA_WRITTEN      (1 << 24)
+#define CPE_IRQ_RX_N_DATA_WRITTEN    (1 << 25)
+#define CPE_IRQ_RX_ABORTED           (1 << 26)
+#define CPE_IRQ_IRQ27                (1 << 27)
+#define CPE_IRQ_SYNTH_NO_LOCK        (1 << 28)
+#define CPE_IRQ_MODULES_UNLOCKED     (1 << 29)
+#define CPE_IRQ_BOOT_DONE            (1 << 30)
+#define CPE_IRQ_INTERNAL_ERROR       (1 << 31)
+/** @} */
 
 #define RFACKIFG_ACKFLAG 0x1
 /** @} */
