@@ -54,25 +54,25 @@ extern "C" {
 /**
  * @brief End of line character to send after the AT command.
  */
-#ifndef AT_SEND_EOL
-#define AT_SEND_EOL "\r"
+#ifndef CONFIG_AT_SEND_EOL
+#define CONFIG_AT_SEND_EOL "\r"
 #endif
 
 /**
  * @brief Disable echo after an AT command is sent.
  */
 #ifdef DOXYGEN
-#define AT_SEND_SKIP_ECHO
+#define CONFIG_AT_SEND_SKIP_ECHO
 #endif
 
 /**
  * @brief Enable/disable the expected echo after an AT command is sent.
- * 
- * @deprecated Use inverse @ref AT_SEND_SKIP_ECHO instead.
+ *
+ * @deprecated Use inverse @ref CONFIG_AT_SEND_SKIP_ECHO instead.
  * Will be removed after 2021.01 release.
  */
 #ifndef AT_SEND_ECHO
-#if IS_ACTIVE(AT_SEND_SKIP_ECHO)
+#if IS_ACTIVE(CONFIG_AT_SEND_SKIP_ECHO)
 #define AT_SEND_ECHO 0
 #else
 #define AT_SEND_ECHO 1
@@ -96,26 +96,25 @@ extern "C" {
 /**
  * @brief default OK reply of an AT device.
  */
-#ifndef AT_RECV_OK
-#define AT_RECV_OK "OK"
+#ifndef CONFIG_AT_RECV_OK
+#define CONFIG_AT_RECV_OK "OK"
 #endif
 
 /**
  * @brief default ERROR reply of an AT device.
  */
-#ifndef AT_RECV_ERROR
-#define AT_RECV_ERROR "ERROR"
+#ifndef CONFIG_AT_RECV_ERROR
+#define CONFIG_AT_RECV_ERROR "ERROR"
 #endif
-/** @} */
 
-/** Shortcut for getting send end of line length */
-#define AT_SEND_EOL_LEN  (sizeof(AT_SEND_EOL) - 1)
-
+/**
+ * @brief Internal buffer size used to process unsolicited result code data.
+ */
 #if defined(MODULE_AT_URC) || DOXYGEN
 #ifndef AT_BUF_SIZE
-/** Internal buffer size used to process unsolicited result code data */
 #define AT_BUF_SIZE (128)
 #endif
+/** @} */
 
 /**
  * @brief   Unsolicited result code callback
@@ -136,6 +135,9 @@ typedef struct {
 } at_urc_t;
 
 #endif /* MODULE_AT_URC */
+
+/** Shortcut for getting send end of line length */
+#define AT_SEND_EOL_LEN  (sizeof(CONFIG_AT_SEND_EOL) - 1)
 
 /**
  * @brief AT device structure
