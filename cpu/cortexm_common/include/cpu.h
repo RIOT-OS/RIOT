@@ -165,7 +165,6 @@ static inline void cortexm_sleep(int deep)
     else {
         SCB->SCR &= ~(SCB_SCR_SLEEPDEEP_Msk);
     }
-
     /* ensure that all memory accesses have completed and trigger sleeping */
     unsigned state = irq_disable();
     __DSB();
