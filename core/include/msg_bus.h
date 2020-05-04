@@ -103,6 +103,7 @@ static inline bool msg_is_from_bus(const msg_bus_t *bus, const msg_t *msg)
  * posted on the bus.
  *
  * Events can be received with @ref msg_receive.
+ * **The contents of the received message must not be modified.**
  *
  * @param[in] bus           The message bus to attach to
  * @param[in] entry         Message bus subscriber entry
@@ -194,13 +195,13 @@ int msg_send_bus(msg_t *m, msg_bus_t *bus);
  *
  * @return                  The number of threads the event was posted to.
  */
-static inline int msg_bus_post(msg_bus_t *bus, uint8_t type, char *arg)
+static inline int msg_bus_post(msg_bus_t *bus, uint8_t type, const void *arg)
 {
     assert(type < 32);
 
     msg_t m = {
         .type = type | ((bus->id) << 5),
-        .content.ptr = arg,
+        .content.ptr = (void *)arg,
     };
 
     return msg_send_bus(&m, bus);
