@@ -10,8 +10,11 @@ menu "Actuator Device Drivers"
 rsource "motor_driver/Kconfig"
 endmenu # Actuator Device Drivers
 
-rsource "Kconfig.net"
+menu "Miscellaneous Device Drivers"
+rsource "at/Kconfig"
+endmenu # Miscellaneous Device Drivers
 
+rsource "Kconfig.net"
 rsource "periph_common/Kconfig"
 
 menu "Sensor Device Drivers"

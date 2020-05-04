@@ -54,12 +54,21 @@ extern "C" {
 /**
  * @brief End of line character to send after the AT command.
  */
+#if IS_ACTIVE(CONFIG_AT_SEND_EOL_WINDOWS)
+#define CONFIG_AT_SEND_EOL   "\r\n"
+#elif IS_ACTIVE(CONFIG_AT_SEND_EOL_UNIX)
+#define CONFIG_AT_SEND_EOL   "\n"
+#elif IS_ACTIVE(CONFIG_AT_SEND_EOL_MAC)
+#define CONFIG_AT_SEND_EOL   "\r"
+#endif
+
 #ifndef CONFIG_AT_SEND_EOL
 #define CONFIG_AT_SEND_EOL "\r"
 #endif
 
 /**
- * @brief Disable echo after an AT command is sent.
+ * @brief Enable this to disable check for echo after an AT
+ * command is sent.
  */
 #ifdef DOXYGEN
 #define CONFIG_AT_SEND_SKIP_ECHO
@@ -107,14 +116,27 @@ extern "C" {
 #define CONFIG_AT_RECV_ERROR "ERROR"
 #endif
 
-/**
- * @brief Internal buffer size used to process unsolicited result code data.
- */
 #if defined(MODULE_AT_URC) || DOXYGEN
-#ifndef AT_BUF_SIZE
-#define AT_BUF_SIZE (128)
+
+/**
+ * @brief   Default buffer size used to process unsolicited result code data.
+ *          (as exponent of 2^n).
+ *
+ *          As the buffer size ALWAYS needs to be power of two, this option
+ *          represents the exponent of 2^n, which will be used as the size of
+ *          the buffer.
+ */
+#ifndef CONFIG_AT_BUF_SIZE_EXP
+#define CONFIG_AT_BUF_SIZE_EXP (7U)
 #endif
 /** @} */
+
+/**
+ * @brief   Size of buffer used to process unsolicited result code data.
+ */
+#ifndef AT_BUF_SIZE
+#define AT_BUF_SIZE   (1 << CONFIG_AT_BUF_SIZE_EXP)
+#endif
 
 /**
  * @brief   Unsolicited result code callback
