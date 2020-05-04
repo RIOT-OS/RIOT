@@ -7,6 +7,7 @@
 menu "Packages"
 
 rsource "tinydtls/Kconfig"
+rsource "tlsf/Kconfig"
 rsource "wakaama/Kconfig"
 
 endmenu # Packages

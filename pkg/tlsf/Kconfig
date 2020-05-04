@@ -1,0 +1,29 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig PKG_TLSF
+    bool "(TLSF) Two-Level Segregated Fit memory allocator"
+
+if PKG_TLSF
+
+config MOD_TLSF_MALLOC
+    bool "Malloc implementation using TLSF"
+    depends on MOD_NEWLIB || BOARD_NATIVE
+    select MOD_TLSF_MALLOC_NEWLIB if MOD_NEWLIB
+    select MOD_TLSF_MALLOC_NATIVE if BOARD_NATIVE
+
+config MOD_TLSF_MALLOC_NEWLIB
+    bool
+    help
+        Malloc implementation using TLSF for newlib.
+
+config MOD_TLSF_MALLOC_NATIVE
+    bool
+    help
+        Malloc implementation using TLSF for native platform.
+
+endif # PKG_TLSF
