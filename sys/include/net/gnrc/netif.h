@@ -71,8 +71,30 @@ extern "C" {
  * @brief   Per-Interface Event Message Busses
  */
 typedef enum {
+#ifdef MODULE_GNRC_IPV6
+    GNRC_NETIF_BUS_IPV6,                    /**< provides @ref gnrc_ipv6_event_t
+                                                 messages to subscribers */
+#endif
     GNRC_NETIF_BUS_NUMOF
 } gnrc_netif_bus_t;
+
+/**
+ * @brief   Event types for GNRC_NETIF_BUS_IPV6 per-interface message bus
+ */
+typedef enum {
+    /**
+     * @brief   Address becomes valid
+     *
+     * The event is generated when an address on the interface becomes valid.
+     * The message payload contains a pointer to the respective
+     * @ref ipv6_addr_t struct.
+     *
+     * @note If the address on the interface changed between sending
+     * the event and processing it, the pointer will point to the new address
+     * which might *not* be valid.
+     */
+    GNRC_IPV6_EVENT_ADDR_VALID,
+} gnrc_ipv6_event_t;
 
 /**
  * @brief   Operations to an interface

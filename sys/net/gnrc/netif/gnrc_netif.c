@@ -665,6 +665,8 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
             gnrc_ipv6_nib_pl_set(netif->pid, addr, pfx_len,
                                  UINT32_MAX, UINT32_MAX);
         }
+
+        gnrc_netif_ipv6_bus_post(netif, GNRC_IPV6_EVENT_ADDR_VALID, &netif->ipv6.addrs[idx]);
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
     else if (!gnrc_netif_is_6ln(netif)) {
