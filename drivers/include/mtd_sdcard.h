@@ -49,15 +49,16 @@ typedef struct {
  * @{
  */
 /**
- * @brief   Enable Skip SDCard Erase
+ * @brief   Enable SDCard Erase
  * @note    SDCards handle sector erase internally so it's
- * possible to directly write to the card without erasing
- * the sector first.
- * Attention: an erase call will therefore NOT touch the content,
- * so disable this feature to ensure overriding the data.
+ *          possible to directly write to the card without erasing
+ *          the sector first.
+ *          Attention: an erase call will therefore NOT touch the content,
+ *          so enable this feature to ensure overriding the data.
+ *          This feature is currently not supported.
  */
-#ifndef MTD_SDCARD_SKIP_ERASE
-#define MTD_SDCARD_SKIP_ERASE (1)
+#ifdef DOXYGEN
+#define CONFIG_MTD_SDCARD_ERASE
 #endif
 /** @} */
 
