@@ -394,6 +394,18 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = max_len;
             break;
 
+        case NETOPT_MR_OFDM_OPTION:
+            assert(max_len >= sizeof(int8_t));
+            *((int8_t *)val) = at86rf215_OFDM_get_option(dev);
+            res = max_len;
+            break;
+
+        case NETOPT_MR_OFDM_MCS:
+            assert(max_len >= sizeof(int8_t));
+            *((int8_t *)val) = at86rf215_OFDM_get_scheme(dev);
+            res = max_len;
+            break;
+
         case NETOPT_MR_OQPSK_CHIPS:
             assert(max_len >= sizeof(int16_t));
             switch (at86rf215_OQPSK_get_chips(dev)) {
@@ -574,8 +586,40 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                                           at86rf215_OQPSK_get_mode(dev));
                 res = sizeof(uint8_t);
                 break;
+            case IEEE802154_PHY_MR_OFDM:
+                at86rf215_configure_OFDM(dev,
+                                         at86rf215_OFDM_get_option(dev),
+                                         at86rf215_OFDM_get_scheme(dev));
+                res = sizeof(uint8_t);
+                break;
             default:
                 return -ENOTSUP;
+            }
+            break;
+
+        case NETOPT_MR_OFDM_OPTION:
+            if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_MR_OFDM) {
+                return -ENOTSUP;
+            }
+
+            assert(len <= sizeof(uint8_t));
+            if (at86rf215_OFDM_set_option(dev, *((const uint8_t *)val)) == 0) {
+                res = sizeof(uint8_t);
+            } else {
+                res = -ERANGE;
+            }
+            break;
+
+        case NETOPT_MR_OFDM_MCS:
+            if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_MR_OFDM) {
+                return -ENOTSUP;
+            }
+
+            assert(len <= sizeof(uint8_t));
+            if (at86rf215_OFDM_set_scheme(dev, *((const uint8_t *)val)) == 0) {
+                res = sizeof(uint8_t);
+            } else {
+                res = -ERANGE;
             }
             break;
 
