@@ -21,6 +21,12 @@ config MOD_AUTO_INIT_GNRC_NETIF
     default y if MOD_AUTO_INIT
     select MOD_GNRC_NETIF_INIT_DEVS
 
+config MOD_TXTSND
+    bool "Command txtsnd"
+    depends on MOD_SHELL_COMMANDS
+    help
+        Adds an useful command to test lower layers.
+
 menu "Interfaces options"
 
 config GNRC_NETIF_MSG_QUEUE_SIZE_EXP
