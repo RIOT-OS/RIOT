@@ -120,6 +120,8 @@ extern "C" {
  */
 #define IEEE802154_RADIO_RSSI_OFFSET        (-174)
 
+#define IEEE802154_PHY_MR_FSK_PHR_LEN      (2)  /**< MR-FSK PHY header length */
+
 /**
  * For the SUN PHYs, the value is 1 ms expressed in symbol periods, rounded
  * up to the next integer number of symbol periods using the ceiling() function.
