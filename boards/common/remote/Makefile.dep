@@ -1,4 +1,4 @@
-ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
+ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += cc2538_rf
 endif
 
