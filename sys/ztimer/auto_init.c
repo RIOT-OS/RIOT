@@ -122,7 +122,7 @@ ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_convert_frac_msec.super.super;
 #  define ZTIMER_MSEC_CONVERT_LOWER_FREQ    RTT_FREQUENCY
 #  define ZTIMER_MSEC_CONVERT_LOWER         (&_ztimer_periph_timer_rtt_msec)
 #    else
-ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_periph_timer_rtt_msec.super;
+ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_periph_timer_rtt_msec;
 #    endif
 #  elif MODULE_ZTIMER_USEC
 static ztimer_convert_frac_t _ztimer_convert_frac_msec;
