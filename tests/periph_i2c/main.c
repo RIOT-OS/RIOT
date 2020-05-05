@@ -24,8 +24,11 @@
 #include <errno.h>
 
 #include "periph_conf.h"
+#include "periph/gpio.h"
 #include "periph/i2c.h"
 #include "shell.h"
+
+#include <xtimer.h>
 
 #ifndef I2C_ACK
 #define I2C_ACK         (0)
@@ -159,6 +162,47 @@ int cmd_i2c_release(int argc, char **argv)
     printf("Success: i2c_%i released\n", dev);
     return 0;
 }
+
+#ifdef MODULE_PERIPH_I2C_RECONFIGURE
+int cmd_i2c_gpio(int argc, char **argv)
+{
+    int dev;
+
+    dev = _check_param(argc, argv, 1, 1, "DEV");
+    if (dev == ARG_ERROR) {
+        return 1;
+    }
+
+    gpio_t sda_pin = i2c_pin_sda(dev);
+    gpio_t scl_pin = i2c_pin_scl(dev);
+
+    printf("Command: i2c_deinit_pins(%i)\n", dev);
+    i2c_deinit_pins(dev);
+
+    gpio_init(sda_pin, GPIO_OUT);
+    gpio_init(scl_pin, GPIO_OUT);
+
+    xtimer_sleep(1);
+
+    printf("Command: gpio_set()\n");
+    gpio_set(sda_pin);
+    gpio_set(scl_pin);
+
+    xtimer_sleep(1);
+
+    printf("Command: gpio_clear()\n");
+    gpio_clear(sda_pin);
+    gpio_clear(scl_pin);
+
+    xtimer_sleep(1);
+
+    printf("Command: i2c_init_pins(%i)\n", dev);
+    i2c_init_pins(dev);
+
+    printf("Success: i2c_%i re-init\n", dev);
+    return 0;
+}
+#endif
 
 int cmd_i2c_read_reg(int argc, char **argv)
 {
@@ -444,6 +488,9 @@ int cmd_i2c_get_id(int argc, char **argv)
 static const shell_command_t shell_commands[] = {
     { "i2c_acquire", "Get access to the I2C bus", cmd_i2c_acquire },
     { "i2c_release", "Release to the I2C bus", cmd_i2c_release },
+#ifdef MODULE_PERIPH_I2C_RECONFIGURE
+    { "i2c_gpio", "Re-configures I2C pins to GPIO mode and back.", cmd_i2c_gpio },
+#endif
     { "i2c_read_reg", "Read byte from register", cmd_i2c_read_reg },
     { "i2c_read_regs", "Read bytes from registers", cmd_i2c_read_regs },
     { "i2c_read_byte", "Read byte from the I2C device", cmd_i2c_read_byte },
