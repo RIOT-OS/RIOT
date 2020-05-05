@@ -61,6 +61,9 @@ ifneq (,$(filter gnrc_mac,$(USEMODULE)))
   USEMODULE += gnrc_priority_pktqueue
   USEMODULE += csma_sender
   USEMODULE += evtimer
+  ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+    USEMODULE += gnrc_netif_mac
+  endif
 endif
 
 ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
