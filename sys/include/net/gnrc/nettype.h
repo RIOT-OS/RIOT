@@ -151,9 +151,8 @@ typedef enum {
 
 /**
  * @brief   Translates an Ether Type number to @ref net_gnrc_nettype
- * @see     <a href="http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml#ieee-802-numbers-1">
- *              IANA, ETHER TYPES
- *          </a>
+ * @see     [IANA, ETHER TYPES]
+ *          (http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml)
  *
  * @param[in] type  An Ether Type number
  *
@@ -186,9 +185,8 @@ static inline gnrc_nettype_t gnrc_nettype_from_ethertype(uint16_t type)
 
 /**
  * @brief   Translates @ref net_gnrc_nettype to an Ether Type number
- * @see     <a href="http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml#ieee-802-numbers-1">
- *              IANA, ETHER TYPES
- *          </a>
+ * @see     [IANA, ETHER TYPES]
+ *          (http://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml)
  *
  * @param[in] type  A protocol type
  *
