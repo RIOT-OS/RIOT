@@ -121,6 +121,21 @@ extern "C" {
 #define IEEE802154_RADIO_RSSI_OFFSET        (-174)
 
 #define IEEE802154_PHY_MR_FSK_PHR_LEN      (2)  /**< MR-FSK PHY header length */
+#define IEEE802154_PHY_MR_FSK_2FSK_SFD_LEN (2)  /**< MR-FSK SFD length on Filtered 2-FSK */
+
+/**
+ * For the MR-FSK PHY, the SFD value when PHR + PSDU are coded/uncoded and with
+ * phyMRFSKSFD = 0 or 1 respectively
+ *
+ * 802.15.4g, Table 131 (p. 51)
+ *
+ *  @{
+ */
+#define IEEE802154_PHY_MR_FSK_2FSK_CODED_SFD_0      (0x6F4E)
+#define IEEE802154_PHY_MR_FSK_2FSK_CODED_SFD_1      (0x632D)
+#define IEEE802154_PHY_MR_FSK_2FSK_UNCODED_SFD_0    (0x90E4)
+#define IEEE802154_PHY_MR_FSK_2FSK_UNCODED_SFD_1    (0x7A0E)
+/** @} */
 
 /**
  * For the SUN PHYs, the value is 1 ms expressed in symbol periods, rounded
