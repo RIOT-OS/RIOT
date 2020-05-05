@@ -7,10 +7,6 @@ endif
 
 ESP_SDK_DIR = $(ESP32_SDK_DIR)
 
-# With the '-Os' option, the ESP32 hangs sporadically in 'tests/bench*' if
-# interrupts are disabled too early by benchmark tests.
-CFLAGS_OPT ?= -O2
-
 # ESP32 specific flashing options
 FLASH_CHIP  = esp32
 FLASH_MODE ?= dout
