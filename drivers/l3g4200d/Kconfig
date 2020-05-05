@@ -1,0 +1,25 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_MODULE_L3G4200D
+    bool "Configure L3G4200D driver"
+    depends on MODULE_L3G4200D
+    help
+        Configure the L3G4200D driver using Kconfig.
+
+if KCONFIG_MODULE_L3G4200D
+
+config L3G4200D_DEFAULT_ADDRESS
+    hex "Default I2C address"
+    range 0x68 0x69
+    default 0x68
+    help
+        The address depends on the status of SDO Pin. Default
+        address corresponds to SDO connected to GND. For more
+        information refer to the section 'I2C Operation' in
+        the datasheet.
+
+endif # KCONFIG_MODULE_L3G4200D
