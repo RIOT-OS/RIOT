@@ -241,7 +241,8 @@ int msg_send_bus(msg_t *m, msg_bus_t *bus)
     const uint32_t event_mask = (1UL << (m->type & 0x1F));
     int count = 0;
 
-    m->sender_pid = in_irq ? KERNEL_PID_ISR : thread_getpid();
+    m->sender_pid = (in_irq ? KERNEL_PID_ISR : thread_getpid())
+                  | MSB_BUS_PID_FLAG;
 
     unsigned state = irq_disable();
 
