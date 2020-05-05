@@ -43,8 +43,8 @@
 #include "ztimer/xtimer_compat.h"
 #else
 
-#ifndef MODULE_XTIMER_ON_ZTIMER
 #include "board.h"
+#ifndef MODULE_XTIMER_ON_ZTIMER
 #include "periph_conf.h"
 #endif
 
