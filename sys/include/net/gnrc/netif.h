@@ -35,7 +35,7 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/netif/conf.h"
-#ifdef MODULE_GNRC_LORAWAN
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
 #include "net/gnrc/netif/lorawan.h"
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN
@@ -80,7 +80,7 @@ typedef struct {
 #ifdef MODULE_NETSTATS_L2
     netstats_t stats;                       /**< transceiver's statistics */
 #endif
-#if defined(MODULE_GNRC_LORAWAN) || DOXYGEN
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN) || defined(DOXYGEN)
     gnrc_netif_lorawan_t lorawan;           /**< LoRaWAN component */
 #endif
 #if defined(MODULE_GNRC_IPV6) || DOXYGEN
