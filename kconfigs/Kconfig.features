@@ -150,6 +150,12 @@ config HAS_PERIPH_GPIO_FAST_READ
 	operations are faster, usually with a tradeoff against a different
 	property.
 
+config HAS_PERIPH_GPIO_TAMPER_WAKE
+    bool
+    help
+        Indicates that Tamper Detection can be used to wake the CPU from
+        Deep Sleep.
+
 config HAS_PERIPH_HWRNG
     bool
     help

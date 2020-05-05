@@ -116,6 +116,15 @@ typedef enum {
 #define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY)         /* in Hz */
 /** @} */
 
+/**
+ * @brief   RTC input pins that can be used for tamper detection and
+ *          wake from Deep Sleep
+ */
+static const gpio_t rtc_tamper_pins[RTC_NUM_OF_TAMPERS] = {
+    GPIO_PIN(PB, 0), GPIO_PIN(PB, 2), GPIO_PIN(PA, 2),
+    GPIO_PIN(PC, 0), GPIO_PIN(PC, 1)
+};
+
 #ifdef __cplusplus
 }
 #endif
