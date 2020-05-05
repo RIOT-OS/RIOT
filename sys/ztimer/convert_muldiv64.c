@@ -120,4 +120,5 @@ void ztimer_convert_muldiv64_init(
     ztimer_convert_muldiv64->super.super.ops = &_ztimer_convert_muldiv64_ops;
     ztimer_convert_muldiv64->div = div;
     ztimer_convert_muldiv64->mul = mul;
+    ztimer_init_extend(&ztimer_convert_muldiv64->super.super);
 }

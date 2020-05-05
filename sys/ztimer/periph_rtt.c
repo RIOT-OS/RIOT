@@ -88,4 +88,5 @@ void ztimer_periph_rtt_init(ztimer_periph_rtt_t *clock)
     clock->max_value = RTT_MAX_VALUE;
     rtt_init();
     rtt_poweron();
+    ztimer_init_extend(clock);
 }
