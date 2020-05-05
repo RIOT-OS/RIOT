@@ -45,7 +45,7 @@
 #include "net/gnrc/netif/dedup.h"
 #endif
 #include "net/gnrc/netif/flags.h"
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
 #include "net/gnrc/netif/ipv6.h"
 #endif
 #ifdef MODULE_GNRC_MAC
@@ -83,7 +83,7 @@ typedef struct {
 #if IS_USED(MODULE_GNRC_NETIF_LORAWAN) || defined(DOXYGEN)
     gnrc_netif_lorawan_t lorawan;           /**< LoRaWAN component */
 #endif
-#if defined(MODULE_GNRC_IPV6) || DOXYGEN
+#if IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN)
     gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */
 #endif
 #if defined(MODULE_GNRC_MAC) || DOXYGEN

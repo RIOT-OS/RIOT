@@ -34,6 +34,7 @@ PSEUDOMODULES += gnrc_netapi_mbox
 PSEUDOMODULES += gnrc_netif_events
 PSEUDOMODULES += gnrc_pktbuf_cmd
 PSEUDOMODULES += gnrc_netif_6lo
+PSEUDOMODULES += gnrc_netif_ipv6
 PSEUDOMODULES += gnrc_netif_cmd_%
 PSEUDOMODULES += gnrc_netif_dedup
 PSEUDOMODULES += gnrc_nettype_%

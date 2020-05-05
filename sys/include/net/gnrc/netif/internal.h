@@ -58,7 +58,7 @@ void gnrc_netif_acquire(gnrc_netif_t *netif);
  */
 void gnrc_netif_release(gnrc_netif_t *netif);
 
-#if defined(MODULE_GNRC_IPV6) || DOXYGEN
+#if IS_USED(MODULE_GNRC_NETIF_IPV6) || DOXYGEN
 /**
  * @brief   Adds an IPv6 address to the interface
  *
@@ -284,7 +284,7 @@ void gnrc_netif_ipv6_group_leave_internal(gnrc_netif_t *netif,
  */
 int gnrc_netif_ipv6_group_idx(gnrc_netif_t *netif,
                               const ipv6_addr_t *addr);
-#endif  /* MODULE_GNRC_IPV6 */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN) */
 
 /**
  * @brief   Checks if the interface represents a router according to RFC 4861
@@ -536,7 +536,7 @@ static inline int gnrc_netif_get_eui64(gnrc_netif_t *netif, eui64_t *eui64)
  */
 void gnrc_netif_init_6ln(gnrc_netif_t *netif);
 
-#if defined(MODULE_GNRC_IPV6) || defined(DOXYGEN)
+#if IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN)
 /**
  * @brief   Initialize IPv6 MTU and other packet length related members of
  *          @ref gnrc_netif_t based on gnrc_netif_t::device_type
@@ -669,13 +669,13 @@ static inline int gnrc_netif_ndp_addr_len_from_l2ao(gnrc_netif_t *netif,
     assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
     return l2util_ndp_addr_len_from_l2ao(netif->device_type, opt);
 }
-#else   /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
+#else   /* IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN) */
 #define gnrc_netif_ipv6_init_mtu(netif)                             (void)netif
 #define gnrc_netif_ipv6_iid_from_addr(netif, addr, addr_len, iid)   (-ENOTSUP)
 #define gnrc_netif_ipv6_iid_to_addr(netif, iid, addr)               (-ENOTSUP)
 #define gnrc_netif_ndp_addr_len_from_l2ao(netif, opt)               (-ENOTSUP)
 #define gnrc_netif_ipv6_get_iid(netif, iid)                         (-ENOTSUP)
-#endif  /* defined(MODULE_GNRC_IPV6) || defined(DOXYGEN) */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN) */
 /** @} */
 
 #ifdef __cplusplus

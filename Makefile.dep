@@ -352,6 +352,7 @@ ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_hdr
   USEMODULE += gnrc_ipv6_nib
   USEMODULE += gnrc_netif
+  USEMODULE += gnrc_netif_ipv6
   USEMODULE += gnrc_nettype_ipv6
 endif
 
