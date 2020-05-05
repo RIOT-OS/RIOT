@@ -144,12 +144,12 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
             res = dev->driver->get(dev, NETOPT_MAX_PDU_SIZE,
                                    &tmp, sizeof(tmp));
             assert(res == sizeof(tmp));
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if IS_USED(MODULE_GNRC_NETIF_6LO)
             netif->ipv6.mtu = MAX(IPV6_MIN_MTU, tmp);
             netif->sixlo.max_frag_size = tmp;
-#else
+#else   /* IS_USED(MODULE_GNRC_NETIF_6LO) */
             netif->ipv6.mtu = tmp;
-#endif
+#endif  /* IS_USED(MODULE_GNRC_NETIF_6LO) */
             break;
 #endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN) || \
          * defined(MODULE_XBEE) || defined(MODULE_ESP_NOW) */

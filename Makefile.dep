@@ -274,6 +274,9 @@ ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_sixlowpan
   USEMODULE += gnrc_nettype_sixlowpan
   USEMODULE += sixlowpan
+  ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+    USEMODULE += gnrc_netif_6lo
+  endif
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))

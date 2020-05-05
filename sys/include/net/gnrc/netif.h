@@ -38,7 +38,7 @@
 #if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
 #include "net/gnrc/netif/lorawan.h"
 #endif
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if IS_USED(MODULE_GNRC_NETIF_6LO)
 #include "net/gnrc/netif/6lo.h"
 #endif
 #if defined(MODULE_GNRC_NETIF_DEDUP) && (GNRC_NETIF_L2ADDR_MAXLEN > 0)
@@ -129,7 +129,7 @@ typedef struct {
     gnrc_netif_dedup_t last_pkt;
 #endif
 #endif
-#if defined(MODULE_GNRC_SIXLOWPAN) || DOXYGEN
+#if IS_USED(MODULE_GNRC_NETIF_6LO) || defined(DOXYGEN)
     gnrc_netif_6lo_t sixlo;                 /**< 6Lo component */
 #endif
     uint8_t cur_hl;                         /**< Current hop-limit for out-going packets */

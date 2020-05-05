@@ -94,11 +94,11 @@ static void _netif_init(gnrc_netif_t *netif)
     /* save the threads context pointer, so we can set its flags */
     _netif_thread = (thread_t *)thread_get(thread_getpid());
 
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if IS_USED(MODULE_GNRC_NETIF_6LO)
     /* we disable fragmentation for this device, as the L2CAP layer takes care
      * of this */
     _nimble_netif->sixlo.max_frag_size = 0;
-#endif
+#endif  /* IS_USED(MODULE_GNRC_NETIF_6LO) */
 }
 
 static int _send_pkt(nimble_netif_conn_t *conn, gnrc_pktsnip_t *pkt)

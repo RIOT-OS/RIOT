@@ -1296,14 +1296,14 @@ static void _test_options(gnrc_netif_t *netif)
             assert((IEEE802154_SHORT_ADDRESS_LEN == netif->l2addr_len) ||
                    (IEEE802154_LONG_ADDRESS_LEN == netif->l2addr_len));
 #ifdef MODULE_GNRC_IPV6
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if IS_USED(MODULE_GNRC_NETIF_6LO)
             assert(netif->ipv6.mtu == IPV6_MIN_MTU);
             assert(netif->sixlo.max_frag_size > 0);
             assert(-ENOTSUP != netif->dev->driver->get(netif->dev, NETOPT_PROTO,
                                                        &tmp, sizeof(tmp)));
-#else   /* MODULE_GNRC_SIXLOWPAN */
+#else   /* IS_USED(MODULE_GNRC_NETIF_6LO) */
             assert(netif->ipv6.mtu < UINT16_MAX);
-#endif  /* MODULE_GNRC_SIXLOWPAN */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_6LO) */
 #endif  /* MODULE_GNRC_IPV6 */
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
             assert((netif->device_type != NETDEV_TYPE_IEEE802154) ||
