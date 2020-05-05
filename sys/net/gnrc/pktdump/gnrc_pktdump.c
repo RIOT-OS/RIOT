@@ -50,15 +50,15 @@ static void _dump_snip(gnrc_pktsnip_t *pkt)
     size_t hdr_len = 0;
 
     switch (pkt->type) {
-        case GNRC_NETTYPE_UNDEF:
-            printf("NETTYPE_UNDEF (%i)\n", pkt->type);
-            break;
         case GNRC_NETTYPE_NETIF:
             printf("NETTYPE_NETIF (%i)\n", pkt->type);
             if (IS_USED(MODULE_GNRC_NETIF_HDR)) {
                 gnrc_netif_hdr_print(pkt->data);
                 hdr_len = pkt->size;
             }
+            break;
+        case GNRC_NETTYPE_UNDEF:
+            printf("NETTYPE_UNDEF (%i)\n", pkt->type);
             break;
 #if IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN)
         case GNRC_NETTYPE_SIXLOWPAN:
