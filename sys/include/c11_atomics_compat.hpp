@@ -36,7 +36,9 @@
  * atomic_int foo = ATOMIC_VAR_INIT(42);
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
+#ifndef ATOMIC_VAR_INIT
 #define ATOMIC_VAR_INIT(x) { x }
+#endif
 
 /**
   * @brief Type with the same alignment and size as `atomic_bool`
