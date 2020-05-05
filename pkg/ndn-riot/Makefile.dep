@@ -1,5 +1,6 @@
 USEMODULE += ndn-encoding
 USEMODULE += gnrc
+USEMODULE += gnrc_nettype_ndn
 USEMODULE += xtimer
 USEMODULE += random
 USEMODULE += hashes

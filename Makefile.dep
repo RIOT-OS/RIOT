@@ -65,6 +65,7 @@ endif
 
 ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
   USEMODULE += gnrc_netif
+  USEMODULE += gnrc_nettype_gomach
   USEMODULE += random
   USEMODULE += xtimer
   USEMODULE += gnrc_mac
@@ -78,6 +79,7 @@ ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
   USEMODULE += crypto_aes
   USEMODULE += netdev_layer
   USEMODULE += gnrc_neterr
+  USEMODULE += gnrc_nettype_lorawan
 endif
 
 ifneq (,$(filter sntp,$(USEMODULE)))
@@ -270,6 +272,7 @@ endif
 
 ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_sixlowpan
+  USEMODULE += gnrc_nettype_sixlowpan
   USEMODULE += sixlowpan
 endif
 
@@ -304,6 +307,7 @@ endif
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   USEMODULE += inet_csum
   USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_nettype_icmpv6
   USEMODULE += icmpv6
 endif
 
@@ -322,6 +326,7 @@ endif
 
 ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
   USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_nettype_ipv6_ext
 endif
 
 ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
@@ -344,6 +349,7 @@ ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_hdr
   USEMODULE += gnrc_ipv6_nib
   USEMODULE += gnrc_netif
+  USEMODULE += gnrc_nettype_ipv6
 endif
 
 ifneq (,$(filter gnrc_ipv6_hdr,$(USEMODULE)))
@@ -396,12 +402,14 @@ endif
 
 ifneq (,$(filter gnrc_udp,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_udp
+  USEMODULE += gnrc_nettype_udp
   USEMODULE += inet_csum
   USEMODULE += udp
 endif
 
 ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_tcp
+  USEMODULE += gnrc_nettype_tcp
   USEMODULE += inet_csum
   USEMODULE += random
   USEMODULE += tcp
@@ -631,6 +639,7 @@ endif
 
 ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
   USEMODULE += gnrc_netif
+  USEMODULE += gnrc_nettype_lwmac
   USEMODULE += gnrc_mac
   FEATURES_REQUIRED += periph_rtt
 endif
