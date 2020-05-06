@@ -66,7 +66,9 @@ static inline void _rtc_set_enabled(bool on)
 static void _rtc_clock_setup(void)
 {
     /* Use 1024 Hz GCLK3 */
-    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(SAM0_GCLK_1KHZ) | GCLK_CLKCTRL_ID_RTC;
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN
+                      | GCLK_CLKCTRL_GEN(SAM0_GCLK_1KHZ)
+                      | GCLK_CLKCTRL_ID_RTC;
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 }
 #else
@@ -121,7 +123,8 @@ int rtc_set_time(struct tm *time)
     /* normalize input */
     rtc_tm_normalize(time);
 
-    if ((time->tm_year < reference_year) || (time->tm_year > reference_year + 63)) {
+    if ((time->tm_year < reference_year) ||
+        (time->tm_year > reference_year + 63)) {
         return -1;
     }
     else {
@@ -139,15 +142,18 @@ int rtc_set_time(struct tm *time)
 
 int rtc_get_time(struct tm *time)
 {
- RTC_MODE2_CLOCK_Type clock;
+    RTC_MODE2_CLOCK_Type clock;
 
     /* Read register in one time */
     clock.reg = RTC->MODE2.CLOCK.reg;
 
     time->tm_year = clock.bit.YEAR + reference_year;
-    if ((time->tm_year < reference_year) || (time->tm_year > (reference_year + 63))) {
+
+    if ((time->tm_year < reference_year) ||
+        (time->tm_year > (reference_year + 63))) {
         return -1;
     }
+
     time->tm_mon = clock.bit.MONTH - 1;
     time->tm_mday = clock.bit.DAY;
     time->tm_hour = clock.bit.HOUR;
@@ -158,11 +164,14 @@ int rtc_get_time(struct tm *time)
 
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
+    /* prevent old alarm from ringing */
+    rtc_clear_alarm();
+
     /* normalize input */
     rtc_tm_normalize(time);
 
-    rtc_clear_alarm();
-    if ((time->tm_year < reference_year) || (time->tm_year > (reference_year + 63))) {
+    if ((time->tm_year < reference_year) ||
+        (time->tm_year > (reference_year + 63))) {
         return -2;
     }
     else {
@@ -197,9 +206,11 @@ int rtc_get_alarm(struct tm *time)
     alarm.reg = RTC->MODE2.Mode2Alarm[0].ALARM.reg;
 
     time->tm_year = alarm.bit.YEAR + reference_year;
-    if ((time->tm_year < reference_year) || (time->tm_year > (reference_year + 63))) {
+    if ((time->tm_year < reference_year) ||
+        (time->tm_year > (reference_year + 63))) {
         return -1;
     }
+
     time->tm_mon = alarm.bit.MONTH - 1;
     time->tm_mday = alarm.bit.DAY;
     time->tm_hour = alarm.bit.HOUR;
