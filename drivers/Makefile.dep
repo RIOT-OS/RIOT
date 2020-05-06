@@ -509,6 +509,10 @@ endif
 ifneq (,$(filter mtd_%,$(USEMODULE)))
   USEMODULE += mtd
 
+  ifneq (,$(filter mtd_at25xxx,$(USEMODULE)))
+    USEMODULE += at25xxx
+  endif
+
   ifneq (,$(filter mtd_sdcard,$(USEMODULE)))
     USEMODULE += sdcard_spi
   endif
