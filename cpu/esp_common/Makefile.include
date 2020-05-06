@@ -89,6 +89,9 @@ BOOTLOADER_INFO = $(if $(filter esp_log_startup,$(USEMODULE)),_info)
 BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
 
 ESPTOOL ?= $(RIOTTOOLS)/esptool/esptool.py
+ifeq ($(ESPTOOL),$(RIOTTOOLS)/esptool/esptool.py)
+  FLASHDEPS += $(ESPTOOL)
+endif
 
 # The ELFFILE is the base one used for flashing
 FLASHFILE ?= $(ELFFILE)

@@ -27,6 +27,11 @@ $(RIOTTOOLS)/edbg/edbg: $(RIOTTOOLS)/edbg/Makefile
 	CC= CFLAGS= make -C $(RIOTTOOLS)/edbg
 	@echo "[INFO] edbg binary successfully built!"
 
+$(RIOTTOOLS)/esptool/esptool.py: $(RIOTTOOLS)/esptool/Makefile
+	@echo "[INFO] esptool.py not found - fetching it from GitHub now"
+	CC= CFLAGS= make -C $(RIOTTOOLS)/esptool
+	@echo "[INFO] esptool.py successfully fetched!"
+
 $(RIOTTOOLS)/mosquitto_rsmb/mosquitto_rsmb:
 	@echo "[INFO] rsmb binary not found - building it from source now"
 	@make -C $(RIOTTOOLS)/mosquitto_rsmb
