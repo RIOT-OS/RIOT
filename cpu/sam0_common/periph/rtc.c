@@ -110,8 +110,8 @@ void rtc_init(void)
     RTC->MODE2.INTENSET.reg = RTC_MODE2_INTENSET_OVF;
 
     /* Clear interrupt flags */
-    RTC->MODE2.INTFLAG.reg |= RTC_MODE2_INTFLAG_OVF;
-    RTC->MODE2.INTFLAG.reg |= RTC_MODE2_INTFLAG_ALARM0;
+    RTC->MODE2.INTFLAG.reg = RTC_MODE2_INTFLAG_OVF
+                           | RTC_MODE2_INTFLAG_ALARM0;
 
     _rtc_set_enabled(1);
 }
@@ -183,7 +183,7 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     /* Enable IRQ */
     rtc_callback.cb = cb;
     rtc_callback.arg = arg;
-    RTC->MODE2.INTFLAG.reg |= RTC_MODE2_INTFLAG_ALARM0;
+    RTC->MODE2.INTFLAG.reg = RTC_MODE2_INTFLAG_ALARM0;
     RTC->MODE2.INTENSET.bit.ALARM0 = 1;
 
     return 0;
@@ -240,11 +240,11 @@ void isr_rtc(void)
     if (RTC->MODE2.INTFLAG.bit.ALARM0) {
         rtc_callback.cb(rtc_callback.arg);
         /* clear flag */
-        RTC->MODE2.INTFLAG.reg |= RTC_MODE2_INTFLAG_ALARM0;
+        RTC->MODE2.INTFLAG.reg = RTC_MODE2_INTFLAG_ALARM0;
     }
     if (RTC->MODE2.INTFLAG.bit.OVF) {
         /* clear flag */
-        RTC->MODE2.INTFLAG.reg |= RTC_MODE2_INTFLAG_OVF;
+        RTC->MODE2.INTFLAG.reg = RTC_MODE2_INTFLAG_OVF;
         /* At 1Hz, RTC goes till 63 years (2^5, see 17.8.22 in datasheet)
         * Start RTC again with reference_year 64 years more (Be careful with alarm set) */
         reference_year += 64;
