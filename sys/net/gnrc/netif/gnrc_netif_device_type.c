@@ -27,6 +27,8 @@
 #include "net/ieee802154.h"
 #include "net/l2util.h"
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
 netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif)
 {
     netopt_t res = NETOPT_ADDRESS;
@@ -143,7 +145,7 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
                                    &tmp, sizeof(tmp));
             assert(res == sizeof(tmp));
 #ifdef MODULE_GNRC_SIXLOWPAN
-            netif->ipv6.mtu = IPV6_MIN_MTU;
+            netif->ipv6.mtu = MAX(IPV6_MIN_MTU, tmp);
             netif->sixlo.max_frag_size = tmp;
 #else
             netif->ipv6.mtu = tmp;
