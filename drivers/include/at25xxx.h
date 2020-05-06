@@ -82,7 +82,7 @@ uint8_t at25xxx_read_byte(const at25xxx_t *dev, uint32_t pos);
  * @param[out] data     read buffer
  * @param[in] len       requested length to be read
  *
- * @return    Number of bytes read
+ * @return    0 on success
  * @return    -ERANGE if pos + len > EEPROM size
  */
 int at25xxx_read(const at25xxx_t *dev, uint32_t pos, void *data, size_t len);
@@ -104,7 +104,7 @@ void at25xxx_write_byte(const at25xxx_t *dev, uint32_t pos, uint8_t data);
  * @param[in] data      write buffer
  * @param[in] len       requested length to be written
  *
- * @return    Number of bytes written
+ * @return    0 on success
  * @return    -ERANGE if pos + len > EEPROM size
  */
 int at25xxx_write(const at25xxx_t *dev, uint32_t pos, const void *data, size_t len);
