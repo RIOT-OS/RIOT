@@ -93,6 +93,15 @@ enum {
 /** @} */
 
 /**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_ADJUST_SET       (19)
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP     (23)
+#define CONFIG_ZTIMER_USEC_REQUIRED_PM_MODE (1)
+/** @} */
+
+/**
  * @brief   Set antenna switch
  */
 void board_antenna_config(uint8_t antenna);
