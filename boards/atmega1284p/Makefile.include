@@ -5,7 +5,7 @@ BAUD                ?= 9600
 ATMEGA1284P_CLOCK   ?=
 
 # Allow overwriting programmer via env variables without affecting other boards
-PROGRAMMER_BOARD_ATMEGA1284P ?= dragon_isp
+PROGRAMMER_BOARD_ATMEGA1284P ?= atmelice
 # ICSP programmer to use for avrdude
 PROGRAMMER ?= $(PROGRAMMER_BOARD_ATMEGA1284P)
 
