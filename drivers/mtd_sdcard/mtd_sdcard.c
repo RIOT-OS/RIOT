@@ -69,12 +69,12 @@ static int mtd_sdcard_read(mtd_dev_t *dev, void *buff, uint32_t addr,
     DEBUG("mtd_sdcard_read: addr:%" PRIu32 " size:%" PRIu32 "\n", addr, size);
     mtd_sdcard_t *mtd_sd = (mtd_sdcard_t*)dev;
     sd_rw_response_t err;
-    int res = sdcard_spi_read_blocks(mtd_sd->sd_card, addr / SD_HC_BLOCK_SIZE,
-                                     buff, SD_HC_BLOCK_SIZE,
-                                     size / SD_HC_BLOCK_SIZE, &err);
+    sdcard_spi_read_blocks(mtd_sd->sd_card, addr / SD_HC_BLOCK_SIZE,
+                           buff, SD_HC_BLOCK_SIZE,
+                           size / SD_HC_BLOCK_SIZE, &err);
 
     if (err == SD_RW_OK) {
-        return res * SD_HC_BLOCK_SIZE;
+        return 0;
     }
     return -EIO;
 }
@@ -85,12 +85,12 @@ static int mtd_sdcard_write(mtd_dev_t *dev, const void *buff, uint32_t addr,
     DEBUG("mtd_sdcard_write: addr:%" PRIu32 " size:%" PRIu32 "\n", addr, size);
     mtd_sdcard_t *mtd_sd = (mtd_sdcard_t*)dev;
     sd_rw_response_t err;
-    int res = sdcard_spi_write_blocks(mtd_sd->sd_card, addr / SD_HC_BLOCK_SIZE,
-                                      buff, SD_HC_BLOCK_SIZE,
-                                      size / SD_HC_BLOCK_SIZE, &err);
+    sdcard_spi_write_blocks(mtd_sd->sd_card, addr / SD_HC_BLOCK_SIZE,
+                            buff, SD_HC_BLOCK_SIZE,
+                            size / SD_HC_BLOCK_SIZE, &err);
 
     if (err == SD_RW_OK) {
-        return res * SD_HC_BLOCK_SIZE;
+        return 0;
     }
     return -EIO;
 }

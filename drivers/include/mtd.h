@@ -93,7 +93,7 @@ struct mtd_desc {
      * @param[in]  addr     Starting address
      * @param[in]  size     Number of bytes
      *
-     * @return the number of bytes actually read
+     * @return 0 on success
      * @return < 0 value on error
      */
     int (*read)(mtd_dev_t *dev,
@@ -112,7 +112,7 @@ struct mtd_desc {
      * @param[in] addr      Starting address
      * @param[in] size      Number of bytes
      *
-     * @return the number of bytes actually written
+     * @return 0 on success
      * @return < 0 value on error
      */
     int (*write)(mtd_dev_t *dev,
@@ -167,7 +167,7 @@ int mtd_init(mtd_dev_t *mtd);
  * @param[in]  addr  the start address to read from
  * @param[in]  count the number of bytes to read
  *
- * @return the number of byte actually read
+ * @return 0 on success
  * @return < 0 if an error occurred
  * @return -ENODEV if @p mtd is not a valid device
  * @return -ENOTSUP if operation is not supported on @p mtd
@@ -188,7 +188,7 @@ int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count);
  * @param[in]  addr  the start address to write to
  * @param[in]  count the number of bytes to write
  *
- * @return the number of byte actually written
+ * @return 0 on success
  * @return < 0 if an error occurred
  * @return -ENODEV if @p mtd is not a valid device
  * @return -ENOTSUP if operation is not supported on @p mtd
