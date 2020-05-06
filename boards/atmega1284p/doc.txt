@@ -11,7 +11,7 @@ it. (An ISP programmer will be needed to program it; or to program a bootloader
 to subsequently allow programming via UART.)
 
 ### MCU
-| MCU           | ATmega328p                             |
+| MCU           | ATmega1284p                            |
 |:------------- |:-------------------------------------- |
 | Family        | AVR/ATmega                             |
 | Vendor        | Microchip (previously Atmel)           |
