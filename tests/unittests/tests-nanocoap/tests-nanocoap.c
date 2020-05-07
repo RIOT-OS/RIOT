@@ -746,7 +746,7 @@ static void test_nanocoap__empty(void)
 }
 
 /*
- * Test adding a path from an unterminated string
+ * Test adding a path from an unterminated string.
  */
 static void test_nanocoap__add_path_unterminated_string(void)
 {
@@ -774,6 +774,34 @@ static void test_nanocoap__add_path_unterminated_string(void)
     TEST_ASSERT_EQUAL_INT(0, strncmp(path, uri, path_len));
 }
 
+/*
+ * Test adding and retrieving the Proxy-URI option to and from a request.
+ */
+static void test_nanocoap__add_get_proxy_uri(void)
+{
+    uint8_t buf[_BUF_SIZE];
+    coap_pkt_t pkt;
+    uint16_t msgid = 0xABCD;
+    uint8_t token[2] = {0xDA, 0xEC};
+    char proxy_uri[60] = "coap://[2001:db8::1]:5683/.well-known/core";
+
+    size_t len = coap_build_hdr((coap_hdr_t *)&buf[0], COAP_TYPE_NON,
+                                &token[0], 2, COAP_METHOD_GET, msgid);
+
+    coap_pkt_init(&pkt, &buf[0], sizeof(buf), len);
+
+    len = coap_opt_add_proxy_uri(&pkt, proxy_uri);
+
+    /* strlen + 1 byte option number + 2 bytes length */
+    TEST_ASSERT_EQUAL_INT(strlen(proxy_uri) + 3, len);
+
+    char *uri;
+    len = coap_get_proxy_uri(&pkt, (char **) &uri);
+
+    TEST_ASSERT_EQUAL_INT(strlen(proxy_uri), len);
+    TEST_ASSERT_EQUAL_INT(0, strncmp((char *) proxy_uri, (char *) uri, len));
+}
+
 Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -799,6 +827,7 @@ Test *tests_nanocoap_tests(void)
         new_TestFixture(test_nanocoap__server_option_count_overflow),
         new_TestFixture(test_nanocoap__empty),
         new_TestFixture(test_nanocoap__add_path_unterminated_string),
+        new_TestFixture(test_nanocoap__add_get_proxy_uri),
     };
 
     EMB_UNIT_TESTCALLER(nanocoap_tests, NULL, NULL, fixtures);
