@@ -2,8 +2,9 @@
 
 [TOC]
 
-The objective of using Kconfig in RIOT is to configure software modules at
-compile-time. This means having a standard way of:
+The objective of using Kconfig in RIOT is to select and configure software
+modules at compile-time. This means having a standard way of:
+- Selecting modules
 - Exposing configurable parameters
 - Assigning application and user-specific configurations
 - Verifying these parameters
@@ -12,6 +13,12 @@ compile-time. This means having a standard way of:
 - Applying the selected configuration
 
 # Overview                                                  {#kconfig-overview}
+
+## Module selection
+The user selects which functionalities to include in the application by adding
+[modules](./creating-modules.html). Modules may have dependencies, so the
+Kconfig only presents the user with the modules it can select given the target
+hardware and already selected modules.
 
 ## Exposure
 Modules in RIOT expose their configurable parameters via
@@ -28,7 +35,7 @@ themselves configurable through this system.
 The user can assign values to the exposed parameters, either by manually writing
 '.config' files or using an interface such as Menuconfig. Parameters with no
 assigned values will take the default ones. For a detailed distinction between
-Kconfig and '.config' files see [Appendix B](#kconfig-appendix-b).
+Kconfig and '.config' files see [this appendix](#kconfig-appendix-different-files).
 
 ## Verification and application
 Using '.config' and Kconfig files the build system takes care of doing the
@@ -43,10 +50,7 @@ configurations in the form of (`CONFIG_` prefixed) macros.
 In order to use the graphical interface menuconfig to configure the
 application, run `make menuconfig` in the application's folder. All available
 configurations (based on the used modules) for the particular platform will be
-presented. By default, the configuration of a module via Kconfig is not enabled.
-In order to activate the configuration via Kconfig the corresponding option
-should be selected. That will enable the configuration of all inner options, if
-available.
+presented.
 
 Once the desired configuration is achieved save the configuration to the
 default proposed path and exit. The saved configuration will be applied when
@@ -69,8 +73,8 @@ Let's say that the `SOCK_UTIL_SCHEME_MAXLEN` symbol in `sock_util` module needs
 to be configured. The `user.config` file could look like:
 
 ```Makefile
-# activate configuration of sock_util using Kconfig
-CONFIG_KCONFIG_MODULE_SOCK_UTIL=y
+# activate module sock_util
+CONFIG_MOD_SOCK_UTIL=y
 # change scheme part length
 CONFIG_SOCK_UTIL_SCHEME_MAXLEN=24
 ```
@@ -78,7 +82,7 @@ CONFIG_SOCK_UTIL_SCHEME_MAXLEN=24
 In this case, there is no need for using menuconfig. It's enough just to call
 `make all` in the application folder, as this configuration will be read and
 applied. Note that if any dependency issue occurs, warnings will be generated
-(e.g. not enabling the configuration of a module via Kconfig).
+(e.g. trying to activate a module without activating its dependencies).
 
 ## Application configuration with Kconfig                 {#app-config-kconfig}
 To expose application-specific configuration options a `Kconfig` file can
@@ -313,31 +317,7 @@ The integration of Kconfig into the build system is mainly done in
 
 ![Ouput of every step of the build process](kconfig_integration.svg)
 
-### 0. Module dependency resolution
-Currently, the resolution of module dependencies is performed by the build
-system where all the used modules and packages end up listed in the `USEMODULE`
-make variables. In the next phases of integration we plan to resolve dependencies
-using Kconfig.
-
-
-#### Input
-- Makefiles.
-
-#### Output
-- `USEMODULE` and `USEPKG` variables.
-
-### 1. Module listing
-The list of modules needed for the particular build is dumped into the
-`$ (GENERATED_DIR)/Kconfig.dep` file, where each module is translated into a
-Kconfig symbol as documented in [Appendix A](#kconfig-appendix-a).
-
-#### Input
-- `USEMODULE` and `USEPKG` variables
-
-#### Output
-- `$ (GENERATED_DIR)/Kconfig.dep` file
-
-### 2. Merging all configuration sources         {#kconfig-steps-merge-configs}
+### 1. Merging all configuration sources         {#kconfig-steps-merge-configs}
 In this step configuration values are taken from multiple sources and merged
 into a single `merged.config` configuration file. This file is temporary and is
 removed on clean. If the user needs to save a particular configuration
@@ -361,25 +341,14 @@ available all default values will be applied.
 #### Output
 - `$ (GENERATED_DIR)/merged.config` file.
 
-### 3. Menuconfig execution (optional)
+### 2. Menuconfig execution (optional)
 Menuconfig is a graphical interface for software configuration. It is used for
 the configuration of the Linux kernel. This section explains the process
 that occurs when RIOT is being configured using the menuconfig interface.
 
-The main `Kconfig` file is used in this step to show the configurable
-parameters of the system. Kconfig will filter innaplicable parameters (i.e.
-parameters exposed by modules that are not being used) based on the file
-`$ (GENERATED_DIR)/Kconfig.dep` generated in step 1.
-
-During the transition phase, the user needs to enable Kconfig explicitly per
-module, by setting the corresponding option. If using `menuconfig` a checkbox
-with a submenu has to be selected, if using `.config` files a
-`CONFIG_KCONFIG_MODULE_` prefixed option has to be set to `y`. For more
-information see
-[Making configuration via Kconfig optional](#kconfig-configuration-optional).
-
-Note that if Kconfig is not used to configure a module, the corresponding
-header files default values will be used.
+The main `Kconfig` file is used in this step to show the available modules of
+the system, together with their configurations. Kconfig will filter innaplicable
+parameters (i.e. parameters exposed by modules that are not being used).
 
 `merged.config` is one of the inputs for menuconfig. This means that any
 configuration that the application defines in the `app.config` or a backup
@@ -402,7 +371,7 @@ choose to save a backup configuration file for later at a different location
 - Updated `$ (GENERATED_DIR)/merged.config` file.
 - `$ (GENERATED_DIR)/merged.config.old` backup file.
 
-### 4. Generation of the autoconf.h header          {#kconfig-steps-header-gen}
+### 3. Generation of the autoconf.h header          {#kconfig-steps-header-gen}
 With the addition of Kconfig a dependency has been added to the build
 process: the `$ (GENERATED_DIR)/autoconf.h` header file. This header file is
 the main output from the Kconfig configuration system. It holds all the macros
@@ -428,7 +397,6 @@ These files are defined in `kconfig.mk`.
 | File              | Description |
 | ----------------- | ----------- |
 | `Kconfig`           | Defines configuration options of modules. |
-| `Kconfig.dep`       | Holds a list of the modules that are being compiled. |
 | `app.config`        | Holds default application configuration values. |
 | `user.config`       | Holds configuration values applied by the user. |
 | `merged.config`     | Holds configuration from multiple sources. Used to generate header. |
@@ -437,18 +405,8 @@ These files are defined in `kconfig.mk`.
 
 ## Kconfig symbols in Makefiles
 As '.config' files have Makefile syntax they can be included when building,
-which allows to access the applied configuration from the build system and, in
-the future, to check for enabled modules.
-
-During migration this is also useful, as it gives the ability to check if a
-parameter is being configured via Kconfig or a default value via `CFLAGS` could
-be injected. For example:
-
-```Makefile
-ifndef CONFIG_USB_VID
-  CFLAGS += -DCONFIG_USB_VID=0x1209
-endif
-```
+which allows to access the applied configuration from the build system and to
+check for enabled modules.
 
 Symbols will have the same name as the configuration macros (thus will always
 have the `CONFIG_` prefix). As the configuration file is loaded in
@@ -664,50 +622,7 @@ reserved for the cases described bellow:
 ---
 # Appendixes                                              {#kconfig-appendixes}
 
-## Appendix A: Check if a module or package is used       {#kconfig-appendix-a}
-In order to show only the relevant configuration parameters to the user with
-respect to a given application and board selection, Kconfig needs knowledge
-about all modules and packages to be used for a compilation. Currently
-dependency handling among modules is performed by the build system (via
-`Makefile.dep` files). The interface defined to declared the used modules and
-packages is the `$ (GENERATED_DIR)/Kconfig.dep` file.
-
-`Kconfig.dep` is a Kconfig file that will define symbols of the form:
-```Kconfig
-config MODULE_SOCK_UTIL
-    bool
-    default y
-```
-There will be a symbol for every used module (i.e. every module in
-`USEMODULE` make variable) and package. The names in the symbols will be
-uppercase and separated by `_`. Based on these symbols configurability is
-decided. Modules and packages symbols will have `MODULE_` and `PKG_` prefixes
-respectively.
-
-The following is an example of how to use these symbols in Kconfig files to
-enable/disable a configuration menu:
-
-```Kconfig
-menuconfig KCONFIG_MODULE_SOCK_UTIL
-    bool "Configure Sock Utilities"
-    depends on MODULE_SOCK_UTIL
-    help
-        "Configure Sock Utilities using Kconfig."
-```
-
-Then, every configuration option for the previous module would be modeled like:
-
-```Kconfig
-if KCONFIG_MODULE_SOCK_UTIL
-
-config SOCK_UTIL_SCHEME_MAXLEN
-    int "Maximum length of the scheme part for sock_urlsplit"
-    default 16
-
-endif # KCONFIG_MODULE_SOCK_UTIL
-```
-
-## Appendix B: Difference between 'Kconfig' and '.config' files {#kconfig-appendix-b}
+## Appendix A: Difference between 'Kconfig' and '.config' files {#kconfig-appendix-different-files}
 Kconfig files describe a configuration database, which is a collection of
 configuration options organized in a tree structure. Configuration options may
 have dependencies (among other attributes), which are used to determine their
@@ -746,7 +661,7 @@ CONFIG_GCOAP_PDU_BUF_SIZE=12345
 In other words: Kconfig files describe configuration options and '.config' files
 assign their values.
 
-## Appendix C: Pitfall when using different configuration interfaces {#kconfig-appendix-c}
+## Appendix B: Pitfall when using different configuration interfaces {#kconfig-appendix-pitfall-interfaces}
 In the current configuration flow the user can choose to configure RIOT using
 the menuconfig graphical interface or writing '.config' files by hand.
 
