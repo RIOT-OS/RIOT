@@ -90,7 +90,8 @@ static uint32_t _ztimer_convert_muldiv64_now(ztimer_clock_t *ztimer)
         (ztimer_convert_muldiv64_t *)ztimer;
 
     return _convert_muldiv64_now(ztimer_convert_muldiv64,
-                                 ztimer_now(ztimer_convert_muldiv64->super.lower));
+                                 ztimer_now(
+                                     ztimer_convert_muldiv64->super.lower));
 }
 
 static const ztimer_ops_t _ztimer_convert_muldiv64_ops = {
