@@ -3,7 +3,6 @@ PORT_LINUX          ?= /dev/ttyUSB0
 PORT_DARWIN         ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 BAUD                ?= 9600
 ATMEGA328P_CLOCK    ?=
-include $(RIOTMAKE)/tools/serial.inc.mk
 
 # Allow overwriting programmer via env variables without affecting other boards
 PROGRAMMER_BOARD_ATMEGA328P ?= usbtiny
@@ -14,5 +13,4 @@ ifneq (,$(ATMEGA328P_CLOCK))
   CFLAGS += -DCLOCK_CORECLOCK=$(ATMEGA328P_CLOCK)
 endif
 
-include $(RIOTMAKE)/tools/avrdude.inc.mk
 include $(RIOTBOARD)/common/atmega/Makefile.include
