@@ -136,6 +136,7 @@ enum {
     SAUL_SENSE_ID_PH,               /**< sensor: pH */
     SAUL_SENSE_ID_POWER,            /**< sensor: power */
     SAUL_SENSE_ID_SIZE,             /**< sensor: size */
+    SAUL_SENSE_ID_SCALE,            /**< sensor: weigh scale */
     SAUL_SENSE_NUMOF                /**< Number of actuators supported */
     /* Extend this list as needed, but keep SAUL_SENSE_ID_ANY the first and
      * SAUL_SENSE_NUMOF the last entry
@@ -219,6 +220,8 @@ enum {
     SAUL_SENSE_POWER        = SAUL_CAT_SENSE | SAUL_SENSE_ID_POWER,
     /** sensor: size */
     SAUL_SENSE_SIZE         = SAUL_CAT_SENSE | SAUL_SENSE_ID_SIZE,
+    /** sensor: weigh scale */
+    SAUL_SENSE_SCALE        = SAUL_CAT_SENSE | SAUL_SENSE_ID_SCALE,
     /** any device - wildcard */
     SAUL_CLASS_ANY          = 0xff
     /* extend this list as needed... */
