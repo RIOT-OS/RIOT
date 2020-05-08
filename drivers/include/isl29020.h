@@ -39,13 +39,12 @@ extern "C" {
 /**
  * @brief Default address
  *
- * The address depends on the status of A0 Pin.
- * Default address corresponds to A0 connected to GND.
- * For more information on SerialBus Address, refer Section I2C
- * Interface on Page 3 of datasheet.
+ * The address depends on the status of A0 Pin. Default address corresponds to
+ * A0 connected to GND. For more information refer to the section 'I2C
+ * Interface' in the datasheet.
  */
-#ifndef ISL29020_DEFAULT_ADDRESS
-#define ISL29020_DEFAULT_ADDRESS        0x44
+#ifndef CONFIG_ISL29020_DEFAULT_ADDRESS
+#define CONFIG_ISL29020_DEFAULT_ADDRESS        0x44
 #endif
 /** @} */
 
