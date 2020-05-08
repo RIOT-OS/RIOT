@@ -28,32 +28,24 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-static gnrc_pktsnip_t *_build_join_req_pkt(uint8_t *appeui, uint8_t *deveui, uint8_t *appkey, uint8_t *dev_nonce)
+static void _build_join_req_pkt(uint8_t *appeui, uint8_t *deveui, uint8_t *appkey, uint8_t *dev_nonce, uint8_t *psdu)
 {
-    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, sizeof(lorawan_join_request_t), GNRC_NETTYPE_UNDEF);
+    lorawan_join_request_t *hdr = (lorawan_join_request_t *) psdu;
 
-    if (pkt) {
-        lorawan_join_request_t *hdr = (lorawan_join_request_t *) pkt->data;
+    hdr->mt_maj = 0;
+    lorawan_hdr_set_mtype((lorawan_hdr_t *) hdr, MTYPE_JOIN_REQUEST);
+    lorawan_hdr_set_maj((lorawan_hdr_t *) hdr, MAJOR_LRWAN_R1);
 
-        hdr->mt_maj = 0;
-        lorawan_hdr_set_mtype((lorawan_hdr_t *) hdr, MTYPE_JOIN_REQUEST);
-        lorawan_hdr_set_maj((lorawan_hdr_t *) hdr, MAJOR_LRWAN_R1);
+    le_uint64_t l_appeui = *((le_uint64_t *) appeui);
+    le_uint64_t l_deveui = *((le_uint64_t *) deveui);
 
-        le_uint64_t l_appeui = *((le_uint64_t *) appeui);
-        le_uint64_t l_deveui = *((le_uint64_t *) deveui);
+    hdr->app_eui = l_appeui;
+    hdr->dev_eui = l_deveui;
 
-        hdr->app_eui = l_appeui;
-        hdr->dev_eui = l_deveui;
+    le_uint16_t l_dev_nonce = *((le_uint16_t *) dev_nonce);
+    hdr->dev_nonce = l_dev_nonce;
 
-        le_uint16_t l_dev_nonce = *((le_uint16_t *) dev_nonce);
-        hdr->dev_nonce = l_dev_nonce;
-
-        iolist_t io = { .iol_base = pkt->data, .iol_len = JOIN_REQUEST_SIZE - MIC_SIZE,
-                        .iol_next = NULL };
-        gnrc_lorawan_calculate_join_mic(&io, appkey, &hdr->mic);
-    }
-
-    return pkt;
+    gnrc_lorawan_calculate_join_mic(psdu, JOIN_REQUEST_SIZE - MIC_SIZE, appkey, &hdr->mic);
 }
 
 static int gnrc_lorawan_send_join_request(gnrc_lorawan_t *mac, uint8_t *deveui,
@@ -69,56 +61,54 @@ static int gnrc_lorawan_send_join_request(gnrc_lorawan_t *mac, uint8_t *deveui,
     mac->mlme.dev_nonce[1] = (random_number >> 8) & 0xFF;
 
     /* build join request */
-    gnrc_pktsnip_t *pkt = _build_join_req_pkt(appeui, deveui, appkey, mac->mlme.dev_nonce);
-    if (!pkt) {
-        return -ENOBUFS;
-    }
+    uint8_t psdu[sizeof(lorawan_join_request_t)];
+
+    iolist_t pkt = {.iol_base = &psdu, .iol_len = sizeof(psdu), .iol_next = NULL};
+    _build_join_req_pkt(appeui, deveui, appkey, mac->mlme.dev_nonce, psdu);
 
     /* We need a random delay for join request. Otherwise there might be
      * network congestion if a group of nodes start at the same time */
     xtimer_usleep(random_uint32() & GNRC_LORAWAN_JOIN_DELAY_U32_MASK);
-    gnrc_lorawan_send_pkt(mac, pkt, dr);
+    gnrc_lorawan_send_pkt(mac, &pkt, dr);
 
     mac->mlme.backoff_budget -= mac->toa;
-    gnrc_pktbuf_release(pkt);
 
     return GNRC_LORAWAN_REQ_STATUS_DEFERRED;
 }
 
-void gnrc_lorawan_mlme_process_join(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt)
+void gnrc_lorawan_mlme_process_join(gnrc_lorawan_t *mac, uint8_t *data, size_t size)
 {
     int status;
+    mlme_confirm_t mlme_confirm;
 
     if (mac->mlme.activation != MLME_ACTIVATION_NONE) {
         status = -EBADMSG;
         goto out;
     }
 
-    if (pkt->size != GNRC_LORAWAN_JOIN_ACCEPT_MAX_SIZE - CFLIST_SIZE &&
-        pkt->size != GNRC_LORAWAN_JOIN_ACCEPT_MAX_SIZE) {
+    if (size != GNRC_LORAWAN_JOIN_ACCEPT_MAX_SIZE - CFLIST_SIZE &&
+        size != GNRC_LORAWAN_JOIN_ACCEPT_MAX_SIZE) {
         status = -EBADMSG;
         goto out;
     }
 
     /* Subtract 1 from join accept max size, since the MHDR was already read */
     uint8_t out[GNRC_LORAWAN_JOIN_ACCEPT_MAX_SIZE - 1];
-    uint8_t has_cflist = (pkt->size - 1) >= CFLIST_SIZE;
-    gnrc_lorawan_decrypt_join_accept(mac->appskey, ((uint8_t *) pkt->data) + 1,
+    uint8_t has_cflist = (size - 1) >= CFLIST_SIZE;
+    gnrc_lorawan_decrypt_join_accept(mac->appskey, data + 1,
                                      has_cflist, out);
-    memcpy(((uint8_t *) pkt->data) + 1, out, pkt->size - 1);
+    memcpy(data + 1, out, size - 1);
 
-    iolist_t io = { .iol_base = pkt->data, .iol_len = pkt->size - MIC_SIZE,
-                    .iol_next = NULL };
     le_uint32_t mic;
-    le_uint32_t *expected_mic = (le_uint32_t *) (((uint8_t *) pkt->data) + pkt->size - MIC_SIZE);
-    gnrc_lorawan_calculate_join_mic(&io, mac->appskey, &mic);
+    le_uint32_t *expected_mic = (le_uint32_t *) (data + size - MIC_SIZE);
+    gnrc_lorawan_calculate_join_mic(data, size - MIC_SIZE, mac->appskey, &mic);
     if (mic.u32 != expected_mic->u32) {
         DEBUG("gnrc_lorawan_mlme: wrong MIC.\n");
         status = -EBADMSG;
         goto out;
     }
 
-    lorawan_join_accept_t *ja_hdr = (lorawan_join_accept_t *) pkt->data;
+    lorawan_join_accept_t *ja_hdr = (lorawan_join_accept_t *) data;
     gnrc_lorawan_generate_session_keys(ja_hdr->app_nonce, mac->mlme.dev_nonce, mac->appskey, mac->nwkskey, mac->appskey);
 
     le_uint32_t le_nid;
@@ -138,11 +128,10 @@ void gnrc_lorawan_mlme_process_join(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt)
     status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
 
 out:
-    gnrc_pktbuf_release(pkt);
-    mlme_confirm_t mlme_confirm;
     mlme_confirm.type = MLME_JOIN;
     mlme_confirm.status = status;
 
+    gnrc_lorawan_mac_release(mac);
     gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
 }
 
@@ -320,21 +309,4 @@ uint8_t gnrc_lorawan_build_options(gnrc_lorawan_t *mac, lorawan_buffer_t *buf)
     }
 
     return size;
-}
-
-void gnrc_lorawan_mlme_no_rx(gnrc_lorawan_t *mac)
-{
-    mlme_confirm_t mlme_confirm;
-
-    mlme_confirm.status = -ETIMEDOUT;
-
-    if (mac->mlme.activation == MLME_ACTIVATION_NONE) {
-        mlme_confirm.type = MLME_JOIN;
-        gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
-    }
-    else if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ) {
-        mlme_confirm.type = MLME_LINK_CHECK;
-        gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
-        mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ;
-    }
 }

@@ -35,7 +35,8 @@
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc/netreg.h"
 
-#define LORAWAN_PORT (2U)
+#define LORAWAN_PORT       (2U)
+#define LORAWAN_QUEUE_SIZE (4U)
 
 static void _usage(void)
 {
@@ -75,16 +76,17 @@ int tx_cmd(int argc, char **argv)
     gnrc_netapi_set(interface, NETOPT_LORAWAN_TX_PORT, 0, &port, sizeof(port));
     gnrc_netif_send(gnrc_netif_get_by_pid(interface), pkt);
 
-    msg_t msg;
     /* wait for packet status and check */
+    msg_t msg;
     msg_receive(&msg);
     if ((msg.type != GNRC_NETERR_MSG_TYPE) ||
         (msg.content.value != GNRC_NETERR_SUCCESS)) {
-        puts("Error sending packet (not joined?)");
+        printf("Error sending packet: (status: %d\n)", (int) msg.content.value);
     }
     else {
         puts("Successfully sent packet");
     }
+
     return 0;
 }
 

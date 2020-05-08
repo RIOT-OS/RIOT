@@ -63,7 +63,6 @@ extern "C" {
 typedef enum {
     MCPS_EVENT_RX,            /**< MCPS RX event */
     MCPS_EVENT_NO_RX,         /**< MCPS no RX event */
-    MCPS_EVENT_ACK_TIMEOUT    /**< MCPS retrans event */
 } mcps_event_t;
 
 /**
@@ -153,9 +152,9 @@ typedef struct {
  * @brief Mac Common Part Sublayer (MCPS) confirm representation
  */
 typedef struct {
-    void *data;     /**< data of the MCPS confirm */
     int16_t status; /**< status of the MCPS confirm */
     mcps_type_t type;   /**< type of the MCPS confirm */
+    iolist_t *msdu;     /**< pointer to the msdu */
 } mcps_confirm_t;
 
 /**
@@ -230,9 +229,11 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac, const mcps_request_t *mcps_r
  *        To be called on radio RX done event.
  *
  * @param[in] mac pointer to the MAC descriptor
- * @param[in] pkt pointer to the packet
+ * @param[in] data pointer to the psdu. Pass NULL if the packet was wrong (or
+ * allocation failed)
+ * @param[in] size size of the PSDU
  */
-void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt);
+void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *data, size_t size);
 
 /**
  * @brief MCPS indication callback

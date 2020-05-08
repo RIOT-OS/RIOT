@@ -45,20 +45,17 @@ typedef struct  __attribute__((packed)) {
     uint8_t len;
 } lorawan_block_t;
 
-void gnrc_lorawan_calculate_join_mic(const iolist_t *io, const uint8_t *key, le_uint32_t *out)
+void gnrc_lorawan_calculate_join_mic(const uint8_t *buf, size_t len, const uint8_t *key, le_uint32_t *out)
 {
     cmac_init(&CmacContext, key, LORAMAC_APPKEY_LEN);
-    while (io != NULL) {
-        cmac_update(&CmacContext, io->iol_base, io->iol_len);
-        io = io->iol_next;
-    }
+    cmac_update(&CmacContext, buf, len);
     cmac_final(&CmacContext, digest);
 
     memcpy(out, digest, sizeof(le_uint32_t));
 }
 
 void gnrc_lorawan_calculate_mic(const le_uint32_t *dev_addr, uint32_t fcnt,
-                                uint8_t dir, iolist_t *pkt, const uint8_t *nwkskey, le_uint32_t *out)
+                                uint8_t dir, iolist_t *frame, const uint8_t *nwkskey, le_uint32_t *out)
 {
     lorawan_block_t block;
 
@@ -72,11 +69,16 @@ void gnrc_lorawan_calculate_mic(const le_uint32_t *dev_addr, uint32_t fcnt,
 
     block.u32_pad = 0;
 
-    block.len = iolist_size(pkt);
+    block.len = iolist_size(frame);
 
-    iolist_t io = { .iol_base = &block, .iol_len = sizeof(block),
-                    .iol_next = pkt };
-    gnrc_lorawan_calculate_join_mic(&io, nwkskey, out);
+    cmac_init(&CmacContext, nwkskey, LORAMAC_APPKEY_LEN);
+    cmac_update(&CmacContext, &block, sizeof(block));
+    for (iolist_t *io = frame; io != NULL; io = io->iol_next) {
+        cmac_update(&CmacContext, io->iol_base, io->iol_len);
+    }
+    cmac_final(&CmacContext, digest);
+
+    memcpy(out, digest, sizeof(le_uint32_t));
 }
 
 void gnrc_lorawan_encrypt_payload(iolist_t *iolist, const le_uint32_t *dev_addr, uint32_t fcnt, uint8_t dir, const uint8_t *appskey)

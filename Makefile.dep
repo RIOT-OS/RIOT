@@ -89,7 +89,6 @@ ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += crypto_aes
   USEMODULE += netdev_layer
-  USEMODULE += gnrc_neterr
   USEMODULE += gnrc_nettype_lorawan
 endif
 
