@@ -109,8 +109,6 @@ PREFFLAGS += python3 $(RIOTTOOLS)/esptool/gen_esp32part.py
 PREFFLAGS += --verify $(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
 FLASHDEPS += preflash
 
-BUILD_BEFORE_FLASH += $(FLASHFILE)
-
 # flasher configuration
 ifneq (,$(filter esp_qemu,$(USEMODULE)))
   FLASHER = dd
