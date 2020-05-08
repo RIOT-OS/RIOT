@@ -125,13 +125,13 @@ static void _driver_cb(netdev_t *dev, netdev_event_t event)
         DEBUG("gnrc_netif: event triggered -> %i\n", event);
         switch (event) {
             case NETDEV_EVENT_RX_COMPLETE:
-                gnrc_lorawan_recv(mac);
+                gnrc_lorawan_radio_rx_done_cb(mac);
                 break;
             case NETDEV_EVENT_TX_COMPLETE:
-                gnrc_lorawan_event_tx_complete(mac);
+                gnrc_lorawan_radio_tx_done_cb(mac);
                 break;
             case NETDEV_EVENT_RX_TIMEOUT:
-                gnrc_lorawan_event_timeout(mac);
+                gnrc_lorawan_radio_rx_timeout_cb(mac);
                 break;
             default:
                 DEBUG("gnrc_netif: warning: unhandled event %u.\n", event);

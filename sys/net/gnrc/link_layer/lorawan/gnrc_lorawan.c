@@ -147,7 +147,7 @@ void gnrc_lorawan_open_rx_window(gnrc_lorawan_t *mac)
     dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
 }
 
-void gnrc_lorawan_event_tx_complete(gnrc_lorawan_t *mac)
+void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac)
 {
     mac->msg.type = MSG_TYPE_TIMEOUT;
     mac->state = LORAWAN_STATE_RX_1;
@@ -166,7 +166,7 @@ void gnrc_lorawan_event_tx_complete(gnrc_lorawan_t *mac)
     _sleep_radio(mac);
 }
 
-void gnrc_lorawan_event_timeout(gnrc_lorawan_t *mac)
+void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac)
 {
     (void) mac;
     switch (mac->state) {
@@ -273,7 +273,7 @@ void gnrc_lorawan_process_pkt(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt)
     gnrc_lorawan_mac_release(mac);
 }
 
-void gnrc_lorawan_recv(gnrc_lorawan_t *mac)
+void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac)
 {
     netdev_t *dev = gnrc_lorawan_get_netdev(mac);
     int bytes_expected = dev->driver->recv(dev, NULL, 0, 0);

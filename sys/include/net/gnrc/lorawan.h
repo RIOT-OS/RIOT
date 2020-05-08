@@ -180,14 +180,14 @@ typedef struct {
  *
  * @param[in] mac pointer to the MAC descriptor
  */
-void gnrc_lorawan_event_timeout(gnrc_lorawan_t *mac);
+void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac);
 
 /**
  * @brief Indicate the MAC layer when the transmission finished
  *
  * @param[in] mac pointer to the MAC descriptor
  */
-void gnrc_lorawan_event_tx_complete(gnrc_lorawan_t *mac);
+void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac);
 
 /**
  * @brief Init GNRC LoRaWAN
@@ -231,7 +231,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac, const mcps_request_t *mcps_r
  *
  * @param[in] mac pointer to the MAC descriptor
  */
-void gnrc_lorawan_recv(gnrc_lorawan_t *mac);
+void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac);
 
 /**
  * @brief MCPS indication callback
