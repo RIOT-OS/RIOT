@@ -249,8 +249,12 @@ void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt, uint8_t dr)
 
 }
 
-void gnrc_lorawan_process_pkt(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt)
+void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt)
 {
+    _sleep_radio(mac);
+    if (pkt == NULL) {
+        return;
+    }
     mac->state = LORAWAN_STATE_IDLE;
     xtimer_remove(&mac->rx);
 
@@ -271,27 +275,4 @@ void gnrc_lorawan_process_pkt(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt)
     }
 
     gnrc_lorawan_mac_release(mac);
-}
-
-void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac)
-{
-    netdev_t *dev = gnrc_lorawan_get_netdev(mac);
-    int bytes_expected = dev->driver->recv(dev, NULL, 0, 0);
-    int nread;
-    struct netdev_radio_rx_info rx_info;
-    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, bytes_expected, GNRC_NETTYPE_UNDEF);
-    if (pkt == NULL) {
-        DEBUG("_recv_ieee802154: cannot allocate pktsnip.\n");
-        /* Discard packet on netdev device */
-        dev->driver->recv(dev, NULL, bytes_expected, NULL);
-        return;
-    }
-    nread = dev->driver->recv(dev, pkt->data, bytes_expected, &rx_info);
-    _sleep_radio(mac);
-    if (nread <= 0) {
-        gnrc_pktbuf_release(pkt);
-        return;
-    }
-
-    gnrc_lorawan_process_pkt(mac, pkt);
 }

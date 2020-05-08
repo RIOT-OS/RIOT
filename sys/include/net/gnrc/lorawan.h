@@ -230,8 +230,9 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac, const mcps_request_t *mcps_r
  *        To be called on radio RX done event.
  *
  * @param[in] mac pointer to the MAC descriptor
+ * @param[in] pkt pointer to the packet
  */
-void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac);
+void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt);
 
 /**
  * @brief MCPS indication callback

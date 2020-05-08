@@ -108,6 +108,30 @@ void gnrc_lorawan_mcps_confirm(gnrc_lorawan_t *mac, mcps_confirm_t *confirm)
     mac->mcps.outgoing_pkt = NULL;
 }
 
+static void _rx_done(gnrc_lorawan_t *mac)
+{
+    netdev_t *dev = gnrc_lorawan_get_netdev(mac);
+    int bytes_expected = dev->driver->recv(dev, NULL, 0, 0);
+    int nread;
+    struct netdev_radio_rx_info rx_info;
+    gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL, bytes_expected, GNRC_NETTYPE_UNDEF);
+    if (pkt == NULL) {
+        DEBUG("_recv_ieee802154: cannot allocate pktsnip.\n");
+        /* Discard packet on netdev device */
+        dev->driver->recv(dev, NULL, bytes_expected, NULL);
+        gnrc_lorawan_radio_rx_done_cb(mac, NULL);
+        return;
+    }
+    nread = dev->driver->recv(dev, pkt->data, bytes_expected, &rx_info);
+    if (nread <= 0) {
+        gnrc_pktbuf_release(pkt);
+        gnrc_lorawan_radio_rx_done_cb(mac, NULL);
+        return;
+    }
+
+    gnrc_lorawan_radio_rx_done_cb(mac, pkt);
+}
+
 static void _driver_cb(netdev_t *dev, netdev_event_t event)
 {
     gnrc_netif_t *netif = dev->context;
@@ -125,7 +149,7 @@ static void _driver_cb(netdev_t *dev, netdev_event_t event)
         DEBUG("gnrc_netif: event triggered -> %i\n", event);
         switch (event) {
             case NETDEV_EVENT_RX_COMPLETE:
-                gnrc_lorawan_radio_rx_done_cb(mac);
+                _rx_done(mac);
                 break;
             case NETDEV_EVENT_TX_COMPLETE:
                 gnrc_lorawan_radio_tx_done_cb(mac);
