@@ -61,11 +61,11 @@ For a `FEATURE` to be provided by a `board` it must meet 2 criteria, and for
   `FEATURES_REQUIRED_ANY += arch_avr8|arch_native` if both are provide then
   `arch_avr8` will be used.
 
-- `FEATURES_BLACKLIST` are `FEATURES` that can't be used by a `MODULE` or `APPLCIATION`.
+- `FEATURES_BLACKLIST` are `FEATURES` that can't be used by a `MODULE` or `APPLICATION`.
   They are usually used for _hw_ characteristics like `arch_` to easily resolve
   unsupported configurations for a group.
 
-- `FEATURES_USED` are the final list of `FEATURES` that will be used by an `APPLCIATION`
+- `FEATURES_USED` are the final list of `FEATURES` that will be used by an `APPLICATION`
 
 ### Where to define FEATURES_%
 
