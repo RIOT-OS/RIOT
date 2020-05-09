@@ -335,6 +335,7 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
                 }
                 else {
                     mlme_request.type = MLME_SET;
+                    mlme_request.mib.type = MIB_ACTIVATION_METHOD;
                     mlme_request.mib.activation = MLME_ACTIVATION_ABP;
                     gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request, &mlme_confirm);
                 }
