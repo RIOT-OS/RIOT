@@ -1,0 +1,2 @@
+# This package is only compatible with stm32 cpus
+FEATURES_REQUIRED += cpu_stm32
