@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
+ *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  * @brief       nRF52 specific CPU configuration
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  */
 
@@ -27,7 +29,7 @@
 #ifdef CPU_MODEL_NRF52832XXAA
 #include "vendor/nrf52.h"
 #include "vendor/nrf52_bitfields.h"
-#elif defined(CPU_MODEL_NRF52840XXAA)
+#elif defined(CPU_MODEL_NRF52811XXAA) || defined(CPU_MODEL_NRF52840XXAA)
 #include "vendor/nrf52840.h"
 #include "vendor/nrf52840_bitfields.h"
 #else
@@ -44,9 +46,12 @@ extern "C" {
  */
 #define CPU_DEFAULT_IRQ_PRIO            (2U)
 #define CPU_FLASH_BASE                  (0x00000000)
-#ifdef CPU_MODEL_NRF52832XXAA
+
+#if defined(CPU_MODEL_NRF52811XXAA)
+#define CPU_IRQ_NUMOF                   (29U)
+#elif defined(CPU_MODEL_NRF52832XXAA)
 #define CPU_IRQ_NUMOF                   (38U)
-#elif CPU_MODEL_NRF52840XXAA
+#elif defined(CPU_MODEL_NRF52840XXAA)
 #define CPU_IRQ_NUMOF                   (46U)
 #endif
 /** @} */
@@ -57,7 +62,9 @@ extern "C" {
  */
 #define FLASHPAGE_SIZE                  (4096U)
 
-#if defined(CPU_MODEL_NRF52832XXAA)
+#if defined(CPU_MODEL_NRF52811XXAA)
+#define FLASHPAGE_NUMOF                 (48U)
+#elif defined(CPU_MODEL_NRF52832XXAA)
 #define FLASHPAGE_NUMOF                 (128U)
 #elif defined(CPU_MODEL_NRF52840XXAA)
 #define FLASHPAGE_NUMOF                 (256U)
