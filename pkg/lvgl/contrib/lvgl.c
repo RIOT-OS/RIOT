@@ -84,8 +84,9 @@ static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *col
         return;
     }
 
-    disp_dev_map(_dev, area->x1, area->x2, area->y1, area->y2,
-                 (const uint16_t *)color_p);
+    disp_dev_coordinates_t coordinates =
+            { .x1 = area->x1, .x2 = area->x2, .y1 = area->y1, .y2 = area->y1 };
+    disp_dev_map(_dev, &coordinates, (const uint16_t *)color_p);
 
     LOG_DEBUG("[lvgl] flush display\n");
 
