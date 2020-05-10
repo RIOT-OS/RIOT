@@ -104,6 +104,16 @@ typedef struct {
 } ili9341_params_t;
 
 /**
+ * @brief Type to store the update coordinates in
+ */
+typedef struct {
+    uint16_t x1;        /**< Left coordinate */
+    uint16_t x2;        /**< Right coordinate */
+    uint16_t y1;        /**< Top coordinate */
+    uint16_t y2;        /**< Bottom coordinate */
+} ili9341_coordinates_t;
+
+/**
  * @brief   Device descriptor for a ili9341
  */
 typedef struct {
@@ -129,15 +139,12 @@ int ili9341_init(ili9341_t *dev, const ili9341_params_t *params);
  * x2 being the last column of pixels to fill. similar to that, y1 is the first
  * row to fill and y2 is the last row to fill.
  *
- * @param[in]   dev     device descriptor
- * @param[in]   x1      x coordinate of the first corner
- * @param[in]   x2      x coordinate of the opposite corner
- * @param[in]   y1      y coordinate of the first corner
- * @param[in]   y2      y coordinate of the opposite corner
- * @param[in]   color   single color to fill the area with
+ * @param[in]   dev              device descriptor
+ * @param[in]   coordinates      coordinates to fill with data
+ * @param[in]   color            single color to fill the area with
  */
-void ili9341_fill(const ili9341_t *dev, uint16_t x1, uint16_t x2,
-                  uint16_t y1, uint16_t y2, uint16_t color);
+void ili9341_fill(const ili9341_t *dev, ili9341_coordinates_t *coordinates,
+                  uint16_t color);
 
 /**
  * @brief   Fill a rectangular area with an array of pixels
@@ -148,15 +155,12 @@ void ili9341_fill(const ili9341_t *dev, uint16_t x1, uint16_t x2,
  *
  * @note @p color must have a length equal to `(x2 - x1 + 1) * (y2 - y1 + 1)`
  *
- * @param[in]   dev     device descriptor
- * @param[in]   x1      x coordinate of the first corner
- * @param[in]   x2      x coordinate of the opposite corner
- * @param[in]   y1      y coordinate of the first corner
- * @param[in]   y2      y coordinate of the opposite corner
- * @param[in]   color   array of colors to fill the area with
+ * @param[in]   dev              device descriptor
+ * @param[in]   coordinates      coordinates to fill with data
+ * @param[in]   color            array of colors to fill the area with
  */
-void ili9341_pixmap(const ili9341_t *dev, uint16_t x1, uint16_t x2, uint16_t y1,
-                 uint16_t y2, const uint16_t *color);
+void ili9341_pixmap(const ili9341_t *dev, ili9341_coordinates_t *coordinates,
+                    const uint16_t *color);
 
 /**
  * @brief   Raw write command

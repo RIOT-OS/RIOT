@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Inria
+ *               2020 Philipp-Alexander Blum
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Driver adaption to disp_dev generic interface
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Philipp-Alexander Blum <philipp-blum@jakiku.de>
  * @}
  */
 
@@ -31,11 +33,11 @@
 #define ILI9341_DISP_COLOR_DEPTH    (16U)
 #endif
 
-static void _ili9341_map(const disp_dev_t *dev, uint16_t x1, uint16_t x2,
-                  uint16_t y1, uint16_t y2, const uint16_t *color)
+static void _ili9341_map(disp_dev_t *dev, disp_dev_coordinates_t *coordinates,
+                         const uint16_t *color)
 {
     ili9341_t *ili9341 = (ili9341_t *)dev;
-    ili9341_pixmap(ili9341, x1, x2, y1, y2, color);
+    ili9341_pixmap(ili9341, (ili9341_coordinates_t *)coordinates, color);
 }
 
 static uint16_t _ili9341_height(const disp_dev_t *disp_dev)
