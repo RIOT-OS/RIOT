@@ -202,6 +202,35 @@ Third, we can define more than a single device in the board configuration
 And finally, we can simply override the `tmpabc_params.h` file as described
 above.
 
+## Compile-time configuration documentation              {#driver-guide-doxygen}
+
+The macros that configure the driver during compilation is added to the listing
+for [Compile time configurations](@ref config). Refer to the following example
+that exposes
+[TMP00x sensor](https://github.com/RIOT-OS/RIOT/blob/master/drivers/include/tmp00x.h#L96-L157)
+to [sensors group](@ref config_drivers_sensors).
+
+@code
+/**
+ * @defgroup drivers_tmp00x_config     TMP006/TMP007 Infrared Thermopile
+ * Sensor driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+/**
+ * @brief   Default Address
+ * ....
+ */
+#ifndef TMP00X_I2C_ADDRESS
+#define TMP00X_I2C_ADDRESS       (0x40)
+#endif
+....
+/** @} */
+@endcode
+
+Sub-groups defined for different types of drivers can be found in
+[drivers/doc.txt](https://github.com/RIOT-OS/RIOT/blob/master/drivers/doc.txt)
+
 ## Initialization                                {#driver-guide-initialization}
 
 In general, the initialization functions should to the following:
