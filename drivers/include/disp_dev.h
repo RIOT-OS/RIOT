@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Inria
+ *               2020 Philipp-Alexander Blum
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,6 +16,7 @@
  * @{
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Philipp-Alexander Blum <philipp-blum@jakiku.de>
  */
 
 #ifndef DISP_DEV_H
@@ -43,21 +45,27 @@ extern "C" {
 typedef struct disp_dev disp_dev_t;
 
 /**
+ * @brief Type to store the update coordinates in
+ */
+typedef struct {
+    uint16_t x1; /**< Left coordinate */
+    uint16_t x2; /**< Right coordinate */
+    uint16_t y1; /**< Top coordinate */
+    uint16_t y2; /**< Bottom coordinate */
+} disp_dev_coordinates_t;
+
+/**
  * @brief   Generic type for a display driver
  */
 typedef struct {
     /**
      * @brief   Map an area to display on the device
      *
-     * @param[in] dev   Pointer to the display device
-     * @param[in] x1    Left coordinate
-     * @param[in] x2    Right coordinate
-     * @param[in] y1    Top coordinate
-     * @param[in] y2    Bottom coordinate
-     * @param[in] color Array of color to map to the display
+     * @param[in] dev           Pointer to the display device
+     * @param[in] coordinates   Coordinate
+     * @param[in] color         Array of color to map to the display
      */
-    void (*map)(const disp_dev_t *dev,
-                uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,
+    void (*map)(disp_dev_t *dev, disp_dev_coordinates_t *coordinates,
                 const uint16_t *color);
 
     /**
@@ -104,15 +112,11 @@ struct disp_dev {
 /**
  * @brief   Map an area to display on the device
  *
- * @param[in] dev   Pointer to the display device
- * @param[in] x1    Left coordinate
- * @param[in] x2    Right coordinate
- * @param[in] y1    Top coordinate
- * @param[in] y2    Bottom coordinate
- * @param[in] color Array of color to map to the display
+ * @param[in] dev            Pointer to the display device
+ * @param[in] coordinates    Coordinate
+ * @param[in] color          Array of color to map to the display
  */
-void disp_dev_map(const disp_dev_t *dev,
-                  uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,
+void disp_dev_map(disp_dev_t *dev, disp_dev_coordinates_t *coordinates,
                   const uint16_t *color);
 
 /**
