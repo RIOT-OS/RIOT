@@ -106,15 +106,6 @@ void _random_bytes(uint8_t *bytes, size_t size) /* TODO: use with global API */
     }
 }
 
-void random_init(uint32_t seed)
-{
-    sha1_init(&ctx);
-    sha1_update(&ctx, (void *)&seed, sizeof(uint32_t));
-    sha1_final(&ctx, digestdata);
-
-    /* copy seeded SHA1 state to PRNG state */
-    memcpy(prng_state, &ctx.state, 20);
-}
 void random_init_by_array(uint32_t init_key[], int key_length)
 {
     sha1_init(&ctx);
@@ -123,6 +114,11 @@ void random_init_by_array(uint32_t init_key[], int key_length)
 
     /* copy seeded SHA1 state to PRNG state */
     memcpy(prng_state, &ctx.state, STATE_SIZE);
+}
+
+void random_init(uint32_t seed)
+{
+    random_init_by_array((uint32_t *)&seed, sizeof(seed));
 }
 
 uint32_t random_uint32(void)
