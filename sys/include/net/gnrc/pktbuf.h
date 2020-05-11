@@ -46,6 +46,11 @@ extern "C" {
 
 /**
  * @def     GNRC_PKTBUF_SIZE
+ * @defgroup net_gnrc_pktbuf_conf GNRC PKTBUF compile configurations
+ * @ingroup net_gnrc_conf
+ * @{
+ */
+/**
  * @brief   Maximum size of the static packet buffer.
  *
  * @details The rational here is to have at least space for 4 full-MTU IPv6
@@ -56,7 +61,8 @@ extern "C" {
  */
 #ifndef GNRC_PKTBUF_SIZE
 #define GNRC_PKTBUF_SIZE    (6144)
-#endif  /* GNRC_PKTBUF_SIZE */
+#endif
+/** @} */
 
 /**
  * @brief   Initializes packet buffer module.
