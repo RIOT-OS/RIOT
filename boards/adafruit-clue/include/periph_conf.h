@@ -79,13 +79,13 @@ static const i2c_conf_t i2c_config[] = {
  */
 static const spi_conf_t spi_config[] = {
     {   /* External connectors */
-        .dev  = NRF_SPI0,
+        .dev  = NRF_SPIM0,
         .sclk = GPIO_PIN(0, 23),    /* D13 */
         .mosi = GPIO_PIN(0, 21),    /* D15 */
         .miso = GPIO_PIN(0, 22),    /* D14 */
     },
     {   /* TFT LCD screen */
-        .dev  = NRF_SPI1,
+        .dev  = NRF_SPIM1,
         .sclk = GPIO_PIN(0, 14),
         .mosi = GPIO_PIN(0, 15),
         .miso = GPIO_PIN(0, 0),
