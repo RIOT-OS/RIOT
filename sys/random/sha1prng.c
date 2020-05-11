@@ -60,9 +60,6 @@ void _updatestate(int8_t *state)
     if (!zf) {
        state[0]++;
     }
-
-    /* update SHA1 state */
-    sha1_update(&ctx, (void *)state, sizeof(state));
 }
 
 void _random_bytes(uint8_t *bytes, size_t size) /* TODO: use with global API */
