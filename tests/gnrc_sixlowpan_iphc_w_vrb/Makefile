@@ -10,6 +10,6 @@ USEMODULE += netdev_test
 USEMODULE += od
 
 # we don't need all this packet buffer space so reduce it a little
-CFLAGS += -DTEST_SUITES -DGNRC_PKTBUF_SIZE=2048
+CFLAGS += -DTEST_SUITES -DCONFIG_GNRC_PKTBUF_SIZE=2048
 
 include $(RIOTBASE)/Makefile.include

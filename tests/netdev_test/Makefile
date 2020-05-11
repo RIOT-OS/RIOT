@@ -13,6 +13,6 @@ USEMODULE += netdev_eth
 USEMODULE += netdev_test
 USEMODULE += od
 
-CFLAGS += -DGNRC_PKTBUF_SIZE=200
+CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=200
 
 include $(RIOTBASE)/Makefile.include

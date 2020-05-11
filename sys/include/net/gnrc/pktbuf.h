@@ -14,7 +14,7 @@
  *
  * @note    **WARNING!!** Do not store data structures that are not packed
  *          (defined with `__attribute__((packed))`) or enforce alignment in
- *          in any way in here if @ref GNRC_PKTBUF_SIZE > 0. On some RISC architectures
+ *          in any way in here if @ref CONFIG_GNRC_PKTBUF_SIZE > 0. On some RISC architectures
  *          this *will* lead to alignment problems and can potentially result
  *          in segmentation/hard faults and other unexpected behaviour.
  *
@@ -45,7 +45,7 @@ extern "C" {
 #endif
 
 /**
- * @def     GNRC_PKTBUF_SIZE
+ * @def     CONFIG_GNRC_PKTBUF_SIZE
  * @defgroup net_gnrc_pktbuf_conf GNRC PKTBUF compile configurations
  * @ingroup net_gnrc_conf
  * @{
@@ -56,11 +56,11 @@ extern "C" {
  * @details The rational here is to have at least space for 4 full-MTU IPv6
  *          packages (2 incoming, 2 outgoing; 2 * 2 * 1280 B = 5 KiB) +
  *          Meta-Data (roughly estimated to 1 KiB; might be smaller). If
- *          @ref GNRC_PKTBUF_SIZE is 0 the packet buffer will use dynamic memory
+ *          @ref CONFIG_GNRC_PKTBUF_SIZE is 0 the packet buffer will use dynamic memory
  *          management to allocate packets.
  */
-#ifndef GNRC_PKTBUF_SIZE
-#define GNRC_PKTBUF_SIZE    (6144)
+#ifndef CONFIG_GNRC_PKTBUF_SIZE
+#define CONFIG_GNRC_PKTBUF_SIZE    (6144)
 #endif
 /** @} */
 
@@ -76,7 +76,7 @@ void gnrc_pktbuf_init(void);
  *          function externally. This will most likely create memory leaks or
  *          not allowed memory access.
  *
- * @pre size < GNRC_PKTBUF_SIZE
+ * @pre size < CONFIG_GNRC_PKTBUF_SIZE
  *
  * @param[in] next      Next gnrc_pktsnip_t in the packet. Leave NULL if you
  *                      want to create a new packet.

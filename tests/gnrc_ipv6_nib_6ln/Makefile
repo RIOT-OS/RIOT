@@ -12,7 +12,7 @@ USEMODULE += netdev_test
 # lower log-level to save memory of LOG_WARNING() in gnrc_netif
 CFLAGS += -DLOG_LEVEL=LOG_ERROR
 CFLAGS += -DGNRC_NETTYPE_NDP=GNRC_NETTYPE_TEST
-CFLAGS += -DGNRC_PKTBUF_SIZE=512
+CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
 CFLAGS += -DTEST_SUITES
 
 include $(RIOTBASE)/Makefile.include

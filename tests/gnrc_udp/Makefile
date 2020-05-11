@@ -16,7 +16,7 @@ USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
 
-CFLAGS += -DGNRC_PKTBUF_SIZE=8192
+CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=8192
 
 include $(RIOTBASE)/Makefile.include
 

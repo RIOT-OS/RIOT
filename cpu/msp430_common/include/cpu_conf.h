@@ -74,9 +74,9 @@ extern "C" {
 #   define ISR_STACKSIZE                    (256)
 #endif
 
-#ifndef GNRC_PKTBUF_SIZE
+#ifndef CONFIG_GNRC_PKTBUF_SIZE
 /* TODO: Make this value overall MTU dependent */
-#   define GNRC_PKTBUF_SIZE                 (2560)
+#   define CONFIG_GNRC_PKTBUF_SIZE                 (2560)
 #endif
 
 #ifndef GNRC_IPV6_STACK_SIZE

@@ -12,7 +12,7 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += xtimer
 
-CFLAGS += -DGNRC_PKTBUF_SIZE=512
+CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
 CFLAGS += -DTEST_SUITES
 
 include $(RIOTBASE)/Makefile.include

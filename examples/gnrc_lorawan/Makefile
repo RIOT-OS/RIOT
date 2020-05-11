@@ -21,7 +21,7 @@ USEMODULE += $(DRIVER)
 
 # We can reduce the size of the packet buffer for LoRaWAN, since there's no IP
 # support. This will reduce RAM consumption.
-CFLAGS += -DGNRC_PKTBUF_SIZE=512
+CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
 
 
 ########################### COMPILE TIME CONFIGURATION ########################
