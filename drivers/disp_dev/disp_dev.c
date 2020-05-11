@@ -27,11 +27,11 @@
 #include "disp_dev.h"
 
 void disp_dev_map(disp_dev_t *dev, disp_dev_coordinates_t *coordinates,
-                 const uint16_t *color)
+                  const void *color, disp_dev_color_depth_t color_depth)
 {
     assert(dev);
 
-    dev->driver->map(dev, coordinates, color);
+    dev->driver->map(dev, coordinates, color, color_depth);
 }
 
 uint16_t disp_dev_height(const disp_dev_t *dev)

@@ -55,6 +55,63 @@ typedef struct {
 } disp_dev_coordinates_t;
 
 /**
+ * @brief Type for color depth.
+ */
+typedef enum {
+    MONOCHROME = 0,
+    2_BIT_COLOR,
+    GRAYSCALE,
+    8_BIT_COLOR,
+    16_BIT_HIGH_COLOR,
+    24_BIT_TRUE_COLOR
+} disp_dev_color_depth_t;
+
+/**
+ * @brief Type to hold a pixel for monochrome data
+ */
+typedef struct {
+    bool color;
+} disp_dev_pix_mono_t;
+
+/**
+ * @brief Type to hold a pixel for 2bit color data
+ */
+typedef struct {
+    bool black;
+    bool color;
+} disp_dev_pix_2bit_color_t;
+
+/**
+ * @brief Type to hold a pixel for greyscale data
+ */
+typedef struct {
+    uint8_t contrast;
+} disp_dev_pix_greyscale_t;
+
+/**
+ * @brief Type to hold a pixel for 8bit color data
+ */
+typedef struct {
+    uint8_t rgb;
+} disp_dev_pix_8bit_color_t;
+
+/**
+ * @brief Type to hold a pixel for 16bit high color data
+ */
+typedef struct {
+    uint16_t rgb;
+} disp_dev_pix_16bit_hc_t;
+
+/**
+ * @brief Type to hold a pixel for monochrome color data
+ */
+typedef struct {
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
+} disp_dev_pix_24bit_tc_t;
+
+/**
  * @brief   Generic type for a display driver
  */
 typedef struct {
@@ -64,9 +121,10 @@ typedef struct {
      * @param[in] dev           Pointer to the display device
      * @param[in] coordinates   Coordinate
      * @param[in] color         Array of color to map to the display
+     * @param[in] color_depth   Color depth of color
      */
     void (*map)(disp_dev_t *dev, disp_dev_coordinates_t *coordinates,
-                const uint16_t *color);
+                const void *color, disp_dev_color_depth_t color_depth);
 
     /**
      * @brief   Get the height of the display device
@@ -91,7 +149,7 @@ typedef struct {
      *
      * @return              The color depth
      */
-    uint8_t (*color_depth)(const disp_dev_t *dev);
+    disp_dev_color_depth_t (*color_depth)(const disp_dev_t *dev);
 
     /**
      * @brief   Invert the display device colors
@@ -115,9 +173,10 @@ struct disp_dev {
  * @param[in] dev            Pointer to the display device
  * @param[in] coordinates    Coordinate
  * @param[in] color          Array of color to map to the display
+ * @param[in] color_depth    Color depth of color
  */
 void disp_dev_map(disp_dev_t *dev, disp_dev_coordinates_t *coordinates,
-                  const uint16_t *color);
+                  const void *color, disp_dev_color_depth_t color_depth);
 
 /**
  * @brief   Get the height of the display device
@@ -142,7 +201,7 @@ uint16_t disp_dev_width(const disp_dev_t *dev);
  *
  * @return              The color depth
  */
-uint8_t disp_dev_color_depth(const disp_dev_t *dev);
+disp_dev_color_depth_t disp_dev_color_depth(const disp_dev_t *dev);
 
 /**
  * @brief   Invert the display device colors
