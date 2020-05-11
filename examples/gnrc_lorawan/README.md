@@ -121,14 +121,14 @@ E.g send confirmable messages:
 
 ```
 ifconfig 3 ack_req
-send "My confirmable message"
+send 3 "My confirmable message"
 ```
 
 And unconfirmable messages:
 
 ```
 ifconfig 3 -ack_req
-send "My unconfirmable message"
+send 3 "My unconfirmable message"
 ```
 
 Current state and future plans
