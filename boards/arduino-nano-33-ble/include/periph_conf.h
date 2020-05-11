@@ -73,7 +73,7 @@ static const i2c_conf_t i2c_config[] = {
  */
 static const spi_conf_t spi_config[] = {
     {
-        .dev  = NRF_SPI0,
+        .dev  = NRF_SPIM0,
         .sclk = GPIO_PIN(0, 13),
         .mosi = GPIO_PIN(1, 1),
         .miso = GPIO_PIN(1, 8),
