@@ -29,7 +29,10 @@
 #ifdef CPU_MODEL_NRF52832XXAA
 #include "vendor/nrf52.h"
 #include "vendor/nrf52_bitfields.h"
-#elif defined(CPU_MODEL_NRF52811XXAA) || defined(CPU_MODEL_NRF52840XXAA)
+#elif defined(CPU_MODEL_NRF52811XXAA)
+#include "vendor/nrf52811.h"
+#include "vendor/nrf52811_bitfields.h"
+#elif defined(CPU_MODEL_NRF52840XXAA)
 #include "vendor/nrf52840.h"
 #include "vendor/nrf52840_bitfields.h"
 #else
