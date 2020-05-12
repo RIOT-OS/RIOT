@@ -291,7 +291,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac, const mcps_request_t *mcps_r
 
     if (!gnrc_lorawan_mac_acquire(mac)) {
         mcps_confirm->status = -EBUSY;
-        goto out;
+        return;
     }
 
     if (mcps_request->data.port < LORAMAC_PORT_MIN ||
