@@ -12,7 +12,10 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += xtimer
 
-CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
+endif
 CFLAGS += -DTEST_SUITES
 
 include $(RIOTBASE)/Makefile.include

@@ -30,7 +30,10 @@ USEMODULE += gnrc_gomach
 
 # We use only the lower layers of the GNRC network stack, hence, we can
 # reduce the size of the packet buffer a bit
-CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=1024
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=1024
+endif
 
 include $(RIOTBASE)/Makefile.include
 

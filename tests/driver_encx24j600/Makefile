@@ -9,7 +9,10 @@ USEMODULE += shell_commands
 USEMODULE += ps
 
 # lower pktbuf size
-CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=2048
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=2048
+endif
 
 # set board specific peripheral configurations
 ifneq (,$(filter nucleo-f334r8,$(BOARD)))
