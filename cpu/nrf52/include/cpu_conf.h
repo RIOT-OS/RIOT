@@ -66,14 +66,12 @@ extern "C" {
  * @brief   Flash page configuration
  * @{
  */
-#define FLASHPAGE_SIZE                  (4096U)
-
-#if defined(CPU_MODEL_NRF52811XXAA)
-#define FLASHPAGE_NUMOF                 (48U)
-#elif defined(CPU_MODEL_NRF52832XXAA)
-#define FLASHPAGE_NUMOF                 (128U)
+#ifdef BPROT_PRESENT
+#define FLASHPAGE_SIZE              BPROT_REGIONS_SIZE
+#define FLASHPAGE_NUMOF             BPROT_REGIONS_NUM
 #elif defined(CPU_MODEL_NRF52840XXAA)
-#define FLASHPAGE_NUMOF                 (256U)
+#define FLASHPAGE_SIZE              (4096U)
+#define FLASHPAGE_NUMOF             (256U)
 #endif
 
 /* The minimum block size which can be written is 4B. However, the erase
