@@ -34,7 +34,8 @@ void ztimer_convert_cancel(ztimer_clock_t *clock)
     ztimer_remove(ztimer_convert->lower, &ztimer_convert->lower_entry);
 }
 
-void ztimer_convert_init(ztimer_convert_t *ztimer_convert, ztimer_clock_t *lower,
+void ztimer_convert_init(ztimer_convert_t *ztimer_convert,
+                         ztimer_clock_t *lower,
                          uint32_t max_value)
 {
     ztimer_convert_t tmp = {

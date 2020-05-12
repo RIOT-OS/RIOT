@@ -70,7 +70,8 @@ typedef struct {
  * @param[in]   freq_self   desired frequency of this clock
  * @param[in]   freq_lower  frequency of the underlying clock
  */
-void ztimer_convert_frac_init(ztimer_convert_frac_t *self, ztimer_clock_t *lower,
+void ztimer_convert_frac_init(ztimer_convert_frac_t *self,
+                              ztimer_clock_t *lower,
                               uint32_t freq_self, uint32_t freq_lower);
 
 /**
