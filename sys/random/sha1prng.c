@@ -25,19 +25,19 @@
 
 #include "hashes/sha1.h"
 
-#define SEED_SIZE           (20)
+#define STATE_SIZE           (SHA1_DIGEST_LENGTH)
 
 static sha1_context ctx;
-static uint32_t datapos = SEED_SIZE;
-static int8_t digestdata[SEED_SIZE];
-static int8_t prng_state[SEED_SIZE];
+static uint32_t datapos = STATE_SIZE;
+static int8_t digestdata[STATE_SIZE];
+static int8_t prng_state[STATE_SIZE];
 
 void _updatestate(int8_t *state)
 {
     signed last = 1;
     char zf = 0;
 
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < STATE_SIZE; i++) {
         signed v;
         char t;
         /* add two bytes */
@@ -60,9 +60,6 @@ void _updatestate(int8_t *state)
     if (!zf) {
        state[0]++;
     }
-
-    /* update SHA1 state */
-    sha1_update(&ctx, (void *)state, sizeof(state));
 }
 
 void _random_bytes(uint8_t *bytes, size_t size) /* TODO: use with global API */
@@ -72,14 +69,14 @@ void _random_bytes(uint8_t *bytes, size_t size) /* TODO: use with global API */
     {
         int copy;
         /* find min between remaining out bytes and so far unused seed bytes */
-        if ( (size-loc) < (SEED_SIZE - datapos) )
+        if ( (size-loc) < (STATE_SIZE - datapos) )
         {
             copy = size-loc;
         }
         else
         {
             /* in first iteration this will be 0 */
-            copy = SEED_SIZE - datapos;
+            copy = STATE_SIZE - datapos;
         }
         if (copy > 0)
         {
@@ -109,15 +106,6 @@ void _random_bytes(uint8_t *bytes, size_t size) /* TODO: use with global API */
     }
 }
 
-void random_init(uint32_t seed)
-{
-    sha1_init(&ctx);
-    sha1_update(&ctx, (void *)&seed, sizeof(uint32_t));
-    sha1_final(&ctx, digestdata);
-
-    /* copy seeded SHA1 state to PRNG state */
-    memcpy(prng_state, &ctx.state, 20);
-}
 void random_init_by_array(uint32_t init_key[], int key_length)
 {
     sha1_init(&ctx);
@@ -125,7 +113,12 @@ void random_init_by_array(uint32_t init_key[], int key_length)
     sha1_final(&ctx, digestdata);
 
     /* copy seeded SHA1 state to PRNG state */
-    memcpy(prng_state, &ctx.state, 20);
+    memcpy(prng_state, &ctx.state, STATE_SIZE);
+}
+
+void random_init(uint32_t seed)
+{
+    random_init_by_array((uint32_t *)&seed, sizeof(seed));
 }
 
 uint32_t random_uint32(void)
