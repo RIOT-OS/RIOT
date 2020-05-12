@@ -45,6 +45,12 @@ static uint32_t _region_size(mtd_mapper_region_t *region)
            region->mtd.sector_count;
 }
 
+static uint32_t _byte_offset(mtd_mapper_region_t *region)
+{
+    return region->mtd.pages_per_sector * region->mtd.page_size *
+           region->sector;
+}
+
 static int _init_target(mtd_mapper_region_t *region)
 {
     mtd_mapper_parent_t *parent = region->parent;
@@ -68,10 +74,7 @@ static int _init(mtd_dev_t *mtd)
     assert(backing_mtd->sector_count >= region->mtd.sector_count);
 
     /* offset + region size must not exceed the backing device */
-    assert(region->offset + _region_size(
-               region) <=
-           backing_mtd->pages_per_sector * backing_mtd->sector_count *
-           backing_mtd->page_size);
+    assert(region->sector + region->mtd.sector_count <= backing_mtd->sector_count);
 
     /* avoid unused variable warning if compiled with NDEBUG */
     (void)backing_mtd;
@@ -92,7 +95,7 @@ static int _write(mtd_dev_t *mtd, const void *src, uint32_t addr,
     }
 
     _lock(region);
-    int res = mtd_write(region->parent->mtd, src, addr + region->offset, count);
+    int res = mtd_write(region->parent->mtd, src, addr + _byte_offset(region), count);
     _unlock(region);
     return res;
 }
@@ -106,7 +109,7 @@ static int _read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count)
     }
 
     _lock(region);
-    int res = mtd_read(region->parent->mtd, dest, addr + region->offset, count);
+    int res = mtd_read(region->parent->mtd, dest, addr + _byte_offset(region), count);
     _unlock(region);
     return res;
 }
@@ -120,7 +123,7 @@ static int _erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count)
     }
 
     _lock(region);
-    int res = mtd_erase(region->parent->mtd, addr + region->offset, count);
+    int res = mtd_erase(region->parent->mtd, addr + _byte_offset(region), count);
     _unlock(region);
     return res;
 }
