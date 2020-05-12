@@ -28,6 +28,9 @@ ifneq (,$(EMCUTE_ID))
   CFLAGS += -DEMCUTE_ID=\"$(EMCUTE_ID)\"
 endif
 
+# Optimize network stack to for use with a single network interface
+CFLAGS += -DGNRC_NETIF_SINGLE
+
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
