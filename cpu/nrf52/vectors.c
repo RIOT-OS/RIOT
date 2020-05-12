@@ -37,6 +37,7 @@ WEAK_DEFAULT void isr_radio(void);
 WEAK_DEFAULT void isr_uart0(void);
 WEAK_DEFAULT void isr_spi0(void);
 WEAK_DEFAULT void isr_spi0_twi0(void);
+WEAK_DEFAULT void isr_spi1_twi0(void);
 WEAK_DEFAULT void isr_spi1_twi1(void);
 WEAK_DEFAULT void isr_nfct(void);
 WEAK_DEFAULT void isr_gpiote(void);
@@ -104,7 +105,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_power_clock,       /* power_clock */
     isr_radio,             /* radio */
     isr_uart0,             /* uart0 */
-    isr_spi1_twi1,         /* spi1_twi1 */
+    isr_spi1_twi0,         /* spi1_twi0 */
     isr_spi0,              /* spi 0 */
     (0UL),                 /* reserved */
     isr_gpiote,            /* gpiote */
