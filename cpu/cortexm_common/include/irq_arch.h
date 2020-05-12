@@ -18,16 +18,24 @@
  * @}
  */
 
+
+#ifndef IRQ_ARCH_H
+#define IRQ_ARCH_H
+
 #include <stdint.h>
-#include "irq.h"
-#include "cpu.h"
+#include "cpu_conf.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Disable all maskable interrupts
  */
-unsigned int irq_disable(void)
+static inline __attribute__((always_inline)) unsigned int irq_disable(void)
 {
     uint32_t mask = __get_PRIMASK();
+
     __disable_irq();
     return mask;
 }
@@ -35,16 +43,20 @@ unsigned int irq_disable(void)
 /**
  * @brief Enable all maskable interrupts
  */
-__attribute__((used)) unsigned int irq_enable(void)
+static inline __attribute__((always_inline)) __attribute__((used)) unsigned int
+irq_enable(void)
 {
+    unsigned result = __get_PRIMASK();
+
     __enable_irq();
-    return __get_PRIMASK();
+    return result;
 }
 
 /**
  * @brief Restore the state of the IRQ flags
  */
-void irq_restore(unsigned int state)
+static inline __attribute__((always_inline)) void irq_restore(
+    unsigned int state)
 {
     __set_PRIMASK(state);
 }
@@ -52,7 +64,14 @@ void irq_restore(unsigned int state)
 /**
  * @brief See if the current context is inside an ISR
  */
-int irq_is_in(void)
+static inline __attribute__((always_inline)) int irq_is_in(void)
 {
     return (__get_IPSR() & 0xFF);
 }
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* IRQ_ARCH_H */
+/** @} */
