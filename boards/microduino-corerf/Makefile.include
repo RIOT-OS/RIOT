@@ -2,7 +2,6 @@
 PORT_LINUX  ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 BAUD        ?= 115200
-include $(RIOTMAKE)/tools/serial.inc.mk
 
 # PROGRAMMER defaults to UM232H which is a FT232H breakout board
 # externally connected using wires
@@ -13,5 +12,4 @@ PROGRAMMER ?= $(PROGRAMMER_MICRODUINO_CORERF)
 BOOTLOADER_SIZE ?= 0
 ROM_RESERVED ?= $(BOOTLOADER_SIZE)
 
-include $(RIOTMAKE)/tools/avrdude.inc.mk
 include $(RIOTBOARD)/common/atmega/Makefile.include
