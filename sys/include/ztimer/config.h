@@ -117,5 +117,9 @@ extern "C" {
 #define CONFIG_ZTIMER_MSEC_REQUIRED_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
 #endif
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* ZTIMER_CONFIG_H */
 /** @} */
