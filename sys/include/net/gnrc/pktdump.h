@@ -29,11 +29,17 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup net_gnrc_pktdump_conf GNRC PKTDUMP compile configurations
+ * @ingroup net_gnrc_conf
+ * @{
+ */
+/**
  * @brief   Message queue size for the pktdump thread
  */
 #ifndef GNRC_PKTDUMP_MSG_QUEUE_SIZE
 #define GNRC_PKTDUMP_MSG_QUEUE_SIZE     (8U)
 #endif
+/** @} */
 
 /**
  * @brief   Priority of the pktdump thread
