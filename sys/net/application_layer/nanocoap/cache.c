@@ -27,34 +27,39 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+static int _cache_replacement_lru(void);
+static int _cache_update_lru(clist_node_t *node);
+
 static clist_node_t _cache_list_head = { NULL };
 static clist_node_t _empty_list_head = { NULL };
 
 static nanocoap_cache_entry_t _cache_entries[CONFIG_NANOCOAP_CACHE_ENTRIES];
 
-static nanocoap_cache_replacement_strategy_t _replacement_strategy = NULL;
+static const nanocoap_cache_replacement_strategy_t _replacement_strategy = _cache_replacement_lru;
+static const nanocoap_cache_update_strategy_t _update_strategy = _cache_update_lru;
 
 static int _cache_replacement_lru(void)
 {
-    nanocoap_cache_entry_t *least = NULL;
-    clist_node_t *it = _cache_list_head.next;
+    clist_node_t *lru_node = clist_lpeek(&_cache_list_head);
 
     /* no element in the list */
-    if (!it) {
+    if (!lru_node) {
         return -1;
     }
 
-    least = container_of(it, nanocoap_cache_entry_t, node);
+    nanocoap_cache_entry_t *lru_ce = container_of(lru_node, nanocoap_cache_entry_t, node);
+    return nanocoap_cache_del(lru_ce);
+}
 
-    do {
-        it = it->next;
-        nanocoap_cache_entry_t *nit = container_of(it, nanocoap_cache_entry_t, node);
-        if (least->access_time > nit->access_time) {
-            least = nit;
-        }
-    } while (it != _cache_list_head.next);
-
-    return nanocoap_cache_del(least);
+static int _cache_update_lru(clist_node_t *node)
+{
+    if (clist_remove(&_cache_list_head, node)) {
+        /* Move an accessed node to the end of the list. Least
+         * recently used nodes are at the beginning of this list */
+        clist_rpush(&_cache_list_head, node);
+        return 0;
+    }
+    return -1;
 }
 
 void nanocoap_cache_init(void)
@@ -66,9 +71,6 @@ void nanocoap_cache_init(void)
     for (unsigned i = 0; i < CONFIG_NANOCOAP_CACHE_ENTRIES; i++) {
         clist_rpush(&_empty_list_head, &_cache_entries[i].node);
     }
-
-    /* hardcode cache replacement strategy for now */
-    _replacement_strategy = _cache_replacement_lru;
 }
 
 size_t nanocoap_cache_used_count(void)
@@ -125,27 +127,21 @@ static int _compare_cache_keys(clist_node_t *ce, void *arg)
     }
     return 0;
 }
-static nanocoap_cache_entry_t *_nanocoap_cache_foreach(const uint8_t *key)
-{
-    clist_node_t *node = clist_foreach(&_cache_list_head, _compare_cache_keys, (uint8_t *)key);
 
-    if (node != NULL) {
-        return container_of(node, nanocoap_cache_entry_t, node);
-    }
-    else {
-        return NULL;
-    }
+static clist_node_t *_nanocoap_cache_foreach(const uint8_t *key)
+{
+    return clist_foreach(&_cache_list_head, _compare_cache_keys, (uint8_t *)key);
 }
 
 nanocoap_cache_entry_t *nanocoap_cache_key_lookup(const uint8_t *key)
 {
-    nanocoap_cache_entry_t *ce = _nanocoap_cache_foreach(key);
+    clist_node_t *node = _nanocoap_cache_foreach(key);
 
-    if (ce) {
-        ce->access_time = ztimer_now(ZTIMER_SEC);
+    if (node) {
+        _update_strategy(node);
     }
 
-    return ce;
+    return container_of(node, nanocoap_cache_entry_t, node);
 }
 
 nanocoap_cache_entry_t *nanocoap_cache_request_lookup(const coap_pkt_t *req)
@@ -217,11 +213,6 @@ int nanocoap_cache_process(const uint8_t *cache_key, unsigned request_method,
        ETag Option for validation.
     */
     else if (resp->hdr->code == COAP_CODE_CONTENT) {
-        uint32_t now = ztimer_now(ZTIMER_SEC);
-        /* cache entry is stale */
-        if (ce && (ce->max_age < now)) {
-            nanocoap_cache_del(ce);
-        }
         if (NULL == nanocoap_cache_add_by_key(cache_key, request_method,
                                               resp, resp_len)) {
             /* no space left in the cache? */
@@ -250,16 +241,20 @@ nanocoap_cache_entry_t *nanocoap_cache_add_by_key(const uint8_t *cache_key,
                                                   const coap_pkt_t *resp,
                                                   size_t resp_len)
 {
-    nanocoap_cache_entry_t *ce;
-    ce = nanocoap_cache_key_lookup(cache_key);
+    nanocoap_cache_entry_t *ce = nanocoap_cache_key_lookup(cache_key);
+    bool add_to_cache = false;
 
-    /* found an already existing cache entry */
-    if (ce) {
-        return ce;
+    if (resp_len > CONFIG_NANOCOAP_CACHE_RESPONSE_SIZE) {
+        DEBUG("nanocoap_cache: response too large to cache (%lu > %d)\n",
+              (long unsigned)resp_len, CONFIG_NANOCOAP_CACHE_RESPONSE_SIZE);
+        return NULL;
     }
 
-    /* did not find .. get an empty cache container */
-    ce = _nanocoap_cache_pop();
+    if (!ce) {
+        /* did not find .. get an empty cache container */
+        ce = _nanocoap_cache_pop();
+        add_to_cache = true;
+    }
 
     /* no space left */
     if (!ce) {
@@ -269,6 +264,7 @@ nanocoap_cache_entry_t *nanocoap_cache_add_by_key(const uint8_t *cache_key,
         }
         /* could remove an entry */
         ce = _nanocoap_cache_pop();
+        add_to_cache = true;
         if (!ce) {
             /* still no free space ? stop trying now */
             return NULL;
@@ -281,7 +277,6 @@ nanocoap_cache_entry_t *nanocoap_cache_add_by_key(const uint8_t *cache_key,
     ce->response_pkt.hdr = (coap_hdr_t *) ce->response_buf;
     ce->response_pkt.payload = ce->response_buf + (resp->payload - ((uint8_t *)resp->hdr));
     ce->response_len = resp_len;
-    ce->access_time = ztimer_now(ZTIMER_SEC);
     ce->request_method = request_method;
 
     /* default value is 60 seconds, if MAX_AGE not present */
@@ -289,7 +284,9 @@ nanocoap_cache_entry_t *nanocoap_cache_add_by_key(const uint8_t *cache_key,
     coap_opt_get_uint((coap_pkt_t *)resp, COAP_OPT_MAX_AGE, &max_age);
     ce->max_age = ztimer_now(ZTIMER_SEC) + max_age;
 
-    clist_rpush(&_cache_list_head, &ce->node);
+    if (add_to_cache) {
+        clist_rpush(&_cache_list_head, &ce->node);
+    }
 
     return ce;
 }
