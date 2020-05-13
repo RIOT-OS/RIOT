@@ -549,7 +549,7 @@ extern ztimer_clock_t *const ZTIMER_USEC_BASE;
 extern ztimer_clock_t *const ZTIMER_MSEC_BASE;
 
 #ifdef __cplusplus
-extern "C" {
+}
 #endif
 
 #endif /* ZTIMER_H */
