@@ -125,18 +125,17 @@ static int _netif_stats(netif_t *iface, unsigned module, bool reset)
         printf("Reset statistics for module %s!\n", _netstats_module_to_str(module));
     }
     else {
-        printf("          Statistics for %s\n"
-               "            RX packets %u  bytes %u\n"
-               "            TX packets %u (Multicast: %u)  bytes %u\n"
-               "            TX succeeded %u errors %u\n",
-               _netstats_module_to_str(module),
-               (unsigned) stats->rx_count,
-               (unsigned) stats->rx_bytes,
-               (unsigned) (stats->tx_unicast_count + stats->tx_mcast_count),
-               (unsigned) stats->tx_mcast_count,
-               (unsigned) stats->tx_bytes,
-               (unsigned) stats->tx_success,
-               (unsigned) stats->tx_failed);
+        printf("          Statistics for %s\n", _netstats_module_to_str(module));
+        printf("            RX packets %u  bytes %u\n",
+                            (unsigned) stats->rx_count,
+                            (unsigned) stats->rx_bytes);
+        printf("            TX packets %u (Multicast: %u)  bytes %u\n",
+                            (unsigned) (stats->tx_unicast_count + stats->tx_mcast_count),
+                            (unsigned) stats->tx_mcast_count,
+                            (unsigned) stats->tx_bytes);
+        printf("            TX succeeded %u errors %u\n",
+                            (unsigned) stats->tx_success,
+                            (unsigned) stats->tx_failed);
         res = 0;
     }
     return res;
