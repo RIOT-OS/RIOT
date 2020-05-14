@@ -378,16 +378,6 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %lx, opcodes: %p\n",
           (unsigned long)dev->params->spi, (unsigned long)dev->params->cs, (void *)dev->params->opcode);
 
-    DEBUG("mtd_spi_nor_init: %" PRIu32 " bytes "
-          "(%" PRIu32 " sectors, %" PRIu32 " bytes/sector, "
-          "%" PRIu32 " pages, "
-          "%" PRIu32 " pages/sector, %" PRIu32 " bytes/page)\n",
-          mtd->pages_per_sector * mtd->sector_count * mtd->page_size,
-          mtd->sector_count, mtd->pages_per_sector * mtd->page_size,
-          mtd->pages_per_sector * mtd->sector_count,
-          mtd->pages_per_sector, mtd->page_size);
-    DEBUG("mtd_spi_nor_init: Using %u byte addresses\n", dev->params->addr_width);
-
     if (dev->params->addr_width == 0) {
         return -EINVAL;
     }
@@ -417,6 +407,16 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
         mtd->sector_count = mtd_spi_nor_get_size(&dev->jedec_id)
                           / (mtd->pages_per_sector * mtd->page_size);
     }
+
+    DEBUG("mtd_spi_nor_init: %" PRIu32 " bytes "
+          "(%" PRIu32 " sectors, %" PRIu32 " bytes/sector, "
+          "%" PRIu32 " pages, "
+          "%" PRIu32 " pages/sector, %" PRIu32 " bytes/page)\n",
+          mtd->pages_per_sector * mtd->sector_count * mtd->page_size,
+          mtd->sector_count, mtd->pages_per_sector * mtd->page_size,
+          mtd->pages_per_sector * mtd->sector_count,
+          mtd->pages_per_sector, mtd->page_size);
+    DEBUG("mtd_spi_nor_init: Using %u byte addresses\n", dev->params->addr_width);
 
     uint8_t status;
     mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
