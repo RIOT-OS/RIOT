@@ -114,8 +114,8 @@ extern "C" {
  * acknowledgment (ACK) of transmitted segment. If the acknowledgment
  * isn't received within this time it is considered lost.
  */
-#ifndef GNRC_TCP_RTO_LOWER_BOUND
-#define GNRC_TCP_RTO_LOWER_BOUND (1U * US_PER_SEC)
+#ifndef CONFIG_GNRC_TCP_RTO_LOWER_BOUND
+#define CONFIG_GNRC_TCP_RTO_LOWER_BOUND (1U * US_PER_SEC)
 #endif
 
 /**
