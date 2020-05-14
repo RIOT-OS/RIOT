@@ -21,7 +21,7 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # This HACK can be removed either when Makefile.include is included after
 # Makefile.features (see #9913) or if 'nordic_softdevice_ble' is deprecated.
 -include $(APPDIR)/Makefile.board.dep
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+include $(BOARDDIR)/Makefile.dep
 
 PROGRAMMER ?= jlink
 ifeq (jlink,$(PROGRAMMER))
