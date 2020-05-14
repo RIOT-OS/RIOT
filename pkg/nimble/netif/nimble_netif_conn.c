@@ -188,6 +188,21 @@ void nimble_netif_conn_foreach(uint16_t filter,
     mutex_unlock(&_lock);
 }
 
+int nimble_netif_conn_get_next(int handle, uint16_t filter)
+{
+    /* if handle is undefined, start from the beginning */
+    if (handle < 0) {
+        handle = -1;
+    }
+    for (int i = (handle + 1); i < (int)CONN_CNT; i++) {
+        if (_conn[i].state & filter) {
+            return i;
+        }
+    }
+
+    return NIMBLE_NETIF_CONN_INVALID;
+}
+
 unsigned nimble_netif_conn_count(uint16_t filter)
 {
     unsigned cnt = 0;
