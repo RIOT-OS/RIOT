@@ -103,7 +103,7 @@ static int _restart_timewait_timer(gnrc_tcp_tcb_t *tcb)
     xtimer_remove(&tcb->tim_tout);
     tcb->msg_tout.type = MSG_TYPE_TIMEWAIT;
     tcb->msg_tout.content.ptr = (void *)tcb;
-    xtimer_set_msg(&tcb->tim_tout, 2 * GNRC_TCP_MSL, &tcb->msg_tout, gnrc_tcp_pid);
+    xtimer_set_msg(&tcb->tim_tout, 2 * CONFIG_GNRC_TCP_MSL, &tcb->msg_tout, gnrc_tcp_pid);
     return 0;
 }
 

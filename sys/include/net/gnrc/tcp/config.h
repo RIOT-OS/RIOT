@@ -61,8 +61,8 @@ extern "C" {
 /**
  * @brief Maximum segment lifetime (MSL). Default is 30 seconds.
  */
-#ifndef GNRC_TCP_MSL
-#define GNRC_TCP_MSL (30U * US_PER_SEC)
+#ifndef CONFIG_GNRC_TCP_MSL
+#define CONFIG_GNRC_TCP_MSL (30U * US_PER_SEC)
 #endif
 
 /**
