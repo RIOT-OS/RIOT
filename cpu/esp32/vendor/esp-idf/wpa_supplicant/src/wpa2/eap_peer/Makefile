@@ -17,4 +17,4 @@ include $(RIOTCPU)/$(CPU)/Makefile.include
 INCLUDES += -I$(RIOTBASE)/core/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/log
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
+INCLUDES += -I$(BOARDDIR)/include
