@@ -142,8 +142,8 @@ extern "C" {
 /**
  * @brief Beta value for RTO calculation, default is 1/4
  */
-#ifndef GNRC_TCP_RTO_B_DIV
-#define GNRC_TCP_RTO_B_DIV (4U)
+#ifndef CONFIG_GNRC_TCP_RTO_B_DIV
+#define CONFIG_GNRC_TCP_RTO_B_DIV (4U)
 #endif
 
 /**
