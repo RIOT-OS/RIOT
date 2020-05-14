@@ -454,10 +454,12 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
             }
             /* If this is a subsequent sample */
             else {
-                tcb->rtt_var = (tcb->rtt_var / GNRC_TCP_RTO_B_DIV) * (GNRC_TCP_RTO_B_DIV-1);
-                tcb->rtt_var += abs(tcb->srtt - rtt) / GNRC_TCP_RTO_B_DIV;
-                tcb->srtt = (tcb->srtt / GNRC_TCP_RTO_A_DIV) * (GNRC_TCP_RTO_A_DIV-1);
-                tcb->srtt += rtt / GNRC_TCP_RTO_A_DIV;
+                tcb->rtt_var = (tcb->rtt_var / GNRC_TCP_RTO_B_DIV) * \
+                    (GNRC_TCP_RTO_B_DIV-1);
+                tcb->rtt_var += abs(tcb->srtt - rtt) / \
+                    GNRC_TCP_RTO_B_DIV;
+                tcb->srtt = (tcb->srtt / CONFIG_GNRC_TCP_RTO_A_DIV) * (CONFIG_GNRC_TCP_RTO_A_DIV-1);
+                tcb->srtt += rtt / CONFIG_GNRC_TCP_RTO_A_DIV;
             }
         }
     }

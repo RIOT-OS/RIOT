@@ -135,8 +135,8 @@ extern "C" {
 /**
  * @brief Alpha value for RTO calculation, default is 1/8
  */
-#ifndef GNRC_TCP_RTO_A_DIV
-#define GNRC_TCP_RTO_A_DIV (8U)
+#ifndef CONFIG_GNRC_TCP_RTO_A_DIV
+#define CONFIG_GNRC_TCP_RTO_A_DIV (8U)
 #endif
 
 /**
