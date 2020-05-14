@@ -79,15 +79,15 @@ extern "C" {
 /**
  * @brief MSS Multiplicator = Number of MSS sized packets stored in receive buffer
  */
-#ifndef GNRC_TCP_MSS_MULTIPLICATOR
-#define GNRC_TCP_MSS_MULTIPLICATOR (1U)
+#ifndef CONFIG_GNRC_TCP_MSS_MULTIPLICATOR
+#define CONFIG_GNRC_TCP_MSS_MULTIPLICATOR (1U)
 #endif
 
 /**
  * @brief Default receive window size
  */
 #ifndef GNRC_TCP_DEFAULT_WINDOW
-#define GNRC_TCP_DEFAULT_WINDOW (GNRC_TCP_MSS * GNRC_TCP_MSS_MULTIPLICATOR)
+#define GNRC_TCP_DEFAULT_WINDOW (GNRC_TCP_MSS * CONFIG_GNRC_TCP_MSS_MULTIPLICATOR)
 #endif
 
 /**
