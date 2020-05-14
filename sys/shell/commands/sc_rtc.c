@@ -161,7 +161,7 @@ int _rtc_handler(int argc, char **argv)
     else if (strncmp(argv[1], "poweroff", 8) == 0) {
         rtc_poweroff();
     }
-    else if (strncmp(argv[1], "clearalarm", 8) == 0) {
+    else if (strncmp(argv[1], "clearalarm", 10) == 0) {
         rtc_clear_alarm();
     }
     else if (strncmp(argv[1], "getalarm", 8) == 0) {
