@@ -407,8 +407,8 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
     if (tcb->rto < (int32_t) CONFIG_GNRC_TCP_RTO_LOWER_BOUND) {
         tcb->rto = CONFIG_GNRC_TCP_RTO_LOWER_BOUND;
     }
-    else if (tcb->rto > (int32_t) GNRC_TCP_RTO_UPPER_BOUND) {
-        tcb->rto = GNRC_TCP_RTO_UPPER_BOUND;
+    else if (tcb->rto > (int32_t) CONFIG_GNRC_TCP_RTO_UPPER_BOUND) {
+        tcb->rto = CONFIG_GNRC_TCP_RTO_UPPER_BOUND;
     }
 
     /* Setup retransmission timer, msg to TCP thread with ptr to TCB */

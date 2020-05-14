@@ -121,8 +121,8 @@ extern "C" {
 /**
  * @brief Upper bound for RTO = 60 sec (see RFC 6298)
  */
-#ifndef GNRC_TCP_RTO_UPPER_BOUND
-#define GNRC_TCP_RTO_UPPER_BOUND (60U * US_PER_SEC)
+#ifndef CONFIG_GNRC_TCP_RTO_UPPER_BOUND
+#define CONFIG_GNRC_TCP_RTO_UPPER_BOUND (60U * US_PER_SEC)
 #endif
 
 /**
