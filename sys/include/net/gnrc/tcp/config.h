@@ -128,8 +128,8 @@ extern "C" {
 /**
  * @brief Assumes clock granularity for TCP of 10 ms (see RFC 6298)
  */
-#ifndef GNRC_TCP_RTO_GRANULARITY
-#define GNRC_TCP_RTO_GRANULARITY (10U * MS_PER_SEC)
+#ifndef CONFIG_GNRC_TCP_RTO_GRANULARITY
+#define CONFIG_GNRC_TCP_RTO_GRANULARITY (10U * MS_PER_SEC)
 #endif
 
 /**
