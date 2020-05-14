@@ -29,7 +29,8 @@
  *   2. Add the credential using @ref credman_add()
  * - Server operation
  *   1. Create UDP sock @ref sock_udp_create()
- *   2. Create DTLS sock @ref sock_dtls_create() using role @ref SOCK_DTLS_SERVER
+ *   2. Create DTLS sock @ref sock_dtls_create() using role
+ *      @ref SOCK_DTLS_SERVER
  *   3. Start listening with @ref sock_dtls_recv()
  * - Client operation
  *   1. Create UDP sock @ref sock_udp_create()
@@ -111,7 +112,7 @@
  *                     .y = server_ecdsa_pub_key_y,
  *                 },
  *                 .client_keys = other_pubkeys,
- *                 .client_keys_size = sizeof(other_pubkeys) / sizeof(other_pubkeys[0]),
+ *                 .client_keys_size = ARRAY_SIZE(other_pubkeys),
  *             },
  *         },
  *     };
@@ -300,7 +301,7 @@
  * #define SOCK_DTLS_CLIENT_TAG (20)
  *
  * #ifndef SERVER_ADDR
- * #define SERVER_ADDR "fe80::aa:bb:cc:dd" // replace this with the server address
+ * #define SERVER_ADDR "fe80::aa:bb:cc:dd" // replace with the server address
  * #endif
  *
  * int main(void)
@@ -339,7 +340,8 @@
  *         return -1;
  *     }
  *
- *     if (sock_dtls_session_create(&dtls_sock, &remote, &session, SOCK_NO_TIMEOUT) < 0) {
+ *     if (sock_dtls_session_create(&dtls_sock, &remote, &session,
+ *                                  SOCK_NO_TIMEOUT) < 0) {
  *         puts("Error creating session");
  *         sock_dtls_close(&dtls_sock);
  *         sock_udp_close(&udp_sock);
@@ -350,7 +352,8 @@
  *     int res = sock_dtls_send(&dtls_sock, &session, data, sizeof(data), 0);
  *     if (res >= 0) {
  *         printf("Sent %d bytes\n", res);
- *         res = sock_dtls_recv(&dtls_sock, &session, rcv, sizeof(rcv), SOCK_NO_TIMEOUT);
+ *         res = sock_dtls_recv(&dtls_sock, &session, rcv, sizeof(rcv),
+ *                              SOCK_NO_TIMEOUT);
  *         if (res > 0) {
  *             printf("Received %d bytes\n", res);
  *         }
@@ -425,7 +428,8 @@
  *     return -1;
  * }
  *
- * if (sock_dtls_session_create(&dtls_sock, &remote, &session, SOCK_NO_TIMEOUT) < 0) {
+ * if (sock_dtls_session_create(&dtls_sock, &remote, &session,
+ *                              SOCK_NO_TIMEOUT) < 0) {
  *     puts("Error creating session");
  *     sock_dtls_close(&dtls_sock);
  *     sock_udp_close(&udp_sock);
@@ -436,7 +440,8 @@
  * int res = sock_dtls_send(&dtls_sock, &session, data, sizeof(data), 0);
  * if (res >= 0) {
  *     printf("Sent %d bytes: %*.s\n", res, res, data);
- *     res = sock_dtls_recv(&dtls_sock, &session, rcv, sizeof(rcv), SOCK_NO_TIMEOUT);
+ *     res = sock_dtls_recv(&dtls_sock, &session, rcv, sizeof(rcv),
+ *                          SOCK_NO_TIMEOUT);
  *     if (res > 0) {
  *         printf("Received %d bytes: %*.s\n", res, res, rcv);
  *     }
@@ -563,7 +568,6 @@ void sock_dtls_init(void);
  */
 int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
                      credman_tag_t tag, unsigned version, unsigned role);
-
 
 /**
  * @brief Initialize session handshake.
@@ -741,8 +745,10 @@ void sock_dtls_close(sock_dtls_t *sock);
  * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
  *          initialized (or closed while sock_udp_recv() blocks).
  */
-static inline int sock_dtls_session_create(sock_dtls_t *sock, const sock_udp_ep_t *ep,
-                                    sock_dtls_session_t *remote, unsigned timeout)
+static inline int sock_dtls_session_create(sock_dtls_t *sock,
+                                           const sock_udp_ep_t *ep,
+                                           sock_dtls_session_t *remote,
+                                           unsigned timeout)
 {
     int res;
     uint8_t buf[DTLS_HANDSHAKE_BUFSIZE];

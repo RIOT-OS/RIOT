@@ -357,7 +357,8 @@ ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
         }
     }
 
-    return dtls_write(sock->dtls_ctx, &remote->dtls_session, (uint8_t *)data, len);
+    return dtls_write(sock->dtls_ctx, &remote->dtls_session,
+                      (uint8_t *)data, len);
 }
 
 static ssize_t _copy_buffer(sock_dtls_t *sock, void *data, size_t max_len)
