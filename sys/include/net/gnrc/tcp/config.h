@@ -149,8 +149,8 @@ extern "C" {
 /**
  * @brief K value for RTO calculation, default is 4
  */
-#ifndef GNRC_TCP_RTO_K
-#define GNRC_TCP_RTO_K (4U)
+#ifndef CONFIG_GNRC_TCP_RTO_K
+#define CONFIG_GNRC_TCP_RTO_K (4U)
 #endif
 
 /**
