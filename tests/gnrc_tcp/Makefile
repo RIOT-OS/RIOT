@@ -14,7 +14,7 @@ TEST_ON_CI_BLACKLIST += all
 
 CFLAGS += -DSHELL_NO_ECHO
 CFLAGS += -DGNRC_TCP_MSL=$(MSL_US)
-CFLAGS += -DGNRC_TCP_CONNECTION_TIMEOUT_DURATION=$(TIMEOUT_US)
+CFLAGS += -DCONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION=$(TIMEOUT_US)
 CFLAGS += -DGNRC_NETIF_SINGLE           # Only one interface used and it makes
                                         # shell commands easier
 
