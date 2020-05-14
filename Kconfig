@@ -10,7 +10,7 @@ mainmenu "RIOT Configuration"
 osource "$(KCONFIG_GENERATED_DEPENDENCIES)"
 
 # Load first board configurations, which might override CPU's
-orsource "$(RIOTBOARD)/$(BOARD)/Kconfig"
+orsource "$(BOARDDIR)/Kconfig"
 orsource "$(RIOTCPU)/$(CPU)/Kconfig"
 
 rsource "$(RIOTBOARD)/Kconfig"
