@@ -164,12 +164,12 @@ void dhcpv6_client_conf_prefix(unsigned iface, const ipv6_addr_t *pfx,
         if (IS_USED(MODULE_GNRC_RPL)) {
             gnrc_rpl_init(netif->pid);
             gnrc_rpl_instance_t *inst = gnrc_rpl_instance_get(
-                    GNRC_RPL_DEFAULT_INSTANCE
+                    CONFIG_GNRC_RPL_DEFAULT_INSTANCE
                 );
             if (inst) {
                 gnrc_rpl_instance_remove(inst);
             }
-            gnrc_rpl_root_init(GNRC_RPL_DEFAULT_INSTANCE, &addr, false, false);
+            gnrc_rpl_root_init(CONFIG_GNRC_RPL_DEFAULT_INSTANCE, &addr, false, false);
         }
     }
 }

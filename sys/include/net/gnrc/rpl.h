@@ -37,9 +37,9 @@
  *
  * If the application defines several interfaces (@ref gnrc_netif_highlander()
  * returns false), then RPL will be initialized on the interface
- * `GNRC_RPL_DEFAULT_NETIF`.
- * Your application is responsible for setting `GNRC_RPL_DEFAULT_NETIF` to a
- * valid interface PID, e.g. via `CFLAGS`.
+ * `CONFIG_GNRC_RPL_DEFAULT_NETIF`.
+ * Your application is responsible for setting `CONFIG_GNRC_RPL_DEFAULT_NETIF`
+ * to a valid interface PID, e.g. via `CFLAGS` or menuconfig.
  *
  * Initializing RPL on multiple interfaces automatically is currently not supported.
  * Call `gnrc_rpl_init()` manually from your application for the desired interfaces in this case.
@@ -49,14 +49,14 @@
  *
  * - Exclude Prefix Information Options from DIOs
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   CFLAGS += -DGNRC_RPL_WITHOUT_PIO
+ *   CFLAGS += -DCONFIG_GNRC_RPL_WITHOUT_PIO
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - Modify trickle parameters
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS=20
- *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_INTERVAL_MIN=3
- *   CFLAGS += -DGNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT=10
+ *   CFLAGS += -DCONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS=20
+ *   CFLAGS += -DCONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN=3
+ *   CFLAGS += -DCONFIG_GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT=10
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - Make reception of DODAG_CONF optional when joining a DODAG.
@@ -66,20 +66,20 @@
  *   The standard behaviour is to request a DODAG_CONF and join
  *   only a DODAG once a DODAG_CONF is received.
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
+ *   CFLAGS += -DCONFIG_GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - Set interface for auto-initialization if more than one
  *   interface exists (@ref gnrc_netif_highlander() returns false)
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   CFLAGS += -DGNRC_RPL_DEFAULT_NETIF=6
+ *   CFLAGS += -DCONFIG_GNRC_RPL_DEFAULT_NETIF=6
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * - By default, all incoming control messages get checked for validation.
  *   This validation can be disabled in case the involved RPL implementations
  *   are known to produce valid messages.
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
- *   CFLAGS += -DGNRC_RPL_WITHOUT_VALIDATION
+ *   CFLAGS += -DCONFIG_GNRC_RPL_WITHOUT_VALIDATION
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @{
@@ -101,6 +101,7 @@
 
 #include <string.h>
 #include <stdint.h>
+#include "kernel_defines.h"
 #include "net/gnrc.h"
 #include "net/gnrc/ipv6.h"
 #include "net/ipv6/addr.h"
@@ -137,8 +138,8 @@ extern "C" {
 /**
  * @brief   Default message queue size to use for the RPL thread.
  */
-#ifndef GNRC_RPL_MSG_QUEUE_SIZE
-#define GNRC_RPL_MSG_QUEUE_SIZE (8U)
+#ifndef CONFIG_GNRC_RPL_MSG_QUEUE_SIZE
+#define CONFIG_GNRC_RPL_MSG_QUEUE_SIZE (8U)
 #endif
 
 /**
@@ -180,15 +181,15 @@ extern "C" {
  *          RFC 6550, section 17
  *      </a>
  */
-#ifndef GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE
-#define GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE (256)
+#ifndef CONFIG_GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE
+#define CONFIG_GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE (256)
 #endif
 
 /**
  * @brief   Maximum rank increase
  */
-#ifndef GNRC_RPL_DEFAULT_MAX_RANK_INCREASE
-#define GNRC_RPL_DEFAULT_MAX_RANK_INCREASE (0)
+#ifndef CONFIG_GNRC_RPL_DEFAULT_MAX_RANK_INCREASE
+#define CONFIG_GNRC_RPL_DEFAULT_MAX_RANK_INCREASE (0)
 #endif
 
 /**
@@ -204,8 +205,8 @@ extern "C" {
 /**
  * @brief   Default Instance ID
  */
-#ifndef GNRC_RPL_DEFAULT_INSTANCE
-#define GNRC_RPL_DEFAULT_INSTANCE (0)
+#ifndef CONFIG_GNRC_RPL_DEFAULT_INSTANCE
+#define CONFIG_GNRC_RPL_DEFAULT_INSTANCE (0)
 #endif
 
 /**
@@ -216,6 +217,17 @@ extern "C" {
 #define GNRC_RPL_MOP_NON_STORING_MODE    (0x01)
 #define GNRC_RPL_MOP_STORING_MODE_NO_MC  (0x02)
 #define GNRC_RPL_MOP_STORING_MODE_MC     (0x03)
+
+/* translate Kconfig options to final value */
+#if IS_ACTIVE(CONFIG_GNRC_RPL_MOP_NO_DOWNWARD_ROUTES)
+#define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_NO_DOWNWARD_ROUTES
+#elif IS_ACTIVE(CONFIG_GNRC_RPL_MOP_NON_STORING_MODE)
+#define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_NON_STORING_MODE
+#elif IS_ACTIVE(CONFIG_GNRC_RPL_MOP_STORING_MODE_NO_MC)
+#define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_STORING_MODE_NO_MC
+#elif IS_ACTIVE(CONFIG_GNRC_RPL_MOP_STORING_MODE_MC)
+#define GNRC_RPL_DEFAULT_MOP GNRC_RPL_MOP_STORING_MODE_MC
+#endif
 
 /** default MOP set on compile time */
 #ifndef GNRC_RPL_DEFAULT_MOP
@@ -268,16 +280,16 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
  *      </a>
  * @{
  */
-#ifndef GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS
-#define GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS (20)
+#ifndef CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS
+#define CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS (20)
 #endif
 
-#ifndef GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN
-#define GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN (3)
+#ifndef CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN
+#define CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN (3)
 #endif
 
-#ifndef GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT
-#define GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT (10)
+#ifndef CONFIG_GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT
+#define CONFIG_GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT (10)
 #endif
 /** @} */
 
@@ -289,11 +301,11 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
         </a>
  * @{
  */
-#ifndef GNRC_RPL_DEFAULT_LIFETIME
-#define GNRC_RPL_DEFAULT_LIFETIME (5)
+#ifndef CONFIG_GNRC_RPL_DEFAULT_LIFETIME
+#define CONFIG_GNRC_RPL_DEFAULT_LIFETIME (5)
 #endif
-#ifndef GNRC_RPL_LIFETIME_UNIT
-#define GNRC_RPL_LIFETIME_UNIT (60)
+#ifndef CONFIG_GNRC_RPL_LIFETIME_UNIT
+#define CONFIG_GNRC_RPL_LIFETIME_UNIT (60)
 #endif
 /** @} */
 
@@ -326,37 +338,37 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
         </a>
  * @{
  */
-#ifndef GNRC_RPL_DAO_SEND_RETRIES
-#define GNRC_RPL_DAO_SEND_RETRIES   (4)
+#ifndef CONFIG_GNRC_RPL_DAO_SEND_RETRIES
+#define CONFIG_GNRC_RPL_DAO_SEND_RETRIES   (4)
 #endif
-#ifndef GNRC_RPL_DAO_ACK_DELAY
-#define GNRC_RPL_DAO_ACK_DELAY      (3000UL)
+#ifndef CONFIG_GNRC_RPL_DAO_ACK_DELAY
+#define CONFIG_GNRC_RPL_DAO_ACK_DELAY      (3000UL)
 #endif
-#ifndef GNRC_RPL_DAO_DELAY_LONG
+#ifndef CONFIG_GNRC_RPL_DAO_DELAY_LONG
 /**
  * @brief Long delay for DAOs in milli seconds
  */
-#define GNRC_RPL_DAO_DELAY_LONG     (60000UL)
+#define CONFIG_GNRC_RPL_DAO_DELAY_LONG     (60000UL)
 #endif
-#ifndef GNRC_RPL_DAO_DELAY_DEFAULT
+#ifndef CONFIG_GNRC_RPL_DAO_DELAY_DEFAULT
 /**
  * @brief Default delay for DAOs in milli seconds
  */
-#define GNRC_RPL_DAO_DELAY_DEFAULT  (1000UL)
+#define CONFIG_GNRC_RPL_DAO_DELAY_DEFAULT  (1000UL)
 #endif
-#ifndef GNRC_RPL_DAO_DELAY_JITTER
+#ifndef CONFIG_GNRC_RPL_DAO_DELAY_JITTER
 /**
  * @brief Jitter for DAOs in milli seconds
  */
-#define GNRC_RPL_DAO_DELAY_JITTER   (1000UL)
+#define CONFIG_GNRC_RPL_DAO_DELAY_JITTER   (1000UL)
 #endif
 /** @} */
 
 /**
  * @brief Cleanup interval in milliseconds.
  */
-#ifndef GNRC_RPL_CLEANUP_TIME
-#define GNRC_RPL_CLEANUP_TIME (5 * MS_PER_SEC)
+#ifndef CONFIG_GNRC_RPL_CLEANUP_TIME
+#define CONFIG_GNRC_RPL_CLEANUP_TIME (5 * MS_PER_SEC)
 #endif
 
 /**
@@ -391,7 +403,7 @@ static inline bool GNRC_RPL_COUNTER_GREATER_THAN(uint8_t A, uint8_t B)
 /**
  * @brief Rank of the root node
  */
-#define GNRC_RPL_ROOT_RANK (GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE)
+#define GNRC_RPL_ROOT_RANK (CONFIG_GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE)
 
 /**
  *  @brief  DIS ICMPv6 code
@@ -484,15 +496,15 @@ extern netstats_rpl_t gnrc_rpl_netstats;
 /**
  * @brief Number of DIS retries before parent times out
  */
-#ifndef GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES
-#define GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES (3)
+#ifndef CONFIG_GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES
+#define CONFIG_GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES (3)
 #endif
 
 /**
  * @brief Default network interface for GNRC RPL
  */
-#ifndef GNRC_RPL_DEFAULT_NETIF
-#define GNRC_RPL_DEFAULT_NETIF (KERNEL_PID_UNDEF)
+#ifndef CONFIG_GNRC_RPL_DEFAULT_NETIF
+#define CONFIG_GNRC_RPL_DEFAULT_NETIF (KERNEL_PID_UNDEF)
 #endif
 
 /**
@@ -655,20 +667,21 @@ void gnrc_rpl_send(gnrc_pktsnip_t *pkt, kernel_pid_t iface, ipv6_addr_t *src, ip
  */
 uint8_t gnrc_rpl_gen_instance_id(bool local);
 
-#ifndef GNRC_RPL_WITHOUT_PIO
 /**
  * @brief (De-)Activate the transmission of Prefix Information Options within DIOs
- *        for a particular DODAG
+ *        for a particular DODAG. This function has no effect if
+ *        CONFIG_GNRC_RPL_WITHOUT_PIO is set.
  *
  * @param[in] dodag             Pointer to the DODAG
  * @param[in] status            true for activating PIOs and false for deactivating them
  */
 static inline void gnrc_rpl_config_pio(gnrc_rpl_dodag_t *dodag, bool status)
 {
-    dodag->dio_opts = (dodag->dio_opts & ~GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) |
-                      (status << GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT);
+    if (!IS_ACTIVE(CONFIG_GNRC_RPL_WITHOUT_PIO)) {
+        dodag->dio_opts = (dodag->dio_opts & ~GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) |
+                          (status << GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO_SHIFT);
+    }
 }
-#endif
 
 #ifdef __cplusplus
 }

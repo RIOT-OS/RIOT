@@ -72,7 +72,8 @@ extern evtimer_msg_t gnrc_rpl_evtimer;
 /**
  * @brief Parent has timed out.
  */
-#define GNRC_RPL_PARENT_TIMEOUT     (GNRC_RPL_PARENT_STALE + GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES)
+#define GNRC_RPL_PARENT_TIMEOUT     (GNRC_RPL_PARENT_STALE + \
+                                     CONFIG_GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES)
 /** @} */
 
 #ifdef __cplusplus

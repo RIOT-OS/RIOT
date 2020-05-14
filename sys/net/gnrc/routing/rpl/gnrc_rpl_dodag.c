@@ -87,8 +87,8 @@ bool gnrc_rpl_instance_add(uint8_t instance_id, gnrc_rpl_instance_t **inst)
     if (*inst != NULL) {
         (*inst)->id = instance_id;
         (*inst)->state = 1;
-        (*inst)->max_rank_inc = GNRC_RPL_DEFAULT_MAX_RANK_INCREASE;
-        (*inst)->min_hop_rank_inc = GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
+        (*inst)->max_rank_inc = CONFIG_GNRC_RPL_DEFAULT_MAX_RANK_INCREASE;
+        (*inst)->min_hop_rank_inc = CONFIG_GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
         (*inst)->dodag.parents = NULL;
         (*inst)->cleanup_event.msg.content.ptr = (*inst);
         return true;
@@ -145,11 +145,11 @@ bool gnrc_rpl_dodag_init(gnrc_rpl_instance_t *instance, ipv6_addr_t *dodag_id, k
     dodag->my_rank = GNRC_RPL_INFINITE_RANK;
     dodag->trickle.callback.func = &_rpl_trickle_send_dio;
     dodag->trickle.callback.args = instance;
-    dodag->dio_interval_doubl = GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS;
-    dodag->dio_min = GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN;
-    dodag->dio_redun = GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT;
-    dodag->default_lifetime = GNRC_RPL_DEFAULT_LIFETIME;
-    dodag->lifetime_unit = GNRC_RPL_LIFETIME_UNIT;
+    dodag->dio_interval_doubl = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS;
+    dodag->dio_min = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN;
+    dodag->dio_redun = CONFIG_GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT;
+    dodag->default_lifetime = CONFIG_GNRC_RPL_DEFAULT_LIFETIME;
+    dodag->lifetime_unit = CONFIG_GNRC_RPL_LIFETIME_UNIT;
     dodag->node_status = GNRC_RPL_NORMAL_NODE;
     dodag->dao_seq = GNRC_RPL_COUNTER_INIT;
     dodag->dtsn = 0;
@@ -249,7 +249,7 @@ bool gnrc_rpl_parent_remove(gnrc_rpl_parent_t *parent)
 void gnrc_rpl_cleanup_start(gnrc_rpl_dodag_t *dodag)
 {
     evtimer_del((evtimer_t *)(&gnrc_rpl_evtimer), (evtimer_event_t *)&dodag->instance->cleanup_event);
-    ((evtimer_event_t *)&(dodag->instance->cleanup_event))->offset = GNRC_RPL_CLEANUP_TIME;
+    ((evtimer_event_t *)&(dodag->instance->cleanup_event))->offset = CONFIG_GNRC_RPL_CLEANUP_TIME;
     dodag->instance->cleanup_event.msg.type = GNRC_RPL_MSG_TYPE_INSTANCE_CLEANUP;
     evtimer_add_msg(&gnrc_rpl_evtimer, &dodag->instance->cleanup_event, gnrc_rpl_pid);
 }
@@ -388,8 +388,8 @@ gnrc_rpl_instance_t *gnrc_rpl_root_instance_init(uint8_t instance_id, ipv6_addr_
     if (gnrc_rpl_instance_add(instance_id, &inst)) {
         inst->of = (gnrc_rpl_of_t *) gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
         inst->mop = mop;
-        inst->min_hop_rank_inc = GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
-        inst->max_rank_inc = GNRC_RPL_DEFAULT_MAX_RANK_INCREASE;
+        inst->min_hop_rank_inc = CONFIG_GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE;
+        inst->max_rank_inc = CONFIG_GNRC_RPL_DEFAULT_MAX_RANK_INCREASE;
     }
     else if (inst == NULL) {
         DEBUG("RPL: could not allocate memory for a new instance with id %d\n", instance_id);
