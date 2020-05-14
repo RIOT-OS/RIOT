@@ -96,8 +96,8 @@ extern "C" {
  * This value determines how many parallel TCP connections can be active at the
  * same time.
  */
-#ifndef GNRC_TCP_RCV_BUFFERS
-#define GNRC_TCP_RCV_BUFFERS (1U)
+#ifndef CONFIG_GNRC_TCP_RCV_BUFFERS
+#define CONFIG_GNRC_TCP_RCV_BUFFERS (1U)
 #endif
 
 /**

@@ -150,7 +150,7 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
  *                    or the address in @p local is invalid.
  * @return   -EISCONN if TCB is already in use.
  * @return   -ENOMEM if the receive buffer for the TCB could not be allocated.
- *            Hint: Increase "GNRC_TCP_RCV_BUFFERS".
+ *            Hint: Increase "CONFIG_GNRC_TCP_RCV_BUFFERS".
  */
 int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *local);
 
