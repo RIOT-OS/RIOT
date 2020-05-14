@@ -11,7 +11,7 @@ CFLAGS += -D__ets__
 
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
-INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
+INCLUDES += -I$(BOARDDIR)/include
 INCLUDES += -I$(RIOTBASE)/core/include
 INCLUDES += -I$(RIOTBASE)/drivers/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include

@@ -17,5 +17,5 @@ INCLUDES += -I$(RIOTBASE)/core/include
 INCLUDES += -I$(RIOTBASE)/sys/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/log/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-INCLUDES += -I$(RIOTBOARD)/$(BOARD)/include
+INCLUDES += -I$(BOARDDIR)/include
 
