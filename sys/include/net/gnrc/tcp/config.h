@@ -156,8 +156,8 @@ extern "C" {
 /**
  * @brief Lower bound for the duration between probes
  */
-#ifndef GNRC_TCP_PROBE_LOWER_BOUND
-#define GNRC_TCP_PROBE_LOWER_BOUND (1U * US_PER_SEC)
+#ifndef CONFIG_GNRC_TCP_PROBE_LOWER_BOUND
+#define CONFIG_GNRC_TCP_PROBE_LOWER_BOUND (1U * US_PER_SEC)
 #endif
 
 /**
