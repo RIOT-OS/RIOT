@@ -33,8 +33,10 @@
  *   3. Start listening with @ref sock_dtls_recv()
  * - Client operation
  *   1. Create UDP sock @ref sock_udp_create()
- *   2. Create DTLS sock @ref sock_dtls_create() using role @ref SOCK_DTLS_CLIENT
- *   3. Create session to server @ref sock_dtls_session_create()
+ *   2. Create DTLS sock @ref sock_dtls_create() using role
+ *      @ref SOCK_DTLS_CLIENT
+ *   3. Start handshake session to server @ref sock_dtls_session_init()
+ *   4. Handle incoming handshake packets with @ref sock_dtls_recv()
  *   4. Send packet to server @ref sock_dtls_send()
  *
  * ## Makefile Includes
@@ -312,7 +314,7 @@
  *     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
  *     local.port = 12345;
  *
- *     sock_udp_ep_t remote;
+ *     sock_udp_ep_t remote = SOCK_IPV6_EP_ANY;
  *     remote.port = DTLS_DEFAULT_PORT;
  *     remote.netif = gnrc_netif_iter(NULL)->pid;   // only if gnrc_netif_highlander() returns true
  *
@@ -337,7 +339,7 @@
  *         return -1;
  *     }
  *
- *     if (sock_dtls_session_create(&dtls_sock, &remote, &session) < 0) {
+ *     if (sock_dtls_session_create(&dtls_sock, &remote, &session, SOCK_NO_TIMEOUT) < 0) {
  *         puts("Error creating session");
  *         sock_dtls_close(&dtls_sock);
  *         sock_udp_close(&udp_sock);
@@ -378,7 +380,7 @@
  * listening port, which is DTLS_DEFAULT_PORT (20220).
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
- * sock_udp_ep_t remote;
+ * sock_udp_ep_t remote = SOCK_IPV6_EP_ANY;
  * remote.port = DTLS_DEFAULT_PORT;
  * remote.netif = gnrc_netif_iter(NULL)->pid;   // only if gnrc_netif_highlander() returns true
  *
@@ -390,10 +392,18 @@
  *
  * After the UDP sock is created, we can proceed with creating the DTLS sock.
  * Before sending the packet, we must first create a session with the remote
- * endpoint using @ref sock_dtls_session_create(). If the handshake is
- * successful and the session is created, we send packets to it using
- * @ref sock_dtls_send(). If the packet is successfully sent, we listen for
- * the response with @ref sock_dtls_recv().
+ * endpoint using @ref sock_dtls_session_create(). We can set the timeout to `0`
+ * if we want the function returns immediately after starting the handshake.
+ * In that case, we will need to call @ref sock_dtls_recv() to receive and
+ * process all the handshake packets. If the handshake is successful and the
+ * session is created, we send packets to it using @ref sock_dtls_send().
+ * As we already know the session exists, we can set the timeout to `0` and
+ * listen to the reply with @ref sock_dtls_recv().
+ *
+ * Alternatively, set the timeout to of @ref sock_dtls_send() to the duration we
+ * want to wait for the handshake process. We can also set the timeout to
+ * @ref SOCK_NO_TIMEOUT to block indefinitely until handshake is complete.
+ * After handshake completes, the packet will be sent.
  *
  * @ref sock_dtls_create() and @ref sock_dtls_close() only manages the DTLS
  * layer. That means we still have to clean up the created UDP sock from before
@@ -415,7 +425,7 @@
  *     return -1;
  * }
  *
- * if (sock_dtls_session_create(&dtls_sock, &remote, &session) < 0) {
+ * if (sock_dtls_session_create(&dtls_sock, &remote, &session, SOCK_NO_TIMEOUT) < 0) {
  *     puts("Error creating session");
  *     sock_dtls_close(&dtls_sock);
  *     sock_udp_close(&udp_sock);
@@ -475,6 +485,14 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifndef DTLS_HANDSHAKE_BUFSIZE
+#define DTLS_HANDSHAKE_BUFSIZE  (256)   /**< Size buffer used in handshake to
+                                             hold credentials */
+#endif
+
+#define SOCK_DTLS_HANDSHAKE     (EXDEV) /**< Return value for a successful
+                                             handshake */
 
 /**
  * @brief DTLS version number
@@ -546,26 +564,26 @@ void sock_dtls_init(void);
 int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
                      credman_tag_t tag, unsigned version, unsigned role);
 
+
 /**
- * @brief Creates a new DTLS session
+ * @brief Initialize session handshake.
  *
- * Initializes handshake process with a DTLS server  at @p ep.
+ * Sends a ClientHello message to initialize the handshake. Call
+ * @ref sock_dtls_recv() to finish the handshake.
  *
- * @param[in]  sock     DLTS sock to use
- * @param[in]  ep       Remote endpoint of the session
- * @param[out] remote   The created session, cannot be NULL
+ * @param[in] sock      DTLS sock to use
+ * @param[in] ep        Remote endpoint to start a handshake with
+ * @param[out] remote   Resulting session
  *
- * @return  0 on success
- * @return  -EAGAIN, if DTLS_HANDSHAKE_TIMEOUT is `0` and no data is available.
- * @return  -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.
- * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
- *          initialized (or closed while sock_udp_recv() blocks).
- * @return  -ENOBUFS, if buffer space is not large enough to store received
- *          credentials.
- * @return  -ETIMEDOUT, if timed out when trying to create session.
+ * @return 1, if new handshake is started
+ * @return 0, if there is an existing session
+ * @return -ENOMEM, not enough memory to allocate for new peer
+ * @return -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.
+ * @return -EINVAL, if @p remote is invalid or @p sock is not properly
+ *         initialized (or closed while sock_udp_recv() blocks).
  */
-int sock_dtls_session_create(sock_dtls_t *sock, const sock_udp_ep_t *ep,
-                             sock_dtls_session_t *remote);
+int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
+                           sock_dtls_session_t *remote);
 
 /**
  * @brief Destroys an existing DTLS session
@@ -578,7 +596,7 @@ int sock_dtls_session_create(sock_dtls_t *sock, const sock_udp_ep_t *ep,
 void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote);
 
 /**
- * @brief Decrypts and reads a message from a remote peer.
+ * @brief Receive handshake messages and application data from remote peer.
  *
  * @param[in] sock      DTLS sock to use.
  * @param[out] remote   Remote DTLS session of the received data.
@@ -593,7 +611,8 @@ void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote);
  *
  * @note Function may block if data is not available and @p timeout != 0
  *
- * @return The number of bytes received on success
+ * @return  The number of bytes received on success
+ * @return  -SOCK_DTLS_HANDSHAKE when new handshake is completed
  * @return  -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.
  * @return  -EAGAIN, if @p timeout is `0` and no data is available.
  * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
@@ -697,6 +716,47 @@ ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
  * @param sock          DTLS sock to close
  */
 void sock_dtls_close(sock_dtls_t *sock);
+
+/**
+ * @brief Creates a new DTLS session
+ *
+ *  Initiates a handshake with a DTLS server at @p ep and wait until it
+ * completes or timed out.
+ *
+ * @deprecated Will not be available after the 2020.10 release.
+ *             Please use @ref sock_dtls_session_init() and
+ *             @ref sock_dtls_recv() instead.
+ *
+ * @param[in]  sock     DLTS sock to use
+ * @param[in]  ep       Remote endpoint of the session
+ * @param[out] remote   The created session, cannot be NULL
+ * @param[in]  timeout  Timeout to wait for handshake to finish.
+ *                      Returns immediately if 0.
+ *                      May be SOCK_NO_TIMEOUT to wait indefinitely until
+ *                      handshake complete.
+ *
+ * @return  0 on success
+ * @return  -ENOMEM, if no memory to allocate for new peer
+ * @return  -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.
+ * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
+ *          initialized (or closed while sock_udp_recv() blocks).
+ */
+static inline int sock_dtls_session_create(sock_dtls_t *sock, const sock_udp_ep_t *ep,
+                                    sock_dtls_session_t *remote, unsigned timeout)
+{
+    int res;
+    uint8_t buf[DTLS_HANDSHAKE_BUFSIZE];
+
+    assert(sock);
+    assert(remote);
+
+    res = sock_dtls_session_init(sock, ep, remote);
+    if (res <= 0) {
+        return res;
+    }
+
+    return sock_dtls_recv(sock, remote, buf, sizeof(buf), timeout);
+}
 
 #include "sock_dtls_types.h"
 
