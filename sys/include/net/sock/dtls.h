@@ -345,7 +345,7 @@
  *     }
  *
  *     const char data[] = "HELLO";
- *     int res = sock_dtls_send(&dtls_sock, &session, data, sizeof(data));
+ *     int res = sock_dtls_send(&dtls_sock, &session, data, sizeof(data), 0);
  *     if (res >= 0) {
  *         printf("Sent %d bytes\n", res);
  *         res = sock_dtls_recv(&dtls_sock, &session, rcv, sizeof(rcv), SOCK_NO_TIMEOUT);
@@ -423,7 +423,7 @@
  * }
  *
  * const char data[] = "HELLO";
- * int res = sock_dtls_send(&dtls_sock, &session, data, sizeof(data));
+ * int res = sock_dtls_send(&dtls_sock, &session, data, sizeof(data), 0);
  * if (res >= 0) {
  *     printf("Sent %d bytes: %*.s\n", res, res, data);
  *     res = sock_dtls_recv(&dtls_sock, &session, rcv, sizeof(rcv), SOCK_NO_TIMEOUT);
@@ -657,28 +657,32 @@ ssize_t sock_dtls_recv_buf(sock_dtls_t *sock, sock_dtls_session_t *remote,
  *                      if no session exist between client and server.
  * @param[in] data      Pointer where the data to be send are stored
  * @param[in] len       Length of @p data to be send
+ * @param[in] timeout   Handshake timeout in microseconds.
+ *                      If `timeout > 0`, will start a new handshake if no
+ *                      session exists yet. The function will block until
+ *                      handshake completed or timed out.
+ *                      May be SOCK_NO_TIMEOUT to block indefinitely until
+ *                      handshake complete.
  *
- * @note Function may block until a session is created if there is no
- *       existing session with @p remote.
- *
- * @note Initiating a session through this function will require
- * @ref sock_dtls_recv() called from another thread to receive the handshake
- * messages.
+ * @note    When blocking, we will need an extra thread to call
+ *          @ref sock_dtls_recv() function to handle the incoming handshake
+ *          messages.
  *
  * @return The number of bytes sent on success
+ * @return  -ENOTCONN, if `timeout == 0` and no existing session exists with
+ *          @p remote
  * @return  -EADDRINUSE, if sock_dtls_t::udp_sock has no local end-point.
  * @return  -EAFNOSUPPORT, if `remote->ep != NULL` and
  *          sock_dtls_session_t::ep::family of @p remote is != AF_UNSPEC and
  *          not supported.
- * @return  -EHOSTUNREACH, if sock_dtls_session_t::ep of @p remote is not
- *          reachable.
  * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote->ep is an
  *          invalid address.
  * @return  -EINVAL, if sock_udp_ep_t::port of @p remote->ep is 0.
  * @return  -ENOMEM, if no memory was available to send @p data.
+ * @return  -ETIMEDOUT, `0 < timeout < SOCK_NO_TIMEOUT` and timed out.
  */
 ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
-                       const void *data, size_t len);
+                       const void *data, size_t len, uint32_t timeout);
 
 /**
  * @brief Closes a DTLS sock

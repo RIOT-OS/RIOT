@@ -74,7 +74,7 @@ static int client_send(char *addr_str, char *data, size_t datalen)
     sock_udp_t udp_sock;
     sock_dtls_t dtls_sock;
     sock_dtls_session_t session;
-    sock_udp_ep_t remote;
+    sock_udp_ep_t remote = SOCK_IPV6_EP_ANY;
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
     local.port = 12345;
     remote.port = DTLS_DEFAULT_PORT;
