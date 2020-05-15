@@ -61,6 +61,9 @@ static void _netapi_cb(uint16_t cmd, gnrc_pktsnip_t *pkt, void *ctx)
         if (mbox_try_put(&reg->mbox, &msg) < 1) {
             LOG_WARNING("gnrc_sock: dropped message to %p (was full)\n",
                         (void *)&reg->mbox);
+            /* packet could not be delivered so it should be dropped */
+            gnrc_pktbuf_release(pkt);
+            return;
         }
         if (reg->async_cb.generic) {
             reg->async_cb.generic(reg, SOCK_ASYNC_MSG_RECV, reg->async_cb_arg);
