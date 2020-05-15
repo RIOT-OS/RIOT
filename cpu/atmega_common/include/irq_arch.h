@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
+ *               2020 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -17,6 +18,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
  */
 
@@ -34,40 +36,19 @@ extern "C" {
 #endif
 
 /**
- * @brief Macro returns state of the global interrupt register
- */
-static uint8_t atmega_get_interrupt_state(void);
-static void atmega_set_interrupt_state(uint8_t state);
-
-__attribute__((always_inline)) static inline uint8_t atmega_get_interrupt_state(void)
-{
-    uint8_t sreg;
-    __asm__ volatile( "in __tmp_reg__, __SREG__ \n\t"
-                      "mov %0, __tmp_reg__      \n\t"
-                      : "=g"(sreg) );
-    return sreg & (1 << 7);
-}
-
-__attribute__((always_inline)) static inline void atmega_set_interrupt_state(uint8_t state)
-{
-    __asm__ volatile( "mov r15,%0        \n\t"
-                      "in r16, __SREG__  \n\t"
-                      "cbr r16,7         \n\t"
-                      "or r15,r16        \n\t"
-                      "out __SREG__, r15 \n\t"
-                      :
-                      : "g"(state)
-                      : "r15", "r16", "memory");
-}
-
-/**
  * @brief Disable all maskable interrupts
  */
 __attribute__((always_inline)) static inline unsigned int irq_disable(void)
 {
-    uint8_t mask = atmega_get_interrupt_state();
-    cli(); /* <-- acts as memory barrier, see doc of avr-libc */
-    return (unsigned int) mask;
+    uint8_t mask;
+    __asm__ volatile(
+        "in %[dest], __SREG__"      "\n\t"
+        "cli"                       "\n\t"
+        : [dest]    "=r"(mask)
+        : /* no inputs */
+        : "memory"
+    );
+    return mask;
 }
 
 /**
@@ -75,17 +56,41 @@ __attribute__((always_inline)) static inline unsigned int irq_disable(void)
  */
 __attribute__((always_inline)) static inline unsigned int irq_enable(void)
 {
-    uint8_t mask = atmega_get_interrupt_state();
-    sei(); /* <-- acts as memory barrier, see doc of avr-libc */
+    uint8_t mask;
+    __asm__ volatile(
+        "in %[dest], __SREG__"      "\n\t"
+        "sei"                       "\n\t"
+        : [dest]    "=r"(mask)
+        : /* no inputs */
+        : "memory"
+    );
     return mask;
 }
 
 /**
  * @brief Restore the state of the IRQ flags
  */
-__attribute__((always_inline)) static inline void irq_restore(unsigned int state)
+__attribute__((always_inline)) static inline void irq_restore(unsigned int _state)
 {
-    atmega_set_interrupt_state(state);
+    uint8_t state = (uint8_t)_state;
+    /*
+     * Implementation in pseudo-code:
+     *
+     * disable_irqs();
+     * if (state & BIT7) {
+     *    enable_irqs();
+     * }
+     *
+     * This takes 3 CPU Cycles if BIT7 is set (IRQs are enabled), otherwise 2.
+     */
+    __asm__ volatile(
+        "cli"                       "\n\t"
+        "sbrc %[state], 7"          "\n\t"
+        "sei"                       "\n\t"
+        : /* no outputs */
+        : [state]           "r"(state)
+        : "memory"
+    );
 }
 
 /**
