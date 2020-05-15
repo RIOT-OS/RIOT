@@ -175,6 +175,8 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 #ifdef MODULE_PERIPH_DMA
     if (_use_dma(&spi_config[bus])) {
         cr2_extra_settings |= SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
+        dma_acquire(spi_config[bus].tx_dma);
+        dma_acquire(spi_config[bus].rx_dma);
     }
 #endif
     dev(bus)->CR1 = cr1_settings;
@@ -188,6 +190,12 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
 void spi_release(spi_t bus)
 {
+#ifdef MODULE_PERIPH_DMA
+    if (_use_dma(&spi_config[bus])) {
+        dma_release(spi_config[bus].tx_dma);
+        dma_release(spi_config[bus].rx_dma);
+    }
+#endif
     /* disable device and release lock */
     dev(bus)->CR1 = 0;
     dev(bus)->CR2 = SPI_CR2_SETTINGS; /* Clear the DMA and SSOE flags */
@@ -211,8 +219,6 @@ static inline void _wait_for_end(spi_t bus)
 static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
 {
     uint8_t tmp = 0;
-    dma_acquire(spi_config[bus].tx_dma);
-    dma_acquire(spi_config[bus].rx_dma);
 
     if (!out) {
         dma_configure(spi_config[bus].tx_dma, spi_config[bus].tx_dma_chan, &tmp,
@@ -240,9 +246,6 @@ static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
 
     dma_stop(spi_config[bus].tx_dma);
     dma_stop(spi_config[bus].rx_dma);
-
-    dma_release(spi_config[bus].tx_dma);
-    dma_release(spi_config[bus].rx_dma);
 
     _wait_for_end(bus);
 }
