@@ -24,7 +24,7 @@
 #include "cc110x_params.h"
 #include "log.h"
 #include "msg.h"
-#include "net/gnrc/netif/conf.h"    /* <- CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE */
+#include "net/gnrc/netif/conf.h"    /* <- GNRC_NETIF_MSG_QUEUE_SIZE */
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
@@ -32,11 +32,11 @@
 /**
  * @brief   Additional stack size required by the driver
  *
- * With increasing of CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE the required stack size
+ * With increasing of GNRC_NETIF_MSG_QUEUE_SIZE the required stack size
  * increases as well. A queue size of 8 messages works with default stack size,
  * so we increase the stack by `sizeof(msg_t)` for each additional element
  */
-#define CC110X_EXTRA_STACKSIZE          ((CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE - 8) * sizeof(msg_t))
+#define CC110X_EXTRA_STACKSIZE          ((GNRC_NETIF_MSG_QUEUE_SIZE - 8) * sizeof(msg_t))
 #endif
 
 /**

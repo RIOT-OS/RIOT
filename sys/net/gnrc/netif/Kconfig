@@ -12,9 +12,13 @@ menuconfig KCONFIG_MODULE_GNRC_NETIF
 
 if KCONFIG_MODULE_GNRC_NETIF
 
-config GNRC_NETIF_MSG_QUEUE_SIZE
-    int "Message queue size for network interface threads"
-    default 16
+config GNRC_NETIF_MSG_QUEUE_SIZE_EXP
+    int "Exponent for the message queue size for network interface threads (as 2^n)"
+    default 4
+    help
+        As the queue size ALWAYS needs to be power of two, this option
+        represents the exponent of 2^n, which will be used as the size of
+        the queue.
 
 config GNRC_NETIF_IPV6_ADDRS_NUMOF
     int "Maximum number of unicast and anycast addresses per interface"
