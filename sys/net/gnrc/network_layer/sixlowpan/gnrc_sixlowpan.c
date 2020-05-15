@@ -308,12 +308,12 @@ static void _send(gnrc_pktsnip_t *pkt)
 
 static void *_event_loop(void *args)
 {
-    msg_t msg, reply, msg_q[CONFIG_GNRC_SIXLOWPAN_MSG_QUEUE_SIZE];
+    msg_t msg, reply, msg_q[GNRC_SIXLOWPAN_MSG_QUEUE_SIZE];
     gnrc_netreg_entry_t me_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                             sched_active_pid);
 
     (void)args;
-    msg_init_queue(msg_q, CONFIG_GNRC_SIXLOWPAN_MSG_QUEUE_SIZE);
+    msg_init_queue(msg_q, GNRC_SIXLOWPAN_MSG_QUEUE_SIZE);
 
     /* register interest in all 6LoWPAN packets */
     gnrc_netreg_register(GNRC_NETTYPE_SIXLOWPAN, &me_reg);
