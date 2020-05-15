@@ -58,10 +58,7 @@ static inline __attribute__((always_inline)) unsigned irq_disable(void)
 
 static inline __attribute__((always_inline)) void irq_restore(unsigned oldCPSR)
 {
-    unsigned _cpsr;
-
-    _cpsr = __get_cpsr();
-    __set_cpsr((_cpsr & ~IRQ_MASK) | (oldCPSR & IRQ_MASK));
+    __set_cpsr(oldCPSR);
 }
 
 static inline __attribute__((always_inline)) unsigned irq_enable(void)
