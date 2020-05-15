@@ -327,8 +327,14 @@ int dma_transfer(dma_t dma, int chan, const volatile void *src, volatile void *d
 void dma_acquire(dma_t dma)
 {
     assert(dma < DMA_NUMOF);
+    int stream_n = dma_config[dma].stream;
 
     mutex_lock(&dma_ctx[dma].conf_lock);
+
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+    stream->FCR = 0;
+#endif
+
 #ifdef STM32_PM_STOP
     /* block STOP mode */
     pm_block(STM32_PM_STOP);
@@ -388,7 +394,6 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
     /* Enable interrupts */
     stream->CR |= DMA_SxCR_TCIE | DMA_SxCR_TEIE;
     /* Configure FIFO */
-    stream->FCR = 0;
 #else
 #if defined(DMA_CSELR_C1S) || defined(DMA1_CSELR_DEFAULT)
     dma_req(stream_n)->CSELR &= ~((0xF) << ((stream_n & 0x7) << 2));
