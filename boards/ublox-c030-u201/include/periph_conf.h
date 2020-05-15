@@ -58,6 +58,24 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    DMA streams configuration
+ * @{
+ */
+#ifdef MODULE_PERIPH_DMA
+static const dma_conf_t dma_config[] = {
+    { .stream = 9 },   /* DMA2 Stream 1 - SPI4_TX */
+    { .stream = 8 },   /* DMA2 Stream 0 - SPI4_RX */
+};
+
+#define DMA_0_ISR           isr_dma2_stream1
+#define DMA_1_ISR           isr_dma2_stream0
+
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
+
+#endif /* MODULE_PERIPH_DMA */
+/** @} */
+
+/**
  * @name    UART configuration
  * @{
  */
@@ -178,17 +196,23 @@ static const uint8_t spi_divtable[2][5] = {
 
 static const spi_conf_t spi_config[] = {
     {
-        .dev      = SPI4,
-        .mosi_pin = GPIO_PIN(PORT_E, 6),
-        .miso_pin = GPIO_PIN(PORT_E, 5),
-        .sclk_pin = GPIO_PIN(PORT_E, 2),
-        .cs_pin   = GPIO_PIN(PORT_E, 11),
-        .mosi_af  = GPIO_AF5,
-        .miso_af  = GPIO_AF5,
-        .sclk_af  = GPIO_AF5,
-        .cs_af    = GPIO_AF5,
-        .rccmask  = RCC_APB2ENR_SPI4EN,
-        .apbbus   = APB2
+        .dev            = SPI4,
+        .mosi_pin       = GPIO_PIN(PORT_E, 6),
+        .miso_pin       = GPIO_PIN(PORT_E, 5),
+        .sclk_pin       = GPIO_PIN(PORT_E, 2),
+        .cs_pin         = GPIO_PIN(PORT_E, 11),
+        .mosi_af        = GPIO_AF5,
+        .miso_af        = GPIO_AF5,
+        .sclk_af        = GPIO_AF5,
+        .cs_af          = GPIO_AF5,
+        .rccmask        = RCC_APB2ENR_SPI4EN,
+        .apbbus         = APB2,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma         = 0,
+        .tx_dma_chan    = 4,
+        .rx_dma         = 1,
+        .rx_dma_chan    = 4,
+#endif
     },
 };
 
