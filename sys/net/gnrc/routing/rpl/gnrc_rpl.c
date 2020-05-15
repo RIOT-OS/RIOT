@@ -44,7 +44,7 @@ static uint32_t _lt_time = GNRC_RPL_LIFETIME_UPDATE_STEP * US_PER_SEC;
 static xtimer_t _lt_timer;
 static msg_t _lt_msg = { .type = GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE };
 #endif
-static msg_t _msg_q[CONFIG_GNRC_RPL_MSG_QUEUE_SIZE];
+static msg_t _msg_q[GNRC_RPL_MSG_QUEUE_SIZE];
 static gnrc_netreg_entry_t _me_reg;
 static mutex_t _inst_id_mutex = MUTEX_INIT;
 static uint8_t _instance_id;
@@ -247,7 +247,7 @@ static void *_event_loop(void *args)
     msg_t msg, reply;
 
     (void)args;
-    msg_init_queue(_msg_q, CONFIG_GNRC_RPL_MSG_QUEUE_SIZE);
+    msg_init_queue(_msg_q, GNRC_RPL_MSG_QUEUE_SIZE);
 
     /* preinitialize ACK */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
