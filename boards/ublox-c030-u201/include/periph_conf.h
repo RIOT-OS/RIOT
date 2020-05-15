@@ -77,6 +77,10 @@ static const uart_conf_t uart_config[] = {
         .cts_af     = GPIO_AF7,
         .rts_af     = GPIO_AF7,
 #endif
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
+#endif
     },
     {   /* Modem UART */
         .dev        = USART2,
@@ -92,6 +96,10 @@ static const uart_conf_t uart_config[] = {
         .rts_pin    = GPIO_PIN(PORT_D, 4),
         .cts_af     = GPIO_AF7,
         .rts_af     = GPIO_AF7,
+#endif
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     },
     {   /* GPS UART */
@@ -109,6 +117,10 @@ static const uart_conf_t uart_config[] = {
         .cts_af     = GPIO_AF8,
         .rts_af     = GPIO_AF8,
 #endif
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
+#endif
     },
     {   /* Arduino Port UART */
         .dev        = USART3,
@@ -124,6 +136,10 @@ static const uart_conf_t uart_config[] = {
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF7,
         .rts_af     = GPIO_AF7,
+#endif
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     },
 };
