@@ -18,14 +18,20 @@
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  *
- * @}
  */
+
+#ifndef IRQ_ARCH_H
+#define IRQ_ARCH_H
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdint.h>
 #include "irq.h"
 #include "cpu.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Macro returns state of the global interrupt register
@@ -42,7 +48,7 @@ __attribute__((always_inline)) static inline uint8_t atmega_get_interrupt_state(
     return sreg & (1 << 7);
 }
 
-__attribute__((always_inline)) inline void atmega_set_interrupt_state(uint8_t state)
+__attribute__((always_inline)) static inline void atmega_set_interrupt_state(uint8_t state)
 {
     __asm__ volatile( "mov r15,%0        \n\t"
                       "in r16, __SREG__  \n\t"
@@ -57,7 +63,7 @@ __attribute__((always_inline)) inline void atmega_set_interrupt_state(uint8_t st
 /**
  * @brief Disable all maskable interrupts
  */
-unsigned int irq_disable(void)
+__attribute__((always_inline)) static inline unsigned int irq_disable(void)
 {
     uint8_t mask = atmega_get_interrupt_state();
     cli(); /* <-- acts as memory barrier, see doc of avr-libc */
@@ -67,7 +73,7 @@ unsigned int irq_disable(void)
 /**
  * @brief Enable all maskable interrupts
  */
-unsigned int irq_enable(void)
+__attribute__((always_inline)) static inline unsigned int irq_enable(void)
 {
     uint8_t mask = atmega_get_interrupt_state();
     sei(); /* <-- acts as memory barrier, see doc of avr-libc */
@@ -77,7 +83,7 @@ unsigned int irq_enable(void)
 /**
  * @brief Restore the state of the IRQ flags
  */
-void irq_restore(unsigned int state)
+__attribute__((always_inline)) static inline void irq_restore(unsigned int state)
 {
     atmega_set_interrupt_state(state);
 }
@@ -85,8 +91,15 @@ void irq_restore(unsigned int state)
 /**
  * @brief See if the current context is inside an ISR
  */
-int irq_is_in(void)
+__attribute__((always_inline)) static inline int irq_is_in(void)
 {
     uint8_t state = atmega_get_state();
     return (state & ATMEGA_STATE_FLAG_ISR);
 }
+
+#ifdef __cplusplus
+}
+#endif
+
+/** @} */
+#endif /* IRQ_ARCH_H */
