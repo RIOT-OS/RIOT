@@ -330,6 +330,7 @@ void dma_acquire(dma_t dma)
     dma_clear_all_flags(dma);
 
 #if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+    STM32_DMA_Stream_Type *stream = dma_stream(stream_n);
     stream->FCR = 0;
 #endif
 
@@ -350,45 +351,23 @@ void dma_release(dma_t dma)
     mutex_unlock(&dma_ctx[dma].conf_lock);
 }
 
-int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
-                  dma_mode_t mode, uint8_t flags)
+void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
+               uint8_t width, bool inc_periph)
 {
-    assert(src != NULL);
-    assert(dst != NULL);
-
     int stream_n = dma_config[dma].stream;
-    uint32_t inc_periph;
-    uint32_t inc_mem;
     STM32_DMA_Stream_Type *stream = dma_stream(stream_n);
 
-    switch (mode) {
-        case DMA_MEM_TO_MEM:
-        case DMA_PERIPH_TO_MEM:
-            stream->PERIPH_ADDR = (uint32_t)src;
-            stream->MEM_ADDR = (uint32_t)dst;
-            inc_periph = (flags & DMA_INC_SRC_ADDR);
-            inc_mem = (flags & DMA_INC_DST_ADDR) >> 1;
-            break;
-        case DMA_MEM_TO_PERIPH:
-            stream->PERIPH_ADDR = (uint32_t)dst;
-            stream->MEM_ADDR = (uint32_t)src;
-            inc_periph = (flags & DMA_INC_DST_ADDR) >> 1;
-            inc_mem = (flags & DMA_INC_SRC_ADDR);
-            break;
-        default:
-            return -1;
-    }
-
-    uint32_t width = (flags & DMA_DATA_WIDTH_MASK) >> DMA_DATA_WIDTH_SHIFT;
 #if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
     /* Set channel, data width, inc and mode */
-    stream->CR = (chan & 0xF) << DMA_SxCR_CHSEL_Pos |
-                 width << DMA_SxCR_MSIZE_Pos | width << DMA_SxCR_PSIZE_Pos |
-                 inc_periph << DMA_SxCR_PINC_Pos | inc_mem << DMA_SxCR_MINC_Pos |
-                 (mode & 3) << DMA_SxCR_DIR_Pos;
-    /* Enable interrupts */
-    stream->CR |= DMA_SxCR_TCIE | DMA_SxCR_TEIE;
+    uint32_t cr_settings = (chan & 0xF) << DMA_SxCR_CHSEL_Pos |
+                           (width << DMA_SxCR_MSIZE_Pos) |
+                           (width << DMA_SxCR_PSIZE_Pos) |
+                           (inc_periph << DMA_SxCR_PINC_Pos) |
+                           (mode & 3) << DMA_SxCR_DIR_Pos |
+                           DMA_SxCR_TCIE |
+                           DMA_SxCR_TEIE;
     /* Configure FIFO */
+    stream->CONTROL_REG  = cr_settings;
 #else
 #if defined(DMA_CSELR_C1S) || defined(DMA1_CSELR_DEFAULT)
     dma_req(stream_n)->CSELR &= ~((0xF) << ((stream_n & 0x7) << 2));
@@ -396,14 +375,75 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
 #else
     (void)chan;
 #endif
-    stream->CONTROL_REG = width << DMA_CCR_MSIZE_Pos | width << DMA_CCR_PSIZE_Pos |
-                        inc_periph << DMA_CCR_PINC_Pos | inc_mem << DMA_CCR_MINC_Pos |
-                        (mode & 1) << DMA_CCR_DIR_Pos | ((mode & 2) >> 1) << DMA_CCR_MEM2MEM_Pos;
-    stream->CONTROL_REG |= DMA_CCR_TCIE | DMA_CCR_TEIE;
+    uint32_t ctr_reg = (width << DMA_CCR_MSIZE_Pos) |
+                       (width << DMA_CCR_PSIZE_Pos) |
+                       (inc_periph << DMA_CCR_PINC_Pos) |
+                       (mode & 1) << DMA_CCR_DIR_Pos |
+                       ((mode & 2) >> 1) << DMA_CCR_MEM2MEM_Pos |
+                       DMA_CCR_TCIE |
+                       DMA_CCR_TEIE;
+    stream->CONTROL_REG = ctr_reg;
 #endif
+    stream->PERIPH_ADDR = (uint32_t)periph_addr;
+}
+
+void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem)
+{
+    int stream_n = dma_config[dma].stream;
+    STM32_DMA_Stream_Type *stream = dma_stream(stream_n);
+    uint32_t ctr_reg = stream->CONTROL_REG;
+
+#if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
+    stream->CONTROL_REG = (ctr_reg & ~(DMA_SxCR_MINC)) |
+                          (incr_mem << DMA_SxCR_MINC_Pos);
+#else
+    stream->CONTROL_REG = (ctr_reg & ~(DMA_CCR_MINC)) |
+                          (incr_mem << DMA_CCR_MINC_Pos);
+#endif
+    stream->MEM_ADDR = (uint32_t)mem;
+
     /* Set length */
     stream->NDTR_REG = len;
     dma_ctx[dma].len = len;
+}
+
+int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
+                  dma_mode_t mode, uint8_t flags)
+{
+    assert(src != NULL);
+    assert(dst != NULL);
+
+    int stream_n = dma_config[dma].stream;
+    bool inc_periph;
+    bool inc_mem;
+    void *periph_addr;
+    void *mem_addr;
+    STM32_DMA_Stream_Type *stream = dma_stream(stream_n);
+
+    switch (mode) {
+        case DMA_MEM_TO_MEM:
+        case DMA_PERIPH_TO_MEM:
+            periph_addr = (void*)src;
+            mem_addr = (void*)dst;
+            inc_periph = (flags & DMA_INC_SRC_ADDR);
+            inc_mem = (flags & DMA_INC_DST_ADDR);
+            break;
+        case DMA_MEM_TO_PERIPH:
+            periph_addr = (void*)dst;
+            /* This discards the const specifier which should be fine as the DMA
+             * stream promises not to write to this location */
+            mem_addr = (void*)src;
+            inc_periph = (flags & DMA_INC_DST_ADDR);
+            inc_mem = (flags & DMA_INC_SRC_ADDR);
+            break;
+        default:
+            return -1;
+    }
+
+    uint32_t width = (flags & DMA_DATA_WIDTH_MASK) >> DMA_DATA_WIDTH_SHIFT;
+
+    dma_setup(dma, chan, periph_addr, mode, width, inc_periph);
+    dma_prepare(dma, mem_addr, len, inc_mem);
 
     return 0;
 }
