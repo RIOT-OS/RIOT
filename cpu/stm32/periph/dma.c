@@ -248,8 +248,6 @@ static inline void dma_isr_enable(int stream)
 
 static inline uint32_t dma_all_flags(dma_t dma)
 {
-    assert(dma < DMA_NUMOF);
-
 #if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
     switch (dma_config[dma].stream & 0x3) {
         case 0: /* 0 and 4 */
@@ -270,8 +268,6 @@ static inline uint32_t dma_all_flags(dma_t dma)
 
 static void dma_clear_all_flags(dma_t dma)
 {
-    assert(dma < DMA_NUMOF);
-
     DMA_TypeDef *dma_dev = dma_base(dma_config[dma].stream);
 
 #if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
@@ -359,7 +355,6 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
 {
     assert(src != NULL);
     assert(dst != NULL);
-    assert(dma < DMA_NUMOF);
 
     int stream_n = dma_config[dma].stream;
     uint32_t inc_periph;
@@ -415,8 +410,6 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
 
 void dma_start(dma_t dma)
 {
-    assert(dma < DMA_NUMOF);
-
     STM32_DMA_Stream_Type *stream = dma_stream(dma_config[dma].stream);
 
     stream->CONTROL_REG |= DMA_EN;
@@ -460,8 +453,6 @@ void dma_resume(dma_t dma, uint16_t remaining)
 
 void dma_stop(dma_t dma)
 {
-    assert(dma < DMA_NUMOF);
-
     STM32_DMA_Stream_Type *stream = dma_stream(dma_config[dma].stream);
 
     stream->CONTROL_REG &= ~(uint32_t)DMA_EN;
@@ -469,8 +460,6 @@ void dma_stop(dma_t dma)
 
 void dma_wait(dma_t dma)
 {
-    assert(dma < DMA_NUMOF);
-
     mutex_lock(&dma_ctx[dma].sync_lock);
 }
 
