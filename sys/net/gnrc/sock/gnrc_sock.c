@@ -150,6 +150,11 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     }
     *pkt_out = pkt; /* set out parameter */
 
+#if IS_ACTIVE(SOCK_HAS_ASYNC)
+    if (reg->async_cb.generic && cib_avail(&reg->mbox.cib)) {
+        reg->async_cb.generic(reg, SOCK_ASYNC_MSG_RECV, reg->async_cb_arg);
+    }
+#endif
 #ifdef MODULE_FUZZING
     prevpkt = pkt;
 #endif
