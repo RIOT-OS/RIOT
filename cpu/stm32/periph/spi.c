@@ -37,6 +37,16 @@
  */
 #define BR_SHIFT            (3U)
 
+#ifdef SPI_CR2_FRXTH
+/* configure SPI for 8-bit data width */
+#define SPI_CR2_SETTINGS    (SPI_CR2_FRXTH |\
+                             SPI_CR2_DS_0 |\
+                             SPI_CR2_DS_1 |\
+                             SPI_CR2_DS_2)
+#else
+#define SPI_CR2_SETTINGS    0
+#endif
+
 /**
  * @brief   Allocate one lock per SPI device
  */
@@ -62,12 +72,7 @@ void spi_init(spi_t bus)
 #ifdef SPI_I2SCFGR_I2SE
     dev(bus)->I2SCFGR = 0;
 #endif
-    /* configure SPI for 8-bit data width */
-#ifdef SPI_CR2_FRXTH
-    dev(bus)->CR2 = (SPI_CR2_FRXTH | SPI_CR2_DS_0 | SPI_CR2_DS_1 | SPI_CR2_DS_2);
-#else
-    dev(bus)->CR2 = 0;
-#endif
+    dev(bus)->CR2 = SPI_CR2_SETTINGS;
     periph_clk_dis(spi_config[bus].apbbus, spi_config[bus].rccmask);
 }
 
@@ -165,7 +170,7 @@ void spi_release(spi_t bus)
 {
     /* disable device and release lock */
     dev(bus)->CR1 = 0;
-    dev(bus)->CR2 &= ~(SPI_CR2_SSOE);
+    dev(bus)->CR2 = SPI_CR2_SETTINGS; /* Clear the DMA and SSOE flags */
     periph_clk_dis(spi_config[bus].apbbus, spi_config[bus].rccmask);
 #ifdef STM32_PM_STOP
     /* unblock STOP mode */
