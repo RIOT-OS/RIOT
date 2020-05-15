@@ -19,9 +19,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "irq.h"
+
 #ifdef MODULE_VFS
 #include <fcntl.h>
-#include "irq.h"
 #include "vfs.h"
 #elif defined(MODULE_STDIO_UART)
 #include "stdio_uart.h"
