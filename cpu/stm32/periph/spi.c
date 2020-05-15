@@ -152,6 +152,7 @@ int spi_init_with_gpio_mode(spi_t bus, spi_gpio_mode_t mode)
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
+
     /* lock bus */
     mutex_lock(&locks[bus]);
 #ifdef STM32_PM_STOP
@@ -243,9 +244,8 @@ static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
     dma_wait(spi_config[bus].rx_dma);
     dma_wait(spi_config[bus].tx_dma);
 
-
-    dma_stop(spi_config[bus].tx_dma);
-    dma_stop(spi_config[bus].rx_dma);
+    /* No need to stop the DMA here, it is automatically disabled when the
+     * transfer is finished */
 
     _wait_for_end(bus);
 }
