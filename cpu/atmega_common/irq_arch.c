@@ -33,8 +33,6 @@
 static uint8_t atmega_get_interrupt_state(void);
 static void atmega_set_interrupt_state(uint8_t state);
 
-uint8_t atmega_state = 0;
-
 __attribute__((always_inline)) static inline uint8_t atmega_get_interrupt_state(void)
 {
     uint8_t sreg;

@@ -37,11 +37,6 @@
 #include "cpu_conf.h"
 #include "sched.h"
 #include "thread.h"
-/**
- * For downwards compatibility with old RIOT code.
- * TODO: remove once core was adjusted
- */
-#include "irq.h"
 
 #ifdef __cplusplus
 extern "C"
