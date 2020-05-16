@@ -201,11 +201,20 @@ void sx127x_start_cad(sx127x_t *dev)
                              /* | SX127X_RF_LORA_IRQFLAGS_CADDETECTED*/
                              );
 
-            /* DIO3 = CADDone */
-            sx127x_reg_write(dev, SX127X_REG_DIOMAPPING1,
-                             (sx127x_reg_read(dev, SX127X_REG_DIOMAPPING1) &
-                              SX127X_RF_LORA_DIOMAPPING1_DIO3_MASK) |
-                             SX127X_RF_LORA_DIOMAPPING1_DIO3_00);
+            if (dev->params.dio3_pin != GPIO_UNDEF) {
+                /* DIO3 = CADDone */
+                sx127x_reg_write(dev, SX127X_REG_DIOMAPPING1,
+                                 (sx127x_reg_read(dev, SX127X_REG_DIOMAPPING1) &
+                                  SX127X_RF_LORA_DIOMAPPING1_DIO3_MASK) |
+                                 SX127X_RF_LORA_DIOMAPPING1_DIO3_00);
+            }
+            else {
+                /* DIO0 = CADDone */
+                sx127x_reg_write(dev, SX127X_REG_DIOMAPPING1,
+                                 (sx127x_reg_read(dev, SX127X_REG_DIOMAPPING1) &
+                                  SX127X_RF_LORA_DIOMAPPING1_DIO0_MASK) |
+                                 SX127X_RF_LORA_DIOMAPPING1_DIO0_10);
+            }
 
             sx127x_set_state(dev,  SX127X_RF_CAD);
             sx127x_set_op_mode(dev, SX127X_RF_LORA_OPMODE_CAD);
