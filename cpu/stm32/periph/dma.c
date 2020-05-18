@@ -331,6 +331,8 @@ void dma_acquire(dma_t dma)
 
     mutex_lock(&dma_ctx[dma].conf_lock);
 
+    dma_clear_all_flags(dma);
+
 #if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
     stream->FCR = 0;
 #endif
@@ -363,8 +365,6 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
     uint32_t inc_periph;
     uint32_t inc_mem;
     STM32_DMA_Stream_Type *stream = dma_stream(stream_n);
-
-    dma_clear_all_flags(dma);
 
     switch (mode) {
         case DMA_MEM_TO_MEM:
