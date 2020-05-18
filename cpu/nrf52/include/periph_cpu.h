@@ -28,6 +28,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Enable the workaround for the SPI single byte transmit errata (No.
+ * 58 on the nrf52832)
+ */
+#ifdef CPU_MODEL_NRF52832XXAA
+#define ERRATA_SPI_SINGLE_BYTE_WORKAROUND (1)
+#endif
+
+/**
  * @brief   System core clock speed, fixed to 64MHz for all NRF52x CPUs
  */
 #define CLOCK_CORECLOCK     (64000000U)
@@ -53,6 +61,14 @@ extern "C" {
  * @brief   The nRF52 family of CPUs provides a fixed number of 9 ADC lines
  */
 #define ADC_NUMOF           (9U)
+
+/**
+ * @brief   SPI temporary buffer size for storing const data in RAM before
+ *          initiating DMA transfer
+ */
+#ifndef CONFIG_SPI_MBUF_SIZE
+#define CONFIG_SPI_MBUF_SIZE    64
+#endif
 
 /**
  * @brief   nRF52 specific naming of ADC lines (for convenience)
@@ -179,6 +195,20 @@ typedef struct {
     uint8_t irqn;           /**< IRQ channel */
 } uart_conf_t;
 #endif
+
+/**
+ * @brief  SPI configuration values
+ */
+typedef struct {
+    NRF_SPIM_Type *dev; /**< SPI device used */
+    gpio_t sclk;        /**< CLK pin */
+    gpio_t mosi;        /**< MOSI pin */
+    gpio_t miso;        /**< MISO pin */
+#if ERRATA_SPI_SINGLE_BYTE_WORKAROUND
+    uint8_t ppi;        /**< PPI channel */
+#endif
+} spi_conf_t;
+
 
 /**
  * @brief Common SPI/I2C interrupt callback
