@@ -237,7 +237,7 @@ void rtc_init(void)
     EXTI->FTSR &= ~(EXTI_FTSR_BIT);
     EXTI->RTSR |= EXTI_RTSR_BIT;
     EXTI->IMR  |= EXTI_IMR_BIT;
-    EXTI->PR   |= EXTI_PR_BIT;
+    EXTI->PR   = EXTI_PR_BIT;
     /* enable global RTC interrupt */
     NVIC_EnableIRQ(IRQN);
 }
@@ -351,7 +351,7 @@ void ISR_NAME(void)
         }
         RTC->ISR &= ~RTC_ISR_ALRAF;
     }
-    EXTI->PR |= EXTI_PR_BIT;
+    EXTI->PR = EXTI_PR_BIT; /* only clear the associated bit */
     cortexm_isr_end();
 }
 
