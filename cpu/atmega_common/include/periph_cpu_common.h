@@ -158,6 +158,11 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   A low-level timer_set() implementation is provided
+ */
+#define PERIPH_TIMER_PROVIDES_SET
+
+/**
  * @brief   EEPROM clear byte
  */
 #define EEPROM_CLEAR_BYTE              (0xff)

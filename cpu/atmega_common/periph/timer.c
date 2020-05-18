@@ -146,6 +146,31 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     return 0;
 }
 
+int timer_set(tim_t tim, int channel, unsigned int timeout)
+{
+    if (channel >= TIMER_CHANNELS) {
+        return -1;
+    }
+
+    unsigned state = irq_disable();
+    unsigned absolute = ctx[tim].dev->CNT + timeout;
+    ctx[tim].dev->OCR[channel] = absolute;
+    uint8_t mask = 1 << (channel + OCIE1A);
+    *ctx[tim].mask |= mask;
+    if ((absolute - ctx[tim].dev->CNT) > timeout) {
+        /* Timer already expired. Trigger the interrupt now and loop until it
+         * is triggered.
+         */
+        while (!(*ctx[tim].flag & (1 << (OCF1A + channel)))) {
+            ctx[tim].dev->OCR[channel] = ctx[tim].dev->CNT;
+        }
+
+    }
+    irq_restore(state);
+
+    return 0;
+}
+
 int timer_clear(tim_t tim, int channel)
 {
     if (channel >= TIMER_CHANNELS) {
