@@ -70,21 +70,21 @@ extern "C" {
 /**
  * @brief GoMacH's superframe duration, i.e., time between two consecutive wake-ups.
  *
- * This macro governs power consumption and GoMacH's reactiveness to traffic loads.
- * In GoMacH, nodes adopt duty-cycle scheme to conserve power. That is,
- * time is divided into repeated cycles (superframes), and in each
- * cycle, a node only wakes up for a short period of time for receiving potential
+ * This macro governs power consumption and GoMacH's reactiveness to traffic
+ * loads. In GoMacH, nodes adopt duty-cycle scheme to conserve power. That is,
+ * time is divided into repeated cycles (superframes), and in each cycle, a
+ * node only wakes up for a short period of time for receiving potential
  * incoming packets for itself. This macro defines the wake-up interval, or,
  * in other words, defines the cycle duration used in GoMacH. If the wake-up
- *  interval is short, nodes will wake up more frequently, which leads to quicker
- * reactiveness of the MAC protocol for handling packet reception and transmission,
- * but also results in higher power consumption due to more idle listening.
- * In GoMacH, by default, we regard the wake-up period (WP) as the beginning of
- * a cycle.
+ * interval is short, nodes will wake up more frequently, which leads to quicker
+ * reactiveness of the MAC protocol for handling packet reception and
+ * transmission, but also results in higher power consumption due to more idle
+ * listening. In GoMacH, by default, we regard the wake-up period (WP) as the
+ * beginning of a cycle.
  *
- * Note that, GoMacH's superframe duration @ref GNRC_GOMACH_SUPERFRAME_DURATION_US
- * should not be shorter than 10 times of @ref GNRC_GOMACH_CP_DURATION_US and not
- * shorter than the RTT tickle interval.
+ * @note GoMacH's superframe duration @ref GNRC_GOMACH_SUPERFRAME_DURATION_US
+ * should not be shorter than 10 times of @ref GNRC_GOMACH_CP_DURATION_US and
+ * not shorter than the RTT tickle interval.
  */
 #ifndef GNRC_GOMACH_SUPERFRAME_DURATION_US
 #define GNRC_GOMACH_SUPERFRAME_DURATION_US        (300LU * US_PER_MS)
@@ -108,10 +108,10 @@ extern "C" {
  * @brief The maximum duration of the random period at the end of GoMacH's
  *        wake-up period (WP).
  *
- * Currently, GoMacH's WP is actually composed of @ref GNRC_GOMACH_CP_DURATION_US
- * and (+) @ref GNRC_GOMACH_CP_RANDOM_END_US. We currently introduced this random
- * period to avoid beacon collision among neighbor nodes. This macro may be removed
- * in the future.
+ * Currently, GoMacH's WP is actually composed of
+ * @ref GNRC_GOMACH_CP_DURATION_US and (+) @ref GNRC_GOMACH_CP_RANDOM_END_US.
+ * We currently introduced this random period to avoid beacon collision among
+ * neighbor nodes. This macro may be removed in the future.
  */
 #ifndef GNRC_GOMACH_CP_RANDOM_END_US
 #define GNRC_GOMACH_CP_RANDOM_END_US        (1U * US_PER_MS)
@@ -123,10 +123,10 @@ extern "C" {
  * @ref GNRC_GOMACH_CP_DURATION_MAX_US defines the allowed maximum duration
  * of GoMacH's WP period. A node will quit WP once it reaches this maximum
  * duration.
- * Note that, in GoMacH's WP, after each normal packet reception (except
- * broadcast packet), a receiver will automatically extends the WP period
- * (reset WP timeout), to receiver more potential incoming packets, before
- * WP reaches this @ref GNRC_GOMACH_CP_DURATION_MAX_US duration.
+ * @note In GoMacH's WP, after each normal packet reception (except broadcast
+ * packet), a receiver will automatically extends the WP period (reset WP
+ * timeout), to receiver more potential incoming packets, before WP
+ * reaches this @ref GNRC_GOMACH_CP_DURATION_MAX_US duration.
  */
 #ifndef GNRC_GOMACH_CP_DURATION_MAX_US
 #define GNRC_GOMACH_CP_DURATION_MAX_US        (5LU * GNRC_GOMACH_CP_DURATION_US)
@@ -135,9 +135,9 @@ extern "C" {
 /**
  * @brief The maximum time for waiting the receiver's beacon in GoMacH.
  *
- * After transmissions in the WP, if the sender still has pending packets
- * for the receiver, it will wait for the receiver's incoming beacon that
- * allocates dynamic transmission slots to it. @ref GNRC_GOMACH_WAIT_BEACON_TIME_US
+ * After transmissions in the WP, if the sender still has pending packets for
+ * the receiver, it will wait for the receiver's incoming beacon that allocates
+ * dynamic transmission slots to it. @ref GNRC_GOMACH_WAIT_BEACON_TIME_US
  * defines the maximum waiting time for the beacon. Once the beacon-waiting
  * timeout expires, the sender will quit the vTMDA (slotted transmission)
  * procedure, and restarts transmissions (started with normal CSMA attempts
@@ -151,8 +151,8 @@ extern "C" {
 /**
  * @brief The minimum gap between neighbor nodes' wake-up phases in GoMacH.
  *
- * To reduce beacon collisions and transmission collisions, GoMacH intends
- * to avoid neighbor nodes' phases being too close to each other. This macro
+ * To reduce beacon collisions and transmission collisions, GoMacH intends to
+ * avoid neighbor nodes' phases being too close to each other. This macro
  * defines the minimum gap between two nodes's wake-up phases. If the sender
  * finds its wake-up phase too closed to its receiver's, it will randomly
  * select a new phase for itself.
@@ -176,10 +176,10 @@ extern "C" {
 /**
  * @brief Timeout duration for confirming TX-No-ISR event in GoMacH.
  *
- * This macro is used to confirm/catch a case that a transmission doesn't have its
- * @ref NETDEV_EVENT_TX_COMPLETE interrupt event, which is considered as a hardware
- * abnormal event. Upon this timeout expiration, GoMach will accordingly take
- *  actions to maintain its state-machine.
+ * This macro is used to confirm/catch a case that a transmission doesn't have
+ * its @ref NETDEV_EVENT_TX_COMPLETE interrupt event, which is considered as a
+ * hardware abnormal event. Upon this timeout expiration, GoMach will
+ * accordingly take actions to maintain its state-machine.
  */
 #ifndef GNRC_GOMACH_NO_TX_ISR_US
 #define GNRC_GOMACH_NO_TX_ISR_US          (50U * US_PER_MS)
@@ -188,9 +188,9 @@ extern "C" {
 /**
  * @brief Maximum time interval between two consecutive preamble packets in GoMacH.
  *
- * In GoMacH, a sender first uses preamble stream to track the receiver's wake-up
- * phase (WP), if the receiver's WP is unknown. This macro defines the maximum
- * time interval between twoconsecutive preamble packets.
+ * In GoMacH, a sender first uses preamble stream to track the receiver's
+ * wake-up phase (WP), if the receiver's WP is unknown. This macro defines the
+ * maximum time interval between twoconsecutive preamble packets.
  */
 #ifndef GNRC_GOMACH_MAX_PREAM_INTERVAL_US
 #define GNRC_GOMACH_MAX_PREAM_INTERVAL_US        (6U * US_PER_MS)
@@ -232,8 +232,8 @@ extern "C" {
  * To ensure that the receiver will catch at least one preamble packet
  * in a critical case that one public channel is jammed, the sender repeatedly
  * broadcasts a stream of preamble packets with the broadcast duration
- * (preamble duration) slightly longer than twice
- * of @ref GNRC_GOMACH_SUPERFRAME_DURATION_US.
+ * (preamble duration) slightly longer than twice of
+ * @ref GNRC_GOMACH_SUPERFRAME_DURATION_US.
  */
 #ifndef GNRC_GOMACH_PREAMBLE_DURATION_US
 #define GNRC_GOMACH_PREAMBLE_DURATION_US        (21LU * GNRC_GOMACH_SUPERFRAME_DURATION_US / 10)
@@ -242,9 +242,9 @@ extern "C" {
 /**
  * @brief The transmission slot size in GoMacH.
  *
- * GoMacH adopts dynamic slots allocation scheme to allocate transmission
- * slots to senders that have pending packets. Each slot is for one data packet
- * with ACK transmission. @ref GNRC_GOMACH_VTDMA_SLOT_SIZE_US is right sufficient
+ * GoMacH adopts dynamic slots allocation scheme to allocate transmission slots
+ * to senders that have pending packets. Each slot is for one data packet with
+ * ACK transmission. @ref GNRC_GOMACH_VTDMA_SLOT_SIZE_US is right sufficient
  * for the transmission of the longest packet in IEEE 802.15.4 with ACK. Should
  * not be changed.
  */
@@ -259,9 +259,9 @@ extern "C" {
  * Senders in GoMacH adopt CSMA scheme to send data packets in the WP period of
  * the receiver. In case of having medium-busy feedback in WP and the TX failure
  * count (due to busy) is below @ref GNRC_GOMACH_TX_BUSY_THRESHOLD, the sender
- * continue to send the packet with CSMAin the receiver's WP, with the consideration
- * that there may be multi-senderssimultaneously competing in WP and the WP will
- * be continuously extended (thus the packet can be received).
+ * continue to send the packet with CSMAin the receiver's WP, with the
+ * consideration that there may be multi-senderssimultaneously competing in WP
+ * and the WP will be continuously extended (thus the packet can be received).
  */
 #ifndef GNRC_GOMACH_TX_BUSY_THRESHOLD
 #define GNRC_GOMACH_TX_BUSY_THRESHOLD      (5U)
@@ -295,11 +295,12 @@ extern "C" {
 /**
  * @brief Maximum number of senders allowed to be allocated slots in one cycle.
  *
- * Exclude the static GoMacH MAC header payload in the beacon, which is 20 bytes,
- * we have 107 bytes left for constructing the sender-ID list and the related slots-number
- * list. A combined slots allocation information pair (sender ID with its corresponded
- * allocate slots number) will cost 9 (8+1) bytes, thus we can hold a maximum of 11
- * i.e., ((127 - 20) / 9), sender IDs in the beacon.
+ * Exclude the static GoMacH MAC header payload in the beacon, which is 20
+ * bytes, we have 107 bytes left for constructing the sender-ID list and the
+ * related slots-numberlist. A combined slots allocation information pair
+ * (sender ID with its corresponded allocate slots number) will cost 9 (8+1)
+ * bytes, thus we can hold a maximum of 11 i.e., ((127 - 20) / 9), sender IDs
+ * in the beacon.
  */
 #ifndef GNRC_GOMACH_MAX_ALLOC_SENDER_NUM
 #define GNRC_GOMACH_MAX_ALLOC_SENDER_NUM          (11U)
@@ -312,9 +313,9 @@ extern "C" {
  * procedure to transmit packet to the phase-known device. However, due to
  * factors like timer driftor busy-channel, a transmission attempt may fail
  * in t2k. If the t2k failure count has reached this
- * @ref GNRC_GOMACH_REPHASELOCK_THRESHOLD, the sender regards phase-locked failed
- * due to timer drift. In this case, it will adopt t2u (transmit-to-unknown)
- *  procedure to get re-phase-locked with the receiver.
+ * @ref GNRC_GOMACH_REPHASELOCK_THRESHOLD, the sender regards phase-locked
+ * failed due to timer drift. In this case, it will adopt t2u
+ * (transmit-to-unknown) procedure to get re-phase-locked with the receiver.
  */
 #ifndef GNRC_GOMACH_REPHASELOCK_THRESHOLD
 #define GNRC_GOMACH_REPHASELOCK_THRESHOLD      (4U)
@@ -323,10 +324,10 @@ extern "C" {
 /**
  * @brief Maximum t2u attempts before dropping data packet in GoMacH.
  *
- * In case the receiver's phase is unknown to the sender, the sender adopts
- * the t2u (transmit-to-unknown) procedure to get phase-locked with the
- * receiver. This macrodefines the maximum t2u attempts before dropping the
- * data packet in GoMacH.
+ * In case the receiver's phase is unknown to the sender, the sender adopts the
+ * t2u (transmit-to-unknown) procedure to get phase-locked with the receiver.
+ * This macro defines the maximum t2u attempts before dropping the data packet
+ * in GoMacH.
  */
 #ifndef GNRC_GOMACH_T2U_RETYR_THRESHOLD
 #define GNRC_GOMACH_T2U_RETYR_THRESHOLD      (2U)
@@ -337,9 +338,9 @@ extern "C" {
  *
  * After a long period of run time, a radio may be in wrong condition which
  * needs to be re-calibrated. This is indicated by having a series of
- * continuous t2u failures (no preambleACK) in GoMacH. In cast we have
- * @ref GNRC_GOMACH_MAX_T2U_RETYR_THRESHOLD number of t2u failures, then we
- * re-initiate the radio, trying to re-calibrate the radio for bringing it
+ * continuous t2u failures (no preambleACK) in GoMacH. In case we have
+ * @ref GNRC_GOMACH_MAX_T2U_RETYR_THRESHOLD number of t2u failures, then
+ * we re-initiate the radio, trying to re-calibrate the radio for bringing it
  * back to normal condition.
  */
 #ifndef GNRC_GOMACH_MAX_T2U_RETYR_THRESHOLD
@@ -367,6 +368,8 @@ extern "C" {
 #ifndef GNRC_GOMACH_IPC_MSG_QUEUE_SIZE
 #define GNRC_GOMACH_IPC_MSG_QUEUE_SIZE  (1 << CONFIG_GNRC_GOMACH_IPC_MSG_QUEUE_SIZE_EXP)
 #endif
+/** @} */
+
 
 /**
  * @brief   Creates an IEEE 802.15.4 GoMacH network interface
