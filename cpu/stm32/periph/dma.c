@@ -89,6 +89,7 @@
 #endif /* CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7 */
 
 struct dma_ctx {
+    STM32_DMA_Stream_Type *stream;
     mutex_t conf_lock;
     mutex_t sync_lock;
     uint16_t len;
@@ -301,8 +302,10 @@ void dma_init(void)
         mutex_init(&dma_ctx[i].conf_lock);
         mutex_init(&dma_ctx[i].sync_lock);
         mutex_lock(&dma_ctx[i].sync_lock);
+        int stream_n = dma_config[i].stream;
         dma_poweron(stream_n);
         dma_isr_enable(stream_n);
+        dma_ctx[i].stream = dma_stream(stream_n);
     }
 }
 
@@ -323,14 +326,13 @@ int dma_transfer(dma_t dma, int chan, const volatile void *src, volatile void *d
 void dma_acquire(dma_t dma)
 {
     assert(dma < DMA_NUMOF);
-    int stream_n = dma_config[dma].stream;
 
     mutex_lock(&dma_ctx[dma].conf_lock);
 
     dma_clear_all_flags(dma);
 
 #if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
-    STM32_DMA_Stream_Type *stream = dma_stream(stream_n);
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
     stream->FCR = 0;
 #endif
 
@@ -354,8 +356,7 @@ void dma_release(dma_t dma)
 void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
                uint8_t width, bool inc_periph)
 {
-    int stream_n = dma_config[dma].stream;
-    STM32_DMA_Stream_Type *stream = dma_stream(stream_n);
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
 
 #if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
     /* Set channel, data width, inc and mode */
@@ -370,6 +371,7 @@ void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
     stream->CONTROL_REG  = cr_settings;
 #else
 #if defined(DMA_CSELR_C1S) || defined(DMA1_CSELR_DEFAULT)
+    int stream_n = dma_config[dma].stream;
     dma_req(stream_n)->CSELR &= ~((0xF) << ((stream_n & 0x7) << 2));
     dma_req(stream_n)->CSELR |= (chan & 0xF) << ((stream_n & 0x7) << 2);
 #else
@@ -389,8 +391,7 @@ void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
 
 void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem)
 {
-    int stream_n = dma_config[dma].stream;
-    STM32_DMA_Stream_Type *stream = dma_stream(stream_n);
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
     uint32_t ctr_reg = stream->CONTROL_REG;
 
 #if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
@@ -413,12 +414,10 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
     assert(src != NULL);
     assert(dst != NULL);
 
-    int stream_n = dma_config[dma].stream;
     bool inc_periph;
     bool inc_mem;
     void *periph_addr;
     void *mem_addr;
-    STM32_DMA_Stream_Type *stream = dma_stream(stream_n);
 
     switch (mode) {
         case DMA_MEM_TO_MEM:
@@ -450,7 +449,7 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
 
 void dma_start(dma_t dma)
 {
-    STM32_DMA_Stream_Type *stream = dma_stream(dma_config[dma].stream);
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
 
     stream->CONTROL_REG |= DMA_EN;
 }
@@ -460,7 +459,7 @@ uint16_t dma_suspend(dma_t dma)
     assert(dma < DMA_NUMOF);
 
     int stream_n = dma_config[dma].stream;
-    STM32_DMA_Stream_Type *stream = dma_stream(stream_n);
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
     uint16_t left = 0;
 
     if ((stream->CONTROL_REG & DMA_EN) == DMA_EN) {
@@ -480,7 +479,7 @@ void dma_resume(dma_t dma, uint16_t remaining)
     assert(dma < DMA_NUMOF);
 
     int stream_n = dma_config[dma].stream;
-    STM32_DMA_Stream_Type *stream = dma_stream(stream_n);
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
 
     if (remaining > 0) {
         dma_isr_enable(stream_n);
