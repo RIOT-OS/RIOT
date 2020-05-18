@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_nrf5x_common
+ * @ingroup     cpu_nrf51
  * @ingroup     drivers_periph_spi
  * @{
  *
@@ -64,10 +64,8 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     (void) cs;
 
     mutex_lock(&locks[bus]);
-#ifdef CPU_FAM_NRF51
     /* power on the bus (NRF51 only) */
     dev(bus)->POWER = 1;
-#endif
     /* configure bus */
     dev(bus)->CONFIG = mode;
     dev(bus)->FREQUENCY = clk;
@@ -81,9 +79,7 @@ void spi_release(spi_t bus)
 {
     /* power off everything */
     dev(bus)->ENABLE = 0;
-#ifdef CPU_FAM_NRF51
     dev(bus)->POWER = 0;
-#endif
     mutex_unlock(&locks[bus]);
 }
 

@@ -58,10 +58,10 @@ static const uart_conf_t uart_config[] = {
  */
 static const spi_conf_t spi_config[] = {
     {
-        .dev  = NRF_SPI0,
+        .dev  = NRF_SPIM0,
         .sclk = 14,
         .mosi = 13,
-        .miso = 15
+        .miso = 15,
     }
 };
 

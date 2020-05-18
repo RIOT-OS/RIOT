@@ -5,5 +5,12 @@ ifneq (,$(filter nrf802154,$(USEMODULE)))
   USEMODULE += netdev_ieee802154
 endif
 
+# The nrf52832 requires gpio IRQ with SPI to work around errata 58
+ifneq (,$(filter nrf52832xxaa,$(CPU_MODEL)))
+  ifneq (,$(filter periph_spi,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_gpio_irq
+  endif
+endif
+
 include $(RIOTCPU)/nrf5x_common/Makefile.dep
 include $(RIOTCPU)/cortexm_common/Makefile.dep
