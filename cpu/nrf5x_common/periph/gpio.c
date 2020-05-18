@@ -146,17 +146,21 @@ void gpio_write(gpio_t pin, int value)
 }
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+uint8_t gpio_int_get_exti(gpio_t pin)
 {
-    uint8_t _pin_index = 0xff;
     /* Looking for already known pin in exti table */
     for (unsigned int i = 0; i < _gpiote_next_index; i++) {
         if (_exti_pins[i] == pin) {
-            _pin_index = i;
-            break;
+            return i;
         }
     }
+    return 0xff;
+}
+
+int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
+                  gpio_cb_t cb, void *arg)
+{
+    uint8_t _pin_index = gpio_int_get_exti(pin);
 
     /* New pin */
     if (_pin_index == 0xff) {

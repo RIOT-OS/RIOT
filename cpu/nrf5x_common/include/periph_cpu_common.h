@@ -184,6 +184,16 @@ typedef struct {
 #define NWDT_TIME_UPPER_LIMIT          ((UINT32_MAX >> 15) * US_PER_MS + 1)
 /** @} */
 
+/**
+ * @brief Retrieve the exti(GPIOTE) channel associated with a gpio
+ *
+ * @param   pin     GPIO pin to retrieve the channel for
+ *
+ * @return          the channel number
+ * @return          0xff if no channel is found
+ */
+uint8_t gpio_int_get_exti(gpio_t pin);
+
 #ifdef __cplusplus
 }
 #endif
