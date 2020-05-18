@@ -180,6 +180,32 @@ typedef struct {
 } uart_conf_t;
 #endif
 
+/**
+ * @brief Common SPI/I2C interrupt callback
+ *
+ * @param   arg     Opaque context pointer
+ */
+typedef void (*spi_twi_irq_cb_t)(void *arg);
+
+/**
+ * @brief Reqister a SPI IRQ handler for a shared I2C/SPI irq vector
+ *
+ * @param   bus bus to register the IRQ handler on
+ * @param   cb  callback to call on IRQ
+ * @param   arg Argument to pass to the handler
+ */
+void spi_twi_irq_register_spi(NRF_SPIM_Type *bus,
+                              spi_twi_irq_cb_t cb, void *arg);
+
+/**
+ * @brief Reqister a I2C IRQ handler for a shared I2C/SPI irq vector
+ *
+ * @param   bus bus to register the IRQ handler on
+ * @param   cb  callback to call on IRQ
+ * @param   arg Argument to pass to the handler
+ */
+void spi_twi_irq_register_i2c(NRF_TWIM_Type *bus,
+                              spi_twi_irq_cb_t cb, void *arg);
 #ifdef __cplusplus
 }
 #endif
