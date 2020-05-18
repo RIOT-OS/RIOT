@@ -166,16 +166,6 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
- * @brief  SPI configuration values
- */
-typedef struct {
-    NRF_SPI_Type *dev;  /**< SPI device used */
-    gpio_t sclk;        /**< CLK pin */
-    gpio_t mosi;        /**< MOSI pin */
-    gpio_t miso;        /**< MISO pin */
-} spi_conf_t;
-
-/**
  * @name    WDT upper and lower bound times in ms
  * @{
  */
