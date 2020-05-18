@@ -287,15 +287,6 @@ static void dma_clear_all_flags(dma_t dma)
 #endif
 }
 
-void dma_init(void)
-{
-    for (unsigned i = 0; i < DMA_NUMOF; i++) {
-        mutex_init(&dma_ctx[i].conf_lock);
-        mutex_init(&dma_ctx[i].sync_lock);
-        mutex_lock(&dma_ctx[i].sync_lock);
-    }
-}
-
 static void dma_poweron(int stream)
 {
     if (stream < 8) {
@@ -308,6 +299,16 @@ static void dma_poweron(int stream)
 #endif
 }
 
+void dma_init(void)
+{
+    for (unsigned i = 0; i < DMA_NUMOF; i++) {
+        mutex_init(&dma_ctx[i].conf_lock);
+        mutex_init(&dma_ctx[i].sync_lock);
+        mutex_lock(&dma_ctx[i].sync_lock);
+        dma_poweron(stream_n);
+        dma_isr_enable(stream_n);
+    }
+}
 
 int dma_transfer(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
                  dma_mode_t mode, uint8_t flags)
@@ -357,7 +358,6 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
     uint32_t inc_mem;
     STM32_DMA_Stream_Type *stream = dma_stream(stream_n);
 
-    dma_poweron(stream_n);
     dma_clear_all_flags(dma);
 
     switch (mode) {
@@ -404,8 +404,6 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
     /* Set length */
     stream->NDTR_REG = len;
     dma_ctx[dma].len = len;
-
-    dma_isr_enable(stream_n);
 
     return 0;
 }
