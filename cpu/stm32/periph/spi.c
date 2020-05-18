@@ -176,8 +176,22 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 #ifdef MODULE_PERIPH_DMA
     if (_use_dma(&spi_config[bus])) {
         cr2_extra_settings |= SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
+
         dma_acquire(spi_config[bus].tx_dma);
+        dma_setup(spi_config[bus].tx_dma,
+                  spi_config[bus].tx_dma_chan,
+                  (uint32_t*)&(dev(bus)->DR),
+                  DMA_MEM_TO_PERIPH,
+                  0,
+                  DMA_DATA_WIDTH_BYTE);
+
         dma_acquire(spi_config[bus].rx_dma);
+        dma_setup(spi_config[bus].rx_dma,
+                  spi_config[bus].rx_dma_chan,
+                  (uint32_t*)&(dev(bus)->DR),
+                  DMA_PERIPH_TO_MEM,
+                  0,
+                  DMA_DATA_WIDTH_BYTE);
     }
 #endif
     dev(bus)->CR1 = cr1_settings;
@@ -221,23 +235,21 @@ static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
 {
     uint8_t tmp = 0;
 
-    if (!out) {
-        dma_configure(spi_config[bus].tx_dma, spi_config[bus].tx_dma_chan, &tmp,
-                      &(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, 0);
+    if (out) {
+        dma_prepare(spi_config[bus].tx_dma, (void*)out, len, 1);
     }
     else {
-        dma_configure(spi_config[bus].tx_dma, spi_config[bus].tx_dma_chan, out,
-                      &(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR);
+        dma_prepare(spi_config[bus].tx_dma, &tmp, len, 0);
     }
-    if (!in) {
-        dma_configure(spi_config[bus].rx_dma, spi_config[bus].rx_dma_chan,
-                      &(dev(bus)->DR), &tmp, len, DMA_PERIPH_TO_MEM, 0);
+    if (in) {
+        dma_prepare(spi_config[bus].rx_dma, in, len, 1);
     }
     else {
-        dma_configure(spi_config[bus].rx_dma, spi_config[bus].rx_dma_chan,
-                      &(dev(bus)->DR), in, len, DMA_PERIPH_TO_MEM, DMA_INC_DST_ADDR);
+        dma_prepare(spi_config[bus].rx_dma, &tmp, len, 0);
     }
 
+    /* Start RX first to ensure it is active before the SPI transfers are
+     * triggered by the TX dma activity */
     dma_start(spi_config[bus].rx_dma);
     dma_start(spi_config[bus].tx_dma);
 
@@ -245,8 +257,7 @@ static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
     dma_wait(spi_config[bus].tx_dma);
 
     /* No need to stop the DMA here, it is automatically disabled when the
-     * transfer is finished */
-
+     * transfer is finished, only wait for SPI to leave the busy state */
     _wait_for_end(bus);
 }
 #endif
