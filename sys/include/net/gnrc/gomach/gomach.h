@@ -300,13 +300,13 @@ extern "C" {
  *
  * Exclude the static GoMacH MAC header payload in the beacon, which is 20
  * bytes, we have 107 bytes left for constructing the sender-ID list and the
- * related slots-numberlist. A combined slots allocation information pair
+ * related slots-number list. A combined slots allocation information pair
  * (sender ID with its corresponded allocate slots number) will cost 9 (8+1)
  * bytes, thus we can hold a maximum of 11 i.e., ((127 - 20) / 9), sender IDs
  * in the beacon.
  */
-#ifndef GNRC_GOMACH_MAX_ALLOC_SENDER_NUM
-#define GNRC_GOMACH_MAX_ALLOC_SENDER_NUM          (11U)
+#ifndef CONFIG_GNRC_GOMACH_MAX_ALLOC_SENDER_NUM
+#define CONFIG_GNRC_GOMACH_MAX_ALLOC_SENDER_NUM          (11U)
 #endif
 
 /**

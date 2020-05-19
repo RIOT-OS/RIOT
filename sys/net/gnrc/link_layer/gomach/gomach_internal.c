@@ -492,7 +492,7 @@ int gnrc_gomach_send_beacon(gnrc_netif_t *netif)
             j++;
 
             /* If reach the maximum sender ID number limit, stop. */
-            if (total_tdma_node_num >= GNRC_GOMACH_MAX_ALLOC_SENDER_NUM) {
+            if (total_tdma_node_num >= CONFIG_GNRC_GOMACH_MAX_ALLOC_SENDER_NUM){
                 break;
             }
         }
