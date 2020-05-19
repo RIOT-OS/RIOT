@@ -168,11 +168,11 @@ extern "C" {
  *
  * Sometimes in GoMacH, if a node finds RX ongoing when it is just about to
  * enter the next MAC state, it will set up a timeout for waiting this packet
- * reception complete with a timeout of this @ref GNRC_GOMACH_WAIT_RX_END_US
- * duration.
+ * reception complete with a timeout of this
+ * @ref CONFIG_GNRC_GOMACH_WAIT_RX_END_US duration.
  */
-#ifndef GNRC_GOMACH_WAIT_RX_END_US
-#define GNRC_GOMACH_WAIT_RX_END_US        (6U * US_PER_MS)
+#ifndef CONFIG_GNRC_GOMACH_WAIT_RX_END_US
+#define CONFIG_GNRC_GOMACH_WAIT_RX_END_US        (6U * US_PER_MS)
 #endif
 
 /**
