@@ -111,12 +111,12 @@ extern "C" {
  *
  * Currently, GoMacH's WP is actually composed of
  * @ref CONFIG_GNRC_GOMACH_CP_DURATION_US and (+)
- * @ref GNRC_GOMACH_CP_RANDOM_END_US. We currently introduced this random
- * period to avoid beacon collision amongneighbor nodes. This macro may be
+ * @ref CONFIG_GNRC_GOMACH_CP_RANDOM_END_US. We currently introduced this random
+ * period to avoid beacon collision among neighbor nodes. This macro may be
  * removed in the future.
  */
-#ifndef GNRC_GOMACH_CP_RANDOM_END_US
-#define GNRC_GOMACH_CP_RANDOM_END_US        (1U * US_PER_MS)
+#ifndef CONFIG_GNRC_GOMACH_CP_RANDOM_END_US
+#define CONFIG_GNRC_GOMACH_CP_RANDOM_END_US        (1U * US_PER_MS)
 #endif
 
 /**

@@ -1482,7 +1482,7 @@ static void gomach_listen_init(gnrc_netif_t *netif)
     gnrc_gomach_set_enter_new_cycle(netif, false);
 
     /* Set listen period timeout. */
-    uint32_t listen_period = random_uint32_range(0, GNRC_GOMACH_CP_RANDOM_END_US) +
+    uint32_t listen_period = random_uint32_range(0, CONFIG_GNRC_GOMACH_CP_RANDOM_END_US) +
                              CONFIG_GNRC_GOMACH_CP_DURATION_US;
     gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_CP_END, listen_period);
     gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_CP_MAX, GNRC_GOMACH_CP_DURATION_MAX_US);
