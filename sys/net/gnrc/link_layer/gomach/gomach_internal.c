@@ -944,15 +944,15 @@ void gnrc_gomach_process_preamble_ack(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     }
 
     if (((uint32_t)phase_us > (CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US -
-                               GNRC_GOMACH_CP_MIN_GAP_US)) ||
-        ((uint32_t)phase_us < GNRC_GOMACH_CP_MIN_GAP_US)) {
+                               CONFIG_GNRC_GOMACH_CP_MIN_GAP_US)) ||
+        ((uint32_t)phase_us < CONFIG_GNRC_GOMACH_CP_MIN_GAP_US)) {
         LOG_DEBUG("[GOMACH] t2u: own phase is close to the neighbor's.\n");
         gnrc_gomach_set_phase_backoff(netif, true);
         /* Set a random phase-backoff value. */
         netif->mac.prot.gomach.backoff_phase_us =
-            random_uint32_range(GNRC_GOMACH_CP_MIN_GAP_US,
+            random_uint32_range(CONFIG_GNRC_GOMACH_CP_MIN_GAP_US,
                                 (CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US -
-                                 GNRC_GOMACH_CP_MIN_GAP_US));
+                                 CONFIG_GNRC_GOMACH_CP_MIN_GAP_US));
     }
 
     netif->mac.tx.current_neighbor->cp_phase = phase_us;

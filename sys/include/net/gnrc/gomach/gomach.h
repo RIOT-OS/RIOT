@@ -159,8 +159,8 @@ extern "C" {
  * finds its wake-up phase too closed to its receiver's, it will randomly
  * select a new phase for itself.
  */
-#ifndef GNRC_GOMACH_CP_MIN_GAP_US
-#define GNRC_GOMACH_CP_MIN_GAP_US        (25U * US_PER_MS)
+#ifndef CONFIG_GNRC_GOMACH_CP_MIN_GAP_US
+#define CONFIG_GNRC_GOMACH_CP_MIN_GAP_US        (25U * US_PER_MS)
 #endif
 
 /**
