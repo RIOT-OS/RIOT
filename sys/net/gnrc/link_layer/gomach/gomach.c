@@ -728,7 +728,7 @@ static void gomach_t2k_wait_beacon(gnrc_netif_t *netif)
                 gnrc_gomach_set_netdev_state(netif, NETOPT_STATE_SLEEP);
 
                 uint32_t wait_slots_duration = netif->mac.tx.vtdma_para.slots_position *
-                                               GNRC_GOMACH_VTDMA_SLOT_SIZE_US;
+                                               CONFIG_GNRC_GOMACH_VTDMA_SLOT_SIZE_US;
                 gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_WAIT_SLOTS,
                                         wait_slots_duration);
 
@@ -1730,7 +1730,7 @@ static void gomach_vtdma_init(gnrc_netif_t *netif)
 
     /* Set the vTDMA period timeout. */
     uint32_t vtdma_duration = netif->mac.rx.vtdma_manag.total_slots_num *
-                              GNRC_GOMACH_VTDMA_SLOT_SIZE_US;
+                              CONFIG_GNRC_GOMACH_VTDMA_SLOT_SIZE_US;
     gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_VTDMA, vtdma_duration);
 
     gnrc_gomach_set_vTDMA_end(netif, false);

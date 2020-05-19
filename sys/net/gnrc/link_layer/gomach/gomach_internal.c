@@ -465,7 +465,7 @@ int gnrc_gomach_send_beacon(gnrc_netif_t *netif)
     /* Check the maximum number of slots that can be allocated to senders. */
     uint16_t max_slot_num = (CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US -
                              gnrc_gomach_phase_now(netif)) /
-                            GNRC_GOMACH_VTDMA_SLOT_SIZE_US;
+                            CONFIG_GNRC_GOMACH_VTDMA_SLOT_SIZE_US;
 
     for (i = 0; i < GNRC_GOMACH_SLOSCH_UNIT_COUNT; i++) {
         if (netif->mac.rx.slosch_list[i].queue_indicator > 0) {

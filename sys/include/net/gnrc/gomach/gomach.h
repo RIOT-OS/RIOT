@@ -247,12 +247,12 @@ extern "C" {
  *
  * GoMacH adopts dynamic slots allocation scheme to allocate transmission slots
  * to senders that have pending packets. Each slot is for one data packet with
- * ACK transmission. @ref GNRC_GOMACH_VTDMA_SLOT_SIZE_US is right sufficient
- * for the transmission of the longest packet in IEEE 802.15.4 with ACK. Should
- * not be changed.
+ * ACK transmission. @ref CONFIG_GNRC_GOMACH_VTDMA_SLOT_SIZE_US is right
+ * sufficient for the transmission of the longest packet in IEEE 802.15.4 with
+ * ACK. Should not be changed.
  */
-#ifndef GNRC_GOMACH_VTDMA_SLOT_SIZE_US
-#define GNRC_GOMACH_VTDMA_SLOT_SIZE_US        (5U * US_PER_MS)
+#ifndef CONFIG_GNRC_GOMACH_VTDMA_SLOT_SIZE_US
+#define CONFIG_GNRC_GOMACH_VTDMA_SLOT_SIZE_US        (5U * US_PER_MS)
 #endif
 
 /**
