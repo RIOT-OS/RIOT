@@ -57,14 +57,14 @@ extern "C" {
  * @brief The default duration of GoMacH's wake-up period (WP).
  *
  * GoMacH adopts the duty-cycle scheme that, by default, a node only wakes up
- * for a short period of @ref GNRC_GOMACH_CP_DURATION_US in each cycle. In the
+ * for a short period of @ref CONFIG_GNRC_GOMACH_CP_DURATION_US in each cycle. In the
  * rest of the cycle (except vTDMA), the node turns off the radio  to conserve
- * power. @ref GNRC_GOMACH_CP_DURATION_US should be at least longer than
+ * power. @ref CONFIG_GNRC_GOMACH_CP_DURATION_US should be at least longer than
  * @ref GNRC_GOMACH_MAX_PREAM_INTERVAL_US, thus to guarantee that the receiver
  * will not miss the preamble packet.
  */
-#ifndef GNRC_GOMACH_CP_DURATION_US
-#define GNRC_GOMACH_CP_DURATION_US        (10U * US_PER_MS)
+#ifndef CONFIG_GNRC_GOMACH_CP_DURATION_US
+#define CONFIG_GNRC_GOMACH_CP_DURATION_US        (10U * US_PER_MS)
 #endif
 
 /**
@@ -83,8 +83,9 @@ extern "C" {
  * beginning of a cycle.
  *
  * @note GoMacH's superframe duration @ref GNRC_GOMACH_SUPERFRAME_DURATION_US
- * should not be shorter than 10 times of @ref GNRC_GOMACH_CP_DURATION_US and
- * not shorter than the RTT tickle interval.
+ * should not be shorter than 10 times of
+ * @ref CONFIG_GNRC_GOMACH_CP_DURATION_US and not shorter than the RTT tickle
+ * interval.
  */
 #ifndef GNRC_GOMACH_SUPERFRAME_DURATION_US
 #define GNRC_GOMACH_SUPERFRAME_DURATION_US        (300LU * US_PER_MS)
@@ -94,12 +95,12 @@ extern "C" {
 #error "RTT_FREQUENCY undefined."
 #else
 #if ((GNRC_GOMACH_SUPERFRAME_DURATION_US < ((1000LU *US_PER_MS) / RTT_FREQUENCY)) || \
-     (GNRC_GOMACH_SUPERFRAME_DURATION_US < (10 *GNRC_GOMACH_CP_DURATION_US)))
+     (GNRC_GOMACH_SUPERFRAME_DURATION_US < (10 * CONFIG_GNRC_GOMACH_CP_DURATION_US)))
 #undef GNRC_GOMACH_SUPERFRAME_DURATION_US
-#if (((1000LU *US_PER_MS) / RTT_FREQUENCY) > (10 * GNRC_GOMACH_CP_DURATION_US))
+#if (((1000LU *US_PER_MS) / RTT_FREQUENCY) > (10 * CONFIG_GNRC_GOMACH_CP_DURATION_US))
 #define GNRC_GOMACH_SUPERFRAME_DURATION_US        ((1000LU * US_PER_MS) / RTT_FREQUENCY)
 #else
-#define GNRC_GOMACH_SUPERFRAME_DURATION_US        (10 * GNRC_GOMACH_CP_DURATION_US)
+#define GNRC_GOMACH_SUPERFRAME_DURATION_US        (10 * CONFIG_GNRC_GOMACH_CP_DURATION_US)
 #endif
 #endif
 #endif
@@ -109,9 +110,10 @@ extern "C" {
  *        wake-up period (WP).
  *
  * Currently, GoMacH's WP is actually composed of
- * @ref GNRC_GOMACH_CP_DURATION_US and (+) @ref GNRC_GOMACH_CP_RANDOM_END_US.
- * We currently introduced this random period to avoid beacon collision among
- * neighbor nodes. This macro may be removed in the future.
+ * @ref CONFIG_GNRC_GOMACH_CP_DURATION_US and (+)
+ * @ref GNRC_GOMACH_CP_RANDOM_END_US. We currently introduced this random
+ * period to avoid beacon collision amongneighbor nodes. This macro may be
+ * removed in the future.
  */
 #ifndef GNRC_GOMACH_CP_RANDOM_END_US
 #define GNRC_GOMACH_CP_RANDOM_END_US        (1U * US_PER_MS)
@@ -129,7 +131,7 @@ extern "C" {
  * reaches this @ref GNRC_GOMACH_CP_DURATION_MAX_US duration.
  */
 #ifndef GNRC_GOMACH_CP_DURATION_MAX_US
-#define GNRC_GOMACH_CP_DURATION_MAX_US        (5LU * GNRC_GOMACH_CP_DURATION_US)
+#define GNRC_GOMACH_CP_DURATION_MAX_US (5LU * CONFIG_GNRC_GOMACH_CP_DURATION_US)
 #endif
 
 /**

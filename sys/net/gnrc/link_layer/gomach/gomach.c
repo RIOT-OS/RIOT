@@ -472,18 +472,18 @@ static void gomach_t2k_init(gnrc_netif_t *netif)
      * Firstly, put the calculated phase ahead, check whether the neighbor's phase has gone ahead
      * of the recorded one */
     if (netif->mac.tx.no_ack_counter == (GNRC_GOMACH_REPHASELOCK_THRESHOLD - 2)) {
-        if ((uint32_t)wait_phase_duration < GNRC_GOMACH_CP_DURATION_US) {
+        if ((uint32_t)wait_phase_duration < CONFIG_GNRC_GOMACH_CP_DURATION_US) {
             wait_phase_duration = (wait_phase_duration + GNRC_GOMACH_SUPERFRAME_DURATION_US) -
-                                  GNRC_GOMACH_CP_DURATION_US;
+                                  CONFIG_GNRC_GOMACH_CP_DURATION_US;
         }
         else {
-            wait_phase_duration = wait_phase_duration - GNRC_GOMACH_CP_DURATION_US;
+            wait_phase_duration = wait_phase_duration - CONFIG_GNRC_GOMACH_CP_DURATION_US;
         }
     }
     /* If this is the last t2k trial, the phase-lock auto-adjust scheme delays the estimated phase
      *  a little bit, to see if the real phase is behind the original calculated one. */
     if (netif->mac.tx.no_ack_counter == (GNRC_GOMACH_REPHASELOCK_THRESHOLD - 1)) {
-        wait_phase_duration = wait_phase_duration + GNRC_GOMACH_CP_DURATION_US;
+        wait_phase_duration = wait_phase_duration + CONFIG_GNRC_GOMACH_CP_DURATION_US;
         if ((uint32_t)wait_phase_duration > GNRC_GOMACH_SUPERFRAME_DURATION_US) {
             wait_phase_duration = wait_phase_duration - GNRC_GOMACH_SUPERFRAME_DURATION_US;
         }
@@ -573,16 +573,13 @@ static void _cp_tx_success(gnrc_netif_t *netif)
      * phase upon success. Here the new phase will be put ahead to the
      * original phase. */
     if (netif->mac.tx.no_ack_counter == (GNRC_GOMACH_REPHASELOCK_THRESHOLD - 2)) {
-        if (netif->mac.tx.current_neighbor->cp_phase >=
-            GNRC_GOMACH_CP_DURATION_US) {
-            netif->mac.tx.current_neighbor->cp_phase -=
-                GNRC_GOMACH_CP_DURATION_US;
+        if (netif->mac.tx.current_neighbor->cp_phase >= CONFIG_GNRC_GOMACH_CP_DURATION_US) {
+            netif->mac.tx.current_neighbor->cp_phase -= CONFIG_GNRC_GOMACH_CP_DURATION_US;
         }
         else {
             netif->mac.tx.current_neighbor->cp_phase +=
                 GNRC_GOMACH_SUPERFRAME_DURATION_US;
-            netif->mac.tx.current_neighbor->cp_phase -=
-                GNRC_GOMACH_CP_DURATION_US;
+            netif->mac.tx.current_neighbor->cp_phase -= CONFIG_GNRC_GOMACH_CP_DURATION_US;
         }
     }
     /* Here is the phase-lock auto-adjust scheme. Use the new adjusted
@@ -590,7 +587,7 @@ static void _cp_tx_success(gnrc_netif_t *netif)
      * phase. */
     if (netif->mac.tx.no_ack_counter == (GNRC_GOMACH_REPHASELOCK_THRESHOLD - 1)) {
         netif->mac.tx.current_neighbor->cp_phase +=
-            (GNRC_GOMACH_CP_DURATION_US + 20 * US_PER_MS);
+            (CONFIG_GNRC_GOMACH_CP_DURATION_US + 20 * US_PER_MS);
 
         if (netif->mac.tx.current_neighbor->cp_phase >=
             GNRC_GOMACH_SUPERFRAME_DURATION_US) {
@@ -1486,10 +1483,9 @@ static void gomach_listen_init(gnrc_netif_t *netif)
 
     /* Set listen period timeout. */
     uint32_t listen_period = random_uint32_range(0, GNRC_GOMACH_CP_RANDOM_END_US) +
-                             GNRC_GOMACH_CP_DURATION_US;
+                             CONFIG_GNRC_GOMACH_CP_DURATION_US;
     gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_CP_END, listen_period);
     gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_CP_MAX, GNRC_GOMACH_CP_DURATION_MAX_US);
-
     gnrc_netif_set_rx_started(netif, false);
     gnrc_gomach_set_pkt_received(netif, false);
     netif->mac.prot.gomach.cp_extend_count = 0;
@@ -1523,14 +1519,16 @@ static void _cp_listen_get_pkt(gnrc_netif_t *netif)
         gnrc_gomach_set_got_preamble(netif, false);
         gnrc_gomach_set_cp_end(netif, false);
         gnrc_gomach_clear_timeout(netif, GNRC_GOMACH_TIMEOUT_CP_END);
-        gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_CP_END, GNRC_GOMACH_CP_DURATION_US);
+        gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_CP_END,
+                                CONFIG_GNRC_GOMACH_CP_DURATION_US);
     }
     else if ((!gnrc_gomach_get_unintd_preamble(netif)) &&
              (!gnrc_gomach_get_quit_cycle(netif))) {
         gnrc_gomach_set_got_preamble(netif, false);
         gnrc_gomach_set_cp_end(netif, false);
         gnrc_gomach_clear_timeout(netif, GNRC_GOMACH_TIMEOUT_CP_END);
-        gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_CP_END, GNRC_GOMACH_CP_DURATION_US);
+        gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_CP_END,
+                                CONFIG_GNRC_GOMACH_CP_DURATION_US);
     }
 }
 
