@@ -1211,7 +1211,7 @@ static void gomach_t2u_wait_preamble_ack(gnrc_netif_t *netif)
         netif->mac.tx.t2u_retry_counter++;
 
         /* If we reach the maximum t2u retry limit, release the data packet. */
-        if (netif->mac.tx.t2u_retry_counter >= GNRC_GOMACH_T2U_RETYR_THRESHOLD) {
+        if (netif->mac.tx.t2u_retry_counter >= CONFIG_GNRC_GOMACH_T2U_RETYR_THRESHOLD) {
             LOG_DEBUG("[GOMACH] t2u failed: no preamble-ACK.\n");
             netif->mac.tx.t2u_retry_counter = 0;
             netif->mac.tx.t2u_state = GNRC_GOMACH_T2U_END;
@@ -1309,7 +1309,7 @@ static void _t2u_data_tx_fail(gnrc_netif_t *netif)
 {
     netif->mac.tx.t2u_retry_counter++;
     /* If we meet t2u retry limit, release the packet. */
-    if (netif->mac.tx.t2u_retry_counter >= GNRC_GOMACH_T2U_RETYR_THRESHOLD) {
+    if (netif->mac.tx.t2u_retry_counter >= CONFIG_GNRC_GOMACH_T2U_RETYR_THRESHOLD) {
         LOG_DEBUG("[GOMACH] t2u send data failed on channel %d,"
                   " drop packet.\n", netif->mac.tx.current_neighbor->pub_chanseq);
         gnrc_pktbuf_release(netif->mac.tx.packet);
