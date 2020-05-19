@@ -155,3 +155,33 @@ the only parts of compounded module names and only match against part of that na
 See `sys/ztimer/Makefile` for an example in code.
 
 `SUBMODULES` can also be true-pseudomodules.
+
+# Helper tools
+
+To help you start writing a module, the RIOT build system provides the
+`generate-module` make target. It is a wrapper around the
+[riotgen](https://pypi.org/project/riotgen/) command line tool that is helpful
+when starting to implement a module: all required files are generated with
+copyright headers, doxygen groups, etc, so you can concentrate on the module
+implementation.
+The module source files are created in the `sys` directory.
+
+**Usage:**
+
+From the RIOT base directory, run:
+```
+make generate-module
+```
+Then answer a few questions about the driver:
+- Module name: enter a name for your module. It will be used as both the name
+  of the module directory under sys, where the source files are created, and
+  the build system module (used with `USEMODULE`).
+- Module doxygen name: Enter the name of module, as displayed in the
+  Doxygen documentation.
+- Brief doxygen description: Describe in one line what is this module about.
+
+Other global information (author name, email, organization) should be retrieved
+automatically from your git configuration.
+
+Once completed, the module files are located in
+`sys/<module name>/<module name>.c` and `sys/include/<module name>.h`.
