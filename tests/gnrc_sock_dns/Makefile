@@ -33,7 +33,7 @@ LOW_MEMORY_BOARDS := nucleo-f334r8 msb-430 msb-430h
 ifeq ($(BOARD),$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
     CFLAGS += -DGNRC_PKTBUF_SIZE=512 -DCONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF=2 \
               -DGNRC_NETIF_IPV6_GROUPS_NUMOF=2 -DCONFIG_GNRC_IPV6_NIB_NUMOF=1 \
-              -DNRC_IPV6_NIB_OFFL_NUMOF=1
+              -DCONFIG_GNRC_IPV6_NIB_OFFL_NUMOF=1
 endif
 
 # The test requires some setup and to be run as root
