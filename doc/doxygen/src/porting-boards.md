@@ -172,6 +172,33 @@ any browser.
 */
 @endcode
 
+# Helper tools
+
+To help you start porting a board, the RIOT build system provides the
+`generate-board` make target. It is a wrapper around the
+[riotgen](https://pypi.org/project/riotgen/) command line tool that is helpful
+when starting to port a board: all required files are generated with
+copyright headers, doxygen groups, etc, so you can concentrate on the port.
+The board source files are created in the `boards/<board name>` directory.
+
+**Usage:**
+
+From the RIOT base directory, run:
+```
+make generate-board
+```
+Then answer a few questions about the driver:
+- Board name: Enter a name for your board. It will be used as the name
+  of the board directory under `boards`.
+- Board displayed name: Enter the name of the board, as displayed in the
+  Doxygen documentation.
+- CPU name: Enter the name of the CPU embedded on the board.
+- CPU model name: Enter the precise model name of the CPU.
+- Features provided: CPU features provided (and configured) for this board.
+
+Other global information (author name, email, organization) should be retrieved
+automatically from your git configuration.
+
 # Using Common code                                         {#common-board-code}
 
 To avoid code duplication, common code across boards has been grouped in
