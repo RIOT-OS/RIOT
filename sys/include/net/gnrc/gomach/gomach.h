@@ -202,15 +202,15 @@ extern "C" {
  * @brief Time interval between two consecutive preamble packets in GoMacH.
  *
  * In GoMacH, after a preamble is sent, the sender sets a timeout with
- * @ref GNRC_GOMACH_PREAMBLE_INTERVAL_US duration for waiting to send the next
- * preamble. Notably, this macro is with a very small value. In GoMacH, for
- * receiving the preamble-ACK packet, the sender doesn't wait for the whole
- * reception of the preamble-ACK. Instead, it only waits for the
+ * @ref CONFIG_GNRC_GOMACH_PREAMBLE_INTERVAL_US duration for waiting to send
+ * the next preamble. Notably, this macro is with a very small value. In
+ * GoMacH, for receiving the preamble-ACK packet, the sender doesn't wait for
+ * the whole reception of the preamble-ACK. Instead, it only waits for the
  * @ref NETDEV_EVENT_RX_STARTED event which leads to shorter time interval
  * between two consecutive preamble transmissions.
  */
-#ifndef GNRC_GOMACH_PREAMBLE_INTERVAL_US
-#define GNRC_GOMACH_PREAMBLE_INTERVAL_US        (2U * US_PER_MS)
+#ifndef CONFIG_GNRC_GOMACH_PREAMBLE_INTERVAL_US
+#define CONFIG_GNRC_GOMACH_PREAMBLE_INTERVAL_US        (2U * US_PER_MS)
 #endif
 
 /**

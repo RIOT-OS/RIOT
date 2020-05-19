@@ -1092,7 +1092,7 @@ static void gomach_t2u_wait_preamble_tx(gnrc_netif_t *netif)
         /* Set preamble interval timeout. This is a very short timeout (1ms),
          * just to catch the rx-start event of receiving possible preamble-ACK. */
         gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_PREAMBLE,
-                                GNRC_GOMACH_PREAMBLE_INTERVAL_US);
+                                CONFIG_GNRC_GOMACH_PREAMBLE_INTERVAL_US);
 
         netif->mac.tx.t2u_state = GNRC_GOMACH_T2U_WAIT_PREAMBLE_ACK;
         gnrc_gomach_set_update(netif, false);
