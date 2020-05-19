@@ -463,7 +463,8 @@ int gnrc_gomach_send_beacon(gnrc_netif_t *netif)
     uint8_t slots_list[GNRC_GOMACH_SLOSCH_UNIT_COUNT];
 
     /* Check the maximum number of slots that can be allocated to senders. */
-    uint16_t max_slot_num = (GNRC_GOMACH_SUPERFRAME_DURATION_US - gnrc_gomach_phase_now(netif)) /
+    uint16_t max_slot_num = (CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US -
+                             gnrc_gomach_phase_now(netif)) /
                             GNRC_GOMACH_VTDMA_SLOT_SIZE_US;
 
     for (i = 0; i < GNRC_GOMACH_SLOSCH_UNIT_COUNT; i++) {
@@ -939,17 +940,19 @@ void gnrc_gomach_process_preamble_ack(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
                         gomach_preamble_ack_hdr->phase_in_us;
 
     if (phase_us < 0) {
-        phase_us += GNRC_GOMACH_SUPERFRAME_DURATION_US;
+        phase_us += CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US;
     }
 
-    if (((uint32_t)phase_us > (GNRC_GOMACH_SUPERFRAME_DURATION_US - GNRC_GOMACH_CP_MIN_GAP_US)) ||
+    if (((uint32_t)phase_us > (CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US -
+                               GNRC_GOMACH_CP_MIN_GAP_US)) ||
         ((uint32_t)phase_us < GNRC_GOMACH_CP_MIN_GAP_US)) {
         LOG_DEBUG("[GOMACH] t2u: own phase is close to the neighbor's.\n");
         gnrc_gomach_set_phase_backoff(netif, true);
         /* Set a random phase-backoff value. */
         netif->mac.prot.gomach.backoff_phase_us =
             random_uint32_range(GNRC_GOMACH_CP_MIN_GAP_US,
-                                (GNRC_GOMACH_SUPERFRAME_DURATION_US - GNRC_GOMACH_CP_MIN_GAP_US));
+                                (CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US -
+                                 GNRC_GOMACH_CP_MIN_GAP_US));
     }
 
     netif->mac.tx.current_neighbor->cp_phase = phase_us;
@@ -1393,7 +1396,7 @@ void gnrc_gomach_update_neighbor_phase(gnrc_netif_t *netif)
             long int tmp = netif->mac.tx.neighbors[i].cp_phase -
                            netif->mac.prot.gomach.backoff_phase_us;
             if (tmp < 0) {
-                tmp += GNRC_GOMACH_SUPERFRAME_DURATION_US;
+                tmp += CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US;
 
                 /* Toggle the neighbor's public channel phase if tmp < 0. */
                 if (netif->mac.tx.neighbors[i].pub_chanseq ==

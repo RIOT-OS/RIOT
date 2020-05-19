@@ -82,25 +82,25 @@ extern "C" {
  * listening. In GoMacH, by default, we regard the wake-up period (WP) as the
  * beginning of a cycle.
  *
- * @note GoMacH's superframe duration @ref GNRC_GOMACH_SUPERFRAME_DURATION_US
- * should not be shorter than 10 times of
- * @ref CONFIG_GNRC_GOMACH_CP_DURATION_US and not shorter than the RTT tickle
- * interval.
+ * @note GoMacH's superframe duration
+ * @ref CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US should not be shorter than 10
+ * times of @ref CONFIG_GNRC_GOMACH_CP_DURATION_US and not shorter than the RTT
+ * tickle interval.
  */
-#ifndef GNRC_GOMACH_SUPERFRAME_DURATION_US
-#define GNRC_GOMACH_SUPERFRAME_DURATION_US        (300LU * US_PER_MS)
+#ifndef CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US
+#define CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US        (300LU * US_PER_MS)
 #endif
 
 #ifndef RTT_FREQUENCY
 #error "RTT_FREQUENCY undefined."
 #else
-#if ((GNRC_GOMACH_SUPERFRAME_DURATION_US < ((1000LU *US_PER_MS) / RTT_FREQUENCY)) || \
-     (GNRC_GOMACH_SUPERFRAME_DURATION_US < (10 * CONFIG_GNRC_GOMACH_CP_DURATION_US)))
-#undef GNRC_GOMACH_SUPERFRAME_DURATION_US
+#if ((CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US < ((1000LU *US_PER_MS) / RTT_FREQUENCY)) || \
+     (CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US < (10 * CONFIG_GNRC_GOMACH_CP_DURATION_US)))
+#undef CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US
 #if (((1000LU *US_PER_MS) / RTT_FREQUENCY) > (10 * CONFIG_GNRC_GOMACH_CP_DURATION_US))
-#define GNRC_GOMACH_SUPERFRAME_DURATION_US        ((1000LU * US_PER_MS) / RTT_FREQUENCY)
+#define CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US   ((1000LU * US_PER_MS) / RTT_FREQUENCY)
 #else
-#define GNRC_GOMACH_SUPERFRAME_DURATION_US        (10 * CONFIG_GNRC_GOMACH_CP_DURATION_US)
+#define CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US   (10 * CONFIG_GNRC_GOMACH_CP_DURATION_US)
 #endif
 #endif
 #endif
@@ -218,9 +218,9 @@ extern "C" {
  *
  * In GoMacH, when sending a broadcast packet, the sender broadcasts the same
  * packet frame on its two public channels simultaneously, with a total duration
- * of @ref GNRC_GOMACH_SUPERFRAME_DURATION_US to guarantee that all neighbors
- * will get a copy. This macro defines the time interval between sending two
- * consecutive broadcast copies.
+ * of @ref CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US to guarantee that all
+ * neighbors will get a copy. This macro defines the time interval between
+ * ending two consecutive broadcast copies.
  */
 #ifndef GNRC_GOMACH_BCAST_INTERVAL_US
 #define GNRC_GOMACH_BCAST_INTERVAL_US        (1U * US_PER_MS)
@@ -235,10 +235,11 @@ extern "C" {
  * in a critical case that one public channel is jammed, the sender repeatedly
  * broadcasts a stream of preamble packets with the broadcast duration
  * (preamble duration) slightly longer than twice of
- * @ref GNRC_GOMACH_SUPERFRAME_DURATION_US.
+ * @ref CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US.
  */
 #ifndef GNRC_GOMACH_PREAMBLE_DURATION_US
-#define GNRC_GOMACH_PREAMBLE_DURATION_US        (21LU * GNRC_GOMACH_SUPERFRAME_DURATION_US / 10)
+#define GNRC_GOMACH_PREAMBLE_DURATION_US \
+     (21LU * CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US / 10)
 #endif
 
 /**
