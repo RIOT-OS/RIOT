@@ -553,7 +553,7 @@ int gnrc_gomach_send_beacon(gnrc_netif_t *netif)
     }
     else {
         gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_NO_TX_ISR,
-                                GNRC_GOMACH_NO_TX_ISR_US);
+                                CONFIG_GNRC_GOMACH_NO_TX_ISR_US);
     }
     return res;
 }

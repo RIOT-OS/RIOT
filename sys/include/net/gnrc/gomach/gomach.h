@@ -183,8 +183,8 @@ extern "C" {
  * hardware abnormal event. Upon this timeout expiration, GoMach will
  * accordingly take actions to maintain its state-machine.
  */
-#ifndef GNRC_GOMACH_NO_TX_ISR_US
-#define GNRC_GOMACH_NO_TX_ISR_US          (50U * US_PER_MS)
+#ifndef CONFIG_GNRC_GOMACH_NO_TX_ISR_US
+#define CONFIG_GNRC_GOMACH_NO_TX_ISR_US          (50U * US_PER_MS)
 #endif
 
 /**

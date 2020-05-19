@@ -557,7 +557,7 @@ static void gomach_t2k_trans_in_cp(gnrc_netif_t *netif)
         return;
     }
 
-    gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_NO_TX_ISR, GNRC_GOMACH_NO_TX_ISR_US);
+    gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_NO_TX_ISR, CONFIG_GNRC_GOMACH_NO_TX_ISR_US);
 
     netif->mac.tx.t2k_state = GNRC_GOMACH_T2K_WAIT_CPTX_FEEDBACK;
     gnrc_gomach_set_update(netif, false);
@@ -815,7 +815,7 @@ static void gomach_t2k_trans_in_slots(gnrc_netif_t *netif)
         return;
     }
 
-    gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_NO_TX_ISR, GNRC_GOMACH_NO_TX_ISR_US);
+    gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_NO_TX_ISR, CONFIG_GNRC_GOMACH_NO_TX_ISR_US);
 
     netif->mac.tx.vtdma_para.slots_num--;
     netif->mac.tx.t2k_state = GNRC_GOMACH_T2K_WAIT_VTDMA_FEEDBACK;
@@ -1268,7 +1268,7 @@ static void gomach_t2u_send_data(gnrc_netif_t *netif)
         return;
     }
 
-    gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_NO_TX_ISR, GNRC_GOMACH_NO_TX_ISR_US);
+    gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_NO_TX_ISR, CONFIG_GNRC_GOMACH_NO_TX_ISR_US);
 
     netif->mac.tx.t2u_state = GNRC_GOMACH_T2U_WAIT_DATA_TX;
     gnrc_gomach_set_update(netif, false);
