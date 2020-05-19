@@ -361,6 +361,27 @@ void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state);
 void mrf24j40_set_state(mrf24j40_t *dev, uint8_t state);
 
 /**
+ * @brief   Enable or disable proprietary Turbo Mode.
+ *
+ * Turbo mode is only compatible with other mrf24j40 chips.
+ *
+ * turbo off:   250 kbit/s (IEEE mode)
+ * turbo  on:   625 kbit/s
+ *
+ * @param[in] dev           device to change state of
+ * @param[in] enable        turbo mode control
+ */
+void mrf24j40_set_turbo(mrf24j40_t *dev, bool enable);
+
+/**
+ * @brief   Query the state of the turbo mode
+ *
+ * @param[in] dev           device to query
+ * @return                  true if Turbo Mode is enabled
+ */
+bool mrf24j40_get_turbo(mrf24j40_t *dev);
+
+/**
  * @brief   Put in sleep mode
  *
  * @param[in] dev       device to put to sleep
