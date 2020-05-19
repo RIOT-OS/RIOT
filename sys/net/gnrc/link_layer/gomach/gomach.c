@@ -1536,7 +1536,7 @@ static void _cp_listen_end(gnrc_netif_t *netif)
 {
     /* If we found ongoing reception, wait for reception complete. */
     if ((gnrc_gomach_get_netdev_state(netif) == NETOPT_STATE_RX) &&
-        (netif->mac.prot.gomach.cp_extend_count < GNRC_GOMACH_CP_EXTEND_THRESHOLD)) {
+        (netif->mac.prot.gomach.cp_extend_count < CONFIG_GNRC_GOMACH_CP_EXTEND_THRESHOLD)) {
         netif->mac.prot.gomach.cp_extend_count++;
         gnrc_gomach_clear_timeout(netif, GNRC_GOMACH_TIMEOUT_WAIT_RX_END);
         gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_WAIT_RX_END,

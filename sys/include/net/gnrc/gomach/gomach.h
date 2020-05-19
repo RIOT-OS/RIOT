@@ -275,11 +275,11 @@ extern "C" {
  *
  * In GoMacH, the WP period of a receiver will be extended upon each successful
  * packet reception (except receiving broadcast or preamble packet) to receive
- * more potentialincoming packets. This macro defines the maximum WP period
+ * more potential incoming packets. This macro defines the maximum WP period
  * extension number allowed in GoMacH.
  */
-#ifndef GNRC_GOMACH_CP_EXTEND_THRESHOLD
-#define GNRC_GOMACH_CP_EXTEND_THRESHOLD      (5U)
+#ifndef CONFIG_GNRC_GOMACH_CP_EXTEND_THRESHOLD
+#define CONFIG_GNRC_GOMACH_CP_EXTEND_THRESHOLD      (5U)
 #endif
 
 /**
