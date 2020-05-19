@@ -261,13 +261,13 @@ extern "C" {
  *
  * Senders in GoMacH adopt CSMA scheme to send data packets in the WP period of
  * the receiver. In case of having medium-busy feedback in WP and the TX failure
- * count (due to busy) is below @ref GNRC_GOMACH_TX_BUSY_THRESHOLD, the sender
- * continue to send the packet with CSMAin the receiver's WP, with the
- * consideration that there may be multi-senderssimultaneously competing in WP
+ * count (due to busy) is below @ref CONFIG_GNRC_GOMACH_TX_BUSY_THRESHOLD, the
+ * sender continue to send the packet with CSMAin the receiver's WP, with the
+ * consideration that there may be multi-senders simultaneously competing in WP
  * and the WP will be continuously extended (thus the packet can be received).
  */
-#ifndef GNRC_GOMACH_TX_BUSY_THRESHOLD
-#define GNRC_GOMACH_TX_BUSY_THRESHOLD      (5U)
+#ifndef CONFIG_GNRC_GOMACH_TX_BUSY_THRESHOLD
+#define CONFIG_GNRC_GOMACH_TX_BUSY_THRESHOLD      (5U)
 #endif
 
 /**

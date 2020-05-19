@@ -617,7 +617,7 @@ static bool _cp_tx_busy(gnrc_netif_t *netif)
 {
     /* If the channel busy counter is below threshold, retry CSMA immediately,
      * by knowing that the CP will be automatically extended. */
-    if (netif->mac.tx.tx_busy_count < GNRC_GOMACH_TX_BUSY_THRESHOLD) {
+    if (netif->mac.tx.tx_busy_count < CONFIG_GNRC_GOMACH_TX_BUSY_THRESHOLD) {
         netif->mac.tx.tx_busy_count++;
 
         /* Store the TX sequence number for this packet. Always use the same
