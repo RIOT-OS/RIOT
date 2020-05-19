@@ -1464,7 +1464,7 @@ static void gomach_listen_init(gnrc_netif_t *netif)
         if (netif->mac.rx.check_dup_pkt.last_nodes[i].node_addr.len != 0) {
             netif->mac.rx.check_dup_pkt.last_nodes[i].life_cycle++;
             if (netif->mac.rx.check_dup_pkt.last_nodes[i].life_cycle >=
-                GNRC_GOMACH_RX_DUPCHK_UNIT_LIFE) {
+                CONFIG_GNRC_GOMACH_RX_DUPCHK_UNIT_LIFE) {
                 netif->mac.rx.check_dup_pkt.last_nodes[i].node_addr.len = 0;
                 netif->mac.rx.check_dup_pkt.last_nodes[i].node_addr.addr[0] = 0;
                 netif->mac.rx.check_dup_pkt.last_nodes[i].node_addr.addr[1] = 0;

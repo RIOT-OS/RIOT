@@ -291,8 +291,8 @@ extern "C" {
  * check-duplicate-packet data unit's life time in cycle count. Once expired,
  * the related data unit will be reset. This macro maybe removed in the future.
  */
-#ifndef GNRC_GOMACH_RX_DUPCHK_UNIT_LIFE
-#define GNRC_GOMACH_RX_DUPCHK_UNIT_LIFE            (30U)
+#ifndef CONFIG_GNRC_GOMACH_RX_DUPCHK_UNIT_LIFE
+#define CONFIG_GNRC_GOMACH_RX_DUPCHK_UNIT_LIFE            (30U)
 #endif
 
 /**
