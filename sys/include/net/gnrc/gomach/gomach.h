@@ -316,12 +316,12 @@ extern "C" {
  * procedure to transmit packet to the phase-known device. However, due to
  * factors like timer driftor busy-channel, a transmission attempt may fail
  * in t2k. If the t2k failure count has reached this
- * @ref GNRC_GOMACH_REPHASELOCK_THRESHOLD, the sender regards phase-locked
- * failed due to timer drift. In this case, it will adopt t2u
+ * @ref CONFIG_GNRC_GOMACH_REPHASELOCK_THRESHOLD, the sender regards
+ * phase-locked failed due to timer drift. In this case, it will adopt t2u
  * (transmit-to-unknown) procedure to get re-phase-locked with the receiver.
  */
-#ifndef GNRC_GOMACH_REPHASELOCK_THRESHOLD
-#define GNRC_GOMACH_REPHASELOCK_THRESHOLD      (4U)
+#ifndef CONFIG_GNRC_GOMACH_REPHASELOCK_THRESHOLD
+#define CONFIG_GNRC_GOMACH_REPHASELOCK_THRESHOLD      (4U)
 #endif
 
 /**

@@ -471,7 +471,7 @@ static void gomach_t2k_init(gnrc_netif_t *netif)
      * phase-lock failure due to timer drift.
      * Firstly, put the calculated phase ahead, check whether the neighbor's phase has gone ahead
      * of the recorded one */
-    if (netif->mac.tx.no_ack_counter == (GNRC_GOMACH_REPHASELOCK_THRESHOLD - 2)) {
+    if (netif->mac.tx.no_ack_counter == (CONFIG_GNRC_GOMACH_REPHASELOCK_THRESHOLD - 2)) {
         if ((uint32_t)wait_phase_duration < CONFIG_GNRC_GOMACH_CP_DURATION_US) {
             wait_phase_duration = (wait_phase_duration +
                                    CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US) -
@@ -483,7 +483,7 @@ static void gomach_t2k_init(gnrc_netif_t *netif)
     }
     /* If this is the last t2k trial, the phase-lock auto-adjust scheme delays the estimated phase
      *  a little bit, to see if the real phase is behind the original calculated one. */
-    if (netif->mac.tx.no_ack_counter == (GNRC_GOMACH_REPHASELOCK_THRESHOLD - 1)) {
+    if (netif->mac.tx.no_ack_counter == (CONFIG_GNRC_GOMACH_REPHASELOCK_THRESHOLD - 1)) {
         wait_phase_duration = wait_phase_duration + CONFIG_GNRC_GOMACH_CP_DURATION_US;
         if ((uint32_t)wait_phase_duration > CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US) {
             wait_phase_duration = wait_phase_duration - CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US;
@@ -573,7 +573,7 @@ static void _cp_tx_success(gnrc_netif_t *netif)
     /* Here is the phase-lock auto-adjust scheme. Use the new adjusted
      * phase upon success. Here the new phase will be put ahead to the
      * original phase. */
-    if (netif->mac.tx.no_ack_counter == (GNRC_GOMACH_REPHASELOCK_THRESHOLD - 2)) {
+    if (netif->mac.tx.no_ack_counter == (CONFIG_GNRC_GOMACH_REPHASELOCK_THRESHOLD - 2)) {
         if (netif->mac.tx.current_neighbor->cp_phase >= CONFIG_GNRC_GOMACH_CP_DURATION_US) {
             netif->mac.tx.current_neighbor->cp_phase -= CONFIG_GNRC_GOMACH_CP_DURATION_US;
         }
@@ -585,7 +585,7 @@ static void _cp_tx_success(gnrc_netif_t *netif)
     /* Here is the phase-lock auto-adjust scheme. Use the new adjusted
      * phase upon success. Here the new phase will be put behind the original
      * phase. */
-    if (netif->mac.tx.no_ack_counter == (GNRC_GOMACH_REPHASELOCK_THRESHOLD - 1)) {
+    if (netif->mac.tx.no_ack_counter == (CONFIG_GNRC_GOMACH_REPHASELOCK_THRESHOLD - 1)) {
         netif->mac.tx.current_neighbor->cp_phase +=
             (CONFIG_GNRC_GOMACH_CP_DURATION_US + 20 * US_PER_MS);
 
@@ -647,7 +647,7 @@ static void _cp_tx_default(gnrc_netif_t *netif)
     /* If no_ack_counter reaches the threshold, regarded as phase-lock failed. So
      * retry to send the packet in t2u, i.e., try to phase-lock with the receiver
      * again. */
-    if (netif->mac.tx.no_ack_counter >= GNRC_GOMACH_REPHASELOCK_THRESHOLD) {
+    if (netif->mac.tx.no_ack_counter >= CONFIG_GNRC_GOMACH_REPHASELOCK_THRESHOLD) {
         LOG_DEBUG("[GOMACH] t2k failed, go to t2u.\n");
         /* Here, we don't queue the packet again, but keep it in tx.packet. */
         netif->mac.tx.current_neighbor->mac_type = GNRC_GOMACH_TYPE_UNKNOWN;
@@ -1321,7 +1321,7 @@ static void _t2u_data_tx_fail(gnrc_netif_t *netif)
     }
     else {
         /* Record the MAC sequence of the data, retry t2u in next cycle. */
-        netif->mac.tx.no_ack_counter = GNRC_GOMACH_REPHASELOCK_THRESHOLD;
+        netif->mac.tx.no_ack_counter = CONFIG_GNRC_GOMACH_REPHASELOCK_THRESHOLD;
         netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
         netif->mac.tx.tx_seq = device_state->seq - 1;
 
@@ -1340,7 +1340,7 @@ static void gomach_t2u_wait_tx_feedback(gnrc_netif_t *netif)
         /* No TX-ISR, go to sleep. */
         netif->mac.tx.t2u_retry_counter++;
 
-        netif->mac.tx.no_ack_counter = GNRC_GOMACH_REPHASELOCK_THRESHOLD;
+        netif->mac.tx.no_ack_counter = CONFIG_GNRC_GOMACH_REPHASELOCK_THRESHOLD;
         netdev_ieee802154_t *device_state = (netdev_ieee802154_t *)netif->dev;
         netif->mac.tx.tx_seq = device_state->seq - 1;
 
