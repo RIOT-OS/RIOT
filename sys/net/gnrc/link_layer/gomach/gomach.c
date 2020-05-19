@@ -1035,7 +1035,7 @@ static void gomach_t2u_send_preamble_prepare(gnrc_netif_t *netif)
             gnrc_gomach_set_on_pubchan_1(netif, true);
         }
         gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_MAX_PREAM_INTERVAL,
-                                GNRC_GOMACH_MAX_PREAM_INTERVAL_US);
+                                CONFIG_GNRC_GOMACH_MAX_PREAM_INTERVAL_US);
     }
     else {
         /* Here, for the first preamble, we set the pream_max_interval timeout to
@@ -1043,7 +1043,7 @@ static void gomach_t2u_send_preamble_prepare(gnrc_netif_t *netif)
          * using csma for sending, and csma costs some time before actually sending
          * the packet. */
         gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_MAX_PREAM_INTERVAL,
-                                (5 * GNRC_GOMACH_MAX_PREAM_INTERVAL_US));
+                                (5 * CONFIG_GNRC_GOMACH_MAX_PREAM_INTERVAL_US));
     }
 
     gnrc_gomach_set_max_pream_interv(netif, false);
