@@ -657,7 +657,9 @@ typedef enum {
     NETOPT_IEEE802154_PHY,
 
     /**
-     * @brief   (uint8_t) legacy O-QPSK Rate Mode
+     * @brief   (uint8_t) legacy O-QPSK proprietary mode
+     *          Allows to select higher data rates than standard 250 kbit/s
+     *          Not compatible across vendors, only use with radios of the same type.
      */
     NETOPT_OQPSK_RATE,
 
