@@ -299,7 +299,7 @@ static void gomach_wait_bcast_tx_finish(gnrc_netif_t *netif)
 {
     if (gnrc_gomach_get_tx_finish(netif)) {
         gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_BCAST_INTERVAL,
-                                GNRC_GOMACH_BCAST_INTERVAL_US);
+                                CONFIG_GNRC_GOMACH_BCAST_INTERVAL_US);
         netif->mac.tx.bcast_state = GNRC_GOMACH_BCAST_WAIT_NEXT_TX;
         gnrc_gomach_set_update(netif, false);
     }

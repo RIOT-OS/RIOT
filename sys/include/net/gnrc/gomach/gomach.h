@@ -222,8 +222,8 @@ extern "C" {
  * neighbors will get a copy. This macro defines the time interval between
  * ending two consecutive broadcast copies.
  */
-#ifndef GNRC_GOMACH_BCAST_INTERVAL_US
-#define GNRC_GOMACH_BCAST_INTERVAL_US        (1U * US_PER_MS)
+#ifndef CONFIG_GNRC_GOMACH_BCAST_INTERVAL_US
+#define CONFIG_GNRC_GOMACH_BCAST_INTERVAL_US        (1U * US_PER_MS)
 #endif
 
 /**
