@@ -91,3 +91,52 @@ USEMODULE += gnrc_udp
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Modules typically pull in all required dependencies.
+
+# Helper tools
+
+To help you start writing an application within RIOT, the build system provides
+the `generate-example` `generate-test` make targets. These targets are wrappers
+around the [riotgen](https://pypi.org/project/riotgen/) command line tool and
+are helpful when starting to implement an application: all required files are
+generated with copyright headers, doxygen groups, etc, so you can concentrate
+on the module implementation.
+For applications, the `Makefile` is generated with the dependencies (modules,
+packages, required features) included.
+
+**Usage:**
+
+To generate an example application, e.g in the `examples` directory, from the
+RIOT base directory, run:
+```
+make generate-example
+```
+
+To generate a test application, e.g in the `tests` directory, from the
+RIOT base directory, run:
+```
+make generate-test
+```
+
+Then answer a few questions about the application:
+- Application name: enter a name for your application. It will be used as both
+  the name of the application directory under `examples` or `tests` and by
+  the build system module (set in the `APPLICATION` variable).
+- Application brief description: Describe in one line what is this application
+  about.
+- Target board: select the default target board. The value is set to `native`
+  by default.
+- Modules: give the list of dependency modules, separated by commas. For
+  example: ztimer,fmt
+- Packages: give the list of dependency packages, separated by commas.
+- Features required: give the list of CPU features (`periph_*`, etc) required
+  by the application, all separated by commas.
+
+Other global information (author name, email, organization) should be retrieved
+automatically from your git configuration.
+
+Once completed, the application files are either located in
+`examples/<application name>` or `tests/<application name>` depending on the
+target used.
+
+**Testrunner:** when using the `make generate-test`, you can also automatically
+add a testrunner Python script. Just answer 'y' when prompted.
