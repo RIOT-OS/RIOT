@@ -115,7 +115,7 @@ void rtt_init(void)
     !defined(CPU_FAM_STM32WB)
     EXTI->FTSR_REG &= ~(EXTI_FTSR_BIT);
     EXTI->RTSR_REG |= EXTI_RTSR_BIT;
-    EXTI->PR_REG |= EXTI_PR_BIT;
+    EXTI->PR_REG = EXTI_PR_BIT;
 #endif
     NVIC_EnableIRQ(LPTIM1_IRQn);
     /* enable timer */
@@ -206,7 +206,7 @@ void isr_lptim1(void)
     LPTIM1->ICR = (LPTIM_ICR_ARRMCF | LPTIM_ICR_CMPMCF);
 #if !defined(CPU_FAM_STM32L4) && !defined(CPU_FAM_STM32L0) && \
     !defined(CPU_FAM_STM32WB)
-    EXTI->PR_REG |= EXTI_PR_BIT;
+    EXTI->PR_REG = EXTI_PR_BIT; /* only clear the associated bit */
 #endif
 
     cortexm_isr_end();
