@@ -1474,7 +1474,7 @@ static void gomach_listen_init(gnrc_netif_t *netif)
         }
     }
 
-    if (netif->mac.tx.t2u_fail_count >= GNRC_GOMACH_MAX_T2U_RETYR_THRESHOLD) {
+    if (netif->mac.tx.t2u_fail_count >= CONFIG_GNRC_GOMACH_MAX_T2U_RETYR_THRESHOLD) {
         netif->mac.tx.t2u_fail_count = 0;
         LOG_DEBUG("[GOMACH]: Re-initialize radio.");
         gomach_reinit_radio(netif);
