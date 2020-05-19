@@ -35,20 +35,20 @@
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/netif/conf.h"
-#ifdef MODULE_GNRC_LORAWAN
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN)
 #include "net/gnrc/netif/lorawan.h"
 #endif
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if IS_USED(MODULE_GNRC_NETIF_6LO)
 #include "net/gnrc/netif/6lo.h"
 #endif
 #if defined(MODULE_GNRC_NETIF_DEDUP) && (GNRC_NETIF_L2ADDR_MAXLEN > 0)
 #include "net/gnrc/netif/dedup.h"
 #endif
 #include "net/gnrc/netif/flags.h"
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
 #include "net/gnrc/netif/ipv6.h"
 #endif
-#ifdef MODULE_GNRC_MAC
+#if IS_USED(MODULE_GNRC_NETIF_MAC)
 #include "net/gnrc/netif/mac.h"
 #endif
 #include "net/ndp.h"
@@ -80,15 +80,15 @@ typedef struct {
 #ifdef MODULE_NETSTATS_L2
     netstats_t stats;                       /**< transceiver's statistics */
 #endif
-#if defined(MODULE_GNRC_LORAWAN) || DOXYGEN
+#if IS_USED(MODULE_GNRC_NETIF_LORAWAN) || defined(DOXYGEN)
     gnrc_netif_lorawan_t lorawan;           /**< LoRaWAN component */
 #endif
-#if defined(MODULE_GNRC_IPV6) || DOXYGEN
+#if IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN)
     gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */
 #endif
-#if defined(MODULE_GNRC_MAC) || DOXYGEN
+#if IS_USED(MODULE_GNRC_NETIF_MAC) || defined(DOXYGEN)
     gnrc_netif_mac_t mac;                  /**< @ref net_gnrc_mac component */
-#endif  /* MODULE_GNRC_MAC */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_MAC) || defined(DOXYGEN) */
     /**
      * @brief   Flags for the interface
      *
@@ -129,7 +129,7 @@ typedef struct {
     gnrc_netif_dedup_t last_pkt;
 #endif
 #endif
-#if defined(MODULE_GNRC_SIXLOWPAN) || DOXYGEN
+#if IS_USED(MODULE_GNRC_NETIF_6LO) || defined(DOXYGEN)
     gnrc_netif_6lo_t sixlo;                 /**< 6Lo component */
 #endif
     uint8_t cur_hl;                         /**< Current hop-limit for out-going packets */

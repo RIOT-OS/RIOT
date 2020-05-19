@@ -135,7 +135,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
         case NETOPT_STATS:
             /* XXX discussed this with Oleg, it's supposed to be a pointer */
             switch ((int16_t)opt->context) {
-#if defined(MODULE_NETSTATS_IPV6) && defined(MODULE_GNRC_IPV6)
+#if IS_USED(MODULE_NETSTATS_IPV6) && IS_USED(MODULE_GNRC_NETIF_IPV6)
                 case NETSTATS_IPV6:
                     assert(opt->data_len == sizeof(netstats_t *));
                     *((netstats_t **)opt->data) = &netif->ipv6.stats;
@@ -154,7 +154,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
                     break;
             }
             break;
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
         case NETOPT_IPV6_ADDR: {
                 assert(opt->data_len >= sizeof(ipv6_addr_t));
                 ipv6_addr_t *tgt = opt->data;
@@ -233,7 +233,7 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
-#endif  /* MODULE_GNRC_IPV6 */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
         case NETOPT_6LO_IPHC:
             assert(opt->data_len == sizeof(netopt_enable_t));
@@ -266,7 +266,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             netif->cur_hl = *((uint8_t *)opt->data);
             res = sizeof(uint8_t);
             break;
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
         case NETOPT_IPV6_ADDR: {
                 assert(opt->data_len == sizeof(ipv6_addr_t));
                 /* always assume manually added */
@@ -335,7 +335,7 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* CONFIG_GNRC_IPV6_NIB_ROUTER */
-#endif  /* MODULE_GNRC_IPV6 */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
         case NETOPT_6LO_IPHC:
             assert(opt->data_len == sizeof(netopt_enable_t));
@@ -497,7 +497,7 @@ void gnrc_netif_release(gnrc_netif_t *netif)
     }
 }
 
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
 static int _addr_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr);
 static int _group_idx(const gnrc_netif_t *netif, const ipv6_addr_t *addr);
 
@@ -1189,7 +1189,7 @@ static ipv6_addr_t *_src_addr_selection(gnrc_netif_t *netif,
         return &netif->ipv6.addrs[idx];
     }
 }
-#endif  /* MODULE_GNRC_IPV6 */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif)
 {
@@ -1273,7 +1273,7 @@ static void _test_options(gnrc_netif_t *netif)
         case NETDEV_TYPE_ESP_NOW:
             assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
             assert(ETHERNET_ADDR_LEN == netif->l2addr_len);
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
             switch (netif->device_type) {
                 case NETDEV_TYPE_BLE:
                     assert(netif->ipv6.mtu == IPV6_MIN_MTU);
@@ -1284,7 +1284,7 @@ static void _test_options(gnrc_netif_t *netif)
                 case NETDEV_TYPE_ESP_NOW:
                     assert(netif->ipv6.mtu <= ETHERNET_DATA_LEN);
             }
-#endif  /* MODULE GNRC_IPV6 */
+#endif  /* IS_USED(MODULE GNRC_NETIF_IPV6) */
             break;
         case NETDEV_TYPE_IEEE802154:
         case NETDEV_TYPE_NRFMIN: {
@@ -1295,16 +1295,16 @@ static void _test_options(gnrc_netif_t *netif)
             assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
             assert((IEEE802154_SHORT_ADDRESS_LEN == netif->l2addr_len) ||
                    (IEEE802154_LONG_ADDRESS_LEN == netif->l2addr_len));
-#ifdef MODULE_GNRC_IPV6
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
+#if IS_USED(MODULE_GNRC_NETIF_6LO)
             assert(netif->ipv6.mtu == IPV6_MIN_MTU);
             assert(netif->sixlo.max_frag_size > 0);
             assert(-ENOTSUP != netif->dev->driver->get(netif->dev, NETOPT_PROTO,
                                                        &tmp, sizeof(tmp)));
-#else   /* MODULE_GNRC_SIXLOWPAN */
+#else   /* IS_USED(MODULE_GNRC_NETIF_6LO) */
             assert(netif->ipv6.mtu < UINT16_MAX);
-#endif  /* MODULE_GNRC_SIXLOWPAN */
-#endif  /* MODULE_GNRC_IPV6 */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_6LO) */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
 #ifdef MODULE_GNRC_SIXLOWPAN_ND
             assert((netif->device_type != NETDEV_TYPE_IEEE802154) ||
                    (-ENOTSUP != netif->dev->driver->get(netif->dev,
@@ -1317,9 +1317,9 @@ static void _test_options(gnrc_netif_t *netif)
         case NETDEV_TYPE_CC110X:
             assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
             assert(1U == netif->l2addr_len);
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
             assert(netif->ipv6.mtu < UINT16_MAX);
-#endif  /* MODULE_GNRC_IPV6 */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
             break;
         case NETDEV_TYPE_LORA: /* LoRa doesn't provide L2 ADDR */
         case NETDEV_TYPE_SLIP:
@@ -1335,11 +1335,11 @@ static void _test_options(gnrc_netif_t *netif)
     }
     /* These functions only apply to network devices having link-layers */
     if (netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR) {
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
         assert(-ENOTSUP != gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&tmp64));
         assert(-ENOTSUP != gnrc_netif_ndp_addr_len_from_l2ao(netif,
                                                              &dummy_opt));
-#endif  /* MODULE_GNRC_IPV6 */
+#endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
         assert(-ENOTSUP != gnrc_netif_ipv6_iid_to_addr(netif, (eui64_t *)&tmp64,
                                                        dummy_addr));

@@ -18,7 +18,7 @@
 #include <kernel_defines.h>
 
 #include "log.h"
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
 #include "net/ipv6.h"
 #endif
 #include "net/gnrc/netif.h"
@@ -121,10 +121,9 @@ void gnrc_netif_init_6ln(gnrc_netif_t *netif)
     }
 }
 
-#ifdef MODULE_GNRC_IPV6
+#if IS_USED(MODULE_GNRC_NETIF_IPV6)
 void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
 {
-#ifdef MODULE_GNRC_IPV6
     netdev_t *dev = netif->dev;
     int res;
     uint16_t tmp;
@@ -144,20 +143,18 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
             res = dev->driver->get(dev, NETOPT_MAX_PDU_SIZE,
                                    &tmp, sizeof(tmp));
             assert(res == sizeof(tmp));
-#ifdef MODULE_GNRC_SIXLOWPAN
+#if IS_USED(MODULE_GNRC_NETIF_6LO)
             netif->ipv6.mtu = MAX(IPV6_MIN_MTU, tmp);
             netif->sixlo.max_frag_size = tmp;
-#else
+#else   /* IS_USED(MODULE_GNRC_NETIF_6LO) */
             netif->ipv6.mtu = tmp;
-#endif
+#endif  /* IS_USED(MODULE_GNRC_NETIF_6LO) */
             break;
 #endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN) || \
          * defined(MODULE_XBEE) || defined(MODULE_ESP_NOW) */
 #ifdef MODULE_NETDEV_ETH
         case NETDEV_TYPE_ETHERNET:
-#ifdef MODULE_GNRC_IPV6
             netif->ipv6.mtu = ETHERNET_DATA_LEN;
-#endif
 #ifdef MODULE_GNRC_SIXLOENC
             netif->flags |= GNRC_NETIF_FLAGS_6LO;
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
@@ -190,7 +187,6 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
             }
             break;
     }
-#endif
 }
 
 int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
@@ -206,6 +202,6 @@ int gnrc_netif_ipv6_iid_from_addr(const gnrc_netif_t *netif,
     return -ENOTSUP;
 }
 
-#endif /* MODULE_GNRC_IPV6 */
+#endif /* IS_USED(MODULE_GNRC_NETIF_IPV6) */
 
 /** @} */
