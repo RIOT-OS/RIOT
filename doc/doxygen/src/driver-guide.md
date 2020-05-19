@@ -263,6 +263,34 @@ enum {
 - *MUST*: use `const devab_t *dev` when the device descriptor can be access
   read-only
 
+## Helper tools
+
+To help you start writing a device driver, the RIOT build system provides the
+`generate-driver` make target. It is a wrapper around the
+[riotgen](https://pypi.org/project/riotgen/) command line tool that is helpful
+when starting to implement a driver: all minimum files are generated with
+copyright headers, doxygen groups, etc, so you can concentrate on the driver
+implementation.
+
+**Usage:**
+
+From the RIOT base directory, run:
+```
+make generate-driver
+```
+Then answer a few questions about the driver:
+- Driver name: enter a name for your driver. It will be used as both the name
+  of the driver directory where the source files are created and the build
+  system module.
+- Driver doxygen group name: Enter the name of driver, as displayed in the
+  Doxygen documentation.
+- Brief doxygen description: Describe in one line what is this driver about.
+- Parent driver Doxygen group: Enter the Doxygen group the driver belongs to.
+  It can be `actuators`, `display`, `misc`, `netdev`, `sensors`, `storage`.
+
+Other global information (author name, email, organization) should be retrieved
+automatically from your git configuration.
+
 # Sensors                                               {#driver-guide-sensors}
 
 ## SAUL                                                    {#driver-guide-saul}
