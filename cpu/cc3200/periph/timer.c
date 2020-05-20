@@ -135,9 +135,6 @@ static inline void *get_irq_handler(tim_t dev)
     };
 }
 
-#define ROM_TimerConfigure \
-    ((void (*)(uint32_t ulBase, uint32_t ulConfig))ROM_TIMERTABLE[2])
-
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
     /* check if timer id is valid */
