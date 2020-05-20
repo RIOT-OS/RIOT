@@ -196,6 +196,10 @@ ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter gnrc_netif_bus,$(USEMODULE)))
+  USEMODULE += core_msg_bus
+endif
+
 ifneq (,$(filter gnrc_netif_events,$(USEMODULE)))
   USEMODULE += core_thread_flags
   USEMODULE += event

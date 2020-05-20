@@ -284,6 +284,25 @@ void gnrc_netif_ipv6_group_leave_internal(gnrc_netif_t *netif,
  */
 int gnrc_netif_ipv6_group_idx(gnrc_netif_t *netif,
                               const ipv6_addr_t *addr);
+
+/**
+ * @brief   Posts a message to the IPv6 event bus of the interface
+ *
+ * @param[in] netif     Pointer to the interface
+ * @param[in] type      [Type of the event](@ref gnrc_ipv6_event_t)
+ * @param[in] ctx       The context of the event
+ */
+static inline void gnrc_netif_ipv6_bus_post(gnrc_netif_t *netif, int type,
+                                            const void *ctx)
+{
+#ifdef MODULE_GNRC_NETIF_BUS
+    msg_bus_post(&netif->bus[GNRC_NETIF_BUS_IPV6], type, ctx);
+#else
+    (void) netif;
+    (void) type;
+    (void) ctx;
+#endif
+}
 #endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN) */
 
 /**
