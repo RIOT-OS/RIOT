@@ -184,3 +184,25 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         gpio_set((gpio_t)cs);
     }
 }
+
+void spi_pm_cb_enter(int deep)
+{
+    if (deep) {
+        for (size_t i = 0; i < SPI_NUMOF; i++) {
+            spi_t bus = SPI_DEV(i);
+            gpio_disable_mux(spi_config[bus].mosi_pin);
+            gpio_disable_mux(spi_config[bus].clk_pin);
+        }
+    }
+}
+
+void spi_pm_cb_leave(int deep)
+{
+    if (deep) {
+        for (size_t i = 0; i < SPI_NUMOF; i++) {
+            spi_t bus = SPI_DEV(i);
+            gpio_init_mux(spi_config[bus].mosi_pin, spi_config[bus].mosi_mux);
+            gpio_init_mux(spi_config[bus].clk_pin, spi_config[bus].clk_mux);
+        }
+    }
+}

@@ -380,6 +380,20 @@ void cpu_pm_cb_enter(int deep);
 void cpu_pm_cb_leave(int deep);
 
 /**
+ * @brief   Called before the power management enters a power mode
+ *
+ * @param[in] deep
+ */
+void spi_pm_cb_enter(int deep);
+
+/**
+ * @brief   Called after the power management left a power mode
+ *
+ * @param[in] deep
+ */
+void spi_pm_cb_leave(int deep);
+
+/**
  * @brief   Wrapper for cortexm_sleep calling power management callbacks
  *
  * @param[in] deep
@@ -390,11 +404,19 @@ static inline void sam0_cortexm_sleep(int deep)
     gpio_pm_cb_enter(deep);
 #endif
 
+#ifdef MODULE_PERIPH_SPI
+    spi_pm_cb_enter(deep);
+#endif
+
     cpu_pm_cb_enter(deep);
 
     cortexm_sleep(deep);
 
     cpu_pm_cb_leave(deep);
+
+#ifdef MODULE_PERIPH_SPI
+    spi_pm_cb_leave(deep);
+#endif
 
 #ifdef MODULE_PERIPH_GPIO
     gpio_pm_cb_leave(deep);
