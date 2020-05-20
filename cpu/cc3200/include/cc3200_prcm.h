@@ -43,9 +43,10 @@ extern "C" {
  * @brief PRCM peripheral clock modes
  * @{
  */
-#define PRCM_RUN_MODE_CLK 0x00000001
-#define PRCM_SLP_MODE_CLK 0x00000100
+#define PRCM_RUN_MODE_CLK  0x00000001
+#define PRCM_SLP_MODE_CLK  0x00000100
 #define PRCM_DSLP_MODE_CLK 0x00010000
+#define PRCM_MODE_CLK_MASK = PRCM_DSLP_MODE_CLK & PRCM_SLP_MODE_CLK & PRCM_RUN_MODE_CLK
 /** @} */
 
 /**
@@ -93,14 +94,16 @@ typedef struct cc3200_arcm_reg_t {
  * @{
  */
 typedef struct cc3200_arcm_t {
-    cc3200_reg_t CAM_CLK_CFG;  /**< Camera Clock Configuration */
-    cc3200_arcm_reg_t CAM;     /**< Camera periph Clock ARCM register */
-    cc3200_reg_t RESERVED1[2]; /**< RESERVED */
-    cc3200_arcm_reg_t MCASP;   /**< Multichannel Audio Serial Port Clock ARCM */
-    cc3200_reg_t RESERVED2[1]; /**< RESERVED */
-    cc3200_reg_t MMCHS_CLK_GEN;       /**< MMCHS/SDIOM Configuration */
-    cc3200_arcm_reg_t MMCHS;          /**< MMCHS/SDIOM ARCM register */
-    cc3200_reg_t MCSPI_A1_CLK_GEN;    /**< SPI 1 Clock Configuration */
+    cc3200_reg_t CAM_CLK_CFG;         /**< 0x00 Camera Clock Configuration */
+    cc3200_reg_t CAM_CLK_EN;          /**< 0x04 Camera Clock Enable register */
+    cc3200_reg_t CAM_SOFT_RST;        /**< 0x08 Camera Soft Reset register */
+    cc3200_reg_t RESERVED1[2];        /**< 0x0C - 0x14 RESERVED */    
+    cc3200_reg_t MCASP_CLK_GATING;    /**< 0x14 Multichannel Audio Serial Port (MCASP) Clock Gating  */
+    cc3200_reg_t MCASP_SOFT_RST;      /**< 0x18 MCASP Soft Reset  */
+    cc3200_reg_t RESERVED2[1];        /**< 0x1C - 0x20 RESERVED */   
+    cc3200_reg_t MMCHS_CLK_GEN;       /**< 0x20 MMCHS/SDIOM Configuration */
+    cc3200_arcm_reg_t MMCHS;          /**< 0x24 MMCHS/SDIOM ARCM register */
+    cc3200_reg_t MCSPI_A1_CLK_GEN;    /**< 0x2C SPI 1 Clock Configuration */
     cc3200_arcm_reg_t MCSPI_A1;       /**< SPI 1 ARCM register */
     cc3200_reg_t MCSPI_A2_CLK_GEN;    /**< SPI 2 Clock Configuration */
     cc3200_reg_t RESERVED3[1];        /**< RESERVED */

@@ -32,8 +32,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define EXTERNAL_SPI 0U
-#define CC3100_SPI 1U
 #define XTAL_CLK 40000000
 #define PIN_MODE_SPI 0x00000007
 #define SPI_CS_ENABLE 0x00000001
@@ -164,24 +162,18 @@ void _spi_config(spi_t bus, spi_mode_t mode, spi_clk_t clk)
 
 void spi_init(spi_t bus)
 {
-    /* assert(bus >= SPI_NUMOF); */
     mutex_init(&locks[bus]);
 
-    /* CC3100 module does not require pin config */
-    if (bus != CC3100_SPI) {
+    /* ignore pin configuration if MISO and MOSI are zero */
+    /* on the CC3200 platform this is used by the CC3200-launchxl board */
+    /* since the NWP SPI pins are configured from the NWP and not the CC3200 itself */
+    if (spi_config[bus].config.pins.miso != 0 && spi_config[bus].config.pins.mosi != 0) {
         /* trigger pin initialization */
         spi_init_pins(bus);
     }
 
-    /* enable clock */
-    switch (bus) {
-    case EXTERNAL_SPI:
-        ARCM->MCSPI_A1.clk_gating |= PRCM_RUN_MODE_CLK;
-        break;
-    case CC3100_SPI:
-        ARCM->MCSPI_A2.clk_gating |= PRCM_RUN_MODE_CLK | PRCM_SLP_MODE_CLK;
-        break;
-    }
+    /* enable/configure SPI clock */
+    (*cc3200_arcm_reg_t)(&ARCM->MCSPI_A1 + bus * 0x1C)->clk_gating |= spi_config[bus].config & PRCM_MODE_CLK_MASK;
 
     /* reset spi for the changes to take effect */
     spi_reset(bus);
