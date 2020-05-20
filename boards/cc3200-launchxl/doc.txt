@@ -42,7 +42,7 @@ Use `BOARD=cc3200-launchxl` for building RIOT for this platform.
 | UART   | OK               |                                                      |
 | LEDS   | OK               |                                                      |
 | GPIO   | OK               |                                                      |
-| Timers | Work in Progress | Only 16bit channel 0 is supported (requires testing) |
+| Timers | Work in Progress | all 4 timers are supported but only in 16 bit mode   |
 | NWP    | Work in Progress |                                                      |
 
 ## Toolchain
