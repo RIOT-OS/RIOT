@@ -31,6 +31,20 @@
 #include "thread.h"
 
 /**
+ * @brief   Default port number used for the CS pin if unassigned
+ */
+#ifndef DEFAULT_SPI_CS_PORT
+#define DEFAULT_SPI_CS_PORT 0
+#endif
+
+/**
+ * @brief   Default port number used for the CS pin if unassigned
+ */
+#ifndef DEFAULT_SPI_CS_PIN
+#define DEFAULT_SPI_CS_PIN 0
+#endif
+
+/**
  * @brief   Some parameters used for benchmarking
  */
 #define BENCH_REDOS             (1000)
@@ -106,8 +120,8 @@ int cmd_init(int argc, char **argv)
 {
     int dev, mode, clk, port, pin, tmp;
 
-    if (argc < 5) {
-        printf("usage: %s <dev> <mode> <clk> <cs port> <cs pin>\n", argv[0]);
+    if (argc < 4) {
+        printf("usage: %s <dev> <mode> <clk> [cs port] [cs pin]\n", argv[0]);
         puts("\tdev:");
         for (int i = 0; i < (int)SPI_NUMOF; i++) {
             printf("\t\t%i: SPI_DEV(%i)\n", i, i);
@@ -165,8 +179,20 @@ int cmd_init(int argc, char **argv)
     }
 
     /* parse chip select port and pin */
-    port = atoi(argv[4]);
-    pin = atoi(argv[5]);
+    if (argc > 5) {
+        pin = atoi(argv[5]);
+    }
+    else {
+        pin = DEFAULT_SPI_CS_PIN;
+    }
+
+    if (argc > 4) {
+        port = atoi(argv[4]);
+    }
+    else {
+        port = DEFAULT_SPI_CS_PORT;
+    }
+
     if (pin < 0 || port < -1) {
         puts("error: invalid CS port/pin combination specified");
     }
