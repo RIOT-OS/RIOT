@@ -126,7 +126,7 @@ static inline cc3200_gpio_t *gpio_port_by_num(uint8_t port_num)
  * @param val value to be masked
  * @return masked value for a given pin with value val
  */
-uint8_t _gpio_pin_value_mask(uint8_t pin, uint8_t val)
+static inline uint8_t _gpio_pin_value_mask(uint8_t pin, uint8_t val)
 {
     return val << (pin & 0x7);
 }
