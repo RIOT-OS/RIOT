@@ -99,8 +99,11 @@ endif
 ifneq (,$(BOARDSDIR))
   # Only warn users, not the CI.
   ifneq ($(RIOT_CI_BUILD),1)
-    $(warning Using BOARDSDIR is deprecated use EXTERNAL_BOARD_DIRS instead)
-    $(info EXTERNAL_BOARD_DIRS can contain multiple folders separated by space)
+    # Do not warn when set from sub-make
+    ifeq ($(MAKELEVEL),0)
+      $(warning Using BOARDSDIR is deprecated use EXTERNAL_BOARD_DIRS instead)
+      $(info EXTERNAL_BOARD_DIRS can contain multiple folders separated by space)
+    endif
   endif
   EXTERNAL_BOARD_DIRS += $(BOARDSDIR)
 endif
