@@ -36,7 +36,7 @@ extern "C" {
 #define TMP00X_PARAM_I2C           I2C_DEV(0)
 #endif
 #ifndef TMP00X_PARAM_ADDR
-#define TMP00X_PARAM_ADDR          (TMP00X_I2C_ADDRESS)
+#define TMP00X_PARAM_ADDR          (CONFIG_TMP00X_I2C_ADDRESS)
 #endif
 #ifndef TMP00X_PARAM_RATE
 #define TMP00X_PARAM_RATE           TMP00X_CONFIG_CR_DEF
