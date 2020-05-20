@@ -486,6 +486,25 @@ int cmd_bench(int argc, char **argv)
     sum += (stop - start);
     sched_sum += sched_diff_us;
 
+    /* 15 - release & acquire the bus 1000 times */
+    sched_start = _sched_ticks();
+    start = xtimer_now_usec();
+    for (int i = 0; i < BENCH_REDOS; i++) {
+        spi_release(spiconf.dev);
+        if (spi_acquire(spiconf.dev, spiconf.cs, spiconf.mode, spiconf.clk) != SPI_OK) {
+            puts("ERROR - spi_acquire() failed.");
+            break;
+        }
+    }
+    stop = xtimer_now_usec();
+    sched_stop = _sched_ticks();
+    sched_diff_us = _xtimer_diff_usec(sched_stop, sched_start);
+    printf("15 - acquire/release %i times:\t\t", BENCH_REDOS);
+    printf("%"PRIu32"\t%"PRIu32"\n", (stop - start), sched_diff_us);
+    sum += (stop - start);
+    sched_sum += sched_diff_us;
+
+
     xtimer_sleep(1);
 
     printf("-- - SUM:\t\t\t\t\t%"PRIu32"\t%"PRIu32"\n", sum, sched_sum);
