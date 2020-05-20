@@ -26,6 +26,21 @@
 #include "shell.h"
 #include "board.h" /* MTD_0 is defined in board.h */
 
+#if !defined(MTD_0) && MODULE_MTD_SDCARD
+#include "mtd_sdcard.h"
+#include "sdcard_spi.h"
+#include "sdcard_spi_params.h"
+
+#define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
+extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
+mtd_sdcard_t mtd_sdcard_devs[SDCARD_SPI_NUM];
+
+/* always default to first sdcard*/
+static mtd_dev_t *mtd0 = (mtd_dev_t*)&mtd_sdcard_devs[0];
+
+#define MTD_0 mtd0
+#endif
+
 /* Flash mount point */
 #define FLASH_MOUNT_POINT   "/sda"
 
@@ -244,6 +259,14 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
+#if MODULE_MTD_SDCARD
+    for (unsigned int i = 0; i < SDCARD_SPI_NUM; i++){
+        mtd_sdcard_devs[i].base.driver = &mtd_sdcard_driver;
+        mtd_sdcard_devs[i].sd_card = &sdcard_spi_devs[i];
+        mtd_sdcard_devs[i].params = &sdcard_spi_params[i];
+    }
+#endif
+
 #if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS))
     /* spiffs and littlefs need a mtd pointer
      * by default the whole memory is used */
