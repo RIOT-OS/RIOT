@@ -1,7 +1,1 @@
-export CPU_ARCH := cortex-m4
-
-# must be set or the ROM definitions will not be set
-export CFLAGS += -DTARGET_IS_CC3200
-
-# Include make defaults for cortex M-Family CPUs
 include $(RIOTMAKE)/arch/cortexm.inc.mk

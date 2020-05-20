@@ -1,3 +1,4 @@
-FEATURES_PROVIDED += periph_spi
+CPU = cc3200
 
-include $(RIOTCPU)/cc3200/Makefile.features
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_spi
