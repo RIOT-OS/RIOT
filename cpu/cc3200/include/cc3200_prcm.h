@@ -43,8 +43,8 @@ extern "C" {
  * @brief PRCM peripheral clock modes
  * @{
  */
-#define PRCM_RUN_MODE_CLK 0x00000001
-#define PRCM_SLP_MODE_CLK 0x00000100
+#define PRCM_RUN_MODE_CLK  0x00000001
+#define PRCM_SLP_MODE_CLK  0x00000100
 #define PRCM_DSLP_MODE_CLK 0x00010000
 #define PRCM_MODE_CLK_MASK \
         = PRCM_DSLP_MODE_CLK & PRCM_SLP_MODE_CLK & PRCM_RUN_MODE_CLK
