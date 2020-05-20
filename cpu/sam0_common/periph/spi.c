@@ -39,6 +39,11 @@
 static mutex_t locks[SPI_NUMOF];
 
 /**
+ * @brief Bitmask marking muxed SPI pins
+ */
+static uint8_t spi_pins_muxed;
+
+/**
  * @brief   Shortcut for accessing the used SPI SERCOM device
  */
 static inline SercomSpi *dev(spi_t bus)
@@ -88,13 +93,21 @@ void spi_init(spi_t bus)
 
 void spi_init_pins(spi_t bus)
 {
+    unsigned state = irq_disable();
+
     /* MISO must always have PD/PU, see #5968. This is a ~65uA difference */
     gpio_init(spi_config[bus].miso_pin, GPIO_IN_PD);
     gpio_init(spi_config[bus].mosi_pin, GPIO_OUT);
     gpio_init(spi_config[bus].clk_pin, GPIO_OUT);
+
     gpio_init_mux(spi_config[bus].miso_pin, spi_config[bus].miso_mux);
     gpio_init_mux(spi_config[bus].mosi_pin, spi_config[bus].mosi_mux);
     gpio_init_mux(spi_config[bus].clk_pin, spi_config[bus].clk_mux);
+
+    assert(bus < sizeof(spi_pins_muxed) * 8);
+    spi_pins_muxed |= (1 << bus);
+
+    irq_restore(state);
 }
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
@@ -190,8 +203,10 @@ void spi_pm_cb_enter(int deep)
     if (deep) {
         for (size_t i = 0; i < SPI_NUMOF; i++) {
             spi_t bus = SPI_DEV(i);
-            gpio_disable_mux(spi_config[bus].mosi_pin);
-            gpio_disable_mux(spi_config[bus].clk_pin);
+            if (spi_pins_muxed & (1 << bus)) {
+                gpio_disable_mux(spi_config[bus].mosi_pin);
+                gpio_disable_mux(spi_config[bus].clk_pin);
+            }
         }
     }
 }
@@ -201,8 +216,10 @@ void spi_pm_cb_leave(int deep)
     if (deep) {
         for (size_t i = 0; i < SPI_NUMOF; i++) {
             spi_t bus = SPI_DEV(i);
-            gpio_init_mux(spi_config[bus].mosi_pin, spi_config[bus].mosi_mux);
-            gpio_init_mux(spi_config[bus].clk_pin, spi_config[bus].clk_mux);
+            if (spi_pins_muxed & (1 << bus)) {
+                gpio_init_mux(spi_config[bus].mosi_pin, spi_config[bus].mosi_mux);
+                gpio_init_mux(spi_config[bus].clk_pin, spi_config[bus].clk_mux);
+            }
         }
     }
 }
