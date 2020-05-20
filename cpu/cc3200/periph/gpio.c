@@ -29,8 +29,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define GPIO_PINS_PER_PORT 8     /**< Number of pins per port */
-#define GPIO_DIR_MASK 0x00000001 /**< GPIO direction configuration mask */
+#define GPIO_PINS_PER_PORT 8        /**< Number of pins per port */
+#define GPIO_DIR_MASK 0x00000001    /**< GPIO direction configuration mask */
 
 /**
  * GPIO Pin type value used to configure pin to GPIO
@@ -146,7 +146,7 @@ static inline cc3200_gpio_t *gpio(gpio_t pin)
 void gpio_init_af(gpio_t dev, uint32_t strength, uint32_t type)
 {
     /* does not support analog pin types, but not a problem for GPIO */
-    uint8_t pin      = gpio_pin_num(dev);
+    uint8_t pin = gpio_pin_num(dev);
     uint8_t gpio_pin = pin_to_gpio_num[pin];
 
     /* copied from TIs PinConfigSet. The register is not documented so for */
@@ -154,23 +154,23 @@ void gpio_init_af(gpio_t dev, uint32_t strength, uint32_t type)
 
     /* enable input */
     HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CMN_CONFIG) &=
-            ~((0x80 << gpio_pin) & (0x1E << 8));
+        ~((0x80 << gpio_pin) & (0x1E << 8));
 
     /* write config to hardware register referred by TI as PAD */
     PAD_CONFIG_REG(gpio_pin) =
-            ((PAD_CONFIG_REG(gpio_pin) & ~(PAD_STRENGTH_MASK | PAD_TYPE_MASK)) |
-             (strength | type));
+        ((PAD_CONFIG_REG(gpio_pin) & ~(PAD_STRENGTH_MASK | PAD_TYPE_MASK)) |
+         (strength | type));
 }
 
 void gpio_pin_mode_set(gpio_t dev, uint32_t mode)
 {
     /* does not support analog pin types, but not a problem for GPIO */
-    uint8_t pin      = gpio_pin_num(dev);
+    uint8_t pin = gpio_pin_num(dev);
     uint8_t gpio_pin = pin_to_gpio_num[pin];
 
     /* set mode */
     PAD_CONFIG_REG(gpio_pin) =
-            (((PAD_CONFIG_REG(gpio_pin) & ~PAD_MODE_MASK) | mode) & ~(3 << 10));
+        (((PAD_CONFIG_REG(gpio_pin) & ~PAD_MODE_MASK) | mode) & ~(3 << 10));
 }
 
 int gpio_init(gpio_t dev, gpio_mode_t mode)
@@ -187,7 +187,8 @@ int gpio_init(gpio_t dev, gpio_mode_t mode)
     if (mode & GPIO_DIR_MASK) {
         /* out */
         gpio(dev)->dir |= ipin;
-    } else {
+    }
+    else {
         /* in */
         gpio(dev)->dir &= ipin;
     }
@@ -271,6 +272,7 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
 {
     /* Note: gpio_init() also checks if the gpio is enabled. */
     int res = gpio_init(dev, mode);
+
     if (res != 0) {
         return res;
     }
@@ -278,13 +280,13 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
     assert(flank != GPIO_NONE);
 
     uint8_t portNum = gpio_port_num(dev);
-    uint8_t pinNum  = gpio_pin_num(dev);
-    uint8_t bit     = gpio_pin_mask(dev);
+    uint8_t pinNum = gpio_pin_num(dev);
+    uint8_t bit = gpio_pin_mask(dev);
     /* convert to number since we use the address for later compare */
     uint32_t portBase = (uint32_t)gpio_port_by_num(portNum);
 
     /* store callback information; */
-    isr_ctx[portNum][pinNum].cb  = cb;
+    isr_ctx[portNum][pinNum].cb = cb;
     isr_ctx[portNum][pinNum].arg = arg;
 
     ROM_IntMasterDisable();
@@ -294,11 +296,11 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
 
     /* configure active flanks */
     gpio(dev)->ibe =
-            (flank & GPIO_BOTH) ? gpio(dev)->ibe | bit : gpio(dev)->ibe & ~bit;
+        (flank & GPIO_BOTH) ? gpio(dev)->ibe | bit : gpio(dev)->ibe & ~bit;
     gpio(dev)->is = (flank & GPIO_VALUE_LOW) ? gpio(dev)->is | bit :
-                                               gpio(dev)->is & ~bit;
+                    gpio(dev)->is & ~bit;
     gpio(dev)->iev = (flank & GPIO_RISING) ? gpio(dev)->iev | bit :
-                                             gpio(dev)->iev & ~bit;
+                     gpio(dev)->iev & ~bit;
 
     /* enable gpio interripts */
     gpio(dev)->im |= bit;
@@ -306,26 +308,26 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
     /* register interrupt handlers */
     /* TODO: replace with cortex common */
     switch (portBase) {
-    case GPIOA0_BASE:
-        ROM_GPIOIntRegister(portBase, isr_gpio_a0);
-        ROM_IntEnable(INT_GPIOA0);
-        break;
-    case GPIOA1_BASE:
-        ROM_GPIOIntRegister(portBase, isr_gpio_a1);
-        ROM_IntEnable(INT_GPIOA1);
-        break;
-    case GPIOA2_BASE:
-        ROM_GPIOIntRegister(portBase, isr_gpio_a2);
-        ROM_IntEnable(INT_GPIOA2);
-        break;
-    case GPIOA3_BASE:
-        ROM_GPIOIntRegister(portBase, isr_gpio_a3);
-        ROM_IntEnable(INT_GPIOA3);
-        break;
-    case GPIOA4_BASE:
-        ROM_GPIOIntRegister(portBase, isr_gpio_a4);
-        ROM_IntEnable(INT_GPIOA4);
-        break;
+        case GPIOA0_BASE:
+            ROM_GPIOIntRegister(portBase, isr_gpio_a0);
+            ROM_IntEnable(INT_GPIOA0);
+            break;
+        case GPIOA1_BASE:
+            ROM_GPIOIntRegister(portBase, isr_gpio_a1);
+            ROM_IntEnable(INT_GPIOA1);
+            break;
+        case GPIOA2_BASE:
+            ROM_GPIOIntRegister(portBase, isr_gpio_a2);
+            ROM_IntEnable(INT_GPIOA2);
+            break;
+        case GPIOA3_BASE:
+            ROM_GPIOIntRegister(portBase, isr_gpio_a3);
+            ROM_IntEnable(INT_GPIOA3);
+            break;
+        case GPIOA4_BASE:
+            ROM_GPIOIntRegister(portBase, isr_gpio_a4);
+            ROM_IntEnable(INT_GPIOA4);
+            break;
     }
 
     ROM_IntMasterEnable();
@@ -342,12 +344,13 @@ int gpio_init_int(gpio_t dev, gpio_mode_t mode, gpio_flank_t flank,
  */
 void gpio_write(gpio_t dev, int value)
 {
-    uint8_t port      = gpio_port_num(dev);
-    uint8_t ipin      = gpio_pin_mask(dev);
+    uint8_t port = gpio_port_num(dev);
+    uint8_t ipin = gpio_pin_mask(dev);
     uint32_t portAddr = (uint32_t)gpio_port_by_num(port);
+
     /* write to pin at portBase + pinOffset */
     HWREG(portAddr + (ipin << 2)) =
-            _gpio_pin_value_mask(pin_to_gpio_num[gpio_pin_num(dev)], value);
+        _gpio_pin_value_mask(pin_to_gpio_num[gpio_pin_num(dev)], value);
 }
 
 /**
@@ -358,8 +361,8 @@ void gpio_write(gpio_t dev, int value)
  */
 int gpio_read(gpio_t dev)
 {
-    uint8_t port      = gpio_port_num(dev);
-    uint8_t ipin      = gpio_pin_mask(dev);
+    uint8_t port = gpio_port_num(dev);
+    uint8_t ipin = gpio_pin_mask(dev);
     uint32_t portAddr = (uint32_t)gpio_port_by_num(port);
 
     /* read from pin at portBase + pinOffset */

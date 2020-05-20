@@ -94,8 +94,7 @@ void uart_disable(uart_t uart)
     volatile cc3200_uart_t *reg = uart_config[uart].dev;
 
     /* wait for uart to finish */
-    while (reg->flags.bits.BUSY) {
-    }
+    while (reg->flags.bits.BUSY) {}
 
     /* disable fifo */
     reg->LCRH.bits.FEN = 0;
@@ -140,13 +139,14 @@ void uart_set_config(uart_t uart, uint32_t baudrate, uint32_t config)
 
         /* half the baudrate to compensate for high speed mode */
         baudrate /= 2;
-    } else {
+    }
+    else {
         /* disable high speed mode */
         reg->CTL.bits.HSE = 0;
     }
 
     /* compute & set fractional baud rate divider */
-    div       = (((CLOCK_CORECLOCK * 8) / baudrate) + 1) / 2;
+    div = (((CLOCK_CORECLOCK * 8) / baudrate) + 1) / 2;
     reg->IBRD = div / 64;
     reg->FBRD = div % 64;
 
@@ -187,11 +187,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* register callbacks */
     uart_ctx[uart].rx_cb = rx_cb;
-    uart_ctx[uart].arg   = arg;
-    uint32_t uart_base   = (uint32_t)uart_config[uart].dev;
+    uart_ctx[uart].arg = arg;
+    uint32_t uart_base = (uint32_t)uart_config[uart].dev;
 
     ROM_UARTIntEnable(uart_base, UART_INT_RX | UART_INT_OE | UART_INT_BE |
-                                         UART_INT_PE | UART_INT_FE);
+                      UART_INT_PE | UART_INT_FE);
 
     ROM_IntPrioritySet(uart_config[uart].irqn, INT_PRIORITY_LVL_3);
     ROM_IntEnable(uart_config[uart].irqn);
@@ -201,6 +201,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     uint32_t u = (uint32_t)uart_config[uart].dev;
+
     for (size_t i = 0; i < len; i++) {
         ROM_UARTCharPut(u, data[i]);
     }
@@ -209,7 +210,8 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 int uart_read_blocking(uart_t uart, uint8_t *data)
 {
     uint32_t u = (uint32_t)uart_config[uart].dev;
-    *data      = ROM_UARTCharGet(u);
+
+    *data = ROM_UARTCharGet(u);
 
     return 1;
 }
@@ -224,23 +226,23 @@ void uart_poweron(uart_t uart)
 {
     switch (uart) {
 #if UART_0_EN
-    case UART_0:
-        /* reset & enable periph clk */
-        reset_periph_clk(&ARCM->UART_A0);
-        ARCM->UART_A0.clk_gating |= PRCM_RUN_MODE_CLK;
+        case UART_0:
+            /* reset & enable periph clk */
+            reset_periph_clk(&ARCM->UART_A0);
+            ARCM->UART_A0.clk_gating |= PRCM_RUN_MODE_CLK;
 
-        break;
+            break;
 #endif
 #if UART_1_EN
-    case UART_1:
-        /* reset & enable periph clk */
-        reset_periph_clk(&ARCM->UART_A1);
-        ARCM->UART_A1.clk_gating |= PRCM_RUN_MODE_CLK;
-        break;
+        case UART_1:
+            /* reset & enable periph clk */
+            reset_periph_clk(&ARCM->UART_A1);
+            ARCM->UART_A1.clk_gating |= PRCM_RUN_MODE_CLK;
+            break;
 #endif
 
-    default:
-        return;
+        default:
+            return;
     }
 
     uart_enable(uart);
@@ -251,19 +253,19 @@ void uart_poweroff(uart_t uart)
     /* disable uart */
     switch (uart) {
 #if UART_0_EN
-    case UART_0:
-        ARCM->UART_A0.clk_gating &= ~PRCM_RUN_MODE_CLK;
+        case UART_0:
+            ARCM->UART_A0.clk_gating &= ~PRCM_RUN_MODE_CLK;
 
-        break;
+            break;
 #endif
 #if UART_1_EN
-    case UART_1:
-        ARCM->UART_A1.clk_gating &= ~PRCM_RUN_MODE_CLK;
-        break;
+        case UART_1:
+            ARCM->UART_A1.clk_gating &= ~PRCM_RUN_MODE_CLK;
+            break;
 #endif
 
-    default:
-        return;
+        default:
+            return;
     }
     uart_disable(uart);
 }

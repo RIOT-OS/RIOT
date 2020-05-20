@@ -113,26 +113,26 @@ static inline void *get_irq_handler(tim_t dev)
 {
     switch (dev) {
 #ifdef TIMER_0_EN
-    case 0:
-        return isr_timer0;
+        case 0:
+            return isr_timer0;
 #endif
 #ifdef TIMER_1_EN
-    case 1:
-        return isr_timer1;
+        case 1:
+            return isr_timer1;
 #endif
 #ifdef TIMER_2_EN
-    case 2:
-        return isr_timer2;
+        case 2:
+            return isr_timer2;
 #endif
 #ifdef TIMER_3_EN
-    case 3:
-        return isr_timer3;
+        case 3:
+            return isr_timer3;
 #endif
-    default:
-        /* requested irq handler for invalid timer */
-        DEBUG("REQUESTED IRQ FOR INVALID TIMER");
-        assert(0);
-    };
+        default:
+            /* requested irq handler for invalid timer */
+            DEBUG("REQUESTED IRQ FOR INVALID TIMER");
+            assert(0);
+    }
 }
 
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
@@ -170,12 +170,12 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     }
     prescaler &= 0xFF;
 
-    timer(dev)->prescale_a      = prescaler;
+    timer(dev)->prescale_a = prescaler;
     timer(dev)->interval_load_a = LOAD_VALUE;
 
     /* register & setup intrrupt handling */
     ROM_TimerIntRegister((uint32_t)timer(dev), TIMER_A, timerHandler);
-    isr_ctx[dev].cb  = cb;
+    isr_ctx[dev].cb = cb;
     isr_ctx[dev].arg = arg;
 
     /* timer A irqn (B now supported) is always two apart */

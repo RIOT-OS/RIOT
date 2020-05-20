@@ -48,7 +48,8 @@ extern "C" {
  * @brief UART Configurations
  * @{
  */
-#define UART_CONFIG_WLEN_MASK 0x00000060 /**< Mask for extracting word length */
+#define UART_CONFIG_WLEN_MASK 0x00000060 /**< Mask for extracting word length \
+                                          */
 #define UART_CONFIG_WLEN_8 0x00000060    /**< 8 bit data */
 #define UART_CONFIG_WLEN_7 0x00000040    /**< 7 bit data */
 #define UART_CONFIG_WLEN_6 0x00000020    /**< 6 bit data */

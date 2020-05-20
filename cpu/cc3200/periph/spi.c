@@ -107,8 +107,7 @@ void spi_reset(spi_t bus)
     dev->sys_conf |= MCSPI_SYSCONFIG_SOFTRESET;
 
     /* wait for reset */
-    while (!((dev->sys_status) & MCSPI_SYSSTATUS_RESETDONE)) {
-    }
+    while (!((dev->sys_status) & MCSPI_SYSSTATUS_RESETDONE)) {}
 
     /* enable spi */
     dev->ch0_ctrl &= ~MCSPI_CH0CTRL_EN;
@@ -167,13 +166,16 @@ void spi_init(spi_t bus)
     /* ignore pin configuration if MISO and MOSI are zero */
     /* on the CC3200 platform this is used by the CC3200-launchxl board */
     /* since the NWP SPI pins are configured from the NWP and not the CC3200 itself */
-    if (spi_config[bus].config.pins.miso != 0 && spi_config[bus].config.pins.mosi != 0) {
+    if (spi_config[bus].config.pins.miso != 0 &&
+        spi_config[bus].config.pins.mosi != 0) {
         /* trigger pin initialization */
         spi_init_pins(bus);
     }
 
     /* enable/configure SPI clock */
-    (*cc3200_arcm_reg_t)(&ARCM->MCSPI_A1 + bus * 0x1C)->clk_gating |= spi_config[bus].config & PRCM_MODE_CLK_MASK;
+    (*cc3200_arcm_reg_t)(&ARCM->MCSPI_A1 + bus *
+                         0x1C)->clk_gating |= spi_config[bus].config &
+                                              PRCM_MODE_CLK_MASK;
 
     /* reset spi for the changes to take effect */
     spi_reset(bus);

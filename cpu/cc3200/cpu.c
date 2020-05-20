@@ -70,8 +70,7 @@ void reset_periph_clk(cc3200_arcm_reg_t *reg)
     reg->soft_reset |= PRCM_SOFT_RESET;
 
     /* wait for the hardware to perform reset */
-    for (ulDelay = 0; ulDelay < 16; ulDelay++) {
-    }
+    for (ulDelay = 0; ulDelay < 16; ulDelay++) {}
 
     /* deassert reset */
     reg->soft_reset &= ~PRCM_SOFT_RESET;
@@ -125,7 +124,7 @@ static void periph_reset(void)
 
     /* enable hibernation power save mode on MCU (ECO) */
     HWREG(HIB3P3_BASE + HIB3P3_O_MEM_HIB_REG0) =
-            HIBERNATION_WAKE_STATUS_REG | (1 << 4);
+        HIBERNATION_WAKE_STATUS_REG | (1 << 4);
     USEC_DELAY(PRCM_OP_USEC_DELAY);
 
     /* enable clock switching */
@@ -146,13 +145,13 @@ static void periph_reset(void)
     /* configure software development mode pins (SWD) */
     if (((HWREG(HIB1P2_BASE + HIB1P2_O_SOP_SENSE_VALUE) & 0xFF) == 0x2)) {
         HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_28) =
-                ((HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_28) &
-                  ~0xC0F) |
-                 0x2);
+            ((HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_28) &
+              ~0xC0F) |
+             0x2);
         HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_29) =
-                ((HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_29) &
-                  ~0xC0F) |
-                 0x2);
+            ((HWREG(OCP_SHARED_BASE + OCP_SHARED_O_GPIO_PAD_CONFIG_29) &
+              ~0xC0F) |
+             0x2);
     }
 
     /* DIG DCDC Voltage Out trim settings based on PROCESS INDICATOR (bits 22-25
@@ -160,14 +159,15 @@ static void periph_reset(void)
      */
     if (((GPRCM->GPRCM_EFUSE_READ_REG0 >> 22) & 0xF) == 0xE) {
         DIGI_DCDC_VTRIM_CFG =
-                (DIGI_DCDC_VTRIM_CFG &
-                 ~HIB1P2_DIG_DCDC_VTRIM_CFG_mem_dcdc_dig_run_vtrim_M) |
-                (0x32 << 18);
-    } else {
+            (DIGI_DCDC_VTRIM_CFG &
+             ~HIB1P2_DIG_DCDC_VTRIM_CFG_mem_dcdc_dig_run_vtrim_M) |
+            (0x32 << 18);
+    }
+    else {
         DIGI_DCDC_VTRIM_CFG =
-                (DIGI_DCDC_VTRIM_CFG &
-                 ~HIB1P2_DIG_DCDC_VTRIM_CFG_mem_dcdc_dig_run_vtrim_M) |
-                (0x29 << 18);
+            (DIGI_DCDC_VTRIM_CFG &
+             ~HIB1P2_DIG_DCDC_VTRIM_CFG_mem_dcdc_dig_run_vtrim_M) |
+            (0x29 << 18);
     }
 
     /* Enable SOFT RESTART in case of DIG DCDC converter collapse */
@@ -175,5 +175,5 @@ static void periph_reset(void)
 
     /* Disable the sleep for ANA DCDC */
     HWREG(HIB1P2_BASE + HIB1P2_O_ANA_DCDC_PARAMETERS_OVERRIDE) |=
-            HIB1P2_ANA_DCDC_PARAMETERS_OVERRIDE_mem_dcdc_ana_en_slp_mode_lowv_fsm_override_ctrl;
+        HIB1P2_ANA_DCDC_PARAMETERS_OVERRIDE_mem_dcdc_ana_en_slp_mode_lowv_fsm_override_ctrl;
 }
