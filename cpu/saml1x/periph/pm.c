@@ -26,12 +26,14 @@
 
 void pm_set(unsigned mode)
 {
+    int deep = 0;
     uint32_t _mode;
 
     switch (mode) {
         case 0:
             DEBUG_PUTS("pm_set(): setting STANDBY mode.");
             _mode = PM_SLEEPCFG_SLEEPMODE_STANDBY;
+            deep = 1;
             break;
         default: /* Falls through */
         case 1:
@@ -45,5 +47,5 @@ void pm_set(unsigned mode)
     /* make sure value has been set */
     while (PM->SLEEPCFG.bit.SLEEPMODE != _mode) {}
 
-    sam0_cortexm_sleep(0);
+    sam0_cortexm_sleep(deep);
 }
