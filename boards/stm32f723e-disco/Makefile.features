@@ -1,5 +1,5 @@
 # define the cpu used by the stm32f723e-disco board
-CPU = stm32f7
+CPU = stm32
 CPU_MODEL = stm32f723ie
 
 # Put defined MCU peripherals here (in alphabetical order)

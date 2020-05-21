@@ -1,5 +1,5 @@
 ## the cpu to build for
-CPU = stm32wb
+CPU = stm32
 CPU_MODEL = stm32wb55rg
 
 # Put defined MCU peripherals here (in alphabetical order)

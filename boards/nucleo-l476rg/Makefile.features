@@ -1,4 +1,4 @@
-CPU = stm32l4
+CPU = stm32
 CPU_MODEL = stm32l476rg
 
 # Put defined MCU peripherals here (in alphabetical order)
