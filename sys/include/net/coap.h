@@ -162,6 +162,13 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    CoAP message format constants
+ * @{
+ */
+#define COAP_TOKEN_LENGTH_MAX    (8)
+/** @} */
+
+/**
  * @defgroup net_coap_conf    CoAP compile configurations
  * @ingroup  net_coap
  * @ingroup  config
