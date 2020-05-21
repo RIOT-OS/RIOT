@@ -1,0 +1,3 @@
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_cdc_acm
+endif
