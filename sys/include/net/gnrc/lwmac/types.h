@@ -91,11 +91,16 @@ extern "C" {
 #define GNRC_LWMAC_RADIO_IS_ON               (0x04)
 
 /**
+ * @ingroup net_gnrc_lwmac_conf
+ * @{
+ */
+/**
  * @brief The default largest number of parallel timeouts in LWMAC
  */
 #ifndef GNRC_LWMAC_TIMEOUT_COUNT
 #define GNRC_LWMAC_TIMEOUT_COUNT             (3U)
 #endif
+/** @} */
 
 /**
  * @brief   Internal states of LWMAC
