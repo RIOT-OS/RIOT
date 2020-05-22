@@ -557,7 +557,7 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
             if (gnrc_netif_hdr_get_flag(netif->mac.tx.packet) &
                 (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
                 /* Set CSMA retries as configured and enable */
-                uint8_t csma_retries = GNRC_LWMAC_BROADCAST_CSMA_RETRIES;
+                uint8_t csma_retries = CONFIG_GNRC_LWMAC_BROADCAST_CSMA_RETRIES;
                 netif->dev->driver->set(netif->dev, NETOPT_CSMA_RETRIES,
                                         &csma_retries, sizeof(csma_retries));
                 netif->mac.mac_info |= GNRC_NETIF_MAC_INFO_CSMA_ENABLED;

@@ -311,8 +311,8 @@ extern "C" {
  * @note Too many CSMA retries may lead to running out of destinations
  * wake-up period.
  */
-#ifndef GNRC_LWMAC_BROADCAST_CSMA_RETRIES
-#define GNRC_LWMAC_BROADCAST_CSMA_RETRIES    (3U)
+#ifndef CONFIG_GNRC_LWMAC_BROADCAST_CSMA_RETRIES
+#define CONFIG_GNRC_LWMAC_BROADCAST_CSMA_RETRIES    (3U)
 #endif
 /** @} */
 
