@@ -143,8 +143,9 @@ static bool _send_wa(gnrc_netif_t *netif)
                                    _gnrc_lwmac_ticks_to_phase(netif->mac.prot.lwmac.last_wakeup));
     }
     else {
-        lwmac_hdr.current_phase = (phase_now + RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US)) -
-                                  _gnrc_lwmac_ticks_to_phase(netif->mac.prot.lwmac.last_wakeup);
+        lwmac_hdr.current_phase = (phase_now +
+                                   RTT_US_TO_TICKS(CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US)) -
+                                   _gnrc_lwmac_ticks_to_phase(netif->mac.prot.lwmac.last_wakeup);
     }
 
     pkt = gnrc_pktbuf_add(NULL, &lwmac_hdr, sizeof(lwmac_hdr), GNRC_NETTYPE_LWMAC);

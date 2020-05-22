@@ -293,14 +293,15 @@ void lwmac_set_state(gnrc_netif_t *netif, gnrc_lwmac_state_t newstate)
                 uint32_t alarm;
 
                 rtt_clear_alarm();
-                alarm = random_uint32_range(RTT_US_TO_TICKS((3 * GNRC_LWMAC_WAKEUP_DURATION_US / 2)),
-                                            RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US -
-                                                            (3 * GNRC_LWMAC_WAKEUP_DURATION_US / 2)));
+                alarm = random_uint32_range(
+                            RTT_US_TO_TICKS((3 * GNRC_LWMAC_WAKEUP_DURATION_US / 2)),
+                            RTT_US_TO_TICKS(CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US -
+                                            (3 * GNRC_LWMAC_WAKEUP_DURATION_US / 2)));
                 LOG_WARNING("WARNING: [LWMAC] phase backoffed: %lu us\n",
                             (unsigned long)RTT_TICKS_TO_US(alarm));
                 netif->mac.prot.lwmac.last_wakeup = netif->mac.prot.lwmac.last_wakeup + alarm;
                 alarm = _next_inphase_event(netif->mac.prot.lwmac.last_wakeup,
-                                            RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US));
+                            RTT_US_TO_TICKS(CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US));
                 rtt_set_alarm(alarm, rtt_cb, (void *) GNRC_LWMAC_EVENT_RTT_WAKEUP_PENDING);
             }
 
@@ -374,7 +375,7 @@ static void _sleep_management(gnrc_netif_t *netif)
 
         if (neighbour != NULL) {
             /* if phase is unknown, send immediately. */
-            if (neighbour->phase > RTT_TICKS_TO_US(GNRC_LWMAC_WAKEUP_INTERVAL_US)) {
+            if (neighbour->phase > RTT_TICKS_TO_US(CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US)) {
                 netif->mac.tx.current_neighbor = neighbour;
                 gnrc_lwmac_set_tx_continue(netif, false);
                 netif->mac.tx.tx_burst_count = 0;
@@ -389,7 +390,7 @@ static void _sleep_management(gnrc_netif_t *netif)
             /* If there's not enough time to prepare a WR to catch the phase
              * postpone to next interval */
             if (time_until_tx < GNRC_LWMAC_WR_PREPARATION_US) {
-                time_until_tx += GNRC_LWMAC_WAKEUP_INTERVAL_US;
+                time_until_tx += CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US;
             }
             time_until_tx -= GNRC_LWMAC_WR_PREPARATION_US;
 
@@ -442,7 +443,7 @@ static void _rx_management_failed(gnrc_netif_t *netif)
         phase = phase - netif->mac.prot.lwmac.last_wakeup;
     }
     /* If the relative phase is beyond 4/5 cycle time, go to sleep. */
-    if (phase > (4 * RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US) / 5)) {
+    if (phase > (4 * RTT_US_TO_TICKS(CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US) / 5)) {
         gnrc_lwmac_set_quit_rx(netif, true);
     }
 
@@ -473,7 +474,7 @@ static void _rx_management_success(gnrc_netif_t *netif)
         phase = phase - netif->mac.prot.lwmac.last_wakeup;
     }
     /* If the relative phase is beyond 4/5 cycle time, go to sleep. */
-    if (phase > (4 * RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US) / 5)) {
+    if (phase > (4 * RTT_US_TO_TICKS(CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US) / 5)) {
         gnrc_lwmac_set_quit_rx(netif, true);
     }
 
@@ -705,7 +706,7 @@ void rtt_handler(uint32_t event, gnrc_netif_t *netif)
         case GNRC_LWMAC_EVENT_RTT_SLEEP_PENDING: {
             /* Set next wake-up timing. */
             alarm = _next_inphase_event(netif->mac.prot.lwmac.last_wakeup,
-                                        RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US));
+                                        RTT_US_TO_TICKS(CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US));
             rtt_set_alarm(alarm, rtt_cb, (void *) GNRC_LWMAC_EVENT_RTT_WAKEUP_PENDING);
             lwmac_set_state(netif, GNRC_LWMAC_SLEEPING);
             break;
@@ -730,7 +731,7 @@ void rtt_handler(uint32_t event, gnrc_netif_t *netif)
             LOG_DEBUG("[LWMAC] RTT: Resume duty cycling\n");
             rtt_clear_alarm();
             alarm = _next_inphase_event(netif->mac.prot.lwmac.last_wakeup,
-                                        RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US));
+                                        RTT_US_TO_TICKS(CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US));
             rtt_set_alarm(alarm, rtt_cb, (void *) GNRC_LWMAC_EVENT_RTT_WAKEUP_PENDING);
             gnrc_lwmac_set_dutycycle_active(netif, true);
             break;

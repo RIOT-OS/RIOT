@@ -100,8 +100,8 @@ extern "C" {
  * In LWMAC, by default, we regard the wake-up period as the beginning of a
  * cycle.
  */
-#ifndef GNRC_LWMAC_WAKEUP_INTERVAL_US
-#define GNRC_LWMAC_WAKEUP_INTERVAL_US        (200LU *US_PER_MS)
+#ifndef CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US
+#define CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US        (200LU *US_PER_MS)
 #endif
 
 /**
@@ -114,10 +114,10 @@ extern "C" {
  * communication. To ensure that the receiver will catch at least one WR
  * packet in one cycle, the sender repeatedly broadcasts a stream of WR packets
  * with the broadcast duration (preamble duration) slightly longer period than
- * @ref GNRC_LWMAC_WAKEUP_INTERVAL_US.
+ * @ref CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US.
  */
 #ifndef GNRC_LWMAC_PREAMBLE_DURATION_US
-#define GNRC_LWMAC_PREAMBLE_DURATION_US      ((13LU *GNRC_LWMAC_WAKEUP_INTERVAL_US) / 10)
+#define GNRC_LWMAC_PREAMBLE_DURATION_US  ((13LU * CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US) / 10)
 #endif
 
 /**
@@ -166,12 +166,12 @@ extern "C" {
  * period in each cycle. Thus, when a node wants to broadcast a packet, it
  * repeatedly broadcasts the packet for one
  * @ref GNRC_LWMAC_BROADCAST_DURATION_US duration which is slightly longer
- * than @ref GNRC_LWMAC_WAKEUP_INTERVAL_US. This is to ensure that all
+ * than @ref CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US. This is to ensure that all
  * neighbors will not miss the broadcast procedure of the sender and catch at
  * least one copy of the broadcast packet.
  */
 #ifndef GNRC_LWMAC_BROADCAST_DURATION_US
-#define GNRC_LWMAC_BROADCAST_DURATION_US     ((GNRC_LWMAC_WAKEUP_INTERVAL_US * 11) / 10)
+#define GNRC_LWMAC_BROADCAST_DURATION_US  ((CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US * 11) / 10)
 #endif
 
 /**
@@ -281,7 +281,8 @@ extern "C" {
  * leading the transmission.
  */
 #ifndef GNRC_LWMAC_MAX_TX_BURST_PKT_NUM
-#define GNRC_LWMAC_MAX_TX_BURST_PKT_NUM      (GNRC_LWMAC_WAKEUP_INTERVAL_US / GNRC_LWMAC_WAKEUP_DURATION_US)
+#define GNRC_LWMAC_MAX_TX_BURST_PKT_NUM \
+        (CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US / GNRC_LWMAC_WAKEUP_DURATION_US)
 #endif
 
 /**

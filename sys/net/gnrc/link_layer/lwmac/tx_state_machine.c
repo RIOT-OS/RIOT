@@ -309,7 +309,8 @@ static uint8_t _packet_process_in_wait_for_wa(gnrc_netif_t *netif)
                                           wa_hdr->current_phase;
             }
             else {
-                netif->mac.tx.timestamp += RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US);
+                netif->mac.tx.timestamp +=
+                    RTT_US_TO_TICKS(CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US);
                 netif->mac.tx.timestamp -= wa_hdr->current_phase;
             }
 
@@ -324,7 +325,7 @@ static uint8_t _packet_process_in_wait_for_wa(gnrc_netif_t *netif)
             }
 
             if ((own_phase < RTT_US_TO_TICKS((3 * GNRC_LWMAC_WAKEUP_DURATION_US / 2))) ||
-                (own_phase > RTT_US_TO_TICKS(GNRC_LWMAC_WAKEUP_INTERVAL_US -
+                (own_phase > RTT_US_TO_TICKS(CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US -
                                              (3 * GNRC_LWMAC_WAKEUP_DURATION_US / 2)))) {
                 gnrc_lwmac_set_phase_backoff(netif, true);
                 LOG_WARNING("WARNING: [LWMAC-tx] phase close\n");
