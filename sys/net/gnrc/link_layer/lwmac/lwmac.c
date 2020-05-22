@@ -389,10 +389,10 @@ static void _sleep_management(gnrc_netif_t *netif)
 
             /* If there's not enough time to prepare a WR to catch the phase
              * postpone to next interval */
-            if (time_until_tx < GNRC_LWMAC_WR_PREPARATION_US) {
+            if (time_until_tx < CONFIG_GNRC_LWMAC_WR_PREPARATION_US) {
                 time_until_tx += CONFIG_GNRC_LWMAC_WAKEUP_INTERVAL_US;
             }
-            time_until_tx -= GNRC_LWMAC_WR_PREPARATION_US;
+            time_until_tx -= CONFIG_GNRC_LWMAC_WR_PREPARATION_US;
 
             /* add a random time before goto TX, for avoiding one node for
              * always holding the medium (if the receiver's phase is recorded earlier in this

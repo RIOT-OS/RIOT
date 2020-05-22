@@ -201,8 +201,8 @@ extern "C" {
  * edge of destination's wake-up phase over time. The idea is not to miss the
  * wake-up period of the receiver, otherwise will lead to a long WR procedure.
  */
-#ifndef GNRC_LWMAC_WR_PREPARATION_US
-#define GNRC_LWMAC_WR_PREPARATION_US         ((3U *US_PER_MS))
+#ifndef CONFIG_GNRC_LWMAC_WR_PREPARATION_US
+#define CONFIG_GNRC_LWMAC_WR_PREPARATION_US         ((3U *US_PER_MS))
 #endif
 
 /**
