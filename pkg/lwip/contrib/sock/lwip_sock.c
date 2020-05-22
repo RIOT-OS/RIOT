@@ -549,6 +549,13 @@ int lwip_sock_recv(struct netconn *conn, uint32_t timeout, struct netbuf **buf)
 #if LWIP_SO_RCVTIMEO
     netconn_set_recvtimeout(conn, 0);
 #endif
+#if IS_ACTIVE(SOCK_HAS_ASYNC)
+    lwip_sock_base_t *sock = netconn_get_callback_arg(conn);
+
+    if (sock && sock->async_cb.gen && cib_avail(&conn->recvmbox.mbox.cib)) {
+        sock->async_cb.gen(sock, SOCK_ASYNC_MSG_RECV, sock->async_cb_arg);
+    }
+#endif
     return res;
 }
 #endif /* defined(MODULE_LWIP_SOCK_UDP) || defined(MODULE_LWIP_SOCK_IP) */

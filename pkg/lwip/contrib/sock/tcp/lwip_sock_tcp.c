@@ -255,6 +255,13 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
 #if LWIP_SO_RCVTIMEO
     netconn_set_recvtimeout(queue->base.conn, 0);
 #endif
+#if IS_ACTIVE(SOCK_HAS_ASYNC)
+    if (queue->base.async_cb.gen &&
+        cib_avail(&queue->base.conn->acceptmbox.mbox.cib)) {
+        queue->base.async_cb.gen(&queue->base, SOCK_ASYNC_CONN_RECV,
+                                 queue->base.async_cb_arg);
+    }
+#endif
     mutex_unlock(&queue->mutex);
     return res;
 }
