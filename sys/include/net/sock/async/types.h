@@ -47,9 +47,9 @@ typedef struct sock_dtls sock_dtls_t;       /**< forward declare for async */
  *
  * @param[in] sock  The sock the event happened on
  * @param[in] flags The event flags. Expected values are
- *                  - @ref SOCK_ASYNC_CONN_RDY (if a session you created becomes ready),
+ *                  - @ref SOCK_ASYNC_CONN_RDY (if a session becomes ready),
  *                  - @ref SOCK_ASYNC_CONN_FIN (if a created session was destroyed),
- *                  - @ref SOCK_ASYNC_CONN_RECV (if a peer tries to create a session),
+ *                  - @ref SOCK_ASYNC_CONN_RECV (if a handshake message needs to be completed)
  *                  - @ref SOCK_ASYNC_MSG_RECV,
  *                  - @ref SOCK_ASYNC_MSG_SENT,
  *                  - @ref SOCK_ASYNC_PATH_PROP, or
