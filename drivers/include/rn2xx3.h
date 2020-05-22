@@ -64,8 +64,8 @@ extern "C" {
 /**
  * @brief   Default sleep duration (in ms)
  */
-#ifndef RN2XX3_DEFAULT_SLEEP
-#define RN2XX3_DEFAULT_SLEEP            (5000U)
+#ifndef CONFIG_RN2XX3_DEFAULT_SLEEP
+#define CONFIG_RN2XX3_DEFAULT_SLEEP            (5000U)
 #endif
 /** @} */
 
