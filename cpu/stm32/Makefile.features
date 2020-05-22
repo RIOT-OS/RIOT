@@ -1,5 +1,6 @@
 include $(RIOTCPU)/stm32/stm32_info.mk
 
+FEATURES_PROVIDED += bootloader_stm32
 FEATURES_PROVIDED += cpu_stm32$(CPU_FAM)
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq

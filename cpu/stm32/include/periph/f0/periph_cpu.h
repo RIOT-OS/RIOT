@@ -24,6 +24,23 @@ extern "C" {
 #endif
 
 #ifndef DOXYGEN
+
+/**
+ * @brief   Starting address of the ROM bootloader
+ *          see application note AN2606
+ */
+#if defined(CPU_LINE_STM32F030x4) || defined(CPU_LINE_STM32F030x6) || \
+    defined(CPU_LINE_STM32F030x8) || defined(CPU_LINE_STM32F031x6) || \
+    defined(CPU_LINE_STM32F051x8)
+#define STM32_BOOTLOADER_ADDR   (0x1FFFEC00)
+#elif defined(CPU_LINE_STM32F072xB) || defined(CPU_LINE_STM32F070xB)
+#define STM32_BOOTLOADER_ADDR   (0x1FFFC800)
+#elif defined(CPU_LINE_STM32F030xC) || defined(CPU_LINE_STM32F091xC)
+#define STM32_BOOTLOADER_ADDR   (0x1FFFD800)
+#elif defined(CPU_LINE_STM32F042x6)
+#define STM32_BOOTLOADER_ADDR   (0x1FFFC400)
+#endif
+
 /**
  * @brief   Override ADC resolution values
  * @{
