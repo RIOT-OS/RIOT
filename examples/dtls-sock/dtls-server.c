@@ -108,22 +108,22 @@ void *dtls_server_wrapper(void *arg)
     }
 
     while (active) {
-        if ((msg_try_receive(&msg) == 1) && (msg.type == DTLS_STOP_SERVER_MSG)) {
+        if ((msg_try_receive(&msg) == 1) &&
+            (msg.type == DTLS_STOP_SERVER_MSG)){
             active = false;
         }
         else {
             res = sock_dtls_recv(&sock, &session, rcv, sizeof(rcv),
                                   10 * US_PER_SEC);
-            if (res < 0) {
-                if (res != -ETIMEDOUT) {
-                    printf("Error receiving UDP over DTLS %d", (int)res);
+            if (res >= 0) {
+                printf("Received %d bytes -- (echo)\n", (int)res);
+                res = sock_dtls_send(&sock, &session, rcv, (size_t)res, 0);
+                if (res < 0) {
+                    printf("Error resending DTLS message: %d", (int)res);
                 }
-                continue;
             }
-            printf("Received %d bytes -- (echo!)\n", (int)res);
-            res = sock_dtls_send(&sock, &session, rcv, (size_t)res);
-            if (res < 0) {
-                printf("Error resending DTLS message: %d", (int)res);
+            else if (res == -SOCK_DTLS_HANDSHAKE) {
+                printf("New client connected\n");
             }
         }
     }

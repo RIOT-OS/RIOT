@@ -24,15 +24,6 @@
 #include "debug.h"
 #include "dtls_debug.h"
 
-#define DTLS_HANDSHAKE_BUFSIZE  (256)       /**< Size buffer used in handshake
-                                                to hold credentials */
-/* ECC handshake takes more time */
-#ifdef CONFIG_DTLS_ECC
-#define DTLS_HANDSHAKE_TIMEOUT  (30 * US_PER_SEC)
-#else
-#define DTLS_HANDSHAKE_TIMEOUT  (1 * US_PER_SEC)
-#endif  /* CONFIG_DTLS_ECC */
-
 #ifdef CONFIG_DTLS_PSK
 static int _get_psk_info(struct dtls_context_t *ctx, const session_t *session,
                          dtls_credentials_type_t type,
@@ -61,6 +52,7 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
 
 static void _session_to_ep(const session_t *session, sock_udp_ep_t *ep);
 static void _ep_to_session(const sock_udp_ep_t *ep, session_t *session);
+static uint32_t _update_timeout(uint32_t start, uint32_t timeout);
 
 static dtls_handler_t _dtls_handler = {
     .event = _event,
@@ -112,7 +104,7 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
     sock_dtls_t *sock = dtls_get_app_data(ctx);
     msg_t msg = { .type = code };
 #ifdef ENABLE_DEBUG
-    switch(code) {
+    switch (code) {
         case DTLS_EVENT_CONNECT:
             DEBUG("sock_dtls: event connect\n");
             break;
@@ -155,7 +147,7 @@ static int _get_psk_info(struct dtls_context_t *ctx, const session_t *session,
 
     const void *c = NULL;
     size_t c_len = 0;
-    switch(type) {
+    switch (type) {
     case DTLS_PSK_HINT:
         DEBUG("sock_dtls: psk hint request\n");
         /* Ignored. See https://tools.ietf.org/html/rfc4279#section-5.2 */
@@ -267,27 +259,39 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
     return 0;
 }
 
-int sock_dtls_session_create(sock_dtls_t *sock, const sock_udp_ep_t *ep,
-                             sock_dtls_session_t *remote)
+int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
+                           sock_dtls_session_t *remote)
 {
-    uint8_t rcv_buffer[DTLS_HANDSHAKE_BUFSIZE];
-    msg_t msg;
-    ssize_t res;
-
     assert(sock);
     assert(ep);
     assert(remote);
+
+    sock_udp_ep_t local;
+    if (!sock->udp_sock || (sock_udp_get_local(sock->udp_sock, &local) < 0)) {
+        return -EADDRNOTAVAIL;
+    }
+    if (ep->port == 0) {
+        return -EINVAL;
+    }
+    switch (ep->family) {
+        case AF_INET:
+ #if IS_ACTIVE(SOCK_HAS_IPV6)
+        case AF_INET6:
+ #endif
+            break;
+        default:
+            return -EINVAL;
+    }
 
     /* prepare a the remote party to connect to */
     memcpy(&remote->ep, ep, sizeof(sock_udp_ep_t));
     memcpy(&remote->dtls_session.addr, &ep->addr.ipv6, sizeof(ipv6_addr_t));
     _ep_to_session(ep, &remote->dtls_session);
 
-    /* start a handshake */
-    DEBUG("sock_dtls: starting handshake\n");
-    res = dtls_connect(sock->dtls_ctx, &remote->dtls_session);
+    /* start the handshake */
+    int res = dtls_connect(sock->dtls_ctx, &remote->dtls_session);
     if (res < 0) {
-        DEBUG("sock_dtls: error establishing a session: %d\n", (int)res);
+        DEBUG("sock_dtls: error establishing a session: %d\n", res);
         return -ENOMEM;
     }
     else if (res == 0) {
@@ -295,28 +299,8 @@ int sock_dtls_session_create(sock_dtls_t *sock, const sock_udp_ep_t *ep,
         return 0;
     }
 
-    /* receive all handshake messages or timeout if timer expires */
-    while (!mbox_try_get(&sock->mbox, &msg) ||
-            msg.type != DTLS_EVENT_CONNECTED) {
-        res = sock_udp_recv(sock->udp_sock, rcv_buffer, sizeof(rcv_buffer),
-                            DTLS_HANDSHAKE_TIMEOUT, &remote->ep);
-        if (res <= 0) {
-            DEBUG("sock_dtls: error receiving handshake messages: %d\n", (int)res);
-            /* deletes peer created in dtls_connect() */
-            dtls_peer_t *peer = dtls_get_peer(sock->dtls_ctx,
-                                              &remote->dtls_session);
-            dtls_reset_peer(sock->dtls_ctx, peer);
-            return -ETIMEDOUT;
-        }
-
-        res = dtls_handle_message(sock->dtls_ctx, &remote->dtls_session,
-                                  rcv_buffer, res);
-        /* stop handshake if received fatal level alert */
-        if (res == -1) {
-            return res;
-        }
-    }
-    return 0;
+    /* New handshake initiated */
+    return 1;
 }
 
 void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote)
@@ -325,7 +309,7 @@ void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote)
 }
 
 ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
-                       const void *data, size_t len)
+                       const void *data, size_t len, uint32_t timeout)
 {
     assert(sock);
     assert(remote);
@@ -334,6 +318,10 @@ ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
     /* check if session exists, if not create session first then send */
     if (!dtls_get_peer(sock->dtls_ctx, &remote->dtls_session)) {
         int res;
+
+        if (timeout == 0) {
+            return -ENOTCONN;
+        }
 
         /* no session with remote, creating new session.
          * This will also create new peer for this session */
@@ -346,22 +334,31 @@ ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
             /* handshake initiated, wait until connected or timed out */
 
             msg_t msg;
+            bool is_timed_out = false;
             do {
-                res = xtimer_msg_receive_timeout(&msg, 3 * DTLS_HANDSHAKE_TIMEOUT);
+                uint32_t start = xtimer_now_usec();
+                res = xtimer_msg_receive_timeout(&msg, timeout);
+
+                if (timeout != SOCK_NO_TIMEOUT) {
+                    timeout = _update_timeout(start, timeout);
+                    is_timed_out = (res < 0) || (timeout == 0);
+                }
             }
-            while ((res != -1) && (msg.type != DTLS_EVENT_CONNECTED));
-            if (res == -1) {
+            while (!is_timed_out && (msg.type != DTLS_EVENT_CONNECTED));
+            if (is_timed_out &&  (msg.type != DTLS_EVENT_CONNECTED)) {
                 DEBUG("sock_dtls: handshake process timed out\n");
 
                 /* deletes peer created in dtls_connect() before */
-                dtls_peer_t *peer = dtls_get_peer(sock->dtls_ctx, &remote->dtls_session);
+                dtls_peer_t *peer = dtls_get_peer(sock->dtls_ctx,
+                                                  &remote->dtls_session);
                 dtls_reset_peer(sock->dtls_ctx, peer);
-                return -EHOSTUNREACH;
+                return -ETIMEDOUT;
             }
         }
     }
 
-    return dtls_write(sock->dtls_ctx, &remote->dtls_session, (uint8_t *)data, len);
+    return dtls_write(sock->dtls_ctx, &remote->dtls_session,
+                      (uint8_t *)data, len);
 }
 
 static ssize_t _copy_buffer(sock_dtls_t *sock, void *data, size_t max_len)
@@ -392,7 +389,7 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
     }
 
     /* loop breaks when timeout or application data read */
-    while(1) {
+    while (1) {
         uint32_t start_recv = xtimer_now_usec();
         ssize_t res = sock_udp_recv(sock->udp_sock, data, max_len, timeout,
                                     &remote->ep);
@@ -406,12 +403,16 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
                                   (uint8_t *)data, res);
 
         if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
-            uint32_t time_passed = (xtimer_now_usec() - start_recv);
-            timeout = (time_passed > timeout) ? 0: timeout - time_passed;
+            timeout = _update_timeout(start_recv, timeout);
         }
 
+        msg_t msg;
         if (sock->buf != NULL) {
             return _copy_buffer(sock, data, max_len);
+        }
+        else if (mbox_try_get(&sock->mbox, &msg) &&
+                 msg.type == DTLS_EVENT_CONNECTED) {
+            return -SOCK_DTLS_HANDSHAKE;
         }
         else if (timeout == 0) {
             DEBUG("sock_dtls: timed out while decrypting message\n");
@@ -446,6 +447,12 @@ static void _session_to_ep(const session_t *session, sock_udp_ep_t *ep)
     ep->port = session->port;
     ep->netif = session->ifindex;
     memcpy(&ep->addr.ipv6, &session->addr, sizeof(ipv6_addr_t));
+}
+
+static inline uint32_t _update_timeout(uint32_t start, uint32_t timeout)
+{
+    uint32_t diff = (xtimer_now_usec() - start);
+    return (diff > timeout) ? 0: timeout - diff;
 }
 
 /** @} */
