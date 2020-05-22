@@ -211,19 +211,19 @@ extern "C" {
  * When a node in LWMAC gets a WR during its wake-up period, it immediately
  * replies a WA packet to the sender for acknowledging the sender's transmission
  * request. After sending the WA, the receiver waits for the data packet from
- * the sender, with a timeout of @ref GNRC_LWMAC_DATA_DELAY_US duration. In
- * case no data will be received in this period, the receiver regards reception
- * failed and go back to normal listen mode. However, in case the receiver
- * receives other unintended packets, like WR/WA packets from other neighbor
- * communication pairs, the receiver resets this timeout and continues to wait
- * for the data packet, with the consideration that the sender's data
+ * the sender, with a timeout of @ref CONFIG_GNRC_LWMAC_DATA_DELAY_US duration.
+ * In case no data will be received in this period, the receiver regards
+ * reception failed and go back to normal listen mode. However, in case the
+ * receiver receives other unintended packets, like WR/WA packets from other
+ * neighbor communication pairs, the receiver resets this timeout and continues
+ * to wait for the data packet, with the consideration that the sender's data
  * transmission might be delayed due to other ongoing transmissions (the data
  * packet is transmitted with CSMA/CA). This data timeout is long enough to
  * catch the beginning of the packet if the transceiver supports
  * @ref NETDEV_EVENT_RX_STARTED event (this can be important for big packets).
  */
-#ifndef GNRC_LWMAC_DATA_DELAY_US
-#define GNRC_LWMAC_DATA_DELAY_US             (10U *US_PER_MS)
+#ifndef CONFIG_GNRC_LWMAC_DATA_DELAY_US
+#define CONFIG_GNRC_LWMAC_DATA_DELAY_US             (10U *US_PER_MS)
 #endif
 
 /**

@@ -232,7 +232,7 @@ static uint8_t _packet_process_in_wait_for_data(gnrc_netif_t *netif)
             gnrc_pktbuf_release(pkt);
             /* Reset timeout to wait for the data packet */
             gnrc_lwmac_clear_timeout(netif, GNRC_LWMAC_TIMEOUT_DATA);
-            gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_DATA, GNRC_LWMAC_DATA_DELAY_US);
+            gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_DATA, CONFIG_GNRC_LWMAC_DATA_DELAY_US);
             continue;
         }
 
@@ -242,7 +242,7 @@ static uint8_t _packet_process_in_wait_for_data(gnrc_netif_t *netif)
             gnrc_pktbuf_release(pkt);
             /* Reset timeout to wait for the data packet */
             gnrc_lwmac_clear_timeout(netif, GNRC_LWMAC_TIMEOUT_DATA);
-            gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_DATA, GNRC_LWMAC_DATA_DELAY_US);
+            gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_DATA, CONFIG_GNRC_LWMAC_DATA_DELAY_US);
             continue;
         }
 
@@ -369,7 +369,7 @@ static bool _lwmac_rx_update(gnrc_netif_t *netif)
             }
 
             /* When reach here, WA has been sent, set timeout for expected data arrival */
-            gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_DATA, GNRC_LWMAC_DATA_DELAY_US);
+            gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_DATA, CONFIG_GNRC_LWMAC_DATA_DELAY_US);
 
             _gnrc_lwmac_set_netdev_state(netif, NETOPT_STATE_IDLE);
             netif->mac.rx.state = GNRC_LWMAC_RX_STATE_WAIT_FOR_DATA;
@@ -404,7 +404,8 @@ static bool _lwmac_rx_update(gnrc_netif_t *netif)
                 }
                 else {
                     /* If radio is receiving packet, reset wait data timeout */
-                    gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_DATA, GNRC_LWMAC_DATA_DELAY_US);
+                    gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_DATA,
+                                           CONFIG_GNRC_LWMAC_DATA_DELAY_US);
                 }
                 break;
             }
