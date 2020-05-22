@@ -97,8 +97,8 @@ extern "C" {
 /**
  * @brief The default largest number of parallel timeouts in LWMAC
  */
-#ifndef GNRC_LWMAC_TIMEOUT_COUNT
-#define GNRC_LWMAC_TIMEOUT_COUNT             (3U)
+#ifndef CONFIG_GNRC_LWMAC_TIMEOUT_COUNT
+#define CONFIG_GNRC_LWMAC_TIMEOUT_COUNT             (3U)
 #endif
 /** @} */
 
@@ -199,7 +199,7 @@ typedef struct lwmac {
     gnrc_lwmac_state_t state;                                   /**< Internal state of MAC layer */
     uint32_t last_wakeup;                                       /**< Used to calculate wakeup times */
     uint8_t lwmac_info;                                         /**< LWMAC's internal information (flags) */
-    gnrc_lwmac_timeout_t timeouts[GNRC_LWMAC_TIMEOUT_COUNT];    /**< Store timeouts used for protocol */
+    gnrc_lwmac_timeout_t timeouts[CONFIG_GNRC_LWMAC_TIMEOUT_COUNT];    /**< Store timeouts used for protocol */
 
 #if (GNRC_MAC_ENABLE_DUTYCYCLE_RECORD == 1)
     /* Parameters for recording duty-cycle */
