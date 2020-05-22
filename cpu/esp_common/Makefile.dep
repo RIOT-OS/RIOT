@@ -24,6 +24,11 @@ USEMODULE += xtensa
 
 FEATURES_REQUIRED += cpp # Vendor code uses C++
 
+ifneq (,$(filter esp_wifi_ap,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_wifi_ap
+  USEMODULE += esp_wifi
+endif
+
 ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
   FEATURES_REQUIRED += esp_wifi_enterprise
   USEMODULE += esp_wifi

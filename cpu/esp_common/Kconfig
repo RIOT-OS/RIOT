@@ -15,6 +15,7 @@ config CPU_COMMON_ESP
     select HAS_ESP_NOW
     select HAS_ESP_SPIFFS
     select HAS_ESP_WIFI
+    select HAS_ESP_WIFI_AP
     select HAS_LIBSTDCPP
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_HWRNG
@@ -33,6 +34,11 @@ config HAS_ESP_WIFI
     bool
     help
         Indicates that an ESP WiFi radio is present.
+
+config HAS_ESP_WIFI_AP
+    bool
+    help
+        Indicates that ESP WiFi SoftAP support is present.
 
 config HAS_ESP_NOW
     bool

@@ -7,6 +7,7 @@ FEATURES_PROVIDED += arch_esp
 FEATURES_PROVIDED += cpp
 FEATURES_PROVIDED += esp_now
 FEATURES_PROVIDED += esp_spiffs
+FEATURES_PROVIDED += esp_wifi_ap
 FEATURES_PROVIDED += esp_wifi
 FEATURES_PROVIDED += libstdcpp
 FEATURES_PROVIDED += periph_cpuid
@@ -14,3 +15,6 @@ FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += ssp
+
+FEATURES_CONFLICT += esp_wifi_ap:esp_now
+FEATURES_CONFLICT_MSG += "ESP_NOW and ESP_WIFI_AP can not be used at the same time."
