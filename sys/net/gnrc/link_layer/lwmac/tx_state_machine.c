@@ -385,7 +385,7 @@ static bool _send_data(gnrc_netif_t *netif)
 
     /* It's okay to retry sending DATA. Timing doesn't matter anymore and
      * destination is waiting for a certain amount of time. */
-    uint8_t csma_retries = GNRC_LWMAC_DATA_CSMA_RETRIES;
+    uint8_t csma_retries = CONFIG_GNRC_LWMAC_DATA_CSMA_RETRIES;
     netif->dev->driver->set(netif->dev, NETOPT_CSMA_RETRIES,
                             &csma_retries, sizeof(csma_retries));
 

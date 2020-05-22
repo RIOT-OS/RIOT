@@ -234,8 +234,8 @@ extern "C" {
  * how many CSMA retries a sender will be allowed to execute for sending its
  * data, before the data is successfully sent (gets data ACK from the receiver).
  */
-#ifndef GNRC_LWMAC_DATA_CSMA_RETRIES
-#define GNRC_LWMAC_DATA_CSMA_RETRIES         (3U)
+#ifndef CONFIG_GNRC_LWMAC_DATA_CSMA_RETRIES
+#define CONFIG_GNRC_LWMAC_DATA_CSMA_RETRIES         (3U)
 #endif
 
 /**
