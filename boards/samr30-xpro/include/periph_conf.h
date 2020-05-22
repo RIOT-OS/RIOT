@@ -115,7 +115,7 @@ static const i2c_conf_t i2c_config[] = {
         .mux      = GPIO_MUX_C,
         .gclk_src = SAM0_GCLK_MAIN,
         .flags    = I2C_FLAG_NONE
-     }
+    }
 };
 #define I2C_NUMOF          ARRAY_SIZE(i2c_config)
 /** @} */
