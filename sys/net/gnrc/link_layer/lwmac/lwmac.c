@@ -398,7 +398,7 @@ static void _sleep_management(gnrc_netif_t *netif)
              * always holding the medium (if the receiver's phase is recorded earlier in this
              * particular node) */
             uint32_t random_backoff;
-            random_backoff = random_uint32_range(0, GNRC_LWMAC_TIME_BETWEEN_WR_US);
+            random_backoff = random_uint32_range(0, CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US);
             time_until_tx = time_until_tx + random_backoff;
 
             gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_WAIT_DEST_WAKEUP, time_until_tx);

@@ -663,7 +663,8 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
             netif->mac.tx.wr_sent++;
 
             /* Set timeout for next WR in case no WA will be received */
-            gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_WR, GNRC_LWMAC_TIME_BETWEEN_WR_US);
+            gnrc_lwmac_set_timeout(netif, GNRC_LWMAC_TIMEOUT_WR,
+                                   CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US);
 
             /* Debug WR timing */
             LOG_DEBUG("[LWMAC-tx] Destination phase was: %" PRIu32 "\n",

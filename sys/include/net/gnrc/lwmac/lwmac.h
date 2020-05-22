@@ -126,18 +126,18 @@ extern "C" {
  *
  * In LWMAC, when a sender initiates a transmission to a receiver, it starts
  * with sending a stream of repeated WR packets with
- * @ref GNRC_LWMAC_TIME_BETWEEN_WR_US interval between two consecutive WRs.
- * After sending one WR (preamble) packet, the sender turns to the listen mode
- * to receive the potential incoming WA (preamble-ACK) packet with a timeout of
- * @ref GNRC_LWMAC_TIME_BETWEEN_WR_US. If no WA is received during
- * @ref GNRC_LWMAC_TIME_BETWEEN_WR_US, the sender starts sending the next WR.
- * It is referenced to the beginning of both WRs, but due to internal
- * overhead, the exact spacing is slightly higher. The minimum possible value
- * depends on the time it takes to completely send a WR with the given hardware
- * (including processor) and data rate.
+ * @ref CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US interval between two consecutive
+ * WRs. After sending one WR (preamble) packet, the sender turns to the listen
+ * mode to receive the potential incoming WA (preamble-ACK) packet with a
+ * timeout of @ref CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US. If no WA is received
+ * during @ref CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US, the sender starts sending
+ * the next WR. It is referenced to the beginning of both WRs, but due to
+ * internal overhead, the exact spacing is slightly higher. The minimum
+ * possible value depends on the time it takes to completely send a WR with the
+ * given hardware (including processor) and data rate.
  */
-#ifndef GNRC_LWMAC_TIME_BETWEEN_WR_US
-#define GNRC_LWMAC_TIME_BETWEEN_WR_US        (5U *US_PER_MS)
+#ifndef CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US
+#define CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US        (5U *US_PER_MS)
 #endif
 
 /**
@@ -148,14 +148,14 @@ extern "C" {
  * period of @ref GNRC_LWMAC_WAKEUP_DURATION_US in each cycle. In the rest of
  * the cycle, the node turns off the radio to conserve power.
  * @ref GNRC_LWMAC_WAKEUP_DURATION_US is set to twice the duration of
- * @ref GNRC_LWMAC_TIME_BETWEEN_WR_US, to guarantee that the wake-up period is
- * long enough that receiver will not miss the WR (preamble) packet.
+ * @ref CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US, to guarantee that the wake-up
+ * period is long enough that receiver will not miss the WR (preamble) packet.
  * Receiver needs to support @ref NETDEV_EVENT_RX_STARTED event in order to use
  * time-between-WR as a sensible default here. Otherwise the duration of WRs as
  * well as longest possible data broadcasts need to be taken into account.
  */
 #ifndef GNRC_LWMAC_WAKEUP_DURATION_US
-#define GNRC_LWMAC_WAKEUP_DURATION_US        (GNRC_LWMAC_TIME_BETWEEN_WR_US * 2)
+#define GNRC_LWMAC_WAKEUP_DURATION_US (CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US * 2)
 #endif
 
 /**
@@ -178,17 +178,18 @@ extern "C" {
  * @brief Time to idle between two successive broadcast packets, referenced to
  *        the start of the packet.
  *
- * The same limitation as for @ref GNRC_LWMAC_TIME_BETWEEN_WR_US apply here. In
- * LWMAC, when a sender initiates a broadcast, it starts with sending a stream
- * ofrepeated broadcast packets with @ref GNRC_LWMAC_TIME_BETWEEN_BROADCAST_US
- * interval between two consecutive broadcast packets. After sending one
- * broadcast packet, the sender turns to the listen mode with a timeout of
+ * The same limitation as for @ref CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US apply
+ * here. In LWMAC, when a sender initiates a broadcast, it starts with sending
+ * a stream ofrepeated broadcast packets with
+ * @ref GNRC_LWMAC_TIME_BETWEEN_BROADCAST_US interval between two consecutive
+ * broadcast packets. After sending one broadcast packet, the sender turns to
+ * the listen mode with a timeout of
  * @ref GNRC_LWMAC_TIME_BETWEEN_BROADCAST_US. When this timeout expires, the
  * sender sends the next broadcast packet until reaching the maximum broadcast
  * duration of @ref GNRC_LWMAC_BROADCAST_DURATION_US.
  */
 #ifndef GNRC_LWMAC_TIME_BETWEEN_BROADCAST_US
-#define GNRC_LWMAC_TIME_BETWEEN_BROADCAST_US (GNRC_LWMAC_TIME_BETWEEN_WR_US)
+#define GNRC_LWMAC_TIME_BETWEEN_BROADCAST_US  (CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US)
 #endif
 
 /**
@@ -260,7 +261,7 @@ extern "C" {
  * this macro here defines the largest number of packets allowed to be sent in
  * one consecutive sequence. In case a sender has multi packets for one
  * receiver,the burst transmission procedure is as follows:
- * 
+ *
  * 1. The sender first uses WR stream to locate the receiver's wake-up period
  *    (if the sender has already phase-locked the receiver's phase, normally
  *    the sender only cost one WR to get the first WA from the receiver) and
@@ -269,13 +270,13 @@ extern "C" {
  *    WR to the receiver for starting the second round of transmission of the
  *    second data. The receiver should also immediately reply WA for continue
  *    receiving data packets. In case the sender doesn't receive WA during
- *    @ref GNRC_LWMAC_TIME_BETWEEN_WR_US, it regards the consecutive (burst)
- *    transmission failed and quits TX procedure (the data will be queued back
- *    to the transmission queue for normal transmission attempt in following
- *    cycles).
+ *    @ref CONFIG_GNRC_LWMAC_TIME_BETWEEN_WR_US, it regards the consecutive
+ *    (burst) transmission failed and quits TX procedure (the data will be
+ *    queued back to the transmission queue for normal transmission attempt in
+ *    following cycles).
  * 3. In case the second transmission succeeds, the sender repeats step (2) to
  *    send all the following pending packets.
- * 
+ *
  * In short, in burst transmission mode, the sender doesn't tolerate no-WA
  * event. All the pending data packets should be sent with only one WR cost for
  * leading the transmission.
