@@ -35,6 +35,7 @@
 #ifndef PHYDAT_H
 #define PHYDAT_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include "kernel_defines.h"
 
@@ -180,6 +181,23 @@ void phydat_dump(phydat_t *data, uint8_t dim);
 const char *phydat_unit_to_str(uint8_t unit);
 
 /**
+ * @brief   Return a string representation for every unit, including
+ *          non-physical units like 'none' or 'time'
+ *
+ * This function is useful when converting phydat_t structures to non-binary
+ * representations like JSON or XML.
+ *
+ * In practice, this function extends phydat_unit_to_str() with additional
+ * identifiers for non physical units.
+ *
+ * @param[in] unit      unit to convert
+ *
+ * @return  string representation of given unit
+ * @return  empty string ("") if unit was not recognized
+ */
+const char *phydat_unit_to_str_verbose(uint8_t unit);
+
+/**
  * @brief   Convert the given scale factor to an SI prefix
  *
  * The given scaling factor is returned as a SI unit prefix (e.g. M for Mega, u
@@ -221,6 +239,51 @@ char phydat_prefix_from_scale(int8_t scale);
  * @param[in]       dim         Number of elements in @p values
  */
 void phydat_fit(phydat_t *dat, const int32_t *values, unsigned int dim);
+
+/**
+ * @brief   Convert the given phydat_t structure into a JSON string
+ *
+ * The output string written to @p buf will be `\0` terminated. You must make
+ * sure, that the given @p buf is large enough to hold the resulting string. You
+ * can call the function with `@p buf := NULL` to simply calculate the size of
+ * the JSON string without writing anything.
+ *
+ * The formatted JSON string will have the following format:
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.json}
+ * // case (dim == 1):
+ * {
+ *   "d": 21.45,
+ *   "u": "°C"
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.json}
+ * // case (dim > 1), dim := 3 in this case:
+ * {
+ *   "d": [1.02, 0.23, -0.81],
+ *   "u": "g"
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * The data will be encoded as fixed point number based on the given scale
+ * factor.
+ *
+ * For encoding the unit, this function uses the extended
+ * phydat_unit_to_str_verbose() function to also print units for non-SI types,
+ * e.g. it will produce `..."u":"date"}` for @ref UNIT_DATE or `..."u":"none"}`
+ * for @ref UNIT_NONE.
+ *
+ * @param[in]  data     data to encode
+ * @param[in]  dim      dimensions used in @p data, MUST be > 0 and < PHYDAT_DIM
+ * @param[out] buf      target buffer for the JSON string, or NULL
+ *
+ * @pre     @p dim > 0
+ * @pre     @p dim < PHYDAT_DIM
+ *
+ * @return  number of bytes (potentially) written to @p buf, including `\0`
+ *          terminator
+ */
+size_t phydat_to_json(const phydat_t *data, size_t dim, char *buf);
 
 #ifdef __cplusplus
 }

@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Generic sensor/actuator data handling
+ * @brief       String helper functions for formatting and dumping phydat data
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
@@ -130,6 +130,19 @@ const char *phydat_unit_to_str(uint8_t unit)
         case UNIT_OHM:      return "ohm";
 
         default:            return "";
+    }
+}
+
+const char *phydat_unit_to_str_verbose(uint8_t unit)
+{
+    switch (unit) {
+        case UNIT_UNDEF:    return "undefined";
+        case UNIT_NONE:     /* fall through */
+        case UNIT_BOOL:
+            return "none";
+        case UNIT_TIME:     return "time";
+        case UNIT_DATE:     return "date";
+        default:            return phydat_unit_to_str(unit);
     }
 }
 
