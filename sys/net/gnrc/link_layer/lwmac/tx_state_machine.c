@@ -508,7 +508,7 @@ void gnrc_lwmac_tx_stop(gnrc_netif_t *netif)
 
     /* Release packet in case of failure */
     if (netif->mac.tx.packet) {
-        if (netif->mac.tx.tx_retry_count >= GNRC_LWMAC_MAX_DATA_TX_RETRIES) {
+        if (netif->mac.tx.tx_retry_count >= CONFIG_GNRC_LWMAC_MAX_DATA_TX_RETRIES) {
             netif->mac.tx.tx_retry_count = 0;
             gnrc_pktbuf_release(netif->mac.tx.packet);
             netif->mac.tx.packet = NULL;

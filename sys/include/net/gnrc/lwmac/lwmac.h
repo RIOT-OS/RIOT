@@ -47,7 +47,7 @@
  * ## Simple retransmission scheme
  * LWMAC adopts a simple retransmission scheme to enhance link reliability. The data
  * packet will only be dropped in case the retransmission counter gets larger than
- * @ref GNRC_LWMAC_MAX_DATA_TX_RETRIES.
+ * @ref CONFIG_GNRC_LWMAC_MAX_DATA_TX_RETRIES.
  *
  * ## Automatic phase backoff scheme
  * LWMAC adopts an automatic phase backoff scheme to reduce WR (preamble) collision
@@ -243,15 +243,15 @@ extern "C" {
  *        response from the receiver.
  *
  * When a data packet is scheduled for transmission, i.e., pushed into TX for
- * sending, LWMAC defines a maximum of @ref GNRC_LWMAC_MAX_DATA_TX_RETRIES
- * retries for transmission of the packet. That is, in case of transmission
- * failure in TX due to no WA from the receiver, the sender will not drop the
- * packet, but keeps it and retries to send the data packet in the following
- * cycles, until the sender reaches the maximum retries limit defined here.
- * Then, the packet will be dropped.
+ * sending, LWMAC defines a maximum of
+ * @ref CONFIG_GNRC_LWMAC_MAX_DATA_TX_RETRIES retries for transmission of the
+ * packet. That is, in case of transmission failure in TX due to no WA from the
+ * receiver, the sender will not drop the packet, but keeps it and retries to
+ * send the data packet in the following cycles, until the sender reaches the
+ * maximum retries limit defined here. Then, the packet will be dropped.
  */
-#ifndef GNRC_LWMAC_MAX_DATA_TX_RETRIES
-#define GNRC_LWMAC_MAX_DATA_TX_RETRIES       (3U)
+#ifndef CONFIG_GNRC_LWMAC_MAX_DATA_TX_RETRIES
+#define CONFIG_GNRC_LWMAC_MAX_DATA_TX_RETRIES       (3U)
 #endif
 
 /**
