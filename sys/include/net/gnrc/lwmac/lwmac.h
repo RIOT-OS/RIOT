@@ -298,8 +298,8 @@ extern "C" {
  * extension limit defined here, it goes to sleep mode with the consideration
  * that the channel is currently unavailable/busy.
  */
-#ifndef GNRC_LWMAC_MAX_RX_EXTENSION_NUM
-#define GNRC_LWMAC_MAX_RX_EXTENSION_NUM      (3U)
+#ifndef CONFIG_GNRC_LWMAC_MAX_RX_EXTENSION_NUM
+#define CONFIG_GNRC_LWMAC_MAX_RX_EXTENSION_NUM      (3U)
 #endif
 
 /**

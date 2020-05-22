@@ -428,7 +428,7 @@ static void _rx_management_failed(gnrc_netif_t *netif)
     LOG_DEBUG("[LWMAC] Reception was NOT successful\n");
     gnrc_lwmac_rx_stop(netif);
 
-    if (netif->mac.rx.rx_bad_exten_count >= GNRC_LWMAC_MAX_RX_EXTENSION_NUM) {
+    if (netif->mac.rx.rx_bad_exten_count >= CONFIG_GNRC_LWMAC_MAX_RX_EXTENSION_NUM) {
         gnrc_lwmac_set_quit_rx(netif, true);
     }
 
