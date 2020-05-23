@@ -35,6 +35,8 @@
 #include "vendor/stm32f4xx.h"
 #elif CPU_FAM_STM32F7
 #include "vendor/stm32f7xx.h"
+#elif CPU_FAM_STM32G4
+#include "vendor/stm32g4xx.h"
 #elif CPU_FAM_STM32L0
 #include "vendor/stm32l0xx.h"
 #elif CPU_FAM_STM32L1
@@ -85,7 +87,8 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   (86U)
 #elif defined(CPU_LINE_STM32F412Zx) || defined(CPU_LINE_STM32F446xx)
 #define CPU_IRQ_NUMOF                   (97U)
-#elif defined(CPU_LINE_STM32F413xx) || defined(CPU_LINE_STM32F423xx)
+#elif defined(CPU_LINE_STM32F413xx) || defined(CPU_LINE_STM32F423xx) || \
+      defined(CPU_LINE_STM32G474xx)
 #define CPU_IRQ_NUMOF                   (102U)
 #elif defined(CPU_LINE_STM32F429xx) || defined(CPU_LINE_STM32F437xx)
 #define CPU_IRQ_NUMOF                   (91U)
@@ -128,7 +131,8 @@ extern "C" {
 #define FLASHPAGE_SIZE                  (4096U)
 #elif defined(CPU_LINE_STM32F091xC) || defined(CPU_LINE_STM32F072xB) \
    || defined(CPU_LINE_STM32F030xC) || defined(CPU_LINE_STM32F103xE) \
-   || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4)
+   || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) \
+   || defined(CPU_FAM_STM32G4)
 #define FLASHPAGE_SIZE                  (2048U)
 #elif defined(CPU_LINE_STM32F051x8) || defined(CPU_LINE_STM32F042x6) \
    || defined(CPU_LINE_STM32F070xB) || defined(CPU_LINE_STM32F030x8) \
@@ -145,7 +149,8 @@ extern "C" {
 /* The minimum block size which can be written depends on the family.
  * However, the erase block is always FLASHPAGE_SIZE.
  */
-#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
+    defined(CPU_FAM_STM32G4)
 #define FLASHPAGE_RAW_BLOCKSIZE         (8U)
 #elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 #define FLASHPAGE_RAW_BLOCKSIZE         (4U)
@@ -153,7 +158,8 @@ extern "C" {
 #define FLASHPAGE_RAW_BLOCKSIZE         (2U)
 #endif
 
-#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
+    defined(CPU_FAM_STM32G4)
 #define FLASHPAGE_RAW_ALIGNMENT         (8U)
 #else
 /* Writing should be always 4 bytes aligned */
