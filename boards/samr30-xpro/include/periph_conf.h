@@ -85,7 +85,7 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 static const spi_conf_t spi_config[] = {
-    {
+    {    /* Internal AT86RF212B */
         .dev      = &(SERCOM4->SPI),
         .miso_pin = GPIO_PIN(PC, 19),
         .mosi_pin = GPIO_PIN(PB, 30),
@@ -93,6 +93,18 @@ static const spi_conf_t spi_config[] = {
         .miso_mux = GPIO_MUX_F,
         .mosi_mux = GPIO_MUX_F,
         .clk_mux  = GPIO_MUX_F,
+        .miso_pad = SPI_PAD_MISO_0,
+        .mosi_pad = SPI_PAD_MOSI_2_SCK_3,
+        .gclk_src = SAM0_GCLK_MAIN,
+    },
+    {    /* EXT1 & EXT3 Pin Header */
+        .dev      = &(SERCOM5->SPI),
+        .miso_pin = GPIO_PIN(PB, 2),
+        .mosi_pin = GPIO_PIN(PB, 22),
+        .clk_pin  = GPIO_PIN(PB, 23),
+        .miso_mux = GPIO_MUX_D,
+        .mosi_mux = GPIO_MUX_D,
+        .clk_mux  = GPIO_MUX_D,
         .miso_pad = SPI_PAD_MISO_0,
         .mosi_pad = SPI_PAD_MOSI_2_SCK_3,
         .gclk_src = SAM0_GCLK_MAIN,
@@ -107,7 +119,7 @@ static const spi_conf_t spi_config[] = {
  * @{
  */
 static const i2c_conf_t i2c_config[] = {
-    {
+    {    /* EXT1 & EXT3 Pin Header */
         .dev      = &(SERCOM1->I2CM),
         .speed    = I2C_SPEED_NORMAL,
         .scl_pin  = GPIO_PIN(PA, 17),
@@ -115,7 +127,7 @@ static const i2c_conf_t i2c_config[] = {
         .mux      = GPIO_MUX_C,
         .gclk_src = SAM0_GCLK_MAIN,
         .flags    = I2C_FLAG_NONE
-     }
+    }
 };
 #define I2C_NUMOF          ARRAY_SIZE(i2c_config)
 /** @} */
