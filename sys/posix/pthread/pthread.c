@@ -25,7 +25,6 @@
 #include "irq.h"
 #include "msg.h"
 #include "mutex.h"
-#include "priority_queue.h"
 #include "thread.h"
 #include "sched.h"
 
@@ -42,7 +41,8 @@
 #endif
 
 #if ENABLE_DEBUG
-#   define PTHREAD_REAPER_STACKSIZE ((CONFIG_PTHREAD_REAPER_BASE_STACKSIZE) + THREAD_EXTRA_STACKSIZE_PRINTF)
+#   define PTHREAD_REAPER_STACKSIZE ((CONFIG_PTHREAD_REAPER_BASE_STACKSIZE) + \
+                                     THREAD_EXTRA_STACKSIZE_PRINTF)
 #   define PTHREAD_STACKSIZE THREAD_STACKSIZE_MAIN
 #else
 #   define PTHREAD_REAPER_STACKSIZE (CONFIG_PTHREAD_REAPER_BASE_STACKSIZE)
@@ -52,7 +52,7 @@
 #include "debug.h"
 
 typedef enum {
-    PTS_RUNNING,
+    PTS_JOINABLE,
     PTS_DETACHED,
     PTS_ZOMBIE,
 } pthread_thread_status_t;
@@ -86,18 +86,20 @@ static void *pthread_start_routine(void *pt_)
 {
     pthread_thread_t *pt = pt_;
     void *retval = pt->start_routine(pt->arg);
+
     pthread_exit(retval);
 }
 
 static int insert(pthread_thread_t *pt)
 {
     int result = KERNEL_PID_UNDEF;
+
     mutex_lock(&pthread_mutex);
 
-    for (int i = 0; i < MAXTHREADS; i++){
+    for (int i = 0; i < MAXTHREADS; i++) {
         if (!pthread_sched_threads[i]) {
             pthread_sched_threads[i] = pt;
-            result = i+1;
+            result = i + 1;
             break;
         }
     }
@@ -108,7 +110,8 @@ static int insert(pthread_thread_t *pt)
 
 static void *pthread_reaper(void *arg)
 {
-    (void) arg;
+    (void)arg;
+    DEBUG("pthread_reaper(): start\n");
 
     while (1) {
         msg_t m;
@@ -120,8 +123,10 @@ static void *pthread_reaper(void *arg)
     return NULL;
 }
 
-int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*start_routine)(void *), void *arg)
+int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*start_routine)(
+                       void *), void *arg)
 {
+    DEBUG("pthread_create()\n");
     pthread_thread_t *pt = calloc(1, sizeof(pthread_thread_t));
 
     if (pt == NULL) {
@@ -135,12 +140,13 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     }
     *newthread = pthread_pid;
 
-    pt->status = attr && attr->detached ? PTS_DETACHED : PTS_RUNNING;
+    pt->status = attr && attr->detached ? PTS_DETACHED : PTS_JOINABLE;
     pt->start_routine = start_routine;
     pt->arg = arg;
 
     bool autofree = attr == NULL || attr->ss_sp == NULL || attr->ss_size == 0;
-    size_t stack_size = attr && attr->ss_size > 0 ? attr->ss_size : PTHREAD_STACKSIZE;
+    size_t stack_size = attr &&
+                        attr->ss_size > 0 ? attr->ss_size : PTHREAD_STACKSIZE;
     void *stack = autofree ? malloc(stack_size) : attr->ss_sp;
 
     if (stack == NULL) {
@@ -154,16 +160,16 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
         if (pthread_reaper_pid == KERNEL_PID_UNDEF) {
             /* volatile pid to overcome problems with double checking */
             volatile kernel_pid_t pid = thread_create(pthread_reaper_stack,
-                                             PTHREAD_REAPER_STACKSIZE,
-                                             0,
-                                             THREAD_CREATE_STACKTEST,
-                                             pthread_reaper,
-                                             NULL,
-                                             "pthread-reaper");
+                                                      PTHREAD_REAPER_STACKSIZE,
+                                                      0,
+                                                      THREAD_CREATE_STACKTEST,
+                                                      pthread_reaper,
+                                                      NULL,
+                                                      "pthread-reaper");
             if (!pid_is_valid(pid)) {
                 free(pt->stack);
                 free(pt);
-                pthread_sched_threads[pthread_pid-1] = NULL;
+                pthread_sched_threads[pthread_pid - 1] = NULL;
                 mutex_unlock(&pthread_mutex);
                 return -1;
             }
@@ -183,7 +189,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
     if (!pid_is_valid(pt->thread_pid)) {
         free(pt->stack);
         free(pt);
-        pthread_sched_threads[pthread_pid-1] = NULL;
+        pthread_sched_threads[pthread_pid - 1] = NULL;
         return -1;
     }
 
@@ -194,6 +200,7 @@ int pthread_create(pthread_t *newthread, const pthread_attr_t *attr, void *(*sta
 
 void pthread_exit(void *retval)
 {
+    DEBUG("pthread_exit()\n");
     pthread_t self_id = pthread_self();
 
     if (self_id == 0) {
@@ -216,7 +223,7 @@ void pthread_exit(void *retval)
         }
 
         self->thread_pid = KERNEL_PID_UNDEF;
-        DEBUG("pthread_exit(%p), self == %p\n", retval, (void *) self);
+        DEBUG("pthread_exit(%p), self == %p\n", retval, (void *)self);
         if (self->status != PTS_DETACHED) {
             self->returnval = retval;
             self->status = PTS_ZOMBIE;
@@ -240,30 +247,33 @@ void pthread_exit(void *retval)
 
 int pthread_join(pthread_t th, void **thread_return)
 {
+    DEBUG("pthread_join()\n");
     if (th < 1 || th > MAXTHREADS) {
-        DEBUG("passed pthread_t th (%d) exceeds bounds of pthread_sched_threads[] in \"%s\"!\n", th, __func__);
+        DEBUG(
+            "passed pthread_t th (%d) exceeds bounds of pthread_sched_threads[] in \"%s\"!\n", th,
+            __func__);
         return -3;
     }
 
-    pthread_thread_t *other = pthread_sched_threads[th-1];
+    pthread_thread_t *other = pthread_sched_threads[th - 1];
     if (!other) {
         return -1;
     }
 
     switch (other->status) {
-        case (PTS_RUNNING):
+        case (PTS_JOINABLE):
             other->joining_thread = thread_getpid();
             /* go blocked, I'm waking up if other thread exits */
             thread_sleep();
-            /* falls through */
+        /* falls through */
         case (PTS_ZOMBIE):
             if (thread_return) {
                 *thread_return = other->returnval;
             }
             free(other);
             /* we only need to free the pthread layer struct,
-            native thread stack is freed by other */
-            pthread_sched_threads[th-1] = NULL;
+               native thread stack is freed by other */
+            pthread_sched_threads[th - 1] = NULL;
             return 0;
         case (PTS_DETACHED):
             return -1;
@@ -274,12 +284,15 @@ int pthread_join(pthread_t th, void **thread_return)
 
 int pthread_detach(pthread_t th)
 {
+    DEBUG("pthread_detach()\n");
     if (th < 1 || th > MAXTHREADS) {
-        DEBUG("passed pthread_t th (%d) exceeds bounds of pthread_sched_threads[] in \"%s\"!\n", th, __func__);
+        DEBUG(
+            "passed pthread_t th (%d) exceeds bounds of pthread_sched_threads[] in \"%s\"!\n", th,
+            __func__);
         return -2;
     }
 
-    pthread_thread_t *other = pthread_sched_threads[th-1];
+    pthread_thread_t *other = pthread_sched_threads[th - 1];
     if (!other) {
         return -1;
     }
@@ -287,9 +300,10 @@ int pthread_detach(pthread_t th)
     if (other->status == PTS_ZOMBIE) {
         free(other);
         /* we only need to free the pthread layer struct,
-        native thread stack is freed by other */
-        pthread_sched_threads[th-1] = NULL;
-    } else {
+           native thread stack is freed by other */
+        pthread_sched_threads[th - 1] = NULL;
+    }
+    else {
         other->status = PTS_DETACHED;
     }
 
@@ -298,12 +312,14 @@ int pthread_detach(pthread_t th)
 
 pthread_t pthread_self(void)
 {
+    DEBUG("pthread_self()\n");
     pthread_t result = 0;
     mutex_lock(&pthread_mutex);
     kernel_pid_t pid = thread_getpid(); /* thread_getpid() is volatile */
     for (int i = 0; i < MAXTHREADS; i++) {
-        if (pthread_sched_threads[i] && pthread_sched_threads[i]->thread_pid == pid) {
-            result = i+1;
+        if (pthread_sched_threads[i] &&
+            pthread_sched_threads[i]->thread_pid == pid) {
+            result = i + 1;
             break;
         }
     }
@@ -313,7 +329,8 @@ pthread_t pthread_self(void)
 
 int pthread_cancel(pthread_t th)
 {
-    pthread_thread_t *other = pthread_sched_threads[th-1];
+    DEBUG("pthread_cancel()\n");
+    pthread_thread_t *other = pthread_sched_threads[th - 1];
     if (!other) {
         return -1;
     }
@@ -325,20 +342,23 @@ int pthread_cancel(pthread_t th)
 
 int pthread_setcancelstate(int state, int *oldstate)
 {
-    (void) state;
-    (void) oldstate;
+    (void)state;
+    (void)oldstate;
+    DEBUG("pthread_setcancelstate(): not implemented!\n");
     return -1;
 }
 
 int pthread_setcanceltype(int type, int *oldtype)
 {
-    (void) type;
-    (void) oldtype;
+    (void)type;
+    (void)oldtype;
+    DEBUG("pthread_setcanceltype(): not implemented!\n");
     return -1;
 }
 
 void pthread_testcancel(void)
 {
+    DEBUG("pthread_testcancel()\n");
     pthread_t self = pthread_self();
 
     if (self == 0) {
@@ -346,13 +366,14 @@ void pthread_testcancel(void)
         return;
     }
 
-    if (pthread_sched_threads[self-1]->should_cancel) {
+    if (pthread_sched_threads[self - 1]->should_cancel) {
         pthread_exit(PTHREAD_CANCELED);
     }
 }
 
 void __pthread_cleanup_push(__pthread_cleanup_datum_t *datum)
 {
+    DEBUG("__pthread_cleanup_push()\n");
     pthread_t self_id = pthread_self();
 
     if (self_id == 0) {
@@ -360,13 +381,14 @@ void __pthread_cleanup_push(__pthread_cleanup_datum_t *datum)
         return;
     }
 
-    pthread_thread_t *self = pthread_sched_threads[self_id-1];
+    pthread_thread_t *self = pthread_sched_threads[self_id - 1];
     datum->__next = self->cleanup_top;
     self->cleanup_top = datum;
 }
 
 void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute)
 {
+    DEBUG("__pthread_cleanup_pop()\n");
     pthread_t self_id = pthread_self();
 
     if (self_id == 0) {
@@ -374,7 +396,7 @@ void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute)
         return;
     }
 
-    pthread_thread_t *self = pthread_sched_threads[self_id-1];
+    pthread_thread_t *self = pthread_sched_threads[self_id - 1];
     self->cleanup_top = datum->__next;
 
     if (execute != 0) {
@@ -387,6 +409,7 @@ void __pthread_cleanup_pop(__pthread_cleanup_datum_t *datum, int execute)
 
 struct __pthread_tls_datum **__pthread_get_tls_head(int self_id)
 {
-    pthread_thread_t *self = pthread_sched_threads[self_id-1];
+    DEBUG("__pthread_tls_datum()\n");
+    pthread_thread_t *self = pthread_sched_threads[self_id - 1];
     return self ? &self->tls_head : NULL;
 }
