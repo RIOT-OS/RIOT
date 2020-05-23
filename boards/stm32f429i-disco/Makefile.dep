@@ -1,0 +1,5 @@
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_cdc_acm
+endif
+
+include $(RIOTBOARD)/stm32f429i-disc1/Makefile.dep
