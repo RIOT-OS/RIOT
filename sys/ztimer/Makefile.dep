@@ -35,7 +35,6 @@ endif
 # make xtimer use ztimer_usec as low level timer
 ifneq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
   USEMODULE += ztimer_usec
-  PSEUDOMODULES += xtimer_on_ztimer
 endif
 
 # "ztimer_xtimer_compat" is a wrapper of the xtimer API on ztimer_used
