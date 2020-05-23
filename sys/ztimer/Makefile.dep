@@ -42,7 +42,6 @@ endif
 ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   USEMODULE += div
   USEMODULE += ztimer_usec
-  PSEUDOMODULES += xtimer
 endif
 
 ifneq (,$(filter ztimer_%,$(USEMODULE)))
