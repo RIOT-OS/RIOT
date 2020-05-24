@@ -105,6 +105,15 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
+/**
+ * @name    I2C configuration
+ * @{
+ */
+#define I2C_NUMOF           (1)
+#define I2C_SCL_PIN         (4)
+#define I2C_SDA_PIN         (5)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
