@@ -72,10 +72,22 @@ extern "C" {
 #endif
 
 /**
- * @brief   The default queue size for transmission packets coming from higher layers
+ * @brief   Default queue size for transmission packets coming from higher
+ *          layers (as exponent of 2^n).
+ *
+ * As the queue size ALWAYS needs to be power of two, this option represents
+ * the exponent of 2^n, which will be used as the size of the buffer.
+ */
+#ifndef CONFIG_GNRC_MAC_TX_QUEUE_SIZE_EXP
+#define CONFIG_GNRC_MAC_TX_QUEUE_SIZE_EXP   (3U)
+#endif
+
+/**
+ * @brief   The default queue size for transmission packets coming from higher
+ *          layers
  */
 #ifndef GNRC_MAC_TX_QUEUE_SIZE
-#define GNRC_MAC_TX_QUEUE_SIZE             (8U)
+#define GNRC_MAC_TX_QUEUE_SIZE          (1 << CONFIG_GNRC_MAC_TX_QUEUE_SIZE_EXP)
 #endif
 
 /**
