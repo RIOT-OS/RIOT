@@ -21,6 +21,8 @@
  * @author      Shuguo Zhuo  <shuguo.zhuo@inria.fr>
  */
 
+#include "kernel_defines.h"
+
 #ifndef NET_GNRC_MAC_MAC_H
 #define NET_GNRC_MAC_MAC_H
 
@@ -91,12 +93,25 @@ extern "C" {
 #endif
 
 /**
+ * @brief Disable MAC radio duty-cycle recording and displaying.
+ */
+#ifdef DOXYGEN
+#define CONFIG_GNRC_MAC_DISABLE_DUTYCYCLE_RECORD
+#endif
+
+/**
  * @brief Enable/disable MAC radio duty-cycle recording and displaying.
  *
  * Set "1" to enable, set "0" to disable.
+ * @deprecated Use inverse @ref CONFIG_GNRC_MAC_DISABLE_DUTYCYCLE_RECORD
+ * instead. Will be removed after 2021.01 release.
  */
 #ifndef GNRC_MAC_ENABLE_DUTYCYCLE_RECORD
+#if IS_ACTIVE(CONFIG_GNRC_MAC_DISABLE_DUTYCYCLE_RECORD)
+#define GNRC_MAC_ENABLE_DUTYCYCLE_RECORD    (0)
+#else
 #define GNRC_MAC_ENABLE_DUTYCYCLE_RECORD    (1U)
+#endif
 #endif
 
 #ifdef __cplusplus
