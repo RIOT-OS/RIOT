@@ -1166,11 +1166,11 @@ bool gnrc_gomach_find_next_tx_neighbor(gnrc_netif_t *netif)
          * thus to be more fair. */
         uint8_t j = netif->mac.tx.last_tx_neighbor_id + 1;
 
-        if (j >= GNRC_MAC_NEIGHBOR_COUNT) {
+        if (j >= CONFIG_GNRC_MAC_NEIGHBOR_COUNT) {
             j = 1;
         }
 
-        for (uint8_t i = 1; i < GNRC_MAC_NEIGHBOR_COUNT; i++) {
+        for (uint8_t i = 1; i < CONFIG_GNRC_MAC_NEIGHBOR_COUNT; i++) {
             if (gnrc_priority_pktqueue_length(&netif->mac.tx.neighbors[j].queue) > 0) {
                 netif->mac.tx.last_tx_neighbor_id = j;
                 next = (int) j;
@@ -1178,7 +1178,7 @@ bool gnrc_gomach_find_next_tx_neighbor(gnrc_netif_t *netif)
             }
             else {
                 j++;
-                if (j >= GNRC_MAC_NEIGHBOR_COUNT) {
+                if (j >= CONFIG_GNRC_MAC_NEIGHBOR_COUNT) {
                     j = 1;
                 }
             }
@@ -1388,7 +1388,7 @@ void gnrc_gomach_update_neighbor_phase(gnrc_netif_t *netif)
 {
     assert(netif != NULL);
 
-    for (uint8_t i = 1; i < GNRC_MAC_NEIGHBOR_COUNT; i++) {
+    for (uint8_t i = 1; i < CONFIG_GNRC_MAC_NEIGHBOR_COUNT; i++) {
         if (netif->mac.tx.neighbors[i].mac_type == GNRC_GOMACH_TYPE_KNOWN) {
             long int tmp = netif->mac.tx.neighbors[i].cp_phase -
                            netif->mac.prot.gomach.backoff_phase_us;
@@ -1422,7 +1422,7 @@ void gnrc_gomach_update_neighbor_pubchan(gnrc_netif_t *netif)
     }
 
     /* Toggle TX neighbors' current channel. */
-    for (uint8_t i = 1; i < GNRC_MAC_NEIGHBOR_COUNT; i++) {
+    for (uint8_t i = 1; i < CONFIG_GNRC_MAC_NEIGHBOR_COUNT; i++) {
         if (netif->mac.tx.neighbors[i].mac_type == GNRC_GOMACH_TYPE_KNOWN) {
             if (netif->mac.tx.neighbors[i].pub_chanseq == netif->mac.prot.gomach.pub_channel_1) {
                 netif->mac.tx.neighbors[i].pub_chanseq = netif->mac.prot.gomach.pub_channel_2;

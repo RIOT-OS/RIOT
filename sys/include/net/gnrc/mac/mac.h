@@ -65,10 +65,10 @@ extern "C" {
 #endif
 
 /**
- * @brief   Count of neighbor nodes in one-hop distance
+ * @brief   Count of neighbor nodes in one-hop distance.
  */
-#ifndef GNRC_MAC_NEIGHBOR_COUNT
-#define GNRC_MAC_NEIGHBOR_COUNT            (8U)
+#ifndef CONFIG_GNRC_MAC_NEIGHBOR_COUNT
+#define CONFIG_GNRC_MAC_NEIGHBOR_COUNT      (8U)
 #endif
 
 /**
