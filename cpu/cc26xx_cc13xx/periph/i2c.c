@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_cc26x0
+ * @ingroup     cpu_cc26xx_cc13xx
  * @ingroup     drivers_periph_i2c
  * @{
  *
