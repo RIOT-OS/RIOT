@@ -47,10 +47,21 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default buffer size to use for storing dispatching packets (as
+ *          exponent of 2^n).
+ *
+ * As the buffer size ALWAYS needs to be power of two, this option represents
+ * the exponent of 2^n, which will be used as the size of the buffer.
+ */
+#ifndef CONFIG_GNRC_MAC_DISPATCH_BUFFER_SIZE_EXP
+#define CONFIG_GNRC_MAC_DISPATCH_BUFFER_SIZE_EXP   (3U)
+#endif
+
+/**
  * @brief   The default buffer size for storing dispatching packets
  */
 #ifndef GNRC_MAC_DISPATCH_BUFFER_SIZE
-#define GNRC_MAC_DISPATCH_BUFFER_SIZE      (8U)
+#define GNRC_MAC_DISPATCH_BUFFER_SIZE  (1 << CONFIG_GNRC_MAC_DISPATCH_BUFFER_SIZE_EXP)
 #endif
 
 /**
