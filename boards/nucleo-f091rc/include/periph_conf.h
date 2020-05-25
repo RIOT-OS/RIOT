@@ -58,7 +58,6 @@ extern "C" {
  * @name    DMA streams configuration
  * @{
  */
-#ifdef MODULE_PERIPH_DMA
 static const dma_conf_t dma_config[] = {
     { .stream = 1  },
     { .stream = 2  },
@@ -68,7 +67,7 @@ static const dma_conf_t dma_config[] = {
 #define DMA_SHARED_ISR_0_STREAMS    { 0, 1 } /* Indexes 0 and 1 of dma_config share the same isr */
 
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
-#endif
+/** @} */
 
 /**
  * @name   Timer configuration

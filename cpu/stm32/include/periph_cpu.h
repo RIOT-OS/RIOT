@@ -366,7 +366,6 @@ typedef enum {
 /** @} */
 #endif /* ndef DOXYGEN */
 
-#ifdef MODULE_PERIPH_DMA
 /**
  * @brief   DMA configuration
  */
@@ -429,7 +428,6 @@ typedef enum {
 #define DMA_DATA_WIDTH_MASK      (0x0C)
 #define DMA_DATA_WIDTH_SHIFT     (2)
 /** @} */
-#endif /* MODULE_PERIPH_DMA */
 
 /**
  * @brief   Available number of ADC devices

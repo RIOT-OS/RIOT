@@ -61,7 +61,6 @@ extern "C" {
  * @name    DMA streams configuration
  * @{
  */
-#ifdef MODULE_PERIPH_DMA
 static const dma_conf_t dma_config[] = {
     { .stream = 9 },   /* DMA2 Stream 1 - SPI4_TX */
     { .stream = 8 },   /* DMA2 Stream 0 - SPI4_RX */
@@ -71,8 +70,6 @@ static const dma_conf_t dma_config[] = {
 #define DMA_1_ISR           isr_dma2_stream0
 
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
-
-#endif /* MODULE_PERIPH_DMA */
 /** @} */
 
 /**
