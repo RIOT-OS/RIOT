@@ -12,16 +12,12 @@
  * @{
  *
  * @file
- * @brief       Implementation of STM32 clock configuration
+ * @brief       Implementation of STM32 clock configuration for F0/F1/F2/F3/F4/F7 families
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @}
  */
-
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
-    defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F3) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7)
 
 #include "cpu.h"
 #include "stmclk.h"
@@ -252,8 +248,3 @@ void stmclk_init_sysclk(void)
 
     irq_restore(is);
 }
-#else
-typedef int dont_be_pedantic;
-#endif /* defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) ||
-        * defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F3) ||
-        * defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7) */

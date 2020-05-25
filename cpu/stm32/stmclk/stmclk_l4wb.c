@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief       Implementation of STM32 clock configuration
+ * @brief       Implementation of STM32 clock configuration for L4 and WB families
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Nick van IJzendoorn <nijzendoorn@engineering-spirit.nl>
@@ -26,8 +26,6 @@
 #include "cpu.h"
 #include "stmclk.h"
 #include "periph_conf.h"
-
-#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
 
 /* make sure we have all needed information about the clock configuration */
 #ifndef CLOCK_HSE
@@ -200,4 +198,3 @@ void stmclk_init_sysclk(void)
 #endif /* CLOCK_LSE */
 #endif /* MODULE_PERIPH_RTT */
 }
-#endif

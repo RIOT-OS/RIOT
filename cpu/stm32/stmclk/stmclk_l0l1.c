@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief       Implementation of STM32 clock configuration
+ * @brief       Implementation of STM32 clock configuration for L0 and L1 families
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
@@ -25,8 +25,6 @@
 #include "board.h"
 #include "periph_conf.h"
 #include "periph/init.h"
-
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 
 /* Check the source to be used for the PLL */
 #if defined(CLOCK_HSI) && defined(CLOCK_HSE)
@@ -115,5 +113,3 @@ void stmclk_init_sysclk(void)
     /* Wait till PLL is used as system clock source */
     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
 }
-
-#endif /* defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) */
