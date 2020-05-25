@@ -29,7 +29,7 @@ define board_unsatisfied_features
   FEATURES_BLACKLIST:= $(FEATURES_BLACKLIST_GLOBAL)
 
   # Find matching board folder
-  BOARDDIR := $(word 1,$(foreach dir,$(BOARDSDIRS),$(wildcard $(dir)/$(BOARD)/.)))
+  BOARDDIR := $$(word 1,$$(foreach dir,$$(BOARDSDIRS),$$(wildcard $$(dir)/$$(BOARD)/.)))
 
   # Remove board specific variables set by Makefile.features/Makefile.dep
   FEATURES_PROVIDED :=
@@ -51,19 +51,19 @@ define board_unsatisfied_features
   ifneq (,$$(FEATURES_MISSING))
     # Skip full dependency resolution, as even without optional modules features
     # and architecture specific limitations already some features are missing
-    BOARDS_FEATURES_MISSING += "$(1) $$(FEATURES_MISSING)"
-    BOARDS_WITH_MISSING_FEATURES += $(1)
+    BOARDS_FEATURES_MISSING += "$$(BOARD) $$(FEATURES_MISSING)"
+    BOARDS_WITH_MISSING_FEATURES += $$(BOARD)
   else
     include $(RIOTMAKE)/dependency_resolution.inc.mk
 
     ifneq (,$$(FEATURES_MISSING))
-      BOARDS_FEATURES_MISSING += "$(1) $$(FEATURES_MISSING)"
-      BOARDS_WITH_MISSING_FEATURES += $(1)
+      BOARDS_FEATURES_MISSING += "$$(BOARD) $$(FEATURES_MISSING)"
+      BOARDS_WITH_MISSING_FEATURES += $$(BOARD)
     endif
 
     ifneq (,$$(FEATURES_USED_BLACKLISTED))
-      BOARDS_FEATURES_USED_BLACKLISTED += "$(1) $$(FEATURES_USED_BLACKLISTED)"
-      BOARDS_WITH_BLACKLISTED_FEATURES += $(1)
+      BOARDS_FEATURES_USED_BLACKLISTED += "$$(BOARD) $$(FEATURES_USED_BLACKLISTED)"
+      BOARDS_WITH_BLACKLISTED_FEATURES += $$(BOARD)
     endif
   endif
 
@@ -80,7 +80,7 @@ BOARDS_FEATURES_MISSING :=
 BOARDS_WITH_BLACKLISTED_FEATURES :=
 BOARDS_FEATURES_USED_BLACKLISTED :=
 
-$(foreach BOARD, $(BOARDS), $(eval $(call board_unsatisfied_features,$(BOARD))))
+$(foreach board,$(BOARDS),$(eval $(call board_unsatisfied_features,$(board))))
 BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES) $(BOARDS_WITH_BLACKLISTED_FEATURES), $(BOARDS))
 
 info-buildsizes: SHELL=bash
