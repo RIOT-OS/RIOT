@@ -241,6 +241,10 @@ ifneq (,$(filter dynamixel,$(USEMODULE)))
   USEMODULE += uart_half_duplex
 endif
 
+ifneq (,$(filter edbg_eui,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter enc28j60,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_gpio_irq
