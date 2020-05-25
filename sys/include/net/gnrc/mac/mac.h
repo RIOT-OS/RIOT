@@ -31,6 +31,11 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup net_gnrc_mac_conf    GNRC MAC compile configurations
+ * @ingroup  net_gnrc_conf
+ * @{
+ */
+/**
  * @brief   Default message queue size to use for the incoming packets (as
  *          exponent of 2^n).
  *
@@ -42,13 +47,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   The default rx queue size for incoming packets
- */
-#ifndef GNRC_MAC_RX_QUEUE_SIZE
-#define GNRC_MAC_RX_QUEUE_SIZE       (1 << CONFIG_GNRC_MAC_RX_QUEUE_SIZE_EXP)
-#endif
-
-/**
  * @brief   Default buffer size to use for storing dispatching packets (as
  *          exponent of 2^n).
  *
@@ -57,13 +55,6 @@ extern "C" {
  */
 #ifndef CONFIG_GNRC_MAC_DISPATCH_BUFFER_SIZE_EXP
 #define CONFIG_GNRC_MAC_DISPATCH_BUFFER_SIZE_EXP   (3U)
-#endif
-
-/**
- * @brief   The default buffer size for storing dispatching packets
- */
-#ifndef GNRC_MAC_DISPATCH_BUFFER_SIZE
-#define GNRC_MAC_DISPATCH_BUFFER_SIZE  (1 << CONFIG_GNRC_MAC_DISPATCH_BUFFER_SIZE_EXP)
 #endif
 
 /**
@@ -82,14 +73,6 @@ extern "C" {
  */
 #ifndef CONFIG_GNRC_MAC_TX_QUEUE_SIZE_EXP
 #define CONFIG_GNRC_MAC_TX_QUEUE_SIZE_EXP   (3U)
-#endif
-
-/**
- * @brief   The default queue size for transmission packets coming from higher
- *          layers
- */
-#ifndef GNRC_MAC_TX_QUEUE_SIZE
-#define GNRC_MAC_TX_QUEUE_SIZE          (1 << CONFIG_GNRC_MAC_TX_QUEUE_SIZE_EXP)
 #endif
 
 /**
@@ -112,6 +95,29 @@ extern "C" {
 #else
 #define GNRC_MAC_ENABLE_DUTYCYCLE_RECORD    (1U)
 #endif
+#endif
+/** @} */
+
+/**
+ * @brief   The default rx queue size for incoming packets
+ */
+#ifndef GNRC_MAC_RX_QUEUE_SIZE
+#define GNRC_MAC_RX_QUEUE_SIZE       (1 << CONFIG_GNRC_MAC_RX_QUEUE_SIZE_EXP)
+#endif
+
+/**
+ * @brief   The default buffer size for storing dispatching packets
+ */
+#ifndef GNRC_MAC_DISPATCH_BUFFER_SIZE
+#define GNRC_MAC_DISPATCH_BUFFER_SIZE  (1 << CONFIG_GNRC_MAC_DISPATCH_BUFFER_SIZE_EXP)
+#endif
+
+/**
+ * @brief   The default queue size for transmission packets coming from higher
+ *          layers
+ */
+#ifndef GNRC_MAC_TX_QUEUE_SIZE
+#define GNRC_MAC_TX_QUEUE_SIZE          (1 << CONFIG_GNRC_MAC_TX_QUEUE_SIZE_EXP)
 #endif
 
 #ifdef __cplusplus
