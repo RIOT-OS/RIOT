@@ -1,16 +1,6 @@
 .PHONY: info-buildsizes info-buildsizes-diff info-features-missing \
         info-boards-features-missing
 
-# Perform dependency resolution without having included
-# $(RIOTBASE)/Makefile.features for now. This results in no optional modules and
-# no architecture specific handling being done. The result will be a subset of
-# used modules and requirements that is present in for *all* boards, so this can
-# be cached to speed up individual dependency checks
-include $(RIOTMAKE)/defaultmodules.inc.mk
-# add default modules
-USEMODULE += $(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE))
-include $(RIOTMAKE)/dependency_resolution.inc.mk
-
 BOARDSDIR_GLOBAL := $(BOARDSDIR)
 USEMODULE_GLOBAL := $(USEMODULE)
 USEPKG_GLOBAL := $(USEPKG)
