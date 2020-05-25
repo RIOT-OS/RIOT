@@ -174,7 +174,14 @@ include $(RIOTMAKE)/boards.inc.mk
 # Debug targets for build system migration
 include $(RIOTMAKE)/dependencies_debug.inc.mk
 
-GLOBAL_GOALS += buildtest buildtest-indocker info-boards-supported info-boards-features-missing info-buildsizes info-buildsizes-diff
+GLOBAL_GOALS += buildtest \
+                buildtest-indocker \
+                info-boards-features-blacklisted \
+                info-boards-features-missing \
+                info-boards-supported \
+                info-buildsizes info-buildsizes-diff \
+                #
+
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
   BOARD=none
 endif

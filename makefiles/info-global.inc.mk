@@ -1,5 +1,9 @@
-.PHONY: info-buildsizes info-buildsizes-diff info-features-missing \
-        info-boards-features-missing
+.PHONY: info-buildsizes \
+        info-buildsizes-diff \
+        info-boards-supported \
+        info-boards-features-missing \
+        info-boards-features-blacklisted \
+        #
 
 # Perform dependency resolution without having included
 # $(RIOTBASE)/Makefile.features for now. This results in no optional modules and
@@ -125,6 +129,9 @@ info-boards-supported:
 
 info-boards-features-missing:
 	@for f in $(BOARDS_FEATURES_MISSING); do echo $${f}; done | column -t
+
+info-boards-features-blacklisted:
+	@for f in $(BOARDS_FEATURES_USED_BLACKLISTED); do echo $${f}; done | column -t
 
 # Reset BOARDSDIR so unchanged for makefiles included after, for now only
 # needed for buildtests.inc.mk
