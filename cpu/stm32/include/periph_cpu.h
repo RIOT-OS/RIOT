@@ -41,10 +41,6 @@
 #include "periph/l1/periph_cpu.h"
 #elif defined(CPU_FAM_STM32L4)
 #include "periph/l4/periph_cpu.h"
-#elif defined(CPU_FAM_STM32WB)
-#include "periph/wb/periph_cpu.h"
-#else
-#error Unsupported STM32 CPU family
 #endif
 
 #ifdef __cplusplus
@@ -73,6 +69,13 @@ extern "C" {
  * This is the same for all members of the stm32 family
  */
 #define CPUID_LEN           (12U)
+
+/**
+ * @brief   Starting address of the CPU ID
+ */
+#ifndef CPUID_ADDR
+#define CPUID_ADDR          (UID_BASE)
+#endif
 
 /**
  * @brief   We provide our own pm_off() function for all STM32-based CPUs
