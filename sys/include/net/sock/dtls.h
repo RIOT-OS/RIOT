@@ -570,6 +570,17 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
                      credman_tag_t tag, unsigned version, unsigned role);
 
 /**
+ * @brief   Get underlying UDP sock.
+ *
+ * @pre `sock != NULL`.
+ *
+ * @param[in] sock  DTLS sock to get UDP sock from.
+ *
+ * @return  The underlying UDP sock.
+ */
+sock_udp_t *sock_dtls_get_udp_sock(sock_dtls_t *sock);
+
+/**
  * @brief Initialize session handshake.
  *
  * Sends a ClientHello message to initialize the handshake. Call
