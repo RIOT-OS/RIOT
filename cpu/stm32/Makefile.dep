@@ -16,4 +16,10 @@ ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
   USEMODULE += tsrb
 endif
 
+ifneq (STM32F030x4, $(CPU_LINE))
+  # Retrieve vendor CMSIS headers from ST cmsis_device_<family> repositories on
+  # GitHub, https://github.com/STMicroelectronics
+  USEPKG += stm32cmsis
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep
