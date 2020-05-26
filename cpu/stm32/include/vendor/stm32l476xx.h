@@ -9,7 +9,7 @@
   *          This file contains:
   *           - Data structures and the address mapping for all peripherals
   *           - Peripheral's registers declarations and bits definition
-  *           - Macros to access peripheral’s registers hardware
+  *           - Macros to access peripheralï¿½s registers hardware
   *
   ******************************************************************************
   * @attention
@@ -448,12 +448,12 @@ typedef struct
 
 typedef struct
 {
-  __IO uint32_t IMR;         /*!< EXTI Interrupt mask register 1,             Address offset: 0x00 */
-  __IO uint32_t EMR ;        /*!< EXTI Event mask register 1,                 Address offset: 0x04 */
-  __IO uint32_t RTSR;        /*!< EXTI Rising trigger selection register 1,   Address offset: 0x08 */
-  __IO uint32_t FTSR;        /*!< EXTI Falling trigger selection register 1,  Address offset: 0x0C */
-  __IO uint32_t SWIER;       /*!< EXTI Software interrupt event register 1,   Address offset: 0x10 */
-  __IO uint32_t PR;          /*!< EXTI Pending register 1,                    Address offset: 0x14 */
+  __IO uint32_t IMR1;        /*!< EXTI Interrupt mask register 1,             Address offset: 0x00 */
+  __IO uint32_t EMR1;        /*!< EXTI Event mask register 1,                 Address offset: 0x04 */
+  __IO uint32_t RTSR1;       /*!< EXTI Rising trigger selection register 1,   Address offset: 0x08 */
+  __IO uint32_t FTSR1;       /*!< EXTI Falling trigger selection register 1,  Address offset: 0x0C */
+  __IO uint32_t SWIER1;      /*!< EXTI Software interrupt event register 1,   Address offset: 0x10 */
+  __IO uint32_t PR1;         /*!< EXTI Pending register 1,                    Address offset: 0x14 */
   uint32_t      RESERVED1;   /*!< Reserved, 0x18                                                   */
   uint32_t      RESERVED2;   /*!< Reserved, 0x1C                                                   */
   __IO uint32_t IMR2;        /*!< EXTI Interrupt mask register 2,             Address offset: 0x20 */
