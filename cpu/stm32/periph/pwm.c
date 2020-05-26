@@ -53,7 +53,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     dev(pwm)->CR1 = 0;
     dev(pwm)->CR2 = 0;
     for (unsigned i = 0; i < TIMER_CHAN; ++i) {
-        dev(pwm)->CCR[i] = 0;
+        TIM_CHAN(pwm, i) = 0;
     }
 
     /* configure the used pins */
@@ -120,7 +120,7 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
         value = (uint16_t)dev(pwm)->ARR;
     }
     /* set new value */
-    dev(pwm)->CCR[pwm_config[pwm].chan[channel].cc_chan] = value;
+    TIM_CHAN(pwm, pwm_config[pwm].chan[channel].cc_chan) = value;
 }
 
 void pwm_poweron(pwm_t pwm)
