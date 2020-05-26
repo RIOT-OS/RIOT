@@ -43,6 +43,18 @@
 static gpio_isr_ctx_t isr_ctx[EXTI_NUMOF];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
+#define EXTI_REG_RTSR       (EXTI->RTSR1)
+#define EXTI_REG_FTSR       (EXTI->FTSR1)
+#define EXTI_REG_PR         (EXTI->PR1)
+#define EXTI_REG_IMR        (EXTI->IMR1)
+#else
+#define EXTI_REG_RTSR       (EXTI->RTSR)
+#define EXTI_REG_FTSR       (EXTI->FTSR)
+#define EXTI_REG_PR         (EXTI->PR)
+#define EXTI_REG_IMR        (EXTI->IMR)
+#endif
+
 /**
  * @brief   Extract the port base address from the given pin identifier
  */
@@ -140,12 +152,12 @@ void gpio_init_analog(gpio_t pin)
 
 void gpio_irq_enable(gpio_t pin)
 {
-    EXTI->IMR |= (1 << _pin_num(pin));
+    EXTI_REG_IMR |= (1 << _pin_num(pin));
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
-    EXTI->IMR &= ~(1 << _pin_num(pin));
+    EXTI_REG_IMR &= ~(1 << _pin_num(pin));
 }
 
 int gpio_read(gpio_t pin)
@@ -227,28 +239,28 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     }
 #endif
     /* configure the active flank */
-    EXTI->RTSR &= ~(1 << pin_num);
-    EXTI->RTSR |=  ((flank & 0x1) << pin_num);
-    EXTI->FTSR &= ~(1 << pin_num);
-    EXTI->FTSR |=  ((flank >> 1) << pin_num);
+    EXTI_REG_RTSR &= ~(1 << pin_num);
+    EXTI_REG_RTSR |=  ((flank & 0x1) << pin_num);
+    EXTI_REG_FTSR &= ~(1 << pin_num);
+    EXTI_REG_FTSR |=  ((flank >> 1) << pin_num);
     /* enable specific pin as exti sources */
     SYSCFG->EXTICR[pin_num >> 2] &= ~(0xf << ((pin_num & 0x03) * 4));
     SYSCFG->EXTICR[pin_num >> 2] |= (port_num << ((pin_num & 0x03) * 4));
 
     /* clear any pending requests */
-    EXTI->PR = (1 << pin_num);
+    EXTI_REG_PR = (1 << pin_num);
     /* unmask the pins interrupt channel */
-    EXTI->IMR |= (1 << pin_num);
+    EXTI_REG_IMR |= (1 << pin_num);
 
     return 0;
 }
 void isr_exti(void)
 {
     /* only generate interrupts against lines which have their IMR set */
-    uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
+    uint32_t pending_isr = (EXTI_REG_PR & EXTI_REG_IMR);
     for (size_t i = 0; i < EXTI_NUMOF; i++) {
         if (pending_isr & (1 << i)) {
-            EXTI->PR = (1 << i);        /* clear by writing a 1 */
+            EXTI_REG_PR = (1 << i);        /* clear by writing a 1 */
             isr_ctx[i].cb(isr_ctx[i].arg);
         }
     }
