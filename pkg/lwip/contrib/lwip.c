@@ -13,6 +13,11 @@
  * @author Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include "kernel_defines.h"
+
+#if IS_USED(MODULE_LWIP_DHCP_AUTO)
+#include "lwip/dhcp.h"
+#endif
 #include "lwip/tcpip.h"
 #include "lwip/netif/netdev.h"
 #include "lwip/netif.h"
@@ -138,11 +143,20 @@ void lwip_bootstrap(void)
 #ifdef MODULE_NETDEV_TAP
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         netdev_tap_setup(&netdev_taps[i], &netdev_tap_params[i]);
+#ifdef MODULE_LWIP_IPV4
+        if (netif_add(&netif[i], IP4_ADDR_ANY, IP4_ADDR_ANY, IP4_ADDR_ANY,
+                      &netdev_taps[i], lwip_netdev_init,
+                      tcpip_input) == NULL) {
+            DEBUG("Could not add netdev_tap device\n");
+            return;
+        }
+#else /* MODULE_LWIP_IPV4 */
         if (netif_add(&netif[i], &netdev_taps[i], lwip_netdev_init,
                       tcpip_input) == NULL) {
             DEBUG("Could not add netdev_tap device\n");
             return;
         }
+#endif /* MODULE_LWIP_IPV4 */
     }
 #elif defined(MODULE_MRF24J40)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
@@ -241,6 +255,13 @@ void lwip_bootstrap(void)
 #endif
     /* also allow for external interface definition */
     tcpip_init(NULL, NULL);
+#if IS_USED(MODULE_LWIP_DHCP_AUTO) && IS_USED(MODULE_NETDEV_TAP)
+    /* XXX: Hack to get DHCP with IPv4 with `netdev_tap`, as it does
+     * not emit a `NETDEV_EVENT_LINK_UP` event. Remove, once it does
+     * at an appropriate point.
+     * (see https://github.com/RIOT-OS/RIOT/pull/14150) */
+    dhcp_start(netif);
+#endif
 }
 
 /** @} */
