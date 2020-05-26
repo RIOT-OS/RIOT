@@ -101,16 +101,16 @@ static void _gpio_init_ain(void)
                 switch (i) {
                     /* preserve JTAG pins on PORTA and PORTB */
                     case 0:
-                        port->CR[0] = GPIO_CRL_CNF;
-                        port->CR[1] = GPIO_CRH_CNF & 0x000FFFFF;
+                        port->CRL = GPIO_CRL_CNF;
+                        port->CRH = GPIO_CRH_CNF & 0x000FFFFF;
                         break;
                     case 1:
-                        port->CR[0] = GPIO_CRL_CNF & 0xFFF00FFF;
-                        port->CR[1] = GPIO_CRH_CNF;
+                        port->CRL = GPIO_CRL_CNF & 0xFFF00FFF;
+                        port->CRH = GPIO_CRH_CNF;
                         break;
                     default:
-                        port->CR[0] = GPIO_CRL_CNF;
-                        port->CR[1] = GPIO_CRH_CNF;
+                        port->CRL = GPIO_CRL_CNF;
+                        port->CRH = GPIO_CRH_CNF;
                         break;
                 }
 #else /* ! defined(CPU_FAM_STM32F1) */
@@ -130,8 +130,8 @@ static void _gpio_init_ain(void)
             }
             else {
 #if defined(CPU_FAM_STM32F1)
-                port->CR[0] = GPIO_CRL_CNF;
-                port->CR[1] = GPIO_CRH_CNF;
+                port->CRL = GPIO_CRL_CNF;
+                port->CRH = GPIO_CRH_CNF;
 #else
                 port->MODER = 0xFFFFFFFF;
 #endif
