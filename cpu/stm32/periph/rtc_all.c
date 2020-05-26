@@ -42,6 +42,19 @@
 #define CLKSEL_LSI          (RCC_BDCR_RTCSEL_1)
 #endif
 
+/* map some EXTI register names */
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
+#define EXTI_REG_RTSR       (EXTI->RTSR1)
+#define EXTI_REG_FTSR       (EXTI->FTSR1)
+#define EXTI_REG_PR         (EXTI->PR1)
+#define EXTI_REG_IMR        (EXTI->IMR1)
+#else
+#define EXTI_REG_RTSR       (EXTI->RTSR)
+#define EXTI_REG_FTSR       (EXTI->FTSR)
+#define EXTI_REG_PR         (EXTI->PR)
+#define EXTI_REG_IMR        (EXTI->IMR)
+#endif
+
 /* interrupt line name mapping */
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0)
 #define IRQN                (RTC_IRQn)
@@ -231,10 +244,10 @@ void rtc_init(void)
 
     /* configure the EXTI channel, as RTC interrupts are routed through it.
      * Needs to be configured to trigger on rising edges. */
-    EXTI->FTSR &= ~(EXTI_FTSR_BIT);
-    EXTI->RTSR |= EXTI_RTSR_BIT;
-    EXTI->IMR  |= EXTI_IMR_BIT;
-    EXTI->PR   = EXTI_PR_BIT;
+    EXTI_REG_FTSR &= ~(EXTI_FTSR_BIT);
+    EXTI_REG_RTSR |= EXTI_RTSR_BIT;
+    EXTI_REG_IMR  |= EXTI_IMR_BIT;
+    EXTI_REG_PR   = EXTI_PR_BIT;
     /* enable global RTC interrupt */
     NVIC_EnableIRQ(IRQN);
 }
@@ -348,6 +361,6 @@ void ISR_NAME(void)
         }
         RTC->ISR &= ~RTC_ISR_ALRAF;
     }
-    EXTI->PR = EXTI_PR_BIT; /* only clear the associated bit */
+    EXTI_REG_PR = EXTI_PR_BIT; /* only clear the associated bit */
     cortexm_isr_end();
 }
