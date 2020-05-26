@@ -1,4 +1,4 @@
-CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
+CFLAGS += -DCPU_FAM_STM32$(call uppercase_and_underscore,$(CPU_FAM))
 
 # For stm32 cpu's we use the generic stm32.ld linker script
 LINKER_SCRIPT ?= stm32.ld
@@ -43,6 +43,6 @@ ifneq (,$(CCMRAM_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)
 endif
 
-VECTORS_O ?= $(BINDIR)/stm32_vectors/vectors_$(subst stm32,,$(CPU_FAM)).o
+VECTORS_O ?= $(BINDIR)/stm32_vectors/vectors_$(CPU_FAM).o
 
 include $(RIOTMAKE)/arch/cortexm.inc.mk
