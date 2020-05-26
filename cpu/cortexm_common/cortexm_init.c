@@ -42,7 +42,12 @@ CORTEXM_STATIC_INLINE void cortexm_init_isr_priorities(void)
     /* set pendSV interrupt to its own priority */
     NVIC_SetPriority(PendSV_IRQn, CPU_CORTEXM_PENDSV_IRQ_PRIO);
     /* set SVC interrupt to same priority as the rest */
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L1)
+    NVIC_SetPriority(SVC_IRQn, CPU_DEFAULT_IRQ_PRIO);
+#else
     NVIC_SetPriority(SVCall_IRQn, CPU_DEFAULT_IRQ_PRIO);
+#endif
     /* initialize all vendor specific interrupts with the same value */
     for (unsigned i = 0; i < CPU_IRQ_NUMOF; i++) {
         NVIC_SetPriority((IRQn_Type) i, CPU_DEFAULT_IRQ_PRIO);
