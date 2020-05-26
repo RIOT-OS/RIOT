@@ -26,6 +26,29 @@
 #include "shell.h"
 #include "board.h" /* MTD_0 is defined in board.h */
 
+/* Configure MTD device for SD card if none is provided */
+#if !defined(MTD_0) && MODULE_MTD_SDCARD
+#include "mtd_sdcard.h"
+#include "sdcard_spi.h"
+#include "sdcard_spi_params.h"
+
+#define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
+
+/* SD card devices are provided by auto_init_sdcard_spi */
+extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
+
+/* Configure MTD device for the first SD card */
+static mtd_sdcard_t mtd_sdcard_dev = {
+    .base = {
+        .driver = &mtd_sdcard_driver
+    },
+    .sd_card = &sdcard_spi_devs[0],
+    .params = &sdcard_spi_params[0],
+};
+static mtd_dev_t *mtd0 = (mtd_dev_t*)&mtd_sdcard_dev;
+#define MTD_0 mtd0
+#endif
+
 /* Flash mount point */
 #define FLASH_MOUNT_POINT   "/sda"
 
@@ -62,6 +85,21 @@ static spiffs_desc_t fs_desc = {
 
 /* spiffs driver will be used */
 #define FS_DRIVER spiffs_file_system
+
+#elif defined(MODULE_FATFS_VFS)
+/* include file system header */
+#include "fs/fatfs.h"
+
+/* file system specific descriptor
+ * as for littlefs, some fields can be changed if needed,
+ * this example focus on basic usage, i.e. entire memory used */
+static fatfs_desc_t fs_desc;
+
+/* provide mtd devices for use within diskio layer of fatfs */
+mtd_dev_t *fatfs_mtd_devs[FF_VOLUMES];
+
+/* fatfs driver will be used */
+#define FS_DRIVER fatfs_file_system
 #endif
 
 /* this structure defines the vfs mount point:
@@ -115,7 +153,7 @@ static int _mount(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS))
+#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_FATFS_VFS))
     int res = vfs_mount(&flash_mount);
     if (res < 0) {
         printf("Error while mounting %s...try format\n", FLASH_MOUNT_POINT);
@@ -134,7 +172,7 @@ static int _format(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS))
+#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_FATFS_VFS))
     int res = vfs_format(&flash_mount);
     if (res < 0) {
         printf("Error while formatting %s\n", FLASH_MOUNT_POINT);
@@ -153,7 +191,7 @@ static int _umount(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS))
+#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_FATFS_VFS))
     int res = vfs_umount(&flash_mount);
     if (res < 0) {
         printf("Error while unmounting %s\n", FLASH_MOUNT_POINT);
@@ -249,6 +287,8 @@ int main(void)
     /* spiffs and littlefs need a mtd pointer
      * by default the whole memory is used */
     fs_desc.dev = MTD_0;
+#elif defined(MTD_0) && defined(MODULE_FATFS_VFS)
+    fatfs_mtd_devs[fs_desc.vol_idx] = MTD_0;
 #endif
     int res = vfs_mount(&const_mount);
     if (res < 0) {
