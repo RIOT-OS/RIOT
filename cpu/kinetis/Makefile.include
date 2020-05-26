@@ -46,12 +46,4 @@ CFLAGS += \
 # add the CPU specific flash configuration field for the linker
 UNDEF += $(BINDIR)/cpu/fcfield.o
 
-# select kinetis periph drivers
-ifeq (EA,$(KINETIS_SERIES))
-USEMODULE += periph_ics
-else
-USEMODULE += periph_mcg
-endif
-USEMODULE += periph_wdog
-
 include $(RIOTMAKE)/arch/cortexm.inc.mk
