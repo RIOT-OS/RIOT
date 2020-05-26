@@ -259,6 +259,12 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
     return 0;
 }
 
+sock_udp_t *sock_dtls_get_udp_sock(sock_dtls_t *sock)
+{
+    assert(sock);
+    return sock->udp_sock;
+}
+
 int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
                            sock_dtls_session_t *remote)
 {
