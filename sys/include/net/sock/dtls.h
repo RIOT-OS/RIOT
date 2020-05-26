@@ -557,7 +557,7 @@ void sock_dtls_init(void);
  *
  * @param[out] sock     The resulting DTLS sock object
  * @param[in] udp_sock  Existing UDP sock initialized with
- *                      @ref sock_udp_create()to be used underneath.
+ *                      @ref sock_udp_create() to be used underneath.
  * @param[in] tag       Credential tag of @p sock. The sock will only use
  *                      credentials with the same tag given here.
  * @param[in] version   [DTLS version](@ref sock_dtls_prot_version) to use.
@@ -568,6 +568,17 @@ void sock_dtls_init(void);
  */
 int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
                      credman_tag_t tag, unsigned version, unsigned role);
+
+/**
+ * @brief   Get underlying UDP sock.
+ *
+ * @pre `sock != NULL`.
+ *
+ * @param[in] sock  DTLS sock to get UDP sock from.
+ *
+ * @return  The underlying UDP sock.
+ */
+sock_udp_t *sock_dtls_get_udp_sock(sock_dtls_t *sock);
 
 /**
  * @brief Initialize session handshake.
