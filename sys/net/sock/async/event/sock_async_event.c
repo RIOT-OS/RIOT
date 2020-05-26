@@ -42,6 +42,11 @@ static inline void _cb(void *sock, sock_async_flags_t type, void *arg,
     ctx->event.type |= type;
     event_post(ctx->queue, &ctx->event.super);
 
+    /* The fuzzing module is only enabled when building a fuzzing
+     * application from the fuzzing/ subdirectory. The fuzzing setup
+     * assumes that gnrc_sock_recv is called by the event callback. If
+     * the value returned by gnrc_sock_recv was the fuzzing packet, the
+     * fuzzing application is terminated as input processing finished. */
 #ifdef MODULE_FUZZING
     if (gnrc_sock_prevpkt && gnrc_sock_prevpkt == gnrc_pktbuf_fuzzptr) {
         exit(EXIT_SUCCESS);
