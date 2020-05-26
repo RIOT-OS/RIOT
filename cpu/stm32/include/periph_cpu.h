@@ -33,8 +33,6 @@
 #include "periph/f3/periph_cpu.h"
 #elif defined(CPU_FAM_STM32F4)
 #include "periph/f4/periph_cpu.h"
-#elif defined(CPU_FAM_STM32F7)
-#include "periph/f7/periph_cpu.h"
 #elif defined(CPU_FAM_STM32L0)
 #include "periph/l0/periph_cpu.h"
 #elif defined(CPU_FAM_STM32L1)
