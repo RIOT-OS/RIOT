@@ -106,20 +106,15 @@ static uint16_t _ip6_addr_to_netif(const ip6_addr_p_t *_addr)
 }
 #endif
 
-static int _parse_iphdr(const struct netbuf *buf, void *data, size_t max_len,
+static int _parse_iphdr(struct netbuf *buf, void **data, void **ctx,
                         sock_ip_ep_t *remote)
 {
-    uint8_t *data_ptr = buf->p->payload;
-    size_t data_len = buf->p->len;
+    uint8_t *data_ptr = buf->ptr->payload;
+    size_t data_len = buf->ptr->len;
 
-    assert(buf->p->next == NULL);   /* TODO this might not be generally the case
-                                     * check later with larger payloads */
     switch (data_ptr[0] >> 4) {
 #if LWIP_IPV4
         case 4:
-            if ((data_len - sizeof(struct ip_hdr)) > max_len) {
-                return -ENOBUFS;
-            }
             if (remote != NULL) {
                 struct ip_hdr *iphdr = (struct ip_hdr *)data_ptr;
 
@@ -134,9 +129,6 @@ static int _parse_iphdr(const struct netbuf *buf, void *data, size_t max_len,
 #endif
 #if LWIP_IPV6
         case 6:
-            if ((data_len - sizeof(struct ip6_hdr)) > max_len) {
-                return -ENOBUFS;
-            }
             if (remote != NULL) {
                 struct ip6_hdr *iphdr = (struct ip6_hdr *)data_ptr;
 
@@ -150,24 +142,63 @@ static int _parse_iphdr(const struct netbuf *buf, void *data, size_t max_len,
             break;
 #endif
         default:
+            netbuf_delete(buf);
             return -EPROTO;
     }
-    memcpy(data, data_ptr, data_len);
+    *data = data_ptr;
+    *ctx = buf;
     return (ssize_t)data_len;
 }
 
 ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
                      uint32_t timeout, sock_ip_ep_t *remote)
 {
+    void *pkt = NULL;
+    struct netbuf *ctx = NULL;
+    uint8_t *ptr = data;
+    ssize_t res, ret = 0;
+    bool nobufs = false;
+
+    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    while ((res = sock_ip_recv_buf(sock, &pkt, (void **)&ctx, timeout,
+                                   remote)) > 0) {
+        if (ctx->p->tot_len > (ssize_t)max_len) {
+            nobufs = true;
+            /* progress context to last element */
+            while (netbuf_next(ctx) == 0) {}
+            continue;
+        }
+        memcpy(ptr, pkt, res);
+        ptr += res;
+        ret += res;
+    }
+    return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
+}
+
+ssize_t sock_ip_recv_buf(sock_ip_t *sock, void **data, void **ctx,
+                         uint32_t timeout, sock_ip_ep_t *remote)
+{
     struct netbuf *buf;
     int res;
 
-    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    assert((sock != NULL) && (data != NULL) && (ctx != NULL));
+    buf = *ctx;
+    if (buf != NULL) {
+        if (netbuf_next(buf) == -1) {
+            *data = NULL;
+            netbuf_delete(buf);
+            *ctx = NULL;
+            return 0;
+        }
+        else {
+            *data = buf->ptr->payload;
+            return buf->ptr->len;
+        }
+    }
     if ((res = lwip_sock_recv(sock->base.conn, timeout, &buf)) < 0) {
         return res;
     }
-    res = _parse_iphdr(buf, data, max_len, remote);
-    netbuf_delete(buf);
+    res = _parse_iphdr(buf, data, ctx, remote);
     return res;
 }
 

@@ -71,18 +71,51 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep)
 ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
                       uint32_t timeout, sock_udp_ep_t *remote)
 {
-    uint8_t *data_ptr = data;
+    void *pkt = NULL;
+    void *ctx = NULL;
+    uint8_t *ptr = data;
+    ssize_t res, ret = 0;
+    bool nobufs = false;
+
+    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    while ((res = sock_udp_recv_buf(sock, &pkt, &ctx, timeout,
+                                    remote)) > 0) {
+        struct netbuf *buf = ctx;
+        if (buf->p->tot_len > (ssize_t)max_len) {
+            nobufs = true;
+            /* progress context to last element */
+            while (netbuf_next(ctx) == 0) {}
+            continue;
+        }
+        memcpy(ptr, pkt, res);
+        ptr += res;
+        ret += res;
+    }
+    return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
+}
+
+ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **ctx,
+                          uint32_t timeout, sock_udp_ep_t *remote)
+{
     struct netbuf *buf;
     int res;
 
-    assert((sock != NULL) && (data != NULL) && (max_len > 0));
+    assert((sock != NULL) && (data != NULL) && (ctx != NULL));
+    buf = *ctx;
+    if (buf != NULL) {
+        if (netbuf_next(buf) == -1) {
+            *data = NULL;
+            netbuf_delete(buf);
+            *ctx = NULL;
+            return 0;
+        }
+        else {
+            *data = buf->ptr->payload;
+            return buf->ptr->len;
+        }
+    }
     if ((res = lwip_sock_recv(sock->base.conn, timeout, &buf)) < 0) {
         return res;
-    }
-    res = buf->p->tot_len;
-    if ((unsigned)res > max_len) {
-        netbuf_delete(buf);
-        return -ENOBUFS;
     }
     if (remote != NULL) {
         /* convert remote */
@@ -113,13 +146,9 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
         memcpy(&remote->addr, &buf->addr, addr_len);
         remote->port = buf->port;
     }
-    /* copy data */
-    for (struct pbuf *q = buf->p; q != NULL; q = q->next) {
-        memcpy(data_ptr, q->payload, q->len);
-        data_ptr += q->len;
-    }
-    netbuf_delete(buf);
-    return (ssize_t)res;
+    *data = buf->ptr->payload;
+    *ctx = buf;
+    return (ssize_t)buf->ptr->len;
 }
 
 ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
