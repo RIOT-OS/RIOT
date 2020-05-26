@@ -29,8 +29,6 @@
 #include "periph/f1/periph_cpu.h"
 #elif defined(CPU_FAM_STM32F2)
 #include "periph/f2/periph_cpu.h"
-#elif defined(CPU_FAM_STM32F3)
-#include "periph/f3/periph_cpu.h"
 #elif defined(CPU_FAM_STM32F4)
 #include "periph/f4/periph_cpu.h"
 #elif defined(CPU_FAM_STM32L0)
