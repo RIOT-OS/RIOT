@@ -26,11 +26,6 @@
 extern "C" {
 #endif
 
-/**
- * @brief   Starting address of the CPU ID
- */
-#define CPUID_ADDR          (0x1ff80050)
-
 #ifndef DOXYGEN
 /**
  * @brief   Override ADC resolution values

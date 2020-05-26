@@ -29,8 +29,6 @@ extern "C" {
  */
 #if defined(CPU_LINE_STM32F722xx) || defined(CPU_LINE_STM32F723xx)
 #define CPUID_ADDR          (0x1ff07a10)
-#else
-#define CPUID_ADDR          (0x1ff0f420)
 #endif
 
 #ifdef __cplusplus
