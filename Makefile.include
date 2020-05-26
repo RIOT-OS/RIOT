@@ -99,8 +99,11 @@ endif
 ifneq (,$(BOARDSDIR))
   # Only warn users, not the CI.
   ifneq ($(RIOT_CI_BUILD),1)
-    $(warning Using BOARDSDIR is deprecated use EXTERNAL_BOARD_DIRS instead)
-    $(info EXTERNAL_BOARD_DIRS can contain multiple folders separated by space)
+    # Do not warn when set from sub-make
+    ifeq ($(MAKELEVEL),0)
+      $(warning Using BOARDSDIR is deprecated use EXTERNAL_BOARD_DIRS instead)
+      $(info EXTERNAL_BOARD_DIRS can contain multiple folders separated by space)
+    endif
   endif
   EXTERNAL_BOARD_DIRS += $(BOARDSDIR)
 endif
@@ -183,10 +186,6 @@ GLOBAL_GOALS += buildtest \
                 #
 
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
-  BOARD=none
-endif
-
-ifeq (none,$(BOARD))
   include $(RIOTMAKE)/info-global.inc.mk
   include $(RIOTMAKE)/buildtests.inc.mk
 else
@@ -947,7 +946,7 @@ ifneq ($(_BASELIBS_VALUE_BEFORE_USAGE),$(BASELIBS))
   $(error BASELIBS value changed)
 endif
 
-endif # BOARD=none
+endif
 
 # include RIOT_MAKEFILES_GLOBAL_POST configuration files
 # allows setting user specific system wide configuration parsed after the body
