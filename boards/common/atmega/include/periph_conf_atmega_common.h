@@ -93,35 +93,10 @@ extern "C" {
  * The timer driver only supports the four 16-bit timers (Timer1, Timer3,
  * Timer4, Timer5), so those are the only ones we can use here.
  *
- *
- * ATmega32U4
- * ==========
- * The ATmega32U4 has 4 timers. Timer0 and Timer2 are 8 Bit Timers.
- *
- * The timer driver only supports the two 16-bit timers (Timer1 and
- * Timer3), so those are the only ones we can use here.
- *
  * @{
  */
 #ifndef TIMER_NUMOF
-#if defined(CPU_ATMEGA32U4)
-    #define TIMER_NUMOF         (2U)
-    #define TIMER_CHANNELS      (3)
-
-    #define TIMER_0             MEGA_TIMER1
-    #define TIMER_0_MASK        &TIMSK1
-    #define TIMER_0_FLAG        &TIFR1
-    #define TIMER_0_ISRA        TIMER1_COMPA_vect
-    #define TIMER_0_ISRB        TIMER1_COMPB_vect
-    #define TIMER_0_ISRC        TIMER1_COMPC_vect
-
-    #define TIMER_1             MEGA_TIMER3
-    #define TIMER_1_MASK        &TIMSK3
-    #define TIMER_1_FLAG        &TIFR3
-    #define TIMER_1_ISRA        TIMER3_COMPA_vect
-    #define TIMER_1_ISRB        TIMER3_COMPB_vect
-    #define TIMER_1_ISRC        TIMER3_COMPC_vect
-#elif defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2)
+#if defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2)
     #define TIMER_NUMOF         (3U)
     #define TIMER_CHANNELS      (3)
 
