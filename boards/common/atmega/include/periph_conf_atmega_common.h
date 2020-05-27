@@ -53,11 +53,6 @@ extern "C" {
  *
  * @details Only the 16 bit timers are used by xtimer
  *
- * ATmega328p
- * ==========
- * The timer driver only supports the 16-bit timer (Timer1)
- * so this is the only one we can use here.
- *
  * ATmega1281
  * ==========
  * The ATmega1281 has 6 timers. Timer0 and Timer2 are 8 Bit Timers,
@@ -81,16 +76,7 @@ extern "C" {
  * @{
  */
 #ifndef TIMER_NUMOF
-#if defined(CPU_ATMEGA328P)
-    #define TIMER_NUMOF         (1U)
-    #define TIMER_CHANNELS      (2)
-
-    #define TIMER_0             MEGA_TIMER1
-    #define TIMER_0_MASK        &TIMSK1
-    #define TIMER_0_FLAG        &TIFR1
-    #define TIMER_0_ISRA        TIMER1_COMPA_vect
-    #define TIMER_0_ISRB        TIMER1_COMPB_vect
-#elif defined(CPU_ATMEGA1284P)
+#if defined(CPU_ATMEGA1284P)
     #define TIMER_NUMOF         (2U)
     #define TIMER_CHANNELS      (2)
 
