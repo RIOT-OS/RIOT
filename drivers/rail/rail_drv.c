@@ -508,12 +508,13 @@ int rail_transmit_frame(rail_t *dev, uint8_t *data_ptr, size_t data_length)
     /* TODO internal state */
     dev->state = RAIL_TRANSCEIVER_STATE_TX;
 
-    /* check if ack req is requested */
-
-    if (dev->netdev.flags & NETDEV_IEEE802154_ACK_REQ) {
+    /* Check FCF field in the TX buffer to see if the ACK_REQ flag was set in
+     * the packet that is queued for transmission */
+    uint8_t fcf = data_ptr[1];
+    if ((fcf & IEEE802154_FCF_ACK_REQ) &&
+            (dev->netdev.flags & NETDEV_IEEE802154_ACK_REQ)) {
         tx_option |= RAIL_TX_OPTION_WAIT_FOR_ACK;
         DEBUG("tx option auto ack\n");
-        /* TODO wait for ack, necessary or done by layer above? */
     }
 
     DEBUG("[rail] transmit - radio state: %s\n", rail_radioState2str(RAIL_GetRadioState(dev->rhandle)));
@@ -534,8 +535,6 @@ int rail_transmit_frame(rail_t *dev, uint8_t *data_ptr, size_t data_length)
         return -1;
     }
     DEBUG("Started transmit\n");
-
-    dev->netdev.netdev.event_callback((netdev_t *)&dev->netdev, NETDEV_EVENT_TX_STARTED);
 
     /* TODO
        - if this should be asymmetric blocking call, we have to wait for the

@@ -180,6 +180,8 @@ typedef struct {
 #endif
     thread_t *thread;               /**< Network driver thread, for providing feedback from IRQ handler */
     bool send_in_progress;          /**< True while waiting for a TX to finish */
+    uint8_t num_retrans;            /**< Counter used internally by send implementation */
+    uint8_t max_retrans;            /**< Maximum number of frame retransmissions when no Ack frame is received */
 } rail_t;
 
 /**

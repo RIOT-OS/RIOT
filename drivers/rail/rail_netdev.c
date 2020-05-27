@@ -116,6 +116,8 @@ static int _init(netdev_t *netdev)
         return ret;
     }
 
+    dev->max_retrans = 3;
+
     ret = rail_start_rx(dev);
     if (ret < 0) {
         return ret;
@@ -186,14 +188,17 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* frame length stored in first byte */
     frame[0] = len + IEEE802154_FCS_LEN;
 
+    dev->num_retrans = 0;
     dev->send_in_progress = true;
-    int ret = rail_transmit_frame(dev, frame, len + IEEE802154_FCS_LEN);
+    int ret = rail_transmit_frame(dev, frame, frame[0]);
 
     if (ret != 0) {
         DEBUG("Can not send data\n");
         return ret;
     }
 
+    dev->netdev.netdev.event_callback((netdev_t *)&dev->netdev,
+                                                    NETDEV_EVENT_TX_STARTED);
     return (int)len;
 }
 
@@ -386,12 +391,9 @@ static void _isr(netdev_t *netdev)
        possible
      */
 
-    /* Occurs when a packet was sent */
-    if (event & RAIL_EVENT_TX_PACKET_SENT) {
-        DEBUG("Rail event Tx packet sent \n");
-
-        dev->send_in_progress = false;
-        dev->netdev.netdev.event_callback((netdev_t *)&dev->netdev, NETDEV_EVENT_TX_COMPLETE);
+    if (event & RAIL_EVENT_TX_CHANNEL_BUSY) {
+        DEBUG("Rail event Tx channel busy\n");
+        dev->netdev.netdev.event_callback((netdev_t *)&dev->netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
         return;
         /* TODO set state? */
     }
@@ -399,8 +401,29 @@ static void _isr(netdev_t *netdev)
     /* Notifies the application when searching for an ack packet has timed out */
     if (event & RAIL_EVENT_RX_ACK_TIMEOUT) {
         DEBUG("Rail event RX ACK TIMEOUT\n");
-        /* ack timeout for tx acks? TODO confirm */
-        dev->netdev.netdev.event_callback((netdev_t *)&dev->netdev, NETDEV_EVENT_TX_NOACK);
+
+        if (dev->num_retrans < dev->max_retrans) {
+            /* Perform frame retransmission */
+            ++dev->num_retrans;
+            DEBUG("[kw41zrf] TX retry %u\n", (unsigned)dev->num_retrans);
+            /* Resubmit the frame for transmission */
+            rail_transmit_frame(dev, frame, frame[0]);
+
+        } else {
+            dev->netdev.netdev.event_callback((netdev_t *)&dev->netdev,
+                                              NETDEV_EVENT_TX_NOACK);
+        }
+        return;
+    }
+
+    /* Occurs when a packet was sent */
+    if (event & (RAIL_EVENT_TX_PACKET_SENT | RAIL_EVENT_TXACK_PACKET_SENT)) {
+        DEBUG("Rail event Tx packet sent \n");
+
+        dev->send_in_progress = false;
+        dev->netdev.netdev.event_callback((netdev_t *)&dev->netdev, NETDEV_EVENT_TX_COMPLETE);
+        return;
+        /* TODO set state? */
     }
 
     /* Occurs when a packet being received has a frame error */
@@ -423,13 +446,6 @@ static void _isr(netdev_t *netdev)
 
     /* TODO RAIL_EVENT_TXACK_PACKET_SENT */
     /* Occurs when an ack packet was sent. */
-
-    if (event & RAIL_EVENT_TX_CHANNEL_BUSY) {
-        DEBUG("Rail event Tx channel busy\n");
-        dev->netdev.netdev.event_callback((netdev_t *)&dev->netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
-
-        /* TODO set state? */
-    }
 
     /* Occurs when a transmit is aborted by the user */
     if (event & RAIL_EVENT_TX_ABORTED) {
@@ -479,9 +495,6 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     /* TODO
         - is it necessary to differencate if transceiver is active or not?
-        - What is a channel page and how to get this info out of the RAIL API?
-        - NETOPT_RETRANS
-        - Can CSMA be switched on / off and if yes how?
         - NETOPT_BANDWIDTH could be calculated, but is it usefull?
         - NETOPT_CHANNEL_FREQUENCY
         - NETOPT_AUTOCCA
@@ -518,7 +531,9 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             ret = sizeof(int16_t);
             break;
         case (NETOPT_RETRANS):
-            /* TODO */
+            assert(max_len >= sizeof(int8_t));
+            *((uint8_t *)val) = dev->max_retrans;
+            ret = sizeof(uint8_t);
             break;
         case (NETOPT_PROMISCUOUSMODE):
             if (dev->promiscuousMode == true) {
@@ -747,7 +762,9 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             /* TODO set auto ack */
             break;
         case (NETOPT_RETRANS):
-            /* TODO set retransmissions */
+            assert(len <= sizeof(uint8_t));
+            dev->max_retrans = *((const uint8_t *)val);
+            res = sizeof(uint8_t);
             break;
         case (NETOPT_PROMISCUOUSMODE):
 
@@ -826,7 +843,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     /* TODO
 
         - NETOPT_AUTOACK
-        - NETOPT_RETRANS
         - NETOPT_PRELOADING ?
         - NETOPT_RX_START_IRQ ?
         - NETOPT_RX_END_IRQ ?
