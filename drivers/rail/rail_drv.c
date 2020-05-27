@@ -776,4 +776,6 @@ static void _rail_radio_event_handler(RAIL_Handle_t rhandle, RAIL_Events_t event
 
     /* let the netdev->isr() handle the rest */
     dev->netdev.netdev.event_callback((netdev_t *)&dev->netdev, NETDEV_EVENT_ISR);
+
+    cortexm_isr_end();
 }
