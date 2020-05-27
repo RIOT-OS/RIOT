@@ -545,7 +545,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             ret = sizeof(netopt_enable_t);
             break;
         case (NETOPT_AUTOACK):
-            if (RAIL_IsAutoAckEnabled(dev->rhandle) == true) {
+            if (RAIL_IsRxAutoAckPaused(dev->rhandle) == false) {
                 *((netopt_enable_t *)val) = NETOPT_ENABLE;
             }
             else {
@@ -759,7 +759,10 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             res = _set_state(dev, *((const netopt_state_t *)val));
             break;
         case (NETOPT_AUTOACK):
-            /* TODO set auto ack */
+            assert(len <= sizeof(netopt_enable_t));
+            bool state = !*(const bool *)val;
+            RAIL_PauseRxAutoAck(dev->rhandle, state);
+            res = sizeof(netopt_enable_t);
             break;
         case (NETOPT_RETRANS):
             assert(len <= sizeof(uint8_t));
@@ -842,7 +845,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
     /* TODO
 
-        - NETOPT_AUTOACK
         - NETOPT_PRELOADING ?
         - NETOPT_RX_START_IRQ ?
         - NETOPT_RX_END_IRQ ?
