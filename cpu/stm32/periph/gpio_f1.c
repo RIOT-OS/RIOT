@@ -89,8 +89,8 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     periph_clk_en(APB2, (RCC_APB2ENR_IOPAEN << _port_num(pin)));
 
     /* set pin mode */
-    port->CR[pin_num >> 3] &= ~(0xf << ((pin_num & 0x7) * 4));
-    port->CR[pin_num >> 3] |=  ((mode & MODE_MASK) << ((pin_num & 0x7) * 4));
+    *(uint32_t *)(&port->CRL + (pin_num >> 3)) &= ~(0xf << ((pin_num & 0x7) * 4));
+    *(uint32_t *)(&port->CRL + (pin_num >> 3)) |=  ((mode & MODE_MASK) << ((pin_num & 0x7) * 4));
 
     /* set ODR */
     if (mode == GPIO_IN_PU)
@@ -109,8 +109,8 @@ void gpio_init_af(gpio_t pin, gpio_af_t af)
     /* enable the clock for the selected port */
     periph_clk_en(APB2, (RCC_APB2ENR_IOPAEN << _port_num(pin)));
     /* configure the pin */
-    port->CR[pin_num >> 3] &= ~(0xf << ((pin_num & 0x7) * 4));
-    port->CR[pin_num >> 3] |=  (af << ((pin_num & 0x7) * 4));
+    *(uint32_t *)(&port->CRL + (pin_num >> 3)) &= ~(0xf << ((pin_num & 0x7) * 4));
+    *(uint32_t *)(&port->CRL + (pin_num >> 3)) |=  (af << ((pin_num & 0x7) * 4));
 }
 
 void gpio_init_analog(gpio_t pin)
@@ -120,7 +120,7 @@ void gpio_init_analog(gpio_t pin)
 
     /* map the pin as analog input */
     int pin_num = _pin_num(pin);
-    _port(pin)->CR[pin_num >= 8] &= ~(0xfl << (4 * (pin_num - ((pin_num >= 8) * 8))));
+    *(uint32_t *)(&_port(pin)->CRL + (pin_num >= 8)) &= ~(0xfl << (4 * (pin_num - ((pin_num >= 8) * 8))));
 }
 
 int gpio_read(gpio_t pin)
@@ -128,7 +128,7 @@ int gpio_read(gpio_t pin)
     GPIO_TypeDef *port = _port(pin);
     int pin_num = _pin_num(pin);
 
-    if (port->CR[pin_num >> 3] & (0x3 << ((pin_num & 0x7) << 2))) {
+    if (*(uint32_t *)(&port->CRL + (pin_num >> 3)) & (0x3 << ((pin_num & 0x7) << 2))) {
         /* pin is output */
         return (port->ODR & (1 << pin_num));
     }
