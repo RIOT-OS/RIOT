@@ -1,0 +1,266 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# Declaration of generic features that CPUs and boards may provide
+
+config HAS_ARCH_8BIT
+    bool
+    help
+        Indicates that the CPU has a 8-bits architecture.
+
+config HAS_ARCH_16BIT
+    bool
+    help
+        Indicates that the CPU has a 16-bits architecture.
+
+config HAS_ARCH_32BIT
+    bool
+    help
+        Indicates that the CPU has a 32-bits architecture.
+
+config HAS_ARDUINO
+    bool
+    help
+        Indicates that Arduino pins compatibility is supported.
+
+config HAS_ARDUINO_PWM
+    bool
+    help
+        Indicates that Arduino PWM compatibility is supported.
+
+config HAS_BACKUP_RAM
+    bool
+    help
+        Indicates that Backup RAM is supported.
+
+config HAS_BOOTLOADER_ARDUINO
+    bool
+    help
+        Indicates that the Arduino bootloader is used.
+
+config HAS_BOOTLOADER_NRFUTIL
+    bool
+    help
+        Indicates that the NRF Util bootloader is used.
+
+config HAS_CPP
+    bool
+    help
+        Indicates that C++ is supported.
+
+config HAS_CPU_CHECK_ADDRESS
+    bool
+    help
+        Indicates that address validity check is supported.
+
+config HAS_ETHERNET
+    bool
+    help
+        Indicates that Ethernet connectivity is present.
+
+config HAS_MOTOR_DRIVER
+    bool
+    help
+        Indicates that a motor_driver configuration is present.
+
+config HAS_PERIPH_ADC
+    bool
+    help
+        Indicates that an ADC peripheral is present.
+
+config HAS_PERIPH_CAN
+    bool
+    help
+        Indicates that a CAN peripheral is present.
+
+config HAS_PERIPH_CPUID
+    bool
+    help
+        Indicates that a CPU ID peripheral is present.
+
+config HAS_PERIPH_DAC
+    bool
+    help
+        Indicates that a DAC peripheral is present.
+
+config HAS_PERIPH_DMA
+    bool
+    help
+        Indicates that a DMA peripheral is present.
+
+config HAS_PERIPH_EEPROM
+    bool
+    help
+        Indicates that a EEPROM peripheral is present.
+
+config HAS_PERIPH_ETH
+    bool
+    help
+        Indicates that an Ethernet peripheral is present.
+
+config HAS_PERIPH_FLASHPAGE
+    bool
+    help
+        Indicates that a Flashpage peripheral is present.
+
+config HAS_PERIPH_FLASHPAGE_RAW
+    bool
+    help
+        Indicates that the Flashpage peripheral supports raw writing.
+
+config HAS_PERIPH_FLASHPAGE_RWEE
+    bool
+    help
+        Indicates that the Flashpage peripheral is of the Read While Write.
+
+config HAS_PERIPH_GPIO
+    bool
+    help
+        Indicates that a GPIO peripheral is present.
+
+config HAS_PERIPH_GPIO_IRQ
+    bool
+    help
+        Indicates that the GPIO peripheral supports external interrupts is
+        present.
+
+config HAS_PERIPH_HWRNG
+    bool
+    help
+        Indicates that a Hardware Random Number Generator (HWRNG) peripheral is
+        present.
+
+config HAS_PERIPH_I2C
+    bool
+    help
+        Indicates that an I2C peripheral is present.
+
+config HAS_PERIPH_I2C_RECONFIGURE
+    bool
+    help
+        Indicates that the I2C peripheral allows pin reconfiguration peripheral
+        is present.
+
+config HAS_PERIPH_ICS
+    bool
+    help
+        Indicates that an ICS peripheral is present.
+
+config HAS_PERIPH_IR
+    bool
+    help
+        Indicates that an IR peripheral is present.
+
+config HAS_PERIPH_LPUART
+    bool
+    help
+        Indicates that a low-power UART peripheral is present.
+
+config HAS_PERIPH_MCG
+    bool
+    help
+        Indicates that an MCG peripheral is present.
+
+config HAS_PERIPH_PM
+    bool
+    help
+        Indicates that a Power Management (PM) peripheral is present.
+
+config HAS_PERIPH_PWM
+    bool
+    help
+        Indicates that a PWM peripheral is present.
+
+config HAS_PERIPH_QDEC
+    bool
+    help
+        Indicates that a QDEC peripheral is present.
+
+config HAS_PERIPH_RTC
+    bool
+    help
+        Indicates that an RTC peripheral is present.
+
+config HAS_PERIPH_RTT
+    bool
+    help
+        Indicates that an RTT peripheral is present.
+
+config HAS_PERIPH_SPI
+    bool
+    help
+        Indicates that an SPI peripheral is present.
+
+config HAS_PERIPH_SPI_GPIO_MODE
+    bool
+    help
+        Indicates that the SPI peripheral supports configuring the GPIOs modes.
+
+config HAS_PERIPH_TEMPERATURE
+    bool
+    help
+        Indicates that a Temperature peripheral is present.
+
+config HAS_PERIPH_TIMER
+    bool
+    help
+        Indicates that a Timer peripheral is present.
+
+config HAS_PERIPH_UART
+    bool
+    help
+        Indicates that an UART peripheral is present.
+
+config HAS_PERIPH_UART_HW_FC
+    bool
+    help
+        Indicates that the UART peripheral supports hardware flow control.
+
+config HAS_PERIPH_UART_MODECFG
+    bool
+    help
+        Indicates that the UART peripheral allows mode configuration.
+
+config HAS_PERIPH_UART_NONBLOCKING
+    bool
+    help
+        Indicates that the UART peripheral allows non-blocking operations.
+
+config HAS_PERIPH_USBDEV
+    bool
+    help
+        Indicates that an USBDEV peripheral is present.
+
+config HAS_PERIPH_WDT
+    bool
+    help
+        Indicates that a Watchdog Timer (WDT) peripheral is present.
+
+config HAS_PERIPH_WDT_CB
+    bool
+    help
+        Indicates that the WDT peripheral allows setting a callback.
+
+config HAS_PUF_SRAM
+    bool
+    help
+        Indicates that the PUF-SRAM module has been tested on the platform.
+
+config HAS_RIOTBOOT
+    bool
+    help
+        Indicates that the riotboot booloader is supported.
+
+config HAS_SDCARD_SPI
+    bool
+    help
+        Indicates that an SD-Card SPI configuration is provided.
+
+config HAS_SSP
+    bool
+    help
+        Indicates that Stack Smashing Protection is supported.
