@@ -49,50 +49,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name    Timer configuration
- *
- * @details Only the 16 bit timers are used by xtimer
- *
- * ATmega1281
- * ==========
- * The ATmega1281 has 6 timers. Timer0 and Timer2 are 8 Bit Timers,
- * Timer0 has special uses too and therefore we'll avoid using it.
- *
- * The timer driver only supports the four 16-bit timers (Timer1, Timer3,
- * Timer4, Timer5), so those are the only ones we can use here.
- *
- * ATmega2560
- * ==========
- * The timer driver only supports the four 16-bit timers (Timer1, Timer3,
- * Timer4, Timer5), so those are the only ones we can use here.
- *
- * @{
- */
-#ifndef TIMER_NUMOF
-#if defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA1281)
-    #define TIMER_NUMOF         (2U)
-    #define TIMER_CHANNELS      (3)
-
-    #define TIMER_0             MEGA_TIMER1
-    #define TIMER_0_MASK        &TIMSK1
-    #define TIMER_0_FLAG        &TIFR1
-    #define TIMER_0_ISRA        TIMER1_COMPA_vect
-    #define TIMER_0_ISRB        TIMER1_COMPB_vect
-    #define TIMER_0_ISRC        TIMER1_COMPC_vect
-
-    #define TIMER_1             MEGA_TIMER4
-    #define TIMER_1_MASK        &TIMSK4
-    #define TIMER_1_FLAG        &TIFR4
-    #define TIMER_1_ISRA        TIMER4_COMPA_vect
-    #define TIMER_1_ISRB        TIMER4_COMPB_vect
-    #define TIMER_1_ISRC        TIMER4_COMPC_vect
-#else
-    #define TIMER_NUMOF         (0U)
-#endif
-#endif /* TIMER_NUMOF */
-/** @} */
-
-/**
  * @name    UART configuration
  *
  * The UART devices have fixed pin mappings, so all we need to do, is to specify
