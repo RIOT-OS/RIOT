@@ -265,6 +265,7 @@ int rail_init(rail_t *dev)
     int r = 0;
 
     netdev_ieee802154_t *netdev = (netdev_ieee802154_t *)dev;
+    dev->thread = (thread_t *)thread_get(thread_getpid());
 
     /* save ref for this driver, for global access (esp in rail event handler) */
     /* TODO multible instances? */
@@ -776,6 +777,9 @@ static void _rail_radio_event_handler(RAIL_Handle_t rhandle, RAIL_Events_t event
 
     /* let the netdev->isr() handle the rest */
     dev->netdev.netdev.event_callback((netdev_t *)&dev->netdev, NETDEV_EVENT_ISR);
+
+    /* Signal to the thread that an IRQ has arrived, if it is waiting */
+    thread_flags_set(dev->thread, RAIL_THREAD_FLAG_ISR);
 
     cortexm_isr_end();
 }

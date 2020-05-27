@@ -124,9 +124,35 @@ static int _init(netdev_t *netdev)
     return 0;
 }
 
+void wait_for_send(netdev_t *netdev)
+{
+    rail_t *dev = (rail_t *)netdev;
+
+    /* we exit this wait using an IRQ so we can't do it from IRQ */
+    assert(!irq_is_in());
+
+    if (!dev->send_in_progress) {
+        return;
+    }
+
+    while (1) {
+        /* TX in progress */
+        /* Block until we get an IRQ */
+        thread_flags_wait_any(RAIL_THREAD_FLAG_ISR);
+        /* Handle the IRQ */
+        _isr(netdev);
+
+        if (!dev->send_in_progress) {
+            break;
+        }
+    }
+}
+
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
     DEBUG("rail_netdev->send called\n");
+
+    wait_for_send(netdev);
 
     rail_t *dev = (rail_t *)netdev;
     uint8_t *pkt_buf = &(frame[1]);
@@ -160,6 +186,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* frame length stored in first byte */
     frame[0] = len + IEEE802154_FCS_LEN;
 
+    dev->send_in_progress = true;
     int ret = rail_transmit_frame(dev, frame, len + IEEE802154_FCS_LEN);
 
     if (ret != 0) {
@@ -325,6 +352,8 @@ static void _isr(netdev_t *netdev)
 
     rail_t *dev = (rail_t *) netdev;
 
+    thread_flags_clear(RAIL_THREAD_FLAG_ISR);
+
     /* get event from ring buffer, but leave it there */
     rail_event_msg_t event_msg;
     rail_event_queue_peek(&(dev->event_queue), &event_msg);
@@ -361,6 +390,7 @@ static void _isr(netdev_t *netdev)
     if (event & RAIL_EVENT_TX_PACKET_SENT) {
         DEBUG("Rail event Tx packet sent \n");
 
+        dev->send_in_progress = false;
         dev->netdev.netdev.event_callback((netdev_t *)&dev->netdev, NETDEV_EVENT_TX_COMPLETE);
         return;
         /* TODO set state? */

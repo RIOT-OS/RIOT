@@ -37,6 +37,7 @@
 #include "net/eui64.h"
 
 #include "ringbuffer.h"
+#include "thread_flags.h"
 
 #include "rail.h"
 
@@ -134,6 +135,9 @@ enum rail_transceiver_config_frequency {
     RAIL_TRANSCEIVER_FREQUENCY_912MHZ   /** US 912 MHz band */
 };
 
+/* Set this to a flag bit that is not used by the MAC implementation */
+#define RAIL_THREAD_FLAG_ISR (1u << 8)
+
 /**
  * @brief   struct holding all params needed for device initialization
  */
@@ -174,6 +178,8 @@ typedef struct {
 #if defined(RAIL_RADIO_HAS_SUBGHZ) || defined(DOXYGEN)
     uint8_t channel_page;           /**< current configured channel page */
 #endif
+    thread_t *thread;               /**< Network driver thread, for providing feedback from IRQ handler */
+    bool send_in_progress;          /**< True while waiting for a TX to finish */
 } rail_t;
 
 /**
