@@ -53,21 +53,6 @@ extern "C" {
  *
  * @details Only the 16 bit timers are used by xtimer
  *
- * ATmega256RFR2
- * =============
- * The timer driver only supports the four 16-bit timers
- * (Timer1, TST, Timer3, Timer4, Timer5), so those are the Timer we can use here.
- * Timer 1, TST, PORT B5/6/7 Out, Port D4/6 In,  Analog Comparator Input Capture, Output Compare Modulator, PWM
- * Timer 3, TST, PORT E3/4/5 Out, Port E/6/7 In, Input or Output Compare and PWM Output
- * Timer 4, TST, It can not be connected to any I/O Pin,
- * Timer 5, TST, It can not be connected to any I/O Pin,
- *
- * Using Atmel Timer 4 and 5 seems to be the best choice
- * Using Atmel Timer 4 as Xtimer
- * and Atmel Timer 5 as timer available for the the application seems to be the best choice,
- * as the special functions of the other timer are not lost.
- * Atmel Timer1 to be used as PWM timer for RGB LED
- *
  * ATmega328p
  * ==========
  * The timer driver only supports the 16-bit timer (Timer1)
@@ -96,31 +81,7 @@ extern "C" {
  * @{
  */
 #ifndef TIMER_NUMOF
-#if defined(CPU_ATMEGA128RFA1) || defined(CPU_ATMEGA256RFR2)
-    #define TIMER_NUMOF         (3U)
-    #define TIMER_CHANNELS      (3)
-
-    #define TIMER_0             MEGA_TIMER4
-    #define TIMER_0_MASK        &TIMSK4
-    #define TIMER_0_FLAG        &TIFR4
-    #define TIMER_0_ISRA        TIMER4_COMPA_vect
-    #define TIMER_0_ISRB        TIMER4_COMPB_vect
-    #define TIMER_0_ISRC        TIMER4_COMPC_vect
-
-    #define TIMER_1             MEGA_TIMER5
-    #define TIMER_1_MASK        &TIMSK5
-    #define TIMER_1_FLAG        &TIFR5
-    #define TIMER_1_ISRA        TIMER5_COMPA_vect
-    #define TIMER_1_ISRB        TIMER5_COMPB_vect
-    #define TIMER_1_ISRC        TIMER5_COMPC_vect
-
-    #define TIMER_2             MEGA_TIMER1
-    #define TIMER_2_MASK        &TIMSK1
-    #define TIMER_2_FLAG        &TIFR1
-    #define TIMER_2_ISRA        TIMER1_COMPA_vect
-    #define TIMER_2_ISRB        TIMER1_COMPB_vect
-    #define TIMER_2_ISRC        TIMER1_COMPC_vect
-#elif defined(CPU_ATMEGA328P)
+#if defined(CPU_ATMEGA328P)
     #define TIMER_NUMOF         (1U)
     #define TIMER_CHANNELS      (2)
 
