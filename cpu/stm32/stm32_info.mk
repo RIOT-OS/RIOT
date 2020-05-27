@@ -10,20 +10,20 @@ STM32_PINCOUNT = $(word 6, $(STM32_INFO))
 STM32_ROMSIZE  = $(word 7, $(STM32_INFO))
 STM32_RAMMOD   = $(word 8, $(STM32_INFO))
 
-CPU_FAM = $(CPU)$(call lowercase,$(STM32_TYPE)$(STM32_FAMILY))
+CPU_FAM = $(call lowercase,$(STM32_TYPE)$(STM32_FAMILY))
 
-ifeq (stm32f0,$(CPU_FAM))
+ifeq (f0,$(CPU_FAM))
   CPU_ARCH = cortex-m0
-else ifneq (,$(filter $(CPU_FAM),stm32f1 stm32f2 stm32l1))
+else ifneq (,$(filter $(CPU_FAM),f1 f2 l1))
   CPU_ARCH = cortex-m3
-else ifneq (,$(filter $(CPU_FAM),stm32f3 stm32f4 stm32l4))
+else ifneq (,$(filter $(CPU_FAM),f3 f4 l4))
   CPU_ARCH = cortex-m4f
-else ifeq (stm32wb,$(CPU_FAM))
+else ifeq (wb,$(CPU_FAM))
   CPU_ARCH = cortex-m4
-else ifeq (stm32f7,$(CPU_FAM))
+else ifeq (f7,$(CPU_FAM))
   CPU_ARCH = cortex-m7
-else ifeq (stm32l0,$(CPU_FAM))
+else ifeq (l0,$(CPU_FAM))
   CPU_ARCH = cortex-m0plus
 else
-  $(error Not supported CPU family: '$(CPU_FAM)')
+  $(error Not supported CPU family: 'stm32$(CPU_FAM)')
 endif

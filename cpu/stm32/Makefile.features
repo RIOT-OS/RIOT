@@ -7,14 +7,14 @@ FEATURES_PROVIDED += puf_sram
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_wdt
 
-ifneq (,$(filter $(CPU_FAM),stm32f0 stm32f1 stm32f3 stm32l0 stm32l1 stm32l4 stm32wb))
+ifneq (,$(filter $(CPU_FAM),f0 f1 f3 l0 l1 l4 wb))
   ifeq (,$(filter nucleo-f031k6,$(BOARD)))
     FEATURES_PROVIDED += periph_flashpage
     FEATURES_PROVIDED += periph_flashpage_raw
   endif
 endif
 
-ifneq (,$(filter $(CPU_FAM),stm32l0 stm32l1))
+ifneq (,$(filter $(CPU_FAM),l0 l1))
   FEATURES_PROVIDED += periph_eeprom
 endif
 
@@ -23,7 +23,7 @@ ifeq (stm32f1,$(CPU_FAM))
   FEATURES_CONFLICT_MSG += "On the STM32F1, the RTC and RTT map to the same hardware peripheral."
 endif
 
-ifneq (,$(filter $(CPU_FAM),stm32f2 stm32f4 stm32f7 stm32l0 stm32l4 stm32wb))
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7 l0 l4 wb))
   FEATURES_PROVIDED += periph_hwrng
 endif
 
@@ -42,7 +42,7 @@ ifneq (,$(filter $(BOARDS_WITHOUT_HWRNG),$(BOARD)))
   FEATURES_PROVIDED := $(filter-out periph_hwrng,$(FEATURES_PROVIDED))
 endif
 
-ifneq (,$(filter $(CPU_FAM),stm32f2 stm32f4 stm32f7 stm32l1 stm32l4))
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7 l1 l4))
   FEATURES_PROVIDED += cortexm_mpu
 endif
 
