@@ -61,13 +61,6 @@ extern "C" {
  * The timer driver only supports the four 16-bit timers (Timer1, Timer3,
  * Timer4, Timer5), so those are the only ones we can use here.
  *
- * ATmega1284P
- * ===========
- * The ATmega1284P has 4 timers. Timer0 and Timer2 are 8 Bit Timers.
- *
- * The timer driver only supports the two 16-bit timers (Timer1 and
- * Timer3), so those are the only ones we can use here.
- *
  * ATmega2560
  * ==========
  * The timer driver only supports the four 16-bit timers (Timer1, Timer3,
@@ -76,22 +69,7 @@ extern "C" {
  * @{
  */
 #ifndef TIMER_NUMOF
-#if defined(CPU_ATMEGA1284P)
-    #define TIMER_NUMOF         (2U)
-    #define TIMER_CHANNELS      (2)
-
-    #define TIMER_0             MEGA_TIMER1
-    #define TIMER_0_MASK        &TIMSK1
-    #define TIMER_0_FLAG        &TIFR1
-    #define TIMER_0_ISRA        TIMER1_COMPA_vect
-    #define TIMER_0_ISRB        TIMER1_COMPB_vect
-
-    #define TIMER_1             MEGA_TIMER3
-    #define TIMER_1_MASK        &TIMSK3
-    #define TIMER_1_FLAG        &TIFR3
-    #define TIMER_1_ISRA        TIMER3_COMPA_vect
-    #define TIMER_1_ISRB        TIMER3_COMPB_vect
-#elif defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA1281)
+#if defined(CPU_ATMEGA2560) || defined(CPU_ATMEGA1281)
     #define TIMER_NUMOF         (2U)
     #define TIMER_CHANNELS      (3)
 
