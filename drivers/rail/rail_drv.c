@@ -606,7 +606,10 @@ static void _rail_radio_event_handler(RAIL_Handle_t rhandle, RAIL_Events_t event
            here the packet?
          */
         DEBUG("Rail event ieee 802.15.4 data request command\n");
-        RAIL_IEEE802154_SetFramePending(rhandle);
+
+        if (dev->netdev.flags & NETDEV_IEEE802154_FRAME_PEND) {
+            RAIL_IEEE802154_SetFramePending(rhandle);
+        }
 
         return;
     }

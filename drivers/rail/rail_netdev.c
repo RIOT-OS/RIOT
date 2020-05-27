@@ -804,6 +804,15 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
             res = sizeof(int8_t);
             break;
+        case (NETOPT_ACK_PENDING):
+            if (((const bool *)val)[0] == true) {
+                dev->netdev.flags |= NETDEV_IEEE802154_FRAME_PEND;
+
+            } else {
+                dev->netdev.flags &= ~NETDEV_IEEE802154_FRAME_PEND;
+            }
+            res = sizeof(netopt_enable_t);
+            break;
         default:
             break;
     }
@@ -818,7 +827,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         - NETOPT_AUTOACK
         - NETOPT_RETRANS
-        - NETOPT_ACK_PENDING  ?
         - NETOPT_PRELOADING ?
         - NETOPT_RX_START_IRQ ?
         - NETOPT_RX_END_IRQ ?
