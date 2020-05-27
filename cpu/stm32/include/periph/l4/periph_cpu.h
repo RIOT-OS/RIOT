@@ -25,11 +25,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Starting address of the CPU ID
- */
-#define CPUID_ADDR          (0x1fff7590)
-
-/**
  * @brief   Available number of ADC devices
  */
 #if defined(CPU_MODEL_STM32L476RG) || defined(CPU_MODEL_STM32L475VG)
