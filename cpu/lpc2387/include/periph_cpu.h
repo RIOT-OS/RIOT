@@ -126,7 +126,7 @@ typedef struct {
 /**
  * @brief   Number of available timer channels
  */
-#define TIMER_CHAN_NUMOF        (4U)
+#define TIMER_CHANNELS      (4U)
 
 /**
  * @brief   Declare needed generic SPI functions

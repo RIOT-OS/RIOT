@@ -38,6 +38,23 @@
  */
 static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
 
+static uint32_t _oneshot;
+
+static inline void set_oneshot(tim_t tim, int chan)
+{
+    _oneshot |= (1 << chan) << (TIMER_CHANNELS * tim);
+}
+
+static inline void clear_oneshot(tim_t tim, int chan)
+{
+    _oneshot &= ~((1 << chan) << (TIMER_CHANNELS * tim));
+}
+
+static inline bool is_oneshot(tim_t tim, int chan)
+{
+    return _oneshot & ((1 << chan) << (TIMER_CHANNELS * tim));
+}
+
 /**
  * @brief   Forward declarations for interrupt functions
  * @{
@@ -139,19 +156,53 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (((unsigned) tim >= TIMER_NUMOF) || ((unsigned) channel >= TIMER_CHAN_NUMOF)) {
+    if (((unsigned) tim >= TIMER_NUMOF) || ((unsigned) channel >= TIMER_CHANNELS)) {
         return -1;
     }
 
     lpc23xx_timer_t *dev = get_dev(tim);
+
+    set_oneshot(tim, channel);
+
     dev->MR[channel] = value;
+    /* Match Interrupt */
     dev->MCR |= (1 << (channel * 3));
+    return 0;
+}
+
+int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags)
+{
+    if (((unsigned) tim >= TIMER_NUMOF) || ((unsigned) channel >= TIMER_CHANNELS)) {
+        return -1;
+    }
+
+    lpc23xx_timer_t *dev = get_dev(tim);
+
+    if (flags & TIM_FLAG_RESET_ON_SET) {
+        /* reset the timer */
+        dev->TCR = 2;
+        /* start the timer */
+        /* cppcheck-suppress redundantAssignment
+         * (reason: TCR is volatile control register.
+                    Bit 2 will put the timer into Reset
+                    Bit 1 will control if the timer is running) */
+        dev->TCR = 1;
+    }
+
+    clear_oneshot(tim, channel);
+
+    uint8_t cfg = (flags & TIM_FLAG_RESET_ON_MATCH)
+                ? 0x3   /* Match Interrupt & Reset on Match */
+                : 0x1;  /* Match Interrupt */
+
+    dev->MR[channel] = value;
+    dev->MCR |= (cfg << (channel * 3));
     return 0;
 }
 
 int timer_clear(tim_t tim, int channel)
 {
-    if (((unsigned) tim >= TIMER_NUMOF) || ((unsigned) channel >= TIMER_CHAN_NUMOF)) {
+    if (((unsigned) tim >= TIMER_NUMOF) || ((unsigned) channel >= TIMER_CHANNELS)) {
         return -1;
     }
     get_dev(tim)->MCR &= ~(1 << (channel * 3));
@@ -173,15 +224,28 @@ void timer_stop(tim_t tim)
     get_dev(tim)->TCR = 0;
 }
 
+static inline void chan_handler(lpc23xx_timer_t *dev, unsigned tim_num, unsigned chan_num)
+{
+    const uint32_t mask = (1 << chan_num);
+
+    if ((dev->IR & mask) == 0) {
+        return;
+    }
+
+    dev->IR |= mask;
+    if (is_oneshot(tim_num, chan_num)) {
+        dev->MCR &= ~(1 << (chan_num * 3));
+    }
+
+    isr_ctx[tim_num].cb(isr_ctx[tim_num].arg, chan_num);
+}
+
 static inline void isr_handler(lpc23xx_timer_t *dev, int tim_num)
 {
-    for (unsigned i = 0; i < TIMER_CHAN_NUMOF; i++) {
-        if (dev->IR & (1 << i)) {
-            dev->IR |= (1 << i);
-            dev->MCR &= ~(1 << (i * 3));
-            isr_ctx[tim_num].cb(isr_ctx[tim_num].arg, i);
-        }
+    for (unsigned i = 0; i < TIMER_CHANNELS; ++i) {
+        chan_handler(dev, tim_num, i);
     }
+
     /* we must not forget to acknowledge the handling of the interrupt */
     VICVectAddr = 0;
 }
