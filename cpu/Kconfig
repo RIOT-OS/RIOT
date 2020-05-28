@@ -19,6 +19,11 @@
 #  +------------+
 #        || selects
 #        \/
+#  +------------+
+#  |  CPU_CORE  |
+#  +------------+
+#        || selects
+#        \/
 #   +----------+
 #   | CPU_ARCH |
 #   +----------+
@@ -41,6 +46,11 @@ config CPU_FAMILY
     string
     help
         Family of the currently selected CPU.
+
+config CPU_CORE
+    string
+    help
+        Core of the currently selected CPU.
 
 config CPU_ARCH
     string
