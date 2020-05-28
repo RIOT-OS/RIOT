@@ -272,7 +272,7 @@ static int _fsm_call_send(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
     /* Check if window is open and all packets were transmitted */
     if (payload > 0 && tcb->snd_wnd > 0 && tcb->pkt_retransmit == NULL) {
         /* Calculate segment size */
-        payload = (payload < GNRC_TCP_MSS) ? payload : GNRC_TCP_MSS;
+        payload = (payload < CONFIG_GNRC_TCP_MSS) ? payload : CONFIG_GNRC_TCP_MSS;
         payload = (payload < tcb->mss) ? payload : tcb->mss;
         payload = (payload < len) ? payload : len;
 
@@ -307,8 +307,8 @@ static int _fsm_call_recv(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
     /* Read data into 'buf' up to 'len' bytes from receive buffer */
     size_t rcvd = ringbuffer_get(&(tcb->rcv_buf), buf, len);
 
-    /* If receive buffer can store more than GNRC_TCP_MSS: open window to available buffer size */
-    if (ringbuffer_get_free(&tcb->rcv_buf) >= GNRC_TCP_MSS) {
+    /* If receive buffer can store more than CONFIG_GNRC_TCP_MSS: open window to available buffer size */
+    if (ringbuffer_get_free(&tcb->rcv_buf) >= CONFIG_GNRC_TCP_MSS) {
         tcb->rcv_wnd = ringbuffer_get_free(&(tcb->rcv_buf));
 
         /* Send ACK to anounce window update */

@@ -68,11 +68,11 @@ extern "C" {
 /**
  * @brief Maximum Segment Size (MSS).
  */
-#ifndef GNRC_TCP_MSS
+#ifndef CONFIG_GNRC_TCP_MSS
 #ifdef  MODULE_GNRC_IPV6
-#define GNRC_TCP_MSS (1220U) /**< If IPv6 is used. Get MSS = 1280 - IPv6 Hdr - TCP Hdr = 1220 */
+#define CONFIG_GNRC_TCP_MSS (1220U) /**< If IPv6 is used. Get MSS = 1280 - IPv6 Hdr - TCP Hdr = 1220 */
 #else
-#define GNRC_TCP_MSS (576U) /**< Default MSS */
+#define CONFIG_GNRC_TCP_MSS (576U) /**< Default MSS */
 #endif
 #endif
 
@@ -87,7 +87,7 @@ extern "C" {
  * @brief Default receive window size
  */
 #ifndef GNRC_TCP_DEFAULT_WINDOW
-#define GNRC_TCP_DEFAULT_WINDOW (GNRC_TCP_MSS * CONFIG_GNRC_TCP_MSS_MULTIPLICATOR)
+#define GNRC_TCP_DEFAULT_WINDOW (CONFIG_GNRC_TCP_MSS * CONFIG_GNRC_TCP_MSS_MULTIPLICATOR)
 #endif
 
 /**
