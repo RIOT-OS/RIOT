@@ -531,8 +531,13 @@ ifeq (,$(FLASHFILE))
   $(error FLASHFILE is not defined for this board: $(FLASHFILE))
 endif
 
-# By default always build ELFFILE and FLASHFILE
-BUILD_FILES += $(ELFFILE) $(FLASHFILE)
+# By default always build ELFFILE, BINFILE and FLASHFILE
+ifeq ($(RIOT_CI_BUILD),1)
+  # Don't build BINFILE on the CI to save some computation time
+  BUILD_FILES += $(ELFFILE) $(FLASHFILE)
+else
+  BUILD_FILES += $(ELFFILE) $(BINFILE) $(FLASHFILE)
+endif
 
 # variables used to compile and link c++
 CPPMIX ?= $(if $(wildcard *.cpp),1,)
