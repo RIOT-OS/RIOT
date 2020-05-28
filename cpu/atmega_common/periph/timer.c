@@ -24,6 +24,7 @@
 
 #include "board.h"
 #include "cpu.h"
+#include "irq.h"
 #include "thread.h"
 
 #include "periph/timer.h"
@@ -136,9 +137,36 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
         return -1;
     }
 
+    unsigned state = irq_disable();
     ctx[tim].dev->OCR[channel] = (uint16_t)value;
     *ctx[tim].flag &= ~(1 << (channel + OCF1A));
     *ctx[tim].mask |= (1 << (channel + OCIE1A));
+    irq_restore(state);
+
+    return 0;
+}
+
+int timer_set(tim_t tim, int channel, unsigned int timeout)
+{
+    if (channel >= TIMER_CHANNELS) {
+        return -1;
+    }
+
+    unsigned state = irq_disable();
+    unsigned absolute = ctx[tim].dev->CNT + timeout;
+    ctx[tim].dev->OCR[channel] = absolute;
+    uint8_t mask = 1 << (channel + OCIE1A);
+    *ctx[tim].mask |= mask;
+    if ((absolute - ctx[tim].dev->CNT) > timeout) {
+        /* Timer already expired. Trigger the interrupt now and loop until it
+         * is triggered.
+         */
+        while (!(*ctx[tim].flag & (1 << (OCF1A + channel)))) {
+            ctx[tim].dev->OCR[channel] = ctx[tim].dev->CNT;
+        }
+
+    }
+    irq_restore(state);
 
     return 0;
 }
@@ -156,7 +184,17 @@ int timer_clear(tim_t tim, int channel)
 
 unsigned int timer_read(tim_t tim)
 {
-    return (unsigned int)ctx[tim].dev->CNT;
+    /* CNT is a 16 bit register, but atomic access is implemented by hardware:
+     * A read from the low byte causes the value in the high byte being stored
+     * in parallel into a temporary register. The read of the high byte will
+     * instead access the temporary register. However, the AVR only has one
+     * temporary register that is used to implement atomic access to all 16 bit
+     * registers. Thus, access has to be guarded by disabling IRQs.
+     */
+    unsigned state = irq_disable();
+    unsigned result = ctx[tim].dev->CNT;
+    irq_restore(state);
+    return result;
 }
 
 void timer_stop(tim_t tim)
