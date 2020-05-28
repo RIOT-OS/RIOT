@@ -1,0 +1,96 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_ARCH_ARMV6_M
+    bool
+    select HAS_ARCH_ARM
+    select HAS_ARCH_32BIT
+
+config CPU_ARCH_ARMV7_M
+    bool
+    select HAS_ARCH_ARM
+    select HAS_ARCH_32BIT
+
+config CPU_ARCH_ARMV8_M
+    bool
+    select HAS_ARCH_ARM
+    select HAS_ARCH_32BIT
+
+config CPU_ARCH
+    default "armv6_m" if CPU_ARCH_ARMV6_M
+    default "armv7_m" if CPU_ARCH_ARMV7_M
+    default "armv8_m" if CPU_ARCH_ARMV8_M
+
+config CPU_CORE_CORTEX_M
+    bool
+    select HAS_ARCH_CORTEXM
+    select HAS_PERIPH_PM
+    select HAS_CPP
+    select HAS_CPU_CHECK_ADDRESS
+    select HAS_SSP
+
+## Common CPU symbols
+config CPU_CORE
+    default "cortex-m0" if CPU_CORE_CORTEX_M0
+    default "cortex-m0plus" if CPU_CORE_CORTEX_M0PLUS
+    default "cortex-m23" if CPU_CORE_CORTEX_M23
+    default "cortex-m3" if CPU_CORE_CORTEX_M3
+    default "cortex-m4" if CPU_CORE_CORTEX_M4
+    default "cortex-m4f" if CPU_CORE_CORTEX_M4F
+    default "cortex-m7" if CPU_CORE_CORTEX_M7
+
+config CPU_CORE_CORTEX_M0
+    bool
+    select CPU_ARCH_ARMV6_M
+    select CPU_CORE_CORTEX_M
+
+config CPU_CORE_CORTEX_M0PLUS
+    bool
+    select CPU_ARCH_ARMV6_M
+    select CPU_CORE_CORTEX_M
+
+config CPU_CORE_CORTEX_M23
+    bool
+    select CPU_ARCH_ARMV8_M
+    select CPU_CORE_CORTEX_M
+
+config CPU_CORE_CORTEX_M3
+    bool
+    select CPU_ARCH_ARMV7_M
+    select CPU_CORE_CORTEX_M
+
+config CPU_CORE_CORTEX_M4
+    bool
+    select CPU_ARCH_ARMV7_M
+    select CPU_CORE_CORTEX_M
+
+config CPU_CORE_CORTEX_M4F
+    bool
+    select CPU_ARCH_ARMV7_M
+    select CPU_CORE_CORTEX_M
+    select HAS_CORTEXM_FPU
+
+config CPU_CORE_CORTEX_M7
+    bool
+    select CPU_ARCH_ARMV7_M
+    select CPU_CORE_CORTEX_M
+    select HAS_CORTEXM_FPU
+
+## Definition of specific features
+config HAS_ARCH_CORTEXM
+    bool
+    help
+        Indicates that the current architecture is ARM Cortex-M.
+
+config HAS_ARCH_ARM
+    bool
+    help
+        Indicates that the current architecture is ARM.
+
+config HAS_CORTEXM_FPU
+    bool
+    help
+        Indicates that a ARM Cortex-M FPU is present.
