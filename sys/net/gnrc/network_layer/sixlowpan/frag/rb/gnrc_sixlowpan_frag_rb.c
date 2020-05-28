@@ -150,7 +150,9 @@ void gnrc_sixlowpan_frag_rb_rm_by_datagram(const gnrc_netif_hdr_t *netif_hdr,
     gnrc_sixlowpan_frag_rb_t *e = _rbuf_get_by_tag(netif_hdr, tag);
 
     if (e != NULL) {
-        gnrc_pktbuf_release(e->pkt);
+        if (e->pkt != NULL) {
+            gnrc_pktbuf_release(e->pkt);
+        }
         gnrc_sixlowpan_frag_rb_remove(e);
     }
 }
@@ -504,8 +506,10 @@ static int _rbuf_get(const void *src, size_t src_len,
         return -1;
     }
 
-    *((uint64_t *)res->pkt->data) = 0;  /* clean first few bytes for later
-                                               * look-ups */
+    if (res->pkt->data) {
+        /* clean first few bytes for later look-ups */
+        memset(res->pkt->data, 0, sizeof(uint64_t));
+    }
     res->super.datagram_size = size;
     res->super.arrival = now_usec;
     memcpy(res->super.src, src, src_len);
