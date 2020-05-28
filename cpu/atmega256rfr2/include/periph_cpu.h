@@ -73,5 +73,8 @@ enum {
 }
 #endif
 
+#include "periph_conf.h"
+#include "default_timer_config.h"
+
 #endif /* PERIPH_CPU_H */
 /** @} */

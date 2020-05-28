@@ -91,7 +91,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     DEBUG_TIMER_DDR |= (1 << DEBUG_TIMER_PIN);
     DEBUG_TIMER_PORT &= ~(1 << DEBUG_TIMER_PIN);
     DEBUG("Debug Pin: DDR 0x%02x Port 0x%02x Pin 0x%02x\n",
-           &DEBUG_TIMER_DDR , &DEBUG_TIMER_PORT,(1<<DEBUG_TIMER_PIN));
+          &DEBUG_TIMER_DDR, &DEBUG_TIMER_PORT, (1 << DEBUG_TIMER_PIN));
 #endif
 
     DEBUG("timer.c: freq = %ld\n", freq);
