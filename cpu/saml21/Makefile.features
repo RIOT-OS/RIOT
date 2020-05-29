@@ -2,7 +2,7 @@ CPU_ARCH = cortex-m0plus
 CPU_FAM  = saml21
 
 # The SAMR30 line of MCUs does not contain a TRNG
-BOARDS_WITHOUT_HWRNG += samr30-xpro
+CPU_MODELS_WITHOUT_HWRNG += samr30%
 
 # Low Power SRAM is *not* retained during Backup Sleep.
 # It therefore does not fulfill the requirements  of the 'backup_ram' interface.
@@ -10,7 +10,7 @@ BOARDS_WITHOUT_HWRNG += samr30-xpro
 # being availiable during deep sleep / backup mode will not be portable here.
 FEATURES_PROVIDED += backup_ram
 
-ifeq (,$(filter $(BOARDS_WITHOUT_HWRNG),$(BOARD)))
+ifeq (,$(filter $(CPU_MODELS_WITHOUT_HWRNG),$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_hwrng
 endif
 
