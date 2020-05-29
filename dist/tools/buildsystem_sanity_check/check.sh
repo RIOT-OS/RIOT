@@ -60,6 +60,22 @@ check_not_parsing_features() {
         | error_with_message 'Modules should not check the content of FEATURES_PROVIDED/_REQUIRED/OPTIONAL'
 }
 
+# Providing features for boards and CPUs should only be done in
+# Makefile.features
+check_providing_features_only_makefile_features() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e 'FEATURES_PROVIDED *+= *')
+
+    pathspec+=("boards/*Makefile*" "cpu/*Makefile*")
+
+    pathspec+=(":!*Makefile.features")
+
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message 'Features in cpu and boards should only be provided in Makefile.features files'
+}
+
 # Some variables do not need to be exported and even cause issues when being
 # exported because they are evaluated even when not needed.
 #
@@ -259,6 +275,7 @@ error_on_input() {
 
 all_checks() {
     check_not_parsing_features
+    check_providing_features_only_makefile_features
     check_not_exporting_variables
     check_deprecated_vars_patterns
     check_board_do_not_include_cpu_features_dep
