@@ -23,23 +23,12 @@ ifeq (stm32f1,$(CPU_FAM))
   FEATURES_CONFLICT_MSG += "On the STM32F1, the RTC and RTT map to the same hardware peripheral."
 endif
 
+# Not all F4 and L0 parts implement a RNG.
+CPU_MODELS_WITHOUT_HWRNG = stm32f401re% stm32f411re% stm32f446re% stm32f446ze% stm32l031k6%
 ifneq (,$(filter $(CPU_FAM),f2 f4 f7 l0 l4 wb))
-  FEATURES_PROVIDED += periph_hwrng
-endif
-
-# the granularity of provided feature definition for STMs is currently by CPU
-# sub-family (e.g., stm32f[1234]). Unfortunately, only some of e.g., the
-# stm32f4 have an RNG peripheral. As during evaluation of the features , no
-# CPU variable is available, we need to filter by board.
-#
-BOARDS_WITHOUT_HWRNG += nucleo-f401re
-BOARDS_WITHOUT_HWRNG += nucleo-f411re
-BOARDS_WITHOUT_HWRNG += nucleo-f446re
-BOARDS_WITHOUT_HWRNG += nucleo-f446ze
-BOARDS_WITHOUT_HWRNG += nucleo-l031k6
-
-ifneq (,$(filter $(BOARDS_WITHOUT_HWRNG),$(BOARD)))
-  FEATURES_PROVIDED := $(filter-out periph_hwrng,$(FEATURES_PROVIDED))
+  ifeq (,$(filter $(CPU_MODELS_WITHOUT_HWRNG),$(CPU_MODEL)))
+    FEATURES_PROVIDED += periph_hwrng
+  endif
 endif
 
 ifneq (,$(filter $(CPU_FAM),f2 f4 f7 l1 l4))
