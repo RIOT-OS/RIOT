@@ -126,6 +126,44 @@ static const timer_conf_t timer_config[] = {
 /** @} */
 
 /**
+ * @name    QDEC configuration
+ * @{
+ */
+
+static const qdec_conf_t qdec_config[] = {
+    {
+        .dev      = TIM1,
+        .max      = 0x0000ffff,
+        .rcc_mask = RCC_APB2ENR_TIM1EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_A, 8),             .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_A, 9),             .cc_chan = 1 } },
+        .bus      = APB2,
+        .irqn     = TIM1_UP_IRQn
+    },
+    {
+        .dev      = TIM3,
+        .max      = 0x0000ffff,
+        .rcc_mask = RCC_APB1ENR_TIM3EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_A, 6),             .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_A, 7),             .cc_chan = 1 } },
+        .bus      = APB1,
+        .irqn     = TIM3_IRQn
+    },
+    {
+        .dev      = TIM4,
+        .max      = 0x0000ffff,
+        .rcc_mask = RCC_APB1ENR_TIM4EN,
+        .chan     = { { .pin = GPIO_PIN(PORT_B, 6),             .cc_chan = 0 },
+                      { .pin = GPIO_PIN(PORT_B, 7),             .cc_chan = 1 } },
+        .bus      = APB1,
+        .irqn     = TIM4_IRQn
+    }
+};
+
+#define QDEC_NUMOF           ARRAY_SIZE(qdec_config)
+/** @} */
+
+/**
  * @name   UART configuration
  * @{
  */
