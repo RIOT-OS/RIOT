@@ -513,7 +513,9 @@ typedef struct {
     uint32_t rcc_mask;              /**< bit in clock enable register */
     qdec_chan_t chan[QDEC_CHAN];    /**< channel mapping, set to {GPIO_UNDEF, 0}
                                      *   if not used */
+#ifndef CPU_FAM_STM32F1
     gpio_af_t af;                   /**< alternate function used */
+#endif
     uint8_t bus;                    /**< APB bus */
     uint8_t irqn;                   /**< global IRQ channel */
 } qdec_conf_t;
