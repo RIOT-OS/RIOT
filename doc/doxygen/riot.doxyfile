@@ -1141,7 +1141,8 @@ HTML_EXTRA_FILES       = src/css/bootstrap.min.css \
                          src/fonts/miso.woff \
                          src/js/bootstrap.min.js \
                          src/js/doxy-jquery.js \
-                         src/js/jquery.min.js \
+                         src/js/jquery-3.5.1.min.js \
+                         src/js/jquery-migrate-3.3.0.min.js \
                          src/js/jquery.powertip.min.js \
                          src/js/jquery.smartmenus.min.js \
                          src/js/jquery.smartmenus.bootstrap.min.js \
