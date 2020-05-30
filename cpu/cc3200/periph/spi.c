@@ -173,9 +173,12 @@ void spi_init(spi_t bus)
     }
 
     /* enable/configure SPI clock */
-    (*cc3200_arcm_reg_t)(&ARCM->MCSPI_A1 + bus *
-                         0x1C)->clk_gating |= spi_config[bus].config &
-                                              PRCM_MODE_CLK_MASK;
+    if (spi(bus) == GSPI_BASE) {
+        ARCM->MCSPI_A1.clk_gating |= PRCM_RUN_MODE_CLK;
+    }
+    else if (spi(bus) == LSPI_BASE) {
+        ARCM->MCSPI_A2.clk_gating |= PRCM_RUN_MODE_CLK | PRCM_SLP_MODE_CLK;
+    }
 
     /* reset spi for the changes to take effect */
     spi_reset(bus);
@@ -227,7 +230,8 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont, const void *out,
     spi(bus)->ch0_conf |= MCSPI_CH0CONF_FORCE;
 
     /* perform transfer */
-    if (ROM_SPITransfer((uint32_t)spi(bus), (uint8_t *)out, (uint8_t *)in, len,
+    if (ROM_SPITransfer((uint32_t)spi(bus), (uint8_t *)out, (uint8_t *)in,
+                        len,
                         0) != SPI_OK) {
         DEBUG("SPI: Transfer failed \n");
         /* check that len and word length combination is valid */
