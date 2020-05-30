@@ -31,6 +31,7 @@
 
 #ifdef MODULE_FUZZING
 extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
+gnrc_pktsnip_t *gnrc_sock_prevpkt = NULL;
 #endif
 
 #ifdef MODULE_XTIMER
@@ -92,9 +93,15 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     gnrc_pktsnip_t *pkt, *netif;
     msg_t msg;
 
-#ifdef MODULE_FUZZING
-    static gnrc_pktsnip_t *prevpkt;
-    if (prevpkt && prevpkt == gnrc_pktbuf_fuzzptr) {
+    /* The fuzzing module is only enabled when building a fuzzing
+     * application from the fuzzing/ subdirectory. When using gnrc_sock
+     * the fuzzer assumes that gnrc_sock_recv is called in a loop. If it
+     * is called again and the previous return value was the special
+     * crafted fuzzing packet, the fuzzing application terminates.
+     *
+     * sock_async_event has its on fuzzing termination condition. */
+#if defined(MODULE_FUZZING) && !defined(MODULE_SOCK_ASYNC_EVENT)
+    if (gnrc_sock_prevpkt && gnrc_sock_prevpkt == gnrc_pktbuf_fuzzptr) {
         exit(EXIT_SUCCESS);
     }
 #endif
@@ -159,7 +166,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     }
 #endif
 #ifdef MODULE_FUZZING
-    prevpkt = pkt;
+    gnrc_sock_prevpkt = pkt;
 #endif
 
     return 0;

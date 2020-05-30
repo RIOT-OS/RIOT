@@ -16,6 +16,11 @@
 #include "irq.h"
 #include "net/sock/async/event.h"
 
+#ifdef MODULE_FUZZING
+extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
+extern gnrc_pktsnip_t *gnrc_sock_prevpkt;
+#endif
+
 static void _event_handler(event_t *ev)
 {
     sock_event_t *event = (sock_event_t *)ev;
@@ -36,6 +41,17 @@ static inline void _cb(void *sock, sock_async_flags_t type, void *arg,
     ctx->event.cb_arg = arg;
     ctx->event.type |= type;
     event_post(ctx->queue, &ctx->event.super);
+
+    /* The fuzzing module is only enabled when building a fuzzing
+     * application from the fuzzing/ subdirectory. The fuzzing setup
+     * assumes that gnrc_sock_recv is called by the event callback. If
+     * the value returned by gnrc_sock_recv was the fuzzing packet, the
+     * fuzzing application is terminated as input processing finished. */
+#ifdef MODULE_FUZZING
+    if (gnrc_sock_prevpkt && gnrc_sock_prevpkt == gnrc_pktbuf_fuzzptr) {
+        exit(EXIT_SUCCESS);
+    }
+#endif
 }
 
 static void _set_ctx(sock_async_ctx_t *ctx, event_queue_t *ev_queue)
