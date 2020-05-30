@@ -1,6 +1,6 @@
 include $(RIOTCPU)/stm32/stm32_info.mk
 
-FEATURES_PROVIDED += cpu_$(CPU_FAM)
+FEATURES_PROVIDED += cpu_stm32$(CPU_FAM)
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += puf_sram
