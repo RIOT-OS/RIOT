@@ -107,8 +107,7 @@ void spi_reset(spi_t bus)
     dev->sys_conf |= MCSPI_SYSCONFIG_SOFTRESET;
 
     /* wait for reset */
-    while (!((dev->sys_status) & MCSPI_SYSSTATUS_RESETDONE)) {
-    }
+    while (!((dev->sys_status) & MCSPI_SYSSTATUS_RESETDONE)) {}
 
     /* enable spi */
     dev->ch0_ctrl &= ~MCSPI_CH0CTRL_EN;
@@ -177,7 +176,8 @@ void spi_init(spi_t bus)
     /* enable/configure SPI clock */
     if (spi(bus) == GSPI_BASE) {
         ARCM->MCSPI_A1.clk_gating |= PRCM_RUN_MODE_CLK;
-    } else if (spi(bus) == LSPI_BASE) {
+    }
+    else if (spi(bus) == LSPI_BASE) {
         ARCM->MCSPI_A2.clk_gating |= PRCM_RUN_MODE_CLK | PRCM_SLP_MODE_CLK;
     }
 
