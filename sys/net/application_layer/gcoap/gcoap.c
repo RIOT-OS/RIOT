@@ -133,6 +133,15 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
     coap_pkt_t pdu;
     sock_udp_ep_t remote;
     gcoap_request_memo_t *memo = NULL;
+    /* Code paths that necessitate a response on the message layer can set a
+     * response type here (COAP_TYPE_RST or COAP_TYPE_ACK). If set, at the end
+     * of the function there will be
+     *   * that value will be put in the code field,
+     *   * token length cleared,
+     *   * code set to EMPTY, and
+     *   * the message is returned with the rest of its header intact.
+     */
+    int8_t messagelayer_emptyresponse_type = -1;
 
     (void)arg;
     if (type & SOCK_ASYNC_MSG_RECV) {
@@ -157,13 +166,7 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
             if (coap_get_code_raw(&pdu) == COAP_CODE_EMPTY) {
                 /* ping request */
                 if (coap_get_type(&pdu) == COAP_TYPE_CON) {
-                    coap_hdr_set_type(pdu.hdr, COAP_TYPE_RST);
-
-                    ssize_t bytes = sock_udp_send(sock, _listen_buf,
-                                                  sizeof(coap_hdr_t), &remote);
-                    if (bytes <= 0) {
-                        DEBUG("gcoap: ping response failed: %d\n", (int)bytes);
-                    }
+                    messagelayer_emptyresponse_type = COAP_TYPE_RST;
                 } else if (coap_get_type(&pdu) == COAP_TYPE_NON) {
                     DEBUG("gcoap: empty NON msg\n");
                 }
@@ -200,6 +203,9 @@ empty_as_response:
             _find_req_memo(&memo, &pdu, &remote);
             if (memo) {
                 switch (coap_get_type(&pdu)) {
+                case COAP_TYPE_CON:
+                    messagelayer_emptyresponse_type = COAP_TYPE_ACK;
+                    /* fall through */
                 case COAP_TYPE_NON:
                 case COAP_TYPE_ACK:
                     if (memo->resp_evt_tmout.queue) {
@@ -215,9 +221,6 @@ empty_as_response:
                     }
                     memo->state = GCOAP_MEMO_UNUSED;
                     break;
-                case COAP_TYPE_CON:
-                    DEBUG("gcoap: separate CON response not handled yet\n");
-                    break;
                 default:
                     DEBUG("gcoap: illegal response type: %u\n", coap_get_type(&pdu));
                     break;
@@ -229,6 +232,19 @@ empty_as_response:
             break;
         default:
             DEBUG("gcoap: illegal code class: %u\n", coap_get_code_class(&pdu));
+        }
+    }
+
+    if (messagelayer_emptyresponse_type != -1) {
+        coap_hdr_set_type(pdu.hdr, (uint8_t)messagelayer_emptyresponse_type);
+        coap_hdr_set_code(pdu.hdr, COAP_CODE_EMPTY);
+        /* FIXME make this a coap_hdr_set_token or set_token_length */
+        pdu.hdr->ver_t_tkl &= 0xf0;
+
+        ssize_t bytes = sock_udp_send(sock, _listen_buf,
+                                      sizeof(coap_hdr_t), &remote);
+        if (bytes <= 0) {
+            DEBUG("gcoap: empty response failed: %d\n", (int)bytes);
         }
     }
 }
