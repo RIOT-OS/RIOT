@@ -1,6 +1,6 @@
 include $(RIOTCPU)/stm32/stm32_info.mk
 
-FEATURES_PROVIDED += cpu_$(CPU_FAM)
+FEATURES_PROVIDED += cpu_stm32$(CPU_FAM)
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += puf_sram
@@ -18,7 +18,7 @@ ifneq (,$(filter $(CPU_FAM),l0 l1))
   FEATURES_PROVIDED += periph_eeprom
 endif
 
-ifeq (stm32f1,$(CPU_FAM))
+ifeq (f1,$(CPU_FAM))
   FEATURES_CONFLICT += periph_rtc:periph_rtt
   FEATURES_CONFLICT_MSG += "On the STM32F1, the RTC and RTT map to the same hardware peripheral."
 endif
