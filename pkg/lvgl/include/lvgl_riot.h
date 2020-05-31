@@ -19,7 +19,7 @@
 #ifndef LVGL_RIOT_H
 #define LVGL_RIOT_H
 
-#include "disp_dev.h"
+#include "screen_dev.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,9 +28,9 @@ extern "C" {
 /**
  * @brief   Initialize the lvgl display engine
  *
- * @param[in] dev   Pointer to the generic display device
+ * @param[in] screen_dev   Pointer to the generic screen device
  */
-void lvgl_init(disp_dev_t *dev);
+void lvgl_init(screen_dev_t *screen_dev);
 
 /**
  * @brief   Wakeup lvgl when inactive

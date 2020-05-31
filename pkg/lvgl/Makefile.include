@@ -31,3 +31,6 @@ CFLAGS += -DLVGL_TASK_THREAD_PRIO=$(LVGL_TASK_THREAD_PRIO)
 
 # lvgl module is not a concrete module, so declare it as a pseudomodule
 PSEUDOMODULES += lvgl
+
+# touch capabilities are available via a pseudomodule
+PSEUDOMODULES += lvgl_contrib_touch

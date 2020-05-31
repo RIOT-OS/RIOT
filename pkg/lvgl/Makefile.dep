@@ -12,6 +12,10 @@ ifneq (,$(filter lvgl_contrib,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter lvgl_contrib_touch,$(USEMODULE)))
+  USEMODULE += touch_dev
+endif
+
 # lvgl is not compatible with non 32bit platforms
 # Building lv_misc triggers the error:
 # "left shift count >= width of type [-Werror=shift-count-overflow]"
