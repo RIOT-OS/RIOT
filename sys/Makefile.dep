@@ -330,6 +330,12 @@ ifneq (,$(filter saul_reg,$(USEMODULE)))
   USEMODULE += saul
 endif
 
+ifneq (,$(filter saul_observer,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_saul_observer
+  USEMODULE += saul_reg
+  USEMODULE += saul
+endif
+
 ifneq (,$(filter saul_default,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_saul
   DEFAULT_MODULE += saul_init_devs
