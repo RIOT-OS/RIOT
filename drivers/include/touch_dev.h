@@ -107,6 +107,8 @@ uint16_t touch_dev_width(const touch_dev_t *dev);
  *
  * If @p touches is NULL, this function only returns the number of touches.
  *
+ * Touch position coordinates use the top left corner as origin.
+ *
  * @param[in] dev       Pointer to the touch device
  * @param[out] touches  The array of touches
  * @param[in] len       The touches array len
