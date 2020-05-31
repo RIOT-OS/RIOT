@@ -3,8 +3,8 @@ USEMODULE += lvgl_draw
 USEMODULE += lvgl_font
 USEMODULE += lvgl_hal
 USEMODULE += lvgl_misc
-USEMODULE += lvgl_objx
 USEMODULE += lvgl_themes
+USEMODULE += lvgl_widgets
 
 ifneq (,$(filter lvgl_contrib,$(USEMODULE)))
   USEMODULE += disp_dev
