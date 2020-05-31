@@ -23,6 +23,9 @@
 
 #include "log.h"
 #include "saul_reg.h"
+#if IS_USED(MODULE_SAUL_OBSERVER)
+#include "saul_observer.h"
+#endif
 #include "saul/periph.h"
 #include "gpio_params.h"
 #include "periph/gpio.h"
@@ -56,6 +59,12 @@ extern saul_driver_t gpio_in_saul_driver;
  */
 extern saul_driver_t gpio_out_saul_driver;
 
+#if IS_USED(MODULE_SAUL_OBSERVER)
+static void _gpio_irq(void *arg)
+{
+    saul_observer_queue_check(arg);
+}
+#endif
 
 void auto_init_gpio(void)
 {
@@ -69,12 +78,17 @@ void auto_init_gpio(void)
         if ((p->mode == GPIO_IN) || (p->mode == GPIO_IN_PD) ||
             (p->mode == GPIO_IN_PU)) {
             saul_reg_entries[i].driver = &gpio_in_saul_driver;
+#if IS_USED(MODULE_SAUL_OBSERVER)
+            gpio_init_int(p->pin, p->mode, GPIO_BOTH, _gpio_irq, (void *)&saul_reg_entries[i]);
+#else
+            gpio_init(p->pin, p->mode);
+#endif
         }
         else {
             saul_reg_entries[i].driver = &gpio_out_saul_driver;
+            gpio_init(p->pin, p->mode);
         }
-        /* initialize the GPIO pin */
-        gpio_init(p->pin, p->mode);
+
         /* set initial pin state if configured */
         if (p->flags & (SAUL_GPIO_INIT_CLEAR | SAUL_GPIO_INIT_SET)) {
             phydat_t s;

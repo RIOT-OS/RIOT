@@ -21,6 +21,9 @@
 #include <string.h>
 
 #include "saul.h"
+#if IS_USED(MODULE_SAUL_OBSERVER)
+#include "saul_observer.h"
+#endif
 #include "phydat.h"
 #include "periph/gpio.h"
 #include "saul/periph.h"
@@ -48,14 +51,30 @@ static int write(const void *dev, phydat_t *state)
     return 1;
 }
 
+#if IS_USED(MODULE_SAUL_OBSERVER)
+static int check(void *dev)
+{
+    (void) dev;
+
+    /* just assume the GPIO has changed */
+    return 1;
+}
+#endif
+
 const saul_driver_t gpio_out_saul_driver = {
     .read = read,
     .write = write,
+#if IS_USED(MODULE_SAUL_OBSERVER)
+    .check = check,
+#endif
     .type = SAUL_ACT_SWITCH
 };
 
 const saul_driver_t gpio_in_saul_driver = {
     .read = read,
     .write = saul_notsup,
+#if IS_USED(MODULE_SAUL_OBSERVER)
+    .check = check,
+#endif
     .type = SAUL_SENSE_BTN
 };
