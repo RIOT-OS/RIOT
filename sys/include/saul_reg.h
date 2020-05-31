@@ -38,6 +38,7 @@ extern "C" {
  */
 typedef struct saul_reg {
     struct saul_reg *next;          /**< pointer to the next device */
+    uint8_t id;                     /**< device ID */
     void *dev;                      /**< pointer to the device descriptor */
     const char *name;               /**< string identifier for the device */
     saul_driver_t const *driver;    /**< the devices read callback */

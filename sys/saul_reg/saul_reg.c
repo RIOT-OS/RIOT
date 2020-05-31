@@ -30,6 +30,7 @@
  */
 saul_reg_t *saul_reg = NULL;
 
+static uint8_t next_dev_id = 0;
 
 int saul_reg_add(saul_reg_t *dev)
 {
@@ -41,6 +42,7 @@ int saul_reg_add(saul_reg_t *dev)
 
     /* prepare new entry */
     dev->next = NULL;
+    dev->id = next_dev_id++;
     /* add to registry */
     if (saul_reg == NULL) {
         saul_reg = dev;
