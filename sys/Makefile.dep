@@ -32,4 +32,9 @@ ifneq (,$(filter rtt_cmd,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
 
+ifneq (,$(filter saul_observer,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_saul_observer
+  USEMODULE += core_msg_bus
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep

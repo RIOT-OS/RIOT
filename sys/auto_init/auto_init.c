@@ -200,6 +200,12 @@ void auto_init(void)
         saul_init_devs();
     }
 
+    if (IS_USED(MODULE_AUTO_INIT_SAUL_OBSERVER)) {
+        LOG_DEBUG("Auto init SAUL observer.\n");
+        extern void saul_observer_init(void);
+        saul_observer_init();
+    }
+
     if (IS_USED(MODULE_AUTO_INIT_GNRC_RPL)) {
         LOG_DEBUG("Auto init gnrc_rpl.\n");
         extern void auto_init_gnrc_rpl(void);

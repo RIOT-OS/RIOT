@@ -24,6 +24,9 @@
 #include <string.h>
 
 #include "saul_reg.h"
+#if IS_USED(MODULE_SAUL_OBSERVER)
+#include "saul_observer.h"
+#endif
 
 /**
  * @brief   Keep the head of the device list as global variable
@@ -125,8 +128,19 @@ int saul_reg_read(saul_reg_t *dev, phydat_t *res)
 
 int saul_reg_write(saul_reg_t *dev, phydat_t *data)
 {
+    int rc;
     if (dev == NULL) {
         return -ENODEV;
     }
-    return dev->driver->write(dev->dev, data);
+
+    rc = dev->driver->write(dev->dev, data);
+
+#if IS_USED(MODULE_SAUL_OBSERVER)
+    if (rc > 0) {
+        /* a write to a SAUL device may changed its state! */
+        saul_observer_queue_check(dev);
+    }
+#endif
+
+    return rc;
 }

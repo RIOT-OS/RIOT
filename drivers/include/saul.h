@@ -274,12 +274,29 @@ typedef int(*saul_read_t)(const void *dev, phydat_t *res);
 typedef int(*saul_write_t)(const void *dev, phydat_t *data);
 
 /**
+ * @brief   Called if a device state change is suspected
+ *
+ * If interested parties should be notified about a device change, which may
+ * results into a `saul_read_t()` call, return 1.
+ *
+ * @param[in] dev       device descriptor of the target device
+ * @param[in] data      data to write to the device
+ *
+ * @return  1 if the decive state has changed significantly
+ * @return  0 if nothing has changed
+ */
+typedef int(*saul_check_change_t)(void *dev);
+
+/**
  * @brief   Definition of the RIOT actuator/sensor interface
  */
 typedef struct {
     saul_read_t read;       /**< read function pointer */
     saul_write_t write;     /**< write function pointer */
     uint8_t type;           /**< device class the device belongs to */
+#if IS_USED(MODULE_SAUL_OBSERVER)
+    saul_check_change_t check; /**< check change function pointer */
+#endif
 } saul_driver_t;
 
 /**
