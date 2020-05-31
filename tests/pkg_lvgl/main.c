@@ -99,16 +99,15 @@ void sysmon_create(void)
     lv_win_set_title(win, "System monitor");
 
     /* Make the window content responsive */
-    lv_win_set_layout(win, LV_LAYOUT_PRETTY);
+    lv_win_set_layout(win, LV_LAYOUT_PRETTY_MID);
 
     /* Create a chart with two data lines */
     chart = lv_chart_create(win, NULL);
-    lv_obj_set_size(chart, hres / 2, vres / 2);
+    lv_obj_set_size(chart, hres / 2.5, vres / 2);
     lv_obj_set_pos(chart, LV_DPI / 10, LV_DPI / 10);
     lv_chart_set_point_count(chart, CHART_POINT_NUM);
     lv_chart_set_range(chart, 0, 100);
     lv_chart_set_type(chart, LV_CHART_TYPE_LINE);
-    lv_chart_set_series_width(chart, 4);
     cpu_ser = lv_chart_add_series(chart, LV_COLOR_RED);
     mem_ser = lv_chart_add_series(chart, LV_COLOR_BLUE);
 
@@ -122,7 +121,6 @@ void sysmon_create(void)
     /* Create a label for the details of Memory and CPU usage */
     info_label = lv_label_create(win, NULL);
     lv_label_set_recolor(info_label, true);
-    lv_obj_align(info_label, chart, LV_ALIGN_OUT_RIGHT_TOP, LV_DPI / 4, 0);
 
     /* Refresh the chart and label manually at first */
     sysmon_task(NULL);
