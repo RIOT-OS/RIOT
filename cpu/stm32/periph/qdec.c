@@ -98,7 +98,9 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
     i = 0;
     while ((i < QDEC_CHAN) && (qdec_config[qdec].chan[i].pin != GPIO_UNDEF)) {
         gpio_init(qdec_config[qdec].chan[i].pin, GPIO_IN);
+#ifndef CPU_FAM_STM32F1
         gpio_init_af(qdec_config[qdec].chan[i].pin, qdec_config[qdec].af);
+#endif
         i++;
     }
 
