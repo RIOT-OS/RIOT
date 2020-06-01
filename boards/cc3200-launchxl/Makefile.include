@@ -1,7 +1,3 @@
-# Define the cpu used by the CC3200 board:
-export CPU        = cc3200
-export CPU_MODEL ?= cc3200
-
 # setup serial terminal
 # if multiple MCUs are connected the last number will increment
 PORT_LINUX ?=/dev/ttyUSB0
@@ -11,15 +7,16 @@ PORT_DARWIN ?=$(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # config flasher tool
-ENERGIA_TOOL_LINUX ?= ~/.energia15/packages/energia/tools/1.1.4/cc3200prog
-ENERGIA_TOOL_DARWIN ?= ~/Library/Energia15/packages/energia/tools/1.1.4/cc3200prog
+ENERGIA_TOOL = cc3200prog
+ENERGIA_PATH_LINUX ?= ~/.energia15/packages/energia/tools/1.1.4
+ENERGIA_PATH_DARWIN ?= ~/Library/Energia15/packages/energia/tools/1.1.4
 
 # set energia tool defaults
 OS := $(shell uname -s)
 ifeq ($(OS),Linux)
-  ENERGIA_TOOL ?= $(ENERGIA_TOOL_LINUX)
+  ENERGIA_TOOL ?= $(ENERGIA_TOOL_LINUX)/$(ENERGIA_TOOL)
 else
-  ENERGIA_TOOL ?= $(ENERGIA_TOOL_DARWIN)
+  ENERGIA_TOOL ?= $(ENERGIA_TOOL_DARWIN)/$(ENERGIA_TOOL)
 endif
 
 
@@ -42,17 +39,17 @@ else ifeq ($(PROGRAMMER),cc3200prog)
   endif
 
   FLASHFILE = $(ELFFILE:.elf=.bin)
-  FLASHER = $(RIOTBOARD)/$(BOARD)/dist/flasher.sh
+  FLASHER = $(RIOTBOARD)/cc3200-launchxl/dist/flasher.sh
   FFLAGS  = $(ENERGIA_TOOL) $(PORT) $(FLASHFILE)
 endif
 
 # debugger config
-DEBUGGER = $(RIOTBOARD)/$(BOARD)/dist/debugger.sh
+DEBUGGER = $(RIOTBOARD)/cc3200-launchxl/dist/debugger.sh
 
-DEBUGGER_FLAGS = $(RIOTBOARD)/$(BOARD)/dist/ $(PREFIX) $(ELFFILE)
+DEBUGGER_FLAGS = $(RIOTBOARD)/cc3200-launchxl/dist/ $(PREFIX) $(ELFFILE)
 
 # reset config
-RESET = $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+RESET = $(RIOTBOARD)/cc3200-launchxl/dist/reset.sh
 RESET_FLAGS = $(BINDIR)
 
 # debugger config
