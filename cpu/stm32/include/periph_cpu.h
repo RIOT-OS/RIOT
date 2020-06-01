@@ -84,6 +84,11 @@ extern "C" {
 #define TIMER_CHAN          (4U)
 
 /**
+ * @brief   Define a macro for accessing a timer channel
+ */
+#define TIM_CHAN(tim, chan) *(&dev(tim)->CCR1 + chan)
+
+/**
  * @brief   All STM QDEC timers have 2 capture channels
  */
 #define QDEC_CHAN           (2U)

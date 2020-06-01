@@ -65,7 +65,7 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
     dev(qdec)->SMCR = 0;
     dev(qdec)->CCER = 0;
     for (i = 0; i < QDEC_CHAN; i++) {
-        dev(qdec)->CCR[i] = 0;
+        TIM_CHAN(qdec, i) = 0;
     }
 
     /* Count on A (TI1) signal edges, B (TI2) signal edges or both,
@@ -91,7 +91,7 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
 
     /* Reset configuration and CC channels */
     for (i = 0; i < QDEC_CHAN; i++) {
-        dev(qdec)->CCR[i] = 0;
+        TIM_CHAN(qdec, i) = 0;
     }
 
     /* Configure the used pins */
