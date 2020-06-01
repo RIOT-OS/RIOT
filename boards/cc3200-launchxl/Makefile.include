@@ -58,6 +58,3 @@ export OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
 
 # include common SPI functions
 USEMODULE += periph_common
-
-# include cortex defaults
-include $(RIOTCPU)/cortexm_common/Makefile.include
