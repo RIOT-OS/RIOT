@@ -173,7 +173,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     timer(dev)->prescale_a = prescaler;
     timer(dev)->interval_load_a = LOAD_VALUE;
 
-    /* register & setup intrrupt handling */
+    /* register & setup interrupt handling */
     ROM_TimerIntRegister((uint32_t)timer(dev), TIMER_A, timerHandler);
     isr_ctx[dev].cb = cb;
     isr_ctx[dev].arg = arg;

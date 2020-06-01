@@ -79,7 +79,7 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Application Reset-Clock Manager regsiter
+ * @brief Application Reset-Clock Manager register
  * @{
  */
 typedef struct cc3200_arcm_reg_t {

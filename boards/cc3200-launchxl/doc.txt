@@ -6,7 +6,7 @@
 
 Overview
 
-The [CC3200-launchxl](https://www.ti.com/tool/cc3200-launchxl) is Texas Instruments development kit for the CC3200 wireless microcontroller. This MCU combines an ARM Cortex-M4 microcontroller with the Texas Instrument CC3100 wireless module. The CC3100 inludes an embeded 802.11b/g/n  and IPv4 stack.
+The [CC3200-launchxl](https://www.ti.com/tool/cc3200-launchxl) is Texas Instruments development kit for the CC3200 wireless micro controller. This MCU combines an ARM Cortex-M4 micro controller with the Texas Instrument CC3100 wireless module. The CC3100 includes an embedded 802.11b/g/n  and IPv4 stack.
 
 Use `BOARD=cc3200-launchxl` for building RIOT for this platform.
 
@@ -81,7 +81,7 @@ Unfortunately CC3200 can only be flashed via propriatery TI software. There are 
 - Uniflash < 4.0.0 (requires a myTI account)
 - Energias `cc3200prog` binary hidden in a toolchain tarball
 
-*For completenes sake there is an OpenSource Python tool aiming to replicate Uniflash functionality. Unfortunately I was unable to get the tool to work on MacOS or Arch Linux.* (cc3200tool on GitHub)[https://github.com/ALLTERCO/cc3200tool]
+*For completeness sake there is an OpenSource Python tool aiming to replicate Uniflash functionality. Unfortunately I was unable to get the tool to work on MacOS or Arch Linux.* (cc3200tool on GitHub)[https://github.com/ALLTERCO/cc3200tool]
 
 To allow flashing on both macOS and Linux as well as skipping the TI registestration process the `cc3200prog ` tool is used. Below you will find direct links to the cc3200prog tool for each platform (same URLs as used by Energia Board Manager).
 
