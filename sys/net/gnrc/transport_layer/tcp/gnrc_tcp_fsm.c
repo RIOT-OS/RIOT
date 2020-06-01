@@ -222,7 +222,7 @@ static int _fsm_call_open(gnrc_tcp_tcb_t *tcb)
     int ret = 0;
 
     DEBUG("gnrc_tcp_fsm.c : _fsm_call_open()\n");
-    tcb->rcv_wnd = GNRC_TCP_DEFAULT_WINDOW;
+    tcb->rcv_wnd = CONFIG_GNRC_TCP_DEFAULT_WINDOW;
 
     if (tcb->status & STATUS_PASSIVE) {
         /* Passive open, T: CLOSED -> LISTEN */

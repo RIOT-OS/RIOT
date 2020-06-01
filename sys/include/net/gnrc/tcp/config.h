@@ -86,8 +86,8 @@ extern "C" {
 /**
  * @brief Default receive window size
  */
-#ifndef GNRC_TCP_DEFAULT_WINDOW
-#define GNRC_TCP_DEFAULT_WINDOW (CONFIG_GNRC_TCP_MSS * CONFIG_GNRC_TCP_MSS_MULTIPLICATOR)
+#ifndef CONFIG_GNRC_TCP_DEFAULT_WINDOW
+#define CONFIG_GNRC_TCP_DEFAULT_WINDOW (CONFIG_GNRC_TCP_MSS * CONFIG_GNRC_TCP_MSS_MULTIPLICATOR)
 #endif
 
 /**
@@ -104,7 +104,7 @@ extern "C" {
  * @brief Default receive buffer size
  */
 #ifndef GNRC_TCP_RCV_BUF_SIZE
-#define GNRC_TCP_RCV_BUF_SIZE (GNRC_TCP_DEFAULT_WINDOW)
+#define GNRC_TCP_RCV_BUF_SIZE (CONFIG_GNRC_TCP_DEFAULT_WINDOW)
 #endif
 
 /**
