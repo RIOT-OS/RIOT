@@ -112,9 +112,10 @@
  * for details on its constraints.
  *
  * The callback will be executed CONFIG_WDT_WARNING_PERIOD before the actual reboot.
- * The value of CONFIG_WDT_WARNING_PERIOD may be configurable or a fixed value. But is
- * in any case defined at compile time. Specific platform implementation should
- * assert improper values.
+ * The value of CONFIG_WDT_WARNING_PERIOD may be configurable or a fixed value. If
+ * a platform allows this value to be configured, the feature
+ * `periph_wdt_warning_period` is provided. But is in any case defined at
+ * compile time. Specific platform implementation should assert improper values.
  *
  *
  * In the code snippet and diagram `time` is an arbitrary value such that
