@@ -167,17 +167,17 @@ void spi_init(spi_t bus)
     /* on the CC3200 platform this is used by the CC3200-launchxl board */
     /* since the NWP SPI pins are configured from the NWP and not the CC3200
      * itself */
-    if (spi_config[bus].config.pins.miso != 0 &&
-        spi_config[bus].config.pins.mosi != 0) {
+    if (spi_config[bus].pins.miso != 0 &&
+        spi_config[bus].pins.mosi != 0) {
         /* trigger pin initialization */
         spi_init_pins(bus);
     }
 
     /* enable/configure SPI clock */
-    if (spi(bus) == GSPI_BASE) {
+    if (spi(bus) == (cc3200_spi_t *)GSPI_BASE) {
         ARCM->MCSPI_A1.clk_gating |= PRCM_RUN_MODE_CLK;
     }
-    else if (spi(bus) == LSPI_BASE) {
+    else if (spi(bus) == (cc3200_spi_t *)LSPI_BASE) {
         ARCM->MCSPI_A2.clk_gating |= PRCM_RUN_MODE_CLK | PRCM_SLP_MODE_CLK;
     }
 
