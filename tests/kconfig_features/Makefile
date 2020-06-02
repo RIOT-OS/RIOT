@@ -50,6 +50,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    esp8266-olimex-mod \
                    esp8266-sparkfun-thing \
                    f4vi1 \
+                   feather-m0 \
                    feather-nrf52840 \
                    firefly \
                    fox \
