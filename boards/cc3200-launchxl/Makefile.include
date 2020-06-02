@@ -14,11 +14,10 @@ ENERGIA_PATH_DARWIN ?= ~/Library/Energia15/packages/energia/tools/1.1.4
 # set energia tool defaults
 OS := $(shell uname -s)
 ifeq ($(OS),Linux)
-  ENERGIA_TOOL ?= $(ENERGIA_TOOL_LINUX)/$(ENERGIA_TOOL)
+  ENERGIA_TOOL_PATH ?= $(ENERGIA_PATH_LINUX)/$(ENERGIA_TOOL)
 else
-  ENERGIA_TOOL ?= $(ENERGIA_TOOL_DARWIN)/$(ENERGIA_TOOL)
+  ENERGIA_TOOL_PATH ?= $(ENERGIA_PATH_DARWIN)/$(ENERGIA_TOOL)
 endif
-
 
 PROGRAMMER ?= cc3200prog
 
@@ -40,7 +39,7 @@ else ifeq ($(PROGRAMMER),cc3200prog)
 
   FLASHFILE = $(ELFFILE:.elf=.bin)
   FLASHER = $(RIOTBOARD)/cc3200-launchxl/dist/flasher.sh
-  FFLAGS  = $(ENERGIA_TOOL) $(PORT) $(FLASHFILE)
+  FFLAGS  = $(ENERGIA_TOOL_PATH) $(PORT) $(FLASHFILE)
 endif
 
 # debugger config
