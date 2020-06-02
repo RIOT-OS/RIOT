@@ -408,17 +408,17 @@ typedef unsigned dma_t;
  * @brief   DMA modes
  */
 typedef enum {
-    DMA_PERIPH_TO_MEM,     /**< Peripheral to memory */
-    DMA_MEM_TO_PERIPH,     /**< Memory to peripheral */
-    DMA_MEM_TO_MEM,        /**< Memory to memory */
+    DMA_PERIPH_TO_MEM = 0,     /**< Peripheral to memory */
+    DMA_MEM_TO_PERIPH = 1,     /**< Memory to peripheral */
+    DMA_MEM_TO_MEM = 2,        /**< Memory to memory */
 } dma_mode_t;
 
 /**
  * @name    DMA Increment modes
  * @{
  */
-#define DMA_INC_SRC_ADDR  (0x01)
-#define DMA_INC_DST_ADDR  (0x02)
+#define DMA_INC_SRC_ADDR  (0x04)
+#define DMA_INC_DST_ADDR  (0x08)
 #define DMA_INC_BOTH_ADDR (DMA_INC_SRC_ADDR | DMA_INC_DST_ADDR)
 /** @} */
 
@@ -427,10 +427,10 @@ typedef enum {
  * @{
  */
 #define DMA_DATA_WIDTH_BYTE      (0x00)
-#define DMA_DATA_WIDTH_HALF_WORD (0x04)
-#define DMA_DATA_WIDTH_WORD      (0x08)
-#define DMA_DATA_WIDTH_MASK      (0x0C)
-#define DMA_DATA_WIDTH_SHIFT     (2)
+#define DMA_DATA_WIDTH_HALF_WORD (0x01)
+#define DMA_DATA_WIDTH_WORD      (0x02)
+#define DMA_DATA_WIDTH_MASK      (0x03)
+#define DMA_DATA_WIDTH_SHIFT     (0)
 /** @} */
 
 /**
@@ -917,6 +917,33 @@ void dma_wait(dma_t dma);
  */
 int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *dst, size_t len,
                   dma_mode_t mode, uint8_t flags);
+
+/**
+ * @brief   Low level initial DMA stream configuration
+ *
+ * This function is supposed to be used together with @ref dma_prepare. This
+ * function sets up the one-time configuration of a stream and @ref dma_prepare
+ * configures the per-transfer registers.
+ *
+ * @param[in]   dma         Logical DMA stream
+ * @param[in]   chan        DMA channel (on stm32f2/4/7, CxS or unused on others)
+ * @param[in]   periph_addr Peripheral register address
+ * @param[in]   mode        DMA direction mode
+ * @param[in]   width       DMA transfer width
+ * @param[in]   inc_periph  Increment peripheral address after read/write
+ */
+void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
+               uint8_t width, bool inc_periph);
+
+/**
+ * @brief   Low level DMA transfer configuration
+ *
+ * @param[in]   dma         Logical DMA stream
+ * @param[in]   mem         Memory address
+ * @param[in]   len         Transfer length
+ * @param[in]   inc_mem     Increment the memory address after read/write
+ */
+void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
 
 #endif /* MODULE_PERIPH_DMA */
 
