@@ -38,7 +38,7 @@ static const spi_conf_t spi_config[] = {
         .miso = GPIO_PIN(1, 14),
     },
     {
-        .dev  = NRF_SPIM1,
+        .dev  = NRF_SPIM2,
         .sclk = GPIO_PIN(0, 19),
         .mosi = GPIO_PIN(0, 20),
         .miso = GPIO_PIN(0, 21),
