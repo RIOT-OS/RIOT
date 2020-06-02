@@ -74,13 +74,20 @@ extern "C" {
  */
 typedef struct cc3200_uart_t {
     cc3200_reg_t dr;        /**< UART Data Register */
+
+    /**
+     * @brief Status register
+     */
     union {
-        cc3200_reg_t rsr;   /**< UART receive status and error clear */
+        cc3200_reg_t rsr;   /**< UART a receiver shift register (RSR) */
         cc3200_reg_t ecr;   /**< UART receive status and error clear */
     } cc3200_uart_dr;
 
     cc3200_reg_t RESERVED1[4];
 
+    /**
+     * @brief Flag register
+     */
     union {
         cc3200_reg_t raw;                   /**< RAW flag register */
         struct {
@@ -238,5 +245,6 @@ typedef struct cc3200_uart_t {
 } /* end extern "C" */
 #endif
 
-#endif /* CC3200_UART_H */
-       /** @} */
+#endif
+/* CC3200_UART_H */
+/** @} */
