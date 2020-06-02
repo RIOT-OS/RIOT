@@ -1,4 +1,5 @@
 CPU = cc3200
+CPU_MODEL = cc3200
 
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_spi
