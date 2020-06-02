@@ -154,6 +154,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    samr30-xpro \
                    samr34-xpro \
                    seeeduino_arch-pro \
+                   sensebox_samd21 \
                    slstk3401a \
                    slstk3402a \
                    sltb001a \
