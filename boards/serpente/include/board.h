@@ -83,6 +83,14 @@ extern mtd_dev_t *mtd0;
 /** @} */
 
 /**
+ * @name USB configuration
+ * @{
+ */
+#define INTERNAL_PERIPHERAL_VID         (0x239A)
+#define INTERNAL_PERIPHERAL_PID         (0x0057)
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
