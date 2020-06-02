@@ -21,7 +21,7 @@
 /**
  * The CC3200 bootloader does not support executing user binaries directly from flash. Instead
  * the entire executable is copied to ram for execution by the bootloader from mcuimg.bin file stored on the MCUs filesystem.
- */ 
+ */
 MEMORY
 {
     rom (rx)    : ORIGIN = 0x20004000, LENGTH = 64K
