@@ -22,6 +22,17 @@
 #include "vendor/hw_gpio.h"
 
 /**
+ * @brief Initialize on-board LEDs
+ */
+void led_init(void)
+{
+    /* enable GPIO block b timer */
+    ARCM->GPIO_B.clk_gating |= PRCM_RUN_MODE_CLK;
+
+    /* enable leads and clear them */
+    gpio_init(LED_RED, GPIO_OUT);
+    gpio_clear(LED_RED);
+
     gpio_init(LED_ORANGE, GPIO_OUT);
     gpio_clear(LED_ORANGE);
 
