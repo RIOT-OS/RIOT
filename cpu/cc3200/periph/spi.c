@@ -149,7 +149,7 @@ void _spi_config(spi_t bus, spi_mode_t mode, spi_clk_t clk)
                    MCSPI_CH0CONF_PHA | MCSPI_CH0CONF_TURBO)) |
           MCSPI_CH0CONF_CLKG;
 
-    /* The least significant four bits of the divider is used fo configure */
+    /* The least significant four bits of the divider is used for configure */
     /* CLKD in MCSPI_CHCONF next eight least significant bits are used to */
     /* configure the EXTCLK in MCSPI_CHCTRL */
     tmp |= ((divider & 0x0000000F) << 2);
