@@ -163,6 +163,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    slwstk6000b-slwrb4162a \
                    slwstk6220a \
                    sodaq-autonomo \
+                   sodaq-explorer \
                    spark-core \
                    stk3600 \
                    stk3700 \
