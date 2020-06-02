@@ -245,6 +245,5 @@ typedef struct cc3200_uart_t {
 } /* end extern "C" */
 #endif
 
-#endif
-/* CC3200_UART_H */
+#endif /* CC3200_UART_H */
 /** @} */
