@@ -903,16 +903,18 @@ static int _set_state(rail_t *dev, netopt_state_t state)
     (void) dev;
     switch (state) {
         case NETOPT_STATE_STANDBY:
-
+            RAIL_Idle(dev->rhandle, RAIL_IDLE_ABORT, true);
+            return sizeof(netopt_state_t);
             break;
         case NETOPT_STATE_SLEEP:
-
+            RAIL_Idle(dev->rhandle, RAIL_IDLE_ABORT, true);
+            return sizeof(netopt_state_t);
             break;
         case NETOPT_STATE_IDLE:
-
+            RAIL_StartRx(dev->rhandle, dev->netdev.chan, NULL);
+            return sizeof(netopt_state_t);
             break;
         case NETOPT_STATE_TX:
-
             break;
         case NETOPT_STATE_RESET:
             break;
@@ -920,5 +922,4 @@ static int _set_state(rail_t *dev, netopt_state_t state)
             return -ENOTSUP;
     }
     return -ENOTSUP;
-    /*return sizeof(netopt_state_t);*/
 }
