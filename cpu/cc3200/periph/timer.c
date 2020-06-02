@@ -112,19 +112,19 @@ void isr_timer3(void)
 static inline void *get_irq_handler(tim_t dev)
 {
     switch (dev) {
-#ifdef TIMER_0_EN
+#if TIMER_0_EN
         case 0:
             return isr_timer0;
 #endif
-#ifdef TIMER_1_EN
+#if TIMER_1_EN
         case 1:
             return isr_timer1;
 #endif
-#ifdef TIMER_2_EN
+#if TIMER_2_EN
         case 2:
             return isr_timer2;
 #endif
-#ifdef TIMER_3_EN
+#if TIMER_3_EN
         case 3:
             return isr_timer3;
 #endif
@@ -132,6 +132,7 @@ static inline void *get_irq_handler(tim_t dev)
             /* requested irq handler for invalid timer */
             DEBUG("REQUESTED IRQ FOR INVALID TIMER");
             assert(0);
+            return NULL;
     }
 }
 
