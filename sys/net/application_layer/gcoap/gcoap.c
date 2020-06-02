@@ -170,11 +170,9 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
                 /* ping request */
                 if (coap_get_type(&pdu) == COAP_TYPE_CON) {
                     messagelayer_emptyresponse_type = COAP_TYPE_RST;
-                } else if (coap_get_type(&pdu) == COAP_TYPE_NON) {
-                    DEBUG("gcoap: empty NON msg\n");
-                }
-                else {
-                    goto empty_as_response;
+                    DEBUG("gcoap: Answering empty CON request with RST\n");
+                } else {
+                    DEBUG("gcoap: Ignoring empty non-CON request\n");
                 }
             }
             /* normal request */
@@ -194,10 +192,6 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
                 DEBUG("gcoap: illegal request type: %u\n", coap_get_type(&pdu));
             }
             break;
-
-empty_as_response:
-            DEBUG("gcoap: empty ack/reset not handled yet\n");
-            return;
 
         /* incoming response */
         case COAP_CLASS_SUCCESS:
