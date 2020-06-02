@@ -1,9 +1,6 @@
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
-CONFIG_USB_VID=0x239A
-CONFIG_USB_PID=0x0057
-
 CFLAGS += -DBOOTLOADER_UF2
 
 # setup serial terminal
