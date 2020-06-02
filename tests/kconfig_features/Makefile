@@ -8,6 +8,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    arduino-duemilanove \
                    arduino-leonardo \
                    arduino-mega2560 \
+                   arduino-mkr1000 \
                    arduino-nano \
                    arduino-nano-33-ble \
                    arduino-uno \
