@@ -15,6 +15,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    arduino-nano \
                    arduino-nano-33-ble \
                    arduino-uno \
+                   arduino-zero \
                    atmega1284p \
                    atmega256rfr2-xpro \
                    atmega328p \
