@@ -56,6 +56,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    fox \
                    frdm-k22f \
                    frdm-k64f \
+                   hamilton \
                    hifive1 \
                    hifive1b \
                    ikea-tradfri \
