@@ -10,6 +10,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    arduino-mega2560 \
                    arduino-mkr1000 \
                    arduino-mkrfox1200 \
+                   arduino-mkrwan1300 \
                    arduino-nano \
                    arduino-nano-33-ble \
                    arduino-uno \
