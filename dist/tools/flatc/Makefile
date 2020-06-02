@@ -17,6 +17,10 @@ CMAKE_OPTIONS = \
     -DFLATBUFFERS_BUILD_FLATLIB=OFF  \
     #
 
+ifneq (, $(CCACHE))
+    CMAKE_OPTIONS += -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+endif
+
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
