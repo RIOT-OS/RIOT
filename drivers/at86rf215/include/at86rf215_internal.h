@@ -514,15 +514,6 @@ void at86rf215_disable_rpc(at86rf215_t *dev);
 void at86rf215_enable_rpc(at86rf215_t *dev);
 
 /**
- * @brief Notify the driver and stack about a change in transmission mode
- *        which may result in a change of PDU.
- *
- * @param[in] dev           device that changed it's mode
- * @param[in] new_mode      the new transmission mode
- */
-bool at86rf215_switch_mode(at86rf215_t *dev, uint8_t new_mode);
-
-/**
  * @brief Checks whether the device operates in the sub-GHz band.
  *
  * @param[in] dev   device to read from
