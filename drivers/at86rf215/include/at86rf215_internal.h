@@ -14,7 +14,6 @@
  * @brief       Low-Level functions for the AT86RF215 driver
  *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
- * @}
  */
 
 #ifndef AT86RF215_INTERNAL_H
@@ -188,10 +187,9 @@ int at86rf215_OFDM_set_option(at86rf215_t *dev, uint8_t option);
  */
 uint8_t at86rf215_OFDM_get_option(at86rf215_t *dev);
 
-/** @} */
-
 /**
- * @defgroup drivers_at86rf215_oqpsk    AT86RF215 MR-O-QPSK PHY
+ * @ingroup     drivers_at86rf215
+ * @defgroup    drivers_at86rf215_oqpsk     AT86RF215 MR-O-QPSK PHY
  * @{
  */
 
