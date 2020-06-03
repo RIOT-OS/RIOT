@@ -219,15 +219,22 @@ _docker_volume_mapping = $(if $1,$(if $(call dir_is_outside_riotbase,$1),$(call 
 docker_environ_mapping = $(addprefix -e ,$(call docker_cmdline_mapping,$1,$2,$3))
 docker_cmdline_mapping = $(if $($1),'$1=$(call path_in_docker,$($1),$2,$3)')
 
+# Name of the docker volue contianing RIOT.
+# By default `RIOTBASE`.
+DOCKER_VOLUME_NAME ?= $(RIOTBASE)
 
-# Application directory relative to either riotbase or riotproject
-DOCKER_RIOTPROJECT = $(call path_in_docker,$(RIOTPROJECT),,riotproject)
+# Path where the file or directory are mounted in the container.
+# By default `DOCKER_RIOTBASE`.
+DOCKER_VOLUME_MOUNT_PATH ?= $(DOCKER_RIOTBASE)
+
+# Path to the RIOTPROJECT in docker.
+# By default `RIOTPROJECT`.
+DOCKER_RIOTPROJECT ?= $(call path_in_docker,$(RIOTPROJECT),,riotproject)
 DOCKER_APPDIR = $(DOCKER_RIOTPROJECT)/$(BUILDRELPATH)
-
 
 # Directory mapping in docker and directories environment variable configuration
 DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(ETC_LOCALTIME),/etc/localtime,ro)
-DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(RIOTBASE),$(DOCKER_RIOTBASE))
+DOCKER_VOLUMES_AND_ENV += $(call docker_volume,$(DOCKER_VOLUME_NAME),$(DOCKER_VOLUME_MOUNT_PATH))
 DOCKER_VOLUMES_AND_ENV += -e 'RIOTBASE=$(DOCKER_RIOTBASE)'
 DOCKER_VOLUMES_AND_ENV += -e 'CCACHE_BASEDIR=$(DOCKER_RIOTBASE)'
 
