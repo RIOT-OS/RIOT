@@ -20,6 +20,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     calliope-mini \
     cc2650-launchpad \
     cc2650stk \
+    cc3200-launchxl \
     chronos \
     derfmega128 \
     derfmega256 \

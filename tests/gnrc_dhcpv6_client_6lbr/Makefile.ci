@@ -8,13 +8,14 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega1284p \
     atmega328p \
     b-l072z-lrwan1 \
-    blackpill-128kib \
     blackpill \
-    bluepill-128kib \
+    blackpill-128kib \
     bluepill \
+    bluepill-128kib \
     calliope-mini \
     cc2650-launchpad \
     cc2650stk \
+    cc3200-launchxl \
     derfmega128 \
     hifive1 \
     hifive1b \

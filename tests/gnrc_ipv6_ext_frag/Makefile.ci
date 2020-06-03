@@ -8,6 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p \
     blackpill \
     bluepill \
+    cc3200-launchxl \
     derfmega128 \
     hifive1 \
     hifive1b \
