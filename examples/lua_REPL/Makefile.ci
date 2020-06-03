@@ -14,6 +14,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     cc2538dk \
     cc2650-launchpad \
     cc2650stk \
+    cc3200-launchxl \
     ek-lm4f120xl \
     esp8266-esp-12x \
     esp8266-olimex-mod \

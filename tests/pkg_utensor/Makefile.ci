@@ -6,6 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     calliope-mini \
     cc2650-launchpad \
     cc2650stk \
+    cc3200-launchxl \
     i-nucleo-lrwan1 \
     im880b \
     lobaro-lorabox \

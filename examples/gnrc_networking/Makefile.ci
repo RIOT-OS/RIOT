@@ -9,6 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     blackpill \
     bluepill \
     calliope-mini \
+    cc3200-launchxl \
     chronos \
     derfmega128 \
     hifive1 \

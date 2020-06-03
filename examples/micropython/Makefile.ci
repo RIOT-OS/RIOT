@@ -2,6 +2,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     blackpill \
     bluepill \
     calliope-mini \
+    cc3200-launchxl \
     i-nucleo-lrwan1 \
     microbit \
     nrf51dongle \
