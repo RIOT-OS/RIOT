@@ -66,9 +66,9 @@ void at86rf215_reset_and_cfg(at86rf215_t *dev)
     luid_get_eui64((eui64_t *)&dev->netdev.long_addr);
 
     if (is_subGHz(dev)) {
-        dev->netdev.chan = AT86RF215_DEFAULT_SUBGHZ_CHANNEL;
+        dev->netdev.chan = CONFIG_AT86RF215_DEFAULT_SUBGHZ_CHANNEL;
     } else {
-        dev->netdev.chan = AT86RF215_DEFAULT_CHANNEL;
+        dev->netdev.chan = CONFIG_AT86RF215_DEFAULT_CHANNEL;
     }
 
     dev->netdev.pan = CONFIG_IEEE802154_DEFAULT_PANID;
@@ -144,14 +144,14 @@ if (!IS_ACTIVE(CONFIG_AT86RF215_USE_CLOCK_OUTPUT)){
 
     at86rf215_reg_write(dev, dev->BBC->RG_AMCS, reg);
 
-    if (AT86RF215_DEFAULT_PHY_MODE == IEEE802154_PHY_OQPSK) {
+    if (CONFIG_AT86RF215_DEFAULT_PHY_MODE == IEEE802154_PHY_OQPSK) {
         at86rf215_configure_legacy_OQPSK(dev, 0);
     }
-    if (AT86RF215_DEFAULT_PHY_MODE == IEEE802154_PHY_MR_OQPSK) {
-        at86rf215_configure_OQPSK(dev, AT86RF215_DEFAULT_MR_OQPSK_CHIPS,
-                                       AT86RF215_DEFAULT_MR_OQPSK_RATE);
+    if (CONFIG_AT86RF215_DEFAULT_PHY_MODE == IEEE802154_PHY_MR_OQPSK) {
+        at86rf215_configure_OQPSK(dev, CONFIG_AT86RF215_DEFAULT_MR_OQPSK_CHIPS,
+                                       CONFIG_AT86RF215_DEFAULT_MR_OQPSK_RATE);
     }
-    if (AT86RF215_DEFAULT_PHY_MODE == IEEE802154_PHY_MR_OFDM) {
+    if (CONFIG_AT86RF215_DEFAULT_PHY_MODE == IEEE802154_PHY_MR_OFDM) {
         at86rf215_configure_OFDM(dev, CONFIG_AT86RF215_DEFAULT_MR_OFDM_OPT,
                                       CONFIG_AT86RF215_DEFAULT_MR_OFDM_MCS);
     }
@@ -169,7 +169,7 @@ if (!IS_ACTIVE(CONFIG_AT86RF215_USE_CLOCK_OUTPUT)){
     at86rf215_set_pan(dev, 0, dev->netdev.pan);
 
     /* set default TX power */
-    at86rf215_set_txpower(dev, AT86RF215_DEFAULT_TXPOWER);
+    at86rf215_set_txpower(dev, CONFIG_AT86RF215_DEFAULT_TXPOWER);
 
     /* start listening for incoming packets */
     at86rf215_rf_cmd(dev, CMD_RF_RX);
