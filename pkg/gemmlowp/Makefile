@@ -6,4 +6,4 @@ PKG_LICENSE=Apache2.0
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.$(PKG_NAME)
+	@:
