@@ -375,6 +375,23 @@ menuconfig, the file will not be re-built anymore, and any changes by manually
 editing the source files will have no effect. To go back to manual edition
 a `make clean` has to be issued in the application directory.
 
+## Appendix D: A few key aspects while exposing a macro to Kconfig {#kconfig-appendix-d}
+A macro that holds a 0 or 1 is modelled in Kconfig as a `bool` symbol. References to this macro
+can then make use of IS_ACTIVE macro from kernel_defines.h with C conditionals
+for conditional compilation.
+[FXOS8700 driver exposure to Kconfig](https://github.com/RIOT-OS/RIOT/pull/13914)
+can be considered as an example. If the macro is defined as `TRUE` by default,
+a new symbol gets introduced to invert the semantics. The recommended
+practice is to add a new symbol and expose it to Kconfig while the old one is
+tagged to be deprecated. The process is documented in this
+[commit](https://github.com/RIOT-OS/RIOT/pull/13129/commits/c7b6dc587cf20f3177abe0417a408b6ab90d0ff8)
+
+There may be cases where a macro is expected to hold only specific values, e.g.
+'GNRC_IPV6_MSG_QUEUE_SIZE' expressed as the power of two. These may be modelled
+in such a way that a new macro is introduced to hold the restricted figures
+while operators are added to arrive at the desired value. The process is
+documented in this [pull request.](https://github.com/RIOT-OS/RIOT/pull/14086)
+
 # Useful references                                {#kconfig-useful-references}
 - [Kconfig language specification](https://www.kernel.org/doc/html/latest/kbuild/kconfig-language.html)
 - [Kconfig macro language specification](https://www.kernel.org/doc/html/latest/kbuild/kconfig-macro-language.html)
