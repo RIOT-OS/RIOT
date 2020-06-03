@@ -103,7 +103,7 @@ static int _restart_timewait_timer(gnrc_tcp_tcb_t *tcb)
     xtimer_remove(&tcb->tim_tout);
     tcb->msg_tout.type = MSG_TYPE_TIMEWAIT;
     tcb->msg_tout.content.ptr = (void *)tcb;
-    xtimer_set_msg(&tcb->tim_tout, 2 * GNRC_TCP_MSL, &tcb->msg_tout, gnrc_tcp_pid);
+    xtimer_set_msg(&tcb->tim_tout, 2 * CONFIG_GNRC_TCP_MSL, &tcb->msg_tout, gnrc_tcp_pid);
     return 0;
 }
 
@@ -222,7 +222,7 @@ static int _fsm_call_open(gnrc_tcp_tcb_t *tcb)
     int ret = 0;
 
     DEBUG("gnrc_tcp_fsm.c : _fsm_call_open()\n");
-    tcb->rcv_wnd = GNRC_TCP_DEFAULT_WINDOW;
+    tcb->rcv_wnd = CONFIG_GNRC_TCP_DEFAULT_WINDOW;
 
     if (tcb->status & STATUS_PASSIVE) {
         /* Passive open, T: CLOSED -> LISTEN */
@@ -272,7 +272,7 @@ static int _fsm_call_send(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
     /* Check if window is open and all packets were transmitted */
     if (payload > 0 && tcb->snd_wnd > 0 && tcb->pkt_retransmit == NULL) {
         /* Calculate segment size */
-        payload = (payload < GNRC_TCP_MSS) ? payload : GNRC_TCP_MSS;
+        payload = (payload < CONFIG_GNRC_TCP_MSS) ? payload : CONFIG_GNRC_TCP_MSS;
         payload = (payload < tcb->mss) ? payload : tcb->mss;
         payload = (payload < len) ? payload : len;
 
@@ -307,8 +307,8 @@ static int _fsm_call_recv(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
     /* Read data into 'buf' up to 'len' bytes from receive buffer */
     size_t rcvd = ringbuffer_get(&(tcb->rcv_buf), buf, len);
 
-    /* If receive buffer can store more than GNRC_TCP_MSS: open window to available buffer size */
-    if (ringbuffer_get_free(&tcb->rcv_buf) >= GNRC_TCP_MSS) {
+    /* If receive buffer can store more than CONFIG_GNRC_TCP_MSS: open window to available buffer size */
+    if (ringbuffer_get_free(&tcb->rcv_buf) >= CONFIG_GNRC_TCP_MSS) {
         tcb->rcv_wnd = ringbuffer_get_free(&(tcb->rcv_buf));
 
         /* Send ACK to anounce window update */

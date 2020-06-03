@@ -201,7 +201,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
 
             /* If SYN flag is set: Add MSS option */
             if (ctl & MSK_SYN) {
-                network_uint32_t mss_option = byteorder_htonl(_option_build_mss(GNRC_TCP_MSS));
+                network_uint32_t mss_option = byteorder_htonl(_option_build_mss(CONFIG_GNRC_TCP_MSS));
                 memcpy(opt_ptr, &mss_option, sizeof(mss_option));
             }
             /* Increase opt_ptr and decrease opt_left, if other options are added */
@@ -385,10 +385,10 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
     if (!retransmit) {
         /* If this is the first transmission: rto is 1 sec (Lower Bound) */
         if (tcb->srtt == RTO_UNINITIALIZED || tcb->rtt_var == RTO_UNINITIALIZED) {
-            tcb->rto = GNRC_TCP_RTO_LOWER_BOUND;
+            tcb->rto = CONFIG_GNRC_TCP_RTO_LOWER_BOUND;
         }
         else {
-            tcb->rto = tcb->srtt + _max(GNRC_TCP_RTO_GRANULARITY,  GNRC_TCP_RTO_K * tcb->rtt_var);
+            tcb->rto = tcb->srtt + _max(CONFIG_GNRC_TCP_RTO_GRANULARITY, CONFIG_GNRC_TCP_RTO_K * tcb->rtt_var);
         }
     }
     else {
@@ -404,11 +404,11 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
     }
 
     /* Perform boundary checks on current RTO before usage */
-    if (tcb->rto < (int32_t) GNRC_TCP_RTO_LOWER_BOUND) {
-        tcb->rto = GNRC_TCP_RTO_LOWER_BOUND;
+    if (tcb->rto < (int32_t) CONFIG_GNRC_TCP_RTO_LOWER_BOUND) {
+        tcb->rto = CONFIG_GNRC_TCP_RTO_LOWER_BOUND;
     }
-    else if (tcb->rto > (int32_t) GNRC_TCP_RTO_UPPER_BOUND) {
-        tcb->rto = GNRC_TCP_RTO_UPPER_BOUND;
+    else if (tcb->rto > (int32_t) CONFIG_GNRC_TCP_RTO_UPPER_BOUND) {
+        tcb->rto = CONFIG_GNRC_TCP_RTO_UPPER_BOUND;
     }
 
     /* Setup retransmission timer, msg to TCP thread with ptr to TCB */
@@ -454,10 +454,10 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
             }
             /* If this is a subsequent sample */
             else {
-                tcb->rtt_var = (tcb->rtt_var / GNRC_TCP_RTO_B_DIV) * (GNRC_TCP_RTO_B_DIV-1);
-                tcb->rtt_var += abs(tcb->srtt - rtt) / GNRC_TCP_RTO_B_DIV;
-                tcb->srtt = (tcb->srtt / GNRC_TCP_RTO_A_DIV) * (GNRC_TCP_RTO_A_DIV-1);
-                tcb->srtt += rtt / GNRC_TCP_RTO_A_DIV;
+                tcb->rtt_var = (tcb->rtt_var / CONFIG_GNRC_TCP_RTO_B_DIV) * (CONFIG_GNRC_TCP_RTO_B_DIV-1);
+                tcb->rtt_var += abs(tcb->srtt - rtt) / CONFIG_GNRC_TCP_RTO_B_DIV;
+                tcb->srtt = (tcb->srtt / CONFIG_GNRC_TCP_RTO_A_DIV) * (CONFIG_GNRC_TCP_RTO_A_DIV-1);
+                tcb->srtt += rtt / CONFIG_GNRC_TCP_RTO_A_DIV;
             }
         }
     }

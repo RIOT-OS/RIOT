@@ -13,5 +13,6 @@ rsource "netif/Kconfig"
 rsource "network_layer/ipv6/Kconfig"
 rsource "network_layer/sixlowpan/Kconfig"
 rsource "routing/rpl/Kconfig"
+rsource "transport_layer/tcp/Kconfig"
 
 endmenu # GNRC Network Stack
