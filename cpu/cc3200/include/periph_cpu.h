@@ -92,8 +92,8 @@ typedef struct {
  */
 typedef struct {
     cc3200_uart_t *dev; /**< pointer to the used UART device */
-    gpio_t pin_tx;      /**< pin used for TX */
-    gpio_t pin_rx;      /**< pin used for RX */
+    gpio_t tx_pin;      /**< pin used for TX */
+    gpio_t rx_pin;      /**< pin used for RX */
     gpio_t cts_pin;     /**< CTS pin - set to GPIO_UNDEF when not using */
     gpio_t rts_pin;     /**< RTS pin - set to GPIO_UNDEF when not using */
     gpio_t irqn;        /**< Interrupt code */
