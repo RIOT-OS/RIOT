@@ -5,4 +5,56 @@
 # directory for more details.
 #
 
+config CPU_FAMILY_SAMD2X
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_COMMON_SAM0
+
+config CPU_SERIES_SAMD21
+    bool
+    select CPU_FAMILY_SAMD2X
+    select HAS_CPU_SAMD21
+    select HAS_PUF_SRAM
+
+## CPU Models
+config CPU_MODEL_SAMD21E18A
+    bool
+    select CPU_SERIES_SAMD21
+
+config CPU_MODEL_SAMD21G18A
+    bool
+    select CPU_SERIES_SAMD21
+
+config CPU_MODEL_SAMD21J18A
+    bool
+    select CPU_SERIES_SAMD21
+
+config CPU_MODEL_SAMR21E18A
+    bool
+    select CPU_SERIES_SAMD21
+
+config CPU_MODEL_SAMR21G18A
+    bool
+    select CPU_SERIES_SAMD21
+
+## Definition of specific features
+config HAS_CPU_SAMD21
+    bool
+    help
+        Indicates that a 'samd21' cpu is being used.
+
+## Common CPU symbols
+config CPU_FAMILY
+    default "samd2x" if CPU_FAMILY_SAMD2X
+
+config CPU_SERIES
+    default "samd21" if CPU_SERIES_SAMD21
+
+config CPU_MODEL
+    default "samd21e18a" if CPU_MODEL_SAMD21E18A
+    default "samd21g18a" if CPU_MODEL_SAMD21G18A
+    default "samd21j18a" if CPU_MODEL_SAMD21J18A
+    default "samr21e18a" if CPU_MODEL_SAMR21E18A
+    default "samr21g18a" if CPU_MODEL_SAMR21G18A
+
 source "$(RIOTCPU)/sam0_common/Kconfig"

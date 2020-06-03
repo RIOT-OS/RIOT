@@ -210,6 +210,12 @@ config HAS_PERIPH_TIMER
     help
         Indicates that a Timer peripheral is present.
 
+config HAS_PERIPH_TIMER_PERIODIC
+    bool
+    help
+        Indicates that the Timer peripheral provides the periodic timeout
+        functionality.
+
 config HAS_PERIPH_UART
     bool
     help
