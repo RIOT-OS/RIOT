@@ -74,6 +74,7 @@ ifneq (,$(filter at86rf215%,$(USEMODULE)))
 
   DEFAULT_MODULE += netdev_ieee802154_oqpsk
   DEFAULT_MODULE += netdev_ieee802154_mr_oqpsk
+  DEFAULT_MODULE += netdev_ieee802154_mr_ofdm
 
   ifeq (,$(filter at86rf215m,$(USEMODULE)))
     DEFAULT_MODULE += at86rf215_24ghz

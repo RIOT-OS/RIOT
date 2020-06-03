@@ -138,6 +138,24 @@ enum {
 /** @} */
 
 /**
+ * @name    Default MR-OFDM Option
+ * @{
+ */
+#ifndef CONFIG_AT86RF215_DEFAULT_MR_OFDM_OPT
+#define CONFIG_AT86RF215_DEFAULT_MR_OFDM_OPT    (2)
+#endif
+/** @} */
+
+/**
+ * @name    Default MR-OFDM Modulation & Coding Scheme
+ * @{
+ */
+#ifndef CONFIG_AT86RF215_DEFAULT_MR_OFDM_MCS
+#define CONFIG_AT86RF215_DEFAULT_MR_OFDM_MCS    (2)
+#endif
+/** @} */
+
+/**
  * @brief   Default TX power (0dBm)
  */
 #define AT86RF215_DEFAULT_TXPOWER       (CONFIG_IEEE802154_DEFAULT_TXPOWER)

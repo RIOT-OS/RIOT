@@ -674,6 +674,16 @@ typedef enum {
     NETOPT_MR_OQPSK_RATE,
 
     /**
+     * @brief   (uint8_t) MR-OFDM PHY Option (Values: 1-4)
+     */
+    NETOPT_MR_OFDM_OPTION,
+
+    /**
+     * @brief   (uint8_t) MR-OFDM PHY Modulation and Coding Scheme (Values: 0-6)
+     */
+    NETOPT_MR_OFDM_MCS,
+
+    /**
      * @brief   (uint8_t) PHY Channel Spacing (kHz)
      */
     NETOPT_CHANNEL_SPACING,
