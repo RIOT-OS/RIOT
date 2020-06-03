@@ -164,10 +164,10 @@ int uart_init_blocking(uart_t uart, uint32_t baudrate)
     uart_poweron(uart);
 
     /* Configure PIN_55 for UART0 UART0_TX */
-    ROM_PinTypeUART(uart_config[uart].pin_tx, PIN_MODE_UART);
+    ROM_PinTypeUART(uart_config[uart].tx_pin, PIN_MODE_UART);
 
     /* Configure PIN_57 for UART0 UART0_RX */
-    ROM_PinTypeUART(uart_config[uart].pin_rx, PIN_MODE_UART);
+    ROM_PinTypeUART(uart_config[uart].rx_pin, PIN_MODE_UART);
 
     uart_set_config(uart, baudrate,
                     (UART_CONFIG_WLEN_8 | UART_CONFIG_STOP_ONE |

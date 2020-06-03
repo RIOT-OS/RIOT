@@ -57,14 +57,14 @@ static const spi_conf_t spi_config[] = {
     {
         .base_addr = GSPI_BASE,
         .gpio_port = 0,
-        .pins = (spi_pins_t){ .miso = 05, .sck = 04, .mosi = 06, .cs = 07 },
+        .pins = (spi_pins_t){ .miso = 05, .mosi = 06, .sck = 04, .cs = 07 },
         .config = (SPI_HW_CTRL_CS | SPI_4PIN_MODE | SPI_TURBO_OFF |
                    SPI_CS_ACTIVELOW | SPI_WL_8),
     },
     {
         .base_addr = LSPI_BASE,
         .gpio_port = 1,
-        .pins = (spi_pins_t){ .miso = 0, .sck = 0, .mosi = 0, .cs = 0 },
+        .pins = (spi_pins_t){ .miso = 0, .mosi = 0, .sck = 0, .cs = 0 },
         .config = (SPI_SW_CTRL_CS | SPI_4PIN_MODE | SPI_TURBO_OFF |
                    SPI_CS_ACTIVEHIGH | SPI_WL_32),
     }
@@ -92,14 +92,18 @@ static const spi_conf_t spi_config[] = {
 static const uart_conf_t uart_config[] = {
     {
         .dev = UART0,
-        .pin_tx = 54,
-        .pin_rx = 56,
+        .tx_pin = 54,
+        .rx_pin = 56,
+        .cts_pin = GPIO_UNDEF,
+        .rts_pin = GPIO_UNDEF,
         .irqn = INT_UARTA0,
     },
     {
         .dev = UART1,
-        .pin_rx = 6,
-        .pin_tx = 8,
+        .rx_pin = 6,
+        .tx_pin = 8,
+        .cts_pin = GPIO_UNDEF,
+        .rts_pin = GPIO_UNDEF,
         .irqn = INT_UARTA1,
     },
 };
