@@ -16,6 +16,8 @@ fuzzing/**/findings/
 # Backup files
 *~
 *.orig
+.*.swn
+.*.swo
 .*.swp
 \#*\#
 cachegrind.out*
