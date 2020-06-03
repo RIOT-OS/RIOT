@@ -1,1 +1,2 @@
+include $(RIOTBOARD)/common/arduino-zero/Makefile.include
 include $(RIOTMAKE)/boards/sam0.inc.mk

@@ -1,0 +1,3 @@
+INCLUDES += -I$(RIOTBOARD)/common/arduino-zero/include
+
+OPENOCD_CONFIG ?= $(RIOTBOARD)/common/arduino-zero/dist/openocd.cfg
