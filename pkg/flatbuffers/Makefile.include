@@ -9,3 +9,6 @@ endif
 
 # This module requires cpp11 support
 CXXEXFLAGS += -std=c++11
+
+# This package is a header only package, so there's nothing to build
+PSEUDOMODULES += flatbuffers

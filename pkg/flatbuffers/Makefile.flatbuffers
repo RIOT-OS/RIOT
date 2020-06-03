@@ -1,5 +1,0 @@
-MODULE = flatbuffers
-
-NO_AUTO_SRC := 1
-
-include $(RIOTBASE)/Makefile.base
