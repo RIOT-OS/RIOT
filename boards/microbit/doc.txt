@@ -9,7 +9,7 @@ The [micro:bit](https://www.microbit.co.uk/) was designed by the BBC and
 released in 2015. The boards was distributed to all 11-12 year old children
 throughout the UK.
 
-The board is based on the Nordic nRF51822 SoC, featuring 16Kb of RAM, 256Kb
+The board is based on the Nordic nRF51822 SoC, featuring 16KiB of RAM, 256KiB
 of ROM, and a 2.4GHz radio, that supports Bluetooth Low Energy (BLE) as well as
 a Nordic proprietary radio mode.
 
@@ -21,21 +21,21 @@ Additionally the boards features 2 buttons, a 5x5 LED matrix, a MAG3110
 
 ![micro:bit](https://github.com/RIOT-OS/RIOT/wiki/images/board_microbit.png)
 
-| MCU        | NRF51822QFAA      |
-|:------------- |:--------------------- |
-| Family | ARM Cortex-M0     |
-| Vendor | Nordic Semiconductor  |
-| RAM        | 16Kb  |
-| Flash      | 256Kb             |
-| Frequency  | 16MHz |
-| FPU        | no                |
-| Timers | 3 (2x 16-bit, 1x 32-bit [TIMER0]) |
-| ADCs       | 1x 10-bit (8 channels)        |
-| UARTs      | 1                 |
-| SPIs       | 2                 |
-| I2Cs       | 2                 |
-| Vcc        | 1.8V - 3.6V           |
-| Reference Manual | [Reference Manual](http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf) |
+| MCU               | NRF51822QFAA                      |
+|:----------------- |:--------------------------------- |
+| Family            | ARM Cortex-M0                     |
+| Vendor            | Nordic Semiconductor              |
+| RAM               | 16KiB                             |
+| Flash             | 256KiB                            |
+| Frequency         | 16MHz                             |
+| FPU               | no                                |
+| Timers            | 3 (2x 16-bit, 1x 32-bit [TIMER0]) |
+| ADCs              | 1x 10-bit (8 channels)            |
+| UARTs             | 1                                 |
+| SPIs              | 2                                 |
+| I2Cs              | 2                                 |
+| Vcc               | 1.8V - 3.6V                       |
+| Reference Manual  | [Reference Manual](http://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.pdf) |
 
 
 ##  Flashing and Debugging
