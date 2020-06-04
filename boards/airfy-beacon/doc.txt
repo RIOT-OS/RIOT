@@ -6,7 +6,7 @@
 ## Overview
 
 The Airfy Beacon is utilizing a Nordics NRF51822QFAA SoC.
-The SoC features 16Kb of RAM, 256Kb of flash ROM and comes on top of the
+The SoC features 16KiB of RAM, 256KiB of flash ROM and comes on top of the
 usual micro-controller peripherals with a 2.4GHz radio that supports both
 Nordics proprietary ShockBurst as well as Bluetooth Low Energy (BLE).
 
@@ -19,22 +19,22 @@ The board was available via
 ![airfy-beacon]
 (https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/airfy-beacon.jpg)
 
-| MCU        | NRF51822QFAA      |
-|:------------- |:--------------------- |
-| Family | ARM Cortex-M0     |
-| Vendor | Nordic Semiconductor  |
-| RAM        | 16Kb  |
-| Flash      | 256Kb             |
-| Frequency  | 16MHz |
-| FPU        | no                |
-| Timers | 3 (2x 16-bit, 1x 32-bit [TIMER0]) |
-| ADCs       | 1x 10-bit (8 channels)        |
-| UARTs      | 1                 |
-| SPIs       | 2                 |
-| I2Cs       | 2                 |
-| Vcc        | 1.8V - 3.6V           |
+| MCU                   | NRF51822QFAA                      |
+|:--------------------- |:--------------------------------- |
+| Family                | ARM Cortex-M0                     |
+| Vendor                | Nordic Semiconductor              |
+| RAM                   | 16KiB                             |
+| Flash                 | 256KiB                            |
+| Frequency             | 16MHz                             |
+| FPU                   | no                                |
+| Timers                | 3 (2x 16-bit, 1x 32-bit [TIMER0]) |
+| ADCs                  | 1x 10-bit (8 channels)            |
+| UARTs                 | 1                                 |
+| SPIs                  | 2                                 |
+| I2Cs                  | 2                                 |
+| Vcc                   | 1.8V - 3.6V                       |
 | Product Specification | [Product Specification](https://infocenter.nordicsemi.com/pdf/nRF51822_PS_v3.3.pdf) |
-| Reference Manual | [Reference Manual](https://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.1.pdf) |
+| Reference Manual      | [Reference Manual](https://infocenter.nordicsemi.com/pdf/nRF51_RM_v3.0.1.pdf) |
 
 ## Unlocking the flash memory
 
