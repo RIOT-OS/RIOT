@@ -16,26 +16,26 @@ STM32F070RB microcontroller with 16Kb of SRAM and 128Kb of ROM Flash.
 
 
 ### MCU
-| MCU        | STM32F070RB           |
-|:---------- |:--------------------- |
-| Family     | ARM Cortex-M0         |
-| Vendor     | ST Microelectronics   |
-| RAM        | 16Kb                  |
-| Flash      | 128Kb                 |
-| Frequency  | up to 48MHz           |
-| FPU        | no                    |
-| Timers     | 11 (2x watchdog, 1 SysTick, 8x 16-bit) |
-| ADCs       | 1x 12-bit (16 channels) |
-| UARTs      | 4                     |
-| SPIs       | 2                     |
-| I2Cs       | 2                     |
-| RTC        | 1                     |
-| USB        | 1                     |
-| Vcc        | 2.4V - 3.6V           |
-| Datasheet  | [Datasheet](http://www.st.com/resource/en/datasheet/stm32f070rb.pdf) |
-| Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/dm00091010.pdf) |
-| Programming Manual | [Programming Manual](http://www.st.com/resource/en/programming_manual/dm00051352.pdf) |
-| Board Manual | [Board Manual](http://www.st.com/resource/en/user_manual/dm00105823.pdf) |
+| MCU                   | STM32F070RB                                                                           |
+|:--------------------- |:------------------------------------------------------------------------------------- |
+| Family                | ARM Cortex-M0                                                                         |
+| Vendor                | ST Microelectronics                                                                   |
+| RAM                   | 16KiB                                                                                 |
+| Flash                 | 128KiB                                                                                |
+| Frequency             | up to 48MHz                                                                           |
+| FPU                   | no                                                                                    |
+| Timers                | 11 (2x watchdog, 1 SysTick, 8x 16-bit)                                                |
+| ADCs                  | 1x 12-bit (16 channels)                                                               |
+| UARTs                 | 4                                                                                     |
+| SPIs                  | 2                                                                                     |
+| I2Cs                  | 2                                                                                     |
+| RTC                   | 1                                                                                     |
+| USB                   | 1                                                                                     |
+| Vcc                   | 2.4V - 3.6V                                                                           |
+| Datasheet             | [Datasheet](http://www.st.com/resource/en/datasheet/stm32f070rb.pdf)                  |
+| Reference Manual      | [Reference Manual](https://www.st.com/resource/en/reference_manual/dm00091010.pdf)    |
+| Programming Manual    | [Programming Manual](http://www.st.com/resource/en/programming_manual/dm00051352.pdf) |
+| Board Manual          | [Board Manual](http://www.st.com/resource/en/user_manual/dm00105823.pdf)              |
 
 
 
