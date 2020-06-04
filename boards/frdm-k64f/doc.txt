@@ -10,25 +10,25 @@ The board has a K64F Kinetis MCU and is supported by `cpu/kinetis_common`.
 
 ![frdm-k64f](https://www.nxp.com/assets/images/en/dev-board-image/BOARD-FRDM-K64F-PRODUCT-SHOT.png)
 
-| MCU        | MK64FN1M0VLL12        |
-|:------------- |:--------------------- |
-| Family | ARM Cortex-M4F    |
-| Vendor | Freescale |
-| RAM        | 256Kb |
-| Flash      | 1024Kb                |
-| Frequency  | 120MHz |
-| FPU        | yes               |
-| Timers | yes   |
-| ADCs       | yes       |
-| UARTs      | yes           |
-| SPIs       | yes               |
-| I2Cs       | yes           |
-| Ethernet   | WIP           |
-| USB        | WIP           |
-| LPM        | TODO          |
-| DAC        | TODO          |
-| Vcc        | TODO          |
-| Reference Manual | TODO |
+| MCU               | MK64FN1M0VLL12        |
+|:----------------- |:--------------------- |
+| Family            | ARM Cortex-M4F        |
+| Vendor            | Freescale             |
+| RAM               | 256KiB                |
+| Flash             | 1024KiB               |
+| Frequency         | 120MHz                |
+| FPU               | yes                   |
+| Timers            | yes                   |
+| ADCs              | yes                   |
+| UARTs             | yes                   |
+| SPIs              | yes                   |
+| I2Cs              | yes                   |
+| Ethernet          | WIP                   |
+| USB               | WIP                   |
+| LPM               | TODO                  |
+| DAC               | TODO                  |
+| Vcc               | TODO                  |
+| Reference Manual  | TODO                  |
 
 The board has an integrated debugger adapter (k20dx128) with the firmware from
 ARMmbed.
