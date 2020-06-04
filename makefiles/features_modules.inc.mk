@@ -25,3 +25,6 @@ USEMODULE += $(filter cpu_check_address, $(FEATURES_USED))
 ifneq (,$(filter periph_%, $(USEMODULE)))
   USEMODULE += periph_common
 endif
+
+# select cortexm_svc pseudomodule if the corresponding feature is used
+USEMODULE += $(filter cortexm_svc, $(FEATURES_USED))
