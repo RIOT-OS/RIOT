@@ -18,8 +18,8 @@ More information about the module can be found on this
 | Family          | ARM Cortex-M4F                                                                          |
 | Vendor          | Silicon Labs                                                                            |
 | Vendor Family   | EFR32 Mighty Gecko 1P                                                                   |
-| RAM             | 32.0KB (1.0KB reserved)                                                                 |
-| Flash           | 256.0KB                                                                                 |
+| RAM             | 32.0KiB (1.0KiB reserved)                                                               |
+| Flash           | 256.0KiB                                                                                |
 | EEPROM          | no                                                                                      |
 | Frequency       | up to 38.4 MHz                                                                          |
 | FPU             | yes                                                                                     |
