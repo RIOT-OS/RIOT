@@ -10,7 +10,9 @@ BOARD_WHITELIST += arduino-duemilanove \
                    cc1352p-launchpad \
                    cc2650-launchpad \
                    cc2650stk \
+                   derfmega128 \
                    ikea-tradfri \
+                   microduino-corerf \
                    samr21-xpro \
                    slstk3401a \
                    slstk3402a \
