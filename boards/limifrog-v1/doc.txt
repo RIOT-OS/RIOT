@@ -16,32 +16,32 @@ features a variety of sensors as well as an OLED Display and a BLE
 ![limifrog-v1 pinout](https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/limifrog-v1_pinout.png)
 
 ### MCU
-| MCU        | STM32L151RC |
-|:------------- |:--------------------- |
-| Family | ARM Cortex-M3     |
-| Vendor | ST Microelectronics   |
-| RAM        | 32Kb  |
-| Flash      | 256Kb             |
-| Frequency  | 32MHz (no external oscilator connected) |
-| FPU        | no                |
-| Timers | 8 (8x 16-bit, 1x 32-bit [TIM5])   |
-| ADCs       | 1x 42-channel 12-bit          |
-| UARTs      | 3                 |
-| SPIs       | 2                 |
-| I2Cs       | 2                 |
-| Vcc        | 1.65V - 3.6V          |
-| Datasheet  | [Datasheet](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00048356.pdf) |
-| Reference Manual | [Reference Manual](http://www.st.com/web/en/resource/technical/document/reference_manual/CD00240193.pdf) |
-| Programming Manual | [Programming Manual](http://www.st.com/web/en/resource/technical/document/programming_manual/CD00228163.pdf) |
+| MCU                   | STM32L151RC                               |
+|:--------------------- |:----------------------------------------- |
+| Family                | ARM Cortex-M3                             |
+| Vendor                | ST Microelectronics                       |
+| RAM                   | 32KiB                                     |
+| Flash                 | 256KiB                                    |
+| Frequency             | 32MHz (no external oscillator connected)  |
+| FPU                   | no                                        |
+| Timers                | 8 (8x 16-bit, 1x 32-bit [TIM5])           |
+| ADCs                  | 1x 42-channel 12-bit                      |
+| UARTs                 | 3                                         |
+| SPIs                  | 2                                         |
+| I2Cs                  | 2                                         |
+| Vcc                   | 1.65V - 3.6V                              |
+| Datasheet             | [Datasheet](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00048356.pdf) |
+| Reference Manual      | [Reference Manual](http://www.st.com/web/en/resource/technical/document/reference_manual/CD00240193.pdf) |
+| Programming Manual    | [Programming Manual](http://www.st.com/web/en/resource/technical/document/programming_manual/CD00228163.pdf) |
 
 ## User Inferface
 
 2 Buttons:
 
-| PIN    |
-|:----- |
+| PIN       |
+|:--------- |
 | PA15 (IN) |
-| PC8 (IN) |
+| PC8 (IN)  |
 
 1 LED:
 
@@ -52,23 +52,23 @@ features a variety of sensors as well as an OLED Display and a BLE
 
 ## Implementation Status
 
-| Device | ID        | Supported | Comments  |
-|:------------- |:------------- |:------------- |:------------- |
-| MCU        | STM32L151RC   | partly    | Energy saving modes not fully utilized |
-| Low-level driver | GPIO    | yes       | |
-|        | PWM       | yes       | |
-|        | UART      | yes       | |
-|        | I2C       | yes       | |
-|        | SPI       | yes       | |
-|        | Timer     | yes       | |
-| Ambient Light Sensor| ST VL6180X | no      | planned|
-| Accelerometer  | ST LSM6DS3    | no        | planned |
-| Magnetometer   | ST LIS3MDL    | no        | planned |
-| Gyroscope  | ST LSM6DS3    | no        | planned |
-| atmospheric pressure (and altitude) sensor | ST SLPS25H    | no        | planned |
-| Microphone | Knowles SPU0414HR5H-SB    | no        | planned |
-| OLED Display   | Densitron DD-160128FC-1A  | no        | planned |
-| BLE    | Panasonic PAN1740 | no        | planned |
+| Device                                        | ID                        | Supported | Comments                                  |
+|:--------------------------------------------- |:------------------------- |:--------- |:----------------------------------------- |
+| MCU                                           | STM32L151RC               | partly    | Energy saving modes not fully utilized    |
+| Low-level driver                              | GPIO                      | yes       |                                           |
+|                                               | PWM                       | yes       |                                           |
+|                                               | UART                      | yes       |                                           |
+|                                               | I2C                       | yes       |                                           |
+|                                               | SPI                       | yes       |                                           |
+|                                               | Timer                     | yes       |                                           |
+| Ambient Light Sensor                          | ST VL6180X                | no        | planned                                   |
+| Accelerometer                                 | ST LSM6DS3                | no        | planned                                   |
+| Magnetometer                                  | ST LIS3MDL                | no        | planned                                   |
+| Gyroscope                                     | ST LSM6DS3                | no        | planned                                   |
+| atmospheric pressure (and altitude) sensor    | ST SLPS25H                | no        | planned                                   |
+| Microphone                                    | Knowles SPU0414HR5H-SB    | no        | planned                                   |
+| OLED Display                                  | Densitron DD-160128FC-1A  | no        | planned                                   |
+| BLE                                           | Panasonic PAN1740         | no        | planned                                   |
 
 ## Flashing and Debugging the device
 
