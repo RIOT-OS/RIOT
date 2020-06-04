@@ -11,7 +11,7 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect(r"TRACE_SIZE: (\d+)\r\n")
+    child.expect(r"BACKTRACE_SIZE: (\d+)\r\n")
     trace_size = int(child.match.group(1))
     for i in range(trace_size):
         child.expect(r"0x[0-9a-f]{7,8}")
