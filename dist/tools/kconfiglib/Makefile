@@ -7,6 +7,10 @@ PKG_BUILDDIR=$(CURDIR)/bin
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	cp $(PKG_BUILDDIR)/kconfiglib.py $(PKG_BUILDDIR)/menuconfig.py \
+	$(Q)cp $(PKG_BUILDDIR)/kconfiglib.py $(PKG_BUILDDIR)/menuconfig.py \
 	   $(PKG_BUILDDIR)/genconfig.py $(PKG_BUILDDIR)/examples/merge_config.py \
 	   .
+
+remove:
+	$(Q)$(RM) -r $(PKG_BUILDDIR) kconfiglib.py menuconfig.py genconfig.py \
+	       merge_config.py
