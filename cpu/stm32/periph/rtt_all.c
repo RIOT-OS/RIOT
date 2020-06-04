@@ -67,6 +67,13 @@
 #endif
 #endif
 
+#if defined(CPU_FAM_STM32WB)
+/* IM32 is the interrupt line used to wakeup the CPU on WB but is not defined
+in the CMSIS. According to the reference manual, this is the first bit in the
+register. */
+#define EXTI_IMR2_IM32      (1 << 0)
+#endif
+
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
 #define IMR_REG             IMR2
 #define EXTI_IMR_BIT        EXTI_IMR2_IM32
