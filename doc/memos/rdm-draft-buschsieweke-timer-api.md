@@ -85,6 +85,8 @@ studied:
     - [OS Time API reference](https://mynewt.apache.org/latest/os/core_os/time/os_time.html)
 - Xtimer, RIOT's (at the time of writing) current timer API
     - [xtimer API documentation](http://api.riot-os.org/group__sys__xtimer.html)
+- ztimer, RIOT's alternative timer API that aims to eventually replace xtimer
+    - [ztimer API documentation](https://api.riot-os.org/group__sys__ztimer.html)
 
 The following common feature sets provided by competing operating systems have
 been identified:
@@ -100,13 +102,16 @@ been identified:
     - Quantify time spans between to events
 - APIs used to delay the execution flow
 
-| Feature                   | FreeRTOS  | Zephyr    | Mbed OS   | Contiki   | TinyOS    | Mynewt    | xtimer    |
-|:------------------------- |:--------- |:--------- |:--------- |:--------- |:--------- |:--------- |:--------- |
-| Software Timers           | ✓         | ✓         | ✓         | ✓         | ✓         | ✗         | ✓         |
-| Periodic Software Timers  | ✓         | ✓         | ✓         | ● (2)     | ✓         | ✗         | ✗ (6)     |
-| Context of Timer Callback | Thread    | ?         | ?         | Both? (3) | ?         | n.a.      | Thread    |
-| System Time               | ✓         | ✓         | ✓         | ✓         | ✓         | ✓         | ✓         |
-| Delays                    | ✓         | ● (1)     | ✓         | ● (4)     | ✓ (5)     | ✓         | ✓         |
+| Feature                   | FreeRTOS      | Zephyr        | Mbed OS   | Contiki       | TinyOS    | Mynewt    | xtimer    | ztimer            |
+|:------------------------- |:------------- |:------------- |:--------- |:------------- |:--------- |:--------- |:--------- |:----------------- |
+| Software Timers           | ✓             | ✓             | ✓         | ✓             | ✓         | ✗         | ✓         | ✓                 |
+| Periodic Software Timers  | ✓             | ✓             | ✓         | ● (2)         | ✓         | ✗         | ● (6)     | ● (6)             |
+| Context of Timer Callback | Thread        | ?             | ?         | Both? (3)     | ?         | n.a.      | Interrupt | Interrupt         |
+| System Time               | ✓             | ✓             | ✓         | ✓             | ✓         | ✓         | ✓         | ● (8)             |
+| System Time Width         | `TickType_t`  | 32bit         | 64 bit    |`clock_time_t` | ?         | 96 bit (7)| 64        | 32                |
+| System Time Unit          | "Tick"        | hw dependent  | µs        | hw dependent  | ?         | µs        | µs        | clock dependent   |
+| Portable System Time (9)  | ✗             | ✗             | ✓         | ✗             | ?         | ✓         | ✓         | ✗                 |
+| Delays                    | ✓             | ● (1)         | ✓         | ● (4)         | ✓ (5)     | ✓         | ✓         | ✓                 |
 
 ✓ = 1st level API support, ● = supported by combining APIs, ✗ = no support
 
@@ -121,10 +126,15 @@ been identified:
    until a specific event has been posted. Combined, this can be used to
    delay execution
 5. Only available when using TOSTThreads
-6. Periodic software timers can be implemented by the use with a few lines of
-   code by resetting the timer from the callback. However, this requires the
-   user to manually compensate for the time delta between the timer has
-   expired and the callback is actually executed
+6. `xtimer_periodic_wakeup()`/`ztimer_periodic_wakeup()` can be used, but
+   requires a dedicated thread allocated for the periodic task
+7. Mynwest uses a `struct` with a members `tv_sec` (64 bit) and `tv_usec`
+   (32 bit)
+8. `ztimer_now()` returns the current time of the given clock. This can be used
+   as system timer
+9. "Portable System Time" means that two nodes can exchange time stamps over
+   network and they still refer to the same point in time, assuming the clocks
+   have been synchronized.
 
 # 2. Requirements
 
