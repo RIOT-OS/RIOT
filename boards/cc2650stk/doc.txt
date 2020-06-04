@@ -16,23 +16,23 @@ Use `BOARD=cc2650stk` for building RIOT for this platform.
 
 ## Components
 
-| MCU        | CC2650f128        |
-|:------------- |:--------------------- |
-| Family | ARM Cortex-M3     |
-| Vendor | Texas Instruments |
-| RAM        | 20KB  |
-| Flash      | 128KB             |
-| Frequency - Standby    | 31.26kHz, 32kHz or 32.768kHz |
-| Frequency - Active / Idle  | 48MHz |
-| RF core    | ARM Cortex-M0 CPU, 4KB RAM                |
-| Timers | 4x 32-bit |
-| ADCs       | 1x 12-bit (8 channels)        |
-| UARTs      | 2                 |
-| SPIs       | 2                 |
-| I2C        | 1                 |
-| I2S        | 1                 |
-| Datasheet  | [Datasheet](http://www.ti.com/lit/ds/symlink/cc2650.pdf) |
-| Reference Manual | [Reference Manual](https://www.ti.com/lit/ug/swcu117h/swcu117h.pdf) |
+| MCU                       | CC2650f128                    |
+|:------------------------- |:----------------------------- |
+| Family                    | ARM Cortex-M3                 |
+| Vendor                    | Texas Instruments             |
+| RAM                       | 20KiB                         |
+| Flash                     | 128KiB                        |
+| Frequency - Standby       | 31.26kHz, 32kHz or 32.768kHz  |
+| Frequency - Active / Idle | 48MHz                         |
+| RF core                   | ARM Cortex-M0 CPU, 4KiB RAM   |
+| Timers                    | 4x 32-bit                     |
+| ADCs                      | 1x 12-bit (8 channels)        |
+| UARTs                     | 2                             |
+| SPIs                      | 2                             |
+| I2C                       | 1                             |
+| I2S                       | 1                             |
+| Datasheet                 | [Datasheet](http://www.ti.com/lit/ds/symlink/cc2650.pdf) |
+| Reference Manual          | [Reference Manual](https://www.ti.com/lit/ug/swcu117h/swcu117h.pdf) |
 
 ## Implementation Status
 
