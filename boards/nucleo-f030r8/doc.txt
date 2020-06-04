@@ -16,21 +16,21 @@ STM32F030R8 microcontroller with 8Kb of SRAM and 64Kb of ROM Flash.
 
 
 ### MCU
-| MCU        | STM32F030R8       |
-|:---------- |:----------------- |
-| Family     | ARM Cortex-M0     |
-| Vendor     | ST Microelectronics |
-| RAM        | 8Kb               |
-| Flash      | 64Kb              |
-| Frequency  | up to 48MHz       |
-| FPU        | no                |
-| Timers     | 10 (2x watchdog, 1 SysTick, 7x 16-bit)    |
-| ADCs       | 1x 12-bit         |
-| UARTs      | 2                 |
-| SPIs       | 2                 |
-| I2Cs       | 2                 |
-| RTC        | 1                 |
-| Vcc        | 2.4V - 3.6V       |
+| MCU        | STM32F030R8                                                          |
+|:---------- |:-------------------------------------------------------------------- |
+| Family     | ARM Cortex-M0                                                        |
+| Vendor     | ST Microelectronics                                                  |
+| RAM        | 8KiB                                                                 |
+| Flash      | 64KiB                                                                |
+| Frequency  | up to 48MHz                                                          |
+| FPU        | no                                                                   |
+| Timers     | 10 (2x watchdog, 1 SysTick, 7x 16-bit)                               |
+| ADCs       | 1x 12-bit                                                            |
+| UARTs      | 2                                                                    |
+| SPIs       | 2                                                                    |
+| I2Cs       | 2                                                                    |
+| RTC        | 1                                                                    |
+| Vcc        | 2.4V - 3.6V                                                          |
 | Datasheet  | [Datasheet](http://www.st.com/resource/en/datasheet/stm32f030r8.pdf) |
 | Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/dm00091010.pdf) |
 | Programming Manual | [Programming Manual](http://www.st.com/resource/en/programming_manual/dm00051352.pdf) |
