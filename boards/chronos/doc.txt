@@ -9,23 +9,23 @@
 (http://riot-os.org/images/hardware-watch-riot.png)
 
 # MCU
-| MCU        | TI CC430F6137     |
-|:------------- |:--------------------- |
-| Family | MSP430    |
-| Vendor | Texas Instruments |
-| Package       | 64VQFN |
-| RAM        | 4Kb   |
-| Flash      | 32Kb          |
-| Frequency  | 20MHz |
-| FPU        | no                |
-| Timers | 2 (2x 16bit)  |
-| ADCs       | 1x 8 channel 12-bit           |
-| UARTs      | 1                 |
-| SPIs       | 2 |
-| I2Cs       | 1     |
-| Vcc        | 2.0V - 3.6V           |
-| Datasheet / Reference Manual   | [Datasheet](http://www.ti.com/lit/gpn/cc430f6137) |
-| Board Manual   | [User Guide](http://www.ti.com/lit/pdf/slau292)|
+| MCU                           | TI CC430F6137         |
+|:----------------------------- |:--------------------- |
+| Family                        | MSP430                |
+| Vendor                        | Texas Instruments     |
+| Package                       | 64VQFN                |
+| RAM                           | 4KiB                  |
+| Flash                         | 32KiB                 |
+| Frequency                     | 20MHz                 |
+| FPU                           | no                    |
+| Timers                        | 2 (2x 16bit)          |
+| ADCs                          | 1x 8 channel 12-bit   |
+| UARTs                         | 1                     |
+| SPIs                          | 2                     |
+| I2Cs                          | 1                     |
+| Vcc                           | 2.0V - 3.6V           |
+| Datasheet / Reference Manual  | [Datasheet](http://www.ti.com/lit/gpn/cc430f6137) |
+| Board Manual                  | [User Guide](http://www.ti.com/lit/pdf/slau292)|
 
 ## Flashing RIOT
 
