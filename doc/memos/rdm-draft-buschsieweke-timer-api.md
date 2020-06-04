@@ -159,7 +159,17 @@ future changes.
     - Long term delays must play well with power management
     - Highly precise short term delays (e.g. for bit banging)
 - System time
-    - APIs to get the current system time in reasonable units
+    - APIs to get the current system time in reasonable, hardware independent
+      units
+        - At least: seconds, milli seconds
+    - UNIX epoch as common reference point for high interoperability
+    - Support for 64 bit time stamps
+        - Devices running for detects might want to log events with milli second
+          resolution timestamps on flash / sd card / ...
+        - Note: The rest of the API can be 32 bit, only for time stamps 64 bit
+          support is mandatory
+    - Optional feature to auto-initialize system time from RTC/RTT during boot
+    - APIs to allow implementing network time synchronization
 - Utilities for convenience
     - Timer utilities
         - Timer that send a message upon expiration
