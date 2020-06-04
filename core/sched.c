@@ -80,11 +80,14 @@ int __attribute__((used)) sched_run(void)
 {
     sched_context_switch_request = 0;
 
+#ifndef MODULE_CORE_IDLE_THREAD
+    while (!runqueue_bitcache) {
+        sched_arch_idle();
+    }
+#endif
+
     thread_t *active_thread = (thread_t *)sched_active_thread;
 
-    /* The bitmask in runqueue_bitcache is never empty,
-     * since the threading should not be started before at least the idle thread was started.
-     */
     int nextrq = bitarithm_lsb(runqueue_bitcache);
     thread_t *next_thread = container_of(sched_runqueues[nextrq].next->next,
                                          thread_t, rq_entry);
