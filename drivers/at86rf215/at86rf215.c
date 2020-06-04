@@ -18,6 +18,7 @@
  */
 
 #include "luid.h"
+#include "board.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/gnrc.h"
