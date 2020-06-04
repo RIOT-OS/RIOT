@@ -11,8 +11,8 @@ Zolertia Firefly platform
 @image html "http://i.imgur.com/m2acovV.png?1" "Firefly"
 
 The Firefly platform (Revision A) is a IoT Hardware development platform based
-on TI's CC2538 system on chip (SoC), featuring an ARM Cortex-M3 with 512KB
-flash, 32Kb RAM, double RF interface (Sub-1GHz CC1200 RF transceiver), and the
+on TI's CC2538 system on chip (SoC), featuring an ARM Cortex-M3 with 512KiB
+flash, 32KiB RAM, double RF interface (Sub-1GHz CC1200 RF transceiver), and the
 following goodies:
 
 - ISM 2.4-GHz IEEE 802.15.4 & Zigbee compliant.
