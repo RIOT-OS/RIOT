@@ -32,4 +32,8 @@ ifneq (,$(filter rtt_cmd,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
 
+ifneq (,$(filter trace,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
