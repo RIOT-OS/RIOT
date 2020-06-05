@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
 BOARD_WHITELIST += arduino-duemilanove \
+                   arduino-mega2560 \
                    arduino-nano \
                    arduino-uno \
                    atmega328p \
