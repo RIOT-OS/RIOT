@@ -79,12 +79,17 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     }
 
     /* token value (tkl bytes) */
-    if (coap_get_token_len(pkt)) {
+    if (coap_get_token_len(pkt) == 0) {
+        pkt->token = NULL;
+    }
+    else if (coap_get_token_len(pkt) <= COAP_TOKEN_LENGTH_MAX) {
         pkt->token = pkt_pos;
+        /* pkt_pos range is validated after options parsing loop below */
         pkt_pos += coap_get_token_len(pkt);
     }
     else {
-        pkt->token = NULL;
+        DEBUG("nanocoap: token length invalid\n");
+        return -EBADMSG;
     }
 
     coap_optpos_t *optpos = pkt->options;
@@ -92,7 +97,7 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
     unsigned option_nr = 0;
 
     /* parse options */
-    while (pkt_pos != pkt_end) {
+    while (pkt_pos < pkt_end) {
         uint8_t *option_start = pkt_pos;
         uint8_t option_byte = *pkt_pos++;
         if (option_byte == 0xff) {
@@ -129,12 +134,12 @@ int coap_parse(coap_pkt_t *pkt, uint8_t *buf, size_t len)
             }
 
             pkt_pos += option_len;
-
-            if (pkt_pos > (buf + len)) {
-                DEBUG("nanocoap: bad pkt\n");
-                return -EBADMSG;
-            }
         }
+    }
+
+    if (pkt_pos > pkt_end) {
+        DEBUG("nanocoap: bad packet length\n");
+        return -EBADMSG;
     }
 
     pkt->options_len = option_count;
