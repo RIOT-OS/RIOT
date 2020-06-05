@@ -1,6 +1,12 @@
 include ../Makefile.tests_common
 
-BOARD_WHITELIST += samr21-xpro
+BOARD_WHITELIST += cc1312-launchpad \
+                   cc1352-launchpad \
+                   cc1352p-launchpad \
+                   cc2650-launchpad \
+                   cc2650stk \
+                   samr21-xpro
+
 
 all: kconfig-features
 
