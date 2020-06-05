@@ -6,6 +6,12 @@ ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_cdc_acm
 endif
 
+ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
+  # The Mask-ROM bootloader provides USB-DFU capability
+  FEATURES_REQUIRED += bootloader_stm32
+  USEMODULE += usb_board_reset
+endif
+
 ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += mtd_spi_nor
 endif
