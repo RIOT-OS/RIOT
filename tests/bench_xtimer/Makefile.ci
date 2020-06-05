@@ -1,5 +1,4 @@
 BOARD_INSUFFICIENT_MEMORY := \
     im880b \
     olimexino-stm32 \
-    serpente \
     #
