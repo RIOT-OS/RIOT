@@ -31,6 +31,7 @@ config CPU_CORE_CORTEX_M
     select HAS_CPP
     select HAS_CPU_CHECK_ADDRESS
     select HAS_SSP
+    select HAS_CORTEXM_SVC
 
 ## Common CPU symbols
 config CPU_CORE
@@ -99,3 +100,8 @@ config HAS_CORTEXM_MPU
     bool
     help
         Indicates that a ARM Cortex-M MPU is present.
+
+config HAS_CORTEXM_SVC
+    bool
+    help
+        Indicates that ARM Cortex-M Supervisor Calls are available.
