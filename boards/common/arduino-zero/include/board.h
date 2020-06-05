@@ -7,12 +7,13 @@
  */
 
 /**
- * @ingroup     boards_arduino-zero
+ * @defgroup    boards_common_arduino_zero  Common files of Arduino Zero and clones
+ * @ingroup     boards_common
+ *
  * @{
  *
  * @file
- * @brief       Board specific definitions for the Arduino Zero
- *              board
+ * @brief       Board specific definitions for the Arduino Zero board and clones
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */

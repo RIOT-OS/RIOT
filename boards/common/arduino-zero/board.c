@@ -8,11 +8,12 @@
  */
 
 /**
- * @ingroup     boards_arduino-zero
+ * @ingroup     boards_common_arduino_zero
  * @{
  *
  * @file
- * @brief       Board specific implementations for the Arduino Zero board
+ * @brief       Board specific implementations for the Arduino Zero board and
+ *              clones
  *
  * @author      Hauke Pertersen  <hauke.pertersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>

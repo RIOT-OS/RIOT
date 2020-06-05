@@ -8,11 +8,12 @@
  */
 
 /**
- * @ingroup     boards_arduino-zero
+ * @ingroup     boards_common_arduino_zero
  * @{
  *
  * @file
- * @brief       Configuration of CPU peripherals for Arduino Zero board
+ * @brief       Configuration of CPU peripherals for Arduino Zero board and
+ *              clones
  *
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>

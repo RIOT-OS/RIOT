@@ -81,5 +81,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f0discovery \
     stm32f3discovery \
     stm32l0538-disco \
+    wemos-zero \
     yunjia-nrf51822 \
     #
