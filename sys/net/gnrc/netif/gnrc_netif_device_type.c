@@ -148,7 +148,11 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
                                    &tmp, sizeof(tmp));
             assert(res == sizeof(tmp));
 #if IS_USED(MODULE_GNRC_NETIF_6LO)
+#if IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU)
             netif->ipv6.mtu = MAX(IPV6_MIN_MTU, tmp);
+#else /* IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU) */
+            netif->ipv6.mtu = IPV6_MIN_MTU;
+#endif /* IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU) */
             netif->sixlo.max_frag_size = MIN(SIXLOWPAN_FRAG_MAX_LEN, tmp);
 #else   /* IS_USED(MODULE_GNRC_NETIF_6LO) */
             netif->ipv6.mtu = tmp;

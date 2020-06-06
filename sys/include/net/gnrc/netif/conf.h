@@ -152,6 +152,18 @@ extern "C" {
 #define CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US   (0U)
 #endif
 
+/**
+ * @brief   Enable the usage of non standard MTU for 6LoWPAN network interfaces
+ *
+ * @experimental
+ *
+ * This feature is non compliant with RFC 4944 and might not be supported by
+ * other implementations.
+ */
+#ifndef CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU
+#define CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU 0
+#endif
+
 #ifdef __cplusplus
 }
 #endif
