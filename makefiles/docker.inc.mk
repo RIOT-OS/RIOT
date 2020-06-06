@@ -219,7 +219,7 @@ _docker_volume_mapping = $(if $1,$(if $(call dir_is_outside_riotbase,$1),$(call 
 docker_environ_mapping = $(addprefix -e ,$(call docker_cmdline_mapping,$1,$2,$3))
 docker_cmdline_mapping = $(if $($1),'$1=$(call path_in_docker,$($1),$2,$3)')
 
-# Name of the docker volue contianing RIOT.
+# Name of the docker volume contianing RIOT.
 # By default `RIOTBASE`.
 DOCKER_VOLUME_NAME ?= $(RIOTBASE)
 
