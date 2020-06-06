@@ -26,8 +26,12 @@
 #include "net/ethernet.h"
 #include "net/ieee802154.h"
 #include "net/l2util.h"
+#if IS_USED(MODULE_GNRC_NETIF_6LO)
+#include "net/sixlowpan.h"
+#endif
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
 
 netopt_t gnrc_netif_get_l2addr_opt(const gnrc_netif_t *netif)
 {
@@ -145,7 +149,7 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
             assert(res == sizeof(tmp));
 #if IS_USED(MODULE_GNRC_NETIF_6LO)
             netif->ipv6.mtu = MAX(IPV6_MIN_MTU, tmp);
-            netif->sixlo.max_frag_size = tmp;
+            netif->sixlo.max_frag_size = MIN(SIXLOWPAN_FRAG_MAX_LEN, tmp);
 #else   /* IS_USED(MODULE_GNRC_NETIF_6LO) */
             netif->ipv6.mtu = tmp;
 #endif  /* IS_USED(MODULE_GNRC_NETIF_6LO) */
