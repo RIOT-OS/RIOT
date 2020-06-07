@@ -17,8 +17,6 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifdef MODULE_SLIPDEV
-
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netif/raw.h"
@@ -56,7 +54,4 @@ void auto_init_slipdev(void)
                               (netdev_t *)&slipdevs[i]);
     }
 }
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_SLIPDEV */
 /** @} */

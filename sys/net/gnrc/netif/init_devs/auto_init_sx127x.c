@@ -17,8 +17,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifdef MODULE_SX127X
-
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netif/lorawan_base.h"
@@ -73,8 +71,4 @@ void auto_init_sx127x(void)
         }
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_SX127X */
 /** @} */

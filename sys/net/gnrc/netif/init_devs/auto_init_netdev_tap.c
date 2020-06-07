@@ -17,8 +17,6 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifdef MODULE_NETDEV_TAP
-
 #include "log.h"
 #include "debug.h"
 #include "netdev_tap_params.h"
@@ -46,8 +44,4 @@ void auto_init_netdev_tap(void)
                                    &netdev_tap[i].netdev);
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_NETDEV_TAP */
 /** @} */

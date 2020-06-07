@@ -17,8 +17,6 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifdef MODULE_ETHOS
-
 #include "log.h"
 #include "debug.h"
 #include "ethos.h"
@@ -64,8 +62,4 @@ void auto_init_ethos(void)
     gnrc_netif_ethernet_create(&_netif, _netdev_eth_stack, ETHOS_MAC_STACKSIZE,
                                ETHOS_MAC_PRIO, "ethos", (netdev_t *)&ethos);
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_ETHOS */
 /** @} */

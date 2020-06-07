@@ -17,8 +17,6 @@
  * @author  Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
-#ifdef MODULE_AT86RF215
-
 #define USED_BANDS (IS_USED(MODULE_AT86RF215_SUBGHZ) + IS_USED(MODULE_AT86RF215_24GHZ))
 
 #include "log.h"
@@ -114,9 +112,4 @@ void auto_init_at86rf215(void)
         _setup_netif(netif_24, dev_24, stack_24, AT86RF215_MAC_PRIO);
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_AT86RF215 */
-
 /** @} */

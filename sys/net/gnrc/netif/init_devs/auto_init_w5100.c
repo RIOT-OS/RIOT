@@ -17,8 +17,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifdef MODULE_W5100
-
 #include "log.h"
 #include "w5100.h"
 #include "w5100_params.h"
@@ -64,8 +62,4 @@ void auto_init_w5100(void)
                                    (netdev_t *)&dev[i]);
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_W5100 */
 /** @} */

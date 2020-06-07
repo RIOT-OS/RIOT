@@ -19,8 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifdef MODULE_XBEE
-
 #include "log.h"
 #include "board.h"
 #include "gnrc_netif_xbee.h"
@@ -58,8 +56,4 @@ void auto_init_xbee(void)
                                "xbee", (netdev_t *)&xbee_devs[i]);
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_XBEE */
 /** @} */

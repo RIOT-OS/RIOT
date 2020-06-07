@@ -19,8 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifdef MODULE_CC110X
-
 #include "cc110x.h"
 #include "cc1xxx_common.h"
 #include "cc110x_params.h"
@@ -79,8 +77,4 @@ void auto_init_cc110x(void)
                                  "cc110x", (netdev_t *)&_cc110x_devs[i]);
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_CC110X */
 /** @} */

@@ -17,8 +17,6 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifdef MODULE_AT86RF2XX
-
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netif/ieee802154.h"
@@ -72,8 +70,4 @@ void auto_init_at86rf2xx(void)
 #endif
     }
 }
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_AT86RF2XX */
-
 /** @} */

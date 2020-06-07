@@ -17,8 +17,6 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
-#ifdef MODULE_ENCX24J600
-
 #include "log.h"
 #include "debug.h"
 #include "encx24j600.h"
@@ -57,8 +55,4 @@ void auto_init_encx24j600(void)
                                ENCX24J600_MAC_PRIO, "encx24j600",
                                (netdev_t *)&encx24j600);
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_ENCX24J600 */
 /** @} */
