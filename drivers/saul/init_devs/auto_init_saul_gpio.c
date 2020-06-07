@@ -19,8 +19,6 @@
  * @}
  */
 
-#ifdef MODULE_SAUL_GPIO
-
 #include "log.h"
 #include "saul_reg.h"
 #include "saul/periph.h"
@@ -86,6 +84,3 @@ void auto_init_gpio(void)
     }
 }
 #endif
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_SAUL_GPIO */

@@ -19,8 +19,6 @@
  * @}
  */
 
- #ifdef MODULE_OPT3001
-
  #include "assert.h"
  #include "log.h"
  #include "saul_reg.h"
@@ -70,7 +68,3 @@
          saul_reg_add(&(saul_entries[i]));
      }
  }
-
- #else
- typedef int dont_be_pedantic;
- #endif /* MODULE_OPT3001 */

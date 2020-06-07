@@ -19,8 +19,6 @@
  * @}
  */
 
-#ifdef MODULE_PIR
-
 #include "log.h"
 #include "saul_reg.h"
 #include "pir_params.h"
@@ -65,7 +63,3 @@ void auto_init_pir(void)
         }
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_PIR */

@@ -19,8 +19,6 @@
  * @}
  */
 
-#ifdef MODULE_AD7746
-
 #include "assert.h"
 #include "log.h"
 
@@ -87,7 +85,3 @@ void auto_init_ad7746(void)
         saul_reg_add(&(saul_entries[i + 2]));
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_AD7746 */

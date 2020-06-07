@@ -19,8 +19,6 @@
  * @}
  */
 
-#ifdef MODULE_PULSE_COUNTER
-
 #include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
@@ -69,7 +67,3 @@ void auto_init_pulse_counter(void)
         }
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_PULSE_COUNTER */

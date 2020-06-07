@@ -19,8 +19,6 @@
  * @}
  */
 
-#ifdef MODULE_GROVE_LEDBAR
-
 #include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
@@ -71,7 +69,3 @@ void auto_init_grove_ledbar(void)
         saul_reg_add(&(saul_entries[i]));
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_GROVE_LEDBAR */

@@ -18,8 +18,6 @@
  * @}
  */
 
-#ifdef MODULE_BMX055
-
 #include "log.h"
 #include "saul_reg.h"
 #include "bmx055.h"
@@ -82,7 +80,3 @@ void auto_init_bmx055(void)
         saul_reg_add(&(saul_entries[(i * 3) + 2]));
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_BMX055 */

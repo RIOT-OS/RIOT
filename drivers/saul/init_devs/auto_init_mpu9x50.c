@@ -19,8 +19,6 @@
  * @}
  */
 
-#ifdef MODULE_MPU9X50
-
 #include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
@@ -83,7 +81,3 @@ void auto_init_mpu9x50(void)
         saul_reg_add(&(saul_entries[(i * 3) + 2]));
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_MPU9X50 */

@@ -15,8 +15,6 @@
  * @file
  */
 
-#if MODULE_PCA9685 && MODULE_SAUL
-
 #include "assert.h"
 #include "log.h"
 
@@ -90,6 +88,3 @@ void auto_init_pca9685(void)
         saul_reg_add(&(pca9685_saul_reg_entries[i]));
     }
 }
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_PCA9685 && MODULE_SAUL */

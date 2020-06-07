@@ -21,8 +21,6 @@
  * @}
  */
 
-#ifdef MODULE_ADS101X
-
 #include "assert.h"
 #include "log.h"
 
@@ -72,7 +70,3 @@ void auto_init_ads101x(void)
         saul_reg_add(&(saul_entries[i]));
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_ADS101X */

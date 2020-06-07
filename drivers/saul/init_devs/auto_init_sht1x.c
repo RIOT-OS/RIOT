@@ -24,8 +24,6 @@
  * @}
  */
 
-#ifdef MODULE_SHT1X
-
 #include "log.h"
 #include "sht1x_params.h"
 #include "sht1x.h"
@@ -101,7 +99,3 @@ void auto_init_sht1x(void)
 #endif /* MODULE_AUTO_INIT_SAUL */
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_SHT1X */
