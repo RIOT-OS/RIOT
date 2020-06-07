@@ -67,7 +67,7 @@ ssize_t stdio_write(const void* buffer, size_t len)
         buffer = (char *)buffer + n;
         len -= n;
     } while (len);
-    return start - (char *)buffer;
+    return (char *)buffer - start;
 }
 
 static void _cdc_acm_rx_pipe(usbus_cdcacm_device_t *cdcacm,
