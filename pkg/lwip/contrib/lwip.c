@@ -55,6 +55,10 @@
 #include "stm32_eth.h"
 #endif
 
+#ifdef MODULE_NRF802154
+#include "nrf802154.h"
+#endif
+
 #include "lwip.h"
 
 #define ENABLE_DEBUG    (0)
@@ -89,6 +93,10 @@
 #endif
 
 #ifdef MODULE_STM32_ETH
+#define LWIP_NETIF_NUMOF        (1)
+#endif
+
+#ifdef MODULE_NRF802154
 #define LWIP_NETIF_NUMOF        (1)
 #endif
 
@@ -129,6 +137,10 @@ extern void esp_wifi_setup(esp_wifi_netdev_t *dev);
 #ifdef MODULE_STM32_ETH
 static netdev_t stm32_eth;
 extern void stm32_eth_netdev_setup(netdev_t *netdev);
+#endif
+
+#ifdef MODULE_NRF802154
+extern netdev_ieee802154_t nrf802154_dev;
 #endif
 
 void lwip_bootstrap(void)
@@ -233,6 +245,12 @@ void lwip_bootstrap(void)
         return;
     }
 #endif /* MODULE_LWIP_IPV4 */
+#elif defined(MODULE_NRF802154)
+    if (netif_add(&netif[0], &nrf802154_dev, lwip_netdev_init,
+                tcpip_6lowpan_input) == NULL) {
+        DEBUG("Could not add nrf802154 device\n");
+        return;
+    }
 #endif
     if (netif[0].state != NULL) {
         /* state is set to a netdev_t in the netif_add() functions above */
