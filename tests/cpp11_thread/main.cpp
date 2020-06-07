@@ -36,11 +36,11 @@ using namespace riot;
 int main() {
   puts("\n************ C++ thread test ***********");
 
-  expect(sched_num_threads == 2); // main + idle
+  const int initial_num_threads = sched_num_threads;
 
   puts("Creating one thread and passing an argument ...");
   {
-    constexpr int i = 3;
+    const int i = initial_num_threads + 1;
     thread t([=](const int j) { expect(j == i); }, i);
     try {
       t.join();
@@ -51,7 +51,7 @@ int main() {
   }
   puts("Done\n");
 
-  expect(sched_num_threads == 2);
+  expect(sched_num_threads == initial_num_threads);
 
   puts("Creating detached thread ...");
   {
@@ -64,7 +64,7 @@ int main() {
   }
   puts("Done\n");
 
-  expect(sched_num_threads == 2);
+  expect(sched_num_threads == initial_num_threads);
 
   puts("Join on 'finished' thread ...");
   {
@@ -83,7 +83,7 @@ int main() {
   }
   puts("Done\n");
 
-  expect(sched_num_threads == 2);
+  expect(sched_num_threads == initial_num_threads);
 
   puts("Join on 'running' thread ...");
   {
@@ -118,7 +118,7 @@ int main() {
   }
   puts("Done\n");
 
-  expect(sched_num_threads == 2);
+  expect(sched_num_threads == initial_num_threads);
 
   puts("Testing sleep_for ...");
   {
@@ -131,7 +131,7 @@ int main() {
   }
   puts("Done\n");
 
-  expect(sched_num_threads == 2);
+  expect(sched_num_threads == initial_num_threads);
 
   puts("Testing sleep_until ...");
   {
@@ -144,7 +144,7 @@ int main() {
   }
   puts("Done\n");
 
-  expect(sched_num_threads == 2);
+  expect(sched_num_threads == initial_num_threads);
 
   puts("Swapping two threads ...");
   {
@@ -164,7 +164,7 @@ int main() {
   }
   puts("Done\n");
 
-  expect(sched_num_threads == 2);
+  expect(sched_num_threads == initial_num_threads);
 
   puts("Move constructor ...");
   {
@@ -178,7 +178,7 @@ int main() {
   }
   puts("Done\n");
 
-  expect(sched_num_threads == 2);
+  expect(sched_num_threads == initial_num_threads);
 
   puts("Bye, bye.");
   puts("******************************************");
