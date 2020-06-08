@@ -99,6 +99,12 @@ static void clk_init(void)
         CMU_OscillatorEnable(cmuOsc_HFRCO, false, false);
     }
 
+#ifdef _SILICON_LABS_32B_SERIES_1
+    /* disable LFRCO comparator chopping and dynamic element matching
+     * else LFRCO has too much jitter for LEUART > 1800 baud */
+    CMU->LFRCOCTRL &= ~(CMU_LFRCOCTRL_ENCHOP | CMU_LFRCOCTRL_ENDEM);
+#endif
+
     /* initialize LFXO with board-specific parameters before switching */
     if (CLOCK_LFA == cmuSelect_LFXO || CLOCK_LFB == cmuSelect_LFXO ||
 #ifdef _SILICON_LABS_32B_SERIES_1
