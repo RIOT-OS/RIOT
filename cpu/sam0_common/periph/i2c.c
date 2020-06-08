@@ -125,23 +125,16 @@ void i2c_init(i2c_t dev)
     /* Find and set baudrate. Read speed configuration. Set transfer
      * speed: SERCOM_I2CM_CTRLA_SPEED(0): Standard-mode (Sm) up to 100
      * kHz and Fast-mode (Fm) up to 400 kHz */
-    switch (i2c_config[dev].speed) {
-        case I2C_SPEED_NORMAL:
-        case I2C_SPEED_FAST:
-            bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(0);
-            break;
-        case I2C_SPEED_HIGH:
-            bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(2);
-            break;
-        default:
-            DEBUG("BAD BAUDRATE\n");
-            return;
+    if (i2c_config[dev].speed > I2C_SPEED_FAST) {
+        bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(2);
+    } else {
+        bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(0);
     }
     /* Get the baudrate */
     tmp_baud = (int32_t)(((sam0_gclk_freq(i2c_config[dev].gclk_src) +
                (2 * (i2c_config[dev].speed)) - 1) /
                (2 * (i2c_config[dev].speed))) -
-               (i2c_config[dev].speed == I2C_SPEED_HIGH ? 1 : 5));
+               (i2c_config[dev].speed > I2C_SPEED_FAST ? 1 : 5));
     /* Ensure baudrate is within limits */
     if (tmp_baud < 255 && tmp_baud > 0) {
         bus(dev)->BAUD.reg = SERCOM_I2CM_BAUD_BAUD(tmp_baud);
