@@ -16,7 +16,6 @@
  * @}
  */
 
-#ifdef MODULE_CAN_LINUX
 #include "can/device.h"
 #include "candev_linux_params.h"
 
@@ -52,6 +51,3 @@ void auto_init_can_native(void) {
                         candev_linux_params[i].name, &candev_dev_linux[i]);
     }
 }
-#else
-typedef int dont_be_pedantic;
-#endif
