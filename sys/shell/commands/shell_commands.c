@@ -216,6 +216,7 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_GNRC_ICMPV6_ECHO
 #ifdef MODULE_XTIMER
     { "ping6", "Ping via ICMPv6", _gnrc_icmpv6_ping },
+    { "ping", "Ping via ICMPv6", _gnrc_icmpv6_ping },
 #endif
 #endif
 #ifdef MODULE_RANDOM
