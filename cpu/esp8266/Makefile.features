@@ -1,3 +1,5 @@
+CPU_FAM = esp8266
+
 # MCU defined features that are provided independent on board definitions
 
 include $(RIOTCPU)/esp_common/Makefile.features
