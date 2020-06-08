@@ -51,6 +51,8 @@
 #include <inttypes.h>
 #include <stddef.h>
 
+#include "hashes/sha2xx_common.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -68,14 +70,7 @@ extern "C" {
 /**
  * @brief Context for cipher operations based on sha256
  */
-typedef struct {
-    /** global state */
-    uint32_t state[8];
-    /** processed bytes counter */
-    uint32_t count[2];
-    /** data buffer */
-    unsigned char buf[64];
-} sha256_context_t;
+typedef sha2xx_context_t sha256_context_t;
 
 /**
  * @brief Context for HMAC operations based on sha256
