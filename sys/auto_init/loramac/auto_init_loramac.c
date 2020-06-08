@@ -17,8 +17,6 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifdef MODULE_SEMTECH_LORAMAC
-
 #include "log.h"
 #include "semtech_loramac.h"
 
@@ -28,8 +26,4 @@ void auto_init_loramac(void)
 {
     semtech_loramac_init(&loramac);
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_SEMTECH_LORAMAC */
 /** @} */
