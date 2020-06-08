@@ -28,7 +28,7 @@
 	line-height: 24px;
 	text-align: center;
 	border-width: 1px;
-	border-style: solid;
+ 	border-style: solid;
 }
 .navbar-nav.sm-collapsible .caret:before {
 	content: '+';
