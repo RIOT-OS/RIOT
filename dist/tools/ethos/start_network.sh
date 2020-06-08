@@ -8,7 +8,7 @@ cleanup() {
 }
 
 setup_network() {
-    ${ETHOS_DIR}/setup_network.sh $1 $2 &
+    ${ETHOS_DIR}/setup_network.sh $* &
     SETUP_NETWORK_PID=$!
 }
 
