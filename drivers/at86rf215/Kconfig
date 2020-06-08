@@ -38,4 +38,98 @@ config AT86RF215_TRIM_VAL
         26 MHz the best.
         For more information Refer Table 6-25 TRIM in Datasheet
 
+choice
+    prompt "Default Modulation"
+
+config AT86RF215_DEFAULT_LEGACY_OQPSK
+    bool "legacy O-QPSK"
+    help
+        O-QPSK compatible with IEEE 802.15.4-2003 devices
+
+config AT86RF215_DEFAULT_MR_OQPSK
+    bool "MR-O-QPSK"
+    help
+        MR-O-QPSK according to IEEE 802.15.4g
+
+config AT86RF215_DEFAULT_MR_OFDM
+    bool "MR-OFDM"
+    help
+        MR-O-OFDM according to IEEE 802.15.4g
+
+endchoice
+
+menu "O-QPSK (802.15.4) configuration"
+    depends on AT86RF215_DEFAULT_LEGACY_OQPSK
+
+config AT86RF215_DEFAULT_OQPSK_RATE
+    int "Default (legacy) O-QPSK rate mode"
+    range 0 1
+    default 0
+    help
+        The at86rf215 supports proprietary high data rates that are compatible
+        with the at86rf2xx parts.
+        Set this to 1 to configure the proprietary high-data rate option as default.
+        If unsure, leave this at 0.
+
+endmenu # legacy O-QPSK
+
+menu "MR-O-QPSK (802.15.4g) configuration"
+    depends on AT86RF215_DEFAULT_MR_OQPSK
+
+config AT86RF215_DEFAULT_MR_OQPSK_RATE
+    int "Default MR-O-QPSK rate mode"
+    range 0 3
+    default 2
+    help
+        Default Rate Mode of the MR-O-QPSK PHY
+        Each increment doubles the PSDU data rate.
+
+choice
+    prompt "Default MR-O-QPSK Chip Rate"
+
+config AT86RF215_DEFAULT_MR_OQPSK_CHIPS_100
+    bool "100 kchip/s"
+
+config AT86RF215_DEFAULT_MR_OQPSK_CHIPS_200
+    bool "200 kchip/s"
+
+config AT86RF215_DEFAULT_MR_OQPSK_CHIPS_1000
+    bool "1000 kchip/s"
+
+config AT86RF215_DEFAULT_MR_OQPSK_CHIPS_2000
+    bool "2000 kchip/s"
+
+endchoice
+
+endmenu # MR-O-QPSK
+
+menu "MR-OFDM (802.15.4g) configuration"
+    depends on AT86RF215_DEFAULT_MR_OFDM
+
+config AT86RF215_DEFAULT_MR_OFDM_OPT
+    int "Default MR-OFDM option"
+    range 1 4
+    default 2
+    help
+        Default Option of the MR-OFDM PHY
+        Each increment halves the PSDU data rate.
+
+config AT86RF215_DEFAULT_MR_OFDM_MCS
+    int "Default MR-OFDM Modulation & Coding Scheme"
+    range 0 6
+    default 2
+    help
+        Default Modulation & Coding Scheme of the MR-OFDM PHY.
+        Higher schemes correspond to higher data rates and lower range.
+
+        0: BPSK, rate 1⁄2, 4 x frequency repetition
+        1: BPSK, rate 1⁄2, 2 x frequency repetition
+        2: QPSK, rate 1⁄2, 2 x frequency repetition
+        3: QPSK, rate 1⁄2
+        4: QPSK, rate 3⁄4
+        5: 16-QAM, rate 1⁄2
+        6: 16-QAM, rate 3⁄4
+
+endmenu
+
 endif # KCONFIG_MODULE_AT86RF215
