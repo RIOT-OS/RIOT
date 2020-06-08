@@ -124,6 +124,16 @@ enum {
 /** @} */
 
 /**
+ * @name    Default O-QPSK Rate Mode
+ *          Non-zero value enables proprietary high data rate by default
+ * @{
+ */
+#ifndef CONFIG_AT86RF215_DEFAULT_OQPSK_RATE
+#define CONFIG_AT86RF215_DEFAULT_OQPSK_RATE     (0)
+#endif
+/** @} */
+
+/**
  * @name    Default MR-O-QPSK Chip Rate
  * @{
  */
