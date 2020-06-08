@@ -18,6 +18,16 @@ BOARD_WHITELIST += arduino-duemilanove \
                    chronos \
                    derfmega128 \
                    derfmega256 \
+                   esp32-heltec-lora32-v2 \
+                   esp32-mh-et-live-minikit \
+                   esp32-olimex-evb \
+                   esp32-ttgo-t-beam \
+                   esp32-wemos-lolin-d32-pro \
+                   esp32-wroom-32 \
+                   esp32-wrover-kit \
+                   esp8266-esp-12x \
+                   esp8266-olimex-mod \
+                   esp8266-sparkfun-thing \
                    firefly \
                    frdm-k22f \
                    frdm-k64f \
