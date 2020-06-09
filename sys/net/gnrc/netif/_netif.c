@@ -33,6 +33,17 @@ int netif_get_name(netif_t *iface, char *name)
     return res;
 }
 
+int16_t netif_get_id(const netif_t *netif)
+{
+    const gnrc_netif_t *iface = (const gnrc_netif_t*)netif;
+    return iface->pid;
+}
+
+netif_t *netif_get_by_id(int16_t id)
+{
+    return &gnrc_netif_get_by_pid((kernel_pid_t)id)->netif;
+}
+
 int netif_get_opt(netif_t *netif, netopt_t opt, uint16_t context,
                   void *value, size_t max_len)
 {

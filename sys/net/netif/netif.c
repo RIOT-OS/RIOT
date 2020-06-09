@@ -40,6 +40,17 @@ netif_t *netif_iter(netif_t *last)
     return (netif_t *)last->node.next;
 }
 
+__attribute__((weak)) int16_t netif_get_id(const netif_t *netif)
+{
+    list_node_t *node = netif_list.next;
+    for (int16_t i = 0; node; i++, node = node->next) {
+        if (netif == (netif_t *)node) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 netif_t *netif_get_by_name(const char *name)
 {
     assert(name);
@@ -57,4 +68,16 @@ netif_t *netif_get_by_name(const char *name)
 
     return NULL;
 }
+
+__attribute__((weak)) netif_t *netif_get_by_id(int16_t id)
+{
+    list_node_t *node = netif_list.next;
+    for (int16_t i = 0; node; i++, node = node->next) {
+        if (i == id) {
+            return (netif_t *)node;
+        }
+    }
+    return NULL;
+}
+
 /** @} */
