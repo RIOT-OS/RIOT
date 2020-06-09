@@ -49,8 +49,8 @@ extern "C" {
 /**
  * @brief Default Maximal CSMA/CA Backoff Exponent
  */
-#ifndef CSMA_SENDER_MAX_BE_DEFAULT
-#define CSMA_SENDER_MAX_BE_DEFAULT          (5U)
+#ifndef CONFIG_CSMA_SENDER_MAX_BE_DEFAULT
+#define CONFIG_CSMA_SENDER_MAX_BE_DEFAULT          (5U)
 #endif
 
 /**
