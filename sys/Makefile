@@ -31,6 +31,9 @@ endif
 ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
   DIRS += test_utils/interactive_sync
 endif
+ifneq (,$(filter dummy_thread,$(USEMODULE)))
+  DIRS += test_utils/dummy_thread
+endif
 ifneq (,$(filter net_help,$(USEMODULE)))
   DIRS += net/crosslayer/net_help
 endif

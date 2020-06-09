@@ -49,6 +49,10 @@ void auto_init(void)
         extern void init_schedstatistics(void);
         init_schedstatistics();
     }
+    if (IS_USED(MODULE_DUMMY_THREAD)) {
+        extern void dummy_thread_create(void);
+        dummy_thread_create();
+    }
     if (IS_USED(MODULE_EVENT_THREAD)) {
         LOG_DEBUG("Auto init event threads.\n");
         extern void auto_init_event_thread(void);
