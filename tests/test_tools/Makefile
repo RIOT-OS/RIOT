@@ -10,4 +10,7 @@ CFLAGS += -DSHELL_NO_ECHO=1 -DSHELL_NO_PROMPT=1
 # synchronizes by itself through `shellping` command.
 DISABLE_MODULE += test_utils_interactive_sync
 
+# include sys/test_utils/dummy_thread
+USEMODULE += dummy_thread
+
 include $(RIOTBASE)/Makefile.include
