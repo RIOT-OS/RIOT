@@ -12,6 +12,8 @@ RIOTBASE ?= $(CURDIR)/../..
 # development process:
 DEVELHELP ?= 1
 
+# Disable the auto init, we handle USBUS initialization in the main.c
+DISABLE_MODULE += auto_init_usbus
 USEMODULE += usbus_cdc_acm_uart
 USEMODULE += fmt
 
