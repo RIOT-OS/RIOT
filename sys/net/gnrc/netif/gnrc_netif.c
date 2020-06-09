@@ -1309,7 +1309,6 @@ static void _test_options(gnrc_netif_t *netif)
 #else /* IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU) */
             assert(netif->ipv6.mtu == IPV6_MIN_MTU);
 #endif /* IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU) */
-            assert(netif->sixlo.max_frag_size > 0);
             assert(-ENOTSUP != netif->dev->driver->get(netif->dev, NETOPT_PROTO,
                                                        &tmp, sizeof(tmp)));
 #else   /* IS_USED(MODULE_GNRC_NETIF_6LO) */

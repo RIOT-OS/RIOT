@@ -153,7 +153,15 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
 #else /* IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU) */
             netif->ipv6.mtu = IPV6_MIN_MTU;
 #endif /* IS_ACTIVE(CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU) */
-            netif->sixlo.max_frag_size = MIN(SIXLOWPAN_FRAG_MAX_LEN, tmp);
+            if (tmp >= netif->ipv6.mtu) {
+                /* When the L2-PDU is higher or equal to the IPv6 MTU, disable
+                 * 6Lo fragmentation, this generally applies to 802.15.4g
+                 * devices with a big L2-PDU */
+                netif->sixlo.max_frag_size = 0;
+            }
+            else {
+                netif->sixlo.max_frag_size = MIN(SIXLOWPAN_FRAG_MAX_LEN, tmp);
+            }
 #else   /* IS_USED(MODULE_GNRC_NETIF_6LO) */
             netif->ipv6.mtu = tmp;
 #endif  /* IS_USED(MODULE_GNRC_NETIF_6LO) */
