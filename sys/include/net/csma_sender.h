@@ -57,8 +57,8 @@ extern "C" {
  * @brief Default Maximal number of retries for sending
  *        a given packet with the CSMA/CA method
  */
-#ifndef CSMA_SENDER_MAX_BACKOFFS_DEFAULT
-#define CSMA_SENDER_MAX_BACKOFFS_DEFAULT    (4U)
+#ifndef CONFIG_CSMA_SENDER_MAX_BACKOFFS_DEFAULT
+#define CONFIG_CSMA_SENDER_MAX_BACKOFFS_DEFAULT    (4U)
 #endif
 
 /**
