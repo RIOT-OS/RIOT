@@ -1,5 +1,5 @@
 #
-# Include this file if your Package needs to be checked out by git
+# Include this file if your package needs to be checked out by git
 #
 # A package is up to date when its '.git-prepared' file is up to date.
 # Any change to the package makefile will force updating the repository
