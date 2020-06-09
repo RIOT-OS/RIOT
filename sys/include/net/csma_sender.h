@@ -35,6 +35,11 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup net_csma_sender_conf CSMA/CA helper compile configurations
+ * @ingroup config
+ * @{
+ */
+/**
  * @brief Default Minimal CSMA/CA Backoff Exponent
  */
 #ifndef CSMA_SENDER_MIN_BE_DEFAULT
@@ -62,6 +67,7 @@ extern "C" {
 #ifndef CSMA_SENDER_BACKOFF_PERIOD_UNIT
 #define CSMA_SENDER_BACKOFF_PERIOD_UNIT     (320U)
 #endif
+/** @} */
 
 /**
  * @brief   Configuration type for backoff
