@@ -5,7 +5,7 @@ COLOR_GREEN  :=
 COLOR_RED    :=
 COLOR_PURPLE :=
 COLOR_RESET  :=
-COLOR_ECHO   := /bin/echo
+COLOR_ECHO   := /usr/bin/env echo
 
 # Check if colored output is not disabled by user, i.e: CC_NOCOLOR unset
 # or 0
@@ -22,7 +22,7 @@ ifneq ($(CC_NOCOLOR),1)
       COLOR_ECHO   := echo -e
       SHELL=bash
     else
-      COLOR_ECHO   := /bin/echo -e
+      COLOR_ECHO   := /usr/bin/env echo -e
     endif
   endif
 endif
