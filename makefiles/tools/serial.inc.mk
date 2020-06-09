@@ -29,4 +29,9 @@ else ifeq ($(RIOT_TERMINAL),miniterm)
 else ifeq ($(RIOT_TERMINAL),jlink)
   TERMPROG = $(RIOTTOOLS)/jlink/jlink.sh
   TERMFLAGS = term-rtt
+else ifeq ($(RIOT_TERMINAL),semihosting)
+  TERMPROG = $(DEBUGGER)
+  TERMFLAGS = $(DEBUGGER_FLAGS)
+  OPENOCD_DBG_EXTRA_CMD += -c 'arm semihosting enable'
+  $(call target-export-variables,term cleanterm,OPENOCD_DBG_EXTRA_CMD)
 endif
