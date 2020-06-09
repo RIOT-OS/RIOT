@@ -64,8 +64,8 @@ extern "C" {
 /**
  * @brief CSMA/CA backoff period, in microseconds
  */
-#ifndef CSMA_SENDER_BACKOFF_PERIOD_UNIT
-#define CSMA_SENDER_BACKOFF_PERIOD_UNIT     (320U)
+#ifndef CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT
+#define CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT     (320U)
 #endif
 /** @} */
 
