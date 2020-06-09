@@ -46,7 +46,6 @@ static mtd_spi_nor_t weact_nor_dev = {
         .driver = &mtd_spi_nor_driver,
         .page_size = WEACT_411CE_NOR_PAGE_SIZE,
         .pages_per_sector = WEACT_411CE_NOR_PAGES_PER_SECTOR,
-        .sector_count = WEACT_411CE_NOR_SECTOR_COUNT,
     },
     .params = &_weact_nor_params,
 };
