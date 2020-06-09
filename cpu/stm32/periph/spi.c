@@ -37,6 +37,16 @@
  */
 #define BR_SHIFT            (3U)
 
+#ifdef SPI_CR2_FRXTH
+/* configure SPI for 8-bit data width */
+#define SPI_CR2_SETTINGS    (SPI_CR2_FRXTH |\
+                             SPI_CR2_DS_0 |\
+                             SPI_CR2_DS_1 |\
+                             SPI_CR2_DS_2)
+#else
+#define SPI_CR2_SETTINGS    0
+#endif
+
 /**
  * @brief   Allocate one lock per SPI device
  */
@@ -46,6 +56,13 @@ static inline SPI_TypeDef *dev(spi_t bus)
 {
     return spi_config[bus].dev;
 }
+
+#ifdef MODULE_PERIPH_DMA
+static inline bool _use_dma(const spi_conf_t *conf)
+{
+    return conf->tx_dma != DMA_STREAM_UNDEF && conf->rx_dma != DMA_STREAM_UNDEF;
+}
+#endif
 
 void spi_init(spi_t bus)
 {
@@ -62,12 +79,7 @@ void spi_init(spi_t bus)
 #ifdef SPI_I2SCFGR_I2SE
     dev(bus)->I2SCFGR = 0;
 #endif
-    /* configure SPI for 8-bit data width */
-#ifdef SPI_CR2_FRXTH
-    dev(bus)->CR2 = (SPI_CR2_FRXTH | SPI_CR2_DS_0 | SPI_CR2_DS_1 | SPI_CR2_DS_2);
-#else
-    dev(bus)->CR2 = 0;
-#endif
+    dev(bus)->CR2 = SPI_CR2_SETTINGS;
     periph_clk_dis(spi_config[bus].apbbus, spi_config[bus].rccmask);
 }
 
@@ -140,6 +152,7 @@ int spi_init_with_gpio_mode(spi_t bus, spi_gpio_mode_t mode)
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
+
     /* lock bus */
     mutex_lock(&locks[bus]);
 #ifdef STM32_PM_STOP
@@ -150,12 +163,41 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     periph_clk_en(spi_config[bus].apbbus, spi_config[bus].rccmask);
     /* enable device */
     uint8_t br = spi_divtable[spi_config[bus].apbbus][clk];
-    dev(bus)->CR1 = ((br << BR_SHIFT) | mode | SPI_CR1_MSTR);
+    uint16_t cr1_settings = ((br << BR_SHIFT) | mode | SPI_CR1_MSTR);
+    /* Settings to add to CR2 in addition to SPI_CR2_SETTINGS */
+    uint16_t cr2_extra_settings = 0;
     if (cs != SPI_HWCS_MASK) {
-        dev(bus)->CR1 |= (SPI_CR1_SSM | SPI_CR1_SSI);
+        cr1_settings |= (SPI_CR1_SSM | SPI_CR1_SSI);
     }
     else {
-        dev(bus)->CR2 |= (SPI_CR2_SSOE);
+        cr2_extra_settings = (SPI_CR2_SSOE);
+    }
+
+#ifdef MODULE_PERIPH_DMA
+    if (_use_dma(&spi_config[bus])) {
+        cr2_extra_settings |= SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
+
+        dma_acquire(spi_config[bus].tx_dma);
+        dma_setup(spi_config[bus].tx_dma,
+                  spi_config[bus].tx_dma_chan,
+                  (uint32_t*)&(dev(bus)->DR),
+                  DMA_MEM_TO_PERIPH,
+                  0,
+                  DMA_DATA_WIDTH_BYTE);
+
+        dma_acquire(spi_config[bus].rx_dma);
+        dma_setup(spi_config[bus].rx_dma,
+                  spi_config[bus].rx_dma_chan,
+                  (uint32_t*)&(dev(bus)->DR),
+                  DMA_PERIPH_TO_MEM,
+                  0,
+                  DMA_DATA_WIDTH_BYTE);
+    }
+#endif
+    dev(bus)->CR1 = cr1_settings;
+    /* Only modify CR2 if needed */
+    if (cr2_extra_settings) {
+        dev(bus)->CR2 = (SPI_CR2_SETTINGS | cr2_extra_settings);
     }
 
     return SPI_OK;
@@ -163,9 +205,15 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
 void spi_release(spi_t bus)
 {
+#ifdef MODULE_PERIPH_DMA
+    if (_use_dma(&spi_config[bus])) {
+        dma_release(spi_config[bus].tx_dma);
+        dma_release(spi_config[bus].rx_dma);
+    }
+#endif
     /* disable device and release lock */
     dev(bus)->CR1 = 0;
-    dev(bus)->CR2 &= ~(SPI_CR2_SSOE);
+    dev(bus)->CR2 = SPI_CR2_SETTINGS; /* Clear the DMA and SSOE flags */
     periph_clk_dis(spi_config[bus].apbbus, spi_config[bus].rccmask);
 #ifdef STM32_PM_STOP
     /* unblock STOP mode */
@@ -186,41 +234,30 @@ static inline void _wait_for_end(spi_t bus)
 static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
 {
     uint8_t tmp = 0;
-    dma_acquire(spi_config[bus].tx_dma);
-    dma_acquire(spi_config[bus].rx_dma);
 
-    if (!out) {
-        dma_configure(spi_config[bus].tx_dma, spi_config[bus].tx_dma_chan, &tmp,
-                      &(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, 0);
+    if (out) {
+        dma_prepare(spi_config[bus].tx_dma, (void*)out, len, 1);
     }
     else {
-        dma_configure(spi_config[bus].tx_dma, spi_config[bus].tx_dma_chan, out,
-                      &(dev(bus)->DR), len, DMA_MEM_TO_PERIPH, DMA_INC_SRC_ADDR);
+        dma_prepare(spi_config[bus].tx_dma, &tmp, len, 0);
     }
-    if (!in) {
-        dma_configure(spi_config[bus].rx_dma, spi_config[bus].rx_dma_chan,
-                      &(dev(bus)->DR), &tmp, len, DMA_PERIPH_TO_MEM, 0);
+    if (in) {
+        dma_prepare(spi_config[bus].rx_dma, in, len, 1);
     }
     else {
-        dma_configure(spi_config[bus].rx_dma, spi_config[bus].rx_dma_chan,
-                      &(dev(bus)->DR), in, len, DMA_PERIPH_TO_MEM, DMA_INC_DST_ADDR);
+        dma_prepare(spi_config[bus].rx_dma, &tmp, len, 0);
     }
-    dev(bus)->CR2 |= SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN;
 
+    /* Start RX first to ensure it is active before the SPI transfers are
+     * triggered by the TX dma activity */
     dma_start(spi_config[bus].rx_dma);
     dma_start(spi_config[bus].tx_dma);
 
     dma_wait(spi_config[bus].rx_dma);
     dma_wait(spi_config[bus].tx_dma);
 
-    dev(bus)->CR2 &= ~(SPI_CR2_TXDMAEN | SPI_CR2_RXDMAEN);
-
-    dma_stop(spi_config[bus].tx_dma);
-    dma_stop(spi_config[bus].rx_dma);
-
-    dma_release(spi_config[bus].tx_dma);
-    dma_release(spi_config[bus].rx_dma);
-
+    /* No need to stop the DMA here, it is automatically disabled when the
+     * transfer is finished, only wait for SPI to leave the busy state */
     _wait_for_end(bus);
 }
 #endif
@@ -279,8 +316,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     }
 
 #ifdef MODULE_PERIPH_DMA
-    if (spi_config[bus].tx_dma != DMA_STREAM_UNDEF
-            && spi_config[bus].rx_dma != DMA_STREAM_UNDEF) {
+    if (_use_dma(&spi_config[bus])) {
         _transfer_dma(bus, out, in, len);
     }
     else {
