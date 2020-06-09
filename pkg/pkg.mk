@@ -1,5 +1,5 @@
 #
-# Include this file if your Package needs to be checked out by git
+# Include this file if your package needs to be checked out by git
 #
 # A package is up to date when its '.git-prepared' file is up to date.
 # Any change to the package makefile will force updating the repository
@@ -64,10 +64,10 @@ $(PKG_PREPARED): $(PKG_PATCHED)
 # directory is not a git repository for any reason (clean -xdff or others)
 GIT_IN_PKG = git -C $(PKG_BUILDDIR) --git-dir=.git --work-tree=.
 
-# When $(PKG_PATCHED).d is included $(PKG_PATCHED) pre-requisites will include
-# the old pre-requisites forcing a rebuild on pre-requisite removal, but we do
-# not want to generate $(PKG_PATCHED).d with the old pre-requisites
-PKG_PATCHED_PRE_REQUISITES = $(PKG_PATCHES) $(PKG_DOWNLOADED) $(MAKEFILE_LIST)
+# When $(PKG_PATCHED).d is included $(PKG_PATCHED) prerequisites will include
+# the old prerequisites forcing a rebuild on prerequisite removal, but we do
+# not want to generate $(PKG_PATCHED).d with the old prerequisites
+PKG_PATCHED_PREREQUISITES = $(PKG_PATCHES) $(PKG_DOWNLOADED) $(MAKEFILE_LIST)
 
 # Generate dependency file. Force rebuilding on dependency deletion
 # Warning: It will be evaluated before target execution, so use as first step
@@ -79,9 +79,9 @@ gen_dependency_files = $(file >$1,$@: $2)$(foreach f,$2,$(file >>$1,$(f):))
 # * clean, without removing the 'state' files
 # * checkout the wanted base commit
 # * apply patches if there are any. (If none, it does nothing)
-$(PKG_PATCHED): $(PKG_PATCHED_PRE_REQUISITES)
+$(PKG_PATCHED): $(PKG_PATCHED_PREREQUISITES)
 	$(info [INFO] patch $(PKG_NAME))
-	$(call gen_dependency_files,$@.d,$(PKG_PATCHED_PRE_REQUISITES))
+	$(call gen_dependency_files,$@.d,$(PKG_PATCHED_PREREQUISITES))
 	$(Q)$(GIT_IN_PKG) clean $(GIT_QUIET) -xdff '**' $(PKG_STATE:$(PKG_BUILDDIR)/%=':!%*')
 	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) -f $(PKG_VERSION)
 	$(Q)$(GIT_IN_PKG) $(GITFLAGS) am $(GITAMFLAGS) $(PKG_PATCHES) </dev/null
