@@ -64,9 +64,9 @@ $(PKG_PREPARED): $(PKG_PATCHED)
 # directory is not a git repository for any reason (clean -xdff or others)
 GIT_IN_PKG = git -C $(PKG_BUILDDIR) --git-dir=.git --work-tree=.
 
-# When $(PKG_PATCHED).d is included $(PKG_PATCHED) pre-requisites will include
-# the old pre-requisites forcing a rebuild on pre-requisite removal, but we do
-# not want to generate $(PKG_PATCHED).d with the old pre-requisites
+# When $(PKG_PATCHED).d is included $(PKG_PATCHED) prerequisites will include
+# the old prerequisites forcing a rebuild on prerequisite removal, but we do
+# not want to generate $(PKG_PATCHED).d with the old prerequisites
 PKG_PATCHED_PRE_REQUISITES = $(PKG_PATCHES) $(PKG_DOWNLOADED) $(MAKEFILE_LIST)
 
 # Generate dependency file. Force rebuilding on dependency deletion
