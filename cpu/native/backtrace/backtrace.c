@@ -17,14 +17,14 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#include "trace.h"
+#include "backtrace.h"
 
-void trace_print(void)
+void backtrace_print(void)
 {
-    void *array[TRACE_SIZE + 1];
+    void *array[BACKTRACE_SIZE + 1];
     size_t size;
 
-    size = backtrace(array, TRACE_SIZE + 1);
+    size = backtrace(array, BACKTRACE_SIZE + 1);
 
     /* skip above line's return address and start with 1 */
     for (size_t i = 1; i < size; i++) {
