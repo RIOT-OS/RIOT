@@ -18,8 +18,6 @@
  * @}
  */
 
-#ifdef MODULE_IO1_XPLAINED
-
 #include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
@@ -84,6 +82,3 @@ void auto_init_io1_xplained(void)
         }
     }
 }
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_IO1_XPLAINED */

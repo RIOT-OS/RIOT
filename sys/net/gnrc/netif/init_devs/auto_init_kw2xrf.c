@@ -20,8 +20,6 @@
  * @author  Sebastian Meiling <s@mlng.net>
  */
 
-#ifdef MODULE_KW2XRF
-
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netif/ieee802154.h"
@@ -58,8 +56,4 @@ void auto_init_kw2xrf(void)
                                      (netdev_t *)&kw2xrf_devs[i]);
     }
 }
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_KW2XRF */
-
 /** @} */

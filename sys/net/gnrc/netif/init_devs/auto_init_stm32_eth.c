@@ -7,8 +7,6 @@
  * @author      Robin Lösch <robin@chilio.net>
  */
 
-#ifdef MODULE_STM32_ETH
-
 #include "stm32_eth.h"
 #include "net/gnrc/netif/ethernet.h"
 
@@ -24,8 +22,4 @@ void auto_init_stm32_eth(void)
   gnrc_netif_ethernet_create(&_netif, stack, THREAD_STACKSIZE_DEFAULT, GNRC_NETIF_PRIO, "stm32_eth",
                              &stm32eth);
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_STM32_ETH */
 /** @} */

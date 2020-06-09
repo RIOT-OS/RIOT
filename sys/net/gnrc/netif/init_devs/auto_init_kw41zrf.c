@@ -18,8 +18,6 @@
  * @author  Thomas Stilwell <stilwellt@openlabs.co>
  */
 
-#ifdef MODULE_KW41ZRF
-
 #include "log.h"
 #include "board.h"
 #include "net/gnrc.h"
@@ -75,8 +73,4 @@ void auto_init_kw41zrf(void)
 #endif
     }
 }
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_KW41ZRF */
-
 /** @} */

@@ -18,8 +18,6 @@
  * @}
  */
 
-#ifdef MODULE_VCNL40X0
-
 #include "log.h"
 #include "saul_reg.h"
 
@@ -76,6 +74,3 @@ void auto_init_vcnl40x0(void)
         saul_reg_add(&(saul_entries[(i * 2) + 1]));
     }
 }
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_VCNL40X0 */

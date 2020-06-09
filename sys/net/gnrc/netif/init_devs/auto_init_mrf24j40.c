@@ -17,8 +17,6 @@
  * @author  Neo Nenaco <neo@nenaco.de>
  */
 
-#ifdef MODULE_MRF24J40
-
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netif/ieee802154.h"
@@ -55,8 +53,4 @@ void auto_init_mrf24j40(void)
                                      (netdev_t *)&mrf24j40_devs[i]);
     }
 }
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_MRF24J40 */
-
 /** @} */

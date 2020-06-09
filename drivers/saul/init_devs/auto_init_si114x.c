@@ -19,8 +19,6 @@
  * @}
  */
 
-#ifdef MODULE_SI114X
-
 #include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
@@ -95,7 +93,3 @@ void auto_init_si114x(void)
         saul_reg_add(&saul_entries[(i * 4) + 3]);
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_SI114X */

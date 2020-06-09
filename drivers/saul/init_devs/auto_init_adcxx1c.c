@@ -19,8 +19,6 @@
  * @}
  */
 
-#ifdef MODULE_ADCXX1C
-
 #include "assert.h"
 #include "log.h"
 
@@ -70,7 +68,3 @@ void auto_init_adcxx1c(void)
         saul_reg_add(&(saul_entries[i]));
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_ADCXX1C */

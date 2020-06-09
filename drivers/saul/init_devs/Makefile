@@ -1,3 +1,3 @@
 MODULE = saul_init_devs
 
-include $(RIOTBASE)/Makefile.base
+include $(RIOTMAKE)/auto_init.inc.mk

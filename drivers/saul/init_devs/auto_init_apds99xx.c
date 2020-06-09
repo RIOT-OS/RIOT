@@ -16,8 +16,6 @@
  * @}
  */
 
-#ifdef MODULE_APDS99XX
-
 #include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
@@ -102,7 +100,3 @@ void auto_init_apds99xx(void)
         #endif
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_APDS99XX */

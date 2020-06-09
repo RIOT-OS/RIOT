@@ -18,8 +18,6 @@
  * @}
  */
 
-#ifdef MODULE_VEML6070
-
 #include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
@@ -72,6 +70,3 @@ void auto_init_veml6070(void)
         saul_reg_add(&(saul_entries[(i)]));
     }
 }
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_VEML6070 */

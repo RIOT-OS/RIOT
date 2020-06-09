@@ -18,8 +18,6 @@
  * @}
  */
 
-#if defined(MODULE_SHT2X)
-
 #include "log.h"
 #include "saul_reg.h"
 
@@ -71,7 +69,3 @@ void auto_init_sht2x(void)
         se_ix++;
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_SHT2X */

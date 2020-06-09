@@ -19,8 +19,6 @@
  * @}
  */
 
-#ifdef MODULE_LIS2DH12
-
 #include "log.h"
 #include "assert.h"
 #include "saul_reg.h"
@@ -70,7 +68,3 @@ void auto_init_lis2dh12(void)
         saul_reg_add(&(saul_entries[i]));
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_LIS2DH12 */

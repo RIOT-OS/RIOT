@@ -17,8 +17,6 @@
  * @author  Juergen Fitschen <me@jue.yt>
  */
 
-#ifdef MODULE_DOSE
-
 #include "log.h"
 #include "debug.h"
 #include "dose.h"
@@ -51,8 +49,4 @@ void auto_init_dose(void)
                                    DOSE_MAC_PRIO, "dose", (netdev_t *)&dose[i]);
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_DOSE */
 /** @} */

@@ -19,8 +19,6 @@
  * @}
  */
 
-#ifdef MODULE_INA2XX
-
 #include "assert.h"
 #include "log.h"
 #include "saul_reg.h"
@@ -76,7 +74,3 @@ void auto_init_ina2xx(void)
         }
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_INA2XX */

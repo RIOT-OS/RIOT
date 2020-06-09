@@ -17,8 +17,6 @@
  * @author  Aaron Sowry <aaron@mutex.nz>
  */
 
-#ifdef MODULE_CC2538_RF
-
 #include "log.h"
 #include "net/gnrc/netif/ieee802154.h"
 
@@ -47,8 +45,4 @@ void auto_init_cc2538_rf(void)
                                  CC2538_MAC_PRIO, "cc2538_rf",
                                  (netdev_t *)&cc2538_rf_dev);
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_CC2538_RF */
 /** @} */

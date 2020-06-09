@@ -19,8 +19,6 @@
  * @}
  */
 
-#ifdef MODULE_FXOS8700
-
 #include "log.h"
 #include "saul_reg.h"
 #include "fxos8700_params.h"
@@ -70,7 +68,3 @@ void auto_init_fxos8700(void)
         }
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_FXOS8700 */

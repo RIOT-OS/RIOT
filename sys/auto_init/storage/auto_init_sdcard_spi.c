@@ -16,8 +16,6 @@
  * @author      Michel Rottleuthner <michel.rottleuthner@haw-hamburg.de>
  */
 
-#ifdef MODULE_SDCARD_SPI
-
 #include "log.h"
 #include "sdcard_spi.h"
 #include "sdcard_spi_params.h"
@@ -50,8 +48,4 @@ void auto_init_sdcard_spi(void)
         }
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_SDCARD_SPI */
 /** @} */

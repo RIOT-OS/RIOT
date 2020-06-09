@@ -17,8 +17,6 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
-#ifdef MODULE_SOCKET_ZEP
-
 #include "log.h"
 #include "socket_zep.h"
 #include "socket_zep_params.h"
@@ -54,8 +52,4 @@ void auto_init_socket_zep(void)
                                      (netdev_t *)&_socket_zeps[i]);
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_SOCKET_ZEP */
 /** @} */

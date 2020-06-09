@@ -19,8 +19,6 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifdef MODULE_ENC28J60
-
 #include "log.h"
 #include "enc28j60.h"
 #include "enc28j60_params.h"
@@ -68,8 +66,4 @@ void auto_init_enc28j60(void)
                                    (netdev_t *)&dev[i]);
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_ENC28J60 */
 /** @} */

@@ -17,9 +17,6 @@
  * @author  Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
 
-#ifdef MODULE_NRF802154
-
-
 #include "log.h"
 #include "board.h"
 #include "nrf802154.h"
@@ -49,8 +46,4 @@ void auto_init_nrf802154(void)
                                  NRF802154_MAC_PRIO, "nrf802154",
                                  (netdev_t *)&nrf802154_dev);
 }
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_NRF802154 */
-
 /** @} */

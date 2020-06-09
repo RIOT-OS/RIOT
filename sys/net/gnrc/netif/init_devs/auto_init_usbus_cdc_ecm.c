@@ -17,8 +17,6 @@
  * @author  Koen Zandberg <koen@bergzand.net>
  */
 
-#ifdef MODULE_USBUS_CDC_ECM
-
 #define USB_H_USER_IS_RIOT_INTERNAL
 
 #include "log.h"
@@ -55,8 +53,4 @@ void auto_init_netdev_cdcecm(void)
     gnrc_netif_ethernet_create(&_netif, _netdev_eth_stack, CDCECM_MAC_STACKSIZE,
                                CDCECM_MAC_PRIO, "cdcecm", &cdcecm.netdev);
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_CDC_ECM */
 /** @} */

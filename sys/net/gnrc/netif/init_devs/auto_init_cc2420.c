@@ -19,8 +19,6 @@
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
  */
 
-#ifdef MODULE_CC2420
-
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netif/ieee802154.h"
@@ -64,9 +62,4 @@ void auto_init_cc2420(void)
                                      (netdev_t *)&cc2420_devs[i]);
     }
 }
-
-#else
-typedef int dont_be_pedantic;
-#endif /* MODULE_CC2420 */
-
 /** @} */
