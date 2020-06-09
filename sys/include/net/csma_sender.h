@@ -42,8 +42,8 @@ extern "C" {
 /**
  * @brief Default Minimal CSMA/CA Backoff Exponent
  */
-#ifndef CSMA_SENDER_MIN_BE_DEFAULT
-#define CSMA_SENDER_MIN_BE_DEFAULT          (3U)
+#ifndef CONFIG_CSMA_SENDER_MIN_BE_DEFAULT
+#define CONFIG_CSMA_SENDER_MIN_BE_DEFAULT          (3U)
 #endif
 
 /**
