@@ -29,10 +29,28 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup net_gnrc_pktdump_conf GNRC PKTDUMP compile configurations
+ * @ingroup net_gnrc_conf
+ * @{
+ */
+/**
+ * @brief   Default message queue size for the PKTDUMP thread (as exponent of
+ *          2^n).
+ *
+ *          As the queue size ALWAYS needs to be power of two, this option
+ *          represents the exponent of 2^n, which will be used as the size of
+ *          the queue.
+ */
+#ifndef CONFIG_GNRC_PKTDUMP_MSG_QUEUE_SIZE_EXP
+#define CONFIG_GNRC_PKTDUMP_MSG_QUEUE_SIZE_EXP  3
+#endif
+/** @} */
+
+/**
  * @brief   Message queue size for the pktdump thread
  */
 #ifndef GNRC_PKTDUMP_MSG_QUEUE_SIZE
-#define GNRC_PKTDUMP_MSG_QUEUE_SIZE     (8U)
+#define GNRC_PKTDUMP_MSG_QUEUE_SIZE  (1 << CONFIG_GNRC_PKTDUMP_MSG_QUEUE_SIZE_EXP)
 #endif
 
 /**
