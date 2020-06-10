@@ -26,7 +26,7 @@ config CPU_ARCH
 
 config CPU_CORE_CORTEX_M
     bool
-    select HAS_ARCH_CORTEXM
+    select HAS_CPU_CORE_CORTEXM
     select HAS_PERIPH_PM
     select HAS_CPP
     select HAS_CPU_CHECK_ADDRESS
@@ -81,10 +81,10 @@ config CPU_CORE_CORTEX_M7
     select HAS_CORTEXM_FPU
 
 ## Definition of specific features
-config HAS_ARCH_CORTEXM
+config HAS_CPU_CORE_CORTEXM
     bool
     help
-        Indicates that the current architecture is ARM Cortex-M.
+        Indicates that the current CPU has an ARM Cortex-M core.
 
 config HAS_ARCH_ARM
     bool
