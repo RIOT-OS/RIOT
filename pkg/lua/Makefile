@@ -7,5 +7,4 @@ PKG_LICENSE=MIT
 include $(RIOTBASE)/pkg/pkg.mk
 
 all: Makefile.lua
-	@cp Makefile.lua $(PKG_BUILDDIR)
-	"$(MAKE)" -C $(PKG_BUILDDIR) -f Makefile.lua
+	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.lua

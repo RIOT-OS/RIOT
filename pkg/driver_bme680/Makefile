@@ -8,5 +8,4 @@ include $(RIOTBASE)/pkg/pkg.mk
 .PHONY: all
 
 all:
-	@cp Makefile.$(PKG_NAME) $(PKG_BUILDDIR)/Makefile
-	"$(MAKE)" -C $(PKG_BUILDDIR)
+	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.$(PKG_NAME)

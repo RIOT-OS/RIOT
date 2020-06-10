@@ -6,5 +6,4 @@ PKG_LICENSE=WTFPL
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	@cp Makefile.$(PKG_NAME) $(PKG_BUILDDIR)/Makefile
-	"$(MAKE)" -C $(PKG_BUILDDIR)
+	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.$(PKG_NAME)
