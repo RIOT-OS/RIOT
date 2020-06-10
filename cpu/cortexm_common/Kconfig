@@ -94,3 +94,8 @@ config HAS_CORTEXM_FPU
     bool
     help
         Indicates that a ARM Cortex-M FPU is present.
+
+config HAS_CORTEXM_MPU
+    bool
+    help
+        Indicates that a ARM Cortex-M MPU is present.
