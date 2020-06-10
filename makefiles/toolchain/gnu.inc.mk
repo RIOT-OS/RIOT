@@ -1,26 +1,26 @@
-export CC         = $(PREFIX)gcc
-export CXX        = $(PREFIX)g++
-export CCAS      ?= $(CC)
+CC         = $(PREFIX)gcc
+CXX        = $(PREFIX)g++
+CCAS      ?= $(CC)
 ifeq ($(LTO),1)
-export AR         = $(PREFIX)gcc-ar
-export RANLIB     = $(PREFIX)gcc-ranlib
+  AR         = $(PREFIX)gcc-ar
+  RANLIB     = $(PREFIX)gcc-ranlib
 else
-export AR         = $(PREFIX)ar
-export RANLIB     = $(PREFIX)ranlib
+  AR         = $(PREFIX)ar
+  RANLIB     = $(PREFIX)ranlib
 endif
-export AS         = $(PREFIX)as
-export NM         = $(PREFIX)nm
-export LINK       = $(PREFIX)gcc
-export LINKXX     = $(PREFIX)g++
-export SIZE       = $(PREFIX)size
+AS         = $(PREFIX)as
+NM         = $(PREFIX)nm
+LINK       = $(PREFIX)gcc
+LINKXX     = $(PREFIX)g++
+SIZE       = $(PREFIX)size
 _OBJCOPY          := $(shell command -v $(PREFIX)objcopy || command -v gobjcopy || command -v objcopy)
-export OBJCOPY   ?= $(_OBJCOPY)
+OBJCOPY   ?= $(_OBJCOPY)
 ifeq ($(OBJCOPY),)
-$(warning objcopy not found. Hex file will not be created.)
-export OBJCOPY    = true
+  $(warning objcopy not found. Hex file will not be created.)
+  OBJCOPY    = true
 endif
 # Default to the native (g)objdump, helps when using toolchain from docker
 _OBJDUMP         := $(or $(shell command -v $(PREFIX)objdump || command -v gobjdump),objdump)
-export OBJDUMP   ?= $(_OBJDUMP)
+OBJDUMP   ?= $(_OBJDUMP)
 # We use GDB for debugging
 include $(RIOTMAKE)/tools/gdb.inc.mk

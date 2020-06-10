@@ -1,35 +1,35 @@
-export LLVMPREFIX ?= llvm-
+LLVMPREFIX ?= llvm-
 # Apple XCode doesn't prefix its tools with llvm-, but manually installed LLVM
 # on OSX might have the llvm- prefix, we can't simply test against uname -s.
 # Test if llvm-ar exists
 ifeq (,$(shell command -v $(LLVMPREFIX)ar 2>/dev/null))
-# fall back to system tools
-export LLVMPREFIX :=
+  # fall back to system tools
+  LLVMPREFIX :=
 endif
-export CC          = clang
-export CXX         = clang++
-export CCAS       ?= $(CC)
-export AS          = $(LLVMPREFIX)as
-export AR          = $(LLVMPREFIX)ar
-export NM          = $(LLVMPREFIX)nm
+CC          = clang
+CXX         = clang++
+CCAS       ?= $(CC)
+AS          = $(LLVMPREFIX)as
+AR          = $(LLVMPREFIX)ar
+NM          = $(LLVMPREFIX)nm
 # LLVM does have a linker, however, it is not entirely
 # compatible with GCC. For instance spec files as used in
 # `makefiles/libc/newlib.mk` are not supported. Therefore
 # we just use GCC for now.
-export LINK        = $(PREFIX)gcc
-export LINKXX      = $(PREFIX)g++
+LINK        = $(PREFIX)gcc
+LINKXX      = $(PREFIX)g++
 # objcopy does not have a clear substitute in LLVM, use GNU binutils
-#export OBJCOPY     = $(LLVMPREFIX)objcopy
-_OBJCOPY          := $(shell command -v $(PREFIX)objcopy || command -v gobjcopy || command -v objcopy)
-export OBJCOPY    ?= $(_OBJCOPY)
+# OBJCOPY   = $(LLVMPREFIX)objcopy
+_OBJCOPY    := $(shell command -v $(PREFIX)objcopy || command -v gobjcopy || command -v objcopy)
+OBJCOPY    ?= $(_OBJCOPY)
 ifeq ($(OBJCOPY),)
-$(warning objcopy not found. Hex file will not be created.)
-export OBJCOPY     = true
+  $(warning objcopy not found. Hex file will not be created.)
+  OBJCOPY     = true
 endif
 # Default to the native (g)objdump, helps when using toolchain from docker
-_OBJDUMP          := $(or $(shell command -v $(LLVMPREFIX)objdump || command -v gobjdump),objdump)
-export OBJDUMP    ?= $(_OBJDUMP)
-export SIZE        = $(LLVMPREFIX)size
+_OBJDUMP    := $(or $(shell command -v $(LLVMPREFIX)objdump || command -v gobjdump),objdump)
+OBJDUMP     ?= $(_OBJDUMP)
+SIZE        = $(LLVMPREFIX)size
 # LLVM lacks a binutils strip tool as well...
 #export STRIP      = $(LLVMPREFIX)strip
 # We use GDB for debugging for now, maybe LLDB will be supported in the future.

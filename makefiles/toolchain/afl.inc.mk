@@ -1,6 +1,6 @@
 include $(RIOTMAKE)/toolchain/gnu.inc.mk
 
-export CC     = $(PREFIX)afl-gcc
-export CXX    = $(PREFIX)afl-g++
-export LINK   = $(PREFIX)afl-gcc
-export LINKXX = $(PREFIX)afl-g++
+CC     = $(PREFIX)afl-gcc
+CXX    = $(PREFIX)afl-g++
+LINK   = $(PREFIX)afl-gcc
+LINKXX = $(PREFIX)afl-g++
