@@ -4,4 +4,5 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+rsource "csma_sender/Kconfig"
 rsource "ieee802154/Kconfig"
