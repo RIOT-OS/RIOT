@@ -29,14 +29,20 @@
 #include "periph/f1/periph_cpu.h"
 #elif defined(CPU_FAM_STM32F2)
 #include "periph/f2/periph_cpu.h"
+#elif defined(CPU_FAM_STM32F3)
+#include "periph/f3/periph_cpu.h"
 #elif defined(CPU_FAM_STM32F4)
 #include "periph/f4/periph_cpu.h"
+#elif defined(CPU_FAM_STM32F7)
+#include "periph/f7/periph_cpu.h"
 #elif defined(CPU_FAM_STM32L0)
 #include "periph/l0/periph_cpu.h"
 #elif defined(CPU_FAM_STM32L1)
 #include "periph/l1/periph_cpu.h"
 #elif defined(CPU_FAM_STM32L4)
 #include "periph/l4/periph_cpu.h"
+#elif defined(CPU_FAM_STM32WB)
+#include "periph/wb/periph_cpu.h"
 #endif
 
 #ifdef __cplusplus
@@ -57,6 +63,14 @@ extern "C" {
 #define CLOCK_LSI           (32000U)
 #else
 #error "error: LSI clock speed not defined for your target CPU"
+#endif
+
+#ifdef Doxygen
+/**
+ * @brief   Starting address of the ROM bootloader
+ *          see application note AN2606
+ */
+#define STM32_BOOTLOADER_ADDR
 #endif
 
 /**
