@@ -6,4 +6,4 @@ PKG_LICENSE=CC-0
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	$(Q)"$(MAKE)" -C $(PKG_BUILDDIR)/src
+	"$(MAKE)" -C $(PKG_BUILDDIR)/src
