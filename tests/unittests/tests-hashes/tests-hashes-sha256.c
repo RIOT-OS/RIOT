@@ -146,70 +146,90 @@ static int calc_and_compare_hash(const char *str, const unsigned char *expected)
     return (memcmp(expected, hash, SHA256_DIGEST_LENGTH) == 0);
 }
 
+static int calc_and_compare_hash_wrapper(const char *str, const unsigned char *expected)
+{
+    static unsigned char hash[SHA256_DIGEST_LENGTH];
+
+    sha256((uint8_t*)str, strlen(str), hash);
+
+    return (memcmp(expected, hash, SHA256_DIGEST_LENGTH) == 0);
+}
+
 static void test_hashes_sha256_hash_sequence_01(void)
 {
-    TEST_ASSERT(calc_and_compare_hash("1234567890_1", h01));
+    const char *teststring = "1234567890_1";
+    TEST_ASSERT(calc_and_compare_hash(teststring, h01));
+    TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, h01));
 }
 
 static void test_hashes_sha256_hash_sequence_02(void)
 {
-    TEST_ASSERT(calc_and_compare_hash("1234567890_2", h02));
+    const char *teststring = "1234567890_2";
+    TEST_ASSERT(calc_and_compare_hash(teststring, h02));
+    TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, h02));
 }
 
 static void test_hashes_sha256_hash_sequence_03(void)
 {
-    TEST_ASSERT(calc_and_compare_hash("1234567890_3", h03));
+    const char *teststring = "1234567890_3";
+    TEST_ASSERT(calc_and_compare_hash(teststring, h03));
+    TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, h03));
 }
 
 static void test_hashes_sha256_hash_sequence_04(void)
 {
-    TEST_ASSERT(calc_and_compare_hash("1234567890_4", h04));
+    const char *teststring = "1234567890_4";
+    TEST_ASSERT(calc_and_compare_hash(teststring, h04));
+    TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, h04));
 }
 
 static void test_hashes_sha256_hash_sequence_digits_letters(void)
 {
-    TEST_ASSERT(calc_and_compare_hash(
-                    "0123456789abcde-0123456789abcde-0123456789abcde-0123456789abcde-",
-                    hdigits_letters));
+    const char *teststring = "0123456789abcde-0123456789abcde-0123456789abcde-0123456789abcde-";
+    TEST_ASSERT(calc_and_compare_hash(teststring, hdigits_letters));
+    TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hdigits_letters));
 }
 
 static void test_hashes_sha256_hash_sequence_pangramm(void)
 {
-    TEST_ASSERT(calc_and_compare_hash(
-                    "Franz jagt im komplett verwahrlosten Taxi quer durch Bayern",
-                    hpangramm));
+    const char *teststring = "Franz jagt im komplett verwahrlosten Taxi quer durch Bayern";
+    TEST_ASSERT(calc_and_compare_hash(teststring, hpangramm));
+    TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hpangramm));
 }
 
 static void test_hashes_sha256_hash_sequence_pangramm_no_more(void)
 {
     /* exchanged `z` with `k` of the first word `Fran[z|k]` */
-    TEST_ASSERT(calc_and_compare_hash(
-                    "Frank jagt im komplett verwahrlosten Taxi quer durch Bayern",
-                    hpangramm_no_more));
+    const char *teststring = "Frank jagt im komplett verwahrlosten Taxi quer durch Bayern";
+    TEST_ASSERT(calc_and_compare_hash(teststring, hpangramm_no_more));
+    TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hpangramm_no_more));
 }
 
 static void test_hashes_sha256_hash_sequence_empty(void)
 {
-    TEST_ASSERT(calc_and_compare_hash("", hempty));
+    const char *teststring = "";
+    TEST_ASSERT(calc_and_compare_hash(teststring, hempty));
+    TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hempty));
 }
 
 static void test_hashes_sha256_hash_sequence_failing_compare(void)
 {
     /* failing compare (sha256 switched last byte of expected hash from `3b` to `3c`) */
-    TEST_ASSERT(!calc_and_compare_hash("This test fails!",
-                    hfailing_compare));
+    char *teststring = "This test fails!";
+    TEST_ASSERT(!calc_and_compare_hash(teststring, hfailing_compare));
+    TEST_ASSERT(!calc_and_compare_hash_wrapper(teststring, hfailing_compare));
 }
 
 static void test_hashes_sha256_hash_long_sequence(void)
 {
-    TEST_ASSERT(calc_and_compare_hash(
-                    "RIOT is an open-source microkernel-based operating system, designed"
-                    " to match the requirements of Internet of Things (IoT) devices and"
-                    " other embedded devices. These requirements include a very low memory"
-                    " footprint (on the order of a few kilobytes), high energy efficiency"
-                    ", real-time capabilities, communication stacks for both wireless and"
-                    " wired networks, and support for a wide range of low-power hardware.",
-                    hlong_sequence));
+    char *teststring = {"RIOT is an open-source microkernel-based operating system, designed"
+                       " to match the requirements of Internet of Things (IoT) devices and"
+                       " other embedded devices. These requirements include a very low memory"
+                       " footprint (on the order of a few kilobytes), high energy efficiency"
+                       ", real-time capabilities, communication stacks for both wireless and"
+                       " wired networks, and support for a wide range of low-power hardware."};
+    TEST_ASSERT(calc_and_compare_hash(teststring, hlong_sequence));
+    TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hlong_sequence));
 }
 
 Test *tests_hashes_sha256_tests(void)
