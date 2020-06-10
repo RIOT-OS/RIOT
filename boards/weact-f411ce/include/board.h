@@ -76,7 +76,6 @@ extern "C" {
  */
 #define WEACT_411CE_NOR_PAGE_SIZE          (256)
 #define WEACT_411CE_NOR_PAGES_PER_SECTOR   (16)
-#define WEACT_411CE_NOR_SECTOR_COUNT       (128)
 #define WEACT_411CE_NOR_FLAGS              (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K)
 #define WEACT_411CE_NOR_SPI_DEV            SPI_DEV(0)
 #define WEACT_411CE_NOR_SPI_CLK            SPI_CLK_10MHZ
