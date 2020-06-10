@@ -122,23 +122,32 @@ void i2c_init(i2c_t dev)
     /* Enable Smart Mode (ACK is sent when DATA.DATA is read) */
     bus(dev)->CTRLB.reg = SERCOM_I2CM_CTRLB_SMEN;
 
-    /* Find and set baudrate. Read speed configuration. Set transfer
-     * speed: SERCOM_I2CM_CTRLA_SPEED(0): Standard-mode (Sm) up to 100
-     * kHz and Fast-mode (Fm) up to 400 kHz */
-    if (i2c_config[dev].speed > I2C_SPEED_FAST) {
+    /* Set SPEED */
+    if (i2c_config[dev].speed > I2C_SPEED_FAST_PLUS) {
         bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(2);
+    } else if (i2c_config[dev].speed > I2C_SPEED_FAST) {
+        bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(1);
     } else {
         bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(0);
     }
+
     /* Get the baudrate */
-    tmp_baud = (int32_t)(((sam0_gclk_freq(i2c_config[dev].gclk_src) +
-               (2 * (i2c_config[dev].speed)) - 1) /
+    /* fSCL = fGCLK / (10 + 2 * BAUD)  -> BAUD   = fGCLK / (2 * fSCL) - 5 */
+    /* fSCL = fGCLK / (2 + 2 * HSBAUD) -> HSBAUD = fGCLK / (2 * fSCL) - 1 */
+    tmp_baud = (((sam0_gclk_freq(i2c_config[dev].gclk_src) +
+               (2 * (i2c_config[dev].speed)) - 1) / /* round up */
                (2 * (i2c_config[dev].speed))) -
-               (i2c_config[dev].speed > I2C_SPEED_FAST ? 1 : 5));
+               (i2c_config[dev].speed > I2C_SPEED_FAST_PLUS ? 1 : 5));
+
     /* Ensure baudrate is within limits */
-    if (tmp_baud < 255 && tmp_baud > 0) {
+    assert(tmp_baud < 255 && tmp_baud > 0);
+
+    if (i2c_config[dev].speed > I2C_SPEED_FAST_PLUS) {
+        bus(dev)->BAUD.reg = SERCOM_I2CM_BAUD_HSBAUD(tmp_baud);
+    } else {
         bus(dev)->BAUD.reg = SERCOM_I2CM_BAUD_BAUD(tmp_baud);
     }
+
     /* ENABLE I2C MASTER */
     _i2c_poweron(dev);
 
