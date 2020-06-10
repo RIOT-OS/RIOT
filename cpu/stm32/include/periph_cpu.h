@@ -547,6 +547,13 @@ typedef enum {
     STM32_LPUART,           /**< STM32 Low-power UART (LPUART) module type */
 } uart_type_t;
 
+/**
+ * @brief   Size of the UART TX buffer for non-blocking mode.
+ */
+#ifndef STM32_UART_TXBUF_SIZE
+#define STM32_UART_TXBUF_SIZE    (64)
+#endif
+
 #ifndef DOXYGEN
 /**
  * @brief   Invalid UART mode mask
