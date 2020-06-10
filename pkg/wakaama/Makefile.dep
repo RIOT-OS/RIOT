@@ -1,3 +1,5 @@
+USEMODULE += wakaama_core wakaama_core_coap13 wakaama_client
+
 # include contrib code (platform adaption and client implementation)
 USEMODULE += wakaama_contrib
 
