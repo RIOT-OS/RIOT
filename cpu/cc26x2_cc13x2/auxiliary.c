@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2020 Locha Inc
  *
@@ -6,6 +5,7 @@
  * Public License v2.1. See the file LICENSE in the top level directory for more
  * details.
  */
+
 /**
  * @ingroup         cpu_cc26x2_cc13x2
  * @{
