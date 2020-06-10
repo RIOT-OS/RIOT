@@ -18,6 +18,8 @@ ifeq (nrfutil,$(PROGRAMMER))
   FLASHDEPS += $(HEXFILE).zip
   FLASHER = nrfutil
   FFLAGS = dfu usb-serial --port=${PORT} --package=$(HEXFILE).zip
+
+  include $(RIOTMAKE)/tools/usb_board_reset.mk
 endif
 
 %.hex.zip: %.hex

@@ -28,9 +28,14 @@ The board is flashed using its on-board boot loader; the
 be installed. That can turn the binary into a suitable zip file and send it to the
 bootloader.
 
-The process is automated in the usual `make flash` target. For that process to
-complete, you need to enter the bootloader manually by pressing the board's
-reset button. Readiness of the bootloader is indicated by LD2 pulsing in red.
+The process is automated in the usual `make flash` target.
+
+If RIOT is already running on the board, it will automatically reset the CPU and enter
+the bootloader.
+If some other firmware is running or RIOT crashed, you need to enter the bootloader
+manually by pressing the board's reset button.
+
+Readiness of the bootloader is indicated by LD2 pulsing in red.
 
 #### nrfutil installation
 
