@@ -10,7 +10,6 @@ RSMB_CFG ?= $(CURDIR)/config.cnf
 # manually set some RIOT env vars, so this Makefile can be called stand-alone
 RIOTBASE ?= $(CURDIR)/../../..
 RIOTTOOLS ?= $(CURDIR)/..
-GITCACHE ?= $(RIOTTOOLS)/git/git-cache
 
 # Include pkg.mk after setting RIOTBASE otherwise it is not found when this
 # Makefile is called stand-alone
