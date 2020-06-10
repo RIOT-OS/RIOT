@@ -69,21 +69,6 @@ void sha256_init(sha256_context_t *ctx)
     ctx->state[7] = 0x5BE0CD19;
 }
 
-/* Add bytes into the hash */
-void sha256_update(sha256_context_t *ctx, const void *data, size_t len)
-{
-    sha2xx_update(ctx, data, len);
-}
-
-/*
- * SHA-256 finalization.  Pads the input data, exports the hash value,
- * and clears the context state.
- */
-void sha256_final(sha256_context_t *ctx, void *dst)
-{
-    sha2xx_final(ctx, dst, SHA256_DIGEST_LENGTH);
-}
-
 void *sha256(const void *data, size_t len, void *digest)
 {
     sha256_context_t c;

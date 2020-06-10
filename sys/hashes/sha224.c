@@ -41,21 +41,6 @@ void sha224_init(sha224_context_t *ctx)
     ctx->state[7] = 0xBEFA4FA4;
 }
 
-/* Add bytes into the hash */
-void sha224_update(sha224_context_t *ctx, const void *data, size_t len)
-{
-    sha2xx_update(ctx, data, len);
-}
-
-/*
- * SHA-224 finalization.  Pads the input data, exports the hash value,
- * and clears the context state.
- */
-void sha224_final(sha224_context_t *ctx, void *dst)
-{
-    sha2xx_final(ctx, dst, SHA224_DIGEST_LENGTH);
-}
-
 void *sha224(const void *data, size_t len, void *digest)
 {
     sha224_context_t c;

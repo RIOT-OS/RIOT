@@ -106,7 +106,10 @@ void sha256_init(sha256_context_t *ctx);
  * @param[in] data Input data
  * @param[in] len  Length of @p data
  */
-void sha256_update(sha256_context_t *ctx, const void *data, size_t len);
+static inline void sha256_update(sha256_context_t *ctx, const void *data, size_t len)
+{
+    sha2xx_update(ctx, data, len);
+}
 
 /**
  * @brief SHA-256 finalization.  Pads the input data, exports the hash value,
@@ -115,7 +118,10 @@ void sha256_update(sha256_context_t *ctx, const void *data, size_t len);
  * @param ctx    sha256_context_t handle to use
  * @param digest resulting digest, this is the hash of all the bytes
  */
-void sha256_final(sha256_context_t *ctx, void *digest);
+static inline void sha256_final(sha256_context_t *ctx, void *digest)
+{
+    sha2xx_final(ctx, digest, SHA256_DIGEST_LENGTH);
+}
 
 /**
  * @brief A wrapper function to simplify the generation of a hash, this is
