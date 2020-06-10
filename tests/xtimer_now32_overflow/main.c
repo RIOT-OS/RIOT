@@ -27,11 +27,11 @@ static void _callback(void *arg)
     (void)arg;
 }
 
+static xtimer_t t1 = { .callback=_callback };
+static xtimer_t t2 = { .callback=_callback };
+
 int main(void)
 {
-    xtimer_t t1 = { .callback=_callback };
-    xtimer_t t2 = { .callback=_callback };
-
     /* ensure that xtimer_now64() is greater than UINT32_MAX
      * and the upper 32bit of xtimer_now64() equal 1 */
     _xtimer_current_time = (1LLU << 32U);
