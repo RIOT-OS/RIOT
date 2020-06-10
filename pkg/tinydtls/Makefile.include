@@ -41,14 +41,6 @@ else
   CFLAGS += -DTINYDTLS_LOG_LVL=0
 endif
 
-ifneq (,$(filter tinydtls_aes,$(USEMODULE)))
-  DIRS += $(PKG_BUILDDIR)/aes
-endif
-
-ifneq (,$(filter tinydtls_ecc,$(USEMODULE)))
-  DIRS += $(PKG_BUILDDIR)/ecc
-endif
-
 # For now contrib only contains sock_dtls adaption
 ifneq (,$(filter tinydtls_sock_dtls,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/tinydtls/contrib
