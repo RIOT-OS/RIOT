@@ -54,6 +54,21 @@
 #define MTD_4K              (4096ul)
 #define MTD_4K_ADDR_MASK    (0xFFF)
 
+#define MBIT_AS_BYTES       ((1024 * 1024) / 8)
+
+/**
+ * @brief   JEDEC memory manufacturer ID codes.
+ *
+ *          see http://www.softnology.biz/pdf/JEP106AV.pdf
+ * @{
+ */
+#define JEDEC_BANK(n)   ((n) << 8)
+
+typedef enum {
+    SPI_NOR_JEDEC_ATMEL     = 0x1F | JEDEC_BANK(1),
+} jedec_manuf_t;
+/** @} */
+
 static int mtd_spi_nor_init(mtd_dev_t *mtd);
 static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t size);
 static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t size);
@@ -77,6 +92,11 @@ static void mtd_spi_acquire(const mtd_spi_nor_t *dev)
 static void mtd_spi_release(const mtd_spi_nor_t *dev)
 {
     spi_release(dev->params->spi);
+}
+
+static bool mtd_spi_manuf_match(const mtd_jedec_id_t *id, jedec_manuf_t manuf)
+{
+    return manuf == ((id->bank << 8) | id->manuf);
 }
 
 /**
@@ -281,6 +301,28 @@ static int mtd_spi_read_jedec_id(const mtd_spi_nor_t *dev, mtd_jedec_id_t *out)
     return status;
 }
 
+/**
+ * @internal
+ * @brief Get Flash capacity based on JEDEC ID
+ *
+ * @note The way the capacity is encoded differs between vendors.
+ *       This formula has been tested with flash chips from Adesto,
+ *       ISSI, Micron and Spansion, but it might not cover all cases.
+ *       Please extend the function if necessary.
+ */
+static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
+{
+    /* old Atmel (now Adesto) parts use 5 lower bits of device ID 1 for density */
+    if (mtd_spi_manuf_match(id, SPI_NOR_JEDEC_ATMEL) &&
+        /* ID 2 is used to encode the product version, usually 1 or 2 */
+        (id->device[1] & ~0x3) == 0) {
+        return (0x1F & id->device[0]) * MBIT_AS_BYTES;
+    }
+
+    /* everyone else seems to use device ID 2 for density */
+    return 1 << id->device[1];
+}
+
 static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us)
 {
     unsigned i = 0, j = 0;
@@ -336,16 +378,6 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %lx, opcodes: %p\n",
           (unsigned long)dev->params->spi, (unsigned long)dev->params->cs, (void *)dev->params->opcode);
 
-    DEBUG("mtd_spi_nor_init: %" PRIu32 " bytes "
-          "(%" PRIu32 " sectors, %" PRIu32 " bytes/sector, "
-          "%" PRIu32 " pages, "
-          "%" PRIu32 " pages/sector, %" PRIu32 " bytes/page)\n",
-          mtd->pages_per_sector * mtd->sector_count * mtd->page_size,
-          mtd->sector_count, mtd->pages_per_sector * mtd->page_size,
-          mtd->pages_per_sector * mtd->sector_count,
-          mtd->pages_per_sector, mtd->page_size);
-    DEBUG("mtd_spi_nor_init: Using %u byte addresses\n", dev->params->addr_width);
-
     if (dev->params->addr_width == 0) {
         return -EINVAL;
     }
@@ -369,6 +401,22 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     }
     DEBUG("mtd_spi_nor_init: Found chip with ID: (%d, 0x%02x, 0x%02x, 0x%02x)\n",
           dev->jedec_id.bank, dev->jedec_id.manuf, dev->jedec_id.device[0], dev->jedec_id.device[1]);
+
+    /* derive density from JEDEC ID  */
+    if (mtd->sector_count == 0) {
+        mtd->sector_count = mtd_spi_nor_get_size(&dev->jedec_id)
+                          / (mtd->pages_per_sector * mtd->page_size);
+    }
+
+    DEBUG("mtd_spi_nor_init: %" PRIu32 " bytes "
+          "(%" PRIu32 " sectors, %" PRIu32 " bytes/sector, "
+          "%" PRIu32 " pages, "
+          "%" PRIu32 " pages/sector, %" PRIu32 " bytes/page)\n",
+          mtd->pages_per_sector * mtd->sector_count * mtd->page_size,
+          mtd->sector_count, mtd->pages_per_sector * mtd->page_size,
+          mtd->pages_per_sector * mtd->sector_count,
+          mtd->pages_per_sector, mtd->page_size);
+    DEBUG("mtd_spi_nor_init: Using %u byte addresses\n", dev->params->addr_width);
 
     uint8_t status;
     mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
