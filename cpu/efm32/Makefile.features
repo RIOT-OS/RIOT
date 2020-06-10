@@ -1,7 +1,7 @@
 include $(RIOTCPU)/efm32/efm32-info.mk
 include $(RIOTCPU)/efm32/efm32-features.mk
 
-CPU_ARCH = $(EFM32_ARCHITECTURE)
+CPU_CORE = $(EFM32_ARCHITECTURE)
 
 FEATURES_PROVIDED += arch_efm32
 FEATURES_PROVIDED += cortexm_mpu

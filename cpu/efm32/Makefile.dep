@@ -13,7 +13,7 @@ USEPKG += gecko_sdk
 USEMODULE += pm_layered
 
 # CMSIS-DSP is needed for arm_math.h on Cortex-M0+ architectures
-ifeq ($(CPU_ARCH),cortex-m0plus)
+ifeq ($(CPU_CORE),cortex-m0plus)
   USEPKG += cmsis-dsp
 endif
 

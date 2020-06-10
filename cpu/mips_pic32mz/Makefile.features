@@ -1,4 +1,5 @@
-CPU_ARCH = m5101
+CPU_ARCH = mips32
+CPU_CORE = m5101
 CPU_FAM = pic32mz
 
 FEATURES_PROVIDED += periph_hwrng

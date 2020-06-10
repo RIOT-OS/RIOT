@@ -27,7 +27,7 @@ static void test_atomic_flag(void)
 }
 
 /* Prevent compiler optimization for SAML1X because of gcc internal bug */
-#ifdef CPU_ARCH_CORTEX_M23
+#ifdef CPU_CORE_CORTEX_M23
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
 #endif

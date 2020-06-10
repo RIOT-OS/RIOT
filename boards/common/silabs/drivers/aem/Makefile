@@ -1,6 +1,6 @@
 MODULE = silabs_aem
 
-ifeq ($(CPU_ARCH),cortex-m0plus)
+ifeq ($(CPU_CORE),cortex-m0plus)
   $(error AEM is not available for the Cortex M0+)
 endif
 

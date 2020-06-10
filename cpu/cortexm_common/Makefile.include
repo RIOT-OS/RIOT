@@ -53,7 +53,7 @@ LINKFLAGS += $(if $(FW_ROM_LEN),$(LINKFLAGPREFIX)--defsym=_fw_rom_length=$(FW_RO
 # The values defined here are a theoretical maximum, in practice most cpu's
 # CPU_IRQ_NUMOF value is around 100, in these cases the value can be reduced
 # accordingly in the cpu Makefile.include, e.g: `kinetis/Makefile.include`
-ifneq (,$(filter cortex-m2% cortex-m4% cortex-m3% cortex-m7%,$(CPU_ARCH)))
+ifneq (,$(filter cortex-m2% cortex-m4% cortex-m3% cortex-m7%,$(CPU_CORE)))
   RIOTBOOT_HDR_LEN ?= 0x400
 else
   RIOTBOOT_HDR_LEN ?= 0x100

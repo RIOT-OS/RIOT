@@ -1,4 +1,4 @@
-CPU_ARCH = cortex-m3
+CPU_CORE = cortex-m3
 # This CPU only implements one CPU_MODEL with the same name
 CPU_MODEL = lpc1768
 

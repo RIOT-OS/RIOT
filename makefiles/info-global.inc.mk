@@ -40,6 +40,7 @@ define board_unsatisfied_features
   undefine CPU
   undefine CPU_MODEL
   undefine CPU_ARCH
+  undefine CPU_CORE
   undefine CPU_FAM
 
   include $(RIOTBASE)/Makefile.features

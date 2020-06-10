@@ -13,17 +13,17 @@ STM32_RAMMOD   = $(word 8, $(STM32_INFO))
 CPU_FAM = $(call lowercase,$(STM32_TYPE)$(STM32_FAMILY))
 
 ifeq (f0,$(CPU_FAM))
-  CPU_ARCH = cortex-m0
+  CPU_CORE = cortex-m0
 else ifneq (,$(filter $(CPU_FAM),f1 f2 l1))
-  CPU_ARCH = cortex-m3
+  CPU_CORE = cortex-m3
 else ifneq (,$(filter $(CPU_FAM),f3 f4 l4))
-  CPU_ARCH = cortex-m4f
+  CPU_CORE = cortex-m4f
 else ifeq (wb,$(CPU_FAM))
-  CPU_ARCH = cortex-m4
+  CPU_CORE = cortex-m4
 else ifeq (f7,$(CPU_FAM))
-  CPU_ARCH = cortex-m7
+  CPU_CORE = cortex-m7
 else ifeq (l0,$(CPU_FAM))
-  CPU_ARCH = cortex-m0plus
+  CPU_CORE = cortex-m0plus
 else
   $(error Not supported CPU family: 'stm32$(CPU_FAM)')
 endif
