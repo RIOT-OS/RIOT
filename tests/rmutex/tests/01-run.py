@@ -11,38 +11,31 @@
 import sys
 from testrunner import run
 
+NUM_THREADS = 5
 
-thread_prio = {
-        3:  6,
-        4:  4,
-        5:  5,
-        6:  2,
-        7:  4
-        }
-
-lock_depth = {
-        3:  5,
-        4:  3,
-        5:  3,
-        6:  4,
-        7:  5
-        }
-
-
-def thread_prio_sort(x):
-    return thread_prio.get(x)*1000 + x
+# Make sure this matches this line in main.c
+#  static const char depth[THREAD_NUMOF] = {5, 3, 3, 4, 5};
+expected_lock_depth = [5, 3, 3, 4, 5]
 
 
 def testfunc(child):
-    for k in thread_prio.keys():
-        child.expect_exact("T{} (prio {}, depth 0): trying to lock rmutex now"
-                           .format(k, thread_prio[k]))
+    # First collect the thread info how they are created
+    # A number of lines with:
+    #  T4 (prio 6): waiting on condition variable now
+    thread_prios = {}
+    lock_depth = {}
+    for nr in range(NUM_THREADS):
+        child.expect(r"T(\d+) \(prio (\d+), depth 0\): trying to lock rmutex now")
+        thread_id = int(child.match.group(1))
+        thread_prio = int(child.match.group(2))
+        thread_prios[thread_id] = thread_prio
+        lock_depth[thread_id] = expected_lock_depth[nr]
 
-    pri_sorted = sorted(thread_prio, key=thread_prio_sort)
+    pri_sorted = sorted(thread_prios, key=lambda x: thread_prios[x] * 1000 + x)
     for T in pri_sorted:
         for depth in range(lock_depth[T]):
             child.expect_exact("T{} (prio {}, depth {}): locked rmutex now"
-                               .format(T, thread_prio[T], depth))
+                               .format(T, thread_prios[T], depth))
 
 
 if __name__ == "__main__":
