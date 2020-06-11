@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include "at86rf215.h"
 #include "at86rf215_registers.h"
+#include "board.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,7 +31,9 @@ extern "C" {
 /**
  * @brief Minimum reset pulse width (tRST) in µs
  */
-#define AT86RF215_RESET_PULSE_WIDTH_US  (16U)
+#ifndef CONFIG_AT86RF215_RESET_PULSE_WIDTH_US
+#define CONFIG_AT86RF215_RESET_PULSE_WIDTH_US  (16U)
+#endif
 
 /**
  * @brief The typical transition time to TRX_OFF after reset (tPOWERON) in µs
