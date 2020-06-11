@@ -7,26 +7,29 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 .PHONY: ..cmake_version_supported
 
+RELIC_BUILD_DIR = $(PKG_BUILDDIR)/build
+RELIC_SOURCE_DIR = $(PKG_BUILDDIR)
+
 CMAKE_MINIMAL_VERSION = 3.6.0
 
 CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function -Wno-newline-eof
 
-TOOLCHAIN_FILE = $(PKG_BUILDDIR)/xcompile-toolchain.cmake
+TOOLCHAIN_FILE = $(RELIC_SOURCE_DIR)/xcompile-toolchain.cmake
 
 all: $(BINDIR)/$(PKG_NAME).a
 
-$(BINDIR)/$(PKG_NAME).a: $(PKG_BUILDDIR)/lib/librelic_s.a
+$(BINDIR)/$(PKG_NAME).a: $(RELIC_BUILD_DIR)/lib/librelic_s.a
 	cp $< $@
 
-$(PKG_BUILDDIR)/lib/librelic_s.a: $(PKG_BUILDDIR)/Makefile
-	$(MAKE) -C $(PKG_BUILDDIR)
+$(RELIC_BUILD_DIR)/lib/librelic_s.a: $(RELIC_BUILD_DIR)/Makefile
+	$(MAKE) -C $(RELIC_BUILD_DIR)
 
 # Pass 'COMP' with a target specific export to not have issues with the shell
 # escaping evaluation.
 COMP = $(filter-out -Werror -Werror=old-style-definition -Werror=strict-prototypes -std=gnu99,$(CFLAGS))
-$(PKG_BUILDDIR)/Makefile: export COMP ?=
-$(PKG_BUILDDIR)/Makefile: $(PKG_PREPARED) $(TOOLCHAIN_FILE) | ..cmake_version_supported
-	cmake -B$(PKG_BUILDDIR) -H$(PKG_BUILDDIR) \
+$(RELIC_BUILD_DIR)/Makefile: export COMP ?=
+$(RELIC_BUILD_DIR)/Makefile: $(PKG_PREPARED) $(TOOLCHAIN_FILE) | ..cmake_version_supported
+	cmake -B$(RELIC_BUILD_DIR) -H$(RELIC_SOURCE_DIR) \
 			-DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 			-DCHECK=off -DTESTS=0 -DBENCH=0 -DSHLIB=off -Wno-dev $(RELIC_CONFIG_FLAGS)
 

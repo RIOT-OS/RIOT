@@ -1,4 +1,5 @@
 INCLUDES += -I$(PKGDIRBASE)/relic/include
+INCLUDES += -I$(PKGDIRBASE)/relic/build/include
 
 ifneq (,$(filter cortex-m%,$(CPU_CORE)))
   # relic package package is not using system includes right now, so
