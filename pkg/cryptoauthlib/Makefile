@@ -40,15 +40,10 @@ $(TOOLCHAIN_FILE): git-download
 	$(RIOTTOOLS)/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
 
 build_tests:
-	cp $(PKG_TESTINCLDIR)/*.c $(PKG_BUILDDIR)
-	cp $(PKG_TESTINCLDIR)/jwt/*.c $(PKG_BUILDDIR)
-	cp $(PKG_TESTINCLDIR)/tng/*.c $(PKG_BUILDDIR)
-	cp $(PKG_TESTINCLDIR)/atcacert/*.c $(PKG_BUILDDIR)
-
-	echo "MODULE = $(PKG_TEST_NAME)" > $(PKG_BUILDDIR)/Makefile
-	echo "include \$$(RIOTBASE)/Makefile.base" >> $(PKG_BUILDDIR)/Makefile
-
-	"$(MAKE)" -C $(PKG_BUILDDIR)
+	"$(MAKE)" MODULE=$(PKG_TEST_NAME) -C $(PKG_BUILDDIR)/test -f $(RIOTBASE)/Makefile.base
+	"$(MAKE)" MODULE=$(PKG_TEST_NAME)_jwt -C $(PKG_BUILDDIR)/test/jwt -f $(RIOTBASE)/Makefile.base
+	"$(MAKE)" MODULE=$(PKG_TEST_NAME)_tng -C $(PKG_BUILDDIR)/test/tng -f $(RIOTBASE)/Makefile.base
+	"$(MAKE)" MODULE=$(PKG_TEST_NAME)_atcacert -C $(PKG_BUILDDIR)/test/atcacert -f $(RIOTBASE)/Makefile.base
 
 git-download: | ..cmake_version_supported
 
