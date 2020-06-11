@@ -44,6 +44,10 @@ void addFailure(const char *msg, long line, const char *file);  /*TestCase.c*/
 void assertImplementationLongLong(long long expected,long long actual, long line, const char *file);
 void assertImplementationCStr(const char *expected,const char *actual, long line, const char *file);
 
+#ifndef RIOT_FILE_RELATIVE
+#define RIOT_FILE_RELATIVE  (__FILE__)
+#endif
+
 #define TEST_ASSERT_EQUAL_STRING(expected_, actual_) \
     do { \
         const char *____expected__ = expected_; \
