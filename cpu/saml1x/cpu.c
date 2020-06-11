@@ -166,6 +166,11 @@ void cpu_init(void)
     _gclk_setup(SAM0_GCLK_32KHZ, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K);
 #endif
 
+#ifdef MODULE_PERIPH_DMA
+    /*  initialize DMA streams */
+    dma_init();
+#endif
+
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
     stdio_init();
 
