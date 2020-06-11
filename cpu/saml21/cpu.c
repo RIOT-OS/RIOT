@@ -284,6 +284,10 @@ void cpu_init(void)
     SUPC->BOD33.bit.ENABLE=0;
 #endif
 
+#ifdef MODULE_PERIPH_DMA
+    /*  initialize DMA streams */
+    dma_init();
+#endif
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
     stdio_init();
 
