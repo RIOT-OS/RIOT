@@ -8,7 +8,10 @@ BOARD ?= samr21-xpro
 RIOTBASE ?= $(CURDIR)/../..
 
 # lower pktbuf size to something sufficient for this application
-CFLAGS += -DGNRC_PKTBUF_SIZE=2000
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=2000
+endif
 
 #
 # Networking

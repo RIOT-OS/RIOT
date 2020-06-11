@@ -101,9 +101,9 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t s
 {
     gnrc_pktsnip_t *pkt;
 
-    if (size > GNRC_PKTBUF_SIZE) {
-        DEBUG("pktbuf: size (%u) > GNRC_PKTBUF_SIZE (%u)\n",
-              (unsigned)size, GNRC_PKTBUF_SIZE);
+    if (size > CONFIG_GNRC_PKTBUF_SIZE) {
+        DEBUG("pktbuf: size (%u) > CONFIG_GNRC_PKTBUF_SIZE (%u)\n",
+              (unsigned)size, CONFIG_GNRC_PKTBUF_SIZE);
         return NULL;
     }
     mutex_lock(&_mutex);

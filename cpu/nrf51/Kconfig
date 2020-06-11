@@ -1,0 +1,9 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+config GNRC_PKTBUF_SIZE
+    default 2048
+    depends on KCONFIG_MODULE_GNRC_PKTBUF_STATIC
