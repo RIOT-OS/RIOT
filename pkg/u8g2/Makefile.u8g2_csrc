@@ -1,0 +1,9 @@
+MODULE = u8g2_csrc
+
+CFLAGS += -Wno-overlength-strings
+
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-newline-eof
+endif
+
+include $(RIOTBASE)/Makefile.base
