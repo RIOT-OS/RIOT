@@ -39,16 +39,30 @@
     defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32F7)
 #define ISR_REG     ISR
 #define ISR_TXE     USART_ISR_TXE
+#define ISR_RXNE    USART_ISR_RXNE
 #define ISR_TC      USART_ISR_TC
 #define TDR_REG     TDR
+#define RDR_REG     RDR
 #else
 #define ISR_REG     SR
 #define ISR_TXE     USART_SR_TXE
+#define ISR_RXNE    USART_SR_RXNE
 #define ISR_TC      USART_SR_TC
 #define TDR_REG     DR
+#define RDR_REG     DR
 #endif
 
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE)
+
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+
+#include "tsrb.h"
+/**
+ * @brief   Allocate for tx ring buffers
+ */
+static tsrb_t uart_tx_rb[UART_NUMOF];
+static uint8_t uart_tx_rb_buf[UART_NUMOF][STM32_UART_TXBUF_SIZE];
+#endif
 
 /**
  * @brief   Allocate memory to store the callback functions
@@ -151,6 +165,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     isr_ctx[uart].rx_cb     = rx_cb;
     isr_ctx[uart].arg       = arg;
     isr_ctx[uart].data_mask = 0xFF;
+
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    /* set up the TX buffer */
+    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], STM32_UART_TXBUF_SIZE);
+#endif
 
     uart_init_pins(uart, rx_cb);
 
@@ -299,15 +318,21 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 #endif /* MODULE_PERIPH_LPUART */
 #endif /* STM32L0 || STM32L4 || STM32WB */
 
+#ifndef MODULE_PERIPH_UART_NONBLOCKING
 static inline void send_byte(uart_t uart, uint8_t byte)
 {
     while (!(dev(uart)->ISR_REG & ISR_TXE)) {}
     dev(uart)->TDR_REG = byte;
 }
+#endif
 
 static inline void wait_for_tx_complete(uart_t uart)
 {
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    (void) uart;
+#else
     while (!(dev(uart)->ISR_REG & ISR_TC)) {}
+#endif
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
@@ -359,7 +384,12 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     }
 #endif
     for (size_t i = 0; i < len; i++) {
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+        dev(uart)->CR1 |= (USART_CR1_TCIE);
+        while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {}
+#else
         send_byte(uart, data[i]);
+#endif
     }
     /* make sure the function is synchronous by waiting for the transfer to
      * finish */
@@ -399,35 +429,45 @@ void uart_poweroff(uart_t uart)
     uart_disable_clock(uart);
 }
 
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+static inline void irq_handler_tx(uart_t uart)
+{
+    int byte = tsrb_get_one(&uart_tx_rb[uart]);
+    if (byte >= 0) {
+        dev(uart)->TDR_REG = byte;
+    }
+
+    /* disable the interrupt if there are no more bytes to send */
+    if (tsrb_empty(&uart_tx_rb[uart])) {
+        dev(uart)->CR1 &= ~(USART_CR1_TCIE);
+    }
+}
+#endif
+
 static inline void irq_handler(uart_t uart)
 {
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32WB)
+    uint32_t status = dev(uart)->ISR_REG;
 
-    uint32_t status = dev(uart)->ISR;
-
-    if (status & USART_ISR_RXNE) {
-        isr_ctx[uart].rx_cb(isr_ctx[uart].arg,
-                            (uint8_t)dev(uart)->RDR & isr_ctx[uart].data_mask);
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    if (status & ISR_TC) {
+        irq_handler_tx(uart);
     }
+#endif
+
+    if (status & ISR_RXNE) {
+        isr_ctx[uart].rx_cb(isr_ctx[uart].arg,
+                            (uint8_t)dev(uart)->RDR_REG & isr_ctx[uart].data_mask);
+    }
+#if defined(USART_ISR_ORE)
+    /* USART_ISR_ORE is cleared by writing 1 to ORECF */
     if (status & USART_ISR_ORE) {
-        dev(uart)->ICR |= USART_ICR_ORECF;    /* simply clear flag on overrun */
+        dev(uart)->ICR |= USART_ICR_ORECF;
     }
-
 #else
-
-    uint32_t status = dev(uart)->SR;
-
-    if (status & USART_SR_RXNE) {
-        isr_ctx[uart].rx_cb(isr_ctx[uart].arg,
-                            (uint8_t)dev(uart)->DR & isr_ctx[uart].data_mask);
-    }
+    /* USART_SR_ORE is cleared by reading SR and DR sequentially */
     if (status & USART_SR_ORE) {
-        /* ORE is cleared by reading SR and DR sequentially */
         dev(uart)->DR;
     }
-
 #endif
 
     cortexm_isr_end();
