@@ -38,10 +38,10 @@
 #endif
 
 const csma_sender_conf_t CSMA_SENDER_CONF_DEFAULT = {
-    CSMA_SENDER_MIN_BE_DEFAULT,
-    CSMA_SENDER_MAX_BE_DEFAULT,
-    CSMA_SENDER_MAX_BACKOFFS_DEFAULT,
-    CSMA_SENDER_BACKOFF_PERIOD_UNIT
+    CONFIG_CSMA_SENDER_MIN_BE_DEFAULT,
+    CONFIG_CSMA_SENDER_MAX_BE_DEFAULT,
+    CONFIG_CSMA_SENDER_MAX_BACKOFFS_DEFAULT,
+    CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT
 };
 
 /*--------------------- "INTERNAL" UTILITY FUNCTIONS ---------------------*/
@@ -63,11 +63,11 @@ static inline uint32_t choose_backoff_period(int be,
     if (be > conf->max_be) {
         be = conf->max_be;
     }
-    uint32_t max_backoff = ((1 << be) - 1) * CSMA_SENDER_BACKOFF_PERIOD_UNIT;
+    uint32_t max_backoff = ((1 << be) - 1) * CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT;
 
     uint32_t period = random_uint32() % max_backoff;
-    if (period < CSMA_SENDER_BACKOFF_PERIOD_UNIT) {
-        period = CSMA_SENDER_BACKOFF_PERIOD_UNIT;
+    if (period < CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT) {
+        period = CONFIG_CSMA_SENDER_BACKOFF_PERIOD_UNIT;
     }
 
     return period;
