@@ -105,31 +105,28 @@ ifneq (,$(SHOULD_RUN_KCONFIG))
 endif
 
 $(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(OBJ_DEPS)
-	$(Q) RELPATH=$$(realpath --relative-base $(RIOTBASE) $(abspath $<)) ; \
-	    cd $(RIOTBASE) && $(CCACHE) $(CC) \
+	$(Q)$(CCACHE) $(CC) \
+		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
-		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ "$${RELPATH}"
+		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
 
 $(GENOBJC): %.o: %.c $(OBJ_DEPS)
-	$(Q) RELPATH=$$(realpath --relative-base $(RIOTBASE) $(abspath $<)) ; \
-	    cd $(RIOTBASE) && $(CCACHE) $(CC) \
+	$(Q) $(CCACHE) $(CC) \
+		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$<)\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
-		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ "$${RELPATH}"
+		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $<
 
 $(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.$(SRCXXEXT) $(OBJ_DEPS)
-	$(Q) RELPATH=$$(realpath --relative-base $(RIOTBASE) $(abspath $<)) ; \
-	    cd $(RIOTBASE) && $(CCACHE) $(CXX) \
+	$(Q)$(CCACHE) $(CXX) \
+		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
-		$(CXXFLAGS) $(CXXINCLUDES) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ "$${RELPATH}"
+		$(CXXFLAGS) $(CXXINCLUDES) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
 
 $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
-	$(Q) RELPATH=$$(realpath --relative-base $(RIOTBASE) $(abspath $<)) ; \
-	    cd $(RIOTBASE) && $(AS) $(ASFLAGS) -o $@ $(abspath $<)
+	$(Q)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
 $(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(OBJ_DEPS)
-	$(Q) RELPATH=$$(realpath --relative-base $(RIOTBASE) $(abspath $<)) ; \
-	    cd $(RIOTBASE) && \
-		$(CCAS) $(CCASFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ "$${RELPATH}"
+	$(Q)$(CCAS) $(CCASFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
 
 # pull in dependency info for *existing* .o files
 # deleted header files will be silently ignored
