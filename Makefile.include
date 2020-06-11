@@ -711,7 +711,7 @@ flash-only: $(FLASHDEPS)
 	$(flash-recipe)
 
 preflash: $(BUILD_BEFORE_FLASH)
-	$(PREFLASHER) $(PREFFLAGS)
+	$(PREFLASHER_PREFIX)$(PREFLASHER) $(PREFFLAGS)
 
 TERMFLASHDEPS ?= $(filter flash flash-only,$(MAKECMDGOALS))
 # Add TERMFLASHDEPS to TERMDEPS so it also applies to `test`
