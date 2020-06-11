@@ -266,6 +266,10 @@ void cpu_init(void)
     cortexm_init();
     /* Initialise clock sources and generic clocks */
     clk_init();
+#ifdef MODULE_PERIPH_DMA
+    /*  initialize DMA streams */
+    dma_init();
+#endif
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
     stdio_init();
     /* trigger static peripheral initialization */
