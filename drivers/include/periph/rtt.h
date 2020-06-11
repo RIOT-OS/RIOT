@@ -61,6 +61,24 @@ extern "C" {
 #define RTT_MAX_VALUE
 #endif
 
+/**
+ * @def     RTT_MIN_OFFSET
+ *
+ * @brief   The minimum offset to correctly set an rtt callback.
+ *
+ * If the callback is taking into account rtt_get_counter() then the rtt
+ * might advance right between the call to rtt_get_counter() and
+ * rtt_set_alarm(). If that happens with val==1, the alarm would be
+ * set to the current time, which would then underflow. To avoid this,
+ * the alarm should be set at least two ticks in the future.
+ *
+ * This value can vary depending on the platform.
+ *
+ */
+#ifndef RTT_MIN_OFFSET
+#define RTT_MIN_OFFSET (2U)
+#endif
+
 #ifndef RTT_FREQUENCY
 /* Allow mock-RTT for unit tests */
 #ifdef MOCK_RTT_FREQUENCY
