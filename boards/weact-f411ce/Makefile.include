@@ -6,5 +6,9 @@ DFU_USB_ID ?= 0483:df11
 DFU_FLAGS  ?= -a 0 -s 0x08000000:leave
 ROM_OFFSET ?= 0x0
 
+# CDC ACM is available faster on STM32
+TERM_DELAY ?= 1
+
 # Setup of programmer and serial is shared between STM32 based boards
 include $(RIOTMAKE)/boards/stm32.inc.mk
+include $(RIOTMAKE)/tools/usb_board_reset.mk

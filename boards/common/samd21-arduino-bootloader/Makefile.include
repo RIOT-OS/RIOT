@@ -8,21 +8,6 @@ ifeq ($(PROGRAMMER),bossa)
   # such bootloader.
   ROM_OFFSET ?= 0x2000
   BOSSA_ARDUINO_PREFLASH = yes
-  PREFLASH_DELAY = 1
-
-  ifneq (,$(filter reset flash flash-only, $(MAKECMDGOALS)))
-    # By default, add 2 seconds delay before opening terminal: this is required
-    # when opening the terminal right after flashing. In this case, the stdio
-    # over USB needs some time after reset before being ready.
-    TERM_DELAY ?= 2
-    TERMDEPS += term-delay
-  endif
 
   include $(RIOTMAKE)/tools/bossa.inc.mk
 endif
-
-term-delay:
-	sleep $(TERM_DELAY)
-
-TESTRUNNER_CONNECT_DELAY ?= $(TERM_DELAY)
-$(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)

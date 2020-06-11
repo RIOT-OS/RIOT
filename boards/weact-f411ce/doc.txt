@@ -36,20 +36,24 @@ It is available on sites like AliExpress for less than 4€.
 ## Flashing the device
 The device comes with a bootloader that allows flashing via `dfu-util`.
 
-There are two buttons on the board labeled `BOOT0` and `NRST`.
-
- - Press and hold down `NRST` to reset the CPU
- - Press `BOOT0` while keeping `NRST` held down
- - Release `NRST`, afterwards release `BOOT0`
-
-The board will now show up as `0483:df11` - `STM32 BOOTLOADER` and will accept
-firmware using the DFU protocol.
-
-You can upload your RIOT-firmware by typing
+If RIOT is already running on the board, you can upload your RIOT-firmware by typing
 
 ```
 make BOARD=weact-f411ce flash
 ```
+
+RIOT will make sure to enter the bootloader automatically.
+
+If RIOT crashed or you have the plain board with the stock firmware, you have to enter
+the bootloader manually.
+
+There are two buttons on the board labeled `BOOT0` and `NRST`.
+
+ - Hold down `BOOT0`
+ - Shortly press `NRST` to reset the CPU while keeping `BOOT0` held down
+
+The board will now show up as `0483:df11` - `STM32 BOOTLOADER` and will accept
+firmware using the DFU protocol.
 
 *Note:* You need to have write permissions to the device.
 On Linux you could add yourself to the `plugdev` group and store the following as `/etc/udev/rules.d/99-weact-f411ce.rules`:
