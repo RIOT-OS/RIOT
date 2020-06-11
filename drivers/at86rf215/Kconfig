@@ -38,6 +38,17 @@ config AT86RF215_TRIM_VAL
         26 MHz the best.
         For more information Refer Table 6-25 TRIM in Datasheet
 
+config AT86RF215_RESET_PULSE_WIDTH_US
+    int "Width of the reset pulse (µs)"
+    range 16 1000
+    default 16
+    help
+        If your board design includes a filtering capacitor on the reset line, this raises
+        the rise time of the reset pulse.
+        To accommodate for this, select a larger reset pulse width here.
+
+        If unsure, leave this at the default value of 16 µs.
+
 choice
     prompt "Default Modulation"
 

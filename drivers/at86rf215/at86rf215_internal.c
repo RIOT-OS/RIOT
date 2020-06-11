@@ -49,7 +49,7 @@ int at86rf215_hardware_reset(at86rf215_t *dev)
 
     /* trigger hardware reset */
     gpio_clear(dev->params.reset_pin);
-    xtimer_usleep(AT86RF215_RESET_PULSE_WIDTH_US);
+    xtimer_usleep(CONFIG_AT86RF215_RESET_PULSE_WIDTH_US);
     gpio_set(dev->params.reset_pin);
     xtimer_usleep(AT86RF215_RESET_DELAY_US);
 
