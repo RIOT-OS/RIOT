@@ -30,3 +30,6 @@ CFLAGS += -DDONT_USE_PREDEFINED_PERIPHERALS_HANDLERS
 LINKER_SCRIPT ?= cortexm.ld
 
 INCLUDES += -I$(RIOTCPU)/sam0_common/include
+
+PSEUDOMODULES += periph_rtc
+PSEUDOMODULES += periph_rtt

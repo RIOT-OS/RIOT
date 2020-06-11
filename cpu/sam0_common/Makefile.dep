@@ -2,6 +2,10 @@ ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
   USEMODULE += tsrb
 endif
 
+ifneq (,$(filter periph_rtc periph_rtt,$(USEMODULE)))
+  USEMODULE += periph_rtc_rtt
+endif
+
 # All SAM0 based CPUs provide PM
 USEMODULE += pm_layered
 
