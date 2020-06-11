@@ -21,6 +21,9 @@ endif
 # select cpu_check_address pseudomodule if the corresponding feature is used
 USEMODULE += $(filter cpu_check_address, $(FEATURES_USED))
 
+# select bootloader_stm32 module if the feature is used
+USEMODULE += $(filter bootloader_stm32, $(FEATURES_USED))
+
 # include puf_sram if used
 USEMODULE += $(filter puf_sram, $(FEATURES_USED))
 
