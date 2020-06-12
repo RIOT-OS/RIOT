@@ -1,5 +1,3 @@
 INCLUDES += -I$(PKGDIRBASE)/littlefs2
 
-ifneq (,$(filter littlefs2_fs,$(USEMODULE)))
-  DIRS += $(RIOTBASE)/pkg/littlefs2/fs
-endif
+DIRS += $(RIOTBASE)/pkg/littlefs2/fs
