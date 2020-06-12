@@ -7,6 +7,9 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 .PHONY: ..cmake_version_supported
 
+CCNLITE_SOURCE_DIR = $(PKG_BUILDDIR)
+CCNLITE_BUILD_DIR = $(PKG_BUILDDIR)/build
+
 CMAKE_MINIMAL_VERSION = 3.6.0
 
 RIOT_CFLAGS = $(INCLUDES)
@@ -15,18 +18,18 @@ ifeq (llvm,$(TOOLCHAIN))
   RIOT_CFLAGS += -Wno-char-subscripts
 endif
 
-TOOLCHAIN_FILE = $(PKG_BUILDDIR)/xcompile-toolchain.cmake
+TOOLCHAIN_FILE = $(CCNLITE_SOURCE_DIR)/xcompile-toolchain.cmake
 
 all: $(BINDIR)/ccn-lite.a
 
-$(BINDIR)/ccn-lite.a: $(PKG_BUILDDIR)/bin/lib/libccnl-riot.a
+$(BINDIR)/ccn-lite.a: $(CCNLITE_BUILD_DIR)/lib/libccnl-riot.a
 	cp $< $@
 
-$(PKG_BUILDDIR)/bin/lib/libccnl-riot.a: $(PKG_BUILDDIR)/bin/Makefile
-	$(MAKE) -C $(PKG_BUILDDIR)/bin
+$(CCNLITE_BUILD_DIR)/lib/libccnl-riot.a: $(CCNLITE_BUILD_DIR)/Makefile
+	$(MAKE) -C $(CCNLITE_BUILD_DIR)
 
-$(PKG_BUILDDIR)/bin/Makefile: $(PKG_PREPARED) $(TOOLCHAIN_FILE) | ..cmake_version_supported
-	cmake -B$(PKG_BUILDDIR)/bin -H$(PKG_BUILDDIR)/src \
+$(CCNLITE_BUILD_DIR)/Makefile: $(PKG_PREPARED) $(TOOLCHAIN_FILE) | ..cmake_version_supported
+	cmake -B$(CCNLITE_BUILD_DIR) -H$(CCNLITE_SOURCE_DIR)/src \
 	      -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 	      -DCCNL_RIOT=1 -DRIOT_CFLAGS="$(RIOT_CFLAGS)" -DBUILD_TESTING=OFF
 
