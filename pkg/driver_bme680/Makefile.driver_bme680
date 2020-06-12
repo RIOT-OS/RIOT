@@ -1,7 +1,0 @@
-MODULE = driver_bme680
-
-ifneq (,$(filter bme680_fp,$(USEMODULE)))
-  CFLAGS += -DBME680_FLOAT_POINT_COMPENSATION
-endif
-
-include $(RIOTBASE)/Makefile.base

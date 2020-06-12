@@ -6,5 +6,4 @@ PKG_LICENSE = LGPL-2.1
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR)/src \
-		-f $(RIOTPKG)/nanocbor/Makefile.$(PKG_NAME)
+	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)

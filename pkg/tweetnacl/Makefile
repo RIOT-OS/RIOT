@@ -6,4 +6,4 @@ PKG_LICENSE=PD
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.riot
+	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(RIOTBASE)/Makefile.base

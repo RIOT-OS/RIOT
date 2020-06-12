@@ -6,4 +6,4 @@ PKG_LICENSE=MIT
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(CURDIR)/Makefile.talking_leds
+	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)

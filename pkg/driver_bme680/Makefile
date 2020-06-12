@@ -5,7 +5,11 @@ PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+ifneq (,$(filter bme680_fp,$(USEMODULE)))
+  CFLAGS += -DBME680_FLOAT_POINT_COMPENSATION
+endif
+
 .PHONY: all
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.$(PKG_NAME)
+	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(RIOTBASE)/Makefile.base

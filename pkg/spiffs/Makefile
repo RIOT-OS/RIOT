@@ -5,5 +5,8 @@ PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+# Disable 'ISO C99 doesn’t support unnamed structs/unions [-Werror=pedantic]'
+CFLAGS += -Wno-pedantic
+
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(CURDIR)/Makefile.spiffs
+	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)

@@ -8,4 +8,4 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -D_XOPEN_SOURCE=600
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.$(PKG_NAME)
+	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(RIOTBASE)/Makefile.base

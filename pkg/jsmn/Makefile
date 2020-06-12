@@ -6,4 +6,4 @@ PKG_LICENSE=MIT
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.jsmn
+	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(RIOTBASE)/Makefile.base

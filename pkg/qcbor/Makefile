@@ -6,4 +6,4 @@ PKG_LICENSE = BSD-3-Clause
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(RIOTPKG)/qcbor/Makefile.$(PKG_NAME)
+	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
