@@ -5,6 +5,9 @@ PKG_LICENSE=Apache2.0
 
 PKG_BUILDDIR=$(CURDIR)/bin
 
+FLATC_SOURCE_DIR = $(PKG_BUILDDIR)
+FLATC_BUILD_DIR = $(PKG_BUILDDIR)/build
+
 # manually set some RIOT env vars, so this Makefile can be called stand-alone
 RIOTBASE ?= $(CURDIR)/../../..
 RIOTTOOLS ?= $(CURDIR)/..
@@ -24,9 +27,9 @@ endif
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	@cd "$(PKG_BUILDDIR)" && env -i PATH="$(PATH)" cmake -G "Unix Makefiles" $(CMAKE_OPTIONS) .
-	"$(MAKE)" -C "$(PKG_BUILDDIR)"
-	@mv "$(PKG_BUILDDIR)"/flatc $(CURDIR)/flatc
+	@env -i PATH="$(PATH)" cmake -G "Unix Makefiles" $(CMAKE_OPTIONS) -H"$(FLATC_SOURCE_DIR)" -B"$(FLATC_BUILD_DIR)"
+	"$(MAKE)" -C "$(FLATC_BUILD_DIR)"
+	@mv "$(FLATC_BUILD_DIR)"/flatc $(CURDIR)/flatc
 
 distclean::
 	@rm -f $(CURDIR)/flatc
