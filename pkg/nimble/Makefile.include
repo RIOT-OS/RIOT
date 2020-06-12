@@ -82,6 +82,12 @@ endif
 ifneq (,$(filter nimble_netif,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/netif/include
 
+  # when using IP, the host should have a higher prio than the netif thread, but
+  # MUST always have a lower priority then the controller thread. Setting it to
+  # controller prio plus will guarantee the latter while also matching the first
+  # condition as long as the default netif prio is not changed.
+  CFLAGS += -DNIMBLE_HOST_PRIO="(NIMBLE_CONTROLLER_PRIO + 1)"
+
   # configure NimBLE's internals
   NIMBLE_MAX_CONN ?= 3
   CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE=264
