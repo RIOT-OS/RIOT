@@ -1,4 +1,5 @@
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_dma
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_raw
 FEATURES_PROVIDED += periph_flashpage_rwee

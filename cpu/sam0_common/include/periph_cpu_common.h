@@ -669,6 +669,218 @@ typedef struct {
  */
 #define WDT_HAS_INIT                   (1)
 
+/**
+ * The sam0 DMA peripheral has a number of channels. Each channel is a separate
+ * data stream, triggered by a configurable trigger when enabled, or triggered
+ * by software (not yet supported). In theory each DMA channel is equal and can
+ * have a configurable priority and can be triggered by the full set of triggers
+ * available.
+ *
+ * DMA descriptors, specifying a single transfer with size, source and
+ * destination, are kept in RAM and are read when the channel is enabled and
+ * triggered. On the SAML21 platform, these descriptors must reside in the LP
+ * SRAM.
+ */
+
+/**
+ * @brief Indicates that the peripheral doesn't utilize the DMA controller.
+ *        Matches with the register configuration for software based triggers.
+ */
+#define DMA_TRIGGER_DISABLED           0
+
+/**
+ * @brief Move the DMA descriptors to the LP SRAM. Required on the SAML21
+ */
+#if defined(CPU_FAM_SAML21)
+#define DMA_DESCRIPTOR_IN_LPSRAM
+#endif
+
+#ifdef DMA_DESCRIPTOR_IN_LPSRAM
+#define DMA_DESCRIPTOR_ATTRS    __attribute__((section(".backup.bss")))
+#else
+#define DMA_DESCRIPTOR_ATTRS
+#endif
+
+/**
+ * @brief DMA channel type
+ */
+typedef unsigned dma_t;
+
+/**
+ * @brief Available DMA address increment modes
+ */
+typedef enum {
+    DMA_INCR_NONE   = 0,    /**< Don't increment any addresses after a beat */
+    DMA_INCR_SRC    = 1,    /**< Increment the source address after a beat */
+    DMA_INCR_DEST   = 2,    /**< Increment destination address after a beat */
+    DMA_INCR_BOTH   = 3,    /**< Increment both addresses after a beat */
+} dma_incr_t;
+
+/**
+ * @brief   Initialize DMA
+ */
+void dma_init(void);
+
+/**
+ * @brief Acquire a DMA channel.
+ *
+ * A free DMA channel is marked as allocated and a reference is returned.
+ * DMA channels can be acquired for long periods of time, e.g. from the start to
+ * end of a number of transfers or directly at boot and never released.
+ *
+ * @returns     A reference to the DMA channel
+ * @returns     UINT8_MAX when no DMA channel is available
+ */
+dma_t dma_acquire_channel(void);
+
+/**
+ * @brief   Release a previously acquired DMA channel
+ *
+ * @param   dma     DMA channel to release
+ */
+void dma_release_channel(dma_t dma);
+
+/**
+ * @brief   Initialize a previously allocated DMA channel with one-time settings
+ *
+ * @param   dma     DMA channel reference
+ * @param   trigger Trigger to use for this DMA channel
+ * @param   prio    Channel priority
+ * @param   irq     Whether to enable the interrupt handler for this channel
+ */
+void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq);
+
+/**
+ * @brief   Prepare the DMA channel for an individual transfer.
+ *
+ * @param   dma     DMA channel reference
+ * @param   width   Transfer beat size to use
+ * @param   src     Source address for the transfer
+ * @param   dst     Destination address for the transfer
+ * @param   len     Number of beats to transfer
+ * @param   incr    Which of the addresses to increment after a beat
+ */
+void dma_prepare(dma_t dma, uint8_t width, void *src, void *dst, size_t len,
+                 dma_incr_t incr);
+
+/**
+ * @brief   Prepare a transfer without modifying the destination address
+ *          settings.
+ *
+ * Can be used when repeatedly using a dma channel to transfer to the same
+ * peripheral address, leaving the destination address and related settings
+ * untouched
+ *
+ * @note This only touches the source address, length and source increment
+ * settings. Be sure to initialize the full descriptor beforehand with
+ * @ref dma_prepare
+ *
+ * @param   dma     DMA channel reference
+ * @param   src     Source address for the transfer
+ * @param   len     Number of beats to transfer
+ * @param   incr    Whether to increment the source address after a beat
+ */
+void dma_prepare_src(dma_t dma, void *src, size_t len, bool incr);
+
+/**
+ * @brief   Prepare a transfer without modifying the source address
+ *          settings.
+ *
+ * Can be used when repeatedly using a dma channel to transfer from the same
+ * peripheral address, leaving the source address and related settings
+ * untouched
+ *
+ * @note This only touches the destination address, length and destination
+ * increment settings. Be sure to initialize the full descriptor beforehand with
+ * @ref dma_prepare
+ *
+ * @param   dma     DMA channel reference
+ * @param   dst     Destination address for the transfer
+ * @param   len     Number of beats to transfer
+ * @param   incr    Whether to increment the destination address after a beat
+ */
+void dma_prepare_dst(dma_t dma, void *dst, size_t len, bool incr);
+
+/**
+ * @brief   Append a second transfer descriptor after the default channel
+ *          descriptor.
+ *
+ * @note Only a single extra transfer descriptor is supported for now.
+ * @note @p descriptor must remain valid throughout the full transfer duration
+ *
+ * @param   dma         DMA channel reference to add the descriptor to
+ * @param   descriptor  Extra transfer descriptor to append
+ * @param   width       Transfer beat size to use
+ * @param   src         Source address for the transfer
+ * @param   dst         Destination address for the transfer
+ * @param   len         Number of beats to transfer
+ * @param   incr        Which of the addresses to increment after a beat
+ */
+void dma_append(dma_t dma, DmacDescriptor *descriptor, uint8_t width,
+                void *src, void *dst, size_t len, dma_incr_t incr);
+
+/**
+ * @brief   Append a second transfer descriptor after the default channel
+ *          descriptor, copying destination and block size from the initial
+ *          descriptor.
+ *
+ * @note Only a single extra transfer descriptor is supported for now.
+ * @note @p descriptor must remain valid throughout the full transfer duration
+ *
+ * @param   dma     DMA channel reference to add the descriptor to
+ * @param   next    Extra transfer descriptor to append
+ * @param   src     Source address for the transfer
+ * @param   len     Number of beats to transfer
+ * @param   incr    Whether to increment the source address after a beat
+ */
+void dma_append_src(dma_t dma, DmacDescriptor *next, void *src, size_t len,
+                    bool incr);
+
+/**
+ * @brief   Append a second transfer descriptor after the default channel
+ *          descriptor, copying source and block size from the initial
+ *          descriptor.
+ *
+ * @note Only a single extra transfer descriptor is supported for now.
+ * @note @p descriptor must remain valid throughout the full transfer duration
+ *
+ * @param   dma     DMA channel reference to add the descriptor to
+ * @param   next    Extra transfer descriptor to append
+ * @param   dst     Destination address for the transfer
+ * @param   len     Number of beats to transfer
+ * @param   incr    Whether to increment the source address after a beat
+ */
+void dma_append_dst(dma_t dma, DmacDescriptor *next, void *dst, size_t len,
+                    bool incr);
+
+/**
+ * @brief   Start a DMA transfer.
+ *
+ * @param   dma     DMA channel reference
+ */
+void dma_start(dma_t dma);
+
+/**
+ * @brief   Wait for a DMA channel to finish the transfer.
+ *
+ * This function uses a blocking mutex to wait for the transfer to finish
+ *
+ * @note Use only with DMA channels of which the interrupt is enabled
+ *
+ * @param   dma     DMA channel reference
+ */
+void dma_wait(dma_t dma);
+
+/**
+ * @brief   Cancel an active DMA transfer
+ *
+ * It is not harmful to call this on an inactive channel, but it will waste some
+ * processing time
+ *
+ * @param   dma     DMA channel reference
+ */
+void dma_cancel(dma_t dma);
+
 #ifdef __cplusplus
 }
 #endif

@@ -227,6 +227,11 @@ void cpu_init(void)
     gclk_connect(SAM0_GCLK_MAIN, GCLK_SOURCE_DFLL, GCLK_GENCTRL_DIV(SAM0_DFLL_FREQ_HZ / CLOCK_CORECLOCK));
 #endif
 
+#ifdef MODULE_PERIPH_DMA
+    /*  initialize DMA streams */
+    dma_init();
+#endif
+
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
     stdio_init();
 
