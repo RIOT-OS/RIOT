@@ -5,6 +5,8 @@ PKG_LICENSE=CC-0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+CFLAGS += -DBLAKE2_NO_UNROLLING
+
 all: $(filter monocypher_optional,$(USEMODULE))
 	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
 
