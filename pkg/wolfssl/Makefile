@@ -5,11 +5,13 @@ PKG_LICENSE=GPLv2
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-all:  # Nothing to do here when building
+.PHONY: wolfcrypt%
 
-prepare:
-	cp Makefile.wolfssl $(PKG_BUILDDIR)/src/Makefile
-	cp Makefile.wolfcrypt $(PKG_BUILDDIR)/wolfcrypt/src/Makefile
-	touch $(PKG_BUILDDIR)/wolfssl.a
-	cp Makefile.wolfcrypt-test $(PKG_BUILDDIR)/wolfcrypt/test/Makefile
-	cp Makefile.wolfcrypt-benchmark $(PKG_BUILDDIR)/wolfcrypt/benchmark/Makefile
+all: $(filter wolfcrypt wolfcrypt-test wolfcrypt-benchmark,$(USEMODULE))
+	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(CURDIR)/Makefile.wolfssl
+
+wolfcrypt:
+	"$(MAKE)" -C $(PKG_BUILDDIR)/wolfcrypt/src -f $(CURDIR)/Makefile.wolfcrypt
+
+wolfcrypt-%:
+	"$(MAKE)" -C $(PKG_BUILDDIR)/wolfcrypt/$* -f $(CURDIR)/Makefile.wolfcrypt-$*

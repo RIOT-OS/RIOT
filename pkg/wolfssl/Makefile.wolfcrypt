@@ -1,5 +1,11 @@
 MODULE = wolfcrypt
 
+CFLAGS += -Wno-unused
+
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-unused-parameter
+endif
+
 SUBMODULES += 1
 
 NO_AUTO_SRC = 1

@@ -1,32 +1,11 @@
-CFLAGS += -Wno-unused-parameter -Wno-unused
 CFLAGS += -DWOLFSSL_USER_SETTINGS=1
 CFLAGS += -DWOLFSSL_RIOT_OS=1
+
 INCLUDES += -I$(PKGDIRBASE)/../../../
 INCLUDES += -I$(PKGDIRBASE)/wolfssl
 INCLUDES += -I$(RIOTBASE)/pkg/wolfssl/sock_tls
 INCLUDES += -I$(RIOTBASE)/pkg/wolfssl/include
 
-# One current limitation is that it is not possible to build `wolfcrypt` without
-# including `wolfssl`.
-# It would require some changes:
-# * Use a different name for the `wolfssl` implementation to differenciate from
-#   the package directory
-# * Declare `wolfssl` a PSEUDOMODULES
-# * Remove the archive in Makefile.include for packages as they could be
-#   PSEUDOMODULES
-#   `$(USEPKG:%=$(BINDIR)/%.a):`
-ifneq (,$(filter wolfcrypt,$(USEMODULE)))
-  DIRS += $(PKGDIRBASE)/wolfssl/wolfcrypt/src
-endif
-ifneq (,$(filter wolfcrypt-test,$(USEMODULE)))
-  DIRS += $(PKGDIRBASE)/wolfssl/wolfcrypt/test
-endif
-ifneq (,$(filter wolfcrypt-benchmark,$(USEMODULE)))
-  DIRS += $(PKGDIRBASE)/wolfssl/wolfcrypt/benchmark
-endif
-ifneq (,$(filter wolfssl,$(USEPKG)))
-  DIRS += $(PKGDIRBASE)/wolfssl/src
-endif
 ifneq (,$(filter sock_tls,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/wolfssl/sock_tls
 endif
