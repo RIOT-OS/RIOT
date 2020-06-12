@@ -43,7 +43,8 @@ extern "C" {
  */
 #define CONFIG_ZTIMER_USEC_TYPE    ZTIMER_TYPE_PERIPH_TIMER
 #define CONFIG_ZTIMER_USEC_DEV     TIMER_DEV(1)
-#define CONFIG_ZTIMER_USEC_MIN     (8)
+/* timer_set() may underflow for values smaller than 9, set 10 as margin */
+#define CONFIG_ZTIMER_USEC_MIN     (10)
 /** @} */
 
 /**
