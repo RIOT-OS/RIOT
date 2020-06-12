@@ -339,7 +339,6 @@ typedef struct {
     uint16_t gclk_ctrl;     /**< GCLK_CLKCTRL_ID for the Timer */
 #endif
     uint8_t gclk_src;       /**< GCLK source which supplys Timer */
-    uint16_t prescaler;     /**< prescaler used by the Timer */
     uint16_t flags;         /**< flags for CTRA, e.g. TC_CTRLA_MODE_COUNT32 */
 } tc32_conf_t;
 
