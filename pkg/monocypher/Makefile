@@ -5,5 +5,8 @@ PKG_LICENSE=CC-0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-all:
-	"$(MAKE)" -C $(PKG_BUILDDIR)/src
+all: $(filter monocypher_optional,$(USEMODULE))
+	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
+
+monocypher_optional:
+	"$(MAKE)" -C $(PKG_BUILDDIR)/src/optional -f $(RIOTBASE)/Makefile.base MODULE=$@
