@@ -12,8 +12,11 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega1284p \
+    atmega256rfr2-xpro \
     atmega328p \
+    avr-rss2 \
     derfmega128 \
+    derfmega256 \
     mega-xplained \
     microduino-corerf \
     saml10-xpro \
