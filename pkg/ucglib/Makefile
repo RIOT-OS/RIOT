@@ -5,9 +5,11 @@ PKG_LICENSE=BSD-2-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-all:
-	cp -u src/Makefile $(PKG_BUILDDIR)/Makefile
-	cp -u src/csrc/Makefile $(PKG_BUILDDIR)/csrc/Makefile
-	cp -u src/csrc/ucg_riotos.c $(PKG_BUILDDIR)/csrc/ucg_riotos.c
-	cp -u src/sys/sdl/dev/Makefile $(PKG_BUILDDIR)/sys/sdl/dev/Makefile
-	"$(MAKE)" -C $(PKG_BUILDDIR)
+.PHONY: ucglib_sdl
+
+all: $(filter ucglib_sdl,$(USEMODULE))
+	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.ucglib
+	"$(MAKE)" -C $(PKG_BUILDDIR)/csrc -f $(CURDIR)/Makefile.ucglib_csrc
+
+ucglib_sdl:
+	"$(MAKE)" -C $(PKG_BUILDDIR)/sys/sdl/dev -f $(CURDIR)/Makefile.ucglib_sdl
