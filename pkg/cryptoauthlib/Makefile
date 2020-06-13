@@ -8,9 +8,6 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 .PHONY: all..cmake_version_supported
 
-CRYPTOAUTHLIB_SOURCE_DIR = $(PKG_BUILDDIR)
-CRYPTOAUTHLIB_BUILD_DIR = $(PKG_BUILDDIR)/build
-
 CMAKE_MINIMAL_VERSION = 3.6.0
 
 CFLAGS += $(INCLUDES)
@@ -19,7 +16,7 @@ CFLAGS += -Wno-type-limits -Wno-strict-aliasing -Wno-unused-variable -DATCA_HAL_
 CFLAGS += -Wno-unused-parameter -Wno-sign-compare -Wno-overflow -Wno-pointer-to-int-cast
 CFLAGS += -Wno-char-subscripts
 
-TOOLCHAIN_FILE=$(CRYPTOAUTHLIB_SOURCE_DIR)/xcompile-toolchain.cmake
+TOOLCHAIN_FILE=$(PKG_SOURCE_DIR)/xcompile-toolchain.cmake
 
 ifneq (,$(filter $(PKG_TEST_NAME),$(USEMODULE)))
     all: cryptoauth build_tests
@@ -27,25 +24,25 @@ else
     all: cryptoauth
 endif
 
-cryptoauth: $(CRYPTOAUTHLIB_BUILD_DIR)/Makefile
-	$(MAKE) -C $(CRYPTOAUTHLIB_BUILD_DIR)
-	cp $(CRYPTOAUTHLIB_BUILD_DIR)/libcryptoauth.a $(BINDIR)/$(PKG_NAME).a
+cryptoauth: $(PKG_BUILD_DIR)/Makefile
+	$(MAKE) -C $(PKG_BUILD_DIR)
+	cp $(PKG_BUILD_DIR)/libcryptoauth.a $(BINDIR)/$(PKG_NAME).a
 
-$(CRYPTOAUTHLIB_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE)
+$(PKG_BUILD_DIR)/Makefile: $(TOOLCHAIN_FILE)
 	cmake -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN_FILE) \
 		  -Wno-dev \
 		  -DATCA_HAL_I2C:BOOL=TRUE \
-		  -B$(CRYPTOAUTHLIB_BUILD_DIR) \
-		  -H$(CRYPTOAUTHLIB_SOURCE_DIR)/lib
+		  -B$(PKG_BUILD_DIR) \
+		  -H$(PKG_SOURCE_DIR)/lib
 
 $(TOOLCHAIN_FILE): git-download
 	$(RIOTTOOLS)/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
 
 build_tests:
-	"$(MAKE)" -C $(CRYPTOAUTHLIB_SOURCE_DIR)/test -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)
-	"$(MAKE)" -C $(CRYPTOAUTHLIB_SOURCE_DIR)/test/jwt -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_jwt
-	"$(MAKE)" -C $(CRYPTOAUTHLIB_SOURCE_DIR)/test/tng -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_tng
-	"$(MAKE)" -C $(CRYPTOAUTHLIB_SOURCE_DIR)/test/atcacert -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_atcacert
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/test -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/jwt -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_jwt
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/tng -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_tng
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/atcacert -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_atcacert
 
 git-download: | ..cmake_version_supported
 
