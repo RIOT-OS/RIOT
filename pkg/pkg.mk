@@ -25,7 +25,18 @@ ifeq (,$(PKG_LICENSE))
 endif
 
 PKG_DIR ?= $(CURDIR)
-PKG_BUILDDIR ?= $(PKGDIRBASE)/$(PKG_NAME)
+
+PKG_BUILD_OUT_OF_SOURCE ?= 1
+ifeq (1,$(PKG_BUILD_OUT_OF_SOURCE))
+  PKG_SOURCE_DIR ?= $(PKGDIRBASE)/$(PKG_NAME)
+  PKG_BUILD_DIR ?= $(BINDIR)/pkg-build/$(PKG_NAME)
+else
+  # in-source builds: packages are cloned within the application build
+  # directory in a separate pkg tree
+  PKG_SOURCE_DIR ?= $(BINDIR)/pkg/$(PKG_NAME)
+  PKG_BUILD_DIR = $(PKG_SOURCE_DIR)
+endif
+
 PKG_SOURCE_LOCAL ?= $(PKG_SOURCE_LOCAL_$(shell echo $(PKG_NAME) | tr a-z- A-Z_))
 
 # git-cache specific management: GIT_CACHE_DIR is exported only
@@ -52,7 +63,7 @@ GITAMFLAGS ?= $(GIT_QUIET) --no-gpg-sign --ignore-whitespace --whitespace=nowarn
 PKG_PATCHES = $(sort $(wildcard $(PKG_DIR)/patches/*.patch))
 
 PKG_STATE_FILE = .pkg-state.git
-PKG_STATE      = $(PKG_BUILDDIR)/$(PKG_STATE_FILE)
+PKG_STATE      = $(PKG_SOURCE_DIR)/$(PKG_STATE_FILE)
 
 PKG_PREPARED   = $(PKG_STATE)-prepared
 PKG_PATCHED    = $(PKG_STATE)-patched
@@ -75,7 +86,7 @@ $(PKG_PREPARED): $(PKG_PATCHED)
 
 # Use explicit '--git-dir' and '--work-tree' to prevent issues when the
 # directory is not a git repository for any reason (clean -xdff or others)
-GIT_IN_PKG = git -C $(PKG_BUILDDIR) --git-dir=.git --work-tree=.
+GIT_IN_PKG = git -C $(PKG_SOURCE_DIR) --git-dir=.git --work-tree=.
 
 # When $(PKG_PATCHED).d is included $(PKG_PATCHED) prerequisites will include
 # the old prerequisites forcing a rebuild on prerequisite removal, but we do
@@ -95,27 +106,37 @@ gen_dependency_files = $(file >$1,$@: $2)$(foreach f,$2,$(file >>$1,$(f):))
 $(PKG_PATCHED): $(PKG_PATCHED_PREREQUISITES)
 	$(info [INFO] patch $(PKG_NAME))
 	$(call gen_dependency_files,$@.d,$(PKG_PATCHED_PREREQUISITES))
-	$(Q)$(GIT_IN_PKG) clean $(GIT_QUIET) -xdff '**' -e $(PKG_STATE:$(PKG_BUILDDIR)/%='%*')
+	$(Q)$(GIT_IN_PKG) clean $(GIT_QUIET) -xdff '**' -e $(PKG_STATE:$(PKG_SOURCE_DIR)/%='%*')
 	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) -f $(PKG_VERSION)
 	$(Q)$(GIT_IN_PKG) $(GITFLAGS) am $(GITAMFLAGS) $(PKG_PATCHES) </dev/null
 	@touch $@
 
-$(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_BUILDDIR)/.git
+$(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_SOURCE_DIR)/.git
 	$(info [INFO] updating $(PKG_NAME) $(PKG_DOWNLOADED))
 	$(Q)$(GIT_IN_PKG) fetch $(GIT_QUIET) $(PKG_URL) $(PKG_VERSION)
 	echo $(PKG_VERSION) > $@
 
-$(PKG_BUILDDIR)/.git: | $(PKG_CUSTOM_PREPARED)
+$(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
 	$(info [INFO] cloning $(PKG_NAME))
-	$(Q)rm -Rf $(PKG_BUILDDIR)
-	$(Q)mkdir -p $(PKG_BUILDDIR)
-	$(Q)$(GITCACHE) clone $(PKG_URL) $(PKG_VERSION) $(PKG_BUILDDIR)
+	$(Q)rm -Rf $(PKG_SOURCE_DIR)
+	$(Q)mkdir -p $(PKG_SOURCE_DIR)
+	$(Q)$(GITCACHE) clone $(PKG_URL) $(PKG_VERSION) $(PKG_SOURCE_DIR)
 
+ifeq ($(PKG_SOURCE_DIR),$(PKG_BUILD_DIR))
+# This is the case for packages that are built within their source directory
+# e.g. micropython and openthread
 clean::
-	@-test -d $(PKG_BUILDDIR) && $(GIT_IN_PKG) clean $(GIT_QUIET) -xdff
+	@-test -d $(PKG_SOURCE_DIR) && $(GIT_IN_PKG) clean $(GIT_QUIET) -xdff
 
 distclean::
-	rm -rf $(PKG_BUILDDIR)
+	rm -rf $(PKG_SOURCE_DIR)
+else
+clean::
+	rm -rf $(PKG_BUILD_DIR)
+
+distclean:: clean
+	rm -rf $(PKG_SOURCE_DIR)
+endif
 
 # Dependencies to 'patches'
 -include $(PKG_PATCHED).d
