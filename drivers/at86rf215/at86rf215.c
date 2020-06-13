@@ -160,6 +160,12 @@ if (!IS_ACTIVE(CONFIG_AT86RF215_USE_CLOCK_OUTPUT)){
         at86rf215_configure_OFDM(dev, CONFIG_AT86RF215_DEFAULT_MR_OFDM_OPT,
                                       CONFIG_AT86RF215_DEFAULT_MR_OFDM_MCS);
     }
+    if (CONFIG_AT86RF215_DEFAULT_PHY_MODE == IEEE802154_PHY_MR_FSK) {
+        at86rf215_configure_FSK(dev, CONFIG_AT86RF215_DEFAULT_MR_FSK_SRATE,
+                                     CONFIG_AT86RF215_DEFAULT_MR_FSK_MOD_IDX,
+                                     CONFIG_AT86RF215_DEFAULT_MR_FSK_MORD,
+                                     CONFIG_AT86RF215_DEFAULT_MR_FSK_FEC);
+    }
 
     /* set default channel */
     at86rf215_set_chan(dev, dev->netdev.chan);

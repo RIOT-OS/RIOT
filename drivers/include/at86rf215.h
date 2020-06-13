@@ -197,6 +197,42 @@ enum {
 /** @} */
 
 /**
+ * @name    Default MR-FSK Symbol Rate
+ * @{
+ */
+#ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_SRATE
+#define CONFIG_AT86RF215_DEFAULT_MR_FSK_SRATE   FSK_SRATE_200K
+#endif
+/** @} */
+
+/**
+ * @name    Default MR-FSK Modulation Index, fraction of 64
+ * @{
+ */
+#ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_MOD_IDX
+#define CONFIG_AT86RF215_DEFAULT_MR_FSK_MOD_IDX (64)
+#endif
+/** @} */
+
+/**
+ * @name    Default MR-FSK Modulation Order
+ * @{
+ */
+#ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_MORD
+#define CONFIG_AT86RF215_DEFAULT_MR_FSK_MORD    FSK_MORD_4SFK
+#endif
+/** @} */
+
+/**
+ * @name    Default MR-FSK Forward Error Correction Scheme
+ * @{
+ */
+#ifndef CONFIG_AT86RF215_DEFAULT_MR_FSK_FEC
+#define CONFIG_AT86RF215_DEFAULT_MR_FSK_FEC     IEEE802154_FEC_NONE
+#endif
+/** @} */
+
+/**
  * @brief   Default TX power (0dBm)
  */
 #ifndef CONFIG_AT86RF215_DEFAULT_TXPOWER
@@ -290,6 +326,9 @@ typedef struct at86rf215 {
     uint8_t retries;                        /**< retries left */
     uint8_t csma_retries_max;               /**< number of retries until channel is clear */
     uint8_t csma_retries;                   /**< CSMA retries left */
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+    uint8_t fsk_pl;                         /**< FSK Preamble Length */
+#endif
     uint8_t csma_minbe;                     /**< CSMA minimum backoff exponent */
     uint8_t csma_maxbe;                     /**< CSMA maximum backoff exponent */
     int8_t  csma_ed;                        /**< CSMA energy detect threshold */

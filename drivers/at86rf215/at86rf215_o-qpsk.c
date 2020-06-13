@@ -343,6 +343,11 @@ void _end_configure_OQPSK(at86rf215_t *dev)
     dev->netdev.chan = at86rf215_chan_valid(dev, dev->netdev.chan);
     at86rf215_reg_write16(dev, dev->RF->RG_CNL, dev->netdev.chan);
 
+    /* disable FSK preamble switching */
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+    dev->fsk_pl = 0;
+#endif
+
     at86rf215_enable_radio(dev, BB_MROQPSK);
 }
 

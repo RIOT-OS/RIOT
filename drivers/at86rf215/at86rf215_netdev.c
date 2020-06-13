@@ -67,6 +67,20 @@ static bool _is_busy(at86rf215_t *dev)
     return false;
 }
 
+static uint8_t _get_best_match(const uint8_t *array, uint8_t len, uint8_t val)
+{
+    uint8_t res = 0;
+    uint8_t best = 0xFF;
+    for (uint8_t i = 0; i < len; ++i) {
+        if (abs((int)array[i] - val) < best) {
+            best = abs((int)array[i] - val);
+            res = i;
+        }
+    }
+
+    return res;
+}
+
 /* executed in the GPIO ISR context */
 static void _irq_handler(void *arg)
 {
@@ -393,7 +407,40 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             *((int8_t *)val) = at86rf215_get_phy_mode(dev);
             res = max_len;
             break;
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+        case NETOPT_MR_FSK_MODULATION_INDEX:
+            assert(max_len >= sizeof(int8_t));
+            *((int8_t *)val) = at86rf215_FSK_get_mod_idx(dev);
+            res = max_len;
+            break;
 
+        case NETOPT_MR_FSK_MODULATION_ORDER:
+            assert(max_len >= sizeof(int8_t));
+            /* 0 -> 2-FSK, 1 -> 4-FSK */
+            *((int8_t *)val) = 2 + 2 * at86rf215_FSK_get_mod_order(dev);
+            res = max_len;
+            break;
+
+        case NETOPT_MR_FSK_SRATE:
+            assert(max_len >= sizeof(uint16_t));
+            /* netopt expects symbol rate in kHz, internally it's stored in 10kHz steps */
+            *((uint16_t *)val) = _at86rf215_fsk_srate_10kHz[at86rf215_FSK_get_srate(dev)]
+                               * 10;
+            res = max_len;
+            break;
+
+        case NETOPT_MR_FSK_FEC:
+            assert(max_len >= sizeof(uint8_t));
+            *((uint8_t *)val) = at86rf215_FSK_get_fec(dev);
+            res = max_len;
+            break;
+
+        case NETOPT_CHANNEL_SPACING:
+            assert(max_len >= sizeof(uint16_t));
+            *((uint16_t *)val) = at86rf215_get_channel_spacing(dev);
+            res = max_len;
+            break;
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
 #ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
         case NETOPT_MR_OFDM_OPTION:
             assert(max_len >= sizeof(int8_t));
@@ -601,11 +648,93 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = sizeof(uint8_t);
                 break;
 #endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+            case IEEE802154_PHY_MR_FSK:
+                at86rf215_configure_FSK(dev,
+                                        at86rf215_FSK_get_srate(dev),
+                                        at86rf215_FSK_get_mod_idx(dev),
+                                        at86rf215_FSK_get_mod_order(dev),
+                                        at86rf215_FSK_get_fec(dev));
+                res = sizeof(uint8_t);
+                break;
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
             default:
                 return -ENOTSUP;
             }
             break;
 
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+        case NETOPT_MR_FSK_MODULATION_INDEX:
+            if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_MR_FSK) {
+                return -ENOTSUP;
+            }
+
+            if (at86rf215_FSK_set_mod_idx(dev, *(uint8_t *)val) == 0) {
+                res = at86rf215_FSK_get_mod_idx(dev);
+            } else {
+                res = -ERANGE;
+            }
+            break;
+
+        case NETOPT_MR_FSK_MODULATION_ORDER:
+            if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_MR_FSK) {
+                return -ENOTSUP;
+            }
+
+            if (*(uint8_t *)val != 2 && *(uint8_t *)val != 4) {
+                res = -ERANGE;
+            } else {
+                /* 4-FSK -> 1, 2-FSK -> 0 */
+                at86rf215_FSK_set_mod_order(dev, *(uint8_t *)val >> 2);
+                res = sizeof(uint8_t);
+            }
+            break;
+
+        case NETOPT_MR_FSK_SRATE:
+            if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_MR_FSK) {
+                return -ENOTSUP;
+            }
+
+            /* find the closest symbol rate value (in 10 kHz) that matches
+               the requested input (in kHz) */
+            res = _get_best_match(_at86rf215_fsk_srate_10kHz,
+                                  FSK_SRATE_400K + 1, *(uint16_t *)val / 10);
+            if (at86rf215_FSK_set_srate(dev, res) == 0) {
+                res = 10 * _at86rf215_fsk_srate_10kHz[res];
+            } else {
+                res = -ERANGE;
+            }
+            break;
+
+        case NETOPT_MR_FSK_FEC:
+            if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_MR_FSK) {
+                return -ENOTSUP;
+            }
+
+            if (at86rf215_FSK_set_fec(dev, *(uint8_t *)val) == 0) {
+                res = sizeof(uint8_t);
+            } else {
+                res = -ERANGE;
+            }
+
+            break;
+
+        case NETOPT_CHANNEL_SPACING:
+            if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_MR_FSK) {
+                return -ENOTSUP;
+            }
+
+            /* find the closest channel spacing value (in 25 kHz) that matches
+               the requested input (in kHz) */
+            res = _get_best_match(_at86rf215_fsk_channel_spacing_25kHz,
+                                  FSK_CHANNEL_SPACING_400K + 1, *(uint16_t *)val / 25);
+            if (at86rf215_FSK_set_channel_spacing(dev, res) == 0) {
+                res = 25 * _at86rf215_fsk_channel_spacing_25kHz[res];
+            } else {
+                res = -ERANGE;
+            }
+            break;
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
 #ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
         case NETOPT_MR_OFDM_OPTION:
             if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_MR_OFDM) {
@@ -937,6 +1066,13 @@ static void _isr(netdev_t *netdev)
         rx_ack_req = 0;
     }
 
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+    /* listen for short preamble in RX */
+    if (bb_irq_mask & BB_IRQ_TXFE && dev->fsk_pl) {
+        at86rf215_FSK_prepare_rx(dev);
+    }
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
+
     if (dev->flags & AT86RF215_OPT_CCA_PENDING) {
 
         /* Start ED or handle result */
@@ -956,6 +1092,13 @@ static void _isr(netdev_t *netdev)
 
         /* start transmitting the frame */
         if (rf_irq_mask & RF_IRQ_TRXRDY) {
+
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+            /* send long preamble in TX */
+            if (dev->fsk_pl) {
+                at86rf215_FSK_prepare_tx(dev);
+            }
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
 
             /* automatically switch to RX when TX is done */
             _enable_tx2rx(dev);
