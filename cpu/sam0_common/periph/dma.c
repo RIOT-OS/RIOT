@@ -124,7 +124,7 @@ void dma_release_channel(dma_t dma)
     irq_restore(state);
 }
 
-static inline void _set_source(DmacDescriptor *descr, void *src)
+static inline void _set_source(DmacDescriptor *descr, const void *src)
 {
     descr->SRCADDR.reg = (uint32_t)src;
 }
@@ -170,7 +170,7 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq)
 #endif
 }
 
-void dma_prepare(dma_t dma, uint8_t width, void *src, void *dst, size_t len,
+void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst, size_t len,
                  uint8_t incr)
 {
     DEBUG("[DMA]: Prepare %u, len: %u\n", dma, (unsigned)len);
@@ -184,7 +184,7 @@ void dma_prepare(dma_t dma, uint8_t width, void *src, void *dst, size_t len,
                         DMAC_BTCTRL_VALID;
 }
 
-void dma_prepare_src(dma_t dma, void *src, size_t len,
+void dma_prepare_src(dma_t dma, const void *src, size_t len,
                      bool incr)
 {
     DEBUG("[dma]: %u: prep src %p, %u, %u\n", dma, src, (unsigned)len, incr);
@@ -209,7 +209,7 @@ void dma_prepare_dst(dma_t dma, void *dst, size_t len,
 }
 
 void _fmt_append(DmacDescriptor *descr, DmacDescriptor *next,
-                 void *src, void *dst, size_t len)
+                 const void *src, void *dst, size_t len)
 {
     /* Configure the full descriptor besides the BTCTRL data */
     _set_next_descriptor(descr, next);
@@ -220,7 +220,7 @@ void _fmt_append(DmacDescriptor *descr, DmacDescriptor *next,
 }
 
 void dma_append(dma_t dma, DmacDescriptor *next, uint8_t width,
-                void *src, void *dst, size_t len, dma_incr_t incr)
+                const void *src, void *dst, size_t len, dma_incr_t incr)
 {
     DmacDescriptor *descr = &descriptors[dma];
 
@@ -230,8 +230,8 @@ void dma_append(dma_t dma, DmacDescriptor *next, uint8_t width,
     _fmt_append(descr, next, src, dst, len);
 }
 
-void dma_append_src(dma_t dma, DmacDescriptor *next, void *src, size_t len,
-                    bool incr)
+void dma_append_src(dma_t dma, DmacDescriptor *next, const void *src,
+                    size_t len, bool incr)
 {
     DmacDescriptor *descr = &descriptors[dma];
 
