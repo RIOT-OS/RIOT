@@ -96,6 +96,42 @@ static void str_toupper(char *str)
     }
 }
 
+__attribute__ ((unused))
+static uint8_t gcd(uint8_t a, uint8_t b)
+{
+    if (a == 0 || b == 0) {
+        return 0;
+    }
+
+    do {
+        uint8_t r = a % b;
+        a = b;
+        b = r;
+    } while (b);
+
+    return a;
+}
+
+__attribute__ ((unused))
+static void frac_short(uint8_t *a, uint8_t *b)
+{
+    uint8_t d = gcd(*a, *b);
+
+    if (d == 0) {
+        return;
+    }
+
+    *a /= d;
+    *b /= d;
+}
+
+__attribute__ ((unused))
+static void frac_extend(uint8_t *a, uint8_t *b, uint8_t base)
+{
+    *a *= base / *b;
+    *b  = base;
+}
+
 #ifdef MODULE_NETSTATS
 static const char *_netstats_module_to_str(uint8_t module)
 {
@@ -194,6 +230,13 @@ static void _set_usage(char *cmd_name)
 #ifdef MODULE_NETDEV_IEEE802154_MR_OFDM
          "       * \"option\" - OFDM option\n"
          "       * \"scheme\" - OFDM modulation & coding scheme\n"
+#endif
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+         "       * \"modulation_index\" - FSK modulation index\n"
+         "       * \"modulation_order\" - FSK modulation order\n"
+         "       * \"symbol_rate\" - FSK symbol rate\n"
+         "       * \"fec\" - FSK forward error correction\n"
+         "       * \"channel_spacing\" - channel spacing\n"
 #endif
          "       * \"power\" - TX power in dBm\n"
          "       * \"retrans\" - max. number of retransmissions\n"
@@ -361,6 +404,29 @@ static void _print_netopt(netopt_t opt)
             break;
 
 #endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+
+        case NETOPT_MR_FSK_MODULATION_INDEX:
+            printf("FSK modulation index");
+            break;
+
+        case NETOPT_MR_FSK_MODULATION_ORDER:
+            printf("FSK modulation order");
+            break;
+
+        case NETOPT_MR_FSK_SRATE:
+            printf("FSK symbol rate");
+            break;
+
+        case NETOPT_MR_FSK_FEC:
+            printf("FSK Forward Error Correction");
+            break;
+
+        case NETOPT_CHANNEL_SPACING:
+            printf("Channel Spacing");
+            break;
+
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
 
         case NETOPT_CHECKSUM:
             printf("checksum");
@@ -438,6 +504,14 @@ static const char *_netopt_ofdm_mcs_str[] = {
     [4] = "QPSK, rate 3/4",
     [5] = "16-QAM, rate 1/2",
     [6] = "16-QAM, rate 3/4",
+};
+#endif
+
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+static const char *_netopt_fec_str[] = {
+    [IEEE802154_FEC_NONE] = "none",
+    [IEEE802154_FEC_NRNSC] = "NRNSC",
+    [IEEE802154_FEC_RSC] = "RSC"
 };
 #endif
 
@@ -627,6 +701,38 @@ static void _netif_list(netif_t *iface)
 
             break;
 #endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+        case IEEE802154_PHY_MR_FSK:
+            printf("\n          ");
+            res = netif_get_opt(iface, NETOPT_MR_FSK_MODULATION_INDEX, 0, &u8, sizeof(u8));
+            if (res >= 0) {
+                hwaddr[0] = 64; /* convenient temp var */
+                frac_short(&u8, hwaddr);
+                if (hwaddr[0] == 1) {
+                    printf(" modulation index: %u ", u8);
+                } else {
+                    printf(" modulation index: %u/%u ", u8, hwaddr[0]);
+                }
+            }
+            res = netif_get_opt(iface, NETOPT_MR_FSK_MODULATION_ORDER, 0, &u8, sizeof(u8));
+            if (res >= 0) {
+                printf(" %u-FSK ", u8);
+            }
+            res = netif_get_opt(iface, NETOPT_MR_FSK_SRATE, 0, &u16, sizeof(u16));
+            if (res >= 0) {
+                printf(" symbol rate: %u kHz ", u16);
+            }
+            res = netif_get_opt(iface, NETOPT_MR_FSK_FEC, 0, &u8, sizeof(u8));
+            if (res >= 0) {
+                printf(" FEC: %s ", _netopt_fec_str[u8]);
+            }
+            res = netif_get_opt(iface, NETOPT_CHANNEL_SPACING, 0, &u16, sizeof(u16));
+            if (res >= 0) {
+                printf(" BW: %ukHz ", u16);
+            }
+
+            break;
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
         }
     }
 #endif /* MODULE_NETDEV_IEEE802154 */
@@ -919,6 +1025,57 @@ static int _netif_set_coding_rate(netif_t *iface, char *value)
     return 0;
 }
 #endif /* MODULE_GNRC_NETIF_CMD_LORA */
+
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+static int _netif_set_fsk_fec(netif_t *iface, char *value)
+{
+    /* ignore case */
+    str_toupper(value);
+
+    for (size_t i = 0; i < ARRAY_SIZE(_netopt_fec_str); ++i) {
+
+        if (strcmp(value, _netopt_fec_str[i])) {
+            continue;
+        }
+
+        if (netif_set_opt(iface, NETOPT_MR_FSK_FEC, 0, &i, sizeof(uint8_t)) < 0) {
+            printf("error: unable to set forward error correction to %s\n", value);
+            return 1;
+        }
+
+        printf("success: set forward error correction to %s\n", value);
+        return 0;
+    }
+
+    puts("usage: ifconfig <if_id> set fec [none|NRNSC|RSC]");
+    return 1;
+}
+
+static int _netif_set_fsk_modulation_index(netif_t *iface, char *value)
+{
+    uint8_t a, b;
+    char* frac = strchr(value, '/');
+    if (frac) {
+        *frac = 0;
+        b = atoi(frac + 1);
+    } else {
+        b = 1;
+    }
+    a = atoi(value);
+
+    frac_extend(&a, &b, 64);
+
+    int res = netif_set_opt(iface, NETOPT_MR_FSK_MODULATION_INDEX, 0, &a, sizeof(uint8_t));
+    if (res < 0) {
+        printf("error: unable to set modulation index to %d/%d\n", a, b);
+        return 1;
+    } else {
+        printf("success: set modulation index to %d/%d\n", res, b);
+    }
+
+    return 0;
+}
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
 
 #ifdef MODULE_NETDEV_IEEE802154_MULTIMODE
 static int _netif_set_ieee802154_phy_mode(netif_t *iface, char *value)
@@ -1358,6 +1515,23 @@ static int _netif_set(char *cmd_name, netif_t *iface, char *key, char *value)
         return _netif_set_u8(iface, NETOPT_MR_OFDM_MCS, 0, value);
     }
 #endif /* MODULE_NETDEV_IEEE802154_MR_OFDM */
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+    else if ((strcmp("modulation_index", key) == 0) || (strcmp("midx", key) == 0)) {
+        return _netif_set_fsk_modulation_index(iface, value);
+    }
+    else if ((strcmp("modulation_order", key) == 0) || (strcmp("mord", key) == 0)) {
+        return _netif_set_u8(iface, NETOPT_MR_FSK_MODULATION_ORDER, 0, value);
+    }
+    else if ((strcmp("symbol_rate", key) == 0) || (strcmp("srate", key) == 0)) {
+        return _netif_set_u16(iface, NETOPT_MR_FSK_SRATE, 0, value);
+    }
+    else if ((strcmp("forward_error_correction", key) == 0) || (strcmp("fec", key) == 0)) {
+        return _netif_set_fsk_fec(iface, value);
+    }
+    else if ((strcmp("channel_spacing", key) == 0) || (strcmp("bw", key) == 0)) {
+        return _netif_set_u16(iface, NETOPT_CHANNEL_SPACING, 0, value);
+    }
+#endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
     else if ((strcmp("channel", key) == 0) || (strcmp("chan", key) == 0)) {
         return _netif_set_u16(iface, NETOPT_CHANNEL, 0, value);
     }
