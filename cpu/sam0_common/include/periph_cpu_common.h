@@ -760,8 +760,8 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq);
  * @param   len     Number of beats to transfer
  * @param   incr    Which of the addresses to increment after a beat
  */
-void dma_prepare(dma_t dma, uint8_t width, void *src, void *dst, size_t len,
-                 dma_incr_t incr);
+void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
+                 size_t len, dma_incr_t incr);
 
 /**
  * @brief   Prepare a transfer without modifying the destination address
@@ -780,7 +780,7 @@ void dma_prepare(dma_t dma, uint8_t width, void *src, void *dst, size_t len,
  * @param   len     Number of beats to transfer
  * @param   incr    Whether to increment the source address after a beat
  */
-void dma_prepare_src(dma_t dma, void *src, size_t len, bool incr);
+void dma_prepare_src(dma_t dma, const void *src, size_t len, bool incr);
 
 /**
  * @brief   Prepare a transfer without modifying the source address
@@ -817,7 +817,7 @@ void dma_prepare_dst(dma_t dma, void *dst, size_t len, bool incr);
  * @param   incr        Which of the addresses to increment after a beat
  */
 void dma_append(dma_t dma, DmacDescriptor *descriptor, uint8_t width,
-                void *src, void *dst, size_t len, dma_incr_t incr);
+                const void *src, void *dst, size_t len, dma_incr_t incr);
 
 /**
  * @brief   Append a second transfer descriptor after the default channel
@@ -833,8 +833,8 @@ void dma_append(dma_t dma, DmacDescriptor *descriptor, uint8_t width,
  * @param   len     Number of beats to transfer
  * @param   incr    Whether to increment the source address after a beat
  */
-void dma_append_src(dma_t dma, DmacDescriptor *next, void *src, size_t len,
-                    bool incr);
+void dma_append_src(dma_t dma, DmacDescriptor *next, const void *src,
+                    size_t len, bool incr);
 
 /**
  * @brief   Append a second transfer descriptor after the default channel
