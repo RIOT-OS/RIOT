@@ -1,6 +1,5 @@
 PKG_NAME=teensy-loader-cli
 PKG_LICENSE=GPL-3
-PKG_BUILDDIR=$(CURDIR)/bin
 
 # get sources from repository
 ifeq ($(OS),Darwin)
@@ -12,8 +11,10 @@ else
   PKG_VERSION=76921edbdd81ae99b869b104404c16c06b0a266f
 endif
 
+PKG_SOURCE_DIR = $(CURDIR)/bin
+PKG_BUILD_OUT_OF_SOURCE = 0
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	env -i PATH=$(PATH) TERM=$(TERM) "$(MAKE)" -C $(PKG_BUILDDIR)
-	mv $(PKG_BUILDDIR)/teensy_loader_cli ./teensy_loader
+	env -i PATH=$(PATH) TERM=$(TERM) "$(MAKE)" -C $(PKG_SOURCE_DIR)
+	mv $(PKG_SOURCE_DIR)/teensy_loader_cli ./teensy_loader
