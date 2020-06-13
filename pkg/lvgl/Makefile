@@ -20,4 +20,4 @@ LVGL_MODULES =  \
 all: $(LVGL_MODULES)
 
 lvgl_%:
-	MODULE=$@ "$(MAKE)" -C $(PKG_BUILDDIR)/src/lv_$* -f $(CURDIR)/Makefile.lvgl_module
+	MODULE=$@ "$(MAKE)" -C $(PKG_SOURCE_DIR)/src/lv_$* -f $(CURDIR)/Makefile.lvgl_module

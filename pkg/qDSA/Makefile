@@ -6,4 +6,4 @@ PKG_LICENSE=PD
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR)/$(QDSA_IMPL)
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/$(QDSA_IMPL)

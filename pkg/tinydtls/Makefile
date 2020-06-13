@@ -11,9 +11,9 @@ CFLAGS += -Wno-implicit-fallthrough
 CFLAGS += -D_XOPEN_SOURCE=600
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(PKG_BUILDDIR)/Makefile.riot
-	"$(MAKE)" -C $(PKG_BUILDDIR)/aes -f $(PKG_BUILDDIR)/aes/Makefile.riot
-	"$(MAKE)" -C $(PKG_BUILDDIR)/ecc -f $(PKG_BUILDDIR)/ecc/Makefile.riot
+	"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(PKG_SOURCE_DIR)/Makefile.riot
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/aes -f $(PKG_SOURCE_DIR)/aes/Makefile.riot
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/ecc -f $(PKG_SOURCE_DIR)/ecc/Makefile.riot
 
 ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-format-nonliteral

@@ -9,4 +9,4 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -DCBOR_ALIGN_READS
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)

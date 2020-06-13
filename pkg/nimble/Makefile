@@ -6,7 +6,7 @@ PKG_LICENSE = Apache-2.0
 include $(RIOTBASE)/pkg/pkg.mk
 
 TDIR = $(RIOTPKG)/$(PKG_NAME)
-PDIR = $(PKG_BUILDDIR)
+PDIR = $(PKG_SOURCE_DIR)
 
 # NimBLE is not optimized for building with all (extra) warnings enabled. So for
 # now, we disable a number of selected compiler warnings when building NimBLE.

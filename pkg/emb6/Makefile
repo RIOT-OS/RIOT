@@ -19,11 +19,11 @@ EMB6_SUBMODULES:=$(filter-out emb6_contrib \
                               emb6_sock_%,$(filter emb6_%,$(USEMODULE)))
 
 all: $(EMB6_SUBMODULES)
-	"$(MAKE)" -C $(PKG_BUILDDIR)
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)
 
 # Rule for all submodules
 emb6_%:
-	"$(MAKE)" -C $(dir $(shell grep -lR "MODULE.*=.*\<$@\>" $(PKG_BUILDDIR)))
+	"$(MAKE)" -C $(dir $(shell grep -lR "MODULE.*=.*\<$@\>" $(PKG_SOURCE_DIR)))
 
 ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-tautological-compare

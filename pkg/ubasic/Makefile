@@ -15,7 +15,7 @@ all: ubasic
 make_module = "$(MAKE)" -f $(RIOTPKG)/ubasic/$(1).mk -C $(2)
 
 ubasic: $(UBASIC_USEMODULE)
-	$(call make_module,$@,$(PKG_BUILDDIR))
+	$(call make_module,$@,$(PKG_SOURCE_DIR))
 
 ubasic%:
-	$(call make_module,$@,$(PKG_BUILDDIR))
+	$(call make_module,$@,$(PKG_SOURCE_DIR))
