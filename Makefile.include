@@ -45,7 +45,7 @@ BUILD_DIR           ?= $(RIOTBASE)/build
 APPDIR              ?= $(CURDIR)
 BINDIRBASE          ?= $(APPDIR)/bin
 BINDIR              ?= $(BINDIRBASE)/$(BOARD)
-PKGDIRBASE          ?= $(BINDIRBASE)/pkg/$(BOARD)
+PKGDIRBASE          ?= $(RIOTBASE)/build/pkg
 DLCACHE             ?= $(RIOTTOOLS)/dlcache/dlcache.sh
 DLCACHE_DIR         ?= $(RIOTBASE)/.dlcache
 
