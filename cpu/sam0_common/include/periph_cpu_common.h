@@ -795,11 +795,11 @@ void dma_setup(dma_t dma, unsigned trigger, uint8_t prio, bool irq);
  * @param   width   Transfer beat size to use
  * @param   src     Source address for the transfer
  * @param   dst     Destination address for the transfer
- * @param   len     Number of beats to transfer
+ * @param   num     Number of beats to transfer
  * @param   incr    Which of the addresses to increment after a beat
  */
 void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
-                 size_t len, dma_incr_t incr);
+                 size_t num, dma_incr_t incr);
 
 /**
  * @brief   Prepare a transfer without modifying the destination address
@@ -809,19 +809,19 @@ void dma_prepare(dma_t dma, uint8_t width, const void *src, void *dst,
  * peripheral address, leaving the destination address and related settings
  * untouched
  *
- * @note    This only touches the source address, length and source increment
- *          settings. Be sure to initialize the full descriptor beforehand with
- *          @ref dma_prepare
+ * @note    This only touches the source address, number of transfers and source
+ *          increment settings. Be sure to initialize the full descriptor
+ *          beforehand with @ref dma_prepare
  *
  * @note    When increment is enabled for source, the @p src must point to the
  *          **end** of the array.
  *
  * @param   dma     DMA channel reference
  * @param   src     Source address for the transfer
- * @param   len     Number of beats to transfer
+ * @param   num     Number of beats to transfer
  * @param   incr    Whether to increment the source address after a beat
  */
-void dma_prepare_src(dma_t dma, const void *src, size_t len, bool incr);
+void dma_prepare_src(dma_t dma, const void *src, size_t num, bool incr);
 
 /**
  * @brief   Prepare a transfer without modifying the source address
@@ -831,19 +831,19 @@ void dma_prepare_src(dma_t dma, const void *src, size_t len, bool incr);
  * peripheral address, leaving the source address and related settings
  * untouched
  *
- * @note    This only touches the destination address, length and destination
- *          increment settings. Be sure to initialize the full descriptor
- *          beforehand with @ref dma_prepare
+ * @note    This only touches the destination address, the number of transfers
+ *          and destination increment settings. Be sure to initialize the full
+ *          descriptor beforehand with @ref dma_prepare
  *
  * @note    When increment is enabled for destination, @p dst must point to the
  *          **end** of the array.
  *
  * @param   dma     DMA channel reference
  * @param   dst     Destination address for the transfer
- * @param   len     Number of beats to transfer
+ * @param   num     Number of beats to transfer
  * @param   incr    Whether to increment the destination address after a beat
  */
-void dma_prepare_dst(dma_t dma, void *dst, size_t len, bool incr);
+void dma_prepare_dst(dma_t dma, void *dst, size_t num, bool incr);
 
 /**
  * @brief   Append a second transfer descriptor after the default channel
@@ -861,11 +861,11 @@ void dma_prepare_dst(dma_t dma, void *dst, size_t len, bool incr);
  * @param   width       Transfer beat size to use
  * @param   src         Source address for the transfer
  * @param   dst         Destination address for the transfer
- * @param   len         Number of beats to transfer
+ * @param   num         Number of beats to transfer
  * @param   incr        Which of the addresses to increment after a beat
  */
 void dma_append(dma_t dma, DmacDescriptor *descriptor, uint8_t width,
-                const void *src, void *dst, size_t len, dma_incr_t incr);
+                const void *src, void *dst, size_t num, dma_incr_t incr);
 
 /**
  * @brief   Append a second transfer descriptor after the default channel
@@ -882,11 +882,11 @@ void dma_append(dma_t dma, DmacDescriptor *descriptor, uint8_t width,
  * @param   dma     DMA channel reference to add the descriptor to
  * @param   next    Extra transfer descriptor to append
  * @param   src     Source address for the transfer
- * @param   len     Number of beats to transfer
+ * @param   num     Number of beats to transfer
  * @param   incr    Whether to increment the source address after a beat
  */
 void dma_append_src(dma_t dma, DmacDescriptor *next, const void *src,
-                    size_t len, bool incr);
+                    size_t num, bool incr);
 
 /**
  * @brief   Append a second transfer descriptor after the default channel
@@ -903,10 +903,10 @@ void dma_append_src(dma_t dma, DmacDescriptor *next, const void *src,
  * @param   dma     DMA channel reference to add the descriptor to
  * @param   next    Extra transfer descriptor to append
  * @param   dst     Destination address for the transfer
- * @param   len     Number of beats to transfer
+ * @param   num     Number of beats to transfer
  * @param   incr    Whether to increment the source address after a beat
  */
-void dma_append_dst(dma_t dma, DmacDescriptor *next, void *dst, size_t len,
+void dma_append_dst(dma_t dma, DmacDescriptor *next, void *dst, size_t num,
                     bool incr);
 
 /**
