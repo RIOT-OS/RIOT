@@ -164,6 +164,10 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_2,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,
         .gclk_src = SAM0_GCLK_MAIN,
+#ifdef MODULE_PERIPH_DMA
+        .tx_trigger = SERCOM1_DMAC_ID_TX,
+        .rx_trigger = SERCOM1_DMAC_ID_RX,
+#endif
     },
     {   /* D0 … D2 (user pins) */
         .dev      = &SERCOM0->SPI,
@@ -176,6 +180,10 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_2,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,
         .gclk_src = SAM0_GCLK_MAIN,
+#ifdef MODULE_PERIPH_DMA
+        .tx_trigger = SERCOM0_DMAC_ID_TX,
+        .rx_trigger = SERCOM0_DMAC_ID_RX,
+#endif
     },
 };
 

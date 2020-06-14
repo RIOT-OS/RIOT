@@ -39,8 +39,10 @@ extern "C" {
  */
 #define PERIPH_SPI_NEEDS_INIT_CS
 #define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+#ifndef MODULE_PERIPH_DMA
 #define PERIPH_SPI_NEEDS_TRANSFER_REG
 #define PERIPH_SPI_NEEDS_TRANSFER_REGS
+#endif
 /** @} */
 
 /**
@@ -275,6 +277,10 @@ typedef struct {
     spi_misopad_t miso_pad; /**< pad to use for MISO line */
     spi_mosipad_t mosi_pad; /**< pad to use for MOSI and CLK line */
     uint8_t gclk_src;       /**< GCLK source which supplys SERCOM */
+#ifdef MODULE_PERIPH_DMA
+    uint8_t tx_trigger;     /**< DMA trigger */
+    uint8_t rx_trigger;     /**< DMA trigger */
+#endif
 } spi_conf_t;
 /** @} */
 

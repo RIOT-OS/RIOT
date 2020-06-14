@@ -95,6 +95,10 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_0,
         .mosi_pad = SPI_PAD_MOSI_2_SCK_3,
         .gclk_src = SAM0_GCLK_MAIN,
+#ifdef MODULE_PERIPH_DMA
+        .tx_trigger = SERCOM4_DMAC_ID_TX,
+        .rx_trigger = SERCOM4_DMAC_ID_RX,
+#endif
     },
     {    /* EXT1 & EXT3 Pin Header */
         .dev      = &(SERCOM5->SPI),
@@ -107,6 +111,11 @@ static const spi_conf_t spi_config[] = {
         .miso_pad = SPI_PAD_MISO_0,
         .mosi_pad = SPI_PAD_MOSI_2_SCK_3,
         .gclk_src = SAM0_GCLK_MAIN,
+#ifdef MODULE_PERIPH_DMA
+        /* The SAML21 doesn't support DMA triggers on SERCOM5 */
+        .tx_trigger = DMA_TRIGGER_DISABLED,
+        .rx_trigger = DMA_TRIGGER_DISABLED,
+#endif
     }
 };
 
