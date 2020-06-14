@@ -164,7 +164,17 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     for (const void* end = data + len; data != end; ++data) {
-        while (tsrb_add_one(&uart_tx_rb[uart], *data) < 0) {}
+        if (irq_is_in() || __get_PRIMASK()) {
+            /* if ring buffer is full free up a spot */
+            if (tsrb_full(&uart_tx_rb[uart])) {
+                while (!dev(uart)->INTFLAG.bit.DRE) {}
+                dev(uart)->DATA.reg = tsrb_get_one(&uart_tx_rb[uart]);
+            }
+            tsrb_add_one(&uart_tx_rb[uart], *data);
+        }
+        else {
+            while (tsrb_add_one(&uart_tx_rb[uart], *data) < 0) {}
+        }
         dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
     }
 #else
