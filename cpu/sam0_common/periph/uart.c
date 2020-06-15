@@ -41,7 +41,7 @@
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
 #include "tsrb.h"
 static tsrb_t uart_tx_rb[UART_NUMOF];
-static uint8_t uart_tx_rb_buf[UART_NUMOF][SAM0_UART_TXBUF_SIZE];
+static uint8_t uart_tx_rb_buf[UART_NUMOF][UART_TXBUF_SIZE];
 #endif
 static uart_isr_ctx_t uart_ctx[UART_NUMOF];
 
@@ -68,7 +68,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
-    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], SAM0_UART_TXBUF_SIZE);
+    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
 
     /* configure pins */

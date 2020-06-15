@@ -61,7 +61,7 @@
  * @brief   Allocate for tx ring buffers
  */
 static tsrb_t uart_tx_rb[UART_NUMOF];
-static uint8_t uart_tx_rb_buf[UART_NUMOF][STM32_UART_TXBUF_SIZE];
+static uint8_t uart_tx_rb_buf[UART_NUMOF][UART_TXBUF_SIZE];
 #endif
 
 /**
@@ -168,7 +168,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
-    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], STM32_UART_TXBUF_SIZE);
+    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
 
     uart_init_pins(uart, rx_cb);

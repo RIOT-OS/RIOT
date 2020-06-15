@@ -550,8 +550,8 @@ typedef enum {
 /**
  * @brief   Size of the UART TX buffer for non-blocking mode.
  */
-#ifndef STM32_UART_TXBUF_SIZE
-#define STM32_UART_TXBUF_SIZE    (64)
+#ifndef UART_TXBUF_SIZE
+#define UART_TXBUF_SIZE    (64)
 #endif
 
 #ifndef DOXYGEN

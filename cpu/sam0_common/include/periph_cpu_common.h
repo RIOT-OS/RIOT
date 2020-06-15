@@ -192,8 +192,8 @@ typedef enum {
 /**
  * @brief   Size of the UART TX buffer for non-blocking mode.
  */
-#ifndef SAM0_UART_TXBUF_SIZE
-#define SAM0_UART_TXBUF_SIZE    (64)
+#ifndef UART_TXBUF_SIZE
+#define UART_TXBUF_SIZE    (64)
 #endif
 
 /**
