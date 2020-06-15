@@ -207,6 +207,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         dev(uart)->CR1 = (USART_CR1_UE | USART_CR1_TE);
     }
 
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    NVIC_EnableIRQ(uart_config[uart].irqn);
+#endif
+
 #ifdef MODULE_PERIPH_UART_HW_FC
     if (uart_config[uart].cts_pin != GPIO_UNDEF) {
         dev(uart)->CR3 |= USART_CR3_CTSE;
