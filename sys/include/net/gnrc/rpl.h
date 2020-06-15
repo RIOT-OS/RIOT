@@ -136,10 +136,22 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default message queue size to use for the RPL thread.
+ * @brief   Default message queue size to use for the RPL thread (as exponent of
+ *          2^n).
+ *
+ *          As the queue size ALWAYS needs to be power of two, this option
+ *          represents the exponent of 2^n, which will be used as the size of
+ *          the queue.
  */
-#ifndef CONFIG_GNRC_RPL_MSG_QUEUE_SIZE
-#define CONFIG_GNRC_RPL_MSG_QUEUE_SIZE (8U)
+#ifndef CONFIG_GNRC_RPL_MSG_QUEUE_SIZE_EXP
+#define CONFIG_GNRC_RPL_MSG_QUEUE_SIZE_EXP   (3U)
+#endif
+
+/**
+ * @brief   Message queue size to use for the RPL thread.
+ */
+#ifndef GNRC_RPL_MSG_QUEUE_SIZE
+#define GNRC_RPL_MSG_QUEUE_SIZE     (1 << CONFIG_GNRC_RPL_MSG_QUEUE_SIZE_EXP)
 #endif
 
 /**

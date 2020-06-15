@@ -112,4 +112,12 @@ config GNRC_TCP_PROBE_UPPER_BOUND
     int "Lower bound for the duration between probes in microseconds"
     default 60000000
 
+config GNRC_TCP_TCB_MBOX_SIZE_EXP
+    int "Size of the TCB mbox (as exponent of 2^n)"
+    default 3
+    help
+        As the mbox buffer size ALWAYS needs to be power of two, this option
+        represents the exponent of 2^n, which will be used as the size of the
+        mbox.
+
 endif # KCONFIG_MODULE_GNRC_TCP

@@ -40,6 +40,11 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup    net_gnrc_nettest_conf   GNRC NETAPI test compile configurations
+ * @ingroup     net_gnrc_conf
+ * @{
+ */
+/**
  * @brief   Timeout for tests in microseconds
  */
 #ifndef GNRC_NETTEST_TIMEOUT
@@ -61,12 +66,24 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default message queue size to use for the nettest thread.
+ * @brief   Default message queue size to use for the nettest thread (as
+ *          exponent of 2^n).
+ *
+ *          As the queue size ALWAYS needs to be power of two, this option
+ *          represents the exponent of 2^n, which will be used as the size of
+ *          the queue.
+ */
+#ifndef CONFIG_GNRC_NETTEST_MSG_QUEUE_SIZE_EXP
+#define CONFIG_GNRC_NETTEST_MSG_QUEUE_SIZE_EXP    (3U)
+#endif
+/** @} */
+
+/**
+ * @brief   Message queue size to use for the nettest thread.
  */
 #ifndef GNRC_NETTEST_MSG_QUEUE_SIZE
-#define GNRC_NETTEST_MSG_QUEUE_SIZE (8U)
+#define GNRC_NETTEST_MSG_QUEUE_SIZE (1 << CONFIG_GNRC_NETTEST_MSG_QUEUE_SIZE_EXP)
 #endif
-
 
 /**
  * @brief   Type for get/set callbacks.

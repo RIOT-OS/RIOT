@@ -39,9 +39,25 @@ extern "C" {
 #endif
 
 /**
+ * @{
+ * @ingroup net_gnrc_tcp_conf
+ * @brief Size of the TCB mbox (as exponent of 2^n).
+ *
+ *        As the mbox buffer size ALWAYS needs to be power of two, this option
+ *        represents the exponent of 2^n, which will be used as the size of the
+ *        mbox.
+ */
+#ifndef CONFIG_GNRC_TCP_TCB_MBOX_SIZE_EXP
+#define CONFIG_GNRC_TCP_TCB_MBOX_SIZE_EXP (3U)
+#endif
+/** @} */
+
+/**
  * @brief Size of the TCB mbox
  */
-#define GNRC_TCP_TCB_MBOX_SIZE (8U)
+#ifndef GNRC_TCP_TCB_MBOX_SIZE
+#define GNRC_TCP_TCB_MBOX_SIZE (1 << CONFIG_GNRC_TCP_TCB_MBOX_SIZE_EXP)
+#endif
 
 /**
  * @brief Transmission control block of GNRC TCP.

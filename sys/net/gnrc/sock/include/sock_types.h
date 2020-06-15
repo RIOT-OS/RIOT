@@ -39,8 +39,28 @@
 extern "C" {
 #endif
 
-#ifndef SOCK_MBOX_SIZE
-#define SOCK_MBOX_SIZE      (8)         /**< Size for gnrc_sock_reg_t::mbox_queue */
+/**
+ * @defgroup net_gnrc_sock_conf  GNRC sock implementation compile configurations
+ * @ingroup  net_gnrc_conf
+ * @{
+ */
+/**
+ * @brief   Default size for gnrc_sock_reg_t::mbox_queue (as exponent of 2^n).
+ *
+ *          As the queue size ALWAYS needs to be power of two, this option
+ *          represents the exponent of 2^n, which will be used as the size of
+ *          the queue.
+ */
+#ifndef CONFIG_GNRC_SOCK_MBOX_SIZE_EXP
+#define CONFIG_GNRC_SOCK_MBOX_SIZE_EXP      (3)
+#endif
+/** @} */
+
+/**
+ * @brief Size for gnrc_sock_reg_t::mbox_queue
+ */
+#ifndef GNRC_SOCK_MBOX_SIZE
+#define GNRC_SOCK_MBOX_SIZE  (1 << CONFIG_GNRC_SOCK_MBOX_SIZE_EXP)
 #endif
 
 /**
@@ -65,13 +85,13 @@ typedef void (*gnrc_sock_reg_cb_t)(gnrc_sock_reg_t *sock,
  */
 struct gnrc_sock_reg {
 #ifdef MODULE_GNRC_SOCK_CHECK_REUSE
-    struct gnrc_sock_reg *next;         /**< list-like for internal storage */
+    struct gnrc_sock_reg *next;            /**< list-like for internal storage */
 #endif
-    gnrc_netreg_entry_t entry;          /**< @ref net_gnrc_netreg entry for mbox */
-    mbox_t mbox;                        /**< @ref core_mbox target for the sock */
-    msg_t mbox_queue[SOCK_MBOX_SIZE];   /**< queue for gnrc_sock_reg_t::mbox */
+    gnrc_netreg_entry_t entry;             /**< @ref net_gnrc_netreg entry for mbox */
+    mbox_t mbox;                           /**< @ref core_mbox target for the sock */
+    msg_t mbox_queue[GNRC_SOCK_MBOX_SIZE]; /**< queue for gnrc_sock_reg_t::mbox */
 #ifdef SOCK_HAS_ASYNC
-    gnrc_netreg_entry_cbd_t netreg_cb;  /**< netreg callback */
+    gnrc_netreg_entry_cbd_t netreg_cb;     /**< netreg callback */
     /**
      * @brief   asynchronous upper layer callback
      *
@@ -79,17 +99,17 @@ struct gnrc_sock_reg {
      *          pair, so casting between these function pointers is okay.
      */
     union {
-        gnrc_sock_reg_cb_t generic;     /**< generic version */
+        gnrc_sock_reg_cb_t generic;        /**< generic version */
 #ifdef MODULE_SOCK_IP
-        sock_ip_cb_t ip;                /**< IP version */
+        sock_ip_cb_t ip;                   /**< IP version */
 #endif
 #ifdef MODULE_SOCK_UDP
-        sock_udp_cb_t udp;              /**< UDP version */
+        sock_udp_cb_t udp;                 /**< UDP version */
 #endif
     } async_cb;
-    void *async_cb_arg;                 /**< asynchronous callback argument */
+    void *async_cb_arg;                    /**< asynchronous callback argument */
 #ifdef SOCK_HAS_ASYNC_CTX
-    sock_async_ctx_t async_ctx;         /**< asynchronous event context */
+    sock_async_ctx_t async_ctx;            /**< asynchronous event context */
 #endif
 #endif  /* SOCK_HAS_ASYNC */
 };
@@ -99,10 +119,10 @@ struct gnrc_sock_reg {
  * @internal
  */
 struct sock_ip {
-    gnrc_sock_reg_t reg;                /**< netreg info */
-    sock_ip_ep_t local;                 /**< local end-point */
-    sock_ip_ep_t remote;                /**< remote end-point */
-    uint16_t flags;                     /**< option flags */
+    gnrc_sock_reg_t reg;                   /**< netreg info */
+    sock_ip_ep_t local;                    /**< local end-point */
+    sock_ip_ep_t remote;                   /**< remote end-point */
+    uint16_t flags;                        /**< option flags */
 };
 
 /**
@@ -110,10 +130,10 @@ struct sock_ip {
  * @internal
  */
 struct sock_udp {
-    gnrc_sock_reg_t reg;                /**< netreg info */
-    sock_udp_ep_t local;                /**< local end-point */
-    sock_udp_ep_t remote;               /**< remote end-point */
-    uint16_t flags;                     /**< option flags */
+    gnrc_sock_reg_t reg;                   /**< netreg info */
+    sock_udp_ep_t local;                   /**< local end-point */
+    sock_udp_ep_t remote;                  /**< remote end-point */
+    uint16_t flags;                        /**< option flags */
 };
 
 #ifdef __cplusplus

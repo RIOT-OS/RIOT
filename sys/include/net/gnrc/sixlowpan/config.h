@@ -43,10 +43,14 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default message queue size to use for the 6LoWPAN thread.
+ * @brief   Default message queue size to use for the 6LoWPAN thread (as
+ *          exponent of 2^n).
+ *
+ * As the queue size ALWAYS needs to be power of two, this option represents the
+ * exponent of 2^n, which will be used as the size of the queue.
  */
-#ifndef CONFIG_GNRC_SIXLOWPAN_MSG_QUEUE_SIZE
-#define CONFIG_GNRC_SIXLOWPAN_MSG_QUEUE_SIZE       (8U)
+#ifndef CONFIG_GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP
+#define CONFIG_GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP   (3U)
 #endif
 
 /**
@@ -306,6 +310,13 @@ extern "C" {
 #define GNRC_SIXLOWPAN_SFR_DG_RETRIES       (0U)
 #endif
 /** @} */
+
+/**
+ * @brief   Message queue size to use for the 6LoWPAN thread.
+ */
+#ifndef GNRC_SIXLOWPAN_MSG_QUEUE_SIZE
+#define GNRC_SIXLOWPAN_MSG_QUEUE_SIZE    (1 << CONFIG_GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP)
+#endif
 
 #ifdef __cplusplus
 }

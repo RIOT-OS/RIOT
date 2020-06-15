@@ -75,7 +75,7 @@ static void _netapi_cb(uint16_t cmd, gnrc_pktsnip_t *pkt, void *ctx)
 
 void gnrc_sock_create(gnrc_sock_reg_t *reg, gnrc_nettype_t type, uint32_t demux_ctx)
 {
-    mbox_init(&reg->mbox, reg->mbox_queue, SOCK_MBOX_SIZE);
+    mbox_init(&reg->mbox, reg->mbox_queue, GNRC_SOCK_MBOX_SIZE);
 #ifdef SOCK_HAS_ASYNC
     reg->async_cb.generic = NULL;
     reg->netreg_cb.cb = _netapi_cb;
@@ -106,7 +106,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     }
 #endif
 
-    if (reg->mbox.cib.mask != (SOCK_MBOX_SIZE - 1)) {
+    if (reg->mbox.cib.mask != (GNRC_SOCK_MBOX_SIZE - 1)) {
         return -EINVAL;
     }
 #ifdef MODULE_XTIMER

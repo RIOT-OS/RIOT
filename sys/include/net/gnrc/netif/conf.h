@@ -51,14 +51,19 @@ extern "C" {
 #endif
 
 /**
- * @brief       Message queue size for network interface threads
+ * @brief       Default message queue size for network interface threads (as
+ *              exponent of 2^n).
+ *
+ *              As the queue size ALWAYS needs to be power of two, this option
+ *              represents the exponent of 2^n, which will be used as the size
+ *              of the queue.
  *
  * @attention   This has influence on the used stack memory of the thread, so
  *              the thread's stack size might need to be adapted if this is
  *              changed.
  */
-#ifndef CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE
-#define CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE  (16U)
+#ifndef CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE_EXP
+#define CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE_EXP  (4U)
 #endif
 
 /**
@@ -151,10 +156,17 @@ extern "C" {
 #ifndef CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US
 #define CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US   (0U)
 #endif
+/** @} */
+
+/**
+ * @brief   Message queue size for network interface threads
+ */
+#ifndef GNRC_NETIF_MSG_QUEUE_SIZE
+#define GNRC_NETIF_MSG_QUEUE_SIZE   (1 << CONFIG_GNRC_NETIF_MSG_QUEUE_SIZE_EXP)
+#endif
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* NET_GNRC_NETIF_CONF_H */
-/** @} */

@@ -81,6 +81,11 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup net_gnrc_lwmac_conf    GNRC LWMAC compile configurations
+ * @ingroup  net_gnrc_conf
+ * @{
+ */
+/**
  * @brief Time between consecutive wake-ups.
  *
  * This macro governs power consumption, latency and throughput!
@@ -287,14 +292,26 @@ extern "C" {
 #endif
 
 /**
- * @brief Default message queue size to use for the LWMAC thread.
+ * @brief Default message queue size to use for the LWMAC thread (as exponent of
+ *        2^n).
+ *
+ * As the queue size ALWAYS needs to be power of two, this option represents the
+ * exponent of 2^n, which will be used as the size of the queue.
  *
  * The value of this macro should be enough for supporting the manipulation of
  * LWMAC.
  *
  */
+#ifndef CONFIG_GNRC_LWMAC_IPC_MSG_QUEUE_SIZE_EXP
+#define CONFIG_GNRC_LWMAC_IPC_MSG_QUEUE_SIZE_EXP        (3U)
+#endif
+/** @} */
+
+/**
+ * @brief Message queue size to use for the LWMAC thread.
+ */
 #ifndef GNRC_LWMAC_IPC_MSG_QUEUE_SIZE
-#define GNRC_LWMAC_IPC_MSG_QUEUE_SIZE        (8U)
+#define GNRC_LWMAC_IPC_MSG_QUEUE_SIZE       (1 << CONFIG_GNRC_LWMAC_IPC_MSG_QUEUE_SIZE_EXP)
 #endif
 
 /**

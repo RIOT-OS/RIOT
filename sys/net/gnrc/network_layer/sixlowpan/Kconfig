@@ -16,8 +16,12 @@ if KCONFIG_MODULE_GNRC_SIXLOWPAN
 rsource "frag/Kconfig"
 rsource "nd/Kconfig"
 
-config GNRC_SIXLOWPAN_MSG_QUEUE_SIZE
-    int "Message queue size for the 6LoWPAN thread"
-    default 8
+config GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP
+    int "Exponent for the message queue size for the 6LoWPAN thread (as 2^n)"
+    default 3
+    help
+        As the queue size ALWAYS needs to be power of two, this option
+        represents the exponent of 2^n, which will be used as the size of
+        the queue.
 
 endif # KCONFIG_MODULE_GNRC_SIXLOWPAN

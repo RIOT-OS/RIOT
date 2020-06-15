@@ -14,9 +14,13 @@ menuconfig KCONFIG_MODULE_GNRC_IPV6
 
 if KCONFIG_MODULE_GNRC_IPV6
 
-config GNRC_IPV6_MSG_QUEUE_SIZE
-    int "Default message queue size to use for the IPv6 thread"
-    default 8
+config GNRC_IPV6_MSG_QUEUE_SIZE_EXP
+    int "Exponent for the message queue size used for the IPv6 thread (as 2^n)"
+    default 3
+    help
+        As the queue size ALWAYS needs to be power of two, this option
+        represents the exponent of 2^n, which will be used as the size of
+        the queue.
 
 endif # KCONFIG_MODULE_GNRC_IPV6
 

@@ -49,6 +49,11 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup   net_gnrc_gomach_conf     GNRC GoMacH compile configuration
+ * @ingroup    net_gnrc_conf
+ * @{
+ */
+/**
  * @brief The default duration of GoMacH's wake-up period (WP).
  *
  * GoMacH adopts the duty-cycle scheme that, by default, a node only wakes up
@@ -342,13 +347,25 @@ extern "C" {
 #endif
 
 /**
- * @brief Default message queue size to use for the GoMacH thread.
+ * @brief Default message queue size to use for the GoMacH thread (as exponent
+ *        of 2^n).
+ *
+ * As the queue size ALWAYS needs to be power of two, this option represents the
+ * exponent of 2^n, which will be used as the size of the queue.
  *
  * The value of this macro should be enough for supporting the manipulation of
  * GoMacH.
  */
+#ifndef CONFIG_GNRC_GOMACH_IPC_MSG_QUEUE_SIZE_EXP
+#define CONFIG_GNRC_GOMACH_IPC_MSG_QUEUE_SIZE_EXP        (3U)
+#endif
+/** @} */
+
+/**
+ * @brief Message queue size to use for the GoMacH thread.
+ */
 #ifndef GNRC_GOMACH_IPC_MSG_QUEUE_SIZE
-#define GNRC_GOMACH_IPC_MSG_QUEUE_SIZE        (8U)
+#define GNRC_GOMACH_IPC_MSG_QUEUE_SIZE  (1 << CONFIG_GNRC_GOMACH_IPC_MSG_QUEUE_SIZE_EXP)
 #endif
 
 /**

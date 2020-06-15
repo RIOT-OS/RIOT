@@ -29,6 +29,7 @@ extern "C" {
 /**
  * @defgroup net_gnrc_tcp_conf GNRC TCP compile configurations
  * @ingroup net_gnrc_conf
+ * @ingroup net_gnrc_tcp
  *
  * ## Calculating RTO
  * To calculate retransmission timeout (RTO), Round Trip Time (RTT) needs to be
