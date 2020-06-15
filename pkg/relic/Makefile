@@ -3,6 +3,8 @@ PKG_URL=https://github.com/relic-toolkit/relic.git
 PKG_VERSION=0b0442a8218df8d309266923f2dd5b9ae3b318ce
 PKG_LICENSE=LGPL-2.1
 
+PKG_CUSTOM_PREPARED = $(PKGDIRBASE)/$(PKG_NAME)/build/include
+
 include $(RIOTBASE)/pkg/pkg.mk
 
 .PHONY: ..cmake_version_supported
@@ -17,6 +19,10 @@ CFLAGS += -Wno-gnu-zero-variadic-macro-arguments -Wno-unused-function -Wno-newli
 TOOLCHAIN_FILE = $(RELIC_SOURCE_DIR)/xcompile-toolchain.cmake
 
 all: $(BINDIR)/$(PKG_NAME).a
+
+$(PKG_CUSTOM_PREPARED):
+	$(info [INFO] Relic: create include directory in build)
+	mkdir -p $(PKG_CUSTOM_PREPARED)
 
 $(BINDIR)/$(PKG_NAME).a: $(RELIC_BUILD_DIR)/lib/librelic_s.a
 	cp $< $@
