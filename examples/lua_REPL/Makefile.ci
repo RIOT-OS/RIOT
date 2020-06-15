@@ -75,6 +75,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     sodaq-explorer \
     sodaq-one \
     sodaq-sara-aff \
+    sodaq-sara-sff \
     spark-core \
     stk3600 \
     stm32f030f4-demo \
