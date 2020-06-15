@@ -114,6 +114,8 @@ static int _restart_timewait_timer(gnrc_tcp_tcb_t *tcb)
  * @param[in]     state   State to transition in.
  *
  * @return   Zero on success.
+ * @return   -EADDRINUSE, if @p state == FSM_STATE_SYN_SENT and tcb->local_port
+ *           is already in use.
  */
 static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
 {
@@ -148,11 +150,6 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
 #endif
             tcb->peer_port = PORT_UNSPEC;
 
-            /* Allocate receive buffer */
-            if (_rcvbuf_get_buffer(tcb) == -ENOMEM) {
-                return -ENOMEM;
-            }
-
             /* Add connection to active connections (if not already active) */
             mutex_lock(&_list_tcb_lock);
             LL_SEARCH(_list_tcb_head, iter, tcb, TCB_EQUAL);
@@ -163,11 +160,6 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
             break;
 
         case FSM_STATE_SYN_SENT:
-            /* Allocate rceveive buffer */
-            if (_rcvbuf_get_buffer(tcb) == -ENOMEM) {
-                return -ENOMEM;
-            }
-
             /* Add connection to active connections (if not already active) */
             mutex_lock(&_list_tcb_lock);
             LL_SEARCH(_list_tcb_head, iter, tcb, TCB_EQUAL);
@@ -175,10 +167,9 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
             if (iter == NULL) {
                 /* Check if port number was specified */
                 if (tcb->local_port != PORT_UNSPEC) {
-                    /* Check if given port number is use: return error and release buffer */
+                    /* Check if given port number is in use: return error */
                     if (_is_local_port_in_use(tcb->local_port)) {
                         mutex_unlock(&_list_tcb_lock);
-                        _rcvbuf_release_buffer(tcb);
                         return -EADDRINUSE;
                     }
                 }
@@ -222,14 +213,17 @@ static int _fsm_call_open(gnrc_tcp_tcb_t *tcb)
     int ret = 0;
 
     DEBUG("gnrc_tcp_fsm.c : _fsm_call_open()\n");
+
+    /* Allocate receive buffer */
+    if (_rcvbuf_get_buffer(tcb) == -ENOMEM) {
+        return -ENOMEM;
+    }
+
     tcb->rcv_wnd = CONFIG_GNRC_TCP_DEFAULT_WINDOW;
 
     if (tcb->status & STATUS_PASSIVE) {
         /* Passive open, T: CLOSED -> LISTEN */
-        if (_transition_to(tcb, FSM_STATE_LISTEN) == -ENOMEM) {
-            _transition_to(tcb, FSM_STATE_CLOSED);
-            return -ENOMEM;
-        }
+        _transition_to(tcb, FSM_STATE_LISTEN);
     }
     else {
         /* Active Open, set TCB values, send SYN, T: CLOSED -> SYN_SENT */
@@ -591,10 +585,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
         if (ctl & MSK_RST) {
             /* .. and state is SYN_RCVD and the connection is passive: SYN_RCVD -> LISTEN */
             if (tcb->state == FSM_STATE_SYN_RCVD && (tcb->status & STATUS_PASSIVE)) {
-                if (_transition_to(tcb, FSM_STATE_LISTEN) == -ENOMEM) {
-                    _transition_to(tcb, FSM_STATE_CLOSED);
-                    return -ENOMEM;
-                }
+                _transition_to(tcb, FSM_STATE_LISTEN);
             }
             else {
                 _transition_to(tcb, FSM_STATE_CLOSED);
