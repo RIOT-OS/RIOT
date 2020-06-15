@@ -51,6 +51,9 @@ PKG_PREPARED   = $(PKG_STATE)-prepared
 PKG_PATCHED    = $(PKG_STATE)-patched
 PKG_DOWNLOADED = $(PKG_STATE)-downloaded
 
+# Custom prepared target that can be defined in packages Makefile.
+PKG_CUSTOM_PREPARED ?=
+
 # Declare 'all' first to have it being the default target
 all: $(PKG_PREPARED)
 prepare: $(PKG_PREPARED)
@@ -92,7 +95,7 @@ $(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_BUILDDIR)/.git
 	$(Q)$(GIT_IN_PKG) fetch $(GIT_QUIET) $(PKG_URL) $(PKG_VERSION)
 	echo $(PKG_VERSION) > $@
 
-$(PKG_BUILDDIR)/.git:
+$(PKG_BUILDDIR)/.git: | $(PKG_CUSTOM_PREPARED)
 	$(info [INFO] cloning $(PKG_NAME))
 	$(Q)rm -Rf $(PKG_BUILDDIR)
 	$(Q)mkdir -p $(PKG_BUILDDIR)
