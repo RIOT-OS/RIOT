@@ -71,12 +71,20 @@
 #define USE_DFLL 0
 #define USE_XOSC 1
 
+#ifndef GCLK_TIMER_HZ
+#define GCLK_TIMER_HZ   MHZ(4)
+#endif
+
 #else /* !USE_XOSC_ONLY */
 
 /* Main clock > 48 MHz -> use DPLL, otherwise use DFLL */
 #define USE_DPLL (CLOCK_CORECLOCK > SAM0_DFLL_FREQ_HZ)
 #define USE_DFLL 1
 #define USE_XOSC 0
+
+#ifndef GCLK_TIMER_HZ
+#define GCLK_TIMER_HZ   MHZ(8)
+#endif
 
 #endif /* USE_XOSC_ONLY */
 
@@ -228,15 +236,15 @@ void sam0_gclk_enable(uint8_t id)
         if (USE_DPLL) {
             gclk_connect(SAM0_GCLK_TIMER,
                          GCLK_SOURCE_DPLL0,
-                         GCLK_GENCTRL_DIV(DPLL_DIV * CLOCK_CORECLOCK / MHZ(8)));
+                         GCLK_GENCTRL_DIV(DPLL_DIV * CLOCK_CORECLOCK / GCLK_TIMER_HZ));
         } else if (USE_DFLL) {
             gclk_connect(SAM0_GCLK_TIMER,
                          GCLK_SOURCE_DFLL,
-                         GCLK_GENCTRL_DIV(SAM0_DFLL_FREQ_HZ / MHZ(8)));
+                         GCLK_GENCTRL_DIV(SAM0_DFLL_FREQ_HZ / GCLK_TIMER_HZ));
         } else if (USE_XOSC) {
             gclk_connect(SAM0_GCLK_TIMER,
                          GCLK_SOURCE_ACTIVE_XOSC,
-                         GCLK_GENCTRL_DIV(SAM0_XOSC_FREQ_HZ / MHZ(4)));
+                         GCLK_GENCTRL_DIV(SAM0_XOSC_FREQ_HZ / GCLK_TIMER_HZ));
         }
         break;
     case SAM0_GCLK_PERIPH:
@@ -258,11 +266,7 @@ uint32_t sam0_gclk_freq(uint8_t id)
     case SAM0_GCLK_32KHZ:
         return 32768;
     case SAM0_GCLK_TIMER:
-        if (USE_XOSC) {
-            return MHZ(4);
-        } else {
-            return MHZ(8);
-        }
+        return GCLK_TIMER_HZ;
     case SAM0_GCLK_PERIPH:
         if (USE_DFLL) {
             return SAM0_DFLL_FREQ_HZ;
