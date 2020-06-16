@@ -26,7 +26,7 @@
 /**
  * @brief   A macro to return the bytes in x KiB
  */
-#define KiB(x) ((unsigned long long)(x) << 10)
+#define KiB(x) ((unsigned long)(x) << 10)
 
 /**
  * @brief   A macro to return the bytes in x MiB
@@ -36,17 +36,22 @@
 /**
  * @brief   A macro to return the bytes in x GiB
  */
-#define GiB(x) (MiB(x) << 10)
+#define GiB(x) ((unsigned long long)MiB(x) << 10)
 
 /**
  * @brief   A macro to return the Hz in x kHz
  */
-#define KHZ(x)    ((x) * 1000ULL)
+#define KHZ(x)    ((x) * 1000UL)
 
 /**
  * @brief   A macro to return the Hz in x MHz
  */
-#define MHZ(x) (KHZ(x) * 1000ULL)
+#define MHZ(x) (KHZ(x) * 1000UL)
+
+/**
+ * @brief   A macro to return the Hz in x GHz
+ */
+#define GHZ(x) (MHZ(x) * 1000ULL)
 
 #ifdef __cplusplus
 }
