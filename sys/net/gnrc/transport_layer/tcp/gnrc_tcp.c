@@ -124,7 +124,6 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
     msg_t msg;
     msg_t msg_queue[TCP_MSG_QUEUE_SIZE];
     mbox_t mbox = MBOX_INIT(msg_queue, TCP_MSG_QUEUE_SIZE);
-    xtimer_t connection_timeout;
     cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &mbox};
     int ret = 0;
 
@@ -187,7 +186,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
         tcb->peer_port = remote->port;
 
         /* Setup connection timeout: Put timeout message in TCBs mbox on expiration */
-        _setup_timeout(&connection_timeout, CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+        _setup_timeout(&(tcb->timer_misc), CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
                        _cb_mbox_put_msg, &connection_timeout_arg);
     }
 
@@ -212,8 +211,9 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
                  * send SYN+ACK we received upon entering SYN_RCVD is never acknowledged
                  * by the peer. */
                 if ((tcb->state == FSM_STATE_SYN_RCVD) && (tcb->status & STATUS_PASSIVE)) {
-                    _setup_timeout(&connection_timeout, CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
-                                   _cb_mbox_put_msg, &connection_timeout_arg);
+                    _setup_timeout(&(tcb->timer_misc),
+                                   CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION, _cb_mbox_put_msg,
+                                   &connection_timeout_arg);
                 }
                 break;
 
@@ -241,7 +241,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
 
     /* Cleanup */
     _fsm_set_mbox(tcb, NULL);
-    xtimer_remove(&connection_timeout);
+    xtimer_remove(&(tcb->timer_misc));
     if (tcb->state == FSM_STATE_CLOSED && ret == 0) {
         ret = -ECONNREFUSED;
     }
@@ -468,7 +468,6 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     msg_t msg;
     msg_t msg_queue[TCP_MSG_QUEUE_SIZE];
     mbox_t mbox = MBOX_INIT(msg_queue, TCP_MSG_QUEUE_SIZE);
-    xtimer_t connection_timeout;
     cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &mbox};
     xtimer_t user_timeout;
     cb_arg_t user_timeout_arg = {MSG_TYPE_USER_SPEC_TIMEOUT, &mbox};
@@ -489,7 +488,9 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
 
     /* Setup messaging */
     _fsm_set_mbox(tcb, &mbox);
-    _setup_timeout(&connection_timeout, CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+
+    /* Setup connection timeout: Put timeout message in tcb's mbox on expiration */
+    _setup_timeout(&(tcb->timer_misc), CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
                    _cb_mbox_put_msg, &connection_timeout_arg);
 
     if (timeout_duration_us > 0) {
@@ -555,7 +556,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
                 DEBUG("gnrc_tcp.c : gnrc_tcp_send() : NOTIFY_USER\n");
 
                 /* Connection is alive: Reset Connection Timeout */
-                _setup_timeout(&connection_timeout, CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+                _setup_timeout(&(tcb->timer_misc), CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
                                _cb_mbox_put_msg, &connection_timeout_arg);
 
                 /* If the window re-opened and we are probing: Stop it */
@@ -572,8 +573,8 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
 
     /* Cleanup */
     _fsm_set_mbox(tcb, NULL);
+    xtimer_remove(&(tcb->timer_misc));
     xtimer_remove(&probe_timeout);
-    xtimer_remove(&connection_timeout);
     xtimer_remove(&user_timeout);
     mutex_unlock(&(tcb->function_lock));
     return ret;
@@ -588,7 +589,6 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     msg_t msg;
     msg_t msg_queue[TCP_MSG_QUEUE_SIZE];
     mbox_t mbox = MBOX_INIT(msg_queue, TCP_MSG_QUEUE_SIZE);
-    xtimer_t connection_timeout;
     cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &mbox};
     xtimer_t user_timeout;
     cb_arg_t user_timeout_arg = {MSG_TYPE_USER_SPEC_TIMEOUT, &mbox};
@@ -624,7 +624,9 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
 
     /* Setup messaging */
     _fsm_set_mbox(tcb, &mbox);
-    _setup_timeout(&connection_timeout, CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+
+    /* Setup connection timeout: Put timeout message in tcb's mbox on expiration */
+    _setup_timeout(&(tcb->timer_misc), CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
                    _cb_mbox_put_msg, &connection_timeout_arg);
     _setup_timeout(&user_timeout, timeout_duration_us, _cb_mbox_put_msg, &user_timeout_arg);
 
@@ -672,7 +674,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
 
     /* Cleanup */
     _fsm_set_mbox(tcb, NULL);
-    xtimer_remove(&connection_timeout);
+    xtimer_remove(&(tcb->timer_misc));
     xtimer_remove(&user_timeout);
     mutex_unlock(&(tcb->function_lock));
     return ret;
@@ -685,7 +687,6 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     msg_t msg;
     msg_t msg_queue[TCP_MSG_QUEUE_SIZE];
     mbox_t mbox = MBOX_INIT(msg_queue, TCP_MSG_QUEUE_SIZE);
-    xtimer_t connection_timeout;
     cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &mbox};
 
     /* Lock the TCB for this function call */
@@ -699,7 +700,9 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
 
     /* Setup messaging */
     _fsm_set_mbox(tcb, &mbox);
-    _setup_timeout(&connection_timeout, CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+
+    /* Setup connection timeout: Put timeout message in tcb's mbox on expiration */
+    _setup_timeout(&(tcb->timer_misc), CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
                    _cb_mbox_put_msg, &connection_timeout_arg);
 
     /* Start connection teardown sequence */
@@ -725,7 +728,7 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
 
     /* Cleanup */
     _fsm_set_mbox(tcb, NULL);
-    xtimer_remove(&connection_timeout);
+    xtimer_remove(&(tcb->timer_misc));
     mutex_unlock(&(tcb->function_lock));
 }
 
