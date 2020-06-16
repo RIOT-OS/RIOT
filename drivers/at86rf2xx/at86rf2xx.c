@@ -39,7 +39,7 @@
 
 void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t index)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    netdev_t *netdev = &dev->netdev.netdev;
 
     netdev->driver = &at86rf2xx_driver;
     /* State to return after receiving or transmitting */
@@ -58,6 +58,8 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t
 #endif
 
     netdev_register(netdev, NETDEV_AT86RF2XX, index);
+    /* set device address */
+    netdev_ieee802154_setup(&dev->netdev);
 }
 
 static void at86rf2xx_disable_clock_output(at86rf2xx_t *dev)
@@ -91,9 +93,6 @@ static void at86rf2xx_enable_smart_idle(at86rf2xx_t *dev)
 
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
-    eui64_t addr_long;
-    network_uint16_t addr_short;
-
     netdev_ieee802154_reset(&dev->netdev);
 
     /* Reset state machine to ensure a known state */
@@ -101,13 +100,9 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
         at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
     }
 
-    /* generate EUI-64 and short address */
-    luid_get_eui64(&addr_long);
-    luid_get_short(&addr_short);
-
     /* set short and long address */
-    at86rf2xx_set_addr_long(dev, &addr_long);
-    at86rf2xx_set_addr_short(dev, &addr_short);
+    at86rf2xx_set_addr_long(dev, (eui64_t *)dev->netdev.long_addr);
+    at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
 
     /* set default channel */
     at86rf2xx_set_chan(dev, AT86RF2XX_DEFAULT_CHANNEL);
