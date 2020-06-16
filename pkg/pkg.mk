@@ -53,7 +53,10 @@ PKG_DOWNLOADED = $(PKG_STATE)-downloaded
 
 # Declare 'all' first to have it being the default target
 all: $(PKG_PREPARED)
+
+# Add noop builtin to avoid "Nothing to be done for prepare" message
 prepare: $(PKG_PREPARED)
+	@:
 
 # Allow packages to add a custom step to be `prepared`.
 # It should be a dependency of `$(PKG_PREPARED)` and depend on `$(PKG_PATCHED)`
