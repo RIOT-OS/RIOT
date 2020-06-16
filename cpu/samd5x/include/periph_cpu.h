@@ -61,11 +61,19 @@ extern "C" {
  * @{
  */
 enum {
-    SAM0_GCLK_MAIN = 0,                 /**< 120 MHz main clock     */
-    SAM0_GCLK_32KHZ,                    /**< 32 kHz clock           */
-    SAM0_GCLK_8MHZ,                     /**< 8 MHz clock for xTimer */
-    SAM0_GCLK_48MHZ,                    /**< 48 MHz DFLL clock      */
+    SAM0_GCLK_MAIN = 0,                 /**< 120 MHz main clock       */
+    SAM0_GCLK_32KHZ,                    /**< 32 kHz clock             */
+    SAM0_GCLK_TIMER,                    /**< 4-8 MHz clock for xTimer */
+    SAM0_GCLK_PERIPH,                   /**< 12-48 MHz (DFLL) clock   */
 };
+/** @} */
+
+/**
+ * @name   GCLK compatibility definitions
+ * @{
+ */
+#define SAM0_GCLK_8MHZ      SAM0_GCLK_TIMER
+#define SAM0_GCLK_48MHZ     SAM0_GCLK_PERIPH
 /** @} */
 
 /**

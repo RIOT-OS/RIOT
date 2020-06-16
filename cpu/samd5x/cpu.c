@@ -223,27 +223,27 @@ void sam0_gclk_enable(uint8_t id)
     /* clocks 0 & 1 are always running */
 
     switch (id) {
-    case SAM0_GCLK_8MHZ:
+    case SAM0_GCLK_TIMER:
         /* 8 MHz clock used by xtimer */
         if (USE_DPLL) {
-            gclk_connect(SAM0_GCLK_8MHZ,
+            gclk_connect(SAM0_GCLK_TIMER,
                          GCLK_SOURCE_DPLL0,
                          GCLK_GENCTRL_DIV(DPLL_DIV * CLOCK_CORECLOCK / MHZ(8)));
         } else if (USE_DFLL) {
-            gclk_connect(SAM0_GCLK_8MHZ,
+            gclk_connect(SAM0_GCLK_TIMER,
                          GCLK_SOURCE_DFLL,
                          GCLK_GENCTRL_DIV(SAM0_DFLL_FREQ_HZ / MHZ(8)));
         } else if (USE_XOSC) {
-            gclk_connect(SAM0_GCLK_8MHZ,
+            gclk_connect(SAM0_GCLK_TIMER,
                          GCLK_SOURCE_ACTIVE_XOSC,
                          GCLK_GENCTRL_DIV(SAM0_XOSC_FREQ_HZ / MHZ(4)));
         }
         break;
-    case SAM0_GCLK_48MHZ:
+    case SAM0_GCLK_PERIPH:
         if (USE_DFLL) {
-            gclk_connect(SAM0_GCLK_48MHZ, GCLK_SOURCE_DFLL, 0);
+            gclk_connect(SAM0_GCLK_PERIPH, GCLK_SOURCE_DFLL, 0);
         } else if (USE_XOSC) {
-            gclk_connect(SAM0_GCLK_48MHZ, GCLK_SOURCE_ACTIVE_XOSC, 0);
+            gclk_connect(SAM0_GCLK_PERIPH, GCLK_SOURCE_ACTIVE_XOSC, 0);
         }
 
         break;
@@ -257,13 +257,13 @@ uint32_t sam0_gclk_freq(uint8_t id)
         return CLOCK_CORECLOCK;
     case SAM0_GCLK_32KHZ:
         return 32768;
-    case SAM0_GCLK_8MHZ:
+    case SAM0_GCLK_TIMER:
         if (USE_XOSC) {
             return MHZ(4);
         } else {
             return MHZ(8);
         }
-    case SAM0_GCLK_48MHZ:
+    case SAM0_GCLK_PERIPH:
         if (USE_DFLL) {
             return SAM0_DFLL_FREQ_HZ;
         } else if (USE_XOSC) {
