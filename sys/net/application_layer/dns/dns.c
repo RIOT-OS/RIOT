@@ -19,7 +19,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "net/dns.h"
 #include "net/sock/udp.h"
 #include "net/sock/dns.h"
 
@@ -28,7 +27,7 @@
 #endif
 
 /* min domain name length is 1, so minimum record length is 7 */
-#define DNS_MIN_REPLY_LEN   (unsigned)(sizeof(sock_dns_hdr_t ) + 7)
+#define DNS_MIN_REPLY_LEN   (unsigned)(sizeof(dns_hdr_t ) + 7)
 
 /* global DNS server UDP endpoint */
 sock_udp_ep_t sock_dns_server;
@@ -105,7 +104,7 @@ static ssize_t _skip_hostname(const uint8_t *buf, size_t len, uint8_t *bufpos)
 static int _parse_dns_reply(uint8_t *buf, size_t len, void* addr_out, int family)
 {
     const uint8_t *buflim = buf + len;
-    sock_dns_hdr_t *hdr = (sock_dns_hdr_t*) buf;
+    dns_hdr_t *hdr = (dns_hdr_t*) buf;
     uint8_t *bufpos = buf + sizeof(*hdr);
 
     /* skip all queries that are part of the reply */
@@ -191,7 +190,7 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
     for (int i = 0; i < SOCK_DNS_RETRIES; i++) {
         uint8_t *buf = dns_buf;
 
-        sock_dns_hdr_t *hdr = (sock_dns_hdr_t*) buf;
+        dns_hdr_t *hdr = (dns_hdr_t*) buf;
         memset(hdr, 0, sizeof(*hdr));
         hdr->id = id;
         hdr->flags = htons(0x0120);
