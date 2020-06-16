@@ -21,14 +21,14 @@ Use `BOARD=mulle` for building RIOT for this platform.
 https://github.com/eistec/mulle/wiki/Datasheets contains a list of relevant
 documentation for the components.
 
-| MCU    | MK60DN512VLL10 – Cortex-M4 |
-|-------|-----------------------------------|
-| RAM    | 64kB |
-| Flash  | 512kB|
-| radio chipset   | AT86RF212B, sub-GHz IEEE802.15.4 transceiver, similar to the AT86RF233 |
-| external flash memory  | Micron M25P16 16 Mbits external NOR flash, used for storing configuration, measurements and other slow changing non-volatile data |
-| external FRAM memory   | Cypress/Ramtron FM25L04B 4 Kbits external F-RAM, used for storing counters and other rapidly changing non-volatile data |
-| accelerometer  | ST micro LIS3DH MEMS accelerometer,  |
+| MCU                   | MK60DN512VLL10 – Cortex-M4                                                                                                        |
+|:--------------------- |:--------------------------------------------------------------------------------------------------------------------------------- |
+| RAM                   | 64KiB                                                                                                                             |
+| Flash                 | 512KiB                                                                                                                            |
+| radio chipset         | AT86RF212B, sub-GHz IEEE802.15.4 transceiver, similar to the AT86RF233                                                            |
+| external flash memory | Micron M25P16 2 MiB external NOR flash, used for storing configuration, measurements and other slow changing non-volatile data    |
+| external FRAM memory  | Cypress/Ramtron FM25L04B 512B external F-RAM, used for storing counters and other rapidly changing non-volatile data              |
+| accelerometer         | ST micro LIS3DH MEMS accelerometer                                                                                                |
 
 
 ## Layout
@@ -40,23 +40,23 @@ documentation for the components.
 The Mulle board is supported by mainline RIOT. See the below table for
 software support status for the different components.
 
-| Device | ID        | Supported | Comments  |
-|:------------- |:------------- |:------------- |:------------- |
-| MCU        | MK60DN512VLL10    | partly    | See below |
-| Low-level driver | GPIO    | yes       | |
-|        | PWM       | yes       | |
-|        | UART      | yes       | |
-|        | I2C       | yes       | |
-|        | SPI       | yes       |Master mode works, slave mode unsupported |
-|        | USB       | no        | [PR#3890](https://github.com/RIOT-OS/RIOT/pull/3890) |
-|        | RTT       | yes       | |
-|        | RNG       | yes       | |
-|        | timer     | yes       | uses LPTMR module for TIMER_0 (used by xtimer), 32.768 kHz tick rate. PIT for additional timers, F_BUS tick rate (48 MHz default) |
-|        | PM/LLWU   | in progress   | [PR#2605](https://github.com/RIOT-OS/RIOT/pull/2605) |
-| Radio Chip | AT86RF212B    | yes       | |
-| Accelerometer  | LIS3DH    | yes       | |
-| Flash  | M25P16    | in progress   | [PR#6762](https://github.com/RIOT-OS/RIOT/pull/6762) |
-| FRAM   | FM25L04B  | yes       | |
+| Device            | ID                | Supported     | Comments                                              |
+|:----------------- |:----------------- |:------------- |:----------------------------------------------------- |
+| MCU               | MK60DN512VLL10    | partly        | See below                                             |
+| Low-level driver  | GPIO              | yes           |                                                       |
+|                   | PWM               | yes           |                                                       |
+|                   | UART              | yes           |                                                       |
+|                   | I2C               | yes           |                                                       |
+|                   | SPI               | yes           | Slave mode unsupported                                |
+|                   | USB               | no            | [PR#3890](https://github.com/RIOT-OS/RIOT/pull/3890)  |
+|                   | RTT               | yes           |                                                       |
+|                   | RNG               | yes           |                                                       |
+|                   | timer             | yes           | uses LPTMR module for TIMER_0 (used by xtimer), 32.768 kHz tick rate. PIT for additional timers, F_BUS tick rate (48 MHz default) |
+|                   | PM/LLWU           | in progress   | [PR#2605](https://github.com/RIOT-OS/RIOT/pull/2605)  |
+| Radio Chip        | AT86RF212B        | yes           |                                                       |
+| Accelerometer     | LIS3DH            | yes           |                                                       |
+| Flash             | M25P16            | yes           |                                                       |
+| FRAM              | FM25L04B          | yes           |                                                       |
 
 ## Toolchains
 

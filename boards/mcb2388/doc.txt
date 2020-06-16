@@ -11,8 +11,8 @@
 
 | MCU:      | LPC2388 ARM7-TDMI |
 |-----------|-------------------|
-| RAM:      | 96kb              |
-| Flash:    | 512kb             |
+| RAM:      | 96KiB             |
+| Flash:    | 512KiB            |
 
 # More info
 

@@ -9,24 +9,24 @@
 
 
 ### MCU
-| MCU        | stm32l151cb-a |
-|:------------- |:--------------------- |
-| Family | ARM Cortex-M3     |
-| Vendor | ST Microelectronics   |
-| RAM        | 16Kb  |
-| Flash      | 128Kb             |
-| Frequency  | 32MHz (no external oscilator connected) |
-| FPU        | no                |
-| Timers | 10 (8x 16-bit, 2x watchdog timers)   |
-| ADCs       | 1x 24-channel 12-bit          |
-| UARTs      | 3                 |
-| SPIs       | 2                 |
-| I2Cs       | 2                 |
-| Vcc        | 1.65V - 3.6V          |
-| Datasheet  | [Datasheet](https://www.st.com/resource/en/datasheet/stm32l151cb-a.pdf) |
-| Reference Manual | [Reference Manual](https://www.st.com/content/ccc/resource/technical/document/reference_manual/cc/f9/93/b2/f0/82/42/57/CD00240193.pdf/files/CD00240193.pdf/jcr:content/translations/en.CD00240193.pdf) |
-| Programming Manual | [Programming Manual](https://www.st.com/content/ccc/resource/technical/document/programming_manual/5b/ca/8d/83/56/7f/40/08/CD00228163.pdf/files/CD00228163.pdf/jcr:content/translations/en.CD00228163.pdf) |
-| Board Manual   | [Board Manual](https://cdn.sos.sk/productdata/29/eb/a68245ed/im880b-l-lorawan.pdf)|
+| MCU                   | stm32l151cb-a                             |
+|:--------------------- |:----------------------------------------- |
+| Family                | ARM Cortex-M3                             |
+| Vendor                | ST Microelectronics                       |
+| RAM                   | 16KiB                                     |
+| Flash                 | 128KiB                                    |
+| Frequency             | 32MHz (no external oscillator connected)  |
+| FPU                   | no                                        |
+| Timers                | 10 (8x 16-bit, 2x watchdog timers)        |
+| ADCs                  | 1x 24-channel 12-bit                      |
+| UARTs                 | 3                                         |
+| SPIs                  | 2                                         |
+| I2Cs                  | 2                                         |
+| Vcc                   | 1.65V - 3.6V                              |
+| Datasheet             | [Datasheet](https://www.st.com/resource/en/datasheet/stm32l151cb-a.pdf) |
+| Reference Manual      | [Reference Manual](https://www.st.com/content/ccc/resource/technical/document/reference_manual/cc/f9/93/b2/f0/82/42/57/CD00240193.pdf/files/CD00240193.pdf/jcr:content/translations/en.CD00240193.pdf) |
+| Programming Manual    | [Programming Manual](https://www.st.com/content/ccc/resource/technical/document/programming_manual/5b/ca/8d/83/56/7f/40/08/CD00228163.pdf/files/CD00228163.pdf/jcr:content/translations/en.CD00228163.pdf) |
+| Board Manual          | [Board Manual](https://cdn.sos.sk/productdata/29/eb/a68245ed/im880b-l-lorawan.pdf)|
 
 ### User Interface
 

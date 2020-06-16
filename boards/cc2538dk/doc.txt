@@ -13,22 +13,22 @@ microcontroller with an IEEE802.15.4 radio.
 
 ![cc2538dk](http://www.ti.com/diagrams/cc2538dk_cc2538dk_web_1.jpg)
 
-| MCU        | CC2538SF53        |
-|:------------- |:--------------------- |
-| Family | ARM Cortex-M3     |
-| Vendor | Texas Instruments |
-| RAM        | 32Kb  |
-| Flash      | 512Kb             |
-| Frequency  | 32MHz |
-| FPU        | no                |
-| Timers | 4 |
-| ADCs       | 1x 12-bit (8 channels)        |
-| UARTs      | 2                 |
-| SPIs       | 2                 |
-| I2Cs       | 1                 |
-| Vcc        | 2V - 3.6V         |
-| Datasheet  | [Datasheet](http://www.ti.com/lit/gpn/cc2538) (pdf file) |
-| Reference Manual | [Reference Manual](http://www.ti.com/lit/pdf/swru319) |
+| MCU               | CC2538SF53                |
+|:----------------- |:------------------------- |
+| Family            | ARM Cortex-M3             |
+| Vendor            | Texas Instruments         |
+| RAM               | 32KiB                     |
+| Flash             | 512KiB                    |
+| Frequency         | 32MHz                     |
+| FPU               | no                        |
+| Timers            | 4                         |
+| ADCs              | 1x 12-bit (8 channels)    |
+| UARTs             | 2                         |
+| SPIs              | 2                         |
+| I2Cs              | 1                         |
+| Vcc               | 2V - 3.6V                 |
+| Datasheet         | [Datasheet](http://www.ti.com/lit/gpn/cc2538) (pdf file) |
+| Reference Manual  | [Reference Manual](http://www.ti.com/lit/pdf/swru319) |
 
 
 ##  Flashing and Debugging

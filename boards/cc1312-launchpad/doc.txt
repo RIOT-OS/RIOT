@@ -13,22 +13,22 @@ Cortex-M4F microcontroller alongside a dedicated Cortex-M0 to control radio.
 
 ![LAUNCHXL-CC1312R1](http://www.ti.com/diagrams/launchxl-cc1312r1_cc1312r1-top-prof1.jpg)
 
-| MCU          | CC1312R1          |
-|:------------ |:----------------- |
-| Family       | ARM Cortex-M4F    |
-| Vendor       | Texas Instruments |
-| RAM          | 80 Kb             |
-| Flash        | 352 Kb            |
-| Frequency    | 48 MHz            |
-| FPU          | yes               |
-| Timers       | 4                 |
-| ADCs         | 1x 12-bt (channels) |
-| UARTs        | 2                 |
-| SPIs         | 2                 |
-| I2Cs         | 1                 |
-| Vcc          | 1.8V - 3.8V       |
-| Datasheet    | [Datasheet](http://www.ti.com/lit/ds/symlink/cc1312r.pdf) (pdf file) |
-| Reference Manual | [Reference Manual](http://www.ti.com/lit/ug/swcu185d/swcu185d.pdf) |
+| MCU               | CC1312R1              |
+|:----------------- |:--------------------- |
+| Family            | ARM Cortex-M4F        |
+| Vendor            | Texas Instruments     |
+| RAM               | 80KiB                 |
+| Flash             | 352KiB                |
+| Frequency         | 48MHz                 |
+| FPU               | yes                   |
+| Timers            | 4                     |
+| ADCs              | 1x 12-bit (channels)  |
+| UARTs             | 2                     |
+| SPIs              | 2                     |
+| I2Cs              | 1                     |
+| Vcc               | 1.8V - 3.8V           |
+| Datasheet         | [Datasheet](http://www.ti.com/lit/ds/symlink/cc1312r.pdf) (pdf file) |
+| Reference Manual  | [Reference Manual](http://www.ti.com/lit/ug/swcu185d/swcu185d.pdf) |
 
 ## Board pinout
 

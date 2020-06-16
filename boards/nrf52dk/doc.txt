@@ -10,8 +10,8 @@ KEY), two LED’s (Pin 30, 31), a voltage regulator and a current messurment shu
 on board. A serial connection and flashing must be provided by external
 Hardware.
 
-The nRF52832 is a SoC with a 32-bit ARM® Cortex™-M4F CPU with 512kB Flash and
-64kB RAM. The embedded 2.4GHz transceiver supports Bluetooth low energy, ANT and
+The nRF52832 is a SoC with a 32-bit ARM® Cortex™-M4F CPU with 512KiB Flash and
+64KiB RAM. The embedded 2.4GHz transceiver supports Bluetooth low energy, ANT and
 proprietary 2.4 GHz protocol stack. It is on air compatible with the nRF51
 Series, nRF24L and nRF24AP Series products from Nordic Semiconductor.
 
@@ -19,26 +19,26 @@ Series, nRF24L and nRF24AP Series products from Nordic Semiconductor.
 ![nRF52 minimal development
 board](https://github.com/d00616/temp/raw/master/nrf52-minidev.jpg)
 
-| MCU        | NRF52832      |
-|:------------- |:--------------------- |
-| Family | ARM Cortex-M4F    |
-| Vendor | Nordic Semiconductor  |
-| RAM        | 64Kb  |
-| Flash      | 512Kb             |
-| Frequency  | 64MHz |
-| FPU        | yes               |
-| Timers | 5 (32-bit)    |
-| RTC    | 3 |
-| ADCs       | 1x 12-bit (8 channels)        |
-| UARTs      | 1                 |
-| SPIs       | 3                 |
-| I2Cs       | 2                 |
-| I2S        | 1                 |
-| PWM        | 3*4 Channels              |
-| Radio         | 2.4GHz BLE compatiple, -20 dBm to +4 dBm output, -96 dBm RX sensitivity |
-| Vcc        | 1.7V - 3.6V           |
-| Datasheet  | [Datasheet](https://www.nordicsemi.com/eng/Products/Bluetooth-low-energy/nRF52832) |
-| Reference Manual | [Reference Manual](https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.4.pdf) |
+| MCU               | NRF52832                                                                              |
+|:----------------- |:------------------------------------------------------------------------------------- |
+| Family            | ARM Cortex-M4F                                                                        |
+| Vendor            | Nordic Semiconductor                                                                  |
+| RAM               | 64KiB                                                                                 |
+| Flash             | 512KiB                                                                                |
+| Frequency         | 64MHz                                                                                 |
+| FPU               | yes                                                                                   |
+| Timers            | 5 (32-bit)                                                                            |
+| RTC               | 3                                                                                     |
+| ADCs              | 1x 12-bit (8 channels)                                                                |
+| UARTs             | 1                                                                                     |
+| SPIs              | 3                                                                                     |
+| I2Cs              | 2                                                                                     |
+| I2S               | 1                                                                                     |
+| PWM               | 3*4 Channels                                                                          |
+| Radio             | 2.4GHz BLE compatiple, -20 dBm to +4 dBm output, -96 dBm RX sensitivity               |
+| Vcc               | 1.7V - 3.6V                                                                           |
+| Datasheet         | [Datasheet](https://www.nordicsemi.com/eng/Products/Bluetooth-low-energy/nRF52832)    |
+| Reference Manual  | [Reference Manual](https://infocenter.nordicsemi.com/pdf/nRF52832_PS_v1.4.pdf)        |
 
 ##Pin layout
 

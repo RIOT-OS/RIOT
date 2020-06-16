@@ -21,8 +21,8 @@ found in the [manual](https://download.mikroe.com/documents/starter-boards/click
 |:---------- |:-------------------- |
 | Family     | PIC32MX (MIPS M4K)   |
 | Vendor     | Microchip            |
-| RAM        | 128Kb                |
-| Flash      | 512Kb                |
+| RAM        | 128KiB               |
+| Flash      | 512KiB               |
 | Frequency  | 120MHz               |
 | FPU        | no                   |
 | Timers     | 5 (all 16-bit)       |
