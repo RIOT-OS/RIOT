@@ -1,0 +1,2 @@
+USEMODULE += ucglib_riot
+USEMODULE += ucglib_csrc
