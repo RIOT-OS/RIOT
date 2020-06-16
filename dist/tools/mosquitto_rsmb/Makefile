@@ -4,8 +4,6 @@ PKG_VERSION  = 9b99a3be9a26635b93aec8fa2ed744e8c49e7262
 PKG_LICENSE  = EPL-1.0
 PKG_BUILDDIR = $(CURDIR)/bin
 
-include $(RIOTBASE)/pkg/pkg.mk
-
 # set default configuration file
 RSMB_CFG ?= $(CURDIR)/config.cnf
 
@@ -14,7 +12,9 @@ RIOTBASE ?= $(CURDIR)/../../..
 RIOTTOOLS ?= $(CURDIR)/..
 GITCACHE ?= $(RIOTTOOLS)/git/git-cache
 
-$(info $(RIOTBASE))
+# Include pkg.mk after setting RIOTBASE otherwise it is not found when this
+# Makefile is called stand-alone
+include $(RIOTBASE)/pkg/pkg.mk
 
 all:
 # Start mosquitto_rsmb build in a clean environment, so variables set by RIOT's
