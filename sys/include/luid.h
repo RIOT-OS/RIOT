@@ -78,6 +78,8 @@ extern "C" {
  * byte.
  *
  * @note    The resulting LUID will repeat after 255 calls.
+ * @post    The generated LUID must be used unchanged, as it could collide with
+ *          other LUIDs if altered.
  *
  * @param[out] buf      memory location to copy the LUID into. MUST be able to
  *                      hold at least @p len bytes
