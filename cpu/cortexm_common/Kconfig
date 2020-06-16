@@ -4,29 +4,29 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-config CPU_ARCH_ARMV6_M
+config CPU_ARCH_ARMV6M
     bool
     select HAS_ARCH_ARM
     select HAS_ARCH_32BIT
 
-config CPU_ARCH_ARMV7_M
+config CPU_ARCH_ARMV7M
     bool
     select HAS_ARCH_ARM
     select HAS_ARCH_32BIT
 
-config CPU_ARCH_ARMV8_M
+config CPU_ARCH_ARMV8M
     bool
     select HAS_ARCH_ARM
     select HAS_ARCH_32BIT
 
 config CPU_ARCH
-    default "armv6_m" if CPU_ARCH_ARMV6_M
-    default "armv7_m" if CPU_ARCH_ARMV7_M
-    default "armv8_m" if CPU_ARCH_ARMV8_M
+    default "armv6m" if CPU_ARCH_ARMV6M
+    default "armv7m" if CPU_ARCH_ARMV7M
+    default "armv8m" if CPU_ARCH_ARMV8M
 
 config CPU_CORE_CORTEX_M
     bool
-    select HAS_ARCH_CORTEXM
+    select HAS_CPU_CORE_CORTEXM
     select HAS_PERIPH_PM
     select HAS_CPP
     select HAS_CPU_CHECK_ADDRESS
@@ -45,46 +45,46 @@ config CPU_CORE
 
 config CPU_CORE_CORTEX_M0
     bool
-    select CPU_ARCH_ARMV6_M
+    select CPU_ARCH_ARMV6M
     select CPU_CORE_CORTEX_M
 
 config CPU_CORE_CORTEX_M0PLUS
     bool
-    select CPU_ARCH_ARMV6_M
+    select CPU_ARCH_ARMV6M
     select CPU_CORE_CORTEX_M
 
 config CPU_CORE_CORTEX_M23
     bool
-    select CPU_ARCH_ARMV8_M
+    select CPU_ARCH_ARMV8M
     select CPU_CORE_CORTEX_M
 
 config CPU_CORE_CORTEX_M3
     bool
-    select CPU_ARCH_ARMV7_M
+    select CPU_ARCH_ARMV7M
     select CPU_CORE_CORTEX_M
 
 config CPU_CORE_CORTEX_M4
     bool
-    select CPU_ARCH_ARMV7_M
+    select CPU_ARCH_ARMV7M
     select CPU_CORE_CORTEX_M
 
 config CPU_CORE_CORTEX_M4F
     bool
-    select CPU_ARCH_ARMV7_M
+    select CPU_ARCH_ARMV7M
     select CPU_CORE_CORTEX_M
     select HAS_CORTEXM_FPU
 
 config CPU_CORE_CORTEX_M7
     bool
-    select CPU_ARCH_ARMV7_M
+    select CPU_ARCH_ARMV7M
     select CPU_CORE_CORTEX_M
     select HAS_CORTEXM_FPU
 
 ## Definition of specific features
-config HAS_ARCH_CORTEXM
+config HAS_CPU_CORE_CORTEXM
     bool
     help
-        Indicates that the current architecture is ARM Cortex-M.
+        Indicates that the current CPU has an ARM Cortex-M core.
 
 config HAS_ARCH_ARM
     bool

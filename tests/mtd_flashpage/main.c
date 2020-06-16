@@ -144,7 +144,7 @@ static void test_mtd_write_read(void)
     TEST_ASSERT_EQUAL_INT(-EINVAL, ret);
 
     /* Only Cortex-M0 doesn't allow unaligned reads */
-#if defined(CPU_ARCH_CORTEX_M0)
+#if defined(CPU_CORE_CORTEX_M0)
     ret = mtd_read(dev, buf_read, TEST_ADDRESS1 + sizeof(buf_empty), sizeof(buf_read));
     TEST_ASSERT_EQUAL_INT(-EINVAL, ret);
 #endif

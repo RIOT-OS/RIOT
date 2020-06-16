@@ -1,6 +1,6 @@
 FEATURES_PROVIDED += arch_32bit
 FEATURES_PROVIDED += arch_arm
-FEATURES_PROVIDED += arch_cortexm
+FEATURES_PROVIDED += cpu_core_cortexm
 FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += cortexm_svc
 FEATURES_PROVIDED += cpp
@@ -8,6 +8,25 @@ FEATURES_PROVIDED += cpu_check_address
 FEATURES_PROVIDED += ssp
 
 # cortex-m4f and cortex-m7 provide FPU support
-ifneq (,$(filter $(CPU_ARCH),cortex-m4f cortex-m7))
+ifneq (,$(filter $(CPU_CORE),cortex-m4f cortex-m7))
   FEATURES_PROVIDED += cortexm_fpu
+endif
+
+# Set CPU_ARCH depending on the CPU_CORE
+ifeq ($(CPU_CORE),cortex-m0)
+  CPU_ARCH := armv6m
+else ifeq ($(CPU_CORE),cortex-m0plus)
+  CPU_ARCH := armv6m
+else ifeq ($(CPU_CORE),cortex-m3)
+  CPU_ARCH := armv7m
+else ifeq ($(CPU_CORE),cortex-m4)
+  CPU_ARCH := armv7m
+else ifeq ($(CPU_CORE),cortex-m4f)
+  CPU_ARCH := armv7m
+else ifeq ($(CPU_CORE),cortex-m7)
+  CPU_ARCH := armv7m
+else ifeq ($(CPU_CORE),cortex-m23)
+  CPU_ARCH := armv8m
+else
+  $(error Unkwnown cortexm core: $(CPU_CORE))
 endif

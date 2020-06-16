@@ -1,4 +1,4 @@
-CPU_ARCH = cortex-m3
+CPU_CORE = cortex-m3
 
 FEATURES_PROVIDED += cortexm_mpu
 

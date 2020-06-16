@@ -1,6 +1,6 @@
 INCLUDES += -I$(PKGDIRBASE)/relic/include
 
-ifneq (,$(filter cortex-m%,$(CPU_ARCH)))
+ifneq (,$(filter cortex-m%,$(CPU_CORE)))
   # relic package package is not using system includes right now, so
   # many newlib headers (not even stdio.h) are not found.
   # Fixed in #9821 for jerryscript, should be applicable here too.

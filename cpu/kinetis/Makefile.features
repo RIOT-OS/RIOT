@@ -26,4 +26,8 @@ ifneq (,$(filter mkw% mk%,$(CPU_MODEL)))
   FEATURES_PROVIDED += periph_flashpage_raw
 endif
 
+# Parse parameters from CPU_MODEL using the kinetis-info.mk script in the same
+# directory as this Makefile.
+include $(LAST_MAKEFILEDIR)/kinetis-info.mk
+
 include $(RIOTCPU)/cortexm_common/Makefile.features

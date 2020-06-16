@@ -53,5 +53,5 @@ endif
 
 ifneq (,$(filter stdio_semihosting,$(USEMODULE)))
   USEMODULE += xtimer
-  FEATURES_REQUIRED += arch_cortexm
+  FEATURES_REQUIRED += cpu_core_cortexm
 endif

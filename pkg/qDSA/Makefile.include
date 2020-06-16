@@ -1,4 +1,4 @@
-ifneq (,$(filter cortex-m23 cortex-m0%,$(CPU_ARCH)))
+ifneq (,$(filter cortex-m23 cortex-m0%,$(CPU_CORE)))
   QDSA_IMPL ?= arm
 else
 ifneq (,$(filter atmega_common,$(USEMODULE)))
@@ -12,7 +12,7 @@ export QDSA_IMPL
 
 INCLUDES += -I$(PKGDIRBASE)/qDSA/$(QDSA_IMPL)
 
-ifeq (cortex-m0plus,$(CPU_ARCH))
+ifeq (cortex-m0plus,$(CPU_CORE))
   # There are problems with the LLVM assembler and the Cortex-M0+ instruction
   # set with this package
   TOOLCHAINS_BLACKLIST += llvm

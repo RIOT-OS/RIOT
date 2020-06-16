@@ -1071,6 +1071,9 @@ FEATURES_OPTIONAL += periph_pm
 # always select provided architecture features
 FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
 
+# always select CPU core features
+FEATURES_REQUIRED += $(filter cpu_core_%,$(FEATURES_PROVIDED))
+
 ifneq (,$(filter ecc_%,$(USEMODULE)))
   USEMODULE += ecc
 endif

@@ -1,4 +1,4 @@
-CPU_ARCH = cortex-m3
+CPU_CORE = cortex-m3
 
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq

@@ -12,7 +12,8 @@ export APPLICATION_MODULE    # The application module name.
 export BOARD                 # The board to compile the application for.
 export CPU                   # The CPU, set by the board's Makefile.features.
 export CPU_MODEL             # The specific identifier of the used CPU, used for some CPU implementations to differentiate between different memory layouts. Set by the board's Makefile.features.
-export CPU_ARCH              # The specific identifier of the core present in the CPU, used currently only for ARM CPU's. Needed for depency resolution.
+export CPU_CORE              # The specific identifier of the core present in the CPU. Needed for depency resolution.
+export CPU_ARCH              # The specific identifier of the architecture of the core defined in CPU_CORE.
 export CPU_FAM               # An intermediate identifier between CPU and CPU_MODEL that represents a sub-group of a Manufacturers CPU's.
 export MCU                   # The MCU, set by the board's Makefile.include, or defaulted to the same value as CPU.
 export INCLUDES              # The extra include paths, set by the various Makefile.include files.
