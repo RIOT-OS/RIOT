@@ -46,6 +46,7 @@ enum {
     SAM0_GCLK_MAIN  = 0,                 /**< Main clock */
     SAM0_GCLK_8MHZ  = 1,                 /**< 8MHz clock */
     SAM0_GCLK_32KHZ = 2,                 /**< 32 kHz clock */
+    SAM0_GCLK_48MHZ = 3,                 /**< 48MHz clock */
 };
 /** @} */
 
