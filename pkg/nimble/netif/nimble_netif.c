@@ -38,6 +38,7 @@
 #include "nimble_riot.h"
 #include "host/ble_gap.h"
 #include "host/util/util.h"
+#include "mem/mem.h"
 
 #define ENABLE_DEBUG            (0)
 #include "debug.h"
@@ -522,9 +523,8 @@ void nimble_netif_init(void)
     nimble_netif_conn_init();
 
     /* initialize of BLE related buffers */
-    res = os_mempool_init(&_mem_pool, MBUF_CNT, MBUF_SIZE, _mem, "nim_gnrc");
-    assert(res == 0);
-    res = os_mbuf_pool_init(&_mbuf_pool, &_mem_pool, MBUF_SIZE, MBUF_CNT);
+    res = mem_init_mbuf_pool(_mem, &_mem_pool, &_mbuf_pool,
+                             MBUF_CNT, MBUF_SIZE, "nim_gnrc");
     assert(res == 0);
 
     res = ble_l2cap_create_server(NIMBLE_NETIF_CID, MTU_SIZE,
