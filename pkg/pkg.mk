@@ -82,7 +82,7 @@ gen_dependency_files = $(file >$1,$@: $2)$(foreach f,$2,$(file >>$1,$(f):))
 $(PKG_PATCHED): $(PKG_PATCHED_PREREQUISITES)
 	$(info [INFO] patch $(PKG_NAME))
 	$(call gen_dependency_files,$@.d,$(PKG_PATCHED_PREREQUISITES))
-	$(Q)$(GIT_IN_PKG) clean $(GIT_QUIET) -xdff '**' $(PKG_STATE:$(PKG_BUILDDIR)/%=':!%*')
+	$(Q)$(GIT_IN_PKG) clean $(GIT_QUIET) -xdff '**' -e $(PKG_STATE:$(PKG_BUILDDIR)/%='%*')
 	$(Q)$(GIT_IN_PKG) checkout $(GIT_QUIET) -f $(PKG_VERSION)
 	$(Q)$(GIT_IN_PKG) $(GITFLAGS) am $(GITAMFLAGS) $(PKG_PATCHES) </dev/null
 	@touch $@
