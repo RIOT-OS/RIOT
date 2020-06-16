@@ -1,4 +1,4 @@
-MODULE := semtech_loramac_mac
+MODULE = semtech_loramac_mac
 
 CFLAGS += -Wno-sign-compare
 
