@@ -7,4 +7,4 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 all:
 	"$(MAKE)" -C $(PKG_BUILDDIR)/src \
-			  -f $(RIOTPKG)/libb2/Makefile.$(PKG_NAME)
+			  -f $(CURDIR)/Makefile.$(PKG_NAME)

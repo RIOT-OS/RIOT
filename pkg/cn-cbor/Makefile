@@ -5,5 +5,8 @@ PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+# Enable code forcing aligned reads
+CFLAGS += -DCBOR_ALIGN_READS
+
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(CURDIR)/Makefile.cn-cbor
+	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)

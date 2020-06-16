@@ -6,7 +6,15 @@ PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-.PHONY: all
+CFLAGS += -Wno-format
+# GCC 4.9 bug (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=64480)
+# used by MIPS
+CFLAGS += -Wno-missing-field-initializers
+
+# Disable debug printing
+ifneq ($(DEVELHELP),1)
+  CFLAGS += -DLFS_NO_DEBUG -DLFS_NO_WARN -DLFS_NO_ERROR
+endif
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.littlefs2
+	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(RIOTBASE)/Makefile.base

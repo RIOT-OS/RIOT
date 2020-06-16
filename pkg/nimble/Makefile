@@ -35,43 +35,43 @@ nimble_riot_contrib:
 	"$(MAKE)" -C $(TDIR)/contrib/
 
 nimble_porting_nimble:
-	"$(MAKE)" -C $(PDIR)/porting/nimble/src/ -f $(TDIR)/porting.nimble.mk
+	"$(MAKE)" -C $(PDIR)/porting/nimble/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_npl_riot:
-	"$(MAKE)" -C $(PDIR)/porting/npl/riot/src/ -f $(TDIR)/porting.npl.riot.mk
+	"$(MAKE)" -C $(PDIR)/porting/npl/riot/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 # host modules
 nimble_host:
 	"$(MAKE)" -C $(PDIR)/nimble/host/src/ -f $(TDIR)/nimble.host.mk
 
 nimble_host_util:
-	"$(MAKE)" -C $(PDIR)/nimble/host/util/src/ -f $(TDIR)/nimble.host.util.mk
+	"$(MAKE)" -C $(PDIR)/nimble/host/util/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_host_store_ram:
-	"$(MAKE)" -C $(PDIR)/nimble/host/store/ram/src/ -f $(TDIR)/nimble.host.store.ram.mk
+	"$(MAKE)" -C $(PDIR)/nimble/host/store/ram/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_tinycrypt:
-	"$(MAKE)" -C $(PDIR)/ext/tinycrypt/src/ -f $(TDIR)/ext.tinycrypt.mk
+	"$(MAKE)" -C $(PDIR)/ext/tinycrypt/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 # service implementations
 nimble_svc_gap:
-	"$(MAKE)" -C $(PDIR)/nimble/host/services/gap/src/ -f $(TDIR)/svc.gap.mk
+	"$(MAKE)" -C $(PDIR)/nimble/host/services/gap/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_svc_gatt:
-	"$(MAKE)" -C $(PDIR)/nimble/host/services/gatt/src/ -f $(TDIR)/svc.gatt.mk
+	"$(MAKE)" -C $(PDIR)/nimble/host/services/gatt/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_svc_ipss:
-	"$(MAKE)" -C $(PDIR)/nimble/host/services/ipss/src/ -f $(TDIR)/svc.ipss.mk
+	"$(MAKE)" -C $(PDIR)/nimble/host/services/ipss/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 # controller specific modules
 nimble_transport_ram:
-	"$(MAKE)" -C $(PDIR)/nimble/transport/ram/src/ -f $(TDIR)/transport.ram.mk
+	"$(MAKE)" -C $(PDIR)/nimble/transport/ram/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_controller:
-	"$(MAKE)" -C $(PDIR)/nimble/controller/src/ -f $(TDIR)/controller.mk
+	"$(MAKE)" -C $(PDIR)/nimble/controller/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_drivers_nrf5x:
-	"$(MAKE)" -C $(PDIR)/nimble/drivers/$(CPU_FAM)/src/ -f $(TDIR)/drivers.nrf5x.mk
+	"$(MAKE)" -C $(PDIR)/nimble/drivers/$(CPU_FAM)/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 # additional, RIOT specific nimble modules
 nimble_addr:

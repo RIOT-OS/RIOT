@@ -5,6 +5,5 @@ PKG_LICENSE=BSD
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-all: Makefile.tlsf
-	@cp Makefile.tlsf $(PKG_BUILDDIR)/Makefile
-	"$(MAKE)" -C $(PKG_BUILDDIR)
+all:
+	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(RIOTBASE)/Makefile.base
