@@ -157,6 +157,21 @@ specific board like this:
     BOARD=samr21-xpro SERIAL="ATML2127031800002124" make debug
 
 
+## Accessing STDIO via UART
+
+STDIO is available through the edbg debugger.
+
+Use the `term` target to open a terminal:
+
+    make BOARD=samr21-xpro -C examples/hello-world term
+
+RTS / CTS hardware flow control is available on `UART_DEV(0)` and
+`UART_DEV(1)`. This is unavailable when using STDIO directly through
+the debugger since it does not support it. Therefore to use hardware
+flow control an external FTDI device must be connected to the board's
+rx, tx, cts & rts matching pin headers, eg. for `UART_DEV(0)` to
+`PA5`, `PA4`, `PA6` & `PA7` (respectively) on EXT1 headers.
+
 
 ## Supported Toolchains
 

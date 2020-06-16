@@ -143,12 +143,16 @@ static const uart_conf_t uart_config[] = {
         .rx_pin   = GPIO_PIN(PA,5),
         .tx_pin   = GPIO_PIN(PA,4),
 #ifdef MODULE_PERIPH_UART_HW_FC
-        .rts_pin  = GPIO_UNDEF,
-        .cts_pin  = GPIO_UNDEF,
+        .rts_pin  = GPIO_PIN(PA,6),
+        .cts_pin  = GPIO_PIN(PA,7),
 #endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_1,
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .tx_pad   = UART_PAD_TX_0_RTS_2_CTS_3,
+#else
         .tx_pad   = UART_PAD_TX_0,
+#endif
         .flags    = UART_FLAG_NONE,
         .gclk_src = SAM0_GCLK_MAIN,
     },
@@ -157,12 +161,16 @@ static const uart_conf_t uart_config[] = {
         .rx_pin   = GPIO_PIN(PA,23),
         .tx_pin   = GPIO_PIN(PA,22),
 #ifdef MODULE_PERIPH_UART_HW_FC
-        .rts_pin  = GPIO_UNDEF,
-        .cts_pin  = GPIO_UNDEF,
+        .rts_pin  = GPIO_PIN(PB,22),
+        .cts_pin  = GPIO_PIN(PB,23),
 #endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_1,
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .tx_pad   = UART_PAD_TX_0_RTS_2_CTS_3,
+#else
         .tx_pad   = UART_PAD_TX_0,
+#endif
         .flags    = UART_FLAG_NONE,
         .gclk_src = SAM0_GCLK_MAIN,
     }
