@@ -69,20 +69,24 @@
 #define SQUOTE '\''
 #define DQUOTE '"'
 #define ESCAPECHAR '\\'
-#define BLANK ' '
+#define SPACE ' '
+#define TAB '\t'
 
-enum PARSE_STATE {
-    PARSE_SPACE,
-    PARSE_UNQUOTED,
-    PARSE_SINGLEQUOTE,
-    PARSE_DOUBLEQUOTE,
-    PARSE_ESCAPE_MASK,
-    PARSE_UNQUOTED_ESC,
-    PARSE_SINGLEQUOTE_ESC,
-    PARSE_DOUBLEQUOTE_ESC,
+#define PARSE_ESCAPE_MASK 0x4;
+
+enum parse_state {
+    PARSE_BLANK             = 0x0,
+
+    PARSE_UNQUOTED          = 0x1,
+    PARSE_SINGLEQUOTE       = 0x2,
+    PARSE_DOUBLEQUOTE       = 0x3,
+
+    PARSE_UNQUOTED_ESC      = 0x5,
+    PARSE_SINGLEQUOTE_ESC   = 0x6,
+    PARSE_DOUBLEQUOTE_ESC   = 0x7,
 };
 
-static enum PARSE_STATE escape_toggle(enum PARSE_STATE s)
+static enum parse_state escape_toggle(enum parse_state s)
 {
     return s ^ PARSE_ESCAPE_MASK;
 }
@@ -136,30 +140,56 @@ static void print_help(const shell_command_t *command_list)
 /**
  * Break input line into words, create argv and call the command handler.
  *
- * Words are broken up at spaces. A backslash escaped the character that comes
+ * Words are broken up at spaces. A backslash escapes the character that comes
  * after (meaning if it is taken literally and if it is a space it does not break
  * the word). Spaces can also be protected by quoting with double or single
  * quotes.
  *
- State diagram for the tokenizer:
-```
-           ┌───[\]────┐   ┌─────["]────┐   ┌───[']─────┐  ┌───[\]────┐
-           ↓          │   ↓            │   │           ↓  │          ↓
-  ┏━━━━━━━━━━┓      ┏━┷━━━━━┓        ┏━┷━━━┷━┓       ┏━━━━┷━━┓     ┏━━━━━━━━━━┓
-  ┃DQUOTE ESC┃      ┃DQUOTE ┠───["]─>┃SPACE  ┃<─[']──┨SQUOTE ┃     ┃SQUOTE ESC┃
-  ┗━━━━━━━━┯━┛      ┗━━━━━━┯┛        ┗┯━━━━┯━┛       ┗━┯━━━━━┛     ┗━━━┯━━━━━━┛
-           │         ↑     │          │    │           │     ↑(store)  │
-           │  (store)│     │   ┌─[\]──┘    └──[*]────┐ │     │         │
-           └──[*]──▶┴◀[*]┘   │                     │ └[*]▶┴◀──[*]──┘
-                               ↓     ┏━━━━━━━┓       ↓
-                               ├◀[\]┨NOQUOTE┃◀─────┼◀─┐
-                               │     ┗━━━━━┯━┛(store)↑   │
-                               │           │         │   │
-                               │           └─[*]─────┘   │
-                               │     ┏━━━━━━━━━━━┓       │
-                               └───▶┃NOQUOTE ESC┠──[*]──┘
-                                     ┗━━━━━━━━━━━┛
-```
+ * There are two unquoted states (PARSE_BLANK and PARSE_UNQUOTED) and two quoted
+ * states (PARSE_SINGLEQUOTE and PARSE_DOUBLEQUOTE). In addition, every state
+ * (except PARSE_BLANK) has an escaped pair state (e.g PARSE_SINGLEQUOTE and
+ * PARSE_SINGLEQUOTE_ESC).
+ *
+ * For the following let's define some things
+ *      - Function transit(character, state) to change to 'state' after
+ *        'character' was read. The order of a list of transit-functions matters.
+ *      - A BLANK is either SPACE or TAB
+ *      - '*' means any character
+ *
+ *      PARSE_BLANK
+ *          transit(SQUOTE, PARSE_SINGLEQUOTE)
+ *          transit(DQUOTE, PARSE_DOUBLEQUOTE)
+ *          transit(ESCAPECHAR, PARSE_UNQUOTED_ESC)
+ *          transit(BLANK, PARSE_BLANK)
+ *          transit(*, PARSE_UNQUOTED) -> store character
+ *
+ *      PARSE_UNQUOTED
+ *          transit(SQUOTE, PARSE_SINGLEQUOTE)
+ *          transit(DQUOTE, PARSE_DOUBLEQUOTE)
+ *          transit(BLANK, PARSE_BLANK)
+ *          transit(ESCAPECHAR, PARSE_UNQUOTED_ESC)
+ *          transit(*, PARSE_UNQUOTED) -> store character
+ *
+ *      PARSE_UNQUOTED_ESC
+ *          transit(*, PARSE_UNQUOTED) -> store character
+ *
+ *      PARSE_SINGLEQUOTE
+ *          transit(SQUOTE, PARSE_UNQUOTED)
+ *          transit(ESCAPECHAR, PARSE_SINGLEQUOTE_ESC)
+ *          transit(*, PARSE_SINGLEQUOTE) -> store character
+ *
+ *      PARSE_SINGLEQUOTE_ESC
+ *          transit(*, PARSE_SINGLEQUOTE) -> store character
+ *
+ *      PARSE_DOUBLEQUOTE
+ *          transit(DQUOTE, PARSE_UNQUOTED)
+ *          transit(ESCAPECHAR, PARSE_DOUBLEQUOTE_ESC)
+ *          transit(*, PARSE_DOUBLEQUOTE) -> store character
+ *
+ *      PARSE_DOUBLEQUOTE_ESC
+ *          transit(*, PARSE_DOUBLEQUOTE) -> store character
+ *
+ *
  */
 static void handle_input_line(const shell_command_t *command_list, char *line)
 {
@@ -167,17 +197,18 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
     int argc = 0;
     char *readpos = line;
     char *writepos = readpos;
-    enum PARSE_STATE pstate = PARSE_SPACE;
+
+    uint8_t pstate = PARSE_BLANK;
 
     for (; *readpos != '\0'; readpos++) {
 
-        char wordbreak = BLANK;
+        char wordbreak = SPACE;
         bool is_wordbreak = false;
 
         switch (pstate) {
 
-            case PARSE_SPACE:
-                if (*readpos != BLANK) {
+            case PARSE_BLANK:
+                if (*readpos != SPACE && *readpos != TAB) {
                     argc++;
                 }
 
@@ -190,15 +221,29 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
                 else if (*readpos == ESCAPECHAR) {
                     pstate = PARSE_UNQUOTED_ESC;
                 }
-                else if (*readpos != BLANK) {
+                else if (*readpos != SPACE && *readpos != TAB) {
                     pstate = PARSE_UNQUOTED;
                     *writepos++ = *readpos;
                 }
                 break;
 
             case PARSE_UNQUOTED:
-                wordbreak = BLANK;
-                is_wordbreak = true;
+                if (*readpos == SQUOTE) {
+                    pstate = PARSE_SINGLEQUOTE;
+                }
+                else if (*readpos == DQUOTE) {
+                    pstate = PARSE_DOUBLEQUOTE;
+                }
+                else if (*readpos == ESCAPECHAR) {
+                    pstate = escape_toggle(pstate);
+                }
+                else if (*readpos == SPACE || *readpos == TAB) {
+                    pstate = PARSE_BLANK;
+                    *writepos++ = '\0';
+                }
+                else {
+                    *writepos++ = *readpos;
+                }
                 break;
 
             case PARSE_SINGLEQUOTE:
@@ -219,8 +264,9 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
 
         if (is_wordbreak) {
             if (*readpos == wordbreak) {
-                pstate = PARSE_SPACE;
-                *writepos++ = '\0';
+                if (wordbreak == SQUOTE || wordbreak == DQUOTE) {
+                    pstate = PARSE_UNQUOTED;
+                }
             }
             else if (*readpos == ESCAPECHAR) {
                 pstate = escape_toggle(pstate);
@@ -232,7 +278,7 @@ static void handle_input_line(const shell_command_t *command_list, char *line)
     }
     *writepos = '\0';
 
-    if (pstate != PARSE_SPACE && pstate != PARSE_UNQUOTED) {
+    if (pstate != PARSE_BLANK && pstate != PARSE_UNQUOTED) {
         puts("shell: incorrect quoting");
         return;
     }
