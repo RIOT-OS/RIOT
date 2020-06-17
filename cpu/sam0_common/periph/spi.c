@@ -69,6 +69,40 @@ static inline void poweroff(spi_t bus)
     sercom_clk_dis(dev(bus));
 }
 
+static void _reset(SercomSpi *dev)
+{
+    dev->CTRLA.reg |= SERCOM_SPI_CTRLA_SWRST;
+    while (dev->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST) {}
+
+#ifdef SERCOM_SPI_STATUS_SYNCBUSY
+    while (dev->STATUS.bit.SYNCBUSY) {}
+#else
+    while (dev->SYNCBUSY.bit.SWRST) {}
+#endif
+}
+
+static inline void _disable(SercomSpi *dev)
+{
+    dev->CTRLA.reg = 0;
+
+#ifdef SERCOM_SPI_STATUS_SYNCBUSY
+    while (dev->STATUS.bit.SYNCBUSY) {}
+#else
+    while (dev->SYNCBUSY.reg) {}
+#endif
+}
+
+static inline void _enable(SercomSpi *dev)
+{
+    dev->CTRLA.bit.ENABLE = 1;
+
+#ifdef SERCOM_SPI_STATUS_SYNCBUSY
+    while (dev->STATUS.bit.SYNCBUSY) {}
+#else
+    while (dev->SYNCBUSY.reg) {}
+#endif
+}
+
 static inline bool _use_dma(spi_t bus)
 {
 #ifdef MODULE_PERIPH_DMA
@@ -120,9 +154,7 @@ void spi_init(spi_t bus)
     poweron(bus);
 
     /* reset all device configuration */
-    dev(bus)->CTRLA.reg |= SERCOM_SPI_CTRLA_SWRST;
-    while ((dev(bus)->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST) ||
-           (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_SWRST)) {}
+    _reset(dev(bus));
 
     /* configure base clock */
     sercom_set_gen(dev(bus), spi_config[bus].gclk_src);
@@ -191,8 +223,7 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     /* first configuration or reconfiguration after altered device usage */
     if (dev(bus)->BAUD.reg != baud || dev(bus)->CTRLA.reg != ctrla) {
         /* disable the device */
-        dev(bus)->CTRLA.reg &= ~(SERCOM_SPI_CTRLA_ENABLE);
-        while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
+        _disable(dev(bus));
 
         dev(bus)->BAUD.reg = baud;
         dev(bus)->CTRLA.reg = ctrla;
@@ -201,8 +232,7 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     }
 
     /* finally enable the device */
-    dev(bus)->CTRLA.reg |= SERCOM_SPI_CTRLA_ENABLE;
-    while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
+    _enable(dev(bus));
 
     /* mux clk_pin to SPI peripheral */
     gpio_init_mux(spi_config[bus].clk_pin, spi_config[bus].clk_mux);
@@ -217,8 +247,7 @@ void spi_release(spi_t bus)
     gpio_disable_mux(spi_config[bus].clk_pin);
 
     /* disable the device */
-    dev(bus)->CTRLA.reg &= ~(SERCOM_SPI_CTRLA_ENABLE);
-    while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
+    _disable(dev(bus));
 
     /* power off the device */
     poweroff(bus);
