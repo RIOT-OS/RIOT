@@ -41,7 +41,7 @@
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
 #include "tsrb.h"
 static tsrb_t uart_tx_rb[UART_NUMOF];
-static uint8_t uart_tx_rb_buf[UART_NUMOF][SAM0_UART_TXBUF_SIZE];
+static uint8_t uart_tx_rb_buf[UART_NUMOF][UART_TXBUF_SIZE];
 #endif
 static uart_isr_ctx_t uart_ctx[UART_NUMOF];
 
@@ -68,7 +68,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
-    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], SAM0_UART_TXBUF_SIZE);
+    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
 
     /* configure pins */
@@ -176,7 +176,17 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     for (const void* end = data + len; data != end; ++data) {
-        while (tsrb_add_one(&uart_tx_rb[uart], *data) < 0) {}
+        if (irq_is_in() || __get_PRIMASK()) {
+            /* if ring buffer is full free up a spot */
+            if (tsrb_full(&uart_tx_rb[uart])) {
+                while (!dev(uart)->INTFLAG.bit.DRE) {}
+                dev(uart)->DATA.reg = tsrb_get_one(&uart_tx_rb[uart]);
+            }
+            tsrb_add_one(&uart_tx_rb[uart], *data);
+        }
+        else {
+            while (tsrb_add_one(&uart_tx_rb[uart], *data) < 0) {}
+        }
         dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
     }
 #else

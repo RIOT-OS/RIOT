@@ -61,7 +61,7 @@
  * @brief   Allocate for tx ring buffers
  */
 static tsrb_t uart_tx_rb[UART_NUMOF];
-static uint8_t uart_tx_rb_buf[UART_NUMOF][STM32_UART_TXBUF_SIZE];
+static uint8_t uart_tx_rb_buf[UART_NUMOF][UART_TXBUF_SIZE];
 #endif
 
 /**
@@ -168,7 +168,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
-    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], STM32_UART_TXBUF_SIZE);
+    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
 
     uart_init_pins(uart, rx_cb);
@@ -206,6 +206,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     else {
         dev(uart)->CR1 = (USART_CR1_UE | USART_CR1_TE);
     }
+
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    NVIC_EnableIRQ(uart_config[uart].irqn);
+#endif
 
 #ifdef MODULE_PERIPH_UART_HW_FC
     if (uart_config[uart].cts_pin != GPIO_UNDEF) {
@@ -318,22 +322,18 @@ static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 #endif /* MODULE_PERIPH_LPUART */
 #endif /* STM32L0 || STM32L4 || STM32WB */
 
-#ifndef MODULE_PERIPH_UART_NONBLOCKING
 static inline void send_byte(uart_t uart, uint8_t byte)
 {
     while (!(dev(uart)->ISR_REG & ISR_TXE)) {}
     dev(uart)->TDR_REG = byte;
 }
-#endif
 
+#ifndef MODULE_PERIPH_UART_NONBLOCKING
 static inline void wait_for_tx_complete(uart_t uart)
 {
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
-    (void) uart;
-#else
     while (!(dev(uart)->ISR_REG & ISR_TC)) {}
-#endif
 }
+#endif
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
@@ -383,17 +383,28 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         return;
     }
 #endif
-    for (size_t i = 0; i < len; i++) {
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
+    for (size_t i = 0; i < len; i++) {
         dev(uart)->CR1 |= (USART_CR1_TCIE);
-        while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {}
+        if (irq_is_in() || __get_PRIMASK()) {
+            /* if ring buffer is full free up a spot */
+            if (tsrb_full(&uart_tx_rb[uart])) {
+                send_byte(uart, tsrb_get_one(&uart_tx_rb[uart]));
+            }
+            tsrb_add_one(&uart_tx_rb[uart], data[i]);
+        }
+        else {
+            while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {}
+        }
+    }
 #else
+    for (size_t i = 0; i < len; i++) {
         send_byte(uart, data[i]);
-#endif
     }
     /* make sure the function is synchronous by waiting for the transfer to
      * finish */
     wait_for_tx_complete(uart);
+#endif
 }
 
 void uart_poweron(uart_t uart)
