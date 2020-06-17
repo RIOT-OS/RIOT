@@ -144,8 +144,9 @@ static const i2c_conf_t i2c_config[] = {
  * @name    RTT configuration
  * @{
  */
-#define RTT_FREQUENCY                           (32768U)
-#define RTT_MAX_VALUE                           (0xffffffffU)
+#ifndef RTT_FREQUENCY
+#define RTT_FREQUENCY       (32768U)
+#endif
 /** @} */
 
 /**
