@@ -328,14 +328,24 @@ void gpio_irq_disable(gpio_t pin)
     _EIC->INTENCLR.reg = (1 << exti);
 }
 
+#if defined(CPU_SAML1X)
+void isr_eic_other(void)
+#else
 void isr_eic(void)
+#endif
 {
-    for (unsigned i = 0; i < NUMOF_IRQS; i++) {
-        if (_EIC->INTFLAG.reg & (1 << i)) {
-            _EIC->INTFLAG.reg = (1 << i);
-            gpio_config[i].cb(gpio_config[i].arg);
-        }
+    /* read & clear interrupt flags */
+    uint32_t state = _EIC->INTFLAG.reg;
+    state &= (1 << NUMOF_IRQS) - 1;
+    _EIC->INTFLAG.reg = state;
+
+    /* execute interrupt callbacks */
+    while (state) {
+        unsigned pin = 8 * sizeof(state) - __builtin_clz(state) - 1;
+        state &= ~(1 << pin);
+        gpio_config[pin].cb(gpio_config[pin].arg);
     }
+
     cortexm_isr_end();
 }
 
@@ -344,7 +354,9 @@ void isr_eic(void)
 #define ISR_EICn(n)             \
 void isr_eic ## n (void)        \
 {                               \
-    isr_eic();                  \
+    _EIC->INTFLAG.reg = 1 << n; \
+    gpio_config[n].cb(gpio_config[n].arg); \
+    cortexm_isr_end();          \
 }
 
 ISR_EICn(0)
@@ -356,6 +368,7 @@ ISR_EICn(4)
 ISR_EICn(5)
 ISR_EICn(6)
 ISR_EICn(7)
+#if (NUMOF_IRQS > 8)
 ISR_EICn(8)
 ISR_EICn(9)
 ISR_EICn(10)
@@ -364,9 +377,8 @@ ISR_EICn(12)
 ISR_EICn(13)
 ISR_EICn(14)
 ISR_EICn(15)
-#else
-ISR_EICn(_other)
-#endif /* CPU_SAML1X */
+#endif /* NUMOF_IRQS > 8 */
+#endif /* CPU_SAMD5X */
 #endif /* CPU_SAML1X || CPU_SAMD5X */
 
 #else /* MODULE_PERIPH_GPIO_IRQ */
