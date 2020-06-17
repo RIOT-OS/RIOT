@@ -47,7 +47,7 @@ gnrc_priority_pktqueue_node_t *_alloc_pktqueue_node(gnrc_priority_pktqueue_node_
 #endif /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_RX_QUEUE_SIZE != 0)) */
 
 #if GNRC_MAC_TX_QUEUE_SIZE != 0
-#if GNRC_MAC_NEIGHBOR_COUNT != 0
+#if CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0
 /* Find the neighbor's id based on the given address */
 int _gnrc_mac_find_neighbor(gnrc_mac_tx_t *tx, const uint8_t *dst_addr, int addr_len)
 {
@@ -59,7 +59,7 @@ int _gnrc_mac_find_neighbor(gnrc_mac_tx_t *tx, const uint8_t *dst_addr, int addr
     neighbors = tx->neighbors;
 
     /* Don't attempt to find broadcast neighbor, so start at index 1 */
-    for (int i = 1; i <= (signed)GNRC_MAC_NEIGHBOR_COUNT; i++) {
+    for (int i = 1; i <= (signed)CONFIG_GNRC_MAC_NEIGHBOR_COUNT; i++) {
         if (neighbors[i].l2_addr_len == addr_len) {
             if (memcmp(&(neighbors[i].l2_addr), dst_addr, addr_len) == 0) {
                 return i;
@@ -78,7 +78,7 @@ int _gnrc_mac_free_neighbor(gnrc_mac_tx_t *tx)
     neighbors = tx->neighbors;
 
     /* Don't attempt to free broadcast neighbor, so start at index 1 */
-    for (int i = 1; i <= (signed)GNRC_MAC_NEIGHBOR_COUNT; i++) {
+    for (int i = 1; i <= (signed)CONFIG_GNRC_MAC_NEIGHBOR_COUNT; i++) {
         if ((gnrc_priority_pktqueue_length(&(neighbors[i].queue)) == 0) &&
             (&neighbors[i] != tx->current_neighbor)) {
             /* Mark as free */
@@ -98,7 +98,7 @@ int _gnrc_mac_alloc_neighbor(gnrc_mac_tx_t *tx)
     neighbors = tx->neighbors;
 
     /* Don't attempt to allocate broadcast neighbor, so start at index 1 */
-    for (int i = 1; i <= (signed)GNRC_MAC_NEIGHBOR_COUNT; i++) {
+    for (int i = 1; i <= (signed)CONFIG_GNRC_MAC_NEIGHBOR_COUNT; i++) {
         if (neighbors[i].l2_addr_len == 0) {
             gnrc_priority_pktqueue_init(&(neighbors[i].queue));
             return i;
@@ -118,14 +118,14 @@ void _gnrc_mac_init_neighbor(gnrc_mac_tx_neighbor_t *neighbor, const uint8_t *ad
     neighbor->phase = GNRC_MAC_PHASE_MAX;
     memcpy(&(neighbor->l2_addr), addr, len);
 }
-#endif /* GNRC_MAC_NEIGHBOR_COUNT != 0 */
+#endif /* CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0 */
 
 bool gnrc_mac_queue_tx_packet(gnrc_mac_tx_t *tx, uint32_t priority, gnrc_pktsnip_t *pkt)
 {
     assert(tx != NULL);
     assert(pkt != NULL);
 
-#if GNRC_MAC_NEIGHBOR_COUNT == 0
+#if CONFIG_GNRC_MAC_NEIGHBOR_COUNT == 0
 
     gnrc_priority_pktqueue_node_t *node;
     node = _alloc_pktqueue_node(tx->_queue_nodes, GNRC_MAC_TX_QUEUE_SIZE);
@@ -177,7 +177,7 @@ bool gnrc_mac_queue_tx_packet(gnrc_mac_tx_t *tx, uint32_t priority, gnrc_pktsnip
             /* No neighbor entries left */
             if (neighbor_id < 0) {
                 DEBUG("[gnrc_mac-int] No neighbor entries left, maybe increase "
-                      "GNRC_MAC_NEIGHBOR_COUNT for better performance\n");
+                      "CONFIG_GNRC_MAC_NEIGHBOR_COUNT for better performance\n");
 
                 /* Try to free an unused queue */
                 neighbor_id = _gnrc_mac_free_neighbor(tx);
@@ -210,7 +210,7 @@ bool gnrc_mac_queue_tx_packet(gnrc_mac_tx_t *tx, uint32_t priority, gnrc_pktsnip
           neighbor_id);
     return false;
 
-#endif  /* GNRC_MAC_NEIGHBOR_COUNT == 0 */
+#endif  /* CONFIG_GNRC_MAC_NEIGHBOR_COUNT == 0 */
 }
 #endif  /* GNRC_MAC_TX_QUEUE_SIZE != 0 */
 
