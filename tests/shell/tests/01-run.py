@@ -43,24 +43,61 @@ CONTROL_D = DLE+'\x04'
 PROMPT = '> '
 
 CMDS = (
+    # test start
     ('start_test', '[TEST_START]'),
     (CONTROL_C, PROMPT),
     ('\n', PROMPT),
+
+    # test simple word separation
+    ('echo a string', '"echo""a""string"'),
+    ('echo   multiple   spaces   between   argv', '"echo""multiple""spaces""between""argv"'),
+    ('echo \t tabs\t\t processed \t\tlike\t \t\tspaces', '"echo""tabs""processed""like""spaces"'),
+
+    # test long line
     ('123456789012345678901234567890123456789012345678901234567890',
      'shell: command not found: '
      '123456789012345678901234567890123456789012345678901234567890'),
     ('unknown_command', 'shell: command not found: unknown_command'),
+
+    # test leading/trailing BLANK
+    ('     echo leading spaces', '"echo""leading""spaces"'),
+    ('\t\t\t\t\techo leading tabs', '"echo""leading""tabs"'),
+    ('echo trailing spaces     ', '"echo""trailing""spaces"'),
+    ('echo trailing tabs\t\t\t\t\t', '"echo""trailing""tabs"'),
+
+    # test backspace
     ('hello-willy\b\b\b\borld', 'shell: command not found: hello-world'),
-    ('\b\b\b\becho', '\"echo\"'),
-    ('help', EXPECTED_HELP),
-    ('echo a string', '\"echo\"\"a\"\"string\"'),
+    ('\b\b\b\becho', '"echo"'),
+
+    # test escaping
+    ('echo \\\'', '"echo""\'"'),
+    ('echo \\"', '"echo""""'),
+    ('echo escaped\\ space', '"echo""escaped space"'),
+    ('echo escape within \'\\s\\i\\n\\g\\l\\e\\q\\u\\o\\t\\e\'', '"echo""escape""within""singlequote"'),
+    ('echo escape within "\\d\\o\\u\\b\\l\\e\\q\\u\\o\\t\\e"', '"echo""escape""within""doublequote"'),
     ("""echo "t\e st" "\\"" '\\'' a\ b""", '"echo""te st"""""\'""a b"'),
+
+    # test correct quoting
+    ('echo "hello"world', '"echo""helloworld"'),
+    ('echo hel"lowo"rld', '"echo""helloworld"'),
+    ('echo hello"world"', '"echo""helloworld"'),
+    ('echo quoted space " "', '"echo""quoted""space"" "'),
+    ('echo abc"def\'ghijk"lmn', '"echo""abcdef\'ghijklmn"'),
+    ('echo abc\'def"ghijk\'lmn', '"echo""abcdef"ghijklmn"'),
+    ('echo "\'" \'"\'', '"echo""\'""""'),
+
+    # test incorrect quoting
     ('echo a\\', 'shell: incorrect quoting'),
     ('echo "', 'shell: incorrect quoting'),
-    ("echo '", 'shell: incorrect quoting'),
-    ('echo "\'" \'"\'', '"echo""\'""""'),
+    ('echo \'', 'shell: incorrect quoting'),
+    ('echo abcdef"ghijklmn', 'shell: incorrect quoting'),
+    ('echo abcdef\'ghijklmn', 'shell: incorrect quoting'),
+
+    # test default commands
     ('ps', EXPECTED_PS),
     ('help', EXPECTED_HELP),
+
+    # test end
     ('reboot', 'test_shell.'),
     ('end_test', '[TEST_END]'),
 )
