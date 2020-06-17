@@ -40,6 +40,14 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
+### sys/net/gnrc/nettest [c84cedb07212a90932e446f5d57391d1edd486d0]
+Author:
+- Martine Lenders <mlenders@inf.fu-berlin.de>
+
+Reasons for removal:
+- Not maintained anymore
+- Not used in GNRC
+
 ### sys/net/gnrc/application_layer/tftp [0e2a62078850e1ecc74db2db4d639cf2d8fb96d3]
 Author:
 - DipSwitch <dipswitch@ownage4u.nl>
