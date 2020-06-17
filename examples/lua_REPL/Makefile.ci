@@ -68,6 +68,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     remote-pa \
     remote-reva \
     remote-revb \
+    samd20-xpro \
     samd21-xpro \
     saml10-xpro \
     saml11-xpro \
