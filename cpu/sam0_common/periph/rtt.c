@@ -36,6 +36,16 @@
 #define RTC_MODE0_CTRLA_COUNTSYNC       (0x1ul << RTC_MODE0_CTRLA_COUNTSYNC_Pos)
 #endif
 
+#ifdef REG_RTC_MODE0_CTRLA
+#define RTC_MODE0_PRESCALER       \
+    (__builtin_ctz(2 * RTT_CLOCK_FREQUENCY / RTT_FREQUENCY) << \
+    RTC_MODE0_CTRLA_PRESCALER_Pos)
+#else
+#define RTC_MODE0_PRESCALER       \
+    (__builtin_ctz(RTT_CLOCK_FREQUENCY / RTT_FREQUENCY) << \
+    RTC_MODE0_CTRL_PRESCALER_Pos)
+#endif
+
 static rtt_cb_t _overflow_cb;
 static void* _overflow_arg;
 
@@ -100,9 +110,11 @@ void rtt_init(void)
 
     /* set 32bit counting mode & enable the RTC */
 #ifdef REG_RTC_MODE0_CTRLA
-    RTC->MODE0.CTRLA.reg = RTC_MODE0_CTRLA_MODE(0) | RTC_MODE0_CTRLA_ENABLE | RTC_MODE0_CTRLA_COUNTSYNC;
+    RTC->MODE0.CTRLA.reg = RTC_MODE0_CTRLA_MODE(0) | RTC_MODE0_CTRLA_ENABLE |
+                           RTC_MODE0_CTRLA_COUNTSYNC | RTC_MODE0_PRESCALER;
 #else
-    RTC->MODE0.CTRL.reg = RTC_MODE0_CTRL_MODE(0) | RTC_MODE0_CTRL_ENABLE;
+    RTC->MODE0.CTRL.reg = RTC_MODE0_CTRL_MODE(0) | RTC_MODE0_CTRL_ENABLE |
+                          RTC_MODE0_PRESCALER;
 #endif
     _wait_syncbusy();
 
