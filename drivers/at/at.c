@@ -114,14 +114,14 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
     size_t cmdlen = strlen(command);
 
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);
-    uart_write(dev->uart, (const uint8_t *)AT_SEND_EOL, AT_SEND_EOL_LEN);
+    uart_write(dev->uart, (const uint8_t *)CONFIG_AT_SEND_EOL, AT_SEND_EOL_LEN);
 
     if (AT_SEND_ECHO) {
         if (at_expect_bytes(dev, command, timeout)) {
             return -1;
         }
 
-        if (at_expect_bytes(dev, AT_SEND_EOL AT_RECV_EOL_1 AT_RECV_EOL_2, timeout)) {
+        if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_1 AT_RECV_EOL_2, timeout)) {
             return -2;
         }
     }
@@ -194,17 +194,17 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
         }
         else if (res > 0) {
             bytes_left -= res;
-            size_t len_ok = sizeof(AT_RECV_OK) - 1;
-            size_t len_error = sizeof(AT_RECV_ERROR) - 1;
+            size_t len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
+            size_t len_error = sizeof(CONFIG_AT_RECV_ERROR) - 1;
             if (((size_t )res == (len_ok + keep_eol)) &&
                 (len_ok != 0) &&
-                (strncmp(pos, AT_RECV_OK, len_ok) == 0)) {
+                (strncmp(pos, CONFIG_AT_RECV_OK, len_ok) == 0)) {
                 res = len - bytes_left;
                 break;
             }
             else if (((size_t )res == (len_error + keep_eol)) &&
                      (len_error != 0) &&
-                     (strncmp(pos, AT_RECV_ERROR, len_error) == 0)) {
+                     (strncmp(pos, CONFIG_AT_RECV_ERROR, len_error) == 0)) {
                 return -1;
             }
             else if (strncmp(pos, "+CME ERROR:", 11) == 0) {
@@ -240,13 +240,13 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
     at_drain(dev);
 
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);
-    uart_write(dev->uart, (const uint8_t *)AT_SEND_EOL, AT_SEND_EOL_LEN);
+    uart_write(dev->uart, (const uint8_t *)CONFIG_AT_SEND_EOL, AT_SEND_EOL_LEN);
 
     if (at_expect_bytes(dev, command, timeout)) {
         return -1;
     }
 
-    if (at_expect_bytes(dev, AT_SEND_EOL AT_RECV_EOL_2, timeout)) {
+    if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_2, timeout)) {
         return -2;
     }
 
@@ -265,8 +265,8 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
     res = at_send_cmd_get_resp(dev, command, resp_buf, sizeof(resp_buf), timeout);
 
     if (res > 0) {
-        ssize_t len_ok = sizeof(AT_RECV_OK) - 1;
-        if ((len_ok != 0) && (strcmp(resp_buf, AT_RECV_OK) == 0)) {
+        ssize_t len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
+        if ((len_ok != 0) && (strcmp(resp_buf, CONFIG_AT_RECV_OK) == 0)) {
             res = 0;
         }
         else {

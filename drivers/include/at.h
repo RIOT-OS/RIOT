@@ -40,6 +40,7 @@
 #include "isrpipe.h"
 #include "periph/uart.h"
 #include "clist.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,15 +54,38 @@ extern "C" {
 /**
  * @brief End of line character to send after the AT command.
  */
-#ifndef AT_SEND_EOL
-#define AT_SEND_EOL "\r"
+#if IS_ACTIVE(CONFIG_AT_SEND_EOL_WINDOWS)
+#define CONFIG_AT_SEND_EOL   "\r\n"
+#elif IS_ACTIVE(CONFIG_AT_SEND_EOL_UNIX)
+#define CONFIG_AT_SEND_EOL   "\n"
+#elif IS_ACTIVE(CONFIG_AT_SEND_EOL_MAC)
+#define CONFIG_AT_SEND_EOL   "\r"
+#endif
+
+#ifndef CONFIG_AT_SEND_EOL
+#define CONFIG_AT_SEND_EOL "\r"
+#endif
+
+/**
+ * @brief Enable this to disable check for echo after an AT
+ * command is sent.
+ */
+#ifdef DOXYGEN
+#define CONFIG_AT_SEND_SKIP_ECHO
 #endif
 
 /**
  * @brief Enable/disable the expected echo after an AT command is sent.
+ *
+ * @deprecated Use inverse @ref CONFIG_AT_SEND_SKIP_ECHO instead.
+ * Will be removed after 2021.01 release.
  */
 #ifndef AT_SEND_ECHO
+#if IS_ACTIVE(CONFIG_AT_SEND_SKIP_ECHO)
+#define AT_SEND_ECHO 0
+#else
 #define AT_SEND_ECHO 1
+#endif
 #endif
 
 /**
@@ -81,25 +105,37 @@ extern "C" {
 /**
  * @brief default OK reply of an AT device.
  */
-#ifndef AT_RECV_OK
-#define AT_RECV_OK "OK"
+#ifndef CONFIG_AT_RECV_OK
+#define CONFIG_AT_RECV_OK "OK"
 #endif
 
 /**
  * @brief default ERROR reply of an AT device.
  */
-#ifndef AT_RECV_ERROR
-#define AT_RECV_ERROR "ERROR"
+#ifndef CONFIG_AT_RECV_ERROR
+#define CONFIG_AT_RECV_ERROR "ERROR"
+#endif
+
+#if defined(MODULE_AT_URC) || DOXYGEN
+
+/**
+ * @brief   Default buffer size used to process unsolicited result code data.
+ *          (as exponent of 2^n).
+ *
+ *          As the buffer size ALWAYS needs to be power of two, this option
+ *          represents the exponent of 2^n, which will be used as the size of
+ *          the buffer.
+ */
+#ifndef CONFIG_AT_BUF_SIZE_EXP
+#define CONFIG_AT_BUF_SIZE_EXP (7U)
 #endif
 /** @} */
 
-/** Shortcut for getting send end of line length */
-#define AT_SEND_EOL_LEN  (sizeof(AT_SEND_EOL) - 1)
-
-#if defined(MODULE_AT_URC) || DOXYGEN
+/**
+ * @brief   Size of buffer used to process unsolicited result code data.
+ */
 #ifndef AT_BUF_SIZE
-/** Internal buffer size used to process unsolicited result code data */
-#define AT_BUF_SIZE (128)
+#define AT_BUF_SIZE   (1 << CONFIG_AT_BUF_SIZE_EXP)
 #endif
 
 /**
@@ -121,6 +157,9 @@ typedef struct {
 } at_urc_t;
 
 #endif /* MODULE_AT_URC */
+
+/** Shortcut for getting send end of line length */
+#define AT_SEND_EOL_LEN  (sizeof(CONFIG_AT_SEND_EOL) - 1)
 
 /**
  * @brief AT device structure
