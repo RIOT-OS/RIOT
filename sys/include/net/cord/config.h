@@ -43,8 +43,8 @@ extern "C" {
 /**
  * @brief   Default client update interval (default is 3/4 the lifetime)
  */
-#ifndef CORD_UPDATE_INTERVAL
-#define CORD_UPDATE_INTERVAL    ((CONFIG_CORD_LT / 4) * 3)
+#ifndef CONFIG_CORD_UPDATE_INTERVAL
+#define CONFIG_CORD_UPDATE_INTERVAL    ((CONFIG_CORD_LT / 4) * 3)
 #endif
 
 /**

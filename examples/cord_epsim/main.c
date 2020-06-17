@@ -140,7 +140,7 @@ int main(void)
         else if (res == CORD_EPSIM_ERROR) {
             puts("error: unable to trigger simple registration process");
         }
-        xtimer_sleep(CORD_UPDATE_INTERVAL);
+        xtimer_sleep(CONFIG_CORD_UPDATE_INTERVAL);
     }
 
     return 0;
