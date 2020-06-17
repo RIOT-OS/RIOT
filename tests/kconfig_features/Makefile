@@ -1,6 +1,10 @@
 include ../Makefile.tests_common
 
-BOARD_WHITELIST += cc1312-launchpad \
+BOARD_WHITELIST += arduino-duemilanove \
+                   arduino-nano \
+                   arduino-uno \
+                   atmega328p \
+                   cc1312-launchpad \
                    cc1352-launchpad \
                    cc1352p-launchpad \
                    cc2650-launchpad \
