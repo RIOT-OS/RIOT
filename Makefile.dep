@@ -432,14 +432,6 @@ ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
   USEMODULE += core_mbox
 endif
 
-ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
-  USEMODULE += gnrc_netapi
-  USEMODULE += gnrc_netreg
-  USEMODULE += gnrc_netif
-  USEMODULE += gnrc_pktbuf
-  USEMODULE += xtimer
-endif
-
 ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_gnrc_pktdump
   USEMODULE += gnrc_pktbuf
