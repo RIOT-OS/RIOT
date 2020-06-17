@@ -67,6 +67,11 @@ config HAS_ETHERNET
     help
         Indicates that Ethernet connectivity is present.
 
+config HAS_NO_IDLE_THREAD
+    bool
+    help
+        Indicates that this MCU doesn't need the idle thread
+
 config HAS_MOTOR_DRIVER
     bool
     help
