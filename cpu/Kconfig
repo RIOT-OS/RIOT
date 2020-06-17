@@ -10,12 +10,7 @@
 #        || selects
 #        \/
 #  +------------+
-#  | CPU_SERIES |
-#  +------------+
-#        || selects
-#        \/
-#  +------------+
-#  | CPU_FAMILY |
+#  |  CPU_FAM   |
 #  +------------+
 #        || selects
 #        \/
@@ -27,25 +22,25 @@
 #   +----------+
 #   | CPU_ARCH |
 #   +----------+
+
 config CPU
     string
     help
-        Name of the currently selected CPU.
+        Name of the currently selected CPU. This reflects the Makefile variable
+        used by the build system as entry point in the cpu folder.
 
 config CPU_MODEL
     string
     help
         Model of the currently selected CPU.
 
-config CPU_SERIES
+config CPU_FAM
     string
     help
-        Series of the currently selected CPU.
-
-config CPU_FAMILY
-    string
-    help
-        Family of the currently selected CPU.
+        Family of the currently selected CPU. It is an identifier that
+        represents a sub-group of a Manufacturers CPU's. All CPU models
+        belonging to the same family, usually share the same core and have
+        similar register mapping.
 
 config CPU_CORE
     string
