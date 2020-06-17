@@ -52,7 +52,7 @@ static inline const char *cord_common_get_ep(void)
  *
  * This function adds:
  *  - `ep` -> as extracted by cord_common_get_ep()
- *  - [optional] `lt` -> if defined by CORD_LT
+ *  - [optional] `lt` -> if defined by CONFIG_CORD_LT
  *  - [optional] 'd'  -> if defined by CORD_D
  *
  *  @return  0 on success

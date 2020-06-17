@@ -359,7 +359,7 @@ void cord_ep_dump_status(void)
 
         printf("RD address: coap://[%s]:%i\n", addr, (int)_rd_remote.port);
         printf("   ep name: %s\n", cord_common_get_ep());
-        printf("  lifetime: %is\n", (int)CORD_LT);
+        printf("  lifetime: %is\n", (int)CONFIG_CORD_LT);
         printf("    reg if: %s\n", _rd_regif);
         printf("  location: %s\n", _rd_loc);
     }

@@ -76,7 +76,7 @@ int main(void)
 
     /* fill riot info */
     sprintf(riot_info, "{\"ep\":\"%s\",\"lt\":%u}",
-            cord_common_get_ep(), CORD_LT);
+            cord_common_get_ep(), CONFIG_CORD_LT);
 
     /* parse RD address information */
     sock_udp_ep_t rd_ep;
@@ -112,7 +112,7 @@ int main(void)
     /* print RD client information */
     puts("epsim configuration:");
     printf("         ep: %s\n", cord_common_get_ep());
-    printf("         lt: %is\n", (int)CORD_LT);
+    printf("         lt: %is\n", (int)CONFIG_CORD_LT);
     printf(" RD address: [%s]:%u\n\n", ep_str, ep_port);
 
     xtimer_sleep(STARTUP_DELAY);

@@ -29,8 +29,8 @@ extern "C" {
 /**
  * @brief   Default lifetime in seconds (the default is 1 day)
  */
-#ifndef CORD_LT
-#define CORD_LT                 (86400UL)
+#ifndef CONFIG_CORD_LT
+#define CONFIG_CORD_LT                 (86400UL)
 #endif
 
 /**
@@ -44,7 +44,7 @@ extern "C" {
  * @brief   Default client update interval (default is 3/4 the lifetime)
  */
 #ifndef CORD_UPDATE_INTERVAL
-#define CORD_UPDATE_INTERVAL    ((CORD_LT / 4) * 3)
+#define CORD_UPDATE_INTERVAL    ((CONFIG_CORD_LT / 4) * 3)
 #endif
 
 /**

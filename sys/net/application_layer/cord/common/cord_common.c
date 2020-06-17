@@ -63,9 +63,9 @@ int cord_common_add_qstring(coap_pkt_t *pkt)
     }
 
     /* [optional] set the lifetime parameter */
-#if CORD_LT
+#if CONFIG_CORD_LT
     char lt[11];
-    lt[fmt_u32_dec(lt, CORD_LT)] = '\0';
+    lt[fmt_u32_dec(lt, CONFIG_CORD_LT)] = '\0';
     res = coap_opt_add_uri_query(pkt, "lt", lt);
     if (res < 0) {
         return res;

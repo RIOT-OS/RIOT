@@ -25,7 +25,7 @@ USEMODULE += fmt
 DEVELHELP ?= 1
 
 # For debugging and demonstration purposes, we limit the lifetime to 60s
-CFLAGS += -DCORD_LT=60
+CFLAGS += -DCONFIG_CORD_LT=60
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
