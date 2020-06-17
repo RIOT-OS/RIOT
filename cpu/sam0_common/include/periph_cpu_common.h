@@ -849,6 +849,7 @@ typedef struct {
  */
 #define WDT_HAS_INIT                   (1)
 
+#if defined(REV_DMAC) || DOXYGEN
 /**
  * @name sam0 DMA peripheral
  * @{
@@ -1117,6 +1118,7 @@ void dma_wait(dma_t dma);
  */
 void dma_cancel(dma_t dma);
 /** @} */
+#endif /* REV_DMAC || DOXYGEN */
 
 /**
  * @name sam0 RTC Tamper Detection

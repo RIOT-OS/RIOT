@@ -1,6 +1,11 @@
 ifneq (,$(filter samd10%,$(CPU_MODEL)))
   CFLAGS += -DCPU_SAMD10
 endif
+ifneq (,$(filter samd20%b,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAMD20B
+else ifneq (,$(filter samd20%,$(CPU_MODEL)))
+  CFLAGS += -DCPU_SAMD20
+endif
 ifneq (,$(filter samd21%a,$(CPU_MODEL)))
   CFLAGS += -DCPU_SAMD21A
 endif

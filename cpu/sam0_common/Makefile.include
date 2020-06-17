@@ -5,7 +5,7 @@ CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 CFLAGS += -D__$(call uppercase_and_underscore,$(CPU_MODEL))__
 
 # Compute CPU_LINE
-LINE   := $(shell echo $(CPU_MODEL) | sed -E -e 's/^sam([a-z][0-9][0-9])(.)([0-9][0-9])(.)/\1 \2 \3 \4/')
+LINE   := $(shell echo $(CPU_MODEL) | sed -E -e 's/^sam([a-z][0-9][0-9])(.)([0-9][0-9])(.)*/\1 \2 \3 \4/')
 FAMILY := $(word 1, $(LINE))
 TYPE1  := $(word 2, $(LINE))
 MEMORY := $(word 3, $(LINE))
@@ -16,7 +16,7 @@ ROM_LEN := $(shell echo $$((1 << $(MEMORY))))
 
 # get vendor file to extract RAM length
 VENDOR_FILE := $(shell find $(RIOTCPU)/sam0_common/include/vendor/sam$(FAMILY) -name $(CPU_MODEL).h | grep include.*/sam)
-RAM_LEN := $(shell sed -E -n 's/\#define (HMCRAMC0_SIZE|HSRAM_SIZE).*(0x[[:xdigit:]]*).*/\2/p' $(VENDOR_FILE))
+RAM_LEN := $(shell sed -E -n 's/\#define (HRAMC0_SIZE|HMCRAMC0_SIZE|HSRAM_SIZE).*(0x[[:xdigit:]]*).*/\2/p' $(VENDOR_FILE))
 
 ROM_START_ADDR ?= 0x00000000
 RAM_START_ADDR ?= 0x20000000

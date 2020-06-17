@@ -49,6 +49,9 @@ WEAK_DEFAULT void isr_tcc0(void);
 WEAK_DEFAULT void isr_tcc1(void);
 WEAK_DEFAULT void isr_tcc2(void);
 WEAK_DEFAULT void isr_tcc3(void);
+WEAK_DEFAULT void isr_tc0(void);
+WEAK_DEFAULT void isr_tc1(void);
+WEAK_DEFAULT void isr_tc2(void);
 WEAK_DEFAULT void isr_tc3(void);
 WEAK_DEFAULT void isr_tc4(void);
 WEAK_DEFAULT void isr_tc5(void);
@@ -82,14 +85,26 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_sercom3,            /* 12 Serial Communication Interface 3 */
     isr_sercom4,            /* 13 Serial Communication Interface 4 */
     isr_sercom5,            /* 14 Serial Communication Interface 5 */
+#ifdef TCC0
     isr_tcc0,               /* 15 Timer Counter Control 0 */
+#else
+    isr_tc0,                /* 15 Basic Timer Counter 0 */
+#endif
+#ifdef TCC1
     isr_tcc1,               /* 16 Timer Counter Control 1 */
+#else
+    isr_tc1,                /* 16 Basic Timer Counter 1 */
+#endif
+#ifdef TCC2
     isr_tcc2,               /* 17 Timer Counter Control 2 */
-    isr_tc3,                /* 18 Basic Timer Counter 0 */
-    isr_tc4,                /* 19 Basic Timer Counter 1 */
-    isr_tc5,                /* 20 Basic Timer Counter 2 */
-    isr_tc6,                /* 21 Basic Timer Counter 3 */
-    isr_tc7,                /* 22 Basic Timer Counter 4 */
+#else
+    isr_tc2,                /* 17 Basic Timer Counter 2 */
+#endif
+    isr_tc3,                /* 18 Basic Timer Counter 3 */
+    isr_tc4,                /* 19 Basic Timer Counter 4 */
+    isr_tc5,                /* 20 Basic Timer Counter 5 */
+    isr_tc6,                /* 21 Basic Timer Counter 6 */
+    isr_tc7,                /* 22 Basic Timer Counter 7 */
     isr_adc,                /* 23 Analog Digital Converter */
     isr_ac,                 /* 24 Analog Comparators */
     isr_dac,                /* 25 Digital Analog Converter */

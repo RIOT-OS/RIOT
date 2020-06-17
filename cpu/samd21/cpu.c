@@ -68,6 +68,10 @@
 #define GCLK_GENCTRL_SRC_FDPLL      (GCLK_GENCTRL_SRC_FDPLL_Val    << GCLK_GENCTRL_SRC_Pos)
 #endif
 
+#ifndef GCLK_CLKCTRL_ID_DFLL48
+#define GCLK_CLKCTRL_ID_DFLL48 GCLK_CLKCTRL_ID_DFLL48M
+#endif
+
 void sam0_gclk_enable(uint8_t id)
 {
     (void) id;
