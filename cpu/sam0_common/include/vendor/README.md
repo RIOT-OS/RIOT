@@ -45,6 +45,10 @@ resolve  any CPU family specific includes required.
 
 samd10: `Atmel.SAMD10_DFP.1.1.77.atpack`
 
+## SAMD20 files
+
+samd20: `Atmel.SAMD20_DFP.1.3.165.atpack`
+
 Each atpack has an include subdirectory with the files we copy into
 RIOT. The files are copied unmodified.
 
