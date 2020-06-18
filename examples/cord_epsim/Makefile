@@ -23,11 +23,6 @@ USEMODULE += xtimer
 # development process:
 DEVELHELP ?= 1
 
-# For debugging and demonstration purposes, we limit the lifetime to the minimal
-# allowed value of 60s (see draft-ietf-core-resource-directory-11, Table 2)
-RD_LT ?= 60
-CFLAGS += -DCONFIG_CORD_LT=$(RD_LT)
-
 # The RD server's address must be defined by the build environment by setting
 # the RD_ADDR environment variable. Per default, this value is set to the
 # loopback address for enabling the build tests to successfully build this
@@ -36,3 +31,12 @@ RD_ADDR ?= \"[affe::1]\"
 CFLAGS += -DRD_ADDR=$(RD_ADDR)
 
 include $(RIOTBASE)/Makefile.include
+
+# For debugging and demonstration purposes, we limit the lifetime to the minimal
+# allowed value of 60s (see draft-ietf-core-resource-directory-11, Table 2)
+RD_LT ?= 60
+
+# Set CONFIG_CORD_LT only if not being set via Kconfig
+ifndef CONFIG_CORD_LT
+CFLAGS += -DCONFIG_CORD_LT=$(RD_LT)
+endif
