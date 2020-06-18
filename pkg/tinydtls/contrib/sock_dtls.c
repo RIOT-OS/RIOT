@@ -117,7 +117,9 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
             break;
     }
 #endif  /* ENABLE_DEBUG */
-    mbox_put(&sock->mbox, &msg);
+    if (!level && (code != DTLS_EVENT_CONNECT)) {
+        mbox_put(&sock->mbox, &msg);
+    }
     return 0;
 }
 
