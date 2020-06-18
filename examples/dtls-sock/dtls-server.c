@@ -86,7 +86,6 @@ void *dtls_server_wrapper(void *arg)
     /* Prepare (thread) messages reception */
     msg_init_queue(_reader_queue, READER_QUEUE_SIZE);
 
-    sock_dtls_session_t session;
     sock_dtls_t sock;
     sock_udp_t udp_sock;
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
@@ -113,6 +112,7 @@ void *dtls_server_wrapper(void *arg)
             active = false;
         }
         else {
+            sock_dtls_session_t session = { 0 };
             res = sock_dtls_recv(&sock, &session, rcv, sizeof(rcv),
                                   10 * US_PER_SEC);
             if (res >= 0) {
@@ -121,14 +121,13 @@ void *dtls_server_wrapper(void *arg)
                 if (res < 0) {
                     printf("Error resending DTLS message: %d", (int)res);
                 }
+                sock_dtls_session_destroy(&sock, &session);
             }
             else if (res == -SOCK_DTLS_HANDSHAKE) {
                 printf("New client connected\n");
             }
         }
     }
-
-    sock_dtls_session_destroy(&sock, &session);
     sock_dtls_close(&sock);
     sock_udp_close(&udp_sock);
     puts("Terminating");
