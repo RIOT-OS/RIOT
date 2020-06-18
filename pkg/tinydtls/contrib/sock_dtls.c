@@ -74,8 +74,9 @@ static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
     sock_dtls_t *sock = dtls_get_app_data(ctx);
 
     DEBUG("sock_dtls: decrypted message arrived\n");
-    sock->buf = buf;
-    sock->buflen = len;
+    sock->buffer.data = buf;
+    sock->buffer.datalen = len;
+    sock->buffer.session = session;
     return len;
 }
 
@@ -246,7 +247,7 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
     }
 
     sock->udp_sock = udp_sock;
-    sock->buf = NULL;
+    sock->buffer.data = NULL;
     sock->role = role;
     sock->tag = tag;
     sock->dtls_ctx = dtls_new_context(sock);
@@ -367,18 +368,22 @@ ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
                       (uint8_t *)data, len);
 }
 
-static ssize_t _copy_buffer(sock_dtls_t *sock, void *data, size_t max_len)
+static ssize_t _copy_buffer(sock_dtls_t *sock, sock_dtls_session_t *remote,
+                            void *data, size_t max_len)
 {
-    uint8_t *buf = sock->buf;
-    size_t buflen = sock->buflen;
+    uint8_t *buf = sock->buffer.data;
+    size_t buflen = sock->buffer.datalen;
 
-    sock->buf = NULL;
+    sock->buffer.data = NULL;
     if (buflen > max_len) {
         return -ENOBUFS;
     }
     /* use `memmove()` as tinydtls reuses `data` to store decrypted data with an
      * offset in `buf`. This prevents problems with overlapping buffers. */
     memmove(data, buf, buflen);
+    memcpy(&remote->dtls_session, sock->buffer.session,
+           sizeof(remote->dtls_session));
+    _session_to_ep(&remote->dtls_session, &remote->ep);
     return buflen;
 }
 
@@ -389,9 +394,9 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
     assert(data);
     assert(remote);
 
-    if (sock->buf != NULL) {
+    if (sock->buffer.data != NULL) {
         /* there is already decrypted data available */
-        return _copy_buffer(sock, data, max_len);
+        return _copy_buffer(sock, remote, data, max_len);
     }
 
     /* loop breaks when timeout or application data read */
@@ -413,8 +418,8 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
         }
 
         msg_t msg;
-        if (sock->buf != NULL) {
-            return _copy_buffer(sock, data, max_len);
+        if (sock->buffer.data != NULL) {
+            return _copy_buffer(sock, remote, data, max_len);
         }
         else if (mbox_try_get(&sock->mbox, &msg) &&
                  msg.type == DTLS_EVENT_CONNECTED) {

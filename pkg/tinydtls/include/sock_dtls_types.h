@@ -41,9 +41,14 @@ struct sock_dtls {
                                                 handling */
     msg_t mbox_queue[SOCK_DTLS_MBOX_SIZE];  /**< Queue for struct
                                                 sock_dtls::mbox */
-    uint8_t *buf;                           /**< Buffer to pass decrypted data
-                                                back to user */
-    size_t buflen;                          /**< Size of buffer */
+    /**
+     * @brief Buffer used to pass decrypted data and its session information.
+     */
+    struct {
+        uint8_t *data;                      /**< Pointer to the decrypted data */
+        size_t datalen;                     /**< data length */
+        session_t *session;                 /**< Session information */
+    } buffer;
     credman_tag_t tag;                      /**< Credential tag of a registered
                                                 (D)TLS credential */
     dtls_peer_type role;                    /**< DTLS role of the socket */
