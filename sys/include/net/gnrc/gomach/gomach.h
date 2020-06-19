@@ -349,30 +349,7 @@ extern "C" {
 #ifndef CONFIG_GNRC_GOMACH_MAX_T2U_RETYR_THRESHOLD
 #define CONFIG_GNRC_GOMACH_MAX_T2U_RETYR_THRESHOLD          (10U)
 #endif
-
-/**
- * @brief Default message queue size to use for the GoMacH thread (as exponent
- *        of 2^n).
- *
- * As the queue size ALWAYS needs to be power of two, this option represents the
- * exponent of 2^n, which will be used as the size of the queue.
- *
- * The value of this macro should be enough for supporting the manipulation of
- * GoMacH.
- */
-#ifndef CONFIG_GNRC_GOMACH_IPC_MSG_QUEUE_SIZE_EXP
-#define CONFIG_GNRC_GOMACH_IPC_MSG_QUEUE_SIZE_EXP        (3U)
-#endif
 /** @} */
-
-/**
- * @brief Message queue size to use for the GoMacH thread.
- */
-#ifndef GNRC_GOMACH_IPC_MSG_QUEUE_SIZE
-#define GNRC_GOMACH_IPC_MSG_QUEUE_SIZE  (1 << CONFIG_GNRC_GOMACH_IPC_MSG_QUEUE_SIZE_EXP)
-#endif
-/** @} */
-
 
 /**
  * @brief   Creates an IEEE 802.15.4 GoMacH network interface
