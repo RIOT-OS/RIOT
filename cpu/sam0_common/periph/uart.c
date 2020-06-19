@@ -76,9 +76,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         gpio_init(uart_config[uart].rx_pin, GPIO_IN);
         gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
     }
-    gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
-    gpio_set(uart_config[uart].tx_pin);
-    gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
+    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+        gpio_set(uart_config[uart].tx_pin);
+        gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
+        gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
+    }
 
 #ifdef MODULE_PERIPH_UART_HW_FC
     /* If RTS/CTS needed, enable them */
@@ -133,7 +135,12 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev(uart)->BAUD.FRAC.BAUD = (baud / 8);
 
     /* enable transmitter, and configure 8N1 mode */
-    dev(uart)->CTRLB.reg = SERCOM_USART_CTRLB_TXEN;
+    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+        dev(uart)->CTRLB.reg = SERCOM_USART_CTRLB_TXEN;
+    } else {
+        dev(uart)->CTRLB.reg = 0;
+    }
+
     /* enable receiver and RX interrupt if configured */
     if ((rx_cb) && (uart_config[uart].rx_pin != GPIO_UNDEF)) {
         uart_ctx[uart].rx_cb = rx_cb;
@@ -174,6 +181,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
+    if (uart_config[uart].tx_pin == GPIO_UNDEF) {
+        return;
+    }
+
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     for (const void* end = data + len; data != end; ++data) {
         if (irq_is_in() || __get_PRIMASK()) {
