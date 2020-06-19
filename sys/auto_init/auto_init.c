@@ -248,6 +248,12 @@ void auto_init(void)
         suit_init_conditions();
     }
 
+    if (IS_USED(MODULE_MBEDTLS)) {
+        LOG_DEBUG("Auto init mbed TLS.\n");
+        extern void auto_init_mbedtls(void);
+        auto_init_mbedtls();
+    }
+
     if (IS_USED(MODULE_AUTO_INIT_SECURITY)) {
         if (IS_USED(MODULE_CRYPTOAUTHLIB)) {
             LOG_DEBUG("Auto init cryptoauthlib.\n");

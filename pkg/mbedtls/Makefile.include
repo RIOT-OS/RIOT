@@ -1,0 +1,26 @@
+INCLUDES += -I$(PKGDIRBASE)/mbedtls/include
+INCLUDES += -I$(PKGDIRBASE)/mbedtls/include/mbedtls
+
+INCLUDES += -I$(RIOTPKG)/mbedtls/include
+
+CFLAGS += -DMBEDTLS_CONFIG_FILE='<riot_mbedtls_config.h>'
+
+# these PSEUDOMODULES can be used to enable/disable an entropy source
+PSEUDOMODULES += mbedtls_entropy_source_hwrng
+PSEUDOMODULES += mbedtls_entropy_source_adc
+
+ifneq (,$(filter mbedtls_contrib,$(USEMODULE)))
+  DIRS += $(RIOTPKG)/mbedtls/contrib
+endif
+
+ifneq (,$(filter mbedtls_entropy,$(USEMODULE)))
+  DIRS += $(RIOTPKG)/mbedtls/contrib/entropy
+endif
+
+ifneq (,$(filter entropy_source_adc_noise,$(USEMODULE)))
+  ifndef CONFIG_KCONFIG_USEMODULE_ENTROPY_SOURCE_ADC_NOISE
+    # disable conditioning by default, enable health tests
+    CFLAGS += -DCONFIG_ENTROPY_SOURCE_ADC_COND=0
+    CFLAGS += -DCONFIG_ENTROPY_SOURCE_ADC_HEALTH_TEST=1
+  endif
+endif
