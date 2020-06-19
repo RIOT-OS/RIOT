@@ -1,12 +1,6 @@
 include ../Makefile.tests_common
 
 USEMODULE += od
-# USEMODULE += od_string
-
-ifeq (,$(filter od_string,$(USEMODULE)))
-  TESTS=$(APPDIR)/tests/01-run.py
-else
-  TESTS=$(APPDIR)/tests/02-run.py
-endif
+USEMODULE += od_string
 
 include $(RIOTBASE)/Makefile.include
