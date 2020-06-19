@@ -32,7 +32,8 @@
 #define CNTRL_REG_LOCK         (FLASH_PECR_PELOCK)
 #define KEY_REG                (FLASH->PEKEYR)
 #else
-#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
+    defined(CPU_FAM_STM32G4)
 #define FLASH_KEY1             ((uint32_t)0x45670123)
 #define FLASH_KEY2             ((uint32_t)0xCDEF89AB)
 #endif
