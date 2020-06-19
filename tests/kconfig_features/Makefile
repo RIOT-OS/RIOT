@@ -9,7 +9,15 @@ BOARD_WHITELIST += arduino-duemilanove \
                    cc1352p-launchpad \
                    cc2650-launchpad \
                    cc2650stk \
-                   samr21-xpro
+                   ikea-tradfri \
+                   samr21-xpro \
+                   slstk3401a \
+                   slstk3402a \
+                   sltb001a \
+                   slwstk6000b-slwrb4150a \
+                   slwstk6000b-slwrb4162a \
+                   stk3600 \
+                   stk3700
 
 
 all: checks
