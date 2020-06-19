@@ -36,18 +36,28 @@
 #define RTC_MODE0_CTRLA_COUNTSYNC       (0x1ul << RTC_MODE0_CTRLA_COUNTSYNC_Pos)
 #endif
 
+#ifdef REG_RTC_MODE0_CTRLA
+#define RTC_MODE0_PRESCALER       \
+    (__builtin_ctz(2 * RTT_CLOCK_FREQUENCY / RTT_FREQUENCY) << \
+    RTC_MODE0_CTRLA_PRESCALER_Pos)
+#else
+#define RTC_MODE0_PRESCALER       \
+    (__builtin_ctz(RTT_CLOCK_FREQUENCY / RTT_FREQUENCY) << \
+    RTC_MODE0_CTRL_PRESCALER_Pos)
+#endif
+
 static rtt_cb_t _overflow_cb;
-static void* _overflow_arg;
+static void *_overflow_arg;
 
 static rtt_cb_t _cmp0_cb;
-static void* _cmp0_arg;
+static void *_cmp0_arg;
 
 static void _wait_syncbusy(void)
 {
 #ifdef REG_RTC_MODE0_SYNCBUSY
     while (RTC->MODE0.SYNCBUSY.reg) {}
 #else
-    while(RTC->MODE0.STATUS.bit.SYNCBUSY) {}
+    while (RTC->MODE0.STATUS.bit.SYNCBUSY) {}
 #endif
 }
 
@@ -66,7 +76,8 @@ static inline void _rtt_reset(void)
 static void _rtt_clock_setup(void)
 {
     /* Setup clock GCLK2 with OSC32K */
-    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(SAM0_GCLK_32KHZ) | GCLK_CLKCTRL_ID_RTC;
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(SAM0_GCLK_32KHZ) |
+                        GCLK_CLKCTRL_ID_RTC;
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 }
 #else
@@ -88,6 +99,7 @@ static void _rtt_clock_setup(void)
 #else
 #error "No clock source for RTT selected. "
 #endif
+
 }
 #endif /* !CPU_SAMD21 - Clock Setup */
 
@@ -100,15 +112,17 @@ void rtt_init(void)
 
     /* set 32bit counting mode & enable the RTC */
 #ifdef REG_RTC_MODE0_CTRLA
-    RTC->MODE0.CTRLA.reg = RTC_MODE0_CTRLA_MODE(0) | RTC_MODE0_CTRLA_ENABLE | RTC_MODE0_CTRLA_COUNTSYNC;
+    RTC->MODE0.CTRLA.reg = RTC_MODE0_CTRLA_MODE(0) | RTC_MODE0_CTRLA_ENABLE |
+                           RTC_MODE0_CTRLA_COUNTSYNC | RTC_MODE0_PRESCALER;
 #else
-    RTC->MODE0.CTRL.reg = RTC_MODE0_CTRL_MODE(0) | RTC_MODE0_CTRL_ENABLE;
+    RTC->MODE0.CTRL.reg = RTC_MODE0_CTRL_MODE(0) | RTC_MODE0_CTRL_ENABLE |
+                          RTC_MODE0_PRESCALER;
 #endif
     _wait_syncbusy();
 
     /* initially clear flag */
     RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_CMP0
-                           |  RTC_MODE0_INTFLAG_OVF;
+                             |  RTC_MODE0_INTFLAG_OVF;
 
     NVIC_EnableIRQ(RTC_IRQn);
 
@@ -167,7 +181,7 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     _wait_syncbusy();
 
     /* enable compare interrupt and clear flag */
-    RTC->MODE0.INTFLAG.reg  = RTC_MODE0_INTFLAG_CMP0;
+    RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_CMP0;
     RTC->MODE0.INTENSET.reg = RTC_MODE0_INTENSET_CMP0;
 }
 
