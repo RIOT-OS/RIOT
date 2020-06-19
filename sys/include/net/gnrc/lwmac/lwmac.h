@@ -290,29 +290,7 @@ extern "C" {
 #ifndef GNRC_LWMAC_BROADCAST_CSMA_RETRIES
 #define GNRC_LWMAC_BROADCAST_CSMA_RETRIES    (3U)
 #endif
-
-/**
- * @brief Default message queue size to use for the LWMAC thread (as exponent of
- *        2^n).
- *
- * As the queue size ALWAYS needs to be power of two, this option represents the
- * exponent of 2^n, which will be used as the size of the queue.
- *
- * The value of this macro should be enough for supporting the manipulation of
- * LWMAC.
- *
- */
-#ifndef CONFIG_GNRC_LWMAC_IPC_MSG_QUEUE_SIZE_EXP
-#define CONFIG_GNRC_LWMAC_IPC_MSG_QUEUE_SIZE_EXP        (3U)
-#endif
 /** @} */
-
-/**
- * @brief Message queue size to use for the LWMAC thread.
- */
-#ifndef GNRC_LWMAC_IPC_MSG_QUEUE_SIZE
-#define GNRC_LWMAC_IPC_MSG_QUEUE_SIZE       (1 << CONFIG_GNRC_LWMAC_IPC_MSG_QUEUE_SIZE_EXP)
-#endif
 
 /**
  * @brief   Creates an IEEE 802.15.4 LWMAC network interface
