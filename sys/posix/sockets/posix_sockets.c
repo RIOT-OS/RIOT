@@ -238,6 +238,9 @@ static int _sockaddr_to_ep(const struct sockaddr *address, socklen_t address_len
             out->family = AF_INET6;
             memcpy(&out->addr.ipv6, &in6_addr->sin6_addr, sizeof(out->addr.ipv6));
             out->port = ntohs(in6_addr->sin6_port);
+            if (in6_addr->sin6_scope_id != 0) {
+                out->netif = (uint16_t) in6_addr->sin6_scope_id;
+            }
             break;
 #endif
         default:
