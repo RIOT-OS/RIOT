@@ -67,6 +67,7 @@ Pin 1 is on the top-left side with only 6 contacts.
 | SPI        | 0       | USART1          | MOSI: PD15, MISO: PD14, CLK: PD13 |                                                     |
 | Timer      | 0       | TIMER0 + TIMER1 |                                   | TIMER0 is used as prescaler (must be adjecent)      |
 | UART       | 0       | USART0          | RX: PB15, TX: PB14                | Default STDIO output                                |
+| LEUART     | 0       | LEUART0         | RX: PB15, TX: PB14                | Alternate to using UART                             |
 
 ### User interface
 | Peripheral | Mapped to | Pin  | Comments |
@@ -91,6 +92,14 @@ Pin 1 is on the top-left side with only 6 contacts.
 | SPI NOR Flash    | IS25LQ020B | yes       | 2MBit flash. Can be used with the the MTD API.                 |
 
 ## Board configuration
+
+### UART selection
+
+By default the UART peripheral is used for the TX/RX pins, however the pinout
+is compatible with LEUART also. You can switch from UART to LEUART by compiling
+with `EFM32_USE_LEUART=1`.
+
+**Note**: LEUART is not working on the ICC-1 module.
 
 ### Clock selection
 There are several clock sources that are available for the different

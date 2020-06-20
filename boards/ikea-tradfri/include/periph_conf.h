@@ -107,6 +107,31 @@ static const timer_conf_t timer_config[] = {
  * @name    UART configuration
  * @{
  */
+#ifndef EFM32_USE_LEUART
+#define EFM32_USE_LEUART   0
+#endif
+
+#if EFM32_USE_LEUART
+
+#ifndef STDIO_UART_BAUDRATE
+#define STDIO_UART_BAUDRATE (9600)
+#endif
+
+static const uart_conf_t uart_config[] = {
+    {
+        .dev = LEUART0,
+        .rx_pin = GPIO_PIN(PB, 15),
+        .tx_pin = GPIO_PIN(PB, 14),
+        .loc = USART_ROUTELOC0_RXLOC_LOC9 |
+               USART_ROUTELOC0_TXLOC_LOC9,
+        .cmu = cmuClock_LEUART0,
+        .irq = LEUART0_IRQn
+    }
+};
+#define UART_0_ISR_RX       isr_leuart0
+
+#else /* EFM32_USE_LEUART */
+
 static const uart_conf_t uart_config[] = {
     {
         .dev = USART0,
@@ -118,9 +143,10 @@ static const uart_conf_t uart_config[] = {
         .irq = USART0_RX_IRQn
     }
 };
-
-#define UART_NUMOF          ARRAY_SIZE(uart_config)
 #define UART_0_ISR_RX       isr_usart0_rx
+
+#endif /* EFM32_USE_LEUART */
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 #ifdef __cplusplus
