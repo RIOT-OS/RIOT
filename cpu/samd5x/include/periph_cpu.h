@@ -22,6 +22,7 @@
 
 #include <limits.h>
 
+#include "macros/units.h"
 #include "periph_cpu_common.h"
 
 #ifdef __cplusplus
@@ -31,17 +32,22 @@ extern "C" {
 /**
  * @brief   DFLL runs at at fixed frequency of 48 MHz
  */
-#define SAM0_DFLL_FREQ_HZ       (48000000U)
+#define SAM0_DFLL_FREQ_HZ       MHZ(48)
+
+/**
+￼ * @brief   XOSC is used to generate a fixed frequency of 48 MHz
+￼ */
+#define SAM0_XOSC_FREQ_HZ       (XOSC0_FREQUENCY ? XOSC0_FREQUENCY : XOSC1_FREQUENCY)
 
 /**
  * @brief   DPLL must run with at least 96 MHz
  */
-#define SAM0_DPLL_FREQ_MIN_HZ   (96000000U)
+#define SAM0_DPLL_FREQ_MIN_HZ   MHZ(96)
 
 /**
  * @brief   DPLL frequency must not exceed 200 MHz
  */
-#define SAM0_DPLL_FREQ_MAX_HZ   (200000000U)
+#define SAM0_DPLL_FREQ_MAX_HZ   MHZ(20)
 
 /**
  * @name    Power mode configuration
@@ -55,11 +61,19 @@ extern "C" {
  * @{
  */
 enum {
-    SAM0_GCLK_MAIN = 0,                 /**< 120 MHz main clock     */
-    SAM0_GCLK_32KHZ,                    /**< 32 kHz clock           */
-    SAM0_GCLK_8MHZ,                     /**< 8 MHz clock for xTimer */
-    SAM0_GCLK_48MHZ,                    /**< 48 MHz DFLL clock      */
+    SAM0_GCLK_MAIN = 0,                 /**< 120 MHz main clock       */
+    SAM0_GCLK_32KHZ,                    /**< 32 kHz clock             */
+    SAM0_GCLK_TIMER,                    /**< 4-8 MHz clock for xTimer */
+    SAM0_GCLK_PERIPH,                   /**< 12-48 MHz (DFLL) clock   */
 };
+/** @} */
+
+/**
+ * @name   GCLK compatibility definitions
+ * @{
+ */
+#define SAM0_GCLK_8MHZ      SAM0_GCLK_TIMER
+#define SAM0_GCLK_48MHZ     SAM0_GCLK_PERIPH
 /** @} */
 
 /**

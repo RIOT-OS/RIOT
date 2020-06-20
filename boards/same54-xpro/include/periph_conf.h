@@ -27,9 +27,48 @@ extern "C" {
 #endif
 
 /**
- * @brief   GCLK reference speed
+ * @brief   Use the external oscillator to source all fast clocks.
+ *          This allows us to use the buck voltage regulator for
+ *          maximum power efficiency, but limits the maximum clock
+ *          frequency to 12 MHz.
  */
-#define CLOCK_CORECLOCK     (120000000U)
+#ifndef USE_XOSC_ONLY
+#define USE_XOSC_ONLY       (0)
+#endif
+
+/**
+ * @name    external Oscillator (XOSC1) configuration
+ * @{
+ */
+#define XOSC1_FREQUENCY     MHZ(12)
+/** @} */
+
+/**
+ * @name    desired core clock frequency
+ * @{
+ */
+#ifndef CLOCK_CORECLOCK
+#if USE_XOSC_ONLY
+#define CLOCK_CORECLOCK     XOSC1_FREQUENCY
+#else
+#define CLOCK_CORECLOCK     MHZ(120)
+#endif
+#endif
+/** @} */
+
+/**
+ * @name    32kHz Oscillator configuration
+ * @{
+ */
+#define EXTERNAL_OSC32_SOURCE                    1
+#define ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE      0
+/** @} */
+
+/**
+ * @brief Enable the internal DC/DC converter
+ *        The board is equipped with the necessary inductor.
+ */
+#define USE_VREG_BUCK       (1)
 
 /**
  * @name Timer peripheral configuration
@@ -42,7 +81,7 @@ static const tc32_conf_t timer_config[] = {
         .mclk           = &MCLK->APBAMASK.reg,
         .mclk_mask      = MCLK_APBAMASK_TC0 | MCLK_APBAMASK_TC1,
         .gclk_id        = TC0_GCLK_ID,
-        .gclk_src       = SAM0_GCLK_8MHZ,
+        .gclk_src       = SAM0_GCLK_TIMER,
         .flags          = TC_CTRLA_MODE_COUNT32,
     },
     {   /* Timer 1 */
@@ -51,7 +90,7 @@ static const tc32_conf_t timer_config[] = {
         .mclk           = &MCLK->APBBMASK.reg,
         .mclk_mask      = MCLK_APBBMASK_TC2 | MCLK_APBBMASK_TC3,
         .gclk_id        = TC2_GCLK_ID,
-        .gclk_src       = SAM0_GCLK_8MHZ,
+        .gclk_src       = SAM0_GCLK_TIMER,
         .flags          = TC_CTRLA_MODE_COUNT32,
     }
 };
@@ -84,7 +123,7 @@ static const uart_conf_t uart_config[] = {
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
         .flags    = UART_FLAG_NONE,
-        .gclk_src = SAM0_GCLK_48MHZ,
+        .gclk_src = SAM0_GCLK_PERIPH,
     },
     {    /* EXT1 */
         .dev      = &SERCOM0->USART,
@@ -98,7 +137,7 @@ static const uart_conf_t uart_config[] = {
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
         .flags    = UART_FLAG_NONE,
-        .gclk_src = SAM0_GCLK_48MHZ,
+        .gclk_src = SAM0_GCLK_PERIPH,
     },
     {    /* EXT2 */
         .dev      = &SERCOM5->USART,
@@ -112,7 +151,7 @@ static const uart_conf_t uart_config[] = {
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
         .flags    = UART_FLAG_NONE,
-        .gclk_src = SAM0_GCLK_48MHZ,
+        .gclk_src = SAM0_GCLK_PERIPH,
     },
     {    /* EXT3 */
         .dev      = &SERCOM1->USART,
@@ -126,7 +165,7 @@ static const uart_conf_t uart_config[] = {
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
         .flags    = UART_FLAG_NONE,
-        .gclk_src = SAM0_GCLK_48MHZ,
+        .gclk_src = SAM0_GCLK_PERIPH,
     }
 };
 
@@ -161,7 +200,7 @@ static const spi_conf_t spi_config[] = {
         .clk_mux  = GPIO_MUX_D,
         .miso_pad = SPI_PAD_MISO_3,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_1,
-        .gclk_src = SAM0_GCLK_48MHZ,
+        .gclk_src = SAM0_GCLK_PERIPH,
 #ifdef MODULE_PERIPH_DMA
         .tx_trigger = SERCOM4_DMAC_ID_TX,
         .rx_trigger = SERCOM4_DMAC_ID_RX,
@@ -200,7 +239,7 @@ static const i2c_conf_t i2c_config[] = {
         .scl_pin  = GPIO_PIN(PA, 23),
         .sda_pin  = GPIO_PIN(PA, 22),
         .mux      = GPIO_MUX_C,
-        .gclk_src = SAM0_GCLK_48MHZ,
+        .gclk_src = SAM0_GCLK_PERIPH,
         .flags    = I2C_FLAG_NONE
     },
     {    /* EXT2, EXT3 */
@@ -209,22 +248,12 @@ static const i2c_conf_t i2c_config[] = {
         .scl_pin  = GPIO_PIN(PD, 9),
         .sda_pin  = GPIO_PIN(PD, 8),
         .mux      = GPIO_MUX_C,
-        .gclk_src = SAM0_GCLK_48MHZ,
+        .gclk_src = SAM0_GCLK_PERIPH,
         .flags    = I2C_FLAG_NONE
     }
 };
 
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
-/** @} */
-
-
-/**
- * @name    RTC configuration
- * @{
- */
-#define EXTERNAL_OSC32_SOURCE                    1
-#define INTERNAL_OSC32_SOURCE                    0
-#define ULTRA_LOW_POWER_INTERNAL_OSC_SOURCE      0
 /** @} */
 
 /**
@@ -246,7 +275,7 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
         .dp     = GPIO_PIN(PA, 25),
         .d_mux  = GPIO_MUX_H,
         .device = &USB->DEVICE,
-        .gclk_src = SAM0_GCLK_48MHZ,
+        .gclk_src = SAM0_GCLK_PERIPH,
     }
 };
 /** @} */
@@ -256,7 +285,7 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
  * @{
  */
                             /* Must not exceed 12 MHz */
-#define DAC_CLOCK           SAM0_GCLK_8MHZ
+#define DAC_CLOCK           SAM0_GCLK_TIMER
                             /* Use external reference voltage on PA03 */
                             /* (You have to manually connect PA03 with Vcc) */
                             /* Internal reference only gives 1V */
