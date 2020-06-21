@@ -35,7 +35,7 @@ USEMODULE += ps
 USEMODULE += saul_default
 
 BOARD_PROVIDES_NETIF := acd52832 adafruit-clue airfy-beacon atmega256rfr2-xpro \
-        arduino-nano-33-ble avr-rss2 b-l072z-lrwan1 cc2538dk fox \
+        arduino-nano-33-ble avr-rss2 b-l072z-lrwan1 cc2538dk dwm1001 fox \
         derfmega128 derfmega256 hamilton iotlab-m3 iotlab-a8-m3 lobaro-lorabox lsn50 mulle microbit msba2 \
         microduino-corerf native nrf51dk nrf51dongle nrf52dk nrf52840dk nrf52840-mdk nrf6310 \
         nucleo-f207zg nucleo-f767zi openmote-b openmote-cc2538 pba-d-01-kw2x remote-pa \
