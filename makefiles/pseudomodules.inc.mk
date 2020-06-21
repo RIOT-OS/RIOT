@@ -305,5 +305,6 @@ NO_PSEUDOMODULES += auto_init_loramac
 NO_PSEUDOMODULES += auto_init_multimedia
 NO_PSEUDOMODULES += auto_init_security
 NO_PSEUDOMODULES += auto_init_usbus
+NO_PSEUDOMODULES += auto_init_screen
 
 # Packages may also add modules to PSEUDOMODULES in their `Makefile.include`.

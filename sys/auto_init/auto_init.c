@@ -270,4 +270,10 @@ void auto_init(void)
             auto_init_dfplayer();
         }
     }
+
+    if (IS_USED(MODULE_AUTO_INIT_SCREEN)) {
+        LOG_DEBUG("Auto init screen devices\n");
+        extern void auto_init_screen(void);
+        auto_init_screen();
+    }
 }
