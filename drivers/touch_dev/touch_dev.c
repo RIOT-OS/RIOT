@@ -22,8 +22,45 @@
 #include <stddef.h>
 #include <inttypes.h>
 #include <stdbool.h>
+#include <errno.h>
 
 #include "touch_dev.h"
+
+touch_dev_reg_t *touch_dev_reg = NULL;
+
+int touch_dev_reg_add(touch_dev_reg_t *dev)
+{
+    touch_dev_reg_t *tmp = touch_dev_reg;
+
+    if (dev == NULL) {
+        return -ENODEV;
+    }
+
+    /* prepare new entry */
+    dev->next = NULL;
+    /* add to registry */
+    if (touch_dev_reg == NULL) {
+        touch_dev_reg = dev;
+    }
+    else {
+        while (tmp->next != NULL) {
+            tmp = tmp->next;
+        }
+        tmp->next = dev;
+    }
+    return 0;
+}
+
+touch_dev_reg_t *touch_dev_reg_find_screen(uint8_t screen_id)
+{
+    touch_dev_reg_t *tmp = touch_dev_reg;
+
+    while (tmp && tmp->screen_id != screen_id) {
+        tmp = tmp->next;
+    }
+
+    return tmp;
+}
 
 uint16_t touch_dev_height(const touch_dev_t *dev)
 {

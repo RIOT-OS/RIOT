@@ -85,6 +85,40 @@ struct touch_dev {
 };
 
 /**
+ * @brief   Touch dev registry entry
+ */
+typedef struct touch_dev_reg {
+    struct touch_dev_reg *next;     /**< pointer to the next touch device in the list */
+    touch_dev_t *dev;               /**< pointer to the device descriptor */
+    uint8_t screen_id;              /**< id of the screen this touch device is attached to */
+} touch_dev_reg_t;
+
+/**
+ * @brief   Export the touch device registry as global variable
+ */
+extern touch_dev_reg_t *touch_dev_reg;
+
+/**
+ * @brief   Add pointer to a touch device item to the list of touch items
+ *
+ * @param[in] dev   Pointer to the touch device
+ *
+ * @return          0 on success
+ * @return         -ENODEV on invalid entry
+*/
+int touch_dev_reg_add(touch_dev_reg_t *dev);
+
+/**
+ * @brief   Find the touch device that is attached to a given screen
+ *
+ * @param[in] screen_id Identifier (number) of the screen
+ *
+ * @return              pointer to the touch device in the registry
+ * @return              NULL if there's no match
+*/
+touch_dev_reg_t *touch_dev_reg_find_screen(uint8_t screen_id);
+
+/**
  * @brief   Get the height of the touch device
  *
  * @param[in] dev       Pointer to the touch device
