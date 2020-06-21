@@ -19,6 +19,7 @@
  * @author      Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Dylan Laduranty <dylanladuranty@gmail.com>
+ * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  *
  * @}
  */
@@ -33,6 +34,11 @@
 
 #if defined (CPU_SAML1X) || defined (CPU_SAMD5X)
 #define UART_HAS_TX_ISR
+#endif
+
+/* default to fractional baud rate calculation */
+#if !defined(CONFIG_SAM0_UART_BAUD_FRAC) && defined(SERCOM_USART_BAUD_FRAC_BAUD)
+#define CONFIG_SAM0_UART_BAUD_FRAC  1
 #endif
 
 /**
@@ -55,6 +61,35 @@ static uart_isr_ctx_t uart_ctx[UART_NUMOF];
 static inline SercomUsart *dev(uart_t dev)
 {
     return uart_config[dev].dev;
+}
+
+static void _set_baud(uart_t uart, uint32_t baudrate)
+{
+    const uint32_t f_src = sam0_gclk_freq(uart_config[uart].gclk_src);
+#if IS_ACTIVE(CONFIG_SAM0_UART_BAUD_FRAC)
+    /* Asynchronous Fractional */
+    uint32_t baud = (((f_src * 8) / baudrate) / 16);
+    dev(uart)->BAUD.FRAC.FP = (baud % 8);
+    dev(uart)->BAUD.FRAC.BAUD = (baud / 8);
+#else
+    /* Asynchronous Arithmetic */
+    /* BAUD = 2^16     * (2^0 - 2^4 * f_baud / f_src)     */
+    /*      = 2^(16-n) * (2^n - 2^(n+4) * f_baud / f_src) */
+    /*      = 2^(20-n) * (2^(n-4) - 2^n * f_baud / f_src) */
+
+    /* 2^n * f_baud < 2^32 -> find the next power of 2 */
+    uint8_t pow = __builtin_clz(baudrate);
+
+    /* 2^n * f_baud */
+    baudrate <<= pow;
+
+    /* (2^(n-4) - 2^n * f_baud / f_src) */
+    uint32_t tmp = (1 << (pow - 4)) - baudrate / f_src;
+    uint32_t rem = baudrate % f_src;
+
+    uint8_t scale = 20 - pow;
+    dev(uart)->BAUD.reg = (tmp << scale) - (rem << scale) / f_src;
+#endif
 }
 
 static void _configure_pins(uart_t uart)
@@ -116,11 +151,15 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* set asynchronous mode w/o parity, LSB first, TX and RX pad as specified
      * by the board in the periph_conf.h, x16 sampling and use internal clock */
-    dev(uart)->CTRLA.reg = (SERCOM_USART_CTRLA_DORD |
-                            SERCOM_USART_CTRLA_SAMPR(0x1) |
-                            SERCOM_USART_CTRLA_TXPO(uart_config[uart].tx_pad) |
-                            SERCOM_USART_CTRLA_RXPO(uart_config[uart].rx_pad) |
-                            SERCOM_USART_CTRLA_MODE(0x1));
+    dev(uart)->CTRLA.reg = SERCOM_USART_CTRLA_DORD
+#if IS_ACTIVE(CONFIG_SAM0_UART_BAUD_FRAC)
+    /* enable Asynchronous Fractional mode */
+                         | SERCOM_USART_CTRLA_SAMPR(0x1)
+#endif
+                         | SERCOM_USART_CTRLA_TXPO(uart_config[uart].tx_pad)
+                         | SERCOM_USART_CTRLA_RXPO(uart_config[uart].rx_pad)
+                         | SERCOM_USART_CTRLA_MODE(0x1);
+
     /* Set run in standby mode if enabled */
     if (uart_config[uart].flags & UART_FLAG_RUN_STANDBY) {
         dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_RUNSTDBY;
@@ -139,9 +178,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 #endif
 
     /* calculate and set baudrate */
-    uint32_t baud = (((sam0_gclk_freq(uart_config[uart].gclk_src) * 8) / baudrate) / 16);
-    dev(uart)->BAUD.FRAC.FP = (baud % 8);
-    dev(uart)->BAUD.FRAC.BAUD = (baud / 8);
+    _set_baud(uart, baudrate);
 
     /* enable transmitter, and configure 8N1 mode */
     if (uart_config[uart].tx_pin != GPIO_UNDEF) {
