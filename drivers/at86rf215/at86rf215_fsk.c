@@ -423,7 +423,8 @@ static void _set_ack_timeout(at86rf215_t *dev, bool mord4, bool fec)
 
 static void _set_csma_backoff_period(at86rf215_t *dev)
 {
-    dev->csma_backoff_period = AT86RF215_BACKOFF_PERIOD_IN_SYMBOLS * FSK_SYMBOL_TIME_US;
+    dev->csma_backoff_period = IEEE802154_CCA_DURATION_IN_SYMBOLS * FSK_SYMBOL_TIME_US
+                             + IEEE802154G_ATURNAROUNDTIME_US;
 
     DEBUG("[%s] CSMA BACKOFF: %"PRIu32" µs\n", "FSK", dev->csma_backoff_period);
 }

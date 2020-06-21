@@ -314,13 +314,15 @@ static void _set_ack_timeout(at86rf215_t *dev, uint8_t chips, uint8_t mode)
 
 static inline void _set_csma_backoff_period(at86rf215_t *dev, uint8_t chips)
 {
-    dev->csma_backoff_period = AT86RF215_BACKOFF_PERIOD_IN_SYMBOLS * _get_symbol_duration_us(chips);
+    dev->csma_backoff_period = _get_cca_duration_syms(chips) * _get_symbol_duration_us(chips)
+                             + IEEE802154G_ATURNAROUNDTIME_US;
     DEBUG("[%s] CSMA BACKOFF: %"PRIu32" µs\n", "O-QPSK", dev->csma_backoff_period);
 }
 
 static inline void _set_csma_backoff_period_legacy(at86rf215_t *dev)
 {
-    dev->csma_backoff_period = AT86RF215_BACKOFF_PERIOD_IN_SYMBOLS * LEGACY_QPSK_SYMBOL_TIME_US;
+    dev->csma_backoff_period = (IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS + IEEE802154_CCA_DURATION_IN_SYMBOLS)
+                             * LEGACY_QPSK_SYMBOL_TIME_US;
     DEBUG("[%s] CSMA BACKOFF: %"PRIu32" µs\n", "legacy O-QPSK", dev->csma_backoff_period);
 }
 

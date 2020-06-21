@@ -44,12 +44,6 @@ extern "C" {
 #define AT86RF215_EDT_DEFAULT           (-84) /* dBm */
 
 /**
- * This is used to calculate the csma backoff based on the bitrate.
- */
-/** 20 symbols is the std period length */
-#define AT86RF215_BACKOFF_PERIOD_IN_SYMBOLS (20U)
-
-/**
  * Default Parameters for 802.15.4 retransmissions & CSMA
  * @{
  */
