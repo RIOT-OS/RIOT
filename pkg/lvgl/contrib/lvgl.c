@@ -155,6 +155,10 @@ void lvgl_init(screen_dev_t *screen_dev)
 #endif
 
     lv_task_handler();
+}
+
+void lvgl_start(void)
+{
     _task_thread_pid = thread_create(_task_thread_stack, sizeof(_task_thread_stack),
                                      LVGL_TASK_THREAD_PRIO, THREAD_CREATE_STACKTEST,
                                      _task_thread, NULL, "_task_thread");
