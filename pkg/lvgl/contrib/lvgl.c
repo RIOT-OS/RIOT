@@ -19,6 +19,7 @@
 
 #include <assert.h>
 
+#include "kernel_defines.h"
 #include "thread.h"
 
 #include "xtimer.h"
@@ -97,7 +98,7 @@ static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *col
     lv_disp_flush_ready(drv);
 }
 
-#ifdef MODULE_TOUCH_DEV
+#if IS_USED(MODULE_TOUCH_DEV)
 /* adapted from https://github.com/lvgl/lvgl/tree/v6.1.2#add-littlevgl-to-your-project */
 static bool _touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
@@ -145,13 +146,14 @@ void lvgl_init(screen_dev_t *screen_dev)
     lv_disp_drv_register(&disp_drv);
     lv_disp_buf_init(&disp_buf, buf, NULL, LVGL_COLOR_BUF_SIZE);
 
-#ifdef MODULE_TOUCH_DEV
-    assert(screen_dev->touch);
-    lv_indev_drv_t indev_drv;
-    lv_indev_drv_init(&indev_drv);
-    indev_drv.type = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb = _touch_read;
-    lv_indev_drv_register(&indev_drv);
+#if IS_USED(MODULE_TOUCH_DEV)
+    if (screen_dev->touch) {
+        lv_indev_drv_t indev_drv;
+        lv_indev_drv_init(&indev_drv);
+        indev_drv.type = LV_INDEV_TYPE_POINTER;
+        indev_drv.read_cb = _touch_read;
+        lv_indev_drv_register(&indev_drv);
+    }
 #endif
 
     lv_task_handler();
