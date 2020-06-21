@@ -57,25 +57,15 @@ static inline SercomUsart *dev(uart_t dev)
     return uart_config[dev].dev;
 }
 
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
+static void _configure_pins(uart_t uart)
 {
-    if (uart >= UART_NUMOF) {
-        return UART_NODEV;
-    }
-
-    /* must disable here first to ensure idempotency */
-    dev(uart)->CTRLA.reg &= ~(SERCOM_USART_CTRLA_ENABLE);
-
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
-    /* set up the TX buffer */
-    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
-#endif
-
-    /* configure pins */
+    /* configure RX pin */
     if (uart_config[uart].rx_pin != GPIO_UNDEF) {
         gpio_init(uart_config[uart].rx_pin, GPIO_IN);
         gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
     }
+
+    /* configure TX pin */
     if (uart_config[uart].tx_pin != GPIO_UNDEF) {
         gpio_set(uart_config[uart].tx_pin);
         gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
@@ -95,6 +85,25 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         }
     }
 #endif
+}
+
+int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
+{
+    if (uart >= UART_NUMOF) {
+        return UART_NODEV;
+    }
+
+    /* must disable here first to ensure idempotency */
+    dev(uart)->CTRLA.reg &= ~(SERCOM_USART_CTRLA_ENABLE);
+
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    /* set up the TX buffer */
+    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
+#endif
+
+    /* configure pins */
+    _configure_pins(uart);
+
     /* enable peripheral clock */
     sercom_clk_en(dev(uart));
 
