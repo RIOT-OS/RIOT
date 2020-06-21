@@ -129,7 +129,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     /* must disable here first to ensure idempotency */
-    dev(uart)->CTRLA.reg &= ~(SERCOM_USART_CTRLA_ENABLE);
+    dev(uart)->CTRLA.reg = 0;
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
