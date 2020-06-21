@@ -52,6 +52,7 @@ config CPU_CORE
     default "cortex-m0plus" if CPU_CORE_CORTEX_M0PLUS
     default "cortex-m23" if CPU_CORE_CORTEX_M23
     default "cortex-m3" if CPU_CORE_CORTEX_M3
+    default "cortex-m33" if CPU_CORE_CORTEX_M33
     default "cortex-m4" if CPU_CORE_CORTEX_M4
     default "cortex-m4f" if CPU_CORE_CORTEX_M4F
     default "cortex-m7" if CPU_CORE_CORTEX_M7
@@ -74,6 +75,11 @@ config CPU_CORE_CORTEX_M23
 config CPU_CORE_CORTEX_M3
     bool
     select CPU_ARCH_ARMV7M
+    select CPU_CORE_CORTEX_M
+
+config CPU_CORE_CORTEX_M33
+    bool
+    select CPU_ARCH_ARMV8M
     select CPU_CORE_CORTEX_M
 
 config CPU_CORE_CORTEX_M4

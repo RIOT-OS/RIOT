@@ -40,8 +40,9 @@ typedef enum {
 #ifdef MODULE_CORTEXM_COMMON
     PANIC_NMI_HANDLER,          /**< non maskable interrupt */
     PANIC_HARD_FAULT,           /**< hard fault */
-#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M4) || \
-    defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)
+#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
+    defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
+    defined(CPU_CORE_CORTEX_M7)
     PANIC_MEM_MANAGE,           /**< memory controller interrupt */
     PANIC_BUS_FAULT,            /**< bus fault */
     PANIC_USAGE_FAULT,          /**< undefined instruction or unaligned access */

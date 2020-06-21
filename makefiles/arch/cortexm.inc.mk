@@ -85,16 +85,18 @@ ifneq (,$(filter cmsis-dsp,$(USEPKG)))
     CFLAGS += -DARM_MATH_CM0
   else ifeq ($(CPU_CORE),cortex-m0plus)
     CFLAGS += -DARM_MATH_CM0PLUS
+  else ifeq ($(CPU_CORE),cortex-m23)
+    CFLAGS += -DARM_MATH_CM23
   else ifeq ($(CPU_CORE),cortex-m3)
     CFLAGS += -DARM_MATH_CM3
+  else ifeq ($(CPU_CORE),cortex-m33)
+    CFLAGS += -DARM_MATH_CM33
   else ifeq ($(CPU_CORE),cortex-m4)
     CFLAGS += -DARM_MATH_CM4
   else ifeq ($(CPU_CORE),cortex-m4f)
     CFLAGS += -DARM_MATH_CM4
   else ifeq ($(CPU_CORE),cortex-m7)
     CFLAGS += -DARM_MATH_CM7
-  else ifeq ($(CPU_CORE),cortex-m23)
-    CFLAGS += -DARM_MATH_CM23
   endif
 endif
 

@@ -17,7 +17,7 @@
  * Members of the Cortex-M family know stacks and are able to handle register
  * backups partly, so we make use of that.
  *
- * Cortex-M3 and Cortex-M4 use the
+ * Cortex-M3, Cortex-M33 and Cortex-M4 use the
  * following register layout when saving their context onto the stack:
  *
  * -------- highest address (bottom of stack)
@@ -56,12 +56,12 @@
  * | R4   | <- R4 lowest address (top of stack)
  * --------
  *
- * For the Cortex-M0 and Cortex-M0plus we use a slightly different layout by
- * switching the blocks R11-R8 and R7-R4. This allows more efficient code when
- * saving/restoring the context:
+ * For the Cortex-M0, Cortex-M0+ and Cortex-M23 we use a slightly different
+ * layout by switching the blocks R11-R8 and R7-R4. This allows more efficient
+ * code when saving/restoring the context:
  *
  * ------------- highest address (bottom of stack)
- * | xPSR - R0 | <- same as for Cortex-M3/4
+ * | xPSR - R0 | <- same as for Cortex-M3/33/4
  * -------------
  * | RET  | <- exception return code
  * --------
@@ -109,8 +109,8 @@ extern uint32_t _sstack;
 /**
  * @brief   CPU core supports full Thumb instruction set
  */
-#if defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS) \
-    || defined(CPU_CORE_CORTEX_M23)
+#if defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS) || \
+    defined(CPU_CORE_CORTEX_M23)
 #define CPU_CORE_CORTEXM_FULL_THUMB 0
 #else
 #define CPU_CORE_CORTEXM_FULL_THUMB 1
@@ -198,10 +198,11 @@ char *thread_stack_init(thread_task_func_t task_func,
 
     /* The following registers are not handled by hardware in return from
      * exception, but manually by select_and_restore_context.
-     * For the Cortex-M0(plus) we write registers R11-R4 in two groups to allow
-     * for more efficient context save/restore code.
-     * For the Cortex-M3 and Cortex-M4 we write them continuously onto the stack
-     * as they can be read/written continuously by stack instructions. */
+     * For the Cortex-M0, Cortex-M0+ and Cortex-M23 we write registers R11-R4
+     * in two groups to allow for more efficient context save/restore code.
+     * For the Cortex-M3, Cortex-M33 and Cortex-M4 we write them continuously
+     * onto the stack as they can be read/written continuously by stack
+     * instructions. */
 
     /* exception return code  - return to task-mode process stack pointer */
     stk--;
@@ -359,7 +360,7 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
                                            * causes end of exception*/
 #else /* CPU_CORE_CORTEXM_FULL_THUMB */
 
-    /* Cortex-M0(+) and Cortex-M23 */
+    /* Cortex-M0, Cortex-M0+ and Cortex-M23 */
     "cmp    r0, r12                   \n" /* if r0 == previous_thread: */
     "bne    cont_schedule             \n" /*   jump over pop if r0 != 0 */
     "pop    {pc}                      \n" /*   Pop exception return to PC */

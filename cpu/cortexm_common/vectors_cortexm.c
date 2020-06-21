@@ -437,8 +437,9 @@ void hard_fault_default(void)
 
 #endif /* DEVELHELP */
 
-#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M4) || \
-    defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)
+#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
+    defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
+    defined(CPU_CORE_CORTEX_M7)
 void mem_manage_default(void)
 {
     core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER");
@@ -503,9 +504,10 @@ ISR_VECTOR(0) const cortexm_base_t cortex_vector_base = {
         [9] = (isr_t)(CORTEXM_VECTOR_RESERVED_0X28),
         #endif  /* CORTEXM_VECTOR_RESERVED_0X28 */
 
-        /* additional vectors used by M3, M4(F), and M7 */
-#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M4) || \
-    defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)
+        /* additional vectors used by M3, M33, M4(F), and M7 */
+#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
+    defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
+    defined(CPU_CORE_CORTEX_M7)
         /* [-12] memory manage exception */
         [ 3] = mem_manage_default,
         /* [-11] bus fault exception */

@@ -31,9 +31,16 @@ LINKFLAGS += $(if $(ROM_OFFSET),$(LINKFLAGPREFIX)--defsym=_rom_offset=$(ROM_OFFS
 # FW_ROM_LEN: rom length to use for firmware linking. Allows linking only in a section of the rom.
 LINKFLAGS += $(if $(FW_ROM_LEN),$(LINKFLAGPREFIX)--defsym=_fw_rom_length=$(FW_ROM_LEN))
 
-# Cortex-M0+/1/3/4/7 riotboot settings
+# Cortex-M riotboot settings
 
-# From ARMv7-M (M4, M3, M7) architecture reference manual, section B1.5.3
+# From ARMv8-M (M23, M33) architecture reference manual, section B3.27
+# https://static.docs.arm.com/ddi0553/a/DDI0553A_e_armv8m_arm.pdf
+# "In a PE with a configurable vector table base, the vector table must be
+# naturally aligned to a power of two, with an alignment value that is:
+# * A minimum of 128 bytes.
+# * Greater than or equal to (Number of Exceptions supported x4)."
+
+# From ARMv7-M (M4, M4F, M3, M7) architecture reference manual, section B1.5.3
 # https://static.docs.arm.com/ddi0403/e/DDI0403E_d_armv7m_arm.pdf
 # "The Vector table must be naturally aligned to a power of two whose alignment
 # value is greater than or equal to number of Exceptions supported x 4"
@@ -47,13 +54,16 @@ LINKFLAGS += $(if $(FW_ROM_LEN),$(LINKFLAGPREFIX)--defsym=_fw_rom_length=$(FW_RO
 
 # For reference on the max number in interrupts per processor look in The
 # technical reference manual "Interrupt Controller Type Register, ICTR" section.
-# * For M4, M3 & M7: Maximum of 256 exceptions (256*4 bytes == 0x400).
+# * For M23 & M33: Maximum of 480 exception (480 * 4 bytes ~= 0x800).
+# * For M4, M4F, M3 & M7: Maximum of 256 exceptions (256*4 bytes == 0x400).
 # * For M0, M0+ & M1: Maximum of 48 exceptions (48*4 bytes = 192 bytes ~= 0x100).
 
 # The values defined here are a theoretical maximum, in practice most cpu's
 # CPU_IRQ_NUMOF value is around 100, in these cases the value can be reduced
 # accordingly in the cpu Makefile.include, e.g: `kinetis/Makefile.include`
-ifneq (,$(filter cortex-m2% cortex-m4% cortex-m3% cortex-m7%,$(CPU_CORE)))
+ifneq (,$(filter cortex-m23% cortex-m33%,$(CPU_CORE)))
+  RIOTBOOT_HDR_LEN ?= 0x800
+else ifneq (,$(filter cortex-m3% cortex-m4% cortex-m7%,$(CPU_CORE)))
   RIOTBOOT_HDR_LEN ?= 0x400
 else
   RIOTBOOT_HDR_LEN ?= 0x100

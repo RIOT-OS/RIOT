@@ -73,8 +73,9 @@ void cortexm_init(void)
     cortexm_init_fpu();
 
     /* configure the vector table location to internal flash */
-#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M4) || \
-    defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7) || \
+#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
+    defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
+    defined(CPU_CORE_CORTEX_M7) || \
     (defined(CPU_CORE_CORTEX_M0PLUS) || defined(CPU_CORE_CORTEX_M23) \
     && (__VTOR_PRESENT == 1))
     SCB->VTOR = (uint32_t)&_isr_vectors;
@@ -86,8 +87,9 @@ void cortexm_init(void)
 
 bool cpu_check_address(volatile const char *address)
 {
-#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M4) || \
-    defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)
+#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
+    defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
+    defined(CPU_CORE_CORTEX_M7)
     static const uint32_t BFARVALID_MASK = (0x80 << SCB_CFSR_BUSFAULTSR_Pos);
 
     bool is_valid = true;
