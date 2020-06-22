@@ -1,0 +1,35 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_ATMEGA256
+    bool
+    select CPU_COMMON_ATMEGA
+
+## CPU Models
+config CPU_MODEL_ATMEGA2560
+    bool
+    select CPU_FAM_ATMEGA256
+    select HAS_ATMEGA_PCINT1
+    select HAS_ATMEGA_PCINT2
+    select HAS_CPU_ATMEGA2560
+
+## Definition of specific features
+config HAS_CPU_ATMEGA2560
+    bool
+    help
+        Indicates that a 'atmega2560' cpu is being used.
+
+## Common CPU symbols
+config CPU_FAM
+    default "atmega256" if CPU_FAM_ATMEGA256
+
+config CPU_MODEL
+    default "atmega2560" if CPU_MODEL_ATMEGA2560
+
+config CPU
+    default "atmega2560" if CPU_FAM_ATMEGA256
+
+source "$(RIOTCPU)/atmega_common/Kconfig"
