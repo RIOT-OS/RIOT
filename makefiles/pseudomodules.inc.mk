@@ -1,4 +1,8 @@
 PSEUDOMODULES += at_urc
+PSEUDOMODULES += at_urc_isr
+PSEUDOMODULES += at_urc_isr_low
+PSEUDOMODULES += at_urc_isr_medium
+PSEUDOMODULES += at_urc_isr_highest
 PSEUDOMODULES += at24c%
 PSEUDOMODULES += base64url
 PSEUDOMODULES += can_mbox
