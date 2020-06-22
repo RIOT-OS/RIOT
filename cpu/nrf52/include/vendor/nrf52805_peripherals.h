@@ -30,8 +30,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef _NRF52811_PERIPHERALS_H
-#define _NRF52811_PERIPHERALS_H
+#ifndef _NRF52805_PERIPHERALS_H
+#define _NRF52805_PERIPHERALS_H
 
 
 /* Clock Peripheral */
@@ -76,7 +76,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #define RADIO_COUNT 1
 
 #define RADIO_EASYDMA_MAXCNT_SIZE 8
-#define RADIO_FEATURE_IEEE_802_15_4_PRESENT
 
 #define RADIO_TXPOWER_TXPOWER_Max RADIO_TXPOWER_TXPOWER_Pos4dBm
 
@@ -98,7 +97,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define PPI_PRESENT
 #define PPI_COUNT 1
 
-#define PPI_CH_NUM 20
+#define PPI_CH_NUM 10
 #define PPI_FIXED_CH_NUM 12
 #define PPI_GROUP_NUM 6
 #define PPI_FEATURE_FORKS_PRESENT
@@ -197,10 +196,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #define UARTE0_EASYDMA_MAXCNT_SIZE 14
 
-/* Quadrature Decoder */
-#define QDEC_PRESENT
-#define QDEC_COUNT 1
-
 /* Successive Approximation Analog to Digital Converter */
 #define SAADC_PRESENT
 #define SAADC_COUNT 1
@@ -218,23 +213,5 @@ POSSIBILITY OF SUCH DAMAGE.
 #define GPIOTE_FEATURE_SET_PRESENT
 #define GPIOTE_FEATURE_CLR_PRESENT
 
-/* Comparator */
-#define COMP_PRESENT
-#define COMP_COUNT 1
 
-/* Pulse Width Modulator */
-#define PWM_PRESENT
-#define PWM_COUNT 1
-
-#define PWM0_CH_NUM 4
-
-#define PWM0_EASYDMA_MAXCNT_SIZE 15
-
-/* Pulse Density Modulator */
-#define PDM_PRESENT
-#define PDM_COUNT 1
-
-#define PDM_EASYDMA_MAXCNT_SIZE 15
-
-
-#endif      // _NRF52811_PERIPHERALS_H
+#endif      // _NRF52805_PERIPHERALS_H

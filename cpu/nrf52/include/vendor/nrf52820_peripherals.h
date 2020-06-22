@@ -30,9 +30,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-#ifndef _NRF52811_PERIPHERALS_H
-#define _NRF52811_PERIPHERALS_H
-
+#ifndef _NRF52820_PERIPHERALS_H
+#define _NRF52820_PERIPHERALS_H
 
 /* Clock Peripheral */
 #define CLOCK_PRESENT
@@ -43,7 +42,9 @@ POSSIBILITY OF SUCH DAMAGE.
 #define POWER_COUNT 1
 
 #define POWER_FEATURE_RAM_REGISTERS_PRESENT
-#define POWER_FEATURE_RAM_REGISTERS_COUNT       3
+#define POWER_FEATURE_RAM_REGISTERS_COUNT       4
+
+#define POWER_FEATURE_VDDH_PRESENT
 
 /* Non-Volatile Memory Controller */
 #define NVMC_PRESENT
@@ -61,24 +62,22 @@ POSSIBILITY OF SUCH DAMAGE.
 #define GPIO_PRESENT
 #define GPIO_COUNT 1
 
-#define P0_PIN_NUM 32
+#define P0_PIN_NUM (18)
+#define P0_FEATURE_PINS_PRESENT (nrf52_errata_230() ? 0xF0168E3Ful : 0x7017C1FFul)
 
-#define P0_FEATURE_PINS_PRESENT 0xFFFFFFFFUL
+/* ACL */
+#define ACL_PRESENT
 
-/* MPU and BPROT */
-#define BPROT_PRESENT
-
-#define BPROT_REGIONS_SIZE 4096
-#define BPROT_REGIONS_NUM 48
+#define ACL_REGIONS_COUNT 8
 
 /* Radio */
 #define RADIO_PRESENT
 #define RADIO_COUNT 1
 
-#define RADIO_EASYDMA_MAXCNT_SIZE 8
+#define RADIO_EASYDMA_MAXCNT_SIZE 16
 #define RADIO_FEATURE_IEEE_802_15_4_PRESENT
 
-#define RADIO_TXPOWER_TXPOWER_Max RADIO_TXPOWER_TXPOWER_Pos4dBm
+#define RADIO_TXPOWER_TXPOWER_Max RADIO_TXPOWER_TXPOWER_Pos8dBm
 
 /* Accelerated Address Resolver */
 #define AAR_PRESENT
@@ -105,22 +104,28 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /* Event Generator Unit */
 #define EGU_PRESENT
-#define EGU_COUNT 2
+#define EGU_COUNT 6
 
 #define EGU0_CH_NUM 16
 #define EGU1_CH_NUM 16
+#define EGU2_CH_NUM 16
+#define EGU3_CH_NUM 16
+#define EGU4_CH_NUM 16
+#define EGU5_CH_NUM 16
 
 /* Timer/Counter */
 #define TIMER_PRESENT
-#define TIMER_COUNT 3
+#define TIMER_COUNT 4
 
 #define TIMER0_MAX_SIZE 32
 #define TIMER1_MAX_SIZE 32
 #define TIMER2_MAX_SIZE 32
+#define TIMER3_MAX_SIZE 32
 
 #define TIMER0_CC_NUM 4
 #define TIMER1_CC_NUM 4
 #define TIMER2_CC_NUM 4
+#define TIMER3_CC_NUM 6
 
 /* Real Time Counter */
 #define RTC_PRESENT
@@ -161,31 +166,33 @@ POSSIBILITY OF SUCH DAMAGE.
 #define SPIM0_FEATURE_RXDELAY_PRESENT  0
 #define SPIM1_FEATURE_RXDELAY_PRESENT  0
 
-#define SPIM0_EASYDMA_MAXCNT_SIZE 14
-#define SPIM1_EASYDMA_MAXCNT_SIZE 14
+#define SPIM0_EASYDMA_MAXCNT_SIZE 16
+#define SPIM1_EASYDMA_MAXCNT_SIZE 16
 
 /* Serial Peripheral Interface Slave with DMA*/
 #define SPIS_PRESENT
 #define SPIS_COUNT 2
 
-#define SPIS0_EASYDMA_MAXCNT_SIZE 14
-#define SPIS1_EASYDMA_MAXCNT_SIZE 14
+#define SPIS0_EASYDMA_MAXCNT_SIZE 16
+#define SPIS1_EASYDMA_MAXCNT_SIZE 16
 
 /* Two Wire Interface Master */
 #define TWI_PRESENT
-#define TWI_COUNT 1
+#define TWI_COUNT 2
 
 /* Two Wire Interface Master with DMA */
 #define TWIM_PRESENT
-#define TWIM_COUNT 1
+#define TWIM_COUNT 2
 
-#define TWIM0_EASYDMA_MAXCNT_SIZE 14
+#define TWIM0_EASYDMA_MAXCNT_SIZE 16
+#define TWIM1_EASYDMA_MAXCNT_SIZE 16
 
 /* Two Wire Interface Slave with DMA */
 #define TWIS_PRESENT
-#define TWIS_COUNT 1
+#define TWIS_COUNT 2
 
-#define TWIS0_EASYDMA_MAXCNT_SIZE 14
+#define TWIS0_EASYDMA_MAXCNT_SIZE 16
+#define TWIS1_EASYDMA_MAXCNT_SIZE 16
 
 /* Universal Asynchronous Receiver-Transmitter */
 #define UART_PRESENT
@@ -195,19 +202,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #define UARTE_PRESENT
 #define UARTE_COUNT 1
 
-#define UARTE0_EASYDMA_MAXCNT_SIZE 14
+#define UARTE0_EASYDMA_MAXCNT_SIZE 16
 
 /* Quadrature Decoder */
 #define QDEC_PRESENT
 #define QDEC_COUNT 1
-
-/* Successive Approximation Analog to Digital Converter */
-#define SAADC_PRESENT
-#define SAADC_COUNT 1
-
-#define SAADC_EASYDMA_MAXCNT_SIZE 15
-
-#define SAADC_CH_NUM 8
 
 /* GPIO Tasks and Events */
 #define GPIOTE_PRESENT
@@ -222,19 +221,11 @@ POSSIBILITY OF SUCH DAMAGE.
 #define COMP_PRESENT
 #define COMP_COUNT 1
 
-/* Pulse Width Modulator */
-#define PWM_PRESENT
-#define PWM_COUNT 1
 
-#define PWM0_CH_NUM 4
+/* Universal Serial Bus Device */
+#define USBD_PRESENT
+#define USBD_COUNT 1
 
-#define PWM0_EASYDMA_MAXCNT_SIZE 15
+#define USBD_EASYDMA_MAXCNT_SIZE 7
 
-/* Pulse Density Modulator */
-#define PDM_PRESENT
-#define PDM_COUNT 1
-
-#define PDM_EASYDMA_MAXCNT_SIZE 15
-
-
-#endif      // _NRF52811_PERIPHERALS_H
+#endif      // _NRF52820_PERIPHERALS_H
