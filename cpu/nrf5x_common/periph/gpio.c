@@ -71,11 +71,11 @@ static inline NRF_GPIO_Type *port(gpio_t pin)
 #if (CPU_FAM_NRF51)
     (void) pin;
     return NRF_GPIO;
-#elif defined(CPU_MODEL_NRF52832XXAA)
+#elif defined(NRF_P1)
+    return (pin & PORT_BIT) ? NRF_P1 : NRF_P0;
+#else
     (void) pin;
     return NRF_P0;
-#else
-    return (pin & PORT_BIT) ? NRF_P1 : NRF_P0;
 #endif
 }
 
