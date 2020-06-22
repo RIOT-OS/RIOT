@@ -1,6 +1,5 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
- *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -12,10 +11,9 @@
  * @{
  *
  * @file
- * @brief       nRF52 interrupt vector definitions
+ * @brief       nRF52840 interrupt vector definitions
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- * @author      Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * @}
  */
@@ -47,6 +45,7 @@ WEAK_DEFAULT void isr_timer1(void);
 WEAK_DEFAULT void isr_timer2(void);
 WEAK_DEFAULT void isr_rtc0(void);
 WEAK_DEFAULT void isr_temp(void);
+WEAK_DEFAULT void isr_twi0(void);
 WEAK_DEFAULT void isr_rng(void);
 WEAK_DEFAULT void isr_ecb(void);
 WEAK_DEFAULT void isr_ccm_aar(void);
@@ -84,8 +83,6 @@ WEAK_DEFAULT void isr_pwm2(void);
 WEAK_DEFAULT void isr_spi2(void);
 WEAK_DEFAULT void isr_rtc2(void);
 WEAK_DEFAULT void isr_i2s(void);
-
-#ifdef CPU_MODEL_NRF52840XXAA
 WEAK_DEFAULT void isr_fpu(void);
 WEAK_DEFAULT void isr_usbd(void);
 WEAK_DEFAULT void isr_uarte1(void);
@@ -93,46 +90,11 @@ WEAK_DEFAULT void isr_qspi(void);
 WEAK_DEFAULT void isr_cryptocell(void);
 WEAK_DEFAULT void isr_spi3(void);
 WEAK_DEFAULT void isr_pwm3(void);
-#endif
 
 #ifdef SOFTDEVICE_PRESENT
 extern void SWI2_EGU2_IRQHandler(void);
 #endif
 
-#if defined(CPU_MODEL_NRF52811XXAA)
-/* CPU specific interrupt vector table */
-ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
-    isr_power_clock,       /* power_clock */
-    isr_radio,             /* radio */
-    isr_uart0,             /* uart0 */
-    isr_spi1_twi0,         /* spi1_twi0 */
-    isr_spi0,              /* spi 0 */
-    (0UL),                 /* reserved */
-    isr_gpiote,            /* gpiote */
-    isr_saadc,             /* adc */
-    isr_timer0,            /* timer0 */
-    isr_timer1,            /* timer1 */
-    isr_timer2,            /* timer2 */
-    isr_rtc0,              /* rtc0 */
-    isr_temp,              /* temp */
-    isr_rng,               /* rng */
-    isr_ecb,               /* ecb */
-    isr_ccm_aar,           /* ccm_aar */
-    isr_wdt,               /* wdt */
-    isr_rtc1,              /* rtc1 */
-    isr_qdec,              /* qdec */
-    isr_lpcomp,            /* lpcomp */
-    isr_swi0,              /* swi0 */
-    isr_swi1,              /* swi1 */
-    isr_swi3,              /* swi3 */
-    isr_swi4,              /* swi4 */
-    isr_swi5,              /* swi5 */
-    (0UL),                 /* reserved */
-    (0UL),                 /* reserved */
-    isr_pwm0,              /* pwm 0 */
-    isr_pdm,               /* pdm */
-};
-#else
 /* CPU specific interrupt vector table */
 ISR_VECTOR(1)
 const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
@@ -178,7 +140,6 @@ const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_spi2,              /* spi 2 */
     isr_rtc2,              /* rtc 2 */
     isr_i2s,               /* i2s */
-#ifdef CPU_MODEL_NRF52840XXAA
     isr_fpu,               /* fpu */
     isr_usbd,              /* usbc */
     isr_uarte1,            /* uarte1 */
@@ -187,6 +148,4 @@ const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_spi3,              /* spi3 */
     (0UL),                 /* reserved */
     isr_pwm3,              /* pwm3 */
-#endif
 };
-#endif
