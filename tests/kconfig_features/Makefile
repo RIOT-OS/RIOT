@@ -4,6 +4,7 @@ BOARD_WHITELIST += arduino-duemilanove \
                    arduino-mega2560 \
                    arduino-nano \
                    arduino-uno \
+                   atmega1284p \
                    atmega328p \
                    cc1312-launchpad \
                    cc1352-launchpad \
@@ -12,6 +13,7 @@ BOARD_WHITELIST += arduino-duemilanove \
                    cc2650stk \
                    derfmega128 \
                    ikea-tradfri \
+                   mega-xplained \
                    microduino-corerf \
                    samr21-xpro \
                    slstk3401a \
@@ -20,7 +22,8 @@ BOARD_WHITELIST += arduino-duemilanove \
                    slwstk6000b-slwrb4150a \
                    slwstk6000b-slwrb4162a \
                    stk3600 \
-                   stk3700
+                   stk3700 \
+                   waspmote-pro
 
 
 all: checks
