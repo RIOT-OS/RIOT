@@ -86,10 +86,6 @@ void cc2538_init(void)
         *pair->reg_addr = pair->value;
     }
 
-    cc2538_set_tx_power(CC2538_RF_POWER_DEFAULT);
-    cc2538_set_chan(CC2538_RF_CHANNEL_DEFAULT);
-    cc2538_set_addr_long(cc2538_get_eui64_primary());
-
     /* Select the observable signals (maximum of three) */
     RFCORE_XREG_RFC_OBS_CTRL0 = tx_active;
     RFCORE_XREG_RFC_OBS_CTRL1 = rx_active;
@@ -137,7 +133,6 @@ void cc2538_init(void)
     RFCORE_SFR_RFST = ISFLUSHRX;
     /* Disable/filter l2 Acks */
     RFCORE_XREG_FRMFILT1 &= ~CC2538_ACCEPT_FT_2_ACK;
-    cc2538_on();
 }
 
 bool cc2538_is_on(void)
@@ -177,4 +172,9 @@ void cc2538_setup(cc2538_rf_t *dev)
     netdev->driver = &cc2538_rf_driver;
 
     cc2538_init();
+    cc2538_set_tx_power(CC2538_RF_POWER_DEFAULT);
+    cc2538_set_chan(CC2538_RF_CHANNEL_DEFAULT);
+    cc2538_set_addr_long(cc2538_get_eui64_primary());
+
+    cc2538_on();
 }
