@@ -1,0 +1,33 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_ATMEGA32
+    bool
+    select CPU_COMMON_ATMEGA
+
+## CPU Models
+config CPU_MODEL_ATMEGA32U4
+    bool
+    select CPU_FAM_ATMEGA32
+    select HAS_CPU_ATMEGA32U4
+
+## Definition of specific features
+config HAS_CPU_ATMEGA32U4
+    bool
+    help
+        Indicates that a 'atmega32u4' cpu is being used.
+
+## Common CPU symbols
+config CPU_FAM
+    default "atmega32" if CPU_FAM_ATMEGA32
+
+config CPU_MODEL
+    default "atmega32u4" if CPU_MODEL_ATMEGA32U4
+
+config CPU
+    default "atmega32u4" if CPU_MODEL_ATMEGA32U4
+
+source "$(RIOTCPU)/atmega_common/Kconfig"
