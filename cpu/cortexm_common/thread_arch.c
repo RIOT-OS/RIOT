@@ -280,7 +280,7 @@ void thread_yield_higher(void)
 {
     /* trigger the PENDSV interrupt to run scheduler and schedule new thread if
      * applicable */
-    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
 }
 
 void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
@@ -432,7 +432,7 @@ static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
 
     switch (svc_number) {
         case 1: /* SVC number used by cpu_switch_context_exit */
-            SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+            SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
             break;
         default:
             DEBUG("svc: unhandled SVC #%u\n", svc_number);
@@ -443,6 +443,6 @@ static void __attribute__((used)) _svc_dispatch(unsigned int *svc_args)
 #else /* MODULE_CORTEXM_SVC */
 void __attribute__((used)) isr_svc(void)
 {
-    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
 }
 #endif /* MODULE_CORTEXM_SVC */
