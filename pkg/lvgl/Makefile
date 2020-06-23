@@ -18,7 +18,6 @@ LVGL_MODULES =  \
 .PHONY: lvgl_%
 
 all: $(LVGL_MODULES)
-	"$(MAKE)" -C $(PKG_BUILDDIR) -f $(CURDIR)/Makefile.$(PKG_NAME)
 
 lvgl_%:
 	MODULE=$@ "$(MAKE)" -C $(PKG_BUILDDIR)/src/lv_$* -f $(CURDIR)/Makefile.lvgl_module
