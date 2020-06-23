@@ -506,12 +506,12 @@ typedef struct {
  */
 #ifdef MODULE_ESP_HW_COUNTER
 /** hardware ccount/ccompare registers are used for timer implementation */
-#define TIMER_NUMOF     (2)
-#define TIMER_CHANNELS  (1)
+#define TIMER_NUMOF         (2)
+#define TIMER_CHANNEL_NUMOF (1)
 #else
 /** hardware timer modules are used for timer implementation (default) */
-#define TIMER_NUMOF     (3)
-#define TIMER_CHANNELS  (1)
+#define TIMER_NUMOF         (3)
+#define TIMER_CHANNEL_NUMOF (1)
 #endif
 
 /** Timer used for system time */

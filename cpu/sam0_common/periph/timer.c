@@ -41,17 +41,17 @@ static uint32_t _oneshot;
 
 static inline void set_oneshot(tim_t tim, int chan)
 {
-    _oneshot |= (1 << chan) << (TIMER_CHANNELS * tim);
+    _oneshot |= (1 << chan) << (TIMER_CHANNEL_NUMOF * tim);
 }
 
 static inline void clear_oneshot(tim_t tim, int chan)
 {
-    _oneshot &= ~((1 << chan) << (TIMER_CHANNELS * tim));
+    _oneshot &= ~((1 << chan) << (TIMER_CHANNEL_NUMOF * tim));
 }
 
 static inline bool is_oneshot(tim_t tim, int chan)
 {
-    return _oneshot & ((1 << chan) << (TIMER_CHANNELS * tim));
+    return _oneshot & ((1 << chan) << (TIMER_CHANNEL_NUMOF * tim));
 }
 
 static inline TcCount32 *dev(tim_t tim)

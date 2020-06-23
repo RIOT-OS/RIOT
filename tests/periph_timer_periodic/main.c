@@ -41,7 +41,7 @@
 #define CYCLE_MS    100UL
 #define CYCLES_MAX   10
 
-static unsigned count[TIMER_CHANNELS];
+static unsigned count[TIMER_CHANNEL_NUMOF];
 
 static void cb(void *arg, int chan)
 {
@@ -93,7 +93,7 @@ int main(void)
     puts("\nCycles:");
 
     bool succeeded = true;
-    for (unsigned i = 0; i < TIMER_CHANNELS; ++i) {
+    for (unsigned i = 0; i < TIMER_CHANNEL_NUMOF; ++i) {
         printf("channel %u = %02u\t[%s]\n", i, count[i], _print_ok(i, &succeeded));
     }
 

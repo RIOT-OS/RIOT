@@ -353,7 +353,7 @@ typedef struct {
 /**
  * @brief   Number of available timer channels
  */
-#define TIMER_CHANNELS      (2)
+#define TIMER_CHANNEL_NUMOF (2)
 
 /**
  * @brief   Set up alternate function (PMUX setting) for a PORT pin
