@@ -41,8 +41,6 @@ RIOTMAKE            ?= $(RIOTBASE)/makefiles
 RIOTPKG             ?= $(RIOTBASE)/pkg
 RIOTTOOLS           ?= $(RIOTBASE)/dist/tools
 RIOTPROJECT         ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
-GITCACHE            ?= $(RIOTTOOLS)/git/git-cache
-GIT_CACHE_DIR       ?= $(HOME)/.gitcache
 BUILD_DIR           ?= $(RIOTBASE)/build
 APPDIR              ?= $(CURDIR)
 BINDIRBASE          ?= $(APPDIR)/bin
@@ -65,7 +63,6 @@ __DIRECTORY_VARIABLES := \
   BUILD_DIR \
   BINDIRBASE \
   BINDIR \
-  GITCACHE \
   PKGDIRBASE \
   DLCACHE_DIR \
   #
@@ -115,7 +112,6 @@ override RIOTMAKE               := $(abspath $(RIOTMAKE))
 override RIOTPKG                := $(abspath $(RIOTPKG))
 override RIOTTOOLS              := $(abspath $(RIOTTOOLS))
 override RIOTPROJECT            := $(abspath $(RIOTPROJECT))
-override GITCACHE               := $(abspath $(GITCACHE))
 override APPDIR                 := $(abspath $(APPDIR))
 override BUILD_DIR              := $(abspath $(BUILD_DIR))
 override BINDIRBASE             := $(abspath $(BINDIRBASE))

@@ -81,8 +81,8 @@ export WERROR                # Treat all compiler warnings as errors if set to 1
 export WPEDANTIC             # Issue all (extensive) compiler warnings demanded by strict C/C++
 # EEPROM_FILE                # (Native only!) file path where the content of the EEPROM is stored
 
-export GITCACHE              # path to git-cache executable
-export GIT_CACHE_DIR         # path to git-cache cache directory
+# GITCACHE                   # path to git-cache executable
+# GIT_CACHE_DIR              # path to git-cache cache directory, only used with packages
 # FLASHER                    # The command to call on "make flash".
 # PROG_DEV                   # The device to connect the FLASHER and DEBUGGER
 # FFLAGS                     # The parameters to supply to FLASHER.
