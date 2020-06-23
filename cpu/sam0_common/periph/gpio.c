@@ -36,6 +36,13 @@
  */
 #define MODE_PINCFG_MASK            (0x06)
 
+/**
+ * @brief   The GCLK used for clocking EXTI
+ */
+#ifndef CONFIG_SAM0_GCLK_GPIO
+#define CONFIG_SAM0_GCLK_GPIO       (SAM0_GCLK_MAIN)
+#endif
+
 #ifdef MODULE_PERIPH_GPIO_IRQ
 
 /**
@@ -207,16 +214,14 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 #ifdef CPU_FAM_SAMD21
     /* enable clocks for the EIC module */
     PM->APBAMASK.reg |= PM_APBAMASK_EIC;
-    /* SAMD21 used GCLK2 which is supplied by either the ultra low power
-       internal or external 32 kHz */
     GCLK->CLKCTRL.reg = EIC_GCLK_ID
                       | GCLK_CLKCTRL_CLKEN
-                      | GCLK_CLKCTRL_GEN(SAM0_GCLK_32KHZ);
+                      | GCLK_CLKCTRL_GEN(CONFIG_SAM0_GCLK_GPIO);
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 #else /* CPU_FAM_SAML21 */
     /* enable clocks for the EIC module */
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_EIC;
-    GCLK->PCHCTRL[EIC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(SAM0_GCLK_MAIN);
+    GCLK->PCHCTRL[EIC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(CONFIG_SAM0_GCLK_GPIO);
     /* disable the EIC module*/
     _EIC->CTRLA.reg = 0;
     EIC_SYNC();
@@ -258,7 +263,7 @@ inline static void reenable_eic(gpio_eic_clock_t clock) {
     } else {
         GCLK->CLKCTRL.reg = EIC_GCLK_ID
                           | GCLK_CLKCTRL_CLKEN
-                          | GCLK_CLKCTRL_GEN(SAM0_GCLK_MAIN);
+                          | GCLK_CLKCTRL_GEN(CONFIG_SAM0_GCLK_GPIO);
     }
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 #else
