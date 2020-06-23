@@ -36,6 +36,9 @@ static netdev_t *_dev;
 
 void _irq_handler(void)
 {
+    RFCORE_SFR_RFIRQF0 = 0;
+    RFCORE_SFR_RFIRQF1 = 0;
+
     netdev_trigger_event_isr(_dev);
 }
 
