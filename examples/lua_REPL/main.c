@@ -23,7 +23,7 @@
 
 #include "lua_run.h"
 #include "lua_builtin.h"
-#include "repl.lua.h"
+#include "blob/repl.lua.h"
 
 /* The basic interpreter+repl needs about 13k ram AT Minimum but we need more
  * memory in order to do interesting stuff.
