@@ -134,6 +134,18 @@ enum {
     RXMASKZERO       = BIT(7),
 };
 
+/*
+ * @brief RFCORE_XREG_RFIRQM1 / RFCORE_XREG_RFIRQF1 bits
+ */
+enum {
+    TXACKDONE        = BIT(0),
+    TXDONE           = BIT(1),
+    RF_IDLE          = BIT(2),
+    CSP_MANINT       = BIT(3),
+    CSP_STOP         = BIT(4),
+    CSP_WAIT         = BIT(5),
+};
+
 /* Values for use with CCTEST_OBSSELx registers: */
 #define OBSSEL_EN BIT(7)
 enum {
