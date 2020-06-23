@@ -41,13 +41,18 @@ extern "C" {
 #ifndef SOFT_UART_PARAM_FREQ
 #define SOFT_UART_PARAM_FREQ        MHZ(1)
 #endif
+#ifndef SOFT_UART_PARAM_FLAGS
+#define SOFT_UART_PARAM_FLAGS       (0)
+#endif
 
 #ifndef SOFT_UART_PARAMS
 #define SOFT_UART_PARAMS     { .rx_pin = SOFT_UART_PARAM_RX,    \
                                .tx_pin = SOFT_UART_PARAM_TX,    \
                                .rx_timer = SOFT_UART_PARAM_TIMER_RX, \
                                .tx_timer = SOFT_UART_PARAM_TIMER_TX, \
-                               .timer_freq = SOFT_UART_PARAM_FREQ }
+                               .timer_freq = SOFT_UART_PARAM_FREQ, \
+                               .flags = SOFT_UART_PARAM_FLAGS, \
+                             }
 #endif
 
 /**

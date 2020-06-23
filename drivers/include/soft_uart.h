@@ -38,6 +38,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief invert the level of the TX signal
+ */
+#define SOFT_UART_FLAG_INVERT_TX    0x1
+
+/**
+ * @brief invert the level of the RX signal
+ */
+#define SOFT_UART_FLAG_INVERT_RX    0x2
+
+/**
  * @brief Software UART port descriptor
  */
 typedef struct {
@@ -47,6 +57,7 @@ typedef struct {
     tim_t tx_timer;         /**< Hardware timer used for TX */
     uint32_t timer_freq;    /**< Operating frequency of the timer.
                                  Should be a multiple of baudrate */
+    uint8_t flags;          /**< Soft UART flags */
 } soft_uart_conf_t;
 
 /**
