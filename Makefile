@@ -22,7 +22,11 @@ clean:
 	@echo "Cleaning all build products for the current board"
 	@for dir in $(APPLICATION_DIRS); do "$(MAKE)" -C$$dir clean; done
 
-distclean: docclean
+pkg-clean:
+	@echo "Cleaning all package sources"
+	rm -rf build/pkg
+
+distclean: docclean pkg-clean
 	@echo "Cleaning all build products"
 	@for dir in $(APPLICATION_DIRS); do "$(MAKE)" -C$$dir distclean; done
 
