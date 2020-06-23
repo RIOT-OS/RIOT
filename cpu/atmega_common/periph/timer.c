@@ -78,17 +78,17 @@ static unsigned _oneshot;
 
 static inline void set_oneshot(tim_t tim, int chan)
 {
-    _oneshot |= (1 << chan) << (TIMER_CHANNELS * tim);
+    _oneshot |= (1 << chan) << (TIMER_CHANNEL_NUMOF * tim);
 }
 
 static inline void clear_oneshot(tim_t tim, int chan)
 {
-    _oneshot &= ~((1 << chan) << (TIMER_CHANNELS * tim));
+    _oneshot &= ~((1 << chan) << (TIMER_CHANNEL_NUMOF * tim));
 }
 
 static inline bool is_oneshot(tim_t tim, int chan)
 {
-    return _oneshot & ((1 << chan) << (TIMER_CHANNELS * tim));
+    return _oneshot & ((1 << chan) << (TIMER_CHANNEL_NUMOF * tim));
 }
 
 /**
@@ -150,7 +150,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (channel >= TIMER_CHANNELS) {
+    if (channel >= TIMER_CHANNEL_NUMOF) {
         return -1;
     }
 
@@ -168,7 +168,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
 int timer_set(tim_t tim, int channel, unsigned int timeout)
 {
-    if (channel >= TIMER_CHANNELS) {
+    if (channel >= TIMER_CHANNEL_NUMOF) {
         return -1;
     }
 
@@ -197,7 +197,7 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 {
     int res = 0;
 
-    if (channel >= TIMER_CHANNELS) {
+    if (channel >= TIMER_CHANNEL_NUMOF) {
         return -1;
     }
 
@@ -235,7 +235,7 @@ int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags
 
 int timer_clear(tim_t tim, int channel)
 {
-    if (channel >= TIMER_CHANNELS) {
+    if (channel >= TIMER_CHANNEL_NUMOF) {
         return -1;
     }
 

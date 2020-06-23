@@ -26,7 +26,7 @@ extern "C" {
 
 #ifndef TIMER_NUMOF
 #define TIMER_NUMOF         (3U)
-#define TIMER_CHANNELS      (3)
+#define TIMER_CHANNEL_NUMOF (3)
 
 #define TIMER_0             MEGA_TIMER4
 #define TIMER_0_MASK        &TIMSK4
