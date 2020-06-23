@@ -16,6 +16,8 @@ BOARD_WHITELIST += arduino-duemilanove \
                    cc2650stk \
                    derfmega128 \
                    derfmega256 \
+                   hifive1 \
+                   hifive1b \
                    ikea-tradfri \
                    mega-xplained \
                    microduino-corerf \
