@@ -203,13 +203,25 @@ extern clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
  */
 NORETURN void sched_task_exit(void);
 
-#ifdef MODULE_SCHED_CB
+#if IS_USED(MODULE_SCHED_CB) || defined(DOXYGEN)
+
 /**
- *  @brief  Register a callback that will be called on every scheduler run
+ * @brief   Scheduler run callback
  *
- *  @param[in] callback The callback functions the will be called
+ * @note Both @p active and @p next can be KERNEL_PID_UNDEF, but not at the same
+ * time.
+ *
+ * @param   active      Pid of the active thread pid
+ * @param   next        Pid of the next scheduled thread
  */
-void sched_register_cb(void (*callback)(kernel_pid_t, kernel_pid_t));
+typedef void (*sched_callback_t)(kernel_pid_t active, kernel_pid_t next);
+
+/**
+ * @brief  Register a callback that will be called on every scheduler run
+ *
+ * @param[in] callback The callback functions that will be called
+ */
+void sched_register_cb(sched_callback_t callback);
 #endif /* MODULE_SCHED_CB */
 
 #ifdef __cplusplus
