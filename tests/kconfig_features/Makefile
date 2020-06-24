@@ -17,6 +17,8 @@ BOARD_WHITELIST += arduino-duemilanove \
                    chronos \
                    derfmega128 \
                    derfmega256 \
+                   hifive1 \
+                   hifive1b \
                    ikea-tradfri \
                    mega-xplained \
                    microduino-corerf \
