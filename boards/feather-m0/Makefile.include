@@ -1,3 +1,5 @@
+PSEUDOMODULES += feather-m0-wifi
+
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
