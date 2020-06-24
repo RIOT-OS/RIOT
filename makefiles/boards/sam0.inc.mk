@@ -43,6 +43,8 @@ endif
 ifeq ($(PROGRAMMER),edbg)
   # use edbg for flashing
   include $(RIOTMAKE)/tools/edbg.inc.mk
+  # use openocd for debugging
+  include $(RIOTMAKE)/tools/openocd.inc.mk
 else ifeq ($(PROGRAMMER),jlink)
   # this board uses J-Link for debug and possibly flashing
   include $(RIOTMAKE)/tools/jlink.inc.mk
