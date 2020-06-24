@@ -628,7 +628,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
-    if (channel != 0) {
+    if (channel < 0 || channel >= (int)TIMER_CHANNEL_NUMOF) {
         /* only one channel is supported */
         return -1;
     }
@@ -651,7 +651,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int target)
 {
-    if (channel != 0) {
+    if (channel < 0 || channel >= (int)TIMER_CHANNEL_NUMOF) {
         /* only one channel is supported */
         return -1;
     }
@@ -676,7 +676,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int target)
 
 int timer_clear(tim_t dev, int channel)
 {
-    if (channel != 0) {
+    if (channel < 0 || channel >= (int)TIMER_CHANNEL_NUMOF) {
         /* only one channel is supported */
         return -1;
     }
