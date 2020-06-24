@@ -360,6 +360,11 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   This timer implementation has three available channels
+ */
+#define TIMER_CHANNEL_NUMOF (3U)
+
+/**
  * @brief   UART device configuration.
  */
 #ifndef DOXYGEN
