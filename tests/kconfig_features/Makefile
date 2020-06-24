@@ -12,10 +12,13 @@ BOARD_WHITELIST += arduino-duemilanove \
                    cc1352p-launchpad \
                    cc2650-launchpad \
                    cc2650stk \
+                   chronos \
                    derfmega128 \
                    ikea-tradfri \
                    mega-xplained \
                    microduino-corerf \
+                   msb-430 \
+                   msb-430h \
                    samr21-xpro \
                    slstk3401a \
                    slstk3402a \
@@ -24,8 +27,12 @@ BOARD_WHITELIST += arduino-duemilanove \
                    slwstk6000b-slwrb4162a \
                    stk3600 \
                    stk3700 \
-                   waspmote-pro
-
+                   telosb \
+                   waspmote-pro \
+                   wsn430-v1_3b \
+                   wsn430-v1_4 \
+                   z1
+                   #
 
 all: checks
 
