@@ -148,27 +148,33 @@ extern void stm32_eth_netdev_setup(netdev_t *netdev);
 extern netdev_ieee802154_t nrf802154_dev;
 #endif
 
+/**
+ * @brief   Add interface with IPv4 or dual stack support.
+ */
+static struct netif *_netif_add(struct netif *netif, void *state,
+                                netif_init_fn init, netif_input_fn input)
+{
+#if IS_USED(MODULE_LWIP_IPV4)
+    return netif_add(netif, IP4_ADDR_ANY, IP4_ADDR_ANY, IP4_ADDR_ANY,
+                     state, init, input);
+#else /* IS_USED(MODULE_LWIP_IPV4) */
+    return netif_add(netif, state, init, input);
+#endif  /* IS_USED(MODULE_LWIP_IPV4) */
+}
+
 void lwip_bootstrap(void)
 {
+    (void)_netif_add;   /* in case it is not used */
     /* TODO: do for every eligible netdev */
 #ifdef LWIP_NETIF_NUMOF
 #ifdef MODULE_NETDEV_TAP
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         netdev_tap_setup(&netdev_taps[i], &netdev_tap_params[i]);
-#ifdef MODULE_LWIP_IPV4
-        if (netif_add(&netif[i], IP4_ADDR_ANY, IP4_ADDR_ANY, IP4_ADDR_ANY,
-                      &netdev_taps[i], lwip_netdev_init,
-                      tcpip_input) == NULL) {
+        if (_netif_add(&netif[i], &netdev_taps[i], lwip_netdev_init,
+                       tcpip_input) == NULL) {
             DEBUG("Could not add netdev_tap device\n");
             return;
         }
-#else /* MODULE_LWIP_IPV4 */
-        if (netif_add(&netif[i], &netdev_taps[i], lwip_netdev_init,
-                      tcpip_input) == NULL) {
-            DEBUG("Could not add netdev_tap device\n");
-            return;
-        }
-#endif /* MODULE_LWIP_IPV4 */
     }
 #elif defined(MODULE_MRF24J40)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
@@ -191,19 +197,11 @@ void lwip_bootstrap(void)
 #elif defined(MODULE_ENC28J60)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         enc28j60_setup(&enc28j60_devs[i], &enc28j60_params[i]);
-#ifdef MODULE_LWIP_IPV4
-        if (netif_add(&netif[0], IP4_ADDR_ANY, IP4_ADDR_ANY, IP4_ADDR_ANY,
-            &enc28j60_devs[i], lwip_netdev_init, tcpip_input) == NULL) {
+        if (_netif_add(&netif[0], &enc28j60_devs[i], lwip_netdev_init,
+                       tcpip_input) == NULL) {
             DEBUG("Could not add enc28j60 device\n");
             return;
         }
-#else /* MODULE_LWIP_IPV4 */
-        if (netif_add(&netif[0], &enc28j60_devs[i], lwip_netdev_init,
-            tcpip_input) == NULL) {
-            DEBUG("Could not add enc28j60 device\n");
-            return;
-        }
-#endif /* MODULE_LWIP_IPV4 */
     }
 #elif defined(MODULE_SOCKET_ZEP)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
@@ -216,49 +214,25 @@ void lwip_bootstrap(void)
     }
 #elif defined(MODULE_ESP_ETH)
     esp_eth_setup(&_esp_eth_dev);
-#ifdef MODULE_LWIP_IPV4
-    if (netif_add(&netif[0], IP4_ADDR_ANY, IP4_ADDR_ANY, IP4_ADDR_ANY,
-                  &_esp_eth_dev, lwip_netdev_init, tcpip_input) == NULL) {
+    if (_netif_add(&netif[0], &_esp_eth_dev, lwip_netdev_init,
+                   tcpip_input) == NULL) {
         DEBUG("Could not add esp_eth device\n");
         return;
     }
-#else /* MODULE_LWIP_IPV4 */
-    if (netif_add(&netif[0], &_esp_eth_dev, lwip_netdev_init,
-                  tcpip_input) == NULL) {
-        DEBUG("Could not add esp_eth device\n");
-        return;
-    }
-#endif /* MODULE_LWIP_IPV4 */
 #elif defined(MODULE_ESP_WIFI)
     esp_wifi_setup(&_esp_wifi_dev);
-#ifdef MODULE_LWIP_IPV4
-    if (netif_add(&netif[0], IP4_ADDR_ANY, IP4_ADDR_ANY, IP4_ADDR_ANY,
-                  &_esp_wifi_dev, lwip_netdev_init, tcpip_input) == NULL) {
+    if (_netif_add(&netif[0], &_esp_wifi_dev, lwip_netdev_init,
+                   tcpip_input) == NULL) {
         DEBUG("Could not add esp_wifi device\n");
         return;
     }
-#else /* MODULE_LWIP_IPV4 */
-    if (netif_add(&netif[0], &_esp_wifi_dev, lwip_netdev_init,
-                  tcpip_input) == NULL) {
-        DEBUG("Could not add esp_wifi device\n");
-        return;
-    }
-#endif /* MODULE_LWIP_IPV4 */
 #elif defined(MODULE_STM32_ETH)
     stm32_eth_netdev_setup(&stm32_eth);
-#ifdef MODULE_LWIP_IPV4
-    if (netif_add(&netif[0], IP4_ADDR_ANY, IP4_ADDR_ANY, IP4_ADDR_ANY,
-                  &stm32_eth, lwip_netdev_init, tcpip_input) == NULL) {
+    if (_netif_add(&netif[0], &stm32_eth, lwip_netdev_init,
+                   tcpip_input) == NULL) {
         DEBUG("Could not add stm32_eth device\n");
         return;
     }
-#else /* MODULE_LWIP_IPV4 */
-    if (netif_add(&netif[0], &stm32_eth, lwip_netdev_init,
-                  tcpip_input) == NULL) {
-        DEBUG("Could not add stm32_eth device\n");
-        return;
-    }
-#endif /* MODULE_LWIP_IPV4 */
 #elif defined(MODULE_NRF802154)
     if (netif_add(&netif[0], &nrf802154_dev, lwip_netdev_init,
                 tcpip_6lowpan_input) == NULL) {
