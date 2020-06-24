@@ -36,7 +36,8 @@
 #define PORT_STR_LEN    (5)
 #define NETIF_STR_LEN   (5)
 
-int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *port)
+int sock_tl_ep_fmt(const struct _sock_tl_ep *endpoint,
+                   char *addr_str, uint16_t *port)
 {
     void *addr_ptr;
     *addr_str = '\0';
@@ -187,7 +188,7 @@ int _parse_netif(sock_udp_ep_t *ep_out, char *netifstart)
     return (netifend - netifstart);
 }
 
-int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
+int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str)
 {
     unsigned brackets_flag;
     char *hoststart = (char*)str;
@@ -253,7 +254,8 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
     return -EINVAL;
 }
 
-bool sock_udp_ep_equal(const sock_udp_ep_t *a, const sock_udp_ep_t *b)
+bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
+                      const struct _sock_tl_ep *b)
 {
     assert(a && b);
 
