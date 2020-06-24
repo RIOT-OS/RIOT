@@ -68,6 +68,31 @@ extern "C" {
 
 #define CC2538_CRC_BIT_MASK         (0x80)
 
+#define CC2538_CCA_THR_MASK         (0x000000FF)
+
+#define CC2538_CCA_MODE_MASK        (0x18)
+#define CC2538_CCA_MODE_POS         (3U)
+
+#define CC2538_CSP_SKIP_INST_MASK   (0x70)
+#define CC2538_CSP_SKIP_INST_POS    (4U)
+
+#define CC2538_CSP_SKIP_N_MASK      (0x08)
+
+#define CC2538_CSP_SKIP_COND_CCA    (0x00)
+#define CC2538_CSP_SKIP_COND_CSPZ   (0x06)
+#define CC2538_CSP_SKIP_COND_RSSI   (0x07)
+
+#define CC2538_SFR_MTMSEL_MASK      (0x7)
+#define CC2538_SFR_MTMSEL_TIMER_P   (0x2)
+#define CC2538_MCTRL_SYNC_MASK      (0x2)
+#define CC2538_MCTRL_RUN_MASK       (0x1)
+
+#define CC2538_CSP_MCU_CTRL_MASK    (0x1)
+
+#define CC2538_CSP_INCMAXY_MAX_MASK (0x7)
+
+#define CC2538_RXENABLE_RXON_MASK   (0x80)
+
 #define CC2538_RSSI_OFFSET          (-73)  /**< Signal strength offset value */
 #define CC2538_RF_SENSITIVITY       (-97)  /**< dBm typical, normal conditions */
 

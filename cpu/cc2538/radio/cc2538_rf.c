@@ -28,7 +28,13 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#define CC2538_ACCEPT_FT_2_ACK     (1 << 5)
+/*
+ * @brief MAC timer period
+ *
+ * The period is set to the CSMA-CA Backoff Period Unit (20 symbols, 320 us)
+ */
+#define TIMER_PERIOD_LSB           (0xF2)
+#define TIMER_PERIOD_MSB           (0x29)
 
 typedef struct {
     cc2538_reg_t *reg_addr;
@@ -58,6 +64,9 @@ static const init_pair_t init_table[] = {
     {&RFCORE_XREG_SRCMATCH,  0x00                     },
     {&RFCORE_XREG_FIFOPCTRL, CC2538_RF_MAX_DATA_LEN   },
     {&RFCORE_XREG_RFIRQM0,   FIFOP | RXPKTDONE        },
+#if IS_USED(MODULE_IEEE802154_RADIO_HAL)
+    {&RFCORE_XREG_RFIRQM1,   TXDONE | CSP_STOP        },
+#endif
     {&RFCORE_XREG_RFERRM,    STROBE_ERR | TXUNDERF | TXOVERF | RXUNDERF | RXOVERF | NLOCK},
     {NULL, 0},
 };
@@ -119,6 +128,9 @@ void cc2538_init(void)
 
         NVIC_SetPriority(RF_ERR_ALT_IRQn, RADIO_IRQ_PRIO);
         NVIC_EnableIRQ(RF_ERR_ALT_IRQn);
+
+        NVIC_SetPriority(MAC_TIMER_ALT_IRQn, RADIO_IRQ_PRIO);
+        NVIC_EnableIRQ(MAC_TIMER_ALT_IRQn);
     }
     else {
         NVIC_SetPriority(RF_RXTX_IRQn, RADIO_IRQ_PRIO);
@@ -126,13 +138,25 @@ void cc2538_init(void)
 
         NVIC_SetPriority(RF_ERR_IRQn, RADIO_IRQ_PRIO);
         NVIC_EnableIRQ(RF_ERR_IRQn);
+
+        NVIC_SetPriority(MACTIMER_IRQn, RADIO_IRQ_PRIO);
+        NVIC_EnableIRQ(MACTIMER_IRQn);
     }
+
+    RFCORE_SFR_MTMSEL &= ~CC2538_SFR_MTMSEL_MASK;
+    /* Select timer period */
+    RFCORE_SFR_MTMSEL |= CC2538_SFR_MTMSEL_TIMER_P;
+
+    /* Fix timer to Backoff period */
+    RFCORE_SFR_MTM0 |= TIMER_PERIOD_LSB;
+    RFCORE_SFR_MTM1 |= TIMER_PERIOD_MSB;
+
+    RFCORE_SFR_MTMSEL &= ~CC2538_SFR_MTMSEL_MASK;
+    RFCORE_SFR_MTCTRL |= CC2538_MCTRL_SYNC_MASK | CC2538_MCTRL_RUN_MASK;
 
     /* Flush the receive and transmit FIFOs */
     RFCORE_SFR_RFST = ISFLUSHTX;
     RFCORE_SFR_RFST = ISFLUSHRX;
-    /* Disable/filter l2 Acks */
-    RFCORE_XREG_FRMFILT1 &= ~CC2538_ACCEPT_FT_2_ACK;
 }
 
 bool cc2538_is_on(void)
