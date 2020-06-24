@@ -5,10 +5,7 @@ USEMODULE += newlib
 # mips32 needs periph_timer for its gettimeofday() implementation
 FEATURES_REQUIRED += periph_timer
 
-ifeq ($(USE_UHI_SYSCALLS),1)
-  #Use UHI to handle syscalls
-  USEMODULE += newlib_syscalls_mips_uhi
-else
-  #Use RIOT to handle syscalls (default)
+#Use RIOT to handle syscalls (default)
+ifeq (,$(filter newlib_syscalls_mips_uhi,$(USEMODULE)))
   USEMODULE += newlib_syscalls_default
 endif

@@ -1,7 +1,5 @@
 INCLUDES += -I$(RIOTCPU)/mips32r2_common/include
 
-ifeq ($(USE_UHI_SYSCALLS),1)
-  #Use UHI to handle syscalls
-  LINKFLAGS += -luhi
-  CFLAGS += -DHAVE_HEAP_STATS
-endif
+# NOTE: This can be turned into normal conditional syntax once #9913 is fixed
+CFLAGS += $(if $(filter newlib_syscalls_mips_uhi,$(USEMODULE)),-DHAVE_HEAP_STATS,)
+LINKFLAGS += $(if $(filter newlib_syscalls_mips_uhi,$(USEMODULE)),-luhi,)

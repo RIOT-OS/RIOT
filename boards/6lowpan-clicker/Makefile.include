@@ -1,5 +1,4 @@
 APPDEPS += $(RIOTCPU)/$(CPU)/$(CPU_MODEL)/$(CPU_MODEL).S
-USE_UHI_SYSCALLS = 1
 
 # use pic32prog by default to program this board
 PROGRAMMER ?= pic32prog
