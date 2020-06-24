@@ -15,14 +15,6 @@ endif
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-# The following configuration are dependencies specific, specifically they need
-# to know if 'nordic_softdevice_ble' is used. The dependencies are not known
-# because BOARDs Makefile.include are included before Makefile.dep
-# This HACK can be removed either when Makefile.include is included after
-# Makefile.features (see #9913) or if 'nordic_softdevice_ble' is deprecated.
--include $(APPDIR)/Makefile.board.dep
-include $(BOARDDIR)/Makefile.dep
-
 PROGRAMMER ?= jlink
 ifeq (jlink,$(PROGRAMMER))
   # setup JLink for flashing
