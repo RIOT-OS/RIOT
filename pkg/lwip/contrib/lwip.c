@@ -155,8 +155,8 @@ static struct netif *_netif_add(struct netif *netif, void *state,
                                 netif_init_fn init, netif_input_fn input)
 {
 #if IS_USED(MODULE_LWIP_IPV4)
-    return netif_add(netif, IP4_ADDR_ANY, IP4_ADDR_ANY, IP4_ADDR_ANY,
-                     state, init, input);
+    return netif_add(netif, ip_2_ip4(IP4_ADDR_ANY), ip_2_ip4(IP4_ADDR_ANY),
+                     ip_2_ip4(IP4_ADDR_ANY), state, init, input);
 #else /* IS_USED(MODULE_LWIP_IPV4) */
     return netif_add(netif, state, init, input);
 #endif  /* IS_USED(MODULE_LWIP_IPV4) */
