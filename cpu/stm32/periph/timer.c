@@ -70,7 +70,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (channel >= (int)TIMER_CHAN) {
+    if (channel >= (int)TIMER_CHANNEL_NUMOF) {
         return -1;
     }
 
@@ -83,7 +83,7 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 
 int timer_clear(tim_t tim, int channel)
 {
-    if (channel >= (int)TIMER_CHAN) {
+    if (channel >= (int)TIMER_CHANNEL_NUMOF) {
         return -1;
     }
 
@@ -110,7 +110,7 @@ static inline void irq_handler(tim_t tim)
 {
     uint32_t status = (dev(tim)->SR & dev(tim)->DIER);
 
-    for (unsigned int i = 0; i < TIMER_CHAN; i++) {
+    for (unsigned int i = 0; i < TIMER_CHANNEL_NUMOF; i++) {
         if (status & (TIM_SR_CC1IF << i)) {
             dev(tim)->DIER &= ~(TIM_DIER_CC1IE << i);
             isr_ctx[tim].cb(isr_ctx[tim].arg, i);

@@ -97,7 +97,7 @@ extern "C" {
 /**
  * @brief   All STM timers have 4 capture-compare channels
  */
-#define TIMER_CHAN          (4U)
+#define TIMER_CHANNEL_NUMOF (4U)
 
 /**
  * @brief   Define a macro for accessing a timer channel
@@ -514,8 +514,9 @@ typedef struct {
 typedef struct {
     TIM_TypeDef *dev;               /**< Timer used */
     uint32_t rcc_mask;              /**< bit in clock enable register */
-    pwm_chan_t chan[TIMER_CHAN];    /**< channel mapping, set to {GPIO_UNDEF, 0}
-                                     *   if not used */
+    pwm_chan_t chan[TIMER_CHANNEL_NUMOF]; /**< channel mapping
+                                           *   set to {GPIO_UNDEF, 0}
+                                           *   if not used */
     gpio_af_t af;                   /**< alternate function used */
     uint8_t bus;                    /**< APB bus */
 } pwm_conf_t;
