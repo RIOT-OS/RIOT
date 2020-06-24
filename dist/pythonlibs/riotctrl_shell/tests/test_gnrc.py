@@ -54,3 +54,50 @@ def test_ping6_parser_missing_rtts():
 --- ::1 PING statistics ---
 3 packets transmitted, 3 packets received, 0% packet loss""")
     assert ping_res is None
+
+
+def test_pktbuf():
+    rc = init_ctrl()
+    si = riotctrl_shell.gnrc.GNRCPktbufStats(rc)
+    res = si.pktbuf_stats()
+    # mock just returns last input
+    assert res == "pktbuf"
+
+
+def test_pktbuf_parser_success_empty():
+    parser = riotctrl_shell.gnrc.GNRCPktbufStatsParser()
+    pktbuf_res = parser.parse("""
+packet buffer: first byte: 0x5660dce0, last byte: 0x5660fce0 (size: 8192)
+  position of last byte used: 1792
+~ unused: 0x5660dce0 (next: (nil), size: 8192) ~""")
+    assert pktbuf_res is not None
+    assert pktbuf_res["first_byte"] > 0
+    assert "start" in pktbuf_res["first_unused"]
+    assert pktbuf_res.is_empty()
+
+
+def test_pktbuf_parser_success_not_empty():
+    parser = riotctrl_shell.gnrc.GNRCPktbufStatsParser()
+    pktbuf_res = parser.parse("""
+packet buffer: first byte: 0x5660dce0, last byte: 0x5660fce0 (size: 8192)
+  position of last byte used: 1792
+~ unused: 0x5660de00 (next: (nil), size: 7904) ~""")
+    assert pktbuf_res is not None
+    assert pktbuf_res["first_byte"] > 0
+    assert "start" in pktbuf_res["first_unused"]
+    assert not pktbuf_res.is_empty()
+
+
+def test_pktbuf_parser_empty():
+    parser = riotctrl_shell.gnrc.GNRCPktbufStatsParser()
+    pktbuf_res = parser.parse("")
+    assert pktbuf_res is None
+
+
+def test_pktbuf_parser_2nd_header_not_found():
+    parser = riotctrl_shell.gnrc.GNRCPktbufStatsParser()
+    pktbuf_res = parser.parse(
+        "packet buffer: first byte: 0x5668ace0, last byte: 0x5668cce0 "
+        "(size: 8192)"
+    )
+    assert pktbuf_res is None
