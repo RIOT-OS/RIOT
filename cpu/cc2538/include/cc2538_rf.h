@@ -68,8 +68,40 @@ extern "C" {
 
 #define CC2538_CRC_BIT_MASK         (0x80)
 
+#define CC2538_CCA_THR_MASK         (0x000000FF)    /**< CCA Threshold mask */
+
+#define CC2538_CCA_MODE_MASK        (0x18)          /**< CCA Mode mask */
+#define CC2538_CCA_MODE_POS         (3U)            /**< CCA Mode pos */
+
+#define CC2538_CSP_SKIP_INST_MASK   (0x70)          /**< CSP Skip instruction mask */
+#define CC2538_CSP_SKIP_INST_POS    (4U)            /**< CSP Skip instruction pos */
+
+#define CC2538_CSP_SKIP_N_MASK      (0x08)          /**< CSP Skip condition negation mask */
+
+#define CC2538_CSP_SKIP_COND_CCA    (0x00)          /**< CSP Skip condition is valid CCA */
+#define CC2538_CSP_SKIP_COND_CSPZ   (0x06)          /**< CSP Skip condition is CSPZ is 0 */
+#define CC2538_CSP_SKIP_COND_RSSI   (0x07)          /**< CSP Skip condition is valid RSSI */
+
+#define CC2538_SFR_MTMSEL_MASK      (0x7)           /**< MAC Timer selection mask */
+#define CC2538_SFR_MTMSEL_TIMER_P   (0x2)           /**< Selects Timer period */
+#define CC2538_MCTRL_SYNC_MASK      (0x2)           /**< Sync MAC Timer to external clock */
+#define CC2538_MCTRL_RUN_MASK       (0x1)           /**< Run MAC Timer */
+
+#define CC2538_CSP_MCU_CTRL_MASK    (0x1)           /**< MCU Ctrl mask */
+
+#define CC2538_CSP_INCMAXY_MAX_MASK (0x7)           /**< CSP INCMAXY instruction (increment Register CSPX
+                                                         without exceeding CSPY) */
+
+#define CC2538_RXENABLE_RXON_MASK   (0x80)          /**< RX on mask */
+
 #define CC2538_RSSI_OFFSET          (-73)  /**< Signal strength offset value */
 #define CC2538_RF_SENSITIVITY       (-97)  /**< dBm typical, normal conditions */
+
+#define CC2538_ACCEPT_FT_2_ACK           (1 << 5) /**< enable or disable the ACK filter */
+#define CC2538_STATE_SFD_WAIT_RANGE_MIN  (0x03U)  /**< min range value of SFD wait state */
+#define CC2538_STATE_SFD_WAIT_RANGE_MAX  (0x06U)  /**< max range value of SFD wait state */
+#define CC2538_FRMCTRL1_PENDING_OR_MASK  (0x04)   /**< mask for enabling or disabling the
+                                                       frame pending bit */
 
 #define RFCORE_ASSERT(expr) (void)( (expr) || RFCORE_ASSERT_failure(#expr, __FUNCTION__, __LINE__) )
 
