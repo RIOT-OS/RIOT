@@ -235,7 +235,7 @@ def test_udpv6_send(board_group, application, env=None):
         receiver.sendline(u"udp server start %d" % port)
         # wait for neighbor discovery to be done
         time.sleep(5)
-        sender.sendline(u"udp send %s %d ab:cd:ef" % (receiver_ip, port))
+        sender.sendline(u"udp send [%s]:%d ab:cd:ef" % (receiver_ip, port))
         sender.expect_exact("Success: send 3 byte over UDP to [{}]:{}"
                             .format(receiver_ip, port))
         receiver.expect(u"00000000  AB  CD  EF")
@@ -261,7 +261,7 @@ def test_tcpv6_send(board_group, application, env=None):
         server.sendline(u"tcp server start %d" % port)
         # wait for neighbor discovery to be done
         time.sleep(5)
-        client.sendline(u"tcp connect %s %d" % (server_ip, port))
+        client.sendline(u"tcp connect [%s]:%d" % (server_ip, port))
         server.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % client_ip)
         client.sendline(u"tcp send affe:abe")
         client.expect_exact(u"Success: send 4 byte over TCP to server")
@@ -301,14 +301,14 @@ def test_tcpv6_multiconnect(board_group, application, env=None):
         server.sendline(u"tcp server start %d" % port)
         # wait for neighbor discovery to be done
         time.sleep(5)
-        client.sendline(u"tcp connect %s %d" % (server_ip, port))
+        client.sendline(u"tcp connect [%s]:%d" % (server_ip, port))
         server.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % client_ip)
         with socket.socket(socket.AF_INET6) as sock:
             sock.connect(connect_addr)
             server.expect(u"Error on TCP accept \\[-[0-9]+\\]")
         client.sendline(u"tcp disconnect")
         server.expect(u"TCP connection to \\[%s\\]:[0-9]+ reset" % client_ip)
-        client.sendline(u"tcp connect %s %d" % (server_ip, port))
+        client.sendline(u"tcp connect [%s]:%d" % (server_ip, port))
         server.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % client_ip)
         client.sendline(u"tcp disconnect")
         server.expect(u"TCP connection to \\[%s\\]:[0-9]+ reset" % client_ip)
@@ -342,7 +342,7 @@ def test_triple_send(board_group, application, env=None):
         receiver.sendline(u"tcp server start %d" % tcp_port)
         # wait for neighbor discovery to be done
         time.sleep(5)
-        sender.sendline(u"udp send %s %d 01:23" % (receiver_ip, udp_port))
+        sender.sendline(u"udp send [%s]:%d 01:23" % (receiver_ip, udp_port))
         sender.expect_exact(u"Success: send 2 byte over UDP to [%s]:%d" %
                             (receiver_ip, udp_port))
         receiver.expect(u"00000000  01  23")
@@ -351,7 +351,7 @@ def test_triple_send(board_group, application, env=None):
         sender.expect_exact(u"Success: send 4 byte over IPv6 to %s (next header: %d)" %
                             (receiver_ip, ipprot))
         receiver.expect(u"00000000  01  02  03  04")
-        sender.sendline(u"tcp connect %s %d" % (receiver_ip, tcp_port))
+        sender.sendline(u"tcp connect [%s]:%d" % (receiver_ip, tcp_port))
         receiver.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % sender_ip)
         sender.sendline(u"tcp send dead:beef")
         sender.expect_exact(u"Success: send 4 byte over TCP to server")

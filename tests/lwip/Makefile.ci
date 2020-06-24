@@ -1,6 +1,7 @@
 BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
     blackpill \
+    bluepill \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \
