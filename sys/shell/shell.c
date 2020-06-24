@@ -42,12 +42,6 @@
 #define BS  '\x08'  /** ASCII "Backspace" */
 #define DEL '\x7f'  /** ASCII "Delete" */
 
-#ifdef MODULE_SHELL_COMMANDS
-    #define MORE_COMMANDS _shell_command_list
-#else
-    #define MORE_COMMANDS
-#endif /* MODULE_SHELL_COMMANDS */
-
 #ifdef MODULE_NEWLIB
     #define flush_if_needed() fflush(stdout)
 #else
@@ -66,160 +60,241 @@
     #define PROMPT_ON 0
 #endif /* SHELL_NO_PROMPT */
 
-static shell_command_handler_t find_handler(const shell_command_t *command_list, char *command)
+#ifdef MODULE_SHELL_COMMANDS
+    #define _builtin_cmds _shell_command_list
+#else
+    #define _builtin_cmds NULL
+#endif
+
+#define SQUOTE '\''
+#define DQUOTE '"'
+#define ESCAPECHAR '\\'
+#define SPACE ' '
+#define TAB '\t'
+
+#define PARSE_ESCAPE_MASK 0x4;
+
+enum parse_state {
+    PARSE_BLANK             = 0x0,
+
+    PARSE_UNQUOTED          = 0x1,
+    PARSE_SINGLEQUOTE       = 0x2,
+    PARSE_DOUBLEQUOTE       = 0x3,
+
+    PARSE_UNQUOTED_ESC      = 0x5,
+    PARSE_SINGLEQUOTE_ESC   = 0x6,
+    PARSE_DOUBLEQUOTE_ESC   = 0x7,
+};
+
+static enum parse_state escape_toggle(enum parse_state s)
 {
-    const shell_command_t *command_lists[] = {
-        command_list,
-        MORE_COMMANDS
-    };
+    return s ^ PARSE_ESCAPE_MASK;
+}
 
-    /* iterating over command_lists */
-    for (unsigned int i = 0; i < ARRAY_SIZE(command_lists); i++) {
-
-        const shell_command_t *entry;
-
-        if ((entry = command_lists[i])) {
-            /* iterating over commands in command_lists entry */
-            while (entry->name != NULL) {
-                if (strcmp(entry->name, command) == 0) {
-                    return entry->handler;
-                }
-                else {
-                    entry++;
-                }
-            }
+static shell_command_handler_t search_commands(const shell_command_t *entry,
+                                               char *command)
+{
+    for (; entry->name != NULL; entry++) {
+        if (strcmp(entry->name, command) == 0) {
+            return entry->handler;
         }
     }
-
     return NULL;
+}
+
+static shell_command_handler_t find_handler(
+        const shell_command_t *command_list, char *command)
+{
+    shell_command_handler_t handler = NULL;
+    if (command_list != NULL) {
+        handler = search_commands(command_list, command);
+    }
+
+    if (handler == NULL && _builtin_cmds != NULL) {
+        handler = search_commands(_builtin_cmds, command);
+    }
+
+    return handler;
+}
+
+static void print_commands(const shell_command_t *entry)
+{
+    for (; entry->name != NULL; entry++) {
+        printf("%-20s %s\n", entry->name, entry->desc);
+    }
 }
 
 static void print_help(const shell_command_t *command_list)
 {
-    printf("%-20s %s\n", "Command", "Description");
-    puts("---------------------------------------");
+    puts("Command              Description"
+         "\n---------------------------------------");
+    if (command_list != NULL) {
+        print_commands(command_list);
+    }
 
-    const shell_command_t *command_lists[] = {
-        command_list,
-        MORE_COMMANDS
-    };
-
-    /* iterating over command_lists */
-    for (unsigned int i = 0; i < ARRAY_SIZE(command_lists); i++) {
-
-        const shell_command_t *entry;
-
-        if ((entry = command_lists[i])) {
-            /* iterating over commands in command_lists entry */
-            while (entry->name != NULL) {
-                printf("%-20s %s\n", entry->name, entry->desc);
-                entry++;
-            }
-        }
+    if (_builtin_cmds != NULL) {
+        print_commands(_builtin_cmds);
     }
 }
 
+/**
+ * Break input line into words, create argv and call the command handler.
+ *
+ * Words are broken up at spaces. A backslash escapes the character that comes
+ * after (meaning if it is taken literally and if it is a space it does not break
+ * the word). Spaces can also be protected by quoting with double or single
+ * quotes.
+ *
+ * There are two unquoted states (PARSE_BLANK and PARSE_UNQUOTED) and two quoted
+ * states (PARSE_SINGLEQUOTE and PARSE_DOUBLEQUOTE). In addition, every state
+ * (except PARSE_BLANK) has an escaped pair state (e.g PARSE_SINGLEQUOTE and
+ * PARSE_SINGLEQUOTE_ESC).
+ *
+ * For the following let's define some things
+ *      - Function transit(character, state) to change to 'state' after
+ *        'character' was read. The order of a list of transit-functions matters.
+ *      - A BLANK is either SPACE or TAB
+ *      - '*' means any character
+ *
+ *      PARSE_BLANK
+ *          transit(SQUOTE, PARSE_SINGLEQUOTE)
+ *          transit(DQUOTE, PARSE_DOUBLEQUOTE)
+ *          transit(ESCAPECHAR, PARSE_UNQUOTED_ESC)
+ *          transit(BLANK, PARSE_BLANK)
+ *          transit(*, PARSE_UNQUOTED) -> store character
+ *
+ *      PARSE_UNQUOTED
+ *          transit(SQUOTE, PARSE_SINGLEQUOTE)
+ *          transit(DQUOTE, PARSE_DOUBLEQUOTE)
+ *          transit(BLANK, PARSE_BLANK)
+ *          transit(ESCAPECHAR, PARSE_UNQUOTED_ESC)
+ *          transit(*, PARSE_UNQUOTED) -> store character
+ *
+ *      PARSE_UNQUOTED_ESC
+ *          transit(*, PARSE_UNQUOTED) -> store character
+ *
+ *      PARSE_SINGLEQUOTE
+ *          transit(SQUOTE, PARSE_UNQUOTED)
+ *          transit(ESCAPECHAR, PARSE_SINGLEQUOTE_ESC)
+ *          transit(*, PARSE_SINGLEQUOTE) -> store character
+ *
+ *      PARSE_SINGLEQUOTE_ESC
+ *          transit(*, PARSE_SINGLEQUOTE) -> store character
+ *
+ *      PARSE_DOUBLEQUOTE
+ *          transit(DQUOTE, PARSE_UNQUOTED)
+ *          transit(ESCAPECHAR, PARSE_DOUBLEQUOTE_ESC)
+ *          transit(*, PARSE_DOUBLEQUOTE) -> store character
+ *
+ *      PARSE_DOUBLEQUOTE_ESC
+ *          transit(*, PARSE_DOUBLEQUOTE) -> store character
+ *
+ *
+ */
 static void handle_input_line(const shell_command_t *command_list, char *line)
 {
-    static const char *INCORRECT_QUOTING = "shell: incorrect quoting";
-
     /* first we need to calculate the number of arguments */
-    unsigned argc = 0;
-    char *pos = line;
-    int contains_esc_seq = 0;
-    while (1) {
-        if ((unsigned char) *pos > ' ') {
-            /* found an argument */
-            if (*pos == '"' || *pos == '\'') {
-                /* it's a quoted argument */
-                const char quote_char = *pos;
-                do {
-                    ++pos;
-                    if (!*pos) {
-                        puts(INCORRECT_QUOTING);
-                        return;
-                    }
-                    else if (*pos == '\\') {
-                        /* skip over the next character */
-                        ++contains_esc_seq;
-                        ++pos;
-                        if (!*pos) {
-                            puts(INCORRECT_QUOTING);
-                            return;
-                        }
-                        continue;
-                    }
-                } while (*pos != quote_char);
-                if ((unsigned char) pos[1] > ' ') {
-                    puts(INCORRECT_QUOTING);
-                    return;
+    int argc = 0;
+    char *readpos = line;
+    char *writepos = readpos;
+
+    uint8_t pstate = PARSE_BLANK;
+
+    for (; *readpos != '\0'; readpos++) {
+
+        char wordbreak = SPACE;
+        bool is_wordbreak = false;
+
+        switch (pstate) {
+
+            case PARSE_BLANK:
+                if (*readpos != SPACE && *readpos != TAB) {
+                    argc++;
+                }
+
+                if (*readpos == SQUOTE) {
+                    pstate = PARSE_SINGLEQUOTE;
+                }
+                else if (*readpos == DQUOTE) {
+                    pstate = PARSE_DOUBLEQUOTE;
+                }
+                else if (*readpos == ESCAPECHAR) {
+                    pstate = PARSE_UNQUOTED_ESC;
+                }
+                else if (*readpos != SPACE && *readpos != TAB) {
+                    pstate = PARSE_UNQUOTED;
+                    *writepos++ = *readpos;
+                }
+                break;
+
+            case PARSE_UNQUOTED:
+                if (*readpos == SQUOTE) {
+                    pstate = PARSE_SINGLEQUOTE;
+                }
+                else if (*readpos == DQUOTE) {
+                    pstate = PARSE_DOUBLEQUOTE;
+                }
+                else if (*readpos == ESCAPECHAR) {
+                    pstate = escape_toggle(pstate);
+                }
+                else if (*readpos == SPACE || *readpos == TAB) {
+                    pstate = PARSE_BLANK;
+                    *writepos++ = '\0';
+                }
+                else {
+                    *writepos++ = *readpos;
+                }
+                break;
+
+            case PARSE_SINGLEQUOTE:
+                wordbreak = SQUOTE;
+                is_wordbreak = true;
+                break;
+
+            case PARSE_DOUBLEQUOTE:
+                wordbreak = DQUOTE;
+                is_wordbreak = true;
+                break;
+
+            default: /* QUOTED state */
+                pstate = escape_toggle(pstate);
+                *writepos++ = *readpos;
+                break;
+        }
+
+        if (is_wordbreak) {
+            if (*readpos == wordbreak) {
+                if (wordbreak == SQUOTE || wordbreak == DQUOTE) {
+                    pstate = PARSE_UNQUOTED;
                 }
             }
-            else {
-                /* it's an unquoted argument */
-                do {
-                    if (*pos == '\\') {
-                        /* skip over the next character */
-                        ++contains_esc_seq;
-                        ++pos;
-                        if (!*pos) {
-                            puts(INCORRECT_QUOTING);
-                            return;
-                        }
-                    }
-                    ++pos;
-                    if (*pos == '"') {
-                        puts(INCORRECT_QUOTING);
-                        return;
-                    }
-                } while ((unsigned char) *pos > ' ');
+            else if (*readpos == ESCAPECHAR) {
+                pstate = escape_toggle(pstate);
             }
-
-            /* count the number of arguments we got */
-            ++argc;
-        }
-
-        /* zero out current position (space or quotation mark) and advance */
-        if (*pos > 0) {
-            *pos = 0;
-            ++pos;
-        }
-        else {
-            break;
+            else {
+                *writepos++ = *readpos;
+            }
         }
     }
-    if (!argc) {
+    *writepos = '\0';
+
+    if (pstate != PARSE_BLANK && pstate != PARSE_UNQUOTED) {
+        puts("shell: incorrect quoting");
+        return;
+    }
+
+    if (argc == 0) {
         return;
     }
 
     /* then we fill the argv array */
-    char *argv[argc + 1];
-    argv[argc] = NULL;
-    pos = line;
-    for (unsigned i = 0; i < argc; ++i) {
-        while (!*pos) {
-            ++pos;
-        }
-        if (*pos == '"' || *pos == '\'') {
-            ++pos;
-        }
-        argv[i] = pos;
-        while (*pos) {
-            ++pos;
-        }
-    }
-    for (char **arg = argv; contains_esc_seq && *arg; ++arg) {
-        for (char *c = *arg; *c; ++c) {
-            if (*c != '\\') {
-                continue;
-            }
-            for (char *d = c; *d; ++d) {
-                *d = d[1];
-            }
-            if (--contains_esc_seq == 0) {
-                break;
-            }
-        }
+    int collected;
+    char *argv[argc];
+
+    readpos = line;
+    for (collected = 0; collected < argc; collected++) {
+        argv[collected] = readpos;
+        readpos += strlen(readpos) + 1;
     }
 
     /* then we call the appropriate handler */
