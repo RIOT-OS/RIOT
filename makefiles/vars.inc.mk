@@ -68,6 +68,8 @@ export ARFLAGS               # Command-line options to pass to AR, default `rcs`
 export AS                    # The assembler.
 export ASFLAGS               # Flags for the assembler.
 export LINK                  # The command used to link the files. Must take the same parameters as GCC, i.e. "ld" won't work.
+export NM                    # The command used to list symbols from objet files
+export RANLIB                # The command used to generate an index to the contents of an archive
 # LINKFLAGS                  # Flags to supply in the linking step.
 export LTOFLAGS              # extra CFLAGS for compiling with link time optimization
 export OBJCOPY               # The command used to create the HEXFILE and BINFILE.
