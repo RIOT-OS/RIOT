@@ -42,13 +42,11 @@ int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *por
     *addr_str = '\0';
 
     switch (endpoint->family) {
-#if defined(SOCK_HAS_IPV4)
         case AF_INET:
             {
                 addr_ptr = (void*)&endpoint->addr.ipv4;
                 break;
             }
-#endif
 #if defined(SOCK_HAS_IPV6)
         case AF_INET6:
             {
