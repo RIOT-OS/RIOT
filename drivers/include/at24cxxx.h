@@ -130,6 +130,23 @@ int at24cxxx_write(const at24cxxx_t *dev, uint32_t pos, const void *data,
                    size_t len);
 
 /**
+ * @brief Sequentially write @p len bytes to a given @p page.
+ *        The function will write up to the page boundary and then return
+ *        the number of bytes written up to that.
+ *
+ * @param[in] dev       AT24CXXX device handle
+ * @param[in] page      page of EEPROM memory
+ * @param[in] offset    offset from the start of the page, must be < page size
+ * @param[in] data      write buffer
+ * @param[in] len       requested length to be written
+ *
+ * @return    number of bytes written on success
+ * @return    error on failure
+ */
+int at24cxxx_write_page(const at24cxxx_t *dev, uint32_t page, uint32_t offset,
+                        const void *data, size_t len);
+
+/**
  * @brief   Set @p len bytes from a given position @p pos to the
  * value @p val
  *
