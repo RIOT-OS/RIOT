@@ -1,5 +1,4 @@
 APPDEPS += $(RIOTCPU)/$(CPU)/$(CPU_MODEL)/$(CPU_MODEL).S
-USE_UHI_SYSCALLS = 1
 
 PORT_LINUX ?= /dev/ttyUSB0
 include $(RIOTMAKE)/tools/serial.inc.mk
