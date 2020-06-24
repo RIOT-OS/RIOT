@@ -35,6 +35,23 @@
  * msg_t queue[8];
  * uint8_t buf[128];
  *
+ * void handler(sock_udp_t *sock, sock_async_flags_t type, void *arg)
+ * {
+ *     (void)arg;
+ *     if (type & SOCK_ASYNC_MSG_RECV) {
+ *         sock_udp_ep_t remote;
+ *         ssize_t res;
+ *
+ *         if ((res = sock_udp_recv(sock, buf, sizeof(buf), 0,
+ *                                  &remote)) >= 0) {
+ *             puts("Received a message");
+ *             if (sock_udp_send(sock, buf, res, &remote) < 0) {
+ *                 puts("Error sending reply");
+ *             }
+ *         }
+ *     }
+ * }
+ *
  * int main(void)
  * {
  *     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
@@ -47,23 +64,13 @@
  *     }
  *
  *     msg_init_queue(&queue, 8);
- *     sock_udp_msg_init(&sock, thread_getpid());
+ *     sock_udp_msg_init(&sock, thread_getpid(), handler, NULL);
  *     while (1) {
  *         msg_t msg;
  *
  *         msg_receive(&msg);
- *         if (sock_async_msg_type(&msg) && (msg.type & SOCK_EVENT_MSG_RECV)) {
- *             sock_udp_t *s = msg.content.ptr;
- *             sock_udp_ep_t remote;
- *             ssize_t res;
- *
- *             if ((res = sock_udp_recv(s, buf, sizeof(buf), 0,
- *                                      &remote)) >= 0) {
- *                 puts("Received a message");
- *                 if (sock_udp_send(s, buf, res, &remote) < 0) {
- *                     puts("Error sending reply");
- *                 }
- *             }
+ *         if (sock_async_msg_is(&msg)) {
+ *             sock_async_msg_handler(&msg);
  *         }
  *     }
  *     return 0;
@@ -89,6 +96,36 @@
  * uint8_t buf[128];
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
+ * We then define an event handler in form of a function. The event handler
+ * checks if the triggering event was a receive event by checking the flags
+ * provided with sock_event_t::type. If it is a receive event it copies the
+ * incoming message to `buf` and its sender into `remote` using @ref
+ * sock_udp_recv(). Note, that we use @ref sock_udp_recv() non-blocking by
+ * setting `timeout` to 0. If an error occurs on receive, we just ignore it and
+ * return from the event handler.
+ *
+ * If we receive a message we use its `remote` to reply. In case of an error on
+ * send, we print an according message:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * void handler(sock_udp_t *sock, sock_async_flags_t type, void *arg)
+ * {
+ *     (void)arg;
+ *     if (type & SOCK_ASYNC_MSG_RECV) {
+ *         sock_udp_ep_t remote;
+ *         ssize_t res;
+ *
+ *         if ((res = sock_udp_recv(sock, buf, sizeof(buf), 0,
+ *                                  &remote)) >= 0) {
+ *             puts("Received a message");
+ *             if (sock_udp_send(sock, buf, res, &remote) < 0) {
+ *                 puts("Error sending reply");
+ *             }
+ *         }
+ *     }
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
  * To be able to listen for incoming packets we bind the `sock` by setting a
  * local end point with a port (`12345` in this case).
  *
@@ -109,37 +146,28 @@
  *     }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * The application then blocks to wait for an IPC message and check if the event
- * triggering the IPC message was a receive event by checking the flags provided
- * with msg_t::type.
+ * We then initialize the message queue for the running thread to allow for
+ * asynchronous IPC (see @ref core_msg) and register the current thread as the
+ * asynchronous event handler for `sock` using the previously defined
+ * `handler()` function.
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ *     msg_init_queue(&queue, 8);
+ *     sock_udp_msg_init(&sock, thread_getpid(), handler, NULL);
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * The thread then blocks to wait for an IPC message and check if the event
+ * triggering the IPC message was an asynchronous sock event.
+ * If it is an asynchronous sock event, the handler function is called, which
+ * in turn calls the registered callback:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  *         msg_t msg;
  *
  *         msg_receive(&msg);
- *         if (sock_async_msg_type(&msg) && (msg.type & SOCK_EVENT_MSG_RECV)) {
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
- *
- * If it is a receive event it copies the incoming message to `buf` and its
- * sender into `remote` using @ref sock_udp_recv(). Note, that we use @ref
- * sock_udp_recv() non-blocking by setting `timeout` to 0. If an error occurs on
- * receive, we just ignore it and continue looping.
- *
- * If we receive a message we use its `remote` to reply. In case of an error on
- * send we print an according message:
- *
- * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
- *             sock_udp_t *s = msg.content.ptr;
- *             sock_udp_ep_t remote;
- *             ssize_t res;
- *
- *             if ((res = sock_udp_recv(s, buf, sizeof(buf), 0,
- *                                      &remote)) >= 0) {
- *                 puts("Received a message");
- *                 if (sock_udp_send(s, buf, res, &remote) < 0) {
- *                     puts("Error sending reply");
- *                 }
- *             }
+ *         if (sock_async_msg_is(&msg)) {
+ *             sock_async_msg_handler(&msg);
+ *         }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * @{
@@ -189,10 +217,25 @@ extern "C" {
  *
  * @param[in] msg   A message.
  */
-static inline sock_async_flags_t sock_async_msg_type(msg_t *msg)
+static inline bool sock_async_msg_is(msg_t *msg)
 {
     return (msg->type & SOCK_ASYNC_MSG_TYPE_MASK) == SOCK_ASYNC_MSG_TYPE_ID;
 }
+
+static inline sock_async_flags_t sock_async_msg_flags(msg_t *msg)
+{
+    return msg->type & ~SOCK_ASYNC_MSG_TYPE_MASK;
+}
+
+/**
+ * @brief   Handles a `sock_async_msg` IPC message and calls the associated
+ *          callback.
+ *
+ * @pre @ref sock_async_msg_is(@p msg)
+ *
+ * @param[in] msg   An IPC message.
+ */
+void sock_async_msg_handler(msg_t *msg);
 
 #if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
 /**
@@ -204,7 +247,8 @@ static inline sock_async_flags_t sock_async_msg_type(msg_t *msg)
  *
  * @note    Only available with module `sock_dtls`.
  */
-void sock_dtls_msg_init(sock_dtls_t *sock, kernel_pid_t target);
+void sock_dtls_msg_init(sock_dtls_t *sock, kernel_pid_t target,
+                        sock_dtls_cb_t handler, void *handler_arg);
 #endif  /* defined(MODULE_SOCK_DTLS) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_IP) || defined(DOXYGEN)
@@ -217,7 +261,8 @@ void sock_dtls_msg_init(sock_dtls_t *sock, kernel_pid_t target);
  *
  * @note    Only available with module `sock_ip`.
  */
-void sock_ip_msg_init(sock_ip_t *sock, kernel_pid_t target);
+void sock_ip_msg_init(sock_ip_t *sock, kernel_pid_t target,
+                      sock_ip_cb_t handler, void *handler_arg);
 #endif  /* defined(MODULE_SOCK_IP) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_TCP) || defined(DOXYGEN)
@@ -230,7 +275,8 @@ void sock_ip_msg_init(sock_ip_t *sock, kernel_pid_t target);
  *
  * @note    Only available with module `sock_tcp`.
  */
-void sock_tcp_msg_init(sock_tcp_t *sock, kernel_pid_t target);
+void sock_tcp_msg_init(sock_tcp_t *sock, kernel_pid_t target,
+                       sock_tcp_cb_t handler, void *handler_arg);
 
 /**
  * @brief   Makes a TCP listening queue able to handle asynchronous events using
@@ -241,7 +287,8 @@ void sock_tcp_msg_init(sock_tcp_t *sock, kernel_pid_t target);
  *
  * @note    Only available with module `sock_tcp`.
  */
-void sock_tcp_queue_msg_init(sock_tcp_queue_t *sock, kernel_pid_t target);
+void sock_tcp_queue_msg_init(sock_tcp_queue_t *sock, kernel_pid_t target,
+                             sock_udp_tcp_t handler, void *handler_arg);
 #endif  /* defined(MODULE_SOCK_TCP) || defined(DOXYGEN) */
 
 #if defined(MODULE_SOCK_UDP) || defined(DOXYGEN)
@@ -254,7 +301,8 @@ void sock_tcp_queue_msg_init(sock_tcp_queue_t *sock, kernel_pid_t target);
  *
  * @note    Only available with module `sock_udp`.
  */
-void sock_udp_msg_init(sock_udp_t *sock, kernel_pid_t target);
+void sock_udp_msg_init(sock_udp_t *sock, kernel_pid_t target,
+                       sock_udp_cb_t handler, void *handler_arg);
 #endif  /* defined(MODULE_SOCK_UDP) || defined(DOXYGEN) */
 
 #ifdef __cplusplus

@@ -26,9 +26,37 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Generalized callback type
+ */
+typedef union {
+    /**
+     * @brief   anything goes
+     */
+    void (*generic)(void *, sock_async_flags_t, void *);
+#ifdef MODULE_SOCK_DTLS
+    sock_dtls_cb_t dtls;                            /**< DTLS callback */
+#endif
+#ifdef MODULE_SOCK_IP
+    sock_ip_cb_t ip;                                /**< IP callback */
+#endif
+#ifdef MODULE_SOCK_TCP
+    sock_tcp_cb_t tcp;                              /**< TCP callback */
+    sock_tcp_queue_cb_t tcp_queue;                  /**< TCP queue callback */
+#endif
+#ifdef MODULE_SOCK_UDP
+    sock_udp_cb_t udp;                              /**< UDP callback */
+#endif
+} sock_msg_cb_t;
+
+/**
  * @brief   Asynchronous context for @ref net_sock_async_msg
  */
-typedef kernel_pid_t sock_async_ctx_t;
+typedef struct {
+    void *sock;                 /**< generic pointer to a @ref net_sock object */
+    sock_msg_cb_t cb;       /**< callback for the message handler */
+    void *cb_arg;           /**< callback argument for sock_async_ctx_t::cb */
+    kernel_pid_t pid;       /**< PID to send the IPC message to */
+} sock_async_ctx_t;
 
 #ifdef __cplusplus
 }
