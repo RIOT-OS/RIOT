@@ -160,7 +160,7 @@ static void _usage(char *cmdname)
               "measure round trip time (default: 4)");
     puts("     hoplimit: Set the IP time to life/hoplimit "
               "(default: interface config)");
-    puts("     ms timeout: Time to wait for a resonse in milliseconds "
+    puts("     ms timeout: Time to wait for a response in milliseconds "
               "(default: 1000). The option affects only timeout in absence "
               "of any responses, otherwise wait for two RTTs");
 }
