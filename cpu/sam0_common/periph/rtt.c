@@ -61,6 +61,14 @@ static void _wait_syncbusy(void)
 #endif
 }
 
+static void _rtt_read_req(void)
+{
+#ifdef RTC_READREQ_RREQ
+    RTC->MODE0.READREQ.reg = RTC_READREQ_RREQ;
+    _wait_syncbusy();
+#endif
+}
+
 static inline void _rtt_reset(void)
 {
 #ifdef RTC_MODE0_CTRL_SWRST
@@ -150,6 +158,7 @@ void rtt_clear_overflow_cb(void)
 uint32_t rtt_get_counter(void)
 {
     _wait_syncbusy();
+    _rtt_read_req();
     return RTC->MODE0.COUNT.reg;
 }
 

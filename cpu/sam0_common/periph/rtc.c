@@ -52,6 +52,14 @@ static void _wait_syncbusy(void)
 #endif
 }
 
+static void _rtt_read_req(void)
+{
+#ifdef RTC_READREQ_RREQ
+    RTC->MODE0.READREQ.reg = RTC_READREQ_RREQ;
+    _wait_syncbusy();
+#endif
+}
+
 static inline void _rtc_set_enabled(bool on)
 {
 #ifdef REG_RTC_MODE2_CTRLA
@@ -145,6 +153,7 @@ int rtc_get_time(struct tm *time)
     RTC_MODE2_CLOCK_Type clock;
 
     /* Read register in one time */
+    _rtt_read_req();
     clock.reg = RTC->MODE2.CLOCK.reg;
 
     time->tm_year = clock.bit.YEAR + reference_year;
