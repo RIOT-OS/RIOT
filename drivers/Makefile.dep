@@ -528,6 +528,10 @@ endif
 ifneq (,$(filter mtd_%,$(USEMODULE)))
   USEMODULE += mtd
 
+  ifneq (,$(filter mtd_at24cxxx,$(USEMODULE)))
+    USEMODULE += at24cxxx
+  endif
+
   ifneq (,$(filter mtd_at25xxx,$(USEMODULE)))
     USEMODULE += at25xxx
   endif
