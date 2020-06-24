@@ -6,13 +6,16 @@ BOARD_WHITELIST += arduino-duemilanove \
                    arduino-nano \
                    arduino-uno \
                    atmega1284p \
+                   atmega256rfr2-xpro \
                    atmega328p \
+                   avr-rss2 \
                    cc1312-launchpad \
                    cc1352-launchpad \
                    cc1352p-launchpad \
                    cc2650-launchpad \
                    cc2650stk \
                    derfmega128 \
+                   derfmega256 \
                    ikea-tradfri \
                    mega-xplained \
                    microduino-corerf \
