@@ -58,6 +58,23 @@ extern "C" {
 #define AT86RF2XX_PARAM_RESET      GPIO_PIN(PB, 15)
 
 /**
+ * @name    OpenWSN timing constants
+ *
+ * @{
+ */
+/* Measured 800us + ~10% */
+#define PORT_maxTxDataPrepare   (900/PORT_US_PER_TICK)
+/* Measured 450us + ~10% */
+#define PORT_maxRxAckPrepare    (500/PORT_US_PER_TICK)
+/* Measured 500us + ~10% */
+#define PORT_maxRxDataPrepare   (550/PORT_US_PER_TICK)
+/* Measured 660us + ~10% */
+#define PORT_maxTxAckPrepare    (750/PORT_US_PER_TICK)
+/* Measured 650us with openwsn_sctimer_rtt */
+#define PORT_delayTx            (650/PORT_US_PER_TICK)
+/** @} */
+
+/**
  * @name    LED pin definitions and handlers
  * @{
  */
