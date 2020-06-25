@@ -70,8 +70,11 @@ ifneq (llvm, $(TOOLCHAIN))
   endif
 endif
 # Add soft or hard FPU CFLAGS depending on the module
-# NOTE: This can be turned into normal conditional syntax once #9913 is fixed
-CFLAGS_FPU ?= $(if $(filter cortexm_fpu,$(USEMODULE)),$(_CORTEX_HW_FPU_CFLAGS),-mfloat-abi=soft)
+ifneq (,$(filter cortexm_fpu,$(USEMODULE)))
+  CFLAGS_FPU ?= $(_CORTEX_HW_FPU_CFLAGS)
+else
+  CFLAGS_FPU ?= -mfloat-abi=soft
+endif
 
 ifeq ($(CPU_CORE),cortex-m4f)
   MCPU = cortex-m4

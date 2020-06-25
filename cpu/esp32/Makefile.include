@@ -43,8 +43,10 @@ INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/esp32/include
 INCLUDES += -I$(ESP32_SDK_DIR)/components/soc/include
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 
-INCLUDES += $(if $(filter esp_eth,$(USEMODULE)),-I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/ethernet)
-INCLUDES += $(if $(filter esp_eth,$(USEMODULE)),-I$(ESP32_SDK_DIR)/components/ethernet/include)
+ifneq (,$(filter esp_eth,$(USEMODULE)))
+  INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/ethernet
+  INCLUDES += -I$(ESP32_SDK_DIR)/components/ethernet/include
+endif
 
 CFLAGS += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM
 CFLAGS += -DLOG_TAG_IN_BRACKETS
@@ -58,18 +60,20 @@ LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp32.rom.nanofmt.ld
 LINKFLAGS += -nostdlib -lgcc -Wl,-gc-sections
 
 # Baselibs needed when using esp_wifi_any pseudomodule
-_ESP_WIFI_ANY_BASELIBS = -lcore -lrtc -lnet80211 -lpp -lcoexist -lwps -lwpa -lwpa2
-_ESP_WIFI_ANY_BASELIBS += -lphy -lstdc++
+ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
+  BASELIBS += -lcore -lrtc -lnet80211 -lpp -lcoexist -lwps -lwpa -lwpa2
+  BASELIBS += -lphy -lstdc++
+endif
 
 # Baselibs needed when using esp_now module
-_ESP_NOW_BASELIBS = -lespnow -lmesh
+ifneq (,$(filter esp_now,$(USEMODULE)))
+  BASELIBS += -lespnow -lmesh
+endif
 
-# NOTE: These checks can be turned into a normal conditional when #9913 is fixed
-BASELIBS += $(if $(filter esp_wifi_any,$(USEMODULE)),$(_ESP_WIFI_ANY_BASELIBS))
-BASELIBS += $(if $(filter esp_now,$(USEMODULE)),$(_ESP_NOW_BASELIBS))
-
-UNDEF += $(if $(filter cpp,$(FEATURES_USED)),$(BINDIR)/esp_cxx/cxa_guard.o)
-BASELIBS += $(if $(filter cpp,$(FEATURES_USED)),-lstdc++)
+ifneq (,$(filter cpp,$(FEATURES_USED)))
+  UNDEF += $(BINDIR)/esp_cxx/cxa_guard.o
+  BASELIBS += -lstdc++
+endif
 
 # additional flasher configuration for ESP32 QEMU
 ifneq (,$(filter esp_qemu,$(USEMODULE)))
