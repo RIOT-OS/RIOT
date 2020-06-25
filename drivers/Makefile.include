@@ -276,6 +276,10 @@ ifneq (,$(filter opt3001,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/opt3001/include
 endif
 
+ifneq (,$(filter pca9633,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/pca9633/include
+endif
+
 ifneq (,$(filter pca9685,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/pca9685/include
 endif
