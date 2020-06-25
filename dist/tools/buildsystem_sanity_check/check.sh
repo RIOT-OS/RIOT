@@ -288,6 +288,21 @@ check_no_pseudomodules_in_makefile_dep() {
         | error_with_message "Don't define PSEUDOMODULES in Makefile.dep"
 }
 
+check_no_usemodules_in_makefile_include() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e 'USEMODULE[\t ]*[+:]*=')
+
+    pathspec+=('**/Makefile.include')
+    pathspec+=(':!Makefile.include')
+    pathspec+=(':!tests/**/Makefile.include')
+    pathspec+=(':!examples/**/Makefile.include')
+
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message "Don't include USEMODULE in Makefile.include"
+}
+
 error_on_input() {
     ! grep ''
 }
@@ -305,6 +320,7 @@ all_checks() {
     checks_develhelp_not_defined_via_cflags
     check_files_in_boards_not_reference_board_var
     check_no_pseudomodules_in_makefile_dep
+    check_no_usemodules_in_makefile_include
 }
 
 main() {
