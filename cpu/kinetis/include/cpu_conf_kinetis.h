@@ -153,6 +153,10 @@ extern "C"
 /** Enable I2C2 clock gate */
 #define I2C2_CLKEN()    (bit_set32(&SIM->SCGC1, SIM_SCGC1_I2C2_SHIFT))
 #endif
+#ifdef SIM_SCGC1_I2C3_SHIFT
+/** Enable I2C3 clock gate */
+#define I2C3_CLKEN()    (bit_set32(&SIM->SCGC1, SIM_SCGC1_I2C3_SHIFT))
+#endif
 /** @} */
 
 /**
