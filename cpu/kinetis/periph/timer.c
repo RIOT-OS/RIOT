@@ -371,7 +371,20 @@ static inline int lptmr_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *ar
     unsigned int mask = irq_disable();
 
     /* Turn on module clock */
-    LPTMR_CLKEN();
+    switch ((uintptr_t)hw) {
+#ifdef LPTMR0
+        case (uintptr_t)LPTMR0:
+            LPTMR0_CLKEN();
+            break;
+#endif
+#ifdef LPTMR1
+        case (uintptr_t)LPTMR1:
+            LPTMR1_CLKEN();
+            break;
+#endif
+        default:
+            return -2;
+    }
 
     /* Completely disable the module before messing with the settings */
     hw->CSR = 0;
@@ -817,5 +830,17 @@ void LPTMR_ISR_0(void)
 void LPTMR_ISR_1(void)
 {
     lptmr_irq_handler(_lptmr_tim_t(1));
+}
+#endif
+
+#ifdef LPTMR_SHARED_ISR
+void LPTMR_ISR(void)
+{
+    for (size_t i = 0; i < LPTMR_NUMOF; i++) {
+        LPTMR_Type *hw = lptmr_config[i].dev;
+        if (hw->CSR & LPTMR_CSR_TCF_MASK) {
+            lptmr_irq_handler(_lptmr_tim_t(i));
+        }
+    }
 }
 #endif

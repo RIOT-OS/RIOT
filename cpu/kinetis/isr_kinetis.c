@@ -159,6 +159,7 @@ WEAK_DEFAULT void isr_i2s0_rx(void);
 WEAK_DEFAULT void isr_i2s0_tx(void);
 WEAK_DEFAULT void isr_llwu(void);
 WEAK_DEFAULT void isr_lptmr0(void);
+WEAK_DEFAULT void isr_lptmr0_lptmr1(void);
 WEAK_DEFAULT void isr_lpuart0(void);
 WEAK_DEFAULT void isr_lpuart1(void);
 WEAK_DEFAULT void isr_lpuart2(void);

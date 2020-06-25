@@ -113,6 +113,7 @@ void isr_i2s0_rx(void);      /**< I2S0 receive interrupt handler */
 void isr_i2s0_tx(void);      /**< I2S0 transmit interrupt handler */
 void isr_llwu(void);         /**< Low leakage wakeup interrupt handler */
 void isr_lptmr0(void);       /**< Low power timer interrupt handler */
+void isr_lptmr0_lptmr1(void);/**< Shared Low power timer interrupt handler */
 void isr_lpuart0(void);      /**< LPUART0 status/error interrupt handler */
 void isr_lpuart1(void);      /**< LPUART1 status/error interrupt handler */
 void isr_lpuart2(void);      /**< LPUART2 status/error interrupt handler */
@@ -170,6 +171,8 @@ void isr_uart5_err(void);    /**< UART5 error interrupt handler */
 void isr_uart5_rx_tx(void);  /**< UART5 receive/transmit interrupt handler */
 void isr_usb0(void);         /**< USB0 interrupt handler */
 void isr_usbdcd(void);       /**< USB charger detect interrupt handler */
+void isr_usbhsdcd(void);     /**< USB High speed Phy interrupt handler */
+void isr_usbhs(void);        /**< USB High speed interrupt handler */
 void isr_wdog_ewm(void);     /**< WDOG interrupt handler */
 
 #ifdef __cplusplus
