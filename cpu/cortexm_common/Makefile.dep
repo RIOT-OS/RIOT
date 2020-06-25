@@ -18,3 +18,8 @@ FEATURES_OPTIONAL += cortexm_fpu
 ifneq (,$(filter cortexm_fpu,$(FEATURES_USED)))
   DEFAULT_MODULE += cortexm_fpu
 endif
+
+# Enable the MPU stack guard if develhelp is enabled
+ifeq (1, $(DEVELHELP))
+  FEATURES_OPTIONAL += cortexm_mpu
+endif
