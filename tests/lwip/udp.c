@@ -25,18 +25,11 @@
 #include "net/af.h"
 #include "net/sock/async/event.h"
 #include "net/sock/udp.h"
+#include "net/sock/util.h"
 #include "shell.h"
 #include "test_utils/expect.h"
 #include "thread.h"
 #include "xtimer.h"
-
-#ifdef MODULE_LWIP_IPV6
-#include "net/ipv6.h"
-#define SOCK_IP_EP_ANY  SOCK_IPV6_EP_ANY
-#else
-#include "net/ipv4.h"
-#define SOCK_IP_EP_ANY  SOCK_IPV4_EP_ANY
-#endif
 
 #ifdef MODULE_SOCK_UDP
 static char sock_inbuf[SOCK_INBUF_SIZE];
@@ -61,16 +54,15 @@ static void _udp_recv(sock_udp_t *sock, sock_async_flags_t flags, void *arg)
         }
         else {
             char addrstr[IPV6_ADDR_MAX_STR_LEN];
+            uint16_t port;
 
-#ifdef MODULE_LWIP_IPV6
-            printf("Received UDP data from [%s]:%" PRIu16 ":\n",
-                   ipv6_addr_to_str(addrstr, (ipv6_addr_t *)&src.addr.ipv6,
-                                    sizeof(addrstr)), src.port);
-#else
-            printf("Received UDP data from [%s]:%" PRIu16 ":\n",
-                   ipv4_addr_to_str(addrstr, (ipv4_addr_t *)&src.addr.ipv4,
-                                    sizeof(addrstr)), src.port);
-#endif
+            printf("Received UDP data from ");
+            if (sock_udp_ep_fmt(&src, addrstr, &port) >= 0) {
+                printf("[%s]:%u\n", addrstr, port);
+            }
+            else {
+                printf("unspecified source\n");
+            }
             od_hex_dump(sock_inbuf, res, 0);
         }
     }
@@ -99,7 +91,7 @@ static void *_server_thread(void *args)
     return NULL;
 }
 
-static int udp_send(char *addr_str, char *port_str, char *data, unsigned int num,
+static int udp_send(char *addr_str, char *data, unsigned int num,
                     unsigned int delay)
 {
     sock_udp_ep_t dst = SOCK_IP_EP_ANY;
@@ -107,16 +99,14 @@ static int udp_send(char *addr_str, char *port_str, char *data, unsigned int num
     size_t data_len;
 
     /* parse destination address */
-#ifdef MODULE_LWIP_IPV6
-    if (ipv6_addr_from_str((ipv6_addr_t *)&dst.addr.ipv6, addr_str) == NULL) {
-#else
-    if (ipv4_addr_from_str((ipv4_addr_t *)&dst.addr.ipv4, addr_str) == NULL) {
-#endif
+    if (sock_udp_str2ep(&dst, addr_str) < 0) {
         puts("Error: unable to parse destination address");
         return 1;
     }
-    /* parse port */
-    dst.port = atoi(port_str);
+    if (dst.port == 0) {
+        puts("Error: no port or illegal port value provided");
+        return 1;
+    }
     data_len = hex2ints(byte_data, data);
     for (unsigned int i = 0; i < num; i++) {
         sock_udp_t *sock = NULL;
@@ -128,8 +118,8 @@ static int udp_send(char *addr_str, char *port_str, char *data, unsigned int num
             puts("could not send");
         }
         else {
-            printf("Success: send %u byte over UDP to [%s]:%" PRIu16 "\n",
-                   (unsigned)data_len, addr_str, dst.port);
+            printf("Success: send %u byte over UDP to %s\n",
+                   (unsigned)data_len, addr_str);
         }
         xtimer_usleep(delay);
     }
@@ -156,18 +146,18 @@ int udp_cmd(int argc, char **argv)
     if (strcmp(argv[1], "send") == 0) {
         uint32_t num = 1;
         uint32_t delay = 1000000;
-        if (argc < 5) {
-            printf("usage: %s send <addr> <port> <hex data> [<num> [<delay in us>]]\n",
+        if (argc < 4) {
+            printf("usage: %s send <addr>:<port> <hex data> [<num> [<delay in us>]]\n",
                    argv[0]);
             return 1;
         }
+        if (argc > 4) {
+            num = atoi(argv[4]);
+        }
         if (argc > 5) {
-            num = atoi(argv[5]);
+            delay = atoi(argv[5]);
         }
-        if (argc > 6) {
-            delay = atoi(argv[6]);
-        }
-        return udp_send(argv[2], argv[3], argv[4], num, delay);
+        return udp_send(argv[2], argv[3], num, delay);
     }
     else if (strcmp(argv[1], "server") == 0) {
         if (argc < 3) {

@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 #include "common.h"
+#include "kernel_defines.h"
 #include "od.h"
 #include "net/af.h"
 #include "net/sock/async/event.h"
@@ -29,14 +30,6 @@
 #include "thread.h"
 #include "test_utils/expect.h"
 #include "xtimer.h"
-
-#ifdef MODULE_LWIP_IPV6
-#include "net/ipv6.h"
-#define SOCK_IP_EP_ANY  SOCK_IPV6_EP_ANY
-#else
-#include "net/ipv4.h"
-#define SOCK_IP_EP_ANY  SOCK_IPV4_EP_ANY
-#endif
 
 #ifdef MODULE_SOCK_IP
 static char sock_inbuf[SOCK_INBUF_SIZE];
@@ -62,15 +55,28 @@ static void _ip_recv(sock_ip_t *sock, sock_async_flags_t flags, void *arg)
         else {
             char addrstr[IPV6_ADDR_MAX_STR_LEN];
 
-#ifdef MODULE_LWIP_IPV6
-            printf("Received IP data from [%s]:\n",
-                   ipv6_addr_to_str(addrstr, (ipv6_addr_t *)&src.addr.ipv6,
-                                    sizeof(addrstr)));
-#else
-            printf("Received IP data from [%s]:\n",
-                   ipv4_addr_to_str(addrstr, (ipv4_addr_t *)&src.addr.ipv4,
-                                    sizeof(addrstr)));
+            printf("Received IP data from ");
+            switch (src.family) {
+#if IS_USED(MODULE_LWIP_IPV4)
+                case AF_INET:
+                    printf("[%s]:\n",
+                           ipv4_addr_to_str(addrstr,
+                                            (ipv4_addr_t *)&src.addr.ipv4,
+                                            sizeof(addrstr)));
+                    break;
 #endif
+#if IS_USED(MODULE_LWIP_IPV6)
+                case AF_INET6:
+                    printf("[%s]:\n",
+                           ipv6_addr_to_str(addrstr,
+                                            (ipv6_addr_t *)&src.addr.ipv6,
+                                            sizeof(addrstr)));
+                    break;
+#endif
+                default:
+                    printf("unspecified source\n");
+                    break;
+            }
             od_hex_dump(sock_inbuf, res, 0);
         }
     }
@@ -105,14 +111,31 @@ static int ip_send(char *addr_str, char *port_str, char *data, unsigned int num,
     size_t data_len;
 
     /* parse destination address */
-#ifdef MODULE_LWIP_IPV6
-    if (ipv6_addr_from_str((ipv6_addr_t *)&dst.addr.ipv6, addr_str) == NULL) {
-#else
-    if (ipv4_addr_from_str((ipv4_addr_t *)&dst.addr.ipv4, addr_str) == NULL) {
+#if IS_USED(MODULE_LWIP_IPV6)
+    if (strchr(addr_str, ':')) {
+        if (ipv6_addr_from_str((ipv6_addr_t *)&dst.addr.ipv6,
+                               addr_str) == NULL) {
+            puts("Error: unable to parse destination address");
+            return 1;
+        }
+        else {
+            dst.family = AF_INET6;
+        }
+    }
+#if IS_USED(MODULE_LWIP_IPV4)
+    else
 #endif
+#endif
+#if IS_USED(MODULE_LWIP_IPV4)
+    if (ipv4_addr_from_str((ipv4_addr_t *)&dst.addr.ipv4,
+                           addr_str) == NULL) {
         puts("Error: unable to parse destination address");
         return 1;
     }
+    else {
+        dst.family = AF_INET;
+    }
+#endif
     /* parse protocol */
     protocol = atoi(port_str);
     data_len = hex2ints(byte_data, data);
@@ -126,13 +149,10 @@ static int ip_send(char *addr_str, char *port_str, char *data, unsigned int num,
             puts("could not send");
         }
         else {
-#ifdef MODULE_LWIP_IPV6
-            printf("Success: send %u byte over IPv6 to %s (next header: %u)\n",
-                   (unsigned)data_len, addr_str, protocol);
-#else
-            printf("Success: send %u byte over IPv4 to %s (next header: %u)\n",
-                   (unsigned)data_len, addr_str, protocol);
-#endif
+            printf("Success: send %u byte over %s to %s (next header: %u)\n",
+                   (unsigned)data_len,
+                   (dst.family == AF_INET6) ? "IPv6" : "IPv4",
+                   addr_str, protocol);
         }
         xtimer_usleep(delay);
     }

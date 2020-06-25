@@ -25,18 +25,11 @@
 #include "net/af.h"
 #include "net/sock/async/event.h"
 #include "net/sock/tcp.h"
+#include "net/sock/util.h"
 #include "shell.h"
 #include "test_utils/expect.h"
 #include "thread.h"
 #include "xtimer.h"
-
-#ifdef MODULE_LWIP_IPV6
-#include "net/ipv6.h"
-#define SOCK_IP_EP_ANY  SOCK_IPV6_EP_ANY
-#else
-#include "net/ipv4.h"
-#define SOCK_IP_EP_ANY  SOCK_IPV4_EP_ANY
-#endif
 
 #ifdef MODULE_SOCK_TCP
 static char sock_inbuf[SOCK_INBUF_SIZE];
@@ -51,19 +44,14 @@ static event_queue_t _ev_queue;
 static void _tcp_recv(sock_tcp_t *sock, sock_async_flags_t flags, void *arg)
 {
     sock_tcp_ep_t client;
+    uint16_t port;
 
     expect(strcmp(arg, "test") == 0);
     if (sock_tcp_get_remote(sock, &client) < 0) {
         /* socket was disconnected between event firing and this handler */
         return;
     }
-#ifdef MODULE_LWIP_IPV6
-    ipv6_addr_to_str(_addr_str, (ipv6_addr_t *)&client.addr.ipv6,
-                     sizeof(_addr_str));
-#else
-    ipv4_addr_to_str(_addr_str, (ipv4_addr_t *)&client.addr.ipv4,
-                     sizeof(_addr_str));
-#endif
+    sock_tcp_ep_fmt(&client, _addr_str, &port);
     if (flags & SOCK_ASYNC_MSG_RECV) {
         int res;
 
@@ -71,8 +59,7 @@ static void _tcp_recv(sock_tcp_t *sock, sock_async_flags_t flags, void *arg)
          * connection */
         while ((res = sock_tcp_read(sock, sock_inbuf, sizeof(sock_inbuf),
                                     0)) >= 0) {
-            printf("Received TCP data from client [%s]:%u:\n", _addr_str,
-                   client.port);
+            printf("Received TCP data from client [%s]:%u\n", _addr_str, port);
             if (res > 0) {
                 od_hex_dump(sock_inbuf, res, 0);
             }
@@ -82,7 +69,7 @@ static void _tcp_recv(sock_tcp_t *sock, sock_async_flags_t flags, void *arg)
         }
     }
     if (flags & SOCK_ASYNC_CONN_FIN) {
-        printf("TCP connection to [%s]:%u reset\n", _addr_str, client.port);
+        printf("TCP connection to [%s]:%u reset\n", _addr_str, port);
         sock_tcp_disconnect(sock);
     }
 }
@@ -100,17 +87,12 @@ static void _tcp_accept(sock_tcp_queue_t *queue, sock_async_flags_t flags,
         }
         else {
             sock_tcp_ep_t client;
+            uint16_t port;
 
             sock_tcp_event_init(sock, &_ev_queue, _tcp_recv, "test");
             sock_tcp_get_remote(sock, &client);
-#ifdef MODULE_LWIP_IPV6
-            ipv6_addr_to_str(_addr_str, (ipv6_addr_t *)&client.addr.ipv6,
-                             sizeof(_addr_str));
-#else
-            ipv4_addr_to_str(_addr_str, (ipv4_addr_t *)&client.addr.ipv4,
-                             sizeof(_addr_str));
-#endif
-            printf("TCP client [%s]:%u connected\n", _addr_str, client.port);
+            sock_tcp_ep_fmt(&client, _addr_str, &port);
+            printf("TCP client [%s]:%u connected\n", _addr_str, port);
         }
     }
 }
@@ -138,28 +120,31 @@ static void *_server_thread(void *args)
     return NULL;
 }
 
-static int tcp_connect(char *addr_str, char *port_str, char *local_port_str)
+static int tcp_connect(char *addr_str, char *local_port_str)
 {
     sock_tcp_ep_t dst = SOCK_IP_EP_ANY;
     uint16_t local_port = 0;
 
     if (client_running) {
         puts("Client already connected");
+        return 1;
     }
 
     /* parse destination address */
-#ifdef MODULE_LWIP_IPV6
-    if (ipv6_addr_from_str((ipv6_addr_t *)&dst.addr.ipv6, addr_str) == NULL) {
-#else
-    if (ipv4_addr_from_str((ipv4_addr_t *)&dst.addr.ipv4, addr_str) == NULL) {
-#endif
+    if (sock_tcp_str2ep(&dst, addr_str) < 0) {
         puts("Error: unable to parse destination address");
         return 1;
     }
-    /* parse port */
-    dst.port = atoi(port_str);
+    if (dst.port == 0) {
+        puts("Error: no port or illegal port value provided");
+        return 1;
+    }
     if (local_port_str != NULL) {
-        local_port = atoi(port_str);
+        local_port = atoi(local_port_str);
+        if (local_port == 0) {
+            puts("Error: Illegal local port 0");
+            return 1;
+        }
     }
     if (sock_tcp_connect(&client_sock, &dst, local_port, 0) < 0) {
         puts("Error: unable to connect");
@@ -214,15 +199,15 @@ int tcp_cmd(int argc, char **argv)
     if (strcmp(argv[1], "connect") == 0) {
         char *local_port = NULL;
 
-        if (argc < 4) {
-            printf("usage: %s connect <addr> <port> [local_port]\n",
+        if (argc < 3) {
+            printf("usage: %s connect <addr>:<port> [local_port]\n",
                    argv[0]);
             return 1;
         }
-        if (argc > 4) {
-            local_port = argv[4];
+        if (argc > 3) {
+            local_port = argv[3];
         }
-        return tcp_connect(argv[2], argv[3], local_port);
+        return tcp_connect(argv[2], local_port);
     }
     if (strcmp(argv[1], "disconnect") == 0) {
         return tcp_disconnect();

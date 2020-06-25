@@ -10,10 +10,14 @@ ifneq (0, $(LWIP_IPV4))
   CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
   LWIP_IPV6 ?= 0
 else
+  # use IPv6 as default IP protocol when IPv4 is not explicitly selected
+  LWIP_IPV6 ?= 1
+endif
+
+ifneq (0, $(LWIP_IPV6))
   USEMODULE += ipv6_addr
   USEMODULE += lwip_ipv6
   USEMODULE += lwip_ipv6_autoconfig
-  LWIP_IPV6 ?= 1
 endif
 
 # including lwip_ipv6_mld would currently break this test on at86rf2xx radios
@@ -22,6 +26,7 @@ USEMODULE += lwip_udp lwip_sock_udp
 USEMODULE += lwip_tcp lwip_sock_tcp
 USEMODULE += lwip_sock_async
 USEMODULE += sock_async_event
+USEMODULE += sock_util
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps

@@ -330,11 +330,6 @@ static int _create(int type, int proto, uint16_t flags, struct netconn **out)
         return -ENOMEM;
     }
     netconn_set_callback_arg(*out, NULL);
-#if LWIP_IPV4 && LWIP_IPV6
-    if (type & NETCONN_TYPE_IPV6) {
-        netconn_set_ipv6only(*out, 1);
-    }
-#endif
 #if SO_REUSE
     if (flags & SOCK_FLAGS_REUSE_EP) {
         ip_set_option((*out)->pcb.ip, SOF_REUSEADDR);
