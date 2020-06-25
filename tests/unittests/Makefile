@@ -28,6 +28,9 @@ BASELIBS += $(UNIT_TESTS:%=$(BINDIR)/%.a)
 
 INCLUDES += -I$(RIOTBASE)/tests/unittests/common
 
+# some tests need more stack
+CFLAGS += -DTHREAD_STACKSIZE_MAIN=THREAD_STACKSIZE_LARGE
+
 include $(RIOTBASE)/Makefile.include
 
 .PHONY: $(UNIT_TESTS)
