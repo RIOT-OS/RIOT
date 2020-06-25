@@ -29,30 +29,6 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static int _get_iid(netdev_ieee802154_t *dev, eui64_t *value, size_t max_len)
-{
-    (void)max_len;
-
-    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
-    uint16_t addr_len;
-
-    assert(max_len >= sizeof(eui64_t));
-
-    dev->netdev.driver->get(&dev->netdev, NETOPT_SRC_LEN, &addr_len,
-                            sizeof(addr_len));
-    if (addr_len == IEEE802154_LONG_ADDRESS_LEN) {
-        dev->netdev.driver->get(&dev->netdev, NETOPT_ADDRESS_LONG, addr,
-                                addr_len);
-    }
-    else {
-        dev->netdev.driver->get(&dev->netdev, NETOPT_ADDRESS, addr,
-                                addr_len);
-    }
-    ieee802154_get_iid(value, addr, addr_len);
-
-    return sizeof(eui64_t);
-}
-
 void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
 {
     /* Only the least significant byte of the random value is used */
@@ -106,6 +82,7 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
 {
     int res = -ENOTSUP;
 
+    (void)max_len;  /* only used in assert() */
     switch (opt) {
         case NETOPT_ADDRESS:
             assert(max_len >= sizeof(dev->short_addr));
@@ -169,9 +146,6 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
             assert(max_len == sizeof(uint16_t));
             *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
             res = sizeof(uint16_t);
-            break;
-        case NETOPT_IPV6_IID:
-            res = _get_iid(dev, value, max_len);
             break;
 #ifdef MODULE_L2FILTER
         case NETOPT_L2FILTER:

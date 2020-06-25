@@ -506,26 +506,6 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
 }
 
 /**
- * @brief   Generate an IPv6 interface identifier for a CC110X transceiver
- *
- * @param   dev     Transceiver to create the IPv6 interface identifier (IID)
- * @param   iid     Store the generated IID here
- *
- * @return  Returns the size of @ref eui64_t to confirm with the API
- *          in @ref netdev_driver_t::get
- */
-static int cc110x_get_iid(cc110x_t *dev, eui64_t *iid)
-{
-    static const eui64_t empty_iid = {
-        .uint8 = { 0x00, 0x00, 0x00, 0xff, 0xfe, 0x00, 0x00, 0x00 }
-    };
-
-    *iid = empty_iid;
-    iid->uint8[7] = dev->addr;
-    return sizeof(eui64_t);
-}
-
-/**
  * @brief   Checks if the CC110x's address filter is disabled
  * @param   dev     Transceiver to check if in promiscuous mode
  * @param   dest    Store the result here
@@ -551,6 +531,7 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
 {
     cc110x_t *dev = (cc110x_t *)netdev;
 
+    (void)max_len;  /* only used in assert() */
     switch (opt) {
         case NETOPT_DEVICE_TYPE:
             assert(max_len == sizeof(uint16_t));
@@ -574,11 +555,6 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
             assert(max_len >= CC1XXX_ADDR_SIZE);
             *((uint8_t *)val) = dev->addr;
             return CC1XXX_ADDR_SIZE;
-        case NETOPT_IPV6_IID:
-            if (max_len < sizeof(eui64_t)) {
-                return -EOVERFLOW;
-            }
-            return cc110x_get_iid(dev, val);
         case NETOPT_CHANNEL:
             assert(max_len == sizeof(uint16_t));
             *((uint16_t *)val) = dev->channel;

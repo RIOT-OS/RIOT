@@ -221,10 +221,6 @@ static int _netdev_get(netdev_t *netdev, netopt_t opt,
             *((uint16_t *)value) = NETDEV_TYPE_BLE;
             res = sizeof(uint16_t);
             break;
-        case NETOPT_IPV6_IID:
-            eui48_to_ipv6_iid((eui64_t *)value, (eui48_t *)_ble_netif->l2addr);
-            res = sizeof(uint64_t);
-            break;
         default:
             break;
     }

@@ -763,19 +763,6 @@ static int xbee_get(netdev_t *ndev, netopt_t opt, void *value, size_t max_len)
             assert(max_len == sizeof(uint16_t));
             *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
             return sizeof(uint16_t);
-        case NETOPT_IPV6_IID:
-            if (max_len < sizeof(eui64_t)) {
-                return -EOVERFLOW;
-            }
-            if (dev->addr_flags & XBEE_ADDR_FLAGS_LONG) {
-                ieee802154_get_iid(value, dev->addr_long.uint8,
-                                   IEEE802154_LONG_ADDRESS_LEN);
-            }
-            else {
-                ieee802154_get_iid(value, dev->addr_short,
-                                   IEEE802154_SHORT_ADDRESS_LEN);
-            }
-            return sizeof(eui64_t);
         case NETOPT_CHANNEL:
             return _get_channel(dev, (uint8_t *)value, max_len);
         case NETOPT_MAX_PDU_SIZE:

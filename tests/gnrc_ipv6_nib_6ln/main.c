@@ -1327,12 +1327,6 @@ int _mock_netif_get(gnrc_netapi_opt_t *opt)
                 *val = sizeof(_loc_l2);
                 return sizeof(uint16_t);
             }
-        case NETOPT_IPV6_IID:
-            if (opt->data_len < sizeof(_loc_iid)) {
-                return -EOVERFLOW;
-            }
-            memcpy(opt->data, _loc_iid, sizeof(_loc_iid));
-            return sizeof(_loc_iid);
         case NETOPT_IS_WIRED:
             return 1;
         case NETOPT_MAX_PDU_SIZE: {
