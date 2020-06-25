@@ -1,0 +1,40 @@
+INCLUDES += -I$(PKGDIRBASE)/openwsn \
+            -I$(PKGDIRBASE)/openwsn/kernel \
+            -I$(PKGDIRBASE)/openwsn/inc \
+            -I$(PKGDIRBASE)/openwsn/drivers/common \
+            -I$(PKGDIRBASE)/openwsn/bsp/boards/ \
+            -I$(PKGDIRBASE)/openwsn/openstack/ \
+            -I$(PKGDIRBASE)/openwsn/openstack/02a-MAClow \
+            -I$(PKGDIRBASE)/openwsn/openstack/02b-MAChigh \
+            -I$(PKGDIRBASE)/openwsn/openstack/03a-IPHC \
+            -I$(PKGDIRBASE)/openwsn/openstack/03b-IPv6 \
+            -I$(PKGDIRBASE)/openwsn/openstack/04-TRAN \
+            -I$(PKGDIRBASE)/openwsn/openstack/cross-layers \
+            -I$(PKGDIRBASE)/openwsn/openapps \
+            -I$(PKGDIRBASE)/openwsn/openapps/cjoin \
+            -I$(PKGDIRBASE)/openwsn/openapps/opencoap \
+            -I$(RIOTBASE)/pkg/openwsn/include \
+
+DIRS += $(RIOTBASE)/pkg/openwsn/contrib
+
+PSEUDOMODULES += openwsn_serial
+PSEUDOMODULES += openwsn_debugpins
+PSEUDOMODULES += openwsn_leds
+PSEUDOMODULES += openwsn_sctimer%
+PSEUDOMODULES += openwsn_cryptoengine
+PSEUDOMODULES += openwsn_radio
+
+# In OpenWSN the ISR stack is shared with the network stack. OpenWSN stack is
+# 2Kb, this means that the ISR stack in OpenWSN might have up to 2Kb available.
+# To keep the same marging increase the ISR stack to 2Kb as well. In practice
+# 1Kb should be enough.
+CFLAGS += -DISR_STACKSIZE=2048
+
+# at86rf2xx state machine is in enhanced mode by default, OpenWSN requires
+# basic mode.
+ifneq (,$(filter at86rf2xx,$(USEMODULE)))
+  CFLAGS += -DAT86RF2XX_BASIC_MODE
+endif
+
+# LLVM ARM shows issues with missing definitions fot stdatomic
+TOOLCHAINS_BLACKLIST += llvm

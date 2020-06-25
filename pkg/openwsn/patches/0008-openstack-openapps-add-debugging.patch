@@ -1,0 +1,175 @@
+From ae6271246adb6fb97a8d23f4b09f78223dbb04f6 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 27 Mar 2020 10:18:16 +0100
+Subject: [PATCH 08/11] openstack/openapps: add debugging
+
+Debugging info that can be also be obtained through ifconfig in
+tests/openwsn.
+---
+ kernel/openos/scheduler.c          |  3 ++-
+ openapps/cjoin/cjoin.c             | 10 +++++++++-
+ openstack/02a-MAClow/IEEE802154E.c |  4 ++++
+ openstack/02b-MAChigh/neighbors.c  |  4 ++++
+ openstack/03b-IPv6/icmpv6rpl.c     |  4 ++++
+ 5 files changed, 23 insertions(+), 2 deletions(-)
+
+diff --git a/kernel/openos/scheduler.c b/kernel/openos/scheduler.c
+index 28bfe5c2..175d6309 100644
+--- a/kernel/openos/scheduler.c
++++ b/kernel/openos/scheduler.c
+@@ -12,6 +12,7 @@
+ 
+ #include "openwsn.h"
+ #include "thread.h"
++#include "log.h"
+ 
+ #define OPENWSN_SCHEDULER_FLAG    (1u << 8)
+ 
+@@ -87,7 +88,7 @@ void scheduler_push_task(task_cbt cb, task_prio_t prio) {
+     }
+     if (taskContainer>&scheduler_vars.taskBuf[TASK_LIST_DEPTH-1]) {
+        // task list has overflown. This should never happpen!
+-
++       LOG_ERROR("[openos/scheduler]: critical, task list overflow\n");
+        // we can not print from within the kernel. Instead:
+        // blink the error LED
+        leds_error_blink();
+diff --git a/openapps/cjoin/cjoin.c b/openapps/cjoin/cjoin.c
+index 2d87372f..74eca7b3 100644
+--- a/openapps/cjoin/cjoin.c
++++ b/openapps/cjoin/cjoin.c
+@@ -18,6 +18,8 @@
+ #include "eui64.h"
+ #include "neighbors.h"
+ 
++#include "log.h"
++
+ //=========================== defines =========================================
+ 
+ /// inter-packet period (in ms)
+@@ -134,14 +136,18 @@ owerror_t cjoin_receive(OpenQueueEntry_t* msg,
+     owerror_t ret;
+ 
+     if (coap_header->Code != COAP_CODE_RESP_CHANGED) {
++        LOG_DEBUG("[cjoin]:fail, replay protection\n");
+         return E_FAIL;
+     }
+ 
+     ret = cojp_cbor_decode_configuration_object(msg->payload, msg->length, &configuration);
+-    if (ret == E_FAIL) { return E_FAIL; }
++    if (ret == E_FAIL) {
++        LOG_DEBUG("[cjoin]: decode fail\n");
++        return E_FAIL; }
+ 
+     if (configuration.keyset.num_keys == 1 &&
+         configuration.keyset.key[0].key_usage == COJP_KEY_USAGE_6TiSCH_K1K2_ENC_MIC32) {
++            LOG_DEBUG("[cjoin]: success\n");
+             // set the L2 keys as per the parsed value
+             IEEE802154_security_setBeaconKey(configuration.keyset.key[0].key_index, configuration.keyset.key[0].key_value);
+             IEEE802154_security_setDataKey(configuration.keyset.key[0].key_index, configuration.keyset.key[0].key_value);
+@@ -152,6 +158,7 @@ owerror_t cjoin_receive(OpenQueueEntry_t* msg,
+         // TODO not supported for now
+     }
+ 
++    LOG_DEBUG("[cjoin]: failed\n");
+     return E_FAIL;
+ }
+ 
+@@ -300,6 +307,7 @@ owerror_t cjoin_sendJoinRequest(open_addr_t* joinProxy) {
+     packetfunctions_reserveHeaderSize(pkt, payload_len);
+     memcpy(pkt->payload, tmp, payload_len);
+     // send
++    LOG_DEBUG("[cjoin]: send join request\n");
+     outcome = opencoap_send(
+         pkt,
+         COAP_TYPE_NON,
+diff --git a/openstack/02a-MAClow/IEEE802154E.c b/openstack/02a-MAClow/IEEE802154E.c
+index 07921ae3..c1b532af 100644
+--- a/openstack/02a-MAClow/IEEE802154E.c
++++ b/openstack/02a-MAClow/IEEE802154E.c
+@@ -18,6 +18,8 @@
+ #include "openrandom.h"
+ #include "msf.h"
+ 
++#include "log.h"
++
+ //=========================== definition ======================================
+ 
+ //=========================== variables =======================================
+@@ -806,6 +808,7 @@ port_INLINE void activity_synchronize_endOfFrame(PORT_TIMER_WIDTH capturedTime)
+       synchronizePacket(ieee154e_vars.syncCapturedTime);
+ 
+       // declare synchronized
++      LOG_DEBUG("[IEE20154E]: synchronized\n");
+       changeIsSync(TRUE);
+       // log the info
+       openserial_printInfo(COMPONENT_IEEE802154E,ERR_SYNCHRONIZED,
+@@ -890,6 +893,7 @@ port_INLINE void activity_ti1ORri1(void) {
+             ieee154e_vars.numOfSleepSlots = 1;
+ 
+             // declare myself desynchronized
++            LOG_DEBUG("[IEE20154E]: desynchronized\n");
+             changeIsSync(FALSE);
+ 
+             // log the error
+diff --git a/openstack/02b-MAChigh/neighbors.c b/openstack/02b-MAChigh/neighbors.c
+index 4cfcf146..b5f064e9 100644
+--- a/openstack/02b-MAChigh/neighbors.c
++++ b/openstack/02b-MAChigh/neighbors.c
+@@ -8,6 +8,8 @@
+ #include "openrandom.h"
+ #include "msf.h"
+ 
++#include "log.h"
++
+ //=========================== variables =======================================
+ 
+ neighbors_vars_t neighbors_vars;
+@@ -687,6 +689,7 @@ void registerNewNeighbor(open_addr_t* address,
+         i=0;
+         while(i<MAXNUMNEIGHBORS) {
+             if (neighbors_vars.neighbors[i].used==FALSE) {
++                LOG_DEBUG("[neighbors]: new neighbor rssi: %d\n", rssi);
+                 if (rssi < GOODNEIGHBORMINRSSI){
+                     break;
+                 }
+@@ -738,6 +741,7 @@ bool isNeighbor(open_addr_t* neighbor) {
+ 
+ void removeNeighbor(uint8_t neighborIndex) {
+ 
++    LOG_DEBUG("[neighbors]: remove beighbour %d\n", neighborIndex);
+     neighbors_vars.neighbors[neighborIndex].used                      = FALSE;
+     neighbors_vars.neighbors[neighborIndex].parentPreference          = 0;
+     neighbors_vars.neighbors[neighborIndex].stableNeighbor            = FALSE;
+diff --git a/openstack/03b-IPv6/icmpv6rpl.c b/openstack/03b-IPv6/icmpv6rpl.c
+index 86e1c7d3..9d819394 100644
+--- a/openstack/03b-IPv6/icmpv6rpl.c
++++ b/openstack/03b-IPv6/icmpv6rpl.c
+@@ -14,6 +14,8 @@
+ #include "schedule.h"
+ #include "msf.h"
+ 
++#include "log.h"
++
+ //=========================== definition ======================================
+ 
+ #define DIO_PORTION 10
+@@ -477,6 +479,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection(void) {
+     }
+ 
+     if (foundBetterParent) {
++        LOG_DEBUG("[icmpv6rpl]: found better parent\n");
+         icmpv6rpl_vars.haveParent=TRUE;
+         if (!prevHadParent) {
+             // in case preParent is killed before calling this function, clear the preferredParent flag
+@@ -645,6 +648,7 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t* msg) {
+ }
+ 
+ void icmpv6rpl_killPreferredParent(void) {
++    LOG_DEBUG("[icmpv6rpl]: kill better parent\n");
+     icmpv6rpl_vars.haveParent=FALSE;
+     if (idmanager_getIsDAGroot()==TRUE) {
+        icmpv6rpl_vars.myDAGrank=MINHOPRANKINCREASE;
+-- 
+2.27.0
+

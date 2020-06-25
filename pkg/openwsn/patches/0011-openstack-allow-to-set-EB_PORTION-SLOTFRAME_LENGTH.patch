@@ -1,0 +1,42 @@
+From d20020308e0728987dff1190273a7b7322926b64 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Thu, 25 Jun 2020 17:50:24 +0200
+Subject: [PATCH 11/11] openstack: allow to set EB_PORTION, SLOTFRAME_LENGTH
+
+---
+ openstack/02a-MAClow/IEEE802154E.h | 2 ++
+ openstack/02b-MAChigh/schedule.h   | 3 +++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/openstack/02a-MAClow/IEEE802154E.h b/openstack/02a-MAClow/IEEE802154E.h
+index 117aa7f3..11d7ec10 100644
+--- a/openstack/02a-MAClow/IEEE802154E.h
++++ b/openstack/02a-MAClow/IEEE802154E.h
+@@ -41,7 +41,9 @@ static const uint8_t ebIEsBytestream[] = {
+ #define TXRETRIES                   15 // number of MAC retries before declaring failed
+ #define TX_POWER                    31 // 1=-25dBm, 31=0dBm (max value)
+ #define RESYNCHRONIZATIONGUARD       5 // in 32kHz ticks. min distance to the end of the slot to successfully synchronize
++#ifndef EB_PORTION
+ #define EB_PORTION                  10 // set EB on minimal cell for 1/EB_PORTION portion
++#endif
+ #define MAXKAPERIOD               1000  // in slots: 1500@20ms per slot -> ~30 seconds. Max value used by adaptive synchronization.
+ #define DESYNCTIMEOUT             1750  // in slots: 1750@20ms per slot -> ~35 seconds. A larger DESYNCTIMEOUT is needed if using a larger KATIMEOUT.
+ #define LIMITLARGETIMECORRECTION     5 // threshold number of ticks to declare a timeCorrection "large"
+diff --git a/openstack/02b-MAChigh/schedule.h b/openstack/02b-MAChigh/schedule.h
+index dc3b9f50..d64d6cf4 100644
+--- a/openstack/02b-MAChigh/schedule.h
++++ b/openstack/02b-MAChigh/schedule.h
+@@ -17,7 +17,10 @@
+ 
+ The superframe reappears over time and can be arbitrarily long.
+ */
++
++#ifndef SLOTFRAME_LENGTH
+ #define SLOTFRAME_LENGTH    101 //should be 101
++#endif
+ 
+ //draft-ietf-6tisch-minimal-06
+ #define SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS                      1
+-- 
+2.27.0
+

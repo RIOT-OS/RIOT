@@ -1,0 +1,32 @@
+From 02420eb4baf4229c66df5f99254f867d816b5e58 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Thu, 25 Jun 2020 15:37:44 +0200
+Subject: [PATCH 10/11] drivers/common/opentimers: enable ISR before return
+
+---
+ drivers/common/opentimers.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/common/opentimers.c b/drivers/common/opentimers.c
+index 718b39a3..0c7c6683 100644
+--- a/drivers/common/opentimers.c
++++ b/drivers/common/opentimers.c
+@@ -60,6 +60,7 @@ opentimers_id_t opentimers_create(uint8_t timer_id, uint8_t task_prio){
+             opentimers_vars.timersBuf[timer_id].isUsed   = TRUE;
+             // the TSCH timer and inhibit timer won't push a task,
+             // hence task_prio is not used
++            ENABLE_INTERRUPTS();
+             return timer_id;
+         }
+     }
+@@ -69,6 +70,7 @@ opentimers_id_t opentimers_create(uint8_t timer_id, uint8_t task_prio){
+             if (opentimers_vars.timersBuf[id].isUsed  == FALSE){
+                 opentimers_vars.timersBuf[id].isUsed   = TRUE;
+                 opentimers_vars.timersBuf[id].timer_task_prio = task_prio;
++                ENABLE_INTERRUPTS();
+                 return id;
+             }
+         }
+-- 
+2.27.0
+

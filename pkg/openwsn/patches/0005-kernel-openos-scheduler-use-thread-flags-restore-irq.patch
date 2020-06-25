@@ -1,0 +1,77 @@
+From 626dbbed27b4a66bcf02fe061d5af1bff2d1accd Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Sun, 29 Mar 2020 12:11:53 +0200
+Subject: [PATCH 05/11] kernel/openos/scheduler: use thread flags, restore
+ irq_state
+
+Use thread_flags_wait_any to pause the scheduler. Set flag in
+scheduler_push_task to trigger new task handling.
+
+squash! kernel/openos/scheduler: use thread flags
+---
+ kernel/openos/scheduler.c | 13 ++++++++++++-
+ kernel/scheduler.h        |  2 +-
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/kernel/openos/scheduler.c b/kernel/openos/scheduler.c
+index 1dad545e..28bfe5c2 100644
+--- a/kernel/openos/scheduler.c
++++ b/kernel/openos/scheduler.c
+@@ -10,6 +10,11 @@
+ #include "debugpins.h"
+ #include "leds.h"
+ 
++#include "openwsn.h"
++#include "thread.h"
++
++#define OPENWSN_SCHEDULER_FLAG    (1u << 8)
++
+ //=========================== variables =======================================
+ 
+ scheduler_vars_t scheduler_vars;
+@@ -31,8 +36,11 @@ void scheduler_init(void) {
+     SCHEDULER_ENABLE_INTERRUPT();
+ }
+ 
+-void scheduler_start(void) {
++void scheduler_start(unsigned state) {
+     taskList_item_t* pThisTask;
++
++   irq_restore(state);
++
+     while (1) {
+         while(scheduler_vars.task_list!=NULL) {
+          // there is still at least one task in the linked-list of tasks
+@@ -59,6 +67,7 @@ void scheduler_start(void) {
+       }
+       debugpins_task_clr();
+       board_sleep();
++      thread_flags_wait_any(OPENWSN_SCHEDULER_FLAG);
+       debugpins_task_set();                      // IAR should halt here if nothing to do
+    }
+ }
+@@ -105,6 +114,8 @@ void scheduler_push_task(task_cbt cb, task_prio_t prio) {
+     }
+ 
+     ENABLE_INTERRUPTS();
++   thread_t *thread = (thread_t*) thread_get(openwsn_get_pid());
++   thread_flags_set(thread, OPENWSN_SCHEDULER_FLAG);
+ }
+ 
+ //=========================== private =========================================
+diff --git a/kernel/scheduler.h b/kernel/scheduler.h
+index bc49817e..f3f64570 100644
+--- a/kernel/scheduler.h
++++ b/kernel/scheduler.h
+@@ -64,7 +64,7 @@ typedef struct {
+ //=========================== prototypes ======================================
+ 
+ void scheduler_init(void);
+-void scheduler_start(void);
++void scheduler_start(unsigned state);
+ void scheduler_push_task(task_cbt task_cb, task_prio_t prio);
+ 
+ /**
+-- 
+2.27.0
+
