@@ -57,6 +57,11 @@ config HAS_CPU_CHECK_ADDRESS
     help
         Indicates that address validity check is supported.
 
+config HAS_EMULATOR_RENODE
+    bool
+    help
+        Indicates that the platform is compatible with the Renode emulator.
+
 config HAS_ETHERNET
     bool
     help

@@ -12,11 +12,13 @@ BOARD_WHITELIST += arduino-duemilanove \
                    cc1312-launchpad \
                    cc1352-launchpad \
                    cc1352p-launchpad \
+                   cc2538dk \
                    cc2650-launchpad \
                    cc2650stk \
                    chronos \
                    derfmega128 \
                    derfmega256 \
+                   firefly \
                    hifive1 \
                    hifive1b \
                    ikea-tradfri \
@@ -24,6 +26,11 @@ BOARD_WHITELIST += arduino-duemilanove \
                    microduino-corerf \
                    msb-430 \
                    msb-430h \
+                   openmote-b \
+                   openmote-cc2538 \
+                   remote-pa \
+                   remote-reva \
+                   remote-revb \
                    samr21-xpro \
                    slstk3401a \
                    slstk3402a \
