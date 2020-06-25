@@ -4,7 +4,7 @@ BOARD_INSUFFICIENT_MEMORY := arduino-duemilanove arduino-leonardo arduino-nano \
                              arduino-uno nucleo-f031k6
 
 USEPKG += arduino_lis3dh
-USEMODULE += arduino_lib
+USEMODULE += arduino
 USEMODULE += cpp11-compat
 USEMODULE += periph_i2c
 USEMODULE += periph_spi

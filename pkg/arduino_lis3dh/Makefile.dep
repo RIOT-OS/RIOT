@@ -1,1 +1,1 @@
-USEMODULE += arduino_lib
+USEMODULE += arduino
