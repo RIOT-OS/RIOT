@@ -42,6 +42,10 @@ extern "C" {
  */
 #define CCM_BLOCK_SIZE                      16
 
+/**
+ * @brief Maximum length for the appended MAC
+ */
+#define CCM_MAC_MAX_LEN                     16
 
 /**
  * @brief Encrypt and authenticate data of arbitrary length in ccm mode.
