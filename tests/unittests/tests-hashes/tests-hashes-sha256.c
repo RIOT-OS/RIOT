@@ -176,42 +176,42 @@ static int calc_and_compare_hash_wrapper(const char *str, const unsigned char *e
 
 static void test_hashes_sha256_hash_sequence_01(void)
 {
-    const char *teststring = "1234567890_1";
+    static const char *teststring = "1234567890_1";
     TEST_ASSERT(calc_and_compare_hash(teststring, h01));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, h01));
 }
 
 static void test_hashes_sha256_hash_sequence_02(void)
 {
-    const char *teststring = "1234567890_2";
+    static const char *teststring = "1234567890_2";
     TEST_ASSERT(calc_and_compare_hash(teststring, h02));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, h02));
 }
 
 static void test_hashes_sha256_hash_sequence_03(void)
 {
-    const char *teststring = "1234567890_3";
+    static const char *teststring = "1234567890_3";
     TEST_ASSERT(calc_and_compare_hash(teststring, h03));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, h03));
 }
 
 static void test_hashes_sha256_hash_sequence_04(void)
 {
-    const char *teststring = "1234567890_4";
+    static const char *teststring = "1234567890_4";
     TEST_ASSERT(calc_and_compare_hash(teststring, h04));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, h04));
 }
 
 static void test_hashes_sha256_hash_sequence_digits_letters(void)
 {
-    const char *teststring = "0123456789abcde-0123456789abcde-0123456789abcde-0123456789abcde-";
+    static const char *teststring = "0123456789abcde-0123456789abcde-0123456789abcde-0123456789abcde-";
     TEST_ASSERT(calc_and_compare_hash(teststring, hdigits_letters));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hdigits_letters));
 }
 
 static void test_hashes_sha256_hash_sequence_pangramm(void)
 {
-    const char *teststring = "Franz jagt im komplett verwahrlosten Taxi quer durch Bayern";
+    static const char *teststring = "Franz jagt im komplett verwahrlosten Taxi quer durch Bayern";
     TEST_ASSERT(calc_and_compare_hash(teststring, hpangramm));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hpangramm));
 }
@@ -219,14 +219,14 @@ static void test_hashes_sha256_hash_sequence_pangramm(void)
 static void test_hashes_sha256_hash_sequence_pangramm_no_more(void)
 {
     /* exchanged `z` with `k` of the first word `Fran[z|k]` */
-    const char *teststring = "Frank jagt im komplett verwahrlosten Taxi quer durch Bayern";
+    static const char *teststring = "Frank jagt im komplett verwahrlosten Taxi quer durch Bayern";
     TEST_ASSERT(calc_and_compare_hash(teststring, hpangramm_no_more));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hpangramm_no_more));
 }
 
 static void test_hashes_sha256_hash_sequence_empty(void)
 {
-    const char *teststring = "";
+    static const char *teststring = "";
     TEST_ASSERT(calc_and_compare_hash(teststring, hempty));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hempty));
 }
@@ -234,33 +234,34 @@ static void test_hashes_sha256_hash_sequence_empty(void)
 static void test_hashes_sha256_hash_sequence_failing_compare(void)
 {
     /* failing compare (sha256 switched last byte of expected hash from `3b` to `3c`) */
-    char *teststring = "This test fails!";
+    static const char *teststring = "This test fails!";
     TEST_ASSERT(!calc_and_compare_hash(teststring, hfailing_compare));
     TEST_ASSERT(!calc_and_compare_hash_wrapper(teststring, hfailing_compare));
 }
 
 static void test_hashes_sha256_hash_long_sequence(void)
 {
-    char *teststring = {"RIOT is an open-source microkernel-based operating system, designed"
-                       " to match the requirements of Internet of Things (IoT) devices and"
-                       " other embedded devices. These requirements include a very low memory"
-                       " footprint (on the order of a few kilobytes), high energy efficiency"
-                       ", real-time capabilities, communication stacks for both wireless and"
-                       " wired networks, and support for a wide range of low-power hardware."};
+    static const char *teststring =
+        {"RIOT is an open-source microkernel-based operating system, designed"
+        " to match the requirements of Internet of Things (IoT) devices and"
+        " other embedded devices. These requirements include a very low memory"
+        " footprint (on the order of a few kilobytes), high energy efficiency"
+        ", real-time capabilities, communication stacks for both wireless and"
+        " wired networks, and support for a wide range of low-power hardware."};
     TEST_ASSERT(calc_and_compare_hash(teststring, hlong_sequence));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hlong_sequence));
 }
 
 static void test_hashes_sha256_hash_sequence_abc(void)
 {
-    char *teststring = "abc";
+    static const char *teststring = "abc";
     TEST_ASSERT(calc_and_compare_hash(teststring, h_fips_oneblock));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, h_fips_oneblock));
 }
 
 static void test_hashes_sha256_hash_sequence_abc_long(void)
 {
-    char *teststring = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
+    static const char *teststring = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq";
     TEST_ASSERT(calc_and_compare_hash(teststring, h_fips_multiblock));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, h_fips_multiblock));
 }
