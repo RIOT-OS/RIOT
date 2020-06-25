@@ -122,12 +122,13 @@ static void test_hashes_sha224_hash_sequence_abc_long(void)
 
 static void test_hashes_sha256_hash_long_sequence(void)
 {
-    char *teststring = {"RIOT is an open-source microkernel-based operating system, designed"
-                       " to match the requirements of Internet of Things (IoT) devices and"
-                       " other embedded devices. These requirements include a very low memory"
-                       " footprint (on the order of a few kilobytes), high energy efficiency"
-                       ", real-time capabilities, communication stacks for both wireless and"
-                       " wired networks, and support for a wide range of low-power hardware."};
+    static const char *teststring =
+        {"RIOT is an open-source microkernel-based operating system, designed"
+         " to match the requirements of Internet of Things (IoT) devices and"
+         " other embedded devices. These requirements include a very low memory"
+         " footprint (on the order of a few kilobytes), high energy efficiency"
+         ", real-time capabilities, communication stacks for both wireless and"
+         " wired networks, and support for a wide range of low-power hardware."};
     TEST_ASSERT(calc_and_compare_hash(teststring, hlong_sequence));
     TEST_ASSERT(calc_and_compare_hash_wrapper(teststring, hlong_sequence));
 }
