@@ -58,11 +58,22 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Default buffer size for the ASYMCUTE (as exponent of 2^n).
+ *
+ *          As the buffer size ALWAYS needs to be power of two, this option
+ *          represents the exponent of 2^n, which will be used as the size of
+ *          the buffer.
+ */
+#ifndef CONFIG_ASYMCUTE_BUFSIZE_EXP
+#define CONFIG_ASYMCUTE_BUFSIZE_EXP     (7U)
+#endif
+
 #ifndef ASYMCUTE_BUFSIZE
 /**
  * @brief   Default buffer size used for receive and request buffers
  */
-#define ASYMCUTE_BUFSIZE            (128U)
+#define ASYMCUTE_BUFSIZE            (1 << CONFIG_ASYMCUTE_BUFSIZE_EXP)
 #endif
 
 #ifndef ASYMCUTE_HANDLER_PRIO
