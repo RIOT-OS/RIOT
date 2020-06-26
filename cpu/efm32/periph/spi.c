@@ -73,12 +73,12 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     USART_InitSync(spi_config[bus].dev, &init);
 
     /* configure pin functions */
-#ifdef _SILICON_LABS_32B_SERIES_0
+#if defined(_SILICON_LABS_32B_SERIES_0)
     spi_config[bus].dev->ROUTE = (spi_config[bus].loc |
                                   USART_ROUTE_RXPEN |
                                   USART_ROUTE_TXPEN |
                                   USART_ROUTE_CLKPEN);
-#else
+#elif defined(_SILICON_LABS_32B_SERIES_1)
     spi_config[bus].dev->ROUTELOC0 = spi_config[bus].loc;
     spi_config[bus].dev->ROUTEPEN = (USART_ROUTEPEN_RXPEN |
                                      USART_ROUTEPEN_TXPEN |
