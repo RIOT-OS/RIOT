@@ -53,7 +53,7 @@
 
 #ifndef RIOTBOOT
 
-#if defined(_SILICON_LABS_32B_SERIES_1)
+#if defined(DCDC_PRESENT) && DCDC_COUNT > 0
 /**
  * @brief   Initialize integrated DC-DC regulator
  */
@@ -176,7 +176,7 @@ void cpu_init(void)
 
 #ifndef RIOTBOOT
 
-#if defined(_SILICON_LABS_32B_SERIES_1)
+#if defined(DCDC_PRESENT) && DCDC_COUNT > 0
     /* initialize dc-dc */
     dcdc_init();
 #endif
