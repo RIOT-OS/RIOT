@@ -136,13 +136,13 @@ extern "C" {
 #define ASYMCUTE_KEEPALIVE_PING     ((CONFIG_ASYMCUTE_KEEPALIVE / 4) * 3)
 #endif
 
-#ifndef ASYMCUTE_T_RETRY
+#ifndef CONFIG_ASYMCUTE_T_RETRY
 /**
  * @brief   Resend interval [in seconds]
  *
  * For the default value, see spec v1.2, section 7.2 -> T_RETRY: 10 to 15 sec
  */
-#define ASYMCUTE_T_RETRY            (10U)       /* -> 10 sec */
+#define CONFIG_ASYMCUTE_T_RETRY            (10U)       /* -> 10 sec */
 #endif
 
 #ifndef ASYMCUTE_N_RETRY
