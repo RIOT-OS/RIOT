@@ -51,6 +51,28 @@ static inline void pm_stopm(uint8_t stopm)
     SMC->PMCTRL = (SMC->PMCTRL & ~(SMC_PMCTRL_STOPM_MASK)) | SMC_PMCTRL_STOPM(stopm);
 }
 
+static inline void _clear_llwu_source(void)
+{
+    /* K28F names the registers PFx for pin wakeup sources and MFx for module
+     * wakeup sources, the other MCU's supported so far all call them Fx
+     * registers
+     */
+#ifdef LLWU_PF1_WUF0_MASK
+    LLWU->PF1 = 0xffu;
+    LLWU->PF2 = 0xffu;
+#else
+    LLWU->F1 = 0xffu;
+    LLWU->F2 = 0xffu;
+#endif
+    /* K28F has 32 LLWU pin wakeup flags */
+#ifdef LLWU_PF3_WUF16
+    LLWU->PF3 = 0xffu;
+#endif
+#ifdef LLWU_PF4_WUF24
+    LLWU->PF4 = 0xffu;
+#endif
+}
+
 void pm_set(unsigned mode)
 {
     unsigned deep = 1;
@@ -103,8 +125,7 @@ void pm_set(unsigned mode)
             /* Clear pending flag first, the LLWU has no purpose in RUN mode, so
              * if the flag is set then it must be a remainder from handling the
              * previous wakeup. */
-            LLWU->F1 = 0xffu;
-            LLWU->F2 = 0xffu;
+            _clear_llwu_source();
             NVIC_ClearPendingIRQ(LLWU_IRQn);
             NVIC_EnableIRQ(LLWU_IRQn);
             break;

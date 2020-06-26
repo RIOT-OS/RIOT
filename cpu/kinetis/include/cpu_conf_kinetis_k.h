@@ -86,6 +86,20 @@
     defined(CPU_MODEL_MK20DX256VML7)
 #include "vendor/MK20D7.h"
 #endif
+#elif (KINETIS_SUBFAMILY == 8)
+#if defined(CPU_MODEL_MK28FN2M0CAU15) || \
+    defined(CPU_MODEL_MK28FN2M0ACAU15) || \
+    defined(CPU_MODEL_MK28FN2M0AVMI15) || \
+    defined(CPU_MODEL_MK28FN2M0CAU15) || \
+    defined(CPU_MODEL_MK28FN2M0VMI15)
+#include "vendor/MK28FA15.h"
+
+/* Separate define as there is no distinguishing macro between this PIT and the
+ * other PIT versions with shared IRQ
+ */
+#define KINETIS_PIT_COMBINED_IRQ    0
+
+#endif
 #endif /* (KINETIS_SUBFAMILY == y) */
 #elif (KINETIS_FAMILY == 6)
 #if (KINETIS_SUBFAMILY == 0)
