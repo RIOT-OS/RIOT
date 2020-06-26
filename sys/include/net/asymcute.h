@@ -115,13 +115,13 @@ extern "C" {
 #define CONFIG_ASYMCUTE_TOPIC_MAXLEN       (32U)
 #endif
 
-#ifndef ASYMCUTE_KEEPALIVE
+#ifndef CONFIG_ASYMCUTE_KEEPALIVE
 /**
  * @brief   Keep alive interval [in s] communicated to the gateway
  *
  * For the default value, see spec v1.2, section 7.2 -> T_WAIT: > 5 min
  */
-#define ASYMCUTE_KEEPALIVE          (360)       /* -> 6 min*/
+#define CONFIG_ASYMCUTE_KEEPALIVE          (360)       /* -> 6 min*/
 #endif
 
 #ifndef ASYMCUTE_KEEPALIVE_PING
@@ -131,9 +131,9 @@ extern "C" {
  * The default behavior of this implementation is to send ping messages as soon
  * as three quarters of the keep alive interval have passed.
  *
- * @note    Must be less than ASYMCUTE_KEEPALIVE
+ * @note    Must be less than CONFIG_ASYMCUTE_KEEPALIVE
  */
-#define ASYMCUTE_KEEPALIVE_PING     ((ASYMCUTE_KEEPALIVE / 4) * 3)
+#define ASYMCUTE_KEEPALIVE_PING     ((CONFIG_ASYMCUTE_KEEPALIVE / 4) * 3)
 #endif
 
 #ifndef ASYMCUTE_T_RETRY

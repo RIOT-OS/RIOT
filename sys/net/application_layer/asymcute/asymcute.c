@@ -752,7 +752,7 @@ int asymcute_connect(asymcute_con_t *con, asymcute_req_t *req,
     req->data[1] = MQTTSN_CONNECT;
     req->data[2] = ((clean) ? MQTTSN_CS : 0);
     req->data[3] = PROTOCOL_VERSION;
-    byteorder_htobebufs(&req->data[4], ASYMCUTE_KEEPALIVE);
+    byteorder_htobebufs(&req->data[4], CONFIG_ASYMCUTE_KEEPALIVE);
     memcpy(&req->data[6], cli_id, id_len);
     req->data_len = (size_t)req->data[0];
     _req_send(req, con, _on_con_timeout);
