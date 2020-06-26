@@ -363,6 +363,12 @@ include $(RIOTBASE)/Makefile.features
 include $(RIOTMAKE)/pseudomodules.inc.mk
 include $(RIOTMAKE)/defaultmodules.inc.mk
 
+# handle removal of default modules
+USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
+
+# process dependencies
+include $(RIOTMAKE)/dependency_resolution.inc.mk
+
 # Include Board and CPU configuration
 INCLUDES += $(addprefix -I,$(wildcard $(BOARDDIR)/include))
 include $(BOARDDIR)/Makefile.include
@@ -384,12 +390,6 @@ include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 # Non cached builds are not affected in any way.
 # For more information, see http://petereisentraut.blogspot.com/2011/09/ccache-and-clang-part-2.html
 export CCACHE_CPP2=yes
-
-# handle removal of default modules
-USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
-
-# process dependencies
-include $(RIOTMAKE)/dependency_resolution.inc.mk
 
 ifeq ($(strip $(MCU)),)
 	MCU = $(CPU)
