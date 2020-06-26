@@ -15,30 +15,30 @@ LWIP_MODULE_MAKEFILE = $(RIOTBASE)/Makefile.base
 
 CFLAGS += -Wno-address
 
-make_module = "$(MAKE)" -f $(LWIP_MODULE_MAKEFILE) MODULE=$(1) -C $(2)
+make_module = "$(MAKE)" -C $(2) -f $(LWIP_MODULE_MAKEFILE) MODULE=$(1)
 
 all: lwip
 
 lwip: $(LWIP_USEMODULE)
-	$(call make_module,$@,$(PKG_BUILDDIR))
+	$(call make_module,$@,$(PKG_SOURCE_DIR))
 
 lwip_api:
-	$(call make_module,$@,$(PKG_BUILDDIR)/src/api)
+	$(call make_module,$@,$(PKG_SOURCE_DIR)/src/api)
 
 lwip_core:
-	$(call make_module,$@,$(PKG_BUILDDIR)/src/core)
+	$(call make_module,$@,$(PKG_SOURCE_DIR)/src/core)
 
 lwip_ipv4:
-	$(call make_module,$@,$(PKG_BUILDDIR)/src/core/ipv4)
+	$(call make_module,$@,$(PKG_SOURCE_DIR)/src/core/ipv4)
 
 lwip_ipv6:
-	$(call make_module,$@,$(PKG_BUILDDIR)/src/core/ipv6)
+	$(call make_module,$@,$(PKG_SOURCE_DIR)/src/core/ipv6)
 
 lwip_netif:
-	$(call make_module,$@,$(PKG_BUILDDIR)/src/netif)
+	$(call make_module,$@,$(PKG_SOURCE_DIR)/src/netif)
 
 lwip_netif_ppp:
-	$(call make_module,$@,$(PKG_BUILDDIR)/src/netif/ppp)
+	$(call make_module,$@,$(PKG_SOURCE_DIR)/src/netif/ppp)
 
 lwip_polarssl:
-	$(call make_module,$@,$(PKG_BUILDDIR)/src/netif/ppp/polarssl)
+	$(call make_module,$@,$(PKG_SOURCE_DIR)/src/netif/ppp/polarssl)

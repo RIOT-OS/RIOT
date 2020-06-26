@@ -7,4 +7,4 @@ PKG_BUILDDIR=$(CURDIR)/bin
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	cp $(PKG_BUILDDIR)/cc2538-bsl.py .
+	cp $(PKG_SOURCE_DIR)/cc2538-bsl.py .

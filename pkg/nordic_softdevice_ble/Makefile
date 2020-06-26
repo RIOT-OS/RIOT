@@ -5,9 +5,10 @@ PKG_URL = https://developer.nordicsemi.com/nRF5_IoT_SDK/nRF5_IoT_SDK_v0.9.x/$(PK
 PKG_MD5 = 291c875df69c51e22491e6112128bd9c
 PKG_LICENSE = nordic-bsd
 
-PKG_DIR=$(CURDIR)
-PKG_BUILDDIR=$(PKGDIRBASE)/$(PKG_NAME)
-PKG_SRCDIR=$(PKG_BUILDDIR)/src
+PKG_DIR = $(CURDIR)
+PKG_BUILD_DIR = $(BINDIR)/pkg/$(PKG_NAME)
+PKG_SOURCE_DIR = $(PKGDIRBASE)/$(PKG_NAME)
+PKG_SRCDIR  = $(PKG_SOURCE_DIR)/src
 
 SOFTDEVICE := components/softdevice/s1xx_iot/s1xx-iot-prototype3_nrf52_softdevice.hex
 BLE_6LOWPAN_LIB := components/iot/ble_6lowpan/lib/ble_6lowpan.a
@@ -21,13 +22,13 @@ all: $(BINDIR)/ble_6lowpan.a $(BINDIR)/softdevice.hex $(SOFTDEVICE_MODULES)
 prepare: $(PKG_SRCDIR)/.extracted
 
 softdevice_handler:
-	make -C $(PKG_BUILDDIR)/src/components/softdevice/common/softdevice_handler -f $(RIOTBASE)/Makefile.base
+	"$(MAKE)" -C $(PKG_SRCDIR)/components/softdevice/common/softdevice_handler -f $(RIOTBASE)/Makefile.base
 
 ble_common:
-	make -C $(PKG_BUILDDIR)/src/components/ble/common -f $(CURDIR)/ble_common.mk
+	"$(MAKE)" -C $(PKG_SRCDIR)/components/ble/common -f $(CURDIR)/ble_common.mk
 
 ble_ipsp:
-	make -C $(PKG_BUILDDIR)/src/components/iot/ble_ipsp -f $(RIOTBASE)/Makefile.base
+	"$(MAKE)" -C $(PKG_SRCDIR)/components/iot/ble_ipsp -f $(RIOTBASE)/Makefile.base
 
 $(BINDIR)/ble_6lowpan.a: $(PKG_SRCDIR)/.extracted
 	cp $(PKG_SRCDIR)/$(BLE_6LOWPAN_LIB) $@
@@ -38,18 +39,18 @@ $(BINDIR)/ble_6lowpan.a: $(PKG_SRCDIR)/.extracted
 $(BINDIR)/softdevice.hex: $(PKG_SRCDIR)/.extracted
 	$(Q)$(OBJCOPY) $(OFLAGS) -Oihex --gap-fill 0xff $(PKG_SRCDIR)/$(SOFTDEVICE) $@
 
-$(PKG_SRCDIR)/.extracted: $(PKG_BUILDDIR)/$(PKG_FILE)
+$(PKG_SRCDIR)/.extracted: $(PKG_SOURCE_DIR)/$(PKG_FILE)
 	rm -rf $(@D)
 	mkdir -p $(@D)
-	$(Q)cd $(@D) && $(UNZIP_HERE) $(PKG_BUILDDIR)/$(PKG_FILE)
+	$(Q)cd $(@D) && $(UNZIP_HERE) $(PKG_SOURCE_DIR)/$(PKG_FILE)
 	touch $@
 
-$(PKG_BUILDDIR)/$(PKG_FILE):
+$(PKG_SOURCE_DIR)/$(PKG_FILE):
 	@mkdir -p $(@D)
 	$(Q)$(DLCACHE) $(PKG_URL) $(PKG_MD5) $@
 
 clean::
-	rm -rf $(PKG_SRCDIR)/
+	rm -rf $(PKG_SOURCE_DIR)/
 
 distclean::
-	rm -rf $(PKG_BUILDDIR)/
+	rm -rf $(PKG_BUILD_DIR)/

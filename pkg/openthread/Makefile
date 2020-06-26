@@ -3,6 +3,10 @@ PKG_URL=https://github.com/openthread/openthread.git
 PKG_VERSION=thread-reference-20180926
 PKG_LICENSE=BSD-3-Clause
 
+# OpenThread build system doesn't support (yet) out-of-source builds
+# so clone and build OpenThread within the application build directory
+PKG_BUILD_OUT_OF_SOURCE = 0
+
 include $(RIOTBASE)/pkg/pkg.mk
 
 ifneq (,$(filter openthread-ftd,$(USEMODULE)))
@@ -25,7 +29,7 @@ OPENTHREAD_COMMON_FLAGS = -fdata-sections -ffunction-sections -Os
 OPENTHREAD_COMMON_FLAGS += -Wno-implicit-fallthrough -Wno-unused-parameter
 OPENTHREAD_CXXFLAGS += -Wno-class-memaccess
 
-OT_LIB_DIR = $(PKG_BUILDDIR)/output/lib
+OT_LIB_DIR = $(PKG_BUILD_DIR)/output/lib
 MODULE_LIBS = mbedcrypto.a openthread-$(TD).a
 ifneq (,$(filter openthread-cli,$(USEMODULE)))
   MODULE_LIBS += openthread-cli.a
@@ -43,12 +47,12 @@ $(BINDIR)/mbedcrypto.a: $(BINDIR)/openthread-$(TD).a
 $(BINDIR)/openthread-cli.a: $(BINDIR)/openthread-$(TD).a
 	@cp $(OT_LIB_DIR)/libopenthread-cli-$(TD).a $@
 
-$(OT_LIB_DIR)/libopenthread-$(TD).a: $(PKG_BUILDDIR)/Makefile
-	make -C $(PKG_BUILDDIR) -j4 --no-print-directory install DESTDIR=$(PKG_BUILDDIR)/output PREFIX=/
+$(OT_LIB_DIR)/libopenthread-$(TD).a: $(PKG_BUILD_DIR)/Makefile
+	make -C $(PKG_BUILD_DIR) -j4 --no-print-directory install DESTDIR=$(PKG_BUILD_DIR)/output PREFIX=/
 	$(Q)printf "OpenThread built for %s device\n" $(TD)
 
-$(PKG_BUILDDIR)/Makefile: $(PKG_BUILDDIR)/configure
-	$(Q)cd $(PKG_BUILDDIR) && CPP="$(CPP)" CC="$(CC)" CXX="$(CXX)"\
+$(PKG_BUILD_DIR)/Makefile: $(PKG_BUILD_DIR)/configure
+	$(Q)cd $(PKG_BUILD_DIR) && CPP="$(CPP)" CC="$(CC)" CXX="$(CXX)"\
 		OBJC="" OBJCXX="" AR="$(AR)" RANLIB="$(RANLIB)" NM="$(NM)" \
 		STRIP="$(STRIP)" \
 		CPPFLAGS="$(OPENTHREAD_COMMON_FLAGS) $(CFLAGS_CPU) -D$(CONFIG_FILE)" \
@@ -60,6 +64,6 @@ $(PKG_BUILDDIR)/Makefile: $(PKG_BUILDDIR)/configure
 		./configure --disable-docs --host=$(TARGET_ARCH) --target=$(TARGET_ARCH) \
 		--prefix=/ --enable-default-logging $(OPENTHREAD_ARGS)
 
-$(PKG_BUILDDIR)/configure: $(PKG_PREPARED)
+$(PKG_BUILD_DIR)/configure: $(PKG_PREPARED)
 	$(Q)printf "OPENTHREAD_ARGS is [$(OPENTHREAD_ARGS)]\n"
-	$(Q)cd $(PKG_BUILDDIR) && PREFIX="/" ./bootstrap
+	$(Q)cd $(PKG_BUILD_DIR) && PREFIX="/" ./bootstrap

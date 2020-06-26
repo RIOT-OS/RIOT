@@ -6,4 +6,4 @@ PKG_LICENSE=	# license of the package
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	$(MAKE) -C $(CURDIR)/$(PKG_NAME)
+	$(MAKE) -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base

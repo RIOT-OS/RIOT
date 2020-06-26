@@ -5,9 +5,6 @@ PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-JERRYSCRIPT_BUILD_DIR   ?= $(PKG_BUILDDIR)/build
-JERRYSCRIPT_SOURCE_DIR  ?= $(PKG_BUILDDIR)
-
 CFLAGS += -Wno-implicit-fallthrough
 
 JERRYHEAP ?= 16
@@ -40,14 +37,14 @@ endif
 
 all: libjerry
 
-libjerry: $(JERRYSCRIPT_BUILD_DIR)/Makefile
-	"$(MAKE)" -C $(JERRYSCRIPT_BUILD_DIR) jerry-core jerry-ext jerry-port-default-minimal
-	@cp $(JERRYSCRIPT_BUILD_DIR)/lib/libjerry-core.a $(BINDIR)/jerryscript.a
-	@cp $(JERRYSCRIPT_BUILD_DIR)/lib/libjerry-ext.a $(BINDIR)/jerryscript-ext.a
-	@cp $(JERRYSCRIPT_BUILD_DIR)/lib/libjerry-port-default-minimal.a $(BINDIR)/jerryport-minimal.a
+libjerry: $(PKG_BUILD_DIR)/Makefile
+	"$(MAKE)" -C $(PKG_BUILD_DIR) jerry-core jerry-ext jerry-port-default-minimal
+	@cp $(PKG_BUILD_DIR)/lib/libjerry-core.a $(BINDIR)/jerryscript.a
+	@cp $(PKG_BUILD_DIR)/lib/libjerry-ext.a $(BINDIR)/jerryscript-ext.a
+	@cp $(PKG_BUILD_DIR)/lib/libjerry-port-default-minimal.a $(BINDIR)/jerryport-minimal.a
 
-$(JERRYSCRIPT_BUILD_DIR)/Makefile:
-	cmake -B$(JERRYSCRIPT_BUILD_DIR) -H$(JERRYSCRIPT_SOURCE_DIR) \
+$(PKG_BUILD_DIR)/Makefile:
+	cmake -B$(PKG_BUILD_DIR) -H$(PKG_SOURCE_DIR) \
 	 -DCMAKE_SYSTEM_NAME=RIOT \
 	 -DCMAKE_SYSTEM_PROCESSOR="$(MCPU)" \
 	 -DCMAKE_C_COMPILER=$(CC) \
@@ -62,4 +59,4 @@ $(JERRYSCRIPT_BUILD_DIR)/Makefile:
 	 -DMEM_HEAP_SIZE_KB=$(JERRYHEAP)
 
 clean::
-	@rm -rf $(JERRYSCRIPT_BUILD_DIR)
+	@rm -rf $(PKG_BUILD_DIR)
