@@ -76,15 +76,45 @@ static void (*sched_cb) (kernel_pid_t active_thread,
                          kernel_pid_t next_thread) = NULL;
 #endif
 
+static void _unschedule(thread_t *active_thread)
+{
+    if (active_thread->status == STATUS_RUNNING) {
+        active_thread->status = STATUS_PENDING;
+    }
+
+#ifdef SCHED_TEST_STACK
+    if (*((uintptr_t *)active_thread->stack_start) !=
+        (uintptr_t)active_thread->stack_start) {
+        LOG_WARNING(
+            "scheduler(): stack overflow detected, pid=%" PRIkernel_pid "\n",
+            active_thread->pid);
+    }
+#endif
+#ifdef MODULE_SCHED_CB
+    if (sched_cb) {
+        sched_cb(active_thread->pid, KERNEL_PID_UNDEF);
+    }
+#endif
+}
+
 int __attribute__((used)) sched_run(void)
 {
     sched_context_switch_request = 0;
-
     thread_t *active_thread = (thread_t *)sched_active_thread;
 
-    /* The bitmask in runqueue_bitcache is never empty,
-     * since the threading should not be started before at least the idle thread was started.
-     */
+    if (!IS_USED(MODULE_CORE_IDLE_THREAD)) {
+        if (!runqueue_bitcache) {
+            if (active_thread) {
+                _unschedule(active_thread);
+                active_thread = NULL;
+            }
+
+            while (!runqueue_bitcache) {
+                sched_arch_idle();
+            }
+        }
+    }
+
     int nextrq = bitarithm_lsb(runqueue_bitcache);
     thread_t *next_thread = container_of(sched_runqueues[nextrq].next->next,
                                          thread_t, rq_entry);
@@ -102,26 +132,12 @@ int __attribute__((used)) sched_run(void)
     }
 
     if (active_thread) {
-        if (active_thread->status == STATUS_RUNNING) {
-            active_thread->status = STATUS_PENDING;
-        }
-
-#ifdef SCHED_TEST_STACK
-        if (*((uintptr_t *)active_thread->stack_start) !=
-            (uintptr_t)active_thread->stack_start) {
-            LOG_WARNING(
-                "scheduler(): stack overflow detected, pid=%" PRIkernel_pid "\n",
-                active_thread->pid);
-        }
-#endif
+        _unschedule(active_thread);
     }
 
 #ifdef MODULE_SCHED_CB
     if (sched_cb) {
-        /* Use `sched_active_pid` instead of `active_thread` since after `sched_task_exit()` is
-           called `active_thread` is set to NULL while `sched_active_thread` isn't updated until
-           `next_thread` is scheduled*/
-        sched_cb(sched_active_pid, next_thread->pid);
+        sched_cb(KERNEL_PID_UNDEF, next_thread->pid);
     }
 #endif
 

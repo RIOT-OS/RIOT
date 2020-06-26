@@ -203,8 +203,22 @@ extern clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
  */
 NORETURN void sched_task_exit(void);
 
-#if IS_USED(MODULE_SCHED_CB) || defined(DOXYGEN)
+/**
+ * @brief  Set CPU to idle mode (CPU dependent)
+ *
+ * Only used when there's no idle thread.
+ *
+ * This function will be called by the scheduler when there's no runnable thread.
+ * It will be called from ISR context, and *must* allow other ISR handlers to be run.
+ * E.g., on Cortex-M, the PendSV priority is temporarily lowered (set to higher
+ * value) in order to enable other exceptions to be run.
+ *
+ * This function should also invoke setting a low power mode, e.g., by calling
+ * 'pm_set_lowest()'.
+ */
+void sched_arch_idle(void);
 
+#if IS_USED(MODULE_SCHED_CB) || defined(DOXYGEN)
 /**
  * @brief   Scheduler run callback
  *

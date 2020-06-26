@@ -446,3 +446,24 @@ void __attribute__((used)) isr_svc(void)
     SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
 }
 #endif /* MODULE_CORTEXM_SVC */
+
+void sched_arch_idle(void)
+{
+    /* by default, PendSV has the same priority as other ISRs.
+     * In this function, we temporarily lower the priority (set higher value),
+     * allowing other ISRs to interrupt.
+     *
+     * According to [this](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dai0321a/BIHJICIE.html),
+     * dynamically changing the priority is not supported on CortexM0(+).
+     */
+    NVIC_SetPriority(PendSV_IRQn, CPU_CORTEXM_PENDSV_IRQ_PRIO + 1);
+    __DSB();
+    __ISB();
+#ifdef MODULE_PM_LAYERED
+    void pm_set_lowest(void);
+    pm_set_lowest();
+#else
+    __WFI();
+#endif
+    NVIC_SetPriority(PendSV_IRQn, CPU_CORTEXM_PENDSV_IRQ_PRIO);
+}

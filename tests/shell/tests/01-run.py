@@ -24,8 +24,7 @@ EXPECTED_HELP = (
 
 EXPECTED_PS = (
     '\tpid | state    Q | pri',
-    '\t  1 | pending  Q |  15',
-    '\t  2 | running  Q |   7'
+    '\t  \d | running  Q |   7'
 )
 
 # In native we are directly executing the binary (no terminal program). We must
@@ -102,6 +101,8 @@ CMDS = (
     ('end_test', '[TEST_END]'),
 )
 
+CMDS_REGEX = {'ps'}
+
 BOARD = os.environ['BOARD']
 
 
@@ -112,10 +113,14 @@ def print_error(message):
 
 
 def check_cmd(child, cmd, expected):
+    regex = cmd in CMDS_REGEX
     child.expect(PROMPT)
     child.sendline(cmd)
     for line in expected:
-        child.expect_exact(line)
+        if regex:
+            child.expect(line)
+        else:
+            child.expect_exact(line)
 
 
 def check_startup(child):

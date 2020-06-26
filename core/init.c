@@ -53,6 +53,9 @@ static void *main_trampoline(void *arg)
     return NULL;
 }
 
+static char main_stack[THREAD_STACKSIZE_MAIN];
+static char idle_stack[THREAD_STACKSIZE_IDLE];
+
 static void *idle_thread(void *arg)
 {
     (void)arg;
@@ -64,17 +67,17 @@ static void *idle_thread(void *arg)
     return NULL;
 }
 
-static char main_stack[THREAD_STACKSIZE_MAIN];
-static char idle_stack[THREAD_STACKSIZE_IDLE];
 
 void kernel_init(void)
 {
     irq_disable();
 
-    thread_create(idle_stack, sizeof(idle_stack),
-                  THREAD_PRIORITY_IDLE,
-                  THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
-                  idle_thread, NULL, "idle");
+    if (IS_USED(MODULE_CORE_IDLE_THREAD)) {
+        thread_create(idle_stack, sizeof(idle_stack),
+                      THREAD_PRIORITY_IDLE,
+                      THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
+                      idle_thread, NULL, "idle");
+    }
 
     thread_create(main_stack, sizeof(main_stack),
                   THREAD_PRIORITY_MAIN,

@@ -28,3 +28,8 @@ endif
 
 # select cortexm_svc pseudomodule if the corresponding feature is used
 USEMODULE += $(filter cortexm_svc, $(FEATURES_USED))
+
+# select core_idle_thread if the feature no_idle_thread is *not* used
+ifeq (, $(filter no_idle_thread, $(FEATURES_USED)))
+  USEMODULE += core_idle_thread
+endif
