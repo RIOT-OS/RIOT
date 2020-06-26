@@ -23,6 +23,11 @@
 #define CPU_CONF_COMMON_H
 
 /**
+ * @brief   This arch uses the inlined IRQ API.
+ */
+#define IRQ_API_INLINED     (1)
+
+/**
  * @brief   Declare the heap_stats function as available
  *
  * Only if module esp_idf_heap is used, a platform specific heap_stats function
