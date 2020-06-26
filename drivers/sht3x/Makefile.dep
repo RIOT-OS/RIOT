@@ -1,0 +1,3 @@
+USEMODULE += xtimer
+USEMODULE += checksum
+FEATURES_REQUIRED += periph_i2c

@@ -1,0 +1,4 @@
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi
+USEMODULE += netdev_eth
+USEMODULE += xtimer

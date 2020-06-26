@@ -1,0 +1,12 @@
+FEATURES_REQUIRED += periph_uart
+USEMODULE += fmt
+USEMODULE += isrpipe
+USEMODULE += isrpipe_read_timeout
+
+_AT_ISR_MODULE := $(filter at_urc_isr_%,$(USEMODULE))
+ifneq (,$(_AT_ISR_MODULE))
+  # pull in the correspondant event_thread_<priority> module
+  USEMODULE += $(_AT_ISR_MODULE:at_urc_isr_%=event_thread_%)
+  USEMODULE += at_urc
+  USEMODULE += at_urc_isr
+endif

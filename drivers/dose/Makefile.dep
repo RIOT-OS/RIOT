@@ -1,0 +1,6 @@
+FEATURES_REQUIRED += periph_uart
+USEMODULE += iolist
+USEMODULE += netdev_eth
+USEMODULE += random
+USEMODULE += xtimer
+FEATURES_REQUIRED += periph_gpio_irq

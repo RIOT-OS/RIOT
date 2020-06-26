@@ -1,0 +1,13 @@
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi
+FEATURES_OPTIONAL += periph_spi_gpio_mode
+USEMODULE += iolist
+USEMODULE += xtimer
+USEMODULE += netif
+USEMODULE += lora
+
+ifneq (,$(filter gnrc,$(USEMODULE)))
+  # Pull in `ifconfig` support for LoRA
+  USEMODULE += gnrc_netif_cmd_lora
+endif

@@ -1,0 +1,11 @@
+ifneq (,$(filter mtd_at24cxxx,$(USEMODULE)))
+  USEMODULE += at24cxxx
+endif
+
+ifneq (,$(filter mtd_at25xxx,$(USEMODULE)))
+  USEMODULE += at25xxx
+endif
+
+ifneq (,$(filter mtd_sdcard,$(USEMODULE)))
+  USEMODULE += sdcard_spi
+endif
