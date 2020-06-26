@@ -64,7 +64,7 @@ void ps(void)
 #endif
             "%-9sQ | pri "
 #ifdef DEVELHELP
-           "| stack  ( used) | base addr  | current     "
+           "| stack  ( used) ( free) | base addr  | current     "
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
            "| runtime  | switches"
@@ -80,7 +80,9 @@ void ps(void)
     void *isr_start = thread_isr_stack_start();
     void *isr_sp = thread_isr_stack_pointer();
     printf("\t  - | isr_stack            | -        - |"
-           "   - | %6i (%5i) | %10p | %10p\n", ISR_STACKSIZE, isr_usage, isr_start, isr_sp);
+           "   - | %6i (%5i) (%5i) | %10p | %10p\n",
+           ISR_STACKSIZE, isr_usage, ISR_STACKSIZE - isr_usage,
+           isr_start, isr_sp);
     overall_stacksz += ISR_STACKSIZE;
     if (isr_usage > 0) {
         overall_used += isr_usage;
@@ -107,7 +109,8 @@ void ps(void)
 #ifdef DEVELHELP
             int stacksz = p->stack_size;                                           /* get stack size */
             overall_stacksz += stacksz;
-            stacksz -= thread_measure_stack_free(p->stack_start);
+            int stack_free = thread_measure_stack_free(p->stack_start);
+            stacksz -= stack_free;
             overall_used += stacksz;
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
@@ -123,7 +126,7 @@ void ps(void)
 #endif
                    " | %-8s %.1s | %3i"
 #ifdef DEVELHELP
-                   " | %6i (%5i) | %10p | %10p "
+                   " | %6i (%5i) (%5i) | %10p | %10p "
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
                    " | %2d.%03d%% |  %8u"
@@ -135,7 +138,8 @@ void ps(void)
 #endif
                    sname, queued, p->priority
 #ifdef DEVELHELP
-                   , p->stack_size, stacksz, (void *)p->stack_start, (void *)p->sp
+                   , p->stack_size, stacksz, stack_free,
+                   (void *)p->stack_start, (void *)p->sp
 #endif
 #ifdef MODULE_SCHEDSTATISTICS
                    , runtime_major, runtime_minor, switches
@@ -145,8 +149,8 @@ void ps(void)
     }
 
 #ifdef DEVELHELP
-    printf("\t%5s %-21s|%13s%6s %6i (%5i)\n", "|", "SUM", "|", "|",
-           overall_stacksz, overall_used);
+    printf("\t%5s %-21s|%13s%6s %6i (%5i) (%5i)\n", "|", "SUM", "|", "|",
+           overall_stacksz, overall_used, overall_stacksz - overall_used);
 #   ifdef MODULE_TLSF_MALLOC
     puts("\nHeap usage:");
     tlsf_size_container_t sizes = { .free = 0, .used = 0 };
