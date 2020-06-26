@@ -58,7 +58,7 @@ extern "C" {
 #elif defined(CPU_MODEL_NRF52832XXAA)
 #define CPU_IRQ_NUMOF                   (38U)
 #elif defined(CPU_MODEL_NRF52840XXAA)
-#define CPU_IRQ_NUMOF                   (46U)
+#define CPU_IRQ_NUMOF                   (48U)
 #endif
 /** @} */
 

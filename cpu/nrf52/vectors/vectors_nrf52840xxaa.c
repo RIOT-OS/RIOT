@@ -145,7 +145,9 @@ const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_uarte1,            /* uarte1 */
     isr_qspi,              /* qspi */
     isr_cryptocell,        /* cryptocell */
-    isr_spi3,              /* spi3 */
+    (0UL),                 /* reserved */
     (0UL),                 /* reserved */
     isr_pwm3,              /* pwm3 */
+    (0UL),                 /* reserved */
+    isr_spi3,              /* spi3 */
 };
