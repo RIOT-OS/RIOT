@@ -211,7 +211,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
      */
     if (info != NULL) {
         uint8_t ed = 0;
-        uint8_t crc = 0;
+        uint8_t crc_valid = 0;
         netdev_ieee802154_rx_info_t *radio_info = info;
         at86rf2xx_fb_read(dev, &(radio_info->lqi), 1);
 
@@ -221,16 +221,16 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
          * from separate register instead */
         at86rf2xx_fb_stop(dev);
         ed = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_ED_LEVEL);
-        crc = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_RSSI) & \
+        crc_valid = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_RSSI) & \
             AT86RF2XX_PHY_RSSI_MASK__RX_CRC_VALID;
 #else
         at86rf2xx_fb_read(dev, &ed, 1);
         uint8_t rx_status;
         at86rf2xx_fb_read(dev, &(rx_status), 1);
-        crc = (rx_status & AT86RF2XX_PHY_RSSI_MASK__RX_CRC_VALID);
+        crc_valid = (rx_status & AT86RF2XX_PHY_RSSI_MASK__RX_CRC_VALID);
         at86rf2xx_fb_stop(dev);
 #endif
-        if (crc) {
+        if (crc_valid) {
             radio_info->flags |= NETDEV_RX_INFO_FLAGS_CRC_VALID;
         }
         radio_info->rssi = RSSI_BASE_VAL + ed;
