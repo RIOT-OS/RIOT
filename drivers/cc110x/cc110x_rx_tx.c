@@ -74,7 +74,7 @@ static netdev_event_t cc110x_rx_done(cc110x_t *dev)
     /* Copy all but the CRC_OK bit */
     dev->rx_info.lqi = (uint8_t)lqi_crc & 0x7f;
 
-    /* Allthough there is a CRC_OK bit the dirver currently drops all frames
+    /* Although there is a CRC_OK bit the driver currently drops all frames
        with invalid CRC */
     if ((uint8_t)lqi_crc & 0x80) {
         dev->rx_info.flags |= NETDEV_RX_INFO_FLAGS_CRC_VALID;
