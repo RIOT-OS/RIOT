@@ -6,7 +6,7 @@
 version: 2
 
 jobs:
-  build:
+  doc-build:
     docker:
       - image: riot/riotbuild
     steps:
@@ -17,3 +17,9 @@ jobs:
             cp -R doc/doxygen/html /doc
       - store_artifacts:
           path: /doc
+
+workflows:
+  version: 2
+  doc-build:
+    jobs:
+      - doc-build
