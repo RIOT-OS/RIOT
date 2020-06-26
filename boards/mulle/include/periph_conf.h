@@ -60,6 +60,7 @@ static const clock_config_t clock_config = {
      * consumption than using the 16 MHz crystal and the OSC0 module */
     .clkdiv1 = SIM_CLKDIV1_OUTDIV1(0) | SIM_CLKDIV1_OUTDIV2(0) |
                SIM_CLKDIV1_OUTDIV3(1) | SIM_CLKDIV1_OUTDIV4(1),
+    .periph_pllfllsel = SIM_SOPT2_PLLFLLSEL(0), /* Use FLL for peripherals */
     .rtc_clc = RTC_LOAD_CAP_BITS,
     .osc32ksel = SIM_SOPT1_OSC32KSEL(2),
     .clock_flags =

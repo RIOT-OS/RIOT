@@ -77,13 +77,21 @@ static void kinetis_mcg_enable_osc(void)
     if (clock_config.clock_flags & KINETIS_CLOCK_OSC0_EN) {
         /* Configure oscillator */
         OSC0->CR = OSC_CR_ERCLKEN_MASK | OSC_CR_EREFSTEN_MASK | clock_config.osc_clc;
+#if defined(MCG_C2_EREFS0_SHIFT)
         bit_set8(&MCG->C2, MCG_C2_EREFS0_SHIFT);
+#else
+        bit_set8(&MCG->C2, MCG_C2_EREFS_SHIFT);
+#endif
 
         /* wait for OSC initialization */
         while ((MCG->S & MCG_S_OSCINIT0_MASK) == 0) {}
     }
     else {
+#if defined(MCG_C2_EREFS0_SHIFT)
         bit_clear8(&MCG->C2, MCG_C2_EREFS0_SHIFT);
+#else
+        bit_clear8(&MCG->C2, MCG_C2_EREFS_SHIFT);
+#endif
     }
 #elif defined(RSIM)
     /* Kinetis CPU with a radio system integration module which can provide an
@@ -475,7 +483,12 @@ void kinetis_mcg_init(void)
 
     /* Set module clock dividers */
     SIM->CLKDIV1 = clock_config.clkdiv1;
-
+#ifdef SIM_CLKDIV3_PLLFLLDIV
+    SIM->CLKDIV3 = clock_config.clkdiv3;
+#endif
+#ifdef SIM_SOPT2_PLLFLLSEL
+    SIM->SOPT2 |= clock_config.periph_pllfllsel;
+#endif
     /* Select external reference clock source for the FLL */
     MCG->C7 = clock_config.oscsel;
 
