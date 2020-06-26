@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "irq.h"
+#include "irq_arch.h"
 #include "panic.h"
 #include "sched.h"
 
@@ -72,45 +73,6 @@ void irq_init(void)
 
     /*  Set default state of mstatus */
     set_csr(mstatus, MSTATUS_DEFAULT);
-}
-
-/**
- * @brief Enable all maskable interrupts
- */
-unsigned int irq_enable(void)
-{
-    /* Enable all interrupts */
-    set_csr(mstatus, MSTATUS_MIE);
-    return read_csr(mstatus);
-}
-
-/**
- * @brief Disable all maskable interrupts
- */
-unsigned int irq_disable(void)
-{
-    unsigned int state = read_csr(mstatus);
-
-    /* Disable all interrupts */
-    clear_csr(mstatus, MSTATUS_MIE);
-    return state;
-}
-
-/**
- * @brief Restore the state of the IRQ flags
- */
-void irq_restore(unsigned int state)
-{
-    /* Restore all interrupts to given state */
-    write_csr(mstatus, state);
-}
-
-/**
- * @brief See if the current context is inside an ISR
- */
-int irq_is_in(void)
-{
-    return fe310_in_isr;
 }
 
 /**
