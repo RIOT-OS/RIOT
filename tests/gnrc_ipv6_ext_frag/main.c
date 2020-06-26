@@ -691,7 +691,7 @@ int main(void)
                                     GNRC_NETIF_PRIO, "mock_netif",
                                     &mock_netdev.netdev.netdev);
     mock_netif = &_netif;
-    assert(res == 0);
+    expect(res == 0);
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }
