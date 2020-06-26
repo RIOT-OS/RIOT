@@ -1,7 +1,7 @@
 From fc93442983afdc95f28a777429279ad5e4fb7fd7 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Fri, 27 Mar 2020 13:22:22 +0100
-Subject: [PATCH 4/5] fix ETH_MODE compilation problem
+Subject: [PATCH 4/6] fix ETH_MODE compilation problem
 
 ---
  src/driver/source/m2m_wifi.c | 2 +-

@@ -1,7 +1,7 @@
 From f07d66798c27359b4348e4a4842b55f601068bd0 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Thu, 26 Mar 2020 15:26:52 +0100
-Subject: [PATCH 1/5] change CONST to _CONST_
+Subject: [PATCH 1/6] change CONST to _CONST_
 
 ---
  src/bsp/include/nm_bsp.h      | 2 +-

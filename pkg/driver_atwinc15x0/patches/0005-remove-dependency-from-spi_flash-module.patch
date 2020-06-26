@@ -1,7 +1,7 @@
 From 0e118023ed9a1426e5299b9e6802e11bd488de8b Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Mon, 30 Mar 2020 02:22:18 +0200
-Subject: [PATCH 5/5] remove dependency from spi_flash module
+Subject: [PATCH 5/6] remove dependency from spi_flash module
 
 ---
  src/driver/source/nmdrv.c | 2 +-

@@ -1,7 +1,7 @@
 From f18b91094401e75f4700d272c1072a92ac870beb Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Thu, 26 Mar 2020 23:55:39 +0100
-Subject: [PATCH 3/5] change default debug config
+Subject: [PATCH 3/6] change default debug config
 
 ---
  src/common/include/nm_debug.h | 6 ++++++

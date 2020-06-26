@@ -1,7 +1,7 @@
 From 6c56be47ce245340129438daafa09b4b0a45b2d2 Mon Sep 17 00:00:00 2001
 From: Gunar Schorcht <gunar@schorcht.net>
 Date: Thu, 26 Mar 2020 23:23:17 +0100
-Subject: [PATCH 2/5] remove platform files
+Subject: [PATCH 2/6] remove platform files
 
 ---
  src/bsp/include/nm_bsp_arduino.h              |  74 ------
