@@ -83,6 +83,7 @@ WEAK_DEFAULT void isr_pwm2(void);
 WEAK_DEFAULT void isr_spi2(void);
 WEAK_DEFAULT void isr_rtc2(void);
 WEAK_DEFAULT void isr_i2s(void);
+WEAK_DEFAULT void isr_fpu(void);
 
 #ifdef SOFTDEVICE_PRESENT
 extern void SWI2_EGU2_IRQHandler(void);
@@ -133,4 +134,5 @@ const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_spi2,              /* spi 2 */
     isr_rtc2,              /* rtc 2 */
     isr_i2s,               /* i2s */
+    isr_fpu,               /* fpu */
 };
