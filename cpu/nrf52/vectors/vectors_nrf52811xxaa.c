@@ -114,6 +114,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_lpcomp,            /* lpcomp */
     isr_swi0,              /* swi0 */
     isr_swi1,              /* swi1 */
+    isr_swi2,              /* swi2 */
     isr_swi3,              /* swi3 */
     isr_swi4,              /* swi4 */
     isr_swi5,              /* swi5 */

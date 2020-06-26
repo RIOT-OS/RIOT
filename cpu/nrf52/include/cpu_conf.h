@@ -54,7 +54,7 @@ extern "C" {
 #define CPU_FLASH_BASE                  (0x00000000)
 
 #if defined(CPU_MODEL_NRF52811XXAA)
-#define CPU_IRQ_NUMOF                   (29U)
+#define CPU_IRQ_NUMOF                   (30U)
 #elif defined(CPU_MODEL_NRF52832XXAA)
 #define CPU_IRQ_NUMOF                   (39U)
 #elif defined(CPU_MODEL_NRF52840XXAA)
