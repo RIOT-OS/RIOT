@@ -12,10 +12,10 @@ All the feather M0 boards are built based on the same Atmel SAMD21G18A
 microcontroller. See @ref cpu_samd21.
 
 Several types of Feather M0 boards exist:
-* [Feather M0 WiFi](https://learn.adafruit.com/adafruit-feather-m0-wifi-atwinc1500/)
-* [Feather M0 BLE](https://learn.adafruit.com/adafruit-feather-m0-bluefruit-le/overview)
-* [Feather M0 Adalogger](https://learn.adafruit.com/adafruit-feather-m0-adalogger/)
-* [Feather M0 LoRa](https://learn.adafruit.com/adafruit-feather-m0-radio-with-lora-radio-module)
+- [Feather M0 WiFi](https://learn.adafruit.com/adafruit-feather-m0-wifi-atwinc1500/)
+- [Feather M0 BLE](https://learn.adafruit.com/adafruit-feather-m0-bluefruit-le/overview)
+- [Feather M0 Adalogger](https://learn.adafruit.com/adafruit-feather-m0-adalogger/)
+- [Feather M0 LoRa](https://learn.adafruit.com/adafruit-feather-m0-radio-with-lora-radio-module)
 
 The different modules used to differentiate the boards (ATWINC1500 WiFi,
 Bluefruit LE, SD card, LoRa) are connected via SPI (SPI_DEV(0)) to the
@@ -51,6 +51,20 @@ Example with `hello-world` application:
           above won't be possible. In this case, the board must be set in
           bootloader mode by double tapping the reset button before running the
           flash command.
+
+### Using the WiFi interface
+
+To enable the WiFi interface of the Feather M0 WiFi variant of the board
+automatically for networking applications, add `USEMODULE=atwin1x0` to
+the `make` command and define the required parameters, for example:
+```
+     USEMODULE='feather-m0-wifi' \
+     CFLAGS='-DWIFI_SSID=\"<ssid>\" -DWIFI_PASS=\"<pass>\"' \
+     make BOARD=feather-m0 -C examples/gnrc_networking
+```
+
+For detailed information about the parameters, see section
+@ref drivers_atwinc15x0.
 
 ### Accessing STDIO via UART
 

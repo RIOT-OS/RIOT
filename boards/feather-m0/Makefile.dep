@@ -2,6 +2,12 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
+ifneq (,$(filter feather-m0-wifi,$(USEMODULE)))
+  ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
+    USEMODULE += atwinc15x0
+  endif
+endif
+
 # use arduino-bootloader only if no other stdio_% other than stdio_cdc_acm
 # is requested
 ifeq (,$(filter-out stdio_cdc_acm,$(filter stdio_% slipdev_stdio,$(USEMODULE))))

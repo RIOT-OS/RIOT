@@ -1,0 +1,40 @@
+From f18b91094401e75f4700d272c1072a92ac870beb Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 26 Mar 2020 23:55:39 +0100
+Subject: [PATCH 3/6] change default debug config
+
+---
+ src/common/include/nm_debug.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/common/include/nm_debug.h b/src/common/include/nm_debug.h
+index a710f6c..50137cf 100644
+--- a/src/common/include/nm_debug.h
++++ b/src/common/include/nm_debug.h
+@@ -42,6 +42,8 @@
+ #ifndef _NM_DEBUG_H_
+ #define _NM_DEBUG_H_
+ 
++#include <stdio.h>
++
+ #include "bsp/include/nm_bsp.h"
+ #include "bsp/include/nm_bsp_internal.h"
+ 
+@@ -58,10 +60,14 @@
+ #define M2M_LOG_DBG										4
+ 
+ #if (defined __APS3_CORTUS__)
++#ifndef M2M_LOG_LEVEL
+ #define M2M_LOG_LEVEL									M2M_LOG_INFO
++#endif
+ #else
++#ifndef M2M_LOG_LEVEL
+ #define M2M_LOG_LEVEL									M2M_LOG_REQ
+ #endif
++#endif
+ 
+ 
+ #define M2M_ERR(...)
+-- 
+2.17.1
+

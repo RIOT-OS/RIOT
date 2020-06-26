@@ -48,6 +48,10 @@ ifneq (,$(filter ata8520e,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/ata8520e/include
 endif
 
+ifneq (,$(filter atwinc15x0,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/atwinc15x0/include
+endif
+
 ifneq (,$(filter bh1750fvi,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/bh1750fvi/include
 endif

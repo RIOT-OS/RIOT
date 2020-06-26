@@ -1,0 +1,25 @@
+From 0e118023ed9a1426e5299b9e6802e11bd488de8b Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Mon, 30 Mar 2020 02:22:18 +0200
+Subject: [PATCH 5/6] remove dependency from spi_flash module
+
+---
+ src/driver/source/nmdrv.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/driver/source/nmdrv.c b/src/driver/source/nmdrv.c
+index 396ade9..3de10c3 100644
+--- a/src/driver/source/nmdrv.c
++++ b/src/driver/source/nmdrv.c
+@@ -385,7 +385,7 @@ sint8 nm_drv_deinit(void * arg)
+ 	}
+ 	
+ 	/* Disable SPI flash to save power when the chip is off */
+-	ret = spi_flash_enable(0);
++    /* ret = spi_flash_enable(0); */
+ 	if (M2M_SUCCESS != ret) {
+ 		M2M_ERR("[nmi stop]: SPI flash disable fail\n");
+ 		goto ERR1;
+-- 
+2.17.1
+

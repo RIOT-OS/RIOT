@@ -1,0 +1,25 @@
+From fc93442983afdc95f28a777429279ad5e4fb7fd7 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Fri, 27 Mar 2020 13:22:22 +0100
+Subject: [PATCH 4/6] fix ETH_MODE compilation problem
+
+---
+ src/driver/source/m2m_wifi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/driver/source/m2m_wifi.c b/src/driver/source/m2m_wifi.c
+index 7b7a322..0256960 100644
+--- a/src/driver/source/m2m_wifi.c
++++ b/src/driver/source/m2m_wifi.c
+@@ -242,7 +242,7 @@ static void m2m_wifi_cb(uint8 u8OpCode, uint16 u16DataSize, uint32 u32Addr)
+ 		{
+ 			uint8 u8SetRxDone;
+ 			tstrM2mIpRsvdPkt strM2mRsvd;
+-			if(hif_receive(u32Addr, &strM2mRsvd ,sizeof(tstrM2mIpRsvdPkt), 0) == M2M_SUCCESS)
++			if(hif_receive(u32Addr, (uint8*)&strM2mRsvd ,sizeof(tstrM2mIpRsvdPkt), 0) == M2M_SUCCESS)
+ 			{
+ 				tstrM2mIpCtrlBuf  strM2mIpCtrlBuf;
+ 				uint16 u16Offset = strM2mRsvd.u16PktOffset;
+-- 
+2.17.1
+

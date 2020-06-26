@@ -531,6 +531,7 @@ static void _netif_list(netif_t *iface)
     uint16_t u16;
     int16_t i16;
     uint8_t u8;
+    int8_t i8;
     int res;
     netopt_state_t state;
     unsigned line_thresh = 1;
@@ -560,6 +561,10 @@ static void _netif_list(netif_t *iface)
     res = netif_get_opt(iface, NETOPT_NID, 0, &u16, sizeof(u16));
     if (res >= 0) {
         printf(" NID: 0x%" PRIx16 " ", u16);
+    }
+    res = netif_get_opt(iface, NETOPT_RSSI, 0, &i8, sizeof(i8));
+    if (res >= 0) {
+        printf(" RSSI: %d ", i8);
     }
 #ifdef MODULE_GNRC_NETIF_CMD_LORA
     res = netif_get_opt(iface, NETOPT_BANDWIDTH, 0, &u8, sizeof(u8));
