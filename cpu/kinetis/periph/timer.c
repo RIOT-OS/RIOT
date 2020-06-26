@@ -32,7 +32,7 @@
 #include "periph_conf.h"
 #include "periph/timer.h"
 
-#ifdef PIT_LTMR64H_LTH_MASK
+#if defined(PIT_LTMR64H_LTH_MASK) && !defined(KINETIS_PIT_COMBINED_IRQ)
 /* The KW41Z PIT module provides only one IRQ for all PIT channels combined. */
 /* TODO: find a better way to distinguish which Kinetis CPUs have separate PIT
  * channel interrupts */
