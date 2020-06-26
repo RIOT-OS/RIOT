@@ -35,7 +35,7 @@
 #include "periph/uart.h"
 #include "periph/gpio.h"
 
-#if defined(CPU_MODEL_NRF52811XXAA) || defined(CPU_MODEL_NRF52840XXAA)
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
 #define UART_INVALID    (uart >= UART_NUMOF)
 #define REG_BAUDRATE    dev(uart)->BAUDRATE
 #define REG_CONFIG      dev(uart)->CONFIG
@@ -114,7 +114,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     gpio_init(UART_PIN_TX, GPIO_OUT);
     PSEL_TXD = UART_PIN_TX;
 
-#if defined(CPU_MODEL_NRF52811XXAA) || defined(CPU_MODEL_NRF52840XXAA)
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
     /* enable HW-flow control if defined */
  #ifdef MODULE_PERIPH_UART_HW_FC
         /* set pin mode for RTS and CTS pins */
@@ -199,7 +199,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     /* enable the UART device */
-#if defined(CPU_MODEL_NRF52811XXAA) || defined(CPU_MODEL_NRF52840XXAA)
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
     dev(uart)->ENABLE = UARTE_ENABLE_ENABLE_Enabled;
 #else
     NRF_UART0->ENABLE = UART_ENABLE_ENABLE_Enabled;
@@ -207,7 +207,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 #endif
 
     if (rx_cb) {
-#if defined(CPU_MODEL_NRF52811XXAA) || defined(CPU_MODEL_NRF52840XXAA)
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
         dev(uart)->RXD.MAXCNT = 1;
         dev(uart)->RXD.PTR = (uint32_t)&rx_buf[uart];
         dev(uart)->INTENSET = UARTE_INTENSET_ENDRX_Msk;
@@ -226,7 +226,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 }
 
 /* nrf52840 || nrf52811 (using EasyDMA) */
-#if defined(CPU_MODEL_NRF52811XXAA) || defined(CPU_MODEL_NRF52840XXAA)
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
 static void _write_buf(uart_t uart, const uint8_t *data, size_t len)
 {
     /* reset endtx flag */

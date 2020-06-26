@@ -179,7 +179,7 @@ typedef struct {
     gpio_t pin[PWM_CHANNELS];           /**< PWM out pins */
 } pwm_conf_t;
 
-#if defined(CPU_MODEL_NRF52811XXAA) || defined(CPU_MODEL_NRF52840XXAA)
+#if !defined(CPU_MODEL_NRF52832XXAA)
 /**
  * @brief   Structure for UART configuration data
  */
