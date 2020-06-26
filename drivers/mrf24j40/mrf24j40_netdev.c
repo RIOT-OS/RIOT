@@ -134,7 +134,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
             mrf24j40_rx_fifo_read(dev, phr + 1, &(radio_info->lqi), 1);
             mrf24j40_rx_fifo_read(dev, phr + 2, &(rssi_scalar), 1);
             radio_info->rssi = mrf24j40_dbm_from_reg(rssi_scalar);
-            /* the driver currently does not support Packet Error Mode 
+            /* the driver currently does not support Packet Error Mode
                so only packets with valid crc are accepted */
             radio_info->flags |= NETDEV_RX_INFO_FLAGS_CRC_VALID;
         }
