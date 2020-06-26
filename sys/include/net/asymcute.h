@@ -106,13 +106,13 @@ extern "C" {
 #define ASYMCUTE_LISTENER_STACKSIZE (THREAD_STACKSIZE_DEFAULT)
 #endif
 
-#ifndef ASYMCUTE_TOPIC_MAXLEN
+#ifndef CONFIG_ASYMCUTE_TOPIC_MAXLEN
 /**
  * @brief   Maximum topic length
  *
  * @note    Must be less than (256 - 8) AND less than (ASYMCUTE_BUFSIZE - 8).
  */
-#define ASYMCUTE_TOPIC_MAXLEN       (32U)
+#define CONFIG_ASYMCUTE_TOPIC_MAXLEN       (32U)
 #endif
 
 #ifndef ASYMCUTE_KEEPALIVE
@@ -283,7 +283,7 @@ struct asymcute_con {
  */
 struct asymcute_topic {
     asymcute_con_t *con;        /**< connection used for registration */
-    char name[ASYMCUTE_TOPIC_MAXLEN + 1];   /**< topic string (ACSII only) */
+    char name[CONFIG_ASYMCUTE_TOPIC_MAXLEN + 1];   /**< topic string (ACSII only) */
     uint8_t flags;              /**< normal, short, or pre-defined */
     uint16_t id;                /**< topic id */
 };

@@ -679,7 +679,7 @@ int asymcute_topic_init(asymcute_topic_t *topic, const char *topic_name,
     }
     else {
         len = strlen(topic_name);
-        if ((len == 0) || (len > ASYMCUTE_TOPIC_MAXLEN)) {
+        if ((len == 0) || (len > CONFIG_ASYMCUTE_TOPIC_MAXLEN)) {
             return ASYMCUTE_OVERFLOW;
         }
     }
