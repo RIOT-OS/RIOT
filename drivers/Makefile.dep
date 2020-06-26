@@ -118,6 +118,16 @@ ifneq (,$(filter ata8520e,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi
 endif
 
+ifneq (,$(filter atwinc15x0,$(USEMODULE)))
+  USEMODULE += luid
+  USEMODULE += netdev_eth
+  USEMODULE += xtimer
+  USEPKG += driver_atwinc15x0
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_spi
+endif
+
 ifneq (,$(filter bh1750fvi,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_i2c
