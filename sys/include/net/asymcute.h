@@ -145,13 +145,13 @@ extern "C" {
 #define CONFIG_ASYMCUTE_T_RETRY            (10U)       /* -> 10 sec */
 #endif
 
-#ifndef ASYMCUTE_N_RETRY
+#ifndef CONFIG_ASYMCUTE_N_RETRY
 /**
  * @brief   Number of retransmissions until requests time out
  *
  * For the default value, see spec v1.2, section 7.2 -> N_RETRY: 3-5
  */
-#define ASYMCUTE_N_RETRY            (3U)
+#define CONFIG_ASYMCUTE_N_RETRY            (3U)
 #endif
 
 /**
