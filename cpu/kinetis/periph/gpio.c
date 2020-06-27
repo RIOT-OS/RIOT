@@ -230,17 +230,20 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
     /* enable PORT clock in case it was not active before */
     clk_en(pin);
 
-#ifdef KINETIS_HAVE_PCR
-    /* if the given interrupt was previously configured as interrupt source, we
-     * need to free its interrupt context. We to this only after we
-     * re-configured the pin in case an event is happening just in between... */
+    /* We don't support setting IRQC this way. It's managed in this file only */
+    assert(!(pcr & PORT_PCR_IRQC_MASK));
 
-    /* set new PCR value */
-    port(pin)->PCR[pin_num(pin)] = pcr;
+#ifdef KINETIS_HAVE_PCR
+    /* set new PCR value, keeping the existing IRQC value */
+    uint32_t old_pcr = port(pin)->PCR[pin_num(pin)];
+    port(pin)->PCR[pin_num(pin)] = pcr | (old_pcr & PORT_PCR_IRQC_MASK);
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-    /* and free the interrupt context if needed */
-    if (get_ctx(port_num(pin), pin_num(pin)) >= 0) {
+    /* Pin interrupts can only be used in digital muxing modes, so disable
+     * them if we're configuring for analog. Also gpio_init() triggers this. */
+    if ((pcr & PORT_PCR_MUX_MASK) == GPIO_AF_ANALOG
+        && get_ctx(port_num(pin), pin_num(pin)) >= 0) {
+        gpio_irq_disable(pin);
         ctx_free(port_num(pin), pin_num(pin));
     }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
