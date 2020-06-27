@@ -3,7 +3,7 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter feather-m0-wifi,$(USEMODULE)))
-  ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
+  ifneq (,$(filter netdev_default,$(USEMODULE)))
     USEMODULE += atwinc15x0
   endif
 endif
