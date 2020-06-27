@@ -47,7 +47,6 @@ static kernel_pid_t _runner_pid;
 static msg_t _msg;
 
 static cord_ep_cb_t _evt_cb = NULL;
-static uint16_t _evt_mask = 0;
 
 static void _set_timer(void)
 {
@@ -63,7 +62,7 @@ static void _on_ep_event(uint16_t event)
         xtimer_remove(&_timer);
     }
 
-    if (_evt_mask & event) {
+    if (_evt_cb) {
         _evt_cb(event);
     }
 }
@@ -78,7 +77,7 @@ static void *_reg_runner(void *arg)
     _msg.type = UPDATE_TIMEOUT;
 
     /* we want to be notified for every cord ep event */
-    cord_ep_event_cb(_on_ep_event, CORD_EP_EVENT_ALL);
+    cord_ep_event_cb(_on_ep_event);
 
     while (1) {
         msg_receive(&in);
@@ -94,13 +93,7 @@ void cord_ep_standalone_run(void)
                   _reg_runner, NULL, TNAME);
 }
 
-void cord_ep_standalone_event_cb(cord_ep_cb_t cb, uint16_t event_mask)
+void cord_ep_standalone_event_cb(cord_ep_cb_t cb)
 {
-    /* disable all events to guard against NULL pointer exceptions */
-    _evt_mask = 0;
     _evt_cb = cb;
-    /* only enable notifications if a callback was specified */
-    if (cb) {
-        _evt_mask = event_mask;
-    }
 }

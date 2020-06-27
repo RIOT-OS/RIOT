@@ -58,7 +58,6 @@ static volatile thread_t *_waiter;
 static uint8_t buf[BUFSIZE];
 
 static cord_ep_cb_t _evt_cb = NULL;
-static uint16_t _evt_mask = 0;
 
 static void _lock(void)
 {
@@ -68,7 +67,7 @@ static void _lock(void)
 
 static void _notify(uint16_t evt)
 {
-    if (_evt_mask & evt) {
+    if (_evt_cb) {
         _evt_cb(evt);
     }
 }
@@ -351,15 +350,9 @@ int cord_ep_remove(void)
     return CORD_EP_OK;
 }
 
-void cord_ep_event_cb(cord_ep_cb_t cb, uint16_t evt_mask)
+void cord_ep_event_cb(cord_ep_cb_t cb)
 {
-    /* disable all events to guard against NULL pointer exceptions */
-    _evt_mask = 0;
     _evt_cb = cb;
-    /* only enable notifications if a callback was specified */
-    if (cb) {
-        _evt_mask = evt_mask;
-    }
 }
 
 void cord_ep_dump_status(void)
