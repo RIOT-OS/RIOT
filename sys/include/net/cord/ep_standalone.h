@@ -47,13 +47,10 @@ void cord_ep_standalone_run(void);
  * Only a single callback can be active at any point in time, so setting a new
  * callback will override the existing one.
  *
- * @pre                     @p cb != NULL
- *
  * @param[in] cb        callback to execute on RD endpoint state changes, my be
  *                      NULL to disable event notifications
- * @param[in] evt_mask  mask for selecting the events that trigger notifications
  */
-void cord_ep_standalone_event_cb(cord_ep_cb_t cb, uint16_t evt_mask);
+void cord_ep_standalone_event_cb(cord_ep_cb_t cb);
 
 #ifdef __cplusplus
 }

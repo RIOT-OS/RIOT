@@ -40,9 +40,6 @@
 extern "C" {
 #endif
 
-#define CORD_EP_EVENT_NONE      (0x0000)
-#define CORD_EP_EVENT_ALL       (0xffff)
-
 /**
  * @brief   Return values and error codes used by this module
  */
@@ -140,9 +137,8 @@ int cord_ep_remove(void);
  *
  * @param[in] cb        callback to execute on RD endpoint state changes, may be
  *                      NULL to disable notifications
- * @param[in] evt_mask
  */
-void cord_ep_event_cb(cord_ep_cb_t cb, uint16_t evt_mask);
+void cord_ep_event_cb(cord_ep_cb_t cb);
 
 /**
  * @brief   Dump the current RD connection status to STDIO (for debugging)
