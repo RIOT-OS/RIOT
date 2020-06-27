@@ -102,7 +102,7 @@ int main(void)
     gcoap_register_listener(&_listener);
 
     /* register event callback with cord_ep_standalone */
-    cord_ep_standalone_event_cb(_on_ep_event, CORD_EP_EVENT_ALL);
+    cord_ep_standalone_event_cb(_on_ep_event);
 
     puts("Client information:");
     printf("  ep: %s\n", cord_common_get_ep());
