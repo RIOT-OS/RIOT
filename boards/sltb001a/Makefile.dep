@@ -1,6 +1,7 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
-  USEMODULE += saul_gpio
   USEMODULE += bmp280_i2c
+  USEMODULE += ccs811
+  USEMODULE += saul_gpio
   USEMODULE += si7021
 endif
 
