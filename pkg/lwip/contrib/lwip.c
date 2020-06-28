@@ -210,19 +210,11 @@ void lwip_bootstrap(void)
 #elif defined(MODULE_ATWINC15X0)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         atwinc15x0_setup(&atwinc15x0_devs[i], &atwinc15x0_params[i]);
-#ifdef MODULE_LWIP_IPV4
-        if (netif_add(&netif[0], IP4_ADDR_ANY, IP4_ADDR_ANY, IP4_ADDR_ANY,
-            &atwinc15x0_devs[i], lwip_netdev_init, tcpip_input) == NULL) {
+        if (_netif_add(&netif[0], &atwinc15x0_devs[i], lwip_netdev_init,
+                       tcpip_input) == NULL) {
             DEBUG("Could not add atwinc15x0 device\n");
             return;
         }
-#else /* MODULE_LWIP_IPV4 */
-        if (netif_add(&netif[0], &atwinc15x0_devs[i], lwip_netdev_init,
-            tcpip_input) == NULL) {
-            DEBUG("Could not add atwinc15x0 device\n");
-            return;
-        }
-#endif /* MODULE_LWIP_IPV4 */
     }
 #elif defined(MODULE_ENC28J60)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {

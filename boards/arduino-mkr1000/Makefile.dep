@@ -1,6 +1,6 @@
 USEMODULE += boards_common_arduino-mkr
 
-ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += atwinc15x0
 endif
 
