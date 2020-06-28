@@ -6,8 +6,8 @@ PKG_LICENSE=Apache2.0
 # manually set some RIOT env vars, so this Makefile can be called stand-alone
 RIOTBASE ?= $(CURDIR)/../../..
 RIOTTOOLS ?= $(CURDIR)/..
-PKGDIRBASE ?= $(RIOTBASE)/build/pkg
-PKG_BUILD_DIR ?= $(CURDIR)/bin
+PKG_SOURCE_DIR ?= $(CURDIR)/bin
+PKG_BUILD_DIR ?= $(CURDIR)/bin/build
 
 CMAKE_OPTIONS = \
     -DCMAKE_BUILD_TYPE=Release       \
