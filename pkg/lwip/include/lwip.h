@@ -23,6 +23,17 @@
 extern "C" {
 #endif
 
+#ifndef LWIP_NETIF_DEFAULT
+/**
+ * @brief   Index of the default lwIP netif.
+ *
+ * Defines the lwIP network interface that is used to output all packets for
+ * which no specific route is found. It has to be defined if more than one
+ * network interface is used for lwIP.
+ */
+#define LWIP_NETIF_DEFAULT  (0)
+#endif
+
 /**
  * @brief   Initializes lwIP stack.
  *
