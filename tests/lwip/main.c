@@ -39,7 +39,7 @@ static int ifconfig(int argc, char **argv)
     (void)argc;
     (void)argv;
     for (struct netif *iface = netif_list; iface != NULL; iface = iface->next) {
-        printf("%s_%02u: ", iface->name, iface->num);
+        printf("%c%c_%02u: ", iface->name[0], iface->name[1], iface->num);
 #if IS_USED(MODULE_LWIP_IPV6)
         char addrstr[IPV6_ADDR_MAX_STR_LEN];
 #elif IS_USED(MODULE_LWIP_IPV4)
