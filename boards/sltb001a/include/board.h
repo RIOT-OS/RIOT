@@ -70,7 +70,7 @@ extern "C" {
 /**
  * @name    Environmental sensors configuration
  *
- * Pin for enabling environmental sensors (BMP280, Si1133, Si7021, Si7210A).
+ * Pin for enabling environmental sensors (BMP280, Si1133, Si7021, Si7210).
  * @{
  */
 #define ENV_SENSE_PIC_ADDR  (0x01)
@@ -180,14 +180,14 @@ extern "C" {
 /**
  * @name    Hall-effect sensor configuration
  *
- * Connection to the on-board hall-effect sensor (Si7210A). Available on Rev. A02
- * boards only.
+ * Connection to the on-board hall-effect sensor (Si7210). Available on
+ * Rev. A02 boards only.
  * @{
  */
-#ifndef SI7210A_ENABLED
-#define SI7210A_ENABLED     (0)
+#ifndef SI7210_ENABLED
+#define SI7210_ENABLED      (0)
 #endif
-#define SI7210A_I2C         I2C_DEV(0)
+#define SI7210_I2C          I2C_DEV(0)
 /** @} */
 
 /**

@@ -47,7 +47,7 @@ void board_init(void)
     pic_write(ICM20648_PIC_ADDR, 1 << ICM20648_PIC_EN_BIT);
 #endif
 
-#if defined(MODULE_BMP280) || defined(MODULE_SI7021) || SI1133_ENABLED || SI7210A_ENABLED
+#if defined(MODULE_BMP280) || defined(MODULE_SI7021) || SI1133_ENABLED || SI7210_ENABLED
     /* enable the environmental sensors */
     pic_write(ENV_SENSE_PIC_ADDR, 1 << ENV_SENSE_PIC_BIT);
 #endif
