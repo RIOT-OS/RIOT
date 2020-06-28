@@ -30,6 +30,10 @@ extern int _version_handler(int argc, char **argv);
 extern int _id_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_DFPLAYER
+extern int _sc_dfplayer(int argc, char **argv);
+#endif
+
 #ifdef MODULE_HEAP_CMD
 extern int _heap_handler(int argc, char **argv);
 #endif
@@ -301,6 +305,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_CRYPTOAUTHLIB
     { "cryptoauth", "Commands for Microchip CryptoAuth devices", _cryptoauth },
+#endif
+#ifdef MODULE_DFPLAYER
+    {"dfplayer", "Control a DFPlayer Mini MP3 player", _sc_dfplayer},
 #endif
     {NULL, NULL, NULL}
 };
