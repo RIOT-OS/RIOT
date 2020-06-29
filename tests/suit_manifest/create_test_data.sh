@@ -9,7 +9,7 @@ gen_manifest() {
    shift
 
 
-   "${RIOTBASE}/dist/tools/suit_v3/gen_manifest.py" \
+   "${RIOTBASE}/dist/tools/suit/gen_manifest.py" \
      --urlroot "test://test" \
      --seqnr "$seqnr" \
      --uuid-vendor "riot-os.org" \

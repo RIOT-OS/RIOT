@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ----------------------------------------------------------------------------
 # Copyright 2018-2020 ARM Limited or its affiliates
@@ -17,20 +17,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ----------------------------------------------------------------------------
-import logging
-import sys
+import logging, sys
 
 from suit_tool.argparser import MainArgumentParser
-from suit_tool import create, sign, parse, get_uecc_pubkey
+from suit_tool import create, sign, parse, get_pubkey, keygen, sever #, verify, cert, init
+
 
 LOG = logging.getLogger(__name__)
-LOG_FORMAT = '[%(levelname)s] %(asctime)s - %(name)s - %(message)s'
-
+LOG_FORMAT='[%(levelname)s] %(asctime)s - %(name)s - %(message)s'
 
 def main():
     driver = CLIDriver()
     return driver.main()
-
 
 class CLIDriver(object):
 
@@ -46,6 +44,10 @@ class CLIDriver(object):
         logging.basicConfig(level=log_level,
                             format=LOG_FORMAT,
                             datefmt='%Y-%m-%d %H:%M:%S')
+        logging.addLevelName( logging.INFO, "\033[1;32m%s\033[1;0m" % logging.getLevelName(logging.INFO))
+        logging.addLevelName( logging.WARNING, "\033[1;93m%s\033[1;0m" % logging.getLevelName(logging.WARNING))
+        logging.addLevelName( logging.CRITICAL, "\033[1;31m%s\033[1;0m" % logging.getLevelName(logging.CRITICAL))
+
         LOG.debug('CLIDriver created. Arguments parsed and logging setup.')
 
     def main(self):
@@ -56,8 +58,10 @@ class CLIDriver(object):
           # "cert": cert.main,
           # "init": init.main,
           # "update" : update.main,
-          "pubkey": get_uecc_pubkey.main,
-          "sign": sign.main
+          "pubkey": get_pubkey.main,
+          "sign": sign.main,
+          "keygen": keygen.main,
+          "sever" : sever.main,
         }[self.options.action](self.options) or 0
 
         sys.exit(rc)

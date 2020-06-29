@@ -144,6 +144,8 @@ The `suit-tool` supports three sub-commands:
 * `create` generates a new manifest.
 * `sign` signs a manifest.
 * `parse` parses an existing manifest into cbor-debug or a json representation.
+* `keygen` Create a signing key. Not for production use.
+* `pubkey` Get the public key for a supplied private key in uECC-compatible C definition.
 
 The `suit-tool` has a configurable log level, specified with `-l`:
 
@@ -178,7 +180,7 @@ To add a component to the manifest from the command-line, use the following synt
 
 The supported fields are:
 
-* `file` the path to a file to use as a payload file.
+* `file` the path fo a file to use as a payload file.
 * `inst` the `install-id`.
 * `uri` the URI where the file will be found.
 
@@ -207,3 +209,28 @@ suit-tool parse -m MANIFEST
 ```
 
 If a json-representation is needed, add the '-j' flag.
+
+## Keygen
+
+Create an asymmetric keypair for non-production use. Production systems should use closely guarded keys, such as keys stored in an HSM.
+
+```sh
+ suit-tool keygen [-t TYPE] -o KEYFILE
+ ```
+
+`suit-tool keygen` defaults to creating SECP256r1 keys. To create another type of key, use `-t`followed by one of:
+
+* `secp256r1`
+* `secp384r1`
+* `secp521r1`
+* `ed25519`
+
+## UECC public key
+
+Derive a public key in the format used by micro ECC. The input is a PEM private key.
+
+```sh
+suit-tool pubkey -k FILE
+```
+
+The tool will then print the public key in micro ECC format.
