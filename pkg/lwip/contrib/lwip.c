@@ -40,7 +40,7 @@
 
 #if IS_USED(MODULE_ENC28J60)
 #include "enc28j60.h"
-#include "enc28j60_params.h")
+#include "enc28j60_params.h"
 #endif
 
 #if IS_USED(MODULE_MRF24J40)
