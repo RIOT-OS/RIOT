@@ -167,7 +167,7 @@ void lwip_bootstrap(void)
         static struct netif netif[LWIP_NETIF_NUMOF];
         int netif_idx = 0;
 
-#if LWIP_NETIF_NUMOF_NETDEV_TAP
+#if IS_USED(MODULE_NETDEV_TAP)
         static netdev_tap_t netdev_taps[LWIP_NETIF_NUMOF_NETDEV_TAP];
         for (unsigned i = 0; i < LWIP_NETIF_NUMOF_NETDEV_TAP; i++) {
             netdev_tap_setup(&netdev_taps[i], &netdev_tap_params[i]);
