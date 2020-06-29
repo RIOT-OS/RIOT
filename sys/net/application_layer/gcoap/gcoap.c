@@ -283,6 +283,12 @@ static void _on_resp_timeout(void *arg) {
 #endif
         event_timeout_set(&memo->resp_evt_tmout, timeout);
 
+        if (memo->state == GCOAP_MEMO_WAIT) {
+            /* See _cease_retransmission: Still going through the timeouts and
+             * rescheduling, but not actually sending any more */
+            return;
+        }
+
         ssize_t bytes = sock_udp_send(&_sock, memo->msg.data.pdu_buf,
                                       memo->msg.data.pdu_len, &memo->remote_ep);
         if (bytes <= 0) {
@@ -296,12 +302,26 @@ static void _on_resp_timeout(void *arg) {
  *
  * This is used in response to an empty ACK.
  *
+ * The current implementation does not touch the timers, but merely sets the
+ * memo's state to GCOAP_MEMO_WAIT. This approach needs less complex code at
+ * the cost of the remaining `send_limit` timers firing and some memory not
+ * being freed until the actual response arrives.
+ *
+ * An alternative implementation would stop the timeouts, and either free the
+ * whole memo if it has no response handler, or calculate the remaining timeout
+ * from `send_limit` to set a final timeout then. In that case, it might also
+ * free the gcoap_resend_t data and move it back into hdr_buf (along with a
+ * change in the discriminator for that). (That's not an option with the
+ * current design because the discriminator is the send_limit field, which is
+ * still used to count down).
+ *
  * @param[inout]   memo   The memo indicating the pending request
  *
- * @pre The @p memo is active, and its send_limit is not GCOAP_SEND_LIMIT_NON.
+ * @pre The @p memo is GCOAP_MEMO_RETRANSMIT or GCOAP_MEMO_WAIT, and its
+ *      send_limit is not GCOAP_SEND_LIMIT_NON.
  */
 static void _cease_retransmission(gcoap_request_memo_t *memo) {
-    /* FIXME This needs to do something, although not doing anything is not terrible. */
+    memo->state = GCOAP_MEMO_WAIT;
 }
 
 /*
@@ -524,7 +544,7 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
 static void _expire_request(gcoap_request_memo_t *memo)
 {
     DEBUG("coap: received timeout message\n");
-    if (memo->state == GCOAP_MEMO_WAIT) {
+    if ((memo->state == GCOAP_MEMO_RETRANSMIT) || (memo->state == GCOAP_MEMO_WAIT)) {
         memo->state = GCOAP_MEMO_TIMEOUT;
         /* Pass response to handler */
         if (memo->resp_handler) {
@@ -779,6 +799,7 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
 #if CONFIG_COAP_RANDOM_FACTOR_1000 > 1000
                 timeout = random_uint32_range(timeout, TIMEOUT_RANGE_END * US_PER_SEC);
 #endif
+                memo->state = GCOAP_MEMO_RETRANSMIT;
             }
             else {
                 memo->state = GCOAP_MEMO_UNUSED;
