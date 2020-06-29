@@ -214,6 +214,7 @@ configuration file, which holds the selected values for the exposed parameters.
 
 #### Output:
 - `$ (GENERATED_DIR)/autoconf.h` configuration header file.
+- `$ (GENERATED_DIR)/out.config` file.
 
 
 ### Summary of files
@@ -227,6 +228,7 @@ These files are defined in `kconfig.mk`.
 | `user.config`       | Holds configuration values applied by the user. |
 | `merged.config`     | Holds configuration from multiple sources. Used to generate header. |
 | `autoconf.h`        | Header file containing the macros that applied the selected configuration. |
+| `out.config`        | Configuration file containing all the symbols defined in `autoconf.h`. |
 
 ## Kconfig symbols in Makefiles
 As '.config' files have Makefile syntax they can be included when building,
@@ -273,6 +275,186 @@ or by means of a '.config' file:
 ```Make
 CONFIG_KCONFIG_MODULE_GCOAP=y
 ```
+
+## Modelling CPUs, boards and provided features  {#kconfig-cpu-boards-features}
+During the current migration phase architectures, CPUs, boards and provided
+features are being modelled in Kconfig. The following is a guide on how to
+organize and name the symbols.
+
+### Features
+Features must be modelled as hidden boolean symbols with the prefix `HAS_`. They
+must contain a `help` attribute clearly specifying what providing that feature
+means. The location of the symbol declaration depends on the type of feature.
+Features that are not platform-specific (e.g. `arch_32bit` or `cpp`) must be
+placed in `/kconfigs/Kconfig.features`. If a feature is specific to a certain
+CPU family or vendor, it should be placed in the correspondent Kconfig file
+(e.g. `esp_wifi_enterprise`). Features related to modules should be placed in
+the Kconfig file of that module.
+
+#### Example
+The feature `arduino` is placed in `/kconfigs/Kconfig.features` and modelled
+like:
+
+```Kconfig
+config HAS_ARDUINO
+    bool
+    help
+        Indicates that Arduino pins compatibility is supported.
+```
+
+### CPUs
+The proposed hierarchy for the classification of CPUs is as follows:
+
+```
+                    +------------+
+More Specific       | CPU_MODEL  |
+      +             +------------+
+      |
+      |
+      |             +------------+
+      |             |  CPU_FAM   |
+      |             +------------+
+      |
+      |
+      |             +------------+
+      |             |  CPU_CORE  |
+      |             +------------+
+      |
+      |
+      v             +------------+
+Less Specific       |  CPU_ARCH  |
+                    +------------+
+```
+
+Where each hierarchy is defined as:
+- `CPU_MODEL`: The specific identifier of the used CPU, used for some CPU
+               implementations to differentiate between different memory
+               layouts.
+- `CPU_FAM`: An intermediate identifier between CPU and CPU_MODEL that
+             represents a sub-group of a Manufacturers CPU's.
+- `CPU_CORE`: The specific identifier of the core present in the CPU.
+- `CPU_ARCH`: The specific identifier of the architecture of the core defined
+              in `CPU_CORE`.
+
+In order to model the hierarchies, a hidden boolean symbol must be declared for
+each. The name of the symbol must begin with the correspondent prefix and must
+be followed by the specific value. For instance, the 'samd21' family symbol is
+named `CPU_FAM_SAMD21`.
+
+In addition, a default value to the correspondent common symbol must be defined.
+The default value must be guarded by the boolean symbol correspondent to the
+hierarchy.
+
+Features may be provided by any hierarchy symbol. Usually symbols are selected
+from more specific to less specific. This means that a `CPU_MODEL_<model>`
+symbol usually would select the correspondent `CPU_FAM_<family>` symbol,
+which would in turn select the `CPU_CORE_<core>`. This may change in some cases
+where `CPU_COMMON_` symbols are defined to avoid repetition.
+
+In addition to the symbols of the hierarchy described above, a default value
+to the `CPU` symbol should be assigned, which will match the value of the `CPU`
+Makefile variable in the build system.
+
+The declaration of the symbols should be placed in a `Kconfig` file in the
+folder that corresponds to the hierarchy. When the symbols are scattered into
+multiple files, it is responsibility of file containing the most specific
+symbols to `source` the less specific. Keep in mind that only the file located
+in `/cpu/<CPU>/Kconfig` will be included by the root `/Kconfig` file.
+
+#### Example
+
+```Kconfig
+# This is the most specific symbol (selected by the board)
+# The CPU model selects the family it belongs to
+config CPU_MODEL_SAMR21G18A
+    bool
+    select CPU_FAM_SAMD21
+
+# In this case the family selects a common 'sam0' symbol (which provides some
+# features), and the core it has (cortex-m0+)
+config CPU_FAM_SAMD21
+    bool
+    select CPU_COMMON_SAM0
+    select CPU_CORE_CORTEX_M0PLUS
+    select HAS_CPU_SAMD21
+    select HAS_PUF_SRAM
+
+# The value of the common value depends on the selected model
+config CPU_MODEL
+    default "samd21e18a" if CPU_MODEL_SAMD21E18A
+    default "samd21g18a" if CPU_MODEL_SAMD21G18A
+    default "samd21j18a" if CPU_MODEL_SAMD21J18A
+    default "samr21e18a" if CPU_MODEL_SAMR21E18A
+    default "samr21g18a" if CPU_MODEL_SAMR21G18A
+
+config CPU_FAM
+    default "samd21" if CPU_FAM_SAMD21
+
+```
+
+### Boards
+Boards must be modelled as hidden boolean symbols with the prefix `BOARD_` which
+default to `y` and are placed in `/boards/<BOARD>/Kconfig`. This file will be
+`source`d from the main `/Kconfig` file. The board symbol must select the
+`CPU_MODEL_<model>` symbol that corresponds to the CPU model present on the
+board. The board symbol must also select the symbols that correspond to the
+features it provides.
+
+In the same `Kconfig` file a default value must be assigned to the
+common `BOARD` symbol. It must be guarded by the board's symbol, so it only
+applies in that case.
+
+There are cases when grouping common code for multiple boards helps to avoid
+unnecessary repetition. In the case features are provided in a common board
+folder (e.g. `/boards/common/arduino-atmega`) a symbol should be declared to
+model this in Kconfig. Symbols for common boards must have the `BOARD_COMMON_`
+prefix, and must select the common provided features.
+
+#### Example
+The samr21-xpro has a `samr21g18a` CPU and provides multiple features. Its
+symbol is modelled as following:
+
+```Kconfig
+# /boards/samr21-xpro/Kconfig
+
+config BOARD
+    default "samr21-xpro" if BOARD_SAMR21_XPRO
+
+config BOARD_SAMR21_XPRO
+    bool
+    default y
+    select CPU_MODEL_SAMR21G18A
+    select HAS_PERIPH_ADC
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+    select HAS_PERIPH_USBDEV
+    select HAS_RIOTBOOT
+```
+
+## Summary of reserved Kconfig prefixes
+The following symbol prefixes have been assigned particular semantics and are
+reserved for the cases described bellow:
+
+<!-- Keep the table in alphabetical order -->
+| Prefix | Description |
+| :----- | :---------- |
+| `BOARD_` | Models a board |
+| `BOARD_COMMON_` | Used for common symbols used by multiple boards |
+| `CPU_ARCH_` | Models a CPU architecture |
+| `CPU_COMMON_` | Used for common symbols used by multiple CPUs |
+| `CPU_CORE_` | Models a CPU core |
+| `CPU_FAM_` | Models a family of CPUs |
+| `CPU_MODEL_` | Models a particular model of CPU |
+| `HAS_` | Models a [feature](build-system-basics.html#features) |
+| `KCONFIG_MODULE_` | Used during transition to enable configuration of a module via Kconfig |
+| `KCONFIG_PKG_` | Used during transition to enable configuration of a package via Kconfig |
+| `MODULE_` | Models a [RIOT module](creating-modules.html#creating-modules) |
+| `PKG_` | Models an [external package](group__pkg.html) |
 
 ---
 # Appendixes                                              {#kconfig-appendixes}
