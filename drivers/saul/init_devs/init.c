@@ -219,6 +219,10 @@ void saul_init_devs(void)
         extern void auto_init_sht2x(void);
         auto_init_sht2x();
     }
+    if (IS_USED(MODULE_SDP3X)) {
+        extern void auto_init_sdp3x(void);
+        auto_init_sdp3x();
+    }
     if (IS_USED(MODULE_SHT3X)) {
         extern void auto_init_sht3x(void);
         auto_init_sht3x();

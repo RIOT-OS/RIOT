@@ -324,6 +324,10 @@ ifneq (,$(filter sdcard_spi,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sdcard_spi/include
 endif
 
+ifneq (,$(filter sdp3x,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sdp3x/include
+endif
+
 ifneq (,$(filter sds011,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/sds011/include
 endif

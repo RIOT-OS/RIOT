@@ -680,6 +680,13 @@ ifneq (,$(filter sdcard_spi,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter sdp3x,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  FEATURES_REQUIRED += periph_gpio_irq
+  USEMODULE += checksum
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter sds011,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
 endif
