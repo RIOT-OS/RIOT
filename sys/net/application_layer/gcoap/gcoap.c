@@ -41,6 +41,9 @@
 #define GCOAP_RESOURCE_WRONG_METHOD -1
 #define GCOAP_RESOURCE_NO_PATH -2
 
+/* Sentinel value indicating that no immediate response is required */
+#define NO_IMMEDIATE_REPLY (-1)
+
 /* End of the range to pick a random timeout */
 #define TIMEOUT_RANGE_END (CONFIG_COAP_ACK_TIMEOUT * CONFIG_COAP_RANDOM_FACTOR_1000 / 1000)
 
@@ -141,7 +144,7 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
      *   * code set to EMPTY, and
      *   * the message is returned with the rest of its header intact.
      */
-    int8_t messagelayer_emptyresponse_type = -1;
+    int8_t messagelayer_emptyresponse_type = NO_IMMEDIATE_REPLY;
 
     (void)arg;
     if (type & SOCK_ASYNC_MSG_RECV) {
@@ -229,7 +232,7 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
         }
     }
 
-    if (messagelayer_emptyresponse_type != -1) {
+    if (messagelayer_emptyresponse_type != NO_IMMEDIATE_REPLY) {
         coap_hdr_set_type(pdu.hdr, (uint8_t)messagelayer_emptyresponse_type);
         coap_hdr_set_code(pdu.hdr, COAP_CODE_EMPTY);
         /* FIXME make this a coap_hdr_set_token or set_token_length */
