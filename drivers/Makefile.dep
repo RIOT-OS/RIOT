@@ -683,6 +683,7 @@ endif
 ifneq (,$(filter sdcard_spi,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_spi
+  FEATURES_OPTIONAL += periph_spi_reconfigure
   DEFAULT_MODULE += auto_init_storage
   USEMODULE += checksum
   USEMODULE += xtimer

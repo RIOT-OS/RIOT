@@ -541,10 +541,59 @@ int cmd_bench(int argc, char **argv)
     return 0;
 }
 
+#ifdef MODULE_PERIPH_SPI_RECONFIGURE
+int cmd_spi_gpio(int argc, char **argv)
+{
+    int dev = -1;
+
+    /* parse the given SPI device */
+    if (argc > 1) {
+        dev = atoi(argv[1]);
+    }
+
+    if (dev < 0 || dev >= (int)SPI_NUMOF) {
+        puts("error: invalid SPI device specified");
+        return 1;
+    }
+
+    gpio_t miso_pin = spi_pin_miso(dev);
+    gpio_t mosi_pin = spi_pin_mosi(dev);
+
+    printf("Command: spi_deinit_pins(%i)\n", dev);
+    spi_deinit_pins(dev);
+
+    gpio_init(miso_pin, GPIO_OUT);
+    gpio_init(mosi_pin, GPIO_OUT);
+
+    xtimer_sleep(1);
+
+    printf("Command: gpio_set()\n");
+    gpio_set(miso_pin);
+    gpio_set(mosi_pin);
+
+    xtimer_sleep(1);
+
+    printf("Command: gpio_clear()\n");
+    gpio_clear(miso_pin);
+    gpio_clear(mosi_pin);
+
+    xtimer_sleep(1);
+
+    printf("Command: spi_init_pins(%i)\n", dev);
+    spi_init_pins(dev);
+
+    printf("Success: spi_%i re-init\n", dev);
+    return 0;
+}
+#endif
+
 static const shell_command_t shell_commands[] = {
     { "init", "Setup a particular SPI configuration", cmd_init },
     { "send", "Transfer string to slave", cmd_transfer },
     { "bench", "Runs some benchmarks", cmd_bench },
+#ifdef MODULE_PERIPH_SPI_RECONFIGURE
+    { "spi_gpio", "Re-configures MISO & MOSI pins to GPIO mode and back.", cmd_spi_gpio },
+#endif
     { NULL, NULL, NULL }
 };
 

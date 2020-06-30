@@ -84,6 +84,9 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
         case SD_INIT_START:
             DEBUG("SD_INIT_START\n");
 
+#ifdef MODULE_PERIPH_SPI_RECONFIGURE
+            spi_deinit_pins(card->params.spi_dev);
+#endif
             if ((gpio_init(card->params.mosi, GPIO_OUT) == 0) &&
                 (gpio_init(card->params.clk,  GPIO_OUT) == 0) &&
                 (gpio_init(card->params.cs,   GPIO_OUT) == 0) &&
