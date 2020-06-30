@@ -173,8 +173,9 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *remote)
     return 0;
 }
 
-ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
-                      uint32_t timeout, sock_udp_ep_t *remote)
+ssize_t sock_udp_recv2(sock_udp_t *sock, void *data, size_t max_len,
+                       uint32_t timeout, sock_udp_ep_t *remote,
+                       sock_udp_ep_t *local)
 {
     void *pkt = NULL, *ctx = NULL;
     uint8_t *ptr = data;
@@ -182,7 +183,9 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     bool nobufs = false;
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    while ((res = sock_udp_recv_buf(sock, &pkt, &ctx, timeout, remote)) > 0) {
+    while (0 > (res = sock_udp_recv_buf2(sock, &pkt, &ctx, timeout, remote,
+                                         local)))
+        {
         if (res > (ssize_t)max_len) {
             nobufs = true;
             continue;
@@ -194,8 +197,9 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
-ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
-                          uint32_t timeout, sock_udp_ep_t *remote)
+ssize_t sock_udp_recv_buf2(sock_udp_t *sock, void **data, void **buf_ctx,
+                           uint32_t timeout, sock_udp_ep_t *remote,
+                           sock_udp_ep_t *local)
 {
     gnrc_pktsnip_t *pkt, *udp;
     udp_hdr_t *hdr;
@@ -224,6 +228,13 @@ ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
         /* return remote to possibly block if wrong remote */
         memcpy(remote, &tmp, sizeof(tmp));
         remote->port = byteorder_ntohs(hdr->src_port);
+    }
+    if (local != NULL) {
+        gnrc_pktsnip_t *ipv6 = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
+        ipv6_hdr_t *ipv6_hdr = ipv6->data;
+        memcpy(local->addr.ipv6, ipv6_hdr->dst.u8, sizeof(local->addr.ipv6));
+        local->port = byteorder_ntohs(hdr->dst_port);
+        local->family = tmp.family;
     }
     if ((sock->remote.family != AF_UNSPEC) &&  /* check remote end-point if set */
         ((sock->remote.port != byteorder_ntohs(hdr->src_port)) ||
