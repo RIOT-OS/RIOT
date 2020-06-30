@@ -96,6 +96,7 @@ extern "C" {
 
 #define IEEE802154_FRAME_LEN_MAX        (127U)  /**< maximum 802.15.4 frame length */
 #define IEEE802154G_FRAME_LEN_MAX      (2047U)  /**< maximum 802.15.4g-2012 frame length */
+#define IEEE802154_ACK_FRAME_LEN          (5U)  /**< ACK frame length */
 
 /**
  * For the SUN PHYs, the value is 1 ms expressed in symbol periods, rounded

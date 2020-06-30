@@ -1,0 +1,71 @@
+ifneq (,$(filter openwsn_openstack,$(USEMODULE)))
+  USEMODULE += openwsn_cjoin
+  USEMODULE += openwsn_iphc
+  USEMODULE += openwsn_ipv6
+  USEMODULE += openwsn_mac_low
+  USEMODULE += openwsn_mac_high
+  USEMODULE += openwsn_transport
+  USEMODULE += openwsn_crosslayers
+
+  USEMODULE += openwsn_drivers
+  USEMODULE += openwsn_sctimer
+  USEMODULE += openwsn_radio
+
+  DEFAULT_MODULE += auto_init_openwsn
+
+  USEMODULE += luid
+  USEMODULE += netdev_default
+endif
+
+ifneq (,$(filter openwsn_scheduler,$(USEMODULE)))
+  USEMODULE += core_thread_flags
+endif
+
+ifneq (,$(filter openwsn_cjoin,$(USEMODULE)))
+  USEMODULE += openwsn_openapps
+  USEMODULE += openwsn_opencoap
+
+  USEMODULE += openwsn_cryptoengine
+endif
+
+ifneq (,$(filter openwsn_cryptoengine,$(USEMODULE)))
+  USEMODULE += crypto_3des
+  USEMODULE += cipher_modes
+endif
+
+ifneq (,$(filter openwsn_sctimer,$(USEMODULE)))
+  ifeq (,$(filter openwsn_sctimer_ztimer,$(USEMODULE)))
+    USEMODULE += openwsn_sctimer_rtt
+  endif
+endif
+
+ifneq (,$(filter openwsn_sctimer_ztimer,$(USEMODULE)))
+  USEMODULE += ztimer_usec
+  USEMODULE += ztimer_msec
+  FEATURES_OPTIONAL += periph_rtt
+  ifneq (,$(filter periph_rtt,$(FEATURES_USED)))
+    USEMODULE += ztimer_periph_rtt
+  endif
+endif
+
+ifneq (,$(filter openwsn_sctimer_rtt,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtt
+endif
+
+ifneq (,$(filter openwsn_serial,$(USEMODULE)))
+  USEMODULE += openwsn_drivers
+  USEMODULE += ztimer_usec
+  FEATURES_REQUIRED += periph_uart
+  FEATURES_OPTIONAL += periph_uart_nonblocking
+endif
+
+ifneq (,$(filter openwsn_leds openwsn_debugpins,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+endif
+
+ifneq (,$(filter openwsn_debugpins,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+endif
+
+# This port currently requires setting ISR_STACKSIZE
+FEATURES_BLACKLIST += arch_esp32 arch_esp8266 arch_riscv arch_avr8

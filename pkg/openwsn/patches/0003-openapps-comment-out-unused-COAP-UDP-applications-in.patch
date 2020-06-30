@@ -1,0 +1,60 @@
+From 1b9c54459e882a2beb4cedbdbafbb299b95be9e8 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 27 Mar 2020 09:59:24 +0100
+Subject: [PATCH 03/11] openapps: comment out unused COAP&UDP applications
+ includes
+
+---
+ openapps/openapps.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/openapps/openapps.c b/openapps/openapps.c
+index 3124d0c6..e30dcaec 100644
+--- a/openapps/openapps.c
++++ b/openapps/openapps.c
+@@ -8,18 +8,18 @@
+ 
+ // CoAP
+ #include "opencoap.h"
+-#include "c6t.h"
+-#include "cinfo.h"
+-#include "cleds.h"
++// #include "c6t.h"
++// #include "cinfo.h"
++// #include "cleds.h"
+ #include "cjoin.h"
+-#include "cwellknown.h"
+-#include "rrt.h"
++// #include "cwellknown.h"
++// #include "rrt.h"
+ // UDP
+-#include "uecho.h"
+-#include "uinject.h"
+-#include "userialbridge.h"
+-#include "uexpiration.h"
+-#include "uexpiration_monitor.h"
++// #include "uecho.h"
++// #include "uinject.h"
++// #include "userialbridge.h"
++// #include "uexpiration.h"
++// #include "uexpiration_monitor.h"
+ 
+ //=========================== variables =======================================
+ 
+@@ -35,10 +35,10 @@ void openapps_init(void) {
+ 
+    // CoAP
+    //c6t_init();
+-   cinfo_init();
+-   cleds__init();
++   // cinfo_init();
++   // cleds__init();
+    cjoin_init();
+-   cwellknown_init();
++   // cwellknown_init();
+    //rrt_init();
+ 
+    // UDP
+-- 
+2.27.0
+

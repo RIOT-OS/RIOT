@@ -899,6 +899,10 @@ ifneq (,$(filter iotlab-m3 wsn430-v1_3b wsn430-v1_4,$(BOARD)))
   endif
 endif
 
+ifneq (,$(filter openv-%,$(MAKECMDGOALS)))
+  include $(RIOTBASE)/dist/tools/openvisualizer/makefile.openvisualizer.inc.mk
+endif
+
 # Include desvirt Makefile
 include $(RIOTTOOLS)/desvirt/Makefile.desvirt
 
