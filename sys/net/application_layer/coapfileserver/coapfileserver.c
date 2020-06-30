@@ -171,11 +171,6 @@ error:
 
 static ssize_t coapfileserver_file_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, struct requestdata *request)
 {
-    /**
-     * ToDo:
-     *
-     * * Error handling on late read errors
-     */
     int err;
 
     union stattag stattag;
@@ -215,7 +210,8 @@ static ssize_t coapfileserver_file_handler(coap_pkt_t *pdu, uint8_t *buf, size_t
     size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
 
     err = vfs_lseek(fd, slicer.start, SEEK_SET);
-    assert(err >= 0); /* Can't rewind PDU yet */
+    if (err < 0)
+        goto late_err;
 
     /* That'd only happen if the buffer is too small for even a 16-byte block,
      * or if the above calculations were wrong.
@@ -225,11 +221,13 @@ static ssize_t coapfileserver_file_handler(coap_pkt_t *pdu, uint8_t *buf, size_t
      * */
     assert(pdu->payload + slicer.end - slicer.start <= buf + len);
     int read = vfs_read(fd, pdu->payload, slicer.end - slicer.start);
-    assert(read >= 0); /* Can't rewind PDU yet */
+    if (err < 0)
+        goto late_err;
 
     uint8_t morebuf;
     int more = vfs_read(fd, &morebuf, 1);
-    assert(more >= 0); /* Can't rewind PDU yet */
+    if (err < 0)
+        goto late_err;
 
     vfs_close(fd);
 
@@ -242,6 +240,11 @@ static ssize_t coapfileserver_file_handler(coap_pkt_t *pdu, uint8_t *buf, size_t
     }
 
     return resp_len + read;
+
+late_err:
+    vfs_close(fd);
+    coap_hdr_set_code(pdu->hdr, COAP_CODE_INTERNAL_SERVER_ERROR);
+    return coap_get_total_hdr_len(pdu);
 }
 
 static ssize_t coapfileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, struct requestdata *request)
