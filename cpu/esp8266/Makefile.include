@@ -48,11 +48,15 @@ INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/spi_flash/include
 
 CFLAGS += -D__ESP_FILE__=__FILE__
 
-# NOTE: These can be turned into normal conditionals after #9913 is fixed
-GDBSTUB_DIR ?= $(if $(filter esp_gdbstub,$(USEMODULE)),$(RIOTCPU)/$(CPU)/vendor/esp-gdbstub)
-CFLAGS     += $(if $(filter esp_gdbstub,$(USEMODULE)),-DGDBSTUB_BREAK_ON_INIT=1)
-INCLUDES   += $(if $(filter esp_gdbstub,$(USEMODULE)),-I$(GDBSTUB_DIR))
-BASELIBS   += $(if $(filter esp_now, $(USEMODULE)), -lespnow)
+ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
+  GDBSTUB_DIR ?= $(RIOTCPU)/$(CPU)/vendor/esp-gdbstub
+  CFLAGS += -DGDBSTUB_BREAK_ON_INIT=1)
+  INCLUDES += -I$(GDBSTUB_DIR)
+endif
+
+ifneq (,$(filter esp_now,$(USEMODULE)))
+  BASELIBS += -lespnow
+endif
 
 BASELIBS += -lgcc -lwpa -lcore -lnet80211 -lphy -lpp -lstdc++
 

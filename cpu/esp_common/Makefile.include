@@ -42,7 +42,11 @@ ARFLAGS = rcs
 CFLAGS_DBG ?= -ggdb -g3
 
 # override default CFLAGS_OPT in case module esp_gdb is enabled
-CFLAGS_OPT ?= $(if $(filter esp_gdb,$(USEMODULE)),-Og,-Os)
+ifneq (,$(filter esp_gdb,$(USEMODULE)))
+  CFLAGS_OPT ?= -Og
+else
+  CFLAGS_OPT ?= -Os
+endif
 
 CFLAGS += $(CFLAGS_OPT) $(CFLAGS_DBG)
 
@@ -51,9 +55,10 @@ ifneq (,$(filter esp_qemu,$(USEMODULE)))
   CFLAGS += -DQEMU
 endif
 
-# NOTE: These checks can be turned into normal conditionals when #9913 is fixed
 # use 32 priority levels if any WiFi interface or the ETH interface is used
-CFLAGS += $(if $(filter esp_wifi_any esp_eth,$(USEMODULE)),-DSCHED_PRIO_LEVELS=32)
+ifneq (,$(filter esp_wifi_any esp_eth,$(USEMODULE)))
+  CFLAGS += -DSCHED_PRIO_LEVELS=32
+endif
 
 # The threads for handling the ESP hardware have the priorities from 2 to 4.
 # The priority of lwIP TCPIP thread should be lower than these priorities.
@@ -62,9 +67,12 @@ ifneq (,$(filter lwip,$(USEMODULE)))
 endif
 
 # if SPI RAM is enabled, the qout flash mode has to be used
-# NOTE: These checks can be turned into normal conditionals when #9913 is fixed
 _FLASH_MODE_PREV := $(FLASH_MODE)
-FLASH_MODE = $(if $(filter esp_spi_ram,$(USEMODULE)),qout,$(_FLASH_MODE_PREV))
+ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
+  FLASH_MODE = qout
+else
+  FLASH_MODE = $(_FLASH_MODE_PREV)
+endif
 
 # set CFLAG for the correspondant FLASH_MODE
 CFLAGS += $(if $(findstring qout,$(FLASH_MODE)),-DFLASH_MODE_QOUT=1)
@@ -82,9 +90,12 @@ LINKFLAGS += -nostdlib -Wl,-gc-sections -Wl,-static
 # LINKFLAGS += -Wl,--verbose
 # LINKFLAGS += -Wl,--print-gc-sections
 
-# NOTE: These checks can be turned into normal conditionals when #9913 is fixed
-BOOTLOADER_COLOR = $(if $(filter esp_log_colored,$(USEMODULE)),_colors)
-BOOTLOADER_INFO = $(if $(filter esp_log_startup,$(USEMODULE)),_info)
+ifneq (,$(filter esp_log_colored,$(USEMODULE)))
+  BOOTLOADER_COLOR = _colors
+endif
+ifneq (,$(filter esp_log_startup,$(USEMODULE)))
+  BOOTLOADER_INFO = _info
+endif
 
 BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
 
@@ -132,7 +143,8 @@ else
   FFLAGS += 0x10000 $(FLASHFILE).bin
 endif
 
-# NOTE: These checks can be turned into normal conditionals when #9913 is fixed
 # increase the test timeout for file system tests that use the SPI flash drive
-RIOT_TEST_TIMEOUT = $(if $(filter spiffs littlefs,$(USEMODULE)),120)
-$(call target-export-variables,test,RIOT_TEST_TIMEOUT)
+ifneq (,$(filter spiffs littlefs,$(USEMODULE)))
+  RIOT_TEST_TIMEOUT = 20
+  $(call target-export-variables,test,RIOT_TEST_TIMEOUT)
+endif
