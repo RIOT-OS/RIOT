@@ -31,6 +31,8 @@
 struct requestdata {
     /** 0-terminated expanded file name in the VFS */
     char namebuf[COAPFILESERVER_PATH_MAX];
+    uint32_t blocknum2;
+    unsigned int szx2; /* would prefer uint8_t but that's what coap_get_blockopt gives */
     bool etag_sent;
     uint8_t etag[ETAG_LENGTH];
 };
@@ -64,6 +66,8 @@ ssize_t coapfileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *
     struct coapfileserver_entry *entry = (struct coapfileserver_entry *)ctx;
     struct requestdata request;
     request.etag_sent = false;
+    request.blocknum2 = 0;
+    request.szx2 = CONFIG_NANOCOAP_BLOCK_SIZE_EXP_MAX;
     /** Index in request.namebuf. Must not point at the last entry as that will be
      * zeroed to get a 0-terminated string. */
     size_t namelength = 0;
@@ -134,6 +138,11 @@ ssize_t coapfileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *
                 request.etag_sent = true;
                 memcpy(request.etag, value, sizeof(request.etag));
                 break;
+            case COAP_OPT_BLOCK2:
+                /* Could be more efficient now that we already know where it
+                 * is, but meh */
+                coap_get_blockopt(pdu, COAP_OPT_BLOCK2, &request.blocknum2, &request.szx2);
+                break;
             default:
                 if (opt.opt_num & 1) {
                     errorcode = COAP_CODE_BAD_REQUEST;
@@ -165,8 +174,6 @@ static ssize_t coapfileserver_file_handler(coap_pkt_t *pdu, uint8_t *buf, size_t
     /**
      * ToDo:
      *
-     * * Blockwise
-     *
      * * Error handling on late read errors
      */
     int err;
@@ -188,12 +195,46 @@ static ssize_t coapfileserver_file_handler(coap_pkt_t *pdu, uint8_t *buf, size_t
 
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     coap_opt_add_opaque(pdu, COAP_OPT_ETAG, stattag.etag, ETAG_LENGTH);
+    /* To best see how this works set CONFIG_GCAOP_PDU_BUF_SIZE to 532 or 533.
+     * If we did a sharper estimation (factoring in the block2 size option with
+     * the current blockum), we'd even pack 512 bytes into 530 until block
+     * numbers get large enough to eat another byte, which is when the block
+     * size would decrease in-flight. */
+    size_t remaining_length = len - (pdu->payload - buf);
+    remaining_length -= 5; /* maximum block2 option usable in nanocoap */
+    remaining_length -= 1; /* payload marker */
+    /* > 0: To not wrap around; if that still won't fit that's later caught in
+     * an assertion */
+    while (coap_szx2size(request->szx2) > remaining_length && request->szx2 > 0) {
+        request->szx2 --;
+        request->blocknum2 <<= 1;
+    }
+    coap_block_slicer_t slicer;
+    coap_block_slicer_init(&slicer, request->blocknum2, coap_szx2size(request->szx2));
+    coap_opt_add_block2(pdu, &slicer, true);
     size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
 
-    int read = vfs_read(fd, pdu->payload, pdu->payload_len);
+    err = vfs_lseek(fd, slicer.start, SEEK_SET);
+    assert(err >= 0); /* Can't rewind PDU yet */
+
+    /* That'd only happen if the buffer is too small for even a 16-byte block,
+     * or if the above calculations were wrong.
+     *
+     * Not using payload_len here as that's needlessly underestimating the
+     * space by CONFIG_GCOAP_RESP_OPTIONS_BUF
+     * */
+    assert(pdu->payload + slicer.end - slicer.start <= buf + len);
+    int read = vfs_read(fd, pdu->payload, slicer.end - slicer.start);
     assert(read >= 0); /* Can't rewind PDU yet */
 
+    uint8_t morebuf;
+    int more = vfs_read(fd, &morebuf, 1);
+    assert(more >= 0); /* Can't rewind PDU yet */
+
     vfs_close(fd);
+
+    slicer.cur = slicer.end + more;
+    coap_block2_finish(&slicer);
 
     if (read == 0) {
         /* Rewind to clear payload marker */
