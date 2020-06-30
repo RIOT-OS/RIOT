@@ -304,6 +304,27 @@ static void test_create(void)
     print_test_result("test_create__umount", vfs_umount(&_test_vfs_mount) == 0);
 }
 
+static void test_fstat(void)
+{
+    int fd;
+    struct stat stat_buf;
+
+    print_test_result("test_stat__mount", vfs_mount(&_test_vfs_mount) == 0);
+
+    fd = vfs_open(FULL_FNAME1, O_WRONLY | O_TRUNC, 0);
+    print_test_result("test_stat__open", fd >= 0);
+    print_test_result("test_stat__write",
+            vfs_write(fd, test_txt, sizeof(test_txt)) == sizeof(test_txt));
+    print_test_result("test_stat__close", vfs_close(fd) == 0);
+
+    fd = vfs_open(FULL_FNAME1, O_RDONLY, 0);
+    print_test_result("test_stat__open", fd >= 0);
+    print_test_result("test_stat__stat", vfs_fstat(fd, &stat_buf) == 0);
+    print_test_result("test_stat__close", vfs_close(fd) == 0);
+    print_test_result("test_stat__size", stat_buf.st_size == sizeof(test_txt));
+    print_test_result("test_stat__umount", vfs_umount(&_test_vfs_mount) == 0);
+}
+
 #ifdef MODULE_NEWLIB
 static void test_newlib(void)
 {
@@ -399,6 +420,7 @@ int main(void)
     test_unlink();
     test_mkrmdir();
     test_create();
+    test_fstat();
 #ifdef MODULE_NEWLIB
     test_newlib();
 #endif
