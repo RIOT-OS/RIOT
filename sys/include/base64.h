@@ -74,7 +74,7 @@ static inline size_t base64_estimate_encode_size(size_t data_in_size)
             BASE64_ERROR_DATA_IN if `data_in` equals NULL.
  */
 int base64_encode(const void *data_in, size_t data_in_size,
-                  unsigned char *base64_out, size_t *base64_out_size);
+                  void *base64_out, size_t *base64_out_size);
 
 /**
  * @brief           Encodes a given datum to base64 with URL and Filename Safe Alphabet
@@ -100,7 +100,7 @@ int base64_encode(const void *data_in, size_t data_in_size,
             BASE64_ERROR_DATA_IN if `data_in` equals NULL.
  */
 int base64url_encode(const void *data_in, size_t data_in_size,
-                     unsigned char *base64_out, size_t *base64_out_size);
+                     void *base64_out, size_t *base64_out_size);
 
 /**
  * @brief           Decodes a given base64 string and save the result to the given destination.
@@ -120,7 +120,7 @@ int base64url_encode(const void *data_in, size_t data_in_size,
             BASE64_ERROR_DATA_IN if `base64_in` equals NULL,
             BASE64_ERROR_DATA_IN_SIZE if `base64_in_size` is between 1 and 4.
  */
-int base64_decode(const unsigned char *base64_in, size_t base64_in_size,
+int base64_decode(const void *base64_in, size_t base64_in_size,
                   void *data_out, size_t *data_out_size);
 
 #ifdef __cplusplus
