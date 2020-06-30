@@ -143,8 +143,9 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep)
     return -ENOTCONN;
 }
 
-int sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
-                  uint32_t timeout, sock_udp_ep_t *remote)
+int sock_udp_recv2(sock_udp_t *sock, void *data, size_t max_len,
+                   uint32_t timeout, sock_udp_ep_t *remote,
+                   sock_udp_ep_t *local)
 {
     xtimer_t timeout_timer;
     int blocking = BLOCKING;
@@ -189,6 +190,13 @@ int sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
                 remote->netif = SOCK_ADDR_ANY_NETIF;
                 memcpy(&remote->addr, sock->recv_info.src, sizeof(ipv6_addr_t));
                 remote->port = sock->recv_info.src_port;
+            }
+            if (local != NULL) {
+                local->family = AF_INET6;
+                local->netif = SOCK_ADDR_ANY_NETIF;
+                /* no local IP address in emb6 */
+                memset(&local->addr, 0, sizeof(local->addr));
+                local->port = ntohs(sock->sock.udp_conn->lport);
             }
             res = (int)sock->recv_info.datalen;
             mutex_unlock(&sock->mutex);
