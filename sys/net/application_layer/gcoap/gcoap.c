@@ -423,7 +423,8 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
         return -1;
     }
 
-    ssize_t pdu_len = resource->handler(pdu, buf, len, resource->context);
+    // HACK to get the remote into the handler (only works when the context is not really used)
+    ssize_t pdu_len = resource->handler(pdu, buf, len, (void*)remote);
     if (pdu_len < 0) {
         pdu_len = gcoap_response(pdu, buf, len,
                                  COAP_CODE_INTERNAL_SERVER_ERROR);
