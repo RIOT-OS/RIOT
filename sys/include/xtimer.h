@@ -151,7 +151,7 @@ static inline void xtimer_sleep(uint32_t seconds);
  *
  * When called from an ISR, this function will spin and thus block the MCU for
  * the specified amount in microseconds, so only use it there for *very* short
- * periods, e.g., less than XTIMER_BACKOFF.
+ * periods, e.g., less than XTIMER_BACKOFF converted to µs.
  *
  * @param[in] microseconds  the amount of microseconds the thread should sleep
  */
@@ -262,8 +262,8 @@ static inline void xtimer_set_wakeup64(xtimer_t *timer, uint64_t offset, kernel_
  * ticks in the future.
  *
  * @warning BEWARE! Callbacks from xtimer_set() are being executed in interrupt
- * context (unless offset < XTIMER_BACKOFF). DON'T USE THIS FUNCTION unless you
- * know *exactly* what that means.
+ * context (unless offset < XTIMER_BACKOFF converted to µs).
+ * DON'T USE THIS FUNCTION unless you know *exactly* what that means.
  *
  * @param[in] timer     the timer structure to use.
  * @param[in] offset    time in microseconds from now specifying that timer's
@@ -281,8 +281,8 @@ static inline void xtimer_set(xtimer_t *timer, uint32_t offset);
  * microseconds in the future.
  *
  * @warning BEWARE! Callbacks from xtimer_set() are being executed in interrupt
- * context (unless offset < XTIMER_BACKOFF). DON'T USE THIS FUNCTION unless you
- * know *exactly* what that means.
+ * context (unless offset < XTIMER_BACKOFF converted to µs).
+ * DON'T USE THIS FUNCTION unless you know *exactly* what that means.
  *
  * @param[in] timer       the timer structure to use.
  * @param[in] offset_us   time in microseconds from now specifying that timer's
@@ -518,7 +518,7 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
 /**
  * @brief xtimer backoff value
  *
- * All timers that are less than XTIMER_BACKOFF microseconds in the future will
+ * All timers that are less than XTIMER_BACKOFF ticks in the future will
  * just spin.
  *
  * This is supposed to be defined per-device in e.g., periph_conf.h.
