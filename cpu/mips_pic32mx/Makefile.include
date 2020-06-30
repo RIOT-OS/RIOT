@@ -29,3 +29,6 @@ OFLAGS += \
 ifneq (,$(filter cpp,$(FEATURES_USED)))
 OFLAGS += --change-section-lma .gcc_except_table-0x80000000
 endif
+
+# system objcopy is not able to generate a binfile for MIPS
+BINFILE =
