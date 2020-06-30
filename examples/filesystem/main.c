@@ -26,6 +26,11 @@
 #include "shell.h"
 #include "board.h" /* MTD_0 is defined in board.h */
 
+#ifdef MODULE_COAPFILESERVER
+#include <net/gcoap.h>
+#include <net/coapfileserver.h>
+#endif
+
 /* Configure MTD device for SD card if none is provided */
 #if !defined(MTD_0) && MODULE_MTD_SDCARD
 #include "mtd_sdcard.h"
@@ -309,6 +314,26 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
+#ifdef MODULE_COAPFILESERVER
+/* Export all the file system */
+static const struct coapfileserver_entry vfs = { "", 1 };
+
+/* CoAP resources. Must be sorted by path (ASCII order). */
+static const coap_resource_t _resources[] = {
+    { "/vfs", COAP_GET | COAP_MATCH_SUBTREE, coapfileserver_handler, (void*)&vfs },
+};
+
+static gcoap_listener_t _listener = {
+    &_resources[0],
+    ARRAY_SIZE(_resources),
+    NULL,
+    NULL
+};
+
+#define MAIN_QUEUE_SIZE (4)
+static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+#endif
+
 int main(void)
 {
 #if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_LITTLEFS2))
@@ -325,6 +350,11 @@ int main(void)
     else {
         puts("constfs mounted successfully");
     }
+
+#ifdef MODULE_COAPFILESERVER
+    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
+    gcoap_register_listener(&_listener);
+#endif
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);

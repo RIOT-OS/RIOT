@@ -76,3 +76,21 @@ Hello World!
 cat /const/hello-riot
 Hello RIOT!
 ```
+
+## Network file server
+
+If ``NETWORK=1`` is passed to make, the board's default network setup is
+enabled, and a CoAP server is started that exports the file system at the path
+``/vfs``.
+
+You can access the file system from another board that runs the gcoap example:
+
+```
+> coap get fe80::3c63:beff:fe85:ca96%6 5683 /vfs/const/
+<hello-world>,<hello-riot>
+> coap get fe80::3c63:beff:fe85:ca96%6 5683 /vfs/const/hello-riot
+--- blockwise start ---
+gcoap: response Success, code 2.05, 13 bytes
+00000000  48  65  6C  6C  6F  20  52  49  4F  54  21  0A  00
+--- blockwise complete ---
+```

@@ -24,6 +24,14 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
+ifeq (${NETWORK},1)
+USEMODULE += gcoap
+USEMODULE += coapfileserver
+USEMODULE += gnrc_ipv6_default
+USEMODULE += gnrc_netdev_default
+USEMODULE += auto_init_gnrc_netif
+endif
+
 # Use MTD (flash layer)
 USEMODULE += mtd
 # USEMODULE += mtd_sdcard
