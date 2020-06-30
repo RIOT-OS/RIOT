@@ -45,12 +45,14 @@ endchoice
 config USB_PID
     hex "Product ID"
     range 0x0000 0xFFFF
+    default 0x7D01
     help
         You must provide your own PID.
 
 config USB_VID
     hex "Vendor ID"
     range 0x0000 0xFFFF
+    default 0x1209
     help
         You must provide your own VID.
 
