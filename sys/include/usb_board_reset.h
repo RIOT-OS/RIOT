@@ -48,6 +48,11 @@ int usb_board_reset_coding_cb(usbus_cdcacm_device_t *cdcacm,
  */
 void usb_board_reset_in_application(void);
 
+/**
+ * @brief   Trigger a bootloader reset, start the bootloader after reset
+ */
+void usb_board_reset_in_bootloader(void);
+
 #ifdef __cplusplus
 }
 #endif

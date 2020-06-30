@@ -32,8 +32,6 @@
 #define RESET_IN_APPLICATION_TRIGGER_BAUDRATE   (600U)
 #endif
 
-void usb_board_reset_in_bootloader(void);
-
 int usb_board_reset_coding_cb(usbus_cdcacm_device_t *cdcacm,
                               uint32_t baud, uint8_t bits,
                               uint8_t parity, uint8_t stop)
