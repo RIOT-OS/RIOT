@@ -24,6 +24,13 @@
  * created implicitly when files are PUT under them; they can be DELETEd when
  * empty -->.
  *
+ * @note The file server uses ETag for cache validation. The ETags are built
+ * from the file system stat values. As clients rely on the ETag to differ when
+ * the file changes, it is important that file modification times are set. The
+ * precise time values do not matter, but if a file is changed in place and
+ * neither its length nor its modification time is varied, then clients will
+ * not become aware of the change or may even mix up the versions half way
+ * through if they have a part of the old version cached.
  *
  * # Usage
  *
