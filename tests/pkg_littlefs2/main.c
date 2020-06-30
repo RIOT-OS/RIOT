@@ -117,7 +117,7 @@ static mtd_dev_t dev = {
 static mtd_dev_t *_dev = (mtd_dev_t*) &dev;
 #endif /* MTD_0 */
 
-static littlefs_desc_t littlefs_desc;
+static littlefs2_desc_t littlefs_desc;
 
 static vfs_mount_t _test_littlefs_mount = {
     .fs = &littlefs2_file_system,

@@ -105,7 +105,7 @@ typedef struct {
 #endif
     /** lookahead buffer to use internally */
     uint8_t lookahead_buf[CONFIG_LITTLEFS2_LOOKAHEAD_SIZE];
-} littlefs_desc_t;
+} littlefs2_desc_t;
 
 /** The littlefs vfs driver */
 extern const vfs_file_system_t littlefs2_file_system;
