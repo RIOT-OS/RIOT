@@ -21,11 +21,26 @@
 #define SHELL_H
 
 #include <stdint.h>
+#include "periph/pm.h"
 
 #include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+ * @brief Shutdown RIOT on shell exit
+ */
+#ifndef CONFIG_SHELL_SHUTDOWN_ON_EXIT
+/* Some systems (e.g Ubuntu 20.04) close stdin on CTRL-D / EOF
+ * That means we can't just re-start the shell.
+ * Instead terminate RIOT, which is also the behavior a user would
+ * expect from a CLI application.
+ */
+#  ifdef CPU_NATIVE
+#    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 1
+#  endif
 #endif
 
 /**
@@ -75,6 +90,9 @@ void shell_run_once(const shell_command_t *commands, char *line_buf, int len);
 /**
  * @brief           Start a shell and restart it if it exits
  *
+ *                  If `CONFIG_SHELL_SHUTDOWN_ON_EXIT` is set (e.g. on native)
+ *                  the shell will instead shut down RIOT once EOF is reached.
+ *
  * @param[in]       commands    ptr to array of command structs
  * @param[in]       line_buf    Buffer that will be used for reading a line
  * @param[in]       len         nr of bytes that fit in line_buf
@@ -84,6 +102,10 @@ static inline void shell_run_forever(const shell_command_t *commands,
 {
     while (1) {
         shell_run_once(commands, line_buf, len);
+
+        if (IS_ACTIVE(CONFIG_SHELL_SHUTDOWN_ON_EXIT)) {
+            pm_off();
+        }
     }
 }
 
