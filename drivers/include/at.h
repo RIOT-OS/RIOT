@@ -22,6 +22,28 @@
  *
  * As a debugging aid, when compiled with "-DAT_PRINT_INCOMING=1", every input
  * byte gets printed.
+ *
+ * ## Unsolicited Result Codes (URC) ##
+ * An unsolicited result code is a string message that is not triggered as a
+ * information text response to a previous AT command and can be output at any
+ * time to inform a specific event or status change.
+ *
+ * The module provides a basic URC handling by adding the `at_urc` module to the
+ * application. This allows to @ref at_add_urc "register" and
+ * @ref at_remove_urc "de-register" URC strings to check. Later,
+ * @ref at_process_urc can be called to check if any of the registered URCs have
+ * been detected. If a registered URC has been detected the correspondant
+ * @ref at_urc_t::cb "callback function" is called. The mode of operation
+ * requires that the user of the module processes periodically the URCs.
+ *
+ * Alternatively, one of the `at_urc_isr_<priority>` modules can be included.
+ * `priority` can be one of `low`, `medium` or `highest`, which correspond to
+ * the priority of the thread that processes the URCs. For more information on
+ * the priorities check the @ref sys_event module. This will extend the
+ * functionality of `at_urc` by processing the URCs when the @ref AT_RECV_EOL_2
+ * character is detected and there is no pending response. This works by posting
+ * an @ref sys_event "event" to an event thread that processes the URCs.
+ *
  * @{
  *
  * @file
@@ -41,6 +63,8 @@
 #include "periph/uart.h"
 #include "clist.h"
 #include "kernel_defines.h"
+
+#include "event.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -169,6 +193,10 @@ typedef struct {
     uart_t uart;            /**< UART device where the AT device is attached */
 #ifdef MODULE_AT_URC
     clist_node_t urc_list;  /**< list to keep track of all registered urc's */
+#ifdef MODULE_AT_URC_ISR
+    bool awaiting_response; /**< indicates if the driver waits for a response */
+    event_t event;          /**< event posted from ISR to process urc's */
+#endif
 #endif
 } at_dev_t;
 
