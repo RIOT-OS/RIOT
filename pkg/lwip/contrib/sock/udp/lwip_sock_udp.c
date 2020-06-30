@@ -24,6 +24,8 @@
 #include "lwip/opt.h"
 #include "lwip/sys.h"
 #include "lwip/sock_internal.h"
+#include "lwip/udp.h"
+#include "kernel_defines.h"
 
 int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                     const sock_udp_ep_t *remote, uint16_t flags)
@@ -68,8 +70,9 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep)
                                0)) ? -ENOTCONN : 0;
 }
 
-ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
-                      uint32_t timeout, sock_udp_ep_t *remote)
+ssize_t sock_udp_recv2(sock_udp_t *sock, void *data, size_t max_len,
+                       uint32_t timeout, sock_udp_ep_t *remote,
+                       sock_udp_ep_t *local)
 {
     void *pkt = NULL;
     void *ctx = NULL;
@@ -78,8 +81,8 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     bool nobufs = false;
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    while ((res = sock_udp_recv_buf(sock, &pkt, &ctx, timeout,
-                                    remote)) > 0) {
+    while ((res = sock_udp_recv_buf2(sock, &pkt, &ctx, timeout,
+                                     remote, local)) > 0) {
         struct netbuf *buf = ctx;
         if (buf->p->tot_len > (ssize_t)max_len) {
             nobufs = true;
@@ -94,8 +97,9 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
-ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **ctx,
-                          uint32_t timeout, sock_udp_ep_t *remote)
+ssize_t sock_udp_recv_buf2(sock_udp_t *sock, void **data, void **ctx,
+                           uint32_t timeout, sock_udp_ep_t *remote,
+                           sock_udp_ep_t *local)
 {
     struct netbuf *buf;
     int res;
@@ -120,23 +124,18 @@ ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **ctx,
     if (remote != NULL) {
         /* convert remote */
         size_t addr_len;
-#if LWIP_IPV6
-        if (sock->base.conn->type & NETCONN_TYPE_IPV6) {
+        if (IS_ACTIVE(LWIP_IPV6) && (sock->base.conn->type & NETCONN_TYPE_IPV6)) {
             addr_len = sizeof(ipv6_addr_t);
             remote->family = AF_INET6;
         }
-        else {
-#endif
-#if LWIP_IPV4
+        else if (IS_ACTIVE(LWIP_IPV4)) {
             addr_len = sizeof(ipv4_addr_t);
             remote->family = AF_INET;
-#else
+        }
+        else {
             netbuf_delete(buf);
             return -EPROTO;
-#endif
-#if LWIP_IPV6
         }
-#endif
 #if LWIP_NETBUF_RECVINFO
         remote->netif = lwip_sock_bind_addr_to_netif(&buf->toaddr);
 #else
@@ -145,6 +144,29 @@ ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **ctx,
         /* copy address */
         memcpy(&remote->addr, &buf->addr, addr_len);
         remote->port = buf->port;
+    }
+    if (local != NULL) {
+        /* convert local */
+        size_t addr_len;
+        if (IS_ACTIVE(LWIP_IPV6) && (sock->base.conn->type & NETCONN_TYPE_IPV6)) {
+            addr_len = sizeof(ipv6_addr_t);
+            remote->family = AF_INET6;
+        }
+        else if (IS_ACTIVE(LWIP_IPV4)) {
+            addr_len = sizeof(ipv4_addr_t);
+            remote->family = AF_INET;
+        }
+        else {
+            netbuf_delete(buf);
+            return -EPROTO;
+        }
+        /* copy address */
+#if LWIP_NETBUF_RECVINFO
+        memcpy(&local->addr, &buf->toaddr, addr_len);
+#else
+        memset(&local->addr, 0, addr_len);
+#endif
+        local->port = sock->base.conn->pcb.udp->local_port;
     }
     *data = buf->ptr->payload;
     *ctx = buf;
