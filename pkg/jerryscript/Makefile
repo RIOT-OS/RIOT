@@ -5,8 +5,6 @@ PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-CFLAGS += -Wno-implicit-fallthrough
-
 JERRY_HEAP ?= 16  # kB
 JERRY_STACK ?= 1  # kB
 JERRY_GC_LIMIT ?= 0  # Use default value, e.g. 1/32 of total heap size
