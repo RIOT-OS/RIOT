@@ -116,10 +116,10 @@ static inline void uart_init_cts_pin(uart_t uart)
 
 static inline void uart_init_pins(uart_t uart, uart_rx_cb_t rx_cb)
 {
-     /* configure TX pin */
-    gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
     /* set TX pin high to avoid garbage during further initialization */
     gpio_set(uart_config[uart].tx_pin);
+     /* configure TX pin after setting it to avoid a momentary low state */
+    gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
 #ifdef CPU_FAM_STM32F1
     gpio_init_af(uart_config[uart].tx_pin, GPIO_AF_OUT_PP);
 #else
