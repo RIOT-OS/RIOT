@@ -36,11 +36,9 @@ else ifeq (esp8266,$(CPU))
   EXT_CFLAGS += -Wno-sign-conversion -Wno-error=sign-conversion
 endif
 
-.PHONY: libjerry
+all: $(BINDIR)/jerryscript.a
 
-all: libjerry
-
-libjerry: $(PKG_BUILD_DIR)/Makefile
+$(BINDIR)/jerryscript.a: $(PKG_BUILD_DIR)/Makefile
 	"$(MAKE)" -C $(PKG_BUILD_DIR) jerry-core jerry-ext jerry-port-default-minimal
 	@cp $(PKG_BUILD_DIR)/lib/libjerry-core.a $(BINDIR)/jerryscript.a
 	@cp $(PKG_BUILD_DIR)/lib/libjerry-ext.a $(BINDIR)/jerryscript-ext.a
