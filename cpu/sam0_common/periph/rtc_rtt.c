@@ -25,6 +25,7 @@
  */
 
 #include <stdint.h>
+#include "mutex.h"
 #include "periph/rtc.h"
 #include "periph/rtt.h"
 #include "periph_conf.h"
@@ -98,6 +99,16 @@ static void _poweron(void)
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_RTC;
 #else
     PM->APBAMASK.reg |= PM_APBAMASK_RTC;
+#endif
+}
+
+__attribute__((unused))
+static bool _power_is_on(void)
+{
+#ifdef MCLK
+    return MCLK->APBAMASK.reg & MCLK_APBAMASK_RTC;
+#else
+    return PM->APBAMASK.reg & PM_APBAMASK_RTC;
 #endif
 }
 
@@ -267,6 +278,93 @@ void rtt_init(void)
 
     NVIC_EnableIRQ(RTC_IRQn);
 }
+
+#if RTC_NUM_OF_TAMPERS
+
+static rtc_state_t tamper_cb;
+
+/* check if pin is a RTC tamper pin */
+static int _rtc_pin(gpio_t pin)
+{
+    for (unsigned i = 0; i < ARRAY_SIZE(rtc_tamper_pins); ++i) {
+        if (rtc_tamper_pins[i] == pin) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+void rtc_tamper_init(void)
+{
+    if (IS_ACTIVE(MODULE_PERIPH_RTC) ||
+        IS_ACTIVE(MODULE_PERIPH_RTT) ||
+        _power_is_on()) {
+        return;
+    }
+
+    _rtt_clock_setup();
+    _poweron();
+
+    /* disable all interrupt sources */
+    RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_MASK;
+
+    NVIC_EnableIRQ(RTC_IRQn);
+}
+
+int rtc_tamper_register(gpio_t pin, gpio_flank_t flank)
+{
+    int in = _rtc_pin(pin);
+
+    if (in < 0) {
+        return -1;
+    }
+
+    /* TAMPCTRL is enable-protected */
+    _rtc_set_enabled(0);
+
+    RTC->MODE0.TAMPCTRL.reg |= RTC_TAMPCTRL_IN0ACT_WAKE << (2 * in);
+
+    if (flank == GPIO_RISING) {
+        RTC->MODE0.TAMPCTRL.reg |= RTC_TAMPCTRL_TAMLVL0 << in;
+    } else if (flank == GPIO_FALLING) {
+        RTC->MODE0.TAMPCTRL.reg &= ~(RTC_TAMPCTRL_TAMLVL0 << in);
+    }
+
+    /* enable the RTC again */
+    _rtc_set_enabled(1);
+
+    return 0;
+}
+
+static void _unlock(void *m)
+{
+    mutex_unlock(m);
+}
+
+void rtc_tamper_enable(void)
+{
+    mutex_t m = MUTEX_INIT;
+
+    /* clear tamper id */
+    RTC->MODE0.TAMPID.reg = 0xF;
+
+    /* work around errata 2.17.4:
+     * ignore the first tamper event on the rising edge */
+    if (RTC->MODE0.TAMPCTRL.reg & RTC_TAMPCTRL_TAMLVL_Msk) {
+        mutex_lock(&m);
+        tamper_cb.cb  = _unlock;
+        tamper_cb.arg = &m;
+    }
+
+    /* enable tamper detect as wake-up source */
+    RTC->MODE0.INTENSET.bit.TAMPER = 1;
+
+    /* wait for first tamper event */
+    mutex_lock(&m);
+}
+
+#endif /* RTC_NUM_OF_TAMPERS */
 
 void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
 {
@@ -503,9 +601,23 @@ static void _isr_rtt(void)
     }
 }
 
+static void _isr_tamper(void)
+{
+#ifdef RTC_MODE0_INTFLAG_TAMPER
+    if (RTC->MODE0.INTFLAG.bit.TAMPER) {
+        RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_TAMPER;
+        if (tamper_cb.cb) {
+            tamper_cb.cb(tamper_cb.arg);
+        }
+    }
+#endif
+}
+
 void isr_rtc(void)
 {
     _isr_rtc();
     _isr_rtt();
+    _isr_tamper();
+
     cortexm_isr_end();
 }
