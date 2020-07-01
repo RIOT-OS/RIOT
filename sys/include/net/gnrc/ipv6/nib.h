@@ -274,8 +274,9 @@ enum {
      * on routes via this neighbor.
      *
      * The `ctx_addr` is the address of the neighbor, `ctx` is a value equal
-     * to the new NUD state as defined in [the NC info flags](@ref
-     * net_gnrc_ipv6_nib_nc_info). If the entry is deleted, `ctx` will be set
+     * to the new NUD state as defined in
+     * [the NC info flags](@ref net_gnrc_ipv6_nib_nc_info). If the entry is
+     * deleted, `ctx` will be set
      * to @ref GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE (except if it was
      * already in the `UNREACHABLE` state). This does not include cache-outs,
      * since they give no information about the neighbor's reachability (you
