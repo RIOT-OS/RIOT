@@ -166,7 +166,7 @@ CFLAGS="-DTMPABC_PARAM_ADDR=0x23" make all
 Second, we can override selected parameters from the board configuration
 (`board.h`):
 
-@code.{c}
+@code
 /* ... */
 /**
  * @brief   TMPABC sensor configuration
