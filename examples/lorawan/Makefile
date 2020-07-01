@@ -46,4 +46,7 @@ ifneq (,$(filter test,$(MAKECMDGOALS)))
   DEFAULT_MODULE += test_utils_interactive_sync
 endif
 
+# Can't be run on ci since it requires gateway + lora node
+TEST_ON_CI_BLACKLIST = all
+
 include $(RIOTBASE)/Makefile.include

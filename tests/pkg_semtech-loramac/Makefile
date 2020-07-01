@@ -34,4 +34,7 @@ ifneq (,$(filter iotlab%,$(MAKECMDGOALS)))
   include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
 endif
 
+# Can't be run on ci since it requires gateway + lora node
+TEST_ON_CI_BLACKLIST = all
+
 include $(RIOTBASE)/Makefile.include
