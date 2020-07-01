@@ -30,6 +30,16 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+        <script>
+            function displaySR(){
+            searchBox.Search();
+            var rhtml=(document.getElementById('MSearchResults').contentWindow.document.body.innerHTML).replace(/href=\"\.\.\//g,'href="');
+            document.getElementById('MSearchResultsWindow').style.display='none';
+            document.getElementById('top').append(document.getElementById('MSearchSelectWindow'));
+            document.getElementById('top').append(document.getElementById('MSearchResultsWindow'));
+            document.getElementById('doc-content').innerHTML=rhtml;
+            }
+        </script>
   </head>
   <body>
       <div id="top">
@@ -51,7 +61,12 @@
               <p class="navbar-text navbar-left"><span id="projectbrief">$projectbrief</span></p>
               <ul id="riot-navlist" class="nav navbar-nav"></ul>
               <!--BEGIN SEARCHENGINE-->
-              <form id="riot-searchform" class="navbar-form navbar-left navbar-right hidden-sm hidden-xs" onsubmit="return false">
+              <form id="riot-searchform" class="navbar-form navbar-left navbar-right hidden-sm hidden-xs"
+                    onsubmit="try{
+                        displaySR();
+                    }finally{
+                            return false;
+                    }">
                  <div class="form-group">
                    <div id="MSearchBox" class="MSearchBoxActive">
                      <div class="input-group">
