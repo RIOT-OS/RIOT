@@ -3,3 +3,5 @@ include $(RIOTCPU)/mips32r2_common/Makefile.include
 CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 
 INCLUDES += -I$(RIOTCPU)/mips_pic32_common/include
+
+DIRS += $(RIOTCPU)/$(CPU)/$(CPU_MODEL)
