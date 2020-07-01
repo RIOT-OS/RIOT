@@ -21,6 +21,7 @@
 
 #define USB_H_USER_IS_RIOT_INTERNAL
 
+#include "cpu.h"
 #include "usb_board_reset.h"
 
 /* Set the value used by the bootloader to select between boot in

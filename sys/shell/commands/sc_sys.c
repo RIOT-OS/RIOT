@@ -23,7 +23,6 @@
 #include "periph/pm.h"
 
 #ifdef MODULE_USB_BOARD_RESET
-#define USB_H_USER_IS_RIOT_INTERNAL
 #include "usb_board_reset.h"
 #endif
 
