@@ -25,27 +25,26 @@ However, please avoid the use of `float` or `double`. Instead, multiply to the
 next SI (or appropriate) unit. E.g. if an ADC would return values like `1.23 V`,
 chose to return `1230 mV` instead.
 
-Additionally towards ease of use, all device drivers in RIOT should provide a
-similar 'look and feel'. They should behave similar concerning things like their
-state after initialization, like their used data representation and so on.
+Additionally, towards ease of use, all device drivers in RIOT should provide a
+similar 'look and feel'. They should behave similarly in terms of their state
+after initialization, like their used data representation and so on.
 
 Secondly, all device drivers should be optimized for minimal RAM/ROM usage, as
-RIOT targets (very) constrained devices. This implies, that instead of exposing
+RIOT targets (very) constrained devices. This implies that instead of exposing
 all thinkable functionality, the drivers should focus on exporting and
 implementing a device's core functionality, thus covering ~95% of the use cases.
-Furthermore great care should be put into ...(?)
 
-Third, it should always be possible, to handle more than a single device of one
-kind. Drivers and their interfaces are thus designed to keep their state
+Third, it should always be possible to handle more than a single device of the
+same kind. Drivers and their interfaces are thus designed to keep their state
 information in a parameterized location instead of driver defined global
 variables.
 
 Fourth, RIOT defines high-level interfaces for certain groups of devices (i.e.
 netdev for network devices, SAUL for sensors and actuators), which enable users
-to work with a wide variety of devices without having to know anything about the
+to work with a wide variety of devices without having to know much about the
 actual device that is mapped.
 
-Fifth, during initialization we make sure that we can communicate with a device.
+Fifth, during initialization, we make sure that we can communicate with a device.
 Other functions should check the dev pointer is not void, and should also handle
 error return values from the lower layer peripheral driver implementations,
 where there are some.
@@ -59,8 +58,8 @@ platform independent interfaces as the peripheral drivers, xtimer, etc.
 ## Documentation                                            {#driver-guide-doc}
 
 Document what your driver does! Most devices come with a very large number of
-features, while the corresponding device driver only supports a sub-set of them.
-This should be clearly stated in the device driver's documentation, so that
+features, while the corresponding device driver only supports a subset of them.
+This should be clearly stated in the device driver's documentation so that
 anyone wanting to use the driver can find out the supported features without
 having to scan through the code.
 
@@ -72,7 +71,7 @@ configuration, using the naming scheme of `DEVNAME_t` (e.g. `dht_t`, or
 descriptor.
 
 This device descriptor MUST contain all the state data of a device. By this, we
-are not limited on the number of instances of the driver we can run
+are not limited to the number of instances of the driver we can run
 concurrently. The descriptor is hereby used for identifying the device we want
 to interact with, and SHOULD always be the first parameter for all device driver
 related functions.
@@ -87,7 +86,7 @@ is `DEVNAME_params_t`. In contrary to the device descriptor, this data structure
 should only contain static information, that is needed for the device
 initialization as it is preferably allocated in ROM.
 
-A simple I2C temperature sensors's device descriptor could look like this:
+A simple I2C temperature sensors' device descriptor could look like this:
 
 @code{.c}
 typedef struct {
@@ -103,8 +102,8 @@ typedef struct {
 @endcode
 
 **NOTE:** In many cases it makes sense, to copy the `xxx_params` data into the
-device descriptor during initialization. In some cases, it is however better to
-just link the `params` data via pointer and only copy selected data. This way,
+device descriptor during initialization. In some cases, it is, however, better
+to just link the `params` data via pointer and only copy selected data. This way,
 configuration data that is only used once can be read directly from ROM, while
 often used fields (e.g. used peripherals) are stored directly in the device
 descriptor and one saves hereby one de-referencing step when accessing them.
@@ -113,7 +112,7 @@ descriptor and one saves hereby one de-referencing step when accessing them.
 
 Each device driver in RIOT MUST supply a default configuration file, named
 `DEVNAME_params.h`. This file should be located in the `RIOT/drivers/...`. The
-idea is, that this file can be overridden by an application or a board, by
+idea is that this file can be overridden by an application or a board, by
 simply putting a file with the same name in the application's or the board's
 include folders, while RIOT's build system takes care of preferring those files
 instead of the default params file.
@@ -233,19 +232,19 @@ Sub-groups defined for different types of drivers can be found in
 
 ## Initialization                                {#driver-guide-initialization}
 
-In general, the initialization functions should to the following:
+In general, the initialization functions should do the following:
 
 - initialize the device descriptor
 - initialize non-shared peripherals they use, e.g. GPIO pins
-- test for device connectivity, e.g. does a SPI/I2C slave react
-- reset the device to a well defined state, e.g. use external reset lines or do
+- test for device connectivity, e.g. does an SPI/I2C slave react
+- reset the device to a well-defined state, e.g. use external reset lines or do
   a software rest
 - do the actual device initialization
 
 For testing a device's connectivity, it is recommended to read certain
 configuration data with a defined value from the device. Some devices offer
 `WHO_AM_I` or `DEVICE_ID` registers for this purpose. Writing and reading back
-some data to the device is another valid option for testing it's responsiveness.
+some data to the device is another valid option for testing its responsiveness.
 
 For more detailed information on how the signature of the init functions should
 look like, please refer below to the specific requirements for network devices
@@ -253,10 +252,10 @@ and sensors.
 
 ## Return values                                  {#driver-guide-return-values}
 
-As stated above, we check communication of a device during initialization, and
+As stated above, we check communication of a device during initialization and
 handle error return values from the lower layers, where they exist. To prevent
 subsequent misuse by passing NULL pointers and similar to the subsequent
-functions, the recommended way is to check parameter using `assert`, e.g.:
+functions, the recommended way is to check the parameter using `assert`, e.g.:
 
 @code{.c}
 int16_t tmpabc_read(const tmpabc_t *dev)
@@ -267,7 +266,7 @@ int16_t tmpabc_read(const tmpabc_t *dev)
 }
 @endcode
 
-Whenever status/error return values are implemented by you in your driver, they
+Whenever you implement status/error return values in your driver, they
 should be named, meaning that the driver MUST define an enum assigning names to
 the actual used value, e.g.
 
@@ -311,7 +310,7 @@ Then answer a few questions about the driver:
 - Driver name: enter a name for your driver. It will be used as both the name
   of the driver directory where the source files are created and the build
   system module.
-- Driver doxygen group name: Enter the name of driver, as displayed in the
+- Driver doxygen group name: Enter the name of the driver, as displayed in the
   Doxygen documentation.
 - Brief doxygen description: Describe in one line what is this driver about.
 - Parent driver Doxygen group: Enter the Doxygen group the driver belongs to.
@@ -379,7 +378,7 @@ preferred type where applicable.
 In many situations, the physical values cannot be mapped directly to integer
 values. For example, we do not want to map temperature values to integers
 directly while using their fraction. The recommended way to solve this is by
-scaling the result value using decimal fixed point arithmetic, in other words
+scaling the result value using decimal fixed point arithmetic, in other words,
 just return centi-degree instead of degree (e.g. 2372c°C instead of 23.72°C).
 
 ## Additional Sensor Driver Checklist          {#driver-guide-sensor-checklist}
@@ -404,7 +403,7 @@ just return centi-degree instead of degree (e.g. 2372c°C instead of 23.72°C).
 
 ## Initialization                                   {#driver-guide-netdev-init}
 
-The initialization process MUST be split into 2 steps: first initialize the
+The initialization process MUST be split into 2 steps: first, initialize the
 device descriptor and if applicable the used peripherals, and secondly do the
 actual device initialization. The reason for this is, that before a device is
 actually activated and can start to process data, the network stack for the
