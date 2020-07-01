@@ -34,7 +34,7 @@
 #endif
 
 #ifdef MODULE_USB_BOARD_RESET
-#include "usb_board_reset.h"
+#include "usb_board_reset_internal.h"
 #endif
 
 static usbus_cdcacm_device_t cdcacm;

@@ -24,29 +24,15 @@
 extern "C" {
 #endif
 
-#include <inttypes.h>
-
-#include "usb/usbus/cdc/acm.h"
-
-/**
- * @brief   USB coding callback used to trigger the board reset
- *
- * @param[in] cdcacm    Pointer to the cdcacm device
- * @param[in] baud      Baudrate used by the client. Only 1200 baud is taken into account
- * @param[in] bits      Number of bit mode used by the client
- * @param[in] parity    Parity mode used by the client
- * @param[in] stop      Stop bit mode used by the client
- *
- * @return  Always return 0
- */
-int usb_board_reset_coding_cb(usbus_cdcacm_device_t *cdcacm,
-                              uint32_t baud, uint8_t bits,
-                              uint8_t parity, uint8_t stop);
-
 /**
  * @brief   Trigger a simple reset, back to the application
  */
 void usb_board_reset_in_application(void);
+
+/**
+ * @brief   Trigger a bootloader reset, start the bootloader after reset
+ */
+void usb_board_reset_in_bootloader(void);
 
 #ifdef __cplusplus
 }
