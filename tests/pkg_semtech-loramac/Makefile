@@ -26,4 +26,12 @@ USEMODULE += fmt
 
 FEATURES_OPTIONAL += periph_eeprom
 
+# Default IotLab Config to run the test
+ifneq (,$(filter iotlab%,$(MAKECMDGOALS)))
+  IOTLAB_NODES ?= 1
+  IOTLAB_TYPE  ?= st-lrwan1:sx1276
+  IOTLAB_SITE  ?= saclay
+  include $(RIOTBASE)/dist/testbed-support/Makefile.iotlab
+endif
+
 include $(RIOTBASE)/Makefile.include
