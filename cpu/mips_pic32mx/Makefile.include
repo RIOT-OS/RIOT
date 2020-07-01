@@ -18,7 +18,6 @@ OFLAGS += \
     --change-section-lma .init-0x80000000 \
     --change-section-lma .fini-0x80000000 \
     --change-section-lma .eh_frame-0x80000000 \
-    --change-section-lma .jcr-0x80000000 \
     --change-section-lma .ctors-0x80000000 \
     --change-section-lma .dtors-0x80000000 \
     --change-section-lma .rodata-0x80000000 \
