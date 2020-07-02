@@ -851,6 +851,15 @@ ifneq (,$(filter veml6070,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter vl6180x_basic,$(USEMODULE)))
+  USEMODULE += vl6180x
+endif
+
+ifneq (,$(filter vl6180x,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  FEATURES_REQUIRED += periph_i2c
+endif
+
 ifneq (,$(filter w5100,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio_irq
   FEATURES_REQUIRED += periph_spi

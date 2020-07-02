@@ -218,6 +218,9 @@ PSEUDOMODULES += vcnl4010
 PSEUDOMODULES += vcnl4020
 PSEUDOMODULES += vcnl4040
 
+# include variants of VL6180X drivers as pseudo modules
+PSEUDOMODULES += vl6180x_basic
+
 # implementations of ws281x_write as submodules of ws281x:
 PSEUDOMODULES += ws281x_%
 
