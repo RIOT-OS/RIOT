@@ -210,11 +210,12 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_NUMOF          ARRAY_SIZE(i2c_config)
 
 /**
- * @name    RTC configuration
+ * @name RTT configuration
  * @{
  */
-#define RTC_DEV             RTC->MODE2
-
+#ifndef RTT_FREQUENCY
+#define RTT_FREQUENCY       (32768U)    /* in Hz. For changes see `rtc_rtt.c` */
+#endif
 /** @} */
 
 /**
