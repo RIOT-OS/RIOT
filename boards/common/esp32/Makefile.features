@@ -6,8 +6,3 @@ FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_gpio_irq
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_uart_modecfg
-
-# other features provided by all boards
-FEATURES_PROVIDED += esp_spiffs
-FEATURES_PROVIDED += esp_wifi
-FEATURES_PROVIDED += esp_now
