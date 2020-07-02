@@ -56,7 +56,7 @@ extern "C" {
 extern const char assert_crash_message[];
 
 #ifdef NDEBUG
-#define assert(ignore)((void)0)
+#define assert(ignore)((void)(ignore))
 #elif defined(DEBUG_ASSERT_VERBOSE)
 /**
  * @brief   Function to handle failed assertion
