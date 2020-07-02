@@ -19,6 +19,8 @@ BOARD_WHITELIST += arduino-duemilanove \
                    derfmega128 \
                    derfmega256 \
                    firefly \
+                   frdm-k22f \
+                   frdm-k64f \
                    hifive1 \
                    hifive1b \
                    ikea-tradfri \
@@ -26,8 +28,13 @@ BOARD_WHITELIST += arduino-duemilanove \
                    microduino-corerf \
                    msb-430 \
                    msb-430h \
+                   mulle \
+                   openlabs-kw41z-mini \
+                   openlabs-kw41z-mini-256kib \
                    openmote-b \
                    openmote-cc2538 \
+                   pba-d-01-kw2x \
+                   phynode-kw41z \
                    remote-pa \
                    remote-reva \
                    remote-revb \
@@ -40,7 +47,9 @@ BOARD_WHITELIST += arduino-duemilanove \
                    slwstk6220a \
                    stk3600 \
                    stk3700 \
+                   teensy31 \
                    telosb \
+                   usb-kw41z \
                    waspmote-pro \
                    wsn430-v1_3b \
                    wsn430-v1_4 \
