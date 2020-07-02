@@ -20,6 +20,9 @@
 
 #include <errno.h>
 #include <stdio.h>
+#ifdef PICOLIBC_TLS
+#include <picotls.h>
+#endif
 
 #include "assert.h"
 #include "thread.h"
@@ -222,6 +225,13 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     }
     /* allocate our thread control block at the top of our stackspace */
     thread_t *thread = (thread_t *)(stack + stacksize);
+
+#ifdef PICOLIBC_TLS
+    stacksize -= _tls_size();
+
+    thread->tls = stack + stacksize;
+    _init_tls(thread->tls);
+#endif
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
     if (flags & THREAD_CREATE_STACKTEST) {

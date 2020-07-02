@@ -118,6 +118,27 @@ SECTIONS
     KEEP (*(.dtors))
   } >flash AT>flash :flash
 
+  /*
+   * TLS relocations are offsets relative to the address
+   * of the first TLS symbol. That means we just need to
+   * allocate them all together so that the TLS region
+   * is compact when allocated for each thread.
+   */
+
+  /*
+   * TLS initialization data is loaded into ROM so that
+   * each thread can get its values initialized from there
+   * at startup
+   */
+  .tdata :
+  {
+       __tdata_start = .;
+      *(.tdata .tdata.* .gnu.linkonce.td.*)
+      __tdata_end = .;
+  } >flash AT>flash :tls
+  __tdata_source = LOADADDR(.tdata);
+  __tdata_size = SIZEOF(.tdata);
+
   .lalign         :
   {
     . = ALIGN(4);
