@@ -36,4 +36,9 @@ void board_init(void)
     LED0_OFF;
     LED1_OFF;
     LED2_OFF;
+
+#ifndef _PICOLIBC__
+    /* Initialize newlib-nano library stubs */
+    nanostubs_init();
+#endif
 }
