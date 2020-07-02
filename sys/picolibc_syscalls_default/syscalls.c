@@ -76,16 +76,13 @@ int picolibc_put(char c, FILE *file)
     stdio_write(&c, 1);
     return 1;
 }
-FILE picolibc_stdout =
-    FDEV_SETUP_STREAM(picolibc_put, NULL, NULL, _FDEV_SETUP_WRITE);
-
-FILE picolibc_stdin =
-    FDEV_SETUP_STREAM(NULL, picolibc_get, NULL, _FDEV_SETUP_READ);
+FILE picolibc_stdio =
+    FDEV_SETUP_STREAM(picolibc_put, picolibc_get, NULL, _FDEV_SETUP_RW);
 
 FILE *const __iob[] = {
-    &picolibc_stdin,
-    &picolibc_stdout,
-    &picolibc_stdout,
+    &picolibc_stdio,
+    &picolibc_stdio,
+    &picolibc_stdio,
 };
 
 /*
@@ -98,6 +95,7 @@ _READ_WRITE_RETURN_TYPE write(int fd, const void *data, size_t count)
     return stdio_write(data, count);
 }
 
+#include <thread.h>
 /**
  * @brief Get the process-ID of the current thread
  *
@@ -105,7 +103,7 @@ _READ_WRITE_RETURN_TYPE write(int fd, const void *data, size_t count)
  */
 pid_t getpid(void)
 {
-    return sched_active_pid;
+    return thread_getpid();
 }
 
 int close(int fd)
