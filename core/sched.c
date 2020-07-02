@@ -40,6 +40,10 @@
 #include <inttypes.h>
 #endif
 
+#ifdef PICOLIBC_TLS
+#include <picotls.h>
+#endif
+
 /* Needed by OpenOCD to read sched_threads */
 #if defined(__APPLE__) && defined(__MACH__)
  #define FORCE_USED_SECTION __attribute__((used)) __attribute__((section( \
@@ -148,6 +152,9 @@ int __attribute__((used)) sched_run(void)
     next_thread->status = STATUS_RUNNING;
     sched_active_pid = next_thread->pid;
     sched_active_thread = next_thread;
+#ifdef PICOLIBC_TLS
+    _set_tls(next_thread->tls);
+#endif
 
 #ifdef MODULE_MPU_STACK_GUARD
     mpu_configure(

@@ -176,6 +176,10 @@ struct _thread {
     const char *name;               /**< thread's name                  */
     int stack_size;                 /**< thread's stack size            */
 #endif
+/* enable TLS only when Picolibc is compiled with TLS enabled */
+#ifdef PICOLIBC_TLS
+    void *tls;                      /**< thread local storage ptr */
+#endif
 #ifdef HAVE_THREAD_ARCH_T
     thread_arch_t arch;             /**< architecture dependent part    */
 #endif
