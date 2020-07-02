@@ -10,6 +10,9 @@ endif
 ifneq (,$(filter posix_inet,$(USEMODULE)))
   DIRS += posix/inet
 endif
+ifneq (,$(filter posix_select,$(USEMODULE)))
+  DIRS += posix/select
+endif
 ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   DIRS += posix/semaphore
 endif

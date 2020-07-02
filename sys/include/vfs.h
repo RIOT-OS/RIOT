@@ -954,6 +954,21 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen);
  */
 const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur);
 
+/**
+ * @brief   Get information about the file for internal purposes
+ *
+ * @attention   Not thread safe! Do not modify any of the fields in the returned
+ * struct.
+ * @note        For file descriptor internal usage only.
+ *
+ * @internal
+ * @param[in] fd    A file descriptor
+ *
+ * @return  Pointer to the file information struct if a file with @p fd exists.
+ * @return  NULL, when no file with file descriptor @p fd exists.
+ */
+const vfs_file_t *vfs_file_get(int fd);
+
 #ifdef __cplusplus
 }
 #endif
