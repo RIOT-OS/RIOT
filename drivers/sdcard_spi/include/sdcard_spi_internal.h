@@ -157,22 +157,51 @@ extern "C" {
 #endif
 /** @} */
 
-/* memory capacity in bytes = (C_SIZE+1) * SD_CSD_V2_C_SIZE_BLOCK_MULT * BLOCK_LEN */
+/**
+ * @brief memory capacity in bytes = (C_SIZE+1) * SD_CSD_V2_C_SIZE_BLOCK_MULT * BLOCK_LEN
+ */
 #define SD_CSD_V2_C_SIZE_BLOCK_MULT 1024
 
+/**
+ * @brief SPI mode used for SD card
+ */
+#ifndef SD_CARD_SPI_MODE
 #define SD_CARD_SPI_MODE SPI_MODE_0
+#endif
 
-/* this speed setting is only used while the init procedure is performed */
+/**
+ * @brief this speed setting is only used while the init procedure is performed
+ */
+#ifndef SD_CARD_SPI_SPEED_PREINIT
 #define SD_CARD_SPI_SPEED_PREINIT SPI_CLK_400KHZ
+#endif
 
-/* after init procedure is finished the driver auto sets the card to this speed */
+/**
+ * @brief after init procedure is finished the driver auto sets the card to this speed
+ */
+#ifndef SD_CARD_SPI_SPEED_POSTINIT
 #define SD_CARD_SPI_SPEED_POSTINIT SPI_CLK_10MHZ
+#endif
 
-#define SD_CARD_DUMMY_BYTE 0xFF
+/**
+ * @brief Dummy Byte
+ */
+#define SD_CARD_DUMMY_BYTE  (0xFF)
 
+/**
+ * @brief 1 kiB in Bytes
+ */
 #define SDCARD_SPI_IEC_KIBI (1024L)
+
+/**
+ * @brief 1 kB in Bytes
+ */
 #define SDCARD_SPI_SI_KILO  (1000L)
 
+/**
+ * @brief SD card driver internal states
+ * @{
+ */
 typedef enum {
     SD_INIT_START,
     SD_INIT_SPI_POWER_SEQ,
@@ -190,6 +219,7 @@ typedef enum {
     SD_INIT_SET_MAX_SPI_SPEED,
     SD_INIT_FINISH
 } sd_init_fsm_state_t;
+/** @} */
 
 /**
  * @brief                 Sends a cmd to the sd card.
