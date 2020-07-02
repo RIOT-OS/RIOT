@@ -369,7 +369,7 @@ static const shell_command_t shell_commands[] = {
     { "read", "'read n m' reads m blocks beginning at block address n and prints the result. "
               "Append -c option to print data readable chars", _read },
     { "write", "'write n data' writes data to block n. Append -r option to "
-               "repeatedly write data to coplete block", _write },
+               "repeatedly write data to complete block", _write },
     { "copy", "'copy src dst' copies block src to block dst", _copy },
     { NULL, NULL, NULL }
 };

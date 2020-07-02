@@ -125,33 +125,83 @@ extern "C" {
 #define SD_CSD_V2 1
 #define SD_CSD_VUNSUPPORTED -1
 
-/* the retry counters below are used as timeouts for specific actions.
-   The values may need some adjustments to either give the card more time to respond
-   to commands or to achieve a lower delay / avoid infinite blocking. */
-#define R1_POLLING_RETRY_CNT       1000000
-#define SD_DATA_TOKEN_RETRY_CNT    1000000
-#define INIT_CMD_RETRY_CNT         1000000
-#define INIT_CMD0_RETRY_CNT        3
-#define SD_WAIT_FOR_NOT_BUSY_CNT   1000000 /* use -1 for full blocking till the card isn't busy */
-#define SD_BLOCK_READ_CMD_RETRIES  10     /* only affects sending of cmd not whole transaction! */
-#define SD_BLOCK_WRITE_CMD_RETRIES 10    /* only affects sending of cmd not whole transaction! */
+/**
+ * @name    Set retry parameters for specific actions
+ *
+ * Retry timeouts in microseconds for specific actions.
+ * The value interpretation is uint32_t.
+ * A value of 0 disables retries.
+ *
+ * @{
+ */
+#ifndef INIT_CMD_RETRY_US
+#define INIT_CMD_RETRY_US           (250 * US_PER_MS) /**< initialization command retry */
+#endif
+#ifndef INIT_CMD0_RETRY_US
+#define INIT_CMD0_RETRY_US          (100UL)           /**< initialization command 0 retry */
+#endif
+#ifndef R1_POLLING_RETRY_US
+#define R1_POLLING_RETRY_US         (100 * US_PER_MS) /**< initialization first response */
+#endif
+#ifndef SD_DATA_TOKEN_RETRY_US
+#define SD_DATA_TOKEN_RETRY_US      (100 * US_PER_MS) /**< data packet token read retry */
+#endif
+#ifndef SD_WAIT_FOR_NOT_BUSY_US
+#define SD_WAIT_FOR_NOT_BUSY_US     (250 * US_PER_MS) /**< wait for SD card */
+#endif
+#ifndef SD_BLOCK_READ_CMD_RETRY_US
+#define SD_BLOCK_READ_CMD_RETRY_US  (100UL)           /**< only affects sending of cmd not whole transaction! */
+#endif
+#ifndef SD_BLOCK_WRITE_CMD_RETRY_US
+#define SD_BLOCK_WRITE_CMD_RETRY_US (100UL)           /**< only affects sending of cmd not whole transaction! */
+#endif
+/** @} */
 
-/* memory capacity in bytes = (C_SIZE+1) * SD_CSD_V2_C_SIZE_BLOCK_MULT * BLOCK_LEN */
+/**
+ * @brief memory capacity in bytes = (C_SIZE+1) * SD_CSD_V2_C_SIZE_BLOCK_MULT * BLOCK_LEN
+ */
 #define SD_CSD_V2_C_SIZE_BLOCK_MULT 1024
 
+/**
+ * @brief SPI mode used for SD card
+ */
+#ifndef SD_CARD_SPI_MODE
 #define SD_CARD_SPI_MODE SPI_MODE_0
+#endif
 
-/* this speed setting is only used while the init procedure is performed */
+/**
+ * @brief this speed setting is only used while the init procedure is performed
+ */
+#ifndef SD_CARD_SPI_SPEED_PREINIT
 #define SD_CARD_SPI_SPEED_PREINIT SPI_CLK_400KHZ
+#endif
 
-/* after init procedure is finished the driver auto sets the card to this speed */
+/**
+ * @brief after init procedure is finished the driver auto sets the card to this speed
+ */
+#ifndef SD_CARD_SPI_SPEED_POSTINIT
 #define SD_CARD_SPI_SPEED_POSTINIT SPI_CLK_10MHZ
+#endif
 
-#define SD_CARD_DUMMY_BYTE 0xFF
+/**
+ * @brief Dummy Byte
+ */
+#define SD_CARD_DUMMY_BYTE  (0xFF)
 
+/**
+ * @brief 1 kiB in Bytes
+ */
 #define SDCARD_SPI_IEC_KIBI (1024L)
+
+/**
+ * @brief 1 kB in Bytes
+ */
 #define SDCARD_SPI_SI_KILO  (1000L)
 
+/**
+ * @brief SD card driver internal states
+ * @{
+ */
 typedef enum {
     SD_INIT_START,
     SD_INIT_SPI_POWER_SEQ,
@@ -169,6 +219,7 @@ typedef enum {
     SD_INIT_SET_MAX_SPI_SPEED,
     SD_INIT_FINISH
 } sd_init_fsm_state_t;
+/** @} */
 
 /**
  * @brief                 Sends a cmd to the sd card.
@@ -179,14 +230,14 @@ typedef enum {
  *                        (for CMDX this parameter is simply the integer value X).
  * @param[in] argument    The argument for the given cmd. As described by "7.3.1.1 Command Format".
  *                        This argument is transmitted byte wise with most significant byte first.
- * @param[in] max_retry   Specifies how often the command should be retried if an error occurs.
- *                        Use 0 to try only once, -1 to try forever, or n to retry n times.
+ * @param[in] retry_us    Specifies microsecond timeout for retries in case of command errors.
+ *                        Use 0 to try exactly once.
  *
  * @return                R1 response of the command if no (low-level) communication error occurred
  * @return                SD_INVALID_R1_RESPONSE if either waiting for the card to enter
  *                        not-busy-state timed out or spi communication failed
  */
-uint8_t sdcard_spi_send_cmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t argument, int32_t max_retry);
+uint8_t sdcard_spi_send_cmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t argument, uint32_t retry_us);
 
 /**
  * @brief                 Sends an acmd to the sd card. ACMD<n> consists of sending CMD55 + CMD<n>
@@ -197,14 +248,14 @@ uint8_t sdcard_spi_send_cmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t arg
  *                        (for ACMDX this parameter is simply the integer value X).
  * @param[in] argument    The argument for the given cmd. As described by "7.3.1.1 Command Format".
  *                        This argument is transmitted byte wise with most significant byte first.
- * @param[in] max_retry   Specifies how often the command should be retried if an error occurs.
- *                        Use 0 to try only once, -1 to try forever, or n to retry n times.
+ * @param[in] retry_us    Specifies microsecond timeout for retries in case of command errors.
+ *                        Use 0 to try exactly once.
  *
  * @return                R1 response of the command if no (low-level) communication error occurred
  * @return                SD_INVALID_R1_RESPONSE if either waiting for the card to enter
  *                        not-busy-state timed out or spi communication failed
  */
-uint8_t sdcard_spi_send_acmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t argument, int32_t max_retry);
+uint8_t sdcard_spi_send_acmd(sdcard_spi_t *card, uint8_t sd_cmd_idx, uint32_t argument, uint32_t retry_us);
 
 /**
  * @brief                 Gets the sector count of the card.
