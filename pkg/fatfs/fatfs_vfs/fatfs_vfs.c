@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <sys/stat.h> /* for struct stat */
+#include <stdlib.h>
 #include <string.h>
 
 #include "fs/fatfs.h"
@@ -31,6 +32,8 @@
 
 #define ENABLE_DEBUG 0
 #include <debug.h>
+
+#define TEST_FATFS_MAX_VOL_STR_LEN 14 /* "-2147483648:/\0" */
 
 static int fatfs_err_to_errno(int32_t err);
 static void _fatfs_time_to_timespec(WORD fdate, WORD ftime, time_t *time);
@@ -66,6 +69,41 @@ static int _init(vfs_mount_t *mountp)
 
     return -1;
 }
+
+#ifdef MODULE_FATFS_VFS_FORMAT
+static int _format(vfs_mount_t *mountp)
+{
+    fatfs_desc_t *fs_desc = mountp->private_data;
+    char volume_str[TEST_FATFS_MAX_VOL_STR_LEN];
+
+#if CONFIG_FATFS_FORMAT_ALLOC_STATIC
+    static BYTE work[FF_MAX_SS];
+    static mutex_t work_mtx;
+    mutex_lock(&work_mtx);
+#else
+    BYTE *work = malloc(FF_MAX_SS);
+    if (work == NULL) {
+        return -ENOMEM;
+    }
+#endif
+
+    const MKFS_PARM param = {
+        .fmt = CONFIG_FATFS_FORMAT_TYPE,
+    };
+
+    snprintf(volume_str, sizeof(volume_str), "%u:/", fs_desc->vol_idx);
+
+    FRESULT res = f_mkfs(volume_str, &param, work, FF_MAX_SS);
+
+#if CONFIG_FATFS_FORMAT_ALLOC_STATIC
+    mutex_unlock(&work_mtx);
+#else
+    free(work);
+#endif
+
+    return fatfs_err_to_errno(res);
+}
+#endif
 
 static int _mount(vfs_mount_t *mountp)
 {
@@ -515,6 +553,9 @@ static int fatfs_err_to_errno(int32_t err)
 }
 
 static const vfs_file_system_ops_t fatfs_fs_ops = {
+#ifdef MODULE_FATFS_VFS_FORMAT
+    .format = _format,
+#endif
     .mount = _mount,
     .umount = _umount,
     .rename = _rename,

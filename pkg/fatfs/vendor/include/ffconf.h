@@ -51,7 +51,11 @@
 
 
 #ifndef FATFS_FFCONF_OPT_USE_MKFS
+#if defined(MODULE_FATFS_VFS) && !defined(MODULE_FATFS_VFS_FORMAT)
+#define FF_USE_MKFS  0
+#else
 #define FF_USE_MKFS	 1
+#endif
 #else
 #define FF_USE_MKFS	 FATFS_FFCONF_OPT_USE_MKFS
 #endif/* This option switches f_mkfs() function. (0:Disable or 1:Enable) */
