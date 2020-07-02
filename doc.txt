@@ -41,6 +41,9 @@
  *   names and stack sizes.
  * * Some error paths that are active even at `DEVELHELP=0` perform more
  *   complex tasks to give useful output.
+ * * The @ref assert() function is only evaluated with `DEVELHELP=1` (or when
+ *   `FORCE_ASSERTS=1`). Otherwise, the build system sets `NDEBUG` and thus
+ *   skips assertions entirely.
  * * On a panic, the system halts (or enters the bootloader) instead of
  *   restarting.
  */
