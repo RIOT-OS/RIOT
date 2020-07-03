@@ -1,0 +1,46 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_FAM_NRF52
+    bool
+    select CPU_CORE_CORTEX_M4F
+    select CPU_COMMON_NRF5X
+# The ADC does not depend on any board configuration, so always available
+    select HAS_PERIPH_ADC
+# So far, NimBLE netif does not support nrf51 platforms, so we use a dedicated
+# feature to mark this
+    select HAS_BLE_NIMBLE_NETIF
+    select HAS_CORTEXM_MPU
+    select HAS_CPU_NRF52
+
+## CPU Models
+config CPU_MODEL_NRF52832XXAA
+    bool
+    select CPU_FAM_NRF52
+    select HAS_BLE_NORDIC_SOFTDEVICE
+
+config CPU_MODEL_NRF52840XXAA
+    bool
+    select CPU_FAM_NRF52
+
+## CPU common symbols
+config CPU_FAM
+    default "nrf52" if CPU_FAM_NRF52
+
+config CPU_MODEL
+    default "nrf52832xxaa" if CPU_MODEL_NRF52832XXAA
+    default "nrf52840xxaa" if CPU_MODEL_NRF52840XXAA
+
+config CPU
+    default "nrf52" if CPU_FAM_NRF52
+
+## Definition of specific features
+config HAS_CPU_NRF52
+    bool
+    help
+        Indicates that the current cpu is 'nrf52'.
+
+source "$(RIOTCPU)/nrf5x_common/Kconfig"
