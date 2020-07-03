@@ -1,14 +1,19 @@
 include ../Makefile.tests_common
 
-BOARD_WHITELIST += arduino-duemilanove \
+BOARD_WHITELIST += acd52832 \
+                   adafruit-clue \
+                   airfy-beacon \
+                   arduino-duemilanove \
                    arduino-leonardo \
                    arduino-mega2560 \
                    arduino-nano \
+                   arduino-nano-33-ble \
                    arduino-uno \
                    atmega1284p \
                    atmega256rfr2-xpro \
                    atmega328p \
                    avr-rss2 \
+                   calliope-mini \
                    cc1312-launchpad \
                    cc1352-launchpad \
                    cc1352p-launchpad \
@@ -18,6 +23,7 @@ BOARD_WHITELIST += arduino-duemilanove \
                    chronos \
                    derfmega128 \
                    derfmega256 \
+                   dwm1001 \
                    esp32-heltec-lora32-v2 \
                    esp32-mh-et-live-minikit \
                    esp32-olimex-evb \
@@ -28,6 +34,7 @@ BOARD_WHITELIST += arduino-duemilanove \
                    esp8266-esp-12x \
                    esp8266-olimex-mod \
                    esp8266-sparkfun-thing \
+                   feather-nrf52840 \
                    firefly \
                    frdm-k22f \
                    frdm-k64f \
@@ -35,19 +42,34 @@ BOARD_WHITELIST += arduino-duemilanove \
                    hifive1b \
                    ikea-tradfri \
                    mega-xplained \
+                   microbit \
                    microduino-corerf \
                    msb-430 \
                    msb-430h \
                    mulle \
+                   nrf51dk \
+                   nrf51dongle \
+                   nrf52832-mdk \
+                   nrf52840-mdk \
+                   nrf52840dk \
+                   nrf52840dongle \
+                   nrf52dk \
+                   nrf6310 \
                    openlabs-kw41z-mini \
                    openlabs-kw41z-mini-256kib \
                    openmote-b \
                    openmote-cc2538 \
+                   particle-argon \
+                   particle-boron \
+                   particle-xenon \
                    pba-d-01-kw2x \
                    phynode-kw41z \
+                   pinetime \
+                   reel \
                    remote-pa \
                    remote-reva \
                    remote-revb \
+                   ruuvitag \
                    samr21-xpro \
                    slstk3401a \
                    slstk3402a \
@@ -59,8 +81,12 @@ BOARD_WHITELIST += arduino-duemilanove \
                    stk3700 \
                    teensy31 \
                    telosb \
+                   thingy52 \
                    usb-kw41z \
                    waspmote-pro \
+                   wsn430-v1_3b \
+                   wsn430-v1_4 \
+                   yunjia-nrf51822 \
                    z1
                    #
 
