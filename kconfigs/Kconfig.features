@@ -42,11 +42,6 @@ config HAS_BOOTLOADER_ARDUINO
     help
         Indicates that the Arduino bootloader is used.
 
-config HAS_BOOTLOADER_NRFUTIL
-    bool
-    help
-        Indicates that the NRF Util bootloader is used.
-
 config HAS_CPP
     bool
     help
