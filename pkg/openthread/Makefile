@@ -48,7 +48,7 @@ $(BINDIR)/openthread-cli.a: $(BINDIR)/openthread-$(TD).a
 	@cp $(OT_LIB_DIR)/libopenthread-cli-$(TD).a $@
 
 $(OT_LIB_DIR)/libopenthread-$(TD).a: $(PKG_BUILD_DIR)/Makefile
-	$(MAKE) -C $(PKG_BUILD_DIR) -j4 --no-print-directory install DESTDIR=$(PKG_BUILD_DIR)/output PREFIX=/
+	$(MAKE) -C $(PKG_BUILD_DIR) --no-print-directory install DESTDIR=$(PKG_BUILD_DIR)/output PREFIX=/
 	$(Q)printf "OpenThread built for %s device\n" $(TD)
 
 $(PKG_BUILD_DIR)/Makefile: $(PKG_BUILD_DIR)/configure
