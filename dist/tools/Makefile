@@ -5,4 +5,4 @@ HOST_TOOLS=ethos uhcpd sliptty
 all: $(HOST_TOOLS)
 
 $(HOST_TOOLS):
-	make -C $@
+	$(MAKE) -C $@

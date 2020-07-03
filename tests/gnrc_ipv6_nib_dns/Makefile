@@ -44,6 +44,6 @@ TEST_ON_CI_BLACKLIST += all
 .PHONY: ethos
 
 ethos:
-	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)/ethos
+	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTTOOLS)/ethos
 
 include $(RIOTBASE)/Makefile.include

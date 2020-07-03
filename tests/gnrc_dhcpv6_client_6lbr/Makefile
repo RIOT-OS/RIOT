@@ -47,5 +47,5 @@ ifeq (,$(filter native,$(BOARD)))
 .PHONY: ethos
 
 ethos:
-	$(Q)env -u CC -u CFLAGS make -C $(RIOTBASE)/dist/tools/ethos
+	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTBASE)/dist/tools/ethos
 endif

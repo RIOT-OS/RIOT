@@ -105,6 +105,6 @@ include $(RIOTBASE)/Makefile.include
 .PHONY: host-tools
 
 host-tools:
-	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)
+	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTTOOLS)
 
 include $(RIOTMAKE)/default-radio-settings.inc.mk

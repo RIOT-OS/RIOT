@@ -22,7 +22,7 @@ $(GENSRC): $(PROTOBUF_FILES)
 	$(Q)D=$(BINDIR)/$(MODULE) && \
 	  mkdir -p "$$D" && \
 		cd $(CURDIR) && \
-		make -C $(PKGDIRBASE)/nanopb/generator/proto && \
+		$(MAKE) -C $(PKGDIRBASE)/nanopb/generator/proto && \
 		for protofile in $(PROTOBUF_FILES); do \
 			protoc --plugin=protoc-gen-nanopb=$(PROTOC_GEN_NANOPB) \
 				--nanopb_out="$$D" $(PROTO_INCLUDES) \

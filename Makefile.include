@@ -729,7 +729,7 @@ list-ttys:
 	$(Q)$(RIOTTOOLS)/usb-serial/list-ttys.sh
 
 doc:
-	make -BC $(RIOTBASE) doc
+	$(MAKE) -BC $(RIOTBASE) doc
 
 debug: $(DEBUGDEPS)
 	$(call check_cmd,$(DEBUGGER),Debug program)
