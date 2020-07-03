@@ -35,6 +35,9 @@ endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   SRC += sc_gnrc_netif.c
 endif
+ifneq (,$(filter netstats_neighbor,$(USEMODULE)))
+  SRC += sc_netstats_nb.c
+endif
 ifneq (,$(filter fib,$(USEMODULE)))
   SRC += sc_fib.c
 endif

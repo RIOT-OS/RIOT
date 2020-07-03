@@ -92,6 +92,10 @@ extern int _random_get(int argc, char **argv);
 extern int _gnrc_ipv6_nib(int argc, char **argv);
 #endif
 
+#ifdef MODULE_NETSTATS_NEIGHBOR
+extern int _netstats_nb(int argc, char **argv);
+#endif
+
 #ifdef MODULE_GNRC_NETIF
 extern int _gnrc_netif_config(int argc, char **argv);
 #ifdef MODULE_GNRC_TXTSND
@@ -244,6 +248,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GNRC_IPV6_NIB
     {"nib", "Configure neighbor information base", _gnrc_ipv6_nib},
+#endif
+#ifdef MODULE_NETSTATS_NEIGHBOR
+    {"neigh", "Show neighbor statistics", _netstats_nb},
 #endif
 #ifdef MODULE_GNRC_NETIF
     {"ifconfig", "Configure network interfaces", _gnrc_netif_config},
