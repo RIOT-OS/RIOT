@@ -5,15 +5,17 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 # DEBUG_ADAPTER_ID="ATML..."
 
 # The SERIAL setting is only available for backwards compatibility with older
-# settings.
-ifneq (,$(SERIAL))
-  EDBG_ARGS += --serial $(SERIAL)
-  SERIAL_TTY = $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh $(SERIAL)))
-  ifeq (,$(SERIAL_TTY))
-    $(error Did not find a device with serial $(SERIAL))
+# settings. It's only checked when a target is given to the make command.
+ifneq (,$(filter debug% flash% %term test,$(MAKECMDGOALS)))
+  ifneq (,$(SERIAL))
+    EDBG_ARGS += --serial $(SERIAL)
+    SERIAL_TTY = $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh $(SERIAL)))
+    ifeq (,$(SERIAL_TTY))
+      $(error Did not find a device with serial $(SERIAL))
+    endif
+    PORT_LINUX := $(SERIAL_TTY)
+    DEBUG_ADAPTER_ID ?= $(SERIAL)
   endif
-  PORT_LINUX := $(SERIAL_TTY)
-  DEBUG_ADAPTER_ID ?= $(SERIAL)
 endif
 
 # setup serial terminal
