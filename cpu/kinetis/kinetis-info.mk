@@ -32,17 +32,17 @@ export KINETIS_SPEED := $(word 11, $(KINETIS_INFO))
 ifeq ($(KINETIS_CORE), Z)
   # Cortex-M0+
   CPU_CORE = cortex-m0plus
-  CPU_FAMILY = klx
 else ifeq ($(KINETIS_CORE), D)
   # Cortex-M4
   CPU_CORE = cortex-m4
-  CPU_FAMILY = kx
 else ifeq ($(KINETIS_CORE), F)
   # Cortex-M4F or Cortex-M7
   # TODO: Add floating point support
   CPU_CORE = cortex-m4
-  CPU_FAMILY = kx
 endif
+
+# For the rest of the build system we expose the series as family
+CPU_FAM = $(call lowercase,$(KINETIS_SERIES))
 
 # RAM sizes are a bit arbitrary, but are usually dependent on ROM size and core speed.
 # KINETIS_RAMSIZE is used inside a $(( )) shell arithmetic block, so it is OK to

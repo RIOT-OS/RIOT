@@ -11,7 +11,13 @@ DEBUG_ADAPTER ?= dap
 # For KW41Z, an OpenOCD version built from source is required. The support for
 # kw41z was introduced in
 # https://github.com/ntfreak/openocd/2c8602ed9f084d6680cec7d0ca1d5dc71c865a5f
-OPENOCD_CONFIG ?= $(RIOTBOARD)/common/frdm/dist/openocd-$(CPU_FAMILY).cfg
+ifeq ($(CPU_CORE), cortex-m0plus)
+  OPENOCD_KINETIS_FAMILY = klx
+else
+  OPENOCD_KINETIS_FAMILY = kx
+endif
+
+OPENOCD_CONFIG ?= $(RIOTBOARD)/common/frdm/dist/openocd-$(OPENOCD_KINETIS_FAMILY).cfg
 
 # Check the flash configuration field before flashing
 PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh

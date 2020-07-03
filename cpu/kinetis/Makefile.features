@@ -13,22 +13,19 @@ endif
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_gpio_irq
 
-# This applies to all Kinetis EA series, for now this is only s9keaz128aclh48
-ifeq (s9keaz128aclh48,$(CPU_MODEL))
-  FEATURES_PROVIDED += periph_ics
-else
-  FEATURES_PROVIDED += periph_mcg
-endif
+# Parse parameters from CPU_MODEL using the kinetis-info.mk script in the same
+# directory as this Makefile.
+include $(LAST_MAKEFILEDIR)/kinetis-info.mk
 
-# Since KINETIS_SERIES isn't available in Makefile.features filter according to
-# CPU_MODEL
-ifneq (,$(filter mkw% mk%,$(CPU_MODEL)))
+ifneq (,$(filter k w,$(CPU_FAM)))
   FEATURES_PROVIDED += periph_flashpage
   FEATURES_PROVIDED += periph_flashpage_raw
 endif
 
-# Parse parameters from CPU_MODEL using the kinetis-info.mk script in the same
-# directory as this Makefile.
-include $(LAST_MAKEFILEDIR)/kinetis-info.mk
+ifeq (ea,$(CPU_FAM))
+  FEATURES_PROVIDED += periph_ics
+else
+  FEATURES_PROVIDED += periph_mcg
+endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.features
