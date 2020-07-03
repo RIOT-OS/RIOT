@@ -95,7 +95,7 @@ endif # BUILD_IN_DOCKER
 	$(Q)mkdir -p '$(SCANBUILD_OUTPUTDIR)'
 	$(Q)env -i $(ENVVARS) \
 	    scan-build -o '$(SCANBUILD_OUTPUTDIR)' $(SCANBUILD_ARGS) \
-	      make -C $(CURDIR) all $(strip $(CMDVARS)) FORCE_ASSERTS=1
+	      $(MAKE) -C $(CURDIR) all $(strip $(CMDVARS)) FORCE_ASSERTS=1
 
 ..scan-build-view: scan-build-analyze
 	@echo "Showing most recent report in your web browser..."

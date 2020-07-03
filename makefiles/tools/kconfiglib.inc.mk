@@ -6,7 +6,7 @@ MERGECONFIG ?= $(RIOTTOOLS)/kconfiglib/merge_config.py
 
 $(BASE_MENUCONFIG):
 	@echo "[INFO] Kconfiglib not found - getting it"
-	@make -C $(RIOTTOOLS)/kconfiglib
+	@$(MAKE) -C $(RIOTTOOLS)/kconfiglib
 	@echo "[INFO] Kconfiglib downloaded"
 
 $(GENCONFIG): $(BASE_MENUCONFIG)

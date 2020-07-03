@@ -291,7 +291,7 @@ docker_run_make = \
 	$(DOCKER_ENVIRONMENT_CMDLINE) \
 	$3 \
 	-w '$(DOCKER_APPDIR)' '$2' \
-	make $(DOCKER_OVERRIDE_CMDLINE) $4 $1
+	$(MAKE) $(DOCKER_OVERRIDE_CMDLINE) $4 $1
 
 # This will execute `make $(DOCKER_MAKECMDGOALS)` inside a Docker container.
 # We do not push the regular $(MAKECMDGOALS) to the container's make command in

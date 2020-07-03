@@ -14,7 +14,7 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 all:
 	@echo "[INFO] compiling pic32prog from source now"
-	@env -i PATH=$(PATH) TERM=$(TERM) make -C $(PKG_BUILD_DIR)
+	@env -i PATH=$(PATH) TERM=$(TERM) $(MAKE) -C $(PKG_BUILD_DIR)
 	@mv $(PKG_BUILD_DIR)/pic32prog pic32prog
 
 distclean::

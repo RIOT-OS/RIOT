@@ -6,7 +6,7 @@ BOARDS_COMMON_MSBA2_DIR := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
 MSBA2_TOOLS = $(BOARDS_COMMON_MSBA2_DIR)/tools
 LPC2K_PGM = $(MSBA2_TOOLS)/bin/lpc2k_pgm
 $(LPC2K_PGM): FORCE
-	env -i PATH=$(PATH) make -C $(MSBA2_TOOLS)
+	env -i PATH=$(PATH) $(MAKE) -C $(MSBA2_TOOLS)
 FLASHDEPS += $(if $(findstring $(LPC2K_PGM),$(FLASHER)),$(LPC2K_PGM))
 
 FLASHER ?= $(LPC2K_PGM)

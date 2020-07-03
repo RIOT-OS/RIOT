@@ -20,7 +20,7 @@ info-applications:
 # All applications / board output of `info-boards-supported`.
 info-applications-supported-boards:
 	@for dir in $(APPLICATION_DIRS); do \
-	  make --no-print-directory -C $${dir} info-boards-supported 2>/dev/null | xargs -n 1 echo $${dir}; \
+	  $(MAKE) --no-print-directory -C $${dir} info-boards-supported 2>/dev/null | xargs -n 1 echo $${dir}; \
 	done
 # BOARDS values from 'boards.inc.mk' to only evaluate it once
 info-applications-supported-boards: export BOARDS ?=

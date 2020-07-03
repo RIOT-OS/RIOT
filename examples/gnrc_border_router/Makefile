@@ -122,7 +122,7 @@ endif
 .PHONY: host-tools
 
 host-tools:
-	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)
+	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTTOOLS)
 
 # define native specific targets to only run UHCP daemon when required
 ifneq (,$(filter native,$(BOARD)))
@@ -136,7 +136,7 @@ endif
 
 ifeq (slip,$(UPLINK))
 sliptty:
-	$(Q)env -u CC -u CFLAGS make -C $(RIOTTOOLS)/sliptty
+	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTTOOLS)/sliptty
 endif
 
 # Set a custom channel if needed
