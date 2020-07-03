@@ -107,6 +107,9 @@ endif
 ifneq (,$(filter netopt,$(USEMODULE)))
   DIRS += net/crosslayer/netopt
 endif
+ifneq (,$(filter netstats_neighbor,$(USEMODULE)))
+  DIRS += net/netstats
+endif
 ifneq (,$(filter sema,$(USEMODULE)))
   DIRS += sema
 endif

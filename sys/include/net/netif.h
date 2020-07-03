@@ -38,6 +38,11 @@
 #include "list.h"
 #include "net/netopt.h"
 
+#ifdef MODULE_NETSTATS_NEIGHBOR
+#include "cib.h"
+#include "net/netstats.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -61,7 +66,10 @@ extern "C" {
  * @note All network interfaces should inherit from this structure.
  */
 typedef struct {
-    list_node_t node;  /**< Pointer to the next interface */
+    list_node_t node;               /**< Pointer to the next interface */
+#ifdef MODULE_NETSTATS_NEIGHBOR
+    netstats_nb_table_t neighbors;  /**< Structure containing all L2 neighbors */
+#endif
 } netif_t;
 
 /**
