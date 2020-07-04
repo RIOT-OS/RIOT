@@ -40,11 +40,6 @@ extern "C" {
 #define PORT_UNSPEC (0)
 
 /**
- * @brief Message queue size for messaging between thread contexts
- */
-#define TCP_MSG_QUEUE_SIZE (8U)
-
-/**
  * @brief TCB status flags
  * @{
  */
@@ -57,9 +52,8 @@ extern "C" {
  * @brief Defines for "eventloop" thread settings.
  * @{
  */
-#define TCP_EVENTLOOP_MSG_QUEUE_SIZE (8U)
-#define TCP_EVENTLOOP_PRIO           (THREAD_PRIORITY_MAIN - 2U)
-#define TCP_EVENTLOOP_STACK_SIZE     (THREAD_STACKSIZE_DEFAULT)
+#define TCP_EVENTLOOP_PRIO       (THREAD_PRIORITY_MAIN - 2U)
+#define TCP_EVENTLOOP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT)
 /** @} */
 
 /**
