@@ -1,1 +1,1 @@
-git+ssh://git@github.com/RIOT-OS/riotctrl
+git+https://github.com/RIOT-OS/riotctrl
