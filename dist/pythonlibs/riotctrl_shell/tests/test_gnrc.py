@@ -4,13 +4,9 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import logging
 import riotctrl_shell.gnrc
 
 from .common import init_ctrl
-
-
-logger = logging.getLogger(__name__)
 
 
 def test_ping6():
