@@ -70,6 +70,18 @@ def _branch_name_strip(branch_name, prefix=RELEASE_PREFIX,
 
 
 def _get_latest_release(branches):
+    """Get latest release from a list of branches.
+
+    >>> _get_latest_release([{'name': '2018.10-branch'}, \
+        {'name': '2020.10-branch'}])
+    ('2020.10', '2020.10-branch')
+    >>> _get_latest_release([{'name': '2020.01-branch'}, \
+        {'name': '2020.04-branch'}])
+    ('2020.04', '2020.04-branch')
+    >>> _get_latest_release([{'name': 'non-release-branch'}, \
+        {'name': '2020.04-branch'}])
+    ('2020.04', '2020.04-branch')
+    """
     version_latest = 0
     release_fullname = ''
     release_short = ''
