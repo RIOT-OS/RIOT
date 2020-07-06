@@ -1,0 +1,37 @@
+name: tools-buildtest
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  tools-build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Build flatc standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/flatc
+    - name: Build mosquitto_rsmb standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/mosquitto_rsmb
+    - name: Build stm32 spi_divtable
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C cpu/stm32/dist/spi_divtable
+    - name: Build stm32 clk_conf
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C cpu/stm32/dist/clk_conf
+    - name: Build kinetis calc_spi_scalers
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C cpu/kinetis/dist/calc_spi_scalers
