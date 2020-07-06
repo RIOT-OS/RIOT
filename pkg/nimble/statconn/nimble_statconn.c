@@ -176,19 +176,20 @@ void nimble_statconn_init(void)
     /* set the advertising parameters used */
     _adv_params.conn_mode = BLE_GAP_CONN_MODE_UND;
     _adv_params.disc_mode = BLE_GAP_DISC_MODE_GEN;
-    _adv_params.itvl_min = ((NIMBLE_STATCONN_ADV_ITVL_MS * 1000) / BLE_HCI_ADV_ITVL);
-    _adv_params.itvl_max = ((NIMBLE_STATCONN_ADV_ITVL_MS * 1000) / BLE_HCI_ADV_ITVL);
+    _adv_params.itvl_min = BLE_GAP_ADV_ITVL_MS(NIMBLE_STATCONN_ADV_ITVL_MS);
+    _adv_params.itvl_max = _adv_params.itvl_min;
     _adv_params.channel_map = 0;
     _adv_params.filter_policy = 0;
     _adv_params.high_duty_cycle = 0;
 
     /* set connection parameters */
-    _conn_params.scan_itvl = ((NIMBLE_STATCONN_CONN_WIN_MS * 1000) / BLE_HCI_SCAN_ITVL);
-    _conn_params.scan_window = ((NIMBLE_STATCONN_CONN_WIN_MS * 1000) / BLE_HCI_SCAN_ITVL);
-    _conn_params.itvl_min = ((NIMBLE_STATCONN_CONN_ITVL_MS * 1000) / BLE_HCI_CONN_ITVL);
-    _conn_params.itvl_max = ((NIMBLE_STATCONN_CONN_ITVL_MS * 1000) / BLE_HCI_CONN_ITVL);
+    _conn_params.scan_itvl = BLE_GAP_SCAN_ITVL_MS(NIMBLE_STATCONN_CONN_WIN_MS);
+    _conn_params.scan_window = _conn_params.scan_itvl;
+    _conn_params.itvl_min = BLE_GAP_CONN_ITVL_MS(NIMBLE_STATCONN_CONN_ITVL_MS);
+    _conn_params.itvl_max = _conn_params.itvl_min;
     _conn_params.latency = NIMBLE_STATCONN_CONN_LATENCY;
-    _conn_params.supervision_timeout = (NIMBLE_STATCONN_CONN_SUPERTO_MS / 10);
+    _conn_params.supervision_timeout = BLE_GAP_SUPERVISION_TIMEOUT_MS(
+                                               NIMBLE_STATCONN_CONN_SUPERTO_MS);
     _conn_params.min_ce_len = 0;
     _conn_params.max_ce_len = 0;
     _conn_timeout = NIMBLE_STATCONN_CONN_TIMEOUT_MS;
