@@ -62,6 +62,12 @@ extern "C" {
 #define BTN0_MODE           GPIO_IN_PU
 /** @} */
 
+/**
+ * @name    Xtimer configuration
+ * @{
+ */
+#define XTIMER_BACKOFF      (40)
+/** @} */
 
 /**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
