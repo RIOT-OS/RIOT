@@ -480,9 +480,6 @@ ifneq (,$(filter picolibc,$(USEMODULE)))
   ifeq (,$(filter picolibc_syscalls_%,$(USEMODULE)))
     USEMODULE += picolibc_syscalls_default
   endif
-  ifeq (,$(filter stdio_rtt,$(USEMODULE)))
-    USEMODULE += stdio_uart
-  endif
 endif
 
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
