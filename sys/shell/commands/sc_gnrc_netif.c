@@ -540,6 +540,7 @@ static void _netif_list(netif_t *iface)
     _print_iface_name(iface);
     printf(" ");
 
+    /* XXX divide options and flags by at least two spaces! */
     res = netif_get_opt(iface, NETOPT_ADDRESS, 0, hwaddr, sizeof(hwaddr));
     if (res >= 0) {
         char hwaddr_str[res * 3];
@@ -678,6 +679,7 @@ static void _netif_list(netif_t *iface)
         line_thresh++;
     }
 #endif
+    /* XXX divide options and flags by at least two spaces! */
     line_thresh = _newline(0U, line_thresh);
     line_thresh = _netif_list_flag(iface, NETOPT_PROMISCUOUSMODE, "PROMISC  ",
                                    line_thresh);
@@ -694,19 +696,20 @@ static void _netif_list(netif_t *iface)
     line_thresh = _netif_list_flag(iface, NETOPT_CSMA, "CSMA  ",
                                    line_thresh);
     line_thresh += _LINE_THRESHOLD + 1; /* enforce linebreak after this option */
-    line_thresh = _netif_list_flag(iface, NETOPT_AUTOCCA, "AUTOCCA ",
+    line_thresh = _netif_list_flag(iface, NETOPT_AUTOCCA, "AUTOCCA  ",
                                    line_thresh);
-    line_thresh = _netif_list_flag(iface, NETOPT_IQ_INVERT, "IQ_INVERT ",
+    line_thresh = _netif_list_flag(iface, NETOPT_IQ_INVERT, "IQ_INVERT  ",
                                    line_thresh);
-    line_thresh = _netif_list_flag(iface, NETOPT_SINGLE_RECEIVE, "RX_SINGLE ",
+    line_thresh = _netif_list_flag(iface, NETOPT_SINGLE_RECEIVE, "RX_SINGLE  ",
                                    line_thresh);
-    line_thresh = _netif_list_flag(iface, NETOPT_CHANNEL_HOP, "CHAN_HOP ",
+    line_thresh = _netif_list_flag(iface, NETOPT_CHANNEL_HOP, "CHAN_HOP  ",
                                    line_thresh);
-    line_thresh = _netif_list_flag(iface, NETOPT_OTAA, "OTAA ",
+    line_thresh = _netif_list_flag(iface, NETOPT_OTAA, "OTAA  ",
                                    line_thresh);
+    /* XXX divide options and flags by at least two spaces! */
     res = netif_get_opt(iface, NETOPT_MAX_PDU_SIZE, 0, &u16, sizeof(u16));
     if (res > 0) {
-        printf("L2-PDU:%" PRIu16 " ", u16);
+        printf("L2-PDU:%" PRIu16 "  ", u16);
         line_thresh++;
     }
 #ifdef MODULE_GNRC_IPV6
@@ -737,6 +740,7 @@ static void _netif_list(netif_t *iface)
 #endif
 #endif
     res = netif_get_opt(iface, NETOPT_SRC_LEN, 0, &u16, sizeof(u16));
+    /* XXX divide options and flags by at least two spaces before this line! */
     if (res >= 0) {
         printf("Source address length: %" PRIu16, u16);
         line_thresh++;
