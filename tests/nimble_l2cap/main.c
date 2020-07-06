@@ -329,9 +329,11 @@ int main(void)
 
     /* wait until we are connected to the test server */
     thread_flags_wait_all(FLAG_UP);
+    struct ble_l2cap_chan_info info;
+    ble_l2cap_get_chan_info(_coc, &info);
     puts("# Connection established");
     printf("# MTUs: our %i, remote %i\n",
-           ble_l2cap_get_our_mtu(_coc), ble_l2cap_get_peer_mtu(_coc));
+           (int)info.our_l2cap_mtu, (int)info.peer_l2cap_mtu);
 
     /* start shell */
     puts("# Shell is now available");
