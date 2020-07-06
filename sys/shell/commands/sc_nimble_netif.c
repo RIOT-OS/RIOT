@@ -343,8 +343,8 @@ static void _cmd_close(int handle)
 static void _cmd_update(int handle, int itvl, int timeout)
 {
     struct ble_gap_upd_params params;
-    params.itvl_min = (uint16_t)((itvl * 1000) / BLE_HCI_CONN_ITVL);
-    params.itvl_max = (uint16_t)((itvl * 1000) / BLE_HCI_CONN_ITVL);
+    params.itvl_min = (uint16_t)BLE_GAP_CONN_ITVL_MS(itvl);
+    params.itvl_max = (uint16_t)BLE_GAP_CONN_ITVL_MS(itvl);
     params.latency = 0;
     params.supervision_timeout = (uint16_t)(timeout / 10);
     params.min_ce_len = BLE_GAP_INITIAL_CONN_MIN_CE_LEN;
