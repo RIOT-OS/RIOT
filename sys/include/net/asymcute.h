@@ -124,7 +124,7 @@ extern "C" {
 #define CONFIG_ASYMCUTE_KEEPALIVE          (360)       /* -> 6 min*/
 #endif
 
-#ifndef ASYMCUTE_KEEPALIVE_PING
+#ifndef CONFIG_ASYMCUTE_KEEPALIVE_PING
 /**
  * @brief   Interval to use for sending periodic ping messages
  *
@@ -133,7 +133,7 @@ extern "C" {
  *
  * @note    Must be less than CONFIG_ASYMCUTE_KEEPALIVE
  */
-#define ASYMCUTE_KEEPALIVE_PING     ((CONFIG_ASYMCUTE_KEEPALIVE / 4) * 3)
+#define CONFIG_ASYMCUTE_KEEPALIVE_PING     ((CONFIG_ASYMCUTE_KEEPALIVE / 4) * 3)
 #endif
 
 #ifndef CONFIG_ASYMCUTE_T_RETRY
