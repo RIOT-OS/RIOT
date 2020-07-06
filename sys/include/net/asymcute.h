@@ -59,15 +59,79 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default buffer size for the ASYMCUTE (as exponent of 2^n).
+ * @defgroup net_asymcute_conf Asymcute (MQTT-SN Client) compile configurations
+ * @ingroup config
+ * @{
+ */
+/**
+ * @brief   Default buffer size for Asymcute client (as exponent of 2^n)
  *
- *          As the buffer size ALWAYS needs to be power of two, this option
- *          represents the exponent of 2^n, which will be used as the size of
- *          the buffer.
+ * As the buffer size ALWAYS needs to be power of two, this option represents
+ * the exponent of 2^n, which will be used as the size of the buffer.
  */
 #ifndef CONFIG_ASYMCUTE_BUFSIZE_EXP
 #define CONFIG_ASYMCUTE_BUFSIZE_EXP     (7U)
 #endif
+
+/**
+ * @brief   Maximum topic length
+ *
+ * @note    Must be less than (256 - 8) AND less than ( @ref ASYMCUTE_BUFSIZE - 8).
+ */
+#ifndef CONFIG_ASYMCUTE_TOPIC_MAXLEN
+#define CONFIG_ASYMCUTE_TOPIC_MAXLEN       (32U)
+#endif
+
+/**
+ * @brief   Keep alive interval [in s] communicated to the gateway
+ *
+ * keep alive interval in seconds which is communicated to the gateway in the
+ * CONNECT message. For more information, see MQTT-SN Spec v1.2, section 5.4.4.
+ * For default values,see section 7.2 -> TWAIT: > 5 min.
+ */
+#ifndef CONFIG_ASYMCUTE_KEEPALIVE
+#define CONFIG_ASYMCUTE_KEEPALIVE          (360)
+#endif
+
+/**
+ * @brief   Interval to use for sending periodic ping messages
+ *
+ * The default behavior of this implementation is to send ping messages as soon
+ * as three quarters of the keep alive interval have passed.
+ *
+ * @note    Must be less than @ref CONFIG_ASYMCUTE_KEEPALIVE
+ */
+#ifndef CONFIG_ASYMCUTE_KEEPALIVE_PING
+#define CONFIG_ASYMCUTE_KEEPALIVE_PING     ((CONFIG_ASYMCUTE_KEEPALIVE / 4) * 3)
+#endif
+
+/**
+ * @brief   Resend interval [in seconds]
+ *
+ * Interval used for timing the retry messages which are sent when the expected
+ * reply from GW is not received. The retry timer is started by the client when
+ * the message is sent and stopped when the expected reply from GW is received.
+ * If the timer times out and the expected GW’s reply is not received, the
+ * client retransmits the message. For more information, see MQTT-SN Spec v1.2,
+ * section 6.13. For default values, see section 7.2 -> Tretry: 10 to 15 sec.
+ */
+#ifndef CONFIG_ASYMCUTE_T_RETRY
+#define CONFIG_ASYMCUTE_T_RETRY            (10U)
+#endif
+
+/**
+ * @brief   Number of retransmissions until requests time out
+ *
+ * Maximum number of retransmissions in the event that the retry timer times
+ * out. After 'CONFIG_ASYMCUTE_N_RETRY' number of retransmissions, the client
+ * aborts the procedure and assumes that its MQTT-SN connection to the gateway
+ * is disconnected. For more information, see MQTT-SN Spec v1.2, section 6.13.
+ * For default values, see section 7.2 -> Nretry: 3-5.
+ */
+#ifndef CONFIG_ASYMCUTE_N_RETRY
+#define CONFIG_ASYMCUTE_N_RETRY            (3U)
+#endif
+/** @} */
 
 #ifndef ASYMCUTE_BUFSIZE
 /**
@@ -104,54 +168,6 @@ extern "C" {
  * @brief   Default stack size for an Asymcute listener thread
  */
 #define ASYMCUTE_LISTENER_STACKSIZE (THREAD_STACKSIZE_DEFAULT)
-#endif
-
-#ifndef CONFIG_ASYMCUTE_TOPIC_MAXLEN
-/**
- * @brief   Maximum topic length
- *
- * @note    Must be less than (256 - 8) AND less than (ASYMCUTE_BUFSIZE - 8).
- */
-#define CONFIG_ASYMCUTE_TOPIC_MAXLEN       (32U)
-#endif
-
-#ifndef CONFIG_ASYMCUTE_KEEPALIVE
-/**
- * @brief   Keep alive interval [in s] communicated to the gateway
- *
- * For the default value, see spec v1.2, section 7.2 -> T_WAIT: > 5 min
- */
-#define CONFIG_ASYMCUTE_KEEPALIVE          (360)       /* -> 6 min*/
-#endif
-
-#ifndef CONFIG_ASYMCUTE_KEEPALIVE_PING
-/**
- * @brief   Interval to use for sending periodic ping messages
- *
- * The default behavior of this implementation is to send ping messages as soon
- * as three quarters of the keep alive interval have passed.
- *
- * @note    Must be less than CONFIG_ASYMCUTE_KEEPALIVE
- */
-#define CONFIG_ASYMCUTE_KEEPALIVE_PING     ((CONFIG_ASYMCUTE_KEEPALIVE / 4) * 3)
-#endif
-
-#ifndef CONFIG_ASYMCUTE_T_RETRY
-/**
- * @brief   Resend interval [in seconds]
- *
- * For the default value, see spec v1.2, section 7.2 -> T_RETRY: 10 to 15 sec
- */
-#define CONFIG_ASYMCUTE_T_RETRY            (10U)       /* -> 10 sec */
-#endif
-
-#ifndef CONFIG_ASYMCUTE_N_RETRY
-/**
- * @brief   Number of retransmissions until requests time out
- *
- * For the default value, see spec v1.2, section 7.2 -> N_RETRY: 3-5
- */
-#define CONFIG_ASYMCUTE_N_RETRY            (3U)
 #endif
 
 /**
