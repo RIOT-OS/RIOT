@@ -110,8 +110,10 @@ void cpu_init(void)
     /* Initialize IRQs */
     irq_init();
 
+#ifndef _PICOLIBC__
     /* Initialize newlib-nano library stubs */
     nanostubs_init();
+#endif /* PICOLIBC */
 
     /* Initialize static peripheral */
     periph_init();
