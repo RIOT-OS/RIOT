@@ -35,6 +35,10 @@
 #include "services/ipss/ble_svc_ipss.h"
 #endif
 
+#ifdef MODULE_NIMBLE_STATCONN
+#include "nimble_statconn.h"
+#endif
+
 #if defined(MODULE_NIMBLE_AUTOCONN) && !defined(MODULE_NIMBLE_AUTOCONN_NOAUTOINIT)
 #include "nimble_autoconn.h"
 #include "nimble_autoconn_params.h"
@@ -125,6 +129,10 @@ void nimble_riot_init(void)
 #endif
 #ifdef MODULE_NIMBLE_SVC_IPSS
     ble_svc_ipss_init();
+#endif
+
+#ifdef MODULE_NIMBLE_STATCONN
+    nimble_statconn_init();
 #endif
 
 #if defined(MODULE_NIMBLE_AUTOCONN) && !defined(MODULE_NIMBLE_AUTOCONN_NOAUTOINIT)

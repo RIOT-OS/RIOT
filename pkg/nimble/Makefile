@@ -88,3 +88,6 @@ nimble_scanlist:
 
 nimble_scanner:
 	"$(MAKE)" -C $(TDIR)/scanner
+
+nimble_statconn:
+	"$(MAKE)" -C $(TDIR)/statconn
