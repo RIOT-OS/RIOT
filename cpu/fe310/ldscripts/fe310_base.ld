@@ -27,6 +27,7 @@ PHDRS
   flash PT_LOAD;
   ram_init PT_LOAD;
   ram PT_NULL;
+  tls PT_TLS;
 }
 
 SECTIONS
