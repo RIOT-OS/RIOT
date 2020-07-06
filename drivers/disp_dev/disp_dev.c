@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Inria
+ *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Helper functions for generic API of display device
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * @}
  */
@@ -24,13 +26,12 @@
 
 #include "disp_dev.h"
 
-void disp_dev_map(const disp_dev_t *dev,
-                  uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,
-                  const uint16_t *color)
+void disp_dev_map(disp_dev_t *dev, disp_dev_coordinates_t *coordinates,
+                 const uint16_t *color)
 {
     assert(dev);
 
-    dev->driver->map(dev, x1, x2, y1, y2, color);
+    dev->driver->map(dev, coordinates, color);
 }
 
 uint16_t disp_dev_height(const disp_dev_t *dev)

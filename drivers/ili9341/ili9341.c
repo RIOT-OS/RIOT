@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Koen Zandberg
+ *               2020 Philipp-Alexander Blum
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Device driver implementation for the ili9341 display controller
  *
  * @author      Koen Zandberg <koen@bergzand.net>
+ * @author      Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * @}
  */
@@ -69,19 +71,25 @@ static void _write_cmd(const ili9341_t *dev, uint8_t cmd, const uint8_t *data,
     }
 }
 
-static void _ili9341_set_area(const ili9341_t *dev, uint16_t x1, uint16_t x2,
-                              uint16_t y1, uint16_t y2)
+static void _ili9341_set_area(const ili9341_t *dev,
+                              ili9341_coordinates_t * coordinates)
 {
     be_uint16_t params[2];
 
-    params[0] = byteorder_htons(x1);
-    params[1] = byteorder_htons(x2);
+    params[0] = byteorder_htons(coordinates->x1);
+    params[1] = byteorder_htons(coordinates->x2);
     _write_cmd(dev, ILI9341_CMD_CASET, (uint8_t *)params,
                sizeof(params));
-    params[0] = byteorder_htons(y1);
-    params[1] = byteorder_htons(y2);
+    params[0] = byteorder_htons(coordinates->y1);
+    params[1] = byteorder_htons(coordinates->y2);
     _write_cmd(dev, ILI9341_CMD_PASET, (uint8_t *)params,
                sizeof(params));
+}
+
+static uint32_t _ili9341_get_pixel_num(ili9341_coordinates_t * coordinates){
+            return
+            (coordinates->x2 - coordinates->x1 + 1) *
+            (coordinates->y2 - coordinates->y1 + 1);
 }
 
 int ili9341_init(ili9341_t *dev, const ili9341_params_t *params)
@@ -230,22 +238,20 @@ void ili9341_read_cmd(const ili9341_t *dev, uint8_t cmd, uint8_t *data, size_t l
 }
 
 
-void ili9341_fill(const ili9341_t *dev, uint16_t x1, uint16_t x2, uint16_t y1,
-                  uint16_t y2, uint16_t color)
+void ili9341_fill(const ili9341_t *dev, ili9341_coordinates_t * coordinates,
+                  uint16_t color)
 {
-    /* Send fill area to the display */
-
-    /* Calculate number of pixels */
-    int32_t num_pix = (x2 - x1 + 1) * (y2 - y1 + 1);
+    int32_t num_pix = _ili9341_get_pixel_num(coordinates);
 
     DEBUG("[ili9341]: Write x1: %" PRIu16 ", x2: %" PRIu16 ", "
           "y1: %" PRIu16 ", y2: %" PRIu16 ". Num pixels: %lu\n",
-          x1, x2, y1, y2, (unsigned long)num_pix);
+            coordinates->x1, coordinates->x2, coordinates->y1,
+            coordinates->y2, (unsigned long)num_pix);
 
     /* Send fill area to the display */
     _ili9341_spi_acquire(dev);
 
-    _ili9341_set_area(dev, x1, x2, y1, y2);
+    _ili9341_set_area(dev, coordinates);
     /* Memory access command */
     _ili9341_cmd_start(dev, ILI9341_CMD_RAMWR, true);
 #if ILI9341_LE_MODE
@@ -260,19 +266,20 @@ void ili9341_fill(const ili9341_t *dev, uint16_t x1, uint16_t x2, uint16_t y1,
     spi_release(dev->params->spi);
 }
 
-void ili9341_pixmap(const ili9341_t *dev, uint16_t x1, uint16_t x2,
-                    uint16_t y1, uint16_t y2, const uint16_t *color)
+void ili9341_pixmap(const ili9341_t *dev, ili9341_coordinates_t * coordinates,
+                    const uint16_t *color)
 {
-    size_t num_pix = (x2 - x1 + 1) * (y2 - y1 + 1);
+    size_t num_pix = (size_t) _ili9341_get_pixel_num(coordinates);
 
     DEBUG("[ili9341]: Write x1: %" PRIu16 ", x2: %" PRIu16 ", "
           "y1: %" PRIu16 ", y2: %" PRIu16 ". Num pixels: %lu\n",
-          x1, x2, y1, y2, (unsigned long)num_pix);
+            coordinates->x1, coordinates->x2, coordinates->y1,
+            coordinates->y2, (unsigned long)num_pix);
 
     _ili9341_spi_acquire(dev);
 
     /* Send fill area to the display */
-    _ili9341_set_area(dev, x1, x2, y1, y2);
+    _ili9341_set_area(dev, coordinates);
 
     /* Memory access command */
     _ili9341_cmd_start(dev, ILI9341_CMD_RAMWR, true);
