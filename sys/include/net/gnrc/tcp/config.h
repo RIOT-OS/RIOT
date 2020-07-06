@@ -167,6 +167,24 @@ extern "C" {
 #ifndef CONFIG_GNRC_TCP_PROBE_UPPER_BOUND
 #define CONFIG_GNRC_TCP_PROBE_UPPER_BOUND (60U * US_PER_SEC)
 #endif
+
+/**
+ * @brief Message queue size for TCP API internal messaging
+ * @note The number of elements in a message queue must be a power of two.
+ *       This value defines the exponent of 2^n.
+ */
+#ifndef CONFIG_GNRC_TCP_MSG_QUEUE_SIZE_EXP
+#define CONFIG_GNRC_TCP_MSG_QUEUE_SIZE_EXP (2U)
+#endif
+
+/**
+ * @brief Message queue size for the TCP eventloop
+ * @note The number of elements in a message queue must be a power of two.
+ *       This value defines the exponent of 2^n.
+ */
+#ifndef CONFIG_GNRC_TCP_EVENTLOOP_MSG_QUEUE_SIZE_EXP
+#define CONFIG_GNRC_TCP_EVENTLOOP_MSG_QUEUE_SIZE_EXP (3U)
+#endif
 /** @} */
 
 #ifdef __cplusplus

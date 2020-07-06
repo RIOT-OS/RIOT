@@ -34,6 +34,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#define TCP_EVENTLOOP_MSG_QUEUE_SIZE (1 << CONFIG_GNRC_TCP_EVENTLOOP_MSG_QUEUE_SIZE_EXP)
+
 static msg_t _eventloop_msg_queue[TCP_EVENTLOOP_MSG_QUEUE_SIZE];
 
 /**

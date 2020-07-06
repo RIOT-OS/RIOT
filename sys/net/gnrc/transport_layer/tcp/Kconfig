@@ -112,12 +112,18 @@ config GNRC_TCP_PROBE_UPPER_BOUND
     int "Lower bound for the duration between probes in microseconds"
     default 60000000
 
-config GNRC_TCP_TCB_MBOX_SIZE_EXP
-    int "Size of the TCB mbox (as exponent of 2^n)"
+config GNRC_TCP_MSG_QUEUE_SIZE_SIZE_EXP
+    int "Message queue size for TCP API internal messaging (as exponent of 2^n)"
+    default 2
+    help
+        The number of elements in a message queue must be always a power of two.
+        This value defines the exponent of 2^n.
+
+config GNRC_TCP_EVENTLOOP_MSG_QUEUE_SIZE_SIZE_EXP
+    int "Message queue size for the TCP eventloop (as exponent of 2^n)"
     default 3
     help
-        As the mbox buffer size ALWAYS needs to be power of two, this option
-        represents the exponent of 2^n, which will be used as the size of the
-        mbox.
+        The number of elements in a message queue must be always a power of two.
+        This value defines the exponent of 2^n.
 
 endif # KCONFIG_MODULE_GNRC_TCP
