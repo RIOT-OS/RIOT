@@ -4,6 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+rsource "asymcute/Kconfig"
+
 menu "CoAP"
 
 rsource "Kconfig.coap"
