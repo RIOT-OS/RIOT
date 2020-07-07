@@ -27,7 +27,14 @@
 #include "periph/pm.h"
 #include "stdio_base.h"
 
-uint8_t sbrk[1];
+/**
+ * @brief manage the heap
+ */
+extern char _sheap;                 /* start of the heap */
+extern char _eheap;                 /* end of the heap */
+
+char * __heap_start = &_sheap;
+char * __heap_end = &_eheap;
 
 /**
  * @brief Exit a program without cleaning up files
