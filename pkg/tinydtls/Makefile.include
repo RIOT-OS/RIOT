@@ -10,6 +10,7 @@ INCLUDES += -I$(RIOTBASE)/pkg/tinydtls/include
 INCLUDES += -I$(PKG_BUILDDIR)
 # Mandatory for tinyDTLS
 CFLAGS += -DDTLSv12 -DWITH_SHA256
+CFLAGS += -DHAVE_ASSERT_H
 
 # Dependencies partially under control of the App's requirements
 
