@@ -136,6 +136,10 @@ ifneq (,$(filter encx24j600,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/encx24j600/include
 endif
 
+ifneq (,$(filter epd_bw_spi,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/drivers/epd_bw_spi/include
+endif
+
 ifneq (,$(filter dose,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/drivers/dose/include
 endif

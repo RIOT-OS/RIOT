@@ -287,6 +287,11 @@ ifneq (,$(filter encx24j600,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter epd_bw_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+  FEATURES_REQUIRED += periph_gpio
+endif
+
 ifneq (,$(filter ethos,$(USEMODULE)))
   FEATURES_REQUIRED += periph_uart
   USEMODULE += iolist
