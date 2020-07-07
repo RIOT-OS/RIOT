@@ -280,6 +280,7 @@ typedef enum {
     NETDEV_ANY = 0,         /**< Will match any device type */
     NETDEV_AT86RF215,
     NETDEV_AT86RF2XX,
+    NETDEV_DOSE,
     /* add more if needed */
 } netdev_type_t;
 /** @} */
