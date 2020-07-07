@@ -2,6 +2,7 @@ USEMODULE += tinydtls
 
 USEMODULE += memarray
 USEMODULE += hashes
+USEMODULE += random
 USEMODULE += tinydtls_aes
 USEMODULE += tinydtls_ecc
 
