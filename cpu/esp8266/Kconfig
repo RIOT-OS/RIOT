@@ -1,0 +1,54 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_CORE_XTENSA_L106
+    bool
+    select CPU_ARCH_XTENSA
+
+config CPU_FAM_ESP8266
+    bool
+    select CPU_CORE_XTENSA_L106
+    select CPU_COMMON_ESP
+    select HAS_ARCH_ESP8266
+    select HAS_CPU_ESP8266
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_RTC
+
+## CPU Models
+config CPU_MODEL_ESP8266EX
+    bool
+    select CPU_FAM_ESP8266
+
+config CPU_MODEL_ESP8266_ESP_12X
+    bool
+    select CPU_FAM_ESP8266
+
+## Definition of specific features
+config HAS_ARCH_ESP8266
+    bool
+    help
+        Indicates that the current architecture is ESP8266.
+
+config HAS_CPU_ESP8266
+    bool
+    help
+        Indicates that the current CPU is 'esp8266'.
+
+## Common CPU symbols
+config CPU_CORE
+    default "xtensa-l106" if CPU_CORE_XTENSA_L106
+
+config CPU_FAM
+    default "esp8266" if CPU_FAM_ESP8266
+
+config CPU_MODEL
+    default "esp8266ex" if CPU_MODEL_ESP8266EX
+    default "esp8266-esp-12x" if CPU_MODEL_ESP8266_ESP_12X
+
+config CPU
+    default "esp8266" if CPU_FAM_ESP8266
+
+source "$(RIOTCPU)/esp_common/Kconfig"

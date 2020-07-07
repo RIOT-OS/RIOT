@@ -1,0 +1,84 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_CORE_XTENSA_LX6
+    bool
+    select CPU_ARCH_XTENSA
+
+config CPU_FAM_ESP32
+    bool
+    select CPU_CORE_XTENSA_LX6
+    select CPU_COMMON_ESP
+    select HAS_ARCH_ESP32
+    select HAS_CPU_ESP32
+    select HAS_ESP_WIFI_ENTERPRISE
+    select HAS_PERIPH_ADC_CTRL
+    select HAS_PERIPH_RTC
+    select HAS_PERIPH_RTT
+
+## CPU Models
+config CPU_MODEL_ESP32_WROOM_32
+    bool
+    select CPU_FAM_ESP32
+
+config CPU_MODEL_ESP32_WROVER
+    bool
+    select CPU_FAM_ESP32
+
+config CPU_MODEL_ESP32_D0WD
+    bool
+    select CPU_FAM_ESP32
+
+## Definition of specific features
+config HAS_ARCH_ESP32
+    bool
+    help
+        Indicates that the current architecture is ESP32.
+
+config HAS_CPU_ESP32
+    bool
+    help
+        Indicates that the current CPU is 'esp32'.
+
+config HAS_ESP_RTC_TIMER_32K
+    bool
+    help
+        Indicates that an external 32.768 kHz crystal is connected to the ESP32
+        in the board.
+
+config HAS_ESP_SPI_RAM
+    bool
+    help
+        Indicates that an external RAM is connected via the FSPI interface in
+        the board.
+
+config HAS_ESP_WIFI_ENTERPRISE
+    bool
+    help
+        Indicates that the platform supports WPA2 enterprise mode for the WiFi
+        interface.
+
+config HAS_PERIPH_ADC_CTRL
+    bool
+    help
+        Indicates that an ESP32 ADC controller peripheral is present.
+
+## Common CPU symbols
+config CPU_CORE
+    default "xtensa-lx6" if CPU_CORE_XTENSA_LX6
+
+config CPU_FAM
+    default "esp32" if CPU_FAM_ESP32
+
+config CPU_MODEL
+    default "esp32-wroom_32" if CPU_MODEL_ESP32_WROOM_32
+    default "esp32-wrover" if CPU_MODEL_ESP32_WROVER
+    default "esp32-d0wd" if CPU_MODEL_ESP32_D0WD
+
+config CPU
+    default "esp32" if CPU_FAM_ESP32
+
+source "$(RIOTCPU)/esp_common/Kconfig"
