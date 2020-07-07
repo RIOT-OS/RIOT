@@ -4,6 +4,7 @@ FEATURES_REQUIRED = periph_gpio
 FEATURES_OPTIONAL = periph_gpio_irq
 
 USEMODULE += shell
+USEMODULE += shell_commands
 USEMODULE += benchmark
 
 include $(RIOTBASE)/Makefile.include
