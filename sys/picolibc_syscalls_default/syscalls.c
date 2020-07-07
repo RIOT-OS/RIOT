@@ -80,9 +80,9 @@ FILE picolibc_stdio =
     FDEV_SETUP_STREAM(picolibc_put, picolibc_get, NULL, _FDEV_SETUP_RW);
 
 FILE *const __iob[] = {
-    &picolibc_stdio,
-    &picolibc_stdio,
-    &picolibc_stdio,
+    &picolibc_stdio,    /* stdin  */
+    &picolibc_stdio,    /* stdout */
+    &picolibc_stdio,    /* stderr */
 };
 
 /*
