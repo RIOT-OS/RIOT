@@ -27,6 +27,7 @@
 #include "periph/pm.h"
 #include "stdio_base.h"
 
+#ifdef MODULE_CORTEXM_COMMON
 /**
  * @brief manage the heap
  */
@@ -35,6 +36,16 @@ extern char _eheap;                 /* end of the heap */
 
 char * __heap_start = &_sheap;
 char * __heap_end = &_eheap;
+#else
+/**
+ * @brief manage the heap
+ */
+extern char _heap_start;                 /* start of the heap */
+extern char _heap_end;                 /* end of the heap */
+
+char * __heap_start = &_heap_start;
+char * __heap_end = &_heap_end;
+#endif
 
 /**
  * @brief Exit a program without cleaning up files
