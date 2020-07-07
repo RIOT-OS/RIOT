@@ -98,6 +98,7 @@ PSEUDOMODULES += saul_nrf_temperature
 PSEUDOMODULES += scanf_float
 PSEUDOMODULES += sched_cb
 PSEUDOMODULES += semtech_loramac_rx
+PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += slipdev_stdio
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_async
