@@ -10,10 +10,10 @@ ifneq (,$(filter picolibc,$(USEMODULE)))
 endif
 
 ifeq (1,$(USE_PICOLIBC))
-  export LINKFLAGS += -specs=picolibc.specs
+  LINKFLAGS += -specs=picolibc.specs
 endif
 
-export LINKFLAGS += -lc
+LINKFLAGS += -lc
 
 ifeq (1,$(USE_PICOLIBC))
   PICOLIBC_INCLUDE_DIR ?= /usr/local/picolibc/$(TARGET_ARCH)/include
