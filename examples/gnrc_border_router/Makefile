@@ -11,8 +11,8 @@ RIOTBASE ?= $(CURDIR)/../..
 UPLINK ?= ethos
 
 # Check if the selected Uplink is valid
-ifeq (,$(filter ethos slip wifi,$(UPLINK)))
-  $(error Supported uplinks are `ethos`, `slip` and `wifi`)
+ifeq (,$(filter ethos slip cdc-ecm wifi,$(UPLINK)))
+  $(error Supported uplinks are `ethos`, `slip`, `cdc-ecm` and `wifi`)
 endif
 
 # Set the SSID and password of your WiFi network here
@@ -89,6 +89,8 @@ ifeq (,$(filter native,$(BOARD)))
     # ethos baudrate can be configured from make command
     ETHOS_BAUDRATE ?= 115200
     include $(CURDIR)/Makefile.ethos.conf
+  else ifeq (cdc-ecm,$(UPLINK))
+    include $(CURDIR)/Makefile.cdc-ecm.conf
   else ifeq (wifi,$(UPLINK))
     # SSID and Password need to be configured
     include $(CURDIR)/Makefile.wifi.conf
