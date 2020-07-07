@@ -5,7 +5,7 @@ MODULE = cpu
 DIRS = periph vendor
 
 ifneq (1,$(PICOLIBC))
-DIRS += nano
+  DIRS += nano
 endif
 
 include $(RIOTBASE)/Makefile.base
