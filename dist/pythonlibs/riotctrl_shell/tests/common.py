@@ -10,11 +10,19 @@ class MockSpawn():
         # set some expected attributes
         self.before = None
         self.echo = False
+        self.output = None
+        self.last_command = None
 
     def sendline(self, line, *args, **kwargs):
-        # just echo last input for before (what replwrap is assembling output
-        # from)
-        self.before = line
+        self.last_command = line
+        if self.output is None:
+            # just echo last input for before (what replwrap is assembling
+            # output from)
+            self.before = line
+        else:
+            # use pre-configured output in case command expects a specific
+            # output
+            self.before = self.output
 
     def expect_exact(self, *args, **kwargs):
         # always match on prompt with replwrap
@@ -27,8 +35,10 @@ class MockRIOTCtrl():
     """
     def __init__(self, *args, **kwargs):
         self.term = MockSpawn()
+        self.last_command = None
 
 
-def init_ctrl():
+def init_ctrl(output=None):
     rc = MockRIOTCtrl("foobar", env={"BOARD": "native"})
+    rc.term.output = output
     return rc
