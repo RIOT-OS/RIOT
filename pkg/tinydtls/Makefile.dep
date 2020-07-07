@@ -4,6 +4,7 @@ USEMODULE += memarray
 USEMODULE += hashes
 USEMODULE += tinydtls_aes
 USEMODULE += tinydtls_ecc
+USEMODULE += random
 
 # TinyDTLS only has support for 32-bit architectures ATM
 FEATURES_REQUIRED += arch_32bit

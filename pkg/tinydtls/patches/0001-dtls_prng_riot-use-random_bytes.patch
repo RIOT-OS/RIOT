@@ -1,0 +1,44 @@
+From 8b4f3035a079205884b9e7dcadd6578782ab2205 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benjamin.valentin@ml-pa.com>
+Date: Tue, 7 Jul 2020 14:36:14 +0200
+Subject: [PATCH] dtls_prng_riot: use random_bytes()
+
+Use the system-provided PRNG instead relying on rand() from libc.
+---
+ platform-specific/dtls_prng_riot.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
+
+diff --git a/platform-specific/dtls_prng_riot.c b/platform-specific/dtls_prng_riot.c
+index 1726444..6bfa1ec 100644
+--- a/platform-specific/dtls_prng_riot.c
++++ b/platform-specific/dtls_prng_riot.c
+@@ -20,23 +20,16 @@
+ 
+ #include "tinydtls.h"
+ #include "dtls_prng.h"
++#include "random.h"
+ 
+-#include <stdlib.h>
+-
+-/**
+- * Fills \p buf with \p len random bytes. This is the default
+- * implementation for prng().  You might want to change prng() to use
+- * a better PRNG on your specific platform.
+- */
+ int
+ dtls_prng(unsigned char *buf, size_t len) {
+-  while (len--)
+-    *buf++ = rand() & 0xFF;
++  random_bytes(buf, len);
+   return 1;
+ }
+ 
+ void
+ dtls_prng_init(unsigned seed) {
+-  srand(seed);
++  (void) seed;
+ }
+ 
+-- 
+2.25.1
+
