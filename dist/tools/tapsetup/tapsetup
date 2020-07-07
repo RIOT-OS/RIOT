@@ -48,7 +48,7 @@ create_bridge() {
 
     case "${PLATFORM}" in
         FreeBSD)
-            kldload if_bridge
+            kldload if_bridge       # module might be already loaded => error
             ifconfig ${BRNAME} create || exit 1 ;;
         Linux)
             ip link add name ${BRNAME} type bridge || exit 1
@@ -88,8 +88,9 @@ delete_bridge() {
     case "${PLATFORM}" in
         FreeBSD)
             sysctl net.link.tap.user_open=0
-            kldunload if_tap || exit 1
-            kldunload if_bridge || exit 1 ;;
+            ifconfig ${BRNAME} destroy || exit 1
+            kldunload if_tap        # unloading might fail due to dependencies
+            kldunload if_bridge ;;
         Linux)
             for IF in $(ls /sys/class/net/${BRNAME}/brif); do
                 if [ "${IF}" != "${UPLINK}" ]; then
@@ -113,7 +114,7 @@ delete_bridge() {
 begin_tap() {
     case "${PLATFORM}" in
         FreeBSD)
-            kldload if_tap || exit 1
+            kldload if_tap          # module might be already loaded => error
             sysctl net.link.tap.user_open=1 ;;
         *)
             ;;
