@@ -154,6 +154,9 @@ endif
 ifneq (,$(filter cord_ep,$(USEMODULE)))
     DIRS += net/application_layer/cord/ep
 endif
+ifneq (,$(filter cord_lc,$(USEMODULE)))
+    DIRS += net/application_layer/cord/lc
+endif
 ifneq (,$(filter bluetil_%,$(USEMODULE)))
   DIRS += net/ble/bluetil
 endif
