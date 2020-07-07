@@ -98,13 +98,13 @@ endif
 
 ifeq (,$(filter printf_float,$(USEMODULE)))
   ifneq (,$(filter picolibc,$(USEMODULE)))
-    export CFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
+    CFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
   endif
 endif
 
 ifeq (,$(filter scanf_float,$(USEMODULE)))
   ifneq (,$(filter picolibc,$(USEMODULE)))
-    export CFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
+    CFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
   endif
 endif
 
