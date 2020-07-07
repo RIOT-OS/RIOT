@@ -28,8 +28,6 @@
 #include "periph/pm.h"
 #include "stdio_base.h"
 
-uint8_t sbrk[1];
-
 /**
  * @brief Exit a program without cleaning up files
  *
