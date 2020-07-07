@@ -28,6 +28,28 @@
 #include "xtimer.h"
 #endif
 
+#if MODULE_SHELL_HOOKS
+void shell_post_readline_hook(void)
+{
+    puts("shell_post_readline_hook");
+}
+
+void shell_pre_command_hook(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    puts("shell_pre_command_hook");
+}
+
+void shell_post_command_hook(int ret, int argc, char **argv)
+{
+    (void)ret;
+    (void)argc;
+    (void)argv;
+    puts("shell_post_command_hook");
+}
+#endif
+
 static int print_teststart(int argc, char **argv)
 {
     (void) argc;
