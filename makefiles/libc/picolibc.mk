@@ -11,13 +11,7 @@ endif
 
 ifeq (1,$(USE_PICOLIBC))
   LINKFLAGS += -specs=picolibc.specs
+  CFLAGS += -specs=picolibc.specs
 endif
 
 LINKFLAGS += -lc
-
-ifeq (1,$(USE_PICOLIBC))
-  PICOLIBC_INCLUDE_DIR ?= /usr/local/picolibc/$(TARGET_ARCH)/include
-
-  INCLUDES += -isystem $(PICOLIBC_INCLUDE_DIR)
-endif
-
