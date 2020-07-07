@@ -786,6 +786,10 @@ ifneq (,$(filter random,$(USEMODULE)))
     USEMODULE += hashes
   endif
 
+  ifneq (,$(filter prng_hwrng,$(USEMODULE)))
+    FEATURES_REQUIRED += periph_hwrng
+  endif
+
   ifeq (,$(filter puf_sram,$(USEMODULE)))
     FEATURES_OPTIONAL += periph_hwrng
   endif
