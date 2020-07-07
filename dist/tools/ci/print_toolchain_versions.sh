@@ -1,5 +1,7 @@
 #!/bin/sh
 
+MAKE=${MAKE:-make}
+
 get_cmd_version() {
     if [ -z "$1" ]; then
         return
@@ -80,7 +82,7 @@ get_sys_shell() {
 }
 
 _get_make_shell() {
-    make -sf - 2>/dev/null <<MAKEFILE
+    ${MAKE} -sf - 2>/dev/null <<MAKEFILE
 \$(info \$(realpath \$(SHELL)))
 MAKEFILE
 }
@@ -156,7 +158,7 @@ for c in \
          cppcheck \
          doxygen \
          git \
-         make \
+         ${MAKE} \
          openocd \
          python \
          python2 \

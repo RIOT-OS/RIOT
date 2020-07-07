@@ -95,6 +95,8 @@ LOG_HANDLER.setFormatter(logging.Formatter(logging.BASIC_FORMAT))
 
 LOG_LEVELS = ('debug', 'info', 'warning', 'error', 'fatal', 'critical')
 
+MAKE = os.environ.get('MAKE', 'make')
+
 
 class ErrorInTest(Exception):
     """Custom exception for a failed test.
@@ -156,7 +158,7 @@ def apps_directories(riotdir, apps_dirs=None, apps_dirs_skip=None):
 
 def _riot_applications_dirs(riotdir):
     """Applications directories in the RIOT repository with relative path."""
-    cmd = ['make', 'info-applications']
+    cmd = [MAKE, 'info-applications']
 
     out = subprocess.check_output(cmd, cwd=riotdir)
     out = out.decode('utf-8', errors='replace')
@@ -383,7 +385,7 @@ class RIOTApplication():
         full_env = os.environ.copy()
         full_env.update(env)
 
-        cmd = ['make']
+        cmd = [MAKE]
         cmd.extend(self.MAKEFLAGS)
         cmd.extend(['-C', os.path.join(self.riotdir, self.appdir)])
         cmd.extend(args)
