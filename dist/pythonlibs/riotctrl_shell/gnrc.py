@@ -45,6 +45,53 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
         res["rtts"] = rtts
 
     def parse(self, cmd_output):
+        """
+        Parses output of GNRCIPv6NIB::nib_neigh_show()
+
+        >>> parser = GNRCICMPv6EchoParser()
+        >>> res = parser.parse(
+        ...     "12 bytes from fe80::385d:f965:106b:1114%6: "
+        ...         "icmp_seq=0 ttl=64 rssi=-34 dBm time=8.839 ms\\n"
+        ...     "12 bytes from fe80::385d:f965:106b:1114%6: "
+        ...         "icmp_seq=1 ttl=64 rssi=-34 dBm time=6.925 ms\\n"
+        ...     "12 bytes from fe80::385d:f965:106b:1114%6: "
+        ...         "icmp_seq=2 ttl=64 rssi=-34 dBm time=7.885 ms\\n"
+        ...     "--- fe80::385d:f965:106b:1114 PING statistics ---\\n"
+        ...     "3 packets transmitted, 3 packets received, 0% packet loss\\n"
+        ...     "round-trip min/avg/max = 6.925/7.883/8.839 ms\\n")
+        >>> sorted(res)
+        ['replies', 'rtts', 'stats']
+        >>> len(res["replies"])
+        3
+        >>> sorted(res["replies"][0])
+        ['rssi', 'rtt', 'seq', 'source', 'ttl']
+        >>> res["replies"][0]["source"]
+        'fe80::385d:f965:106b:1114%6'
+        >>> res["replies"][0]["seq"]
+        0
+        >>> res["replies"][0]["ttl"]
+        64
+        >>> res["replies"][0]["rssi"]
+        -34
+        >>> res["replies"][0]["rtt"]
+        8.839
+        >>> sorted(res["stats"])
+        ['packet_loss', 'rx', 'tx']
+        >>> res["stats"]["tx"]
+        3
+        >>> res["stats"]["rx"]
+        3
+        >>> res["stats"]["packet_loss"]
+        0
+        >>> sorted(res["rtts"])
+        ['avg', 'max', 'min']
+        >>> res["rtts"]["min"]
+        6.925
+        >>> res["rtts"]["avg"]
+        7.883
+        >>> res["rtts"]["max"]
+        8.839
+        """
         res = {}
         c_reply = re.compile(r"\d+ bytes from (?P<source>[0-9a-f:]+): "
                              r"icmp_seq=(?P<seq>\d+) ttl=(?P<ttl>\d+) "
@@ -129,6 +176,37 @@ class GNRCPktbufStatsParser(ShellInteractionParser):
         res["first_unused"]["size"] = int(first_unused["size"])
 
     def parse(self, cmd_output):
+        """
+        Parses output of GNRCPktbufStats::pktbuf_stats()
+
+        >>> parser = GNRCPktbufStatsParser()
+        >>> res = parser.parse(
+        ...     "packet buffer: first byte: 0x20001f54, last byte: 0x20003f54 "
+        ...         "(size: 8192)\\n"
+        ...     "  position of last byte used: 312\\n"
+        ...     "~ unused: 0x20001f54 (next: (nil), size: 8192) ~\\n")
+        >>> sorted(res)
+        ['first_byte', 'first_unused', 'last_byte', 'last_byte_used', 'size']
+        >>> res.is_empty()
+        True
+        >>> hex(res["first_byte"])
+        '0x20001f54'
+        >>> hex(res["last_byte"])
+        '0x20003f54'
+        >>> res["size"]
+        8192
+        >>> res["last_byte_used"]
+        312
+        >>> res.fullest_capacity() <= (res["last_byte_used"] / res["size"])
+        True
+        >>> sorted(res["first_unused"])
+        ['next', 'size', 'start']
+        >>> hex(res["first_unused"]["start"])
+        '0x20001f54'
+        >>> res["first_unused"]["next"]     # has no next according to dump
+        >>> res["first_unused"]["size"]
+        8192
+        """
         c_init1 = re.compile(r"packet buffer: "
                              r"first byte: 0x(?P<first_byte>[0-9A-Fa-f]+), "
                              r"last byte: 0x(?P<last_byte>[0-9A-Fa-f]+) "
