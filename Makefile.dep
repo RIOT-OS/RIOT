@@ -189,6 +189,10 @@ ifneq (,$(filter trickle,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter eui_provider,$(USEMODULE)))
+  USEMODULE += luid
+endif
+
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += l2util
