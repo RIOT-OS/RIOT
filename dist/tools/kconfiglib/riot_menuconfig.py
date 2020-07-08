@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """ Menuconfig variant which uses RiotKconfig as base class """
 import menuconfig
 from riot_kconfig import standard_riot_kconfig
