@@ -61,23 +61,54 @@ int kill(pid_t pid, int sig)
     return -1;
 }
 
-/* File descriptor pointers */
-int picolibc_get(FILE *file)
+#include "mutex.h"
+
+static mutex_t picolibc_put_mutex = MUTEX_INIT;
+
+#define PICOLIBC_STDOUT_BUFSIZE 64
+
+static char picolibc_stdout[PICOLIBC_STDOUT_BUFSIZE];
+static int picolibc_stdout_queued;
+
+static void _picolibc_flush(void)
+{
+    if (picolibc_stdout_queued) {
+        stdio_write(picolibc_stdout, picolibc_stdout_queued);
+        picolibc_stdout_queued = 0;
+    }
+}
+
+static int picolibc_put(char c, FILE *file)
 {
     (void)file;
+    mutex_lock(&picolibc_put_mutex);
+    picolibc_stdout[picolibc_stdout_queued++] = c;
+    if (picolibc_stdout_queued == PICOLIBC_STDOUT_BUFSIZE || c == '\n')
+        _picolibc_flush();
+    mutex_unlock(&picolibc_put_mutex);
+    return 1;
+}
+
+static int picolibc_flush(FILE *file)
+{
+    (void)file;
+    mutex_lock(&picolibc_put_mutex);
+    _picolibc_flush();
+    mutex_unlock(&picolibc_put_mutex);
+    return 0;
+}
+
+static int picolibc_get(FILE *file)
+{
+    (void)file;
+    picolibc_flush(NULL);
     char c = 0;
     stdio_read(&c, 1);
     return c;
 }
 
-int picolibc_put(char c, FILE *file)
-{
-    (void)file;
-    stdio_write(&c, 1);
-    return 1;
-}
 FILE picolibc_stdio =
-    FDEV_SETUP_STREAM(picolibc_put, picolibc_get, NULL, _FDEV_SETUP_RW);
+    FDEV_SETUP_STREAM(picolibc_put, picolibc_get, picolibc_flush, _FDEV_SETUP_RW);
 
 FILE *const __iob[] = {
     &picolibc_stdio,    /* stdin  */
