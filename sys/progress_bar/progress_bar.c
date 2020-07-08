@@ -72,7 +72,7 @@ void progress_bar_print(char *prefix, char *suffix, uint8_t value)
     /* show cursor */
     printf("\033[?25h");
 
-#ifdef MODULE_NEWLIB
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     fflush(stdout);
 #endif
 }
