@@ -1,0 +1,37 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_LPC176X
+    bool
+    select CPU_CORE_CORTEX_M3
+    select HAS_CORTEXM_MPU
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_PM
+
+## CPU Models
+config CPU_MODEL_LPC1768
+    bool
+    select CPU_FAM_LPC176X
+    select HAS_CPU_LPC1768
+
+## Declaration of specific features
+config HAS_CPU_LPC1768
+    bool
+    help
+        Indicates that an 'lpc1768' cpu is being used.
+
+## Common CPU symbols
+config CPU_FAM
+    default "lpc176x" if CPU_FAM_LPC176X
+
+config CPU_MODEL
+    default "lpc1768" if CPU_MODEL_LPC1768
+
+config CPU
+    default "lpc1768" if CPU_MODEL_LPC1768
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"
