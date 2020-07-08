@@ -22,6 +22,9 @@
  *  - Simple Park-Miller PRNG
  *  - Musl C PRNG
  *  - Fortuna (CS)PRNG
+ *  - Hardware Random Number Generator (non-seedable)
+ *    HWRNG differ in how they generate random numbers and may not use a PRNG internally.
+ *    Refer to the manual of your MCU for details.
  */
 
 #ifndef RANDOM_H

@@ -65,6 +65,8 @@ static void test_init(char *name)
         puts("Tiny Mersenne Twister PRNG.\n");
 #elif MODULE_PRNG_XORSHIFT
         puts("XOR Shift PRNG.\n");
+#elif MODULE_PRNG_HWRNG
+        puts("Hardware RNG.\n");
 #else
         puts("unknown PRNG.\n");
 #endif
