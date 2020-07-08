@@ -36,7 +36,8 @@
  *
  * @param n     the exit code, 0 for all OK, >0 for not OK
  */
-void _exit(int n)
+void __attribute__((__noreturn__))
+_exit(int n)
 {
     LOG_INFO("#! exit %i: powering off\n", n);
     pm_off();
