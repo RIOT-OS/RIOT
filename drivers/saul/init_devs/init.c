@@ -111,6 +111,10 @@ void saul_init_devs(void)
         extern void auto_init_hts221(void);
         auto_init_hts221();
     }
+    if (IS_USED(MODULE_HX711)) {
+        extern void auto_init_hx711(void);
+        auto_init_hx711();
+    }
     if (IS_USED(MODULE_INA2XX)) {
         extern void auto_init_ina2xx(void);
         auto_init_ina2xx();
