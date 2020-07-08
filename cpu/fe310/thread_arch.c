@@ -187,10 +187,10 @@ void thread_yield_higher(void)
  */
 void heap_stats(void)
 {
-    extern char _heap_start; /* defined in linker script */
-    extern char _heap_end;   /* defined in linker script */
+    extern char _sheap;     /* defined in linker script */
+    extern char _eheap;     /* defined in linker script */
 
-    long int heap_size = &_heap_end - &_heap_start;
+    long int heap_size = &_eheap - &_sheap;
     struct mallinfo minfo = mallinfo();
     printf("heap: %ld (used %u, free %ld) [bytes]\n",
            heap_size, minfo.uordblks, heap_size - minfo.uordblks);
