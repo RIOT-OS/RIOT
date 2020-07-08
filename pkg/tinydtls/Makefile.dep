@@ -2,8 +2,13 @@ USEMODULE += tinydtls
 
 USEMODULE += memarray
 USEMODULE += hashes
+USEMODULE += random
 USEMODULE += tinydtls_aes
 USEMODULE += tinydtls_ecc
+
+# tinydtls needs cryptographically secure randomness
+# TODO: restore configurability, e.g. allow to use HWRNG instead if available
+USEMODULE += prng_sha1prng
 
 # TinyDTLS only has support for 32-bit architectures ATM
 FEATURES_REQUIRED += arch_32bit
