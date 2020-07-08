@@ -43,6 +43,7 @@ TESTRUNNER_RESET_AFTER_TERM = int(os.environ.get('TESTRUNNER_RESET_AFTER_TERM')
 
 MAKE = os.environ.get('MAKE', 'make')
 
+
 def _reset_board(env):
     if MAKE_RESET_DELAY > 0:
         time.sleep(MAKE_RESET_DELAY)

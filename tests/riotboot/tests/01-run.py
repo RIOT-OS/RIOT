@@ -10,11 +10,12 @@
 import sys
 import subprocess
 from testrunner import run
+from testrunner.spawn import MAKE
 
 
 def flash_slot(slotnum, version):
     cmd = [
-        "make",
+        MAKE,
         "RIOTBOOT_SKIP_COMPILE=1",
         "riotboot/flash-slot{}".format(slotnum),
         "APP_VER={}".format(version),
