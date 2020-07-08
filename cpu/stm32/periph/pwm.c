@@ -45,7 +45,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     uint32_t timer_clk = periph_timer_clk(pwm_config[pwm].bus);
 
     /* verify parameters */
-    assert((pwm < PWM_NUMOF) && ((freq * res) < timer_clk));
+    assert((pwm < PWM_NUMOF) && ((freq * res) <= timer_clk));
 
     /* power on the used timer */
     periph_clk_en(pwm_config[pwm].bus, pwm_config[pwm].rcc_mask);
