@@ -100,12 +100,15 @@ static int _on_l2cap_evt(struct ble_l2cap_event *event, void *arg)
     (void)arg;
 
     switch (event->type) {
-        case BLE_L2CAP_EVENT_COC_CONNECTED:
+        case BLE_L2CAP_EVENT_COC_CONNECTED: {
             _coc = event->connect.chan;
+            struct ble_l2cap_chan_info info;
+            ble_l2cap_get_chan_info(_coc, &info);
             puts("# L2CAP: CONNECTED");
             printf("# MTUs: our %i, remote %i\n",
-                   ble_l2cap_get_our_mtu(_coc), ble_l2cap_get_peer_mtu(_coc));
+                   (int)info.our_l2cap_mtu, (int)info.peer_l2cap_mtu);
             break;
+        }
         case BLE_L2CAP_EVENT_COC_DISCONNECTED:
             _coc = NULL;
             puts("# L2CAP: DISCONNECTED");
