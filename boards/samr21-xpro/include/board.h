@@ -25,6 +25,8 @@
 #include "periph_conf.h"
 #include "periph_cpu.h"
 
+#include "edbg_eui.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -56,6 +58,25 @@ extern "C" {
 #define AT86RF2XX_PARAM_INT        GPIO_PIN(PB, 0)
 #define AT86RF2XX_PARAM_SLEEP      GPIO_PIN(PA, 20)
 #define AT86RF2XX_PARAM_RESET      GPIO_PIN(PB, 15)
+
+/**
+ * @brief    EDBG provides a EUI-64, the same that is printed on the board
+ */
+static inline int _edbg_get_eui64(const void *arg, eui64_t *addr)
+{
+    (void) arg;
+    return edbg_get_eui64(addr);
+}
+
+/**
+ * @name    EUI sources on the board
+ *          EUI-64 inside EDBG for the internal radio
+ * @{
+ */
+#define EUI64_PROVIDER_FUNC   _edbg_get_eui64
+#define EUI64_PROVIDER_TYPE   NETDEV_AT86RF2XX
+#define EUI64_PROVIDER_INDEX  0
+/** @} */
 
 /**
  * @name    OpenWSN timing constants
