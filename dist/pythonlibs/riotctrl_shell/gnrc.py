@@ -93,7 +93,7 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
         8.839
         """
         res = {}
-        c_reply = re.compile(r"\d+ bytes from (?P<source>[0-9a-f:]+): "
+        c_reply = re.compile(r"\d+ bytes from (?P<source>[0-9a-f:]+(%\S+)?): "
                              r"icmp_seq=(?P<seq>\d+) ttl=(?P<ttl>\d+) "
                              r"(rssi=(?P<rssi>-?\d+) dBm )?"
                              r"time=(?P<rtt>\d+.\d+) ms")
