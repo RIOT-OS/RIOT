@@ -29,8 +29,10 @@ OPENOCD_ADAPTER_INIT ?= \
   -c 'bcm2835gpio_peripheral_base $(PERIPH_BASE)' \
   -c 'bcm2835gpio_speed_coeffs $(SPEED_COEFF) $(SPEED_OFFSET)' \
   -c 'bcm2835gpio_swd_nums $(SWCLK_PIN ) $(SWDIO_PIN)' \
-  -c 'bcm2835gpio_srst_num $(SRST_PIN)' \
-  -c 'transport select swd'
+  -c 'bcm2835gpio_srst_num $(SRST_PIN)'
+
+# Default to SWD
+OPENOCD_TRANSPORT ?= swd
 
 # bcm2835gpio needs access to /dev/mem
 export OPENOCD ?= sudo -E openocd
