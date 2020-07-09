@@ -5,4 +5,4 @@ FEATURES_PROVIDED += cortexm_mpu
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_hwrng
 
--include $(RIOTCPU)/cortexm_common/Makefile.features
+include $(RIOTCPU)/cortexm_common/Makefile.features
