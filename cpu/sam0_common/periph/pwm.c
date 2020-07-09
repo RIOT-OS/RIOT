@@ -17,14 +17,11 @@
  *
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  *
  * @}
  */
 
-#include <stdint.h>
-#include <string.h>
-
-#include "log.h"
 #include "cpu.h"
 #include "board.h"
 #include "periph/gpio.h"
@@ -32,7 +29,7 @@
 
 static inline Tcc *_tcc(pwm_t dev)
 {
-    return pwm_config[dev].dev;
+    return pwm_config[dev].tim.dev;
 }
 
 static inline uint8_t _chan(pwm_t dev, int chan)
@@ -40,57 +37,7 @@ static inline uint8_t _chan(pwm_t dev, int chan)
     return pwm_config[dev].chan[chan].chan;
 }
 
-static int _clk_id(pwm_t dev)
-{
-    Tcc *tcc = _tcc(dev);
-
-    if (tcc == TCC0) {
-        return TCC0_GCLK_ID;
-    }
-
-    if (tcc == TCC1) {
-        return TCC1_GCLK_ID;
-    }
-
-    if (tcc == TCC2) {
-        return TCC2_GCLK_ID;
-    }
-#ifdef TCC3
-    if (tcc == TCC3) {
-        return TCC3_GCLK_ID;
-    }
-#endif
-
-    assert(0);
-    return 0;
-}
-
-static uint32_t _apbcmask_tcc(pwm_t dev)
-{
-    Tcc *tcc = _tcc(dev);
-
-    if (tcc == TCC0) {
-        return PM_APBCMASK_TCC0;
-    }
-
-    if (tcc == TCC1) {
-        return PM_APBCMASK_TCC1;
-    }
-
-    if (tcc == TCC2) {
-        return PM_APBCMASK_TCC2;
-    }
-#ifdef TCC3
-    if (tcc == TCC3) {
-        return PM_APBCMASK_TCC3;
-    }
-#endif
-
-    assert(0);
-    return 0;
-}
-
-static uint8_t get_prescaler(unsigned int target, int *scale)
+static uint8_t _get_prescaler(unsigned int target, int *scale)
 {
     if (target == 0) {
         return 0xff;
@@ -124,13 +71,68 @@ static uint8_t get_prescaler(unsigned int target, int *scale)
     return target - 1;
 }
 
+static uint8_t _get_cc_numof(Tcc *tcc)
+{
+    switch ((uintptr_t) tcc) {
+#ifdef TCC0_CC_NUM
+    case (uintptr_t)TCC0:
+        return TCC0_CC_NUM;
+#endif
+#ifdef TCC1_CC_NUM
+    case (uintptr_t)TCC1:
+        return TCC1_CC_NUM;
+#endif
+#ifdef TCC2_CC_NUM
+    case (uintptr_t)TCC2:
+        return TCC2_CC_NUM;
+#endif
+#ifdef TCC3_CC_NUM
+    case (uintptr_t)TCC3:
+        return TCC3_CC_NUM;
+#endif
+#ifdef TCC4_CC_NUM
+    case (uintptr_t)TCC4:
+        return TCC4_CC_NUM;
+#endif
+#ifdef TCC5_CC_NUM
+    case (uintptr_t)TCC5:
+        return TCC5_CC_NUM;
+#endif
+    }
+
+    assert(0);
+    return 0;
+}
+
 static void poweron(pwm_t dev)
 {
-    PM->APBCMASK.reg |= _apbcmask_tcc(dev);
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN |
-                         GCLK_CLKCTRL_GEN_GCLK0 |
-                         GCLK_CLKCTRL_ID(_clk_id(dev)));
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
+    const pwm_conf_t *cfg = &pwm_config[dev];
+
+    sam0_gclk_enable(cfg->gclk_src);
+#ifdef MCLK
+    GCLK->PCHCTRL[cfg->tim.gclk_id].reg = GCLK_PCHCTRL_GEN(cfg->gclk_src)
+                                        | GCLK_PCHCTRL_CHEN;
+    *cfg->tim.mclk |= cfg->tim.mclk_mask;
+#else
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN
+                      | GCLK_CLKCTRL_GEN(cfg->gclk_src)
+                      | GCLK_CLKCTRL_ID(cfg->tim.gclk_id);
+    PM->APBCMASK.reg |= cfg->tim.pm_mask;
+#endif
+}
+
+static void poweroff(pwm_t dev)
+{
+    const pwm_conf_t *cfg = &pwm_config[dev];
+
+#ifdef MCLK
+    GCLK->PCHCTRL[cfg->tim.gclk_id].reg = 0;
+    *cfg->tim.mclk &= ~cfg->tim.mclk_mask;
+#else
+    PM->APBCMASK.reg &= ~cfg->tim.pm_mask;
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_GEN_GCLK7
+                      | GCLK_CLKCTRL_ID(cfg->tim.gclk_id);
+#endif
 }
 
 uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
@@ -143,12 +145,14 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
         return 0;
     }
 
+    const uint32_t f_src = sam0_gclk_freq(pwm_config[dev].gclk_src);
+
     /* calculate the closest possible clock presacler */
-    prescaler = get_prescaler(CLOCK_CORECLOCK / (freq * res), &scale);
+    prescaler = _get_prescaler(f_src / (freq * res), &scale);
     if (prescaler == 0xff) {
         return 0;
     }
-    f_real = (CLOCK_CORECLOCK / (scale * res));
+    f_real = f_src / (scale * res);
 
     /* configure the used pins */
     for (unsigned i = 0; i < pwm_config[dev].chan_numof; i++) {
@@ -164,6 +168,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     /* reset TCC module */
     _tcc(dev)->CTRLA.reg = TCC_CTRLA_SWRST;
     while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_SWRST) {}
+
     /* set PWM mode */
     switch (mode) {
         case PWM_LEFT:
@@ -179,16 +184,20 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_CTRLB) {}
 
     /* configure the TCC device */
-    _tcc(dev)->CTRLA.reg = (TCC_CTRLA_PRESCSYNC_GCLK_Val
-                            | TCC_CTRLA_PRESCALER(prescaler));
+    _tcc(dev)->CTRLA.reg = TCC_CTRLA_PRESCSYNC_GCLK_Val
+                         | TCC_CTRLA_PRESCALER(prescaler);
+
     /* select the waveform generation mode -> normal PWM */
     _tcc(dev)->WAVE.reg = (TCC_WAVE_WAVEGEN_NPWM);
     while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_WAVE) {}
+
     /* set the selected period */
     _tcc(dev)->PER.reg = (res - 1);
     while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_PER) {}
+
     /* start PWM operation */
-    _tcc(dev)->CTRLA.reg |= (TCC_CTRLA_ENABLE);
+    _tcc(dev)->CTRLA.reg |= TCC_CTRLA_ENABLE;
+
     /* return the actual frequency the PWM is running at */
     return f_real;
 }
@@ -206,14 +215,12 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
     }
 
     uint8_t chan = _chan(dev, channel);
-    if (chan < 4) {
-        _tcc(dev)->CC[chan].reg = value;
-        while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << chan)) {}
-    } else {
-        chan -= 4;
-        _tcc(dev)->CCB[chan].reg = value;
-        while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CCB0 << chan)) {}
-    }
+
+    /* TODO: use OTMX for pin remapping */
+    chan %= _get_cc_numof(_tcc(dev));
+
+    _tcc(dev)->CC[chan].reg = value;
+    while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << chan)) {}
 }
 
 void pwm_poweron(pwm_t dev)
@@ -225,9 +232,5 @@ void pwm_poweron(pwm_t dev)
 void pwm_poweroff(pwm_t dev)
 {
     _tcc(dev)->CTRLA.reg &= ~(TCC_CTRLA_ENABLE);
-
-    PM->APBCMASK.reg &= ~_apbcmask_tcc(dev);
-    GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_GEN_GCLK7 |
-                         GCLK_CLKCTRL_ID(_clk_id(dev)));
-    while (GCLK->STATUS.bit.SYNCBUSY) {}
+    poweroff(dev);
 }
