@@ -26,9 +26,8 @@
 
 #if defined(MODULE_MTD_SDCARD) || defined(DOXYGEN)
  /* this is provided by the sdcard_spi driver
- * see sys/auto_init/storage/auto_init_sdcard_spi.c */
-extern sdcard_spi_t sdcard_spi_devs[sizeof(sdcard_spi_params) /
-                                    sizeof(sdcard_spi_params[0])];
+  * see drivers/sdcard_spi/sdcard_spi.c */
+extern sdcard_spi_t sdcard_spi_devs[ARRAY_SIZE(sdcard_spi_params)];
 mtd_sdcard_t sensebox_sd_dev = {
     .base = {
         .driver = &mtd_sdcard_driver,

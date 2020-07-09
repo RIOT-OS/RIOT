@@ -35,7 +35,7 @@
 #define ASCII_UNPRINTABLE_REPLACEMENT "."
 
 /* this is provided by the sdcard_spi driver
- * see sys/auto_init/storage/auto_init_sdcard_spi.c */
+ * see drivers/sdcard_spi/sdcard_spi.c */
 extern sdcard_spi_t sdcard_spi_devs[ARRAY_SIZE(sdcard_spi_params)];
 sdcard_spi_t *card = &sdcard_spi_devs[0];
 
