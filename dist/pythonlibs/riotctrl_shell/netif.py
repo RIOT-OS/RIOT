@@ -279,6 +279,7 @@ class Ifconfig(ShellInteraction):
     def ifconfig_list(self, netif=None, timeout=-1, async_=False):
         return self.ifconfig_cmd(netif=netif, timeout=timeout, async_=async_)
 
+    @ShellInteraction.check_term
     def ifconfig_cmd(self, netif=None, args=None, timeout=-1, async_=False):
         cmd = "ifconfig"
         if netif is not None:
@@ -370,6 +371,7 @@ class Ifconfig(ShellInteraction):
 
 
 class TXTSnd(ShellInteraction):
+    @ShellInteraction.check_term
     def netif_txtsnd(self, netif, target, data, timeout=-1, async_=False):
         cmd = "txtsnd {netif} {target} {data}".format(
             netif=netif,
