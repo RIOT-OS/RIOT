@@ -287,7 +287,7 @@ class Ifconfig(ShellInteraction):
         if args is not None:
             if netif is None:
                 raise ValueError("netif required when args are provided")
-            cmd += " {args}".format(args=" ".join(args))
+            cmd += " {args}".format(args=" ".join(str(a) for a in args))
         return self.cmd(cmd, timeout=timeout, async_=False)
 
     def ifconfig_help(self, netif, timeout=-1, async_=False):
