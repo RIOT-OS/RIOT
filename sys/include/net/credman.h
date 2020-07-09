@@ -37,8 +37,8 @@ extern "C" {
 /**
  * @brief Maximum number of credentials in credential pool
  */
-#ifndef CREDMAN_MAX_CREDENTIALS
-#define CREDMAN_MAX_CREDENTIALS  (2)
+#ifndef CONFIG_CREDMAN_MAX_CREDENTIALS
+#define CONFIG_CREDMAN_MAX_CREDENTIALS  (2)
 #endif
 
 /**
@@ -173,7 +173,7 @@ void credman_delete(credman_tag_t tag, credman_type_t type);
 /**
  * @brief Gets the number of credentials currently in the credential pool
  *
- * Maximum number of allowed credentials is defined by CREDMAN_MAX_CREDENTIALS
+ * Maximum number of allowed credentials is defined by CONFIG_CREDMAN_MAX_CREDENTIALS
  *
  * @return number of credentials currently in the credential pool
  */
