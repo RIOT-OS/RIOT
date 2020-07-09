@@ -76,12 +76,18 @@ def test_ifconfig_help():
     assert res == "ifconfig foobar help"
 
 
-def test_ifconfig_set():
-    rc = init_ctrl(output="success: address set")
+@pytest.mark.parametrize(
+    "option,value,expected",
+    [("addr", "42:de:ad:c0:ff:ee",
+      "ifconfig foobar set addr 42:de:ad:c0:ff:ee"),
+     ("chan", 17, "ifconfig foobar set chan 17")]
+)
+def test_ifconfig_set(option, value, expected):
+    rc = init_ctrl(output="success: option set")
     si = riotctrl_shell.netif.Ifconfig(rc)
-    res = si.ifconfig_set("foobar", "addr", "42:de:ad:c0:ff:ee")
-    assert res == "success: address set"
-    assert rc.term.last_command == "ifconfig foobar set addr 42:de:ad:c0:ff:ee"
+    res = si.ifconfig_set("foobar", option, value)
+    assert res == "success: option set"
+    assert rc.term.last_command == expected
 
 
 def test_ifconfig_set_error():
