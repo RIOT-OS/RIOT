@@ -26,7 +26,7 @@ def testfunc():
         try:
             if BOARD == 'stm32f4discovery':
                 child.expect_exact('\x1b[1;33mThe following features may conflict:'
-                                   '\x1b[0m \x1b[1;32mperiph_dac periph_spi\x1b[0m')
+                                   '\x1b[0m periph_dac periph_spi')
                 child.expect_exact('\x1b[1;33mRationale: '
                                    '\x1b[0mOn stm32f4discovery boards there are '
                                    'the same pins for the DAC and/or SPI_0.')
