@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 HAW Hamburg
+ * Copyright (C) 2018, 2020 HAW Hamburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,13 +10,9 @@
  */
 
  /**
- * @ingroup sys_random
+ * @ingroup sys_random_shaxprng
  * @{
  * @file
- *
- * @brief   SHA based PRNG random number generator implementation
- *
- * BLABLA
  *
  * @author Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  * @}
