@@ -29,7 +29,7 @@
 
 static inline Tcc *_tcc(pwm_t dev)
 {
-    return pwm_config[dev].tim.dev;
+    return pwm_config[dev].tim.dev.tcc;
 }
 
 static inline uint8_t _chan(pwm_t dev, int chan)
@@ -71,7 +71,7 @@ static uint8_t _get_prescaler(unsigned int target, int *scale)
     return target - 1;
 }
 
-static uint8_t _get_cc_numof(Tcc *tcc)
+static uint8_t _tcc_get_cc_numof(Tcc *tcc)
 {
     switch ((uintptr_t) tcc) {
 #ifdef TCC0_CC_NUM
@@ -135,6 +135,42 @@ static void poweroff(pwm_t dev)
 #endif
 }
 
+static void _tcc_init(Tcc *tcc, pwm_mode_t mode, uint8_t prescaler, uint16_t res)
+{
+    /* reset TCC module */
+    tcc->CTRLA.reg = TCC_CTRLA_SWRST;
+    while (tcc->SYNCBUSY.reg & TCC_SYNCBUSY_SWRST) {}
+
+    /* set PWM mode */
+    switch (mode) {
+        case PWM_LEFT:
+            tcc->CTRLBCLR.reg = TCC_CTRLBCLR_DIR;     /* count up */
+            break;
+        case PWM_RIGHT:
+            tcc->CTRLBSET.reg = TCC_CTRLBSET_DIR;     /* count down */
+            break;
+        case PWM_CENTER:        /* currently not supported */
+        default:
+            return;
+    }
+    while (tcc->SYNCBUSY.reg & TCC_SYNCBUSY_CTRLB) {}
+
+    /* configure the TCC device */
+    tcc->CTRLA.reg = TCC_CTRLA_PRESCSYNC_GCLK_Val
+                   | TCC_CTRLA_PRESCALER(prescaler);
+
+    /* select the waveform generation mode -> normal PWM */
+    tcc->WAVE.reg = (TCC_WAVE_WAVEGEN_NPWM);
+    while (tcc->SYNCBUSY.reg & TCC_SYNCBUSY_WAVE) {}
+
+    /* set the selected period */
+    tcc->PER.reg = (res - 1);
+    while (tcc->SYNCBUSY.reg & TCC_SYNCBUSY_PER) {}
+
+    /* start PWM operation */
+    tcc->CTRLA.reg |= TCC_CTRLA_ENABLE;
+}
+
 uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     uint8_t prescaler;
@@ -165,38 +201,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     /* power on the device */
     poweron(dev);
 
-    /* reset TCC module */
-    _tcc(dev)->CTRLA.reg = TCC_CTRLA_SWRST;
-    while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_SWRST) {}
-
-    /* set PWM mode */
-    switch (mode) {
-        case PWM_LEFT:
-            _tcc(dev)->CTRLBCLR.reg = TCC_CTRLBCLR_DIR;     /* count up */
-            break;
-        case PWM_RIGHT:
-            _tcc(dev)->CTRLBSET.reg = TCC_CTRLBSET_DIR;     /* count down */
-            break;
-        case PWM_CENTER:        /* currently not supported */
-        default:
-            return 0;
-    }
-    while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_CTRLB) {}
-
-    /* configure the TCC device */
-    _tcc(dev)->CTRLA.reg = TCC_CTRLA_PRESCSYNC_GCLK_Val
-                         | TCC_CTRLA_PRESCALER(prescaler);
-
-    /* select the waveform generation mode -> normal PWM */
-    _tcc(dev)->WAVE.reg = (TCC_WAVE_WAVEGEN_NPWM);
-    while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_WAVE) {}
-
-    /* set the selected period */
-    _tcc(dev)->PER.reg = (res - 1);
-    while (_tcc(dev)->SYNCBUSY.reg & TCC_SYNCBUSY_PER) {}
-
-    /* start PWM operation */
-    _tcc(dev)->CTRLA.reg |= TCC_CTRLA_ENABLE;
+    _tcc_init(_tcc(dev), mode, prescaler, res);
 
     /* return the actual frequency the PWM is running at */
     return f_real;
@@ -207,6 +212,14 @@ uint8_t pwm_channels(pwm_t dev)
     return pwm_config[dev].chan_numof;
 }
 
+static void _tcc_set(Tcc *tcc, uint8_t chan, uint16_t value)
+{
+    /* TODO: use OTMX for pin remapping */
+    chan %= _tcc_get_cc_numof(tcc);
+    tcc->CC[chan].reg = value;
+    while (tcc->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << chan)) {}
+}
+
 void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
 {
     if ((channel >= pwm_config[dev].chan_numof) ||
@@ -214,13 +227,7 @@ void pwm_set(pwm_t dev, uint8_t channel, uint16_t value)
         return;
     }
 
-    uint8_t chan = _chan(dev, channel);
-
-    /* TODO: use OTMX for pin remapping */
-    chan %= _get_cc_numof(_tcc(dev));
-
-    _tcc(dev)->CC[chan].reg = value;
-    while (_tcc(dev)->SYNCBUSY.reg & (TCC_SYNCBUSY_CC0 << chan)) {}
+    _tcc_set(_tcc(dev), _chan(dev, channel), value);
 }
 
 void pwm_poweron(pwm_t dev)

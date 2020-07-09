@@ -221,9 +221,14 @@ typedef struct {
  * @brief   Common configuration for timer devices
  */
 typedef struct {
-#ifdef REV_TCC
-    Tcc *dev;                   /**< TCC device to use */
+    union {
+#ifdef REV_TC
+        Tc *tc;                 /**< TC device to use */
 #endif
+#ifdef REV_TCC
+        Tcc *tcc;               /**< TCC device to use */
+#endif
+    } dev;                      /**< The Timer device used for PWM */
 #ifdef MCLK
     volatile uint32_t *mclk;    /**< Pointer to MCLK->APBxMASK.reg */
     uint32_t mclk_mask;         /**< MCLK_APBxMASK bits to enable Timer */
@@ -231,20 +236,20 @@ typedef struct {
     uint32_t pm_mask;           /**< PM_APBCMASK bits to enable Timer */
 #endif
     uint16_t gclk_id;           /**< TCn_GCLK_ID */
-} tcc_cfg_t;
+} tc_tcc_cfg_t;
 
 /**
- * @brief   Static initializer for timer configuration
+ * @brief   Static initializer for TCC timer configuration
  */
 #ifdef MCLK
 #define TCC_CONFIG(tim)                   { \
-        .dev       = tim,                   \
+        .dev.tcc   = tim,                   \
         .mclk      = MCLK_ ## tim,          \
         .mclk_mask = MCLK_ ## tim ## _MASK, \
         .gclk_id   = tim ## _GCLK_ID,     }
 #else
 #define TCC_CONFIG(tim)                   { \
-        .dev       = tim,                   \
+        .dev.tcc   = tim,                   \
         .pm_mask   = PM_APBCMASK_ ## tim,   \
         .gclk_id   = tim ## _GCLK_ID,     }
 #endif
@@ -262,7 +267,7 @@ typedef struct {
  * @brief   PWM device configuration data structure
  */
 typedef struct {
-    tcc_cfg_t tim;                  /**< timer configuration */
+    tc_tcc_cfg_t tim;               /**< timer configuration */
     const pwm_conf_chan_t *chan;    /**< channel configuration */
     uint8_t chan_numof;             /**< number of channels */
     uint8_t gclk_src;               /**< GCLK source which clocks TIMER */
