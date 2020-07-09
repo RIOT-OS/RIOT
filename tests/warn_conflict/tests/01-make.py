@@ -7,6 +7,7 @@ from traceback import print_tb
 import pexpect
 
 BOARD = os.getenv('BOARD', 'stm32f4discovery')
+MAKE = os.environ.get('MAKE', 'make')
 
 
 def testfunc():
@@ -20,7 +21,7 @@ def testfunc():
         if exc.errno == os.errno.ENOENT:
             print("ABORTING TEST: {} seems to be missing.\n".format(cross_gcc))
     else:
-        child = pexpect.spawnu(['make'], env=os.environ)
+        child = pexpect.spawnu([MAKE], env=os.environ)
         child.logfile = sys.stdout
 
         try:

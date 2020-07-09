@@ -18,6 +18,8 @@ import socket
 
 DEFAULT_TIMEOUT = 5
 
+MAKE = os.environ.get('MAKE', 'make')
+
 
 class Strategy(object):
     def __init__(self, func=None):
@@ -47,7 +49,7 @@ class BoardStrategy(Strategy):
         if env is not None:
             env.update(env)
         env.update(self.board.to_env())
-        cmd = ("make", "-C", application) + make_targets
+        cmd = (MAKE, "-C", application) + make_targets
         print(' '.join(cmd))
         print(subprocess.check_output(cmd, env=env))
 
@@ -165,7 +167,7 @@ def default_test_case(board_group, application, env=None):
         if env is not None:
             env.update(env)
         env.update(board.to_env())
-        with pexpect.spawnu("make", ["-C", application, "term"], env=env,
+        with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env,
                             timeout=DEFAULT_TIMEOUT,
                             logfile=sys.stdout) as spawn:
             spawn.expect("TEST: SUCCESS")
@@ -201,9 +203,9 @@ def test_ipv6_send(board_group, application, env=None):
     if env is not None:
         env_receiver.update(env)
     env_receiver.update(board_group.boards[1].to_env())
-    with pexpect.spawnu("make", ["-C", application, "term"], env=env_sender,
+    with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_sender,
                         timeout=DEFAULT_TIMEOUT) as sender, \
-        pexpect.spawnu("make", ["-C", application, "term"], env=env_receiver,
+        pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_receiver,
                        timeout=DEFAULT_TIMEOUT) as receiver:
         ipprot = random.randint(0x00, 0xff)
         receiver_ip = get_ipv6_address(receiver)
@@ -225,9 +227,9 @@ def test_udpv6_send(board_group, application, env=None):
     if env is not None:
         env_receiver.update(env)
     env_receiver.update(board_group.boards[1].to_env())
-    with pexpect.spawnu("make", ["-C", application, "term"], env=env_sender,
+    with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_sender,
                         timeout=DEFAULT_TIMEOUT) as sender, \
-        pexpect.spawnu("make", ["-C", application, "term"], env=env_receiver,
+        pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_receiver,
                        timeout=DEFAULT_TIMEOUT) as receiver:
         port = random.randint(0x0000, 0xffff)
         receiver_ip = get_ipv6_address(receiver)
@@ -250,9 +252,9 @@ def test_tcpv6_send(board_group, application, env=None):
     if env is not None:
         env_server.update(env)
     env_server.update(board_group.boards[1].to_env())
-    with pexpect.spawnu("make", ["-C", application, "term"], env=env_client,
+    with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_client,
                         timeout=DEFAULT_TIMEOUT) as client, \
-        pexpect.spawnu("make", ["-C", application, "term"], env=env_server,
+        pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_server,
                        timeout=DEFAULT_TIMEOUT) as server:
         port = random.randint(0x0000, 0xffff)
         server_ip = get_ipv6_address(server)
@@ -284,9 +286,9 @@ def test_tcpv6_multiconnect(board_group, application, env=None):
     if env is not None:
         env_server.update(env)
     env_server.update(board_group.boards[1].to_env())
-    with pexpect.spawnu("make", ["-C", application, "term"], env=env_client,
+    with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_client,
                         timeout=DEFAULT_TIMEOUT) as client, \
-        pexpect.spawnu("make", ["-C", application, "term"], env=env_server,
+        pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_server,
                        timeout=DEFAULT_TIMEOUT) as server:
         port = random.randint(0x0000, 0xffff)
         server_ip = get_ipv6_address(server)
@@ -327,9 +329,9 @@ def test_triple_send(board_group, application, env=None):
     if env is not None:
         env_receiver.update(env)
     env_receiver.update(board_group.boards[1].to_env())
-    with pexpect.spawnu("make", ["-C", application, "term"], env=env_sender,
+    with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_sender,
                         timeout=DEFAULT_TIMEOUT) as sender, \
-        pexpect.spawnu("make", ["-C", application, "term"], env=env_receiver,
+        pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_receiver,
                        timeout=DEFAULT_TIMEOUT) as receiver:
         udp_port = random.randint(0x0000, 0xffff)
         tcp_port = random.randint(0x0000, 0xffff)

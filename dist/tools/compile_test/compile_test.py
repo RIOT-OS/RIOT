@@ -38,6 +38,9 @@ except ImportError:
 from itertools import tee
 
 
+MAKE = environ.get("MAKE", "make")
+
+
 class Termcolor:
     red = '\033[1;31m'
     green = '\033[1;32m'
@@ -90,7 +93,7 @@ def get_results_and_output_from(fd):
 
 
 def get_app_dirs():
-    return check_output(["make", "-f", "makefiles/app_dirs.inc.mk", "info-applications"]) \
+    return check_output([MAKE, "-f", "makefiles/app_dirs.inc.mk", "info-applications"]) \
             .decode("utf-8", errors="ignore")\
             .split()
 
@@ -130,7 +133,7 @@ def build_all():
             stdout.flush()
             try:
                 app_dir = join(riotbase, folder, application)
-                subprocess = Popen(('make', 'buildtest'),
+                subprocess = Popen((MAKE, 'buildtest'),
                                    bufsize=1, stdin=null, stdout=PIPE, stderr=null,
                                    cwd=app_dir,
                                    env=subprocess_env)
