@@ -40,6 +40,19 @@
 
 #endif
 
+/**
+ * The vendor file is weird here. nRF52805 is the only other MCU
+ * that has only 1 SPI and separate 1 TWI interface, but define
+ * SPIM_COUNT = 2, which is in line with how it is used here.
+ * nRF52810 has the same set of SPI/TWI peripherals, but defines
+ * SPIM_COUNT = 1 which is more logical.
+ * Just re-define it to work around this inconsistency.
+ */
+#ifdef CPU_MODEL_NRF52810XXAA
+#undef SPIM_COUNT
+#define SPIM_COUNT 2
+#endif
+
 static spi_twi_irq_cb_t _irq[SPIM_COUNT];
 static void *_irq_arg[SPIM_COUNT];
 
