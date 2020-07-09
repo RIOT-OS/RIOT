@@ -15,6 +15,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    atmega256rfr2-xpro \
                    atmega328p \
                    avr-rss2 \
+                   avsextrem \
                    b-l072z-lrwan1 \
                    b-l475e-iot01a \
                    blackpill \
@@ -61,11 +62,13 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    lsn50 \
                    maple-mini \
                    mbed_lpc1768 \
+                   mcb2388 \
                    mega-xplained \
                    microbit \
                    microduino-corerf \
                    msb-430 \
                    msb-430h \
+                   msba2 \
                    msbiot \
                    mulle \
                    native \
