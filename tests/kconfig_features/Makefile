@@ -4,6 +4,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    acd52832 \
                    adafruit-clue \
                    airfy-beacon \
+                   arduino-due \
                    arduino-duemilanove \
                    arduino-leonardo \
                    arduino-mega2560 \
@@ -156,6 +157,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    telosb \
                    thingy52 \
                    ublox-c030-u201 \
+                   udoo \
                    usb-kw41z \
                    waspmote-pro \
                    weact-f411ce \
