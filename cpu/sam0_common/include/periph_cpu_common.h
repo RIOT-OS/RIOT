@@ -217,6 +217,11 @@ typedef struct {
     uint8_t gclk_src;       /**< GCLK source which supplys SERCOM */
 } uart_conf_t;
 
+enum {
+    TIMER_TYPE_TC,          /**< Timer is a TC timer  */
+    TIMER_TYPE_TCC,         /**< Timer is a TCC timer */
+};
+
 /**
  * @brief   Common configuration for timer devices
  */
@@ -236,22 +241,43 @@ typedef struct {
     uint32_t pm_mask;           /**< PM_APBCMASK bits to enable Timer */
 #endif
     uint16_t gclk_id;           /**< TCn_GCLK_ID */
+    uint8_t type;               /**< Timer type (TC/TCC) */
 } tc_tcc_cfg_t;
+
+/**
+ * @brief   Static initializer for TC timer configuration
+ */
+#ifdef MCLK
+#define TC_CONFIG(tim)                    { \
+        .dev       = {.tc = tim},           \
+        .mclk      = MCLK_ ## tim,          \
+        .mclk_mask = MCLK_ ## tim ## _MASK, \
+        .gclk_id   = tim ## _GCLK_ID,       \
+        .type      = TIMER_TYPE_TC,       }
+#else
+#define TC_CONFIG(tim)                    { \
+        .dev       = {.tc = tim},           \
+        .pm_mask   = PM_APBCMASK_ ## tim,   \
+        .gclk_id   = tim ## _GCLK_ID,       \
+        .type      = TIMER_TYPE_TC,       }
+#endif
 
 /**
  * @brief   Static initializer for TCC timer configuration
  */
 #ifdef MCLK
 #define TCC_CONFIG(tim)                   { \
-        .dev.tcc   = tim,                   \
+        .dev       = {.tcc = tim},          \
         .mclk      = MCLK_ ## tim,          \
         .mclk_mask = MCLK_ ## tim ## _MASK, \
-        .gclk_id   = tim ## _GCLK_ID,     }
+        .gclk_id   = tim ## _GCLK_ID,       \
+        .type      = TIMER_TYPE_TCC,      }
 #else
 #define TCC_CONFIG(tim)                   { \
-        .dev.tcc   = tim,                   \
+        .dev       = {.tcc = tim},          \
         .pm_mask   = PM_APBCMASK_ ## tim,   \
-        .gclk_id   = tim ## _GCLK_ID,     }
+        .gclk_id   = tim ## _GCLK_ID,       \
+        .type      = TIMER_TYPE_TCC,      }
 #endif
 
 /**
