@@ -35,11 +35,17 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup net_credman_conf (D)TLS Credential Manager compile configurations
+ * @ingroup config
+ * @{
+ */
+/**
  * @brief Maximum number of credentials in credential pool
  */
 #ifndef CONFIG_CREDMAN_MAX_CREDENTIALS
 #define CONFIG_CREDMAN_MAX_CREDENTIALS  (2)
 #endif
+/** @} */
 
 /**
  * @brief Buffer of the credential
