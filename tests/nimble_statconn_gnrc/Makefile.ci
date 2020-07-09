@@ -1,0 +1,3 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    e104-bt5010a-tb \
+    #

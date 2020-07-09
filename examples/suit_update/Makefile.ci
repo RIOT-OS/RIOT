@@ -5,6 +5,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     b-l072z-lrwan1 \
+    e104-bt5010a-tb \
     lsn50 \
     msb-430 \
     msb-430h \

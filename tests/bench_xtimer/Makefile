@@ -22,6 +22,7 @@ LOW_MEMORY_BOARDS += \
   cc1352-launchpad \
   cc2650-launchpad \
   cc2650stk \
+  e104-bt5010a-tb \
   derfmega128 \
   feather-m0 \
   feather-m0-wifi \
