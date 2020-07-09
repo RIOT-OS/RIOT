@@ -88,11 +88,6 @@ config HAS_CPU_CORE_CORTEXM
     help
         Indicates that the current CPU has an ARM Cortex-M core.
 
-config HAS_ARCH_ARM
-    bool
-    help
-        Indicates that the current architecture is ARM.
-
 config HAS_CORTEXM_FPU
     bool
     help
