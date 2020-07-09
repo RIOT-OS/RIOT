@@ -63,6 +63,12 @@ ifeq ($(strip $(ASSMSRC))$(NO_AUTO_SRC),)
   ASSMSRC := $(wildcard *.S)
 endif
 
+ifneq (,$(SRCXX))
+  ifeq (,$(filter cpp,$(FEATURES_USED)))
+    $(error Found C++ source, but feature "cpp" is not used. Add "FEATURES_REQUIRED += cpp")
+  endif
+endif
+
 # include makefile snippets for packages in $(USEPKG) that modify GENSRC:
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.gensrc)
 
