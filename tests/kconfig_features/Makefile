@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
-BOARD_WHITELIST += acd52832 \
+BOARD_WHITELIST += 6lowpan-clicker \
+                   acd52832 \
                    adafruit-clue \
                    airfy-beacon \
                    arduino-duemilanove \
@@ -122,6 +123,7 @@ BOARD_WHITELIST += acd52832 \
                    particle-xenon \
                    pba-d-01-kw2x \
                    phynode-kw41z \
+                   pic32-wifire \
                    pinetime \
                    pyboard \
                    reel \
