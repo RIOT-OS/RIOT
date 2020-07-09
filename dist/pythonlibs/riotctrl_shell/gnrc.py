@@ -22,9 +22,18 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
     def _add_reply(res, reply):
         reply["seq"] = int(reply["seq"])
         reply["ttl"] = int(reply["ttl"])
-        reply["rtt"] = float(reply["rtt"])
+        if reply.get("rtt") is not None:
+            reply["rtt"] = float(reply["rtt"])
+        else:
+            reply.pop("rtt", None)
+        if reply.get("dup"):
+            reply["dup"] = True
+        else:
+            reply.pop("dup", None)
         if reply.get("rssi") is not None:
             reply["rssi"] = int(reply["rssi"])
+        else:
+            reply.pop("rssi", None)
         if "replies" in res:
             res["replies"].append(reply)
         else:
@@ -35,6 +44,10 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
         stats["packet_loss"] = int(stats["packet_loss"])
         stats["rx"] = int(stats["rx"])
         stats["tx"] = int(stats["tx"])
+        if stats.get("dup") is not None:
+            stats["dup"] = int(stats["dup"])
+        else:
+            stats.pop("dup")
         res["stats"] = stats
 
     @staticmethod
@@ -94,11 +107,13 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
         """
         res = {}
         c_reply = re.compile(r"\d+ bytes from (?P<source>[0-9a-f:]+(%\S+)?): "
-                             r"icmp_seq=(?P<seq>\d+) ttl=(?P<ttl>\d+) "
-                             r"(rssi=(?P<rssi>-?\d+) dBm )?"
-                             r"time=(?P<rtt>\d+.\d+) ms")
+                             r"icmp_seq=(?P<seq>\d+) ttl=(?P<ttl>\d+)"
+                             r"( rssi=(?P<rssi>-?\d+) dBm)?"
+                             r"( time=(?P<rtt>\d+.\d+) ms)?"
+                             r"(?P<dup> \(DUP\))?")
         c_stats = re.compile(r"(?P<tx>\d+) packets transmitted, "
                              r"(?P<rx>\d+) packets received, "
+                             r"((?P<dup>\d+) duplicates, )?"
                              r"(?P<packet_loss>\d+)% packet loss")
         c_rtts = re.compile(r"round-trip min/avg/max = (?P<min>\d+.\d+)/"
                             r"(?P<avg>\d+.\d+)/(?P<max>\d+.\d+) ms")
@@ -116,9 +131,7 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
                 m = c_rtts.match(line)
                 if m is not None:
                     self._set_rtts(res, m.groupdict())
-                    return res
-        # Unable to parse RTTs, so something went wrong.
-        return None
+        return res
 
 
 class GNRCPktbufStatsResults(dict):
