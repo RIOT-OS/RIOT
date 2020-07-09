@@ -43,9 +43,9 @@
 
 /* Delay to give time to the remote peer to do the compute (client only). */
 #ifdef CONFIG_DTLS_ECC
-#define DEFAULT_US_DELAY 10000000
+#define DEFAULT_US_DELAY    (20 * US_PER_SEC)
 #else
-#define DEFAULT_US_DELAY 100
+#define DEFAULT_US_DELAY    (1 * US_PER_SEC)
 #endif
 
 static int dtls_connected = 0; /* This is handled by Tinydtls callbacks */
@@ -108,7 +108,7 @@ static int dtls_handle_read(dtls_context_t *ctx)
     }
 
     ssize_t res = sock_udp_recv(sock, packet_rcvd, sizeof(packet_rcvd),
-                                1 * US_PER_SEC + DEFAULT_US_DELAY, &remote);
+                                DEFAULT_US_DELAY, &remote);
 
     if (res <= 0) {
         if ((ENABLE_DEBUG) && (res != -EAGAIN) && (res != -ETIMEDOUT)) {
@@ -454,6 +454,11 @@ static void client_send(char *addr_str, char *data)
         }
         watch--;
     } /* END while */
+
+    /* check if we failed to send */
+    if ((app_data_buf != 0)) {
+        printf("Failed to send the data\n");
+    }
 
     /*
      * BUG: tinyDTLS (<= 0.8.6)
