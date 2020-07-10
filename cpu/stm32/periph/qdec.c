@@ -115,13 +115,10 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
     isr_ctx[qdec].arg = arg;
 
     /* Enable the qdec's interrupt only if there is a callback provided */
-    if (cb)
-    {
+    if (cb) {
         NVIC_EnableIRQ(qdec_config[qdec].irqn);
         dev(qdec)->DIER |= TIM_DIER_UIE;
-    }
-    else
-    {
+    } else {
         dev(qdec)->DIER &= ~TIM_DIER_UIE;
     }
 
