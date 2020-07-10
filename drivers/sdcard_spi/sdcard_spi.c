@@ -43,6 +43,12 @@ static sd_rw_response_t _read_csd(sdcard_spi_t *card);
 static sd_rw_response_t _read_data_packet(sdcard_spi_t *card, uint8_t token, uint8_t *data, int size);
 static sd_rw_response_t _write_data_packet(sdcard_spi_t *card, uint8_t token, const uint8_t *data, int size);
 
+/* number of used sd cards */
+#define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
+
+/* Allocate memory for the device descriptors */
+sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
+
 /* CRC-7 (polynomial: x^7 + x^3 + 1) LSB of CRC-7 in a 8-bit variable is always 1*/
 static uint8_t _crc_7(const uint8_t *data, int n);
 
