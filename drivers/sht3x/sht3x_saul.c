@@ -51,7 +51,7 @@ static unsigned _dev2index (const sht3x_dev_t *dev)
     return SHT3X_NUM;
 }
 
-static int read(int dev)
+static int _read(int dev)
 {
     /* read both sensor values */
     unsigned res = sht3x_read(&sht3x_devs[dev], &_temp[dev], &_hum[dev]);
@@ -74,7 +74,7 @@ static int read_temp(const void *dev, phydat_t *data)
     }
 
     /* either local variable is valid or fetching it was successful */
-    if (_temp_valid[dev_index] || read(dev_index) == SHT3X_OK) {
+    if (_temp_valid[dev_index] || _read(dev_index) == SHT3X_OK) {
         /* mark local variable as invalid */
         _temp_valid[dev_index] = false;
 
@@ -96,7 +96,7 @@ static int read_hum(const void *dev, phydat_t *data)
     }
 
     /* either local variable is valid or fetching it was successful */
-    if (_hum_valid[dev_index] || read(dev_index) == SHT3X_OK) {
+    if (_hum_valid[dev_index] || _read(dev_index) == SHT3X_OK) {
         /* mark local variable as invalid */
         _hum_valid[dev_index] = false;
 
