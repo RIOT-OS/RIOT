@@ -154,6 +154,9 @@ void random_init_by_array(uint32_t init_key[], int key_length)
 
     /* copy seeded SHA1 state to PRNG state */
     memcpy(prng_state, &ctx.state, STATE_SIZE);
+
+    /* reset position indicator */
+    datapos = STATE_SIZE;
 }
 
 void random_init(uint32_t seed)
