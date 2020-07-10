@@ -392,7 +392,7 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
                 res = ETHERNET_ADDR_LEN;
             }
             break;
-        case NETOPT_LINK_CONNECTED:
+        case NETOPT_LINK:
             {
                 encx24j600_t * encdev = (encx24j600_t *) dev;
                 lock(encdev);

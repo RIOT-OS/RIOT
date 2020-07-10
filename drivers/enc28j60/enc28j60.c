@@ -505,7 +505,7 @@ static int nd_get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             assert(max_len >= ETHERNET_ADDR_LEN);
             mac_get(dev, (uint8_t *)value);
             return ETHERNET_ADDR_LEN;
-        case NETOPT_LINK_CONNECTED:
+        case NETOPT_LINK:
             if (cmd_r_phy(dev, REG_PHY_PHSTAT2) & PHSTAT2_LSTAT) {
                 *((netopt_enable_t *)value) = NETOPT_ENABLE;
             }
