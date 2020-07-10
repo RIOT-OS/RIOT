@@ -152,8 +152,8 @@ void random_init_by_array(uint32_t init_key[], int key_length)
     _shax_update(&ctx, init_key, key_length);
     _shax_final(&ctx, digestdata);
 
-    /* copy seeded SHA1 state to PRNG state */
-    memcpy(prng_state, &ctx.state, STATE_SIZE);
+    /* copy SHA digestdata to PRNG state */
+    memcpy(prng_state, digestdata, STATE_SIZE);
 
     /* reset position indicator */
     datapos = STATE_SIZE;
