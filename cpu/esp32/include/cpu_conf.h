@@ -51,6 +51,11 @@ extern "C" {
  */
 #define PRINTF_BUFSIZ 256
 
+/**
+ * @brief   Remaining parts of the various DRAM sections can be used as heap.
+ */
+#define NUM_HEAPS (4)
+
 #ifdef __cplusplus
 }
 #endif
