@@ -188,7 +188,7 @@ static int enable_int(int argc, char **argv)
 }
 #endif
 
-static int read(int argc, char **argv)
+static int cmd_read(int argc, char **argv)
 {
     int port, pin;
 
@@ -210,7 +210,7 @@ static int read(int argc, char **argv)
     return 0;
 }
 
-static int set(int argc, char **argv)
+static int cmd_set(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
@@ -222,7 +222,7 @@ static int set(int argc, char **argv)
     return 0;
 }
 
-static int clear(int argc, char **argv)
+static int cmd_clear(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
@@ -234,7 +234,7 @@ static int clear(int argc, char **argv)
     return 0;
 }
 
-static int toggle(int argc, char **argv)
+static int cmd_toggle(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
@@ -281,10 +281,10 @@ static const shell_command_t shell_commands[] = {
     { "init_int", "init as external INT w/o pull resistor", init_int },
     { "enable_int", "enable or disable gpio interrupt", enable_int },
 #endif
-    { "read", "read pin status", read },
-    { "set", "set pin to HIGH", set },
-    { "clear", "set pin to LOW", clear },
-    { "toggle", "toggle pin", toggle },
+    { "read", "read pin status", cmd_read },
+    { "set", "set pin to HIGH", cmd_set },
+    { "clear", "set pin to LOW", cmd_clear },
+    { "toggle", "toggle pin", cmd_toggle },
     { "bench", "run a set of predefined benchmarks", bench },
     { NULL, NULL, NULL }
 };
