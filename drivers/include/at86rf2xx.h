@@ -389,7 +389,7 @@ uint8_t at86rf2xx_get_phy_mode(at86rf2xx_t *dev);
  *
  * @param[in] dev           device to read from
  *
- * @return                  the currenty set rate mode
+ * @return                  the currently set rate mode
  */
 uint8_t at86rf2xx_get_rate(at86rf2xx_t *dev);
 
