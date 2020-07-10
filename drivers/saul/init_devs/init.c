@@ -139,6 +139,10 @@ void saul_init_devs(void)
         extern void auto_init_l3g4200d(void);
         auto_init_l3g4200d();
     }
+    if (IS_USED(MODULE_L3GD20H)) {
+        extern void auto_init_l3gd20h(void);
+        auto_init_l3gd20h();
+    }
     if (IS_USED(MODULE_LIS2DH12)) {
         extern void auto_init_lis2dh12(void);
         auto_init_lis2dh12();

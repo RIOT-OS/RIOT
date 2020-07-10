@@ -186,6 +186,11 @@ PSEUDOMODULES += ina220
 # include variants of mrf24j40 drivers as pseudo modules
 PSEUDOMODULES += mrf24j40m%
 
+# include variants of L3GD20H driver as pseudo modules
+PSEUDOMODULES += l3gd20h_i2c
+PSEUDOMODULES += l3gd20h_spi
+PSEUDOMODULES += l3gd20h_full
+
 # include variants of SX127X drivers as pseudo modules
 PSEUDOMODULES += sx1272
 PSEUDOMODULES += sx1276

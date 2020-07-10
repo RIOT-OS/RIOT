@@ -1,0 +1,754 @@
+/**
+@defgroup    drivers_l3gd20h L3GD20H 3-axis gyroscope
+@ingroup     drivers_sensors
+@ingroup     drivers_saul
+@brief       Device Driver for ST L3GD20H 3-axis digital output gyroscope
+
+# Driver for the L3GD20H 3-axis digital output gyroscope
+
+The driver is for the usage with [RIOT-OS](https://github.com/RIOT-OS/RIOT).
+Although it is written for ST L3GD20H, it should also works also with
+L3GD20 and L3G4200D.
+
+## <a name="toc"> Table of contets </a>
+
+1. [Overview](#overview)
+    1. [About the sensor](#about)
+    2. [Supported features](#supported)
+2. [Measurement Process](#measurement_process)
+    1. [Sensor modes](#sensor_modes)
+    2. [Output Data Rates and Filters](#odr_filters)
+3. [Measurement results](#measurement_results)
+    1. [Output data format](#output_data)
+    2. [Fetching output data](#fetching_data)
+    3. [Filters](#filters)
+    4. [FIFO](#fifo)
+4. [Interrupts](#interrupts)
+    1. [Data interrupts (data ready and FIFO status)](#data_interrupt)
+    2. [Event interrupts (Axes movement and wake up)](#event_interrupt)
+    3. [Interrupt signal properties](#interrupt_signal)
+5. [Low level functions](#low_level)
+6. [Power Saving](#power_saving)
+7. [Error Handling](#error_handling)
+8. [Configuration](#configuration)
+    1. [Hardware Configurations](#hardware_configuration)
+    2. [Driver Configuration Parameters](#driver_configuration)
+
+### <a name="overview"> Overview </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+### <a name="about"> About the sensor </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+L3GD20H is a low-power **3-axis angular rate sensor** connected to **I2C**
+ or **SPI** with a full scale of up to **2000 dps**. It supports different
+ measuring rates with a user selectable bandwidth.
+
+**Main features** of the sensor are:
+
+- 3 selectable full scales of ±245, ±500, and ±2000 dps
+- 7 measuring rates from 12.5 Hz to 800 Hz with 4 bandwidths
+- 16 bit angular rate value data output
+- 8 bit temperature data output
+- 2 dedicated interrupt signals for data and event interrupts
+- integrated high-pass filters with 3 modes and 10 different cut off frequencies
+- embedded temperature sensor
+- embedded 32 levels of 16 bit data output FIFO
+- I2C and SPI digital output interface
+- embedded power-down and sleep mode with fast turn-on and wake-up
+
+### <a name="supported"> Supported Features </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+There are different variations of the driver by which the commication
+interface (I2C or SPI) and the supported features are selected.
+
+1. **l3gd20h** is the basic module with small size, which offers only very
+   basic functions such as initializing the sensor and reading data through
+   polling and the SAUL interface.
+2. **l3gd20h_full** module provides additional features like filtering,
+   interrupts, event detection, and FIFO handling.
+3. **l3gd20h_i2c** module realizes the I2C interface of the L3GD20H device.
+4. **l3gd20h_spi** module realizes the SPI interface of the L3GD20H device.
+
+The following table gives an overview which modules have to be used to activate
+L3GD20H features.
+
+Feature | Module
+------- | ------
+Full scales of ±245, ±500, and ±2000 dps                    | **l3gd20h**
+Measuring rates from 12.5 Hz to 800 Hz with 4 bandwidths    | **l3gd20h**
+16 bit angular rate value data output                       | **l3gd20h**
+Data-ready check functionality                              | **l3gd20h**
+Power-down / power-up and sleep functionality               | **l3gd20h**
+SAUL sensor interface                                       | **l3gd20h**
+High-pass filter and low-pass filter configuration          | **l3gd20h_full**
+Data-ready interrupt                                        | **l3gd20h_full**
+Event detection interrupt                                   | **l3gd20h_full**
+FIFO handling with interrupt generation                     | **l3gd20h_full**
+I2C interface                                               | **l3gd20h_i2c**
+SPI interface                                               | **l3gd20h_spi**
+
+@note
+- Modules **l3gd20h_full**, **l3gd20h_i2c** and **l3gd20h_spi** include
+  module **l3gd20h** automatically.
+- Modules **l3gd20h_i2c** and **l3gd20h_spi** must not be used at the
+  same time.
+- Module **l3gd20h_i2c** is used as default if module **l3gd20h_spi**
+  is not specified.
+
+## <a name="measurement_process"> Measurement Process </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+### <a name="sensor_modes"> Sensor modes </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+L3GD20H provides different operating modes.
+
+- **Power Down mode** is configured automatically after power up boot
+  sequence. In this mode, all gyros are switched off. Therefore, it takes
+  up to 100 ms to switch to another mode.
+
+- **Normal mode** is the normal measurement mode. All gyros are switched on
+  and at least one axis is enabled for measurements. Measurements are
+  performed at a defined output data rate (**ODR**).
+
+- **Sleep mode** is the normal mode when no axis is enabled for
+  measurement. In this modes, all gyros are kept switched on. Therefore,
+  it only takes 1/ODR to switch to normal mode if low pass filtering is
+  disabled or 6/ODR if low pass filtering is enabled.
+
+### <a name="odr_filters"> Output Data Rates and Filters </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+In normal mode, measurements are performed at a defined output rate (ODR)
+with a user selectable bandwidth. The L3GD20H integrates a combination
+of two low pass filters (LPF) and one high pass filter (HPF).
+
+```
+                      +------------------------------->   L3GD20H_NO_FILTER
+                      |                  +----- +
+                      +----------------->|      |----->   L3GD20H_LPF2_ONLY
+                      |                  | LPF2 |
++-----+    +------+   |   +-----+   +--->|      |----->   L3GD20H_HPF_AND_LPF2
+|     |    |      |   |   |     |   |    +------+
+| ADC |--->| LPF1 |---+-->| HPF |---+----------------->   L3GD20H_HPF_ONLY
+|     |    |      |       |     |
++-----+    +------+       +-----+
+```
+
+First, raw sensor data are always filtered by LPF1 at a cutoff frequency
+which is fixed for the selected output data rate (ODR), see #l3gd20h_mode_t.
+The resulting data can then optionally be filtered by HPF and LPF2. Both
+filters can be used or bypassed. The figure above shows possible filter
+combinations and the driver symbols defined by #l3gd20h_filter_sel_t that
+are used with function #l3gd20h_select_output_filter to select a certain
+data path through the filters.
+
+The cutoff frequency of LPF2 is determined by used sensor operation
+mode #l3gd20h_mode_t, while the cutoff frequency of HPF is set with
+function #l3gd20h_config_hpf.
+
+Following output data rates (ODR) are supported with selectable bandwith of
+LPF2.
+
+Mode    | ODR [Hz] | LPF1 cutoff [Hz] | LPF2 cutoff [Hz] | Driver symbol
+------- |:--------:|:----------------:|:----------------:|:-------------
+Normal  | 100      | 32               | 12.5             | #L3GD20H_MODE_100_12
+Normal  | 100      | 32               | 25               | #L3GD20H_MODE_100_25
+Normal  | 200      | 63.3             | 12.5             | #L3GD20H_MODE_200_12
+Normal  | 200      | 63.3             | -                | #L3GD20H_MODE_200
+Normal  | 200      | 63.3             | 70               | #L3GD20H_MODE_200_70
+Normal  | 400      | 128              | 20               | #L3GD20H_MODE_400_20
+Normal  | 400      | 128              | 25               | #L3GD20H_MODE_400_25
+Normal  | 400      | 128              | 50               | #L3GD20H_MODE_400_50
+Normal  | 400      | 128              | 110              | #L3GD20H_MODE_400_110
+Normal  | 400      | 211              | 30               | #L3GD20H_MODE_800_30
+Normal  | 400      | 211              | 35               | #L3GD20H_MODE_800_35
+Normal  | 400      | 211              | -                | #L3GD20H_MODE_800
+Normal  | 400      | 211              | 100              | #L3GD20H_MODE_800_100
+Low ODR | 12.5     | 3.9              | -                | #L3GD20H_MODE_12
+Low ODR | 25       | 7.8              | -                | #L3GD20H_MODE_25
+Low ODR | 50       | 16               | 16.6             | #L3GD20H_MODE_50_16
+Power Down | -     | -                | -                | #L3GD20H_MODE_POWER_DOWN
+
+Output data rates (ODR) of less than 100 Hz are called Low Data Rates.
+
+The **easiest way to use the sensor** is simply to initialize it with
+function #l3gd20h_init# and the default driver configuration parameter
+set to start measurements
+
+```
+...
+static l3gd20h_t dev;
+...
+if (l3gd20h_init(&dev, &l3gd20h_params[0]) != L3DG20H_OK) {
+    ... /* error handling */
+}
+...
+
+```
+The default configuration parameters define the used communication
+interface, the sensor operation mode, and the full scale. After this
+initialization, the sensor is operational and data can be fetched either
+by polling or interrupt driven.
+
+@note Function #l3gd20h_init resets the sensor completely. All registers
+are reset to default values and the embedded FIFO is cleared.
+
+## <a name="measurement_results"> Measurement results </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+### <a name="output_data"> Output data format </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+In normal mode, sensor determines periodically the angular rate for all
+axes that are enabled for measurement and produces output data with the
+selected output data rate (ODR).
+
+Function #l3gd20h_data_ready or the data ready interrupt (see below)
+can be used to determine when new data are available.
+
+Raw **output data** (**raw data**) are given as 16-bit signed integer
+values in 2’s complement representation. The range and the resolution
+of these data depend on the sensitivity of the sensor which is selected
+by the **full scale** value. The L3GD20H allows to select the following
+full scales:
+
+Full Scale  | Resolution | Driver symbol
+-----------:|-----------:|:---------------
+±245 dps | 2 mdps  | #L3GD20H_SCALE_245_DPS
+±500 dps | 4 mdps  | #L3GD20H_SCALE_500_DPS
+±2000 dps | 16 mdps | #L3GD20H_SCALE_2000_DPS
+
+By default, a full scale of ±245 dps is used. Function #l3gd20h_set_scale
+can be used to change it.
+
+```
+l3gd20h_set_scale(sensor, L3GD20H_SCALE_500_DPS);
+```
+
+### <a name="fetching_data"> Fetching output data </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+To get the information whether new data are available, the user task can
+either use
+
+- the function #l3gd20h_data_ready to check periodically whether new
+  output data are available, or
+- the data ready interrupt (DRDY) which is thrown as soon as new output
+  data are available (see below).
+
+Last measurement results can then be fetched either
+
+- as raw data using function #l3gd20h_read_raw or
+- as 16 bit integer values in mdps (milli-degrees per second) using
+  function #l3gd20h_read.
+
+It is recommended to use function #l3gd20h_read since it already converts
+measurement results to real values according to the selected full scale.
+
+```
+while (1)
+{
+    l3gd20h_data_t data;
+
+    /* execute task every 10 ms */
+    xtimer_usleep(10 * US_PER_MS);
+    ...
+    /* test for new data and fetch them when available */
+    if (l3gd20h_data_ready (&dev) >  0 &&
+        l3gd20h_read (&dev, &data) == L3GD20H_OK)
+    {
+        /* do something with data */
+        ...
+    }
+}
+```
+
+@note
+The functions #l3gd20h_read and #l3gd20h_read_raw always return the last
+available results. If these functions are called more often than
+measurements are performed, some measurement results are retrieved
+multiple times. If these functions are called too rarely, some measurement
+results will be lost.
+
+### <a name="filters"> Filters </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+L3GD20H provides embedded low-pass as well as high-pass filtering
+capabilities to improve measurement results. It is possible to
+independently apply the filters on the output data and/or on
+the data used for event interrupt generation (selective axis
+movement and wake up, see below) separately. Please refer the
+[datasheet](http://www.st.com/resource/en/datasheet/l3gd20.pdf) or
+[application note](http://www.st.com/resource/en/application_note/dm00119036.pdf)
+for more details.
+
+The filters applied to the output data
+are selected with function #l3gd20h_select_output_filter.
+Following selections are possible:
+
+Driver symbol | Low pass filter (LPF2) used | High pass filter (HPF) used
+:-------------|:---------------------------:|:---------------------:
+ #L3GD20H_NO_FILTER    | - | -
+ #L3GD20H_HPF_ONLY     | x | -
+ #L3GD20H_LPF2_ONLY    | - | x
+ #L3GD20H_HPF_AND_LPF2 | x | x
+
+These filters can also be applied to data used for event interrupt
+generation (selective axis movement and wake up). The filter mode
+is defined by member #l3gd20h_int_event_config_t::filter in the
+settings of interrupt generator configuration, see
+function #l3gd20h_set_int_event_config.
+
+While the cutoff frequency of the low pass filter (LPF2) is fixed and
+depends only on the output data rate (ODR), the mode and the cutoff
+frequency of the high pass filter can be configured using
+function #l3gd20h_config_hpf. Following HPF modes are available:
+
+Driver symbol | HPF mode
+:--------------|:---------
+ #L3GD20H_HPF_NORMAL    | Normal mode
+ #L3GD20H_HPF_REFERENCE | Reference mode
+ #L3GD20H_HPF_AUTORESET | Auto-reset on interrupt
+
+For each output data rate (ODR), 10 different HPF cutoff frequencies
+can be used.
+
+```
+...
+/* select LPF/HPF */
+l3gd20h_select_output_filter(&dev, L3GD20H_HPF_ONLY);
+
+/* configure HPF in normal mode with cutoff frequency 0 */
+l3gd20h_config_hpf(&dev, L3GD20H_HPF_NORMAL, 0);
+
+// reset the reference by a dummy read
+l3gd20h_get_hpf_ref (&dev, &ref);
+...
+```
+
+@note Since same filters are used for the output data as well as the
+data used for event interrupt generation (selective axes movement / wake up),
+the configuration of the filters always affects both data.
+
+
+### <a name="fifo"> FIFO </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+In order to limit the rate at which the host processor has to fetch
+the data, the L3GD20H embeds a first-in first-out buffer (FIFO).
+This is in particular helpful at high output data rates. The FIFO
+buffer can work in seven different modes and is able to store up
+to 32 angular rate samples. Please refer the
+[datasheet](http://www.st.com/resource/en/datasheet/l3gd20.pdf) or
+[application note](http://www.st.com/resource/en/application_note/dm00119036.pdf)
+for more details.
+
+Driver symbol | FIFO mode
+--------------|-------------------------
+#L3GD20H_BYPASS  | Bypass mode (FIFO is not used)
+#L3GD20H_FIFO    | FIFO mode
+#L3GD20H_STREAM  | Stream mode
+#L3GD20H_STREAM_TO_FIFO   | Stream-to-FIFO mode
+#L3GD20H_BYPASS_TO_STREAM | Bypass-to-Stream mode
+#L3GD20H_DYNAMIC_STREAM   | Dynamic Stream mode
+#L3GD20H_BYPASS_TO_FIFO   | Bypass to FIFO mode
+
+The FIFO mode can be set using function #l3gd20h_set_fifo_mode.
+This function takes two parameters, the FIFO mode and a threshold
+value which defines a watermark level. When the FIFO content
+exceeds this level, a watermark flag is set and an interrupt
+can be generated. They can be used to gather a minimum number
+of axes angular rate samples with the sensor before the data
+are fetched as a single read operation from the sensor.
+
+```
+...
+/* clear FIFO */
+l3gd20h_set_fifo_mode (&dev, L3GD20H_BYPASS, 0);
+
+/* activate FIFO mode */
+l3gd20h_set_fifo_mode (&dev, L3GD20H_STREAM, 10);
+...
+```
+
+@note To clear the FIFO at any time, set the FIFO mode to #L3GD20H_BYPASS
+and back to the desired FIFO mode.
+
+To read data from the FIFO, simply use either
+
+- the function #l3gd20h_read_raw_fifo to all get raw output data stored
+  in FIFO or
+- the function #l3gd20h_read_fifo to get all data stored in FIFO
+  and converted to real values in mdps (milli-degrees per second).
+
+Both functions clear the FIFO and return the number of samples read
+from the FIFO.
+
+```
+l3gd20h_data_fifo_t  data;
+
+while (1)
+{
+    /* execute task every 500 ms */
+    xtimer_usleep(500 * US_PER_MS);
+        ...
+    /* test for new data */
+    if (l3gd20h_data_ready (sensor) > 0) {
+
+        /* fetch data from fifo */
+        int num = l3gd20h_read_fifo (dev, data);
+
+        for (int i = 0; i < num; i++) {
+           // do something with data[i] ...
+        }
+}
+```
+
+## <a name="interrupts"> Interrupts </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+The L3GD20H allows to activate interrupts on two dedicated interrupt signals
+
+- for data interrupts (data ready and FIFO status) on
+  signal **DRDY/INT2**, and
+- for event interrupts (axis movement and wake up) on
+  signal **INT1**.
+
+### <a name="data_interrupt"> Data interrupts (data ready and FIFO status) on signal **DRDY/INT2** </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+Interrupts on signal **DRDY/INT2** can be generated by following sources:
+
+Interrupt source                         | Driver symbol
+:----------------------------------------|:-------------
+Output data become ready to read         | #L3GD20H_INT_DATA_READY
+FIFO content exceeds the watermark level | #L3GD20H_INT_FIFO_THRESHOLD
+FIFO is completely filled                | #L3GD20H_INT_FIFO_OVERRUN
+FIFO becomes empty                       | #L3GD20H_INT_FIFO_EMPTY
+
+Each of these interrupt sources can be enabled or disabled separately with
+function #l3gd20h_enable_int. By default all interrupt sources are disabled.
+
+```
+l3gd20h_enable_int(&dev, L3GD20H_INT_DATA_READY, true);
+
+```
+
+Whenever the interrupt signal **DRDY/INT2** is generated,
+function #l3gd20h_get_int_data_source can be used to determine the source
+of the interrupt signal. This function returns a data structure of
+type #l3gd20h_int_data_source_t that contains a boolean member for each
+source that can be tested for true.
+
+```
+void int2_handler (const l3gd20h_t *dev)
+{
+   l3gd20h_int_data_source_t source;
+
+   /* get the interrupt source of INT2 */
+   l3gd20h_get_int_data_source (dev, &source);
+
+   /* in case of data ready interrupt, get the results and do something with them */
+   if (source.data_ready)
+   {
+      l3gd20h_read (dev, &data)
+
+      /* do something with data */
+      ...
+   }
+}
+```
+
+### <a name="event_interrupt"> Event interrupts (Axes movement and wake up) on signal **INT1** </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+This interrupt signal allows to recognize independent rotations of
+the x, y and z axes. For this purpose, a separate threshold can be
+defined for each axis. If activated, the angular rate of each axis
+is compared with its threshold to check whether it is below or above
+the threshold. The results of all activated comparisons are combined
+OR or AND to generate the interrupt signal.
+
+The configuration of the thresholds, the activated comparisons and
+selected AND/OR combination allows to recognize special situations
+like selective axis movement (SA) or axes movement wakeup (WU).
+
+- **Selective axis movement recognition (SA)** means that only one
+  axis is rotating. This is the case if the angular rate of selected
+  axis is above its threshold AND angular rates of all other axes are
+  below their thresholds.
+
+- **Axis movement wake up (WU)** means that the angular rate of any
+  axis is above its threshold (OR).
+
+To configure event interrupts, the function #l3gd20h_set_int_event_config
+has to be used with a parameter of structured data
+type #l3gd20h_int_event_config_t which contains the configuration.
+For example, selective axis movement recognition (SA) for the z-axis
+could be configured as following:
+
+```
+l3gd20h_int_event_config_t int_cfg;
+
+/* thresholds */
+int_cfg.x_threshold = 100;
+int_cfg.y_threshold = 100;
+int_cfg.z_threshold = 1000;
+
+/* x axis below threshold */
+int_cfg.x_low_enabled  = false;
+int_cfg.x_high_enabled = true;
+
+/* y axis below threshold */
+int_cfg.y_low_enabled  = true;
+int_cfg.y_high_enabled = false;
+
+/* z axis below threshold */
+int_cfg.z_low_enabled  = false;
+int_cfg.z_high_enabled = true;
+
+/* AND combination of all conditions */
+int_cfg.and_or = true;
+
+/* further parameters */
+int_cfg.filter = L3GD20H_HPF_ONLY;
+int_cfg.latch = true;
+int_cfg.duration = 0;
+int_cfg.wait = false;
+
+/* set the configuration and enable the interrupt */
+l3gd20h_set_int_cfg (&dev, &int_cfg);
+l3gd20h_enable_int (&dev, L3GD20H_INT_EVENT, true);
+```
+
+Furthermore, with this data structure it is also configured
+
+- whether the interrupt signal should latched until the interrupt
+  source is read,
+- which filters are applied to data used for interrupt generation,
+- which time in 1/ODR an interrupt condition has to be given before
+  the interrupt is generated, and
+- whether this time is also used when interrupt condition in no
+  longer given before interrupt signal is reset.
+
+Function #l3gd20h_enable_int is used to enable or disable the
+event interrupt generation.
+
+As with data ready and FIFO interrupts, function #l3gd20h_get_int_event_source
+can be used to determine the source of the interrupt signal whenever
+it is generated. This function fills a data structure of
+type #l3gd20h_int_event_source_t that contain a boolean member
+for each source that can be tested for true.
+
+```
+void int1_handler ()
+{
+   l3gd20h_int_event_source_t source;
+
+   // get the source of INT1 reset INT1 signal
+   l3gd20h_get_int_event_source (sensor, &source);
+
+   // if all conditions where true interrupt
+   if (source.active)
+   {
+      l3gd20h_read (sensor, &data)
+
+      // do something with data
+      ...
+   }
+}
+```
+@note If the interrupt is configured to be latched, the interrupt signal is
+active until the interrupt source is read. Otherwise the interrupt signal is
+only active as long as the interrupt condition is satisfied.
+
+@note Activating all threshold comparisons and the OR combination is the most
+flexible way, functions like selective axis movement can then be realized
+combining the different interrupt sources. Following example realizes also
+the selective axis movement recognition (SA) for the z-axis.
+
+```
+l3gd20h_int_event_config_t int_cfg;
+
+/* thresholds */
+int_cfg.x_threshold = 100;
+int_cfg.y_threshold = 100;
+int_cfg.z_threshold = 100;
+
+/* x axis */
+int_cfg.x_low_enabled  = true;
+int_cfg.x_high_enabled = true;
+
+/* y axis */
+int_cfg.y_low_enabled  = true;
+int_cfg.y_high_enabled = true;
+
+/* z axis */
+int_cfg.z_low_enabled  = true;
+int_cfg.z_high_enabled = true;
+
+/* OR combination of all conditions */
+int_cfg.and_or = false;
+...
+/* set the configuration and enable the interrupt */
+l3gd20h_set_int_cfg (sensor, &int_cfg);
+l3gd20h_enable_int (sensor, l3gd20h_int_event, true);
+```
+
+```
+void int1_handler (const l3gd20h_t *dev)
+{
+   l3gd20h_int1_source_t source;
+
+   /* get the interrupt source of INT1 */
+   l3gd20h_get_int1_source (&dev, &source);
+
+   /* if all conditions where true interrupt */
+   if (source.y_low && source.y_low && source.z_high)
+   {
+      /* selective axis movement of z-axis */
+      ...
+   }
+}
+```
+
+### <a name="interrupt_signal"> Interrupt signal properties </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+By default, interrupt signals are high active. Using
+function #l3gd20h_config_int_signals#, the level of the interrupt
+signal and the type of the interrupt outputs can be changed.
+
+Driver symbol  | Meaning
+:--------------|:-------
+ #L3GD20H_HIGH | Interrupt signal is high active (default)
+ #L3GD20H_LOW  | Interrupt signal is low active
+
+Driver symbol        | Meaning
+:--------------------|:-------
+ #L3GD20H_PUSH_PULL  | Interrupt output is pushed/pulled
+ #L3GD20H_OPEN_DRAIN | Interrupt output is open-drain
+
+## <a name="low_level"> Low level functions </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+The L3GD20H is a very complex and flexible sensor with a lot of
+features. It can be used for a big number of different use cases.
+Since it is quite impossible to implement a high level interface
+which is generic enough to cover all the functionality of the sensor
+for all different use cases, there are two low level interface
+functions that allow direct read and write access to the registers of the sensor.
+
+```
+bool l3gd20h_reg_read  (l3gd20h_sensor_t* dev, uint8_t reg, uint8_t *data, uint16_t len);
+bool l3gd20h_reg_write (l3gd20h_sensor_t* dev, uint8_t reg, uint8_t *data, uint16_t len);
+```
+@note
+These functions should only be used to do something special that
+is not covered by the high level interface AND if you exactly
+know what you do and what it might affect. Please be aware that
+it might affect the high level interface.
+
+## <a name="power_saving"> Power Saving </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+The L3G20H offers two modes for power saving:
+
+- **Power-down** down mode
+- **Sleep** mode
+
+While in power-down mode almost all internal blocks of the device, including
+the gyros, are switched off, only the measurement functions for all three axes
+are deactivated in sleep mode. Therefore, the time to continue measurements
+after sleep mode is drastically shorter than after power down.
+
+Starting mode | Target mode | Turn-on time typical
+------------- | ----------- | --------------------
+Power-down    | Normal      | 100 ms
+Power-down    | Sleep       | 100 ms
+Sleep         | Normal      | 1/ODR when LPF2 disabled <br> 6/ODR when LPF2 enabled
+
+With the function #l3gd20h_power_down the L3G20H can be powered down, when
+no measurements are required. The current reduced to some uA in power
+down mode. To re-enable the L3G20H in the previous measurement mode,
+the #l3gd20h_power_up function can be used.
+
+The sleep mode can be activated with the function #l3gd20h_sleep. The
+current is reduced from 4.8 mA to 2.4 mA and thus to half.
+The #l3gd20h_wake_up function continues the measurement in
+the previous operation mode.
+
+## <a name="error_handling"> Error Handling </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+All driver functions return an error code (#l3gd20h_error_codes_t) to
+indicate whether its execution was successful or an error happened.
+
+
+## <a name="configuration"> Configuration </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+### <a name="hardware_configuration"> Hardware Configurations </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+Following figure shows a possible hardware configuration using an
+I2C interface.
+
+```
+  +-----------+     +----------+
+  | MCU       |     | L3GD20H  |
+  |           |     |          |
+  |     SCL   >-----> SCL      |
+  |     SDA   <-----> SDA      |
+  |     GPIOx <------ INT1     |
+  |     GPIOy <------ DRDY/INT2|
+  +-----------+     +----------+
+```
+
+If SPI interface is used, would look like following.
+
+```
+  +-----------+     +----------+
+  | MCU       |     | L3GD20H  |
+  |           |     |          |
+  |     SCK   >-----> SCK      |
+  |     MOSI  <-----> SDI      |
+  |     MISO  <-----> SDO      |
+  |     GPIOz ------> CS       |
+  |     GPIOx <------ INT1     |
+  |     GPIOy <------ DRDY/INT2|
+  +-----------+     +----------+
+```
+
+### <a name="driver_configuration"> Driver Configuration Parameters </a> &nbsp;&nbsp; [[TOC](#toc)]
+
+The following configuration parameters can be used to configure the
+sensor during its initialization (#l3gd20h_init):
+
+Parameter         | Member                      | Define macro           | Default
+----------------- | --------------------------- | ---------------------- | -------
+I2C device        | l3gd20h_params_t::dev       | L3GD20H_PARAM_DEV      | #I2C_DEV(0)
+I2C slave address | l3gd20h_params_t::addr      | L3GD20H_PARAM_ADDR     | #L3GD20H_I2C_ADDRESS_2
+                  |
+SPI device        | l3gd20h_params_t::dev       | L3GD20H_PARAM_DEV      | #SPI_DEV(0)
+SPI clock         | l3gd20h_params_t::clk       | L3GD20H_PARAM_CLK      | #SPI_CLK_1MHZ
+SPI cs pin        | l3gd20h_params_t::cs        | L3GD20H_PARAM_CS       | #GPIO_PIN(0, 2)
+                  |
+Measurement mode  | l3gd20h_params_t::mode      | L3GD20H_PARAM_MODE      | #L3GD20H_MODE_50_16
+Full scale        | l3gd20h_params_t::scale     | L3GD20H_PARAM_SCALE     | #L3GD20H_SCALE_245_DPS
+INT1 signal pin   | l3gd20h_params_t::int1      | L3GD20H_PARAM_INT1      | #GPIO_PIN(0, 0)
+INT2 signal pin   | l3gd20h_params_t::int2      | L3GD20H_PARAM_INT2      | #GPIO_PIN(0, 1)
+
+The default configuration of these parameters can be overridden by
+defining according macros before including **l3gd20h_params.h**, for
+example when I2C is used:
+```
+#define L3GD20H_PARAM_DEV         (I2C_DEV(1))
+#define L3GD20H_PARAM_ADDR        (L3GD20H_I2C_ADDRESS_1)
+#define L3GD20H_PARAM_MODE        (L3GD20H_MODE_400_20)
+#define L3GD20H_PARAM_SCALE       (L3GD20H_SCALE_500_DPS)
+#define L3GD20H_PARAM_INT1        (GPIO_PIN(0, 6))
+#define L3GD20H_PARAM_INT2        (GPIO_PIN(0, 7))
+...
+#include "l3gd20h.h"
+#include "l3gd20h_params.h"
+```
+
+Alternatively, the complete set of default configuration parameters could
+also be overriden by a single definition, for example:
+```
+#define L3GD20H_PARAMS             { \
+                                     .dev   = I2C_DEV(1),  \
+                                     .addr  = L3GD20H_I2C_ADDRESS_1, \
+                                     .int1  = GPIO_PIN(0, 6), \
+                                     .int2  = GPIO_PIN(0, 7), \
+                                     .mode  = L3GD20H_MODE_400_20, \
+                                     .scale = L3GD20H_SCALE_500_DPS \
+                                   }
+#endif
+```
+
+*/

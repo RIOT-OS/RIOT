@@ -423,6 +423,28 @@ ifneq (,$(filter l3g4200d,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
 endif
 
+ifneq (,$(filter l3gd20h_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+  USEMODULE += l3gd20h
+endif
+
+ifneq (,$(filter l3gd20h_i2c,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += l3gd20h
+endif
+
+ifneq (,$(filter l3gd20h_full,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+  USEMODULE += l3gd20h
+endif
+
+ifneq (,$(filter l3gd20h,$(USEMODULE)))
+  USEMODULE += xtimer
+  ifeq (,$(filter l3gd20h_spi,$(USEMODULE)))
+    USEMODULE += l3gd20h_i2c
+  endif
+endif
+
 ifneq (,$(filter lc709203f,$(USEMODULE)))
   FEATURES_REQUIRED += periph_i2c
   FEATURES_REQUIRED += periph_gpio_irq
