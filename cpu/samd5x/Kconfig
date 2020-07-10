@@ -5,4 +5,34 @@
 # directory for more details.
 #
 
+config CPU_FAM_SAMD5X
+    bool
+    select CPU_COMMON_SAM0
+    select CPU_CORE_CORTEX_M4F
+    select HAS_BACKUP_RAM
+    select HAS_CORTEXM_MPU
+    select HAS_CPU_SAMD5X
+    select HAS_PERIPH_HWRNG
+
+## CPU Models
+config CPU_MODEL_SAME54P20A
+    bool
+    select CPU_FAM_SAMD5X
+
+## Declaration of specific features
+config HAS_CPU_SAMD5X
+    bool
+    help
+        Indicates that a 'samd5x' cpu is being used.
+
+## CPU common symbols
+config CPU_FAM
+    default "samd5x" if CPU_FAM_SAMD5X
+
+config CPU_MODEL
+    default "same54p20a" if CPU_MODEL_SAME54P20A
+
+config CPU
+    default "samd5x" if CPU_FAM_SAMD5X
+
 source "$(RIOTCPU)/sam0_common/Kconfig"
