@@ -35,18 +35,16 @@
                              TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC2M_0 | \
                              TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2);
 
-static pwm_mode_t mode;
+static uint32_t dc_reverse = 0;
 
 static inline TIM_TypeDef *dev(pwm_t pwm)
 {
     return pwm_config[pwm].dev;
 }
 
-uint32_t pwm_init(pwm_t pwm, pwm_mode_t m, uint32_t freq, uint16_t res)
+uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     uint32_t timer_clk = periph_timer_clk(pwm_config[pwm].bus);
-
-    mode = m;
 
     /* in PWM_CENTER mode the counter counts up and down at each periode
      * so the resolution had to be divided by 2 */
@@ -77,6 +75,8 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t m, uint32_t freq, uint16_t res)
     dev(pwm)->PSC = (timer_clk / (res * freq)) - 1;
     dev(pwm)->ARR = (mode == PWM_CENTER) ? (res / 2) : res - 1;
 
+    dc_reverse &= ~(1 << pwm);
+
     /* set PWM mode */
     switch (mode) {
         case PWM_LEFT:
@@ -86,6 +86,8 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t m, uint32_t freq, uint16_t res)
         case PWM_RIGHT:
             dev(pwm)->CCMR1 = CCMR_MODE2;
             dev(pwm)->CCMR1 = CCMR_MODE2;
+            /* duty cycle should be reversed */
+            dc_reverse |= (1 << pwm);
             break;
         case PWM_CENTER:
             dev(pwm)->CCMR1 = CCMR_MODE1;
@@ -129,7 +131,7 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
         value = (uint16_t)dev(pwm)->ARR + 1;
     }
 
-    if (mode == PWM_RIGHT) {
+    if (dc_reverse & (1 << pwm)) {
         /* reverse the value */
         value = (uint16_t)dev(pwm)->ARR + 1 - value;
     }
