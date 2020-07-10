@@ -137,6 +137,221 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
         return res
 
 
+class GNRCIPv6NIBNeighShowParser(ShellInteractionParser):
+    def __init__(self):
+        self.c_neigh = re.compile(r"(?P<ipv6_addr>[0-9a-f:]+)\s+"
+                                  r"dev\s+#(?P<iface>\d+)\s+"
+                                  r"lladdr\s+(?P<l2addr>[0-9A-F:]+)?"
+                                  r"(\s+(?P<router>router))?"
+                                  r"(\s+((?P<nud_state>[A-Z_]+)|-))?"
+                                  r"(\s+(?P<ar_state>[A-Z_]+))?$")
+
+    def parse(self, cmd_output):
+        """
+        Parses output of GNRCIPv6NIB::nib_neigh_show()
+
+        >>> parser = GNRCIPv6NIBNeighShowParser()
+        >>> res = parser.parse("2001:db8::1 dev #5 lladdr AB:CD:EF:01:23:45 "
+        ...                    "router REACHABLE REGISTERED\\n"
+        ...                    "2001:db8::2 dev #5 lladdr  -")
+        >>> len(res)
+        2
+        >>> sorted(res[0])
+        ['ar_state', 'iface', 'ipv6_addr', 'l2addr', 'nud_state', 'router']
+        >>> res[0]["ipv6_addr"]
+        '2001:db8::1'
+        >>> res[0]["iface"]
+        5
+        >>> res[0]["l2addr"]
+        'AB:CD:EF:01:23:45'
+        >>> res[0]["router"]
+        True
+        >>> res[0]["nud_state"]
+        'REACHABLE'
+        >>> res[0]["ar_state"]
+        'REGISTERED'
+        >>> sorted(res[1])
+        ['iface', 'ipv6_addr']
+        >>> res[1]["ipv6_addr"]
+        '2001:db8::2'
+        >>> res[1]["iface"]
+        5
+        """
+        res = []
+        for line in cmd_output.splitlines():
+            m = self.c_neigh.search(line)
+            if m is not None:
+                res.append({k: v for k, v in m.groupdict().items()
+                            if v is not None})
+                res[-1]["iface"] = int(res[-1]["iface"])
+                if "router" in res[-1]:
+                    res[-1]["router"] = True
+        return res
+
+
+class GNRCIPv6NIBPrefixShowParser(ShellInteractionParser):
+    def __init__(self):
+        self.c_prefix = re.compile(r"(?P<prefix>[0-9a-f:]+)/"
+                                   r"(?P<prefix_len>\d+)\s+"
+                                   r"dev\s+#(?P<iface>\d+)"
+                                   r"(\s+expires (?P<valid_sec>\d+) sec)?"
+                                   r"(\s+deprecates (?P<pref_sec>\d+) sec)?$")
+
+    def parse(self, cmd_output):
+        """
+        Parses output of GNRCIPv6NIB::nib_prefix_show()
+
+        >>> parser = GNRCIPv6NIBPrefixShowParser()
+        >>> res = parser.parse("2001:db8::/64 dev #5  expires 4999 sec "
+        ...                        "deprecates 3999 sec\\n"
+        ...                    "2001:db8:1::/64 dev #6")
+        >>> len(res)
+        2
+        >>> sorted(res[0])
+        ['iface', 'pref_sec', 'prefix', 'prefix_len', 'valid_sec']
+        >>> res[0]["prefix"]
+        '2001:db8::'
+        >>> res[0]["prefix_len"]
+        64
+        >>> sorted(res[1])
+        ['iface', 'prefix', 'prefix_len']
+        """
+        res = []
+        for line in cmd_output.splitlines():
+            m = self.c_prefix.search(line)
+            if m is not None:
+                pfx = {k: v for k, v in m.groupdict().items() if v is not None}
+                pfx["prefix_len"] = int(pfx["prefix_len"])
+                pfx["iface"] = int(pfx["iface"])
+                if "valid_sec" in pfx:
+                    pfx["valid_sec"] = int(pfx["valid_sec"])
+                if "pref_sec" in pfx:
+                    pfx["pref_sec"] = int(pfx["pref_sec"])
+                res.append(pfx)
+        return res
+
+
+class GNRCIPv6NIBRouteShowParser(ShellInteractionParser):
+    def __init__(self):
+        self.c_route = re.compile(r"(?P<route>default(?P<primary>\*)?|"
+                                  r"(?P<prefix>[0-9a-f:]+)/"
+                                  r"(?P<prefix_len>\d+))\s+"
+                                  r"(via\s+(?P<next_hop>[0-9a-f:]+)\s+)?"
+                                  r"dev\s+#(?P<iface>\d+)$")
+
+    def parse(self, cmd_output):
+        """
+        Parses output of GNRCIPv6NIB::nib_route_show()
+
+        >>> parser = GNRCIPv6NIBRouteShowParser()
+        >>> res = parser.parse("2001:db8::/64 dev #5\\n"
+        ...                    "2001:db8:1::/64 via fe80::1 dev #5\\n"
+        ...                    "default via fe80::2 dev #5\\n"
+        ...                    "default* via fe80::3 dev #6\\n")
+        >>> len(res)
+        4
+        >>> sorted(res[0])
+        ['iface', 'route']
+        >>> sorted(res[0]["route"])
+        ['prefix', 'prefix_len']
+        >>> res[0]["route"]["prefix"]
+        '2001:db8::'
+        >>> res[0]["route"]["prefix_len"]
+        64
+        >>> res[0]["iface"]
+        5
+        >>> sorted(res[1])
+        ['iface', 'next_hop', 'route']
+        >>> res[1]["route"]["prefix"]
+        '2001:db8:1::'
+        >>> res[1]["route"]["prefix_len"]
+        64
+        >>> res[1]["next_hop"]
+        'fe80::1'
+        >>> res[1]["iface"]
+        5
+        >>> sorted(res[2])
+        ['iface', 'next_hop', 'route']
+        >>> sorted(res[2]["route"])
+        ['default']
+        >>> res[2]["route"]["default"]
+        True
+        >>> res[2]["next_hop"]
+        'fe80::2'
+        >>> res[2]["iface"]
+        5
+        >>> sorted(res[3])
+        ['iface', 'next_hop', 'route']
+        >>> sorted(res[3]["route"])
+        ['default', 'primary']
+        >>> res[3]["route"]["default"]
+        True
+        >>> res[3]["route"]["primary"]
+        True
+        >>> res[3]["next_hop"]
+        'fe80::3'
+        >>> res[3]["iface"]
+        6
+        """
+        res = []
+        for line in cmd_output.splitlines():
+            m = self.c_route.search(line)
+            if m is not None:
+                fte = {k: v for k, v in m.groupdict().items() if v is not None}
+                fte['iface'] = int(fte['iface'])
+                if "prefix" in fte and fte["prefix"] is not None and \
+                   "prefix_len" in fte and fte["prefix_len"] is not None:
+                    fte["route"] = {"prefix": fte["prefix"],
+                                    "prefix_len": int(fte["prefix_len"])}
+                elif fte["route"].startswith("default"):
+                    fte["route"] = {"default": True}
+                else:
+                    raise ValueError("Unexpected route value {}".format(fte))
+                if "primary" in fte and fte["primary"] is not None:
+                    fte["route"]["primary"] = True
+                if fte.get("next_hop") is None:
+                    fte.pop("next_hop", None)
+                fte.pop("prefix", None)
+                fte.pop("prefix_len", None)
+                fte.pop("primary", None)
+                res.append(fte)
+        return res
+
+
+class GNRCIPv6NIBABRShowParser(ShellInteractionParser):
+    def __init__(self):
+        self.c_abr = re.compile(r"(?P<addr>[0-9a-f:]+)\s+"
+                                r"v(?P<version>\d+)\s+expires\s+"
+                                r"(?P<valid_min>\d+)min$")
+
+    def parse(self, cmd_output):
+        """
+        Parses output of GNRCIPv6NIB::nib_abr_show()
+
+        >>> parser = GNRCIPv6NIBABRShowParser()
+        >>> res = parser.parse("2001:db8::abcd:ef01 v43 expires 1400min")
+        >>> len(res)
+        1
+        >>> sorted(res[0])
+        ['addr', 'valid_min', 'version']
+        >>> res[0]["addr"]
+        '2001:db8::abcd:ef01'
+        >>> res[0]["version"]
+        43
+        >>> res[0]["valid_min"]
+        1400
+        """
+        res = []
+        for line in cmd_output.splitlines():
+            m = self.c_abr.search(line)
+            if m is not None:
+                abr = m.groupdict()
+                abr["version"] = int(abr["version"])
+                abr["valid_min"] = int(abr["valid_min"])
+                res.append(abr)
+        return res
+
+
 class GNRCPktbufStatsResults(dict):
     def is_empty(self):
         """
@@ -282,6 +497,102 @@ class GNRCICMPv6Echo(ShellInteraction):
         # wait a second longer than all pings
         cmd_timeout = ((timeout / 1000) * count) + 1
         return self.cmd(cmd, timeout=cmd_timeout, async_=async_)
+
+
+class GNRCIPv6NIB(ShellInteraction):
+    NEIGH = "neigh"
+    PREFIX = "prefix"
+    ROUTE = "route"
+    ABR = "abr"
+
+    @ShellInteraction.check_term
+    def nib_cmd(self, cmd, args=None, timeout=-1, async_=False):
+        return self.cmd(self._create_cmd(cmd, args),
+                        timeout=timeout, async_=async_)
+
+    def nib_neigh_show(self, iface=None, timeout=-1, async_=False):
+        return self._nib_show(self.NEIGH, iface, timeout, async_)
+
+    def nib_neigh_add(self, iface, ipv6_addr, l2addr=None,
+                      timeout=-1, async_=False):
+        args = [iface, ipv6_addr]
+        if l2addr:
+            args.append(l2addr)
+        return self._nib_add(self.NEIGH, args, timeout, async_)
+
+    def nib_neigh_del(self, iface, ipv6_addr, timeout=-1, async_=False):
+        return self._nib_del(self.NEIGH, iface, ipv6_addr, timeout, async_)
+
+    def nib_prefix_show(self, iface=None, timeout=-1, async_=False):
+        return self._nib_show(self.PREFIX, iface, timeout, async_)
+
+    def nib_prefix_add(self, iface, prefix, valid_sec=None, pref_sec=None,
+                       timeout=-1, async_=False):
+        if valid_sec is None and pref_sec is not None:
+            raise ValueError("pref_sec provided with no valid_sec")
+        args = [iface, prefix]
+        if valid_sec:
+            args.append(int(valid_sec))
+        if pref_sec:
+            args.append(int(pref_sec))
+        return self._nib_add(self.PREFIX, args, timeout, async_)
+
+    def nib_prefix_del(self, iface, prefix, timeout=-1, async_=False):
+        return self._nib_del(self.PREFIX, iface, prefix, timeout, async_)
+
+    def nib_route_show(self, iface=None, timeout=-1, async_=False):
+        return self._nib_show(self.ROUTE, iface, timeout, async_)
+
+    def nib_route_add(self, iface, prefix, next_hop, ltime_sec=None,
+                      timeout=-1, async_=False):
+        args = [iface, prefix, next_hop]
+        if ltime_sec:
+            args.append(int(ltime_sec))
+        return self._nib_add(self.ROUTE, args, timeout, async_)
+
+    def nib_route_del(self, iface, prefix, timeout=-1, async_=False):
+        return self._nib_del(self.ROUTE, iface, prefix, timeout, async_)
+
+    def nib_abr_show(self, timeout=-1, async_=False):
+        return self._nib_show(self.ABR, timeout=timeout, async_=async_)
+
+    def nib_abr_add(self, ipv6_addr, timeout=-1, async_=False):
+        args = [ipv6_addr]
+        return self._nib_add(self.ABR, args, timeout, async_)
+
+    def nib_abr_del(self, ipv6_addr, timeout=-1, async_=False):
+        args = ["del", ipv6_addr]
+        return self._nib_error_cmd(self.ABR, args, timeout, async_)
+
+    @staticmethod
+    def _create_cmd(cmd, args=None):
+        cmd_str = "nib {cmd}".format(cmd=cmd)
+        if args is not None:
+            cmd_str += " {args}".format(args=" ".join(str(a) for a in args))
+        return cmd_str
+
+    @ShellInteraction.check_term
+    def _nib_error_cmd(self, cmd, args=None, timeout=-1, async_=False):
+        cmd_str = self._create_cmd(cmd, args)
+        res = self.cmd(cmd_str, timeout=timeout, async_=async_)
+        # nib manipulation commands only show command string on success
+        if res.strip() != cmd_str:
+            raise RuntimeError(repr(res.strip()) + "!=" + repr(cmd_str))
+        return res
+
+    def _nib_show(self, view, iface=None, timeout=-1, async_=False):
+        args = ["show"]
+        if iface:
+            args.append(iface)
+        return self.nib_cmd(view, args, timeout, async_)
+
+    def _nib_add(self, view, args, timeout=-1, async_=False):
+        args.insert(0, "add")
+        return self._nib_error_cmd(view, args, timeout, async_)
+
+    def _nib_del(self, view, iface, item, timeout=-1, async_=False):
+        args = ["del", iface, item]
+        return self._nib_error_cmd(view, args, timeout, async_)
 
 
 class GNRCPktbufStats(ShellInteraction):
