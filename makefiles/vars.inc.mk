@@ -48,6 +48,7 @@ export PYTHONPATH            # Python default search path for module filesi, wit
 export FEATURES_REQUIRED     # List of required features by the application
 export FEATURES_PROVIDED     # List of provided features by the board
 export FEATURES_OPTIONAL     # List of nice to have features
+export FEATURES_USED         # List of features used
 # TOOLCHAINS_SUPPORTED       # List of supported toolchains by an MCU (gnu/llvm/...).
 # TOOLCHAINS_BLACKLISTED     # List of unspported toolchains for a module or an application.
 export TOOLCHAIN             # Base build toolchain, i.e. GNU or LLVM
