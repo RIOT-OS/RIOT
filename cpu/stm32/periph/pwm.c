@@ -46,7 +46,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 {
     uint32_t timer_clk = periph_timer_clk(pwm_config[pwm].bus);
 
-    /* in PWM_CENTER mode the counter counts up and down at each periode
+    /* in PWM_CENTER mode the counter counts up and down at each period
      * so the resolution had to be divided by 2 */
     res *= (mode == PWM_CENTER) ? 2 : 1;
 
@@ -131,7 +131,7 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
         value = (uint16_t)dev(pwm)->ARR + 1;
     }
 
-    if (dc_reverse & (1 << pwm)) {
+    if ((dc_reverse & (1 << pwm)) != 0) {
         /* reverse the value */
         value = (uint16_t)dev(pwm)->ARR + 1 - value;
     }
