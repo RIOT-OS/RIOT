@@ -61,8 +61,6 @@ BOARD_WHITELIST += arduino-duemilanove \
                    telosb \
                    usb-kw41z \
                    waspmote-pro \
-                   wsn430-v1_3b \
-                   wsn430-v1_4 \
                    z1
                    #
 

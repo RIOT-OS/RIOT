@@ -24,7 +24,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f0discovery \
     telosb \
     waspmote-pro \
-    wsn430-v1_3b \
-    wsn430-v1_4 \
     z1 \
     #
