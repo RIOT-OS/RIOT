@@ -81,17 +81,17 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     switch (mode) {
         case PWM_LEFT:
             dev(pwm)->CCMR1 = CCMR_MODE1;
-            dev(pwm)->CCMR1 = CCMR_MODE1;
+            dev(pwm)->CCMR2 = CCMR_MODE1;
             break;
         case PWM_RIGHT:
             dev(pwm)->CCMR1 = CCMR_MODE2;
-            dev(pwm)->CCMR1 = CCMR_MODE2;
+            dev(pwm)->CCMR2 = CCMR_MODE2;
             /* duty cycle should be reversed */
             dc_reverse |= (1 << pwm);
             break;
         case PWM_CENTER:
             dev(pwm)->CCMR1 = CCMR_MODE1;
-            dev(pwm)->CCMR1 = CCMR_MODE1;
+            dev(pwm)->CCMR2 = CCMR_MODE1;
             /* center-aligned mode 3 */
             dev(pwm)->CR1 |= (TIM_CR1_CMS_0 | TIM_CR1_CMS_1);
             break;
