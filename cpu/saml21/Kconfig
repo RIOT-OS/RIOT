@@ -5,4 +5,44 @@
 # directory for more details.
 #
 
+config CPU_FAM_SAML21
+    bool
+    select CPU_COMMON_SAM0
+    select CPU_CORE_CORTEX_M0PLUS
+    select HAS_BACKUP_RAM
+    select HAS_CPU_SAML21
+
+## CPU Models
+config CPU_MODEL_SAML21J18A
+    bool
+    select CPU_FAM_SAML21
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_SAMR30G18A
+    bool
+    select CPU_FAM_SAML21
+
+config CPU_MODEL_SAMR34J18B
+    bool
+    select CPU_FAM_SAML21
+    select HAS_PERIPH_HWRNG
+
+## Declaration of specific features
+config HAS_CPU_SAML21
+    bool
+    help
+        Indicates that a 'saml21' cpu is being used.
+
+## Common CPU symbols
+config CPU_FAM
+    default "saml21" if CPU_FAM_SAML21
+
+config CPU_MODEL
+    default "saml21j18a" if CPU_MODEL_SAML21J18A
+    default "samr30g18a" if CPU_MODEL_SAMR30G18A
+    default "samr34j18b" if CPU_MODEL_SAMR34J18B
+
+config CPU
+    default "saml21" if CPU_FAM_SAML21
+
 source "$(RIOTCPU)/sam0_common/Kconfig"
