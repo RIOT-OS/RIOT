@@ -6,7 +6,7 @@
 #  * reset
 #  * term
 #
-# Tested on m3/a8-m3/wsn430/samr21/arduino-zero nodes
+# Tested on m3/a8-m3/samr21/arduino-zero nodes
 #
 # It can be run:
 # * From your computer by setting IOTLAB_NODE to the full url like
@@ -78,8 +78,6 @@ IOTLAB_ARCHI_nrf52840-mdk   = nrf52840mdk:multi
 IOTLAB_ARCHI_pba-d-01-kw2x  = phynode:kw2xrf
 IOTLAB_ARCHI_samr21-xpro    = samr21:at86rf233
 IOTLAB_ARCHI_samr30-xpro    = samr30:at86rf212b
-IOTLAB_ARCHI_wsn430-v1_3b   = wsn430:cc1101
-IOTLAB_ARCHI_wsn430-v1_4    = wsn430:cc2420
 IOTLAB_ARCHI := $(IOTLAB_ARCHI_$(BOARD))
 
 # There are several deprecated and incompatible features used here that were
@@ -94,8 +92,8 @@ else
   _NODES_DEPLOYED = $(shell iotlab-experiment --jmespath='"0"' --format='" ".join' get $(_IOTLAB_EXP_ID) --deployment)
   _NODES_LIST_OPTION = --nodes
   _NODES_FLASH_OPTION = --flash
-  ifneq (,$(filter-out wsn430-% firefly,$(BOARD)))
-    # All boards in IoT-LAB except firefly and WSN430 can be flashed using $(BINFILE).
+  ifneq (firefly,$(BOARD))
+    # All boards in IoT-LAB except firefly can be flashed using $(BINFILE).
     # On IoT-LAB, firefly only accepts $(ELFFILE) and WSN320 boards on accept $(HEXFILE).
     # Using $(BINFILE) speeds up the firmware upload since the file is much
     # smaller than an elffile.
@@ -177,7 +175,7 @@ _STDIN_EQ_0 = grep 0
 
 ifneq (iotlab-a8-m3,$(BOARD))
 
-  # M3 and wsn430 nodes
+  # M3 nodes
   FLASHER     = iotlab-node
   RESET       = iotlab-node
   _NODE_FMT   = --jmespath='keys(@)[0]' --format='int'

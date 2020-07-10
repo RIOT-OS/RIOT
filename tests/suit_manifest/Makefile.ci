@@ -11,7 +11,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32l0538-disco \
     stm32f0discovery \
     telosb \
-    wsn430-v1_3b \
-    wsn430-v1_4 \
     z1 \
     #

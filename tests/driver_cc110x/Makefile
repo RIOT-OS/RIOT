@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 DEVICE ?= cc1100 # The MSB-A2 uses the CC1100. New boards use CC1101
 
 # stdlib.h for msp430 does not provide EXIT_FAILURE and EXIT_SUCCESS
-BOARD_BLACKLIST += msb-430 msb-430h telosb wsn430-v1_3b wsn430-v1_4 z1
+BOARD_BLACKLIST += msb-430 msb-430h telosb z1
 
 # This test will rely on a human interacting with the shell, so we better add
 # the shell and some commands

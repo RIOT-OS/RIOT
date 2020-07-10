@@ -24,8 +24,6 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     stm32f3discovery \
                     telosb \
                     waspmote-pro \
-                    wsn430-v1_3b \
-                    wsn430-v1_4 \
                     z1 \
                     #
 
