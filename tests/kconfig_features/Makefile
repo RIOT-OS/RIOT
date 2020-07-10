@@ -141,7 +141,10 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    same54-xpro \
                    saml10-xpro \
                    saml11-xpro \
+                   saml21-xpro \
                    samr21-xpro \
+                   samr30-xpro \
+                   samr34-xpro \
                    seeeduino_arch-pro \
                    slstk3401a \
                    slstk3402a \
