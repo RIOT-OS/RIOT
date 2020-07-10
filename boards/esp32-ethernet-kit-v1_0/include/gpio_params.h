@@ -31,6 +31,14 @@ extern "C" {
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
+#ifndef MODULE_ESP_ETH
+    {
+        .name = "BOOT",
+        .pin = BTN0_PIN,
+        .mode = BTN0_MODE,
+        .flags = SAUL_GPIO_INVERTED
+    },
+#endif
 };
 
 #ifdef __cplusplus

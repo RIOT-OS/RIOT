@@ -33,6 +33,40 @@ static inline void board_init(void) {
     board_init_common();
 }
 
+#if !MODULE_ESP_ETH || DOXYGEN
+/**
+ * @name    Button pin definitions
+ * @{
+ */
+/**
+ * @brief   Default button GPIO pin definition
+ *
+ * The button is only available when Ethernet is not used, as is shares its pin
+ * with the Phy clock.
+ */
+#define BTN0_PIN        GPIO0
+
+/**
+ * @brief   Default button GPIO mode definition
+ *
+ * Since the GPIO of the button is pulled up with an external resistor, the
+ * mode for the GPIO pin has to be GPIO_IN.  */
+#define BTN0_MODE       GPIO_IN
+
+/**
+ * @brief   Default interrupt flank definition for the button GPIO
+ */
+#ifndef BTN0_INT_FLANK
+#define BTN0_INT_FLANK  GPIO_FALLING
+#endif
+
+/**
+ * @brief   Definition for compatibility with previous versions
+ */
+#define BUTTON0_PIN     BTN0_PIN
+/** @} */
+#endif /* !MODULE_ESP_ETH || DOXYGEN */
+
 /**
  * @name    ESP32 Ethernet (EMAC) configuration
  * @{
