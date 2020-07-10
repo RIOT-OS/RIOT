@@ -19,7 +19,6 @@ PSEUDOMODULES += crypto_%	# crypto_aes or crypto_3des
 PSEUDOMODULES += devfs_%
 PSEUDOMODULES += dhcpv6_%
 PSEUDOMODULES += ecc_%
-PSEUDOMODULES += emb6_router
 PSEUDOMODULES += event_%
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gnrc_dhcpv6_%
