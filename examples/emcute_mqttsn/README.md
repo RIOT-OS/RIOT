@@ -106,7 +106,7 @@ connect more than one node to the broker, you need to set a custom ID for each
 node during compile time. Simply use the `EMCUTE_ID` environment variable for
 this, e.g. build with `EMCUTE_ID=horst make all`.
 
-### I see incomming messages in RSMB, but no outgoing message seems to arrive?
+### I see incoming messages in RSMB, but no outgoing message seems to arrive?
 The UDP socket handling for IPv6 based endpoints in the `Mosquitto.rsmb`
 implementation is buggy when it comes to handling link local addresses,
 as the implementation does not remember the interface on which data comes in,
