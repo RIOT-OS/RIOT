@@ -1,3 +1,18 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
+
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += rail
+endif
+
+ifneq (,$(filter rail,$(USEMODULE)))
+  USEMODULE += gecko_sdk_emlib
+  USEMODULE += gecko_sdk_emlib_extra
+endif
+
+ifneq (,$(filter gecko_sdk_librail,$(USEMODULE)))
+  CFLAGS_FPU = -mfloat-abi=softfp -mfpu=fpv4-sp-d16
+  # Blacklisted for llvm because `CFLAGS_FPU` is used before its final value set here
+  TOOLCHAINS_BLACKLIST += llvm
+endif

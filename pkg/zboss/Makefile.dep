@@ -1,0 +1,4 @@
+USEMODULE += zboss zboss-aps zboss-common zboss-mac zboss-nwk zboss-secur zboss-zcl zboss-zdo zboss-unix
+
+USEMODULE += memarray
+USEMODULE += xtimer

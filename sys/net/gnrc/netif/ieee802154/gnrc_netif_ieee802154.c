@@ -217,9 +217,26 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
     return pkt;
 }
 
-static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
+static int _send_raw(gnrc_netif_t *netif, iolist_t *iolist)
 {
     netdev_t *dev = netif->dev;
+    int res;
+
+#ifdef MODULE_GNRC_MAC
+    if (netif->mac.mac_info & GNRC_NETIF_MAC_INFO_CSMA_ENABLED) {
+        res = csma_sender_csma_ca_send(dev, iolist, &netif->mac.csma_conf);
+    } else {
+        res = dev->driver->send(dev, iolist);
+    }
+#else
+    res = dev->driver->send(dev, iolist);
+#endif
+
+    return res;
+}
+
+static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
+{
     netdev_ieee802154_t *state = (netdev_ieee802154_t *)netif->dev;
     gnrc_netif_hdr_t *netif_hdr;
     const uint8_t *src, *dst = NULL;
@@ -228,6 +245,11 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
     uint8_t flags = (uint8_t)(state->flags & NETDEV_IEEE802154_SEND_MASK);
     le_uint16_t dev_pan = byteorder_btols(byteorder_htons(state->pan));
+
+    /* send raw 802.15.4 packets out without adding a header */
+    if (netif->flags & GNRC_NETIF_FLAGS_RAWMODE) {
+        return _send_raw(netif, (iolist_t *)pkt);
+    }
 
     flags |= IEEE802154_FCF_TYPE_DATA;
     if (pkt == NULL) {
@@ -285,16 +307,8 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         netif->stats.tx_unicast_count++;
     }
 #endif
-#ifdef MODULE_GNRC_MAC
-    if (netif->mac.mac_info & GNRC_NETIF_MAC_INFO_CSMA_ENABLED) {
-        res = csma_sender_csma_ca_send(dev, &iolist, &netif->mac.csma_conf);
-    }
-    else {
-        res = dev->driver->send(dev, &iolist);
-    }
-#else
-    res = dev->driver->send(dev, &iolist);
-#endif
+
+    res = _send_raw(netif, &iolist);
 
     /* release old data */
     gnrc_pktbuf_release(pkt);

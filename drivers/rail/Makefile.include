@@ -1,0 +1,18 @@
+
+
+#RAIL_SDK_DIR  = $(RIOTBASE)/pkg/gecko-sdk/sdk/
+RAIL_SDK_SRCDIR = $(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib
+
+RAIL_INCLUDES += -I$(RAIL_SDK_SRCDIR)/common
+RAIL_INCLUDES += -I$(RAIL_SDK_SRCDIR)/protocol
+RAIL_INCLUDES += -I$(RAIL_SDK_SRCDIR)/chip/efr32/efr32xg1x
+RAIL_INCLUDES += -I$(RAIL_SDK_SRCDIR)/plugin/pa-conversions
+
+#RAIL_INCLUDES += -I$(RAIL_SDK_DIR)/hardware/kit/common/bsp/
+# if thunderbird
+#RAIL_INCLUDES += -I$(RAIL_SDK_DIR)/hardware/kit/EFR32MG1_BRD4160A/config/
+
+
+export INCLUDES += $(RAIL_INCLUDES)
+
+export RAIL_SDK_SRCDIR

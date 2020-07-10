@@ -163,4 +163,9 @@ void gnrc_netif_init_devs(void)
         extern void auto_init_nrf802154(void);
         auto_init_nrf802154();
     }
+
+    if (IS_USED(MODULE_RAIL)) {
+        extern void auto_init_rail(void);
+        auto_init_rail();
+    }
 }
