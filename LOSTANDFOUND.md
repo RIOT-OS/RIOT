@@ -181,3 +181,14 @@ Reason for removal:
 - its only user within the RIOT code base `gnrc_ipv6_ext` was reworked in
   f671a87fe2c539c3aecd595ae03fa4f6f209d042 so it is not needed anymore.
 - the function was deprecated in f2760c033c5f332be076b25aa212aca4007c3d65
+
+### boards/wsn430-v1_3b, boards/wsn430-v1_4 [e63cd54f3b1e002a7895bb7c46af889b341c1a15]
+
+Author(s):
+- Hauke Petersen <hauke.petersen@fu-berlin.de>
+- Martine Lenders <m.lenders@fu-berlin.de>
+- Milan Babel <babel@inf.fu-berlin.de>
+- Oliver Hahm <oliver.hahm@inria.fr>
+
+Reason for removal:
+- no longer accessible on the IoT-LAB testbed
