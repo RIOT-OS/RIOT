@@ -192,3 +192,12 @@ Author(s):
 
 Reason for removal:
 - no longer accessible on the IoT-LAB testbed
+
+### pkg/emb6 [4f243c52eabefe709d78560ce7f1d502d737a999]
+Author(s):
+- Martine S. Lenders <m.lenders@fu-berlin.de>
+
+Reason for removal:
+- Stale upstream (last update to date in Mar 2018)
+- Ported version even older (last update Feb 2016)
+- Updating to more recent version would be more effort than its worth
