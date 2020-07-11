@@ -34,7 +34,7 @@ extern "C" {
 /**
  * @name    MRF24J40 shield configuration
  *
- * Configuration for the MRF24J40 shield when module ```mrf24j40``` is used.
+ * Configuration for the MRF24J40 shield when module `mrf24j40` is used.
  *
  * MRF24J40 module uses SPI_DEV(0) and according pins on this board to be
  * compatible with the Wemos D1 mini MRF24J40 shield.
@@ -64,7 +64,7 @@ extern "C" {
 /**
  * @name    SD-Card shield configuration
  *
- * Configuration of the SD-Card interface when module ```sdcard_spi``` is used.
+ * Configuration of the SD-Card interface when module `sdcard_spi` is used.
  *
  * SD card interface uses SPI_DEV(0) on this board to be compatible with the
  * Wemos D1 mini micro SD card shield. The D8 pin (GPIO5) is used as default
