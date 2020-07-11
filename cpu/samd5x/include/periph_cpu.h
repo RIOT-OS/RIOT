@@ -125,6 +125,43 @@ static const gpio_t rtc_tamper_pins[RTC_NUM_OF_TAMPERS] = {
     GPIO_PIN(PC, 0), GPIO_PIN(PC, 1)
 };
 
+/**
+ * @brief   NVM User Page Mapping - Dedicated Entries
+ *          Config values will be applied at power-on.
+ * @{
+ */
+struct sam0_aux_cfg_mapping {
+    /* config word 0 */
+    uint32_t bod33_disable              :  1; /**< BOD33 Disable at power-on.           */
+    uint32_t bod33_level                :  8; /**< BOD33 threshold level at power-on.   */
+    uint32_t bod33_action               :  2; /**< BOD33 Action at power-on.            */
+    uint32_t bod33_hysteresis           :  4; /**< BOD33 Hysteresis configuration       */
+    const uint32_t bod12_calibration    : 11; /**< Factory settings - do not change.    */
+    uint32_t nvm_boot_size              :  4; /**< NVM Bootloader Size                  */
+    uint32_t reserved_0                 :  2; /**< Factory settings - do not change.    */
+    /* config word 1 */
+    uint32_t smart_eeprom_blocks        :  4; /**< NVM Blocks per SmartEEPROM sector    */
+    uint32_t smart_eeprom_page_size     :  3; /**< SmartEEPROM Page Size                */
+    uint32_t ram_eccdis                 :  1; /**< RAM ECC Disable                      */
+    uint32_t reserved_1                 :  8; /**< Factory settings - do not change.    */
+    uint32_t wdt_enable                 :  1; /**< WDT Enable at power-on.              */
+    uint32_t wdt_always_on              :  1; /**< WDT Always-On at power-on.           */
+    uint32_t wdt_period                 :  4; /**< WDT Period at power-on.              */
+    uint32_t wdt_window                 :  4; /**< WDT Window at power-on.              */
+    uint32_t wdt_ewoffset               :  4; /**< WDT Early Warning Interrupt Offset   */
+    uint32_t wdt_window_enable          :  1; /**< WDT Window mode enabled on power-on  */
+    uint32_t reserved_2                 :  1; /**< Factory settings - do not change.    */
+    /* config word 2 */
+    uint32_t nvm_locks;                       /**< NVM Region Lock Bits.                */
+    /* config word 3 */
+    uint32_t user_page;                       /**< User page                            */
+    /* config word 4 */
+    uint32_t reserved_3;                      /**< Factory settings - do not change.    */
+    /* config words 5,6,7 */
+    uint32_t user_pages[3];                   /**< User pages                           */
+};
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
