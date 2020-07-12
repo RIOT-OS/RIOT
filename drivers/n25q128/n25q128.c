@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -33,19 +34,19 @@
 #define CLAMP(x, min, max)    ((x > max) ? max : ((x < min) ? min : x))
 
 /*
+ * @brief   Calls the spi driver for receiving bytes.
+ */
+static inline void _receive(spi_t bus, uint8_t * in, size_t len)
+{
+    spi_transfer_bytes(bus, SPI_CS_UNDEF, false, NULL, in, len);
+}
+
+/*
  * @brief   Calls the spi driver for sending bytes.
  */
 static inline void _send(spi_t bus, uint8_t * out, size_t len)
 {
     spi_transfer_bytes(bus, SPI_CS_UNDEF, false, out, NULL, len);
-}
-
-/*
- * @brief   Calls the spi driver for receiving bytes.
- */
-static inline void _receive(spi_t bus,uint8_t * in, size_t len)
-{
-    spi_transfer_bytes(bus, SPI_CS_UNDEF, false, NULL, in, len);
 }
 
 /*
@@ -72,7 +73,8 @@ static inline void _send_instruction(n25q128_dev_t *dev)
 }
 
 /*
- * @brief   Execute the configured device with the prepared instruction set.
+ * @brief   Execute the assembled command of the configured device with the
+ *          prepared instruction set.
  */
 static inline void _execute(n25q128_dev_t *dev)
 {
@@ -136,18 +138,23 @@ static inline void _write_disable(n25q128_dev_t *dev)
  */
 static inline uint8_t _read_status_reg(n25q128_dev_t *dev)
 {
-    uint8_t buf[1] = {0};
+    static uint8_t buf[1] = {0};
 
     dev->cmd.code = N25Q128_OPCODE_RDSR;
     dev->cmd.addr = 0;
     dev->data.buf = buf;
     dev->data.len = 1;
-    dev->opt.mask = 0;
     dev->opt.mask = N25Q128_OPT_RECV_EN;
 
     _execute(dev);
 
     return buf[0];
+}
+
+static inline bool _write_enable_latch(n25q128_dev_t *dev)
+{
+    uint8_t spi_status_reg = _read_status_reg(dev);
+    return (spi_status_reg & N25Q128_STAT_REG_WEL);
 }
 
 int n25q128_init(n25q128_dev_t *dev)
@@ -203,7 +210,6 @@ void n25q128_read_id(n25q128_dev_t *dev, uint8_t *buf, size_t len)
     dev->cmd.addr = 0;
     dev->data.buf = buf;
     dev->data.len = CLAMP(len, 1, 20);
-    dev->opt.mask = 0;
     dev->opt.mask = N25Q128_OPT_RECV_EN;
 
     _execute(dev);
@@ -214,8 +220,7 @@ void n25q128_read_data_bytes(n25q128_dev_t *dev, uint32_t addr, uint8_t *buf, si
     dev->cmd.code = N25Q128_OPCODE_READ;
     dev->cmd.addr = addr;
     dev->data.buf = buf;
-    dev->data.len = CLAMP(len, 1, len); /* 'infinite' bytes possible. No maximum. */
-    dev->opt.mask = 0;
+    dev->data.len = CLAMP(len, 1, len); /* 'infinite' bytes possible */
     dev->opt.mask = N25Q128_OPT_INF_EN | N25Q128_OPT_RECV_EN | N25Q128_OPT_ADDR_EN;
 
     _execute(dev);
@@ -229,7 +234,6 @@ void n25q128_page_program(n25q128_dev_t *dev, uint32_t addr, uint8_t *buf, size_
     dev->cmd.addr = addr;
     dev->data.buf = buf;
     dev->data.len = CLAMP(len, 1, 256);
-    dev->opt.mask = 0;
     dev->opt.mask = N25Q128_OPT_SEND_EN | N25Q128_OPT_ADDR_EN;
 
     _execute(dev);
@@ -281,4 +285,9 @@ void n25q128_program_erase_resume(n25q128_dev_t *dev)
     dev->opt.mask = 0;
 
     _execute(dev);
+}
+
+bool n25q128_write_in_progress(n25q128_dev_t *dev)
+{
+    return (_read_status_reg(dev) & N25Q128_STAT_REG_WIP);
 }

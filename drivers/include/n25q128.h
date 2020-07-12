@@ -126,8 +126,6 @@ int n25q128_init(n25q128_dev_t *dev);
  * @param[in] *dev      A pointer to the configured device.
  * @param[out] *buf     Stores the id from the memory device.
  * @param[in] buf_len   The length of the *buf.
- *
- * @return  Status code used by the N25Q128 driver interface
  */
 void n25q128_read_id(n25q128_dev_t *dev, uint8_t *buf, size_t len);
 
@@ -138,8 +136,6 @@ void n25q128_read_id(n25q128_dev_t *dev, uint8_t *buf, size_t len);
  * @param[in] address   The address to read bytes from.
  * @param[out] *buf     Stores the bytes from the address of the device.
  * @param[in] buf_len   The length of the *buf.
- *
- * @return  Status code used by the N25Q128 driver interface
  */
 void n25q128_read_data_bytes(n25q128_dev_t *dev, uint32_t addr, uint8_t *buf, size_t len);
 
@@ -155,8 +151,6 @@ void n25q128_read_data_bytes(n25q128_dev_t *dev, uint32_t addr, uint8_t *buf, si
  * @param[in] address   The address to read bytes from.
  * @param[out] *buf     Stores the bytes from the address of the device.
  * @param[in] buf_len   The length of the *buf.
- *
- * @return  Status code used by the N25Q128 driver interface
  */
 void n25q128_page_program(n25q128_dev_t *dev, uint32_t addr, uint8_t *buf, size_t len);
 
@@ -169,8 +163,6 @@ void n25q128_page_program(n25q128_dev_t *dev, uint32_t addr, uint8_t *buf, size_
  *
  * @param[in] *dev      A pointer to the configured device.
  * @param[in] addr      The address of the sector to erase.
- *
- * @return  Status code used by the N25Q128 driver interface
  */
 void n25q128_sector_erase(n25q128_dev_t *dev, uint32_t addr);
 
@@ -181,8 +173,6 @@ void n25q128_sector_erase(n25q128_dev_t *dev, uint32_t addr);
  * accepted, a Write Enable (WREN) instruction must previously have been
  * executed. After the Write Enable (WREN) instruction has been decoded, the
  * device sets the Write Enable Latch (WEL).
- *
- * @return  Status code used by the N25Q128 driver interface
  */
 void n25q128_bulk_erase(n25q128_dev_t *dev);
 
@@ -198,6 +188,15 @@ void n25q128_program_erase_suspend(n25q128_dev_t *dev);
  * @return  Status code used by the N25Q128 driver interface
  */
 void n25q128_program_erase_resume(n25q128_dev_t *dev);
+
+/*
+ * @brief   Check if there is a write in progress.
+ *
+ * @return  The Write In Progress (WIP) bit set to 1 indicates that the memory
+ *          is busy with a Write Status Register, Program or Erase cycle.
+ *          0 indicates no cycles is in progress.
+ */
+bool n25q128_write_in_progress(n25q128_dev_t *dev);
 
 #ifdef __cplusplus
 }

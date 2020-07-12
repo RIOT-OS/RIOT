@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "xtimer.h"
 #include "board.h"
 #include "periph/pm.h"
 #include "shell.h"
@@ -73,7 +74,7 @@ static int cmd_init(int argc, char **argv)
 
     puts("cmd_init: Initialize the N25Q128 flash memory.\n");
 
-    /* XXX: This is only for iot-lab-m3 boards at the moment! See board.h */
+    // XXX: Specific configuration for iotlab-m3 nodes.
     n25q128.conf.bus = EXTFLASH_SPI;
     n25q128.conf.mode = SPI_MODE_0;
     n25q128.conf.clk = SPI_CLK_100KHZ;
@@ -202,6 +203,29 @@ static int cmd_reboot(int argc, char **argv)
     return 0;
 }
 
+static int cmd_wip_check(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    puts("cmd_wip_check: This may take a few minutes to finish.");
+
+    /* Erase the whole memory. This takes a couple of minutes. */
+    n25q128_bulk_erase(&n25q128);
+
+    puts("Waiting for the Write-In-Process (WIP) flag to be cleared: ");
+
+    /* Check every few seconds if the wip bit is set (erase in process)*/
+    while(n25q128_write_in_progress(&n25q128) == 1) {
+        puts(".");
+        xtimer_sleep(1); // 1 second.
+    }
+
+    puts("done!");
+
+    return 0;
+}
+
 /**
  * @brief   List of shell commands for this test.
  */
@@ -213,6 +237,7 @@ static const shell_command_t shell_commands[] = {
     { "pp", "Program byte for byte at a specific address", cmd_page_program },
     { "se", "Erase a sector of a given address", cmd_sector_erase},
     { "be", "Erase the whole memory. Tooks ~250 seconds", cmd_bulk_erase },
+    { "wip", "Check via bulk erase if WIP bit is set", cmd_wip_check },
     { NULL, NULL, NULL }
 };
 
@@ -221,8 +246,8 @@ int main(void)
     char line_buf[SHELL_DEFAULT_BUFSIZE];
 
     puts("\nApplication: /tests/driver_n25q128");
-    puts("This driver only supports the extended SPI protocol at the moment.");
-    puts("Make sure to execute the 'init' command to initialize the memory.\n");
+
+    cmd_init(0, NULL);
 
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
