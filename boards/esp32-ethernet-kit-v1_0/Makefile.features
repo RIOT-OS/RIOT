@@ -8,6 +8,10 @@ FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm
 
+ifeq (,$(filter esp_jtag,$(USEMODULE)))
+  FEATURES_PROVIDED += periph_spi
+endif
+
 # unique features provided by the board
 FEATURES_PROVIDED += esp_jtag
 FEATURES_PROVIDED += esp_spi_ram

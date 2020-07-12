@@ -93,6 +93,23 @@
 #endif
 /** @} */
 
+/**
+ * @name    SPI configuration
+ *
+ * SPI configuration depends on configured/connected components.
+ *
+ * HSPI is only available when all JTAG pins are disabled.
+ *
+ * @{
+ */
+#ifndef MODULE_ESP_JTAG
+#define SPI0_CTRL   HSPI    /**< HSPI is used as SPI_DEV(0) */
+#define SPI0_SCK    GPIO14  /**< HSPI SCK */
+#define SPI0_MISO   GPIO12  /**< HSPI MISO */
+#define SPI0_MOSI   GPIO13  /**< HSPI MOSI */
+#define SPI0_CS0    GPIO15  /**< HSPI CS0 */
+#endif /* MODULE_ESP_JTAG not defined */
+/** @} */
 
 /**
  * @name   UART configuration
