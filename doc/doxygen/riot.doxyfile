@@ -770,6 +770,7 @@ INPUT                  = ../../doc.txt \
                          ../../tests/README.md \
                          src/build-system-basics.md \
                          src/kconfig/kconfig.md \
+                         src/using-cpp.md \
                          src/advanced-build-system-tricks.md \
                          src/changelog.md \
                          ../../LOSTANDFOUND.md
