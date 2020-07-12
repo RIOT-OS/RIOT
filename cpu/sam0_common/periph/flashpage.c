@@ -44,10 +44,9 @@
 #define _NVMCTRL NVMCTRL
 #endif
 
-static inline void wait_nvm_is_ready(void) __attribute__((always_inline));
 static inline void wait_nvm_is_ready(void)
 {
-#if defined(CPU_SAML1X) || defined(CPU_SAMD5X)
+#ifdef NVMCTRL_STATUS_READY
     while (!_NVMCTRL->STATUS.bit.READY) {}
 #else
     while (!_NVMCTRL->INTFLAG.bit.READY) {}
@@ -60,9 +59,7 @@ static void _unlock(void)
 #ifdef REG_PAC_WRCTRL
     PAC->WRCTRL.reg = (PAC_WRCTRL_KEY_CLR | ID_NVMCTRL);
 #else
-    if (PAC1->WPSET.reg & NVMCTRL_PAC_BIT) {
-        PAC1->WPCLR.reg = NVMCTRL_PAC_BIT;
-    }
+    PAC1->WPCLR.reg = NVMCTRL_PAC_BIT;
 #endif
 }
 
@@ -72,9 +69,7 @@ static void _lock(void)
 #ifdef REG_PAC_WRCTRL
     PAC->WRCTRL.reg = (PAC_WRCTRL_KEY_SET | ID_NVMCTRL);
 #else
-    if (PAC1->WPCLR.reg & NVMCTRL_PAC_BIT) {
-        PAC1->WPSET.reg = NVMCTRL_PAC_BIT;
-    }
+    PAC1->WPSET.reg = NVMCTRL_PAC_BIT;
 #endif
 }
 
