@@ -48,22 +48,22 @@ extern "C" {
  *     RTO <- SRTT + max (G, K*RTTVAR)
  *
  * where K is a constant, and G is clock granularity in seconds
- * ( @ref CONFIG_GNRC_TCP_RTO_GRANULARITY).
+ * ( @ref CONFIG_GNRC_TCP_RTO_GRANULARITY_MS).
  * For more information refer to https://tools.ietf.org/html/rfc6298
  * @{
  */
 /**
- * @brief Timeout duration for user calls. Default is 2 minutes.
+ * @brief Timeout duration in milliseconds for user calls. Default is 2 minutes.
  */
-#ifndef CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION
-#define CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION (120U * US_PER_SEC)
+#ifndef CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION_MS
+#define CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION_MS (120U * MS_PER_SEC)
 #endif
 
 /**
- * @brief Maximum segment lifetime (MSL). Default is 30 seconds.
+ * @brief Maximum segment lifetime (MSL) in milliseconds. Default is 30 seconds.
  */
-#ifndef CONFIG_GNRC_TCP_MSL
-#define CONFIG_GNRC_TCP_MSL (30U * US_PER_SEC)
+#ifndef CONFIG_GNRC_TCP_MSL_MS
+#define CONFIG_GNRC_TCP_MSL_MS (30U * MS_PER_SEC)
 #endif
 
 /**
@@ -109,28 +109,28 @@ extern "C" {
 #endif
 
 /**
- * @brief Lower bound for RTO = 1 sec (see RFC 6298)
+ * @brief Lower bound for RTO in milliseconds. Default is 1 sec (see RFC 6298)
  *
  * @note Retransmission Timeout (RTO) determines how long TCP waits for
  * acknowledgment (ACK) of transmitted segment. If the acknowledgment
  * isn't received within this time it is considered lost.
  */
-#ifndef CONFIG_GNRC_TCP_RTO_LOWER_BOUND
-#define CONFIG_GNRC_TCP_RTO_LOWER_BOUND (1U * US_PER_SEC)
+#ifndef CONFIG_GNRC_TCP_RTO_LOWER_BOUND_MS
+#define CONFIG_GNRC_TCP_RTO_LOWER_BOUND_MS (1U * MS_PER_SEC)
 #endif
 
 /**
- * @brief Upper bound for RTO = 60 sec (see RFC 6298)
+ * @brief Upper bound for RTO in milliseconds. Default is 60 sec (see RFC 6298)
  */
-#ifndef CONFIG_GNRC_TCP_RTO_UPPER_BOUND
-#define CONFIG_GNRC_TCP_RTO_UPPER_BOUND (60U * US_PER_SEC)
+#ifndef CONFIG_GNRC_TCP_RTO_UPPER_BOUND_MS
+#define CONFIG_GNRC_TCP_RTO_UPPER_BOUND_MS (60U * MS_PER_SEC)
 #endif
 
 /**
- * @brief Assumes clock granularity for TCP of 10 ms (see RFC 6298)
+ * @brief Clock granularity for TCP in milliseconds. Dedault is 10 milliseconds (see RFC 6298)
  */
-#ifndef CONFIG_GNRC_TCP_RTO_GRANULARITY
-#define CONFIG_GNRC_TCP_RTO_GRANULARITY (10U * MS_PER_SEC)
+#ifndef CONFIG_GNRC_TCP_RTO_GRANULARITY_MS
+#define CONFIG_GNRC_TCP_RTO_GRANULARITY_MS (10U)
 #endif
 
 /**
@@ -155,17 +155,17 @@ extern "C" {
 #endif
 
 /**
- * @brief Lower bound for the duration between probes
+ * @brief Lower bound for the duration between probes in milliseconds. Default is 1 seconds
  */
-#ifndef CONFIG_GNRC_TCP_PROBE_LOWER_BOUND
-#define CONFIG_GNRC_TCP_PROBE_LOWER_BOUND (1U * US_PER_SEC)
+#ifndef CONFIG_GNRC_TCP_PROBE_LOWER_BOUND_MS
+#define CONFIG_GNRC_TCP_PROBE_LOWER_BOUND_MS (1U * MS_PER_SEC)
 #endif
 
 /**
- * @brief Upper bound for the duration between probes
+ * @brief Upper bound for the duration between probes in milliseconds. Default is 60 seconds
  */
-#ifndef CONFIG_GNRC_TCP_PROBE_UPPER_BOUND
-#define CONFIG_GNRC_TCP_PROBE_UPPER_BOUND (60U * US_PER_SEC)
+#ifndef CONFIG_GNRC_TCP_PROBE_UPPER_BOUND_MS
+#define CONFIG_GNRC_TCP_PROBE_UPPER_BOUND_MS (60U * MS_PER_SEC)
 #endif
 
 /**

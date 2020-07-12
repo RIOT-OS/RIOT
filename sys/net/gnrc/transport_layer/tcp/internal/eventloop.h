@@ -20,18 +20,43 @@
 #ifndef EVENTLOOP_H
 #define EVENTLOOP_H
 
+#include <stdint.h>
+
+#include "evtimer_msg.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @brief GNRC TCPs main processing thread.
+ * @brief Starts GNRC TCP's main processing thread.
  *
- * @param[in] arg   Thread arguments (unused).
- *
- * @returns   Never, its an endless loop
+ * @retval  PID of processing thread on success
+ * @retval  -EEXIST if processing thread was already started
+ * @retval  see @ref thread_create() for more error cases.
  */
-void *_event_loop(__attribute__((unused)) void *arg);
+int _gnrc_tcp_event_loop_init(void);
+
+/**
+ * @brief   Schedule event to event loop
+ *
+ * @param[in] event     The event to schedule
+ * @param[in] offset    Offset in milliseconds when the event should be handled
+ *                      in the event loop
+ * @param[in] type      Type of the message for the event
+ * @param[in] context   Context of the event.
+ */
+void _gnrc_tcp_event_loop_sched(evtimer_msg_event_t *event, uint32_t offset,
+                                uint16_t type, void *context);
+
+/**
+ * @brief   Unschedule event to event loop
+ *
+ * Does nothing if @p event was not scheduled.
+ *
+ * @param[in] event The event to unschedule
+ */
+void _gnrc_tcp_event_loop_unsched(evtimer_msg_event_t *event);
 
 #ifdef __cplusplus
 }

@@ -22,7 +22,10 @@
 #include "random.h"
 #include "net/af.h"
 #include "net/gnrc.h"
+#include "evtimer.h"
+#include "evtimer_msg.h"
 #include "internal/common.h"
+#include "internal/eventloop.h"
 #include "internal/pkt.h"
 #include "internal/option.h"
 #include "internal/rcvbuf.h"
@@ -84,8 +87,8 @@ static uint16_t _get_random_local_port(void)
 static int _clear_retransmit(gnrc_tcp_tcb_t *tcb)
 {
     if (tcb->pkt_retransmit != NULL) {
+        _gnrc_tcp_event_loop_unsched(&tcb->event_retransmit);
         gnrc_pktbuf_release(tcb->pkt_retransmit);
-        xtimer_remove(&(tcb->timer_retransmit));
         tcb->pkt_retransmit = NULL;
     }
     return 0;
@@ -100,11 +103,9 @@ static int _clear_retransmit(gnrc_tcp_tcb_t *tcb)
  */
 static int _restart_timewait_timer(gnrc_tcp_tcb_t *tcb)
 {
-    xtimer_remove(&tcb->timer_retransmit);
-    tcb->msg_retransmit.type = MSG_TYPE_TIMEWAIT;
-    tcb->msg_retransmit.content.ptr = (void *)tcb;
-    xtimer_set_msg(&(tcb->timer_retransmit), 2 * CONFIG_GNRC_TCP_MSL, &(tcb->msg_retransmit),
-                   gnrc_tcp_pid);
+    _gnrc_tcp_event_loop_unsched(&tcb->event_retransmit);
+    _gnrc_tcp_event_loop_sched(&tcb->event_retransmit, 2 * CONFIG_GNRC_TCP_MSL_MS,
+                               MSG_TYPE_TIMEWAIT, tcb);
     return 0;
 }
 
@@ -306,7 +307,7 @@ static int _fsm_call_recv(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
     if (ringbuffer_get_free(&tcb->rcv_buf) >= CONFIG_GNRC_TCP_MSS) {
         tcb->rcv_wnd = ringbuffer_get_free(&(tcb->rcv_buf));
 
-        /* Send ACK to anounce window update */
+        /* Send ACK to announce window update */
         gnrc_pktsnip_t *out_pkt = NULL;
         uint16_t seq_con = 0;
         _pkt_build(tcb, &out_pkt, &seq_con, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0);
