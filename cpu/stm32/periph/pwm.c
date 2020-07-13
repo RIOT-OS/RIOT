@@ -33,9 +33,7 @@
                              TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2)
 #define CCMR_MODE2          (TIM_CCMR1_OC1M_0 | TIM_CCMR1_OC1M_1 | \
                              TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC2M_0 | \
-                             TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2);
-
-static uint32_t dc_reverse = 0;
+                             TIM_CCMR1_OC2M_1 | TIM_CCMR1_OC2M_2)
 
 static inline TIM_TypeDef *dev(pwm_t pwm)
 {
@@ -75,8 +73,6 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     dev(pwm)->PSC = (timer_clk / (res * freq)) - 1;
     dev(pwm)->ARR = (mode == PWM_CENTER) ? (res / 2) : res - 1;
 
-    dc_reverse &= ~(1 << pwm);
-
     /* set PWM mode */
     switch (mode) {
         case PWM_LEFT:
@@ -87,7 +83,6 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
             dev(pwm)->CCMR1 = CCMR_MODE2;
             dev(pwm)->CCMR2 = CCMR_MODE2;
             /* duty cycle should be reversed */
-            dc_reverse |= (1 << pwm);
             break;
         case PWM_CENTER:
             dev(pwm)->CCMR1 = CCMR_MODE1;
@@ -131,7 +126,7 @@ void pwm_set(pwm_t pwm, uint8_t channel, uint16_t value)
         value = (uint16_t)dev(pwm)->ARR + 1;
     }
 
-    if ((dc_reverse & (1 << pwm)) != 0) {
+    if (dev(pwm)->CCMR1 == CCMR_MODE2) {
         /* reverse the value */
         value = (uint16_t)dev(pwm)->ARR + 1 - value;
     }
