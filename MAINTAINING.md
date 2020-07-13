@@ -117,6 +117,11 @@ complete that no input from the original developer or maintainer is required.
 -   Be friendly. Respect the original author, bearing in mind that their coding
     style or their design may be just as valid as the way you would have done
     it. And of course, always follow the [Code of Conduct].
+-   If a contributor has opened a PR, the reviewer should attempt to
+    help the author of the contribution to get it to its best shape and
+    according to the RIOT Standard™. If there is disagreement, it’s important
+    to understand the reasons behind and always give technical arguments,
+    pros and cons or snippets.
 
 
 ### Organisation of reviewing between maintainers
