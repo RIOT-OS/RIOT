@@ -25,15 +25,10 @@ include $(RIOTBASE)/Makefile.include
 LOADER=$(RIOTBASE)/dist/tools/jlink/jlink.sh
 # LOADER=st-flash
 
-ELF=$(BINDIR)/$(APPLICATION).elf
-BIN=$(BINDIR)/$(APPLICATION)
-HEX=$(BINDIR)/$(APPLICATION).hex
-load:
-	export JLINK_DEVICE=STM32F103C8
-	export FLASH_ADDR=0x08000000
-	arm-none-eabi-objcopy -O ihex $(ELF) $(HEX)
-	$(LOADER) flash $(HEX)
+export JLINK_DEVICE=$(CPU_MODEL)
+export FLASH_ADDR=0x08000000
+load: hexfile
+	$(LOADER) flash $(HEXFILE)
 	# $(LOADER)  --reset --format ihex write $(HEX)
-
 
 .PHONY: load

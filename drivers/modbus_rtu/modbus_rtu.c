@@ -60,16 +60,16 @@ int modbus_rtu_init(modbus_rtu_t *modbus) {
   if (err != UART_OK) {
     return err;
   }
-  if (modbus->pin_rts) {
+  if (modbus->pin_rts != GPIO_UNDEF) {
     gpio_init(modbus->pin_rts, GPIO_OUT);
     gpio_write(modbus->pin_rts, !modbus->pin_rts_enable);
   }
-  mutex_init(&(modbus->_mutex_buffer));
+  mutex_init(&(modbus->mutex_buffer));
   // usec in sec / byte per second * 1.5
-  modbus->_rx_timeout = 1000000 / (modbus->baudrate / 10) * 1.5;
+  modbus->rx_timeout = 1000000 / (modbus->baudrate / 10) * 1.5;
 
-  modbus->_size_buffer = 0;
-  modbus->_msg = NULL;
+  modbus->size_buffer = 0;
+  modbus->msg = NULL;
 
   puts("modbus_init");
 
@@ -77,53 +77,53 @@ int modbus_rtu_init(modbus_rtu_t *modbus) {
 }
 
 int modbus_rtu_send_request(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
-  modbus->_msg = message;
-  modbus->_pid = thread_getpid();
-  mutex_lock(&(modbus->_mutex_buffer));
+  modbus->msg = message;
+  modbus->pid = thread_getpid();
+  mutex_lock(&(modbus->mutex_buffer));
   if (prepare_request(modbus) != 0) {
-    mutex_unlock(&(modbus->_mutex_buffer));
+    mutex_unlock(&(modbus->mutex_buffer));
     return -1;
   }
   send(modbus);
-  modbus->_size_buffer = 0;
-  mutex_unlock(&(modbus->_mutex_buffer));
+  modbus->size_buffer = 0;
+  mutex_unlock(&(modbus->mutex_buffer));
 
   return get_response(modbus);
 }
 
 static inline int prepare_request(modbus_rtu_t *modbus) {
-  modbus->_buffer[ID] = modbus->_msg->id;
-  modbus->_buffer[FUNC] = modbus->_msg->func;
-  modbus->_buffer[ADD_HI] = lowByte(modbus->_msg->addr);
-  modbus->_buffer[ADD_LO] = lowByte(modbus->_msg->addr);
+  modbus->buffer[ID] = modbus->msg->id;
+  modbus->buffer[FUNC] = modbus->msg->func;
+  modbus->buffer[ADD_HI] = lowByte(modbus->msg->addr);
+  modbus->buffer[ADD_LO] = lowByte(modbus->msg->addr);
   uint8_t size;
-  switch (modbus->_msg->func) {
+  switch (modbus->msg->func) {
   case MB_FC_READ_COILS:
   case MB_FC_READ_DISCRETE_INPUT:
   case MB_FC_READ_REGISTERS:
   case MB_FC_READ_INPUT_REGISTER:
-    modbus->_buffer[NB_HI] = highByte(modbus->_msg->count);
-    modbus->_buffer[NB_LO] = lowByte(modbus->_msg->count);
-    modbus->_size_buffer = 6;
+    modbus->buffer[NB_HI] = highByte(modbus->msg->count);
+    modbus->buffer[NB_LO] = lowByte(modbus->msg->count);
+    modbus->size_buffer = 6;
     break;
   // ...
   case MB_FC_WRITE_COILS:
-    modbus->_buffer[NB_HI] = highByte(modbus->_msg->count);
-    modbus->_buffer[NB_LO] = lowByte(modbus->_msg->count);
-    size = modbus->_msg->count / 8 + 1;
-    modbus->_buffer[BYTE_CNT] = size;
-    modbus->_size_buffer = 7;
-    memcpy(modbus->_buffer + modbus->_size_buffer, modbus->_msg->regs, size);
-    modbus->_size_buffer += size;
+    modbus->buffer[NB_HI] = highByte(modbus->msg->count);
+    modbus->buffer[NB_LO] = lowByte(modbus->msg->count);
+    size = modbus->msg->count / 8 + 1;
+    modbus->buffer[BYTE_CNT] = size;
+    modbus->size_buffer = 7;
+    memcpy(modbus->buffer + modbus->size_buffer, modbus->msg->data, size);
+    modbus->size_buffer += size;
     break;
   case MB_FC_WRITE_REGISTERS:
-    modbus->_buffer[NB_HI] = highByte(modbus->_msg->count);
-    modbus->_buffer[NB_LO] = lowByte(modbus->_msg->count);
-    size = modbus->_msg->count * 2;
-    modbus->_buffer[BYTE_CNT] = size;
-    modbus->_size_buffer = 7;
-    memcpy(modbus->_buffer + modbus->_size_buffer, modbus->_msg->regs, size);
-    modbus->_size_buffer += size;
+    modbus->buffer[NB_HI] = highByte(modbus->msg->count);
+    modbus->buffer[NB_LO] = lowByte(modbus->msg->count);
+    size = modbus->msg->count * 2;
+    modbus->buffer[BYTE_CNT] = size;
+    modbus->size_buffer = 7;
+    memcpy(modbus->buffer + modbus->size_buffer, modbus->msg->data, size);
+    modbus->size_buffer += size;
     break;
   default:
     return -15;
@@ -139,56 +139,56 @@ static inline int get_response(modbus_rtu_t *modbus) {
     return -99; // timeout; no has answer
   } else {
     // start aswer
-    if (modbus->_buffer[ID] != modbus->_msg->id) {
+    if (modbus->buffer[ID] != modbus->msg->id) {
       return -2; // invalid id
     }
 
-    while (modbus->_size_buffer < MIN_SIZE_REQUEST) {
-      if (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) < 0) {
+    while (modbus->size_buffer < MIN_SIZE_REQUEST) {
+      if (xtimer_msg_receive_timeout(&msg, modbus->rx_timeout) < 0) {
         return -3;
       }
     }
 
-    if (modbus->_buffer[FUNC] != modbus->_msg->func) {
+    if (modbus->buffer[FUNC] != modbus->msg->func) {
       return -4;
     }
     uint8_t size;
-    switch (modbus->_buffer[FUNC]) {
+    switch (modbus->buffer[FUNC]) {
     case MB_FC_READ_COILS:
     case MB_FC_READ_DISCRETE_INPUT:
       // id + func + size + size of regs + crc16
-      size = 3 + modbus->_buffer[2] + 2;
-      mutex_lock(&(modbus->_mutex_buffer));
-      if (calcCRC(modbus->_buffer, size) != 0) {
-        mutex_unlock(&(modbus->_mutex_buffer));
+      size = 3 + modbus->buffer[2] + 2;
+      mutex_lock(&(modbus->mutex_buffer));
+      if (calcCRC(modbus->buffer, size) != 0) {
+        mutex_unlock(&(modbus->mutex_buffer));
         return -7;
       }
-      memcpy(modbus->_msg->regs, modbus->_buffer + 3, modbus->_buffer[2]);
-      mutex_unlock(&(modbus->_mutex_buffer));
+      memcpy(modbus->msg->data, modbus->buffer + 3, modbus->buffer[2]);
+      mutex_unlock(&(modbus->mutex_buffer));
       break;
     case MB_FC_READ_REGISTERS:
     case MB_FC_READ_INPUT_REGISTER:
       // id + func + size + size of regs + crc16
-      size = 3 + modbus->_buffer[2] + 2;
-      while (modbus->_size_buffer < size) {
-        if (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) < 0) {
+      size = 3 + modbus->buffer[2] + 2;
+      while (modbus->size_buffer < size) {
+        if (xtimer_msg_receive_timeout(&msg, modbus->rx_timeout) < 0) {
           return -6;
         }
       }
-      mutex_lock(&(modbus->_mutex_buffer));
-      if (calcCRC(modbus->_buffer, size) != 0) {
-        mutex_unlock(&(modbus->_mutex_buffer));
+      mutex_lock(&(modbus->mutex_buffer));
+      if (calcCRC(modbus->buffer, size) != 0) {
+        mutex_unlock(&(modbus->mutex_buffer));
         return -7;
       }
-      memcpy(modbus->_msg->regs, modbus->_buffer + 3, modbus->_buffer[2]);
-      mutex_unlock(&(modbus->_mutex_buffer));
+      memcpy(modbus->msg->data, modbus->buffer + 3, modbus->buffer[2]);
+      mutex_unlock(&(modbus->mutex_buffer));
       break;
     case MB_FC_WRITE_COIL:
     case MB_FC_WRITE_REGISTER:
     case MB_FC_WRITE_COILS:
     case MB_FC_WRITE_REGISTERS:
       // todo: add check function
-      if (calcCRC(modbus->_buffer, modbus->_size_buffer) != 0) {
+      if (calcCRC(modbus->buffer, modbus->size_buffer) != 0) {
         return -7;
       }
       break;
@@ -197,71 +197,71 @@ static inline int get_response(modbus_rtu_t *modbus) {
       break;
     }
 
-    modbus->_size_buffer = 0;
+    modbus->size_buffer = 0;
     return 0;
   }
 }
 
 int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
-  modbus->_pid = thread_getpid();
-  modbus->_msg = message;
+  modbus->pid = thread_getpid();
+  modbus->msg = message;
   msg_t msg;
 
   while (1) {
     msg_receive(&msg);
-    // printf("slave id: %u\n", modbus->_buffer[ID]);
-    if (modbus->_buffer[ID] != modbus->id) {
+    // printf("slave id: %u\n", modbus->buffer[ID]);
+    if (modbus->buffer[ID] != modbus->id) {
       // wait the end of transfer for other slave
-      while (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) >= 0) {
+      while (xtimer_msg_receive_timeout(&msg, modbus->rx_timeout) >= 0) {
       }
-      modbus->_size_buffer = 0;
+      modbus->size_buffer = 0;
       continue;
     }
-    modbus->_msg->id = modbus->_buffer[ID];
+    modbus->msg->id = modbus->buffer[ID];
 
     // wait minimal size of request
-    while (modbus->_size_buffer < MIN_SIZE_REQUEST) {
-      if (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) < 0) {
+    while (modbus->size_buffer < MIN_SIZE_REQUEST) {
+      if (xtimer_msg_receive_timeout(&msg, modbus->rx_timeout) < 0) {
         goto error;
       }
     }
-    modbus->_msg->func = modbus->_buffer[FUNC];
+    modbus->msg->func = modbus->buffer[FUNC];
     uint8_t size;
-    switch (modbus->_buffer[FUNC]) {
+    switch (modbus->buffer[FUNC]) {
     case MB_FC_READ_COILS:
     case MB_FC_READ_DISCRETE_INPUT:
     case MB_FC_READ_REGISTERS:
     case MB_FC_READ_INPUT_REGISTER:
-      while (modbus->_size_buffer < 8) {
-        if (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) < 0) {
+      while (modbus->size_buffer < 8) {
+        if (xtimer_msg_receive_timeout(&msg, modbus->rx_timeout) < 0) {
           goto error;
         }
       }
-      if (calcCRC(modbus->_buffer, 8) != 0) {
+      if (calcCRC(modbus->buffer, 8) != 0) {
         goto error;
       }
-      modbus->_msg->addr = ((modbus->_buffer[ADD_HI]) << 8) | modbus->_buffer[ADD_LO];
-      modbus->_msg->count = ((modbus->_buffer[NB_HI]) << 8) | modbus->_buffer[NB_LO];
+      modbus->msg->addr = ((modbus->buffer[ADD_HI]) << 8) | modbus->buffer[ADD_LO];
+      modbus->msg->count = ((modbus->buffer[NB_HI]) << 8) | modbus->buffer[NB_LO];
       break;
     case MB_FC_WRITE_COILS:
     case MB_FC_WRITE_REGISTERS:
       // (id + func + addr + count + size) + size of regs + crc
-      size = 7 + modbus->_buffer[BYTE_CNT] + 2;
+      size = 7 + modbus->buffer[BYTE_CNT] + 2;
       // thread_stack_print();
-      while (modbus->_size_buffer < size) {
-        if (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) < 0) {
+      while (modbus->size_buffer < size) {
+        if (xtimer_msg_receive_timeout(&msg, modbus->rx_timeout) < 0) {
           goto error;
         }
       }
-      mutex_lock(&(modbus->_mutex_buffer));
-      if (calcCRC(modbus->_buffer, size) != 0) {
-        mutex_unlock(&(modbus->_mutex_buffer));
+      mutex_lock(&(modbus->mutex_buffer));
+      if (calcCRC(modbus->buffer, size) != 0) {
+        mutex_unlock(&(modbus->mutex_buffer));
         goto error;
       }
-      modbus->_msg->addr = ((modbus->_buffer[ADD_HI]) << 8) | modbus->_buffer[ADD_LO];
-      modbus->_msg->count = ((modbus->_buffer[NB_HI]) << 8) | modbus->_buffer[NB_LO];
-      memcpy(modbus->_msg->regs, modbus->_buffer + 7, modbus->_buffer[BYTE_CNT]);
-      mutex_unlock(&(modbus->_mutex_buffer));
+      modbus->msg->addr = ((modbus->buffer[ADD_HI]) << 8) | modbus->buffer[ADD_LO];
+      modbus->msg->count = ((modbus->buffer[NB_HI]) << 8) | modbus->buffer[NB_LO];
+      memcpy(modbus->msg->data, modbus->buffer + 7, modbus->buffer[BYTE_CNT]);
+      mutex_unlock(&(modbus->mutex_buffer));
       break;
     default:
       goto error;
@@ -271,71 +271,71 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
     goto OK;
   }
 error:
-  modbus->_size_buffer = 0;
-  modbus->_msg = NULL;
+  modbus->size_buffer = 0;
+  modbus->msg = NULL;
   return -1;
 OK:
-  modbus->_size_buffer = 0;
-  modbus->_msg = NULL;
+  modbus->size_buffer = 0;
+  modbus->msg = NULL;
   return 0;
 }
 
 int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
-  modbus->_msg = message;
-  mutex_lock(&(modbus->_mutex_buffer));
-  modbus->_buffer[ID] = modbus->_msg->id;
-  modbus->_buffer[FUNC] = modbus->_msg->func;
-  switch (modbus->_msg->func) {
+  modbus->msg = message;
+  mutex_lock(&(modbus->mutex_buffer));
+  modbus->buffer[ID] = modbus->msg->id;
+  modbus->buffer[FUNC] = modbus->msg->func;
+  switch (modbus->msg->func) {
   case MB_FC_READ_COILS:
   case MB_FC_READ_DISCRETE_INPUT:
-    modbus->_buffer[2] = modbus->_msg->count / 8 + 1; // calc size for send
-    modbus->_size_buffer = 3 + modbus->_buffer[2];
-    memcpy(modbus->_buffer + 3, modbus->_msg->regs, modbus->_size_buffer);
+    modbus->buffer[2] = modbus->msg->count / 8 + 1; // calc size for send
+    modbus->size_buffer = 3 + modbus->buffer[2];
+    memcpy(modbus->buffer + 3, modbus->msg->data, modbus->size_buffer);
     break;
   case MB_FC_READ_REGISTERS:
   case MB_FC_READ_INPUT_REGISTER:
-    modbus->_buffer[2] = modbus->_msg->count * 2; // calc size for send
-    modbus->_size_buffer = 3 + modbus->_buffer[2];
-    memcpy(modbus->_buffer + 3, modbus->_msg->regs, modbus->_size_buffer);
+    modbus->buffer[2] = modbus->msg->count * 2; // calc size for send
+    modbus->size_buffer = 3 + modbus->buffer[2];
+    memcpy(modbus->buffer + 3, modbus->msg->data, modbus->size_buffer);
     break;
   case MB_FC_WRITE_COILS:
   case MB_FC_WRITE_REGISTERS:
-    modbus->_buffer[ADD_HI] = highByte(modbus->_msg->addr);
-    modbus->_buffer[ADD_LO] = lowByte(modbus->_msg->addr);
-    modbus->_buffer[NB_HI] = highByte(modbus->_msg->count);
-    modbus->_buffer[NB_LO] = lowByte(modbus->_msg->count);
-    modbus->_size_buffer = 6;
+    modbus->buffer[ADD_HI] = highByte(modbus->msg->addr);
+    modbus->buffer[ADD_LO] = lowByte(modbus->msg->addr);
+    modbus->buffer[NB_HI] = highByte(modbus->msg->count);
+    modbus->buffer[NB_LO] = lowByte(modbus->msg->count);
+    modbus->size_buffer = 6;
     break;
   default:
-    mutex_unlock(&(modbus->_mutex_buffer));
+    mutex_unlock(&(modbus->mutex_buffer));
     return -1;
     break;
   }
   send(modbus);
-  modbus->_size_buffer = 0;
-  mutex_unlock(&(modbus->_mutex_buffer));
+  modbus->size_buffer = 0;
+  mutex_unlock(&(modbus->mutex_buffer));
   return 0;
 }
 
 static inline void send(modbus_rtu_t *modbus) {
-  uint16_t crc = calcCRC(modbus->_buffer, modbus->_size_buffer);
-  modbus->_buffer[modbus->_size_buffer] = lowByte(crc);
-  modbus->_size_buffer++;
-  modbus->_buffer[modbus->_size_buffer] = highByte(crc);
-  modbus->_size_buffer++;
+  uint16_t crc = calcCRC(modbus->buffer, modbus->size_buffer);
+  modbus->buffer[modbus->size_buffer] = lowByte(crc);
+  modbus->size_buffer++;
+  modbus->buffer[modbus->size_buffer] = highByte(crc);
+  modbus->size_buffer++;
   enamdle_trasmit(modbus);
-  uart_write(modbus->uart, modbus->_buffer, modbus->_size_buffer);
+  uart_write(modbus->uart, modbus->buffer, modbus->size_buffer);
   disamdle_trasmit(modbus);
 }
 
 static inline void enamdle_trasmit(modbus_rtu_t *modbus) {
-  if (modbus->pin_rts) {
+  if (modbus->pin_rts != GPIO_UNDEF) {
     gpio_write(modbus->pin_rts, modbus->pin_rts_enable);
   }
 }
 
 static inline void disamdle_trasmit(modbus_rtu_t *modbus) {
-  if (modbus->pin_rts) {
+  if (modbus->pin_rts != GPIO_UNDEF) {
     gpio_write(modbus->pin_rts, !modbus->pin_rts_enable);
   }
 }
@@ -345,20 +345,20 @@ static void rx_cb(void *arg, uint8_t data) {
   modbus_rtu_t *modbus = (modbus_rtu_t *)arg;
   // printf("rx_cb: %x\n", data);
 
-  if (mutex_trylock(&(modbus->_mutex_buffer)) == 0) {
+  if (mutex_trylock(&(modbus->mutex_buffer)) == 0) {
     goto exit;
   }
 
-  if (modbus->_msg == NULL) {
+  if (modbus->msg == NULL) {
     goto exit;
   }
 
-  modbus->_buffer[modbus->_size_buffer] = data;
-  modbus->_size_buffer++;
+  modbus->buffer[modbus->size_buffer] = data;
+  modbus->size_buffer++;
 
-  msg_send(&msg, modbus->_pid);
+  msg_send(&msg, modbus->pid);
 
 exit:
-  mutex_unlock(&(modbus->_mutex_buffer));
+  mutex_unlock(&(modbus->mutex_buffer));
   return;
 }
