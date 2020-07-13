@@ -69,14 +69,15 @@ void gnrc_lorawan_mlme_confirm(gnrc_lorawan_t *mac, mlme_confirm_t *confirm)
 
 static inline void _set_be_addr(gnrc_lorawan_t *mac, uint8_t *be_addr)
 {
-    uint32_t tmp = *((uint32_t*) be_addr);
-    tmp = byteorder_swapl(tmp);
+    uint32_t tmp = byteorder_bebuftohl(be_addr);
+    le_uint32_t dev_addr = byteorder_btoll(byteorder_htonl(tmp));
+
     mlme_request_t mlme_request;
     mlme_confirm_t mlme_confirm;
 
     mlme_request.type = MLME_SET;
     mlme_request.mib.type = MIB_DEV_ADDR;
-    mlme_request.mib.dev_addr = &tmp;
+    mlme_request.mib.dev_addr = &dev_addr;
 
     gnrc_lorawan_mlme_request(mac, &mlme_request, &mlme_confirm);
 }
