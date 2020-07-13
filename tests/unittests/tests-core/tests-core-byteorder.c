@@ -88,6 +88,14 @@ static void test_byteorder_bebuftohs(void)
     TEST_ASSERT_EQUAL_INT(host, byteorder_bebuftohs(bebuf));
 }
 
+static void test_byteorder_bebuftohl(void)
+{
+    static const uint8_t bebuf[4] = { 0xAA, 0xBB, 0xCC, 0xDD};
+    static const uint32_t host = 0xAABBCCDD;
+
+    TEST_ASSERT_EQUAL_INT(host, byteorder_bebuftohl(bebuf));
+}
+
 static void test_byteorder_htobebufs(void)
 {
     static const uint8_t bebuf[2] = { 0xAA, 0xBB };
@@ -96,6 +104,18 @@ static void test_byteorder_htobebufs(void)
     uint8_t tmp[2] = {0};
 
     byteorder_htobebufs(tmp, host);
+
+    TEST_ASSERT_EQUAL_INT(0, memcmp(bebuf, tmp, sizeof(tmp)));
+}
+
+static void test_byteorder_htobebufl(void)
+{
+    static const uint8_t bebuf[4] = { 0xAA, 0xBB, 0xCC, 0xDD};
+    static const uint32_t host = 0xAABBCCDD;
+
+    uint8_t tmp[4] = {0};
+
+    byteorder_htobebufl(tmp, host);
 
     TEST_ASSERT_EQUAL_INT(0, memcmp(bebuf, tmp, sizeof(tmp)));
 }
@@ -114,6 +134,8 @@ Test *tests_core_byteorder_tests(void)
         new_TestFixture(test_byteorder_host_to_network_64),
         new_TestFixture(test_byteorder_bebuftohs),
         new_TestFixture(test_byteorder_htobebufs),
+        new_TestFixture(test_byteorder_bebuftohl),
+        new_TestFixture(test_byteorder_htobebufl),
     };
 
     EMB_UNIT_TESTCALLER(core_byteorder_tests, NULL, NULL, fixtures);
