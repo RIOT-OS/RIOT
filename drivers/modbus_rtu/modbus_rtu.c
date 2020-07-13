@@ -232,6 +232,11 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
     case MB_FC_READ_DISCRETE_INPUT:
     case MB_FC_READ_REGISTERS:
     case MB_FC_READ_INPUT_REGISTER:
+      while (modbus->_size_buffer < 8) {
+        if (xtimer_msg_receive_timeout(&msg, modbus->_rx_timeout) < 0) {
+          goto error;
+        }
+      }
       if (calcCRC(modbus->_buffer, 8) != 0) {
         goto error;
       }
