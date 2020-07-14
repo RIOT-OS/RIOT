@@ -167,6 +167,15 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief   Bit-Band configuration
+ * @{
+ */
+#ifdef SRAM_BB_BASE
+#define CPU_HAS_BITBAND 1
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
