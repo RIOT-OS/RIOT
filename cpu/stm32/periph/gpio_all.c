@@ -27,6 +27,7 @@
  */
 
 
+#include "bit.h"
 #include "cpu.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
@@ -155,12 +156,12 @@ void gpio_init_analog(gpio_t pin)
 
 void gpio_irq_enable(gpio_t pin)
 {
-    EXTI_REG_IMR |= (1 << _pin_num(pin));
+    bit_set32(&EXTI_REG_IMR, _pin_num(pin));
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
-    EXTI_REG_IMR &= ~(1 << _pin_num(pin));
+    bit_clear32(&EXTI_REG_IMR, _pin_num(pin));
 }
 
 int gpio_read(gpio_t pin)
@@ -170,12 +171,12 @@ int gpio_read(gpio_t pin)
 
 void gpio_set(gpio_t pin)
 {
-    _port(pin)->BSRR = (1 << _pin_num(pin));
+    bit_set32(&_port(pin)->BSRR, _pin_num(pin));
 }
 
 void gpio_clear(gpio_t pin)
 {
-    _port(pin)->BSRR = (1 << (_pin_num(pin) + 16));
+    bit_set32(&_port(pin)->BSRR, _pin_num(pin) + 16);
 }
 
 void gpio_toggle(gpio_t pin)
