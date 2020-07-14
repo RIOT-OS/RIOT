@@ -455,6 +455,11 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             sx127x_set_fixed_header_len_mode(dev, *((const netopt_enable_t*) val) ? true : false);
             return sizeof(netopt_enable_t);
 
+        case NETOPT_PDU_SIZE:
+            assert(len <= sizeof(uint16_t));
+            sx127x_set_payload_length(dev, *((const uint16_t*) val));
+            return sizeof(uint16_t);
+
         case NETOPT_PREAMBLE_LENGTH:
             assert(len <= sizeof(uint16_t));
             sx127x_set_preamble_length(dev, *((const uint16_t*) val));
