@@ -41,6 +41,7 @@ static const char *_netopt_strmap[] = {
     [NETOPT_IPV6_FORWARDING]       = "NETOPT_IPV6_FORWARDING",
     [NETOPT_IPV6_SND_RTR_ADV]      = "NETOPT_IPV6_SND_RTR_ADV",
     [NETOPT_TX_POWER]              = "NETOPT_TX_POWER",
+    [NETOPT_PDU_SIZE]              = "NETOPT_PDU_SIZE",
     [NETOPT_MAX_PDU_SIZE]          = "NETOPT_MAX_PDU_SIZE",
     [NETOPT_PRELOADING]            = "NETOPT_PRELOADING",
     [NETOPT_PROMISCUOUSMODE]       = "NETOPT_PROMISCUOUSMODE",
