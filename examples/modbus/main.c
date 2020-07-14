@@ -31,13 +31,12 @@ static modbus_rtu_message_t message_slave = {
 
 static void init_master(void) {
   master.uart = UART_DEV(2);
-  master.baudrate = BAUDRATE;
   master.timeout = 1000000;
   master.id = 0;
   master.pin_rts = GPIO_PIN(PORT_A, 1);
   master.pin_rts_enable = 0;
 
-  if (modbus_rtu_init(&master)) {
+  if (modbus_rtu_init(&master, BAUDRATE)) {
     puts("fail UART init");
   }
 }
@@ -103,12 +102,11 @@ static void *thread_master(void *arg __attribute__((unused))) {
 
 static void init_slave(void) {
   slave.uart = UART_DEV(0);
-  slave.baudrate = BAUDRATE;
   slave.id = SLAVE_ID;
   slave.pin_rts = GPIO_PIN(PORT_B, 15);
   slave.pin_rts_enable = 1;
 
-  if (modbus_rtu_init(&slave)) {
+  if (modbus_rtu_init(&slave, BAUDRATE)) {
     puts("fail UART init");
   }
 }

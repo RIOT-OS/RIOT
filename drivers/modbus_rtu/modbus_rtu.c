@@ -55,8 +55,8 @@ static inline int prepare_request(modbus_rtu_t *modbus);
 static inline int get_response(modbus_rtu_t *modbus);
 static void rx_cb(void *arg, uint8_t data);
 
-int modbus_rtu_init(modbus_rtu_t *modbus) {
-  int err = uart_init(modbus->uart, modbus->baudrate, rx_cb, modbus);
+int modbus_rtu_init(modbus_rtu_t *modbus, uint32_t baudrate) {
+  int err = uart_init(modbus->uart, baudrate, rx_cb, modbus);
   if (err != UART_OK) {
     return err;
   }
@@ -66,7 +66,7 @@ int modbus_rtu_init(modbus_rtu_t *modbus) {
   }
   mutex_init(&(modbus->mutex_buffer));
   // usec in sec / byte per second * 1.5
-  modbus->rx_timeout = 1000000 / (modbus->baudrate / 10) * 1.5;
+  modbus->rx_timeout = 1000000 / (baudrate / 10) * 1.5;
 
   modbus->size_buffer = 0;
   modbus->msg = NULL;

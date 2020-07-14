@@ -58,10 +58,6 @@ typedef struct {
    */
   uart_t uart;
   /**
-   * @brief   baudrate.
-   */
-  uint32_t baudrate;
-  /**
    * @brief   RTS pin. GPIO_UNDEF if not use.
    */
   gpio_t pin_rts;
@@ -119,7 +115,7 @@ typedef struct {
  *
  * @return              0 on success, otherwise error
  */
-int modbus_rtu_init(modbus_rtu_t *modbus);
+int modbus_rtu_init(modbus_rtu_t *modbus, uint32_t baudrate);
 
 /**
  * @brief   Send request to slave.
