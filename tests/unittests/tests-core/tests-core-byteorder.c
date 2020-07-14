@@ -80,6 +80,30 @@ static void test_byteorder_host_to_network_64(void)
     TEST_ASSERT_EQUAL_INT(host, byteorder_ntohll(network));
 }
 
+static void test_byteorder_host_to_little_16(void)
+{
+    static const uint16_t host = 0x3412;
+    network_uint16_t network = { .u8 = { 0x12, 0x34 } };
+    TEST_ASSERT_EQUAL_INT(network.u16, byteorder_htols(host).u16);
+    TEST_ASSERT_EQUAL_INT(host, byteorder_ltohs(network));
+}
+
+static void test_byteorder_host_to_little_32(void)
+{
+    static const uint32_t host = 0x78563412ul;
+    network_uint32_t network = { .u8 = { 0x12, 0x34, 0x56, 0x78 } };
+    TEST_ASSERT_EQUAL_INT(network.u32, byteorder_htoll(host).u32);
+    TEST_ASSERT_EQUAL_INT(host, byteorder_ltohl(network));
+}
+
+static void test_byteorder_host_to_little_64(void)
+{
+    static const uint64_t host = 0xf0debc9a78563412ull;
+    network_uint64_t network = { .u8 = { 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0 } };
+    TEST_ASSERT_EQUAL_INT(network.u64, byteorder_htolll(host).u64);
+    TEST_ASSERT_EQUAL_INT(host, byteorder_ltohll(network));
+}
+
 static void test_byteorder_bebuftohs(void)
 {
     static const uint8_t bebuf[2] = { 0xAA, 0xBB };
@@ -132,6 +156,9 @@ Test *tests_core_byteorder_tests(void)
         new_TestFixture(test_byteorder_host_to_network_16),
         new_TestFixture(test_byteorder_host_to_network_32),
         new_TestFixture(test_byteorder_host_to_network_64),
+        new_TestFixture(test_byteorder_host_to_little_16),
+        new_TestFixture(test_byteorder_host_to_little_32),
+        new_TestFixture(test_byteorder_host_to_little_64),
         new_TestFixture(test_byteorder_bebuftohs),
         new_TestFixture(test_byteorder_htobebufs),
         new_TestFixture(test_byteorder_bebuftohl),
