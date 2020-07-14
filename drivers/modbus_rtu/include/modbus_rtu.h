@@ -54,10 +54,6 @@ typedef struct {
  */
 typedef struct {
   /**
-   * @brief   UART port.
-   */
-  uart_t uart;
-  /**
    * @brief   RTS pin. GPIO_UNDEF if not use.
    */
   gpio_t pin_rts;
@@ -66,29 +62,9 @@ typedef struct {
    */
   int pin_rts_enable;
   /**
-   * @brief   ID device. 0 - master, otherwice slave.
-   */
-  uint8_t id;
-  /**
    * @brief   Before slave begin to response; usec.
    */
   uint32_t timeout;
-  /**
-   * @brief   Template buffer for receive message or send. **Must never be changed
-   *          by the user.**
-   * @internal
-   */
-  uint8_t buffer[MODBUS_RTU_PACKET_SIZE_MAX];
-  /**
-   * @brief   Buffer size. **Must never be changed by the user.**
-   * @internal
-   */
-  uint8_t size_buffer;
-  /**
-   * @brief   Mutex for block buffer. **Must never be changed by the user.**
-   * @internal
-   */
-  mutex_t mutex_buffer;
   /**
    * @brief   Timeout beetwin dyte. **Must never be changed by the user.**
    * @internal
@@ -100,10 +76,34 @@ typedef struct {
    */
   modbus_rtu_message_t *msg;
   /**
+   * @brief   Mutex for block buffer. **Must never be changed by the user.**
+   * @internal
+   */
+  mutex_t mutex_buffer;
+  /**
+   * @brief   UART port.
+   */
+  uart_t uart;
+  /**
    * @brief   PID thread. **Must never be changed by the user.**
    * @internal
    */
   kernel_pid_t pid;
+  /**
+   * @brief   ID device. 0 - master, otherwice slave.
+   */
+  uint8_t id;
+  /**
+   * @brief   Buffer size. **Must never be changed by the user.**
+   * @internal
+   */
+  uint8_t size_buffer;
+  /**
+   * @brief   Template buffer for receive message or send. **Must never be changed
+   *          by the user.**
+   * @internal
+   */
+  uint8_t buffer[MODBUS_RTU_PACKET_SIZE_MAX];
 } modbus_rtu_t;
 
 /**
