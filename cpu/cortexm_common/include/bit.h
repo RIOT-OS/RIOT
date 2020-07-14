@@ -35,16 +35,8 @@ extern "C" {
 #define CPU_HAS_BITBAND 1 || 0 (1 for Cortex-M3 and up, 0 for Cortex-M0)
 #endif
 
-#ifndef CPU_HAS_BITBAND
-#if (__CORTEX_M >= 3)
-#define CPU_HAS_BITBAND 1
-#else
-#define CPU_HAS_BITBAND 0
-#endif
-#endif
-
 #if CPU_HAS_BITBAND || DOXYGEN
-/* Cortex-M3 and higher provide a bitband address space for atomically accessing
+/* Some MCUs provide a bitband address space for atomically accessing
  * single bits of peripheral registers, and sometimes for RAM as well */
 /**
  * @name Bit manipulation functions
