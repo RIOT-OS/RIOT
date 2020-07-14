@@ -151,18 +151,88 @@ static void _cmd_write_page(void)
 #endif
 }
 
+/* We have to write whole words, but writing 0xFF is basically a no-op
+ * so fill the unaligned bytes with 0xFF to get a whole extra word.
+ */
+static uint32_t unaligned_pad_start(const void *_data, uint8_t len)
+{
+    const uint8_t *data = _data;
+    union {
+        uint32_t u32;
+        uint8_t  u8[4];
+    } buffer = {.u32 = ~0};
+
+    switch (len) {
+        case 3:
+            buffer.u8[1] = *data++;
+            /* fall-through */
+        case 2:
+            buffer.u8[2] = *data++;
+            /* fall-through */
+        case 1:
+            buffer.u8[3] = *data++;
+    }
+
+    return buffer.u32;
+}
+
+/* We have to write whole words, but writing 0xFF is basically a no-op
+ * so fill the unaligned bytes with 0xFF to get a whole extra word.
+ */
+static uint32_t unaligned_pad_end(const void *_data, uint8_t len)
+{
+    const uint8_t *data = _data;
+    union {
+        uint32_t u32;
+        uint8_t  u8[4];
+    } buffer = {.u32 = ~0};
+
+    switch (len) {
+        case 3:
+            buffer.u8[2] = data[2];
+            /* fall-through */
+        case 2:
+            buffer.u8[1] = data[1];
+            /* fall-through */
+        case 1:
+            buffer.u8[0] = data[0];
+    }
+
+    return buffer.u32;
+}
+
 static void _write_page(void* dst, const void *data, size_t len, void (*cmd_write)(void))
 {
-    uint32_t *dst32 = dst;
+    /* set bytes in the first, unaligned word */
+    uint8_t unaligned_start = (4 - ((uintptr_t)dst & 0x3)) & 0x3;
+    len -= unaligned_start;
+
+    /* set bytes in the last, unaligned word */
+    uint8_t unaligned_end = len & 0x3;
+    len -= unaligned_end;
+
+    /* word align destination address */
+    uint32_t *dst32 = (void*)((uintptr_t)dst & ~0x3);
 
     _unlock();
     _cmd_clear_page_buffer();
+
+    /* write the first, unaligned bytes */
+    if (unaligned_start) {
+        *dst32++ = unaligned_pad_start(data, unaligned_start);
+        data = (uint8_t*)data + unaligned_start;
+    }
 
     /* copy whole words */
     const uint32_t *data32 = data;
     while (len) {
         *dst32++ = *data32++;
         len -= sizeof(uint32_t);
+    }
+
+    /* write the last, unaligned bytes */
+    if (unaligned_end) {
+        *dst32 = unaligned_pad_end(data32, unaligned_end);
     }
 
     cmd_write();
@@ -190,21 +260,18 @@ static void _erase_page(void* page, void (*cmd_erase)(void))
     _lock();
 }
 
-/* dst must be row-aligned */
 static void _write_row(uint8_t *dst, const void *_data, size_t len, size_t chunk_size,
                        void (*cmd_write)(void))
 {
     const uint8_t *data = _data;
 
-    /* One RIOT page is FLASHPAGE_PAGES_PER_ROW SAM0 flash pages (a row) as
-     * defined in the file cpu/sam0_common/include/cpu_conf.h, therefore we
-     * have to split the write into FLASHPAGE_PAGES_PER_ROW raw calls
-     * underneath, each writing a physical page in chunks of 4 bytes (see
-     * flashpage_write_raw)
-     * The erasing is done once as a full row is always erased.
-     */
+    size_t next_chunk = chunk_size - ((uintptr_t)dst & (chunk_size - 1));
+    next_chunk = next_chunk ? next_chunk : chunk_size;
+
     while (len) {
-        size_t chunk = MIN(len, chunk_size);
+        size_t chunk = MIN(len, next_chunk);
+        next_chunk = chunk_size;
+
         _write_page(dst, data, chunk, cmd_write);
         data += chunk;
         dst  += chunk;
@@ -222,26 +289,24 @@ void flashpage_write(int page, const void *data)
         return;
     }
 
+    /* One RIOT page is FLASHPAGE_PAGES_PER_ROW SAM0 flash pages (a row) as
+     * defined in the file cpu/sam0_common/include/cpu_conf.h, therefore we
+     * have to split the write into FLASHPAGE_PAGES_PER_ROW raw calls
+     * underneath, each writing a physical page in chunks of 4 bytes (see
+     * flashpage_write_raw)
+     * The erasing is done once as a full row is always erased.
+     */
     _write_row(flashpage_addr(page), data, FLASHPAGE_SIZE, NVMCTRL_PAGE_SIZE,
                _cmd_write_page);
 }
 
 void flashpage_write_raw(void *target_addr, const void *data, size_t len)
 {
-    /* The actual minimal block size for writing is 16B, thus we
-     * assert we write on multiples and no less of that length.
-     */
-    assert(!(len % FLASHPAGE_RAW_BLOCKSIZE));
-
-    /* ensure 4 byte aligned writes */
-    assert(!(((unsigned)target_addr % FLASHPAGE_RAW_ALIGNMENT) ||
-            ((unsigned)data % FLASHPAGE_RAW_ALIGNMENT)));
-
     /* ensure the length doesn't exceed the actual flash size */
     assert(((unsigned)target_addr + len) <=
            (CPU_FLASH_BASE + (FLASHPAGE_SIZE * FLASHPAGE_NUMOF)));
 
-    _write_page(target_addr, data, len, _cmd_write_page);
+    _write_row(target_addr, data, len, NVMCTRL_PAGE_SIZE, _cmd_write_page);
 }
 
 void sam0_flashpage_aux_write_raw(uint32_t offset, const void *data, size_t len)
@@ -300,19 +365,10 @@ static void _cmd_write_page_rwwee(void)
 
 void flashpage_rwwee_write_raw(void *target_addr, const void *data, size_t len)
 {
-    /* The actual minimal block size for writing is 16B, thus we
-     * assert we write on multiples and no less of that length.
-     */
-    assert(!(len % FLASHPAGE_RAW_BLOCKSIZE));
-
-    /* ensure 4 byte aligned writes */
-    assert(!(((unsigned)target_addr % FLASHPAGE_RAW_ALIGNMENT) ||
-            ((unsigned)data % FLASHPAGE_RAW_ALIGNMENT)));
-
     assert(((unsigned)target_addr + len) <=
            (CPU_FLASH_RWWEE_BASE + (FLASHPAGE_SIZE * FLASHPAGE_RWWEE_NUMOF)));
 
-    _write_page(target_addr, data, len, _cmd_write_page_rwwee);
+    _write_row(target_addr, data, len, NVMCTRL_PAGE_SIZE, _cmd_write_page_rwwee);
 }
 
 void flashpage_rwwee_write(int page, const void *data)
@@ -325,6 +381,13 @@ void flashpage_rwwee_write(int page, const void *data)
         return;
     }
 
+    /* One RIOT page is FLASHPAGE_PAGES_PER_ROW SAM0 flash pages (a row) as
+     * defined in the file cpu/sam0_common/include/cpu_conf.h, therefore we
+     * have to split the write into FLASHPAGE_PAGES_PER_ROW raw calls
+     * underneath, each writing a physical page in chunks of 4 bytes (see
+     * flashpage_write_raw)
+     * The erasing is done once as a full row is always erased.
+     */
     _write_row(flashpage_rwwee_addr(page), data, FLASHPAGE_SIZE, NVMCTRL_PAGE_SIZE,
                _cmd_write_page_rwwee);
 }
