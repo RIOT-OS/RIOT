@@ -220,7 +220,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
     modbus->msg->id = modbus->buffer[ID];
 
     // wait minimal size of request
-    while (modbus->size_buffer < MIN_SIZE_REQUEST) {
+    while (modbus->size_buffer < 8) {
       if (xtimer_msg_receive_timeout(&msg, modbus->rx_timeout) < 0) {
         goto error;
       }
@@ -232,11 +232,6 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
     case MB_FC_READ_DISCRETE_INPUT:
     case MB_FC_READ_REGISTERS:
     case MB_FC_READ_INPUT_REGISTER:
-      while (modbus->size_buffer < 8) {
-        if (xtimer_msg_receive_timeout(&msg, modbus->rx_timeout) < 0) {
-          goto error;
-        }
-      }
       if (calcCRC(modbus->buffer, 8) != 0) {
         goto error;
       }
