@@ -1095,6 +1095,78 @@ int rtc_tamper_register(gpio_t pin, gpio_flank_t flank);
 void rtc_tamper_enable(void);
 /** @} */
 
+/**
+ * @name sam0 User Configuration
+ *
+ *      The MCUs of this family contain a region of memory that is used to store
+ *      CPU configuration & calibration data.
+ *      It can be used to set persistent settings and has some additional space
+ *      to store user configuration data.
+ * @{
+ */
+
+/**
+ * @brief MCU configuration applied on start. The contents of this struct differ
+ *        between families.
+ */
+typedef struct sam0_aux_cfg_mapping nvm_user_page_t;
+
+/**
+ * @brief   Size of the free to use auxiliary area in the user page
+ */
+#ifdef FLASH_USER_PAGE_SIZE
+#define FLASH_USER_PAGE_AUX_SIZE (FLASH_USER_PAGE_SIZE - sizeof(nvm_user_page_t))
+#else
+#define FLASH_USER_PAGE_AUX_SIZE (AUX_PAGE_SIZE * AUX_NB_OF_PAGES - sizeof(nvm_user_page_t))
+#endif
+
+/**
+ * @brief   Reset the configuration area, apply a new configuration.
+ *
+ *
+ * @param   cfg     New MCU configuration, may be NULL.
+ *                  If cfg is NULL, this will clear the configuration area
+ *                  and apply the current configuration again.
+ */
+void sam0_flashpage_aux_reset(const nvm_user_page_t *cfg);
+
+/**
+ * @brief   Write data to the user configuration area.
+ *          This will write data to the remaining space after @see nvm_user_page_t
+ *          The size of this area depends on the MCU family used.
+ *
+ *          Will only write bits 1 -> 0. To reset bits to 1, call @see sam0_flashpage_aux_reset
+ *          This will reset the whole user area configuration.
+ *
+ *          Arbitrary data lengths and offsets are supported.
+ *
+ * @param   offset  Byte offset after @see nvm_user_page_t
+ *                  must be less than `FLASH_USER_PAGE_AUX_SIZE`
+ * @param   data    The data to write
+ * @param   len     Size of the data
+ */
+void sam0_flashpage_aux_write_raw(uint32_t offset, const void *data, size_t len);
+
+/**
+ * @brief   Get pointer to data in the user configuration area.
+ *
+ * @param   offset  Byte offset after @see nvm_user_page_t
+ *                  must be less than `FLASH_USER_PAGE_AUX_SIZE`
+ * @return  Pointer to the data in the User Page
+ */
+#define sam0_flashpage_aux_get(offset)  \
+    (const void*)((uint8_t*)NVMCTRL_USER + sizeof(nvm_user_page_t) + (offset))
+
+/**
+ * @brief   Get pointer to data in the CPU configuration struct
+ *
+ * @return  Pointer to the @ref nvm_user_page_t structure
+ */
+#define sam0_flashpage_aux_cfg() \
+    ((const nvm_user_page_t*)NVMCTRL_USER)
+
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

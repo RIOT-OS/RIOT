@@ -27,6 +27,7 @@
  */
 
 #include <assert.h>
+#include <string.h>
 
 #include "cpu.h"
 #include "periph/flashpage.h"
@@ -35,6 +36,15 @@
 #include "debug.h"
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
+/* Write Quad Word is the only allowed operation on AUX pages */
+#if defined(NVMCTRL_CTRLB_CMD_WQW)
+#define AUX_CHUNK_SIZE  (4 * sizeof(uint32_t))
+#elif defined(AUX_PAGE_SIZE)
+#define AUX_CHUNK_SIZE AUX_PAGE_SIZE
+#else
+#define AUX_CHUNK_SIZE FLASH_USER_PAGE_SIZE
+#endif
 
 /**
  * @brief   NVMCTRL selection macros
@@ -87,6 +97,21 @@ static void _cmd_clear_page_buffer(void)
 #endif
 }
 
+static void _cmd_erase_aux(void)
+{
+    wait_nvm_is_ready();
+
+    /* send Erase Page/Auxiliary Row command */
+#if defined(NVMCTRL_CTRLB_CMD_EP)
+    _NVMCTRL->CTRLB.reg = (NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_EP);
+#elif defined(NVMCTRL_CTRLA_CMD_EAR)
+    _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_EAR);
+#else
+    /* SAML1x uses same command for all areas */
+    _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_ER);
+#endif
+}
+
 static void _cmd_erase_row(void)
 {
     wait_nvm_is_ready();
@@ -96,6 +121,21 @@ static void _cmd_erase_row(void)
     _NVMCTRL->CTRLB.reg = (NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_EB);
 #else
     _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_ER);
+#endif
+}
+
+static void _cmd_write_aux(void)
+{
+    wait_nvm_is_ready();
+
+    /* write auxiliary page */
+#if defined(NVMCTRL_CTRLA_CMD_WAP)
+    _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_WAP);
+#elif defined(NVMCTRL_CTRLB_CMD_WQW)
+    _NVMCTRL->CTRLB.reg = (NVMCTRL_CTRLB_CMDEX_KEY | NVMCTRL_CTRLB_CMD_WQW);
+#else
+    /* SAML1x uses same command for all areas */
+    _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_WP);
 #endif
 }
 
@@ -202,7 +242,32 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
            (CPU_FLASH_BASE + (FLASHPAGE_SIZE * FLASHPAGE_NUMOF)));
 
     _write_page(target_addr, data, len, _cmd_write_page);
+}
 
+void sam0_flashpage_aux_write_raw(uint32_t offset, const void *data, size_t len)
+{
+    uintptr_t dst = NVMCTRL_USER + sizeof(nvm_user_page_t) + offset;
+
+#ifdef FLASH_USER_PAGE_SIZE
+    assert(dst + len <= NVMCTRL_USER + FLASH_USER_PAGE_SIZE);
+#else
+    assert(dst + len <= NVMCTRL_USER + AUX_PAGE_SIZE * AUX_NB_OF_PAGES);
+#endif
+
+    _write_row((void*)dst, data, len, AUX_CHUNK_SIZE, _cmd_write_aux);
+}
+
+void sam0_flashpage_aux_reset(const nvm_user_page_t *cfg)
+{
+    nvm_user_page_t old_cfg;
+
+    if (cfg == NULL) {
+        cfg = &old_cfg;
+        memcpy(&old_cfg, (void*)NVMCTRL_USER, sizeof(*cfg));
+    }
+
+    _erase_page((void*)NVMCTRL_USER, _cmd_erase_aux);
+    _write_row((void*)NVMCTRL_USER, cfg, sizeof(*cfg), AUX_CHUNK_SIZE, _cmd_write_aux);
 }
 
 #ifdef FLASHPAGE_RWWEE_NUMOF
