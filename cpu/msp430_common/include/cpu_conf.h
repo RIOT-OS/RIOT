@@ -23,6 +23,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   This arch uses the inlined IRQ API.
+ */
+#define IRQ_API_INLINED     (1)
+
+/**
  * @name   Configure the internal flash memory
  * @{
  */
