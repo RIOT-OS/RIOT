@@ -18,8 +18,8 @@ def testfunc(child):
     child.expect(r"inet6 addr:\s+(?P<global_addr>[0-9a-f:]+)\s+scope: global")
     global_addr = child.match.group("global_addr")
     child.expect(r"(?P<global_pfx>[0-9a-f:]+)/64\s+dev #\d\s+"
-                 r"expires \d+sec\s+"
-                 r"deprecates \d+sec")
+                 r"expires \d+ sec\s+"
+                 r"deprecates \d+ sec")
     global_pfx = child.match.group("global_pfx")
     if global_pfx.endswith("::"):
         # remove one trailing : in case there are no 0s between prefix and
