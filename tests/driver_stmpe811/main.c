@@ -20,25 +20,25 @@
 
 #include <stdio.h>
 
-#include "xtimer.h"
+#include "mutex.h"
 
 #include "stmpe811.h"
 #include "stmpe811_params.h"
 
 static void _touch_event_cb(void *arg)
 {
-    (void)arg;
-    puts("Pressed!");
+    mutex_unlock(arg);
 }
 
 int main(void)
 {
+    mutex_t lock = MUTEX_INIT_LOCKED;
     stmpe811_t dev;
 
     puts("STMPE811 test application\n");
 
     printf("+------------Initializing------------+\n");
-    int ret = stmpe811_init(&dev, &stmpe811_params[0], _touch_event_cb, NULL);
+    int ret = stmpe811_init(&dev, &stmpe811_params[0], _touch_event_cb, &lock);
     if (ret != STMPE811_OK) {
         puts("[Error] Initialization failed");
         return 1;
@@ -51,8 +51,16 @@ int main(void)
     stmpe811_touch_state_t last_touch_state = current_touch_state;
 
     while (1) {
+
+        /* wait for touch event */
+        mutex_lock(&lock);
+
         stmpe811_read_touch_state(&dev, &current_touch_state);
+
         if (current_touch_state != last_touch_state) {
+            if (current_touch_state == STMPE811_TOUCH_STATE_PRESSED) {
+                puts("Pressed!");
+            }
             if (current_touch_state == STMPE811_TOUCH_STATE_RELEASED) {
                 puts("Released!");
             }
@@ -65,8 +73,6 @@ int main(void)
             stmpe811_read_touch_position(&dev, &position);
             printf("X: %i, Y:%i\n", position.x, position.y);
         }
-
-        xtimer_usleep(10 * US_PER_MS);
     }
 
     return 0;
