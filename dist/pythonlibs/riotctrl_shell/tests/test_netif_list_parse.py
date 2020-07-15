@@ -364,3 +364,49 @@ Iface  7  HWaddr: 3A:A4  Channel: 26  NID: 0x23  PHY: MR-FSK
     assert "mcs" not in res["7"]
     assert len(res["7"]["ipv6_addrs"]) == 1
     assert len(res["7"]["ipv6_groups"]) == 3
+
+
+def test_ifconfig_list_parser7():
+    cmd_output = """
+Iface  8  HWaddr: 45:5B  Channel: 26  NID: 0x23
+          Long HWaddr: 00:5A:45:50:0A:00:45:5B
+          L2-PDU:102  MTU:1280  HL:64  RTR
+          6LO  IPHC
+          Source address length: 8
+          Link type: wireless
+          inet6 addr: fe80::25a:4550:a00:455b  scope: link  VAL
+          inet6 group: ff02::2
+          inet6 group: ff02::1
+          inet6 group: ff02::1:ff00:455b
+
+          Statistics for Layer 2
+            RX packets 0  bytes 0
+            TX packets 2 (Multicast: 2)  bytes 43
+            TX succeeded 3 errors 0
+          Statistics for IPv6
+            RX packets 0  bytes 0
+            TX packets 2 (Multicast: 2)  bytes 128
+            TX succeeded 2 errors 0
+
+Iface  7  HWaddr: B6:4F:A1:0E:8F:CC
+          L2-PDU:1500  MTU:1500  HL:64  RTR
+          Source address length: 6
+          Link type: wired
+          inet6 addr: fe80::b44f:a1ff:fe0e:8fcc  scope: link  VAL
+          inet6 group: ff02::2
+          inet6 group: ff02::1
+          inet6 group: ff02::1:ff0e:8fcc
+
+          Statistics for Layer 2
+            RX packets 4  bytes 480
+            TX packets 3 (Multicast: 3)  bytes 210
+            TX succeeded 3 errors 0
+          Statistics for IPv6
+            RX packets 4  bytes 424
+            TX packets 3 (Multicast: 3)  bytes 168
+            TX succeeded 3 errors 0"""
+    parser = riotctrl_shell.netif.IfconfigListParser()
+    res = parser.parse(cmd_output)
+    assert len(res) == 2
+    assert "7" in res
+    assert "8" in res

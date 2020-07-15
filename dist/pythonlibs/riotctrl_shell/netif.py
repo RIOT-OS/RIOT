@@ -106,7 +106,9 @@ class IfconfigListParser(ShellInteractionParser):
                     if stats is not None:
                         current["stats"] = stats
                         # assume stats to be always last
-                        break
+                        current = None
+                        parse_blacklist = False
+                        parse_ipv6 = False
             offset += len(line)
         return netifs
 
