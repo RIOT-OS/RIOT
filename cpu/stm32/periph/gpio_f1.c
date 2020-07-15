@@ -74,6 +74,26 @@ static inline int _pin_num(gpio_t pin)
     return (pin & 0x0f);
 }
 
+/**
+ * @brief   Check if the given mode is some kind of input mdoe
+ * @param[in]   mode    Mode to check
+ * @retval  1           @p mode is GPIO_IN, GPIO_IN_PD, or GPIO_IN_PU
+ * @retval  0           @p mode is not an input mode
+ */
+static inline int gpio_mode_is_input(gpio_mode_t mode)
+{
+    return !(mode & 3);
+}
+
+static inline void set_mode_or_af(GPIO_TypeDef *port, int pin_num,
+                                  unsigned mode_or_af)
+{
+    volatile uint32_t *crl = (&port->CRL + (pin_num >> 3));
+    uint32_t tmp = *crl;
+    tmp &= ~(0xf << ((pin_num & 0x7) * 4));
+    tmp |= ((mode_or_af & MODE_MASK) << ((pin_num & 0x7) * 4));
+    *crl = tmp;
+}
 
 int gpio_init(gpio_t pin, gpio_mode_t mode)
 {
@@ -89,14 +109,15 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     periph_clk_en(APB2, (RCC_APB2ENR_IOPAEN << _port_num(pin)));
 
     /* set pin mode */
-    *(uint32_t *)(&port->CRL + (pin_num >> 3)) &= ~(0xf << ((pin_num & 0x7) * 4));
-    *(uint32_t *)(&port->CRL + (pin_num >> 3)) |=  ((mode & MODE_MASK) << ((pin_num & 0x7) * 4));
+    set_mode_or_af(port, pin_num, mode);
 
-    /* set ODR */
-    if (mode == GPIO_IN_PU)
-        port->ODR |= 1 << pin_num;
-    else
-        port->ODR &= ~(1 << pin_num);
+    /* For input modes, ODR controls pull up settings */
+    if (gpio_mode_is_input(mode)) {
+        if (mode == GPIO_IN_PU)
+            port->ODR |= 1 << pin_num;
+        else
+            port->ODR &= ~(1 << pin_num);
+    }
 
     return 0; /* all OK */
 }
@@ -109,8 +130,7 @@ void gpio_init_af(gpio_t pin, gpio_af_t af)
     /* enable the clock for the selected port */
     periph_clk_en(APB2, (RCC_APB2ENR_IOPAEN << _port_num(pin)));
     /* configure the pin */
-    *(uint32_t *)(&port->CRL + (pin_num >> 3)) &= ~(0xf << ((pin_num & 0x7) * 4));
-    *(uint32_t *)(&port->CRL + (pin_num >> 3)) |=  (af << ((pin_num & 0x7) * 4));
+    set_mode_or_af(port, pin_num, af);
 }
 
 void gpio_init_analog(gpio_t pin)
