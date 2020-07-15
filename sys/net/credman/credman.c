@@ -26,7 +26,7 @@
 
 static mutex_t _mutex = MUTEX_INIT;
 
-static credman_credential_t credentials[CREDMAN_MAX_CREDENTIALS];
+static credman_credential_t credentials[CONFIG_CREDMAN_MAX_CREDENTIALS];
 static unsigned used = 0;
 
 static int _find_credential_pos(credman_tag_t tag, credman_type_t type,
@@ -129,7 +129,7 @@ int credman_get_used_count(void)
 static int _find_credential_pos(credman_tag_t tag, credman_type_t type,
                                 credman_credential_t **empty)
 {
-    for (unsigned i = 0; i < CREDMAN_MAX_CREDENTIALS; i++) {
+    for (unsigned i = 0; i < CONFIG_CREDMAN_MAX_CREDENTIALS; i++) {
         credman_credential_t *c = &credentials[i];
         if ((c->tag == tag) && (c->type == type)) {
             return i;
@@ -148,7 +148,7 @@ void credman_reset(void)
 {
     mutex_lock(&_mutex);
     memset(credentials, 0,
-           sizeof(credman_credential_t) * CREDMAN_MAX_CREDENTIALS);
+           sizeof(credman_credential_t) * CONFIG_CREDMAN_MAX_CREDENTIALS);
     used = 0;
     mutex_unlock(&_mutex);
 }
