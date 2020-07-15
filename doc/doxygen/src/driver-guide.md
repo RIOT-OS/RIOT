@@ -291,6 +291,35 @@ enum {
 - *MUST*: use `const devab_t *dev` when the device descriptor can be access
   read-only
 
+## Build system integration
+
+### Internal include files
+
+If the driver contains internal include files, a `Makefile.include` must be
+added in the driver implementation directory, with the following content
+(adapted to the name of the driver module):
+
+```
+USEMODULE_INCLUDES_<driver name> := $(LAST_MAKEFILEDIR)/include
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_<driver name>)
+```
+
+### External dependencies
+
+If the driver has other module or CPU features dependencies (like `xtimer` or
+`periph_i2c`), they must be added in the `$(RIOTBASE)/drivers/Makefile.dep`
+file in a block like below (this is an example, you'll have to adapt to the
+driver requirements):
+
+```
+ifneq (,$(filter <driver name>,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += xtimer
+endif
+```
+
+**Warning:** Please be careful with alphabetical order when modifying this file.
+
 ## Helper tools
 
 To help you start writing a device driver, the RIOT build system provides the

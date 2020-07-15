@@ -447,7 +447,9 @@ BASELIBS += $(APPDEPS)
 USEMODULE_INCLUDES =
 
 include $(RIOTBASE)/sys/Makefile.include
-include $(RIOTBASE)/drivers/Makefile.include
+
+# include Makefile.includes of each driver modules if they exist
+-include $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.include)
 
 # include Makefile.includes for packages in $(USEPKG)
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
