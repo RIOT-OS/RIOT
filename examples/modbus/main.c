@@ -90,11 +90,33 @@ static void *thread_master(void *arg __attribute__((unused))) {
       message_master.func = MB_FC_READ_COILS;
       res = modbus_rtu_send_request(&master, &message_master);
       // assert(message_slave.count == message_master.count);
-      // if (res || memcmp(regs_master1, regs_master2, message_master.count / 8 + 1) != 0) {
-      //   printf("fail MB_FC_READ_COILS %d\n", res);
-      // } else {
-      //   // puts("ok request");
-      // }
+      if (res /*|| memcmp(regs_master1, regs_master2, message_master.count / 8 + 1) != 0*/) {
+        printf("fail MB_FC_READ_COILS %d\n", res);
+      } else {
+        // puts("ok request");
+      }
+    }
+
+    puts("try MB_FC_WRITE_COIL");
+    message_master.data = regs_master1;
+    regs_master1[0] = 1;
+    message_master.func = MB_FC_WRITE_COIL;
+    res = modbus_rtu_send_request(&master, &message_master);
+    // assert(message_slave.count == message_master.count);
+    if (res) {
+      printf("fail MB_FC_WRITE_COIL %d\n", res);
+    } else {
+      xtimer_usleep(master.rx_timeout * 3);
+      puts("try MB_FC_READ_COILS");
+      message_master.data = regs_master2;
+      message_master.func = MB_FC_READ_COILS;
+      res = modbus_rtu_send_request(&master, &message_master);
+      // assert(message_slave.count == message_master.count);
+      if (res || (!!regs_master1[0]) != (!!regs_master2[0] & 1)) {
+        printf("fail MB_FC_READ_COILS 2 %d\n", res);
+      } else {
+        // puts("ok request");
+      }
     }
   }
   return NULL;
@@ -127,7 +149,7 @@ static void *thread_slave(void *arg __attribute__((unused))) {
       // assert(message_slave.data == regs_slave);
       res = modbus_rtu_send_response(&slave, &message_slave);
       if (res) {
-        puts("fail response");
+        printf("fail response %d\n", res);
       } else {
         puts("ok poll");
       }
