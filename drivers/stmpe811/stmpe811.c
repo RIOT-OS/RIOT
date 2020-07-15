@@ -162,7 +162,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, touch_event
 
     if ((dev->params.int_pin != GPIO_UNDEF) && cb) {
         DEBUG("[stmpe811] init: configuring touchscreen interrupt\n");
-        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, cb, arg);
+        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, cb, arg);
 
         /* Enable touchscreen interrupt */
         ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
@@ -170,7 +170,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, touch_event
 
         /* Enable global interrupt */
         ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                             STMPE811_INT_CTRL, STMPE811_INT_CTRL_GLOBAL_INT, 0);
+                             STMPE811_INT_CTRL, STMPE811_INT_CTRL_GLOBAL_INT | STMPE811_INT_CTRL_INT_TYPE, 0);
     }
 
     if (ret < 0) {
