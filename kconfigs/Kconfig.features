@@ -205,6 +205,21 @@ config HAS_PERIPH_PM
     help
         Indicates that a Power Management (PM) peripheral is present.
 
+config HAS_PERIPH_PTP
+    bool
+    help
+        Indicates that a PTP clock is present.
+
+config HAS_PERIPH_PTP_SPEED_ADJUSTMENT
+    bool
+    help
+        Indicates that the PTP clock speed can be adjust. This can be used for clock drift correction and synchronization.
+
+config HAS_PERIPH_PTP_TIMER
+    bool
+    help
+        Indicates that the PTP clock can be used as timer.
+
 config HAS_PERIPH_PWM
     bool
     help
