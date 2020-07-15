@@ -21,7 +21,7 @@
 __attribute__((naked)) void thread_yield_higher(void)
 {
     __asm__("push r2"); /* save SR */
-    __disable_irq();
+    irq_disable();
 
     __save_context();
 

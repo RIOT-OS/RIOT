@@ -46,28 +46,6 @@ extern "C" {
 #define ISR(a,b)        void __attribute__((naked, interrupt (a))) b(void)
 
 /**
- * @brief Globally disable IRQs
- */
-static inline void __attribute__((always_inline)) __disable_irq(void)
-{
-    __asm__ __volatile__("bic  %0, r2" : : "i"(GIE));
-    /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
-       impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
-    __asm__ __volatile__("nop");
-}
-
-/**
- * @brief Globally enable IRQs
- */
-static inline void __attribute__((always_inline)) __enable_irq(void)
-{
-    __asm__ __volatile__("bis  %0, r2" : : "i"(GIE));
-    /* this NOP is needed to handle a "delay slot" that all MSP430 MCUs
-       impose silently after messing with the GIE bit, DO NOT REMOVE IT! */
-    __asm__ __volatile__("nop");
-}
-
-/**
  * @brief   The current ISR state (inside or not)
  */
 extern volatile int __irq_is_in;
