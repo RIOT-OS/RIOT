@@ -9,6 +9,7 @@ FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_ptp
 FEATURES_PROVIDED += periph_ptp_speed_adjustment
 FEATURES_PROVIDED += periph_ptp_timer
+FEATURES_PROVIDED += periph_ptp_txrx_timestamps
 FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_spi
