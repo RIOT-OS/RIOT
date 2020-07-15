@@ -393,7 +393,7 @@ class GNRCPktbufStatsParser(ShellInteractionParser):
             r"~ unused: 0x(?P<start>[0-9A-Fa-f]+) "
             # flake reports r'\(', r'\)' as invalid escape sequence
             # false positively
-            r"\(next: ""(0x(?P<next>[0-9A-Fa-f]+)|\(nil\)), "   # noqa W605
+            r"\(next: (0x(?P<next>[0-9A-Fa-f]+)|\(nil\)), "
             r"size: +(?P<size>\d+)\) ~"
         )
 
