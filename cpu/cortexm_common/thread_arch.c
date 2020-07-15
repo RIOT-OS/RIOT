@@ -372,6 +372,8 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
                                            * causes end of exception*/
 #endif
     /* {r0-r3,r12,LR,PC,xPSR,s0-s15,FPSCR} are restored automatically on exception return */
+     ".ltorg                           \n" /* literal pool needed to access
+                                            * sched_active_thread */
     );
 }
 
