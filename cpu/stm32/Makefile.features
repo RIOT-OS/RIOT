@@ -10,10 +10,8 @@ FEATURES_PROVIDED += periph_uart_nonblocking
 FEATURES_PROVIDED += periph_wdt
 
 ifneq (,$(filter $(CPU_FAM),f0 f1 f3 g4 l0 l1 l4 wb))
-  ifeq (,$(filter nucleo-f031k6,$(BOARD)))
-    FEATURES_PROVIDED += periph_flashpage
-    FEATURES_PROVIDED += periph_flashpage_raw
-  endif
+  FEATURES_PROVIDED += periph_flashpage
+  FEATURES_PROVIDED += periph_flashpage_raw
 endif
 
 ifneq (,$(filter $(CPU_FAM),l0 l1))
