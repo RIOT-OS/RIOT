@@ -22,7 +22,7 @@ def testfunc(child):
     # test riot.thread_getpid()
     child.sendline('import riot')
     child.sendline('print(riot.thread_getpid())')
-    child.expect_exact('2')
+    child.expect(r'\d+')
     child.expect_exact('>>>')
 
     #
