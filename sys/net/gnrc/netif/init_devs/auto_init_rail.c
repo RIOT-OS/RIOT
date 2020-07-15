@@ -29,6 +29,7 @@
 #define RAIL_NUM (sizeof(rail_params) / sizeof(rail_params[0]))
 
 static rail_t rail_devs[RAIL_NUM];
+static gnrc_netif_t _netif[RAIL_NUM];
 static char _rail_stacks[RAIL_NUM][RAIL_MAC_STACKSIZE];
 
 
@@ -42,7 +43,8 @@ void auto_init_rail(void)
         rail_setup(&rail_devs[i], &rail_params[i]);
 
         /* init ieee802154 layer */
-        gnrc_netif_ieee802154_create(_rail_stacks[i],
+        gnrc_netif_ieee802154_create(&_netif[i],
+                                     _rail_stacks[i],
                                      RAIL_MAC_STACKSIZE,
                                      RAIL_MAC_PRIO,
                                      "rail 802.15.4",

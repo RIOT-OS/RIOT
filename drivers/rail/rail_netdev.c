@@ -93,7 +93,7 @@ static int _init(netdev_t *netdev)
 
     /* set default channel */
 #if (RAIL_RADIO_BAND == 2400)
-    dev->netdev.chan = IEEE802154_DEFAULT_CHANNEL;
+    dev->netdev.chan = (CONFIG_IEEE802154_DEFAULT_CHANNEL);
 #elif (RAIL_RADIO_BAND == 868)
     dev->netdev.chan = 0; /* for 868MHz there is only one channel */
 #elif (RAIL_RADIO_BAND == 915)

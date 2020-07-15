@@ -115,12 +115,12 @@ extern "C" {
 /**
  * @brief default panid for rail
  */
-#define RAIL_DEFAULT_PANID         (IEEE802154_DEFAULT_PANID)
+#define RAIL_DEFAULT_PANID         (CONFIG_IEEE802154_DEFAULT_PANID)
 
 /**
  * @brief default tx power
  */
-#define RAIL_DEFAULT_TXPOWER       (IEEE802154_DEFAULT_TXPOWER)
+#define RAIL_DEFAULT_TXPOWER       (CONFIG_IEEE802154_DEFAULT_TXPOWER)
 /**
  * @brief default CSMA retries
  */
@@ -135,7 +135,10 @@ enum rail_transceiver_config_frequency {
     RAIL_TRANSCEIVER_FREQUENCY_912MHZ   /** US 912 MHz band */
 };
 
-/* Set this to a flag bit that is not used by the MAC implementation */
+/**
+ * @brief This is active while the netdev thread needs to handle events while
+ * blocking. Set this to a flag bit that is not used by the MAC implementation.
+ */
 #define RAIL_THREAD_FLAG_ISR (1u << 8)
 
 /**

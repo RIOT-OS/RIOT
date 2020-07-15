@@ -13,5 +13,7 @@ ifneq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-int-in-bool-context
 endif
 
+export EFM32_FAMILY = $(CPU_FAM)
+
 all:
 	"$(MAKE)" -C $(PKG_SOURCE_DIR)/dist

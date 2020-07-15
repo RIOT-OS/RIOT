@@ -1,4 +1,4 @@
-
+USEMODULE_INCLUDES_rail := $(LAST_MAKEFILEDIR)/include
 
 #RAIL_SDK_DIR  = $(RIOTBASE)/pkg/gecko-sdk/sdk/
 RAIL_SDK_SRCDIR = $(PKGDIRBASE)/gecko_sdk/dist/radio/rail_lib
@@ -16,3 +16,5 @@ RAIL_INCLUDES += -I$(RAIL_SDK_SRCDIR)/plugin/pa-conversions
 export INCLUDES += $(RAIL_INCLUDES)
 
 export RAIL_SDK_SRCDIR
+
+USEMODULE_INCLUDES += $(USEMODULE_INCLUDES_rail)
