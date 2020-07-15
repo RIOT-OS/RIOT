@@ -24,6 +24,9 @@ config BOARD_NUCLEO_F767ZI
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
     select HAS_PERIPH_ETH
+    select HAS_PERIPH_PTP
+    select HAS_PERIPH_PTP_SPEED_ADJUSTMENT
+    select HAS_PERIPH_PTP_TIMER
 
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
