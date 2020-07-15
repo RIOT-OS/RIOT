@@ -126,17 +126,14 @@ ifeq ($(PKG_SOURCE_DIR),$(PKG_BUILD_DIR))
 # This is the case for packages that are built within their source directory
 # e.g. micropython and openthread
 clean::
-	@-test -d $(PKG_SOURCE_DIR) && $(GIT_IN_PKG) clean $(GIT_QUIET) -xdff
-
-distclean::
-	rm -rf $(PKG_SOURCE_DIR)
+	@-test -d $(PKG_SOURCE_DIR) && $(GIT_IN_PKG) clean -xdff '**' -e $(PKG_STATE:$(PKG_SOURCE_DIR)/%='%*')
 else
 clean::
 	rm -rf $(PKG_BUILD_DIR)
+endif
 
 distclean:: clean
 	rm -rf $(PKG_SOURCE_DIR)
-endif
 
 # Dependencies to 'patches'
 -include $(PKG_PATCHED).d

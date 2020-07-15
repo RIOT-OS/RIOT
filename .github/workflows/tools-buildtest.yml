@@ -23,6 +23,38 @@ jobs:
       uses: aabadie/riot-action@v1
       with:
         cmd: make -C dist/tools/mosquitto_rsmb
+    - name: Build bossa-1.8 standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/bossa-1.8
+    - name: Build bossa-1.9 standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/bossa-1.9
+    - name: Build bossa-nrf52 standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/bossa-nrf52
+    - name: Build edbg standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/edbg
+    - name: Build pic32prog standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/pic32prog
+    - name: Build setsid standalone
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/setsid
+    - name: Build ethos
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/ethos
+    - name: Build uhcpd
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/uhcpd
     - name: Build stm32 spi_divtable
       uses: aabadie/riot-action@v1
       with:
