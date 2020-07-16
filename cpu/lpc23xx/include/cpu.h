@@ -10,16 +10,16 @@
 #define CPU_H
 
 /**
- * @defgroup    cpu_lpc2387     NXP LPC2387
+ * @defgroup    cpu_lpc23xx     NXP LPC23XX
  * @ingroup     cpu
- * @brief       NXP LPC2387 specific code
+ * @brief       NXP LPC23XX family specific code
  * @{
  */
 
 #include <stdio.h>
 #include <stdbool.h>
 
-#include "lpc2387.h"
+#include "lpc23xx.h"
 #include "arm_cpu.h"
 
 #ifdef __cplusplus
@@ -39,17 +39,17 @@ void cpu_init_pll(void);
 void cpu_init_mam(void);
 
 /**
- * @brief Scale lpc2387 cpu speed
+ * @brief Scale lpc23xx cpu speed
  */
-void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale);
+void lpc23xx_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale);
 
 /**
- * @brief Initialize lpc2387 cpu clocks
+ * @brief Initialize lpc23xx cpu clocks
  */
 void cpu_init_clks(void);
 
 /**
- * @brief install lpc2387 irq
+ * @brief install lpc23xx irq
  */
 bool install_irq(int IntNumber, void (*HandlerAddr)(void), int Priority);
 

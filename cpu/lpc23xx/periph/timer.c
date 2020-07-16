@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_lpc2387
+ * @ingroup     cpu_lpc23xx
  * @ingroup     drivers_periph_timer
  * @{
  *
@@ -137,7 +137,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     }
 
     uint32_t scale, prescale;
-    lpc2387_pclk_scale(CLOCK_PCLK, freq, &scale, &prescale);
+    lpc23xx_pclk_scale(CLOCK_PCLK, freq, &scale, &prescale);
 
     /* save the callback */
     isr_ctx[tim].cb = cb;

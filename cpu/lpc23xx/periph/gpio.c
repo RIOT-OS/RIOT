@@ -7,12 +7,12 @@
  */
 
 /**
- * @ingroup     cpu_lpc2387
+ * @ingroup     cpu_lpc23xx
  * @ingroup     drivers_periph_gpio
  * @{
  *
  * @file
- * @brief       CPU specific low-level GPIO driver implementation for the LPC2387
+ * @brief       CPU specific low-level GPIO driver implementation for the LPC23XX family
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
@@ -52,7 +52,7 @@ static int _isr_map_entry(gpio_t pin) {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
 
-    /* lpc2387 can only interrupt in pins of port 0 and 2 */
+    /* lpc23xx can only interrupt in pins of port 0 and 2 */
     if (port && port != 2) {
         return -1;
     }
@@ -214,7 +214,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
     if (_state_index == 0xff) {
 #ifdef DEVELHELP
-        puts("lpc2387: gpio: warning: no free gpio callback state!");
+        puts("lpc23xx: gpio: warning: no free gpio callback state!");
 #endif
         return -1;
     }

@@ -8,7 +8,7 @@
  */
 
  /**
-  * @ingroup     cpu_lpc2387
+  * @ingroup     cpu_lpc23xx
   * @ingroup     drivers_periph_rtc
   * @{
   *
@@ -29,7 +29,7 @@
 /* cpu */
 #include "periph/rtc.h"
 #include "VIC.h"
-#include "lpc2387.h"
+#include "lpc23xx.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"

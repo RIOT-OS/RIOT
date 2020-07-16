@@ -8,8 +8,8 @@
  * Parts taken from FeuerWhere-Project, lpc2387.h.
  */
 
-#ifndef LPC2387_H
-#define LPC2387_H
+#ifndef LPC23XX_H
+#define LPC23XX_H
 
 #include "vendor/lpc23xx.h"
 #include "arm7_common.h"
@@ -154,4 +154,4 @@ extern "C" {
 }
 #endif
 
-#endif /* LPC2387_H */
+#endif /* LPC23XX_H */

@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     cpu_lpc2387
+ * @ingroup     cpu_lpc23xx
  * @{
  * @file
- * @brief       LPC2387 clock initialization
+ * @brief       LPC23XX family clock initialization
  *
  * @author      Heiko Will
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
@@ -24,7 +24,7 @@
 #include "board.h"
 #include "cpu.h"
 #include "periph_conf.h"
-#include "lpc2387.h"
+#include "lpc23xx.h"
 
 #define CL_CPU_DIV      4
 

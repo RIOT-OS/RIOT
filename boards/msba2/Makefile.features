@@ -1,4 +1,5 @@
-CPU = lpc2387
+CPU = lpc23xx
+CPU_MODEL = lpc2387
 
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
