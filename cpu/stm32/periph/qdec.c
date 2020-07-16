@@ -96,7 +96,7 @@ int32_t qdec_init(qdec_t qdec, qdec_mode_t mode, qdec_cb_t cb, void *arg)
 
     /* Configure the used pins */
     i = 0;
-    while ((i < QDEC_CHAN) && (qdec_config[qdec].chan[i].pin != GPIO_UNDEF)) {
+    while ((i < QDEC_CHAN) && gpio_is_valid(qdec_config[qdec].chan[i].pin)) {
         gpio_init(qdec_config[qdec].chan[i].pin, GPIO_IN);
 #ifndef CPU_FAM_STM32F1
         gpio_init_af(qdec_config[qdec].chan[i].pin, qdec_config[qdec].af);
