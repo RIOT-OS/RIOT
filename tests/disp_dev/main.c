@@ -50,13 +50,22 @@ int main(void)
     expect(max_height == 240);
 
     uint16_t color = 0;
+    disp_dev_coordinates_t coordinates;
     for (uint16_t y = 0; y < max_height; ++y) {
+        coordinates.y1 = y;
+        coordinates.y2 = y;
         for (uint16_t x = 0; x < max_width; ++x) {
-            disp_dev_map(dev, x, x, y, y, &color);
+            coordinates.x1 = x;
+            coordinates.x2 = x;
+            disp_dev_map(dev, &coordinates, &color);
         }
     }
 
-    disp_dev_map(dev, 95, 222, 85, 153, (const uint16_t *)picture);
+    coordinates.x1 = 95;
+    coordinates.x2 = 222;
+    coordinates.y1 = 85;
+    coordinates.y2 = 153;
+    disp_dev_map(dev, &coordinates, (const uint16_t *)picture);
 
     puts("SUCCESS");
 
