@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_lpc2387
+ * @ingroup     cpu_lpc23xx
  * @ingroup     drivers_periph_timer
  * @{
  *

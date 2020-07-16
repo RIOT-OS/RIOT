@@ -1,6 +1,6 @@
 /**
- * @defgroup lpc2387_intro LPC2387 Introduction
- * @ingroup cpu_lpc2387
+ * @defgroup lpc23xx_intro LPC23XX Introduction
+ * @ingroup cpu_lpc23xx
 
 <h2>First steps</h2>
 \li See the manual for toolchain and ide setup
@@ -8,7 +8,7 @@
 
 <h2>Components</h2>
 \li \ref cpu_arm7_common
-\li \ref lpc2387_rtc
+\li \ref lpc23xx_rtc
 
 <h2>Memory layout</h2>
 The following table gives a rough overview of the memory usage. For detailed values please

@@ -7,10 +7,10 @@
  */
 
 /**
- * @ingroup     cpu_lpc2387
+ * @ingroup     cpu_lpc23xx
  * @{
  * @file
- * @brief       LPC2387 clock initialization
+ * @brief       LPC23XX family clock initialization
  *
  * @author      Heiko Will
  * @author      Kaspar Schleiser <kaspar@schleiser.de>

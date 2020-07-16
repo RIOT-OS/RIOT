@@ -6,7 +6,7 @@
  * directory for more details.
  */
 
-/* specify the LPC2387 memory areas (see LPC2387 datasheet page 15)  */
+/* specify the LPC23XX memory areas (see LPC2387 datasheet page 15)  */
 MEMORY
 {
     rom (rx)            : ORIGIN = 0,          LENGTH = 504K    /* FLASH ROM 512kByte without ISP bootloader*/

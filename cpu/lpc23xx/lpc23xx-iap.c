@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup cpu_lpc2387
+ * @ingroup cpu_lpc23xx
  * @{
  */
 
 /**
  * @file
- * @brief       lpc2387 in-application programming driver (for flashrom)
+ * @brief       lpc23xx in-application programming driver (for flashrom)
  *
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  *

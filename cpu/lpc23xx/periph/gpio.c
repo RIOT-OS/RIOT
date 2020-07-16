@@ -7,12 +7,12 @@
  */
 
 /**
- * @ingroup     cpu_lpc2387
+ * @ingroup     cpu_lpc23xx
  * @ingroup     drivers_periph_gpio
  * @{
  *
  * @file
- * @brief       CPU specific low-level GPIO driver implementation for the LPC2387
+ * @brief       CPU specific low-level GPIO driver implementation for the LPC23XX family
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *

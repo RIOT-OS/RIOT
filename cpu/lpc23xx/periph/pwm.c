@@ -7,12 +7,12 @@
  */
 
 /**
- * @ingroup     cpu_lpc2387
+ * @ingroup     cpu_lpc23xx
  * @ingroup     drivers_periph_pwm
  * @{
  *
  * @file
- * @brief       CPU specific low-level PWM driver implementation for the LPC2387
+ * @brief       CPU specific low-level PWM driver implementation for the LPC23XX family
  *
  * The current implementation is somewhat limited: it supports only a single
  * hardware PWM device (fixed to PWM1) and it is fixed on supporting 3 channels.
