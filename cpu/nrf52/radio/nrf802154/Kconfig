@@ -20,3 +20,9 @@ config NRF802154_CCA_THRESH_DEFAULT
         Default CCA threshold value for the CCACTRL register.
 
 endif # KCONFIG_MODULE_NRF802154
+
+## Related features
+config HAS_RADIO_NRF802154
+    bool
+    help
+        Indicates that a IEEE 802.15.4 NRF52 radio is present.
