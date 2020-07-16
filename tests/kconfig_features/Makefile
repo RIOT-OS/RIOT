@@ -166,6 +166,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    sodaq-explorer \
                    sodaq-one \
                    sodaq-sara-aff \
+                   sodaq-sara-sff \
                    spark-core \
                    stk3600 \
                    stk3700 \
