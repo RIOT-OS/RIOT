@@ -460,6 +460,7 @@ void sched_arch_idle(void)
      * According to [this](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dai0321a/BIHJICIE.html),
      * dynamically changing the priority is not supported on CortexM0(+).
      */
+    unsigned state = irq_disable();
     NVIC_SetPriority(PendSV_IRQn, CPU_CORTEXM_PENDSV_IRQ_PRIO + 1);
     __DSB();
     __ISB();
@@ -469,5 +470,6 @@ void sched_arch_idle(void)
 #else
     __WFI();
 #endif
+    irq_restore(state);
     NVIC_SetPriority(PendSV_IRQn, CPU_CORTEXM_PENDSV_IRQ_PRIO);
 }
