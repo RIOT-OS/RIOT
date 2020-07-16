@@ -52,7 +52,7 @@ static int _isr_map_entry(gpio_t pin) {
     unsigned _pin = pin & 31;
     unsigned port = pin >> 5;
 
-    /* lpc2387 can only interrupt in pins of port 0 and 2 */
+    /* lpc23xx can only interrupt in pins of port 0 and 2 */
     if (port && port != 2) {
         return -1;
     }
@@ -214,7 +214,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
     if (_state_index == 0xff) {
 #ifdef DEVELHELP
-        puts("lpc2387: gpio: warning: no free gpio callback state!");
+        puts("lpc23xx: gpio: warning: no free gpio callback state!");
 #endif
         return -1;
     }
