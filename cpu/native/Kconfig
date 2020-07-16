@@ -1,0 +1,72 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_ARCH_NATIVE
+    bool
+    select HAS_ARCH_NATIVE
+    select HAS_ARCH_32BIT
+    select HAS_CPP
+    select HAS_CPU_NATIVE
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_EEPROM
+    select HAS_PERIPH_HWRNG
+    select HAS_PERIPH_PM
+    select HAS_PERIPH_PWM
+    select HAS_SSP
+
+config CPU_CORE_NATIVE
+    bool
+    select CPU_ARCH_NATIVE
+
+config CPU_FAM_NATIVE
+    bool
+    select CPU_CORE_NATIVE
+
+config CPU_MODEL_NATIVE
+    bool
+    select CPU_FAM_NATIVE
+    select NATIVE_OS_DARWIN if "$(OS)" = "Darwin"
+    select NATIVE_OS_LINUX if "$(OS)" = "Linux"
+    select NATIVE_OS_FREEBSD if "$(OS)" = "FreeBSD"
+
+## Declaration of specific features
+config HAS_ARCH_NATIVE
+    bool
+    help
+        Indicates that the architecture being used is 'native'.
+
+config HAS_CPU_NATIVE
+    bool
+    help
+        Indicates that the cpu being used is 'native'.
+
+## OS Variants
+config NATIVE_OS_DARWIN
+    bool
+
+config NATIVE_OS_LINUX
+    bool
+    select HAS_PERIPH_SPI
+
+config NATIVE_OS_FREEBSD
+    bool
+
+## CPU Common symbols
+config CPU_ARCH
+    default "native" if CPU_ARCH_NATIVE
+
+config CPU_CORE
+    default "native" if CPU_CORE_NATIVE
+
+config CPU_FAM
+    default "native" if CPU_FAM_NATIVE
+
+config CPU_MODEL
+    default "native" if CPU_MODEL_NATIVE
+
+config CPU
+    default "native" if CPU_MODEL_NATIVE
