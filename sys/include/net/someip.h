@@ -28,42 +28,43 @@ extern "C" {
 
 #include <stdint.h>
 
-#define SOMEIP_MAX_PLEN (1400)    /**< SOME/IP maximum payload length */
-#define SOMEIP_HDR_LENGTH (8)     /**< SOME/IP header length size, excluding payload */
-#define SOMEIP_FULL_HDR_SIZE (16) /**< SOME/IP full header size, including all fields except for the payload */
+/**
+ * @brief SOME/IP header length size, excluding payload
+ */
+#define SOMEIP_HDR_LENGTH       (8U)
+/**
+ * @brief SOME/IP full header size, including all field expect for the payload
+ */
+#define SOMEIP_FULL_HDR_SIZE    (16U)
 
 /**
  * @brief       Structure of the Message ID
  */
-    struct message_id
-    {
-        uint16_t service_id; /**< Service ID */
-        uint16_t method_id;  /**< Method ID */
-    };
+typedef struct {
+    uint16_t service_id; /**< Service ID */
+    uint16_t method_id;  /**< Method ID */
+} someip_message_id_t;
 
 /**
  * @brief       Structure of the Request ID
  */
-    struct request_id
-    {
-        uint16_t client_id;  /**< Client ID */
-        uint16_t session_id; /**< Session ID */
-    };
+typedef struct {
+    uint16_t client_id;  /**< Client ID */
+    uint16_t session_id; /**< Session ID */
+} someip_request_id_t;
 
 /**
  * @brief       SOME/IP header
  */
-    typedef struct __attribute__((packed))
-    {
-        struct message_id message_id;     /**< Message ID */
-        uint32_t length;                  /**< Length */
-        struct request_id request_id;     /**< Request ID */
-        uint8_t protocol_version;         /**< Protocol Version */
-        uint8_t interface_version;        /**< Interface Version*/
-        uint8_t msg_type;                 /**< Message Type*/
-        uint8_t return_code;              /**< Return Code*/
-        uint8_t payload[SOMEIP_MAX_PLEN]; /**< Payload */
-    } someip_hdr_t;
+typedef struct __attribute__((packed)) {
+    someip_message_id_t message_id; /**< Message ID */
+    uint32_t length;                /**< Length */
+    someip_request_id_t request_id; /**< Request ID */
+    uint8_t protocol_version;       /**< Protocol Version */
+    uint8_t interface_version;      /**< Interface Version*/
+    uint8_t msg_type;               /**< Message Type*/
+    uint8_t return_code;            /**< Return Code*/
+} someip_hdr_t;
 
 #ifdef __cplusplus
 }
