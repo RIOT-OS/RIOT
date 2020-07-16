@@ -27,8 +27,15 @@
 #include "net/gnrc/lorawan/region.h"
 #include "net/gnrc/netreg.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
+
+#define MSG_TYPE_MLME_BACKOFF_EXPIRE (0x3458)           /**< Backoff timer expiration message type */
+
+/* This factor is used for converting "real" seconds into microcontroller
+ * microseconds. This is done in order to correct timer drift.
+ */
+#define ADJUST_DRIFT(us) (int) (us * 100 / (100 + (CONFIG_GNRC_LORAWAN_TIMER_DRIFT / 10.0)))
 
 static uint8_t _nwkskey[LORAMAC_NWKSKEY_LEN];
 static uint8_t _appskey[LORAMAC_APPSKEY_LEN];
@@ -36,6 +43,9 @@ static uint8_t _appkey[LORAMAC_APPKEY_LEN];
 static uint8_t _deveui[LORAMAC_DEVEUI_LEN];
 static uint8_t _appeui[LORAMAC_APPEUI_LEN];
 static uint8_t _devaddr[LORAMAC_DEVADDR_LEN];
+
+static msg_t timeout_msg = {.type = MSG_TYPE_TIMEOUT};
+static msg_t backoff_msg = {.type = MSG_TYPE_MLME_BACKOFF_EXPIRE};
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
@@ -71,6 +81,18 @@ void gnrc_lorawan_mlme_confirm(gnrc_lorawan_t *mac, mlme_confirm_t *confirm)
         lw_netif->demod_margin = confirm->link_req.margin;
         lw_netif->num_gateways = confirm->link_req.num_gateways;
     }
+}
+
+void gnrc_lorawan_set_timer(gnrc_lorawan_t *mac, uint32_t us)
+{
+    gnrc_netif_lorawan_t *lw_netif = container_of(mac, gnrc_netif_lorawan_t, mac);
+    xtimer_set_msg(&lw_netif->timer, ADJUST_DRIFT(us), &timeout_msg, thread_getpid());
+}
+
+void gnrc_lorawan_remove_timer(gnrc_lorawan_t *mac)
+{
+    gnrc_netif_lorawan_t *lw_netif = container_of(mac, gnrc_netif_lorawan_t, mac);
+    xtimer_remove(&lw_netif->timer);
 }
 
 static inline void _set_be_addr(gnrc_lorawan_t *mac, uint8_t *be_addr)
@@ -228,8 +250,11 @@ static void _init(gnrc_netif_t *netif)
     _memcpy_reversed(netif->lorawan.appeui, _appeui, sizeof(_appeui));
 
     _set_be_addr(&netif->lorawan.mac, _devaddr);
-    gnrc_lorawan_init(&netif->lorawan.mac, netif->lorawan.nwkskey,
-                      netif->lorawan.appskey);
+    gnrc_lorawan_init(&netif->lorawan.mac, netif->lorawan.nwkskey, netif->lorawan.appskey);
+
+    xtimer_set_msg(&netif->lorawan.backoff_timer,
+                   GNRC_LORAWAN_BACKOFF_WINDOW_TICK,
+                   &backoff_msg, thread_getpid());
 }
 
 int gnrc_netif_lorawan_create(gnrc_netif_t *netif, char *stack, int stacksize,
@@ -276,13 +301,13 @@ static void _msg_handler(gnrc_netif_t *netif, msg_t *msg)
     (void)msg;
     switch (msg->type) {
         case MSG_TYPE_TIMEOUT:
-            gnrc_lorawan_open_rx_window(&netif->lorawan.mac);
-            break;
-        case MSG_TYPE_MCPS_ACK_TIMEOUT:
-            gnrc_lorawan_event_ack_timeout(&netif->lorawan.mac);
+            gnrc_lorawan_timeout_cb(&netif->lorawan.mac);
             break;
         case MSG_TYPE_MLME_BACKOFF_EXPIRE:
-            gnrc_lorawan_mlme_backoff_expire(&netif->lorawan.mac);
+            gnrc_lorawan_mlme_backoff_expire_cb(&netif->lorawan.mac);
+            xtimer_set_msg(&netif->lorawan.backoff_timer,
+                           GNRC_LORAWAN_BACKOFF_WINDOW_TICK,
+                           &backoff_msg, thread_getpid());
         default:
             break;
     }
