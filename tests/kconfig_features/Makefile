@@ -188,6 +188,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    usb-kw41z \
                    waspmote-pro \
                    weact-f411ce \
+                   wemos-zero \
                    yunjia-nrf51822 \
                    z1
                    #
