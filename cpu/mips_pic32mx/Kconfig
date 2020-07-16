@@ -1,0 +1,35 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_PIC32MX
+    bool
+    select CPU_COMMON_MIPS_PIC32
+    select CPU_CORE_M4K
+    select HAS_CPU_MIPS_PIC32MX
+
+## CPU Models
+config CPU_MODEL_P32MX470F512H
+    bool
+    select CPU_FAM_PIC32MX
+
+## Declaration of specific features
+config HAS_CPU_MIPS_PIC32MX
+    bool
+    help
+        Indicates that a 'mips_pic32mx' cpu is being used.
+
+## Common CPU symbols
+config CPU_FAM
+    default "pic32mx" if CPU_FAM_PIC32MX
+
+config CPU_MODEL
+    default "p32mx470f512h" if CPU_MODEL_P32MX470F512H
+
+config CPU
+    default "mips_pic32mx" if CPU_FAM_PIC32MX
+
+source "$(RIOTCPU)/mips_pic32_common/Kconfig"
