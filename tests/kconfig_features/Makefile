@@ -13,6 +13,12 @@ BOARD_WHITELIST += acd52832 \
                    atmega256rfr2-xpro \
                    atmega328p \
                    avr-rss2 \
+                   b-l072z-lrwan1 \
+                   b-l475e-iot01a \
+                   blackpill \
+                   blackpill-128kib \
+                   bluepill \
+                   bluepill-128kib \
                    calliope-mini \
                    cc1312-launchpad \
                    cc1352-launchpad \
@@ -34,18 +40,29 @@ BOARD_WHITELIST += acd52832 \
                    esp8266-esp-12x \
                    esp8266-olimex-mod \
                    esp8266-sparkfun-thing \
+                   f4vi1 \
                    feather-nrf52840 \
                    firefly \
+                   fox \
                    frdm-k22f \
                    frdm-k64f \
                    hifive1 \
                    hifive1b \
                    ikea-tradfri \
+                   im880b \
+                   i-nucleo-lrwan1 \
+                   iotlab-a8-m3 \
+                   iotlab-m3 \
+                   limifrog-v1 \
+                   lobaro-lorabox \
+                   lsn50 \
+                   maple-mini \
                    mega-xplained \
                    microbit \
                    microduino-corerf \
                    msb-430 \
                    msb-430h \
+                   msbiot \
                    mulle \
                    nrf51dk \
                    nrf51dongle \
@@ -55,16 +72,58 @@ BOARD_WHITELIST += acd52832 \
                    nrf52840dongle \
                    nrf52dk \
                    nrf6310 \
+                   nucleo-f030r8 \
+                   nucleo-f031k6 \
+                   nucleo-f042k6 \
+                   nucleo-f070rb \
+                   nucleo-f072rb \
+                   nucleo-f091rc \
+                   nucleo-f103rb \
+                   nucleo-f207zg \
+                   nucleo-f302r8 \
+                   nucleo-f303k8 \
+                   nucleo-f303re \
+                   nucleo-f303ze \
+                   nucleo-f334r8 \
+                   nucleo-f401re \
+                   nucleo-f410rb \
+                   nucleo-f411re \
+                   nucleo-f412zg \
+                   nucleo-f413zh \
+                   nucleo-f429zi \
+                   nucleo-f446re \
+                   nucleo-f446ze \
+                   nucleo-f722ze \
+                   nucleo-f746zg \
+                   nucleo-f767zi \
+                   nucleo-g474re \
+                   nucleo-l031k6 \
+                   nucleo-l053r8 \
+                   nucleo-l073rz \
+                   nucleo-l152re \
+                   nucleo-l412kb \
+                   nucleo-l432kc \
+                   nucleo-l433rc \
+                   nucleo-l452re \
+                   nucleo-l476rg \
+                   nucleo-l496zg \
+                   nucleo-l4r5zi \
+                   nz32-sc151 \
+                   olimexino-stm32 \
+                   opencm904 \
                    openlabs-kw41z-mini \
                    openlabs-kw41z-mini-256kib \
                    openmote-b \
                    openmote-cc2538 \
+                   p-l496g-cell02 \
+                   p-nucleo-wb55 \
                    particle-argon \
                    particle-boron \
                    particle-xenon \
                    pba-d-01-kw2x \
                    phynode-kw41z \
                    pinetime \
+                   pyboard \
                    reel \
                    remote-pa \
                    remote-reva \
@@ -77,15 +136,26 @@ BOARD_WHITELIST += acd52832 \
                    slwstk6000b-slwrb4150a \
                    slwstk6000b-slwrb4162a \
                    slwstk6220a \
+                   spark-core \
                    stk3600 \
                    stk3700 \
+                   stm32f030f4-demo \
+                   stm32f0discovery \
+                   stm32f3discovery \
+                   stm32f4discovery \
+                   stm32f429i-disc1 \
+                   stm32f429i-disco \
+                   stm32f723e-disco \
+                   stm32f769i-disco \
+                   stm32l0538-disco \
+                   stm32l476g-disco \
                    teensy31 \
                    telosb \
                    thingy52 \
+                   ublox-c030-u201 \
                    usb-kw41z \
                    waspmote-pro \
-                   wsn430-v1_3b \
-                   wsn430-v1_4 \
+                   weact-f411ce \
                    yunjia-nrf51822 \
                    z1
                    #

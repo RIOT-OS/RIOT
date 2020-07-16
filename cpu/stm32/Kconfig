@@ -1,0 +1,546 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_STM32
+    bool
+    select HAS_CPU_STM32
+    select HAS_BOOTLOADER_STM32
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PUF_SRAM
+    select HAS_PERIPH_UART_MODECFG
+    select HAS_PERIPH_UART_NONBLOCKING
+    select HAS_PERIPH_WDT
+
+config CPU_FAM_F0
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M0
+    select HAS_CPU_STM32F0
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_RAW
+
+config CPU_FAM_F1
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M3
+    select HAS_CPU_STM32F1
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_RAW
+
+config CPU_FAM_F2
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M3
+    select HAS_CPU_STM32F2
+    select HAS_CORTEXM_MPU
+    select HAS_PERIPH_HWRNG
+
+config CPU_FAM_F3
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M4F
+    select HAS_CPU_STM32F3
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_RAW
+
+config CPU_FAM_F4
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M4F
+    select HAS_CPU_STM32F4
+    select HAS_CORTEXM_MPU
+
+config CPU_FAM_F7
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M7
+    select HAS_CPU_STM32F7
+    select HAS_CORTEXM_MPU
+    select HAS_PERIPH_HWRNG
+
+config CPU_FAM_G4
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M4
+    select HAS_CPU_STM32G4
+    select HAS_CORTEXM_MPU
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_HWRNG
+
+config CPU_FAM_L0
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M0PLUS
+    select HAS_CPU_STM32L0
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_EEPROM
+
+config CPU_FAM_L1
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M3
+    select HAS_CPU_STM32L1
+    select HAS_CORTEXM_MPU
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_EEPROM
+
+config CPU_FAM_L4
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M4F
+    select HAS_CPU_STM32L4
+    select HAS_CORTEXM_MPU
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_HWRNG
+
+config CPU_FAM_WB
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M4
+    select HAS_CPU_STM32WB
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_HWRNG
+
+# CPU Models
+
+# STM32F0
+config CPU_MODEL_STM32F030F4
+    bool
+    select CPU_FAM_F0
+
+config CPU_MODEL_STM32F030R8
+    bool
+    select CPU_FAM_F0
+
+config CPU_MODEL_STM32F031K6
+    bool
+    select CPU_FAM_F0
+
+config CPU_MODEL_STM32F042K6
+    bool
+    select CPU_FAM_F0
+
+config CPU_MODEL_STM32F051R8
+    bool
+    select CPU_FAM_F0
+
+config CPU_MODEL_STM32F070RB
+    bool
+    select CPU_FAM_F0
+
+config CPU_MODEL_STM32F072RB
+    bool
+    select CPU_FAM_F0
+
+config CPU_MODEL_STM32F091RC
+    bool
+    select CPU_FAM_F0
+
+# STM32F1
+config CPU_MODEL_STM32F103C8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103CB
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103RB
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103RE
+    bool
+    select CPU_FAM_F1
+
+# STM32F2
+config CPU_MODEL_STM32F207ZG
+    bool
+    select CPU_FAM_F2
+
+# STM32F3
+config CPU_MODEL_STM32F302R8
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F303K8
+    bool
+    select CPU_FAM_F3
+
+config CPU_MODEL_STM32F303RE
+    bool
+    select CPU_FAM_F3
+    select HAS_CORTEXM_MPU
+
+config CPU_MODEL_STM32F303VC
+    bool
+    select CPU_FAM_F3
+    select HAS_CORTEXM_MPU
+
+config CPU_MODEL_STM32F303ZE
+    bool
+    select CPU_FAM_F3
+    select HAS_CORTEXM_MPU
+
+config CPU_MODEL_STM32F334R8
+    bool
+    select CPU_FAM_F3
+
+# STM32F4
+config CPU_MODEL_STM32F401RE
+    bool
+    select CPU_FAM_F4
+
+config CPU_MODEL_STM32F405RG
+    bool
+    select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_STM32F407VG
+    bool
+    select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_STM32F410RB
+    bool
+    select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_STM32F411RE
+    bool
+    select CPU_FAM_F4
+
+config CPU_MODEL_STM32F411CEU6
+    bool
+    select CPU_FAM_F4
+
+config CPU_MODEL_STM32F412ZG
+    bool
+    select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_STM32F413ZH
+    bool
+    select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_STM32F415RG
+    bool
+    select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_STM32F429ZI
+    bool
+    select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_STM32F437VG
+    bool
+    select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_STM32F446RE
+    bool
+    select CPU_FAM_F4
+
+config CPU_MODEL_STM32F446ZE
+    bool
+    select CPU_FAM_F4
+
+# STM32F7
+config CPU_MODEL_STM32F722ZE
+    bool
+    select CPU_FAM_F7
+
+config CPU_MODEL_STM32F723IE
+    bool
+    select CPU_FAM_F7
+
+config CPU_MODEL_STM32F746ZG
+    bool
+    select CPU_FAM_F7
+
+config CPU_MODEL_STM32F767ZI
+    bool
+    select CPU_FAM_F7
+
+config CPU_MODEL_STM32F769NI
+    bool
+    select CPU_FAM_F7
+
+# STM32G4
+config CPU_MODEL_STM32G474RE
+    bool
+    select CPU_FAM_G4
+
+# STM32L0
+config CPU_MODEL_STM32L031K6
+    bool
+    select CPU_FAM_L0
+
+config CPU_MODEL_STM32L052T8
+    bool
+    select CPU_FAM_L0
+    select HAS_CORTEXM_MPU
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_STM32L053R8
+    bool
+    select CPU_FAM_L0
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_STM32L053C8
+    bool
+    select CPU_FAM_L0
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_STM32L072CZ
+    bool
+    select CPU_FAM_L0
+    select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_STM32L073RZ
+    bool
+    select CPU_FAM_L0
+    select HAS_PERIPH_HWRNG
+
+# STM32L1
+config CPU_MODEL_STM32L151CB
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L151CB_A
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L151RC
+    bool
+    select CPU_FAM_L1
+
+config CPU_MODEL_STM32L152RE
+    bool
+    select CPU_FAM_L1
+
+# STM32L4
+config CPU_MODEL_STM32L412KB
+    bool
+    select CPU_FAM_L4
+
+config CPU_MODEL_STM32L432KC
+    bool
+    select CPU_FAM_L4
+
+config CPU_MODEL_STM32L433RC
+    bool
+    select CPU_FAM_L4
+
+config CPU_MODEL_STM32L452RE
+    bool
+    select CPU_FAM_L4
+
+config CPU_MODEL_STM32L475VG
+    bool
+    select CPU_FAM_L4
+
+config CPU_MODEL_STM32L476RG
+    bool
+    select CPU_FAM_L4
+
+config CPU_MODEL_STM32L476VG
+    bool
+    select CPU_FAM_L4
+
+config CPU_MODEL_STM32L496AG
+    bool
+    select CPU_FAM_L4
+
+config CPU_MODEL_STM32L496ZG
+    bool
+    select CPU_FAM_L4
+
+config CPU_MODEL_STM32L4R5ZI
+    bool
+    select CPU_FAM_L4
+
+# STM32WB
+config CPU_MODEL_STM32WB55RG
+    bool
+    select CPU_FAM_WB
+
+# Definition of specific features
+config HAS_CPU_STM32
+    bool
+    help
+        Indicates that a 'stm32' cpu is being used.
+
+config HAS_CPU_STM32F0
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32f0' family.
+
+config HAS_CPU_STM32F1
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32f1' family.
+
+config HAS_CPU_STM32F2
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32f2' family.
+
+config HAS_CPU_STM32F3
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32f3' family.
+
+config HAS_CPU_STM32F4
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32f4' family.
+
+config HAS_CPU_STM32F7
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32f7' family.
+
+config HAS_CPU_STM32G4
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32g4' family.
+
+config HAS_CPU_STM32L0
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32l0' family.
+
+config HAS_CPU_STM32L1
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32l1' family.
+
+config HAS_CPU_STM32L4
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32l4' family.
+
+config HAS_CPU_STM32WB
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32wb' family.
+
+config HAS_BOOTLOADER_STM32
+    bool
+    help
+        Indicates that the stm32 bootloader is being used.
+
+# Common CPU symbols
+config CPU_FAM
+    default "f0" if CPU_FAM_F0
+    default "f1" if CPU_FAM_F1
+    default "f2" if CPU_FAM_F2
+    default "f3" if CPU_FAM_F3
+    default "f4" if CPU_FAM_F4
+    default "f7" if CPU_FAM_F7
+    default "g4" if CPU_FAM_G4
+    default "l0" if CPU_FAM_L0
+    default "l1" if CPU_FAM_L1
+    default "l4" if CPU_FAM_L4
+    default "wb" if CPU_FAM_WB
+
+config CPU_MODEL
+    # STM32F0
+    default "stm32f030f4" if CPU_MODEL_STM32F030F4
+    default "stm32f030r8" if CPU_MODEL_STM32F030R8
+    default "stm32f031k6" if CPU_MODEL_STM32F031K6
+    default "stm32f042k6" if CPU_MODEL_STM32F042K6
+    default "stm32f051r8" if CPU_MODEL_STM32F051R8
+    default "stm32f070rb" if CPU_MODEL_STM32F070RB
+    default "stm32f072rb" if CPU_MODEL_STM32F072RB
+    default "stm32f091rc" if CPU_MODEL_STM32F091RC
+
+    # STM32F1
+    default "stm32f103c8" if CPU_MODEL_STM32F103C8
+    default "stm32f103cb" if CPU_MODEL_STM32F103CB
+    default "stm32f103rb" if CPU_MODEL_STM32F103RB
+    default "stm32f103re" if CPU_MODEL_STM32F103RE
+
+    # STM32F2
+    default "stm32f207zg" if CPU_MODEL_STM32F207ZG
+
+    # STM32F3
+    default "stm32f302r8" if CPU_MODEL_STM32F302R8
+    default "stm32f303k8" if CPU_MODEL_STM32F303K8
+    default "stm32f303re" if CPU_MODEL_STM32F303RE
+    default "stm32f303vc" if CPU_MODEL_STM32F303VC
+    default "stm32f303ze" if CPU_MODEL_STM32F303ZE
+    default "stm32f334r8" if CPU_MODEL_STM32F334R8
+
+    # STM32F4
+    default "stm32f401re" if CPU_MODEL_STM32F401RE
+    default "stm32f405rg" if CPU_MODEL_STM32F405RG
+    default "stm32f407vg" if CPU_MODEL_STM32F407VG
+    default "stm32f410rb" if CPU_MODEL_STM32F410RB
+    default "stm32f411re" if CPU_MODEL_STM32F411RE
+    default "stm32f411ceu6" if CPU_MODEL_STM32F411CEU6
+    default "stm32f412zg" if CPU_MODEL_STM32F412ZG
+    default "stm32f413zh" if CPU_MODEL_STM32F413ZH
+    default "stm32f415rg" if CPU_MODEL_STM32F415RG
+    default "stm32f429zi" if CPU_MODEL_STM32F429ZI
+    default "stm32f437vg" if CPU_MODEL_STM32F437VG
+    default "stm32f446re" if CPU_MODEL_STM32F446RE
+    default "stm32f446ze" if CPU_MODEL_STM32F446ZE
+
+    # STM32F7
+    default "stm32f722ze" if CPU_MODEL_STM32F722ZE
+    default "stm32f723ie" if CPU_MODEL_STM32F723IE
+    default "stm32f746zg" if CPU_MODEL_STM32F746ZG
+    default "stm32f767zi" if CPU_MODEL_STM32F767ZI
+    default "stm32f769ni" if CPU_MODEL_STM32F769NI
+
+    # STM32G4
+    default "stm32g474re" if CPU_MODEL_STM32G474RE
+
+    # STM32L0
+    default "stm32l031k6" if CPU_MODEL_STM32L031K6
+    default "stm32l052t8" if CPU_MODEL_STM32L052T8
+    default "stm32l053r8" if CPU_MODEL_STM32L053R8
+    default "stm32l053c8" if CPU_MODEL_STM32L053C8
+    default "stm32l072cz" if CPU_MODEL_STM32L072CZ
+    default "stm32l073rz" if CPU_MODEL_STM32L073RZ
+
+    # STM32L1
+    default "stm32l151cb" if CPU_MODEL_STM32L151CB
+    default "stm32l151cb_a" if CPU_MODEL_STM32L151CB_A
+    default "stm32l151rc" if CPU_MODEL_STM32L151RC
+    default "stm32l152re" if CPU_MODEL_STM32L152RE
+
+    # STM32L4
+    default "stm32l412kb" if CPU_MODEL_STM32L412KB
+    default "stm32l432kc" if CPU_MODEL_STM32L432KC
+    default "stm32l433rc" if CPU_MODEL_STM32L433RC
+    default "stm32l452re" if CPU_MODEL_STM32L452RE
+    default "stm32l475vg" if CPU_MODEL_STM32L475VG
+    default "stm32l476rg" if CPU_MODEL_STM32L476RG
+    default "stm32l476vg" if CPU_MODEL_STM32L476VG
+    default "stm32l496ag" if CPU_MODEL_STM32L496AG
+    default "stm32l496zg" if CPU_MODEL_STM32L496ZG
+    default "stm32l4r5zi" if CPU_MODEL_STM32L4R5ZI
+
+    # STM32WB
+    default "stm32wb55rg" if CPU_MODEL_STM32WB55RG
+
+config CPU
+    default "stm32" if CPU_STM32
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"
