@@ -30,6 +30,7 @@ BOARD_WHITELIST += acd52832 \
                    derfmega128 \
                    derfmega256 \
                    dwm1001 \
+                   ek-lm4f120xl \
                    esp32-heltec-lora32-v2 \
                    esp32-mh-et-live-minikit \
                    esp32-olimex-evb \
