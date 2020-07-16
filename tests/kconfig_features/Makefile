@@ -64,6 +64,7 @@ BOARD_WHITELIST += acd52832 \
                    msb-430h \
                    msbiot \
                    mulle \
+                   native \
                    nrf51dk \
                    nrf51dongle \
                    nrf52832-mdk \
