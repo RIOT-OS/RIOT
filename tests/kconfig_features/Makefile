@@ -67,6 +67,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    msb-430h \
                    msbiot \
                    mulle \
+                   native \
                    nrf51dk \
                    nrf51dongle \
                    nrf52832-mdk \
