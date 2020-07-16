@@ -60,6 +60,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    lobaro-lorabox \
                    lsn50 \
                    maple-mini \
+                   mbed_lpc1768 \
                    mega-xplained \
                    microbit \
                    microduino-corerf \
@@ -136,6 +137,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    ruuvitag \
                    same54-xpro \
                    samr21-xpro \
+                   seeeduino_arch-pro \
                    slstk3401a \
                    slstk3402a \
                    sltb001a \
