@@ -130,6 +130,7 @@ static inline int prepare_request(modbus_rtu_t *modbus) {
   case MB_FC_READ_REGISTERS:
   case MB_FC_READ_INPUT_REGISTER:
     write_count(modbus);
+    // id + func + addr + count
     modbus->size_buffer = 6;
     break;
   case MB_FC_WRITE_COIL:
@@ -147,17 +148,17 @@ static inline int prepare_request(modbus_rtu_t *modbus) {
     write_count(modbus);
     size = modbus->msg->count / 8 + 1;
     modbus->buffer[BYTE_CNT] = size;
-    modbus->size_buffer = 7;
-    memcpy(modbus->buffer + modbus->size_buffer, modbus->msg->data, size);
-    modbus->size_buffer += size;
+    // (id + func + addr + count + size) + data
+    modbus->size_buffer = 7 + size;
+    memcpy(modbus->buffer + 7, modbus->msg->data, size);
     break;
   case MB_FC_WRITE_REGISTERS:
     write_count(modbus);
     size = modbus->msg->count * 2;
     modbus->buffer[BYTE_CNT] = size;
-    modbus->size_buffer = 7;
-    memcpy(modbus->buffer + modbus->size_buffer, modbus->msg->data, size);
-    modbus->size_buffer += size;
+    // (id + func + addr + count + size) + data
+    modbus->size_buffer = 7 + size;
+    memcpy(modbus->buffer + 7, modbus->msg->data, size);
     break;
   default:
     return -__LINE__;
@@ -282,9 +283,8 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
       break;
     case MB_FC_WRITE_COILS:
     case MB_FC_WRITE_REGISTERS:
-      // (id + func + addr + count + size) + size of regs + crc
+      // (id + func + addr + count + size) + data + crc
       size = 7 + modbus->buffer[BYTE_CNT] + 2;
-      // thread_stack_print();
       if (wait_bytes(modbus, size)) {
         goto error;
       }
@@ -316,6 +316,7 @@ OK:
 }
 
 int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
+  uint8_t size;
   modbus->msg = message;
   mutex_lock(&(modbus->mutex_buffer));
   modbus->buffer[ID] = modbus->msg->id;
@@ -323,12 +324,15 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message
   switch (modbus->msg->func) {
   case MB_FC_READ_COILS:
   case MB_FC_READ_DISCRETE_INPUT:
-    modbus->buffer[2] = modbus->msg->count / 8 + 1; // calc size for send
-    modbus->size_buffer = 3 + modbus->buffer[2];
-    memcpy(modbus->buffer + 3, modbus->msg->data, modbus->size_buffer);
+    size = modbus->msg->count / 8 + 1;
+    modbus->buffer[2] = size;
+    modbus->size_buffer = 3 + size;
+    memcpy(modbus->buffer + 3, modbus->msg->data, size);
     break;
   case MB_FC_WRITE_COIL:
   case MB_FC_WRITE_REGISTER:
+  case MB_FC_WRITE_COILS:
+  case MB_FC_WRITE_REGISTERS:
     // don't change any data in buffer, send this back as is
     // size_buffer change for calculate CRC
     // todo: calculate CRC for MB_FC_WRITE_COIL no need, need reduce this
@@ -337,15 +341,10 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message
     break;
   case MB_FC_READ_REGISTERS:
   case MB_FC_READ_INPUT_REGISTER:
-    modbus->buffer[2] = modbus->msg->count * 2; // calc size for send
-    modbus->size_buffer = 3 + modbus->buffer[2];
-    memcpy(modbus->buffer + 3, modbus->msg->data, modbus->size_buffer);
-    break;
-  case MB_FC_WRITE_COILS:
-  case MB_FC_WRITE_REGISTERS:
-    write_address(modbus);
-    write_count(modbus);
-    modbus->size_buffer = 6;
+    size = modbus->msg->count * 2;
+    modbus->buffer[2] = size; // calc size for send
+    modbus->size_buffer = 3 + size;
+    memcpy(modbus->buffer + 3, modbus->msg->data, size);
     break;
   default:
     mutex_unlock(&(modbus->mutex_buffer));
