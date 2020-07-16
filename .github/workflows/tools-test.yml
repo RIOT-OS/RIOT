@@ -8,7 +8,7 @@ on:
       - '*'
   pull_request:
     branches:
-      - master
+      - '*'
 
 jobs:
   python-tests:
