@@ -50,12 +50,27 @@ static const tc32_conf_t timer_config[] = {
         .gclk_id        = TC0_GCLK_ID,
         .gclk_src       = SAM0_GCLK_MAIN,
         .flags          = TC_CTRLA_MODE_COUNT32,
+    },
+    {
+        .dev            = TC2,
+        .irq            = TC2_IRQn,
+        .mclk           = &MCLK->APBCMASK.reg,
+        .mclk_mask      = MCLK_APBCMASK_TC2,
+        .gclk_id        = TC2_GCLK_ID,
+        .gclk_src       = SAM0_GCLK_MAIN,
+        .flags          = TC_CTRLA_MODE_COUNT16,
     }
 };
 
 /* Timer 0 configuration */
 #define TIMER_0_CHANNELS    2
 #define TIMER_0_ISR         isr_tc0
+
+/* Timer 1 configuration */
+#define TIMER_1_CHANNELS    2
+#define TIMER_1_ISR         isr_tc2
+#define TIMER_1_MAX_VALUE   0xffff
+
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
