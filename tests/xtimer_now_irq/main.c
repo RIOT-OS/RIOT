@@ -26,22 +26,27 @@
 
 int main(void)
 {
-    puts("xtimer_now_irq test application.\n");
-
-    uint8_t count = TEST_COUNT;
-    while (count) {
-        unsigned int state = irq_disable();
-        uint32_t t1 = xtimer_now_usec();
-        xtimer_spin(xtimer_ticks((uint32_t)(~XTIMER_MASK) / 2));
-        uint32_t t2 = xtimer_now_usec();
-        irq_restore(state);
-        if (t2 < t1) {
-            puts("ERROR: wrong time with interrupts disabled");
-            return -1;
-        }
-        puts("OK");
-        count --;
+    if (XTIMER_WIDTH == 32) {
+        puts("Nothing to do for 32 bit timers.\n");
     }
+    else {
+        puts("xtimer_now_irq test application.\n");
+        uint8_t count = TEST_COUNT;
+        while (count) {
+            unsigned int state = irq_disable();
+            uint32_t t1 = xtimer_now_usec();
+            xtimer_spin(xtimer_ticks((uint32_t)(~XTIMER_MASK) / 2));
+            uint32_t t2 = xtimer_now_usec();
+            irq_restore(state);
+            if (t2 < t1) {
+                puts("ERROR: wrong time with interrupts disabled");
+                return -1;
+            }
+            puts("OK");
+            count --;
+        }
+    }
+
     puts("SUCCESS");
     return 0;
 }

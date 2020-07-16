@@ -15,8 +15,11 @@ TIMEOUT = 20
 
 
 def testfunc(child):
-    for _ in range(4):
-        child.expect_exact("OK", timeout=TIMEOUT)
+    res = child.expect(['Nothing to do for 32 bit timers.\r\n',
+                        'xtimer_now_irq test application.\r\n'])
+    if res == 1:
+        for _ in range(4):
+            child.expect_exact("OK", timeout=TIMEOUT)
     child.expect_exact("SUCCESS")
 
 
