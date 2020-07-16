@@ -51,6 +51,7 @@ static void *thread_master(void *arg __attribute__((unused))) {
     for (uint8_t i = 0; i < message_master.count; i++) {
       regs_master1[i] = rand();
     }
+
     puts("try MB_FC_WRITE_REGISTERS");
     message_master.data = regs_master1;
     message_master.func = MB_FC_WRITE_REGISTERS;
@@ -72,6 +73,28 @@ static void *thread_master(void *arg __attribute__((unused))) {
       } else {
         // puts("ok request");
       }
+    }
+
+    puts("try MB_FC_READ_DISCRETE_INPUT");
+    message_master.data = regs_master1;
+    message_master.func = MB_FC_READ_DISCRETE_INPUT;
+    res = modbus_rtu_send_request(&master, &message_master);
+    // assert(message_slave.count == message_master.count);
+    if (res) {
+      printf("fail MB_FC_READ_DISCRETE_INPUT %d\n", res);
+    } else {
+      // puts("ok request");
+    }
+
+    puts("try MB_FC_READ_INPUT_REGISTER");
+    message_master.data = regs_master1;
+    message_master.func = MB_FC_READ_INPUT_REGISTER;
+    res = modbus_rtu_send_request(&master, &message_master);
+    // assert(message_slave.count == message_master.count);
+    if (res) {
+      printf("fail MB_FC_READ_INPUT_REGISTER %d\n", res);
+    } else {
+      // puts("ok request");
     }
 
     puts("try MB_FC_WRITE_COILS");
