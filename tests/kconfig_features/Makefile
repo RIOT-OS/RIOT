@@ -132,6 +132,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    remote-reva \
                    remote-revb \
                    ruuvitag \
+                   same54-xpro \
                    samr21-xpro \
                    slstk3401a \
                    slstk3402a \
