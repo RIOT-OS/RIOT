@@ -124,7 +124,7 @@ void i2c_release(i2c_t dev)
 static void _set_baud(lpc23xx_i2c_t *i2c, uint32_t baud)
 {
     uint32_t pclksel, prescale;
-    lpc2387_pclk_scale(CLOCK_CORECLOCK, baud, &pclksel, &prescale);
+    lpc23xx_pclk_scale(CLOCK_CORECLOCK, baud, &pclksel, &prescale);
 
     switch ((uint32_t)i2c) {
     case I2C0_BASE_ADDR:

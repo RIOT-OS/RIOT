@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include "lpc2387.h"
+#include "lpc23xx.h"
 #include "arm_cpu.h"
 
 #ifdef __cplusplus
@@ -41,7 +41,7 @@ void cpu_init_mam(void);
 /**
  * @brief Scale lpc2387 cpu speed
  */
-void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale);
+void lpc23xx_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale);
 
 /**
  * @brief Initialize lpc2387 cpu clocks

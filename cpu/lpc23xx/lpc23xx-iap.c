@@ -24,7 +24,7 @@
 #include "irq.h"
 #include "flashrom.h"
 #include "iap.h"
-#include "lpc2387.h"
+#include "lpc23xx.h"
 
 #define ENABLE_DEBUG    (0)
 #include "debug.h"

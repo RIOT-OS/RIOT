@@ -12,8 +12,8 @@
  *
 ******************************************************************************/
 
-#ifndef LPC23XX_H
-#define LPC23XX_H
+#ifndef LPC23XX_VENDOR_H
+#define LPC23XX_VENDOR_H
 
 #include <stdint.h>
 
@@ -1256,4 +1256,4 @@ with the spec. update in USB Device Section. */
 }
 #endif
 
-#endif  /* LPC23XX_H */
+#endif  /* LPC23XX_VENDOR_H */

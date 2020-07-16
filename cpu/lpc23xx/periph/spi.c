@@ -119,7 +119,7 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     dev->CR0 = 7;
 
     /* configure bus clock */
-    lpc2387_pclk_scale(CLOCK_CORECLOCK / 1000, (uint32_t)clk, &pclksel, &cpsr);
+    lpc23xx_pclk_scale(CLOCK_CORECLOCK / 1000, (uint32_t)clk, &pclksel, &cpsr);
 
     switch ((uint32_t)dev) {
     case SSP0_BASE_ADDR:

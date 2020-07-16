@@ -19,7 +19,7 @@
 #include "stdio_base.h"
 #include "periph/init.h"
 
-void lpc2387_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale)
+void lpc23xx_pclk_scale(uint32_t source, uint32_t target, uint32_t *pclksel, uint32_t *prescale)
 {
     uint32_t pclkdiv;
     *prescale = source / target;
@@ -52,7 +52,7 @@ void cpu_clock_scale(uint32_t source, uint32_t target, uint32_t *prescale)
 {
     uint32_t pclksel;
 
-    lpc2387_pclk_scale(source, target, &pclksel, prescale);
+    lpc23xx_pclk_scale(source, target, &pclksel, prescale);
 
     PCLKSEL0 = (PCLKSEL0 & ~(BIT2 | BIT3)) | (pclksel << 2);    /* timer 0 */
     PCLKSEL0 = (PCLKSEL0 & ~(BIT4 | BIT5)) | (pclksel << 4);    /* timer 1 */
