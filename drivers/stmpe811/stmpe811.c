@@ -262,8 +262,9 @@ int stmpe811_read_touch_state(const stmpe811_t *dev, stmpe811_touch_state_t *sta
         return -STMPE811_ERR_I2C;
     }
 
+    _clear_interrupt_status(dev);
+
     if ((val & STMPE811_TSC_CTRL_STA)) {
-        _clear_interrupt_status(dev);
         *state = STMPE811_TOUCH_STATE_PRESSED;
     }
     else {
