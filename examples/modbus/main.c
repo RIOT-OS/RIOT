@@ -102,7 +102,6 @@ static void *thread_master(void *arg __attribute__((unused))) {
     regs_master1[0] = 1;
     message_master.func = MB_FC_WRITE_COIL;
     res = modbus_rtu_send_request(&master, &message_master);
-    // assert(message_slave.count == message_master.count);
     if (res) {
       printf("fail MB_FC_WRITE_COIL %d\n", res);
     } else {
@@ -113,7 +112,26 @@ static void *thread_master(void *arg __attribute__((unused))) {
       res = modbus_rtu_send_request(&master, &message_master);
       // assert(message_slave.count == message_master.count);
       if (res || (!!regs_master1[0]) != (!!regs_master2[0] & 1)) {
-        printf("fail MB_FC_READ_COILS 2 %d\n", res);
+        printf("fail MB_FC_READ_COILS_2 %d\n", res);
+      } else {
+        // puts("ok request");
+      }
+    }
+
+    puts("try MB_FC_WRITE_REGISTER");
+    message_master.data = regs_master1;
+    message_master.func = MB_FC_WRITE_REGISTER;
+    res = modbus_rtu_send_request(&master, &message_master);
+    if (res) {
+      printf("fail MB_FC_WRITE_REGISTER %d\n", res);
+    } else {
+      xtimer_usleep(master.rx_timeout * 3);
+      puts("try MB_FC_READ_INPUT_REGISTER");
+      message_master.data = regs_master2;
+      message_master.func = MB_FC_READ_REGISTERS;
+      res = modbus_rtu_send_request(&master, &message_master);
+      if (res || regs_master1[0] != regs_master2[0]) {
+        printf("fail MB_FC_READ_REGISTERS_2 %d\n", res);
       } else {
         // puts("ok request");
       }

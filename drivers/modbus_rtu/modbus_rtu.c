@@ -110,7 +110,7 @@ int modbus_rtu_send_request(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
   mutex_lock(&(modbus->mutex_buffer));
   if (prepare_request(modbus) != 0) {
     mutex_unlock(&(modbus->mutex_buffer));
-    return -1;
+    return -__LINE__;
   }
   send(modbus);
   modbus->size_buffer = 0;
@@ -135,10 +135,13 @@ static inline int prepare_request(modbus_rtu_t *modbus) {
   case MB_FC_WRITE_COIL:
     modbus->buffer[4] = (modbus->msg->data[0]) ? 0xff : 0x00;
     modbus->buffer[5] = 0;
+    // id + func + addr + data
     modbus->size_buffer = 6;
     break;
   case MB_FC_WRITE_REGISTER:
-    return -__LINE__;
+    memcpy(modbus->buffer + 4, (char *)modbus->msg->data, 2);
+    // id + func + addr + data
+    modbus->size_buffer = 6;
     break;
   case MB_FC_WRITE_COILS:
     write_count(modbus);
@@ -157,7 +160,7 @@ static inline int prepare_request(modbus_rtu_t *modbus) {
     modbus->size_buffer += size;
     break;
   default:
-    return -15;
+    return -__LINE__;
     break;
   }
 
@@ -273,13 +276,17 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
       modbus->msg->data[0] = modbus->buffer[4];
       // write_bit(modbus->msg->data, modbus->msg->addr, modbus->buffer[4]);
       break;
+    case MB_FC_WRITE_REGISTER:
+      read_address(modbus);
+      memcpy((char *)modbus->msg->data, modbus->buffer + 4, 2);
+      break;
     case MB_FC_WRITE_COILS:
     case MB_FC_WRITE_REGISTERS:
       // (id + func + addr + count + size) + size of regs + crc
       size = 7 + modbus->buffer[BYTE_CNT] + 2;
       // thread_stack_print();
-      if (wait_bytes(modbus, size)){
-          goto error;
+      if (wait_bytes(modbus, size)) {
+        goto error;
       }
       mutex_lock(&(modbus->mutex_buffer));
       if (calcCRC(modbus->buffer, size) != 0) {
@@ -321,6 +328,7 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message
     memcpy(modbus->buffer + 3, modbus->msg->data, modbus->size_buffer);
     break;
   case MB_FC_WRITE_COIL:
+  case MB_FC_WRITE_REGISTER:
     // don't change any data in buffer, send this back as is
     // size_buffer change for calculate CRC
     // todo: calculate CRC for MB_FC_WRITE_COIL no need, need reduce this
