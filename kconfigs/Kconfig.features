@@ -255,6 +255,11 @@ config HAS_PERIPH_SPI_GPIO_MODE
     help
         Indicates that the SPI peripheral supports configuring the GPIOs modes.
 
+config HAS_PERIPH_SYSTICK
+    bool
+    help
+        Indicates that the SysTick timer peripheral is implemented.
+
 config HAS_PERIPH_TEMPERATURE
     bool
     help

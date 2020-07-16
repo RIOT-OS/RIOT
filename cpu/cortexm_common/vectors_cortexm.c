@@ -487,7 +487,7 @@ ISR_VECTOR(0) const cortexm_base_t cortex_vector_base = {
         [10] = isr_svc,
         /* [-2] pendSV interrupt, in RIOT use to do the actual context switch */
         [13] = isr_pendsv,
-        /* [-1] SysTick interrupt, not used in RIOT */
+        /* [-1] SysTick interrupt, only used by periph_systick module */
         [14] = isr_systick,
 
         /* -9 to -6 reserved entries can be defined by the cpu module */
