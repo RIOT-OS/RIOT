@@ -136,6 +136,8 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    remote-revb \
                    ruuvitag \
                    same54-xpro \
+                   saml10-xpro \
+                   saml11-xpro \
                    samr21-xpro \
                    seeeduino_arch-pro \
                    slstk3401a \
