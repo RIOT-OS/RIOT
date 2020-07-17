@@ -20,6 +20,8 @@
  * @}
  */
 #include "assert.h"
+
+#include "irq.h"
 #include "periph/rtt.h"
 #include "ztimer/periph_rtt.h"
 
