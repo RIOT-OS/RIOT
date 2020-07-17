@@ -28,15 +28,11 @@ DEVELHELP ?= 1
 RD_LT ?= 60
 CFLAGS += -DCORD_LT=$(RD_LT)
 
-# If nothing else is defined, we use CoAP default port
-RD_PORT ?= COAP_PORT
-CFLAGS += -DRD_PORT=$(RD_PORT)
-
 # The RD server's address must be defined by the build environment by setting
 # the RD_ADDR environment variable. Per default, this value is set to the
 # loopback address for enabling the build tests to successfully build this
 # example.
-RD_ADDR ?= \"affe::1\"
+RD_ADDR ?= \"[affe::1]\"
 CFLAGS += -DRD_ADDR=$(RD_ADDR)
 
 include $(RIOTBASE)/Makefile.include
