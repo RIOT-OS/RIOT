@@ -52,7 +52,7 @@ int wakeup(int argc, char **argv)
     return 0;
 }
 
-int sleep(int argc, char **argv)
+int enter_sleep(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -454,7 +454,7 @@ static const shell_command_t shell_commands[] = {
     { "turn_on", "Turn on all LEDs.", turn_on },
     { "turn_off", "Turn off all LEDs.", turn_off },
     { "wakeup", "Switch to normal mode.", wakeup },
-    { "sleep", "Switch to low power mode.", sleep },
+    { "sleep", "Switch to low power mode.", enter_sleep },
     { "pwm", "Set individual PWM signal for a given channel.", pwm },
     { "grp_pwm", "Set global PWM signal.", grp_pwm },
     { "blinking", "Set up values for blinking mode.", blinking },

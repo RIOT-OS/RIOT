@@ -65,7 +65,7 @@ static void _float_fit(float *src, phydat_t *data, size_t dim, uint32_t mul)
     phydat_fit(data, &i32[0], dim);
 }
 
-static int read(const void *dev, phydat_t *data, unsigned int val_idx)
+static int _read(const void *dev, phydat_t *data, unsigned int val_idx)
 {
     /* find the device index */
     unsigned dev_idx = _dev2index((sps30_t*)dev);
@@ -131,27 +131,27 @@ static int read(const void *dev, phydat_t *data, unsigned int val_idx)
 
 static int read_mc_pm_1_2p5_4(const void *dev, phydat_t *data)
 {
-    return read(dev, data, SPS30_SAUL_VAL_IDX_MC_PM_1_2P5_4);
+    return _read(dev, data, SPS30_SAUL_VAL_IDX_MC_PM_1_2P5_4);
 }
 
 static int read_mc_pm_10(const void *dev, phydat_t *data)
 {
-    return read(dev, data, SPS30_SAUL_VAL_IDX_MC_PM_10);
+    return _read(dev, data, SPS30_SAUL_VAL_IDX_MC_PM_10);
 }
 
 static int read_nc_pm_0p5_1_2p5(const void *dev, phydat_t *data)
 {
-    return read(dev, data, SPS30_SAUL_VAL_IDX_NC_PM_0P5_1_2P5);
+    return _read(dev, data, SPS30_SAUL_VAL_IDX_NC_PM_0P5_1_2P5);
 }
 
 static int read_nc_pm_4_10(const void *dev, phydat_t *data)
 {
-    return read(dev, data, SPS30_SAUL_VAL_IDX_NC_PM_4_10);
+    return _read(dev, data, SPS30_SAUL_VAL_IDX_NC_PM_4_10);
 }
 
 static int read_ps(const void *dev, phydat_t *data)
 {
-    return read(dev, data, SPS30_SAUL_VAL_IDX_PS);
+    return _read(dev, data, SPS30_SAUL_VAL_IDX_PS);
 }
 
 const saul_driver_t sps30_saul_driver_mc_pm_1_2p5_4 = {
