@@ -24,7 +24,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 #include "thread.h"
 
 #include "periph/gpio.h"
@@ -110,12 +111,12 @@ int sx127x_reset(const sx127x_t *dev)
         /* set reset pin to the state that triggers manual reset */
         gpio_write(dev->params.reset_pin, SX127X_POR_ACTIVE_LOGIC_LEVEL);
 
-        xtimer_usleep(SX127X_MANUAL_RESET_SIGNAL_LEN_US);
+        ztimer_sleep(ZTIMER_USEC, SX127X_MANUAL_RESET_SIGNAL_LEN_US);
 
         /* Put reset pin in High-Z */
         gpio_init(dev->params.reset_pin, GPIO_IN);
 
-        xtimer_usleep(SX127X_MANUAL_RESET_WAIT_FOR_READY_US);
+        ztimer_sleep(ZTIMER_USEC, SX127X_MANUAL_RESET_WAIT_FOR_READY_US);
     }
 
     return 0;
@@ -147,7 +148,7 @@ int sx127x_init(sx127x_t *dev)
     }
 
     /* wait for the device to become ready */
-    xtimer_usleep(SX127X_POR_WAIT_FOR_READY_US);
+    ztimer_sleep(ZTIMER_USEC, SX127X_POR_WAIT_FOR_READY_US);
 
     sx127x_reset(dev);
 
@@ -205,7 +206,7 @@ uint32_t sx127x_random(sx127x_t *dev)
     sx127x_set_op_mode(dev, SX127X_RF_OPMODE_RECEIVER);
 
     for (unsigned i = 0; i < 32; i++) {
-        xtimer_usleep(1000); /* wait for the chaos */
+        ztimer_sleep(ZTIMER_MSEC, 1);   /* wait one millisecond */
 
         /* Non-filtered RSSI value reading. Only takes the LSB value */
         rnd |= ((uint32_t) sx127x_reg_read(dev, SX127X_REG_LR_RSSIWIDEBAND) & 0x01) << i;

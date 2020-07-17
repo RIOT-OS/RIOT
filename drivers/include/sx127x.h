@@ -60,7 +60,8 @@
 #ifndef SX127X_H
 #define SX127X_H
 
-#include "xtimer.h"
+#include "timex.h"
+#include "ztimer.h"
 #include "net/netdev.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -78,9 +79,9 @@ extern "C" {
 #define SX127X_HF_CHANNEL_DEFAULT        (868000000UL)          /**< Use to calibrate RX chain for LF and HF bands */
 #define SX127X_RF_MID_BAND_THRESH        (525000000UL)          /**< Mid-band threshold */
 #define SX127X_XTAL_FREQ                 (32000000UL)           /**< Internal oscillator frequency, 32MHz */
-#define SX127X_RADIO_WAKEUP_TIME         (1000U)                /**< In microseconds [us] */
+#define SX127X_RADIO_WAKEUP_TIME         (1U)                   /**< In milliseconds [ms] */
 
-#define SX127X_TX_TIMEOUT_DEFAULT        (1000U * 1000U * 30UL) /**< TX timeout, 30s */
+#define SX127X_TX_TIMEOUT_DEFAULT        (30 * MS_PER_SEC)      /**< TX timeout, 30s */
 #define SX127X_RX_SINGLE                 (false)                /**< Single byte receive mode => continuous by default */
 #define SX127X_RX_BUFFER_SIZE            (256)                  /**< RX buffer size */
 #define SX127X_RADIO_TX_POWER            (14U)                  /**< Radio power in dBm */
@@ -183,8 +184,8 @@ typedef struct {
     uint8_t coderate;                  /**< Error coding rate */
     uint8_t freq_hop_period;           /**< Frequency hop period */
     uint8_t flags;                     /**< Boolean flags */
-    uint32_t rx_timeout;               /**< RX timeout in microseconds */
-    uint32_t tx_timeout;               /**< TX timeout in microseconds */
+    uint32_t rx_timeout;               /**< RX timeout in milliseconds */
+    uint32_t tx_timeout;               /**< TX timeout in milliseconds */
 } sx127x_lora_settings_t;
 
 /**
@@ -202,8 +203,8 @@ typedef struct {
  */
 typedef struct {
     /* Data that will be passed to events handler in application */
-    xtimer_t tx_timeout_timer;         /**< TX operation timeout timer */
-    xtimer_t rx_timeout_timer;         /**< RX operation timeout timer */
+    ztimer_t tx_timeout_timer;         /**< TX operation timeout timer */
+    ztimer_t rx_timeout_timer;         /**< RX operation timeout timer */
     uint32_t last_channel;             /**< Last channel in frequency hopping sequence */
     bool is_last_cad_success;          /**< Sign of success of last CAD operation (activity detected) */
 } sx127x_internal_t;
