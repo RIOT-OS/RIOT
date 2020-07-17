@@ -37,7 +37,7 @@ void l2filter_init(l2filter_t *list)
 {
     assert(list);
 
-    for (unsigned i = 0; i < L2FILTER_LISTSIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_L2FILTER_LISTSIZE; i++) {
         list[i].addr_len = 0;
     }
 }
@@ -48,7 +48,7 @@ int l2filter_add(l2filter_t *list, const void *addr, size_t addr_len)
 
     int res = -ENOMEM;
 
-    for (unsigned i = 0; i < L2FILTER_LISTSIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_L2FILTER_LISTSIZE; i++) {
         if (list[i].addr_len == 0) {
             list[i].addr_len = addr_len;
             memcpy(list[i].addr, addr, addr_len);
@@ -66,7 +66,7 @@ int l2filter_rm(l2filter_t *list, const void *addr, size_t addr_len)
 
     int res = -ENOENT;
 
-    for (unsigned i = 0; i < L2FILTER_LISTSIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_L2FILTER_LISTSIZE; i++) {
         if (match(&list[i], addr, addr_len)) {
             list[i].addr_len = 0;
             res = 0;
@@ -83,7 +83,7 @@ bool l2filter_pass(const l2filter_t *list, const void *addr, size_t addr_len)
 
 #ifdef MODULE_L2FILTER_WHITELIST
     bool res = false;
-    for (unsigned i = 0; i < L2FILTER_LISTSIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_L2FILTER_LISTSIZE; i++) {
         if (match(&list[i], addr, addr_len)) {
             DEBUG("[l2filter] whitelist: address match -> packet passes\n");
             res = true;
@@ -93,7 +93,7 @@ bool l2filter_pass(const l2filter_t *list, const void *addr, size_t addr_len)
     DEBUG("[l2filter] whitelist: no match -> packet dropped\n");
 #else
     bool res = true;
-    for (unsigned i = 0; i < L2FILTER_LISTSIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_L2FILTER_LISTSIZE; i++) {
         if (match(&list[i], addr, addr_len)) {
             DEBUG("[l2filter] blacklist: address match -> packet dropped\n");
             res = false;

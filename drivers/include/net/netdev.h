@@ -288,7 +288,7 @@ struct netdev {
     netdev_t *lower;                        /**< ptr to the lower netdev layer */
 #endif
 #ifdef MODULE_L2FILTER
-    l2filter_t filter[L2FILTER_LISTSIZE];   /**< link layer address filters */
+    l2filter_t filter[CONFIG_L2FILTER_LISTSIZE];   /**< link layer address filters */
 #endif
 };
 

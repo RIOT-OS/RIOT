@@ -50,8 +50,8 @@ extern "C" {
 /**
  * @brief   Number of slots in each filter list (filter entries per device)
  */
-#ifndef L2FILTER_LISTSIZE
-#define L2FILTER_LISTSIZE               (8U)
+#ifndef CONFIG_L2FILTER_LISTSIZE
+#define CONFIG_L2FILTER_LISTSIZE               (8U)
 #endif
 
 /**

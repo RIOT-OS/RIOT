@@ -784,7 +784,7 @@ static void _netif_list(netif_t *iface)
         puts("\n           Black-listed link layer addresses:");
 #endif
         int count = 0;
-        for (unsigned i = 0; i < L2FILTER_LISTSIZE; i++) {
+        for (unsigned i = 0; i < CONFIG_L2FILTER_LISTSIZE; i++) {
             if (filter[i].addr_len > 0) {
                 char hwaddr_str[filter[i].addr_len * 3];
                 gnrc_netif_addr_to_str(filter[i].addr, filter[i].addr_len,
