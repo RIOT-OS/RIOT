@@ -65,6 +65,7 @@ typedef struct {
   uint16_t addr;  /**< Starting Address */
   uint16_t count; /**< Quantity of Registers or byte or bits */
   uint16_t *data; /**< Registers or byte or bits*/
+  uint16_t data_size; /**< size of data in byte*/
 } modbus_rtu_message_t;
 
 /**

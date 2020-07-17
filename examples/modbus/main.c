@@ -23,6 +23,7 @@ static modbus_rtu_message_t message_master = {
     .id = SLAVE_ID,
     .addr = 0,
     .data = regs_master1,
+    .data_size = sizeof(regs_master1),
     .count = 16};
 
 static char stack_slave[400];
@@ -30,7 +31,8 @@ static kernel_pid_t pid_slave;
 static modbus_rtu_t slave;
 static uint16_t regs_slave[16];
 static modbus_rtu_message_t message_slave = {
-    .data = regs_slave};
+    .data = regs_slave,
+    .data_size = sizeof(regs_slave)};
 
 static void init_master(void) {
   master.uart = UART_DEV(MASTER_UART);
@@ -168,7 +170,7 @@ static void *thread_slave(void *arg __attribute__((unused))) {
     res = modbus_rtu_poll(&slave, &message_slave);
     // printf("func: %u; addr: %u; count: %u\n", message_slave.func, message_slave.addr, message_slave.count);
     if (res) {
-      puts("fail poll");
+      printf("fail poll %d\n", res);
     } else {
       // assert(message_slave.id == SLAVE_ID);
       // assert(message_slave.func == message_master.func);
