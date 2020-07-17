@@ -13,39 +13,11 @@ menuconfig KCONFIG_MODULE_GCOAP
 
 if KCONFIG_MODULE_GCOAP
 
-menu "Buffer Sizes"
-
 config GCOAP_PDU_BUF_SIZE
     int "Request or response buffer size"
     default 128
     help
         Size of the buffer used to build a CoAP request or response.
-
-config GCOAP_REQ_OPTIONS_BUF
-    int "Request options buffer size"
-    default 4
-    help
-        Reduce payload length by this value for a request.
-        Accommodates writing Content-Format option in gcoap_finish(). May be
-        set to zero if the function is not used.
-
-config GCOAP_RESP_OPTIONS_BUF
-    int "Response options buffer size"
-    default 4
-    help
-        Reduce payload length by this value for a response.
-        Accommodates writing Content-Format option in gcoap_finish(). May be
-        set to zero if the function is not used.
-
-config GCOAP_OBS_OPTIONS_BUF
-    int "Observe notification options buffer size"
-    default 4
-    help
-        Reduce payload length by this value for an observe notification.
-        Accommodates writing Content-Format option in gcoap_finish(). May be
-        set to zero if the function is not used.
-
-endmenu # Buffer Sizes
 
 menu "Observe options"
 
