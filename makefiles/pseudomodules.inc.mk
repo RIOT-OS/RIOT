@@ -138,6 +138,7 @@ PSEUDOMODULES += sys_bus_%
 PSEUDOMODULES += systick_prescaler
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += wifi_enterprise
+PSEUDOMODULES += xtimer_on_systick
 PSEUDOMODULES += xtimer_on_ztimer
 PSEUDOMODULES += zptr
 PSEUDOMODULES += ztimer%

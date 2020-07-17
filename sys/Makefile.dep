@@ -1005,9 +1005,14 @@ ifneq (,$(filter xtimer,$(USEMODULE)))
     # xtimer is used, ztimer xtimer wrapper is not
     DEFAULT_MODULE += auto_init_xtimer
     USEMODULE += div
-    ifeq (,$(filter xtimer_on_ztimer,$(USEMODULE)))
+    ifeq (,$(filter xtimer_on_systick xtimer_on_ztimer,$(USEMODULE)))
       # ztimer is not used, so use *periph_timer as low-level timer*.
       FEATURES_REQUIRED += periph_timer
+    else ifneq (,$(filter xtimer_on_systick,$(USEMODULE)))
+      # will use *SysTick as low-level timer*
+      FEATURES_REQUIRED += periph_systick
+      # xtimer requires prescaling
+      USEMODULE += systick_prescaler
     else
       # will use *ztimer_usec as low-level timer*
     endif
