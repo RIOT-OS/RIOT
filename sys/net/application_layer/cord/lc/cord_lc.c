@@ -186,7 +186,7 @@ static ssize_t _lookup_raw(const cord_lc_rd_t *rd, unsigned content_format,
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
     coap_opt_add_uint(&pkt, COAP_OPT_ACCEPT, content_format);
 
-    pkt_len = gcoap_finish(&pkt, 0, COAP_FORMAT_NONE);
+    pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
     if (pkt_len < 0) {
         return CORD_LC_ERR;
     }
@@ -244,9 +244,9 @@ static int _send_rd_init_req(coap_pkt_t *pkt, const sock_udp_ep_t *remote,
     coap_hdr_set_type(pkt->hdr, COAP_TYPE_CON);
     coap_opt_add_uri_query(pkt, "rt", "core.rd-lookup-*");
 
-    ssize_t pkt_len = gcoap_finish(pkt, 0, COAP_FORMAT_NONE);
+    ssize_t pkt_len = coap_opt_finish(pkt, COAP_OPT_FINISH_NONE);
     if (pkt_len < 0) {
-        DEBUG("cord_lc: error gcoap_finish() %zd\n", pkt_len);
+        DEBUG("cord_lc: error coap_opt_finish() %zd\n", pkt_len);
         return CORD_LC_ERR;
     }
 
