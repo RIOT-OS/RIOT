@@ -41,6 +41,11 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup net_l2filter_conf Link layer address filter compile configurations
+ * @ingroup config
+ * @{
+ */
+/**
  * @brief   Maximal length of addresses that can be stored in the filter list
  */
 #ifndef CONFIG_L2FILTER_ADDR_MAXLEN
@@ -53,6 +58,7 @@ extern "C" {
 #ifndef CONFIG_L2FILTER_LISTSIZE
 #define CONFIG_L2FILTER_LISTSIZE               (8U)
 #endif
+/** @} */
 
 /**
  * @brief   Filter list entries
@@ -63,7 +69,7 @@ extern "C" {
  */
 typedef struct {
     uint8_t addr[CONFIG_L2FILTER_ADDR_MAXLEN];     /**< link layer address */
-    size_t addr_len;                        /**< address length in byte */
+    size_t addr_len;                               /**< address length in byte */
 } l2filter_t;
 
 /**
