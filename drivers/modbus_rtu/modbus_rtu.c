@@ -326,10 +326,11 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
       }
       read_address(modbus);
       if (modbus->msg->addr * 2 >= modbus->msg->data_size) {
+        mutex_unlock(&(modbus->mutex_buffer));
         err = MB_ER_ILLEGAL_ADDRESS;
         goto exit;
       }
-      memcpy((char *)modbus->msg->data + modbus->msg->addr, modbus->buffer + 4, 2);
+      memcpy(modbus->msg->data + modbus->msg->addr, modbus->buffer + 4, 2);
       mutex_unlock(&(modbus->mutex_buffer));
       break;
     case MB_FC_WRITE_COILS:
@@ -357,10 +358,6 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
     case MB_FC_WRITE_REGISTERS:
       // (id + func + addr + count + size) + data + crc
       size = 7 + modbus->buffer[BYTE_CNT] + 2;
-      if (modbus->buffer[BYTE_CNT] != modbus->msg->count * 2) {
-        err = MB_ER_ILLEGAL_VALUE;
-        goto exit;
-      }
       if (wait_bytes(modbus, size)) {
         err = MB_ER_TIMEOUT;
         goto exit;
@@ -373,6 +370,10 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
       }
       read_address(modbus);
       read_count(modbus);
+      if (modbus->buffer[BYTE_CNT] != modbus->msg->count * 2) {
+        err = MB_ER_ILLEGAL_VALUE;
+        goto exit;
+      }
       if ((modbus->msg->addr * 2 + modbus->buffer[BYTE_CNT]) > modbus->msg->data_size) {
         err = MB_ER_ILLEGAL_ADDRESS;
         goto exit;
@@ -436,7 +437,7 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message
     }
     modbus->buffer[2] = size; // calc size for send
     modbus->size_buffer = 3 + size;
-    memcpy(modbus->buffer + 3, modbus->msg->data, size);
+    memcpy(modbus->buffer + 3, modbus->msg->data + modbus->msg->addr, size);
     break;
   default:
     mutex_unlock(&(modbus->mutex_buffer));
