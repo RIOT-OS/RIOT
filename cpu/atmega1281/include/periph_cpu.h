@@ -40,6 +40,7 @@ enum {
     PORT_E = 4,       /**< port E */
     PORT_F = 5,       /**< port F */
     PORT_G = 6,       /**< port G */
+    GPIO_EXP_PORT = 7 /**< first GPIO expander port */
 };
 
 /**

@@ -32,11 +32,12 @@ extern "C" {
  * @{
  */
 enum {
-    PORT_B  = 1,        /**< port B */
-    PORT_D  = 3,        /**< port D */
-    PORT_E  = 4,        /**< port E */
-    PORT_F  = 5,        /**< port F */
-    PORT_G  = 6,        /**< port G */
+    PORT_B = 1,         /**< port B */
+    PORT_D = 3,         /**< port D */
+    PORT_E = 4,         /**< port E */
+    PORT_F = 5,         /**< port F */
+    PORT_G = 6,         /**< port G */
+    GPIO_EXP_PORT = 7   /**< first GPIO expander port */
 };
 /** @} */
 
