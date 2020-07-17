@@ -72,6 +72,22 @@ static littlefs_desc_t fs_desc = {
 /* littlefs file system driver will be used */
 #define FS_DRIVER littlefs_file_system
 
+#elif defined(MODULE_LITTLEFS2)
+/* include file system header for driver */
+#include "fs/littlefs2_fs.h"
+
+/* file system specific descriptor
+ * for littlefs2, some fields can be tweaked to define the size
+ * of the partition, see header documentation.
+ * In this example, default behavior will be used, i.e. the entire
+ * memory will be used (parameters come from mtd) */
+static littlefs2_desc_t fs_desc = {
+    .lock = MUTEX_INIT,
+};
+
+/* littlefs file system driver will be used */
+#define FS_DRIVER littlefs2_file_system
+
 #elif defined(MODULE_SPIFFS)
 /* include file system header */
 #include "fs/spiffs_fs.h"
@@ -153,7 +169,7 @@ static int _mount(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_FATFS_VFS))
+#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_LITTLEFS2) || defined(MODULE_FATFS_VFS))
     int res = vfs_mount(&flash_mount);
     if (res < 0) {
         printf("Error while mounting %s...try format\n", FLASH_MOUNT_POINT);
@@ -172,7 +188,7 @@ static int _format(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_FATFS_VFS))
+#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_LITTLEFS2) || defined(MODULE_FATFS_VFS))
     int res = vfs_format(&flash_mount);
     if (res < 0) {
         printf("Error while formatting %s\n", FLASH_MOUNT_POINT);
@@ -191,7 +207,7 @@ static int _umount(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_FATFS_VFS))
+#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_LITTLEFS2) || defined(MODULE_FATFS_VFS))
     int res = vfs_umount(&flash_mount);
     if (res < 0) {
         printf("Error while unmounting %s\n", FLASH_MOUNT_POINT);
@@ -283,7 +299,7 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS))
+#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_LITTLEFS2))
     /* spiffs and littlefs need a mtd pointer
      * by default the whole memory is used */
     fs_desc.dev = MTD_0;
