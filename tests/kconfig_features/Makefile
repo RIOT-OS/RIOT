@@ -8,9 +8,14 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    arduino-duemilanove \
                    arduino-leonardo \
                    arduino-mega2560 \
+                   arduino-mkr1000 \
+                   arduino-mkrfox1200 \
+                   arduino-mkrwan1300 \
+                   arduino-mkrzero \
                    arduino-nano \
                    arduino-nano-33-ble \
                    arduino-uno \
+                   arduino-zero \
                    atmega1284p \
                    atmega256rfr2-xpro \
                    atmega328p \
@@ -45,11 +50,13 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    esp8266-olimex-mod \
                    esp8266-sparkfun-thing \
                    f4vi1 \
+                   feather-m0 \
                    feather-nrf52840 \
                    firefly \
                    fox \
                    frdm-k22f \
                    frdm-k64f \
+                   hamilton \
                    hifive1 \
                    hifive1b \
                    ikea-tradfri \
@@ -138,6 +145,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    remote-reva \
                    remote-revb \
                    ruuvitag \
+                   samd21-xpro \
                    same54-xpro \
                    saml10-xpro \
                    saml11-xpro \
@@ -146,12 +154,19 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    samr30-xpro \
                    samr34-xpro \
                    seeeduino_arch-pro \
+                   sensebox_samd21 \
+                   serpente \
                    slstk3401a \
                    slstk3402a \
                    sltb001a \
                    slwstk6000b-slwrb4150a \
                    slwstk6000b-slwrb4162a \
                    slwstk6220a \
+                   sodaq-autonomo \
+                   sodaq-explorer \
+                   sodaq-one \
+                   sodaq-sara-aff \
+                   sodaq-sara-sff \
                    spark-core \
                    stk3600 \
                    stk3700 \
@@ -173,6 +188,7 @@ BOARD_WHITELIST += 6lowpan-clicker \
                    usb-kw41z \
                    waspmote-pro \
                    weact-f411ce \
+                   wemos-zero \
                    yunjia-nrf51822 \
                    z1
                    #
