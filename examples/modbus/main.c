@@ -11,26 +11,29 @@
 #define SLAVE_ID 1
 #define BAUDRATE 115200
 
+#define SLAVE_UART 2
+#define MASTER_UART 0
+
 static char stack_master[400];
 static kernel_pid_t pid_master;
 static modbus_rtu_t master;
-static uint16_t regs_master1[10];
-static uint16_t regs_master2[10];
+static uint16_t regs_master1[16];
+static uint16_t regs_master2[16];
 static modbus_rtu_message_t message_master = {
     .id = SLAVE_ID,
     .addr = 0,
     .data = regs_master1,
-    .count = 10};
+    .count = 16};
 
 static char stack_slave[400];
 static kernel_pid_t pid_slave;
 static modbus_rtu_t slave;
-static uint16_t regs_slave[10];
+static uint16_t regs_slave[16];
 static modbus_rtu_message_t message_slave = {
     .data = regs_slave};
 
 static void init_master(void) {
-  master.uart = UART_DEV(2);
+  master.uart = UART_DEV(MASTER_UART);
   master.timeout = 1000000;
   master.id = 0;
   master.pin_rts = GPIO_PIN(PORT_A, 1);
@@ -56,22 +59,17 @@ static void *thread_master(void *arg __attribute__((unused))) {
     message_master.data = regs_master1;
     message_master.func = MB_FC_WRITE_REGISTERS;
     res = modbus_rtu_send_request(&master, &message_master);
-    // assert(message_slave.count == message_master.count);
     if (res) {
       printf("fail MB_FC_WRITE_REGISTERS %d\n", res);
     } else {
-      // puts("ok request");
-
       xtimer_usleep(master.rx_timeout * 3);
       puts("try MB_FC_READ_REGISTERS");
       message_master.data = regs_master2;
       message_master.func = MB_FC_READ_REGISTERS;
       res = modbus_rtu_send_request(&master, &message_master);
-      // assert(message_slave.count == message_master.count);
       if (res || memcmp(regs_master1, regs_master2, message_master.count * 2) != 0) {
         printf("fail MB_FC_READ_REGISTERS %d\n", res);
       } else {
-        // puts("ok request");
       }
     }
 
@@ -79,44 +77,36 @@ static void *thread_master(void *arg __attribute__((unused))) {
     message_master.data = regs_master1;
     message_master.func = MB_FC_READ_DISCRETE_INPUT;
     res = modbus_rtu_send_request(&master, &message_master);
-    // assert(message_slave.count == message_master.count);
-    if (res) {
+    if (res || memcmp(regs_master1, regs_slave, sizeof(regs_master1)) != 0) {
       printf("fail MB_FC_READ_DISCRETE_INPUT %d\n", res);
     } else {
-      // puts("ok request");
     }
 
     puts("try MB_FC_READ_INPUT_REGISTER");
     message_master.data = regs_master1;
     message_master.func = MB_FC_READ_INPUT_REGISTER;
     res = modbus_rtu_send_request(&master, &message_master);
-    // assert(message_slave.count == message_master.count);
-    if (res) {
+    if (res || message_master.data[0] != regs_slave[0]) {
       printf("fail MB_FC_READ_INPUT_REGISTER %d\n", res);
     } else {
-      // puts("ok request");
     }
 
     puts("try MB_FC_WRITE_COILS");
     message_master.data = regs_master1;
     message_master.func = MB_FC_WRITE_COILS;
     res = modbus_rtu_send_request(&master, &message_master);
-    // assert(message_slave.count == message_master.count);
     if (res) {
       printf("fail MB_FC_WRITE_COILS %d\n", res);
     } else {
-      // puts("ok request");
-
       xtimer_usleep(master.rx_timeout * 3);
       puts("try MB_FC_READ_COILS");
       message_master.data = regs_master2;
       message_master.func = MB_FC_READ_COILS;
       res = modbus_rtu_send_request(&master, &message_master);
-      // assert(message_slave.count == message_master.count);
-      if (res /*|| memcmp(regs_master1, regs_master2, message_master.count / 8 + 1) != 0*/) {
+      if (res || memcmp(regs_master1, regs_master2, message_master.count / 8) != 0) {
+        printf("out: %x in: %x\n", regs_master1[0], regs_master2[0]);
         printf("fail MB_FC_READ_COILS %d\n", res);
       } else {
-        // puts("ok request");
       }
     }
 
@@ -133,11 +123,9 @@ static void *thread_master(void *arg __attribute__((unused))) {
       message_master.data = regs_master2;
       message_master.func = MB_FC_READ_COILS;
       res = modbus_rtu_send_request(&master, &message_master);
-      // assert(message_slave.count == message_master.count);
       if (res || (!!regs_master1[0]) != (!!regs_master2[0] & 1)) {
         printf("fail MB_FC_READ_COILS_2 %d\n", res);
       } else {
-        // puts("ok request");
       }
     }
 
@@ -156,7 +144,6 @@ static void *thread_master(void *arg __attribute__((unused))) {
       if (res || regs_master1[0] != regs_master2[0]) {
         printf("fail MB_FC_READ_REGISTERS_2 %d\n", res);
       } else {
-        // puts("ok request");
       }
     }
   }
@@ -164,7 +151,7 @@ static void *thread_master(void *arg __attribute__((unused))) {
 }
 
 static void init_slave(void) {
-  slave.uart = UART_DEV(0);
+  slave.uart = UART_DEV(SLAVE_UART);
   slave.id = SLAVE_ID;
   slave.pin_rts = GPIO_PIN(PORT_B, 15);
   slave.pin_rts_enable = 1;
@@ -178,8 +165,8 @@ static void *thread_slave(void *arg __attribute__((unused))) {
   int res __attribute__((unused));
   init_slave();
   while (1) {
-    puts("try poll");
     res = modbus_rtu_poll(&slave, &message_slave);
+    // printf("func: %u; addr: %u; count: %u\n", message_slave.func, message_slave.addr, message_slave.count);
     if (res) {
       puts("fail poll");
     } else {
@@ -192,7 +179,6 @@ static void *thread_slave(void *arg __attribute__((unused))) {
       if (res) {
         printf("fail response %d\n", res);
       } else {
-        puts("ok poll");
       }
     }
   }
@@ -201,8 +187,6 @@ static void *thread_slave(void *arg __attribute__((unused))) {
 }
 
 int main(void) {
-  // printf("%u", thread_getpid());
-
   pid_slave = thread_create(stack_slave, sizeof(stack_slave),
                             THREAD_PRIORITY_MAIN - 1, 0, thread_slave, NULL, NULL);
   pid_master = thread_create(stack_master, sizeof(stack_master),
