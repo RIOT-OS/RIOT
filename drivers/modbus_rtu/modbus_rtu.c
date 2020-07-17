@@ -169,7 +169,7 @@ static inline int prepare_request(modbus_rtu_t *modbus) {
     modbus->buffer[BYTE_CNT] = size;
     // (id + func + addr + count + size) + data
     modbus->size_buffer = 7 + size;
-    memcpy(modbus->buffer + 7, modbus->msg->data, size);
+    memcpy(modbus->buffer + 7, modbus->msg->data + modbus->msg->addr, size);
     break;
   default:
     return MB_ER_ILLEGAL_FUNCTION;
@@ -236,7 +236,7 @@ static inline int get_response(modbus_rtu_t *modbus) {
         mutex_unlock(&(modbus->mutex_buffer));
         return MB_ER_CRC;
       }
-      memcpy(modbus->msg->data, modbus->buffer + 3, modbus->buffer[2]);
+      memcpy(modbus->msg->data + modbus->msg->addr, modbus->buffer + 3, modbus->buffer[2]);
       mutex_unlock(&(modbus->mutex_buffer));
       break;
     case MB_FC_WRITE_COIL:
@@ -378,7 +378,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
         err = MB_ER_ILLEGAL_ADDRESS;
         goto exit;
       }
-      memcpy(modbus->msg->data, modbus->buffer + 7, modbus->buffer[BYTE_CNT]);
+      memcpy(modbus->msg->data + modbus->msg->addr, modbus->buffer + 7, modbus->buffer[BYTE_CNT]);
       mutex_unlock(&(modbus->mutex_buffer));
       break;
     default:
