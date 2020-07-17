@@ -36,6 +36,24 @@ enum {
   MB_FC_WRITE_REGISTERS = 16     /**< write multiple registers */
 };
 
+/**
+ * @brief   Modbus error
+ */
+enum {
+  MB_ER_NONE = 0,
+  MB_ER_ILLEGAL_FUNCTION = 1,
+  MB_ER_ILLEGAL_ADDRESS,
+  MB_ER_ILLEGAL_VALUE,
+  MB_ER_SERVER_FAILURE,
+  MB_ER_ACKNOWLEDGE,
+  MB_ER_SERVER_BUSY,
+  MB_ER_MEMORY_PARITY_ERROR,
+  // non standart
+  MB_ER_TIMEOUT = 250,
+  MB_ER_CRC = 251,
+  MB_ER_INVAL_ID = 252
+};
+
 #define MODBUS_RTU_PACKET_SIZE_MAX 256 /**< max size packet */
 
 /**
