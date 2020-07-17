@@ -43,8 +43,8 @@ extern "C" {
 /**
  * @brief   Maximal length of addresses that can be stored in the filter list
  */
-#ifndef L2FILTER_ADDR_MAXLEN
-#define L2FILTER_ADDR_MAXLEN            (8U)
+#ifndef CONFIG_L2FILTER_ADDR_MAXLEN
+#define CONFIG_L2FILTER_ADDR_MAXLEN            (8U)
 #endif
 
 /**
@@ -62,7 +62,7 @@ extern "C" {
  * addresses at the same time.
  */
 typedef struct {
-    uint8_t addr[L2FILTER_ADDR_MAXLEN];     /**< link layer address */
+    uint8_t addr[CONFIG_L2FILTER_ADDR_MAXLEN];     /**< link layer address */
     size_t addr_len;                        /**< address length in byte */
 } l2filter_t;
 
@@ -75,7 +75,7 @@ typedef struct {
  *
  * @pre     @p list != NULL
  * @pre     @p addr != NULL
- * @pre     @p addr_maxlen <= @ref L2FILTER_ADDR_MAXLEN
+ * @pre     @p addr_maxlen <= @ref CONFIG_L2FILTER_ADDR_MAXLEN
  *
  * @return  0 on success
  * @return  -ENOMEM if no empty slot left in list
@@ -91,7 +91,7 @@ int l2filter_add(l2filter_t *list, const void *addr, size_t addr_len);
  *
  * @pre     @p list != NULL
  * @pre     @p addr != NULL
- * @pre     @p addr_maxlen <= @ref L2FILTER_ADDR_MAXLEN
+ * @pre     @p addr_maxlen <= @ref CONFIG_L2FILTER_ADDR_MAXLEN
  *
  * @return  0 on success
  * @return  -ENOENT if @p addr was not found in @p list
@@ -112,7 +112,7 @@ int l2filter_rm(l2filter_t *list, const void *addr, size_t addr_len);
  *
  * @pre     @p list != NULL
  * @pre     @p addr != NULL
- * @pre     @p addr_maxlen <= @ref L2FILTER_ADDR_MAXLEN
+ * @pre     @p addr_maxlen <= @ref CONFIG_L2FILTER_ADDR_MAXLEN
  *
  * @return  in whitelist mode: true if @p addr is in @p list
  * @return  in whitelist mode: false if @p addr is not in @p list

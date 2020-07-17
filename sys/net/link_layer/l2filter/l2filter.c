@@ -44,7 +44,7 @@ void l2filter_init(l2filter_t *list)
 
 int l2filter_add(l2filter_t *list, const void *addr, size_t addr_len)
 {
-    assert(list && addr && (addr_len <= L2FILTER_ADDR_MAXLEN));
+    assert(list && addr && (addr_len <= CONFIG_L2FILTER_ADDR_MAXLEN));
 
     int res = -ENOMEM;
 
@@ -62,7 +62,7 @@ int l2filter_add(l2filter_t *list, const void *addr, size_t addr_len)
 
 int l2filter_rm(l2filter_t *list, const void *addr, size_t addr_len)
 {
-    assert(list && addr && (addr_len <= L2FILTER_ADDR_MAXLEN));
+    assert(list && addr && (addr_len <= CONFIG_L2FILTER_ADDR_MAXLEN));
 
     int res = -ENOENT;
 
@@ -79,7 +79,7 @@ int l2filter_rm(l2filter_t *list, const void *addr, size_t addr_len)
 
 bool l2filter_pass(const l2filter_t *list, const void *addr, size_t addr_len)
 {
-    assert(list && addr && (addr_len <= L2FILTER_ADDR_MAXLEN));
+    assert(list && addr && (addr_len <= CONFIG_L2FILTER_ADDR_MAXLEN));
 
 #ifdef MODULE_L2FILTER_WHITELIST
     bool res = false;
