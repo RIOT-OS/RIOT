@@ -1,0 +1,9 @@
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += cc2538_rf
+endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+  USEMODULE += adxl345
+  USEMODULE += bmp180
+endif
