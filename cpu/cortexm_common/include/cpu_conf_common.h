@@ -63,6 +63,7 @@ extern "C" {
  */
 #ifdef __ARM_FEATURE_CLZ
 #define BITARITHM_LSB_BUILTIN
+#define BITARITHM_HAS_CLZ
 #else
 #define BITARITHM_LSB_LOOKUP
 #endif
