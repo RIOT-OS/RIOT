@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup   boards_OMote
+ * @ingroup   boards_omote
  * @{
  *
  * @file

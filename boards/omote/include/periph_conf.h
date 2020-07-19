@@ -9,11 +9,11 @@
  */
 
 /**
- * @ingroup     boards_OMote
+ * @ingroup     boards_omote
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the OMote board
+ * @brief       Peripheral MCU configuration for the omote board
  *
  */
 

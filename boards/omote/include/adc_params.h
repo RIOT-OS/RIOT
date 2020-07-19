@@ -8,11 +8,11 @@
  */
 
 /**
- * @ingroup   boards_OMote
+ * @ingroup   boards_omote
  * @{
  *
  * @file
- * @brief     Board specific configuration of direct mapped ADC in OMote
+ * @brief     Board specific configuration of direct mapped ADC in omote
  *
  */
 

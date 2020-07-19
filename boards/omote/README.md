@@ -1,17 +1,15 @@
-Oppila Microsystems OMote platform -  http://www.oppila.in
+Oppila Microsystems omote platform -  http://www.oppila.in
 ============================================
 
-The OMote platform  is a IoT Hardware development platform based
+The omote platform  is a IoT Hardware development platform based
 on TI's CC2538 system on chip (SoC), featuring an ARM Cortex-M3 with 512KB
 flash, 32Kb RAM, 2.4GHz RF interface , and the
 following goodies:
 
 * ISM 2.4-GHz IEEE 802.15.4 & Zigbee compliant.
-* ISM 868-, 915-, 920-, 950-MHz ISM/SRD Band.
 * AES-128/256, SHA2 Hardware Encryption Engine.
 * ECC-128/256, RSA Hardware Acceleration Engine for Secure Key Exchange.
 * Power consumption down to 150nA using our shutdown mode.
-* Flashing over BSL without requiring to press any button to enter bootloader mode.
 * Built-in battery charger (500mA), Energy Harvesting and Solar Panels to be connected to standards LiPo batteries.
 * Power input with wide range 3.7-16VDC.
 
@@ -42,8 +40,6 @@ Requirements
 
  * Toolchain to compile RIOT for the CC2538
  * Drivers to enable your host to communicate with the platform
- * Built-in BSL programming over USB using cc2538-bsl (included)
-
 
 Install a Toolchain
 -------------------
@@ -64,19 +60,17 @@ Else install from <https://launchpad.net/gcc-arm-embedded>
 
 Drivers
 -------
-The OMote features a CP2104 serial-to-USB module, the driver is commonly found in most OS, but if required it can be downloaded
+The omote features a CP2104 serial-to-USB module, the driver is commonly found in most OS, but if required it can be downloaded
 from <https://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx>
 
 
 ### For the CC2538EM (USB CDC-ACM)
-The OMote has built-in support for USB 2.0 USB, Vendor and Product IDs are the following:
+The omote has built-in support for USB 2.0 USB, Vendor and Product IDs are the following:
 
   * VID 0x0451
   * PID 0x16C8
 
 On Linux and OS X this is straightforward, on windows you need to install the following driver:
-
-<https://github.com/alignan/lufa/blob/remote-zongle/LUFA/CodeTemplates/WindowsINF/LUFA%20CDC-ACM.inf>
 
 And replace the IDs accordingly.
 
@@ -93,12 +87,12 @@ On OS X, `/dev/tty.SLAB_USBtoUARTx`.
 
 On Linux:
 
-* OMote over CP2104: `ttyUSB0`
-* OMote over USB driver (in CDC-ACM): `ttyACMn` (n=0, 1, ....)
+* omote over CP2104: `ttyUSB0`
+* omote over USB driver (in CDC-ACM): `ttyACMn` (n=0, 1, ....)
 
 More Reading
 ============
-1. [Oppila Microsystems OMote website]
+1. [Oppila Microsystems omote website - http://www.oppila.in]
 2. [CC2538 System-on-Chip Solution for 2.4-GHz IEEE 802.15.4 and ZigBee applications (SWRU319B)][cc2538]
 
 [cc2538]: http://www.ti.com/product/cc2538     "CC2538"

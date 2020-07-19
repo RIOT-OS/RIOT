@@ -5,7 +5,6 @@
 # After that, JLinkExe will be executed with that set of commands to flash the
 # latest .bin file to the board.
 
-# @author Hauke Petersen <hauke.petersen@fu-berlin.de>
 
 BINDIR=$1
 BINFILE=$2

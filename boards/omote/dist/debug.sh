@@ -5,7 +5,6 @@
 #
 # Start the GDB server first using the 'make debugserver' target
 
-# @author Hauke Petersen <hauke.petersen@fu-berlin.de>
 
 BINDIR=$1
 ELFFILE=$2
