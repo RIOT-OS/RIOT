@@ -15,6 +15,7 @@ def testfunc(child):
     child.expect(r'\+ bitarithm_msb: \d+ iterations per second')
     child.expect(r'\+ bitarithm_lsb: \d+ iterations per second')
     child.expect(r'\+ bitarithm_bits_set: \d+ iterations per second')
+    child.expect(r'\+ bitarithm_test_and_clear: \d+ iterations per second')
     child.expect_exact("Done.")
 
 
