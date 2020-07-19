@@ -25,6 +25,7 @@
  */
 
 #include "cpu.h"
+#include "bitarithm.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
@@ -345,9 +346,9 @@ void isr_eic(void)
     _EIC->INTFLAG.reg = state;
 
     /* execute interrupt callbacks */
+    uint8_t pin = 0;
     while (state) {
-        unsigned pin = 8 * sizeof(state) - __builtin_clz(state) - 1;
-        state &= ~(1 << pin);
+        state = bitarithm_test_and_clear(state, &pin);
         gpio_config[pin].cb(gpio_config[pin].arg);
     }
 
