@@ -136,14 +136,21 @@ def check_and_get_bufsize(child):
     return bufsize
 
 
+# there's an issue with some boards' serial that causes lost characters.
+LINE_EXCEEDED_BLACKLIST = {
+    # There is an issue with nrf52dk when the Virtual COM port is connected
+    # and sending more than 64 bytes over UART. If no terminal is connected
+    # to the Virtual COM and interfacing directly to the nrf52832 UART pins
+    # the issue is not present. See issue #10639 on GitHub.
+    'nrf52dk',
+    'z1',
+}
+
+
 def check_line_exceeded(child, longline):
 
-    if BOARD == 'nrf52dk':
-        # There is an issue with nrf52dk when the Virtual COM port is connected
-        # and sending more than 64 bytes over UART. If no terminal is connected
-        # to the Virtual COM and interfacing directly to the nrf52832 UART pins
-        # the issue is not present. See issue #10639 on GitHub.
-        print_error('test case "check_line_exceeded" broken for nrf52dk. SKIP')
+    if BOARD in LINE_EXCEEDED_BLACKLIST:
+        print_error('test case "check_line_exceeded" blacklisted, SKIP')
         return
 
     child.sendline(longline)
