@@ -669,7 +669,6 @@ ifneq (,$(filter rtt_rtc,$(USEMODULE)))
   ifeq (,$(UNIT_TESTS))
     FEATURES_REQUIRED += periph_rtt
   endif
-  FEATURES_PROVIDED += periph_rtc
 endif
 
 ifneq (,$(filter rn2%3,$(USEMODULE)))

@@ -1,7 +1,3 @@
-ifneq (,$(filter periph_rtc,$(USEMODULE)))
-  USEMODULE += rtt_rtc
-endif
-
 # include nrf5x common periph drivers
 USEMODULE += nrf5x_common_periph
 
