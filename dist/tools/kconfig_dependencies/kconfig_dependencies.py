@@ -31,6 +31,8 @@ def main():
         description=('Generate a dependency graph from a Kconfig specification.'))
     parser.add_argument('-k', '--kconfig', default='Kconfig',
         help='Kconfig file to read')
+    parser.add_argument('-o', '--output', default='deps.dot',
+        help='Output dot file')
     parser.add_argument('-d', '--debug', dest='debug', action='store_true',
         help='Enable debug messages')
     args = parser.parse_args()
@@ -56,7 +58,9 @@ def main():
     A = to_agraph(G)
     A.graph_attr.update(landscape='true',ranksep='4')
     A.layout()
-    print(A.to_string())
+
+    with open(args.output, 'w') as f:
+        f.write(A.to_string())
 
 if __name__=='__main__':
     main()
