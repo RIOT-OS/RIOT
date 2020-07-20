@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "byteorder.h"
 #include "xtimer.h"
 #include "thread.h"
 #include "periph/gpio.h"
@@ -15,7 +16,7 @@
 #include "checksum/ucrc16.h"
 #include "mutex.h"
 
-enum MESSAGE {
+enum {
   ID = 0,  //!< ID field
   FUNC,    //!< Function code position
   ADD_HI,  //!< Address high byte
@@ -27,9 +28,6 @@ enum MESSAGE {
 
 // bytes with crc16
 #define MIN_SIZE_REQUEST (8)
-
-#define lowByte(w) ((uint8_t)((w)&0xff))
-#define highByte(w) ((uint8_t)((w) >> 8))
 
 #define calcCRC(buffer, size) (ucrc16_calc_le(buffer, size, 0xA001, 0xFFFF))
 
@@ -51,21 +49,19 @@ static inline int wait_bytes(modbus_rtu_t *modbus, uint8_t num) {
 }
 // from buffer
 static inline void read_address(modbus_rtu_t *modbus) {
-  modbus->msg->addr = ((modbus->buffer[ADD_HI]) << 8) | modbus->buffer[ADD_LO];
+  modbus->msg->addr = byteorder_bebuftohs(modbus->buffer + ADD_HI);
 }
 // to buffer
 static inline void write_address(modbus_rtu_t *modbus) {
-  modbus->buffer[ADD_HI] = highByte(modbus->msg->addr);
-  modbus->buffer[ADD_LO] = lowByte(modbus->msg->addr);
+  byteorder_htobebufs(modbus->buffer + ADD_HI, modbus->msg->addr);
 }
 // from buffer
 static inline void read_count(modbus_rtu_t *modbus) {
-  modbus->msg->count = ((modbus->buffer[NB_HI]) << 8) | modbus->buffer[NB_LO];
+  modbus->msg->count = byteorder_bebuftohs(modbus->buffer + NB_HI);
 }
 // to buffer
 static inline void write_count(modbus_rtu_t *modbus) {
-  modbus->buffer[NB_HI] = highByte(modbus->msg->count);
-  modbus->buffer[NB_LO] = lowByte(modbus->msg->count);
+  byteorder_htobebufs(modbus->buffer + NB_HI, modbus->msg->count);
 }
 
 static void copy_bits(uint8_t *dst, uint16_t start_bit_dst,
@@ -98,7 +94,7 @@ int modbus_rtu_init(modbus_rtu_t *modbus, uint32_t baudrate) {
   }
   mutex_init(&(modbus->mutex_buffer));
   // usec in sec / byte per second * 1.5
-  modbus->rx_timeout = 1000000 / (baudrate / 10) * 1.5;
+  modbus->rx_timeout = US_PER_SEC / (baudrate / 10) * 1.5;
 
   modbus->size_buffer = 0;
   modbus->msg = NULL;
@@ -452,10 +448,8 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message
 
 static inline void send(modbus_rtu_t *modbus) {
   uint16_t crc = calcCRC(modbus->buffer, modbus->size_buffer);
-  modbus->buffer[modbus->size_buffer] = lowByte(crc);
-  modbus->size_buffer++;
-  modbus->buffer[modbus->size_buffer] = highByte(crc);
-  modbus->size_buffer++;
+  byteorder_htobebufs(modbus->buffer + modbus->size_buffer, crc);
+  modbus->size_buffer += sizeof(crc);
   enamdle_trasmit(modbus);
   uart_write(modbus->uart, modbus->buffer, modbus->size_buffer);
   disamdle_trasmit(modbus);

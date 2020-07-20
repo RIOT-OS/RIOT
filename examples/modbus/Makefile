@@ -12,10 +12,8 @@ RIOTBASE ?= $(CURDIR)/../..
 # development process:
 DEVELHELP ?= 1
 
-FEATURES_USED += gpio
 USEMODULE += $(filter periph_%,$(FEATURES_USED))
 USEMODULE += modbus_rtu  
-USEMODULE += xtimer  
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
@@ -29,6 +27,6 @@ export JLINK_DEVICE=$(CPU_MODEL)
 export FLASH_ADDR=0x08000000
 load: hexfile
 	$(LOADER) flash $(HEXFILE)
-	# $(LOADER)  --reset --format ihex write $(HEX)
+	# $(LOADER) --reset --format ihex write $(HEXFILE)
 
 .PHONY: load
