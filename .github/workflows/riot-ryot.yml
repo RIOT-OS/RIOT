@@ -1,0 +1,94 @@
+# Run 'compile_and_test_for_board.py' on connected boards.
+#
+# This workflow will run on a RYOT machine and lunch all tests on all boards
+# currently connected to that machine. Builds can be parallelized if multiple
+# github self-hosted runners are configured.
+#
+# Running self-hosted runners on public repositories is not advised, but here
+# we do not run them on PRs, only on master and release candidates.
+#
+# Documentation:
+#
+# * Setup a RYOT machine:
+#   https://github.com/fjmolinas/riot-ryot/blob/master/setup.md
+# * Setup Runner:
+#   https://github.com/fjmolinas/riot-ryot/blob/master/setup.md#self-hosted-github-runners
+
+name: riot-ryot
+
+on:
+  # Schedule weekly runs Saturday at 00:00 on master
+  schedule:
+    - cron: '00 0 * * 6'
+  push:
+    # TODO: remove only here to demonstrate build once
+    branches:
+      - master
+    # Run on all new release candidates
+    tags:
+      - '*-RC*'
+
+jobs:
+  # Get all currently connected boards
+  connected_boards:
+    name: Get Connected Boards
+    runs-on: self-hosted
+    env:
+      RIOT_MAKEFILES_GLOBAL_PRE: /builds/conf/makefiles.pre
+    outputs:
+      boards: ${{ steps.list-boards.outputs.boards }}
+    steps:
+      - id: list-boards
+        run: echo "::set-output name=boards::$(make -C /builds/boards/ list-boards-json --no-print-directory)"
+
+  # Runs all tests on connected boards
+  compile_and_test_for_board:
+    name: ${{ matrix.board }}
+    runs-on: self-hosted
+    needs: connected_boards
+    continue-on-error: true
+    # ci-riot-tribe has 7 cores, keep one free
+    strategy:
+      max-parallel: 8
+      matrix:
+        board: ${{fromJson(needs.connected_boards.outputs.boards)}}
+    env:
+      BUILD_IN_DOCKER: 1
+      RIOT_MAKEFILES_GLOBAL_PRE: /builds/conf/makefiles.pre
+      COMPILE_AND_TEST_FOR_BOARD: ./dist/tools/compile_and_test_for_board/compile_and_test_for_board.py
+      COMPILE_AND_TEST_ARGS: --with-test-only --incremental
+    steps:
+    - name: Checkout RIOT
+      uses: actions/checkout@v2
+    - name: Run compile_and_test_for_board.py
+      run: ${COMPILE_AND_TEST_FOR_BOARD} . ${{ matrix.board }} results ${COMPILE_AND_TEST_ARGS}
+    - name: Archive results
+      if: always()
+      # Store all generated results to same 'results' artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: results
+        path: results
+
+  # Aggregate all boards results
+  results_summary:
+    name: Results Summary
+    needs: compile_and_test_for_board
+    runs-on: self-hosted
+    steps:
+      - name: Download all results
+        uses: actions/download-artifact@v2
+        # Download all artifacts to results
+        with:
+          name: results
+          path: results
+      - name: Aggregate Results
+        shell: bash
+        run: python /builds/scripts/ci_aggregate.py results
+      - name: Archive results summary
+        if: always()
+        # Store all generated results to same 'results' artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: results
+          path: results/failuresummary.md
