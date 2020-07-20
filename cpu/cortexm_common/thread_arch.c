@@ -317,7 +317,9 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
 #endif
     "push   {lr}                      \n" /* push exception return code */
 
+    "cpsid  i                         \n" /* Disable IRQs during sched_run */
     "bl     sched_run                 \n" /* perform scheduling */
+    "cpsie  i                         \n" /* Re-enable interrupts */
 
 #if CPU_CORE_CORTEXM_FULL_THUMB
     "cmp    r0, r12                   \n" /* if r0 == 0: (no switch required) */
@@ -495,24 +497,14 @@ void __attribute__((used)) isr_svc(void)
 
 void sched_arch_idle(void)
 {
-    /* by default, PendSV has the same priority as other ISRs.
-     * In this function, we temporarily lower the priority (set higher value),
-     * allowing other ISRs to interrupt.
-     *
-     * According to [this](http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.dai0321a/BIHJICIE.html),
-     * dynamically changing the priority is not supported on CortexM0(+).
-     */
-    unsigned state = irq_disable();
-    NVIC_SetPriority(PendSV_IRQn, CPU_CORTEXM_PENDSV_IRQ_PRIO + 1);
-    __DSB();
-    __ISB();
 #ifdef MODULE_PM_LAYERED
     void pm_set_lowest(void);
     pm_set_lowest();
 #else
     __WFI();
 #endif
-    irq_restore(state);
-    NVIC_SetPriority(PendSV_IRQn, CPU_CORTEXM_PENDSV_IRQ_PRIO);
-    SCB->ICSR = SCB_ICSR_PENDSVCLR_Msk;
+    /* Briefly re-enable IRQs to allow pending interrupts to be serviced and
+     * have them update the runqueue */
+    __enable_irq();
+    __disable_irq();
 }
