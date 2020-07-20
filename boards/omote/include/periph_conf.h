@@ -46,7 +46,6 @@ static const adc_conf_t adc_config[] = {
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
-	
 /**
  * @name I2C configuration
  * @{
@@ -63,7 +62,6 @@ static const i2c_conf_t i2c_config[] = {
 
 #define I2C_NUMOF               ARRAY_SIZE(i2c_config)
 /** @} */
-
 /**
  * @name SPI configuration
  * @{
@@ -80,7 +78,6 @@ static const spi_conf_t spi_config[] = {
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
-
 /**
  * @name    UART configuration
  * @{

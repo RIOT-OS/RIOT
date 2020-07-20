@@ -12,7 +12,6 @@
  *
  * @file
  * @brief       Board specific definitions for the omote board 
- *
  */
 
 #ifndef BOARD_H
@@ -46,14 +45,10 @@
 
 #define LED_ALL_OFF        LED0_OFF;   \
                            LED1_OFF;   
-
 /* Output is color white */
 #define LED_ALL_ON         LED0_ON;    \
                            LED1_ON;
-
-
 /** @} */
-
 /**
  * @name User button pin definition
  * @{
@@ -61,7 +56,6 @@
 #define BTN0_PIN        GPIO_PIN(1, 0)
 #define BTN0_MODE       GPIO_IN_PU
 /** @} */
-
 /**
  * @name  RF switch controlled by SW
  * @brief Controls which RF interface goes to the RP-SMA external antenna
@@ -77,7 +71,6 @@
 #define RF_SWITCH_GPIO      GPIO_PD2
 #define RF_SWITCH_2_4_GHZ   gpio_clear(RF_SWITCH_GPIO)
 /** @} */
-
 /**
  * @name Flash Customer Configuration Area (CCA) parameters
  * @{
@@ -91,7 +84,6 @@
 
 #define BOOT_PIN    GPIO_PIN(0, CCA_BACKDOOR_PORT_A_PIN) /**< BSL_BOOT Pin */
 /** @} */
-
 /**
  * @name xtimer configuration
  * @{
@@ -103,7 +95,6 @@
 
 #define INTERNAL_PERIPHERAL_VID         (0x0451)
 #define INTERNAL_PERIPHERAL_PID         (0x16C8)
-
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */

@@ -1,5 +1,5 @@
 /**
-@defgroup    boards_OMote OMote 
+@defgroup    boards_omote 
 @ingroup     boards
-@brief       Support for the OMote board 
+@brief       Support for the omote board 
  */
