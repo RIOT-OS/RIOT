@@ -29,7 +29,13 @@ enum {
 /* bytes with crc16 */
 #define MIN_SIZE_REQUEST (8)
 
+/* use for set CRC */
+#define lowByte(w) ((uint8_t)((w)&0xff))
+#define highByte(w) ((uint8_t)((w) >> 8))
+
 #define calcCRC(buffer, size) (ucrc16_calc_le(buffer, size, 0xA001, 0xFFFF))
+/* return zero if check success */
+#define checkCRC(buffer, size) (ucrc16_calc_le(buffer, size, 0xA001, 0xFFFF) != 0)
 
 static inline void enamdle_trasmit(modbus_rtu_t *modbus);
 static inline void disamdle_trasmit(modbus_rtu_t *modbus);
@@ -78,6 +84,24 @@ static void copy_bits(uint8_t *dst, uint16_t start_bit_dst,
     start_bit_dst++;
     start_bit_src++;
     count--;
+  }
+}
+
+static void copy_buffer_to_registers(uint16_t *reg, const uint8_t *buff, uint8_t count) {
+  while (count) {
+    *reg = byteorder_bebuftohs(buff);
+    count--;
+    reg++;
+    buff += sizeof(*reg);
+  }
+}
+
+static void copy_registers_to_buffer(uint8_t *buff, const uint16_t *reg, uint8_t count) {
+  while (count) {
+    byteorder_htobebufs(buff, *reg);
+    count--;
+    reg++;
+    buff += sizeof(*reg);
   }
 }
 
@@ -139,7 +163,7 @@ static inline int prepare_request(modbus_rtu_t *modbus) {
     modbus->size_buffer = 6;
     break;
   case MB_FC_WRITE_REGISTER:
-    memcpy(modbus->buffer + 4, (char *)(modbus->msg->data + modbus->msg->addr), 2);
+    copy_registers_to_buffer(modbus->buffer + 4, modbus->msg->data + modbus->msg->addr, 1);
     /* id + func + addr + data */
     modbus->size_buffer = 6;
     break;
@@ -161,7 +185,7 @@ static inline int prepare_request(modbus_rtu_t *modbus) {
     modbus->buffer[BYTE_CNT] = size;
     /* (id + func + addr + count + size) + data */
     modbus->size_buffer = 7 + size;
-    memcpy(modbus->buffer + 7, modbus->msg->data + modbus->msg->addr, size);
+    copy_registers_to_buffer(modbus->buffer + 7, modbus->msg->data + modbus->msg->addr, modbus->msg->count);
     break;
   default:
     return MB_ER_ILLEGAL_FUNCTION;
@@ -189,7 +213,7 @@ static inline int get_response(modbus_rtu_t *modbus) {
       /* if slave return error */
       if (((~0x80) & modbus->buffer[FUNC]) == modbus->msg->func) {
         mutex_lock(&(modbus->mutex_buffer));
-        if (calcCRC(modbus->buffer, 5) != 0) {
+        if (checkCRC(modbus->buffer, 5)) {
           mutex_unlock(&(modbus->mutex_buffer));
           return MB_ER_CRC;
         }
@@ -209,7 +233,7 @@ static inline int get_response(modbus_rtu_t *modbus) {
         return MB_ER_TIMEOUT;
       }
       mutex_lock(&(modbus->mutex_buffer));
-      if (calcCRC(modbus->buffer, size) != 0) {
+      if (checkCRC(modbus->buffer, size)) {
         mutex_unlock(&(modbus->mutex_buffer));
         return MB_ER_CRC;
       }
@@ -224,11 +248,11 @@ static inline int get_response(modbus_rtu_t *modbus) {
         return MB_ER_TIMEOUT;
       }
       mutex_lock(&(modbus->mutex_buffer));
-      if (calcCRC(modbus->buffer, size) != 0) {
+      if (checkCRC(modbus->buffer, size)) {
         mutex_unlock(&(modbus->mutex_buffer));
         return MB_ER_CRC;
       }
-      memcpy(modbus->msg->data + modbus->msg->addr, modbus->buffer + 3, modbus->buffer[2]);
+      copy_buffer_to_registers(modbus->msg->data + modbus->msg->addr, modbus->buffer + 3, modbus->msg->count);
       mutex_unlock(&(modbus->mutex_buffer));
       break;
     case MB_FC_WRITE_COIL:
@@ -239,7 +263,7 @@ static inline int get_response(modbus_rtu_t *modbus) {
         return MB_ER_TIMEOUT;
       }
       mutex_lock(&(modbus->mutex_buffer));
-      if (calcCRC(modbus->buffer, modbus->size_buffer) != 0) {
+      if (checkCRC(modbus->buffer, modbus->size_buffer)) {
         mutex_unlock(&(modbus->mutex_buffer));
         return MB_ER_CRC;
       }
@@ -284,7 +308,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
     case MB_FC_READ_REGISTERS:
     case MB_FC_READ_INPUT_REGISTER:
       mutex_lock(&(modbus->mutex_buffer));
-      if (calcCRC(modbus->buffer, 8) != 0) {
+      if (checkCRC(modbus->buffer, 8)) {
         mutex_unlock(&(modbus->mutex_buffer));
         err = MB_ER_CRC;
         goto exit;
@@ -295,7 +319,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
       break;
     case MB_FC_WRITE_COIL:
       mutex_lock(&(modbus->mutex_buffer));
-      if (calcCRC(modbus->buffer, 8) != 0) {
+      if (checkCRC(modbus->buffer, 8)) {
         mutex_unlock(&(modbus->mutex_buffer));
         err = MB_ER_CRC;
         goto exit;
@@ -310,7 +334,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
       break;
     case MB_FC_WRITE_REGISTER:
       mutex_lock(&(modbus->mutex_buffer));
-      if (calcCRC(modbus->buffer, 8) != 0) {
+      if (checkCRC(modbus->buffer, 8)) {
         mutex_unlock(&(modbus->mutex_buffer));
         err = MB_ER_CRC;
         goto exit;
@@ -321,7 +345,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
         err = MB_ER_ILLEGAL_ADDRESS;
         goto exit;
       }
-      memcpy(modbus->msg->data + modbus->msg->addr, modbus->buffer + 4, 2);
+      copy_buffer_to_registers(modbus->msg->data + modbus->msg->addr, modbus->buffer + 4, 1);
       mutex_unlock(&(modbus->mutex_buffer));
       break;
     case MB_FC_WRITE_COILS:
@@ -332,7 +356,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
         goto exit;
       }
       mutex_lock(&(modbus->mutex_buffer));
-      if (calcCRC(modbus->buffer, size) != 0) {
+      if (checkCRC(modbus->buffer, size)) {
         mutex_unlock(&(modbus->mutex_buffer));
         err = MB_ER_CRC;
         goto exit;
@@ -354,7 +378,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
         goto exit;
       }
       mutex_lock(&(modbus->mutex_buffer));
-      if (calcCRC(modbus->buffer, size) != 0) {
+      if (checkCRC(modbus->buffer, size)) {
         mutex_unlock(&(modbus->mutex_buffer));
         err = MB_ER_CRC;
         goto exit;
@@ -369,7 +393,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
         err = MB_ER_ILLEGAL_ADDRESS;
         goto exit;
       }
-      memcpy(modbus->msg->data + modbus->msg->addr, modbus->buffer + 7, modbus->buffer[BYTE_CNT]);
+      copy_buffer_to_registers(modbus->msg->data + modbus->msg->addr, modbus->buffer + 7, modbus->msg->count);
       mutex_unlock(&(modbus->mutex_buffer));
       break;
     default:
@@ -428,7 +452,7 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message
     }
     modbus->buffer[2] = size; /* calc size for send */
     modbus->size_buffer = 3 + size;
-    memcpy(modbus->buffer + 3, modbus->msg->data + modbus->msg->addr, size);
+    copy_registers_to_buffer(modbus->buffer + 3, modbus->msg->data + modbus->msg->addr, modbus->msg->count);
     break;
   default:
     mutex_unlock(&(modbus->mutex_buffer));
@@ -443,8 +467,10 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message
 
 static inline void send(modbus_rtu_t *modbus) {
   uint16_t crc = calcCRC(modbus->buffer, modbus->size_buffer);
-  byteorder_htobebufs(modbus->buffer + modbus->size_buffer, crc);
-  modbus->size_buffer += sizeof(crc);
+  modbus->buffer[modbus->size_buffer] = lowByte(crc);
+  modbus->size_buffer++;
+  modbus->buffer[modbus->size_buffer] = highByte(crc);
+  modbus->size_buffer++;
   enamdle_trasmit(modbus);
   uart_write(modbus->uart, modbus->buffer, modbus->size_buffer);
   disamdle_trasmit(modbus);
