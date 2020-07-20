@@ -35,18 +35,6 @@ extern "C" {
  * @{
  */
 /**
- * @brief maximum timer drift in per mille
- *
- * @note this is only a workaround to compensate inaccurate timers.
- *
- * E.g a value of 1 means there's a positive drift of 0.1% (set timeout to
- * 1000 ms => triggers after 1001 ms)
- */
-#ifndef CONFIG_GNRC_LORAWAN_TIMER_DRIFT
-#define CONFIG_GNRC_LORAWAN_TIMER_DRIFT 10
-#endif
-
-/**
  * @brief the minimum symbols to detect a LoRa preamble
  */
 #ifndef CONFIG_GNRC_LORAWAN_MIN_SYMBOLS_TIMEOUT

@@ -16,16 +16,6 @@ menuconfig KCONFIG_USEMODULE_GNRC_LORAWAN
 
 if KCONFIG_USEMODULE_GNRC_LORAWAN
 
-config GNRC_LORAWAN_TIMER_DRIFT
-    int "Maximum timer drift"
-    default 10
-    range -1000 1000
-    help
-        The value is expressed in per mille. This is only a workaround to
-        compensate inaccurate timers. E.g. a value of 1 means there's a
-        positive drift of 0.1% (set timeout to 1000 ms => triggers after
-        1001 ms)
-
 config GNRC_LORAWAN_MIN_SYMBOLS_TIMEOUT
     int "Minimum symbols to detect a LoRa preamble"
     default 30
