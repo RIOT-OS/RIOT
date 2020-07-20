@@ -42,6 +42,13 @@ typedef struct {
 } touch_t;
 
 /**
+ * @brief   Signature of touch event callback triggered from interrupt
+ *
+ * @param[in] arg       optional context for the callback
+ */
+typedef void (*touch_event_cb_t)(void *arg);
+
+/**
  * @brief   Generic type for a touch driver
  */
 typedef struct {
@@ -75,6 +82,15 @@ typedef struct {
      * @return              number of touch positions, 0 means no touch
      */
     uint8_t (*touches)(const touch_dev_t *dev, touch_t *touches, size_t len);
+
+    /**
+     * @brief   Set and configure the touch event callback
+     *
+     * @param[in] dev       Pointer to the touch device
+     * @param[in] cb        The callback function
+     * @param[in] arg       Context argument
+     */
+    void (*set_event_callback)(const touch_dev_t *dev, touch_event_cb_t cb, void *arg);
 } touch_dev_driver_t;
 
 /**
@@ -149,6 +165,15 @@ uint16_t touch_dev_width(const touch_dev_t *dev);
  * @return              number of touch positions, 0 means no touch
  */
 uint8_t touch_dev_touches(const touch_dev_t *dev, touch_t *touches, size_t len);
+
+/**
+ * @brief   Set and configure the touch event callback
+ *
+ * @param[in] dev       Pointer to the touch device
+ * @param[in] cb        The callback function
+ * @param[in] arg       Context argument
+ */
+void touch_dev_set_touch_event_callback(const touch_dev_t *dev, touch_event_cb_t cb, void *arg);
 
 #ifdef __cplusplus
 }
