@@ -345,6 +345,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
       }
       read_address(modbus);
       if (modbus->msg->addr >= modbus->msg->data_size * 8) {
+        mutex_unlock(&(modbus->mutex_buffer));
         err = MB_ER_ILLEGAL_ADDRESS;
         goto exit;
       }
@@ -406,10 +407,12 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
       read_address(modbus);
       read_count(modbus);
       if (modbus->buffer[BYTE_CNT] != modbus->msg->count * 2) {
+        mutex_unlock(&(modbus->mutex_buffer));
         err = MB_ER_ILLEGAL_VALUE;
         goto exit;
       }
       if ((modbus->msg->addr * 2 + modbus->buffer[BYTE_CNT]) > modbus->msg->data_size) {
+        mutex_unlock(&(modbus->mutex_buffer));
         err = MB_ER_ILLEGAL_ADDRESS;
         goto exit;
       }
