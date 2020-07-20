@@ -77,9 +77,9 @@ static void copy_bits(uint8_t *dst, uint16_t start_bit_dst,
     div_t d = div(start_bit_dst, 8);
     uint8_t bit = src[s.quot] & (1 << s.rem);
     if (bit) {
-      dst[d.quot] |= 1 << (7 - d.rem);
+      dst[d.quot] |= 1 << (d.rem);
     } else {
-      dst[d.quot] &= ~(1 << (7 - d.rem));
+      dst[d.quot] &= ~(1 << (d.rem));
     }
     start_bit_dst++;
     start_bit_src++;
@@ -177,6 +177,7 @@ static inline int prepare_request(modbus_rtu_t *modbus) {
     modbus->buffer[BYTE_CNT] = size;
     /* (id + func + addr + count + size) + data */
     modbus->size_buffer = 7 + size;
+    memset(modbus->buffer + 3, 0, size);
     copy_bits(modbus->buffer + 7, 0, (uint8_t *)modbus->msg->data, modbus->msg->addr, modbus->msg->count);
     break;
   case MB_FC_WRITE_REGISTERS:
@@ -431,6 +432,7 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus, modbus_rtu_message_t *message
     }
     modbus->buffer[2] = size;
     modbus->size_buffer = 3 + size;
+    memset(modbus->buffer + 3, 0, size);
     copy_bits(modbus->buffer + 3, 0, (uint8_t *)modbus->msg->data, modbus->msg->addr, modbus->msg->count);
     break;
   case MB_FC_WRITE_COIL:
