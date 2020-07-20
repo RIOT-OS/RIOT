@@ -1,4 +1,22 @@
 /*
+ * Copyright (C) 2020 Denis Litvinov <li.denis.iv@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
+/**
+ * @ingroup     drivers_modbus
+ * @brief       Modbus
+ *
+ * @{
+ * @file
+ * @brief       Modbus interface implementation
+ *
+ * @author      Denis Litvinov <li.denis.iv@gmail.com>
+ */
+/*
   todo: send exeption
 */
 
@@ -365,6 +383,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message) {
       read_address(modbus);
       read_count(modbus);
       if ((modbus->msg->addr + modbus->msg->count) > (modbus->msg->data_size * 8)) {
+        mutex_unlock(&(modbus->mutex_buffer));
         err = MB_ER_ILLEGAL_ADDRESS;
         goto exit;
       }
@@ -511,3 +530,5 @@ exit:
   mutex_unlock(&(modbus->mutex_buffer));
   return;
 }
+
+/** @} */

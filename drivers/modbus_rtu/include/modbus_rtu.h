@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2020 Denis Litvinov <li.denis.iv@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser General
+ * Public License v2.1. See the file LICENSE in the top level directory for more
+ * details.
+ */
+
 /**
  * @defgroup    drivers_modbus ModBus
  * @ingroup     drivers
@@ -131,6 +139,8 @@ typedef struct {
  * Initialize fields of modbus and UART, RTS pin.
  *
  * @param[in] modbus    pointer modbus 
+ *
+ * @param[in] baudrate  desired baudrate in baud/s
  *
  * @return              0 on success, otherwise error
  */
