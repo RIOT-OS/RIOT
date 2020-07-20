@@ -28,6 +28,7 @@
 
 
 #include "cpu.h"
+#include "bitarithm.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
@@ -289,26 +290,26 @@ void isr_exti(void)
     /* only generate interrupts against lines which have their IMR set */
     uint32_t pending_rising_isr = (EXTI->RPR1 & EXTI_REG_IMR);
     uint32_t pending_falling_isr = (EXTI->FPR1 & EXTI_REG_IMR);
-    for (size_t i = 0; i < EXTI_NUMOF; i++) {
-        if (pending_rising_isr & (1 << i)) {
-            EXTI->RPR1 = (1 << i);        /* clear by writing a 1 */
-            isr_ctx[i].cb(isr_ctx[i].arg);
-        }
-        if (pending_falling_isr & (1 << i)) {
-            EXTI->FPR1 = (1 << i);        /* clear by writing a 1 */
-            isr_ctx[i].cb(isr_ctx[i].arg);
-        }
-    }
+
+    /* clear by writing a 1 */
+    EXTI->RPR1 = pending_rising_isr;
+    EXTI->FPR1 = pending_falling_isr;
+
+    uint32_t pending_isr = pending_rising_isr | pending_falling_isr;
 #else
     /* only generate interrupts against lines which have their IMR set */
     uint32_t pending_isr = (EXTI_REG_PR & EXTI_REG_IMR);
-    for (size_t i = 0; i < EXTI_NUMOF; i++) {
-        if (pending_isr & (1 << i)) {
-            EXTI_REG_PR = (1 << i);        /* clear by writing a 1 */
-            isr_ctx[i].cb(isr_ctx[i].arg);
-        }
-    }
+
+    /* clear by writing a 1 */
+    EXTI_REG_PR = pending_isr;
 #endif
+
+    /* iterate over all set bits */
+    uint8_t pin = 0;
+    while (pending_isr) {
+        pending_isr = bitarithm_test_and_clear(pending_isr, &pin);
+        isr_ctx[pin].cb(isr_ctx[pin].arg);
+    }
     cortexm_isr_end();
 }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
