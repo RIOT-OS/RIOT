@@ -1,0 +1,6 @@
+USEMODULE += tsrb
+FEATURES_REQUIRED += periph_uart
+
+ifneq (,$(filter slipdev_stdio,$(USEMODULE)))
+  USEMODULE += isrpipe
+endif

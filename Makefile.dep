@@ -15,6 +15,9 @@
 include $(RIOTBASE)/sys/Makefile.dep
 include $(RIOTBASE)/drivers/Makefile.dep
 
+# pull Makefile.dep of each driver modules if they exist
+-include $(sort $(USEMODULE:%=$(RIOTBASE)/drivers/%/Makefile.dep))
+
 # pull dependencies from packages
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 

@@ -1,0 +1,6 @@
+FEATURES_REQUIRED += periph_i2c
+USEMODULE += xtimer
+
+ifneq (,$(filter itg320x_int,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+endif

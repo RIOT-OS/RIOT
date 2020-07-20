@@ -1,0 +1,5 @@
+FEATURES_REQUIRED += periph_i2c
+
+ifneq (,$(filter apds99%full,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_irq
+endif
