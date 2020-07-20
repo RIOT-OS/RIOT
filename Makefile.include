@@ -230,11 +230,17 @@ GLOBAL_GOALS += buildtest \
                 info-boards-features-missing \
                 info-boards-supported \
                 info-buildsizes info-buildsizes-diff \
+                info-kconfig-boards-supported \
+                info-kconfig-board-supported-% \
                 #
 
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
-  include $(RIOTMAKE)/info-global.inc.mk
-  include $(RIOTMAKE)/buildtests.inc.mk
+  ifneq (, $(TEST_KCONFIG))
+    include $(RIOTMAKE)/info-kconfig.inc.mk
+  else
+    include $(RIOTMAKE)/buildtests.inc.mk
+    include $(RIOTMAKE)/info-global.inc.mk
+  endif
 else
 
 all: link
