@@ -19,6 +19,3 @@ OPTIONAL_CFLAGS_BLACKLIST += -fdiagnostics-color
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
 OPTIONAL_CFLAGS_BLACKLIST += -gz
-
-# msp430 uses newlib by default
-DEFAULT_MODULE += newlib
