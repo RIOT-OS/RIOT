@@ -9,3 +9,14 @@ config MOD_NETDEV_IEEE802154
     default y if HAVE_RADIO_IEEE802154 && MOD_NETDEV_DEFAULT
     depends on MOD_IEEE802154
     select MOD_RANDOM
+
+config MOD_NETDEV_IEEE802154_OQPSK
+    bool "Netdev IEEE802154 OQPSK support"
+    depends on MOD_NETDEV_IEEE802154
+    default y if HAVE_RADIO_IEEE802154_OQPSK
+
+config HAVE_RADIO_IEEE802154_OQPSK
+    bool
+    help
+        Indicates that an IEEE 802.15.4 compatible radio with OQPSK supporte is
+        present.
