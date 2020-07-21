@@ -1,3 +1,43 @@
+Build 1.210 (GCC)
+=================
+05/14/2020
+
+New device support:
+------------------
+- None
+
+New features / changes:
+-----------------------
+- Adjusted high-memory boundaries in default linker command files to fix CPU47
+- Changed lower (<0x10000) memory name from 'ROM' to 'FRAM' in applicable linker
+  command files
+- Removed redundant TLV #defines from header files
+
+Bug fixes:
+----------
+- Removed invalid IO ports from several MSP430FRxx devices
+- Added missing HSPLL #defines for MSP430FR6043 family
+- Fixed FR2XX/4XX family include guard in legacy.h
+
+
+Build 1.209 (GCC)
+=================
+02/03/2020
+
+New device support:
+------------------
+- MSP430FR2673, MSP430FR2672
+- MSP430FR6005, MSP430FR6007
+
+New features / changes:
+-----------------------
+- None
+
+Bug fixes:
+----------
+- None
+
+
 Build 1.208 (GCC)
 =================
 08/29/2019

@@ -5,7 +5,7 @@
 
 set -e
 
-URL="https://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/exports/msp430-gcc-support-files-1.208.zip"
+URL="https://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/9_2_0_0/export/msp430-gcc-support-files-1.210.zip"
 rm -Rf msp430-gcc-support-files
 
 _CPUS="$(git -C ../../.. grep -o '^CPU_MODEL.=.*430.*$' | cut -d' ' -f 3 | sort -u)"

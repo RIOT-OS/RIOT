@@ -1821,6 +1821,12 @@
 #elif defined (__MSP430F5259__)
 #include "msp430f5259.h"
 
+#elif defined (__MSP430FR6005__)
+#include "msp430fr6005.h"
+
+#elif defined (__MSP430FR6007__)
+#include "msp430fr6007.h"
+
 #elif defined (__MSP430FR6035__)
 #include "msp430fr6035.h"
 
@@ -1874,6 +1880,12 @@
 
 #elif defined (__MSP430FR2476__)
 #include "msp430fr2476.h"
+
+#elif defined (__MSP430FR2672__)
+#include "msp430fr2672.h"
+
+#elif defined (__MSP430FR2673__)
+#include "msp430fr2673.h"
 
 #elif defined (__MSP430FR2675__)
 #include "msp430fr2675.h"

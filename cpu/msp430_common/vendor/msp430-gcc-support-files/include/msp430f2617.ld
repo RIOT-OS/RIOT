@@ -1,5 +1,5 @@
 /* ============================================================================ */
-/* Copyright (c) 2019, Texas Instruments Incorporated                           */
+/* Copyright (c) 2020, Texas Instruments Incorporated                           */
 /*  All rights reserved.                                                        */
 /*                                                                              */
 /*  Redistribution and use in source and binary forms, with or without          */
@@ -31,7 +31,7 @@
 /* ============================================================================ */
 
 /* This file supports MSP430F2617 devices. */
-/* Version: 1.208 */
+/* Version: 1.210 */
 /* Default linker script, for normal executables */
 
 OUTPUT_ARCH(msp430)
@@ -144,7 +144,7 @@ SECTIONS
      read only but which older linkers treat as read-write.
      This prevents older linkers from marking the entire .rodata
      section as read-write.  */
-  .rodata2 : 
+  .rodata2 :
   {
     . = ALIGN(2);
     PROVIDE (__preinit_array_start = .);
@@ -264,7 +264,7 @@ SECTIONS
     . = ALIGN(2);
     __heap_start__ = .;
     _end = __heap_start__;
-    PROVIDE (end = .); 
+    PROVIDE (end = .);
     KEEP (*(.heap))
     _end = .;
     PROVIDE (end = .);

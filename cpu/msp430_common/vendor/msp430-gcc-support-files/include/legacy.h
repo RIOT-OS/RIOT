@@ -134,7 +134,7 @@
 
 #ifdef __MSP430_HAS_CS__
 
-#ifdef __MSP430FR2XX_FR4XX_FAMILY__
+#ifdef __MSP430FR2XX_4XX_FAMILY__
 
 #define DCOFTRIM_0              (0x0000)    /* DCO frequency trim: 0 */
 #define DCOFTRIM_1              (0x0010)    /* DCO frequency trim: 1 */

@@ -1,5 +1,5 @@
 /* ============================================================================ */
-/* Copyright (c) 2019, Texas Instruments Incorporated                           */
+/* Copyright (c) 2020, Texas Instruments Incorporated                           */
 /*  All rights reserved.                                                        */
 /*                                                                              */
 /*  Redistribution and use in source and binary forms, with or without          */
@@ -31,7 +31,7 @@
 /* ============================================================================ */
 
 /* This file supports MSP430F1612 devices. */
-/* Version: 1.208 */
+/* Version: 1.210 */
 /* Default linker script, for normal executables */
 
 OUTPUT_ARCH(msp430)
@@ -87,7 +87,7 @@ SECTIONS
     KEEP (*(.resetvec))
   } > RESETVEC
 
-  .rodata : 
+  .rodata :
   {
     . = ALIGN(2);
     *(.plt)
@@ -100,12 +100,13 @@ SECTIONS
      read only but which older linkers treat as read-write.
      This prevents older linkers from marking the entire .rodata
      section as read-write.  */
-  .rodata2 : 
+  .rodata2 :
   {
     . = ALIGN(2);
     PROVIDE (__preinit_array_start = .);
     KEEP (*(.preinit_array))
     PROVIDE (__preinit_array_end = .);
+    . = ALIGN(2);
     PROVIDE (__init_array_start = .);
     KEEP (*(SORT(.init_array.*)))
     KEEP (*(.init_array))
@@ -160,7 +161,7 @@ SECTIONS
     KEEP (*(.tm_clone_table))
   } > ROM
 
-  .data : 
+  .data :
   {
     . = ALIGN(2);
     PROVIDE (__datastart = .);
@@ -192,7 +193,7 @@ SECTIONS
   PROVIDE(__romdatastart = LOADADDR(.data));
   PROVIDE (__romdatacopysize = SIZEOF(.data));
 
-  .bss : 
+  .bss :
   {
     . = ALIGN(2);
     PROVIDE (__bssstart = .);
@@ -207,7 +208,7 @@ SECTIONS
 
   /* This section contains data that is not initialised during load
      or application reset.  */
-  .noinit (NOLOAD) : 
+  .noinit (NOLOAD) :
   {
     . = ALIGN(2);
     PROVIDE (__noinit_start = .);
@@ -225,7 +226,7 @@ SECTIONS
     . = ALIGN(2);
     __heap_start__ = .;
     _end = __heap_start__;
-    PROVIDE (end = .); 
+    PROVIDE (end = .);
     KEEP (*(.heap))
     _end = .;
     PROVIDE (end = .);
