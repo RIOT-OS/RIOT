@@ -34,7 +34,7 @@
 #include "periph/gpio.h"
 #include "pm_layered.h"
 
-#if defined(CPU_LINE_STM32L4R5xx)
+#if defined(CPU_LINE_STM32L4R5xx) || defined(CPU_FAM_STM32G0)
 #define ISR_REG     ISR
 #define ISR_TXE     USART_ISR_TXE_TXFNF
 #define ISR_RXNE    USART_ISR_RXNE_RXFNE
@@ -60,7 +60,7 @@
 #define RDR_REG     DR
 #endif
 
-#if defined(CPU_LINE_STM32L4R5xx)
+#if defined(CPU_LINE_STM32L4R5xx) || defined(CPU_FAM_STM32G0)
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE_RXFNEIE)
 #define USART_ISR_RXNE      (USART_ISR_RXNE_RXFNE)
 #else

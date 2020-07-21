@@ -48,7 +48,7 @@
 #define PM_STOP_CONFIG  (PWR_CR_LPSDSR | PWR_CR_ULP | PWR_CR_CWUF)
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4)
 #define PM_STOP_CONFIG  (PWR_CR1_LPMS_STOP1)
-#elif defined(CPU_FAM_STM32WB)
+#elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G0)
 #define PM_STOP_CONFIG  (PWR_CR1_LPMS_0)
 #elif defined(CPU_FAM_STM32F7)
 #define PM_STOP_CONFIG  (PWR_CR1_LPDS | PWR_CR1_FPDS | PWR_CR1_LPUDS)
@@ -68,7 +68,7 @@
 #define PM_STANDBY_CONFIG   (PWR_CR_PDDS | PWR_CR_CWUF | PWR_CR_CSBF | PWR_CR_ULP)
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4)
 #define PM_STANDBY_CONFIG   (PWR_CR1_LPMS_STANDBY)
-#elif defined(CPU_FAM_STM32WB)
+#elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G0)
 #define PM_STANDBY_CONFIG   (PWR_CR1_LPMS_0 | PWR_CR1_LPMS_1)
 #elif defined(CPU_FAM_STM32F7)
 #define PM_STANDBY_CONFIG   (PWR_CR1_PDDS | PWR_CR1_CSBF)
@@ -78,7 +78,7 @@
 #endif
 
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4)
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
 #define PWR_CR_REG     PWR->CR1
 #define PWR_WUP_REG    PWR->CR3
 /* Allow overridable SRAM2 retention mode using CFLAGS */
