@@ -109,9 +109,9 @@ int __attribute__((used)) sched_run(void)
                 active_thread = NULL;
             }
 
-            while (!runqueue_bitcache) {
+            do {
                 sched_arch_idle();
-            }
+            } while (!runqueue_bitcache);
         }
     }
 
