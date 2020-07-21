@@ -7,16 +7,19 @@
 # directory for more details.
 
 import sys
+import os
 from testrunner import run
 
 
 # On slow platforms, like AVR, this test can take some time to complete.
 TIMEOUT = 30
+# Allow setting a specific port to test
+PORT_UNDER_TEST = int(os.environ.get('PORT_UNDER_TEST') or 0)
 
 
 def testfunc(child):
     for pin in range(0, 8):
-        child.sendline("bench 0 {}".format(pin))
+        child.sendline("bench {} {}".format(PORT_UNDER_TEST, pin))
         child.expect(r" *nop loop: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
         child.expect(r" *gpio_set: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
         child.expect(r" *gpio_clear: +(\d+)us  --- +(\d+\.\d+)us per call  --- +(\d+) calls per sec")
