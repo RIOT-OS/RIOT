@@ -1,0 +1,5 @@
+/**
+ * @defgroup pkg_stm32cmsis STM32 cmsis device
+ * @ingroup  pkg
+ * @brief    Provides STM32 CMSIS device headers from GitHub
+ */

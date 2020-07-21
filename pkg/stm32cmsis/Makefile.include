@@ -1,0 +1,10 @@
+# This package is only used to fetch headers. No module is built.
+PSEUDOMODULES += stm32cmsis
+
+# Add this define to skip the inclusion of the system_stm32xxxx.h header files
+# which are only used for STM32 system includes and not of interest for RIOT.
+CFLAGS += -D__SYSTEM_STM32$(call uppercase,$(CPU_FAM))XX_H
+
+STM32CMSIS_INCLUDE_DIR = $(RIOTBASE)/cpu/stm32/include/vendor/cmsis/$(CPU_FAM)/Include
+
+INCLUDES += -I$(STM32CMSIS_INCLUDE_DIR)

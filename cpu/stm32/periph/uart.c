@@ -34,10 +34,17 @@
 #include "periph/gpio.h"
 #include "pm_layered.h"
 
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
-    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32F7) || \
-    defined(CPU_FAM_STM32G4)
+#if defined(CPU_LINE_STM32L4R5xx)
+#define ISR_REG     ISR
+#define ISR_TXE     USART_ISR_TXE_TXFNF
+#define ISR_RXNE    USART_ISR_RXNE_RXFNE
+#define ISR_TC      USART_ISR_TC
+#define TDR_REG     TDR
+#define RDR_REG     RDR
+#elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
+      defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) || \
+      defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32F7) || \
+      defined(CPU_FAM_STM32G4)
 #define ISR_REG     ISR
 #define ISR_TXE     USART_ISR_TXE
 #define ISR_RXNE    USART_ISR_RXNE
@@ -53,7 +60,12 @@
 #define RDR_REG     DR
 #endif
 
+#if defined(CPU_LINE_STM32L4R5xx)
+#define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE_RXFNEIE)
+#define USART_ISR_RXNE      (USART_ISR_RXNE_RXFNE)
+#else
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE)
+#endif
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
 
