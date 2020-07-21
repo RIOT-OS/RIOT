@@ -261,13 +261,13 @@ extern "C" {
  * page 31 in the data sheet for the possible states in the status byte.
  */
 typedef enum {
-    CC110X_STATE_IDLE               = 0b00000000,   /**< IDLE state */
+    CC110X_STATE_IDLE               = 0x00,   /**< IDLE state */
     /**
      * @brief   Frame received, waiting for upper layer to retrieve it
      *
      * Transceiver is in IDLE state.
      */
-    CC110X_STATE_FRAME_READY        = 0b00001000,
+    CC110X_STATE_FRAME_READY        = 0x08,
     /**
      * @brief   Frame received, waiting for upper layer to retrieve it
      *
@@ -276,26 +276,26 @@ typedef enum {
      * bring it in the IDLE state. Thus, we set the three least significant bits
      * to the IDLE state
      */
-    CC110X_STATE_OFF                = 0b00010000,
-    CC110X_STATE_RX_MODE            = 0b00000001,   /**< Listening for frames */
+    CC110X_STATE_OFF                = 0x10,
+    CC110X_STATE_RX_MODE            = 0x01,   /**< Listening for frames */
     /**
      * @brief   Receiving a frame just now
      *
      * Transceiver is in RX state.
      */
-    CC110X_STATE_RECEIVING          = 0b00001001,
-    CC110X_STATE_TX_MODE            = 0b00000010,   /**< Transmit mode */
+    CC110X_STATE_RECEIVING          = 0x09,
+    CC110X_STATE_TX_MODE            = 0x02,   /**< Transmit mode */
     /**
      * @brief   Waiting for transceiver to complete outgoing transmission
      *
      * Transceiver is in TX state
      */
-    CC110X_STATE_TX_COMPLETING      = 0b00001010,
-    CC110X_STATE_FSTXON             = 0b00000011,   /**< Fast TX ready */
-    CC110X_STATE_CALIBRATE          = 0b00000100,   /**< Device is calibrating */
-    CC110X_STATE_SETTLING           = 0b00000101,   /**< PLL is settling */
-    CC110X_STATE_RXFIFO_OVERFLOW    = 0b00000110,   /**< RX FIFO overflown */
-    CC110X_STATE_TXFIFO_UNDERFLOW   = 0b00000111,   /**< TX FIFO underflown */
+    CC110X_STATE_TX_COMPLETING      = 0x0A,
+    CC110X_STATE_FSTXON             = 0x03,   /**< Fast TX ready */
+    CC110X_STATE_CALIBRATE          = 0x04,   /**< Device is calibrating */
+    CC110X_STATE_SETTLING           = 0x05,   /**< PLL is settling */
+    CC110X_STATE_RXFIFO_OVERFLOW    = 0x06,   /**< RX FIFO overflown */
+    CC110X_STATE_TXFIFO_UNDERFLOW   = 0x07,   /**< TX FIFO underflown */
 } cc110x_state_t;
 
 /**

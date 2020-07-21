@@ -20,7 +20,7 @@
 #include "cc110x.h"
 #include "cc110x_internal.h"
 
-const char cc110x_conf[CC110X_CONF_SIZE] = {
+const uint8_t cc110x_conf[CC110X_CONF_SIZE] = {
     /*
      * IOCFG2; default: 0x29 (CHIP_RDYn)
      * Invert GDO2: off,
@@ -327,4 +327,4 @@ const char cc110x_conf[CC110X_CONF_SIZE] = {
     0x00,   /*< RCCTRL0 */
 };
 
-const char cc110x_magic_registers[3] = { 0x88, 0x31, 0x09 };
+const uint8_t cc110x_magic_registers[3] = { 0x88, 0x31, 0x09 };
