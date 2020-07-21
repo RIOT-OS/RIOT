@@ -194,6 +194,13 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
     /* Acquire I2C device */
     i2c_acquire(STMPE811_DEV_I2C);
 
+    /* Ensure there's a least one position measured in the FIFO */
+    uint8_t fifo_size = 0;
+    do {
+        i2c_read_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
+                     STMPE811_FIFO_SIZE, &fifo_size, 0);
+    } while (!fifo_size);
+
     uint8_t  xyz[4];
     uint32_t xyz_ul;
 
@@ -203,7 +210,6 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
         i2c_release(STMPE811_DEV_I2C);
         return -STMPE811_ERR_I2C;
     }
-    _reset_fifo(dev);
 
     /* Release I2C device */
     i2c_release(STMPE811_DEV_I2C);
