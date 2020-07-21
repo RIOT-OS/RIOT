@@ -19,8 +19,6 @@
 
 #include "periph/gpio.h"
 
-#ifndef MODULE_PERIPH_GPIO_LINUX
-
 int gpio_init(gpio_t pin, gpio_mode_t mode) {
   (void) pin;
   (void) mode;
@@ -53,7 +51,5 @@ void gpio_write(gpio_t pin, int value) {
   (void) pin;
   (void) value;
 }
-
-#endif /* !MODULE_PERIPH_GPIO_LINUX */
 
 /** @} */

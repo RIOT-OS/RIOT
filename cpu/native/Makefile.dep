@@ -1,9 +1,15 @@
 ifeq ($(OS),Linux)
   ifneq (,$(filter periph_gpio,$(USEMODULE)))
-    USEMODULE += periph_gpio_linux
+    ifeq (,$(filter periph_gpio_mock,$(USEMODULE)))
+      USEMODULE += periph_gpio_linux
+    endif
   endif
   ifneq (,$(filter periph_spi,$(USEMODULE)))
     USEMODULE += periph_spidev_linux
+  endif
+else
+  ifneq (,$(filter periph_gpio,$(USEMODULE)))
+    USEMODULE += periph_gpio_mock
   endif
 endif
 

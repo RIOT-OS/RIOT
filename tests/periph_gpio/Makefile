@@ -7,6 +7,11 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += benchmark
 
+# disable native GPIOs for automatic test
+ifeq (native,$(BOARD))
+  USEMODULE += periph_gpio_mock
+endif
+
 BOARDS_BENCH_PORT_1 = \
     slstk3402a \
     z1 \
