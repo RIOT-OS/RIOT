@@ -28,7 +28,7 @@
 #ifdef BOARD_NATIVE
 #define CHUNK_SIZE          (1024 * 1024U)
 #else
-#define CHUNK_SIZE          (512U)
+#define CHUNK_SIZE          (128U)
 #endif
 #endif
 
