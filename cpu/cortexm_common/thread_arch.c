@@ -474,4 +474,5 @@ void sched_arch_idle(void)
 #endif
     irq_restore(state);
     NVIC_SetPriority(PendSV_IRQn, CPU_CORTEXM_PENDSV_IRQ_PRIO);
+    SCB->ICSR = SCB_ICSR_PENDSVCLR_Msk;
 }
