@@ -83,7 +83,7 @@ void nm_bsp_register_isr(tpfNmBspIsr pfIsr)
 {
     assert(atwinc15x0);
 
-    DEBUG("%s %p\n", __func__, pfIsr);
+    DEBUG("%s %p\n", __func__, (void *)(uintptr_t)pfIsr);
 
     atwinc15x0->bsp_isr = pfIsr;
 }
