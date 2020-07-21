@@ -77,10 +77,13 @@ register. */
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
 #define IMR_REG             IMR2
 #define EXTI_IMR_BIT        EXTI_IMR2_IM32
+#elif defined(CPU_FAM_STM32G0)
+#define IMR_REG             IMR1
+#define EXTI_IMR_BIT        EXTI_IMR1_IM29
 #elif defined(CPU_FAM_STM32G4)
 #define IMR_REG             IMR2
 #define EXTI_IMR_BIT        EXTI_IMR2_IM37
-#elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32G0)
+#elif defined(CPU_FAM_STM32L0)
 #define IMR_REG             IMR
 #define EXTI_IMR_BIT        EXTI_IMR_IM29
 #else
@@ -128,7 +131,11 @@ void rtt_init(void)
     EXTI->RTSR_REG |= EXTI_RTSR_BIT;
     EXTI->PR_REG = EXTI_PR_BIT;
 #endif
+#if defined(CPU_FAM_STM32G0)
+    NVIC_EnableIRQ(TIM6_DAC_LPTIM1_IRQn);
+#else
     NVIC_EnableIRQ(LPTIM1_IRQn);
+#endif
     /* enable timer */
     LPTIM1->CR = LPTIM_CR_ENABLE;
     /* set auto-reload value (timer needs to be enabled for this) */
@@ -185,6 +192,8 @@ void rtt_poweron(void)
 {
 #ifdef RCC_APB1ENR1_LPTIM1EN
     periph_clk_en(APB1, RCC_APB1ENR1_LPTIM1EN);
+#elif defined(RCC_APBENR1_LPTIM1EN)
+    periph_clk_en(APB1, RCC_APBENR1_LPTIM1EN);
 #else
     periph_clk_en(APB1, RCC_APB1ENR_LPTIM1EN);
 #endif
@@ -194,12 +203,18 @@ void rtt_poweroff(void)
 {
 #ifdef RCC_APB1ENR1_LPTIM1EN
     periph_clk_dis(APB1, RCC_APB1ENR1_LPTIM1EN);
+#elif defined(RCC_APBENR1_LPTIM1EN)
+    periph_clk_dis(APB1, RCC_APBENR1_LPTIM1EN);
 #else
     periph_clk_dis(APB1, RCC_APB1ENR_LPTIM1EN);
 #endif
 }
 
+#if defined(CPU_FAM_STM32G0)
+void isr_tim6_dac_lptim1(void)
+#else
 void isr_lptim1(void)
+#endif
 {
     if (LPTIM1->ISR & LPTIM_ISR_CMPM) {
         if (to_cb) {
