@@ -99,7 +99,6 @@ static void _unschedule(thread_t *active_thread)
 
 int __attribute__((used)) sched_run(void)
 {
-    sched_context_switch_request = 0;
     thread_t *active_thread = (thread_t *)sched_active_thread;
 
     if (!IS_USED(MODULE_CORE_IDLE_THREAD)) {
@@ -114,6 +113,8 @@ int __attribute__((used)) sched_run(void)
             }
         }
     }
+
+    sched_context_switch_request = 0;
 
     int nextrq = bitarithm_lsb(runqueue_bitcache);
     thread_t *next_thread = container_of(sched_runqueues[nextrq].next->next,
