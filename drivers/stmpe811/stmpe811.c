@@ -34,6 +34,16 @@
 #define STMPE811_DEV_I2C    (dev->params.i2c)
 #define STMPE811_DEV_ADDR   (dev->params.addr)
 
+static void _gpio_irq(void *arg)
+{
+    const stmpe811_t *dev = (const stmpe811_t *)arg;
+    assert(dev);
+
+    if (dev->cb) {
+        dev->cb(dev->cb_arg);
+    }
+}
+
 static int _soft_reset(const stmpe811_t *dev)
 {
     if (i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
@@ -66,9 +76,12 @@ static void _clear_interrupt_status(const stmpe811_t *dev)
     i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR, STMPE811_INT_STA, 0xff, 0);
 }
 
-int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, touch_event_cb_t cb, void *arg)
+int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, stmpe811_event_cb_t cb, void *arg)
 {
     dev->params = *params;
+    dev->cb = cb;
+    dev->cb_arg = arg;
+
     int ret = STMPE811_OK;
 
     /* Acquire I2C device */
@@ -160,9 +173,9 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, touch_event
     /* clear interrupt status */
     _clear_interrupt_status(dev);
 
-    if (gpio_is_valid(dev->params.int_pin) && cb) {
+    if (gpio_is_valid(dev->params.int_pin)) {
         DEBUG("[stmpe811] init: configuring touchscreen interrupt\n");
-        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, cb, arg);
+        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, _gpio_irq, dev);
 
         /* Enable touchscreen interrupt */
         ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
