@@ -44,7 +44,7 @@ void TimerStart(TimerEvent_t *obj)
     xtimer_t *timer = &(obj->dev);
     msg_t *msg = &(obj->msg);
     msg->type = MSG_TYPE_MAC_TIMEOUT;
-    msg->content.ptr = obj->cb;
+    msg->content.value = (uintptr_t)obj->cb;
     xtimer_set_msg(timer, obj->timeout, msg, semtech_loramac_pid);
 }
 
