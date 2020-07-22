@@ -28,4 +28,36 @@ rsource "pktdump/Kconfig"
 rsource "routing/rpl/Kconfig"
 rsource "transport_layer/Kconfig"
 
+menu "Protocol types"
+
+comment "Protocol type definitions are used by GNRC NetAPI, Netif, Netreg and"
+comment "PKT to identify network protocols throughout the network stack"
+
+# NOTE: Not sure if these should even be visible
+config MOD_GNRC_NETTYPE_GOMACH
+    bool "GoMacH protocol type"
+
+config MOD_GNRC_NETTYPE_LORAWAN
+    bool "LoRaWAN protocol type"
+
+config MOD_GNRC_NETTYPE_SIXLOWPAN
+    bool "Sixlowpan protocol type"
+
+config MOD_GNRC_NETTYPE_ICMPV6
+    bool "ICMPv6 protocol type"
+
+config MOD_GNRC_NETTYPE_IPV6_EXT
+    bool "IPv6 extension header protocol type"
+
+config MOD_GNRC_NETTYPE_IPV6
+    bool "IPv6 protocol type"
+
+config MOD_GNRC_NETTYPE_UDP
+    bool "UDP protocol type"
+
+config MOD_GNRC_NETTYPE_TCP
+    bool "TCP protocol type"
+
+endmenu # Protocol types
+
 endif # GNRC_STACK

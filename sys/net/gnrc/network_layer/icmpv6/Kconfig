@@ -11,6 +11,7 @@ config MOD_GNRC_ICMPV6
     depends on MOD_GNRC_IPV6
     select MOD_ICMPV6
     select MOD_INET_CSUM
+    select MOD_GNRC_NETTYPE_ICMPV6
 
 rsource "echo/Kconfig"
 rsource "error/Kconfig"

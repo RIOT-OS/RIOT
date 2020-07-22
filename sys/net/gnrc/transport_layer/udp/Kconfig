@@ -8,6 +8,7 @@
 menuconfig MOD_GNRC_UDP
     bool "UDP support"
     select MOD_INET_CSUM
+    select MOD_GNRC_NETTYPE_UDP
     select MOD_UDP
 
 if MOD_GNRC_UDP

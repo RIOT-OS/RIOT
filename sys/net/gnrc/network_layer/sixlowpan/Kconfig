@@ -9,6 +9,7 @@ menuconfig MOD_GNRC_SIXLOWPAN
     bool "6LoWPAN support"
     default HAVE_RADIO_IEEE802154 if MOD_GNRC_IPV6
     select MOD_SIXLOWPAN
+    select MOD_GNRC_NETTYPE_SIXLOWPAN
 
 if MOD_GNRC_SIXLOWPAN
 
