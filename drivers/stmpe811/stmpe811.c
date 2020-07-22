@@ -162,7 +162,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, touch_event
 
     if ((dev->params.int_pin != GPIO_UNDEF) && cb) {
         DEBUG("[stmpe811] init: configuring touchscreen interrupt\n");
-        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, cb, arg);
+        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, cb, arg);
 
         /* Enable touchscreen interrupt */
         ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
@@ -170,7 +170,7 @@ int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params, touch_event
 
         /* Enable global interrupt */
         ret += i2c_write_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
-                             STMPE811_INT_CTRL, STMPE811_INT_CTRL_GLOBAL_INT, 0);
+                             STMPE811_INT_CTRL, STMPE811_INT_CTRL_GLOBAL_INT | STMPE811_INT_CTRL_INT_TYPE, 0);
     }
 
     if (ret < 0) {
@@ -194,6 +194,13 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
     /* Acquire I2C device */
     i2c_acquire(STMPE811_DEV_I2C);
 
+    /* Ensure there's a least one position measured in the FIFO */
+    uint8_t fifo_size = 0;
+    do {
+        i2c_read_reg(STMPE811_DEV_I2C, STMPE811_DEV_ADDR,
+                     STMPE811_FIFO_SIZE, &fifo_size, 0);
+    } while (!fifo_size);
+
     uint8_t  xyz[4];
     uint32_t xyz_ul;
 
@@ -203,7 +210,6 @@ int stmpe811_read_touch_position(stmpe811_t *dev, stmpe811_touch_position_t *pos
         i2c_release(STMPE811_DEV_I2C);
         return -STMPE811_ERR_I2C;
     }
-    _reset_fifo(dev);
 
     /* Release I2C device */
     i2c_release(STMPE811_DEV_I2C);
@@ -262,8 +268,9 @@ int stmpe811_read_touch_state(const stmpe811_t *dev, stmpe811_touch_state_t *sta
         return -STMPE811_ERR_I2C;
     }
 
+    _clear_interrupt_status(dev);
+
     if ((val & STMPE811_TSC_CTRL_STA)) {
-        _clear_interrupt_status(dev);
         *state = STMPE811_TOUCH_STATE_PRESSED;
     }
     else {
