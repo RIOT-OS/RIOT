@@ -784,7 +784,7 @@ static void _netif_list(netif_t *iface)
         puts("\n           Black-listed link layer addresses:");
 #endif
         int count = 0;
-        for (unsigned i = 0; i < L2FILTER_LISTSIZE; i++) {
+        for (unsigned i = 0; i < CONFIG_L2FILTER_LISTSIZE; i++) {
             if (filter[i].addr_len > 0) {
                 char hwaddr_str[filter[i].addr_len * 3];
                 gnrc_netif_addr_to_str(filter[i].addr, filter[i].addr_len,
@@ -1242,7 +1242,7 @@ static int _netif_addrm_l2filter(netif_t *iface, char *val, bool add)
     uint8_t addr[GNRC_NETIF_L2ADDR_MAXLEN];
     size_t addr_len = gnrc_netif_addr_from_str(val, addr);
 
-    if ((addr_len == 0) || (addr_len > L2FILTER_ADDR_MAXLEN)) {
+    if ((addr_len == 0) || (addr_len > CONFIG_L2FILTER_ADDR_MAXLEN)) {
         puts("error: given address is invalid");
         return 1;
     }
