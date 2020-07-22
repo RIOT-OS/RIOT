@@ -70,6 +70,10 @@ endmenu # Interfaces options"
 rsource "hdr/Kconfig"
 rsource "init_devs/Kconfig"
 
+config MOD_GNRC_NETIF_IPV6
+    bool "GNRC Network Interface IPv6 support"
+    default y if MOD_GNRC_IPV6
+
 config MOD_GNRC_NETIF_6LO
     bool "GNRC Network Interface Sixlowpan support"
     default y if MOD_GNRC_SIXLOWPAN
