@@ -70,6 +70,10 @@ endmenu # Interfaces options"
 rsource "hdr/Kconfig"
 rsource "init_devs/Kconfig"
 
+config MOD_GNRC_NETIF_6LO
+    bool "GNRC Network Interface Sixlowpan support"
+    default y if MOD_GNRC_SIXLOWPAN
+
 # include particular technologies
 rsource "ieee802154/Kconfig"
 endif # MOD_GNRC_NETIF
