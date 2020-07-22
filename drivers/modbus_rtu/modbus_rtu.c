@@ -92,11 +92,11 @@ static inline void write_count(modbus_rtu_t *modbus)
     byteorder_htobebufs(modbus->buffer + NB_HI, modbus->msg->count);
 }
 
-static void copy_bits(uint8_t *dst, uint16_t start_bit_dst,
-                      const uint8_t *src, uint16_t start_bit_src,
-                      uint16_t count)
+void modbus_rtu_copy_bits(uint8_t *dst, uint16_t start_bit_dst,
+                          const uint8_t *src, uint16_t start_bit_src,
+                          uint16_t number)
 {
-    while (count > 0) {
+    while (number > 0) {
         div_t s = div(start_bit_src, 8);
         div_t d = div(start_bit_dst, 8);
         uint8_t bit = src[s.quot] & (1 << s.rem);
@@ -108,7 +108,7 @@ static void copy_bits(uint8_t *dst, uint16_t start_bit_dst,
         }
         start_bit_dst++;
         start_bit_src++;
-        count--;
+        number--;
     }
 }
 
@@ -213,8 +213,9 @@ static inline int prepare_request(modbus_rtu_t *modbus)
             /* (id + func + addr + count + size) + data */
             modbus->size_buffer = 7 + size;
             memset(modbus->buffer + 3, 0, size);
-            copy_bits(modbus->buffer + 7, 0, (uint8_t *)modbus->msg->data,
-                      modbus->msg->addr, modbus->msg->count);
+            modbus_rtu_copy_bits(modbus->buffer + 7, 0,
+                                 (uint8_t *)modbus->msg->data,
+                                 modbus->msg->addr, modbus->msg->count);
             break;
         case MB_FC_WRITE_REGISTERS:
             write_count(modbus);
@@ -280,8 +281,9 @@ static inline int get_response(modbus_rtu_t *modbus)
                     mutex_unlock(&(modbus->mutex_buffer));
                     return MB_ER_CRC;
                 }
-                copy_bits((uint8_t *)modbus->msg->data, modbus->msg->addr,
-                          modbus->buffer + 3, 0, modbus->msg->count);
+                modbus_rtu_copy_bits((uint8_t *)modbus->msg->data,
+                                     modbus->msg->addr,
+                                     modbus->buffer + 3, 0, modbus->msg->count);
                 mutex_unlock(&(modbus->mutex_buffer));
                 break;
             case MB_FC_READ_REGISTERS:
@@ -376,8 +378,9 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
                     err = MB_ER_ILLEGAL_ADDRESS;
                     goto exit;
                 }
-                copy_bits((uint8_t *)modbus->msg->data, modbus->msg->addr,
-                          modbus->buffer + 4, 0, 1);
+                modbus_rtu_copy_bits((uint8_t *)modbus->msg->data,
+                                     modbus->msg->addr,
+                                     modbus->buffer + 4, 0, 1);
                 mutex_unlock(&(modbus->mutex_buffer));
                 break;
             case MB_FC_WRITE_REGISTER:
@@ -418,8 +421,9 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
                     err = MB_ER_ILLEGAL_ADDRESS;
                     goto exit;
                 }
-                copy_bits((uint8_t *)modbus->msg->data, modbus->msg->addr,
-                          modbus->buffer + 7, 0, modbus->msg->count);
+                modbus_rtu_copy_bits((uint8_t *)modbus->msg->data,
+                                     modbus->msg->addr,
+                                     modbus->buffer + 7, 0, modbus->msg->count);
                 mutex_unlock(&(modbus->mutex_buffer));
                 break;
             case MB_FC_WRITE_REGISTERS:
@@ -492,8 +496,9 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus,
             modbus->buffer[2] = size;
             modbus->size_buffer = 3 + size;
             memset(modbus->buffer + 3, 0, size);
-            copy_bits(modbus->buffer + 3, 0, (uint8_t *)modbus->msg->data,
-                      modbus->msg->addr, modbus->msg->count);
+            modbus_rtu_copy_bits(modbus->buffer + 3, 0,
+                                 (uint8_t *)modbus->msg->data,
+                                 modbus->msg->addr, modbus->msg->count);
             break;
         case MB_FC_WRITE_COIL:
         case MB_FC_WRITE_REGISTER:

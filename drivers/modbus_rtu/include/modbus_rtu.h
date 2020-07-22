@@ -139,7 +139,6 @@ typedef struct {
  * Initialize fields of modbus and UART, RTS pin.
  *
  * @param[in] modbus    pointer modbus
- *
  * @param[in] baudrate  desired baudrate in baud/s
  *
  * @return              0 on success, otherwise error
@@ -149,7 +148,8 @@ int modbus_rtu_init(modbus_rtu_t *modbus, uint32_t baudrate);
 /**
  * @brief   Send request to slave.
  *
- * Send request to slave, blocking and wait response.
+ * Send request to slave, blocking and wait response
+ * if necessary write in data field.
  *
  * @param[in] modbus    pointer modbus
  * @param[in] message   pointer modbus message
@@ -187,6 +187,19 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message);
  */
 int modbus_rtu_send_response(modbus_rtu_t *modbus,
                              modbus_rtu_message_t *message);
+
+/**
+ * @brief   Copy number bit from src to dst.
+ *
+ * @param[in] dst            destination
+ * @param[in] start_bit_dst  the first bit will be copied to
+ * @param[in] src            source
+ * @param[in] start_bit_src  the first bit will be copied from
+ * @param[in] number         number of bits
+ */
+void modbus_rtu_copy_bits(uint8_t *dst, uint16_t start_bit_dst,
+                          const uint8_t *src, uint16_t start_bit_src,
+                          uint16_t number);
 
 #ifdef __cplusplus
 }
