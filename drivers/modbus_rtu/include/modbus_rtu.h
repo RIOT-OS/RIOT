@@ -11,6 +11,17 @@
  * @ingroup     drivers
  * @brief       Modbus
  *
+ *              To use function need defined corresponding macro:
+ *              `MODBUS_RTU_USE_READ_COILS`,
+ *              `MODBUS_RTU_USE_READ_DISCRETE_INPUT`,
+ *              `MODBUS_RTU_USE_READ_REGISTERS`,
+ *              `MODBUS_RTU_USE_READ_INPUT_REGISTER`,
+ *              `MODBUS_RTU_USE_WRITE_COIL`,
+ *              `MODBUS_RTU_USE_WRITE_REGISTER`,
+ *              `MODBUS_RTU_USE_WRITE_COILS`,
+ *              `MODBUS_RTU_USE_WRITE_REGISTERS`,
+ *              or `MODBUS_RTU_USE_ALL`
+ * 
  * @{
  * @file
  * @brief       Modbus interface definitions
@@ -43,6 +54,17 @@ enum {
     MB_FC_WRITE_COILS           = 15,   /**< write multiple coils or outputs */
     MB_FC_WRITE_REGISTERS       = 16    /**< write multiple registers */
 };
+
+#ifdef MODBUS_RTU_USE_ALL
+#define MODBUS_RTU_USE_READ_COILS
+#define MODBUS_RTU_USE_READ_DISCRETE_INPUT
+#define MODBUS_RTU_USE_READ_REGISTERS
+#define MODBUS_RTU_USE_READ_INPUT_REGISTER
+#define MODBUS_RTU_USE_WRITE_COIL
+#define MODBUS_RTU_USE_WRITE_REGISTER
+#define MODBUS_RTU_USE_WRITE_COILS
+#define MODBUS_RTU_USE_WRITE_REGISTERS
+#endif /* MODBUS_RTU_USE_ALL */
 
 /**
  * @brief   Modbus error

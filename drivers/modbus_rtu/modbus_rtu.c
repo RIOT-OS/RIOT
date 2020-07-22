@@ -112,8 +112,9 @@ void modbus_rtu_copy_bits(uint8_t *dst, uint16_t start_bit_dst,
     }
 }
 
-static void copy_buffer_to_registers(uint16_t *reg, const uint8_t *buff,
-                                     uint8_t count)
+static void __attribute__((unused)) copy_buffer_to_registers(uint16_t *reg,
+                                                             const uint8_t *buff,
+                                                             uint8_t count)
 {
     while (count) {
         *reg = byteorder_bebuftohs(buff);
@@ -123,8 +124,9 @@ static void copy_buffer_to_registers(uint16_t *reg, const uint8_t *buff,
     }
 }
 
-static void copy_registers_to_buffer(uint8_t *buff, const uint16_t *reg,
-                                     uint8_t count)
+static void __attribute__((unused)) copy_registers_to_buffer(uint8_t *buff,
+                                                             const uint16_t *reg,
+                                                             uint8_t count)
 {
     while (count) {
         byteorder_htobebufs(buff, *reg);
@@ -177,17 +179,31 @@ static inline int prepare_request(modbus_rtu_t *modbus)
     modbus->buffer[ID] = modbus->msg->id;
     modbus->buffer[FUNC] = modbus->msg->func;
     write_address(modbus);
-    uint8_t size;
-    div_t d;
+    uint8_t size __attribute__((unused));
+    div_t d __attribute__((unused));
     switch (modbus->msg->func) {
+#if defined(MODBUS_RTU_USE_READ_COILS)
         case MB_FC_READ_COILS:
+#endif  /* MODBUS_RTU_USE_READ_COILS */
+#if defined(MODBUS_RTU_USE_READ_DISCRETE_INPUT)
         case MB_FC_READ_DISCRETE_INPUT:
+#endif  /* MODBUS_RTU_USE_READ_DISCRETE_INPUT */
+#if defined(MODBUS_RTU_USE_READ_REGISTERS)
         case MB_FC_READ_REGISTERS:
+#endif  /* MODBUS_RTU_USE_READ_REGISTERS */
+#if defined(MODBUS_RTU_USE_READ_INPUT_REGISTER)
         case MB_FC_READ_INPUT_REGISTER:
+#endif  /* MODBUS_RTU_USE_READ_INPUT_REGISTER */
+#if defined(MODBUS_RTU_USE_READ_COILS) || \
+        defined(MODBUS_RTU_USE_READ_DISCRETE_INPUT) || \
+        defined(MODBUS_RTU_USE_READ_REGISTERS) || \
+        defined(MODBUS_RTU_USE_READ_INPUT_REGISTER)
             write_count(modbus);
             /* id + func + addr + count */
             modbus->size_buffer = 6;
             break;
+#endif  /* MODBUS_RTU_USE_READ_COILS || MODBUS_RTU_USE_READ_DISCRETE_INPUT || MODBUS_RTU_USE_READ_REGISTERS || MODBUS_RTU_USE_READ_INPUT_REGISTER */
+#if defined(MODBUS_RTU_USE_WRITE_COIL)
         case MB_FC_WRITE_COIL:
             d = div(modbus->msg->addr, 16);
             modbus->buffer[4] =
@@ -196,12 +212,16 @@ static inline int prepare_request(modbus_rtu_t *modbus)
             /* id + func + addr + data */
             modbus->size_buffer = 6;
             break;
+#endif  /* MODBUS_RTU_USE_WRITE_COIL */
+#if defined(MODBUS_RTU_USE_WRITE_REGISTER)
         case MB_FC_WRITE_REGISTER:
             copy_registers_to_buffer(modbus->buffer + 4,
                                      modbus->msg->data + modbus->msg->addr, 1);
             /* id + func + addr + data */
             modbus->size_buffer = 6;
             break;
+#endif  /* MODBUS_RTU_USE_WRITE_REGISTER */
+#if defined(MODBUS_RTU_USE_WRITE_COILS)
         case MB_FC_WRITE_COILS:
             write_count(modbus);
             d = div(modbus->msg->count, 8);
@@ -217,6 +237,8 @@ static inline int prepare_request(modbus_rtu_t *modbus)
                                  (uint8_t *)modbus->msg->data,
                                  modbus->msg->addr, modbus->msg->count);
             break;
+#endif  /* MODBUS_RTU_USE_WRITE_COILS */
+#if defined(MODBUS_RTU_USE_WRITE_REGISTERS)
         case MB_FC_WRITE_REGISTERS:
             write_count(modbus);
             size = modbus->msg->count * 2;
@@ -227,6 +249,7 @@ static inline int prepare_request(modbus_rtu_t *modbus)
                                      modbus->msg->data + modbus->msg->addr,
                                      modbus->msg->count);
             break;
+#endif  /* MODBUS_RTU_USE_WRITE_REGISTERS */
         default:
             return MB_ER_ILLEGAL_FUNCTION;
             break;
@@ -267,10 +290,16 @@ static inline int get_response(modbus_rtu_t *modbus)
                 return MB_ER_ILLEGAL_FUNCTION;
             }
         }
-        uint8_t size;
+        uint8_t size __attribute__((unused));
         switch (modbus->buffer[FUNC]) {
+#if defined(MODBUS_RTU_USE_READ_COILS)
             case MB_FC_READ_COILS:
+#endif      /* MODBUS_RTU_USE_READ_COILS */
+#if defined(MODBUS_RTU_USE_READ_DISCRETE_INPUT)
             case MB_FC_READ_DISCRETE_INPUT:
+#endif      /* MODBUS_RTU_USE_READ_DISCRETE_INPUT */
+#if defined(MODBUS_RTU_USE_READ_COILS) || \
+            defined(MODBUS_RTU_USE_READ_DISCRETE_INPUT)
                 /* id + func + size + data + crc16 */
                 size = 3 + modbus->buffer[2] + 2;
                 if (wait_bytes(modbus, size)) {
@@ -286,8 +315,15 @@ static inline int get_response(modbus_rtu_t *modbus)
                                      modbus->buffer + 3, 0, modbus->msg->count);
                 mutex_unlock(&(modbus->mutex_buffer));
                 break;
+#endif      /* MODBUS_RTU_USE_READ_COILS || MODBUS_RTU_USE_READ_DISCRETE_INPUT */
+#if defined(MODBUS_RTU_USE_READ_REGISTERS)
             case MB_FC_READ_REGISTERS:
+#endif      /* MODBUS_RTU_USE_READ_REGISTERS */
+#if defined(MODBUS_RTU_USE_READ_INPUT_REGISTER)
             case MB_FC_READ_INPUT_REGISTER:
+#endif      /* MODBUS_RTU_USE_READ_INPUT_REGISTER */
+#if defined(MODBUS_RTU_USE_READ_REGISTERS) || \
+            defined(MODBUS_RTU_USE_READ_INPUT_REGISTER)
                 /* id + func + size + data + crc16 */
                 size = 3 + modbus->buffer[2] + 2;
                 if (wait_bytes(modbus, size)) {
@@ -303,10 +339,23 @@ static inline int get_response(modbus_rtu_t *modbus)
                                          modbus->msg->count);
                 mutex_unlock(&(modbus->mutex_buffer));
                 break;
+#endif      /* MODBUS_RTU_USE_READ_REGISTERS || MODBUS_RTU_USE_READ_INPUT_REGISTER */
+#if defined(MODBUS_RTU_USE_WRITE_COIL)
             case MB_FC_WRITE_COIL:
+#endif      /* MODBUS_RTU_USE_WRITE_COIL */
+#if defined(MODBUS_RTU_USE_WRITE_REGISTER)
             case MB_FC_WRITE_REGISTER:
+#endif      /* MODBUS_RTU_USE_WRITE_REGISTER */
+#if defined(MODBUS_RTU_USE_WRITE_COILS)
             case MB_FC_WRITE_COILS:
+#endif      /* MODBUS_RTU_USE_WRITE_COILS */
+#if defined(MODBUS_RTU_USE_WRITE_REGISTERS)
             case MB_FC_WRITE_REGISTERS:
+#endif      /* MODBUS_RTU_USE_WRITE_REGISTERS */
+#if defined(MODBUS_RTU_USE_WRITE_COIL) || \
+            defined(MODBUS_RTU_USE_WRITE_REGISTER) || \
+            defined(MODBUS_RTU_USE_WRITE_COILS) || \
+            defined(MODBUS_RTU_USE_WRITE_REGISTERS)
                 if (wait_bytes(modbus, MIN_SIZE_REQUEST)) {
                     return MB_ER_TIMEOUT;
                 }
@@ -317,6 +366,7 @@ static inline int get_response(modbus_rtu_t *modbus)
                 }
                 mutex_unlock(&(modbus->mutex_buffer));
                 break;
+#endif      /* MODBUS_RTU_USE_WRITE_COIL ||  MODBUS_RTU_USE_WRITE_REGISTER || MODBUS_RTU_USE_WRITE_COILS || MODBUS_RTU_USE_WRITE_REGISTERS */
             default:
                 return MB_ER_ILLEGAL_FUNCTION;
                 break;
@@ -349,12 +399,25 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
             goto exit;
         }
         modbus->msg->func = modbus->buffer[FUNC];
-        uint8_t size;
+        uint8_t size __attribute__((unused));
         switch (modbus->buffer[FUNC]) {
+
+#if defined(MODBUS_RTU_USE_READ_COILS)
             case MB_FC_READ_COILS:
+#endif      /* MODBUS_RTU_USE_READ_COILS */
+#if defined(MODBUS_RTU_USE_READ_DISCRETE_INPUT)
             case MB_FC_READ_DISCRETE_INPUT:
+#endif      /* MODBUS_RTU_USE_READ_DISCRETE_INPUT */
+#if defined(MODBUS_RTU_USE_READ_REGISTERS)
             case MB_FC_READ_REGISTERS:
+#endif      /* MODBUS_RTU_USE_READ_REGISTERS */
+#if defined(MODBUS_RTU_USE_READ_INPUT_REGISTER)
             case MB_FC_READ_INPUT_REGISTER:
+#endif      /* MODBUS_RTU_USE_READ_INPUT_REGISTER */
+#if defined(MODBUS_RTU_USE_READ_COILS) || \
+            defined(MODBUS_RTU_USE_READ_DISCRETE_INPUT) || \
+            defined(MODBUS_RTU_USE_READ_REGISTERS) || \
+            defined(MODBUS_RTU_USE_READ_INPUT_REGISTER)
                 mutex_lock(&(modbus->mutex_buffer));
                 if (checkCRC(modbus->buffer, 8)) {
                     mutex_unlock(&(modbus->mutex_buffer));
@@ -365,6 +428,8 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
                 read_count(modbus);
                 mutex_unlock(&(modbus->mutex_buffer));
                 break;
+#endif      /* MODBUS_RTU_USE_READ_COILS || MODBUS_RTU_USE_READ_DISCRETE_INPUT || MODBUS_RTU_USE_READ_REGISTERS || MODBUS_RTU_USE_READ_INPUT_REGISTER */
+#if defined(MODBUS_RTU_USE_WRITE_COIL)
             case MB_FC_WRITE_COIL:
                 mutex_lock(&(modbus->mutex_buffer));
                 if (checkCRC(modbus->buffer, 8)) {
@@ -383,6 +448,8 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
                                      modbus->buffer + 4, 0, 1);
                 mutex_unlock(&(modbus->mutex_buffer));
                 break;
+#endif      /* MODBUS_RTU_USE_WRITE_COIL */
+#if defined(MODBUS_RTU_USE_WRITE_REGISTER)
             case MB_FC_WRITE_REGISTER:
                 mutex_lock(&(modbus->mutex_buffer));
                 if (checkCRC(modbus->buffer, 8)) {
@@ -400,6 +467,8 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
                                          modbus->buffer + 4, 1);
                 mutex_unlock(&(modbus->mutex_buffer));
                 break;
+#endif      /* MODBUS_RTU_USE_WRITE_REGISTER */
+#if defined(MODBUS_RTU_USE_WRITE_COILS)
             case MB_FC_WRITE_COILS:
                 /* (id + func + addr + count + size) + data + crc */
                 size = 7 + modbus->buffer[BYTE_CNT] + 2;
@@ -426,6 +495,8 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
                                      modbus->buffer + 7, 0, modbus->msg->count);
                 mutex_unlock(&(modbus->mutex_buffer));
                 break;
+#endif      /* MODBUS_RTU_USE_WRITE_COILS */
+#if defined(MODBUS_RTU_USE_WRITE_REGISTERS)
             case MB_FC_WRITE_REGISTERS:
                 /* (id + func + addr + count + size) + data + crc */
                 size = 7 + modbus->buffer[BYTE_CNT] + 2;
@@ -457,6 +528,7 @@ int modbus_rtu_poll(modbus_rtu_t *modbus, modbus_rtu_message_t *message)
                                          modbus->msg->count);
                 mutex_unlock(&(modbus->mutex_buffer));
                 break;
+#endif      /* MODBUS_RTU_USE_WRITE_REGISTERS */
             default:
                 err = MB_ER_ILLEGAL_FUNCTION;
                 goto exit;
@@ -474,16 +546,22 @@ exit:
 int modbus_rtu_send_response(modbus_rtu_t *modbus,
                              modbus_rtu_message_t *message)
 {
-    uint8_t size;
-    div_t d;
+    uint8_t size __attribute__((unused));
+    div_t d __attribute__((unused));
 
     modbus->msg = message;
     mutex_lock(&(modbus->mutex_buffer));
     modbus->buffer[ID] = modbus->msg->id;
     modbus->buffer[FUNC] = modbus->msg->func;
     switch (modbus->msg->func) {
+#if defined(MODBUS_RTU_USE_READ_COILS)
         case MB_FC_READ_COILS:
+#endif  /* MODBUS_RTU_USE_READ_COILS */
+#if defined(MODBUS_RTU_USE_READ_DISCRETE_INPUT)
         case MB_FC_READ_DISCRETE_INPUT:
+#endif  /* MODBUS_RTU_USE_READ_DISCRETE_INPUT */
+#if defined(MODBUS_RTU_USE_READ_COILS) || \
+        defined(MODBUS_RTU_USE_READ_DISCRETE_INPUT)
             d = div(modbus->msg->count, 8);
             size = d.quot;
             if (d.rem) {
@@ -500,18 +578,39 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus,
                                  (uint8_t *)modbus->msg->data,
                                  modbus->msg->addr, modbus->msg->count);
             break;
+#endif  /* MODBUS_RTU_USE_READ_COILS || MODBUS_RTU_USE_READ_DISCRETE_INPUT */
+
+#if defined(MODBUS_RTU_USE_WRITE_COIL)
         case MB_FC_WRITE_COIL:
+#endif  /* MODBUS_RTU_USE_WRITE_COIL */
+#if defined(MODBUS_RTU_USE_WRITE_REGISTER)
         case MB_FC_WRITE_REGISTER:
+#endif  /* MODBUS_RTU_USE_WRITE_REGISTER */
+#if defined(MODBUS_RTU_USE_WRITE_COILS)
         case MB_FC_WRITE_COILS:
+#endif  /* MODBUS_RTU_USE_WRITE_COILS */
+#if defined(MODBUS_RTU_USE_WRITE_REGISTERS)
         case MB_FC_WRITE_REGISTERS:
+#endif  /* MODBUS_RTU_USE_WRITE_REGISTERS */
+#if defined(MODBUS_RTU_USE_WRITE_COIL) || \
+        defined(MODBUS_RTU_USE_WRITE_REGISTER) || \
+        defined(MODBUS_RTU_USE_WRITE_COILS) || \
+        defined(MODBUS_RTU_USE_WRITE_REGISTERS)
             /* don't change any data in buffer, send this back as is
              * size_buffer change for calculate CRC
              * todo: calculate CRC for MB_FC_WRITE_COIL no need, need reduce this
              * id + func + addr + val */
             modbus->size_buffer = 6;
             break;
+#endif  /* MODBUS_RTU_USE_WRITE_COIL || MODBUS_RTU_USE_WRITE_REGISTER || MODBUS_RTU_USE_WRITE_COILS || MODBUS_RTU_USE_WRITE_REGISTERS*/
+#if defined(MODBUS_RTU_USE_READ_REGISTERS)
         case MB_FC_READ_REGISTERS:
+#endif  /* MODBUS_RTU_USE_READ_REGISTERS */
+#if defined(MODBUS_RTU_USE_READ_INPUT_REGISTER)
         case MB_FC_READ_INPUT_REGISTER:
+#endif  /* MODBUS_RTU_USE_READ_INPUT_REGISTER */
+#if defined(MODBUS_RTU_USE_READ_REGISTERS) || \
+        defined(MODBUS_RTU_USE_READ_INPUT_REGISTER)
             size = modbus->msg->count * 2;
             if (size > modbus->msg->data_size) {
                 mutex_unlock(&(modbus->mutex_buffer));
@@ -523,6 +622,7 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus,
                                      modbus->msg->data + modbus->msg->addr,
                                      modbus->msg->count);
             break;
+#endif  /* MODBUS_RTU_USE_READ_REGISTERS || MODBUS_RTU_USE_READ_INPUT_REGISTER */
         default:
             mutex_unlock(&(modbus->mutex_buffer));
             return MB_ER_ILLEGAL_FUNCTION;

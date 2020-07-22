@@ -23,7 +23,7 @@ static char stack_master[600];
 static kernel_pid_t pid_master;
 static modbus_rtu_t master;
 static uint16_t regs_master1[16];
-static uint16_t regs_master2[16];
+static uint16_t regs_master2[16] __attribute__((unused));
 static modbus_rtu_message_t message_master = {
     .id = SLAVE_ID,
     .addr = 0,
@@ -73,6 +73,7 @@ static void *thread_master(void *arg __attribute__((unused)))
             regs_master1[i] = rand();
         }
 
+#if defined(MODBUS_RTU_USE_WRITE_REGISTERS)
         DEBUG("try MB_FC_WRITE_REGISTERS\n");
         message_master.data = regs_master1;
         message_master.func = MB_FC_WRITE_REGISTERS;
@@ -81,6 +82,7 @@ static void *thread_master(void *arg __attribute__((unused)))
             DEBUG("fail MB_FC_WRITE_REGISTERS %d\n", res);
         }
         else {
+#if defined(MODBUS_RTU_USE_READ_REGISTERS)
             xtimer_usleep(master.rx_timeout * 3);
             DEBUG("try MB_FC_READ_REGISTERS\n");
             message_master.data = regs_master2;
@@ -92,15 +94,18 @@ static void *thread_master(void *arg __attribute__((unused)))
                 DEBUG("fail MB_FC_READ_REGISTERS %d\n", res);
             }
             else {}
+#endif      /* MODBUS_RTU_USE_READ_REGISTERS */
         }
+#endif      /* MODBUS_RTU_USE_WRITE_REGISTERS */
 
+#if defined(MODBUS_RTU_USE_READ_DISCRETE_INPUT)
         DEBUG("try MB_FC_READ_DISCRETE_INPUT\n");
         message_master.data = regs_master1;
         message_master.func = MB_FC_READ_DISCRETE_INPUT;
         res = modbus_rtu_send_request(&master, &message_master);
         #ifdef USE_SLAVE
         if (res ||
-            memcmp(regs_master1, regs_slave, sizeof(regs_master1)) != 0) {
+            memcmp(regs_master1, regs_slave, message_master.count / 8) != 0) {
             DEBUG("fail MB_FC_READ_DISCRETE_INPUT %d\n", res);
         }
         #else /* USE_SLAVE */
@@ -109,7 +114,9 @@ static void *thread_master(void *arg __attribute__((unused)))
         }
         #endif /* USE_SLAVE */
         else {}
+#endif      /* MODBUS_RTU_USE_READ_DISCRETE_INPUT */
 
+#if defined(MODBUS_RTU_USE_READ_INPUT_REGISTER)
         DEBUG("try MB_FC_READ_INPUT_REGISTER\n");
         message_master.data = regs_master1;
         message_master.func = MB_FC_READ_INPUT_REGISTER;
@@ -124,7 +131,9 @@ static void *thread_master(void *arg __attribute__((unused)))
         }
         #endif /* USE_SLAVE */
         else {}
+#endif      /* MODBUS_RTU_USE_READ_INPUT_REGISTER */
 
+#if defined(MODBUS_RTU_USE_WRITE_COILS)
         DEBUG("try MB_FC_WRITE_COILS\n");
         message_master.data = regs_master1;
         message_master.func = MB_FC_WRITE_COILS;
@@ -133,6 +142,7 @@ static void *thread_master(void *arg __attribute__((unused)))
             DEBUG("fail MB_FC_WRITE_COILS %d\n", res);
         }
         else {
+#if defined(MODBUS_RTU_USE_READ_COILS)
             xtimer_usleep(master.rx_timeout * 3);
             DEBUG("try MB_FC_READ_COILS\n");
             message_master.data = regs_master2;
@@ -145,8 +155,11 @@ static void *thread_master(void *arg __attribute__((unused)))
                 DEBUG("fail MB_FC_READ_COILS %d\n", res);
             }
             else {}
+#endif      /* MODBUS_RTU_USE_READ_COILS */
         }
+#endif      /* MODBUS_RTU_USE_WRITE_COILS */
 
+#if defined(MODBUS_RTU_USE_WRITE_COIL)
         DEBUG("try MB_FC_WRITE_COIL\n");
         message_master.data = regs_master1;
         regs_master1[0] = 1;
@@ -156,6 +169,7 @@ static void *thread_master(void *arg __attribute__((unused)))
             DEBUG("fail MB_FC_WRITE_COIL %d\n", res);
         }
         else {
+#if defined(MODBUS_RTU_USE_READ_COILS)
             xtimer_usleep(master.rx_timeout * 3);
             DEBUG("try MB_FC_READ_COILS\n");
             message_master.data = regs_master2;
@@ -165,8 +179,11 @@ static void *thread_master(void *arg __attribute__((unused)))
                 DEBUG("fail MB_FC_READ_COILS_2 %d\n", res);
             }
             else {}
+#endif      /* MODBUS_RTU_USE_READ_COILS */
         }
+#endif      /* MODBUS_RTU_USE_WRITE_COIL */
 
+#if defined(MODBUS_RTU_USE_WRITE_REGISTER)
         DEBUG("try MB_FC_WRITE_REGISTER\n");
         message_master.data = regs_master1;
         message_master.func = MB_FC_WRITE_REGISTER;
@@ -175,6 +192,7 @@ static void *thread_master(void *arg __attribute__((unused)))
             DEBUG("fail MB_FC_WRITE_REGISTER %d\n", res);
         }
         else {
+#if defined(MODBUS_RTU_USE_READ_REGISTERS)
             xtimer_usleep(master.rx_timeout * 3);
             DEBUG("try MB_FC_READ_INPUT_REGISTER\n");
             message_master.data = regs_master2;
@@ -184,7 +202,9 @@ static void *thread_master(void *arg __attribute__((unused)))
                 DEBUG("fail MB_FC_READ_REGISTERS_2 %d\n", res);
             }
             else {}
+#endif      /* MODBUS_RTU_USE_READ_REGISTERS */
         }
+#endif      /* MODBUS_RTU_USE_WRITE_REGISTER */
     }
     return NULL;
 }
