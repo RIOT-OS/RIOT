@@ -123,7 +123,14 @@ int main(void)
         printf("Posted event %d to %d threads\n", id, woken);
     }
 
-    puts("SUCCESS");
+    /* make sure all threads have terminated */
+    if (thread_getstatus(p1) != STATUS_NOT_FOUND ||
+        thread_getstatus(p2) != STATUS_NOT_FOUND ||
+        thread_getstatus(p3) != STATUS_NOT_FOUND ) {
+        puts("FAILED");
+        return 1;
+    }
 
+    puts("SUCCESS");
     return 0;
 }
