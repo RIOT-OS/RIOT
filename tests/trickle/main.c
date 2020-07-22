@@ -31,6 +31,9 @@
 #define FIRST_ROUND     (5)
 #define SECOND_ROUND    (12)
 
+#define MAIN_QUEUE_SIZE     (2)
+static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
+
 static uint32_t old_t = 0;
 static bool error = false;
 
@@ -62,6 +65,8 @@ int main(void)
 {
     msg_t msg;
     unsigned counter = 0;
+
+    msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
     trickle_start(sched_active_pid, &trickle, TRICKLE_MSG, TR_IMIN,
                   TR_IDOUBLINGS, TR_REDCONST);
