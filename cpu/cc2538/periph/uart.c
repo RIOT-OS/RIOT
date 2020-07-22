@@ -199,6 +199,9 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         while (u->cc2538_uart_fr.FRbits.TXFF) {}
         u->DR = data[i];
     }
+
+    /* Wait for the TX FIFO to clear */
+    while (!uart_config[uart].dev->cc2538_uart_fr.FRbits.TXFE) {}
 }
 
 void uart_poweron(uart_t uart)
