@@ -412,45 +412,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Reduce payload length by this value for a request
- *
- * Accommodates writing Content-Format option in gcoap_finish(). May set to
- * zero if function not used.
- *
- * @deprecated  Will not be available after the 2020.07 release. Used only by
- * gcoap_finish(), which also is deprecated.
- */
-#ifndef CONFIG_GCOAP_REQ_OPTIONS_BUF
-#define CONFIG_GCOAP_REQ_OPTIONS_BUF   (4)
-#endif
-
-/**
- * @brief   Reduce payload length by this value for a response
- *
- * Accommodates writing Content-Format option in gcoap_finish(). May set to
- * zero if function not used.
- *
- * @deprecated  Will not be available after the 2020.07 release. Used only by
- * gcoap_finish(), which also is deprecated.
- */
-#ifndef CONFIG_GCOAP_RESP_OPTIONS_BUF
-#define CONFIG_GCOAP_RESP_OPTIONS_BUF  (4)
-#endif
-
-/**
- * @brief   Reduce payload length by this value for an observe notification
- *
- * Accommodates writing Content-Format option in gcoap_finish(). May set to
- * zero if function not used.
- *
- * @deprecated  Will not be available after the 2020.07 release. Used only by
- * gcoap_finish(), which also is deprecated.
- */
-#ifndef CONFIG_GCOAP_OBS_OPTIONS_BUF
-#define CONFIG_GCOAP_OBS_OPTIONS_BUF   (4)
-#endif
-
-/**
  * @brief   Maximum number of requests awaiting a response
  */
 #ifndef CONFIG_GCOAP_REQ_WAITING_MAX
@@ -751,31 +712,6 @@ void gcoap_register_listener(gcoap_listener_t *listener);
  */
 int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                    unsigned code, const char *path);
-
-/**
- * @brief   Finishes formatting a CoAP PDU after the payload has been written
- *
- * Assumes the PDU has been initialized with a gcoap_xxx_init() function, like
- * gcoap_req_init().
- *
- * @deprecated  Will not be available after the 2020.07 release. Use
- * coap_opt_finish() instead.
- *
- * @warning To use this function, you only may have added an Option with
- * option number less than COAP_OPT_CONTENT_FORMAT. Otherwise, use the
- * struct-based API described with @link net_nanocoap nanocoap. @endlink With
- * this API, you specify the format with coap_opt_add_uint(), prepare for the
- * payload with coap_opt_finish(), and then write the payload.
- *
- * @param[in,out] pdu       Request metadata
- * @param[in] payload_len   Length of the payload, or 0 if none
- * @param[in] format        Format code for the payload; use COAP_FORMAT_NONE if
- *                          not specified
- *
- * @return  size of the PDU
- * @return  < 0 on error
- */
-ssize_t gcoap_finish(coap_pkt_t *pdu, size_t payload_len, unsigned format);
 
 /**
  * @brief   Writes a complete CoAP request PDU when there is not a payload
