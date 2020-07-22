@@ -146,7 +146,7 @@ msg_bus_entry_t *msg_bus_get_entry(msg_bus_t *bus);
 static inline void msg_bus_subscribe(msg_bus_entry_t *entry, uint8_t type)
 {
     assert(type < 32);
-    entry->event_mask |= (1 << type);
+    entry->event_mask |= (1UL << type);
 }
 
 /**
@@ -160,7 +160,7 @@ static inline void msg_bus_subscribe(msg_bus_entry_t *entry, uint8_t type)
 static inline void msg_bus_unsubscribe(msg_bus_entry_t *entry, uint8_t type)
 {
     assert(type < 32);
-    entry->event_mask &= ~(1 << type);
+    entry->event_mask &= ~(1UL << type);
 }
 
 /**
