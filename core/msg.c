@@ -239,7 +239,7 @@ int msg_send_int(msg_t *m, kernel_pid_t target_pid)
 int msg_send_bus(msg_t *m, msg_bus_t *bus)
 {
     const bool in_irq = irq_is_in();
-    const uint32_t event_mask = (1 << (m->type & 0x1F));
+    const uint32_t event_mask = (1UL << (m->type & 0x1F));
     int count = 0;
 
     m->sender_pid = in_irq ? KERNEL_PID_ISR : sched_active_pid;
