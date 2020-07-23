@@ -1,10 +1,11 @@
 FEATURES_PROVIDED += arch_32bit
 FEATURES_PROVIDED += arch_arm
-FEATURES_PROVIDED += cpu_core_cortexm
-FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += cortexm_svc
 FEATURES_PROVIDED += cpp
 FEATURES_PROVIDED += cpu_check_address
+FEATURES_PROVIDED += cpu_core_cortexm
+FEATURES_PROVIDED += libstdcpp
+FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += ssp
 
 # cortex-m4f and cortex-m7 provide FPU support

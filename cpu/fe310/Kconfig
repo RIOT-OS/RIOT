@@ -24,6 +24,7 @@ config CPU_FAM_FE310
     select HAS_PERIPH_PM
     select HAS_PERIPH_WDT
     select HAS_CPP
+    select HAS_LIBSTDCPP
     select HAS_SSP
 
 config CPU_MODEL_FE310_G000

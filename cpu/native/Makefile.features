@@ -1,6 +1,15 @@
+ifeq (FreeBSD,$(OS))
+  DISABLE_LIBSTDCPP ?= 1
+endif
+
 FEATURES_PROVIDED += arch_32bit
 FEATURES_PROVIDED += arch_native
 FEATURES_PROVIDED += cpp
+ifneq ($(DISABLE_LIBSTDCPP),1)
+  # libstdc++ on FreeBSD is broken (does not work with -m32)
+  # Override with "export DISABLE_LIBSTDCPP=0"
+  FEATURES_PROVIDED += libstdcpp
+endif
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_eeprom
 FEATURES_PROVIDED += periph_hwrng
