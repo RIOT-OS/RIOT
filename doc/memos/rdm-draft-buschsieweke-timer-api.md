@@ -150,6 +150,7 @@ future changes.
 - Software Timers
     - Upper bound for number of timers only given by available resources
     - APIs to set and abort timers
+        - Functions for setting timers with both absolute time and relative time
     - Support for periodic timers (support via explicit calls to some
       `timer_reset()` like in Contiki is fine)
     - Long term low resolution software timers that play well with power management
@@ -178,6 +179,8 @@ future changes.
     - Timeout utilities
         - Timeout for receiving a message
         - Timeout for locking a mutex
+    - System time utilities
+        - Functions to convert between different time formats, e.g. UNIX and GPS timestamps
 
 ## Real-Time Requirements
 
