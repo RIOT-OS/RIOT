@@ -78,7 +78,7 @@ enum {
     MB_ER_ACKNOWLEDGE,
     MB_ER_SERVER_BUSY,
     MB_ER_MEMORY_PARITY_ERROR,
-    // non standart
+    /* non standart */
     MB_ER_TIMEOUT   = 250,
     MB_ER_CRC       = 251,
     MB_ER_INVAL_ID  = 252

@@ -16,20 +16,21 @@
 
 #define SLAVE_ID 1
 #define BAUDRATE 115200
+#define COUNT_REGISTER (16)
 
 #ifdef USE_MASTER
 #define MASTER_UART 0
 static char stack_master[600];
 static kernel_pid_t pid_master;
 static modbus_rtu_t master;
-static uint16_t regs_master1[16];
-static uint16_t regs_master2[16] __attribute__((unused));
+static uint16_t regs_master1[COUNT_REGISTER];
+static uint16_t regs_master2[COUNT_REGISTER] __attribute__((unused));
 static modbus_rtu_message_t message_master = {
     .id = SLAVE_ID,
     .addr = 0,
     .data = regs_master1,
     .data_size = sizeof(regs_master1),
-    .count = 16
+    .count = COUNT_REGISTER
 };
 #endif /* USE_MASTER */
 
@@ -38,7 +39,7 @@ static modbus_rtu_message_t message_master = {
 static char stack_slave[550];
 static kernel_pid_t pid_slave;
 static modbus_rtu_t slave;
-static uint16_t regs_slave[16];
+static uint16_t regs_slave[COUNT_REGISTER];
 static modbus_rtu_message_t message_slave = {
     .data = regs_slave,
     .data_size = sizeof(regs_slave)
@@ -65,12 +66,16 @@ static void *thread_master(void *arg __attribute__((unused)))
     int res __attribute__((unused));
 
     init_master();
-    /* return NULL; */
     while (1) {
         xtimer_usleep(master.rx_timeout * 3);
         srand(xtimer_now_usec());
         for (uint8_t i = 0; i < message_master.count; i++) {
             regs_master1[i] = rand();
+        }
+        message_master.addr = rand() % COUNT_REGISTER;
+        message_master.count = rand() % (COUNT_REGISTER - message_master.addr);
+        if (message_master.count == 0) {
+            message_master.count = 1;
         }
 
 #if defined(MODBUS_RTU_USE_WRITE_REGISTERS)
@@ -81,6 +86,14 @@ static void *thread_master(void *arg __attribute__((unused)))
         if (res) {
             DEBUG("fail MB_FC_WRITE_REGISTERS %d\n", res);
         }
+        #ifdef USE_SLAVE
+        if (res ||
+            memcmp(message_master.data + message_master.addr,
+                   message_slave.data + message_slave.addr,
+                   message_master.count * 2) != 0) {
+            DEBUG("fail MB_FC_WRITE_REGISTERS slave %d\n", res);
+        }
+        #endif /* USE_SLAVE */
         else {
 #if defined(MODBUS_RTU_USE_READ_REGISTERS)
             xtimer_usleep(master.rx_timeout * 3);
@@ -89,11 +102,11 @@ static void *thread_master(void *arg __attribute__((unused)))
             message_master.func = MB_FC_READ_REGISTERS;
             res = modbus_rtu_send_request(&master, &message_master);
             if (res ||
-                memcmp(regs_master1, regs_master2,
+                memcmp(regs_master1 + message_master.addr,
+                       regs_master2 + message_master.addr,
                        message_master.count * 2) != 0) {
                 DEBUG("fail MB_FC_READ_REGISTERS %d\n", res);
             }
-            else {}
 #endif      /* MODBUS_RTU_USE_READ_REGISTERS */
         }
 #endif      /* MODBUS_RTU_USE_WRITE_REGISTERS */
@@ -105,7 +118,8 @@ static void *thread_master(void *arg __attribute__((unused)))
         res = modbus_rtu_send_request(&master, &message_master);
         #ifdef USE_SLAVE
         if (res ||
-            memcmp(regs_master1, regs_slave, message_master.count / 8) != 0) {
+            message_master.count != message_slave.count ||
+            message_master.addr != message_slave.addr) {
             DEBUG("fail MB_FC_READ_DISCRETE_INPUT %d\n", res);
         }
         #else /* USE_SLAVE */
@@ -113,7 +127,6 @@ static void *thread_master(void *arg __attribute__((unused)))
             DEBUG("fail MB_FC_READ_DISCRETE_INPUT %d\n", res);
         }
         #endif /* USE_SLAVE */
-        else {}
 #endif      /* MODBUS_RTU_USE_READ_DISCRETE_INPUT */
 
 #if defined(MODBUS_RTU_USE_READ_INPUT_REGISTER)
@@ -122,7 +135,9 @@ static void *thread_master(void *arg __attribute__((unused)))
         message_master.func = MB_FC_READ_INPUT_REGISTER;
         res = modbus_rtu_send_request(&master, &message_master);
         #ifdef USE_SLAVE
-        if (res || message_master.data[0] != regs_slave[0]) {
+        if (res || message_master.addr != message_slave.addr ||
+            message_master.data[message_master.addr] !=
+            message_slave.data[message_slave.addr]) {
             DEBUG("fail MB_FC_READ_INPUT_REGISTER %d\n", res);
         }
         #else /* USE_SLAVE */
@@ -130,7 +145,6 @@ static void *thread_master(void *arg __attribute__((unused)))
             DEBUG("fail MB_FC_READ_INPUT_REGISTER %d\n", res);
         }
         #endif /* USE_SLAVE */
-        else {}
 #endif      /* MODBUS_RTU_USE_READ_INPUT_REGISTER */
 
 #if defined(MODBUS_RTU_USE_WRITE_COILS)
@@ -148,13 +162,16 @@ static void *thread_master(void *arg __attribute__((unused)))
             message_master.data = regs_master2;
             message_master.func = MB_FC_READ_COILS;
             res = modbus_rtu_send_request(&master, &message_master);
-            if (res ||
-                memcmp(regs_master1, regs_master2,
-                       message_master.count / 8) != 0) {
-                DEBUG("out: %x in: %x\n", regs_master1[0], regs_master2[0]);
+            #ifdef USE_SLAVE
+            if (res || message_slave.addr != message_master.addr ||
+                message_slave.count != message_master.count) {
                 DEBUG("fail MB_FC_READ_COILS %d\n", res);
             }
-            else {}
+            #else
+            if (res) {
+                DEBUG("fail MB_FC_READ_COILS %d\n", res);
+            }
+            #endif /* USE_SLAVE */
 #endif      /* MODBUS_RTU_USE_READ_COILS */
         }
 #endif      /* MODBUS_RTU_USE_WRITE_COILS */
@@ -175,10 +192,9 @@ static void *thread_master(void *arg __attribute__((unused)))
             message_master.data = regs_master2;
             message_master.func = MB_FC_READ_COILS;
             res = modbus_rtu_send_request(&master, &message_master);
-            if (res || (!!regs_master1[0]) != (!!regs_master2[0] & 1)) {
+            if (res) {
                 DEBUG("fail MB_FC_READ_COILS_2 %d\n", res);
             }
-            else {}
 #endif      /* MODBUS_RTU_USE_READ_COILS */
         }
 #endif      /* MODBUS_RTU_USE_WRITE_COIL */
@@ -194,14 +210,21 @@ static void *thread_master(void *arg __attribute__((unused)))
         else {
 #if defined(MODBUS_RTU_USE_READ_REGISTERS)
             xtimer_usleep(master.rx_timeout * 3);
-            DEBUG("try MB_FC_READ_INPUT_REGISTER\n");
+            DEBUG("try MB_FC_READ_REGISTERS\n");
             message_master.data = regs_master2;
             message_master.func = MB_FC_READ_REGISTERS;
             res = modbus_rtu_send_request(&master, &message_master);
-            if (res || regs_master1[0] != regs_master2[0]) {
+            #ifdef USE_SLAVE
+            if (res || message_master.addr != message_slave.addr ||
+                message_master.data[message_master.addr] !=
+                message_slave.data[message_slave.addr]) {
                 DEBUG("fail MB_FC_READ_REGISTERS_2 %d\n", res);
             }
-            else {}
+            #else
+            if (res) {
+                DEBUG("fail MB_FC_READ_REGISTERS_2 %d\n", res);
+            }
+            #endif /* USE_SLAVE */
 #endif      /* MODBUS_RTU_USE_READ_REGISTERS */
         }
 #endif      /* MODBUS_RTU_USE_WRITE_REGISTER */
@@ -246,7 +269,6 @@ static void *thread_slave(void *arg __attribute__((unused)))
             if (res) {
                 DEBUG("fail response %d\n", res);
             }
-            else {}
         }
     }
 
