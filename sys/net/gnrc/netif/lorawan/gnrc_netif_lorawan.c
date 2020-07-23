@@ -77,6 +77,14 @@ void gnrc_lorawan_mlme_confirm(gnrc_lorawan_t *mac, mlme_confirm_t *confirm)
         lw_netif->demod_margin = confirm->link_req.margin;
         lw_netif->num_gateways = confirm->link_req.num_gateways;
     }
+    else if (confirm->type == MLME_SYNC) {
+        if (confirm->status == 0) {
+            puts("LA RAJA");
+        }
+        else {
+            puts("COMO LAS WEAS");
+        }
+    }
 }
 
 void gnrc_lorawan_set_timer(gnrc_lorawan_t *mac, uint32_t us)
@@ -153,8 +161,20 @@ release:
 
 void gnrc_lorawan_mlme_indication(gnrc_lorawan_t *mac, mlme_indication_t *ind)
 {
-    (void)mac;
-    (void)ind;
+    (void) mac;
+    switch(ind->type) {
+        case MLME_BEACON_NOTIFY:
+            puts("RX_BEACON!");
+            for (unsigned i=0;i<ind->beacon.len;i++) {
+                printf("%02x ", ind->beacon.psdu[i]);
+            }
+            puts("");
+            printf("RSSI: %i\n", ind->beacon.info->rssi);
+            printf("SNR: %i\n", ind->beacon.info->snr);
+            break;
+        default:
+            break;
+    }
 }
 
 void gnrc_lorawan_mcps_confirm(gnrc_lorawan_t *mac, mcps_confirm_t *confirm)
@@ -190,7 +210,7 @@ static void _rx_done(gnrc_lorawan_t *mac)
         return;
     }
 
-    gnrc_lorawan_radio_rx_done_cb(mac, pkt->data, pkt->size);
+    gnrc_lorawan_radio_rx_done_cb(mac, pkt->data, pkt->size, (lora_rx_info_t*) &rx_info);
     gnrc_pktbuf_release(pkt);
 }
 
@@ -368,6 +388,12 @@ static void _msg_handler(gnrc_netif_t *netif, msg_t *msg)
     }
 }
 
+uint32_t gnrc_lorawan_timer_now(gnrc_lorawan_t *mac)
+{
+    (void) mac;
+    return ztimer_now(ZTIMER_MSEC); 
+}
+
 static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
     int res = 0;
@@ -380,6 +406,9 @@ static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
         case NETOPT_OTAA:
             assert(opt->data_len >= sizeof(netopt_enable_t));
             *((netopt_enable_t *)opt->data) = netif->lorawan.otaa;
+            break;
+        case NETOPT_LORAWAN_DEVICE_CLASS:
+            *((netopt_enable_t*) opt->data) = true;
             break;
         case NETOPT_LINK:
             mlme_request.type = MLME_GET;
@@ -472,6 +501,11 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
         case NETOPT_LORAWAN_NWKSKEY:
             assert(opt->data_len >= LORAMAC_NWKSKEY_LEN);
             memcpy(netif->lorawan.nwkskey, opt->data, LORAMAC_NWKSKEY_LEN);
+            break;
+        case NETOPT_LORAWAN_DEVICE_CLASS:
+            mlme_request.type = MLME_SYNC;
+            mlme_request.enabled = true;
+            gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request, &mlme_confirm);
             break;
         case NETOPT_LINK:
         {

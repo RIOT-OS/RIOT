@@ -249,7 +249,13 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
     lorawan_hdr_set_maj(lw_hdr, MAJOR_LRWAN_R1);
 
     lw_hdr->addr = mac->dev_addr;
+
     lw_hdr->fctrl = 0;
+
+    if (mac->mlme.sync) {
+        /* The pending bit is used to indicate class B frames */
+        lorawan_hdr_set_frame_pending(lw_hdr, true);
+    }
 
     lorawan_hdr_set_ack(lw_hdr, mac->mcps.ack_requested);
 
@@ -302,6 +308,20 @@ static void _end_of_tx(gnrc_lorawan_t *mac, int type, int status)
     mcps_confirm.msdu = mac->mcps.msdu;
     mac->mcps.msdu = NULL;
     gnrc_lorawan_mcps_confirm(mac, &mcps_confirm);
+}
+
+void gnrc_lorawan_class_b_finish(gnrc_lorawan_t *mac)
+{
+    mcps_confirm_t mcps_confirm;
+    mac->mcps.fcnt++;
+    if (mac->mcps.waiting_for_ack == false) {
+        mcps_confirm.status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
+        mcps_confirm.msdu = mac->mcps.msdu;
+        mac->mcps.msdu = NULL;
+        gnrc_lorawan_mcps_confirm(mac, &mcps_confirm);
+    }
+
+    gnrc_lorawan_mac_release(mac);
 }
 
 static void _transmit_pkt(gnrc_lorawan_t *mac)
@@ -381,9 +401,9 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
         goto out;
     }
 
-    if (!gnrc_lorawan_mac_acquire(mac)) {
+    if (!gnrc_lorawan_mac_acquire(mac) || mac->state != LORAWAN_STATE_IDLE) {
         mcps_confirm->status = -EBUSY;
-        return;
+        goto out;
     }
 
     if (mcps_request->data.port < LORAMAC_PORT_MIN ||

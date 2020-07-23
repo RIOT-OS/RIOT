@@ -71,6 +71,17 @@ uint8_t gnrc_lorawan_rx1_get_dr_offset(uint8_t dr_up, uint8_t dr_offset);
  */
 bool gnrc_lorawan_validate_dr(uint8_t dr);
 
+static inline uint32_t gnrc_lorawan_get_beacon_channel(void)
+{
+    return 869525000LU;
+}
+
+static inline uint32_t gnrc_lorawan_get_beacon_dr(void)
+{
+    return 3;
+}
+
+
 #ifdef __cplusplus
 }
 #endif

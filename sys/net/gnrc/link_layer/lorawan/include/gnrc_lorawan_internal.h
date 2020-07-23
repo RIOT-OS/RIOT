@@ -58,6 +58,10 @@ extern "C" {
 #define LORAWAN_STATE_RX_2 (2)                          /**< MAC state machine in RX2 */
 #define LORAWAN_STATE_TX (3)                            /**< MAC state machine in TX */
 #define LORAWAN_STATE_JOIN (4)                          /**< MAC state machine in Join */
+#define LORAWAN_STATE_BEACON_ACQUISITION (5)            /**< MAC state machine in beacon acquisition */
+#define LORAWAN_STATE_BEACON_ACQUIRE (6)            /**< MAC state machine in beacon acquisition */
+
+#define LORAWAN_STATE_PING_SLOT (7)
 
 #define GNRC_LORAWAN_DIR_UPLINK (0U)                    /**< uplink frame direction */
 #define GNRC_LORAWAN_DIR_DOWNLINK (1U)                  /**< downlink frame direction */
@@ -69,11 +73,18 @@ extern "C" {
 #define GNRC_LORAWAN_BACKOFF_BUDGET_3   (8700000LL)     /**< budget of time on air every 24 hours */
 
 #define GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ  (1 << 0) /**< Internal Link Check request flag */
+#define GNRC_LORAWAN_MLME_OPTS_PING_SLOT_CHANNEL_ANS  (1 << 1) /**< Internal Link Check request flag */
 
 #define GNRC_LORAWAN_CID_SIZE (1U)                      /**< size of Command ID in FOps */
 #define GNRC_LORAWAN_CID_LINK_CHECK_ANS (0x02)          /**< Link Check CID */
 
 #define GNRC_LORAWAN_FOPT_LINK_CHECK_ANS_SIZE (3U)      /**< size of Link check answer */
+
+#define GNRC_LORAWAN_CID_PING_SLOT_CHANNEL_REQ (0x11)
+
+#define GNRC_LORAWAN_CID_PING_SLOT_CHANNEL_REQ_SIZE (5)
+
+#define GNRC_LORAWAN_CID_PING_SLOT_CHANNEL_ANS_SIZE (2)
 
 #define GNRC_LORAWAN_JOIN_DELAY_U32_MASK (0x1FFFFF)     /**< mask for detecting overflow in frame counter */
 
@@ -164,9 +175,19 @@ typedef struct {
     int pending_mlme_opts;  /**< holds pending mlme opts */
     uint32_t nid;           /**< current Network ID */
     int32_t backoff_budget; /**< remaining Time On Air budget */
+    uint32_t ps_channel;
+    uint16_t ping_period;   /**< ping slot period */
     uint8_t dev_nonce[2];   /**< Device Nonce */
     uint8_t backoff_state;  /**< state in the backoff state machine */
+    uint8_t ps_chan_ans;
+    uint8_t ps_dr;
+    bool sync;
 } gnrc_lorawan_mlme_t;
+
+typedef struct {
+    uint8_t rssi;
+    int8_t snr;
+} lora_rx_info_t;
 
 /**
  * @brief GNRC LoRaWAN mac descriptor */
@@ -487,6 +508,12 @@ void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr);
  * @param[in] mac pointer to the MAC descriptor
  */
 void gnrc_lorawan_trigger_join(gnrc_lorawan_t *mac);
+
+void gnrc_lorawan_enable_beacon_rx(gnrc_lorawan_t *mac);
+void gnrc_lorawan_beacon_lost(gnrc_lorawan_t *mac);
+void gnrc_lorawan_mlme_process_beacon(gnrc_lorawan_t *mac, uint8_t *psdu, size_t size, lora_rx_info_t *info);
+int gnrc_lorawan_calculate_slot(const void *beacon_time, const void *dev_addr, int ping_period);
+void gnrc_lorawan_class_b_finish(gnrc_lorawan_t *mac);
 
 #ifdef __cplusplus
 }

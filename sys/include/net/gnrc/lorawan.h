@@ -38,9 +38,24 @@ extern "C" {
  * @brief the minimum symbols to detect a LoRa preamble
  */
 #ifndef CONFIG_GNRC_LORAWAN_MIN_SYMBOLS_TIMEOUT
-#define CONFIG_GNRC_LORAWAN_MIN_SYMBOLS_TIMEOUT 30
+#define CONFIG_GNRC_LORAWAN_MIN_SYMBOLS_TIMEOUT 10
 #endif
 /** @} */
+
+/**
+ * @brief power of 2 exponent of the number of ping slots (only for class B)
+ */
+#ifndef CONFIG_GNRC_LORAWAN_PING_NB_EXP
+#define CONFIG_GNRC_LORAWAN_PING_NB_EXP (7U)
+#endif
+
+#ifndef CONFIG_GNRC_LORAWAN_DEFAULT_PING_SLOT_DR
+#define CONFIG_GNRC_LORAWAN_DEFAULT_PING_SLOT_DR (3)
+#endif
+
+#ifndef CONFIG_GNRC_LORAWAN_DEFAULT_PING_SLOT_CHANNEL
+#define CONFIG_GNRC_LORAWAN_DEFAULT_PING_SLOT_CHANNEL (869525000)
+#endif
 
 #define GNRC_LORAWAN_REQ_STATUS_SUCCESS (0)     /**< MLME or MCPS request successful status */
 #define GNRC_LORAWAN_REQ_STATUS_DEFERRED (1)    /**< the MLME or MCPS confirm message is asynchronous */
@@ -80,7 +95,10 @@ typedef enum {
     MLME_RESET,                 /**< reset the MAC layer */
     MLME_SET,                   /**< set the MIB */
     MLME_GET,                   /**< get the MIB */
-    MLME_SCHEDULE_UPLINK        /**< schedule uplink indication */
+    MLME_SCHEDULE_UPLINK,       /**< schedule uplink indication */
+    MLME_SYNC,                  /**< request synchronization to gateway beacons */
+    MLME_BEACON_NOTIFY,         /**< device received a valid beacon */
+    MLME_BEACON_LOSS,           /**< device couldn't synchronize to beacons */
 } mlme_type_t;
 
 /**
@@ -110,6 +128,7 @@ typedef struct {
     union {
         mlme_lorawan_join_t join;   /**< Join Data holder */
         mlme_mib_t mib;             /**< MIB holder */
+        bool enabled;               /**< enabled status holder */
     };
     mlme_type_t type;               /**< type of the MLME request */
 } mlme_request_t;
@@ -155,11 +174,19 @@ typedef struct {
     };
 } mcps_indication_t;
 
+typedef struct {
+    lora_rx_info_t *info;
+    uint8_t *psdu;
+    uint8_t len;
+} mlme_beacon_t;
 /**
  * @brief MAC (sub) Layer Management Entity (MLME) indication representation
  */
 typedef struct {
     mlme_type_t type; /**< type of the MLME indication */
+    union {
+        mlme_beacon_t beacon;
+    };
 } mlme_indication_t;
 
 /**
@@ -241,9 +268,9 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
  *            @ref gnrc_lorawan_radio_rx_error_cb instead if the reception was
  *            not successful.
  * @param[in] size size of the PSDU
+ * @param[in] info packet info
  */
-void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *data,
-                                   size_t size);
+void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *data, size_t size, lora_rx_info_t *info);
 
 /**
  * @brief MCPS indication callback
@@ -319,6 +346,8 @@ void gnrc_lorawan_set_timer(gnrc_lorawan_t *mac, uint32_t us);
  * @param[in] mac pointer to the MAC descriptor
  */
 void gnrc_lorawan_remove_timer(gnrc_lorawan_t *mac);
+
+uint32_t gnrc_lorawan_timer_now(gnrc_lorawan_t *mac);
 
 #ifdef __cplusplus
 }

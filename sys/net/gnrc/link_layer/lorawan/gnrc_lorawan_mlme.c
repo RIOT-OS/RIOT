@@ -28,6 +28,9 @@
 #include "net/lorawan/hdr.h"
 
 #define ENABLE_DEBUG 0
+#define BEACON_TOA_US   (153)
+#define BEACON_RESERVED (2120)
+
 #include "debug.h"
 
 static void _build_join_req_pkt(uint8_t *appeui, uint8_t *deveui,
@@ -257,6 +260,26 @@ void gnrc_lorawan_mlme_request(gnrc_lorawan_t *mac,
                                                                   mlme_request->join.appeui, mlme_request->join.appkey,
                                                                   mlme_request->join.dr);
             break;
+        case MLME_SYNC:
+            if (!gnrc_lorawan_mac_acquire(mac)) {
+                mlme_confirm->status = -EBUSY;
+                break;
+            }
+
+            if(mac->mlme.activation == MLME_ACTIVATION_NONE) {
+                mlme_confirm->status = -EINVAL;
+                break;
+            }
+            if (mlme_request->enabled) {
+                mlme_confirm->status = GNRC_LORAWAN_REQ_STATUS_DEFERRED;
+                gnrc_lorawan_enable_beacon_rx(mac);
+                puts(":)");
+            }
+            else {
+                /* TODO: Disable beacons */
+            }
+            break;
+
         case MLME_LINK_CHECK:
             mac->mlme.pending_mlme_opts |=
                 GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ;
@@ -277,6 +300,82 @@ void gnrc_lorawan_mlme_request(gnrc_lorawan_t *mac,
     }
 }
 
+void gnrc_lorawan_beacon_lost(gnrc_lorawan_t *mac)
+{
+    netdev_t *dev = gnrc_lorawan_get_netdev(mac);
+    mlme_confirm_t mlme_confirm;
+    mlme_confirm.type = MLME_SYNC;
+    mlme_confirm.status = -ENOLINK;
+    mac->state = LORAWAN_STATE_IDLE;
+
+    netopt_state_t state = NETOPT_STATE_SLEEP;
+    dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
+    gnrc_lorawan_mac_release(mac);
+    gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
+}
+
+uint32_t beacon_window_start;
+uint16_t next_slot;
+
+static uint32_t get_slot_timestamp(int slot)
+{
+    return beacon_window_start + slot * 30;
+}
+
+void gnrc_lorawan_schedule_next_pingslot(gnrc_lorawan_t *mac)
+{
+    uint32_t now = gnrc_lorawan_timer_now(mac);
+    /* TODO: Add backoff? */
+    while (get_slot_timestamp(next_slot) < now) {
+        /* TODO: Check */
+        next_slot += mac->mlme.ping_period;
+    }
+
+    if (next_slot < 4096) {
+        gnrc_lorawan_set_timer(mac, (get_slot_timestamp(next_slot) - 1 - gnrc_lorawan_timer_now(mac))*1000);
+        printf("%i\n", next_slot);
+    }
+    else {
+        puts("BEACON");
+        mac->state = LORAWAN_STATE_BEACON_ACQUIRE;
+        gnrc_lorawan_set_timer(mac, 500000);
+        /* TODO: Set timer for beacon! */
+    }
+}
+
+void _config_pingslot_rx_window(gnrc_lorawan_t *mac);
+
+void gnrc_lorawan_mlme_process_beacon(gnrc_lorawan_t *mac, uint8_t *psdu, size_t size, lora_rx_info_t *info)
+{
+    netdev_t *dev = gnrc_lorawan_get_netdev(mac);
+
+    mlme_indication_t mlme_indication;
+    mlme_confirm_t mlme_confirm;
+    mlme_confirm.type = MLME_SYNC;
+    mlme_confirm.status = 0;
+    mac->state = LORAWAN_STATE_IDLE;
+    mac->mlme.sync = true;
+
+    int slot_offset = gnrc_lorawan_calculate_slot(psdu+2, &mac->dev_addr, mac->mlme.ping_period);
+
+    beacon_window_start = gnrc_lorawan_timer_now(mac) + BEACON_RESERVED - BEACON_TOA_US;
+    next_slot = slot_offset;
+
+    _config_pingslot_rx_window(mac);
+    gnrc_lorawan_set_timer(mac, (get_slot_timestamp(next_slot) - 1 - gnrc_lorawan_timer_now(mac))*1000);
+
+    netopt_state_t state = NETOPT_STATE_SLEEP;
+    dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
+
+    gnrc_lorawan_mac_release(mac);
+    gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
+    mlme_indication.type = MLME_BEACON_NOTIFY;
+    mlme_indication.beacon.psdu = psdu;
+    mlme_indication.beacon.len = (uint8_t) size;
+    mlme_indication.beacon.info = info;
+    gnrc_lorawan_mlme_indication(mac, &mlme_indication);
+}
+
 int _fopts_mlme_link_check_req(lorawan_buffer_t *buf)
 {
     if (buf) {
@@ -285,6 +384,17 @@ int _fopts_mlme_link_check_req(lorawan_buffer_t *buf)
     }
 
     return GNRC_LORAWAN_CID_SIZE;
+}
+
+static int _fopts_mlme_ping_slot_ans(gnrc_lorawan_t *mac, lorawan_buffer_t *buf)
+{
+    if (buf) {
+        assert(buf->index + GNRC_LORAWAN_CID_PING_SLOT_CHANNEL_ANS_SIZE <= buf->size);
+        buf->data[buf->index++] = GNRC_LORAWAN_CID_PING_SLOT_CHANNEL_REQ;
+        buf->data[buf->index++] = mac->mlme.ps_chan_ans;
+    }
+    mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ;
+    return GNRC_LORAWAN_CID_PING_SLOT_CHANNEL_ANS_SIZE;
 }
 
 static void _mlme_link_check_ans(gnrc_lorawan_t *mac, uint8_t *p)
@@ -299,6 +409,27 @@ static void _mlme_link_check_ans(gnrc_lorawan_t *mac, uint8_t *p)
     gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
 
     mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ;
+}
+static void _mlme_ping_slot_channel_req(gnrc_lorawan_t *mac, uint8_t *p)
+{
+    uint32_t channel = (p[1] + (p[2] << 8) + ((uint32_t) p[3] << 16)) * 100;
+    uint8_t tmp = 0;
+    for (unsigned i=0; i<GNRC_LORAWAN_MAX_CHANNELS; i++) {
+        if (mac->channel[i] == channel) {
+            tmp = 1;
+        }
+    }
+    if (gnrc_lorawan_validate_dr(p[4])) {
+        tmp |= 1<<1;
+    }
+
+    if ((tmp & 0x3) == 0x3) {
+        mac->mlme.ps_channel = channel ? channel : CONFIG_GNRC_LORAWAN_DEFAULT_PING_SLOT_CHANNEL;
+        mac->mlme.ps_dr = p[4];
+    }
+
+    mac->mlme.ps_chan_ans = tmp;
+    mac->mlme.pending_mlme_opts |= GNRC_LORAWAN_MLME_OPTS_PING_SLOT_CHANNEL_ANS;
 }
 
 void gnrc_lorawan_process_fopts(gnrc_lorawan_t *mac, uint8_t *fopts,
@@ -318,6 +449,10 @@ void gnrc_lorawan_process_fopts(gnrc_lorawan_t *mac, uint8_t *fopts,
                 ret += GNRC_LORAWAN_FOPT_LINK_CHECK_ANS_SIZE;
                 cb = _mlme_link_check_ans;
                 break;
+            case GNRC_LORAWAN_CID_PING_SLOT_CHANNEL_REQ:
+                ret += GNRC_LORAWAN_CID_PING_SLOT_CHANNEL_REQ_SIZE;
+                cb = _mlme_ping_slot_channel_req;
+                break;
             default:
                 return;
         }
@@ -336,6 +471,10 @@ uint8_t gnrc_lorawan_build_options(gnrc_lorawan_t *mac, lorawan_buffer_t *buf)
 
     if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ) {
         size += _fopts_mlme_link_check_req(buf);
+    }
+
+    if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_PING_SLOT_CHANNEL_ANS) {
+        size += _fopts_mlme_ping_slot_ans(mac, buf);
     }
 
     return size;

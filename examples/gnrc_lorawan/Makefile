@@ -14,6 +14,9 @@ USEMODULE += auto_init_gnrc_netif
 
 # Add support for GNRC LoRaWAN
 USEMODULE += gnrc_lorawan
+FEATURES_REQUIRED += periph_rtt
+
+CFLAGS += -DRIOT_EPOCH=1980
 
 # Use GNRC pktdump to print downlink messages
 USEMODULE += gnrc_pktdump
