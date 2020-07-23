@@ -20,4 +20,4 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
   USEMODULE += random
 endif
 
-USEMODULE += native-drivers
+USEMODULE += native_drivers
