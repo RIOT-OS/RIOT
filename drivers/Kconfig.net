@@ -22,6 +22,7 @@ rsource "netdev_ieee802154/Kconfig"
 rsource "pn532/Kconfig"
 rsource "rn2xx3/Kconfig"
 rsource "slipdev/Kconfig"
+source "$(RIOTCPU)/native/netdev_tap/Kconfig"
 source "$(RIOTCPU)/nrf52/radio/nrf802154/Kconfig"
 endmenu # Network Device Drivers
 
