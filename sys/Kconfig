@@ -6,6 +6,7 @@
 #
 menu "System"
 
+rsource "arduino/Kconfig"
 rsource "auto_init/Kconfig"
 rsource "benchmark/Kconfig"
 rsource "div/Kconfig"
