@@ -145,6 +145,13 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* enable interrupts */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
                         AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
+
+    /* enable TX start interrupt for retry counter */
+#ifdef AT86RF2XX_REG__IRQ_MASK1
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,
+                             AT86RF2XX_IRQ_STATUS_MASK1__TX_START);
+#endif
+
     /* clear interrupt flags */
     at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
 
@@ -189,9 +196,13 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, const uint8_t *data,
     return offset + len;
 }
 
-void at86rf2xx_tx_exec(const at86rf2xx_t *dev)
+void at86rf2xx_tx_exec(at86rf2xx_t *dev)
 {
     netdev_t *netdev = (netdev_t *)dev;
+
+#if AT86RF2XX_HAVE_RETRIES
+    dev->tx_retries = -1;
+#endif
 
     /* write frame length field in FIFO */
     at86rf2xx_sram_write(dev, 0, &(dev->tx_frame_len), 1);
