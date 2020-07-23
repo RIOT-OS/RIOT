@@ -68,6 +68,8 @@ config MOD_PERIPH_INIT_EEPROM
     default y if MOD_PERIPH_INIT
     depends on MOD_PERIPH_EEPROM
 
+rsource "Kconfig.flashpage"
+
 config MOD_PERIPH_GPIO
     bool "GPIO peripheral driver"
     default y
