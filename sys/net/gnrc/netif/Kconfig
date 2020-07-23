@@ -79,5 +79,6 @@ config MOD_GNRC_NETIF_6LO
     default y if MOD_GNRC_SIXLOWPAN
 
 # include particular technologies
+rsource "ethernet/Kconfig"
 rsource "ieee802154/Kconfig"
 endif # MOD_GNRC_NETIF
