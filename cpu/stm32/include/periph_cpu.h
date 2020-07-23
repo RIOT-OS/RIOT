@@ -217,32 +217,37 @@ typedef uint32_t gpio_t;
  * @brief   Available GPIO ports
  */
 enum {
+#ifdef GPIOA
     PORT_A = 0,             /**< port A */
+#endif
+#ifdef GPIOB
     PORT_B = 1,             /**< port B */
+#endif
+#ifdef GPIOC
     PORT_C = 2,             /**< port C */
+#endif
+#ifdef GPIOD
     PORT_D = 3,             /**< port D */
+#endif
+#ifdef GPIOE
     PORT_E = 4,             /**< port E */
+#endif
+#ifdef GPIOF
     PORT_F = 5,             /**< port F */
-#if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32F4) || \
-    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L1) || \
-    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4)
+#endif
+#ifdef GPIOG
     PORT_G = 6,             /**< port G */
 #endif
-#if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F3) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7) || \
-    defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
-    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4)
+#ifdef GPIOH
     PORT_H = 7,             /**< port H */
 #endif
-#if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
-    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32G4)
+#ifdef GPIOI
     PORT_I = 8,             /**< port I */
 #endif
-#if defined(CPU_FAM_STM32F7)
+#ifdef GPIOJ
     PORT_J = 9,             /**< port J */
+#endif
+#ifdef GPIOK
     PORT_K = 10,            /**< port K */
 #endif
 };
