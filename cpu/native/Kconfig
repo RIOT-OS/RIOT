@@ -18,6 +18,7 @@ config CPU_ARCH_NATIVE
     select HAS_PERIPH_PM
     select HAS_PERIPH_PWM
     select HAS_SSP
+    select HAVE_TAP
 
 config CPU_CORE_NATIVE
     bool
