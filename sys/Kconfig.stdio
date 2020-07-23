@@ -9,6 +9,7 @@ menu "Standard Input/Ouput (STDIO)"
 
 choice
     bool "STDIO implementation"
+    default MOD_STDIO_NATIVE if CPU_ARCH_NATIVE
     default MOD_STDIO_UART
 
 config MOD_STDIO_CDC_ACM
