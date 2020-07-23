@@ -49,8 +49,9 @@ extern "C" {
 #ifndef DHCPV6_CLIENT_SERVER_MAX
 #define DHCPV6_CLIENT_SERVER_MAX    (1U)    /**< maximum number of servers to store */
 #endif
-#ifndef DHCPV6_CLIENT_PFX_LEASE_MAX
-#define DHCPV6_CLIENT_PFX_LEASE_MAX (1U)    /**< maximum number of prefix leases to store */
+
+#ifndef CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX
+#define CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX (1U)    /**< maximum number of prefix leases to store */
 #endif
 
 /**
