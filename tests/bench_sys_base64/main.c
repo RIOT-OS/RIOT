@@ -75,24 +75,24 @@ int main(void) {
     }
 
     start = xtimer_now_usec();
-    for (unsigned i = 0; i < 10000; i++) {
+    for (unsigned i = 0; i < 1000; i++) {
         size = sizeof(buf);
         base64_encode(input, sizeof(input), buf, &size);
     }
     stop = xtimer_now_usec();
 
-    print_str("Encoding 10.000 x 96 bytes (128 bytes in base64): ");
+    print_str("Encoding 1.000 x 96 bytes (128 bytes in base64): ");
     print_u32_dec(stop - start);
     print_str(" µs\n");
 
     start = xtimer_now_usec();
-    for (unsigned i = 0; i < 10000; i++) {
+    for (unsigned i = 0; i < 1000; i++) {
         size = sizeof(buf);
         base64_decode(base64, sizeof(base64), buf, &size);
     }
     stop = xtimer_now_usec();
 
-    print_str("Decoding 10.000 x 96 bytes (128 bytes in base64): ");
+    print_str("Decoding 1.000 x 96 bytes (128 bytes in base64): ");
     print_u32_dec(stop - start);
     print_str(" µs\n");
     return 0;
