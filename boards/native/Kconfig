@@ -24,3 +24,5 @@ config BOARD_NATIVE
     # Various other features (if any)
     select HAS_ETHERNET
     select HAS_MOTOR_DRIVER
+
+rsource "drivers/Kconfig"
