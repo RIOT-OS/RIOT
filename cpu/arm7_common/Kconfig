@@ -10,6 +10,7 @@ config CPU_ARCH_ARMV4T
     select HAS_ARCH_32BIT
     select HAS_ARCH_ARM
     select HAS_CPP
+    select HAS_LIBSTDCPP
 
 config CPU_CORE_ARM7TDMI_S
     bool
