@@ -2,11 +2,9 @@
 
 : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 nrf52dk samr21-xpro"}
 : ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
-: ${TEST_KCONFIG_APPS:="samr21-xpro:examples/gnrc_networking"}
-declare -A TEST_KCONFIG=( \
-                          [samr21-xpro]="examples/gnrc_networking examples/hello-world tests/periph_*"
-                          [native]="examples/gnrc_networking examples/hello-world tests/periph_*"
-    )
+# we can't use '-' in the variable names, convert them to '_' to add new boards
+: ${TEST_KCONFIG_samr21_xpro:="examples/gnrc_networking examples/hello-world tests/periph_*"}
+: ${TEST_KCONFIG_native:="examples/gnrc_networking examples/hello-world tests/periph_*"}
 
 export RIOT_CI_BUILD=1
 export STATIC_TESTS=${STATIC_TESTS:-1}
@@ -248,7 +246,11 @@ compile() {
     # list of board-application tuples that are currently modeled to
     # run with Kconfig
     if [ $RES -eq 0 ]; then
-        for app in ${TEST_KCONFIG[${board}]}
+        # we can't use '-' in variable names
+        _board=$(echo ${board} | tr '-' '_')
+        kconfig_test_apps=TEST_KCONFIG_$_board
+
+        for app in ${!kconfig_test_apps}
         do
             if [ ${appdir} == ${app} ]; then
                 BOARD=$board make -C${appdir} clean
