@@ -19,6 +19,7 @@
  */
 #include <string.h>
 
+#include "bitarithm.h"
 #include "mutex.h"
 #include "luid.h"
 
@@ -29,7 +30,6 @@
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
-
 
 /* Set the value of the divider with the clock configured */
 #if !defined(CLOCK_CORECLOCK) || CLOCK_CORECLOCK < (20000000U)
@@ -45,31 +45,6 @@
 #else /* CLOCK_CORECLOCK < (20000000U) */
 #define CLOCK_RANGE ETH_MACMIIAR_CR_Div102
 #endif /* CLOCK_CORECLOCK < (20000000U) */
-
-/* Internal flags for the DMA descriptors */
-#define DESC_OWN           (0x80000000)
-#define RX_DESC_FL         (0x3FFF0000)
-#define RX_DESC_FS         (0x00000200)
-#define RX_DESC_LS         (0x00000100)
-#define RX_DESC_RCH        (0x00004000)
-#define TX_DESC_TCH        (0x00100000)
-#define TX_DESC_IC         (0x40000000)
-#define TX_DESC_CIC        (0x00C00000)
-#define TX_DESC_LS         (0x20000000)
-#define TX_DESC_FS         (0x10000000)
-
-struct eth_dma_desc {
-    uint32_t status;
-    uint32_t control;
-    char *buffer_addr;
-    struct eth_dma_desc *desc_next;
-    uint32_t reserved1_ext;
-    uint32_t reserved2;
-    uint32_t ts_low;
-    uint32_t ts_high;
-} __attribute__((packed));
-
-typedef struct eth_dma_desc edma_desc_t;
 
 /* Descriptors */
 static edma_desc_t rx_desc[ETH_RX_BUFFER_COUNT];
@@ -142,8 +117,8 @@ static void _init_buffer(void)
 {
     int i;
     for (i = 0; i < ETH_RX_BUFFER_COUNT; i++) {
-        rx_desc[i].status = DESC_OWN;
-        rx_desc[i].control = RX_DESC_RCH | (ETH_RX_BUFFER_SIZE & 0x0fff);
+        rx_desc[i].status = RX_DESC_STAT_OWN;
+        rx_desc[i].control = RX_DESC_CTRL_RCH | (ETH_RX_BUFFER_SIZE & 0x0fff);
         rx_desc[i].buffer_addr = &rx_buffer[i][0];
         if((i+1) < ETH_RX_BUFFER_COUNT) {
             rx_desc[i].desc_next = &rx_desc[i + 1];
@@ -152,7 +127,7 @@ static void _init_buffer(void)
     rx_desc[i - 1].desc_next = &rx_desc[0];
 
     for (i = 0; i < ETH_TX_BUFFER_COUNT; i++) {
-        tx_desc[i].status = TX_DESC_TCH | TX_DESC_CIC;
+        tx_desc[i].status = TX_DESC_STAT_TCH | TX_DESC_STAT_CIC;
         tx_desc[i].buffer_addr = &tx_buffer[i][0];
         if ((i + 1) < ETH_RX_BUFFER_COUNT) {
             tx_desc[i].desc_next = &tx_desc[i + 1];
@@ -164,8 +139,8 @@ static void _init_buffer(void)
     rx_curr = &rx_desc[0];
     tx_curr = &tx_desc[0];
 
-    ETH->DMARDLAR = (uint32_t)rx_curr;
-    ETH->DMATDLAR = (uint32_t)tx_curr;
+    ETH->DMARDLAR = (uintptr_t)rx_curr;
+    ETH->DMATDLAR = (uintptr_t)tx_curr;
 }
 
 int stm32_eth_init(void)
@@ -262,7 +237,7 @@ int stm32_eth_send(const struct iolist *iolist)
     }
 
     /* block until there's an available descriptor */
-    while (tx_curr->status & DESC_OWN) {
+    while (tx_curr->status & TX_DESC_STAT_OWN) {
         DEBUG("stm32_eth: not avail\n");
     }
 
@@ -271,8 +246,10 @@ int stm32_eth_send(const struct iolist *iolist)
 
     dma_acquire(eth_config.dma);
     for (; iolist; iolist = iolist->iol_next) {
-        ret += dma_transfer(eth_config.dma, eth_config.dma_chan, iolist->iol_base,
-                            tx_curr->buffer_addr+ret, iolist->iol_len, DMA_MEM_TO_MEM, DMA_INC_BOTH_ADDR);
+        ret += dma_transfer(
+                eth_config.dma, eth_config.dma_chan,
+                iolist->iol_base, tx_curr->buffer_addr + ret, iolist->iol_len,
+                DMA_MEM_TO_MEM, DMA_INC_BOTH_ADDR);
     }
 
     dma_release(eth_config.dma);
@@ -283,11 +260,11 @@ int stm32_eth_send(const struct iolist *iolist)
     tx_curr->control = (len & 0x1fff);
 
     /* set flags for first and last frames */
-    tx_curr->status |= TX_DESC_FS;
-    tx_curr->status |= TX_DESC_LS | TX_DESC_IC;
+    tx_curr->status |= TX_DESC_STAT_FS;
+    tx_curr->status |= TX_DESC_STAT_LS | TX_DESC_STAT_IC;
 
     /* give the descriptors to the DMA */
-    tx_curr->status |= DESC_OWN;
+    tx_curr->status |= TX_DESC_STAT_OWN;
     tx_curr = tx_curr->desc_next;
 
     /* start tx */
@@ -305,7 +282,7 @@ static int _try_receive(char *data, int max_len, int block)
     for (int i = 0; i < ETH_RX_BUFFER_COUNT && len == 0; i++) {
         /* try receiving, if the block is set, simply wait for the rest of
          * the packet to complete, otherwise just break */
-        while (p->status & DESC_OWN) {
+        while (p->status & RX_DESC_STAT_OWN) {
             if (!block) {
                 break;
             }
@@ -313,7 +290,7 @@ static int _try_receive(char *data, int max_len, int block)
 
         /* amount of data to copy */
         copy = ETH_RX_BUFFER_SIZE;
-        if (p->status & (RX_DESC_LS | RX_DESC_FL)) {
+        if (p->status & (RX_DESC_STAT_LS | RX_DESC_STAT_FL)) {
             len = ((p->status >> 16) & 0x3FFF) - 4;
             copy = len - copied;
         }
@@ -327,7 +304,7 @@ static int _try_receive(char *data, int max_len, int block)
             else if (max_len < copy) {
                 len = -1;
             }
-            p->status = DESC_OWN;
+            p->status = RX_DESC_STAT_OWN;
         }
         p = p->desc_next;
     }
@@ -351,7 +328,7 @@ int stm32_eth_receive_blocking(char *data, unsigned max_len)
 
 int stm32_eth_get_rx_status_owned(void)
 {
-    return (!(rx_curr->status & DESC_OWN));
+    return (!(rx_curr->status & RX_DESC_STAT_OWN));
 }
 
 void stm32_eth_isr_eth_wkup(void)
