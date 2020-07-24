@@ -41,4 +41,7 @@ config MOD_CORE_PANIC
     help
         Kernel crash handling module.
 
+config MOD_SCHED_CB
+    bool "Scheduler Callback support"
+
 endmenu # Kernel
