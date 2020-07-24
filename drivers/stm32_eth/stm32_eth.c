@@ -34,7 +34,7 @@ netdev_t *_netdev;
 void stm32_eth_set_mac(const char *mac);
 void stm32_eth_get_mac(char *out);
 int stm32_eth_init(void);
-int stm32_eth_receive_blocking(char *data, unsigned max_len);
+int stm32_eth_receive(void *data, size_t max_len);
 int stm32_eth_send(const struct iolist *iolist);
 int stm32_eth_get_rx_status_owned(void);
 
@@ -73,7 +73,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     if (!stm32_eth_get_rx_status_owned()){
                 mutex_lock(&_rx);
     }
-    int ret = stm32_eth_receive_blocking((char *)buf, len);
+    int ret = stm32_eth_receive(buf, len);
     DEBUG("stm32_eth_netdev: _recev: %d\n", ret);
 
     return ret;

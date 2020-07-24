@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 TriaGnoSys GmbH
+ *               2020 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -14,9 +15,11 @@
  * @brief       Low-level ETH driver implementation
  *
  * @author      Víctor Ariño <victor.arino@triagnosys.com>
+ * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
  * @}
  */
+#include <errno.h>
 #include <string.h>
 
 #include "bitarithm.h"
@@ -45,6 +48,8 @@
 #else /* CLOCK_CORECLOCK < (20000000U) */
 #define CLOCK_RANGE ETH_MACMIIAR_CR_Div102
 #endif /* CLOCK_CORECLOCK < (20000000U) */
+
+#define MIN(a, b) (((a) <= (b)) ? (a) : (b))
 
 /* Descriptors */
 static edma_desc_t rx_desc[ETH_RX_BUFFER_COUNT];
@@ -115,7 +120,7 @@ void stm32_eth_set_mac(const char *mac)
 /** Initialization of the DMA descriptors to be used */
 static void _init_buffer(void)
 {
-    int i;
+    size_t i;
     for (i = 0; i < ETH_RX_BUFFER_COUNT; i++) {
         rx_desc[i].status = RX_DESC_STAT_OWN;
         rx_desc[i].control = RX_DESC_CTRL_RCH | (ETH_RX_BUFFER_SIZE & 0x0fff);
@@ -274,58 +279,85 @@ int stm32_eth_send(const struct iolist *iolist)
     return ret;
 }
 
-static int _try_receive(char *data, int max_len, int block)
+static ssize_t get_rx_frame_size(void)
 {
-    int copy, len = 0;
-    int copied = 0;
-    int drop = (data || max_len > 0);
-
-    edma_desc_t *p = rx_curr;
-    for (int i = 0; i < ETH_RX_BUFFER_COUNT && len == 0; i++) {
-        /* try receiving, if the block is set, simply wait for the rest of
-         * the packet to complete, otherwise just break */
-        while (p->status & RX_DESC_STAT_OWN) {
-            if (!block) {
-                break;
-            }
+    edma_desc_t *i = rx_curr;
+    uint32_t status;
+    while (1) {
+        /* Wait until DMA gave up control over descriptor */
+        while ((status = i->status) & RX_DESC_STAT_OWN) { }
+        DEBUG("stm32_eth: get_rx_frame_size(): FS=%c, LS=%c, DE=%c, FL=%lu\n",
+              (status & RX_DESC_STAT_FS) ? '1' : '0',
+              (status & RX_DESC_STAT_LS) ? '1' : '0',
+              (status & RX_DESC_STAT_DE) ? '1' : '0',
+              ((status >> 16) & 0x3fff) - ETHERNET_FCS_LEN);
+        if (status & RX_DESC_STAT_LS) {
+            break;
         }
-
-        /* amount of data to copy */
-        copy = ETH_RX_BUFFER_SIZE;
-        if (p->status & (RX_DESC_STAT_LS | RX_DESC_STAT_FL)) {
-            len = ((p->status >> 16) & 0x3FFF) - 4;
-            copy = len - copied;
-        }
-
-        if (drop) {
-            /* copy the data if possible */
-            if (data && max_len >= copy) {
-                memcpy(data, p->buffer_addr, copy);
-                max_len -= copy;
-            }
-            else if (max_len < copy) {
-                len = -1;
-            }
-            p->status = RX_DESC_STAT_OWN;
-        }
-        p = p->desc_next;
+        i = i->desc_next;
     }
 
-    if (drop) {
-        rx_curr = p;
+    if (status & RX_DESC_STAT_DE) {
+        return -1;
     }
 
-    return len;
+    /* bits 16-29 contain the frame length including 4 B frame check sequence */
+    return ((status >> 16) & 0x3fff) - ETHERNET_FCS_LEN;
 }
 
-int stm32_eth_try_receive(char *data, unsigned max_len)
+static void drop_frame_and_update_rx_curr(void)
 {
-    return _try_receive(data, max_len, 0);
+    while (1) {
+        uint32_t old_status = rx_curr->status;
+        /* hand over old descriptor to DMA */
+        rx_curr->status = RX_DESC_STAT_OWN;
+        rx_curr = rx_curr->desc_next;
+        if (old_status & RX_DESC_STAT_LS) {
+            /* reached last DMA descriptor of frame ==> done */
+            return;
+        }
+    }
 }
 
-int stm32_eth_receive_blocking(char *data, unsigned max_len)
+int stm32_eth_receive(void *buf, size_t max_len)
 {
-    return _try_receive(data, max_len, 1);
+    char *data = buf;
+    /* Determine the size of received frame. The frame might span multiple
+     * DMA buffers */
+    ssize_t size = get_rx_frame_size();
+
+    if (size == -1) {
+        DEBUG("stm32_eth: Received frame was too large for DMA buffer(s)\n");
+        drop_frame_and_update_rx_curr();
+        return -EOVERFLOW;
+    }
+
+    if (!buf) {
+        if (max_len) {
+            DEBUG("stm32_eth: Dropping frame as requested by upper layer\n");
+            drop_frame_and_update_rx_curr();
+        }
+        return size;
+    }
+
+    if (max_len < (size_t)size) {
+        DEBUG("stm32_eth: Buffer provided by upper layer is too small\n");
+        drop_frame_and_update_rx_curr();
+        return -ENOBUFS;
+    }
+
+    size_t remain = size;
+    while (remain) {
+        size_t chunk = MIN(remain, ETH_RX_BUFFER_SIZE);
+        memcpy(data, rx_curr->buffer_addr, chunk);
+        data += chunk;
+        remain -= chunk;
+        /* Hand over descriptor to DMA */
+        rx_curr->status = RX_DESC_STAT_OWN;
+        rx_curr = rx_curr->desc_next;
+    }
+
+    return size;
 }
 
 int stm32_eth_get_rx_status_owned(void)

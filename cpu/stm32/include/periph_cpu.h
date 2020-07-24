@@ -1080,6 +1080,10 @@ typedef struct eth_dma_desc {
  * @name    Flags in the status word of the Ethernet enhanced TX DMA descriptor
  * @{
  */
+#define TX_DESC_STAT_UF         (BIT1)  /**< If set, an underflow occurred while sending */
+#define TX_DESC_STAT_EC         (BIT8)  /**< If set, TX was aborted due to excessive collisions (half-duplex only) */
+#define TX_DESC_STAT_NC         (BIT10) /**< If set, no carrier was detected (TX aborted) */
+#define TX_DESC_STAT_ES         (BIT15) /**< If set, one or more error occurred */
 #define TX_DESC_STAT_TTSS       (BIT17) /**< If set, the descriptor contains a valid PTP timestamp */
 /**
  * @brief   Indicates if TDES3 points to the next DMA descriptor (1), or to a second buffer (0)
@@ -1089,6 +1093,7 @@ typedef struct eth_dma_desc {
  * always set by the driver
  */
 #define TX_DESC_STAT_TCH        (BIT20)
+#define TX_DESC_STAT_TER        (BIT21) /**< If set, DMA will return to first descriptor in ring afterwards */
 /**
  * @brief   Checksum insertion control
  *
