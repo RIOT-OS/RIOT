@@ -64,8 +64,6 @@ $(GENERATED_DIR): $(CLEAN)
 
 # During migration this checks if Kconfig should run. It will run if any of
 # the following is true:
-# - A file with '.config' extension is present in the application directory
-# - A 'Kconfig' file is present in the application directory
 # - A previous configuration file is present (e.g. from a previous call to
 #   menuconfig)
 # - menuconfig is being called
@@ -75,7 +73,7 @@ $(GENERATED_DIR): $(CLEAN)
 # configuration via Kconfig is disabled by default). Should this change, the
 # check would not longer be valid, and Kconfig would have to run on every
 # build.
-SHOULD_RUN_KCONFIG ?= $(or $(wildcard $(APPDIR)/*.config), $(wildcard $(APPDIR)/Kconfig), $(wildcard $(KCONFIG_MERGED_CONFIG)), $(filter menuconfig, $(MAKECMDGOALS)))
+SHOULD_RUN_KCONFIG ?= $(or $(wildcard $(KCONFIG_MERGED_CONFIG)), $(filter menuconfig, $(MAKECMDGOALS)))
 
 ifneq (,$(SHOULD_RUN_KCONFIG))
 # Add configuration header to build dependencies
