@@ -210,13 +210,15 @@ int stm32_eth_init(void)
     NVIC_EnableIRQ(ETH_IRQn);
     ETH->DMAIER |= ETH_DMAIER_NISE | ETH_DMAIER_TIE | ETH_DMAIER_RIE;
 
-    /* enable */
-    ETH->MACCR |= ETH_MACCR_TE;
+    /* enable transmitter and receiver */
+    ETH->MACCR |= ETH_MACCR_TE | ETH_MACCR_RE;
+    /* flush transmit FIFO */
     ETH->DMAOMR |= ETH_DMAOMR_FTF;
-    ETH->MACCR |= ETH_MACCR_RE;
+    /* wait for FIFO flushing to complete */
+    while (ETH->DMAOMR & ETH_DMAOMR_FTF) { }
 
-    ETH->DMAOMR |= ETH_DMAOMR_ST;
-    ETH->DMAOMR |= ETH_DMAOMR_SR;
+    /* enable DMA TX and RX */
+    ETH->DMAOMR |= ETH_DMAOMR_ST | ETH_DMAOMR_SR;
 
     /* configure speed, do it at the end so the PHY had time to
      * reset */
