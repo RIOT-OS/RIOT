@@ -373,6 +373,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
                                mcps_confirm_t *mcps_confirm)
 {
     iolist_t *pkt = mcps_request->data.pkt;
+    assert(pkt);
 
     if (mac->mlme.activation == MLME_ACTIVATION_NONE) {
         DEBUG("gnrc_lorawan_mcps: LoRaWAN not activated\n");
