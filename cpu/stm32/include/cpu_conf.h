@@ -27,28 +27,40 @@
 #include "vendor/stm32f030x4.h"
 #elif CPU_FAM_STM32F0
 #include "stm32f0xx.h"
+#include "irqs/f0/irqs.h"
 #elif CPU_FAM_STM32F1
 #include "stm32f1xx.h"
+#include "irqs/f1/irqs.h"
 #elif CPU_FAM_STM32F2
 #include "stm32f2xx.h"
+#include "irqs/f2/irqs.h"
 #elif CPU_FAM_STM32F3
 #include "stm32f3xx.h"
+#include "irqs/f3/irqs.h"
 #elif CPU_FAM_STM32F4
 #include "stm32f4xx.h"
+#include "irqs/f4/irqs.h"
 #elif CPU_FAM_STM32F7
 #include "stm32f7xx.h"
+#include "irqs/f7/irqs.h"
 #elif CPU_FAM_STM32G0
 #include "stm32g0xx.h"
+#include "irqs/g0/irqs.h"
 #elif CPU_FAM_STM32G4
 #include "stm32g4xx.h"
+#include "irqs/g4/irqs.h"
 #elif CPU_FAM_STM32L0
 #include "stm32l0xx.h"
+#include "irqs/l0/irqs.h"
 #elif CPU_FAM_STM32L1
 #include "stm32l1xx.h"
+#include "irqs/l1/irqs.h"
 #elif CPU_FAM_STM32L4
 #include "stm32l4xx.h"
+#include "irqs/l4/irqs.h"
 #elif CPU_FAM_STM32WB
 #include "stm32wbxx.h"
+#include "irqs/wb/irqs.h"
 #else
 #error Not supported CPU family
 #endif
@@ -62,71 +74,12 @@ extern "C" {
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
-#if defined(CPU_LINE_STM32F030x8)
-#define CPU_IRQ_NUMOF                   (29U)
-#elif defined(CPU_LINE_STM32F031x6) || defined(CPU_LINE_STM32F030x4)
-#define CPU_IRQ_NUMOF                   (28U)
-#elif defined(CPU_LINE_STM32F051x8) || defined(CPU_LINE_STM32F091xC)
-#define CPU_IRQ_NUMOF                   (31U)
-#elif defined (CPU_FAM_STM32F0)
-#define CPU_IRQ_NUMOF                   (32U)
-#elif defined(CPU_LINE_STM32F103xE)
-#define CPU_IRQ_NUMOF                   (60U)
-#elif defined (CPU_FAM_STM32F1)
-#define CPU_IRQ_NUMOF                   (43U)
-#elif defined (CPU_FAM_STM32F2)
-#define CPU_IRQ_NUMOF                   (81U)
-#elif defined(CPU_LINE_STM32F303xE)
-#define CPU_IRQ_NUMOF                   (85U)
-#elif defined(CPU_FAM_STM32F3)
-#define CPU_IRQ_NUMOF                   (82U)
-#elif defined(CPU_LINE_STM32F401xE)
-#define CPU_IRQ_NUMOF                   (85U)
-#elif defined(CPU_LINE_STM32F405xx) || defined(CPU_LINE_STM32F407xx) \
-    || defined(CPU_LINE_STM32F415xx)
-#define CPU_IRQ_NUMOF                   (82U)
-#elif defined(CPU_LINE_STM32F410Rx)
-#define CPU_IRQ_NUMOF                   (98U)
-#elif defined(CPU_LINE_STM32F411xE)
-#define CPU_IRQ_NUMOF                   (86U)
-#elif defined(CPU_LINE_STM32F412Zx) || defined(CPU_LINE_STM32F446xx)
-#define CPU_IRQ_NUMOF                   (97U)
-#elif defined(CPU_LINE_STM32F413xx) || defined(CPU_LINE_STM32F423xx) || \
-      defined(CPU_LINE_STM32G474xx)
-#define CPU_IRQ_NUMOF                   (102U)
-#elif defined(CPU_LINE_STM32F429xx) || defined(CPU_LINE_STM32F437xx)
-#define CPU_IRQ_NUMOF                   (91U)
-#elif defined(CPU_LINE_STM32F746xx)
-#define CPU_IRQ_NUMOF                   (98U)
-#elif defined(CPU_LINE_STM32F767xx) || defined(CPU_LINE_STM32F769xx)
-#define CPU_IRQ_NUMOF                   (110U)
-#elif defined(CPU_LINE_STM32F722xx) || defined(CPU_LINE_STM32F723xx)
-#define CPU_IRQ_NUMOF                   (104U)
-#elif defined(CPU_LINE_STM32L031xx)
-#define CPU_IRQ_NUMOF                   (30U)
-#elif defined(CPU_FAM_STM32L0)
-#define CPU_IRQ_NUMOF                   (32U)
-#elif defined(CPU_MODEL_STM32L151RB_A) || defined(CPU_MODEL_STM32L151CB) || \
-    defined(CPU_MODEL_STM32L151CB_A)
-#define CPU_IRQ_NUMOF                   (45U)
-#elif defined(CPU_FAM_STM32L1)
-#define CPU_IRQ_NUMOF                   (57U)
-#elif defined(CPU_MODEL_STM32L432KC) || defined(CPU_MODEL_STM32L433RC)
-#define CPU_IRQ_NUMOF                   (83U)
-#elif defined(CPU_MODEL_STM32L496ZG) || defined(CPU_MODEL_STM32L496AG)
-#define CPU_IRQ_NUMOF                   (91U)
-#elif defined(CPU_MODEL_STM32L4R5ZI)
-#define CPU_IRQ_NUMOF                   (95U)
-#elif defined(CPU_FAM_STM32L4)
-#define CPU_IRQ_NUMOF                   (82U)
-#elif defined(CPU_MODEL_STM32WB55RG)
-#define CPU_IRQ_NUMOF                   (63U)
-#elif defined(CPU_MODEL_STM32G070RB)
-#define CPU_IRQ_NUMOF                   (30U)
-#else
-#error Number of IRQs not configured for this CPU
-#endif
 #define CPU_FLASH_BASE                  FLASH_BASE
+
+/* CPU_IRQ_NUMOF cannot be determined automatically from cmsis header */
+#if defined(CPU_LINE_STM32F030x4)
+#define CPU_IRQ_NUMOF                   (28U)
+#endif
 /** @} */
 
 /**
