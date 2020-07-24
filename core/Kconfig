@@ -44,4 +44,7 @@ config MOD_CORE_PANIC
 config MOD_SCHED_CB
     bool "Scheduler Callback support"
 
+config MOD_CORE_THREAD_FLAGS
+    bool "Thread flags support"
+
 endmenu # Kernel
