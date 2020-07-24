@@ -27,21 +27,17 @@
 #include "debug.h"
 
 #include <string.h>
-static mutex_t _tx = MUTEX_INIT;
-static mutex_t _rx = MUTEX_INIT;
 netdev_t *_netdev;
+extern mutex_t stm32_eth_tx_completed;
 
 void stm32_eth_set_mac(const char *mac);
 void stm32_eth_get_mac(char *out);
 int stm32_eth_init(void);
 int stm32_eth_receive(void *data, size_t max_len);
 int stm32_eth_send(const struct iolist *iolist);
-int stm32_eth_get_rx_status_owned(void);
 
 static void _isr(netdev_t *netdev) {
-    if (stm32_eth_get_rx_status_owned()) {
-        netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
-    }
+    netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
 void isr_eth(void)
@@ -49,19 +45,18 @@ void isr_eth(void)
     unsigned tmp = ETH->DMASR;
 
     if ((tmp & ETH_DMASR_TS)) {
-        ETH->DMASR = ETH_DMASR_TS | ETH_DMASR_NIS;
-        mutex_unlock(&_tx);
+        ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_TS;
+        DEBUG("isr_eth: TX completed\n");
+        mutex_unlock(&stm32_eth_tx_completed);
     }
 
     if ((tmp & ETH_DMASR_RS)) {
-        ETH->DMASR = ETH_DMASR_RS | ETH_DMASR_NIS;
-        mutex_unlock(&_rx);
+        ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_RS;
+        DEBUG("isr_eth: RX completed\n");
         if (_netdev) {
             netdev_trigger_event_isr(_netdev);
         }
     }
-
-    /* printf("r:%x\n\n", tmp); */
 
     cortexm_isr_end();
 }
@@ -70,32 +65,15 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     (void)info;
     (void)netdev;
-    if (!stm32_eth_get_rx_status_owned()){
-                mutex_lock(&_rx);
-    }
-    int ret = stm32_eth_receive(buf, len);
-    DEBUG("stm32_eth_netdev: _recev: %d\n", ret);
-
-    return ret;
+    return stm32_eth_receive(buf, len);
 }
 
 static int _send(netdev_t *netdev, const struct iolist *iolist)
 {
     (void)netdev;
-    int ret = 0;
-    if(stm32_eth_get_rx_status_owned()) {
-        mutex_lock(&_tx);
-    }
     netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
-    ret = stm32_eth_send(iolist);
-    DEBUG("stm32_eth_netdev: _send: %d %d\n", ret, iolist_size(iolist));
-    if (ret < 0)
-    {
-        netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
-        return ret;
-    }
+    int ret = stm32_eth_send(iolist);
     netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-
     return ret;
 }
 

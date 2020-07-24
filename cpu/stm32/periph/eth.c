@@ -50,14 +50,11 @@
 #endif /* CLOCK_CORECLOCK < (20000000U) */
 
 /* Default DMA buffer setup */
-#ifndef ETH_RX_BUFFER_COUNT
-#define ETH_RX_BUFFER_COUNT (6U)
+#ifndef ETH_RX_DESCRIPTOR_COUNT
+#define ETH_RX_DESCRIPTOR_COUNT (6U)
 #endif
-#ifndef ETH_TX_BUFFER_COUNT
-#define ETH_TX_BUFFER_COUNT (4U)
-#endif
-#ifndef ETH_TX_BUFFER_SIZE
-#define ETH_TX_BUFFER_SIZE  (1524U)
+#ifndef ETH_TX_DESCRIPTOR_COUNT
+#define ETH_TX_DESCRIPTOR_COUNT (8U)
 #endif
 #ifndef ETH_RX_BUFFER_SIZE
 #define ETH_RX_BUFFER_SIZE  (256U)
@@ -70,21 +67,22 @@
 #warning "ETH_RX_BUFFER_SIZE is not a multiple of 16. (See comment above.)"
 #endif
 
-#if ETH_RX_BUFFER_COUNT * ETH_RX_BUFFER_SIZE < 1524U
+#if ETH_RX_DESCRIPTOR_COUNT * ETH_RX_BUFFER_SIZE < 1524U
 #warning "Total RX buffers lower than MTU, you won't receive huge frames!"
 #endif
 
 #define MIN(a, b) (((a) <= (b)) ? (a) : (b))
 
-/* Descriptors */
-static edma_desc_t rx_desc[ETH_RX_BUFFER_COUNT];
-static edma_desc_t tx_desc[ETH_TX_BUFFER_COUNT];
-static edma_desc_t *rx_curr;
-static edma_desc_t *tx_curr;
+/* Synchronization between IRQ and thread context */
+mutex_t stm32_eth_tx_completed = MUTEX_INIT_LOCKED;
 
-/* Buffers */
-static char rx_buffer[ETH_RX_BUFFER_COUNT][ETH_RX_BUFFER_SIZE];
-static char tx_buffer[ETH_TX_BUFFER_COUNT][ETH_TX_BUFFER_SIZE];
+/* Descriptors */
+static edma_desc_t rx_desc[ETH_RX_DESCRIPTOR_COUNT];
+static edma_desc_t tx_desc[ETH_TX_DESCRIPTOR_COUNT];
+static edma_desc_t *rx_curr;
+
+/* RX Buffers */
+static char rx_buffer[ETH_RX_DESCRIPTOR_COUNT][ETH_RX_BUFFER_SIZE];
 
 /** Read or write a phy register, to write the register ETH_MACMIIAR_MW is to
  * be passed as the higher nibble of the value */
@@ -146,31 +144,25 @@ void stm32_eth_set_mac(const char *mac)
 static void _init_buffer(void)
 {
     size_t i;
-    for (i = 0; i < ETH_RX_BUFFER_COUNT; i++) {
+    for (i = 0; i < ETH_RX_DESCRIPTOR_COUNT; i++) {
         rx_desc[i].status = RX_DESC_STAT_OWN;
         rx_desc[i].control = RX_DESC_CTRL_RCH | (ETH_RX_BUFFER_SIZE & 0x0fff);
         rx_desc[i].buffer_addr = &rx_buffer[i][0];
-        if((i+1) < ETH_RX_BUFFER_COUNT) {
+        if ((i + 1) < ETH_RX_DESCRIPTOR_COUNT) {
             rx_desc[i].desc_next = &rx_desc[i + 1];
         }
     }
     rx_desc[i - 1].desc_next = &rx_desc[0];
 
-    for (i = 0; i < ETH_TX_BUFFER_COUNT; i++) {
-        tx_desc[i].status = TX_DESC_STAT_TCH | TX_DESC_STAT_CIC;
-        tx_desc[i].buffer_addr = &tx_buffer[i][0];
-        if ((i + 1) < ETH_RX_BUFFER_COUNT) {
-            tx_desc[i].desc_next = &tx_desc[i + 1];
-        }
+    for (i = 0; i < ETH_TX_DESCRIPTOR_COUNT - 1; i++) {
+        tx_desc[i].desc_next = &tx_desc[i + 1];
     }
-
-    tx_desc[i - 1].desc_next = &tx_desc[0];
+    tx_desc[ETH_RX_DESCRIPTOR_COUNT - 1].desc_next = &tx_desc[0];
 
     rx_curr = &rx_desc[0];
-    tx_curr = &tx_desc[0];
 
     ETH->DMARDLAR = (uintptr_t)rx_curr;
-    ETH->DMATDLAR = (uintptr_t)tx_curr;
+    ETH->DMATDLAR = (uintptr_t)&tx_desc[0];
 }
 
 int stm32_eth_init(void)
@@ -259,49 +251,58 @@ int stm32_eth_init(void)
 
 int stm32_eth_send(const struct iolist *iolist)
 {
-    unsigned len = iolist_size(iolist);
-    int ret = 0;
+    unsigned bytes_to_send = iolist_size(iolist);
+    /* Input must not be bigger than maximum allowed frame length */
+    assert(bytes_to_send <= ETHERNET_FRAME_LEN);
+    /* This API is not thread safe, check that no other thread is sending */
+    assert(!(tx_desc[0].status & TX_DESC_STAT_OWN));
+    /* We cannot send more chunks than allocated descriptors */
+    assert(iolist_count(iolist) <= ETH_TX_DESCRIPTOR_COUNT);
 
-    /* safety check */
-    if (len > ETH_TX_BUFFER_SIZE) {
-        DEBUG("stm32_eth: Error iolist_size > ETH_TX_BUFFER_SIZE\n");
-        return -1;
+    for (unsigned i = 0; iolist; iolist = iolist->iol_next, i++) {
+        tx_desc[i].control = iolist->iol_len;
+        tx_desc[i].buffer_addr = iolist->iol_base;
+        uint32_t status = TX_DESC_STAT_IC | TX_DESC_STAT_TCH | TX_DESC_STAT_CIC
+                          | TX_DESC_STAT_OWN;
+        if (!i) {
+            /* fist chunk */
+            status |= TX_DESC_STAT_FS;
+        }
+        if (!iolist->iol_next) {
+            /* last chunk */
+            status |= TX_DESC_STAT_LS | TX_DESC_STAT_TER;
+        }
+        tx_desc[i].status = status;
     }
 
-    /* block until there's an available descriptor */
-    while (tx_curr->status & TX_DESC_STAT_OWN) {
-        DEBUG("stm32_eth: not avail\n");
-    }
-
-    /* clear status field */
-    tx_curr->status &= 0x0fffffff;
-
-    dma_acquire(eth_config.dma);
-    for (; iolist; iolist = iolist->iol_next) {
-        ret += dma_transfer(
-                eth_config.dma, eth_config.dma_chan,
-                iolist->iol_base, tx_curr->buffer_addr + ret, iolist->iol_len,
-                DMA_MEM_TO_MEM, DMA_INC_BOTH_ADDR);
-    }
-
-    dma_release(eth_config.dma);
-    if (ret < 0) {
-        DEBUG("stm32_eth: Failure in dma_transfer\n");
-        return ret;
-    }
-    tx_curr->control = (len & 0x1fff);
-
-    /* set flags for first and last frames */
-    tx_curr->status |= TX_DESC_STAT_FS;
-    tx_curr->status |= TX_DESC_STAT_LS | TX_DESC_STAT_IC;
-
-    /* give the descriptors to the DMA */
-    tx_curr->status |= TX_DESC_STAT_OWN;
-    tx_curr = tx_curr->desc_next;
-
-    /* start tx */
+    /* start TX */
     ETH->DMATPDR = 0;
-    return ret;
+    /* await completion */
+    DEBUG("stm32_eth: Started to send %u B via DMA\n", bytes_to_send);
+    mutex_lock(&stm32_eth_tx_completed);
+    DEBUG("stm32_eth: TX completed\n");
+
+    /* Error check */
+    unsigned i = 0;
+    while (1) {
+        uint32_t status = tx_desc[i].status;
+        DEBUG("TX desc %u status: ES=%c, UF=%c, EC=%c, NC=%c, FS=%c, LS=%c\n",
+              i,
+              (status & TX_DESC_STAT_ES) ? '1' : '0',
+              (status & TX_DESC_STAT_UF) ? '1' : '0',
+              (status & TX_DESC_STAT_EC) ? '1' : '0',
+              (status & TX_DESC_STAT_NC) ? '1' : '0',
+              (status & TX_DESC_STAT_FS) ? '1' : '0',
+              (status & TX_DESC_STAT_LS) ? '1' : '0');
+        if (status & TX_DESC_STAT_ES) {
+            return -1;
+        }
+        if (status & TX_DESC_STAT_LS) {
+            break;
+        }
+        i++;
+    }
+    return (int)bytes_to_send;
 }
 
 static ssize_t get_rx_frame_size(void)
@@ -383,11 +384,6 @@ int stm32_eth_receive(void *buf, size_t max_len)
     }
 
     return size;
-}
-
-int stm32_eth_get_rx_status_owned(void)
-{
-    return (!(rx_curr->status & RX_DESC_STAT_OWN));
 }
 
 void stm32_eth_isr_eth_wkup(void)
