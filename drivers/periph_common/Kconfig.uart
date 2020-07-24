@@ -1,0 +1,41 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MOD_PERIPH_UART
+    bool "UART peripheral driver"
+    depends on HAS_PERIPH_UART
+    select MOD_PERIPH_COMMON
+
+if MOD_PERIPH_UART
+
+config MOD_PERIPH_INIT_UART
+    bool "Auto initialize UART peripheral"
+    default y if MOD_PERIPH_INIT
+
+config MOD_PERIPH_UART_MODECFG
+    bool "Mode configuration support"
+    depends on HAS_PERIPH_UART_MODECFG
+
+
+config MOD_PERIPH_UART_NONBLOCKING
+    bool "Non-blocking support"
+    depends on HAS_PERIPH_UART_NONBLOCKING
+
+# TODO: I think these modules are actually just artifacts from the way
+# periph_init_% modules are handled in Makefile. We need to define them to keep
+# the list the same.
+config MOD_PERIPH_INIT_UART_MODECFG
+    bool
+    depends on MOD_PERIPH_UART_MODECFG
+    default y if MOD_PERIPH_INIT
+
+config MOD_PERIPH_INIT_UART_NONBLOCKING
+    bool
+    depends on MOD_PERIPH_UART_NONBLOCKING
+    default y if MOD_PERIPH_INIT
+
+endif # MOD_PERIPH_UART

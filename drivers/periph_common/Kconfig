@@ -139,15 +139,7 @@ rsource "Kconfig.spi"
 
 rsource "Kconfig.timer"
 
-config MOD_PERIPH_UART
-    bool "UART peripheral driver"
-    depends on HAS_PERIPH_UART
-    select MOD_PERIPH_COMMON
-
-config MOD_PERIPH_INIT_UART
-    bool "Auto initialize UART peripheral"
-    default y if MOD_PERIPH_INIT
-    depends on MOD_PERIPH_UART
+rsource "Kconfig.uart"
 
 config MOD_PERIPH_USBDEV
     bool "USBDEV peripheral driver"
