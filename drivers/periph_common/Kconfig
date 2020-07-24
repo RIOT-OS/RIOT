@@ -105,6 +105,16 @@ config MOD_PERIPH_INIT_PM
     default y if MOD_PERIPH_INIT
     depends on MOD_PERIPH_PM
 
+config MOD_PERIPH_QDEC
+    bool "Quadrature Decoder (QDEC) peripheral driver"
+    depends on HAS_PERIPH_QDEC
+    select MOD_PERIPH_COMMON
+
+config MOD_PERIPH_INIT_QDEC
+    bool "Auto initialize Quadrature Decoder (QDEC) peripheral"
+    default y if MOD_PERIPH_INIT
+    depends on MOD_PERIPH_QDEC
+
 config MOD_PERIPH_RTC
     bool "RTC peripheral driver"
     depends on HAS_PERIPH_RTC
@@ -125,15 +135,7 @@ config MOD_PERIPH_INIT_RTT
     default y if MOD_PERIPH_INIT
     depends on MOD_PERIPH_RTT
 
-config MOD_PERIPH_SPI
-    bool "SPI peripheral driver"
-    depends on HAS_PERIPH_SPI
-    select MOD_PERIPH_COMMON
-
-config MOD_PERIPH_INIT_SPI
-    bool "Auto initialize SPI peripheral"
-    default y if MOD_PERIPH_INIT
-    depends on MOD_PERIPH_SPI
+rsource "Kconfig.spi"
 
 config MOD_PERIPH_TIMER
     bool "Timer peripheral driver"
