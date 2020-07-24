@@ -72,3 +72,5 @@ config CPU_MODEL
 
 config CPU
     default "native" if CPU_MODEL_NATIVE
+
+rsource "periph/Kconfig"
