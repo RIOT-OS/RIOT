@@ -1,0 +1,181 @@
+From 0e2e1e1b3898a77bc0a3474a4edc79c3c54a85d3 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 24 Jul 2020 16:48:22 +0200
+Subject: [PATCH 10/10] openwsn-fw: add ifndef guards for configurable
+ parameters
+
+---
+ inc/config.h                       | 18 ++++++++++++++----
+ openstack/02a-MAClow/IEEE802154E.h |  8 +++++++-
+ openstack/02b-MAChigh/neighbors.h  |  8 ++++++++
+ openstack/02b-MAChigh/schedule.h   | 12 +++++++++++-
+ openstack/02b-MAChigh/sixtop.h     |  2 ++
+ 5 files changed, 42 insertions(+), 6 deletions(-)
+
+diff --git a/inc/config.h b/inc/config.h
+index 974ceb76..4f27b98a 100644
+--- a/inc/config.h
++++ b/inc/config.h
+@@ -16,8 +16,9 @@
+  * - level 6: critical, error, success, warning, info, and verbose
+  *
+  */
+-
++#ifndef OPENWSN_DEBUG_LEVEL
+ #define OPENWSN_DEBUG_LEVEL         6
++#endif
+ 
+ // ========================== Applications ==========================
+ 
+@@ -221,11 +222,16 @@
+  *  - OPENWSN_MAX_NUM_BIGPKTS: defines how many static buffer space will be allocated for processing large packets.
+  *
+  */
+-
+ // #define OPENWSN_6LO_FRAGMENTATION_C
+-// #define OPENWSN_MAX_PKTSIZE_SUPPORTED   1320
+-// #define OPENWSN_MAX_NUM_BIGPKTS         2
+ 
++#ifdef OPENWSN_6LO_FRAGMENTATION_C
++#ifndef OPENWSN_MAX_PKTSIZE_SUPPORTED
++#define OPENWSN_MAX_PKTSIZE_SUPPORTED   1320
++#endif
++#ifndef OPENWSN_MAX_NUM_BIGPKTS
++#define OPENWSN_MAX_NUM_BIGPKTS         2
++#endif
++#endif
+ 
+ /**
+  * \def OPENWSN_ADAPTIVE_MSF
+@@ -279,7 +285,9 @@
+  * When the channel is set to 0, frequency hopping is enabled, otherwise a single channel is used.
+  *
+  */
++#ifndef IEEE802154E_SINGLE_CHANNEL
+ #define IEEE802154E_SINGLE_CHANNEL      11
++#endif
+ 
+ /**
+  * \def PACKETQUEUE_LENGTH
+@@ -288,7 +296,9 @@
+  * increase RAM usage.
+  *
+  */
++#ifndef PACKETQUEUE_LENGTH
+ #define PACKETQUEUE_LENGTH              20
++#endif
+ 
+ // ======================== Board configuration ========================
+ 
+diff --git a/openstack/02a-MAClow/IEEE802154E.h b/openstack/02a-MAClow/IEEE802154E.h
+index f3274979..472e4b85 100644
+--- a/openstack/02a-MAClow/IEEE802154E.h
++++ b/openstack/02a-MAClow/IEEE802154E.h
+@@ -42,9 +42,15 @@ static const uint8_t ebIEsBytestream[] = {
+ #define TXRETRIES                   15  // number of MAC retries before declaring failed
+ #define TX_POWER                    31  // 1=-25dBm, 31=0dBm (max value)
+ #define RESYNCHRONIZATIONGUARD       5  // in 32kHz ticks. min distance to the end of the slot to successfully synchronize
+-#define EB_PORTION                  10  // set EB on minimal cell for 1/EB_PORTION portion
++#ifndef EB_PORTION
++#define EB_PORTION                  10 // set EB on minimal cell for 1/EB_PORTION portion
++#endif
++#ifndef MAXKAPERIOD
+ #define MAXKAPERIOD               1000  // in slots: 1500@20ms per slot -> ~30 seconds. Max value used by adaptive synchronization.
++#endif
++#ifndef DESYNCTIMEOUT
+ #define DESYNCTIMEOUT             1750  // in slots: 1750@20ms per slot -> ~35 seconds. A larger DESYNCTIMEOUT is needed if using a larger KATIMEOUT.
++#endif
+ #define LIMITLARGETIMECORRECTION     5  // threshold number of ticks to declare a timeCorrection "large"
+ #define LENGTH_IEEE154_MAX         128  // max length of a valid radio packet
+ #define DUTY_CYCLE_WINDOW_LIMIT    (0xFFFFFFFF>>1) // limit of the dutycycle window
+diff --git a/openstack/02b-MAChigh/neighbors.h b/openstack/02b-MAChigh/neighbors.h
+index 894001e6..3ca55cdc 100644
+--- a/openstack/02b-MAChigh/neighbors.h
++++ b/openstack/02b-MAChigh/neighbors.h
+@@ -13,10 +13,18 @@
+ //=========================== define ==========================================
+ 
+ #define MAXPREFERENCE             2
++#ifndef BADNEIGHBORMAXRSSI
+ #define BADNEIGHBORMAXRSSI        -70 //dBm
++#endif
++#ifndef GOODNEIGHBORMINRSSI
+ #define GOODNEIGHBORMINRSSI       -80 //dBm
++#endif
++#ifndef SWITCHSTABILITYTHRESHOLD
+ #define SWITCHSTABILITYTHRESHOLD  3
++#endif
++#ifndef DEFAULTLINKCOST
+ #define DEFAULTLINKCOST           4
++#endif
+ #define MINIMAL_NUM_TX            16
+ 
+ #define MAXDAGRANK                0xffff
+diff --git a/openstack/02b-MAChigh/schedule.h b/openstack/02b-MAChigh/schedule.h
+index 6ba2657a..ae53a9ce 100644
+--- a/openstack/02b-MAChigh/schedule.h
++++ b/openstack/02b-MAChigh/schedule.h
+@@ -17,10 +17,15 @@
+ 
+ The superframe reappears over time and can be arbitrarily long.
+ */
++
++#ifndef SLOTFRAME_LENGTH
+ #define SLOTFRAME_LENGTH    101 //should be 101
++#endif
+ 
+ //draft-ietf-6tisch-minimal-06
++#ifndef SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS
+ #define SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS                      1
++#endif
+ #define SCHEDULE_MINIMAL_6TISCH_SLOTOFFSET                        0
+ #define SCHEDULE_MINIMAL_6TISCH_CHANNELOFFSET                     0
+ #define SCHEDULE_MINIMAL_6TISCH_DEFAULT_SLOTFRAME_HANDLE          0 //id of slotframe
+@@ -37,7 +42,9 @@ The superframe reappears over time and can be arbitrarily long.
+   for serial port to transmit data to dagroot.
+ */
+ 
++#ifndef NUMSLOTSOFF
+ #define NUMSLOTSOFF          20
++#endif
+ 
+ /**
+ \brief Maximum number of active slots in a superframe.
+@@ -49,7 +56,9 @@ in that table; a slot is "active" when it is not of type CELLTYPE_OFF.
+ Set this number to the exact number of active slots you are planning on having
+ in your schedule, so not to waste RAM.
+ */
++#ifndef MAXACTIVESLOTS
+ #define MAXACTIVESLOTS       SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS+NUMSLOTSOFF
++#endif
+ 
+ /**
+ \brief Maximum number of alternative slots (more than one cells with same slotOffset)
+@@ -59,8 +68,9 @@ Note that for each slot entry, it has a table of alternative slots. All
+ those slots's next pointer is pointing to the same entries.
+ 
+ */
+-
++#ifndef MAXBACKUPSLOTS
+ #define MAXBACKUPSLOTS   2
++#endif
+ 
+ /**
+ \brief Minimum backoff exponent.
+diff --git a/openstack/02b-MAChigh/sixtop.h b/openstack/02b-MAChigh/sixtop.h
+index 6cd98959..7028ca50 100644
+--- a/openstack/02b-MAChigh/sixtop.h
++++ b/openstack/02b-MAChigh/sixtop.h
+@@ -81,7 +81,9 @@ typedef enum {
+ // >2^4*3*(101/9)*15=8080 (2^MAXEB * maxretries * (slotframe / numberOfsharedCellsFor6p)*slotlength) (ms))
+ // on the receiver side of sixtop, it may has mutiple sixtop request in the queue to response (most of them will return with RC BUSY)
+ // increase the timeout longer than calculated value
++#ifndef SIX2SIX_TIMEOUT_MS
+ #define SIX2SIX_TIMEOUT_MS      65535
++#endif
+ 
+ typedef uint8_t                 (*sixtop_sf_getsfid_cbt)(void);
+ 
+-- 
+2.27.0
+

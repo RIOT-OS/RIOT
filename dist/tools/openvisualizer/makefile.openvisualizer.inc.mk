@@ -10,7 +10,7 @@
 # Not all logs for openvisualizer are piped to the terminal, more detailed logs
 # are stored in $(BINDIR)/openv-server.log
 #
-# More info at https://github.com/fjmolinas/openvisualizer/blob/develop_SW-318-RIOT/README.md
+# More info at https://github.com/fjmolinas/openvisualizer/blob/develop-RIOT/README.md
 #
 # Supported:
 #  * openv-term
@@ -24,7 +24,7 @@
 # -------------
 #
 # * Install openvisualizer:
-#   * git clone -b develop_SW-318-RIOT https://github.com/fjmolinas/openvisualizer.git
+#   * git clone -b develop-RIOT https://github.com/fjmolinas/openvisualizer.git
 #   * cd openvisualizer
 #   * pip2 install .
 #

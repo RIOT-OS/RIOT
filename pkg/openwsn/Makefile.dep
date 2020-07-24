@@ -1,5 +1,4 @@
 ifneq (,$(filter openwsn_openstack,$(USEMODULE)))
-  USEMODULE += openwsn_cjoin
   USEMODULE += openwsn_iphc
   USEMODULE += openwsn_ipv6
   USEMODULE += openwsn_mac_low
@@ -11,10 +10,17 @@ ifneq (,$(filter openwsn_openstack,$(USEMODULE)))
   USEMODULE += openwsn_sctimer
   USEMODULE += openwsn_radio
 
+  USEMODULE += openwsn_openweb
+  USEMODULE += openwsn_openapps
+
   DEFAULT_MODULE += auto_init_openwsn
 
   USEMODULE += luid
   USEMODULE += netdev_default
+endif
+
+ifneq (,$(filter openwsn_ipv6,$(USEMODULE)))
+  DEFAULT_MODULE += openwsn_icmpv6_echo
 endif
 
 ifneq (,$(filter openwsn_scheduler,$(USEMODULE)))
@@ -22,13 +28,11 @@ ifneq (,$(filter openwsn_scheduler,$(USEMODULE)))
 endif
 
 ifneq (,$(filter openwsn_cjoin,$(USEMODULE)))
-  USEMODULE += openwsn_openapps
   USEMODULE += openwsn_opencoap
-
-  USEMODULE += openwsn_cryptoengine
+  USEMODULE += openwsn_crypto
 endif
 
-ifneq (,$(filter openwsn_cryptoengine,$(USEMODULE)))
+ifneq (,$(filter openwsn_crypto,$(USEMODULE)))
   USEMODULE += crypto_3des
   USEMODULE += cipher_modes
 endif

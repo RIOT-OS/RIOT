@@ -30,7 +30,7 @@
 #include "scheduler.h"
 #include "02a-MAClow/IEEE802154E.h"
 #include "03b-IPv6/icmpv6rpl.h"
-#include "04-TRAN/openudp.h"
+#include "04-TRAN/udp.h"
 #include "cross-layers/openqueue.h"
 #include "cross-layers/idmanager.h"
 #include "cross-layers/packetfunctions.h"
@@ -105,15 +105,15 @@ static int udp_send(char *addr_str, char *port_str, char *data,
         pkt->l3_destinationAdd.type = ADDR_128B;
         memcpy(&pkt->l3_destinationAdd.addr_128b[0], (void *)&addr, 16);
         /* add payload */
-        packetfunctions_reserveHeaderSize(pkt, data_len);
+        packetfunctions_reserveHeader(&pkt, data_len);
         memcpy(&pkt->payload[0], data, data_len);
 
-        packetfunctions_reserveHeaderSize(pkt, sizeof(uint16_t));
+        packetfunctions_reserveHeader(&pkt, sizeof(uint16_t));
         pkt->payload[1] = (uint8_t)((counter & 0xff00) >> 8);
         pkt->payload[0] = (uint8_t)(counter & 0x00ff);
         counter++;
 
-        packetfunctions_reserveHeaderSize(pkt, sizeof(asn_t));
+        packetfunctions_reserveHeader(&pkt, sizeof(asn_t));
         ieee154e_getAsn(asnArray);
         pkt->payload[0] = asnArray[0];
         pkt->payload[1] = asnArray[1];

@@ -178,6 +178,8 @@ to see the ipv6 address:
 
                   NO RPL parent
 
+Note that the '6TiSCH joined' field will only show up if `openwsn_cjoin`
+is used.
 
 On the root node Openvisualizer is launched and the DAGroot is setup.
 
@@ -194,7 +196,7 @@ On the root node Openvisualizer is launched and the DAGroot is setup.
 The root node will now start sending beacons and other nodes will synchronize, and
 join. If channel hopping is enabled this can take quite some time (see
 [Synchronization](../../pkg/openwsn/doc.txt#Synchronization). Once leaf nodes
-have joined the network when issuing `ifconfing` you should see:
+have joined the network when issuing `ifconfig` you should see:
 
     ifconfig
     Iface  3      HWaddr: 0F:F4  NID: CA:FE

@@ -1,7 +1,7 @@
-From 6fff6e0e31dbed9a603e4e1eab434c45e8b43861 Mon Sep 17 00:00:00 2001
+From 4522c2b7cc03b96b23278953292a9b3c9bb0ee60 Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Mon, 10 Feb 2020 15:05:07 +0100
-Subject: [PATCH 02/11] drivers/common/openserial: rename include for
+Subject: [PATCH 02/10] drivers/common/openserial: rename include for
  RIOT-OpenWSN uart
 
 ---
@@ -9,7 +9,7 @@ Subject: [PATCH 02/11] drivers/common/openserial: rename include for
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/common/openserial.c b/drivers/common/openserial.c
-index d39634c1..5c3c0003 100644
+index 27a30d24..2e417071 100644
 --- a/drivers/common/openserial.c
 +++ b/drivers/common/openserial.c
 @@ -20,7 +20,7 @@
