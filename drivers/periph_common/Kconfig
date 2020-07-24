@@ -137,15 +137,7 @@ config MOD_PERIPH_INIT_RTT
 
 rsource "Kconfig.spi"
 
-config MOD_PERIPH_TIMER
-    bool "Timer peripheral driver"
-    depends on HAS_PERIPH_TIMER
-    select MOD_PERIPH_COMMON
-
-config MOD_PERIPH_INIT_TIMER
-    bool "Auto initialize Timer peripheral"
-    default y if MOD_PERIPH_INIT
-    depends on MOD_PERIPH_TIMER
+rsource "Kconfig.timer"
 
 config MOD_PERIPH_UART
     bool "UART peripheral driver"

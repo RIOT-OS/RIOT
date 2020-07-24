@@ -1,0 +1,31 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MOD_PERIPH_TIMER
+    bool "Timer peripheral driver"
+    depends on HAS_PERIPH_TIMER
+    select MOD_PERIPH_COMMON
+
+if MOD_PERIPH_TIMER
+
+config MOD_PERIPH_INIT_TIMER
+    bool "Auto initialize Timer peripheral"
+    default y if MOD_PERIPH_INIT
+
+config MOD_PERIPH_TIMER_PERIODIC
+    bool "Periodic timeout support"
+    depends on HAS_PERIPH_TIMER_PERIODIC
+
+# TODO: I think this module is actually just an artifact from the way
+# periph_init_% modules are handled in Makefile. We need to define it to keep
+# the list the same.
+config MOD_PERIPH_INIT_TIMER_PERIODIC
+    bool
+    depends on MOD_PERIPH_TIMER_PERIODIC
+    default y if MOD_PERIPH_INIT
+
+endif # MOD_PERIPH_TIMER
