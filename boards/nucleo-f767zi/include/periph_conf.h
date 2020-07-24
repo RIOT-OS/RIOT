@@ -178,12 +178,6 @@ static const eth_conf_t eth_config = {
     }
 };
 
-#define ETH_RX_BUFFER_COUNT (4)
-#define ETH_TX_BUFFER_COUNT (4)
-
-#define ETH_RX_BUFFER_SIZE (1524)
-#define ETH_TX_BUFFER_SIZE (1524)
-
 #define ETH_DMA_ISR        isr_dma2_stream0
 
 /** @} */

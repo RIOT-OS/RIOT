@@ -49,6 +49,31 @@
 #define CLOCK_RANGE ETH_MACMIIAR_CR_Div102
 #endif /* CLOCK_CORECLOCK < (20000000U) */
 
+/* Default DMA buffer setup */
+#ifndef ETH_RX_BUFFER_COUNT
+#define ETH_RX_BUFFER_COUNT (6U)
+#endif
+#ifndef ETH_TX_BUFFER_COUNT
+#define ETH_TX_BUFFER_COUNT (4U)
+#endif
+#ifndef ETH_TX_BUFFER_SIZE
+#define ETH_TX_BUFFER_SIZE  (1524U)
+#endif
+#ifndef ETH_RX_BUFFER_SIZE
+#define ETH_RX_BUFFER_SIZE  (256U)
+#endif
+
+#if (ETH_RX_BUFFER_SIZE % 16) != 0
+/* For compatibility with 128bit memory interfaces, the buffer size needs to
+ * be a multiple of 16 Byte. For 64 bit memory interfaces need the size to be
+ * a multiple of 8 Byte, for 32 bit a multiple of 4 byte is sufficient. */
+#warning "ETH_RX_BUFFER_SIZE is not a multiple of 16. (See comment above.)"
+#endif
+
+#if ETH_RX_BUFFER_COUNT * ETH_RX_BUFFER_SIZE < 1524U
+#warning "Total RX buffers lower than MTU, you won't receive huge frames!"
+#endif
+
 #define MIN(a, b) (((a) <= (b)) ? (a) : (b))
 
 /* Descriptors */
