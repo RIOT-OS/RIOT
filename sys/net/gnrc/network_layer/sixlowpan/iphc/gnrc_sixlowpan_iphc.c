@@ -1081,7 +1081,7 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
 
         if ((src_ctx != NULL) || ipv6_addr_is_link_local(&(ipv6_hdr->src))) {
             eui64_t iid;
-            iid.uint64.u64 = 0;
+            memset(&iid, 0, sizeof(iid));
 
             gnrc_netif_acquire(iface);
             if (gnrc_netif_ipv6_get_iid(iface, &iid) < 0) {
@@ -1091,7 +1091,7 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
             }
             gnrc_netif_release(iface);
 
-            if ((ipv6_hdr->src.u64[1].u64 == iid.uint64.u64) ||
+            if (!memcmp(&ipv6_hdr->src.u64[1], &iid, sizeof(iid)) ||
                 _context_overlaps_iid(src_ctx, &ipv6_hdr->src, &iid)) {
                 /* 0 bits. The address is derived from link-layer address */
                 iphc_hdr[IPHC2_IDX] |= IPHC_SAC_SAM_L2;
@@ -1208,7 +1208,7 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
             return 0;
         }
 
-        if ((ipv6_hdr->dst.u64[1].u64 == iid.uint64.u64) ||
+        if (!memcmp(&ipv6_hdr->dst.u64[1], &iid, sizeof(iid)) ||
             _context_overlaps_iid(dst_ctx, &(ipv6_hdr->dst), &iid)) {
             /* 0 bits. The address is derived using the link-layer address */
             iphc_hdr[IPHC2_IDX] |= IPHC_M_DAC_DAM_U_L2;

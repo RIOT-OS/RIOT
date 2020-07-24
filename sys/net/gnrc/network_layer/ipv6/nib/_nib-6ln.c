@@ -35,7 +35,7 @@ static bool _is_iface_eui64(gnrc_netif_t *netif, const eui64_t *eui64)
     eui64_t iface_eui64;
     int res = gnrc_netif_get_eui64(netif, &iface_eui64);
     return (res == sizeof(eui64_t)) &&
-           (iface_eui64.uint64.u64 == eui64->uint64.u64);
+           !memcmp(&iface_eui64, eui64, sizeof(eui64_t));
 }
 
 bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,

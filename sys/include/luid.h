@@ -55,6 +55,7 @@
 
 #include <stddef.h>
 
+#include "byteorder.h"
 #include "net/eui48.h"
 #include "net/eui64.h"
 
