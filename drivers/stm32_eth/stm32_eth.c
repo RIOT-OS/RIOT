@@ -39,14 +39,14 @@ int stm32_eth_send(const struct iolist *iolist);
 int stm32_eth_get_rx_status_owned(void);
 
 static void _isr(netdev_t *netdev) {
-    if(stm32_eth_get_rx_status_owned()) {
+    if (stm32_eth_get_rx_status_owned()) {
         netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
     }
 }
 
 void isr_eth(void)
 {
-    volatile unsigned tmp = ETH->DMASR;
+    unsigned tmp = ETH->DMASR;
 
     if ((tmp & ETH_DMASR_TS)) {
         ETH->DMASR = ETH_DMASR_TS | ETH_DMASR_NIS;
@@ -70,7 +70,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     (void)info;
     (void)netdev;
-    if(!stm32_eth_get_rx_status_owned()){
+    if (!stm32_eth_get_rx_status_owned()){
                 mutex_lock(&_rx);
     }
     int ret = stm32_eth_receive_blocking((char *)buf, len);
@@ -104,14 +104,14 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t max_len)
     int res = -1;
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            assert(max_len >= ETHERNET_ADDR_LEN);
-            stm32_eth_set_mac((char *)value);
-            res = ETHERNET_ADDR_LEN;
-            break;
-        default:
-            res = netdev_eth_set(dev, opt, value, max_len);
-            break;
+    case NETOPT_ADDRESS:
+        assert(max_len >= ETHERNET_ADDR_LEN);
+        stm32_eth_set_mac((char *)value);
+        res = ETHERNET_ADDR_LEN;
+        break;
+    default:
+        res = netdev_eth_set(dev, opt, value, max_len);
+        break;
     }
 
     return res;
@@ -122,14 +122,14 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
     int res = -1;
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            assert(max_len >= ETHERNET_ADDR_LEN);
-            stm32_eth_get_mac((char *)value);
-            res = ETHERNET_ADDR_LEN;
-            break;
-        default:
-            res = netdev_eth_get(dev, opt, value, max_len);
-            break;
+    case NETOPT_ADDRESS:
+        assert(max_len >= ETHERNET_ADDR_LEN);
+        stm32_eth_get_mac((char *)value);
+        res = ETHERNET_ADDR_LEN;
+        break;
+    default:
+        res = netdev_eth_get(dev, opt, value, max_len);
+        break;
     }
 
     return res;
