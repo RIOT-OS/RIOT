@@ -70,21 +70,7 @@ config MOD_PERIPH_INIT_EEPROM
 
 rsource "Kconfig.flashpage"
 
-config MOD_PERIPH_GPIO
-    bool "GPIO peripheral driver"
-    default y
-    depends on HAS_PERIPH_GPIO
-    select MOD_PERIPH_COMMON
-
-config MOD_PERIPH_INIT_GPIO
-    bool "Auto initialize GPIO peripheral"
-    default y if MOD_PERIPH_INIT
-    depends on MOD_PERIPH_GPIO
-
-config MOD_PERIPH_GPIO_IRQ
-    bool "GPIO interrupt peripheral driver"
-    depends on HAS_PERIPH_GPIO_IRQ
-    select MOD_PERIPH_COMMON
+rsource "Kconfig.gpio"
 
 config MOD_PERIPH_HWRNG
     bool "HWRNG peripheral driver"
@@ -95,11 +81,6 @@ config MOD_PERIPH_INIT_HWRNG
     bool "Auto initialize HWRNG peripheral"
     default y if MOD_PERIPH_INIT
     depends on MOD_PERIPH_HWRNG
-
-config MOD_PERIPH_INIT_GPIO_IRQ
-    bool "Auto initialize GPIO interrupt peripheral"
-    default y if MOD_PERIPH_INIT
-    depends on MOD_PERIPH_GPIO_IRQ
 
 rsource "Kconfig.i2c"
 
