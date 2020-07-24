@@ -101,15 +101,7 @@ config MOD_PERIPH_INIT_GPIO_IRQ
     default y if MOD_PERIPH_INIT
     depends on MOD_PERIPH_GPIO_IRQ
 
-config MOD_PERIPH_I2C
-    bool "I2C peripheral driver"
-    depends on HAS_PERIPH_I2C
-    select MOD_PERIPH_COMMON
-
-config MOD_PERIPH_INIT_I2C
-    bool "Auto initialize I2C peripheral"
-    default y if MOD_PERIPH_INIT
-    depends on MOD_PERIPH_I2C
+rsource "Kconfig.i2c"
 
 config MOD_PERIPH_PWM
     bool "PWM peripheral driver"
