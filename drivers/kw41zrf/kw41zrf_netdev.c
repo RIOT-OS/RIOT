@@ -786,10 +786,14 @@ static int kw41zrf_netdev_set(netdev_t *netdev, netopt_t opt, const void *value,
             break;
 
         case NETOPT_ADDRESS_LONG: {
-            eui64_t addr;
+            union {
+                eui64_t addr;
+                uint64_t u64;
+            } tmp;
             assert(len <= sizeof(const eui64_t));
-            addr.uint64.u64 = byteorder_swapll(*(uint64_t*)value);
-            kw41zrf_set_addr_long(dev, &addr);
+            memcpy(&tmp, value, sizeof(tmp));
+            tmp.u64 = byteorder_swapll(tmp.u64);
+            kw41zrf_set_addr_long(dev, &tmp.addr);
             res = sizeof(const eui64_t);
             break;
         }

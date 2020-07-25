@@ -126,8 +126,10 @@ void kw41zrf_set_addr_short(kw41zrf_t *dev, const network_uint16_t *addr)
 void kw41zrf_set_addr_long(kw41zrf_t *dev, const eui64_t *addr)
 {
     (void) dev;
-    ZLL->MACLONGADDRS0_LSB = addr->uint32[0].u32;
-    ZLL->MACLONGADDRS0_MSB = addr->uint32[1].u32;
+    uint32_t tmp[2];
+    memcpy(tmp, addr, sizeof(*addr));
+    ZLL->MACLONGADDRS0_LSB = tmp[0];
+    ZLL->MACLONGADDRS0_MSB = tmp[1];
 }
 
 void kw41zrf_get_addr_short(kw41zrf_t *dev, network_uint16_t *addr)
@@ -142,8 +144,10 @@ void kw41zrf_get_addr_short(kw41zrf_t *dev, network_uint16_t *addr)
 void kw41zrf_get_addr_long(kw41zrf_t *dev, eui64_t *addr)
 {
     (void) dev;
-    addr->uint32[0] = (network_uint32_t)ZLL->MACLONGADDRS0_LSB;
-    addr->uint32[1] = (network_uint32_t)ZLL->MACLONGADDRS0_MSB;
+    uint32_t tmp[2];
+    tmp[0] = ZLL->MACLONGADDRS0_LSB;
+    tmp[1] = ZLL->MACLONGADDRS0_MSB;
+    memcpy(addr, tmp, sizeof(*addr));
 }
 
 int8_t kw41zrf_get_cca_threshold(kw41zrf_t *dev)
