@@ -101,6 +101,7 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     USEMODULE += xtimer
   endif
   USEMODULE += evtimer
+  USEMODULE += netstats_neighbor_etx
 endif
 
 ifneq (,$(filter gnrc_ipv6_auto_subnets_eui,$(USEMODULE)))
