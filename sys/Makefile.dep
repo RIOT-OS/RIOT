@@ -224,6 +224,7 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += trickle
   USEMODULE += xtimer
   USEMODULE += evtimer
+  USEMODULE += netstats_neighbor_etx
 endif
 
 ifneq (,$(filter trickle,$(USEMODULE)))
