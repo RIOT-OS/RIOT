@@ -17,3 +17,53 @@ config BOARD_HIFIVE1
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+
+menu "Hifive1 clock configuration"
+    depends on BOARD_HIFIVE1
+
+choice
+bool "Clock source selection"
+default USE_CLOCK_HFXOSC_PLL
+
+config USE_CLOCK_HFXOSC_PLL
+    bool "PLL clocked by high frequency external oscillator (HFXOSC)"
+
+config USE_CLOCK_HFXOSC
+    bool "Direct High frequency external oscillator (HFXOSC)"
+
+config USE_CLOCK_HFROSC_PLL
+    bool "PLL clocked by High frequency internal oscillator (HFROSC)"
+
+config USE_CLOCK_HFROSC
+    bool "Direct High frequency internal oscillator (HFROSC)"
+endchoice
+
+if USE_CLOCK_HFXOSC_PLL
+config CLOCK_PLL_F
+    int "F: REFR multiply factor"
+    default 39
+
+config CLOCK_PLL_Q
+    int "Q: VCO divide factor"
+    default 1
+endif
+
+config CLOCK_DESIRED_FREQUENCY
+    int "Desired clock frequency"
+    default 320000000
+    range 1000000 320000000
+    depends on USE_CLOCK_HFROSC_PLL
+
+if USE_CLOCK_HFROSC
+config CLOCK_HFROSC_TRIM
+    int "TRIM: input frequency multiplier"
+    default 6
+    range 0 31
+
+config CLOCK_HFROSC_DIV
+    int "DIV: output frequency divider"
+    default 1
+    range 0 63
+endif
+
+endmenu
