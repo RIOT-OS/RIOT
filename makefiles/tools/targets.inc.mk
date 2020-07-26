@@ -49,3 +49,8 @@ $(RIOTTOOLS)/lpc2k_pgm/bin/lpc2k_pgm: $(RIOTTOOLS)/lpc2k_pgm/Makefile
 	@echo "[INFO] lpc2k_pgm binary not found - building it from source now"
 	@$(MAKE) -C $(RIOTTOOLS)/lpc2k_pgm
 	@echo "[INFO] lpc2k_pgm binary successfully built!"
+
+$(RIOTTOOLS)/uf2/uf2conv.py: $(RIOTTOOLS)/uf2/Makefile
+	@echo "[INFO] uf2conv.py not found - fetching it from GitHub now"
+	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/uf2
+	@echo "[INFO] uf2conv.py successfully fetched!"
