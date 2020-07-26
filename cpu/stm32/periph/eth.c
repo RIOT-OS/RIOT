@@ -23,12 +23,11 @@
 #include <string.h>
 
 #include "bitarithm.h"
-#include "mutex.h"
-#include "luid.h"
-
 #include "iolist.h"
+#include "luid.h"
+#include "mutex.h"
 #include "net/ethernet.h"
-
+#include "net/netdev/eth.h"
 #include "periph/gpio.h"
 
 #define ENABLE_DEBUG (0)
@@ -84,6 +83,9 @@ static edma_desc_t *rx_curr;
 /* RX Buffers */
 static char rx_buffer[ETH_RX_DESCRIPTOR_COUNT][ETH_RX_BUFFER_SIZE];
 
+/* Netdev used in RIOT's API to upper layer */
+netdev_t *_netdev;
+
 /** Read or write a phy register, to write the register ETH_MACMIIAR_MW is to
  * be passed as the higher nibble of the value */
 static unsigned _rw_phy(unsigned addr, unsigned reg, unsigned value)
@@ -105,18 +107,17 @@ static unsigned _rw_phy(unsigned addr, unsigned reg, unsigned value)
     return (ETH->MACMIIDR & 0x0000ffff);
 }
 
-int32_t stm32_eth_phy_read(uint16_t addr, uint8_t reg)
+static inline int32_t _phy_read(uint16_t addr, uint8_t reg)
 {
     return _rw_phy(addr, reg, 0);
 }
 
-int32_t stm32_eth_phy_write(uint16_t addr, uint8_t reg, uint16_t value)
+static inline void _phy_write(uint16_t addr, uint8_t reg, uint16_t value)
 {
     _rw_phy(addr, reg, (value & 0xffff) | (ETH_MACMIIAR_MW << 16));
-    return 0;
 }
 
-void stm32_eth_get_mac(char *out)
+static void stm32_eth_get_mac(char *out)
 {
     unsigned t;
 
@@ -133,7 +134,7 @@ void stm32_eth_get_mac(char *out)
 
 /** Set the mac address. The peripheral supports up to 4 MACs but only one is
  * implemented */
-void stm32_eth_set_mac(const char *mac)
+static void stm32_eth_set_mac(const char *mac)
 {
     ETH->MACA0HR &= 0xffff0000;
     ETH->MACA0HR |= ((mac[5] << 8) | mac[4]);
@@ -165,8 +166,9 @@ static void _init_buffer(void)
     ETH->DMATDLAR = (uintptr_t)&tx_desc[0];
 }
 
-int stm32_eth_init(void)
+static int stm32_eth_init(netdev_t *netdev)
 {
+    (void)netdev;
     /* enable APB2 clock */
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 
@@ -199,7 +201,7 @@ int stm32_eth_init(void)
 
     /* configure the PHY (standard for all PHY's) */
     /* if there's no PHY, this has no effect */
-    stm32_eth_phy_write(eth_config.phy_addr, PHY_BMCR, BMCR_RESET);
+    _phy_write(eth_config.phy_addr, PHY_BMCR, BMCR_RESET);
 
     /* speed from conf */
     ETH->MACCR |= (ETH_MACCR_ROD | ETH_MACCR_IPCO | ETH_MACCR_APCS |
@@ -244,13 +246,15 @@ int stm32_eth_init(void)
 
     /* configure speed, do it at the end so the PHY had time to
      * reset */
-    stm32_eth_phy_write(eth_config.phy_addr, PHY_BMCR, eth_config.speed);
+    _phy_write(eth_config.phy_addr, PHY_BMCR, eth_config.speed);
 
     return 0;
 }
 
-int stm32_eth_send(const struct iolist *iolist)
+static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
 {
+    (void)netdev;
+    netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
     unsigned bytes_to_send = iolist_size(iolist);
     /* Input must not be bigger than maximum allowed frame length */
     assert(bytes_to_send <= ETHERNET_FRAME_LEN);
@@ -294,7 +298,10 @@ int stm32_eth_send(const struct iolist *iolist)
               (status & TX_DESC_STAT_NC) ? '1' : '0',
               (status & TX_DESC_STAT_FS) ? '1' : '0',
               (status & TX_DESC_STAT_LS) ? '1' : '0');
+        /* The Error Summary (ES) bit is set, if any error during TX occurred */
         if (status & TX_DESC_STAT_ES) {
+            /* TODO: Report better event to reflect error */
+            netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
             return -1;
         }
         if (status & TX_DESC_STAT_LS) {
@@ -302,6 +309,7 @@ int stm32_eth_send(const struct iolist *iolist)
         }
         i++;
     }
+    netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     return (int)bytes_to_send;
 }
 
@@ -345,8 +353,11 @@ static void drop_frame_and_update_rx_curr(void)
     }
 }
 
-int stm32_eth_receive(void *buf, size_t max_len)
+static int stm32_eth_recv(netdev_t *netdev, void *buf, size_t max_len,
+                             void *info)
 {
+    (void)info;
+    (void)netdev;
     char *data = buf;
     /* Determine the size of received frame. The frame might span multiple
      * DMA buffers */
@@ -389,4 +400,82 @@ int stm32_eth_receive(void *buf, size_t max_len)
 void stm32_eth_isr_eth_wkup(void)
 {
     cortexm_isr_end();
+}
+
+static void stm32_eth_isr(netdev_t *netdev) {
+    netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
+}
+
+void isr_eth(void)
+{
+    unsigned tmp = ETH->DMASR;
+
+    if ((tmp & ETH_DMASR_TS)) {
+        ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_TS;
+        DEBUG("isr_eth: TX completed\n");
+        mutex_unlock(&stm32_eth_tx_completed);
+    }
+
+    if ((tmp & ETH_DMASR_RS)) {
+        ETH->DMASR = ETH_DMASR_NIS | ETH_DMASR_RS;
+        DEBUG("isr_eth: RX completed\n");
+        if (_netdev) {
+            netdev_trigger_event_isr(_netdev);
+        }
+    }
+
+    cortexm_isr_end();
+}
+
+static int stm32_eth_set(netdev_t *dev, netopt_t opt,
+                         const void *value, size_t max_len)
+{
+    int res = -1;
+
+    switch (opt) {
+    case NETOPT_ADDRESS:
+        assert(max_len >= ETHERNET_ADDR_LEN);
+        stm32_eth_set_mac((char *)value);
+        res = ETHERNET_ADDR_LEN;
+        break;
+    default:
+        res = netdev_eth_set(dev, opt, value, max_len);
+        break;
+    }
+
+    return res;
+}
+
+static int stm32_eth_get(netdev_t *dev, netopt_t opt,
+                         void *value, size_t max_len)
+{
+    int res = -1;
+
+    switch (opt) {
+    case NETOPT_ADDRESS:
+        assert(max_len >= ETHERNET_ADDR_LEN);
+        stm32_eth_get_mac((char *)value);
+        res = ETHERNET_ADDR_LEN;
+        break;
+    default:
+        res = netdev_eth_get(dev, opt, value, max_len);
+        break;
+    }
+
+    return res;
+}
+
+static const netdev_driver_t netdev_driver_stm32f4eth = {
+    .send = stm32_eth_send,
+    .recv = stm32_eth_recv,
+    .init = stm32_eth_init,
+    .isr = stm32_eth_isr,
+    .get = stm32_eth_get,
+    .set = stm32_eth_set,
+};
+
+void stm32_eth_netdev_setup(netdev_t *netdev)
+{
+    _netdev = netdev;
+    netdev->driver = &netdev_driver_stm32f4eth;
 }

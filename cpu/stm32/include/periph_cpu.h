@@ -1227,29 +1227,6 @@ typedef struct eth_dma_desc {
 #define ANER_LP_AN_ABLE                    (0x0001)
 /** @} */
 
-#ifdef MODULE_STM32_ETH
-/**
- * @brief Read a PHY register
- *
- * @param[in] addr      address of the PHY to read
- * @param[in] reg       register to be read
- *
- * @return value in the register, or <=0 on error
- */
-int32_t stm32_eth_phy_read(uint16_t addr, uint8_t reg);
-
-/**
- * @brief Write a PHY register
- *
- * @param[in] addr      address of the PHY to write
- * @param[in] reg       register to be written
- * @param[in] value     value to write into the register
- *
- * @return 0 in case of success or <=0 on error
- */
-int32_t stm32_eth_phy_write(uint16_t addr, uint8_t reg, uint16_t value);
-#endif /* MODULE_STM32_ETH */
-
 #ifdef __cplusplus
 }
 #endif

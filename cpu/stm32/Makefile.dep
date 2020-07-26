@@ -16,6 +16,13 @@ ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
   USEMODULE += tsrb
 endif
 
+ifneq (,$(filter stm32_eth,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_eth
+  USEMODULE += netdev_eth
+  USEMODULE += iolist
+  USEMODULE += luid
+endif
+
 ifneq (STM32F030x4, $(CPU_LINE))
   # Retrieve vendor CMSIS headers from ST cmsis_device_<family> repositories on
   # GitHub, https://github.com/STMicroelectronics
