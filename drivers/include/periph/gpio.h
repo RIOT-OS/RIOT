@@ -1,15 +1,34 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
+ *               2020 Gunar Schorcht
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
 
+#ifndef PERIPH_GPIO_H
+#define PERIPH_GPIO_H
+
+#ifdef MODULE_PERIPH_GPIO_EXP
+
+#include "periph/gpio_exp.h"
+
+#else /* MODULE_PERIPH_GPIO_EXP */
+
 /**
+ * @anchor      drivers_periph_gpio
  * @defgroup    drivers_periph_gpio GPIO
  * @ingroup     drivers_periph
- * @brief       Low-level GPIO peripheral driver
+ * @brief       GPIO peripheral driver
+ *
+ * @note This is the legacy GPIO API. It will be removed once all platforms
+ * implement the new GPIO API which allows to implement the API for any kind
+ * of GPIO hardware. The new GPIO API is compatible with this legacy API.
+ * @warning The scalar GPIO pin type `gpio_t` is deprecated and will be
+ * replaced by a structured GPIO pin type in the new GPIO API. Therefore,
+ * don't use the direct comparison of GPIO pins anymore. Instead, use the
+ * inline comparison functions @ref gpio_is_equal and @ref gpio_is_undef.
  *
  * This is a basic GPIO (General-purpose input/output) interface to allow
  * platform independent access to a MCU's input/output pins. This interface is
@@ -71,9 +90,6 @@
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  */
-
-#ifndef PERIPH_GPIO_H
-#define PERIPH_GPIO_H
 
 #include <limits.h>
 
@@ -283,5 +299,7 @@ static inline int gpio_is_valid(gpio_t gpio)
 }
 #endif
 
-#endif /* PERIPH_GPIO_H */
 /** @} */
+
+#endif /* MODULE_PERIPH_GPIO_EXP */
+#endif /* PERIPH_GPIO_H */
