@@ -5,6 +5,7 @@ CPU_MODEL = stm32f446re
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_dma
 FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_can
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_spi

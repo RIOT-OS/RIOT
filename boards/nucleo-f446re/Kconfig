@@ -18,6 +18,7 @@ config BOARD_NUCLEO_F446RE
     select HAS_PERIPH_ADC
     select HAS_PERIPH_DMA
     select HAS_PERIPH_I2C
+    select HAS_PERIPH_CAN
     select HAS_PERIPH_PWM
     select HAS_PERIPH_RTC
     select HAS_PERIPH_SPI
