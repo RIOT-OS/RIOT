@@ -98,6 +98,12 @@ menuconfig: $(MENUCONFIG) $(KCONFIG_OUT_CONFIG)
 	$(Q)KCONFIG_CONFIG=$(KCONFIG_OUT_CONFIG) $(MENUCONFIG) $(KCONFIG)
 	$(MAKE) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
 
+# Variable used to conditionally depend on KCONFIG_GENERATED_DEPDENDENCIES
+# When testing Kconfig module modelling this file is not needed
+ifneq (1, $(TEST_KCONFIG))
+  GENERATED_DEPENDENCIES_DEP = $(KCONFIG_GENERATED_DEPENDENCIES)
+endif
+
 # These rules are not included when only calling `make clean` in
 # order to keep the $(BINDIR) directory clean.
 ifneq (clean, $(MAKECMDGOALS))
@@ -106,6 +112,7 @@ ifneq (clean, $(MAKECMDGOALS))
 # defining symbols like 'MODULE_<MODULE_NAME>' or PKG_<PACKAGE_NAME> which
 # default to 'y'. Then, every module and package Kconfig menu will depend on
 # that symbol being set to show its options.
+# Do nothing when testing Kconfig module dependency modelling.
 $(KCONFIG_GENERATED_DEPENDENCIES): FORCE | $(GENERATED_DIR)
 	$(Q)printf "%s " $(USEMODULE_W_PREFIX) $(USEPKG_W_PREFIX) \
 	  | awk 'BEGIN {RS=" "}{ gsub("-", "_", $$0); \
@@ -115,7 +122,7 @@ $(KCONFIG_GENERATED_DEPENDENCIES): FORCE | $(GENERATED_DIR)
 # Generates a .config file by merging multiple sources specified in
 # MERGE_SOURCES. This will also generate KCONFIG_OUT_DEP with the list of used
 # Kconfig files.
-$(KCONFIG_OUT_CONFIG): $(KCONFIG_GENERATED_DEPENDENCIES) $(GENCONFIG) $(MERGE_SOURCES) | $(GENERATED_DIR)
+$(KCONFIG_OUT_CONFIG): $(GENERATED_DEPENDENCIES_DEP) $(GENCONFIG) $(MERGE_SOURCES) | $(GENERATED_DIR)
 	$(Q) $(GENCONFIG) \
 	  --config-out=$(KCONFIG_OUT_CONFIG) \
 	  --file-list $(KCONFIG_OUT_DEP) \
