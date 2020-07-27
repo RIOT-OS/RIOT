@@ -9,8 +9,8 @@
 
 gimmeapps() {
     case "$1" in
-        "samr21_xpro") echo ${TEST_KCONFIG_samr21_xpro} ;;
-        "native")      echo ${TEST_KCONFIG_native} ;;
+        "samr21_xpro") echo "${TEST_KCONFIG_samr21_xpro}" ;;
+        "native")      echo "${TEST_KCONFIG_native}" ;;
     esac
 }
 
