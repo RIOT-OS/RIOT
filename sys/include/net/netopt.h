@@ -622,6 +622,11 @@ typedef enum {
     NETOPT_LORAWAN_DEVICE_CLASS,
 
     /**
+     * @brief   (@ref netopt_enable_t) Request device time from Network Server
+     */
+    NETOPT_LORAWAN_DEVICE_TIME,
+
+    /**
      * @brief   (uint8_t) LoRaWAN datarate
      * - LoRaWAN: @ref loramac_dr_idx_t
      */

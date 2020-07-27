@@ -159,7 +159,7 @@ void gnrc_lorawan_open_rx_window(gnrc_lorawan_t *mac)
 
     /* Switch to RX state */
     if (mac->state == LORAWAN_STATE_RX_1) {
-        gnrc_lorawan_set_timer(mac, US_PER_SEC);
+        gnrc_lorawan_set_timer(mac, mac->mlme.rx_ref + MS_PER_SEC - gnrc_lorawan_timer_now(mac));
     }
     netopt_state_t state = NETOPT_STATE_RX;
 
@@ -189,9 +189,6 @@ void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac)
         case LORAWAN_STATE_JOIN:
             gnrc_lorawan_trigger_join(mac);
             break;
-        case LORAWAN_STATE_BEACON_ACQUISITION:
-            gnrc_lorawan_beacon_lost(mac);
-            break;
         case LORAWAN_STATE_BEACON_ACQUIRE:
             puts("OPEN_BEACON");
             gnrc_lorawan_enable_beacon_rx(mac);
@@ -213,6 +210,8 @@ void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac)
 
 void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac)
 {
+    mac->mlme.timestamp = gnrc_lorawan_timer_now(mac);
+
     if (mac->mlme.sync) {
         mac->state = LORAWAN_STATE_IDLE;
         _config_pingslot_rx_window(mac);
@@ -228,7 +227,8 @@ void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac)
         rx_1 = mac->mlme.activation == MLME_ACTIVATION_NONE ?
                CONFIG_LORAMAC_DEFAULT_JOIN_DELAY1 : mac->rx_delay;
 
-        gnrc_lorawan_set_timer(mac, rx_1 * US_PER_SEC);
+        mac->mlme.rx_ref = mac->mlme.timestamp + rx_1 * MS_PER_SEC;
+        gnrc_lorawan_set_timer(mac, mac->mlme.rx_ref - mac->mlme.timestamp);
 
         uint8_t dr_offset = (mac->dl_settings & GNRC_LORAWAN_DL_DR_OFFSET_MASK) >>
                             GNRC_LORAWAN_DL_DR_OFFSET_POS;
@@ -264,6 +264,9 @@ void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac)
             break;
         case LORAWAN_STATE_IDLE:
             assert(false);
+            break;
+        case LORAWAN_STATE_BEACON_ACQUISITION:
+            gnrc_lorawan_beacon_lost(mac);
             break;
         default:
             assert(false);
@@ -316,7 +319,6 @@ void gnrc_lorawan_enable_beacon_rx(gnrc_lorawan_t *mac)
     gnrc_lorawan_set_dr(mac, gnrc_lorawan_get_beacon_dr());
 
     const netopt_enable_t en = false;
-    dev->driver->set(dev, NETOPT_SINGLE_RECEIVE, &en, sizeof(en));
 
     dev->driver->set(dev, NETOPT_INTEGRITY_CHECK, &en, sizeof(en));
 
@@ -328,7 +330,6 @@ void gnrc_lorawan_enable_beacon_rx(gnrc_lorawan_t *mac)
 
     netopt_state_t state = NETOPT_STATE_RX;
     dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
-    //gnrc_lorawan_set_timer(mac, 5000000);
 }
 
 void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *psdu, size_t size, lora_rx_info_t *info)

@@ -73,7 +73,10 @@ extern "C" {
 #define GNRC_LORAWAN_BACKOFF_BUDGET_3   (8700000LL)     /**< budget of time on air every 24 hours */
 
 #define GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ  (1 << 0) /**< Internal Link Check request flag */
+
 #define GNRC_LORAWAN_MLME_OPTS_PING_SLOT_CHANNEL_ANS  (1 << 1) /**< Internal Link Check request flag */
+
+#define GNRC_LORAWAN_MLME_OPTS_DEVICE_TIME_REQ  (1 << 2) /**< Device Time request flag */
 
 #define GNRC_LORAWAN_CID_SIZE (1U)                      /**< size of Command ID in FOps */
 #define GNRC_LORAWAN_CID_LINK_CHECK_ANS (0x02)          /**< Link Check CID */
@@ -86,7 +89,10 @@ extern "C" {
 
 #define GNRC_LORAWAN_CID_PING_SLOT_CHANNEL_ANS_SIZE (2)
 
-#define GNRC_LORAWAN_JOIN_DELAY_U32_MASK (0x1FFFFF)     /**< mask for detecting overflow in frame counter */
+#define GNRC_LORAWAN_CID_DEVICE_TIME    (0x0D)          /**< Device Time CID */
+#define GNRC_LORAWAN_FOPT_DEVICE_TIME_ANS_SIZE (6U)      /**< size of Device Time answer */
+
+#define GNRC_LORAWAN_JOIN_DELAY_U32_MASK (0x7ff)     /**< mask for detecting overflow in frame counter */
 
 #define GNRC_LORAWAN_MAX_PAYLOAD_1 (59U)                /**< max MAC payload in DR0, DR1 and DR2 */
 #define GNRC_LORAWAN_MAX_PAYLOAD_2 (123U)               /**< max MAC payload in DR3 */
@@ -146,6 +152,14 @@ typedef struct {
 } mlme_link_req_confirm_t;
 
 /**
+ * @brief MLME Device Time confirmation data
+ */
+typedef struct __attribute__((packed)) {
+    le_uint32_t seconds;    /**< Seconds since epoch */
+    uint8_t frac;           /**< fraction of second */
+} mlme_dt_opt_t;
+
+/**
  * @brief MCPS data
  */
 typedef struct {
@@ -171,7 +185,11 @@ typedef struct {
  * @brief MLME service access point descriptor
  */
 typedef struct {
-    uint8_t activation;     /**< Activation mechanism of the MAC layer */
+    uint32_t timestamp;         /**< timestamp of uplink */
+    uint32_t rx_ref;
+    le_uint32_t beacon_time;
+    uint8_t beacon_counter;
+    uint8_t activation;         /**< Activation mechanism of the MAC layer */
     int pending_mlme_opts;  /**< holds pending mlme opts */
     uint32_t nid;           /**< current Network ID */
     int32_t backoff_budget; /**< remaining Time On Air budget */

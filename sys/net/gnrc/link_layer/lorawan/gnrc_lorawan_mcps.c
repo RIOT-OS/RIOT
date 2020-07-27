@@ -294,10 +294,17 @@ static void _end_of_tx(gnrc_lorawan_t *mac, int type, int status)
 
     mac->mcps.fcnt++;
 
+    mlme_confirm.status = -ETIMEDOUT;
+
     if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ) {
         mlme_confirm.type = MLME_LINK_CHECK;
-        mlme_confirm.status = -ETIMEDOUT;
         mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ;
+        gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
+    }
+
+    if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_DEVICE_TIME_REQ) {
+        mlme_confirm.type = MLME_DEVICE_TIME;
+        mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_DEVICE_TIME_REQ;
         gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
     }
 
@@ -357,7 +364,7 @@ static void _handle_retransmissions(gnrc_lorawan_t *mac)
     if (mac->mcps.nb_trials-- == 0) {
         _end_of_tx(mac, MCPS_CONFIRMED, -ETIMEDOUT);
     } else {
-        gnrc_lorawan_set_timer(mac, 1000000 + random_uint32_range(0, 2000000));
+        gnrc_lorawan_set_timer(mac, 1000 + random_uint32_range(0, 2000));
     }
 }
 
