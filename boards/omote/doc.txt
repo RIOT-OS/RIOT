@@ -2,4 +2,48 @@
 @defgroup    boards_omote omote
 @ingroup     boards
 @brief       Support for the omote board
+
+# Components
+
+| MCU   | [CC2538 (ARM Cortex-M3 with on-board 2.4GHz radio)](http://www.ti.com/product/CC2538) |
+|-------|-----------------------------------------------------------------------------------------------------|
+| Radio | radio interfaces (IEEE 802.15.4)
+|  | RP-SMA connector for external antenna (with a RF switch to select either 2.4GHz/Sub-GHz radio)           |
+| USB-to-Serial | [CP2104](https://www.silabs.com/documents/public/data-sheets/cp2104.pdf) |
+| Others | LED, bmp180, ldr and adxl345 sensor |
+
+# Porting status
+
+In terms of hardware support, the following drivers have been implemented
+for CC2538 System-on-Chip:
+
+- UART
+- Random number generator
+- Low Power Modes
+- General-Purpose Timers
+- I2C/SPI library
+- LEDs
+- Buttons
+- RF 2.4GHz built-in in CC2538
+  RP-SMA
+
+##  Flashing and Debugging
+
+Currently RIOT supports flashing the OpenMote using a Segger JLink JTAG
+adapter or via USB, using the bootloader on the board.
+
+### Flashing via JTAG
+
+To be able to flash the board via JTAG you need to install Seggers JLinkExe
+tool. Once you have this in place, you can simply flash by calling
+
+### Flashing via USB
+
+The omote has built-in support to flash over USB using the BSL.It requires to unlock the bootloader by manually pressing the `BSL
+button` and `reset button`
+
+Bash
+$ make BOARD=omote flash
+```
+The omote has 13 burgs pinouts to connect boolean,digital and analog sensors based on I2C,UART,and SPI Protocols as well as other sensors or actuators you may need to connect.
 */
