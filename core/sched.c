@@ -106,7 +106,9 @@ static void _unschedule(thread_t *active_thread)
 
 int __attribute__((used)) sched_run(void)
 {
+    sched_context_switch_request = 0;
     thread_t *active_thread = thread_get_active();
+    thread_t *previous_thread = active_thread;
 
     if (!IS_USED(MODULE_CORE_IDLE_THREAD)) {
         if (!runqueue_bitcache) {
@@ -114,6 +116,7 @@ int __attribute__((used)) sched_run(void)
                 _unschedule(active_thread);
                 active_thread = NULL;
             }
+            active_thread = NULL;
 
             do {
                 sched_arch_idle();
@@ -134,8 +137,13 @@ int __attribute__((used)) sched_run(void)
                        : active_thread->pid),
         next_thread->pid);
 
-    if (active_thread == next_thread) {
+    if (previous_thread == next_thread) {
         DEBUG("sched_run: done, sched_active_thread was not changed.\n");
+#ifdef MODULE_SCHED_CB
+        if (sched_cb && !active_thread) {
+            sched_cb(KERNEL_PID_UNDEF, next_thread->pid);
+        }
+#endif
         return 0;
     }
 
@@ -159,7 +167,7 @@ int __attribute__((used)) sched_run(void)
 #ifdef MODULE_MPU_STACK_GUARD
     mpu_configure(
         2,                                                  /* MPU region 2 */
-        (uintptr_t)sched_active_thread->stack_start + 31,   /* Base Address (rounded up) */
+        (uintptr_t)next_thread->stack_start + 31,   /* Base Address (rounded up) */
         MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B)     /* Attributes and Size */
         );
 #endif
