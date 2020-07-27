@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Board specific definitions for the omote board 
+ * @brief       Board specific definitions for the omote board
  */
 
 #ifndef BOARD_H
@@ -44,7 +44,7 @@
 #define LED1_TOGGLE     (GPIO_B->DATA ^=  LED1_MASK)
 
 #define LED_ALL_OFF        LED0_OFF;   \
-                           LED1_OFF;   
+                           LED1_OFF;
 /* Output is color white */
 #define LED_ALL_ON         LED0_ON;    \
                            LED1_ON;

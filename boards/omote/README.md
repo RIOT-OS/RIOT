@@ -70,10 +70,6 @@ The omote has built-in support for USB 2.0 USB, Vendor and Product IDs are the f
   * VID 0x0451
   * PID 0x16C8
 
-On Linux and OS X this is straightforward, on windows you need to install the following driver:
-
-And replace the IDs accordingly.
-
 ### Device Enumerations
 For the UART, serial line settings are 115200 8N1, no flow control.
 
