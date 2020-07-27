@@ -10,6 +10,7 @@ rsource "auto_init/Kconfig"
 rsource "net/Kconfig"
 rsource "Kconfig.newlib"
 rsource "Kconfig.stdio"
+rsource "pm_layered/Kconfig"
 rsource "usb/Kconfig"
 
 config MOD_SYS
