@@ -173,8 +173,9 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *remote)
     return 0;
 }
 
-ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
-                      uint32_t timeout, sock_udp_ep_t *remote)
+ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
+                         uint32_t timeout, sock_udp_ep_t *remote,
+                         sock_udp_aux_rx_t *aux)
 {
     void *pkt = NULL, *ctx = NULL;
     uint8_t *ptr = data;
@@ -182,7 +183,8 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     bool nobufs = false;
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    while ((res = sock_udp_recv_buf(sock, &pkt, &ctx, timeout, remote)) > 0) {
+    while ((res = sock_udp_recv_buf_aux(sock, &pkt, &ctx, timeout, remote,
+                                        aux)) > 0) {
         if (res > (ssize_t)max_len) {
             nobufs = true;
             continue;
@@ -194,8 +196,9 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
-ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
-                          uint32_t timeout, sock_udp_ep_t *remote)
+ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
+                              uint32_t timeout, sock_udp_ep_t *remote,
+                              sock_udp_aux_rx_t *aux)
 {
     gnrc_pktsnip_t *pkt, *udp;
     udp_hdr_t *hdr;
@@ -225,6 +228,9 @@ ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
         memcpy(remote, &tmp, sizeof(tmp));
         remote->port = byteorder_ntohs(hdr->src_port);
     }
+    if (aux != NULL) {
+        aux->flags = 0;
+    }
     if ((sock->remote.family != AF_UNSPEC) &&  /* check remote end-point if set */
         ((sock->remote.port != byteorder_ntohs(hdr->src_port)) ||
         /* We only have IPv6 for now, so just comparing the whole end point
@@ -241,8 +247,8 @@ ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
     return res;
 }
 
-ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
-                      const sock_udp_ep_t *remote)
+ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
+                          const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
 {
     int res;
     gnrc_pktsnip_t *payload, *pkt;
@@ -344,6 +350,9 @@ ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
                                sock->reg.async_cb_arg);
     }
 #endif  /* SOCK_HAS_ASYNC */
+    if (aux != NULL) {
+        aux->flags = 0;
+    }
     return res;
 }
 
