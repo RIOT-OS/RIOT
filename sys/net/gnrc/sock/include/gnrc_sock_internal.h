@@ -56,6 +56,33 @@ extern "C" {
 #define GNRC_SOCK_DYN_PORTRANGE_ERR (0)
 
 /**
+ * @brief   Structure to retrieve auxiliary data from @ref gnrc_sock_recv
+ *
+ * @details The members of this function depend on the modules used
+ * @internal
+ */
+typedef struct {
+#if IS_USED(MODULE_SOCK_AUX_LOCAL) || DOXYGEN
+    /**
+     * @brief   local IP address PDU was received on
+     *
+     * This member is only present if module `sock_aux_local` is used.
+     */
+    sock_ip_ep_t *local;
+#endif
+#if !IS_USED(MODULE_SOCK_AUX_LOCAL) || DOXYGEN
+    /**
+     * @brief   Workaround in case no `sock_aux_%` module is used
+     *
+     * Empty structures are only allowed with a GNU extension. For portability,
+     * this member is present if and only if this structure would be otherwise
+     * empty.
+     */
+    uint8_t this_struct_is_not_empty;
+#endif
+} gnrc_sock_recv_aux_t;
+
+/**
  * @brief   Internal helper functions for GNRC
  * @internal
  * @{
@@ -116,7 +143,7 @@ void gnrc_sock_create(gnrc_sock_reg_t *reg, gnrc_nettype_t type, uint32_t demux_
  * @internal
  */
 ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt, uint32_t timeout,
-                       sock_ip_ep_t *remote);
+                       sock_ip_ep_t *remote, gnrc_sock_recv_aux_t aux);
 
 /**
  * @brief   Send a packet internally
