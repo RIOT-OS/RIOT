@@ -24,10 +24,12 @@ USEMODULE += lwip_sock_udp
 USEMODULE += netdev_eth
 USEMODULE += netdev_test
 USEMODULE += ps
+USEMODULE += sock_aux_local
 
 DISABLE_MODULE += auto_init_lwip
 
 CFLAGS += -DSO_REUSE
 CFLAGS += -DLWIP_SO_RCVTIMEO
+CFLAGS += -DLWIP_NETBUF_RECVINFO
 
 include $(RIOTBASE)/Makefile.include
