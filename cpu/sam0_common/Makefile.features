@@ -16,3 +16,6 @@ FEATURES_CONFLICT += periph_rtc:periph_rtt
 FEATURES_CONFLICT_MSG += "The RTC and RTT map to the same hardware peripheral."
 
 -include $(RIOTCPU)/cortexm_common/Makefile.features
+
+# add sam0 configurations after including cortexm_common so sam0 takes precendence
+KCONFIG_ADD_CONFIG += $(RIOTCPU)/sam0_common/sam0_common.config
