@@ -73,7 +73,7 @@ void spectrum_scanner(unsigned long interval_us)
 
     while (1) {
         /* Stack optimization, statically allocate this buffer */
-        static float ed_average[GNRC_NETIF_NUMOF][IEEE802154_CHANNEL_MAX + 1];
+        float ed_average[netif_numof][IEEE802154_CHANNEL_MAX + 1];
 
         memset(ed_average, 0, sizeof(ed_average));
 
