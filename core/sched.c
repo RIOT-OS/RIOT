@@ -40,18 +40,6 @@
 #include <inttypes.h>
 #endif
 
-volatile int sched_num_threads = 0;
-
-volatile unsigned int sched_context_switch_request;
-
-volatile thread_t *sched_threads[KERNEL_PID_LAST + 1];
-volatile thread_t *sched_active_thread;
-
-volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
-
-clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
-static uint32_t runqueue_bitcache = 0;
-
 /* Needed by OpenOCD to read sched_threads */
 #if defined(__APPLE__) && defined(__MACH__)
  #define FORCE_USED_SECTION __attribute__((used)) __attribute__((section( \
@@ -60,6 +48,14 @@ static uint32_t runqueue_bitcache = 0;
  #define FORCE_USED_SECTION __attribute__((used)) __attribute__((section( \
                                                                      ".openocd")))
 #endif
+
+/**
+ * @brief   Symbols also used by OpenOCD, keep in sync with src/rtos/riot.c
+ * @{
+ */
+volatile kernel_pid_t sched_active_pid = KERNEL_PID_UNDEF;
+volatile thread_t *sched_threads[KERNEL_PID_LAST + 1];
+volatile int sched_num_threads = 0;
 
 FORCE_USED_SECTION
 const uint8_t max_threads = ARRAY_SIZE(sched_threads);
@@ -70,6 +66,13 @@ const uint8_t max_threads = ARRAY_SIZE(sched_threads);
 FORCE_USED_SECTION
 const uint8_t _tcb_name_offset = offsetof(thread_t, name);
 #endif
+/** @} */
+
+volatile thread_t *sched_active_thread;
+volatile unsigned int sched_context_switch_request;
+
+clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
+static uint32_t runqueue_bitcache = 0;
 
 #ifdef MODULE_SCHED_CB
 static void (*sched_cb) (kernel_pid_t active_thread,

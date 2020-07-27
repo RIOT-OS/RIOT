@@ -97,6 +97,8 @@ typedef struct _thread thread_t;
 
 /**
  * @name Thread states supported by RIOT
+ *
+ *       Keep in sync with OpenOCD src/rtos/riot.c
  * @{
  */
 typedef enum {
