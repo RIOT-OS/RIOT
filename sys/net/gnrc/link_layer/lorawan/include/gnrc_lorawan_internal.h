@@ -201,7 +201,6 @@ typedef struct {
     uint32_t channel[GNRC_LORAWAN_MAX_CHANNELS];    /**< channel array */
     uint16_t channel_mask;                          /**< channel mask */
     uint32_t toa;                                   /**< Time on Air of the last transmission */
-    int busy;                                       /**< MAC busy  */
     int shutdown_req;                               /**< MAC Shutdown request */
     le_uint32_t dev_addr;                           /**< Device address */
     int state;                                      /**< state of MAC layer */
@@ -467,32 +466,6 @@ void gnrc_lorawan_open_rx_window(gnrc_lorawan_t *mac);
  * @param mac
  */
 void gnrc_lorawan_perform_save(gnrc_lorawan_t *mac);
-
-/**
- * @brief Acquire the MAC layer
- *
- * @param[in] mac pointer to the MAC descriptor
- *
- * @return true on success
- * @return false if MAC is already acquired
- */
-static inline int gnrc_lorawan_mac_acquire(gnrc_lorawan_t *mac)
-{
-    int _c = mac->busy;
-
-    mac->busy = true;
-    return !_c;
-}
-
-/**
- * @brief Release the MAC layer
- *
- * @param[in] mac pointer to the MAC descriptor
- */
-static inline void gnrc_lorawan_mac_release(gnrc_lorawan_t *mac)
-{
-    mac->busy = false;
-}
 
 /**
  * @brief Set the datarate of the second reception window

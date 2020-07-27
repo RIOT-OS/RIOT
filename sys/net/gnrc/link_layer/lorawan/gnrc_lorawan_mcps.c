@@ -294,8 +294,6 @@ static void _end_of_tx(gnrc_lorawan_t *mac, int type, int status)
 
     mac->mcps.fcnt++;
 
-    gnrc_lorawan_mac_release(mac);
-
     if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ) {
         mlme_confirm.type = MLME_LINK_CHECK;
         mlme_confirm.status = -ETIMEDOUT;
@@ -320,8 +318,6 @@ void gnrc_lorawan_class_b_finish(gnrc_lorawan_t *mac)
         mac->mcps.msdu = NULL;
         gnrc_lorawan_mcps_confirm(mac, &mcps_confirm);
     }
-
-    gnrc_lorawan_mac_release(mac);
 }
 
 static void _transmit_pkt(gnrc_lorawan_t *mac)
@@ -373,7 +369,6 @@ void gnrc_lorawan_event_no_rx(gnrc_lorawan_t *mac)
         /* This was a Join Request */
         mlme_confirm.type = MLME_JOIN;
         mlme_confirm.status = -ETIMEDOUT;
-        gnrc_lorawan_mac_release(mac);
         gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
         return;
     }
@@ -398,23 +393,23 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     if (mac->mlme.activation == MLME_ACTIVATION_NONE) {
         DEBUG("gnrc_lorawan_mcps: LoRaWAN not activated\n");
         mcps_confirm->status = -ENOTCONN;
-        goto out;
+        return;
     }
 
-    if (!gnrc_lorawan_mac_acquire(mac) || mac->state != LORAWAN_STATE_IDLE) {
+    if (mac->state != LORAWAN_STATE_IDLE) {
         mcps_confirm->status = -EBUSY;
-        goto out;
+        return;
     }
 
     if (mcps_request->data.port < LORAMAC_PORT_MIN ||
         mcps_request->data.port > LORAMAC_PORT_MAX) {
         mcps_confirm->status = -EBADMSG;
-        goto out;
+        return;
     }
 
     if (!gnrc_lorawan_validate_dr(mcps_request->data.dr)) {
         mcps_confirm->status = -EINVAL;
-        goto out;
+        return;
     }
 
     uint8_t fopts_length = gnrc_lorawan_build_options(mac, NULL);
@@ -426,7 +421,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     if (mac_payload_size >
         gnrc_lorawan_region_mac_payload_max(mcps_request->data.dr)) {
         mcps_confirm->status = -EMSGSIZE;
-        goto out;
+        return;
     }
 
     int waiting_for_ack = mcps_request->type == MCPS_CONFIRMED;
@@ -443,11 +438,6 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     mac->last_dr = mcps_request->data.dr;
     _transmit_pkt(mac);
     mcps_confirm->status = GNRC_LORAWAN_REQ_STATUS_DEFERRED;
-out:
-
-    if (mcps_confirm->status != GNRC_LORAWAN_REQ_STATUS_DEFERRED) {
-        gnrc_lorawan_mac_release(mac);
-    }
 }
 
 /** @} */

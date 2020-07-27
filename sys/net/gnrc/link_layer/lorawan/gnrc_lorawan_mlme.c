@@ -159,7 +159,6 @@ out:
     mlme_confirm.type = MLME_JOIN;
     mlme_confirm.status = status;
 
-    gnrc_lorawan_mac_release(mac);
     gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
 }
 
@@ -245,10 +244,6 @@ void gnrc_lorawan_mlme_request(gnrc_lorawan_t *mac,
                 mlme_confirm->status = -EINVAL;
                 break;
             }
-            if (!gnrc_lorawan_mac_acquire(mac)) {
-                mlme_confirm->status = -EBUSY;
-                break;
-            }
 
             if (mac->mlme.backoff_budget < 0) {
                 mlme_confirm->status = -EDQUOT;
@@ -261,15 +256,16 @@ void gnrc_lorawan_mlme_request(gnrc_lorawan_t *mac,
                                                                   mlme_request->join.dr);
             break;
         case MLME_SYNC:
-            if (!gnrc_lorawan_mac_acquire(mac)) {
-                mlme_confirm->status = -EBUSY;
-                break;
-            }
-
             if(mac->mlme.activation == MLME_ACTIVATION_NONE) {
                 mlme_confirm->status = -EINVAL;
                 break;
             }
+
+            if (mac->state != LORAWAN_STATE_IDLE) {
+                mlme_confirm->status = -EBUSY;
+                break;
+            }
+
             if (mlme_request->enabled) {
                 mlme_confirm->status = GNRC_LORAWAN_REQ_STATUS_DEFERRED;
                 gnrc_lorawan_enable_beacon_rx(mac);
@@ -310,7 +306,6 @@ void gnrc_lorawan_beacon_lost(gnrc_lorawan_t *mac)
 
     netopt_state_t state = NETOPT_STATE_SLEEP;
     dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
-    gnrc_lorawan_mac_release(mac);
     gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
 }
 
@@ -367,7 +362,6 @@ void gnrc_lorawan_mlme_process_beacon(gnrc_lorawan_t *mac, uint8_t *psdu, size_t
     netopt_state_t state = NETOPT_STATE_SLEEP;
     dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
 
-    gnrc_lorawan_mac_release(mac);
     gnrc_lorawan_mlme_confirm(mac, &mlme_confirm);
     mlme_indication.type = MLME_BEACON_NOTIFY;
     mlme_indication.beacon.psdu = psdu;

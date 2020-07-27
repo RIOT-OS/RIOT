@@ -83,7 +83,6 @@ void gnrc_lorawan_init(gnrc_lorawan_t *mac, uint8_t *nwkskey, uint8_t *appskey)
 {
     mac->nwkskey = nwkskey;
     mac->appskey = appskey;
-    mac->busy = false;
     mac->mlme.ping_period = 1<<(12 - CONFIG_GNRC_LORAWAN_PING_NB_EXP);
     mac->mlme.ps_dr = CONFIG_GNRC_LORAWAN_DEFAULT_PING_SLOT_DR;
     mac->mlme.ps_channel = CONFIG_GNRC_LORAWAN_DEFAULT_PING_SLOT_CHANNEL;
