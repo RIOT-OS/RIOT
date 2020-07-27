@@ -118,3 +118,4 @@ export LAZYSPONGE_FLAGS      # Parameters supplied to LAZYSPONGE.
 export AFL_FLAGS             # Additional command-line flags passed to afl during fuzzing.
 
 # LOG_LEVEL                  # Logging level as integer (NONE: 0, ERROR: 1, WARNING: 2, INFO: 3, DEBUG: 4, default: 3)
+# KCONFIG_ADD_CONFIG         # List of .config files to be merged used by Boards and CPUs. See kconfig.mk

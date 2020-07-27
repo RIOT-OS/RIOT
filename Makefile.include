@@ -217,9 +217,6 @@ ifeq (1,$(TEST_KCONFIG))
   SHOULD_RUN_KCONFIG = 1
 endif
 
-# Include Kconfig functionalities
-include $(RIOTMAKE)/kconfig.mk
-
 ifeq ($(OS),Darwin)
   OPEN   := open
 else
@@ -365,6 +362,9 @@ include $(RIOTBASE)/Makefile.features
 # mandatory includes!
 include $(RIOTMAKE)/pseudomodules.inc.mk
 include $(RIOTMAKE)/defaultmodules.inc.mk
+
+# Include Kconfig functionalities
+include $(RIOTMAKE)/kconfig.mk
 
 # For testing, use TEST_KCONFIG as a switch between Makefile.dep and Kconfig
 ifeq (1,$(TEST_KCONFIG))
