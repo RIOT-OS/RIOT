@@ -446,7 +446,7 @@ static bool _check_product_number(uint8_t *readData)
     if (readData[1] != SDP31_PRODUCT_NO_BYTE_1) {
         return false;
     }
-    if ((readData[3] != SDP3X_MODEL_31) || (readData[3] != SDP3X_MODEL_32)) {
+    if ((readData[3] != SDP3X_MODEL_31) && (readData[3] != SDP3X_MODEL_32)) {
         return false;
     }
     if (readData[4] != SDP31_PRODUCT_NO_BYTE_3) {
