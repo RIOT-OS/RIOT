@@ -259,7 +259,7 @@ compile() {
 
         for app in $(gimmeapps "${_board}")
         do
-            if [ "${appdir}" == "${app}" ]; then
+            if [ "${appdir}" = "${app}" ]; then
                 BOARD=$board make -C${appdir} clean
                 CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
                               make -C${appdir} all test-input-hash -j${JOBS:-4}
