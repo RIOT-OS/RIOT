@@ -108,7 +108,7 @@ static uint16_t _ip6_addr_to_netif(const ip6_addr_p_t *_addr)
 #endif
 
 static int _parse_iphdr(struct netbuf *buf, void **data, void **ctx,
-                        sock_ip_ep_t *remote)
+                        sock_ip_ep_t *remote, sock_ip_ep_t *local)
 {
     uint8_t *data_ptr = buf->ptr->payload;
     size_t data_len = buf->ptr->len;
@@ -124,6 +124,13 @@ static int _parse_iphdr(struct netbuf *buf, void **data, void **ctx,
                 memcpy(&remote->addr, &iphdr->src, sizeof(ip4_addr_t));
                 remote->netif = _ip4_addr_to_netif(&iphdr->dest);
             }
+            if (local != NULL) {
+                struct ip_hdr *iphdr = (struct ip_hdr *)data_ptr;
+
+                assert(buf->p->len > sizeof(struct ip_hdr));
+                local->family = AF_INET;
+                memcpy(&local->addr, &iphdr->dest, sizeof(ip4_addr_t));
+            }
             data_ptr += sizeof(struct ip_hdr);
             data_len -= sizeof(struct ip_hdr);
             break;
@@ -137,6 +144,13 @@ static int _parse_iphdr(struct netbuf *buf, void **data, void **ctx,
                 remote->family = AF_INET6;
                 memcpy(&remote->addr, &iphdr->src, sizeof(ip6_addr_t));
                 remote->netif = _ip6_addr_to_netif(&iphdr->dest);
+            }
+            if (local != NULL) {
+                struct ip6_hdr *iphdr = (struct ip6_hdr *)data_ptr;
+
+                assert(buf->p->len > sizeof(struct ip6_hdr));
+                local->family = AF_INET6;
+                memcpy(&local->addr, &iphdr->dest, sizeof(ip6_addr_t));
             }
             data_ptr += sizeof(struct ip6_hdr);
             data_len -= sizeof(struct ip6_hdr);
@@ -202,7 +216,14 @@ ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **ctx,
     if ((res = lwip_sock_recv(sock->base.conn, timeout, &buf)) < 0) {
         return res;
     }
-    res = _parse_iphdr(buf, data, ctx, remote);
+    sock_ip_ep_t *local = NULL;
+#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+    if (aux != NULL) {
+        local = &aux->local;
+        aux->flags &= ~(SOCK_AUX_GET_LOCAL);
+    }
+#endif
+    res = _parse_iphdr(buf, data, ctx, remote, local);
     return res;
 }
 
