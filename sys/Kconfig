@@ -8,6 +8,7 @@ menu "System"
 
 rsource "auto_init/Kconfig"
 rsource "net/Kconfig"
+rsource "Kconfig.newlib"
 rsource "usb/Kconfig"
 
 config MOD_SYS
