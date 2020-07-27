@@ -28,7 +28,8 @@ DEVELHELP ?= 1
 QUIET ?= 1
 
 # Features required
-FEATURES_REQUIRED += cpp
+FEATURES_REQUIRED += cpp # basic C++ support
+FEATURES_REQUIRED += libstdcpp # libstdc++ support (for #include <cstdio>)
 
 # If you want to add some extra flags when compile c++ files, add these flags
 # to CXXEXFLAGS variable
