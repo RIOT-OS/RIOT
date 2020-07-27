@@ -116,7 +116,7 @@ void gnrc_sock_create(gnrc_sock_reg_t *reg, gnrc_nettype_t type, uint32_t demux_
  * @internal
  */
 ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt, uint32_t timeout,
-                       sock_ip_ep_t *remote);
+                       sock_ip_ep_t *remote, sock_ip_ep_t *local);
 
 /**
  * @brief   Send a packet internally
