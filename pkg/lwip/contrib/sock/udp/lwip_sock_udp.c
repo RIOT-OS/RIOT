@@ -69,8 +69,9 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep)
                                0)) ? -ENOTCONN : 0;
 }
 
-ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
-                      uint32_t timeout, sock_udp_ep_t *remote)
+ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
+                          uint32_t timeout, sock_udp_ep_t *remote,
+                          sock_udp_aux_rx_t *aux)
 {
     void *pkt = NULL;
     void *ctx = NULL;
@@ -79,8 +80,8 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     bool nobufs = false;
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    while ((res = sock_udp_recv_buf(sock, &pkt, &ctx, timeout,
-                                    remote)) > 0) {
+    while ((res = sock_udp_recv_buf_aux(sock, &pkt, &ctx, timeout,
+                                        remote, aux)) > 0) {
         struct netbuf *buf = ctx;
         if (buf->p->tot_len > (ssize_t)max_len) {
             nobufs = true;
@@ -95,9 +96,11 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
-ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **ctx,
-                          uint32_t timeout, sock_udp_ep_t *remote)
+ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
+                              uint32_t timeout, sock_udp_ep_t *remote,
+                              sock_udp_aux_rx_t *aux)
 {
+    (void)aux;
     struct netbuf *buf;
     int res;
 
@@ -147,9 +150,10 @@ ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **ctx,
     return (ssize_t)buf->ptr->len;
 }
 
-ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
-                      const sock_udp_ep_t *remote)
+ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
+                          const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux)
 {
+    (void)aux;
     assert((sock != NULL) || (remote != NULL));
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
 
