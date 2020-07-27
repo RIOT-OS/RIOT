@@ -151,8 +151,9 @@ static int _parse_iphdr(struct netbuf *buf, void **data, void **ctx,
     return (ssize_t)data_len;
 }
 
-ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
-                     uint32_t timeout, sock_ip_ep_t *remote)
+ssize_t sock_ip_recv_aux(sock_ip_t *sock, void *data, size_t max_len,
+                         uint32_t timeout, sock_ip_ep_t *remote,
+                         sock_ip_aux_rx_t *aux)
 {
     void *pkt = NULL;
     struct netbuf *ctx = NULL;
@@ -161,8 +162,8 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
     bool nobufs = false;
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    while ((res = sock_ip_recv_buf(sock, &pkt, (void **)&ctx, timeout,
-                                   remote)) > 0) {
+    while ((res = sock_ip_recv_buf_aux(sock, &pkt, (void **)&ctx, timeout,
+                                       remote, aux)) > 0) {
         if (ctx->p->tot_len > (ssize_t)max_len) {
             nobufs = true;
             /* progress context to last element */
@@ -176,9 +177,11 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
-ssize_t sock_ip_recv_buf(sock_ip_t *sock, void **data, void **ctx,
-                         uint32_t timeout, sock_ip_ep_t *remote)
+ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **ctx,
+                             uint32_t timeout, sock_ip_ep_t *remote,
+                             sock_ip_aux_rx_t *aux)
 {
+    (void)aux;
     struct netbuf *buf;
     int res;
 
@@ -203,9 +206,11 @@ ssize_t sock_ip_recv_buf(sock_ip_t *sock, void **data, void **ctx,
     return res;
 }
 
-ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
-                     uint8_t proto, const sock_ip_ep_t *remote)
+ssize_t sock_ip_send_aux(sock_ip_t *sock, const void *data, size_t len,
+                         uint8_t proto, const sock_ip_ep_t *remote,
+                         sock_ip_aux_tx_t *aux)
 {
+    (void)aux;
     assert((sock != NULL) || (remote != NULL));
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
     return lwip_sock_send(sock ? sock->base.conn : NULL, data, len, proto,

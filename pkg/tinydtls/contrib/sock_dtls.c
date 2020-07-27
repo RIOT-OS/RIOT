@@ -354,6 +354,7 @@ void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote)
 ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
                        const void *data, size_t len, uint32_t timeout)
 {
+    (void)aux;
     int res;
 
     assert(sock);
@@ -511,6 +512,7 @@ static ssize_t _complete_handshake(sock_dtls_t *sock,
 ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
                        void *data, size_t max_len, uint32_t timeout)
 {
+    (void)aux;
     assert(sock);
     assert(data);
     assert(remote);
