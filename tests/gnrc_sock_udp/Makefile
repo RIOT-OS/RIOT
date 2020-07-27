@@ -4,6 +4,7 @@ USEMODULE += gnrc_sock_check_reuse
 USEMODULE += gnrc_sock_udp
 USEMODULE += gnrc_ipv6
 USEMODULE += ps
+USEMODULE += sock_aux_local
 
 # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
 ifndef CONFIG_GNRC_PKTBUF_SIZE
