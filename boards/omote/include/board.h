@@ -45,7 +45,6 @@
 
 #define LED_ALL_OFF        LED0_OFF;   \
                            LED1_OFF;
-/* Output is color white */
 #define LED_ALL_ON         LED0_ON;    \
                            LED1_ON;
 /** @} */
@@ -57,8 +56,7 @@
 #define BTN0_MODE       GPIO_IN_PU
 /** @} */
 /**
- * @name  RF switch controlled by SW
- * @brief Controls which RF interface goes to the RP-SMA external antenna
+ * @name  RF switch control
  *
  * These values configure the required pin to drive the RF antenna switch, to
  * enable the 2.4GHz RF interface of the CC2538.

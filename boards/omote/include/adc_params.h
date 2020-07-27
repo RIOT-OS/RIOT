@@ -47,7 +47,6 @@ static const  saul_adc_params_t saul_adc_params[] =
         .line = ADC_LINE(2),
         .res  = ADC_RES_12BIT,
     }
-
 };
 
 #ifdef __cplusplus

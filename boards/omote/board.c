@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_OMote
+ * @ingroup     boards_omote
  * @{
  *
  * @file
- * @brief       Board specific implementations for the OMote board
+ * @brief       Board specific implementations for the omote board
  *
  *
  * @}
