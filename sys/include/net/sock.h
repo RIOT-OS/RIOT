@@ -245,6 +245,45 @@ struct _sock_tl_ep {
     uint16_t port;          /**< transport layer port (in host byte order) */
 };
 
+/**
+ * @brief   Flags used to indicate which auxiliary data is provided
+ */
+enum {
+    /**
+     * @brief   Flag to indicate that local address/endpoint is provided
+     *
+     * @note    Select module `sock_aux_local` and a compatible network stack
+     *          to use this
+     *
+     * This is the address/endpoint the packet/datagram/segment was received on
+     */
+    SOCK_AUX_HAS_LOCAL = (1LU << 0),
+    /**
+     * @brief   Flag to indicate that a time stamp of transmission / reception
+     *          is available
+     *
+     * @note    Select module `sock_aux_timestamp` and a compatible network
+     *          stack to use this
+     *
+     * Unless otherwise noted, the time stamp is the current system time in
+     * nanoseconds on which the start of frame delimiter or preamble was
+     * sent / received.
+     */
+    SOCK_AUX_HAS_TIMESTAMP = (1LU << 1),
+};
+
+/**
+ * @brief   Type holding the flags indicating which auxiliary data is provided
+ *
+ * This is a bitmask of `SOCK_AUX_HAS_...`, e.g. if the mask contains
+ * @ref SOCK_AUX_HAS_LOCAL, the local address/endpoint is present
+ *
+ * @details The underlying type can be changed without further notice, if more
+ *          flags are needed. Thus, only the `typedef`ed type should be used
+ *          to store the flags.
+ */
+typedef uint8_t sock_aux_flags_t;
+
 #ifdef __cplusplus
 }
 #endif

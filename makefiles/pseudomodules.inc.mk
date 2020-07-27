@@ -102,6 +102,7 @@ PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += slipdev_stdio
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_async
+PSEUDOMODULES += sock_aux%
 PSEUDOMODULES += sock_dtls
 PSEUDOMODULES += sock_ip
 PSEUDOMODULES += sock_tcp
