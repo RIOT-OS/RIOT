@@ -1,5 +1,8 @@
 include ../Makefile.tests_common
 
+# we want to run Kconfig for this test
+SHOULD_RUN_KCONFIG ?= 1
+
 all: checks
 
 include $(RIOTBASE)/Makefile.include
