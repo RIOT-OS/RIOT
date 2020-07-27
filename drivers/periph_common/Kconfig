@@ -4,6 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+config MOD_PERIPH_INIT
+    bool "Peripherals auto-initialization"
+    default y
+    depends on TEST_KCONFIG
+    help
+        Auto-initialization of all used peripherals.
+
 menuconfig KCONFIG_MODULE_PERIPH_WDT
     bool "Configure Watchdog peripheral"
     depends on MODULE_PERIPH_WDT
