@@ -93,7 +93,7 @@ static unsigned _rw_phy(unsigned addr, unsigned reg, unsigned value)
     unsigned tmp;
 
     while (ETH->MACMIIAR & ETH_MACMIIAR_MB) {}
-    DEBUG("stm32_eth: rw_phy %x (%x): %x\n", addr, reg, value);
+    DEBUG("[stm32_eth] rw_phy %x (%x): %x\n", addr, reg, value);
 
     tmp = (ETH->MACMIIAR & ETH_MACMIIAR_CR) | ETH_MACMIIAR_MB;
     tmp |= (((addr & 0x1f) << 11) | ((reg & 0x1f) << 6));
@@ -103,7 +103,7 @@ static unsigned _rw_phy(unsigned addr, unsigned reg, unsigned value)
     ETH->MACMIIAR = tmp;
     while (ETH->MACMIIAR & ETH_MACMIIAR_MB) {}
 
-    DEBUG("stm32_eth: %lx\n", ETH->MACMIIDR);
+    DEBUG("[stm32_eth] %lx\n", ETH->MACMIIDR);
     return (ETH->MACMIIDR & 0x0000ffff);
 }
 
@@ -282,9 +282,9 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     /* start TX */
     ETH->DMATPDR = 0;
     /* await completion */
-    DEBUG("stm32_eth: Started to send %u B via DMA\n", bytes_to_send);
+    DEBUG("[stm32_eth] Started to send %u B via DMA\n", bytes_to_send);
     mutex_lock(&stm32_eth_tx_completed);
-    DEBUG("stm32_eth: TX completed\n");
+    DEBUG("[stm32_eth] TX completed\n");
 
     /* Error check */
     unsigned i = 0;
@@ -313,26 +313,34 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     return (int)bytes_to_send;
 }
 
-static ssize_t get_rx_frame_size(void)
+static int get_rx_frame_size(void)
 {
     edma_desc_t *i = rx_curr;
     uint32_t status;
     while (1) {
         /* Wait until DMA gave up control over descriptor */
-        while ((status = i->status) & RX_DESC_STAT_OWN) { }
-        DEBUG("stm32_eth: get_rx_frame_size(): FS=%c, LS=%c, DE=%c, FL=%lu\n",
+        if ((status = i->status) & RX_DESC_STAT_OWN) {
+            DEBUG("[stm32_eth] RX not completed (spurious interrupt?)\n");
+            return -EAGAIN;
+        }
+        DEBUG("[stm32_eth] get_rx_frame_size(): FS=%c, LS=%c, ES=%c, DE=%c, FL=%lu\n",
               (status & RX_DESC_STAT_FS) ? '1' : '0',
               (status & RX_DESC_STAT_LS) ? '1' : '0',
+              (status & RX_DESC_STAT_ES) ? '1' : '0',
               (status & RX_DESC_STAT_DE) ? '1' : '0',
               ((status >> 16) & 0x3fff) - ETHERNET_FCS_LEN);
+        if (status & RX_DESC_STAT_DE) {
+            DEBUG("[stm32_eth] Overflow during RX\n");
+            return -EOVERFLOW;
+        }
+        if (status & RX_DESC_STAT_ES) {
+            DEBUG("[stm32_eth] Error during RX\n");
+            return -EIO;
+        }
         if (status & RX_DESC_STAT_LS) {
             break;
         }
         i = i->desc_next;
-    }
-
-    if (status & RX_DESC_STAT_DE) {
-        return -1;
     }
 
     /* bits 16-29 contain the frame length including 4 B frame check sequence */
@@ -346,39 +354,63 @@ static void drop_frame_and_update_rx_curr(void)
         /* hand over old descriptor to DMA */
         rx_curr->status = RX_DESC_STAT_OWN;
         rx_curr = rx_curr->desc_next;
-        if (old_status & RX_DESC_STAT_LS) {
-            /* reached last DMA descriptor of frame ==> done */
+        if (old_status & (RX_DESC_STAT_LS | RX_DESC_STAT_ES)) {
+            /* reached either last DMA descriptor of frame or error ==> done */
             return;
         }
     }
 }
 
+static void handle_lost_rx_irqs(void)
+{
+    edma_desc_t *iter = rx_curr;
+    while (1) {
+        uint32_t status = iter->status;
+        if (status & RX_DESC_STAT_OWN) {
+            break;
+        }
+        if (status & RX_DESC_STAT_LS) {
+            DEBUG("[stm32_eth] Lost RX IRQ, sending event to upper layer now\n");
+            /* we use the ISR event for this, as the upper layer calls recv()
+             * right away on an NETDEV_EVENT_RX_COMPLETE. Because there could be
+             * potentially quite a lot of received frames in the queue, we might
+             * risk a stack overflow if we would send an NETDEV_EVENT_RX_COMPLETE
+             */
+            netdev_trigger_event_isr(_netdev);
+            break;
+        }
+        iter = iter->desc_next;
+    }
+}
+
 static int stm32_eth_recv(netdev_t *netdev, void *buf, size_t max_len,
-                             void *info)
+                          void *info)
 {
     (void)info;
     (void)netdev;
     char *data = buf;
     /* Determine the size of received frame. The frame might span multiple
      * DMA buffers */
-    ssize_t size = get_rx_frame_size();
+    int size = get_rx_frame_size();
 
-    if (size == -1) {
-        DEBUG("stm32_eth: Received frame was too large for DMA buffer(s)\n");
-        drop_frame_and_update_rx_curr();
-        return -EOVERFLOW;
+    if (size < 0) {
+        if (size != -EAGAIN) {
+            DEBUG("[stm32_eth] Dropping frame due to error\n");
+            drop_frame_and_update_rx_curr();
+        }
+        return size;
     }
 
     if (!buf) {
         if (max_len) {
-            DEBUG("stm32_eth: Dropping frame as requested by upper layer\n");
+            DEBUG("[stm32_eth] Dropping frame as requested by upper layer\n");
             drop_frame_and_update_rx_curr();
         }
         return size;
     }
 
     if (max_len < (size_t)size) {
-        DEBUG("stm32_eth: Buffer provided by upper layer is too small\n");
+        DEBUG("[stm32_eth] Buffer provided by upper layer is too small\n");
         drop_frame_and_update_rx_curr();
         return -ENOBUFS;
     }
@@ -394,6 +426,7 @@ static int stm32_eth_recv(netdev_t *netdev, void *buf, size_t max_len,
         rx_curr = rx_curr->desc_next;
     }
 
+    handle_lost_rx_irqs();
     return size;
 }
 
