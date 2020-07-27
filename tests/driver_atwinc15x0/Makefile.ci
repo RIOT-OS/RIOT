@@ -2,8 +2,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-duemilanove \
     arduino-leonardo \
     arduino-mega2560 \
-    arduino-uno \
     arduino-nano \
+    arduino-uno \
     atmega328p \
     i-nucleo-lrwan1 \
     msb-430 \
