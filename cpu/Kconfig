@@ -58,3 +58,9 @@ config MOD_CPU
     depends on TEST_KCONFIG
     help
         Module which holds all CPU-specific files.
+
+config MOD_PERIPH
+    bool
+    depends on TEST_KCONFIG
+    help
+        CPU peripheral implementations module.

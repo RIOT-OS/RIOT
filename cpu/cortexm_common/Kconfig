@@ -8,6 +8,7 @@ config MOD_CORTEXM_COMMON
     bool
     default y if CPU_CORE_CORTEX_M
     depends on TEST_KCONFIG
+    select MOD_PERIPH
     help
         Common code for Cortex-M cores.
 
