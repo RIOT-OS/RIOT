@@ -210,6 +210,16 @@ typedef enum {
 
 /**
  * @brief   UART device configuration
+ *
+ *          The frequency f() of the clock `gclk_src` must fulfill the condition
+ *
+ *              16 * baud < f(gclk_src) ≤ 2²⁰ * baud
+ *
+ *          in Asynchronous Arithmetic mode and
+ *
+ *              16 * baud < f(gclk_src) ≤ 2¹⁷ * baud
+ *
+ *          in Asynchronous Fractional mode
  */
 typedef struct {
     SercomUsart *dev;       /**< pointer to the used UART device */
