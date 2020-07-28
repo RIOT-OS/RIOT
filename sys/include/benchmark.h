@@ -43,13 +43,11 @@ extern "C" {
  */
 #define BENCHMARK_FUNC(name, runs, func)                    \
     {                                                           \
-        unsigned _benchmark_irqstate = irq_disable();           \
         uint32_t _benchmark_time = xtimer_now_usec();           \
         for (unsigned long i = 0; i < runs; i++) {              \
             func;                                               \
         }                                                       \
         _benchmark_time = (xtimer_now_usec() - _benchmark_time);\
-        irq_restore(_benchmark_irqstate);                       \
         benchmark_print_time(_benchmark_time, runs, name);      \
     }
 
