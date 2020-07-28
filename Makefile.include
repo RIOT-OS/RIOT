@@ -536,7 +536,9 @@ else
 endif
 
 # variables used to compile and link c++
-CPPMIX ?= $(if $(wildcard *.cpp),1,)
+ifneq (,$(filter cpp,$(FEATURES_USED)))
+  CPPMIX ?= 1
+endif
 
 # We assume $(LINK) to be gcc-like. Use `LINKFLAGPREFIX :=` for ld-like linker options.
 LINKFLAGPREFIX ?= -Wl,

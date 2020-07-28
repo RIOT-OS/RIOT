@@ -16,6 +16,10 @@ USEMODULE += random
 USEMODULE += stdio_uart
 USEMODULE += xtensa
 
+# Features used by ESP*
+
+FEATURES_REQUIRED += cpp # Vendor code uses C++
+
 ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
   FEATURES_REQUIRED += esp_wifi_enterprise
   USEMODULE += esp_wifi
