@@ -562,6 +562,26 @@ typedef struct sock_dtls sock_dtls_t;
 typedef struct sock_dtls_session sock_dtls_session_t;
 
 /**
+ * @brief   Auxiliary data provided when receiving using an DTLS sock object
+ *
+ * @warning Implementations of this API may rely on this type to be compatible
+ *          with @ref sock_udp_aux_rx_t. These implementations need to be
+ *          updated, if this is no longer the case. Users of this API should
+ *          not rely on this compatibility
+ */
+typedef sock_udp_aux_rx_t sock_dtls_aux_rx_t;
+
+/**
+ * @brief   Auxiliary data provided when sending using an DTLS sock object
+ *
+ * @warning Implementations of this API may rely on this type to be compatible
+ *          with @ref sock_udp_aux_rx_t. These implementations need to be
+ *          updated, if this is no longer the case. Users of this API should
+ *          not rely on this compatibility
+ */
+typedef sock_udp_aux_tx_t sock_dtls_aux_tx_t;
+
+/**
  * @brief Called exactly once during `auto_init`.
  *
  * Calls the initialization function required by the DTLS stack used.
@@ -635,6 +655,39 @@ void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote);
 /**
  * @brief Receive handshake messages and application data from remote peer.
  *
+ * @param[in]   sock    DTLS sock to use.
+ * @param[out]  remote  Remote DTLS session of the received data.
+ *                      Cannot be NULL.
+ * @param[out]  data    Pointer where the received data should be stored.
+ * @param[in]   maxlen  Maximum space available at @p data.
+ * @param[in]   timeout Receive timeout in microseconds.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be SOCK_NO_TIMEOUT to wait until data
+ *                      is available.
+ * @param[out]  aux     Auxiliary data about the received datagram.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @note Function may block if data is not available and @p timeout != 0
+ *
+ * @return  The number of bytes received on success
+ * @return  -SOCK_DTLS_HANDSHAKE when new handshake is completed
+ * @return  -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
+ * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
+ *          initialized (or closed while sock_dtls_recv() blocks).
+ * @return  -ENOBUFS, if buffer space is not large enough to store received
+ *          data.
+ * @return  -ENOMEM, if no memory was available to receive @p data.
+ * @return  -ETIMEDOUT, if @p timeout expired.
+ */
+ssize_t sock_dtls_recv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
+                           void *data, size_t maxlen, uint32_t timeout,
+                           sock_dtls_aux_rx_t *aux);
+
+/**
+ * @brief Receive handshake messages and application data from remote peer.
+ *
  * @param[in] sock      DTLS sock to use.
  * @param[out] remote   Remote DTLS session of the received data.
  *                      Cannot be NULL.
@@ -659,8 +712,59 @@ void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote);
  * @return  -ENOMEM, if no memory was available to receive @p data.
  * @return  -ETIMEDOUT, if @p timeout expired.
  */
-ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
-                       void *data, size_t maxlen, uint32_t timeout);
+static inline ssize_t sock_dtls_recv(sock_dtls_t *sock,
+                                     sock_dtls_session_t *remote,
+                                     void *data, size_t maxlen,
+                                     uint32_t timeout)
+{
+    return sock_dtls_recv_aux(sock, remote, data, maxlen, timeout, NULL);
+}
+
+/**
+ * @brief Decrypts and provides stack-internal buffer space containing a
+ *        message from a remote peer.
+ *
+ * @param[in] sock      DTLS sock to use.
+ * @param[out] remote   Remote DTLS session of the received data.
+ *                      Cannot be NULL.
+ * @param[out] data     Pointer to a stack-internal buffer space containing the
+ *                      received data.
+ * @param[in,out] buf_ctx   Stack-internal buffer context. If it points to a
+ *                      `NULL` pointer, the stack returns a new buffer space for
+ *                      a new packet. If it does not point to a `NULL` pointer,
+ *                      an existing context is assumed to get a next segment in
+ *                      a buffer.
+ * @param[in] timeout   Receive timeout in microseconds.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be SOCK_NO_TIMEOUT to wait until data
+ *                      is available.
+ * @param[out]  aux     Auxiliary data about the received datagram.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @experimental    This function is quite new, not implemented for all stacks
+ *                  yet, and may be subject to sudden API changes. Do not use in
+ *                  production if this is unacceptable.
+ *
+ * @note Function may block if data is not available and @p timeout != 0
+ *
+ * @note    Function blocks if no packet is currently waiting.
+ *
+ * @return  The number of bytes received on success. May not be the complete
+ *          payload. Continue calling with the returned @p buf_ctx to get more
+ *          buffers until result is 0 or an error.
+ * @return  0, if no received data is available, but everything is in order.
+ *          If @p buf_ctx was provided, it was released.
+ * @return  -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
+ * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
+ *          initialized (or closed while sock_dtls_recv() blocks).
+ * @return  -ENOMEM, if no memory was available to receive @p data.
+ * @return  -ETIMEDOUT, if @p timeout expired.
+ */
+ssize_t sock_dtls_recv_buf_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
+                               void **data, void **buf_ctx, uint32_t timeout,
+                               sock_dtls_aux_rx_t *aux);
 
 /**
  * @brief Decrypts and provides stack-internal buffer space containing a
@@ -702,8 +806,51 @@ ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
  * @return  -ENOMEM, if no memory was available to receive @p data.
  * @return  -ETIMEDOUT, if @p timeout expired.
  */
-ssize_t sock_dtls_recv_buf(sock_dtls_t *sock, sock_dtls_session_t *remote,
-                           void **data, void **buf_ctx, uint32_t timeout);
+static inline ssize_t sock_dtls_recv_buf(sock_dtls_t *sock,
+                                         sock_dtls_session_t *remote,
+                                         void **data, void **buf_ctx,
+                                         uint32_t timeout)
+{
+    return sock_dtls_recv_buf_aux(sock, remote, data, buf_ctx, timeout, NULL);
+}
+
+/**
+ * @brief Encrypts and sends a message to a remote peer
+ *
+ * @param[in]   sock    DTLS sock to use
+ * @param[in]   remote  DTLS session to use. A new session will be created
+ *                      if no session exist between client and server.
+ * @param[in]   data    Pointer where the data to be send are stored
+ * @param[in]   len     Length of @p data to be send
+ * @param[in]   timeout Handshake timeout in microseconds.
+ *                      If `timeout > 0`, will start a new handshake if no
+ *                      session exists yet. The function will block until
+ *                      handshake completed or timed out.
+ *                      May be SOCK_NO_TIMEOUT to block indefinitely until
+ *                      handshake complete.
+ * @param[out] aux      Auxiliary data about the transmission.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @note    When blocking, we will need an extra thread to call
+ *          @ref sock_dtls_recv() function to handle the incoming handshake
+ *          messages.
+ *
+ * @return The number of bytes sent on success
+ * @return  -ENOTCONN, if `timeout == 0` and no existing session exists with
+ *          @p remote
+ * @return  -EADDRINUSE, if sock_dtls_t::udp_sock has no local end-point.
+ * @return  -EAFNOSUPPORT, if `remote->ep != NULL` and
+ *          sock_dtls_session_t::ep::family of @p remote is != AF_UNSPEC and
+ *          not supported.
+ * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote->ep is an
+ *          invalid address.
+ * @return  -EINVAL, if sock_udp_ep_t::port of @p remote->ep is 0.
+ * @return  -ENOMEM, if no memory was available to send @p data.
+ * @return  -ETIMEDOUT, `0 < timeout < SOCK_NO_TIMEOUT` and timed out.
+ */
+ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
+                           const void *data, size_t len, uint32_t timeout,
+                           sock_dtls_aux_tx_t *aux);
 
 /**
  * @brief Encrypts and sends a message to a remote peer
@@ -737,8 +884,13 @@ ssize_t sock_dtls_recv_buf(sock_dtls_t *sock, sock_dtls_session_t *remote,
  * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ETIMEDOUT, `0 < timeout < SOCK_NO_TIMEOUT` and timed out.
  */
-ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
-                       const void *data, size_t len, uint32_t timeout);
+static inline ssize_t sock_dtls_send(sock_dtls_t *sock,
+                                     sock_dtls_session_t *remote,
+                                     const void *data, size_t len,
+                                     uint32_t timeout)
+{
+    return sock_dtls_send_aux(sock, remote, data, len, timeout, NULL);
+}
 
 /**
  * @brief Closes a DTLS sock
