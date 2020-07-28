@@ -93,20 +93,21 @@ static size_t _send(uint8_t *buf, size_t len, char *addr_str)
     memcpy(&remote.addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
 
     /* parse port */
-    remote.port = GCOAP_PORT;
+    remote.port = CONFIG_GCOAP_PORT;
 
     return gcoap_req_send(buf, len, &remote, NULL, NULL);
 }
 
 int coap_post(char *addr, char *msgbuf, size_t msglen)
 {
-    assert(msglen < GCOAP_PDU_BUF_SIZE);
+    assert(msglen < CONFIG_GCOAP_PDU_BUF_SIZE);
 
     coap_pkt_t pdu;
-    uint8_t buf[GCOAP_PDU_BUF_SIZE];
+    uint8_t buf[CONFIG_GCOAP_PDU_BUF_SIZE];
     size_t len = 0;
 
-    gcoap_req_init(&pdu, buf, GCOAP_PDU_BUF_SIZE, COAP_POST, COAP_CHAT_PATH);
+    gcoap_req_init(&pdu, buf, CONFIG_GCOAP_PDU_BUF_SIZE,
+                   COAP_POST, COAP_CHAT_PATH);
 
     memcpy(pdu.payload, msgbuf, msglen);
 
