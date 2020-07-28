@@ -32,6 +32,9 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
+# a router needs at least two interfaces
+DISABLE_MODULE += netdev_single
+
 # Optionally include RPL as a routing protocol. When includede gnrc_uhcpc will
 # configure the node as a RPL DODAG root when receiving a prefix.
 #USEMODULE += gnrc_rpl
