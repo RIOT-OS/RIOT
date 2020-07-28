@@ -20,6 +20,7 @@
 #define BYTEORDER_H
 
 #include <stdint.h>
+#include "unaligned.h"
 
 #if defined(__MACH__)
 #   include "clang_compat.h"
@@ -485,7 +486,9 @@ static inline uint16_t byteorder_bebuftohs(const uint8_t *buf)
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
     return (uint16_t)((buf[0] << 8) | (buf[1] << 0));
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    return (uint16_t)((buf[1] << 8) | (buf[0] << 0));
+    /* big endian to big endian conversion is easy, but buffer might be
+     * unaligned */
+    return unaligned_get_u16(buf);
 #endif
 }
 
@@ -497,10 +500,9 @@ static inline uint32_t byteorder_bebuftohl(const uint8_t *buf)
           | ((uint32_t) buf[2] << 8)
           | ((uint32_t) buf[3] << 0));
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    return (((uint32_t) buf[3] << 24)
-          | ((uint32_t) buf[2] << 16)
-          | ((uint32_t) buf[1] << 8)
-          | ((uint32_t) buf[0] << 0));
+    /* big endian to big endian conversion is easy, but buffer might be
+     * unaligned */
+    return unaligned_get_u32(buf);
 #endif
 }
 
@@ -510,8 +512,9 @@ static inline void byteorder_htobebufs(uint8_t *buf, uint16_t val)
     buf[0] = (uint8_t)(val >> 8);
     buf[1] = (uint8_t)(val >> 0);
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    buf[1] = (uint8_t)(val >> 8);
-    buf[0] = (uint8_t)(val >> 0);
+    /* big endian to big endian conversion is easy, but buffer might be
+     * unaligned */
+    memcpy(buf, &val, sizeof(val));
 #endif
 }
 
@@ -523,10 +526,9 @@ static inline void byteorder_htobebufl(uint8_t *buf, uint32_t val)
     buf[2] = (uint8_t)(val >> 8);
     buf[3] = (uint8_t)(val >> 0);
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    buf[3] = (uint8_t)(val >> 24);
-    buf[2] = (uint8_t)(val >> 16);
-    buf[1] = (uint8_t)(val >> 8);
-    buf[0] = (uint8_t)(val >> 0);
+    /* big endian to big endian conversion is easy, but buffer might be
+     * unaligned */
+    memcpy(buf, &val, sizeof(val));
 #endif
 }
 
