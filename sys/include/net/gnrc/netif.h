@@ -14,6 +14,11 @@
  * Network interfaces in the context of GNRC are threads for protocols that are
  * below the network layer.
  *
+ * ## Single interface optimizations
+ *
+ * If you only have one network interface on the board, you can select the
+ * `gnrc_netif_single` pseudo-module to enable further optimisations.
+ *
  * @{
  *
  * @file
@@ -330,7 +335,7 @@ unsigned gnrc_netif_numof(void);
  */
 static inline bool gnrc_netif_highlander(void)
 {
-    return IS_ACTIVE(GNRC_NETIF_SINGLE);
+    return IS_USED(MODULE_GNRC_NETIF_SINGLE);
 }
 
 /**
