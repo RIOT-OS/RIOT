@@ -1,1 +1,4 @@
 USEMODULE += boards_common_atmega
+
+# board only has a single network interface
+DEFAULT_MODULE += netdev_single
