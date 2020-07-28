@@ -30,18 +30,19 @@
 /* This factor is used for converting "real" seconds into microcontroller
  * microseconds. This is done in order to correct timer drift.
  */
-#define _DRIFT_FACTOR (int) (US_PER_SEC * 100 / (100 + (CONFIG_GNRC_LORAWAN_TIMER_DRIFT / 10.0)))
+#define _DRIFT_FACTOR (int)(US_PER_SEC * 100 / \
+                            (100 + (CONFIG_GNRC_LORAWAN_TIMER_DRIFT / 10.0)))
 
-#define GNRC_LORAWAN_DL_RX2_DR_MASK       (0x0F)  /**< DL Settings DR Offset mask */
-#define GNRC_LORAWAN_DL_RX2_DR_POS        (0)     /**< DL Settings DR Offset pos */
-#define GNRC_LORAWAN_DL_DR_OFFSET_MASK    (0x70)  /**< DL Settings RX2 DR mask */
-#define GNRC_LORAWAN_DL_DR_OFFSET_POS     (4)     /**< DL Settings RX2 DR pos */
+#define GNRC_LORAWAN_DL_RX2_DR_MASK       (0x0F)    /**< DL Settings DR Offset mask */
+#define GNRC_LORAWAN_DL_RX2_DR_POS        (0)       /**< DL Settings DR Offset pos */
+#define GNRC_LORAWAN_DL_DR_OFFSET_MASK    (0x70)    /**< DL Settings RX2 DR mask */
+#define GNRC_LORAWAN_DL_DR_OFFSET_POS     (4)       /**< DL Settings RX2 DR pos */
 
 static inline void gnrc_lorawan_mlme_reset(gnrc_lorawan_t *mac)
 {
     mac->mlme.activation = MLME_ACTIVATION_NONE;
     mac->mlme.pending_mlme_opts = 0;
-    mac->rx_delay = (LORAMAC_DEFAULT_RX1_DELAY/MS_PER_SEC);
+    mac->rx_delay = (LORAMAC_DEFAULT_RX1_DELAY / MS_PER_SEC);
     mac->mlme.nid = LORAMAC_DEFAULT_NETID;
 }
 
@@ -65,7 +66,7 @@ void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr)
 {
     mac->dl_settings &= ~GNRC_LORAWAN_DL_RX2_DR_MASK;
     mac->dl_settings |= (rx2_dr << GNRC_LORAWAN_DL_RX2_DR_POS) &
-        GNRC_LORAWAN_DL_RX2_DR_MASK;
+                        GNRC_LORAWAN_DL_RX2_DR_MASK;
 }
 
 static void _sleep_radio(gnrc_lorawan_t *mac)
@@ -94,10 +95,12 @@ void gnrc_lorawan_reset(gnrc_lorawan_t *mac)
 
     uint8_t syncword = LORAMAC_DEFAULT_PUBLIC_NETWORK ? LORA_SYNCWORD_PUBLIC
                                                       : LORA_SYNCWORD_PRIVATE;
+
     dev->driver->set(dev, NETOPT_SYNCWORD, &syncword, sizeof(syncword));
 
     /* Continuous reception */
     uint32_t rx_timeout = 0;
+
     dev->driver->set(dev, NETOPT_RX_TIMEOUT, &rx_timeout, sizeof(rx_timeout));
 
     gnrc_lorawan_set_rx2_dr(mac, LORAMAC_DEFAULT_RX2_DR);
@@ -108,15 +111,18 @@ void gnrc_lorawan_reset(gnrc_lorawan_t *mac)
     gnrc_lorawan_channels_init(mac);
 }
 
-static void _config_radio(gnrc_lorawan_t *mac, uint32_t channel_freq, uint8_t dr, int rx)
+static void _config_radio(gnrc_lorawan_t *mac, uint32_t channel_freq,
+                          uint8_t dr, int rx)
 {
     netdev_t *dev = gnrc_lorawan_get_netdev(mac);
 
     if (channel_freq != 0) {
-        dev->driver->set(dev, NETOPT_CHANNEL_FREQUENCY, &channel_freq, sizeof(channel_freq));
+        dev->driver->set(dev, NETOPT_CHANNEL_FREQUENCY, &channel_freq,
+                         sizeof(channel_freq));
     }
 
     netopt_enable_t iq_invert = rx;
+
     dev->driver->set(dev, NETOPT_IQ_INVERT, &iq_invert, sizeof(iq_invert));
 
     gnrc_lorawan_set_dr(mac, dr);
@@ -126,11 +132,13 @@ static void _config_radio(gnrc_lorawan_t *mac, uint32_t channel_freq, uint8_t dr
         const netopt_enable_t single = true;
         dev->driver->set(dev, NETOPT_SINGLE_RECEIVE, &single, sizeof(single));
         const uint16_t timeout = CONFIG_GNRC_LORAWAN_MIN_SYMBOLS_TIMEOUT;
-        dev->driver->set(dev, NETOPT_RX_SYMBOL_TIMEOUT, &timeout, sizeof(timeout));
+        dev->driver->set(dev, NETOPT_RX_SYMBOL_TIMEOUT, &timeout,
+                         sizeof(timeout));
     }
 }
 
-static void _configure_rx_window(gnrc_lorawan_t *mac, uint32_t channel_freq, uint8_t dr)
+static void _configure_rx_window(gnrc_lorawan_t *mac, uint32_t channel_freq,
+                                 uint8_t dr)
 {
     _config_radio(mac, channel_freq, dr, true);
 }
@@ -138,12 +146,14 @@ static void _configure_rx_window(gnrc_lorawan_t *mac, uint32_t channel_freq, uin
 void gnrc_lorawan_open_rx_window(gnrc_lorawan_t *mac)
 {
     netdev_t *dev = gnrc_lorawan_get_netdev(mac);
+
     mac->msg.type = MSG_TYPE_TIMEOUT;
     /* Switch to RX state */
     if (mac->state == LORAWAN_STATE_RX_1) {
         xtimer_set_msg(&mac->rx, _DRIFT_FACTOR, &mac->msg, thread_getpid());
     }
     netopt_state_t state = NETOPT_STATE_RX;
+
     dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
 }
 
@@ -153,6 +163,7 @@ void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac)
     mac->state = LORAWAN_STATE_RX_1;
 
     int rx_1;
+
     /* if the MAC is not activated, then this is a Join Request */
     rx_1 = mac->mlme.activation == MLME_ACTIVATION_NONE ?
            LORAMAC_DEFAULT_JOIN_DELAY1 : mac->rx_delay;
@@ -160,18 +171,23 @@ void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac)
     xtimer_set_msg(&mac->rx, rx_1 * _DRIFT_FACTOR, &mac->msg, thread_getpid());
 
     uint8_t dr_offset = (mac->dl_settings & GNRC_LORAWAN_DL_DR_OFFSET_MASK) >>
-        GNRC_LORAWAN_DL_DR_OFFSET_POS;
-    _configure_rx_window(mac, 0, gnrc_lorawan_rx1_get_dr_offset(mac->last_dr, dr_offset));
+                        GNRC_LORAWAN_DL_DR_OFFSET_POS;
+
+    _configure_rx_window(mac, 0,
+                         gnrc_lorawan_rx1_get_dr_offset(mac->last_dr,
+                                                        dr_offset));
 
     _sleep_radio(mac);
 }
 
 void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac)
 {
-    (void) mac;
+    (void)mac;
     switch (mac->state) {
         case LORAWAN_STATE_RX_1:
-            _configure_rx_window(mac, LORAMAC_DEFAULT_RX2_FREQ, mac->dl_settings & GNRC_LORAWAN_DL_RX2_DR_MASK);
+            _configure_rx_window(mac, LORAMAC_DEFAULT_RX2_FREQ,
+                                 mac->dl_settings &
+                                 GNRC_LORAWAN_DL_RX2_DR_MASK);
             mac->state = LORAWAN_STATE_RX_2;
             break;
         case LORAWAN_STATE_RX_2:
@@ -205,6 +221,7 @@ static uint32_t lora_time_on_air(size_t payload_size, uint8_t dr, uint8_t cr)
     int nb_symbols;
 
     uint8_t offset = _K[index][1];
+
     if (payload_size < offset) {
         nb_symbols = 8 + n0 * cr;
     }
@@ -217,18 +234,22 @@ static uint32_t lora_time_on_air(size_t payload_size, uint8_t dr, uint8_t cr)
     }
 
     uint32_t t_payload = t_sym * nb_symbols;
+
     return t_preamble + t_payload;
 }
 
 void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, iolist_t *psdu, uint8_t dr)
 {
     netdev_t *dev = gnrc_lorawan_get_netdev(mac);
+
     mac->state = LORAWAN_STATE_TX;
 
     uint32_t chan = gnrc_lorawan_pick_channel(mac);
+
     _config_radio(mac, chan, dr, false);
 
     uint8_t cr;
+
     dev->driver->get(dev, NETOPT_CODING_RATE, &cr, sizeof(cr));
 
     mac->toa = lora_time_on_air(iolist_size(psdu), dr, cr + 4);
@@ -239,7 +260,8 @@ void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, iolist_t *psdu, uint8_t dr)
 
 }
 
-void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *psdu, size_t size)
+void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *psdu,
+                                   size_t size)
 {
     _sleep_radio(mac);
     if (psdu == NULL) {
@@ -249,6 +271,7 @@ void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *psdu, size_t si
     xtimer_remove(&mac->rx);
 
     uint8_t mtype = (*psdu & MTYPE_MASK) >> 5;
+
     switch (mtype) {
         case MTYPE_JOIN_ACCEPT:
             gnrc_lorawan_mlme_process_join(mac, psdu, size);

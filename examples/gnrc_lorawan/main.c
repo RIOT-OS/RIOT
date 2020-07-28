@@ -49,7 +49,7 @@ int tx_cmd(int argc, char **argv)
     uint8_t port = LORAWAN_PORT; /* Default: 2 */
     int interface;
 
-    if(argc < 3) {
+    if (argc < 3) {
         _usage();
         return 1;
     }
@@ -91,7 +91,7 @@ int tx_cmd(int argc, char **argv)
 }
 
 static const shell_command_t shell_commands[] = {
-    { "send",       "Send LoRaWAN data",     tx_cmd},
+    { "send",       "Send LoRaWAN data",     tx_cmd },
     { NULL, NULL, NULL }
 };
 
@@ -102,6 +102,7 @@ int main(void)
     puts("Initialization successful - starting the shell now");
     gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(LORAWAN_PORT,
                                                           gnrc_pktdump_pid);
+
     gnrc_netreg_register(GNRC_NETTYPE_LORAWAN, &dump);
     char line_buf[SHELL_DEFAULT_BUFSIZE];
 

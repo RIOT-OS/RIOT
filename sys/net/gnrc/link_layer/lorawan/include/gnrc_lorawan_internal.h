@@ -150,27 +150,27 @@ typedef struct {
  * @brief MCPS service access point descriptor
  */
 typedef struct {
-    uint32_t fcnt;                  /**< uplink framecounter */
-    uint32_t fcnt_down;             /**< downlink frame counter */
-    iolist_t *msdu;             /**< current MSDU */
-    int nb_trials;              /**< holds the remaining number of retransmissions */
-    int ack_requested;          /**< whether the network server requested an ACK */
-    int waiting_for_ack;        /**< true if the MAC layer is waiting for an ACK */
-    char mhdr_mic[MHDR_MIC_BUF_SIZE]; /**< internal retransmissions buffer */
+    uint32_t fcnt;                      /**< uplink framecounter */
+    uint32_t fcnt_down;                 /**< downlink frame counter */
+    iolist_t *msdu;                     /**< current MSDU */
+    int nb_trials;                      /**< holds the remaining number of retransmissions */
+    int ack_requested;                  /**< whether the network server requested an ACK */
+    int waiting_for_ack;                /**< true if the MAC layer is waiting for an ACK */
+    char mhdr_mic[MHDR_MIC_BUF_SIZE];   /**< internal retransmissions buffer */
 } gnrc_lorawan_mcps_t;
 
 /**
  * @brief MLME service access point descriptor
  */
 typedef struct {
-    xtimer_t backoff_timer;     /**< timer used for backoff expiration */
-    msg_t backoff_msg;          /**< msg for backoff expiration */
-    uint8_t activation;         /**< Activation mechanism of the MAC layer */
+    xtimer_t backoff_timer; /**< timer used for backoff expiration */
+    msg_t backoff_msg;      /**< msg for backoff expiration */
+    uint8_t activation;     /**< Activation mechanism of the MAC layer */
     int pending_mlme_opts;  /**< holds pending mlme opts */
-    uint32_t nid;               /**< current Network ID */
-    int32_t backoff_budget;     /**< remaining Time On Air budget */
-    uint8_t dev_nonce[2];       /**< Device Nonce */
-    uint8_t backoff_state;      /**< state in the backoff state machine */
+    uint32_t nid;           /**< current Network ID */
+    int32_t backoff_budget; /**< remaining Time On Air budget */
+    uint8_t dev_nonce[2];   /**< Device Nonce */
+    uint8_t backoff_state;  /**< state in the backoff state machine */
 } gnrc_lorawan_mlme_t;
 
 /**
@@ -207,7 +207,9 @@ typedef struct {
  * @param[in] dir direction of the packet (0 if uplink, 1 if downlink)
  * @param[in] appskey pointer to the Application Session Key
  */
-void gnrc_lorawan_encrypt_payload(iolist_t *iolist, const le_uint32_t *dev_addr, uint32_t fcnt, uint8_t dir, const uint8_t *appskey);
+void gnrc_lorawan_encrypt_payload(iolist_t *iolist, const le_uint32_t *dev_addr,
+                                  uint32_t fcnt, uint8_t dir,
+                                  const uint8_t *appskey);
 
 /**
  * @brief Decrypts join accept message
@@ -217,7 +219,8 @@ void gnrc_lorawan_encrypt_payload(iolist_t *iolist, const le_uint32_t *dev_addr,
  * @param[in] has_clist true if the Join Accept frame has CFList
  * @param[out] out buffer where the decryption is stored
  */
-void gnrc_lorawan_decrypt_join_accept(const uint8_t *key, uint8_t *pkt, int has_clist, uint8_t *out);
+void gnrc_lorawan_decrypt_join_accept(const uint8_t *key, uint8_t *pkt,
+                                      int has_clist, uint8_t *out);
 
 /**
  * @brief Generate LoRaWAN session keys
@@ -231,7 +234,10 @@ void gnrc_lorawan_decrypt_join_accept(const uint8_t *key, uint8_t *pkt, int has_
  * @param[out] nwkskey pointer to the NwkSKey
  * @param[out] appskey pointer to the AppSKey
  */
-void gnrc_lorawan_generate_session_keys(const uint8_t *app_nonce, const uint8_t *dev_nonce, const uint8_t *appkey, uint8_t *nwkskey, uint8_t *appskey);
+void gnrc_lorawan_generate_session_keys(const uint8_t *app_nonce,
+                                        const uint8_t *dev_nonce,
+                                        const uint8_t *appkey, uint8_t *nwkskey,
+                                        uint8_t *appskey);
 
 /**
  * @brief Set datarate for the next transmission
@@ -255,7 +261,8 @@ int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate);
  * @return full LoRaWAN frame including payload
  * @return NULL if packet buffer is full. `payload` is released
  */
-size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload, int confirmed_data, uint8_t port);
+size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
+                                 int confirmed_data, uint8_t port);
 
 /**
  * @brief pick a random available LoRaWAN channel
@@ -284,7 +291,8 @@ uint8_t gnrc_lorawan_build_options(gnrc_lorawan_t *mac, lorawan_buffer_t *buf);
  * @param[in] fopts pointer to fopts frame
  * @param[in] size size of fopts frame
  */
-void gnrc_lorawan_process_fopts(gnrc_lorawan_t *mac, uint8_t *fopts, size_t size);
+void gnrc_lorawan_process_fopts(gnrc_lorawan_t *mac, uint8_t *fopts,
+                                size_t size);
 
 /**
  * @brief calculate join Message Integrity Code
@@ -294,7 +302,8 @@ void gnrc_lorawan_process_fopts(gnrc_lorawan_t *mac, uint8_t *fopts, size_t size
  * @param[in] key key used to calculate the MIC
  * @param[out] out calculated MIC
  */
-void gnrc_lorawan_calculate_join_mic(const uint8_t *buf, size_t len, const uint8_t *key, le_uint32_t *out);
+void gnrc_lorawan_calculate_join_mic(const uint8_t *buf, size_t len,
+                                     const uint8_t *key, le_uint32_t *out);
 
 /**
  * @brief Calculate Message Integrity Code for a MCPS message
@@ -307,7 +316,8 @@ void gnrc_lorawan_calculate_join_mic(const uint8_t *buf, size_t len, const uint8
  * @param[out] out calculated MIC
  */
 void gnrc_lorawan_calculate_mic(const le_uint32_t *dev_addr, uint32_t fcnt,
-                                uint8_t dir, iolist_t *frame, const uint8_t *nwkskey, le_uint32_t *out);
+                                uint8_t dir, iolist_t *frame,
+                                const uint8_t *nwkskey, le_uint32_t *out);
 /**
  * @brief Build a MCPS LoRaWAN header
  *
@@ -320,7 +330,9 @@ void gnrc_lorawan_calculate_mic(const le_uint32_t *dev_addr, uint32_t fcnt,
  *
  * @return the size of the header
  */
-size_t gnrc_lorawan_build_hdr(uint8_t mtype, le_uint32_t *dev_addr, uint32_t fcnt, uint8_t ack, uint8_t fopts_length, lorawan_buffer_t *buf);
+size_t gnrc_lorawan_build_hdr(uint8_t mtype, le_uint32_t *dev_addr,
+                              uint32_t fcnt, uint8_t ack, uint8_t fopts_length,
+                              lorawan_buffer_t *buf);
 
 /**
  * @brief Process an MCPS downlink message (confirmable or non comfirmable)
@@ -329,7 +341,8 @@ size_t gnrc_lorawan_build_hdr(uint8_t mtype, le_uint32_t *dev_addr, uint32_t fcn
  * @param[in] psdu pointer to the downlink PSDU
  * @param[in] size size of the PSDU
  */
-void  gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu, size_t size);
+void  gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
+                                         size_t size);
 
 /**
  * @brief Init regional channel settings.
@@ -365,7 +378,8 @@ void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, iolist_t *psdu, uint8_t dr);
  * @param[in] data the Join Accept packet
  * @param[in] size size of the Join Accept packet
  */
-void gnrc_lorawan_mlme_process_join(gnrc_lorawan_t *mac, uint8_t *data, size_t size);
+void gnrc_lorawan_mlme_process_join(gnrc_lorawan_t *mac, uint8_t *data,
+                                    size_t size);
 
 /**
  * @brief Inform the MAC layer that no packet was received during reception.
