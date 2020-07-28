@@ -32,18 +32,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Single interface optimizations
- *
- *          Define to 1 to allow GNRC optimizations when only one interface
- *          is available.
- *
- * @note    This MUST NOT be enabled if there's more than one interface.
- */
-#if DOXYGEN
-#define GNRC_NETIF_SINGLE
-#endif
-
-/**
  * @brief   Default priority for network interface threads
  */
 #ifndef GNRC_NETIF_PRIO
