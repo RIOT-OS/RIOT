@@ -306,7 +306,7 @@ typedef struct {
     /**
      * @brief   The local address the packet was received on
      *
-     * Check if sock_ip_aux_tx_t::flags contains SOCK_AUX_HAS_LOCAL. Module
+     * Check if sock_ip_aux_rx_t::flags contains SOCK_AUX_HAS_LOCAL. Module
      * `sock_aux_local` needs to be selected to use this.
      */
     sock_ip_ep_t local;
@@ -315,7 +315,7 @@ typedef struct {
     /**
      * @brief   System time the packet was received
      *
-     * Check if sock_ip_aux_tx_t::flags contains SOCK_AUX_HAS_TIMESTAMP. Module
+     * Check if sock_ip_aux_rx_t::flags contains SOCK_AUX_HAS_TIMESTAMP. Module
      * `sock_aux_timestamp` needs to be selected to use this. The timestamp
      * refers to the reception of start of frame delimiter or preamble of
      * the frame carrying the IP packet and is given in nanoseconds since
