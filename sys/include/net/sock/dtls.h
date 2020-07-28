@@ -542,7 +542,7 @@ typedef struct sock_dtls_session sock_dtls_session_t;
 /**
  * @brief   Auxiliary data provided when receiving using an DTLS sock object
  *
- * @details Implementations of this API may rely on this type to be compatible
+ * @warning Implementations of this API may rely on this type to be compatible
  *          with @ref sock_udp_aux_rx_t. These implementations need to be
  *          updated, if this is no longer the case. Users of this API should
  *          not rely on this compatibility
@@ -552,7 +552,7 @@ typedef sock_udp_aux_rx_t sock_dtls_aux_rx_t;
 /**
  * @brief   Auxiliary data provided when sending using an DTLS sock object
  *
- * @details Implementations of this API may rely on this type to be compatible
+ * @warning Implementations of this API may rely on this type to be compatible
  *          with @ref sock_udp_aux_rx_t. These implementations need to be
  *          updated, if this is no longer the case. Users of this API should
  *          not rely on this compatibility
