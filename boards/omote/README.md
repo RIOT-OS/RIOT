@@ -1,5 +1,5 @@
 Oppila Microsystems omote platform -  http://www.oppila.in
-============================================
+==========================================================
 
 The omote platform  is a IoT Hardware development platform based
 on TI's CC2538 system on chip (SoC), featuring an ARM Cortex-M3 with 512KB
