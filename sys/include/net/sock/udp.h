@@ -308,7 +308,7 @@ typedef struct {
     /**
      * @brief   The local endpoint the datagram was received on
      *
-     * Check if sock_udp_aux_tx_t::flags contains SOCK_AUX_HAS_LOCAL. Module
+     * Check if sock_udp_aux_rx_t::flags contains SOCK_AUX_HAS_LOCAL. Module
      * `sock_aux_local` needs to be selected to use this.
      */
     sock_udp_ep_t local;
@@ -317,7 +317,7 @@ typedef struct {
     /**
      * @brief   System time the datagram was received
      *
-     * Check if sock_udp_aux_tx_t::flags contains SOCK_AUX_HAS_TIMESTAMP. Module
+     * Check if sock_udp_aux_rx_t::flags contains SOCK_AUX_HAS_TIMESTAMP. Module
      * `sock_aux_timestamp` needs to be selected to use this. The timestamp
      * refers to the reception of start of frame delimiter or preamble of
      * the frame carrying the UDP datagram and is given in nanoseconds since
