@@ -164,6 +164,45 @@ static inline unsigned bitarithm_lsb(unsigned v)
 }
 #endif
 
+/**
+ * @brief   Used for iterating over the bits in @p state.
+ *          Returns the index of a set bit in @p state, returns @p state with that bit cleared.
+ *
+ * @warning This is a low-level helper function, arguments are not checked.
+ *          It is intended to iterate over a bit map until all bits are cleared.
+ *          Whether it starts with the highest or lowest bit will depend on what is fastest
+ *          on the given hardware.
+ *
+ * @warning @p state must not be zero.
+ *
+ * @param[in]   state   Bit Map with at least one bit set
+ * @param[out]  index   Index of the first set bit. Must be initialized with 0 before the
+ *                      first call to this function, must not be modified between subsequent
+ *                      calls.
+ *
+ * @return      new state value - must be treated as opaque value
+ *
+ */
+static inline unsigned bitarithm_test_and_clear(unsigned state, uint8_t *index)
+{
+#if defined(BITARITHM_HAS_CLZ)
+    *index = 8 * sizeof(state) - __builtin_clz(state) - 1;
+    return state & ~(1 << *index);
+#elif defined(BITARITHM_LSB_LOOKUP)
+    /* Source: http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup */
+    extern const uint8_t MultiplyDeBruijnBitPosition[32];
+    uint32_t least_bit = state & -state;
+    *index = MultiplyDeBruijnBitPosition[(least_bit * 0x077CB531U) >> 27];
+    return state & ~least_bit;
+#else
+    while ((state & 1) == 0) {
+        *index += 1;
+        state >>= 1;
+    }
+    return state & ~1;
+#endif
+}
+
 #ifdef __cplusplus
 }
 #endif

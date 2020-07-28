@@ -34,6 +34,17 @@ void arm_reset(void);
  */
 #define STACK_CANARY_WORD   (0xEAFFFFFEu)
 
+/**
+ * @brief   Select fastest bitarithm_lsb implementation
+ * @{
+ */
+#ifdef __ARM_FEATURE_CLZ
+#define BITARITHM_LSB_BUILTIN
+#define BITARITHM_HAS_CLZ
+#else
+#define BITARITHM_LSB_LOOKUP
+#endif
+/** @} */
 
 #ifdef __cplusplus
 }
