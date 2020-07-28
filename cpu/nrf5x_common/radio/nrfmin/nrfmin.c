@@ -310,9 +310,10 @@ void isr_radio(void)
     cortexm_isr_end();
 }
 
-static int nrfmin_send(netdev_t *dev, const iolist_t *iolist)
+static int nrfmin_send(netdev_t *dev, const iolist_t *iolist, void *info)
 {
     (void)dev;
+    (void)info;
 
     assert(iolist);
     if (state == STATE_OFF) {

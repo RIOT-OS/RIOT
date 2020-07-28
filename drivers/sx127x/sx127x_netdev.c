@@ -42,9 +42,10 @@ void _on_dio1_irq(void *arg);
 void _on_dio2_irq(void *arg);
 void _on_dio3_irq(void *arg);
 
-static int _send(netdev_t *netdev, const iolist_t *iolist)
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
-    sx127x_t *dev = (sx127x_t*) netdev;
+    (void)info;
+    sx127x_t *dev = (sx127x_t*)netdev;
 
     if (sx127x_get_state(dev) == SX127X_RF_TX_RUNNING) {
         DEBUG("[sx127x] Cannot send packet: radio already in transmitting "

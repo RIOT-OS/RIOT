@@ -143,8 +143,9 @@ unsigned slipdev_unstuff_readbyte(uint8_t *buf, uint8_t byte, bool *escaped)
     return res;
 }
 
-static int _send(netdev_t *netdev, const iolist_t *iolist)
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     slipdev_t *dev = (slipdev_t *)netdev;
     int bytes = 0;
 

@@ -173,8 +173,9 @@ static int _esp_eth_init(netdev_t *netdev)
     return (ret == ESP_OK) ? 0 : -1;
 }
 
-static int _esp_eth_send(netdev_t *netdev, const iolist_t *iolist)
+static int _esp_eth_send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     DEBUG("%s: netdev=%p iolist=%p\n", __func__, netdev, iolist);
 
     CHECK_PARAM_RET (netdev != NULL, -ENODEV);

@@ -317,9 +317,10 @@ static int _init(netdev_t *dev)
     return 0;
 }
 
-static int _send(netdev_t *dev,  const iolist_t *iolist)
+static int _send(netdev_t *dev,  const iolist_t *iolist, void *info)
 {
     (void)dev;
+    (void)info;
 
     DEBUG("[nrf802154] Send a packet\n");
 

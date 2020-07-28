@@ -214,8 +214,10 @@ int kw41zrf_cca(kw41zrf_t *dev)
     return dev->cca_result;
 }
 
-static int kw41zrf_netdev_send(netdev_t *netdev, const iolist_t *iolist)
+static int kw41zrf_netdev_send(netdev_t *netdev, const iolist_t *iolist,
+                               void *info)
 {
+    (void)info;
     kw41zrf_t *dev = (kw41zrf_t *)netdev;
     size_t len = 0;
 

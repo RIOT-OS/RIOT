@@ -640,8 +640,9 @@ int xbee_init(netdev_t *dev)
     return 0;
 }
 
-static int xbee_send(netdev_t *dev, const iolist_t *iolist)
+static int xbee_send(netdev_t *dev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     xbee_t *xbee = (xbee_t *)dev;
     size_t size;
     uint8_t csum;

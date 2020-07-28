@@ -87,7 +87,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     DEBUG("gnrc_esp_now: sending packet to %02x:%02x:%02x:%02x:%02x:%02x with size %u\n",
           mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], (unsigned)payload->size);
 
-    int res = dev->driver->send(dev, &iolist);
+    int res = dev->driver->send(dev, &iolist, NULL);
 
     gnrc_pktbuf_release(pkt);
 

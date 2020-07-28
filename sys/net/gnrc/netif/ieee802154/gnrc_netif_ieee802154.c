@@ -290,10 +290,10 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         res = csma_sender_csma_ca_send(dev, &iolist, &netif->mac.csma_conf);
     }
     else {
-        res = dev->driver->send(dev, &iolist);
+        res = dev->driver->send(dev, &iolist, NULL);
     }
 #else
-    res = dev->driver->send(dev, &iolist);
+    res = dev->driver->send(dev, &iolist, NULL);
 #endif
 
     /* release old data */

@@ -192,8 +192,9 @@ static uint16_t tx_upload(w5100_t *dev, uint16_t start, void *data, size_t len)
     }
 }
 
-static int send(netdev_t *netdev, const iolist_t *iolist)
+static int send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     w5100_t *dev = (w5100_t *)netdev;
     int sum = 0;
 

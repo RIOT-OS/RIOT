@@ -304,17 +304,20 @@ typedef struct netdev_driver {
      *
      * @pre `(dev != NULL) && (iolist != NULL`
      *
-     * @param[in] dev       Network device descriptor. Must not be NULL.
-     * @param[in] iolist    IO vector list to send. Elements of this list may
+     * @param[in]   dev     Network device descriptor. Must not be NULL.
+     * @param[in]   iolist  IO vector list to send. Elements of this list may
      *                      have iolist_t::iol_data == NULL or
      *                      iolist_t::iol_size == 0. However, unless otherwise
      *                      specified by the device, the *first* element
      *                      must contain data.
+     * @param[out]  info    Status information of the transmission. Might
+     *                      be of different type for different netdev devices.
+     *                      May be NULL if not needed or applicable.
      *
      * @return negative errno on error
      * @return number of bytes sent
      */
-    int (*send)(netdev_t *dev, const iolist_t *iolist);
+    int (*send)(netdev_t *dev, const iolist_t *iolist, void *info);
 
     /**
      * @brief Drop a received frame, **OR** get the length of a received frame,
@@ -343,7 +346,7 @@ typedef struct netdev_driver {
      * @param[in]   len     maximum number of bytes to read. If @p buf is NULL
      *                      the currently buffered packet is dropped when
      *                      @p len > 0. Must not be 0 when @p buf != NULL.
-     * @param[out] info     status information for the received packet. Might
+     * @param[out]  info    status information for the received packet. Might
      *                      be of different type for different netdev devices.
      *                      May be NULL if not needed or applicable.
      *

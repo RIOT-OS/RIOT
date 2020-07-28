@@ -138,7 +138,7 @@ void SX127XSend(uint8_t *buffer, uint8_t size)
         .iol_base = buffer,
         .iol_len = size
     };
-    dev->driver->send(dev, &iol);
+    dev->driver->send(dev, &iol, NULL);
 }
 
 void SX127XSleep(void)

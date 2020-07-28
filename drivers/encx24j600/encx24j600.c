@@ -59,7 +59,7 @@ static inline int _packets_available(encx24j600_t *dev);
 static void _get_mac_addr(netdev_t *dev, uint8_t* buf);
 
 /* netdev interface */
-static int _send(netdev_t *netdev, const iolist_t *iolist);
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *dev);
 static void _isr(netdev_t *dev);
@@ -287,8 +287,9 @@ static int _init(netdev_t *encdev)
     return 0;
 }
 
-static int _send(netdev_t *netdev, const iolist_t *iolist) {
-    encx24j600_t * dev = (encx24j600_t *) netdev;
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info) {
+    (void)info;
+    encx24j600_t *dev = (encx24j600_t *)netdev;
     lock(dev);
 
     /* wait until previous packet has been sent */

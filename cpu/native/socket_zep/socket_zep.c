@@ -99,8 +99,9 @@ static size_t _prep_vector(socket_zep_t *dev, const iolist_t *iolist,
     return bytes;
 }
 
-static int _send(netdev_t *netdev, const iolist_t *iolist)
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     socket_zep_t *dev = (socket_zep_t *)netdev;
     unsigned n = iolist_count(iolist);
     struct iovec v[n + 2];

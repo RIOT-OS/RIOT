@@ -256,8 +256,9 @@ static void on_int(void *arg)
     netdev_trigger_event_isr(arg);
 }
 
-static int nd_send(netdev_t *netdev, const iolist_t *iolist)
+static int nd_send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     enc28j60_t *dev = (enc28j60_t *)netdev;
     uint8_t ctrl = 0;
     int c = 0;

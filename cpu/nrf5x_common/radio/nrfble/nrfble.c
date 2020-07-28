@@ -269,9 +269,10 @@ static int _nrfble_init(netdev_t *dev)
     return 0;
 }
 
-static int _nrfble_send(netdev_t *dev, const iolist_t *data)
+static int _nrfble_send(netdev_t *dev, const iolist_t *data, void *info)
 {
     (void)dev;
+    (void)info;
     assert(data);
 
     NRF_RADIO->PACKETPTR = (uint32_t)data->iol_base;

@@ -141,7 +141,7 @@ typedef struct {
 static inline int netdev_ble_send(netdev_t *dev, netdev_ble_pkt_t *pkt)
 {
     struct iolist data = { NULL, pkt, sizeof(netdev_ble_pkt_t) };
-    return dev->driver->send(dev, &data);
+    return dev->driver->send(dev, &data, NULL);
 }
 
 /**

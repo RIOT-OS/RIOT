@@ -54,8 +54,9 @@ void cdcecm_netdev_setup(usbus_cdcecm_device_t *cdcecm)
     cdcecm->netdev.driver = &netdev_driver_cdcecm;
 }
 
-static int _send(netdev_t *netdev, const iolist_t *iolist)
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     assert(iolist);
     usbus_cdcecm_device_t *cdcecm = _netdev_to_cdcecm(netdev);
     uint8_t *buf = cdcecm->ep_in->ep->buf;

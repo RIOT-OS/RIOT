@@ -104,7 +104,7 @@ static int gnrc_nrfmin_send(gnrc_netif_t *dev, gnrc_pktsnip_t *pkt)
     };
 
     /* and finally send out the data and release the packet */
-    res = dev->dev->driver->send(dev->dev, &iolist);
+    res = dev->dev->driver->send(dev->dev, &iolist, NULL);
 
 out:
     gnrc_pktbuf_release(pkt);

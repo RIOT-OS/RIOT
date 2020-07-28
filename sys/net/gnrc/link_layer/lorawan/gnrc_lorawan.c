@@ -243,7 +243,7 @@ void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, gnrc_pktsnip_t *pkt, uint8_t dr)
 
     mac->toa = lora_time_on_air(gnrc_pkt_len(pkt), dr, cr + 4);
 
-    if (dev->driver->send(dev, &iolist) == -ENOTSUP) {
+    if (dev->driver->send(dev, &iolist, NULL) == -ENOTSUP) {
         DEBUG("gnrc_lorawan: Cannot send: radio is still transmitting");
     }
 

@@ -38,7 +38,7 @@
 
 static int cc110x_init(netdev_t *netdev);
 static int cc110x_recv(netdev_t *netdev, void *buf, size_t len, void *info);
-static int cc110x_send(netdev_t *netdev, const iolist_t *iolist);
+static int cc110x_send(netdev_t *netdev, const iolist_t *iolist, void *info);
 static int cc110x_get(netdev_t *netdev, netopt_t opt,
                       void *val, size_t max_len);
 static int cc110x_set(netdev_t *netdev, netopt_t opt,
@@ -404,8 +404,9 @@ static int cc110x_recv(netdev_t *netdev, void *buf, size_t len, void *info)
     return size;
 }
 
-static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
+static int cc110x_send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     cc110x_t *dev = (cc110x_t *)netdev;
 
     /* assert that cc110x_send was called with valid parameters */

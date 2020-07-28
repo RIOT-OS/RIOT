@@ -18,9 +18,9 @@ void netdev_isr_pass(netdev_t *dev)
     dev->lower->driver->isr(dev->lower);
 }
 
-int netdev_send_pass(netdev_t *dev, const iolist_t *iolist)
+int netdev_send_pass(netdev_t *dev, const iolist_t *iolist, void *info)
 {
-    return dev->lower->driver->send(dev->lower, iolist);
+    return dev->lower->driver->send(dev->lower, iolist, info);
 }
 
 int netdev_recv_pass(netdev_t *dev, void *buf, size_t len, void *info)

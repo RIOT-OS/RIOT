@@ -66,7 +66,7 @@
 
 /* netdev interface */
 static int _init(netdev_t *netdev);
-static int _send(netdev_t *netdev, const iolist_t *iolist);
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info);
 static int _recv(netdev_t *netdev, void *buf, size_t n, void *info);
 
 static inline void _get_mac_addr(netdev_t *netdev, uint8_t *dst)
@@ -273,8 +273,9 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     return -1;
 }
 
-static int _send(netdev_t *netdev, const iolist_t *iolist)
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     netdev_tap_t *dev = (netdev_tap_t*)netdev;
 
     struct iovec iov[iolist_count(iolist)];

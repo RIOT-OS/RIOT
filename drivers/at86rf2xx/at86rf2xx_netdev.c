@@ -43,7 +43,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static int _send(netdev_t *netdev, const iolist_t *iolist);
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *netdev);
 static void _isr(netdev_t *netdev);
@@ -109,8 +109,9 @@ static int _init(netdev_t *netdev)
     return 0;
 }
 
-static int _send(netdev_t *netdev, const iolist_t *iolist)
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
     size_t len = 0;
 

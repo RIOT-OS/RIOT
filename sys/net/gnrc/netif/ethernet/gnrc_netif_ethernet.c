@@ -158,7 +158,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         netif->stats.tx_unicast_count++;
     }
 #endif
-    res = dev->driver->send(dev, &iolist);
+    res = dev->driver->send(dev, &iolist, NULL);
 
     gnrc_pktbuf_release(pkt);
 

@@ -70,12 +70,15 @@ void netdev_isr_pass(netdev_t *dev);
  * See also @ref netdev_driver for the extended description of this functions
  * behaviour
  *
- * @param[in] dev       network device descriptor
- * @param[in] iolist    io vector list to send
+ * @param[in]   dev     network device descriptor
+ * @param[in]   iolist  io vector list to send
+ * @param[out]  info    Status information for the transmission. Might
+ *                      be of different type for different netdev devices.
+ *                      May be NULL if not needed or applicable.
  *
  * @return              number of bytes sent, or `< 0` on error
  */
-int netdev_send_pass(netdev_t *dev, const iolist_t *iolist);
+int netdev_send_pass(netdev_t *dev, const iolist_t *iolist, void *info);
 
 /**
  * @brief   Passthrough recv function.

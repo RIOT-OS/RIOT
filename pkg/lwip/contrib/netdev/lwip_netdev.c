@@ -220,7 +220,7 @@ static err_t _eth_link_output(struct netif *netif, struct pbuf *p)
 #if ETH_PAD_SIZE
     pbuf_header(p, ETH_PAD_SIZE); /* reclaim the padding word */
 #endif
-    return (netdev->driver->send(netdev, iolist) > 0) ? ERR_OK : ERR_BUF;
+    return (netdev->driver->send(netdev, iolist, NULL) > 0) ? ERR_OK : ERR_BUF;
 }
 #endif
 
@@ -234,7 +234,7 @@ static err_t _ieee802154_link_output(struct netif *netif, struct pbuf *p)
         .iol_len = (p->len - IEEE802154_FCS_LEN),   /* FCS is written by driver */
     };
 
-    return (netdev->driver->send(netdev, &pkt) > 0) ? ERR_OK : ERR_BUF;
+    return (netdev->driver->send(netdev, &pkt, NULL) > 0) ? ERR_OK : ERR_BUF;
 }
 #endif
 

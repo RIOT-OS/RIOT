@@ -31,8 +31,9 @@ void netdev_test_reset(netdev_test_t *dev)
     mutex_unlock(&dev->mutex);
 }
 
-static int _send(netdev_t *netdev, const iolist_t *iolist)
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     netdev_test_t *dev = (netdev_test_t *)netdev;
     int res = -EINVAL;
 

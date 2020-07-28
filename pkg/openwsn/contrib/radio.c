@@ -151,7 +151,7 @@ void radio_loadPacket(uint8_t *packet, uint16_t len)
         .iol_len = (size_t)(len - IEEE802154_FCS_LEN),
     };
 
-    if (openwsn_radio.dev->driver->send(openwsn_radio.dev, &pkt) < 0) {
+    if (openwsn_radio.dev->driver->send(openwsn_radio.dev, &pkt, NULL) < 0) {
         LOG_DEBUG("[openwsn/radio]: couldn't load pkt\n");
     }
     LOG_DEBUG("[openwsn/radio]: loaded radio packet\n");

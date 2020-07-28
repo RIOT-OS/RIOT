@@ -502,8 +502,9 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
     return ESP_OK;
 }
 
-static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist)
+static int _esp_wifi_send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     ESP_WIFI_DEBUG("netdev=%p iolist=%p", netdev, iolist);
 
     assert(netdev != NULL);

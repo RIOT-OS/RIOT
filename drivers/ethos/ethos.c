@@ -263,10 +263,10 @@ void ethos_send_frame(ethos_t *dev, const uint8_t *data, size_t len, unsigned fr
     }
 }
 
-static int _send(netdev_t *netdev, const iolist_t *iolist)
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
-    ethos_t * dev = (ethos_t *) netdev;
-    (void)dev;
+    (void)info;
+    ethos_t *dev = (ethos_t *)netdev;
 
     /* count total packet length */
     size_t pktlen = iolist_count_total(iolist);

@@ -356,7 +356,7 @@ otError otPlatRadioTransmit(otInstance *aInstance, otRadioFrame *aPacket)
     _set_channel(aPacket->mChannel);
 
     /* send packet though netdev */
-    _dev->driver->send(_dev, &iolist);
+    _dev->driver->send(_dev, &iolist, NULL);
     otPlatRadioTxStarted(aInstance, aPacket);
 
     return OT_ERROR_NONE;

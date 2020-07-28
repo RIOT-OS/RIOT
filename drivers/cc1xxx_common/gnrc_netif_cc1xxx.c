@@ -151,7 +151,7 @@ static int cc1xxx_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     };
 
     DEBUG("[cc1xxx-gnrc] send: triggering the drivers send function\n");
-    res = netif->dev->driver->send(netif->dev, &iolist);
+    res = netif->dev->driver->send(netif->dev, &iolist, NULL);
 
     gnrc_pktbuf_release(pkt);
 

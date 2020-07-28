@@ -64,8 +64,9 @@ static int _init(netdev_t *netdev)
     return 0;
 }
 
-static int _send(netdev_t *netdev, const iolist_t *iolist)
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     mrf24j40_t *dev = (mrf24j40_t *)netdev;
     size_t len = 0;
 

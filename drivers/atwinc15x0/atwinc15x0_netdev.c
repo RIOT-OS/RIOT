@@ -227,8 +227,10 @@ static void _atwinc15x0_wifi_cb(uint8_t type, void *msg)
     }
 }
 
-static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist)
+static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist,
+                            void *info)
 {
+    (void)info;
     atwinc15x0_t *dev = (atwinc15x0_t *)netdev;
 
     assert(dev);

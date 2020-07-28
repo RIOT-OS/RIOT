@@ -106,7 +106,7 @@ static int send_if_cca(netdev_t *device, iolist_t *iolist)
     /* if medium is clear, send the packet and return */
     if (hwfeat == NETOPT_ENABLE) {
         DEBUG("csma: Radio medium available: sending packet.\n");
-        return device->driver->send(device, iolist);
+        return device->driver->send(device, iolist, NULL);
     }
 
     /* if we arrive here, medium was not available for transmission */
@@ -152,7 +152,7 @@ int csma_sender_csma_ca_send(netdev_t *dev, iolist_t *iolist,
     if (ok) {
         /* device does CSMA/CA all by itself: let it do its job */
         DEBUG("csma: Network device does hardware CSMA/CA\n");
-        return dev->driver->send(dev, iolist);
+        return dev->driver->send(dev, iolist, NULL);
     }
 
     /* if we arrive here, then we must perform the CSMA/CA procedure
@@ -225,7 +225,7 @@ int csma_sender_cca_send(netdev_t *dev, iolist_t *iolist)
     if (ok) {
         /* device does auto-CCA: let him do its job */
         DEBUG("csma: Network device does auto-CCA checking.\n");
-        return dev->driver->send(dev, iolist);
+        return dev->driver->send(dev, iolist, NULL);
     }
 
     /* if we arrive here, we must do CCA ourselves to see if radio medium

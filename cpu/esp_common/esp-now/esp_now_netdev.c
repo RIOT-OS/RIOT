@@ -485,8 +485,9 @@ static int _init(netdev_t *netdev)
     return 0;
 }
 
-static int _send(netdev_t *netdev, const iolist_t *iolist)
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
 #if ESP_NOW_UNICAST
     if (!_esp_now_scan_peers_done) {
         return -ENODEV;

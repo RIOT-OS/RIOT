@@ -79,9 +79,10 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     return ret;
 }
 
-static int _send(netdev_t *netdev, const struct iolist *iolist)
+static int _send(netdev_t *netdev, const struct iolist *iolist, void *info)
 {
     (void)netdev;
+    (void)info;
     int ret = 0;
     if(stm32_eth_get_rx_status_owned()) {
         mutex_lock(&_tx);

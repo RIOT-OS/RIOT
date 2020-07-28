@@ -45,7 +45,7 @@ static void _isr(netdev_t *netdev);
 static int _recv(netdev_t *dev, void *buf, size_t len, void *info);
 static uint8_t wait_for_state(dose_t *ctx, uint8_t state);
 static int send_octet(dose_t *ctx, uint8_t c);
-static int _send(netdev_t *dev, const iolist_t *iolist);
+static int _send(netdev_t *dev, const iolist_t *iolist, void *info);
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
 static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t len);
 static int _init(netdev_t *dev);
@@ -389,9 +389,10 @@ static int send_data_octet(dose_t *ctx, uint8_t c)
     return rc;
 }
 
-static int _send(netdev_t *dev, const iolist_t *iolist)
+static int _send(netdev_t *dev, const iolist_t *iolist, void *info)
 {
-    dose_t *ctx = (dose_t *) dev;
+    (void)info;
+    dose_t *ctx = (dose_t *)dev;
     int8_t retries = 3;
     size_t pktlen;
     uint16_t crc;

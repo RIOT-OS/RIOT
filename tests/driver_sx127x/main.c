@@ -245,7 +245,7 @@ int send_cmd(int argc, char **argv)
     };
 
     netdev_t *netdev = (netdev_t *)&sx127x;
-    if (netdev->driver->send(netdev, &iolist) == -ENOTSUP) {
+    if (netdev->driver->send(netdev, &iolist, NULL) == -ENOTSUP) {
         puts("Cannot send: radio is still transmitting");
     }
 

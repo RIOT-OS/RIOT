@@ -134,8 +134,9 @@ static void kw2xrf_wait_idle(kw2xrf_t *dev)
     }
 }
 
-static int _send(netdev_t *netdev, const iolist_t *iolist)
+static int _send(netdev_t *netdev, const iolist_t *iolist, void *info)
 {
+    (void)info;
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
     uint8_t *pkt_buf = &(dev->buf[1]);
     size_t len = 0;

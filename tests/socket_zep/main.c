@@ -61,7 +61,7 @@ static void test_send__iolist_NULL(void)
     netdev_t *netdev = (netdev_t *)(&_dev);
 
     puts("Send zero-length packet");
-    int res = netdev->driver->send(netdev, NULL);
+    int res = netdev->driver->send(netdev, NULL, NULL);
     expect((res < 0) || (res == 0));
     if ((res < 0) && (errno == ECONNREFUSED)) {
         puts("No remote socket exists (use scripts in `tests/` to have proper tests)");
@@ -78,7 +78,7 @@ static void test_send__iolist_not_NULL(void)
     netdev_t *netdev = (netdev_t *)(&_dev);
 
     puts("Send 'Hello\\0World\\0'");
-    int res =  netdev->driver->send(netdev, iolist);
+    int res =  netdev->driver->send(netdev, iolist, NULL);
     expect((res < 0) || (res == (sizeof("Hello")) + sizeof("World")));
     if ((res < 0) && (errno == ECONNREFUSED)) {
         puts("No remote socket exists (use scripts in `tests/` to have proper tests)");
