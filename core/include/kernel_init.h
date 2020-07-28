@@ -26,6 +26,27 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup core_init_config Core initialization compile configuration
+ * @ingroup config
+ * @{
+ */
+#ifdef DOXYGEN
+
+/**
+ * @brief Enable this to disable printing a message on bootup.
+ */
+#define CONFIG_SKIP_BOOT_MSG
+
+/**
+ * @brief The message printed by RIOT before calling the main() function, when
+ *        @ref CONFIG_SKIP_BOOT_MSG is not set.
+ */
+#define CONFIG_BOOT_MSG_STRING
+
+#endif /* DOXYGEN */
+/** @} */
+
+/**
  * @brief   Initializes scheduler and creates main and idle task
  */
 void kernel_init(void);
