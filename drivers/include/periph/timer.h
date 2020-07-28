@@ -163,6 +163,9 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value);
  * @brief Set an absolute timeout value for the given channel of the given timer
  *        The timeout will be called periodically for each iteration
  *
+ * @note  Only one channel with `TIM_FLAG_RESET_ON_MATCH` can be active.
+ *        Some platforms (Atmel) only allow to use the first channel as TOP value.
+ *
  * @param[in] dev           the timer device to set
  * @param[in] channel       the channel to set
  * @param[in] value         the absolute compare value when the callback will be
