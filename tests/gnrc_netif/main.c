@@ -1117,8 +1117,8 @@ static void test_netif_iter(void)
 
 static void test_netif_get_name(void)
 {
-    char exp_name[NETIF_NAMELENMAX + 1];
-    char name[NETIF_NAMELENMAX];
+    char exp_name[CONFIG_NETIF_NAMELENMAX + 1];
+    char name[CONFIG_NETIF_NAMELENMAX];
     int res;
     netif_t *netif = netif_iter(NULL);
     /* there must be at least one interface */
@@ -1132,7 +1132,7 @@ static void test_netif_get_name(void)
 
 static void test_netif_get_by_name(void)
 {
-    char name[NETIF_NAMELENMAX] = "6nPRK28";
+    char name[CONFIG_NETIF_NAMELENMAX] = "6nPRK28";
     netif_t *netif = netif_iter(NULL);
 
     TEST_ASSERT(netif_get_by_name(name) == NULL);
