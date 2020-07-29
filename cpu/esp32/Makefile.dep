@@ -8,11 +8,6 @@ USEMODULE += esp_idf_soc
 USEMODULE += newlib_nano
 USEMODULE += pm_layered
 
-ifneq (,$(filter cpp,$(FEATURES_USED)))
-  USEMODULE += pthread
-  USEMODULE += esp_cxx
-endif
-
 ifneq (,$(filter esp_eth,$(USEMODULE)))
   USEMODULE += esp_freertos
   USEMODULE += esp_idf_eth
@@ -41,7 +36,6 @@ endif
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
   # add additional modules required by esp_idf_nvs_flash
   USEMODULE += mtd
-  USEMODULE += pthread
 endif
 
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
