@@ -33,16 +33,21 @@
 #include <stdbool.h>
 
 #include "board.h"
+
 #include "kernel_defines.h"
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
+
 #include "net/gnrc/nettype.h"
+#include "net/ieee802154/radio.h"
+#include "net/ieee802154.h"
+#include "errno.h"
+#include "byteorder.h"
+#include "net/eui64.h"
 
 /* we need no peripherals for memory mapped radios */
-#if !defined(MODULE_AT86RFA1) && !defined(MODULE_AT86RFR2)
 #include "periph/spi.h"
 #include "periph/gpio.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,19 +62,9 @@ extern "C" {
  * @name    Channel configuration
  * @{
  */
-#ifdef MODULE_AT86RF212B
-/* the AT86RF212B has a sub-1GHz radio */
-#define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN_SUBGHZ)
-#define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX_SUBGHZ)
-#define AT86RF2XX_DEFAULT_CHANNEL       (CONFIG_IEEE802154_DEFAULT_SUBGHZ_CHANNEL)
-/* Page 2 is O-QPSK 100 kbit/s (channel 0), or 250 kbit/s (channels 1-10) */
-#define AT86RF2XX_DEFAULT_PAGE          (CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE)
-#else
 #define AT86RF2XX_MIN_CHANNEL           (IEEE802154_CHANNEL_MIN)
 #define AT86RF2XX_MAX_CHANNEL           (IEEE802154_CHANNEL_MAX)
-#define AT86RF2XX_DEFAULT_CHANNEL       (CONFIG_IEEE802154_DEFAULT_CHANNEL)
-/* Only page 0 is supported in the 2.4 GHz band */
-#endif
+#define AT86RF2XX_DEFAULT_CHANNEL       (IEEE802154_DEFAULT_CHANNEL)
 /** @} */
 
 /**
@@ -82,14 +77,6 @@ extern "C" {
  */
 #if MODULE_AT86RF233
 #   define RSSI_BASE_VAL                   (-94)
-#elif MODULE_AT86RF212B
-/**
- * @note for the default settings in RIOT for the at86rf212b,
- *       for other seetings this value may change.
- */
-#   define RSSI_BASE_VAL                   (-98)
-#elif MODULE_AT86RFA1 || MODULE_AT86RFR2
-#   define RSSI_BASE_VAL                   (-90)
 #else
 #   define RSSI_BASE_VAL                   (-91)
 #endif
@@ -99,10 +86,6 @@ extern "C" {
  */
 #if MODULE_AT86RF233
 #   define MAX_RX_SENSITIVITY              (-52)
-#elif MODULE_AT86RF212B
-#   define MAX_RX_SENSITIVITY              (-54)
-#elif MODULE_AT86RFA1 || MODULE_AT86RFR2
-#   define MAX_RX_SENSITIVITY              (-48)
 #else
 #   define MAX_RX_SENSITIVITY              (-49)
 #endif
@@ -112,10 +95,6 @@ extern "C" {
  */
 #if MODULE_AT86RF233
 #   define MIN_RX_SENSITIVITY              (-101)
-#elif MODULE_AT86RF212B
-#   define MIN_RX_SENSITIVITY              (-110)
-#elif MODULE_AT86RFA1 || MODULE_AT86RFR2
-#   define MIN_RX_SENSITIVITY              (-100)
 #else
 #   define MIN_RX_SENSITIVITY              (-101)
 #endif
@@ -129,9 +108,9 @@ extern "C" {
  * contains the frame retry counter. Only the at86rf232 and the at86rf233
  * support this register.
  */
-#define AT86RF2XX_HAVE_RETRIES             (1)
+#define AT86RF2XX_HAVE_RETRIES             1
 #else
-#define AT86RF2XX_HAVE_RETRIES             (0)
+#define AT86RF2XX_HAVE_RETRIES             0
 #endif
 
 /**
@@ -141,7 +120,7 @@ extern "C" {
  * register as a source of randomness.
  * See Section 11.2 of the at86rf233 reference manual. (RND_VALUE)
  */
-#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231) || defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RF231)
 #ifndef AT86RF2XX_RANDOM_NUMBER_GENERATOR
 #define AT86RF2XX_RANDOM_NUMBER_GENERATOR  (1)
 #endif
@@ -159,7 +138,7 @@ extern "C" {
  * manual recommends to disable this feature for RSSI measurements or random number
  * generation (Section 8.4 and Section 11.2).
  */
-#if defined(MODULE_AT86RF233) || defined(MODULE_AT86RFR2)
+#if defined(MODULE_AT86RF233)
 #ifndef AT86RF2XX_SMART_IDLE_LISTENING
 #define AT86RF2XX_SMART_IDLE_LISTENING     (1)
 #endif
@@ -205,39 +184,10 @@ extern "C" {
 #define AT86RF2XX_OPT_AUTOACK        (0x0080)       /**< Auto ACK active */
 #define AT86RF2XX_OPT_ACK_PENDING    (0x0100)       /**< ACK frames with data
                                                      *   pending */
-
+#define AT86RF2XX_FLAG_PROMISC       (0x1)
+#define AT86RF2XX_FLAG_AUTO_ACK      (0x2)
 /** @} */
 
-#if IS_ACTIVE(AT86RF2XX_BASIC_MODE) || defined(DOXYGEN)
-/**
- * @brief Internal radio state equivalent to RX_ON
- */
-#define AT86RF2XX_PHY_STATE_RX       AT86RF2XX_STATE_RX_ON
-/**
- * @brief Internal radio state equivalent to RX_BUSY
- */
-#define AT86RF2XX_PHY_STATE_RX_BUSY  AT86RF2XX_STATE_BUSY_RX
-/**
- * @brief Internal radio state equivalent to TX_ON
- */
-#define AT86RF2XX_PHY_STATE_TX       AT86RF2XX_STATE_PLL_ON
-/**
- * @brief Internal radio state equivalent to TX_BUSY
- */
-#define AT86RF2XX_PHY_STATE_TX_BUSY  AT86RF2XX_STATE_BUSY_TX
-#else
-#define AT86RF2XX_PHY_STATE_RX       AT86RF2XX_STATE_RX_AACK_ON
-#define AT86RF2XX_PHY_STATE_RX_BUSY  AT86RF2XX_STATE_BUSY_RX_AACK
-#define AT86RF2XX_PHY_STATE_TX       AT86RF2XX_STATE_TX_ARET_ON
-#define AT86RF2XX_PHY_STATE_TX_BUSY  AT86RF2XX_STATE_BUSY_TX_ARET
-#endif /* IS_ACTIVE(AT86RF2XX_BASIC_MODE) */
-
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
-/**
- * @brief   memory mapped radio needs no parameters
- */
-typedef void at86rf2xx_params_t;
-#else
 /**
  * @brief   struct holding all params needed for device initialization
  */
@@ -249,7 +199,12 @@ typedef struct at86rf2xx_params {
     gpio_t sleep_pin;       /**< GPIO pin connected to the sleep pin */
     gpio_t reset_pin;       /**< GPIO pin connected to the reset pin */
 } at86rf2xx_params_t;
-#endif
+
+typedef enum {
+    AT86RF2XX_TRX_STATE_RX_ON,
+    AT86RF2XX_TRX_STATE_TX_ON,
+    AT86RF2XX_TRX_STATE_TRX_OFF,
+} at86rf2xx_trx_state_t;
 
 /**
  * @brief   Device descriptor for AT86RF2XX radio devices
@@ -257,35 +212,11 @@ typedef struct at86rf2xx_params {
  * @extends netdev_ieee802154_t
  */
 typedef struct {
-    netdev_ieee802154_t netdev;             /**< netdev parent struct */
-#if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
-    /* ATmega256rfr2 signals transceiver events with different interrupts
-     * they have to be stored to mimic the same flow as external transceiver
-     * Use irq_status to map saved interrupts of SOC transceiver,
-     * as they clear after IRQ callback.
-     *
-     *  irq_status = IRQ_STATUS
-     */
-    uint8_t irq_status;                     /**< save irq status */
-#else
+    ieee802154_dev_t dev;
     /* device specific fields */
     at86rf2xx_params_t params;              /**< parameters for initialization */
-#endif
-    uint16_t flags;                         /**< Device specific flags */
-    uint8_t state;                          /**< current state of the radio */
-    uint8_t tx_frame_len;                   /**< length of the current TX frame */
-#ifdef MODULE_AT86RF212B
-    /* Only AT86RF212B supports multiple pages (PHY modes) */
-    uint8_t page;                       /**< currently used channel page */
-#endif
-    uint8_t idle_state;                 /**< state to return to after sending */
-    uint8_t pending_tx;                 /**< keep track of pending TX calls
-                                             this is required to know when to
-                                             return to @ref at86rf2xx_t::idle_state */
-#if AT86RF2XX_HAVE_RETRIES
-    /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
-    uint8_t tx_retries;                 /**< Number of NOACK retransmissions */
-#endif
+    uint8_t trx_state;                      /**< current state of the radio */
+    bool is_sleep;
     /** @} */
 } at86rf2xx_t;
 
@@ -634,6 +565,15 @@ void at86rf2xx_tx_exec(const at86rf2xx_t *dev);
  * @return                  false if channel is determined busy
  */
 bool at86rf2xx_cca(at86rf2xx_t *dev);
+void at86rf2xx_set_promiscuous(at86rf2xx_t *dev, bool enable);
+void at86rf2xx_set_auto_ack(at86rf2xx_t *dev, bool enable);
+void at86rf2xx_set_frame_pending(at86rf2xx_t *dev, bool pending);
+void at86rf2xx_set_internal_state(const at86rf2xx_t *dev, int state);
+uint8_t at86rf2xx_get_internal_state(const at86rf2xx_t *dev);
+void at86rf2xx_sleep(at86rf2xx_t *dev);
+
+void at86rf2xx_init_int(at86rf2xx_t *dev);
+int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, void (*isr)(void *arg));
 
 #ifdef __cplusplus
 }
