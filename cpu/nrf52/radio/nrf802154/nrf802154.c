@@ -36,6 +36,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+#if !IS_USED(MODULE_IEEE802154_RADIO_HAL)
 static const netdev_driver_t nrf802154_netdev_driver;
 
 netdev_ieee802154_t nrf802154_dev = {
@@ -547,3 +548,6 @@ static const netdev_driver_t nrf802154_netdev_driver = {
     .get  = _get,
     .set  = _set
 };
+#else
+int dont_be_pedantic;
+#endif
