@@ -11,8 +11,6 @@ import os
 from testrunner import run
 
 
-# On slow platforms, like AVR, this test can take some time to complete.
-TIMEOUT = 30
 # Allow setting a specific port to test
 PORT_UNDER_TEST = int(os.environ.get('PORT_UNDER_TEST') or 0)
 
@@ -37,4 +35,4 @@ def testfunc(child):
 
 
 if __name__ == "__main__":
-    sys.exit(run(testfunc, timeout=TIMEOUT))
+    sys.exit(run(testfunc))

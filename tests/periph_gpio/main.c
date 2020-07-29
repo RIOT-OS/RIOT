@@ -26,7 +26,7 @@
 #include "benchmark.h"
 #include "periph/gpio.h"
 
-#define BENCH_RUNS_DEFAULT      (1000UL * 1000)
+#define BENCH_RUNS_DEFAULT      (1000UL * 100)
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static void cb(void *arg)
