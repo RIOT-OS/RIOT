@@ -34,11 +34,9 @@
 
 /* list of states copied from tcb.h */
 static const char *state_names[STATUS_NUMOF] = {
-    [STATUS_RUNNING] = "running",
-    [STATUS_PENDING] = "pending",
     [STATUS_STOPPED] = "stopped",
-    [STATUS_SLEEPING] = "sleeping",
     [STATUS_ZOMBIE] = "zombie",
+    [STATUS_SLEEPING] = "sleeping",
     [STATUS_MUTEX_BLOCKED] = "bl mutex",
     [STATUS_RECEIVE_BLOCKED] = "bl rx",
     [STATUS_SEND_BLOCKED] = "bl send",
@@ -47,6 +45,8 @@ static const char *state_names[STATUS_NUMOF] = {
     [STATUS_FLAG_BLOCKED_ALL] = "bl allfl",
     [STATUS_MBOX_BLOCKED] = "bl mbox",
     [STATUS_COND_BLOCKED] = "bl cond",
+    [STATUS_RUNNING] = "running",
+    [STATUS_PENDING] = "pending",
 };
 
 #define STATE_NAME_UNKNOWN "unknown"
