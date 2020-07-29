@@ -25,9 +25,9 @@
 
 #include "board.h"
 
-/* as default we run the test 100k times */
+/* as default we run the test 1k times */
 #ifndef TEST_ITER
-#define TEST_ITER           (100000UL)
+#define TEST_ITER           (1000UL)
 #endif
 
 #define STEP                (0.1)
