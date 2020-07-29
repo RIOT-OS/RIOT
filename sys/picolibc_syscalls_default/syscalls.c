@@ -22,6 +22,7 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <sys/times.h>
 
 #include "log.h"
 #include "periph/pm.h"
@@ -109,4 +110,19 @@ int close(int fd)
     (void) fd;
     errno = ENODEV;
     return -1;
+}
+
+/**
+ * Current process times (not implemented).
+ *
+ * @param[out]  ptms    Not modified.
+ *
+ * @return  -1, this function always fails. errno is set to ENOSYS.
+ */
+clock_t times(struct tms *ptms)
+{
+    (void)ptms;
+    errno = ENOSYS;
+
+    return (-1);
 }
