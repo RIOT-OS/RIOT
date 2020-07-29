@@ -36,7 +36,9 @@
 #ifndef NRF802154_H
 #define NRF802154_H
 
+#if !IS_USED(MODULE_IEEE802154_RADIO_HAL)
 #include "net/netdev/ieee802154.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,10 +61,12 @@ extern "C" {
 #endif
 /** @} */
 
+#if !IS_USED(MODULE_IEEE802154_RADIO_HAL)
 /**
  * @brief   Export the netdev device descriptor
  */
 extern netdev_ieee802154_t nrf802154_dev;
+#endif
 
 /**
  * @brief   IEEE 802.15.4 radio timer configuration
@@ -73,6 +77,14 @@ extern netdev_ieee802154_t nrf802154_dev;
 #ifndef NRF802154_TIMER
 #define NRF802154_TIMER TIMER_DEV(1)
 #endif
+
+/**
+ * @brief Initialize the NRF52840 radio.
+ *
+ * @return 0 on success
+ * @return negative errno on error
+ */
+int nrf802154_init(void);
 
 #endif /* NRF802154_H */
 /** @} */
