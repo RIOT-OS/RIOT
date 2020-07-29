@@ -4,11 +4,14 @@ KCONFIG ?= $(RIOTBASE)/Kconfig
 # Include tools targets
 include $(RIOTMAKE)/tools/kconfiglib.inc.mk
 
+# Include fixdep tool
+include $(RIOTMAKE)/tools/fixdep.inc.mk
+
 # Generated dir will contain Kconfig generated configurations
 GENERATED_DIR = $(BINDIR)/generated
 
 # The sync dir will contain a tree of header files that represent Kconfig symbols
-KCONFIG_SYNC_DIR = $(GENERATED_DIR)/deps
+export KCONFIG_SYNC_DIR = $(GENERATED_DIR)/deps
 
 # This file will contain all generated configuration from kconfig
 export KCONFIG_GENERATED_AUTOCONF_HEADER_C = $(GENERATED_DIR)/autoconf.h
@@ -72,13 +75,13 @@ SHOULD_RUN_KCONFIG ?= $(or $(wildcard $(APPDIR)/*.config), \
                            $(if $(CLEAN),,$(wildcard $(KCONFIG_OUT_CONFIG))), \
                            $(filter menuconfig, $(MAKECMDGOALS)))
 
+# export variable to make it visible in other Makefiles
+export SHOULD_RUN_KCONFIG
+
 ifneq (,$(SHOULD_RUN_KCONFIG))
 
-# Flag to enable the --sync-dir feature of Kconfiglib
-KCONFIG_SYNC_DEPS ?=
-
 # Add configuration header to build dependencies
-BUILDDEPS += $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
+BUILDDEPS += $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) $(FIXDEP)
 
 # Include configuration header when building
 CFLAGS += -imacros '$(KCONFIG_GENERATED_AUTOCONF_HEADER_C)'
@@ -126,12 +129,11 @@ endif # eq (clean, $(MAKECMDGOALS))
 # as KCONFIG_OUT_CONFIG, and is used to inject the configurations during
 # compilation.
 #
-# This will optionally generate the 'dummy' header files needed for incremental
-# builds.
+# This will generate the 'dummy' header files needed for incremental builds.
 $(KCONFIG_GENERATED_AUTOCONF_HEADER_C): $(KCONFIG_OUT_CONFIG)
 	$(Q) $(GENCONFIG) \
 	  --header-path $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) \
-	  $(if $(KCONFIG_SYNC_DEPS),--sync-deps $(KCONFIG_SYNC_DIR)) \
+	  --sync-deps $(KCONFIG_SYNC_DIR) \
 	  --kconfig-filename $(KCONFIG) \
 	  --config-sources $(KCONFIG_OUT_CONFIG) && \
 	  touch $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
