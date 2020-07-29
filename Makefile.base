@@ -84,6 +84,7 @@ OBJ := $(OBJC) $(OBJCXX) $(ASMOBJ) $(ASSMOBJ) $(GENOBJC)
 DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 
 include $(RIOTMAKE)/blob.inc.mk
+include $(RIOTMAKE)/tools/fixdep.inc.mk
 
 $(BINDIR)/$(MODULE)/:
 	$(Q)mkdir -p $@
