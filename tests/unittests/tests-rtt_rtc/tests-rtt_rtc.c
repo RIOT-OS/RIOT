@@ -39,14 +39,14 @@ static void test_set_time(void)
     rtc_get_time(&now);
     TEST_ASSERT_EQUAL_INT(0, rtc_tm_compare(&t1, &now));
 
-    rtt_add_ticks(60 * RTT_FREQUENCY);
+    rtt_add_ticks(60LU * RTT_FREQUENCY);
     t1.tm_min++;
     rtc_get_time(&now);
     TEST_ASSERT_EQUAL_INT(t1.tm_sec, now.tm_sec);
     TEST_ASSERT_EQUAL_INT(t1.tm_min, now.tm_min);
     TEST_ASSERT_EQUAL_INT(0, rtc_tm_compare(&t1, &now));
 
-    rtt_add_ticks(60 * 60 * RTT_FREQUENCY);
+    rtt_add_ticks(60LU * 60 * RTT_FREQUENCY);
     t1.tm_hour++;
     rtc_get_time(&now);
     TEST_ASSERT_EQUAL_INT(t1.tm_sec, now.tm_sec);
@@ -54,7 +54,7 @@ static void test_set_time(void)
     TEST_ASSERT_EQUAL_INT(t1.tm_hour, now.tm_hour);
     TEST_ASSERT_EQUAL_INT(0, rtc_tm_compare(&t1, &now));
 
-    rtt_add_ticks(60 * RTT_FREQUENCY);
+    rtt_add_ticks(60LU * RTT_FREQUENCY);
     t1.tm_min++;
     rtc_get_time(&now);
     TEST_ASSERT_EQUAL_INT(t1.tm_sec, now.tm_sec);
@@ -95,7 +95,7 @@ static void test_set_alarm(void)
     rtc_set_time(&t1);
     rtc_set_alarm(&alarm, _alarm_cb, &alarm);
 
-    rtt_add_ticks(60 * RTT_FREQUENCY);
+    rtt_add_ticks(60UL * RTT_FREQUENCY);
     t1.tm_min++;
     rtc_get_time(&now);
     TEST_ASSERT_EQUAL_INT(t1.tm_sec, now.tm_sec);
@@ -131,14 +131,14 @@ static void test_set_alarm_short(void)
     rtc_set_time(&t1);
     rtc_set_alarm(&alarm, _alarm_cb, &alarm);
 
-    rtt_add_ticks(60 * RTT_FREQUENCY);
+    rtt_add_ticks(60LU * RTT_FREQUENCY);
     t1.tm_min++;
     rtc_get_time(&now);
     TEST_ASSERT_EQUAL_INT(t1.tm_sec, now.tm_sec);
     TEST_ASSERT_EQUAL_INT(t1.tm_min, now.tm_min);
     TEST_ASSERT_EQUAL_INT(0, rtc_tm_compare(&t1, &now));
 
-    rtt_add_ticks(60*60 * RTT_FREQUENCY);
+    rtt_add_ticks(60LU * 60 * RTT_FREQUENCY);
     t1.tm_hour++;
     rtc_get_time(&now);
     TEST_ASSERT_EQUAL_INT(t1.tm_sec, now.tm_sec);
@@ -170,14 +170,14 @@ static void test_set_alarm_set_time(void)
     t1.tm_hour += 4;
     rtc_set_time(&t1);
 
-    rtt_add_ticks(60 * RTT_FREQUENCY);
+    rtt_add_ticks(60LU * RTT_FREQUENCY);
     t1.tm_min++;
     rtc_get_time(&now);
     TEST_ASSERT_EQUAL_INT(t1.tm_sec, now.tm_sec);
     TEST_ASSERT_EQUAL_INT(t1.tm_min, now.tm_min);
     TEST_ASSERT_EQUAL_INT(0, rtc_tm_compare(&t1, &now));
 
-    rtt_add_ticks(60*60 * RTT_FREQUENCY);
+    rtt_add_ticks(60LU * 60 * RTT_FREQUENCY);
     t1.tm_hour++;
     rtc_get_time(&now);
     TEST_ASSERT_EQUAL_INT(t1.tm_sec, now.tm_sec);
@@ -190,7 +190,7 @@ static void test_set_alarm_set_time(void)
 
     t1.tm_hour--;
     rtc_set_time(&t1);
-    rtt_add_ticks(60*60 * RTT_FREQUENCY);
+    rtt_add_ticks(60LU * 60 * RTT_FREQUENCY);
     t1.tm_hour++;
     rtc_get_time(&now);
     TEST_ASSERT_EQUAL_INT(t1.tm_sec, now.tm_sec);
@@ -199,7 +199,7 @@ static void test_set_alarm_set_time(void)
 
     TEST_ASSERT_EQUAL_INT(2, alarm.tm_isdst);
 
-    rtt_add_ticks(60*60 * RTT_FREQUENCY);
+    rtt_add_ticks(60LU * 60 * RTT_FREQUENCY);
     TEST_ASSERT_EQUAL_INT(2, alarm.tm_isdst);
 }
 
