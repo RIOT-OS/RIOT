@@ -61,22 +61,24 @@
 #endif
 
 #ifdef MODULE_MSP430_COMMON
+/* the msp430 linker scripts define the end of all memory as __stack, which in
+ * turn is used as the initial stack. RIOT also uses __stack as SP on isr
+ * entry.  This logic makes __stack - ISR_STACKSIZE the heap end.
+ */
+extern char __stack;
+extern char __heap_start__;
 #define _sheap __heap_start__
-#define _eheap __heap_end__
+#define __eheap (char *)((uintptr_t)&__stack - ISR_STACKSIZE)
 
-/* the msp430 linker script needs the heap to be explicitly defined,
- * otherwise the section ends up empty.*/
-#ifndef CONFIG_MSP430_NEWLIB_HEAPSIZE
-#define CONFIG_MSP430_NEWLIB_HEAPSIZE 512
-#endif
-char __attribute__((used, section(".heap"))) _heap[CONFIG_MSP430_NEWLIB_HEAPSIZE];
-#endif
+#else /* MODULE_MSP430_COMMON */
 
 /**
  * @brief manage the heap
  */
 extern char _sheap;                 /* start of the heap */
 extern char _eheap;                 /* end of the heap */
+#define __eheap &_eheap
+#endif
 
 /**
  * @brief Additional heap sections that may be defined in the linkerscript.
@@ -120,7 +122,7 @@ static char *heap_top[NUM_HEAPS] = {
 static const struct heap heaps[NUM_HEAPS] = {
     {
         .start = &_sheap,
-        .end   = &_eheap
+        .end   = __eheap
     },
 #if NUM_HEAPS > 1
     {
