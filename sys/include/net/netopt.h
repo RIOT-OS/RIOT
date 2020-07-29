@@ -187,6 +187,22 @@ typedef enum {
      */
     NETOPT_MAX_PDU_SIZE,
     /**
+     * @brief   (uint16_t) protocol data unit size
+     *
+     * When set, fixes the number of bytes to be received. This is required for
+     * MAC layers with implicit header mode (no packet length information in
+     * PDDU) and predictable packet length (e.g LoRaWAN beacons). The device
+     * driver implementation should attempt to read exactly the expected number
+     * of bytes (possibly filling it up with garbage data if the payload is
+     * smaller).
+     *
+     * When get, returns the number of expected bytes for the next reception.
+     *
+     * In some MAC layers it will only be effective if used in conjunction with
+     * @ref NETOPT_FIXED_HEADER
+     */
+    NETOPT_PDU_SIZE,
+    /**
      * @brief   (@ref netopt_enable_t) frame preloading
      *
      * Preload frame data using gnrc_netdev_driver_t::send_data() or gnrc_netapi_send(),
