@@ -71,7 +71,6 @@ ifneq (,$(filter esp_now,$(USEMODULE)))
 endif
 
 ifneq (,$(filter cpp,$(FEATURES_USED)))
-  UNDEF += $(BINDIR)/esp_cxx/cxa_guard.o
   BASELIBS += -lstdc++
 endif
 
