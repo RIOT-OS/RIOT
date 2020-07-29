@@ -43,11 +43,17 @@ extern "C" {
 #endif
 
 /**
- * @brief   Maximum length for an interface name
+ * @defgroup net_netif_conf Network interfaces compile configurations
+ * @ingroup  config
+ * @{
+ */
+/**
+ * @brief    Maximum length for an interface name
  */
 #ifndef CONFIG_NETIF_NAMELENMAX
 #define CONFIG_NETIF_NAMELENMAX    (8U)
 #endif
+/** @} */
 
 /**
  * @brief Network interface descriptor.
