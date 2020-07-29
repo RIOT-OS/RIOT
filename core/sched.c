@@ -110,18 +110,15 @@ int __attribute__((used)) sched_run(void)
     thread_t *active_thread = thread_get_active();
     thread_t *previous_thread = active_thread;
 
-    if (!IS_USED(MODULE_CORE_IDLE_THREAD)) {
-        if (!runqueue_bitcache) {
-            if (active_thread) {
-                _unschedule(active_thread);
-                active_thread = NULL;
-            }
-            active_thread = NULL;
-
-            do {
-                sched_arch_idle();
-            } while (!runqueue_bitcache);
+    if (!IS_USED(MODULE_CORE_IDLE_THREAD) && !runqueue_bitcache) {
+        if (active_thread) {
+            _unschedule(active_thread);
         }
+        active_thread = NULL;
+
+        do {
+            sched_arch_idle();
+        } while (!runqueue_bitcache);
     }
 
     sched_context_switch_request = 0;
