@@ -778,7 +778,8 @@ ifneq (,$(filter random,$(USEMODULE)))
     USEMODULE += tinymt32
   endif
 
-  ifneq (,$(filter prng_sha1prng,$(USEMODULE)))
+  ifneq (,$(filter prng_sha%prng,$(USEMODULE)))
+    USEMODULE += prng_shaxprng
     USEMODULE += hashes
   endif
 
