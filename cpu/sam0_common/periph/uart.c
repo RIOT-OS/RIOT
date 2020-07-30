@@ -41,6 +41,12 @@
 #define CONFIG_SAM0_UART_BAUD_FRAC  1
 #endif
 
+/* SAMD20 defines no generic macro */
+#ifdef SERCOM_USART_CTRLA_TXPO_PAD0
+#undef SERCOM_USART_CTRLA_TXPO
+#define SERCOM_USART_CTRLA_TXPO(n) ((n) << SERCOM_USART_CTRLA_TXPO_Pos)
+#endif
+
 /**
  * @brief   Allocate memory to store the callback functions & buffers
  */
@@ -61,6 +67,27 @@ static uart_isr_ctx_t uart_ctx[UART_NUMOF];
 static inline SercomUsart *dev(uart_t dev)
 {
     return uart_config[dev].dev;
+}
+
+static inline void _syncbusy(SercomUsart *dev)
+{
+#ifdef SERCOM_USART_SYNCBUSY_MASK
+    while (dev->SYNCBUSY.reg) {}
+#else
+    while (dev->STATUS.bit.SYNCBUSY) {}
+#endif
+}
+
+static inline void _reset(SercomUsart *dev)
+{
+    dev->CTRLA.reg = SERCOM_USART_CTRLA_SWRST;
+    while (dev->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST) {}
+
+#ifdef SERCOM_USART_SYNCBUSY_MASK
+    while (dev->SYNCBUSY.bit.SWRST) {}
+#else
+    while (dev->STATUS.bit.SYNCBUSY) {}
+#endif
 }
 
 static void _set_baud(uart_t uart, uint32_t baudrate)
@@ -143,8 +170,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     sercom_clk_en(dev(uart));
 
     /* reset the UART device */
-    dev(uart)->CTRLA.reg = SERCOM_USART_CTRLA_SWRST;
-    while (dev(uart)->SYNCBUSY.bit.SWRST) {}
+    _reset(dev(uart));
 
     /* configure clock generator */
     sercom_set_gen(dev(uart), uart_config[uart].gclk_src);
@@ -217,7 +243,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 #endif
 #endif /* MODULE_PERIPH_UART_NONBLOCKING */
 
-    while (dev(uart)->SYNCBUSY.bit.CTRLB) {}
+    _syncbusy(dev(uart));
 
     /* and finally enable the device */
     dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
@@ -322,7 +348,7 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 
     /* Disable UART first to remove write protect */
     dev(uart)->CTRLA.bit.ENABLE = 0;
-    while (dev(uart)->SYNCBUSY.bit.ENABLE) {}
+    _syncbusy(dev(uart));
 
     dev(uart)->CTRLB.bit.CHSIZE = data_bits;
 
@@ -338,7 +364,7 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 
     /* Enable UART again */
     dev(uart)->CTRLA.bit.ENABLE = 1;
-    while (dev(uart)->SYNCBUSY.bit.ENABLE) {}
+    _syncbusy(dev(uart));
 
     return UART_OK;
 }
@@ -375,10 +401,12 @@ static inline void irq_handler(unsigned uartnum)
         uart_ctx[uartnum].rx_cb(uart_ctx[uartnum].arg,
                                 (uint8_t)(dev(uartnum)->DATA.reg));
     }
+#ifdef SERCOM_USART_INTFLAG_ERROR
     else if (status & SERCOM_USART_INTFLAG_ERROR) {
         /* clear error flag */
         dev(uartnum)->INTFLAG.reg = SERCOM_USART_INTFLAG_ERROR;
     }
+#endif
 
     cortexm_isr_end();
 }
