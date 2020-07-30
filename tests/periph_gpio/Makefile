@@ -9,6 +9,7 @@ USEMODULE += benchmark
 
 BOARDS_BENCH_PORT_1 = \
     slstk3402a \
+    z1 \
     #
 
 # port 0 pins are used for serial output on these boards, e.g.: on slstk3402a
