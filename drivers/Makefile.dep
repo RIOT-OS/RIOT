@@ -105,6 +105,10 @@ ifneq (,$(filter rn2%3,$(USEMODULE)))
   USEMODULE += rn2xx3
 endif
 
+ifneq (,$(filter sdp3x_%,$(USEMODULE)))
+  USEMODULE += sdp3x
+endif
+
 ifneq (,$(filter sht1%,$(USEMODULE)))
   USEMODULE += sht1x
 endif

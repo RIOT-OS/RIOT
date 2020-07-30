@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-DRIVER ?= sdp3x
+DRIVER ?= sdp3x_irq
 
 USEMODULE += $(DRIVER)
 USEMODULE += printf_float
