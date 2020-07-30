@@ -9,8 +9,7 @@ following goodies:
 * ISM 2.4-GHz IEEE 802.15.4 & Zigbee compliant.
 * AES-128/256, SHA2 Hardware Encryption Engine.
 * ECC-128/256, RSA Hardware Acceleration Engine for Secure Key Exchange.
-* Power consumption down to 150nA using our shutdown mode.
-* Built-in battery charger (500mA), Energy Harvesting and Solar Panels to be connected to standards LiPo batteries.
+* On board sensors LDR, ADXL345 and BMP180
 * Power input with wide range 3.7-16VDC.
 
 Port Features
@@ -19,21 +18,11 @@ In terms of hardware support, the following drivers have been implemented:
 
   * CC2538 System-on-Chip:
     * UART
-    * Random number generator
-    * Low Power Modes
     * General-Purpose Timers
     * I2C/SPI library
     * LEDs
     * Buttons
     * RF 2.4GHz built-in in CC2538
-
-And under work or pending at cc2538 base cpu:
-
-    * Built-in core temperature and battery sensor.
-    * Micro-SD external storage.
-    * ADC
-    * USB (in CDC-ACM).
-    * uDMA Controller.
 
 Requirements
 ============
@@ -88,7 +77,7 @@ On Linux:
 
 More Reading
 ============
-1. [Oppila Microsystems omote website](http://www.oppila.in]
+1. [Oppila Microsystems omote website](http://www.oppila.in)
 2. [CC2538 System-on-Chip Solution for 2.4-GHz IEEE 802.15.4 and ZigBee applications (SWRU319B)][cc2538]
 
 [cc2538]: http://www.ti.com/product/cc2538     "CC2538"
