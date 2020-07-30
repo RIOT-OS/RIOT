@@ -678,9 +678,11 @@ pkg-build-%: $(BUILDDEPS)
 	$(QQ)"$(MAKE)" -C $(RIOTPKG)/$*
 
 clean:
+ifndef MAKE_RESTARTS
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i clean ; done
 	-@rm -rf $(BINDIR)
 	-@rm -rf $(SCANBUILD_OUTPUTDIR)
+endif
 
 # Remove intermediates, but keep the .elf, .hex and .map etc.
 clean-intermediates:
