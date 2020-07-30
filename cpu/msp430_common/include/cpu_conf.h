@@ -68,7 +68,7 @@ extern "C" {
 #endif
 
 #ifndef THREAD_STACKSIZE_DEFAULT
-#   define THREAD_STACKSIZE_DEFAULT         (256)
+#   define THREAD_STACKSIZE_DEFAULT         (384)
 #endif
 
 #ifndef THREAD_STACKSIZE_IDLE
