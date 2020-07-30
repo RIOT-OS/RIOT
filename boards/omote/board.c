@@ -57,7 +57,7 @@ static inline void leds_init(void)
  */
 static void rf_init(void)
 {
-    /* Set RF 2.4GHz as default */
+    /* Set RF 2.4GHz */
     gpio_init(RF_GPIO, GPIO_OUT);
     RF_2_4_GHZ;
 }
