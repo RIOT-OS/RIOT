@@ -1,9 +1,17 @@
+# Introduction
+
 The folder "msp430-gcc-support-files" has been imported from this URL:
-https://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/exports/msp430-gcc-support-files-1.207.zip
 
-Then cleaned up to remove currently unused (by RIOT) files:
+# Source
+https://software-dl.ti.com/msp430/msp430_public_sw/mcu/msp430/MSPGCC/latest/exports/msp430-gcc-support-files-${VERSION}.zip
+Check msp430-gcc-support-files/Revisions_Header.txt for the actual version.
 
-    $ _CPUS="$(git grep -o '^CPU_MODEL.=.*430.*$' | cut -d' ' -f 3 | sort -u)"
-    $ cd cpu/msp430_common/vendor/msp430-gcc-support-files/include
-    $ rm $(ls | grep -v -E '(msp430\.h|in430\.h|legacy\.h|iomacros\.h)' | \
-            grep -v -F "${_CPUS}" )
+# How to update
+
+The script `update.sh` can be used to update to the newest version.
+
+The steps would be:
+
+1. figure out newest version, update URL in `update.sh`
+2. run update.sh
+3. create a commit with the changes, PR that
