@@ -1,3 +1,0 @@
-CPU_FAM = cc430
-
-include $(RIOTCPU)/msp430_common/Makefile.features
