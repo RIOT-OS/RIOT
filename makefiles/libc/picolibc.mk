@@ -16,6 +16,10 @@ ifeq (1,$(USE_PICOLIBC))
   LINKFLAGS += -Wl,--defsym=__heap_end=_eheap
   LINKFLAGS += -Wl,--defsym=__heap_start=_sheap
   CFLAGS += -specs=picolibc.specs
+  ifneq (1,$(PICOLIBC_FLOAT_PRINTF))
+   CFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
+   LINKFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
+  endif
 endif
 
 LINKFLAGS += -lc
