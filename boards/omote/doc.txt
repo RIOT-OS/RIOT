@@ -7,10 +7,11 @@
 
 | MCU   | [CC2538 (ARM Cortex-M3 with on-board 2.4GHz radio)](http://www.ti.com/product/CC2538) |
 |-------|-----------------------------------------------------------------------------------------------------|
-| Radio | radio interfaces (IEEE 802.15.4)
-|  | RP-SMA connector for external antenna (with a RF switch to select either 2.4GHz/Sub-GHz radio)           |
+| Radio | ISM 2.4GHz IEEE 802.15.4: (http://www.ti.com/product/CC2538) & Zig-Bee compliant radio |
+| Antenna | On-board PCB antenna (2.4GHz) |
 | USB-to-Serial | [CP2104](https://www.silabs.com/documents/public/data-sheets/cp2104.pdf) |
-| Others | LED, bmp180, ldr and adxl345 sensor |
+| Peripherals | BMP180, ADXL345 and LDR |
+| Others | LED, Buttons |
 
 # Porting status
 
@@ -18,24 +19,23 @@ In terms of hardware support, the following drivers have been implemented
 for CC2538 System-on-Chip:
 
 - UART
-- Random number generator
-- Low Power Modes
 - General-Purpose Timers
 - I2C/SPI library
 - LEDs
 - Buttons
 - RF 2.4GHz built-in in CC2538
-  RP-SMA
 
 ##  Flashing and Debugging
 
-Currently RIOT supports flashing the OpenMote using a Segger JLink JTAG
+Currently RIOT supports flashing the omote using a Segger JLink JTAG
 adapter or via USB, using the bootloader on the board.
 
 ### Flashing via JTAG
 
-To be able to flash the board via JTAG you need to install Seggers JLinkExe
+To be able to flash the board via JTAG you need to install Seggers JFlashLite
 tool. Once you have this in place, you can simply flash by calling
+	
+	$ JFlashLite
 
 ### Flashing via USB
 

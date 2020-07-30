@@ -1,5 +1,5 @@
 Oppila Microsystems omote platform -  http://www.oppila.in
-============================================
+==========================================================
 
 The omote platform  is a IoT Hardware development platform based
 on TI's CC2538 system on chip (SoC), featuring an ARM Cortex-M3 with 512KB
@@ -10,7 +10,7 @@ following goodies:
 * AES-128/256, SHA2 Hardware Encryption Engine.
 * ECC-128/256, RSA Hardware Acceleration Engine for Secure Key Exchange.
 * On board sensors LDR, ADXL345 and BMP180
-* Power input with wide range 3.7-16VDC.
+* Power input with wide range 3.7-30VDC.
 
 Port Features
 =============
@@ -36,28 +36,20 @@ The toolchain used to build is arm-gcc, to check if it is currently installed ru
 
     $ arm-none-eabi-gcc -v
     Using built-in specs.
+    COLLECT-GCC=arm-none-eabi-gcc
     Target: arm-none-eabi
-    Configured with: /scratch/julian/lite-respin/eabi/src/gcc-4.3/configure
     ...
-    (skip)
+    ...
     ...
     Thread model: single
-    gcc version 4.3.2 (Sourcery G++ Lite 2008q3-66)
+    gcc version 8.2.1 20181213 (release) [gcc-8-branch revision 267074] (GNU Tools for Arm Embedded Processors 8-2018-q4-major) 
 
-Else install from <https://launchpad.net/gcc-arm-embedded>
-
+if not installed, install from <https://launchpad.net/gcc-arm-embedded>
 
 Drivers
 -------
 The omote features a CP2104 serial-to-USB module, the driver is commonly found in most OS, but if required it can be downloaded
 from <https://www.silabs.com/products/mcu/Pages/USBtoUARTBridgeVCPDrivers.aspx>
-
-
-### For the CC2538EM (USB CDC-ACM)
-The omote has built-in support for USB 2.0 USB, Vendor and Product IDs are the following:
-
-  * VID 0x0451
-  * PID 0x16C8
 
 ### Device Enumerations
 For the UART, serial line settings are 115200 8N1, no flow control.
@@ -73,7 +65,6 @@ On OS X, `/dev/tty.SLAB_USBtoUARTx`.
 On Linux:
 
 * omote over CP2104: `ttyUSB0`
-* omote over USB driver (in CDC-ACM): `ttyACMn` (n=0, 1, ....)
 
 More Reading
 ============

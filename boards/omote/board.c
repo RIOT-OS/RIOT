@@ -51,9 +51,9 @@ static inline void leds_init(void)
 }
 
 /**
- * @brief Initialize the Radio interface SW-controlled Switch
- *
- * The OMote features an on-board RF switch.
+ * @brief Initialize the Radio interface
+ * 
+ * The omote features an on-board RF switch.
  *
  */
 static void rf_switch_init(void)
