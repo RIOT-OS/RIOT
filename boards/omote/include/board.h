@@ -56,18 +56,18 @@
 #define BTN0_MODE       GPIO_IN_PU
 /** @} */
 /**
- * @name  RF switch control
+ * @name  RF control
  *
  * These values configure the required pin to drive the RF antenna switch, to
  * enable the 2.4GHz RF interface of the CC2538.
  *
  * RF switch state:
- * - LOW: 2.4GHz RF interface on RP-SMA connector
+ * - LOW: 2.4GHz RF interface 
  *
  * @{
  */
-#define RF_SWITCH_GPIO      GPIO_PD2
-#define RF_SWITCH_2_4_GHZ   gpio_clear(RF_SWITCH_GPIO)
+#define RF_GPIO      GPIO_PD2
+#define RF_2_4_GHZ   gpio_clear(RF_GPIO)
 /** @} */
 /**
  * @name Flash Customer Configuration Area (CCA) parameters

@@ -34,7 +34,6 @@ adapter or via USB, using the bootloader on the board.
 
 To be able to flash the board via JTAG you need to install Seggers JFlashLite
 tool. Once you have this in place, you can simply flash by calling
-	
 	$ JFlashLite
 
 ### Flashing via USB

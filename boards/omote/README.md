@@ -42,8 +42,8 @@ The toolchain used to build is arm-gcc, to check if it is currently installed ru
     ...
     ...
     Thread model: single
-    gcc version 8.2.1 20181213 (release) [gcc-8-branch revision 267074] (GNU Tools for Arm Embedded Processors 8-2018-q4-major) 
-
+    gcc version 8.2.1 20181213 (release) [gcc-8-branch revision 267074] (GNU Tools for Arm Embedded Processors 8-2018-q4-major)
+    
 if not installed, install from <https://launchpad.net/gcc-arm-embedded>
 
 Drivers

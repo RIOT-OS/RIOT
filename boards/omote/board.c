@@ -21,7 +21,7 @@
 #include "cpu.h"
 
 static inline void leds_init(void);
-static inline void rf_switch_init(void);
+static inline void rf_init(void);
 
 void board_init(void)
 {
@@ -29,8 +29,8 @@ void board_init(void)
     leds_init();
     /* initialize the CPU */
     cpu_init();
-    /* initialize the 2.4GHz RF switch */
-    rf_switch_init();
+    /* initialize the 2.4GHz RF */
+    rf_init();
 
     /* The boot pin must be set to input otherwise it may lock the bootloader */
     gpio_init(BOOT_PIN, GPIO_IN);
@@ -52,13 +52,12 @@ static inline void leds_init(void)
 
 /**
  * @brief Initialize the Radio interface
- * 
  * The omote features an on-board RF switch.
  *
  */
-static void rf_switch_init(void)
+static void rf_init(void)
 {
     /* Set RF 2.4GHz as default */
-    gpio_init(RF_SWITCH_GPIO, GPIO_OUT);
-    RF_SWITCH_2_4_GHZ;
+    gpio_init(RF_GPIO, GPIO_OUT);
+    RF_2_4_GHZ;
 }
