@@ -43,16 +43,17 @@ KCONFIG_OUT_CONFIG = $(GENERATED_DIR)/out.config
 # https://www.gnu.org/software/make/manual/html_node/Remaking-Makefiles.html).
 -include $(KCONFIG_OUT_CONFIG)
 
-# Flag that indicates that the configuration has been edited
+# Flag that indicates that the configuration KCONFIG_MERGED_CONFIG has been
+# edited
 KCONFIG_EDITED_CONFIG = $(GENERATED_DIR)/.editedconfig
 
 # Add configurations to merge, in ascendent priority (i.e. a file overrides the
-# previous ones)
+# previous ones).
 MERGE_SOURCES += $(wildcard $(KCONFIG_APP_CONFIG))
 MERGE_SOURCES += $(wildcard $(KCONFIG_USER_CONFIG))
 
 # Create directory to place generated files
-$(GENERATED_DIR): $(CLEAN)
+$(GENERATED_DIR): $(if $(MAKE_RESTARTS),,$(CLEAN))
 	$(Q)mkdir -p $@
 
 # During migration this checks if Kconfig should run. It will run if any of
@@ -96,9 +97,14 @@ $(KCONFIG_GENERATED_DEPENDENCIES): FORCE | $(GENERATED_DIR)
 
 .PHONY: menuconfig
 
+# Conditionally depend on KCONFIG_MERGED_CONFIG. Only trigger configuration
+# merging process if there are configuration files to merge. This avoids the
+# usage of aditional bash `if [ ]` in the target recipe.
+MERGE_CONFIG_DEP = $(if $(strip $(MERGE_SOURCES)),$(KCONFIG_MERGED_CONFIG))
+
 # Opens the menuconfig interface for configuration of modules using the Kconfig
 # system.
-menuconfig: $(MENUCONFIG) $(KCONFIG_MERGED_CONFIG) $(KCONFIG_EDITED_CONFIG)
+menuconfig: $(MENUCONFIG) $(MERGE_CONFIG_DEP) $(KCONFIG_EDITED_CONFIG)
 	$(Q)KCONFIG_CONFIG=$(KCONFIG_MERGED_CONFIG) $(MENUCONFIG) $(KCONFIG)
 
 # Marks that the configuration file has been edited via some interface, such as
@@ -106,17 +112,12 @@ menuconfig: $(MENUCONFIG) $(KCONFIG_MERGED_CONFIG) $(KCONFIG_EDITED_CONFIG)
 $(KCONFIG_EDITED_CONFIG): FORCE
 	$(Q)touch $(KCONFIG_EDITED_CONFIG)
 
-# Generates a merged configuration file from the given sources. If the config
-# file has been edited a '.editedconfig' file will be present.
-# This is used to decide if the sources have to be merged or not.
-$(KCONFIG_MERGED_CONFIG): $(MERGECONFIG) $(KCONFIG_GENERATED_DEPENDENCIES) FORCE
+# Generates a merged configuration file from the given sources, only when the
+# configuration has not been updated by some interface like menuconfig
+$(KCONFIG_MERGED_CONFIG): $(MERGECONFIG) $(KCONFIG_GENERATED_DEPENDENCIES) $(MERGE_SOURCES)
 	$(Q)\
 	if ! test -f $(KCONFIG_EDITED_CONFIG); then \
-	  if ! test -z "$(strip $(MERGE_SOURCES))"; then \
-	    $(MERGECONFIG) $(KCONFIG) $@ $(MERGE_SOURCES); \
-	  else \
-	    rm -f $@; \
-	  fi \
+	  $(MERGECONFIG) $(KCONFIG) $@ $(MERGE_SOURCES); \
 	fi
 
 # Build a header file with all the Kconfig configurations. genconfig will avoid
@@ -124,7 +125,7 @@ $(KCONFIG_MERGED_CONFIG): $(MERGECONFIG) $(KCONFIG_GENERATED_DEPENDENCIES) FORCE
 # The rule is not included when only `make clean` is called in order to keep the
 # $(BINDIR) folder clean
 ifneq (clean,$(MAKECMDGOALS))
-$(KCONFIG_OUT_CONFIG) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) &: $(KCONFIG_GENERATED_DEPENDENCIES) $(GENCONFIG) $(KCONFIG_MERGED_CONFIG) FORCE
+$(KCONFIG_OUT_CONFIG) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) &: $(KCONFIG_GENERATED_DEPENDENCIES) $(GENCONFIG) $(MERGE_CONFIG_DEP)
 	$(Q) \
 	KCONFIG_CONFIG=$(KCONFIG_MERGED_CONFIG) $(GENCONFIG) \
 	  --config-out=$(KCONFIG_OUT_CONFIG) \
