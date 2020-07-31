@@ -350,11 +350,9 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     if (info != NULL) {
         netdev_ieee802154_rx_info_t *radio_info = info;
 
-        RFCORE_ASSERT(rssi_val > CC2538_RF_SENSITIVITY);
-
         /* The number of dB above maximum sensitivity detected for the
          * received packet */
-        radio_info->rssi = -CC2538_RF_SENSITIVITY + rssi_val;
+        radio_info->rssi = rssi_val;
 
         uint8_t corr_val = crc_corr_val & CC2538_CORR_VAL_MASK;
 
