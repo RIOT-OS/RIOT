@@ -127,7 +127,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
         ((aux != NULL) && IS_USED(MODULE_SOCK_AUX_LOCAL)
                        && IS_ACTIVE(LWIP_NETBUF_RECVINFO))) {
         /* convert remote */
-        size_t addr_len = sizeof(ipv6_addr_t);
+        size_t addr_len = sizeof(ipv4_addr_t);
         int family = AF_INET;
         if (NETCONNTYPE_ISIPV6(sock->base.conn->type)) {
             addr_len = sizeof(ipv6_addr_t);
