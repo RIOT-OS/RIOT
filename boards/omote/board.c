@@ -52,7 +52,7 @@ static inline void leds_init(void)
 
 /**
  * @brief Initialize the Radio interface
- * The omote features an on-board RF switch.
+ * The omote features an on-board RF.
  *
  */
 static void rf_init(void)

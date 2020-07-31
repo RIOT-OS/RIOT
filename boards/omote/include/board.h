@@ -57,13 +57,12 @@
 /** @} */
 /**
  * @name  RF control
- *
+ * 
  * These values configure the required pin to drive the RF antenna switch, to
  * enable the 2.4GHz RF interface of the CC2538.
  *
  * RF switch state:
- * - LOW: 2.4GHz RF interface 
- *
+ * LOW: 2.4GHz RF interface *
  * @{
  */
 #define RF_GPIO      GPIO_PD2
