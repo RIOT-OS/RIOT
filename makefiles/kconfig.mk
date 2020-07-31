@@ -38,17 +38,10 @@ KCONFIG_MERGED_CONFIG = $(GENERATED_DIR)/merged.config
 # configuration symbols to the build system.
 KCONFIG_OUT_CONFIG = $(GENERATED_DIR)/out.config
 
-# Include configuration symbols if available, only when not cleaning. This
-# allows to check for Kconfig symbols in makefiles.
-# Make tries to 'remake' all included files
-# (see https://www.gnu.org/software/make/manual/html_node/Remaking-Makefiles.html).
-# So if this file was included even when 'clean' is called, make would enter a
-# loop, as it always is out-of-date.
-# This has the side effect of requiring a Kconfig user to run 'clean' on a
-# separate call (e.g. 'make clean && make all'), to get the symbols correctly.
-ifneq ($(CLEAN),clean)
-  -include $(KCONFIG_OUT_CONFIG)
-endif
+# Include configuration symbols if available. This allows to check for Kconfig
+# symbols in makefiles. Make tries to 'remake' all included files (see
+# https://www.gnu.org/software/make/manual/html_node/Remaking-Makefiles.html).
+-include $(KCONFIG_OUT_CONFIG)
 
 # Flag that indicates that the configuration has been edited
 KCONFIG_EDITED_CONFIG = $(GENERATED_DIR)/.editedconfig
@@ -128,6 +121,9 @@ $(KCONFIG_MERGED_CONFIG): $(MERGECONFIG) $(KCONFIG_GENERATED_DEPENDENCIES) FORCE
 
 # Build a header file with all the Kconfig configurations. genconfig will avoid
 # any unnecessary rewrites of the header file if no configurations changed.
+# The rule is not included when only `make clean` is called in order to keep the
+# $(BINDIR) folder clean
+ifneq (clean,$(MAKECMDGOALS))
 $(KCONFIG_OUT_CONFIG) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) &: $(KCONFIG_GENERATED_DEPENDENCIES) $(GENCONFIG) $(KCONFIG_MERGED_CONFIG) FORCE
 	$(Q) \
 	KCONFIG_CONFIG=$(KCONFIG_MERGED_CONFIG) $(GENCONFIG) \
@@ -135,4 +131,6 @@ $(KCONFIG_OUT_CONFIG) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) &: $(KCONFIG_GENERA
 	  --header-path $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) \
 	  $(if $(KCONFIG_SYNC_DEPS),--sync-deps $(KCONFIG_SYNC_DIR)) \
 	  $(KCONFIG)
+endif
+
 endif
