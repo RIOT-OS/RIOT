@@ -167,6 +167,9 @@ struct _thread {
                                          (thread_t::msg_array), if any  */
     msg_t *msg_array;               /**< memory holding messages sent
                                          to this thread's message queue */
+#if defined(MODULE_CORE_MSG_PRIO) || defined(DOXYGEN)
+    msg_t prio_msg;                 /**< Target for @ref msg_send_prio */
+#endif
 #endif
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK) \
     || defined(MODULE_MPU_STACK_GUARD) || defined(DOXYGEN)

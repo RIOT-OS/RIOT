@@ -191,7 +191,6 @@ typedef struct {
     } content;                  /**< Content of the message. */
 } msg_t;
 
-
 /**
  * @brief Send a message (blocking).
  *
@@ -212,6 +211,22 @@ typedef struct {
  */
 int msg_send(msg_t *m, kernel_pid_t target_pid);
 
+/**
+ * @brief   Send a priority message, bypassing any the message queue
+ *
+ * @warning This might overwrite a pending priority message
+ *
+ * @note    This function is only available, if module `core_msg_prio` is
+ *          used
+ *
+ * @note    It is safe to call this function from IRQ context
+ *
+ * This function sends a priority message to the given thread. Unlike to
+ * @ref msg_send, it never fails nor blocks. This is achieved by statically
+ * allocating one message slot for priority messages. If this slot is already
+ * taken, the older message is lost in favor of the newer message.
+ */
+void msg_send_prio(msg_t *m, kernel_pid_t target_pid);
 
 /**
  * @brief Send a message (non-blocking).
@@ -230,7 +245,6 @@ int msg_send(msg_t *m, kernel_pid_t target_pid);
  * @return -1, on error (invalid PID)
  */
 int msg_try_send(msg_t *m, kernel_pid_t target_pid);
-
 
 /**
  * @brief Send a message to the current thread.
@@ -295,6 +309,19 @@ static inline int msg_sent_by_int(const msg_t *m)
  * @return  1, Function always succeeds or blocks forever.
  */
 int msg_receive(msg_t *m);
+
+/**
+ * @brief   Block until a priority message is received
+ *
+ * @note    This function is only available, if module `core_msg_prio` is
+ *          used
+ *
+ * Regular messages are ignored by this function. Incoming regular message
+ * while this function blocks will either queue up in the message queue, or are
+ * lost if the message queue is full or no message queue is set up for the
+ * calling thread.
+ */
+void msg_receive_prio(msg_t *m);
 
 /**
  * @brief Try to receive a message.

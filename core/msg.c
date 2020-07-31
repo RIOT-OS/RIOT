@@ -177,6 +177,64 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
     return 1;
 }
 
+#ifdef MODULE_CORE_MSG_PRIO
+void msg_send_prio(msg_t *m, kernel_pid_t target_pid)
+{
+    assert(m && pid_is_valid(target_pid));
+    unsigned state = irq_disable();
+
+    thread_t *target = (thread_t *)sched_threads[target_pid];
+    m->sender_pid = sched_active_pid;
+
+    if (target == NULL) {
+        DEBUG("msg_send_prio(): target thread %d does not exist\n", target_pid);
+        irq_restore(state);
+        return;
+    }
+
+    thread_t *me = (thread_t *)sched_active_thread;
+
+    DEBUG("msg_send_prio() %s:%i: Sending from %" PRIkernel_pid
+          " to %" PRIkernel_pid ". src->state=%i target->state=%i\n",
+          RIOT_FILE_RELATIVE,  __LINE__, sched_active_pid, target_pid,
+          me->status, target->status);
+
+    if ((target->status == STATUS_RECEIVE_BLOCKED) ||
+        (target->status == STATUS_RECEIVE_PRIO_BLOCKED)) {
+        msg_t *target_message = target->wait_data;
+        *target_message = *m;
+        sched_set_status(target, STATUS_PENDING);
+
+        irq_restore(state);
+        if (irq_is_in())
+            sched_context_switch_request = 1;
+        else
+            thread_yield_higher();
+    }
+    else {
+        target->prio_msg = *m;
+        irq_restore(state);
+    }
+}
+
+void msg_receive_prio(msg_t *m)
+{
+    assert(m && !irq_is_in());
+    unsigned state = irq_disable();
+    thread_t *me = (thread_t *)sched_active_thread;
+    if (me->prio_msg.sender_pid != KERNEL_PID_UNDEF) {
+        *m = me->prio_msg;
+        me->prio_msg.sender_pid = KERNEL_PID_UNDEF;
+        irq_restore(state);
+    }
+    else {
+        sched_set_status(me, STATUS_RECEIVE_PRIO_BLOCKED);
+        irq_restore(state);
+        thread_yield_higher();
+    }
+}
+#endif /* MODULE_CORE_MSG_PRIO */
+
 int msg_send_to_self(msg_t *m)
 {
     unsigned state = irq_disable();
@@ -347,6 +405,16 @@ static int _msg_receive(msg_t *m, int block)
           sched_active_thread->pid);
 
     thread_t *me = (thread_t *)sched_threads[sched_active_pid];
+
+#ifdef MODULE_CORE_MSG_PRIO
+    if (me->prio_msg.sender_pid != KERNEL_PID_UNDEF) {
+        DEBUG("_msg_receive: %" PRIkernel_pid ": Got prio message\n", me->pid);
+        *m = me->prio_msg;
+        me->prio_msg.sender_pid = KERNEL_PID_UNDEF;
+        irq_restore(state);
+        return 1;
+    }
+#endif /* MODULE_CORE_MSG_PRIO */
 
     int queue_index = -1;
 
