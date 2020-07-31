@@ -629,19 +629,14 @@ static void test_tcp_connect6__success_local_port(void)
 #ifdef SO_REUSE
 static void test_tcp_listen6__EADDRINUSE(void)
 {
+    static sock_tcp_t queue_array2[_QUEUE_SIZE];
+    static sock_tcp_queue_t queue2;
     static const sock_tcp_ep_t local = { .addr = { .ipv6 = _TEST_ADDR6_LOCAL },
                                          .family = AF_INET6,
                                          .port = _TEST_PORT_LOCAL,
                                          .netif = SOCK_ADDR_ANY_NETIF };
-    msg_t msg = { .type = _SERVER_MSG_START };
-
-    _server_addr.family = AF_INET6;
-    _server_addr.port = _TEST_PORT_LOCAL;
-    _server_addr.netif = SOCK_ADDR_ANY_NETIF;
-
-    msg_send(&msg, _server);    /* start server on _TEST_PORT_LOCAL */
-
-    expect(-EADDRINUSE == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(0 == sock_tcp_listen(&_queue, &local, _queue_array, _QUEUE_SIZE, 0));
+    expect(-EADDRINUSE == sock_tcp_listen(&queue2, &local, queue_array2,
                                           _QUEUE_SIZE, 0));
 }
 #endif
