@@ -120,23 +120,18 @@ ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **ctx,
     if (remote != NULL) {
         /* convert remote */
         size_t addr_len;
-#if LWIP_IPV6
-        if (sock->base.conn->type & NETCONN_TYPE_IPV6) {
+        if (NETCONNTYPE_ISIPV6(sock->base.conn->type)) {
             addr_len = sizeof(ipv6_addr_t);
             remote->family = AF_INET6;
         }
-        else {
-#endif
-#if LWIP_IPV4
+        else if (IS_ACTIVE(LWIP_IPV4)) {
             addr_len = sizeof(ipv4_addr_t);
             remote->family = AF_INET;
-#else
+        }
+        else {
             netbuf_delete(buf);
             return -EPROTO;
-#endif
-#if LWIP_IPV6
         }
-#endif
 #if LWIP_NETBUF_RECVINFO
         remote->netif = lwip_sock_bind_addr_to_netif(&buf->toaddr);
 #else
