@@ -345,7 +345,7 @@ static int _atwinc15x0_get(netdev_t *netdev, netopt_t opt, void *val,
     assert(dev == atwinc15x0);
 
     DEBUG("%s dev=%p opt=%u val=%p max_len=%u\n", __func__,
-          netdev, opt, val, max_len);
+          (void *)netdev, opt, val, max_len);
 
     switch (opt) {
         case NETOPT_IS_WIRED:
@@ -395,7 +395,7 @@ static int _atwinc15x0_set(netdev_t *netdev, netopt_t opt, const void *val,
     assert(val);
 
     DEBUG("%s dev=%p opt=%u val=%p max_len=%u\n", __func__,
-          netdev, opt, val, max_len);
+          (void *)netdev, opt, val, max_len);
 
     switch (opt) {
         case NETOPT_ADDRESS:
@@ -415,7 +415,7 @@ static int _atwinc15x0_init(netdev_t *netdev)
     assert(dev);
     assert(dev == atwinc15x0);
 
-    DEBUG("%s dev=%p\n", __func__, dev);
+    DEBUG("%s dev=%p\n", __func__, (void *)dev);
 
     atwinc15x0->bsp_isr = NULL;
     atwinc15x0->bsp_irq_enabled = true;
@@ -492,7 +492,7 @@ static void _atwinc15x0_isr(netdev_t *netdev)
     assert(dev);
     assert(dev == atwinc15x0);
 
-    DEBUG("%s dev=%p\n", __func__, dev);
+    DEBUG("%s dev=%p\n", __func__, (void *)dev);
 
     /* handle pending ATWINC15x0 module events */
     while (m2m_wifi_handle_events(NULL) != M2M_SUCCESS) { }

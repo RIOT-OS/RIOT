@@ -14,6 +14,8 @@ CFLAGS += -Wno-incompatible-pointer-types-discards-qualifiers
 CFLAGS += -DETH_MODE
 CFLAGS += -I$(PKG_SOURCE_DIR)/src
 
+CFLAGS += -Wno-pedantic
+
 all:
 	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/driver/source -f $(RIOTBASE)/Makefile.base MODULE=driver_atwinc15x0
 	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/common/source -f $(RIOTBASE)/Makefile.base MODULE=driver_atwinc15x0_common

@@ -609,7 +609,7 @@ void *_semtech_loramac_event_loop(void *arg)
                 case MSG_TYPE_MAC_TIMEOUT:
                 {
                     DEBUG("[semtech-loramac] MAC timer timeout\n");
-                    void (*callback)(void) = msg.content.ptr;
+                    void (*callback)(void) = (void (*)(void))(uintptr_t)msg.content.value;
                     callback();
                     break;
                 }
