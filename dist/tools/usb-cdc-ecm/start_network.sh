@@ -97,8 +97,8 @@ fi
 
 if [ -z "${PORT}" ]; then
     echo "Network enabled over CDC-ECM"
-    read -n 1 -s -p "Press any key to stop"
-    echo
+    echo "Press Return to stop"
+    read dummy
 else
     ${USB_CDC_ECM_DIR}/../pyterm/pyterm -p "${PORT}"
 fi
