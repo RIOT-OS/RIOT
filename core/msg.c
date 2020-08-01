@@ -228,6 +228,7 @@ void msg_receive_prio(msg_t *m)
         irq_restore(state);
     }
     else {
+        me->wait_data = m;
         sched_set_status(me, STATUS_RECEIVE_PRIO_BLOCKED);
         irq_restore(state);
         thread_yield_higher();
