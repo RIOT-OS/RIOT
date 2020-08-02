@@ -67,7 +67,8 @@ extern "C" {
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
       defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L4) || \
       defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-      defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5)
+      defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
+      defined(CPU_FAM_STM32MP1)
 #define CLOCK_LSI           (32000U)
 #else
 #error "error: LSI clock speed not defined for your target CPU"
