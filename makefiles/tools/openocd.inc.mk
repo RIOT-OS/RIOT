@@ -20,6 +20,9 @@ OPENOCD_CONFIG ?= $(BOARDDIR)/dist/openocd.cfg
 OPENOCD_TARGETS = debug% flash% reset
 $(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_CONFIG)
 
+# Export OPENOCD_CORE to required targets
+$(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_CORE)
+
 # Export OPENOCD_ADAPTER_INIT to required targets
 $(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_ADAPTER_INIT)
 

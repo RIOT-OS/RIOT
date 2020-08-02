@@ -104,6 +104,8 @@
 : ${OPENOCD_DBG_EXTRA_CMD:=}
 # command used to reset the board
 : ${OPENOCD_CMD_RESET_RUN:="-c 'reset run'"}
+# Select core on multi-core processors.
+: ${OPENOCD_CORE:=}
 # This is an optional offset to the base address that can be used to flash an
 # image in a different location than it is linked at. This feature can be useful
 # when flashing images for firmware swapping/remapping boot loaders.
@@ -336,7 +338,7 @@ do_debug() {
             -c 'gdb_port ${GDB_PORT}' \
             -c 'init' \
             ${OPENOCD_DBG_EXTRA_CMD} \
-            -c 'targets' \
+            -c 'targets ${OPENOCD_CORE}' \
             ${OPENOCD_DBG_START_CMD} \
             -l /dev/null & \
             echo \$! > $OCD_PIDFILE" &
