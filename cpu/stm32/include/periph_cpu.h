@@ -191,10 +191,14 @@ typedef enum {
     AHB1,           /**< AHB1 bus */
     AHB2,           /**< AHB2 bus */
     AHB3,           /**< AHB3 bus */
+#elif defined(CPU_FAM_STM32MP1)
+    AHB1,           /**< AHB1 bus */
+    AHB2,           /**< AHB2 bus */
+    AHB3,           /**< AHB3 bus */
 #else
 #warning "unsupported stm32XX family"
 #endif
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32MP1)
     AHB4,           /**< AHB4 bus */
 #endif
 } bus_t;

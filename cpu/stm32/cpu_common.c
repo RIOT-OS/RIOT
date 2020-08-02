@@ -72,13 +72,19 @@ void periph_clk_en(bus_t bus, uint32_t mask)
             RCC->APB1ENR1 |= mask;
 #elif defined(CPU_FAM_STM32G0)
             RCC->APBENR1 |= mask;
+#elif defined(CPU_FAM_STM32MP1)
+            RCC->MC_APB1ENSETR |= mask;
 #else
             RCC->APB1ENR |= mask;
 #endif
             break;
 #if !defined(CPU_FAM_STM32G0)
         case APB2:
+#if defined(CPU_FAM_STM32MP1)
+            RCC->MC_APB2ENSETR |= mask;
+#else
             RCC->APB2ENR |= mask;
+#endif
             break;
 #endif
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
@@ -120,6 +126,11 @@ void periph_clk_en(bus_t bus, uint32_t mask)
             break;
 #endif
 #endif
+#if defined(CPU_FAM_STM32MP1)
+        case AHB4:
+            RCC->MC_AHB4ENSETR |= mask;
+            break;
+#endif
         default:
             DEBUG("unsupported bus %d\n", (int)bus);
             break;
@@ -137,13 +148,20 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
             RCC->APB1ENR1 &= ~(mask);
 #elif defined(CPU_FAM_STM32G0)
             RCC->APBENR1 &= ~(mask);
+#elif defined(CPU_FAM_STM32MP1)
+            /* Write 1 to clear */
+            RCC->MC_APB1ENCLRR |= mask;
 #else
             RCC->APB1ENR &= ~(mask);
 #endif
             break;
 #if !defined(CPU_FAM_STM32G0)
         case APB2:
+#if defined(CPU_FAM_STM32MP1)
+            RCC->MC_APB2ENCLRR |= mask;
+#else
             RCC->APB2ENR &= ~(mask);
+#endif
             break;
 #endif
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
