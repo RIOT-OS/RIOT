@@ -84,6 +84,8 @@ extern "C" {
 /* CPU_IRQ_NUMOF cannot be determined automatically from cmsis header */
 #if defined(CPU_LINE_STM32F030x4)
 #define CPU_IRQ_NUMOF                   (28U)
+#elif defined(CPU_MODEL_STM32MP157CAC)
+#define CPU_IRQ_NUMOF                   (150U)
 #endif
 /** @} */
 
