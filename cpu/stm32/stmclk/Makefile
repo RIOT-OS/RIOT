@@ -1,6 +1,8 @@
 MODULE = stm32_clk
 
-SRC = stmclk_common.c
+ifneq (mp1,$(CPU_FAM))
+  SRC = stmclk_common.c
+endif
 
 ifneq (,$(filter $(CPU_FAM),f2 f4 f7))
   SRC += stmclk_f2f4f7.c
@@ -14,6 +16,8 @@ else ifneq (,$(filter $(CPU_FAM),l5))
   SRC += stmclk_l5.c
 else ifneq (,$(filter $(CPU_FAM),g0 g4))
   SRC += stmclk_gx.c
+else ifneq (,$(filter $(CPU_FAM),mp1))
+  SRC = stmclk_mp1.c
 endif
 
 include $(RIOTBASE)/Makefile.base
