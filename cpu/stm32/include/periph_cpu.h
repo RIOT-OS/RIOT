@@ -221,7 +221,11 @@ typedef uint32_t gpio_t;
 /**
  * @brief   Define a CPU specific GPIO pin generator macro
  */
+#if defined(CPU_FAM_STM32MP1)
+#define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 12)) | y)
+#else
 #define GPIO_PIN(x, y)      ((GPIOA_BASE + (x << 10)) | y)
+#endif
 
 /**
  * @brief   Available GPIO ports
