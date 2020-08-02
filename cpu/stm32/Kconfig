@@ -8,7 +8,6 @@
 config CPU_STM32
     bool
     select HAS_CPU_STM32
-    select HAS_BOOTLOADER_STM32
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ

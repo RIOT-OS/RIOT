@@ -12,6 +12,8 @@ config CPU_FAM_F3
     select HAS_CPU_STM32F3
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_BOOTLOADER_STM32
 
 config CPU_FAM
     default "f3" if CPU_FAM_F3

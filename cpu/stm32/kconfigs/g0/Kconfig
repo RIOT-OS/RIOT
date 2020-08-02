@@ -12,6 +12,8 @@ config CPU_FAM_G0
     select HAS_CPU_STM32G0
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_BOOTLOADER_STM32
 
 config CPU_FAM
     default "g0" if CPU_FAM_G0
