@@ -284,7 +284,8 @@ enum {
 #define PERIPH_I2C_NEED_WRITE_REG
 #define PERIPH_I2C_NEED_READ_REGS
 #if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F4)
+    defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32F4) || \
+    defined(CPU_FAM_STM32MP1)
 #define PERIPH_I2C_NEED_WRITE_REGS
 #endif
 /** @} */
@@ -718,7 +719,8 @@ typedef struct {
 #define HAVE_I2C_SPEED_T
 typedef enum {
 #if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L1)
+    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L1) || \
+    defined(CPU_FAM_STM32MP1)
     I2C_SPEED_LOW,          /**< low speed mode: ~10kit/s */
 #endif
     I2C_SPEED_NORMAL,       /**< normal mode:  ~100kbit/s */
@@ -752,7 +754,8 @@ typedef struct {
     uint32_t rcc_sw_mask;   /**< bit to switch I2C clock */
 #endif
 #if defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || \
-    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L1)
+    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32L1) || \
+    defined(CPU_FAM_STM32MP1)
     uint32_t clk;           /**< bus frequency as defined in board config */
 #endif
     uint8_t irqn;           /**< I2C event interrupt number */
