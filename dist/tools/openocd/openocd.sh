@@ -51,6 +51,10 @@
 #               DBG:            debugger client command, default: 'gdb -q'
 #               TUI:            if TUI!=null, the -tui option will be used
 #
+# debugr:       debug <elfile>
+#               debug given file on the target but flash it first directly
+#               in RAM.
+#
 # debug-server: starts OpenOCD as GDB server, but does not connect to
 #               to it with any frontend. This might be useful when using
 #               IDEs.
@@ -390,6 +394,14 @@ case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
     do_flash "$@"
+    ;;
+  debugr)
+    START_ADDR=$(objdump -f $1 | sed '/^$/d' | tail -1 | grep -o "0x[0-9a-fA-F].*")
+    echo "Start address: $START_ADDR"
+    DBG_FLAGS="$DBG_FLAGS \
+        -ex 'load $1' \
+        "
+        do_debug "$@"
     ;;
   debug)
     echo "### Starting Debugging ###"
