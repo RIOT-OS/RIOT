@@ -38,6 +38,8 @@
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
       defined(CPU_FAM_STM32WB)
 #include "l4l5wb/cfg_clock_default.h"
+#elif defined(CPU_FAM_STM32MP1)
+#include "mp1/cfg_clock_default.h"
 #else
 #error "No clock configuration available"
 #endif
