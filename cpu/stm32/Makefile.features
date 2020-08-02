@@ -31,7 +31,7 @@ ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l0 l4 l5 wb))
   endif
 endif
 
-ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l1 l4))
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l1 l4 mp1))
   FEATURES_PROVIDED += cortexm_mpu
 endif
 
