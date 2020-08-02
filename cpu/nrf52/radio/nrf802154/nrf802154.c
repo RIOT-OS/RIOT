@@ -215,7 +215,7 @@ static void _set_txpower(int16_t txpower)
     if (txpower > 8) {
         NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Pos8dBm;
     }
-    if (txpower > 1) {
+    else if (txpower > 1) {
         NRF_RADIO->TXPOWER = (uint32_t)txpower;
     }
     else if (txpower > -1) {
