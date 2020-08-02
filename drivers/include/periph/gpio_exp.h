@@ -13,7 +13,7 @@
  * @brief       New expandable GPIO peripheral driver
  *
  * This API is the **new expandable GPIO API** that provides a consistent
- * access to GPIO pins of the MCU and GPIO expanders. This allows to expand
+ * access to GPIO pins of the MCU and GPIO expanders. It allows to expand
  * MCU GPIO pins by GPIO expanders. The API consists of
  *
  * - a **pin-oriented high-level API** which is compatible with the
@@ -57,7 +57,7 @@
  *
  * 1. Default case without GPIO expanders (module `gpio_exp` is not enabled)<br>
  *    Only MCU GPIO ports are used. The functions of the high-level API can
- *    therefore directly calls the the low-level API functions `gpio_cpu_*`
+ *    therefore directly call the low-level API functions `gpio_cpu_*`
  *    of the MCU implementation.
  * 2. GPIO expanders are used (module `gpio_exp` is enabled)<br>
  *    The functions of the high-level API always call the low-level API
@@ -234,7 +234,7 @@
  * address, #GPIO_CPU_PORT_NUM provides the port number for a specific register
  * address. Both macros are required by the GPIO API.
  *
- * If an MCU imeplementation uses register addresses and defines the
+ * If an MCU implementation uses register addresses and defines the
  * #GPIO_CPU_PORT and #GPIO_CPU_PORT_NUM macros, it has also to define the
  * GPIO port base register address #GPIO_CPU_PORT_BASE and a
  * #GPIO_CPU_PORT_MASK mask to uniquely distinguish a pointer to a memory
