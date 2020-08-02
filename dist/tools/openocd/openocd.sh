@@ -55,6 +55,11 @@
 #               debug given file on the target but flash it first directly
 #               in RAM.
 #
+# flashr:       flash <image_file>
+#               flash given file to the target but directly in RAM.
+#
+#               See 'flash' command above for options
+#
 # debug-server: starts OpenOCD as GDB server, but does not connect to
 #               to it with any frontend. This might be useful when using
 #               IDEs.
@@ -260,6 +265,52 @@ _flash_address() {
     _flash_list | awk "NR==${bank_num}"'{printf "0x%08x\n", $4}'
 }
 
+do_flashr() {
+    IMAGE_FILE=$1
+    test_config
+    test_imagefile
+    if [ -n "${PRE_FLASH_CHECK_SCRIPT}" ]; then
+        sh -c "${PRE_FLASH_CHECK_SCRIPT} '${IMAGE_FILE}'"
+        RETVAL=$?
+        if [ $RETVAL -ne 0 ]; then
+            echo "pre-flash checks failed, status=$RETVAL"
+            exit $RETVAL
+        fi
+    fi
+
+    # In case of binary file, IMAGE_OFFSET should include the flash base address
+    # This allows flashing normal binary files without env configuration
+    if _is_binfile "${IMAGE_FILE}" "${IMAGE_TYPE}"; then
+        # hardwritten to use the first bank
+        FLASH_ADDR=$(_flash_address 1)
+        echo "Binfile detected, adding ROM base address: ${FLASH_ADDR}"
+        IMAGE_TYPE=bin
+        IMAGE_OFFSET=$(printf "0x%08x\n" "$((${IMAGE_OFFSET} + ${FLASH_ADDR}))")
+    fi
+
+    if [ "${IMAGE_OFFSET}" != "0" ]; then
+        echo "Flashing with IMAGE_OFFSET: ${IMAGE_OFFSET}"
+    fi
+
+    # flash device
+    sh -c "${OPENOCD} \
+            ${OPENOCD_ADAPTER_INIT} \
+            -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_INIT} \
+            ${OPENOCD_EXTRA_RESET_INIT} \
+            -c 'tcl_port 0' \
+            -c 'telnet_port 0' \
+            -c 'gdb_port 0' \
+            -c 'init' \
+            -c 'targets ${OPENOCD_CORE}' \
+            -c 'reset' \
+            -c 'halt' \
+            -c 'load_image \"${IMAGE_FILE}\" ' \
+            -c 'resume ${START_ADDR}' \
+            -c 'shutdown'" &&
+    echo "'Done flashing"
+}
+
 #
 # now comes the actual actions
 #
@@ -396,6 +447,11 @@ case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
     do_flash "$@"
+    ;;
+  flashr)
+    START_ADDR=$(objdump -f $1 | sed '/^$/d' | tail -1 | grep -o "0x[0-9a-fA-F].*")
+    echo "### Flashing target RAM ###"
+        do_flashr "$@"
     ;;
   debugr)
     START_ADDR=$(objdump -f $1 | sed '/^$/d' | tail -1 | grep -o "0x[0-9a-fA-F].*")
