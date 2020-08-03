@@ -151,4 +151,4 @@ subset of modules).
 
 For instructions on how to configure via `CFLAGS` check the
 @ref config "identified compile-time configurations". To learn how to use
-Kconfig in RIOT, please refer to the @ref kconfig-users-guide.
+Kconfig in RIOT, please refer to the @ref kconfig-user-guide.

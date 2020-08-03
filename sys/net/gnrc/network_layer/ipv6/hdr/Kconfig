@@ -1,0 +1,12 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MOD_GNRC_IPV6_HDR
+    bool "IPv6 header"
+    default y
+    depends on MOD_GNRC_PKTBUF
+    select MOD_IPV6_HDR

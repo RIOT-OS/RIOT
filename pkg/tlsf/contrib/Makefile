@@ -1,4 +1,4 @@
-MODULE = tlsf-malloc
+MODULE = tlsf_malloc
 SUBMODULES = 1
 SRC = tlsf-malloc.c
 

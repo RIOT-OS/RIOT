@@ -1,4 +1,4 @@
-USEMODULE += ccn-lite-utils
+USEMODULE += ccn_lite_utils
 USEMODULE += gnrc_nettype_ccn
 USEMODULE += evtimer
 USEMODULE += random

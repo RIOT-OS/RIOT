@@ -11,6 +11,7 @@ config BOARD_SAMR21_XPRO
     bool
     default y
     select CPU_MODEL_SAMR21G18A
+    select HAVE_AT86RF233
     select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM

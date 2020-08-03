@@ -48,7 +48,10 @@ KCONFIG_EDITED_CONFIG = $(GENERATED_DIR)/.editedconfig
 
 # Add configurations to merge, in ascendent priority (i.e. a file overrides the
 # previous ones)
+MERGE_SOURCES += $(wildcard $(RIOTCPU)/$(CPU)/cpu.config)
+MERGE_SOURCES += $(wildcard $(RIOTBOARD)/$(BOARD)/board.config)
 MERGE_SOURCES += $(wildcard $(KCONFIG_APP_CONFIG))
+MERGE_SOURCES += $(wildcard $(KCONFIG_APP_CONFIG).$(BOARD))
 MERGE_SOURCES += $(wildcard $(KCONFIG_USER_CONFIG))
 
 # Create directory to place generated files
@@ -57,8 +60,6 @@ $(GENERATED_DIR): $(CLEAN)
 
 # During migration this checks if Kconfig should run. It will run if any of
 # the following is true:
-# - A file with '.config' extension is present in the application directory
-# - A 'Kconfig' file is present in the application directory
 # - A previous configuration file is present (e.g. from a previous call to
 #   menuconfig)
 # - menuconfig is being called
@@ -68,7 +69,7 @@ $(GENERATED_DIR): $(CLEAN)
 # configuration via Kconfig is disabled by default). Should this change, the
 # check would not longer be valid, and Kconfig would have to run on every
 # build.
-SHOULD_RUN_KCONFIG ?= $(or $(wildcard $(APPDIR)/*.config), $(wildcard $(APPDIR)/Kconfig), $(wildcard $(KCONFIG_MERGED_CONFIG)), $(filter menuconfig, $(MAKECMDGOALS)))
+SHOULD_RUN_KCONFIG ?= $(or $(wildcard $(KCONFIG_OUT_CONFIG)), $(filter menuconfig, $(MAKECMDGOALS)))
 
 ifneq (,$(SHOULD_RUN_KCONFIG))
 
@@ -88,12 +89,16 @@ USEPKG_W_PREFIX = $(addprefix PKG_,$(USEPKG))
 # defining symbols like 'MODULE_<MODULE_NAME>' or PKG_<PACKAGE_NAME> which
 # default to 'y'. Then, every module and package Kconfig menu will depend on
 # that symbol being set to show its options.
+ifeq (1,$(TEST_KCONFIG))
+$(KCONFIG_GENERATED_DEPENDENCIES): FORCE | $(GENERATED_DIR)
+	$(Q)touch $@
+else
 $(KCONFIG_GENERATED_DEPENDENCIES): FORCE | $(GENERATED_DIR)
 	$(Q)printf "%s " $(USEMODULE_W_PREFIX) $(USEPKG_W_PREFIX) \
 	  | awk 'BEGIN {RS=" "}{ gsub("-", "_", $$0); \
 	      printf "config %s\n\tbool\n\tdefault y\n", toupper($$0)}' \
 	  | $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@
-
+endif
 .PHONY: menuconfig
 
 # Opens the menuconfig interface for configuration of modules using the Kconfig

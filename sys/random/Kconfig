@@ -1,0 +1,90 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MOD_RANDOM
+    bool "Pseudo Random Number Generator (PRNG)"
+    select MOD_LUID
+    select MOD_PRNG
+
+if MOD_RANDOM
+
+config MOD_AUTO_INIT_RANDOM
+    bool "Auto-init Random"
+    default y if MOD_AUTO_INIT
+
+choice
+    bool "Seed source"
+
+config RANDOM_SEED_SOURCE_PUF
+    bool "PUF-SRAM"
+    depends on MOD_PUF_SRAM
+
+config RANDOM_SEED_SOURCE_PERIPH_HWRNG
+    bool "Hardware RNG"
+    depends on HAS_PERIPH_HWRNG
+    select MOD_PERIPH_HWRNG
+
+config RANDOM_SEED_SOURCE_PERIPH_CPUID
+    bool "CPU ID"
+    select MOD_LUID
+
+config RANDOM_SEED_SOURCE_DEFAULT
+    bool "Default Seed"
+
+endchoice
+
+comment "Attention! Module PUF SRAM requires power-off in order to generate a high-entropy seed"
+    depends on RANDOM_SEED_SOURCE_PUF
+
+config RANDOM_SEED_DEFAULT
+    hex "Seed value"
+    default 0x1
+    range 0x0 0xFFFFFFFF
+    depends on RANDOM_SEED_SOURCE_DEFAULT
+
+choice RANDOM_IMPL
+    bool "PRNG implementation"
+    default MOD_PRNG_TINYMT32
+
+config MOD_PRNG_FORTUNA
+    bool "Fortuna"
+    select MOD_FORTUNA
+    depends on MOD_CRYPTO
+    depends on MOD_XTIMER
+    select MOD_HASHES
+
+config MOD_PRNG_TINYMT32
+    bool "TinyMT32"
+    select MOD_TINYMT32
+
+config MOD_PRNG_MERSENNE
+    bool "Mersenne Twister"
+
+config MOD_PRNG_MINSTD
+    bool "Minimal Standard (minstd)"
+
+config MOD_PRNG_MUSL_LCG
+    bool "Musl LCG"
+
+config MOD_PRNG_SHA1PRNG
+    bool "SHA1PRNG"
+    select MOD_HASHES
+
+config MOD_PRNG_XORSHIFT
+    bool "XOR Shift"
+
+endchoice # RANDOM_IMPL
+
+endif # MOD_RANDOM
+
+config MOD_PRNG
+    bool
+    help
+        PRNG base module.
+
+rsource "fortuna/Kconfig"
+rsource "tinymt32/Kconfig"

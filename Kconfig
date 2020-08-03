@@ -25,6 +25,7 @@ rsource "$(RIOTCPU)/Kconfig"
 # The application may declare new symbols as well
 osource "$(APPDIR)/Kconfig"
 
+rsource "core/Kconfig"
 rsource "drivers/Kconfig"
 rsource "sys/Kconfig"
 rsource "pkg/Kconfig"

@@ -1,0 +1,20 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig MOD_GNRC_NETAPI
+    bool "GNRC communication interface"
+    default y
+
+if MOD_GNRC_NETAPI
+
+config MOD_GNRC_NETAPI_MBOX
+    bool "Message box functionalities"
+    select MOD_CORE_MBOX
+
+config MOD_GNRC_NETAPI_CALLBACKS
+    bool "Callback functionalities"
+
+endif # MOD_GNRC_NETAPI

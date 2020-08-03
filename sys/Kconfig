@@ -6,7 +6,39 @@
 #
 menu "System"
 
+rsource "arduino/Kconfig"
+rsource "auto_init/Kconfig"
+rsource "benchmark/Kconfig"
+rsource "div/Kconfig"
+rsource "evtimer/Kconfig"
+rsource "fmt/Kconfig"
+rsource "hashes/Kconfig"
+rsource "isrpipe/Kconfig"
+rsource "iolist/Kconfig"
+rsource "luid/Kconfig"
 rsource "net/Kconfig"
+rsource "od/Kconfig"
+rsource "pm_layered/Kconfig"
+rsource "posix/Kconfig"
+rsource "ps/Kconfig"
+rsource "puf_sram/Kconfig"
+rsource "random/Kconfig"
+rsource "schedstatistics/Kconfig"
+rsource "shell/Kconfig"
+rsource "test_utils/Kconfig"
+rsource "timex/Kconfig"
+rsource "trickle/Kconfig"
+rsource "tsrb/Kconfig"
 rsource "usb/Kconfig"
+rsource "xtimer/Kconfig"
+
+rsource "Kconfig.newlib"
+rsource "Kconfig.stdio"
 
 endmenu # System
+
+config MOD_SYS
+    bool
+    default y
+    help
+        System module, it serves to pull in all the rest of system modules.

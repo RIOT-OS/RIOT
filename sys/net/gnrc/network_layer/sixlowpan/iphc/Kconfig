@@ -1,0 +1,18 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MOD_GNRC_SIXLOWPAN_IPHC
+    bool "IPv6 header compression (IPHC)"
+    default y
+    depends on MOD_GNRC_IPV6
+    depends on MOD_GNRC_SIXLOWPAN
+    depends on MOD_GNRC_SIXLOWPAN_CTX
+    select MOD_GNRC_SIXLOWPAN_IPHC_NHC
+
+config MOD_GNRC_SIXLOWPAN_IPHC_NHC
+    bool
+    # TODO: Add description?

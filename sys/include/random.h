@@ -42,7 +42,7 @@ extern "C" {
  * @brief   Seed selected when all tries to collect seeds from a random source
  *          failed
  */
-#define RANDOM_SEED_DEFAULT (1)
+#define CONFIG_RANDOM_SEED_DEFAULT (1)
 #endif
 
 /**

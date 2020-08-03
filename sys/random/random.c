@@ -25,6 +25,7 @@
 #include "log.h"
 #include "random.h"
 #include "bitarithm.h"
+#include "kernel_defines.h"
 
 #ifdef MODULE_PUF_SRAM
 #include "puf_sram.h"
@@ -54,7 +55,7 @@ void auto_init_random(void)
     luid_get(&seed, 4);
 #else
     LOG_WARNING("random: NO SEED AVAILABLE!\n");
-    seed = RANDOM_SEED_DEFAULT;
+    seed = CONFIG_RANDOM_SEED_DEFAULT;
 #endif
     DEBUG("random: using seed value %u\n", (unsigned)seed);
     random_init(seed);

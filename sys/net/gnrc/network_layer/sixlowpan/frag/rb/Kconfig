@@ -4,13 +4,12 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_GNRC_SIXLOWPAN_FRAG_RB
-    bool "Configure GNRC 6LoWPAN Reassembly buffer"
-    depends on MODULE_GNRC_SIXLOWPAN_FRAG_RB
-    help
-        Configure GNRC 6LoWPAN Reassembly buffer using Kconfig.
+menuconfig MOD_GNRC_SIXLOWPAN_FRAG_RB
+    bool "6LoWPAN Reassembly buffer"
+    default y
+    depends on MOD_XTIMER
 
-if KCONFIG_MODULE_GNRC_SIXLOWPAN_FRAG_RB
+if MOD_GNRC_SIXLOWPAN_FRAG_RB
 
 config GNRC_SIXLOWPAN_FRAG_RBUF_SIZE
     int "Size of the reassembly buffer"
@@ -39,4 +38,4 @@ config GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER
         of a reassembly buffer entry on late arriving link-layer
         uplicates.
 
-endif # KCONFIG_MODULE_GNRC_SIXLOWPAN_FRAG_RB
+endif # MOD_GNRC_SIXLOWPAN_FRAG_RB

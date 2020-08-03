@@ -1,0 +1,31 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MOD_ARDUINO
+    bool "Arduino sketches support"
+    depends on HAS_ARDUINO
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_UART
+    depends on MOD_XTIMER
+    select MOD_PERIPH_ADC if HAS_PERIPH_ADC
+    select MOD_PERIPH_GPIO
+    select MOD_PERIPH_I2C if HAS_PERIPH_I2C
+    select MOD_PERIPH_SPI if HAS_PERIPH_SPI
+    select MOD_PERIPH_UART
+
+if MOD_ARDUINO
+
+# TODO: Sketch module
+
+config MOD_ARDUINO_PWM
+    bool "Arduino PWM support"
+    default y
+    depends on HAS_ARDUINO_PWM
+    depends on HAS_PERIPH_PWM
+    select MOD_PERIPH_PWM
+
+endif # MOD_ARDUINO

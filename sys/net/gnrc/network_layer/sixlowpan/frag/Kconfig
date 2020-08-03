@@ -5,10 +5,17 @@
 # directory for more details.
 #
 
-if MODULE_GNRC_SIXLOWPAN_FRAG
+menu "6LoWPAN fragmentation"
+
+config MOD_GNRC_SIXLOWPAN_FRAG
+    bool "6LoWPAN fragmentation support"
+    default y
+    depends on MOD_GNRC_SIXLOWPAN
+    select MOD_GNRC_SIXLOWPAN_FRAG_FB
+    depends on MOD_GNRC_SIXLOWPAN_FRAG_RB
 
 rsource "fb/Kconfig"
 rsource "rb/Kconfig"
 rsource "vrb/Kconfig"
 
-endif # MODULE_GNRC_SIXLOWPAN_FRAG
+endmenu # 6LoWPAN fragmentation

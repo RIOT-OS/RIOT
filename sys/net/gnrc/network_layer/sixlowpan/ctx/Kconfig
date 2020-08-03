@@ -1,0 +1,12 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MOD_GNRC_SIXLOWPAN_CTX
+    bool "Contexts for 6LoWPAN address compression"
+    default y
+    depends on MOD_XTIMER
+    select MOD_IPV6_ADDR

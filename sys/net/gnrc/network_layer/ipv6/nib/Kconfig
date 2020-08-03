@@ -4,40 +4,70 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_GNRC_IPV6_NIB
-    bool "Configure GNRC IPv6 NIB"
+menuconfig MOD_GNRC_IPV6_NIB
+    bool "IPv6 Neighbor Information Base (NIB)"
+    default y
+    depends on MOD_EVTIMER
+    depends on MOD_GNRC_NETIF
+    select MOD_IPV6_ADDR
+    select MOD_RANDOM
 
-if KCONFIG_MODULE_GNRC_IPV6_NIB
+if MOD_GNRC_IPV6_NIB
 
-config GNRC_IPV6_NIB_6LBR
-    bool "6LoWPAN border router features"
-    default y if MODULE_GNRC_IPV6_NIB_6LBR
-    help
-        Enable 6LoWPAN Border Router (6LBR) features.
-        @see https://tools.ietf.org/html/rfc6775#section-2
+config MOD_AUTO_INIT_GNRC_IPV6_NIB
+    bool "Auto-init GNRC IPv6 NIB"
+    default y if MOD_AUTO_INIT
 
-config GNRC_IPV6_NIB_6LR
-    bool "6LoWPAN router features"
-    default y if MODULE_GNRC_IPV6_NIB_6LR || GNRC_IPV6_NIB_6LBR
-    help
-        Enable 6LoWPAN Router (6LR) features.
-        @see https://tools.ietf.org/html/rfc6775#section-2
+config MOD_GNRC_IPV6_NIB_ROUTER
+    bool "Router features"
+    select GNRC_IPV6_NIB_ROUTER
 
-config GNRC_IPV6_NIB_6LN
+
+config MOD_GNRC_IPV6_NIB_6LN
     bool "6LoWPAN node features"
-    default y if MODULE_GNRC_IPV6_NIB_6LN || GNRC_IPV6_NIB_6LR
+    depends on MOD_GNRC_SIXLOWPAN_ND
+    default y if MOD_GNRC_SIXLOWPAN
+    select GNRC_IPV6_NIB_6LN
     help
         Enable 6LoWPAN Node (6LN) features.
         @see https://tools.ietf.org/html/rfc6775#section-2
 
+config MOD_GNRC_IPV6_NIB_6LR
+    bool "6LoWPAN router features"
+    depends on MOD_GNRC_IPV6_NIB_6LN
+    depends on MOD_GNRC_IPV6_NIB_ROUTER
+    default y if MOD_GNRC_SIXLOWPAN
+    select GNRC_IPV6_NIB_6LR
+    help
+        Enable 6LoWPAN Router (6LR) features.
+        @see https://tools.ietf.org/html/rfc6775#section-2
+
+config MOD_GNRC_IPV6_NIB_6LBR
+    bool "6LoWPAN border router features"
+    depends on MOD_GNRC_IPV6_NIB_6LR
+    select GNRC_IPV6_NIB_6LBR
+    help
+        Enable 6LoWPAN Border Router (6LBR) features.
+        @see https://tools.ietf.org/html/rfc6775#section-2
+
+# TODO: These features should be just brought in by the module symbol, but that
+# means changing the macros in the code.
+config GNRC_IPV6_NIB_6LBR
+    bool
+
+config GNRC_IPV6_NIB_6LR
+    bool
+
+config GNRC_IPV6_NIB_6LN
+    bool
+
 config GNRC_IPV6_NIB_ROUTER
-    bool "Router features"
-    default y if MODULE_GNRC_IPV6_NIB_ROUTER || GNRC_IPV6_NIB_6LR
+    bool
 
 config GNRC_IPV6_NIB_SLAAC
     bool "Stateless address auto-configuration"
-    default y if MODULE_GNRC_IPV6_NIB_6LBR
-    default n if MODULE_GNRC_IPV6_NIB_6LR || MODULE_GNRC_IPV6_NIB_6LN
+    default y if MOD_GNRC_IPV6_NIB_6LBR
+    default n if MOD_GNRC_IPV6_NIB_6LR || MOD_GNRC_IPV6_NIB_6LN
     default y
 
 config GNRC_IPV6_NIB_QUEUE_PKT
@@ -118,4 +148,4 @@ comment "Warning: Behavior for more than 2 Authoritative Border Router entries"
 comment "is currently not specified or tested."
 endif
 
-endif # KCONFIG_MODULE_GNRC_IPV6_NIB
+endif # MOD_GNRC_IPV6_NIB

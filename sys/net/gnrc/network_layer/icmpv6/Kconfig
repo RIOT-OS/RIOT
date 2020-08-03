@@ -1,0 +1,17 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MOD_GNRC_ICMPV6
+    bool "ICMPv6 support"
+    default y
+    depends on MOD_GNRC_IPV6
+    select MOD_ICMPV6
+    select MOD_INET_CSUM
+    select MOD_GNRC_NETTYPE_ICMPV6
+
+rsource "echo/Kconfig"
+rsource "error/Kconfig"
