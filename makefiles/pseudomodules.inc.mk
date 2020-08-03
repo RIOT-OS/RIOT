@@ -115,6 +115,7 @@ PSEUDOMODULES += stdio_cdc_acm
 PSEUDOMODULES += stdio_ethos
 PSEUDOMODULES += stdio_uart_rx
 PSEUDOMODULES += stm32_eth
+PSEUDOMODULES += stm32_eth_link_up
 PSEUDOMODULES += suit_transport_%
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += wifi_enterprise
