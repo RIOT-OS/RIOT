@@ -1,5 +1,5 @@
 /*
- *Copyright (C) 2020 Oppila Microsystems - http://www.oppila.in
+ * Copyright (C) 2020 Oppila Microsystems - http://www.oppila.in
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -12,8 +12,6 @@
  *
  * @file
  * @brief       Board specific implementations for the omote board
- *
- *
  * @}
  */
 
@@ -21,7 +19,6 @@
 #include "cpu.h"
 
 static inline void leds_init(void);
-static inline void rf_init(void);
 
 void board_init(void)
 {
@@ -29,9 +26,7 @@ void board_init(void)
     leds_init();
     /* initialize the CPU */
     cpu_init();
-    /* initialize the 2.4GHz RF */
-    rf_init();
-
+    
     /* The boot pin must be set to input otherwise it may lock the bootloader */
     gpio_init(BOOT_PIN, GPIO_IN);
 
@@ -48,16 +43,4 @@ static inline void leds_init(void)
 {
     gpio_init(LED0_PIN, GPIO_OUT);
     gpio_init(LED1_PIN, GPIO_OUT);
-}
-
-/**
- * @brief Initialize the Radio interface
- * The omote features an on-board RF.
- *
- */
-static void rf_init(void)
-{
-    /* Set RF 2.4GHz */
-    gpio_init(RF_GPIO, GPIO_OUT);
-    RF_2_4_GHZ;
 }

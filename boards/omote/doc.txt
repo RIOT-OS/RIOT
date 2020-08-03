@@ -44,5 +44,5 @@ button` and `reset button`
 Bash
 $ make BOARD=omote flash
 
-The omote has 13 burgs pinouts to connect boolean,digital and analog sensors based on I2C,UART,and SPI Protocols as well as other sensors or actuators you may need to connect.
+The omote has 13 pinouts to connect boolean,digital and analog sensors based on I2C,UART,and SPI Protocols as well as other sensors or actuators you may need to connect.
 */

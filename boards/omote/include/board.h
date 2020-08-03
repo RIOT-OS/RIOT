@@ -60,7 +60,6 @@
  * @{
  */
 #define RF_GPIO      GPIO_PD2
-#define RF_2_4_GHZ   gpio_clear(RF_GPIO)
 /** @} */
 /**
  * @name Flash Customer Configuration Area (CCA) parameters

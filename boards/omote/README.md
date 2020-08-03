@@ -1,7 +1,7 @@
 Oppila Microsystems omote platform -  http://www.oppila.in
 ==========================================================
 
-The omote platform  is a IoT Hardware development platform based
+The omote platform is a IoT Hardware development platform based
 on TI's CC2538 system on chip (SoC), featuring an ARM Cortex-M3 with 512KB
 flash, 32Kb RAM, 2.4GHz RF interface , and the
 following goodies:
@@ -55,11 +55,11 @@ For the UART, serial line settings are 115200 8N1, no flow control.
 
 Once all drivers have been installed correctly:
 
-On windows, devices will appear as a virtual `COM` port.
+On Windows, devices will appear as a virtual `COM` port.
 
 On Linux, devices will appear under `/dev/`.
 
-On OS X, `/dev/tty.SLAB_USBtoUARTx`.
+On macOS, `/dev/tty.SLAB_USBtoUARTx`.
 
 On Linux:
 
