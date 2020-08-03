@@ -527,7 +527,7 @@ static inline bool _in_dsts(const _nib_offl_entry_t *dst)
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 static inline unsigned _idx_dsts(const _nib_offl_entry_t *dst)
 {
-    return (dst - _dsts) / sizeof(*dst);
+    return (dst - _dsts);
 }
 
 static inline bool _in_abrs(const _nib_abr_entry_t *abr)
