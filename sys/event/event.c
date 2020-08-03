@@ -96,14 +96,20 @@ event_t *event_get(event_queue_t *queue)
     return result;
 }
 
-event_t *event_wait(event_queue_t *queue)
+event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
 {
-    assert(queue);
+    assert(queues && n_queues);
     event_t *result;
 
     do {
         unsigned state = irq_disable();
-        result = (event_t *)clist_lpop(&queue->event_list);
+        for (size_t i = 0; i < n_queues; i++) {
+            result = container_of(clist_lpop(&queues[i].event_list),
+                                  event_t, list_node);
+            if (result) {
+                break;
+            }
+        }
         irq_restore(state);
         if (result == NULL) {
             thread_flags_wait_any(THREAD_FLAG_EVENT);
@@ -152,11 +158,11 @@ event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout)
 }
 #endif
 
-void event_loop(event_queue_t *queue)
+void event_loop_multi(event_queue_t *queues, size_t n_queues)
 {
     event_t *event;
 
-    while ((event = event_wait(queue))) {
+    while ((event = event_wait_multi(queues, n_queues))) {
         event->handler(event);
     }
 }

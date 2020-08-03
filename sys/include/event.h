@@ -216,6 +216,35 @@ void event_cancel(event_queue_t *queue, event_t *event);
 event_t *event_get(event_queue_t *queue);
 
 /**
+ * @brief   Get next event from the given event queues, blocking
+ *
+ * This function will block until an event becomes available. If more than one
+ * queue contains an event, the queue with the lowest index is chosen. Thus,
+ * a lower index in the @p queues array translates into a higher priority of
+ * the queue.
+ *
+ * In order to handle an event retrieved using this function,
+ * call event->handler(event).
+ *
+ * @warning There can only be a single waiter on a queue!
+ *
+ * @note    This function *can* be suitable for having a single thread
+ *          handling both real-time and non-real-time events. However, a real
+ *          time event can be delayed for the whole duration a single
+ *          non-real-time event takes (in addition to all other sources of
+ *          latency). Thus, the slowest to handle non-real-time event must still
+ *          execute fast enough to add an amount of latency (on top of other
+ *          sources of latency) that is acceptable to the real-time event with
+ *          the strictest requirements.
+ *
+ * @param[in]   queues      Array of event queues to get event from
+ * @param[in]   n_queues    Number of event queues passed in @p queues
+ *
+ * @returns     pointer to next event
+ */
+event_t *event_wait_multi(event_queue_t *queues, size_t n_queues);
+
+/**
  * @brief   Get next event from event queue, blocking
  *
  * This function will block until an event becomes available.
@@ -223,13 +252,16 @@ event_t *event_get(event_queue_t *queue);
  * In order to handle an event retrieved using this function,
  * call event->handler(event).
  *
- * @note    There can only be a single waiter on a queue!
+ * @warning     There can only be a single waiter on a queue!
  *
  * @param[in]   queue   event queue to get event from
  *
  * @returns     pointer to next event
  */
-event_t *event_wait(event_queue_t *queue);
+static inline event_t *event_wait(event_queue_t *queue)
+{
+    return event_wait_multi(queue, 1);
+}
 
 #if defined(MODULE_XTIMER) || defined(DOXYGEN)
 /**
@@ -256,6 +288,29 @@ event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout);
 #endif
 
 /**
+ * @brief   Simple event loop with multiple queues
+ *
+ * This function will forever sit in a loop, waiting for events to be queued
+ * and executing their handlers. If more than one queue contains an event, the
+ * queue with the lowest index is chosen. Thus, a lower index in the @p queues
+ * array translates into a higher priority of the queue.
+ *
+ * It is pretty much defined as:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ *     while ((event = event_wait_multi(queues, n_queues))) {
+ *         event->handler(event);
+ *     }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * @see event_wait_multi
+ *
+ * @param[in]   queues      Event queues to process
+ * @param[in]   n_queues    Number of queues passed with @p queues
+ */
+void event_loop_multi(event_queue_t *queues, size_t n_queues);
+
+/**
  * @brief   Simple event loop
  *
  * This function will forever sit in a loop, waiting for events to be queued
@@ -271,7 +326,10 @@ event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout);
  *
  * @param[in]   queue   event queue to process
  */
-void event_loop(event_queue_t *queue);
+static inline void event_loop(event_queue_t *queue)
+{
+    event_loop_multi(queue, 1);
+}
 
 #ifdef __cplusplus
 }
