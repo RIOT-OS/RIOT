@@ -96,10 +96,8 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_add(
                         while (tmp->next != NULL) {
                             if (tmp == base->ints) {
                                 tmp = NULL;
+                                break;
                             }
-                            /* cppcheck-suppress nullPointer
-                             * (reason: possible bug in cppcheck, tmp can't
-                             * clearly be a NULL pointer here) */
                             tmp = tmp->next;
                         }
                         if (tmp != NULL) {
