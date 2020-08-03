@@ -82,7 +82,7 @@ static const struct {
 /* utility functions */
 static void _print_iface_name(netif_t *iface)
 {
-    char name[NETIF_NAMELENMAX];
+    char name[CONFIG_NETIF_NAMELENMAX];
     netif_get_name(iface, name);
     printf("%s", name);
 }

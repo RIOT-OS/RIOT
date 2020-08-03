@@ -43,11 +43,17 @@ extern "C" {
 #endif
 
 /**
- * @brief   Maximum length for an interface name
+ * @defgroup net_netif_conf Network interfaces compile configurations
+ * @ingroup  config
+ * @{
  */
-#ifndef NETIF_NAMELENMAX
-#define NETIF_NAMELENMAX    (8U)
+/**
+ * @brief    Maximum length for an interface name
+ */
+#ifndef CONFIG_NETIF_NAMELENMAX
+#define CONFIG_NETIF_NAMELENMAX    (8U)
 #endif
+/** @} */
 
 /**
  * @brief Network interface descriptor.
@@ -75,14 +81,14 @@ netif_t *netif_iter(netif_t *last);
  * @brief   Gets name of an interface
  *
  * @pre `name != NULL`
- * @pre name holds at least @ref NETIF_NAMELENMAX characters
+ * @pre name holds at least @ref CONFIG_NETIF_NAMELENMAX characters
  *
  * @note    Supposed to be implemented by the networking module. `name` must be
  *          zero-terminated in the result!
  *
  * @param[in] netif A network interface.
  * @param[out] name The name of the interface. Must not be `NULL`. Must at least
- *                  hold @ref NETIF_NAMELENMAX bytes.
+ *                  hold @ref CONFIG_NETIF_NAMELENMAX bytes.
  *
  * @return  length of @p name on success
  */
