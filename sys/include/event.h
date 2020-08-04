@@ -97,10 +97,12 @@
 #define EVENT_H
 
 #include <stdint.h>
+#include <string.h>
 
+#include "assert.h"
+#include "clist.h"
 #include "irq.h"
 #include "thread_flags.h"
-#include "clist.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -156,14 +158,23 @@ typedef struct {
  *
  * @param[out]  queue   event queue object to initialize
  */
-void event_queue_init(event_queue_t *queue);
+static inline void event_queue_init(event_queue_t *queue)
+{
+    assert(queue);
+    memset(queue, '\0', sizeof(*queue));
+    queue->waiter = (thread_t *)sched_active_thread;
+}
 
 /**
  * @brief   Initialize an event queue not binding it to a thread
  *
  * @param[out]  queue   event queue object to initialize
  */
-void event_queue_init_detached(event_queue_t *queue);
+static inline void event_queue_init_detached(event_queue_t *queue)
+{
+    assert(queue);
+    memset(queue, '\0', sizeof(*queue));
+}
 
 /**
  * @brief   Bind an event queue to the calling thread
@@ -175,7 +186,11 @@ void event_queue_init_detached(event_queue_t *queue);
  *
  * @param[out]  queue   event queue object to bind to a thread
  */
-void event_queue_claim(event_queue_t *queue);
+static inline void event_queue_claim(event_queue_t *queue)
+{
+    assert(queue && (queue->waiter == NULL));
+    queue->waiter = (thread_t *)sched_active_thread;
+}
 
 /**
  * @brief   Queue an event
@@ -308,7 +323,14 @@ event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout);
  * @param[in]   queues      Event queues to process
  * @param[in]   n_queues    Number of queues passed with @p queues
  */
-void event_loop_multi(event_queue_t *queues, size_t n_queues);
+static inline void event_loop_multi(event_queue_t *queues, size_t n_queues)
+{
+    event_t *event;
+
+    while ((event = event_wait_multi(queues, n_queues))) {
+        event->handler(event);
+    }
+}
 
 /**
  * @brief   Simple event loop

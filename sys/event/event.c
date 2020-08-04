@@ -33,25 +33,6 @@
 #include "xtimer.h"
 #endif
 
-void event_queue_init_detached(event_queue_t *queue)
-{
-    assert(queue);
-    memset(queue, '\0', sizeof(*queue));
-}
-
-void event_queue_init(event_queue_t *queue)
-{
-    assert(queue);
-    memset(queue, '\0', sizeof(*queue));
-    queue->waiter = (thread_t *)sched_active_thread;
-}
-
-void event_queue_claim(event_queue_t *queue)
-{
-    assert(queue && (queue->waiter == NULL));
-    queue->waiter = (thread_t *)sched_active_thread;
-}
-
 void event_post(event_queue_t *queue, event_t *event)
 {
     assert(queue && event);
@@ -152,12 +133,3 @@ event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout)
     return _wait_timeout(queue, &timer);
 }
 #endif
-
-void event_loop_multi(event_queue_t *queues, size_t n_queues)
-{
-    event_t *event;
-
-    while ((event = event_wait_multi(queues, n_queues))) {
-        event->handler(event);
-    }
-}
