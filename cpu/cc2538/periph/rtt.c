@@ -24,6 +24,9 @@
 #include "cpu.h"
 #include "periph/rtt.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 #define SMWDTHROSC_STLOAD_STLOAD_MASK  (0x00000001)
 
 /* allocate memory for alarm and overflow callbacks + args */
@@ -31,6 +34,14 @@ static rtt_cb_t alarm_cb = NULL;
 static void *alarm_arg;
 static rtt_cb_t overflow_cb = NULL;
 static void *overflow_arg;
+
+static uint32_t rtt_alarm;
+static uint32_t rtt_offset;
+
+static enum {
+    RTT_ALARM,
+    RTT_OVERFLOW
+} rtt_next_alarm;
 
 static inline void _rtt_irq_enable(void)
 {
@@ -60,12 +71,38 @@ void rtt_init(void)
     rtt_poweron();
 }
 
+static inline uint32_t _rtt_get_counter(void)
+{
+    return ((SMWDTHROSC_ST0 & 0xFF)
+         | ((SMWDTHROSC_ST1 & 0xFF) << 8)
+         | ((SMWDTHROSC_ST2 & 0xFF) << 16)
+         | ((SMWDTHROSC_ST3 & 0xFF) << 24));
+}
+
 uint32_t rtt_get_counter(void)
 {
-    return ((SMWDTHROSC_ST0 & 0xFF) |
-            ((SMWDTHROSC_ST1 & 0xFF) << 8) |
-            ((SMWDTHROSC_ST2 & 0xFF) << 16) |
-            ((SMWDTHROSC_ST3 & 0xFF) << 24));
+    return _rtt_get_counter() - rtt_offset;
+}
+
+void rtt_set_counter(uint32_t counter)
+{
+    rtt_alarm -= rtt_offset;
+    rtt_offset = _rtt_get_counter() + counter;
+    rtt_alarm += rtt_offset;
+
+    /* re-set the overflow callback */
+    if (overflow_cb) {
+        rtt_set_overflow_cb(overflow_cb, overflow_arg);
+    }
+}
+
+static void _set_alarm(uint32_t alarm)
+{
+    while (!(SMWDTHROSC_STLOAD & SMWDTHROSC_STLOAD_STLOAD_MASK)) {}
+    SMWDTHROSC_ST3 = (alarm >> 24) & 0xFF;
+    SMWDTHROSC_ST2 = (alarm >> 16) & 0xFF;
+    SMWDTHROSC_ST1 = (alarm >>  8) & 0xFF;
+    SMWDTHROSC_ST0 = alarm & 0xFF;
 }
 
 void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
@@ -73,19 +110,29 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     assert(cb && !(alarm & ~RTT_MAX_VALUE));
 
     unsigned irq = irq_disable();
+    uint32_t now = _rtt_get_counter();
 
-    /* set alarm value */
-    while (!(SMWDTHROSC_STLOAD & SMWDTHROSC_STLOAD_STLOAD_MASK)) {}
-    SMWDTHROSC_ST3 = (alarm >> 24) & 0xFF;
-    SMWDTHROSC_ST2 = (alarm >> 16) & 0xFF;
-    SMWDTHROSC_ST1 = (alarm >>  8) & 0xFF;
-    SMWDTHROSC_ST0 = alarm & 0xFF;
+    rtt_alarm = alarm + rtt_offset;
 
     /* set callback*/
     alarm_cb = cb;
     alarm_arg = arg;
 
+    DEBUG("rtt_set_alarm(%lu), alarm in %lu ticks, overflow in %lu ticks\n",
+          alarm, rtt_alarm - now, rtt_offset - now);
+
+    /* only set overflow alarm if it happens before the scheduled alarm */
+    if (overflow_cb == NULL || (rtt_offset - now >= rtt_alarm - now)) {
+        rtt_next_alarm = RTT_ALARM;
+        _set_alarm(rtt_alarm);
+    }
+
     irq_restore(irq);
+}
+
+uint32_t rtt_get_alarm(void)
+{
+    return rtt_alarm - rtt_offset;
 }
 
 void rtt_clear_alarm(void)
@@ -100,17 +147,17 @@ void rtt_clear_alarm(void)
 void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
 {
     unsigned irq = irq_disable();
-
-    /* set threshold to RTT_MAX_VALUE */
-    while (!(SMWDTHROSC_STLOAD & SMWDTHROSC_STLOAD_STLOAD_MASK)) {}
-    SMWDTHROSC_ST3 = (RTT_MAX_VALUE >> 24) & 0xFF;
-    SMWDTHROSC_ST2 = (RTT_MAX_VALUE >> 16) & 0xFF;
-    SMWDTHROSC_ST1 = (RTT_MAX_VALUE >>  8) & 0xFF;
-    SMWDTHROSC_ST0 = RTT_MAX_VALUE & 0xFF;
+    uint32_t now = _rtt_get_counter();
 
     /* set callback*/
     overflow_cb = cb;
     overflow_arg = arg;
+
+    /* only set overflow alarm if it happens before the scheduled alarm */
+    if (alarm_cb == NULL || (rtt_alarm - now > rtt_offset - now)) {
+        rtt_next_alarm = RTT_OVERFLOW;
+        _set_alarm(rtt_offset);
+    }
 
     irq_restore(irq);
 }
@@ -126,17 +173,40 @@ void rtt_clear_overflow_cb(void)
 
 void isr_sleepmode(void)
 {
-    if (alarm_cb) {
+    rtt_cb_t tmp;
+    bool both = (rtt_alarm == rtt_offset);
+
+    switch (rtt_next_alarm) {
+    case RTT_ALARM:
         /* 'consume' the callback (as it might be set again in the cb) */
-        rtt_cb_t tmp = alarm_cb;
+        tmp = alarm_cb;
         alarm_cb = NULL;
         tmp(alarm_arg);
-    }
-    else if (overflow_cb) {
+
+        if (!both) {
+            break;
+        } /* fall-through */
+    case RTT_OVERFLOW:
         /* 'consume' the callback (as it might be set again in the cb) */
-        rtt_cb_t tmp = overflow_cb;
+        tmp = overflow_cb;
         overflow_cb = NULL;
         tmp(overflow_arg);
+        break;
     }
+
+    uint32_t now = _rtt_get_counter();
+
+    if (alarm_cb && (rtt_offset - now >= rtt_alarm - now)) {
+        DEBUG("rtt: next alarm in %lu ticks (RTT)\n", rtt_alarm - now);
+
+        rtt_next_alarm = RTT_ALARM;
+        _set_alarm(rtt_alarm);
+    } else if (overflow_cb && (rtt_alarm - now > rtt_offset - now)) {
+        DEBUG("rtt: next alarm in %lu ticks (OVERFLOW)\n", rtt_offset - now);
+
+        rtt_next_alarm = RTT_OVERFLOW;
+        _set_alarm(rtt_offset);
+    }
+
     cortexm_isr_end();
 }
