@@ -121,6 +121,9 @@ endif
 ifneq (,$(filter sock_async_event,$(USEMODULE)))
   DIRS += net/sock/async/event
 endif
+ifneq (,$(filter sock_async_msg,$(USEMODULE)))
+  DIRS += net/sock/async/msg
+endif
 ifneq (,$(filter sock_util,$(USEMODULE)))
   DIRS += net/sock
 endif
