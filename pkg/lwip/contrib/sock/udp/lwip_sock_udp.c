@@ -148,13 +148,14 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **ctx,
             memcpy(&remote->addr, &buf->addr, addr_len);
             remote->port = buf->port;
         }
-        if ((aux != NULL) && IS_USED(MODULE_SOCK_AUX_LOCAL) &&
-            IS_ACTIVE(LWIP_NETBUF_RECVINFO)) {
+#ifdef MODULE_SOCK_AUX_LOCAL
+        if ((aux != NULL) && IS_ACTIVE(LWIP_NETBUF_RECVINFO)) {
             aux->flags |= SOCK_AUX_HAS_LOCAL;
             aux->local.family = family;
             memcpy(&aux->local.addr, &buf->toaddr, addr_len);
             aux->local.port = sock->base.conn->pcb.udp->local_port;
         }
+#endif /* MODULE_SOCK_AUX_LOCAL */
     }
     *data = buf->ptr->payload;
     *ctx = buf;
