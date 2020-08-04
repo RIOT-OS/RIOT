@@ -1,1 +1,2 @@
 */vendor/*
+dist/tools/fixdep/fixdep.c
