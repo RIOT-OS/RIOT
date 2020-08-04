@@ -28,7 +28,7 @@ OPENOCD_ADAPTER_INIT ?= \
   -c 'adapter driver bcm2835gpio' \
   -c 'bcm2835gpio_peripheral_base $(PERIPH_BASE)' \
   -c 'bcm2835gpio_speed_coeffs $(SPEED_COEFF) $(SPEED_OFFSET)' \
-  -c 'bcm2835gpio_swd_nums $(SWCLK_PIN ) $(SWDIO_PIN)' \
+  -c 'bcm2835gpio_swd_nums $(SWCLK_PIN) $(SWDIO_PIN)' \
   -c 'bcm2835gpio_srst_num $(SRST_PIN)'
 
 # Default to SWD
