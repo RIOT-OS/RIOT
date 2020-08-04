@@ -402,6 +402,15 @@ typedef enum {
 
 /**
  * @brief   I2C device configuration
+ *          The frequency f() of the clock `gclk_src` must fulfill the condition
+ *
+ *              4 * speed ≤ f(gclk_src) ≤ 512 * speed
+ *
+ *          if speed ≤ 1 MHz and
+ *
+ *             12 * speed ≤ f(gclk_src) ≤ 520 * speed
+ *
+ *          if speed > 1 MHz
  */
 typedef struct {
     SercomI2cm *dev;        /**< pointer to the used I2C device */
