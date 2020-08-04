@@ -164,8 +164,8 @@
  * The following example illustrates a receive sequence triggered by an
  * external interrupt:
  *
- * 1. packet arrives for device
- * 2. The driver previously registered an ISR for handling received packets.
+ * 1. frame arrives for device
+ * 2. The driver previously registered an ISR for handling received frames.
  *    This ISR then calls @ref netdev_t::event_callback "netdev->event_callback()"
  *    with `event:= `@ref NETDEV_EVENT_ISR (from Interrupt Service Routine)
  *    which wakes up event handler
@@ -175,7 +175,7 @@
  *    @ref netdev_t::event_callback "netdev->event_callback()" with
  *    `event:= `@ref NETDEV_EVENT_RX_COMPLETE
  * 5. @ref netdev_t::event_callback "netdev->event_callback()" uses
- *    @ref netdev_driver_t::recv "netdev->driver->recv()" to fetch packet
+ *    @ref netdev_driver_t::recv "netdev->driver->recv()" to fetch frame
  *
  * ![RX event example](riot-netdev-rx.svg)
  *
@@ -232,13 +232,13 @@ enum {
  */
 typedef enum {
     NETDEV_EVENT_ISR,                       /**< driver needs it's ISR handled */
-    NETDEV_EVENT_RX_STARTED,                /**< started to receive a packet */
-    NETDEV_EVENT_RX_COMPLETE,               /**< finished receiving a packet */
-    NETDEV_EVENT_TX_STARTED,                /**< started to transfer a packet */
-    NETDEV_EVENT_TX_COMPLETE,               /**< transfer packet complete */
-    NETDEV_EVENT_TX_COMPLETE_DATA_PENDING,  /**< transfer packet complete and data pending flag */
+    NETDEV_EVENT_RX_STARTED,                /**< started to receive a frame */
+    NETDEV_EVENT_RX_COMPLETE,               /**< finished receiving a frame */
+    NETDEV_EVENT_TX_STARTED,                /**< started to transfer a frame */
+    NETDEV_EVENT_TX_COMPLETE,               /**< transfer frame complete */
+    NETDEV_EVENT_TX_COMPLETE_DATA_PENDING,  /**< transfer frame complete and data pending flag */
     NETDEV_EVENT_TX_NOACK,                  /**< ACK requested but not received */
-    NETDEV_EVENT_TX_MEDIUM_BUSY,            /**< couldn't transfer packet */
+    NETDEV_EVENT_TX_MEDIUM_BUSY,            /**< couldn't transfer frame */
     NETDEV_EVENT_LINK_UP,                   /**< link established */
     NETDEV_EVENT_LINK_DOWN,                 /**< link gone */
     NETDEV_EVENT_TX_TIMEOUT,                /**< timeout when sending */
@@ -250,13 +250,13 @@ typedef enum {
 } netdev_event_t;
 
 /**
- * @brief   Received packet status information for most radios
+ * @brief   Received frame status information for most radios
  *
  * May be different for certain radios.
  */
 struct netdev_radio_rx_info {
-    int16_t rssi;       /**< RSSI of a received packet in dBm */
-    uint8_t lqi;        /**< LQI of a received packet */
+    int16_t rssi;       /**< RSSI of a received frame in dBm */
+    uint8_t lqi;        /**< LQI of a received frame */
 };
 
 /**
@@ -300,12 +300,12 @@ struct netdev {
  */
 typedef struct netdev_driver {
     /**
-     * @brief Send frame
+     * @brief   Send frame
      *
-     * @pre `(dev != NULL) && (iolist != NULL`
+     * @pre     `(dev != NULL) && (iolist != NULL)`
      *
-     * @param[in] dev       Network device descriptor. Must not be NULL.
-     * @param[in] iolist    IO vector list to send. Elements of this list may
+     * @param[in]   dev     Network device descriptor. Must not be NULL.
+     * @param[in]   iolist  IO vector list to send. Elements of this list may
      *                      have iolist_t::iol_data == NULL or
      *                      iolist_t::iol_size == 0. However, unless otherwise
      *                      specified by the device, the *first* element
@@ -317,58 +317,58 @@ typedef struct netdev_driver {
     int (*send)(netdev_t *dev, const iolist_t *iolist);
 
     /**
-     * @brief Drop a received frame, **OR** get the length of a received frame,
-     *        **OR** get a received frame.
+     * @brief   Drop a received frame, **OR** get the length of a received
+     *          frame, **OR** get a received frame.
      *
-     * @pre `(dev != NULL)`
+     * @pre     `(dev != NULL)`
      *
      * Supposed to be called from
      * @ref netdev_t::event_callback "netdev->event_callback()"
      *
-     * If @p buf == NULL and @p len == 0, returns the packet size -- or an upper
-     * bound estimation of the size -- without dropping the packet.
-     * If @p buf == NULL and @p len > 0, drops the packet and returns the packet
+     * If @p buf == NULL and @p len == 0, returns the frame size -- or an upper
+     * bound estimation of the size -- without dropping the frame.
+     * If @p buf == NULL and @p len > 0, drops the frame and returns the frame
      * size.
      *
      * If called with @p buf != NULL and @p len is smaller than the received
-     * packet:
-     *  - The received packet is dropped
+     * frame:
+     *  - The received frame is dropped
      *  - The content in @p buf becomes invalid. (The driver may use the memory
      *    to implement the dropping - or may not change it.)
      *  - `-ENOBUFS` is returned
      *
      * @param[in]   dev     network device descriptor. Must not be NULL.
-     * @param[out]  buf     buffer to write into or NULL to return the packet
+     * @param[out]  buf     buffer to write into or NULL to return the frame
      *                      size.
      * @param[in]   len     maximum number of bytes to read. If @p buf is NULL
-     *                      the currently buffered packet is dropped when
+     *                      the currently buffered frame is dropped when
      *                      @p len > 0. Must not be 0 when @p buf != NULL.
-     * @param[out] info     status information for the received packet. Might
+     * @param[out]  info    status information for the received frame. Might
      *                      be of different type for different netdev devices.
      *                      May be NULL if not needed or applicable.
      *
-     * @return `-ENOBUFS` if supplied buffer is too small
-     * @return number of bytes read if buf != NULL
-     * @return packet size (or upper bound estimation) if buf == NULL
+     * @retval  -ENOBUFS    if supplied buffer is too small
+     * @return  number of bytes read if buf != NULL
+     * @return  frame size (or upper bound estimation) if buf == NULL
      */
     int (*recv)(netdev_t *dev, void *buf, size_t len, void *info);
 
     /**
-     * @brief the driver's initialization function
+     * @brief   the driver's initialization function
      *
-     * @pre `(dev != NULL)`
+     * @pre     `(dev != NULL)`
      *
      * @param[in]   dev     network device descriptor. Must not be NULL.
      *
-     * @return `< 0` on error
-     * @return 0 on success
+     * @retval  <0      on error
+     * @retval  0       on success
      */
     int (*init)(netdev_t *dev);
 
     /**
-     * @brief a driver's user-space ISR handler
+     * @brief   a driver's user-space ISR handler
      *
-     * @pre `(dev != NULL)`
+     * @pre     `(dev != NULL)`
      *
      * This function will be called from a network stack's loop when being
      * notified by netdev_isr.
@@ -377,7 +377,7 @@ typedef struct netdev_driver {
      * @ref netdev_t::event_callback "netdev->event_callback()" for each
      * occurring event.
      *
-     * See receive packet flow description for details.
+     * See receive frame flow description for details.
      *
      * @param[in]   dev     network device descriptor. Must not be NULL.
      */
@@ -386,20 +386,21 @@ typedef struct netdev_driver {
     /**
      * @brief   Get an option value from a given network device
      *
-     * @pre `(dev != NULL)`
-     * @pre for scalar types of @ref netopt_t @p max_len must be of exactly that
-     *      length (see [netopt documentation](@ref net_netopt) for type)
-     * @pre for array types of @ref netopt_t @p max_len must greater or equal the
-     *      required length (see [netopt documentation](@ref net_netopt) for
-     *      type)
+     * @pre     `(dev != NULL)`
+     * @pre     for scalar types of @ref netopt_t @p max_len must be of exactly
+     *          that length (see [netopt documentation](@ref net_netopt) for
+     *          type)
+     * @pre     for array types of @ref netopt_t @p max_len must greater or
+     *          equal the required length (see
+     *          [netopt documentation](@ref net_netopt) for type)
      *
      * @param[in]   dev     network device descriptor
      * @param[in]   opt     option type
      * @param[out]  value   pointer to store the option's value in
      * @param[in]   max_len maximal amount of byte that fit into @p value
      *
-     * @return              number of bytes written to @p value
-     * @return              `-ENOTSUP` if @p opt is not provided by the device
+     * @return  number of bytes written to @p value
+     * @retval  -ENOTSUP    if @p opt is not provided by the device
      */
     int (*get)(netdev_t *dev, netopt_t opt,
                void *value, size_t max_len);
@@ -407,23 +408,23 @@ typedef struct netdev_driver {
     /**
      * @brief   Set an option value for a given network device
      *
-     * @pre `(dev != NULL)`
-     * @pre for scalar types of @ref netopt_t @p value_len must be of exactly
-     *      that length (see [netopt documentation](@ref net_netopt) for type)
-     * @pre for array types of @ref netopt_t @p value_len must lesser or equal
-     *      the required length (see [netopt documentation](@ref net_netopt) for
-     *      type)
+     * @pre     `(dev != NULL)`
+     * @pre     for scalar types of @ref netopt_t @p value_len must be of
+     *          exactly that length (see [netopt documentation](@ref net_netopt)
+     *          for type)
+     * @pre     for array types of @ref netopt_t @p value_len must lesser or
+     *          equal the required length (see
+     *          [netopt documentation](@ref net_netopt) for type)
      *
-     * @param[in] dev       network device descriptor
-     * @param[in] opt       option type
-     * @param[in] value     value to set
-     * @param[in] value_len the length of @p value
+     * @param[in]   dev         network device descriptor
+     * @param[in]   opt         option type
+     * @param[in]   value       value to set
+     * @param[in]   value_len   the length of @p value
      *
-     * @return              number of bytes written to @p value
-     * @return              `-ENOTSUP` if @p opt is not configurable for the
-     *                      device
-     * @return              `-EINVAL` if @p value is an invalid value with
-     *                      regards to @p opt
+     * @return  number of bytes written to @p value
+     * @retval  -ENOTSUP    if @p opt is not configurable for the device
+     * @retval  -EINVAL     if @p value is an invalid value with regards to
+     *                      @p opt
      */
     int (*set)(netdev_t *dev, netopt_t opt,
                const void *value, size_t value_len);
