@@ -136,6 +136,23 @@ static inline uint8_t bitarithm_bits_set_u32(uint32_t v)
 uint8_t bitarithm_bits_set_u32(uint32_t v);
 #endif
 
+/**
+ * @brief   Returns the base-2 logarithm of a power of 2 number
+ * @param[in]   v   Input value, must be a power of two
+ * @return          log2(v)
+ *
+ */
+static inline unsigned bitarithm_log2(unsigned v)
+{
+    assert(bitarithm_bits_set(v) == 1);
+
+#if defined(BITARITHM_HAS_CLZ)
+    return 8 * sizeof(v) - __builtin_clz(v) - 1;
+#else
+    return bitarithm_lsb(v);
+#endif
+}
+
 /* implementations */
 
 static inline unsigned bitarithm_lsb(unsigned v)
