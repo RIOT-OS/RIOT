@@ -229,7 +229,8 @@ def main():
         bp_repo = git.Repo(worktree_dir)
         # Apply commits
         for commit in commits:
-            bp_repo.git.cherry_pick('-x', commit['sha'])
+            bp_repo.git.cherry_pick('-x', '--strategy=recursive', '-X',
+                                    'theirs', commit['sha'])
         # Push to github
         origin = _find_remote(repo, username, REPO)
         print("Pushing branch {} to {}".format(new_branch, origin))
