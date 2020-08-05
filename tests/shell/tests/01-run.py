@@ -27,6 +27,9 @@ EXPECTED_PS = (
     '\t  \d | running  Q |   7'
 )
 
+RIOT_TERMINAL = os.environ.get('RIOT_TERMINAL')
+CLEANTERMS = {"socat"}
+
 # In native we are directly executing the binary (no terminal program). We must
 # therefore use Ctrl-V (DLE or "data link escape") before Ctrl-C to send a
 # literal ETX instead of SIGINT.
@@ -44,7 +47,6 @@ PROMPT = '> '
 CMDS = (
     # test start
     ('start_test', '[TEST_START]'),
-    (CONTROL_C, PROMPT),
     ('\n', PROMPT),
 
     # test simple word separation
@@ -100,6 +102,10 @@ CMDS = (
     ('reboot', 'test_shell.'),
     ('end_test', '[TEST_END]'),
 )
+
+CMDS_CLEANTERM = {
+    (CONTROL_C, PROMPT),
+}
 
 CMDS_REGEX = {'ps'}
 
@@ -181,20 +187,27 @@ def testfunc(child):
     if BOARD == 'native':
         child.crlf = '\n'
 
-    check_startup(child)
-
     bufsize = check_and_get_bufsize(child)
     longline = "_"*bufsize + "verylong"
 
     check_line_exceeded(child, longline)
 
-    check_line_canceling(child)
+    if RIOT_TERMINAL in CLEANTERMS:
+        check_line_canceling(child)
+    else:
+        print("skipping check_line_canceling()")
 
     check_erase_long_line(child, longline)
 
     # loop other defined commands and expected output
     for cmd, expected in CMDS:
         check_cmd(child, cmd, expected)
+
+    if RIOT_TERMINAL in CLEANTERMS:
+        for cmd, expected in CMDS_CLEANTERM:
+            check_cmd(child, cmd, expected)
+    else:
+        print("skipping cleanterm tests")
 
 
 if __name__ == "__main__":
