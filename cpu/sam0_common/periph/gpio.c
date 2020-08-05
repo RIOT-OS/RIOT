@@ -321,6 +321,11 @@ void gpio_irq_enable(gpio_t pin)
     if (exti == -1) {
         return;
     }
+
+    /* clear stale interrupt */
+    _EIC->INTFLAG.reg = (1 << exti);
+
+    /* enable interrupt */
     _EIC->INTENSET.reg = (1 << exti);
 }
 
