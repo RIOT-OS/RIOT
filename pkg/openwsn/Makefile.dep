@@ -43,6 +43,10 @@ ifneq (,$(filter openwsn_cjoin,$(USEMODULE)))
   USEMODULE += openwsn_crypto
 endif
 
+ifneq (,$(filter openwsn_opencoap,$(USEMODULE)))
+  USEMODULE += openwsn_sock_async
+endif
+
 ifneq (,$(filter openwsn_crypto,$(USEMODULE)))
   USEMODULE += crypto_3des
   USEMODULE += cipher_modes
@@ -97,6 +101,20 @@ endif
 
 ifneq (,$(filter openwsn_debugpins,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio_irq
+endif
+
+ifneq (,$(filter sock_udp,$(USEMODULE)))
+  USEMODULE += openwsn_sock_udp
+endif
+
+ifneq (,$(filter openwsn_sock%,$(USEMODULE)))
+  USEMODULE += openwsn_sock
+  USEMODULE += core_mbox
+  USEMODULE += ztimer_usec
+endif
+
+ifneq (,$(filter openwsn_sock_async,$(USEMODULE)))
+  USEMODULE += sock_async
 endif
 
 # This port currently requires setting ISR_STACKSIZE

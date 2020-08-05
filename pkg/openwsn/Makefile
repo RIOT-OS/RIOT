@@ -1,6 +1,6 @@
 PKG_NAME=openwsn
 PKG_URL=https://github.com/openwsn-berkeley/openwsn-fw.git
-PKG_VERSION=028db872c0c60f756e16880a0c86d6282e421c71
+PKG_VERSION=a49f5a34304daa8c013772ca1705f3d7da1e1514
 PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
@@ -13,6 +13,9 @@ IGNORE_MODULES  := openwsn_leds \
                    openwsn_iee802154e_security \
                    openwsn_radio \
                    openwsn_riotos \
+                   openwsn_sock_udp \
+                   openwsn_sock \
+                   openwsn_sock_async \
                    openwsn_serial \
                    openwsn_sctimer \
                    openwsn_sctimer_rtt \
