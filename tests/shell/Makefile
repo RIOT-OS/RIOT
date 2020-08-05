@@ -14,9 +14,6 @@ endif
 # Use a terminal that does not introduce extra characters into the stream.
 RIOT_TERMINAL ?= socat
 
-# chronos is missing a getchar implementation
-BOARD_BLACKLIST += chronos
-
 APP_SHELL_FMT ?= NONE
 
 include $(RIOTBASE)/Makefile.include

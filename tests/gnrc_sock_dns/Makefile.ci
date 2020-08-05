@@ -6,7 +6,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega1284p \
     atmega328p \
-    chronos \
     derfmega128 \
     hifive1 \
     hifive1b \

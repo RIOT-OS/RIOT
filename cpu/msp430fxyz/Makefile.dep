@@ -1,3 +1,2 @@
-USEMODULE += periph stdio_uart
-
+USEMODULE += periph
 include $(RIOTCPU)/msp430_common/Makefile.dep

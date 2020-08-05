@@ -1,1 +1,4 @@
 USEMODULE+=random
+
+# the test takes ages and then reboots on msp430.
+FEATURES_BLACKLIST += arch_msp430

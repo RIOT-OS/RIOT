@@ -1,6 +1,0 @@
-# flasher configuration
-FLASHFILE ?= $(HEXFILE)
-FLASHER = mspdebug
-FFLAGS = rf2500 "prog $(FLASHFILE)"
-
-INCLUDES += -I$(RIOTBOARD)/chronos/drivers/include

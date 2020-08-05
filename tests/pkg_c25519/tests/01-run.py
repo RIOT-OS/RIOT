@@ -17,7 +17,8 @@ from testrunner import TIMEOUT as DEFAULT_TIMEOUT
 BOARD = os.environ['BOARD']
 # Increase timeout on "real" hardware
 # 170 seconds on `arduino-mega2560`
-TIMEOUT = 200 if BOARD != 'native' else DEFAULT_TIMEOUT
+# ~300 seconds on `z1`
+TIMEOUT = 320 if BOARD != 'native' else DEFAULT_TIMEOUT
 
 
 if __name__ == "__main__":

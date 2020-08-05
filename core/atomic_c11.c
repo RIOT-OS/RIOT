@@ -48,7 +48,14 @@
 
 /* GCC documentation refers to the types as I1, I2, I4, I8, I16 */
 typedef uint8_t  I1;
+
+/* the builtins are declared with "unsigned int", but "uint16_t" is typedef'ed
+ * to "short unsigned int" on most platforms where "sizeof(int) == 2." */
+#if __SIZEOF_INT__ == 2
+typedef unsigned int I2;
+#else
 typedef uint16_t I2;
+#endif
 
 /* the builtins are declared with "unsigned int", but "uint32_t" is typedef'ed
  * to "long unsigned int" on most platforms where "sizeof(int) == 4. */

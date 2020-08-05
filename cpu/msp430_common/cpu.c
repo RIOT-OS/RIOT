@@ -117,19 +117,20 @@ char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     --stackptr;
 
     /* initial value for SR */
-
     *stackptr = GIE;
     --stackptr;
 
-    /* set argument to task_func */
-    *stackptr = (unsigned short) arg;
-    --stackptr;
-
     /* Space for registers. */
-    for (unsigned int i = 14; i > 4; i--) {
+    for (unsigned int i = 15; i > 4; i--) {
         *stackptr = i;
         --stackptr;
     }
+
+    /* set arg to R12
+       this was R15 in mspgcc, see https://www.ti.com/lit/an/slaa664/slaa664.pdf
+       stackptr points to R3, so write arg 9 words after that.
+    */
+    stackptr[8] = (intptr_t)arg;
 
     return (char *) stackptr;
 }

@@ -23,5 +23,3 @@
 #include "cpu.h"
 
 volatile int __irq_is_in = 0;
-
-char __isr_stack[ISR_STACKSIZE];

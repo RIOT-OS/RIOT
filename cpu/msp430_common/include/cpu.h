@@ -28,7 +28,6 @@
 
 #include "sched.h"
 #include "thread.h"
-#include "msp430_types.h"
 #include "cpu_conf.h"
 
 #ifdef __cplusplus
@@ -49,11 +48,6 @@ extern "C" {
  * @brief   The current ISR state (inside or not)
  */
 extern volatile int __irq_is_in;
-
-/**
- * @brief   Memory used as stack for the interrupt context
- */
-extern char __isr_stack[ISR_STACKSIZE];
 
 /**
  * @brief   Save the current thread context from inside an ISR
@@ -103,8 +97,9 @@ static inline void __attribute__((always_inline)) __restore_context(void)
  */
 static inline void __attribute__((always_inline)) __enter_isr(void)
 {
+    extern char __stack;    /* defined by linker script to end of RAM */
     __save_context();
-    __asm__("mov.w %0,r1" : : "i"(__isr_stack + ISR_STACKSIZE));
+    __asm__("mov.w %0,r1" : : "i"(&__stack));
     __irq_is_in = 1;
 }
 

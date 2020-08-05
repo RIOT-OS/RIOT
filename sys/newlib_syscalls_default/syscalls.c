@@ -60,11 +60,25 @@
 #define NUM_HEAPS 1
 #endif
 
+#ifdef MODULE_MSP430_COMMON
+/* the msp430 linker scripts define the end of all memory as __stack, which in
+ * turn is used as the initial stack. RIOT also uses __stack as SP on isr
+ * entry.  This logic makes __stack - ISR_STACKSIZE the heap end.
+ */
+extern char __stack;
+extern char __heap_start__;
+#define _sheap __heap_start__
+#define __eheap (char *)((uintptr_t)&__stack - ISR_STACKSIZE)
+
+#else /* MODULE_MSP430_COMMON */
+
 /**
  * @brief manage the heap
  */
 extern char _sheap;                 /* start of the heap */
 extern char _eheap;                 /* end of the heap */
+#define __eheap &_eheap
+#endif
 
 /**
  * @brief Additional heap sections that may be defined in the linkerscript.
@@ -108,7 +122,7 @@ static char *heap_top[NUM_HEAPS] = {
 static const struct heap heaps[NUM_HEAPS] = {
     {
         .start = &_sheap,
-        .end   = &_eheap
+        .end   = __eheap
     },
 #if NUM_HEAPS > 1
     {
@@ -157,7 +171,7 @@ __attribute__((used)) void _fini(void)
  *
  * @param n     the exit code, 0 for all OK, >0 for not OK
  */
-void _exit(int n)
+__attribute__((used)) void _exit(int n)
 {
     LOG_INFO("#! exit %i: powering off\n", n);
     pm_off();

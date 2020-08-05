@@ -20,9 +20,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#if defined(CPU_CC430) || defined(CPU_ESP8266) || defined(CPU_MSP430FXYZ)
-#include <sys/cdefs.h>
-#endif
 
 /* This file contains only #defines, so it is fully compatible with C */
 #include "c11_atomics_compat_cpu.hpp"

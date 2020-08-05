@@ -198,7 +198,4 @@ void board_init(void)
     msb_ports_init();
 
     msp430_set_cpu_speed(CLOCK_CORECLOCK);
-
-    /* finally initialize STDIO */
-    stdio_init();
 }
