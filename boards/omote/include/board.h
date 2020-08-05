@@ -56,12 +56,6 @@
 #define BTN0_MODE       GPIO_IN_PU
 /** @} */
 /**
- * @name  RF Pin definition
- * @{
- */
-#define RF_GPIO      GPIO_PD2
-/** @} */
-/**
  * @name Flash Customer Configuration Area (CCA) parameters
  * @{
  */
