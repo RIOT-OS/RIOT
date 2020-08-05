@@ -192,6 +192,9 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 /**
  * @brief   Enable pin interrupt if configured as interrupt source
  *
+ *          Interrupts that would have occured after @see gpio_irq_disable
+ *          was called will be discarded.
+ *
  * @note    You have to add the module `periph_gpio_irq` to your project to
  *          enable this function
  *
