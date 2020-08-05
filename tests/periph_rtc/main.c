@@ -74,6 +74,8 @@ int main(void)
     printf("This test will display 'Alarm!' every %u seconds for %u times\n",
             PERIOD, REPEAT);
 
+    rtc_init();
+
     /* set RTC */
     print_time("  Setting clock to ", &time);
     rtc_set_time(&time);
