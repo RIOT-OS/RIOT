@@ -837,12 +837,17 @@ endif
 
 ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += nanocoap
-  USEMODULE += sock_async
   USEMODULE += sock_async_event
   USEMODULE += sock_udp
   USEMODULE += sock_util
   USEMODULE += event_callback
   USEMODULE += event_timeout
+ifneq (,$(filter gnrc%,$(USEMODULE)))
+  USEMODULE += gnrc_sock_async
+endif
+ifneq (,$(filter openwsn%,$(USEMODULE)))
+  USEMODULE += openwsn_sock_udp
+endif
 endif
 
 ifneq (,$(filter luid,$(USEMODULE)))
