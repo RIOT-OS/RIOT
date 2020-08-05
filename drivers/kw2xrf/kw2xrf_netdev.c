@@ -71,7 +71,7 @@ static int _init(netdev_t *netdev)
 {
     kw2xrf_t *dev = (kw2xrf_t *)netdev;
 
-    dev->thread = (thread_t *)thread_get(thread_getpid());
+    dev->thread = thread_get_active();
 
     /* initialize SPI and GPIOs */
     if (kw2xrf_init(dev, &_irq_handler)) {

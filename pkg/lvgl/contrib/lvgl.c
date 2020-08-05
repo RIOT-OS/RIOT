@@ -162,6 +162,6 @@ void lvgl_init(screen_dev_t *screen_dev)
 
 void lvgl_wakeup(void)
 {
-    thread_t *tcb = (thread_t *)sched_threads[_task_thread_pid];
+    thread_t *tcb = thread_get(_task_thread_pid);
     thread_flags_set(tcb, LVGL_THREAD_FLAG);
 }
