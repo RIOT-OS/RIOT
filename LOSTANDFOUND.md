@@ -48,7 +48,7 @@ Reasons for removal:
 - Not maintained anymore
 - Not used in GNRC
 
-### boards/chronos [f7ef85d6559eb421d3ddf313c5ad4e5c3c10c64c]
+### boards/chronos [ed3887ac5c1e95308c2827bce3cdca8b0f146c22]
 Author(s):
 - Oliver Hahm <oliver.hahm@inria.fr>
 - Kaspar Schleiser <kaspar@schleiser.de>
