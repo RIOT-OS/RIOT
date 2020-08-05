@@ -356,7 +356,13 @@ kernel_pid_t thread_create(char *stack,
  * @param[in]   pid   Thread to retrieve.
  * @return      `NULL` if the PID is invalid or there is no such thread.
  */
-volatile thread_t *thread_get(kernel_pid_t pid);
+static inline volatile thread_t *thread_get(kernel_pid_t pid)
+{
+    if (pid_is_valid(pid)) {
+        return sched_threads[pid];
+    }
+    return NULL;
+}
 
 /**
  * @brief Returns the status of a process

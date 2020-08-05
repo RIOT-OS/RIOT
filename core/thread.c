@@ -30,14 +30,6 @@
 #include "bitarithm.h"
 #include "sched.h"
 
-volatile thread_t *thread_get(kernel_pid_t pid)
-{
-    if (pid_is_valid(pid)) {
-        return sched_threads[pid];
-    }
-    return NULL;
-}
-
 thread_status_t thread_getstatus(kernel_pid_t pid)
 {
     volatile thread_t *thread = thread_get(pid);
