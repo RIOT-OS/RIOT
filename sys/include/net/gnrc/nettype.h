@@ -92,6 +92,17 @@ typedef enum {
 
     /**
      * @{
+     * @name Link layer
+     */
+#if IS_USED(MODULE_GNRC_NETTYPE_CUSTOM) || defined(DOXYGEN)
+    GNRC_NETTYPE_CUSTOM,            /**< Custom ethertype */
+#endif
+    /**
+     * @}
+     */
+
+    /**
+     * @{
      * @name Network layer
      */
 #if IS_USED(MODULE_GNRC_NETTYPE_IPV6) || defined(DOXYGEN)
@@ -178,6 +189,10 @@ static inline gnrc_nettype_t gnrc_nettype_from_ethertype(uint16_t type)
         case ETHERTYPE_6LOENC:
             return GNRC_NETTYPE_SIXLOWPAN;
 #endif
+#if IS_USED(MODULE_GNRC_NETTYPE_CUSTOM)
+        case ETHERTYPE_CUSTOM:
+            return GNRC_NETTYPE_CUSTOM;
+#endif
         default:
             return GNRC_NETTYPE_UNDEF;
     }
@@ -211,6 +226,10 @@ static inline uint16_t gnrc_nettype_to_ethertype(gnrc_nettype_t type)
 #if IS_USED(MODULE_GNRC_NETTYPE_NDN)
         case GNRC_NETTYPE_NDN:
             return ETHERTYPE_NDN;
+#endif
+#if IS_USED(MODULE_GNRC_NETTYPE_CUSTOM)
+        case GNRC_NETTYPE_CUSTOM:
+            return ETHERTYPE_CUSTOM;
 #endif
         default:
             return ETHERTYPE_UNKNOWN;
