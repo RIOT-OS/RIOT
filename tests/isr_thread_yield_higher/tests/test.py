@@ -11,9 +11,8 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.sendline('a')
     child.expect_exact('Go to sleep')
-    child.expect_exact('Value is 1')
+    child.expect_exact('SUCCESS!')
 
 
 if __name__ == "__main__":

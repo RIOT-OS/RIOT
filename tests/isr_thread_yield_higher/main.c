@@ -51,13 +51,21 @@ int main(void)
     struct cb_arg arg = {.thread=(thread_t *)sched_active_thread, .value=0};
     xtimer_t timer = {.callback=_timer_cb, .arg=&arg};
 
-    printf("Send character to start\n");
-    getchar();
-
     printf("Go to sleep\n");
-    xtimer_set(&timer, 1000000);
+
+    xtimer_set(&timer, TEST_TIME);
+    /* thread_sleep() internally has memory barriers so there is no
+       need to use C11 atomics for arg.value since initialization is
+       on one side of the barrier and checking the state happens on the
+       other side of the barrier */
     thread_sleep();
-    printf("Value is %u\n", arg.value);
+
+    if (arg.value == 1) {
+        puts("SUCCESS!");
+    }
+    else {
+        printf("FAILED!\nValue is %u, but expected 1\n", arg.value);
+    }
 
     return 0;
 }
