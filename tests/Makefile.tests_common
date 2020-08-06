@@ -6,6 +6,8 @@ ifneq (,$(wildcard $(CURDIR)/tests*/.))
   ifeq (1,$(TEST_KCONFIG))
     KCONFIG_ADD_CONFIG += $(RIOTBASE)/tests/test_interactive.config
   endif
+
+  DEFAULT_MODULE += test_utils_print_stack_usage
 endif
 
 ifneq (,$(filter tests_driver_%,$(APPLICATION)))
