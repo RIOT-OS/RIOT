@@ -102,7 +102,7 @@ extern "C" {
  *
  * Source: http://graphics.stanford.edu/~seander/bithacks.html#IntegerLogObvious
  */
-unsigned bitarithm_msb(unsigned v);
+static inline unsigned bitarithm_msb(unsigned v);
 
 /**
  * @brief   Returns the number of the lowest '1' bit in a value
@@ -136,7 +136,32 @@ static inline uint8_t bitarithm_bits_set_u32(uint32_t v)
 uint8_t bitarithm_bits_set_u32(uint32_t v);
 #endif
 
+/**
+ * @brief   Returns the number of the highest '1' bit in a value
+ *
+ *          Internal software implementation for 32 bit platforms,
+ *          use @see bitarithm_msb in application code.
+ * @param[in]   v   Input value
+ * @return          Bit Number
+ */
+unsigned bitarith_msb_32bit_no_native_clz(unsigned v);
+
 /* implementations */
+
+static inline unsigned bitarithm_msb(unsigned v)
+{
+#if defined(BITARITHM_HAS_CLZ)
+    return 8 * sizeof(v) - __builtin_clz(v) - 1;
+#elif ARCH_32_BIT
+    return bitarith_msb_32bit_no_native_clz(v);
+#else
+    unsigned r = 0;
+    while (v >>= 1) { /* unroll for more speed... */
+        ++r;
+    }
+    return r;
+#endif
+}
 
 static inline unsigned bitarithm_lsb(unsigned v)
 #if defined(BITARITHM_LSB_BUILTIN)

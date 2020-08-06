@@ -23,11 +23,9 @@
 
 #include "bitarithm.h"
 
-unsigned bitarithm_msb(unsigned v)
+unsigned bitarith_msb_32bit_no_native_clz(unsigned v)
 {
     register unsigned r; /* result of log2(v) will go here */
-
-#if ARCH_32_BIT
     register unsigned shift;
 
     /* begin{code-style-ignore} */
@@ -37,13 +35,6 @@ unsigned bitarithm_msb(unsigned v)
     shift = (v > 0x3   ) << 1; v >>= shift; r |= shift;
                                             r |= (v >> 1);
     /* end{code-style-ignore} */
-#else
-    r = 0;
-    while (v >>= 1) { /* unroll for more speed... */
-        r++;
-    }
-
-#endif
 
     return r;
 }
