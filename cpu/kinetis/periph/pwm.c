@@ -29,17 +29,11 @@
 #include "cpu.h"
 #include "assert.h"
 #include "periph/pwm.h"
-
-#ifdef MODULE_PWM_LAYERED
 #include "pm_layered.h"
-#else
-#define pm_block(...)
-#define pm_unblock(...)
-#endif
 
 /* This mode will be blocked while PWM is active */
 #ifndef PWM_PM_BLOCKER
-#define PWM_PM_BLOCKER           2
+#define PWM_PM_BLOCKER           KINETIS_PM_STOP
 #endif
 
 /**
