@@ -93,10 +93,15 @@
 /**
  * @brief   Define the number of simultaneously configurable interrupt channels
  *
- * We have configured 4-bits per pin, so we can go up to 15 simultaneous active
- * extern interrupt sources.
+ * We have configured 4-bits per pin, so we could go up to 15 simultaneous
+ * active external interrupt sources here.
  */
 #define CTX_NUMOF           (8U)
+
+/**
+ * @brief   The pin has no context associated with it
+ */
+#define CTX_NONE            (-1)
 
 /**
  * @brief   Interrupt context data
@@ -117,6 +122,11 @@ static isr_ctx_t isr_ctx[CTX_NUMOF];
 
 /**
  * @brief   Allocation of 4 bit per pin to map a pin to an interrupt context
+ *
+ * This maps each pin to one of CTX_NUMOF separate contexts, or to CTX_NONE
+ * in case of no context for that pin. Each pin gets 4 bits to specify a context
+ * including the no-context value so we could increase CTX_NUMOF to 16 - 1
+ * before having to refactor isr_map.
  */
 static uint32_t isr_map[ISR_MAP_SIZE];
 
@@ -153,7 +163,12 @@ static inline int pin_num(gpio_t pin)
  */
 static inline int get_ctx(int port, int pin)
 {
-    return ((isr_map[(port * 4) + (pin >> 3)] >> ((pin & 0x7) * 4)) & 0xf) - 1;
+    /* get the ctx_num for the given port and pin, or 0 if no context is set */
+    int ctx_num = ((isr_map[(port * 4) + (pin >> 3)] >> ((pin & 0x7) * 4)) & 0xf);
+
+    /* here we shift ctx_num down by 1 so that -1 can represent no-context
+     * while storing as 0 in the isr_map */
+    return ctx_num - 1;
 }
 
 /**
@@ -166,7 +181,9 @@ static int get_free_ctx(void)
             return i;
         }
     }
-    return -1;
+
+    assert(0); /* ran out of free contexts; increase CTX_NUMOF */
+    return CTX_NONE;
 }
 
 /**
@@ -174,6 +191,10 @@ static int get_free_ctx(void)
  */
 static void write_map(int port, int pin, int ctx)
 {
+    /* here we shift ctx_num up by 1 so that -1 can represent no-context while
+     * storing as 0 in the isr_map */
+    ctx += 1;
+
     isr_map[(port * 4) + (pin >> 3)] &= ~(0xf << ((pin & 0x7) * 4));
     isr_map[(port * 4) + (pin >> 3)] |=  (ctx << ((pin & 0x7) * 4));
 }
@@ -185,7 +206,7 @@ static void ctx_free(int port, int pin)
 {
     int ctx = get_ctx(port, pin);
     /* clear the context pointer for this pin */
-    write_map(port, pin, 0);
+    write_map(port, pin, CTX_NONE);
     /* mark the context entry as free */
     isr_ctx[ctx].cb = NULL;
 }
@@ -304,8 +325,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     isr_ctx[ctx_num].cb = cb;
     isr_ctx[ctx_num].arg = arg;
     isr_ctx[ctx_num].state = flank;
-    /* context map requires ctx_num + 1, as 0 is the no-context value */
-    write_map(port_num(pin), pin_num(pin), ctx_num + 1);
+    write_map(port_num(pin), pin_num(pin), ctx_num);
 
     /* clear interrupt flags */
     port(pin)->ISFR &= ~(1 << pin_num(pin));
