@@ -49,9 +49,9 @@ RD address: {proto}://[fe80::4494:71ff:fec4:9cac]{port}
 
 def test_cord_ep_parser_empty():
     reginfo_parser = riotctrl_shell.cord_ep.CordEpRegistrationInfoParser()
-    assert reginfo_parser.parse("") is None
+    assert not reginfo_parser.parse("")
     discover_parser = riotctrl_shell.cord_ep.CordEpDiscoverParser()
-    assert discover_parser.parse("") is None
+    assert not discover_parser.parse("")
 
 
 @pytest.mark.parametrize(
