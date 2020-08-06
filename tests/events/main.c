@@ -128,9 +128,8 @@ static void *claiming_thread(void *arg)
     event_queue_t *dqs = arg;
 
     printf("claiming event queues %p\n", (void *)dqs);
-    for (size_t i = 0; i < DELAYED_QUEUES_NUMOF; i++) {
-        event_queue_claim(&dqs[i]);
-    }
+    event_queues_claim(dqs, DELAYED_QUEUES_NUMOF);
+
     printf("launching event queue for queues %p\n", (void *)dqs);
     event_loop_multi(dqs, DELAYED_QUEUES_NUMOF);
 

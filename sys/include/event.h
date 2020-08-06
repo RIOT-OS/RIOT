@@ -97,10 +97,12 @@
 #define EVENT_H
 
 #include <stdint.h>
+#include <string.h>
 
+#include "assert.h"
+#include "clist.h"
 #include "irq.h"
 #include "thread_flags.h"
-#include "clist.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -149,6 +151,26 @@ typedef struct {
     thread_t *waiter;           /**< thread ownning event queue         */
 } event_queue_t;
 
+
+/**
+ * @brief   Initialize an array of event queues
+ *
+ * This will set the calling thread as owner of each queue in @p queues.
+ *
+ * @param[out]  queues      event queue objects to initialize
+ * @param[in]   n_queues    number of queues in @p queues
+ */
+static inline void event_queues_init(event_queue_t *queues,
+                                          size_t n_queues)
+{
+    assert(queues && n_queues);
+    thread_t *me = (thread_t *)sched_active_thread;
+    for (size_t i = 0; i < n_queues; i++) {
+        memset(&queues[i], '\0', sizeof(queues[0]));
+        queues[i].waiter = me;
+    }
+}
+
 /**
  * @brief   Initialize an event queue
  *
@@ -156,14 +178,56 @@ typedef struct {
  *
  * @param[out]  queue   event queue object to initialize
  */
-void event_queue_init(event_queue_t *queue);
+static inline void event_queue_init(event_queue_t *queue)
+{
+    event_queues_init(queue, 1);
+}
+
+/**
+ * @brief   Initialize an array of event queues not binding it to a thread
+ *
+ * @param[out]  queues      event queue objects to initialize
+ * @param[in]   n_queues    number of queues in @p queues
+ */
+static inline void event_queues_init_detached(event_queue_t *queues,
+                                             size_t n_queues)
+{
+    assert(queues);
+    for (size_t i = 0; i < n_queues; i++) {
+        memset(&queues[i], '\0', sizeof(queues[0]));
+    }
+}
 
 /**
  * @brief   Initialize an event queue not binding it to a thread
  *
  * @param[out]  queue   event queue object to initialize
  */
-void event_queue_init_detached(event_queue_t *queue);
+static inline void event_queue_init_detached(event_queue_t *queue)
+{
+    event_queues_init_detached(queue, 1);
+}
+
+/**
+ * @brief   Bind an array of event queues to the calling thread
+ *
+ * This function must only be called once and only if the given queue is not
+ * yet bound to a thread.
+ *
+ * @pre     (queues[i].waiter == NULL for i in {0, ..., n_queues - 1})
+ *
+ * @param[out]  queues      event queue objects to bind to a thread
+ * @param[in]   n_queues    number of queues in @p queues
+ */
+static inline void event_queues_claim(event_queue_t *queues, size_t n_queues)
+{
+    assert(queues);
+    thread_t *me = (thread_t *)sched_active_thread;
+    for (size_t i = 0; i < n_queues; i++) {
+        assert(queues[i].waiter == NULL);
+        queues[i].waiter = me;
+    }
+}
 
 /**
  * @brief   Bind an event queue to the calling thread
@@ -175,7 +239,10 @@ void event_queue_init_detached(event_queue_t *queue);
  *
  * @param[out]  queue   event queue object to bind to a thread
  */
-void event_queue_claim(event_queue_t *queue);
+static inline void event_queue_claim(event_queue_t *queue)
+{
+    event_queues_claim(queue, 1);
+}
 
 /**
  * @brief   Queue an event
@@ -308,7 +375,14 @@ event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout);
  * @param[in]   queues      Event queues to process
  * @param[in]   n_queues    Number of queues passed with @p queues
  */
-void event_loop_multi(event_queue_t *queues, size_t n_queues);
+static inline void event_loop_multi(event_queue_t *queues, size_t n_queues)
+{
+    event_t *event;
+
+    while ((event = event_wait_multi(queues, n_queues))) {
+        event->handler(event);
+    }
+}
 
 /**
  * @brief   Simple event loop
