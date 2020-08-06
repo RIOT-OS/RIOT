@@ -52,7 +52,7 @@ static void _thread_flags_wait(thread_flags_t mask, thread_t *thread,
 
 thread_flags_t thread_flags_clear(thread_flags_t mask)
 {
-    thread_t *me = (thread_t *)sched_active_thread;
+    thread_t *me = thread_get_active();
 
     mask = _thread_flags_clear_atomic(me, mask);
     DEBUG("thread_flags_clear(): pid %" PRIkernel_pid " clearing 0x%08x\n",
@@ -62,7 +62,7 @@ thread_flags_t thread_flags_clear(thread_flags_t mask)
 
 static void _thread_flags_wait_any(thread_flags_t mask)
 {
-    thread_t *me = (thread_t *)sched_active_thread;
+    thread_t *me = thread_get_active();
     unsigned state = irq_disable();
 
     if (!(me->flags & mask)) {
@@ -75,7 +75,7 @@ static void _thread_flags_wait_any(thread_flags_t mask)
 
 thread_flags_t thread_flags_wait_any(thread_flags_t mask)
 {
-    thread_t *me = (thread_t *)sched_active_thread;
+    thread_t *me = thread_get_active();
 
     _thread_flags_wait_any(mask);
     return _thread_flags_clear_atomic(me, mask);
@@ -84,7 +84,7 @@ thread_flags_t thread_flags_wait_any(thread_flags_t mask)
 thread_flags_t thread_flags_wait_one(thread_flags_t mask)
 {
     _thread_flags_wait_any(mask);
-    thread_t *me = (thread_t *)sched_active_thread;
+    thread_t *me = thread_get_active();
     thread_flags_t tmp = me->flags & mask;
     /* clear all but least significant bit */
     tmp &= (~tmp + 1);
@@ -94,7 +94,7 @@ thread_flags_t thread_flags_wait_one(thread_flags_t mask)
 thread_flags_t thread_flags_wait_all(thread_flags_t mask)
 {
     unsigned state = irq_disable();
-    thread_t *me = (thread_t *)sched_active_thread;
+    thread_t *me = thread_get_active();
 
     if (!((me->flags & mask) == mask)) {
         DEBUG(

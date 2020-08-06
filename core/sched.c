@@ -102,7 +102,7 @@ static void _unschedule(thread_t *active_thread)
 
 int __attribute__((used)) sched_run(void)
 {
-    thread_t *active_thread = (thread_t *)sched_active_thread;
+    thread_t *active_thread = thread_get_active();
 
     if (!IS_USED(MODULE_CORE_IDLE_THREAD)) {
         if (!runqueue_bitcache) {
@@ -147,7 +147,7 @@ int __attribute__((used)) sched_run(void)
 
     next_thread->status = STATUS_RUNNING;
     sched_active_pid = next_thread->pid;
-    sched_active_thread = (volatile thread_t *)next_thread;
+    sched_active_thread = next_thread;
 
 #ifdef MODULE_MPU_STACK_GUARD
     mpu_configure(
@@ -194,7 +194,7 @@ void sched_set_status(thread_t *process, thread_status_t status)
 
 void sched_switch(uint16_t other_prio)
 {
-    thread_t *active_thread = (thread_t *)sched_active_thread;
+    thread_t *active_thread = thread_get_active();
     uint16_t current_prio = active_thread->priority;
     int on_runqueue = (active_thread->status >= STATUS_ON_RUNQUEUE);
 
@@ -221,13 +221,13 @@ void sched_switch(uint16_t other_prio)
 NORETURN void sched_task_exit(void)
 {
     DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n",
-          sched_active_thread->pid);
+          thread_getpid());
 
     (void)irq_disable();
-    sched_threads[sched_active_pid] = NULL;
+    sched_threads[thread_getpid()] = NULL;
     sched_num_threads--;
 
-    sched_set_status((thread_t *)sched_active_thread, STATUS_STOPPED);
+    sched_set_status(thread_get_active(), STATUS_STOPPED);
 
     sched_active_thread = NULL;
     cpu_switch_context_exit();

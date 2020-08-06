@@ -35,7 +35,7 @@ void cond_init(cond_t *cond)
 void cond_wait(cond_t *cond, mutex_t *mutex)
 {
     unsigned irqstate = irq_disable();
-    thread_t *me = (thread_t *)sched_active_thread;
+    thread_t *me = thread_get_active();
 
     mutex_unlock(mutex);
     sched_set_status(me, STATUS_COND_BLOCKED);

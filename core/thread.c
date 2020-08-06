@@ -32,7 +32,7 @@
 
 thread_status_t thread_getstatus(kernel_pid_t pid)
 {
-    volatile thread_t *thread = thread_get(pid);
+    thread_t *thread = thread_get(pid);
 
     return thread ? thread->status : STATUS_NOT_FOUND;
 }
@@ -40,7 +40,7 @@ thread_status_t thread_getstatus(kernel_pid_t pid)
 const char *thread_getname(kernel_pid_t pid)
 {
 #ifdef DEVELHELP
-    volatile thread_t *thread = thread_get(pid);
+    thread_t *thread = thread_get(pid);
     return thread ? thread->name : NULL;
 #else
     (void)pid;
@@ -55,7 +55,7 @@ void thread_zombify(void)
     }
 
     irq_disable();
-    sched_set_status((thread_t *)sched_active_thread, STATUS_ZOMBIE);
+    sched_set_status(thread_get_active(), STATUS_ZOMBIE);
     irq_enable();
     thread_yield_higher();
 
@@ -70,7 +70,7 @@ int thread_kill_zombie(kernel_pid_t pid)
 
     int result = (int)STATUS_NOT_FOUND;
 
-    thread_t *thread = (thread_t *)thread_get(pid);
+    thread_t *thread = thread_get(pid);
 
     if (!thread) {
         DEBUG("thread_kill: Thread does not exist!\n");
@@ -98,7 +98,7 @@ void thread_sleep(void)
     }
 
     unsigned state = irq_disable();
-    sched_set_status((thread_t *)sched_active_thread, STATUS_SLEEPING);
+    sched_set_status(thread_get_active(), STATUS_SLEEPING);
     irq_restore(state);
     thread_yield_higher();
 }
@@ -109,7 +109,7 @@ int thread_wakeup(kernel_pid_t pid)
 
     unsigned old_state = irq_disable();
 
-    thread_t *thread = (thread_t *)thread_get(pid);
+    thread_t *thread = thread_get(pid);
 
     if (!thread) {
         DEBUG("thread_wakeup: Thread does not exist!\n");
@@ -135,7 +135,7 @@ int thread_wakeup(kernel_pid_t pid)
 void thread_yield(void)
 {
     unsigned old_state = irq_disable();
-    thread_t *me = (thread_t *)sched_active_thread;
+    thread_t *me = thread_get_active();
 
     if (me->status >= STATUS_ON_RUNQUEUE) {
         clist_lpoprpush(&sched_runqueues[me->priority]);
