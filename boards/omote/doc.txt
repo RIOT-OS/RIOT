@@ -79,15 +79,16 @@ adapter or via USB, using the bootloader on the board.
 To be able to flash the board via JTAG you need to install Seggers JFlashLite
 tool. Once you have this in place, you can simply flash by calling
 	$ JFlashLite
-
 ### Flashing via USB
 
 The omote has built-in support to flash over USB using the BSL.It requires to unlock the bootloader by manually pressing the `BSL
 button` and `reset button`
 
+e.g.
+```
 Bash
 $ make BOARD=omote flash
-
+```
 The omote has 13 pinouts to connect boolean,digital and analog sensors based on I2C,UART,and SPI Protocols as well as other sensors or actuators you may need to connect.
 
 More Reading
