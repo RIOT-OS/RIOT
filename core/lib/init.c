@@ -40,6 +40,9 @@
 
 extern int main(void);
 
+static char main_stack[THREAD_STACKSIZE_MAIN];
+static char idle_stack[THREAD_STACKSIZE_IDLE];
+
 static void *main_trampoline(void *arg)
 {
     (void)arg;
@@ -54,11 +57,15 @@ static void *main_trampoline(void *arg)
 
     main();
 
+#ifdef MODULE_TEST_UTILS_PRINT_STACK_USAGE
+    void print_stack_usage_metric(const char *name, void *stack, unsigned max_size);
+    if (IS_USED(MODULE_CORE_IDLE_THREAD)) {
+        print_stack_usage_metric("idle", idle_stack, THREAD_STACKSIZE_IDLE);
+    }
+#endif
+
     return NULL;
 }
-
-static char main_stack[THREAD_STACKSIZE_MAIN];
-static char idle_stack[THREAD_STACKSIZE_IDLE];
 
 static void *idle_thread(void *arg)
 {
