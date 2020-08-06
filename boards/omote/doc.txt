@@ -84,10 +84,9 @@ tool. Once you have this in place, you can simply flash by calling
 The omote has built-in support to flash over USB using the BSL.It requires to unlock the bootloader by manually pressing the `BSL
 button` and `reset button`
 
-e.g.
-```
-Bash
-$ make BOARD=omote flash
+e.g
+```bash
+make BOARD=omote flash
 ```
 The omote has 13 pinouts to connect boolean,digital and analog sensors based on I2C,UART,and SPI Protocols as well as other sensors or actuators you may need to connect.
 
