@@ -26,6 +26,7 @@
  * @}
  */
 
+#include "bme.h"
 #include "cpu.h"
 #include "assert.h"
 #include "periph/pwm.h"
@@ -39,7 +40,7 @@
 /**
  * @brief   Keeps track of whether PWM is active for power management
  */
-static bool _is_powered_on[PWM_NUMOF];
+static uint8_t _is_powered_on;
 
 #define PRESCALER_MAX       (7U)
 
@@ -57,12 +58,12 @@ static inline TPM_Type *tpm(pwm_t pwm)
 
 static void poweron(pwm_t pwm)
 {
-    if (_is_powered_on[pwm]) {
+    if (_is_powered_on & (1 << pwm)) {
         return;
     }
 
     pm_block(PWM_PM_BLOCKER);
-    _is_powered_on[pwm] = true;
+    bit_set8(&_is_powered_on, pwm);
 
 #ifdef FTM0
     int ftm = pwm_config[pwm].ftm_num;
@@ -210,12 +211,12 @@ void pwm_poweroff(pwm_t pwm)
 {
     assert(pwm < PWM_NUMOF);
 
-    if (!_is_powered_on[pwm]) {
+    if (!(_is_powered_on & (1 << pwm))) {
         return;
     }
 
     pm_unblock(PWM_PM_BLOCKER);
-    _is_powered_on[pwm] = false;
+    bit_clear8(&_is_powered_on, pwm);
 
 #ifdef FTM0
 
