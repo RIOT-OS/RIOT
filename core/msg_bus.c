@@ -37,7 +37,7 @@ void msg_bus_attach(msg_bus_t *bus, msg_bus_entry_t *entry)
 
     entry->next.next = NULL;
     entry->event_mask = 0;
-    entry->pid = sched_active_pid;
+    entry->pid = thread_getpid();
 
     state = irq_disable();
     list_add(&bus->subs, &entry->next);
@@ -62,7 +62,7 @@ msg_bus_entry_t *msg_bus_get_entry(msg_bus_t *bus)
 
         msg_bus_entry_t *subscriber = container_of(e, msg_bus_entry_t, next);
 
-        if (subscriber->pid == sched_active_pid) {
+        if (subscriber->pid == thread_getpid()) {
             s = subscriber;
             break;
         }

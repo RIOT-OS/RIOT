@@ -46,8 +46,8 @@ extern "C" {
 #include "cpu_conf.h"
 #define DEBUG_PRINT(...) \
     do { \
-        if ((sched_active_thread == NULL) || \
-            (sched_active_thread->stack_size >= \
+        if ((thread_get_active() == NULL) || \
+            (thread_get_active()->stack_size >= \
              THREAD_EXTRA_STACKSIZE_PRINTF)) { \
             printf(__VA_ARGS__); \
         } \

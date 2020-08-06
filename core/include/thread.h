@@ -351,15 +351,26 @@ kernel_pid_t thread_create(char *stack,
 
 /**
  * @brief       Retrieve a thread control block by PID.
+ * @pre         @p pid is valid
+ * @param[in]   pid   Thread to retrieve.
+ * @return      `NULL` if the PID is invalid or there is no such thread.
+ */
+static inline thread_t *thread_get_unchecked(kernel_pid_t pid)
+{
+    return (thread_t *)sched_threads[pid];
+}
+
+/**
+ * @brief       Retrieve a thread control block by PID.
  * @details     This is a bound-checked variant of accessing `sched_threads[pid]` directly.
  *              If you know that the PID is valid, then don't use this function.
  * @param[in]   pid   Thread to retrieve.
  * @return      `NULL` if the PID is invalid or there is no such thread.
  */
-static inline volatile thread_t *thread_get(kernel_pid_t pid)
+static inline thread_t *thread_get(kernel_pid_t pid)
 {
     if (pid_is_valid(pid)) {
-        return sched_threads[pid];
+        return thread_get_unchecked(pid);
     }
     return NULL;
 }
@@ -450,6 +461,20 @@ static inline kernel_pid_t thread_getpid(void)
 }
 
 /**
+ * @brief   Returns a pointer to the Thread Control Block of the currently
+ *          running thread
+ *
+ * @return  Pointer to the TCB of the currently running thread, or `NULL` if
+ *          no thread is running
+ */
+static inline thread_t *thread_get_active(void)
+{
+    extern volatile thread_t *sched_active_thread;
+
+    return (thread_t *)sched_active_thread;
+}
+
+/**
  * @brief   Gets called upon thread creation to set CPU registers
  *
  * @param[in] task_func     First function to call within the thread
@@ -495,7 +520,7 @@ const char *thread_getname(kernel_pid_t pid);
  *
  * Only works if the thread was created with the flag THREAD_CREATE_STACKTEST.
  *
- * @param[in] stack the stack you want to measure. try `sched_active_thread->stack_start`
+ * @param[in] stack the stack you want to measure. Try `thread_get_active()->stack_start`
  *
  * @return          the amount of unused space of the thread's stack
  */
