@@ -76,7 +76,8 @@
 #define XTIMER_BACKOFF      (50)
 #define XTIMER_ISR_BACKOFF  (40)
 /** @} */
-
+#define INTERNAL_PERIPHERAL_VID         (0x0451)
+#define INTERNAL_PERIPHERAL_PID         (0x16C8)
 /**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
