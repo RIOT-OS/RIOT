@@ -271,7 +271,7 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
 {
     assert(sched_active_pid != target_pid);
     unsigned state = irq_disable();
-    thread_t *me = (thread_t *)sched_threads[sched_active_pid];
+    thread_t *me = (thread_t *)sched_active_thread;
     sched_set_status(me, STATUS_REPLY_BLOCKED);
     me->wait_data = (void *)reply;
 
@@ -346,7 +346,7 @@ static int _msg_receive(msg_t *m, int block)
     DEBUG("_msg_receive: %" PRIkernel_pid ": _msg_receive.\n",
           sched_active_thread->pid);
 
-    thread_t *me = (thread_t *)sched_threads[sched_active_pid];
+    thread_t *me = (thread_t *)sched_active_thread;
 
     int queue_index = -1;
 
