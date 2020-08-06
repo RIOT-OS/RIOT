@@ -141,6 +141,8 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
                        PORT_PCR_MUX(pwm_config[pwm].chan[i].af));
         /* set the given mode */
         ftm(pwm)->CONTROLS[pwm_config[pwm].chan[i].ftm_chan].CnSC = mode;
+        /* and reset the PWM to 0% duty cycle */
+        ftm(pwm)->CONTROLS[pwm_config[pwm].chan[i].ftm_chan].CnV = 0;
     }
 
     /* and now we start the actual waveform generation */
@@ -169,6 +171,8 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
                        PORT_PCR_MUX(pwm_config[pwm].chan[i].af));
         /* set the given mode */
         tpm(pwm)->CONTROLS[pwm_config[pwm].chan[i].ftm_chan].CnSC = mode;
+        /* and reset the PWM to 0% duty cycle */
+        tpm(pwm)->CONTROLS[pwm_config[pwm].chan[i].ftm_chan].CnV = 0;
     }
 
     /* and now we start the actual waveform generation */
