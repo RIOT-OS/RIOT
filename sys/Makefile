@@ -112,6 +112,9 @@ endif
 ifneq (,$(filter gcoap,$(USEMODULE)))
   DIRS += net/application_layer/gcoap
 endif
+ifneq (,$(filter gcoap_forward_proxy,$(USEMODULE)))
+  DIRS += net/application_layer/gcoap/forward_proxy
+endif
 ifneq (,$(filter asymcute,$(USEMODULE)))
   DIRS += net/application_layer/asymcute
 endif

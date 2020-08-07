@@ -35,4 +35,24 @@ config NANOCOAP_QS_MAX
     int "Maximum length of a query string written to a message"
     default 64
 
+menuconfig KCONFIG_MODULE_NANOCOAP_CACHE
+    bool "Configure Nanocoap Cache module"
+    depends on MODULE_NANOCOAP_CACHE
+
+if KCONFIG_MODULE_NANOCOAP_CACHE
+
+config NANOCOAP_CACHE_ENTRIES
+    int "Number of maximum cache entries"
+    default 8
+
+config NANOCOAP_CACHE_KEY_LENGTH
+    int "The length of the cache key in bytes"
+    default 8
+
+config NANOCOAP_CACHE_RESPONSE_SIZE
+    int "Size of the buffer to store responses in the cache"
+    default 128
+
+endif # KCONFIG_MODULE_NANOCOAP_CACHE
+
 endif # KCONFIG_MODULE_NANOCOAP

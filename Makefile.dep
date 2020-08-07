@@ -889,8 +889,18 @@ ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += event_timeout
 endif
 
+ifneq (,$(filter gcoap_forward_proxy,$(USEMODULE)))
+  USEMODULE += gcoap
+  USEMODULE += uri_parser
+endif
+
 ifneq (,$(filter luid,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_cpuid
+endif
+
+ifneq (,$(filter nanocoap_cache,$(USEMODULE)))
+  USEMODULE += xtimer
+  USEMODULE += hashes
 endif
 
 ifneq (,$(filter nanocoap_%,$(USEMODULE)))
