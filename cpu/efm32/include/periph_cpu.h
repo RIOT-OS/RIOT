@@ -348,16 +348,36 @@ typedef struct {
  * @{
  */
 typedef struct {
-    TIMER_TypeDef *dev;     /**< Timer device used */
+    void *dev;              /**< TIMER_TypeDef or LETIMER_TypeDef device used */
     CMU_Clock_TypeDef cmu;  /**< the device CMU channel */
 } timer_dev_t;
 
 typedef struct {
-    timer_dev_t prescaler;  /**< the lower numbered neighboring timer */
+    timer_dev_t prescaler;  /**< the lower neighboring timer (not initialized for LETIMER) */
     timer_dev_t timer;      /**< the higher numbered timer */
     IRQn_Type irq;          /**< number of the higher timer IRQ channel */
 } timer_conf_t;
 /** @} */
+
+
+/**
+ * @brief   The implementation can use one LETIMER or two regular timers cascaded
+ */
+#ifndef EFM32_USE_LETIMER
+#define EFM32_USE_LETIMER   0
+#endif
+
+#ifdef EFM32_USE_LETIMER
+/**
+ * @brief   This timer implementation has two available channels
+ */
+#define TIMER_CHANNEL_NUMOF     (2)
+#else
+/**
+ * @brief   This timer implementation has three available channels
+ */
+#define TIMER_CHANNEL_NUMOF     (3)
+#endif
 
 /**
  * @brief   UART device configuration.

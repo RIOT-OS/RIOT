@@ -33,8 +33,13 @@ extern "C" {
  * @name    Xtimer configuration
  * @{
  */
+#ifdef EFM32_USE_LETIMER
+#define XTIMER_HZ           (32768UL)
+#define XTIMER_WIDTH        (16)
+#else
 #define XTIMER_HZ           (1000000UL)
 #define XTIMER_WIDTH        (32)
+#endif
 /** @} */
 
 /**
