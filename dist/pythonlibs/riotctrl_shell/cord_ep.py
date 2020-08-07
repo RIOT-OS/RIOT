@@ -69,7 +69,7 @@ class CordEpRegistrationInfoParser(ShellInteractionParser):
                         res[key] = int(m.group(key))
                     except ValueError:
                         res[key] = m.group(key)
-        return res if bool(res) else None
+        return res
 
 
 class CordEpDiscoverParser(ShellInteractionParser):
