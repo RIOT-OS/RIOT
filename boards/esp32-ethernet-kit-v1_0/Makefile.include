@@ -1,5 +1,3 @@
-PSEUDOMODULES += esp32_ethernet_kit
-PSEUDOMODULES += esp32_ethernet_kit_v1_0
 
 # configure the serial interface
 PORT_LINUX ?= /dev/ttyUSB1

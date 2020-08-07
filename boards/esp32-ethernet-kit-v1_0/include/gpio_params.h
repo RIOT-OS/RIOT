@@ -11,7 +11,7 @@
 #define GPIO_PARAMS_H
 
 /**
- * @ingroup     boards_esp32_esp-ethernet-kit-v1_0
+ * @ingroup     boards_esp32_esp-ethernet-kit
  * @brief       Board specific configuration of direct mapped GPIOs
  * @file
  * @author      Gunar Schorcht <gunar@schorcht.net>

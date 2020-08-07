@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     boards_esp32_esp-ethernet-kit-v1_0
+ * @ingroup     boards_esp32_esp-ethernet-kit
  * @brief       Peripheral MCU configuration for Espressif ESP32-Ethernet-Kit
  * @file
  * @author      Gunar Schorcht <gunar@schorcht.net>
@@ -80,7 +80,7 @@
  * @{
  */
 #ifndef PWM0_GPIOS
-#ifdef MODULE_ESP32_ETHERNET_KIT_V1_0
+#ifdef BOARD_ESP32_ETHERNET_KIT_V1_0
 #define PWM0_GPIOS  { GPIO4 }
 #else
 #define PWM0_GPIOS  { GPIO2, GPIO4 }
