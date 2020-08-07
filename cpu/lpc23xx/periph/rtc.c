@@ -57,7 +57,7 @@ void rtc_init(void)
      * after cold boot or external reset.
      */
     if ((RSIR == RSIR_POR) || (RSIR == (RSIR_POR | RSIR_EXTR))) {
-        struct tm localt = { .tm_year = 70 };
+        struct tm localt = { .tm_year = RIOT_EPOCH - 1900 };
         rtc_set_time(&localt);
     }
 
