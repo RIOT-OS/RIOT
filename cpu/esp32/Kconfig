@@ -32,6 +32,10 @@ config CPU_MODEL_ESP32_WROVER_B
     bool
     select CPU_FAM_ESP32
 
+config CPU_MODEL_ESP32_WROVER_E
+    bool
+    select CPU_FAM_ESP32
+
 config CPU_MODEL_ESP32_D0WD
     bool
     select CPU_FAM_ESP32

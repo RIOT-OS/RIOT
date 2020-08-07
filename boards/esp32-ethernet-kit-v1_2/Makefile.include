@@ -1,0 +1,3 @@
+
+INCLUDES += -I$(RIOTBOARD)/esp32-ethernet-kit-v1_0/include
+include $(RIOTBOARD)/esp32-ethernet-kit-v1_0/Makefile.include

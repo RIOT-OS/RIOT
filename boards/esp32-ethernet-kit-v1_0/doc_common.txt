@@ -35,6 +35,7 @@ Furthermore, some GPIOs are broken out for extension. The USB bridge based on FD
 There are different revisions of the board:
 - \ref boards_esp32_esp-ethernet-kit-v1_0
 - \ref boards_esp32_esp-ethernet-kit-v1_1
+- \ref boards_esp32_esp-ethernet-kit-v1_2
 
 ## <a name="hardware"> Hardware </a> &nbsp;&nbsp; [[TOC](#toc)]
 
