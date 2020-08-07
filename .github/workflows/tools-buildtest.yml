@@ -67,3 +67,7 @@ jobs:
       uses: aabadie/riot-action@v1
       with:
         cmd: make -C cpu/kinetis/dist/calc_spi_scalers
+    - name: Build fixdep tool
+      uses: aabadie/riot-action@v1
+      with:
+        cmd: make -C dist/tools/fixdep
