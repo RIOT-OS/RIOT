@@ -31,10 +31,6 @@
 #define HOUR    (60U * MINUTE)
 #define DAY     (24U * HOUR)
 
-#ifndef RIOT_EPOCH
-#define RIOT_EPOCH (2020)
-#endif
-
 /*
  * The rules here are (to be checked in that explicit order):
  *  1. If the year is not a multiple of four, it is not a leap year.
