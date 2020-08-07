@@ -22,7 +22,7 @@
 
 #include "vendor/prci_driver.h"
 
-#if !(USE_CLOCK_HFXOSC || USE_CLOCK_HFXOSC_PLL)
+#if !(CONFIG_USE_CLOCK_HFXOSC || CONFIG_USE_CLOCK_HFXOSC_PLL)
 static uint32_t _cpu_frequency = 0;
 #endif
 
@@ -41,7 +41,7 @@ void clock_init(void)
         PRCI_REG(PRCI_PLLCFG) &= ~PLL_SEL(PLL_SEL_PLL);
     }
 
-#if USE_CLOCK_HFXOSC || USE_CLOCK_HFXOSC_PLL
+#if CONFIG_USE_CLOCK_HFXOSC || CONFIG_USE_CLOCK_HFXOSC_PLL
     /* Ensure HFXOSC is enabled */
     PRCI_REG(PRCI_HFXOSCCFG) = XOSC_EN(1);
 
@@ -51,12 +51,12 @@ void clock_init(void)
     /* Select HFXOSC as reference frequency and bypass PLL */
     PRCI_REG(PRCI_PLLCFG) = PLL_REFSEL(PLL_REFSEL_HFXOSC) | PLL_BYPASS(1);
 
-#if USE_CLOCK_HFXOSC_PLL
+#if CONFIG_USE_CLOCK_HFXOSC_PLL
     /* Divide final output frequency by 1 */
     PRCI_REG(PRCI_PLLDIV) = (PLL_FINAL_DIV_BY_1(1) | PLL_FINAL_DIV(0));
 
     /* Configure PLL */
-    PRCI_REG(PRCI_PLLCFG) |= PLL_R(CLOCK_PLL_R) | PLL_F(CLOCK_PLL_F) | PLL_Q(CLOCK_PLL_Q);
+    PRCI_REG(PRCI_PLLCFG) |= PLL_R(CONFIG_CLOCK_PLL_R) | PLL_F(CONFIG_CLOCK_PLL_F) | PLL_Q(CONFIG_CLOCK_PLL_Q);
 
     /* Disable PLL Bypass */
     PRCI_REG(PRCI_PLLCFG) &= ~PLL_BYPASS(1);
@@ -70,14 +70,14 @@ void clock_init(void)
 
     /* Turn off the HFROSC */
     PRCI_REG(PRCI_HFROSCCFG) &= ~ROSC_EN(1);
-#elif USE_CLOCK_HFROSC_PLL
-    PRCI_set_hfrosctrim_for_f_cpu(CLOCK_DESIRED_FREQUENCY, PRCI_FREQ_UNDERSHOOT);
+#elif CONFIG_USE_CLOCK_HFROSC_PLL
+    PRCI_set_hfrosctrim_for_f_cpu(CONFIG_CLOCK_DESIRED_FREQUENCY, PRCI_FREQ_UNDERSHOOT);
 #else /* Clock HFROSC */
     /* Disable Bypass */
     PRCI_REG(PRCI_PLLCFG) &= ~PLL_BYPASS(1);
 
     /* Configure trim and divider values of HFROSC */
-    PRCI_REG(PRCI_HFROSCCFG) = (ROSC_DIV(CLOCK_HFROSC_DIV) | ROSC_TRIM(CLOCK_HFROSC_TRIM) | ROSC_EN(1));
+    PRCI_REG(PRCI_HFROSCCFG) = (ROSC_DIV(CONFIG_CLOCK_HFROSC_DIV) | ROSC_TRIM(CONFIG_CLOCK_HFROSC_TRIM) | ROSC_EN(1));
 
     /* Wait for HFROSC to be ready */
     while ((PRCI_REG(PRCI_HFROSCCFG) & ROSC_RDY(1)) == 0);
@@ -89,7 +89,7 @@ void clock_init(void)
 
 uint32_t cpu_freq(void)
 {
-#if USE_CLOCK_HFXOSC || USE_CLOCK_HFXOSC_PLL
+#if CONFIG_USE_CLOCK_HFXOSC || CONFIG_USE_CLOCK_HFXOSC_PLL
     return CLOCK_CORECLOCK;
 #else /* Clock frequency with HFROSC cannot be determined precisely from
          settings */
