@@ -5,32 +5,8 @@ PROGRAMMER_SERIAL ?= 06EB
 # the debug UART is always the second tty with the matching serial number:
 PORT_LINUX ?= $(word 2,$(shell $(RIOTTOOLS)/usb-serial/find-tty.sh '^$(PROGRAMMER_SERIAL)'))
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
-include $(RIOTMAKE)/tools/serial.inc.mk
 
 # setup emulator
 include $(RIOTMAKE)/tools/renode.inc.mk
 
-# debugger config
-DEBUGGER = $(RIOTBOARD)/cc2538dk/dist/debug.sh
-DEBUGSERVER = JLinkGDBServer -device CC2538SF53
-RESET ?= $(RIOTBOARD)/cc2538dk/dist/reset.sh
-
-# Define the flash-tool and default port:
-PROGRAMMER ?= cc2538-bsl
-
-ifeq ($(PROGRAMMER),cc2538-bsl)
-  include $(RIOTMAKE)/tools/cc2538-bsl.inc.mk
-else ifeq ($(PROGRAMMER),jlink)
-  FLASHER = $(RIOTBOARD)/cc2538dk/dist/flash.sh
-  FFLAGS  = $(BINDIR) $(FLASHFILE)
-endif
-
-OFLAGS = --gap-fill 0xff
-FLASHFILE ?= $(BINFILE)
-DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
-RESET_FLAGS ?= $(BINDIR)
-
-OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
-
-# include common cc2538 includes
-INCLUDES += -I$(RIOTBOARD)/common/cc2538/include
+include $(RIOTBOARD)/common/cc2538/Makefile.include
