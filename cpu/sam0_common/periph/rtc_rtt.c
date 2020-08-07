@@ -62,9 +62,10 @@ static rtc_state_t alarm_cb;
 static rtc_state_t overflow_cb;
 
 /* At 1Hz, RTC goes till 63 years (2^5, see 17.8.22 in datasheet)
-* reference_year is set to 100 (offset) to be in our current time (2000)
-* Thanks to this, the user will be able to set time in 2000's*/
-static uint16_t reference_year = 100;
+ * struct tm younts the year since 1900, use the difference to RIOT_EPOCH
+ * as an offset so the user can set years in RIOT_EPOCH + 63
+ */
+static uint16_t reference_year = RIOT_EPOCH - 1900;
 
 static void _wait_syncbusy(void)
 {
