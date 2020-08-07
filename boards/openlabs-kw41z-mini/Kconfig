@@ -14,6 +14,7 @@ config BOARD_OPENLABS_KW41Z_MINI
     select HAS_PERIPH_ADC
     select HAS_PERIPH_DAC
     select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
     select HAS_PERIPH_RTC
     select HAS_PERIPH_RTT
     select HAS_PERIPH_SPI
