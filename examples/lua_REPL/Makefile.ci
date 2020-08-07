@@ -51,6 +51,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l412kb \
     nz32-sc151 \
     olimexino-stm32 \
+    omote \
     opencm904 \
     openmote-b \
     openmote-cc2538 \
