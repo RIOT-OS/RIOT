@@ -34,6 +34,9 @@ BOARD_WHITELIST = \
 # OpenWSN Modules
 USEPKG += openwsn
 USEMODULE += openwsn_openstack
+USEMODULE += sock_udp
+# This example uses async
+USEMODULE += sock_async
 
 # Optional OpenWSN Modules
 ## Enable Constrained Join Protocol (CoJP)
@@ -75,11 +78,11 @@ endif
 # export OPENWSN_LOG_LEVEL ?= LOG_ERROR
 
 ## Test application Modules
-USEMODULE += ipv6_addr
 USEMODULE += ps
 USEMODULE += od_string
 USEMODULE += shell
 USEMODULE += shell_commands
+
 # ztimer is used instead of xtimer because it's a dependency of some
 # OpenWSN modules.
 USEMODULE += ztimer_usec
