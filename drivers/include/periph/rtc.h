@@ -46,6 +46,18 @@
 extern "C" {
 #endif
 
+#if !defined(RIOT_EPOCH) || DOXYGEN
+/**
+ * @brief Earliest year of the RTC
+ *
+ * 01.01.$RIOT_EPOCH will be the reset value of the RTC if supported.
+ *
+ * Internal RTC helper functions such as @see rtc_mktime and @see rtc_localtime
+ * will not work on dates earlier than that.
+ */
+#define RIOT_EPOCH (2020)
+#endif
+
 /**
  * @brief Signature for alarm Callback
  *
