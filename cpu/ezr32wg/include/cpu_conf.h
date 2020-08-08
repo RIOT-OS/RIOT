@@ -42,6 +42,15 @@ extern "C" {
 #define CPU_FLASH_BASE                  FLASH_BASE
 /** @} */
 
+/**
+ * @brief   Bit-Band configuration
+ * @{
+ */
+#ifdef BITBAND_RAM_BASE
+#define CPU_HAS_BITBAND 1
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

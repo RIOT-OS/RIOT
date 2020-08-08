@@ -44,6 +44,15 @@ extern "C"
 {
 #endif
 
+/**
+ * @brief   Bit-Band configuration
+ * @{
+ */
+#ifdef BITBAND_REG32
+#define CPU_HAS_BITBAND 1
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

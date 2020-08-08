@@ -51,6 +51,15 @@ extern "C" {
 #define FLASHPAGE_RAW_ALIGNMENT    (4U)
 /** @} */
 
+/**
+ * @brief   Bit-Band configuration
+ * @{
+ */
+#ifdef BITBAND_RAM_BASE
+#define CPU_HAS_BITBAND 1
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

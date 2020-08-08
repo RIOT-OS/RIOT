@@ -40,6 +40,7 @@ extern "C" {
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
 #define CPU_IRQ_NUMOF                   PERIPH_COUNT_IRQn
 #define CPU_FLASH_BASE                  FLASH_BASE
+#define CPU_HAS_BITBAND                 (1)
 /** @} */
 
 #ifdef __cplusplus
