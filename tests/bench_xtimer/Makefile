@@ -24,6 +24,7 @@ LOW_MEMORY_BOARDS += \
   cc2650stk \
   derfmega128 \
   feather-m0 \
+  feather-m0-wifi \
   hifive1 \
   hifive1b \
   i-nucleo-lrwan1 \
