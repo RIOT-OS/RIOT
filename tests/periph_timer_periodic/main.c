@@ -38,7 +38,7 @@
  * provides a configuration for it.
  */
 #define TIMER_CYCL  XTIMER_DEV
-#define CYCLE_MS    100UL
+#define CYCLE_MS    25UL
 #define CYCLES_MAX   10
 
 static unsigned count[TIMER_CHANNEL_NUMOF];

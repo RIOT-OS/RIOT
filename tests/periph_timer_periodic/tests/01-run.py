@@ -16,9 +16,9 @@ def testfunc(child):
     start = time.time()
     child.expect_exact('TEST SUCCEEDED')
     end = time.time()
-    # test should run 10 cycles with 100ms each
-    assert (end - start) > 1
-    assert (end - start) < 1.5
+    # test should run 10 cycles with 25ms each
+    assert (end - start) > 0.25
+    assert (end - start) < 0.35
 
 
 if __name__ == "__main__":
