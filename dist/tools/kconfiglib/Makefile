@@ -7,9 +7,7 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 all:
 	$(Q)cp $(PKG_SOURCE_DIR)/kconfiglib.py $(PKG_SOURCE_DIR)/menuconfig.py \
-	   $(PKG_SOURCE_DIR)/genconfig.py $(PKG_SOURCE_DIR)/examples/merge_config.py \
 	   .
 
 remove:
-	$(Q)$(RM) -r $(PKG_SOURCE_DIR) kconfiglib.py menuconfig.py genconfig.py \
-	       merge_config.py
+	$(Q)$(RM) -r $(PKG_SOURCE_DIR) kconfiglib.py menuconfig.py
