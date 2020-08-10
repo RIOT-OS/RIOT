@@ -1,8 +1,8 @@
 # Test if the input language was specified externally.
-# Otherwise test if the compiler unterstands the "-std=c99" flag, and use it if so.
+# Otherwise test if the compiler unterstands the "-std=c11" flag, and use it if so.
 ifeq ($(filter -std=%,$(CFLAGS)),)
-  ifeq ($(shell $(CC) -std=c99 -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
-    CFLAGS += -std=c99
+  ifeq ($(shell $(CC) -std=c11 -E - 2>/dev/null >/dev/null </dev/null ; echo $$?),0)
+    CFLAGS += -std=c11
   endif
 endif
 
