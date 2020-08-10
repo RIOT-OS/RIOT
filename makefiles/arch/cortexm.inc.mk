@@ -102,13 +102,6 @@ ifneq (,$(filter cmsis-dsp,$(USEPKG)))
   endif
 endif
 
-# Explicitly tell the linker to link the startup code.
-#   Without this the interrupt vectors will not be linked correctly!
-VECTORS_O ?= $(BINDIR)/cpu/vectors.o
-ifeq ($(COMMON_STARTUP),)
-  UNDEF += $(VECTORS_O)
-endif
-
 # CPU depends on the cortex-m common module, so include it:
 include $(RIOTCPU)/cortexm_common/Makefile.include
 

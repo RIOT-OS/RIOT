@@ -37,7 +37,4 @@ CFLAGS += \
   -DKINETIS_ROMSIZE=$(KINETIS_ROMSIZE) \
   #
 
-# add the CPU specific flash configuration field for the linker
-UNDEF += $(BINDIR)/cpu/fcfield.o
-
 include $(RIOTMAKE)/arch/cortexm.inc.mk

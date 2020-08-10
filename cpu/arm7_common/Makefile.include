@@ -17,5 +17,3 @@ ASFLAGS     += $(CFLAGS_CPU) $(CFLAGS_DBG)
 LINKFLAGS   += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU).ld
 LINKFLAGS   += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
 LINKFLAGS   += -Wl,--gc-sections
-
-UNDEF += $(BINDIR)/cpu/startup.o

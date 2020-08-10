@@ -426,12 +426,6 @@ CFLAGS += -DBOARD_$(BOARDDEF)=\"$(BOARD)\" -DRIOT_BOARD=BOARD_$(BOARDDEF)
 CFLAGS += -DCPU_$(CPUDEF)=\"$(CPU)\" -DRIOT_CPU=CPU_$(CPUDEF)
 CFLAGS += -DMCU_$(MCUDEF)=\"$(MCU)\" -DRIOT_MCU=MCU_$(MCUDEF)
 
-# OSX fails to create empty archives. Provide a wrapper to catch that error.
-ifneq (0, $(shell mkdir -p $(BINDIR); $(AR) rc $(BINDIR)/empty-archive.a 2> /dev/null; \
-            echo $$?; rm -f $(BINDIR)/empty-archive.a 2>&1 > /dev/null))
-	AR := $(RIOTBASE)/dist/ar-wrapper $(AR)
-endif
-
 # Feature test default CFLAGS and LINKFLAGS for the set compiled.
 include $(RIOTMAKE)/cflags.inc.mk
 
@@ -452,7 +446,7 @@ endif
 APPLICATION_MODULE ?= application_$(APPLICATION)
 
 # the binaries to link
-BASELIBS += $(BINDIR)/$(APPLICATION_MODULE).a
+BASELIBS += $(APPLICATION_MODULE).module
 BASELIBS += $(APPDEPS)
 
 
@@ -567,11 +561,14 @@ BUILDDEPS += $(APPDEPS)
 _BASELIBS_VALUE_BEFORE_USAGE := $(BASELIBS)
 
 # Linker rule
+# Only use --start-group when archives are defined
+ARCHIVES_GROUP = $(if $(ARCHIVES),$(LINKFLAGPREFIX)--start-group $(ARCHIVES) -lm $(LINKFLAGPREFIX)--end-group, -lm)
+
 $(ELFFILE): FORCE
 ifeq ($(BUILDOSXNATIVE),1)
-  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $$(find $(BASELIBS) -size +8c) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
+  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS:%.module=$(BINDIR)/%/*.o) 2> /dev/null) $(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-no_pie
 else
-  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $(UNDEF) $(LINKFLAGPREFIX)--start-group $(BASELIBS) -lm $(LINKFLAGPREFIX)--end-group $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
+  _LINK = $(if $(CPPMIX),$(LINKXX),$(LINK)) $$(find $(BASELIBS:%.module=$(BINDIR)/%/*.o) 2> /dev/null) $(ARCHIVES_GROUP) $(LINKFLAGS) $(LINKFLAGPREFIX)-Map=$(BINDIR)/$(APPLICATION).map
 endif # BUILDOSXNATIVE
 
 ifeq ($(BUILD_IN_DOCKER),1)
@@ -580,20 +577,22 @@ else
 ifeq (,$(RIOTNOLINK))
 link: ..compiler-check ..build-message $(BUILD_FILES) print-size
 else
-link: ..compiler-check ..build-message $(BASELIBS)
+link: ..compiler-check ..build-message $(BASELIBS) $(ARCHIVES)
 endif # RIOTNOLINK
 
-$(ELFFILE): $(BASELIBS)
+$(ELFFILE): $(BASELIBS) $(ARCHIVES)
 	$(Q)$(_LINK) -o $@
 
-$(BINDIR)/$(APPLICATION_MODULE).a: pkg-build $(BUILDDEPS)
+.PHONY: $(APPLICATION_MODULE).module
+
+$(APPLICATION_MODULE).module: pkg-build $(BUILDDEPS)
 	$(Q)DIRS="$(DIRS)" APPLICATION_BLOBS="$(BLOBS)" \
 	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
-$(BINDIR)/$(APPLICATION_MODULE).a: FORCE
+$(APPLICATION_MODULE).module: FORCE
 
 # Other modules are built by application.inc.mk and packages building
-_SUBMAKE_LIBS = $(filter-out $(BINDIR)/$(APPLICATION_MODULE).a $(APPDEPS), $(BASELIBS))
-$(_SUBMAKE_LIBS): $(BINDIR)/$(APPLICATION_MODULE).a pkg-build
+_SUBMAKE_LIBS = $(filter-out $(APPLICATION_MODULE).module $(APPDEPS), $(BASELIBS) $(ARCHIVES))
+$(_SUBMAKE_LIBS): $(APPLICATION_MODULE).module pkg-build
 
 # 'print-size' triggers a rebuild. Use 'info-buildsize' if you do not need to rebuild.
 print-size: $(ELFFILE)
@@ -605,50 +604,6 @@ print-size: $(ELFFILE)
 %.bin: %.elf
 	$(Q)$(OBJCOPY) $(OFLAGS) -Obinary $< $@
 
-endif # BUILD_IN_DOCKER
-
-# Rules to check the correctness of thin archives.
-
-# OS independant relpath as 'realpath --relative-to' is not supported on OSx
-relpath = $(shell python3 -c 'import pathlib; print(pathlib.Path("$1").relative_to("$(CURDIR)"))')
-
-# Each ARCHECK file contains all the absolute paths found inside the archive.
-BASELIB_ARCHECKS = $(patsubst %.a,%.a-check,$(filter %.a,$(BASELIBS)))
-
-# For each a file, print the absolute paths found inside it
-# If "ar t" is called with an absolute path it will print an abs path regardless
-# of how the archive is internally
-# In case of a malformed archive, ar prints to stderr (and sets an error code).
-# Doing `2>&1` is hacky, the correct thing would be to get the exit code.
-# The `| %.a` is necessary to be able to check file produced in docker.
-%.a-check: %.a
-	$(Q)$(AR) t $(call relpath,$<) 2>&1 | grep '^/' | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
-
-# There's no point on keeping files whose content is later copied to another file
-.INTERMEDIATE: $(BASELIB_ARCHECKS)
-
-ARCHIVE_CHECK = $(BINDIR)/$(APPLICATION).archive-check
-
-$(ARCHIVE_CHECK): $(BASELIB_ARCHECKS)
-	$(Q)cat $^ | '$(LAZYSPONGE)' $(LAZYSPONGE_FLAGS) '$@'
-
-# Rule to check if thin archives are correctly produced, that is, with a correct
-# relative path.
-ifeq ($(BUILD_IN_DOCKER),1)
-archive-check: ..in-docker-container
-else
-archive-check: $(ARCHIVE_CHECK) FORCE
-	@if [ -s '$<' ] ; then \
-		$(COLOR_ECHO) '$(COLOR_RED)Found the following absolute paths in archives' ;\
-		cat '$<';\
-		$(COLOR_ECHO) '$(COLOR_RESET)' ;\
-		exit 1;\
-	elif [ -f '$<' ] ; then \
-		$(COLOR_ECHO) '$(COLOR_GREEN)Archives correctly formed$(COLOR_RESET)' ;\
-	else \
-		$(COLOR_ECHO) '$(COLOR_RED)Unexpected error (file not found)$(COLOR_RESET)' ;\
-		exit 1;\
-	fi
 endif # BUILD_IN_DOCKER
 
 # Check given command is available in the path
@@ -680,7 +635,7 @@ endif
 	@$(COLOR_ECHO)
 
 # The `clean` needs to be serialized before everything else.
-all $(BASELIBS) $(BUILDDEPS) ..in-docker-container: | $(CLEAN)
+all $(BASELIBS) $(ARCHIVES) $(BUILDDEPS) ..in-docker-container: | $(CLEAN)
 
 .PHONY: pkg-prepare pkg-build pkg-build-%
 pkg-prepare:
