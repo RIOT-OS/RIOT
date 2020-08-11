@@ -37,7 +37,8 @@
  [constrained join protocol](https://datatracker.ietf.org/doc/draft-ietf-6tisch-minimal-security/)
  an the stack itself only handles Join Requests. The JRC (join registrar/coordinator,
  a central entity) is not running on the root node, but alongside it, in the
- `OpenVisualizer` external tool.
+ `OpenVisualizer` external tool. This functionality is now optional but can be
+ included through the `openwsn_cjoin` module.
 
  Once joined the device has the required keys to start listening to DIS (DODAG
  Information Solicitation) messages and to send DIO (DODAG Information Object)
@@ -246,6 +247,9 @@
  and `SLOTFRAME_LENGTH` are not configurable by default so need to be overridden
  with `CFLAGS`.
 
+ See [Tune parameters in OpenWSN](https://openwsn.atlassian.net/wiki/spaces/OW/pages/132055073/Tune+parameters+in+OpenWSN)
+ for more details.
+
  ### Timing
 
  Timing is essential for OpenWSN to work properly. For optimal results most
@@ -277,6 +281,17 @@
  `OPENWSN_DEBUGPINS_BOARD` in the form of `debugpins_config_t`.
 
  The default configuration maps to OpenWSN reference hardware `openmote-b`.
+
+ ## Optional Modules and Features
+
+ The following modules are optional and can be disabled if not needed, or to
+ lower the stack footprint.
+
+  - `openwsn_cjoin`: this enabled the use of Constrained Join Protocol (CoJP)
+  - `openwsn_6lo_frag`: this enable 6LoWPAN fragmentation
+  - `openwsn_iee802154e_security`: enable link layer security
+  - `openwsn_adaptive_msf`: allow the MSF algorithm to dynamically remove and
+    allocate slots
 
  ## Testing and debugging
 
@@ -405,13 +420,9 @@ critical sections. This can cause bytes sent over stdio to be missed.
 
  ##  Future Steps
 
- The OpenWSN community is working on refactoring their code base. As
- one of the outputs of this modules like `cjoin`, `udp`, `coap` will become
- optional. Once this is upstream the support for this pkg should be adapted.
+ It would be desirable to achieve an extraction of the MAC layer.
 
- With above mentioned re-works the extraction of the MAC layer might be favored.
-
- As more immediate future steps:
+ Immediate future steps:
 
  - Follow up PR to add OpenWSN sock
  - Complete support of OpenWSN default HW (`openmote-b`)

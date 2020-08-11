@@ -32,8 +32,10 @@
 #include "02a-MAClow/IEEE802154E.h"
 #include "02b-MAChigh/neighbors.h"
 #include "03b-IPv6/icmpv6rpl.h"
-#include "04-TRAN/openudp.h"
+#include "04-TRAN/udp.h"
+#ifdef MODULE_OPENWSN_CJOIN
 #include "cjoin.h"
+#endif
 #include "cross-layers/openqueue.h"
 #include "cross-layers/idmanager.h"
 #include "cross-layers/packetfunctions.h"
@@ -114,7 +116,9 @@ static int ifconfig_cmd(int argc, char **argv)
 
 
     printf("\t\tIEEE802154E sync: %i\n", ieee154e_isSynch());
+#ifdef MODULE_OPENWSN_CJOIN
     printf("\t\t6TiSCH joined: %i\n", cjoin_getIsJoined());
+#endif
     printf("\n");
 
     if (idmanager_vars.isDAGroot) {
@@ -193,7 +197,7 @@ static const struct {
     { "udp", COMPONENT_OPENUDP },
     { "coap", COMPONENT_OPENCOAP },
     { "cjoin", COMPONENT_CJOIN },
-    { "openoscoap", COMPONENT_OPENOSCOAP },
+    { "openoscoap", COMPONENT_OSCORE },
     { "c6t", COMPONENT_C6T },
     { "uinject", COMPONENT_UINJECT },
 };

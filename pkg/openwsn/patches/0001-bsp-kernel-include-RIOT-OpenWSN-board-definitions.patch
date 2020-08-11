@@ -1,7 +1,7 @@
-From 6f845cd8b8ea316307fd9ef6ab58127a26772f72 Mon Sep 17 00:00:00 2001
+From f519ad22f9564aee46e860c50875a0d66adbb193 Mon Sep 17 00:00:00 2001
 From: PeterKietzmann <peter.kietzmann@haw-hamburg.de>
 Date: Thu, 8 Feb 2018 10:23:00 +0100
-Subject: [PATCH 01/11] bsp-kernel: include  RIOT-OpenWSN board definitions
+Subject: [PATCH 01/10] bsp-kernel: include RIOT-OpenWSN board definitions
 
 ---
  bsp/boards/radio.h        | 2 +-

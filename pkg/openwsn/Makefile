@@ -1,6 +1,6 @@
 PKG_NAME=openwsn
 PKG_URL=https://github.com/openwsn-berkeley/openwsn-fw.git
-PKG_VERSION=cbcf622bd9369fcfc8455a5fb9349de2ed3c3a46
+PKG_VERSION=4e58c93dc76d8c5c5c4b8dfebdd955feaf605e74
 PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
@@ -8,10 +8,14 @@ include $(RIOTBASE)/pkg/pkg.mk
 # openwsn_% RIOT Modules or PSEUDOMODULES that don't have custom rules
 IGNORE_MODULES  := openwsn_leds \
                    openwsn_debugpins \
+                   openwsn_6lo_frag \
+                   openwsn_icmpv6_echo \
+                   openwsn_iee802154e_security \
                    openwsn_radio \
                    openwsn_serial \
-                   openwsn_sctimer% \
-                   openwsn_cryptoengine \
+                   openwsn_sctimer \
+                   openwsn_sctimer_rtt \
+                   openwsn_sctimer_ztimer \
                    #
 
 OPENWSN_MODULES := $(filter-out $(IGNORE_MODULES),$(filter openwsn_%,$(USEMODULE)))
@@ -34,10 +38,12 @@ CFLAGS += -DLOG_LEVEL=$(OPENWSN_LOG_LEVEL)
 
 OPENWSN_PATH_openstack      = openstack
 OPENWSN_PATH_openapps       = openapps
+OPENWSN_PATH_openweb        = openweb
 OPENWSN_PATH_drivers        = drivers/common
+OPENWSN_PATH_crypto         = drivers/common/crypto
 OPENWSN_PATH_scheduler      = kernel/openos
 OPENWSN_PATH_cjoin          = openapps/cjoin
-OPENWSN_PATH_opencoap       = openapps/opencoap
+OPENWSN_PATH_opencoap       = openweb/opencoap
 OPENWSN_PATH_mac_low        = openstack/02a-MAClow
 OPENWSN_PATH_mac_high       = openstack/02b-MAChigh
 OPENWSN_PATH_iphc           = openstack/03a-IPHC
