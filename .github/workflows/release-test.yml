@@ -120,7 +120,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       if: always()
       with:
-        name: Upload test report
+        name: Test Reports
         path: test-reports/*
   iotlab-tasks:
     runs-on: ubuntu-latest
