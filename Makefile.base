@@ -84,6 +84,7 @@ OBJ := $(OBJC) $(OBJCXX) $(ASMOBJ) $(ASSMOBJ) $(GENOBJC)
 DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 
 include $(RIOTMAKE)/blob.inc.mk
+include $(RIOTMAKE)/tools/fixdep.inc.mk
 
 $(BINDIR)/$(MODULE)/:
 	$(Q)mkdir -p $@
@@ -106,33 +107,46 @@ $(OBJC_LTO): CFLAGS+=$(LTOFLAGS)
 
 # Define dependencies for object files
 OBJ_DEPS += $(RIOTBUILD_CONFIG_HEADER_C)
-ifneq (,$(SHOULD_RUN_KCONFIG))
-  OBJ_DEPS += $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
-endif
 
-$(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(OBJ_DEPS)
+$(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q)$(CCACHE) $(CC) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
+ifneq (,$(SHOULD_RUN_KCONFIG))
+	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
+	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
+endif
 
-$(GENOBJC): %.o: %.c $(OBJ_DEPS)
+$(GENOBJC): %.o: %.c $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q) $(CCACHE) $(CC) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$<)\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $<
+ifneq (,$(SHOULD_RUN_KCONFIG))
+	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
+	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
+endif
 
-$(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.$(SRCXXEXT) $(OBJ_DEPS)
+$(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.$(SRCXXEXT) $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q)$(CCACHE) $(CXX) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CXXFLAGS) $(CXXINCLUDES) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
+ifneq (,$(SHOULD_RUN_KCONFIG))
+	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
+	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
+endif
 
 $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
 	$(Q)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
-$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(OBJ_DEPS)
+$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q)$(CCAS) $(CCASFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
+ifneq (,$(SHOULD_RUN_KCONFIG))
+	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
+	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
+endif
 
 # pull in dependency info for *existing* .o files
 # deleted header files will be silently ignored
