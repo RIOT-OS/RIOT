@@ -1,34 +1,4 @@
-# define the default flash-tool
-PROGRAMMER ?= cc2538-bsl
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
-# For backward compatibility
-ifneq (,$(PORT_BSL))
-  $(warning Warning! PORT_BSL is deprecated use PROG_DEV)
-  PROG_DEV ?= $(PORT_BSL)
-endif
-
-ifeq ($(PROGRAMMER),cc2538-bsl)
-  PROG_BAUD ?= 115200
-  include $(RIOTMAKE)/tools/cc2538-bsl.inc.mk
-else ifeq ($(PROGRAMMER),jlink)
-  FLASHER = $(RIOTBOARD)/common/remote/dist/flash.sh
-  FFLAGS  = $(BINDIR) $(FLASHFILE)
-  DEBUGGER = $(RIOTBOARD)/common/remote/dist/debug.sh
-  DEBUGSERVER = JLinkGDBServer -device CC2538SF53
-  RESET ?= $(RIOTBOARD)/common/remote/dist/reset.sh
-  RESET_FLAGS ?= $(BINDIR)
-endif
-
-OFLAGS = --gap-fill 0xff
-FLASHFILE ?= $(BINFILE)
-DEBUGGER_FLAGS = $(BINDIR) $(ELFFILE)
-OBJDUMPFLAGS += --disassemble --source --disassembler-options=force-thumb
-
-# include common cc2538 includes
-INCLUDES += -I$(RIOTBOARD)/common/cc2538/include
-
 # include common remote includes
 INCLUDES += -I$(RIOTBOARD)/common/remote/include
+
+include $(RIOTBOARD)/common/cc2538/Makefile.include
