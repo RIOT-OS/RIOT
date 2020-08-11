@@ -1033,9 +1033,9 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
             iphc_hdr[inline_pos++] = (uint8_t)((ipv6_hdr_get_fl(ipv6_hdr) & 0x000f0000) >> 16);
         }
 
-        /* copy remaining byteos of flow label */
+        /* copy remaining bytes of flow label */
         iphc_hdr[inline_pos++] = (uint8_t)((ipv6_hdr_get_fl(ipv6_hdr) & 0x0000ff00) >> 8);
-        iphc_hdr[inline_pos++] = (uint8_t)((ipv6_hdr_get_fl(ipv6_hdr) & 0x000000ff) >> 8);
+        iphc_hdr[inline_pos++] = (uint8_t)(ipv6_hdr_get_fl(ipv6_hdr) & 0x000000ff);
     }
 
     /* check for compressible next header */
