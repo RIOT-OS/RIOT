@@ -113,14 +113,14 @@ jobs:
       - name: Run compile_and_test_for_board.py on ${{ matrix.boards.riot }}
         run: |
           ${COMPILE_AND_TEST_FOR_BOARD} . ${{ matrix.boards.riot }} \
-            results-${{ matrix.boards.riot }} ${COMPILE_AND_TEST_ARGS}
+            test-results ${COMPILE_AND_TEST_ARGS}
       - name: Stop IoT-LAB experiment
         if: always()
         run: iotlab-experiment stop -i ${IOTLAB_EXP_ID}
       - name: Archive results
         if: always()
-        # Store generated results-<riot board name> artifact
+        # Store generated test-results artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.boards.riot }}
-          path: results-${{ matrix.boards.riot }}
+          name: Test Results
+          path: test-results/*
