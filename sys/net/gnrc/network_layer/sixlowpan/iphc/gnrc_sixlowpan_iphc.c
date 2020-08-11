@@ -417,7 +417,7 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
                 ipv6_hdr->dst.u8[1] = iphc_hdr[payload_offset++];
                 ipv6_hdr->dst.u8[2] = iphc_hdr[payload_offset++];
                 ipv6_hdr->dst.u8[3] = ctx->prefix_len;
-                ipv6_addr_init_prefix((ipv6_addr_t *)ipv6_hdr->dst.u8 + 4,
+                ipv6_addr_init_prefix((ipv6_addr_t *)(ipv6_hdr->dst.u8 + 4),
                                       &ctx->prefix, ctx->prefix_len);
                 memcpy(ipv6_hdr->dst.u8 + 12, iphc_hdr + payload_offset + 2, 4);
 
@@ -1033,9 +1033,9 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
             iphc_hdr[inline_pos++] = (uint8_t)((ipv6_hdr_get_fl(ipv6_hdr) & 0x000f0000) >> 16);
         }
 
-        /* copy remaining byteos of flow label */
+        /* copy remaining bytes of flow label */
         iphc_hdr[inline_pos++] = (uint8_t)((ipv6_hdr_get_fl(ipv6_hdr) & 0x0000ff00) >> 8);
-        iphc_hdr[inline_pos++] = (uint8_t)((ipv6_hdr_get_fl(ipv6_hdr) & 0x000000ff) >> 8);
+        iphc_hdr[inline_pos++] = (uint8_t)(ipv6_hdr_get_fl(ipv6_hdr) & 0x000000ff);
     }
 
     /* check for compressible next header */
