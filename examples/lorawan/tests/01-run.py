@@ -21,7 +21,7 @@ def testfunc(child):
         child.expect_exact("Sending: This is RIOT!")
         time.sleep(20)
 
-    print("TESST PASSED")
+    print("TEST PASSED")
 
 
 if __name__ == "__main__":
