@@ -131,7 +131,24 @@ unsigned int timer_max(tim_t tim)
 {
     /* make sure the given timer is valid */
     if (tim < TIMER_NUMOF) {
-        return UINT32_MAX;
+        switch (timer_config[tim].bitmode)
+        {
+        case TIMER_BITMODE_BITMODE_32Bit:
+            return UINT32_MAX;
+            break;
+        case TIMER_BITMODE_BITMODE_24Bit:
+            return 0x00FFFFFF;
+            break;
+        case TIMER_BITMODE_BITMODE_16Bit:
+            return UINT16_MAX;
+            break;
+        case TIMER_BITMODE_BITMODE_08Bit:
+            return UINT8_MAX;
+            break;
+        default:
+            return UINT32_MAX;
+            break;
+        }
     }
     return 0;
 }
