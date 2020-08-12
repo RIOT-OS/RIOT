@@ -132,6 +132,7 @@ PSEUDOMODULES += at86rf23%
 PSEUDOMODULES += at86rf21%
 PSEUDOMODULES += at86rfa1
 PSEUDOMODULES += at86rfr2
+PSEUDOMODULES += at86rf2xx_aes_spi
 NO_PSEUDOMODULES += at86rf215
 
 # include variants of the BME680 drivers as pseudo modules
