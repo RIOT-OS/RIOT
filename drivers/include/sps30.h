@@ -91,15 +91,15 @@ typedef struct {
  *
  */
 typedef struct {
-    float mc_pm1;       /**< Mass concentration of PM 1.0 [µg/m^3] */
-    float mc_pm2_5;     /**< Mass concentration of PM 2.5 [µg/m^3] */
-    float mc_pm4;       /**< Mass concentration of PM 4.0 [µg/m^3] */
-    float mc_pm10;      /**< Mass concentration of PM 10 [µg/m^3] */
-    float nc_pm0_5;     /**< Number concentration of PM 0.5 [µg/m^3] */
-    float nc_pm1;       /**< Number concentration of PM 1.0 [µg/m^3] */
-    float nc_pm2_5;     /**< Number concentration of PM 2.5 [µg/m^3] */
-    float nc_pm4;       /**< Number concentration of PM 4.0 [µg/m^3] */
-    float nc_pm10;      /**< Number concentration of PM 10 [µg/m^3] */
+    float mc_pm1;       /**< Mass concentration of all particles <= 1µm [µg/m^3] */
+    float mc_pm2_5;     /**< Mass concentration of all particles <= 2.5µm [µg/m^3] */
+    float mc_pm4;       /**< Mass concentration of all particles <= 4µm [µg/m^3] */
+    float mc_pm10;      /**< Mass concentration of all particles <= 10µm [µg/m^3] */
+    float nc_pm0_5;     /**< Number concentration of all particles <= 0.5µm [#/cm^3] */
+    float nc_pm1;       /**< Number concentration of all particles <= 1µm [#/cm^3] */
+    float nc_pm2_5;     /**< Number concentration of all particles <= 2.5µm [#/cm^3] */
+    float nc_pm4;       /**< Number concentration of all particles <= 4µm [#/cm^3] */
+    float nc_pm10;      /**< Number concentration of all particles <= 10µm [#/cm^3] */
     float ps;           /**< Typical particle size [µm] */
 } sps30_data_t;
 
