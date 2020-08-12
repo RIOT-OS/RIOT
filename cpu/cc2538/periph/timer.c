@@ -33,7 +33,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define LOAD_VALUE              (0xffff)
+#define LOAD_VALUE_16_BIT       (UINT16_MAX)
+#define LOAD_VALUE_32_BIT       (UINT32_MAX)
 
 #define TIMER_A_IRQ_MASK        (0x000000ff)
 #define TIMER_B_IRQ_MASK        (0x0000ff00)
@@ -240,13 +241,14 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     dev(tim)->CFG = timer_config[tim].cfg;
     /* enable and configure GPTM(tim) timer A */
     dev(tim)->TAMR = chan_mode;
-    dev(tim)->TAILR = LOAD_VALUE;
+    dev(tim)->TAILR = (timer_config[tim].cfg == GPTMCFG_32_BIT_TIMER) ?
+                      LOAD_VALUE_32_BIT : LOAD_VALUE_16_BIT;
     dev(tim)->CTL |= GPTIMER_CTL_TAEN;
 
     if (timer_config[tim].chn > 1) {
         /* Enable and configure GPTM(tim) timer B */
         dev(tim)->TBMR = chan_mode;
-        dev(tim)->TBILR = LOAD_VALUE;
+        dev(tim)->TBILR = LOAD_VALUE_16_BIT;
         dev(tim)->CTL |= GPTIMER_CTL_TBEN;
     }
 
@@ -278,10 +280,10 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
     dev(tim)->ICR = chn_isr_cfg[channel].flag;
     if (channel == 0) {
         dev(tim)->TAMATCHR = (timer_config[tim].cfg == GPTMCFG_32_BIT_TIMER) ?
-                             value : (LOAD_VALUE - value);
+                             value : (LOAD_VALUE_16_BIT - value);
     }
     else {
-        dev(tim)->TBMATCHR = (LOAD_VALUE - value);
+        dev(tim)->TBMATCHR = (LOAD_VALUE_16_BIT - value);
     }
     dev(tim)->IMR |= chn_isr_cfg[channel].flag;
 
@@ -318,7 +320,7 @@ unsigned int timer_read(tim_t tim)
         return dev(tim)->TAV;
     }
     else {
-        return LOAD_VALUE - (dev(tim)->TAV & 0xffff);
+        return LOAD_VALUE_16_BIT - (dev(tim)->TAV & 0xffff);
     }
 }
 
