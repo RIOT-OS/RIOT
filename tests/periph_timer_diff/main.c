@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdatomic.h>
 
 #include "periph/timer.h"
 
@@ -35,30 +36,32 @@
 #define MAX_LOOPS   (10U)
 #define TIMEOUT     (20000U)
 
-static volatile unsigned fired;
-static volatile uint32_t sw_count;
-static volatile unsigned timevals[MAX_LOOPS];
+static atomic_uint fired;
+static atomic_uint timevals[MAX_LOOPS];
 
 static void cb(void *arg, int chan)
 {
     (void) chan;
-    timevals[fired] = timer_read(TIMER_DEV((unsigned)arg));
-    fired++;
-    if (fired < MAX_LOOPS) {
+    unsigned int a_fired = atomic_load(&fired);
+    atomic_store(&timevals[a_fired],
+                 timer_read(TIMER_DEV((unsigned)arg)));
+    if (a_fired < MAX_LOOPS) {
         timer_set(TIMER_DEV((unsigned)arg), 0, TIMEOUT);
     }
+    atomic_store(&fired, a_fired + 1);
 }
 
 static int test_timer(unsigned num)
 {
     printf("\n*** Testing TIMER_%u ***\n", num);
+
     /* reset state */
-    sw_count = 0;
-    fired = 0;
+    atomic_store(&fired, 0);
     for (unsigned i = 0; i < MAX_LOOPS; i++) {
-        timevals[i] = 0;
+        atomic_store(&timevals[i], 0);
     }
-    printf(" _init(%u, %lu, cb, args)\n", num, TIMER_SPEED);
+
+    printf(" _init(%u, %lu, cb, args)\n", num, (unsigned long) TIMER_SPEED);
     /* initialize and halt timer */
     if (timer_init(TIMER_DEV(num), TIMER_SPEED, cb, (void *)(num)) < 0) {
         puts("WARN: incompatible timer speed?");
@@ -75,16 +78,15 @@ static int test_timer(unsigned num)
     /* (re)start timer */
     timer_start(TIMER_DEV(num));
     /* wait for all channels to fire */
-    do {
-        ++sw_count;
-    } while (fired < MAX_LOOPS);
-    bool match = true;
+    while (atomic_load(&fired) < MAX_LOOPS) { }
+
     /* collect results */
+    bool match = true;
     printf("  fired %u , offset %u [us]\n\n", fired, TIMEOUT);
     printf(";num, begin, until, timer_diff, simple_diff\n");
     for (unsigned i = 1; i < fired; i++) {
-        unsigned tdiff = timer_diff(TIMER_DEV(num), timevals[i-1], timevals[i]);
-        unsigned sdiff = (timevals[i] - timevals[i-1]);
+        unsigned int tdiff = timer_diff(TIMER_DEV(num), timevals[i-1], timevals[i]);
+        unsigned int sdiff = (timevals[i] - timevals[i-1]);
         if (tdiff != sdiff) {
             match = false;
         }
@@ -100,7 +102,7 @@ int main(void)
     int res = 0;
 
     printf("TIMER_NUMOF=%i\n", TIMER_NUMOF);
-    printf("TIMER_SPEED=%lu\n", TIMER_SPEED);
+    printf("TIMER_SPEED=%lu\n", (unsigned long) TIMER_SPEED);
 
     /* test all configured timers */
     for (unsigned i = 0; i < TIMER_NUMOF; i++) {
