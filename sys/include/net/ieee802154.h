@@ -99,6 +99,13 @@ extern "C" {
 #define IEEE802154_ACK_FRAME_LEN          (5U)  /**< ACK frame length */
 
 /**
+ * @brief value of measured power when RSSI is zero.
+ *
+ * This value is defined in the IEEE 802.15.4 standard
+ */
+#define IEEE802154_RADIO_RSSI_OFFSET        (-174)
+
+/**
  * For the SUN PHYs, the value is 1 ms expressed in symbol periods, rounded
  * up to the next integer number of symbol periods using the ceiling() function.
  *
