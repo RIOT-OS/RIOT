@@ -377,6 +377,11 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsign
         return -1;
     }
 
+    if (option_len > 4) {
+        DEBUG("nanocoap: invalid option length\n");
+        return -1;
+    }
+
     uint32_t blkopt = _decode_uint(data_start, option_len);
 
     DEBUG("nanocoap: blkopt len: %i\n", option_len);
