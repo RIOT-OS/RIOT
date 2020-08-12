@@ -169,17 +169,6 @@ static const spi_conf_t spi_config[] = {
 /** @} */
 
 /**
- * @name    RTT/RTC configuration
- *
- * @{
- */
-#define RTT_FREQUENCY               (1)             /* in Hz */
-#define RTT_MAX_VALUE               (0xFFFFFFFF)
-#define RTT_INTR_PRIORITY           (2)
-
-/** @} */
-
-/**
  * @name    PWM configuration
  *
  * @{
