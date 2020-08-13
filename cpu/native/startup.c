@@ -268,23 +268,26 @@ void usage_exit(int status)
         real_printf(" <tap interface %d>", i + 1);
     }
 #endif
-    real_printf(" [-i <id>] [-d] [-e|-E] [-o] [-c <tty>]\n");
+    real_printf(" [-i <id>] [-d] [-e|-E] [-o] [-c <tty>]");
 #ifdef MODULE_PERIPH_GPIO_LINUX
-    real_printf(" [-g <gpiochip>]\n");
+    real_printf(" [-g <gpiochip>]");
 #endif
+    real_printf(" [-i <id>] [-d] [-e|-E] [-o] [-c <tty>]");
 #if defined(MODULE_SOCKET_ZEP) && (SOCKET_ZEP_MAX > 0)
-    real_printf(" -z [[<laddr>:<lport>,]<raddr>:<rport>]\n");
+    real_printf(" -z [[<laddr>:<lport>,]<raddr>:<rport>]");
     for (int i = 0; i < SOCKET_ZEP_MAX - 1; i++) {
         /* for further interfaces the local address must be different so we omit
          * the braces (marking them as optional) to be 100% clear on that */
-        real_printf(" -z <laddr>:<lport>,<raddr>:<rport>\n");
+        real_printf(" -z <laddr>:<lport>,<raddr>:<rport>");
     }
 #endif
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
-    real_printf(" [-p <b>:<d>:<spidev>]\n");
+    real_printf(" [-p <b>:<d>:<spidev>]");
 #endif
 
-    real_printf(" help: %s -h\n\n", _progname);
+    real_printf("\n\n");
+
+    real_printf("help: %s -h\n", _progname);
 
     real_printf("\nOptions:\n"
 "    -h, --help\n"
