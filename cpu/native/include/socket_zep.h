@@ -23,6 +23,8 @@
 #ifndef SOCKET_ZEP_H
 #define SOCKET_ZEP_H
 
+#include <stdbool.h>
+
 #include "net/netdev.h"
 #include "net/netdev/ieee802154.h"
 #include "net/zep.h"
@@ -39,6 +41,7 @@ typedef struct {
     int sock_fd;                    /**< socket fd */
     netdev_event_t last_event;      /**< event triggered */
     uint32_t seq;                   /**< ZEP sequence number */
+    bool disabled;                  /**< simulate sleep */
     /**
      * @brief   Receive buffer
      */

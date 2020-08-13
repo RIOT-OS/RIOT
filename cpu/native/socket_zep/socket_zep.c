@@ -107,6 +107,11 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     int res;
 
     assert((dev != NULL) && (dev->sock_fd != 0));
+
+    if (dev->disabled) {
+        return -EBUSY;
+    }
+
     _prep_vector(dev, iolist, n, v);
     DEBUG("socket_zep::send(%p, %p, %u)\n", (void *)netdev, (void *)iolist, n);
     /* simulate TX_STARTED interrupt */
@@ -259,6 +264,15 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static void _isr(netdev_t *netdev)
 {
+    socket_zep_t *dev = (socket_zep_t *)netdev;
+
+    /* discard packet when sleeping */
+    if (dev->disabled) {
+        uint8_t buffer[128];
+        real_read(dev->sock_fd, buffer, sizeof(buffer));
+        return;
+    }
+
     if (netdev->event_callback) {
         socket_zep_t *dev = (socket_zep_t *)netdev;
 
@@ -299,16 +313,52 @@ static int _init(netdev_t *netdev)
     return 0;
 }
 
+static netopt_state_t _get_state(socket_zep_t *dev)
+{
+    if (dev->disabled) {
+        return NETOPT_STATE_SLEEP;
+    } else {
+        return NETOPT_STATE_IDLE;
+    }
+}
+
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
     assert(netdev != NULL);
+
+    if (opt == NETOPT_STATE) {
+        *((netopt_state_t *)value) = _get_state((void*)netdev);
+        return sizeof(netopt_state_t);
+    }
+
     return netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, value, max_len);
+}
+
+static int _set_state(socket_zep_t *dev, netopt_state_t state)
+{
+    switch (state) {
+    case NETOPT_STATE_SLEEP:
+        dev->disabled = true;
+        break;
+    case NETOPT_STATE_IDLE:
+        dev->disabled = false;
+        break;
+    default:
+        return -ENOTSUP;
+    }
+
+    return sizeof(netopt_state_t);
 }
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *value,
                 size_t value_len)
 {
     assert(netdev != NULL);
+
+    if (opt == NETOPT_STATE) {
+        return _set_state((void*)netdev, *((const netopt_state_t *)value));
+    }
+
     return netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt,
                                   value, value_len);
 }
