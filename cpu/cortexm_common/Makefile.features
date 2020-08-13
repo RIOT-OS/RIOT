@@ -36,3 +36,5 @@ endif
 ifneq (,$(filter armv7m armv8m,$(CPU_ARCH)))
   FEATURES_PROVIDED += no_idle_thread
 endif
+
+KCONFIG_ADD_CONFIG += $(RIOTCPU)/cortexm_common/cortexm_common.config

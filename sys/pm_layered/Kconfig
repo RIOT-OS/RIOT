@@ -4,14 +4,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-config BOARD
-    string
-    help
-        Name of the currently selected board.
 
-config MOD_BOARD
-    bool
-    default y
+config MOD_PM_LAYERED
+    bool "Platform-independent Power Management"
+    depends on MOD_PERIPH_PM
     depends on TEST_KCONFIG
-    help
-        Module which holds all board-specific files.
