@@ -262,6 +262,10 @@ void gpio_irq_enable(gpio_t pin)
     const uint8_t pin_num = _pin_num(pin);
     const uint8_t pin_bit = 1<<pin_num;
 
+    /* clear stale interrupt */
+    ROM_GPIOPinIntClear(port_addr, pin_bit);
+
+    /* enable interrupt */
     HWREG(im_reg_addr) |= pin_bit;
 }
 
