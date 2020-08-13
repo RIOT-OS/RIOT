@@ -176,6 +176,7 @@ include $(RIOTMAKE)/dependencies_debug.inc.mk
 GLOBAL_GOALS += buildtest \
                 buildtest-indocker \
                 info-boards-features-blacklisted \
+                info-boards-features-conflicting \
                 info-boards-features-missing \
                 info-boards-supported \
                 info-buildsizes info-buildsizes-diff \

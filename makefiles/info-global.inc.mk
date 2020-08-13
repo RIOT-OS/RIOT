@@ -3,6 +3,7 @@
         info-boards-supported \
         info-boards-features-missing \
         info-boards-features-blacklisted \
+        info-boards-features-conflicting \
         #
 
 BOARDDIR_GLOBAL := $(BOARDDIR)
@@ -66,6 +67,11 @@ define board_unsatisfied_features
       BOARDS_FEATURES_USED_BLACKLISTED += "$$(BOARD) $$(FEATURES_USED_BLACKLISTED)"
       BOARDS_WITH_BLACKLISTED_FEATURES += $$(BOARD)
     endif
+
+    ifneq (,$$(FEATURES_CONFLICTING))
+      BOARDS_FEATURES_CONFLICTING += "$$(BOARD) $$(FEATURES_CONFLICTING)"
+      BOARDS_WITH_CONFLICTING_FEATURES += $$(BOARD)
+    endif
   endif
 
   ifneq (,$$(DEPENDENCY_DEBUG))
@@ -80,9 +86,13 @@ BOARDS_WITH_MISSING_FEATURES :=
 BOARDS_FEATURES_MISSING :=
 BOARDS_WITH_BLACKLISTED_FEATURES :=
 BOARDS_FEATURES_USED_BLACKLISTED :=
+BOARDS_FEATURES_CONFLICTING :=
+BOARDS_WITH_CONFLICTING_FEATURES :=
 
 $(foreach board,$(BOARDS),$(eval $(call board_unsatisfied_features,$(board))))
-BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES) $(BOARDS_WITH_BLACKLISTED_FEATURES), $(BOARDS))
+BOARDS := $(filter-out $(BOARDS_WITH_MISSING_FEATURES) \
+                       $(BOARDS_WITH_BLACKLISTED_FEATURES) \
+                       $(BOARDS_WITH_CONFLICTING_FEATURES), $(BOARDS))
 
 info-buildsizes: SHELL=bash
 info-buildsizes:
@@ -123,6 +133,9 @@ info-boards-features-missing:
 
 info-boards-features-blacklisted:
 	@for f in $(BOARDS_FEATURES_USED_BLACKLISTED); do echo $${f}; done | column -t
+
+info-boards-features-conflicting:
+	@for f in $(BOARDS_FEATURES_CONFLICTING); do echo $${f}; done | column -t
 
 # Reset BOARDSDIR so unchanged for makefiles included after, for now only
 # needed for buildtests.inc.mk
