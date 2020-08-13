@@ -106,6 +106,7 @@ static const char short_opts[] = ":hi:s:deEoc:"
 #endif
 #ifdef MODULE_SOCKET_ZEP
     "z:"
+    "Z:"
 #endif
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
     "p:"
@@ -132,6 +133,7 @@ static const struct option long_opts[] = {
 #endif
 #ifdef MODULE_SOCKET_ZEP
     { "zep", required_argument, NULL, 'z' },
+    { "zep_mac", required_argument, NULL, 'Z' },
 #endif
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
     { "spi", required_argument, NULL, 'p' },
@@ -280,6 +282,9 @@ void usage_exit(int status)
          * the braces (marking them as optional) to be 100% clear on that */
         real_printf(" -z <laddr>:<lport>,<raddr>:<rport>");
     }
+    for (int i = 0; i < SOCKET_ZEP_MAX; i++) {
+        real_printf(" [-Z <eui64>]");
+    }
 #endif
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
     real_printf(" [-p <b>:<d>:<spidev>]");
@@ -320,6 +325,9 @@ void usage_exit(int status)
 "        provide a ZEP interface with local address and port (<laddr>, <lport>)\n"
 "        and remote address and port (default local: [::]:17754).\n"
 "        Required to be provided SOCKET_ZEP_MAX times\n"
+"    -Z <eui64>, --zep_mac=<eui64>\n"
+"        provide a ZEP interface with EUI-64 (MAC address)\n"
+"        This argument can be provided SOCKET_ZEP_MAX times\n"
 #endif
     );
 #ifdef MODULE_MTD_NATIVE
@@ -446,6 +454,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
     int c, opt_idx = 0, uart = 0;
 #ifdef MODULE_SOCKET_ZEP
     unsigned zeps = 0;
+    unsigned zep_macs = 0;
 #endif
     bool dmn = false, force_stderr = false;
     _stdiotype_t stderrtype = _STDIOTYPE_STDIO;
@@ -523,6 +532,9 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 #ifdef MODULE_SOCKET_ZEP
             case 'z':
                 _zep_params_setup(optarg, zeps++);
+                break;
+            case 'Z':
+                socket_zep_params[zep_macs++].mac_addr = optarg;
                 break;
 #endif
 #ifdef MODULE_PERIPH_SPIDEV_LINUX

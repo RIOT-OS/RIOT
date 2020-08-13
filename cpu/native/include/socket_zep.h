@@ -54,10 +54,11 @@ typedef struct {
  * @brief   ZEP device initialization parameters
  */
 typedef struct {
-    char *local_addr;   /**< local address string */
-    char *local_port;   /**< local address string */
+    char *local_addr;   /**< local address string  */
+    char *local_port;   /**< local address string  */
     char *remote_addr;  /**< remote address string */
-    char *remote_port;  /**< local address string */
+    char *remote_port;  /**< local address string  */
+    char *mac_addr;     /**< EUI-64 address string */
 } socket_zep_params_t;
 
 /**

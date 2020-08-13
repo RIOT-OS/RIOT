@@ -16,6 +16,7 @@ endif
 ifneq (,$(filter socket_zep,$(USEMODULE)))
   USEMODULE += iolist
   USEMODULE += netdev_ieee802154
+  USEMODULE += netif
   USEMODULE += checksum
   USEMODULE += random
 endif
