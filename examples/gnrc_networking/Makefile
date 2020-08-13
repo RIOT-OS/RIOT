@@ -36,6 +36,17 @@ USEMODULE += netstats_rpl
 # development process:
 DEVELHELP ?= 1
 
+# Instead of simulating an Ethernet connection, we can also simulate
+# an IEEE 802.15.4 radio using ZEP
+USE_ZEP ?= 0
+
+# set the ZEP port for native
+ZEP_PORT_BASE ?= 17754
+ifeq (1,$(USE_ZEP))
+  TERMFLAGS += -z [::1]:$(ZEP_PORT_BASE)
+  USEMODULE += socket_zep
+endif
+
 # Uncomment the following 2 lines to specify static link lokal IPv6 address
 # this might be useful for testing, in cases where you cannot or do not want to
 # run a shell with ifconfig to get the real link lokal address.
