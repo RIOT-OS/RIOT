@@ -56,6 +56,25 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    DMA streams configuration
+ * @{
+ */
+static const dma_conf_t dma_config[] = {
+    { .stream = 1 },    /* DMA1 Channel 2 - SPI1_RX */
+    { .stream = 2 },    /* DMA1 Channel 3 - SPI1_TX */
+    { .stream = 3 },    /* DMA1 Channel 4 - USART1_TX */
+    { .stream = 6 },    /* DMA1 Channel 7 - USART2_TX */
+};
+
+#define DMA_0_ISR   isr_dma1_channel2
+#define DMA_1_ISR   isr_dma1_channel3
+#define DMA_2_ISR   isr_dma1_channel4
+#define DMA_3_ISR   isr_dma1_channel7
+
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
+/** @} */
+
+/**
  * @name   UART configuration
  * @{
  */
@@ -68,7 +87,11 @@ static const uart_conf_t uart_config[] = {
         .rx_af      = GPIO_AF7,
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
-        .irqn       = USART2_IRQn
+        .irqn       = USART2_IRQn,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 3,
+        .dma_chan   = DMA_CHAN_CONFIG_UNSUPPORTED
+#endif
     },
     {
         .dev        = USART1,
@@ -78,7 +101,11 @@ static const uart_conf_t uart_config[] = {
         .rx_af      = GPIO_AF7,
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
-        .irqn       = USART1_IRQn
+        .irqn       = USART1_IRQn,
+#ifdef MODULE_PERIPH_DMA
+        .dma        = 2,
+        .dma_chan   = DMA_CHAN_CONFIG_UNSUPPORTED
+#endif
     }
 };
 
@@ -134,7 +161,13 @@ static const spi_conf_t spi_config[] = {
         .sclk_af  = GPIO_AF5,
         .cs_af    = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2
+        .apbbus   = APB2,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma   = 1,
+        .tx_dma_chan = DMA_CHAN_CONFIG_UNSUPPORTED,
+        .rx_dma   = 0,
+        .rx_dma_chan = DMA_CHAN_CONFIG_UNSUPPORTED
+#endif
     }
 };
 
