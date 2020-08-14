@@ -1,0 +1,25 @@
+From 478d952b17c33ed5644172c9b4aebf4cdf7bec62 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 14 Aug 2020 15:04:20 +0200
+Subject: [PATCH 3/7] lib/tofdb/: use DPL_ENOENT instead of OS_ENOENT
+
+---
+ lib/tofdb/src/tofdb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/tofdb/src/tofdb.c b/lib/tofdb/src/tofdb.c
+index e6c8015..7d75942 100644
+--- a/lib/tofdb/src/tofdb.c
++++ b/lib/tofdb/src/tofdb.c
+@@ -28,7 +28,7 @@ int tofdb_get_tof(uint16_t addr, uint32_t *tof)
+             goto ret;
+         }
+     }
+-    return OS_ENOENT;
++    return DPL_ENOENT;
+ ret:
+     return OS_OK;
+ }
+-- 
+2.28.0
+

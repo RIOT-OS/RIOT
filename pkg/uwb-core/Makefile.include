@@ -1,0 +1,22 @@
+INCLUDES += -I$(PKGDIRBASE)/uwb-core/hw/drivers/uwb/include/ \
+            -I$(PKGDIRBASE)/uwb-core/lib/euclid/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/dsp/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/json/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/rng_math/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/twr_ss/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/twr_ss_ext/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/twr_ss_ack/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/twr_ds/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/twr_ds_ext/include \
+            -I$(PKGDIRBASE)/uwb-core/lib/uwb_rng/include \
+            -I$(PKGDIRBASE)/uwb-core/porting/dpl/riot/include/ \
+            -I$(PKGDIRBASE)/uwb-core/sys/uwbcfg/include \
+            -I$(RIOTPKG)/uwb-core/include \
+            #
+
+DIRS += $(RIOTPKG)/uwb-core/dpl \
+        $(RIOTPKG)/uwb-core/contrib \
+        #
+
+# A cflag to indicate in pkg code that we are building for RIOT
+CFLAGS += -DRIOT

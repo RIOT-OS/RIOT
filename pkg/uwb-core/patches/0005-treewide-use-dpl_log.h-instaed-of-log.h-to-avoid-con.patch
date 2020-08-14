@@ -1,0 +1,78 @@
+From 86db74c73938d86a3bcf581af2174991cef632fe Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 14 Aug 2020 15:11:06 +0200
+Subject: [PATCH 5/7] treewide: use dpl_log.h instaed of log.h to avoid
+ conflict
+
+---
+ lib/panmaster/src/panmaster.c | 10 +++++-----
+ sys/uwbcfg/src/uwbcfg.c       |  2 +-
+ sys/uwbcfg/src/uwbcfg_priv.h  | 10 +++++-----
+ 3 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/lib/panmaster/src/panmaster.c b/lib/panmaster/src/panmaster.c
+index a1234b6..f2d9fef 100644
+--- a/lib/panmaster/src/panmaster.c
++++ b/lib/panmaster/src/panmaster.c
+@@ -2,7 +2,7 @@
+ #include <dpl/dpl.h>
+ #include <syscfg/syscfg.h>
+ #include <sysinit/sysinit.h>
+-#include <log/log.h>
++#include <log/dpl_log.h>
+ #include <config/config.h>
+ 
+ #include "panmaster/panmaster.h"
+@@ -23,10 +23,10 @@ static uint16_t pan_id = 0x0000;
+ static volatile int nodes_loaded = 0;
+ 
+ #define LOG_MODULE_PAN_MASTER (91)
+-#define PM_INFO(...)     LOG_INFO(&_log, LOG_MODULE_PAN_MASTER, __VA_ARGS__)
+-#define PM_DEBUG(...)    LOG_DEBUG(&_log, LOG_MODULE_PAN_MASTER, __VA_ARGS__)
+-#define PM_WARN(...)     LOG_WARN(&_log, LOG_MODULE_PAN_MASTER, __VA_ARGS__)
+-#define PM_ERR(...)      LOG_ERROR(&_log, LOG_MODULE_PAN_MASTER, __VA_ARGS__)
++#define PM_INFO(...)     LOG_INFO(__VA_ARGS__)
++#define PM_DEBUG(...)    LOG_DEBUG(__VA_ARGS__)
++#define PM_WARN(...)     LOG_WARN(__VA_ARGS__)
++#define PM_ERR(...)      LOG_ERROR(__VA_ARGS__)
+ static struct log _log;
+ 
+ /*
+diff --git a/sys/uwbcfg/src/uwbcfg.c b/sys/uwbcfg/src/uwbcfg.c
+index 4c4678e..c7c97ea 100644
+--- a/sys/uwbcfg/src/uwbcfg.c
++++ b/sys/uwbcfg/src/uwbcfg.c
+@@ -21,7 +21,7 @@
+ #include <stdio.h>
+ 
+ #include <dpl/dpl.h>
+-#include <log/log.h>
++#include <log/dpl_log.h>
+ #include <syscfg/syscfg.h>
+ #include <sysinit/sysinit.h>
+ #include <config/config.h>
+diff --git a/sys/uwbcfg/src/uwbcfg_priv.h b/sys/uwbcfg/src/uwbcfg_priv.h
+index 8f7f05b..4158b34 100644
+--- a/sys/uwbcfg/src/uwbcfg_priv.h
++++ b/sys/uwbcfg/src/uwbcfg_priv.h
+@@ -20,12 +20,12 @@
+ #ifndef __UWBCFG_PRIV_H_
+ #define __UWBCFG_PRIV_H_
+ 
+-#include <log/log.h>
++#include <log/dpl_log.h>
+ #define LOG_MODULE_UWBCFG (92)
+-#define UC_INFO(...)     LOG_INFO(&_uwbcfg_log, LOG_MODULE_UWBCFG, __VA_ARGS__)
+-#define UC_DEBUG(...)    LOG_DEBUG(&_uwbcfg_log, LOG_MODULE_UWBCFG, __VA_ARGS__)
+-#define UC_WARN(...)     LOG_WARN(&_uwbcfg_log, LOG_MODULE_UWBCFG, __VA_ARGS__)
+-#define UC_ERR(...)      LOG_ERROR(&_uwbcfg_log, LOG_MODULE_UWBCFG, __VA_ARGS__)
++#define UC_INFO(...)     LOG_INFO(__VA_ARGS__)
++#define UC_DEBUG(...)    LOG_DEBUG(__VA_ARGS__)
++#define UC_WARN(...)     LOG_WARN(__VA_ARGS__)
++#define UC_ERR(...)      LOG_ERROR(__VA_ARGS__)
+ 
+ enum {
+     CFGSTR_CH=0,
+-- 
+2.28.0
+

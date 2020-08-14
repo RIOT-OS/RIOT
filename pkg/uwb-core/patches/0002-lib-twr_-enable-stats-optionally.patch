@@ -1,0 +1,758 @@
+From cac1c7aeb1db0732519fa6ae27f3f34234c83615 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 14 Aug 2020 14:22:29 +0200
+Subject: [PATCH 2/7] lib/twr_*: enable stats optionally
+
+---
+ lib/twr_ds/src/twr_ds.c                   | 41 +++++++++++++----------
+ lib/twr_ds/syscfg.yml                     |  3 ++
+ lib/twr_ds_ext/src/twr_ds_ext.c           | 17 +++++++---
+ lib/twr_ds_ext/syscfg.yml                 |  3 ++
+ lib/twr_ds_ext_nrng/src/twr_ds_ext_nrng.c | 16 ++++++---
+ lib/twr_ds_ext_nrng/syscfg.yml            |  3 ++
+ lib/twr_ds_nrng/src/twr_ds_nrng.c         | 16 ++++++---
+ lib/twr_ds_nrng/syscfg.yml                |  3 ++
+ lib/twr_ss/src/twr_ss.c                   |  6 ++++
+ lib/twr_ss/syscfg.yml                     |  3 ++
+ lib/twr_ss_ack/src/twr_ss_ack.c           |  8 +++--
+ lib/twr_ss_ack/syscfg.yml                 |  3 ++
+ lib/twr_ss_ext/src/twr_ss_ext.c           | 15 ++++++---
+ lib/twr_ss_ext/syscfg.yml                 |  3 ++
+ lib/twr_ss_ext_nrng/src/twr_ss_ext_nrng.c |  9 ++++-
+ lib/twr_ss_ext_nrng/syscfg.yml            |  3 ++
+ lib/twr_ss_nrng/src/twr_ss_nrng.c         | 39 ++++++++++++++++++---
+ lib/twr_ss_nrng/syscfg.yml                |  3 ++
+ 18 files changed, 151 insertions(+), 43 deletions(-)
+
+diff --git a/lib/twr_ds/src/twr_ds.c b/lib/twr_ds/src/twr_ds.c
+index c73c412..cb5de6a 100644
+--- a/lib/twr_ds/src/twr_ds.c
++++ b/lib/twr_ds/src/twr_ds.c
+@@ -51,6 +51,23 @@
+ #endif
+ #endif
+ 
++#if MYNEWT_VAL(TWR_DS_STATS)
++STATS_SECT_START(twr_ds_stat_section)
++    STATS_SECT_ENTRY(complete)
++    STATS_SECT_ENTRY(start_tx_error)
++STATS_SECT_END
++
++STATS_NAME_START(twr_ds_stat_section)
++    STATS_NAME(twr_ds_stat_section, complete)
++    STATS_NAME(twr_ds_stat_section, start_tx_error)
++STATS_NAME_END(twr_ds_stat_section)
++
++STATS_SECT_DECL(twr_ds_stat_section) g_twr_ds_stat;
++#define DS_STATS_INC(__X) STATS_INC(g_twr_ds_stat, __X)
++#else
++#define DS_STATS_INC(__X) {}
++#endif
++
+ static bool rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs);
+ 
+ static struct uwb_mac_interface g_cbs[] = {
+@@ -72,18 +89,6 @@ static struct uwb_mac_interface g_cbs[] = {
+ #endif
+ };
+ 
+-STATS_SECT_START(twr_ds_stat_section)
+-    STATS_SECT_ENTRY(complete)
+-    STATS_SECT_ENTRY(start_tx_error)
+-STATS_SECT_END
+-
+-STATS_NAME_START(twr_ds_stat_section)
+-    STATS_NAME(twr_ds_stat_section, complete)
+-    STATS_NAME(twr_ds_stat_section, start_tx_error)
+-STATS_NAME_END(twr_ds_stat_section)
+-
+-STATS_SECT_DECL(twr_ds_stat_section) g_twr_ds_stat;
+-
+ static struct uwb_rng_config g_config = {
+     .tx_holdoff_delay = MYNEWT_VAL(TWR_DS_TX_HOLDOFF),         // Send Time delay in usec.
+     .rx_timeout_delay = MYNEWT_VAL(TWR_DS_RX_TIMEOUT)       // Receive response timeout in usec
+@@ -137,6 +142,7 @@ void twr_ds_pkg_init(void)
+         uwb_rng_append_config(g_cbs[i].inst_ptr, &g_rng_cfgs[i]);
+     }
+ 
++#if MYNEWT_VAL(TWR_DS_STATS)
+     rc = stats_init(
+         STATS_HDR(g_twr_ds_stat),
+         STATS_SIZE_INIT_PARMS(g_twr_ds_stat, STATS_SIZE_32),
+@@ -145,6 +151,7 @@ void twr_ds_pkg_init(void)
+ 
+     rc = stats_register("twr_ds", STATS_HDR(g_twr_ds_stat));
+     assert(rc == 0);
++#endif
+ 
+ }
+ 
+@@ -231,7 +238,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+ 
+                 /* Start tx now, the remaining settings can be done whilst sending anyway */
+                 if (uwb_start_tx(inst).start_tx_error){
+-                    STATS_INC(g_twr_ds_stat, start_tx_error);
++                    DS_STATS_INC(start_tx_error);
+                     dpl_sem_release(&rng->sem);
+                 }
+ 
+@@ -291,7 +298,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                 uwb_set_rxauto_disable(inst, true);
+ 
+                 if (uwb_start_tx(inst).start_tx_error){
+-                    STATS_INC(g_twr_ds_stat, start_tx_error);
++                    DS_STATS_INC(start_tx_error);
+                     dpl_sem_release(&rng->sem);
+                 }
+                 /* Setup when to listen for response, relative the end of our transmitted frame */
+@@ -337,11 +344,11 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                 uwb_set_delay_start(inst, txd.response_tx_delay);
+ 
+                 if (uwb_start_tx(inst).start_tx_error) {
+-                    STATS_INC(g_twr_ds_stat, start_tx_error);
++                    DS_STATS_INC(start_tx_error);
+                     dpl_sem_release(&rng->sem);
+                     rng_issue_complete(inst);
+                 } else {
+-                    STATS_INC(g_twr_ds_stat, complete);
++                    DS_STATS_INC(complete);
+                     rng->control.complete_after_tx = 1;
+                 }
+ 
+@@ -352,7 +359,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                 // This code executes on the device that initialed the original request, and has now receive the final response timestamp.
+                 // This marks the completion of the double-single-two-way request.
+ 
+-                STATS_INC(g_twr_ds_stat, complete);
++                DS_STATS_INC(complete);
+                 dpl_sem_release(&rng->sem);
+                 rng_issue_complete(inst);
+                 break;
+diff --git a/lib/twr_ds/syscfg.yml b/lib/twr_ds/syscfg.yml
+index cb12594..288b8fd 100644
+--- a/lib/twr_ds/syscfg.yml
++++ b/lib/twr_ds/syscfg.yml
+@@ -10,3 +10,6 @@ syscfg.defs:
+       TWR_DS_RX_TIMEOUT:
+         description: 'TOA timeout delay for DS TWR (usec)'
+         value: ((uint16_t)0x30)
++      TWR_DS_STATS:
++        description: 'Enable statistics for the twr_ds module'
++        value: 1
+diff --git a/lib/twr_ds_ext/src/twr_ds_ext.c b/lib/twr_ds_ext/src/twr_ds_ext.c
+index 95f38fe..07cc28c 100644
+--- a/lib/twr_ds_ext/src/twr_ds_ext.c
++++ b/lib/twr_ds_ext/src/twr_ds_ext.c
+@@ -67,6 +67,7 @@ static struct uwb_mac_interface g_cbs[] = {
+ #endif
+ };
+ 
++#if MYNEWT_VAL(TWR_DS_EXT_STATS)
+ STATS_SECT_START(twr_ds_ext_stat_section)
+     STATS_SECT_ENTRY(complete)
+     STATS_SECT_ENTRY(tx_error)
+@@ -78,6 +79,10 @@ STATS_NAME_START(twr_ds_ext_stat_section)
+ STATS_NAME_END(twr_ds_ext_stat_section)
+ 
+ static STATS_SECT_DECL(twr_ds_ext_stat_section) g_twr_ds_ext_stat;
++#define DS_STATS_INC(__X) STATS_INC(g_twr_ds_ext_stat, __X)
++#else
++#define DS_STATS_INC(__X) {}
++#endif
+ 
+ static struct uwb_rng_config g_config = {
+     .tx_holdoff_delay = MYNEWT_VAL(TWR_DS_EXT_TX_HOLDOFF),         // Send Time delay in usec.
+@@ -132,6 +137,7 @@ void twr_ds_ext_pkg_init(void)
+         uwb_rng_append_config(g_cbs[i].inst_ptr, &g_rng_cfgs[i]);
+     }
+ 
++#if MYNEWT_VAL(TWR_DS_EXT_STATS)
+     rc = stats_init(
+         STATS_HDR(g_twr_ds_ext_stat),
+         STATS_SIZE_INIT_PARMS(g_twr_ds_ext_stat, STATS_SIZE_32),
+@@ -140,6 +146,7 @@ void twr_ds_ext_pkg_init(void)
+ 
+     rc = stats_register("twr_ds_ext", STATS_HDR(g_twr_ds_ext_stat));
+     assert(rc == 0);
++#endif
+ }
+ 
+ 
+@@ -224,7 +231,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                 uwb_set_rxauto_disable(inst, true);
+ 
+                 if (uwb_start_tx(inst).start_tx_error){
+-                    STATS_INC(g_twr_ds_ext_stat, tx_error);
++                    DS_STATS_INC(tx_error);
+                     dpl_sem_release(&rng->sem);
+                 }
+ 
+@@ -293,7 +300,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                 uwb_set_rxauto_disable(inst, true);
+ 
+                 if (uwb_start_tx(inst).start_tx_error){
+-                    STATS_INC(g_twr_ds_ext_stat, tx_error);
++                    DS_STATS_INC(tx_error);
+                     dpl_sem_release(&rng->sem);
+                 }
+                 /* Setup when to listen for response, relative the end of our transmitted frame */
+@@ -348,11 +355,11 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                 uwb_rng_clear_twr_data(&frame->remote);
+ 
+                 if (uwb_start_tx(inst).start_tx_error) {
+-                    STATS_INC(g_twr_ds_ext_stat, tx_error);
++                    DS_STATS_INC(tx_error);
+                     dpl_sem_release(&rng->sem);
+                     rng_issue_complete(inst);
+                 }else{
+-                    STATS_INC(g_twr_ds_ext_stat, complete);
++                    DS_STATS_INC(complete);
+                     rng->control.complete_after_tx = 1;
+                 }
+                 break;
+@@ -362,7 +369,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                 // This code executes on the device that initialed the original request, and has now receive the final response timestamp.
+                 // This marks the completion of the double-single-two-way request.
+ 
+-                STATS_INC(g_twr_ds_ext_stat, complete);
++                DS_STATS_INC(complete);
+                 dpl_sem_release(&rng->sem);
+                 rng_issue_complete(inst);
+                 break;
+diff --git a/lib/twr_ds_ext/syscfg.yml b/lib/twr_ds_ext/syscfg.yml
+index 199a671..fe80282 100644
+--- a/lib/twr_ds_ext/syscfg.yml
++++ b/lib/twr_ds_ext/syscfg.yml
+@@ -10,3 +10,6 @@ syscfg.defs:
+       TWR_DS_EXT_RX_TIMEOUT:
+         description: 'TOA timeout delay for DS TWR extended frame (usec)'
+         value: ((uint16_t)0x40)
++      TWR_DS_EXT_STATS:
++        description: 'Enable statistics for the twr_ds_ext module'
++        value: 1
+diff --git a/lib/twr_ds_ext_nrng/src/twr_ds_ext_nrng.c b/lib/twr_ds_ext_nrng/src/twr_ds_ext_nrng.c
+index b2a821e..2b15ae1 100644
+--- a/lib/twr_ds_ext_nrng/src/twr_ds_ext_nrng.c
++++ b/lib/twr_ds_ext_nrng/src/twr_ds_ext_nrng.c
+@@ -65,6 +65,7 @@ static struct uwb_mac_interface g_cbs = {
+             .final_cb = tx_final_cb,
+ };
+ 
++#if MYNEWT_VAL(TWR_DS_EXT_NRNG_STATS)
+ STATS_SECT_START(twr_ds_ext_nrng_stat_section)
+     STATS_SECT_ENTRY(complete)
+     STATS_SECT_ENTRY(rx_error)
+@@ -78,6 +79,11 @@ STATS_NAME_START(twr_ds_ext_nrng_stat_section)
+ STATS_NAME_END(twr_ds_ext_nrng_stat_section)
+ 
+ static STATS_SECT_DECL(twr_ds_ext_nrng_stat_section) g_stat;
++#define DS_STATS_INC(__X) STATS_INC(g_stat, __X)
++#else
++#define DS_STATS_INC(__X) {}
++#endif
++
+ 
+ static struct uwb_rng_config g_config = {
+     .tx_holdoff_delay = MYNEWT_VAL(TWR_DS_EXT_NRNG_TX_HOLDOFF),         // Send Time delay in usec.
+@@ -96,6 +102,7 @@ void twr_ds_ext_nrng_pkg_init(void){
+     printf("{\"utime\": %lu,\"msg\": \"twr_ds_ext_nrng_pkg_init\"}\n",os_cputime_ticks_to_usecs(os_cputime_get32()));
+     uwb_mac_append_interface(hal_dw1000_inst(0), &g_cbs);
+ 
++#if MYNEWT_VAL(TWR_DS_EXT_NRNG_STATS)
+     int rc = stats_init(
+     STATS_HDR(g_stat),
+     STATS_SIZE_INIT_PARMS(g_stat, STATS_SIZE_32),
+@@ -104,6 +111,7 @@ void twr_ds_ext_nrng_pkg_init(void){
+ 
+     rc = stats_register("twr_ds_ext_nrng", STATS_HDR(g_stat));
+     assert(rc == 0);
++#endif
+ }
+ 
+ 
+@@ -145,7 +153,7 @@ rx_timeout_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs){
+     if(inst->fctrl != FCNTL_IEEE_N_RANGES_16){
+         return false;
+     }
+-    STATS_INC(g_stat, rx_timeout);
++    DS_STATS_INC(rx_timeout);
+     assert(inst->nrng);
+     switch(inst->nrng->code){
+         case UWB_DATA_CODE_DS_TWR_NRNG_EXT ... UWB_DATA_CODE_DS_TWR_NRNG_EXT_FINAL:
+@@ -191,7 +199,7 @@ rx_error_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs){
+     if(inst->fctrl != FCNTL_IEEE_N_RANGES_16){
+         return false;
+     }
+-    STATS_INC(g_stat, rx_error);
++    DS_STATS_INC(rx_error);
+     assert(inst->nrng);
+     struct nrng_instance * nrng = inst->nrng;
+     os_error_t err = os_sem_release(&nrng->sem);
+@@ -371,7 +379,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                     if (cbs!=NULL && cbs->start_tx_error_cb)
+                         cbs->start_tx_error_cb(inst, cbs);
+                 }else{
+-                    STATS_INC(g_stat, complete);
++                    DS_STATS_INC(complete);
+                     os_sem_release(&nrng->sem);
+                     struct uwb_mac_interface * cbs = NULL;
+                     if(!(SLIST_EMPTY(&inst->interface_cbs))){
+@@ -416,7 +424,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                 if(idx == nnodes -1){
+                     os_sem_release(&nrng->sem);
+                     nrng->resp_count = 0;
+-                    STATS_INC(g_stat, complete);
++                    DS_STATS_INC(complete);
+                     struct uwb_mac_interface * cbs = NULL;
+                     if(!(SLIST_EMPTY(&inst->interface_cbs))){
+                         SLIST_FOREACH(cbs, &inst->interface_cbs, next){
+diff --git a/lib/twr_ds_ext_nrng/syscfg.yml b/lib/twr_ds_ext_nrng/syscfg.yml
+index 5fd3404..92a952b 100644
+--- a/lib/twr_ds_ext_nrng/syscfg.yml
++++ b/lib/twr_ds_ext_nrng/syscfg.yml
+@@ -12,3 +12,6 @@ syscfg.defs:
+         value: ((uint16_t)0x10)
+       TWR_DS_EXT_NRNG_TX_GUARD_DELAY:
+         value: ((uint16_t)0x150)
++      TWR_DS_EXT_NRNG_STATS:
++        description: 'Enable statistics for the twr_ds_ext_nrng module'
++        value: 1
+diff --git a/lib/twr_ds_nrng/src/twr_ds_nrng.c b/lib/twr_ds_nrng/src/twr_ds_nrng.c
+index b32b2f8..3aea94a 100644
+--- a/lib/twr_ds_nrng/src/twr_ds_nrng.c
++++ b/lib/twr_ds_nrng/src/twr_ds_nrng.c
+@@ -61,6 +61,7 @@ static struct uwb_mac_interface g_cbs = {
+             .rx_error_cb = rx_error_cb,
+ };
+ 
++#if MYNEWT_VAL(TWR_DS_NRNG_STATS)
+ STATS_SECT_START(twr_ds_nrng_stat_section)
+     STATS_SECT_ENTRY(complete)
+     STATS_SECT_ENTRY(rx_timeout)
+@@ -74,6 +75,10 @@ STATS_NAME_START(twr_ds_nrng_stat_section)
+ STATS_NAME_END(twr_ds_nrng_stat_section)
+ 
+ static STATS_SECT_DECL(twr_ds_nrng_stat_section) g_stat;
++#define DS_STATS_INC(__X) STATS_INC(g_stat, __X)
++#else
++#define DS_STATS_INC(__X) {}
++#endif
+ 
+ static struct uwb_rng_config g_config = {
+     .tx_holdoff_delay = MYNEWT_VAL(TWR_DS_NRNG_TX_HOLDOFF),         // Send Time delay in usec.
+@@ -101,6 +106,7 @@ void twr_ds_nrng_pkg_init(void){
+     uwb_mac_append_interface(uwb_dev_idx_lookup(0), &g_cbs);
+     nrng_append_config(nrng, &g_rng_cfgs);
+ 
++#if MYNEWT_VAL(TWR_DS_NRNG_STATS)
+     int rc = stats_init(
+     STATS_HDR(g_stat),
+     STATS_SIZE_INIT_PARMS(g_stat, STATS_SIZE_32),
+@@ -109,7 +115,7 @@ void twr_ds_nrng_pkg_init(void){
+ 
+     rc = stats_register("twr_ds_nrng", STATS_HDR(g_stat));
+     assert(rc == 0);
+-
++#endif
+ }
+ 
+ 
+@@ -139,7 +145,7 @@ rx_timeout_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs){
+     if(inst->fctrl != FCNTL_IEEE_N_RANGES_16){
+         return false;
+     }
+-    STATS_INC(g_stat, rx_timeout);
++    DS_STATS_INC(rx_timeout);
+     switch(inst->nrng->code){
+         case UWB_DATA_CODE_DS_TWR_NRNG ... UWB_DATA_CODE_DS_TWR_NRNG_FINAL:
+         {
+@@ -183,7 +189,7 @@ rx_error_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs){
+     if(inst->fctrl != FCNTL_IEEE_N_RANGES_16){
+         return false;
+     }
+-    STATS_INC(g_stat, rx_error);
++    DS_STATS_INC(rx_error);
+     assert(inst->nrng);
+     struct nrng_instance * nrng = inst->nrng;
+     if(os_sem_get_count(&nrng->sem) == 0){
+@@ -381,7 +387,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                     if (cbs!=NULL && cbs->start_tx_error_cb)
+                         cbs->start_tx_error_cb(inst, cbs);
+                 }else{
+-                    STATS_INC(g_stat, complete);
++                    DS_STATS_INC(complete);
+                     os_sem_release(&nrng->sem);
+                     struct uwb_mac_interface * cbs = NULL;
+                     if(!(SLIST_EMPTY(&inst->interface_cbs))){
+@@ -430,7 +436,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                 frame->transmission_timestamp = dw1000_read_txtime_lo(inst);
+                 if(idx == nnodes -1)
+                 {
+-                    STATS_INC(g_stat, complete);
++                    DS_STATS_INC(complete);
+                     os_sem_release(&nrng->sem);
+                     struct uwb_mac_interface * cbs = NULL;
+                     if(!(SLIST_EMPTY(&inst->interface_cbs))){
+diff --git a/lib/twr_ds_nrng/syscfg.yml b/lib/twr_ds_nrng/syscfg.yml
+index 804234a..28777c1 100644
+--- a/lib/twr_ds_nrng/syscfg.yml
++++ b/lib/twr_ds_nrng/syscfg.yml
+@@ -12,3 +12,6 @@ syscfg.defs:
+         value: ((uint16_t)0x10)
+       TWR_DS_NRNG_TX_GUARD_DELAY:
+         value: ((uint16_t)0x100)
++      TWR_DS_NRNG_STATS:
++        description: 'Enable statistics for the twr_ds_nrng module'
++        value: 1
+diff --git a/lib/twr_ss/src/twr_ss.c b/lib/twr_ss/src/twr_ss.c
+index 84c5084..7394ef4 100644
+--- a/lib/twr_ss/src/twr_ss.c
++++ b/lib/twr_ss/src/twr_ss.c
+@@ -76,6 +76,7 @@ static struct uwb_mac_interface g_cbs[] = {
+ #endif
+ };
+ 
++#if MYNEWT_VAL(TWR_SS_STATS)
+ STATS_SECT_START(twr_ss_stat_section)
+     STATS_SECT_ENTRY(complete)
+     STATS_SECT_ENTRY(tx_error)
+@@ -88,6 +89,9 @@ STATS_NAME_END(twr_ss_stat_section)
+ 
+ STATS_SECT_DECL(twr_ss_stat_section) g_twr_ss_stat;
+ #define SS_STATS_INC(__X) STATS_INC(g_twr_ss_stat, __X)
++#else
++#define SS_STATS_INC(__X) {}
++#endif
+ 
+ static struct uwb_rng_config g_config = {
+     .tx_holdoff_delay = MYNEWT_VAL(TWR_SS_TX_HOLDOFF),         // Send Time delay in usec.
+@@ -143,6 +147,7 @@ twr_ss_pkg_init(void)
+         uwb_rng_append_config(g_cbs[i].inst_ptr, &g_rng_cfgs[i]);
+     }
+ 
++#if MYNEWT_VAL(TWR_SS_STATS)
+     rc = stats_init(
+         STATS_HDR(g_twr_ss_stat),
+         STATS_SIZE_INIT_PARMS(g_twr_ss_stat, STATS_SIZE_32),
+@@ -151,6 +156,7 @@ twr_ss_pkg_init(void)
+ 
+     rc |= stats_register("twr_ss", STATS_HDR(g_twr_ss_stat));
+     assert(rc == 0);
++#endif
+ }
+ 
+ /**
+diff --git a/lib/twr_ss/syscfg.yml b/lib/twr_ss/syscfg.yml
+index e2ab7a5..05dc497 100644
+--- a/lib/twr_ss/syscfg.yml
++++ b/lib/twr_ss/syscfg.yml
+@@ -10,3 +10,6 @@ syscfg.defs:
+       TWR_SS_RX_TIMEOUT:
+         description: 'TOA timeout delay for SS TWR (usec)'
+         value: ((uint16_t)0x30)
++      TWR_SS_STATS:
++        description: 'Enable statistics for the twr_ss module'
++        value: 1
+diff --git a/lib/twr_ss_ack/src/twr_ss_ack.c b/lib/twr_ss_ack/src/twr_ss_ack.c
+index f0e0884..a64ce37 100644
+--- a/lib/twr_ss_ack/src/twr_ss_ack.c
++++ b/lib/twr_ss_ack/src/twr_ss_ack.c
+@@ -78,7 +78,7 @@ static struct uwb_mac_interface g_cbs[] = {
+ #endif
+ };
+ 
+-
++#if MYNEWT_VAL(TWR_SS_ACK_STATS)
+ STATS_SECT_START(twr_ss_ack_stat_section)
+     STATS_SECT_ENTRY(complete)
+     STATS_SECT_ENTRY(tx_error)
+@@ -97,7 +97,9 @@ STATS_NAME_END(twr_ss_ack_stat_section)
+ 
+ STATS_SECT_DECL(twr_ss_ack_stat_section) g_twr_ss_ack_stat;
+ #define SS_STATS_INC(__X) STATS_INC(g_twr_ss_ack_stat, __X)
+-
++#else
++#define SS_STATS_INC(__X) {}
++#endif
+ 
+ static struct uwb_rng_config g_config = {
+     .tx_holdoff_delay = MYNEWT_VAL(TWR_SS_ACK_TX_HOLDOFF),       // Send Time delay in usec.
+@@ -154,6 +156,7 @@ twr_ss_ack_pkg_init(void)
+         uwb_rng_append_config(g_cbs[i].inst_ptr, &g_rng_cfgs[i]);
+     }
+ 
++#if MYNEWT_VAL(TWR_SS_ACK_STATS)
+     rc = stats_init(
+         STATS_HDR(g_twr_ss_ack_stat),
+         STATS_SIZE_INIT_PARMS(g_twr_ss_ack_stat, STATS_SIZE_32),
+@@ -162,6 +165,7 @@ twr_ss_ack_pkg_init(void)
+ 
+     rc |= stats_register("twr_ss_ack", STATS_HDR(g_twr_ss_ack_stat));
+     assert(rc == 0);
++#endif
+ }
+ 
+ /**
+diff --git a/lib/twr_ss_ack/syscfg.yml b/lib/twr_ss_ack/syscfg.yml
+index 4a27a9c..52177a2 100644
+--- a/lib/twr_ss_ack/syscfg.yml
++++ b/lib/twr_ss_ack/syscfg.yml
+@@ -10,3 +10,6 @@ syscfg.defs:
+       TWR_SS_ACK_RX_TIMEOUT:
+         description: 'TOA timeout delay for SS TWR (usec)'
+         value: ((uint16_t)0x100)
++      TWR_SS_ACK_STATS:
++        description: 'Enable statistics for the twr_ss_ack module'
++        value: 1
+diff --git a/lib/twr_ss_ext/src/twr_ss_ext.c b/lib/twr_ss_ext/src/twr_ss_ext.c
+index 6e55a13..2ea3384 100644
+--- a/lib/twr_ss_ext/src/twr_ss_ext.c
++++ b/lib/twr_ss_ext/src/twr_ss_ext.c
+@@ -74,6 +74,7 @@ static struct uwb_mac_interface g_cbs[] = {
+ #endif
+ };
+ 
++#if MYNEWT_VAL(TWR_SS_EXT_STATS)
+ STATS_SECT_START(twr_ss_ext_stat_section)
+     STATS_SECT_ENTRY(complete)
+     STATS_SECT_ENTRY(tx_error)
+@@ -85,6 +86,10 @@ STATS_NAME_START(twr_ss_ext_stat_section)
+ STATS_NAME_END(twr_ss_ext_stat_section)
+ 
+ static STATS_SECT_DECL(twr_ss_ext_stat_section) g_twr_ss_ext_stat;
++#define SS_STATS_INC(__X) STATS_INC(g_twr_ss_ext_stat __X)
++#else
++#define SS_STATS_INC(__X) {}
++#endif
+ 
+ static struct uwb_rng_config g_config = {
+     .tx_holdoff_delay = MYNEWT_VAL(TWR_SS_EXT_TX_HOLDOFF),         // Send Time delay in usec.
+@@ -140,12 +145,14 @@ twr_ss_ext_pkg_init(void)
+         uwb_rng_append_config(g_cbs[i].inst_ptr, &g_rng_cfgs[i]);
+     }
+ 
++#if MYNEWT_VAL(TWR_SS_EXT_STATS)
+     rc = stats_init(
+         STATS_HDR(g_twr_ss_ext_stat),
+         STATS_SIZE_INIT_PARMS(g_twr_ss_ext_stat, STATS_SIZE_32),
+         STATS_NAME_INIT_PARMS(twr_ss_ext_stat_section));
+     rc |= stats_register("twr_ss_ext", STATS_HDR(g_twr_ss_ext_stat));
+     assert(rc == 0);
++#endif
+ }
+ 
+ /**
+@@ -241,7 +248,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                 uwb_set_delay_start(inst, txd.response_tx_delay);
+ 
+                 if (uwb_start_tx(inst).start_tx_error){
+-                    STATS_INC(g_twr_ss_ext_stat, tx_error);
++                    SS_STATS_INC(tx_error);
+                     dpl_sem_release(&rng->sem);
+                 }
+                 /* Setup when to listen for response, relative the end of our transmitted frame */
+@@ -284,12 +291,12 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                 uwb_set_delay_start(inst, txd.response_tx_delay);
+ 
+                 if (uwb_start_tx(inst).start_tx_error){
+-                    STATS_INC(g_twr_ss_ext_stat, tx_error);
++                    SS_STATS_INC(tx_error);
+                     dpl_sem_release(&rng->sem);
+                     rng_issue_complete(inst);
+                 }
+                 else{
+-                    STATS_INC(g_twr_ss_ext_stat, complete);
++                    SS_STATS_INC(complete);
+                     rng->control.complete_after_tx = 1;
+                 }
+                 break;
+@@ -301,7 +308,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+                 if (inst->frame_len != sizeof(twr_frame_final_t))
+                    break;
+ 
+-                STATS_INC(g_twr_ss_ext_stat, complete);
++                SS_STATS_INC(complete);
+                 dpl_sem_release(&rng->sem);
+                 rng_issue_complete(inst);
+                 break;
+diff --git a/lib/twr_ss_ext/syscfg.yml b/lib/twr_ss_ext/syscfg.yml
+index fcca45a..a71963f 100644
+--- a/lib/twr_ss_ext/syscfg.yml
++++ b/lib/twr_ss_ext/syscfg.yml
+@@ -10,3 +10,6 @@ syscfg.defs:
+       TWR_SS_EXT_RX_TIMEOUT:
+         description: 'TOA timeout delay for SS EXT TWR (usec)'
+         value: ((uint16_t)0x40)
++      TWR_SS_EXT_STATS:
++        description: 'Enable statistics for the twr_ss_ext module'
++        value: 1
+diff --git a/lib/twr_ss_ext_nrng/src/twr_ss_ext_nrng.c b/lib/twr_ss_ext_nrng/src/twr_ss_ext_nrng.c
+index 3808785..759f928 100644
+--- a/lib/twr_ss_ext_nrng/src/twr_ss_ext_nrng.c
++++ b/lib/twr_ss_ext_nrng/src/twr_ss_ext_nrng.c
+@@ -67,6 +67,7 @@ static struct uwb_mac_interface g_cbs = {
+             .final_cb = tx_final_cb,
+ };
+ 
++#if MYNEWT_VAL(TWR_SS_EXT_NRNG_STATS)
+ STATS_SECT_START(twr_ss_ext_nrng_stat_section)
+     STATS_SECT_ENTRY(complete)
+     STATS_SECT_ENTRY(rx_error)
+@@ -80,6 +81,10 @@ STATS_NAME_START(twr_ss_ext_nrng_stat_section)
+ STATS_NAME_END(twr_ss_ext_nrng_stat_section)
+ 
+ static STATS_SECT_DECL(twr_ss_ext_nrng_stat_section) g_stat;
++#define SS_STATS_INC(__X) STATS_INC(g_stat, __X)
++#else
++#define SS_STATS_INC(__X) {}
++#endif
+ 
+ static struct uwb_rng_config g_config = {
+     .tx_holdoff_delay = MYNEWT_VAL(TWR_SS_EXT_NRNG_TX_HOLDOFF),         // Send Time delay in usec.
+@@ -107,12 +112,14 @@ void twr_ss_ext_nrng_pkg_init(void)
+     uwb_mac_append_interface(uwb_dev_idx_lookup(0), &g_cbs);
+     nrng_append_config(nrng, &g_rng_cfgs);
+ 
++#if MYNEWT_VAL(TWR_SS_EXT_NRNG_STATS)
+     int rc = stats_init(
+     STATS_HDR(g_stat),
+     STATS_SIZE_INIT_PARMS(g_stat, STATS_SIZE_32),
+     STATS_NAME_INIT_PARMS(twr_ss_ext_nrng_stat_section));
+     rc |= stats_register("ss_ext_nrng", STATS_HDR(g_stat));
+     assert(rc == 0);
++#endif
+ }
+ 
+ /**
+@@ -144,7 +151,7 @@ rx_error_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs){
+     }
+     struct uwb_rng_instance * rng = inst->rng;
+     if(os_sem_get_count(&rng->sem) == 0){
+-        STATS_INC(g_stat, rx_error);
++        SS_STATS_INC(rx_error);
+         os_error_t err = os_sem_release(&rng->sem);
+         assert(err == OS_OK);
+         return true;
+diff --git a/lib/twr_ss_ext_nrng/syscfg.yml b/lib/twr_ss_ext_nrng/syscfg.yml
+index 997def3..ff8c789 100644
+--- a/lib/twr_ss_ext_nrng/syscfg.yml
++++ b/lib/twr_ss_ext_nrng/syscfg.yml
+@@ -12,6 +12,9 @@ syscfg.defs:
+         value: ((uint16_t)0x10)
+       TWR_SS_EXT_NRNG_TX_GUARD_DELAY:
+         value: ((uint32_t)0x90)
++      TWR_SS_EXT_NRNG_STATS:
++        description: 'Enable statistics for the twr_ss_ext_nrng module'
++        value: 1
+       CELL_ENABLED:
+         description: 'Cell network model on slot decoding'
+         value: 0
+diff --git a/lib/twr_ss_nrng/src/twr_ss_nrng.c b/lib/twr_ss_nrng/src/twr_ss_nrng.c
+index b6550f6..f5a60fc 100644
+--- a/lib/twr_ss_nrng/src/twr_ss_nrng.c
++++ b/lib/twr_ss_nrng/src/twr_ss_nrng.c
+@@ -52,6 +52,24 @@
+ #define DIAGMSG(s,u)
+ #endif
+ 
++#if MYNEWT_VAL(TWR_SS_NRNG_STATS)
++STATS_SECT_START(twr_ss_nrng_stat_section)
++    STATS_SECT_ENTRY(complete)
++    STATS_SECT_ENTRY(start_tx_error)
++STATS_SECT_END
++
++STATS_NAME_START(twr_ss_nrng_stat_section)
++    STATS_NAME(twr_ss_nrng_stat_section, complete)
++    STATS_NAME(twr_ss_nrng_stat_section, start_tx_error)
++STATS_NAME_END(twr_ss_nrng_stat_section)
++
++STATS_SECT_DECL(twr_ss_nrng_stat_section) g_twr_ss_nrng_stat;
++#define SS_STATS_INC(__X) STATS_INC(g_twr_ss_nrng_stat, __X)
++#else
++#define SS_STATS_INC(__X) {}
++#endif
++
++
+ static bool rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs);
+ static bool rx_timeout_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs);
+ static bool rx_error_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs);
+@@ -93,6 +111,17 @@ void twr_ss_nrng_pkg_init(void)
+     g_cbs.inst_ptr = nrng;
+     uwb_mac_append_interface(udev, &g_cbs);
+     nrng_append_config(nrng, &g_rng_cfgs);
++
++#if MYNEWT_VAL(TWR_SS_NRNG_STATS)
++    int rc = stats_init(
++    STATS_HDR(g_twr_ss_nrng_stat),
++    STATS_SIZE_INIT_PARMS(g_twr_ss_nrng_stat, STATS_SIZE_32),
++    STATS_NAME_INIT_PARMS(twr_ss_nrng_stat_section));
++    assert(rc == 0);
++
++    rc = stats_register("twr_ss_nrng", STATS_HDR(g_twr_ss_nrng_stat));
++    assert(rc == 0);
++#endif
+ }
+ 
+ 
+@@ -126,7 +155,7 @@ rx_error_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+         return false;
+ 
+     if(dpl_sem_get_count(&nrng->sem) == 0){
+-        NRNG_STATS_INC(rx_error);
++        SS_STATS_INC(rx_error);
+         dpl_error_t err = dpl_sem_release(&nrng->sem);
+         assert(err == DPL_OK);
+         return true;
+@@ -150,7 +179,7 @@ rx_timeout_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+         return false;
+ 
+     if(dpl_sem_get_count(&nrng->sem) == 0){
+-        NRNG_STATS_INC(rx_timeout);
++        SS_STATS_INC(rx_timeout);
+         // In the case of a NRNG timeout is used to mark the end of the request
+         // and is used to call the completion callback
+         if(!(SLIST_EMPTY(&inst->interface_cbs))){
+@@ -179,7 +208,7 @@ reset_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+     if(dpl_sem_get_count(&nrng->sem) == 0){
+         dpl_error_t err = dpl_sem_release(&nrng->sem);
+         assert(err == DPL_OK);
+-        NRNG_STATS_INC(reset);
++        SS_STATS_INC(reset);
+         return true;
+     }
+     else
+@@ -203,7 +232,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+ 
+     if(dpl_sem_get_count(&nrng->sem) == 1){
+         // unsolicited inbound
+-        NRNG_STATS_INC(rx_unsolicited);
++        SS_STATS_INC(rx_unsolicited);
+         return false;
+     }
+ 
+@@ -213,7 +242,7 @@ rx_complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+     if (_frame->dst_address != inst->my_short_address && _frame->dst_address != UWB_BROADCAST_ADDRESS)
+         return true;
+ 
+-    NRNG_STATS_INC(rx_complete);
++    SS_STATS_INC(rx_complete);
+ 
+     switch(_frame->code){
+         case UWB_DATA_CODE_SS_TWR_NRNG:
+diff --git a/lib/twr_ss_nrng/syscfg.yml b/lib/twr_ss_nrng/syscfg.yml
+index 7ef5969..a296efd 100644
+--- a/lib/twr_ss_nrng/syscfg.yml
++++ b/lib/twr_ss_nrng/syscfg.yml
+@@ -12,6 +12,9 @@ syscfg.defs:
+         value: ((uint16_t)0x10)
+       TWR_SS_NRNG_TX_GUARD_DELAY:
+         value: ((uint32_t)0x120)
++      TWR_SS_NRNG_STATS:
++        description: 'Enable statistics for the twr_ss_nrng module'
++        value: 1
+       CELL_ENABLED:
+         description: 'Cell network model on slot decoding'
+         value: 1
+-- 
+2.28.0
+

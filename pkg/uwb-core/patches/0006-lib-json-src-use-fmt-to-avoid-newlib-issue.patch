@@ -1,0 +1,41 @@
+From b7dd28c1fa7610baa00950e8798392102dfd69f9 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Thu, 17 Sep 2020 17:00:09 +0200
+Subject: [PATCH 6/7] lib/json/src: use fmt to avoid newlib issue
+
+---
+ lib/json/src/json_encode.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/json/src/json_encode.c b/lib/json/src/json_encode.c
+index 4de928e..377fd18 100644
+--- a/lib/json/src/json_encode.c
++++ b/lib/json/src/json_encode.c
+@@ -21,6 +21,8 @@
+ #include <string.h>
+ #include <inttypes.h>
+ 
++#include "fmt.h"
++
+ #ifdef __KERNEL__
+ #include <linux/kernel.h>
+ #else
+@@ -70,13 +72,11 @@ json_encode_value(struct json_encoder *encoder, struct json_value *jv)
+             encoder->je_write(encoder->je_arg, encoder->je_encode_buf, len);
+             break;
+         case JSON_VALUE_TYPE_UINT64:
+-            len = sprintf(encoder->je_encode_buf, "%" PRIu64,
+-                    jv->jv_val.u);
++            len = fmt_u64_dec(encoder->je_encode_buf, jv->jv_val.u);
+             encoder->je_write(encoder->je_arg, encoder->je_encode_buf, len);
+             break;
+         case JSON_VALUE_TYPE_INT64:
+-            len = sprintf(encoder->je_encode_buf, "%" PRIi64,
+-                    jv->jv_val.u);
++            len = fmt_s64_dec(encoder->je_encode_buf, jv->jv_val.u);
+             encoder->je_write(encoder->je_arg, encoder->je_encode_buf, len);
+             break;
+         case JSON_VALUE_TYPE_FLOAT64:
+-- 
+2.28.0
+
