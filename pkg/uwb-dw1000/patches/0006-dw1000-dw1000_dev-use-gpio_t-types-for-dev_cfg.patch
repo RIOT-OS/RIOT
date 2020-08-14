@@ -1,0 +1,29 @@
+From e8207fa0b9ececc5e1d5e3c4fe1bc491b4d74884 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Wed, 7 Oct 2020 14:11:43 +0200
+Subject: [PATCH 6/6] dw1000/dw1000_dev: use gpio_t types for dev_cfg
+
+---
+ hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h b/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h
+index 2dcd7f8..e149054 100644
+--- a/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h
++++ b/hw/drivers/uwb/uwb_dw1000/include/dw1000/dw1000_dev.h
+@@ -214,9 +214,9 @@ struct dw1000_dev_cfg {
+     int spi_baudrate;             //!< SPI Baudrate (<20MHz)
+     int spi_baudrate_low;         //!< Low SPI Baudrate (<2MHz)
+     uint8_t spi_num;              //!< SPI number
+-    uint8_t rst_pin;              //!< Reset pin
+-    uint8_t irq_pin;              //!< Interrupt request pin
+-    uint8_t ss_pin;               //!< Slave select pin
++    gpio_t rst_pin;               //!< Reset pin
++    gpio_t irq_pin;               //!< Interrupt request pin
++    gpio_t ss_pin;                //!< Slave select pin
+ 
+     uint16_t rx_antenna_delay;    //!< Receive antenna delay
+     uint16_t tx_antenna_delay;    //!< Transmit antenna delay
+-- 
+2.28.0
+

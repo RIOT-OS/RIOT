@@ -1,0 +1,25 @@
+From 715f6687e3b2b77f63303e3c231fbeb2c8588e97 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Thu, 17 Sep 2020 12:26:44 +0200
+Subject: [PATCH 5/5] uwb_dw1000/dw1000_hal: os_sr_t by dpl_sr_t
+
+---
+ hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c b/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c
+index 30539a5..4cff459 100644
+--- a/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c
++++ b/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c
+@@ -715,7 +715,7 @@ int
+ hal_dw1000_wakeup(struct _dw1000_dev_instance_t * inst)
+ {
+     int rc = DPL_OK;
+-    os_sr_t sr;
++    dpl_sr_t sr;
+     assert(inst->spi_sem);
+     rc = dpl_sem_pend(inst->spi_sem, DPL_TIMEOUT_NEVER);
+     if (rc != DPL_OK) {
+-- 
+2.28.0
+
