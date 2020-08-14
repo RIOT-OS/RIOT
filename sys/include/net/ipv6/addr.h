@@ -71,11 +71,8 @@ extern "C" {
 /**
  * @brief Data type to represent an IPv6 address.
  */
-typedef union {
-    uint8_t u8[16];             /**< divided by 16 8-bit words. */
-    network_uint16_t u16[8];    /**< divided by 8 16-bit words. */
-    network_uint32_t u32[4];    /**< divided by 4 32-bit words. */
-    network_uint64_t u64[2];    /**< divided by 2 64-bit words. */
+typedef struct {
+    uint8_t u8[16];             /**< 16 bytes of IPv6 address */
 } ipv6_addr_t;
 
 /**
@@ -112,6 +109,11 @@ typedef union {
                                                0x00, 0x00, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x00, \
                                                0x00, 0x00, 0x00, 0x00 }}
+
+/**
+ * @brief   Length of the link local prefix
+ */
+#define IPV6_ADDR_LINK_LOCAL_PREFIX_LEN     (8U)
 
 /**
  * @brief   Static initializer for the interface-local all nodes multicast IPv6
@@ -375,7 +377,7 @@ static inline bool ipv6_addr_is_ipv4_mapped(const ipv6_addr_t *addr)
 {
     return ((memcmp(addr, &ipv6_addr_unspecified,
                     sizeof(ipv6_addr_t) - sizeof(ipv4_addr_t) - 2) == 0) &&
-            (addr->u16[5].u16 == 0xffff));
+            (addr->u8[10] == 0xff) && (addr->u8[11] == 0xff));
 }
 
 /**
@@ -412,7 +414,8 @@ static inline bool ipv6_addr_is_multicast(const ipv6_addr_t *addr)
  */
 static inline bool ipv6_addr_is_link_local(const ipv6_addr_t *addr)
 {
-    return (memcmp(addr, &ipv6_addr_link_local_prefix, sizeof(addr->u64[0])) == 0) ||
+    return (memcmp(addr, &ipv6_addr_link_local_prefix,
+                   IPV6_ADDR_LINK_LOCAL_PREFIX_LEN) == 0) ||
            (ipv6_addr_is_multicast(addr) &&
             (addr->u8[1] & 0x0f) == IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
 }
@@ -435,10 +438,9 @@ static inline bool ipv6_addr_is_link_local(const ipv6_addr_t *addr)
  */
 static inline bool ipv6_addr_is_site_local(const ipv6_addr_t *addr)
 {
-    return (((byteorder_ntohs(addr->u16[0]) & 0xffc0) ==
-             IPV6_ADDR_SITE_LOCAL_PREFIX) ||
+    return (((addr->u8[0] == 0xfe) && ((addr->u8[1] & 0xc0) == 0xc0)) ||
             (ipv6_addr_is_multicast(addr) &&
-             (addr->u8[1] & 0x0f) == IPV6_ADDR_MCAST_SCP_SITE_LOCAL));
+            (addr->u8[1] & 0x0f) == IPV6_ADDR_MCAST_SCP_SITE_LOCAL));
 }
 
 /**
@@ -587,7 +589,7 @@ static inline void ipv6_addr_set_loopback(ipv6_addr_t *addr)
  */
 static inline void ipv6_addr_set_link_local_prefix(ipv6_addr_t *addr)
 {
-    memcpy(addr, &ipv6_addr_link_local_prefix, sizeof(addr->u64[0]));
+    memcpy(addr, &ipv6_addr_link_local_prefix, IPV6_ADDR_LINK_LOCAL_PREFIX_LEN);
 }
 
 /**
@@ -603,7 +605,7 @@ static inline void ipv6_addr_set_link_local_prefix(ipv6_addr_t *addr)
  */
 static inline void ipv6_addr_set_iid(ipv6_addr_t *addr, uint64_t iid)
 {
-    addr->u64[1] = byteorder_htonll(iid);
+    byteorder_htobebufll(&addr->u8[8], iid);
 }
 
 /**
@@ -619,7 +621,7 @@ static inline void ipv6_addr_set_iid(ipv6_addr_t *addr, uint64_t iid)
  */
 static inline void ipv6_addr_set_aiid(ipv6_addr_t *addr, uint8_t *iid)
 {
-    memcpy(&addr->u64[1], iid, sizeof(addr->u64[1]));
+    memcpy(&addr->u8[8], iid, 8);
 }
 
 /**
@@ -687,11 +689,16 @@ static inline void ipv6_addr_set_all_routers_multicast(ipv6_addr_t *addr, unsign
  */
 static inline void ipv6_addr_set_solicited_nodes(ipv6_addr_t *out, const ipv6_addr_t *in)
 {
-    out->u64[0] = byteorder_htonll(0xff02000000000000);
-    out->u32[2] = byteorder_htonl(1);
-    out->u8[12] = 0xff;
+    static const ipv6_addr_t solicited_node_addr = {
+        .u8 = {
+            0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x01, 0xff, 0x00, 0x00, 0x00
+        }
+    };
+    *out = solicited_node_addr;
     out->u8[13] = in->u8[13];
-    out->u16[7] = in->u16[7];
+    out->u8[14] = in->u8[14];
+    out->u8[15] = in->u8[15];
 }
 
 /**

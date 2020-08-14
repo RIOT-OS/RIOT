@@ -55,7 +55,7 @@ char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len
      *  Find the longest run of 0x0000's in address for :: shorthanding.
      */
     for (uint8_t i = 0; i < IPV6_ADDR_WORD_LEN; i++) {
-        if (addr->u16[i].u16 == 0) {
+        if ((addr->u8[2 * i] == 0) && (addr->u8[2 * i+1] == 0)) {
             if (cur.base == -1) {
                 cur.base = i;
                 cur.len = 1;
@@ -106,8 +106,9 @@ char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len
 #ifdef MODULE_IPV4_ADDR
         /* Is this address an encapsulated IPv4? */
         if (i == 6 && best.base == 0 &&
-            (best.len == 6 || (best.len == 5 && addr->u16[5].u16 == 0xffff))) {
-            if (!ipv4_addr_to_str(tp, (const ipv4_addr_t *)&addr->u32[3],
+            (best.len == 6 || (best.len == 5 && addr->u8[10] == 0xff &&
+                                addr->u8[11] == 0xff))) {
+            if (!ipv4_addr_to_str(tp, (const ipv4_addr_t *)&addr->u8[12],
                                   sizeof(tmp) - (tp - tmp))) {
                 return (NULL);
             }
@@ -117,20 +118,20 @@ char *ipv6_addr_to_str(char *result, const ipv6_addr_t *addr, uint8_t result_len
         }
 #endif
 
-        if ((addr->u16[i].u8[0] & 0xf0) != 0x00) {
-            *tp++ = HEX_L[addr->u16[i].u8[0] >> 4];
-            *tp++ = HEX_L[addr->u16[i].u8[0] & 0x0f];
-            *tp++ = HEX_L[addr->u16[i].u8[1] >> 4];
+        if ((addr->u8[2 * i] & 0xf0) != 0x00) {
+            *tp++ = HEX_L[addr->u8[2 * i] >> 4];
+            *tp++ = HEX_L[addr->u8[2 * i] & 0x0f];
+            *tp++ = HEX_L[addr->u8[2 * i + 1] >> 4];
         }
-        else if ((addr->u16[i].u8[0] & 0x0f) != 0x00) {
-            *tp++ = HEX_L[addr->u16[i].u8[0] & 0x0f];
-            *tp++ = HEX_L[addr->u16[i].u8[1] >> 4];
+        else if ((addr->u8[2 * i] & 0x0f) != 0x00) {
+            *tp++ = HEX_L[addr->u8[2 * i] & 0x0f];
+            *tp++ = HEX_L[addr->u8[2 * i + 1] >> 4];
         }
-        else if ((addr->u16[i].u8[1] & 0xf0) != 0x00) {
-            *tp++ = HEX_L[addr->u16[i].u8[1] >> 4];
+        else if ((addr->u8[2 * i + 1] & 0xf0) != 0x00) {
+            *tp++ = HEX_L[addr->u8[2 * i + 1] >> 4];
         }
 
-        *tp++ = HEX_L[addr->u16[i].u8[1] & 0xf];
+        *tp++ = HEX_L[addr->u8[2 * i + 1] & 0xf];
 
         i++;
     }

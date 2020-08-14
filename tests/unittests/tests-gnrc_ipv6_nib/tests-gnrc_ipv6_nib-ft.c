@@ -26,12 +26,22 @@
 
 #include "tests-gnrc_ipv6_nib.h"
 
-#define LINK_LOCAL_PREFIX   { 0xfe, 0x08, 0, 0, 0, 0, 0, 0 }
-#define GLOBAL_PREFIX       { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0 }
+#define _LINK_LOCAL_PREFIX   0xfe, 0x08, 0, 0, 0, 0, 0, 0
+#define LINK_LOCAL_PREFIX   { _LINK_LOCAL_PREFIX }
+#define _GLOBAL_PREFIX      0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0
+#define GLOBAL_PREFIX       { _GLOBAL_PREFIX }
 #define L2ADDR              { 0x90, 0xd5, 0x8e, 0x8c, 0x92, 0x43, 0x73, 0x5c }
 #define GLOBAL_PREFIX_LEN   (30)
 #define IFACE               (6)
-
+#define _GLOBAL_PREFIX      0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0
+#define LOCAL_ADDR          { _LINK_LOCAL_PREFIX, \
+                              0x07, 0x73, 0xc1, 0xb9, 0xc2, 0x94, 0x5a, 0xbb }
+#define LOCAL_ADDR2         { _LINK_LOCAL_PREFIX, \
+                              0x07, 0x73, 0xc1, 0xb9, 0xc2, 0x94, 0x5a, 0xbc }
+#define GLOBAL_ADDR         { _GLOBAL_PREFIX, \
+                              0x07, 0x73, 0xc1, 0xb9, 0xc2, 0x94, 0x5a, 0xbb }
+#define GLOBAL_ADDR2        { _GLOBAL_PREFIX, \
+                              0x07, 0x73, 0xc1, 0xb9, 0xc2, 0x94, 0x5a, 0xbc }
 static void set_up(void)
 {
     evtimer_event_t *tmp;
@@ -51,8 +61,7 @@ static void set_up(void)
 static void test_nib_ft_get__ENETUNREACH_empty(void)
 {
     gnrc_ipv6_nib_ft_t fte;
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                              { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t dst = { GLOBAL_ADDR };
 
     TEST_ASSERT_EQUAL_INT(-ENETUNREACH, gnrc_ipv6_nib_ft_get(&dst, NULL, &fte));
 }
@@ -65,13 +74,12 @@ static void test_nib_ft_get__ENETUNREACH_empty(void)
 static void test_nib_ft_get__ENETUNREACH_no_def_route(void)
 {
     gnrc_ipv6_nib_ft_t fte;
-    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                                 { .u64 = TEST_UINT64 } } };
-    ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    static const ipv6_addr_t next_hop = { LOCAL_ADDR };
+    ipv6_addr_t dst = { GLOBAL_PREFIX };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                   &next_hop, IFACE, 0));
-    dst.u16[0].u16--;
+    dst.u8[0]--;
     TEST_ASSERT_EQUAL_INT(-ENETUNREACH, gnrc_ipv6_nib_ft_get(&dst, NULL, &fte));
 }
 
@@ -83,10 +91,8 @@ static void test_nib_ft_get__ENETUNREACH_no_def_route(void)
 static void test_nib_ft_get__success1(void)
 {
     gnrc_ipv6_nib_ft_t fte;
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                              { .u64 = TEST_UINT64 } } };
-    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t dst = { GLOBAL_ADDR };
+    static const ipv6_addr_t next_hop = { LOCAL_ADDR };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0, &next_hop, IFACE, 0));
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_get(&dst, NULL, &fte));
@@ -105,10 +111,8 @@ static void test_nib_ft_get__success1(void)
 static void test_nib_ft_get__success2(void)
 {
     gnrc_ipv6_nib_ft_t fte;
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                              { .u64 = TEST_UINT64 } } };
-    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t dst = { GLOBAL_ADDR };
+    static const ipv6_addr_t next_hop = { LOCAL_ADDR };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                   &next_hop, IFACE, 0));
@@ -129,13 +133,10 @@ static void test_nib_ft_get__success2(void)
 static void test_nib_ft_get__success3(void)
 {
     gnrc_ipv6_nib_ft_t fte;
-    static const ipv6_addr_t dst1 = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                               { .u64 = TEST_UINT64 } } };
-    static const ipv6_addr_t next_hop1 = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                                  { .u64 = TEST_UINT64 } } };
-    static const ipv6_addr_t next_hop2 = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                                  { .u64 = TEST_UINT64 + 1 } } };
-    ipv6_addr_t dst2 = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    static const ipv6_addr_t dst1 = { GLOBAL_ADDR };
+    static const ipv6_addr_t next_hop1 = { LOCAL_ADDR };
+    static const ipv6_addr_t next_hop2 = { LOCAL_ADDR2 };
+    ipv6_addr_t dst2 = { GLOBAL_PREFIX };
 
     bf_toggle(dst2.u8, GLOBAL_PREFIX_LEN);
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst1, GLOBAL_PREFIX_LEN,
@@ -159,12 +160,9 @@ static void test_nib_ft_get__success3(void)
 static void test_nib_ft_get__success4(void)
 {
     gnrc_ipv6_nib_ft_t fte;
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                              { .u64 = TEST_UINT64 } } };
-    static const ipv6_addr_t next_hop1 = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                                  { .u64 = TEST_UINT64 } } };
-    static const ipv6_addr_t next_hop2 = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                                  { .u64 = TEST_UINT64 + 1 } } };
+    static const ipv6_addr_t dst = { GLOBAL_ADDR };
+    static const ipv6_addr_t next_hop1 = { LOCAL_ADDR };
+    static const ipv6_addr_t next_hop2 = { GLOBAL_ADDR2 };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                   &next_hop1, IFACE, 0));
@@ -185,8 +183,7 @@ static void test_nib_ft_get__success4(void)
  */
 static void test_nib_ft_add__EINVAL_def_route_next_hop_NULL(void)
 {
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                              { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t dst = { GLOBAL_ADDR };
 
     TEST_ASSERT_EQUAL_INT(-EINVAL, gnrc_ipv6_nib_ft_add(&ipv6_addr_unspecified,
                                                         GLOBAL_PREFIX_LEN,
@@ -203,10 +200,8 @@ static void test_nib_ft_add__EINVAL_def_route_next_hop_NULL(void)
  */
 static void test_nib_ft_add__EINVAL_iface0(void)
 {
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                              { .u64 = TEST_UINT64 } } };
-    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t dst = { GLOBAL_ADDR };
+    static const ipv6_addr_t next_hop = { LOCAL_ADDR };
 
     TEST_ASSERT_EQUAL_INT(-EINVAL, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                         &next_hop, 0, 0));
@@ -225,13 +220,12 @@ static void test_nib_ft_add__EINVAL_iface0(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_def_router(void)
 {
-    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                    { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t next_hop = { LOCAL_ADDR };
 
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0, &next_hop,
                                                       IFACE, 0));
-        next_hop.u64[1].u64++;
+        next_hop.u8[8]++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(NULL, GLOBAL_PREFIX_LEN,
                                                         &next_hop, IFACE, 0));
@@ -244,12 +238,12 @@ static void test_nib_ft_add__ENOMEM_diff_def_router(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_dst(void)
 {
-    ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    ipv6_addr_t dst = { GLOBAL_PREFIX };
 
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                       NULL, IFACE, 0));
-        dst.u16[0].u16--;
+        dst.u8[0]--;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                         NULL, IFACE, 0));
@@ -262,7 +256,7 @@ static void test_nib_ft_add__ENOMEM_diff_dst(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_dst_len(void)
 {
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    static const ipv6_addr_t dst = { GLOBAL_PREFIX };
     unsigned dst_len = GLOBAL_PREFIX_LEN;
 
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
@@ -282,13 +276,13 @@ static void test_nib_ft_add__ENOMEM_diff_dst_len(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_dst_dst_len(void)
 {
-    ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    ipv6_addr_t dst = { GLOBAL_PREFIX };
     unsigned dst_len = GLOBAL_PREFIX_LEN;
 
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len,
                                                       NULL, IFACE, 0));
-        dst.u16[0].u16--;
+        dst.u8[0]--;
         dst_len--;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, dst_len,
@@ -302,14 +296,13 @@ static void test_nib_ft_add__ENOMEM_diff_dst_dst_len(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_next_hop(void)
 {
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
-    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                      { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t dst = { GLOBAL_PREFIX };
+    ipv6_addr_t next_hop = { LOCAL_ADDR };
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                       &next_hop, IFACE, 0));
-        next_hop.u64[1].u64++;
+        next_hop.u8[8]++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                         &next_hop, IFACE, 0));
@@ -322,15 +315,14 @@ static void test_nib_ft_add__ENOMEM_diff_next_hop(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_dst_next_hop(void)
 {
-    ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
-    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                      { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t dst = { GLOBAL_PREFIX };
+    ipv6_addr_t next_hop = { LOCAL_ADDR };
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                       &next_hop, IFACE, 0));
-        dst.u16[0].u16--;
-        next_hop.u64[1].u64++;
+        dst.u8[0]--;
+        next_hop.u8[8]++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                         &next_hop, IFACE, 0));
@@ -343,17 +335,16 @@ static void test_nib_ft_add__ENOMEM_diff_dst_next_hop(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_dst_dst_len_next_hop(void)
 {
-    ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
-    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                      { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t dst = { GLOBAL_PREFIX };
+    ipv6_addr_t next_hop = { LOCAL_ADDR };
     unsigned dst_len = GLOBAL_PREFIX_LEN;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len, &next_hop,
                                                       IFACE, 0));
-        dst.u16[0].u16--;
+        dst.u8[0]--;
         dst_len--;
-        next_hop.u64[1].u64++;
+        next_hop.u8[8]++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, dst_len,
                                                         &next_hop, IFACE, 0));
@@ -367,13 +358,13 @@ static void test_nib_ft_add__ENOMEM_diff_dst_dst_len_next_hop(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_dst_iface(void)
 {
-    ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    ipv6_addr_t dst = { GLOBAL_PREFIX };
     unsigned iface = IFACE;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                       NULL, iface, 0));
-        dst.u16[0].u16--;
+        dst.u8[0]--;
         iface++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
@@ -388,7 +379,7 @@ static void test_nib_ft_add__ENOMEM_diff_dst_iface(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_dst_len_iface(void)
 {
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    static const ipv6_addr_t dst = { GLOBAL_PREFIX };
     unsigned dst_len = GLOBAL_PREFIX_LEN;
     unsigned iface = IFACE;
 
@@ -410,14 +401,14 @@ static void test_nib_ft_add__ENOMEM_diff_dst_len_iface(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_dst_dst_len_iface(void)
 {
-    ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    ipv6_addr_t dst = { GLOBAL_PREFIX };
     unsigned dst_len = GLOBAL_PREFIX_LEN;
     unsigned iface = IFACE;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len,
                                                       NULL, iface, 0));
-        dst.u16[0].u16--;
+        dst.u8[0]--;
         dst_len--;
         iface++;
     }
@@ -432,15 +423,14 @@ static void test_nib_ft_add__ENOMEM_diff_dst_dst_len_iface(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_next_hop_iface(void)
 {
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
-    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                      { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t dst = { GLOBAL_PREFIX };
+    ipv6_addr_t next_hop = { LOCAL_ADDR };
     unsigned iface = IFACE;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                       &next_hop, iface, 0));
-        next_hop.u64[1].u64++;
+        next_hop.u8[8]++;
         iface++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
@@ -454,16 +444,15 @@ static void test_nib_ft_add__ENOMEM_diff_next_hop_iface(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_dst_next_hop_iface(void)
 {
-    ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
-    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                      { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t dst = { GLOBAL_PREFIX };
+    ipv6_addr_t next_hop = { LOCAL_ADDR };
     unsigned iface = IFACE;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                       &next_hop, iface, 0));
-        dst.u16[0].u16--;
-        next_hop.u64[1].u64++;
+        dst.u8[0]--;
+        next_hop.u8[8]++;
         iface++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
@@ -478,18 +467,17 @@ static void test_nib_ft_add__ENOMEM_diff_dst_next_hop_iface(void)
  */
 static void test_nib_ft_add__ENOMEM_diff_dst_dst_len_next_hop_iface(void)
 {
-    ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
-    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                      { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t dst = { GLOBAL_PREFIX };
+    ipv6_addr_t next_hop = { LOCAL_ADDR };
     unsigned dst_len = GLOBAL_PREFIX_LEN;
     unsigned iface = IFACE;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len, &next_hop,
                                                       iface, 0));
-        dst.u16[0].u16--;
+        dst.u8[0]--;
         dst_len--;
-        next_hop.u64[1].u64++;
+        next_hop.u8[8]++;
         iface++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_ft_add(&dst, dst_len,
@@ -503,16 +491,15 @@ static void test_nib_ft_add__ENOMEM_diff_dst_dst_len_next_hop_iface(void)
  */
 static void test_nib_ft_add__success_duplicate(void)
 {
-    ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
-    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                      { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t dst = { GLOBAL_PREFIX };
+    ipv6_addr_t next_hop = { LOCAL_ADDR };
     unsigned dst_len = GLOBAL_PREFIX_LEN;
     unsigned iface = IFACE;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
-        dst.u16[0].u16--;
+        dst.u8[0]--;
         dst_len--;
-        next_hop.u64[1].u64++;
+        next_hop.u8[8]++;
         iface++;
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len, &next_hop,
                                                       iface, 0));
@@ -531,9 +518,8 @@ static void test_nib_ft_add__success_overwrite_unspecified(void)
 {
     gnrc_ipv6_nib_ft_t fte;
     void *iter_state = NULL;
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
-    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t dst = { GLOBAL_PREFIX };
+    static const ipv6_addr_t next_hop = { LOCAL_ADDR };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN, NULL,
                                                   IFACE, 0));
@@ -553,9 +539,8 @@ static void test_nib_ft_add__success(void)
 {
     gnrc_ipv6_nib_ft_t fte;
     void *iter_state = NULL;
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
-    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t dst = { GLOBAL_PREFIX };
+    static const ipv6_addr_t next_hop = { LOCAL_ADDR };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
                                                   &next_hop, IFACE, 0));
@@ -577,8 +562,7 @@ static void test_nib_ft_add__success_dr(void)
 {
     gnrc_ipv6_nib_ft_t fte;
     void *iter_state = NULL;
-    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t next_hop = { LOCAL_ADDR };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0, &next_hop, IFACE, 0));
     TEST_ASSERT(gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte));
@@ -601,17 +585,16 @@ static void test_nib_ft_del__unknown(void)
 {
     gnrc_ipv6_nib_ft_t fte;
     void *iter_state = NULL;
-    ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
-    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                      { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t dst = { GLOBAL_PREFIX };
+    ipv6_addr_t next_hop = { LOCAL_ADDR };
     unsigned dst_len = GLOBAL_PREFIX_LEN, iface = IFACE, count = 0;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, dst_len, &next_hop,
                                                       iface, 0));
-        dst.u16[0].u16--;
+        dst.u8[0]--;
         dst_len--;
-        next_hop.u64[1].u64++;
+        next_hop.u8[8]++;
         iface++;
     }
     gnrc_ipv6_nib_ft_del(&dst, dst_len);
@@ -628,9 +611,8 @@ static void test_nib_ft_del__unknown(void)
 static void test_nib_ft_del__success(void)
 {
     void *iter_state = NULL;
-    static const ipv6_addr_t dst = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
-    static const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                                 { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t dst = { GLOBAL_PREFIX };
+    static const ipv6_addr_t next_hop = { LOCAL_ADDR };
     gnrc_ipv6_nib_ft_t fte;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&dst, GLOBAL_PREFIX_LEN,
@@ -649,25 +631,24 @@ static void test_nib_ft_iter__empty_def_route_at_beginning(void)
 {
     gnrc_ipv6_nib_ft_t fte;
     void *iter_state = NULL;
-    ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                    { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t next_hop = { LOCAL_ADDR };
     int count = 0;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
                                                   &next_hop, IFACE, 0));
-    next_hop.u16[0].u16++;
+    next_hop.u8[0]++;
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
                                                   &next_hop, IFACE, 0));
-    next_hop.u16[0].u16++;
+    next_hop.u8[0]++;
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
                                                   &next_hop, IFACE, 0));
     /* make first added route the primary default route again */
-    next_hop.u16[0].u16 -= 2;
+    next_hop.u8[0] -= 2;
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(NULL, 0,
                                                   &next_hop, IFACE, 0));
     /* remove primary default route */
     gnrc_ipv6_nib_ft_del(NULL, 0);
-    next_hop.u16[0].u16++;
+    next_hop.u8[0]++;
     while (gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte)) {
         TEST_ASSERT(ipv6_addr_is_unspecified(&fte.dst));
         TEST_ASSERT(ipv6_addr_equal(&fte.next_hop, &next_hop));
@@ -675,7 +656,7 @@ static void test_nib_ft_iter__empty_def_route_at_beginning(void)
         TEST_ASSERT_EQUAL_INT(IFACE, fte.iface);
         TEST_ASSERT(!fte.primary);
         count++;
-        next_hop.u16[0].u16++;
+        next_hop.u8[0]++;
     }
     TEST_ASSERT_EQUAL_INT(2, count);
 }
@@ -690,30 +671,28 @@ static void test_nib_ft_iter__empty_pref_route_in_the_middle(void)
 {
     gnrc_ipv6_nib_ft_t fte;
     void *iter_state = NULL;
-    ipv6_addr_t route = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                 { .u64 = TEST_UINT64 } } };
-    const ipv6_addr_t next_hop = { .u64 = { { .u8 = LINK_LOCAL_PREFIX },
-                                            { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t route = { GLOBAL_ADDR };
+    const ipv6_addr_t next_hop = { LOCAL_ADDR };
     int count = 0;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&route, GLOBAL_PREFIX_LEN,
                                                   &next_hop, IFACE, 0));
-    route.u16[0].u16++;
+    route.u8[0]++;
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&route, GLOBAL_PREFIX_LEN,
                                                   &next_hop, IFACE, 0));
-    route.u16[0].u16++;
+    route.u8[0]++;
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_ft_add(&route, GLOBAL_PREFIX_LEN,
                                                   &next_hop, IFACE, 0));
-    route.u16[0].u16--;
+    route.u8[0]--;
     gnrc_ipv6_nib_ft_del(&route, GLOBAL_PREFIX_LEN);
-    route.u16[0].u16--;
+    route.u8[0]--;
     while (gnrc_ipv6_nib_ft_iter(NULL, 0, &iter_state, &fte)) {
         TEST_ASSERT(ipv6_addr_match_prefix(&fte.dst, &route) >= GLOBAL_PREFIX_LEN);
         TEST_ASSERT(ipv6_addr_equal(&fte.next_hop, &next_hop));
         TEST_ASSERT_EQUAL_INT(GLOBAL_PREFIX_LEN, fte.dst_len);
         TEST_ASSERT_EQUAL_INT(IFACE, fte.iface);
         count++;
-        route.u16[0].u16 += 2;  /* we skip the second address */
+        route.u8[0] += 2;  /* we skip the second address */
     }
     TEST_ASSERT_EQUAL_INT(2, count);
 }

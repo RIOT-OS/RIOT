@@ -44,8 +44,7 @@ gnrc_pktsnip_t *gnrc_ndp_nbr_sol_build(const ipv6_addr_t *tgt,
     if (pkt != NULL) {
         ndp_nbr_sol_t *nbr_sol = pkt->data;
         nbr_sol->resv.u32 = 0;
-        nbr_sol->tgt.u64[0].u64 = tgt->u64[0].u64;
-        nbr_sol->tgt.u64[1].u64 = tgt->u64[1].u64;
+        memcpy(&nbr_sol->tgt, tgt, sizeof(*tgt));
     }
 #if ENABLE_DEBUG
     else {
@@ -67,8 +66,7 @@ gnrc_pktsnip_t *gnrc_ndp_nbr_adv_build(const ipv6_addr_t *tgt, uint8_t flags,
         ndp_nbr_adv_t *nbr_adv = pkt->data;
         nbr_adv->flags = (flags & NDP_NBR_ADV_FLAGS_MASK);
         nbr_adv->resv[0] = nbr_adv->resv[1] = nbr_adv->resv[2] = 0;
-        nbr_adv->tgt.u64[0].u64 = tgt->u64[0].u64;
-        nbr_adv->tgt.u64[1].u64 = tgt->u64[1].u64;
+        memcpy(&nbr_adv->tgt, tgt, sizeof(*tgt));
     }
 #if ENABLE_DEBUG
     else {

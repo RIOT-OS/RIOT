@@ -38,8 +38,7 @@ const ipv6_addr_t ipv6_addr_all_routers_site_local = IPV6_ADDR_ALL_ROUTERS_SITE_
 
 bool ipv6_addr_equal(const ipv6_addr_t *a, const ipv6_addr_t *b)
 {
-    return (a->u64[0].u64 == b->u64[0].u64) &&
-           (a->u64[1].u64 == b->u64[1].u64);
+    return !memcmp(a, b, sizeof(*a));
 }
 
 uint8_t ipv6_addr_match_prefix(const ipv6_addr_t *a, const ipv6_addr_t *b)

@@ -299,7 +299,7 @@ static inline int _get_l2addr_from_ipv6(const gnrc_netif_t *netif,
                                         gnrc_ipv6_nib_nc_t *nce)
 {
     int res = gnrc_netif_ipv6_iid_to_addr(netif,
-                                          (eui64_t *)&node->ipv6.u64[1],
+                                          (eui64_t *)&node->ipv6.u8[8],
                                           nce->l2addr);
     if (res >= 0) {
         DEBUG("nib: resolve address %s%%%u by reverse translating to ",

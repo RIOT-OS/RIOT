@@ -109,6 +109,9 @@
 #define NHC_IPV6_EXT_EID_MOB        (0x04 << 1)
 #define NHC_IPV6_EXT_EID_IPV6       (0x07 << 1)
 
+static const uint8_t addr_fffe[] = { 0x00, 0x00, 0x00, 0xff, 0xfe, 0x00 };
+static const uint8_t zeros8[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
 /* currently only used with forwarding output, remove guard if more debug info
  * is added */
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
@@ -246,15 +249,14 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
 
         case IPHC_SAC_SAM_16:
             ipv6_addr_set_link_local_prefix(&ipv6_hdr->src);
-            ipv6_hdr->src.u32[2] = byteorder_htonl(0x000000ff);
-            ipv6_hdr->src.u16[6] = byteorder_htons(0xfe00);
+            memcpy(&ipv6_hdr->src.u8[8], addr_fffe, sizeof(addr_fffe));
             memcpy(ipv6_hdr->src.u8 + 14, iphc_hdr + payload_offset, 2);
             payload_offset += 2;
             break;
 
         case IPHC_SAC_SAM_L2:
             if (gnrc_netif_hdr_ipv6_iid_from_src(
-                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->src.u64[1])
+                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->src.u8[8])
                     ) < 0) {
                 DEBUG("6lo iphc: could not get source's IID\n");
                 return 0;
@@ -276,8 +278,7 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
 
         case IPHC_SAC_SAM_CTX_16:
             assert(ctx != NULL);
-            ipv6_hdr->src.u32[2] = byteorder_htonl(0x000000ff);
-            ipv6_hdr->src.u16[6] = byteorder_htons(0xfe00);
+            memcpy(&ipv6_hdr->src.u8[8], addr_fffe, sizeof(addr_fffe));
             memcpy(ipv6_hdr->src.u8 + 14, iphc_hdr + payload_offset, 2);
             ipv6_addr_init_prefix(&ipv6_hdr->src, &ctx->prefix,
                                   ctx->prefix_len);
@@ -287,7 +288,7 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
         case IPHC_SAC_SAM_CTX_L2:
             assert(ctx != NULL);
             if (gnrc_netif_hdr_ipv6_iid_from_src(
-                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->src.u64[1])
+                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->src.u8[8])
                     ) < 0) {
                 DEBUG("6lo iphc: could not get source's IID\n");
                 return 0;
@@ -330,15 +331,14 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
 
         case IPHC_M_DAC_DAM_U_16:
             ipv6_addr_set_link_local_prefix(&ipv6_hdr->dst);
-            ipv6_hdr->dst.u32[2] = byteorder_htonl(0x000000ff);
-            ipv6_hdr->dst.u16[6] = byteorder_htons(0xfe00);
+            memcpy(&ipv6_hdr->dst.u8[8], addr_fffe, sizeof(addr_fffe));
             memcpy(ipv6_hdr->dst.u8 + 14, iphc_hdr + payload_offset, 2);
             payload_offset += 2;
             break;
 
         case IPHC_M_DAC_DAM_U_L2:
             if (gnrc_netif_hdr_ipv6_iid_from_dst(
-                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->dst.u64[1])
+                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->dst.u8[8])
                     ) < 0) {
                 DEBUG("6lo iphc: could not get destination's IID\n");
                 return 0;
@@ -355,8 +355,7 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
             break;
 
         case IPHC_M_DAC_DAM_U_CTX_16:
-            ipv6_hdr->dst.u32[2] = byteorder_htonl(0x000000ff);
-            ipv6_hdr->dst.u16[6] = byteorder_htons(0xfe00);
+            memcpy(&ipv6_hdr->dst.u8[8], addr_fffe, sizeof(addr_fffe));
             memcpy(ipv6_hdr->dst.u8 + 14, iphc_hdr + payload_offset, 2);
             assert(ctx != NULL);
             ipv6_addr_init_prefix(&ipv6_hdr->dst, &ctx->prefix,
@@ -366,7 +365,7 @@ static size_t _iphc_ipv6_decode(const uint8_t *iphc_hdr,
 
         case IPHC_M_DAC_DAM_U_CTX_L2:
             if (gnrc_netif_hdr_ipv6_iid_from_dst(
-                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->dst.u64[1])
+                        iface, netif_hdr, (eui64_t *)(&ipv6_hdr->dst.u8[8])
                     ) < 0) {
                 DEBUG("6lo iphc: could not get destination's IID\n");
                 return 0;
@@ -1091,24 +1090,24 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
             }
             gnrc_netif_release(iface);
 
-            if ((ipv6_hdr->src.u64[1].u64 == iid.uint64.u64) ||
+            if ((!memcmp(&ipv6_hdr->src.u8[8], &iid, sizeof(iid))) ||
                 _context_overlaps_iid(src_ctx, &ipv6_hdr->src, &iid)) {
                 /* 0 bits. The address is derived from link-layer address */
                 iphc_hdr[IPHC2_IDX] |= IPHC_SAC_SAM_L2;
                 addr_comp = true;
             }
-            else if ((byteorder_ntohl(ipv6_hdr->src.u32[2]) == 0x000000ff) &&
-                     (byteorder_ntohs(ipv6_hdr->src.u16[6]) == 0xfe00)) {
+            else if (!memcmp(&ipv6_hdr->src.u8[8],
+                             addr_fffe, sizeof(addr_fffe))) {
                 /* 16 bits. The address is derived using 16 bits carried inline */
                 iphc_hdr[IPHC2_IDX] |= IPHC_SAC_SAM_16;
-                memcpy(iphc_hdr + inline_pos, ipv6_hdr->src.u16 + 7, 2);
+                memcpy(iphc_hdr + inline_pos, ipv6_hdr->src.u8 + 14, 2);
                 inline_pos += 2;
                 addr_comp = true;
             }
             else {
                 /* 64 bits. The address is derived using 64 bits carried inline */
                 iphc_hdr[IPHC2_IDX] |= IPHC_SAC_SAM_64;
-                memcpy(iphc_hdr + inline_pos, ipv6_hdr->src.u64 + 1, 8);
+                memcpy(iphc_hdr + inline_pos, ipv6_hdr->src.u8 + 8, 8);
                 inline_pos += 8;
                 addr_comp = true;
             }
@@ -1129,22 +1128,17 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
         iphc_hdr[IPHC2_IDX] |= SIXLOWPAN_IPHC2_M;
 
         /* if multicast address is of format ffXX::XXXX:XXXX:XXXX */
-        if ((ipv6_hdr->dst.u16[1].u16 == 0) &&
-            (ipv6_hdr->dst.u32[1].u32 == 0) &&
-            (ipv6_hdr->dst.u16[4].u16 == 0)) {
+        if (!memcpy(&ipv6_hdr->dst.u8[2], zeros8, 8)) {
             /* if multicast address is of format ff02::XX */
             if ((ipv6_hdr->dst.u8[1] == 0x02) &&
-                (ipv6_hdr->dst.u32[2].u32 == 0) &&
-                (ipv6_hdr->dst.u16[6].u16 == 0) &&
-                (ipv6_hdr->dst.u8[14] == 0)) {
+                !memcmp(&ipv6_hdr->dst.u8[8], zeros8, 7)) {
                 /* 8 bits. The address is derived using 8 bits carried inline */
                 iphc_hdr[IPHC2_IDX] |= IPHC_M_DAC_DAM_M_8;
                 iphc_hdr[inline_pos++] = ipv6_hdr->dst.u8[15];
                 addr_comp = true;
             }
             /* if multicast address is of format ffXX::XX:XXXX */
-            else if ((ipv6_hdr->dst.u16[5].u16 == 0) &&
-                     (ipv6_hdr->dst.u8[12] == 0)) {
+            else if (!memcmp(&ipv6_hdr->dst.u8[10], &zeros8, 3)) {
                 /* 32 bits. The address is derived using 32 bits carried inline */
                 iphc_hdr[IPHC2_IDX] |= IPHC_M_DAC_DAM_M_32;
                 iphc_hdr[inline_pos++] = ipv6_hdr->dst.u8[1];
@@ -1166,10 +1160,7 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
         else {
             gnrc_sixlowpan_ctx_t *ctx;
             ipv6_addr_t unicast_prefix;
-            unicast_prefix.u16[0] = ipv6_hdr->dst.u16[2];
-            unicast_prefix.u16[1] = ipv6_hdr->dst.u16[3];
-            unicast_prefix.u16[2] = ipv6_hdr->dst.u16[4];
-            unicast_prefix.u16[3] = ipv6_hdr->dst.u16[5];
+            memcpy(unicast_prefix.u8, &ipv6_hdr->dst.u8[4], 8);
 
             ctx = gnrc_sixlowpan_ctx_lookup_addr(&unicast_prefix);
 
@@ -1184,7 +1175,7 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
                 }
                 iphc_hdr[inline_pos++] = ipv6_hdr->dst.u8[1];
                 iphc_hdr[inline_pos++] = ipv6_hdr->dst.u8[2];
-                memcpy(iphc_hdr + inline_pos, ipv6_hdr->dst.u16 + 6, 4);
+                memcpy(iphc_hdr + inline_pos, ipv6_hdr->dst.u8 + 12, 4);
                 inline_pos += 4;
                 addr_comp = true;
             }
@@ -1208,17 +1199,16 @@ static size_t _iphc_ipv6_encode(gnrc_pktsnip_t *pkt,
             return 0;
         }
 
-        if ((ipv6_hdr->dst.u64[1].u64 == iid.uint64.u64) ||
+        if (!memcmp(&ipv6_hdr->dst.u8[8], &iid, sizeof(iid)) ||
             _context_overlaps_iid(dst_ctx, &(ipv6_hdr->dst), &iid)) {
             /* 0 bits. The address is derived using the link-layer address */
             iphc_hdr[IPHC2_IDX] |= IPHC_M_DAC_DAM_U_L2;
             addr_comp = true;
         }
-        else if ((byteorder_ntohl(ipv6_hdr->dst.u32[2]) == 0x000000ff) &&
-                 (byteorder_ntohs(ipv6_hdr->dst.u16[6]) == 0xfe00)) {
+        else if (!memcmp(&ipv6_hdr->dst.u8[8], addr_fffe, sizeof(addr_fffe))) {
             /* 16 bits. The address is derived using 16 bits carried inline */
             iphc_hdr[IPHC2_IDX] |= IPHC_M_DAC_DAM_U_16;
-            memcpy(&(iphc_hdr[inline_pos]), &(ipv6_hdr->dst.u16[7]), 2);
+            memcpy(&(iphc_hdr[inline_pos]), &(ipv6_hdr->dst.u8[14]), 2);
             inline_pos += 2;
             addr_comp = true;
         }

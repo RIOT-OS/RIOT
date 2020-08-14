@@ -48,7 +48,7 @@ bool _resolve_addr_from_ipv6(const ipv6_addr_t *dst, gnrc_netif_t *netif,
         uint8_t l2addr_len;
 
         if ((l2addr_len = gnrc_netif_ipv6_iid_to_addr(netif,
-                                                      (eui64_t *)&dst->u64[1],
+                                                      (eui64_t *)&dst->u8[8],
                                                       nce->l2addr)) > 0) {
             DEBUG("nib: resolve address %s%%%u by reverse translating to ",
                   ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)),

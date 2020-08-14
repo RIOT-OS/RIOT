@@ -25,9 +25,15 @@
 
 #include "tests-gnrc_ipv6_nib.h"
 
-#define LINK_LOCAL_PREFIX   { 0xfe, 0x08, 0, 0, 0, 0, 0, 0 }
-#define GLOBAL_PREFIX       { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0 }
+#define _LINK_LOCAL_PREFIX  0xfe, 0x08, 0, 0, 0, 0, 0, 0
+#define LINK_LOCAL_PREFIX   { _LINK_LOCAL_PREFIX }
+#define _GLOBAL_PREFIX      0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0
+#define GLOBAL_PREFIX       { _GLOBAL_PREFIX }
 #define L2ADDR              { 0x90, 0xd5, 0x8e, 0x8c, 0x92, 0x43, 0x73, 0x5c }
+#define LOCAL_ADDR          { _LINK_LOCAL_PREFIX, \
+                              0x07, 0x73, 0xc1, 0xb9, 0xc2, 0x94, 0x5a, 0xbb }
+#define GLOBAL_ADDR         { _GLOBAL_PREFIX, \
+                              0x07, 0x73, 0xc1, 0xb9, 0xc2, 0x94, 0x5a, 0xbb }
 #define GLOBAL_PREFIX_LEN   (30)
 #define IFACE               (6)
 
@@ -90,7 +96,7 @@ static void test_nib_pl_set__EINVAL_mc_addr(void)
  */
 static void test_nib_pl_set__EINVAL_pfx_len(void)
 {
-    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX } } };
+    static const ipv6_addr_t pfx = { GLOBAL_PREFIX };
     TEST_ASSERT_EQUAL_INT(-EINVAL, gnrc_ipv6_nib_pl_set(IFACE, &pfx, 0,
                                                         UINT32_MAX,
                                                         UINT32_MAX));
@@ -109,8 +115,7 @@ static void test_nib_pl_set__EINVAL_pfx_len(void)
  */
 static void test_nib_pl_set__ENOMEM_diff_iface(void)
 {
-    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                            { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { GLOBAL_ADDR };
     unsigned iface = IFACE;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
@@ -132,14 +137,13 @@ static void test_nib_pl_set__ENOMEM_diff_iface(void)
  */
 static void test_nib_pl_set__ENOMEM_diff_pfx(void)
 {
-    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                               { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { GLOBAL_ADDR };
 
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx,
                                                       GLOBAL_PREFIX_LEN,
                                                       UINT32_MAX, UINT32_MAX));
-        pfx.u16[0].u16++;
+        pfx.u8[0]++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_pl_set(IFACE, &pfx,
                                                         GLOBAL_PREFIX_LEN,
@@ -154,8 +158,7 @@ static void test_nib_pl_set__ENOMEM_diff_pfx(void)
  */
 static void test_nib_pl_set__ENOMEM_diff_iface_pfx(void)
 {
-    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                               { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { GLOBAL_ADDR };
     unsigned iface = IFACE;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
@@ -163,7 +166,7 @@ static void test_nib_pl_set__ENOMEM_diff_iface_pfx(void)
                                                       GLOBAL_PREFIX_LEN,
                                                       UINT32_MAX, UINT32_MAX));
         iface++;
-        pfx.u16[0].u16++;
+        pfx.u8[0]++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_pl_set(iface, &pfx,
                                                         GLOBAL_PREFIX_LEN,
@@ -178,8 +181,7 @@ static void test_nib_pl_set__ENOMEM_diff_iface_pfx(void)
  */
 static void test_nib_pl_set__ENOMEM_diff_pfx_len(void)
 {
-    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                            { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { GLOBAL_ADDR };
     unsigned pfx_len = GLOBAL_PREFIX_LEN;
 
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
@@ -199,8 +201,7 @@ static void test_nib_pl_set__ENOMEM_diff_pfx_len(void)
  */
 static void test_nib_pl_set__ENOMEM_diff_iface_pfx_len(void)
 {
-    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                            { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { GLOBAL_ADDR };
     unsigned pfx_len = GLOBAL_PREFIX_LEN, iface = IFACE;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
@@ -221,15 +222,14 @@ static void test_nib_pl_set__ENOMEM_diff_iface_pfx_len(void)
  */
 static void test_nib_pl_set__ENOMEM_diff_pfx_pfx_len(void)
 {
-    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { GLOBAL_ADDR };
     unsigned pfx_len = GLOBAL_PREFIX_LEN;
 
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx, pfx_len,
                                                       UINT32_MAX, UINT32_MAX));
         pfx_len--;
-        pfx.u16[0].u16++;
+        pfx.u8[0]++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_pl_set(IFACE, &pfx, pfx_len,
                                                         UINT32_MAX,
@@ -243,15 +243,14 @@ static void test_nib_pl_set__ENOMEM_diff_pfx_pfx_len(void)
  */
 static void test_nib_pl_set__ENOMEM_diff_iface_pfx_pfx_len(void)
 {
-    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { GLOBAL_ADDR };
     unsigned pfx_len = GLOBAL_PREFIX_LEN, iface = IFACE;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(iface, &pfx, pfx_len,
                                                       UINT32_MAX, UINT32_MAX));
         pfx_len--;
-        pfx.u16[0].u16++;
+        pfx.u8[0]++;
         iface++;
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_pl_set(iface, &pfx, pfx_len,
@@ -266,13 +265,12 @@ static void test_nib_pl_set__ENOMEM_diff_iface_pfx_pfx_len(void)
  */
 static void test_nib_pl_set__success_duplicate(void)
 {
-    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { GLOBAL_ADDR };
     unsigned pfx_len = GLOBAL_PREFIX_LEN, iface = IFACE;
 
     for (unsigned i = 0; i < MAX_NUMOF; i++) {
         pfx_len--;
-        pfx.u16[0].u16++;
+        pfx.u8[0]++;
         iface++;
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(iface, &pfx, pfx_len,
                                                       UINT32_MAX, UINT32_MAX));
@@ -291,8 +289,7 @@ static void test_nib_pl_set__success_change(void)
 {
     gnrc_ipv6_nib_pl_t ple;
     void *iter_state = NULL;
-    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                            { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { GLOBAL_ADDR };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx,
                                                   GLOBAL_PREFIX_LEN,
@@ -317,8 +314,7 @@ static void test_nib_pl_set__success(void)
 {
     gnrc_ipv6_nib_pl_t ple;
     void *iter_state = NULL;
-    static const ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                            { .u64 = TEST_UINT64 } } };
+    static const ipv6_addr_t pfx = { GLOBAL_ADDR };
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx,
                                                   GLOBAL_PREFIX_LEN,
@@ -341,8 +337,7 @@ static void test_nib_pl_set__success(void)
 static void test_nib_pl_del__unknown(void)
 {
     void *iter_state = NULL;
-    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { GLOBAL_ADDR };
     gnrc_ipv6_nib_pl_t ple;
     unsigned pfx_len = GLOBAL_PREFIX_LEN, iface = IFACE, count = 0;
 
@@ -350,7 +345,7 @@ static void test_nib_pl_del__unknown(void)
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(iface, &pfx, pfx_len,
                                                       UINT32_MAX, UINT32_MAX));
         pfx_len--;
-        pfx.u16[0].u16++;
+        pfx.u8[0]++;
         iface++;
     }
     gnrc_ipv6_nib_pl_del(iface, &pfx, pfx_len);
@@ -367,8 +362,7 @@ static void test_nib_pl_del__unknown(void)
 static void test_nib_pl_del__success(void)
 {
     void *iter_state = NULL;
-    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                 { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { GLOBAL_ADDR };
     gnrc_ipv6_nib_pl_t ple;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx, GLOBAL_PREFIX_LEN,
@@ -387,24 +381,23 @@ static void test_nib_pl_iter__empty_in_the_middle(void)
 {
     gnrc_ipv6_nib_pl_t ple;
     void *iter_state = NULL;
-    ipv6_addr_t pfx = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                               { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t pfx = { GLOBAL_ADDR };
     int count = 0;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx,
                                                   GLOBAL_PREFIX_LEN,
                                                   UINT32_MAX, UINT32_MAX));
-    pfx.u16[0].u16++;
+    pfx.u8[0]++;
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx,
                                                   GLOBAL_PREFIX_LEN,
                                                   UINT32_MAX, UINT32_MAX));
-    pfx.u16[0].u16++;
+    pfx.u8[0]++;
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_pl_set(IFACE, &pfx,
                                                   GLOBAL_PREFIX_LEN,
                                                   UINT32_MAX, UINT32_MAX));
-    pfx.u16[0].u16--;
+    pfx.u8[0]--;
     gnrc_ipv6_nib_pl_del(IFACE, &pfx, GLOBAL_PREFIX_LEN);
-    pfx.u16[0].u16--;
+    pfx.u8[0]--;
     while (gnrc_ipv6_nib_pl_iter(0, &iter_state, &ple)) {
         TEST_ASSERT(ipv6_addr_match_prefix(&ple.pfx, &pfx) >= GLOBAL_PREFIX_LEN);
         TEST_ASSERT_EQUAL_INT(GLOBAL_PREFIX_LEN, ple.pfx_len);
@@ -412,7 +405,7 @@ static void test_nib_pl_iter__empty_in_the_middle(void)
         TEST_ASSERT_EQUAL_INT(UINT32_MAX, ple.valid_until);
         TEST_ASSERT_EQUAL_INT(UINT32_MAX, ple.pref_until);
         count++;
-        pfx.u16[0].u16 += 2; /* we skip the second address */
+        pfx.u8[0] += 2; /* we skip the second address */
     }
     TEST_ASSERT_EQUAL_INT(2, count);
 }

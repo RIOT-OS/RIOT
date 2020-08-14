@@ -25,7 +25,10 @@
 
 #include "tests-gnrc_ipv6_nib.h"
 
-#define GLOBAL_PREFIX       { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0 }
+#define _GLOBAL_PREFIX      0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0
+#define GLOBAL_PREFIX       { _GLOBAL_PREFIX }
+#define TEST_ADDR           { _GLOBAL_PREFIX, \
+                              0x07, 0x73, 0xc1, 0xb9, 0xc2, 0x94, 0x5a, 0xbb }
 
 static void set_up(void)
 {
@@ -47,13 +50,12 @@ static void set_up(void)
 static void test_nib_abr_add__ENOMEM(void)
 {
     void *iter_state = NULL;
-    ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t addr = { TEST_ADDR };
     gnrc_ipv6_nib_abr_t abr;
 
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_ABR_NUMOF; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_abr_add(&addr));
-        addr.u16[0].u16++;
+        addr.u8[0]++;
         TEST_ASSERT(gnrc_ipv6_nib_abr_iter(&iter_state, &abr));
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_ipv6_nib_abr_add(&addr));
@@ -68,12 +70,11 @@ static void test_nib_abr_add__ENOMEM(void)
 static void test_nib_abr_add__success(void)
 {
     void *iter_state = NULL;
-    ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t addr = { TEST_ADDR };
     gnrc_ipv6_nib_abr_t abr;
 
     for (unsigned i = 0; i < CONFIG_GNRC_IPV6_NIB_ABR_NUMOF; i++) {
-        addr.u16[0].u16++;
+        addr.u8[0]++;
         TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_abr_add(&addr));
         TEST_ASSERT(gnrc_ipv6_nib_abr_iter(&iter_state, &abr));
         TEST_ASSERT(memcmp(&abr.addr, &addr, sizeof(addr)) == 0);
@@ -89,8 +90,7 @@ static void test_nib_abr_add__success(void)
 static void test_nib_abr_del__success(void)
 {
     void *iter_state = NULL;
-    ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },
-                                  { .u64 = TEST_UINT64 } } };
+    ipv6_addr_t addr = { TEST_ADDR };
     gnrc_ipv6_nib_abr_t abr;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_ipv6_nib_abr_add(&addr));

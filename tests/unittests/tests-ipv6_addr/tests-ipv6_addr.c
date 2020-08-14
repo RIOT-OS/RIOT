@@ -109,9 +109,13 @@ static void test_ipv6_addr_is_unspecified_not_unspecified(void)
 static void test_ipv6_addr_is_unspecified_unspecified(void)
 {
     ipv6_addr_t a = IPV6_ADDR_UNSPECIFIED;
+    const ipv6_addr_t expected = { {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        }
+    };
 
-    TEST_ASSERT_EQUAL_INT(0, a.u64[0].u64); /* Don't trust the macro ;) */
-    TEST_ASSERT_EQUAL_INT(0, a.u64[1].u64);
+    TEST_ASSERT(!memcmp(expected.u8, a.u8, sizeof(a))); /* Don't trust the macro ;) */
     TEST_ASSERT_EQUAL_INT(true, ipv6_addr_is_unspecified(&a));
 }
 
@@ -300,10 +304,13 @@ static void test_ipv6_addr_is_loopback_not_loopback(void)
 static void test_ipv6_addr_is_loopback_loopback(void)
 {
     ipv6_addr_t a = IPV6_ADDR_LOOPBACK;
+    const ipv6_addr_t expected = { {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
+        }
+    };
 
-    TEST_ASSERT_EQUAL_INT(0, a.u64[0].u64); /* Don't trust the macro ;) */
-    TEST_ASSERT_EQUAL_INT(1, byteorder_ntohll(a.u64[1]));
-    TEST_ASSERT_EQUAL_INT(true, ipv6_addr_is_loopback(&a));
+    TEST_ASSERT(!memcmp(expected.u8, a.u8, sizeof(a))); /* Don't trust the macro ;) */
 }
 
 static void test_ipv6_addr_is_link_local_not_link_local(void)
@@ -653,8 +660,7 @@ static void test_ipv6_addr_set_iid(void)
         }
     };
 
-    ipv6_addr_set_iid(&a, byteorder_ntohll(b.u64[1]));
-
+    ipv6_addr_set_iid(&a, byteorder_bebuftohll(&b.u8[8]));
     TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(&a, &b));
 }
 
@@ -694,13 +700,14 @@ static void test_ipv6_addr_set_all_nodes_multicast_if_local(void)
     ipv6_addr_t a = IPV6_ADDR_UNSPECIFIED;
     ipv6_addr_t b = IPV6_ADDR_ALL_NODES_IF_LOCAL;
     unsigned int scope = IPV6_ADDR_MCAST_SCP_IF_LOCAL;
+    const ipv6_addr_t expected = { {
+            0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
+        }
+    };
 
-    TEST_ASSERT_EQUAL_INT(0xff010000, byteorder_ntohl(b.u32[0])); /* Don't trust the macro ;) */
-    TEST_ASSERT_EQUAL_INT(0, b.u32[1].u32);
-    TEST_ASSERT_EQUAL_INT(1, byteorder_ntohll(b.u64[1]));
-
+    TEST_ASSERT(!memcmp(expected.u8, b.u8, sizeof(b))); /* Don't trust the macro ;) */
     ipv6_addr_set_all_nodes_multicast(&a, scope);
-
     TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(&a, &b));
 }
 
@@ -709,13 +716,14 @@ static void test_ipv6_addr_set_all_nodes_multicast_link_local(void)
     ipv6_addr_t a = IPV6_ADDR_UNSPECIFIED;
     ipv6_addr_t b = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
     unsigned int scope = IPV6_ADDR_MCAST_SCP_LINK_LOCAL;
+    const ipv6_addr_t expected = { {
+            0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
+        }
+    };
 
-    TEST_ASSERT_EQUAL_INT(0xff020000, byteorder_ntohl(b.u32[0])); /* Don't trust the macro ;) */
-    TEST_ASSERT_EQUAL_INT(0, b.u32[1].u32);
-    TEST_ASSERT_EQUAL_INT(1, byteorder_ntohll(b.u64[1]));
-
+    TEST_ASSERT(!memcmp(expected.u8, b.u8, sizeof(b))); /* Don't trust the macro ;) */
     ipv6_addr_set_all_nodes_multicast(&a, scope);
-
     TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(&a, &b));
 }
 
@@ -723,12 +731,14 @@ static void test_ipv6_addr_set_all_nodes_multicast_unusual(void)
 {
     ipv6_addr_t a;
     unsigned int scope = IPV6_ADDR_MCAST_SCP_REALM_LOCAL;
+    const ipv6_addr_t expected = { {
+            0xff, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
+        }
+    };
 
     ipv6_addr_set_all_nodes_multicast(&a, scope);
-
-    TEST_ASSERT_EQUAL_INT(0xff030000, byteorder_ntohl(a.u32[0]));
-    TEST_ASSERT_EQUAL_INT(0, a.u32[1].u32);
-    TEST_ASSERT_EQUAL_INT(1, byteorder_ntohll(a.u64[1]));
+    TEST_ASSERT(!memcmp(expected.u8, a.u8, sizeof(a)));
 }
 
 static void test_ipv6_addr_set_all_routers_multicast_if_local(void)
@@ -736,13 +746,14 @@ static void test_ipv6_addr_set_all_routers_multicast_if_local(void)
     ipv6_addr_t a = IPV6_ADDR_UNSPECIFIED;
     ipv6_addr_t b = IPV6_ADDR_ALL_ROUTERS_IF_LOCAL;
     unsigned int scope = IPV6_ADDR_MCAST_SCP_IF_LOCAL;
+    const ipv6_addr_t expected = { {
+            0xff, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02
+        }
+    };
 
-    TEST_ASSERT_EQUAL_INT(0xff010000, byteorder_ntohl(b.u32[0])); /* Don't trust the macro ;) */
-    TEST_ASSERT_EQUAL_INT(0, b.u32[1].u32);
-    TEST_ASSERT_EQUAL_INT(2, byteorder_ntohll(b.u64[1]));
-
+    TEST_ASSERT(!memcmp(expected.u8, b.u8, sizeof(b))); /* Don't trust the macro ;) */
     ipv6_addr_set_all_routers_multicast(&a, scope);
-
     TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(&a, &b));
 }
 
@@ -751,13 +762,14 @@ static void test_ipv6_addr_set_all_routers_multicast_link_local(void)
     ipv6_addr_t a = IPV6_ADDR_UNSPECIFIED;
     ipv6_addr_t b = IPV6_ADDR_ALL_ROUTERS_LINK_LOCAL;
     unsigned int scope = IPV6_ADDR_MCAST_SCP_LINK_LOCAL;
+    const ipv6_addr_t expected = { {
+            0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02
+        }
+    };
 
-    TEST_ASSERT_EQUAL_INT(0xff020000, byteorder_ntohl(b.u32[0])); /* Don't trust the macro ;) */
-    TEST_ASSERT_EQUAL_INT(0, b.u32[1].u32);
-    TEST_ASSERT_EQUAL_INT(2, byteorder_ntohll(b.u64[1]));
-
+    TEST_ASSERT(!memcmp(expected.u8, b.u8, sizeof(b))); /* Don't trust the macro ;) */
     ipv6_addr_set_all_routers_multicast(&a, scope);
-
     TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(&a, &b));
 }
 
@@ -766,13 +778,14 @@ static void test_ipv6_addr_set_all_routers_multicast_site_local(void)
     ipv6_addr_t a = IPV6_ADDR_UNSPECIFIED;
     ipv6_addr_t b = IPV6_ADDR_ALL_ROUTERS_SITE_LOCAL;
     unsigned int scope = IPV6_ADDR_MCAST_SCP_SITE_LOCAL;
+    const ipv6_addr_t expected = { {
+            0xff, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02
+        }
+    };
 
-    TEST_ASSERT_EQUAL_INT(0xff050000, byteorder_ntohl(b.u32[0])); /* Don't trust the macro ;) */
-    TEST_ASSERT_EQUAL_INT(0, b.u32[1].u32);
-    TEST_ASSERT_EQUAL_INT(2, byteorder_ntohll(b.u64[1]));
-
+    TEST_ASSERT(!memcmp(expected.u8, b.u8, sizeof(b))); /* Don't trust the macro ;) */
     ipv6_addr_set_all_routers_multicast(&a, scope);
-
     TEST_ASSERT_EQUAL_INT(true, ipv6_addr_equal(&a, &b));
 }
 
@@ -780,12 +793,14 @@ static void test_ipv6_addr_set_all_routers_multicast_unusual(void)
 {
     ipv6_addr_t a;
     unsigned int scope = IPV6_ADDR_MCAST_SCP_ORG_LOCAL;
+    const ipv6_addr_t expected = { {
+            0xff, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02
+        }
+    };
 
     ipv6_addr_set_all_routers_multicast(&a, scope);
-
-    TEST_ASSERT_EQUAL_INT(0xff080000, byteorder_ntohl(a.u32[0]));
-    TEST_ASSERT_EQUAL_INT(0, a.u32[1].u32);
-    TEST_ASSERT_EQUAL_INT(2, byteorder_ntohll(a.u64[1]));
+    TEST_ASSERT(!memcmp(expected.u8, a.u8, sizeof(expected)));
 }
 
 static void test_ipv6_addr_set_solicited_nodes(void)
@@ -796,13 +811,14 @@ static void test_ipv6_addr_set_solicited_nodes(void)
             0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
         }
     };
+    const ipv6_addr_t expected = { {
+            0xff, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x01, 0xff, 0x0d, 0x0e, 0x0f
+        }
+    };
 
     ipv6_addr_set_solicited_nodes(&a, &b);
-
-    TEST_ASSERT_EQUAL_INT(0xff020000, byteorder_ntohl(a.u32[0]));
-    TEST_ASSERT_EQUAL_INT(0, a.u32[1].u32);
-    TEST_ASSERT_EQUAL_INT(1, byteorder_ntohl(a.u32[2]));
-    TEST_ASSERT_EQUAL_INT(0xff0d0e0f, byteorder_ntohl(a.u32[3]));
+    TEST_ASSERT(!memcmp(expected.u8, a.u8, sizeof(expected)));
 }
 
 static void test_ipv6_addr_to_str__string_too_short(void)

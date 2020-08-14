@@ -74,8 +74,7 @@ gnrc_pktsnip_t *gnrc_sixlowpan_nd_opt_abr_build(uint32_t version, uint16_t ltime
         abr_opt->vlow = byteorder_htons(version & 0xffff);
         abr_opt->vhigh = byteorder_htons(version >> 16);
         abr_opt->ltime = byteorder_htons(ltime);
-        abr_opt->braddr.u64[0] = braddr->u64[0];
-        abr_opt->braddr.u64[1] = braddr->u64[1];
+        memcpy(&abr_opt->braddr, braddr, sizeof(*braddr));
     }
 
     return pkt;

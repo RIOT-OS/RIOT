@@ -55,7 +55,7 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     bool new_address = false;
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
-    gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u64[1]);
+    gnrc_netif_ipv6_get_iid(netif, (eui64_t *)&addr.u8[8]);
     ipv6_addr_init_prefix(&addr, pfx, pfx_len);
     if ((idx = gnrc_netif_ipv6_addr_idx(netif, &addr)) < 0) {
         if ((idx = gnrc_netif_ipv6_addr_add_internal(netif, &addr, pfx_len,
@@ -138,7 +138,7 @@ static bool _try_addr_reconfiguration(gnrc_netif_t *netif)
         if (remove_old) {
             for (unsigned i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF; i++) {
                 ipv6_addr_t *addr = &netif->ipv6.addrs[i];
-                if (addr->u64[1].u64 == orig_iid.uint64.u64) {
+                if (!memcmp(&addr->u8[8], &orig_iid, sizeof(orig_iid))) {
                     gnrc_netif_ipv6_addr_remove_internal(netif, addr);
                 }
             }
