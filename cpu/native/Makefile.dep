@@ -4,6 +4,9 @@ endif
 ifeq (,$(filter stdio_%,$(USEMODULE)))
   USEMODULE += stdio_native
 endif
+ifeq (,$(filter periph_rtc,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
 
 USEMODULE += periph
 
