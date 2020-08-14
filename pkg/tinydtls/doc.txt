@@ -12,6 +12,8 @@
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
  * USEPKG += tinydtls
+ * # a cryptographically secure implementation of PRNG is needed
+ * USEMODULE += prng_sha1prng
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * Supported Cipher Suites

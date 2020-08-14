@@ -117,3 +117,7 @@ endif
 ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   PSEUDOMODULES += xtimer
 endif
+
+ifneq (,$(filter prng,$(USEMODULE)))
+  include $(RIOTBASE)/sys/random/Makefile.include
+endif
