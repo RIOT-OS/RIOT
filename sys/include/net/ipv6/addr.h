@@ -113,7 +113,7 @@ typedef struct {
 /**
  * @brief   Length of the link local prefix
  */
-#define IPV6_ADDR_LINK_LOCAL_PREFIX_LEN     (8U)
+#define IPV6_ADDR_LINK_LOCAL_PREFIX_BYTES     (8U)
 
 /**
  * @brief   Static initializer for the interface-local all nodes multicast IPv6
@@ -415,7 +415,7 @@ static inline bool ipv6_addr_is_multicast(const ipv6_addr_t *addr)
 static inline bool ipv6_addr_is_link_local(const ipv6_addr_t *addr)
 {
     return (memcmp(addr, &ipv6_addr_link_local_prefix,
-                   IPV6_ADDR_LINK_LOCAL_PREFIX_LEN) == 0) ||
+                   IPV6_ADDR_LINK_LOCAL_PREFIX_BYTES) == 0) ||
            (ipv6_addr_is_multicast(addr) &&
             (addr->u8[1] & 0x0f) == IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
 }
@@ -589,7 +589,8 @@ static inline void ipv6_addr_set_loopback(ipv6_addr_t *addr)
  */
 static inline void ipv6_addr_set_link_local_prefix(ipv6_addr_t *addr)
 {
-    memcpy(addr, &ipv6_addr_link_local_prefix, IPV6_ADDR_LINK_LOCAL_PREFIX_LEN);
+    memcpy(addr, &ipv6_addr_link_local_prefix,
+           IPV6_ADDR_LINK_LOCAL_PREFIX_BYTES);
 }
 
 /**
