@@ -258,13 +258,6 @@ void timer_stop(tim_t tim)
 
 static inline void chan_handler(lpc23xx_timer_t *dev, unsigned tim_num, unsigned chan_num)
 {
-    const uint32_t mask = (1 << chan_num);
-
-    if ((dev->IR & mask) == 0) {
-        return;
-    }
-
-    dev->IR |= mask;
     if (is_oneshot(tim_num, chan_num)) {
         dev->MCR &= ~(1 << (chan_num * 3));
     }
@@ -274,8 +267,15 @@ static inline void chan_handler(lpc23xx_timer_t *dev, unsigned tim_num, unsigned
 
 static inline void isr_handler(lpc23xx_timer_t *dev, int tim_num)
 {
-    for (unsigned i = 0; i < TIMER_CHANNEL_NUMOF; ++i) {
-        chan_handler(dev, tim_num, i);
+    uint32_t state = dev->IR;
+    uint8_t chan = 0;
+
+    /* clear interrupt flags */
+    dev->IR = state;
+
+    while (state) {
+        state = bitarithm_test_and_clear(state, &chan);
+        chan_handler(dev, tim_num, chan);
     }
 
     /* we must not forget to acknowledge the handling of the interrupt */
