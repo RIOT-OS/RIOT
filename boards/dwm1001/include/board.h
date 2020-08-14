@@ -77,9 +77,9 @@ extern "C" {
  * @name    DW1000 UWB transceiver
  * @{
  */
-#define DW1000_PARAM_SPI_DEV        SPI_DEV(1)
-#define DW1000_PARAM_CS_PIN         GPIO_DEV(0, 17)
-#define DW1000_PARAM_INT_PIN        GPIO_DEV(0, 19)
+#define DW1000_PARAM_SPI            SPI_DEV(1)
+#define DW1000_PARAM_CS_PIN         GPIO_PIN(0, 17)
+#define DW1000_PARAM_INT_PIN        GPIO_PIN(0, 19)
 /** @} */
 
 #ifdef __cplusplus
