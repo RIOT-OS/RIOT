@@ -252,6 +252,19 @@ static inline uint16_t byteorder_bebuftohs(const uint8_t *buf);
 static inline uint32_t byteorder_bebuftohl(const uint8_t *buf);
 
 /**
+ * @brief           Read a big endian encoded unsigned integer from a buffer
+ *                  into host byte order encoded variable, 64-bit
+ *
+ * @note            This function is agnostic to the alignment of the target
+ *                  value in the given buffer
+ *
+ * @param[in] buf   position in a buffer holding the target value
+ *
+ * @return          64-bit unsigned integer in host byte order
+ */
+static inline uint64_t byteorder_bebuftohll(const uint8_t *buf);
+
+/**
  * @brief           Write a host byte order encoded unsigned integer as big
  *                  endian encoded value into a buffer, 16-bit
  *
@@ -274,6 +287,18 @@ static inline void byteorder_htobebufs(uint8_t *buf, uint16_t val);
  * @param[in]  val  value written to the buffer, in host byte order
  */
 static inline void byteorder_htobebufl(uint8_t *buf, uint32_t val);
+
+/**
+ * @brief           Write a host byte order encoded unsigned integer as big
+ *                  endian encoded value into a buffer, 64-bit
+ *
+ * @note            This function is alignment agnostic and works with any given
+ *                  memory location of the buffer
+ *
+ * @param[out] buf  target buffer, must be able to accept 8 bytes
+ * @param[in]  val  value written to the buffer, in host byte order
+ */
+static inline void byteorder_htobebufll(uint8_t *buf, uint64_t val);
 
 /**
  * @brief          Convert from host byte order to network byte order, 16 bit.
@@ -506,6 +531,24 @@ static inline uint32_t byteorder_bebuftohl(const uint8_t *buf)
 #endif
 }
 
+static inline uint64_t byteorder_bebuftohll(const uint8_t *buf)
+{
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    return (((uint64_t) buf[0] << 56)
+          | ((uint64_t) buf[1] << 48)
+          | ((uint64_t) buf[2] << 40)
+          | ((uint64_t) buf[3] << 32)
+          | ((uint64_t) buf[4] << 24)
+          | ((uint64_t) buf[5] << 16)
+          | ((uint64_t) buf[6] <<  8)
+          | ((uint64_t) buf[7] <<  0));
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    /* big endian to big endian conversion is easy, but buffer might be
+     * unaligned */
+    return unaligned_get_u64(buf);
+#endif
+}
+
 static inline void byteorder_htobebufs(uint8_t *buf, uint16_t val)
 {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -525,6 +568,24 @@ static inline void byteorder_htobebufl(uint8_t *buf, uint32_t val)
     buf[1] = (uint8_t)(val >> 16);
     buf[2] = (uint8_t)(val >> 8);
     buf[3] = (uint8_t)(val >> 0);
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    /* big endian to big endian conversion is easy, but buffer might be
+     * unaligned */
+    memcpy(buf, &val, sizeof(val));
+#endif
+}
+
+static inline void byteorder_htobebufll(uint8_t *buf, uint64_t val)
+{
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    buf[0] = (uint8_t)(val >> 56);
+    buf[1] = (uint8_t)(val >> 48);
+    buf[2] = (uint8_t)(val >> 40);
+    buf[3] = (uint8_t)(val >> 32);
+    buf[4] = (uint8_t)(val >> 24);
+    buf[5] = (uint8_t)(val >> 16);
+    buf[6] = (uint8_t)(val >> 8);
+    buf[7] = (uint8_t)(val >> 0);
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     /* big endian to big endian conversion is easy, but buffer might be
      * unaligned */
