@@ -8,6 +8,7 @@
 config BOARD_COMMON_BLXXXPILL
     bool
     select HAS_PERIPH_ADC
+    select HAS_PERIPH_DMA
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_RTC
