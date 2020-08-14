@@ -238,7 +238,7 @@ static void test_ipv6_addr_add__ENOMEM(void)
     ipv6_addr_t addr = { .u8 = NETIF0_IPV6_G };
 
     for (unsigned i = 0; i < CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF;
-         i++, addr.u16[3].u16++) {
+         i++, addr.u8[6]++) {
         TEST_ASSERT(0 <= gnrc_netif_ipv6_addr_add_internal(&netifs[0], &addr, 64U,
                                                   GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID));
     }
@@ -595,7 +595,7 @@ static void test_ipv6_group_join__ENOMEM(void)
     ipv6_addr_t addr = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
 
     for (unsigned i = 0; i < GNRC_NETIF_IPV6_GROUPS_NUMOF;
-            i++, addr.u16[7].u16++) {
+            i++, addr.u8[14]++) {
         TEST_ASSERT(0 <= gnrc_netif_ipv6_group_join_internal(&netifs[0], &addr));
     }
     TEST_ASSERT_EQUAL_INT(-ENOMEM,
@@ -702,11 +702,11 @@ static void test_ipv6_get_iid(void)
 
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t),
             gnrc_netif_ipv6_get_iid(&ethernet_netif, &res));
-    TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ethernet_ipv6_ll.u64[1],
+    TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ethernet_ipv6_ll.u8[8],
                 sizeof(res)));
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t),
             gnrc_netif_ipv6_get_iid(&ieee802154_netif, &res));
-    TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ieee802154_ipv6_ll_long.u64[1],
+    TEST_ASSERT_EQUAL_INT(0, memcmp(&res, &ieee802154_ipv6_ll_long.u8[8],
                 sizeof(res)));
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_len),
             gnrc_netapi_set(ieee802154_netif.pid,
@@ -788,12 +788,12 @@ static void test_netapi_get__IPV6_IID(void)
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t), gnrc_netapi_get(ethernet_netif.pid,
                 NETOPT_IPV6_IID,
                 0, &value, sizeof(value)));
-    TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ethernet_ipv6_ll.u64[1],
+    TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ethernet_ipv6_ll.u8[8],
                 sizeof(value)));
     TEST_ASSERT_EQUAL_INT(sizeof(eui64_t), gnrc_netapi_get(ieee802154_netif.pid,
                 NETOPT_IPV6_IID,
                 0, &value, sizeof(value)));
-    TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ieee802154_ipv6_ll_long.u64[1],
+    TEST_ASSERT_EQUAL_INT(0, memcmp(&value, &ieee802154_ipv6_ll_long.u8[8],
                 sizeof(value)));
     TEST_ASSERT_EQUAL_INT(sizeof(ieee802154_l2addr_len),
             gnrc_netapi_set(ieee802154_netif.pid,
