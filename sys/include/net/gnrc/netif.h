@@ -557,6 +557,8 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
 /**
  * @brief   Converts a hardware address to a human readable string.
  *
+ * @note    Compatibility wrapper for @see netif_addr_to_str
+ *
  * @details The format will be like `xx:xx:xx:xx` where `xx` are the bytes
  *          of @p addr in hexadecimal representation.
  *
@@ -570,11 +572,16 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
  *
  * @return  @p out.
  */
-char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
+static inline char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out)
+{
+    return netif_addr_to_str(addr, addr_len, out);
+}
 
 /**
  * @brief   Parses a string of colon-separated hexadecimals to a hardware
  *          address.
+ *
+ * @note    Compatibility wrapper for @see netif_addr_from_str
  *
  * @details The input format must be like `xx:xx:xx:xx` where `xx` will be the
  *          bytes of @p addr in hexadecimal representation.
@@ -590,7 +597,10 @@ char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
  * @return  Actual length of @p out on success.
  * @return  0, on failure.
  */
-size_t gnrc_netif_addr_from_str(const char *str, uint8_t *out);
+static inline size_t gnrc_netif_addr_from_str(const char *str, uint8_t *out)
+{
+    return netif_addr_from_str(str, out);
+}
 
 /**
  * @brief   Send a GNRC packet via a given @ref gnrc_netif_t interface.
