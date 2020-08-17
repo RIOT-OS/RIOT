@@ -67,7 +67,7 @@ static inline void __attribute__((always_inline)) __save_context(void)
     __asm__("push r5");
     __asm__("push r4");
 
-    __asm__("mov.w r1,%0" : "=r"(sched_active_thread->sp));
+    __asm__("mov.w r1,%0" : "=r"(thread_get_active()->sp));
 }
 
 /**
@@ -75,7 +75,7 @@ static inline void __attribute__((always_inline)) __save_context(void)
  */
 static inline void __attribute__((always_inline)) __restore_context(void)
 {
-    __asm__("mov.w %0,r1" : : "m"(sched_active_thread->sp));
+    __asm__("mov.w %0,r1" : : "m"(thread_get_active()->sp));
 
     __asm__("pop r4");
     __asm__("pop r5");
