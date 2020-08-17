@@ -262,10 +262,11 @@ void IRAM_ATTR thread_yield_higher(void)
 
     /* yield next task */
     #if defined(ENABLE_DEBUG) && defined(DEVELHELP)
-    if (sched_active_thread) {
+    thread_t *active_thread = thread_get_active();
+    if (active_thread) {
         DEBUG("%u old task %u %s %u\n", system_get_time(),
-               sched_active_thread->pid, sched_active_thread->name,
-               sched_active_thread->sp - sched_active_thread-> stack_start);
+               active_thread->pid, active_thread->name,
+               active_thread->sp - active_thread-> stack_start);
     }
     #endif
     if (!irq_is_in()) {
@@ -285,10 +286,11 @@ void IRAM_ATTR thread_yield_higher(void)
     }
 
     #if defined(ENABLE_DEBUG) && defined(DEVELHELP)
-    if (sched_active_thread) {
+    active_thread = thread_get_active();
+    if (active_thread) {
         DEBUG("%u new task %u %s %u\n", system_get_time(),
-               sched_active_thread->pid, sched_active_thread->name,
-               sched_active_thread->sp - sched_active_thread-> stack_start);
+               active_thread->pid, active_thread->name,
+               active_thread->sp - active_thread-> stack_start);
     }
     #endif
 
@@ -307,7 +309,7 @@ void thread_stack_print(void)
     /* Print the current stack to stdout. */
 
     #if defined(DEVELHELP)
-    volatile thread_t* task = thread_get(sched_active_pid);
+    thread_t* task = thread_get_active();
     if (task) {
 
         char* stack_top = task->stack_start + task->stack_size;
@@ -415,7 +417,7 @@ NORETURN void cpu_switch_context_exit(void)
 NORETURN void task_exit(void)
 {
     DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n",
-          sched_active_thread ? sched_active_thread->pid : KERNEL_PID_UNDEF);
+          thread_getpid());
 
     (void) irq_disable();
 

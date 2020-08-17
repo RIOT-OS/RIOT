@@ -903,10 +903,10 @@ static void ATTR_GDBINIT install_exceptions(void)
 
 static void ATTR_GDBFN uart_hdlr(void *arg)
 {
-    assert(sched_active_thread != NULL);
-    assert(sched_active_thread->sp != NULL);
+    assert(thread_get_active() != NULL);
+    assert(thread_get_active()->sp != NULL);
 
-    XtExcFrame* frame = (XtExcFrame *)sched_active_thread->sp;
+    XtExcFrame* frame = (XtExcFrame *)thread_get_active()->sp;
 
     int doDebug=0;
     int fifolen=0;
