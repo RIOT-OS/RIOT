@@ -5,7 +5,7 @@
 # directory for more details.
 #
 
-menu "Standard Input/Ouput (STDIO)"
+menu "Standard Input/Output (STDIO)"
     depends on TEST_KCONFIG
 
 choice
@@ -27,4 +27,15 @@ config MODULE_STDIO_UART
 
 endchoice
 
-endmenu # Standard Input/Ouput (STDIO)
+config MODULE_STDIN
+    bool "Standard Input"
+
+config MODULE_STDIO_UART_RX
+    bool
+    depends on MODULE_STDIO_UART
+    select MODULE_ISRPIPE
+    default y if MODULE_STDIN
+    help
+        Reception when using UART-based STDIO needs to be enabled.
+
+endmenu # Standard Input/Output (STDIO)
