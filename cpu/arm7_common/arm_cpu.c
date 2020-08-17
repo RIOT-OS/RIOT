@@ -89,7 +89,8 @@ void thread_print_stack(void)
     __asm__("mov %0, sp" : "=r"(stack));
 
     register unsigned int *s = (unsigned int *)stack;
-    printf("task: %X SP: %X\n", (unsigned int) sched_active_thread, (unsigned int) stack);
+    printf("task: %" PRIkernel_pid " SP: %X\n", thread_getpid(),
+           (uintptr_t)stack);
     register int i = 0;
     s += 5;
 

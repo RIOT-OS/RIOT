@@ -50,7 +50,7 @@ void thread_yield_higher(void)
 
         __save_context();
 
-        /* have sched_active_thread point to the next thread */
+        /* have thread_get_active() point to the next thread */
         sched_run();
 
         __restore_context();

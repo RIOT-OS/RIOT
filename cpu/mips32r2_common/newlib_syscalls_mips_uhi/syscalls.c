@@ -105,7 +105,7 @@ void *_sbrk_r(struct _reent *r, ptrdiff_t incr)
 */
 pid_t _getpid(void)
 {
-    return sched_active_pid;
+    return thread_getpid();
 }
 
 /**
@@ -115,8 +115,8 @@ pid_t _getpid(void)
 */
 pid_t _getpid_r(struct _reent *ptr)
 {
-    (void) ptr;
-    return sched_active_pid;
+    (void)ptr;
+    return thread_getpid();
 }
 
 /**
@@ -132,8 +132,8 @@ pid_t _getpid_r(struct _reent *ptr)
 __attribute__ ((weak))
 int _kill_r(struct _reent *r, pid_t pid, int sig)
 {
-    (void) pid;
-    (void) sig;
+    (void)pid;
+    (void)sig;
     r->_errno = ESRCH; /* not implemented yet */
     return -1;
 }
@@ -331,8 +331,8 @@ int _isatty_r(struct _reent *r, int fd)
 __attribute__ ((weak))
 int _kill(pid_t pid, int sig)
 {
-    (void) pid;
-    (void) sig;
+    (void)pid;
+    (void)sig;
     errno = ESRCH; /* not implemented yet */
     return -1;
 }

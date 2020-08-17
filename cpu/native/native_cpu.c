@@ -142,12 +142,12 @@ void isr_cpu_switch_context_exit(void)
     ucontext_t *ctx;
 
     DEBUG("isr_cpu_switch_context_exit\n");
-    if ((sched_context_switch_request == 1) || (sched_active_thread == NULL)) {
+    if ((sched_context_switch_request == 1) || (thread_get_active() == NULL)) {
         sched_run();
     }
 
-    DEBUG("isr_cpu_switch_context_exit: calling setcontext(%" PRIkernel_pid ")\n\n", sched_active_pid);
-    ctx = (ucontext_t *)(sched_active_thread->sp);
+    DEBUG("isr_cpu_switch_context_exit: calling setcontext(%" PRIkernel_pid ")\n\n", thread_getpid());
+    ctx = (ucontext_t *)(thread_get_active()->sp);
 
     native_interrupts_enabled = 1;
     _native_mod_ctx_leave_sigh(ctx);
@@ -195,8 +195,9 @@ void isr_thread_yield(void)
     }
 
     sched_run();
-    ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
-    DEBUG("isr_thread_yield: switching to(%" PRIkernel_pid ")\n\n", sched_active_pid);
+    ucontext_t *ctx = (ucontext_t *)(thread_get_active()->sp);
+    DEBUG("isr_thread_yield: switching to(%" PRIkernel_pid ")\n\n",
+          thread_getpid());
 
     native_interrupts_enabled = 1;
     _native_mod_ctx_leave_sigh(ctx);
@@ -211,7 +212,7 @@ void thread_yield_higher(void)
     sched_context_switch_request = 1;
 
     if (_native_in_isr == 0) {
-        ucontext_t *ctx = (ucontext_t *)(sched_active_thread->sp);
+        ucontext_t *ctx = (ucontext_t *)(thread_get_active()->sp);
         _native_in_isr = 1;
         if (!native_interrupts_enabled) {
             warnx("thread_yield_higher: interrupts are disabled - this should not be");
