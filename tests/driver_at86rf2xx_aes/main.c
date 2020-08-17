@@ -141,7 +141,7 @@ int main(void)
 {
     at86rf2xx_t dev;
     bool success = true;
-    at86rf2xx_setup(&dev, &at86rf2xx_params[0]);
+    at86rf2xx_setup(&dev, &at86rf2xx_params[0], 0);
     dev.netdev.netdev.event_callback = _event_cb;
     if (dev.netdev.netdev.driver->init(&dev.netdev.netdev) != 0) {
         return EXIT_FAILURE;

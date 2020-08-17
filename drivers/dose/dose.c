@@ -49,7 +49,6 @@ static int _send(netdev_t *dev, const iolist_t *iolist);
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
 static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t len);
 static int _init(netdev_t *dev);
-void dose_setup(dose_t *ctx, const dose_params_t *params);
 
 static uint16_t crc16_update(uint16_t crc, uint8_t octet)
 {
@@ -540,7 +539,7 @@ static const netdev_driver_t netdev_driver_dose = {
     .set = _set
 };
 
-void dose_setup(dose_t *ctx, const dose_params_t *params)
+void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
 {
     static const xtimer_ticks32_t min_timeout = {.ticks32 = XTIMER_BACKOFF};
 
@@ -556,6 +555,8 @@ void dose_setup(dose_t *ctx, const dose_params_t *params)
         gpio_init_int(ctx->sense_pin, GPIO_IN, GPIO_FALLING, _isr_gpio, (void *) ctx);
         gpio_irq_disable(ctx->sense_pin);
     }
+
+    netdev_register(&ctx->netdev, NETDEV_DOSE, index);
 
     assert(sizeof(ctx->mac_addr.uint8) == ETHERNET_ADDR_LEN);
     luid_get_eui48(&ctx->mac_addr);

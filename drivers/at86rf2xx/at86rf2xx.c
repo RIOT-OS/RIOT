@@ -37,7 +37,7 @@
 #include "debug.h"
 
 
-void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
+void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t index)
 {
     netdev_t *netdev = (netdev_t *)dev;
 
@@ -56,6 +56,8 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     /* initialize device descriptor */
     dev->params = *params;
 #endif
+
+    netdev_register(netdev, NETDEV_AT86RF2XX, index);
 }
 
 static void at86rf2xx_disable_clock_output(at86rf2xx_t *dev)

@@ -73,6 +73,7 @@ PSEUDOMODULES += mpu_noexec_ram
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += netdev_default
 PSEUDOMODULES += netdev_ieee802154_%
+PSEUDOMODULES += netdev_register
 PSEUDOMODULES += netstats
 PSEUDOMODULES += netstats_l2
 PSEUDOMODULES += netstats_ipv6
