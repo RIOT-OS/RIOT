@@ -3,7 +3,7 @@
 : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
 : ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
 # we can't use '-' in the variable names, convert them to '_' to add new boards
-: ${TEST_KCONFIG_samr21_xpro:="examples/hello-world"}
+: ${TEST_KCONFIG_samr21_xpro:="examples/hello-world tests/periph_*"}
 
 export RIOT_CI_BUILD=1
 export CC_NOCOLOR=1
