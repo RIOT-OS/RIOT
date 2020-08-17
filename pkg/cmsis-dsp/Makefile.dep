@@ -1,0 +1,10 @@
+USEMODULE += cmsis-dsp_BasicMathFunctions
+USEMODULE += cmsis-dsp_CommonTables
+USEMODULE += cmsis-dsp_ComplexMathFunctions
+USEMODULE += cmsis-dsp_ControllerFunctions
+USEMODULE += cmsis-dsp_FastMathFunctions
+USEMODULE += cmsis-dsp_FilteringFunctions
+USEMODULE += cmsis-dsp_MatrixFunctions
+USEMODULE += cmsis-dsp_StatisticsFunctions
+USEMODULE += cmsis-dsp_SupportFunctions
+USEMODULE += cmsis-dsp_TransformFunctions
