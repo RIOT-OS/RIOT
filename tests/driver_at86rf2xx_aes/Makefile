@@ -13,6 +13,8 @@ ifneq (,$(filter mulle,$(BOARD)))
   DRIVER := at86rf212b
 endif
 
+TEST_ON_CI_WHITELIST += samr21-xpro iotlab-m3 mulle
+
 # use the at86rf231 as fallback device
 DRIVER ?= at86rf231
 
