@@ -274,7 +274,7 @@ static void _handle_data(usbdev_mock_t *dev, usbdev_mock_ep_t *ep, size_t len)
 
 static void _ep_esr_validation(usbdev_mock_t *dev, usbdev_mock_ep_t *ep)
 {
-    DEBUG("[ep esr]: Data available for stack: %u\n", ep->available);
+    DEBUG("[ep esr]: Data available for stack: %u\n", (unsigned)ep->available);
     if (req_phase == TEST_REQ_PHASE_IDLE) {
         DEBUG("[ep esr]: Done with the request\n");
         /* signal USBDEV_EVENT_ESR to call _test_sequence */

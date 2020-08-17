@@ -17,7 +17,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "embUnit.h"
 #include "periph/usbdev.h"
 #include "test_utils/expect.h"
 #include "usbdev_mock.h"
