@@ -20,6 +20,7 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
+#include "kernel_defines.h"
 #include "mutex.h"
 
 #include "cpu_conf.h"
@@ -363,11 +364,11 @@ typedef struct {
 /**
  * @brief   The implementation can use one LETIMER or two regular timers cascaded
  */
-#ifndef EFM32_USE_LETIMER
-#define EFM32_USE_LETIMER   0
+#ifndef CONFIG_EFM32_USE_LETIMER
+#define CONFIG_EFM32_USE_LETIMER   0
 #endif
 
-#ifdef EFM32_USE_LETIMER
+#if IS_ACTIVE(CONFIG_EFM32_USE_LETIMER)
 /**
  * @brief   This timer implementation has two available channels
  */
