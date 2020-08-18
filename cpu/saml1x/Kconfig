@@ -20,15 +20,6 @@ config CPU_FAM_SAML11
     bool
     select CPU_COMMON_SAML1X
 
-## CPU Models
-config CPU_MODEL_SAML10E16A
-    bool
-    select CPU_FAM_SAML10
-
-config CPU_MODEL_SAML11E16A
-    bool
-    select CPU_FAM_SAML11
-
 ## Declaration of specific features
 config HAS_CPU_SAML1X
     bool
@@ -40,11 +31,10 @@ config CPU_FAM
     default "saml10" if CPU_FAM_SAML10
     default "saml11" if CPU_FAM_SAML11
 
-config CPU_MODEL
-    default "saml10e16a" if CPU_MODEL_SAML10E16A
-    default "saml11e16a" if CPU_MODEL_SAML11E16A
-
 config CPU
     default "saml1x" if CPU_COMMON_SAML1X
+
+source "$(RIOTCPU)/saml1x/Kconfig.saml10"
+source "$(RIOTCPU)/saml1x/Kconfig.saml11"
 
 source "$(RIOTCPU)/sam0_common/Kconfig"
