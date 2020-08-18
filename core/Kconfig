@@ -45,6 +45,9 @@ config MODULE_CORE_PANIC
 config MODULE_CORE_THREAD_FLAGS
     bool "Thread flags"
 
+config MODULE_SCHED_CB
+    bool "Callback support on the scheduler"
+
 endif # MODULE_CORE
 
 menuconfig KCONFIG_USEMODULE_CORE
