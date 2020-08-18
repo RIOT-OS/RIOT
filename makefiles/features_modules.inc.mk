@@ -33,3 +33,8 @@ USEMODULE += $(filter cortexm_svc, $(FEATURES_USED))
 ifeq (, $(filter no_idle_thread, $(FEATURES_USED)))
   USEMODULE += core_idle_thread
 endif
+
+# use mpu_stack_guard if the feature is used
+ifneq (,$(filter cortexm_mpu,$(FEATURES_USED)))
+  USEMODULE += mpu_stack_guard
+endif
