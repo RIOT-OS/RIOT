@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2014  René Kijewski  <rene.kijewski@fu-berlin.de>
@@ -19,22 +19,13 @@
 # License along with this library; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
-from __future__ import print_function
-
 from collections import defaultdict
 from itertools import groupby
 from os import devnull, environ
 from os.path import abspath, dirname, isfile, join
 from subprocess import CalledProcessError, check_call, check_output, PIPE, Popen
 from sys import argv, exit, stdout
-
-
-try:
-    # Python 2.x
-    from StringIO import StringIO
-except ImportError:
-    # Python 3.x
-    from io import StringIO
+from io import StringIO
 from itertools import tee
 
 
