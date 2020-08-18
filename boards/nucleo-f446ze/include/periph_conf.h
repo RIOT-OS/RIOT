@@ -22,7 +22,6 @@
 #include "periph_cpu.h"
 #include "f4/cfg_clock_180_8_1.h"
 #include "cfg_i2c1_pb8_pb9.h"
-#include "cfg_spi_divtable.h"
 #include "cfg_timer_tim5.h"
 #include "cfg_usb_otg_fs.h"
 
