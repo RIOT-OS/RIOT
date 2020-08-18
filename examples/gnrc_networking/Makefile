@@ -31,6 +31,8 @@ USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
 USEMODULE += netstats_rpl
 USEMODULE += gnrc_netif_pktq
+USEMODULE += gnrc_netif_events
+USEMODULE += netdev_ieee802154_submac
 
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
