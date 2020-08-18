@@ -192,11 +192,15 @@ void RTT_ISR(void)
 {
     if (RTT_DEV->CRL & RTC_CRL_ALRF) {
         RTT_DEV->CRL &= ~(RTC_CRL_ALRF);
-        alarm_cb(alarm_arg);
+        if (alarm_cb) {
+            alarm_cb(alarm_arg);
+        }
     }
     if (RTT_DEV->CRL & RTC_CRL_OWF) {
         RTT_DEV->CRL &= ~(RTC_CRL_OWF);
-        overflow_cb(overflow_arg);
+        if (overflow_cb) {
+            overflow_cb(overflow_arg);
+        }
     }
     cortexm_isr_end();
 }
