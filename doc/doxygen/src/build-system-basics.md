@@ -55,6 +55,11 @@ For a `FEATURE` to be provided by a `board` it must meet 2 criteria, and for
 - `FEATURES_OPTIONAL` are "nice to have" `FEATURES`, not needed but useful. If
   available they are always included.
 
+- `FEATURES_OPTIONAL_ANY` are nice to have `FEATURES` that fullfil a similar
+  function. Alternatives are separated by a pipe (`|`) in order of preference,
+  e.g.: `FEATURES_OPTIONAL_ANY += puf_sram|periph_hwrng` if both are provided
+  then only `puf_sram` will be used.
+
 - `FEATURES_REQUIRED_ANY` are `FEATURES` of which (at least) one of
   is needed by a `MODULE` or `APPLICATION`. Alternatives are separated by
   a pipe (`|`) in order of preference, e.g.:
