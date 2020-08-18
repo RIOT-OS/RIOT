@@ -1,41 +1,53 @@
 # Check if all required FEATURES are provided
 
+# Receives a list of list of '|' separated features and resturns for each
+# item in list, the first match that is present in the whitelist.
+#
+# _features_one_out_of <features-list> <whitelist>
+#
+# Parameters
+#   features-list: list of list of '|' separated features
+#     e.g.: "periph_spi|periph_i2c puf_sram|periph_hwrng"
+#   whitelist: possible features to select one out of
+#     e.g.: "$(FEATURES_PROVIDED)"
+#
+# One out of Algorithm:
+#  - For each list in features-list as "item":
+#     - Store the intersection of features-whitelist and the features in
+#       "item" in "tmp"
+#     - Append "item" to "tmp" (with pipes between features, e.g.
+#       "periph_spi|periph_i2c")
+#     - Appends the first's element of "tmp" to the caller
+#   ==> If one (or more) features in whitelist is listed in item, the first
+#       one will be taken.
+#   ==> At the end of the list item itself (with pipes between features) is the
+#       last item in "tmp". If no feature in the feature-list is in whitelist
+#       this will be the only item in "tmp" and be picked
+_features_one_out_of = $(foreach item, $1, $(firstword \
+                          $(filter $(subst |, ,$(item)), $2) $(item)))
+
+# Features that are provided and not blacklisted
+FEATURES_USABLE := $(filter-out $(FEATURES_BLACKLIST),$(FEATURES_PROVIDED))
+
 FEATURES_OPTIONAL_ONLY := $(sort $(filter-out $(FEATURES_REQUIRED),$(FEATURES_OPTIONAL)))
 FEATURES_OPTIONAL_USED := $(sort $(filter $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
+
 # Optional features that will not be used because they are not provided
 FEATURES_OPTIONAL_MISSING := $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
 
 # Features that are used without taking "one out of" dependencies into account
 FEATURES_USED_SO_FAR := $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
 
-# Features that are provided and not blacklisted
-FEATURES_USABLE := $(filter-out $(FEATURES_BLACKLIST),$(FEATURES_PROVIDED))
-
 # Additionally required features due to the "one out of" dependencies
-# Algorithm:
-#  - For each list in FEATURES_REQUIRED_ANY as "item":
-#     - Store the intersection of FEATURES_USED_SO_FAR and the features in
-#       "item" in "tmp"
-#     - Append the intersection of FEATURES_USABLE and the features in "item"
-#       to "tmp"
-#     - Append "item" to "tmp" (with pipes between features, e.g.
-#       "periph_spi|periph_i2c")
-#     - Append the first element of "tmp" to FEATURES_REQUIRED_ONE_OUT_OF
-#   ==> If one (or more) already used features is listed in item, this (or
-#       one of these) will be in the front of "tmp" and be taken
-#   ==> If one (or more) usable features is listed in item, this will come
-#       afterwards. If no no feature in item is used so for, one of the
-#       features supported and listed in item will be picked
-#   ==> At the end of the list item itself (with pipes between features) is the
-#       last item in "tmp". If no feature is item is supported or used, this
-#       will be the only item in "tmp" and be picked
-FEATURES_REQUIRED_ONE_OUT_OF := $(foreach item,\
+#   For each features list in $(FEATURES_REQUIRED_ANY):
+#     ==> If one (or more) features is already used then the first one
+#         will be taken
+#     ==> If one (or more) features is usable select the first on in list
+#     ==> If no feature is usable return the list
+FEATURES_REQUIRED_ONE_OUT_OF := $(call _features_one_out_of,\
                                   $(FEATURES_REQUIRED_ANY),\
-                                  $(word 1,\
-                                    $(filter $(subst |, ,$(item)),\
-                                              $(FEATURES_USED_SO_FAR) \
-                                              $(FEATURES_USABLE)) \
-                                              $(item)))
+                                    $(FEATURES_USED_SO_FAR) \
+                                    $(FEATURES_USABLE))
 
 # Features that are required by the application but not provided by the BSP
 # Having features missing may case the build to fail.
