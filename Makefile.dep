@@ -21,10 +21,6 @@ include $(RIOTBASE)/drivers/Makefile.dep
 # pull dependencies from packages
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
-# function that receives a list of FEATURES and that thar return the first of
-# of those FEATURES that is also PROVIDED
-_find_first_of_these_provided_features = $(firstword $(filter $1,$(FEATURES_PROVIDED)))
-
 ifneq (,$(filter ssp,$(USEMODULE)))
   FEATURES_REQUIRED += ssp
 endif
@@ -791,8 +787,7 @@ ifneq (,$(filter random,$(USEMODULE)))
     USEMODULE += hashes
   endif
 
-  FEATURES_OPTIONAL += $(call _find_first_of_these_provided_features, \
-                         puf_sram periph_hwrng)
+  FEATURES_OPTIONAL_ALT += periph_hwrng|puf_sram
 
   USEMODULE += luid
 endif
