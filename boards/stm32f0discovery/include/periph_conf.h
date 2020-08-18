@@ -128,23 +128,6 @@ static const uart_conf_t uart_config[] = {
  * @name SPI configuration
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 48000000Hz */
-        7,  /* -> 187500Hz */
-        6,  /* -> 375000Hz */
-        5,  /* -> 750000Hz */
-        2,  /* -> 6000000Hz */
-        1   /* -> 12000000Hz */
-    },
-    {       /* for APB2 @ 48000000Hz */
-        7,  /* -> 187500Hz */
-        6,  /* -> 375000Hz */
-        5,  /* -> 750000Hz */
-        2,  /* -> 6000000Hz */
-        1   /* -> 12000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI1,

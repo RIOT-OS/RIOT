@@ -55,10 +55,6 @@ jobs:
       uses: aabadie/riot-action@v1
       with:
         cmd: make -C dist/tools/uhcpd
-    - name: Build stm32 spi_divtable
-      uses: aabadie/riot-action@v1
-      with:
-        cmd: make -C cpu/stm32/dist/spi_divtable
     - name: Build stm32 clk_conf
       uses: aabadie/riot-action@v1
       with:

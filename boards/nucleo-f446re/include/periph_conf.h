@@ -22,7 +22,6 @@
 #include "periph_cpu.h"
 #include "f4/cfg_clock_180_8_1.h"
 #include "cfg_i2c1_pb8_pb9.h"
-#include "cfg_spi_divtable.h"
 #include "cfg_timer_tim5.h"
 
 #ifdef __cplusplus
@@ -173,9 +172,6 @@ static const qdec_conf_t qdec_config[] = {
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
 static const spi_conf_t spi_config[] = {

@@ -22,7 +22,6 @@
 
 #include "periph_cpu.h"
 #include "f4/cfg_clock_168_8_0.h"
-#include "cfg_spi_divtable.h"
 #include "cfg_usb_otg_fs.h"
 
 #ifdef __cplusplus

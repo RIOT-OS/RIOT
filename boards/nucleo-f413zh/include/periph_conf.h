@@ -135,28 +135,8 @@ static const pwm_conf_t pwm_config[] = {
 
 /**
  * @name    SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 50000000Hz */
-        7,  /* -> 195312Hz */
-        6,  /* -> 390625Hz */
-        5,  /* -> 781250Hz */
-        2,  /* -> 6250000Hz */
-        1   /* -> 12500000Hz */
-    },
-    {       /* for APB2 @ 100000000Hz */
-        7,  /* -> 390625Hz */
-        7,  /* -> 390625Hz */
-        6,  /* -> 781250Hz */
-        3,  /* -> 6250000Hz */
-        2   /* -> 12500000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev            = SPI1,

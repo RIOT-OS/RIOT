@@ -22,7 +22,6 @@
 #include "periph_cpu.h"
 #include "f7/cfg_clock_216_8_1.h"
 #include "cfg_i2c1_pb8_pb9.h"
-#include "cfg_spi_divtable.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
 #include "cfg_usb_otg_fs.h"
@@ -108,9 +107,6 @@ static const uart_conf_t uart_config[] = {
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
 static const spi_conf_t spi_config[] = {

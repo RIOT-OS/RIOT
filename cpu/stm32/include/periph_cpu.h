@@ -22,6 +22,7 @@
 #define PERIPH_CPU_H
 
 #include "cpu.h"
+#include "macros/units.h"
 
 #if defined(CPU_FAM_STM32F0)
 #include "periph/f0/periph_cpu.h"
@@ -619,6 +620,25 @@ typedef enum {
 } uart_stop_bits_t;
 /** @} */
 #endif /* ndef DOXYGEN */
+
+/**
+ * @brief   Override SPI clock speed values
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+enum {
+    SPI_CLK_100KHZ = KHZ(100), /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ = KHZ(400), /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ   = MHZ(1),   /**< drive the SPI bus with 1MHz */
+    SPI_CLK_5MHZ   = MHZ(5),   /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ  = MHZ(10),  /**< drive the SPI bus with 10MHz */
+};
+
+/**
+ * @brief   SPI clock type
+ */
+typedef uint32_t spi_clk_t;
+/** @} */
 
 /**
  * @brief   Structure for UART configuration data

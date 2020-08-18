@@ -126,28 +126,8 @@ static const uart_conf_t uart_config[] = {
 
 /**
  * @name    SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 20000000Hz */
-        7,  /* -> 78125Hz */
-        5,  /* -> 312500Hz */
-        3,  /* -> 1250000Hz */
-        1,  /* -> 5000000Hz */
-        0   /* -> 10000000Hz */
-    },
-    {       /* for APB2 @ 40000000Hz */
-        7,  /* -> 156250Hz */
-        6,  /* -> 312500Hz */
-        4,  /* -> 1250000Hz */
-        2,  /* -> 5000000Hz */
-        1   /* -> 10000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI1,
