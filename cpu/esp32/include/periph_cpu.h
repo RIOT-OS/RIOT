@@ -521,12 +521,6 @@ typedef struct {
  * @brief   Prevent shared timer functions from being used
  */
 #define PERIPH_TIMER_PROVIDES_SET
-/** @} */
-
-/**
- * @brief   Prevent shared timer functions from being used
- */
-#define PERIPH_TIMER_PROVIDES_SET
 
 /**
  * @name   UART configuration
