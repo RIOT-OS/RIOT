@@ -21,7 +21,6 @@
 
 #include "periph_cpu.h"
 #include "f4/cfg_clock_168_16_0.h"
-#include "cfg_spi_divtable.h"
 
 #ifdef __cplusplus
 extern "C" {
