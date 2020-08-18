@@ -17,7 +17,6 @@
  * @}
  */
 
-#include "luid.h"
 #include "board.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
@@ -65,8 +64,7 @@ void at86rf215_reset_and_cfg(at86rf215_t *dev)
     netdev_ieee802154_reset(&dev->netdev);
 
     /* set device address */
-    luid_get_short((network_uint16_t *)&dev->netdev.short_addr);
-    luid_get_eui64((eui64_t *)&dev->netdev.long_addr);
+    netdev_ieee802154_setup(&dev->netdev);
 
     if (is_subGHz(dev)) {
         dev->netdev.chan = CONFIG_AT86RF215_DEFAULT_SUBGHZ_CHANNEL;
