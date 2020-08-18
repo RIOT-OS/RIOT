@@ -25,7 +25,6 @@
 
 #include "periph_cpu.h"
 #include "l4/cfg_clock_80_1.h"
-#include "cfg_spi_divtable.h"
 #include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_rtt_default.h"
 
