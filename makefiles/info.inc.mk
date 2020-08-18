@@ -57,6 +57,8 @@ info-build:
 	@echo '         $(or $(sort $(FEATURES_REQUIRED_ANY)), -none-)'
 	@echo 'FEATURES_OPTIONAL_ONLY (optional that are not required, strictly "nice to have"):'
 	@echo '         $(or $(FEATURES_OPTIONAL_ONLY), -none-)'
+	@echo 'FEATURES_OPTIONAL_ALT:'
+	@echo '         $(or $(sort $(FEATURES_OPTIONAL_ALT)), -none-)'
 	@echo 'FEATURES_OPTIONAL_MISSING (missing optional features):'
 	@echo '         $(or $(FEATURES_OPTIONAL_MISSING), -none-)'
 	@echo 'FEATURES_PROVIDED (by the board or USEMODULE'"'"'d drivers):'

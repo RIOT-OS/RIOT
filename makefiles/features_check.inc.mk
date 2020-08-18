@@ -29,11 +29,24 @@ _features_one_out_of = $(foreach item, $1, $(firstword \
 # Features that are provided and not blacklisted
 FEATURES_USABLE := $(filter-out $(FEATURES_BLACKLIST),$(FEATURES_PROVIDED))
 
-FEATURES_OPTIONAL_ONLY := $(sort $(filter-out $(FEATURES_REQUIRED),$(FEATURES_OPTIONAL)))
-FEATURES_OPTIONAL_USED := $(sort $(filter $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
+# Additionally optional features due to the "one out of" dependencies,
+#   For each features list in $(FEATURES_OPTIONAL_ALT):
+#     ==> If one (or more) features is usable select the first on in list
+#     ==> If no feature is usable return the list
+FEATURES_OPTIONAL_ONE_OUT_OF := $(call _features_one_out_of,\
+                                  $(FEATURES_OPTIONAL_ALT),\
+                                    $(FEATURES_OPTIONAL) \
+                                    $(FEATURES_USABLE))
+
+FEATURES_OPTIONAL_ONLY := $(sort $(filter-out $(FEATURES_REQUIRED),\
+                            $(FEATURES_OPTIONAL) \
+                            $(FEATURES_OPTIONAL_ONE_OUT_OF)))
+FEATURES_OPTIONAL_USED := $(sort $(filter $(FEATURES_PROVIDED), \
+                            $(FEATURES_OPTIONAL_ONLY)))
 
 # Optional features that will not be used because they are not provided
-FEATURES_OPTIONAL_MISSING := $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
+FEATURES_OPTIONAL_MISSING := $(sort $(filter-out $(FEATURES_PROVIDED),\
+                              $(FEATURES_OPTIONAL_ONLY)))
 
 # Features that are used without taking "one out of" dependencies into account
 FEATURES_USED_SO_FAR := $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
