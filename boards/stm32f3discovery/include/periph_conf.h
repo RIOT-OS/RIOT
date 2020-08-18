@@ -162,23 +162,6 @@ static const pwm_conf_t pwm_config[] = {
  * @name SPI configuration
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 36000000Hz */
-        7,  /* -> 140625Hz */
-        6,  /* -> 281250Hz */
-        4,  /* -> 1125000Hz */
-        2,  /* -> 4500000Hz */
-        1   /* -> 9000000Hz */
-    },
-    {       /* for APB2 @ 72000000Hz */
-        7,  /* -> 281250Hz */
-        7,  /* -> 281250Hz */
-        5,  /* -> 1125000Hz */
-        3,  /* -> 4500000Hz */
-        2   /* -> 9000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI1,
