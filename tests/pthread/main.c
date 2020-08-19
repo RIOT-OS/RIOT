@@ -22,6 +22,7 @@
 #include <inttypes.h>
 
 #include "pthread.h"
+#include "thread.h"
 
 #define FACTORIAL_PARAM     (6U)
 #define FACTORIAL_EXPECTED  (720U)
@@ -47,11 +48,14 @@ void *run(void *parameter) {
 int main(void) {
     pthread_t th_id;
     pthread_attr_t th_attr;
+    pthread_attr_init(&th_attr);
+    char stack[THREAD_STACKSIZE_DEFAULT];
+    pthread_attr_setstackaddr(&th_attr, (void*)&stack);
+    pthread_attr_setstacksize(&th_attr, THREAD_STACKSIZE_DEFAULT);
 
     size_t arg = FACTORIAL_PARAM;
     printf("main: parameter = %u\n", (unsigned int) arg);
 
-    pthread_attr_init(&th_attr);
     pthread_create(&th_id, &th_attr, run, (void *) arg);
     size_t res;
     pthread_join(th_id, (void **) &res);
