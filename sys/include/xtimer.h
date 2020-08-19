@@ -590,14 +590,14 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
  */
 #define XTIMER_HZ_BASE (1000000ul)
 
-#ifndef XTIMER_HZ
+#if !defined(XTIMER_HZ) && !defined(MODULE_XTIMER_ON_ZTIMER)
 /**
  * @brief  Frequency of the underlying hardware timer
  */
 #define XTIMER_HZ XTIMER_HZ_BASE
 #endif
 
-#ifndef XTIMER_SHIFT
+#if !defined(XTIMER_SHIFT) && !defined(MODULE_XTIMER_ON_ZTIMER)
 #if (XTIMER_HZ == 32768ul)
 /* No shift necessary, the conversion is not a power of two and is handled by
  * functions in tick_conversion.h */
@@ -634,7 +634,7 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
 #else
 #error "XTIMER_SHIFT cannot be derived for given XTIMER_HZ, verify settings!"
 #endif
-#else
+#elif !defined(MODULE_XTIMER_ON_ZTIMER)
 #error "XTIMER_SHIFT is set relative to XTIMER_HZ, no manual define required!"
 #endif
 
