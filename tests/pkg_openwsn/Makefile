@@ -15,7 +15,7 @@ BOARD_WHITELIST = \
 # OpenWSN Modules
 USEPKG += openwsn
 USEMODULE += openwsn_openstack
-USEMODULE += openwsn_scheduler
+
 # Optional OpenWSN Modules
 ## Enable Constrained Join Protocol (CoJP)
 USEMODULE += openwsn_cjoin
