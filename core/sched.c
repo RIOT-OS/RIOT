@@ -155,8 +155,6 @@ int __attribute__((used)) sched_run(void)
         (uintptr_t)sched_active_thread->stack_start + 31,   /* Base Address (rounded up) */
         MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B)     /* Attributes and Size */
         );
-
-    mpu_enable();
 #endif
 
     DEBUG("sched_run: done, changed sched_active_thread.\n");
