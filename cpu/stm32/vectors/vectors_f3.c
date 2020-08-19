@@ -244,9 +244,9 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     (0UL),                  /* [79] Reserved */
     (0UL),                  /* [80] Reserved */
     isr_fpu                 /* [81] Floating point Interrupt */
-#elif (CPU_LINE_STM32F334x8)
+#elif defined(CPU_LINE_STM32F334x8)
     isr_tim3,               /* [29] TIM3 global Interrupt */
-    isr_tim4,               /* [30] TIM4 global Interrupt */
+    (0UL),                  /* [30] Reserved */
     isr_i2c1_ev,            /* [31] I2C1 Event Interrupt & EXTI Line23 Interrupt (I2C1 wakeup) */
     isr_i2c1_er,            /* [32] I2C1 Error Interrupt */
     (0UL),                  /* [33] Reserved */
