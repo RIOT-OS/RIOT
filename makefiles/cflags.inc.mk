@@ -30,7 +30,6 @@ CXXUWFLAGS += -std=%
 CXXUWFLAGS += -Wstrict-prototypes -Wold-style-definition
 
 ifeq ($(LTO),1)
-  $(warning Building with Link-Time-Optimizations is currently an experimental feature. Expect broken binaries.)
   LTOFLAGS = -flto
   LINKFLAGS += $(LTOFLAGS)
 endif
