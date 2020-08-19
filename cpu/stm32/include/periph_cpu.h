@@ -442,6 +442,12 @@ typedef enum {
 } dma_mode_t;
 
 /**
+ * @brief   DMA channel/trigger configuration for DMA peripherals without
+ *          channel/trigger filtering such as the stm32f1 and stm32f3.
+ */
+#define DMA_CHAN_CONFIG_UNSUPPORTED  (UINT8_MAX)
+
+/**
  * @name    DMA Increment modes
  * @{
  */
