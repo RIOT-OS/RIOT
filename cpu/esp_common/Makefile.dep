@@ -13,7 +13,11 @@ USEMODULE += periph_hwrng
 USEMODULE += periph_flash
 USEMODULE += periph_uart
 USEMODULE += random
-USEMODULE += stdio_uart
+
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_uart
+endif
+
 USEMODULE += xtensa
 
 # Features used by ESP*
