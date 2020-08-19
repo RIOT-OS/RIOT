@@ -29,7 +29,7 @@
 
 void led_init(void);
 
-void board_init(void)
+void __attribute__((weak)) board_init(void)
 {
 #ifdef CPU_ATMEGA32U4
     /* disable usb interrupt on Atmega32U4 */
