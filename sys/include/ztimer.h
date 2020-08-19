@@ -485,6 +485,7 @@ void ztimer_update_head_offset(ztimer_clock_t *clock);
  */
 void ztimer_init(void);
 
+#if defined(MODULE_ZTIMER_EXTEND) || defined(DOXYGEN)
 /**
  * @brief   Initialize possible ztimer extension intermediate timer
  *
@@ -501,6 +502,7 @@ static inline void ztimer_init_extend(ztimer_clock_t *clock)
         clock->ops->set(clock, clock->max_value >> 1);
     }
 }
+#endif /* MODULE_ZTIMER_EXTEND */
 
 /* default ztimer virtual devices */
 /**

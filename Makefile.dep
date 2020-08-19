@@ -1050,7 +1050,7 @@ ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
 endif
 
 # include ztimer dependencies
-ifneq (,$(filter ztimer%,$(USEMODULE)))
+ifneq (,$(filter ztimer% %ztimer,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer/Makefile.dep
 endif
 
