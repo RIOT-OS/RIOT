@@ -26,10 +26,6 @@
 #include "assert.h"
 #include "pm_layered.h"
 
-#if CPU_FAM_STM32F3
-#error "DMA is not supported on STM32F3"
-#endif
-
 #if CPU_FAM_STM32F2 || CPU_FAM_STM32F4 || CPU_FAM_STM32F7
 #define STM32_DMA_Stream_Type   DMA_Stream_TypeDef
 #define CLOCK                   AHB1
@@ -51,11 +47,11 @@
 #define RCC_MASK_DMA2           RCC_AHB1ENR_DMA2EN
 #else /* CPU_FAM_STM32L4 */
 #define CLOCK                   AHB
-#if CPU_FAM_STM32F1 || CPU_FAM_STM32L1
+#if CPU_FAM_STM32F1 || CPU_FAM_STM32F3 || CPU_FAM_STM32L1
 #define RCC_MASK_DMA1           RCC_AHBENR_DMA1EN
-#else /* CPU_FAM_STM32F1 || CPU_FAM_STM32L1 */
+#else /* CPU_FAM_STM32F1 || CPU_FAM_STM32F3 || CPU_FAM_STM32L1 */
 #define RCC_MASK_DMA1           RCC_AHBENR_DMAEN
-#endif /* CPU_FAM_STM32F1 || CPU_FAM_STM32L1 */
+#endif /* CPU_FAM_STM32F1 || CPU_FAM_STM32F3 || CPU_FAM_STM32L1 */
 #define RCC_MASK_DMA2           RCC_AHBENR_DMA2EN
 #endif /* CPU_FAM_STM32L4 */
 #define PERIPH_ADDR             CPAR
@@ -118,7 +114,7 @@ static inline DMA_TypeDef *dma_base(int stream)
 #endif
 }
 
-#ifdef CPU_FAM_STM32F0
+#if CPU_FAM_STM32F0 || CPU_FAM_STM32F3
 static inline DMA_TypeDef *dma_req(int stream_n)
 {
     return dma_base(stream_n);
@@ -196,6 +192,7 @@ static IRQn_Type dma_get_irqn(int stream)
     if (stream < 7) {
         return ((IRQn_Type)((int)DMA1_Channel1_IRQn + stream));
     }
+#if defined(DMA2_BASE)
 #if defined(CPU_FAM_STM32F1)
     else if (stream < 11) {
 #else
@@ -211,7 +208,8 @@ static IRQn_Type dma_get_irqn(int stream)
         return ((IRQn_Type)((int)DMA2_Channel6_IRQn + stream));
 #endif
     }
-#endif
+#endif /* !defined(CPU_FAM_STM32L1) */
+#endif /* defined(DMA2_BASE) */
 #endif
 
     return -1;
