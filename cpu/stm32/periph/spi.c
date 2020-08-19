@@ -256,8 +256,10 @@ static void _transfer_dma(spi_t bus, const void *out, void *in, size_t len)
     dma_wait(spi_config[bus].rx_dma);
     dma_wait(spi_config[bus].tx_dma);
 
-    /* No need to stop the DMA here, it is automatically disabled when the
-     * transfer is finished, only wait for SPI to leave the busy state */
+#ifdef DMA_CCR_EN
+    dma_stop(spi_config[bus].rx_dma);
+    dma_stop(spi_config[bus].tx_dma);
+#endif
     _wait_for_end(bus);
 }
 #endif
