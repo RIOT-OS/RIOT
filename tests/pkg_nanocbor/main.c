@@ -61,10 +61,143 @@ void test_nanocbor_encode(void)
     TEST_ASSERT_EQUAL_INT(0, memcmp(buf, expected, sizeof(expected)));
 }
 
+enum {
+    CFG_FOO,
+    CFG_BAR,
+    CFG_RANGE,
+};
+
+typedef struct {
+    uint32_t foo;
+    uint32_t bar;
+    uint32_t min;
+    uint32_t mean;
+    uint32_t max;
+} test_cfg_t;
+
+static size_t _serialize_config(uint8_t *buffer, size_t len, const test_cfg_t *cfg)
+{
+    nanocbor_encoder_t enc;
+    nanocbor_encoder_init(&enc, buffer, len);
+
+    nanocbor_fmt_map_indefinite(&enc);
+
+    /* write key - value pair*/
+    nanocbor_fmt_uint(&enc, CFG_FOO);
+    nanocbor_fmt_uint(&enc, cfg->foo);
+
+    /* write key - value pair*/
+    nanocbor_fmt_uint(&enc, CFG_BAR);
+    nanocbor_fmt_uint(&enc, cfg->bar);
+
+    /* write key - value pair*/
+    nanocbor_fmt_uint(&enc, CFG_RANGE);
+    nanocbor_fmt_array(&enc, 3);
+    nanocbor_fmt_uint(&enc, cfg->min);
+    nanocbor_fmt_uint(&enc, cfg->mean);
+    nanocbor_fmt_uint(&enc, cfg->max);
+
+    nanocbor_fmt_end_indefinite(&enc);
+
+    return nanocbor_encoded_len(&enc);
+}
+
+static bool _decode_period(nanocbor_value_t *it, test_cfg_t *cfg)
+{
+    nanocbor_value_t array;
+
+    if (nanocbor_enter_array(it, &array) <= 0) {
+        return false;
+    }
+
+    if (nanocbor_get_uint32(&array, &cfg->min) <= 0) {
+        return false;
+    }
+
+    if (nanocbor_get_uint32(&array, &cfg->mean) <= 0) {
+        return false;
+    }
+
+    if (nanocbor_get_uint32(&array, &cfg->max) <= 0) {
+        return false;
+    }
+
+    nanocbor_leave_container(it, &array);
+
+    return true;
+}
+
+static bool _cfg_cb(nanocbor_value_t *map, uint32_t key, void *dst)
+{
+    test_cfg_t *cfg = dst;
+
+    switch (key) {
+    case CFG_FOO:
+        return nanocbor_get_uint32(map, &cfg->foo) > 0;
+    case CFG_BAR:
+        return nanocbor_get_uint32(map, &cfg->bar) > 0;
+    case CFG_RANGE:
+        return _decode_period(map, cfg);
+    default:
+        nanocbor_skip(map);
+    }
+
+    return true;
+}
+
+static bool _parse_config(const uint8_t *buffer, size_t len, test_cfg_t *cfg)
+{
+    nanocbor_value_t msg, map;
+    nanocbor_decoder_init(&msg, buffer, len);
+
+    if (nanocbor_enter_map(&msg, &map) < 0) {
+        return false;
+    }
+
+    while (!nanocbor_at_end(&map)) {
+        uint32_t key;
+        if (nanocbor_get_uint32(&map, &key) < 0) {
+            return false;
+        }
+
+        if (!_cfg_cb(&map, key, cfg)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+void test_nanocbor_encode_decode_cfg(void)
+{
+    uint8_t buffer[64];
+
+    test_cfg_t cfg = {
+        .foo  = 23,
+        .bar  = 42,
+        .min  = 5,
+        .mean = 30,
+        .max  = 60,
+    };
+
+    size_t len = _serialize_config(buffer, sizeof(buffer), &cfg);
+    TEST_ASSERT(len < sizeof(buffer));
+
+    test_cfg_t new_cfg;
+    TEST_ASSERT(_parse_config(buffer, len, &new_cfg));
+
+    TEST_ASSERT_EQUAL_INT(cfg.foo,  new_cfg.foo);
+    TEST_ASSERT_EQUAL_INT(cfg.bar,  new_cfg.bar);
+    TEST_ASSERT_EQUAL_INT(cfg.min,  new_cfg.min);
+    TEST_ASSERT_EQUAL_INT(cfg.mean, new_cfg.mean);
+    TEST_ASSERT_EQUAL_INT(cfg.max,  new_cfg.max);
+}
+
 Test *tests_nanocbor(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_nanocbor_encode),
+        new_TestFixture(test_nanocbor_encode_decode_cfg),
     };
     EMB_UNIT_TESTCALLER(nanocbor_tests, NULL, NULL, fixtures);
     return (Test *)&nanocbor_tests;
