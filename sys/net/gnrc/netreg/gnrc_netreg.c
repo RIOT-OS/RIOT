@@ -24,7 +24,9 @@
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/udp.h"
+#ifdef MODULE_GNRC_TCP
 #include "net/gnrc/tcp.h"
+#endif
 
 #define _INVALID_TYPE(type) (((type) < GNRC_NETTYPE_UNDEF) || ((type) >= GNRC_NETTYPE_NUMOF))
 

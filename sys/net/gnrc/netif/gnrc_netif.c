@@ -34,7 +34,9 @@
 #include "fmt.h"
 #include "log.h"
 #include "sched.h"
+#if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
 #include "xtimer.h"
+#endif
 
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/internal.h"
