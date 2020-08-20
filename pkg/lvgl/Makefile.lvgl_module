@@ -1,6 +1,7 @@
 CFLAGS += -Wno-unused-parameter
 CFLAGS += -Wno-sign-compare
 CFLAGS += -Wno-unused-function
+CFLAGS += -Wno-maybe-uninitialized
 
 ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-missing-braces
