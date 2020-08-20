@@ -20,7 +20,7 @@
  * # Design Decisions and Limitations
  * - support for local addresses only (using `luid` to generate them)
  * - advertising interval is configured during compile time, override by setting
- *   `CFLAGS+=-DSKALD_INTERVAL=xxx`
+ *   `CFLAGS+=-DCONFIG_SKALD_INTERVAL=xxx`
  * - advertising channels are configured during compile time, override by
  *   setting `CFLAGS+=-DSKALD_ADV_CHAN={37,39}`
  *
@@ -55,10 +55,10 @@ extern "C" {
 #endif
 
 /**
- * @brief   Static advertising interval
+ * @brief   Default static advertising interval
  */
-#ifndef SKALD_INTERVAL
-#define SKALD_INTERVAL          (1 * US_PER_SEC)
+#ifndef CONFIG_SKALD_INTERVAL
+#define CONFIG_SKALD_INTERVAL          (1 * US_PER_SEC)
 #endif
 
 /**
@@ -93,7 +93,7 @@ void skald_init(void);
 /**
  * @brief   Start advertising the given packet
  *
- * The packet will be send out each advertising interval (see SKALD_INTERVAL) on
+ * The packet will be send out each advertising interval (see CONFIG_SKALD_INTERVAL) on
  * each of the defined advertising channels (see SKALD_ADV_CHAN).
  *
  * @param[in,out] ctx   start advertising this context
