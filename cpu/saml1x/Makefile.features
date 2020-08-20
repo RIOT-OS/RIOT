@@ -8,7 +8,6 @@ else
   $(error Unknown saml1x CPU Model: $(CPU_MODEL))
 endif
 
-FEATURES_PROVIDED += cortexm_mpu
 FEATURES_PROVIDED += periph_hwrng
 
 include $(RIOTCPU)/sam0_common/Makefile.features
