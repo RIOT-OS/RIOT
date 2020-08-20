@@ -62,10 +62,31 @@ extern "C" {
 #endif
 
 /**
- * @brief   Static list of used advertising channels
+ * @brief   Configure advertising channels
+ */
+#ifndef CONFIG_ADV_CH_37_DISABLE
+#define ADV_CH_37 37,
+#else
+#define ADV_CH_37
+#endif
+
+#ifndef CONFIG_ADV_CH_38_DISABLE
+#define ADV_CH_38 38,
+#else
+#define ADV_CH_38
+#endif
+
+#ifndef CONFIG_ADV_CH_39_DISABLE
+#define ADV_CH_39 39
+#else
+#define ADV_CH_39
+#endif
+
+/**
+ * @brief   List of advertising channels
  */
 #ifndef SKALD_ADV_CHAN
-#define SKALD_ADV_CHAN          { 37, 38, 39 }
+#define SKALD_ADV_CHAN { ADV_CH_37 ADV_CH_38 ADV_CH_39 }
 #endif
 
 /**
