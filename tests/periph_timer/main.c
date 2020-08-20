@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdatomic.h>
 #include <stdlib.h>
 
 #include "macros/units.h"
@@ -44,10 +45,10 @@
 #define TIMER_SPEED         XTIMER_HZ
 #endif
 
-static volatile int fired;
-static volatile uint32_t sw_count;
-static volatile uint32_t timeouts[MAX_CHANNELS];
-static volatile unsigned args[MAX_CHANNELS];
+static atomic_int fired;
+static atomic_uint_least32_t sw_count;
+static atomic_uint_least32_t timeouts[MAX_CHANNELS];
+static atomic_uint args[MAX_CHANNELS];
 
 static void cb(void *arg, int chan)
 {
@@ -98,7 +99,7 @@ static int test_timer(unsigned num)
     timer_start(TIMER_DEV(num));
     /* wait for all channels to fire */
     do {
-        ++sw_count;
+        sw_count++;
     } while (fired != set);
     /* collect results */
     for (int i = 0; i < fired; i++) {
