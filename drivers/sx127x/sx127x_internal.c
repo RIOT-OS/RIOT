@@ -25,6 +25,8 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
+#include "ztimer.h"
+
 #include "net/lora.h"
 
 #include "sx127x.h"
@@ -231,7 +233,7 @@ bool sx127x_is_channel_free(sx127x_t *dev, uint32_t freq, int16_t rssi_threshold
     sx127x_set_channel(dev, freq);
     sx127x_set_op_mode(dev, SX127X_RF_OPMODE_RECEIVER);
 
-    xtimer_usleep(1000); /* wait 1 millisecond */
+    ztimer_sleep(ZTIMER_MSEC, 1); /* wait 1 millisecond */
 
     rssi = sx127x_read_rssi(dev);
     sx127x_set_sleep(dev);

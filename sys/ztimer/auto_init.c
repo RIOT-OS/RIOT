@@ -68,7 +68,6 @@ ztimer_clock_t *const ZTIMER_USEC = &_ztimer_convert_shift_usec.super.super;
 #    else
 static ztimer_convert_frac_t _ztimer_convert_frac_usec;
 ztimer_clock_t *const ZTIMER_USEC = &_ztimer_convert_frac_usec.super.super;
-#  define ZTIMER_USEC_CONVERT_LOWER (&_ztimer_periph_timer_usec.super)
 #    endif
 #   else
 #     error ztimer_usec selected, but no configuration available!
@@ -92,13 +91,8 @@ ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_periph_timer_rtt_msec;
 static ztimer_convert_frac_t _ztimer_convert_frac_msec;
 ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_convert_frac_msec.super.super;
 ztimer_clock_t *const ZTIMER_MSEC_BASE = &_ztimer_periph_timer_usec.super;
-#    if CONFIG_ZTIMER_USEC_BASE_FREQ < FREQ_1MHZ
-#      define ZTIMER_MSEC_CONVERT_LOWER         ZTIMER_USEC_CONVERT_LOWER
-#      define ZTIMER_MSEC_CONVERT_LOWER_FREQ    CONFIG_ZTIMER_USEC_BASE_FREQ
-#    else
-#      define ZTIMER_MSEC_CONVERT_LOWER (ZTIMER_USEC)
-#      define ZTIMER_MSEC_CONVERT_LOWER_FREQ    FREQ_1MHZ
-#    endif
+#    define ZTIMER_MSEC_CONVERT_LOWER       ZTIMER_USEC_BASE
+#    define ZTIMER_MSEC_CONVERT_LOWER_FREQ  CONFIG_ZTIMER_USEC_BASE_FREQ
 #  else
 #  error No suitable ZTIMER_MSEC config. Maybe add USEMODULE += ztimer_usec?
 #  endif
