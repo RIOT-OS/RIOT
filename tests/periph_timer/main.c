@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "macros/units.h"
 #include "periph/timer.h"
 
 /**
@@ -34,6 +35,14 @@
 #define MAX_CHANNELS        (10U)
 #define CHAN_OFFSET         (5000U)     /* fire every 5ms */
 #define COOKIE              (100U)      /* for checking if arg is passed */
+
+#ifndef XTIMER_HZ
+#define XTIMER_HZ MHZ(1)
+#endif
+
+#ifndef TIMER_SPEED
+#define TIMER_SPEED         XTIMER_HZ
+#endif
 
 static volatile int fired;
 static volatile uint32_t sw_count;
