@@ -8,7 +8,9 @@ else
   $(error Unknown saml1x CPU Model: $(CPU_MODEL))
 endif
 
-FEATURES_PROVIDED += cortexm_mpu
+# TODO: The cortex-m23 MPU is not ported
+# FEATURES_PROVIDED += cortexm_mpu
+
 FEATURES_PROVIDED += periph_hwrng
 
 include $(RIOTCPU)/sam0_common/Makefile.features
