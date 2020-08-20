@@ -23,20 +23,35 @@
 #include <stdlib.h>
 
 #include "board.h"
+#include "macros/units.h"
 #include "thread.h"
 #include "thread_flags.h"
 
 #include "periph/timer.h"
 
-#ifndef TEST_TIMER_DEV
-# include "xtimer.h"
-# define TEST_TIMER_DEV      XTIMER_DEV
-# define TEST_TIMER_FREQ     XTIMER_HZ
-# define TEST_TIMER_WIDTH    XTIMER_WIDTH
-#else
-# ifndef TEST_TIMER_FREQ
-#  define TEST_TIMER_FREQ     (1000000LU)
+/* recreate logic to obtain valid XTIMER_DEV used in xtimer.h, but don't include
+ * xtimer.h, as this leads to issues on some boards when the xtimer module is
+ * not used */
+#ifndef XTIMER_DEV
+# define XTIMER_DEV         TIMER_DEV(0)
+#endif
+#ifndef XTIMER_HZ
+# define XTIMER_HZ          MHZ(1)
+#endif
+#ifndef XTIMER_WIDTH
+# if(TIMER_0_MAX_VALUE) == 0xfffffful
+#  define XTIMER_WIDTH      (24)
+# elif (TIMER_0_MAX_VALUE) == 0xffff
+#  define XTIMER_WIDTH      (16)
+# else
+#  define XTIMER_WIDTH      (32)
 # endif
+#endif /* !defined(XTIMER_WIDTH) */
+
+#ifndef TEST_TIMER_FREQ
+# define TEST_TIMER_DEV     XTIMER_DEV
+# define TEST_TIMER_FREQ    XTIMER_HZ
+# define TEST_TIMER_WIDTH   XTIMER_WIDTH
 #endif
 
 #ifndef TEST_MAX_DIFF
