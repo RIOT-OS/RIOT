@@ -729,6 +729,11 @@ ifneq (,$(filter evtimer,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter evtimer_mbox,$(USEMODULE)))
+  USEMODULE += evtimer
+  USEMODULE += core_mbox
+endif
+
 ifneq (,$(filter fuzzing,$(USEMODULE)))
   USEMODULE += netdev_test
   USEMODULE += gnrc_netif
