@@ -162,4 +162,4 @@ void gnrc_ipv6_nib_ft_print(const gnrc_ipv6_nib_ft_t *fte)
     printf("dev #%u\n", fte->iface);
 }
 
-/**i @} */
+/** @} */
