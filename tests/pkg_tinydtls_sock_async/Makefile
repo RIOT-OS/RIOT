@@ -17,6 +17,8 @@ USEMODULE += event_timeout
 
 # Use tinydtls for sock_dtls
 USEMODULE += tinydtls_sock_dtls
+# tinydtls needs crypto secure PRNG
+USEMODULE += prng_sha1prng
 
 # Add also the shell, some shell commands
 USEMODULE += shell

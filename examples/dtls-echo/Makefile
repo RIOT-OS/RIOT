@@ -20,6 +20,8 @@ USEMODULE += shell
 USEMODULE += shell_commands
 
 USEPKG += tinydtls
+# tinydtls needs crypto secure PRNG
+USEMODULE += prng_sha1prng
 
 # UDP Port to use (20220 is default for DTLS).
 DTLS_PORT ?= 20220
