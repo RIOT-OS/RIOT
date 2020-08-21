@@ -18,6 +18,11 @@ config CPU_MODEL_SAML21J18A
     select CPU_FAM_SAML21
     select HAS_PERIPH_HWRNG
 
+config CPU_MODEL_SAML21J18B
+    bool
+    select CPU_FAM_SAML21
+    select HAS_PERIPH_HWRNG
+
 config CPU_MODEL_SAMR30G18A
     bool
     select CPU_FAM_SAML21
@@ -39,6 +44,7 @@ config CPU_FAM
 
 config CPU_MODEL
     default "saml21j18a" if CPU_MODEL_SAML21J18A
+    default "saml21j18b" if CPU_MODEL_SAML21J18B
     default "samr30g18a" if CPU_MODEL_SAMR30G18A
     default "samr34j18b" if CPU_MODEL_SAMR34J18B
 
