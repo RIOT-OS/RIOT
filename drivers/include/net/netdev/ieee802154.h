@@ -24,6 +24,7 @@
 #include "net/gnrc/nettype.h"
 #include "net/netopt.h"
 #include "net/netdev.h"
+#include "luid.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -193,6 +194,23 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
  * @return 1            fails if packet is not for the device or pan
  */
 int netdev_ieee802154_dst_filter(netdev_ieee802154_t *dev, const uint8_t *mhr);
+
+/**
+ * @brief   Configure the hardware address of a IEEE 802.15.4 devices
+ *
+ * This will obtain a long and short address based on the netdev ID.
+ * The addresses is stored in the netdev's `long_addr` & `short_addr`.
+ * The caller must take care of writing them to the hardware.
+ *
+ * @pre the netdev registered itself with @see netdev_register
+ *
+ * @param[out]  dev     Netdev to configure
+ */
+static inline void netdev_ieee802154_setup(netdev_ieee802154_t *dev)
+{
+    luid_netdev_get_eui64(&dev->netdev, (eui64_t *)&dev->long_addr);
+    luid_get_short((network_uint16_t *)&dev->short_addr);
+}
 
 #ifdef __cplusplus
 }
