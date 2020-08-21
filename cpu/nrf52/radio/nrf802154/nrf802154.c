@@ -192,6 +192,16 @@ static bool _channel_is_clear(void)
     NRF_RADIO->TASKS_START = 1;
  }
 
+/**
+ * @brief basic ieee802.15.4 data frame validation
+ */
+static bool _data_frame_filter(void)
+{
+    /* Check CRC and data frame filter*/
+    return ((NRF_RADIO->CRCSTATUS == 1) &&
+            netdev_ieee802154_data_frame_filter(&nrf802154_dev, &rxbuf[1], rxbuf[0]));
+}
+
 static void _set_chan(uint16_t chan)
 {
     assert((chan >= IEEE802154_CHANNEL_MIN) && (chan <= IEEE802154_CHANNEL_MAX));
@@ -505,9 +515,7 @@ void isr_radio(void)
             case RADIO_STATE_STATE_RxIdle:
                 /* only process packet if event callback is set and CRC is valid */
                 if ((nrf802154_dev.netdev.event_callback) &&
-                    (NRF_RADIO->CRCSTATUS == 1) &&
-                    (netdev_ieee802154_dst_filter(&nrf802154_dev,
-                                                  &rxbuf[1]) == 0)) {
+                    _data_frame_filter()) {
                     _state |= RX_COMPLETE;
                 }
                 else {
