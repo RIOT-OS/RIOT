@@ -70,7 +70,6 @@ config CPU_FAM_G0
     select CPU_STM32
     select CPU_CORE_CORTEX_M0PLUS
     select HAS_CPU_STM32G0
-    select HAS_CORTEXM_MPU
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_RAW
 
@@ -307,7 +306,6 @@ config CPU_MODEL_STM32L031K6
 config CPU_MODEL_STM32L052T8
     bool
     select CPU_FAM_L0
-    select HAS_CORTEXM_MPU
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32L053R8
