@@ -1,6 +1,6 @@
 PKG_NAME=cn-cbor
-PKG_URL=https://github.com/cabo/cn-cbor
-PKG_VERSION=f1cf9ffdf5cfab935a45900556f9b68af925c256
+PKG_URL=https://github.com/jimsch/cn-cbor
+PKG_VERSION=821797f9421c04dc783561dc465066857839e108 # 1.0.0
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
