@@ -17,24 +17,27 @@
  *
  * @{
  *
- * @file        /home/k_f/ws_doriot/thread_duel/sched_rr.h
+ * @file
  * @brief       Round Robin Scheduler
  *
  * @author      Karl Fessel <karl.fessel@ovgu.de>
  *
  */
+
+#if !defined(SCHED_RR_TIMER) || defined(DOXYGEN)
 /**
- * time between rond robin calls default 1ms
+ * @brief Time between round robin calls in µs
+ *
+ * @details Defaults to 1ms
  */
-#ifndef SCHED_RR_TIMER
-    #define SCHED_RR_TIMER 1000
+#define SCHED_RR_TIMER 1000
 #endif
 
+#if !defined(SCHED_RR_MASK) || defined(DOXYGEN)
 /**
- * masks off priorities that should not be scheduled default 0
+ * @brief masks off priorities that should not be scheduled default 0
  */
-#ifndef SCHED_RR_MASK
-    #define SCHED_RR_MASK 1<<0
+#define SCHED_RR_MASK 1<<0
 #endif
 
 /**

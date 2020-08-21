@@ -25,31 +25,40 @@
 
 static xtimer_t rr_timer;
 
-void schedule_rr(void * d){
-    // this lets the current thread give way
-    // simple RoundRobin
+
+/*
+ * will run in the current threads context (xtimer/ISR)
+ * and force it to give way to implement a simple round robin
+ * it may be started in any thread
+ */
+void schedule_rr(void * d)
+{
     (void)d;
-    //this will run in an other threads context (xtimer/ISR)
-    //it can be started from any thread
-    //it will setup a timer to pull itself up
-    //this will try to reorder the current priority
-    //(put the current thread at the end of the list)
-    thread_t * active_thread = thread_get_active();
-    if(active_thread != NULL){
-        if(! (SCHED_RR_MASK & 1 << active_thread->priority)){
+    /*
+     * try to reorder the current priority
+     * (put the current thread at the end of the run queue of its priority)
+     * and setup the schedueler to schedule when returning from the IRQ
+     */
+    thread_t *active_thread = thread_get_active();
+    if (active_thread != NULL) {
+        if (!(SCHED_RR_MASK & 1 << active_thread->priority)) {
             clist_lpoprpush(&sched_runqueues[active_thread->priority]);
             thread_yield_higher();
         }
     }
-    // if time is shorter than XTIMER_BACKOFF we stack the stack
-    xtimer_set(&rr_timer,SCHED_RR_TIMER);
+
+    /* setup a timer to pull itself up agian */
+    /* if time is shorter than XTIMER_BACKOFF we stack the stack */
+    xtimer_set(&rr_timer, SCHED_RR_TIMER);
 }
 
-void stop_schedule_rr(void){
+void stop_schedule_rr(void)
+{
     xtimer_remove(&rr_timer);
 }
 
-void start_schedule_rr(void){
+void start_schedule_rr(void)
+{
     rr_timer.callback = schedule_rr;
-    xtimer_set(&rr_timer,SCHED_RR_TIMER);
+    xtimer_set(&rr_timer, SCHED_RR_TIMER);
 }
