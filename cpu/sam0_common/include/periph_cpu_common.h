@@ -623,7 +623,7 @@ static inline uint8_t sercom_id(const void *sercom)
 static inline void sercom_clk_en(void *sercom)
 {
     const uint8_t id = sercom_id(sercom);
-#if defined(CPU_FAM_SAMD21)
+#if defined(CPU_COMMON_SAMD21)
     PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << id);
 #elif defined (CPU_FAM_SAMD5X)
     if (id < 2) {
@@ -653,7 +653,7 @@ static inline void sercom_clk_en(void *sercom)
 static inline void sercom_clk_dis(void *sercom)
 {
     const uint8_t id = sercom_id(sercom);
-#if defined(CPU_FAM_SAMD21)
+#if defined(CPU_COMMON_SAMD21)
     PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << id);
 #elif defined (CPU_FAM_SAMD5X)
     if (id < 2) {
@@ -696,7 +696,7 @@ static inline void sercom_set_gen(void *sercom, uint8_t gclk)
 {
     const uint8_t id = sercom_id(sercom);
     sam0_gclk_enable(gclk);
-#if defined(CPU_FAM_SAMD21)
+#if defined(CPU_COMMON_SAMD21)
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(gclk) |
                          (SERCOM0_GCLK_ID_CORE + id));
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}

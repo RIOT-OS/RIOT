@@ -180,7 +180,7 @@ void gpio_write(gpio_t pin, int value)
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 
-#ifdef CPU_FAM_SAMD21
+#ifdef CPU_COMMON_SAMD21
 #define EIC_SYNC() while (_EIC->STATUS.bit.SYNCBUSY)
 #else
 #define EIC_SYNC() while (_EIC->SYNCBUSY.bit.ENABLE)
@@ -212,7 +212,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* configure pin as input and set MUX to peripheral function A */
     gpio_init(pin, mode);
     gpio_init_mux(pin, GPIO_MUX_A);
-#ifdef CPU_FAM_SAMD21
+#ifdef CPU_COMMON_SAMD21
     /* enable clocks for the EIC module */
     PM->APBAMASK.reg |= PM_APBAMASK_EIC;
     GCLK->CLKCTRL.reg = EIC_GCLK_ID
@@ -242,7 +242,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* clear interrupt flag and enable the interrupt line and line wakeup */
     _EIC->INTFLAG.reg = (1 << exti);
     _EIC->INTENSET.reg = (1 << exti);
-#ifdef CPU_FAM_SAMD21
+#ifdef CPU_COMMON_SAMD21
     _EIC->WAKEUP.reg |= (1 << exti);
     /* enable the EIC module*/
     _EIC->CTRL.reg = EIC_CTRL_ENABLE;
@@ -256,7 +256,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 }
 
 inline static void reenable_eic(gpio_eic_clock_t clock) {
-#if defined(CPU_SAMD21)
+#if defined(CPU_COMMON_SAMD21)
     if (clock == _EIC_CLOCK_SLOW) {
         GCLK->CLKCTRL.reg = EIC_GCLK_ID
                           | GCLK_CLKCTRL_CLKEN

@@ -45,7 +45,7 @@
 static inline void _set_enable(bool on)
 {
 /* work around strange watchdog behaviour if IDLE2 is used on samd21 */
-#ifdef CPU_FAM_SAMD21
+#ifdef CPU_COMMON_SAMD21
     if (on) {
         pm_block(1);
     }
@@ -80,7 +80,7 @@ static uint32_t ms_to_per(uint32_t ms)
     return 29 - __builtin_clz(cycles - 1);
 }
 
-#ifdef CPU_SAMD21
+#ifdef CPU_COMMON_SAMD21
 static void _wdt_clock_setup(void)
 {
     /* Connect to GCLK3 (~1.024 kHz) */
