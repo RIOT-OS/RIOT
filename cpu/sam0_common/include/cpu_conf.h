@@ -78,7 +78,7 @@ extern "C" {
 #define CPU_IRQ_NUMOF                   PERIPH_COUNT_IRQn
 #define CPU_FLASH_BASE                  FLASH_ADDR
 
-#ifdef CPU_SAML1X
+#ifdef CPU_COMMON_SAML1X
 #define CPU_FLASH_RWWEE_BASE            DATAFLASH_ADDR
 #else
 #define CPU_FLASH_RWWEE_BASE            NVMCTRL_RWW_EEPROM_ADDR

@@ -49,7 +49,7 @@
 /**
  * @brief   Number of external interrupt lines
  */
-#ifdef CPU_SAML1X
+#ifdef CPU_COMMON_SAML1X
 #define NUMOF_IRQS                  (8U)
 #else
 #define NUMOF_IRQS                  (16U)
@@ -231,7 +231,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     _EIC->CONFIG[exti >> 3].reg &= ~(0xf << ((exti & 0x7) * 4));
     _EIC->CONFIG[exti >> 3].reg |=  (flank << ((exti & 0x7) * 4));
     /* enable the global EIC interrupt */
-#ifdef CPU_SAML1X
+#ifdef CPU_COMMON_SAML1X
     /* EXTI[4..7] are binded to EIC_OTHER_IRQn */
     NVIC_EnableIRQ((exti > 3 )? EIC_OTHER_IRQn : (EIC_0_IRQn + exti));
 #elif defined(CPU_SAMD5X)
@@ -339,7 +339,7 @@ void gpio_irq_disable(gpio_t pin)
     _EIC->INTENCLR.reg = (1 << exti);
 }
 
-#if defined(CPU_SAML1X)
+#if defined(CPU_COMMON_SAML1X)
 void isr_eic_other(void)
 #else
 void isr_eic(void)
@@ -360,7 +360,7 @@ void isr_eic(void)
     cortexm_isr_end();
 }
 
-#if defined(CPU_SAML1X) || defined(CPU_SAMD5X)
+#if defined(CPU_COMMON_SAML1X) || defined(CPU_SAMD5X)
 
 #define ISR_EICn(n)             \
 void isr_eic ## n (void)        \
@@ -390,7 +390,7 @@ ISR_EICn(14)
 ISR_EICn(15)
 #endif /* NUMOF_IRQS > 8 */
 #endif /* CPU_SAMD5X */
-#endif /* CPU_SAML1X || CPU_SAMD5X */
+#endif /* CPU_COMMON_SAML1X || CPU_SAMD5X */
 
 #else /* MODULE_PERIPH_GPIO_IRQ */
 
