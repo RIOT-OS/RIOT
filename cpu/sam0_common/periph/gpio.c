@@ -234,7 +234,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 #ifdef CPU_COMMON_SAML1X
     /* EXTI[4..7] are binded to EIC_OTHER_IRQn */
     NVIC_EnableIRQ((exti > 3 )? EIC_OTHER_IRQn : (EIC_0_IRQn + exti));
-#elif defined(CPU_SAMD5X)
+#elif defined(CPU_COMMON_SAMD5X)
     NVIC_EnableIRQ(EIC_0_IRQn + exti);
 #else
     NVIC_EnableIRQ(EIC_IRQn);
@@ -360,7 +360,7 @@ void isr_eic(void)
     cortexm_isr_end();
 }
 
-#if defined(CPU_COMMON_SAML1X) || defined(CPU_SAMD5X)
+#if defined(CPU_COMMON_SAML1X) || defined(CPU_COMMON_SAMD5X)
 
 #define ISR_EICn(n)             \
 void isr_eic ## n (void)        \
@@ -374,7 +374,7 @@ ISR_EICn(0)
 ISR_EICn(1)
 ISR_EICn(2)
 ISR_EICn(3)
-#if defined(CPU_SAMD5X)
+#if defined(CPU_COMMON_SAMD5X)
 ISR_EICn(4)
 ISR_EICn(5)
 ISR_EICn(6)
@@ -389,8 +389,8 @@ ISR_EICn(13)
 ISR_EICn(14)
 ISR_EICn(15)
 #endif /* NUMOF_IRQS > 8 */
-#endif /* CPU_SAMD5X */
-#endif /* CPU_COMMON_SAML1X || CPU_SAMD5X */
+#endif /* CPU_COMMON_SAMD5X */
+#endif /* CPU_COMMON_SAML1X || CPU_COMMON_SAMD5X */
 
 #else /* MODULE_PERIPH_GPIO_IRQ */
 

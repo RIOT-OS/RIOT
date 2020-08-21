@@ -363,7 +363,7 @@ static void _usbdev_init(usbdev_t *dev)
     _block_pm();
     usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_HOST_CONNECT);
     /* Interrupt configuration */
-#ifdef CPU_FAM_SAMD5X
+#ifdef CPU_COMMON_SAMD5X
     NVIC_EnableIRQ(USB_0_IRQn);
     NVIC_EnableIRQ(USB_1_IRQn);
     NVIC_EnableIRQ(USB_2_IRQn);

@@ -32,7 +32,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#if defined (CPU_COMMON_SAML1X) || defined (CPU_SAMD5X)
+#if defined (CPU_COMMON_SAML1X) || defined (CPU_COMMON_SAMD5X)
 #define UART_HAS_TX_ISR
 #endif
 
