@@ -804,6 +804,15 @@ ifneq (,$(filter sock_async_event,$(USEMODULE)))
   USEMODULE += event
 endif
 
+ifneq (,$(filter sock_async,$(USEMODULE)))
+  ifneq (,$(filter gnrc%,$(USEMODULE)))
+    USEMODULE += gnrc_sock_async
+  endif
+  ifneq (,$(filter openwsn%,$(USEMODULE)))
+    USEMODULE += openwsn_sock_async
+  endif
+endif
+
 ifneq (,$(filter sock_dns,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += sock_util
