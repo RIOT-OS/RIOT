@@ -9,9 +9,11 @@
 /**
  * @defgroup    Sched_RR
  * @ingroup     sys
- * @brief       This module module privides round robin scheduling within
+ * @brief       This module module provides round robin scheduling within
  *              for all runnable threads within each not masked priority.
  *              Priority 0 is masked by default.
+ *              There is no fainess involved in this scheuler. It schedules,
+ *              when the timer ticks. Keep it as simple as possible.
  *
  * @note        start using start_schedule_rr()
  *
