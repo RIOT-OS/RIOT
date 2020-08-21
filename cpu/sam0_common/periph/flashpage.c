@@ -139,7 +139,7 @@ static void _erase_page(void* page, void (*cmd_erase)(void))
     /* ADDR drives the hardware (16-bit) address to the NVM when a command is executed using CMDEX.
      * 8-bit addresses must be shifted one bit to the right before writing to this register.
      */
-#if defined(CPU_COMMON_SAMD21) || defined(CPU_SAML21)
+#if defined(CPU_COMMON_SAMD21) || defined(CPU_COMMON_SAML21)
     page_addr >>= 1;
 #endif
 

@@ -637,11 +637,11 @@ static inline void sercom_clk_en(void *sercom)
     if (id < 5) {
         MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << id);
     }
-#if defined(CPU_FAM_SAML21)
+#if defined(CPU_COMMON_SAML21)
     else {
         MCLK->APBDMASK.reg |= (MCLK_APBDMASK_SERCOM5);
     }
-#endif /* CPU_FAM_SAML21 */
+#endif /* CPU_COMMON_SAML21 */
 #endif
 }
 
@@ -667,11 +667,11 @@ static inline void sercom_clk_dis(void *sercom)
     if (id < 5) {
         MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << id);
     }
-#if defined (CPU_FAM_SAML21)
+#if defined (CPU_COMMON_SAML21)
     else {
         MCLK->APBDMASK.reg &= ~(MCLK_APBDMASK_SERCOM5);
     }
-#endif /* CPU_FAM_SAML21 */
+#endif /* CPU_COMMON_SAML21 */
 #endif
 }
 
@@ -706,11 +706,11 @@ static inline void sercom_set_gen(void *sercom, uint8_t gclk)
     if (id < 5) {
         GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + id].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
     }
-#if defined(CPU_FAM_SAML21)
+#if defined(CPU_COMMON_SAML21)
     else {
         GCLK->PCHCTRL[SERCOM5_GCLK_ID_CORE].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
     }
-#endif /* CPU_FAM_SAML21 */
+#endif /* CPU_COMMON_SAML21 */
 #endif
 }
 
@@ -821,7 +821,7 @@ typedef struct {
 /**
  * @brief Move the DMA descriptors to the LP SRAM. Required on the SAML21
  */
-#if defined(CPU_FAM_SAML21) || defined(DOXYGEN)
+#if defined(CPU_COMMON_SAML21) || defined(DOXYGEN)
 #define DMA_DESCRIPTOR_IN_LPSRAM
 #endif
 

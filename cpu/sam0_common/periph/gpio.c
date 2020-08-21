@@ -219,7 +219,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                       | GCLK_CLKCTRL_CLKEN
                       | GCLK_CLKCTRL_GEN(CONFIG_SAM0_GCLK_GPIO);
     while (GCLK->STATUS.bit.SYNCBUSY) {}
-#else /* CPU_FAM_SAML21 */
+#else /* CPU_COMMON_SAML21 */
     /* enable clocks for the EIC module */
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_EIC;
     GCLK->PCHCTRL[EIC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(CONFIG_SAM0_GCLK_GPIO);
@@ -247,7 +247,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* enable the EIC module*/
     _EIC->CTRL.reg = EIC_CTRL_ENABLE;
     EIC_SYNC();
-#else /* CPU_FAM_SAML21 */
+#else /* CPU_COMMON_SAML21 */
     /* enable the EIC module*/
     _EIC->CTRLA.reg = EIC_CTRLA_ENABLE;
     EIC_SYNC();
