@@ -1,3 +1,23 @@
+RIOT-2020.07.1 - Release Notes
+==============================
+This is a bug fixing release for the RIOT 2020.07 release.
+The following bugs were fixed:
+
+#14670: tests/lwip_sock_tcp: fix -EADDRINUSE test
+
+#14671: pkg/lwip: Use IS_ACTIVE() and bugfix
+    - pkg/lwip: Compatibility with IS_USED()
+    - pkg/lwip: Use IS_ACTIVE() & NETCONNTYPE_ISIPV6()
+
+#14686: gnrc_sixlowpan_frag_vrb: fix cppcheck warning
+
+#14693: cpu/msp430_common: fix thread_yield_higher() when called in isr
+
+#14685: gnrc/nib: fix _idx_dsts() calculation
+
+#14817: gnrc_sixlowpan_frag_rb: Check possibly uninitialized pointers
+
+
 RIOT-2020.07 - Release Notes
 ============================
 RIOT is a multi-threading operating system which enables soft real-time
