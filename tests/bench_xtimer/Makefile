@@ -62,6 +62,7 @@ LOW_MEMORY_BOARDS += \
   telosb \
   waspmote-pro \
   wemos-zero \
+  yarm \
   yunjia-nrf51822 \
   z1 \
   #
