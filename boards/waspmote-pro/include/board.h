@@ -166,7 +166,8 @@ extern "C" {
  */
 #define XTIMER_WIDTH                (16)
 #define XTIMER_HZ                   (230400LU)
-#define XTIMER_BACKOFF              (40)
+#define XTIMER_BACKOFF              (80)
+#define XTIMER_ISR_BACKOFF          (120)
 /** @} */
 
 /**
