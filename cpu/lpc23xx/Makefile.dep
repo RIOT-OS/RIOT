@@ -1,6 +1,5 @@
 USEMODULE += arm7_common
 USEMODULE += bitfield
-USEMODULE += newlib
 USEMODULE += periph
 USEMODULE += pm_layered
 
