@@ -22,6 +22,7 @@
 #include "board.h"
 #include "hdc2010.h"
 #include "saul_reg.h"
+#include "periph/gpio.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,23 +41,23 @@ extern "C" {
 #ifndef HDC2010_PARAM_RES
 #define HDC2010_PARAM_RES            HDC2010_14BIT
 #endif
-#ifndef HDC2010_PARAM_RENEW_INTERVAL
-#define HDC2010_PARAM_RENEW_INTERVAL (1000000ul)
-#endif
 #ifndef HDC2010_PARAM_MODE
 #define HDC2010_PARAM_MODE           HDC2010_MEAS_HUM_AND_TEMP
 #endif
 #ifndef HDC2010_PARAM_AMM
 #define HDC2010_PARAM_AMM            HDC2010_TRIGGER
 #endif
+#ifndef HDC2010_PARAM_IRQ_PIN
+#define HDC2010_PARAM_IRQ_PIN        GPIO_UNDEF
+#endif
 
 #ifndef HDC2010_PARAMS
-#define HDC2010_PARAMS               { .i2c  = HDC2010_PARAM_I2C,  \
-                                       .addr = HDC2010_PARAM_ADDR, \
-                                       .res  = HDC2010_PARAM_RES, \
-                                       .mode = HDC2010_PARAM_MODE, \
-                                       .amm  = HDC2010_PARAM_AMM, \
-                                       .renew_interval = HDC2010_PARAM_RENEW_INTERVAL }
+#define HDC2010_PARAMS               { .i2c     = HDC2010_PARAM_I2C,     \
+                                       .addr    = HDC2010_PARAM_ADDR,    \
+                                       .irq_pin = HDC2010_PARAM_IRQ_PIN, \
+                                       .res     = HDC2010_PARAM_RES,     \
+                                       .mode    = HDC2010_PARAM_MODE,    \
+                                       .amm     = HDC2010_PARAM_AMM }
 #endif
 #ifndef HDC2010_SAUL_INFO
 #define HDC2010_SAUL_INFO            { .name = "hdc2010" }

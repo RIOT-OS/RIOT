@@ -48,6 +48,10 @@ ifneq (,$(filter hmc5883l_%,$(USEMODULE)))
   USEMODULE += hmc5883l
 endif
 
+ifneq (,$(filter hdc2010_%,$(USEMODULE)))
+  USEMODULE += hdc2010
+endif
+
 ifneq (,$(filter ina2%,$(USEMODULE)))
   USEMODULE += ina2xx
 endif

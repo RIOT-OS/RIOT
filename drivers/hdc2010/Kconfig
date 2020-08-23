@@ -23,7 +23,7 @@ config HDC2010_I2C_ADDRESS
 
 config HDC2010_CONVERSION_TIME
     int "Conversion time in microseconds [us]"
-    default 26000
+    default 2540
     help
         This time value is chosen twice as large as needed for two 14-bit
         conversions (worst case) to allow for timer imprecision:

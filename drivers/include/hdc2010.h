@@ -41,6 +41,8 @@
 #include <stdint.h>
 
 #include "periph/i2c.h"
+#include "periph/gpio.h"
+#include "mutex.h"
 #include "hdc2010_regs.h"
 
 #ifdef __cplusplus
@@ -116,16 +118,25 @@ typedef enum {
     HDC2010_MEAS_TEMP = HDC2010_TEMP_MODE,  /**< Only measure temperature */
 } hdc2010_meas_mode_t;
 
+
+/**
+ * @brief   Callback function when interrupt happens
+ *
+ * This allows the user to define custom interrupt logic.
+ */
+ typedef void (*hdc2010_int_cb_t)(void *arg);
+
 /**
  * @brief   Parameters needed for device initialization
  */
 typedef struct {
     i2c_t i2c;                  /**< bus the device is connected to */
     uint8_t addr;               /**< address on that bus */
+    gpio_t irq_pin;             /**< IRQ pin to check data ready */
     hdc2010_res_t res;          /**< resolution used for sampling temp and hum */
     hdc2010_meas_mode_t mode;   /**< sensors to be used */
     hdc2010_amm_t amm;          /**< Auto Measurement Mode */
-    uint32_t renew_interval;    /**< interval for cache renewal */
+    hdc2010_int_cb_t user_cb;   /**< User defined interrupt callback */
 } hdc2010_params_t;
 
 /**
@@ -133,6 +144,7 @@ typedef struct {
  */
 typedef struct {
     hdc2010_params_t p;     /**< Configuration parameters */
+    mutex_t mutex;          /**< Mutex for this hdc2010 dev */
 } hdc2010_t;
 
 /**
@@ -186,24 +198,7 @@ int hdc2010_get_results(const hdc2010_t *dev, int16_t *temp, int16_t *hum);
  * @return                  HDC2010_OK on success
  * @return                  HDC2010_BUSERR on I2C communication failures
  */
-int hdc2010_read(const hdc2010_t *dev, int16_t *temp, int16_t *hum);
-
-/**
- * @brief   Extended read function including caching capability
- *
- * This function will return cached values if they are within the sampling
- * period (HDC2010_PARAM_RENEW_INTERVAL), or will trigger a new conversion,
- * wait for the conversion to be finished and the get the results from the
- * device.
- *
- * @param[in]  dev          device descriptor of sensor
- * @param[out] temp         temperature [in 100 * degree centigrade]
- * @param[out] hum          humidity [in 100 * percent relative]
- *
- * @return                  HDC2010_OK on success
- * @return                  HDC2010_BUSERR on I2C communication failures
- */
-int hdc2010_read_cached(const hdc2010_t *dev, int16_t *temp, int16_t *hum);
+int hdc2010_read(hdc2010_t *dev, int16_t *temp, int16_t *hum);
 
 #ifdef __cplusplus
 }

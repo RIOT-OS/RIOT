@@ -174,6 +174,9 @@ PSEUDOMODULES += cc1101
 # interrupt variant of the HMC5883L driver
 PSEUDOMODULES += hmc5883l_int
 
+# include variants of hdc2010 drivers as pseudo modules
+PSEUDOMODULES += hdc2010_irq
+
 # interrupt variant of the ITG320X driver as pseudo module
 PSEUDOMODULES += itg320x_int
 

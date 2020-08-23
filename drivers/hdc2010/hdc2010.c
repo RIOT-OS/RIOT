@@ -22,6 +22,7 @@
 #include <string.h>
 
 #include "assert.h"
+#include "byteorder.h"
 #include "xtimer.h"
 #include "periph/i2c.h"
 #include "hdc2010.h"
@@ -29,12 +30,12 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-static int16_t temp_cached, hum_cached;
-static uint32_t last_read_time;
+#ifdef MODULE_HDC2010_IRQ
+static void _hdc2010_irq_callback(void *arg);
+#endif
 
 int hdc2010_init(hdc2010_t *dev, const hdc2010_params_t *params)
 {
-    uint8_t reg[2];
     uint16_t tmp;
 
     /* write device descriptor */
@@ -44,38 +45,57 @@ int hdc2010_init(hdc2010_t *dev, const hdc2010_params_t *params)
     i2c_acquire(dev->p.i2c);
     if (i2c_read_regs(dev->p.i2c, dev->p.addr,
                       HDC2010_MANUFACTURER_ID, &tmp, sizeof(tmp), 0) < 0) {
+        DEBUG("[HDC2010] Could not read manufacture id.\n");
         i2c_release(dev->p.i2c);
         return HDC2010_NOBUS;
     }
 
     tmp = ntohs(tmp);
     if (tmp != HDC2010_MID_VALUE) {
+        DEBUG("[HDC2010] Wrong manufacture id: %x\n", tmp);
         i2c_release(dev->p.i2c);
         return HDC2010_NODEV;
     }
 
+    /* operation mode */
+    uint8_t mode = dev->p.amm;
+
+    /* check if current device has irq pin connected */
+    if (IS_USED(MODULE_HDC2010_IRQ) && (dev->p.irq_pin != GPIO_UNDEF)) {
+        /* enable DRDY/INT pin */
+        mode |= HDC2010_IRQ_ENABLE;
+
+        /* configure interrupt register */
+        if (i2c_write_reg(dev->p.i2c, dev->p.addr, HDC2010_INTERRUPT_CONFIG,
+                        HDC2010_DRDY_ENABLE, 0) < 0) {
+            DEBUG("[HDC2010] Error while setting IRQ register!\n");
+            i2c_release(dev->p.i2c);
+            return HDC2010_NOBUS;
+        }
+
+        mutex_init(&dev->mutex);
+        /* lock mutex initially to be unlocked when interrupt is raised */
+        mutex_lock(&dev->mutex);
+        /* Interrupt set to trigger on falling edge of interrupt pin */
+        gpio_init_int(params->irq_pin, GPIO_IN, GPIO_FALLING,
+                      _hdc2010_irq_callback, dev);
+    }
+
     /* set operation mode */
-    reg[0] = (HDC2010_RST | dev->p.amm);
-    if (i2c_write_reg(dev->p.i2c, dev->p.addr,
-                      HDC2010_CONFIG, HDC2010_RST | dev->p.amm, 0) < 0) {
+    if (i2c_write_reg(dev->p.i2c, dev->p.addr, HDC2010_CONFIG, mode, 0) < 0) {
+        DEBUG("[HDC2010] Error while setting operation mode!\n");
         i2c_release(dev->p.i2c);
         return HDC2010_NOBUS;
     }
 
-    /* set resolution for both sensors */
-    reg[0] = (dev->p.res | dev->p.mode);
-    if (i2c_write_reg(dev->p.i2c, dev->p.addr,
-                      HDC2010_MEASUREMENT_CONFIG, dev->p.res | dev->p.mode, 0) < 0) {
+    /* set resolution and mode */
+    if (i2c_write_reg(dev->p.i2c, dev->p.addr, HDC2010_MEASUREMENT_CONFIG,
+                      dev->p.res | dev->p.mode, 0) < 0) {
+        DEBUG("[HDC2010] Error while setting resolution!\n");
         i2c_release(dev->p.i2c);
         return HDC2010_NOBUS;
     }
     i2c_release(dev->p.i2c);
-
-    /* initial read for caching operation */
-    if (hdc2010_read(dev, &temp_cached, &hum_cached) != HDC2010_OK) {
-        return HDC2010_BUSERR;
-    }
-    last_read_time = xtimer_now_usec();
 
     /* all set */
     return HDC2010_OK;
@@ -85,15 +105,11 @@ int hdc2010_trigger_conversion(const hdc2010_t *dev)
 {
     int status = HDC2010_OK;
     assert(dev);
-    uint8_t reg = (dev->p.res | dev->p.mode | 0x1);
 
     i2c_acquire(dev->p.i2c);
-    /* Trigger the measurements by executing a write access
-     * to the address 0x00 (HDC2010_TEMPERATURE).
-     * Conversion Time is 6.50ms for each value for 14 bit resolution.
-     */
-    if (i2c_write_reg(dev->p.i2c, dev->p.addr,
-                      HDC2010_MEASUREMENT_CONFIG, reg, 0) < 0) {
+    /* Trigger the measurements */
+    if (i2c_write_reg(dev->p.i2c, dev->p.addr, HDC2010_MEASUREMENT_CONFIG,
+                      (dev->p.res | dev->p.mode | 0x1), 0) < 0) {
         status = HDC2010_NOBUS;
     }
     i2c_release(dev->p.i2c);
@@ -105,69 +121,57 @@ int hdc2010_get_results(const hdc2010_t *dev, int16_t *temp, int16_t *hum)
     int status = HDC2010_OK;
     assert(dev);
 
-    uint8_t buf[4];
+    uint16_t buf[2];
     i2c_acquire(dev->p.i2c);
 
     /* first read the temperature register */
     if (i2c_read_regs(dev->p.i2c, dev->p.addr,
-                      HDC2010_TEMPERATURE, buf, 2, 0) < 0) {
+                      HDC2010_TEMPERATURE, buf, 4, 0) < 0) {
         status = HDC2010_BUSERR;
-    }
-
-    if (dev->p.mode != HDC2010_MEAS_TEMP) {
-        /* read the humidity register */
-        if (i2c_read_regs(dev->p.i2c, dev->p.addr,
-                          HDC2010_HUMIDITY, buf+2, 2, 0) < 0) {
-            status = HDC2010_BUSERR;
-        }
     }
     i2c_release(dev->p.i2c);
 
     if (status == HDC2010_OK) {
         /* if all ok, we convert the values to their physical representation */
         if (temp) {
-            uint16_t traw = ((uint16_t)buf[1] << 8) | buf[0];
-            *temp = (int16_t)((((int32_t)traw * 16500) >> 16) - 4000);
+            *temp = (int16_t)((((int32_t)buf[0] * 16500) >> 16) - 4000);
         }
-        if (hum && (dev->p.mode != HDC2010_MEAS_TEMP)) {
-            uint16_t hraw = ((uint16_t)buf[3] << 8) | buf[2];
-            *hum  = (int16_t)(((int32_t)hraw * 10000) >> 16);
+        if (hum) {
+            *hum  = (int16_t)(((int32_t)buf[1] * 10000) >> 16);
         }
     }
     return status;
 }
 
-int hdc2010_read(const hdc2010_t *dev, int16_t *temp, int16_t *hum)
+int hdc2010_read(hdc2010_t *dev, int16_t *temp, int16_t *hum)
 {
     if (dev->p.amm == HDC2010_TRIGGER) {
         if (hdc2010_trigger_conversion(dev) != HDC2010_OK) {
+            DEBUG("[HDC2010] Error while triggering new measurement!\n");
             return HDC2010_BUSERR;
         }
+    }
+
+    if (!IS_USED(MODULE_HDC2010_IRQ) || dev->p.irq_pin == GPIO_UNDEF) {
+        /* Wait for measurement to be ready if irq pin not used */
         xtimer_usleep(CONFIG_HDC2010_CONVERSION_TIME);
+    } else {
+        /* Try to lock mutex till the interrupt is raised or till timeut happens */
+        xtimer_mutex_lock_timeout(&dev->mutex, CONFIG_HDC2010_CONVERSION_TIME);
     }
 
     return hdc2010_get_results(dev, temp, hum);
 }
 
-
-int hdc2010_read_cached(const hdc2010_t *dev, int16_t *temp, int16_t *hum)
+#ifdef MODULE_HDC2010_IRQ
+static void _hdc2010_irq_callback(void *arg)
 {
-    uint32_t now = xtimer_now_usec();
+    hdc2010_t *dev = (hdc2010_t *)arg;
+    mutex_unlock(&(dev->mutex));
 
-    /* check if readings are outdated */
-    if (now - last_read_time > dev->p.renew_interval) {
-        /* update last_read_time */
-        if (hdc2010_read(dev, &temp_cached, &hum_cached) != HDC2010_OK) {
-            return HDC2010_BUSERR;
-        }
-        last_read_time = now;
+    /* call user defined cb */
+    if (dev->p.user_cb) {
+        (dev->p.user_cb)(arg);
     }
-
-    if (temp) {
-        *temp = temp_cached;
-    }
-    if (hum) {
-        *hum = hum_cached;
-    }
-    return HDC2010_OK;
 }
+#endif
