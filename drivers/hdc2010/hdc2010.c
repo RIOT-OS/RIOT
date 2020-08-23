@@ -43,12 +43,12 @@ int hdc2010_init(hdc2010_t *dev, const hdc2010_params_t *params)
     /* try if we can interact with the device by reading its manufacturer ID */
     i2c_acquire(dev->p.i2c);
     if (i2c_read_regs(dev->p.i2c, dev->p.addr,
-                      HDC2010_MANUFACTURER_ID, reg, 2, 0) < 0) {
+                      HDC2010_MANUFACTURER_ID, &tmp, sizeof(tmp), 0) < 0) {
         i2c_release(dev->p.i2c);
         return HDC2010_NOBUS;
     }
 
-    tmp = ((uint16_t)reg[0] << 8) | reg[1];
+    tmp = ntohs(tmp);
     if (tmp != HDC2010_MID_VALUE) {
         i2c_release(dev->p.i2c);
         return HDC2010_NODEV;
@@ -57,7 +57,7 @@ int hdc2010_init(hdc2010_t *dev, const hdc2010_params_t *params)
     /* set operation mode */
     reg[0] = (HDC2010_RST | dev->p.amm);
     if (i2c_write_reg(dev->p.i2c, dev->p.addr,
-                      HDC2010_CONFIG, reg[0], 0) < 0) {
+                      HDC2010_CONFIG, HDC2010_RST | dev->p.amm, 0) < 0) {
         i2c_release(dev->p.i2c);
         return HDC2010_NOBUS;
     }
@@ -65,7 +65,7 @@ int hdc2010_init(hdc2010_t *dev, const hdc2010_params_t *params)
     /* set resolution for both sensors */
     reg[0] = (dev->p.res | dev->p.mode);
     if (i2c_write_reg(dev->p.i2c, dev->p.addr,
-                      HDC2010_MEASUREMENT_CONFIG, reg[0], 0) < 0) {
+                      HDC2010_MEASUREMENT_CONFIG, dev->p.res | dev->p.mode, 0) < 0) {
         i2c_release(dev->p.i2c);
         return HDC2010_NOBUS;
     }
