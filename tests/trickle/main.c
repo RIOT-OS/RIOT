@@ -68,7 +68,7 @@ int main(void)
 
     msg_init_queue(_main_msg_queue, MAIN_QUEUE_SIZE);
 
-    trickle_start(sched_active_pid, &trickle, TRICKLE_MSG, TR_IMIN,
+    trickle_start(thread_getpid(), &trickle, TRICKLE_MSG, TR_IMIN,
                   TR_IDOUBLINGS, TR_REDCONST);
 
     puts("[START]");

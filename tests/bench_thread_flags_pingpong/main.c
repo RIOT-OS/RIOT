@@ -62,7 +62,7 @@ int main(void)
                                        NULL,
                                        "second_thread");
 
-    thread_t *tcb = (thread_t *)sched_threads[other];
+    thread_t *tcb = thread_get(other);
 
     xtimer_t timer;
     timer.callback = _timer_callback;

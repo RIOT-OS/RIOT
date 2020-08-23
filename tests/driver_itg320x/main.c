@@ -66,7 +66,7 @@ int main(void)
 {
     itg320x_t dev;
 
-    p_main = sched_active_pid;
+    p_main = thread_getpid();
 
     puts("ITG320X gyroscope driver test application\n");
     puts("Initializing ITG320X sensor");

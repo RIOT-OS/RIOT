@@ -142,7 +142,7 @@ static int _netdev_send(netdev_t *dev, const iolist_t *iolist)
 void _net_init(void)
 {
     msg_init_queue(_msg_queue, _MSG_QUEUE_SIZE);
-    _check_pid = sched_active_pid;
+    _check_pid = thread_getpid();
 
     netdev_test_setup(&netdev, NULL);
     netdev_test_set_get_cb(&netdev, NETOPT_SRC_LEN, _get_src_len);

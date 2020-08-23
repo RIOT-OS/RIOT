@@ -63,8 +63,8 @@ static mutex_t stdout_mutex = MUTEX_INIT;
     do {                                                    \
         mutex_lock(&stdout_mutex);                          \
         printf("%c%" PRIkernel_pid " (prio=%u): " FMT "\n", \
-               __func__[0], sched_active_pid,               \
-               sched_active_thread->priority,               \
+               __func__[0], thread_getpid(),                \
+               thread_get_active()->priority,                \
                (int)__VA_ARGS__);                           \
         mutex_unlock(&stdout_mutex);                        \
     } while (0)

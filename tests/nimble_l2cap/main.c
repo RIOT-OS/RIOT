@@ -312,7 +312,7 @@ int main(void)
     puts("NimBLE L2CAP test application");
 
     /* save context of the main thread */
-    _main = (thread_t *)thread_get(thread_getpid());
+    _main = thread_get_active();
 
     /* initialize buffers and setup the test environment */
     res = os_mempool_init(&_coc_mempool, MBUFCNT, MBUFSIZE, _coc_mem, "appbuf");

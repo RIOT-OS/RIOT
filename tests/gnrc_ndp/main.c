@@ -1275,7 +1275,7 @@ static void init_pkt_handler(void)
 {
     msg_init_queue(msg_queue_main, MSG_QUEUE_SIZE);
     gnrc_netreg_entry_init_pid(&netreg_entry, GNRC_NETREG_DEMUX_CTX_ALL,
-                               sched_active_pid);
+                               thread_getpid());
     gnrc_netreg_register(GNRC_NETTYPE_NDP, &netreg_entry);
     netdev_test_setup(&dev, NULL);
     netdev_test_set_get_cb(&dev, NETOPT_ADDRESS_LONG,

@@ -92,7 +92,7 @@ void _tests_init(void)
     _mock_netif->ipv6.addrs_flags[0] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
     _mock_netif->ipv6.addrs_flags[0] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
     gnrc_netreg_entry_init_pid(&dumper, GNRC_NETREG_DEMUX_CTX_ALL,
-                               sched_active_pid);
+                               thread_getpid());
     gnrc_netreg_register(GNRC_NETTYPE_NDP, &dumper);
 }
 

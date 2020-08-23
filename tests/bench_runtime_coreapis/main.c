@@ -62,7 +62,7 @@ int main(void)
 {
     puts("Runtime of Selected Core API functions\n");
 
-    t = (thread_t *)sched_active_thread;
+    t = thread_get_active();
 
     BENCHMARK_FUNC("nop loop", BENCH_RUNS, __asm__ volatile ("nop"));
     puts("");
