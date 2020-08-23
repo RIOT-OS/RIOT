@@ -408,7 +408,7 @@ void gnrc_sixlowpan_frag_rb_gc(void)
 static inline void _set_rbuf_timeout(void)
 {
     xtimer_set_msg(&_gc_timer, CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US,
-                   &_gc_timer_msg, sched_active_pid);
+                   &_gc_timer_msg, thread_getpid());
 }
 
 static int _rbuf_get(const void *src, size_t src_len,

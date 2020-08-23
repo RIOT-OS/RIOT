@@ -425,7 +425,7 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_frag_reass(gnrc_pktsnip_t *pkt)
     }
     rbuf->arrival = xtimer_now_usec();
     xtimer_set_msg(&_gc_xtimer, CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US, &_gc_msg,
-                   sched_active_pid);
+                   thread_getpid());
     nh = fh->nh;
     offset = ipv6_ext_frag_get_offset(fh);
     switch (_overlaps(rbuf, offset, pkt->size)) {

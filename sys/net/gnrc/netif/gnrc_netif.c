@@ -1468,11 +1468,11 @@ static void *_gnrc_netif_thread(void *args)
     msg_t reply = { .type = GNRC_NETAPI_MSG_TYPE_ACK };
     msg_t msg_queue[GNRC_NETIF_MSG_QUEUE_SIZE];
 
-    DEBUG("gnrc_netif: starting thread %i\n", sched_active_pid);
+    DEBUG("gnrc_netif: starting thread %i\n", thread_getpid());
     netif = args;
     gnrc_netif_acquire(netif);
     dev = netif->dev;
-    netif->pid = sched_active_pid;
+    netif->pid = thread_getpid();
 
 #if IS_USED(MODULE_GNRC_NETIF_EVENTS)
     netif->event_isr.handler = _event_handler_isr,

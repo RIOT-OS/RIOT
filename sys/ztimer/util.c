@@ -109,7 +109,7 @@ int ztimer_msg_receive_timeout(ztimer_clock_t *clock, msg_t *msg,
     ztimer_t t;
     msg_t m = { .type = MSG_ZTIMER, .content.ptr = &m };
 
-    ztimer_set_msg(clock, &t, timeout, &m, sched_active_pid);
+    ztimer_set_msg(clock, &t, timeout, &m, thread_getpid());
 
     msg_receive(msg);
     ztimer_remove(clock, &t);
@@ -134,7 +134,7 @@ void ztimer_set_timeout_flag(ztimer_clock_t *clock, ztimer_t *t,
                              uint32_t timeout)
 {
     t->callback = _set_timeout_flag_callback;
-    t->arg = (thread_t *)sched_active_thread;
+    t->arg = thread_get_active();
     thread_flags_clear(THREAD_FLAG_TIMEOUT);
     ztimer_set(clock, t, timeout);
 }

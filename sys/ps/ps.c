@@ -115,7 +115,7 @@ void ps(void)
 #ifdef MODULE_SCHEDSTATISTICS
     uint64_t rt_sum = 0;
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
-        thread_t *p = (thread_t *)sched_threads[i];
+        thread_t *p = thread_get(i);
         if (p != NULL) {
             rt_sum += sched_pidlist[i].runtime_ticks;
         }
@@ -123,7 +123,7 @@ void ps(void)
 #endif /* MODULE_SCHEDSTATISTICS */
 
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
-        thread_t *p = (thread_t *)sched_threads[i];
+        thread_t *p = thread_get(i);
 
         if (p != NULL) {
             thread_status_t state = p->status;                                     /* copy state */
