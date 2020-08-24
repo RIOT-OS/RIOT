@@ -479,6 +479,14 @@ ifneq (,$(filter posix_select,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter picolibc,$(USEMODULE)))
+  # allow custom picolibc syscalls implementations by adding
+  # picolibc_syscalls_XXX to USEMODULE
+  ifeq (,$(filter picolibc_syscalls_%,$(USEMODULE)))
+    USEMODULE += picolibc_syscalls_default
+  endif
+endif
+
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
   USEMODULE += bitfield
   USEMODULE += random

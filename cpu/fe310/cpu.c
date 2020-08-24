@@ -24,6 +24,8 @@
 #include "vendor/encoding.h"
 #include "vendor/plic_driver.h"
 
+#include "stdio_uart.h"
+
 /*
  * Configure the memory mapped flash for faster throughput
  * to minimize interrupt latency on an I-Cache miss and refill
@@ -110,8 +112,12 @@ void cpu_init(void)
     /* Initialize IRQs */
     irq_init();
 
+    /* Initialize stdio */
+    stdio_init();
+#ifndef _PICOLIBC__
     /* Initialize newlib-nano library stubs */
     nanostubs_init();
+#endif /* PICOLIBC */
 
     /* Initialize static peripheral */
     periph_init();

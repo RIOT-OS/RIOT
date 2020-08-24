@@ -27,6 +27,7 @@ PHDRS
   flash PT_LOAD;
   ram_init PT_LOAD;
   ram PT_NULL;
+  tls PT_TLS;
 }
 
 SECTIONS
@@ -117,6 +118,42 @@ SECTIONS
     KEEP (*(SORT(.dtors.*)))
     KEEP (*(.dtors))
   } >flash AT>flash :flash
+
+  /*
+   * TLS relocations are offsets relative to the address
+   * of the first TLS symbol. That means we just need to
+   * allocate them all together so that the TLS region
+   * is compact when allocated for each thread.
+   */
+
+  /*
+   * TLS initialization data is loaded into ROM so that
+   * each thread can get its values initialized from there
+   * at startup
+   */
+  .tdata :
+  {
+       __tdata_start = .;
+      *(.tdata .tdata.* .gnu.linkonce.td.*)
+      __tdata_end = .;
+  } >flash AT>flash :tls
+  __tdata_source = LOADADDR(.tdata);
+  __tdata_size = SIZEOF(.tdata);
+
+  /*
+   * TLS zeroed data is relocated as if it immediately followed
+   * the tdata values. However, the linker 'magically' erases the
+   * memory allocation so that no ROM is consumed by this
+   * section
+   */
+  .tbss :
+  {
+      *(.tbss .tbss.* .gnu.linkonce.tb.*)
+      *(.tcommon)
+      __tbss_end = .;
+  } >flash : tls
+  __tls_size = __tbss_end - __tdata_start;
+  __tbss_size = __tls_size - __tdata_size;
 
   .lalign         :
   {

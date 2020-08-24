@@ -2,6 +2,10 @@
 MODULE = cpu
 
 # add a list of subdirectories, that should also be built
-DIRS = periph nano vendor
+DIRS = periph vendor
+
+ifneq (1,$(PICOLIBC))
+  DIRS += nano
+endif
 
 include $(RIOTBASE)/Makefile.base

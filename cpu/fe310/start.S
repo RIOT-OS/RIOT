@@ -43,8 +43,6 @@ _start:
 2:
 
     /* Call global constructors */
-    la a0, __libc_fini_array
-    call atexit
     call __libc_init_array
 
 

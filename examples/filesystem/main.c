@@ -240,9 +240,9 @@ static int _cat(int argc, char **argv)
         printf("Usage: %s <file>\n", argv[0]);
         return 1;
     }
-    /* With newlib, low-level syscalls are plugged to RIOT vfs
+    /* With newlib or picolibc, low-level syscalls are plugged to RIOT vfs
      * on native, open/read/write/close/... are plugged to RIOT vfs */
-#ifdef MODULE_NEWLIB
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     FILE *f = fopen(argv[1], "r");
     if (f == NULL) {
         printf("file %s does not exist\n", argv[1]);
@@ -276,7 +276,7 @@ static int _tee(int argc, char **argv)
         return 1;
     }
 
-#ifdef MODULE_NEWLIB
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     FILE *f = fopen(argv[1], "w+");
     if (f == NULL) {
         printf("error while trying to create %s\n", argv[1]);
