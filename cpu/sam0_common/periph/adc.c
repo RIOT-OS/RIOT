@@ -76,11 +76,13 @@ static inline void _wait_syncbusy(void)
 static void _adc_poweroff(void)
 {
     _wait_syncbusy();
+
     /* Disable */
     ADC_DEV->CTRLA.reg &= ~ADC_CTRLA_ENABLE;
     _wait_syncbusy();
+
     /* Disable bandgap */
-#ifdef CPU_SAMD21
+#ifdef SYSCTRL_VREF_BGOUTEN
     if (ADC_REF_DEFAULT == ADC_REFCTRL_REFSEL_INT1V) {
         SYSCTRL->VREF.reg &= ~SYSCTRL_VREF_BGOUTEN;
     }
@@ -95,12 +97,14 @@ static void _setup_clock(void)
 {
     /* Enable gclk in case we are the only user */
     sam0_gclk_enable(ADC_GCLK_SRC);
-#ifdef CPU_SAMD21
+
+#ifdef PM_APBCMASK_ADC
     /* Power On */
     PM->APBCMASK.reg |= PM_APBCMASK_ADC;
     /* GCLK Setup */
-    GCLK->CLKCTRL.reg = (uint32_t)(GCLK_CLKCTRL_CLKEN
-            | GCLK_CLKCTRL_GEN(ADC_GCLK_SRC) | (GCLK_CLKCTRL_ID(ADC_GCLK_ID)));
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN
+                      | GCLK_CLKCTRL_GEN(ADC_GCLK_SRC)
+                      | GCLK_CLKCTRL_ID(ADC_GCLK_ID);
     /* Configure prescaler */
     ADC_DEV->CTRLB.reg = ADC_PRESCALER;
 #else
@@ -143,7 +147,7 @@ static void _setup_clock(void)
 
 static void _setup_calibration(void)
 {
-#ifdef CPU_SAMD21
+#ifdef ADC_CALIB_BIAS_CAL
     /* Load the fixed device calibration constants */
     ADC_DEV->CALIB.reg =
         ADC_CALIB_BIAS_CAL((*(uint32_t*)ADC_FUSES_BIASCAL_ADDR >>
@@ -186,12 +190,15 @@ static int _adc_configure(adc_res_t res)
           (res == ADC_RES_12BIT))){
         return -1;
     }
+
     _adc_poweroff();
+
     if (ADC_DEV->CTRLA.reg & ADC_CTRLA_SWRST ||
         ADC_DEV->CTRLA.reg & ADC_CTRLA_ENABLE ) {
         DEBUG("adc: not ready\n");
         return -1;
     }
+
     _setup_clock();
     _setup_calibration();
 
@@ -211,7 +218,7 @@ static int _adc_configure(adc_res_t res)
     /* Disable all interrupts */
     ADC_DEV->INTENCLR.reg = 0xFF;
 
-#ifdef CPU_SAMD21
+#ifdef SYSCTRL_VREF_BGOUTEN
     /* Enable bandgap if VREF is internal 1V */
     if (ADC_REF_DEFAULT == ADC_REFCTRL_REFSEL_INT1V) {
         SYSCTRL->VREF.reg |= SYSCTRL_VREF_BGOUTEN;
@@ -235,10 +242,12 @@ int adc_init(adc_t line)
         DEBUG("adc: line arg not applicable\n");
         return -1;
     }
+
     _prep();
     gpio_init(adc_channels[line].pin, GPIO_IN);
     gpio_init_mux(adc_channels[line].pin, GPIO_MUX_B);
     _done();
+
     return 0;
 }
 
@@ -248,22 +257,30 @@ int32_t adc_sample(adc_t line, adc_res_t res)
         DEBUG("adc: line arg not applicable\n");
         return -1;
     }
+
     _prep();
+
     if (_adc_configure(res) != 0) {
         _done();
         DEBUG("adc: configuration failed\n");
         return -1;
     }
-    ADC_DEV->INPUTCTRL.reg = ADC_GAIN_FACTOR_DEFAULT |
-                         adc_channels[line].muxpos | ADC_NEG_INPUT;
+
+    ADC_DEV->INPUTCTRL.reg = ADC_GAIN_FACTOR_DEFAULT
+                           | adc_channels[line].muxpos
+                           | ADC_NEG_INPUT;
     _wait_syncbusy();
 
     /* Start the conversion */
     ADC_DEV->SWTRIG.reg = ADC_SWTRIG_START;
+
     /* Wait for the result */
     while (!(ADC_DEV->INTFLAG.reg & ADC_INTFLAG_RESRDY)) {}
+
     int result = ADC_DEV->RESULT.reg;
+
     _adc_poweroff();
     _done();
+
     return result;
 }

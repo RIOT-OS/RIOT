@@ -1,0 +1,32 @@
+## CPU Models
+config CPU_MODEL_SAML11D14A
+    bool
+    select CPU_FAM_SAML11
+
+config CPU_MODEL_SAML11D15A
+    bool
+    select CPU_FAM_SAML11
+
+config CPU_MODEL_SAML11D16A
+    bool
+    select CPU_FAM_SAML11
+
+config CPU_MODEL_SAML11E14A
+    bool
+    select CPU_FAM_SAML11
+
+config CPU_MODEL_SAML11E15A
+    bool
+    select CPU_FAM_SAML11
+
+config CPU_MODEL_SAML11E16A
+    bool
+    select CPU_FAM_SAML11
+
+config CPU_MODEL
+    default "saml11d14a" if CPU_MODEL_SAML11D14A
+    default "saml11d15a" if CPU_MODEL_SAML11D15A
+    default "saml11d16a" if CPU_MODEL_SAML11D16A
+    default "saml11e14a" if CPU_MODEL_SAML11E14A
+    default "saml11e15a" if CPU_MODEL_SAML11E15A
+    default "saml11e16a" if CPU_MODEL_SAML11E16A

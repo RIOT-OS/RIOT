@@ -81,7 +81,7 @@ void dma_init(void)
     NVIC_EnableIRQ(DMAC_1_IRQn);
     NVIC_EnableIRQ(DMAC_2_IRQn);
     NVIC_EnableIRQ(DMAC_3_IRQn);
-#elif defined(CPU_FAM_SAMD5X)
+#elif defined(CPU_COMMON_SAMD5X)
     NVIC_EnableIRQ(DMAC_0_IRQn);
     NVIC_EnableIRQ(DMAC_1_IRQn);
     NVIC_EnableIRQ(DMAC_2_IRQn);

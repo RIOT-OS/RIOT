@@ -233,14 +233,14 @@ static void _blocking_transfer(spi_t bus, const void *out, void *in, size_t len)
 
 static void _dma_execute(spi_t bus)
 {
-#if defined(CPU_FAM_SAMD21)
+#if defined(CPU_COMMON_SAMD21)
     pm_block(SAMD21_PM_IDLE_1);
 #endif
     dma_start(_dma_state[bus].rx_dma);
     dma_start(_dma_state[bus].tx_dma);
 
     dma_wait(_dma_state[bus].rx_dma);
-#if defined(CPU_FAM_SAMD21)
+#if defined(CPU_COMMON_SAMD21)
     pm_unblock(SAMD21_PM_IDLE_1);
 #endif
 }

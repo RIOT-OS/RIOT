@@ -131,7 +131,7 @@ static inline void _rtt_reset(void)
 #endif
 }
 
-#ifdef CPU_SAMD21
+#ifdef CPU_COMMON_SAMD21
 static void _rtc_clock_setup(void)
 {
     /* Use 1024 Hz GCLK */
@@ -150,7 +150,7 @@ static void _rtt_clock_setup(void)
     while (GCLK->STATUS.bit.SYNCBUSY) {}
 }
 
-#else /* CPU_SAMD21 - Clock Setup */
+#else /* CPU_COMMON_SAMD21 - Clock Setup */
 
 static void _rtc_clock_setup(void)
 {
@@ -192,7 +192,7 @@ static void _rtt_clock_setup(void)
 #error "No clock source for RTT selected. "
 #endif
 }
-#endif /* !CPU_SAMD21 - Clock Setup */
+#endif /* !CPU_COMMON_SAMD21 - Clock Setup */
 
 static void _rtc_init(void)
 {

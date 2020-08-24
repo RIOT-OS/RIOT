@@ -49,7 +49,7 @@
 /**
  * @brief   Number of external interrupt lines
  */
-#ifdef CPU_SAML1X
+#ifdef CPU_COMMON_SAML1X
 #define NUMOF_IRQS                  (8U)
 #else
 #define NUMOF_IRQS                  (16U)
@@ -180,7 +180,7 @@ void gpio_write(gpio_t pin, int value)
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 
-#ifdef CPU_FAM_SAMD21
+#ifdef CPU_COMMON_SAMD21
 #define EIC_SYNC() while (_EIC->STATUS.bit.SYNCBUSY)
 #else
 #define EIC_SYNC() while (_EIC->SYNCBUSY.bit.ENABLE)
@@ -212,14 +212,14 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* configure pin as input and set MUX to peripheral function A */
     gpio_init(pin, mode);
     gpio_init_mux(pin, GPIO_MUX_A);
-#ifdef CPU_FAM_SAMD21
+#ifdef CPU_COMMON_SAMD21
     /* enable clocks for the EIC module */
     PM->APBAMASK.reg |= PM_APBAMASK_EIC;
     GCLK->CLKCTRL.reg = EIC_GCLK_ID
                       | GCLK_CLKCTRL_CLKEN
                       | GCLK_CLKCTRL_GEN(CONFIG_SAM0_GCLK_GPIO);
     while (GCLK->STATUS.bit.SYNCBUSY) {}
-#else /* CPU_FAM_SAML21 */
+#else /* CPU_COMMON_SAML21 */
     /* enable clocks for the EIC module */
     MCLK->APBAMASK.reg |= MCLK_APBAMASK_EIC;
     GCLK->PCHCTRL[EIC_GCLK_ID].reg = GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(CONFIG_SAM0_GCLK_GPIO);
@@ -231,10 +231,10 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     _EIC->CONFIG[exti >> 3].reg &= ~(0xf << ((exti & 0x7) * 4));
     _EIC->CONFIG[exti >> 3].reg |=  (flank << ((exti & 0x7) * 4));
     /* enable the global EIC interrupt */
-#ifdef CPU_SAML1X
+#ifdef CPU_COMMON_SAML1X
     /* EXTI[4..7] are binded to EIC_OTHER_IRQn */
     NVIC_EnableIRQ((exti > 3 )? EIC_OTHER_IRQn : (EIC_0_IRQn + exti));
-#elif defined(CPU_SAMD5X)
+#elif defined(CPU_COMMON_SAMD5X)
     NVIC_EnableIRQ(EIC_0_IRQn + exti);
 #else
     NVIC_EnableIRQ(EIC_IRQn);
@@ -242,12 +242,12 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* clear interrupt flag and enable the interrupt line and line wakeup */
     _EIC->INTFLAG.reg = (1 << exti);
     _EIC->INTENSET.reg = (1 << exti);
-#ifdef CPU_FAM_SAMD21
+#ifdef CPU_COMMON_SAMD21
     _EIC->WAKEUP.reg |= (1 << exti);
     /* enable the EIC module*/
     _EIC->CTRL.reg = EIC_CTRL_ENABLE;
     EIC_SYNC();
-#else /* CPU_FAM_SAML21 */
+#else /* CPU_COMMON_SAML21 */
     /* enable the EIC module*/
     _EIC->CTRLA.reg = EIC_CTRLA_ENABLE;
     EIC_SYNC();
@@ -256,7 +256,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 }
 
 inline static void reenable_eic(gpio_eic_clock_t clock) {
-#if defined(CPU_SAMD21)
+#if defined(CPU_COMMON_SAMD21)
     if (clock == _EIC_CLOCK_SLOW) {
         GCLK->CLKCTRL.reg = EIC_GCLK_ID
                           | GCLK_CLKCTRL_CLKEN
@@ -339,7 +339,7 @@ void gpio_irq_disable(gpio_t pin)
     _EIC->INTENCLR.reg = (1 << exti);
 }
 
-#if defined(CPU_SAML1X)
+#if defined(CPU_COMMON_SAML1X)
 void isr_eic_other(void)
 #else
 void isr_eic(void)
@@ -360,7 +360,7 @@ void isr_eic(void)
     cortexm_isr_end();
 }
 
-#if defined(CPU_SAML1X) || defined(CPU_SAMD5X)
+#if defined(CPU_COMMON_SAML1X) || defined(CPU_COMMON_SAMD5X)
 
 #define ISR_EICn(n)             \
 void isr_eic ## n (void)        \
@@ -374,7 +374,7 @@ ISR_EICn(0)
 ISR_EICn(1)
 ISR_EICn(2)
 ISR_EICn(3)
-#if defined(CPU_SAMD5X)
+#if defined(CPU_COMMON_SAMD5X)
 ISR_EICn(4)
 ISR_EICn(5)
 ISR_EICn(6)
@@ -389,8 +389,8 @@ ISR_EICn(13)
 ISR_EICn(14)
 ISR_EICn(15)
 #endif /* NUMOF_IRQS > 8 */
-#endif /* CPU_SAMD5X */
-#endif /* CPU_SAML1X || CPU_SAMD5X */
+#endif /* CPU_COMMON_SAMD5X */
+#endif /* CPU_COMMON_SAML1X || CPU_COMMON_SAMD5X */
 
 #else /* MODULE_PERIPH_GPIO_IRQ */
 

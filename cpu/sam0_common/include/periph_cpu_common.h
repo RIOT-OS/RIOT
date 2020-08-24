@@ -623,9 +623,9 @@ static inline uint8_t sercom_id(const void *sercom)
 static inline void sercom_clk_en(void *sercom)
 {
     const uint8_t id = sercom_id(sercom);
-#if defined(CPU_FAM_SAMD21)
+#if defined(CPU_COMMON_SAMD21)
     PM->APBCMASK.reg |= (PM_APBCMASK_SERCOM0 << id);
-#elif defined (CPU_FAM_SAMD5X)
+#elif defined (CPU_COMMON_SAMD5X)
     if (id < 2) {
         MCLK->APBAMASK.reg |= (1 << (id + 12));
     } else if (id < 4) {
@@ -637,11 +637,11 @@ static inline void sercom_clk_en(void *sercom)
     if (id < 5) {
         MCLK->APBCMASK.reg |= (MCLK_APBCMASK_SERCOM0 << id);
     }
-#if defined(CPU_FAM_SAML21)
+#if defined(CPU_COMMON_SAML21)
     else {
         MCLK->APBDMASK.reg |= (MCLK_APBDMASK_SERCOM5);
     }
-#endif /* CPU_FAM_SAML21 */
+#endif /* CPU_COMMON_SAML21 */
 #endif
 }
 
@@ -653,9 +653,9 @@ static inline void sercom_clk_en(void *sercom)
 static inline void sercom_clk_dis(void *sercom)
 {
     const uint8_t id = sercom_id(sercom);
-#if defined(CPU_FAM_SAMD21)
+#if defined(CPU_COMMON_SAMD21)
     PM->APBCMASK.reg &= ~(PM_APBCMASK_SERCOM0 << id);
-#elif defined (CPU_FAM_SAMD5X)
+#elif defined (CPU_COMMON_SAMD5X)
     if (id < 2) {
         MCLK->APBAMASK.reg &= ~(1 << (id + 12));
     } else if (id < 4) {
@@ -667,15 +667,15 @@ static inline void sercom_clk_dis(void *sercom)
     if (id < 5) {
         MCLK->APBCMASK.reg &= ~(MCLK_APBCMASK_SERCOM0 << id);
     }
-#if defined (CPU_FAM_SAML21)
+#if defined (CPU_COMMON_SAML21)
     else {
         MCLK->APBDMASK.reg &= ~(MCLK_APBDMASK_SERCOM5);
     }
-#endif /* CPU_FAM_SAML21 */
+#endif /* CPU_COMMON_SAML21 */
 #endif
 }
 
-#ifdef CPU_FAM_SAMD5X
+#ifdef CPU_COMMON_SAMD5X
 static inline uint8_t _sercom_gclk_id_core(uint8_t sercom_id) {
     if (sercom_id < 2)
         return sercom_id + 7;
@@ -696,21 +696,21 @@ static inline void sercom_set_gen(void *sercom, uint8_t gclk)
 {
     const uint8_t id = sercom_id(sercom);
     sam0_gclk_enable(gclk);
-#if defined(CPU_FAM_SAMD21)
+#if defined(CPU_COMMON_SAMD21)
     GCLK->CLKCTRL.reg = (GCLK_CLKCTRL_CLKEN | GCLK_CLKCTRL_GEN(gclk) |
                          (SERCOM0_GCLK_ID_CORE + id));
     while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
-#elif defined(CPU_FAM_SAMD5X)
+#elif defined(CPU_COMMON_SAMD5X)
     GCLK->PCHCTRL[_sercom_gclk_id_core(id)].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
 #else
     if (id < 5) {
         GCLK->PCHCTRL[SERCOM0_GCLK_ID_CORE + id].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
     }
-#if defined(CPU_FAM_SAML21)
+#if defined(CPU_COMMON_SAML21)
     else {
         GCLK->PCHCTRL[SERCOM5_GCLK_ID_CORE].reg = (GCLK_PCHCTRL_CHEN | GCLK_PCHCTRL_GEN(gclk));
     }
-#endif /* CPU_FAM_SAML21 */
+#endif /* CPU_COMMON_SAML21 */
 #endif
 }
 
@@ -821,7 +821,7 @@ typedef struct {
 /**
  * @brief Move the DMA descriptors to the LP SRAM. Required on the SAML21
  */
-#if defined(CPU_FAM_SAML21) || defined(DOXYGEN)
+#if defined(CPU_COMMON_SAML21) || defined(DOXYGEN)
 #define DMA_DESCRIPTOR_IN_LPSRAM
 #endif
 

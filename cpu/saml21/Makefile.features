@@ -1,5 +1,4 @@
 CPU_CORE = cortex-m0plus
-CPU_FAM  = saml21
 
 # The SAMR30 line of MCUs does not contain a TRNG
 CPU_MODELS_WITHOUT_HWRNG += samr30%

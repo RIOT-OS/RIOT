@@ -5,33 +5,20 @@
 # directory for more details.
 #
 
-config CPU_FAM_SAMD21
+config CPU_COMMON_SAMD21
     bool
     select CPU_COMMON_SAM0
     select CPU_CORE_CORTEX_M0PLUS
     select HAS_CPU_SAMD21
     select HAS_PUF_SRAM
 
-## CPU Models
-config CPU_MODEL_SAMD21E18A
+config CPU_FAM_SAMD21
     bool
-    select CPU_FAM_SAMD21
+    select CPU_COMMON_SAMD21
 
-config CPU_MODEL_SAMD21G18A
+config CPU_FAM_SAMR21
     bool
-    select CPU_FAM_SAMD21
-
-config CPU_MODEL_SAMD21J18A
-    bool
-    select CPU_FAM_SAMD21
-
-config CPU_MODEL_SAMR21E18A
-    bool
-    select CPU_FAM_SAMD21
-
-config CPU_MODEL_SAMR21G18A
-    bool
-    select CPU_FAM_SAMD21
+    select CPU_COMMON_SAMD21
 
 ## Definition of specific features
 config HAS_CPU_SAMD21
@@ -42,15 +29,12 @@ config HAS_CPU_SAMD21
 ## Common CPU symbols
 config CPU_FAM
     default "samd21" if CPU_FAM_SAMD21
-
-config CPU_MODEL
-    default "samd21e18a" if CPU_MODEL_SAMD21E18A
-    default "samd21g18a" if CPU_MODEL_SAMD21G18A
-    default "samd21j18a" if CPU_MODEL_SAMD21J18A
-    default "samr21e18a" if CPU_MODEL_SAMR21E18A
-    default "samr21g18a" if CPU_MODEL_SAMR21G18A
+    default "samr21" if CPU_FAM_SAMR21
 
 config CPU
-    default "samd21"
+    default "samd21" if CPU_COMMON_SAMD21
+
+source "$(RIOTCPU)/samd21/Kconfig.samd21"
+source "$(RIOTCPU)/samd21/Kconfig.samr21"
 
 source "$(RIOTCPU)/sam0_common/Kconfig"
