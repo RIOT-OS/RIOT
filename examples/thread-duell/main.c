@@ -10,139 +10,148 @@
 #include "sched_rr.h"
 
 #define PRINT_STEPS 10
-#define WORK_SCALE 1000
+#define WORK_SCALE  1000
 
-void bad_wait(uint64_t us){
+void bad_wait(uint64_t us)
+{
     /*keep the cpu busy waiting for some time to pass simulate working*/
     uint64_t until = xtimer_now_usec64() + us;
-    while(xtimer_now_usec64() < until);//do nothing
+
+    while (xtimer_now_usec64() < until) {
+        /*do nothing*/
+    }
 }
 
-void nice_wait(uint64_t us){
+void nice_wait(uint64_t us)
+{
     /*be nice give the core some time to do other things or rest*/
     xtimer_usleep64(us);
 }
 
-void* thread_nicebreaks(void* d)
+void * thread_nicebreaks(void * d)
 {
-        uint32_t w = 0;
-        xtimer_usleep64(200*1000);/*allways be nice at start*/
-        int16_t pid = thread_getpid();
+    uint32_t w = 0;
 
-        uint32_t work = * (uint32_t *) d ;
-        if ( work  >10 ){
-            work = 5;
-        }
-        uint32_t rest = (10 - work);
-        uint32_t step = 0;
+    xtimer_usleep64(200 * 1000);  /*allways be nice at start*/
+    int16_t pid = thread_getpid();
 
-        /*work some time and rest*/
-        for (;;){
-            if (w - step >= PRINT_STEPS) {
-                printf("T-Pid %i: %u, %d\n",pid, w, work);
-                step = w;
-            }
-            bad_wait(work * WORK_SCALE);
-            w += work;
-            nice_wait(rest * WORK_SCALE);
+    uint32_t work = * (uint32_t *) d;
+    if (work > 10) {
+        work = 5;
+    }
+    uint32_t rest = (10 - work);
+    uint32_t step = 0;
+
+    /*work some time and rest*/
+    for (;;) {
+        if (w - step >= PRINT_STEPS) {
+            printf("T-Pid %i: %u, %d\n", pid, w, work);
+            step = w;
         }
+        bad_wait(work * WORK_SCALE);
+        w += work;
+        nice_wait(rest * WORK_SCALE);
+    }
 }
 
 
-void* thread_bad(void* d)
+void * thread_bad(void * d)
 {
-        uint32_t w = 0;
-        xtimer_usleep64(200*1000);/*allways be nice at start*/
-        int16_t pid = thread_getpid();
+    uint32_t w = 0;
 
-        uint32_t work = * (uint32_t *) d ;
-        if ( work  >10 ){
-            work = 5;
-        }
-        uint32_t rest = (10 - work);
-        uint32_t step = 0;
+    xtimer_usleep64(200 * 1000);  /*allways be nice at start*/
+    int16_t pid = thread_getpid();
 
-        /*work some time yield rest blocking*/
-        for (;;){
-            if (w - step >= PRINT_STEPS) {
-                printf("T-Pid %i: %u, %d\n",pid, w, work);
-                step = w;
-            }
-            bad_wait(work * WORK_SCALE);
-            w += work;
-            bad_wait(rest * WORK_SCALE);
+    uint32_t work = * (uint32_t *) d;
+    if (work > 10) {
+        work = 5;
+    }
+    uint32_t rest = (10 - work);
+    uint32_t step = 0;
+
+    /*work some time yield rest blocking*/
+    for (;;) {
+        if (w - step >= PRINT_STEPS) {
+            printf("T-Pid %i: %u, %d\n", pid, w, work);
+            step = w;
         }
+        bad_wait(work * WORK_SCALE);
+        w += work;
+        bad_wait(rest * WORK_SCALE);
+    }
 }
 
-void* thread_restless_yielding(void* d)
+void * thread_restless_yielding(void * d)
 {
-        uint32_t w = 0;
-        xtimer_usleep64(200*1000);/*allways be nice at start*/
-        int16_t pid = thread_getpid();
+    uint32_t w = 0;
 
-        uint32_t work = * (uint32_t *) d ;
-        if ( work  >10 ){
-            work = 5;
-        }
-        /*uint32_t rest = (10 - work);*/
-        uint32_t step = 0;
+    xtimer_usleep64(200 * 1000);  /*allways be nice at start*/
+    int16_t pid = thread_getpid();
 
-        /*work for some time and yield*/
-        for (;;) {
-            if (w - step >= PRINT_STEPS) {
-                printf("T-Pid %i: %u, %d\n",pid, w, work);
-                step = w;
-            }
-            bad_wait(work * WORK_SCALE);
-            w += work;
-            thread_yield();
+    uint32_t work = * (uint32_t *) d;
+    if (work > 10) {
+        work = 5;
+    }
+    /*uint32_t rest = (10 - work);*/
+    uint32_t step = 0;
+
+    /*work for some time and yield*/
+    for (;;) {
+        if (w - step >= PRINT_STEPS) {
+            printf("T-Pid %i: %u, %d\n", pid, w, work);
+            step = w;
         }
+        bad_wait(work * WORK_SCALE);
+        w += work;
+        thread_yield();
+    }
 }
 
 
-void* thread_restless(void* d)
+void * thread_restless(void * d)
 {
-        uint32_t w = 0;
-        xtimer_usleep64(200*1000);/*allways be nice at start*/
-        int16_t pid = thread_getpid();
+    uint32_t w = 0;
 
-        uint32_t work = * (uint32_t *) d ;
-        if ( work  >10 ){
-            work = 5;
-        }
-        /*uint32_t rest = (10 - work);*/
-        uint32_t step = 0;
+    xtimer_usleep64(200 * 1000);  /*allways be nice at start*/
+    int16_t pid = thread_getpid();
 
-        /*continue working*/
-        for (;;) {
-            if (w - step >= PRINT_STEPS) {
-                printf("T-Pid %i: %u, %d\n",pid, w, work);
-                step = w;
-            }
-            bad_wait(work*WORK_SCALE);
-            w += work;
+    uint32_t work = * (uint32_t *) d;
+    if (work > 10) {
+        work = 5;
+    }
+    /*uint32_t rest = (10 - work);*/
+    uint32_t step = 0;
+
+    /*continue working*/
+    for (;;) {
+        if (w - step >= PRINT_STEPS) {
+            printf("T-Pid %i: %u, %d\n", pid, w, work);
+            step = w;
         }
+        bad_wait(work * WORK_SCALE);
+        w += work;
+    }
 }
 
 int main(void)
 {
     start_schedule_rr();
     {
-        int size = THREAD_STACKSIZE_DEFAULT ;
+        int size = THREAD_STACKSIZE_DEFAULT;
         char * wech = malloc(size + 4);
-        * (uint32_t *) wech = 3; /* 0-10 workness*/
-        thread_create(wech+4, size ,7,0, thread_restless,wech,"T1");
+        * (uint32_t *) wech = 3;   /* 0-10 workness*/
+        thread_create(wech + 4, size, 7, THREAD_CREATE_STACKTEST, thread_restless, wech, "T1");
     }
     {
         int size = THREAD_STACKSIZE_DEFAULT;
         char * wech = malloc(size + 4);
-        * (uint32_t *) wech = 5; /* 0-10 workness*/
-        thread_create(wech+4, size ,7,0, thread_restless,wech,"T2");
+        * (uint32_t *) wech = 5;   /* 0-10 workness*/
+        thread_create(wech + 4, size, 7, THREAD_CREATE_STACKTEST, thread_restless, wech, "T2");
     }
     {
-        int size = THREAD_STACKSIZE_DEFAULT ;
-        char * wech = malloc(size + 4);
-        * (uint32_t *) wech = 5; /* 0-10 workness*/
-        thread_create(wech+4, size ,7,0, thread_restless,wech,"T3");
+        int size = THREAD_STACKSIZE_DEFAULT;
+        char *wech = malloc(size + 4);
+        * (uint32_t *) wech = 5;   /* 0-10 workness*/
+        thread_create(wech + 4, size, 7, THREAD_CREATE_STACKTEST, thread_restless, wech, "T3");
     }
 }
