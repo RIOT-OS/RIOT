@@ -24,7 +24,8 @@
 #include <unistd.h>
 #include <string.h>
 
-#if defined(__WITH_AVRLIBC__) || defined(__mips__)
+#if defined(__WITH_AVRLIBC__) || defined(__mips__) || defined(MODULE_PICOLIBC)
+#define USE_FWRITE
 #include <stdio.h>  /* for fwrite() */
 #else
 /* work around broken sys/posix/unistd.h */
@@ -503,7 +504,7 @@ uint32_t scn_u32_hex(const char *str, size_t n)
 
 void print(const char *s, size_t n)
 {
-#ifdef __WITH_AVRLIBC__
+#ifdef USE_FWRITE
     /* AVR's libc doesn't offer write(), so use fwrite() instead */
     fwrite(s, n, 1, stdout);
 #else
@@ -515,7 +516,7 @@ void print(const char *s, size_t n)
         n -= written;
         s += written;
     }
-#endif /* __WITH_AVRLIBC__ */
+#endif /* USE_FWRITE */
 }
 
 void print_u32_dec(uint32_t val)
