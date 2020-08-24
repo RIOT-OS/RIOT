@@ -1010,6 +1010,10 @@ ifneq (,$(filter tinydtls_sock_dtls, $(USEMODULE)))
     USEMODULE += sock_dtls
 endif
 
+ifneq (,$(filter sched_rr, $(USEMODULE)))
+    USEMODULE += xtimer
+endif
+
 ifneq (,$(filter sock_dtls, $(USEMODULE)))
     USEMODULE += credman
     USEMODULE += sock_udp
