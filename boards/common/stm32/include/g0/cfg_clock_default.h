@@ -35,41 +35,100 @@ extern "C" {
  * @{
  */
 /* Select the desired system clock source between PLL, HSE or HSI */
-#define CLOCK_USE_HSI       (0)
-#define CLOCK_USE_HSE       (0)
-#define CLOCK_USE_PLL       (1)
+#ifndef CONFIG_USE_CLOCK_PLL
+#if IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
+#define CONFIG_USE_CLOCK_PLL            (0)
+#else
+#define CONFIG_USE_CLOCK_PLL            (1)     /* Use PLL by default */
+#endif
+#endif /* CONFIG_USE_CLOCK_PLL */
 
-#define CLOCK_HSI           (16000000U)
+#ifndef CONFIG_USE_CLOCK_HSE
+#define CONFIG_USE_CLOCK_HSE            (0)
+#endif /* CONFIG_USE_CLOCK_HSE */
+
+#ifndef CONFIG_USE_CLOCK_HSI
+#define CONFIG_USE_CLOCK_HSI            (0)
+#endif /* CONFIG_USE_CLOCK_HSI */
+
+#if CONFIG_USE_CLOCK_PLL && \
+    (CONFIG_USE_CLOCK_HSE || CONFIG_USE_CLOCK_HSI)
+#error "Cannot use PLL as clock source with other clock configurations"
+#endif
+
+#if CONFIG_USE_CLOCK_HSE && \
+    (CONFIG_USE_CLOCK_PLL || CONFIG_USE_CLOCK_HSI)
+#error "Cannot use HSE as clock source with other clock configurations"
+#endif
+
+#if CONFIG_USE_CLOCK_HSI && \
+    (CONFIG_USE_CLOCK_PLL || CONFIG_USE_CLOCK_HSE)
+#error "Cannot use HSI as clock source with other clock configurations"
+#endif
+
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE            (0)
+#endif
+
 #ifndef CLOCK_HSE
-#define CLOCK_HSE           (0)
+#define CLOCK_HSE                       MHZ(24)
 #endif
-#ifndef CLOCK_LSE
-#define CLOCK_LSE           (1U)
+#if CONFIG_BOARD_HAS_HSE && (CLOCK_HSE < MHZ(4) || CLOCK_HSE > MHZ(48))
+#error "HSE clock frequency must be between 4MHz and 48MHz"
 #endif
 
-#if CLOCK_USE_HSI
-#define CLOCK_CORECLOCK     (CLOCK_HSI)
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE            (0)
+#endif
+#if CONFIG_BOARD_HAS_LSE
+#define CLOCK_LSE                       (1)
+#else
+#define CLOCK_LSE                       (0)
+#endif
 
-#elif CLOCK_USE_HSE
-#define CLOCK_CORECLOCK     (CLOCK_HSE)
+#define CLOCK_HSI                       MHZ(16)
 
-#elif CLOCK_USE_PLL
+#if CONFIG_USE_CLOCK_HSI
+#ifndef CONFIG_CLOCK_HSISYS_DIV
+#define CONFIG_CLOCK_HSISYS_DIV         (1)
+#endif
+#define CLOCK_CORECLOCK                 (CLOCK_HSI / CONFIG_CLOCK_HSISYS_DIV)
+
+#elif CONFIG_USE_CLOCK_HSE
+#if CONFIG_BOARD_HAS_HSE == 0
+#error "The board doesn't provide an HSE oscillator"
+#endif
+#define CLOCK_CORECLOCK                 (CLOCK_HSE)
+
+#elif CONFIG_USE_CLOCK_PLL
 /* The following parameters configure a 64MHz system clock with HSI as input clock */
-#define CLOCK_PLL_M         (1)
-#define CLOCK_PLL_N         (20)
-#define CLOCK_PLL_R         (5)
-#if CLOCK_HSE
-#define CLOCK_PLL_SRC       (CLOCK_HSE)
-#else /* CLOCK_HSI */
-#define CLOCK_PLL_SRC       (CLOCK_HSI)
+#ifndef CONFIG_CLOCK_PLL_M
+#define CONFIG_CLOCK_PLL_M              (1)
 #endif
-#define CLOCK_CORECLOCK     ((CLOCK_PLL_SRC / CLOCK_PLL_M) * CLOCK_PLL_N) / CLOCK_PLL_R
-#endif /* CLOCK_USE_PLL */
+#ifndef CONFIG_CLOCK_PLL_N
+#define CONFIG_CLOCK_PLL_N              (20)
+#endif
+#ifndef CONFIG_CLOCK_PLL_R
+#define CONFIG_CLOCK_PLL_R              (5)
+#endif
+#if CONFIG_BOARD_HAS_HSE
+#define CLOCK_PLL_SRC                   (CLOCK_HSE)
+#else /* CLOCK_HSI */
+#define CLOCK_PLL_SRC                   (CLOCK_HSI)
+#endif
+#define CLOCK_CORECLOCK                 \
+        ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_M) * CONFIG_CLOCK_PLL_N) / CONFIG_CLOCK_PLL_R
+#if CLOCK_CORECLOCK > MHZ(64)
+#error "SYSCLK cannot exceed 64MHz"
+#endif
+#endif /* CONFIG_USE_CLOCK_PLL */
 
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_0
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)   /* max: 64MHz */
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE_0
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)   /* max: 64MHz */
+#define CLOCK_AHB                       CLOCK_CORECLOCK  /* max: 64MHz */
+
+#ifndef CONFIG_CLOCK_APB1_DIV
+#define CONFIG_CLOCK_APB1_DIV           (1)
+#endif
+#define CLOCK_APB1                      (CLOCK_CORECLOCK / CONFIG_CLOCK_APB1_DIV)   /* max: 64MHz */
 /** @} */
 
 #ifdef __cplusplus
