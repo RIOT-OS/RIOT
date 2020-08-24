@@ -1,3 +1,5 @@
+CPU_FAM := $(shell echo $(CPU_MODEL) | cut -c -6)
+
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_dma
 FEATURES_PROVIDED += periph_flashpage

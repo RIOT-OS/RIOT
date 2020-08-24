@@ -1,13 +1,5 @@
 CPU_CORE = cortex-m23
 
-ifneq (,$(filter saml10%,$(CPU_MODEL)))
-  CPU_FAM = saml10
-else ifneq (,$(filter saml11%,$(CPU_MODEL)))
-  CPU_FAM = saml11
-else
-  $(error Unknown saml1x CPU Model: $(CPU_MODEL))
-endif
-
 # TODO: The cortex-m23 MPU is not ported
 # FEATURES_PROVIDED += cortexm_mpu
 

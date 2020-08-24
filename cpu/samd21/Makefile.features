@@ -1,5 +1,4 @@
 CPU_CORE = cortex-m0plus
-CPU_FAM  = samd21
 
 FEATURES_PROVIDED += puf_sram
 

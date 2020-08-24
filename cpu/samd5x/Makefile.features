@@ -1,5 +1,4 @@
 CPU_CORE = cortex-m4f
-CPU_FAM  = samd5x
 
 FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += backup_ram
