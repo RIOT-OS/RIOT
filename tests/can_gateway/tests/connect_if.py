@@ -12,6 +12,7 @@ import json
 
 DEFAULT_SLEEP_TIME = 0.01
 
+
 class Connect:
 
     def __init__(self, port, baud):
@@ -23,7 +24,12 @@ class Connect:
         with open("{}".format(config_file)) as json_file:
             data = json.load(json_file)
             for entry in data['Entries']:
-                self.__dev.write("can_gateway add_id {} {} {} {} {} {}\n".format(entry['can_id'],entry['dst_port'],entry['ip_addr'],entry['eth_send'],entry['dst_ifnum'],entry['src_ifnum']).encode())
+                self.__dev.write("can_gateway add_id {} {} {} {} {} {}\n".format(entry['can_id'],
+                                 entry['dst_port'],
+                                 entry['ip_addr'],
+                                 entry['eth_send'],
+                                 entry['dst_ifnum'],
+                                 entry['src_ifnum']).encode())
                 time.sleep(DEFAULT_SLEEP_TIME)
 
     def can_set_bitrate(self, iface, bitrate, sample_point):

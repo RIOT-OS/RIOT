@@ -659,7 +659,7 @@ static int _add_can_id(int argc, char **argv)
     }
 
     if (list_counter >= ID_LIST_COUNT) {
-        DEBUG("_add_can_id: List ist full!\n");
+        DEBUG("_add_can_id: List is full!\n");
         return -1;
     } else {
         uint32_t can_id = strtoul(argv[2], NULL, 16);
