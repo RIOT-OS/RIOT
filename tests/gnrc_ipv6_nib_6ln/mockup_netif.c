@@ -108,7 +108,7 @@ void _tests_init(void)
     _mock_netif = &_netif;
     expect(res == 0);
     gnrc_netreg_entry_init_pid(&dumper, GNRC_NETREG_DEMUX_CTX_ALL,
-                               sched_active_pid);
+                               thread_getpid());
     gnrc_netreg_register(GNRC_NETTYPE_NDP, &dumper);
 }
 

@@ -54,7 +54,7 @@ int main(void)
     puts("START");
     msg_t msg;
 
-    p_main = sched_active_pid;
+    p_main = thread_getpid();
 
     p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN - 1,
                        THREAD_CREATE_STACKTEST, sub_thread, "nr1", "nr1");

@@ -122,7 +122,7 @@ int main(void)
 #ifdef MODULE_QMC5883L_INT
     /* safe a reference to the main thread TCB so we can wait for flags */
     if (qmc5883l_params[0].pin_drdy != GPIO_UNDEF) {
-        _tmain = (thread_t *)thread_get(thread_getpid());
+        _tmain = thread_get_active();
 
         if (qmc5883l_init_int(&_dev, _on_drdy, NULL) != QMC5883L_OK) {
             puts("Error: unable to configure interrupt callback");

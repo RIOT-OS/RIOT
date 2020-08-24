@@ -1073,7 +1073,7 @@ static void *_server_func(void *arg)
 
     (void)arg;
     msg_init_queue(_server_msg_queue, _MSG_QUEUE_SIZE);
-    _server = sched_active_pid;
+    _server = thread_getpid();
     while (1) {
         msg_t msg;
 
@@ -1139,7 +1139,7 @@ static void *_client_func(void *arg)
 
     (void)arg;
     msg_init_queue(_client_msg_queue, _MSG_QUEUE_SIZE);
-    _client = sched_active_pid;
+    _client = thread_getpid();
     while (1) {
         msg_t msg;
 

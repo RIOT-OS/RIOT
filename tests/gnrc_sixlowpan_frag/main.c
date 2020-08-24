@@ -330,7 +330,7 @@ static void test_rbuf_add__success_complete(void)
     msg_t msg = { .type = 0U };
     gnrc_netreg_entry_t reg = GNRC_NETREG_ENTRY_INIT_PID(
             GNRC_NETREG_DEMUX_CTX_ALL,
-            sched_active_pid
+            thread_getpid()
         );
 
     gnrc_netreg_register(TEST_DATAGRAM_NETTYPE, &reg);

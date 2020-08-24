@@ -86,7 +86,7 @@ int main(void)
     random_init(timer_read(TIMER_DEV(0)));
     puts("Test is \"successful\" if it runs forever without halting\n"
          "on any of the assertion in this file\n");
-    _pid_main = sched_active_pid;
+    _pid_main = thread_getpid();
 
     puts("I will try to trigger an interrupt at random intervals. When an\n"
          "interrupt is fired while ISR is disable in the thread_yield_higher()\n"

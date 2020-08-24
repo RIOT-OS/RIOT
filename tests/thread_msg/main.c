@@ -85,7 +85,7 @@ void *thread3(void *arg)
 
 int main(void)
 {
-    p_main = sched_active_pid;
+    p_main = thread_getpid();
     p1 = thread_create(t1_stack, sizeof(t1_stack), THREAD_PRIORITY_MAIN - 1,
                        THREAD_CREATE_WOUT_YIELD | THREAD_CREATE_STACKTEST,
                        thread1, NULL, "nr1");

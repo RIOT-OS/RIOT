@@ -27,7 +27,9 @@
 #include "sched.h"
 #include "socket_zep.h"
 #include "socket_zep_params.h"
+#include "socket_zep_params.h"
 #include "test_utils/expect.h"
+#include "thread.h"
 #include "msg.h"
 #include "od.h"
 
@@ -106,7 +108,7 @@ int main(void)
 {
     puts("Socket ZEP device driver test");
     msg_init_queue(_msg_queue, MSG_QUEUE_SIZE);
-    _main_pid = sched_active_pid;
+    _main_pid = thread_getpid();
 
     test_init();
     test_send__iolist_NULL();
