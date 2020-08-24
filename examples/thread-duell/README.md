@@ -1,14 +1,9 @@
 Thread_Duel
-============
+== == == == == ==
 
-this is a thread duell application to test RIOTS mutithreading abblities
+this is a thread duel application
+    to show or not to show
+RIOTS multi-threading abilities
 
 it contains:
-* example thread that use the cpu in different patterns
-
-* a basic round robin scheuler using xtimer,
-* a sorting scheduler
-* some monitoring
-* a top like thread
-
-
+* example threads that use the CPU in different patterns
