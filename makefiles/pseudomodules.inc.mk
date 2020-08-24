@@ -86,6 +86,7 @@ PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
 PSEUDOMODULES += openthread
 PSEUDOMODULES += picolibc
+PSEUDOMODULES += picolibc_stdout_buffered
 PSEUDOMODULES += pktqueue
 PSEUDOMODULES += posix_headers
 PSEUDOMODULES += printf_float
