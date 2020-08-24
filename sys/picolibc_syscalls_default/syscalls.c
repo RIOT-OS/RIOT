@@ -28,6 +28,81 @@
 #include "periph/pm.h"
 #include "stdio_base.h"
 
+#ifndef NUM_HEAPS
+#define NUM_HEAPS 1
+#endif
+
+/**
+ * @brief manage the heap
+ */
+extern char _sheap;                 /* start of the heap */
+extern char _eheap;                 /* end of the heap */
+#define __eheap &_eheap
+
+/**
+ * @brief Additional heap sections that may be defined in the linkerscript.
+ *
+ *        The compiler should not generate references to those symbols if
+ *        they are not used, so only provide them if additional memory sections
+ *        that can be used as heap are available.
+ * @{
+ */
+extern char _sheap1;
+extern char _eheap1;
+
+extern char _sheap2;
+extern char _eheap2;
+
+extern char _sheap3;
+extern char _eheap3;
+/* @} */
+
+struct heap {
+    char* start;
+    char* end;
+};
+
+static char *heap_top[NUM_HEAPS] = {
+    &_sheap,
+#if NUM_HEAPS > 1
+    &_sheap1,
+#endif
+#if NUM_HEAPS > 2
+    &_sheap2,
+#endif
+#if NUM_HEAPS > 3
+    &_sheap3,
+#endif
+#if NUM_HEAPS > 4
+#error "Unsupported NUM_HEAPS value, edit newlib_syscalls_default/syscalls.c to add more heaps."
+#endif
+};
+
+static const struct heap heaps[NUM_HEAPS] = {
+    {
+        .start = &_sheap,
+        .end   = __eheap
+    },
+#if NUM_HEAPS > 1
+    {
+        .start = &_sheap1,
+        .end   = &_eheap1
+    },
+#endif
+#if NUM_HEAPS > 2
+    {
+        .start = &_sheap2,
+        .end   = &_eheap2
+    },
+#endif
+#if NUM_HEAPS > 3
+    {
+        .start = &_sheap3,
+        .end   = &_eheap3
+    },
+#endif
+};
+
 /**
  * @brief Exit a program without cleaning up files
  *
@@ -42,6 +117,32 @@ _exit(int n)
     LOG_INFO("#! exit %i: powering off\n", n);
     pm_off();
     while(1);
+}
+
+/**
+ * @brief Allocate memory from the heap.
+ *
+ * @return      pointer to the newly allocated memory on success
+ * @return      pointer set to address `-1` on failure
+ */
+void *sbrk(ptrdiff_t incr)
+{
+    void *res = (void*)UINTPTR_MAX;
+    unsigned int state = irq_disable();
+
+    for (unsigned i = 0; i < NUM_HEAPS; ++i) {
+        if ((heap_top[i] + incr > heaps[i].end) ||
+            (heap_top[i] + incr < heaps[i].start)) {
+            continue;
+        }
+
+        res = heap_top[i];
+        heap_top[i] += incr;
+        break;
+    }
+
+    irq_restore(state);
+    return res;
 }
 
 /**

@@ -11,14 +11,10 @@ endif
 
 ifeq (1,$(USE_PICOLIBC))
   LINKFLAGS += -specs=picolibc.specs
-  # RIOT uses _sheap and _eheap for heap start and end, PicoLIBC uses
-  # __heap_start and __heap_end. This glues these different names together.
-  LINKFLAGS += -Wl,--defsym=__heap_end=_eheap
-  LINKFLAGS += -Wl,--defsym=__heap_start=_sheap
   CFLAGS += -specs=picolibc.specs
   ifeq (,$(filter printf_float scanf_float,$(USEMODULE)))
-   CFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
-   LINKFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
+    CFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
+    LINKFLAGS += -DPICOLIBC_INTEGER_PRINTF_SCANF
   endif
 endif
 
