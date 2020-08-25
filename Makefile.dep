@@ -636,6 +636,12 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   FEATURES_REQUIRED += libstdcpp
 endif
 
+ifneq (,$(filter fuzzing,$(USEMODULE)))
+  USEMODULE += netdev_test
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_pktbuf_malloc
+endif
+
 ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netapi
   USEMODULE += gnrc_netreg
@@ -740,12 +746,6 @@ endif
 ifneq (,$(filter evtimer_mbox,$(USEMODULE)))
   USEMODULE += evtimer
   USEMODULE += core_mbox
-endif
-
-ifneq (,$(filter fuzzing,$(USEMODULE)))
-  USEMODULE += netdev_test
-  USEMODULE += gnrc_netif
-  USEMODULE += gnrc_pktbuf_malloc
 endif
 
 ifneq (,$(filter can_linux,$(USEMODULE)))
