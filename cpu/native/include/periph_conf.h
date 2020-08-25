@@ -111,7 +111,7 @@ extern "C" {
  * `--spi` startup parameter with the corresponding SPI device and HWCS-line
  * parameter has been given.
  */
-#define SPI_HWCS(x)     (x)
+#define SPI_HWCS(x)     (UINT_MAX - SPI_MAXCS + x)
 /** @} */
 
 #ifdef __cplusplus

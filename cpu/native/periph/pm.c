@@ -27,8 +27,10 @@
 #include "tty_uart.h"
 
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
-/* Only manage SPI if it is part of the build */
 #include "spidev_linux.h"
+#endif
+#ifdef MODULE_PERIPH_GPIO_LINUX
+#include "gpiodev_linux.h"
 #endif
 
 #define ENABLE_DEBUG (0)
@@ -52,6 +54,9 @@ void pm_off(void)
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
     spidev_linux_teardown();
 #endif
+#ifdef MODULE_PERIPH_GPIO_LINUX
+    gpio_linux_teardown();
+#endif
     real_exit(EXIT_SUCCESS);
 }
 
@@ -62,6 +67,9 @@ void pm_reboot(void)
     native_async_read_cleanup();
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
     spidev_linux_teardown();
+#endif
+#ifdef MODULE_PERIPH_GPIO_LINUX
+    gpio_linux_teardown();
 #endif
 
     if (real_execve(_native_argv[0], _native_argv, NULL) == -1) {

@@ -25,8 +25,8 @@
 
 #define AES_DEBUG(...)  DEBUG("[at86rf2xx_aes_spi]: "__VA_ARGS__)
 
-#define AT86RF2XX_CMD_SRAM_READ             (0b00000000)
-#define AT86RF2XX_CMD_SRAM_WRITE            (0b01000000)
+#define AT86RF2XX_CMD_SRAM_READ             (0x00)
+#define AT86RF2XX_CMD_SRAM_WRITE            (0x40)
 
 static inline
 void at86rf2xx_spi_get_bus(const at86rf2xx_t *dev)

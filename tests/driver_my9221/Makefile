@@ -2,6 +2,11 @@ include ../Makefile.tests_common
 
 USEMODULE += my9221
 
+# disable native GPIOs for automatic test
+ifeq (native,$(BOARD))
+  USEMODULE += periph_gpio_mock
+endif
+
 # set default device parameters in case they are undefined
 # the following params are for board pba-d-01-kw2x and pins PA01 and PA02
 TEST_MY9221_CLK ?= GPIO_PIN\(0,1\)
