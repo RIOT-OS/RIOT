@@ -46,6 +46,9 @@
  *    A rough template for several methods of acquiring a package is provided in
  *    `pkg/Makefile.git` and `pkg/Makefile.http`.
  *
+ * Packages should be registered in the build system by adding them to the
+ * `MODULE_REGISTRY`.
+ *
  * Patch files can be included in a `patches` directory in the package dir.
  * These are applied to the upstream package to make it build with RIOT.
  *

@@ -34,6 +34,9 @@ current configuration or not.
 Modules can be used by adding their name to the `USEMODULE` macro of your
 application's Makefile.
 
+Modules need to be registered in the build system by adding them to the
+`MODULE_REGISTRY` list.
+
 ### Pitfalls ###
 
 The `MODULE` name should be unique or build breaks as modules overwrite the

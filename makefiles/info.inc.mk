@@ -2,7 +2,8 @@
         info-features-missing info-modules info-cpu \
         info-features-provided info-features-required \
         info-features-used \
-        info-debug-variable-% info-toolchains-supported \
+        info-debug-variable-% info-registered-modules \
+        info-toolchains-supported \
         check-toolchain-supported
 
 info-objsize:
@@ -131,6 +132,9 @@ info-files:
 
 info-modules:
 	@for i in $(sort $(USEMODULE)); do echo $$i; done
+
+info-registered-modules:
+	@echo $(MODULE_REGISTRY)
 
 info-cpu:
 	@echo $(CPU)

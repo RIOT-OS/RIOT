@@ -173,6 +173,9 @@ include $(RIOTMAKE)/boards.inc.mk
 # Debug targets for build system migration
 include $(RIOTMAKE)/dependencies_debug.inc.mk
 
+# List of available modules
+include $(RIOTMAKE)/module_registry.inc.mk
+
 GLOBAL_GOALS += buildtest \
                 buildtest-indocker \
                 info-boards-features-blacklisted \

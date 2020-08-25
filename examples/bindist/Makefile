@@ -24,6 +24,7 @@ QUIET ?= 1
 BIN_DIRS += abc
 BIN_USEMODULE += abc                    # include "abc" module
 BIN_USEMODULE += $(APPLICATION_MODULE)  # include application module
+MODULE_REGISTRY += abc
 
 # list of extra files to include in binary distribution
 DIST_FILES += Makefile
