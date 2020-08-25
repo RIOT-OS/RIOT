@@ -269,7 +269,8 @@ void lwip_bootstrap(void)
 #endif
     /* also allow for external interface definition */
     tcpip_init(NULL, NULL);
-#if IS_USED(MODULE_LWIP_DHCP_AUTO) && IS_USED(MODULE_NETDEV_TAP)
+#if IS_USED(MODULE_LWIP_DHCP_AUTO) && \
+    (IS_USED(MODULE_NETDEV_TAP) || IS_USED(MODULE_STM32_ETH))
     /* XXX: Hack to get DHCP with IPv4 with `netdev_tap`, as it does
      * not emit a `NETDEV_EVENT_LINK_UP` event. Remove, once it does
      * at an appropriate point.
