@@ -4,6 +4,14 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+menuconfig KCONFIG_USEMODULE_PERIPH_TIMER
+    bool "Configure timer peripheral"
+    depends on USEMODULE_PERIPH_TIMER
+    help
+        Configure Timer peripheral using Kconfig.
+
+orsource "$(RIOTCPU)/$(CPU)/periph/Kconfig"
+
 menuconfig KCONFIG_USEMODULE_PERIPH_WDT
     bool "Configure Watchdog peripheral"
     depends on USEMODULE_PERIPH_WDT
