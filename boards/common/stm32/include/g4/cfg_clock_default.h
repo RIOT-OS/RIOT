@@ -48,15 +48,10 @@ extern "C" {
 #define CLOCK_CORECLOCK     (CLOCK_HSE)
 
 #elif CLOCK_USE_PLL
-/* The following parameters configure a 80MHz system clock with HSE as input clock */
-#define CLOCK_PLL_M         (6)
-#define CLOCK_PLL_N         (40)
-#define CLOCK_PLL_R         (2)
-/* Use the following to reach 170MHz
+/* The following parameters configure a 170MHz system clock with HSE as input clock */
 #define CLOCK_PLL_M          (6)
 #define CLOCK_PLL_N          (85)
 #define CLOCK_PLL_R          (2)
-*/
 #if CLOCK_HSE
 #define CLOCK_PLL_SRC       (CLOCK_HSE)
 #else /* CLOCK_HSI */
