@@ -25,6 +25,7 @@
 #define TEST_START_DELAY_S          (2U)
 #define SENSOR_RESET_DELAY_S        (10U)
 #define SENSOR_STARTUP_DELAY_S      (10U)
+#define SENSOR_SLEEP_WAKE_DELAY_S   (5U)
 #define POLL_FOR_READY_S            (1U)
 #define NUM_OF_MEASUREMENTS         (10U)
 
@@ -101,6 +102,16 @@ int main(void)
     error |= _print_error("reset", ec);
 
     xtimer_sleep(SENSOR_RESET_DELAY_S);
+
+    /* Put the sensor in sleep */
+    ec = sps30_sleep(&dev);
+    error |= _print_error("sleep", ec);
+    xtimer_sleep(SENSOR_SLEEP_WAKE_DELAY_S);
+
+    /* Wake-up the sensor */
+    ec = sps30_wakeup(&dev);
+    error |= _print_error("wake-up", ec);
+    xtimer_sleep(SENSOR_SLEEP_WAKE_DELAY_S);
 
     /* start the sensor again again... */
     ec = sps30_start_measurement(&dev);
