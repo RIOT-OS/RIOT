@@ -48,11 +48,6 @@
 #define ADC_SAMPLE_TIME_384C  (7)
 
 /**
- * @brief   Load the ADC configuration
- */
-static const adc_conf_t adc_config[] = ADC_CONFIG;
-
-/**
  * @brief   Allocate locks for all three available ADC device
  *
  * All STM32l1 CPU's have single ADC device
