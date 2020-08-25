@@ -344,6 +344,16 @@ off_t lseek(int fd, _off_t off, int whence)
 }
 
 /**
+ * @brief Sets the file position indicator to the the beginning of the file.
+ *
+ * @param[in]  stream   open file descriptor obtained from @c fopen()
+ */
+void rewind(FILE *stream)
+{
+    fseek(stream, 0L, SEEK_SET);
+}
+
+/**
  * @brief Get status of an open file
  *
  * This is a wrapper around @c vfs_fstat
@@ -424,4 +434,49 @@ int unlink(const char *path)
     errno = ENODEV;
     return -1;
 #endif
+}
+
+/**
+ * @brief  Deletes a directory, which must be empty
+ *
+ * @param[in]  path     path to directory to be deleted
+ *
+ * @return 0 on success
+ * @return -1 on error, @c errno set to a constant from errno.h to indicate the error
+ */
+int rmdir(const char *path)
+{
+#ifdef MODULE_VFS
+    int res = vfs_rmdir(path);
+    if (res < 0) {
+        /* vfs returns negative error codes */
+        errno = -res;
+        return -1;
+    }
+    return 0;
+#else
+    (void)path;
+    errno = ENODEV;
+    return -1;
+#endif
+}
+
+/**
+ * @brief  Remove (delete) a file or directory
+ *
+ * remove()  deletes  a name from the filesystem.
+ * It calls unlink(2) for files, and rmdir(2) for directories.
+ *
+ * @param[in]  path     path to file or directory to be deleted
+ *
+ * @return 0 on success
+ * @return -1 on error, @c errno set to a constant from errno.h to indicate the error
+ */
+int remove(const char *path)
+{
+    if (unlink(path) == 0) {
+        return 0;
+    }
+
+    return rmdir(path);
 }
