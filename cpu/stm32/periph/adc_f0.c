@@ -24,11 +24,6 @@
 #include "periph/adc.h"
 
 /**
- * @brief   Load the ADC configuration
- */
-static const adc_conf_t adc_config[] = ADC_CONFIG;
-
-/**
  * @brief   Allocate locks for all three available ADC device
  *
  * All STM32F0 CPUs we support so far only come with a single ADC device.
