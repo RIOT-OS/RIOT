@@ -56,11 +56,6 @@
 #endif
 
 /**
- * @brief   Load the ADC configuration
- */
-static const adc_conf_t adc_config[] = ADC_CONFIG;
-
-/**
  * @brief   Allocate locks for all three available ADC devices
  */
 static mutex_t locks[ADC_DEVS];
