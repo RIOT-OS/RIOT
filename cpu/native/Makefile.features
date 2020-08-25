@@ -1,7 +1,3 @@
-ifeq (FreeBSD,$(OS))
-  DISABLE_LIBSTDCPP ?= 1
-endif
-
 FEATURES_PROVIDED += arch_32bit
 FEATURES_PROVIDED += arch_native
 FEATURES_PROVIDED += cpp

@@ -52,6 +52,11 @@ ifeq ($(OS_ARCH),x86_64)
 endif
 ifeq ($(OS),FreeBSD)
   ifeq ($(OS_ARCH),amd64)
+    ifeq (,$(filter libstdcpp,$(FEATURES_USED)))
+      ifneq (,$(filter cpp,$(FEATURES_USED)))
+        LINKFLAGS += -nodefaultlibs -lgcc_s -lc -lc++ -lm -lpthread
+      endif
+    endif
     LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
   endif
   LINKFLAGS += -L $(BINDIR)
