@@ -35,6 +35,10 @@ ifneq (,$(filter rtt_cmd,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
 
+ifneq (,$(filter sched_rr, $(USEMODULE)))
+    USEMODULE += xtimer
+endif
+
 ifneq (,$(filter trace,$(USEMODULE)))
   USEMODULE += xtimer
 endif
