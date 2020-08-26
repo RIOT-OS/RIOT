@@ -137,47 +137,44 @@ void _xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_
     _xtimer_set64(timer, offset, offset >> 32);
 }
 
-/* Prepares the message to trigger the timeout.
- * Additionally, the xtimer_t struct gets initialized.
- */
-static void _setup_timer_msg(msg_t *m, xtimer_t *t)
+#if MODULE_CORE_THREAD_FLAGS
+/* Waits for incoming message or timeout flag. */
+static int _msg_wait(msg_t *m, xtimer_t *t)
 {
-    m->type = MSG_XTIMER;
-    m->content.ptr = m;
+    int res;
 
-    t->offset = t->long_offset = 0;
-}
+    thread_flags_t flags =
+        thread_flags_wait_any(THREAD_FLAG_TIMEOUT | THREAD_FLAG_MSG_WAITING);
 
-/* Waits for incoming message or timeout. */
-static int _msg_wait(msg_t *m, msg_t *tmsg, xtimer_t *t)
-{
-    msg_receive(m);
-    if (m->type == MSG_XTIMER && m->content.ptr == tmsg) {
-        /* we hit the timeout */
-        return -1;
+    if (flags & THREAD_FLAG_MSG_WAITING) {
+        res = 0;
+        msg_receive(m);
     }
     else {
-        xtimer_remove(t);
-        return 1;
+        res = -1;
     }
+
+    if (! (flags & THREAD_FLAG_TIMEOUT)) {
+        xtimer_remove(t);
+        thread_flags_clear(THREAD_FLAG_TIMEOUT);
+    }
+
+    return res;
 }
 
-int _xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout_ticks) {
-    msg_t tmsg;
+int _xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout_us) {
     xtimer_t t;
-    _setup_timer_msg(&tmsg, &t);
-    _xtimer_set_msg64(&t, timeout_ticks, &tmsg, sched_active_pid);
-    return _msg_wait(m, &tmsg, &t);
+    xtimer_set_timeout_flag64(&t, timeout_us);
+    return _msg_wait(m, &t);
 }
 
-int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout_ticks)
+int _xtimer_msg_receive_timeout(msg_t *m, uint32_t timeout_us)
 {
-    msg_t tmsg;
     xtimer_t t;
-    _setup_timer_msg(&tmsg, &t);
-    _xtimer_set_msg(&t, timeout_ticks, &tmsg, sched_active_pid);
-    return _msg_wait(msg, &tmsg, &t);
+    xtimer_set_timeout_flag(&t, timeout_us);
+    return _msg_wait(m, &t);
 }
+#endif /* MODULE_CORE_THREAD_FLAGS */
 #endif /* MODULE_CORE_MSG */
 
 static void _callback_wakeup(void* arg)
