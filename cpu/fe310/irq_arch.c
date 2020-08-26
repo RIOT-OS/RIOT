@@ -51,9 +51,6 @@ void timer_isr(void);
 
 void irq_init(void)
 {
-    volatile uint64_t *mtimecmp =
-        (uint64_t *) (CLINT_CTRL_ADDR + CLINT_MTIMECMP);
-
     /* Setup trap handler function */
     write_csr(mtvec, &trap_entry);
 
@@ -63,12 +60,8 @@ void irq_init(void)
     /* Initial PLIC external interrupt controller */
     PLIC_init(PLIC_CTRL_ADDR, PLIC_NUM_INTERRUPTS, PLIC_NUM_PRIORITIES);
 
-    /* Set mtimecmp to largest value to avoid spurious timer interrupts */
-    *mtimecmp = 0xFFFFFFFFFFFFFFFF;
-
-    /* Enable SW, timer and external interrupts */
+    /* Enable SW and external interrupts */
     set_csr(mie, MIP_MSIP);
-    set_csr(mie, MIP_MTIP);
     set_csr(mie, MIP_MEIP);
 
     /*  Set default state of mstatus */
