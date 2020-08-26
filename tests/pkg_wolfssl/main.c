@@ -7,7 +7,6 @@
  * directory for more details.
  */
 
-
 /**
  * @ingroup     examples
  * @{
@@ -33,15 +32,17 @@
 
 int main(void)
 {
-    LOG(LOG_INFO, "wolfSSL Crypto Test!");
+    LOG_INFO("wolfSSL Crypto Test!\n");
     /* Wait to work around a failing tests
      * on platforms that don't have RTC synchronized
      */
     xtimer_sleep(1);
     wolfcrypt_test(NULL);
 #ifdef MODULE_WOLFCRYPT_BENCHMARK
-    LOG(LOG_INFO, "wolfSSL Benchmark!");
+    LOG_INFO("wolfSSL Benchmark!\n");
     benchmark_test(NULL);
+#else
+    LOG_INFO("wolfSSL Benchmark disabled\n");
 #endif
     return 0;
 }
