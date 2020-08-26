@@ -97,12 +97,8 @@ void external_isr(void)
 /**
  * @brief Global trap and interrupt handler
  */
-int handle_trap(unsigned int mcause, unsigned int mepc, unsigned int mtval)
+int handle_trap(unsigned int mcause)
 {
-#ifndef DEVELHELP
-    (void) mepc;
-    (void) mtval;
-#endif
     int res = 0;
     /*  Tell RIOT to set sched_context_switch_request instead of
      *  calling thread_yield(). */
@@ -139,8 +135,8 @@ int handle_trap(unsigned int mcause, unsigned int mepc, unsigned int mtval)
 #ifdef DEVELHELP
         printf("Unhandled trap:\n");
         printf("  mcause: 0x%08x\n", mcause);
-        printf("  mepc:   0x%08x\n", mepc);
-        printf("  mtval:  0x%08x\n", mtval);
+        printf("  mepc:   0x%"PRIx32"\n", read_csr(mepc));
+        printf("  mtval:  0x%"PRIx32"\n", read_csr(mtval));
 #endif
         /* Unknown trap */
         core_panic(PANIC_GENERAL_ERROR, "Unhandled trap");
@@ -194,9 +190,7 @@ static void __attribute((aligned(4))) __attribute__((interrupt)) trap_entry(void
 
     /* Get the interrupt cause, PC and trap vector */
     "csrr a0, mcause                                    \n"
-    "csrr a1, mepc                                      \n"
-    "csrr a2, mtval                                     \n"
-    /* Call trap handler */
+    /* Call trap handler, a0 contains the return value */
     "call handle_trap                                   \n"
 
     /* Move stack pointer back */
