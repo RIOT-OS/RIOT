@@ -388,6 +388,9 @@ static void _zep_params_setup(char *zep_str, int zep)
 {
     char *save_ptr, *first_ep, *second_ep;
 
+    /* reboot uses execve() so we need to preserve argv */
+    zep_str = strdup(zep_str);
+
     if ((first_ep = strtok_r(zep_str, ",", &save_ptr)) == NULL) {
         usage_exit(EXIT_FAILURE);
     }
