@@ -25,3 +25,9 @@ config BOARD_P_NUCLEO_WB55
     # Put other features for this board (in alphabetical order)
     select HAS_ARDUINO
     select HAS_RIOTBOOT
+
+    # Clock configuration
+    select BOARD_HAS_HSE
+    select BOARD_HAS_LSE
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

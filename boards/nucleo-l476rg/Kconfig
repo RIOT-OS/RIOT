@@ -29,4 +29,7 @@ config BOARD_NUCLEO_L476RG
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
 
+    # Clock configuration
+    select BOARD_HAS_LSE
+
 source "$(RIOTBOARD)/common/nucleo64/Kconfig"
