@@ -27,17 +27,6 @@
 #include "stmclk.h"
 #include "periph_conf.h"
 
-/* make sure we have all needed information about the clock configuration */
-#ifndef CLOCK_HSE
-#error "Please provide CLOCK_HSE in your board's perhip_conf.h"
-#endif
-#ifndef CLOCK_LSE
-#error "Please provide CLOCK_LSE in your board's periph_conf.h"
-#endif
-#if !defined(CLOCK_PLL_M) || !defined(CLOCK_PLL_N) || !defined(CLOCK_PLL_R)
-#error "Please provide the PLL configuration in your board's periph_conf.h"
-#endif
-
 /* map CMSIS defines not present in stm32wb55xx.h */
 #if defined(CPU_FAM_STM32WB)
 #define RCC_PLLCFGR_PLLSRC_HSE      (RCC_PLLCFGR_PLLSRC_0 | RCC_PLLCFGR_PLLSRC_1)
@@ -57,45 +46,127 @@
  * @{
  */
 /* figure out which input to use */
-#if (CLOCK_HSE)
-#define PLL_IN                      CLOCK_HSE
+#if CONFIG_CLOCK_PLL_SRC_MSI
+#define PLL_SRC                     RCC_PLLCFGR_PLLSRC_MSI
+#elif CONFIG_CLOCK_PLL_SRC_HSE && CONFIG_BOARD_HAS_HSE
 #define PLL_SRC                     RCC_PLLCFGR_PLLSRC_HSE
 #else
-#define PLL_IN                      (48000000) /* MSI @ 48MHz */
-#define PLL_SRC                     RCC_PLLCFGR_PLLSRC_MSI
+#define PLL_SRC                     RCC_PLLCFGR_PLLSRC_HSI
 #endif
 
 /**check configuration and get the corresponding bitfields */
-#if (CLOCK_PLL_M < 1 || CLOCK_PLL_M > 8)
+#if (CONFIG_CLOCK_PLL_M < 1 || CONFIG_CLOCK_PLL_M > 8)
 #error "PLL configuration: PLL M value is out of range"
 #endif
-#define PLL_M                       ((CLOCK_PLL_M - 1) << RCC_PLLCFGR_PLLM_Pos)
+#define PLL_M                       ((CONFIG_CLOCK_PLL_M - 1) << RCC_PLLCFGR_PLLM_Pos)
 
-#if (CLOCK_PLL_N < 8 || CLOCK_PLL_N > 86)
+#if (CONFIG_CLOCK_PLL_N < 8 || CONFIG_CLOCK_PLL_N > 86)
 #error "PLL configuration: PLL N value is out of range"
 #endif
-#define PLL_N                       (CLOCK_PLL_N << RCC_PLLCFGR_PLLN_Pos)
+#define PLL_N                       (CONFIG_CLOCK_PLL_N << RCC_PLLCFGR_PLLN_Pos)
 
 #if defined(CPU_FAM_STM32WB)
-#if (CLOCK_PLL_R < 1 || CLOCK_PLL_R > 8)
+#if (CONFIG_CLOCK_PLL_R < 1 || CONFIG_CLOCK_PLL_R > 8)
 #error "PLL configuration: PLL R value is invalid"
 #else
-#define PLL_R                       ((CLOCK_PLL_R - 1)<< RCC_PLLCFGR_PLLR_Pos)
+#define PLL_R                       ((CONFIG_CLOCK_PLL_R - 1)<< RCC_PLLCFGR_PLLR_Pos)
 #endif
 #else
-#if (CLOCK_PLL_R == 2)
+#if (CONFIG_CLOCK_PLL_R == 2)
 #define PLL_R                       (0)
-#elif (CLOCK_PLL_R == 4)
+#elif (CONFIG_CLOCK_PLL_R == 4)
 #define PLL_R                       (RCC_PLLCFGR_PLLR_0)
-#elif (CLOCK_PLL_R == 6)
+#elif (CONFIG_CLOCK_PLL_R == 6)
 #define PLL_R                       (RCC_PLLCFGR_PLLR_1)
-#elif (CLOCK_PLL_R == 8)
+#elif (CONFIG_CLOCK_PLL_R == 8)
 #define PLL_R                       (RCC_PLLCFGR_PLLR_0 | RCC_PLLCFGR_PLLR_1)
 #else
 #error "PLL configuration: PLL R value is invalid"
 #endif
 #endif
 /** @} */
+
+#if CONFIG_CLOCK_MSI == KHZ(100)
+#define CLOCK_MSIRANGE              (RCC_CR_MSIRANGE_0)
+#elif CONFIG_CLOCK_MSI == KHZ(200)
+#define CLOCK_MSIRANGE              (RCC_CR_MSIRANGE_1)
+#elif CONFIG_CLOCK_MSI == KHZ(400)
+#define CLOCK_MSIRANGE              (RCC_CR_MSIRANGE_2)
+#elif CONFIG_CLOCK_MSI == KHZ(800)
+#define CLOCK_MSIRANGE              (RCC_CR_MSIRANGE_3)
+#elif CONFIG_CLOCK_MSI == MHZ(1)
+#define CLOCK_MSIRANGE              (RCC_CR_MSIRANGE_4)
+#elif CONFIG_CLOCK_MSI == MHZ(2)
+#define CLOCK_MSIRANGE              (RCC_CR_MSIRANGE_5)
+#elif CONFIG_CLOCK_MSI == MHZ(4)
+#define CLOCK_MSIRANGE              (RCC_CR_MSIRANGE_6)
+#elif CONFIG_CLOCK_MSI == MHZ(8)
+#define CLOCK_MSIRANGE              (RCC_CR_MSIRANGE_7)
+#elif CONFIG_CLOCK_MSI == MHZ(16)
+#define CLOCK_MSIRANGE              (RCC_CR_MSIRANGE_8)
+#elif CONFIG_CLOCK_MSI == MHZ(24)
+#define CLOCK_MSIRANGE              (RCC_CR_MSIRANGE_9)
+#elif CONFIG_CLOCK_MSI == MHZ(32)
+#define CLOCK_MSIRANGE              (RCC_CR_MSIRANGE_10)
+#elif CONFIG_CLOCK_MSI == MHZ(48)
+#define CLOCK_MSIRANGE              (RCC_CR_MSIRANGE_11)
+#else
+#error "Invalid MSI clock"
+#endif
+
+#if defined(CPU_FAM_STM32WB)
+#define CLOCK_AHB_DIV               (0)
+
+#if CONFIG_CLOCK_APB1_DIV == 1
+#define CLOCK_APB1_DIV              (0)
+#elif CONFIG_CLOCK_APB1_DIV == 2
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_2)
+#elif CONFIG_CLOCK_APB1_DIV == 4
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_2 | RCC_CFGR_PPRE1_0)
+#elif CONFIG_CLOCK_APB1_DIV == 8
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_2 | RCC_CFGR_PPRE1_1)
+#elif CONFIG_CLOCK_APB1_DIV == 16
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_2 | RCC_CFGR_PPRE1_1 | RCC_CFGR_PPRE1_0)
+#endif
+
+#if CONFIG_CLOCK_APB2_DIV == 1
+#define CLOCK_APB2_DIV              (0)
+#elif CONFIG_CLOCK_APB2_DIV == 2
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_2)
+#elif CONFIG_CLOCK_APB2_DIV == 4
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_2 | RCC_CFGR_PPRE2_0)
+#elif CONFIG_CLOCK_APB2_DIV == 8
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_2 | RCC_CFGR_PPRE2_1)
+#elif CONFIG_CLOCK_APB2_DIV == 16
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_2 | RCC_CFGR_PPRE2_1 | RCC_CFGR_PPRE2_0)
+#endif
+#else /* CPU_FAM_STM32L4 */
+#define CLOCK_AHB_DIV               (RCC_CFGR_HPRE_DIV1)
+
+#if CONFIG_CLOCK_APB1_DIV == 1
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_DIV1)
+#elif CONFIG_CLOCK_APB1_DIV == 2
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_DIV1)
+#elif CONFIG_CLOCK_APB1_DIV == 4
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_DIV4)
+#elif CONFIG_CLOCK_APB1_DIV == 8
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_DIV8)
+#elif CONFIG_CLOCK_APB1_DIV == 16
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_DIV16)
+#endif
+
+#if CONFIG_CLOCK_APB2_DIV == 1
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_DIV1)
+#elif CONFIG_CLOCK_APB2_DIV == 2
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_DIV1)
+#elif CONFIG_CLOCK_APB2_DIV == 4
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_DIV4)
+#elif CONFIG_CLOCK_APB2_DIV == 8
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_DIV8)
+#elif CONFIG_CLOCK_APB2_DIV == 16
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_DIV16)
+#endif
+#endif /* CPU_FAM_STM32WB */
 
 /**
  * @name    Deduct the needed flash wait states from the core clock frequency
@@ -124,9 +195,9 @@ void stmclk_init_sysclk(void)
     stmclk_enable_hsi();
 
     /* use HSI as system clock while we do any further configuration and
-     * configure the AHB and APB clock dividers as configure by the board */
-    RCC->CFGR = (RCC_CFGR_SW_HSI | CLOCK_AHB_DIV |
-                 CLOCK_APB1_DIV | CLOCK_APB2_DIV);
+     * configure the AHB and APB clock dividers as configured by the board */
+    RCC->CFGR = (RCC_CFGR_SW_HSI | CLOCK_AHB_DIV | CLOCK_APB1_DIV | CLOCK_APB2_DIV);
+
 #if defined(CPU_FAM_STM32WB)
     /* Use HSE/2 for radios systems */
     RCC->EXTCFGR = (RCC_EXTCFGR_RFCSS | CLOCK_EXTAHB_DIV);
@@ -151,50 +222,80 @@ void stmclk_init_sysclk(void)
              (instead of MSIRANGE in the RCC_CR) */
     RCC->CR = (RCC_CR_HSION);
 
-#if (CLOCK_HSE)
-    /* if configured, we need to enable the HSE clock now */
-    RCC->CR |= (RCC_CR_HSEON);
-    while (!(RCC->CR & RCC_CR_HSERDY)) {}
-#endif
+    if (CONFIG_USE_CLOCK_HSE) {
+        RCC->CR |= (RCC_CR_HSEON);
+        while (!(RCC->CR & RCC_CR_HSERDY)) {}
 
-#if ((CLOCK_HSE == 0) || CLOCK_MSI_ENABLE)
-    /* reset clock to MSI with 48MHz, disables all other clocks */
+        /* Select HSE as system clock and configure the different prescalers */
+        RCC->CFGR &= ~RCC_CFGR_SW;
+        RCC->CFGR |= RCC_CFGR_SW_HSE;
+    }
+    else if (CONFIG_USE_CLOCK_MSI) {
 #if defined(CPU_FAM_STM32WB)
-    RCC->CR |= (RCC_CR_MSIRANGE_11 | RCC_CR_MSION);
+        RCC->CR |= (CLOCK_MSIRANGE | RCC_CR_MSION);
 #else
-    RCC->CR |= (RCC_CR_MSIRANGE_11 | RCC_CR_MSION | RCC_CR_MSIRGSEL);
+        RCC->CR |= (CLOCK_MSIRANGE | RCC_CR_MSION | RCC_CR_MSIRGSEL);
 #endif
-    while (!(RCC->CR & RCC_CR_MSIRDY)) {}
-    /* select the MSI clock for the 48MHz clock tree (USB, RNG) */
-    RCC->CCIPR = (RCC_CCIPR_CLK48SEL_0 | RCC_CCIPR_CLK48SEL_1);
-#if (CLOCK_MSI_LSE_PLL && CLOCK_LSE)
-    /* configure the low speed clock domain */
-    stmclk_enable_lfclk();
-    /* now we can enable the MSI PLL mode to enhance accuracy of the MSI*/
-    RCC->CR |= RCC_CR_MSIPLLEN;
-    while (!(RCC->CR & RCC_CR_MSIRDY)) {}
-#endif /* (CLOCK_MSI_LSE_PLL && CLOCK_LSE) */
-#endif /* ((CLOCK_HSE == 0) || CLOCK_MSI_ENABLE) */
+        while (!(RCC->CR & RCC_CR_MSIRDY)) {}
 
-    /* now we can safely configure and start the PLL */
-    RCC->PLLCFGR = (PLL_SRC | PLL_M | PLL_N | PLL_R | RCC_PLLCFGR_PLLREN);
-    RCC->CR |= (RCC_CR_PLLON);
-    while (!(RCC->CR & RCC_CR_PLLRDY)) {}
+        if (CONFIG_CLOCK_MSI == MHZ(48)) {
+            /* select the MSI clock for the 48MHz clock tree (USB, RNG) */
+            RCC->CCIPR = (RCC_CCIPR_CLK48SEL_0 | RCC_CCIPR_CLK48SEL_1);
+        }
+        /* Select MSI as system clock and configure the different prescalers */
+        RCC->CFGR = (RCC_CFGR_SW_MSI | CLOCK_AHB_DIV | CLOCK_APB1_DIV | CLOCK_APB2_DIV);
+    }
+    else if (CONFIG_USE_CLOCK_PLL) {
+        if (CONFIG_BOARD_HAS_HSE && CONFIG_CLOCK_PLL_SRC_HSE) {
+            /* if configured, we need to enable the HSE clock now */
+            RCC->CR |= (RCC_CR_HSEON);
+            while (!(RCC->CR & RCC_CR_HSERDY)) {}
+        }
 
-    /* now that the PLL is running, we use it as system clock */
-    RCC->CFGR |= RCC_CFGR_SW_PLL;
-    while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
+        if (CONFIG_CLOCK_PLL_SRC_MSI) {
+            /* reset clock to MSI with 48MHz, disables all other clocks */
+#if defined(CPU_FAM_STM32WB)
+            RCC->CR |= (CLOCK_MSIRANGE | RCC_CR_MSION);
+#else
+            RCC->CR |= (CLOCK_MSIRANGE | RCC_CR_MSION | RCC_CR_MSIRGSEL);
+#endif
+            while (!(RCC->CR & RCC_CR_MSIRDY)) {}
+
+            if (CONFIG_BOARD_HAS_LSE) {
+                /* configure the low speed clock domain */
+                stmclk_enable_lfclk();
+                /* now we can enable the MSI PLL mode to enhance accuracy of the MSI */
+                RCC->CR |= RCC_CR_MSIPLLEN;
+                while (!(RCC->CR & RCC_CR_MSIRDY)) {}
+            }
+
+            if (CONFIG_CLOCK_MSI == MHZ(48)) {
+                /* select the MSI clock for the 48MHz clock tree (USB, RNG) */
+                RCC->CCIPR = (RCC_CCIPR_CLK48SEL_0 | RCC_CCIPR_CLK48SEL_1);
+            }
+        }
+
+        /* now we can safely configure and start the PLL */
+        RCC->PLLCFGR = (PLL_SRC | PLL_M | PLL_N | PLL_R | RCC_PLLCFGR_PLLREN);
+        RCC->CR |= (RCC_CR_PLLON);
+        while (!(RCC->CR & RCC_CR_PLLRDY)) {}
+
+        /* now that the PLL is running, we use it as system clock */
+        RCC->CFGR |= RCC_CFGR_SW_PLL;
+        while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
+    }
 
     stmclk_disable_hsi();
     irq_restore(is);
 
-#ifdef MODULE_PERIPH_RTT
-    /* Ensure LPTIM1 clock source (LSI or LSE) is correctly reset when initializing
-       the clock, this is particularly useful after waking up from deep sleep */
-#if CLOCK_LSE
-    RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0 | RCC_CCIPR_LPTIM1SEL_1;
-#else
-    RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0;
-#endif /* CLOCK_LSE */
-#endif /* MODULE_PERIPH_RTT */
+    if (IS_USED(MODULE_PERIPH_RTT)) {
+        /* Ensure LPTIM1 clock source (LSI or LSE) is correctly reset when initializing
+           the clock, this is particularly useful after waking up from deep sleep */
+        if (CONFIG_BOARD_HAS_LSE) {
+            RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0 | RCC_CCIPR_LPTIM1SEL_1;
+        }
+        else {
+            RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0;
+        }
+    }
 }

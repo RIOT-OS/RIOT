@@ -12,14 +12,14 @@
  * @{
  *
  * @file
- * @brief       Configure STM32L4 clock using 80MHz core clock and LSE (32.768kHz)
+ * @brief       Default STM32L4 clock configuration
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef L4_CFG_CLOCK_80_1_H
-#define L4_CFG_CLOCK_80_1_H
+#ifndef L4_CFG_CLOCK_DEFAULT_H
+#define L4_CFG_CLOCK_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -31,55 +31,153 @@ extern "C" {
  * @name    Clock system configuration
  * @{
  */
-/* 0: no external high speed crystal available
- * else: actual crystal frequency [in Hz] */
-#define CLOCK_HSE           (0)
+#ifndef CONFIG_USE_CLOCK_PLL
+#if IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || IS_ACTIVE(CONFIG_USE_CLOCK_HSI) || \
+    IS_ACTIVE(CONFIG_USE_CLOCK_MSI)
+#define CONFIG_USE_CLOCK_PLL            (0)
+#else
+#define CONFIG_USE_CLOCK_PLL            (1)     /* Use PLL by default */
+#endif
+#endif /* CONFIG_USE_CLOCK_PLL */
 
-/* 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz)
- */
-#define CLOCK_LSE           (1)
+#ifndef CONFIG_USE_CLOCK_MSI
+#define CONFIG_USE_CLOCK_MSI            (0)
+#endif /* CONFIG_USE_CLOCK_MSI */
 
-/* 0: enable MSI only if HSE isn't available
- * 1: always enable MSI (e.g. if USB or RNG is used)*/
-#define CLOCK_MSI_ENABLE    (1)
+#ifndef CONFIG_USE_CLOCK_HSE
+#define CONFIG_USE_CLOCK_HSE            (0)
+#endif /* CONFIG_USE_CLOCK_HSE */
 
-/* 0: disable Hardware auto calibration with LSE
- * 1: enable Hardware auto calibration with LSE (PLL-mode)
- * LSE is mandatory for MSI/LSE-trimming to work */
-#define CLOCK_MSI_LSE_PLL   (1)
+#ifndef CONFIG_USE_CLOCK_HSI
+#define CONFIG_USE_CLOCK_HSI            (0)
+#endif /* CONFIG_USE_CLOCK_HSI */
 
-/* give the target core clock (HCLK) frequency [in Hz], maximum: 80MHz */
-#define CLOCK_CORECLOCK     (80000000U)
-/* PLL configuration: make sure your values are legit!
- *
- * compute by: CORECLOCK = (((PLL_IN / M) * N) / R)
- * with:
- * PLL_IN:  input clock, HSE or MSI @ 48MHz
- * M:       pre-divider,  allowed range: [1:8]
- * N:       multiplier,   allowed range: [8:86]
- * R:       post-divider, allowed range: [2,4,6,8]
- *
- * Also the following constraints need to be met:
- * (PLL_IN / M)     -> [4MHz:16MHz]
- * (PLL_IN / M) * N -> [64MHz:344MHz]
- * CORECLOCK        -> 80MHz MAX!
- */
-#define CLOCK_PLL_M         (6)
-#define CLOCK_PLL_N         (20)
-#define CLOCK_PLL_R         (2)
-/* peripheral clock setup */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
-/** @} */
+#if CONFIG_USE_CLOCK_PLL && \
+    (CONFIG_USE_CLOCK_MSI || CONFIG_USE_CLOCK_HSE || CONFIG_USE_CLOCK_HSI)
+#error "Cannot use PLL as clock source with other clock configurations"
+#endif
+
+#if CONFIG_USE_CLOCK_MSI && \
+    (CONFIG_USE_CLOCK_PLL || CONFIG_USE_CLOCK_HSI || CONFIG_USE_CLOCK_HSE)
+#error "Cannot use MSI as clock source with other clock configurations"
+#endif
+
+#if CONFIG_USE_CLOCK_HSE && \
+    (CONFIG_USE_CLOCK_PLL || CONFIG_USE_CLOCK_MSI || CONFIG_USE_CLOCK_HSI)
+#error "Cannot use HSE as clock source with other clock configurations"
+#endif
+
+#if CONFIG_USE_CLOCK_HSI && \
+    (CONFIG_USE_CLOCK_PLL || CONFIG_USE_CLOCK_MSI || CONFIG_USE_CLOCK_HSE)
+#error "Cannot use HSI as clock source with other clock configurations"
+#endif
+
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE            (0)
+#endif
+#ifndef CLOCK_HSE
+#define CLOCK_HSE                       MHZ(8)
+#endif
+#if CONFIG_BOARD_HAS_HSE && (CLOCK_HSE < MHZ(4) || CLOCK_HSE > MHZ(48))
+#error "HSE clock frequency must be between 4MHz and 48MHz"
+#endif
+
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE            (0)
+#endif
+#if CONFIG_BOARD_HAS_LSE
+#define CLOCK_LSE                       (1)
+#else
+#define CLOCK_LSE                       (0)
+#endif
+
+#define CLOCK_HSI                       MHZ(16)
+
+#ifndef CONFIG_CLOCK_MSI
+#define CONFIG_CLOCK_MSI                MHZ(48)
+#endif
+
+/* The following parameters configure a 80MHz system clock with PLL as input clock */
+#ifndef CONFIG_CLOCK_PLL_SRC_MSI
+#if IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) || IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSI) || \
+    CONFIG_BOARD_HAS_HSE
+#define CONFIG_CLOCK_PLL_SRC_MSI        (0)
+#else
+#define CONFIG_CLOCK_PLL_SRC_MSI        (1)     /* Use MSI an input clock by default */
+#endif
+#endif /* CONFIG_CLOCK_PLL_SRC_MSI */
+#ifndef CONFIG_CLOCK_PLL_SRC_HSE
+#if CONFIG_BOARD_HAS_HSE
+#define CONFIG_CLOCK_PLL_SRC_HSE        (1)
+#else
+#define CONFIG_CLOCK_PLL_SRC_HSE        (0)
+#endif
+#endif
+#ifndef CONFIG_CLOCK_PLL_SRC_HSI
+#define CONFIG_CLOCK_PLL_SRC_HSI        (0)
+#endif
+#ifndef CONFIG_CLOCK_PLL_M
+#define CONFIG_CLOCK_PLL_M              (6)
+#endif
+#ifndef CONFIG_CLOCK_PLL_N
+#define CONFIG_CLOCK_PLL_N              (20)
+#endif
+#ifndef CONFIG_CLOCK_PLL_R
+#define CONFIG_CLOCK_PLL_R              (2)
+#endif
+
+#if CONFIG_USE_CLOCK_HSI
+#define CLOCK_CORECLOCK                 (CLOCK_HSI)
+
+#elif CONFIG_USE_CLOCK_HSE
+#if CONFIG_BOARD_HAS_HSE == 0
+#error "The board doesn't provide an HSE oscillator"
+#endif
+#define CLOCK_CORECLOCK                 (CLOCK_HSE)
+
+#elif CONFIG_USE_CLOCK_MSI
+#define CLOCK_CORECLOCK                 (CONFIG_CLOCK_MSI)
+
+#elif CONFIG_USE_CLOCK_PLL
+#if CONFIG_CLOCK_PLL_SRC_MSI
+#define CLOCK_PLL_SRC                   (CONFIG_CLOCK_MSI)
+#elif CONFIG_CLOCK_PLL_SRC_HSE
+#define CLOCK_PLL_SRC                   (CLOCK_HSE)
+#else /* CONFIG_CLOCK_PLL_SRC_ */
+#define CLOCK_PLL_SRC                   (CLOCK_HSI)
+#endif
+#define CLOCK_CORECLOCK                 \
+        ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_M) * CONFIG_CLOCK_PLL_N) / CONFIG_CLOCK_PLL_R
+#ifndef CLOCK_CORECLOCK_MAX
+#define CLOCK_CORECLOCK_MAX             MHZ(80)
+#endif
+#if CLOCK_CORECLOCK > CLOCK_CORECLOCK_MAX
+#if CLOCK_CORECLOCK_MAX == MHZ(64)
+#error "SYSCLK cannot exceed 64MHz"
+#elif CLOCK_CORECLOCK_MAX == MHZ(80)
+#error "SYSCLK cannot exceed 80MHz"
+#elif CLOCK_CORECLOCK_MAX == MHZ(120)
+#error "SYSCLK cannot exceed 120MHz"
+#else
+#error "invalid SYSCLK"
+#endif
+#endif /* CLOCK_CORECLOCK > CLOCK_CORECLOCK_MAX */
+#endif /* CONFIG_USE_CLOCK_PLL */
+
+#define CLOCK_AHB                       CLOCK_CORECLOCK /* max: 80MHz */
+
+#ifndef CONFIG_CLOCK_APB1_DIV
+#define CONFIG_CLOCK_APB1_DIV           (4)
+#endif
+#define CLOCK_APB1                      (CLOCK_CORECLOCK / CONFIG_CLOCK_APB1_DIV)   /* max: 80MHz */
+#ifndef CONFIG_CLOCK_APB2_DIV
+#define CONFIG_CLOCK_APB2_DIV           (2)
+#endif
+#define CLOCK_APB2                      (CLOCK_CORECLOCK / CONFIG_CLOCK_APB2_DIV)   /* max: 80MHz */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* L4_CFG_CLOCK_80_1_H */
+#endif /* L4_CFG_CLOCK_DEFAULT_H */
 /** @} */
