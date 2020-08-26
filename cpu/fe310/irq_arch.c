@@ -218,8 +218,7 @@ static void __attribute((aligned(4))) __attribute__((interrupt)) trap_entry(void
     "csrr s2, mepc                                      \n"
     /* Save return PC in stack frame */
     "sw s2, "XTSTR(pc_OFFSET)"(sp)                      \n"
-    /* Skips the stack pointer save if no active thread */
-    "beqz s1, null_thread                               \n"
+
     /* Save stack pointer of current thread */
     "sw sp, "XTSTR(SP_OFFSET_IN_THREAD)"(s1)            \n"
 
