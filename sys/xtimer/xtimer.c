@@ -116,6 +116,18 @@ static void _callback_msg(void* arg)
     msg_send_int(msg, msg->sender_pid);
 }
 
+static void _callback_timeout_msg(void* arg)
+{
+    msg_t *msg = (msg_t*)arg;
+    thread_t* t = (thread_t*) sched_threads[msg->sender_pid];
+
+    /* only send the message if the thread is still waiting to receive one */
+    if (t->status == STATUS_RECEIVE_BLOCKED)
+    {
+        msg_send_int(msg, msg->sender_pid);
+    }
+}
+
 static inline void _setup_msg(xtimer_t *timer, msg_t *msg, kernel_pid_t target_pid)
 {
     timer->callback = _callback_msg;
@@ -137,17 +149,6 @@ void _xtimer_set_msg64(xtimer_t *timer, uint64_t offset, msg_t *msg, kernel_pid_
     _xtimer_set64(timer, offset, offset >> 32);
 }
 
-/* Prepares the message to trigger the timeout.
- * Additionally, the xtimer_t struct gets initialized.
- */
-static void _setup_timer_msg(msg_t *m, xtimer_t *t)
-{
-    m->type = MSG_XTIMER;
-    m->content.ptr = m;
-
-    t->offset = t->long_offset = 0;
-}
-
 /* Waits for incoming message or timeout. */
 static int _msg_wait(msg_t *m, msg_t *tmsg, xtimer_t *t)
 {
@@ -163,20 +164,20 @@ static int _msg_wait(msg_t *m, msg_t *tmsg, xtimer_t *t)
 }
 
 int _xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout_ticks) {
-    msg_t tmsg;
-    xtimer_t t;
-    _setup_timer_msg(&tmsg, &t);
-    _xtimer_set_msg64(&t, timeout_ticks, &tmsg, sched_active_pid);
+    msg_t tmsg = { .sender_pid  = sched_active_pid,
+                   .type        = MSG_XTIMER,
+                   .content.ptr = &tmsg };
+
+    xtimer_t t = { .callback = _callback_timeout_msg,
+                   .arg      = &tmsg };
+
+    _xtimer_set64(&t, timeout_ticks, timeout_ticks >> 32);
     return _msg_wait(m, &tmsg, &t);
 }
 
 int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout_ticks)
 {
-    msg_t tmsg;
-    xtimer_t t;
-    _setup_timer_msg(&tmsg, &t);
-    _xtimer_set_msg(&t, timeout_ticks, &tmsg, sched_active_pid);
-    return _msg_wait(msg, &tmsg, &t);
+    return _xtimer_msg_receive_timeout64(msg, timeout_ticks);
 }
 #endif /* MODULE_CORE_MSG */
 
