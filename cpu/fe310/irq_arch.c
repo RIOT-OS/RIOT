@@ -21,7 +21,9 @@
 #include <assert.h>
 #include <inttypes.h>
 
+#include "macros/xtstr.h"
 #include "cpu.h"
+#include "context_frame.h"
 #include "irq.h"
 #include "irq_arch.h"
 #include "panic.h"
@@ -150,4 +152,111 @@ void handle_trap(unsigned int mcause, unsigned int mepc, unsigned int mtval)
 
     /* ISR done - no more changes to thread states */
     fe310_in_isr = 0;
+}
+
+void __attribute__((naked)) trap_entry(void) {
+    __asm__ volatile (
+    /* Save registers to stack */
+    "addi sp, sp, -"XTSTR(CONTEXT_FRAME_SIZE)"         \n"
+
+    "sw s0,  "XTSTR(s0_OFFSET)"(sp)                    \n"
+    "sw s1,  "XTSTR(s1_OFFSET)"(sp)                    \n"
+    "sw s2,  "XTSTR(s2_OFFSET)"(sp)                    \n"
+    "sw s3,  "XTSTR(s3_OFFSET)"(sp)                    \n"
+    "sw s4,  "XTSTR(s4_OFFSET)"(sp)                    \n"
+    "sw s5,  "XTSTR(s5_OFFSET)"(sp)                    \n"
+    "sw s6,  "XTSTR(s6_OFFSET)"(sp)                    \n"
+    "sw s7,  "XTSTR(s7_OFFSET)"(sp)                    \n"
+    "sw s8,  "XTSTR(s8_OFFSET)"(sp)                    \n"
+    "sw s9,  "XTSTR(s9_OFFSET)"(sp)                    \n"
+    "sw s10, "XTSTR(s10_OFFSET)"(sp)                   \n"
+    "sw s11, "XTSTR(s11_OFFSET)"(sp)                   \n"
+    "sw ra,  "XTSTR(ra_OFFSET)"(sp)                    \n"
+    "sw t0,  "XTSTR(t0_OFFSET)"(sp)                    \n"
+    "sw t1,  "XTSTR(t1_OFFSET)"(sp)                    \n"
+    "sw t2,  "XTSTR(t2_OFFSET)"(sp)                    \n"
+    "sw t3,  "XTSTR(t3_OFFSET)"(sp)                    \n"
+    "sw t4,  "XTSTR(t4_OFFSET)"(sp)                    \n"
+    "sw t5,  "XTSTR(t5_OFFSET)"(sp)                    \n"
+    "sw t6,  "XTSTR(t6_OFFSET)"(sp)                    \n"
+    "sw a0,  "XTSTR(a0_OFFSET)"(sp)                    \n"
+    "sw a1,  "XTSTR(a1_OFFSET)"(sp)                    \n"
+    "sw a2,  "XTSTR(a2_OFFSET)"(sp)                    \n"
+    "sw a3,  "XTSTR(a3_OFFSET)"(sp)                    \n"
+    "sw a4,  "XTSTR(a4_OFFSET)"(sp)                    \n"
+    "sw a5,  "XTSTR(a5_OFFSET)"(sp)                    \n"
+    "sw a6,  "XTSTR(a6_OFFSET)"(sp)                    \n"
+    "sw a7,  "XTSTR(a7_OFFSET)"(sp)                    \n"
+
+
+    /* Get the interrupt cause, PC, and address */
+    "csrr a0, mcause                            \n"
+    "csrr a1, mepc                              \n"
+    "csrr a2, mtval                             \n"
+
+    /* Save return PC in stack frame */
+    "sw a1, "XTSTR(pc_OFFSET)"(sp)                     \n"
+
+    /*  Get the active thread (could be NULL) */
+    "lw tp, sched_active_thread                 \n"
+    "beqz tp, null_thread                       \n"
+
+    /* Save stack pointer of current thread */
+    "sw sp, "XTSTR(SP_OFFSET_IN_THREAD)"(tp)           \n"
+
+    "null_thread:                               \n"
+    /* Switch to ISR stack.  Interrupts are not nested so use fixed
+     *  starting address and just abandon stack when finished. */
+    "la  sp, _sp                                \n"
+
+    /*  Call handle_trap with MCAUSE and MEPC register value as args */
+    "call handle_trap                           \n"
+
+    /*  Get the active thread (guaranteed to be non NULL) */
+    "lw tp, sched_active_thread                 \n"
+
+    /*  Load the thread SP of scheduled thread */
+    "lw sp, "XTSTR(SP_OFFSET_IN_THREAD)"(tp)           \n"
+
+    /*  Set return PC */
+    "lw a1, "XTSTR(pc_OFFSET)"(sp)                     \n"
+    "csrw mepc, a1                              \n"
+
+    /* Restore registers from stack */
+    "lw s0,  "XTSTR(s0_OFFSET)"(sp)                    \n"
+    "lw s1,  "XTSTR(s1_OFFSET)"(sp)                    \n"
+    "lw s2,  "XTSTR(s2_OFFSET)"(sp)                    \n"
+    "lw s3,  "XTSTR(s3_OFFSET)"(sp)                    \n"
+    "lw s4,  "XTSTR(s4_OFFSET)"(sp)                    \n"
+    "lw s5,  "XTSTR(s5_OFFSET)"(sp)                    \n"
+    "lw s6,  "XTSTR(s6_OFFSET)"(sp)                    \n"
+    "lw s7,  "XTSTR(s7_OFFSET)"(sp)                    \n"
+    "lw s8,  "XTSTR(s8_OFFSET)"(sp)                    \n"
+    "lw s9,  "XTSTR(s9_OFFSET)"(sp)                    \n"
+    "lw s10, "XTSTR(s10_OFFSET)"(sp)                   \n"
+    "lw s11, "XTSTR(s11_OFFSET)"(sp)                   \n"
+    "lw ra,  "XTSTR(ra_OFFSET)"(sp)                    \n"
+    "lw t0,  "XTSTR(t0_OFFSET)"(sp)                    \n"
+    "lw t1,  "XTSTR(t1_OFFSET)"(sp)                    \n"
+    "lw t2,  "XTSTR(t2_OFFSET)"(sp)                    \n"
+    "lw t3,  "XTSTR(t3_OFFSET)"(sp)                    \n"
+    "lw t4,  "XTSTR(t4_OFFSET)"(sp)                    \n"
+    "lw t5,  "XTSTR(t5_OFFSET)"(sp)                    \n"
+    "lw t6,  "XTSTR(t6_OFFSET)"(sp)                    \n"
+    "lw a0,  "XTSTR(a0_OFFSET)"(sp)                    \n"
+    "lw a1,  "XTSTR(a1_OFFSET)"(sp)                    \n"
+    "lw a2,  "XTSTR(a2_OFFSET)"(sp)                    \n"
+    "lw a3,  "XTSTR(a3_OFFSET)"(sp)                    \n"
+    "lw a4,  "XTSTR(a4_OFFSET)"(sp)                    \n"
+    "lw a5,  "XTSTR(a5_OFFSET)"(sp)                    \n"
+    "lw a6,  "XTSTR(a6_OFFSET)"(sp)                    \n"
+    "lw a7,  "XTSTR(a7_OFFSET)"(sp)                    \n"
+
+    "addi sp, sp, "XTSTR(CONTEXT_FRAME_SIZE)"          \n"
+    "mret                                       \n"
+
+    :
+    :
+    :
+    );
 }
