@@ -15,7 +15,6 @@ ifneq (,$(filter openwsn_openstack,$(USEMODULE)))
   USEMODULE += openwsn_scheduler
 
   DEFAULT_MODULE += auto_init_openwsn
-
 endif
 
 ifneq (,$(filter openwsn_scheduler,$(USEMODULE)))

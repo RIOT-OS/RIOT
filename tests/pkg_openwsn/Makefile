@@ -76,7 +76,6 @@ endif
 # export OPENWSN_LOG_LEVEL ?= LOG_ERROR
 
 ## Test application Modules
-USEMODULE += ipv6_addr
 USEMODULE += ps
 USEMODULE += od_string
 USEMODULE += shell
