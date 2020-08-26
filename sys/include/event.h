@@ -102,6 +102,7 @@
 #include "assert.h"
 #include "clist.h"
 #include "irq.h"
+#include "thread.h"
 #include "thread_flags.h"
 
 #ifdef __cplusplus
@@ -118,7 +119,7 @@ extern "C" {
 /**
  * @brief   event_queue_t static initializer
  */
-#define EVENT_QUEUE_INIT    { .waiter = (thread_t *)sched_active_thread }
+#define EVENT_QUEUE_INIT    { .waiter = thread_get_active() }
 
 /**
  * @brief   static initializer for detached event queues
@@ -164,7 +165,7 @@ static inline void event_queues_init(event_queue_t *queues,
                                           size_t n_queues)
 {
     assert(queues && n_queues);
-    thread_t *me = (thread_t *)sched_active_thread;
+    thread_t *me = thread_get_active();
     for (size_t i = 0; i < n_queues; i++) {
         memset(&queues[i], '\0', sizeof(queues[0]));
         queues[i].waiter = me;
@@ -222,7 +223,7 @@ static inline void event_queue_init_detached(event_queue_t *queue)
 static inline void event_queues_claim(event_queue_t *queues, size_t n_queues)
 {
     assert(queues);
-    thread_t *me = (thread_t *)sched_active_thread;
+    thread_t *me = thread_get_active();
     for (size_t i = 0; i < n_queues; i++) {
         assert(queues[i].waiter == NULL);
         queues[i].waiter = me;

@@ -166,7 +166,7 @@ int _xtimer_msg_receive_timeout64(msg_t *m, uint64_t timeout_ticks) {
     msg_t tmsg;
     xtimer_t t;
     _setup_timer_msg(&tmsg, &t);
-    _xtimer_set_msg64(&t, timeout_ticks, &tmsg, sched_active_pid);
+    _xtimer_set_msg64(&t, timeout_ticks, &tmsg, thread_getpid());
     return _msg_wait(m, &tmsg, &t);
 }
 
@@ -175,7 +175,7 @@ int _xtimer_msg_receive_timeout(msg_t *msg, uint32_t timeout_ticks)
     msg_t tmsg;
     xtimer_t t;
     _setup_timer_msg(&tmsg, &t);
-    _xtimer_set_msg(&t, timeout_ticks, &tmsg, sched_active_pid);
+    _xtimer_set_msg(&t, timeout_ticks, &tmsg, thread_getpid());
     return _msg_wait(msg, &tmsg, &t);
 }
 #endif /* MODULE_CORE_MSG */
@@ -247,7 +247,7 @@ static void _mutex_timeout(void *arg)
      */
     unsigned int irqstate = irq_disable();
 
-    mutex_thread_t *mt = (mutex_thread_t *)arg;
+    mutex_thread_t *mt = arg;
     mt->blocking = 0;
     _mutex_remove_thread_from_waiting_queue(mt->mutex, mt->thread, &mt->dequeued);
     irq_restore(irqstate);
@@ -256,11 +256,13 @@ static void _mutex_timeout(void *arg)
 int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
 {
     xtimer_t t;
-    mutex_thread_t mt = { mutex, (thread_t *)sched_active_thread, .dequeued=0, .blocking=1 };
+    mutex_thread_t mt = {
+        mutex, thread_get_active(), .dequeued = 0, .blocking = 1
+    };
 
     if (timeout != 0) {
         t.callback = _mutex_timeout;
-        t.arg = (void *)((mutex_thread_t *)&mt);
+        t.arg = &mt;
         xtimer_set64(&t, timeout);
     }
     int ret = _mutex_lock(mutex, &mt.blocking);
@@ -294,7 +296,7 @@ static void _set_timeout_flag_callback(void* arg)
 static void _set_timeout_flag_prepare(xtimer_t *t)
 {
     t->callback = _set_timeout_flag_callback;
-    t->arg = (thread_t *)sched_active_thread;
+    t->arg = thread_get_active();
     thread_flags_clear(THREAD_FLAG_TIMEOUT);
 }
 

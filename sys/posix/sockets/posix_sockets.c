@@ -1197,7 +1197,7 @@ int posix_socket_select(int fd)
                 return res;
             }
         }
-        socket->selecting_thread = (thread_t *)sched_active_thread;
+        socket->selecting_thread = thread_get_active();
         return 0;
     }
 #else
