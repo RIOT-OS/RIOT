@@ -44,7 +44,7 @@ static external_isr_ptr_t _ext_isrs[PLIC_NUM_INTERRUPTS];
 /**
  * @brief   ISR trap vector
  */
-void trap_entry(void);
+static void trap_entry(void);
 
 /**
  * @brief   Timer ISR
@@ -97,7 +97,7 @@ void external_isr(void)
 /**
  * @brief Global trap and interrupt handler
  */
-void handle_trap(unsigned int mcause, unsigned int mepc, unsigned int mtval)
+static void handle_trap(unsigned int mcause, unsigned int mepc, unsigned int mtval)
 {
 #ifndef DEVELHELP
     (void) mepc;
@@ -154,7 +154,10 @@ void handle_trap(unsigned int mcause, unsigned int mepc, unsigned int mtval)
     fe310_in_isr = 0;
 }
 
-void __attribute__((naked)) trap_entry(void) {
+/* Must be naked to allow for returning with mret
+ * Aligned to 4-byte boundary as per RISC-V spec  */
+static void __attribute((aligned(4))) __attribute__((naked)) trap_entry(void) {
+    unsigned int mepc_val;
     __asm__ volatile (
     /* Save registers to stack */
     "addi sp, sp, -"XTSTR(CONTEXT_FRAME_SIZE)"         \n"
@@ -189,38 +192,42 @@ void __attribute__((naked)) trap_entry(void) {
     "sw a7,  "XTSTR(a7_OFFSET)"(sp)                    \n"
 
 
-    /* Get the interrupt cause, PC, and address */
-    "csrr a0, mcause                            \n"
-    "csrr a1, mepc                              \n"
-    "csrr a2, mtval                             \n"
+    /* Get the interrupt PC */
+    "csrr %[mepc_reg], mepc                            \n"
 
     /* Save return PC in stack frame */
-    "sw a1, "XTSTR(pc_OFFSET)"(sp)                     \n"
+    "sw %[mepc_reg], "XTSTR(pc_OFFSET)"(sp)            \n"
 
     /*  Get the active thread (could be NULL) */
-    "lw tp, sched_active_thread                 \n"
-    "beqz tp, null_thread                       \n"
+    "lw tp, sched_active_thread                        \n"
+    /* Skips the stack pointer save if no active thread */
+    "beqz tp, null_thread                              \n"
 
     /* Save stack pointer of current thread */
     "sw sp, "XTSTR(SP_OFFSET_IN_THREAD)"(tp)           \n"
 
-    "null_thread:                               \n"
+    "null_thread:                                      \n"
     /* Switch to ISR stack.  Interrupts are not nested so use fixed
      *  starting address and just abandon stack when finished. */
-    "la  sp, _sp                                \n"
+    "la  sp, _sp                                       \n"
+    : [mepc_reg] "=r" (mepc_val)
+    :
+    :
+    );
 
-    /*  Call handle_trap with MCAUSE and MEPC register value as args */
-    "call handle_trap                           \n"
+    /* Give the compiler some freedom to inline this */
+    handle_trap(read_csr(mcause), mepc_val, read_csr(mtval));
 
+    __asm__ volatile (
     /*  Get the active thread (guaranteed to be non NULL) */
-    "lw tp, sched_active_thread                 \n"
+    "lw tp, sched_active_thread                        \n"
 
     /*  Load the thread SP of scheduled thread */
     "lw sp, "XTSTR(SP_OFFSET_IN_THREAD)"(tp)           \n"
 
     /*  Set return PC */
     "lw a1, "XTSTR(pc_OFFSET)"(sp)                     \n"
-    "csrw mepc, a1                              \n"
+    "csrw mepc, a1                                     \n"
 
     /* Restore registers from stack */
     "lw s0,  "XTSTR(s0_OFFSET)"(sp)                    \n"
@@ -253,8 +260,7 @@ void __attribute__((naked)) trap_entry(void) {
     "lw a7,  "XTSTR(a7_OFFSET)"(sp)                    \n"
 
     "addi sp, sp, "XTSTR(CONTEXT_FRAME_SIZE)"          \n"
-    "mret                                       \n"
-
+    "mret                                              \n"
     :
     :
     :
