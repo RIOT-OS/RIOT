@@ -416,6 +416,8 @@ NORETURN void cpu_switch_context_exit(void)
  */
 NORETURN void task_exit(void)
 {
+    extern volatile thread_t *sched_active_thread;
+    extern volatile kernel_pid_t sched_active_pid;
     DEBUG("sched_task_exit: ending thread %" PRIkernel_pid "...\n",
           thread_getpid());
 
