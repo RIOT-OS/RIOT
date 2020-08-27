@@ -6,7 +6,6 @@
 
 config CPU_FAM_NRF52
     bool
-    select CPU_CORE_CORTEX_M4F
     select CPU_COMMON_NRF5X
 # The ADC does not depend on any board configuration, so always available
     select HAS_PERIPH_ADC
@@ -17,13 +16,40 @@ config CPU_FAM_NRF52
     select HAS_CPU_NRF52
 
 ## CPU Models
+config CPU_MODEL_NRF52805XXAA
+    bool
+    select CPU_CORE_CORTEX_M4
+    select CPU_FAM_NRF52
+
+config CPU_MODEL_NRF52810XXAA
+    bool
+    select CPU_CORE_CORTEX_M4
+    select CPU_FAM_NRF52
+
+config CPU_MODEL_NRF52811XXAA
+    bool
+    select CPU_CORE_CORTEX_M4
+    select CPU_FAM_NRF52
+
+config CPU_MODEL_NRF52820XXAA
+    bool
+    select CPU_CORE_CORTEX_M4
+    select CPU_FAM_NRF52
+
 config CPU_MODEL_NRF52832XXAA
     bool
     select CPU_FAM_NRF52
+    select CPU_CORE_CORTEX_M4F
     select HAS_BLE_NORDIC_SOFTDEVICE
+
+config CPU_MODEL_NRF52833XXAA
+    bool
+    select CPU_CORE_CORTEX_M4F
+    select CPU_FAM_NRF52
 
 config CPU_MODEL_NRF52840XXAA
     bool
+    select CPU_CORE_CORTEX_M4F
     select CPU_FAM_NRF52
 
 ## CPU common symbols
@@ -31,7 +57,12 @@ config CPU_FAM
     default "nrf52" if CPU_FAM_NRF52
 
 config CPU_MODEL
+    default "nrf52805xxaa" if CPU_MODEL_NRF52805XXAA
+    default "nrf52810xxaa" if CPU_MODEL_NRF52810XXAA
+    default "nrf52811xxaa" if CPU_MODEL_NRF52811XXAA
+    default "nrf52820xxaa" if CPU_MODEL_NRF52820XXAA
     default "nrf52832xxaa" if CPU_MODEL_NRF52832XXAA
+    default "nrf52833xxaa" if CPU_MODEL_NRF52833XXAA
     default "nrf52840xxaa" if CPU_MODEL_NRF52840XXAA
 
 config CPU

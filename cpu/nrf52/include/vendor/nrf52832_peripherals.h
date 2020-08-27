@@ -87,6 +87,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #define RADIO_EASYDMA_MAXCNT_SIZE 8
 
+#define RADIO_TXPOWER_TXPOWER_Max RADIO_TXPOWER_TXPOWER_Pos4dBm
+
 /* Accelerated Address Resolver */
 #define AAR_PRESENT
 #define AAR_COUNT 1

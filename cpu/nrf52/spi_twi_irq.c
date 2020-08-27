@@ -14,30 +14,43 @@
  * @brief       Shared IRQ handling between SPI and TWI peripherals on the nRF52
  *              devices
  *
- * I2C is called TWI (Two Wire Interface) in the datasheets from Nordic
+ *              I2C is called TWI (Two Wire Interface) in the datasheets from Nordic
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  *
  * @}
  */
-
 #include "cpu.h"
 #include "periph_cpu.h"
 
-/* nRF52811 ISR names */
-#if defined(CPU_MODEL_NRF52811XXAA)
-
+#if NRF_SPIM0_BASE != NRF_TWIM0_BASE
 #define ISR_SPIM0   isr_spi0
+
+#if defined(NRF_SPIM1)
 #define ISR_SPIM1   isr_spi1_twi0
+#else
+#define ISR_SPIM1   isr_twi0
+#endif
 
 /* nRF52832 and nRF52840 ISR names */
-#elif (defined(CPU_MODEL_NRF52840XXAA) ||  defined(CPU_MODEL_NRF52832XXAA))
+#else
 
 #define ISR_SPIM0   isr_spi0_twi0
 #define ISR_SPIM1   isr_spi1_twi1
 
-#else
-#error Unknown nrf52 MCU model
+#endif
+
+/**
+ * The vendor file is weird here. nRF52805 is the only other MCU
+ * that has only 1 SPI and separate 1 TWI interface, but define
+ * SPIM_COUNT = 2, which is in line with how it is used here.
+ * nRF52810 has the same set of SPI/TWI peripherals, but defines
+ * SPIM_COUNT = 1 which is more logical.
+ * Just re-define it to work around this inconsistency.
+ */
+#ifdef CPU_MODEL_NRF52810XXAA
+#undef SPIM_COUNT
+#define SPIM_COUNT 2
 #endif
 
 static spi_twi_irq_cb_t _irq[SPIM_COUNT];
@@ -49,9 +62,11 @@ static size_t _spi_dev2num(void *dev)
     if (dev == NRF_SPIM0) {
         return 0;
     }
+#ifdef NRF_SPIM1
     else if (dev == NRF_SPIM1) {
         return 1;
     }
+#endif
 #ifdef NRF_SPIM2
     else if (dev == NRF_SPIM2) {
         return 2;
@@ -70,16 +85,28 @@ static size_t _spi_dev2num(void *dev)
 
 static inline size_t _i2c_dev2num(void *dev)
 {
-    return _spi_dev2num(dev);
+    if (NRF_SPIM0_BASE == NRF_TWIM0_BASE) {
+        return _spi_dev2num(dev);
+    } else {
+        assert(!IS_ACTIVE(NRF_TWIM1_BASE));
+        /* if they are not equal (nrf528105/10/11)
+           TWI0 is mapped to SPI1 */
+        return 1;
+    }
 }
 
 static const IRQn_Type _isr[] = {
-    SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQn,
 
-#ifdef CPU_MODEL_NRF52811XXAA
+#if NRF_SPIM0_BASE == NRF_TWIM0_BASE
+    SPIM0_SPIS0_TWIM0_TWIS0_SPI0_TWI0_IRQn,
+    SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn,
+#else
+    SPIM0_SPIS0_SPI0_IRQn,
+#if defined(NRF_SPIM1)
     TWIM0_TWIS0_TWI0_SPIM1_SPIS1_SPI1_IRQn,
 #else
-    SPIM1_SPIS1_TWIM1_TWIS1_SPI1_TWI1_IRQn,
+    TWIM0_TWIS0_TWI0_IRQn,
+#endif
 #endif
 
 #ifdef NRF_SPIM2
