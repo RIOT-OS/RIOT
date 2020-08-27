@@ -97,9 +97,8 @@ void external_isr(void)
 /**
  * @brief Global trap and interrupt handler
  */
-int handle_trap(unsigned int mcause)
+void handle_trap(uint32_t mcause)
 {
-    int res = 0;
     /*  Tell RIOT to set sched_context_switch_request instead of
      *  calling thread_yield(). */
     fe310_in_isr = 1;
@@ -134,22 +133,15 @@ int handle_trap(unsigned int mcause)
     else {
 #ifdef DEVELHELP
         printf("Unhandled trap:\n");
-        printf("  mcause: 0x%08x\n", mcause);
+        printf("  mcause: 0x%"PRIx32"\n", mcause);
         printf("  mepc:   0x%"PRIx32"\n", read_csr(mepc));
         printf("  mtval:  0x%"PRIx32"\n", read_csr(mtval));
 #endif
         /* Unknown trap */
         core_panic(PANIC_GENERAL_ERROR, "Unhandled trap");
     }
-
-    /* Check if context change was requested */
-    if (sched_context_switch_request) {
-        res = sched_run();
-    }
-
     /* ISR done - no more changes to thread states */
     fe310_in_isr = 0;
-    return res;
 }
 
 /* Marking this as interrupt to ensure an mret at the end, provided by the
@@ -180,23 +172,38 @@ static void __attribute((aligned(4))) __attribute__((interrupt)) trap_entry(void
     "sw s0, "XTSTR(s0_OFFSET)"(sp)                      \n"
     "sw s1, "XTSTR(s1_OFFSET)"(sp)                      \n"
 
-    /*  Get the active thread (could be NULL) */
-    "lw s1, sched_active_thread                         \n"
-
     /* Save the user stack ptr */
     "mv s0, sp                                          \n"
     /* Load exception stack ptr */
     "la sp, _sp                                         \n"
 
-    /* Get the interrupt cause, PC and trap vector */
+    /* Get the interrupt cause */
     "csrr a0, mcause                                    \n"
-    /* Call trap handler, a0 contains the return value */
+
+    /* Call trap handler, a0 contains mcause before, and the return value after
+     * the call */
     "call handle_trap                                   \n"
 
-    /* Move stack pointer back */
+    /* Load the sched_context_switch_request */
+    "lw a0, sched_context_switch_request                \n"
+
+    /* And skip the context switch if not requested */
+    "beqz a0, no_sched                                  \n"
+
+    /*  Get the previous active thread (could be NULL) */
+    "lw s1, sched_active_thread                         \n"
+
+    /* Run the scheduler */
+    "call sched_run                                     \n"
+
+    "no_sched:                                          \n"
+    /* Restore the thread stack pointer and check if a new thread must be
+     * scheduled */
     "mv sp, s0                                          \n"
 
-    /* No context switch required, shortcut to restore */
+    /* No context switch required, shortcut to restore. a0 contains the return
+     * value of sched_run, or the sched_context_switch_request if the sched_run
+     * was skipped */
     "beqz a0, no_switch                                 \n"
 
     /* Skips the rest of the save if no active thread */
@@ -216,12 +223,14 @@ static void __attribute((aligned(4))) __attribute__((interrupt)) trap_entry(void
 
     /* Grab mepc to save it to the stack */
     "csrr s2, mepc                                      \n"
+
     /* Save return PC in stack frame */
     "sw s2, "XTSTR(pc_OFFSET)"(sp)                      \n"
 
     /* Save stack pointer of current thread */
     "sw sp, "XTSTR(SP_OFFSET_IN_THREAD)"(s1)            \n"
 
+    /* Context saving done, from here on the new thread is scheduled */
     "null_thread:                                       \n"
 
     /*  Get the new active thread (guaranteed to be non NULL) */
