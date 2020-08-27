@@ -84,6 +84,11 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
+ * @brief ADC configuration wrapper
+ */
+typedef gpio_t adc_conf_t;
+
+/**
  * @brief   I2C (TWI) configuration options
  */
 typedef struct {
