@@ -9,6 +9,8 @@ ifneq (0, $(LWIP_IPV4))
   USEMODULE += lwip_dhcp_auto
   CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
   LWIP_IPV6 ?= 0
+  # give RIOTCtrl a bit more time to start up terminal for DHCP
+  export RIOT_TERM_START_DELAY = 5
 else
   # use IPv6 as default IP protocol when IPv4 is not explicitly selected
   LWIP_IPV6 ?= 1
@@ -44,7 +46,12 @@ endif
 
 DISABLE_MODULE += test_utils_interactive_sync
 
+DOCKER_ENV_VARS += PORT2
+
 # test fails on murdock and on my machine due to the process exiting directly
 TEST_ON_CI_BLACKLIST += all
 
 include $(RIOTBASE)/Makefile.include
+
+# expose PORT to test target
+test: export PORT:=$(PORT)
