@@ -202,8 +202,7 @@ static void __attribute((aligned(4))) __attribute__((interrupt)) trap_entry(void
     /* Skips the rest of the save if no active thread */
     "beqz s1, null_thread                               \n"
 
-    /* Store s1-s11 */
-    //"sw s1, "XTSTR(s1_OFFSET)"(sp) \n"
+    /* Store s2-s11 */
     "sw s2, "XTSTR(s2_OFFSET)"(sp)                      \n"
     "sw s3, "XTSTR(s3_OFFSET)"(sp)                      \n"
     "sw s4, "XTSTR(s4_OFFSET)"(sp)                      \n"
