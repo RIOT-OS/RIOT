@@ -22,7 +22,7 @@ The RIOT port for ESP32 realizes with module ```esp_eth``` a ```netdev``` driver
 
 If the board has one of the supported PHY layer chips connected to the ESP32, the ```esp_eth``` module should be enabled by default in board's ```Makefile.dep``` when module ```netdev_default``` is used.
 ```
-ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+ifneq (,$(filter netdev_default,$(USEMODULE)))
     USEMODULE += esp_eth
 endif
 ```
