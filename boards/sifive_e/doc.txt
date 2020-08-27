@@ -1,0 +1,48 @@
+/*
+ * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    boards_sifive_e Qemu siFive_e RISC-V board
+ * @ingroup     boards
+ * @brief       Support for the QEmu sifive_e RISC-V board
+ * @author      Koen Zandberg <koen@bergzand.net>
+
+The Qemu sifive_e 'board' is an emulated RISC-V machine supported by Qemu from
+release v2.12.0. Supported is UART stdio and the RISC-V core internal timer.
+
+Binaries for the hifive1 board are mostly compatible. The exception is the
+timer. On sifive_e it runs at 10 MHz.
+
+## Usage
+
+Compile as usual:
+```
+make -C examples/hello-world BOARD=sifive_e
+```
+
+Start and run with Qemu with the `emulate` target:
+
+```
+make -C examples/hello-world BOARD=sifive_e emulate
+```
+
+## Known issues
+
+A Qemu-supplied warning noting that time_lo and time_hi are not implemented
+can appear when using the hardware timer:
+
+```
+qemu-system-riscv32: clint: time_lo write not implemented
+qemu-system-riscv32: clint: time_hi write not implemented
+```
+
+RIOT resets the mtime register when initializing the timer. Qemu however
+doesn't implement writes to this register and throws a warning instead. This
+doesn't negatively impact RIOT as long as the firmware doesn't rely on an
+absolute value returned by `timer_read()`.
+ */
