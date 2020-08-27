@@ -32,6 +32,7 @@ extern "C" {
  *
  * @{
  */
+#define CLOCK_TIMERCLOCK            (RTC_FREQ)
 #define TIMER_NUMOF                 (1)
 /** @} */
 
