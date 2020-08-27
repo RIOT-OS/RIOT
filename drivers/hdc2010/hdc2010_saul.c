@@ -38,7 +38,7 @@ static int read_temp(const void *dev, phydat_t *res)
 
 static int read_hum(const void *dev, phydat_t *res)
 {
-    if (hdc2010_read((hdc2010_t *)dev, NULL, &(res->val[0])) != HDC2010_OK) {
+    if (hdc2010_read((hdc2010_t *)dev, NULL, (uint16_t*)&(res->val[0])) != HDC2010_OK) {
         return -ECANCELED;
     }
     res->val[1] = 0;

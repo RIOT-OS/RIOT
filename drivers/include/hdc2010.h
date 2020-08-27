@@ -183,7 +183,7 @@ int hdc2010_trigger_conversion(const hdc2010_t *dev);
  * @return                  HDC2010_OK on success
  * @return                  HDC2010_BUSERR on I2C communication failures
  */
-int hdc2010_get_results(const hdc2010_t *dev, int16_t *temp, int16_t *hum);
+int hdc2010_get_results(const hdc2010_t *dev, int16_t *temp, uint16_t *hum);
 
 /**
  * @brief   Convenience function for reading temperature and humidity
@@ -198,7 +198,7 @@ int hdc2010_get_results(const hdc2010_t *dev, int16_t *temp, int16_t *hum);
  * @return                  HDC2010_OK on success
  * @return                  HDC2010_BUSERR on I2C communication failures
  */
-int hdc2010_read(hdc2010_t *dev, int16_t *temp, int16_t *hum);
+int hdc2010_read(hdc2010_t *dev, int16_t *temp, uint16_t *hum);
 
 #ifdef __cplusplus
 }

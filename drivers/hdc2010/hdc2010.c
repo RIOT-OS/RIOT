@@ -116,7 +116,7 @@ int hdc2010_trigger_conversion(const hdc2010_t *dev)
     return status;
 }
 
-int hdc2010_get_results(const hdc2010_t *dev, int16_t *temp, int16_t *hum)
+int hdc2010_get_results(const hdc2010_t *dev, int16_t *temp, uint16_t *hum)
 {
     int status = HDC2010_OK;
     assert(dev);
@@ -124,9 +124,9 @@ int hdc2010_get_results(const hdc2010_t *dev, int16_t *temp, int16_t *hum)
     uint16_t buf[2];
     i2c_acquire(dev->p.i2c);
 
-    /* first read the temperature register */
+    /* read the temperature and humidity registers */
     if (i2c_read_regs(dev->p.i2c, dev->p.addr,
-                      HDC2010_TEMPERATURE, buf, 4, 0) < 0) {
+                      HDC2010_TEMPERATURE, buf, sizeof(buf), 0) < 0) {
         status = HDC2010_BUSERR;
     }
     i2c_release(dev->p.i2c);
@@ -137,27 +137,27 @@ int hdc2010_get_results(const hdc2010_t *dev, int16_t *temp, int16_t *hum)
             *temp = (int16_t)((((int32_t)buf[0] * 16500) >> 16) - 4000);
         }
         if (hum) {
-            *hum  = (int16_t)(((int32_t)buf[1] * 10000) >> 16);
+            *hum  = (uint16_t)(((int32_t)buf[1] * 10000) >> 16);
         }
     }
     return status;
 }
 
-int hdc2010_read(hdc2010_t *dev, int16_t *temp, int16_t *hum)
+int hdc2010_read(hdc2010_t *dev, int16_t *temp, uint16_t *hum)
 {
     if (dev->p.amm == HDC2010_TRIGGER) {
         if (hdc2010_trigger_conversion(dev) != HDC2010_OK) {
             DEBUG("[HDC2010] Error while triggering new measurement!\n");
             return HDC2010_BUSERR;
         }
-    }
 
-    if (!IS_USED(MODULE_HDC2010_IRQ) || dev->p.irq_pin == GPIO_UNDEF) {
-        /* Wait for measurement to be ready if irq pin not used */
-        xtimer_usleep(CONFIG_HDC2010_CONVERSION_TIME);
-    } else {
-        /* Try to lock mutex till the interrupt is raised or till timeut happens */
-        xtimer_mutex_lock_timeout(&dev->mutex, CONFIG_HDC2010_CONVERSION_TIME);
+        if (!IS_USED(MODULE_HDC2010_IRQ) || dev->p.irq_pin == GPIO_UNDEF) {
+            /* Wait for measurement to be ready if irq pin not used */
+            xtimer_usleep(CONFIG_HDC2010_CONVERSION_TIME);
+        } else {
+            /* Try to lock mutex till the interrupt is raised or till timeut happens */
+            xtimer_mutex_lock_timeout(&dev->mutex, CONFIG_HDC2010_CONVERSION_TIME);
+        }
     }
 
     return hdc2010_get_results(dev, temp, hum);
@@ -167,10 +167,9 @@ int hdc2010_read(hdc2010_t *dev, int16_t *temp, int16_t *hum)
 static void _hdc2010_irq_callback(void *arg)
 {
     hdc2010_t *dev = (hdc2010_t *)arg;
-    mutex_unlock(&(dev->mutex));
-
-    /* call user defined cb */
-    if (dev->p.user_cb) {
+    if (dev->p.amm == HDC2010_TRIGGER) {
+        mutex_unlock(&(dev->mutex));
+    } else if (dev->p.user_cb) {
         (dev->p.user_cb)(arg);
     }
 }
