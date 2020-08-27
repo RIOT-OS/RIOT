@@ -23,6 +23,7 @@
 #endif
 
 #include "div.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -120,6 +121,24 @@ static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
     /* return (usec * 15625) / 512; */
     uint64_t usec = (uint64_t)ticks * 15625ul;
     return (usec >> 9); /* equivalent to (usec / 512) */
+}
+
+#elif XTIMER_HZ == MHZ(10)
+
+static inline uint32_t _xtimer_ticks_from_usec(uint32_t usec) {
+    return usec * 10;
+}
+
+static inline uint64_t _xtimer_ticks_from_usec64(uint64_t usec) {
+    return usec * 10;
+}
+
+static inline uint32_t _xtimer_usec_from_ticks(uint32_t ticks) {
+    return ticks / 10;
+}
+
+static inline uint64_t _xtimer_usec_from_ticks64(uint64_t ticks) {
+    return ticks / 10;
 }
 
 #else

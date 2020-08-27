@@ -32,6 +32,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "timex.h"
+#include "macros/units.h"
 #ifdef MODULE_CORE_MSG
 #include "msg.h"
 #endif /* MODULE_CORE_MSG */
@@ -605,7 +606,7 @@ static inline int xtimer_msg_receive_timeout64(msg_t *msg, uint64_t timeout);
 #endif
 
 #if !defined(XTIMER_SHIFT) && !defined(MODULE_XTIMER_ON_ZTIMER)
-#if (XTIMER_HZ == 32768ul)
+#if (XTIMER_HZ == 32768ul) || (XTIMER_HZ == MHZ(10))
 /* No shift necessary, the conversion is not a power of two and is handled by
  * functions in tick_conversion.h */
 #define XTIMER_SHIFT (0)
