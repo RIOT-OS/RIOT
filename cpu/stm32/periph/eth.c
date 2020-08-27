@@ -79,6 +79,7 @@ mutex_t stm32_eth_tx_completed = MUTEX_INIT_LOCKED;
 static edma_desc_t rx_desc[ETH_RX_DESCRIPTOR_COUNT];
 static edma_desc_t tx_desc[ETH_TX_DESCRIPTOR_COUNT];
 static edma_desc_t *rx_curr;
+static edma_desc_t *tx_curr;
 
 /* RX Buffers */
 static char rx_buffer[ETH_RX_DESCRIPTOR_COUNT][ETH_RX_BUFFER_SIZE];
@@ -161,9 +162,10 @@ static void _init_buffer(void)
     tx_desc[ETH_RX_DESCRIPTOR_COUNT - 1].desc_next = &tx_desc[0];
 
     rx_curr = &rx_desc[0];
+    tx_curr = &tx_desc[0];
 
     ETH->DMARDLAR = (uintptr_t)rx_curr;
-    ETH->DMATDLAR = (uintptr_t)&tx_desc[0];
+    ETH->DMATDLAR = (uintptr_t)tx_curr;
 }
 
 static int stm32_eth_init(netdev_t *netdev)
@@ -264,8 +266,8 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     assert(iolist_count(iolist) <= ETH_TX_DESCRIPTOR_COUNT);
 
     for (unsigned i = 0; iolist; iolist = iolist->iol_next, i++) {
-        tx_desc[i].control = iolist->iol_len;
-        tx_desc[i].buffer_addr = iolist->iol_base;
+        tx_curr->control = iolist->iol_len;
+        tx_curr->buffer_addr = iolist->iol_base;
         uint32_t status = TX_DESC_STAT_IC | TX_DESC_STAT_TCH | TX_DESC_STAT_CIC
                           | TX_DESC_STAT_OWN;
         if (!i) {
@@ -274,9 +276,10 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
         }
         if (!iolist->iol_next) {
             /* last chunk */
-            status |= TX_DESC_STAT_LS | TX_DESC_STAT_TER;
+            status |= TX_DESC_STAT_LS;
         }
-        tx_desc[i].status = status;
+        tx_curr->status = status;
+        tx_curr = tx_curr->desc_next;
     }
 
     /* start TX */
