@@ -87,7 +87,7 @@ extern "C" {
 #endif
 
 #ifndef CONFIG_BOARD_HAS_LSE
-#define CONFIG_BOARD_HAS_LSE            (1)
+#define CONFIG_BOARD_HAS_LSE            (0)
 #endif
 #if CONFIG_BOARD_HAS_LSE
 #define CLOCK_LSE                       (1)
