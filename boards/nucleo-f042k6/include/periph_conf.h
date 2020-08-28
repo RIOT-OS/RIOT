@@ -154,15 +154,15 @@ static const spi_conf_t spi_config[] = {
  * @name   ADC configuration
  * @{
  */
-#define ADC_CONFIG {            \
-    { GPIO_PIN(PORT_A, 0), 0 }, \
-    { GPIO_PIN(PORT_A, 1), 1 }, \
-    { GPIO_PIN(PORT_A, 3), 3 }, \
-    { GPIO_PIN(PORT_A, 4), 4 }, \
-    { GPIO_PIN(PORT_A, 7), 7 }  \
-}
+static const adc_conf_t adc_config[] = {
+    { GPIO_PIN(PORT_A, 0), 0 },
+    { GPIO_PIN(PORT_A, 1), 1 },
+    { GPIO_PIN(PORT_A, 3), 3 },
+    { GPIO_PIN(PORT_A, 4), 4 },
+    { GPIO_PIN(PORT_A, 7), 7 }
+};
 
-#define ADC_NUMOF          (5)
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

@@ -243,15 +243,16 @@ static const i2c_conf_t i2c_config[] = {
  *
  * @{
  */
-#define ADC_NUMOF          (6U)
-#define ADC_CONFIG {             \
-    {GPIO_PIN(PORT_A, 3), 0, 3}, \
-    {GPIO_PIN(PORT_C, 0), 0, 10}, \
-    {GPIO_PIN(PORT_C, 3), 0, 4}, \
-    {GPIO_PIN(PORT_A, 4), 0, 14}, \
-    {GPIO_PIN(PORT_B, 7), 0, 7}, \
-    {GPIO_PIN(PORT_B, 6), 0, 6}, \
-}
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 3), 0, 3},
+    {GPIO_PIN(PORT_C, 0), 0, 10},
+    {GPIO_PIN(PORT_C, 3), 0, 4},
+    {GPIO_PIN(PORT_A, 4), 0, 14},
+    {GPIO_PIN(PORT_B, 7), 0, 7},
+    {GPIO_PIN(PORT_B, 6), 0, 6},
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

@@ -112,16 +112,16 @@ static const uart_conf_t uart_config[] = {
  * [ pin, channel ]
  * @{
  */
-#define ADC_CONFIG {            \
-    { GPIO_PIN(PORT_C, 0), 10 },\
-    { GPIO_PIN(PORT_C, 1), 11 },\
-    { GPIO_PIN(PORT_C, 2), 12 },\
-    { GPIO_PIN(PORT_C, 3), 13 },\
-    { GPIO_PIN(PORT_C, 4), 14 },\
-    { GPIO_PIN(PORT_C, 5), 15 } \
-}
+static const adc_conf_t adc_config[] = {
+    { GPIO_PIN(PORT_C, 0), 10 },
+    { GPIO_PIN(PORT_C, 1), 11 },
+    { GPIO_PIN(PORT_C, 2), 12 },
+    { GPIO_PIN(PORT_C, 3), 13 },
+    { GPIO_PIN(PORT_C, 4), 14 },
+    { GPIO_PIN(PORT_C, 5), 15 }
+};
 
-#define ADC_NUMOF           (6)
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 /**

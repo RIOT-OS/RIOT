@@ -161,17 +161,17 @@ static const i2c_conf_t i2c_config[] = {
  * @name    ADC configuration
  * @{
  */
-#define ADC_CONFIG {              \
-    { GPIO_PIN(PORT_A, 0), 0 }, /* P14 */ \
-    { GPIO_PIN(PORT_A, 1), 1 }, /* P15 */ \
-    { GPIO_PIN(PORT_A, 3), 3 }, /* P17 */ \
-    /* ADC Temperature channel */ \
-    { GPIO_UNDEF,          16 },  \
-    /* ADC VREF channel */        \
-    { GPIO_UNDEF,          17 },  \
-}
+static const adc_conf_t adc_config[] = {
+    { GPIO_PIN(PORT_A, 0), 0 }, /* P14 */
+    { GPIO_PIN(PORT_A, 1), 1 }, /* P15 */
+    { GPIO_PIN(PORT_A, 3), 3 }, /* P17 */
+    /* ADC Temperature channel */
+    { GPIO_UNDEF,          16 },
+    /* ADC VREF channel */
+    { GPIO_UNDEF,          17 },
+};
 
-#define ADC_NUMOF           (5)
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus
