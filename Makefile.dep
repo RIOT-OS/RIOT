@@ -311,21 +311,27 @@ endif
 
 ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ipv6_hdr
   USEMODULE += gnrc_netif
 endif
 
 ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ipv6_hdr
+  USEMODULE += gnrc_netif_hdr
 endif
 
 ifneq (,$(filter gnrc_icmpv6_error,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ipv6_hdr
+  USEMODULE += gnrc_netif_hdr
 endif
 
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   USEMODULE += inet_csum
-  USEMODULE += gnrc_ipv6
+  USEMODULE += ipv6_hdr
   USEMODULE += gnrc_nettype_icmpv6
+  USEMODULE += gnrc_nettype_ipv6
   USEMODULE += icmpv6
 endif
 
@@ -347,7 +353,7 @@ ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_nettype_ipv6
   USEMODULE += gnrc_nettype_ipv6_ext
 endif
 
