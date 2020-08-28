@@ -55,6 +55,7 @@ LOW_MEMORY_BOARDS += \
   saml10-xpro \
   saml11-xpro \
   serpente \
+  sifive_e \
   sodaq-autonomo \
   sodaq-explorer \
   sodaq-one \

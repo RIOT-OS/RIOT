@@ -30,6 +30,10 @@ BOARDS_TIMER_32kHz := \
     stk3700 \
     #
 
+BOARDS_TIMER_10MHz := \
+  sifive_e \
+  #
+
 BOARDS_TIMER_CLOCK_CORECLOCK := \
   cc2538dk \
   openmote-b \
@@ -39,10 +43,13 @@ BOARDS_TIMER_CLOCK_CORECLOCK := \
   waspmote-pro \
   #
 
+
 ifneq (,$(filter $(BOARDS_TIMER_250kHz),$(BOARD)))
   TIMER_SPEED ?= 250000
 else ifneq (,$(filter $(BOARDS_TIMER_32kHz),$(BOARD)))
   TIMER_SPEED ?= 32768
+else ifneq (,$(filter $(BOARDS_TIMER_10MHz),$(BOARD)))
+  TIMER_SPEED ?= 10000000
 else ifneq (,$(filter $(BOARDS_TIMER_CLOCK_CORECLOCK),$(BOARD)))
   TIMER_SPEED ?= CLOCK_CORECLOCK
 endif

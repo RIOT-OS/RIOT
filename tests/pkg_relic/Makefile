@@ -19,6 +19,7 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     msb-430h \
                     msbiot \
                     redbee-econotag \
+		    sifive_e \
                     stm32f0discovery \
                     stm32f3discovery \
                     telosb \

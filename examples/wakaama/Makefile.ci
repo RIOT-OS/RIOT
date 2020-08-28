@@ -30,6 +30,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     samd10-xmini \
     saml10-xpro \
     saml11-xpro \
+    sifive_e \
     slstk3400a \
     spark-core \
     stk3200 \
