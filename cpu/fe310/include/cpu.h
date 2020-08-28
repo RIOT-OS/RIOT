@@ -57,16 +57,6 @@ uint32_t cpu_freq(void);
 void irq_init(void);
 
 /**
- * @brief   External ISR callback
- */
-typedef void (*external_isr_ptr_t)(int intNum);
-
-/**
- * @brief   Set External ISR callback
- */
-void set_external_isr_cb(int intNum, external_isr_ptr_t cbFunc);
-
-/**
  * @brief   Print the last instruction's address
  *
  * @todo:   Not supported
