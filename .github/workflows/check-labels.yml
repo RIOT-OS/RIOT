@@ -1,0 +1,15 @@
+name: check-labels
+on:
+  pull_request:
+    types: [opened, reopened, labeled, unlabeled]
+  pull_request_review:
+    types: [submitted, dismissed]
+jobs:
+  check-labels:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: RIOT-OS/check-labels-action@v1.0.0
+      with:
+        access_token: ${{ secrets.GITHUB_TOKEN }}
+        unset_labels: 'CI: needs squashing,State: waiting for other PR'
+        cond_labels: '(Process: needs >1 ACK,review.approvals>1),(Area: RDM,review.approvals>2)'
