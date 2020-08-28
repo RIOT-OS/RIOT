@@ -11,13 +11,13 @@
  * @{
  *
  * @file
- * @brief       Default STM32L0 clock configuration
+ * @brief       Default STM32L0/STM32L1 clock configuration
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef L0_CFG_CLOCK_DEFAULT_H
-#define L0_CFG_CLOCK_DEFAULT_H
+#ifndef L0L1_CFG_CLOCK_DEFAULT_H
+#define L0L1_CFG_CLOCK_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -97,6 +97,10 @@ extern "C" {
 
 #define CLOCK_HSI                       MHZ(16)
 
+#ifndef CONFIG_CLOCK_MSI
+#define CONFIG_CLOCK_MSI                KHZ(4194)
+#endif
+
 #if CONFIG_USE_CLOCK_HSI
 #define CLOCK_CORECLOCK                 (CLOCK_HSI)
 
@@ -107,9 +111,6 @@ extern "C" {
 #define CLOCK_CORECLOCK                 (CLOCK_HSE)
 
 #elif CONFIG_USE_CLOCK_MSI
-#ifndef CONFIG_CLOCK_MSI
-#define CONFIG_CLOCK_MSI                KHZ(4194)
-#endif
 #define CLOCK_CORECLOCK                 (CONFIG_CLOCK_MSI)
 
 #elif CONFIG_USE_CLOCK_PLL
@@ -127,8 +128,16 @@ extern "C" {
 #define CLOCK_PLL_SRC                   (CLOCK_HSE)
 #else /* CLOCK_HSI */
 #define CLOCK_PLL_SRC                   (CLOCK_HSI)
-#endif
 #endif /* CONFIG_BOARD_HAS_HSE */
+/* PLL configuration: make sure your values are legit!
+ *
+ * compute by: CORECLOCK = ((PLL_IN / PLL_PREDIV) * PLL_MUL)
+ * with:
+ * PLL_IN:          input clock is HSE if available or HSI otherwise
+ * PLL_DIV :        divider, allowed values: 2, 3, 4
+ * PLL_MUL:         multiplier, allowed values: 3, 4, 6, 8, 12, 16, 24, 32, 48
+ * CORECLOCK        -> 48MHz MAX!
+ */
 #define CLOCK_CORECLOCK                 ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_DIV) * CONFIG_CLOCK_PLL_MUL)
 #if CLOCK_CORECLOCK > MHZ(32)
 #error "SYSCLK cannot exceed 32MHz"
@@ -144,12 +153,12 @@ extern "C" {
 #ifndef CONFIG_CLOCK_APB2_DIV
 #define CONFIG_CLOCK_APB2_DIV           (1)
 #endif
-#define CLOCK_APB2                     (CLOCK_CORECLOCK / CONFIG_CLOCK_APB2_DIV)   /* max: 32MHz */
+#define CLOCK_APB2                      (CLOCK_CORECLOCK / CONFIG_CLOCK_APB2_DIV)   /* max: 32MHz */
 /** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* L0_CFG_CLOCK_DEFAULT_H */
+#endif /* L0L1_CFG_CLOCK_DEFAULT_H */
 /** @} */

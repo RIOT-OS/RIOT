@@ -32,7 +32,7 @@
 #endif
 
 #include "periph_cpu.h"
-#include "l1/cfg_clock_default.h"
+#include "l0l1/cfg_clock_default.h"
 #include "cfg_timer_tim2.h"
 
 #ifdef __cplusplus
