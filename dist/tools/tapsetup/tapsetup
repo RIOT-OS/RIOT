@@ -30,7 +30,7 @@ usage() {
 
 unsupported_plattform() {
     echo "unsupported platform" >&2
-    echo "(currently supported \`uname -s\` 'Darvin', 'FreeBSD', and 'Linux')" >&2
+    echo "(currently supported \`uname -s\` 'Darwin', 'FreeBSD', and 'Linux')" >&2
 }
 
 update_uplink() {
