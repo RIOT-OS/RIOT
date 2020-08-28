@@ -69,6 +69,21 @@ uint8_t _reg_addr_upstream(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                 _handle_sl2ao(netif, ipv6, icmpv6, sl2ao);
                 /* re-get NCE in case it was updated */
                 nce = _nib_onl_get(&ipv6->src, netif->pid);
+                /* and re-check EUI-64 in case nce was not an NC before */
+                if ((memcmp(&nce->eui64, &aro->eui64,
+                            sizeof(aro->eui64)) != 0) &&
+                    (_get_ar_state(nce) != GNRC_IPV6_NIB_NC_INFO_AR_STATE_GC)) {
+                    /* ignore address registration requests from upstream */
+                    DEBUG("nib: Could not register %s, duplicate entry with "
+                          "EUI-64 %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+                          ipv6_addr_to_str(addr_str, &ipv6->src,
+                                           sizeof(addr_str)),
+                          nce->eui64.uint8[0], nce->eui64.uint8[1],
+                          nce->eui64.uint8[2], nce->eui64.uint8[3],
+                          nce->eui64.uint8[4], nce->eui64.uint8[5],
+                          nce->eui64.uint8[6], nce->eui64.uint8[7]);
+                    return SIXLOWPAN_ND_STATUS_DUP;
+                }
                 return _update_nce_ar_state(aro, nce);
             }
             else if (nce != NULL) {
