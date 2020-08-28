@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2019 Inria
+ * Copyright (C) 2018-2020 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -11,13 +11,13 @@
  * @{
  *
  * @file
- * @brief       Configure STM32L0 clock using 32MHz core clock and LSE (32.768kHz)
+ * @brief       Default STM32L0 clock configuration
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef L0_CFG_CLOCK_32_16_1_H
-#define L0_CFG_CLOCK_32_16_1_H
+#ifndef L0_CFG_CLOCK_DEFAULT_H
+#define L0_CFG_CLOCK_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -31,7 +31,9 @@ extern "C" {
  */
 #define CLOCK_HSI           (16000000U)         /* internal oscillator */
 #define CLOCK_CORECLOCK     (32000000U)         /* desired core clock frequency */
+#ifndef CLOCK_LSE
 #define CLOCK_LSE           (1)                 /* enable low speed external oscillator */
+#endif
 
 /* configuration of PLL prescaler and multiply values */
 /* CORECLOCK := HSI / CLOCK_PLL_DIV * CLOCK_PLL_MUL */
@@ -54,5 +56,5 @@ extern "C" {
 }
 #endif
 
-#endif /* L0_CFG_CLOCK_32_16_1_H */
+#endif /* L0_CFG_CLOCK_DEFAULT_H */
 /** @} */

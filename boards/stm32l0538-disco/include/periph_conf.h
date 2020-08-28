@@ -20,6 +20,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "l0/cfg_clock_default.h"
 
 #ifdef __cplusplus
 extern "C" {
