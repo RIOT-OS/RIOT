@@ -28,7 +28,7 @@ usage() {
     echo "   -h, --help:                   Prints this text" >&2
 }
 
-unsupported_plattform() {
+unsupported_platform() {
     echo "unsupported platform" >&2
     echo "(currently supported \`uname -s\` 'Darvin', 'FreeBSD', and 'Linux')" >&2
 }
@@ -234,7 +234,7 @@ case "$(uname -s)" in
     Linux)
         PLATFORM="Linux" ;;
     *)
-        unsupported_plattform
+        unsupported_platform
         exit 1 ;;
 esac
 
