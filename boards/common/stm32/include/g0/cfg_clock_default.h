@@ -88,10 +88,11 @@ extern "C" {
 
 #define CLOCK_HSI                       MHZ(16)
 
-#if CONFIG_USE_CLOCK_HSI
 #ifndef CONFIG_CLOCK_HSISYS_DIV
 #define CONFIG_CLOCK_HSISYS_DIV         (1)
 #endif
+
+#if CONFIG_USE_CLOCK_HSI
 #define CLOCK_CORECLOCK                 (CLOCK_HSI / CONFIG_CLOCK_HSISYS_DIV)
 
 #elif CONFIG_USE_CLOCK_HSE

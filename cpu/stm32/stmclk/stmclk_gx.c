@@ -37,7 +37,6 @@
 #define PLL_R_MAX                   (8)
 #endif
 
-#if CONFIG_USE_CLOCK_PLL
 #if (CONFIG_CLOCK_PLL_M < PLL_M_MIN || CONFIG_CLOCK_PLL_M > PLL_M_MAX)
 #error "PLL configuration: PLL M value is out of range"
 #endif
@@ -66,14 +65,11 @@
 #define PLL_SRC                     RCC_PLLCFGR_PLLSRC_HSI
 #endif
 
-#endif /* CONFIG_USE_CLOCK_PLL */
-
 #if defined(CPU_FAM_STM32G0)
 #define RCC_CFGR_SW_HSI             (0)
 #define RCC_CFGR_SW_HSE             (RCC_CFGR_SW_0)
 #define RCC_CFGR_SW_PLL             (RCC_CFGR_SW_1)
 
-#if CONFIG_USE_CLOCK_HSI
 #if CONFIG_CLOCK_HSISYS_DIV == 1
 #define CLOCK_HSI_DIV               (0)
 #elif CONFIG_CLOCK_HSISYS_DIV == 2
@@ -91,7 +87,6 @@
 #elif CONFIG_CLOCK_HSISYS_DIV == 128
 #define CLOCK_HSI_DIV               (RCC_CR_HSIDIV_2 | RCC_CR_HSIDIV_1 | RCC_CR_HSIDIV_0)
 #endif
-#endif /* CONFIG_USE_CLOCK_HSI */
 
 #define CLOCK_AHB_DIV               (0)
 
@@ -195,69 +190,78 @@ void stmclk_init_sysclk(void)
     stmclk_enable_lfclk();
 #endif
 
-#if CONFIG_USE_CLOCK_HSI && defined(CPU_FAM_STM32G0)
-    /* configure HSISYS divider, only available on G0 */
-    RCC->CR |= CLOCK_HSI_DIV;
-    while (!(RCC->CR & RCC_CR_HSIRDY)) {}
+#if defined(CPU_FAM_STM32G0)
+    if (CONFIG_USE_CLOCK_HSI && CONFIG_CLOCK_HSISYS_DIV != 1) {
+        /* configure HSISYS divider, only available on G0 */
+        RCC->CR |= CLOCK_HSI_DIV;
+        while (!(RCC->CR & RCC_CR_HSIRDY)) {}
+    }
+#endif
 
-#elif CONFIG_USE_CLOCK_HSE
-    /* if configured, we need to enable the HSE clock now */
-    RCC->CR |= RCC_CR_HSEON;
-    while (!(RCC->CR & RCC_CR_HSERDY)) {}
+    if (CONFIG_USE_CLOCK_HSE) {
+        /* if configured, we need to enable the HSE clock now */
+        RCC->CR |= RCC_CR_HSEON;
+        while (!(RCC->CR & RCC_CR_HSERDY)) {}
 
 #if defined(CPU_FAM_STM32G0)
-    RCC->CFGR = (RCC_CFGR_SW_HSE | CLOCK_AHB_DIV | CLOCK_APB1_DIV);
+        RCC->CFGR = (RCC_CFGR_SW_HSE | CLOCK_AHB_DIV | CLOCK_APB1_DIV);
 #elif defined(CPU_FAM_STM32G4)
-    RCC->CFGR = (RCC_CFGR_SW_HSE | CLOCK_AHB_DIV | CLOCK_APB1_DIV | CLOCK_APB2_DIV);
+        RCC->CFGR = (RCC_CFGR_SW_HSE | CLOCK_AHB_DIV | CLOCK_APB1_DIV | CLOCK_APB2_DIV);
 #endif
-    while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSE) {}
+        while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSE) {}
+    }
+    else if (CONFIG_USE_CLOCK_PLL) {
+        if (CONFIG_BOARD_HAS_HSE) {
+            /* if configured, we need to enable the HSE clock now */
+            RCC->CR |= RCC_CR_HSEON;
+            while (!(RCC->CR & RCC_CR_HSERDY)) {}
+        }
+        /* now we can safely configure and start the PLL */
+        RCC->PLLCFGR = (PLL_SRC | PLL_M | PLL_N | PLL_R | RCC_PLLCFGR_PLLREN);
+        RCC->CR |= RCC_CR_PLLON;
+        while (!(RCC->CR & RCC_CR_PLLRDY)) {}
 
-#elif CONFIG_USE_CLOCK_PLL
-#if CONFIG_BOARD_HAS_HSE
-    /* if configured, we need to enable the HSE clock now */
-    RCC->CR |= RCC_CR_HSEON;
-    while (!(RCC->CR & RCC_CR_HSERDY)) {}
-#endif
-    /* now we can safely configure and start the PLL */
-    RCC->PLLCFGR = (PLL_SRC | PLL_M | PLL_N | PLL_R | RCC_PLLCFGR_PLLREN);
-    RCC->CR |= RCC_CR_PLLON;
-    while (!(RCC->CR & RCC_CR_PLLRDY)) {}
-
-#if CLOCK_AHB > MHZ(80)
-    /* Divide HCLK by before enabling the PLL */
-    RCC->CFGR |= RCC_CFGR_HPRE_DIV2;
-#endif
-
-    /* now that the PLL is running, we use it as system clock */
-    RCC->CFGR |= RCC_CFGR_SW_PLL;
-    while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
-
-#if CLOCK_AHB > MHZ(80)
-    /* Wait 1us before switching back to full speed */
-    /* Use volatile to prevent the compiler from optimizing the loop */
-    volatile uint8_t count = CLOCK_CORECLOCK / MHZ(1);
-    while (count--) {}
-    RCC->CFGR &= ~RCC_CFGR_HPRE_DIV2;
+#if defined(CPU_FAM_STM32G4)
+        if (CLOCK_AHB > MHZ(80)) {
+            /* Divide HCLK by before enabling the PLL */
+            RCC->CFGR |= RCC_CFGR_HPRE_DIV2;
+        }
 #endif
 
+        /* now that the PLL is running, we use it as system clock */
+        RCC->CFGR |= RCC_CFGR_SW_PLL;
+        while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
+
+#if defined(CPU_FAM_STM32G4)
+        if (CLOCK_AHB > MHZ(80)) {
+            /* Wait 1us before switching back to full speed */
+            /* Use volatile to prevent the compiler from optimizing the loop */
+            volatile uint8_t count = CLOCK_CORECLOCK / MHZ(1);
+            while (count--) {}
+            RCC->CFGR &= ~RCC_CFGR_HPRE_DIV2;
+        }
 #endif
+    }
 
     stmclk_disable_hsi();
     irq_restore(is);
 
-#ifdef MODULE_PERIPH_HWRNG
-    /* HWRNG is clocked by HSI48 so enable this clock when the peripheral is used */
-    RCC->CRRCR |= RCC_CRRCR_HSI48ON;
-    while (!(RCC->CRRCR & RCC_CRRCR_HSI48RDY)) {}
-#endif
+#if defined(CPU_FAM_STM32G4)
+    if (IS_USED(MODULE_PERIPH_HWRNG)) {
+        /* HWRNG is clocked by HSI48 so enable this clock when the peripheral is used */
+        RCC->CRRCR |= RCC_CRRCR_HSI48ON;
+        while (!(RCC->CRRCR & RCC_CRRCR_HSI48RDY)) {}
+    }
 
-#ifdef MODULE_PERIPH_RTT
-    /* Ensure LPTIM1 clock source (LSI or LSE) is correctly reset when initializing
-       the clock, this is particularly useful after waking up from deep sleep */
-#if CLOCK_LSE
-    RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0 | RCC_CCIPR_LPTIM1SEL_1;
-#else
-    RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0;
-#endif /* CLOCK_LSE */
-#endif /* MODULE_PERIPH_RTT */
+    if (IS_USED(MODULE_PERIPH_RTT)) {
+        /* Ensure LPTIM1 clock source (LSI or LSE) is correctly reset when initializing
+           the clock, this is particularly useful after waking up from deep sleep */
+        if (CONFIG_BOARD_HAS_LSE) {
+            RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0 | RCC_CCIPR_LPTIM1SEL_1;
+        }
+        else {
+            RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0;
+        }
+    }
+#endif
 }
