@@ -186,10 +186,6 @@ void stmclk_init_sysclk(void)
     /* disable all active clocks except HSI -> resets the clk configuration */
     RCC->CR = RCC_CR_HSION;
 
-#if CLOCK_LSE
-    stmclk_enable_lfclk();
-#endif
-
 #if defined(CPU_FAM_STM32G0)
     if (CONFIG_USE_CLOCK_HSI && CONFIG_CLOCK_HSISYS_DIV != 1) {
         /* configure HSISYS divider, only available on G0 */
