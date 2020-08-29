@@ -69,7 +69,8 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install tox junit2html
+        python -m pip install tox junit2html \
+          pytest-github-actions-annotate-failures
     - name: Pull riotbuild docker image
       run: |
         DOCKER_VERSION="${{ github.event.inputs.docker_version }}"
@@ -81,6 +82,8 @@ jobs:
       run: |
         sudo RIOT/dist/tools/tapsetup/tapsetup -c 11
     - name: Run release tests
+      env:
+        PYTEST_PLUGINS: pytest_github_actions_annotate_failures
       timeout-minutes: 350
       run: |
         RIOTBASE="$GITHUB_WORKSPACE/RIOT"
@@ -150,7 +153,8 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install tox junit2html
+        python -m pip install tox junit2html \
+          pytest-github-actions-annotate-failures
     - name: Pull riotbuild docker image
       run: |
         DOCKER_VERSION="${{ github.event.inputs.docker_version }}"
@@ -171,6 +175,8 @@ jobs:
         ssh -oStrictHostKeyChecking=accept-new \
           ${IOTLAB_USER}@saclay.iot-lab.info exit
     - name: Run release tests
+      env:
+        PYTEST_PLUGINS: pytest_github_actions_annotate_failures
       timeout-minutes: 350
       run: |
         # definition in env does not work since $GITHUB_WORKSPACE seems not to
