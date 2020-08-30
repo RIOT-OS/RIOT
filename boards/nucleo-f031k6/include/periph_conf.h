@@ -20,12 +20,13 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-/* No HSE available on this board */
-#define CLOCK_HSE            (0U)
-
-/* Adjust PLL factors when PLL is clocked by HSI */
-#define CLOCK_PLL_PREDIV     (2)
-#define CLOCK_PLL_MUL        (12)
+/* Adjust PLL factors:
+  - On nucleo-f031k6, there's no HSE and PREDIV is hard-wired to 2
+  - to reach 48MHz set PLL_MUL to 12 so core clock = (HSI8 / 2) * 12 = 48MHz */
+#define CONFIG_CLOCK_PLL_PREDIV     (2)
+#ifndef CONFIG_CLOCK_PLL_MUL
+#define CONFIG_CLOCK_PLL_MUL        (12)
+#endif
 
 #include "periph_cpu.h"
 #include "f0/cfg_clock_default.h"
