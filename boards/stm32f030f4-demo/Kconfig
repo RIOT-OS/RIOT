@@ -20,3 +20,8 @@ config BOARD_STM32F030F4_DEMO
     select HAS_PERIPH_UART
     select HAS_PERIPH_SPI
     select HAS_PERIPH_RTC
+
+    # Clock configuration
+    select BOARD_HAS_HSE
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

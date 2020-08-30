@@ -19,3 +19,8 @@ config BOARD_STM32F0DISCOVERY
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+
+    # Clock configuration
+    select BOARD_HAS_HSE
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"
