@@ -38,7 +38,7 @@ extern "C" {
  * Instead terminate RIOT, which is also the behavior a user would
  * expect from a CLI application.
  */
-#  ifdef CPU_NATIVE
+#  if defined(CPU_NATIVE) || defined(CPU_UTIL)
 #    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 1
 #  endif
 #endif
