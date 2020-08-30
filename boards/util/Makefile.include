@@ -1,0 +1,21 @@
+# basic cflags:
+CFLAGS += -Os
+CFLAGS += -Wall -Wextra -pedantic $(CFLAGS_DBG)
+CFLAGS_DBG ?= -g3
+
+# default std set to gnu99 of not overwritten by user
+ifeq (,$(filter -std=%, $(CFLAGS)))
+  CFLAGS += -std=gnu11
+endif
+
+# clean up unused functions
+CFLAGS += -ffunction-sections -fdata-sections
+ifeq ($(OS),Darwin)
+  LINKFLAGS += -Wl,-dead_strip
+else
+  LINKFLAGS += -Wl,--gc-sections
+endif
+LINKFLAGS += -ffunction-sections
+
+FLASHFILE ?= $(ELFFILE)
+TERMPROG  ?= $(ELFFILE)
