@@ -1,3 +1,4 @@
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 INCLUDES += -I$(RIOTBOARD)/common/blxxxpill/include
 
 ifeq (dfu-util,$(PROGRAMMER))
