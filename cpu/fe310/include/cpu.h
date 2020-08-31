@@ -26,6 +26,7 @@
 #define CPU_H
 
 #include "thread.h"
+#include "macros/units.h"
 
 #include "vendor/platform.h"
 #include "vendor/plic_driver.h"

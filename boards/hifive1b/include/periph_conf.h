@@ -81,25 +81,25 @@ extern "C" {
 #endif
 
 #if CONFIG_USE_CLOCK_HFXOSC_PLL
-#define CLOCK_PLL_INPUT_CLOCK               (16000000UL)
+#define CLOCK_PLL_INPUT_CLOCK               MHZ(16)
 #define CLOCK_PLL_REFR                      (CLOCK_PLL_INPUT_CLOCK / (CONFIG_CLOCK_PLL_R + 1))
 #define CLOCK_PLL_VCO                       (CLOCK_PLL_REFR * (2 * (CONFIG_CLOCK_PLL_F + 1)))
 #define CLOCK_PLL_OUT                       (CLOCK_PLL_VCO / (1 << CONFIG_CLOCK_PLL_Q))
 #define CLOCK_CORECLOCK                     (CLOCK_PLL_OUT) /* 320000000Hz with the values used above */
 
 /* Check PLL settings */
-#if CLOCK_PLL_REFR != 8000000
+#if CLOCK_PLL_REFR != MHZ(8)
 #error "Only R=2 can be used when using HFXOSC"
 #endif
-#if (CLOCK_PLL_VCO < 384000000) || (CLOCK_PLL_VCO > 768000000)
+#if (CLOCK_PLL_VCO < MHZ(384)) || (CLOCK_PLL_VCO > MHZ(768))
 #error "VCO frequency must be in the range [384MHz - 768MHz], check the CLOCK_PLL_F value"
 #endif
-#if (CLOCK_PLL_OUT < 48000000) || (CLOCK_PLL_OUT > 384000000)
+#if (CLOCK_PLL_OUT < MHZ(48)) || (CLOCK_PLL_OUT > MHZ(384))
 #error "PLL output frequency must be in the range [48MHz - 384MHz], check the CLOCK_PLL_Q value"
 #endif
 
 #elif CONFIG_USE_CLOCK_HFXOSC
-#define CLOCK_CORECLOCK                     (16000000UL)
+#define CLOCK_CORECLOCK                     MHZ(16)
 #endif
 
 /*
@@ -107,7 +107,7 @@ extern "C" {
   call cpu_freq() to get the configured CPU frequency.
 */
 #ifndef CONFIG_CLOCK_DESIRED_FREQUENCY
-#define CONFIG_CLOCK_DESIRED_FREQUENCY     (320000000UL)
+#define CONFIG_CLOCK_DESIRED_FREQUENCY     MHZ(320)
 #endif
 
 #ifndef CONFIG_CLOCK_HFROSC_TRIM
