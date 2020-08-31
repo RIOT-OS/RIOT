@@ -33,4 +33,16 @@ if KCONFIG_USEMODULE_IEEE802154
         int "IEEE802.15.4 default TX power (in dBm)"
         default 0
 
+    config IEEE802154_DEFAULT_CSMA_CA_MIN
+        int "IEEE802.15.4 default CSMA-CA minimum backoff exponent"
+        default 3
+
+    config IEEE802154_DEFAULT_CSMA_CA_RETRIES
+        int "IEEE802.15.4 default CSMA-CA maximum number of retries"
+        default 4
+
+    config IEEE802154_DEFAULT_CSMA_CA_MAX
+        int "IEEE802.15.4 default CSMA-CA maximum backoff exponent"
+        default 5
+
 endif # KCONFIG_USEMODULE_IEEE802154

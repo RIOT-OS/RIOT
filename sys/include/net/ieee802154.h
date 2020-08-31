@@ -204,6 +204,27 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 /** @} */
 
 /**
+ * @brief IEEE802.15.4 default value for minimum backoff exponent
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE
+#define CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE   (3U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 default value for maximum number of CSMA-CA retries.
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES
+#define CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES  (4U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 default value for maximum backoff exponent
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE
+#define CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE   (5U)
+#endif
+
+/**
  * @brief   Initializes an IEEE 802.15.4 MAC frame header in @p buf.
  *
  * @pre Resulting header must fit in memory allocated at @p buf.
