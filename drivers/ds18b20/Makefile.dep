@@ -1,0 +1,2 @@
+USEMODULE += onewire
+USEMODULE += xtimer
