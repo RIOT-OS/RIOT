@@ -143,18 +143,12 @@ ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_sock_async,$(USEMODULE)))
-  USEMODULE += sock_async
   USEMODULE += gnrc_netapi_callbacks
-endif
-
-ifneq (,$(filter gnrc_sock_ip,$(USEMODULE)))
-  USEMODULE += sock_ip
 endif
 
 ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
   USEMODULE += random     # to generate random ports
-  USEMODULE += sock_udp
 endif
 
 ifneq (,$(filter gnrc_sock,$(USEMODULE)))
@@ -557,17 +551,14 @@ endif
 
 ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
   USEMODULE += lwip_raw
-  USEMODULE += sock_ip
 endif
 
 ifneq (,$(filter lwip_sock_tcp,$(USEMODULE)))
   USEMODULE += lwip_tcp
-  USEMODULE += sock_tcp
 endif
 
 ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
   USEMODULE += lwip_udp
-  USEMODULE += sock_udp
 endif
 
 ifneq (,$(filter lwip_%,$(USEMODULE)))
@@ -1024,7 +1015,6 @@ endif
 
 ifneq (,$(filter tinydtls_sock_dtls, $(USEMODULE)))
     USEPKG += tinydtls
-    USEMODULE += sock_dtls
 endif
 
 ifneq (,$(filter sock_dtls, $(USEMODULE)))
