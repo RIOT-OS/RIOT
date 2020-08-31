@@ -39,7 +39,7 @@ static debugpins_config_t _configuration = {
 static void _set_checked(gpio_t pin)
 {
     if (IS_USED(MODULE_OPENWSN_DEBUGPINS)) {
-        if (pin != GPIO_UNDEF){
+        if (gpio_is_valid(pin)){
             gpio_set(pin);
         }
     }
@@ -48,7 +48,7 @@ static void _set_checked(gpio_t pin)
 static void _clear_checked(gpio_t pin)
 {
     if (IS_USED(MODULE_OPENWSN_DEBUGPINS)) {
-        if (pin != GPIO_UNDEF){
+        if (gpio_is_valid(pin)){
             gpio_clear(pin);
         }
     }
@@ -57,7 +57,7 @@ static void _clear_checked(gpio_t pin)
 static void _toggle_checked(gpio_t pin)
 {
     if (IS_USED(MODULE_OPENWSN_DEBUGPINS)) {
-        if (pin != GPIO_UNDEF){
+        if (gpio_is_valid(pin)){
             gpio_toggle(pin);
         }
     }
@@ -66,7 +66,7 @@ static void _toggle_checked(gpio_t pin)
 static void _init_checked(gpio_t pin)
 {
     if (IS_USED(MODULE_OPENWSN_DEBUGPINS)) {
-        if (pin != GPIO_UNDEF){
+        if (gpio_is_valid(pin)){
             gpio_init(pin, GPIO_OUT);
         }
     }

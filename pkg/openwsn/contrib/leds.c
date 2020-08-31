@@ -41,7 +41,7 @@ static leds_config_t _configuration = {
 static void _toggle_checked(gpio_t pin)
 {
     if (IS_USED(MODULE_OPENWSN_LEDS)) {
-        if (pin != GPIO_UNDEF) {
+        if (gpio_is_valid(pin)) {
             gpio_toggle(pin);
         }
     }
@@ -50,7 +50,7 @@ static void _toggle_checked(gpio_t pin)
 static void _init_checked(gpio_t pin)
 {
     if (IS_USED(MODULE_OPENWSN_LEDS)) {
-        if (pin != GPIO_UNDEF) {
+        if (gpio_is_valid(pin)) {
             gpio_init(pin, GPIO_OUT);
         }
     }
@@ -59,7 +59,7 @@ static void _init_checked(gpio_t pin)
 static void _write_checked(gpio_t pin, uint8_t on_state)
 {
     if (IS_USED(MODULE_OPENWSN_LEDS)) {
-        if (pin != GPIO_UNDEF) {
+        if (gpio_is_valid(pin)) {
             gpio_write(pin, on_state);
         }
     }
@@ -70,7 +70,7 @@ static uint8_t _is_on_checked(gpio_t pin)
     if (IS_USED(MODULE_OPENWSN_LEDS)) {
         uint8_t ret = 0;
 
-        if (pin != GPIO_UNDEF) {
+        if (gpio_is_valid(pin)) {
             ret = gpio_read(pin);
         }
         return ret;
