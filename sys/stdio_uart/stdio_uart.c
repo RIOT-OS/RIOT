@@ -28,6 +28,7 @@
  */
 
 #include <errno.h>
+#include <string.h>
 
 #include "stdio_uart.h"
 
@@ -85,8 +86,29 @@ ssize_t stdio_read(void* buffer, size_t count)
 #endif
 }
 
-ssize_t stdio_write(const void* buffer, size_t len)
+ssize_t stdio_write(const void *buffer, size_t len)
 {
-    uart_write(STDIO_UART_DEV, (const uint8_t *)buffer, len);
-    return len;
+    ssize_t result = len;
+    if (IS_USED(MODULE_STDIO_UART_ONLCR)) {
+        static const uint8_t crlf[2] = { (uint8_t)'\r', (uint8_t)'\n' };
+        const uint8_t *buf = buffer;
+        while (len) {
+            const uint8_t *pos = memchr(buf, '\n', len);
+            size_t chunk_len = (pos != NULL)
+                             ? (uintptr_t)pos - (uintptr_t)buf
+                             : len;
+            uart_write(STDIO_UART_DEV, buf, chunk_len);
+            buf += chunk_len;
+            len -= chunk_len;
+            if (len) {
+                uart_write(STDIO_UART_DEV, crlf, sizeof(crlf));
+                buf++;
+                len--;
+            }
+        }
+    }
+    else {
+        uart_write(STDIO_UART_DEV, (const uint8_t *)buffer, len);
+    }
+    return result;
 }
