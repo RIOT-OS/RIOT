@@ -110,7 +110,7 @@ static int _cmd_discover(int argc, char **argv)
     for (unsigned i = 0; i < cnt; i++) {
         char rom_str[ONEWIRE_ROM_STR_LEN];
         onewire_rom_to_str(rom_str, &_devlist[i]);
-        printf("[%2i]    %s\n", i, rom_str);
+        printf("[%2u]    %s\n", i, rom_str);
     }
 
     return 0;
