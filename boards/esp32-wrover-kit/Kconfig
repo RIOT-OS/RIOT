@@ -15,6 +15,7 @@ config BOARD_ESP32_WROVER_KIT
     select HAS_ARDUINO
     select HAS_ESP_RTC_TIMER_32K
     select HAS_ESP_SPI_RAM
+    select HAS_ESP_JTAG
     select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM

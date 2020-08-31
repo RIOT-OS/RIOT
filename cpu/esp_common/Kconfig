@@ -45,6 +45,11 @@ config HAS_ESP_NOW
     help
         Indicates that an ESP NOW-compatible radio is present.
 
+config HAS_ESP_JTAG
+    bool
+    help
+        Indicates that a JTAG interface is present.
+
 config HAS_ARCH_ESP
     bool
     help
