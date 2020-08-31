@@ -38,7 +38,12 @@ extern "C" {
 #endif
 
 /**
- * @brief   String length of a hex encoded 1-wire ROM code (including \0)
+ * @brief   Length of 1-Wire ROM code in bytes
+ */
+#define ONEWIRE_ROM_LEN         (8U)
+
+/**
+ * @brief   String length of a hex encoded 1-Wire ROM code (including \0)
  */
 #define ONEWIRE_ROM_STR_LEN     (17U)
 
@@ -48,7 +53,7 @@ extern "C" {
 #define ONEWIRE_SEARCH_FIRST    (0)
 
 /**
- * @brief   Return codes used by the 1-wire driver
+ * @brief   Return codes used by the 1-Wire driver
  */
 enum {
     ONEWIRE_OK          =  0,   /**< everything fine */
@@ -89,12 +94,12 @@ typedef struct {
  * @brief   1-Wire ROM code (device address) representation
  */
 typedef struct {
-    uint8_t u8[8];              /**< byte-wise access to address bytes */
+    uint8_t u8[ONEWIRE_ROM_LEN];    /**< byte-wise access to address bytes */
 } onewire_rom_t;
 
 
 /**
- * @brief   Initialize a 1-wire bus on the given GPIO pin
+ * @brief   Initialize a 1-Wire bus on the given GPIO pin
  *
  * This tries to configure the pin as open-drain output and will fail, if the
  * platform does not support this GPIO mode.
@@ -163,7 +168,14 @@ uint8_t onewire_crc8(const uint8_t *data, size_t len);
 /**
  * @brief   Search for devices on the given 1-Wire bus
  *
- * TODO
+ * @see     https://pdfserv.maximintegrated.com/en/an/AN937.pdf page 51+52
+ *
+ * Use this function to discover devices connected to the given 1-Wire bus. To
+ * carry out a full device discovery, this function has to be called multiple
+ * times. For each iteration, the return value of the previous call as well as
+ * the previous discovered ROM code have to be given as @p rom and @p ld
+ * parameters to the subsequent call. One the function returns 0, the last
+ * device has been found and there are no further devices to be discovered.
  *
  * @param[in] owi       1-Wire bus
  * @param[in,out] rom   next discovery ROM code, needs to hold previous value

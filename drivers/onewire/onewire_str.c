@@ -24,21 +24,6 @@
 #include "assert.h"
 #include "onewire.h"
 
-static int _hex2int(char c) {
-    if ('0' <= c && c <= '9') {
-        return c - '0';
-    }
-    else if ('a' <= c && c <= 'f') {
-        return c - 'a' + 10;
-    }
-    else if ('A' <= c && c <= 'F') {
-        return c - 'A' + 10;
-    }
-    else {
-        return -1;
-    }
-}
-
 int onewire_rom_from_str(onewire_rom_t *rom, const char *str)
 {
     assert(rom);
@@ -47,17 +32,7 @@ int onewire_rom_from_str(onewire_rom_t *rom, const char *str)
     if (strlen(str) != (ONEWIRE_ROM_STR_LEN - 1)) {
         return ONEWIRE_ERR_ROMSTR;
     }
-
-    memset(rom->u8, 0, sizeof(onewire_rom_t));
-    for (int i = 0; i < 8; i++) {
-        for (int j = 0; j < 2; j++) {
-            int digit = _hex2int(str[(i * 2) + j]);
-            if (digit < 0) {
-                return ONEWIRE_ERR_ROMSTR;
-            }
-            rom->u8[i] |= (digit << ((1 - j) * 4));
-        }
-    }
+    fmt_hex_bytes(rom->u8, str);
 
     return ONEWIRE_OK;
 }
