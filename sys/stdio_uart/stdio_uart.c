@@ -92,7 +92,19 @@ ssize_t stdio_write(const void* buffer, size_t len)
 #ifdef MODULE_STDIO_ETHOS
     ethos_send_frame(&ethos, (const uint8_t *)buffer, len, ETHOS_FRAME_TYPE_TEXT);
 #else
+  #ifdef MODULE_STDIO_UART_ONLCR
+    const uint8_t *buf = (const uint8_t *)buffer;
+    const uint8_t cr = '\r';
+    size_t rem = len;
+    while (rem--) {
+            if (*buf == '\n')
+                    uart_write(STDIO_UART_DEV, &cr, 1);
+            uart_write(STDIO_UART_DEV, buf, 1);
+            buf++;
+    }
+  #else
     uart_write(STDIO_UART_DEV, (const uint8_t *)buffer, len);
+  #endif
 #endif
     return len;
 }

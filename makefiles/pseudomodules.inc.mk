@@ -129,6 +129,7 @@ PSEUDOMODULES += soft_uart_modecfg
 PSEUDOMODULES += stdin
 PSEUDOMODULES += stdio_cdc_acm
 PSEUDOMODULES += stdio_ethos
+PSEUDOMODULES += stdio_uart_onlcr
 PSEUDOMODULES += stdio_uart_rx
 PSEUDOMODULES += stm32_eth
 PSEUDOMODULES += stm32_eth_auto
