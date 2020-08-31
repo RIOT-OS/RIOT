@@ -24,7 +24,14 @@
 #define PERIPH_CONF_H
 
 /* This board provides an LSE */
-#define CLOCK_LSE            (1)
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE    1
+#endif
+
+/* This board provides an HSE */
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE    1
+#endif
 
 #include "periph_cpu.h"
 #include "f1f3/cfg_clock_default.h"
