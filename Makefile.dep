@@ -236,7 +236,6 @@ ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_router_default,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_router_default
   USEMODULE += gnrc_ipv6_nib_6lr
   USEMODULE += gnrc_sixlowpan_frag
   USEMODULE += gnrc_sixlowpan_iphc
