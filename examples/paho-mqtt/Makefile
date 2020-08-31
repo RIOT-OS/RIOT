@@ -31,7 +31,6 @@ ifneq (0, $(LWIP_IPV4))
   USEMODULE += lwip_arp
   USEMODULE += lwip_ipv4
   USEMODULE += lwip_dhcp_auto
-  USEMODULE += lwip_sock_udp
   CFLAGS += -DETHARP_SUPPORT_STATIC_ENTRIES=1
   LWIP_IPV6 ?= 0
 else
@@ -44,11 +43,13 @@ ifneq (0, $(LWIP_IPV6))
 endif
 
 USEMODULE += lwip_netdev
-USEMODULE += lwip lwip_sock_ip
-USEMODULE += lwip_tcp lwip_sock_tcp
-USEMODULE += lwip_sock_async
+USEMODULE += lwip
 
 USEMODULE += sock_async_event
+USEMODULE += sock_ip
+USEMODULE += sock_udp
+USEMODULE += sock_tcp
+
 ####
 
 include $(RIOTBASE)/Makefile.include

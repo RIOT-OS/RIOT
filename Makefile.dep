@@ -903,7 +903,7 @@ endif
 
 ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += nanocoap
-  USEMODULE += gnrc_sock_async
+  USEMODULE += sock_async
   USEMODULE += sock_async_event
   USEMODULE += sock_util
   USEMODULE += event_callback
