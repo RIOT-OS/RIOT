@@ -850,6 +850,7 @@ ifneq (,$(filter sock_async_event,$(USEMODULE)))
 endif
 
 ifneq (,$(filter sock_dns,$(USEMODULE)))
+  USEMODULE += sock_udp
   USEMODULE += sock_util
   USEMODULE += posix_headers
 endif
@@ -857,7 +858,6 @@ endif
 ifneq (,$(filter sock_util,$(USEMODULE)))
   USEMODULE += posix_inet
   USEMODULE += fmt
-  USEMODULE += sock_udp
 endif
 
 ifneq (,$(filter event_%,$(USEMODULE)))
@@ -905,6 +905,7 @@ ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += nanocoap
   USEMODULE += sock_async
   USEMODULE += sock_async_event
+  USEMODULE += sock_udp
   USEMODULE += sock_util
   USEMODULE += event_callback
   USEMODULE += event_timeout
