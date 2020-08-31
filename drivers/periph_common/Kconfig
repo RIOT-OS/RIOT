@@ -4,37 +4,7 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig KCONFIG_USEMODULE_PERIPH_TIMER
-    bool "Configure timer peripheral"
-    depends on USEMODULE_PERIPH_TIMER
-    help
-        Configure Timer peripheral using Kconfig.
-
-orsource "$(RIOTCPU)/$(CPU)/periph/Kconfig"
-
-menuconfig KCONFIG_USEMODULE_PERIPH_WDT
-    bool "Configure Watchdog peripheral"
-    depends on USEMODULE_PERIPH_WDT
-    help
-        Configure Watchdog peripheral using Kconfig.
-
-if KCONFIG_USEMODULE_PERIPH_WDT
-
-config WDT_WARNING_PERIOD
-    int "Warning period (in ms)"
-    depends on HAS_PERIPH_WDT_WARNING_PERIOD
-    help
-        Period in ms before reboot where wdt_cb() is executed.
-
-endif # KCONFIG_USEMODULE_PERIPH_WDT
-
-config HAS_PERIPH_WDT_WARNING_PERIOD
-    bool
-    help
-        Indicates that a CPU provides a warning period configuration option.
-
-menu "Peripheral drivers"
-    depends on TEST_KCONFIG
+if TEST_KCONFIG
 
 config MODULE_PERIPH_COMMON
     bool
@@ -167,8 +137,6 @@ config MODULE_PERIPH_INIT_RTT
 
 rsource "Kconfig.spi"
 
-rsource "Kconfig.timer"
-
 rsource "Kconfig.uart"
 
 config MODULE_PERIPH_USBDEV
@@ -181,14 +149,7 @@ config MODULE_PERIPH_INIT_USBDEV
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_USBDEV
 
-menuconfig MODULE_PERIPH_WDT
-    bool "Watchdog Timer peripheral driver"
-    depends on HAS_PERIPH_WDT
-    select MODULE_PERIPH_COMMON
+endif # TEST_KCONFIG
 
-config MODULE_PERIPH_INIT_WDT
-    bool "Auto initialize the Watchdog Timer peripheral"
-    default y if MODULE_PERIPH_INIT
-    depends on MODULE_PERIPH_WDT
-
-endmenu # Peripheral drivers
+rsource "Kconfig.timer"
+rsource "Kconfig.wdt"
