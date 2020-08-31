@@ -180,6 +180,11 @@ config HAS_PERIPH_MCG
     help
         Indicates that an MCG peripheral is present.
 
+config HAS_PERIPH_PLIC
+    bool
+    help
+        Indicates that a RISC-V Platform-local Interrupt Controller (PLIC) peripheral is present.
+
 config HAS_PERIPH_PM
     bool
     help

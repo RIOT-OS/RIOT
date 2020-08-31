@@ -10,6 +10,8 @@ USEMODULE += sifive_drivers_fe310
 USEMODULE += periph
 USEMODULE += periph_pm
 
+FEATURES_REQUIRED += periph_plic
+
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif

@@ -29,6 +29,7 @@
 #include "periph_cpu.h"
 #include "periph_conf.h"
 #include "periph/rtt.h"
+#include "plic.h"
 #include "vendor/encoding.h"
 #include "vendor/platform.h"
 #include "vendor/plic_driver.h"
@@ -76,9 +77,9 @@ void rtt_init(void)
     clear_csr(mie, MIP_MEIP);
 
     /* Configure RTC ISR with PLIC */
-    set_external_isr_cb(INT_RTCCMP, rtt_isr);
-    PLIC_enable_interrupt(INT_RTCCMP);
-    PLIC_set_priority(INT_RTCCMP, RTT_INTR_PRIORITY);
+    plic_set_isr_cb(INT_RTCCMP, rtt_isr);
+    plic_enable_interrupt(INT_RTCCMP);
+    plic_set_priority(INT_RTCCMP, RTT_INTR_PRIORITY);
 
     /*  Configure RTC scaler, etc... */
     AON_REG(AON_RTCCFG) = RTT_SCALE;

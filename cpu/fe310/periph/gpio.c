@@ -25,6 +25,7 @@
 #include "periph_cpu.h"
 #include "periph_conf.h"
 #include "periph/gpio.h"
+#include "plic.h"
 #include "vendor/encoding.h"
 #include "vendor/platform.h"
 #include "vendor/plic_driver.h"
@@ -159,9 +160,9 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     clear_csr(mie, MIP_MEIP);
 
     /* Configure GPIO ISR with PLIC */
-    set_external_isr_cb(INT_GPIO_BASE + pin, gpio_isr);
-    PLIC_enable_interrupt(INT_GPIO_BASE + pin);
-    PLIC_set_priority(INT_GPIO_BASE + pin, GPIO_INTR_PRIORITY);
+    plic_set_isr_cb(INT_GPIO_BASE + pin, gpio_isr);
+    plic_enable_interrupt(INT_GPIO_BASE + pin);
+    plic_set_priority(INT_GPIO_BASE + pin, GPIO_INTR_PRIORITY);
 
     /*  Configure the active flank(s) */
     gpio_irq_enable(pin);

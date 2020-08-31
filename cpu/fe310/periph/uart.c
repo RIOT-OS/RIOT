@@ -25,6 +25,7 @@
 #include "irq.h"
 #include "cpu.h"
 #include "periph/uart.h"
+#include "plic.h"
 #include "vendor/encoding.h"
 #include "vendor/platform.h"
 #include "vendor/plic_driver.h"
@@ -111,9 +112,9 @@ int uart_init(uart_t dev, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         clear_csr(mie, MIP_MEIP);
 
         /* Configure UART ISR with PLIC */
-        set_external_isr_cb(uart_config[dev].isr_num, uart_isr);
-        PLIC_enable_interrupt(uart_config[dev].isr_num);
-        PLIC_set_priority(uart_config[dev].isr_num, UART_ISR_PRIO);
+        plic_set_isr_cb(uart_config[dev].isr_num, uart_isr);
+        plic_enable_interrupt(uart_config[dev].isr_num);
+        plic_set_priority(uart_config[dev].isr_num, UART_ISR_PRIO);
 
         /* avoid trap by emptying RX FIFO */
         _drain(dev);

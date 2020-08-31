@@ -28,6 +28,7 @@
 #include "irq_arch.h"
 #include "panic.h"
 #include "sched.h"
+#include "plic.h"
 
 #include "vendor/encoding.h"
 #include "vendor/platform.h"
@@ -37,9 +38,6 @@
 #define MSTATUS_DEFAULT     (MSTATUS_MPP | MSTATUS_MPIE)
 
 volatile int fe310_in_isr = 0;
-
-/* PLIC external ISR function list */
-static external_isr_ptr_t _ext_isrs[PLIC_NUM_INTERRUPTS];
 
 /**
  * @brief   ISR trap vector
@@ -60,7 +58,9 @@ void irq_init(void)
     write_csr(mie, 0);
 
     /* Initial PLIC external interrupt controller */
-    PLIC_init(PLIC_CTRL_ADDR, PLIC_NUM_INTERRUPTS, PLIC_NUM_PRIORITIES);
+    if (IS_ACTIVE(MODULE_PERIPH_PLIC)) {
+        plic_init();
+    }
 
     /* Enable SW and external interrupts */
     set_csr(mie, MIP_MSIP);
@@ -68,30 +68,6 @@ void irq_init(void)
 
     /*  Set default state of mstatus */
     set_csr(mstatus, MSTATUS_DEFAULT);
-}
-
-/**
- * @brief   Set External ISR callback
- */
-void set_external_isr_cb(int intNum, external_isr_ptr_t cbFunc)
-{
-    assert((intNum > 0) && (intNum < PLIC_NUM_INTERRUPTS));
-
-    _ext_isrs[intNum] = cbFunc;
-}
-
-/**
- * @brief External interrupt handler
- */
-void external_isr(void)
-{
-    uint32_t intNum = (uint32_t)PLIC_claim_interrupt();
-
-    if ((intNum > 0) && (intNum < PLIC_NUM_INTERRUPTS) && (_ext_isrs[intNum] != NULL)) {
-        _ext_isrs[intNum](intNum);
-    }
-
-    PLIC_complete_interrupt(intNum);
 }
 
 /**
@@ -121,7 +97,9 @@ void handle_trap(uint32_t mcause)
 #endif
             case IRQ_M_EXT:
                 /* Handle external interrupt */
-                external_isr();
+                if (IS_ACTIVE(MODULE_PERIPH_PLIC)) {
+                    plic_isr_handler();
+                }
                 break;
 
             default:

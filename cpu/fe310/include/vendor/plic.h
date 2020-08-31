@@ -1,7 +1,7 @@
 // See LICENSE for license details.
 
-#ifndef PLIC_H
-#define PLIC_H
+#ifndef VENDOR_PLIC_H
+#define VENDOR_PLIC_H
 
 
 // 32 bits per source
@@ -27,4 +27,4 @@
 #define PLIC_MAX_TARGET                 15871
 #define PLIC_TARGET_MASK                0x3FFF
 
-#endif /* PLIC_H */
+#endif /* VENDOR_PLIC_H */
