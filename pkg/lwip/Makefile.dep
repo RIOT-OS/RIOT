@@ -7,3 +7,9 @@ DEFAULT_MODULE += auto_init_lwip
 ifneq (,$(filter lwip_sock_async,$(USEMODULE)))
   USEMODULE += sock_async
 endif
+
+ifneq (,$(filter stm32_eth,$(USEMODULE)))
+  ifneq (,$(filter lwip_dhcp_auto,$(USEMODULE)))
+    USEMODULE += stm32_eth_link_up
+  endif
+endif

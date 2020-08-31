@@ -33,6 +33,14 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#if IS_USED(MODULE_STM32_ETH_LINK_UP)
+#include "xtimer.h"
+
+#define STM32_ETH_LINK_UP_TIMEOUT_US    (1UL * US_PER_SEC)
+
+static xtimer_t _link_status_timer;
+#endif
+
 /* Set the value of the divider with the clock configured */
 #if !defined(CLOCK_CORECLOCK) || CLOCK_CORECLOCK < (20000000U)
 #error This peripheral requires a CORECLOCK of at least 20MHz
@@ -58,6 +66,10 @@
 #ifndef ETH_RX_BUFFER_SIZE
 #define ETH_RX_BUFFER_SIZE  (256U)
 #endif
+
+#define LINK_STATE_DOWN         (0x00)
+#define LINK_STATE_UP           (0x01)
+#define LINK_STATE_NOTIFIED_UP  (0x02)
 
 #if (ETH_RX_BUFFER_SIZE % 16) != 0
 /* For compatibility with 128bit memory interfaces, the buffer size needs to
@@ -85,6 +97,11 @@ static char rx_buffer[ETH_RX_DESCRIPTOR_COUNT][ETH_RX_BUFFER_SIZE];
 
 /* Netdev used in RIOT's API to upper layer */
 netdev_t *_netdev;
+
+#if IS_USED(MODULE_STM32_ETH_LINK_UP)
+/* Used for checking the link status */
+static uint8_t _link_state = LINK_STATE_DOWN;
+#endif
 
 /** Read or write a phy register, to write the register ETH_MACMIIAR_MW is to
  * be passed as the higher nibble of the value */
@@ -166,9 +183,71 @@ static void _init_buffer(void)
     ETH->DMATDLAR = (uintptr_t)&tx_desc[0];
 }
 
+static int stm32_eth_set(netdev_t *dev, netopt_t opt,
+                         const void *value, size_t max_len)
+{
+    int res = -1;
+
+    switch (opt) {
+    case NETOPT_ADDRESS:
+        assert(max_len >= ETHERNET_ADDR_LEN);
+        stm32_eth_set_mac((char *)value);
+        res = ETHERNET_ADDR_LEN;
+        break;
+    default:
+        res = netdev_eth_set(dev, opt, value, max_len);
+        break;
+    }
+
+    return res;
+}
+
+static int stm32_eth_get(netdev_t *dev, netopt_t opt,
+                         void *value, size_t max_len)
+{
+    int res = -1;
+
+    switch (opt) {
+    case NETOPT_ADDRESS:
+        assert(max_len >= ETHERNET_ADDR_LEN);
+        stm32_eth_get_mac((char *)value);
+        res = ETHERNET_ADDR_LEN;
+        break;
+    case NETOPT_LINK:
+        res = (_phy_read(0, PHY_BSMR) & BSMR_LINK_STATUS);
+        break;
+    default:
+        res = netdev_eth_get(dev, opt, value, max_len);
+        break;
+    }
+
+    return res;
+}
+
+#if IS_USED(MODULE_STM32_ETH_LINK_UP)
+static void _timer_cb(void *arg)
+{
+    netdev_t *dev = (netdev_t *)arg;
+    if (stm32_eth_get(dev, NETOPT_LINK, NULL, 0)) {
+        _link_state = LINK_STATE_UP;
+        dev->event_callback(dev, NETDEV_EVENT_ISR);
+    }
+    else {
+        _link_state = LINK_STATE_DOWN;
+        xtimer_set(&_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_US);
+    }
+}
+#endif
+
 static int stm32_eth_init(netdev_t *netdev)
 {
+#if IS_USED(MODULE_STM32_ETH_LINK_UP)
+    _link_status_timer.callback = _timer_cb;
+    _link_status_timer.arg = netdev;
+    xtimer_set(&_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_US);
+#else
     (void)netdev;
+#endif
     /* enable APB2 clock */
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 
@@ -435,7 +514,19 @@ void stm32_eth_isr_eth_wkup(void)
     cortexm_isr_end();
 }
 
-static void stm32_eth_isr(netdev_t *netdev) {
+static void stm32_eth_isr(netdev_t *netdev)
+{
+#if IS_USED(MODULE_STM32_ETH_LINK_UP)
+    switch (_link_state) {
+    case LINK_STATE_UP:
+        netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+        _link_state = LINK_STATE_NOTIFIED_UP;
+        return;
+    default:
+        break;
+    }
+#endif
+
     netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
@@ -458,44 +549,6 @@ void isr_eth(void)
     }
 
     cortexm_isr_end();
-}
-
-static int stm32_eth_set(netdev_t *dev, netopt_t opt,
-                         const void *value, size_t max_len)
-{
-    int res = -1;
-
-    switch (opt) {
-    case NETOPT_ADDRESS:
-        assert(max_len >= ETHERNET_ADDR_LEN);
-        stm32_eth_set_mac((char *)value);
-        res = ETHERNET_ADDR_LEN;
-        break;
-    default:
-        res = netdev_eth_set(dev, opt, value, max_len);
-        break;
-    }
-
-    return res;
-}
-
-static int stm32_eth_get(netdev_t *dev, netopt_t opt,
-                         void *value, size_t max_len)
-{
-    int res = -1;
-
-    switch (opt) {
-    case NETOPT_ADDRESS:
-        assert(max_len >= ETHERNET_ADDR_LEN);
-        stm32_eth_get_mac((char *)value);
-        res = ETHERNET_ADDR_LEN;
-        break;
-    default:
-        res = netdev_eth_get(dev, opt, value, max_len);
-        break;
-    }
-
-    return res;
 }
 
 static const netdev_driver_t netdev_driver_stm32f4eth = {
