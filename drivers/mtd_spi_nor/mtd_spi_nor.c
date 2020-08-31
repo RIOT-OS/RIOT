@@ -546,12 +546,14 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
     /* Wait for WEL to be cleared */
     wait_for_write_enable_cleared(dev);
 
-    /* Read security register */
-    uint8_t rdscur;
-    mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
-    if (rdscur & SECURITY_PFAIL) {
-        DEBUG("mtd_spi_nor_write: ERR: page program failed!\n");
-        ret = -EIO;
+    if (IS_ACTIVE(CONFIG_MTD_SPI_NOR_RDSCUR)) {
+        /* Read security register */
+        uint8_t rdscur;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
+        if (rdscur & SECURITY_PFAIL) {
+            DEBUG("mtd_spi_nor_write: ERR: page program failed!\n");
+            ret = -EIO;
+        }
     }
 
     mtd_spi_release(dev);
@@ -590,12 +592,14 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
     /* Wait for WEL to be cleared */
     wait_for_write_enable_cleared(dev);
 
-    /* Read security register */
-    uint8_t rdscur;
-    mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
-    if (rdscur & SECURITY_PFAIL) {
-        DEBUG("mtd_spi_nor_write: ERR: page program failed!\n");
-        ret = -EIO;
+    if (IS_ACTIVE(CONFIG_MTD_SPI_NOR_RDSCUR)) {
+        /* Read security register */
+        uint8_t rdscur;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
+        if (rdscur & SECURITY_PFAIL) {
+            DEBUG("mtd_spi_nor_write: ERR: page program failed!\n");
+            ret = -EIO;
+        }
     }
 
     mtd_spi_release(dev);
@@ -672,12 +676,14 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         /* Wait for WEL to be cleared */
         wait_for_write_enable_cleared(dev);
 
-        /* Read security register */
-        uint8_t rdscur;
-        mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
-        if (rdscur & SECURITY_EFAIL) {
-            DEBUG("mtd_spi_nor_erase: ERR: erase failed!\n");
-            ret = -EIO;
+        if (IS_ACTIVE(CONFIG_MTD_SPI_NOR_RDSCUR)) {
+            /* Read security register */
+            uint8_t rdscur;
+            mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
+            if (rdscur & SECURITY_EFAIL) {
+                DEBUG("mtd_spi_nor_erase: ERR: erase failed!\n");
+                ret = -EIO;
+            }
         }
     }
     mtd_spi_release(dev);
