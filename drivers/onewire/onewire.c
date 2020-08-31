@@ -37,7 +37,7 @@
 #define T_R_SAMPLE_US       (7)
 #define T_R_RECOVER_US      (55)
 
-static inline int _read_bit(const onewire_t *owi)
+static int _read_bit(const onewire_t *owi)
 {
     gpio_clear(owi->pin);
     xtimer_usleep(T_RW_PULSE_US);
@@ -51,7 +51,7 @@ static inline int _read_bit(const onewire_t *owi)
     return in;
 }
 
-static inline void _write_bit(const onewire_t *owi, int out)
+static void _write_bit(const onewire_t *owi, int out)
 {
     gpio_clear(owi->pin);
     if (out) {
@@ -112,7 +112,7 @@ void onewire_read(const onewire_t *owi, void *data, size_t len)
 {
     uint8_t *buf = (uint8_t *)data;
 
-    for (size_t pos = 0; pos < (size_t)len; pos++) {
+    for (size_t pos = 0; pos < len; pos++) {
         /* read the next byte from the bus */
         uint8_t tmp = 0;
         for (int i = 0; i < 8; i++) {
@@ -126,7 +126,7 @@ void onewire_write(const onewire_t *owi, const void *data, size_t len)
 {
     const uint8_t *buf = (uint8_t *)data;
 
-    for (size_t pos = 0; pos < (size_t)len; pos ++) {
+    for (size_t pos = 0; pos < len; pos ++) {
 
         for (int i = 0; i < 8; i++) {
             _write_bit(owi, (buf[pos] & (1 << i)));
