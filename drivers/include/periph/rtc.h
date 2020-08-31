@@ -52,7 +52,7 @@ extern "C" {
  *
  * 01.01.$RIOT_EPOCH will be the reset value of the RTC if supported.
  *
- * Internal RTC helper functions such as @see rtc_mktime and @see rtc_localtime
+ * Internal RTC helper functions such as @ref rtc_mktime and @ref rtc_localtime
  * will not work on dates earlier than that.
  */
 #define RIOT_EPOCH (2020)
