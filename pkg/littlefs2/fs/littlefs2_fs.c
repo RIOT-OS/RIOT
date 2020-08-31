@@ -85,8 +85,12 @@ static int _dev_write(const struct lfs_config *c, lfs_block_t block,
     DEBUG("lfs_write: c=%p, block=%" PRIu32 ", off=%" PRIu32 ", buf=%p, size=%" PRIu32 "\n",
           (void *)c, block, off, buffer, size);
 
-    return mtd_write_page(mtd, buffer, (fs->base_addr + block) * mtd->pages_per_sector,
-                          off, size);
+    int ret = mtd_write_page(mtd, buffer, (fs->base_addr + block) * mtd->pages_per_sector,
+                             off, size);
+    if (ret == -EIO) {
+        ret = LFS_ERR_CORRUPT;
+    }
+    return ret;
 }
 
 static int _dev_erase(const struct lfs_config *c, lfs_block_t block)
@@ -96,7 +100,11 @@ static int _dev_erase(const struct lfs_config *c, lfs_block_t block)
 
     DEBUG("lfs_erase: c=%p, block=%" PRIu32 "\n", (void *)c, block);
 
-    return mtd_erase_sector(mtd, fs->base_addr + block, 1);
+    int ret = mtd_erase_sector(mtd, fs->base_addr + block, 1);
+    if (ret == -EIO) {
+        ret = LFS_ERR_CORRUPT;
+    }
+    return ret;
 }
 
 static int _dev_sync(const struct lfs_config *c)
