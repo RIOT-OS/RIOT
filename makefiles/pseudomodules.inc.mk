@@ -84,6 +84,7 @@ PSEUDOMODULES += nimble_autoconn_%
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
+PSEUDOMODULES += onewire_%
 PSEUDOMODULES += openthread
 PSEUDOMODULES += picolibc
 PSEUDOMODULES += pktqueue

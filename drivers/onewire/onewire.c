@@ -36,18 +36,35 @@
 #define T_W_RECOVER_US      (10)
 #define T_R_SAMPLE_US       (7)
 #define T_R_RECOVER_US      (55)
+#define T_SLOT_DELAY        (60)
 
 static int _read_bit(const onewire_t *owi)
 {
+    int in;
+
     gpio_clear(owi->pin);
+
+#if defined(MODULE_ONEWIRE_POLL)
+    uint32_t delay;
+    uint32_t start = xtimer_now_usec();
+    /* poll the pin and wait for it to go high */
+    do {
+        delay = xtimer_now_usec() - start;
+    } while (!gpio_read(owi->pin) && (delay < T_SLOT_DELAY));
+
+    xtimer_usleep(T_SLOT_DELAY - delay);
+
+    in = (delay < (T_RW_PULSE_US + T_R_SAMPLE_US)) ? 1 : 0;
+#else
     xtimer_usleep(T_RW_PULSE_US);
     gpio_init(owi->pin, owi->imode);
     xtimer_usleep(T_R_SAMPLE_US);
-    int in = (gpio_read(owi->pin)) ? 1 : 0;
+    in = (gpio_read(owi->pin)) ? 1 : 0;
     xtimer_usleep(T_R_RECOVER_US);
+#endif
+
     gpio_init(owi->pin, owi->omode);
     gpio_set(owi->pin);
-
     return in;
 }
 
