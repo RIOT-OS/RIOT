@@ -422,6 +422,7 @@ ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   USEMODULE += evtimer
   USEMODULE += gnrc_ndp
   USEMODULE += gnrc_netif
+  USEMODULE += gnrc_netif_ipv6
   USEMODULE += ipv6_addr
   USEMODULE += random
   ifneq (,$(filter sock_dns,$(USEMODULE)))
