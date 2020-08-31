@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_MOTOR_DRIVER
+menuconfig KCONFIG_USEMODULE_MOTOR_DRIVER
     bool "Configure the DC Motor driver"
-    depends on MODULE_MOTOR_DRIVER
+    depends on USEMODULE_MOTOR_DRIVER
     help
         Configure the DC Motor driver using Kconfig.
 
-if KCONFIG_MODULE_MOTOR_DRIVER
+if KCONFIG_USEMODULE_MOTOR_DRIVER
 
 config MOTOR_DRIVER_MAX
     int "Maximum number of motors"
@@ -20,4 +20,4 @@ config MOTOR_DRIVER_MAX
         The value should not exceed the number of PWM channels
         Default value is set to 2.
 
-endif # KCONFIG_MODULE_MOTOR_DRIVER
+endif # KCONFIG_USEMODULE_MOTOR_DRIVER

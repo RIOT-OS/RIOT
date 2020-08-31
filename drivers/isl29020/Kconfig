@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_ISL29020
+menuconfig KCONFIG_USEMODULE_ISL29020
     bool "Configure ISL29020 driver"
-    depends on MODULE_ISL29020
+    depends on USEMODULE_ISL29020
     help
         Configure the ISL29020 driver using Kconfig.
 
-if KCONFIG_MODULE_ISL29020
+if KCONFIG_USEMODULE_ISL29020
 
 config ISL29020_DEFAULT_ADDRESS
     hex "Default I2C address"
@@ -21,4 +21,4 @@ config ISL29020_DEFAULT_ADDRESS
         corresponds to A0 connected to GND. For more information refer to the
         section 'I2C Interface' in the datasheet.
 
-endif # KCONFIG_MODULE_ISL29020
+endif # KCONFIG_USEMODULE_ISL29020

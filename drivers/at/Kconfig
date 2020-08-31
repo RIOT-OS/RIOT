@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_AT
+menuconfig KCONFIG_USEMODULE_AT
     bool "Configure AT driver"
-    depends on MODULE_AT
+    depends on USEMODULE_AT
     help
         Configure the AT driver using Kconfig.
 
-if KCONFIG_MODULE_AT
+if KCONFIG_USEMODULE_AT
 
 choice
     bool "End of line character"
@@ -53,11 +53,11 @@ config AT_BUF_SIZE_EXP
     int "Exponent for the buffer size (resulting in the queue size 2^n)"
     range 0 31
     default 7
-    depends on MODULE_AT_URC
+    depends on USEMODULE_AT_URC
     help
         Size of buffer used to process unsolicited result code data. (as
         exponent of 2^n). As the buffer size ALWAYS needs to be power of two,
         this option represents the exponent of 2^n, which will be used as the
         size of the buffer.
 
-endif # KCONFIG_MODULE_AT
+endif # KCONFIG_USEMODULE_AT

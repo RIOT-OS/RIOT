@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_LPSXXX
+menuconfig KCONFIG_USEMODULE_LPSXXX
     bool "Configure LPSXXX driver"
-    depends on MODULE_LPSXXX
+    depends on USEMODULE_LPSXXX
     help
         Configure the LPSXXX driver using Kconfig.
 
-if KCONFIG_MODULE_LPSXXX
+if KCONFIG_USEMODULE_LPSXXX
 
 config LPSXXX_DEFAULT_ADDRESS
     hex "Default I2C address"
@@ -22,4 +22,4 @@ config LPSXXX_DEFAULT_ADDRESS
         information refer to the section 'I2C operation' in the
         datasheet.
 
-endif # KCONFIG_MODULE_LPSXXX
+endif # KCONFIG_USEMODULE_LPSXXX

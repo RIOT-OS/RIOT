@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_PKG_WAKAAMA
+menuconfig KCONFIG_USEPKG_WAKAAMA
     bool "Configure Wakaama LwM2M"
-    depends on PKG_WAKAAMA
+    depends on USEPKG_WAKAAMA
     help
         Configure Wakaama package via Kconfig.
 
-if KCONFIG_PKG_WAKAAMA
+if KCONFIG_USEPKG_WAKAAMA
 
 menu "Remote server"
 
@@ -126,4 +126,4 @@ config LWM2M_TLSF_BUFFER
     int "Allocation buffer size"
     default 5120
 
-endif # KCONFIG_PKG_WAKAAMA
+endif # KCONFIG_USEPKG_WAKAAMA

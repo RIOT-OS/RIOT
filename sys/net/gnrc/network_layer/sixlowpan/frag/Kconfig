@@ -5,10 +5,10 @@
 # directory for more details.
 #
 
-if MODULE_GNRC_SIXLOWPAN_FRAG
+if USEMODULE_GNRC_SIXLOWPAN_FRAG
 
 rsource "fb/Kconfig"
 rsource "rb/Kconfig"
 rsource "vrb/Kconfig"
 
-endif # MODULE_GNRC_SIXLOWPAN_FRAG
+endif # USEMODULE_GNRC_SIXLOWPAN_FRAG

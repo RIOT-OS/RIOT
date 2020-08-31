@@ -5,13 +5,13 @@
 # directory for more details.
 #
 
-menuconfig KCONFIG_MODULE_GNRC_SIXLOWPAN
+menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN
     bool "Configure GNRC 6LoWPAN"
-    depends on MODULE_GNRC_SIXLOWPAN
+    depends on USEMODULE_GNRC_SIXLOWPAN
     help
         Configure GNRC 6LoWPAN module using Kconfig.
 
-if KCONFIG_MODULE_GNRC_SIXLOWPAN
+if KCONFIG_USEMODULE_GNRC_SIXLOWPAN
 
 rsource "frag/Kconfig"
 rsource "nd/Kconfig"
@@ -24,4 +24,4 @@ config GNRC_SIXLOWPAN_MSG_QUEUE_SIZE_EXP
         represents the exponent of 2^n, which will be used as the size of
         the queue.
 
-endif # KCONFIG_MODULE_GNRC_SIXLOWPAN
+endif # KCONFIG_USEMODULE_GNRC_SIXLOWPAN

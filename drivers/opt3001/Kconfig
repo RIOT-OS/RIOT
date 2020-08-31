@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_OPT3001
+menuconfig KCONFIG_USEMODULE_OPT3001
     bool "Configure OPT3001 driver"
-    depends on MODULE_OPT3001
+    depends on USEMODULE_OPT3001
     help
         Configure the OPT3001 driver using Kconfig.
 
-if KCONFIG_MODULE_OPT3001
+if KCONFIG_USEMODULE_OPT3001
 
 config OPT3001_I2C_ADDRESS
     hex "Default I2C address"
@@ -38,4 +38,4 @@ config OPT3001_CONVERSION_TIME_800
 
 endchoice
 
-endif # KCONFIG_MODULE_OPT3001
+endif # KCONFIG_USEMODULE_OPT3001
