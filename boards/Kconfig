@@ -9,7 +9,7 @@ config BOARD
     help
         Name of the currently selected board.
 
-config MOD_BOARD
+config MODULE_BOARD
     bool
     default y
     depends on TEST_KCONFIG

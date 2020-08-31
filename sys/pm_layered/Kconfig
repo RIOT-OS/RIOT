@@ -5,7 +5,7 @@
 # directory for more details.
 #
 
-config MOD_PM_LAYERED
+config MODULE_PM_LAYERED
     bool "Platform-independent Power Management"
-    depends on MOD_PERIPH_PM
+    depends on MODULE_PERIPH_PM
     depends on TEST_KCONFIG

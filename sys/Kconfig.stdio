@@ -10,20 +10,20 @@ menu "Standard Input/Ouput (STDIO)"
 
 choice
     bool "STDIO implementation"
-    default MOD_STDIO_UART
+    default MODULE_STDIO_UART
 
-# TODO: Add MOD_STDIO_CDC_ACM, MOD_STDIO_RTT, MOD_SLIPDEV_STDIO,
-# MOD_STDIO_NATIVE and MOD_STDIO_ETHOS
+# TODO: Add MODULE_STDIO_CDC_ACM, MODULE_STDIO_RTT, MODULE_SLIPDEV_STDIO,
+# MODULE_STDIO_NATIVE and MODULE_STDIO_ETHOS
 
-config MOD_STDIO_NULL
+config MODULE_STDIO_NULL
     bool "Null"
     help
         Empty implementation.
 
-config MOD_STDIO_UART
+config MODULE_STDIO_UART
     bool "UART"
     depends on HAS_PERIPH_UART
-    select MOD_PERIPH_UART
+    select MODULE_PERIPH_UART
 
 endchoice
 

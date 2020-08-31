@@ -5,18 +5,18 @@
 # directory for more details.
 #
 
-menuconfig MOD_PERIPH_SPI
+menuconfig MODULE_PERIPH_SPI
     bool "SPI peripheral driver"
     depends on HAS_PERIPH_SPI
-    select MOD_PERIPH_COMMON
+    select MODULE_PERIPH_COMMON
 
-if MOD_PERIPH_SPI
+if MODULE_PERIPH_SPI
 
-config MOD_PERIPH_INIT_SPI
+config MODULE_PERIPH_INIT_SPI
     bool "Auto initialize SPI peripheral"
-    default y if MOD_PERIPH_INIT
+    default y if MODULE_PERIPH_INIT
 
-config MOD_PERIPH_SPI_RECONFIGURE
+config MODULE_PERIPH_SPI_RECONFIGURE
     bool "Pin reconfiguration support"
     depends on HAS_PERIPH_SPI_RECONFIGURE
 
@@ -24,9 +24,9 @@ config MOD_PERIPH_SPI_RECONFIGURE
 # modules are handled in Makefile. We need to define it to keep the list the
 # same for now. We should be able to remove it later on.
 
-config MOD_PERIPH_INIT_SPI_RECONFIGURE
+config MODULE_PERIPH_INIT_SPI_RECONFIGURE
     bool "Auto initialize SPI pin reconfiguration support"
-    default y if MOD_PERIPH_INIT
-    depends on MOD_PERIPH_SPI_RECONFIGURE
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_SPI_RECONFIGURE
 
-endif # MOD_PERIPH_SPI
+endif # MODULE_PERIPH_SPI
