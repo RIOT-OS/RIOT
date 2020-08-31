@@ -30,7 +30,7 @@
 #include "shell.h"
 #include "can/device.h"
 
-#ifdef BOARD_NATIVE
+#if IS_USED(MODULE_CAN_LINUX)
 
 #include <candev_linux.h>
 
@@ -192,7 +192,7 @@ int main(void)
     puts("candev test application\n");
 
     isrpipe_init(&rxbuf, (uint8_t *)rx_ringbuf, sizeof(rx_ringbuf));
-#ifdef BOARD_NATIVE
+#if IS_USED(MODULE_CAN_LINUX)
     puts("Initializing Linux Can device");
     candev_linux_init( &linux_dev, &(candev_linux_conf[0]));    /* vcan0 */
     candev = (candev_t *)&linux_dev;
