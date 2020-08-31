@@ -21,7 +21,7 @@
  */
 
 /**
- * @ingroup     drivers_ds18b20
+ * @ingroup     drivers_onewire
  * @{
  *
  * @file
