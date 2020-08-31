@@ -37,11 +37,16 @@
  * as xtimer is not used in this test, we can use it and the fact that every board
  * provides a configuration for it.
  */
-#define TIMER_CYCL  XTIMER_DEV
-#define CYCLE_MS    25UL
-#define CYCLES_MAX   10
+#define TIMER_CYCL      (XTIMER_DEV)
+#define CYCLE_MS        (25UL)
+#define CYCLES_MAX      (10)
+#ifdef TIMER_CHANNEL_NUMOF
+#define MAX_CHANNELS    (TIMER_CHANNEL_NUMOF)
+#else
+#define MAX_CHANNELS    (10)
+#endif
 
-static unsigned count[TIMER_CHANNEL_NUMOF];
+static unsigned count[MAX_CHANNELS];
 
 static void cb(void *arg, int chan)
 {
@@ -85,7 +90,13 @@ int main(void)
 
     /* Only the first channel should trigger and reset the counter */
     /* If subsequent channels trigger this is an error. */
-    timer_set_periodic(TIMER_CYCL, 1, 2 * steps, TIM_FLAG_RESET_ON_SET);
+    unsigned channel_numof = 1;
+    for(unsigned i = 1; i < MAX_CHANNELS; i++) {
+        if(!timer_set_periodic(TIMER_CYCL, i, (1 + i) * steps, TIM_FLAG_RESET_ON_SET)) {
+            channel_numof = i;
+            break;
+        }
+    }
     timer_set_periodic(TIMER_CYCL, 0, steps, TIM_FLAG_RESET_ON_MATCH);
 
     mutex_lock(&lock);
@@ -93,7 +104,7 @@ int main(void)
     puts("\nCycles:");
 
     bool succeeded = true;
-    for (unsigned i = 0; i < TIMER_CHANNEL_NUMOF; ++i) {
+    for (unsigned i = 0; i < channel_numof; ++i) {
         printf("channel %u = %02u\t[%s]\n", i, count[i], _print_ok(i, &succeeded));
     }
 

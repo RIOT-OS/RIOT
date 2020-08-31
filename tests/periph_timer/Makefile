@@ -19,6 +19,11 @@ BOARDS_TIMER_32kHz := \
     openlabs-kw41z-mini \
     frdm-k64f \
     frdm-k22f \
+    slstk3401a \
+    slstk3402a \
+    sltb001a \
+    stk3600 \
+    stk3700 \
     #
 
 BOARDS_TIMER_CLOCK_CORECLOCK := \
