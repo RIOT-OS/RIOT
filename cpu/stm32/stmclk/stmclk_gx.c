@@ -57,7 +57,7 @@
 #define PLL_R                       (((CONFIG_CLOCK_PLL_R >> 1) - 1) << RCC_PLLCFGR_PLLR_Pos)
 #endif
 
-#if CONFIG_BOARD_HAS_HSE
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
 #define PLL_IN                      CLOCK_HSE
 #define PLL_SRC                     RCC_PLLCFGR_PLLSRC_HSE
 #else
@@ -187,14 +187,14 @@ void stmclk_init_sysclk(void)
     RCC->CR = RCC_CR_HSION;
 
 #if defined(CPU_FAM_STM32G0)
-    if (CONFIG_USE_CLOCK_HSI && CONFIG_CLOCK_HSISYS_DIV != 1) {
+    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSI) && CONFIG_CLOCK_HSISYS_DIV != 1) {
         /* configure HSISYS divider, only available on G0 */
         RCC->CR |= CLOCK_HSI_DIV;
         while (!(RCC->CR & RCC_CR_HSIRDY)) {}
     }
 #endif
 
-    if (CONFIG_USE_CLOCK_HSE) {
+    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
         /* if configured, we need to enable the HSE clock now */
         RCC->CR |= RCC_CR_HSEON;
         while (!(RCC->CR & RCC_CR_HSERDY)) {}
@@ -206,8 +206,8 @@ void stmclk_init_sysclk(void)
 #endif
         while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSE) {}
     }
-    else if (CONFIG_USE_CLOCK_PLL) {
-        if (CONFIG_BOARD_HAS_HSE) {
+    else if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
+        if (IS_ACTIVE(CONFIG_BOARD_HAS_HSE)) {
             /* if configured, we need to enable the HSE clock now */
             RCC->CR |= RCC_CR_HSEON;
             while (!(RCC->CR & RCC_CR_HSERDY)) {}
@@ -252,7 +252,7 @@ void stmclk_init_sysclk(void)
     if (IS_USED(MODULE_PERIPH_RTT)) {
         /* Ensure LPTIM1 clock source (LSI or LSE) is correctly reset when initializing
            the clock, this is particularly useful after waking up from deep sleep */
-        if (CONFIG_BOARD_HAS_LSE) {
+        if (IS_ACTIVE(CONFIG_BOARD_HAS_LSE)) {
             RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0 | RCC_CCIPR_LPTIM1SEL_1;
         }
         else {
