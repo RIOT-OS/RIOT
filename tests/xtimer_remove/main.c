@@ -44,6 +44,14 @@ int main(void)
 
         xtimer_remove(&timers[n]);
 
+        /* timers that are removed should be reset (0)*/
+        if ((timers[n].offset) ||
+            (timers[n].long_offset) ||
+            (timers[n].start_time) ||
+            (timers[n].long_start_time)) {
+            return -1;
+        }
+
         unsigned int num = NUMOF-1;
         while(num--) {
             msg_t m;
