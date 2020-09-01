@@ -491,13 +491,35 @@
 extern "C" {
 #endif
 
+/**
+ * @defgroup net_sock_dtls_conf    SOCK DTLS compile configuration
+ * @ingroup  net_sock_conf
+ * @{
+ */
+/**
+ * @brief   Default buffer size for DTLS handshake (as exponent of 2^n)
+ *
+ * As the buffer size ALWAYS needs to be power of two, this option represents
+ * the exponent of 2^n, which will be used as the size of the buffer
+ * ( @ref DTLS_HANDSHAKE_BUFSIZE ).
+ *
+ */
+#ifndef CONFIG_DTLS_HANDSHAKE_BUFSIZE_EXP
+#define CONFIG_DTLS_HANDSHAKE_BUFSIZE_EXP  8
+#endif
+/** @} */
+
+/**
+ * @brief   Size buffer used in handshake to hold credentials
+ */
 #ifndef DTLS_HANDSHAKE_BUFSIZE
-#define DTLS_HANDSHAKE_BUFSIZE  (256)   /**< Size buffer used in handshake to
-                                             hold credentials */
+#define DTLS_HANDSHAKE_BUFSIZE  (1 << CONFIG_DTLS_HANDSHAKE_BUFSIZE_EXP)
 #endif
 
-#define SOCK_DTLS_HANDSHAKE     (EXDEV) /**< Return value for a successful
-                                             handshake */
+/**
+ * @brief   Return value for a successful handshake
+ */
+#define SOCK_DTLS_HANDSHAKE     (EXDEV)
 
 /**
  * @brief DTLS version number
