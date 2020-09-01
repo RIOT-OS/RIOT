@@ -6,6 +6,7 @@ COMMAND=""
 BRNAME="tapbr0"
 TAPNAME="tap"
 DEACTIVATE_IPV6=""
+ENABLE_FORWARDING=0
 UPLINK=""
 
 usage() {
@@ -20,6 +21,8 @@ usage() {
     echo "   -l <iface>, --list <iface>:   If <iface> belongs to a bridge, list the bridge and" >&2
     echo "                                 all interfaces that belong to it. If <iface> does " >&2
     echo"                                  not belong to a bridge, just print <iface>." >&2
+    echo "   -f, --forwarding              Enable forwarding system-wide on creation and " >&2
+    echo "                                 disable on deletion." >&2
     echo "   -b <name>, --bridge <name>:   Give name for the bridge (default: tapbr)" >&2
     echo "   -t <name>, --tap <name>:      Name base for the tap interfaces; the" >&2
     echo "                                 generated names will be <name>x" >&2
@@ -43,6 +46,20 @@ update_uplink() {
         echo "DHCP client \`dhclient\` not found." >&2
         echo "Please reconfigure your DHCP client for interface $1" >&2
         echo "to keep up-link's IPv4 connection." >&2
+    fi
+}
+
+activate_forwarding() {
+    if [ ${ENABLE_FORWARDING} -eq 1 ]; then
+        case "${PLATFORM}" in
+            FreeBSD|OSX)
+                sysctl -w net.inet.ip.forwarding=1 || exit 1 ;;
+            Linux)
+                sysctl -w net.ipv6.conf.${BRNAME}.forwarding=1 || exit 1
+                sysctl -w net.ipv6.conf.${BRNAME}.accept_ra=0 || exit 1
+                sysctl -w net.ipv6.conf.all.forwarding=1 || exit 1 ;;
+            *)  ;;
+        esac
     fi
 }
 
@@ -83,6 +100,20 @@ up_bridge() {
         *)
             ;;
     esac
+}
+
+deactivate_forwarding() {
+    if [ ${ENABLE_FORWARDING} -eq 1 ]; then
+        case "${PLATFORM}" in
+            FreeBSD|OSX)
+                sysctl -w net.inet.ip.forwarding=0 || exit 1 ;;
+            Linux)
+                sysctl -w net.ipv6.conf.${BRNAME}.forwarding=0 || exit 1
+                sysctl -w net.ipv6.conf.${BRNAME}.accept_ra=1 || exit 1
+                sysctl -w net.ipv6.conf.all.forwarding=0 || exit 1 ;;
+            *)  ;;
+        esac
+    fi
 }
 
 delete_bridge() {
@@ -232,6 +263,9 @@ while true ; do
             fi
             COMMAND="delete"
             shift ;;
+        -f|--forwarding)
+            ENABLE_FORWARDING=1
+            shift ;;
         -l|--list)
             if [ -n "${COMMAND}" ]; then
                 usage
@@ -308,9 +342,11 @@ if [ "${COMMAND}" = 'create' ]; then
         create_tap || exit 1
     done
 
+    activate_forwarding || exit 1
     up_bridge || exit 1
 
 elif [ "${COMMAND}" = 'delete' ]; then
+    deactivate_forwarding || exit 1
     delete_bridge
 elif [ "${COMMAND}" = 'list' ]; then
     list_bridge $(get_master "$BRNAME")
