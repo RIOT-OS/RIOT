@@ -28,8 +28,8 @@
 #include "debug.h"
 
 
-#ifdef CORD_EP
-#define BUFSIZE         (sizeof(CORD_EP))   /* contains \0 termination char */
+#ifdef CONFIG_CORD_EP
+#define BUFSIZE         (sizeof(CONFIG_CORD_EP))   /* contains \0 termination char */
 #else
 #define PREFIX_LEN      (sizeof(CORD_EP_PREFIX))        /* contains \0 char */
 #define BUFSIZE         (PREFIX_LEN + CORD_EP_SUFFIX_LEN)
@@ -39,8 +39,8 @@ char cord_common_ep[BUFSIZE];
 
 void cord_common_init(void)
 {
-#ifdef CORD_EP
-    memcpy(cord_common_ep, CORD_EP, BUFSIZE);
+#ifdef CONFIG_CORD_EP
+    memcpy(cord_common_ep, CONFIG_CORD_EP, BUFSIZE);
 #else
     uint8_t luid[CORD_EP_SUFFIX_LEN / 2];
 

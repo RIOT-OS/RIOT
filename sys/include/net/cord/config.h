@@ -60,7 +60,7 @@ extern "C" {
  *
  * @{
  */
-#ifndef CORD_EP
+#ifndef CONFIG_CORD_EP
 /**
  * @brief   Number of generated hexadecimal characters added to the ep
  *
