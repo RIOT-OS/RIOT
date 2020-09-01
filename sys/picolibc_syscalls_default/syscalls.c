@@ -165,10 +165,12 @@ int kill(pid_t pid, int sig)
 
 #include "mutex.h"
 
-static mutex_t picolibc_put_mutex = MUTEX_INIT;
-
+#ifndef PICOLIBC_STDOUT_BUFSIZE
 #define PICOLIBC_STDOUT_BUFSIZE 64
+#endif
 
+#ifdef MODULE_PICOLIBC_STDOUT_BUFFERED
+static mutex_t picolibc_put_mutex = MUTEX_INIT;
 static char picolibc_stdout[PICOLIBC_STDOUT_BUFSIZE];
 static int picolibc_stdout_queued;
 
@@ -183,10 +185,14 @@ static void _picolibc_flush(void)
 static int picolibc_put(char c, FILE *file)
 {
     (void)file;
+
     mutex_lock(&picolibc_put_mutex);
     picolibc_stdout[picolibc_stdout_queued++] = c;
-    if (picolibc_stdout_queued == PICOLIBC_STDOUT_BUFSIZE || c == '\n')
+
+    if (picolibc_stdout_queued == PICOLIBC_STDOUT_BUFSIZE || c == '\n') {
         _picolibc_flush();
+    }
+
     mutex_unlock(&picolibc_put_mutex);
     return 1;
 }
@@ -199,6 +205,22 @@ static int picolibc_flush(FILE *file)
     mutex_unlock(&picolibc_put_mutex);
     return 0;
 }
+
+#else
+int picolibc_put(char c, FILE *file)
+{
+    (void)file;
+    stdio_write(&c, 1);
+    return 1;
+}
+
+static int picolibc_flush(FILE *file)
+{
+    (void)file;
+    return 0;
+}
+
+#endif
 
 static int picolibc_get(FILE *file)
 {

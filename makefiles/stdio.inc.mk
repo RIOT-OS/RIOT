@@ -55,3 +55,10 @@ ifneq (,$(filter stdio_semihosting,$(USEMODULE)))
   USEMODULE += xtimer
   FEATURES_REQUIRED += cpu_core_cortexm
 endif
+
+# enable stdout buffering for modules that benefit from sending out buffers in larger chunks
+ifneq (,$(filter picolibc,$(USEMODULE)))
+  ifneq (,$(filter stdio_cdc_acm stdio_ethos slipdev_stdio stdio_semihosting,$(USEMODULE)))
+    USEMODULE += picolibc_stdout_buffered
+  endif
+endif
