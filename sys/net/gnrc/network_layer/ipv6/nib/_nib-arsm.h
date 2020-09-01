@@ -28,6 +28,7 @@
 #include "net/gnrc/netif.h"
 #include "net/ndp.h"
 #include "net/icmpv6.h"
+#include "net/ipv6/hdr.h"
 
 #include "_nib-internal.h"
 
