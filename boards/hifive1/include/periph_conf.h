@@ -33,22 +33,22 @@ extern "C" {
 #ifndef CONFIG_USE_CLOCK_HFXOSC_PLL
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HFXOSC) || IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC_PLL) || \
     IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC)
-#define CONFIG_USE_CLOCK_HFXOSC_PLL         (0)
+#define CONFIG_USE_CLOCK_HFXOSC_PLL         0
 #else
-#define CONFIG_USE_CLOCK_HFXOSC_PLL         (1)     /* Use PLL clocked by HFXOSC by default */
+#define CONFIG_USE_CLOCK_HFXOSC_PLL         1       /* Use PLL clocked by HFXOSC by default */
 #endif
 #endif /* CONFIG_USE_CLOCK_HFXOSC_PLL */
 
 #ifndef CONFIG_USE_CLOCK_HFXOSC
-#define CONFIG_USE_CLOCK_HFXOSC             (0)
+#define CONFIG_USE_CLOCK_HFXOSC             0
 #endif /* CONFIG_USE_CLOCK_HFXOSC */
 
 #ifndef CONFIG_USE_CLOCK_HFROSC_PLL
-#define CONFIG_USE_CLOCK_HFROSC_PLL         (0)
+#define CONFIG_USE_CLOCK_HFROSC_PLL         0
 #endif /* CONFIG_USE_CLOCK_HFROSC_PLL */
 
 #ifndef CONFIG_USE_CLOCK_HFROSC
-#define CONFIG_USE_CLOCK_HFROSC             (0)
+#define CONFIG_USE_CLOCK_HFROSC             0
 #endif /* CONFIG_USE_CLOCK_HFROSC */
 
 #if CONFIG_USE_CLOCK_HFXOSC_PLL && \

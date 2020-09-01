@@ -22,7 +22,7 @@
 
 #include "vendor/prci_driver.h"
 
-#if CONFIG_USE_CLOCK_HFROSC || CONFIG_USE_CLOCK_HFROSC_PLL
+#if IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC) || IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC_PLL)
 static uint32_t _cpu_frequency = 0;
 #endif
 
@@ -41,7 +41,7 @@ void clock_init(void)
         PRCI_REG(PRCI_PLLCFG) &= ~PLL_SEL(PLL_SEL_PLL);
     }
 
-    if (CONFIG_USE_CLOCK_HFXOSC || CONFIG_USE_CLOCK_HFXOSC_PLL) {
+    if (IS_ACTIVE(CONFIG_USE_CLOCK_HFXOSC) || IS_ACTIVE(CONFIG_USE_CLOCK_HFXOSC_PLL)) {
         /* Ensure HFXOSC is enabled */
         PRCI_REG(PRCI_HFXOSCCFG) = XOSC_EN(1);
 
@@ -51,7 +51,7 @@ void clock_init(void)
         /* Select HFXOSC as reference frequency and bypass PLL */
         PRCI_REG(PRCI_PLLCFG) = PLL_REFSEL(PLL_REFSEL_HFXOSC) | PLL_BYPASS(1);
 
-        if (CONFIG_USE_CLOCK_HFXOSC_PLL) {
+        if (IS_ACTIVE(CONFIG_USE_CLOCK_HFXOSC_PLL)) {
             /* Divide final output frequency by 1 */
             PRCI_REG(PRCI_PLLDIV) = (PLL_FINAL_DIV_BY_1(1) | PLL_FINAL_DIV(0));
 
@@ -71,7 +71,7 @@ void clock_init(void)
         /* Turn off the HFROSC */
         PRCI_REG(PRCI_HFROSCCFG) &= ~ROSC_EN(1);
     }
-    else if (CONFIG_USE_CLOCK_HFROSC_PLL) {
+    else if (IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC_PLL)) {
         PRCI_set_hfrosctrim_for_f_cpu(CONFIG_CLOCK_DESIRED_FREQUENCY, PRCI_FREQ_UNDERSHOOT);
     }
     else { /* Clock HFROSC */
@@ -91,7 +91,7 @@ void clock_init(void)
 
 uint32_t cpu_freq(void)
 {
-#if CONFIG_USE_CLOCK_HFROSC || CONFIG_USE_CLOCK_HFROSC_PLL
+#if IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC) || IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC_PLL)
     /* Clock frequency with HFROSC cannot be determined precisely from
        settings */
     /* If not done already, estimate the CPU frequency */
