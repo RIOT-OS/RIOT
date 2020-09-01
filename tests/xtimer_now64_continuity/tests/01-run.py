@@ -11,9 +11,9 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect_exact("[START]")
+    child.expect_exact("[START]: xtimer_now64_continuity")
     child.expect(r"\[RESULTS\] min=\d+, avg=\d+, max=\d+")
-    child.expect_exact("[SUCCESS]")
+    child.expect_exact("[SUCCESS]: xtimer_now64_continuity")
 
 
 if __name__ == "__main__":

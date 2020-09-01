@@ -31,6 +31,7 @@ int32_t res[NUMOF];
 int main(void)
 {
     puts("xtimer_periodic_wakeup test application.\n");
+    puts("[START]: xtimer_periodic_wakeup");
 
     uint32_t interval = NUMOF;
     int32_t max_diff = INT32_MIN;
@@ -66,5 +67,6 @@ int main(void)
     }
 
     printf("\nTest complete.\n");
+    puts("[SUCCESS]: xtimer_periodic_wakeup");
     return 0;
 }

@@ -15,7 +15,7 @@ def testfunc(child):
     for i in range(5):
         child.expect("Message: 42")
         child.expect("Timeout!")
-    child.expect("[SUCCESS]")
+    child.expect("[SUCCESS]: xtimer_msg_receive_timeout")
 
 
 if __name__ == "__main__":

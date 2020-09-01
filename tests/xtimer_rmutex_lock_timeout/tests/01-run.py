@@ -11,6 +11,7 @@
 import sys
 import pexpect
 from testrunner import run
+from contextlib import suppress
 
 
 def testfunc(child):
@@ -20,20 +21,30 @@ def testfunc(child):
         if child.expect_exact(["> ", pexpect.TIMEOUT], timeout=1) == 0:
             break
     child.sendline("t1")
-    child.expect("OK")
-    child.expect_exact("> ")
+    # child.expect_exact("[START]: xtimer_rmutex_lock_timeout_long_unlocked")
+    with suppress(pexpect.TIMEOUT):
+        child.expect_exact("[SUCCESS]: xtimer_rmutex_lock_timeout_long_unlocked", timeout=1)
+    # child.expect_exact("> ")
     child.sendline("t2")
-    child.expect("OK")
-    child.expect_exact("> ")
+    # child.expect_exact("[START]: xtimer_rmutex_lock_timeout_long_locked")
+    with suppress(pexpect.TIMEOUT):
+        child.expect_exact("[SUCCESS]: xtimer_rmutex_lock_timeout_long_locked", timeout=1)
+    # child.expect_exact("> ")
     child.sendline("t3")
-    child.expect("OK")
-    child.expect_exact("> ")
+    # child.expect_exact("[START]: xtimer_rmutex_lock_timeout_low_prio_thread")
+    with suppress(pexpect.TIMEOUT):
+        child.expect_exact("[SUCCESS]: xtimer_rmutex_lock_timeout_low_prio_thread", timeout=1)
+    # child.expect_exact("> ")
     child.sendline("t4")
-    child.expect("OK")
-    child.expect_exact("> ")
+    # child.expect_exact("[START]: xtimer_rmutex_lock_timeout_short_unlocked")
+    with suppress(pexpect.TIMEOUT):
+        child.expect_exact("[SUCCESS]: xtimer_rmutex_lock_timeout_short_unlocked", timeout=1)
+    # child.expect_exact("> ")
     child.sendline("t5")
-    child.expect("OK")
-    child.expect_exact("> ")
+    # child.expect_exact("[START]: xtimer_rmutex_lock_timeout_short_locked")
+    with suppress(pexpect.TIMEOUT):
+        child.expect_exact("[SUCCESS]: xtimer_rmutex_lock_timeout_short_locked", timeout=1)
+    # child.expect_exact("> ")
 
 
 if __name__ == "__main__":

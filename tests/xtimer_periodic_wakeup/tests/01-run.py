@@ -12,14 +12,16 @@ from testrunner import run
 
 def testfunc(child):
     child.expect_exact("xtimer_periodic_wakeup test application.")
+    child.expect_exact("[START]: xtimer_periodic_wakeup")
 
     for i in range(256):
-        child.expect(r"Testing interval \d+... \(now=\d+\)")
+        child.expect(r"Testing interval \d+... \(now=\d+\)", timeout=0.1)
     for i in range(256):
         child.expect(r" +\d+ diff=\d+")
 
     child.expect(r"Min/max error: \d+/\d+")
     child.expect_exact("Test complete.")
+    child.expect_exact("[SUCCESS]: xtimer_periodic_wakeup")
 
 
 if __name__ == "__main__":

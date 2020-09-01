@@ -48,6 +48,6 @@ int main(void)
         /* flip sign */
         offset *= (-1);
     }
-    puts("[SUCCESS]");
+    puts("[SUCCESS]: xtimer_msg_receive_timeout");
     return 0;
 }

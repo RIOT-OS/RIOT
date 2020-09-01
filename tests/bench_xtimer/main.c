@@ -89,6 +89,7 @@ static void _print_result(const char *desc, unsigned n, uint32_t total)
 
 int main(void)
 {
+    puts("[START]: bench_xtimer");
     puts("xtimer benchmark application.\n");
 
     unsigned n;
@@ -287,6 +288,7 @@ int main(void)
     _print_result("sizeof(xtimer_t)", NUMOF_TIMERS, sizeof(_timers));
 
     puts("done.");
+    puts("[SUCCESS]: bench_xtimer");
 
     return 0;
 }

@@ -59,6 +59,7 @@ int main(void)
     gpio_init(sleep_pin, GPIO_OUT);
 #endif
 
+    puts("[START]: xtimer_usleep");
     printf("Running test %u times with %u distinct sleep times\n", RUNS,
            (unsigned)SLEEP_TIMES_NUMOF);
     start_test = xtimer_now_usec();
@@ -90,6 +91,7 @@ int main(void)
     }
     testtime = xtimer_now_usec() - start_test;
     printf("Test ran for %" PRIu32 " us\n", testtime);
+    puts("[SUCCESS]: xtimer_usleep");
 
     return 0;
 }

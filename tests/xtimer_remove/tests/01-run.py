@@ -11,6 +11,7 @@ from testrunner import run
 
 
 def testfunc(child):
+    child.expect_exact("[START]: xtimer_remove")
     child.expect_exact("xtimer_remove test application.")
     child.expect_exact("Setting 3 timers, removing timer 0/3")
     child.expect_exact("timer 1 triggered.")
@@ -21,7 +22,7 @@ def testfunc(child):
     child.expect_exact("Setting 3 timers, removing timer 2/3")
     child.expect_exact("timer 0 triggered.")
     child.expect_exact("timer 1 triggered.")
-    child.expect_exact("test successful.")
+    child.expect_exact("[SUCCESS]: xtimer_remove")
 
 
 if __name__ == "__main__":

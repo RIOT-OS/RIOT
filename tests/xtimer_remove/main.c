@@ -28,6 +28,7 @@
 
 int main(void)
 {
+    puts("[START]: xtimer_remove");
     puts("xtimer_remove test application.\n");
 
     kernel_pid_t me = thread_getpid();
@@ -53,11 +54,12 @@ int main(void)
             }
             else {
                 printf("timer %u triggered.\n", m.type);
+
             }
         }
     }
 
-    printf("test successful.\n");
+    puts("[SUCCESS]: xtimer_remove");
 
     return 0;
 }

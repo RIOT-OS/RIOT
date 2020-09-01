@@ -26,6 +26,7 @@
 
 int main(void)
 {
+    puts("[START]: xtimer_now_irq");
     if (XTIMER_WIDTH == 32) {
         puts("Nothing to do for 32 bit timers.\n");
     }
@@ -47,6 +48,6 @@ int main(void)
         }
     }
 
-    puts("SUCCESS");
+    puts("[SUCCESS]: xtimer_now_irq");
     return 0;
 }

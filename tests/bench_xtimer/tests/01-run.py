@@ -11,11 +11,13 @@ from testrunner import run
 
 
 def testfunc(child):
+    child.expect_exact("[START]: bench_xtimer")
     child.expect_exact("xtimer benchmark application.\r\n")
     for i in range(13):
         child.expect(r"\s+[\w() _\+]+\s+\d+ / \d+ = \d+\r\n")
 
     child.expect_exact("done.\r\n")
+    child.expect_exact("[SUCCESS]: bench_xtimer")
 
 
 if __name__ == "__main__":

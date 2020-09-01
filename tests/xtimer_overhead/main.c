@@ -54,5 +54,7 @@ int main(void)
     printf("min=%" PRIi32 " max=%" PRIi32 " avg_diff=%" PRIi32 "\n", min, max,
            (total / SAMPLES));
 
+    puts("[SUCCESS]: xtimer_overhead");
+
     return 0;
 }

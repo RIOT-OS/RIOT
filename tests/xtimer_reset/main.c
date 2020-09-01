@@ -31,6 +31,8 @@ int main(void)
     printf("It should print three times \"now=<value>\", with values"
            " approximately 100ms (100000us) apart.\n");
 
+    puts("[START]: xtimer_reset");
+
     xtimer_t xtimer;
     xtimer_t xtimer2;
 
@@ -54,7 +56,7 @@ int main(void)
     thread_sleep();
     printf("now=%" PRIu32 "\n", xtimer_now_usec());
 
-    printf("Test completed!\n");
+    puts("[SUCCESS]: xtimer_reset");
 
     return 0;
 }
