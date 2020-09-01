@@ -140,7 +140,7 @@ void rn2xx3_setup(rn2xx3_t *dev, const rn2xx3_params_t *params)
     dev->p = *params;
 
     /* initialize pins and perform hardware reset */
-    if (dev->p.pin_reset != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.pin_reset)) {
         gpio_init(dev->p.pin_reset, GPIO_OUT);
         gpio_set(dev->p.pin_reset);
     }
@@ -162,7 +162,7 @@ int rn2xx3_init(rn2xx3_t *dev)
     }
 
     /* if reset pin is connected, do a hardware reset */
-    if (dev->p.pin_reset != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.pin_reset)) {
         gpio_clear(dev->p.pin_reset);
         xtimer_usleep(RESET_DELAY);
         gpio_set(dev->p.pin_reset);

@@ -224,7 +224,7 @@ int main(void)
         }
     }
 
-    if (dev.params.interrupt_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev.params.interrupt_pin)) {
         /* Setting up and enabling the interrupt pin of the pH OEM */
         printf("Enabling interrupt pin... ");
         if (ph_oem_enable_interrupt(&dev, interrupt_pin_callback,
@@ -259,7 +259,7 @@ int main(void)
         /* blocking for ~420ms till reading is done if no interrupt pin defined */
         ph_oem_start_new_reading(&dev);
 
-        if (dev.params.interrupt_pin != GPIO_UNDEF) {
+        if (gpio_is_valid(dev.params.interrupt_pin)) {
             /* when interrupt is defined, wait for the IRQ to fire and
              * the event to be posted, so the "reading_available_event_callback"
              * can be executed after */
@@ -267,7 +267,7 @@ int main(void)
             ev->handler(ev);
         }
 
-        if (dev.params.interrupt_pin == GPIO_UNDEF) {
+        if (!gpio_is_valid(dev.params.interrupt_pin)) {
 
             if (ph_oem_read_ph(&dev, &data) == PH_OEM_OK) {
                 printf("pH value raw: %d\n", data);

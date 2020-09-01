@@ -63,21 +63,22 @@ void soft_spi_init_pins(soft_spi_t bus)
     assert(soft_spi_bus_is_valid(bus));
 
     /* check that miso is not mosi is not clk*/
-    assert(soft_spi_config[bus].mosi_pin != soft_spi_config[bus].miso_pin);
-    assert(soft_spi_config[bus].mosi_pin != soft_spi_config[bus].clk_pin);
-    assert(soft_spi_config[bus].miso_pin != soft_spi_config[bus].clk_pin);
+    assert(!gpio_is_equal(soft_spi_config[bus].mosi_pin, soft_spi_config[bus].miso_pin));
+    assert(!gpio_is_equal(soft_spi_config[bus].mosi_pin, soft_spi_config[bus].clk_pin));
+    assert(!gpio_is_equal(soft_spi_config[bus].miso_pin, soft_spi_config[bus].clk_pin));
     /* mandatory pins */
-    assert((GPIO_UNDEF != soft_spi_config[bus].mosi_pin) || (GPIO_UNDEF != soft_spi_config[bus].miso_pin));
-    assert(GPIO_UNDEF != soft_spi_config[bus].clk_pin);
+    assert(gpio_is_valid(soft_spi_config[bus].mosi_pin) ||
+           gpio_is_valid(soft_spi_config[bus].miso_pin));
+    assert(gpio_is_valid(soft_spi_config[bus].clk_pin));
 
     /* initialize clock pin */
     gpio_init(soft_spi_config[bus].clk_pin, GPIO_OUT);
     /* initialize optional pins */
-    if (GPIO_UNDEF != soft_spi_config[bus].mosi_pin) {
+    if (gpio_is_valid(soft_spi_config[bus].mosi_pin)) {
         gpio_init(soft_spi_config[bus].mosi_pin, GPIO_OUT);
         gpio_clear(soft_spi_config[bus].mosi_pin);
     }
-    if (GPIO_UNDEF != soft_spi_config[bus].miso_pin) {
+    if (gpio_is_valid(soft_spi_config[bus].miso_pin)) {
         gpio_init(soft_spi_config[bus].mosi_pin, GPIO_IN);
     }
 }
@@ -90,7 +91,7 @@ int soft_spi_init_cs(soft_spi_t bus, soft_spi_cs_t cs)
         return SOFT_SPI_NODEV;
     }
 
-    if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF)) {
+    if (gpio_is_valid(cs) && !gpio_is_equal(cs, SOFT_SPI_CS_UNDEF)) {
         DEBUG("Soft SPI set user CS line\n");
         gpio_init(cs, GPIO_OUT);
         gpio_set(cs);
@@ -174,14 +175,14 @@ uint8_t soft_spi_transfer_byte(soft_spi_t bus, soft_spi_cs_t cs, bool cont, uint
     uint8_t retval = 0;
 
     /* activate the given chip select line */
-    if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF)) {
+    if (gpio_is_valid(cs) && !gpio_is_equal(cs, SOFT_SPI_CS_UNDEF)) {
         gpio_clear((gpio_t)cs);
     }
 
     retval = _transfer_one_byte(bus, out);
 
     if (!cont) {
-        if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF)) {
+        if (gpio_is_valid(cs) && !gpio_is_equal(cs, SOFT_SPI_CS_UNDEF)) {
             gpio_set((gpio_t)cs);
         }
     }

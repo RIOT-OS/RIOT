@@ -38,8 +38,8 @@ void atwinc15x0_isr(void *arg)
 sint8 nm_bsp_init(void)
 {
     assert(atwinc15x0);
-    assert(atwinc15x0->params.reset_pin != GPIO_UNDEF);
-    assert(atwinc15x0->params.irq_pin != GPIO_UNDEF);
+    assert(gpio_is_valid(atwinc15x0->params.reset_pin));
+    assert(gpio_is_valid(atwinc15x0->params.irq_pin));
 
     gpio_init(atwinc15x0->params.reset_pin, GPIO_OUT);
     gpio_set(atwinc15x0->params.reset_pin);
@@ -47,12 +47,12 @@ sint8 nm_bsp_init(void)
     gpio_init_int(atwinc15x0->params.irq_pin, GPIO_IN_PU, GPIO_FALLING,
                   atwinc15x0_isr, NULL);
 
-    if (atwinc15x0->params.chip_en_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(atwinc15x0->params.chip_en_pin)) {
         gpio_init(atwinc15x0->params.chip_en_pin, GPIO_OUT);
         gpio_set(atwinc15x0->params.chip_en_pin);
     }
 
-    if (atwinc15x0->params.wake_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(atwinc15x0->params.wake_pin)) {
         gpio_init(atwinc15x0->params.wake_pin, GPIO_OUT);
         gpio_set(atwinc15x0->params.wake_pin);
     }

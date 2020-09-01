@@ -97,7 +97,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
                 (gpio_init(card->params.clk,  GPIO_OUT) == 0) &&
                 (gpio_init(card->params.cs,   GPIO_OUT) == 0) &&
                 (gpio_init(card->params.miso, GPIO_IN_PU) == 0) &&
-                ( (card->params.power == GPIO_UNDEF) ||
+                ( (!gpio_is_valid(card->params.power)) ||
                   (gpio_init(card->params.power, GPIO_OUT) == 0)) ) {
 
                 DEBUG("gpio_init(): [OK]\n");
@@ -110,7 +110,7 @@ static sd_init_fsm_state_t _init_sd_fsm_step(sdcard_spi_t *card, sd_init_fsm_sta
         case SD_INIT_SPI_POWER_SEQ:
             DEBUG("SD_INIT_SPI_POWER_SEQ\n");
 
-            if (card->params.power != GPIO_UNDEF) {
+            if (gpio_is_valid(card->params.power)) {
                 gpio_write(card->params.power, card->params.power_act_high);
                 xtimer_usleep(SD_CARD_WAIT_AFTER_POWER_UP_US);
             }

@@ -97,7 +97,7 @@ int itg320x_init(itg320x_t *dev, const itg320x_params_t *params)
 int itg320x_init_int(const itg320x_t *dev, itg320x_drdy_int_cb_t cb, void *arg)
 {
     assert(dev != NULL);
-    assert(dev->params.int_pin != GPIO_UNDEF);
+    assert(gpio_is_valid(dev->params.int_pin));
 
     DEBUG_DEV("cb=%p, arg=%p", dev, cb, arg);
 

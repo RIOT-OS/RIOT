@@ -36,7 +36,7 @@ sint8 nm_bus_init(void *arg)
     (void)arg;
 
     assert(atwinc15x0);
-    assert(atwinc15x0->params.ssn_pin != GPIO_UNDEF);
+    assert(gpio_is_valid(atwinc15x0->params.ssn_pin));
 
     gpio_init(atwinc15x0->params.ssn_pin, GPIO_OUT);
     gpio_set(atwinc15x0->params.ssn_pin);

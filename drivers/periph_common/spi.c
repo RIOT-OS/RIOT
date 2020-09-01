@@ -33,7 +33,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     if (bus >= SPI_NUMOF) {
         return SPI_NODEV;
     }
-    if ((cs == SPI_CS_UNDEF) || (cs == GPIO_UNDEF)) {
+    if (gpio_is_equal(cs, SPI_CS_UNDEF) || !gpio_is_valid(cs)) {
         return SPI_NOCS;
     }
 

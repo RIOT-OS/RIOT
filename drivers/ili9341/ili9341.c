@@ -96,7 +96,7 @@ int ili9341_init(ili9341_t *dev, const ili9341_params_t *params)
         return -1;
     }
 
-    if (dev->params->rst_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params->rst_pin)) {
         gpio_init(dev->params->rst_pin, GPIO_OUT);
         gpio_clear(dev->params->rst_pin);
         xtimer_usleep(120 * US_PER_MS);

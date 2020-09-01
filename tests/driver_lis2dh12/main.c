@@ -107,7 +107,7 @@ int main(void)
 
 #ifdef MODULE_LIS2DH12_INT
     /* enable interrupt Pins */
-    if (lis2dh12_params[0].int1_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(lis2dh12_params[0].int1_pin)) {
         /* create and set the interrupt params */
         lis2dh12_int_params_t params_int1 = {
             .int_type = LIS2DH12_INT_TYPE_I1_IA1,
@@ -121,7 +121,7 @@ int main(void)
     }
 
     /* create and set the interrupt params */
-    if (lis2dh12_params[0].int2_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(lis2dh12_params[0].int2_pin)) {
         lis2dh12_int_params_t params_int2 = {
             .int_type = LIS2DH12_INT_TYPE_I2_IA2,
             .int_config = LIS2DH12_INT_CFG_YLIE,
