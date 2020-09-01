@@ -1,5 +1,9 @@
 USEMODULE += boards_common_atmega
 
+ifneq (,$(filter eui_provider,$(USEMODULE)))
+  USEMODULE += at24mac
+endif
+
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += bme280_i2c
   USEMODULE += saul_gpio

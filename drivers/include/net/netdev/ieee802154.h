@@ -20,11 +20,11 @@
 #ifndef NET_NETDEV_IEEE802154_H
 #define NET_NETDEV_IEEE802154_H
 
+#include "net/eui_provider.h"
 #include "net/ieee802154.h"
 #include "net/gnrc/nettype.h"
 #include "net/netopt.h"
 #include "net/netdev.h"
-#include "luid.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -208,8 +208,10 @@ int netdev_ieee802154_dst_filter(netdev_ieee802154_t *dev, const uint8_t *mhr);
  */
 static inline void netdev_ieee802154_setup(netdev_ieee802154_t *dev)
 {
-    luid_netdev_get_eui64(&dev->netdev, (eui64_t *)&dev->long_addr);
-    luid_get_short((network_uint16_t *)&dev->short_addr);
+    /* generate EUI-64 and short address */
+    netdev_eui64_get(&dev->netdev, (eui64_t *)&dev->long_addr);
+    eui_short_from_eui64((eui64_t *)&dev->long_addr,
+                         (network_uint16_t *)&dev->short_addr);
 }
 
 #ifdef __cplusplus

@@ -47,6 +47,9 @@ endif
 ifneq (,$(filter emcute,$(USEMODULE)))
   DIRS += net/application_layer/emcute
 endif
+ifneq (,$(filter eui_provider,$(USEMODULE)))
+  DIRS += net/link_layer/eui_provider
+endif
 ifneq (,$(filter fib,$(USEMODULE)))
   DIRS += net/network_layer/fib
 endif
