@@ -237,7 +237,10 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                       "search neighbor cache\n",
                       ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
 
-                if (res == 0) {
+                if ((res == 0) &&
+                    /* If ARSM is not active only use link-local as next hop */
+                    (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM) ||
+                     ipv6_addr_is_link_local(dst))) {
                     DEBUG("nib: prefix list entry => taking dst as next hop\n");
                     memcpy(&route.next_hop, dst, sizeof(route.next_hop));
                 }
