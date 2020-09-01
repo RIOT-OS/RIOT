@@ -37,12 +37,17 @@ int main(void)
     int32_t max_diff = INT32_MIN;
     int32_t min_diff = INT32_MAX;
 
+    xtimer_ticks32_t last_wakeup = xtimer_now();
     for (int i = 0; i < NUMOF; i++) {
         xtimer_ticks32_t now = xtimer_now();
         printf("Testing interval %" PRIu32 "... (now=%" PRIu32 ")\n", interval, xtimer_usec_from_ticks(now));
-        xtimer_ticks32_t last_wakeup = xtimer_now();
         xtimer_ticks32_t before = last_wakeup;
         xtimer_periodic_wakeup(&last_wakeup, interval);
+        xtimer_ticks32_t diff = xtimer_diff(before, last_wakeup);
+        if (diff.ticks32 == 0) {
+            puts("Test Failed: last_wakeup not updated.");
+            return -1;
+        }
         now = xtimer_now();
         res[i] = (xtimer_usec_from_ticks(now) - xtimer_usec_from_ticks(before)) - interval;
         interval -= 1;
@@ -64,6 +69,17 @@ int main(void)
         puts("too large difference.\n");
         puts("Test Failed.\n");
         return 1;
+    }
+
+    /* test expired last_wakeup */
+    last_wakeup = xtimer_now();
+    xtimer_ticks32_t before = last_wakeup;
+    xtimer_usleep(500);
+    xtimer_periodic_wakeup(&last_wakeup, 250);
+    xtimer_ticks32_t diff = xtimer_diff(before, last_wakeup);
+    if (diff.ticks32 == 0) {
+        puts("Test Failed: last_wakeup not updated.");
+        return -1;
     }
 
     printf("\nTest complete.\n");
