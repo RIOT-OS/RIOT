@@ -89,10 +89,7 @@ include $(RIOTMAKE)/tools/fixdep.inc.mk
 $(BINDIR)/$(MODULE)/:
 	$(Q)mkdir -p $@
 
-# only create the module folder when it's going to hold objects
-ifneq (,$(strip $(OBJ)))
-  $(MODULE).module $(OBJ): | $(BINDIR)/$(MODULE)/
-endif
+$(MODULE).module $(OBJ): | $(BINDIR)/$(MODULE)/
 
 $(MODULE).module: $(OBJ) | $(DIRS:%=ALL--%)
 
