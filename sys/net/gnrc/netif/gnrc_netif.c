@@ -588,8 +588,9 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
 
         gnrc_netif_ipv6_bus_post(netif, GNRC_IPV6_EVENT_ADDR_VALID, &netif->ipv6.addrs[idx]);
     }
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
-    else if (!gnrc_netif_is_6ln(netif)) {
+    else if (IS_USED(MODULE_GNRC_IPV6) &&
+             IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) &&
+             !gnrc_netif_is_6ln(netif)) {
         /* cast to remove const qualifier (will still be used NIB internally as
          * const) */
         msg_t msg = { .type = GNRC_IPV6_NIB_DAD,
@@ -597,7 +598,6 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
 
         msg_send(&msg, gnrc_ipv6_pid);
     }
-#endif
 #else
     (void)pfx_len;
 #endif
