@@ -46,9 +46,9 @@
  * @{
  */
 /* figure out which input to use */
-#if CONFIG_CLOCK_PLL_SRC_MSI
+#if IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)
 #define PLL_SRC                     RCC_PLLCFGR_PLLSRC_MSI
-#elif CONFIG_CLOCK_PLL_SRC_HSE && CONFIG_BOARD_HAS_HSE
+#elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
 #define PLL_SRC                     RCC_PLLCFGR_PLLSRC_HSE
 #else
 #define PLL_SRC                     RCC_PLLCFGR_PLLSRC_HSI
@@ -222,15 +222,22 @@ void stmclk_init_sysclk(void)
              (instead of MSIRANGE in the RCC_CR) */
     RCC->CR = (RCC_CR_HSION);
 
-    if (CONFIG_USE_CLOCK_HSE) {
+    /* Enable the HSE clock only when it's provided by the board and required:
+        - Use HSE as system clock
+        - Use HSE as PLL input clock
+    */
+    if (IS_ACTIVE(CONFIG_BOARD_HAS_HSE) &&
+        (IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE))) {
         RCC->CR |= (RCC_CR_HSEON);
         while (!(RCC->CR & RCC_CR_HSERDY)) {}
+    }
 
+    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
         /* Select HSE as system clock and configure the different prescalers */
         RCC->CFGR &= ~RCC_CFGR_SW;
         RCC->CFGR |= RCC_CFGR_SW_HSE;
     }
-    else if (CONFIG_USE_CLOCK_MSI) {
+    else if (IS_ACTIVE(CONFIG_USE_CLOCK_MSI)) {
 #if defined(CPU_FAM_STM32WB)
         RCC->CR |= (CLOCK_MSIRANGE | RCC_CR_MSION);
 #else
@@ -245,14 +252,8 @@ void stmclk_init_sysclk(void)
         /* Select MSI as system clock and configure the different prescalers */
         RCC->CFGR = (RCC_CFGR_SW_MSI | CLOCK_AHB_DIV | CLOCK_APB1_DIV | CLOCK_APB2_DIV);
     }
-    else if (CONFIG_USE_CLOCK_PLL) {
-        if (CONFIG_BOARD_HAS_HSE && CONFIG_CLOCK_PLL_SRC_HSE) {
-            /* if configured, we need to enable the HSE clock now */
-            RCC->CR |= (RCC_CR_HSEON);
-            while (!(RCC->CR & RCC_CR_HSERDY)) {}
-        }
-
-        if (CONFIG_CLOCK_PLL_SRC_MSI) {
+    else if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
+        if (IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)) {
             /* reset clock to MSI with 48MHz, disables all other clocks */
 #if defined(CPU_FAM_STM32WB)
             RCC->CR |= (CLOCK_MSIRANGE | RCC_CR_MSION);
@@ -261,7 +262,7 @@ void stmclk_init_sysclk(void)
 #endif
             while (!(RCC->CR & RCC_CR_MSIRDY)) {}
 
-            if (CONFIG_BOARD_HAS_LSE) {
+            if (IS_ACTIVE(CONFIG_BOARD_HAS_LSE)) {
                 /* configure the low speed clock domain */
                 stmclk_enable_lfclk();
                 /* now we can enable the MSI PLL mode to enhance accuracy of the MSI */
@@ -285,17 +286,22 @@ void stmclk_init_sysclk(void)
         while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
     }
 
-    stmclk_disable_hsi();
-    irq_restore(is);
+    if (!IS_ACTIVE(CONFIG_USE_CLOCK_HSI) ||
+        (IS_ACTIVE(CONFIG_USE_CLOCK_PLL) && !IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSI))) {
+        /* Disable HSI only if not used */
+        stmclk_disable_hsi();
+    }
 
     if (IS_USED(MODULE_PERIPH_RTT)) {
         /* Ensure LPTIM1 clock source (LSI or LSE) is correctly reset when initializing
            the clock, this is particularly useful after waking up from deep sleep */
-        if (CONFIG_BOARD_HAS_LSE) {
+        if (IS_ACTIVE(CONFIG_BOARD_HAS_LSE)) {
             RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0 | RCC_CCIPR_LPTIM1SEL_1;
         }
         else {
             RCC->CCIPR |= RCC_CCIPR_LPTIM1SEL_0;
         }
     }
+
+    irq_restore(is);
 }

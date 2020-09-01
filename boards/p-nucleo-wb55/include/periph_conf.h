@@ -26,11 +26,11 @@
 #define CLOCK_CORECLOCK_MAX             MHZ(64)
 
 #ifndef CONFIG_BOARD_HAS_LSE
-#define CONFIG_BOARD_HAS_LSE            (1)
+#define CONFIG_BOARD_HAS_LSE            1
 #endif
 
 #ifndef CONFIG_BOARD_HAS_HSE
-#define CONFIG_BOARD_HAS_HSE            (1)
+#define CONFIG_BOARD_HAS_HSE            1
 #endif
 
 #define CLOCK_HSE                       MHZ(32)
