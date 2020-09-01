@@ -52,14 +52,14 @@ config CPU_ARCH
     help
         Architecture of the currently selected CPU.
 
-config MOD_CPU
+config MODULE_CPU
     bool
     default y
     depends on TEST_KCONFIG
     help
         Module which holds all CPU-specific files.
 
-config MOD_PERIPH
+config MODULE_PERIPH
     bool
     depends on TEST_KCONFIG
     help

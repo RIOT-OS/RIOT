@@ -5,7 +5,7 @@
 # directory for more details.
 #
 menu "GNRC Network stack"
-    depends on MODULE_GNRC
+    depends on USEMODULE_GNRC
 
 rsource "application_layer/dhcpv6/Kconfig"
 rsource "link_layer/gomach/Kconfig"

@@ -370,7 +370,7 @@ include $(RIOTMAKE)/kconfig.mk
 # For testing, use TEST_KCONFIG as a switch between Makefile.dep and Kconfig
 ifeq (1,$(TEST_KCONFIG))
   $(info === [ATTENTION] Testing Kconfig dependency modelling ===)
-  KCONFIG_MODULES := $(call lowercase,$(patsubst CONFIG_MOD_%,%,$(filter CONFIG_MOD_%,$(.VARIABLES))))
+  KCONFIG_MODULES := $(call lowercase,$(patsubst CONFIG_MODULE_%,%,$(filter CONFIG_MODULE_%,$(.VARIABLES))))
   USEMODULE := $(KCONFIG_MODULES)
 else
   # handle removal of default modules

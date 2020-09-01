@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_GNRC_LORAWAN
+menuconfig KCONFIG_USEMODULE_GNRC_LORAWAN
     bool "Configure GNRC LoRaWAN"
-    depends on MODULE_GNRC_LORAWAN
+    depends on USEMODULE_GNRC_LORAWAN
     help
         Configure GNRC LoRaWAN module using Kconfig.
 
-if KCONFIG_MODULE_GNRC_LORAWAN
+if KCONFIG_USEMODULE_GNRC_LORAWAN
 
 config GNRC_LORAWAN_TIMER_DRIFT
     int "Maximum timer drift"
@@ -27,4 +27,4 @@ config GNRC_LORAWAN_MIN_SYMBOLS_TIMEOUT
     default 30
     range 0 1024
 
-endif # KCONFIG_MODULE_GNRC_LORAWAN
+endif # KCONFIG_USEMODULE_GNRC_LORAWAN

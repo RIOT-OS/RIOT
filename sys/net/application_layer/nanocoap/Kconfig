@@ -6,15 +6,15 @@
 #
 
 # Nanocoap provides CoAP functionalities
-config MODULE_NANOCOAP
+config USEMODULE_NANOCOAP
     bool
     select HAS_PROTOCOL_COAP
 
-menuconfig KCONFIG_MODULE_NANOCOAP
+menuconfig KCONFIG_USEMODULE_NANOCOAP
     bool "Configure Nanocoap module"
-    depends on MODULE_NANOCOAP
+    depends on USEMODULE_NANOCOAP
 
-if KCONFIG_MODULE_NANOCOAP
+if KCONFIG_USEMODULE_NANOCOAP
 
 config NANOCOAP_NOPTS_MAX
     int "Maximum number of options in a message"
@@ -35,4 +35,4 @@ config NANOCOAP_QS_MAX
     int "Maximum length of a query string written to a message"
     default 64
 
-endif # KCONFIG_MODULE_NANOCOAP
+endif # KCONFIG_USEMODULE_NANOCOAP

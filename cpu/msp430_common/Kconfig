@@ -34,4 +34,4 @@ config HAS_ARCH_MSP430
 ## Specific default configuration values
 config GNRC_PKTBUF_SIZE
     default 2560
-    depends on KCONFIG_MODULE_GNRC_PKTBUF_STATIC
+    depends on KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC

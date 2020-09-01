@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_TMP00X
+menuconfig KCONFIG_USEMODULE_TMP00X
     bool "Configure TMP00X driver"
-    depends on MODULE_TMP00X
+    depends on USEMODULE_TMP00X
     help
         Configure the TMP00X driver using Kconfig.
 
-if KCONFIG_MODULE_TMP00X
+if KCONFIG_USEMODULE_TMP00X
 
 config TMP00X_I2C_ADDRESS
     hex "Default I2C Address"
@@ -61,4 +61,4 @@ config TMP00X_USE_RAW_VALUES
         Enable this to return raw ADC readings. By default measurements are
         converted to Celsius.
 
-endif # KCONFIG_MODULE_TMP00X
+endif # KCONFIG_USEMODULE_TMP00X

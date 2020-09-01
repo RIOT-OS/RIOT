@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_PKG_TINYDTLS
+menuconfig KCONFIG_USEPKG_TINYDTLS
     bool "Configure tinydtls"
-    depends on PKG_TINYDTLS
+    depends on USEPKG_TINYDTLS
     help
         Configure tinydtls package via Kconfig.
 
-if KCONFIG_PKG_TINYDTLS
+if KCONFIG_USEPKG_TINYDTLS
 
 # TODO change to multiple choice after DTLS application support enabling more than one types of cypher suites
 choice
@@ -48,4 +48,4 @@ config DTLS_HANDSHAKE_MAX
     help
         The maximum number of concurrent DTLS handshakes.
 
-endif # KCONFIG_PKG_TINYDTLS
+endif # KCONFIG_USEPKG_TINYDTLS

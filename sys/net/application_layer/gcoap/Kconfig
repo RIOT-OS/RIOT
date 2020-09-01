@@ -4,14 +4,14 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_GCOAP
+menuconfig KCONFIG_USEMODULE_GCOAP
     bool "Configure Gcoap"
-    depends on MODULE_GCOAP
+    depends on USEMODULE_GCOAP
     help
         Configure Gcoap module using Kconfig. If not set default values and
         CFLAGS will be used.
 
-if KCONFIG_MODULE_GCOAP
+if KCONFIG_USEMODULE_GCOAP
 
 config GCOAP_PDU_BUF_SIZE
     int "Request or response buffer size"
@@ -113,4 +113,4 @@ config GCOAP_NO_AUTO_INIT
         Disable gcoap startup during system auto init. If disabled,
         gcoap_init() must be called by some other means.
 
-endif # KCONFIG_MODULE_GCOAP
+endif # KCONFIG_USEMODULE_GCOAP

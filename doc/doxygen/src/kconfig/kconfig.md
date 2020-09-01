@@ -454,10 +454,10 @@ reserved for the cases described bellow:
 | `CPU_FAM_` | Models a family of CPUs |
 | `CPU_MODEL_` | Models a particular model of CPU |
 | `HAS_` | Models a [feature](build-system-basics.html#features) |
-| `KCONFIG_MODULE_` | Used during transition to enable configuration of a module via Kconfig |
-| `KCONFIG_PKG_` | Used during transition to enable configuration of a package via Kconfig |
-| `MODULE_` | Models a [RIOT module](creating-modules.html#creating-modules) |
-| `PKG_` | Models an [external package](group__pkg.html) |
+| `KCONFIG_USEMODULE_` | Used during transition to enable configuration of a module via Kconfig |
+| `KCONFIG_USEPKG_` | Used during transition to enable configuration of a package via Kconfig |
+| `USEMODULE_` | Models a [RIOT module](creating-modules.html#creating-modules). Generated from `USEMODULE` variable |
+| `USEPKG_` | Models an [external package](group__pkg.html). Generated from `USEPKG` variable |
 
 ---
 # Appendixes                                              {#kconfig-appendixes}

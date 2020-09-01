@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_HDC1000
+menuconfig KCONFIG_USEMODULE_HDC1000
     bool "Configure HDC1000 driver"
-    depends on MODULE_HDC1000
+    depends on USEMODULE_HDC1000
     help
         Configure the HDC1000 driver using Kconfig.
 
-if KCONFIG_MODULE_HDC1000
+if KCONFIG_USEMODULE_HDC1000
 
 config HDC1000_I2C_ADDRESS
     hex "I2C default address"
@@ -29,4 +29,4 @@ config HDC1000_CONVERSION_TIME
         conversions (worst case) to allow for timer imprecision:
         (convert temp + convert hum) * 2 -> (6.5ms + 6.5ms) * 2 := 26ms.
 
-endif # KCONFIG_MODULE_HDC1000
+endif # KCONFIG_USEMODULE_HDC1000

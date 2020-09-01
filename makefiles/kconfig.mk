@@ -93,8 +93,8 @@ BUILDDEPS += $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) $(FIXDEP)
 # Include configuration header when building
 CFLAGS += -imacros '$(KCONFIG_GENERATED_AUTOCONF_HEADER_C)'
 
-USEMODULE_W_PREFIX = $(addprefix MODULE_,$(USEMODULE))
-USEPKG_W_PREFIX = $(addprefix PKG_,$(USEPKG))
+USEMODULE_W_PREFIX = $(addprefix USEMODULE_,$(USEMODULE))
+USEPKG_W_PREFIX = $(addprefix USEPKG_,$(USEPKG))
 
 .PHONY: menuconfig
 
@@ -116,7 +116,7 @@ endif
 ifneq (clean, $(MAKECMDGOALS))
 
 # Build a Kconfig file defining all used modules and packages. This is done by
-# defining symbols like 'MODULE_<MODULE_NAME>' or PKG_<PACKAGE_NAME> which
+# defining symbols like 'USEMODULE_<MODULE_NAME>' or USEPKG_<PACKAGE_NAME> which
 # default to 'y'. Then, every module and package Kconfig menu will depend on
 # that symbol being set to show its options.
 # Do nothing when testing Kconfig module dependency modelling.
