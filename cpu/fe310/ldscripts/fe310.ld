@@ -11,18 +11,20 @@
  * @{
  *
  * @file
- * @brief           Memory definitions for the SiFive FE310_G002
+ * @brief           Memory definitions for the SiFive FE310
  *
  * @author          Ken Rabold
+ * @author          Koen Zandberg <koen@bergzand.net>
  *
  * @}
  */
+INCLUDE fe310_vars.ld
 
 MEMORY
 {
-  flash (rxai!w) : ORIGIN = 0x20010000, LENGTH = 0x0006a120
-  ram   (wxa!ri) : ORIGIN = 0x80000000, LENGTH = 0x00004000
-  itim  (wxa!ri) : ORIGIN = 0x08000000, LENGTH = 0x00002000
+  flash (rxai!w) : ORIGIN = _rom_start_addr , LENGTH = _rom_length
+  ram   (wxa!ri) : ORIGIN = _ram_start_addr, LENGTH = _ram_length
+  itim  (wxa!ri) : ORIGIN = _itim_start_addr, LENGTH = _itim_length
 }
 
 INCLUDE fe310_base.ld
