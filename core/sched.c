@@ -83,6 +83,40 @@ static void (*sched_cb) (kernel_pid_t active_thread,
                          kernel_pid_t next_thread) = NULL;
 #endif
 
+/* Depending on whether the CLZ instruction is available, the order of the
+ * runqueue_bitcache is reversed. When the instruction is available, it is
+ * faster to determine the MSBit set. When it is not available it is faster to
+ * determine the LSBit set. These functions abstract the runqueue modifications
+ * and readout away, switching between the two orders depending on the CLZ
+ * instruction availability
+ */
+static inline void _set_runqueue_bit(thread_t *process)
+{
+#if defined(BITARITHM_HAS_CLZ)
+    runqueue_bitcache |= BIT31 >> process->priority;
+#else
+    runqueue_bitcache |= 1 << process->priority;
+#endif
+}
+
+static inline void _clear_runqueue_bit(thread_t *process)
+{
+#if defined(BITARITHM_HAS_CLZ)
+    runqueue_bitcache &= ~(BIT31 >> process->priority);
+#else
+    runqueue_bitcache &= ~(1 << process->priority);
+#endif
+}
+
+static inline unsigned _get_prio_queue_from_runqueue(void)
+{
+#if defined(BITARITHM_HAS_CLZ)
+    return 31 - bitarithm_msb(runqueue_bitcache);
+#else
+    return bitarithm_lsb(runqueue_bitcache);
+#endif
+}
+
 static void _unschedule(thread_t *active_thread)
 {
     if (active_thread->status == STATUS_RUNNING) {
@@ -123,7 +157,7 @@ int __attribute__((used)) sched_run(void)
 
     sched_context_switch_request = 0;
 
-    int nextrq = bitarithm_lsb(runqueue_bitcache);
+    unsigned nextrq = _get_prio_queue_from_runqueue();
     thread_t *next_thread = container_of(sched_runqueues[nextrq].next->next,
                                          thread_t, rq_entry);
 
@@ -178,7 +212,7 @@ void sched_set_status(thread_t *process, thread_status_t status)
                 process->pid, process->priority);
             clist_rpush(&sched_runqueues[process->priority],
                         &(process->rq_entry));
-            runqueue_bitcache |= 1 << process->priority;
+            _set_runqueue_bit(process);
         }
     }
     else {
@@ -189,7 +223,7 @@ void sched_set_status(thread_t *process, thread_status_t status)
             clist_lpop(&sched_runqueues[process->priority]);
 
             if (!sched_runqueues[process->priority].next) {
-                runqueue_bitcache &= ~(1 << process->priority);
+                _clear_runqueue_bit(process);
             }
         }
     }
