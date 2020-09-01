@@ -19,42 +19,19 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "periph_cpu.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
- * @name    Clock system configuration
- * @{
- **/
-#define CLOCK_HSE           (16000000U)         /* external oscillator */
-#define CLOCK_CORECLOCK     (32000000U)         /* desired core clock frequency */
-
 /*
- * 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz)
+ * This board provides an LSE, so enable it before including the default clock config
  */
 #ifndef CLOCK_LSE
 #define CLOCK_LSE           (1)
 #endif
-/* configuration of PLL prescaler and multiply values */
-/* CORECLOCK := HSE / CLOCK_PLL_DIV * CLOCK_PLL_MUL */
-#define CLOCK_PLL_DIV       RCC_CFGR_PLLDIV2
-#define CLOCK_PLL_MUL       RCC_CFGR_PLLMUL4
-/* configuration of peripheral bus clock prescalers */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* AHB clock -> 32MHz */
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1     /* APB2 clock -> 32MHz */
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV1     /* APB1 clock -> 32MHz */
-/* configuration of flash access cycles */
-#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY
 
-/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
-/** @} */
+#include "periph_cpu.h"
+#include "l1/cfg_clock_default.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @name    Timer configuration
