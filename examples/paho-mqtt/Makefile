@@ -17,6 +17,16 @@ QUIET ?= 1
 WIFI_SSID ?= "Your_WiFi_name"
 WIFI_PASS ?= "Your_secure_password"
 
+ifneq (,$(DEFAULT_MQTT_CLIENT_ID))
+  CFLAGS += -DDEFAULT_MQTT_CLIENT_ID=\"$(DEFAULT_MQTT_CLIENT_ID)\"
+endif
+ifneq (,$(DEFAULT_MQTT_USER))
+  CFLAGS += -DDEFAULT_MQTT_USER=\"$(DEFAULT_MQTT_USER)\"
+endif
+ifneq (,$(DEFAULT_MQTT_PWD))
+  CFLAGS += -DDEFAULT_MQTT_PWD=\"$(DEFAULT_MQTT_PWD)\"
+endif
+
 USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
@@ -26,7 +36,7 @@ USEPKG += paho-mqtt
 # paho-mqtt depends on TCP support, choose the stack you want
 LWIP_IPV4 ?= 0
 
-ifneq (0, $(LWIP_IPV4))
+ifneq (0,$(LWIP_IPV4))
   USEMODULE += ipv4_addr
   USEMODULE += lwip_arp
   USEMODULE += lwip_ipv4
@@ -38,7 +48,7 @@ else
   LWIP_IPV6 ?= 1
 endif
 
-ifneq (0, $(LWIP_IPV6))
+ifneq (0,$(LWIP_IPV6))
   USEMODULE += ipv6_addr
   USEMODULE += lwip_ipv6_autoconfig
 endif
