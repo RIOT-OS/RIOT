@@ -11,6 +11,7 @@
 import sys
 import pexpect
 from testrunner import run
+from contextlib import suppress
 
 
 def testfunc(child):
@@ -20,35 +21,41 @@ def testfunc(child):
         if child.expect_exact(["> ", pexpect.TIMEOUT], timeout=1) == 0:
             break
     child.sendline("mutex_timeout_long_unlocked")
-    child.expect("starting test: xtimer mutex lock timeout")
-    child.expect("OK")
-    child.expect_exact("> ")
+    # child.expect_exact("[START]: xtimer_mutex_lock_timeout_long_unlocked")
+    with suppress(pexpect.TIMEOUT):
+        child.expect_exact("[SUCCESS]: xtimer_mutex_lock_timeout_long_unlocked", timeout=1)
+    # child.expect_exact("> ")
     child.sendline("mutex_timeout_long_locked")
-    child.expect("starting test: xtimer mutex lock timeout")
-    child.expect("OK")
-    child.expect_exact("> ")
+    # child.expect_exact("[START]: xtimer_mutex_lock_timeout_long_locked")
+    with suppress(pexpect.TIMEOUT):
+        child.expect_exact("[SUCCESS]: xtimer_mutex_lock_timeout_long_locked", timeout=1)
+    # child.expect_exact("> ")
     child.sendline("mutex_timeout_long_locked_low")
-    child.expect("starting test: xtimer mutex lock timeout with thread")
-    child.expect("threads = (\d+)")
-    num_threads = int(child.match.group(1))
-    child.expect("THREAD low prio: start")
-    child.expect("MAIN THREAD: calling xtimer_mutex_lock_timeout")
-    child.expect("OK")
-    child.expect("threads = (\d+)")
-    assert int(child.match.group(1)) == num_threads + 1
-    child.expect("MAIN THREAD: waiting for created thread to end")
-    child.expect("THREAD low prio: exiting low")
-    child.expect("threads = (\d+)")
-    assert int(child.match.group(1)) == num_threads
-    child.expect_exact("> ")
+    # child.expect_exact("[START]: xtimer_mutex_lock_timeout_low_prio_thread")
+    # child.expect("threads = (\d+)")
+    # num_threads = int(child.match.group(1))
+    # child.expect_exact("THREAD low prio: start")
+    # child.expect_exact("MAIN THREAD: calling xtimer_mutex_lock_timeout")
+    with suppress(pexpect.TIMEOUT):
+        child.expect_exact("[SUCCESS]: xtimer_mutex_lock_timeout_low_prio_thread", timeout=1)
+    # child.expect("threads = (\d+)")
+    # assert int(child.match.group(1)) == num_threads + 1
+    # child.expect_exact("MAIN THREAD: waiting for created thread to end")
+    # child.expect_exact("THREAD low prio: exiting low")
+    # child.expect("threads = (\d+)")
+    # assert int(child.match.group(1)) == num_threads
+    with suppress(pexpect.TIMEOUT):
+        child.expect_exact("> ", timeout=0.2)
     child.sendline("mutex_timeout_short_locked")
-    child.expect("starting test: xtimer mutex lock timeout with short timeout and locked mutex")
-    child.expect("OK")
-    child.expect_exact("> ")
+    # child.expect_exact("[START]: xtimer_mutex_lock_timeout_short_locked")
+    with suppress(pexpect.TIMEOUT):
+        child.expect_exact("[SUCCESS]: xtimer_mutex_lock_timeout_short_locked", timeout=1)
+    # child.expect_exact("> ")
     child.sendline("mutex_timeout_short_unlocked")
-    child.expect("starting test: xtimer mutex lock timeout with short timeout and unlocked mutex")
-    child.expect("OK")
-    child.expect_exact("> ")
+    # child.expect_exact("[START]: xtimer_mutex_lock_timeout_short_unlocked")
+    with suppress(pexpect.TIMEOUT):
+        child.expect_exact("[SUCCESS]: xtimer_mutex_lock_timeout_short_unlocked", timeout=1)
+    # child.expect_exact("> ")
 
 
 if __name__ == "__main__":

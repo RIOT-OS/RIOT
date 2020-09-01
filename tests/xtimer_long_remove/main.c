@@ -28,23 +28,18 @@
 
 int main(void)
 {
-    puts("[START]: xtimer_remove");
-    puts("xtimer_remove test application.\n");
-
-    kernel_pid_t me = thread_getpid();
+    puts("[START]: xtimer_long_remove");
 
     for (unsigned int n = 0; n < NUMOF; n++) {
         printf("Setting %u timers, removing timer %u/%u\n", NUMOF, n, NUMOF);
         xtimer_t timers[NUMOF];
-        msg_t msg[NUMOF];
         for (unsigned int i = 0; i < NUMOF; i++) {
-            msg[i].type = i;
-            xtimer_set_msg(&timers[i], 100000*(i+1), &msg[i], me);
+            xtimer_set64(&timers[i], ((uint64_t)1) << 32);
         }
 
         xtimer_remove(&timers[n]);
 
-        /* timers that are removed should be reset (0)*/
+        /* timers that are already fired should be reset (0)*/
         if ((timers[n].offset) ||
             (timers[n].long_offset) ||
             (timers[n].start_time) ||
@@ -52,22 +47,9 @@ int main(void)
             return -1;
         }
 
-        unsigned int num = NUMOF-1;
-        while(num--) {
-            msg_t m;
-            msg_receive(&m);
-            if (m.type == n) {
-                printf("ERROR: msg type=%i unexpected!\n", m.type);
-                return -1;
-            }
-            else {
-                printf("timer %u triggered.\n", m.type);
-
-            }
-        }
     }
 
-    puts("[SUCCESS]: xtimer_remove");
+    puts("[SUCCESS]: xtimer_long_remove");
 
     return 0;
 }

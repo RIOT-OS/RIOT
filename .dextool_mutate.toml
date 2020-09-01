@@ -1,0 +1,93 @@
+[workarea]
+# path used as the root for accessing files
+# dextool will not modify files outside the root when it perform mutation testing
+root = "."
+# restrict analysis to files in this directory tree
+# this make it possible to only mutate certain parts of an application
+# use relative paths that are inside the root
+restrict = ["sys/xtimer"]
+
+[analyze]
+# exclude files in these directory tree(s) from analysis
+# relative paths are relative to workarea.root
+exclude = ["cpu/", "boards", "core/", "drivers/", "tests/"]
+# limit the number of threads used when analysing. Default is as many as there are cores available
+# threads = 1
+# prune (remove) files from the database that aren't found during the analyze
+prune = true
+# number of mutants per schema (soft upper limit). Zero means no limit
+# mutants_per_schema = 100
+
+[database]
+# path to where to store the sqlite3 database
+db = "mutate/dextool_mutate.sqlite3"
+
+[compiler]
+# extra flags to pass on to the compiler such as the C++ standard
+# extra_flags = []
+# toggle this to force system include paths to use -I instead of -isystem
+#force_system_includes = true
+# use this compilers system includes instead of the one used in the compile_commands.json
+#use_compiler_system_includes = "/opt/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-g++"
+
+[compile_commands]
+# search for compile_commands.json in this paths
+search_paths = ["./compile_commands.json"]
+# flags to remove when analyzing a file in the DB
+# filter = ["-c", "-o", "-m", "-nodevicelib", "-Waddr-space-convert", "-non-static", "-Bstatic", "-Bdynamic", "-Xbind-lazy", "-Xbind-now", "-f", "-static", "-shared", "-rdynamic", "-s", "-l", "-L", "-z", "-u", "-T", "-Xlinker", "-l", "-MT", "-MF", "-MD", "-MQ", "-MMD", "-MP", "-MG", "-E", "-cc1", "-S", "-M", "-MM", "-###"]
+# compiler arguments to skip from the beginning. Needed when the first argument is NOT a compiler but rather a wrapper
+# skip_compiler_args = 0
+
+[mutant_test]
+# (required) program used to run the test suite
+# the arguments for test_cmd can be an array of multiple test commands
+# 1. ["test1.sh", "test2.sh"]
+# 2. [["test1.sh", "-x"], "test2.sh"]
+test_cmd = "mutate/test-all.sh"
+
+
+# timeout to use for the test suite
+test_cmd_timeout = "4 minutes"
+# (required) program used to build the application
+# the arguments for build_cmd can be an array: ["./build.sh", "-x"]
+build_cmd = "mutate/build.sh"
+# timeout to use when compiling the SUT and test suite (default: 30 minutes)
+# build_cmd_timeout = "1 hours 1 minutes 1 seconds 1 msecs"
+# program used to analyze the output from the test suite for test cases that killed the mutant
+analyze_cmd = "mutate/analyze.py"
+# builtin analyzer of output from testing frameworks to find failing test cases
+analyze_using_builtin = ["makefile"]
+# determine in what order mutations are chosen
+order = "consecutive"
+# how to behave when new test cases are found
+detected_new_test_case = "resetAlive"
+# how to behave when test cases are detected as having been removed
+# should the test and the gathered statistics be remove too?
+#detected_dropped_test_case = "remove"
+# how the oldest mutants should be treated.
+# It is recommended to test them again.
+# Because you may have changed the test suite so mutants that where previously killed by the test suite now survive.
+oldest_mutants = "test"
+# How many of the oldest mutants to do the above with
+# oldest_mutants_nr = 10
+# limit the number of threads used when running tests in parallel. Default is as many as there are cores available
+# parallel_test = 1
+# stop executing tests as soon as a test command fails.
+# This speed up the test phase but the report of test cases killing mutants is less accurate
+use_early_stop = false
+# reduce the compile+link time when testing mutants
+use_schemata = false
+# sanity check the schemata before it is used by executing the test cases
+# it is a slowdown but nice robustness that is usually worth having
+#check_schemata = true
+
+[report]
+# default style to use
+style = "plain"
+
+[test_group]
+# subgroups with a description and pattern. Example:
+# [test_group.uc1]
+# description = "use case 1"
+# pattern = "uc_1.*"
+# see for regex syntax: http://dlang.org/phobos/std_regex.html

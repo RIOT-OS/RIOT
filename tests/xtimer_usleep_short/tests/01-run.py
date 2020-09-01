@@ -12,6 +12,7 @@ from testrunner import run
 
 
 def testfunc(child):
+    child.expect_exact("[START]: xtimer_usleep_short")
     child.expect(u"This test will call xtimer_usleep for values from \\d+ down to \\d+\r\n")
 
     i = 500
@@ -25,7 +26,7 @@ def testfunc(child):
             break
         i = i - 1
 
-    child.expect(u"[SUCCESS]", timeout=3)
+    child.expect_exact("[SUCCESS]: xtimer_usleep_short", timeout=1)
 
 
 if __name__ == "__main__":

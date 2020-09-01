@@ -11,7 +11,8 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect_exact("[SUCCESS]")
+    child.expect_exact("[START]: xtimer_now32_overflow")
+    child.expect_exact("[SUCCESS]: xtimer_now32_overflow")
 
 
 if __name__ == "__main__":

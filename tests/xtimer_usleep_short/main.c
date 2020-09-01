@@ -24,6 +24,7 @@
 
 int main(void)
 {
+    puts("[START]: xtimer_usleep_short");
     xtimer_sleep(3);
     printf("This test will call xtimer_usleep for values from %d down to %d\n",
             TEST_USLEEP_MAX, TEST_USLEEP_MIN);
@@ -33,7 +34,7 @@ int main(void)
         xtimer_usleep(i);
     }
 
-    puts("[SUCCESS]");
+    puts("[SUCCESS]: xtimer_usleep_short");
 
     return 0;
 }

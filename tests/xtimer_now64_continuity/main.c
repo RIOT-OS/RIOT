@@ -34,7 +34,7 @@ int main(void)
     uint64_t diff_min = UINT64_MAX;
     uint64_t diff_max = 0;
     uint64_t diff_sum = 0;
-    print_str("[START]\n");
+    print_str("[START]: xtimer_now64_continuity\n");
     xtimer_ticks64_t before = xtimer_now64();
     while(--n) {
         xtimer_ticks64_t now = xtimer_now64();
@@ -59,6 +59,6 @@ int main(void)
         print_str("[FAILURE]\n");
         return 1;
     }
-    print_str("[SUCCESS]\n");
+    print_str("[SUCCESS]: xtimer_now64_continuity\n");
     return 0;
 }

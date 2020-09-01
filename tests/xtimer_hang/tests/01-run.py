@@ -11,14 +11,14 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect_exact("[START]")
+    child.expect_exact("[START]: xtimer_hang")
 
     # due to timer inaccuracies, boards might not display exactly 100 steps, so
     # we accept 10% deviation
     for i in range(90):
         child.expect(r"Testing \( +\d+%\)")
 
-    child.expect_exact("[SUCCESS]")
+    child.expect_exact("[SUCCESS]: xtimer_hang")
 
 
 if __name__ == "__main__":

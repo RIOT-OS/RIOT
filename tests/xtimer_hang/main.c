@@ -71,6 +71,7 @@ void *timer_func(void *arg)
 
 int main(void)
 {
+    puts("[START]: xtimer_hang");
 #if defined(MAIN_THREAD_PIN)
     gpio_t main_pin = MAIN_THREAD_PIN;
     gpio_init(main_pin, GPIO_OUT);
@@ -99,7 +100,6 @@ int main(void)
     uint32_t interval = TEST_INTERVAL_MS * US_PER_MS;
     xtimer_ticks32_t last_wakeup = xtimer_now();
 
-    puts("[START]");
     while ((now = xtimer_now_usec()) < until) {
         unsigned percent = (100 * (now - start)) / (until - start);
 #if defined(MAIN_THREAD_PIN)
@@ -112,6 +112,6 @@ int main(void)
         printf("Testing (%3u%%)\n", percent);
     }
     puts("Testing (100%)");
-    puts("[SUCCESS]");
+    puts("[SUCCESS]: xtimer_hang");
     return 0;
 }

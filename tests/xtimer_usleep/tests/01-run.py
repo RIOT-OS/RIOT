@@ -24,6 +24,7 @@ class InvalidTimeout(Exception):
 
 
 def testfunc(child):
+    child.expect_exact("[START]: xtimer_usleep", timeout=1)
     child.expect(u"Running test (\\d+) times with (\\d+) distinct sleep times")
     RUNS = int(child.match.group(1))
     SLEEP_TIMES_NUMOF = int(child.match.group(2))
@@ -50,6 +51,7 @@ def testfunc(child):
         if not (lower_bound < testtime < upper_bound):
             raise InvalidTimeout("Host timer measured %d us (client measured %d us)" %
                                  (testtime, exp))
+        child.expect_exact("[SUCCESS]: xtimer_usleep")
     except InvalidTimeout as e:
         print(e)
         sys.exit(1)

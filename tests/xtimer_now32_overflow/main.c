@@ -32,6 +32,7 @@ static xtimer_t t2 = { .callback=_callback };
 
 int main(void)
 {
+    puts("[START]: xtimer_now32_overflow");
     /* ensure that xtimer_now64() is greater than UINT32_MAX
      * and the upper 32bit of xtimer_now64() equal 1 */
     _xtimer_current_time = (1LLU << 32U);
@@ -49,7 +50,7 @@ int main(void)
     xtimer_usleep(1000);
 
     if (t2.long_start_time == 1) {
-        puts("[SUCCESS]");
+        puts("[SUCCESS]: xtimer_now32_overflow");
     }
     else {
         puts("[FAILED]");

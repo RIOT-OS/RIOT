@@ -143,6 +143,7 @@ static int cmd_test_xtimer_rmutex_lock_timeout_long_unlocked(int argc,
 {
     (void)argc;
     (void)argv;
+    puts("[START]: xtimer_rmutex_lock_timeout_long_unlocked");
 
     rmutex_t test_rmutex = RMUTEX_INIT;
 
@@ -152,7 +153,7 @@ static int cmd_test_xtimer_rmutex_lock_timeout_long_unlocked(int argc,
                                  memory_order_relaxed) == thread_getpid() &&
             test_rmutex.refcount == 1 &&
             mutex_trylock(&test_rmutex.mutex) == 0) {
-            puts("OK");
+            puts("[SUCCESS]: xtimer_rmutex_lock_timeout_long_unlocked");
         }
         else {
             puts(error_wrong_variables);
@@ -186,6 +187,7 @@ static int cmd_test_xtimer_rmutex_lock_timeout_long_locked(int argc,
 {
     (void)argc;
     (void)argv;
+    puts("[START]: xtimer_rmutex_lock_timeout_long_locked");
 
     rmutex_t test_rmutex = RMUTEX_INIT;
 
@@ -206,7 +208,7 @@ static int cmd_test_xtimer_rmutex_lock_timeout_long_locked(int argc,
                                  memory_order_relaxed) == second_t_pid &&
             test_rmutex.refcount == 1 &&
             mutex_trylock(&test_rmutex.mutex) == 0) {
-            puts("OK");
+            puts("[SUCCESS]: xtimer_rmutex_lock_timeout_long_locked");
         }
         else {
             puts(error_wrong_variables);
@@ -239,6 +241,7 @@ static int cmd_test_xtimer_rmutex_lock_timeout_low_prio_thread(
 {
     (void)argc;
     (void)argv;
+    puts("[START]: xtimer_rmutex_lock_timeout_low_prio_thread");
 
     main_thread_pid = thread_getpid();
     rmutex_t test_rmutex = RMUTEX_INIT;
@@ -258,7 +261,7 @@ static int cmd_test_xtimer_rmutex_lock_timeout_low_prio_thread(
                                  memory_order_relaxed) == thread_getpid() &&
             test_rmutex.refcount == 1 &&
             mutex_trylock(&test_rmutex.mutex) == 0) {
-            puts("OK");
+            puts("[SUCCESS]: xtimer_rmutex_lock_timeout_low_prio_thread");
         }
         else {
             puts(error_wrong_variables);
@@ -295,6 +298,7 @@ static int cmd_test_xtimer_rmutex_lock_timeout_short_locked(int argc,
 {
     (void)argc;
     (void)argv;
+    puts("[START]: xtimer_rmutex_lock_timeout_short_locked");
 
     rmutex_t test_rmutex = RMUTEX_INIT;
 
@@ -314,7 +318,7 @@ static int cmd_test_xtimer_rmutex_lock_timeout_short_locked(int argc,
                                  memory_order_relaxed) == second_t_pid &&
             test_rmutex.refcount == 1 &&
             mutex_trylock(&test_rmutex.mutex) == 0) {
-            puts("OK");
+            puts("[SUCCESS]: xtimer_rmutex_lock_timeout_short_locked");
         }
         else {
             puts(error_wrong_variables);
@@ -344,6 +348,8 @@ static int cmd_test_xtimer_rmutex_lock_timeout_short_unlocked(int argc,
     (void)argc;
     (void)argv;
 
+    puts("[START]: xtimer_rmutex_lock_timeout_short_unlocked");
+
     rmutex_t test_rmutex = RMUTEX_INIT;
 
     if (xtimer_rmutex_lock_timeout(&test_rmutex, SHORT_RMUTEX_TIMEOUT) == 0) {
@@ -352,7 +358,7 @@ static int cmd_test_xtimer_rmutex_lock_timeout_short_unlocked(int argc,
                                  memory_order_relaxed) == thread_getpid() &&
             test_rmutex.refcount == 1 &&
             mutex_trylock(&test_rmutex.mutex) == 0) {
-            puts("OK");
+            puts("[SUCCESS]: xtimer_rmutex_lock_timeout_short_unlocked");
         }
         else {
             puts(error_wrong_variables);

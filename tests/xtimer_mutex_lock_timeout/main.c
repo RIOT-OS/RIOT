@@ -131,13 +131,13 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_unlocked(int argc,
 {
     (void)argc;
     (void)argv;
-    puts("starting test: xtimer mutex lock timeout");
+    puts("[START]: xtimer_mutex_lock_timeout_long_unlocked");
     mutex_t test_mutex = MUTEX_INIT;
 
     if (xtimer_mutex_lock_timeout(&test_mutex, LONG_MUTEX_TIMEOUT) == 0) {
         /* mutex has to be locked */
         if (mutex_trylock(&test_mutex) == 0) {
-            puts("OK");
+            puts("[SUCCESS]: xtimer_mutex_lock_timeout_long_unlocked");
         }
         else {
             puts("error mutex not locked");
@@ -169,7 +169,7 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_locked(int argc,
 {
     (void)argc;
     (void)argv;
-    puts("starting test: xtimer mutex lock timeout");
+    puts("[START]: xtimer_mutex_lock_timeout_long_locked");
     mutex_t test_mutex = MUTEX_INIT;
     mutex_lock(&test_mutex);
 
@@ -179,7 +179,7 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_locked(int argc,
     else {
         /* mutex has to be locked */
         if (mutex_trylock(&test_mutex) == 0) {
-            puts("OK");
+            puts("[SUCCESS]: xtimer_mutex_lock_timeout_long_locked");
         }
         else {
             puts("error mutex not locked");
@@ -212,7 +212,7 @@ static int cmd_test_xtimer_mutex_lock_timeout_low_prio_thread(int argc,
 {
     (void)argc;
     (void)argv;
-    puts("starting test: xtimer mutex lock timeout with thread");
+    puts("[START]: xtimer_mutex_lock_timeout_low_prio_thread");
     mutex_t test_mutex = MUTEX_INIT;
     main_thread_pid = thread_getpid();
     int current_thread_count = sched_num_threads;
@@ -232,7 +232,7 @@ static int cmd_test_xtimer_mutex_lock_timeout_low_prio_thread(int argc,
     if (xtimer_mutex_lock_timeout(&test_mutex, LONG_MUTEX_TIMEOUT) == 0) {
         /* mutex has to be locked */
         if (mutex_trylock(&test_mutex) == 0) {
-            puts("OK");
+            puts("[SUCCESS]: xtimer_mutex_lock_timeout_low_prio_thread");
         }
         else {
             puts("error mutex not locked");
@@ -276,8 +276,7 @@ static int cmd_test_xtimer_mutex_lock_timeout_short_locked(int argc,
 {
     (void)argc;
     (void)argv;
-    puts(
-        "starting test: xtimer mutex lock timeout with short timeout and locked mutex");
+    puts("[START]: xtimer_mutex_lock_timeout_short_locked");
     mutex_t test_mutex = MUTEX_INIT;
     mutex_lock(&test_mutex);
 
@@ -287,7 +286,7 @@ static int cmd_test_xtimer_mutex_lock_timeout_short_locked(int argc,
     else {
         /* mutex has to be locked */
         if (mutex_trylock(&test_mutex) == 0) {
-            puts("OK");
+            puts("[SUCCESS]: xtimer_mutex_lock_timeout_short_locked");
         }
         else {
             puts("error mutex not locked");
@@ -316,14 +315,13 @@ static int cmd_test_xtimer_mutex_lock_timeout_short_unlocked(int argc,
 {
     (void)argc;
     (void)argv;
-    puts(
-        "starting test: xtimer mutex lock timeout with short timeout and unlocked mutex");
+    puts("[START]: xtimer_mutex_lock_timeout_short_unlocked");
     mutex_t test_mutex = MUTEX_INIT;
 
     if (xtimer_mutex_lock_timeout(&test_mutex, SHORT_MUTEX_TIMEOUT) == 0) {
         /* mutex has to be locked */
         if (mutex_trylock(&test_mutex) == 0) {
-            puts("OK");
+            puts("[SUCCESS]: xtimer_mutex_lock_timeout_short_unlocked");
         }
         else {
             puts("error mutex not locked");
@@ -337,7 +335,6 @@ static int cmd_test_xtimer_mutex_lock_timeout_short_unlocked(int argc,
 
     return 0;
 }
-
 
 /**
  * @brief   main function starting shell
