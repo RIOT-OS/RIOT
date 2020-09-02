@@ -16,7 +16,7 @@ static inline bool _is_sleep(ieee802154_dev_t *dev)
     return _dev->is_sleep;
 }
 
-static int _write(ieee802154_dev_t *dev, iolist_t *pkt)
+static int _write(ieee802154_dev_t *dev, const iolist_t *pkt)
 {
     at86rf2xx_t *_dev = (at86rf2xx_t*) dev;
     uint8_t len = 0;
@@ -231,7 +231,8 @@ static bool _get_cap(ieee802154_dev_t *dev, ieee802154_rf_caps_t cap)
 }
 
 static int set_hw_addr_filter(ieee802154_dev_t *dev,
-                              network_uint16_t *short_addr, eui64_t *ext_addr,
+                              const network_uint16_t *short_addr,
+                              const eui64_t *ext_addr,
                               uint16_t pan_id)
 {
     at86rf2xx_t *_dev = (at86rf2xx_t*) dev;
