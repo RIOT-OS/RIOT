@@ -54,6 +54,21 @@ static inline void wait_nvm_is_ready(void)
 #endif
 }
 
+static inline void _set_cache(bool on)
+{
+#ifdef NVMCTRL_CTRLA_CACHEDIS0
+    if (on) {
+        _NVMCTRL->CTRLA.bit.CACHEDIS0 = 0;
+        _NVMCTRL->CTRLA.bit.CACHEDIS1 = 0;
+    } else {
+        _NVMCTRL->CTRLA.bit.CACHEDIS0 = 1;
+        _NVMCTRL->CTRLA.bit.CACHEDIS1 = 1;
+    }
+#else
+    (void) on;
+#endif
+}
+
 static void _unlock(void)
 {
     /* remove peripheral access lock for the NVMCTRL peripheral */
@@ -176,14 +191,15 @@ void flashpage_write(int page, const void *data)
 {
     assert((unsigned)page < FLASHPAGE_NUMOF);
 
+    _set_cache(0);
     _erase_page(flashpage_addr(page), _cmd_erase_row);
 
-    if (data == NULL) {
-        return;
+    if (data != NULL) {
+        _write_row(flashpage_addr(page), data, FLASHPAGE_SIZE, NVMCTRL_PAGE_SIZE,
+                   _cmd_write_page);
     }
 
-    _write_row(flashpage_addr(page), data, FLASHPAGE_SIZE, NVMCTRL_PAGE_SIZE,
-               _cmd_write_page);
+    _set_cache(1);
 }
 
 void flashpage_write_raw(void *target_addr, const void *data, size_t len)
@@ -201,8 +217,9 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     assert(((unsigned)target_addr + len) <=
            (CPU_FLASH_BASE + (FLASHPAGE_SIZE * FLASHPAGE_NUMOF)));
 
+    _set_cache(0);
     _write_page(target_addr, data, len, _cmd_write_page);
-
+    _set_cache(1);
 }
 
 #ifdef FLASHPAGE_RWWEE_NUMOF
