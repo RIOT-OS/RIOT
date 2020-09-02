@@ -24,7 +24,7 @@ static int cc2538_retries = 4;
 static bool cc2538_cca_status;
 static bool cc2538_cca;
 
-static int _write(ieee802154_dev_t *dev, iolist_t *iolist)
+static int _write(ieee802154_dev_t *dev, const iolist_t *iolist)
 {
     (void) dev;
     int pkt_len = 0;
@@ -332,8 +332,8 @@ static bool _get_cap(ieee802154_dev_t *dev, ieee802154_rf_caps_t cap)
     }
 }
 
-static int _set_hw_addr_filter(ieee802154_dev_t *dev, network_uint16_t *short_addr,
-                               eui64_t *ext_addr, uint16_t pan_id)
+static int _set_hw_addr_filter(ieee802154_dev_t *dev, const network_uint16_t *short_addr,
+                               const eui64_t *ext_addr, uint16_t pan_id)
 {
     (void) dev;
     if (short_addr) {
