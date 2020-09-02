@@ -31,71 +31,61 @@
 #define T_RESET_HOLD_US     (480)
 #define T_RESET_SAMPLE_US   (70)
 
-#define T_RW_PULSE_US       (3)
-#define T_W_HOLD_US         (57)
-#define T_W_RECOVER_US      (10)
-#define T_R_SAMPLE_US       (7)
-#define T_R_RECOVER_US      (55)
-#define T_SLOT_DELAY        (60)
+#define T_RW_SLOT_US        (60U)
+#define T_R_DELAY_US        (15U)
+#define T_R_FILL_US         (46U)
+
+static void _pull(const onewire_t *owi)
+{
+    gpio_init(owi->pin, owi->omode);
+    gpio_clear(owi->pin);
+}
+
+static void _release(const onewire_t *owi)
+{
+    gpio_init(owi->pin, owi->imode);
+}
 
 static int _read_bit(const onewire_t *owi)
 {
     int in;
 
-    gpio_clear(owi->pin);
-
-#if defined(MODULE_ONEWIRE_POLL)
-    uint32_t delay;
-    uint32_t start = xtimer_now_usec();
-    /* poll the pin and wait for it to go high */
-    do {
-        delay = xtimer_now_usec() - start;
-    } while (!gpio_read(owi->pin) && (delay < T_SLOT_DELAY));
-
-    xtimer_usleep(T_SLOT_DELAY - delay);
-
-    in = (delay < (T_RW_PULSE_US + T_R_SAMPLE_US)) ? 1 : 0;
-#else
-    xtimer_usleep(T_RW_PULSE_US);
-    gpio_init(owi->pin, owi->imode);
-    xtimer_usleep(T_R_SAMPLE_US);
+    _pull(owi);
+    _release(owi);
+    xtimer_usleep(T_R_DELAY_US);
     in = (gpio_read(owi->pin)) ? 1 : 0;
-    xtimer_usleep(T_R_RECOVER_US);
-#endif
+    xtimer_usleep(T_R_FILL_US);
 
-    gpio_init(owi->pin, owi->omode);
-    gpio_set(owi->pin);
     return in;
 }
 
 static void _write_bit(const onewire_t *owi, int out)
 {
-    gpio_clear(owi->pin);
+    _pull(owi);
     if (out) {
-        /* shift out a `1` */
-        xtimer_usleep(T_RW_PULSE_US);
-        gpio_set(owi->pin);
-        xtimer_usleep(T_W_HOLD_US);
+        _release(owi);
     }
-    else {
-        /* shift out a `0` */
-        xtimer_usleep(T_RW_PULSE_US + T_W_HOLD_US);
-        gpio_set(owi->pin);
+    xtimer_usleep(T_RW_SLOT_US);
+    if (!out) {
+        _release(owi);
     }
-    xtimer_usleep(T_W_RECOVER_US);
+    // xtimer_usleep(T_RECOVER_US);
 }
 
 int onewire_init(onewire_t *owi, const onewire_params_t *params)
 {
     owi->pin = params->pin;
-
     owi->omode = params->pin_mode;
     owi->imode = (owi->omode == GPIO_OD_PU) ? GPIO_IN_PU : GPIO_IN;
 
-    if (gpio_init(owi->pin, owi->omode) != 0) {
+    if ((gpio_init(owi->pin, owi->omode) != 0) ||
+        (gpio_init(owi->pin, owi->imode) != 0)) {
         return ONEWIRE_ERR_PINCFG;
     }
-    gpio_set(owi->pin);
+    /* the following release is not really needed as it is done in the second
+     * part of the condition above, but better be safe... */
+    _release(owi);
+
     return ONEWIRE_OK;
 }
 
@@ -103,19 +93,16 @@ int onewire_reset(const onewire_t *owi, const onewire_rom_t *rom)
 {
     int res = ONEWIRE_OK;
 
-    gpio_clear(owi->pin);
+    _pull(owi);
     xtimer_usleep(T_RESET_HOLD_US);
-    gpio_set(owi->pin);
 
+    _release(owi);
     xtimer_usleep(T_RESET_SAMPLE_US);
-    gpio_init(owi->pin, owi->imode);
     if (gpio_read(owi->pin)) {
         res = ONEWIRE_NODEV;
     }
 
     xtimer_usleep(T_RESET_HOLD_US - T_RESET_SAMPLE_US);
-    gpio_init(owi->pin, owi->omode);
-    gpio_set(owi->pin);
 
     if ((res == ONEWIRE_OK) && (rom != NULL)) {
         onewire_write_byte(owi, ONEWIRE_ROM_MATCH);
