@@ -90,7 +90,7 @@ static bool _l2filter(uint8_t *mhr)
     return false;
 }
 
-static int _write(ieee802154_dev_t *dev, iolist_t *iolist)
+static int _write(ieee802154_dev_t *dev, const iolist_t *iolist)
 {
     (void)dev;
 
@@ -595,8 +595,8 @@ int _set_cca_mode(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode)
     return 0;
 }
 
-static int _set_hw_addr_filter(ieee802154_dev_t *dev, network_uint16_t *short_addr,
-                              eui64_t *ext_addr, uint16_t pan_id)
+static int _set_hw_addr_filter(ieee802154_dev_t *dev, const network_uint16_t *short_addr,
+                              const eui64_t *ext_addr, uint16_t pan_id)
 {
     (void) dev;
     if (short_addr) {
