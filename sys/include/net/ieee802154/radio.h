@@ -635,14 +635,15 @@ struct ieee802154_radio_ops {
      *            address is not altered..
      * @param[in] ext_addr the IEEE802.15.4 extended address (Network Byte Order).
      *            If NULL, the extended address is not altered.
-     * @param[in] pan_id the IEEE802.15.4 PAN ID
+     * @param[in] pan_id the IEEE802.15.4 PAN ID. If NULL, the PAN ID is not altered.
      *
      * @return 0 on success
      * @return negative errno on error
      */
     int (*set_hw_addr_filter)(ieee802154_dev_t *dev,
                               const network_uint16_t *short_addr,
-                              const eui64_t *ext_addr, uint16_t pan_id);
+                              const eui64_t *ext_addr,
+                              const uint16_t *pan_id);
 
     /**
      * @brief Set number of frame retransmissions
@@ -826,16 +827,18 @@ static inline int ieee802154_radio_off(ieee802154_dev_t *dev)
  * @pre the device is on
  *
  * @param[in] dev IEEE802.15.4 device descriptor
- * @param[in] short_addr the IEEE802.15.4 short address
- * @param[in] ext_addr the IEEE802.15.4 extended address (Network Byte Order)
- * @param[in] pan_id IEEE802.15.4 PAN ID
+ * @param[in] short_addr the IEEE802.15.4 short address. If NULL, the short
+ *            address is not altered..
+ * @param[in] ext_addr the IEEE802.15.4 extended address (Network Byte Order).
+ *            If NULL, the extended address is not altered.
+ * @param[in] pan_id the IEEE802.15.4 PAN ID. If NULL, the PAN ID is not altered.
  *
  * @return result of @ref ieee802154_radio_ops::set_hw_addr_filter
  */
 static inline int ieee802154_radio_set_hw_addr_filter(ieee802154_dev_t *dev,
                                                       const network_uint16_t *short_addr,
                                                       const eui64_t *ext_addr,
-                                                      uint16_t pan_id)
+                                                      const uint16_t *pan_id)
 {
     return dev->driver->set_hw_addr_filter(dev, short_addr, ext_addr, pan_id);
 }
