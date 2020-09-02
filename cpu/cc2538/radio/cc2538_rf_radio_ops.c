@@ -333,7 +333,7 @@ static bool _get_cap(ieee802154_dev_t *dev, ieee802154_rf_caps_t cap)
 }
 
 static int _set_hw_addr_filter(ieee802154_dev_t *dev, const network_uint16_t *short_addr,
-                               const eui64_t *ext_addr, uint16_t pan_id)
+                               const eui64_t *ext_addr, const uint16_t *pan_id)
 {
     (void) dev;
     if (short_addr) {
@@ -352,8 +352,11 @@ static int _set_hw_addr_filter(ieee802154_dev_t *dev, const network_uint16_t *sh
         RFCORE_FFSM_EXT_ADDR7 = ext_addr->uint8[0];
     }
 
-    RFCORE_FFSM_PAN_ID0 = pan_id;
-    RFCORE_FFSM_PAN_ID1 = pan_id >> 8;
+    if (pan_id) {
+        RFCORE_FFSM_PAN_ID0 = *pan_id;
+        RFCORE_FFSM_PAN_ID1 = (*pan_id) >> 8;
+    }
+
     return 0;
 }
 
