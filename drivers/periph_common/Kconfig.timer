@@ -3,10 +3,11 @@
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
-#
+
+if TEST_KCONFIG
 
 menuconfig MODULE_PERIPH_TIMER
-    bool "Timer peripheral driver"
+    bool "Configure timer peripheral driver"
     depends on HAS_PERIPH_TIMER
     select MODULE_PERIPH_COMMON
 
@@ -30,3 +31,16 @@ config MODULE_PERIPH_INIT_TIMER_PERIODIC
     default y if MODULE_PERIPH_INIT
 
 endif # MODULE_PERIPH_TIMER
+
+endif # TEST_KCONFIG
+
+menuconfig KCONFIG_USEMODULE_PERIPH_TIMER
+    bool "Configure timer peripheral driver"
+    depends on USEMODULE_PERIPH_TIMER
+    help
+        Configure Timer peripheral using Kconfig.
+
+# Include CPU specific configurations
+if KCONFIG_USEMODULE_PERIPH_TIMER
+osource "$(RIOTCPU)/$(CPU)/periph/Kconfig.timer"
+endif
