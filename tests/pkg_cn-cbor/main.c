@@ -58,12 +58,10 @@ static cn_cbor_context ct =
 static void *cbor_calloc(size_t count, size_t size, void *memblock)
 {
     (void)count;
+    (void)size;
     expect(count == 1); /* Count is always 1 with cn-cbor */
-    void *block = memarray_alloc(memblock);
-    if (block) {
-        memset(block, 0, size);
-    }
-    return block;
+    expect(size == sizeof(cn_cbor));
+    return memarray_calloc(memblock);
 }
 
 static void cbor_free(void *ptr, void *memblock)
