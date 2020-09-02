@@ -347,6 +347,16 @@ typedef gpio_t adc_conf_t;
 /** @} */
 
 /**
+ * @name    WDT upper and lower bound times in ms
+ * @{
+ */
+/* Limits are in clock cycles according to data sheet.
+   As the WDT is clocked by a 32 kHz clock and supports 4 intervals */
+#define NWDT_TIME_LOWER_LIMIT          (2U)
+#define NWDT_TIME_UPPER_LIMIT          (1000U)
+/** @} */
+
+/**
  * @name Radio peripheral configuration
  * @{
  */
