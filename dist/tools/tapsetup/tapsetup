@@ -44,7 +44,7 @@ update_uplink() {
 }
 
 create_bridge() {
-    echo "creating ${BRNAME}"
+    echo "creating bridge ${BRNAME}"
 
     case "${PLATFORM}" in
         FreeBSD)
