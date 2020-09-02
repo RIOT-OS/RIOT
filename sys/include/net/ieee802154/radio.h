@@ -363,7 +363,7 @@ struct ieee802154_radio_ops {
      * @return 0 on success
      * @return negative errno on error
      */
-    int (*write)(ieee802154_dev_t *dev, iolist_t *psdu);
+    int (*write)(ieee802154_dev_t *dev, const iolist_t *psdu);
 
     /**
      * @brief Request the transmission of a preloaded frame
@@ -641,8 +641,8 @@ struct ieee802154_radio_ops {
      * @return negative errno on error
      */
     int (*set_hw_addr_filter)(ieee802154_dev_t *dev,
-                              network_uint16_t *short_addr,
-                              eui64_t *ext_addr, uint16_t pan_id);
+                              const network_uint16_t *short_addr,
+                              const eui64_t *ext_addr, uint16_t pan_id);
 
     /**
      * @brief Set number of frame retransmissions
@@ -701,7 +701,7 @@ struct ieee802154_radio_ops {
  *
  * @return result of @ref ieee802154_radio_ops::write
  */
-static inline int ieee802154_radio_write(ieee802154_dev_t *dev, iolist_t *psdu)
+static inline int ieee802154_radio_write(ieee802154_dev_t *dev, const iolist_t *psdu)
 {
     return dev->driver->write(dev, psdu);
 }
@@ -833,8 +833,8 @@ static inline int ieee802154_radio_off(ieee802154_dev_t *dev)
  * @return result of @ref ieee802154_radio_ops::set_hw_addr_filter
  */
 static inline int ieee802154_radio_set_hw_addr_filter(ieee802154_dev_t *dev,
-                                                      network_uint16_t *short_addr,
-                                                      eui64_t *ext_addr,
+                                                      const network_uint16_t *short_addr,
+                                                      const eui64_t *ext_addr,
                                                       uint16_t pan_id)
 {
     return dev->driver->set_hw_addr_filter(dev, short_addr, ext_addr, pan_id);
