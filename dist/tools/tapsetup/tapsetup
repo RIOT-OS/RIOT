@@ -7,6 +7,8 @@ BRNAME="tapbr0"
 TAPNAME="tap"
 DEACTIVATE_IPV6=""
 ENABLE_FORWARDING=0
+BRIDGE_ADDRS=""
+BRIDGE_ROUTES=""
 DEFAULT_PREFIX_LEN=128
 UPLINK=""
 
@@ -24,6 +26,9 @@ usage() {
     echo"                                  not belong to a bridge, just print <iface>." >&2
     echo "   -a <address>[/<prefix_len>], --address <address>[/<prefix_len>]:" >&2
     echo "                                 Address to add to the created bridge. Can be used" >&2
+    echo "                                 multiple times." >&2
+    echo "   -r <route>[/<prefix_len>] <next_hop>, --route <route>[/<prefix_len>] <next_hop>:" >&2
+    echo "                                 Route to add to via the created bridge. Can be used" >&2
     echo "                                 multiple times." >&2
     echo "   -f, --forwarding              Enable forwarding system-wide on creation and " >&2
     echo "                                 disable on deletion." >&2
@@ -82,6 +87,31 @@ add_ipv6_addrs() {
             Linux)
                 ip address add ${address_addr}/${prefix_len} dev ${BRNAME} || exit 1
                 ;;
+            *)  ;;
+        esac
+    done
+}
+
+add_ipv6_routes() {
+    for r in ${BRIDGE_ROUTES}; do
+        route=$(echo "${r}" | cut -d- -f1)
+        next_hop=$(echo "${r}" | cut -d- -f2)
+        route_prefix=$(echo "${route}" | cut -d/ -f1)
+        route_prefix_len=$(echo "${route}" | cut -d/ -f2)
+        if [ "${route}" = "${route_prefix_len}" ]; then
+            # prefix length is not defined
+            route_prefix_len=${DEFAULT_PREFIX_LEN}
+        fi
+        case "${PLATFORM}" in
+            FreeBSD|OSX)
+                route -6n add ${route_prefix} -interface ${BRNAME} \
+                    ${next_hop} || exit 1
+                ;;
+            Linux)
+                ip route add ${route_prefix}/${route_prefix_len} \
+                    via ${next_hop} dev ${BRNAME} || exit 1
+                ;;
+            *)  ;;
         esac
     done
 }
@@ -154,6 +184,31 @@ del_ipv6_addrs() {
             Linux)
                 ip address delete ${address_addr}/${prefix_len} dev ${BRNAME} || exit 1
                 ;;
+            *)  ;;
+        esac
+    done
+}
+
+del_ipv6_routes() {
+    for r in ${BRIDGE_ROUTES}; do
+        route=$(echo "${r}" | cut -d- -f1)
+        next_hop=$(echo "${r}" | cut -d- -f2)
+        route_prefix=$(echo "${route}" | cut -d/ -f1)
+        route_prefix_len=$(echo "${route}" | cut -d/ -f2)
+        if [ "${route}" = "${route_prefix_len}" ]; then
+            # prefix length is not defined
+            route_prefix_len=${DEFAULT_PREFIX_LEN}
+        fi
+        case "${PLATFORM}" in
+            FreeBSD|OSX)
+                route -6 delete ${route_prefix}/${route_prefix_len} \
+                    -interface ${BRNAME} ${next_hop} || exit 1
+                ;;
+            Linux)
+                ip route delete ${route_prefix}/${route_prefix_len} \
+                    via ${next_hop} dev ${BRNAME} || exit 1
+                ;;
+            *)  ;;
         esac
     done
 }
@@ -334,6 +389,19 @@ while true ; do
         -h|--help)
             usage
             exit ;;
+        -r|--route)
+            # check if valid address + optional prefix length
+            if ! echo "$2" | grep -q "^[a-f0-9:]\+\(/[0-9]\+\)\?$"; then
+                usage
+                exit 2
+            fi
+            # check if valid next hop
+            if ! echo "$3" | grep -q "^[a-f0-9:]\+$"; then
+                usage
+                exit 2
+            fi
+            BRIDGE_ROUTES="${BRIDGE_ROUTES} $2-$3"
+            shift 3 ;;
         -u|--uplink)
             case "$2" in
                 "")
@@ -396,8 +464,10 @@ if [ "${COMMAND}" = 'create' ]; then
     activate_forwarding || exit 1
     up_bridge || exit 1
     add_ipv6_addrs || exit 1
+    add_ipv6_routes || exit 1
 
 elif [ "${COMMAND}" = 'delete' ]; then
+    del_ipv6_routes || exit 1
     del_ipv6_addrs || exit 1
     deactivate_forwarding || exit 1
     delete_bridge
