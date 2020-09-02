@@ -17,4 +17,5 @@ OPENOCD_CONFIG ?= $(RIOTBOARD)/common/iotlab/dist/openocd.cfg
 include $(RIOTMAKE)/tools/openocd.inc.mk
 
 # add the common header files to the include path
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 INCLUDES += -I$(RIOTBOARD)/common/iotlab/include
