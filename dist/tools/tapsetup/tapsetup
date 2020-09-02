@@ -219,6 +219,9 @@ delete_bridge() {
     case "${PLATFORM}" in
         FreeBSD)
             sysctl net.link.tap.user_open=0
+            for IF in $(ifconfig ${BRIDGE} | grep -oiE "member: .+ " | cut -d' ' -f2); do
+                ifconfig $IF destroy || exit 1
+            done
             ifconfig ${BRNAME} destroy || exit 1
             kldunload if_tap        # unloading might fail due to dependencies
             kldunload if_bridge ;;
@@ -236,6 +239,9 @@ delete_bridge() {
                 update_uplink ${UPLINK}
             fi ;;
         OSX)
+            for IF in $(ifconfig ${BRIDGE} | grep -oiE "member: .+ " | cut -d' ' -f2); do
+                ifconfig $IF destroy || exit 1
+            done
             ifconfig ${BRNAME} destroy || exit 1 ;;
         *)
             ;;
