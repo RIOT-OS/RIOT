@@ -596,7 +596,7 @@ int _set_cca_mode(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode)
 }
 
 static int _set_hw_addr_filter(ieee802154_dev_t *dev, const network_uint16_t *short_addr,
-                              const eui64_t *ext_addr, uint16_t pan_id)
+                              const eui64_t *ext_addr, const uint16_t *pan_id)
 {
     (void) dev;
     if (short_addr) {
@@ -607,7 +607,9 @@ static int _set_hw_addr_filter(ieee802154_dev_t *dev, const network_uint16_t *sh
         memcpy(nrf802154_long_addr, ext_addr, IEEE802154_LONG_ADDRESS_LEN);
     }
 
-    nrf802154_pan_id = pan_id;
+    if (pan_id) {
+        nrf802154_pan_id = *pan_id;
+    }
 
     return 0;
 }
