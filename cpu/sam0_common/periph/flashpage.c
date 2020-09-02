@@ -29,6 +29,7 @@
 #include <assert.h>
 
 #include "cpu.h"
+#include "mutex.h"
 #include "periph/flashpage.h"
 
 #define ENABLE_DEBUG    (0)
@@ -43,6 +44,29 @@
 #define _NVMCTRL NVMCTRL_SEC
 #else
 #define _NVMCTRL NVMCTRL
+#endif
+
+#ifdef CPU_COMMON_SAMD5X
+/* INTFLAGS >= 0x100 are on NVMCTRL_1_IRQn */
+#define NVM_ISR  isr_nvmctrl0
+#define NVM_IRQ  NVMCTRL_0_IRQn
+#else
+#define NVM_ISR  isr_nvmctrl
+#define NVM_IRQ  NVMCTRL_IRQn
+#endif
+
+#ifdef NVMCTRL_INTFLAG_DONE
+static mutex_t lock = MUTEX_INIT_LOCKED;
+
+static inline void wait_for_cmd(void)
+{
+    mutex_lock(&lock);
+}
+#else
+static inline void wait_for_cmd(void)
+{
+    /* no-op */
+}
 #endif
 
 static inline void wait_nvm_is_ready(void)
@@ -100,6 +124,8 @@ static void _cmd_clear_page_buffer(void)
 #else
     _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_PBC);
 #endif
+
+    wait_for_cmd();
 }
 
 static void _cmd_erase_row(void)
@@ -112,6 +138,8 @@ static void _cmd_erase_row(void)
 #else
     _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_ER);
 #endif
+
+    wait_for_cmd();
 }
 
 static void _cmd_write_page(void)
@@ -124,6 +152,8 @@ static void _cmd_write_page(void)
 #else
     _NVMCTRL->CTRLA.reg = (NVMCTRL_CTRLA_CMDEX_KEY | NVMCTRL_CTRLA_CMD_WP);
 #endif
+
+    wait_for_cmd();
 }
 
 static void _write_page(void* dst, const void *data, size_t len, void (*cmd_write)(void))
@@ -281,3 +311,20 @@ void flashpage_rwwee_write(int page, const void *data)
                _cmd_write_page_rwwee);
 }
 #endif /* FLASHPAGE_RWWEE_NUMOF */
+
+#ifdef NVMCTRL_INTFLAG_DONE
+void flashpage_init(void)
+{
+    NVIC_EnableIRQ(NVM_IRQ);
+
+    _NVMCTRL->INTENSET.reg = NVMCTRL_INTFLAG_DONE;
+}
+
+void NVM_ISR(void)
+{
+    _NVMCTRL->INTFLAG.reg = 0xff;
+    mutex_unlock(&lock);
+
+    cortexm_isr_end();
+}
+#endif

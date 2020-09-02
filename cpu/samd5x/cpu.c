@@ -297,6 +297,8 @@ void cpu_pm_cb_leave(int deep)
     }
 }
 
+void flashpage_init(void);
+
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks
  */
@@ -382,6 +384,10 @@ void cpu_init(void)
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
     stdio_init();
+
+#ifdef MODULE_PERIPH_FLASHPAGE
+    flashpage_init();
+#endif
 
     /* trigger static peripheral initialization */
     periph_init();
