@@ -233,11 +233,9 @@ static bool _get_cap(ieee802154_dev_t *dev, ieee802154_rf_caps_t cap)
 static int set_hw_addr_filter(ieee802154_dev_t *dev,
                               const network_uint16_t *short_addr,
                               const eui64_t *ext_addr,
-                              uint16_t pan_id)
+                              const uint16_t *pan_id)
 {
     at86rf2xx_t *_dev = (at86rf2xx_t*) dev;
-
-    le_uint16_t le_pan = byteorder_btols(byteorder_htons(pan_id));
 
     if (short_addr) {
         at86rf2xx_reg_write(_dev, AT86RF2XX_REG__SHORT_ADDR_0,
@@ -253,8 +251,13 @@ static int set_hw_addr_filter(ieee802154_dev_t *dev,
         }
     }
 
-    at86rf2xx_reg_write(_dev, AT86RF2XX_REG__PAN_ID_0, le_pan.u8[0]);
-    at86rf2xx_reg_write(_dev, AT86RF2XX_REG__PAN_ID_1, le_pan.u8[1]);
+    if (pan_id) {
+        le_uint16_t le_pan = byteorder_btols(byteorder_htons(*pan_id));
+
+        at86rf2xx_reg_write(_dev, AT86RF2XX_REG__PAN_ID_0, le_pan.u8[0]);
+        at86rf2xx_reg_write(_dev, AT86RF2XX_REG__PAN_ID_1, le_pan.u8[1]);
+    }
+
     return 0;
 }
 
