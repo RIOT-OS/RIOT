@@ -295,7 +295,9 @@ struct ztimer_clock {
     ztimer_base_t list;             /**< list of active timers              */
     const ztimer_ops_t *ops;        /**< pointer to methods structure       */
     ztimer_base_t *last;            /**< last timer in queue, for _is_set() */
-    uint32_t adjust;                /**< will be subtracted on every set()  */
+    uint16_t adjust_set;            /**< will be subtracted on every set()  */
+    uint16_t adjust_sleep;          /**< will be subtracted on every sleep(),
+                                         in addition to adjust_set          */
 #if MODULE_ZTIMER_EXTEND || MODULE_ZTIMER_NOW64 || DOXYGEN
     /* values used for checkpointed intervals and 32bit extension */
     uint32_t max_value;             /**< maximum relative timer value       */
