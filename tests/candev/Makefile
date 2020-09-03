@@ -1,4 +1,6 @@
 include ../Makefile.tests_common
+
+# the test currently only works with can_linux, so on "native"
 BOARD_WHITELIST := native
 
 USEMODULE += shell
@@ -7,15 +9,6 @@ USEMODULE += isrpipe
 
 # define the CAN driver you want to use here
 CAN_DRIVER ?= CAN_NATIVE
-
-# prevent using native driver on non-native board
-ifeq ($(CAN_DRIVER), CAN_NATIVE)
-  ifneq ($(BOARD), native)
-    $(error native can driver can only be used on native board!)
-  endif
-endif
-
-
 
 ifeq ($(CAN_DRIVER), PERIPH_CAN)
 # periph_can modules/variables go here
