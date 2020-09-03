@@ -945,13 +945,13 @@ static inline int gpio_is_equal(gpio_t gpio1, gpio_t gpio2)
 }
 
 /**
- * @brief   Test if a GPIO pin is declared as undefined
+ * @brief   Test if a GPIO pin is a valid pin and not declared as undefined
  *
  * @param[in] gpio GPIO pin to check
  */
-static inline int gpio_is_undef(gpio_t gpio)
+static inline int gpio_is_valid(gpio_t gpio)
 {
-    return gpio_is_equal(gpio, GPIO_UNDEF);
+    return !gpio_is_equal(gpio, GPIO_UNDEF);
 }
 
 /**

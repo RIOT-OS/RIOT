@@ -28,7 +28,7 @@
  * @warning The scalar GPIO pin type `gpio_t` is deprecated and will be
  * replaced by a structured GPIO pin type in the new GPIO API. Therefore,
  * don't use the direct comparison of GPIO pins anymore. Instead, use the
- * inline comparison functions @ref gpio_is_equal and @ref gpio_is_undef.
+ * inline comparison functions @ref gpio_is_equal and @ref gpio_is_valid.
  *
  * This is a basic GPIO (General-purpose input/output) interface to allow
  * platform independent access to a MCU's input/output pins. This interface is
