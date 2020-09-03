@@ -16,7 +16,6 @@ config CPU_FAM_CC2538
     select HAS_PERIPH_UART_MODECFG
     select HAS_PERIPH_WDT
     select HAS_CORTEXM_MPU
-    select HAS_PUF_SRAM
 
 ## CPU Models
 config CPU_MODEL_CC2538NF53
