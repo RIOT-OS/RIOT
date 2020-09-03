@@ -25,6 +25,7 @@
 #include "fs/fatfs.h"
 #include "vfs.h"
 #include "mtd.h"
+#include "board.h"
 
 #include "kernel_defines.h"
 
@@ -403,7 +404,7 @@ int main(void)
     }
 #endif
 
-#ifdef MODULE_MTD_NATIVE
+#if defined(MODULE_MTD_NATIVE) || defined(MODULE_MTD_MCI)
     fatfs_mtd_devs[fatfs.vol_idx] = mtd0;
 #else
     fatfs_mtd_devs[fatfs.vol_idx] = mtd1;
