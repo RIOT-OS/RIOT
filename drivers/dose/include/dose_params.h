@@ -30,7 +30,7 @@ extern "C" {
  * @{
  */
 #ifndef DOSE_PARAM_UART
-#define DOSE_PARAM_UART         (UART_DEV(0))
+#define DOSE_PARAM_UART         (UART_DEV(1))
 #endif
 #ifndef DOSE_PARAM_BAUDRATE
 #define DOSE_PARAM_BAUDRATE     (115200)
