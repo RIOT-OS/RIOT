@@ -24,16 +24,33 @@
 #include "xtimer.h"
 #include "onewire.h"
 
+#if IS_USED(MODULE_ONEWIRE_SAFE)
+#include "irq.h"
+#endif
+
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
-/* bus timings, all in microseconds */
+#if IS_USED(MODULE_ONEWIRE_SAFE)
+#define CRIT_IN     unsigned is = irq_disable();
+#define CRIT_OUT    irq_restore(is);
+#else
+#define CRIT_IN
+#define CRIT_OUT
+#endif
+
+/* bus timings as given in
+ * https://www.maximintegrated.com/en/design/technical-documents/app-notes/1/126.html
+ * all in microseconds
+ */
 #define T_RESET_HOLD_US     (480)
 #define T_RESET_SAMPLE_US   (70)
-
-#define T_RW_SLOT_US        (60U)
-#define T_R_DELAY_US        (15U)
-#define T_R_FILL_US         (46U)
+#define T_RW_START_US       (6U)
+#define T_W_0_HOLD_US       (60U)
+#define T_W_0_END_US        (10U)
+#define T_W_1_DELAY_US      (64U)
+#define T_R_WAIT_US         (9U)
+#define T_R_END_US          (55U)
 
 static void _pull(const onewire_t *owi)
 {
@@ -46,30 +63,43 @@ static void _release(const onewire_t *owi)
     gpio_init(owi->pin, owi->imode);
 }
 
+static void _spin_us(uint32_t delay_us)
+{
+    uint32_t target = xtimer_now_usec() + delay_us;
+    while (xtimer_now_usec() < target) {}
+}
+
 static int _read_bit(const onewire_t *owi)
 {
     int in;
 
+    CRIT_IN;
     _pull(owi);
+    _spin_us(T_RW_START_US);
     _release(owi);
-    xtimer_usleep(T_R_DELAY_US);
+    _spin_us(T_R_WAIT_US);
     in = (gpio_read(owi->pin)) ? 1 : 0;
-    xtimer_usleep(T_R_FILL_US);
+    _spin_us(T_R_END_US);
+    CRIT_OUT;
 
     return in;
 }
 
 static void _write_bit(const onewire_t *owi, int out)
 {
+    CRIT_IN;
     _pull(owi);
     if (out) {
+        _spin_us(T_RW_START_US);
         _release(owi);
+        _spin_us(T_W_1_DELAY_US);
     }
-    xtimer_usleep(T_RW_SLOT_US);
-    if (!out) {
+    else {
+        _spin_us(T_W_0_HOLD_US);
         _release(owi);
+        _spin_us(T_W_0_END_US);
     }
-    // xtimer_usleep(T_RECOVER_US);
+    CRIT_OUT
 }
 
 int onewire_init(onewire_t *owi, const onewire_params_t *params)
@@ -93,16 +123,16 @@ int onewire_reset(const onewire_t *owi, const onewire_rom_t *rom)
 {
     int res = ONEWIRE_OK;
 
+    CRIT_IN;
     _pull(owi);
-    xtimer_usleep(T_RESET_HOLD_US);
-
+    _spin_us(T_RESET_HOLD_US);
     _release(owi);
-    xtimer_usleep(T_RESET_SAMPLE_US);
+    _spin_us(T_RESET_SAMPLE_US);
     if (gpio_read(owi->pin)) {
         res = ONEWIRE_NODEV;
     }
-
-    xtimer_usleep(T_RESET_HOLD_US - T_RESET_SAMPLE_US);
+    _spin_us(T_RESET_HOLD_US - T_RESET_SAMPLE_US);
+    CRIT_OUT;
 
     if ((res == ONEWIRE_OK) && (rom != NULL)) {
         onewire_write_byte(owi, ONEWIRE_ROM_MATCH);

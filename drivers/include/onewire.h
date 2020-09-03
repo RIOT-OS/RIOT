@@ -15,9 +15,31 @@
  * This is generic soft driver to interface devices connected via the 1-Wire
  * bus specified by Dallas Semiconductor Corp, today Maxim Integrated.
  *
+ * @see         https://www.maximintegrated.com/en/design/technical-documents/app-notes/1/126.html
  * @see         https://www.maximintegrated.com/en/design/technical-documents/app-notes/7/74.html
  * @see         https://pdfserv.maximintegrated.com/en/an/AN937.pdf
  * @see         https://www.ti.com/lit/an/spma057c/spma057c.pdf?ts=1598599201996
+ *
+ * # Thread Safety and Preemtion (onewire_safe)
+ * In the vanilla form this driver is not thread safe and will not work reliable
+ * if the thread running the driver is interrupted during data transfer. This is
+ * because the driver depends on an active spin loop to produce the needed
+ * timings. If that loop is interrupted, the timings will be off target and
+ * therefore the ongoing data transfer will be invalid.
+ *
+ * To achieve reliable data transfers you have two choices:
+ * 1. Run the driver in a high priority thread that will not be interrupted.
+ *    Furthermore it needs to run in an environment, where at most very short
+ *    interrupts may be triggered.
+ * 2. Run the driver in safe mode by selecting the `onewire_safe` module. In
+ *    this mode all data transfers are run in a critical section by disabling
+ *    ALL interrupts for that period of time. Precisely, the interrupts will be
+ *    disabled for one block of 960us and 1-to-N blocks of 70us for each
+ *    reset->read/write sequence.
+ *
+ * @warning     Using the drivers safe mode (`onewire_safe`) will impact the
+ *              real-time capabilities of the overall system as interrupts will
+ *              be disabled for periods of time (blocks of 960us and 70us)
  *
  * @{
  * @file
