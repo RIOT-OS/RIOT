@@ -21,12 +21,11 @@
 #include <string.h>
 
 #include "dose.h"
-#include "luid.h"
 #include "random.h"
 #include "irq.h"
 
+#include "net/eui_provider.h"
 #include "net/netdev/eth.h"
-#include "net/eui64.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -559,7 +558,7 @@ void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
     netdev_register(&ctx->netdev, NETDEV_DOSE, index);
 
     assert(sizeof(ctx->mac_addr.uint8) == ETHERNET_ADDR_LEN);
-    luid_get_eui48(&ctx->mac_addr);
+    netdev_eui48_get(&ctx->netdev, &ctx->mac_addr);
     DEBUG("dose dose_setup(): mac addr %02x:%02x:%02x:%02x:%02x:%02x\n",
           ctx->mac_addr.uint8[0], ctx->mac_addr.uint8[1], ctx->mac_addr.uint8[2],
           ctx->mac_addr.uint8[3], ctx->mac_addr.uint8[4], ctx->mac_addr.uint8[5]
