@@ -99,6 +99,12 @@ To create a bridge and two (or `count` at your option) tap interfaces:
 To contribute something to RIOT, please refer to our
 [contributing document](CONTRIBUTING.md).
 
+## QUESTIONS
+
+Use the `riot-os` 
+[tag on Stackoverflow](https://stackoverflow.com/questions/tagged/riot-os) 
+to ask RIOT-OS related questions.
+
 ## MAILING LISTS
 * RIOT OS kernel developers list
  * devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
