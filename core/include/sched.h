@@ -137,9 +137,12 @@ typedef enum {
 
 /**
  * @brief   Triggers the scheduler to schedule the next thread
- * @returns 1 if sched_active_thread/sched_active_pid was changed, 0 otherwise.
+ *
+ * @returns     The new thread to schedule if sched_active_thread/sched_active_pid
+ *              was changed,
+ * @returns     NULL if the active thread was not changed.
  */
-int sched_run(void);
+thread_t *sched_run(void);
 
 /**
  * @brief   Set the status of the specified process
