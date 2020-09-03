@@ -20,6 +20,7 @@
 #define BOARD_H
 
 #include "lpc23xx.h"
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,6 +103,16 @@ extern "C" {
                                             GPIO_PIN(1,26), GPIO_PIN(1,27), \
                                             GPIO_UNDEF,     GPIO_UNDEF,     \
                                             GPIO_UNDEF,     GPIO_UNDEF      }
+/** @} */
+
+/**
+ * @name MTD configuration
+ * @{
+ */
+#ifdef MODULE_MTD_MCI
+extern mtd_dev_t *mtd0;
+#define MTD_0 mtd0
+#endif
 /** @} */
 
 #ifdef __cplusplus
