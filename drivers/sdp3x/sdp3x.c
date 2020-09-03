@@ -91,7 +91,7 @@ int sdp3x_init(sdp3x_t *dev, const sdp3x_params_t *params)
 
 #ifdef MODULE_SDP3X_IRQ
     /* check if current device has irq pin connected */
-    if (params->irq_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.irq_pin)) {
         mutex_init(&dev->mutex);
         /* lock mutex initially to be unlocked when interrupt is raised */
         mutex_lock(&dev->mutex);
@@ -108,7 +108,7 @@ int sdp3x_init(sdp3x_t *dev, const sdp3x_params_t *params)
 int32_t sdp3x_read_single_temperature(sdp3x_t *dev, uint8_t flags)
 {
     _SDP3x_start_triggered(dev, flags);
-    if (!IS_USED(MODULE_SDP3X_IRQ) || dev->params.irq_pin == GPIO_UNDEF) {
+    if (!IS_USED(MODULE_SDP3X_IRQ) || !gpio_is_valid(dev->params.irq_pin)) {
         /* Wait for measurement to be ready if irq pin not used */
         xtimer_usleep(DATA_READY_SLEEP_US);
     }
@@ -123,7 +123,7 @@ int32_t sdp3x_read_single_differential_pressure(sdp3x_t *dev,
                                                uint8_t flags)
 {
     _SDP3x_start_triggered(dev, flags);
-    if (!IS_USED(MODULE_SDP3X_IRQ) || dev->params.irq_pin == GPIO_UNDEF) {
+    if (!IS_USED(MODULE_SDP3X_IRQ) || !gpio_is_valid(dev->params.irq_pin)) {
         /* Wait for measurement to be ready if irq pin not used */
         xtimer_usleep(DATA_READY_SLEEP_US);
     }
@@ -138,7 +138,7 @@ int8_t sdp3x_read_single_measurement(sdp3x_t *dev, uint8_t flags,
                                      sdp3x_measurement_t *result)
 {
     _SDP3x_start_triggered(dev, flags);
-    if (!IS_USED(MODULE_SDP3X_IRQ) || dev->params.irq_pin == GPIO_UNDEF) {
+    if (!IS_USED(MODULE_SDP3X_IRQ) || !gpio_is_valid(dev->params.irq_pin)) {
         /* Wait for measurement to be ready if irq pin not used */
         xtimer_usleep(DATA_READY_SLEEP_US);
     }
