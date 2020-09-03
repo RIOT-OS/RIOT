@@ -319,7 +319,7 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     "mov    sp, r12                   \n"
     "pop    {r1}                      \n" /* r1 = sched_active_thread */
 #else
-#if (defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)) && defined(MODULE_CORTEXM_FPU)
+#ifdef MODULE_CORTEXM_FPU
     "tst    lr, #0x10                 \n"
     "it     eq                        \n"
     "vstmdbeq r0!, {s16-s31}          \n" /* save FPU registers if FPU is used */
@@ -362,7 +362,7 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     "ldr    r1, [r0]                  \n" /* load tcb->sp to register 1 */
     "ldmia  r1!, {r0}                 \n" /* restore exception return value */
     "ldmia  r1!, {r4-r11}             \n" /* restore other registers */
-#if (defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)) && defined(MODULE_CORTEXM_FPU)
+#ifdef MODULE_CORTEXM_FPU
     "tst    r0, #0x10                 \n"
     "it     eq                        \n"
     "vldmiaeq r1!, {s16-s31}          \n" /* load FPU registers if saved */
