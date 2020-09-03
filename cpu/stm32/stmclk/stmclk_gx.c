@@ -239,8 +239,11 @@ void stmclk_init_sysclk(void)
 #endif
     }
 
-    stmclk_disable_hsi();
-    irq_restore(is);
+    if (!IS_ACTIVE(CONFIG_USE_CLOCK_HSI) ||
+        (IS_ACTIVE(CONFIG_USE_CLOCK_PLL) && IS_ACTIVE(CONFIG_BOARD_HAS_HSE))) {
+        /* Disable HSI only if not used */
+        stmclk_disable_hsi();
+    }
 
 #if defined(CPU_FAM_STM32G4)
     if (IS_USED(MODULE_PERIPH_HWRNG)) {
@@ -260,4 +263,6 @@ void stmclk_init_sysclk(void)
         }
     }
 #endif
+
+    irq_restore(is);
 }
