@@ -233,7 +233,7 @@ void _handle_snd_ns(_nib_onl_entry_t *nbr)
             }
             /* intentionally falls through */
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE:
-            _probe_nbr(nbr, false);
+            _snd_uc_ns(nbr, true);
             break;
         default:
             break;
