@@ -21,8 +21,16 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* This board provides an HSE */
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE    1
+#endif
+
+/* The HSE provides a 16MHz clock */
+#define CLOCK_HSE               MHZ(16)
+
 #include "periph_cpu.h"
-#include "f4/cfg_clock_168_16_0.h"
+#include "f2f4f7/cfg_clock_default_168.h"
 
 #ifdef __cplusplus
 extern "C" {

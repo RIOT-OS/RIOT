@@ -20,8 +20,13 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* This board provides an HSE */
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE    1
+#endif
+
 #include "periph_cpu.h"
-#include "f4/cfg_clock_168_8_0.h"
+#include "f2f4f7/cfg_clock_default_168.h"
 #include "cfg_usb_otg_fs.h"
 
 #ifdef __cplusplus
