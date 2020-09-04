@@ -108,6 +108,11 @@ ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
   USEMODULE += random
 endif
 
+ifneq (,$(filter netdev_ieee802154_submac,$(USEMODULE)))
+  USEMODULE += ieee802154_radio_hal
+  USEMODULE += ieee802154_submac
+endif
+
 ifneq (,$(filter gnrc_dhcpv6_%, $(USEMODULE)))
   USEMODULE += gnrc_dhcpv6
 endif
