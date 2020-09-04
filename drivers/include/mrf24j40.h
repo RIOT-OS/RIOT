@@ -179,8 +179,10 @@ typedef struct {
  *
  * @param[out] dev          device descriptor
  * @param[in]  params       parameters for device initialization
+ * @param[in]  index        index of @p params in a global parameter struct array.
+ *                          If initialized manually, pass a unique identifier instead.
  */
-void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params);
+void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params, uint8_t index);
 
 /**
  * @brief   Trigger a hardware reset and configure radio with default values
