@@ -159,8 +159,13 @@ only supported for backwards compatibility).
         logging.debug("Kconfig dependencies written to '{}'".format(args.file_list))
         with open(args.file_list, "w", encoding="utf-8") as f:
             f.write("{}: \\\n".format(args.config_out))
+            # add dependencies
             for path in kconf.kconfig_filenames:
                 f.write("    {} \\\n".format(os.path.abspath(path)))
+            # add empty recipes for dependencies
+            f.write("\n\n")
+            for path in kconf.kconfig_filenames:
+                f.write("{}:\n\n".format(os.path.abspath(path)))
 
     if args.env_list is not None:
         logging.debug("Kconfig environmental variables written to '{}'".format(args.env_list))
