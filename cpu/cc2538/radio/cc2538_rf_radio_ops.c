@@ -8,7 +8,6 @@
 
 #include "net/ieee802154/radio.h"
 
-#if IS_USED(MODULE_IEEE802154_RADIO_HAL)
 static const ieee802154_radio_ops_t cc2538_rf_ops;
 
 ieee802154_dev_t cc2538_rf_dev = {
@@ -487,6 +486,3 @@ static const ieee802154_radio_ops_t cc2538_rf_ops = {
     .set_csma_params = _set_csma_params,
     .set_rx_mode = _set_rx_mode,
 };
-#else
-int dont_be_pedantic;
-#endif
