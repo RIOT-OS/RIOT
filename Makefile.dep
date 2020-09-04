@@ -437,6 +437,11 @@ ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
   USEMODULE += od
 endif
 
+ifneq (,$(filter ieee802154_submac,$(USEMODULE)))
+  USEMODULE += luid
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter od,$(USEMODULE)))
   USEMODULE += fmt
 endif
