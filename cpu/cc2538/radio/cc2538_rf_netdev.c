@@ -31,11 +31,16 @@
 #define ENABLE_DEBUG        (0)
 #include "debug.h"
 
+#if !IS_USED(MODULE_IEEE802154_RADIO_HAL)
+
 /* Reference pointer for the IRQ handler */
 static netdev_t *_dev;
 
 void _irq_handler(void)
 {
+    RFCORE_SFR_RFIRQF0 = 0;
+    RFCORE_SFR_RFIRQF1 = 0;
+
     netdev_trigger_event_isr(_dev);
 }
 
@@ -417,3 +422,6 @@ const netdev_driver_t cc2538_rf_driver = {
     .isr  = _isr,
     .init = _init,
 };
+#else
+int dont_be_pedantic;
+#endif /* MODULE_IEEE802154_RADIO_HAL */

@@ -64,9 +64,6 @@ void isr_rfcoreerr(void)
 
 void isr_rfcorerxtx(void)
 {
-    RFCORE_SFR_RFIRQF0 = 0;
-    RFCORE_SFR_RFIRQF1 = 0;
-
    _irq_handler();
 
     cortexm_isr_end();
