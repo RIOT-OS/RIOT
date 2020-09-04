@@ -146,7 +146,9 @@ void pm_set(unsigned mode)
 
     if (deep) {
         /* Re-init clock after STOP */
+#if !defined(CPU_FAM_STM32MP1) || IS_USED(MODULE_STM32MP1_ENG_MODE)
         stmclk_init_sysclk();
+#endif
     }
 }
 

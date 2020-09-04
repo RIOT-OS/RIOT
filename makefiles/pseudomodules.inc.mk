@@ -125,6 +125,7 @@ PSEUDOMODULES += stdio_uart_rx
 PSEUDOMODULES += stm32_eth
 PSEUDOMODULES += stm32_eth_auto
 PSEUDOMODULES += stm32_eth_link_up
+PSEUDOMODULES += stm32mp1_eng_mode
 PSEUDOMODULES += suit_transport_%
 PSEUDOMODULES += suit_storage_%
 PSEUDOMODULES += wakaama_objects_%

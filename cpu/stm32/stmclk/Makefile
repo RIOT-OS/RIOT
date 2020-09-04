@@ -17,7 +17,12 @@ else ifneq (,$(filter $(CPU_FAM),l5))
 else ifneq (,$(filter $(CPU_FAM),g0 g4))
   SRC += stmclk_gx.c
 else ifneq (,$(filter $(CPU_FAM),mp1))
-  SRC = stmclk_mp1.c
+  ifneq (,$(filter stm32mp1_eng_mode,$(USEMODULE)))
+    SRC = stmclk_mp1.c
+  else
+    # Do not use *.c as SRC if SRC is empty (see Makefile.base)
+    NO_AUTO_SRC = 1
+  endif
 endif
 
 include $(RIOTBASE)/Makefile.base
