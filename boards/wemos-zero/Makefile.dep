@@ -1,12 +1,4 @@
 include $(RIOTBOARD)/common/arduino-zero/Makefile.dep
 
-# use arduino-bootloader only if no other stdio_% other than stdio_cdc_acm
-# is requested
-ifeq (,$(filter-out stdio_cdc_acm,$(filter stdio_%,$(USEMODULE))))
-  USEMODULE += boards_common_samd21-arduino-bootloader
-endif
-
-ifneq (,$(filter boards_common_samd21-arduino-bootloader,$(USEMODULE)))
-  # setup the samd21 arduino bootloader related dependencies
-  include $(RIOTBOARD)/common/samd21-arduino-bootloader/Makefile.dep
-endif
+# setup the samd21 arduino bootloader related dependencies
+include $(RIOTBOARD)/common/samd21-arduino-bootloader/Makefile.dep

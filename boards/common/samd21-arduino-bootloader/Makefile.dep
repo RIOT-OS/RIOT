@@ -1,5 +1,7 @@
-# This boards requires support for Arduino bootloader.
-USEMODULE += usb_board_reset
-USEMODULE += stdio_cdc_acm
+include $(RIOTBOARD)/common/makefiles/stdio_cdc_acm.dep.mk
 
-FEATURES_REQUIRED += highlevel_stdio
+# USB Board reset only works if CDC ACM is used
+ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
+  USEMODULE += boards_common_samd21-arduino-bootloader
+  USEMODULE += usb_board_reset
+endif
