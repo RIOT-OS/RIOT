@@ -21,6 +21,9 @@ endif
 # select cpu_check_address pseudomodule if the corresponding feature is used
 USEMODULE += $(filter cpu_check_address, $(FEATURES_USED))
 
+# include puf_sram if used
+USEMODULE += $(filter puf_sram, $(FEATURES_USED))
+
 # include periph_common if any periph_* driver is used
 ifneq (,$(filter periph_%, $(USEMODULE)))
   USEMODULE += periph_common
