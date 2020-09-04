@@ -515,7 +515,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
                     usage_exit(EXIT_FAILURE);
                 }
                 optarg++;
-                strncpy(candev_linux_conf[i].interface_name, optarg,
+                strncpy(candev_conf[i].interface_name, optarg,
                         CAN_MAX_SIZE_INTERFACE_NAME);
                 }
                 break;

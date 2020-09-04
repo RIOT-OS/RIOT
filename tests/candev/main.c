@@ -34,7 +34,7 @@
 
 #include <candev_linux.h>
 
-static candev_linux_t linux_dev;
+static can_t linux_dev;
 
 #else
 /* add other candev drivers here */
@@ -194,7 +194,7 @@ int main(void)
     isrpipe_init(&rxbuf, (uint8_t *)rx_ringbuf, sizeof(rx_ringbuf));
 #if IS_USED(MODULE_CAN_LINUX)
     puts("Initializing Linux Can device");
-    candev_linux_init( &linux_dev, &(candev_linux_conf[0]));    /* vcan0 */
+    can_init( &linux_dev, &(candev_conf[0]));    /* vcan0 */
     candev = (candev_t *)&linux_dev;
 #else
     /* add initialization for other candev drivers here */

@@ -16,6 +16,7 @@
  * @}
  */
 
+#include "periph/can.h"
 #include "can/device.h"
 #include "can_params.h"
 

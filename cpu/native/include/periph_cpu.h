@@ -156,6 +156,10 @@ typedef enum {
 #endif
 /** @} */
 
+#ifdef MODULE_PERIPH_CAN
+#include "candev_linux.h"
+#endif
+
 #ifdef __cplusplus
 }
 #endif

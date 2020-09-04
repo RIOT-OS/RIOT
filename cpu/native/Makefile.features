@@ -22,4 +22,6 @@ ifeq ($(OS),Linux)
   FEATURES_PROVIDED += periph_spi
   # Hardware GPIO access is only available on Linux hosts
   FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+  # CAN is only supported on Linux through socketCAN
+  FEATURES_PROVIDED += periph_can
 endif
