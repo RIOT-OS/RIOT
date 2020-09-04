@@ -37,8 +37,8 @@ int main(void)
     int32_t max = INT32_MIN;
 
     /* unset configured adjustment */
-    /* ZTIMER_USEC->adjust = 0; */
-    printf("ZTIMER_USEC->adjust = %" PRIu32 "\n", ZTIMER_USEC->adjust);
+    /* ZTIMER_USEC->adjust_set = 0; */
+    printf("ZTIMER_USEC->adjust_set = %" PRIu16 "\n", ZTIMER_USEC->adjust_set);
 
     unsigned n = SAMPLES;
     while (n--) {
