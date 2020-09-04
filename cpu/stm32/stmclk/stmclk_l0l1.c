@@ -62,7 +62,7 @@
 #endif
 
 /* Check the source to be used for the PLL */
-#if CONFIG_BOARD_HAS_HSE
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
 #define CLOCK_PLL_SOURCE            (RCC_CFGR_PLLSRC_HSE)
 #else /* Use HSI as PLL input */
 #define CLOCK_PLL_SOURCE            (RCC_CFGR_PLLSRC_HSI)
@@ -155,16 +155,23 @@ void stmclk_init_sysclk(void)
     /* Wait Until the Voltage Regulator is ready */
     while((PWR->CSR & PWR_CSR_VOSF) != 0) {}
 
-    if (CONFIG_USE_CLOCK_HSE) {
-        /* Enable the HSE clock now */
+    /* Only enable the HSE clock when it's provided by the board and required:
+        - when HSE is used as system clock
+        - when PLL is used as system clock (because HSE is used automatically
+          as PLL input if it's available)
+     */
+    if (IS_ACTIVE(CONFIG_BOARD_HAS_HSE) &&
+        (IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || IS_ACTIVE(CONFIG_USE_CLOCK_PLL))) {
         RCC->CR |= (RCC_CR_HSEON);
         while (!(RCC->CR & RCC_CR_HSERDY)) {}
+    }
 
+    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
         /* Select HSE as system clock and configure the different prescalers */
         RCC->CFGR &= ~(RCC_CFGR_SW);
         RCC->CFGR |= RCC_CFGR_SW_HSE;
     }
-    else if (CONFIG_USE_CLOCK_MSI) {
+    else if (IS_ACTIVE(CONFIG_USE_CLOCK_MSI)) {
         /* Configure MSI range and enable it */
         RCC->ICSCR |= CLOCK_MSIRANGE;
         RCC->CR |= (RCC_CR_MSION);
@@ -174,13 +181,7 @@ void stmclk_init_sysclk(void)
         RCC->CFGR &= ~(RCC_CFGR_SW);
         RCC->CFGR |= RCC_CFGR_SW_MSI;
     }
-    else if (CONFIG_USE_CLOCK_PLL) {
-        if (CONFIG_BOARD_HAS_HSE) {
-            /* if configured, we need to enable the HSE clock now */
-            RCC->CR |= (RCC_CR_HSEON);
-            while (!(RCC->CR & RCC_CR_HSERDY)) {}
-        }
-
+    else if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
         /* Configure PLL clock source and configure the different prescalers */
         RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLDIV | RCC_CFGR_PLLMUL);
         RCC->CFGR |= (CLOCK_PLL_SOURCE | CLOCK_PLL_DIV | CLOCK_PLL_MUL);

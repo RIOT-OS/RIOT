@@ -23,7 +23,7 @@
  * This board provides an LSE, so enable it before including the default clock config
  */
 #ifndef CONFIG_BOARD_HAS_LSE
-#define CONFIG_BOARD_HAS_LSE            (1)
+#define CONFIG_BOARD_HAS_LSE            1
 #endif
 
 #include "periph_cpu.h"

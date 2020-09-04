@@ -33,63 +33,63 @@ extern "C" {
 #ifndef CONFIG_USE_CLOCK_PLL
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || IS_ACTIVE(CONFIG_USE_CLOCK_HSI) || \
     IS_ACTIVE(CONFIG_USE_CLOCK_MSI)
-#define CONFIG_USE_CLOCK_PLL            (0)
+#define CONFIG_USE_CLOCK_PLL            0
 #else
-#define CONFIG_USE_CLOCK_PLL            (1)     /* Use PLL by default */
+#define CONFIG_USE_CLOCK_PLL            1     /* Use PLL by default */
 #endif
 #endif /* CONFIG_USE_CLOCK_PLL */
 
 #ifndef CONFIG_USE_CLOCK_MSI
-#define CONFIG_USE_CLOCK_MSI            (0)
+#define CONFIG_USE_CLOCK_MSI            0
 #endif /* CONFIG_USE_CLOCK_MSI */
 
 #ifndef CONFIG_USE_CLOCK_HSE
-#define CONFIG_USE_CLOCK_HSE            (0)
+#define CONFIG_USE_CLOCK_HSE            0
 #endif /* CONFIG_USE_CLOCK_HSE */
 
 #ifndef CONFIG_USE_CLOCK_HSI
-#define CONFIG_USE_CLOCK_HSI            (0)
+#define CONFIG_USE_CLOCK_HSI            0
 #endif /* CONFIG_USE_CLOCK_HSI */
 
-#if CONFIG_USE_CLOCK_PLL && \
-    (CONFIG_USE_CLOCK_MSI || CONFIG_USE_CLOCK_HSE || CONFIG_USE_CLOCK_HSI)
+#if IS_ACTIVE(CONFIG_USE_CLOCK_PLL) && \
+    (IS_ACTIVE(CONFIG_USE_CLOCK_MSI) || IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || \
+     IS_ACTIVE(CONFIG_USE_CLOCK_HSI))
 #error "Cannot use PLL as clock source with other clock configurations"
 #endif
 
-#if CONFIG_USE_CLOCK_MSI && \
-    (CONFIG_USE_CLOCK_PLL || CONFIG_USE_CLOCK_HSE || CONFIG_USE_CLOCK_HSI)
+#if IS_ACTIVE(CONFIG_USE_CLOCK_MSI) && \
+    (IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || \
+     IS_ACTIVE(CONFIG_USE_CLOCK_HSI))
 #error "Cannot use MSI as clock source with other clock configurations"
 #endif
 
-#if CONFIG_USE_CLOCK_HSE && \
-    (CONFIG_USE_CLOCK_PLL || CONFIG_USE_CLOCK_MSI || CONFIG_USE_CLOCK_HSI)
+#if IS_ACTIVE(CONFIG_USE_CLOCK_HSE) && \
+    (IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || IS_ACTIVE(CONFIG_USE_CLOCK_MSI) || \
+     IS_ACTIVE(CONFIG_USE_CLOCK_HSI))
 #error "Cannot use HSE as clock source with other clock configurations"
 #endif
 
-#if CONFIG_USE_CLOCK_HSI && \
-    (CONFIG_USE_CLOCK_PLL || CONFIG_USE_CLOCK_MSI || CONFIG_USE_CLOCK_HSE)
+#if IS_ACTIVE(CONFIG_USE_CLOCK_HSI) && \
+    (IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || IS_ACTIVE(CONFIG_USE_CLOCK_MSI) || \
+     IS_ACTIVE(CONFIG_USE_CLOCK_HSE))
 #error "Cannot use HSI as clock source with other clock configurations"
 #endif
 
 #ifndef CONFIG_BOARD_HAS_HSE
-#define CONFIG_BOARD_HAS_HSE            (0)
+#define CONFIG_BOARD_HAS_HSE            0
 #endif
 
 #ifndef CLOCK_HSE
 #define CLOCK_HSE                       MHZ(24)
 #endif
-#if CONFIG_BOARD_HAS_HSE && (CLOCK_HSE < MHZ(1) || CLOCK_HSE > MHZ(24))
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE < MHZ(1) || CLOCK_HSE > MHZ(24))
 #error "HSE clock frequency must be between 1MHz and 24MHz"
 #endif
 
-#ifndef CONFIG_CLOCK_HSI_USE_DIV4
-#define CONFIG_CLOCK_HSI_USE_DIV4       (0)
-#endif
-
 #ifndef CONFIG_BOARD_HAS_LSE
-#define CONFIG_BOARD_HAS_LSE            (0)
+#define CONFIG_BOARD_HAS_LSE            0
 #endif
-#if CONFIG_BOARD_HAS_LSE
+#if IS_ACTIVE(CONFIG_BOARD_HAS_LSE)
 #define CLOCK_LSE                       (1)
 #else
 #define CLOCK_LSE                       (0)
@@ -101,27 +101,28 @@ extern "C" {
 #define CONFIG_CLOCK_MSI                KHZ(4194)
 #endif
 
-#if CONFIG_USE_CLOCK_HSI
-#define CLOCK_CORECLOCK                 (CLOCK_HSI)
-
-#elif CONFIG_USE_CLOCK_HSE
-#if CONFIG_BOARD_HAS_HSE == 0
-#error "The board doesn't provide an HSE oscillator"
-#endif
-#define CLOCK_CORECLOCK                 (CLOCK_HSE)
-
-#elif CONFIG_USE_CLOCK_MSI
-#define CLOCK_CORECLOCK                 (CONFIG_CLOCK_MSI)
-
-#elif CONFIG_USE_CLOCK_PLL
-/* The following parameters configure a 64MHz system clock with HSI as input clock */
+/* The following parameters configure a 32MHz system clock with HSI as input clock */
 #ifndef CONFIG_CLOCK_PLL_DIV
 #define CONFIG_CLOCK_PLL_DIV            (2)
 #endif
 #ifndef CONFIG_CLOCK_PLL_MUL
 #define CONFIG_CLOCK_PLL_MUL            (4)
 #endif
-#if CONFIG_BOARD_HAS_HSE
+
+#if IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
+#define CLOCK_CORECLOCK                 (CLOCK_HSI)
+
+#elif IS_ACTIVE(CONFIG_USE_CLOCK_HSE)
+#if !IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
+#error "The board doesn't provide an HSE oscillator"
+#endif
+#define CLOCK_CORECLOCK                 (CLOCK_HSE)
+
+#elif IS_ACTIVE(CONFIG_USE_CLOCK_MSI)
+#define CLOCK_CORECLOCK                 (CONFIG_CLOCK_MSI)
+
+#elif IS_ACTIVE(CONFIG_USE_CLOCK_PLL)
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
 #if CLOCK_HSE < MHZ(2)
 #error "HSE must be greater than 2MHz when used as PLL input clock"
 #endif
@@ -134,9 +135,9 @@ extern "C" {
  * compute by: CORECLOCK = ((PLL_IN / PLL_PREDIV) * PLL_MUL)
  * with:
  * PLL_IN:          input clock is HSE if available or HSI otherwise
- * PLL_DIV :        divider, allowed values: 2, 3, 4
- * PLL_MUL:         multiplier, allowed values: 3, 4, 6, 8, 12, 16, 24, 32, 48
- * CORECLOCK        -> 48MHz MAX!
+ * PLL_DIV :        divider, allowed values: 2, 3, 4. Default is 2.
+ * PLL_MUL:         multiplier, allowed values: 3, 4, 6, 8, 12, 16, 24, 32, 48. Default is 4.
+ * CORECLOCK        -> 32MHz MAX!
  */
 #define CLOCK_CORECLOCK                 ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_DIV) * CONFIG_CLOCK_PLL_MUL)
 #if CLOCK_CORECLOCK > MHZ(32)
