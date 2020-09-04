@@ -46,6 +46,10 @@ int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count)
         return -ENODEV;
     }
 
+    if (mtd->driver->read) {
+        return mtd->driver->read(mtd, dest, addr, count);
+    }
+
     /* page size is always a power of two */
     const uint32_t page_shift = bitarithm_msb(mtd->page_size);
     const uint32_t page_mask = mtd->page_size - 1;
@@ -110,6 +114,10 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count)
         return -ENODEV;
     }
 
+    if (mtd->driver->write) {
+        return mtd->driver->write(mtd, src, addr, count);
+    }
+
     /* page size is always a power of two */
     const uint32_t page_shift = bitarithm_msb(mtd->page_size);
     const uint32_t page_mask = mtd->page_size - 1;
@@ -172,6 +180,10 @@ int mtd_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count)
 {
     if (!mtd || !mtd->driver) {
         return -ENODEV;
+    }
+
+    if (mtd->driver->erase) {
+        mtd->driver->erase(mtd, addr, count);
     }
 
     uint32_t sector_size = mtd->pages_per_sector * mtd->page_size;
