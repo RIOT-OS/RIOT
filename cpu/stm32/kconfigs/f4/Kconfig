@@ -21,3 +21,18 @@ config HAS_CPU_STM32F4
     bool
     help
         Indicates that the cpu being used belongs to the 'stm32f4' family.
+
+config CLOCK_MAX_84MHZ
+    bool
+    help
+        Indicates that the CPU max core clock frequency is 84MHz
+
+config CLOCK_MAX_100MHZ
+    bool
+    help
+        Indicates that the CPU max core clock frequency is 100MHz
+
+config CLOCK_MAX_180MHZ
+    bool
+    help
+        Indicates that the CPU max core clock frequency is 180MHz
