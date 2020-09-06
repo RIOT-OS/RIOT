@@ -115,6 +115,15 @@ enum {
 /** @} */
 
 /**
+ * @name    Enable Reduced Power Consumption
+ * @{
+ */
+#ifndef CONFIG_AT86RF215_RPC_EN
+#define CONFIG_AT86RF215_RPC_EN                 (0)
+#endif
+/** @} */
+
+/**
  * @name    Default PHY Mode
  * @{
  */
