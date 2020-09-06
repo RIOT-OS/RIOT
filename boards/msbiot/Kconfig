@@ -22,3 +22,9 @@ config BOARD_MSBIOT
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+
+    # Clock configuration
+    select BOARD_HAS_HSE
+    select BOARD_HAS_LSE
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

@@ -9,3 +9,6 @@ FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_usbdev
+
+# pyboard provides a custom default Kconfig clock configuration
+KCONFIG_ADD_CONFIG += $(RIOTBOARD)/pyboard/clock.config
