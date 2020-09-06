@@ -40,6 +40,28 @@ extern "C" {
 #endif
 
 /**
+ * @name    ADC configuration
+ *
+ * Note that we do not configure all ADC channels,
+ * and not in the STM32F334 order.  Instead, we
+ * just define 6 ADC channels, for the Nucleo
+ * Arduino header pins A0-A5
+ *
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_A, 0), .dev = 0, .chan =  1 }, /* ADC1_IN1,  fast */
+    { .pin = GPIO_PIN(PORT_A, 1), .dev = 0, .chan =  2 }, /* ADC1_IN2,  fast */
+    { .pin = GPIO_PIN(PORT_A, 4), .dev = 1, .chan =  1 }, /* ADC2_IN1,  fast */
+    { .pin = GPIO_PIN(PORT_B, 0), .dev = 2, .chan = 12 }, /* ADC3_IN12, slow */
+    { .pin = GPIO_PIN(PORT_C, 1), .dev = 1, .chan =  7 }, /* ADC12_IN7, slow */
+    { .pin = GPIO_PIN(PORT_C, 0), .dev = 1, .chan =  6 }, /* ADC12_IN6, slow */
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+/** @} */
+
+/**
  * @name   UART configuration
  * @{
  */
