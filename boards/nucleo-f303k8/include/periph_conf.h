@@ -35,6 +35,27 @@ extern "C" {
 #endif
 
 /**
+ * @name    ADC configuration
+ *
+ * Note that we do not configure all ADC channels,
+ * and not in the STM32F303 order.  Instead, we
+ * just define 6 ADC channels, for the Nucleo
+ * Arduino header pins A0-A3 and A6
+ *
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    { .pin = GPIO_PIN(PORT_A, 0), .dev = 0, .chan = 1 }, /* ADC1_IN1, fast */
+    { .pin = GPIO_PIN(PORT_A, 1), .dev = 0, .chan = 2 }, /* ADC1_IN2, fast */
+    { .pin = GPIO_PIN(PORT_A, 3), .dev = 0, .chan = 4 }, /* ADC1_IN4, fast */
+    { .pin = GPIO_PIN(PORT_A, 4), .dev = 1, .chan = 1 }, /* ADC2_IN1, fast */
+    { .pin = GPIO_PIN(PORT_A, 7), .dev = 1, .chan = 4 }, /* ADC2_IN4, fast */
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+/** @} */
+
+/**
  * @name    DMA streams configuration
  * @{
  */
