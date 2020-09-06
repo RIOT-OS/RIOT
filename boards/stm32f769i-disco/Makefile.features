@@ -7,3 +7,6 @@ FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_usbdev
+
+# stm32f769i-disco provides a custom default Kconfig clock configuration
+KCONFIG_ADD_CONFIG += $(RIOTBOARD)/stm32f769i-disco/clock.config
