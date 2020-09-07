@@ -81,7 +81,7 @@ enum {
     ONEWIRE_OK          =  0,   /**< everything fine */
     ONEWIRE_NODEV       = -1,   /**< no device connected to the bus */
     ONEWIRE_ERR_PINCFG  = -2,   /**< unable to initialize pin as open-drain */
-    ONEWIRE_ERR_ROMSTR  = -3    /**< invalid ROM string given */
+    ONEWIRE_ERR_ROMSTR  = -3,   /**< invalid ROM string given */
 };
 
 /**
@@ -92,7 +92,7 @@ enum {
     ONEWIRE_ROM_READ    = 0x33, /**< read ROM code in single device config */
     ONEWIRE_ROM_MATCH   = 0x55, /**< address a specific slave */
     ONEWIRE_ROM_SKIP    = 0xcc, /**< broadcast commands to all connected devs */
-    ONEWIRE_ROM_ALARM   = 0xec  /**< search for devices with active alarm */
+    ONEWIRE_ROM_ALARM   = 0xec, /**< search for devices with active alarm */
 };
 
 /**
