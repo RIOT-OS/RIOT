@@ -1,5 +1,19 @@
 # Target architecture for the build.
-TARGET_ARCH_RISCV ?= riscv-none-embed
+TARGET_ARCH_RISCV ?= riscv-none-elf
+
+# If TARGET_ARCH wasn't set by user, also check if riscv64-unknown-elf
+# or riscv-none-embed is present.
+ifeq (riscv-none-elf,$(TARGET_ARCH_RISCV))
+  ifeq (,$(shell which $(TARGET_ARCH_RISCV)-gcc))
+    ifneq (,$(shell which riscv64-unknown-elf-gcc))
+      TARGET_ARCH_RISCV := riscv64-unknown-elf
+    else ifneq (,$(shell which riscv-none-embed-gcc))
+      $(info Falling back to legacy riscv-none-embed toolchain)
+      TARGET_ARCH_RISCV := riscv-none-embed
+    endif
+  endif
+endif
+
 TARGET_ARCH ?= $(TARGET_ARCH_RISCV)
 
 # define build specific options
