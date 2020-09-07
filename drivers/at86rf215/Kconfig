@@ -27,6 +27,11 @@ config AT86RF215_TRIM_VAL_EN
     help
         Enable crystal oscillator trimming.
 
+config AT86RF215_RPC_EN
+    bool "Enable Reduced Power Consumption"
+    help
+        Reduce Power Consumption in RX IDLE by duty-cycling the RF circuitry.
+
 config AT86RF215_TRIM_VAL
     int "Trim value for the crystal oscillator"
     range 0 15

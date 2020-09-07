@@ -204,6 +204,38 @@ int8_t at86rf215_get_ed_level(at86rf215_t *dev)
     return at86rf215_reg_read(dev, dev->RF->RG_EDV);
 }
 
+void at86rf215_enable_rpc(at86rf215_t *dev)
+{
+    if (!(dev->flags & AT86RF215_OPT_RPC) || !CONFIG_AT86RF215_RPC_EN) {
+        return;
+    }
+
+    /* no Reduced Power mode available for OFDM */
+
+#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+    {
+        /* MR-O-QPSK */
+        at86rf215_reg_or(dev, dev->BBC->RG_OQPSKC2, OQPSKC2_RPC_MASK);
+    }
+#endif
+}
+
+void at86rf215_disable_rpc(at86rf215_t *dev)
+{
+    if (!(dev->flags & AT86RF215_OPT_RPC) || !CONFIG_AT86RF215_RPC_EN) {
+        return;
+    }
+
+    /* no Reduced Power mode available for OFDM */
+
+#ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
+    {
+        /* MR-O-QPSK */
+        at86rf215_reg_and(dev, dev->BBC->RG_OQPSKC2, ~OQPSKC2_RPC_MASK);
+    }
+#endif
+}
+
 void at86rf215_set_option(at86rf215_t *dev, uint16_t option, bool state)
 {
     /* set option field */
@@ -243,7 +275,14 @@ void at86rf215_set_option(at86rf215_t *dev, uint16_t option, bool state)
             }
 
             break;
+        case AT86RF215_OPT_RPC:
+            if (state) {
+                at86rf215_enable_rpc(dev);
+            } else {
+                at86rf215_disable_rpc(dev);
+            }
 
+            break;
         default:
             /* do nothing */
             break;
