@@ -31,6 +31,8 @@ Reason for removal:
 - feature was never used and there is no reason for keeping it
 ~~~~~~~~~~~~~~~~~~~
 
+Additionally, a link reference for the commit on GitHub is added to the bottom of this document.
+
 By putting the name of the removed feature and the commit hash in the same line,
 one can very quickly find the commit using `git grep`.
 
@@ -191,8 +193,8 @@ Author(s):
 Reason for removal:
 - broke the abstraction of `gnrc_pktbuf`
 - its only user within the RIOT code base `gnrc_ipv6_ext` was reworked in
-  f671a87fe2c539c3aecd595ae03fa4f6f209d042 so it is not needed anymore.
-- the function was deprecated in f2760c033c5f332be076b25aa212aca4007c3d65
+  [f671a87fe2c539c3aecd595ae03fa4f6f209d042] so it is not needed anymore.
+- the function was deprecated in [f2760c033c5f332be076b25aa212aca4007c3d65]
 
 ### boards/wsn430-v1_3b, boards/wsn430-v1_4 [e63cd54f3b1e002a7895bb7c46af889b341c1a15]
 
@@ -213,3 +215,26 @@ Reason for removal:
 - Stale upstream (last update to date in Mar 2018)
 - Ported version even older (last update Feb 2016)
 - Updating to more recent version would be more effort than its worth
+
+
+[c84cedb07212a90932e446f5d57391d1edd486d0]: https://github.com/RIOT-OS/RIOT/commit/c84cedb07212a90932e446f5d57391d1edd486d0
+[ed3887ac5c1e95308c2827bce3cdca8b0f146c22]: https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22
+[0e2a62078850e1ecc74db2db4d639cf2d8fb96d3]: https://github.com/RIOT-OS/RIOT/commit/0e2a62078850e1ecc74db2db4d639cf2d8fb96d3
+[c829f820ee870bffc60c7df688d2da8373553212]: https://github.com/RIOT-OS/RIOT/commit/c829f820ee870bffc60c7df688d2da8373553212
+[0201a2d273fe17aa1b8eeb22776ae9670551433d]: https://github.com/RIOT-OS/RIOT/commit/0201a2d273fe17aa1b8eeb22776ae9670551433d
+[868d37708bb674739ab4983441d6df904dd5a25f]: https://github.com/RIOT-OS/RIOT/commit/868d37708bb674739ab4983441d6df904dd5a25f
+[232aed3e18118624b862d36bfec7cd1c21ca2d26]: https://github.com/RIOT-OS/RIOT/commit/232aed3e18118624b862d36bfec7cd1c21ca2d26
+[a2bcd7539ce1931b7aec0077ea71dadd62c96edd]: https://github.com/RIOT-OS/RIOT/commit/a2bcd7539ce1931b7aec0077ea71dadd62c96edd
+[ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7]: https://github.com/RIOT-OS/RIOT/commit/ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7
+[9447cb303426d7c6348bb84999f88bf929cd6263]: https://github.com/RIOT-OS/RIOT/commit/9447cb303426d7c6348bb84999f88bf929cd6263
+[ea73cc49eacd45640b9660134c4c92b887cb2716]: https://github.com/RIOT-OS/RIOT/commit/ea73cc49eacd45640b9660134c4c92b887cb2716
+[99009af25e201bbc182d376e99df34133417be6c]: https://github.com/RIOT-OS/RIOT/commit/99009af25e201bbc182d376e99df34133417be6c
+[cfa9580f319508f858c8fe30ecce8b2b59b6caa3]: https://github.com/RIOT-OS/RIOT/commit/cfa9580f319508f858c8fe30ecce8b2b59b6caa3
+[b3eb9b8cf23f0702fa725d536df6ad6528f84189]: https://github.com/RIOT-OS/RIOT/commit/b3eb9b8cf23f0702fa725d536df6ad6528f84189
+[7bc271807cecbffbb01a37c56a367b98fb823573]: https://github.com/RIOT-OS/RIOT/commit/7bc271807cecbffbb01a37c56a367b98fb823573
+[fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836]: https://github.com/RIOT-OS/RIOT/commit/fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836
+[b83430aa625a1d42f11f9badf5e5cfbb8efacd99]: https://github.com/RIOT-OS/RIOT/commit/b83430aa625a1d42f11f9badf5e5cfbb8efacd99
+[f671a87fe2c539c3aecd595ae03fa4f6f209d042]: https://github.com/RIOT-OS/RIOT/commit/f671a87fe2c539c3aecd595ae03fa4f6f209d042
+[f2760c033c5f332be076b25aa212aca4007c3d65]: https://github.com/RIOT-OS/RIOT/commit/f2760c033c5f332be076b25aa212aca4007c3d65
+[e63cd54f3b1e002a7895bb7c46af889b341c1a15]: https://github.com/RIOT-OS/RIOT/commit/e63cd54f3b1e002a7895bb7c46af889b341c1a15
+[4f243c52eabefe709d78560ce7f1d502d737a999]: https://github.com/RIOT-OS/RIOT/commit/4f243c52eabefe709d78560ce7f1d502d737a999
