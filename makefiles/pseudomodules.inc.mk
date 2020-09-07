@@ -127,6 +127,7 @@ PSEUDOMODULES += stm32_eth_auto
 PSEUDOMODULES += stm32_eth_link_up
 PSEUDOMODULES += suit_transport_%
 PSEUDOMODULES += suit_storage_%
+PSEUDOMODULES += sys_bus_%
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += wifi_enterprise
 PSEUDOMODULES += xtimer_on_ztimer
