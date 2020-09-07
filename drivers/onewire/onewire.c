@@ -65,8 +65,10 @@ static void _release(const onewire_t *owi)
 
 static void _spin_us(uint32_t *t_ref, uint32_t delay_us)
 {
-    *t_ref = *t_ref + delay_us;
-    while (xtimer_now_usec() < *t_ref) {}
+    /* we know, that t_ref is always less then xtimer_now_usec(). So the
+     * following does also work for t_ref + delay_us overflowing */
+    while ((xtimer_now_usec() - *t_ref) < delay_us) {}
+    *t_ref += delay_us;
 }
 
 static int _read_bit(const onewire_t *owi, uint32_t *t_ref)
