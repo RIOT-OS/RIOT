@@ -12,6 +12,24 @@ menuconfig KCONFIG_USEMODULE_AT86RF215
 
 if KCONFIG_USEMODULE_AT86RF215
 
+menuconfig KCONFIG_USEMODULE_AT86RF215_BATMON
+    bool "AT86RF215 Battery Monitor"
+    depends on USEMODULE_AT86RF215
+    help
+        Configure the AT86RF215 battery monitor using Kconfig.
+
+config AT86RF215_BATMON_THRESHOLD
+    int "Treshold voltage (in mV) of the battery monitor"
+    range 1700 3675
+    default 1800
+    depends on KCONFIG_USEMODULE_AT86RF215_BATMON
+    help
+        If the supply voltage falls below the configured threshold
+        a SYS_BUS_POWER_EVENT_LOW_VOLTAGE event is generated on the
+        SYS_BUS_POWER bus.
+
+        Battery Monitoring is disabled when the device is in Deep Sleep.
+
 config AT86RF215_USE_CLOCK_OUTPUT
     bool "Enable clock output"
     help

@@ -69,6 +69,11 @@ int at86rf215_hardware_reset(at86rf215_t *dev)
         return -ENODEV;
     }
 
+    /* enable battery monitor */
+    if (IS_ACTIVE(MODULE_AT86RF215_BATMON)) {
+        at86rf215_enable_batmon(dev, CONFIG_AT86RF215_BATMON_THRESHOLD);
+    }
+
     /* clear interrupts */
     at86rf215_reg_read(dev, RG_RF09_IRQS);
     at86rf215_reg_read(dev, RG_RF24_IRQS);

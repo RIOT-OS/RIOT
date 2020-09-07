@@ -124,6 +124,16 @@ enum {
 /** @} */
 
 /**
+ * @name    Default Battery Monitor trigger threshold (in mV)
+ *          if battery monitoring is enabled
+ * @{
+ */
+#ifndef CONFIG_AT86RF215_BATMON_THRESHOLD
+#define CONFIG_AT86RF215_BATMON_THRESHOLD       (1800)
+#endif
+/** @} */
+
+/**
  * @name    Default PHY Mode
  * @{
  */
@@ -590,6 +600,24 @@ void at86rf215_tx_done(at86rf215_t *dev);
  * @return                  false if channel is determined busy
  */
 bool at86rf215_cca(at86rf215_t *dev);
+
+/**
+ * @brief   Generate an interrupt if supply voltage drops below the configured
+ *          threshold.
+ *
+ * @param[in] dev           device to configure
+ * @param[in] voltage       Threshold voltage in mV
+ *
+ * @return                  0 on success, error otherwise
+ */
+int at86rf215_enable_batmon(at86rf215_t *dev, unsigned voltage);
+
+/**
+ * @brief   Disable the Battery Monitor interrupt.
+ *
+ * @param[in] dev           device to configure
+ */
+void at86rf215_disable_batmon(at86rf215_t *dev);
 
 #ifdef __cplusplus
 }
