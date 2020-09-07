@@ -96,6 +96,14 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                     uint16_t ltime = byteorder_ntohs(aro->ltime);
                     uint32_t rereg_time;
                     int idx = gnrc_netif_ipv6_addr_idx(netif, &ipv6->dst);
+
+                    if (idx < 0) {
+                        DEBUG("nib: Address %s is not assigned to interface "
+                              "%d ignoring ARO\n",
+                              ipv6_addr_to_str(addr_str, &ipv6->dst,
+                                               sizeof(addr_str)), netif->pid);
+                        return _ADDR_REG_STATUS_IGNORE;
+                    }
                     /* if ltime 1min, reschedule NS in 30sec, otherwise 1min
                      * before timeout */
                     rereg_time = (ltime == 1U) ? (30 * MS_PER_SEC) :
@@ -176,6 +184,8 @@ static inline bool _is_valid(const gnrc_netif_t *netif, int idx)
 void _handle_rereg_address(const ipv6_addr_t *addr)
 {
     gnrc_netif_t *netif = gnrc_netif_get_by_ipv6_addr(addr);
+
+    gnrc_netif_acquire(netif);
     _nib_dr_entry_t *router = _nib_drl_get(NULL, netif->pid);
     const bool router_reachable = (router != NULL) &&
                                   _is_reachable(router->next_hop);
@@ -197,10 +207,15 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
     if (netif != NULL) {
         int idx = gnrc_netif_ipv6_addr_idx(netif, addr);
 
-        if (router_reachable &&
-            (_is_valid(netif, idx) || (_is_tentative(netif, idx) &&
-             (gnrc_netif_ipv6_addr_dad_trans(netif, idx) <
-              SIXLOWPAN_ND_REG_TRANSMIT_NUMOF)))) {
+        if (idx < 0) {
+            DEBUG("nib: %s is not assigned to interface %d anymore.\n",
+                  ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+                  netif->pid);
+        }
+        else if (router_reachable &&
+                 (_is_valid(netif, idx) || (_is_tentative(netif, idx) &&
+                 (gnrc_netif_ipv6_addr_dad_trans(netif, idx) <
+                 SIXLOWPAN_ND_REG_TRANSMIT_NUMOF)))) {
             uint32_t retrans_time;
 
             if (_is_valid(netif, idx)) {
@@ -219,6 +234,7 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
             _handle_search_rtr(netif);
         }
     }
+    gnrc_netif_release(netif);
 }
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
