@@ -5,8 +5,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega328p \
+    atmega1284p \
     derfmega128 \
     i-nucleo-lrwan1 \
+    mega-xplained \
     microduino-corerf \
     msb-430 \
     msb-430h \
