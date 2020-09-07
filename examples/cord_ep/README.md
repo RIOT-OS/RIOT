@@ -13,13 +13,13 @@ RD, called `cord_ep`. Simply use that shell command without parameters for
 more information on its usage.
 
 Some connection parameters are configured statically during compile time,
-namely the lifetime (`CORD_LT`) and the node's endpoint name (`CORD_EP`). You
+namely the lifetime (`CONFIG_CORD_LT`) and the node's endpoint name (`CONFIG_CORD_EP`). You
 can change these values at compile time by overriding their defines using
 command line arguments:
 ```
-CFLAGS="-DCORD_EP=\\\"your_ep_name_here\\\"" make all
+CFLAGS="-DCONFIG_CORD_EP=\\\"your_ep_name_here\\\"" make all
 ```
 or by setting their values in the application's Makefile:
 ```
-CFLAGS += "-DCORD_EP=\"MyNewEpName\""
+CFLAGS += "-DCONFIG_CORD_EP=\"MyNewEpName\""
 ```

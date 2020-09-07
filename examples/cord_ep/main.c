@@ -103,7 +103,7 @@ int main(void)
 
     puts("Client information:");
     printf("  ep: %s\n", cord_common_get_ep());
-    printf("  lt: %is\n", (int)CORD_LT);
+    printf("  lt: %is\n", (int)CONFIG_CORD_LT);
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
