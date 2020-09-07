@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
+ * Copyright (C) 2017-20 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -58,6 +58,9 @@
 #endif
 #if IS_USED(MODULE_GNRC_NETIF_MAC)
 #include "net/gnrc/netif/mac.h"
+#endif
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+#include "net/gnrc/netif/pktq/type.h"
 #endif
 #include "net/ndp.h"
 #include "net/netdev.h"
@@ -171,6 +174,14 @@ typedef struct {
 #endif
 #if IS_USED(MODULE_GNRC_NETIF_6LO) || defined(DOXYGEN)
     gnrc_netif_6lo_t sixlo;                 /**< 6Lo component */
+#endif
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ) || defined(DOXYGEN)
+    /**
+     * @brief   Packet queue for sending
+     *
+     * @note    Only available with @ref net_gnrc_netif_pktq.
+     */
+    gnrc_netif_pktq_t send_queue;
 #endif
     uint8_t cur_hl;                         /**< Current hop-limit for out-going packets */
     uint8_t device_type;                    /**< Device type */
