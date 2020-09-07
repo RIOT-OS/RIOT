@@ -42,7 +42,7 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
-### sys/net/gnrc/nettest [c84cedb07212a90932e446f5d57391d1edd486d0]
+### sys/net/gnrc/nettest [cdc252ab7bd4161cc046bf93a3e55995704b24d4]
 Author:
 - Martine Lenders <mlenders@inf.fu-berlin.de>
 
@@ -79,7 +79,7 @@ Reasons for removal:
 - Tests were never integrated to the CI.
 - NHDP, which was the only upstream user, has been removed.
 
-### sys/net/routing/nhdp [0201a2d273fe17aa1b8eeb22776ae9670551433d]
+### sys/net/routing/nhdp [9026823bb906f64168d7d38e52be92f390353dc8]
 Author:
 - Fabian Nack <nack@inf.fu-berlin.de>
 
@@ -87,7 +87,7 @@ Reasons for removal:
 - Not maintained anymore.
 - Does not comply with the current RIOT programming practices.
 
-### sys/ubjson [868d37708bb674739ab4983441d6df904dd5a25f]
+### sys/ubjson [bea30c3f8949ebd9fdf4a9bf0a987652889930f5]
 Author(s):
 - René Kijewski <rene.kijewski@fu-berlin.de>
 
@@ -217,12 +217,12 @@ Reason for removal:
 - Updating to more recent version would be more effort than its worth
 
 
-[c84cedb07212a90932e446f5d57391d1edd486d0]: https://github.com/RIOT-OS/RIOT/commit/c84cedb07212a90932e446f5d57391d1edd486d0
+[cdc252ab7bd4161cc046bf93a3e55995704b24d4]: https://github.com/RIOT-OS/RIOT/commit/cdc252ab7bd4161cc046bf93a3e55995704b24d4
 [ed3887ac5c1e95308c2827bce3cdca8b0f146c22]: https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22
 [0e2a62078850e1ecc74db2db4d639cf2d8fb96d3]: https://github.com/RIOT-OS/RIOT/commit/0e2a62078850e1ecc74db2db4d639cf2d8fb96d3
 [c829f820ee870bffc60c7df688d2da8373553212]: https://github.com/RIOT-OS/RIOT/commit/c829f820ee870bffc60c7df688d2da8373553212
-[0201a2d273fe17aa1b8eeb22776ae9670551433d]: https://github.com/RIOT-OS/RIOT/commit/0201a2d273fe17aa1b8eeb22776ae9670551433d
-[868d37708bb674739ab4983441d6df904dd5a25f]: https://github.com/RIOT-OS/RIOT/commit/868d37708bb674739ab4983441d6df904dd5a25f
+[9026823bb906f64168d7d38e52be92f390353dc8]: https://github.com/RIOT-OS/RIOT/commit/9026823bb906f64168d7d38e52be92f390353dc8
+[bea30c3f8949ebd9fdf4a9bf0a987652889930f5]: https://github.com/RIOT-OS/RIOT/commit/bea30c3f8949ebd9fdf4a9bf0a987652889930f5
 [232aed3e18118624b862d36bfec7cd1c21ca2d26]: https://github.com/RIOT-OS/RIOT/commit/232aed3e18118624b862d36bfec7cd1c21ca2d26
 [a2bcd7539ce1931b7aec0077ea71dadd62c96edd]: https://github.com/RIOT-OS/RIOT/commit/a2bcd7539ce1931b7aec0077ea71dadd62c96edd
 [ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7]: https://github.com/RIOT-OS/RIOT/commit/ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7
