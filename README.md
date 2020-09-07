@@ -100,15 +100,10 @@ To contribute something to RIOT, please refer to our
 [contributing document](CONTRIBUTING.md).
 
 ## MAILING LISTS
-* RIOT OS kernel developers list
- * devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
-* RIOT OS users list
- * users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
-* RIOT commits
- * commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
-* Github notifications
- * notifications@riot-os.org
-   (https://lists.riot-os.org/mailman/listinfo/notifications)
+* RIOT OS kernel developers list: [devel@riot-os.org](https://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list: [users@riot-os.org](https://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits: [commits@riot-os.org](https://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications: [notifications@riot-os.org](https://lists.riot-os.org/mailman/listinfo/notifications)
 
 ## LICENSE
 * Most of the code developed by the RIOT community is licensed under the GNU
