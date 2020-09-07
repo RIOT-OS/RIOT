@@ -36,14 +36,20 @@ extern "C" {
  * @name    Clock settings
  * @{
  */
-/* give the target core clock (HCLK) frequency [in Hz],
- * maximum: 72MHz */
-#define CLOCK_CORECLOCK     MHZ(72)
 /* 0: no external high speed crystal available
  * else: actual crystal frequency [in Hz] */
 #ifndef CLOCK_HSE
 #define CLOCK_HSE           MHZ(8)
 #endif
+
+/* give the target core clock (HCLK) frequency [in Hz],
+ * maximum: 72MHz when input clock is HSE, 64MHz when input clock is HSI */
+#if CLOCK_HSE
+#define CLOCK_CORECLOCK     MHZ(72)
+#else
+#define CLOCK_CORECLOCK     MHZ(64)
+#endif
+
 /* 0: no external low speed crystal available,
  * 1: external crystal available (always 32.768kHz) */
 #ifndef CLOCK_LSE
