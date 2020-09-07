@@ -55,7 +55,7 @@ int mrf24j40_reset(mrf24j40_t *dev)
     netdev_ieee802154_setup(&dev->netdev);
 
     /* set short and long address */
-    mrf24j40_set_addr_long(dev, unaligned_get_u64(dev->netdev.long_addr));
+    mrf24j40_set_addr_long(dev, dev->netdev.long_addr);
     mrf24j40_set_addr_short(dev, unaligned_get_u16(dev->netdev.short_addr));
 
     mrf24j40_set_chan(dev, CONFIG_IEEE802154_DEFAULT_CHANNEL);

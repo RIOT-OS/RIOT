@@ -184,7 +184,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
                 res = -EOVERFLOW;
             }
             else {
-                *(uint64_t*)val = mrf24j40_get_addr_long(dev);
+                mrf24j40_get_addr_long(dev, val);
                 res = sizeof(uint64_t);
             }
             break;
@@ -400,7 +400,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = -EOVERFLOW;
             }
             else {
-                mrf24j40_set_addr_long(dev, *((const uint64_t *)val));
+                mrf24j40_set_addr_long(dev, val);
                 res = sizeof(uint64_t);
             }
             break;
