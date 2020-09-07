@@ -73,21 +73,21 @@ static int _read_bit(const onewire_t *owi, uint32_t *t_ref)
 {
     int in;
 
-    CRIT_IN;
+    CRIT_IN
     _pull(owi);
     _spin_us(t_ref, T_RW_START_US);
     _release(owi);
     _spin_us(t_ref, T_R_WAIT_US);
     in = (gpio_read(owi->pin)) ? 1 : 0;
     _spin_us(t_ref, T_R_END_US);
-    CRIT_OUT;
+    CRIT_OUT
 
     return in;
 }
 
 static void _write_bit(const onewire_t *owi, uint32_t *t_ref, int out)
 {
-    CRIT_IN;
+    CRIT_IN
     _pull(owi);
     if (out) {
         _spin_us(t_ref, T_RW_START_US);
@@ -123,7 +123,7 @@ int onewire_reset(const onewire_t *owi, const onewire_rom_t *rom)
 {
     int res = ONEWIRE_OK;
 
-    CRIT_IN;
+    CRIT_IN
     uint32_t t_ref = xtimer_now_usec();
     _pull(owi);
     _spin_us(&t_ref, T_RESET_HOLD_US);
@@ -133,7 +133,7 @@ int onewire_reset(const onewire_t *owi, const onewire_rom_t *rom)
         res = ONEWIRE_NODEV;
     }
     _spin_us(&t_ref, (T_RESET_HOLD_US - T_RESET_SAMPLE_US));
-    CRIT_OUT;
+    CRIT_OUT
 
     if ((res == ONEWIRE_OK) && (rom != NULL)) {
         onewire_write_byte(owi, ONEWIRE_ROM_MATCH);
@@ -191,6 +191,7 @@ int onewire_search(const onewire_t *owi, onewire_rom_t *rom, int ld)
     int marker = 0;
     int pos = 1;
     for (unsigned b = 0; b < sizeof(onewire_rom_t); b++) {
+        CRIT_IN
         for (int i = 0; i < 8; i++) {
             int bit1 = _read_bit(owi, &t_ref);
             int bit2 = _read_bit(owi, &t_ref);
@@ -216,6 +217,7 @@ int onewire_search(const onewire_t *owi, onewire_rom_t *rom, int ld)
             _write_bit(owi, &t_ref, bit1);
             pos++;
         }
+        CRIT_OUT
     }
 
     return marker;
