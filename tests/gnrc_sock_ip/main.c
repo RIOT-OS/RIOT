@@ -366,10 +366,20 @@ static void test_sock_ip_recv_buf__success(void)
     assert(_check_net());
 }
 
-static void test_sock_ip_send__EAFNOSUPPORT(void)
+static void test_sock_ip_send__EAFNOSUPPORT_INET(void)
 {
     static const sock_ip_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR_REMOTE },
                                          .family = AF_INET };
+
+    expect(-EAFNOSUPPORT == sock_ip_send(NULL, "ABCD", sizeof("ABCD"),
+                                         _TEST_PROTO, &remote));
+    expect(_check_net());
+}
+
+static void test_sock_ip_send__EAFNOSUPPORT_UNSPEC(void)
+{
+    static const sock_ip_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR_REMOTE },
+                                         .family = AF_UNSPEC };
 
     expect(-EAFNOSUPPORT == sock_ip_send(NULL, "ABCD", sizeof("ABCD"),
                                          _TEST_PROTO, &remote));
@@ -641,7 +651,8 @@ int main(void)
     CALL(test_sock_ip_recv__non_blocking());
     CALL(test_sock_ip_recv_buf__success());
     _prepare_send_checks();
-    CALL(test_sock_ip_send__EAFNOSUPPORT());
+    CALL(test_sock_ip_send__EAFNOSUPPORT_INET());
+    CALL(test_sock_ip_send__EAFNOSUPPORT_UNSPEC());
     CALL(test_sock_ip_send__EINVAL_addr());
     CALL(test_sock_ip_send__EINVAL_netif());
     CALL(test_sock_ip_send__ENOTCONN());
