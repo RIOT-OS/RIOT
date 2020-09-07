@@ -63,41 +63,41 @@ static void _release(const onewire_t *owi)
     gpio_init(owi->pin, owi->imode);
 }
 
-static void _spin_us(uint32_t delay_us)
+static void _spin_us(uint32_t *t_ref, uint32_t delay_us)
 {
-    uint32_t target = xtimer_now_usec() + delay_us;
-    while (xtimer_now_usec() < target) {}
+    *t_ref = *t_ref + delay_us;
+    while (xtimer_now_usec() < *t_ref) {}
 }
 
-static int _read_bit(const onewire_t *owi)
+static int _read_bit(const onewire_t *owi, uint32_t *t_ref)
 {
     int in;
 
     CRIT_IN;
     _pull(owi);
-    _spin_us(T_RW_START_US);
+    _spin_us(t_ref, T_RW_START_US);
     _release(owi);
-    _spin_us(T_R_WAIT_US);
+    _spin_us(t_ref, T_R_WAIT_US);
     in = (gpio_read(owi->pin)) ? 1 : 0;
-    _spin_us(T_R_END_US);
+    _spin_us(t_ref, T_R_END_US);
     CRIT_OUT;
 
     return in;
 }
 
-static void _write_bit(const onewire_t *owi, int out)
+static void _write_bit(const onewire_t *owi, uint32_t *t_ref, int out)
 {
     CRIT_IN;
     _pull(owi);
     if (out) {
-        _spin_us(T_RW_START_US);
+        _spin_us(t_ref, T_RW_START_US);
         _release(owi);
-        _spin_us(T_W_1_DELAY_US);
+        _spin_us(t_ref, T_W_1_DELAY_US);
     }
     else {
-        _spin_us(T_W_0_HOLD_US);
+        _spin_us(t_ref, T_W_0_HOLD_US);
         _release(owi);
-        _spin_us(T_W_0_END_US);
+        _spin_us(t_ref, T_W_0_END_US);
     }
     CRIT_OUT
 }
@@ -124,14 +124,15 @@ int onewire_reset(const onewire_t *owi, const onewire_rom_t *rom)
     int res = ONEWIRE_OK;
 
     CRIT_IN;
+    uint32_t t_ref = xtimer_now_usec();
     _pull(owi);
-    _spin_us(T_RESET_HOLD_US);
+    _spin_us(&t_ref, T_RESET_HOLD_US);
     _release(owi);
-    _spin_us(T_RESET_SAMPLE_US);
+    _spin_us(&t_ref, T_RESET_SAMPLE_US);
     if (gpio_read(owi->pin)) {
         res = ONEWIRE_NODEV;
     }
-    _spin_us(T_RESET_HOLD_US - T_RESET_SAMPLE_US);
+    _spin_us(&t_ref, (T_RESET_HOLD_US - T_RESET_SAMPLE_US));
     CRIT_OUT;
 
     if ((res == ONEWIRE_OK) && (rom != NULL)) {
@@ -145,12 +146,13 @@ int onewire_reset(const onewire_t *owi, const onewire_rom_t *rom)
 void onewire_read(const onewire_t *owi, void *data, size_t len)
 {
     uint8_t *buf = (uint8_t *)data;
+    uint32_t t_ref = xtimer_now_usec();
 
     for (size_t pos = 0; pos < len; pos++) {
         /* read the next byte from the bus */
         uint8_t tmp = 0;
         for (int i = 0; i < 8; i++) {
-            tmp |= (_read_bit(owi) << i);
+            tmp |= (_read_bit(owi, &t_ref) << i);
         }
         buf[pos] = tmp;
     }
@@ -159,11 +161,12 @@ void onewire_read(const onewire_t *owi, void *data, size_t len)
 void onewire_write(const onewire_t *owi, const void *data, size_t len)
 {
     const uint8_t *buf = (uint8_t *)data;
+    uint32_t t_ref = xtimer_now_usec();
 
     for (size_t pos = 0; pos < len; pos ++) {
 
         for (int i = 0; i < 8; i++) {
-            _write_bit(owi, (buf[pos] & (1 << i)));
+            _write_bit(owi, &t_ref, (buf[pos] & (1 << i)));
         }
     }
 }
@@ -184,12 +187,13 @@ int onewire_search(const onewire_t *owi, onewire_rom_t *rom, int ld)
     /* start search. Refer to e.g. to
      * https://pdfserv.maximintegrated.com/en/an/AN937.pdf, page 51 and 52 for
      * a detailed description on the search algorithm */
+    uint32_t t_ref = xtimer_now_usec();
     int marker = 0;
     int pos = 1;
     for (unsigned b = 0; b < sizeof(onewire_rom_t); b++) {
         for (int i = 0; i < 8; i++) {
-            int bit1 = _read_bit(owi);
-            int bit2 = _read_bit(owi);
+            int bit1 = _read_bit(owi, &t_ref);
+            int bit2 = _read_bit(owi, &t_ref);
 
             if (bit1 == bit2) {
                 if (pos < ld) {
@@ -209,7 +213,7 @@ int onewire_search(const onewire_t *owi, onewire_rom_t *rom, int ld)
 
             rom->u8[b] &= ~(1 << i);
             rom->u8[b] |= (bit1 << i);
-            _write_bit(owi, bit1);
+            _write_bit(owi, &t_ref, bit1);
             pos++;
         }
     }
