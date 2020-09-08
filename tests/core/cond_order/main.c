@@ -63,6 +63,10 @@ int main(void)
     mutex_init(&testlock);
     cond_init(&testcond);
 
+    /* Test if condition signal and broadcast works when no thread is waiting */
+    cond_signal(&testcond);
+    cond_broadcast(&testcond);
+
     /* create threads */
     for (unsigned i = 0; i < THREAD_NUMOF; i++) {
         thread_create(stacks[i], sizeof(stacks[i]), prios[i], 0,
