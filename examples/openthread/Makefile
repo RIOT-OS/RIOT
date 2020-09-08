@@ -4,7 +4,22 @@ APPLICATION = openthread
 BOARD ?= samr21-xpro
 
 # These are the boards that OpenThread stack has been tested on
-BOARD_WHITELIST := samr21-xpro iotlab-m3 fox iotlab-a8-m3 frdm-kw41z openlabs-kw41z-mini-256kib openlabs-kw41z-mini phynode-kw41z usb-kw41z
+BOARD_WHITELIST := \
+                    samr21-xpro \
+                    iotlab-m3 \
+                    fox \
+                    iotlab-a8-m3 \
+                    frdm-kw41z \
+                    openlabs-kw41z-mini-256kib \
+                    openlabs-kw41z-mini \
+                    phynode-kw41z \
+                    usb-kw41z \
+                    cc2538dk \
+                    remote-reva \
+                    remote-revb \
+                    omote \
+                    openmote-cc2538 \
+                    #
 
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..

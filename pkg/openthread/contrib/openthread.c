@@ -34,6 +34,10 @@
 #include "kw41zrf.h"
 #endif
 
+#ifdef MODULE_CC2538_RF
+#include "cc2538_rf.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -43,6 +47,10 @@
 
 #ifdef MODULE_KW41ZRF
 #define OPENTHREAD_NETIF_NUMOF        (1U)
+#endif
+
+#ifdef MODULE_CC2538_RF
+static cc2538_rf_t cc2538_rf_dev;
 #endif
 
 #ifdef MODULE_AT86RF2XX
@@ -70,6 +78,10 @@ void openthread_bootstrap(void)
 #ifdef MODULE_KW41ZRF
     kw41zrf_setup(&kw41z_dev);
     netdev_t *netdev = (netdev_t *) &kw41z_dev;
+#endif
+#ifdef MODULE_CC2538_RF
+    cc2538_setup(&cc2538_rf_dev);
+    netdev_t *netdev = (netdev_t*) &cc2538_rf_dev;
 #endif
 
     openthread_radio_init(netdev, tx_buf, rx_buf);
