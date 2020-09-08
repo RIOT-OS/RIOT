@@ -403,7 +403,7 @@ static void run_test(test_ctx_t *ctx, uint32_t interval, unsigned int variant)
 
     spin_random_delay();
     if (variant & TEST_PARALLEL) {
-        _xtimer_set(&xt_parallel, interval);
+        _xtimer_set64(&xt_parallel, interval, 0);
         //~ interval += XTIMER_BACKOFF;
         spin_random_delay();
     }
@@ -412,8 +412,7 @@ static void run_test(test_ctx_t *ctx, uint32_t interval, unsigned int variant)
     ctx->target_tut = now + interval;
     switch (variant & ~TEST_PARALLEL) {
         case TEST_XTIMER_SET:
-            _xtimer_set(&xt, interval);
-            break;
+            _xtimer_set64(&xt, interval, 0);
             break;
         case TEST_XTIMER_PERIODIC_WAKEUP:
             _xtimer_periodic_wakeup(&now, interval);
