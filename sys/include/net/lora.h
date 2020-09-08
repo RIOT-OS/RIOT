@@ -115,8 +115,8 @@ extern "C" {
 #endif
 
 /** @brief Frequency hopping period */
-#ifndef LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT
-#define LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT  (0U)
+#ifndef CONFIG_LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT
+#define CONFIG_LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT (0U)
 #endif
 
 /** @brief Set fixed header length mode (implicit header) */
