@@ -27,6 +27,7 @@
 #include "timex.h"
 #include "ztimer.h"
 #include "thread.h"
+#include "kernel_defines.h"
 
 #include "periph/gpio.h"
 #include "periph/spi.h"
@@ -178,7 +179,7 @@ void sx127x_init_radio_settings(sx127x_t *dev)
     sx127x_set_freq_hop(dev, LORA_FREQUENCY_HOPPING_DEFAULT);
     sx127x_set_hop_period(dev, LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT);
     sx127x_set_fixed_header_len_mode(dev, LORA_FIXED_HEADER_LEN_MODE_DEFAULT);
-    sx127x_set_iq_invert(dev, LORA_IQ_INVERTED_DEFAULT);
+    sx127x_set_iq_invert(dev, IS_ACTIVE(CONFIG_LORA_IQ_INVERTED_DEFAULT) ? true : false);
     sx127x_set_payload_length(dev, LORA_PAYLOAD_LENGTH_DEFAULT);
     sx127x_set_preamble_length(dev, CONFIG_LORA_PREAMBLE_LENGTH_DEFAULT);
     sx127x_set_symbol_timeout(dev, CONFIG_LORA_SYMBOL_TIMEOUT_DEFAULT);

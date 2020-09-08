@@ -104,9 +104,9 @@ extern "C" {
 #define LORA_FIX_LENGTH_PAYLOAD_ON_DEFAULT     (false)
 #endif
 
-/** @brief Set inverted IQ on */
-#ifndef LORA_IQ_INVERTED_DEFAULT
-#define LORA_IQ_INVERTED_DEFAULT               (false)
+/** @brief Set this to true to enable inverted IQ mode */
+#ifdef DOXYGEN
+#define CONFIG_LORA_IQ_INVERTED_DEFAULT
 #endif
 
 /** @brief Frequency hopping on */
