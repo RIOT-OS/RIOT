@@ -180,7 +180,7 @@ void sx127x_init_radio_settings(sx127x_t *dev)
     sx127x_set_fixed_header_len_mode(dev, LORA_FIXED_HEADER_LEN_MODE_DEFAULT);
     sx127x_set_iq_invert(dev, LORA_IQ_INVERTED_DEFAULT);
     sx127x_set_payload_length(dev, LORA_PAYLOAD_LENGTH_DEFAULT);
-    sx127x_set_preamble_length(dev, LORA_PREAMBLE_LENGTH_DEFAULT);
+    sx127x_set_preamble_length(dev, CONFIG_LORA_PREAMBLE_LENGTH_DEFAULT);
     sx127x_set_symbol_timeout(dev, LORA_SYMBOL_TIMEOUT_DEFAULT);
     sx127x_set_rx_single(dev, SX127X_RX_SINGLE);
     sx127x_set_tx_timeout(dev, SX127X_TX_TIMEOUT_DEFAULT);

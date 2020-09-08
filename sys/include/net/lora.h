@@ -39,8 +39,8 @@ extern "C" {
 #endif
 
 /** @brief Preamble length, same for Tx and Rx */
-#ifndef LORA_PREAMBLE_LENGTH_DEFAULT
-#define LORA_PREAMBLE_LENGTH_DEFAULT           (8U)
+#ifndef CONFIG_LORA_PREAMBLE_LENGTH_DEFAULT
+#define CONFIG_LORA_PREAMBLE_LENGTH_DEFAULT         (8U)
 #endif
 
 /** @brief Symbols timeout (s) */
