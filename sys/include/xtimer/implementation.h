@@ -78,19 +78,6 @@ static inline uint32_t _xtimer_lltimer_mask(uint32_t val)
 
 uint32_t _xtimer_now(void);
 
-/**
- * @brief Sets the timer to the appropriate timer_list or list_head.
- *
- * @note    The target to set the timer to has to be at least bigger then the
- *          ticks needed to jump into the function and calculate '_xtimer_now()'.
- *          So that 'now' did not pass the target.
- *          This is crucial when using low CPU frequencies and/or when the
- *          '_xtimer_now()' call needs multiple xtimer ticks to evaluate.
- *
- * @param[in] timer   pointer to xtimer_t which is added to the list.
- * @param[in] target  Absolute target value in ticks.
- */
-int _xtimer_set_absolute(xtimer_t *timer, uint32_t target);
 void _xtimer_set64(xtimer_t *timer, uint32_t offset, uint32_t long_offset);
 void _xtimer_periodic_wakeup(uint32_t *last_wakeup, uint32_t period);
 void _xtimer_set_wakeup(xtimer_t *timer, uint32_t offset, kernel_pid_t pid);

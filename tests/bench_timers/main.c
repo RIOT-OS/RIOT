@@ -60,10 +60,9 @@
 enum test_variants {
     TEST_XTIMER_SET             = 0,
     TEST_PARALLEL               = 1,
-    TEST_XTIMER_SET_ABSOLUTE    = 2,
-    TEST_XTIMER_PERIODIC_WAKEUP = 4,
-    TEST_XTIMER_SPIN            = 6,
-    TEST_VARIANT_NUMOF          = 8,
+    TEST_XTIMER_PERIODIC_WAKEUP = 2,
+    TEST_XTIMER_SPIN            = 4,
+    TEST_VARIANT_NUMOF          = 6,
 };
 #else /* TEST_XTIMER */
 /*
@@ -131,8 +130,6 @@ static const result_presentation_t presentation = {
             .sub_labels = (const char *[]){
                 [TEST_XTIMER_SET] = "_xt_set",
                 [TEST_XTIMER_SET | TEST_PARALLEL] = "_xt_set race",
-                [TEST_XTIMER_SET_ABSOLUTE] = "_xt_set_abs",
-                [TEST_XTIMER_SET_ABSOLUTE | TEST_PARALLEL] = "_xt_set_abs race",
                 [TEST_XTIMER_PERIODIC_WAKEUP] = "_xt_periodic",
                 [TEST_XTIMER_PERIODIC_WAKEUP | TEST_PARALLEL] = "_xt_periodic race",
                 [TEST_XTIMER_SPIN] = "_xt_spin",
@@ -147,8 +144,6 @@ static const result_presentation_t presentation = {
     .offsets = (const unsigned[]) {
         [TEST_XTIMER_SET]                               = TEST_MIN_REL,
         [TEST_XTIMER_SET | TEST_PARALLEL]               = TEST_MIN_REL,
-        [TEST_XTIMER_SET_ABSOLUTE]                      = TEST_MIN,
-        [TEST_XTIMER_SET_ABSOLUTE | TEST_PARALLEL]      = TEST_MIN,
         [TEST_XTIMER_PERIODIC_WAKEUP]                   = TEST_MIN_REL,
         [TEST_XTIMER_PERIODIC_WAKEUP | TEST_PARALLEL]   = TEST_MIN_REL,
         [TEST_XTIMER_SPIN]                              = TEST_MIN_REL,
@@ -387,9 +382,6 @@ static void run_test(test_ctx_t *ctx, uint32_t interval, unsigned int variant)
             case TEST_XTIMER_SET:
                 print_str("rel ");
                 break;
-            case TEST_XTIMER_SET_ABSOLUTE:
-                print_str("abs ");
-                break;
             case TEST_XTIMER_PERIODIC_WAKEUP:
                 print_str("per ");
                 break;
@@ -422,10 +414,6 @@ static void run_test(test_ctx_t *ctx, uint32_t interval, unsigned int variant)
         case TEST_XTIMER_SET:
             _xtimer_set(&xt, interval);
             break;
-        case TEST_XTIMER_SET_ABSOLUTE:
-            now = READ_TUT();
-            ctx->target_tut = now + interval;
-            _xtimer_set_absolute(&xt, ctx->target_tut);
             break;
         case TEST_XTIMER_PERIODIC_WAKEUP:
             _xtimer_periodic_wakeup(&now, interval);
