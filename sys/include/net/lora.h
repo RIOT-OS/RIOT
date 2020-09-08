@@ -24,6 +24,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "kernel_defines.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -48,9 +50,17 @@ extern "C" {
 #define CONFIG_LORA_SYMBOL_TIMEOUT_DEFAULT          (10U)
 #endif
 
+#if IS_ACTIVE(CONFIG_LORA_BW_DEFAULT_125)
+#define CONFIG_LORA_BW_DEFAULT                      (LORA_BW_125_KHZ)
+#elif IS_ACTIVE(CONFIG_LORA_BW_DEFAULT_250)
+#define CONFIG_LORA_BW_DEFAULT                      (LORA_BW_250_KHZ)
+#elif IS_ACTIVE(CONFIG_LORA_BW_DEFAULT_500)
+#define CONFIG_LORA_BW_DEFAULT                      (LORA_BW_500_KHZ)
+#endif
+
 /** @brief Set default bandwidth to 125kHz */
-#ifndef LORA_BW_DEFAULT
-#define LORA_BW_DEFAULT                        (LORA_BW_125_KHZ)
+#ifndef CONFIG_LORA_BW_DEFAULT
+#define CONFIG_LORA_BW_DEFAULT                      (LORA_BW_125_KHZ)
 #endif
 
 /** @brief Set default spreading factor to 12 */

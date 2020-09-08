@@ -171,7 +171,7 @@ void sx127x_init_radio_settings(sx127x_t *dev)
     sx127x_set_channel(dev, SX127X_CHANNEL_DEFAULT);
     sx127x_set_modem(dev, SX127X_MODEM_DEFAULT);
     sx127x_set_tx_power(dev, SX127X_RADIO_TX_POWER);
-    sx127x_set_bandwidth(dev, LORA_BW_DEFAULT);
+    sx127x_set_bandwidth(dev, CONFIG_LORA_BW_DEFAULT);
     sx127x_set_spreading_factor(dev, LORA_SF_DEFAULT);
     sx127x_set_coding_rate(dev, LORA_CR_DEFAULT);
     sx127x_set_crc(dev, LORA_PAYLOAD_CRC_ON_DEFAULT);
