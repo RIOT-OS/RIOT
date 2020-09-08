@@ -84,9 +84,19 @@ extern "C" {
 #define CONFIG_LORA_SF_DEFAULT                      (LORA_SF12)
 #endif
 
+#if IS_ACTIVE(CONFIG_LORA_CR_DEFAULT_CR_4_5)
+#define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_4_5)
+#elif IS_ACTIVE(CONFIG_LORA_CR_DEFAULT_CR_4_6)
+#define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_4_6)
+#elif IS_ACTIVE(CONFIG_LORA_CR_DEFAULT_CR_4_7)
+#define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_4_7)
+#elif IS_ACTIVE(CONFIG_LORA_CR_DEFAULT_CR_4_8)
+#define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_4_8)
+#endif
+
 /** @brief Set default coding rate to 8 */
-#ifndef LORA_CR_DEFAULT
-#define LORA_CR_DEFAULT                        (LORA_CR_4_8)
+#ifndef CONFIG_LORA_CR_DEFAULT
+#define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_4_8)
 #endif
 
 /** @brief Set fixed payload length on */

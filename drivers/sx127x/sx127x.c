@@ -173,7 +173,7 @@ void sx127x_init_radio_settings(sx127x_t *dev)
     sx127x_set_tx_power(dev, SX127X_RADIO_TX_POWER);
     sx127x_set_bandwidth(dev, CONFIG_LORA_BW_DEFAULT);
     sx127x_set_spreading_factor(dev, CONFIG_LORA_SF_DEFAULT);
-    sx127x_set_coding_rate(dev, LORA_CR_DEFAULT);
+    sx127x_set_coding_rate(dev, CONFIG_LORA_CR_DEFAULT);
     sx127x_set_crc(dev, LORA_PAYLOAD_CRC_ON_DEFAULT);
     sx127x_set_freq_hop(dev, LORA_FREQUENCY_HOPPING_DEFAULT);
     sx127x_set_hop_period(dev, LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT);
