@@ -109,9 +109,9 @@ extern "C" {
 #define CONFIG_LORA_IQ_INVERTED_DEFAULT
 #endif
 
-/** @brief Frequency hopping on */
-#ifndef LORA_FREQUENCY_HOPPING_DEFAULT
-#define LORA_FREQUENCY_HOPPING_DEFAULT         (false)
+/** @brief Set this to true to enable frequency hopping */
+#ifdef DOXYGEN
+#define CONFIG_LORA_FREQUENCY_HOPPING_DEFAULT
 #endif
 
 /** @brief Frequency hopping period */

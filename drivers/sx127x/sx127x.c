@@ -176,7 +176,7 @@ void sx127x_init_radio_settings(sx127x_t *dev)
     sx127x_set_spreading_factor(dev, CONFIG_LORA_SF_DEFAULT);
     sx127x_set_coding_rate(dev, CONFIG_LORA_CR_DEFAULT);
     sx127x_set_crc(dev, LORA_PAYLOAD_CRC_ON_DEFAULT);
-    sx127x_set_freq_hop(dev, LORA_FREQUENCY_HOPPING_DEFAULT);
+    sx127x_set_freq_hop(dev, IS_ACTIVE(CONFIG_LORA_FREQUENCY_HOPPING_DEFAULT) ? true : false);
     sx127x_set_hop_period(dev, LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT);
     sx127x_set_fixed_header_len_mode(dev, LORA_FIXED_HEADER_LEN_MODE_DEFAULT);
     sx127x_set_iq_invert(dev, IS_ACTIVE(CONFIG_LORA_IQ_INVERTED_DEFAULT) ? true : false);
@@ -293,7 +293,7 @@ static int _init_gpios(sx127x_t *dev)
     }
     else {
         /* if frequency hopping is enabled, DIO2 pin must be defined */
-        assert(LORA_FREQUENCY_HOPPING_DEFAULT == false);
+        assert(!IS_ACTIVE(CONFIG_LORA_FREQUENCY_HOPPING_DEFAULT));
     }
 
     /* check if DIO3 pin is defined */
