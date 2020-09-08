@@ -194,11 +194,18 @@ void stmclk_init_sysclk(void)
     }
 #endif
 
-    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
-        /* if configured, we need to enable the HSE clock now */
+    /* Only enable the HSE clock if it's available and used by the clock
+       configuration:
+        - as direct system clock source
+        - as PLL input clock
+    */
+    if (IS_ACTIVE(CONFIG_BOARD_HAS_HSE) &&
+        (IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || IS_ACTIVE(CONFIG_USE_CLOCK_HSE))) {
         RCC->CR |= RCC_CR_HSEON;
         while (!(RCC->CR & RCC_CR_HSERDY)) {}
+    }
 
+    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
 #if defined(CPU_FAM_STM32G0)
         RCC->CFGR = (RCC_CFGR_SW_HSE | CLOCK_AHB_DIV | CLOCK_APB1_DIV);
 #elif defined(CPU_FAM_STM32G4)
@@ -207,11 +214,6 @@ void stmclk_init_sysclk(void)
         while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSE) {}
     }
     else if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
-        if (IS_ACTIVE(CONFIG_BOARD_HAS_HSE)) {
-            /* if configured, we need to enable the HSE clock now */
-            RCC->CR |= RCC_CR_HSEON;
-            while (!(RCC->CR & RCC_CR_HSERDY)) {}
-        }
         /* now we can safely configure and start the PLL */
         RCC->PLLCFGR = (PLL_SRC | PLL_M | PLL_N | PLL_R | RCC_PLLCFGR_PLLREN);
         RCC->CR |= RCC_CR_PLLON;
