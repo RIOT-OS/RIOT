@@ -44,8 +44,8 @@ extern "C" {
 #endif
 
 /** @brief Symbols timeout (s) */
-#ifndef LORA_SYMBOL_TIMEOUT_DEFAULT
-#define LORA_SYMBOL_TIMEOUT_DEFAULT            (10U)
+#ifndef CONFIG_LORA_SYMBOL_TIMEOUT_DEFAULT
+#define CONFIG_LORA_SYMBOL_TIMEOUT_DEFAULT          (10U)
 #endif
 
 /** @brief Set default bandwidth to 125kHz */
