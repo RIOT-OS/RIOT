@@ -94,6 +94,11 @@ typedef struct {
  */
 #define CPUID_LEN           (8U)
 
+/**
+ * @brief   CPU Frequency Define
+ */
+#define CLOCK_CORECLOCK     SystemCoreClock
+
 #if defined(DAC_COUNT) && DAC_COUNT > 0
 /**
  * @brief   DAC device configuration
