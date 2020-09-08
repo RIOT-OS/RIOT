@@ -63,9 +63,25 @@ extern "C" {
 #define CONFIG_LORA_BW_DEFAULT                      (LORA_BW_125_KHZ)
 #endif
 
+#if IS_ACTIVE(CONFIG_LORA_SF_DEFAULT_SF6)
+#define CONFIG_LORA_SF_DEFAULT                      (LORA_SF6)
+#elif IS_ACTIVE(CONFIG_LORA_SF_DEFAULT_SF7)
+#define CONFIG_LORA_SF_DEFAULT                      (LORA_SF7)
+#elif IS_ACTIVE(CONFIG_LORA_SF_DEFAULT_SF8)
+#define CONFIG_LORA_SF_DEFAULT                      (LORA_SF8)
+#elif IS_ACTIVE(CONFIG_LORA_SF_DEFAULT_SF9)
+#define CONFIG_LORA_SF_DEFAULT                      (LORA_SF9)
+#elif IS_ACTIVE(CONFIG_LORA_SF_DEFAULT_SF10)
+#define CONFIG_LORA_SF_DEFAULT                      (LORA_SF10)
+#elif IS_ACTIVE(CONFIG_LORA_SF_DEFAULT_SF11)
+#define CONFIG_LORA_SF_DEFAULT                      (LORA_SF11)
+#elif IS_ACTIVE(CONFIG_LORA_SF_DEFAULT_SF12)
+#define CONFIG_LORA_SF_DEFAULT                      (LORA_SF12)
+#endif
+
 /** @brief Set default spreading factor to 12 */
-#ifndef LORA_SF_DEFAULT
-#define LORA_SF_DEFAULT                        (LORA_SF12)
+#ifndef CONFIG_LORA_SF_DEFAULT
+#define CONFIG_LORA_SF_DEFAULT                      (LORA_SF12)
 #endif
 
 /** @brief Set default coding rate to 8 */
