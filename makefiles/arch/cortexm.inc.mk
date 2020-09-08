@@ -3,7 +3,8 @@ ifeq (,$(CPU_MODEL))
 endif
 
 # Target triple for the build. Use arm-none-eabi if you are unsure.
-TARGET_ARCH ?= arm-none-eabi
+TARGET_ARCH_CORTEXM ?= arm-none-eabi
+TARGET_ARCH ?= $(TARGET_ARCH_CORTEXM)
 
 # define build specific options
 CFLAGS_CPU   = -mcpu=$(MCPU) -mlittle-endian -mthumb $(CFLAGS_FPU)

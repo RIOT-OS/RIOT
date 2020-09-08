@@ -1,5 +1,6 @@
 # Target architecture for the build. Use avr if you are unsure.
-TARGET_ARCH ?= avr
+TARGET_ARCH_AVR ?= avr
+TARGET_ARCH ?= $(TARGET_ARCH_AVR)
 
 CFLAGS_CPU   = -mmcu=$(CPU) $(CFLAGS_FPU)
 CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums

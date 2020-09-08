@@ -1,5 +1,6 @@
 # Target triple for the build.
-TARGET_ARCH ?= mips-mti-elf
+TARGET_ARCH_MIPS ?= mips-mti-elf
+TARGET_ARCH ?= $(TARGET_ARCH_MIPS)
 
 ABI = 32
 

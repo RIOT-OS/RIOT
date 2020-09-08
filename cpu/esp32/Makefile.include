@@ -18,7 +18,8 @@ include $(RIOTCPU)/esp_common/Makefile.include
 
 # regular Makefile
 
-TARGET_ARCH ?= xtensa-esp32-elf
+TARGET_ARCH_ESP32 ?= xtensa-esp32-elf
+TARGET_ARCH ?= $(TARGET_ARCH_ESP32)
 
 PSEUDOMODULES += esp_eth_hw
 PSEUDOMODULES += esp_gdbstub
