@@ -24,7 +24,8 @@ include $(RIOTCPU)/esp_common/Makefile.include
 
 # regular Makefile
 
-TARGET_ARCH ?= xtensa-esp8266-elf
+TARGET_ARCH_ESP8266 ?= xtensa-esp8266-elf
+TARGET_ARCH ?= $(TARGET_ARCH_ESP8266)
 
 PSEUDOMODULES += esp_sw_timer
 
