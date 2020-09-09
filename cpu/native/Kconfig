@@ -19,6 +19,9 @@ config CPU_ARCH_NATIVE
     select HAS_PERIPH_PWM
     select HAS_SSP
 
+    # needed modules
+    select MODULE_PERIPH if TEST_KCONFIG
+
 config CPU_CORE_NATIVE
     bool
     select CPU_ARCH_NATIVE
