@@ -41,10 +41,10 @@ static timer_isr_ctx_t config[TIMER_NUMOF];
 
 int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 {
-    if (dev == TIMER_0) {
+    if (dev == 0) {
         /* save callback */
-        config[TIMER_0].cb = cb;
-        config[TIMER_0].arg = arg;
+        config[dev].cb = cb;
+        config[dev].arg = arg;
         /* enable power for timer */
         TIMER_0_CLKEN();
         /* let timer run with full frequency */
@@ -65,7 +65,7 @@ int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
-    if (dev == TIMER_0) {
+    if (dev == 0) {
         switch (channel) {
             case 0:
                 TIMER_0_DEV->MR0 = value;
@@ -90,7 +90,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
-    if (dev == TIMER_0 && channel >= 0 && channel < TIMER_0_CHANNELS) {
+    if (dev == 0 && channel >= 0 && channel < TIMER_0_CHANNELS) {
         TIMER_0_DEV->MCR &= ~(1 << (channel * 3));
         return 0;
     }
@@ -99,7 +99,7 @@ int timer_clear(tim_t dev, int channel)
 
 unsigned int timer_read(tim_t dev)
 {
-    if (dev == TIMER_0) {
+    if (dev == 0) {
         return (unsigned int)TIMER_0_DEV->TC;
     }
     return 0;
@@ -107,40 +107,41 @@ unsigned int timer_read(tim_t dev)
 
 void timer_start(tim_t dev)
 {
-    if (dev == TIMER_0) {
+    if (dev == 0) {
         TIMER_0_DEV->TCR |= 1;
     }
 }
 
 void timer_stop(tim_t dev)
 {
-    if (dev == TIMER_0) {
+    if (dev == 0) {
         TIMER_0_DEV->TCR &= ~(1);
     }
 }
 
-#if TIMER_0_EN
+#ifdef TIMER_0_ISR
 void TIMER_0_ISR(void)
 {
+    uint32_t timer = 0;
     if (TIMER_0_DEV->IR & MR0_FLAG) {
         TIMER_0_DEV->IR |= (MR0_FLAG);
         TIMER_0_DEV->MCR &= ~(1 << 0);
-        config[TIMER_0].cb(config[TIMER_0].arg, 0);
+        config[timer].cb(config[timer].arg, 0);
     }
     if (TIMER_0_DEV->IR & MR1_FLAG) {
         TIMER_0_DEV->IR |= (MR1_FLAG);
         TIMER_0_DEV->MCR &= ~(1 << 3);
-        config[TIMER_0].cb(config[TIMER_0].arg, 1);
+        config[timer].cb(config[timer].arg, 1);
     }
     if (TIMER_0_DEV->IR & MR2_FLAG) {
         TIMER_0_DEV->IR |= (MR2_FLAG);
         TIMER_0_DEV->MCR &= ~(1 << 6);
-        config[TIMER_0].cb(config[TIMER_0].arg, 2);
+        config[timer].cb(config[timer].arg, 2);
     }
     if (TIMER_0_DEV->IR & MR3_FLAG) {
         TIMER_0_DEV->IR |= (MR3_FLAG);
         TIMER_0_DEV->MCR &= ~(1 << 9);
-        config[TIMER_0].cb(config[TIMER_0].arg, 3);
+        config[timer].cb(config[timer].arg, 3);
     }
     cortexm_isr_end();
 }
