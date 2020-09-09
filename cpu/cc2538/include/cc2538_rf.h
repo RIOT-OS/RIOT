@@ -38,9 +38,6 @@ extern "C" {
 
 #define CC2538_RF_MAX_DATA_LEN (CC2538_RF_FIFO_SIZE - CC2538_PACKET_LENGTH_SIZE)
 
-#define CC2538_EUI64_LOCATION_PRI   (0x00280028) /**< Primary EUI-64 address location */
-#define CC2538_EUI64_LOCATION_SEC   (0x0027FFCC) /**< Secondary EUI-64 address location */
-
 /* TODO: Move these to sys/include/net/ieee802154.h somehow */
 /* IEEE 802.15.4 defined constants (2.4 GHz logical channels) */
 #define IEEE802154_MIN_FREQ         (2405) /**< Min. frequency (2405 MHz) */
@@ -246,13 +243,6 @@ void cc2538_get_addr_long(uint8_t *addr);
  * @param[out] addr The currently set (2-byte) short address
  */
 void cc2538_get_addr_short(uint8_t *addr);
-
-/**
- * @brief   Get the primary (burned-in) EUI-64 of the device
- *
- * @return  The primary EUI-64 of the device
- */
-uint64_t cc2538_get_eui64_primary(void);
 
 /**
  * @brief   Get the configured channel number of the device
