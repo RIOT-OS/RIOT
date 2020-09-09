@@ -138,10 +138,9 @@ extern "C" {
 #endif
 
 /** @brief Set payload length, unused with implicit header */
-#ifndef LORA_PAYLOAD_LENGTH_DEFAULT
-#define LORA_PAYLOAD_LENGTH_DEFAULT            (0U)
+#ifndef CONFIG_LORA_PAYLOAD_LENGTH_DEFAULT
+#define CONFIG_LORA_PAYLOAD_LENGTH_DEFAULT          (0U)
 #endif
-
 /** @} */
 
 /**
