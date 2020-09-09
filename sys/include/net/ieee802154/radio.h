@@ -620,7 +620,7 @@ struct ieee802154_radio_ops {
      * @return -EINVAL if the configuration is not valid for the device.
      * @return negative errno on error
      */
-    int (*config_phy)(ieee802154_dev_t *dev, ieee802154_phy_conf_t *conf);
+    int (*config_phy)(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf);
 
     /**
      * @brief Set IEEE802.15.4 addresses in hardware address filter
@@ -679,7 +679,7 @@ struct ieee802154_radio_ops {
      * @return -EINVAL if the settings are not supported.
      * @return negative errno on error
      */
-    int (*set_csma_params)(ieee802154_dev_t *dev, ieee802154_csma_be_t *bd,
+    int (*set_csma_params)(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd,
                            int8_t retries);
 
     /**
@@ -802,7 +802,7 @@ static inline int ieee802154_radio_set_cca_mode(ieee802154_dev_t *dev,
  * @return result of @ref ieee802154_radio_ops::config_phy
  */
 static inline int ieee802154_radio_config_phy(ieee802154_dev_t *dev,
-                                              ieee802154_phy_conf_t *conf)
+                                              const ieee802154_phy_conf_t *conf)
 {
     return dev->driver->config_phy(dev, conf);
 }
@@ -876,7 +876,7 @@ static inline int ieee802154_radio_set_frame_retrans(ieee802154_dev_t *dev,
  * @return result of @ref ieee802154_radio_ops::set_csma_params
  */
 static inline int ieee802154_radio_set_csma_params(ieee802154_dev_t *dev,
-                                                   ieee802154_csma_be_t *bd,
+                                                   const ieee802154_csma_be_t *bd,
                                                    int8_t retries)
 {
     return dev->driver->set_csma_params(dev, bd, retries);
