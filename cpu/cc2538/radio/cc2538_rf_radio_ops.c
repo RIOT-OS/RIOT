@@ -1,3 +1,24 @@
+/*
+ * Copyright (C) 2020 HAW Hamburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ *
+ */
+
+/**
+ * @ingroup     cpu_cc2538
+ * @{
+ *
+ * @file
+ * @brief       IEEE 802.15.4 Radio HAL implementation for the CC2538 RF driver
+ *
+ * @author      José I. Alamos <jose.alamos@haw-hamburg.de>
+ *
+ * @}
+ */
+
 #include <errno.h>
 #include <stdio.h>
 
@@ -19,7 +40,7 @@ static uint8_t cc2538_max_be = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE;
 static int cc2538_csma_ca_retries = CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES;
 
 static bool cc2538_cca_status;  /**< status of the last CCA request */
-static bool cc2538_cca;         /**< used to check wether the last CCA result
+static bool cc2538_cca;         /**< used to check whether the last CCA result
                                      corresponds to a CCA request or send with
                                      CSMA-CA */
 
@@ -46,7 +67,8 @@ static int _confirm_transmit(ieee802154_dev_t *dev, ieee802154_tx_info_t *info)
 {
     (void) dev;
 
-    if (RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE != 0 || !(RFCORE_XREG_CSPCTRL & CC2538_CSP_MCU_CTRL_MASK)) {
+    if (RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE != 0
+            || !(RFCORE_XREG_CSPCTRL & CC2538_CSP_MCU_CTRL_MASK)) {
         return -EAGAIN;
     }
 
@@ -260,14 +282,16 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
 {
 
     (void) dev;
-    bool wait_sfd = RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE >= CC2538_STATE_SFD_WAIT_RANGE_MIN
-                    && RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE <= CC2538_STATE_SFD_WAIT_RANGE_MAX;
+    bool wait_sfd =
+        RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE >= CC2538_STATE_SFD_WAIT_RANGE_MIN
+        && RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE <= CC2538_STATE_SFD_WAIT_RANGE_MAX;
+
     if ((RFCORE->XREG_FSMSTAT1bits.RX_ACTIVE && !wait_sfd) ||
          RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE) {
         return -EBUSY;
     }
 
-    switch(state) {
+    switch (state) {
         case IEEE802154_TRX_STATE_TRX_OFF:
         case IEEE802154_TRX_STATE_TX_ON:
             if (RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE != FSM_STATE_IDLE) {
@@ -323,7 +347,8 @@ void _irq_handler(void)
             }
         }
         else {
-            cc2538_cca_status = BOOLEAN(RFCORE->XREG_FSMSTAT1bits.CCA) && RFCORE->XREG_RSSISTATbits.RSSI_VALID;
+            cc2538_cca_status = BOOLEAN(RFCORE->XREG_FSMSTAT1bits.CCA)
+                                && RFCORE->XREG_RSSISTATbits.RSSI_VALID;
             cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_CONFIRM_CCA);
         }
     }
@@ -338,7 +363,7 @@ static int _off(ieee802154_dev_t *dev)
 static bool _get_cap(ieee802154_dev_t *dev, ieee802154_rf_caps_t cap)
 {
     (void) dev;
-    switch(cap) {
+    switch (cap) {
         case IEEE802154_CAP_24_GHZ:
         case IEEE802154_CAP_IRQ_TX_DONE:
         case IEEE802154_CAP_IRQ_CCA_DONE:
