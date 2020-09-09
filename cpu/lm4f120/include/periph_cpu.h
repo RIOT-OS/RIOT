@@ -21,7 +21,6 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
-
 #include "cpu.h"
 
 #ifdef __cplusplus
@@ -34,7 +33,7 @@ extern "C" {
  */
 #define HAVE_GPIO_T
 typedef uint32_t gpio_t;
-#define GPIO_PIN(x,y) ((gpio_t)((x<<4) | y))
+#define GPIO_PIN(x, y) ((gpio_t)((x<<4) | y))
 /** @} */
 
 #ifndef DOXYGEN
@@ -105,6 +104,18 @@ typedef enum {
     ADC_RES_16BIT = 0xd00,            /**< not supported by hardware */
 } adc_res_t;
 #endif /* ndef DOXYGEN */
+
+/**
+ * @brief   Define timer configuration values
+ */
+typedef struct {
+    uint32_t dev;       /**< Address of timer base */
+    uint32_t max;       /**< Max tick value of timer */
+    int irqn;           /**< Number of the higher timer IRQ channel */
+    uint32_t sysctl;    /**< Address of timer system control */
+    uint32_t intbase;   /**< Interrupt base of timer */
+    int channels;       /**< Number of channels for the timer */
+} timer_conf_t;
 
 /**
  * @brief   Override SPI hardware chip select macro
