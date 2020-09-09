@@ -4,6 +4,7 @@
 : ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
 # we can't use '-' in the variable names, convert them to '_' to add new boards
 : ${TEST_KCONFIG_samr21_xpro:="examples/hello-world tests/periph_*"}
+: ${TEST_KCONFIG_native:="examples/hello-world tests/periph_*"}
 
 export RIOT_CI_BUILD=1
 export CC_NOCOLOR=1
@@ -38,6 +39,9 @@ DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
 get_kconfig_test_apps() {
     case "$1" in
         "samr21_xpro") echo "${TEST_KCONFIG_samr21_xpro}" ;;
+    esac
+    case "$1" in
+        "native") echo "${TEST_KCONFIG_native}" ;;
     esac
 }
 
