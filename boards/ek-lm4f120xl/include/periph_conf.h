@@ -20,6 +20,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,6 +36,7 @@ extern "C" {
 #define CLK16                           4
 #define CLK1                            5
 #define CLOCK_SOURCE                    CLK40
+#define CLOCK_CORECLOCK                 MHZ(80)
 /** @} */
 
 /**
