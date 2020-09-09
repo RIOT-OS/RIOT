@@ -53,7 +53,17 @@ kernel_pid_t openwsn_get_pid(void)
 }
 
 #ifdef MODULE_OPENWSN_RADIO
-void openwsn_set_addr_16b(netdev_t* dev)
+void _openwsn_set_panid(netdev_t* dev)
+{
+    uint16_t panid;
+    dev->driver->get(dev, NETOPT_NID, (uint8_t*) &panid, sizeof(uint16_t));
+    open_addr_t id;
+    id.type = ADDR_PANID;
+    memcpy(&id.panid, &panid, sizeof(uint16_t));
+    idmanager_setMyID(&id);
+}
+
+void _openwsn_set_addr_16b(netdev_t* dev)
 {
     uint8_t addr[IEEE802154_SHORT_ADDRESS_LEN];
     dev->driver->get(dev, NETOPT_ADDRESS, addr, IEEE802154_SHORT_ADDRESS_LEN);
@@ -90,7 +100,8 @@ int openwsn_bootstrap(void)
 
 #ifdef MODULE_OPENWSN_RADIO
     /* override 16b address to avoid short address collision */
-    openwsn_set_addr_16b(netdev);
+    _openwsn_set_addr_16b(netdev);
+    _openwsn_set_panid(netdev);
 #endif
 
     LOG_DEBUG("[openwsn]: network thread\n");
@@ -108,11 +119,10 @@ int openwsn_bootstrap(void)
 static void *_event_loop(void *arg)
 {
     (void)arg;
-
     LOG_DEBUG("[openwsn]: init scheduler\n");
     scheduler_init();
+    /* Disable IRQ while scheduler/queue is not ready to start */
     LOG_DEBUG("[openwsn]: init openstack\n");
-    /* Disable IRQ while scheduler is not ready to start */
     unsigned irq_state = irq_disable();
     openstack_init();
     LOG_DEBUG("[openwsn]: start scheduler loop\n");
