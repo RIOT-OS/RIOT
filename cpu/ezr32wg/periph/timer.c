@@ -135,4 +135,4 @@ void TIMER_0_ISR(void)
     }
     cortexm_isr_end();
 }
-#endif /* TIMER_0_EN */
+#endif /* TIMER_0_ISR */
