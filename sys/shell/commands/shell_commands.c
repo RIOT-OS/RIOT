@@ -102,6 +102,9 @@ extern int _gnrc_netif_send(int argc, char **argv);
 #ifdef MODULE_OPENWSN
 extern int _openwsn_ifconfig(int argc, char **argv);
 extern int _openwsn_handler(int argc, char **argv);
+#ifdef MODULE_OPENWSN_TXTSND
+extern int _openwsn_send(int argc, char **argv);
+#endif
 #endif
 
 #ifdef MODULE_FIB
@@ -254,6 +257,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_OPENWSN
     {"ifconfig", "Shows assigned IPv6 addresses", _openwsn_ifconfig},
     {"openwsn", "OpenWSN commands", _openwsn_handler},
+#ifdef MODULE_OPENWSN_TXTSND
+    {"txtsnd", "Sends a custom string as is over the link layer", _openwsn_send },
+#endif
 #endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},

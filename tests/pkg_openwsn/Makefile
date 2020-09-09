@@ -14,7 +14,7 @@ BOARD_WHITELIST = \
 
 # OpenWSN Modules
 USEPKG += openwsn
-USEMODULE += openwsn_openstack
+USEMODULE += openwsn_stack
 
 # Optional OpenWSN Modules
 ## Enable Constrained Join Protocol (CoJP)
@@ -64,6 +64,8 @@ USEMODULE += shell_commands
 # ztimer is used instead of xtimer because it's a dependency of some
 # OpenWSN modules.
 USEMODULE += ztimer_usec
+
+CFLAGS += -fms-extensions
 
 include $(RIOTBASE)/Makefile.include
 

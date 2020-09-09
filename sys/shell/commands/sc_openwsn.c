@@ -37,9 +37,12 @@
 #include "02a-MAClow/IEEE802154E.h"
 #include "02b-MAChigh/neighbors.h"
 #include "02b-MAChigh/sixtop.h"
-#include "02b-MAChigh/msf.h"
 #include "03b-IPv6/icmpv6rpl.h"
 #include "cjoin.h"
+
+#include "net/mac/sap.h"
+
+extern mac_t openwsn_mac;
 
 #define IEEE802154_LONG_ADDRESS_LEN_STR_MAX \
     (sizeof("00:00:00:00:00:00:00:00"))
@@ -78,6 +81,7 @@ static const struct {
     { "oscore", COMPONENT_OSCORE },
     { "c6t", COMPONENT_C6T },
     { "uinject", COMPONENT_UINJECT },
+    { "sap", COMPONENT_SAP },
 };
 
 static char *_get_component(int id)
@@ -89,6 +93,34 @@ static char *_get_component(int id)
     }
     return NULL;
 }
+
+#ifdef MODULE_OPENWSN_TXTSND
+int _openwsn_send(int argc, char **argv)
+{
+    mcps_request_t req;
+    mcps_confirm_t conf;
+
+    if(argc > 2) {
+        uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+        size_t len = netif_addr_from_str(argv[1], addr);
+        if (len == 0) {
+            puts("Error: invalid address");
+            return -1;
+        }
+        req.data.data = (uint8_t*) argv[2];
+        req.data.len = strlen(argv[2]);
+        req.data.addr = addr;
+    }
+    else {
+        req.data.data = (uint8_t*) argv[1];
+        req.data.len = strlen(argv[1]);
+        req.data.addr = NULL;
+    }
+
+    mac_mcps_request(&openwsn_mac, &req, &conf);
+    return 0;
+}
+#endif
 
 int _openwsn_ifconfig(char *arg)
 {
@@ -145,11 +177,11 @@ int _openwsn_ifconfig(char *arg)
         uint8_t index;
 
         if (icmpv6rpl_getPreferredParentIndex(
-                &index) || idmanager_getIsDAGroot()) {
+                &index) || idmanager_isPanCoordinator()) {
             open_addr_t neighbor;
             uint8_t addr_ipv6[IPV6_ADDR_BIT_LEN / 8];
             printf("\t\tRPL rank: %i\n", icmpv6rpl_getMyDAGrank());
-            if (idmanager_getIsDAGroot()) {
+            if (idmanager_isPanCoordinator()) {
                 puts("\t\tRPL parent: Node is DAG root");
             }
             else {
@@ -203,17 +235,51 @@ static int _neighbors_cmd(char *arg)
     return 0;
 }
 
-static void _print_cell_usage(void)
+static int _panrole_cmd(int argc, char **argv)
 {
-    puts("Usage:");
-    puts("\tcell list: show all active cell");
-    puts("\tcell add <slot_offset> <channel_offset> <adv|tx|rx>"
-         " [<address>]: add cell directly to schedule");
-    puts("\tcell rmv <slot_offset> <channel_offset> <adv|tx|rx>"
-         " [<address>]: remove cell directly in schedule ");
+    (void) argc;
+
+    mlme_request_t req;
+    mlme_confirm_t conf;
+
+    req.type = MLME_SET;
+    req.mib.type = MIB_ROLE;
+
+    if(strcmp(argv[1], "pancoord") == 0) {
+        req.mib.content = IEEE802154E_ROLE_PAN_COORDINATOR;
+    } else if(strcmp(argv[1], "coord") == 0) {
+        req.mib.content = IEEE802154E_ROLE_COORDINATOR;
+    }
+    else if(strcmp(argv[1], "leaf") == 0){
+        req.mib.content = IEEE802154E_ROLE_LEAF;
+    }
+    else {
+        printf("Usage: %s <pancoord|coord|leaf>\n", argv[0]);
+        return -1;
+    }
+
+    mac_mlme_request(&openwsn_mac, &req, &conf);
+
+    if (conf.status != MAC_REQ_STATUS_SUCCESS) {
+        puts("Error: unable to set new role");
+        return -1;
+    }
+
+    return 0;
 }
 
-static int _cell_list_cmd(char *arg)
+static void _print_sched_usage(void)
+{
+    puts("Usage:");
+    puts("\tsched list: show all active cell");
+    puts("\tsched add <slot_offset> <channel_offset> <adv|txrx|tx|rx>"
+         " [<address>]: add cell directly to schedule");
+    puts("\tsched rmv <slot_offset> <channel_offset> <adv|txrx|tx|rx>"
+         " [<address>]: remove cell directly in schedule ");
+    puts("\tsched slotframe [<length>]: get or set slotframe length");
+}
+
+static int _schedule_list_cmd(char *arg)
 {
     (void)arg;
 
@@ -251,80 +317,122 @@ static int _cell_list_cmd(char *arg)
     return 0;
 }
 
-static int _cell_manage_cmd(int argc, char **argv)
+static int _schedule_slotframe_cmd(int argc, char **argv)
 {
-    open_addr_t addr;
-    cellType_t type;
-    int res;
+    if (argc == 2) {
+        mlme_request_t req;
+        mlme_confirm_t conf;
 
-    memset(&addr, 0, sizeof(addr));
+        req.type = MLME_GET;
+        req.mib.type = MIB_SLOTFRAME_LENGTH;
+
+        mac_mlme_request(&openwsn_mac, &req, &conf);
+        printf("Slotframe length: %"PRIu32"\n", conf.mib.content);
+    }
+    else if (argc == 3) {
+        mlme_request_t req;
+        mlme_confirm_t conf;
+
+        req.type = MLME_SET;
+        req.mib.content = atoi(argv[2]);
+        req.mib.type = MIB_SLOTFRAME_LENGTH;
+
+        mac_mlme_request(&openwsn_mac, &req, &conf);
+
+        if (conf.status != MAC_REQ_STATUS_SUCCESS) {
+            puts("Error: couldn't set new slotframe");
+            return -1;
+        }
+    }
+
+    return -1;
+}
+
+static int _schedule_cells_manage_cmd(int argc, char **argv)
+{
+    mlme_request_t req;
+    mlme_confirm_t conf;
+
+    req.type = MLME_SET_LINK;
 
     if (argc < 5) {
-        _print_cell_usage();
+        _print_sched_usage();
         return -1;
     }
 
     if (argc == 6) {
-        addr.type = ADDR_64B;
-        size_t len = netif_addr_from_str(argv[5], addr.addr_64b);
+        uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+        size_t len = netif_addr_from_str(argv[5], addr);
         if (len == 0) {
             puts("Error: invalid address");
             return -1;
         }
+        req.link.addr = addr;
     }
     else {
-        addr.type = ADDR_ANYCAST;
+        req.link.addr = NULL;
     }
 
     if (!strcmp(argv[4], "adv")) {
-        type = CELLTYPE_TXRX;
+        req.link.addr = NULL;
+        req.link.type = ADVERTISING_LINK;
+    }
+    else if (!strcmp(argv[4], "txrx")) {
+        req.link.type = TXRX_LINK;
     }
     else if (!strcmp(argv[4], "tx")) {
-        type = CELLTYPE_TX;
+        req.link.type = TX_LINK;
     }
     else if (!strcmp(argv[4], "rx")) {
-        type = CELLTYPE_RX;
+        req.link.type = RX_LINK;
     }
     else {
-        _print_cell_usage();
+        _print_sched_usage();
         return -1;
     }
+    req.link.channel_offset = atoi(argv[3]);
+    req.link.slot_offset = atoi(argv[2]);
 
     if (!strcmp(argv[1], "add")) {
-        res =
-            schedule_addActiveSlot(atoi(argv[2]), type, true, false,
-                                   atoi(argv[3]), &addr);
+        req.link.operation = ADD_LINK;
     }
     else {
-        res = schedule_removeActiveSlot(atoi(argv[2]), type, true, &addr);
+        req.link.operation = DELETE_LINK;
     }
 
-    if (res == 0) {
+    req.link.shared = true;
+
+    mac_mlme_request(&openwsn_mac, &req, &conf);
+
+    if (conf.status == MAC_REQ_STATUS_SUCCESS) {
         puts("Successfully set link");
         return 0;
     }
     else {
-        puts("Something went wrong (duplicate link?)");
+        puts("Error: duplicate link?");
         return -1;
     }
 }
 
-static int _cell_cmd(int argc, char **argv)
+static int _schedule_cmd(int argc, char **argv)
 {
     if (argc < 2) {
-        _print_cell_usage();
+        _print_sched_usage();
         return -1;
     }
 
     if (!strcmp(argv[1], "list")) {
-        return _cell_list_cmd(NULL);
+        return _schedule_list_cmd(NULL);
     }
 
     if (!strcmp(argv[1], "add") || !strcmp(argv[1], "rmv")) {
-        return _cell_manage_cmd(argc, argv);
+        return _schedule_cells_manage_cmd(argc, argv);
     }
 
-    _print_cell_usage();
+    if (!strcmp(argv[1], "slotframe")) {
+        return _schedule_slotframe_cmd(argc, argv);
+    }
+    _print_sched_usage();
     return -1;
 }
 
@@ -343,12 +451,10 @@ static void _print_6top_usage(void)
 
 static int _6top_manage_cmd(int argc, char **argv)
 {
-    cellInfo_ht cells_add[CELLLIST_MAX_LEN];
-    cellInfo_ht cells_rmv[CELLLIST_MAX_LEN];
-    open_addr_t neigh;
-    uint8_t cell_options;
-    uint8_t code = IANA_6TOP_CMD_NONE;
-    uint8_t num;
+    mlme_request_t req;
+    mlme_confirm_t conf;
+
+    req.type = MLME_SIXTOP_REQ;
 
     if (argc < 4) {
         puts("Error: not enough args");
@@ -357,19 +463,21 @@ static int _6top_manage_cmd(int argc, char **argv)
     }
 
     if (argc == 5) {
-        neigh.type = ADDR_64B;
-        size_t len = netif_addr_from_str(argv[4], neigh.addr_64b);
-        if (len == 0) {
+        uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+        if (netif_addr_from_str(argv[4], addr) == 0) {
             puts("Error: invalid address");
             return -1;
         }
+        req.sixtop.addr = addr;
     }
     else {
         if (IS_USED(MODULE_OPENWSN_IPV6)) {
-            if (!icmpv6rpl_getPreferredParentEui64(&neigh)) {
+            open_addr_t neighbor;
+            if (!icmpv6rpl_getPreferredParentEui64(&neighbor)) {
                 puts("Error: no preferred parent");
                 return -1;
             }
+            req.sixtop.addr = neighbor.addr_64b;
         }
         else {
             puts("Error: a neighbor address must be supplied");
@@ -378,53 +486,38 @@ static int _6top_manage_cmd(int argc, char **argv)
     }
 
     if (!strcmp(argv[3], "adv")) {
-        cell_options = CELLOPTIONS_TX | CELLOPTIONS_RX | CELLOPTIONS_SHARED;
+        req.sixtop.opts = TX_CELL | RX_CELL | SHARED_CELL;
     }
     else if (!strcmp(argv[3], "tx")) {
-        cell_options = CELLOPTIONS_TX;
+        req.sixtop.opts = TX_CELL;
     }
     else if (!strcmp(argv[3], "rx")) {
-        cell_options = CELLOPTIONS_RX;
+        req.sixtop.opts = RX_CELL;
     }
     else {
         puts("Error: invalid cell option");
         return -1;
     }
 
-    num = atoi(argv[2]);
+    req.sixtop.num = atoi(argv[2]);
 
     if (!strcmp(argv[1], "add")) {
-        code = IANA_6TOP_CMD_ADD;
-        if (!msf_candidateAddCellList(cells_add, num)) {
-            puts("Error: can't add that many cells");
-            return -1;
-        }
+        req.sixtop.cmd = SIXTOP_ADD;
     }
     else if (!strcmp(argv[1], "rmv")) {
-        code = IANA_6TOP_CMD_DELETE;
-        if (!msf_candidateRemoveCellList(cells_rmv, &neigh, num,
-                                         cell_options)) {
-            puts("Error: can't remove the specified cells");
-            return -1;
-        }
+        req.sixtop.cmd = SIXTOP_REMOVE;
     }
     else if (!strcmp(argv[1], "rel")) {
-        code = IANA_6TOP_CMD_RELOCATE;
-        if (!schedule_getCellsToBeRelocated(&neigh, cells_rmv) ||
-            !msf_candidateAddCellList(cells_add, num)) {
-            puts("Error: failed to get cells to relocate");
-            return -1;
-        }
+        req.sixtop.cmd = SIXTOP_RELOCATE;
     }
     else {
         puts("Error: unknown 6top command");
         return -1;
     }
 
-    int ret = sixtop_request(code, &neigh, num, cell_options, cells_add,
-                             cells_rmv, IANA_6TISCH_SFID_MSF, 0, 0);
+    mac_mlme_request(&openwsn_mac, &req, &conf);
 
-    if (ret) {
+    if (conf.status != MAC_REQ_STATUS_DEFERRED) {
         puts("Error: 6top request failed");
         return -1;
     }
@@ -440,32 +533,38 @@ static int _6top_cmd(int argc, char **argv)
     }
 
     if (!strcmp(argv[1], "clear")) {
+        mlme_request_t req;
+        mlme_confirm_t conf;
 
-        open_addr_t neighbor;
+        req.type = MLME_SIXTOP_REQ;
 
         if (argc == 3) {
-            neighbor.type = ADDR_64B;
-            size_t len = netif_addr_from_str(argv[2], neighbor.addr_64b);
-            if (len == 0) {
+            uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+            if (netif_addr_from_str(argv[2], addr) == 0) {
                 puts("Error: invalid address");
                 return -1;
             }
+            req.sixtop.addr = addr;
         }
         else {
             if (IS_USED(MODULE_OPENWSN_IPV6)) {
+                open_addr_t neighbor;
                 if (!icmpv6rpl_getPreferredParentEui64(&neighbor)) {
                     puts("Error: no preferred parent");
                     return -1;
                 }
+                req.sixtop.addr = neighbor.addr_64b;
             }
             else {
                 puts("Error: a neighbor address must be supplied");
                 return -1;
             }
         }
-        int ret = sixtop_request(IANA_6TOP_CMD_CLEAR, &neighbor, 0, 0,
-                                 NULL, NULL, IANA_6TISCH_SFID_MSF, 0, 0);
-        if (ret) {
+
+        req.sixtop.cmd = SIXTOP_CLEAR;
+        mac_mlme_request(&openwsn_mac, &req, &conf);
+
+        if (conf.status != MAC_REQ_STATUS_DEFERRED) {
             puts("Error: 6top request failed");
             return -1;
         }
@@ -559,10 +658,11 @@ static void _print_usage(void)
     puts("Usage:");
     puts("\topenwsn neigh: show neighbor table");
     puts("\topenwsn queue: Openqueue management commands");
-    puts("\topenwsn cell: cell management commands");
+    puts("\topenwsn sched: schedule management commands");
     puts("\topenwsn 6top: 6top request commands");
+    puts("\topenwsn role: set node PAN role");
 #if SCHEDULER_DEBUG_ENABLE
-    puts("\topenwsn sched: show openos scheduler information");
+    puts("\topenwsn tasks: show openos scheduler information");
 #endif
 }
 
@@ -577,20 +677,20 @@ int _openwsn_handler(int argc, char **argv)
         return _neighbors_cmd(NULL);
     }
 
+    if (!strcmp(argv[1], "role")) {
+        return _panrole_cmd(argc - 1, &argv[1]);
+    }
+
     if (!strcmp(argv[1], "queue")) {
         return _queue_cmd(argc - 1, &argv[1]);
     }
 
-    if (!strcmp(argv[1], "cell")) {
-        if (!ieee154e_isSynch()) {
-            puts("Error: node is not synchronized");
-            return -1;
-        }
-        return _cell_cmd(argc - 1, &argv[1]);
+    if (!strcmp(argv[1], "sched")) {
+        return _schedule_cmd(argc - 1, &argv[1]);
     }
 
 #if SCHEDULER_DEBUG_ENABLE
-    if (!strcmp(argv[1], "sched")) {
+    if (!strcmp(argv[1], "tasks")) {
         return _scheduler_cmd(NULL);
     }
 #endif
