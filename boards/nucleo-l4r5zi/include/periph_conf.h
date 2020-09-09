@@ -20,53 +20,25 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+
+/* Add specific clock configuration (HSE, LSE) for this board here */
+#define CLOCK_CORECLOCK_MAX             MHZ(120)
+
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE            1
+#endif
+
+#ifndef CONFIG_CLOCK_PLL_N
+#define CONFIG_CLOCK_PLL_N              (30)
+#endif
+
+#include "l4/cfg_clock_default.h"
 #include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_rtt_default.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Clock system configuration
- * @{
- */
-/* 0: no external high speed crystal available
- * else: actual crystal frequency [in Hz] */
-#define CLOCK_HSE           (0)
-
-#ifndef CLOCK_LSE
-/* 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (1)
-#endif
-
-/* 0: enable MSI only if HSE isn't available
- * 1: always enable MSI (e.g. if USB or RNG is used)*/
-#define CLOCK_MSI_ENABLE    (1)
-
-#ifndef CLOCK_MSI_LSE_PLL
-/* 0: disable Hardware auto calibration with LSE
- * 1: enable Hardware auto calibration with LSE (PLL-mode)
- * Same as with CLOCK_LSE above this defaults to 0 because LSE is
- * mandatory for MSI/LSE-trimming to work */
-#define CLOCK_MSI_LSE_PLL   (0)
-#endif
-
-/* give the target core clock (HCLK) frequency [in Hz], maximum: 120MHz */
-#define CLOCK_CORECLOCK     (120000000U)
-/* PLL configuration: make sure your values are legit! */
-#define CLOCK_PLL_M         (6)
-#define CLOCK_PLL_N         (30)
-#define CLOCK_PLL_R         (2)
-/* peripheral clock setup */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
-/** @} */
 
 /**
  * @name    Timer configuration
