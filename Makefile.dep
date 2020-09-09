@@ -221,9 +221,6 @@ ifneq (,$(filter ieee802154 nrfmin esp_now cc110x gnrc_sixloenc,$(USEMODULE)))
   ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
     USEMODULE += gnrc_sixlowpan
   endif
-  ifneq (,$(filter gnrc_ipv6_router, $(USEMODULE)))
-    USEMODULE += gnrc_sixlowpan_router
-  endif
   ifneq (,$(filter gnrc_ipv6_default, $(USEMODULE)))
     USEMODULE += gnrc_sixlowpan_default
   endif
@@ -236,7 +233,6 @@ ifneq (,$(filter ieee802154 nrfmin esp_now cc110x gnrc_sixloenc,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_default
   USEMODULE += gnrc_ipv6_nib_6ln
   USEMODULE += gnrc_sixlowpan
   USEMODULE += gnrc_sixlowpan_frag
@@ -244,9 +240,7 @@ ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_router_default,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_router_default
   USEMODULE += gnrc_ipv6_nib_6lr
-  USEMODULE += gnrc_sixlowpan_router
   USEMODULE += gnrc_sixlowpan_frag
   USEMODULE += gnrc_sixlowpan_iphc
 endif
@@ -254,13 +248,8 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_border_router_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_nib_6lbr
   USEMODULE += gnrc_ipv6_router_default
-  USEMODULE += gnrc_sixlowpan_router
   USEMODULE += gnrc_sixlowpan_frag
   USEMODULE += gnrc_sixlowpan_iphc
-endif
-
-ifneq (,$(filter gnrc_sixlowpan_router,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6_router
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
@@ -315,21 +304,27 @@ endif
 
 ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ipv6_hdr
   USEMODULE += gnrc_netif
 endif
 
 ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ipv6_hdr
+  USEMODULE += gnrc_netif_hdr
 endif
 
 ifneq (,$(filter gnrc_icmpv6_error,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ipv6_hdr
+  USEMODULE += gnrc_netif_hdr
 endif
 
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   USEMODULE += inet_csum
-  USEMODULE += gnrc_ipv6
+  USEMODULE += ipv6_hdr
   USEMODULE += gnrc_nettype_icmpv6
+  USEMODULE += gnrc_nettype_ipv6
   USEMODULE += icmpv6
 endif
 
@@ -351,7 +346,7 @@ ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
-  USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_nettype_ipv6
   USEMODULE += gnrc_nettype_ipv6_ext
 endif
 
@@ -420,6 +415,7 @@ ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
   USEMODULE += evtimer
   USEMODULE += gnrc_ndp
   USEMODULE += gnrc_netif
+  USEMODULE += gnrc_netif_ipv6
   USEMODULE += ipv6_addr
   USEMODULE += random
 endif
