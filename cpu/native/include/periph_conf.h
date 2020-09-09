@@ -39,7 +39,6 @@ extern "C" {
  * @{
  */
 #define TIMER_NUMOF        (1U)
-#define TIMER_0_EN         1
 
 /**
  * @brief xtimer configuration
