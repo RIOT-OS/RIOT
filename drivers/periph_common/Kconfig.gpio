@@ -44,3 +44,5 @@ config MODULE_PERIPH_INIT_GPIO_FAST_READ
     depends on MODULE_PERIPH_GPIO_FAST_READ
 
 endif # MODULE_PERIPH_GPIO
+
+osource "$(RIOTCPU)/$(CPU)/periph/Kconfig.gpio"
