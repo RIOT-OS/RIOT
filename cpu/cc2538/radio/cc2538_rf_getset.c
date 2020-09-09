@@ -62,29 +62,22 @@ static const uint8_t power_lut[NUM_POWER_LEVELS] = {
     255, /**<   7 dBm */
 };
 
-uint64_t cc2538_get_addr_long(void)
+void cc2538_get_addr_long(uint8_t *addr)
 {
-    uint64_t addr = RFCORE_FFSM_EXT_ADDR0;
-    addr <<= 8;
-    addr |= RFCORE_FFSM_EXT_ADDR1;
-    addr <<= 8;
-    addr |= RFCORE_FFSM_EXT_ADDR2;
-    addr <<= 8;
-    addr |= RFCORE_FFSM_EXT_ADDR3;
-    addr <<= 8;
-    addr |= RFCORE_FFSM_EXT_ADDR4;
-    addr <<= 8;
-    addr |= RFCORE_FFSM_EXT_ADDR5;
-    addr <<= 8;
-    addr |= RFCORE_FFSM_EXT_ADDR6;
-    addr <<= 8;
-    addr |= RFCORE_FFSM_EXT_ADDR7;
-    return addr;
+    addr[7] = RFCORE_FFSM_EXT_ADDR0;
+    addr[6] = RFCORE_FFSM_EXT_ADDR1;
+    addr[5] = RFCORE_FFSM_EXT_ADDR2;
+    addr[4] = RFCORE_FFSM_EXT_ADDR3;
+    addr[3] = RFCORE_FFSM_EXT_ADDR4;
+    addr[2] = RFCORE_FFSM_EXT_ADDR5;
+    addr[1] = RFCORE_FFSM_EXT_ADDR6;
+    addr[0] = RFCORE_FFSM_EXT_ADDR7;
 }
 
-uint16_t cc2538_get_addr_short(void)
+void cc2538_get_addr_short(uint8_t *addr)
 {
-    return (RFCORE_FFSM_SHORT_ADDR0 << 8) | RFCORE_FFSM_SHORT_ADDR1;
+    addr[1] = RFCORE_FFSM_SHORT_ADDR0;
+    addr[0] = RFCORE_FFSM_SHORT_ADDR1;
 }
 
 unsigned int cc2538_get_chan(void)
@@ -147,22 +140,22 @@ int cc2538_get_tx_power(void)
     return OUTPUT_POWER_MIN + best_index;
 }
 
-void cc2538_set_addr_long(uint64_t addr)
+void cc2538_set_addr_long(const uint8_t *addr)
 {
-    RFCORE_FFSM_EXT_ADDR0 = addr >> (7 * 8);
-    RFCORE_FFSM_EXT_ADDR1 = addr >> (6 * 8);
-    RFCORE_FFSM_EXT_ADDR2 = addr >> (5 * 8);
-    RFCORE_FFSM_EXT_ADDR3 = addr >> (4 * 8);
-    RFCORE_FFSM_EXT_ADDR4 = addr >> (3 * 8);
-    RFCORE_FFSM_EXT_ADDR5 = addr >> (2 * 8);
-    RFCORE_FFSM_EXT_ADDR6 = addr >> (1 * 8);
-    RFCORE_FFSM_EXT_ADDR7 = addr >> (0 * 8);
+    RFCORE_FFSM_EXT_ADDR0 = addr[7];
+    RFCORE_FFSM_EXT_ADDR1 = addr[6];
+    RFCORE_FFSM_EXT_ADDR2 = addr[5];
+    RFCORE_FFSM_EXT_ADDR3 = addr[4];
+    RFCORE_FFSM_EXT_ADDR4 = addr[3];
+    RFCORE_FFSM_EXT_ADDR5 = addr[2];
+    RFCORE_FFSM_EXT_ADDR6 = addr[1];
+    RFCORE_FFSM_EXT_ADDR7 = addr[0];
 }
 
-void cc2538_set_addr_short(uint16_t addr)
+void cc2538_set_addr_short(const uint8_t *addr)
 {
-    RFCORE_FFSM_SHORT_ADDR1 = addr;
-    RFCORE_FFSM_SHORT_ADDR0 = addr >> 8;
+    RFCORE_FFSM_SHORT_ADDR0 = addr[1];
+    RFCORE_FFSM_SHORT_ADDR1 = addr[0];
 }
 
 void cc2538_set_chan(unsigned int chan)
