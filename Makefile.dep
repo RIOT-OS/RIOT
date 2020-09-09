@@ -143,18 +143,12 @@ ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_sock_async,$(USEMODULE)))
-  USEMODULE += sock_async
   USEMODULE += gnrc_netapi_callbacks
-endif
-
-ifneq (,$(filter gnrc_sock_ip,$(USEMODULE)))
-  USEMODULE += sock_ip
 endif
 
 ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
   USEMODULE += gnrc_udp
   USEMODULE += random     # to generate random ports
-  USEMODULE += sock_udp
 endif
 
 ifneq (,$(filter gnrc_sock,$(USEMODULE)))
@@ -557,17 +551,14 @@ endif
 
 ifneq (,$(filter lwip_sock_ip,$(USEMODULE)))
   USEMODULE += lwip_raw
-  USEMODULE += sock_ip
 endif
 
 ifneq (,$(filter lwip_sock_tcp,$(USEMODULE)))
   USEMODULE += lwip_tcp
-  USEMODULE += sock_tcp
 endif
 
 ifneq (,$(filter lwip_sock_udp,$(USEMODULE)))
   USEMODULE += lwip_udp
-  USEMODULE += sock_udp
 endif
 
 ifneq (,$(filter lwip_%,$(USEMODULE)))
@@ -645,6 +636,12 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_netif_hdr
   USEMODULE += gnrc_pktbuf
+  ifneq (,$(filter sock_async, $(USEMODULE)))
+    USEMODULE += gnrc_sock_async
+  endif
+  ifneq (,$(filter sock_ip, $(USEMODULE)))
+    USEMODULE += gnrc_sock_ip
+  endif
   ifneq (,$(filter sock_udp, $(USEMODULE)))
     USEMODULE += gnrc_sock_udp
   endif
@@ -848,6 +845,7 @@ ifneq (,$(filter sock_async_event,$(USEMODULE)))
 endif
 
 ifneq (,$(filter sock_dns,$(USEMODULE)))
+  USEMODULE += sock_udp
   USEMODULE += sock_util
   USEMODULE += posix_headers
 endif
@@ -855,7 +853,6 @@ endif
 ifneq (,$(filter sock_util,$(USEMODULE)))
   USEMODULE += posix_inet
   USEMODULE += fmt
-  USEMODULE += sock_udp
 endif
 
 ifneq (,$(filter event_%,$(USEMODULE)))
@@ -901,8 +898,9 @@ endif
 
 ifneq (,$(filter gcoap,$(USEMODULE)))
   USEMODULE += nanocoap
-  USEMODULE += gnrc_sock_async
+  USEMODULE += sock_async
   USEMODULE += sock_async_event
+  USEMODULE += sock_udp
   USEMODULE += sock_util
   USEMODULE += event_callback
   USEMODULE += event_timeout
@@ -1021,7 +1019,6 @@ endif
 
 ifneq (,$(filter tinydtls_sock_dtls, $(USEMODULE)))
     USEPKG += tinydtls
-    USEMODULE += sock_dtls
 endif
 
 ifneq (,$(filter sock_dtls, $(USEMODULE)))

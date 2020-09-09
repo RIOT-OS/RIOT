@@ -25,8 +25,7 @@ endif
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for IPv6 and UDP
 USEMODULE += gnrc_ipv6_router_default
-USEMODULE += gnrc_udp
-USEMODULE += gnrc_sock_udp
+USEMODULE += sock_udp
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
 

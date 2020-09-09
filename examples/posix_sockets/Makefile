@@ -13,8 +13,7 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Specify the mandatory networking modules for socket communication via UDP
 USEMODULE += gnrc_ipv6_default
-USEMODULE += gnrc_udp
-USEMODULE += gnrc_sock_udp
+USEMODULE += sock_udp
 USEMODULE += posix_sockets
 USEMODULE += posix_time
 USEMODULE += posix_inet

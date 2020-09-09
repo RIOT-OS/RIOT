@@ -5,7 +5,6 @@ RIOTBASE ?= $(CURDIR)/../..
 export TAP ?= tap0
 
 USEMODULE += sock_dns
-USEMODULE += gnrc_sock_udp
 USEMODULE += gnrc_ipv6_default
 USEMODULE += gnrc_ipv6_nib_dns
 USEMODULE += gnrc_netif_single          # Only one interface used and it makes
