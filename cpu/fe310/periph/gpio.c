@@ -26,9 +26,8 @@
 #include "periph_conf.h"
 #include "periph/gpio.h"
 #include "plic.h"
-#include "vendor/encoding.h"
+#include "vendor/riscv_csr.h"
 #include "vendor/platform.h"
-#include "vendor/plic_driver.h"
 
 /* Num of GPIOs supported */
 #define GPIO_NUMOF (32)

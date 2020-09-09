@@ -20,6 +20,7 @@
 #define CLK_CONF_H
 
 #include "macros/units.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {

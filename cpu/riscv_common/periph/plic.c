@@ -7,11 +7,15 @@
  */
 
 /**
- * @ingroup     cpu_fe310
+ * @ingroup     cpu_riscv_common
  * @{
  *
  * @file
  * @brief       Platform-Level interrupt controller driver
+ *
+ * RISCV implementations using this peripheral must define the `PLIC_BASE_ADDR`,
+ * in order to use the PLIC as interrupt controller. Also required are:
+ * PLIC_NUM_INTERRUPTS and PLIC_NUM_PRIORITIES (future compatibility).
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  * @}
@@ -19,10 +23,15 @@
 
 #include <assert.h>
 
-#include "vendor/encoding.h"
-#include "vendor/platform.h"
+#include "vendor/riscv_csr.h"
+
+#include "assert.h"
 #include "cpu.h"
 #include "plic.h"
+
+/* Local macros to calculate register offsets */
+#define _REG32(p, i) 			(*(volatile uint32_t *) ((p) + (i)))
+#define PLIC_REG(offset) 		_REG32(PLIC_CTRL_ADDR, offset)
 
 /* PLIC external ISR function list */
 static plic_isr_cb_t _ext_isrs[PLIC_NUM_INTERRUPTS];

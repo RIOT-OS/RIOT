@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_fe310
+ * @ingroup     cpu_riscv_common
  * @{
  *
  * @file        cpu.c
- * @brief       Implementation of the CPU thread management for SiFive FE310
+ * @brief       Implementation of the CPU thread management for RISC-V
  *
  * @author      Ken Rabold
  * @}

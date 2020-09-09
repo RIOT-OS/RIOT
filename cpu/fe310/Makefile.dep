@@ -5,10 +5,8 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += newlib_syscalls_default
 endif
 
-USEMODULE += sifive_drivers_fe310
-
 USEMODULE += periph
-USEMODULE += periph_pm
+USEMODULE += sifive_drivers_fe310
 
 FEATURES_REQUIRED += periph_plic
 
@@ -16,5 +14,8 @@ ifneq (,$(filter periph_rtc,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
 
-# Make calls to malloc and friends thread-safe
-USEMODULE += malloc_thread_safe
+ifneq (,$(filter periph_timer,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_coretimer
+endif
+
+include $(RIOTCPU)/riscv_common/Makefile.dep

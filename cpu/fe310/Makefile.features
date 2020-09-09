@@ -1,16 +1,6 @@
-FEATURES_PROVIDED += arch_32bit
-FEATURES_PROVIDED += arch_riscv
-FEATURES_PROVIDED += cpp
-FEATURES_PROVIDED += libstdcpp
-FEATURES_PROVIDED += newlib
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
-FEATURES_PROVIDED += periph_plic
 FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += periph_wdt
-FEATURES_PROVIDED += ssp
 
-# RISC-V toolchain on CI does not work properly with picolibc yet
-ifeq (,$(RIOT_CI_BUILD))
-  FEATURES_PROVIDED += picolibc
-endif
+include $(RIOTCPU)/riscv_common/Makefile.features

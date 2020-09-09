@@ -7,24 +7,24 @@
  */
 
 /**
- * @addtogroup      cpu_fe310
+ * @addtogroup         cpu_riscv_common
  * @{
  *
  * @file
- * @brief           Memory definitions for the SiFive FE310
+ * @brief           Memory definitions for the RISC-V CPU
  *
  * @author          Ken Rabold
  * @author          Koen Zandberg <koen@bergzand.net>
  *
  * @}
  */
-INCLUDE fe310_vars.ld
+INCLUDE riscv_vars.ld
 
 MEMORY
 {
-  flash (rxai!w) : ORIGIN = _rom_start_addr , LENGTH = _rom_length
+  flash (rxai!w) : ORIGIN = _rom_start_addr, LENGTH = _rom_length
   ram   (wxa!ri) : ORIGIN = _ram_start_addr, LENGTH = _ram_length
   itim  (wxa!ri) : ORIGIN = _itim_start_addr, LENGTH = _itim_length
 }
 
-INCLUDE fe310_base.ld
+INCLUDE riscv_base.ld

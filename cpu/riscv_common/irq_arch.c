@@ -7,11 +7,12 @@
  */
 
 /**
- * @ingroup     cpu_fe310
+ * @ingroup     cpu_riscv_common
  * @{
  *
  * @file        cpu.c
- * @brief       Implementation of the CPU IRQ management for SiFive FE310
+ * @brief       Implementation of the CPU IRQ management for RISC-V clint/plic
+ *              peripheral
  *
  * @author      Ken Rabold
  * @}
@@ -29,14 +30,12 @@
 #include "sched.h"
 #include "plic.h"
 
-#include "vendor/encoding.h"
-#include "vendor/platform.h"
-#include "vendor/plic_driver.h"
+#include "vendor/riscv_csr.h"
 
 /* Default state of mstatus register */
 #define MSTATUS_DEFAULT     (MSTATUS_MPP | MSTATUS_MPIE)
 
-volatile int fe310_in_isr = 0;
+volatile int riscv_in_isr = 0;
 
 /**
  * @brief   ISR trap vector
@@ -48,7 +47,7 @@ static void trap_entry(void);
  */
 void timer_isr(void);
 
-void irq_init(void)
+void riscv_irq_init(void)
 {
     /* Setup trap handler function */
     write_csr(mtvec, &trap_entry);
@@ -75,7 +74,7 @@ void handle_trap(uint32_t mcause)
 {
     /*  Tell RIOT to set sched_context_switch_request instead of
      *  calling thread_yield(). */
-    fe310_in_isr = 1;
+    riscv_in_isr = 1;
 
     /* Check for INT or TRAP */
     if ((mcause & MCAUSE_INT) == MCAUSE_INT) {
@@ -125,7 +124,7 @@ void handle_trap(uint32_t mcause)
         }
     }
     /* ISR done - no more changes to thread states */
-    fe310_in_isr = 0;
+    riscv_in_isr = 0;
 }
 
 /* Marking this as interrupt to ensure an mret at the end, provided by the

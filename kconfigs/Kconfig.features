@@ -94,6 +94,11 @@ config HAS_PERIPH_CAN
     help
         Indicates that a CAN peripheral is present.
 
+config HAS_PERIPH_CORETIMER
+    bool
+    help
+        Indicates that the CLINT timer can be used as timer peripheral
+
 config HAS_PERIPH_CPUID
     bool
     help

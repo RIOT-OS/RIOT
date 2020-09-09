@@ -7,11 +7,11 @@
  */
 
 /**
- * @addtogroup      cpu_fe310
+ * @addtogroup      cpu_riscv_common
  * @{
  *
  * @file
- * @brief           Common linker directives for the SiFive FE310
+ * @brief           Common linker directives for the RISC-V CPU
  *
  * @author          Ken Rabold
  *

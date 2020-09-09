@@ -21,8 +21,7 @@
 #include "periph/init.h"
 #include "periph_conf.h"
 
-#include "vendor/encoding.h"
-#include "vendor/plic_driver.h"
+#include "vendor/riscv_csr.h"
 
 #include "stdio_uart.h"
 
@@ -95,7 +94,7 @@ void flash_init(void)
 void cpu_init(void)
 {
     /* Initialize clock */
-    clock_init();
+    fe310_clock_init();
 
 #if USE_CLOCK_HFROSC_PLL
     /* Initialize flash memory, only when using the PLL: in this
@@ -104,14 +103,8 @@ void cpu_init(void)
     flash_init();
 #endif
 
-    /* Enable FPU if present */
-    if (read_csr(misa) & (1 << ('F' - 'A'))) {
-        write_csr(mstatus, MSTATUS_FS); /* allow FPU instructions without trapping */
-        write_csr(fcsr, 0);             /* initialize rounding mode, undefined at reset */
-    }
-
-    /* Initialize IRQs */
-    irq_init();
+    /* Common RISC-V initialization */
+    riscv_init();
 
     /* Initialize stdio */
     stdio_init();
