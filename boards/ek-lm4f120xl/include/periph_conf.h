@@ -73,10 +73,9 @@ extern "C" {
  * @{
  */
 #define UART_NUMOF          (1U)
-#define UART_0_EN           1
-#define UART_1_EN           0
 #define UART_IRQ_PRIO       1
-#define UART_CLK            ROM_SysCtlClockGet()  /* UART clock runs with 40MHz */
+/* UART clock runs with 40MHz */
+#define UART_CLK            ROM_SysCtlClockGet()
 /* UART 0 device configuration */
 #define UART_0_DEV          UART0_BASE
 #define UART_0_CLK          (40000000)
@@ -86,12 +85,6 @@ extern "C" {
 #define UART_0_PORT         GPIOA
 #define UART_0_TX_PIN       UART_PA1_U0TX
 #define UART_0_RX_PIN       UART_PA0_U0RX
-
-/* UART 1 device configuration */
-#define UART_1_DEV          UART1_BASE
-#define UART_1_CLK          (40000000)
-#define UART_1_IRQ_CHAN     UART1_IRQn
-#define UART_1_ISR          isr_uart1
 /** @} */
 
 /**
