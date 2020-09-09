@@ -296,7 +296,13 @@ static void _ztimer_update(ztimer_clock_t *clock)
             clock->ops->set(clock, clock->list.next->offset);
         }
         else {
-            clock->ops->cancel(clock);
+            if (IS_USED(MODULE_ZTIMER_NOW64)) {
+                /* ensure there's at least one ISR per half period */
+                clock->ops->set(clock, clock->max_value >> 1);
+            }
+            else {
+                clock->ops->cancel(clock);
+            }
         }
     }
 }
