@@ -53,6 +53,7 @@ static const uart_conf_t uart_config[] = {
     {
         .dev = (LPC_UART_TypeDef*)LPC_UART0,
         .irq_rx = UART0_IRQn,
+        .clk_offset = 3,
         .pinsel = 0,
         .pinsel_shift = 2,
         .pinsel_af = 1,
@@ -60,8 +61,9 @@ static const uart_conf_t uart_config[] = {
     {
         .dev = (LPC_UART_TypeDef*)LPC_UART2,
         .irq_rx = UART2_IRQn,
+        .clk_offset = 24,
         .pinsel = 0,
-        .pinsel_shift = 20,
+        .pinsel_shift = 10,
         .pinsel_af = 1,
     }
 };
