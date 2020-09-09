@@ -1,0 +1,5 @@
+/**
+@defgroup    boards_nucleo-l412kb STM32 Nucleo-L412KB
+@ingroup     boards_common_nucleo32
+@brief       Support for the STM32 Nucleo-L412KB
+ */

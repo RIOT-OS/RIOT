@@ -69,15 +69,6 @@ static inline void get_msg(conn_can_isotp_t *conn, msg_t *msg)
 #endif
 }
 
-static inline int try_get_msg(conn_can_isotp_t *conn, msg_t *msg)
-{
-#ifdef MODULE_CONN_CAN_ISOTP_MULTI
-    return mbox_try_get(&conn->master->mbox, msg);
-#else
-    return mbox_try_get(&conn->mbox, msg);
-#endif
-}
-
 int conn_can_isotp_create(conn_can_isotp_t *conn, struct isotp_options *options, int ifnum)
 {
     assert(conn != NULL);
@@ -366,7 +357,7 @@ int conn_can_isotp_close(conn_can_isotp_t *conn)
         }
     }
 #else
-    while (try_get_msg(conn, &msg)) {
+    while (mbox_try_get(&conn->mbox, &msg)) {
         if (msg.type == CAN_MSG_RX_INDICATION) {
             DEBUG("conn_can_isotp_close: freeing %p\n", msg.content.ptr);
             isotp_free_rx(msg.content.ptr);

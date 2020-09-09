@@ -23,6 +23,11 @@ extern "C" {
 #endif
 
 /**
+ * @brief   This arch uses the inlined IRQ API.
+ */
+#define IRQ_API_INLINED     (1)
+
+/**
  * @name   Configure the internal flash memory
  * @{
  */
@@ -63,7 +68,7 @@ extern "C" {
 #endif
 
 #ifndef THREAD_STACKSIZE_DEFAULT
-#   define THREAD_STACKSIZE_DEFAULT         (256)
+#   define THREAD_STACKSIZE_DEFAULT         (384)
 #endif
 
 #ifndef THREAD_STACKSIZE_IDLE
@@ -74,20 +79,15 @@ extern "C" {
 #   define ISR_STACKSIZE                    (256)
 #endif
 
-#ifndef GNRC_PKTBUF_SIZE
+#ifndef CONFIG_GNRC_PKTBUF_SIZE
 /* TODO: Make this value overall MTU dependent */
-#   define GNRC_PKTBUF_SIZE                 (2560)
+#   define CONFIG_GNRC_PKTBUF_SIZE                 (2560)
 #endif
 
 #ifndef GNRC_IPV6_STACK_SIZE
 #   define GNRC_IPV6_STACK_SIZE             (512)
 #endif
 /** @} */
-
-/**
- * @brief   Declare the heap_stats function as available
- */
-#define HAVE_HEAP_STATS
 
 #ifdef __cplusplus
 }

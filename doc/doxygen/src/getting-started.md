@@ -140,3 +140,15 @@ make -C examples/gnrc_networking/ term \
     TERMPROG=gtkterm \
     TERMFLAGS="-s 115200 -p /dev/ttyACM0 -e"
 ~~~~~~~~
+
+Configuring an application                         {#configuring-an-application}
+--------------------------
+Many modules in RIOT offer configuration options that will be considered during
+compile-time.They are modeled as macros that can be overridden by the user.
+Currently there are two ways of doing this: using `CFLAGS` or via
+@ref kconfig-in-riot "Kconfig" (the last one is currently only possible for a
+subset of modules).
+
+For instructions on how to configure via `CFLAGS` check the
+@ref config "identified compile-time configurations". To learn how to use
+Kconfig in RIOT, please refer to the @ref kconfig-users-guide.

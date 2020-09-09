@@ -25,6 +25,8 @@
 #include <stdbool.h>
 #include <inttypes.h>
 
+#include "ztimer.h"
+
 #include "net/lora.h"
 
 #include "sx127x.h"
@@ -201,11 +203,20 @@ void sx127x_start_cad(sx127x_t *dev)
                              /* | SX127X_RF_LORA_IRQFLAGS_CADDETECTED*/
                              );
 
-            /* DIO3 = CADDone */
-            sx127x_reg_write(dev, SX127X_REG_DIOMAPPING1,
-                             (sx127x_reg_read(dev, SX127X_REG_DIOMAPPING1) &
-                              SX127X_RF_LORA_DIOMAPPING1_DIO3_MASK) |
-                             SX127X_RF_LORA_DIOMAPPING1_DIO3_00);
+            if (gpio_is_valid(dev->params.dio3_pin)) {
+                /* DIO3 = CADDone */
+                sx127x_reg_write(dev, SX127X_REG_DIOMAPPING1,
+                                 (sx127x_reg_read(dev, SX127X_REG_DIOMAPPING1) &
+                                  SX127X_RF_LORA_DIOMAPPING1_DIO3_MASK) |
+                                 SX127X_RF_LORA_DIOMAPPING1_DIO3_00);
+            }
+            else {
+                /* DIO0 = CADDone */
+                sx127x_reg_write(dev, SX127X_REG_DIOMAPPING1,
+                                 (sx127x_reg_read(dev, SX127X_REG_DIOMAPPING1) &
+                                  SX127X_RF_LORA_DIOMAPPING1_DIO0_MASK) |
+                                 SX127X_RF_LORA_DIOMAPPING1_DIO0_10);
+            }
 
             sx127x_set_state(dev,  SX127X_RF_CAD);
             sx127x_set_op_mode(dev, SX127X_RF_LORA_OPMODE_CAD);
@@ -222,7 +233,7 @@ bool sx127x_is_channel_free(sx127x_t *dev, uint32_t freq, int16_t rssi_threshold
     sx127x_set_channel(dev, freq);
     sx127x_set_op_mode(dev, SX127X_RF_OPMODE_RECEIVER);
 
-    xtimer_usleep(1000); /* wait 1 millisecond */
+    ztimer_sleep(ZTIMER_MSEC, 1); /* wait 1 millisecond */
 
     rssi = sx127x_read_rssi(dev);
     sx127x_set_sleep(dev);

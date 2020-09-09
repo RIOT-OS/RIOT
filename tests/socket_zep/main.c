@@ -18,7 +18,6 @@
  * @}
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <stdio.h>
@@ -28,10 +27,11 @@
 #include "sched.h"
 #include "socket_zep.h"
 #include "socket_zep_params.h"
+#include "socket_zep_params.h"
+#include "test_utils/expect.h"
+#include "thread.h"
 #include "msg.h"
 #include "od.h"
-
-#include "test_utils/interactive_sync.h"
 
 #define MSG_QUEUE_SIZE  (8)
 #define MSG_TYPE_ISR    (0x3456)
@@ -54,7 +54,7 @@ static void test_init(void)
            p->local_addr, p->local_port, p->remote_addr, p->remote_port);
     socket_zep_setup(&_dev, p);
     netdev->event_callback = _event_cb;
-    assert(netdev->driver->init(netdev) >= 0);
+    expect(netdev->driver->init(netdev) >= 0);
     _print_info(netdev);
 }
 
@@ -64,7 +64,7 @@ static void test_send__iolist_NULL(void)
 
     puts("Send zero-length packet");
     int res = netdev->driver->send(netdev, NULL);
-    assert((res < 0) || (res == 0));
+    expect((res < 0) || (res == 0));
     if ((res < 0) && (errno == ECONNREFUSED)) {
         puts("No remote socket exists (use scripts in `tests/` to have proper tests)");
     }
@@ -81,7 +81,7 @@ static void test_send__iolist_not_NULL(void)
 
     puts("Send 'Hello\\0World\\0'");
     int res =  netdev->driver->send(netdev, iolist);
-    assert((res < 0) || (res == (sizeof("Hello")) + sizeof("World")));
+    expect((res < 0) || (res == (sizeof("Hello")) + sizeof("World")));
     if ((res < 0) && (errno == ECONNREFUSED)) {
         puts("No remote socket exists (use scripts in `tests/` to have proper tests)");
     }
@@ -106,11 +106,9 @@ static void test_recv(void)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     puts("Socket ZEP device driver test");
     msg_init_queue(_msg_queue, MSG_QUEUE_SIZE);
-    _main_pid = sched_active_pid;
+    _main_pid = thread_getpid();
 
     test_init();
     test_send__iolist_NULL();
@@ -126,14 +124,14 @@ static void _recv(netdev_t *dev)
     const int exp_len = dev->driver->recv(dev, NULL, 0, NULL);
     int data_len;
 
-    assert(exp_len >= 0);
-    assert(((unsigned)exp_len) <= sizeof(_recvbuf));
+    expect(exp_len >= 0);
+    expect(((unsigned)exp_len) <= sizeof(_recvbuf));
     data_len = dev->driver->recv(dev, _recvbuf, sizeof(_recvbuf), &rx_info);
     if (data_len < 0) {
         puts("Received invalid packet");
     }
     else {
-        assert(data_len <= exp_len);
+        expect(data_len <= exp_len);
         printf("RSSI: %u, LQI: %u, Data:\n", rx_info.rssi, rx_info.lqi);
         if (data_len > 0) {
             od_hex_dump(_recvbuf, data_len, OD_WIDTH_DEFAULT);
@@ -171,9 +169,9 @@ static void _print_info(netdev_t *netdev)
     uint64_t long_addr;
     uint16_t short_addr;
 
-    assert(netdev->driver->get(netdev, NETOPT_ADDRESS, &short_addr,
+    expect(netdev->driver->get(netdev, NETOPT_ADDRESS, &short_addr,
                                sizeof(short_addr)) == sizeof(uint16_t));
-    assert(netdev->driver->get(netdev, NETOPT_ADDRESS_LONG, &long_addr,
+    expect(netdev->driver->get(netdev, NETOPT_ADDRESS_LONG, &long_addr,
                                sizeof(long_addr)) == sizeof(uint64_t));
 
     /* we are on native, so using PRIu* is okay */

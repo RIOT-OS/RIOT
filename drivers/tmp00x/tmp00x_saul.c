@@ -22,6 +22,7 @@
 
 #include "saul.h"
 #include "tmp00x.h"
+#include "kernel_defines.h"
 
 static int read_temp(const void *dev, phydat_t *res)
 {
@@ -30,13 +31,14 @@ static int read_temp(const void *dev, phydat_t *res)
         return -ECANCELED;
     }
     res->val[2] = 0;
-#if TMP00X_USE_RAW_VALUES
-    res->unit = UNIT_NONE;
-    res->scale = 0;
-#else
-    res->unit = UNIT_TEMP_C;
-    res->scale = -2;
-#endif
+    if (IS_ACTIVE(CONFIG_TMP00X_USE_RAW_VALUES)) {
+        res->unit = UNIT_NONE;
+        res->scale = 0;
+    }
+    else {
+        res->unit = UNIT_TEMP_C;
+        res->scale = -2;
+    }
     return 2;
 }
 

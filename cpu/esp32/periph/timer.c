@@ -111,8 +111,8 @@ struct hw_timer_t {
 };
 
 struct hw_timer_hw_t {
-    struct hw_timer_regs_t* regs;     /* timer configuration regs */
-    struct hw_timer_ints_t* int_regs; /* timer interrupt regs */
+    volatile struct hw_timer_regs_t* regs;     /* timer configuration regs */
+    volatile struct hw_timer_ints_t* int_regs; /* timer interrupt regs */
     uint8_t int_mask;  /* timer interrupt bit mask in interrupt regs */
     uint8_t int_src;   /* timer interrupt source */
 };
@@ -144,10 +144,8 @@ static const struct hw_timer_hw_t timers_hw[HW_TIMER_NUMOF] =
 /** Latches the current counter value and return only the low part */
 static inline uint32_t timer_get_counter_lo(tim_t dev)
 {
-    /* we have to latch the current timer value */
+    /* latch the current timer value by writing any value to the update reg */
     timers_hw[dev].regs->UPDATE_REG = 0;
-    /* wait until instructions have been finished */
-    __asm__ volatile ("isync");
     /* read high and low part of counter */
     return timers_hw[dev].regs->LO_REG;
 }
@@ -159,10 +157,8 @@ static inline void timer_get_counter(tim_t dev, uint32_t* hi, uint32_t* lo)
     if (!hi || !lo) {
         return;
     }
-    /* we have to latch the current timer value */
+    /* latch the current timer value by writing any value to the update reg */
     timers_hw[dev].regs->UPDATE_REG = 0;
-    /* wait until instructions have been finished */
-    __asm__ volatile ("isync");
     /* read high and low part of counter */
     *hi = timers_hw[dev].regs->HI_REG;
     *lo = timers_hw[dev].regs->LO_REG;
@@ -278,7 +274,6 @@ int IRAM timer_set(tim_t dev, int chn, unsigned int delta)
 
     /* wait until instructions have been finished */
     timers_hw[dev].regs->CONFIG_REG.EN = 1;
-    __asm__ volatile ("isync");
 
     /* clear the bit in status and set the bit in interrupt enable */
     timers_hw[dev].int_regs->INT_CLR_REG |= timers_hw[dev].int_mask;

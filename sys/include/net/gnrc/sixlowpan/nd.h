@@ -27,6 +27,7 @@
 
 #include "kernel_types.h"
 #include "net/gnrc/pkt.h"
+#include "net/gnrc/sixlowpan/config.h"
 #include "net/ipv6/addr.h"
 #include "net/ndp.h"
 #include "net/sixlowpan/nd.h"
@@ -34,20 +35,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifndef GNRC_SIXLOWPAN_ND_AR_LTIME
-/**
- * @brief   Registration lifetime in minutes for the address registration option
- *
- * This value should be adapted to the devices power-lifecycle so that it is greater than the
- * time the device spends sleeping.
- *
- * @see <a href="https://tools.ietf.org/html/rfc6775#section-5.8.1">
- *          RFC 6775, section 5.8.1
- *      </a>
- */
-#define GNRC_SIXLOWPAN_ND_AR_LTIME          (15U)
 #endif
 
 /**

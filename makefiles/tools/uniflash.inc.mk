@@ -1,11 +1,13 @@
 # http://www.ti.com/tool/uniflash
 FLASHFILE ?= $(ELFFILE)
 
-UNIFLASH_CONFIG_CCXML ?= $(BOARDSDIR)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).ccxml
-UNIFLASH_CONFIG_DAT ?= $(BOARDSDIR)/$(BOARD)/dist/$(CPU_MODEL)_$(XDEBUGGER).dat
-UNIFLASH_CONFIG_GDB ?= $(BOARDSDIR)/$(BOARD)/dist/$(CPU_MODEL)_gdb.conf
+UNIFLASH_CONFIG ?= $(BOARDDIR)/dist
 
-export UNIFLASH_PATH ?= "UNIFLASH_PATH unconfigured"
+UNIFLASH_CONFIG_CCXML ?= $(UNIFLASH_CONFIG)/$(CPU_MODEL)_$(XDEBUGGER).ccxml
+UNIFLASH_CONFIG_DAT ?= $(UNIFLASH_CONFIG)/$(CPU_MODEL)_$(XDEBUGGER).dat
+UNIFLASH_CONFIG_GDB ?= $(UNIFLASH_CONFIG)/$(CPU_MODEL)_gdb.conf
+
+UNIFLASH_PATH ?= "UNIFLASH_PATH unconfigured"
 # check which uniflash version is available, either 4.x or 3.x
 ifneq ("$(wildcard $(UNIFLASH_PATH)/dslite.sh)","")
   FLASHER ?= $(UNIFLASH_PATH)/dslite.sh
@@ -24,8 +26,10 @@ else
   RESET ?= $(UNIFLASH_PATH)/uniflash.sh
   RESET_FLAGS ?= -ccxml $(UNIFLASH_CONFIG_CCXML) -reset
 endif
+
+CCS_PATH ?= "CCS_PATH unconfigured"
 # configure the debug server
-DEBUGSERVER = $(UNIFLASH_PATH)/ccs_base/common/uscif/gdb_agent_console
+DEBUGSERVER = $(CCS_PATH)/ccs/ccs_base/common/uscif/gdb_agent_console
 DEBUGSERVER_FLAGS = -p 3333 $(UNIFLASH_CONFIG_DAT)
 
 # configure the debugging tool

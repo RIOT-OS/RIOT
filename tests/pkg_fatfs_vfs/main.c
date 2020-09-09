@@ -292,8 +292,104 @@ static void test_create(void)
     nw = vfs_write(fd, test_txt, sizeof(test_txt));
     print_test_result("test_create__write_wo", nw == sizeof(test_txt));
     print_test_result("test_create__close_wo", vfs_close(fd) == 0);
+
+    /* test create if file exists */
+    fd = vfs_open(FULL_FNAME1, O_WRONLY | O_CREAT, 0);
+    print_test_result("test_create__open_wo2", fd >= 0);
+
+    nw = vfs_write(fd, test_txt, sizeof(test_txt));
+    print_test_result("test_create__write_wo2", nw == sizeof(test_txt));
+    print_test_result("test_create__close_wo2", vfs_close(fd) == 0);
+
     print_test_result("test_create__umount", vfs_umount(&_test_vfs_mount) == 0);
 }
+
+static void test_fstat(void)
+{
+    int fd;
+    struct stat stat_buf;
+
+    print_test_result("test_stat__mount", vfs_mount(&_test_vfs_mount) == 0);
+
+    fd = vfs_open(FULL_FNAME1, O_WRONLY | O_TRUNC, 0);
+    print_test_result("test_stat__open", fd >= 0);
+    print_test_result("test_stat__write",
+            vfs_write(fd, test_txt, sizeof(test_txt)) == sizeof(test_txt));
+    print_test_result("test_stat__close", vfs_close(fd) == 0);
+
+    fd = vfs_open(FULL_FNAME1, O_RDONLY, 0);
+    print_test_result("test_stat__open", fd >= 0);
+    print_test_result("test_stat__stat", vfs_fstat(fd, &stat_buf) == 0);
+    print_test_result("test_stat__close", vfs_close(fd) == 0);
+    print_test_result("test_stat__size", stat_buf.st_size == sizeof(test_txt));
+    print_test_result("test_stat__umount", vfs_umount(&_test_vfs_mount) == 0);
+}
+
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+static void test_libc(void)
+{
+    FILE* fl;
+    char buf[sizeof(test_txt) + sizeof(test_txt2)];
+    print_test_result("test_libc__mount", vfs_mount(&_test_vfs_mount) == 0);
+
+    /* try to open file that doesn't exist */
+    fl = fopen(FULL_FNAME_NXIST, "r");
+    print_test_result("test_libc__fopen", fl == NULL);
+    if (fl) {
+        fclose(fl);
+    }
+
+    /* create new file write and check content */
+    remove(FULL_FNAME2);
+    fl = fopen(FULL_FNAME2, "w+");
+    print_test_result("test_libc__fopen_w", fl != NULL);
+    if (fl) {
+        print_test_result("test_libc__fputs_w", fputs(test_txt, fl) >= 0);
+        rewind(fl);
+        print_test_result("test_libc__fread_w",
+                fread(buf, sizeof(*buf), sizeof(buf), fl) > 0);
+        print_test_result("test_libc__strcmp_w", strcmp(test_txt, buf) == 0);
+        print_test_result("test_libc__fclose_w", fclose(fl) == 0);
+    }
+
+    /* cppcheck-suppress resourceLeak
+     * (reason: cppcheck <2.0 reports a false positive here) */
+    fl = fopen(FULL_FNAME2, "r"); /* open file RO */
+    print_test_result("test_libc__fopen_r", fl != NULL);
+    if (fl) {
+        print_test_result("test_libc__fclose_r", fclose(fl) == 0);
+    }
+
+    /* remove file */
+    print_test_result("test_libc__remove", remove(FULL_FNAME2) == 0);
+
+    /* append to non existing file */
+    fl = fopen(FULL_FNAME2, "a");
+    print_test_result("test_libc__fopen_a", fl != NULL);
+    if (fl) {
+        print_test_result("test_libc__fputs_a", fputs(test_txt, fl) >= 0);
+        print_test_result("test_libc__fclose_a", fclose(fl) == 0);
+    }
+
+    /* append to existing file and check content */
+    fl = fopen(FULL_FNAME2, "a+");
+    print_test_result("test_libc__fopen_a2", fl != NULL);
+    if (fl) {
+        print_test_result("test_libc__fputs_a2", fputs(test_txt2, fl) >= 0);
+        rewind(fl);
+        print_test_result("test_libc__fread_a2",
+                fread(buf, sizeof(*buf), sizeof(buf), fl) > 0);
+        print_test_result("test_libc__strcmp_a2",
+                strncmp(test_txt, buf, strlen(test_txt)) == 0);
+        print_test_result("test_libc__strcmp_a2", strncmp(test_txt2,
+                    &buf[strlen(test_txt)], strlen(test_txt2)) == 0);
+        print_test_result("test_libc__fclose_a2", fclose(fl) == 0);
+    }
+    print_test_result("test_libc__remove", remove(FULL_FNAME2) == 0);
+
+    print_test_result("test_libc__umount", vfs_umount(&_test_vfs_mount) == 0);
+}
+#endif
 
 int main(void)
 {
@@ -324,6 +420,10 @@ int main(void)
     test_unlink();
     test_mkrmdir();
     test_create();
+    test_fstat();
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
+    test_libc();
+#endif
 
     printf("Test end.\n");
     return 0;

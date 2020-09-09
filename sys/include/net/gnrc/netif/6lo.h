@@ -34,7 +34,7 @@ typedef struct {
      * @note    Only available with module
      *          @ref net_gnrc_sixlowpan_frag "gnrc_sixlowpan_frag".
      */
-    uint8_t max_frag_size;
+    uint16_t max_frag_size;
 } gnrc_netif_6lo_t;
 
 #ifdef __cplusplus

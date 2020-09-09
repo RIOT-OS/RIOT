@@ -3,7 +3,7 @@ include ../Makefile.tests_common
 USEMODULE += libfixmath-unittests
 
 ifneq (,$(filter native,$(BOARD)))
-  export LINKFLAGS += -lm
+  LINKFLAGS += -lm
 endif
 
 USEMODULE += printf_float

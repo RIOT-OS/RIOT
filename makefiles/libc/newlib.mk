@@ -14,10 +14,10 @@ ifneq (,$(filter newlib_gnu_source,$(USEMODULE)))
 endif
 
 ifeq (1,$(USE_NEWLIB_NANO))
-  export LINKFLAGS += -specs=nano.specs
+  LINKFLAGS += -specs=nano.specs
 endif
 
-export LINKFLAGS += -lc
+LINKFLAGS += -lc
 
 # Note on `realpath` vs `abspath`
 #

@@ -46,7 +46,17 @@ extern "C" {
 #define ILI9341_PARAM_RST          GPIO_UNDEF
 #endif
 #ifndef ILI9341_PARAM_SPI_MODE
-#define ILI9341_PARAM_SPI_MODE      SPI_MODE_0
+#define ILI9341_PARAM_SPI_MODE     SPI_MODE_0
+#endif
+#ifndef ILI9341_PARAM_RGB
+#define ILI9341_PARAM_RGB          0
+#endif
+#ifndef ILI9341_PARAM_INVERTED
+#define ILI9341_PARAM_INVERTED     0
+#endif
+
+#ifndef ILI9341_PARAM_NUM_LINES
+#define ILI9341_PARAM_NUM_LINES    320U
 #endif
 
 #ifndef ILI9341_PARAMS
@@ -56,6 +66,9 @@ extern "C" {
                                       .cs_pin = ILI9341_PARAM_CS, \
                                       .dcx_pin = ILI9341_PARAM_DCX, \
                                       .rst_pin = ILI9341_PARAM_RST, \
+                                      .rgb = ILI9341_PARAM_RGB, \
+                                      .inverted = ILI9341_PARAM_INVERTED, \
+                                      .lines = ILI9341_PARAM_NUM_LINES, \
                                     }
 #endif
 /**@}*/

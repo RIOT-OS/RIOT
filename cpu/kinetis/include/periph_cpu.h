@@ -130,9 +130,32 @@ typedef uint16_t gpio_t;
 #define PERIPH_TIMER_PROVIDES_SET
 
 /**
- * @brief   number of usable power modes
+ * @name    Kinetis power mode configuration
+ * @{
  */
-#define PM_NUM_MODES    (1U)
+#define PM_NUM_MODES    (3U)
+enum {
+    KINETIS_PM_LLS  = 0,
+    KINETIS_PM_VLPS = 1,
+    KINETIS_PM_STOP = 2,
+    KINETIS_PM_WAIT = 3,
+};
+#if MODULE_PM_LAYERED
+#include "pm_layered.h"
+/**
+ * @brief   pm_block iff pm_layered is used
+ */
+#define PM_BLOCK(x) pm_block(x)
+/**
+ * @brief   pm_unblock iff pm_layered is used
+ */
+#define PM_UNBLOCK(x) pm_unblock(x)
+#else
+/* ignore these calls when not using pm_layered */
+#define PM_BLOCK(x)
+#define PM_UNBLOCK(x)
+#endif
+/** @} */
 
 #ifdef RTC
 /* All Kinetis CPUs have exactly one RTC hardware module, except for the KL02

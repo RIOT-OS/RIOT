@@ -129,7 +129,7 @@ static void test_sixlowpan_ctx_lookup_addr__same_addr(void)
     TEST_ASSERT_EQUAL_INT(GNRC_SIXLOWPAN_CTX_FLAGS_COMP | DEFAULT_TEST_ID, ctx->flags_id);
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_PREFIX_LEN, ctx->prefix_len);
     TEST_ASSERT(TEST_UINT16 >= ctx->ltime);
-    TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN >= ipv6_addr_match_prefix(&addr, &ctx->prefix));
+    TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN <= ipv6_addr_match_prefix(&addr, &ctx->prefix));
 }
 
 static void test_sixlowpan_ctx_lookup_addr__other_addr_same_prefix(void)
@@ -144,7 +144,7 @@ static void test_sixlowpan_ctx_lookup_addr__other_addr_same_prefix(void)
     TEST_ASSERT_EQUAL_INT(GNRC_SIXLOWPAN_CTX_FLAGS_COMP | DEFAULT_TEST_ID, ctx->flags_id);
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_PREFIX_LEN, ctx->prefix_len);
     TEST_ASSERT(TEST_UINT16 >= ctx->ltime);
-    TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN >= ipv6_addr_match_prefix(&addr1, &ctx->prefix));
+    TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN <= ipv6_addr_match_prefix(&addr1, &ctx->prefix));
 }
 
 static void test_sixlowpan_ctx_lookup_addr__other_addr_other_prefix(void)
@@ -179,7 +179,7 @@ static void test_sixlowpan_ctx_lookup_id__success(void)
     TEST_ASSERT_EQUAL_INT(GNRC_SIXLOWPAN_CTX_FLAGS_COMP | DEFAULT_TEST_ID, ctx->flags_id);
     TEST_ASSERT_EQUAL_INT(DEFAULT_TEST_PREFIX_LEN, ctx->prefix_len);
     TEST_ASSERT(TEST_UINT16 >= ctx->ltime);
-    TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN >= ipv6_addr_match_prefix(&addr, &ctx->prefix));
+    TEST_ASSERT(DEFAULT_TEST_PREFIX_LEN <= ipv6_addr_match_prefix(&addr, &ctx->prefix));
 }
 
 static void test_sixlowpan_ctx_remove(void)

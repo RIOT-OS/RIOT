@@ -100,7 +100,7 @@ static bool _esp_now_scan_peers_done = false;
 static wifi_ap_record_t* aps = NULL;
 static uint32_t aps_size = 0;
 
-static const wifi_scan_config_t scan_cfg = {
+static wifi_scan_config_t scan_cfg = {
         .ssid = NULL,
         .bssid = NULL,
         .channel = ESP_NOW_CHANNEL,
@@ -185,7 +185,7 @@ static void IRAM_ATTR esp_now_scan_peers_timer_cb(void* arg)
 
     if (dev->netdev.event_callback) {
         dev->scan_event++;
-        dev->netdev.event_callback((netdev_t*)dev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr((netdev_t*)dev);
     }
 }
 
@@ -290,6 +290,9 @@ static esp_err_t IRAM_ATTR _esp_system_event_handler(void *ctx, system_event_t *
 extern esp_err_t esp_system_event_add_handler(system_event_cb_t handler,
                                               void *arg);
 
+/* ESP-NOW SoftAP configuration */
+static wifi_config_t wifi_config_ap = {};
+
 esp_now_netdev_t *netdev_esp_now_setup(void)
 {
     esp_now_netdev_t* dev = &_esp_now_dev;
@@ -360,9 +363,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     /* get SoftAP interface mac address and store it as device address */
     esp_read_mac(dev->addr, ESP_MAC_WIFI_SOFTAP);
 
-    /* prepare the ESP_NOW configuration for SoftAP */
-    wifi_config_t wifi_config_ap = {};
-
+    /* prepare initial ESP_NOW configuration for SoftAP */
     strcpy ((char*)wifi_config_ap.ap.password, esp_now_params.softap_pass);
     sprintf((char*)wifi_config_ap.ap.ssid, "%s%02x%02x%02x%02x%02x%02x",
             ESP_NOW_AP_PREFIX,
@@ -450,6 +451,31 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
 #endif /* ESP_NOW_UNICAST */
 
     return dev;
+}
+
+int esp_now_set_channel(uint8_t channel)
+{
+#ifdef ESP_NOW_UNICAST
+    scan_cfg.channel = channel;
+#endif
+#ifdef MODULE_ESP_WIFI
+    /* channel is controlled by `esp_wifi`, only update SoftAP info */
+    wifi_config_ap.ap.channel = channel;
+    return ESP_ERR_NOT_SUPPORTED;
+#else
+    /* channel is controlled by `esp_now`, try to reconfigure SoftAP */
+    uint8_t old_channel = wifi_config_ap.ap.channel;
+    wifi_config_ap.ap.channel = channel;
+    esp_err_t result = esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config_ap);
+    if (result != ESP_OK) {
+        LOG_TAG_ERROR("esp_now",
+                      "esp_wifi_set_config softap failed with return value %d\n",
+                      result);
+        wifi_config_ap.ap.channel = old_channel;
+        return result;
+    }
+    return ESP_OK;
+#endif
 }
 
 static int _init(netdev_t *netdev)
@@ -636,6 +662,12 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             res = sizeof(dev->addr);
             break;
 
+        case NETOPT_CHANNEL:
+            CHECK_PARAM_RET(max_len >= sizeof(uint16_t), -EOVERFLOW);
+            *((uint16_t *)val) = wifi_config_ap.ap.channel;
+            res = sizeof(uint16_t);
+            break;
+
         default:
             DEBUG("%s: %s not supported\n", __func__, netopt2str(opt));
             break;
@@ -667,6 +699,15 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t max_len)
             CHECK_PARAM_RET(max_len >= sizeof(dev->addr), -EOVERFLOW);
             memcpy(dev->addr, val, sizeof(dev->addr));
             res = sizeof(dev->addr);
+            break;
+
+        case NETOPT_CHANNEL:
+            CHECK_PARAM_RET(max_len >= sizeof(uint16_t), -EOVERFLOW);
+            uint16_t channel = *((uint16_t *)val);
+            if (esp_now_set_channel(channel) != ESP_OK) {
+                return -ENOTSUP;
+            }
+            res = sizeof(uint16_t);
             break;
 
         default:

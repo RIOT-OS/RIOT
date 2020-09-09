@@ -26,7 +26,7 @@
 
 #include "shell.h"
 
-#include "suit/coap.h"
+#include "suit/transport/coap.h"
 #include "riotboot/slot.h"
 
 #ifdef MODULE_PERIPH_GPIO

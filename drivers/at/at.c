@@ -14,6 +14,7 @@
 #include "isrpipe.h"
 #include "isrpipe/read_timeout.h"
 #include "periph/uart.h"
+#include "event/thread.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -22,39 +23,79 @@
 #define AT_PRINT_INCOMING (0)
 #endif
 
-static void _isrpipe_write_one_wrapper(void *_isrpipe, uint8_t data)
+#if defined(MODULE_AT_URC_ISR_LOW)
+#define AT_EVENT_PRIO EVENT_PRIO_LOW
+#elif defined(MODULE_AT_URC_ISR_MEDIUM)
+#define AT_EVENT_PRIO EVENT_PRIO_MEDIUM
+#elif defined(MODULE_AT_URC_ISR_HIGH)
+#define AT_EVENT_PRIO EVENT_PRIO_HIGH
+#endif
+
+#if defined(MODULE_AT_URC_ISR)
+static void _event_process_urc(event_t *_event)
 {
-    isrpipe_write_one(_isrpipe, data);
+    at_dev_t *dev = (at_dev_t *)container_of(_event, at_dev_t, event);
+    at_process_urc(dev, 1000);
+}
+#endif
+
+static void _isrpipe_write_one_wrapper(void *_dev, uint8_t data)
+{
+    at_dev_t *dev = (at_dev_t *) _dev;
+    isrpipe_write_one(&dev->isrpipe, data);
+#if defined(MODULE_AT_URC_ISR)
+    if (data == AT_RECV_EOL_2[0] && !dev->awaiting_response) {
+        event_post(AT_EVENT_PRIO, &dev->event);
+    }
+#endif
 }
 
 int at_dev_init(at_dev_t *dev, uart_t uart, uint32_t baudrate, char *buf, size_t bufsize)
 {
     dev->uart = uart;
+
+#if IS_USED(MODULE_AT_URC_ISR)
+    dev->awaiting_response = false;
+    dev->event.handler = _event_process_urc;
+#endif
+
     isrpipe_init(&dev->isrpipe, (uint8_t *)buf, bufsize);
 
     return uart_init(uart, baudrate, _isrpipe_write_one_wrapper,
-                     &dev->isrpipe);
+                     dev);
 }
 
 int at_expect_bytes(at_dev_t *dev, const char *bytes, uint32_t timeout)
 {
+    int res = 0;
+
+#if IS_USED(MODULE_AT_URC_ISR)
+    dev->awaiting_response = true;
+#endif
+
     while (*bytes) {
         char c;
-        int res;
         if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout)) == 1) {
             if (AT_PRINT_INCOMING) {
                 print(&c, 1);
             }
             if (c != *bytes++) {
-                return -1;
+                res = -1;
+                goto out;
             }
         }
         else {
-            return res;
+            goto out;
         }
     }
+    res = 0;
 
-    return 0;
+out:
+#if IS_USED(MODULE_AT_URC_ISR)
+    dev->awaiting_response = false;
+#endif
+
+    return res;
 }
 
 void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len)
@@ -65,6 +106,10 @@ void at_send_bytes(at_dev_t *dev, const char *bytes, size_t len)
 ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout)
 {
     char *resp_pos = bytes;
+
+#if IS_USED(MODULE_AT_URC_ISR)
+    dev->awaiting_response = true;
+#endif
 
     while (len) {
         int read_res;
@@ -78,6 +123,10 @@ ssize_t at_recv_bytes(at_dev_t *dev, char *bytes, size_t len, uint32_t timeout)
         }
     }
 
+#if IS_USED(MODULE_AT_URC_ISR)
+    dev->awaiting_response = false;
+#endif
+
     return (resp_pos - bytes);
 }
 
@@ -86,9 +135,13 @@ int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
 {
     size_t len = 0;
     char *_string = (char *)string;
+    int res = 0;
+
+#if IS_USED(MODULE_AT_URC_ISR)
+    dev->awaiting_response = true;
+#endif
 
     while (*_string && len < *bytes_len) {
-        int res;
         char c;
         if ((res = isrpipe_read_timeout(&dev->isrpipe, (uint8_t *)&c, 1, timeout)) == 1) {
             if (AT_PRINT_INCOMING) {
@@ -101,12 +154,16 @@ int at_recv_bytes_until_string(at_dev_t *dev, const char *string,
             len++;
         }
         else {
-            *bytes_len = len;
-            return res;
+            break;
         }
     }
     *bytes_len = len;
-    return 0;
+
+#if IS_USED(MODULE_AT_URC_ISR)
+    dev->awaiting_response = false;
+#endif
+
+    return res;
 }
 
 int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
@@ -114,14 +171,14 @@ int at_send_cmd(at_dev_t *dev, const char *command, uint32_t timeout)
     size_t cmdlen = strlen(command);
 
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);
-    uart_write(dev->uart, (const uint8_t *)AT_SEND_EOL, AT_SEND_EOL_LEN);
+    uart_write(dev->uart, (const uint8_t *)CONFIG_AT_SEND_EOL, AT_SEND_EOL_LEN);
 
     if (AT_SEND_ECHO) {
         if (at_expect_bytes(dev, command, timeout)) {
             return -1;
         }
 
-        if (at_expect_bytes(dev, AT_SEND_EOL AT_RECV_EOL_1 AT_RECV_EOL_2, timeout)) {
+        if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_1 AT_RECV_EOL_2, timeout)) {
             return -2;
         }
     }
@@ -134,10 +191,18 @@ void at_drain(at_dev_t *dev)
     uint8_t _tmp[16];
     int res;
 
+#if IS_USED(MODULE_AT_URC_ISR)
+    dev->awaiting_response = true;
+#endif
+
     do {
         /* consider no character within 10ms "drained" */
         res = isrpipe_read_timeout(&dev->isrpipe, _tmp, sizeof(_tmp), 10000U);
     } while (res > 0);
+
+#if IS_USED(MODULE_AT_URC_ISR)
+    dev->awaiting_response = false;
+#endif
 }
 
 ssize_t at_send_cmd_get_resp(at_dev_t *dev, const char *command,
@@ -194,17 +259,17 @@ ssize_t at_send_cmd_get_lines(at_dev_t *dev, const char *command,
         }
         else if (res > 0) {
             bytes_left -= res;
-            size_t len_ok = sizeof(AT_RECV_OK) - 1;
-            size_t len_error = sizeof(AT_RECV_ERROR) - 1;
+            size_t len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
+            size_t len_error = sizeof(CONFIG_AT_RECV_ERROR) - 1;
             if (((size_t )res == (len_ok + keep_eol)) &&
                 (len_ok != 0) &&
-                (strncmp(pos, AT_RECV_OK, len_ok) == 0)) {
+                (strncmp(pos, CONFIG_AT_RECV_OK, len_ok) == 0)) {
                 res = len - bytes_left;
                 break;
             }
             else if (((size_t )res == (len_error + keep_eol)) &&
                      (len_error != 0) &&
-                     (strncmp(pos, AT_RECV_ERROR, len_error) == 0)) {
+                     (strncmp(pos, CONFIG_AT_RECV_ERROR, len_error) == 0)) {
                 return -1;
             }
             else if (strncmp(pos, "+CME ERROR:", 11) == 0) {
@@ -240,13 +305,13 @@ int at_send_cmd_wait_prompt(at_dev_t *dev, const char *command, uint32_t timeout
     at_drain(dev);
 
     uart_write(dev->uart, (const uint8_t *)command, cmdlen);
-    uart_write(dev->uart, (const uint8_t *)AT_SEND_EOL, AT_SEND_EOL_LEN);
+    uart_write(dev->uart, (const uint8_t *)CONFIG_AT_SEND_EOL, AT_SEND_EOL_LEN);
 
     if (at_expect_bytes(dev, command, timeout)) {
         return -1;
     }
 
-    if (at_expect_bytes(dev, AT_SEND_EOL AT_RECV_EOL_2, timeout)) {
+    if (at_expect_bytes(dev, CONFIG_AT_SEND_EOL AT_RECV_EOL_2, timeout)) {
         return -2;
     }
 
@@ -265,8 +330,8 @@ int at_send_cmd_wait_ok(at_dev_t *dev, const char *command, uint32_t timeout)
     res = at_send_cmd_get_resp(dev, command, resp_buf, sizeof(resp_buf), timeout);
 
     if (res > 0) {
-        ssize_t len_ok = sizeof(AT_RECV_OK) - 1;
-        if ((len_ok != 0) && (strcmp(resp_buf, AT_RECV_OK) == 0)) {
+        ssize_t len_ok = sizeof(CONFIG_AT_RECV_OK) - 1;
+        if ((len_ok != 0) && (strcmp(resp_buf, CONFIG_AT_RECV_OK) == 0)) {
             res = 0;
         }
         else {
@@ -284,6 +349,10 @@ ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, ui
 
     ssize_t res = -1;
     char *resp_pos = resp_buf;
+
+#if IS_USED(MODULE_AT_URC_ISR)
+    dev->awaiting_response = true;
+#endif
 
     memset(resp_buf, 0, len);
 
@@ -315,6 +384,10 @@ ssize_t at_readline(at_dev_t *dev, char *resp_buf, size_t len, bool keep_eol, ui
     }
 
 out:
+#if IS_USED(MODULE_AT_URC_ISR)
+    dev->awaiting_response = false;
+#endif
+
     if (res < 0) {
         *resp_buf = '\0';
     }

@@ -56,7 +56,7 @@ extern "C" {
 extern const char assert_crash_message[];
 
 #ifdef NDEBUG
-#define assert(ignore)((void) 0)
+#define assert(ignore)((void)0)
 #elif defined(DEBUG_ASSERT_VERBOSE)
 /**
  * @brief   Function to handle failed assertion
@@ -101,9 +101,11 @@ NORETURN void _assert_failure(const char *file, unsigned line);
  *
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
  */
-#define assert(cond) ((cond) ? (void)0 :  _assert_failure(RIOT_FILE_RELATIVE, __LINE__))
+#define assert(cond) ((cond) ? (void)0 :  _assert_failure(RIOT_FILE_RELATIVE, \
+                                                          __LINE__))
 #else
-#define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, assert_crash_message))
+#define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, \
+                                                    assert_crash_message))
 #endif
 
 #if !defined __cplusplus

@@ -1,15 +1,23 @@
 # additional modules dependencies
 
-ifneq (, $(filter esp_spiffs, $(USEMODULE)))
-    export SPIFFS_STD_OPTION = -std=c99
-    USEMODULE += spiffs
-    USEMODULE += vfs
+include $(RIOTCPU)/esp_common/Makefile.dep
+
+USEMODULE += esp_idf_esp8266
+USEMODULE += esp_idf_nvs_flash
+USEMODULE += esp_idf_spi_flash
+USEMODULE += esp_idf_util
+USEMODULE += esp_idf_wpa_supplicant_crypto
+USEMODULE += esp_sdk
+USEMODULE += mtd
+USEMODULE += newlib
+USEMODULE += periph_common
+USEMODULE += ps
+
+ifneq (,$(filter periph_i2c,$(USEMODULE)))
+  USEMODULE += esp_i2c_sw
+  USEMODULE += periph_i2c_sw
 endif
 
-ifneq (, $(filter esp_wifi, $(USEMODULE)))
-    USEMODULE += netdev_eth
-endif
-
-ifneq (,$(filter log_color,$(USEMODULE)))
-    USEMODULE += esp_log_colored
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
+  USEMODULE += rtt_rtc
 endif

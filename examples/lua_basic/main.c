@@ -25,7 +25,7 @@
 #include "lualib.h"
 #include "lua_run.h"
 
-#include "main.lua.h"
+#include "blob/main.lua.h"
 
 #define LUA_MEM_SIZE (11000)
 static char lua_mem[LUA_MEM_SIZE] __attribute__ ((aligned(__BIGGEST_ALIGNMENT__)));

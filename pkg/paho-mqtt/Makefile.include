@@ -1,0 +1,8 @@
+INCLUDES += -I$(PKGDIRBASE)/paho-mqtt/MQTTClient-C/src/
+INCLUDES += -I$(PKGDIRBASE)/paho-mqtt/MQTTPacket/src
+INCLUDES += -I$(RIOTBASE)/pkg/paho-mqtt/include
+
+DIRS += $(RIOTBASE)/pkg/paho-mqtt/contrib
+
+#define to use MQTT Paho as a task using MQTTStartTask()
+CFLAGS += -DMQTT_TASK=1

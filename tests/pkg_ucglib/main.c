@@ -55,31 +55,11 @@
 #endif
 
 #include "xtimer.h"
+
 #include "ucg.h"
+#include "ucg_riotos.h"
 
 #include "logo.h"
-
-#if TEST_OUTPUT == TEST_OUTPUT_SPI
-/**
- * @brief   RIOT-OS pin mapping of Ucglib pin numbers to RIOT-OS GPIO pins.
- * @note    To minimize the overhead, you can implement an alternative for
- *          ucg_com_riotos_hw_spi.
- */
-static gpio_t pins[] = {
-    [UCG_PIN_CS] = TEST_PIN_CS,
-    [UCG_PIN_CD] = TEST_PIN_CD,
-    [UCG_PIN_RST] = TEST_PIN_RESET
-};
-
-/**
- * @brief   Bit mapping to indicate which pins are set.
- */
-static uint32_t pins_enabled = (
-    (1 << UCG_PIN_CS) +
-    (1 << UCG_PIN_CD) +
-    (1 << UCG_PIN_RST)
-    );
-#endif
 
 int main(void)
 {
@@ -90,7 +70,7 @@ int main(void)
     /* initialize dummy output */
     puts("Initializing dummy output.");
 
-    ucg_Init(&ucg, ucg_dev_dummy_cb, ucg_ext_none, NULL);
+    ucg_Init(&ucg, ucg_dev_dummy_riotos, ucg_ext_none, NULL);
 #endif
 
 #if TEST_OUTPUT == TEST_OUTPUT_SDL
@@ -104,10 +84,17 @@ int main(void)
     /* initialize to SPI */
     puts("Initializing to SPI.");
 
-    ucg_SetPins(&ucg, pins, pins_enabled);
-    ucg_SetDevice(&ucg, SPI_DEV(TEST_SPI));
+    ucg_riotos_t user_data =
+    {
+        .device_index = TEST_SPI,
+        .pin_cs = TEST_PIN_CS,
+        .pin_cd = TEST_PIN_CD,
+        .pin_reset = TEST_PIN_RESET,
+    };
 
-    ucg_Init(&ucg, TEST_DISPLAY, TEST_DISPLAY_EXT, ucg_com_riotos_hw_spi);
+    ucg_SetUserPtr(&ucg, &user_data);
+
+    ucg_Init(&ucg, TEST_DISPLAY, TEST_DISPLAY_EXT, ucg_com_hw_spi_riotos);
 #endif
 
     /* initialize the display */

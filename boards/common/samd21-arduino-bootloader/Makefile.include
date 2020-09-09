@@ -1,0 +1,13 @@
+# setup the flash tool used
+# Bossa is the default programmer
+PROGRAMMER ?= bossa
+
+ifeq ($(PROGRAMMER),bossa)
+  # by default, we use BOSSA to flash this board and take into account the
+  # preinstalled Arduino bootloader. ROM_OFFSET skips the space taken by
+  # such bootloader.
+  ROM_OFFSET ?= 0x2000
+  BOSSA_ARDUINO_PREFLASH = yes
+
+  include $(RIOTMAKE)/tools/bossa.inc.mk
+endif

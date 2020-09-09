@@ -24,6 +24,8 @@
 #include "net/gcoap.h"
 #include "net/cord/epsim.h"
 #include "net/cord/common.h"
+#include "net/sock/util.h"
+#include "net/ipv6/addr.h"
 
 #define BUFSIZE             (64U)
 #define STARTUP_DELAY       (3U)    /* wait 3s before sending first request*/
@@ -67,24 +69,42 @@ static gcoap_listener_t listener = {
 
 int main(void)
 {
+    char ep_str[CONFIG_SOCK_URLPATH_MAXLEN];
+    uint16_t ep_port;
+
     puts("Simplified CoRE RD registration example\n");
 
     /* fill riot info */
     sprintf(riot_info, "{\"ep\":\"%s\",\"lt\":%u}",
-            cord_common_get_ep(), CORD_LT);
+            cord_common_get_ep(), CONFIG_CORD_LT);
 
     /* parse RD address information */
-    sock_udp_ep_t rd_ep = {
-        .family    = AF_INET6,
-        .netif     = SOCK_ADDR_ANY_NETIF,
-        .port      = RD_PORT,
-    };
+    sock_udp_ep_t rd_ep;
 
-    /* parse RD server address */
-    if (ipv6_addr_from_str((ipv6_addr_t *)&rd_ep.addr.ipv6, RD_ADDR) == NULL) {
+    if (sock_udp_str2ep(&rd_ep, RD_ADDR) < 0) {
         puts("error: unable to parse RD address from RD_ADDR variable");
         return 1;
     }
+
+    /* if netif is not specified in addr and it's link local */
+    if ((rd_ep.netif == SOCK_ADDR_ANY_NETIF) &&
+         ipv6_addr_is_link_local((ipv6_addr_t *) &rd_ep.addr.ipv6)) {
+        /* if there is only one interface we use that */
+        if (gnrc_netif_numof() == 1) {
+            rd_ep.netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
+        }
+        /* if there are many it's an error */
+        else {
+            puts("error: must specify an interface for a link local address");
+            return 1;
+        }
+    }
+
+    if (rd_ep.port == 0) {
+        rd_ep.port = COAP_PORT;
+    }
+
+    sock_udp_ep_fmt(&rd_ep, ep_str, &ep_port);
 
     /* register resource handlers with gcoap */
     gcoap_register_listener(&listener);
@@ -92,8 +112,8 @@ int main(void)
     /* print RD client information */
     puts("epsim configuration:");
     printf("         ep: %s\n", cord_common_get_ep());
-    printf("         lt: %is\n", (int)CORD_LT);
-    printf(" RD address: [%s]:%u\n\n", RD_ADDR, (unsigned)RD_PORT);
+    printf("         lt: %is\n", (int)CONFIG_CORD_LT);
+    printf(" RD address: [%s]:%u\n\n", ep_str, ep_port);
 
     xtimer_sleep(STARTUP_DELAY);
 
@@ -112,8 +132,7 @@ int main(void)
                 break;
         }
 
-        printf("updating registration with RD [%s]:%u\n", RD_ADDR,
-               (unsigned)RD_PORT);
+        printf("updating registration with RD [%s]:%u\n", ep_str, ep_port);
         res = cord_epsim_register(&rd_ep);
         if (res == CORD_EPSIM_BUSY) {
             puts("warning: registration already in progress");
@@ -121,7 +140,7 @@ int main(void)
         else if (res == CORD_EPSIM_ERROR) {
             puts("error: unable to trigger simple registration process");
         }
-        xtimer_sleep(CORD_UPDATE_INTERVAL);
+        xtimer_sleep(CONFIG_CORD_UPDATE_INTERVAL);
     }
 
     return 0;

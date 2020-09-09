@@ -22,13 +22,15 @@
 
 #include <stdio.h>
 
+#include "test_utils/expect.h"
 #include "thread.h"
 #include "event.h"
 #include "event/timeout.h"
 #include "event/callback.h"
 
-#define STACKSIZE       THREAD_STACKSIZE_DEFAULT
-#define PRIO            (THREAD_PRIORITY_MAIN - 1)
+#define STACKSIZE               THREAD_STACKSIZE_DEFAULT
+#define PRIO                    (THREAD_PRIORITY_MAIN - 1)
+#define DELAYED_QUEUES_NUMOF    2
 
 static char stack[STACKSIZE];
 
@@ -41,17 +43,19 @@ static void timed_callback(void *arg);
 static void forbidden_callback(void *arg);
 static void delayed_callback1(event_t *arg);
 static void delayed_callback2(event_t *arg);
+static void delayed_callback3(event_t *arg);
 
 static event_t event = { .handler = callback };
 static event_t event2 = { .handler = callback };
 static event_t delayed_event1 = { .handler = delayed_callback1 };
 static event_t delayed_event2 = { .handler = delayed_callback2 };
+static event_t delayed_event3 = { .handler = delayed_callback3 };
 
 static void callback(event_t *arg)
 {
     order++;
-    assert(order == 3);
-    assert(arg == &event);
+    expect(order == 4);
+    expect(arg == &event);
     printf("triggered 0x%08x\n", (unsigned)arg);
 }
 
@@ -67,8 +71,8 @@ static event_callback_t noevent_callback = EVENT_CALLBACK_INIT(forbidden_callbac
 static void custom_callback(event_t *event)
 {
     order++;
-    assert(order == 4);
-    assert(event == (event_t *)&custom_event);
+    expect(order == 5);
+    expect(event == (event_t *)&custom_event);
     custom_event_t *custom_event = (custom_event_t *)event;
     printf("triggered custom event with text: \"%s\"\n", custom_event->text);
 }
@@ -76,10 +80,10 @@ static void custom_callback(event_t *event)
 static void timed_callback(void *arg)
 {
     order++;
-    assert(order == 5);
-    assert(arg == event_callback.arg);
+    expect(order == 6);
+    expect(arg == event_callback.arg);
     uint32_t now = xtimer_now_usec();
-    assert((now - before >= 100000LU));
+    expect((now - before >= 100000LU));
     printf("triggered timed callback with arg 0x%08x after %" PRIu32 "us\n", (unsigned)arg, now - before);
     puts("[SUCCESS]");
 }
@@ -91,34 +95,43 @@ static void forbidden_callback(void *arg)
     puts("call to forbidden callback");
     puts("[FAILED]");
     while (1) {
-        assert(false);
+        expect(false);
     }
 }
 
 static void delayed_callback1(event_t *arg)
 {
     order++;
-    assert(order == 1);
-    assert(arg == &delayed_event1);
+    expect(order == 2);
+    expect(arg == &delayed_event1);
     printf("triggered delayed event %p\n", (void *)arg);
 }
 
 static void delayed_callback2(event_t *arg)
 {
     order++;
-    assert(order == 2);
-    assert(arg == &delayed_event2);
+    expect(order == 3);
+    expect(arg == &delayed_event2);
+    printf("triggered delayed event %p\n", (void *)arg);
+}
+
+static void delayed_callback3(event_t *arg)
+{
+    order++;
+    expect(order == 1);
+    expect(arg == &delayed_event3);
     printf("triggered delayed event %p\n", (void *)arg);
 }
 
 static void *claiming_thread(void *arg)
 {
-    event_queue_t *dq = (event_queue_t *)arg;
+    event_queue_t *dqs = arg;
 
-    printf("claiming event queue %p\n", (void *)dq);
-    event_queue_claim(dq);
-    printf("launching event queue %p\n", (void *)dq);
-    event_loop(dq);
+    printf("claiming event queues %p\n", (void *)dqs);
+    event_queues_claim(dqs, DELAYED_QUEUES_NUMOF);
+
+    printf("launching event queue for queues %p\n", (void *)dqs);
+    event_loop_multi(dqs, DELAYED_QUEUES_NUMOF);
 
     return NULL;
 }
@@ -128,17 +141,22 @@ int main(void)
     puts("[START] event test application.\n");
 
     /* test creation of delayed claiming of a detached event queue */
-    event_queue_t dq = EVENT_QUEUE_INIT_DETACHED;
-    printf("initializing detached event queue %p\n", (void *)&dq);
-    event_queue_init_detached(&dq);
+    event_queue_t dqs[DELAYED_QUEUES_NUMOF] = {
+        EVENT_QUEUE_INIT_DETACHED, EVENT_QUEUE_INIT_DETACHED
+    };
+    printf("initializing detached event queues %p\n", (void *)dqs);
+    event_queue_init_detached(&dqs[0]);
+    event_queue_init_detached(&dqs[1]);
 
-    printf("posting %p\n", (void *)&delayed_event1);
-    event_post(&dq, &delayed_event1);
-    printf("posting %p\n", (void *)&delayed_event2);
-    event_post(&dq, &delayed_event2);
+    printf("posting %p to delayed queue at index 1\n", (void *)&delayed_event1);
+    event_post(&dqs[1], &delayed_event1);
+    printf("posting %p to delayed queue at index 1\n", (void *)&delayed_event2);
+    event_post(&dqs[1], &delayed_event2);
+    printf("posting %p to delayed queue at index 0\n", (void *)&delayed_event3);
+    event_post(&dqs[0], &delayed_event3);
 
-    printf("running thread that will claim event queue %p\n", (void *)&dq);
-    thread_create(stack, sizeof(stack), PRIO, 0, claiming_thread, &dq, "ct");
+    printf("running thread that will claim event queues %p\n", (void *)&dqs);
+    thread_create(stack, sizeof(stack), PRIO, 0, claiming_thread, dqs, "ct");
 
     /* test posting different kind of events in order to a statically
      * initialized queue */

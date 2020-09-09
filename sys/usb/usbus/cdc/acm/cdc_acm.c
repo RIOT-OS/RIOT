@@ -16,6 +16,8 @@
  * @}
  */
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #include <string.h>
 
 #include "tsrb.h"
@@ -145,15 +147,35 @@ static size_t _gen_full_acm_descriptor(usbus_t *usbus, void *arg)
 /* Submit (ACM interface in) */
 size_t usbus_cdc_acm_submit(usbus_cdcacm_device_t *cdcacm, const uint8_t *buf, size_t len)
 {
-    return tsrb_add(&cdcacm->tsrb, buf, len);
+    size_t n;
+    unsigned old;
+    if (cdcacm->state != USBUS_CDC_ACM_LINE_STATE_DISCONNECTED) {
+        old = irq_disable();
+        n = tsrb_add(&cdcacm->tsrb, buf, len);
+        irq_restore(old);
+        return n;
+    }
+    /* stuff as much data as possible into tsrb, discarding the oldest */
+    old = irq_disable();
+    n = tsrb_free(&cdcacm->tsrb);
+    if (len > n) {
+        n += tsrb_drop(&cdcacm->tsrb, len - n);
+        buf += len - n;
+    } else {
+        n = len;
+    }
+    tsrb_add(&cdcacm->tsrb, buf, n);
+    /* behave as if everything has been written correctly */
+    irq_restore(old);
+    return len;
 }
 
 void usbus_cdc_acm_set_coding_cb(usbus_cdcacm_device_t *cdcacm,
                                  usbus_cdcacm_coding_cb_t coding_cb)
 {
-    irq_disable();
+    unsigned old = irq_disable();
     cdcacm->coding_cb = coding_cb;
-    irq_enable();
+    irq_restore(old);
 }
 
 /* flush event */
@@ -210,14 +232,14 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_enable_endpoint(ep);
     ep = usbus_add_endpoint(usbus, &cdcacm->iface_data,
                             USB_EP_TYPE_BULK, USB_EP_DIR_IN,
-                            USBUS_CDC_ACM_BULK_EP_SIZE);
+                            CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
     ep->interval = 0; /* Interval is not used with bulk endpoints */
     usbus_enable_endpoint(ep);
     /* Store the endpoint reference to activate it
      * when DTE present is signalled by the host */
     ep = usbus_add_endpoint(usbus, &cdcacm->iface_data,
                             USB_EP_TYPE_BULK, USB_EP_DIR_OUT,
-                            USBUS_CDC_ACM_BULK_EP_SIZE);
+                            CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE);
     ep->interval = 0; /* Interval is not used with bulk endpoints */
     usbus_enable_endpoint(ep);
 
@@ -297,13 +319,16 @@ static void _handle_in(usbus_cdcacm_device_t *cdcacm,
         (cdcacm->state != USBUS_CDC_ACM_LINE_STATE_DTE)) {
         return;
     }
+    /* copy at most CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE chars from input into ep->buf */
+    unsigned old = irq_disable();
     while (!tsrb_empty(&cdcacm->tsrb)) {
         int c = tsrb_get_one(&cdcacm->tsrb);
         ep->buf[cdcacm->occupied++] = (uint8_t)c;
-        if (cdcacm->occupied >= USBUS_CDC_ACM_BULK_EP_SIZE) {
+        if (cdcacm->occupied >= CONFIG_USBUS_CDC_ACM_BULK_EP_SIZE) {
             break;
         }
     }
+    irq_restore(old);
     usbdev_ep_ready(ep, cdcacm->occupied);
 }
 

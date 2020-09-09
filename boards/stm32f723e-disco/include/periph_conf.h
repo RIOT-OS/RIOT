@@ -21,6 +21,7 @@
 
 #include "periph_cpu.h"
 #include "cfg_rtt_default.h"
+#include "cfg_usb_otg_fs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,7 +74,7 @@ static const timer_conf_t timer_config[] = {
 
 #define TIMER_0_ISR         isr_tim2
 
-#define TIMER_NUMOF         (sizeof(timer_config) / sizeof(timer_config[0]))
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -90,7 +91,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF8,
@@ -106,7 +107,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF8,
@@ -122,7 +123,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB1,
         .irqn       = UART7_IRQn,
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_PIN(PORT_F, 9),
         .rts_pin    = GPIO_PIN(PORT_F, 8),
         .cts_af     = GPIO_AF8,
@@ -138,7 +139,7 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB1,
         .irqn       = UART5_IRQn,
-#ifdef MODULE_STM32_PERIPH_UART_HW_FC
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin    = GPIO_UNDEF,
         .rts_pin    = GPIO_UNDEF,
         .cts_af     = GPIO_AF8,
@@ -153,7 +154,7 @@ static const uart_conf_t uart_config[] = {
 #define UART_3_ISR          (isr_uart7)
 #define UART_4_ISR          (isr_uart5)
 
-#define UART_NUMOF          (sizeof(uart_config) / sizeof(uart_config[0]))
+#define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
 /**
@@ -176,33 +177,13 @@ static const i2c_conf_t i2c_config[] = {
 
 #define I2C_0_ISR           isr_i2c2_er
 
-#define I2C_NUMOF           (sizeof(i2c_config) / sizeof(i2c_config[0]))
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 54000000Hz */
-        7,  /* -> 210937Hz */
-        6,  /* -> 421875Hz */
-        5,  /* -> 843750Hz */
-        3,  /* -> 3375000Hz */
-        2   /* -> 6750000Hz */
-    },
-    {       /* for APB2 @ 108000000Hz */
-        7,  /* -> 421875Hz */
-        7,  /* -> 421875Hz */
-        6,  /* -> 843750Hz */
-        4,  /* -> 3375000Hz */
-        3   /* -> 6750000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     { /* Arduino connector */
         .dev      = SPI1,
@@ -232,7 +213,7 @@ static const spi_conf_t spi_config[] = {
     },
 };
 
-#define SPI_NUMOF           (sizeof(spi_config) / sizeof(spi_config[0]))
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 #ifdef __cplusplus

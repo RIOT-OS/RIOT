@@ -1,0 +1,51 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_NRF51
+    bool
+    select CPU_CORE_CORTEX_M0
+    select CPU_COMMON_NRF5X
+    select HAS_CPU_NRF51
+
+## CPU Models
+config CPU_MODEL_NRF51X22XXAA
+    bool
+    select CPU_FAM_NRF51
+
+config CPU_MODEL_NRF51X22XXAB
+    bool
+    select CPU_FAM_NRF51
+
+config CPU_MODEL_NRF51X22XXAC
+    bool
+    select CPU_FAM_NRF51
+
+## CPU common symbols
+config CPU_FAM
+    default "nrf51" if CPU_FAM_NRF51
+
+config CPU_MODEL
+    default "nrf51x22xxaa" if CPU_MODEL_NRF51X22XXAA
+    default "nrf51x22xxab" if CPU_MODEL_NRF51X22XXAB
+    default "nrf51x22xxac" if CPU_MODEL_NRF51X22XXAC
+
+config CPU
+    default "nrf51" if CPU_FAM_NRF51
+
+## Definition of specific features
+config HAS_CPU_NRF51
+    bool
+    help
+        Indicates that the current cpu is 'nrf51'.
+
+## Platform-specific defaults
+config GNRC_PKTBUF_SIZE
+    default 2048
+    depends on KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC
+
+source "$(RIOTCPU)/nrf5x_common/Kconfig"

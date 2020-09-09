@@ -29,10 +29,17 @@ extern "C" {
 #endif
 
 /**
+ * @name    Power mode configuration
+ * @{
+ */
+#define PM_NUM_MODES        (3)
+/** @} */
+
+/**
  * @brief   Override the default initial PM blocker
  * @todo   Idle modes are enabled by default, deep sleep mode blocked
  */
-#define PM_BLOCKER_INITIAL  { .val_u32 = 0x00000001 }
+#define PM_BLOCKER_INITIAL      0x00000001
 
 /**
  * @name   SAMD21 sleep modes for PM
@@ -45,33 +52,16 @@ extern "C" {
 /** @} */
 
 /**
- * @brief   Mapping of pins to EXTI lines, -1 means not EXTI possible
+ * @name   SAMD21 GCLK definitions
+ * @{
  */
-static const int8_t exti_config[2][32] = {
-#ifdef CPU_MODEL_SAMD21J18A
-    { 0,  1,  2,  3,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
-      0,  1,  2,  3,  4,  5,  6,  7, 12, 13, -1, 15,  8, -1, 10, 11},
-    { 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-      0,  1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1, -1, -1, 14, 15},
-#elif CPU_MODEL_SAMD21G18A
-    { 0,  1,  2,  3,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
-      0,  1,  2,  3,  4,  5,  6,  7, 12, 13, -1, 15,  8, -1, 10, 11},
-    {-1, -1,  2,  3, -1, -1, -1, -1,  8,  9, 10, 11, -1, -1, -1, -1,
-     -1, -1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1, -1, -1, -1, -1},
-#elif CPU_MODEL_SAMR21G18A
-    {-1,  1, -1, -1,  4,  5,  6,  7, -1,  9, 10, 11, 12, 13, 14, 15,
-     -1,  1,  2,  3, -1, -1,  6,  7, 12, 13, -1, 15,  8, -1, 10, 11},
-    { 0, -1,  2,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-      0,  1, -1, -1, -1, -1,  6,  7, -1, -1, -1, -1,  8, -1, -1, -1},
-#elif CPU_MODEL_SAMR21E18A
-    {-1, -1, -1, -1, -1, -1,  6,  7, -1,  9, 10, 11, -1, -1, 14, 15,
-     -1,  1,  2,  3, -1, -1, -1, -1, 12, 13, -1, 15,  8, -1, 10, 11},
-    { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-      0,  1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
-#else
-    #error Please define a proper CPU_MODEL.
-#endif
+enum {
+    SAM0_GCLK_MAIN = 0,                 /**< 48 MHz main clock      */
+    SAM0_GCLK_1MHZ,                     /**< 1 MHz clock for xTimer */
+    SAM0_GCLK_32KHZ,                    /**< 32 kHz clock           */
+    SAM0_GCLK_1KHZ,                     /**< 1 kHz clock            */
 };
+/** @} */
 
 /**
  * @brief   Override SPI hardware chip select macro
@@ -79,23 +69,6 @@ static const int8_t exti_config[2][32] = {
  * As of now, we do not support HW CS, so we always set it to a fixed value
  */
 #define SPI_HWCS(x)     (UINT_MAX - 1)
-
-/**
- * @brief   PWM channel configuration data structure
- */
-typedef struct {
-    gpio_t pin;                 /**< GPIO pin */
-    gpio_mux_t mux;             /**< pin function multiplex value */
-    uint8_t chan;               /**< TCC channel to use */
-} pwm_conf_chan_t;
-
-/**
- * @brief   PWM device configuration data structure
- */
-typedef struct {
-    Tcc *dev;                   /**< TCC device to use */
-    pwm_conf_chan_t chan[3];    /**< channel configuration */
-} pwm_conf_t;
 
 /**
  * @brief   Return the numeric id of a SERCOM device derived from its address
@@ -125,6 +98,29 @@ typedef enum {
 } adc_res_t;
 /** @} */
 #endif /* ndef DOXYGEN */
+
+/**
+ * @brief   The MCU has a 10 bit DAC
+ */
+#define DAC_RES_BITS        (10)
+
+/**
+ * @brief   The MCU has one DAC Output.
+ */
+#define DAC_NUMOF           (1)
+
+/**
+ * @name    Real time counter configuration
+ * @{
+ */
+#define RTT_RUNSTDBY        (1)         /* Keep RTT running in sleep states */
+
+#define RTT_MAX_VALUE       (0xffffffff)
+#define RTT_CLOCK_FREQUENCY (32768U)                      /* in Hz */
+#define RTT_MIN_FREQUENCY   (RTT_CLOCK_FREQUENCY / 1024U) /* in Hz */
+#define RTT_MAX_FREQUENCY   (RTT_CLOCK_FREQUENCY)         /* in Hz */
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

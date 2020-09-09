@@ -22,7 +22,7 @@
 #include <string.h>
 #include <inttypes.h>
 
-#include "suit/coap.h"
+#include "suit/transport/coap.h"
 
 
 int _suit_handler(int argc, char **argv)

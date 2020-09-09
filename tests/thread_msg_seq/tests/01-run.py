@@ -3,19 +3,26 @@
 import sys
 from testrunner import run
 
+THREAD_NAMES = ("nr1", "nr2", "nr3")
+
 
 def testfunc(child):
     child.expect_exact("START")
+    # Collect pids
+    thread_pids = []
+    for name in THREAD_NAMES:
+        child.expect(r"THREAD {} \(pid:(\d+)\) start".format(name))
+        thread_pids.append(int(child.match.group(1)))
     child.expect_exact("THREADS CREATED")
-    child.expect_exact("THREAD nr1 (pid:3) start")
-    child.expect_exact("THREAD nr1 (pid:3) end.")
-    child.expect_exact("THREAD nr2 (pid:4) start")
-    child.expect_exact("THREAD nr3 (pid:5) start")
-    child.expect_exact("Got msg from pid 3: \"nr1\"")
-    child.expect_exact("THREAD nr2 (pid:4) end.")
-    child.expect_exact("Got msg from pid 4: \"nr2\"")
-    child.expect_exact("THREAD nr3 (pid:5) end.")
-    child.expect_exact("Got msg from pid 5: \"nr3\"")
+
+    for index, name in enumerate(THREAD_NAMES):
+        child.expect(r"THREAD {} \(pid:(\d+)\) end.".format(name))
+        thread_pid = int(child.match.group(1))
+        assert thread_pid == thread_pids[index]
+        child.expect(r'Got msg from pid (\d+): "{}"'.format(name))
+        thread_pid = int(child.match.group(1))
+        assert thread_pid == thread_pids[index]
+
     child.expect_exact("SUCCESS")
 
 

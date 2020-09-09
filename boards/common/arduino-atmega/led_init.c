@@ -26,7 +26,7 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 
-void led_init(void)
+void __attribute__((weak)) led_init(void)
 {
     /* initialize the on-board LED */
     gpio_init(LED0_PIN, GPIO_OUT);

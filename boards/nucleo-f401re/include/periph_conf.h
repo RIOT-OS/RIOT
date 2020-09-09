@@ -29,6 +29,29 @@ extern "C" {
 #endif
 
 /**
+ * @name    DMA streams configuration
+ * @{
+ */
+static const dma_conf_t dma_config[] = {
+    { .stream = 11 },   /* DMA2 Stream 3 - SPI1_TX */
+    { .stream = 10 },   /* DMA2 Stream 2 - SPI1_RX */
+    { .stream = 4 },    /* DMA1 Stream 4 - SPI2_TX */
+    { .stream = 3 },    /* DMA1 Stream 3 - SPI2_RX */
+    { .stream = 5 },    /* DMA1 Stream 5 - SPI3_TX */
+    { .stream = 0 },    /* DMA1 Stream 0 - SPI3_RX */
+};
+
+#define DMA_0_ISR           isr_dma2_stream3
+#define DMA_1_ISR           isr_dma2_stream2
+#define DMA_2_ISR           isr_dma1_stream4
+#define DMA_3_ISR           isr_dma1_stream3
+#define DMA_4_ISR           isr_dma1_stream5
+#define DMA_5_ISR           isr_dma1_stream0
+
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
+/** @} */
+
+/**
  * @name   UART configuration
  * @{
  */
@@ -42,9 +65,9 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 6,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     },
     {
@@ -56,9 +79,9 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
         .irqn       = USART1_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 6,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     },
     {
@@ -70,19 +93,16 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 6,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     }
 };
 
 #define UART_0_ISR          (isr_usart2)
-#define UART_0_DMA_ISR      (isr_dma1_stream6)
 #define UART_1_ISR          (isr_usart1)
-#define UART_1_DMA_ISR      (isr_dma1_stream6)
 #define UART_2_ISR          (isr_usart6)
-#define UART_2_DMA_ISR      (isr_dma1_stream6)
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
@@ -142,67 +162,65 @@ static const qdec_conf_t qdec_config[] = {
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 42000000Hz */
-        7,  /* -> 164062Hz */
-        6,  /* -> 328125Hz */
-        4,  /* -> 1312500Hz */
-        2,  /* -> 5250000Hz */
-        1   /* -> 10500000Hz */
-    },
-    {       /* for APB2 @ 84000000Hz */
-        7,  /* -> 328125Hz */
-        7,  /* -> 328125Hz */
-        5,  /* -> 1312500Hz */
-        3,  /* -> 5250000Hz */
-        2   /* -> 10500000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
-        .dev      = SPI1,
-        .mosi_pin = GPIO_PIN(PORT_A, 7),
-        .miso_pin = GPIO_PIN(PORT_A, 6),
-        .sclk_pin = GPIO_PIN(PORT_A, 5),
-        .cs_pin   = GPIO_PIN(PORT_A, 4),
-        .mosi_af  = GPIO_AF5,
-        .miso_af  = GPIO_AF5,
-        .sclk_af  = GPIO_AF5,
-        .cs_af    = GPIO_AF5,
-        .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2
+        .dev            = SPI1,
+        .mosi_pin       = GPIO_PIN(PORT_A, 7),
+        .miso_pin       = GPIO_PIN(PORT_A, 6),
+        .sclk_pin       = GPIO_PIN(PORT_A, 5),
+        .cs_pin         = GPIO_PIN(PORT_A, 4),
+        .mosi_af        = GPIO_AF5,
+        .miso_af        = GPIO_AF5,
+        .sclk_af        = GPIO_AF5,
+        .cs_af          = GPIO_AF5,
+        .rccmask        = RCC_APB2ENR_SPI1EN,
+        .apbbus         = APB2,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma         = 0,
+        .tx_dma_chan    = 3,
+        .rx_dma         = 1,
+        .rx_dma_chan    = 3,
+#endif
     },
     {
-        .dev      = SPI2,
-        .mosi_pin = GPIO_PIN(PORT_B, 15),
-        .miso_pin = GPIO_PIN(PORT_B, 14),
-        .sclk_pin = GPIO_PIN(PORT_B, 13),
-        .cs_pin   = GPIO_PIN(PORT_B, 12),
-        .mosi_af  = GPIO_AF5,
-        .miso_af  = GPIO_AF5,
-        .sclk_af  = GPIO_AF5,
-        .cs_af    = GPIO_AF5,
-        .rccmask  = RCC_APB1ENR_SPI2EN,
-        .apbbus   = APB1
+        .dev            = SPI2,
+        .mosi_pin       = GPIO_PIN(PORT_B, 15),
+        .miso_pin       = GPIO_PIN(PORT_B, 14),
+        .sclk_pin       = GPIO_PIN(PORT_B, 13),
+        .cs_pin         = GPIO_PIN(PORT_B, 12),
+        .mosi_af        = GPIO_AF5,
+        .miso_af        = GPIO_AF5,
+        .sclk_af        = GPIO_AF5,
+        .cs_af          = GPIO_AF5,
+        .rccmask        = RCC_APB1ENR_SPI2EN,
+        .apbbus         = APB1,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma         = 2,
+        .tx_dma_chan    = 0,
+        .rx_dma         = 3,
+        .rx_dma_chan    = 0,
+#endif
     },
     {
-        .dev      = SPI3,
-        .mosi_pin = GPIO_PIN(PORT_C, 12),
-        .miso_pin = GPIO_PIN(PORT_C, 11),
-        .sclk_pin = GPIO_PIN(PORT_C, 10),
-        .cs_pin   = GPIO_UNDEF,
-        .mosi_af  = GPIO_AF6,
-        .miso_af  = GPIO_AF6,
-        .sclk_af  = GPIO_AF6,
-        .cs_af    = GPIO_AF6,
-        .rccmask  = RCC_APB1ENR_SPI3EN,
-        .apbbus   = APB1
+        .dev            = SPI3,
+        .mosi_pin       = GPIO_PIN(PORT_C, 12),
+        .miso_pin       = GPIO_PIN(PORT_C, 11),
+        .sclk_pin       = GPIO_PIN(PORT_C, 10),
+        .cs_pin         = GPIO_UNDEF,
+        .mosi_af        = GPIO_AF6,
+        .miso_af        = GPIO_AF6,
+        .sclk_af        = GPIO_AF6,
+        .cs_af          = GPIO_AF6,
+        .rccmask        = RCC_APB1ENR_SPI3EN,
+        .apbbus         = APB1,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma         = 4,
+        .tx_dma_chan    = 0,
+        .rx_dma         = 5,
+        .rx_dma_chan    = 0,
+#endif
     }
 };
 
@@ -219,15 +237,16 @@ static const spi_conf_t spi_config[] = {
  *
  * @{
  */
-#define ADC_NUMOF          (6U)
-#define ADC_CONFIG {             \
-    {GPIO_PIN(PORT_A, 0), 0, 0}, \
-    {GPIO_PIN(PORT_A, 1), 0, 1}, \
-    {GPIO_PIN(PORT_A, 4), 0, 4}, \
-    {GPIO_PIN(PORT_B, 0), 0, 8}, \
-    {GPIO_PIN(PORT_C, 1), 0, 11}, \
-    {GPIO_PIN(PORT_C, 0), 0, 10}, \
-}
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 0), 0, 0},
+    {GPIO_PIN(PORT_A, 1), 0, 1},
+    {GPIO_PIN(PORT_A, 4), 0, 4},
+    {GPIO_PIN(PORT_B, 0), 0, 8},
+    {GPIO_PIN(PORT_C, 1), 0, 11},
+    {GPIO_PIN(PORT_C, 0), 0, 10},
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

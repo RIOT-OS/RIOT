@@ -49,6 +49,7 @@
  * @brief   Allocate the stack for the GNRC netdev thread to run in
  */
 static char stack[NRFMIN_GNRC_STACKSIZE];
+static gnrc_netif_t _netif;
 
 static int hdr_netif_to_nrfmin(nrfmin_hdr_t *nrfmin, gnrc_pktsnip_t *pkt)
 {
@@ -184,6 +185,6 @@ void gnrc_nrfmin_init(void)
 {
     /* setup the NRFMIN driver */
     nrfmin_setup();
-    gnrc_netif_create(stack, sizeof(stack), NRFMIN_GNRC_THREAD_PRIO, "nrfmin",
+    gnrc_netif_create(&_netif, stack, sizeof(stack), NRFMIN_GNRC_THREAD_PRIO, "nrfmin",
                       (netdev_t *)&nrfmin_dev, &gnrc_nrfmin_ops);
 }

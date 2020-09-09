@@ -38,7 +38,7 @@
 
 #define UPDATE_TIMEOUT      (0xe537)
 
-#define TIMEOUT_US          ((uint64_t)(CORD_UPDATE_INTERVAL * US_PER_SEC))
+#define TIMEOUT_US          ((uint64_t)(CONFIG_CORD_UPDATE_INTERVAL * US_PER_SEC))
 
 static char _stack[STACKSIZE];
 

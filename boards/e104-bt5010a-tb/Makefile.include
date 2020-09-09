@@ -1,0 +1,4 @@
+# external programmer required
+DEBUG_ADAPTER ?= jlink
+
+include $(RIOTBOARD)/common/nrf52/Makefile.include

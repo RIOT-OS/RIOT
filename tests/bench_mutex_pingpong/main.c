@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 
+#include "macros/units.h"
 #include "mutex.h"
 #include "thread.h"
 #include "xtimer.h"
@@ -78,7 +79,12 @@ int main(void)
         n++;
     }
 
-    printf("{ \"result\" : %"PRIu32" }\n", n);
+    printf("{ \"result\" : %"PRIu32, n);
+#ifdef CLOCK_CORECLOCK
+    printf(", \"ticks\" : %"PRIu32,
+           (uint32_t)((TEST_DURATION/US_PER_MS) * (CLOCK_CORECLOCK/KHZ(1)))/n);
+#endif
+    puts(" }");
 
     return 0;
 }

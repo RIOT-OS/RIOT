@@ -93,3 +93,8 @@ const riotboot_hdr_t *riotboot_slot_get_hdr(unsigned slot)
 
     return riotboot_slots[slot];
 }
+
+size_t riotboot_slot_offset(unsigned slot)
+{
+    return (size_t)riotboot_slot_get_hdr(slot) - CPU_FLASH_BASE;
+}

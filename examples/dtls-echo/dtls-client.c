@@ -42,10 +42,10 @@
 #define MAX_TIMES_TRY_TO_SEND 10 /* Expected to be 1 - 255 */
 
 /* Delay to give time to the remote peer to do the compute (client only). */
-#ifdef DTLS_ECC
-#define DEFAULT_US_DELAY 10000000
+#ifdef CONFIG_DTLS_ECC
+#define DEFAULT_US_DELAY    (20 * US_PER_SEC)
 #else
-#define DEFAULT_US_DELAY 100
+#define DEFAULT_US_DELAY    (1 * US_PER_SEC)
 #endif
 
 static int dtls_connected = 0; /* This is handled by Tinydtls callbacks */
@@ -108,7 +108,7 @@ static int dtls_handle_read(dtls_context_t *ctx)
     }
 
     ssize_t res = sock_udp_recv(sock, packet_rcvd, sizeof(packet_rcvd),
-                                1 * US_PER_SEC + DEFAULT_US_DELAY, &remote);
+                                DEFAULT_US_DELAY, &remote);
 
     if (res <= 0) {
         if ((ENABLE_DEBUG) && (res != -EAGAIN) && (res != -ETIMEDOUT)) {
@@ -138,7 +138,7 @@ static int dtls_handle_read(dtls_context_t *ctx)
     return dtls_handle_message(ctx, &session, packet_rcvd, res);
 }
 
-#ifdef DTLS_PSK
+#ifdef CONFIG_DTLS_PSK
 static unsigned char psk_id[PSK_ID_MAXLEN] = PSK_DEFAULT_IDENTITY;
 static size_t psk_id_length = sizeof(PSK_DEFAULT_IDENTITY) - 1;
 static unsigned char psk_key[PSK_MAXLEN] = PSK_DEFAULT_KEY;
@@ -189,9 +189,9 @@ static int _peer_get_psk_info_handler(struct dtls_context_t *ctx,
 
     return dtls_alert_fatal_create(DTLS_ALERT_INTERNAL_ERROR);
 }
-#endif /* DTLS_PSK */
+#endif /* CONFIG_DTLS_PSK */
 
-#ifdef DTLS_ECC
+#ifdef CONFIG_DTLS_ECC
 static int _peer_get_ecdsa_key_handler(struct dtls_context_t *ctx,
                                        const session_t *session,
                                        const dtls_ecdsa_key_t **result)
@@ -228,7 +228,7 @@ static int _peer_verify_ecdsa_key_handler(struct dtls_context_t *ctx,
 
     return 0;
 }
-#endif /* DTLS_ECC */
+#endif /* CONFIG_DTLS_ECC */
 
 /* Reception of a DTLS Application data record. */
 static int _read_from_peer_handler(struct dtls_context_t *ctx,
@@ -301,19 +301,19 @@ dtls_context_t *_init_dtls(sock_udp_t *sock, sock_udp_ep_t *local,
         .write = _send_to_peer_handler,
         .read = _read_from_peer_handler,
         .event = _events_handler,
-#ifdef DTLS_PSK
+#ifdef CONFIG_DTLS_PSK
         .get_psk_info = _peer_get_psk_info_handler,
-#endif  /* DTLS_PSK */
-#ifdef DTLS_ECC
+#endif  /* CONFIG_DTLS_PSK */
+#ifdef CONFIG_DTLS_ECC
         .get_ecdsa_key = _peer_get_ecdsa_key_handler,
         .verify_ecdsa_key = _peer_verify_ecdsa_key_handler
-#endif  /* DTLS_ECC */
+#endif  /* CONFIG_DTLS_ECC */
     };
 
-#ifdef DTLS_PSK
+#ifdef CONFIG_DTLS_PSK
     DEBUG("Client support PSK\n");
 #endif
-#ifdef DTLS_ECC
+#ifdef CONFIG_DTLS_ECC
     DEBUG("Client support ECC\n");
 #endif
 
@@ -454,6 +454,11 @@ static void client_send(char *addr_str, char *data)
         }
         watch--;
     } /* END while */
+
+    /* check if we failed to send */
+    if ((app_data_buf != 0)) {
+        printf("Failed to send the data\n");
+    }
 
     /*
      * BUG: tinyDTLS (<= 0.8.6)

@@ -27,10 +27,10 @@ for a quick getting started guide.
 | SPIs       | 3                 |
 | I2Cs       | 3                 |
 | Vcc        | 2.0V - 3.6V           |
-| Datasheet  | [Datasheet](http://www.st.com/web/en/resource/technical/document/datasheet/DM00037051.pdf) |
-| Reference Manual | [Reference Manual](http://www.st.com/web/en/resource/technical/document/reference_manual/DM00031020.pdf) |
-| Programming Manual | [Programming Manual](http://www.st.com/web/en/resource/technical/document/programming_manual/DM00023388.pdf) |
-| Board Manual   | [Board Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/DM00039084.pdf)|
+| Datasheet  | [Datasheet](https://www.st.com/resource/en/datasheet/stm32f407vg.pdf) |
+| Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/dm00031020.pdf) |
+| Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/dm00046982.pdf) |
+| Board Manual   | [Board Manual](https://www.st.com/resource/en/user_manual/dm00039084.pdf)|
 
 ### RIOT pin mapping
 
@@ -88,7 +88,7 @@ The STM32F4discovery board contains a on-board MEMS audio sensor.
 |:------------- |:--------------------- |
 | Type       | Audio sensor |
 | Vendor | ST Microelectronics   |
-| Datasheet  | [Datasheet](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00025467.pdf)|
+| Datasheet  | [Datasheet](http://www.mouser.com/pdfdocs/STM_MP45DT02_Datasheet.PDF)|
 | Connected to   | n/a           |
 | Pin Config:    | |
 | Device | I2S2          |
@@ -177,5 +177,5 @@ is a good value to start with.
 ### OS X & make term
 If you want the terminal to work using `make term` command and get a message
 about missing tty device install the driver from
-http://www.silabs.com/products/mcu/pages/usbtouartbridgevcpdrivers.aspx .
+https://www.silabs.com/products/development-tools/software/usb-to-uart-bridge-vcp-drivers .
  */

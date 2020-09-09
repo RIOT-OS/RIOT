@@ -14,4 +14,4 @@ FEATURES_PROVIDED += radio_nrfble
 FEATURES_PROVIDED += radio_nrfmin
 FEATURES_PROVIDED += puf_sram
 
--include $(RIOTCPU)/cortexm_common/Makefile.features
+include $(RIOTCPU)/cortexm_common/Makefile.features

@@ -1,14 +1,13 @@
 PKG_NAME=kconfiglib
 PKG_URL=https://github.com/ulfalizer/Kconfiglib
-PKG_VERSION=82f59179b1b35fcd8b6d188453b283599ea70518
+PKG_VERSION=061e71f7d78cb057762d88de088055361863deff
 PKG_LICENSE=ISC
-PKG_BUILDDIR=$(CURDIR)/bin
-
-.PHONY: all
-
-all: git-download
-	cp $(PKG_BUILDDIR)/kconfiglib.py $(PKG_BUILDDIR)/menuconfig.py \
-	   $(PKG_BUILDDIR)/genconfig.py $(PKG_BUILDDIR)/examples/merge_config.py \
-	   .
 
 include $(RIOTBASE)/pkg/pkg.mk
+
+all:
+	$(Q)cp $(PKG_SOURCE_DIR)/kconfiglib.py $(PKG_SOURCE_DIR)/menuconfig.py \
+	   .
+
+remove:
+	$(Q)$(RM) -r $(PKG_SOURCE_DIR) kconfiglib.py menuconfig.py

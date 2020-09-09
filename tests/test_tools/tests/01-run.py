@@ -64,8 +64,6 @@ def testfunc(child):
     * getting some test output without other messages
     * sending empty lines
     """
-    child.expect_exact("Running 'tests_tools' application")
-
     _wait_shell_ready(child)
 
     # Verify there is no local and remote echo as it is disabled

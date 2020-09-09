@@ -120,7 +120,11 @@ void *worker_thread(void *arg)
             expected = last + TEST_HZ * test_interval;
             int32_t jitter = now - expected;
             printf("now=%" PRIu32 ".%06" PRIu32 " (0x%08" PRIx32 " ticks), ",
+#ifdef MODULE_ZTIMER_XTIMER_COMPAT
+                   sec, us, ticks);
+#else
                    sec, us, ticks.ticks32);
+#endif
             printf("drift=%" PRId32 " us, jitter=%" PRId32 " us\n",
                    drift, jitter);
             last = now;

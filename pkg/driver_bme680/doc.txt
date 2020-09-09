@@ -1,0 +1,6 @@
+/**
+ * @defgroup pkg_driver_bme680  Driver package for I2C/SPI BME680 sensor
+ * @ingroup  pkg
+ * @brief    Provides the Bosch Sensortec's BME680 gas sensor API
+ * @see      https://github.com/BoschSensortec/BME680_driver
+ */

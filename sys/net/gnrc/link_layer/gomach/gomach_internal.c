@@ -463,8 +463,9 @@ int gnrc_gomach_send_beacon(gnrc_netif_t *netif)
     uint8_t slots_list[GNRC_GOMACH_SLOSCH_UNIT_COUNT];
 
     /* Check the maximum number of slots that can be allocated to senders. */
-    uint16_t max_slot_num = (GNRC_GOMACH_SUPERFRAME_DURATION_US - gnrc_gomach_phase_now(netif)) /
-                            GNRC_GOMACH_VTDMA_SLOT_SIZE_US;
+    uint16_t max_slot_num = (CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US -
+                             gnrc_gomach_phase_now(netif)) /
+                            CONFIG_GNRC_GOMACH_VTDMA_SLOT_SIZE_US;
 
     for (i = 0; i < GNRC_GOMACH_SLOSCH_UNIT_COUNT; i++) {
         if (netif->mac.rx.slosch_list[i].queue_indicator > 0) {
@@ -491,7 +492,7 @@ int gnrc_gomach_send_beacon(gnrc_netif_t *netif)
             j++;
 
             /* If reach the maximum sender ID number limit, stop. */
-            if (total_tdma_node_num >= GNRC_GOMACH_MAX_ALLOC_SENDER_NUM) {
+            if (total_tdma_node_num >= CONFIG_GNRC_GOMACH_MAX_ALLOC_SENDER_NUM){
                 break;
             }
         }
@@ -552,7 +553,7 @@ int gnrc_gomach_send_beacon(gnrc_netif_t *netif)
     }
     else {
         gnrc_gomach_set_timeout(netif, GNRC_GOMACH_TIMEOUT_NO_TX_ISR,
-                                GNRC_GOMACH_NO_TX_ISR_US);
+                                CONFIG_GNRC_GOMACH_NO_TX_ISR_US);
     }
     return res;
 }
@@ -939,17 +940,19 @@ void gnrc_gomach_process_preamble_ack(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
                         gomach_preamble_ack_hdr->phase_in_us;
 
     if (phase_us < 0) {
-        phase_us += GNRC_GOMACH_SUPERFRAME_DURATION_US;
+        phase_us += CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US;
     }
 
-    if (((uint32_t)phase_us > (GNRC_GOMACH_SUPERFRAME_DURATION_US - GNRC_GOMACH_CP_MIN_GAP_US)) ||
-        ((uint32_t)phase_us < GNRC_GOMACH_CP_MIN_GAP_US)) {
+    if (((uint32_t)phase_us > (CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US -
+                               CONFIG_GNRC_GOMACH_CP_MIN_GAP_US)) ||
+        ((uint32_t)phase_us < CONFIG_GNRC_GOMACH_CP_MIN_GAP_US)) {
         LOG_DEBUG("[GOMACH] t2u: own phase is close to the neighbor's.\n");
         gnrc_gomach_set_phase_backoff(netif, true);
         /* Set a random phase-backoff value. */
         netif->mac.prot.gomach.backoff_phase_us =
-            random_uint32_range(GNRC_GOMACH_CP_MIN_GAP_US,
-                                (GNRC_GOMACH_SUPERFRAME_DURATION_US - GNRC_GOMACH_CP_MIN_GAP_US));
+            random_uint32_range(CONFIG_GNRC_GOMACH_CP_MIN_GAP_US,
+                                (CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US -
+                                 CONFIG_GNRC_GOMACH_CP_MIN_GAP_US));
     }
 
     netif->mac.tx.current_neighbor->cp_phase = phase_us;
@@ -1166,11 +1169,11 @@ bool gnrc_gomach_find_next_tx_neighbor(gnrc_netif_t *netif)
          * thus to be more fair. */
         uint8_t j = netif->mac.tx.last_tx_neighbor_id + 1;
 
-        if (j >= GNRC_MAC_NEIGHBOR_COUNT) {
+        if (j >= CONFIG_GNRC_MAC_NEIGHBOR_COUNT) {
             j = 1;
         }
 
-        for (uint8_t i = 1; i < GNRC_MAC_NEIGHBOR_COUNT; i++) {
+        for (uint8_t i = 1; i < CONFIG_GNRC_MAC_NEIGHBOR_COUNT; i++) {
             if (gnrc_priority_pktqueue_length(&netif->mac.tx.neighbors[j].queue) > 0) {
                 netif->mac.tx.last_tx_neighbor_id = j;
                 next = (int) j;
@@ -1178,7 +1181,7 @@ bool gnrc_gomach_find_next_tx_neighbor(gnrc_netif_t *netif)
             }
             else {
                 j++;
-                if (j >= GNRC_MAC_NEIGHBOR_COUNT) {
+                if (j >= CONFIG_GNRC_MAC_NEIGHBOR_COUNT) {
                     j = 1;
                 }
             }
@@ -1388,12 +1391,12 @@ void gnrc_gomach_update_neighbor_phase(gnrc_netif_t *netif)
 {
     assert(netif != NULL);
 
-    for (uint8_t i = 1; i < GNRC_MAC_NEIGHBOR_COUNT; i++) {
+    for (uint8_t i = 1; i < CONFIG_GNRC_MAC_NEIGHBOR_COUNT; i++) {
         if (netif->mac.tx.neighbors[i].mac_type == GNRC_GOMACH_TYPE_KNOWN) {
             long int tmp = netif->mac.tx.neighbors[i].cp_phase -
                            netif->mac.prot.gomach.backoff_phase_us;
             if (tmp < 0) {
-                tmp += GNRC_GOMACH_SUPERFRAME_DURATION_US;
+                tmp += CONFIG_GNRC_GOMACH_SUPERFRAME_DURATION_US;
 
                 /* Toggle the neighbor's public channel phase if tmp < 0. */
                 if (netif->mac.tx.neighbors[i].pub_chanseq ==
@@ -1422,7 +1425,7 @@ void gnrc_gomach_update_neighbor_pubchan(gnrc_netif_t *netif)
     }
 
     /* Toggle TX neighbors' current channel. */
-    for (uint8_t i = 1; i < GNRC_MAC_NEIGHBOR_COUNT; i++) {
+    for (uint8_t i = 1; i < CONFIG_GNRC_MAC_NEIGHBOR_COUNT; i++) {
         if (netif->mac.tx.neighbors[i].mac_type == GNRC_GOMACH_TYPE_KNOWN) {
             if (netif->mac.tx.neighbors[i].pub_chanseq == netif->mac.prot.gomach.pub_channel_1) {
                 netif->mac.tx.neighbors[i].pub_chanseq = netif->mac.prot.gomach.pub_channel_2;

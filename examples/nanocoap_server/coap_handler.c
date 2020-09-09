@@ -24,7 +24,7 @@ static const uint8_t block2_mcu[] = " board with a ";
 static ssize_t _echo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
 {
     (void)context;
-    char uri[NANOCOAP_URI_MAX];
+    char uri[CONFIG_NANOCOAP_URI_MAX];
 
     if (coap_get_uri_path(pkt, (uint8_t *)uri) <= 0) {
         return coap_reply_simple(pkt, COAP_CODE_INTERNAL_SERVER_ERROR, buf,

@@ -1,0 +1,24 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC
+    bool "Configure the GNRC Packet Buffer"
+    depends on USEMODULE_GNRC_PKTBUF_STATIC
+    help
+        Configure the GNRC_PKTBUF using Kconfig.
+
+if KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC
+
+config GNRC_PKTBUF_SIZE
+    int "Maximum size of the static packet buffer"
+    default 6144
+    help
+        Set the value to 0 to allow dynamic memory management to allocate
+        packets. The rational here is to have enough space for 4 full-MTU IPv6
+        packets (2 incoming, 2 outgoing; 2 * 2 * 1280 B = 5 KiB) + Meta-Data
+        (roughly estimated to 1 KiB; might be smaller).
+
+endif # KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC

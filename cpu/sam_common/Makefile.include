@@ -5,6 +5,6 @@ CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 CFLAGS += -DDONT_USE_CMSIS_INIT
 
 # for the sam[drl] CPUs we hold all linkerscripts in the sam0 common folder
-export LINKFLAGS += -L$(RIOTCPU)/sam_common/ldscripts
+LINKFLAGS += -L$(RIOTCPU)/sam_common/ldscripts
 
 INCLUDES += -I$(RIOTCPU)/sam_common/include

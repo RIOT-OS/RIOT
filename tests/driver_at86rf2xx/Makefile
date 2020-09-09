@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-DISABLE_MODULE += auto_init
+DISABLE_MODULE += auto_init_at86rf2xx
 
 USEMODULE += od
 USEMODULE += shell

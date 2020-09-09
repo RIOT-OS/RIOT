@@ -22,41 +22,23 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <poll.h>
 
 #include "async_read.h"
 #include "native_internal.h"
 
 static int _next_index;
-static int _fds[ASYNC_READ_NUMOF];
-static void *_args[ASYNC_READ_NUMOF];
-static native_async_read_callback_t _native_async_read_callbacks[ASYNC_READ_NUMOF];
+static struct pollfd _fds[ASYNC_READ_NUMOF];
+static async_read_t pollers[ASYNC_READ_NUMOF];
 
-#ifdef __MACH__
-static pid_t _sigio_child_pids[ASYNC_READ_NUMOF];
 static void _sigio_child(int fd);
-#endif
 
 static void _async_io_isr(void) {
-    fd_set rfds;
-
-    FD_ZERO(&rfds);
-
-    int max_fd = 0;
-
-    struct timeval timeout = { .tv_usec = 0 };
-
-    for (int i = 0; i < _next_index; i++) {
-        FD_SET(_fds[i], &rfds);
-
-        if (max_fd < _fds[i]) {
-            max_fd = _fds[i];
-        }
-    }
-
-    if (real_select(max_fd + 1, &rfds, NULL, NULL, &timeout) > 0) {
+    if (real_poll(_fds, _next_index, 0) > 0) {
         for (int i = 0; i < _next_index; i++) {
-            if (FD_ISSET(_fds[i], &rfds)) {
-                _native_async_read_callbacks[i](_fds[i], _args[i]);
+            /* handle if one of the events has happened */
+            if (_fds[i].revents & _fds[i].events) {
+                pollers[i].cb(_fds[i].fd, pollers[i].arg);
             }
         }
     }
@@ -70,22 +52,30 @@ void native_async_read_cleanup(void) {
     unregister_interrupt(SIGIO);
 
     for (int i = 0; i < _next_index; i++) {
-#ifdef __MACH__
-        kill(_sigio_child_pids[i], SIGKILL);
-#endif
-        real_close(_fds[i]);
+        real_close(_fds[i].fd);
+        if (pollers[i].child_pid) {
+            kill(pollers[i].child_pid, SIGKILL);
+        }
     }
 }
 
 void native_async_read_continue(int fd) {
-    (void) fd;
-#ifdef __MACH__
     for (int i = 0; i < _next_index; i++) {
-        if (_fds[i] == fd) {
-            kill(_sigio_child_pids[i], SIGCONT);
+        if (_fds[i].fd == fd && pollers[i].child_pid) {
+            kill(pollers[i].child_pid, SIGCONT);
         }
     }
-#endif
+}
+
+static void _add_handler(int fd, void *arg, native_async_read_callback_t handler) {
+    _fds[_next_index].fd = fd;
+    _fds[_next_index].events = POLLIN | POLLPRI;
+    async_read_t *poll = &pollers[_next_index];
+
+    poll->child_pid = 0;
+    poll->cb = handler;
+    poll->arg = arg;
+    poll->fd = &_fds[_next_index];
 }
 
 void native_async_read_add_handler(int fd, void *arg, native_async_read_callback_t handler) {
@@ -93,13 +83,11 @@ void native_async_read_add_handler(int fd, void *arg, native_async_read_callback
         err(EXIT_FAILURE, "native_async_read_add_handler(): too many callbacks");
     }
 
-    _fds[_next_index] = fd;
-    _args[_next_index] = arg;
-    _native_async_read_callbacks[_next_index] = handler;
+    _add_handler(fd, arg, handler);
 
-#ifdef __MACH__
     /* tuntap signalled IO is not working in OSX,
-     * * check http://sourceforge.net/p/tuntaposx/bugs/17/ */
+     * * check http://sourceforge.net/p/tuntaposx/bugs/18/ */
+#ifdef __MACH__
     _sigio_child(_next_index);
 #else
     /* configure fds to send signals on io */
@@ -115,17 +103,28 @@ void native_async_read_add_handler(int fd, void *arg, native_async_read_callback
     _next_index++;
 }
 
-#ifdef __MACH__
+void native_async_read_add_int_handler(int fd, void *arg, native_async_read_callback_t handler) {
+    if (_next_index >= ASYNC_READ_NUMOF) {
+        err(EXIT_FAILURE, "native_async_read_add_int_handler(): too many callbacks");
+    }
+
+    _add_handler(fd, arg, handler);
+
+    _sigio_child(_next_index);
+    _next_index++;
+}
+
 static void _sigio_child(int index)
 {
-    int fd = _fds[index];
+    struct pollfd fds = _fds[index];
+    async_read_t *poll = &pollers[_next_index];
     pid_t parent = _native_pid;
     pid_t child;
     if ((child = real_fork()) == -1) {
         err(EXIT_FAILURE, "sigio_child: fork");
     }
     if (child > 0) {
-        _sigio_child_pids[index] = child;
+        poll->child_pid = child;
 
         /* return in parent process */
         return;
@@ -139,11 +138,8 @@ static void _sigio_child(int index)
 
     /* watch tap interface and signal parent process if data is
      * available */
-    fd_set rfds;
     while (1) {
-        FD_ZERO(&rfds);
-        FD_SET(fd, &rfds);
-        if (real_select(fd + 1, &rfds, NULL, NULL, NULL) == 1) {
+        if (real_poll(&fds, 1, -1) == 1) {
             kill(parent, SIGIO);
         }
         else {
@@ -161,5 +157,4 @@ static void _sigio_child(int index)
         sigwait(&sigmask, &sig);
     }
 }
-#endif
 /** @} */

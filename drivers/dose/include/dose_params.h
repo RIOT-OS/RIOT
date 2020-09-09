@@ -30,13 +30,13 @@ extern "C" {
  * @{
  */
 #ifndef DOSE_PARAM_UART
-#define DOSE_PARAM_UART         (UART_DEV(0))
+#define DOSE_PARAM_UART         (UART_DEV(1))
 #endif
 #ifndef DOSE_PARAM_BAUDRATE
 #define DOSE_PARAM_BAUDRATE     (115200)
 #endif
 #ifndef DOSE_PARAM_SENSE_PIN
-#define DOSE_PARAM_SENSE_PIN    (GPIO_PIN(0, 0))
+#define DOSE_PARAM_SENSE_PIN    (GPIO_UNDEF)
 #endif
 
 #ifndef DOSE_PARAMS

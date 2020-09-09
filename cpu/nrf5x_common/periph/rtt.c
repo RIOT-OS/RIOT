@@ -38,8 +38,6 @@
 #error "RTT configuration: invalid or no RTC device specified (RTT_DEV)"
 #endif
 
-#define LFCLK_FREQ      (32768U)
-
 /* allocate memory for callbacks and their args */
 static rtt_cb_t alarm_cb;
 static void *alarm_arg;
@@ -59,7 +57,7 @@ void rtt_init(void)
     /* configure interrupt */
     NVIC_EnableIRQ(IRQn);
     /* set prescaler */
-    DEV->PRESCALER = (LFCLK_FREQ / RTT_FREQUENCY) - 1;
+    DEV->PRESCALER = (RTT_CLOCK_FREQUENCY / RTT_FREQUENCY) - 1;
     /* start the actual RTT thing */
     DEV->TASKS_START = 1;
 }

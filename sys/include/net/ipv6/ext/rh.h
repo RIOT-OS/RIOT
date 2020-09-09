@@ -24,10 +24,6 @@
 
 #include <stdint.h>
 
-#include "net/ipv6/addr.h"
-#include "net/ipv6/ext.h"
-#include "net/ipv6/hdr.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

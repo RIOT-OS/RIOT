@@ -136,6 +136,24 @@
 #endif /* (KINETIS_SUBFAMILY == y) */
 #endif /* (KINETIS_FAMILY == x) */
 
+/**
+ * @name   Flashpage configuration
+ * @{
+ */
+#define FLASHPAGE_SIZE      (4096U)
+#define FLASHPAGE_NUMOF     ((KINETIS_ROMSIZE * 1024) / FLASHPAGE_SIZE)
+
+/* The minimum block size which can be written is 8B (Phrase). However, the
+ * erase block is always FLASHPAGE_SIZE.
+ */
+#define FLASHPAGE_RAW_PHRASE              (8U)
+#define FLASHPAGE_RAW_BLOCKSIZE           FLASHPAGE_RAW_PHRASE
+/* Writing should be always 8 bytes aligned */
+#define FLASHPAGE_RAW_ALIGNMENT           FLASHPAGE_RAW_PHRASE
+/* Section erase and programming must be 16 bytes aligned */
+#define FLASHPAGE_RAW_SECTION_ALIGNMENT   (16U)
+/** @} */
+
 #ifdef __cplusplus
 extern "C"
 {

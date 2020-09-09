@@ -43,6 +43,11 @@
  * definitions in `RIOT/boards/ * /include/periph_conf.h` will define the selected
  * GPIO pin.
  *
+ * @warning The scalar GPIO pin type `gpio_t` is deprecated and will be
+ * replaced by a structured GPIO pin type in a future GPIO API. Therefore,
+ * don't use the direct comparison of GPIO pins anymore. Instead, use the
+ * inline comparison functions @ref gpio_is_equal and @ref gpio_is_valid.
+ *
  * # (Low-) Power Implications
  *
  * On almost all platforms, we can only control the peripheral power state of
@@ -192,6 +197,9 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 /**
  * @brief   Enable pin interrupt if configured as interrupt source
  *
+ *          Interrupts that would have occured after @see gpio_irq_disable
+ *          was called will be discarded.
+ *
  * @note    You have to add the module `periph_gpio_irq` to your project to
  *          enable this function
  *
@@ -249,6 +257,27 @@ void gpio_toggle(gpio_t pin);
  * @param[in] value     value to set the pin to, 0 for LOW, HIGH otherwise
  */
 void gpio_write(gpio_t pin, int value);
+
+/**
+ * @brief   Test if a GPIO pin is equal to another GPIO pin
+ *
+ * @param[in] gpio1 First GPIO pin to check
+ * @param[in] gpio2 Second GPIO pin to check
+ */
+static inline int gpio_is_equal(gpio_t gpio1, gpio_t gpio2)
+{
+    return (gpio1 == gpio2);
+}
+
+/**
+ * @brief   Test if a GPIO pin is a valid pin and not declared as undefined.
+ *
+ * @param[in] gpio GPIO pin to check
+ */
+static inline int gpio_is_valid(gpio_t gpio)
+{
+    return (gpio != GPIO_UNDEF);
+}
 
 #ifdef __cplusplus
 }

@@ -56,7 +56,7 @@ void gnrc_rpl_p2p_update(void)
             p2p_ext->lifetime_sec -= GNRC_RPL_LIFETIME_UPDATE_STEP;
             if (p2p_ext->lifetime_sec <= 0) {
                 gnrc_rpl_dodag_remove_all_parents(p2p_ext->dodag);
-                p2p_ext->dodag->instance->cleanup = GNRC_RPL_CLEANUP_TIME;
+                gnrc_rpl_cleanup_start(p2p_ext->dodag);
                 continue;
             }
             p2p_ext->dro_delay -= GNRC_RPL_LIFETIME_UPDATE_STEP;
@@ -87,7 +87,7 @@ gnrc_rpl_instance_t *gnrc_rpl_p2p_root_init(uint8_t instance_id, ipv6_addr_t *do
     instance->max_rank_inc = 0;
     dodag->dtsn = 0;
     dodag->prf = 0;
-    dodag->dio_interval_doubl = GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS;
+    dodag->dio_interval_doubl = CONFIG_GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS;
     dodag->dio_min = GNRC_RPL_P2P_DEFAULT_DIO_INTERVAL_MIN;
     dodag->dio_redun = GNRC_RPL_P2P_DEFAULT_DIO_REDUNDANCY_CONSTANT;
     dodag->default_lifetime = GNRC_RPL_P2P_DEFAULT_LIFETIME;
@@ -110,9 +110,9 @@ gnrc_rpl_instance_t *gnrc_rpl_p2p_root_init(uint8_t instance_id, ipv6_addr_t *do
     p2p_ext->maxrank = GNRC_RPL_P2P_MAX_RANK;
     p2p_ext->dro_delay = -1;
 
-    trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_INTERVAL,
-                  GNRC_RPL_MSG_TYPE_TRICKLE_CALLBACK, (1 << dodag->dio_min),
-                  dodag->dio_interval_doubl, dodag->dio_redun);
+    trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
+                  (1 << dodag->dio_min), dodag->dio_interval_doubl,
+                  dodag->dio_redun);
 
     return instance;
 }
@@ -163,7 +163,7 @@ void gnrc_rpl_p2p_rdo_parse(gnrc_rpl_p2p_opt_rdo_t *rdo, gnrc_rpl_p2p_ext_t *p2p
         return;
     }
 
-    p2p_ext->for_me = (gnrc_ipv6_netif_find_by_addr(NULL, &rdo->target) != KERNEL_PID_UNDEF);
+    p2p_ext->for_me = (gnrc_netif_get_by_ipv6_addr(&rdo->target) != NULL);
 
     p2p_ext->reply = (rdo->compr_flags & (1 << GNRC_RPL_P2P_RDO_FLAGS_REPLY))
                       >> GNRC_RPL_P2P_RDO_FLAGS_REPLY;
@@ -195,10 +195,19 @@ void gnrc_rpl_p2p_rdo_parse(gnrc_rpl_p2p_opt_rdo_t *rdo, gnrc_rpl_p2p_ext_t *p2p
 
     if (!p2p_ext->for_me) {
         ipv6_addr_t *me = NULL;
-        if(gnrc_ipv6_netif_find_by_prefix(&me, &p2p_ext->dodag->dodag_id) == KERNEL_PID_UNDEF) {
-            DEBUG("RPL: no address configured\n");
+        gnrc_netif_t *netif = gnrc_netif_get_by_pid(p2p_ext->dodag->iface);
+        if(netif == NULL) {
+            DEBUG("RPL: no interface configured\n");
             return;
         }
+
+        me = gnrc_netif_ipv6_addr_best_src(netif, &p2p_ext->dodag->dodag_id, false);
+
+        if(me == NULL) {
+            DEBUG("RPL: no source address found\n");
+            return;
+        }
+
         addr = ((uint8_t *) &p2p_ext->addr_vec[i]) + p2p_ext->compr;
         memcpy(addr, ((uint8_t *) me) + p2p_ext->compr, addr_len);
         p2p_ext->addr_numof++;
@@ -337,7 +346,6 @@ void gnrc_rpl_p2p_recv_DRO(gnrc_pktsnip_t *pkt, ipv6_addr_t *src)
 
     addr_len = sizeof(ipv6_addr_t) - p2p_ext->compr;
     ipv6_addr_t addr = p2p_ext->dodag->dodag_id;
-    ipv6_addr_t *me = NULL;
     addr_vec = addr_snip->data;
 
     rdo = rdo_snip->data;
@@ -347,7 +355,9 @@ void gnrc_rpl_p2p_recv_DRO(gnrc_pktsnip_t *pkt, ipv6_addr_t *src)
         memcpy(&addr.u8[p2p_ext->compr], &addr_vec[addr_len * rdo->lmn], addr_len);
     }
 
-    if (gnrc_ipv6_netif_find_by_addr(&me, &addr) == dodag->iface) {
+    gnrc_netif_t *netif = gnrc_netif_get_by_ipv6_addr(&addr);
+
+    if (netif && (netif->pid == dodag->iface)) {
         gnrc_ipv6_nib_ft_add(&p2p_ext->target, IPV6_ADDR_BIT_LEN, src, dodag->iface,
                              p2p_ext->dodag->default_lifetime *
                              p2p_ext->dodag->lifetime_unit);

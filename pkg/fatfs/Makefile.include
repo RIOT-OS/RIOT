@@ -1,6 +1,5 @@
 INCLUDES += -I$(PKGDIRBASE)
 INCLUDES += -I$(RIOTPKG)/fatfs/fatfs_diskio/mtd/include
-DIRS += $(PKGDIRBASE)/fatfs
 
 DIRS += $(RIOTBASE)/pkg/fatfs/fatfs_diskio/mtd
 

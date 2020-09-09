@@ -1,0 +1,11 @@
+USEMODULE += cc1xxx_common
+USEMODULE += luid
+USEMODULE += netif
+USEMODULE += xtimer
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi
+
+ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan
+endif

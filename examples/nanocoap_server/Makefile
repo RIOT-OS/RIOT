@@ -42,7 +42,10 @@ ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   $(info Using low-memory configuration for microcoap_server.)
   ## low-memory tuning values
   # lower pktbuf buffer size
-  CFLAGS += -DGNRC_PKTBUF_SIZE=1000
+  # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=1000
+endif
   USEMODULE += prng_minstd
 endif
 

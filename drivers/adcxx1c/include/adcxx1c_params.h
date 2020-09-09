@@ -29,9 +29,9 @@ extern "C" {
 #endif
 
 /**
- * @defgroup drivers_adcxx1c_conf   ADCXX1C driver compile configurations
+ * @defgroup drivers_adcxx1c_config   ADCXX1C driver compile configurations
  * @ingroup drivers_adcxx1c
- * @ingroup config
+ * @ingroup config_drivers_sensors
  * @{
  */
 

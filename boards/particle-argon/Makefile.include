@@ -1,3 +1,1 @@
-USEMODULE += boards_common_particle_mesh
-
 include $(RIOTBOARD)/common/particle-mesh/Makefile.include

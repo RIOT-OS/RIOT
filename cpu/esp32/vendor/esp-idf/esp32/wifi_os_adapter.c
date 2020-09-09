@@ -476,6 +476,7 @@ wifi_osi_funcs_t g_wifi_osi_funcs = {
     ._periph_module_enable = periph_module_enable,
     ._periph_module_disable = periph_module_disable,
     ._esp_timer_get_time = esp_timer_get_time,
+#if MODULE_ESP_IDF_NVS_FLASH
     ._nvs_set_i8 = nvs_set_i8,
     ._nvs_get_i8 = nvs_get_i8,
     ._nvs_set_u8 = nvs_set_u8,
@@ -488,6 +489,20 @@ wifi_osi_funcs_t g_wifi_osi_funcs = {
     ._nvs_set_blob = nvs_set_blob,
     ._nvs_get_blob = nvs_get_blob,
     ._nvs_erase_key = nvs_erase_key,
+#else
+    ._nvs_set_i8 = NULL,
+    ._nvs_get_i8 = NULL,
+    ._nvs_set_u8 = NULL,
+    ._nvs_get_u8 = NULL,
+    ._nvs_set_u16 = NULL,
+    ._nvs_get_u16 = NULL,
+    ._nvs_open = NULL,
+    ._nvs_close = NULL,
+    ._nvs_commit = NULL,
+    ._nvs_set_blob = NULL,
+    ._nvs_get_blob = NULL,
+    ._nvs_erase_key = NULL,
+#endif
     ._get_random = os_get_random,
     ._get_time = get_time_wrapper,
     ._random = os_random,

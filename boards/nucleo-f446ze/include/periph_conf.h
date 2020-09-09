@@ -22,12 +22,27 @@
 #include "periph_cpu.h"
 #include "f4/cfg_clock_180_8_1.h"
 #include "cfg_i2c1_pb8_pb9.h"
-#include "cfg_spi_divtable.h"
 #include "cfg_timer_tim5.h"
+#include "cfg_usb_otg_fs.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name    DMA streams configuration
+ * @{
+ */
+static const dma_conf_t dma_config[] = {
+    { .stream = 11 },   /* DMA2 Stream 3 - SPI1_TX */
+    { .stream = 10 },   /* DMA2 Stream 2 - SPI1_RX */
+};
+
+#define DMA_0_ISR           isr_dma2_stream3
+#define DMA_1_ISR           isr_dma2_stream2
+
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
+/** @} */
 
 /**
  * @name    UART configuration
@@ -43,9 +58,9 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART3_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 6,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     },
     {
@@ -57,9 +72,9 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 5,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     },
     {
@@ -71,19 +86,16 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 4,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     },
 };
 
 #define UART_0_ISR          (isr_usart3)
-#define UART_0_DMA_ISR      (isr_dma1_stream6)
 #define UART_1_ISR          (isr_usart6)
-#define UART_1_DMA_ISR      (isr_dma1_stream5)
 #define UART_2_ISR          (isr_usart2)
-#define UART_2_DMA_ISR      (isr_dma1_stream4)
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
@@ -134,8 +146,14 @@ static const spi_conf_t spi_config[] = {
         .sclk_af  = GPIO_AF5,
         .cs_af    = GPIO_AF5,
         .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2
-    }
+        .apbbus   = APB2,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma         = 0,
+        .tx_dma_chan    = 3,
+        .rx_dma         = 1,
+        .rx_dma_chan    = 3,
+#endif
+    },
 };
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)

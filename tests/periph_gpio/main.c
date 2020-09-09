@@ -26,7 +26,8 @@
 #include "benchmark.h"
 #include "periph/gpio.h"
 
-#define BENCH_RUNS_DEFAULT      (1000UL * 1000)
+#define BENCH_RUNS_DEFAULT      (1000UL * 100)
+#define IRQ_TIMEOUT_US          (1000UL)
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static void cb(void *arg)
@@ -188,7 +189,7 @@ static int enable_int(int argc, char **argv)
 }
 #endif
 
-static int read(int argc, char **argv)
+static int cmd_read(int argc, char **argv)
 {
     int port, pin;
 
@@ -210,7 +211,7 @@ static int read(int argc, char **argv)
     return 0;
 }
 
-static int set(int argc, char **argv)
+static int cmd_set(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
@@ -222,7 +223,7 @@ static int set(int argc, char **argv)
     return 0;
 }
 
-static int clear(int argc, char **argv)
+static int cmd_clear(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
@@ -234,7 +235,7 @@ static int clear(int argc, char **argv)
     return 0;
 }
 
-static int toggle(int argc, char **argv)
+static int cmd_toggle(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
@@ -242,6 +243,135 @@ static int toggle(int argc, char **argv)
     }
 
     gpio_toggle(GPIO_PIN(atoi(argv[1]), atoi(argv[2])));
+
+    return 0;
+}
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
+static void _test_cb(void *ctx)
+{
+    mutex_unlock(ctx);
+}
+#endif
+
+static int cmd_auto_test(int argc, char **argv)
+{
+    if (argc < 5) {
+        printf("usage: %s <port> <pin> <port> <pin>\n", argv[0]);
+        return 1;
+    }
+
+    gpio_t pin_in  = GPIO_PIN(atoi(argv[1]), atoi(argv[2]));
+    gpio_t pin_out = GPIO_PIN(atoi(argv[3]), atoi(argv[4]));
+
+    puts("[START]");
+
+    if (gpio_init(pin_in, GPIO_IN)) {
+        printf("Error to initialize GPIO_PIN(%s, %s)\n", argv[1], argv[2]);
+        return -1;
+    }
+
+    if (gpio_init(pin_out, GPIO_OUT)) {
+        printf("Error to initialize GPIO_PIN(%s, %s)\n", argv[3], argv[4]);
+        return -1;
+    }
+
+    /* test set HIGH */
+    gpio_set(pin_out);
+
+    if (gpio_read(pin_in) == 0) {
+        puts("gpio_set() or gpio_read() or failed");
+        return -1;
+    }
+
+    /* test set LOW */
+    gpio_clear(pin_out);
+
+    if (gpio_read(pin_in) != 0) {
+        puts("gpio_clear() or gpio_read() failed");
+        return -1;
+    }
+
+#ifdef MODULE_PERIPH_GPIO_IRQ
+    mutex_t lock = MUTEX_INIT_LOCKED;
+
+    /* test rising interrupt */
+    if (gpio_init_int(pin_in, GPIO_IN, GPIO_RISING, _test_cb, &lock)) {
+        puts("setting rising interrupt failed");
+        return -1;
+    }
+
+    gpio_set(pin_out);
+    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US)) {
+        puts("rising interrupt timeout");
+        return -1;
+    }
+
+    gpio_clear(pin_out);
+    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
+        puts("interrupt falsely generated on falling edge");
+        return -1;
+    }
+
+    /* test falling interrupt */
+    if (gpio_init_int(pin_in, GPIO_IN, GPIO_FALLING, _test_cb, &lock)) {
+        puts("setting falling interrupt failed");
+        return -1;
+    }
+
+    gpio_set(pin_out);
+    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
+        puts("interrupt falsely generated on rising edge");
+        return -1;
+    }
+
+    gpio_clear(pin_out);
+    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US)) {
+        puts("rising interrupt timeout");
+        return -1;
+    }
+
+    /* test IRQ disable */
+    gpio_irq_disable(pin_in);
+
+    gpio_set(pin_out);
+    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
+        puts("interrupt falsely generated on rising edge while disabled");
+        return -1;
+    }
+
+    gpio_clear(pin_out);
+    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
+        puts("interrupt falsely generated while disabled");
+        return -1;
+    }
+
+    /* test IRQ enable */
+
+    gpio_irq_enable(pin_in);
+    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
+        puts("interrupt falsely generated after being re-enabled");
+        return -1;
+    }
+
+    gpio_set(pin_out);
+    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
+        puts("interrupt falsely generated on rising edge after re-enabled");
+        return -1;
+    }
+
+    gpio_clear(pin_out);
+    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US)) {
+        puts("interrupt not re-enabled");
+        return -1;
+    }
+
+    /* disable IRQ to avoid further interrupts */
+    gpio_irq_disable(pin_in);
+
+#endif
+
+    puts("[SUCCESS]");
 
     return 0;
 }
@@ -281,10 +411,11 @@ static const shell_command_t shell_commands[] = {
     { "init_int", "init as external INT w/o pull resistor", init_int },
     { "enable_int", "enable or disable gpio interrupt", enable_int },
 #endif
-    { "read", "read pin status", read },
-    { "set", "set pin to HIGH", set },
-    { "clear", "set pin to LOW", clear },
-    { "toggle", "toggle pin", toggle },
+    { "read", "read pin status", cmd_read },
+    { "set", "set pin to HIGH", cmd_set },
+    { "clear", "set pin to LOW", cmd_clear },
+    { "toggle", "toggle pin", cmd_toggle },
+    { "auto_test", "Run a series of automatic tests on two connected GPIOs", cmd_auto_test },
     { "bench", "run a set of predefined benchmarks", bench },
     { NULL, NULL, NULL }
 };

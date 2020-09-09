@@ -7,16 +7,9 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-import os
 import sys
-
-
-def testfunc(child):
-    child.expect(r"OK \(1 tests\)")
+from testrunner import run_check_unittests
 
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.environ['RIOTBASE'],
-                                 'dist/tools/testrunner'))
-    from testrunner import run
-    sys.exit(run(testfunc))
+    sys.exit(run_check_unittests(nb_tests=1))

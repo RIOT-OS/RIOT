@@ -14,7 +14,8 @@ endif
 unexport DIRS
 DIRS := $(sort $(abspath $(DIRS)))
 
-MODULE ?= $(shell basename $(CURDIR))
+_MOD := $(shell basename $(CURDIR))
+MODULE ?= $(_MOD)
 
 .PHONY: all clean $(DIRS:%=ALL--%) $(DIRS:%=CLEAN--%)
 
@@ -40,12 +41,10 @@ ifeq (1, $(SUBMODULES))
   BASE_MODULE ?= $(MODULE)
 
   # for each $(BASE_MODULE)_<name> in USEMODULE, add <name>.c to SRC
-  SRC += $(patsubst $(BASE_MODULE)_%,%.c,$(filter $(BASE_MODULE)_%,$(USEMODULE)))
+  SRC += $(wildcard $(patsubst $(BASE_MODULE)_%,%.c,$(filter $(BASE_MODULE)_%,$(USEMODULE))))
 
-  # don't fail if a selected *.c file does not exist
-  ifeq (1, $(SUBMODULES_NOFORCE))
-    SRC := $(filter $(SRC), $(wildcard *.c))
-  endif
+  # remove duplicates
+  SRC := $(sort $(SRC))
 endif
 
 # By default consider C++ files has a .cpp extension
@@ -64,6 +63,12 @@ ifeq ($(strip $(ASSMSRC))$(NO_AUTO_SRC),)
   ASSMSRC := $(wildcard *.S)
 endif
 
+ifneq (,$(SRCXX))
+  ifeq (,$(filter cpp,$(FEATURES_USED)))
+    $(error Found C++ source, but feature "cpp" is not used. Add "FEATURES_REQUIRED += cpp")
+  endif
+endif
+
 # include makefile snippets for packages in $(USEPKG) that modify GENSRC:
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.gensrc)
 
@@ -79,6 +84,7 @@ OBJ := $(OBJC) $(OBJCXX) $(ASMOBJ) $(ASSMOBJ) $(GENOBJC)
 DEP := $(OBJC:.o=.d) $(OBJCXX:.o=.d) $(ASSMOBJ:.o=.d)
 
 include $(RIOTMAKE)/blob.inc.mk
+include $(RIOTMAKE)/tools/fixdep.inc.mk
 
 $(BINDIR)/$(MODULE)/:
 	$(Q)mkdir -p $@
@@ -99,29 +105,48 @@ CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)
 
 $(OBJC_LTO): CFLAGS+=$(LTOFLAGS)
 
-$(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(RIOTBUILD_CONFIG_HEADER_C) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
+# Define dependencies for object files
+OBJ_DEPS += $(RIOTBUILD_CONFIG_HEADER_C)
+
+$(OBJC): $(BINDIR)/$(MODULE)/%.o: %.c $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q)$(CCACHE) $(CC) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
+ifneq (,$(SHOULD_RUN_KCONFIG))
+	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
+	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
+endif
 
-$(GENOBJC): %.o: %.c $(RIOTBUILD_CONFIG_HEADER_C) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
+$(GENOBJC): %.o: %.c $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q) $(CCACHE) $(CC) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$<)\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $<
+ifneq (,$(SHOULD_RUN_KCONFIG))
+	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
+	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
+endif
 
-$(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.$(SRCXXEXT) $(RIOTBUILD_CONFIG_HEADER_C) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
+$(OBJCXX): $(BINDIR)/$(MODULE)/%.o: %.$(SRCXXEXT) $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q)$(CCACHE) $(CXX) \
 		-DRIOT_FILE_RELATIVE=\"$(patsubst $(RIOTBASE)/%,%,$(abspath $<))\" \
 		-DRIOT_FILE_NOPATH=\"$(notdir $<)\" \
 		$(CXXFLAGS) $(CXXINCLUDES) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
+ifneq (,$(SHOULD_RUN_KCONFIG))
+	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
+	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
+endif
 
 $(ASMOBJ): $(BINDIR)/$(MODULE)/%.o: %.s
 	$(Q)$(AS) $(ASFLAGS) -o $@ $(abspath $<)
 
-$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(RIOTBUILD_CONFIG_HEADER_C) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
+$(ASSMOBJ): $(BINDIR)/$(MODULE)/%.o: %.S $(OBJ_DEPS) | $(if $(SHOULD_RUN_KCONFIG),$(KCONFIG_GENERATED_AUTOCONF_HEADER_C))
 	$(Q)$(CCAS) $(CCASFLAGS) $(INCLUDES) -MQ '$@' -MD -MP -c -o $@ $(abspath $<)
+ifneq (,$(SHOULD_RUN_KCONFIG))
+	$(Q)$(FIXDEP) $(@:.o=.d) $@ $(KCONFIG_SYNC_DIR) > $(@:.o=.tmp)
+	$(Q)mv $(@:.o=.tmp) $(@:.o=.d)
+endif
 
 # pull in dependency info for *existing* .o files
 # deleted header files will be silently ignored

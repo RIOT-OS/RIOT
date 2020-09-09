@@ -73,7 +73,7 @@ static void test_credman_add(void)
 
     /* fill the pool */
     memcpy(&credential.params.psk, &exp_psk_params, sizeof(psk_params_t));
-    while (credman_get_used_count() < CREDMAN_MAX_CREDENTIALS) {
+    while (credman_get_used_count() < CONFIG_CREDMAN_MAX_CREDENTIALS) {
         /* increase tag number so that it is not recognized as duplicate */
         credential.tag++;
         TEST_ASSERT_EQUAL_INT(CREDMAN_OK, credman_add(&credential));
@@ -176,7 +176,7 @@ static void test_credman_delete_random_order(void)
     };
     TEST_ASSERT_EQUAL_INT(0, credman_get_used_count());
 
-    /* fill the credential pool, assume CREDMAN_MAX_CREDENTIALS is 2 */
+    /* fill the credential pool, assume CONFIG_CREDMAN_MAX_CREDENTIALS is 2 */
     TEST_ASSERT_EQUAL_INT(CREDMAN_OK, credman_add(&in_credential));
     in_credential.tag = tag2;
     TEST_ASSERT_EQUAL_INT(CREDMAN_OK, credman_add(&in_credential));

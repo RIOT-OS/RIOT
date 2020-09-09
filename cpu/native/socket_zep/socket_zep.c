@@ -112,7 +112,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* simulate TX_STARTED interrupt */
     if (netdev->event_callback) {
         dev->last_event = NETDEV_EVENT_TX_STARTED;
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
         thread_yield();
     }
     res = writev(dev->sock_fd, v, n + 2);
@@ -123,7 +123,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* simulate TX_COMPLETE interrupt */
     if (netdev->event_callback) {
         dev->last_event = NETDEV_EVENT_TX_COMPLETE;
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
         thread_yield();
     }
 
@@ -283,7 +283,7 @@ static void _socket_isr(int fd, void *arg)
         socket_zep_t *dev = (socket_zep_t *)netdev;
 
         dev->last_event = NETDEV_EVENT_RX_COMPLETE;
-        netdev->event_callback(netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(netdev);
     }
 }
 
@@ -294,7 +294,7 @@ static int _init(netdev_t *netdev)
     netdev_ieee802154_reset(&dev->netdev);
 
     assert(dev != NULL);
-    dev->netdev.chan = IEEE802154_DEFAULT_CHANNEL;
+    dev->netdev.chan = CONFIG_IEEE802154_DEFAULT_CHANNEL;
 
     return 0;
 }

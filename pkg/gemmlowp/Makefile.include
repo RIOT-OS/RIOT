@@ -1,0 +1,6 @@
+INCLUDES += -I$(PKGDIRBASE)/gemmlowp
+
+CXXEXFLAGS += -Wno-sign-compare
+
+# This package is a header only package, so there's nothing to build
+PSEUDOMODULES += gemmlowp

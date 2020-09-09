@@ -31,8 +31,8 @@ extern "C" {
  * @{
  */
 /** @brief Size of allocation buffer in bytes */
-#ifndef LWM2M_TLSF_BUFFER
-#define LWM2M_TLSF_BUFFER     5120
+#ifndef CONFIG_LWM2M_TLSF_BUFFER
+#define CONFIG_LWM2M_TLSF_BUFFER     5120
 #endif
 /** @} */
 

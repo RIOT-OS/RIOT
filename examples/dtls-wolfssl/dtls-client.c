@@ -111,20 +111,20 @@ int dtls_client(int argc, char **argv)
     else {
         gnrc_netif_t *netif = gnrc_netif_get_by_pid(atoi(iface));
         if (netif == NULL) {
-            LOG(LOG_ERROR, "ERROR: interface not valid");
+            LOG(LOG_ERROR, "ERROR: interface not valid\n");
             usage(argv[0]);
             return -1;
         }
         remote.netif = (uint16_t)netif->pid;
     }
     if (ipv6_addr_from_str((ipv6_addr_t *)remote.addr.ipv6, addr_str) == NULL) {
-        LOG(LOG_ERROR, "ERROR: unable to parse destination address");
+        LOG(LOG_ERROR, "ERROR: unable to parse destination address\n");
         usage(argv[0]);
         return -1;
     }
     remote.port = SERVER_PORT;
     if (sock_dtls_create(sk, &local, &remote, 0, wolfDTLSv1_2_client_method()) != 0) {
-        LOG(LOG_ERROR, "ERROR: Unable to create DTLS sock");
+        LOG(LOG_ERROR, "ERROR: Unable to create DTLS sock\n");
         return -1;
     }
 
@@ -147,7 +147,7 @@ int dtls_client(int argc, char **argv)
     if (sock_dtls_session_create(sk) < 0)
         return -1;
     wolfSSL_dtls_set_timeout_init(sk->ssl, 5);
-    LOG(LOG_INFO, "connecting to server...");
+    LOG(LOG_INFO, "connecting to server...\n");
     /* attempt to connect until the connection is successful */
     do {
         ret = wolfSSL_connect(sk->ssl);
@@ -179,13 +179,13 @@ int dtls_client(int argc, char **argv)
     /* wait for a reply, indefinitely */
     do {
         ret = wolfSSL_read(sk->ssl, buf, APP_DTLS_BUF_SIZE - 1);
-        LOG(LOG_INFO, "wolfSSL_read returned %d\r\n", ret);
+        LOG(LOG_INFO, "wolfSSL_read returned %d\n", ret);
     } while (ret <= 0);
     buf[ret] = (char)0;
-    LOG(LOG_INFO, "Received: '%s'\r\n", buf);
+    LOG(LOG_INFO, "Received: '%s'\n", buf);
 
     /* Clean up and exit. */
-    LOG(LOG_INFO, "Closing connection.\r\n");
+    LOG(LOG_INFO, "Closing connection.\n");
     sock_dtls_session_destroy(sk);
     sock_dtls_close(sk);
     return 0;

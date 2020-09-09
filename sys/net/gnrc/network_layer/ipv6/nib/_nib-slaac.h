@@ -13,7 +13,7 @@
  *
  * @file
  * @brief   Definions related to SLAAC functionality of the NIB
- * @see     @ref GNRC_IPV6_NIB_CONF_SLAAC
+ * @see     @ref CONFIG_GNRC_IPV6_NIB_SLAAC
  * @internal
  *
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
@@ -21,6 +21,7 @@
 #ifndef PRIV_NIB_SLAAC_H
 #define PRIV_NIB_SLAAC_H
 
+#include <kernel_defines.h>
 #include <stdint.h>
 
 #include "net/gnrc/ipv6/nib/conf.h"
@@ -31,7 +32,7 @@
 extern "C" {
 #endif
 
-#if GNRC_IPV6_NIB_CONF_6LN || GNRC_IPV6_NIB_CONF_SLAAC || defined(DOXYGEN)
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
 /**
  * @brief   Auto-configures an address from a given prefix
  *
@@ -41,11 +42,11 @@ extern "C" {
  */
 void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
                           uint8_t pfx_len);
-#else   /* GNRC_IPV6_NIB_CONF_6LN || GNRC_IPV6_NIB_CONF_SLAAC */
+#else   /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
 #define _auto_configure_addr(netif, pfx, pfx_len) \
     (void)netif; (void)pfx; (void)pfx_len;
-#endif  /* GNRC_IPV6_NIB_CONF_6LN || GNRC_IPV6_NIB_CONF_SLAAC */
-#if GNRC_IPV6_NIB_CONF_SLAAC || defined(DOXYGEN)
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN || CONFIG_GNRC_IPV6_NIB_SLAAC */
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || defined(DOXYGEN)
 /**
  * @brief   Removes a tentative address from the interface and tries to
  *          reconfigure a new address
@@ -68,12 +69,12 @@ void _handle_dad(const ipv6_addr_t *addr);
  * @param[in] addr  A TENTATIVE address.
  */
 void _handle_valid_addr(const ipv6_addr_t *addr);
-#else   /* GNRC_IPV6_NIB_CONF_SLAAC */
+#else   /* CONFIG_GNRC_IPV6_NIB_SLAAC */
 #define _remove_tentative_addr(netif, addr) \
     (void)netif; (void)addr
 #define _handle_dad(addr)           (void)addr
 #define _handle_valid_addr(addr)    (void)addr
-#endif  /* GNRC_IPV6_NIB_CONF_SLAAC */
+#endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC */
 
 #ifdef __cplusplus
 }

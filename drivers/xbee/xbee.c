@@ -233,9 +233,7 @@ static void _rx_cb(void *arg, uint8_t c)
             dev->rx_buf[dev->rx_count++] = c;
             if (dev->rx_count == dev->rx_limit) {
                 /* packet is complete */
-                if (dev->event_callback) {
-                    dev->event_callback((netdev_t *)dev, NETDEV_EVENT_ISR);
-                }
+                netdev_trigger_event_isr((netdev_t*) dev);
                 dev->int_state = XBEE_INT_STATE_IDLE;
             }
             break;
@@ -486,11 +484,11 @@ void xbee_setup(xbee_t *dev, const xbee_params_t *params)
     dev->p = *params;
 
     /* initialize pins */
-    if (dev->p.pin_reset != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.pin_reset)) {
         gpio_init(dev->p.pin_reset, GPIO_OUT);
         gpio_set(dev->p.pin_reset);
     }
-    if (dev->p.pin_sleep != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.pin_sleep)) {
         gpio_init(dev->p.pin_sleep, GPIO_OUT);
         gpio_clear(dev->p.pin_sleep);
     }
@@ -588,7 +586,7 @@ int xbee_init(netdev_t *dev)
         return -ENXIO;
     }
     /* if reset pin is connected, do a hardware reset */
-    if (xbee->p.pin_reset != GPIO_UNDEF) {
+    if (gpio_is_valid(xbee->p.pin_reset)) {
         gpio_clear(xbee->p.pin_reset);
         xtimer_usleep(RESET_DELAY);
         gpio_set(xbee->p.pin_reset);
@@ -601,6 +599,14 @@ int xbee_init(netdev_t *dev)
     _at_cmd(xbee, "ATMM2\r");
     /* put XBee module in "API mode without escaped characters" */
     _at_cmd(xbee, "ATAP1\r");
+    /* disable xbee CTS and RTS, unless hardware flow control is used */
+    if(!IS_USED(MODULE_PERIPH_UART_HW_FC)) {
+        DEBUG("[xbee] init: WARNING if using an arduino BOARD + arduino xbee " \
+            "shield with ICSP connector, hardware flow control can't be " \
+            "used since CTS pin is connected to ICSP RESET pin\n");
+        _at_cmd(xbee, "ATD6 0\r");
+        _at_cmd(xbee, "ATD7 0\r");
+    }
     /* apply AT commands */
     _at_cmd(xbee, "ATAC\r");
     /* exit command mode */
@@ -757,19 +763,6 @@ static int xbee_get(netdev_t *ndev, netopt_t opt, void *value, size_t max_len)
             assert(max_len == sizeof(uint16_t));
             *((uint16_t *)value) = NETDEV_TYPE_IEEE802154;
             return sizeof(uint16_t);
-        case NETOPT_IPV6_IID:
-            if (max_len < sizeof(eui64_t)) {
-                return -EOVERFLOW;
-            }
-            if (dev->addr_flags & XBEE_ADDR_FLAGS_LONG) {
-                ieee802154_get_iid(value, dev->addr_long.uint8,
-                                   IEEE802154_LONG_ADDRESS_LEN);
-            }
-            else {
-                ieee802154_get_iid(value, dev->addr_short,
-                                   IEEE802154_SHORT_ADDRESS_LEN);
-            }
-            return sizeof(eui64_t);
         case NETOPT_CHANNEL:
             return _get_channel(dev, (uint8_t *)value, max_len);
         case NETOPT_MAX_PDU_SIZE:

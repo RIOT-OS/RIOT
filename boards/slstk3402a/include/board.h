@@ -33,8 +33,16 @@ extern "C" {
  * @name    Xtimer configuration
  * @{
  */
+#if IS_ACTIVE(CONFIG_EFM32_XTIMER_USE_LETIMER)
+#define XTIMER_DEV          (TIMER_DEV(1))
+#define XTIMER_HZ           (32768UL)
+#define XTIMER_WIDTH        (16)
+#else
+#define XTIMER_DEV          (TIMER_DEV(0))
 #define XTIMER_HZ           (1000000UL)
 #define XTIMER_WIDTH        (32)
+#endif
+#define XTIMER_CHAN (0)
 /** @} */
 
 /**
@@ -93,9 +101,6 @@ extern "C" {
  * Connection to the on-board temperature/humidity sensor (Si7021).
  * @{
  */
-#ifndef SI7021_ENABLED
-#define SI7021_ENABLED          (1)
-#endif
 #define SI7021_I2C              I2C_DEV(0)
 #define SI7021_EN_PIN           GPIO_PIN(PB, 10)
 

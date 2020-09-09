@@ -1,6 +1,3 @@
-# this CPU implementation is using the new core/CPU interface
-CFLAGS += -DCOREIF_NG=1
-
 # define path to atmega common module, which is needed for this CPU
 export ATMEGA_COMMON = $(RIOTCPU)/atmega_common/
 

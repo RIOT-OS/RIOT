@@ -144,7 +144,7 @@ void heap_caps_init(void)
     heap_t temp_heaps[num_heaps];
     size_t heap_idx = 0;
 
-    ESP_EARLY_LOGI(TAG, "Initializing. RAM available for dynamic allocation:");
+    ESP_EARLY_LOGD(TAG, "Initializing. RAM available for dynamic allocation:");
     for (unsigned i = 0; i < soc_memory_region_count; i++) {
         soc_memory_region_t *region = &regions[i];
         const soc_memory_type_desc_t *type = &soc_memory_types[region->type];
@@ -167,7 +167,7 @@ void heap_caps_init(void)
         }
         SLIST_NEXT(heap, next) = NULL;
 
-        ESP_EARLY_LOGI(TAG, "At %08X len %08X (%d KiB): %s",
+        ESP_EARLY_LOGD(TAG, "At %08X len %08X (%d KiB): %s",
                        region->start, region->size, region->size / 1024, type->name);
     }
 

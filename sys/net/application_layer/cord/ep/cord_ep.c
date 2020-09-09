@@ -48,19 +48,19 @@
 static char *_regif_buf;
 static size_t _regif_buf_len;
 
-static char _rd_loc[NANOCOAP_URI_MAX];
-static char _rd_regif[NANOCOAP_URI_MAX];
+static char _rd_loc[CONFIG_NANOCOAP_URI_MAX];
+static char _rd_regif[CONFIG_NANOCOAP_URI_MAX];
 static sock_udp_ep_t _rd_remote;
 
 static mutex_t _mutex = MUTEX_INIT;
-static volatile thread_t *_waiter;
+static thread_t *_waiter;
 
 static uint8_t buf[BUFSIZE];
 
 static void _lock(void)
 {
     mutex_lock(&_mutex);
-    _waiter = sched_active_thread;
+    _waiter = thread_get_active();
 }
 
 static int _sync(void)
@@ -103,7 +103,7 @@ static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
         flag = FLAG_TIMEOUT;
     }
 
-    thread_flags_set((thread_t *)_waiter, flag);
+    thread_flags_set(_waiter, flag);
 }
 
 static void _on_update_remove(unsigned req_state, coap_pkt_t *pdu, uint8_t code)
@@ -117,7 +117,7 @@ static void _on_update_remove(unsigned req_state, coap_pkt_t *pdu, uint8_t code)
         flag = FLAG_TIMEOUT;
     }
 
-    thread_flags_set((thread_t *)_waiter, flag);
+    thread_flags_set(_waiter, flag);
 }
 
 static void _on_update(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
@@ -202,7 +202,7 @@ static void _on_discover(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
     }
 
 end:
-    thread_flags_set((thread_t *)_waiter, flag);
+    thread_flags_set(_waiter, flag);
 }
 
 static int _discover_internal(const sock_udp_ep_t *remote,
@@ -221,7 +221,7 @@ static int _discover_internal(const sock_udp_ep_t *remote,
         return CORD_EP_ERR;
     }
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
-    gcoap_add_qstring(&pkt, "rt", "core.rd");
+    coap_opt_add_uri_query(&pkt, "rt", "core.rd");
     size_t pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_NONE);
     res = gcoap_req_send(buf, pkt_len, remote, _on_discover, NULL);
     if (res < 0) {
@@ -359,7 +359,7 @@ void cord_ep_dump_status(void)
 
         printf("RD address: coap://[%s]:%i\n", addr, (int)_rd_remote.port);
         printf("   ep name: %s\n", cord_common_get_ep());
-        printf("  lifetime: %is\n", (int)CORD_LT);
+        printf("  lifetime: %is\n", (int)CONFIG_CORD_LT);
         printf("    reg if: %s\n", _rd_regif);
         printf("  location: %s\n", _rd_loc);
     }

@@ -58,7 +58,7 @@ mtd_dev_t *fatfs_mtd_devs[1];
 #include "mtd_sdcard.h"
 #include "sdcard_spi_params.h"
 #define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
-/* sdcard devs are provided by sys/auto_init/storage/auto_init_sdcard_spi.c */
+/* sdcard devs are provided by drivers/sdcard_spi/sdcard_spi.c */
 extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
 mtd_sdcard_t mtd_sdcard_devs[SDCARD_SPI_NUM];
 mtd_dev_t *fatfs_mtd_devs[SDCARD_SPI_NUM];

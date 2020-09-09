@@ -1,0 +1,95 @@
+/**
+@defgroup        boards_cc1352p_launchpad TI CC1352P LaunchPad
+@ingroup         boards
+@brief           Texas Instruments SimpleLink(TM) CC1352P Wireless MCU LaunchPad(TM) Kit
+*/
+
+## Overview
+
+The [LAUNCHXL-CC1352P](http://www.ti.com/tool/LAUNCHXL-CC1352P) is a Texas
+Instrument's development kit for the CC1352P SoC which combines dual-band wireless MCU
+with integrated power amplifier.
+
+## Hardware
+
+![LAUNCHPAD-CC1352P](http://www.ti.com/diagrams/launchxl-cc1352p_launchxl-cc1352p_mcu041a_cc1352p1.jpg)
+
+The board comes in two variants with different RF matching network on the 20 dBm PA output port:
+
+- LAUNCHXL-CC1352P1: 868/915 MHz up to 20 dBm, 2.4 GHz up to 5 dBm
+- LAUNCHXL-CC1352P-2: 868/915 MHz up to 14 dBm, 2.4 GHz up to 20 dBm.
+
+For a more detailed information, please check out the [CC1352P datasheet](http://www.ti.com/lit/ds/swrs192c/swrs192c.pdf) or the [quick start guide](http://www.ti.com/lit/ug/swau108a/swau108a.pdf)
+
+## Flashing and Debugging
+
+The LAUNCHXL-CC1352P comes with an XDS110 on-board debug probe that provides
+programming, flashing and debugging capabilities.
+
+### TI Code Composer Studio _CCS_
+
+The TI's [Code Composer Studio _CCS_](http://www.ti.com/tool/CCSTUDIO) is an Integrated Development Environment which provides the necessary tools to use the debug features of the XDS110.
+
+### Uniflash
+
+[Uniflash](http://www.ti.com/tool/UNIFLASH) is a standalone flash tool for TI MCUs, Sitara Processors & SimpleLink devices.
+
+#### Setting up the environment
+
+In order to make use of the programming and debugging capabilities of the XDS110 some environment variable needs to be set:
+
+```
+export CCS_PATH=<path to ti install folder>/ti/ccs930
+export UNIFLASH_PATH<path to ti install folder>/ti/uniflash_5.2.0
+```
+
+That assumes you have CCS 9.3.0 (for the path name) and Uniflash 5.2.0, adjust
+accordingly.
+
+After that you can flash using the RIOT `make flash` command on your application
+or to debug you first start the debug server:
+
+```
+make debug-server
+```
+
+And then on another terminal you can run:
+
+```
+make debug
+```
+
+It will open GDB and connect to the debug server automatically.
+
+### Using OpenOCD
+
+To use OpenOCD with the XDS110 you need to use the an special version of
+OpenOCD made by TI (upstream version is not _yet_ compatible). You can
+clone and compile it from source:
+
+```
+# Clone into the openocd-ti folder
+git clone https://git.ti.com/cgit/sdo-emu/openocd openocd-ti
+
+# Change directory to the openocd source code
+cd openocd-ti/openocd
+
+# Configure, build, install
+./configure
+make
+sudo make install
+```
+
+#### Setting up the environment
+
+Now that we have the TI version of OpenOCD we need to export the `PROGRAMMER`
+environment variable, this is to enable OpenOCD instead of Uniflash.
+
+```
+export PROGRAMMER=openocd
+```
+
+Now we can just do `make debug-server` and then `make debug`, this all using
+OpenOCD.
+
+*/

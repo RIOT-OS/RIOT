@@ -7,6 +7,6 @@ USEMODULE += xtimer
 
 USEMODULE += fmt
 
-DISABLE_MODULE += auto_init
+DISABLE_MODULE += auto_init_random
 
 include $(RIOTBASE)/Makefile.include

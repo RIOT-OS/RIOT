@@ -21,9 +21,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #include "shell.h"
+#include "test_utils/expect.h"
 
 #include "periph/eeprom.h"
 
@@ -222,28 +222,28 @@ static int cmd_test(int argc, char **argv)
 
     /* read/write from beginning of EEPROM */
     size_t ret = eeprom_write(0, (uint8_t *)expected, 4);
-    assert(ret == 4);
+    expect(ret == 4);
 
     char result[4];
     ret = eeprom_read(0, (uint8_t *)result, 4);
-    assert(memcmp(result, expected, 4) == 0);
-    assert(ret == 4);
+    expect(memcmp(result, expected, 4) == 0);
+    expect(ret == 4);
 
     /* read/write at end of EEPROM */
     ret = eeprom_write(EEPROM_SIZE - 4, (uint8_t *)expected, 4);
-    assert(ret == 4);
+    expect(ret == 4);
     memset(result, 0, 4);
     ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
-    assert(memcmp(result, expected, 4) == 0);
-    assert(ret == 4);
+    expect(memcmp(result, expected, 4) == 0);
+    expect(ret == 4);
 
     /* read/write single byte */
     eeprom_write_byte(0, 'A');
-    assert(eeprom_read_byte(0) == 'A');
+    expect(eeprom_read_byte(0) == 'A');
     eeprom_write_byte(EEPROM_SIZE - 1, 'A');
-    assert(eeprom_read_byte(EEPROM_SIZE - 1) == 'A');
+    expect(eeprom_read_byte(EEPROM_SIZE - 1) == 'A');
     eeprom_write_byte(EEPROM_SIZE / 2, 'A');
-    assert(eeprom_read_byte(EEPROM_SIZE / 2) == 'A');
+    expect(eeprom_read_byte(EEPROM_SIZE / 2) == 'A');
 
     /* clear some bytes */
     const uint8_t cleared[4] = {
@@ -253,25 +253,25 @@ static int cmd_test(int argc, char **argv)
     eeprom_clear(0, 4);
     memset(result, 0, 4);
     ret = eeprom_read(0, (uint8_t *)result, 4);
-    assert(memcmp(result, cleared, 4) == 0);
-    assert(ret == 4);
+    expect(memcmp(result, cleared, 4) == 0);
+    expect(ret == 4);
 
     eeprom_clear(EEPROM_SIZE - 4, 4);
     ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
-    assert(memcmp(result, cleared, 4) == 0);
-    assert(ret == 4);
+    expect(memcmp(result, cleared, 4) == 0);
+    expect(ret == 4);
 
     /* set some bytes */
     eeprom_set(0, 'A', 4);
     ret = eeprom_read(0, (uint8_t *)result, 4);
-    assert(memcmp(result, "AAAA", 4) == 0);
-    assert(ret == 4);
+    expect(memcmp(result, "AAAA", 4) == 0);
+    expect(ret == 4);
 
     memset(result, 0, 4);
     eeprom_set(EEPROM_SIZE - 4, 'A', 4);
     ret = eeprom_read(EEPROM_SIZE - 4, (uint8_t *)result, 4);
-    assert(memcmp(result, "AAAA", 4) == 0);
-    assert(ret == 4);
+    expect(memcmp(result, "AAAA", 4) == 0);
+    expect(ret == 4);
 
     puts("SUCCESS");
     return 0;

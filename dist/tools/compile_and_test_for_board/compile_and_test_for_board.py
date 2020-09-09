@@ -41,7 +41,7 @@ usage: compile_and_test_for_board.py [-h] [--applications APPLICATIONS]
                                      [--flash-targets FLASH_TARGETS]
                                      [--test-targets TEST_TARGETS]
                                      [--test-available-targets TEST_AVAILABLE_TARGETS]
-                                     [--jobs JOBS]
+                                     [--report-xml] [--jobs JOBS]
                                      riot_directory board [result_directory]
 
 positional arguments:
@@ -76,6 +76,8 @@ optional arguments:
   --test-available-targets TEST_AVAILABLE_TARGETS
                         List of make targets to know if a test is present
                         (default: test/available)
+  --report-xml          Output results to report.xml in the result_directory
+                        (default: False)
   --jobs JOBS, -j JOBS  Parallel building (0 means not limit, like '--jobs')
                         (default: None)
 ```
@@ -90,10 +92,20 @@ import argparse
 import subprocess
 import collections
 
+try:
+    import junit_xml
+    import io
+    import time
+except ImportError:
+    junit_xml = None
+
+
 LOG_HANDLER = logging.StreamHandler()
 LOG_HANDLER.setFormatter(logging.Formatter(logging.BASIC_FORMAT))
 
 LOG_LEVELS = ('debug', 'info', 'warning', 'error', 'fatal', 'critical')
+
+MAKE = os.environ.get('MAKE', 'make')
 
 
 class ErrorInTest(Exception):
@@ -156,7 +168,7 @@ def apps_directories(riotdir, apps_dirs=None, apps_dirs_skip=None):
 
 def _riot_applications_dirs(riotdir):
     """Applications directories in the RIOT repository with relative path."""
-    cmd = ['make', 'info-applications']
+    cmd = [MAKE, 'info-applications']
 
     out = subprocess.check_output(cmd, cwd=riotdir)
     out = out.decode('utf-8', errors='replace')
@@ -217,6 +229,7 @@ class RIOTApplication():
     :param riotdir: RIOT repository directory
     :param appdir: directory of the application, can be relative to riotdir
     :param resultdir: base directory where to put execution results
+    :param junit: track application in JUnit XML
     """
 
     MAKEFLAGS = ('RIOT_CI_BUILD=1', 'CC_NOCOLOR=1', '--no-print-directory')
@@ -226,11 +239,21 @@ class RIOTApplication():
     TEST_TARGETS = ('test',)
     TEST_AVAILABLE_TARGETS = ('test/available',)
 
-    def __init__(self, board, riotdir, appdir, resultdir):
+    # pylint: disable=too-many-arguments
+    def __init__(self, board, riotdir, appdir, resultdir, junit=False):
         self.board = board
         self.riotdir = riotdir
         self.appdir = appdir
         self.resultdir = os.path.join(resultdir, appdir)
+        if junit:
+            if not junit_xml:
+                raise ImportError("`junit-xml` required for --report-xml")
+            self.testcase = junit_xml.TestCase(name=self.appdir,
+                                               stdout='', stderr='')
+            self.log_stream = io.StringIO()
+            logging.basicConfig(stream=self.log_stream)
+        else:
+            self.testcase = None
         self.logger = logging.getLogger('%s.%s' % (board, appdir))
 
         # Currently not handling absolute directories or outside of RIOT
@@ -284,6 +307,8 @@ class RIOTApplication():
             cmd = ['clean', 'clean-pkg']
             self.make(cmd)
         except subprocess.CalledProcessError as err:
+            if self.testcase:
+                self.testcase.stderr += err.output + '\n'
             self.logger.warning('Got an error during clean, ignore: %r', err)
 
     def clean_intermediates(self):
@@ -292,6 +317,8 @@ class RIOTApplication():
             cmd = ['clean-intermediates']
             self.make(cmd)
         except subprocess.CalledProcessError as err:
+            if self.testcase:
+                self.testcase.stderr += err.output + '\n'
             self.logger.warning('Got an error during clean-intermediates,'
                                 ' ignore: %r', err)
 
@@ -301,11 +328,29 @@ class RIOTApplication():
         :returns: 0 on success and 1 on error.
         """
         try:
+            if self.testcase:
+                self.testcase.timestamp = time.time()
             self.compilation_and_test(**test_kwargs)
-            return None
+            res = None
         except ErrorInTest as err:
             self.logger.error('Failed during: %s', err)
-            return (str(err), err.application.appdir, err.errorfile)
+            res = (str(err), err.application.appdir, err.errorfile)
+        if self.testcase:
+            self.testcase.elapsed_sec = time.time() - self.testcase.timestamp
+            self.testcase.log = self.log_stream.getvalue()
+            if not self.testcase.stdout:
+                self.testcase.stdout = None
+            if not self.testcase.stderr:
+                self.testcase.stderr = None
+        return res
+
+    def _skip(self, skip_reason, skip_reason_details=None, output=None):
+        if self.testcase:
+            self.testcase.add_skipped_info(
+                skip_reason_details if skip_reason_details else skip_reason,
+                output,
+            )
+        self._write_resultfile('skip', skip_reason)
 
     def compilation_and_test(self, clean_after=False, runtest=True,
                              incremental=False, jobs=False,
@@ -330,19 +375,25 @@ class RIOTApplication():
         # Ignore incompatible APPS
         if not self.board_is_supported():
             create_directory(self.resultdir, clean=True)
-            self._write_resultfile('skip', 'not_supported')
+            self._skip('not_supported', 'Board not supported')
             return
 
         if not self.board_has_enough_memory():
             create_directory(self.resultdir, clean=True)
-            self._write_resultfile('skip', 'not_enough_memory')
+            self._skip(
+                'not_enough_memory',
+                'Board has not enough memory to carry application',
+            )
             return
 
         has_test = self.has_test()
 
         if with_test_only and not has_test:
             create_directory(self.resultdir, clean=True)
-            self._write_resultfile('skip', 'disabled_has_no_tests')
+            self._skip(
+                'disabled_has_no_tests',
+                "{} has no tests".format(self.appdir)
+            )
             return
 
         # Normal case for supported apps
@@ -369,7 +420,10 @@ class RIOTApplication():
                 if clean_after:
                     self.clean()
             else:
-                self._write_resultfile('test', 'skip.no_test')
+                self._skip(
+                    'skip.no_test',
+                    "{} has no tests".format(self.appdir)
+                )
 
         self.logger.info('Success')
 
@@ -383,7 +437,7 @@ class RIOTApplication():
         full_env = os.environ.copy()
         full_env.update(env)
 
-        cmd = ['make']
+        cmd = [MAKE]
         cmd.extend(self.MAKEFLAGS)
         cmd.extend(['-C', os.path.join(self.riotdir, self.appdir)])
         cmd.extend(args)
@@ -419,6 +473,8 @@ class RIOTApplication():
         # Do not re-run if success
         output = self._make_get_previous_output(name)
         if output is not None:
+            if self.testcase:
+                self.testcase.stdout += output + '\n'
             return output
 
         # Run setup-tasks, output is only kept in case of error
@@ -435,6 +491,8 @@ class RIOTApplication():
             output = self.make(args)
             if not save_output:
                 output = ''
+            if self.testcase:
+                self.testcase.stdout += output + '\n'
             self._write_resultfile(name, 'success', output)
             return output
         except subprocess.CalledProcessError as err:
@@ -463,6 +521,14 @@ class RIOTApplication():
 
         self.logger.warning(output)
         self.logger.error('Error during %s, writing to %s', name, outfile)
+        if self.testcase:
+            self.testcase.stderr += err.output + '\n'
+            if name == "test":
+                self.testcase.add_failure_info("{} failed".format(err.cmd),
+                                               err.output)
+            else:
+                self.testcase.add_error_info("{} had an error".format(err.cmd),
+                                             err.output)
         raise ErrorInTest(name, self, outfile)
 
     def _write_resultfile(self, name, status, body=''):
@@ -621,16 +687,17 @@ PARSER.add_argument('--test-targets', type=list_from_string,
 PARSER.add_argument('--test-available-targets', type=list_from_string,
                     default=' '.join(RIOTApplication.TEST_AVAILABLE_TARGETS),
                     help='List of make targets to know if a test is present')
+PARSER.add_argument('--report-xml', action='store_true', default=False,
+                    help='Output results to report.xml in the '
+                         'result_directory')
 
 PARSER.add_argument(
     '--jobs', '-j', type=int, default=None,
     help="Parallel building (0 means not limit, like '--jobs')")
 
 
-def main():
+def main(args):
     """For one board, compile all examples and tests and run test on board."""
-    args = PARSER.parse_args()
-
     logger = logging.getLogger(args.board)
     if args.loglevel:
         loglevel = logging.getLevelName(args.loglevel.upper())
@@ -665,7 +732,8 @@ def main():
 
     # List of applications for board
     applications = [RIOTApplication(board, args.riot_directory, app_dir,
-                                    board_result_directory)
+                                    board_result_directory,
+                                    junit=args.report_xml)
                     for app_dir in app_dirs]
 
     # Execute tests
@@ -681,6 +749,16 @@ def main():
     summary = _test_failed_summary(errors, relpathstart=board_result_directory)
     save_failure_summary(board_result_directory, summary)
 
+    if args.report_xml:
+        if not junit_xml:
+            raise ImportError("`junit-xml` required for --report-xml")
+        report_file = os.path.join(board_result_directory, "report.xml")
+        with open(report_file, "w+") as report:
+            junit_xml.TestSuite.to_file(
+                report,
+                [junit_xml.TestSuite('compile_and_test_for_{}'.format(board),
+                                     [app.testcase for app in applications])]
+            )
     if num_errors:
         logger.error('Tests failed: %d', num_errors)
         print(summary, end='')
@@ -690,4 +768,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(PARSER.parse_args())

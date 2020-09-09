@@ -58,9 +58,7 @@
  * see: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60932
  */
 #ifdef __cplusplus
-#include <atomic>
-/* Make atomic_int available without namespace specifier */
-using std::atomic_int;
+#include "c11_atomics_compat.hpp"
 #else
 #include <stdatomic.h> /* for atomic_int */
 #endif
@@ -80,6 +78,70 @@ extern "C" {
  * empty definition instead: */
 /* #define restrict */
 #endif
+
+/**
+ * @brief   MAX functions for internal use
+ * @{
+ */
+#ifndef _MAX
+#define _MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
+#ifndef MAX4
+#define MAX4(a, b, c, d) _MAX(_MAX((a), (b)), _MAX((c),(d)))
+#endif
+/** @} */
+
+/**
+ * @brief   VFS parameters for FAT
+ * @{
+ */
+#ifdef MODULE_FATFS_VFS
+#define FATFS_VFS_DIR_BUFFER_SIZE       (44)
+#define FATFS_VFS_FILE_BUFFER_SIZE      (72)
+#else
+#define FATFS_VFS_DIR_BUFFER_SIZE       (1)
+#define FATFS_VFS_FILE_BUFFER_SIZE      (1)
+#endif
+/** @} */
+
+/**
+ * @brief   VFS parameters for littlefs
+ * @{
+ */
+#ifdef MODULE_LITTLEFS
+#define LITTLEFS_VFS_DIR_BUFFER_SIZE    (44)
+#define LITTLEFS_VFS_FILE_BUFFER_SIZE   (56)
+#else
+#define LITTLEFS_VFS_DIR_BUFFER_SIZE    (1)
+#define LITTLEFS_VFS_FILE_BUFFER_SIZE   (1)
+#endif
+/** @} */
+
+/**
+ * @brief   VFS parameters for littlefs2
+ * @{
+ */
+#ifdef MODULE_LITTLEFS2
+#define LITTLEFS2_VFS_DIR_BUFFER_SIZE   (52)
+#define LITTLEFS2_VFS_FILE_BUFFER_SIZE  (84)
+#else
+#define LITTLEFS2_VFS_DIR_BUFFER_SIZE   (1)
+#define LITTLEFS2_VFS_FILE_BUFFER_SIZE  (1)
+#endif
+/** @} */
+
+/**
+ * @brief   VFS parameters for spiffs
+ * @{
+ */
+#ifdef MODULE_SPIFFS
+#define SPIFFS_VFS_DIR_BUFFER_SIZE      (12)
+#define SPIFFS_VFS_FILE_BUFFER_SIZE     (1)
+#else
+#define SPIFFS_VFS_DIR_BUFFER_SIZE      (1)
+#define SPIFFS_VFS_FILE_BUFFER_SIZE     (1)
+#endif
+/** @} */
 
 #ifndef VFS_MAX_OPEN_FILES
 /**
@@ -116,7 +178,11 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_DIR_BUFFER_SIZE (12)
+#define VFS_DIR_BUFFER_SIZE MAX4(FATFS_VFS_DIR_BUFFER_SIZE,     \
+                                 LITTLEFS_VFS_DIR_BUFFER_SIZE,  \
+                                 LITTLEFS2_VFS_DIR_BUFFER_SIZE, \
+                                 SPIFFS_VFS_DIR_BUFFER_SIZE     \
+                                )
 #endif
 
 #ifndef VFS_FILE_BUFFER_SIZE
@@ -139,7 +205,11 @@ extern "C" {
  * @attention Put the check in the public header file (.h), do not put the check in the
  * implementation (.c) file.
  */
-#define VFS_FILE_BUFFER_SIZE (1)
+#define VFS_FILE_BUFFER_SIZE MAX4(FATFS_VFS_FILE_BUFFER_SIZE,    \
+                                  LITTLEFS_VFS_FILE_BUFFER_SIZE, \
+                                  LITTLEFS2_VFS_FILE_BUFFER_SIZE,\
+                                  SPIFFS_VFS_FILE_BUFFER_SIZE    \
+                                 )
 #endif
 
 #ifndef VFS_NAME_MAX
@@ -883,6 +953,21 @@ int vfs_normalize_path(char *buf, const char *path, size_t buflen);
  * @return     NULL if @p cur is the last element in the list
  */
 const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur);
+
+/**
+ * @brief   Get information about the file for internal purposes
+ *
+ * @attention   Not thread safe! Do not modify any of the fields in the returned
+ * struct.
+ * @note        For file descriptor internal usage only.
+ *
+ * @internal
+ * @param[in] fd    A file descriptor
+ *
+ * @return  Pointer to the file information struct if a file with @p fd exists.
+ * @return  NULL, when no file with file descriptor @p fd exists.
+ */
+const vfs_file_t *vfs_file_get(int fd);
 
 #ifdef __cplusplus
 }

@@ -22,41 +22,12 @@
 #include "cpu.h"
 #include "periph_cpu.h"
 
+#include "cfg_clk_default.h"
+#include "cfg_timer_default.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Timer configuration
- *
- * General purpose timers (GPT[0-3]) are configured consecutively and in order
- * (without gaps) starting from GPT0, i.e. if multiple timers are enabled.
- *
- * @{
- */
-static const timer_conf_t timer_config[] = {
-    {
-        .chn = 2,
-        .cfg = GPTMCFG_16_BIT_TIMER, /* required for XTIMER */
-    },
-    {
-        .chn = 1,
-        .cfg = GPTMCFG_32_BIT_TIMER,
-    },
-    {
-        .chn = 2,
-        .cfg = GPTMCFG_16_BIT_TIMER,
-    },
-    {
-        .chn = 1,
-        .cfg = GPTMCFG_32_BIT_TIMER,
-    },
-};
-
-#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
-
-#define TIMER_IRQ_PRIO      1
-/** @} */
 
 /**
  * @name    UART configuration
@@ -67,8 +38,10 @@ static const uart_conf_t uart_config[] = {
         .dev      = UART0_BASEADDR,
         .rx_pin   = GPIO_PIN(0, 0),
         .tx_pin   = GPIO_PIN(0, 1),
+#ifdef MODULE_PERIPH_UART_HW_FC
         .cts_pin  = GPIO_UNDEF,
         .rts_pin  = GPIO_UNDEF
+#endif
     }
 };
 

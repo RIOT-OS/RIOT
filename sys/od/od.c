@@ -42,8 +42,8 @@ void od_hex_dump(const void *data, size_t data_len, uint8_t width)
             }
             print_str("  ");
             for(unsigned k = 0; k < (i % width) + 1; k++){
-                if(isprint(((char *)data)[str_pos+k])){
-                    putchar(((char *)data)[str_pos+k]);
+                if(isprint(((uint8_t *)data)[str_pos+k])){
+                    putchar(((uint8_t *)data)[str_pos+k]);
                 }
                 else{
                     putchar('.');

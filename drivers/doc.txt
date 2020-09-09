@@ -16,6 +16,12 @@
  */
 
 /**
+ * @defgroup    drivers_multimedia Multimedia Device Drivers
+ * @ingroup     drivers
+ * @brief       Drivers for external multimedia devices.
+ */
+
+/**
  * @defgroup    drivers_netdev Network Device Drivers
  * @ingroup     drivers
  * @brief       Drivers for external network devices.
@@ -45,17 +51,74 @@
  * @brief       Drivers for storage devices
  */
 
- /**
+/**
+ * @defgroup    drivers_display Display Device Drivers
+ * @ingroup     drivers
+ * @brief       Drivers for display devices
+ */
+
+/**
  * @defgroup    drivers_soft_periph Soft Peripheral Driver Interface
  * @ingroup     drivers
  * @brief       Software emulated @ref drivers_periph for UART, SPI, etc
  */
 
- /**
+/**
  * @defgroup    drivers_power Power Supply Drivers
  * @ingroup     drivers
  * @brief       Drivers for power supply devices
  *
  * The group of power supply drivers indludes all kinds of AC/DC, DC/DC supply devices
  * or charger ICs which can be controlled from the host e.g by config pin settings or by bus.
+ */
+
+/**
+ * @defgroup    drivers_misc Miscellaneous Drivers
+ * @ingroup     drivers
+ * @brief       Drivers for different kinds of devices that do not match any
+ *              other category
+ */
+
+/**
+ * @defgroup    config_drivers_netdev Network Device Configurations
+ * @ingroup     config
+ * @brief       Compile time configurations for external network devices
+ */
+
+/**
+ * @defgroup    config_drivers_sensors Sensor Device Configurations
+ * @ingroup     config
+ * @brief       Compile time configurations for Sensors
+ */
+
+/**
+ * @defgroup    config_drivers_actuators Actuator Device Configurations
+ * @ingroup     config
+ * @brief       Compile time configurations for actuating devices
+ */
+
+/**
+ * @defgroup    config_drivers_storage Storage Device Configurations
+ * @ingroup     config
+ * @brief       Compile time configurations for storage devices
+ */
+
+ /**
+ * @defgroup    config_drivers_display Display Device Configurations
+ * @ingroup     config
+ * @brief       Compile time configurations for display devices
+ */
+
+/**
+ * @defgroup    config_drivers_soft_periph Soft Peripheral Configurations
+ * @ingroup     config
+ * @brief       Compile time configurations for Software emulated
+ *              @ref drivers_periph for UART, SPI, etc
+ */
+
+/**
+ * @defgroup    config_drivers_misc Miscellaneous Device Configurations
+ * @ingroup     config
+ * @brief       Compile time configurations for different kinds of
+ *              devices that do not match any other category
  */

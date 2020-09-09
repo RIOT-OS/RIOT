@@ -1,1 +1,54 @@
 INCLUDES += -I$(RIOTBOARD)/common/atmega/include
+
+# If programmer is not set, set it based on the bootloader used
+ifeq (,$(PROGRAMMER))
+  ifeq (atmegaboot,$(BOOTLOADER))
+    PROGRAMMER = arduino
+    BOOTLOADER_SIZE ?= 2048
+    BOOTLOADER_BAUD ?= 57600
+  endif
+
+  ifeq (optiboot,$(BOOTLOADER))
+    PROGRAMMER = arduino
+    ifneq (,$(filter $(CPU), atmega128rfa1 atmega256rfr2 atmega1281 atmega1284p atmega2560))
+      # The minimum bootloader size on these CPUs is 1 KiB (so 512 Byte are wasted)
+      BOOTLOADER_SIZE ?= 1024
+    else
+      BOOTLOADER_SIZE ?= 512
+    endif
+  endif
+
+  ifeq (stk500v1,$(BOOTLOADER))
+    PROGRAMMER = stk500v1
+    BOOTLOADER_SIZE ?= 8K
+  endif
+
+  ifeq (stk500v2,$(BOOTLOADER))
+    PROGRAMMER = stk500v2
+    BOOTLOADER_SIZE ?= 8K
+    # Disable auto erase; erasing the flash is done implicitly by the bootloader
+    # and explicit erase is not supported
+    FFLAGS_EXTRA += -D
+  endif
+
+  ifeq (avr109,$(BOOTLOADER))
+    PROGRAMMER = avr109
+    BOOTLOADER_SIZE ?= 4K
+  endif
+
+  ifeq (derfmega,$(BOOTLOADER))
+    PROGRAMMER = wiring
+    BOOTLOADER_SIZE ?= 4K
+  endif
+
+  ifneq (,$(BOOTLOADER_BAUD))
+    FFLAGS_EXTRA += -b $(BOOTLOADER_BAUD)
+  endif
+endif
+
+BOOTLOADER_SIZE ?= 0
+ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+
+include $(RIOTMAKE)/tools/serial.inc.mk
+# include avrdude flashing tool
+include $(RIOTMAKE)/tools/avrdude.inc.mk

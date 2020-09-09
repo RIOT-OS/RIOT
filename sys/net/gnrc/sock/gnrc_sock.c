@@ -14,6 +14,7 @@
  */
 
 #include <errno.h>
+#include <stdlib.h>
 
 #include "log.h"
 #include "net/af.h"
@@ -27,6 +28,11 @@
 
 #include "sock_types.h"
 #include "gnrc_sock_internal.h"
+
+#ifdef MODULE_FUZZING
+extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
+gnrc_pktsnip_t *gnrc_sock_prevpkt = NULL;
+#endif
 
 #ifdef MODULE_XTIMER
 #define _TIMEOUT_MAGIC      (0xF38A0B63U)
@@ -56,9 +62,12 @@ static void _netapi_cb(uint16_t cmd, gnrc_pktsnip_t *pkt, void *ctx)
         if (mbox_try_put(&reg->mbox, &msg) < 1) {
             LOG_WARNING("gnrc_sock: dropped message to %p (was full)\n",
                         (void *)&reg->mbox);
+            /* packet could not be delivered so it should be dropped */
+            gnrc_pktbuf_release(pkt);
+            return;
         }
         if (reg->async_cb.generic) {
-            reg->async_cb.generic(reg, SOCK_ASYNC_MSG_RECV);
+            reg->async_cb.generic(reg, SOCK_ASYNC_MSG_RECV, reg->async_cb_arg);
         }
     }
 }
@@ -66,7 +75,7 @@ static void _netapi_cb(uint16_t cmd, gnrc_pktsnip_t *pkt, void *ctx)
 
 void gnrc_sock_create(gnrc_sock_reg_t *reg, gnrc_nettype_t type, uint32_t demux_ctx)
 {
-    mbox_init(&reg->mbox, reg->mbox_queue, SOCK_MBOX_SIZE);
+    mbox_init(&reg->mbox, reg->mbox_queue, GNRC_SOCK_MBOX_SIZE);
 #ifdef SOCK_HAS_ASYNC
     reg->async_cb.generic = NULL;
     reg->netreg_cb.cb = _netapi_cb;
@@ -84,7 +93,20 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     gnrc_pktsnip_t *pkt, *netif;
     msg_t msg;
 
-    if (reg->mbox.cib.mask != (SOCK_MBOX_SIZE - 1)) {
+    /* The fuzzing module is only enabled when building a fuzzing
+     * application from the fuzzing/ subdirectory. When using gnrc_sock
+     * the fuzzer assumes that gnrc_sock_recv is called in a loop. If it
+     * is called again and the previous return value was the special
+     * crafted fuzzing packet, the fuzzing application terminates.
+     *
+     * sock_async_event has its on fuzzing termination condition. */
+#if defined(MODULE_FUZZING) && !defined(MODULE_SOCK_ASYNC_EVENT)
+    if (gnrc_sock_prevpkt && gnrc_sock_prevpkt == gnrc_pktbuf_fuzzptr) {
+        exit(EXIT_SUCCESS);
+    }
+#endif
+
+    if (reg->mbox.cib.mask != (GNRC_SOCK_MBOX_SIZE - 1)) {
         return -EINVAL;
     }
 #ifdef MODULE_XTIMER
@@ -137,6 +159,16 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
         remote->netif = (uint16_t)netif_hdr->if_pid;
     }
     *pkt_out = pkt; /* set out parameter */
+
+#if IS_ACTIVE(SOCK_HAS_ASYNC)
+    if (reg->async_cb.generic && cib_avail(&reg->mbox.cib)) {
+        reg->async_cb.generic(reg, SOCK_ASYNC_MSG_RECV, reg->async_cb_arg);
+    }
+#endif
+#ifdef MODULE_FUZZING
+    gnrc_sock_prevpkt = pkt;
+#endif
+
     return 0;
 }
 
@@ -226,7 +258,7 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
         while (err_report.type != GNRC_NETERR_MSG_TYPE) {
             msg_try_receive(&err_report);
             if (err_report.type != GNRC_NETERR_MSG_TYPE) {
-                msg_try_send(&err_report, sched_active_pid);
+                msg_try_send(&err_report, thread_getpid());
             }
         }
         if (err_report.content.value != last_status) {
@@ -238,7 +270,7 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
                 while (err_report.type != GNRC_NETERR_MSG_TYPE) {
                     msg_try_receive(&err_report);
                     if (err_report.type != GNRC_NETERR_MSG_TYPE) {
-                        msg_try_send(&err_report, sched_active_pid);
+                        msg_try_send(&err_report, thread_getpid());
                     }
                 }
             }

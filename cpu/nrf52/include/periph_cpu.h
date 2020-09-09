@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2015-2018 Freie Universität Berlin
+ *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief           nRF52 specific definitions for handling peripherals
  *
  * @author          Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author          Philipp-Alexander Blum <philipp-blum@jakiku.de>
  */
 
 #ifndef PERIPH_CPU_H
@@ -23,6 +25,14 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+/**
+ * @brief   Enable the workaround for the SPI single byte transmit errata (No.
+ * 58 on the nrf52832)
+ */
+#ifdef CPU_MODEL_NRF52832XXAA
+#define ERRATA_SPI_SINGLE_BYTE_WORKAROUND (1)
 #endif
 
 /**
@@ -42,7 +52,7 @@ extern "C" {
 #define SPI_SCKSEL          (dev(bus)->PSEL.SCK)
 #define SPI_MOSISEL         (dev(bus)->PSEL.MOSI)
 #define SPI_MISOSEL         (dev(bus)->PSEL.MISO)
-#ifndef CPU_MODEL_NRF52840XXAA
+#ifdef CPU_MODEL_NRF52832XXAA
 #define UART_IRQN           (UARTE0_UART0_IRQn)
 #endif
 /** @} */
@@ -51,6 +61,14 @@ extern "C" {
  * @brief   The nRF52 family of CPUs provides a fixed number of 9 ADC lines
  */
 #define ADC_NUMOF           (9U)
+
+/**
+ * @brief   SPI temporary buffer size for storing const data in RAM before
+ *          initiating DMA transfer
+ */
+#ifndef CONFIG_SPI_MBUF_SIZE
+#define CONFIG_SPI_MBUF_SIZE    64
+#endif
 
 /**
  * @brief   nRF52 specific naming of ADC lines (for convenience)
@@ -105,8 +123,8 @@ typedef enum {
  */
 typedef struct {
     NRF_TWIM_Type *dev;         /**< TWIM hardware device */
-    uint8_t scl;                /**< SCL pin */
-    uint8_t sda;                /**< SDA pin */
+    gpio_t scl;                 /**< SCL pin */
+    gpio_t sda;                 /**< SDA pin */
     i2c_speed_t speed;          /**< Bus speed */
 } i2c_conf_t;
 /** @} */
@@ -156,25 +174,70 @@ typedef enum {
  *          always start with channel 0 to x and the undefined ones are from x+1
  *          to PWM_CHANNELS.
  */
+#if defined(PWM_PRESENT) || DOXYGEN
 typedef struct {
     NRF_PWM_Type *dev;                  /**< PWM device descriptor */
-    uint32_t pin[PWM_CHANNELS];         /**< PWM out pins */
+    gpio_t pin[PWM_CHANNELS];           /**< PWM out pins */
 } pwm_conf_t;
+#endif
 
-#ifdef CPU_MODEL_NRF52840XXAA
+#if !defined(CPU_MODEL_NRF52832XXAA)
 /**
  * @brief   Structure for UART configuration data
  */
 typedef struct {
-    NRF_UARTE_Type *dev;    /**< UART with EasyDMA device base register address */
-    uint8_t rx_pin;         /**< RX pin */
-    uint8_t tx_pin;         /**< TX pin */
-    uint8_t rts_pin;        /**< RTS pin - set to GPIO_UNDEF when not using HW flow control */
-    uint8_t cts_pin;        /**< CTS pin - set to GPIO_UNDEF when not using HW flow control */
+    NRF_UARTE_Type *dev;    /**< UART with EasyDMA device base
+                             * register address */
+    gpio_t rx_pin;          /**< RX pin */
+    gpio_t tx_pin;          /**< TX pin */
+#ifdef MODULE_PERIPH_UART_HW_FC
+    gpio_t rts_pin;         /**< RTS pin */
+    gpio_t cts_pin;         /**< CTS pin */
+#endif
     uint8_t irqn;           /**< IRQ channel */
 } uart_conf_t;
 #endif
 
+/**
+ * @brief  SPI configuration values
+ */
+typedef struct {
+    NRF_SPIM_Type *dev; /**< SPI device used */
+    gpio_t sclk;        /**< CLK pin */
+    gpio_t mosi;        /**< MOSI pin */
+    gpio_t miso;        /**< MISO pin */
+#if ERRATA_SPI_SINGLE_BYTE_WORKAROUND
+    uint8_t ppi;        /**< PPI channel */
+#endif
+} spi_conf_t;
+
+
+/**
+ * @brief Common SPI/I2C interrupt callback
+ *
+ * @param   arg     Opaque context pointer
+ */
+typedef void (*spi_twi_irq_cb_t)(void *arg);
+
+/**
+ * @brief Reqister a SPI IRQ handler for a shared I2C/SPI irq vector
+ *
+ * @param   bus bus to register the IRQ handler on
+ * @param   cb  callback to call on IRQ
+ * @param   arg Argument to pass to the handler
+ */
+void spi_twi_irq_register_spi(NRF_SPIM_Type *bus,
+                              spi_twi_irq_cb_t cb, void *arg);
+
+/**
+ * @brief Reqister a I2C IRQ handler for a shared I2C/SPI irq vector
+ *
+ * @param   bus bus to register the IRQ handler on
+ * @param   cb  callback to call on IRQ
+ * @param   arg Argument to pass to the handler
+ */
+void spi_twi_irq_register_i2c(NRF_TWIM_Type *bus,
+                              spi_twi_irq_cb_t cb, void *arg);
 #ifdef __cplusplus
 }
 #endif

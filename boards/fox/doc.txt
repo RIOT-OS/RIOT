@@ -5,28 +5,28 @@
 
 ## Components
 
-| MCU    | [ST2M32F103REY](http://www.st.com/web/catalog/mmc/FM141/SC1169/SS1031/LN1565/PF164485) – 32-bits|
-|-------|-----------------------------------------------------------------------------------------------------|
-| RAM | 64Kb |
-| Flash | 512Kb |
-| radio chipset   | [AT86RF231](http://www.atmel.com/images/doc8111.pdf) |
-| | a IEEE802.15.4-compliant radio at 2.4 GHz |
+| MCU           | [ST2M32F103REY](http://www.st.com/web/catalog/mmc/FM141/SC1169/SS1031/LN1565/PF164485) – 32-bits  |
+|:------------- |:------------------------------------------------------------------------------------------------- |
+| RAM           | 64KiB                                                                                             |
+| Flash         | 512KiB                                                                                            |
+| radio chipset | [AT86RF231](http://www.atmel.com/images/doc8111.pdf)                                              |
+|               | a IEEE802.15.4-compliant radio at 2.4 GHz                                                         |
 
 ## Implementation Status
 
-| Device | ID        | Supported | Comments  |
-|:------------- |:------------- |:------------- |:------------- |
-| MCU        | [STM23F103REY](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/reference_manual/CD00171190.pdf) | partly    | Energy saving modes not fully utilized |
-| Low-level driver | GPIO    | yes       | |
-|        | PWM       | no        | |
-|        | UART      | full      | |
-|        | I2C       | yes       | |
-|        | SPI       | yes       | one SPI device for now    |
-|        | USB       | no        | |
-|        | RTT       | yes       | in progress |
-|        | RNG       | no        | no HW module |
-|        | Timer     | full      | |
-| Radio Chip | AT86RF231 | partly        | will be remodelled soon |
+| Device            | ID            | Supported | Comments                  |
+|:----------------- |:------------- |:----------|:------------------------- |
+| MCU               | [STM23F103REY](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/reference_manual/CD00171190.pdf) | partly    | Energy saving modes not fully utilized |
+| Low-level driver  | GPIO          | yes       |                           |
+|                   | PWM           | no        |                           |
+|                   | UART          | full      |                           |
+|                   | I2C           | yes       |                           |
+|                   | SPI           | yes       | one SPI device for now    |
+|                   | USB           | no        |                           |
+|                   | RTT           | yes       | in progress               |
+|                   | RNG           | no        | no HW module              |
+|                   | Timer         | full      |                           |
+| Radio Chip        | AT86RF231     | partly    |   will be remodelled soon |
 
 
 ##### Note on at86rf231 radio driver

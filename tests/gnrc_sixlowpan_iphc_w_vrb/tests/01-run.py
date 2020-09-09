@@ -7,7 +7,7 @@
 # directory for more details.
 
 import sys
-from testrunner import run
+from testrunner import run, check_unittests
 
 
 def testfunc(child):
@@ -88,8 +88,7 @@ def testfunc(child):
         )
         child.expect_exact("Original fragmentation header:")
         child.expect_exact("IPHC headers + payload:")
-        child.expect(r"OK \((\d+) tests\)")
-        assert int(child.match.group(1)) >= 4
+        assert check_unittests(child) >= 4
 
 
 if __name__ == "__main__":

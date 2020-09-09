@@ -6,12 +6,17 @@
  * directory for more details.
  */
 
+#include <kernel_defines.h>
+
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif.h"
 #ifdef MODULE_GNRC_RPL
 #include "net/gnrc/rpl.h"
+#endif
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+#include "net/gnrc/sixlowpan/ctx.h"
 #endif
 #include "net/ipv6/addr.h"
 #include "net/netdev.h"
@@ -21,6 +26,7 @@
 #include "log.h"
 #include "fmt.h"
 
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 static kernel_pid_t gnrc_border_interface;
 static kernel_pid_t gnrc_wireless_interface;
 
@@ -36,9 +42,19 @@ static void set_interface_roles(void)
             gnrc_border_interface = dev;
 
             ipv6_addr_from_str(&addr, "fe80::2");
-            gnrc_netapi_set(dev, NETOPT_IPV6_ADDR, 64 << 8, &addr, sizeof(addr));
+            gnrc_netapi_set(dev, NETOPT_IPV6_ADDR, 64 << 8, &addr,
+                            sizeof(addr));
             ipv6_addr_from_str(&addr, "fe80::1");
             gnrc_ipv6_nib_ft_add(&defroute, IPV6_ADDR_BIT_LEN, &addr, dev, 0);
+
+            /* Disable router advertisements on upstream interface. With this,
+             * the border router
+             * 1. Does not confuse the upstream router to add the border router
+             *    to its default router list and
+             * 2. Solicits upstream Router Advertisements quicker to
+             *    auto-configure its upstream global address.
+             */
+            gnrc_ipv6_nib_change_rtr_adv_iface(netif, false);
         }
         else if ((!gnrc_wireless_interface) && (is_wired != 1)) {
             gnrc_wireless_interface = dev;
@@ -49,25 +65,71 @@ static void set_interface_roles(void)
         }
     }
 
-    LOG_INFO("gnrc_uhcpc: Using %u as border interface and %u as wireless interface.\n", gnrc_border_interface, gnrc_wireless_interface);
+    LOG_INFO("gnrc_uhcpc: Using %u as border interface and %u as wireless "
+             "interface.\n", gnrc_border_interface, gnrc_wireless_interface);
 }
 
 static ipv6_addr_t _prefix;
+static uint8_t _prefix_len;
 
-void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, uint8_t *src, uhcp_iface_t iface)
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+#define SIXLO_CTX_LTIME_MIN (60U)   /**< context lifetime in minutes */
+
+static bool _ctx_match(const gnrc_sixlowpan_ctx_t *ctx,
+                       const ipv6_addr_t *prefix, uint8_t prefix_len)
 {
-    (void)prefix_len;
+    return (ctx != NULL) &&
+           (ctx->prefix_len == prefix_len) &&
+           (ipv6_addr_match_prefix(&ctx->prefix, prefix) >= prefix_len);
+}
+
+static void _update_6ctx(const ipv6_addr_t *prefix, uint8_t prefix_len)
+{
+    gnrc_sixlowpan_ctx_t *ctx = gnrc_sixlowpan_ctx_lookup_addr(prefix);
+    uint8_t cid = 0;
+
+    if (!_ctx_match(ctx, prefix, prefix_len)) {
+        /* While the context is a prefix match, the defined prefix within the
+         * context does not match => use new context */
+        ctx = NULL;
+    }
+    else {
+        cid = ctx->flags_id & GNRC_SIXLOWPAN_CTX_FLAGS_CID_MASK;
+    }
+    /* find first free context ID */
+    if (ctx == NULL) {
+        while (((ctx = gnrc_sixlowpan_ctx_lookup_id(cid)) != NULL) &&
+               !_ctx_match(ctx, prefix, prefix_len)) {
+            cid++;
+        }
+    }
+    if (cid < GNRC_SIXLOWPAN_CTX_SIZE) {
+        LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): add compression context "
+                 "%u for prefix %s/%u\n", cid,
+                 ipv6_addr_to_str(addr_str, prefix, sizeof(addr_str)),
+                 prefix_len);
+        gnrc_sixlowpan_ctx_update(cid, (ipv6_addr_t *)prefix, prefix_len,
+                                  SIXLO_CTX_LTIME_MIN, true);
+    }
+}
+#endif
+
+void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime,
+                        uint8_t *src, uhcp_iface_t iface)
+{
     (void)lifetime;
     (void)src;
 
     eui64_t iid;
     if (!gnrc_wireless_interface) {
-        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): received prefix, but don't know any wireless interface\n");
+        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): received prefix, but "
+                    "don't know any wireless interface\n");
         return;
     }
 
     if ((kernel_pid_t)iface != gnrc_border_interface) {
-        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): received prefix from unexpected interface\n");
+        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): received prefix from "
+                    "unexpected interface\n");
         return;
     }
 
@@ -76,53 +138,72 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime, 
         ipv6_addr_set_aiid((ipv6_addr_t*)prefix, iid.uint8);
     }
     else {
-        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): cannot get IID of wireless interface\n");
+        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): cannot get IID of "
+                    "wireless interface\n");
         return;
     }
 
-    if (ipv6_addr_equal(&_prefix, (ipv6_addr_t*)prefix)) {
-        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): got same prefix again\n");
-        return;
-    }
-
-    gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR, (64 << 8),
-                    prefix, sizeof(ipv6_addr_t));
-#if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
-    GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
-    gnrc_ipv6_nib_abr_add((ipv6_addr_t *)prefix);
+    if ((_prefix_len == prefix_len) &&
+        (ipv6_addr_match_prefix(&_prefix,
+                                (ipv6_addr_t *)prefix) >= prefix_len)) {
+        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): got same prefix "
+                    "again\n");
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+        if (gnrc_netif_is_6ln(gnrc_netif_get_by_pid(gnrc_wireless_interface))) {
+            /* always update 6LoWPAN compression context so it does not time
+             * out, we can't just remove it anyway according to the RFC */
+            _update_6ctx((ipv6_addr_t *)prefix, prefix_len);
+        }
 #endif
+        return;
+    }
+    else if (!ipv6_addr_is_unspecified(&_prefix)) {
+        gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
+                        &_prefix, sizeof(_prefix));
+#if defined(MODULE_GNRC_IPV6_NIB) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) && \
+    IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
+        gnrc_ipv6_nib_abr_del(&_prefix);
+#endif
+        LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix %s/%u\n",
+                 ipv6_addr_to_str(addr_str, &_prefix, sizeof(addr_str)),
+                 prefix_len);
+    }
+    memcpy(&_prefix, prefix, sizeof(_prefix));
+    _prefix_len = prefix_len;
+    gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR,
+                    (prefix_len << 8), prefix, sizeof(ipv6_addr_t));
+    /* only configure 6Lo-ND features when wireless interface uses
+     * 6Lo-ND */
+    if (gnrc_netif_is_6ln(gnrc_netif_get_by_pid(gnrc_wireless_interface))) {
+#ifdef MODULE_GNRC_SIXLOWPAN_CTX
+        /* add compression before ABR to add it automatically to its context
+         * list */
+        _update_6ctx((ipv6_addr_t *)prefix, prefix_len);
+#endif
+#if defined(MODULE_GNRC_IPV6_NIB) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) && \
+        IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
+        gnrc_ipv6_nib_abr_add((ipv6_addr_t *)prefix);
+#endif
+    }
 #ifdef MODULE_GNRC_RPL
     gnrc_rpl_init(gnrc_wireless_interface);
-    gnrc_rpl_instance_t *inst = gnrc_rpl_instance_get(GNRC_RPL_DEFAULT_INSTANCE);
+    gnrc_rpl_instance_t *inst = gnrc_rpl_instance_get(
+                                    CONFIG_GNRC_RPL_DEFAULT_INSTANCE);
     if (inst) {
         gnrc_rpl_instance_remove(inst);
     }
-    gnrc_rpl_root_init(GNRC_RPL_DEFAULT_INSTANCE, (ipv6_addr_t*)prefix, false, false);
+    gnrc_rpl_root_init(CONFIG_GNRC_RPL_DEFAULT_INSTANCE, (ipv6_addr_t*)prefix, false,
+                       false);
 #endif
-    gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
-                    &_prefix, sizeof(_prefix));
-    print_str("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix ");
-    ipv6_addr_print((ipv6_addr_t*)prefix);
-    puts("/64");
-
-    if (!ipv6_addr_is_unspecified(&_prefix)) {
-        gnrc_netapi_set(gnrc_wireless_interface, NETOPT_IPV6_ADDR_REMOVE, 0,
-                        &_prefix, sizeof(_prefix));
-#if defined(MODULE_GNRC_IPV6_NIB) && GNRC_IPV6_NIB_CONF_6LBR && \
-    GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
-        gnrc_ipv6_nib_abr_del(&_prefix);
-#endif
-        print_str("gnrc_uhcpc: uhcp_handle_prefix(): removed old prefix ");
-        ipv6_addr_print(&_prefix);
-        puts("/64");
-    }
-
-    memcpy(&_prefix, prefix, 16);
+    LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): configured new prefix %s/%u\n",
+             ipv6_addr_to_str(addr_str, (ipv6_addr_t *)prefix,
+             sizeof(addr_str)), prefix_len);
 }
 
 extern void uhcp_client(uhcp_iface_t iface);
 
-static char _uhcp_client_stack[THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF];
+static char _uhcp_client_stack[THREAD_STACKSIZE_DEFAULT +
+                               THREAD_EXTRA_STACKSIZE_PRINTF];
 static msg_t _uhcp_msg_queue[4];
 
 static void* uhcp_client_thread(void *arg)

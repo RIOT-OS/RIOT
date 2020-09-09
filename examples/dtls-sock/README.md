@@ -30,7 +30,7 @@ $ PORT=tap1 make all term
 
 ## Debug logs
 
-To enable debug logs uncomment `CFLAGS += -DDTLS_DEBUG` in the Makefile.
+To enable debug logs uncomment `CFLAGS += -DCONFIG_DTLS_DEBUG` in the Makefile.
 Tinydtls supports setting the log level. See Makefile for more info.
 
 ## Configs and constraints

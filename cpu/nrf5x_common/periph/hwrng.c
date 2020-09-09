@@ -30,7 +30,8 @@
 
 void hwrng_init(void)
 {
-    /* nothing to do here */
+    /* enable bias correction */
+    NRF_RNG->CONFIG = 1;
 }
 
 /*

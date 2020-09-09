@@ -1,0 +1,20 @@
+# This file contains all codes that should trigger the usb_id_check warning
+# about a test PID being used
+
+1209 0001
+1209 0002
+1209 0003
+1209 0004
+1209 0005
+1209 0006
+1209 0007
+1209 0008
+1209 0009
+1209 000a
+1209 000b
+1209 000c
+1209 000d
+1209 000e
+1209 000f
+1209 0010
+1209 7d01

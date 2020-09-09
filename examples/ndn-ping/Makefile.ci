@@ -6,7 +6,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega1284p \
     atmega328p \
-    chronos \
     derfmega128 \
     i-nucleo-lrwan1 \
     mega-xplained \
@@ -24,7 +23,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     telosb \
     waspmote-pro \
     weio \
-    wsn430-v1_3b \
-    wsn430-v1_4 \
     z1 \
     #

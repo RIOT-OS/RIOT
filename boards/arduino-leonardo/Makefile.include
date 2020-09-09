@@ -11,9 +11,6 @@ BAUD            ?= 9600
 
 # PROGRAMMER defaults to avr109 which is the internal flasher via USB. Can be
 # overridden for debugging (which requires changes that require to use an ISP)
-PROGRAMMER ?= avr109
-
-BOOTLOADER_SIZE ?= 4K
-ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+BOOTLOADER ?= avr109
 
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

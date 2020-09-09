@@ -21,6 +21,7 @@
 #include <string.h>
 #include <utlist.h>
 
+#include "mbox.h"
 #include "net/af.h"
 #include "net/gnrc.h"
 #include "net/gnrc/tcp.h"
@@ -37,6 +38,8 @@
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
+
+#define TCP_MSG_QUEUE_SIZE (1 << CONFIG_GNRC_TCP_MSG_QUEUE_SIZE_EXP)
 
 /**
  * @brief Allocate memory for GNRC TCP thread stack.
@@ -115,77 +118,75 @@ static void _setup_timeout(xtimer_t *timer, const uint32_t duration, const xtime
  *            -ETIMEDOUT if the connection opening timed out.
  *            -ECONNREFUSED if the connection was reset by the peer.
  */
-static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t target_port,
-                          const char *local_addr, uint16_t local_port, uint8_t passive)
+static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
+                          const uint8_t *local_addr, uint16_t local_port, int passive)
 {
     msg_t msg;
-    xtimer_t connection_timeout;
-    cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &(tcb->mbox)};
-    int8_t ret = 0;
+    msg_t msg_queue[TCP_MSG_QUEUE_SIZE];
+    mbox_t mbox = MBOX_INIT(msg_queue, TCP_MSG_QUEUE_SIZE);
+    cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &mbox};
+    int ret = 0;
 
     /* Lock the TCB for this function call */
     mutex_lock(&(tcb->function_lock));
 
-    /* Connection is already connected: Return -EISCONN */
+    /* TCB is already connected: Return -EISCONN */
     if (tcb->state != FSM_STATE_CLOSED) {
         mutex_unlock(&(tcb->function_lock));
         return -EISCONN;
     }
 
-    /* Mark TCB as waiting for incoming messages */
-    tcb->status |= STATUS_WAIT_FOR_MSG;
-
-    /* 'Flush' mbox */
-    while (mbox_try_get(&(tcb->mbox), &msg) != 0) {
-    }
+    /* Setup messaging */
+    _fsm_set_mbox(tcb, &mbox);
 
     /* Setup passive connection */
     if (passive) {
         /* Mark connection as passive opend */
         tcb->status |= STATUS_PASSIVE;
-        if (local_addr == NULL) {
-            tcb->status |= STATUS_ALLOW_ANY_ADDR;
-        }
 #ifdef MODULE_GNRC_IPV6
         /* If local address is specified: Copy it into TCB */
-        else if (tcb->address_family == AF_INET6) {
-            if (ipv6_addr_from_str((ipv6_addr_t *) tcb->local_addr,  local_addr) == NULL) {
+        if (local_addr && tcb->address_family == AF_INET6) {
+            /* Store given address in TCB */
+            if (memcpy(tcb->local_addr, local_addr, sizeof(tcb->local_addr)) == NULL) {
                 DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : Invalid peer addr\n");
                 return -EINVAL;
+            }
+
+            if (ipv6_addr_is_unspecified((ipv6_addr_t *) tcb->local_addr)) {
+                tcb->status |= STATUS_ALLOW_ANY_ADDR;
             }
         }
 #else
         /* Suppress Compiler Warnings */
-        (void) target_addr;
+        (void) remote;
+        (void) local_addr;
 #endif
         /* Set port number to listen on */
         tcb->local_port = local_port;
     }
     /* Setup active connection */
     else {
+        assert(remote != NULL);
+
         /* Parse target address and port number into TCB */
  #ifdef MODULE_GNRC_IPV6
-        if ((target_addr != NULL) && (tcb->address_family == AF_INET6)) {
+        if (tcb->address_family == AF_INET6) {
 
-            /* Extract interface (optional) specifier from target address */
-            char *ll_iface = ipv6_addr_split_iface(target_addr);
-            if (ipv6_addr_from_str((ipv6_addr_t *) tcb->peer_addr, target_addr) == NULL) {
+            /* Store Address information in TCB */
+            if (memcpy(tcb->peer_addr, remote->addr.ipv6, sizeof(tcb->peer_addr)) == NULL) {
                 DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : Invalid peer addr\n");
                 return -EINVAL;
             }
-
-            /* In case the given address is link-local: Memorize the interface Id if existing. */
-            if ((ll_iface) && ipv6_addr_is_link_local((ipv6_addr_t *) tcb->peer_addr)) {
-                tcb->ll_iface = atoi(ll_iface);
-            }
+            tcb->ll_iface = remote->netif;
         }
  #endif
+
         /* Assign port numbers, verification happens in fsm */
         tcb->local_port = local_port;
-        tcb->peer_port = target_port;
+        tcb->peer_port = remote->port;
 
         /* Setup connection timeout: Put timeout message in TCBs mbox on expiration */
-        _setup_timeout(&connection_timeout, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+        _setup_timeout(&(tcb->timer_misc), CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
                        _cb_mbox_put_msg, &connection_timeout_arg);
     }
 
@@ -194,14 +195,14 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t targe
     if (ret == -ENOMEM) {
         DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : Out of receive buffers.\n");
     }
-    else if(ret == -EADDRINUSE) {
+    else if (ret == -EADDRINUSE) {
         DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : local_port is already in use.\n");
     }
 
     /* Wait until a connection was established or closed */
     while (ret >= 0 && tcb->state != FSM_STATE_CLOSED && tcb->state != FSM_STATE_ESTABLISHED &&
            tcb->state != FSM_STATE_CLOSE_WAIT) {
-        mbox_get(&(tcb->mbox), &msg);
+        mbox_get(&mbox, &msg);
         switch (msg.type) {
             case MSG_TYPE_NOTIFY_USER:
                 DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : MSG_TYPE_NOTIFY_USER\n");
@@ -210,8 +211,9 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t targe
                  * send SYN+ACK we received upon entering SYN_RCVD is never acknowledged
                  * by the peer. */
                 if ((tcb->state == FSM_STATE_SYN_RCVD) && (tcb->status & STATUS_PASSIVE)) {
-                    _setup_timeout(&connection_timeout, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
-                                   _cb_mbox_put_msg, &connection_timeout_arg);
+                    _setup_timeout(&(tcb->timer_misc),
+                                   CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION, _cb_mbox_put_msg,
+                                   &connection_timeout_arg);
                 }
                 break;
 
@@ -238,16 +240,142 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, char *target_addr, uint16_t targe
     }
 
     /* Cleanup */
-    xtimer_remove(&connection_timeout);
+    _fsm_set_mbox(tcb, NULL);
+    xtimer_remove(&(tcb->timer_misc));
     if (tcb->state == FSM_STATE_CLOSED && ret == 0) {
         ret = -ECONNREFUSED;
     }
-    tcb->status &= ~STATUS_WAIT_FOR_MSG;
     mutex_unlock(&(tcb->function_lock));
     return ret;
 }
 
 /* External GNRC TCP API */
+int gnrc_tcp_ep_init(gnrc_tcp_ep_t *ep, int family, const uint8_t *addr, size_t addr_size,
+                     uint16_t port, uint16_t netif)
+{
+#ifdef MODULE_GNRC_IPV6
+    if (family != AF_INET6) {
+        return -EAFNOSUPPORT;
+    }
+
+    if (addr == NULL && addr_size == 0) {
+        ipv6_addr_set_unspecified((ipv6_addr_t *) ep->addr.ipv6);
+    }
+    else if (addr_size == sizeof(ipv6_addr_t)) {
+        memcpy(ep->addr.ipv6, addr, sizeof(ipv6_addr_t));
+    }
+    else {
+        return -EINVAL;
+    }
+#else
+    /* Suppress Compiler Warnings */
+    (void) addr;
+    (void) addr_size;
+    return -EAFNOSUPPORT;
+#endif
+
+    ep->family = family;
+    ep->port = port;
+    ep->netif = netif;
+    return 0;
+}
+
+int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
+{
+    assert(str);
+
+    unsigned port = 0;
+    unsigned netif = 0;
+
+    /* Examine given string */
+    char *addr_begin = strchr(str, '[');
+    char *addr_end = strchr(str, ']');
+
+    /* 1) Ensure that str contains a single pair of brackets */
+    if (!addr_begin || !addr_end || strchr(addr_begin + 1, '[') || strchr(addr_end + 1, ']')) {
+        return -EINVAL;
+    }
+    /* 2) Ensure that the first character is the opening bracket */
+    else if (addr_begin != str) {
+        return -EINVAL;
+    }
+
+    /* 3) Examine optional port number */
+    char *port_begin = strchr(addr_end, ':');
+    if (port_begin) {
+        /* 3.1) Ensure that there are characters left to parse after ':'. */
+        if (*(++port_begin) == '\0') {
+            return -EINVAL;
+        }
+
+        /* 3.2) Ensure that port is a number (atol, does not report errors) */
+        for (char *ptr = port_begin; *ptr; ++ptr) {
+            if ((*ptr < '0') || ('9' < *ptr)) {
+                return -EINVAL;
+            }
+        }
+
+        /* 3.3) Read and verify that given number port is within range */
+        port = atol(port_begin);
+        if (port > 0xFFFF) {
+            return -EINVAL;
+        }
+    }
+
+    /* 4) Examine optional interface identifier. */
+    char *if_begin = strchr(str, '%');
+    if (if_begin) {
+        /* 4.1) Ensure that the identifier is not empty and within brackets. */
+        if (addr_end <= (++if_begin)) {
+            return -EINVAL;
+        }
+
+        /* 4.2) Ensure that the identifier is a number (atol, does not report errors) */
+        for (char *ptr = if_begin; ptr != addr_end; ++ptr) {
+            if ((*ptr < '0') || ('9' < *ptr)) {
+                return -EINVAL;
+            }
+        }
+
+        /* 4.3) Read and replace addr_end with if_begin. */
+        netif = atol(if_begin);
+        addr_end = if_begin - 1;
+    }
+
+#ifdef MODULE_GNRC_IPV6
+    /* 5) Try to parse IP Address. Construct Endpoint on after success. */
+    char tmp[IPV6_ADDR_MAX_STR_LEN];
+
+    /* 5.1) Verify address length and copy address into temporary buffer.
+     *      This is required to preserve constness of input.
+     */
+    int len = addr_end - (++addr_begin);
+
+    if (0 <= len && len < (int) sizeof(tmp)) {
+        memcpy(tmp, addr_begin, len);
+        tmp[len] = '\0';
+    }
+    else {
+        return -EINVAL;
+    }
+
+    /* 5.2) Try to read address into endpoint. */
+    if (ipv6_addr_from_str((ipv6_addr_t *) ep->addr.ipv6, tmp) == NULL) {
+        return -EINVAL;
+    }
+    ep->family = AF_INET6;
+#else
+    /* Suppress Compiler Warnings */
+    (void) port;
+    (void) netif;
+    return -EINVAL;
+#endif
+
+    ep->port = (uint16_t) port;
+    ep->netif = (uint16_t) netif;
+    return 0;
+}
+
 int gnrc_tcp_init(void)
 {
     /* Guard: Check if thread is already running */
@@ -279,22 +407,19 @@ void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb)
     tcb->rtt_var = RTO_UNINITIALIZED;
     tcb->srtt = RTO_UNINITIALIZED;
     tcb->rto = RTO_UNINITIALIZED;
-    mbox_init(&(tcb->mbox), tcb->mbox_raw, GNRC_TCP_TCB_MBOX_SIZE);
     mutex_init(&(tcb->fsm_lock));
     mutex_init(&(tcb->function_lock));
 }
 
-int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb, uint8_t address_family,
-                         char *target_addr, uint16_t target_port,
-                         uint16_t local_port)
+int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote, uint16_t local_port)
 {
     assert(tcb != NULL);
-    assert(target_addr != NULL);
-    assert(target_port != PORT_UNSPEC);
+    assert(remote != NULL);
+    assert(remote->port != PORT_UNSPEC);
 
-    /* Check if AF-Family of target_addr is supported */
+    /* Check if given AF-Family in remote is supported */
 #ifdef MODULE_GNRC_IPV6
-    if (address_family != AF_INET6) {
+    if (remote->family != AF_INET6) {
         return -EAFNOSUPPORT;
     }
 #else
@@ -302,35 +427,36 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb, uint8_t address_family,
 #endif
 
     /* Check if AF-Family for target address matches internally used AF-Family */
-    if (tcb->address_family != address_family) {
+    if (remote->family != tcb->address_family) {
         return -EINVAL;
     }
+
     /* Proceed with connection opening */
-    return _gnrc_tcp_open(tcb, target_addr, target_port, NULL, local_port, 0);
+    return _gnrc_tcp_open(tcb, remote, NULL, local_port, 0);
 }
 
-int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, uint8_t address_family,
-                          const char *local_addr, uint16_t local_port)
+int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *local)
 {
     assert(tcb != NULL);
-    assert(local_port != PORT_UNSPEC);
+    assert(local != NULL);
+    assert(local->port != PORT_UNSPEC);
 
-    /* Check AF-Family support if local address was supplied */
-    if (local_addr != NULL) {
+    /* Check if given AF-Family in local is supported */
 #ifdef MODULE_GNRC_IPV6
-        if (address_family != AF_INET6) {
-            return -EAFNOSUPPORT;
-        }
-#else
+    if (local->family != AF_INET6) {
         return -EAFNOSUPPORT;
-#endif
-        /* Check if AF-Family matches internally used AF-Family */
-        if (tcb->address_family != address_family) {
-            return -EINVAL;
-        }
     }
+
+    /* Check if AF-Family matches internally used AF-Family */
+    if (local->family != tcb->address_family) {
+        return -EINVAL;
+    }
+
     /* Proceed with connection opening */
-    return _gnrc_tcp_open(tcb, NULL, 0, local_addr, local_port, 1);
+    return _gnrc_tcp_open(tcb, NULL, local->addr.ipv6, local->port, 1);
+#else
+    return -EAFNOSUPPORT;
+#endif
 }
 
 ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
@@ -340,12 +466,13 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     assert(data != NULL);
 
     msg_t msg;
-    xtimer_t connection_timeout;
-    cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &(tcb->mbox)};
+    msg_t msg_queue[TCP_MSG_QUEUE_SIZE];
+    mbox_t mbox = MBOX_INIT(msg_queue, TCP_MSG_QUEUE_SIZE);
+    cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &mbox};
     xtimer_t user_timeout;
-    cb_arg_t user_timeout_arg = {MSG_TYPE_USER_SPEC_TIMEOUT, &(tcb->mbox)};
+    cb_arg_t user_timeout_arg = {MSG_TYPE_USER_SPEC_TIMEOUT, &mbox};
     xtimer_t probe_timeout;
-    cb_arg_t probe_timeout_arg = {MSG_TYPE_PROBE_TIMEOUT, &(tcb->mbox)};
+    cb_arg_t probe_timeout_arg = {MSG_TYPE_PROBE_TIMEOUT, &mbox};
     uint32_t probe_timeout_duration_us = 0;
     ssize_t ret = 0;
     bool probing_mode = false;
@@ -359,18 +486,13 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
         return -ENOTCONN;
     }
 
-    /* Mark TCB as waiting for incoming messages */
-    tcb->status |= STATUS_WAIT_FOR_MSG;
-
-    /* 'Flush' mbox */
-    while (mbox_try_get(&(tcb->mbox), &msg) != 0) {
-    }
+    /* Setup messaging */
+    _fsm_set_mbox(tcb, &mbox);
 
     /* Setup connection timeout: Put timeout message in tcb's mbox on expiration */
-    _setup_timeout(&connection_timeout, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+    _setup_timeout(&(tcb->timer_misc), CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
                    _cb_mbox_put_msg, &connection_timeout_arg);
 
-    /* Setup user specified timeout if timeout_us is greater than zero */
     if (timeout_duration_us > 0) {
         _setup_timeout(&user_timeout, timeout_duration_us, _cb_mbox_put_msg, &user_timeout_arg);
     }
@@ -401,7 +523,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
         }
 
         /* Wait for responses */
-        mbox_get(&(tcb->mbox), &msg);
+        mbox_get(&mbox, &msg);
         switch (msg.type) {
             case MSG_TYPE_CONNECTION_TIMEOUT:
                 DEBUG("gnrc_tcp.c : gnrc_tcp_send() : CONNECTION_TIMEOUT\n");
@@ -422,11 +544,11 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
                 probe_timeout_duration_us += probe_timeout_duration_us;
 
                 /* Boundary check for time interval between probes */
-                if (probe_timeout_duration_us < GNRC_TCP_PROBE_LOWER_BOUND) {
-                    probe_timeout_duration_us = GNRC_TCP_PROBE_LOWER_BOUND;
+                if (probe_timeout_duration_us < CONFIG_GNRC_TCP_PROBE_LOWER_BOUND) {
+                    probe_timeout_duration_us = CONFIG_GNRC_TCP_PROBE_LOWER_BOUND;
                 }
-                else if (probe_timeout_duration_us > GNRC_TCP_PROBE_UPPER_BOUND) {
-                    probe_timeout_duration_us = GNRC_TCP_PROBE_UPPER_BOUND;
+                else if (probe_timeout_duration_us > CONFIG_GNRC_TCP_PROBE_UPPER_BOUND) {
+                    probe_timeout_duration_us = CONFIG_GNRC_TCP_PROBE_UPPER_BOUND;
                 }
                 break;
 
@@ -434,7 +556,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
                 DEBUG("gnrc_tcp.c : gnrc_tcp_send() : NOTIFY_USER\n");
 
                 /* Connection is alive: Reset Connection Timeout */
-                _setup_timeout(&connection_timeout, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+                _setup_timeout(&(tcb->timer_misc), CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
                                _cb_mbox_put_msg, &connection_timeout_arg);
 
                 /* If the window re-opened and we are probing: Stop it */
@@ -450,10 +572,10 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     }
 
     /* Cleanup */
+    _fsm_set_mbox(tcb, NULL);
+    xtimer_remove(&(tcb->timer_misc));
     xtimer_remove(&probe_timeout);
-    xtimer_remove(&connection_timeout);
     xtimer_remove(&user_timeout);
-    tcb->status &= ~STATUS_WAIT_FOR_MSG;
     mutex_unlock(&(tcb->function_lock));
     return ret;
 }
@@ -465,10 +587,11 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     assert(data != NULL);
 
     msg_t msg;
-    xtimer_t connection_timeout;
-    cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &(tcb->mbox)};
+    msg_t msg_queue[TCP_MSG_QUEUE_SIZE];
+    mbox_t mbox = MBOX_INIT(msg_queue, TCP_MSG_QUEUE_SIZE);
+    cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &mbox};
     xtimer_t user_timeout;
-    cb_arg_t user_timeout_arg = {MSG_TYPE_USER_SPEC_TIMEOUT, &(tcb->mbox)};
+    cb_arg_t user_timeout_arg = {MSG_TYPE_USER_SPEC_TIMEOUT, &mbox};
     ssize_t ret = 0;
 
     /* Lock the TCB for this function call */
@@ -499,18 +622,12 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         return ret;
     }
 
-    /* Mark TCB as waiting for incoming messages */
-    tcb->status |= STATUS_WAIT_FOR_MSG;
-
-    /* 'Flush' mbox */
-    while (mbox_try_get(&(tcb->mbox), &msg) != 0) {
-    }
+    /* Setup messaging */
+    _fsm_set_mbox(tcb, &mbox);
 
     /* Setup connection timeout: Put timeout message in tcb's mbox on expiration */
-    _setup_timeout(&connection_timeout, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+    _setup_timeout(&(tcb->timer_misc), CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
                    _cb_mbox_put_msg, &connection_timeout_arg);
-
-    /* Setup user specified timeout */
     _setup_timeout(&user_timeout, timeout_duration_us, _cb_mbox_put_msg, &user_timeout_arg);
 
     /* Processing loop */
@@ -531,7 +648,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
 
         /* If there was no data: Wait for next packet or until the timeout fires */
         if (ret <= 0) {
-            mbox_get(&(tcb->mbox), &msg);
+            mbox_get(&mbox, &msg);
             switch (msg.type) {
                 case MSG_TYPE_CONNECTION_TIMEOUT:
                     DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : CONNECTION_TIMEOUT\n");
@@ -556,9 +673,9 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     }
 
     /* Cleanup */
-    xtimer_remove(&connection_timeout);
+    _fsm_set_mbox(tcb, NULL);
+    xtimer_remove(&(tcb->timer_misc));
     xtimer_remove(&user_timeout);
-    tcb->status &= ~STATUS_WAIT_FOR_MSG;
     mutex_unlock(&(tcb->function_lock));
     return ret;
 }
@@ -568,8 +685,9 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     assert(tcb != NULL);
 
     msg_t msg;
-    xtimer_t connection_timeout;
-    cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &(tcb->mbox)};
+    msg_t msg_queue[TCP_MSG_QUEUE_SIZE];
+    mbox_t mbox = MBOX_INIT(msg_queue, TCP_MSG_QUEUE_SIZE);
+    cb_arg_t connection_timeout_arg = {MSG_TYPE_CONNECTION_TIMEOUT, &mbox};
 
     /* Lock the TCB for this function call */
     mutex_lock(&(tcb->function_lock));
@@ -580,15 +698,11 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
         return;
     }
 
-    /* Mark TCB as waiting for incoming messages */
-    tcb->status |= STATUS_WAIT_FOR_MSG;
-
-    /* 'Flush' mbox */
-    while (mbox_try_get(&(tcb->mbox), &msg) != 0) {
-    }
+    /* Setup messaging */
+    _fsm_set_mbox(tcb, &mbox);
 
     /* Setup connection timeout: Put timeout message in tcb's mbox on expiration */
-    _setup_timeout(&connection_timeout, GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
+    _setup_timeout(&(tcb->timer_misc), CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION,
                    _cb_mbox_put_msg, &connection_timeout_arg);
 
     /* Start connection teardown sequence */
@@ -596,7 +710,7 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
 
     /* Loop until the connection has been closed */
     while (tcb->state != FSM_STATE_CLOSED) {
-        mbox_get(&(tcb->mbox), &msg);
+        mbox_get(&mbox, &msg);
         switch (msg.type) {
             case MSG_TYPE_CONNECTION_TIMEOUT:
                 DEBUG("gnrc_tcp.c : gnrc_tcp_close() : CONNECTION_TIMEOUT\n");
@@ -613,8 +727,8 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     }
 
     /* Cleanup */
-    xtimer_remove(&connection_timeout);
-    tcb->status &= ~STATUS_WAIT_FOR_MSG;
+    _fsm_set_mbox(tcb, NULL);
+    xtimer_remove(&(tcb->timer_misc));
     mutex_unlock(&(tcb->function_lock));
 }
 

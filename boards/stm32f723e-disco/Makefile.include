@@ -11,8 +11,5 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # this board has an on-board ST-link adapter
 DEBUG_ADAPTER ?= stlink
 
-# TODO: remove the stdin dependency
-USEMODULE += stdin
-
 # this board uses openocd
 include $(RIOTMAKE)/tools/openocd.inc.mk

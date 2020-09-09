@@ -20,7 +20,6 @@
 
 #include <stdio.h>
 #include "thread.h"
-#include "test_utils/interactive_sync.h"
 #ifdef MODULE_PS
 #include "ps.h"
 #endif /* MODULE_PS */
@@ -45,8 +44,6 @@ void *second_thread(void *arg)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     /* save thread count on test start */
     int current_thread_count;
     int start_thread_count = sched_num_threads;

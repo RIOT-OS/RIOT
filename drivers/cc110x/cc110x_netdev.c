@@ -89,7 +89,7 @@ void cc110x_on_gdo(void *_dev)
         mutex_unlock(&dev->isr_signal);
     }
     else {
-        dev->netdev.event_callback(&dev->netdev, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr(&dev->netdev);
     }
 }
 
@@ -348,7 +348,7 @@ static int cc110x_init(netdev_t *netdev)
      * cc110x_full_calibration
      */
     retval = cc110x_apply_config(dev, dev->params.config, dev->params.channels,
-                                 CC110X_DEFAULT_CHANNEL);
+                                 CONFIG_CC110X_DEFAULT_CHANNEL);
     if (retval) {
         gpio_irq_disable(dev->params.gdo0);
         gpio_irq_disable(dev->params.gdo2);
@@ -486,8 +486,19 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
     gpio_irq_enable(dev->params.gdo2);
 
     while ((dev->state & 0x07) == CC110X_STATE_TX_MODE) {
-        /* Block until mutex is unlocked from ISR */
-        mutex_lock(&dev->isr_signal);
+        uint64_t timeout = (dev->state != CC110X_STATE_TX_COMPLETING) ?
+                           2048 : 1024;
+        /* Block until mutex is unlocked from ISR, or a timeout occurs. The
+         * timeout prevents deadlocks when IRQs are lost. If the TX FIFO
+         * still needs to be filled, the timeout is 1024 µs - or after 32 Byte
+         * (= 50%) of the FIFO have been transmitted at 250 kbps. If
+         * no additional data needs to be fed into the FIFO, a timeout of
+         * 2048 µs is used instead to allow the frame to be completely drained
+         * before the timeout triggers. The ISR handler is prepared to be
+         * called prematurely, so we don't need to worry about extra calls
+         * to cc110x_isr() introduced by accident.
+         */
+        xtimer_mutex_lock_timeout(&dev->isr_signal, timeout);
         cc110x_isr(&dev->netdev);
     }
 
@@ -495,23 +506,24 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
 }
 
 /**
- * @brief   Generate an IPv6 interface identifier for a CC110X transceiver
+ * @brief   Checks if the CC110x's address filter is disabled
+ * @param   dev     Transceiver to check if in promiscuous mode
+ * @param   dest    Store the result here
  *
- * @param   dev     Transceiver to create the IPv6 interface identifier (IID)
- * @param   iid     Store the generated IID here
- *
- * @return  Returns the size of @ref eui64_t to confirm with the API
+ * @return  Returns the size of @ref netopt_enable_t to confirm with the API
  *          in @ref netdev_driver_t::get
  */
-static int cc110x_get_iid(cc110x_t *dev, eui64_t *iid)
+static int cc110x_get_promiscuous_mode(cc110x_t *dev, netopt_enable_t *dest)
 {
-    static const eui64_t empty_iid = {
-        .uint8 = { 0x00, 0x00, 0x00, 0xff, 0xfe, 0x00, 0x00, 0x00 }
-    };
+    if (cc110x_acquire(dev) != SPI_OK) {
+        return -EIO;
+    }
 
-    *iid = empty_iid;
-    iid->uint8[7] = dev->addr;
-    return sizeof(eui64_t);
+    uint8_t pktctrl1;
+    cc110x_read(dev, CC110X_REG_PKTCTRL1, &pktctrl1);
+    *dest = ((pktctrl1 & CC110X_PKTCTRL1_GET_ADDR_MODE) == CC110X_PKTCTRL1_ADDR_ALL);
+    cc110x_release(dev);
+    return sizeof(netopt_enable_t);
 }
 
 static int cc110x_get(netdev_t *netdev, netopt_t opt,
@@ -519,6 +531,7 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
 {
     cc110x_t *dev = (cc110x_t *)netdev;
 
+    (void)max_len;  /* only used in assert() */
     switch (opt) {
         case NETOPT_DEVICE_TYPE:
             assert(max_len == sizeof(uint16_t));
@@ -542,11 +555,6 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
             assert(max_len >= CC1XXX_ADDR_SIZE);
             *((uint8_t *)val) = dev->addr;
             return CC1XXX_ADDR_SIZE;
-        case NETOPT_IPV6_IID:
-            if (max_len < sizeof(eui64_t)) {
-                return -EOVERFLOW;
-            }
-            return cc110x_get_iid(dev, val);
         case NETOPT_CHANNEL:
             assert(max_len == sizeof(uint16_t));
             *((uint16_t *)val) = dev->channel;
@@ -555,6 +563,9 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
             assert(max_len == sizeof(uint16_t));
             *((uint16_t *)val) = dbm_from_tx_power[dev->tx_power];
             return sizeof(uint16_t);
+        case NETOPT_PROMISCUOUSMODE:
+            assert(max_len == sizeof(netopt_enable_t));
+            return cc110x_get_promiscuous_mode(dev, val);
         default:
             return -ENOTSUP;
     }
@@ -576,6 +587,32 @@ static int cc110x_set_addr(cc110x_t *dev, uint8_t addr)
     cc110x_write(dev, CC110X_REG_ADDR, addr);
     cc110x_release(dev);
     return 1;
+}
+
+/**
+ * @brief   Enables/disables the CC110x's address filter
+ * @param   dev     Transceiver to turn promiscuous mode on/off
+ * @param   enable  Whether to enable or disable promiscuous mode
+ *
+ * @return  Returns the size of @ref netopt_enable_t to confirm with the API
+ *          in @ref netdev_driver_t::set
+ */
+static int cc110x_set_promiscuous_mode(cc110x_t *dev, netopt_enable_t enable)
+{
+    if (cc110x_acquire(dev) != SPI_OK) {
+        return -EIO;
+    }
+
+    uint8_t pktctrl1 = CC110X_PKTCTRL1_VALUE;
+    if (enable == NETOPT_ENABLE) {
+        pktctrl1 |= CC110X_PKTCTRL1_ADDR_ALL;
+    }
+    else {
+        pktctrl1 |= CC110X_PKTCTRL1_ADDR_MATCH;
+    }
+    cc110x_write(dev, CC110X_REG_PKTCTRL1, pktctrl1);
+    cc110x_release(dev);
+    return sizeof(netopt_enable_t);
 }
 
 static int cc110x_set(netdev_t *netdev, netopt_t opt,
@@ -616,6 +653,9 @@ static int cc110x_set(netdev_t *netdev, netopt_t opt,
             }
         }
             return sizeof(uint16_t);
+        case NETOPT_PROMISCUOUSMODE:
+            assert(len == sizeof(netopt_enable_t));
+            return cc110x_set_promiscuous_mode(dev, *((const netopt_enable_t *)val));
         default:
             return -ENOTSUP;
     }

@@ -130,7 +130,7 @@ int lis3dh_set_aux_adc(const lis3dh_t *dev, const uint8_t enable,
                        const uint8_t temperature)
 {
     return lis3dh_write_bits(dev, LIS3DH_REG_TEMP_CFG_REG,
-                             LIS3DH_TEMP_CFG_REG_ADC_PD_MASK,
+                             LIS3DH_TEMP_CFG_REG_ADC_PD_MASK | LIS3DH_TEMP_CFG_REG_TEMP_EN_MASK,
                              (enable ? LIS3DH_TEMP_CFG_REG_ADC_PD_MASK : 0) |
                              (temperature ? LIS3DH_TEMP_CFG_REG_TEMP_EN_MASK : 0));
 }

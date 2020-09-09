@@ -41,9 +41,8 @@ static void _irq_handler(void *arg)
 {
     netdev_t *dev = (netdev_t *) arg;
 
-    if (dev->event_callback) {
-        dev->event_callback(dev, NETDEV_EVENT_ISR);
-    }
+    netdev_trigger_event_isr(dev);
+
     ((mrf24j40_t *)arg)->irq_flag = 1;
 }
 
@@ -331,6 +330,20 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             }
             break;
 
+#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+
+        case NETOPT_IEEE802154_PHY:
+            assert(max_len >= sizeof(int8_t));
+            *(uint8_t *)val = IEEE802154_PHY_OQPSK;
+            return sizeof(uint8_t);
+
+        case NETOPT_OQPSK_RATE:
+            assert(max_len >= sizeof(int8_t));
+            *(uint8_t *)val = mrf24j40_get_turbo(dev);
+            return sizeof(uint8_t);
+
+#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
+
         default:
             /* try netdev settings */
             res = netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt,
@@ -524,6 +537,16 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
                 res = sizeof(int8_t);
             }
             break;
+
+#ifdef MODULE_NETDEV_IEEE802154_OQPSK
+
+        case NETOPT_OQPSK_RATE:
+            res = !!*(uint8_t *)val;
+            mrf24j40_set_turbo(dev, res);
+            res = sizeof(uint8_t);
+            break;
+
+#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
 
         default:
             break;

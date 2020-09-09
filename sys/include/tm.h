@@ -105,7 +105,7 @@ void tm_fill_derived_values(struct tm *tm);
  * @param[in]       year   The year.
  * @param[in]       mon    The month.
  * @param[in]       mday   The day in the month.
- * @returns         0 iff the date is invalid.
+ * @returns         0 if the date is invalid.
  */
 int tm_is_valid_date(int year, int mon, int mday) CONST;
 
@@ -115,7 +115,7 @@ int tm_is_valid_date(int year, int mon, int mday) CONST;
  * @param[in]       hour   The hour.
  * @param[in]       min    The minutes.
  * @param[in]       sec    The seconds.
- * @returns         0 iff the time is invalid.
+ * @returns         0 if the time is invalid.
  */
 int tm_is_valid_time(int hour, int min, int sec) CONST;
 

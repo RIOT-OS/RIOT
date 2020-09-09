@@ -11,15 +11,6 @@ ASFLAGS   += $(CFLAGS_CPU) $(CFLAGS_DBG)
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -e reset_handler -Wl,--gc-sections
 OFLAGS    += -j .text -j .data
 
-# Tell the build system that the CPU depends on the atmega common files:
-USEMODULE += atmega_common
-
-# export the peripheral drivers to be linked into the final binary
-USEMODULE += atmega_common_periph
-
-# the atmel port uses stdio_uart
-USEMODULE += stdio_uart
-
 # explicitly tell the linker to link the syscalls and startup code.
 # without this the interrupt vectors will not be linked correctly!
 UNDEF += $(BINDIR)/atmega_common/startup.o

@@ -8,7 +8,7 @@ the moment and does suffer stability issues!
 
 **NOTE 2:** Currently, Linux does not support 6LoWPAN neighbor discovery (which
 RIOT uses per default with BLE), so RIOT needs to be compiled to use stateless
-address auto configuration (SLAAC) -> `CFLAGS=-DGNRC_IPV6_NIB_CONF_SLAAC=1`.
+address auto configuration (SLAAC) -> `CFLAGS=-DCONFIG_GNRC_IPV6_NIB_SLAAC=1`.
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ following:
 
 First, you compile and flash the `examples/gnrc_networking` application to your
 RIOT device. When doing this, make sure to enable SLAAC
-(`CFLAGS=-DGNRC_IPV6_NIB_CONF_SLAAC=1`), see note above.
+(`CFLAGS=-DCONFIG_GNRC_IPV6_NIB_SLAAC=1`), see note above.
 
 Once the firmware is running, you can verify it by typing
 

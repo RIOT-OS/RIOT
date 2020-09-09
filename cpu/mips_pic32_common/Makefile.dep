@@ -1,0 +1,11 @@
+USEMODULE += mips_pic32_common
+USEMODULE += mips_pic32_common_periph
+
+# mips32 needs periph_timer for its gettimeofday() implementation
+USEMODULE += periph_timer
+
+# add module defining cpu model specific symbols. This module is located in
+# $(RIOTCPU)/$(CPU)/$(CPU_MODEL)
+USEMODULE += $(CPU_MODEL)
+
+include $(RIOTCPU)/mips32r2_common/Makefile.dep

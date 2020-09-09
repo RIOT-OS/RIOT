@@ -27,7 +27,6 @@
 #include <inttypes.h>
 
 #include "thread.h"
-#include "xtimer.h"
 #include "shell.h"
 #include "shell_commands.h"
 
@@ -266,7 +265,7 @@ int listen_cmd(int argc, char **argv)
     netdev->driver->set(netdev, NETOPT_RX_TIMEOUT, &timeout, sizeof(timeout));
 
     /* Switch to RX state */
-    uint8_t state = NETOPT_STATE_RX;
+    netopt_state_t state = NETOPT_STATE_RX;
     netdev->driver->set(netdev, NETOPT_STATE, &state, sizeof(state));
 
     printf("Listen mode set\n");
@@ -379,8 +378,65 @@ int reset_cmd(int argc, char **argv)
     return 0;
 }
 
+static void _set_opt(netdev_t *netdev, netopt_t opt, bool val, char* str_help)
+{
+    netopt_enable_t en = val ? NETOPT_ENABLE : NETOPT_DISABLE;
+    netdev->driver->set(netdev, opt, &en, sizeof(en));
+    printf("Successfully ");
+    if (val) {
+        printf("enabled ");
+    }
+    else {
+        printf("disabled ");
+    }
+    printf("%s\n", str_help);
+}
+
+int crc_cmd(int argc, char **argv)
+{
+    netdev_t *netdev = (netdev_t *)&sx127x;
+    if (argc < 3 || strcmp(argv[1], "set") != 0) {
+        printf("usage: %s set <1|0>\n", argv[0]);
+        return 1;
+    }
+
+    int tmp = atoi(argv[2]);
+    _set_opt(netdev, NETOPT_INTEGRITY_CHECK, tmp, "CRC check");
+    return 0;
+}
+
+int implicit_cmd(int argc, char **argv)
+{
+    netdev_t *netdev = (netdev_t *)&sx127x;
+    if (argc < 3 || strcmp(argv[1], "set") != 0) {
+        printf("usage: %s set <1|0>\n", argv[0]);
+        return 1;
+    }
+
+    int tmp = atoi(argv[2]);
+    _set_opt(netdev, NETOPT_FIXED_HEADER, tmp, "implicit header");
+    return 0;
+}
+
+int payload_cmd(int argc, char **argv)
+{
+    netdev_t *netdev = (netdev_t *)&sx127x;
+    if (argc < 3 || strcmp(argv[1], "set") != 0) {
+        printf("usage: %s set <payload length>\n", argv[0]);
+        return 1;
+    }
+
+    uint16_t tmp = atoi(argv[2]);
+    netdev->driver->set(netdev, NETOPT_PDU_SIZE, &tmp, sizeof(tmp));
+    printf("Successfully set payload to %i\n", tmp);
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "setup",    "Initialize LoRa modulation settings",     lora_setup_cmd },
+    { "implicit", "Enable implicit header",                  implicit_cmd },
+    { "crc",      "Enable CRC",                              crc_cmd },
+    { "payload",  "Set payload length (implicit header)",    payload_cmd },
     { "random",   "Get random number from sx127x",           random_cmd },
     { "syncword", "Get/Set the syncword",                    syncword_cmd },
     { "rx_timeout", "Set the RX timeout",                    rx_timeout_cmd },

@@ -1,3 +1,2 @@
 USEMODULE += hashes
-USEMODULE += crypto
-CFLAGS += -DCRYPTO_AES
+USEMODULE += crypto_aes

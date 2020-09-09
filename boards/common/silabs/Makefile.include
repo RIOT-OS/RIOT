@@ -1,2 +1,13 @@
 INCLUDES += -I$(RIOTBOARD)/common/silabs/include
 INCLUDES += -I$(RIOTBOARD)/common/silabs/drivers/include
+
+PROGRAMMER ?= jlink
+
+JLINK_DEVICE ?= ${CPU_MODEL}
+OPENOCD_CONFIG ?= board/efm32.cfg
+
+ifeq ($(PROGRAMMER),jlink)
+  include $(RIOTMAKE)/tools/jlink.inc.mk
+else ifeq ($(PROGRAMMER),openocd)
+  include $(RIOTMAKE)/tools/openocd.inc.mk
+endif

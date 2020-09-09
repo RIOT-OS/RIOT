@@ -45,7 +45,7 @@
 #define BUSSTATE_OWNER SERCOM_I2CM_STATUS_BUSSTATE(2)
 #define BUSSTATE_BUSY SERCOM_I2CM_STATUS_BUSSTATE(3)
 
-#if defined(CPU_SAML21) || defined(CPU_SAML1X) || defined(CPU_SAMD5X)
+#if defined(CPU_COMMON_SAML21) || defined(CPU_COMMON_SAML1X) || defined(CPU_COMMON_SAMD5X)
 #define SERCOM_I2CM_CTRLA_MODE_I2C_MASTER SERCOM_I2CM_CTRLA_MODE(5)
 #endif
 
@@ -79,6 +79,10 @@ void i2c_init(i2c_t dev)
     int32_t tmp_baud;
 
     assert(dev < I2C_NUMOF);
+
+    const uint32_t fSCL = i2c_config[dev].speed;
+    const uint32_t fGCLK = sam0_gclk_freq(i2c_config[dev].gclk_src);
+
     /* Initialize mutex */
     mutex_init(&locks[dev]);
     /* DISABLE I2C MASTER */
@@ -92,7 +96,7 @@ void i2c_init(i2c_t dev)
     sercom_clk_en(bus(dev));
 
     /* I2C using CLK GEN 0 */
-    sercom_set_gen(bus(dev),i2c_config[dev].gclk_src);
+    sercom_set_gen(bus(dev), i2c_config[dev].gclk_src);
 
     /* Check if module is enabled. */
     if (bus(dev)->CTRLA.reg & SERCOM_I2CM_CTRLA_ENABLE) {
@@ -121,30 +125,31 @@ void i2c_init(i2c_t dev)
     /* Enable Smart Mode (ACK is sent when DATA.DATA is read) */
     bus(dev)->CTRLB.reg = SERCOM_I2CM_CTRLB_SMEN;
 
-    /* Find and set baudrate. Read speed configuration. Set transfer
-     * speed: SERCOM_I2CM_CTRLA_SPEED(0): Standard-mode (Sm) up to 100
-     * kHz and Fast-mode (Fm) up to 400 kHz */
-    switch (i2c_config[dev].speed) {
-        case I2C_SPEED_NORMAL:
-        case I2C_SPEED_FAST:
-            bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(0);
-            break;
-        case I2C_SPEED_HIGH:
-            bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(2);
-            break;
-        default:
-            DEBUG("BAD BAUDRATE\n");
-            return;
+    /* Set SPEED */
+    if (fSCL > I2C_SPEED_FAST_PLUS) {
+        bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(2);
+    } else if (fSCL > I2C_SPEED_FAST) {
+        bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(1);
+    } else {
+        bus(dev)->CTRLA.reg |= SERCOM_I2CM_CTRLA_SPEED(0);
     }
+
     /* Get the baudrate */
-    tmp_baud = (int32_t)(((CLOCK_CORECLOCK +
-               (2 * (i2c_config[dev].speed)) - 1) /
-               (2 * (i2c_config[dev].speed))) -
-               (i2c_config[dev].speed == I2C_SPEED_HIGH ? 1 : 5));
+    /* fSCL = fGCLK / (10 + 2 * BAUD)  -> BAUD   = fGCLK / (2 * fSCL) - 5 */
+    /* fSCL = fGCLK / (2 + 2 * HSBAUD) -> HSBAUD = fGCLK / (2 * fSCL) - 1 */
+    tmp_baud = (fGCLK + (2 * fSCL) - 1) /* round up */
+             / (2 * fSCL)
+             - (fSCL > I2C_SPEED_FAST_PLUS ? 1 : 5);
+
     /* Ensure baudrate is within limits */
-    if (tmp_baud < 255 && tmp_baud > 0) {
+    assert(tmp_baud < 255 && tmp_baud > 0);
+
+    if (fSCL > I2C_SPEED_FAST_PLUS) {
+        bus(dev)->BAUD.reg = SERCOM_I2CM_BAUD_HSBAUD(tmp_baud);
+    } else {
         bus(dev)->BAUD.reg = SERCOM_I2CM_BAUD_BAUD(tmp_baud);
     }
+
     /* ENABLE I2C MASTER */
     _i2c_poweron(dev);
 
@@ -170,6 +175,31 @@ void i2c_release(i2c_t dev)
     assert(dev < I2C_NUMOF);
     mutex_unlock(&locks[dev]);
 }
+
+#ifdef MODULE_PERIPH_I2C_RECONFIGURE
+void i2c_init_pins(i2c_t dev)
+{
+    assert(dev < I2C_NUMOF);
+
+    _i2c_poweron(dev);
+
+    gpio_init_mux(i2c_config[dev].scl_pin, i2c_config[dev].mux);
+    gpio_init_mux(i2c_config[dev].sda_pin, i2c_config[dev].mux);
+
+    mutex_unlock(&locks[dev]);
+}
+
+void i2c_deinit_pins(i2c_t dev)
+{
+    assert(dev < I2C_NUMOF);
+
+    mutex_lock(&locks[dev]);
+    _i2c_poweroff(dev);
+
+    gpio_disable_mux(i2c_config[dev].sda_pin);
+    gpio_disable_mux(i2c_config[dev].scl_pin);
+}
+#endif
 
 int i2c_read_bytes(i2c_t dev, uint16_t addr,
                    void *data, size_t len, uint8_t flags)

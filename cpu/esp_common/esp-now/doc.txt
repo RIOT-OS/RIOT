@@ -9,6 +9,8 @@
 /**
  * @defgroup    cpu_esp_common_esp_now ESP-NOW netdev interface
  * @ingroup     cpu_esp_common
+ * @ingroup     cpu_esp32
+ * @ingroup     cpu_esp8266
  * @brief       WiFi based ESP-NOW network device driver
  *
  * @author      Gunar Schorcht <gunar@schorcht.net>
@@ -43,5 +45,8 @@ ESP_NOW_KEY | NULL | Defines a key that is used for encrypted communication betw
 Wifi network interface (module `esp_wifi`)
 can be used simultaneously, for example, to realize a border router for
 a mesh network which uses ESP-NOW.
+In this case the ESP-NOW interface must use the same channel as the AP of the
+infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
 
  */

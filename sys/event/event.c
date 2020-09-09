@@ -33,25 +33,6 @@
 #include "xtimer.h"
 #endif
 
-void event_queue_init_detached(event_queue_t *queue)
-{
-    assert(queue);
-    memset(queue, '\0', sizeof(*queue));
-}
-
-void event_queue_init(event_queue_t *queue)
-{
-    assert(queue);
-    memset(queue, '\0', sizeof(*queue));
-    queue->waiter = (thread_t *)sched_active_thread;
-}
-
-void event_queue_claim(event_queue_t *queue)
-{
-    assert(queue && (queue->waiter == NULL));
-    queue->waiter = (thread_t *)sched_active_thread;
-}
-
 void event_post(event_queue_t *queue, event_t *event)
 {
     assert(queue && event);
@@ -63,11 +44,6 @@ void event_post(event_queue_t *queue, event_t *event)
     thread_t *waiter = queue->waiter;
     irq_restore(state);
 
-    /* WARNING: there is a minimal chance, that a waiter claims a formerly
-     *          detached queue between the end of the critical section above and
-     *          the block below. In that case, the new waiter will not be woken
-     *          up. This should be fixed at some point once it is safe to call
-     *          thread_flags_set() inside a critical section on all platforms. */
     if (waiter) {
         thread_flags_set(waiter, THREAD_FLAG_EVENT);
     }
@@ -96,14 +72,20 @@ event_t *event_get(event_queue_t *queue)
     return result;
 }
 
-event_t *event_wait(event_queue_t *queue)
+event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
 {
-    assert(queue);
+    assert(queues && n_queues);
     event_t *result;
 
     do {
         unsigned state = irq_disable();
-        result = (event_t *)clist_lpop(&queue->event_list);
+        for (size_t i = 0; i < n_queues; i++) {
+            result = container_of(clist_lpop(&queues[i].event_list),
+                                  event_t, list_node);
+            if (result) {
+                break;
+            }
+        }
         irq_restore(state);
         if (result == NULL) {
             thread_flags_wait_any(THREAD_FLAG_EVENT);
@@ -115,14 +97,12 @@ event_t *event_wait(event_queue_t *queue)
 }
 
 #ifdef MODULE_XTIMER
-event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout)
+static event_t *_wait_timeout(event_queue_t *queue, xtimer_t *timer)
 {
     assert(queue);
     event_t *result;
-    xtimer_t timer;
     thread_flags_t flags = 0;
 
-    xtimer_set_timeout_flag(&timer, timeout);
     do {
         result = event_get(queue);
         if (result == NULL) {
@@ -131,18 +111,25 @@ event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout)
     } while ((result == NULL) && (flags & THREAD_FLAG_EVENT));
 
     if (result) {
-        xtimer_remove(&timer);
+        xtimer_remove(timer);
     }
 
     return result;
 }
-#endif
 
-void event_loop(event_queue_t *queue)
+event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout)
 {
-    event_t *event;
+    xtimer_t timer;
 
-    while ((event = event_wait(queue))) {
-        event->handler(event);
-    }
+    xtimer_set_timeout_flag(&timer, timeout);
+    return _wait_timeout(queue, &timer);
 }
+
+event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout)
+{
+    xtimer_t timer;
+
+    xtimer_set_timeout_flag64(&timer, timeout);
+    return _wait_timeout(queue, &timer);
+}
+#endif

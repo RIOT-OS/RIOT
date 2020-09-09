@@ -20,32 +20,31 @@
  */
 
 #include <stdio.h>
+
+#include "periph_conf.h"
+#include "periph/init.h"
 #include "kernel_init.h"
+#include "stdio_base.h"
 #include "irq.h"
 #include "log.h"
 
 extern void board_init(void);
 
-/**
- * Leave some extra space in the stack to allows us to finish the kernel
- * initialization procedure. __heap_end is set the current stack, minus
- * STACK_EXTRA since there is still code to execute.
- */
-#define STACK_EXTRA 32
-
 __attribute__((constructor)) static void startup(void)
 {
-    /* use putchar so the linker links it in: */
-    putchar('\n');
-
     board_init();
 
-    LOG_INFO("RIOT MSP430 hardware initialization complete.\n");
+#ifdef MODULE_NEWLIB
+    void _init(void);
+    _init();
+#endif
 
-    /* save current stack pointer as top of heap before enter the thread mode */
-    extern char *__heap_end;
-    __asm__ __volatile__("mov r1, %0" : "=r"(__heap_end));
-    __heap_end -= STACK_EXTRA;
-
+    /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
+    stdio_init();
+    /* trigger static peripheral initialization */
+    periph_init();
+    /* continue with kernel initialization */
     kernel_init();
+
+    __builtin_unreachable();
 }

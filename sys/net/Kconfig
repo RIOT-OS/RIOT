@@ -6,6 +6,12 @@
 #
 menu "Networking"
 
+rsource "application_layer/Kconfig"
+rsource "ble/Kconfig"
+rsource "credman/Kconfig"
 rsource "gnrc/Kconfig"
+rsource "sock/Kconfig"
+rsource "link_layer/Kconfig"
+rsource "netif/Kconfig"
 
 endmenu # Networking

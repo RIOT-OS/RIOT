@@ -3,39 +3,25 @@
  *
  * \brief Header file for SAML21G18A
  *
- * Copyright (c) 2017 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2018 Microchip Technology Inc.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * SPDX-License-Identifier: Apache-2.0
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the Licence at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * \asf_license_stop
  *
@@ -76,12 +62,24 @@ typedef volatile       uint8_t  WoReg8;  /**< Write only  8-bit register (volati
 typedef volatile       uint32_t RwReg;   /**< Read-Write 32-bit register (volatile unsigned int) */
 typedef volatile       uint16_t RwReg16; /**< Read-Write 16-bit register (volatile unsigned int) */
 typedef volatile       uint8_t  RwReg8;  /**< Read-Write  8-bit register (volatile unsigned int) */
-#define CAST(type, value) ((type *)(value))
-#define REG_ACCESS(type, address) (*(type*)(address)) /**< C code: Register value */
-#else
-#define CAST(type, value) (value)
-#define REG_ACCESS(type, address) (address) /**< Assembly code: Register address */
 #endif
+
+#if !defined(SKIP_INTEGER_LITERALS)
+#if defined(_U_) || defined(_L_) || defined(_UL_)
+  #error "Integer Literals macros already defined elsewhere"
+#endif
+
+#if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
+/* Macros that deal with adding suffixes to integer literal constants for C/C++ */
+#define _U_(x)         x ## U            /**< C code: Unsigned integer literal constant value */
+#define _L_(x)         x ## L            /**< C code: Long integer literal constant value */
+#define _UL_(x)        x ## UL           /**< C code: Unsigned Long integer literal constant value */
+#else /* Assembler */
+#define _U_(x)         x                 /**< Assembler: Unsigned integer literal constant value */
+#define _L_(x)         x                 /**< Assembler: Long integer literal constant value */
+#define _UL_(x)        x                 /**< Assembler: Unsigned Long integer literal constant value */
+#endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+#endif /* SKIP_INTEGER_LITERALS */
 
 /* ************************************************************************** */
 /**  CMSIS DEFINITIONS FOR SAML21G18A */
@@ -92,21 +90,14 @@ typedef volatile       uint8_t  RwReg8;  /**< Read-Write  8-bit register (volati
 /** Interrupt Number Definition */
 typedef enum IRQn
 {
-  /******  Cortex-M0+ Processor Exceptions Numbers ******************************/
-  NonMaskableInt_IRQn      = -14,/**<  2 Non Maskable Interrupt                 */
-  HardFault_IRQn           = -13,/**<  3 Cortex-M0+ Hard Fault Interrupt        */
-  SVCall_IRQn              = -5, /**< 11 Cortex-M0+ SV Call Interrupt           */
-  PendSV_IRQn              = -2, /**< 14 Cortex-M0+ Pend SV Interrupt           */
-  SysTick_IRQn             = -1, /**< 15 Cortex-M0+ System Tick Interrupt       */
-  /******  SAML21G18A-specific Interrupt Numbers ***********************/
+  /******  Cortex-M0+ Processor Exceptions Numbers *******************/
+  NonMaskableInt_IRQn      = -14,/**<  2 Non Maskable Interrupt      */
+  HardFault_IRQn           = -13,/**<  3 Hard Fault Interrupt        */
+  SVCall_IRQn              = -5, /**< 11 SV Call Interrupt           */
+  PendSV_IRQn              = -2, /**< 14 Pend SV Interrupt           */
+  SysTick_IRQn             = -1, /**< 15 System Tick Interrupt       */
+  /******  SAML21G18A-specific Interrupt Numbers *********************/
   SYSTEM_IRQn              =  0, /**<  0 SAML21G18A System Interrupts */
-  MCLK_IRQn                =  0, /**<  0 SAML21G18A Main Clock (MCLK) */
-  OSCCTRL_IRQn             =  0, /**<  0 SAML21G18A Oscillators Control (OSCCTRL) */
-  OSC32KCTRL_IRQn          =  0, /**<  0 SAML21G18A 32k Oscillators Control (OSC32KCTRL) */
-  PAC_IRQn                 =  0, /**<  0 SAML21G18A Peripheral Access Controller (PAC) */
-  PM_IRQn                  =  0, /**<  0 SAML21G18A Power Manager (PM) */
-  SUPC_IRQn                =  0, /**<  0 SAML21G18A Supply Controller (SUPC) */
-  TAL_IRQn                 =  0, /**<  0 SAML21G18A Trigger Allocator (TAL) */
   WDT_IRQn                 =  1, /**<  1 SAML21G18A Watchdog Timer (WDT) */
   RTC_IRQn                 =  2, /**<  2 SAML21G18A Real-Time Counter (RTC) */
   EIC_IRQn                 =  3, /**<  3 SAML21G18A External Interrupt Controller (EIC) */
@@ -133,7 +124,7 @@ typedef enum IRQn
   AES_IRQn                 = 26, /**< 26 SAML21G18A Advanced Encryption Standard (AES) */
   TRNG_IRQn                = 27, /**< 27 SAML21G18A True Random Generator (TRNG) */
 
-  PERIPH_COUNT_IRQn        = 28  /**< Number of peripheral IDs */
+  PERIPH_COUNT_IRQn        = 29  /**< Number of peripheral IDs */
 } IRQn_Type;
 
 typedef struct _DeviceVectors
@@ -143,23 +134,23 @@ typedef struct _DeviceVectors
 
   /* Cortex-M handlers */
   void* pfnReset_Handler;
-  void* pfnNMI_Handler;
+  void* pfnNonMaskableInt_Handler;
   void* pfnHardFault_Handler;
-  void* pfnReservedM12;
-  void* pfnReservedM11;
-  void* pfnReservedM10;
-  void* pfnReservedM9;
-  void* pfnReservedM8;
-  void* pfnReservedM7;
-  void* pfnReservedM6;
-  void* pfnSVC_Handler;
-  void* pfnReservedM4;
-  void* pfnReservedM3;
+  void* pvReservedM12;
+  void* pvReservedM11;
+  void* pvReservedM10;
+  void* pvReservedM9;
+  void* pvReservedM8;
+  void* pvReservedM7;
+  void* pvReservedM6;
+  void* pfnSVCall_Handler;
+  void* pvReservedM4;
+  void* pvReservedM3;
   void* pfnPendSV_Handler;
   void* pfnSysTick_Handler;
 
   /* Peripheral handlers */
-  void* pfnSYSTEM_Handler;                /*  0 Main Clock, Oscillators Control, 32k Oscillators Control, Peripheral Access Controller, Power Manager, Supply Controller, Trigger Allocator */
+  void* pfnSYSTEM_Handler;                /*  0 Main Clock, 32k Oscillators Control, Oscillators Control, Peripheral Access Controller, Power Manager, Supply Controller, Trigger Allocator */
   void* pfnWDT_Handler;                   /*  1 Watchdog Timer */
   void* pfnRTC_Handler;                   /*  2 Real-Time Counter */
   void* pfnEIC_Handler;                   /*  3 External Interrupt Controller */
@@ -178,8 +169,8 @@ typedef struct _DeviceVectors
   void* pfnTCC2_Handler;                  /* 16 Timer Counter Control 2 */
   void* pfnTC0_Handler;                   /* 17 Basic Timer Counter 0 */
   void* pfnTC1_Handler;                   /* 18 Basic Timer Counter 1 */
-  void* pfnReserved19;
-  void* pfnReserved20;
+  void* pvReserved19;
+  void* pvReserved20;
   void* pfnTC4_Handler;                   /* 21 Basic Timer Counter 4 */
   void* pfnADC_Handler;                   /* 22 Analog Digital Converter */
   void* pfnAC_Handler;                    /* 23 Analog Comparators */
@@ -187,14 +178,14 @@ typedef struct _DeviceVectors
   void* pfnPTC_Handler;                   /* 25 Peripheral Touch Controller */
   void* pfnAES_Handler;                   /* 26 Advanced Encryption Standard */
   void* pfnTRNG_Handler;                  /* 27 True Random Generator */
-  void* pfnReserved28;
+  void* pvReserved28;
 } DeviceVectors;
 
 /* Cortex-M0+ processor handlers */
 void Reset_Handler               ( void );
-void NMI_Handler                 ( void );
+void NonMaskableInt_Handler      ( void );
 void HardFault_Handler           ( void );
-void SVC_Handler                 ( void );
+void SVCall_Handler              ( void );
 void PendSV_Handler              ( void );
 void SysTick_Handler             ( void );
 
@@ -230,7 +221,6 @@ void TRNG_Handler                ( void );
  * \brief Configuration of the Cortex-M0+ Processor and Core Peripherals
  */
 
-#define LITTLE_ENDIAN          1
 #define __CM0PLUS_REV          1         /*!< Core revision r0p1 */
 #define __MPU_PRESENT          0         /*!< MPU present or not */
 #define __NVIC_PRIO_BITS       2         /*!< Number of bits used for Priority Levels */
@@ -277,7 +267,6 @@ void TRNG_Handler                ( void );
 #include "component/rtc_100.h"
 #include "component/sercom.h"
 #include "component/supc_100.h"
-#include "component/tal.h"
 #include "component/tc_100.h"
 #include "component/tcc_200.h"
 #include "component/trng.h"
@@ -310,6 +299,7 @@ void TRNG_Handler                ( void );
 #include "instance/pac_100.h"
 #include "instance/pm_100.h"
 #include "instance/port.h"
+#include "instance/ptc.h"
 #include "instance/rstc_100.h"
 #include "instance/rtc_100.h"
 #include "instance/sercom0.h"
@@ -319,7 +309,6 @@ void TRNG_Handler                ( void );
 #include "instance/sercom4.h"
 #include "instance/sercom5.h"
 #include "instance/supc_100.h"
-#include "instance/tal.h"
 #include "instance/tc0_100.h"
 #include "instance/tc1_100.h"
 #include "instance/tc4_100.h"
@@ -349,7 +338,6 @@ void TRNG_Handler                ( void );
 #define ID_RTC            8 /**< \brief Real-Time Counter (RTC) */
 #define ID_EIC            9 /**< \brief External Interrupt Controller (EIC) */
 #define ID_PORT          10 /**< \brief Port Module (PORT) */
-#define ID_TAL           11 /**< \brief Trigger Allocator (TAL) */
 
 // Peripheral instances on HPB1 bridge
 #define ID_USB           32 /**< \brief Universal Serial Bus (USB) */
@@ -386,7 +374,7 @@ void TRNG_Handler                ( void );
 #define ID_PAC          128 /**< \brief Peripheral Access Controller (PAC) */
 #define ID_DMAC         129 /**< \brief Direct Memory Access Controller (DMAC) */
 
-#define ID_PERIPH_COUNT 130 /**< \brief Number of peripheral IDs */
+#define ID_PERIPH_COUNT 130 /**< \brief Max number of peripheral IDs */
 /*@}*/
 
 /* ************************************************************************** */
@@ -396,54 +384,54 @@ void TRNG_Handler                ( void );
 /*@{*/
 
 #if defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)
-#define AC                            (0x43001000UL) /**< \brief (AC) APB Base Address */
-#define ADC                           (0x43000C00UL) /**< \brief (ADC) APB Base Address */
-#define AES                           (0x42003400UL) /**< \brief (AES) APB Base Address */
-#define CCL                           (0x43001C00UL) /**< \brief (CCL) APB Base Address */
-#define DAC                           (0x42003000UL) /**< \brief (DAC) APB Base Address */
-#define DMAC                          (0x44000400UL) /**< \brief (DMAC) APB Base Address */
-#define DSU                           (0x41002000UL) /**< \brief (DSU) APB Base Address */
-#define EIC                           (0x40002400UL) /**< \brief (EIC) APB Base Address */
-#define EVSYS                         (0x43000000UL) /**< \brief (EVSYS) APB Base Address */
-#define GCLK                          (0x40001800UL) /**< \brief (GCLK) APB Base Address */
-#define MCLK                          (0x40000400UL) /**< \brief (MCLK) APB Base Address */
-#define MTB                           (0x41006000UL) /**< \brief (MTB) APB Base Address */
-#define NVMCTRL                       (0x41004000UL) /**< \brief (NVMCTRL) APB Base Address */
-#define NVMCTRL_CAL                   (0x00800000UL) /**< \brief (NVMCTRL) CAL Base Address */
-#define NVMCTRL_LOCKBIT               (0x00802000UL) /**< \brief (NVMCTRL) LOCKBIT Base Address */
-#define NVMCTRL_OTP1                  (0x00806000UL) /**< \brief (NVMCTRL) OTP1 Base Address */
-#define NVMCTRL_OTP2                  (0x00806008UL) /**< \brief (NVMCTRL) OTP2 Base Address */
-#define NVMCTRL_OTP3                  (0x00806010UL) /**< \brief (NVMCTRL) OTP3 Base Address */
-#define NVMCTRL_OTP4                  (0x00806018UL) /**< \brief (NVMCTRL) OTP4 Base Address */
-#define NVMCTRL_OTP5                  (0x00806020UL) /**< \brief (NVMCTRL) OTP5 Base Address */
-#define NVMCTRL_TEMP_LOG              (0x00806030UL) /**< \brief (NVMCTRL) TEMP_LOG Base Address */
-#define NVMCTRL_USER                  (0x00804000UL) /**< \brief (NVMCTRL) USER Base Address */
-#define OPAMP                         (0x43001800UL) /**< \brief (OPAMP) APB Base Address */
-#define OSCCTRL                       (0x40000C00UL) /**< \brief (OSCCTRL) APB Base Address */
-#define OSC32KCTRL                    (0x40001000UL) /**< \brief (OSC32KCTRL) APB Base Address */
-#define PAC                           (0x44000000UL) /**< \brief (PAC) APB Base Address */
-#define PM                            (0x40000000UL) /**< \brief (PM) APB Base Address */
-#define PORT                          (0x40002800UL) /**< \brief (PORT) APB Base Address */
-#define PORT_IOBUS                    (0x60000000UL) /**< \brief (PORT) IOBUS Base Address */
-#define RSTC                          (0x40000800UL) /**< \brief (RSTC) APB Base Address */
-#define RTC                           (0x40002000UL) /**< \brief (RTC) APB Base Address */
-#define SERCOM0                       (0x42000000UL) /**< \brief (SERCOM0) APB Base Address */
-#define SERCOM1                       (0x42000400UL) /**< \brief (SERCOM1) APB Base Address */
-#define SERCOM2                       (0x42000800UL) /**< \brief (SERCOM2) APB Base Address */
-#define SERCOM3                       (0x42000C00UL) /**< \brief (SERCOM3) APB Base Address */
-#define SERCOM4                       (0x42001000UL) /**< \brief (SERCOM4) APB Base Address */
-#define SERCOM5                       (0x43000400UL) /**< \brief (SERCOM5) APB Base Address */
-#define SUPC                          (0x40001400UL) /**< \brief (SUPC) APB Base Address */
-#define TAL                           (0x40002C00UL) /**< \brief (TAL) APB Base Address */
-#define TC0                           (0x42002000UL) /**< \brief (TC0) APB Base Address */
-#define TC1                           (0x42002400UL) /**< \brief (TC1) APB Base Address */
-#define TC4                           (0x43000800UL) /**< \brief (TC4) APB Base Address */
-#define TCC0                          (0x42001400UL) /**< \brief (TCC0) APB Base Address */
-#define TCC1                          (0x42001800UL) /**< \brief (TCC1) APB Base Address */
-#define TCC2                          (0x42001C00UL) /**< \brief (TCC2) APB Base Address */
-#define TRNG                          (0x42003800UL) /**< \brief (TRNG) APB Base Address */
-#define USB                           (0x41000000UL) /**< \brief (USB) APB Base Address */
-#define WDT                           (0x40001C00UL) /**< \brief (WDT) APB Base Address */
+#define AC                            (0x43001000) /**< \brief (AC) APB Base Address */
+#define ADC                           (0x43000C00) /**< \brief (ADC) APB Base Address */
+#define AES                           (0x42003400) /**< \brief (AES) APB Base Address */
+#define CCL                           (0x43001C00) /**< \brief (CCL) APB Base Address */
+#define DAC                           (0x42003000) /**< \brief (DAC) APB Base Address */
+#define DMAC                          (0x44000400) /**< \brief (DMAC) APB Base Address */
+#define DSU                           (0x41002000) /**< \brief (DSU) APB Base Address */
+#define EIC                           (0x40002400) /**< \brief (EIC) APB Base Address */
+#define EVSYS                         (0x43000000) /**< \brief (EVSYS) APB Base Address */
+#define GCLK                          (0x40001800) /**< \brief (GCLK) APB Base Address */
+#define MCLK                          (0x40000400) /**< \brief (MCLK) APB Base Address */
+#define MTB                           (0x41006000) /**< \brief (MTB) APB Base Address */
+#define NVMCTRL                       (0x41004000) /**< \brief (NVMCTRL) APB Base Address */
+#define NVMCTRL_CAL                   (0x00800000) /**< \brief (NVMCTRL) CAL Base Address */
+#define NVMCTRL_LOCKBIT               (0x00802000) /**< \brief (NVMCTRL) LOCKBIT Base Address */
+#define NVMCTRL_OTP1                  (0x00806000) /**< \brief (NVMCTRL) OTP1 Base Address */
+#define NVMCTRL_OTP2                  (0x00806008) /**< \brief (NVMCTRL) OTP2 Base Address */
+#define NVMCTRL_OTP3                  (0x00806010) /**< \brief (NVMCTRL) OTP3 Base Address */
+#define NVMCTRL_OTP4                  (0x00806018) /**< \brief (NVMCTRL) OTP4 Base Address */
+#define NVMCTRL_OTP5                  (0x00806020) /**< \brief (NVMCTRL) OTP5 Base Address */
+#define NVMCTRL_TEMP_LOG              (0x00806030) /**< \brief (NVMCTRL) TEMP_LOG Base Address */
+#define NVMCTRL_USER                  (0x00804000) /**< \brief (NVMCTRL) USER Base Address */
+#define OPAMP                         (0x43001800) /**< \brief (OPAMP) APB Base Address */
+#define OSCCTRL                       (0x40000C00) /**< \brief (OSCCTRL) APB Base Address */
+#define OSC32KCTRL                    (0x40001000) /**< \brief (OSC32KCTRL) APB Base Address */
+#define PAC                           (0x44000000) /**< \brief (PAC) APB Base Address */
+#define PM                            (0x40000000) /**< \brief (PM) APB Base Address */
+#define PORT                          (0x40002800) /**< \brief (PORT) APB Base Address */
+#define PORT_IOBUS                    (0x60000000) /**< \brief (PORT) IOBUS Base Address */
+#define PTC                           (0x43001400) /**< \brief (PTC) APB Base Address */
+#define RSTC                          (0x40000800) /**< \brief (RSTC) APB Base Address */
+#define RTC                           (0x40002000) /**< \brief (RTC) APB Base Address */
+#define SERCOM0                       (0x42000000) /**< \brief (SERCOM0) APB Base Address */
+#define SERCOM1                       (0x42000400) /**< \brief (SERCOM1) APB Base Address */
+#define SERCOM2                       (0x42000800) /**< \brief (SERCOM2) APB Base Address */
+#define SERCOM3                       (0x42000C00) /**< \brief (SERCOM3) APB Base Address */
+#define SERCOM4                       (0x42001000) /**< \brief (SERCOM4) APB Base Address */
+#define SERCOM5                       (0x43000400) /**< \brief (SERCOM5) APB Base Address */
+#define SUPC                          (0x40001400) /**< \brief (SUPC) APB Base Address */
+#define TC0                           (0x42002000) /**< \brief (TC0) APB Base Address */
+#define TC1                           (0x42002400) /**< \brief (TC1) APB Base Address */
+#define TC4                           (0x43000800) /**< \brief (TC4) APB Base Address */
+#define TCC0                          (0x42001400) /**< \brief (TCC0) APB Base Address */
+#define TCC1                          (0x42001800) /**< \brief (TCC1) APB Base Address */
+#define TCC2                          (0x42001C00) /**< \brief (TCC2) APB Base Address */
+#define TRNG                          (0x42003800) /**< \brief (TRNG) APB Base Address */
+#define USB                           (0x41000000) /**< \brief (USB) APB Base Address */
+#define WDT                           (0x40001C00) /**< \brief (WDT) APB Base Address */
 #else
 #define AC                ((Ac       *)0x43001000UL) /**< \brief (AC) APB Base Address */
 #define AC_INST_NUM       1                          /**< \brief (AC) Number of instances */
@@ -530,7 +518,10 @@ void TRNG_Handler                ( void );
 #define PORT_IOBUS        ((Port     *)0x60000000UL) /**< \brief (PORT) IOBUS Base Address */
 #define PORT_INST_NUM     1                          /**< \brief (PORT) Number of instances */
 #define PORT_INSTS        { PORT }                   /**< \brief (PORT) Instances List */
+#define PORT_IOBUS_INST_NUM 1                          /**< \brief (PORT) Number of instances */
+#define PORT_IOBUS_INSTS  { PORT_IOBUS }             /**< \brief (PORT) Instances List */
 
+#define PTC               ((void     *)0x43001400UL) /**< \brief (PTC) APB Base Address */
 #define PTC_GCLK_ID       33
 #define PTC_INST_NUM      1                          /**< \brief (PTC) Number of instances */
 #define PTC_INSTS         { PTC }                    /**< \brief (PTC) Instances List */
@@ -555,10 +546,6 @@ void TRNG_Handler                ( void );
 #define SUPC              ((Supc     *)0x40001400UL) /**< \brief (SUPC) APB Base Address */
 #define SUPC_INST_NUM     1                          /**< \brief (SUPC) Number of instances */
 #define SUPC_INSTS        { SUPC }                   /**< \brief (SUPC) Instances List */
-
-#define TAL               ((Tal      *)0x40002C00UL) /**< \brief (TAL) APB Base Address */
-#define TAL_INST_NUM      1                          /**< \brief (TAL) Number of instances */
-#define TAL_INSTS         { TAL }                    /**< \brief (TAL) Instances List */
 
 #define TC0               ((Tc       *)0x42002000UL) /**< \brief (TC0) APB Base Address */
 #define TC1               ((Tc       *)0x42002400UL) /**< \brief (TC1) APB Base Address */
@@ -600,26 +587,26 @@ void TRNG_Handler                ( void );
 /**  MEMORY MAPPING DEFINITIONS FOR SAML21G18A */
 /* ************************************************************************** */
 
-#define FLASH_SIZE            0x40000UL /* 256 kB */
+#define FLASH_SIZE            _UL_(0x00040000) /* 256 kB */
 #define FLASH_PAGE_SIZE       64
 #define FLASH_NB_OF_PAGES     4096
 #define FLASH_USER_PAGE_SIZE  64
-#define HSRAM_SIZE            0x8000UL /* 32 kB */
-#define LPRAM_SIZE            0x2000UL /* 8 kB */
+#define HSRAM_SIZE            _UL_(0x00008000) /* 32 kB */
+#define LPRAM_SIZE            _UL_(0x00002000) /* 8 kB */
 
-#define FLASH_ADDR            (0x00000000u) /**< FLASH base address */
-#define FLASH_USER_PAGE_ADDR  (0x00800000u) /**< FLASH_USER_PAGE base address */
-#define HSRAM_ADDR            (0x20000000u) /**< HSRAM base address */
-#define LPRAM_ADDR            (0x30000000u) /**< LPRAM base address */
-#define HPB0_ADDR             (0x40000000u) /**< HPB0 base address */
-#define HPB1_ADDR             (0x41000000u) /**< HPB1 base address */
-#define HPB2_ADDR             (0x42000000u) /**< HPB2 base address */
-#define HPB3_ADDR             (0x43000000u) /**< HPB3 base address */
-#define HPB4_ADDR             (0x44000000u) /**< HPB4 base address */
-#define PPB_ADDR              (0xE0000000u) /**< PPB base address */
+#define FLASH_ADDR            _UL_(0x00000000) /**< FLASH base address */
+#define FLASH_USER_PAGE_ADDR  _UL_(0x00800000) /**< FLASH_USER_PAGE base address */
+#define HSRAM_ADDR            _UL_(0x20000000) /**< HSRAM base address */
+#define LPRAM_ADDR            _UL_(0x30000000) /**< LPRAM base address */
+#define HPB0_ADDR             _UL_(0x40000000) /**< HPB0 base address */
+#define HPB1_ADDR             _UL_(0x41000000) /**< HPB1 base address */
+#define HPB2_ADDR             _UL_(0x42000000) /**< HPB2 base address */
+#define HPB3_ADDR             _UL_(0x43000000) /**< HPB3 base address */
+#define HPB4_ADDR             _UL_(0x44000000) /**< HPB4 base address */
+#define PPB_ADDR              _UL_(0xE0000000) /**< PPB base address */
 
-#define DSU_DID_RESETVALUE    0x10810005UL
-#define NVMCTRL_RWW_EEPROM_SIZE 0x2000UL /* 8 kB */
+#define DSU_DID_RESETVALUE    _UL_(0x10810005)
+#define NVMCTRL_RWW_EEPROM_SIZE _UL_(0x00002000) /* 8 kB */
 #define PORT_GROUPS           2
 #define USB_HOST_IMPLEMENTED  1
 

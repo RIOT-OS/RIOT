@@ -18,20 +18,41 @@ cleanup() {
     echo "Cleaning up..."
     remove_tap
     ip a d fd00:dead:beef::1/128 dev lo
+    if [ -n "${UHCPD_PID}" ]; then
+        kill ${UHCPD_PID}
+    fi
+    if [ -n "${DHCPD_PIDFILE}" ]; then
+        kill "$(cat ${DHCPD_PIDFILE})"
+        rm "${DHCPD_PIDFILE}"
+    fi
     trap "" INT QUIT TERM EXIT
 }
 
 start_uhcpd() {
     ${UHCPD} ${TAP} ${PREFIX}
+    UHCPD_PID=$!
 }
+
+start_dhcpd() {
+    DHCPD_PIDFILE=$(mkfile)
+    ${DHCPD} -d -p ${DHCPD_PIDFILE} ${TAP} ${PREFIX} 2> /dev/null
+}
+
+if [ "$1" = "-d" ] || [ "$1" = "--use-dhcp" ]; then
+    USE_DHCPV6=1
+    shift 1
+else
+    USE_DHCPV6=0
+fi
 
 TAP=$1
 PREFIX=$2
 _USER=$3
 : ${UHCPD:="$(readlink -f $(dirname $0)"/../uhcpd/bin")/uhcpd"}
+: ${DHCPD:="$(readlink -f $(dirname $0)"/../dhcpdv6-pd_ia")/dhcpv6-pd_ia.py"}
 
 [ -z "${TAP}" -o -z "${PREFIX}" ] && {
-    echo "usage: $0 <tap-device> <prefix> [<user>]"
+    echo "usage: $0 [-d|--use-dhcp] <tap-device> <prefix> [<user>]"
     exit 1
 }
 
@@ -46,4 +67,8 @@ fi
 trap "cleanup" INT QUIT TERM EXIT
 
 
-create_tap && start_uhcpd
+create_tap && if [ ${USE_DHCPV6} -eq 1 ]; then
+    start_dhcpd
+else
+    start_uhcpd
+fi

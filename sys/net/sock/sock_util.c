@@ -29,23 +29,25 @@
 #include "net/sock/udp.h"
 #include "net/sock/util.h"
 
-#ifdef RIOT_VERSION
+#ifdef MODULE_FMT
 #include "fmt.h"
 #endif
 
-int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *port)
+#define PORT_STR_LEN    (5)
+#define NETIF_STR_LEN   (5)
+
+int sock_tl_ep_fmt(const struct _sock_tl_ep *endpoint,
+                   char *addr_str, uint16_t *port)
 {
     void *addr_ptr;
     *addr_str = '\0';
 
     switch (endpoint->family) {
-#if defined(SOCK_HAS_IPV4)
         case AF_INET:
             {
                 addr_ptr = (void*)&endpoint->addr.ipv4;
                 break;
             }
-#endif
 #if defined(SOCK_HAS_IPV6)
         case AF_INET6:
             {
@@ -63,7 +65,7 @@ int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *por
 
 #if defined(SOCK_HAS_IPV6)
     if ((endpoint->family == AF_INET6) && endpoint->netif) {
-#ifdef RIOT_VERSION
+#ifdef MODULE_FMT
         char *tmp = addr_str + strlen(addr_str);
         *tmp++ = '%';
         tmp += fmt_u16_dec(tmp, endpoint->netif);
@@ -83,10 +85,10 @@ int sock_udp_ep_fmt(const sock_udp_ep_t *endpoint, char *addr_str, uint16_t *por
 
 static char* _find_hoststart(const char *url)
 {
-    /* Increment SOCK_SCHEME_MAXLEN due to comparison with the colon after the
+    /* Increment CONFIG_SOCK_SCHEME_MAXLEN due to comparison with the colon after the
      * scheme part
      */
-    size_t remaining = SOCK_SCHEME_MAXLEN + 1;
+    size_t remaining = CONFIG_SOCK_SCHEME_MAXLEN + 1;
     char *urlpos = (char*)url;
     while(*urlpos && remaining) {
         remaining--;
@@ -103,7 +105,7 @@ static char* _find_hoststart(const char *url)
 
 static char* _find_pathstart(const char *url)
 {
-    size_t remaining = SOCK_HOSTPORT_MAXLEN;
+    size_t remaining = CONFIG_SOCK_HOSTPORT_MAXLEN;
     char *urlpos = (char*)url;
     while(*urlpos && remaining) {
         remaining--;
@@ -127,9 +129,9 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
 
     if (hostport) {
         size_t hostlen = pathstart - hoststart;
-        /* hostlen must be smaller SOCK_HOSTPORT_MAXLEN to have space for the null
+        /* hostlen must be smaller CONFIG_SOCK_HOSTPORT_MAXLEN to have space for the null
         * terminator */
-        if (hostlen > SOCK_HOSTPORT_MAXLEN - 1) {
+        if (hostlen > CONFIG_SOCK_HOSTPORT_MAXLEN - 1) {
             return -EOVERFLOW;
         }
         memcpy(hostport, hoststart, hostlen);
@@ -138,7 +140,7 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
 
     if (urlpath) {
         size_t pathlen = strlen(pathstart);
-        if (pathlen > SOCK_URLPATH_MAXLEN - 1) {
+        if (pathlen > CONFIG_SOCK_URLPATH_MAXLEN - 1) {
             return -EOVERFLOW;
         }
         memcpy(urlpath, pathstart, pathlen);
@@ -147,20 +149,60 @@ int sock_urlsplit(const char *url, char *hostport, char *urlpath)
     return 0;
 }
 
-int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
+int _parse_port(sock_udp_ep_t *ep_out, const char *portstart)
+{
+    int port_len = strlen(portstart);
+
+    /* Checks here verify that the supplied port number is up to 5 (random)
+     * chars in size and result is smaller or equal to UINT16_MAX. */
+    if (port_len > PORT_STR_LEN) {
+        return -EINVAL;
+    }
+    uint32_t port = atol(portstart);
+    if (port > UINT16_MAX) {
+        return -EINVAL;
+    }
+    ep_out->port = (uint16_t)port;
+    return port_len;
+}
+
+int _parse_netif(sock_udp_ep_t *ep_out, char *netifstart)
+{
+    char *netifend;
+    size_t netiflen;
+    char netifbuf[NETIF_STR_LEN + 1];
+
+    for (netifend = netifstart; *netifend && *netifend != ']';
+         netifend++);
+    netiflen = netifend - netifstart;
+    if (!*netifend || (netiflen >= NETIF_STR_LEN) || (netiflen == 0)) {
+        /* no netif found, bail out */
+        return -EINVAL;
+    }
+    strncpy(netifbuf, netifstart, netiflen);
+    int netif = strtol(netifbuf, NULL, 10);
+    if ((netif < 0) || (((unsigned)netif) > UINT16_MAX)) {
+        return -EINVAL;
+    }
+    ep_out->netif = (uint16_t)netif;
+    return (netifend - netifstart);
+}
+
+int sock_tl_str2ep(struct _sock_tl_ep *ep_out, const char *str)
 {
     unsigned brackets_flag;
     char *hoststart = (char*)str;
     char *hostend;
 
-    char hostbuf[SOCK_HOSTPORT_MAXLEN];
+    char hostbuf[CONFIG_SOCK_HOSTPORT_MAXLEN];
 
     memset(ep_out, 0, sizeof(sock_udp_ep_t));
 
     if (*hoststart == '[') {
         brackets_flag = 1;
-        for (hostend = ++hoststart; *hostend && *hostend != ']';
-                hostend++);
+        for (hostend = ++hoststart;
+             *hostend && *hostend != ']' && *hostend != '%';
+             hostend++);
         if (! *hostend || ((size_t)(hostend - hoststart) >= sizeof(hostbuf))) {
             /* none found, bail out */
             return -EINVAL;
@@ -171,26 +213,28 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
         for (hostend = hoststart; *hostend && (*hostend != ':') && \
                 ((size_t)(hostend - hoststart) < sizeof(hostbuf)); hostend++) {}
     }
-
     size_t hostlen = hostend - hoststart;
     if (*(hostend + brackets_flag) == ':') {
-        char *portstart = hostend + brackets_flag + 1;
-        /* Checks here verify that the supplied port number is up to 5 (random)
-         * chars in size and result is smaller or equal to UINT16_MAX. */
-        if (strlen(portstart) > 5) {
-            return -EINVAL;
+        int res = _parse_port(ep_out, hostend + brackets_flag + 1);
+        if (res < 0) {
+            return res;
         }
-        uint32_t port = atol(portstart);
-        if (port > UINT16_MAX) {
-            return -EINVAL;
+    }
+    else if (brackets_flag && (*hostend == '%')) {
+        int res = _parse_netif(ep_out, hostend + 1);
+        if (res < 0) {
+            return res;
         }
-        ep_out->port = (uint16_t)port;
+        char *colon_ptr = hostend + res + brackets_flag + 1;
+        if ((*colon_ptr == ':') &&
+            ((res = _parse_port(ep_out, colon_ptr + 1)) < 0)) {
+            return res;
+        }
     }
 
     if (hostlen >= sizeof(hostbuf)) {
         return -EINVAL;
     }
-
     memcpy(hostbuf, hoststart, hostlen);
 
     hostbuf[hostlen] = '\0';
@@ -210,7 +254,8 @@ int sock_udp_str2ep(sock_udp_ep_t *ep_out, const char *str)
     return -EINVAL;
 }
 
-bool sock_udp_ep_equal(const sock_udp_ep_t *a, const sock_udp_ep_t *b)
+bool sock_tl_ep_equal(const struct _sock_tl_ep *a,
+                      const struct _sock_tl_ep *b)
 {
     assert(a && b);
 

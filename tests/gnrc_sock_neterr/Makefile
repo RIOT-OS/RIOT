@@ -7,6 +7,10 @@ USEMODULE += gnrc_sock_udp
 USEMODULE += od
 USEMODULE += xtimer
 
-CFLAGS += -DGNRC_PKTBUF_SIZE=200
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=200
+endif
+
 
 include $(RIOTBASE)/Makefile.include

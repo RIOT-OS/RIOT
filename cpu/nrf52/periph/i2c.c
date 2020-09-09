@@ -45,6 +45,14 @@
  */
 static mutex_t locks[I2C_NUMOF];
 
+/**
+ * @brief   array with a busy mutex for each I2C device, used to block the
+ *          thread until the transfer is done
+ */
+static mutex_t busy[I2C_NUMOF];
+
+void i2c_isr_handler(void *arg);
+
 static inline NRF_TWIM_Type *bus(i2c_t dev)
 {
     return i2c_config[dev].dev;
@@ -53,9 +61,9 @@ static inline NRF_TWIM_Type *bus(i2c_t dev)
 static int finish(i2c_t dev)
 {
     DEBUG("[i2c] waiting for STOPPED or ERROR event\n");
-    while ((!(bus(dev)->EVENTS_STOPPED)) && (!(bus(dev)->EVENTS_ERROR))) {
-        nrf52_sleep();
-    }
+    /* Unmask interrupts */
+    bus(dev)->INTENSET = TWIM_INTEN_STOPPED_Msk | TWIM_INTEN_ERROR_Msk;
+    mutex_lock(&busy[dev]);
 
     if ((bus(dev)->EVENTS_STOPPED)) {
         bus(dev)->EVENTS_STOPPED = 0;
@@ -85,6 +93,9 @@ void i2c_init(i2c_t dev)
 
     /* Initialize mutex */
     mutex_init(&locks[dev]);
+    mutex_init(&busy[dev]);
+    mutex_lock(&busy[dev]);
+
     /* disable device during initialization, will be enabled when acquire is
      * called */
     bus(dev)->ENABLE = TWIM_ENABLE_ENABLE_Disabled;
@@ -95,6 +106,8 @@ void i2c_init(i2c_t dev)
     bus(dev)->PSEL.SDA = i2c_config[dev].sda;
     /* configure dev clock speed */
     bus(dev)->FREQUENCY = i2c_config[dev].speed;
+
+    spi_twi_irq_register_i2c(bus(dev), i2c_isr_handler, (void *)dev);
 
     /* re-enable the device. We expect that the device was being acquired before
      * the i2c_init_master() function is called, so it should be enabled when
@@ -210,4 +223,14 @@ int i2c_write_bytes(i2c_t dev, uint16_t addr, const void *data, size_t len,
     bus(dev)->TASKS_STARTTX = 1;
 
     return finish(dev);
+}
+
+void i2c_isr_handler(void *arg)
+{
+    i2c_t dev = (i2c_t)arg;
+
+    /* Mask interrupts to ensure that they only trigger once */
+    bus(dev)->INTENCLR = TWIM_INTEN_STOPPED_Msk | TWIM_INTEN_ERROR_Msk;
+
+    mutex_unlock(&busy[dev]);
 }

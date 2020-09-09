@@ -19,6 +19,7 @@
  * @author      Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Dylan Laduranty <dylanladuranty@gmail.com>
+ * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  *
  * @}
  */
@@ -31,8 +32,13 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#if defined (CPU_SAML1X) || defined (CPU_SAMD5X)
+#if defined (CPU_COMMON_SAML1X) || defined (CPU_COMMON_SAMD5X)
 #define UART_HAS_TX_ISR
+#endif
+
+/* default to fractional baud rate calculation */
+#if !defined(CONFIG_SAM0_UART_BAUD_FRAC) && defined(SERCOM_USART_BAUD_FRAC_BAUD)
+#define CONFIG_SAM0_UART_BAUD_FRAC  1
 #endif
 
 /**
@@ -41,7 +47,7 @@
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
 #include "tsrb.h"
 static tsrb_t uart_tx_rb[UART_NUMOF];
-static uint8_t uart_tx_rb_buf[UART_NUMOF][SAM0_UART_TXBUF_SIZE];
+static uint8_t uart_tx_rb_buf[UART_NUMOF][UART_TXBUF_SIZE];
 #endif
 static uart_isr_ctx_t uart_ctx[UART_NUMOF];
 
@@ -57,6 +63,65 @@ static inline SercomUsart *dev(uart_t dev)
     return uart_config[dev].dev;
 }
 
+static void _set_baud(uart_t uart, uint32_t baudrate)
+{
+    const uint32_t f_src = sam0_gclk_freq(uart_config[uart].gclk_src);
+#if IS_ACTIVE(CONFIG_SAM0_UART_BAUD_FRAC)
+    /* Asynchronous Fractional */
+    uint32_t baud = (((f_src * 8) / baudrate) / 16);
+    dev(uart)->BAUD.FRAC.FP = (baud % 8);
+    dev(uart)->BAUD.FRAC.BAUD = (baud / 8);
+#else
+    /* Asynchronous Arithmetic */
+    /* BAUD = 2^16     * (2^0 - 2^4 * f_baud / f_src)     */
+    /*      = 2^(16-n) * (2^n - 2^(n+4) * f_baud / f_src) */
+    /*      = 2^(20-n) * (2^(n-4) - 2^n * f_baud / f_src) */
+
+    /* 2^n * f_baud < 2^32 -> find the next power of 2 */
+    uint8_t pow = __builtin_clz(baudrate);
+
+    /* 2^n * f_baud */
+    baudrate <<= pow;
+
+    /* (2^(n-4) - 2^n * f_baud / f_src) */
+    uint32_t tmp = (1 << (pow - 4)) - baudrate / f_src;
+    uint32_t rem = baudrate % f_src;
+
+    uint8_t scale = 20 - pow;
+    dev(uart)->BAUD.reg = (tmp << scale) - (rem << scale) / f_src;
+#endif
+}
+
+static void _configure_pins(uart_t uart)
+{
+    /* configure RX pin */
+    if (uart_config[uart].rx_pin != GPIO_UNDEF) {
+        gpio_init(uart_config[uart].rx_pin, GPIO_IN);
+        gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
+    }
+
+    /* configure TX pin */
+    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+        gpio_set(uart_config[uart].tx_pin);
+        gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
+        gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
+    }
+
+#ifdef MODULE_PERIPH_UART_HW_FC
+    /* If RTS/CTS needed, enable them */
+    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
+        /* Ensure RTS is defined */
+        if (uart_config[uart].rts_pin != GPIO_UNDEF) {
+            gpio_init_mux(uart_config[uart].rts_pin, uart_config[uart].mux);
+        }
+        /* Ensure CTS is defined */
+        if (uart_config[uart].cts_pin != GPIO_UNDEF) {
+            gpio_init_mux(uart_config[uart].cts_pin, uart_config[uart].mux);
+        }
+    }
+#endif
+}
+
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     if (uart >= UART_NUMOF) {
@@ -64,21 +129,15 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     /* must disable here first to ensure idempotency */
-    dev(uart)->CTRLA.reg &= ~(SERCOM_USART_CTRLA_ENABLE);
+    dev(uart)->CTRLA.reg = 0;
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     /* set up the TX buffer */
-    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], SAM0_UART_TXBUF_SIZE);
+    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
 #endif
 
     /* configure pins */
-    if (uart_config[uart].rx_pin != GPIO_UNDEF) {
-        gpio_init(uart_config[uart].rx_pin, GPIO_IN);
-        gpio_init_mux(uart_config[uart].rx_pin, uart_config[uart].mux);
-    }
-    gpio_init(uart_config[uart].tx_pin, GPIO_OUT);
-    gpio_set(uart_config[uart].tx_pin);
-    gpio_init_mux(uart_config[uart].tx_pin, uart_config[uart].mux);
+    _configure_pins(uart);
 
     /* enable peripheral clock */
     sercom_clk_en(dev(uart));
@@ -92,23 +151,42 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
     /* set asynchronous mode w/o parity, LSB first, TX and RX pad as specified
      * by the board in the periph_conf.h, x16 sampling and use internal clock */
-    dev(uart)->CTRLA.reg = (SERCOM_USART_CTRLA_DORD |
-                            SERCOM_USART_CTRLA_SAMPR(0x1) |
-                            SERCOM_USART_CTRLA_TXPO(uart_config[uart].tx_pad) |
-                            SERCOM_USART_CTRLA_RXPO(uart_config[uart].rx_pad) |
-                            SERCOM_USART_CTRLA_MODE(0x1));
+    dev(uart)->CTRLA.reg = SERCOM_USART_CTRLA_DORD
+#if IS_ACTIVE(CONFIG_SAM0_UART_BAUD_FRAC)
+    /* enable Asynchronous Fractional mode */
+                         | SERCOM_USART_CTRLA_SAMPR(0x1)
+#endif
+                         | SERCOM_USART_CTRLA_TXPO(uart_config[uart].tx_pad)
+                         | SERCOM_USART_CTRLA_RXPO(uart_config[uart].rx_pad)
+                         | SERCOM_USART_CTRLA_MODE(0x1);
+
     /* Set run in standby mode if enabled */
     if (uart_config[uart].flags & UART_FLAG_RUN_STANDBY) {
         dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_RUNSTDBY;
     }
+#ifdef SERCOM_USART_CTRLA_RXINV
+    /* COM100-61: The TXINV and RXINV bits in the CTRLA register have inverted functionality. */
+    if (uart_config[uart].flags & UART_FLAG_TXINV) {
+        dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_RXINV;
+    }
+#endif
+#ifdef SERCOM_USART_CTRLA_TXINV
+    /* COM100-61: The TXINV and RXINV bits in the CTRLA register have inverted functionality. */
+    if (uart_config[uart].flags & UART_FLAG_RXINV) {
+        dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_TXINV;
+    }
+#endif
 
     /* calculate and set baudrate */
-    uint32_t baud = ((((uint32_t)CLOCK_CORECLOCK * 8) / baudrate) / 16);
-    dev(uart)->BAUD.FRAC.FP = (baud % 8);
-    dev(uart)->BAUD.FRAC.BAUD = (baud / 8);
+    _set_baud(uart, baudrate);
 
     /* enable transmitter, and configure 8N1 mode */
-    dev(uart)->CTRLB.reg = SERCOM_USART_CTRLB_TXEN;
+    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+        dev(uart)->CTRLB.reg = SERCOM_USART_CTRLB_TXEN;
+    } else {
+        dev(uart)->CTRLB.reg = 0;
+    }
+
     /* enable receiver and RX interrupt if configured */
     if ((rx_cb) && (uart_config[uart].rx_pin != GPIO_UNDEF)) {
         uart_ctx[uart].rx_cb = rx_cb;
@@ -147,11 +225,61 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return UART_OK;
 }
 
+void uart_init_pins(uart_t uart)
+{
+    _configure_pins(uart);
+
+    uart_poweron(uart);
+}
+
+void uart_deinit_pins(uart_t uart)
+{
+    uart_poweroff(uart);
+
+    /* de-configure RX pin */
+    if (uart_config[uart].rx_pin != GPIO_UNDEF) {
+        gpio_disable_mux(uart_config[uart].rx_pin);
+    }
+
+    /* de-configure TX pin */
+    if (uart_config[uart].tx_pin != GPIO_UNDEF) {
+        gpio_disable_mux(uart_config[uart].tx_pin);
+    }
+
+#ifdef MODULE_PERIPH_UART_HW_FC
+    /* If RTS/CTS needed, enable them */
+    if (uart_config[uart].tx_pad == UART_PAD_TX_0_RTS_2_CTS_3) {
+        /* Ensure RTS is defined */
+        if (uart_config[uart].rts_pin != GPIO_UNDEF) {
+            gpio_disable_mux(uart_config[uart].rts_pin);
+        }
+        /* Ensure CTS is defined */
+        if (uart_config[uart].cts_pin != GPIO_UNDEF) {
+            gpio_disable_mux(uart_config[uart].cts_pin);
+        }
+    }
+#endif
+}
+
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
+    if (uart_config[uart].tx_pin == GPIO_UNDEF) {
+        return;
+    }
+
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     for (const void* end = data + len; data != end; ++data) {
-        while (tsrb_add_one(&uart_tx_rb[uart], *data) < 0) {}
+        if (irq_is_in() || __get_PRIMASK()) {
+            /* if ring buffer is full free up a spot */
+            if (tsrb_full(&uart_tx_rb[uart])) {
+                while (!dev(uart)->INTFLAG.bit.DRE) {}
+                dev(uart)->DATA.reg = tsrb_get_one(&uart_tx_rb[uart]);
+            }
+            tsrb_add_one(&uart_tx_rb[uart], *data);
+        }
+        else {
+            while (tsrb_add_one(&uart_tx_rb[uart], *data) < 0) {}
+        }
         dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
     }
 #else

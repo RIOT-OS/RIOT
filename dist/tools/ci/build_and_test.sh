@@ -9,46 +9,6 @@
 
 CI_BASE_BRANCH=${CI_BASE_BRANCH:-master}
 
-function print_result {
-    local RED="\033[0;31m"
-    local GREEN="\033[0;32m"
-    local NO_COLOUR="\033[0m"
-
-    if (( "$1" == 0 )); then
-        echo -e "${GREEN}✓$NO_COLOUR"
-    else
-        echo -e "${RED}x$NO_COLOUR"
-    fi
-}
-
-RESULT=0
-set_result() {
-    NEW_RESULT=$1
-
-    if (( $NEW_RESULT != 0))
-    then
-        RESULT=$NEW_RESULT
-    fi
-}
-
-function run {
-    echo -n "Running '$@' "
-    OUT=$($@ 2>&1)
-    NEW_RESULT=$?
-
-    print_result $NEW_RESULT
-    set_result $NEW_RESULT
-
-    # Indent command output so that its easily discernible from the rest
-    if [ -n "$OUT" ]; then
-        echo "Command output:"
-        echo ""
-        # Using printf to avoid problems if the command output begins with a -
-        (printf "%s\n" "$OUT" | while IFS= read -r line; do printf "\t%s\n" "$line"; done)
-        echo ""
-    fi
-}
-
 if [[ $BUILDTEST_MCU_GROUP ]]
 then
     export BASE_BRANCH="${CI_BASE_BRANCH}"
@@ -80,22 +40,7 @@ then
             exit $RESULT
         fi
 
-        run make print-versions
-
-        run ./dist/tools/commit-msg/check.sh ${CI_BASE_BRANCH}
-        run ./dist/tools/whitespacecheck/check.sh ${CI_BASE_BRANCH}
-        DIFFFILTER="MR" ERROR_EXIT_CODE=0 run ./dist/tools/licenses/check.sh
-        DIFFFILTER="AC" run ./dist/tools/licenses/check.sh
-        run ./dist/tools/doccheck/check.sh
-        run ./dist/tools/externc/check.sh
-        run ./dist/tools/cppcheck/check.sh
-        run ./dist/tools/pr_check/pr_check.sh ${CI_BASE_BRANCH}
-        run ./dist/tools/coccinelle/check.sh
-        run ./dist/tools/flake8/check.sh
-        run ./dist/tools/headerguards/check.sh
-        run ./dist/tools/buildsystem_sanity_check/check.sh
-        run ./dist/tools/codespell/check.sh
-        exit $RESULT
+        exec ./dist/tools/ci/static_tests.sh
     fi
 
     if [ "$BUILDTEST_MCU_GROUP" == "host" ]; then

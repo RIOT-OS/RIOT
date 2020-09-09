@@ -19,6 +19,7 @@
 
 #include "embUnit.h"
 #include "periph/usbdev.h"
+#include "test_utils/expect.h"
 #include "usbdev_mock.h"
 
 #define ENABLE_DEBUG    (0)
@@ -121,7 +122,7 @@ int _set(usbdev_t *usbdev, usbopt_t opt,
             res = sizeof(uint8_t);
             break;
         case USBOPT_ATTACH:
-            assert(value_len == sizeof(usbopt_enable_t));
+            expect(value_len == sizeof(usbopt_enable_t));
             res = sizeof(usbopt_enable_t);
             break;
         default:

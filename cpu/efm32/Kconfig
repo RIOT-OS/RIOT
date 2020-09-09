@@ -1,0 +1,34 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config CPU_COMMON_EFM32
+    bool
+    select HAS_ARCH_EFM32
+    select HAS_CORTEXM_MPU
+    select HAS_CPU_EFM32
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+
+## Definition of specific features
+config HAS_ARCH_EFM32
+    bool
+    help
+        Indicates that the 'efm32' architecture is being used.
+
+config HAS_CPU_EFM32
+    bool
+    help
+        Indicates that the CPU being used is an EFM32.
+
+## Common CPU symbols
+config CPU
+    default "efm32" if CPU_COMMON_EFM32
+
+orsource "families/*/Kconfig"
+source "$(RIOTCPU)/cortexm_common/Kconfig"

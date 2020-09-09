@@ -83,6 +83,23 @@ typedef volatile       uint8_t  RwReg8;  /**< Read-Write  8-bit register (volati
 #define REG_ACCESS(type, address) (address) /**< Assembly code: Register address */
 #endif
 
+#if !defined(SKIP_INTEGER_LITERALS)
+#if defined(_U_) || defined(_L_) || defined(_UL_)
+  #error "Integer Literals macros already defined elsewhere"
+#endif
+
+#if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
+/* Macros that deal with adding suffixes to integer literal constants for C/C++ */
+#define _U_(x)         x ## U            /**< C code: Unsigned integer literal constant value */
+#define _L_(x)         x ## L            /**< C code: Long integer literal constant value */
+#define _UL_(x)        x ## UL           /**< C code: Unsigned Long integer literal constant value */
+#else /* Assembler */
+#define _U_(x)         x                 /**< Assembler: Unsigned integer literal constant value */
+#define _L_(x)         x                 /**< Assembler: Long integer literal constant value */
+#define _UL_(x)        x                 /**< Assembler: Unsigned Long integer literal constant value */
+#endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
+#endif /* SKIP_INTEGER_LITERALS */
+
 /* ************************************************************************** */
 /**  CMSIS DEFINITIONS FOR SAMR30G18A */
 /* ************************************************************************** */

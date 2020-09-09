@@ -21,9 +21,10 @@
 #include <string.h>
 
 /* RIOT includes */
-#include <log.h>
-#include <motor_driver.h>
-#include <xtimer.h>
+#include "log.h"
+#include "motor_driver.h"
+#include "test_utils/expect.h"
+#include "xtimer.h"
 
 /* set interval to 20 milli-second */
 #define INTERVAL (3000 * US_PER_MS)
@@ -78,7 +79,7 @@ void motion_control(void)
     if (ret) {
         LOG_ERROR("motor_driver_init failed with error code %d\n", ret);
     }
-    assert(ret == 0);
+    expect(ret == 0);
 
     for (;;) {
         /* BRAKE - duty cycle 100% */

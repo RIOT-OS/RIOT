@@ -10,7 +10,7 @@
  * @defgroup    net_eui64   IEEE EUI-64 identifier
  * @ingroup     net
  * @brief       Type definition of the IEEE EUI-64 identifier
- * @see         <a href="http://standards.ieee.org/regauth/oui/tutorials/EUI64.html">
+ * @see         <a href="https://web.archive.org/web/20170730083229/http://standards.ieee.org:80/develop/regauth/tut/eui64.pdf">
  *                  IEEE, "Guidelines for 64-bit Global Identifier (EUI-64)"
  *              </a>
  * @{
@@ -54,8 +54,9 @@ extern "C" {
  */
 typedef union {
     network_uint64_t uint64;     /**< represented as 64 bit value */
-    uint8_t uint8[8];            /**< split into 8 8-bit words. */
-    network_uint16_t uint16[4];  /**< split into 4 16-bit words. */
+    uint8_t uint8[8];            /**< split into 8 8-bit words.   */
+    network_uint16_t uint16[4];  /**< split into 4 16-bit words.  */
+    network_uint32_t uint32[2];  /**< split into 2 32-bit words.  */
 } eui64_t;
 
 /**

@@ -1,0 +1,37 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_ARCH_MSP430
+    bool
+    select HAS_ARCH_16BIT
+    select HAS_ARCH_MSP430
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_PM
+
+config CPU_CORE_MSP430
+    bool
+    select CPU_ARCH_MSP430
+
+## Common CPU symbols
+config CPU_ARCH
+    default "msp430" if CPU_ARCH_MSP430
+
+config CPU_CORE
+    default "msp430" if CPU_CORE_MSP430
+
+## Definition of specific features
+config HAS_ARCH_MSP430
+    bool
+    help
+        Indicates that the current architecture is MSP430.
+
+## Specific default configuration values
+config GNRC_PKTBUF_SIZE
+    default 2560
+    depends on KCONFIG_USEMODULE_GNRC_PKTBUF_STATIC

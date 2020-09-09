@@ -9,18 +9,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-## Uncomment to redefine port, for example use 61616 for RFC 6282 UDP compression.
-#GCOAP_PORT = 5683
-#CFLAGS += -DGCOAP_PORT=$(GCOAP_PORT)
-
-## Uncomment to redefine request token length, max 8.
-#GCOAP_TOKENLEN = 2
-#CFLAGS += -DGCOAP_TOKENLEN=$(GCOAP_TOKENLEN)
-
-# Increase from default for confirmable block2 follow-on requests
-GCOAP_RESEND_BUFS_MAX ?= 2
-CFLAGS += -DGCOAP_RESEND_BUFS_MAX=$(GCOAP_RESEND_BUFS_MAX)
-
 # Include packages that pull up and auto-init the link layer.
 # NOTE: 6LoWPAN will be included if IEEE802.15.4 devices are present
 USEMODULE += gnrc_netdev_default
@@ -48,3 +36,20 @@ DEVELHELP ?= 1
 QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
+
+# For now this goes after the inclusion of Makefile.include so Kconfig symbols
+# are available. Only set configuration via CFLAGS if Kconfig is not being used
+# for this module.
+ifndef CONFIG_KCONFIG_MODULE_GCOAP
+## Uncomment to redefine port, for example use 61616 for RFC 6282 UDP compression.
+#GCOAP_PORT = 5683
+#CFLAGS += -DCONFIG_GCOAP_PORT=$(GCOAP_PORT)
+
+## Uncomment to redefine request token length, max 8.
+#GCOAP_TOKENLEN = 2
+#CFLAGS += -DCONFIG_GCOAP_TOKENLEN=$(GCOAP_TOKENLEN)
+
+# Increase from default for confirmable block2 follow-on requests
+GCOAP_RESEND_BUFS_MAX ?= 2
+CFLAGS += -DCONFIG_GCOAP_RESEND_BUFS_MAX=$(GCOAP_RESEND_BUFS_MAX)
+endif

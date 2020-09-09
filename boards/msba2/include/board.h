@@ -19,7 +19,7 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include "lpc2387.h"
+#include "lpc23xx.h"
 #include "bitarithm.h"
 
 #ifdef __cplusplus
@@ -43,13 +43,6 @@ extern "C" {
 #define LED1_OFF            (FIO3SET  = LED1_MASK)
 #define LED1_ON             (FIO3CLR  = LED1_MASK)
 #define LED1_TOGGLE         (FIO3PIN ^= LED1_MASK)
-/** @} */
-
-/**
- * @name    xtimer tuning values
- * @{
- */
-#define XTIMER_OVERHEAD     7
 /** @} */
 
 #ifdef __cplusplus

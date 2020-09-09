@@ -20,44 +20,11 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "f1f3/cfg_clock_default.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Clock system configuration
- * @{
- **/
-/* high speed clock configuration:
- * 0 := use internal HSI oscillator (always 8MHz)
- * HSE frequency value := use external HSE oscillator with given freq [in Hz]
- *                        must be 4000000 <= value <= 16000000 */
-#define CLOCK_HSE           (8000000U)
-/* low speed clock configuration:
- * 0 := use internal LSI oscillator (~40kHz)
- * 1 := use extern LSE oscillator, always 32.768kHz */
-#define CLOCK_LSE           (0)
-/* targeted system clock speed [in Hz], must be <= 72MHz */
-#define CLOCK_CORECLOCK     (72000000U)
-/* PLL configuration, set both values to zero to disable PLL usage. The values
- * must be set to satisfy the following equation:
- * CORECLOCK := CLOCK_SOURCE / PLL_DIV * PLL_MUL
- * with
- * 1 <= CLOCK_PLL_DIV <= 2
- * 2 <= CLOCK_PLL_MUL <= 17 */
-#define CLOCK_PLL_DIV       (1)
-#define CLOCK_PLL_MUL       (9)
-/* AHB and APBx bus clock configuration, keep in mind the following constraints:
- * ABP1 <= 36MHz
- */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV2
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 2)
-/** @} */
 
 /**
  * @name   Timer configuration
@@ -156,29 +123,6 @@ static const i2c_conf_t i2c_config[] = {
 
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
-
-/**
- * @brief   Shared SPI clock div table
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
- */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 36000000Hz */
-        7,  /* -> 140625Hz */
-        6,  /* -> 281250Hz */
-        4,  /* -> 1125000Hz */
-        2,  /* -> 4500000Hz */
-        1   /* -> 9000000Hz */
-    },
-    {       /* for APB2 @ 72000000Hz */
-        7,  /* -> 281250Hz */
-        7,  /* -> 281250Hz */
-        5,  /* -> 1125000Hz */
-        3,  /* -> 4500000Hz */
-        2   /* -> 9000000Hz */
-    }
-};
 
 /**
  * @name SPI configuration

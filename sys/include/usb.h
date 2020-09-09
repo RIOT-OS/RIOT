@@ -24,23 +24,45 @@
 extern "C" {
 #endif
 
+#include "board.h"
+
 /**
  * @defgroup usb_conf USB peripheral compile time configurations
  * @ingroup config
  * @{
  */
+
+/* These can be overridden by boards that should come up with their board
+ * supplier VID/PID pair. Boards should only override this if the RIOT built-in
+ * peripherals are compatible with whatever is usually shipped with that pair
+ * */
+#ifndef INTERNAL_PERIPHERAL_VID
+/** Reserved for RIOT standard peripherals as per http://pid.codes/1209/7D00/ */
+#define INTERNAL_PERIPHERAL_VID (0x1209)
+#endif
+#ifndef INTERNAL_PERIPHERAL_PID
+/** Reserved for RIOT standard peripherals as per http://pid.codes/1209/7D00/ */
+#define INTERNAL_PERIPHERAL_PID (0x7D00)
+#endif
+
+#if !(defined(CONFIG_USB_VID) && defined(CONFIG_USB_PID))
+#ifdef USB_H_USER_IS_RIOT_INTERNAL
+#define CONFIG_USB_VID INTERNAL_PERIPHERAL_VID
+#define CONFIG_USB_PID INTERNAL_PERIPHERAL_PID
+#else
+#error Please configure your vendor and product IDs. For development, you may \
+    set USB_VID=${USB_VID_TESTING} USB_PID=${USB_PID_TESTING}.
+#endif
+#endif
+
 /**
  * @brief USB peripheral device vendor ID
  *
  * @note You must provide your own VID/PID combination when manufacturing a
  * device with USB.
  */
-#ifndef USB_CONFIG_VID
 #ifdef DOXYGEN
-#define USB_CONFIG_VID
-#else
-#error  Please supply your vendor ID by setting USB_CONFIG_VID
-#endif
+#define CONFIG_USB_VID
 #endif
 
 /**
@@ -49,33 +71,29 @@ extern "C" {
  * @note You must provide your own VID/PID combination when manufacturing a
  * device with USB.
  */
-#ifndef USB_CONFIG_PID
 #ifdef DOXYGEN
-#define USB_CONFIG_PID
-#else
-#error  Please supply your vendor ID by setting USB_CONFIG_PID
-#endif
+#define CONFIG_USB_PID
 #endif
 
 /**
  * @brief USB peripheral manufacturer string
  */
-#ifndef USB_CONFIG_MANUF_STR
-#define USB_CONFIG_MANUF_STR   "RIOT-os.org"
+#ifndef CONFIG_USB_MANUF_STR
+#define CONFIG_USB_MANUF_STR   "RIOT-os.org"
 #endif
 
 /**
  * @brief USB peripheral product string
  */
-#ifndef USB_CONFIG_PRODUCT_STR
-#define USB_CONFIG_PRODUCT_STR  "USB device"
+#ifndef CONFIG_USB_PRODUCT_STR
+#define CONFIG_USB_PRODUCT_STR  "USB device"
 #endif
 
 /**
  * @brief USB peripheral configuration string
  */
-#ifndef USB_CONFIG_CONFIGURATION_STR
-#define USB_CONFIG_CONFIGURATION_STR    "USB config"
+#ifndef CONFIG_USB_CONFIGURATION_STR
+#define CONFIG_USB_CONFIGURATION_STR    "USB config"
 #endif
 
 /**
@@ -84,36 +102,71 @@ extern "C" {
  * This is the version number of this peripheral
  * @note Not to be be confused with the USB version number
  */
-#ifndef USB_CONFIG_PRODUCT_BCDVERSION
-#define USB_CONFIG_PRODUCT_BCDVERSION   0x0100
+#ifndef CONFIG_USB_PRODUCT_BCDVERSION
+#define CONFIG_USB_PRODUCT_BCDVERSION   0x0100
 #endif
 
 /**
  * @brief USB specification version
  */
-#ifndef USB_CONFIG_SPEC_BCDVERSION
-#define USB_CONFIG_SPEC_BCDVERSION      0x0200
+#ifndef CONFIG_USB_SPEC_BCDVERSION
+#if defined(CONFIG_USB_SPEC_BCDVERSION_1_1)
+#define CONFIG_USB_SPEC_BCDVERSION      0x0110
+#elif defined(CONFIG_USB_SPEC_BCDVERSION_2_0)
+#define CONFIG_USB_SPEC_BCDVERSION      0x0200
+#else
+#define CONFIG_USB_SPEC_BCDVERSION      0x0200
+#endif
 #endif
 
 /**
  * @brief USB peripheral setting to indicate self powered devices.
  */
-#ifndef USB_CONFIG_SELF_POWERED
-#define USB_CONFIG_SELF_POWERED   (0)
+#ifndef CONFIG_USB_SELF_POWERED
+#define CONFIG_USB_SELF_POWERED   (0)
 #endif
 
 /**
  * @brief USB device max power draw in mA, between 0 and 500mA
  */
-#ifndef USB_CONFIG_MAX_POWER
-#define USB_CONFIG_MAX_POWER   (100)
+#ifndef CONFIG_USB_MAX_POWER
+#define CONFIG_USB_MAX_POWER   (100)
 #endif
 
 /**
  * @brief Default LANG ID reported to the host
  */
-#ifndef USB_CONFIG_DEFAULT_LANGID
-#define USB_CONFIG_DEFAULT_LANGID   0x0409 /* EN-US */
+#ifndef CONFIG_USB_DEFAULT_LANGID
+#define CONFIG_USB_DEFAULT_LANGID   0x0409 /* EN-US */
+#endif
+/** @} */
+
+/**
+ * @brief RIOT-internal USB peripheral clearance indicator
+ *
+ * This define must only be set in compilation units that are RIOT internal,
+ * and only when they implement peripherals that can be considered default RIOT
+ * peripherals.
+ *
+ * When this is defined in all uses of `usb.h`, the board can use the
+ * 0x1209/0x7D00 VID/PID pair unless explicit configuration using @ref
+ * CONFIG_USB_VID and @ref CONFIG_USB_PID say otherwise.
+ *
+ * There is no sharp characterization of what consititutes an internal
+ * peripheral; a good check is this: If an application can, just by switching
+ * between boards, can have a feature provided by either RIOT's USB stack or a
+ * different mechanism, the USB version is a default RIOT peripheral.
+ *
+ * Examples are stdio access (is provided by most boards using a UART and an
+ * external USB UART adapter), Ethernet (is provided by other boards using
+ * ethos) and firmware upload and reset (is provided by other boards using an
+ * on-board programmer).
+ *
+ * See http://pid.codes/1209/7D00/ for the allocation of that code.
+ * @{
+ */
+#ifdef DOXYGEN
+#define USB_H_USER_IS_RIOT_INTERNAL
 #endif
 /** @} */
 

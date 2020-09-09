@@ -44,5 +44,6 @@ void board_init(void)
  */
 void led_init(void)
 {
-    gpio_init(GPIO_PIN(PB,10), GPIO_OUT);
+    gpio_init(LED0_PIN, GPIO_OUT);
+    LED0_OFF;
 }

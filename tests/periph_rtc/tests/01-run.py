@@ -32,18 +32,12 @@ def testfunc(child):
 
     child.expect(r'  Setting alarm to   ({})'.format(DATE_PATTERN))
     alarm_set = child.match.group(1)
-    if BOARD == 'native':
-        child.expect(r'.*rtc_set_alarm: not implemented')
     child.expect(r'   Alarm is set to   ({})'.format(DATE_PATTERN))
     alarm_value = child.match.group(1)
-    if BOARD != 'native':
-        # Set alarm is not implemented for native board so no need to compare
-        # alarm values
-        assert alarm_set == alarm_value
+    assert alarm_set == alarm_value
 
-    if BOARD != 'native':
-        for _ in range(alarm_count):
-            child.expect_exact('Alarm!')
+    for _ in range(alarm_count):
+        child.expect_exact('Alarm!')
 
 
 if __name__ == "__main__":

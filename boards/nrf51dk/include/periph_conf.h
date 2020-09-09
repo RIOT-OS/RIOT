@@ -34,7 +34,6 @@ extern "C" {
  */
 #define UART_NUMOF          (1U)
 /* UART pin configuration */
-#define UART_HWFLOWCTRL     1
 #define UART_PIN_RX         11
 #define UART_PIN_TX         9
 #define UART_PIN_RTS        8
@@ -73,6 +72,11 @@ static const i2c_conf_t i2c_config[] = {
 
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
+
+/**
+ * @brief Enable the internal DC/DC converter
+ */
+#define NRF5X_ENABLE_DCDC
 
 #ifdef __cplusplus
 }

@@ -1,6 +1,6 @@
 PROGRAMMER ?= openocd
 
-PROGRAMMERS_SUPPORTED := bmp dfu-util openocd
+PROGRAMMERS_SUPPORTED := bmp dfu-util openocd stm32flash jlink
 
 ifeq (,$(filter $(PROGRAMMER), $(PROGRAMMERS_SUPPORTED)))
   $(error Programmer $(PROGRAMMER) not supported)
@@ -23,7 +23,7 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 ifeq (openocd,$(PROGRAMMER))
   # STM32 boards can become un-flashable after a hardfault,
   # use connect_assert_srst to always be able to flash or reset the boards.
-  export OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
+  OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
   # For STM32 boards the ST-link adapter is the default adapter, e.g. all
   # Nucleo boards have an on-board ST-link adapter
@@ -37,6 +37,11 @@ ifeq (bmp,$(PROGRAMMER))
   include $(RIOTMAKE)/tools/bmp.inc.mk
 endif
 
+ifeq (jlink,$(PROGRAMMER))
+  JLINK_DEVICE ?= $(CPU_MODEL)
+  include $(RIOTMAKE)/tools/jlink.inc.mk
+endif
+
 ifeq (dfu-util,$(PROGRAMMER))
   # optionally, use dfu-util to flash via usb
   # note: needs a bootloader flashed before, config below is compatible
@@ -46,13 +51,15 @@ ifeq (dfu-util,$(PROGRAMMER))
   ifeq (,$(DFU_USB_ID))
     $(error DFU_USB_ID is not set)
   endif
-  # Skip the space needed by the embedded bootloader
-  export ROM_OFFSET ?= 0x2000
-  FLASHER = dfu-util
-  DEBUGGER = # no debugger
-  RESET ?= # dfu-util has no support for resetting the device
+  include $(RIOTMAKE)/tools/dfu.inc.mk
+endif
 
-  FLASHFILE ?= $(BINFILE)
-  DFU_FLAGS ?= -a 2
-  FFLAGS = -d $(DFU_USB_ID) $(DFU_FLAGS) -D $(FLASHFILE)
+ifeq (stm32flash,$(PROGRAMMER))
+	ROM_OFFSET ?= 0x0
+	FLASHER = stm32flash
+	DEBUGGER =
+	FLASHFILE ?= $(BINFILE)
+	PROG_BAUD ?= 57600
+	BIN_ADDR ?= $(shell echo  $$(($(ROM_START_ADDR) + $(ROM_OFFSET))))
+	FFLAGS = -v -b $(PROG_BAUD) -w $(FLASHFILE) -S $(BIN_ADDR) -g $(BIN_ADDR) $(PORT)
 endif

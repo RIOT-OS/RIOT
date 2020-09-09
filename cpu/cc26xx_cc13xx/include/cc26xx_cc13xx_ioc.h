@@ -142,30 +142,42 @@ typedef struct {
 #define IOCFG_HYST_ENABLE               0x40000000
 /** @} */
 
+/**
+ * @brief   AON_IOC registers
+ */
+typedef struct {
+    reg32_t IOSTRMIN; /**< IO Drive Strength Minimum */
+    reg32_t IOSTRMED; /**< IO Drive Strength Medium */
+    reg32_t IOSTRMAX; /**< IO Drive Strength Maximum */
+    reg32_t IOCLATCH; /**< IO Latch Control */
+    reg32_t CLK32KCTL; /**< SCLK_LF External Output Control */
+#ifdef CPU_VARIANT_X2
+    reg32_t TCKCTL; /**< TCK IO Pin Control */
+#endif
+} aon_ioc_regs_t;
 
-/** @ingroup cpu_specific_peripheral_memory_map
+/**
+ * @brief   AON_IOC register values
  * @{
  */
-#define AON_IOC_BASE            (PERIPH_BASE + 0x94000) /**< always-on-IOC base address */
+#define AON_IOC_IOCLATCH_EN   0x00000001
+#define AON_IOC_CLK32KCTL_OEN 0x00000001
 /** @} */
 
 /**
- * AON registers
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
  */
-typedef struct {
-    reg32_t IOSTRMIN; /**< IO drive strength minimum */
-    reg32_t IOSTRMED; /**< IO drive strength medium */
-    reg32_t IOSTRMAX; /**< IO drive strength maximum */
-    reg32_t IOCLATCH; /**< IO latch control */
-    reg32_t CLK32KCTL; /**< SCLK_LF external output control */
-} aon_regs_t;
+/**
+ * @brief   AON_IOC base address
+ */
+#define AON_IOC_BASE         (PERIPH_BASE + 0x94000)
+/** @} */
 
-#define AON                     ((aon_regs_t *) (AON_IOC_BASE)) /**< AON register bank */
-
-#define IOCLATCH_EN             0x00000001 /**< IO controlled by GPIO or peripheral; kept in AON otherwise */
-
-#define CLK32KCTL_OEN           0x00000001 /**< don't output SCLK_LF on DIOs with PORT_ID AON_CLK32K */
-
+/**
+ * @brief   AON_IOC register bank
+ */
+#define AON_IOC              ((aon_ioc_regs_t *) (AON_IOC_BASE))
 
 #ifdef __cplusplus
 }

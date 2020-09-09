@@ -1,5 +1,3 @@
-genconfig.py
 kconfiglib.py
 menuconfig.py
-merge_config.py
 __pycache__

@@ -1,0 +1,50 @@
+# Copyright (c) 2019 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_GNRC_IPV6_EXT_FRAG
+    bool "Configure GNRC IPv6 fragmentation and reassembly"
+    depends on USEMODULE_GNRC_IPV6_EXT_FRAG
+    help
+        Configure GNRC IPv6 fragmentation and reassembly via Kconfig.
+
+if KCONFIG_USEMODULE_GNRC_IPV6_EXT_FRAG
+
+config GNRC_IPV6_EXT_FRAG_SEND_SIZE
+    int "Number of entries IPv6 in the send buffer"
+    default 1
+    help
+        This limits the total amount of datagrams that can be fragmented at
+        the same time.
+
+config GNRC_IPV6_EXT_FRAG_RBUF_SIZE
+    int "Number of IPv6 fragmentation reassembly entries"
+    default 1
+    help
+        This limits the total amount of datagrams that can be reassembled at
+        the same time.
+
+config GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE
+    int "Number of allocatable fragment limit objects"
+    default 2
+    help
+        Number of total allocable gnrc_ipv6_ext_frag_limits_t objects. This is
+        the maximum number of receivable fragments, shared between all
+        fragmented datagrams.
+
+config GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US
+    int "Timeout for IPv6 fragmentation reassembly buffer entries"
+    default 10000000
+    help
+        This value is expressed in microseconds.
+
+config GNRC_IPV6_EXT_FRAG_RBUF_DO_NOT_OVERRIDE
+    bool "Do not override oldest datagram when reassembly buffer is full"
+    help
+        When not set, it will cause the reassembly buffer to override the oldest
+        entry when a fragment for a new datagram is received. When set to 1, no
+        entry will be overwritten (they will still timeout normally)
+
+endif # KCONFIG_USEMODULE_GNRC_IPV6_EXT_FRAG

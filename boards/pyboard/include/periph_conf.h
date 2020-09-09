@@ -22,6 +22,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "cfg_usb_otg_fs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,6 +60,21 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    DMA streams configuration
+ * @{
+ */
+static const dma_conf_t dma_config[] = {
+    { .stream = 11 },   /* DMA2 Stream 3 - SPI1_TX */
+    { .stream = 10 },   /* DMA2 Stream 2 - SPI1_RX */
+};
+
+#define DMA_0_ISR           isr_dma2_stream3
+#define DMA_1_ISR           isr_dma2_stream2
+
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
+/** @} */
+
+/**
  * @name    Timer configuration
  * @{
  */
@@ -92,8 +108,8 @@ static const uart_conf_t uart_config[] = {
         .bus        = APB2,
         .irqn       = USART1_IRQn,
 #ifdef MODULE_PERIPH_DMA
-        .dma        = 2,
-        .dma_chan   = 2
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     },
 };
@@ -105,46 +121,26 @@ static const uart_conf_t uart_config[] = {
 
 /**
  * @name    SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 42000000Hz */
-        7,  /* -> 164062Hz */
-        6,  /* -> 328125Hz */
-        4,  /* -> 1312500Hz */
-        2,  /* -> 5250000Hz */
-        1   /* -> 10500000Hz */
-    },
-    {       /* for APB2 @ 84000000Hz */
-        7,  /* -> 328125Hz */
-        7,  /* -> 328125Hz */
-        5,  /* -> 1312500Hz */
-        3,  /* -> 5250000Hz */
-        2   /* -> 10500000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
-        .dev      = SPI1,
-        .mosi_pin = GPIO_PIN(PORT_A, 7),
-        .miso_pin = GPIO_PIN(PORT_A, 6),
-        .sclk_pin = GPIO_PIN(PORT_A, 5),
-        .cs_pin   = GPIO_UNDEF,
-        .mosi_af  = GPIO_AF5,
-        .miso_af  = GPIO_AF5,
-        .sclk_af  = GPIO_AF5,
-        .cs_af    = GPIO_AF5,
-        .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2,
+        .dev            = SPI1,
+        .mosi_pin       = GPIO_PIN(PORT_A, 7),
+        .miso_pin       = GPIO_PIN(PORT_A, 6),
+        .sclk_pin       = GPIO_PIN(PORT_A, 5),
+        .cs_pin         = GPIO_UNDEF,
+        .mosi_af        = GPIO_AF5,
+        .miso_af        = GPIO_AF5,
+        .sclk_af        = GPIO_AF5,
+        .cs_af          = GPIO_AF5,
+        .rccmask        = RCC_APB2ENR_SPI1EN,
+        .apbbus         = APB2,
 #ifdef MODULE_PERIPH_DMA
-        .tx_dma   = 1,
-        .tx_dma_chan = 1,
-        .rx_dma   = 0,
-        .rx_dma_chan = 1,
+        .tx_dma         = 0,
+        .tx_dma_chan    = 3,
+        .rx_dma         = 1,
+        .rx_dma_chan    = 3,
 #endif
     }
 };

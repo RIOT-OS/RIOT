@@ -21,6 +21,7 @@
 #define FSM_H
 
 #include <stdint.h>
+#include "mbox.h"
 #include "net/gnrc.h"
 #include "net/gnrc/tcp/tcb.h"
 
@@ -76,6 +77,15 @@ typedef enum {
  *            -ENOSYS if event is not implemented
  */
 int _fsm(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *buf, size_t len);
+
+/**
+ * @brief Associate mbox with tcb. Messages sent from the FSM will be stored in the mbox.
+ *
+ * @param[in, out] tcb   TCB to set message box on.
+ * @param[in]      mbox  Message box used to store messages from the FSM.
+ *                       If @p mbox is NULL, no messages will be stored.
+ */
+void _fsm_set_mbox(gnrc_tcp_tcb_t *tcb, mbox_t *mbox);
 
 #ifdef __cplusplus
 }

@@ -12,23 +12,27 @@ export APPLICATION_MODULE    # The application module name.
 export BOARD                 # The board to compile the application for.
 export CPU                   # The CPU, set by the board's Makefile.features.
 export CPU_MODEL             # The specific identifier of the used CPU, used for some CPU implementations to differentiate between different memory layouts. Set by the board's Makefile.features.
-export CPU_ARCH              # The specific identifier of the core present in the CPU, used currently only for ARM CPU's. Needed for depency resolution.
+export CPU_CORE              # The specific identifier of the core present in the CPU. Needed for depency resolution.
+export CPU_ARCH              # The specific identifier of the architecture of the core defined in CPU_CORE.
 export CPU_FAM               # An intermediate identifier between CPU and CPU_MODEL that represents a sub-group of a Manufacturers CPU's.
 export MCU                   # The MCU, set by the board's Makefile.include, or defaulted to the same value as CPU.
 export INCLUDES              # The extra include paths, set by the various Makefile.include files.
 export CXXINCLUDES           # The extra include paths for c++, set by the various Makefile.include files.
+export NATIVEINCLUDES        # The native include paths, set by the various native Makefile.include files.
 
 export USEMODULE             # Sys Module dependencies of the application. Set in the application's Makefile.
 export USEPKG                # Pkg dependencies (third party modules) of the application. Set in the application's Makefile.
 export DISABLE_MODULE        # Used in the application's Makefile to suppress DEFAULT_MODULEs.
-export APPDEPS               # Files / Makefile targets that need to be created before the application can be build. Set in the application's Makefile.
+# APPDEPS                    # Files / Makefile targets that need to be created before the application can be build. Set in the application's Makefile.
 # BUILDDEPS                  # Files / Makefile targets that need to be created before starting to build.
 # DEBUGDEPS                  # Files / Makefile targets that need to be created before starting a debug session.
 
 export RIOTBASE              # The root folder of RIOT. The folder where this very file lives in.
 export RIOTCPU               # For third party CPUs this folder is the base of the CPUs.
 export RIOTBOARD             # This folder is the base of the riot boards.
-export BOARDSDIR             # For third party BOARDs this folder is the base of the BOARDs.
+export BOARDSDIR             # This is the folder containing the board dir
+export EXTERNAL_BOARD_DIRS   # List of folders containing external board dirs
+export BOARDDIR              # This folder contains the board
 export RIOTPKG               # For overriding RIOT's pkg directory
 export RIOTTOOLS             # Location of host machine tools
 export RIOTPROJECT           # Top level git root of the project being built, or PWD if not a git repository
@@ -44,6 +48,7 @@ export PYTHONPATH            # Python default search path for module filesi, wit
 export FEATURES_REQUIRED     # List of required features by the application
 export FEATURES_PROVIDED     # List of provided features by the board
 export FEATURES_OPTIONAL     # List of nice to have features
+export FEATURES_USED         # List of features used
 # TOOLCHAINS_SUPPORTED       # List of supported toolchains by an MCU (gnu/llvm/...).
 # TOOLCHAINS_BLACKLISTED     # List of unspported toolchains for a module or an application.
 export TOOLCHAIN             # Base build toolchain, i.e. GNU or LLVM
@@ -64,6 +69,8 @@ export ARFLAGS               # Command-line options to pass to AR, default `rcs`
 export AS                    # The assembler.
 export ASFLAGS               # Flags for the assembler.
 export LINK                  # The command used to link the files. Must take the same parameters as GCC, i.e. "ld" won't work.
+export NM                    # The command used to list symbols from objet files
+export RANLIB                # The command used to generate an index to the contents of an archive
 # LINKFLAGS                  # Flags to supply in the linking step.
 export LTOFLAGS              # extra CFLAGS for compiling with link time optimization
 export OBJCOPY               # The command used to create the HEXFILE and BINFILE.
@@ -75,15 +82,18 @@ export SIZEFLAGS             # The optional size flags.
 export UNDEF                 # Object files that the linker must include in the ELFFILE even if no call to the functions or symbols (ex: interrupt vectors).
 export WERROR                # Treat all compiler warnings as errors if set to 1 (see -Werror flag in GCC manual)
 export WPEDANTIC             # Issue all (extensive) compiler warnings demanded by strict C/C++
+# EEPROM_FILE                # (Native only!) file path where the content of the EEPROM is stored
 
-export GITCACHE              # path to git-cache executable
-export GIT_CACHE_DIR         # path to git-cache cache directory
+# GITCACHE                   # path to git-cache executable
+# GIT_CACHE_DIR              # path to git-cache cache directory, only used with packages
 # FLASHER                    # The command to call on "make flash".
 # PROG_DEV                   # The device to connect the FLASHER and DEBUGGER
 # FFLAGS                     # The parameters to supply to FLASHER.
 export FLASH_ADDR            # Define an offset to flash code into ROM memory.
 # TERMPROG                   # The command to call on "make term".
 # TERMFLAGS                  # Additional parameters to supply to TERMPROG.
+# TERMLOG                    # Optional file to log "make term" output to.
+# TERMTEE                    # Optional pipe to redirect "make term" output. Default: '| tee -a ${TERMLOG}' when TERMLOG is defined else undefined.
 # PORT                       # The port to connect the TERMPROG to.
 export ELFFILE               # The unstripped result of the compilation.
 export HEXFILE               # The 'intel hex' stripped result of the compilation.
@@ -105,4 +115,7 @@ export UNZIP_HERE            # Use `cd $(SOME_FOLDER) && $(UNZIP_HERE) $(SOME_FI
 export LAZYSPONGE            # Command saving stdin to a file only on content update.
 export LAZYSPONGE_FLAGS      # Parameters supplied to LAZYSPONGE.
 
+export AFL_FLAGS             # Additional command-line flags passed to afl during fuzzing.
+
 # LOG_LEVEL                  # Logging level as integer (NONE: 0, ERROR: 1, WARNING: 2, INFO: 3, DEBUG: 4, default: 3)
+# KCONFIG_ADD_CONFIG         # List of .config files to be merged used by Boards and CPUs. See kconfig.mk

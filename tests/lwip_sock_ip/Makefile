@@ -25,7 +25,7 @@ USEMODULE += netdev_eth
 USEMODULE += netdev_test
 USEMODULE += ps
 
-DISABLE_MODULE += auto_init
+DISABLE_MODULE += auto_init_lwip
 
 CFLAGS += -DSO_REUSE
 CFLAGS += -DLWIP_SO_RCVTIMEO

@@ -2,7 +2,7 @@
 
 This is a demo of a signature verification using wolfCrypt.
 
-wolfCrypt is part of [wolfSSL](https://www.wolfss.com) which provides several different cryptographic services.
+wolfCrypt is part of [wolfSSL](https://www.wolfssl.com) which provides several different cryptographic services.
 
 In this test, a text message is signed using Edwards-curve digital signature algorithm,
 using the Ed25519 signature scheme.

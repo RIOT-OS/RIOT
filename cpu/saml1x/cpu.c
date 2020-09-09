@@ -30,6 +30,16 @@
 #define _NVMCTRL NVMCTRL
 #endif
 
+/* As long as FDPLL is not used, we can default to
+ * always using the buck converter.
+ *
+ * An external inductor needs to be present on the board,
+ * so the feature can only be enabled by the board configuration.
+ */
+#ifndef USE_VREG_BUCK
+#define USE_VREG_BUCK (0)
+#endif
+
 static void _gclk_setup(int gclk, uint32_t reg)
 {
     GCLK->GENCTRL[gclk].reg = reg;
@@ -71,6 +81,36 @@ static void _xosc32k_setup(void)
 #endif
 }
 
+void sam0_gclk_enable(uint8_t id)
+{
+    (void) id;
+    /* clocks are always running */
+}
+
+uint32_t sam0_gclk_freq(uint8_t id)
+{
+    switch (id) {
+    case SAM0_GCLK_MAIN:
+        return CLOCK_CORECLOCK;
+    case SAM0_GCLK_32KHZ:
+        return 32768;
+    default:
+        return 0;
+    }
+}
+
+void cpu_pm_cb_enter(int deep)
+{
+    (void) deep;
+    /* will be called before entering sleep */
+}
+
+void cpu_pm_cb_leave(int deep)
+{
+    (void) deep;
+    /* will be called after wake-up */
+}
+
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks
  */
@@ -78,6 +118,11 @@ void cpu_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();
+
+    /* not compatible with 96 MHz FDPLL */
+    if (USE_VREG_BUCK) {
+        sam0_set_voltage_regulator(SAM0_VREG_BUCK);
+    }
 
     /* turn on only needed APB peripherals */
     MCLK->APBAMASK.reg = MCLK_APBAMASK_MCLK
@@ -114,7 +159,17 @@ void cpu_init(void)
     _xosc32k_setup();
 
     /* Setup GCLK generators */
-    _gclk_setup(0, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
+    _gclk_setup(SAM0_GCLK_MAIN, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
+#if EXTERNAL_OSC32_SOURCE
+    _gclk_setup(SAM0_GCLK_32KHZ, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_XOSC32K);
+#else
+    _gclk_setup(SAM0_GCLK_32KHZ, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSCULP32K);
+#endif
+
+#ifdef MODULE_PERIPH_DMA
+    /*  initialize DMA streams */
+    dma_init();
+#endif
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
     stdio_init();

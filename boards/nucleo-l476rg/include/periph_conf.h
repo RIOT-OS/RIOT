@@ -24,6 +24,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "l4/cfg_clock_80_1.h"
 #include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_rtt_default.h"
 
@@ -32,67 +33,9 @@ extern "C" {
 #endif
 
 /**
- * @name    Clock system configuration
- * @{
- */
-/* 0: no external high speed crystal available
- * else: actual crystal frequency [in Hz] */
-#define CLOCK_HSE           (0)
-
-#ifndef CLOCK_LSE
-/* 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz)
- * This defaults to 0 because hardware revision 'MB1136 C-01' of the nucleo-64
- * board disconnects LSE by default. You may safely set this to 1 on revisions
- * newer than 'MB1136 C-01' */
-#define CLOCK_LSE           (0)
-#endif
-
-/* 0: enable MSI only if HSE isn't available
- * 1: always enable MSI (e.g. if USB or RNG is used)*/
-#define CLOCK_MSI_ENABLE    (1)
-
-#ifndef CLOCK_MSI_LSE_PLL
-/* 0: disable Hardware auto calibration with LSE
- * 1: enable Hardware auto calibration with LSE (PLL-mode)
- * Same as with CLOCK_LSE above this defaults to 0 because LSE is
- * mandatory for MSI/LSE-trimming to work */
-#define CLOCK_MSI_LSE_PLL   (0)
-#endif
-
-/* give the target core clock (HCLK) frequency [in Hz], maximum: 80MHz */
-#define CLOCK_CORECLOCK     (80000000U)
-/* PLL configuration: make sure your values are legit!
- *
- * compute by: CORECLOCK = (((PLL_IN / M) * N) / R)
- * with:
- * PLL_IN:  input clock, HSE or MSI @ 48MHz
- * M:       pre-divider,  allowed range: [1:8]
- * N:       multiplier,   allowed range: [8:86]
- * R:       post-divider, allowed range: [2,4,6,8]
- *
- * Also the following constraints need to be met:
- * (PLL_IN / M)     -> [4MHz:16MHz]
- * (PLL_IN / M) * N -> [64MHz:344MHz]
- * CORECLOCK        -> 80MHz MAX!
- */
-#define CLOCK_PLL_M         (6)
-#define CLOCK_PLL_N         (20)
-#define CLOCK_PLL_R         (2)
-/* peripheral clock setup */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
-/** @} */
-
-/**
  * @name    DMA streams configuration
  * @{
  */
-#ifdef MODULE_PERIPH_DMA
 static const dma_conf_t dma_config[] = {
     { .stream = 1 },    /* DMA1 Channel 2 - SPI1_RX | USART3_TX */
     { .stream = 2 },    /* DMA1 Channel 3 - SPI1_TX */
@@ -106,7 +49,6 @@ static const dma_conf_t dma_config[] = {
 #define DMA_3_ISR  isr_dma1_channel7
 
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
-#endif /* MODULE_PERIPH_DMA */
 /** @} */
 
 
@@ -233,28 +175,8 @@ static const pwm_conf_t pwm_config[] = {
 
 /**
  * @name    SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 20000000Hz */
-        7,  /* -> 78125Hz */
-        5,  /* -> 312500Hz */
-        3,  /* -> 1250000Hz */
-        1,  /* -> 5000000Hz */
-        0   /* -> 10000000Hz */
-    },
-    {       /* for APB2 @ 40000000Hz */
-        7,  /* -> 156250Hz */
-        6,  /* -> 312500Hz */
-        4,  /* -> 1250000Hz */
-        2,  /* -> 5000000Hz */
-        1   /* -> 10000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI1,
@@ -287,15 +209,16 @@ static const spi_conf_t spi_config[] = {
  *
  * @{
  */
-#define ADC_NUMOF           (6U)
-#define ADC_CONFIG {             \
-    {GPIO_PIN(PORT_A, 0), 0, 5},  /*< ADC12_IN5 */   \
-    {GPIO_PIN(PORT_A, 1), 0, 6},  /*< ADC12_IN6 */   \
-    {GPIO_PIN(PORT_A, 4), 1, 9},  /*< ADC12_IN9 */   \
-    {GPIO_PIN(PORT_B, 0), 1, 15}, /*< ADC12_IN15 */  \
-    {GPIO_PIN(PORT_C, 1), 2, 2},  /*< ADC123_IN_2 */ \
-    {GPIO_PIN(PORT_C, 0), 2, 1},  /*< ADC123_IN_1 */ \
-}
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 0), 0, 5},  /*< ADC12_IN5 */
+    {GPIO_PIN(PORT_A, 1), 0, 6},  /*< ADC12_IN6 */
+    {GPIO_PIN(PORT_A, 4), 1, 9},  /*< ADC12_IN9 */
+    {GPIO_PIN(PORT_B, 0), 1, 15}, /*< ADC12_IN15 */
+    {GPIO_PIN(PORT_C, 1), 2, 2},  /*< ADC123_IN_2 */
+    {GPIO_PIN(PORT_C, 0), 2, 1},  /*< ADC123_IN_1 */
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

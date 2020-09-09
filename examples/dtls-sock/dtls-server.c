@@ -39,7 +39,7 @@ char _dtls_server_stack[THREAD_STACKSIZE_MAIN +
 
 static kernel_pid_t _dtls_server_pid = KERNEL_PID_UNDEF;
 
-#ifdef DTLS_ECC
+#ifdef CONFIG_DTLS_ECC
 static const ecdsa_public_key_t other_pubkeys[] = {
     { .x = ecdsa_pub_key_x, .y = ecdsa_pub_key_y },
 };
@@ -59,7 +59,7 @@ static const credman_credential_t credential = {
         },
     },
 };
-#else /* #ifdef DTLS_PSK */
+#else /* #ifdef CONFIG_DTLS_PSK */
 static const uint8_t psk_key_0[] = PSK_DEFAULT_KEY;
 
 static const credman_credential_t credential = {
@@ -86,7 +86,6 @@ void *dtls_server_wrapper(void *arg)
     /* Prepare (thread) messages reception */
     msg_init_queue(_reader_queue, READER_QUEUE_SIZE);
 
-    sock_dtls_session_t session;
     sock_dtls_t sock;
     sock_udp_t udp_sock;
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
@@ -103,32 +102,32 @@ void *dtls_server_wrapper(void *arg)
     res = credman_add(&credential);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
-        printf("Error cannot add credential to system: %zd\n", res);
+        printf("Error cannot add credential to system: %d\n", (int)res);
         return NULL;
     }
 
     while (active) {
-        if ((msg_try_receive(&msg) == 1) && (msg.type == DTLS_STOP_SERVER_MSG)) {
+        if ((msg_try_receive(&msg) == 1) &&
+            (msg.type == DTLS_STOP_SERVER_MSG)){
             active = false;
         }
         else {
+            sock_dtls_session_t session = { 0 };
             res = sock_dtls_recv(&sock, &session, rcv, sizeof(rcv),
                                   10 * US_PER_SEC);
-            if (res < 0) {
-                if (res != -ETIMEDOUT) {
-                    printf("Error receiving UDP over DTLS %zd", res);
+            if (res >= 0) {
+                printf("Received %d bytes -- (echo)\n", (int)res);
+                res = sock_dtls_send(&sock, &session, rcv, (size_t)res, 0);
+                if (res < 0) {
+                    printf("Error resending DTLS message: %d", (int)res);
                 }
-                continue;
+                sock_dtls_session_destroy(&sock, &session);
             }
-            printf("Received %zd bytes -- (echo!)\n", res);
-            res = sock_dtls_send(&sock, &session, rcv, (size_t)res);
-            if (res < 0) {
-                printf("Error resending DTLS message: %zd", res);
+            else if (res == -SOCK_DTLS_HANDSHAKE) {
+                printf("New client connected\n");
             }
         }
     }
-
-    sock_dtls_session_destroy(&sock, &session);
     sock_dtls_close(&sock);
     sock_udp_close(&udp_sock);
     puts("Terminating");

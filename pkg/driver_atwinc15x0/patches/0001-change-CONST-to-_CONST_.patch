@@ -1,0 +1,71 @@
+From f07d66798c27359b4348e4a4842b55f601068bd0 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Thu, 26 Mar 2020 15:26:52 +0100
+Subject: [PATCH 1/6] change CONST to _CONST_
+
+---
+ src/bsp/include/nm_bsp.h      | 2 +-
+ src/driver/include/m2m_wifi.h | 4 ++--
+ src/driver/source/m2m_wifi.c  | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/src/bsp/include/nm_bsp.h b/src/bsp/include/nm_bsp.h
+index 5527bab..543d9fc 100644
+--- a/src/bsp/include/nm_bsp.h
++++ b/src/bsp/include/nm_bsp.h
+@@ -52,7 +52,7 @@
+ /*!< 
+ *        Attribute used to define memory section to map Functions in host memory.
+ */
+-#define CONST const
++#define _CONST_ const
+ 
+ /*!< 
+ *     Used for code portability.
+diff --git a/src/driver/include/m2m_wifi.h b/src/driver/include/m2m_wifi.h
+index 3477196..f25519a 100644
+--- a/src/driver/include/m2m_wifi.h
++++ b/src/driver/include/m2m_wifi.h
+@@ -1404,7 +1404,7 @@ NMI_API sint8 m2m_wifi_p2p_disconnect(void);
+  /**@{*/
+ /*!
+ @fn	\
+-	NMI_API sint8 m2m_wifi_enable_ap(CONST tstrM2MAPConfig* pstrM2MAPConfig);
++	NMI_API sint8 m2m_wifi_enable_ap(_CONST_ tstrM2MAPConfig* pstrM2MAPConfig);
+ 
+ @param [in]	pstrM2MAPConfig
+ 				A structure holding the AP configurations.
+@@ -1485,7 +1485,7 @@ NMI_API sint8 m2m_wifi_p2p_disconnect(void);
+ @endcode
+ 
+ */
+-NMI_API sint8 m2m_wifi_enable_ap(CONST tstrM2MAPConfig* pstrM2MAPConfig);
++NMI_API sint8 m2m_wifi_enable_ap(_CONST_ tstrM2MAPConfig* pstrM2MAPConfig);
+  /**@}*/
+ /** @defgroup WifiDisableApFn m2m_wifi_disable_ap
+  *   @ingroup WLANAPI
+diff --git a/src/driver/source/m2m_wifi.c b/src/driver/source/m2m_wifi.c
+index fc4d1eb..7b7a322 100644
+--- a/src/driver/source/m2m_wifi.c
++++ b/src/driver/source/m2m_wifi.c
+@@ -324,7 +324,7 @@ _EXIT0:
+ 	return ret;
+ }
+ 
+-static sint8 m2m_validate_ap_parameters(CONST tstrM2MAPConfig* pstrM2MAPConfig)
++static sint8 m2m_validate_ap_parameters(_CONST_ tstrM2MAPConfig* pstrM2MAPConfig)
+ {
+ 	sint8 s8Ret = M2M_SUCCESS;
+ 	/* Check for incoming pointer */
+@@ -953,7 +953,7 @@ sint8 m2m_wifi_p2p_disconnect(void)
+ 	ret = hif_send(M2M_REQ_GROUP_WIFI, M2M_WIFI_REQ_DISABLE_P2P, NULL, 0, NULL, 0, 0);
+ 	return ret;
+ }
+-sint8 m2m_wifi_enable_ap(CONST tstrM2MAPConfig* pstrM2MAPConfig)
++sint8 m2m_wifi_enable_ap(_CONST_ tstrM2MAPConfig* pstrM2MAPConfig)
+ {
+ 	sint8 ret = M2M_ERR_FAIL;
+ 	if(M2M_SUCCESS == m2m_validate_ap_parameters(pstrM2MAPConfig))
+-- 
+2.17.1
+

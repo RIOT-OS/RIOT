@@ -95,16 +95,16 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count)
         return RES_PARERR;
     }
 
-    int res = mtd_read(fatfs_mtd_devs[pdrv], buff,
-                       sector * fatfs_mtd_devs[pdrv]->page_size,
-                       count * fatfs_mtd_devs[pdrv]->page_size);
+    uint32_t sector_size = fatfs_mtd_devs[pdrv]->page_size
+                         * fatfs_mtd_devs[pdrv]->pages_per_sector;
 
-    if (res >= 0) {
-        uint32_t r_sect = ((unsigned)res) / fatfs_mtd_devs[pdrv]->page_size;
-        return ((r_sect == count) ? RES_OK : RES_ERROR);
+    int res = mtd_read_page(fatfs_mtd_devs[pdrv], buff,
+                            sector, 0, count * sector_size);
+
+    if (res != 0) {
+        return RES_ERROR;
     }
-
-    return RES_ERROR;
+    return RES_OK;
 }
 
 /**
@@ -127,24 +127,22 @@ DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
     }
 
     /* erase memory before writing to it */
-    int res = mtd_erase(fatfs_mtd_devs[pdrv],
-                        sector * fatfs_mtd_devs[pdrv]->page_size,
-                        count * fatfs_mtd_devs[pdrv]->page_size);
+    int res = mtd_erase_sector(fatfs_mtd_devs[pdrv], sector, count);
 
     if (res != 0) {
         return RES_ERROR; /* erase failed! */
     }
 
-    res = mtd_write(fatfs_mtd_devs[pdrv], buff,
-                    sector * fatfs_mtd_devs[pdrv]->page_size,
-                    count * fatfs_mtd_devs[pdrv]->page_size);
+    uint32_t sector_size = fatfs_mtd_devs[pdrv]->page_size
+                         * fatfs_mtd_devs[pdrv]->pages_per_sector;
 
-    if (res >= 0) {
-        uint32_t w_sect = ((unsigned)res) / fatfs_mtd_devs[pdrv]->page_size;
-        return ((w_sect == count) ? RES_OK : RES_ERROR);
+    res = mtd_write_page(fatfs_mtd_devs[pdrv], buff,
+                         sector, 0, count * sector_size);
+
+    if (res != 0) {
+        return RES_ERROR;
     }
-
-    return RES_ERROR;
+    return RES_OK;
 }
 
 /**
@@ -213,7 +211,7 @@ DWORD get_fattime(void)
     /* bit 31:25 Year origin from 1980 (0..127) */
     uint8_t year = time.tm_year + RTC_YEAR_OFFSET - FATFS_YEAR_OFFSET;
     uint8_t month = time.tm_mon + 1;        /* bit 24:21 month (1..12) */
-    uint8_t day_of_month = time.tm_mon + 1; /* bit 20:16 day (1..31) */
+    uint8_t day_of_month = time.tm_mday;    /* bit 20:16 day (1..31) */
     uint8_t hour = time.tm_hour;            /* bit 15:11 hour (0..23) */
     uint8_t minute = time.tm_min;           /* bit 10:5 minute (0..59) */
     uint8_t second = (time.tm_sec / 2);     /* bit 4:0 second/2 (0..29) */

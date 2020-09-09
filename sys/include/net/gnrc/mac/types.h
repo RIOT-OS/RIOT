@@ -43,9 +43,7 @@ extern "C" {
 /**
  * @brief   MAC message type for getting radio's duty-cycle.
  */
-#ifndef GNRC_MAC_TYPE_GET_DUTYCYCLE
 #define GNRC_MAC_TYPE_GET_DUTYCYCLE      (0x4401)
-#endif
 
 /**
  * @brief definition for device transmission feedback types
@@ -115,7 +113,7 @@ typedef struct {
 #endif  /* ((GNRC_MAC_RX_QUEUE_SIZE != 0) && (GNRC_MAC_DISPATCH_BUFFER_SIZE != 0)) || defined(DOXYGEN) */
 #endif  /* ((GNRC_MAC_RX_QUEUE_SIZE != 0) || (GNRC_MAC_DISPATCH_BUFFER_SIZE != 0)) || defined(DOXYGEN) */
 
-#if (GNRC_MAC_NEIGHBOR_COUNT != 0) || defined(DOXYGEN)
+#if (CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0) || defined(DOXYGEN)
 /**
  * @brief type for storing states of TX neighbor node.
  */
@@ -162,9 +160,9 @@ typedef struct {
         GNRC_MAC_PHASE_UNINITIALIZED, \
 }
 #endif  /* (GNRC_MAC_TX_QUEUE_SIZE != 0) || defined(DOXYGEN) */
-#endif  /* (GNRC_MAC_NEIGHBOR_COUNT != 0) || defined(DOXYGEN) */
+#endif  /* (CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0) || defined(DOXYGEN) */
 
-#if ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_NEIGHBOR_COUNT != 0)) || defined(DOXYGEN)
+#if ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0)) || defined(DOXYGEN)
 /**
  * @brief MAC internal type for storing transmission state parameters and
  *        state machines.
@@ -173,18 +171,18 @@ typedef struct {
  *        \#ifdef directives when applicable.
  */
 typedef struct {
-#if (GNRC_MAC_NEIGHBOR_COUNT != 0) || defined(DOXYGEN)
-    gnrc_mac_tx_neighbor_t neighbors[GNRC_MAC_NEIGHBOR_COUNT + 1];      /**< Neighbor information units for one-hop neighbors.
+#if (CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0) || defined(DOXYGEN)
+    gnrc_mac_tx_neighbor_t neighbors[CONFIG_GNRC_MAC_NEIGHBOR_COUNT + 1];      /**< Neighbor information units for one-hop neighbors.
                                                                              First unit is for broadcast (+1) */
     gnrc_mac_tx_neighbor_t *current_neighbor;                           /**< Neighbor information unit of destination node to which
                                                                              the current packet will be sent */
-#endif /* (GNRC_MAC_NEIGHBOR_COUNT != 0) || defined(DOXYGEN) */
+#endif /* (CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0) || defined(DOXYGEN) */
 
 #if (GNRC_MAC_TX_QUEUE_SIZE != 0) || defined(DOXYGEN)
-#if (GNRC_MAC_NEIGHBOR_COUNT == 0) || defined(DOXYGEN)
+#if (CONFIG_GNRC_MAC_NEIGHBOR_COUNT == 0) || defined(DOXYGEN)
     gnrc_priority_pktqueue_t queue;                                     /**< If neighbor queues is not used, define
                                                                              a single queue for managing TX packets. */
-#endif /* (GNRC_MAC_NEIGHBOR_COUNT == 0) || defined(DOXYGEN) */
+#endif /* (CONFIG_GNRC_MAC_NEIGHBOR_COUNT == 0) || defined(DOXYGEN) */
 
     gnrc_priority_pktqueue_node_t _queue_nodes[GNRC_MAC_TX_QUEUE_SIZE]; /**< Shared buffer for TX queue nodes */
     gnrc_pktsnip_t *packet;                                             /**< currently scheduled packet for sending */
@@ -197,6 +195,7 @@ typedef struct {
     uint8_t bcast_seqnr;               /**< Sequence number for broadcast data to filter at receiver */
     uint8_t tx_burst_count;            /**< Count how many consecutive packets have been transmitted */
     uint8_t tx_retry_count;            /**< Count how many Tx-retrials have been executed before packet drop */
+    uint8_t preamble_fail_counts;      /**< Preamble trial failure count. */
 #endif
 
 #ifdef MODULE_GNRC_GOMACH
@@ -219,26 +218,26 @@ typedef struct {
 /**
  * @brief Static initializer for gnrc_mac_tx_t.
  */
-#if ((GNRC_MAC_TX_QUEUE_SIZE != 0) && (GNRC_MAC_NEIGHBOR_COUNT != 0)) || defined(DOXYGEN)
+#if ((GNRC_MAC_TX_QUEUE_SIZE != 0) && (CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0)) || defined(DOXYGEN)
 #define GNRC_MAC_TX_INIT { \
         { GNRC_MAC_TX_NEIGHBOR_INIT }, \
         NULL, \
         { PRIORITY_PKTQUEUE_NODE_INIT(0, NULL) }, \
         NULL, \
 }
-#elif ((GNRC_MAC_TX_QUEUE_SIZE != 0) && (GNRC_MAC_NEIGHBOR_COUNT == 0)) || defined(DOXYGEN)
+#elif ((GNRC_MAC_TX_QUEUE_SIZE != 0) && (CONFIG_GNRC_MAC_NEIGHBOR_COUNT == 0)) || defined(DOXYGEN)
 #define GNRC_MAC_TX_INIT { \
         PRIORITY_PKTQUEUE_INIT, \
         { PRIORITY_PKTQUEUE_NODE_INIT(0, NULL) }, \
         NULL, \
 }
-#elif ((GNRC_MAC_TX_QUEUE_SIZE == 0) && (GNRC_MAC_NEIGHBOR_COUNT != 0)) || defined(DOXYGEN)
+#elif ((GNRC_MAC_TX_QUEUE_SIZE == 0) && (CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0)) || defined(DOXYGEN)
 #define GNRC_MAC_TX_INIT { \
         { GNRC_MAC_TX_NEIGHBOR_INIT }, \
         NULL, \
 }
-#endif  /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) && (GNRC_MAC_NEIGHBOR_COUNT != 0)) || defined(DOXYGEN) */
-#endif  /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (GNRC_MAC_NEIGHBOR_COUNT != 0)) || defined(DOXYGEN) */
+#endif  /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) && (CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0)) || defined(DOXYGEN) */
+#endif  /* ((GNRC_MAC_TX_QUEUE_SIZE != 0) || (CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0)) || defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }

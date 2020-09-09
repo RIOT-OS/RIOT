@@ -36,7 +36,7 @@
 static const char *TAG = "reset_reason";
 static uint32_t s_reset_reason;
 
-static inline void esp_reset_reason_clear_hint()
+static inline void esp_reset_reason_clear_hint(void)
 {
     rtc_sys_info.hint = 0;
 }
@@ -46,7 +46,7 @@ static inline uint32_t esp_reset_reason_get_hint(uint32_t hw_reset)
     if (hw_reset == POWERON_RESET && rtc_sys_info.hint != ESP_RST_SW) {
         uint32_t *p = (uint32_t *)&rtc_sys_info;
 
-        for (int i = 0; i < RTC_SYS_RAM_SIZE / sizeof(uint32_t); i++)
+        for (unsigned i = 0; i < RTC_SYS_RAM_SIZE / sizeof(uint32_t); i++)
             *p++ = 0;
     }
 
@@ -73,10 +73,19 @@ static inline uint32_t get_reset_reason(uint32_t rtc_reset_reason, uint32_t rese
                 return reset_reason_hint;
             return ESP_RST_POWERON;
         case EXT_RESET:
+#ifdef RIOT_VERSION
+            if (reset_reason_hint == ESP_RST_DEEPSLEEP ||
+                reset_reason_hint == ESP_RST_SW ||
+                reset_reason_hint == ESP_RST_POWERON) {
+                return reset_reason_hint;
+            }
+#else
             if (reset_reason_hint == ESP_RST_DEEPSLEEP) {
                 return reset_reason_hint;
             }
+#endif
             return ESP_RST_EXT;
+
         case SW_RESET:
             if (reset_reason_hint == ESP_RST_PANIC ||
                 reset_reason_hint == ESP_RST_BROWNOUT ||
@@ -113,7 +122,7 @@ void esp_reset_reason_init(void)
         esp_reset_reason_clear_hint();
     }
 
-    ESP_LOGI(TAG, "RTC reset %u wakeup %u store %u, reason is %u", hw_reset, hw_wakeup, hint, s_reset_reason);
+    ESP_LOGD(TAG, "RTC reset %u wakeup %u store %u, reason is %u", hw_reset, hw_wakeup, hint, s_reset_reason);
 }
 
 /**

@@ -34,6 +34,8 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#define TCP_EVENTLOOP_MSG_QUEUE_SIZE (1 << CONFIG_GNRC_TCP_EVENTLOOP_MSG_QUEUE_SIZE_EXP)
+
 static msg_t _eventloop_msg_queue[TCP_EVENTLOOP_MSG_QUEUE_SIZE];
 
 /**
@@ -174,8 +176,10 @@ static int _receive(gnrc_pktsnip_t *pkt)
     /* Validate checksum */
     if (byteorder_ntohs(hdr->checksum) != _pkt_calc_csum(tcp, ip, pkt)) {
         DEBUG("gnrc_tcp_eventloop.c : _receive() : Invalid checksum\n");
+#ifndef MODULE_FUZZING
         gnrc_pktbuf_release(pkt);
         return -EINVAL;
+#endif
     }
 
     /* Find TCB to for this packet */

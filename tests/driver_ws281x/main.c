@@ -59,7 +59,7 @@ int main(void)
 
     while (1) {
         unsigned offset = 0;
-        puts("Animation: Moving rainbow...");
+        puts("\nAnimation: Moving rainbow...");
         xtimer_ticks32_t last_wakeup = xtimer_now();
         for (unsigned i = 0; i < 100; i++) {
             for (uint16_t j = 0; j < dev.params.numof; j++) {
@@ -70,27 +70,21 @@ int main(void)
             xtimer_periodic_wakeup(&last_wakeup, 100 * US_PER_MS);
         }
 
-        puts("Animation: Fading rainbow...");
+        puts("\nAnimation: Fading rainbow...");
         last_wakeup = xtimer_now();
         for (unsigned i = 0; i < RAINBOW_LEN; i++) {
-            for (unsigned j = 0; j < 100; j++) {
-                color_rgb_t col = {
-                    .r = (uint8_t)(((unsigned)rainbow[i].r * j + 50) / 100),
-                    .g = (uint8_t)(((unsigned)rainbow[i].g * j + 50) / 100),
-                    .b = (uint8_t)(((unsigned)rainbow[i].b * j + 50) / 100),
-                };
+            for (unsigned j = 0; j < 255; j++) {
+                color_rgb_t col;
+                color_rgb_set_brightness(&rainbow[i], &col, j);
                 for (uint16_t k = 0; k < dev.params.numof; k++) {
                     ws281x_set(&dev, k, col);
                 }
                 ws281x_write(&dev);
                 xtimer_periodic_wakeup(&last_wakeup, 10 * US_PER_MS);
             }
-            for (unsigned j = 100; j > 0; j--) {
-                color_rgb_t col = {
-                    .r = (uint8_t)(((unsigned)rainbow[i].r * j + 50) / 100),
-                    .g = (uint8_t)(((unsigned)rainbow[i].g * j + 50) / 100),
-                    .b = (uint8_t)(((unsigned)rainbow[i].b * j + 50) / 100),
-                };
+            for (unsigned j = 255; j > 0; j--) {
+                color_rgb_t col;
+                color_rgb_set_brightness(&rainbow[i], &col, j);
                 for (uint16_t k = 0; k < dev.params.numof; k++) {
                     ws281x_set(&dev, k, col);
                 }
@@ -99,7 +93,7 @@ int main(void)
             }
         }
 
-        puts("Animation: 100 rainbows. (You'll need a long chain for this)");
+        puts("\nAnimation: 100 rainbows. (You'll need a long chain for this)");
         uint8_t buf[RAINBOW_LEN * WS281X_BYTES_PER_DEVICE];
         for (unsigned i = 0; i < RAINBOW_LEN; i++) {
             ws281x_set_buffer(buf, i, rainbow[i]);

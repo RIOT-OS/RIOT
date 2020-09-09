@@ -1,4 +1,4 @@
-ifneq (,$(filter gnrc_netdev_default netdev_default,$(USEMODULE)))
+ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += at86rf233
 endif
 
@@ -11,4 +11,9 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += tmp006
   # ToDo: peripherals to be added in the future
   #USEMODULE += apds9007
+endif
+
+# Use Segger's RTT unless another stdio_% is already used
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_rtt
 endif

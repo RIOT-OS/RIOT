@@ -50,7 +50,32 @@ extern "C" {
  * @{
  */
 #define XTIMER_WIDTH        (16U)
-#define XTIMER_OVERHEAD     (6U)
+/** @} */
+
+/**
+ * @name    ztimer configuration
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_TYPE    ZTIMER_TYPE_PERIPH_TIMER
+#define CONFIG_ZTIMER_USEC_DEV     TIMER_DEV(0)
+#define CONFIG_ZTIMER_USEC_MIN     (2)
+/** @} */
+
+/**
+ * @name    OpenWSN timing constants
+ *
+ * @{
+ */
+/* Measured 440us + ~10% */
+#define PORT_maxTxDataPrepare   (500/PORT_US_PER_TICK)
+/* Measured 200us + ~10% */
+#define PORT_maxRxAckPrepare    (300/PORT_US_PER_TICK)
+/* Measured 300us + ~10% */
+#define PORT_maxRxDataPrepare   (350/PORT_US_PER_TICK)
+/* Measured 316us + ~10% */
+#define PORT_maxTxAckPrepare    (350/PORT_US_PER_TICK)
+/* Measured 360us with openwsn_sctimer_rtt */
+#define PORT_delayTx            (360/PORT_US_PER_TICK)
 /** @} */
 
 /**

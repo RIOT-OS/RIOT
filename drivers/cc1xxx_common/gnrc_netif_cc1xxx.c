@@ -166,10 +166,9 @@ static const gnrc_netif_ops_t cc1xxx_netif_ops = {
     .set = gnrc_netif_set_from_netdev,
 };
 
-gnrc_netif_t *gnrc_netif_cc1xxx_create(char *stack, int stacksize,
-                                       char priority, char *name,
-                                       netdev_t *dev)
+int gnrc_netif_cc1xxx_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                             char priority, char *name, netdev_t *dev)
 {
-    return gnrc_netif_create(stack, stacksize, priority, name,
+    return gnrc_netif_create(netif, stack, stacksize, priority, name,
                              dev, &cc1xxx_netif_ops);
 }

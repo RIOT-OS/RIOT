@@ -32,11 +32,19 @@ extern "C" {
 /**
  * @name    Xtimer configuration
  *
- * The timer runs at 250 KHz to increase accuracy.
+ * The timer runs at 250 KHz to increase accuracy or 32768 Hz for LETIMER.
  * @{
  */
+#if IS_ACTIVE(CONFIG_EFM32_XTIMER_USE_LETIMER)
+#define XTIMER_DEV          (TIMER_DEV(1))
+#define XTIMER_HZ           (32768UL)
+#define XTIMER_WIDTH        (16)
+#else
+#define XTIMER_DEV          (TIMER_DEV(0))
 #define XTIMER_HZ           (250000UL)
 #define XTIMER_WIDTH        (16)
+#endif
+#define XTIMER_CHAN (0)
 /** @} */
 
 /**
@@ -70,7 +78,7 @@ extern "C" {
 /**
  * @name    Environmental sensors configuration
  *
- * Pin for enabling environmental sensors (BMP280, Si1133, Si7021, Si7210A).
+ * Pin for enabling environmental sensors (BMP280, Si1133, Si7021, Si7210).
  * @{
  */
 #define ENV_SENSE_PIC_ADDR  (0x01)
@@ -94,13 +102,13 @@ extern "C" {
  * Connection to the on-board air quality/gas sensor (CCS811).
  * @{
  */
-#ifndef CCS811_ENABLED
-#define CCS811_ENABLED      (0)
-#endif
-#define CCS811_I2C          I2C_DEV(0)
-#define CCS811_PIC_ADDR     (0x03)
-#define CCS811_PIC_EN_BIT   (0x00)
-#define CCS811_PIC_WAKE_BIT (0x01)
+#define CCS811_I2C              I2C_DEV(0)
+
+#define CCS811_PIC_ADDR         (0x03)
+#define CCS811_PIC_EN_BIT       (0x00)
+#define CCS811_PIC_WAKE_BIT     (0x01)
+
+#define CCS811_PARAM_I2C_DEV    CCS811_I2C
 /** @} */
 
 /**
@@ -180,14 +188,14 @@ extern "C" {
 /**
  * @name    Hall-effect sensor configuration
  *
- * Connection to the on-board hall-effect sensor (Si7210A). Available on Rev. A02
- * boards only.
+ * Connection to the on-board hall-effect sensor (Si7210). Available on
+ * Rev. A02 boards only.
  * @{
  */
-#ifndef SI7210A_ENABLED
-#define SI7210A_ENABLED     (0)
+#ifndef SI7210_ENABLED
+#define SI7210_ENABLED      (0)
 #endif
-#define SI7210A_I2C         I2C_DEV(0)
+#define SI7210_I2C          I2C_DEV(0)
 /** @} */
 
 /**

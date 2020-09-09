@@ -1,8 +1,11 @@
-FEATURES_PROVIDED += arch_32bit
+CPU_FAM = esp32
+
+# MCU defined features that are provided independent on board definitions
+
+include $(RIOTCPU)/esp_common/Makefile.features
+
 FEATURES_PROVIDED += arch_esp32
-FEATURES_PROVIDED += cpp
-FEATURES_PROVIDED += periph_cpuid
-FEATURES_PROVIDED += periph_hwrng
-FEATURES_PROVIDED += periph_pm
+FEATURES_PROVIDED += esp_wifi_enterprise
+FEATURES_PROVIDED += periph_adc_ctrl
 FEATURES_PROVIDED += periph_rtc
-FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_rtt

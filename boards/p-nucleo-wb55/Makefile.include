@@ -1,0 +1,14 @@
+# CPU2 defines a restricted memory region. This is not available for
+# CPU1 linking or general access, for now we define it by its default
+# value.
+CPU2_ROM_LEN = 216K
+
+# CPU2 can define restricted SRAM within SRAM2a and SRAM2b. These subregions
+# will generate busfaults if accessed by CPU1. For now we will assume that both
+# SRAM2a regions are completely dedicated to CPU2.
+CPU2_RAM_LEN = 64K
+
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
+
+# include shared global Nucleo Makefile
+include $(RIOTBOARD)/common/nucleo/Makefile.include

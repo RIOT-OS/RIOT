@@ -1,108 +1,35 @@
 # check some environment variables first
-
 ifndef ESP8266_RTOS_SDK_DIR
-    $(info ESP8266_RTOS_SDK_DIR should be defined as /path/to/sdk directory)
-    $(info ESP8266_RTOS_SDK_DIR is set by default to /opt/esp/ESP8266-RTOS-SDK)
-    export ESP8266_RTOS_SDK_DIR=/opt/esp/ESP8266-RTOS-SDK
+  $(info ESP8266_RTOS_SDK_DIR should be defined as /path/to/sdk directory)
+  $(info ESP8266_RTOS_SDK_DIR is set by default to /opt/esp/ESP8266-RTOS-SDK)
+  export ESP8266_RTOS_SDK_DIR=/opt/esp/ESP8266-RTOS-SDK
 endif
 
-# Options to control the compilation
+ESP_SDK_DIR = $(ESP8266_RTOS_SDK_DIR)
 
-ifeq ($(ENABLE_GDB), 1)
-    USEMODULE += esp_gdb
-endif
+# With the '-Os' option, char arrays have not to be 32-bit word aligned. This
+# leads to an alignment exception when the address of a char array is assigned
+# to an 'uint32_t' pointer and the pointer is used for the access.
+CFLAGS_OPT ?= -O2
 
-ifeq ($(ENABLE_GDBSTUB), 1)
-    USEMODULE += esp_gdbstub
-endif
+# ESP8266 specific flashing options
+FLASH_CHIP  = esp8266
+FLASH_OPTS  = --version 3
+FLASH_MODE  = dout  # DO NOT CHANGE, ESP8266/ESP8285 modules only work with dout
+FLASH_FREQ  = 26m   # DO NOT CHANGE
+FLASH_SIZE ?= 1
+BOOTLOADER_POS = 0x0000
 
-# SPECIAL module dependencies
-# cannot be done in Makefile.dep since Makefile.dep is included too late
-
-ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
-  # use esp_now as default netdev if no other netdev module is enabled
-  ifeq (,$(filter esp_wifi esp_eth,$(USEMODULE)))
-    USEMODULE += esp_now
-  endif
-endif
-
-ifneq (, $(filter esp_wifi, $(USEMODULE)))
-    $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
-    USEMODULE += esp_wifi_any
-endif
-
-ifneq (, $(filter esp_now, $(USEMODULE)))
-    $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
-    USEMODULE += esp_wifi_any
-endif
-
-ifneq (, $(filter esp_wifi_any, $(USEMODULE)))
-    CFLAGS += -DSCHED_PRIO_LEVELS=32
-    USEMODULE += netopt
-    USEMODULE += xtimer
-endif
-
-ifneq (, $(filter esp_gdbstub, $(USEMODULE)))
-    USEMODULE += esp_gdb
-endif
-
-ifneq (, $(filter spiffs, $(USEMODULE)))
-    export RIOT_TEST_TIMEOUT = 200
-endif
-
-ifneq (, $(filter littlefs, $(USEMODULE)))
-    export RIOT_TEST_TIMEOUT = 200
-endif
-
-ifneq (,$(filter log_color,$(USEMODULE)))
-    USEMODULE += esp_log_colored
-endif
-
-ifneq (,$(filter 4 5,$(LOG_LEVEL)))
-  USEMODULE += esp_log_startup
-endif
+include $(RIOTCPU)/esp_common/Makefile.include
 
 # regular Makefile
 
-export TARGET_ARCH ?= xtensa-esp8266-elf
+TARGET_ARCH ?= xtensa-esp8266-elf
 
-# ESP8266 pseudomodules
-PSEUDOMODULES += esp_gdb
-PSEUDOMODULES += esp_log_colored
-PSEUDOMODULES += esp_log_tagged
-PSEUDOMODULES += esp_log_startup
-PSEUDOMODULES += esp_qemu
 PSEUDOMODULES += esp_sw_timer
-PSEUDOMODULES += esp_spiffs
-PSEUDOMODULES += esp_wifi_any
 
-USEMODULE += esp_freertos
-USEMODULE += esp_idf
-USEMODULE += esp_idf_esp8266
-USEMODULE += esp_idf_nvs_flash
-USEMODULE += esp_idf_spi_flash
-USEMODULE += esp_idf_util
-USEMODULE += esp_idf_wpa_supplicant_crypto
-USEMODULE += esp_sdk
-USEMODULE += log
-USEMODULE += mtd
-USEMODULE += newlib
-USEMODULE += newlib_syscalls_default
-USEMODULE += periph
-USEMODULE += periph_common
-USEMODULE += periph_hrng
-USEMODULE += periph_flash
-USEMODULE += periph_uart
-USEMODULE += ps
-USEMODULE += random
-USEMODULE += stdio_uart
-USEMODULE += xtensa
-
-INCLUDES += -I$(RIOTBOARD)/common/$(CPU)/include
-INCLUDES += -I$(RIOTCPU)/esp_common/vendor/
 INCLUDES += -I$(RIOTCPU)/$(CPU)
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
-INCLUDES += -I$(RIOTCPU)/$(CPU)/include/freertos
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/
 INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/bootloader_support/include
@@ -119,68 +46,19 @@ INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/heap/port/esp8266/include
 INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/nvs_flash/include
 INCLUDES += -I$(ESP8266_RTOS_SDK_DIR)/components/spi_flash/include
 
-CFLAGS  += -D__ESP_FILE__=__FILE__
-CFLAGS  += -Wno-unused-parameter -Wformat=0
-CFLAGS  += -mlongcalls -mtext-section-literals -fstrict-volatile-bitfields
-CFLAGS  += -fdata-sections -ffunction-sections -fzero-initialized-in-bss
+CFLAGS += -D__ESP_FILE__=__FILE__
 
-OPTIONAL_CFLAGS_BLACKLIST += -fdiagnostics-color
-OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
-OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
-OPTIONAL_CFLAGS_BLACKLIST += -gz
-
-ASFLAGS += --longcalls --text-section-literals
-
-# thin archives trigger a reboot loop - see #12258, #12035, #12346
-ARFLAGS = rcs
-
-ifneq (,$(filter lwip,$(USEMODULE)))
-  # The threads for handling the ESP hardware have the priorities from 2 to 4.
-  # The priority of lwIP TCPIP thread should be lower than these priorities.
-  CFLAGS += -DTCPIP_THREAD_PRIO=5
+ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
+  GDBSTUB_DIR ?= $(RIOTCPU)/$(CPU)/vendor/esp-gdbstub
+  CFLAGS += -DGDBSTUB_BREAK_ON_INIT=1)
+  INCLUDES += -I$(GDBSTUB_DIR)
 endif
 
-ifneq (, $(filter esp_gdbstub, $(USEMODULE)))
-    GDBSTUB_DIR ?= $(RIOTCPU)/$(CPU)/vendor/esp-gdbstub
-    CFLAGS      += -DGDBSTUB_BREAK_ON_INIT=1
-    INCLUDES    += -I$(GDBSTUB_DIR)
+ifneq (,$(filter esp_now,$(USEMODULE)))
+  BASELIBS += -lespnow
 endif
 
-ifneq (, $(filter esp_gdb, $(USEMODULE)))
-    CFLAGS_OPT ?= -Og -ggdb -g3
-else
-    # TODO should be -Os
-    # With -Os char arrays have not to be 32-bit word aligned. This leads to
-    # an alignment exception when the address of an char array is assigned to
-    # an uint32_t pointer and the pointer is used for the access.
-    CFLAGS_OPT ?= -O2
-endif
-
-CFLAGS += $(CFLAGS_OPT)
-
-ifeq ($(QEMU), 1)
-    USEMODULE += esp_qemu
-endif
-
-ifeq ($(FLASH_MODE), qio)
-    CFLAGS += -DFLASH_MODE_QIO
-endif
-
-ifeq ($(FLASH_MODE), qout)
-    CFLAGS += -DFLASH_MODE_QOUT
-endif
-
-LINKFLAGS += -L$(ESP8266_RTOS_SDK_DIR)/components/esp8266/lib
-LINKFLAGS += $(CFLAGS_OPT)
-
-BASELIBS += -lc -lgcc -lwpa -lcore -lnet80211 -lphy -lpp -lhal -lstdc++
-
-ifneq (, $(filter esp_now, $(USEMODULE)))
-    BASELIBS += -lespnow
-endif
-
-LINKFLAGS += -u _malloc_r
-LINKFLAGS += -nostdlib -Wl,-gc-sections -Wl,-static # -Wl,--print-gc-sections
+BASELIBS += -lgcc -lwpa -lcore -lnet80211 -lphy -lpp -lstdc++
 
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp8266.rom.ld
 LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp8266.riot-os.ld
@@ -188,66 +66,3 @@ LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp8266.peripherals.ld
 
 LINKFLAGS += -Wl,-wrap=pp_attach
 LINKFLAGS += -Wl,-wrap=pm_attach
-
-ifneq (, $(filter esp_idf_heap, $(USEMODULE)))
-    LINKFLAGS += -Wl,-wrap=_malloc_r
-    LINKFLAGS += -Wl,-wrap=_calloc_r
-    LINKFLAGS += -Wl,-wrap=_free_r
-    LINKFLAGS += -Wl,-wrap=_realloc_r
-endif
-
-# The ELFFILE is the base one used for flashing
-FLASHFILE ?= $(ELFFILE)
-
-# configure preflasher to convert .elf to .bin before flashing
-FLASH_MODE = dout  # FIX configuration, DO NOT CHANGE
-FLASH_FREQ = 26m   # FIX configuration, DO NOT CHANGE
-FLASH_SIZE ?= 1MB
-FLASHDEPS  += preflash
-
-PREFLASHER ?= $(RIOTTOOLS)/esptool/esptool.py
-PREFFLAGS  = --chip esp8266 elf2image
-PREFFLAGS += --flash_mode $(FLASH_MODE) --flash_size $(FLASH_SIZE)
-PREFFLAGS += --flash_freq $(FLASH_FREQ) --version 3
-PREFFLAGS += -o $(FLASHFILE).bin $(FLASHFILE);
-PREFFLAGS += printf "\n" > $(BINDIR)/partitions.csv;
-PREFFLAGS += printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $(BINDIR)/partitions.csv;
-PREFFLAGS += printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $(BINDIR)/partitions.csv;
-PREFFLAGS += printf "factory, app, factory, 0x10000, " >> $(BINDIR)/partitions.csv;
-PREFFLAGS += ls -l $(FLASHFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partitions.csv;
-
-PREFFLAGS += python $(RIOTCPU)/$(CPU)/vendor/esp-idf/partition_table/gen_esp32part.py
-PREFFLAGS += --verify $(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
-
-ifneq (,$(filter esp_log_colored,$(USEMODULE)))
-  BOOTLOADER_COLOR = _colors
-endif
-
-ifneq (,$(filter esp_log_startup,$(USEMODULE)))
-  BOOTLOADER_INFO = _info
-endif
-
-BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
-
-ifneq (, $(filter esp_qemu, $(USEMODULE)))
-    FLASHER = dd
-    FFLAGS += if=/dev/zero bs=1M count=1 | tr "\\000" "\\377" > tmp.bin &&
-    FFLAGS += cat $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN) tmp.bin |
-    FFLAGS += head -c $$((0x8000)) |
-    FFLAGS += cat - $(BINDIR)/partitions.bin tmp.bin |
-    FFLAGS += head -c $$((0x10000)) |
-    FFLAGS += cat - $(FLASHFILE).bin tmp.bin |
-    FFLAGS += head -c $$((0xfc000)) |
-    FFLAGS += cat - $(RIOTCPU)/$(CPU)/bin/esp_init_data_default.bin tmp.bin |
-    FFLAGS += head -c $$((0x100000)) > $(BINDIR)/esp8266flash.bin && rm tmp.bin
-else
-    export PROGRAMMER_SPEED ?= 460800
-    FLASHER = $(RIOTBASE)/dist/tools/esptool/esptool.py
-    FFLAGS += --chip esp8266 --port $(PROG_DEV) --baud $(PROGRAMMER_SPEED)
-    FFLAGS += --before default_reset write_flash -z
-    FFLAGS += --flash_size detect
-    FFLAGS += --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ)
-    FFLAGS += 0x0000 $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN)
-    FFLAGS += 0x8000 $(BINDIR)/partitions.bin
-    FFLAGS += 0x10000 $(FLASHFILE).bin
-endif

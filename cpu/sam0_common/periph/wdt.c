@@ -45,7 +45,7 @@
 static inline void _set_enable(bool on)
 {
 /* work around strange watchdog behaviour if IDLE2 is used on samd21 */
-#ifdef CPU_FAM_SAMD21
+#ifdef CPU_COMMON_SAMD21
     if (on) {
         pm_block(1);
     }
@@ -80,12 +80,12 @@ static uint32_t ms_to_per(uint32_t ms)
     return 29 - __builtin_clz(cycles - 1);
 }
 
-#ifdef CPU_SAMD21
+#ifdef CPU_COMMON_SAMD21
 static void _wdt_clock_setup(void)
 {
-    /* Connect to GCLK4 (~1.024 kHz) */
+    /* Connect to GCLK3 (~1.024 kHz) */
     GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID_WDT
-                      | GCLK_CLKCTRL_GEN_GCLK4
+                      | GCLK_CLKCTRL_GEN(SAM0_GCLK_1KHZ)
                       | GCLK_CLKCTRL_CLKEN;
 }
 #else
@@ -193,7 +193,7 @@ void wdt_setup_reboot_with_callback(uint32_t min_time, uint32_t max_time,
     cb_arg = arg;
 
     if (cb != NULL) {
-        uint32_t warning_offset = ms_to_per(WDT_WARNING_PERIOD);
+        uint32_t warning_offset = ms_to_per(CONFIG_WDT_WARNING_PERIOD);
 
         if (warning_offset == 0) {
             warning_offset = 1;

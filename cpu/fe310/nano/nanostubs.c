@@ -29,9 +29,9 @@
 #include "cpu.h"
 #include "stdio_uart.h"
 
-extern char _heap_start;            /* Heap markers from fe310.ld file */
-extern char _heap_end;
-char *heap_top = &_heap_start + 4;
+extern char _sheap;            /* Heap markers from fe310.ld file */
+extern char _eheap;
+char *heap_top = &_sheap + 4;
 
 /**
  * @brief Initialize the Newlib-nano functions (also forces inclusion of stubs for linking)
@@ -40,7 +40,6 @@ void nanostubs_init(void)
 {
 #if defined(MODULE_STDIO_UART)
     /* STDIO redirected to UART, no line buffering */
-    stdio_init();
     setvbuf(stdout, NULL, _IONBF, 0);
 #endif
 }
@@ -59,7 +58,7 @@ void *_sbrk(ptrdiff_t incr)
     void *res = heap_top;
 
     /* Allocate memory from heap */
-    if ((heap_top + incr > &_heap_end) || (heap_top + incr < &_heap_start)) {
+    if ((heap_top + incr > &_eheap) || (heap_top + incr < &_sheap)) {
         errno = ENOMEM;
         res = (void *) -1;
     }

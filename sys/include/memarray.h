@@ -54,12 +54,26 @@ void memarray_init(memarray_t *mem, void *data, size_t size, size_t num);
  *
  * @pre `mem != NULL`
  *
+ * @note Allocated structure is not cleared before returned
+ *
  * @param[in,out] mem   memarray pool to allocate block in
  *
  * @return pointer to allocated structure, if enough memory was available
  * @return NULL, on failure
  */
 void *memarray_alloc(memarray_t *mem);
+
+/**
+ * @brief Allocate and clear memory chunk in memarray pool
+ *
+ * @pre `mem != NULL`
+ *
+ * @param[in,out] mem   memarray pool to allocate block in
+ *
+ * @return pointer to allocated structure, if enough memory was available
+ * @return NULL, on failure
+ */
+void *memarray_calloc(memarray_t *mem);
 
 /**
  * @brief Free memory chunk in memarray pool

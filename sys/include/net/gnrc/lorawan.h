@@ -79,7 +79,9 @@ typedef enum {
  * @brief MAC Information Base attributes
  */
 typedef enum {
-    MIB_ACTIVATION_METHOD      /**< type is activation method */
+    MIB_ACTIVATION_METHOD,     /**< type is activation method */
+    MIB_DEV_ADDR,              /**< type is dev addr */
+    MIB_RX2_DR,                /**< type is rx2 DR */
 } mlme_mib_type_t;
 
 /**
@@ -109,6 +111,8 @@ typedef struct {
     mlme_mib_type_t type; /**< MIB attribute identifier */
     union {
         mlme_activation_t activation;   /**< holds activation mechanism */
+        void *dev_addr;                 /**< pointer to the dev_addr */
+        uint8_t rx2_dr;                 /** datarate of second rx window */
     };
 } mlme_mib_t;
 
@@ -230,12 +234,50 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac, const mcps_request_t *mcps_r
 void gnrc_lorawan_recv(gnrc_lorawan_t *mac);
 
 /**
- * @brief Setup GNRC LoRaWAN netdev layers
+ * @brief MCPS indication callback
+ * @note Supposed to be implemented by the user of GNRC LoRaWAN
  *
- * @param mac pointer to the MAC descriptor
- * @param lower pointer to the lower netdev device (radio)
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] ind pointer of the indication (see @ref mcps_indication_t)
  */
-void gnrc_lorawan_setup(gnrc_lorawan_t *mac, netdev_t *lower);
+void gnrc_lorawan_mcps_indication(gnrc_lorawan_t *mac, mcps_indication_t *ind);
+
+/**
+ * @brief MLME indication callback
+ * @note Supposed to be implemented by the user of GNRC LoRaWAN
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] ind pointer of the indication (see @ref mlme_indication_t)
+ */
+void gnrc_lorawan_mlme_indication(gnrc_lorawan_t *mac, mlme_indication_t *ind);
+
+/**
+ * @brief MCPS Confirm callback
+ * @note Supposed to be implemented by the user of GNRC LoRaWAN
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] confirm pointer to the confirm (see @ref mcps_confirm_t)
+ */
+void gnrc_lorawan_mcps_confirm(gnrc_lorawan_t *mac, mcps_confirm_t *confirm);
+
+/**
+ * @brief MLME confirm callback
+ * @note Supposed to be implemented by the user of GNRC LoRaWAN
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] confirm pointer to the confirm (see @ref mlme_confirm_t)
+ */
+void gnrc_lorawan_mlme_confirm(gnrc_lorawan_t *mac, mlme_confirm_t *confirm);
+
+/**
+ * @brief Get netdev pointer from mac descriptor
+ * @note Supposed to be implemented by the user of GNRC LoRaWAN
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ *
+ * @return pointer to the @ref netdev_t structure
+ */
+netdev_t *gnrc_lorawan_get_netdev(gnrc_lorawan_t *mac);
 
 #ifdef __cplusplus
 }

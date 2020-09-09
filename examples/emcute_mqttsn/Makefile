@@ -22,6 +22,8 @@ USEMODULE += shell_commands
 USEMODULE += ps
 # For testing we also include the ping6 command and some stats
 USEMODULE += gnrc_icmpv6_echo
+# Optimize network stack to for use with a single network interface
+USEMODULE += gnrc_netif_single
 
 # Allow for env-var-based override of the nodes name (EMCUTE_ID)
 ifneq (,$(EMCUTE_ID))
@@ -35,7 +37,7 @@ DEVELHELP ?= 1
 
 # Comment this out to join RPL DODAGs even if DIOs do not contain
 # DODAG Configuration Options (see the doc for more info)
-# CFLAGS += -DGNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
+# CFLAGS += -DCONFIG_GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
 
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1

@@ -130,7 +130,7 @@
 #endif
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -175,6 +175,10 @@ struct _thread {
 #if defined(DEVELHELP) || defined(DOXYGEN)
     const char *name;               /**< thread's name                  */
     int stack_size;                 /**< thread's stack size            */
+#endif
+/* enable TLS only when Picolibc is compiled with TLS enabled */
+#ifdef PICOLIBC_TLS
+    void *tls;                      /**< thread local storage ptr */
 #endif
 #ifdef HAVE_THREAD_ARCH_T
     thread_arch_t arch;             /**< architecture dependent part    */
@@ -228,7 +232,8 @@ struct _thread {
  * @brief Size of the main task's stack in bytes
  */
 #ifndef THREAD_STACKSIZE_MAIN
-#define THREAD_STACKSIZE_MAIN      (THREAD_STACKSIZE_DEFAULT + THREAD_EXTRA_STACKSIZE_PRINTF)
+#define THREAD_STACKSIZE_MAIN      (THREAD_STACKSIZE_DEFAULT + \
+                                    THREAD_EXTRA_STACKSIZE_PRINTF)
 #endif
 
 /**
@@ -270,7 +275,7 @@ struct _thread {
  * @def THREAD_PRIORITY_MIN
  * @brief Least priority a thread can have
  */
-#define THREAD_PRIORITY_MIN            (SCHED_PRIO_LEVELS-1)
+#define THREAD_PRIORITY_MIN            (SCHED_PRIO_LEVELS - 1)
 
 /**
  * @def THREAD_PRIORITY_IDLE
@@ -283,7 +288,8 @@ struct _thread {
  * @brief Priority of the main thread
  */
 #ifndef THREAD_PRIORITY_MAIN
-#define THREAD_PRIORITY_MAIN           (THREAD_PRIORITY_MIN - (SCHED_PRIO_LEVELS/2))
+#define THREAD_PRIORITY_MAIN           (THREAD_PRIORITY_MIN - \
+                                        (SCHED_PRIO_LEVELS / 2))
 #endif
 
 /**
@@ -308,10 +314,10 @@ struct _thread {
  */
 #define THREAD_CREATE_WOUT_YIELD        (4)
 
- /**
-  * @brief Write markers into the thread's stack to measure stack usage (for
-  *        debugging and profiling purposes)
-  */
+/**
+ * @brief Write markers into the thread's stack to measure stack usage (for
+ *        debugging and profiling purposes)
+ */
 #define THREAD_CREATE_STACKTEST         (8)
 /** @} */
 
@@ -338,14 +344,25 @@ struct _thread {
  * @return              -EINVAL, if @p priority is greater than or equal to
  *                      @ref SCHED_PRIO_LEVELS
  * @return              -EOVERFLOW, if there are too many threads running already
-*/
+ */
 kernel_pid_t thread_create(char *stack,
-                  int stacksize,
-                  uint8_t priority,
-                  int flags,
-                  thread_task_func_t task_func,
-                  void *arg,
-                  const char *name);
+                           int stacksize,
+                           uint8_t priority,
+                           int flags,
+                           thread_task_func_t task_func,
+                           void *arg,
+                           const char *name);
+
+/**
+ * @brief       Retrieve a thread control block by PID.
+ * @pre         @p pid is valid
+ * @param[in]   pid   Thread to retrieve.
+ * @return      `NULL` if the PID is invalid or there is no such thread.
+ */
+static inline thread_t *thread_get_unchecked(kernel_pid_t pid)
+{
+    return (thread_t *)sched_threads[pid];
+}
 
 /**
  * @brief       Retrieve a thread control block by PID.
@@ -354,7 +371,13 @@ kernel_pid_t thread_create(char *stack,
  * @param[in]   pid   Thread to retrieve.
  * @return      `NULL` if the PID is invalid or there is no such thread.
  */
-volatile thread_t *thread_get(kernel_pid_t pid);
+static inline thread_t *thread_get(kernel_pid_t pid)
+{
+    if (pid_is_valid(pid)) {
+        return thread_get_unchecked(pid);
+    }
+    return NULL;
+}
 
 /**
  * @brief Returns the status of a process
@@ -437,7 +460,22 @@ int thread_wakeup(kernel_pid_t pid);
 static inline kernel_pid_t thread_getpid(void)
 {
     extern volatile kernel_pid_t sched_active_pid;
+
     return sched_active_pid;
+}
+
+/**
+ * @brief   Returns a pointer to the Thread Control Block of the currently
+ *          running thread
+ *
+ * @return  Pointer to the TCB of the currently running thread, or `NULL` if
+ *          no thread is running
+ */
+static inline thread_t *thread_get_active(void)
+{
+    extern volatile thread_t *sched_active_thread;
+
+    return (thread_t *)sched_active_thread;
 }
 
 /**
@@ -450,7 +488,8 @@ static inline kernel_pid_t thread_getpid(void)
  *
  * @return stack pointer
  */
-char *thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_start, int stack_size);
+char *thread_stack_init(thread_task_func_t task_func, void *arg,
+                        void *stack_start, int stack_size);
 
 /**
  * @brief Add thread to list, sorted by priority (internal)
@@ -485,7 +524,7 @@ const char *thread_getname(kernel_pid_t pid);
  *
  * Only works if the thread was created with the flag THREAD_CREATE_STACKTEST.
  *
- * @param[in] stack the stack you want to measure. try `sched_active_thread->stack_start`
+ * @param[in] stack the stack you want to measure. Try `thread_get_active()->stack_start`
  *
  * @return          the amount of unused space of the thread's stack
  */

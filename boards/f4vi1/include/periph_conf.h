@@ -69,15 +69,14 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF8,
         .bus        = APB2,
         .irqn       = USART6_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 14,
-        .dma_chan   = 5
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     }
 };
 
 #define UART_0_ISR          (isr_usart6)
-#define UART_0_DMA_ISR      (isr_dma2_stream6)
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */

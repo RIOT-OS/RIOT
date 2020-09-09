@@ -41,6 +41,13 @@ changes will be lost when a new ASF release is going to be used.
 A SAM based CPU should include `sam0.h` in this directory, which will
 resolve  any CPU family specific includes required.
 
+## SAMD21 files
+
+samd21: `Atmel.SAMD21_DFP.1.3.395.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
 ## SAML10/SAML11 files
 
 Since 2019 the necessary variant files are available in atpacks at
@@ -52,6 +59,38 @@ saml11: `Atmel.SAML11_DFP.1.0.91.atpack`
 
 Each atpack has an include subdirectory with the files we copy into
 RIOT. The files are copied unmodified.
+
+## SAML21 files
+
+saml21: `Atmel.SAML21_DFP.1.2.125.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
+## SAMR21 files
+
+samr21: `Atmel.SAMR21_DFP.1.1.72.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The following replacements were done for compatibility with newlib:
+
+    find -name '*.h' -exec sed -ie 's/_U(/_U_(/g' {} \;
+    find -name '*.h' -exec sed -ie 's/_L(/_L_(/g' {} \;
+
+## SAMR30 files
+
+samr30: `Atmel.SAMR30_DFP.1.1.35.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT.
+
+The PIN_($pin)_EIC_EXTINT_NUM macos and integer literal macros (_L_() etc)
+were added manually.
+It is expected for those to appear in the next atpack release by
+Microchip.
+
+If *_EIC_EXTINT_NUM macros are missing after an update, GPIO interrupts
+not work. See 93d536f76 for how to generate them.
 
 ## SAMR34 files
 

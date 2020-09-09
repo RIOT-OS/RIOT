@@ -32,7 +32,13 @@ extern "C" {
 /**
  * @brief   GCLK reference speed
  */
-#define CLOCK_CORECLOCK     (16000000U)
+#define CLOCK_CORECLOCK     (48000000U)
+
+/**
+ * @brief Enable the internal DC/DC converter
+ *        The board is equipped with the necessary inductor.
+ */
+#define USE_VREG_BUCK       (1)
 
 /**
  * @name    Timer peripheral configuration
@@ -45,8 +51,7 @@ static const tc32_conf_t timer_config[] = {
         .mclk           = &MCLK->APBCMASK.reg,
         .mclk_mask      = MCLK_APBCMASK_TC0 | MCLK_APBCMASK_TC1,
         .gclk_id        = TC0_GCLK_ID,
-        .gclk_src       = GCLK_PCHCTRL_GEN(0),
-        .prescaler      = TC_CTRLA_PRESCALER(4),
+        .gclk_src       = SAM0_GCLK_8MHZ,
         .flags          = TC_CTRLA_MODE_COUNT32,
     }
 };
@@ -66,21 +71,29 @@ static const uart_conf_t uart_config[] = {
         .dev      = &SERCOM3->USART,
         .rx_pin   = GPIO_PIN(PA,23),
         .tx_pin   = GPIO_PIN(PA,22),
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin  = GPIO_UNDEF,
+        .cts_pin  = GPIO_UNDEF,
+#endif
         .mux      = GPIO_MUX_C,
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
         .flags    = UART_FLAG_NONE,
-        .gclk_src = GCLK_PCHCTRL_GEN_GCLK0
+        .gclk_src = SAM0_GCLK_MAIN,
     },
     {    /* EXT1 header */
         .dev      = &SERCOM4->USART,
         .rx_pin   = GPIO_PIN(PB, 9),
         .tx_pin   = GPIO_PIN(PB, 8),
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin  = GPIO_UNDEF,
+        .cts_pin  = GPIO_UNDEF,
+#endif
         .mux      = GPIO_MUX_D,
         .rx_pad   = UART_PAD_RX_1,
         .tx_pad   = UART_PAD_TX_0,
         .flags    = UART_FLAG_NONE,
-        .gclk_src = GCLK_PCHCTRL_GEN_GCLK0
+        .gclk_src = SAM0_GCLK_MAIN,
     }
 };
 
@@ -89,6 +102,35 @@ static const uart_conf_t uart_config[] = {
 #define UART_1_ISR          isr_sercom4
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
+/** @} */
+
+/**
+ * @name PWM configuration
+ * @{
+ */
+#define PWM_0_EN            1
+
+#if PWM_0_EN
+/* PWM0 channels */
+static const pwm_conf_chan_t pwm_chan0_config[] = {
+    /* GPIO pin, MUX value, TCC channel */
+    { GPIO_PIN(PB, 10), GPIO_MUX_F, 4 },
+};
+#endif
+
+/* PWM device configuration */
+static const pwm_conf_t pwm_config[] = {
+#if PWM_0_EN
+    { .tim  = TCC_CONFIG(TCC0),
+      .chan = pwm_chan0_config,
+      .chan_numof = ARRAY_SIZE(pwm_chan0_config),
+      .gclk_src = SAM0_GCLK_8MHZ,
+    },
+#endif
+};
+
+/* number of devices that are actually defined */
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
 
 /**
@@ -105,8 +147,12 @@ static const spi_conf_t spi_config[] = {
         .mosi_mux = GPIO_MUX_D,
         .clk_mux  = GPIO_MUX_D,
         .miso_pad = SPI_PAD_MISO_0,
-        .mosi_pad = SPI_PAD_MOSI_2_SCK_3
-
+        .mosi_pad = SPI_PAD_MOSI_2_SCK_3,
+        .gclk_src = SAM0_GCLK_MAIN,
+#ifdef MODULE_PERIPH_DMA
+        .tx_trigger = SERCOM0_DMAC_ID_TX,
+        .rx_trigger = SERCOM0_DMAC_ID_RX,
+#endif
     }
 };
 
@@ -124,7 +170,7 @@ static const i2c_conf_t i2c_config[] = {
         .scl_pin  = GPIO_PIN(PA, 9),
         .sda_pin  = GPIO_PIN(PA, 8),
         .mux      = GPIO_MUX_D,
-        .gclk_src = GCLK_PCHCTRL_GEN_GCLK0,
+        .gclk_src = SAM0_GCLK_MAIN,
         .flags    = I2C_FLAG_NONE
     }
 };
@@ -145,8 +191,9 @@ static const i2c_conf_t i2c_config[] = {
  * @name    RTT configuration
  * @{
  */
+#ifndef RTT_FREQUENCY
 #define RTT_FREQUENCY       (32768U)
-#define RTT_MAX_VALUE       (0xffffffffU)
+#endif
 /** @} */
 
 /**
@@ -168,6 +215,31 @@ static const adc_conf_chan_t adc_channels[] = {
 };
 
 #define ADC_NUMOF                           ARRAY_SIZE(adc_channels)
+/** @} */
+
+/**
+ * @name DAC configuration
+ * @{
+ */
+                            /* Must not exceed 12 MHz */
+#define DAC_CLOCK           SAM0_GCLK_8MHZ
+                            /* use Vcc as reference voltage */
+#define DAC_VREF            DAC_CTRLB_REFSEL_VDDANA
+/** @} */
+
+/**
+ * @name USB peripheral configuration
+ * @{
+ */
+static const sam0_common_usb_config_t sam_usbdev_config[] = {
+    {
+        .dm     = GPIO_PIN(PA, 24),
+        .dp     = GPIO_PIN(PA, 25),
+        .d_mux  = GPIO_MUX_G,
+        .device = &USB->DEVICE,
+        .gclk_src = SAM0_GCLK_48MHZ,
+    }
+};
 /** @} */
 
 #ifdef __cplusplus

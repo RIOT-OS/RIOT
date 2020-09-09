@@ -1,0 +1,11 @@
+USEMODULE += mips32r2_common
+USEMODULE += mips32r2_common_periph
+USEMODULE += newlib
+
+# mips32 needs periph_timer for its gettimeofday() implementation
+FEATURES_REQUIRED += periph_timer
+
+#Use RIOT to handle syscalls (default)
+ifeq (,$(filter newlib_syscalls_mips_uhi,$(USEMODULE)))
+  USEMODULE += newlib_syscalls_default
+endif

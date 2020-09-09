@@ -8,13 +8,8 @@
 # directory for more details.
 
 import sys
-from testrunner import run
-
-
-def testfunc(child):
-    # 1st 6LoWPAN fragment
-    child.expect(r"OK \(\d+ tests\)")
+from testrunner import run_check_unittests
 
 
 if __name__ == "__main__":
-    sys.exit(run(testfunc))
+    sys.exit(run_check_unittests())

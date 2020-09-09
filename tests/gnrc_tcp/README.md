@@ -25,7 +25,10 @@ in the tests directory.
 6) 06-receive_data_closed_conn.py
     This test covers accessing received data after receiving a FIN packet. If the connection was closed
     by the peer, a call to gnrc_tcp_recv must return directly with all currently received data
-    or zero if there is no data. The function must return immediatly dispite any given timeout.
+    or zero if there is no data. The function must return immediately despite any given timeout.
+
+7) 07-endpoint_construction.py
+    This test ensures the correctness of the endpoint construction.
 
 Setup
 ==========

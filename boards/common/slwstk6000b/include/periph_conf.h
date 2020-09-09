@@ -147,7 +147,8 @@ static const timer_conf_t timer_config[] = {
             .dev = TIMER1,
             .cmu = cmuClock_TIMER1
         },
-        .irq = TIMER1_IRQn
+        .irq = TIMER1_IRQn,
+        .channel_numof = 3
     }
 };
 

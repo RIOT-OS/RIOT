@@ -29,6 +29,7 @@
 #include "periph_cpu.h"
 #include "periph_conf.h"
 #include "periph/rtt.h"
+#include "plic.h"
 #include "vendor/encoding.h"
 #include "vendor/platform.h"
 #include "vendor/plic_driver.h"
@@ -37,41 +38,12 @@
 #include "debug.h"
 
 /* Convert RTT freq to pre-scaler value */
-#if (RTT_FREQUENCY == 32768)
-#define RTT_SCALE       (0)
-#elif (RTT_FREQUENCY == 16384)
-#define RTT_SCALE       (1)
-#elif (RTT_FREQUENCY == 8192)
-#define RTT_SCALE       (2)
-#elif (RTT_FREQUENCY == 4096)
-#define RTT_SCALE       (3)
-#elif (RTT_FREQUENCY == 2048)
-#define RTT_SCALE       (4)
-#elif (RTT_FREQUENCY == 1024)
-#define RTT_SCALE       (5)
-#elif (RTT_FREQUENCY == 512)
-#define RTT_SCALE       (6)
-#elif (RTT_FREQUENCY == 256)
-#define RTT_SCALE       (7)
-#elif (RTT_FREQUENCY == 128)
-#define RTT_SCALE       (8)
-#elif (RTT_FREQUENCY == 64)
-#define RTT_SCALE       (9)
-#elif (RTT_FREQUENCY == 32)
-#define RTT_SCALE       (10)
-#elif (RTT_FREQUENCY == 16)
-#define RTT_SCALE       (11)
-#elif (RTT_FREQUENCY == 8)
-#define RTT_SCALE       (12)
-#elif (RTT_FREQUENCY == 4)
-#define RTT_SCALE       (13)
-#elif (RTT_FREQUENCY == 2)
-#define RTT_SCALE       (14)
-#elif (RTT_FREQUENCY == 1)
-#define RTT_SCALE       (15)
-#else
+#ifdef RTT_FREQUENCY
+#if ((RTT_CLOCK_FREQUENCY % RTT_FREQUENCY) != 0)
 #error "Invalid RTT_FREQUENCY: Must be power of 2"
 #endif
+#endif
+#define RTT_SCALE __builtin_ctz(RTT_CLOCK_FREQUENCY / RTT_FREQUENCY)
 
 typedef struct {
     uint32_t alarm_val;     /**< cached alarm val */
@@ -105,9 +77,9 @@ void rtt_init(void)
     clear_csr(mie, MIP_MEIP);
 
     /* Configure RTC ISR with PLIC */
-    set_external_isr_cb(INT_RTCCMP, rtt_isr);
-    PLIC_enable_interrupt(INT_RTCCMP);
-    PLIC_set_priority(INT_RTCCMP, RTT_INTR_PRIORITY);
+    plic_set_isr_cb(INT_RTCCMP, rtt_isr);
+    plic_enable_interrupt(INT_RTCCMP);
+    plic_set_priority(INT_RTCCMP, RTT_INTR_PRIORITY);
 
     /*  Configure RTC scaler, etc... */
     AON_REG(AON_RTCCFG) = RTT_SCALE;
@@ -161,8 +133,14 @@ void rtt_set_counter(uint32_t counter)
      * Must program HI/LO regs
      * Write scaled counter reg value
      */
-    AON_REG(AON_RTCLO) = counter << RTT_SCALE;
-    AON_REG(AON_RTCHI) = counter >> (32 - RTT_SCALE);
+    /* Use ifdef to avoid out of bound shift when RTT_SCALE == 0 */
+#if RTT_CLOCK_FREQUENCY == RTT_FREQUENCY
+        AON_REG(AON_RTCLO) = counter;
+        AON_REG(AON_RTCHI) = 0;
+#else
+        AON_REG(AON_RTCLO) = counter << RTT_SCALE;
+        AON_REG(AON_RTCHI) = counter >> (32 - RTT_SCALE);
+#endif
 }
 
 void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)

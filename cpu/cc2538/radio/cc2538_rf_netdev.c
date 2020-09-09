@@ -36,9 +36,10 @@ static netdev_t *_dev;
 
 void _irq_handler(void)
 {
-    if (_dev->event_callback) {
-        _dev->event_callback(_dev, NETDEV_EVENT_ISR);
-    }
+    RFCORE_SFR_RFIRQF0 = 0;
+    RFCORE_SFR_RFIRQF1 = 0;
+
+    netdev_trigger_event_isr(_dev);
 }
 
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
@@ -301,18 +302,26 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     size_t pkt_len;
 
     if (buf == NULL) {
+        /* Check that the last byte of a new frame has been received */
+        if (RFCORE->XREG_FSMSTAT1bits.FIFOP == 0) {
+            DEBUG_PRINT("cc2538_rf: Frame has not finished being received\n");
+            return -EAGAIN;
+        }
+
         /* GNRC wants to know how much data we've got for it */
         pkt_len = rfcore_read_byte();
 
         /* Make sure pkt_len is sane */
         if (pkt_len > CC2538_RF_MAX_DATA_LEN) {
+            DEBUG_PRINT("cc2538_rf: pkt_len > CC2538_RF_MAX_DATA_LEN\n");
             RFCORE_SFR_RFST = ISFLUSHRX;
             return -EOVERFLOW;
         }
 
-        /* CRC check */
-        if (!(rfcore_peek_rx_fifo(pkt_len) & 0x80)) {
-            /* CRC failed; discard packet */
+        /* Make sure pkt_len is not too short.
+         * There are at least 2 bytes (FCS). */
+        if (pkt_len < IEEE802154_FCS_LEN) {
+            DEBUG_PRINT("cc2538_rf: pkt_len < IEEE802154_FCS_LEN\n");
             RFCORE_SFR_RFST = ISFLUSHRX;
             return -ENODATA;
         }
@@ -331,19 +340,24 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     rfcore_read_fifo(buf, pkt_len);
 
-    if (info != NULL && RFCORE->XREG_RSSISTATbits.RSSI_VALID) {
-        uint8_t corr_val;
-        int8_t rssi_val;
-        netdev_ieee802154_rx_info_t *radio_info = info;
-        rssi_val = rfcore_read_byte() + CC2538_RSSI_OFFSET;
+    int8_t rssi_val = rfcore_read_byte() + CC2538_RSSI_OFFSET;
+    uint8_t crc_corr_val = rfcore_read_byte();
 
-        RFCORE_ASSERT(rssi_val > CC2538_RF_SENSITIVITY);
+    /* CRC check */
+    if (!(crc_corr_val & CC2538_CRC_BIT_MASK)) {
+        /* CRC failed; discard packet */
+        RFCORE_SFR_RFST = ISFLUSHRX;
+        return -ENODATA;
+    }
+
+    if (info != NULL) {
+        netdev_ieee802154_rx_info_t *radio_info = info;
 
         /* The number of dB above maximum sensitivity detected for the
          * received packet */
-        radio_info->rssi = -CC2538_RF_SENSITIVITY + rssi_val;
+        radio_info->rssi = rssi_val;
 
-        corr_val = rfcore_read_byte() & CC2538_CORR_VAL_MASK;
+        uint8_t corr_val = crc_corr_val & CC2538_CORR_VAL_MASK;
 
         if (corr_val < CC2538_CORR_VAL_MIN) {
             corr_val = CC2538_CORR_VAL_MIN;
@@ -358,7 +372,13 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
                           (CC2538_CORR_VAL_MAX - CC2538_CORR_VAL_MIN);
     }
 
-    RFCORE_SFR_RFST = ISFLUSHRX;
+    /* Check for overflow of the rx fifo */
+    if (RFCORE->XREG_FSMSTAT1bits.FIFOP != 0 &&
+        RFCORE->XREG_FSMSTAT1bits.FIFO == 0)
+    {
+        DEBUG_PRINT("cc2538_rf: RXFIFO Overflow\n");
+        RFCORE_SFR_RFST = ISFLUSHRX;
+    }
 
     return pkt_len;
 }

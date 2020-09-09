@@ -62,15 +62,11 @@ static void _rx_cb(void *arg, uint8_t c)
         if (dev->int_state == RN2XX3_INT_STATE_MAC_RX_MESSAGE) {
             /* RX state: closing RX buffer */
             dev->rx_buf[(dev->rx_size + 1) / 2] = 0;
-            if (netdev->event_callback) {
-                netdev->event_callback(netdev, NETDEV_EVENT_ISR);
-            }
+            netdev_trigger_event_isr(netdev);
         }
         else if (dev->int_state == RN2XX3_INT_STATE_MAC_TX) {
             /* still in TX state: transmission complete but no data received */
-            if (netdev->event_callback) {
-                netdev->event_callback(netdev, NETDEV_EVENT_ISR);
-            }
+            netdev_trigger_event_isr(netdev);
         }
         dev->resp_size = 0;
         dev->rx_size = 0;
@@ -144,7 +140,7 @@ void rn2xx3_setup(rn2xx3_t *dev, const rn2xx3_params_t *params)
     dev->p = *params;
 
     /* initialize pins and perform hardware reset */
-    if (dev->p.pin_reset != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.pin_reset)) {
         gpio_init(dev->p.pin_reset, GPIO_OUT);
         gpio_set(dev->p.pin_reset);
     }
@@ -166,7 +162,7 @@ int rn2xx3_init(rn2xx3_t *dev)
     }
 
     /* if reset pin is connected, do a hardware reset */
-    if (dev->p.pin_reset != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->p.pin_reset)) {
         gpio_clear(dev->p.pin_reset);
         xtimer_usleep(RESET_DELAY);
         gpio_set(dev->p.pin_reset);
@@ -175,7 +171,7 @@ int rn2xx3_init(rn2xx3_t *dev)
     dev->sleep_timer.callback = _sleep_timer_cb;
     dev->sleep_timer.arg = dev;
 
-    rn2xx3_sys_set_sleep_duration(dev, RN2XX3_DEFAULT_SLEEP);
+    rn2xx3_sys_set_sleep_duration(dev, CONFIG_RN2XX3_DEFAULT_SLEEP);
 
     /* sending empty command to clear uart buffer */
     if (rn2xx3_write_cmd(dev) == RN2XX3_TIMEOUT) {

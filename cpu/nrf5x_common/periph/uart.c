@@ -2,6 +2,7 @@
  * Copyright (C) 2014-2017 Freie Universität Berlin
  *               2015 Jan Wagner <mail@jwagner.eu>
  *               2018 Inria
+ *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -22,6 +23,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Jan Wagner <mail@jwagner.eu>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
+ * @author      Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * @}
  */
@@ -33,7 +35,7 @@
 #include "periph/uart.h"
 #include "periph/gpio.h"
 
-#ifdef CPU_MODEL_NRF52840XXAA
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
 #define UART_INVALID    (uart >= UART_NUMOF)
 #define REG_BAUDRATE    dev(uart)->BAUDRATE
 #define REG_CONFIG      dev(uart)->CONFIG
@@ -42,10 +44,10 @@
 #define UART_IRQN       uart_config[uart].irqn
 #define UART_PIN_RX     uart_config[uart].rx_pin
 #define UART_PIN_TX     uart_config[uart].tx_pin
+#ifdef MODULE_PERIPH_UART_HW_FC
 #define UART_PIN_RTS    uart_config[uart].rts_pin
 #define UART_PIN_CTS    uart_config[uart].cts_pin
-#define UART_HWFLOWCTRL (uart_config[uart].rts_pin != (uint8_t)GPIO_UNDEF && \
-                         uart_config[uart].cts_pin != (uint8_t)GPIO_UNDEF)
+#endif
 #define ISR_CTX         isr_ctx[uart]
 #define RAM_MASK        (0x20000000)
 
@@ -82,8 +84,7 @@ static inline NRF_UARTE_Type *dev(uart_t uart)
  */
 static uart_isr_ctx_t isr_ctx;
 
-#endif  /* CPU_MODEL_NRF52840XXAA */
-
+#endif  /* CPU_MODEL_NRF52840XXAA || CPU_MODEL_NRF52811XXAA */
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
@@ -113,33 +114,37 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     gpio_init(UART_PIN_TX, GPIO_OUT);
     PSEL_TXD = UART_PIN_TX;
 
-#ifdef CPU_MODEL_NRF52840XXAA
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
     /* enable HW-flow control if defined */
-    if (UART_HWFLOWCTRL) {
+ #ifdef MODULE_PERIPH_UART_HW_FC
         /* set pin mode for RTS and CTS pins */
+        if (UART_PIN_RTS != GPIO_UNDEF && UART_PIN_CTS != GPIO_UNDEF) {
+            gpio_init(UART_PIN_RTS, GPIO_OUT);
+            gpio_init(UART_PIN_CTS, GPIO_IN);
+            /* configure RTS and CTS pins to use */
+            dev(uart)->PSEL.RTS = UART_PIN_RTS;
+            dev(uart)->PSEL.CTS = UART_PIN_CTS;
+            REG_CONFIG |= UART_CONFIG_HWFC_Msk; /* enable HW flow control */
+        }
+#else
+        dev(uart)->PSEL.RTS = 0xffffffff;   /* pin disconnected */
+        dev(uart)->PSEL.CTS = 0xffffffff;   /* pin disconnected */
+#endif
+#else
+#ifdef MODULE_PERIPH_UART_HW_FC
+    /* set pin mode for RTS and CTS pins */
+    if (UART_PIN_RTS != GPIO_UNDEF && UART_PIN_CTS != GPIO_UNDEF) {
         gpio_init(UART_PIN_RTS, GPIO_OUT);
         gpio_init(UART_PIN_CTS, GPIO_IN);
         /* configure RTS and CTS pins to use */
-        dev(uart)->PSEL.RTS = UART_PIN_RTS;
-        dev(uart)->PSEL.CTS = UART_PIN_CTS;
-        REG_CONFIG |= UART_CONFIG_HWFC_Msk; /* enable HW flow control */
-    } else {
-        dev(uart)->PSEL.RTS = 0xffffffff;   /* pin disconnected */
-        dev(uart)->PSEL.CTS = 0xffffffff;   /* pin disconnected */
+        NRF_UART0->PSELRTS = UART_PIN_RTS;
+        NRF_UART0->PSELCTS = UART_PIN_CTS;
+        REG_CONFIG |= UART_CONFIG_HWFC_Msk;     /* enable HW flow control */
     }
 #else
-#if UART_HWFLOWCTRL
-    /* set pin mode for RTS and CTS pins */
-    gpio_init(UART_PIN_RTS, GPIO_OUT);
-    gpio_init(UART_PIN_CTS, GPIO_IN);
-    /* configure RTS and CTS pins to use */
-    NRF_UART0->PSELRTS = UART_PIN_RTS;
-    NRF_UART0->PSELCTS = UART_PIN_CTS;
-    REG_CONFIG |= UART_CONFIG_HWFC_Msk;     /* enable HW flow control */
-#else
-    NRF_UART0->PSELRTS = 0xffffffff;        /* pin disconnected */
-    NRF_UART0->PSELCTS = 0xffffffff;        /* pin disconnected */
-#endif
+        NRF_UART0->PSELRTS = 0xffffffff;        /* pin disconnected */
+        NRF_UART0->PSELCTS = 0xffffffff;        /* pin disconnected */
+#endif /* MODULE_PERIPH_UART_HW_FC */
 #endif
 
     /* select baudrate */
@@ -194,7 +199,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     /* enable the UART device */
-#ifdef CPU_MODEL_NRF52840XXAA
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
     dev(uart)->ENABLE = UARTE_ENABLE_ENABLE_Enabled;
 #else
     NRF_UART0->ENABLE = UART_ENABLE_ENABLE_Enabled;
@@ -202,7 +207,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 #endif
 
     if (rx_cb) {
-#ifdef CPU_MODEL_NRF52840XXAA
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
         dev(uart)->RXD.MAXCNT = 1;
         dev(uart)->RXD.PTR = (uint32_t)&rx_buf[uart];
         dev(uart)->INTENSET = UARTE_INTENSET_ENDRX_Msk;
@@ -220,8 +225,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     return UART_OK;
 }
 
-
-#ifdef CPU_MODEL_NRF52840XXAA /* nrf52840 (using EasyDMA) */
+/* nrf52840 || nrf52811 (using EasyDMA) */
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
 static void _write_buf(uart_t uart, const uint8_t *data, size_t len)
 {
     /* reset endtx flag */
@@ -406,7 +411,7 @@ static inline void irq_handler(uart_t uart)
     cortexm_isr_end();
 }
 
-#endif /* CPU_MODEL_NRF52840XXAA */
+#endif /* CPU_MODEL_NRF52840XXAA || CPU_MODEL_NRF5211XXAA */
 
 #ifdef UART_0_ISR
 void UART_0_ISR(void)

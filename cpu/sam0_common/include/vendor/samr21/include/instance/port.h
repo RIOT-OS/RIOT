@@ -3,39 +3,24 @@
  *
  * \brief Instance description for PORT
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2016 Atmel Corporation,
+ *                    a wholly owned subsidiary of Microchip Technology Inc.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the Licence at
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * \asf_license_stop
  *
@@ -46,85 +31,85 @@
 
 /* ========== Register definition for PORT peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-#define REG_PORT_DIR0              (0x41004400U) /**< \brief (PORT) Data Direction 0 */
-#define REG_PORT_DIRCLR0           (0x41004404U) /**< \brief (PORT) Data Direction Clear 0 */
-#define REG_PORT_DIRSET0           (0x41004408U) /**< \brief (PORT) Data Direction Set 0 */
-#define REG_PORT_DIRTGL0           (0x4100440CU) /**< \brief (PORT) Data Direction Toggle 0 */
-#define REG_PORT_OUT0              (0x41004410U) /**< \brief (PORT) Data Output Value 0 */
-#define REG_PORT_OUTCLR0           (0x41004414U) /**< \brief (PORT) Data Output Value Clear 0 */
-#define REG_PORT_OUTSET0           (0x41004418U) /**< \brief (PORT) Data Output Value Set 0 */
-#define REG_PORT_OUTTGL0           (0x4100441CU) /**< \brief (PORT) Data Output Value Toggle 0 */
-#define REG_PORT_IN0               (0x41004420U) /**< \brief (PORT) Data Input Value 0 */
-#define REG_PORT_CTRL0             (0x41004424U) /**< \brief (PORT) Control 0 */
-#define REG_PORT_WRCONFIG0         (0x41004428U) /**< \brief (PORT) Write Configuration 0 */
-#define REG_PORT_PMUX0             (0x41004430U) /**< \brief (PORT) Peripheral Multiplexing 0 */
-#define REG_PORT_PINCFG0           (0x41004440U) /**< \brief (PORT) Pin Configuration 0 */
-#define REG_PORT_DIR1              (0x41004480U) /**< \brief (PORT) Data Direction 1 */
-#define REG_PORT_DIRCLR1           (0x41004484U) /**< \brief (PORT) Data Direction Clear 1 */
-#define REG_PORT_DIRSET1           (0x41004488U) /**< \brief (PORT) Data Direction Set 1 */
-#define REG_PORT_DIRTGL1           (0x4100448CU) /**< \brief (PORT) Data Direction Toggle 1 */
-#define REG_PORT_OUT1              (0x41004490U) /**< \brief (PORT) Data Output Value 1 */
-#define REG_PORT_OUTCLR1           (0x41004494U) /**< \brief (PORT) Data Output Value Clear 1 */
-#define REG_PORT_OUTSET1           (0x41004498U) /**< \brief (PORT) Data Output Value Set 1 */
-#define REG_PORT_OUTTGL1           (0x4100449CU) /**< \brief (PORT) Data Output Value Toggle 1 */
-#define REG_PORT_IN1               (0x410044A0U) /**< \brief (PORT) Data Input Value 1 */
-#define REG_PORT_CTRL1             (0x410044A4U) /**< \brief (PORT) Control 1 */
-#define REG_PORT_WRCONFIG1         (0x410044A8U) /**< \brief (PORT) Write Configuration 1 */
-#define REG_PORT_PMUX1             (0x410044B0U) /**< \brief (PORT) Peripheral Multiplexing 1 */
-#define REG_PORT_PINCFG1           (0x410044C0U) /**< \brief (PORT) Pin Configuration 1 */
-#define REG_PORT_DIR2              (0x41004500U) /**< \brief (PORT) Data Direction 2 */
-#define REG_PORT_DIRCLR2           (0x41004504U) /**< \brief (PORT) Data Direction Clear 2 */
-#define REG_PORT_DIRSET2           (0x41004508U) /**< \brief (PORT) Data Direction Set 2 */
-#define REG_PORT_DIRTGL2           (0x4100450CU) /**< \brief (PORT) Data Direction Toggle 2 */
-#define REG_PORT_OUT2              (0x41004510U) /**< \brief (PORT) Data Output Value 2 */
-#define REG_PORT_OUTCLR2           (0x41004514U) /**< \brief (PORT) Data Output Value Clear 2 */
-#define REG_PORT_OUTSET2           (0x41004518U) /**< \brief (PORT) Data Output Value Set 2 */
-#define REG_PORT_OUTTGL2           (0x4100451CU) /**< \brief (PORT) Data Output Value Toggle 2 */
-#define REG_PORT_IN2               (0x41004520U) /**< \brief (PORT) Data Input Value 2 */
-#define REG_PORT_CTRL2             (0x41004524U) /**< \brief (PORT) Control 2 */
-#define REG_PORT_WRCONFIG2         (0x41004528U) /**< \brief (PORT) Write Configuration 2 */
-#define REG_PORT_PMUX2             (0x41004530U) /**< \brief (PORT) Peripheral Multiplexing 2 */
-#define REG_PORT_PINCFG2           (0x41004540U) /**< \brief (PORT) Pin Configuration 2 */
+#define REG_PORT_DIR0              (0x41004400) /**< \brief (PORT) Data Direction 0 */
+#define REG_PORT_DIRCLR0           (0x41004404) /**< \brief (PORT) Data Direction Clear 0 */
+#define REG_PORT_DIRSET0           (0x41004408) /**< \brief (PORT) Data Direction Set 0 */
+#define REG_PORT_DIRTGL0           (0x4100440C) /**< \brief (PORT) Data Direction Toggle 0 */
+#define REG_PORT_OUT0              (0x41004410) /**< \brief (PORT) Data Output Value 0 */
+#define REG_PORT_OUTCLR0           (0x41004414) /**< \brief (PORT) Data Output Value Clear 0 */
+#define REG_PORT_OUTSET0           (0x41004418) /**< \brief (PORT) Data Output Value Set 0 */
+#define REG_PORT_OUTTGL0           (0x4100441C) /**< \brief (PORT) Data Output Value Toggle 0 */
+#define REG_PORT_IN0               (0x41004420) /**< \brief (PORT) Data Input Value 0 */
+#define REG_PORT_CTRL0             (0x41004424) /**< \brief (PORT) Control 0 */
+#define REG_PORT_WRCONFIG0         (0x41004428) /**< \brief (PORT) Write Configuration 0 */
+#define REG_PORT_PMUX0             (0x41004430) /**< \brief (PORT) Peripheral Multiplexing 0 */
+#define REG_PORT_PINCFG0           (0x41004440) /**< \brief (PORT) Pin Configuration 0 */
+#define REG_PORT_DIR1              (0x41004480) /**< \brief (PORT) Data Direction 1 */
+#define REG_PORT_DIRCLR1           (0x41004484) /**< \brief (PORT) Data Direction Clear 1 */
+#define REG_PORT_DIRSET1           (0x41004488) /**< \brief (PORT) Data Direction Set 1 */
+#define REG_PORT_DIRTGL1           (0x4100448C) /**< \brief (PORT) Data Direction Toggle 1 */
+#define REG_PORT_OUT1              (0x41004490) /**< \brief (PORT) Data Output Value 1 */
+#define REG_PORT_OUTCLR1           (0x41004494) /**< \brief (PORT) Data Output Value Clear 1 */
+#define REG_PORT_OUTSET1           (0x41004498) /**< \brief (PORT) Data Output Value Set 1 */
+#define REG_PORT_OUTTGL1           (0x4100449C) /**< \brief (PORT) Data Output Value Toggle 1 */
+#define REG_PORT_IN1               (0x410044A0) /**< \brief (PORT) Data Input Value 1 */
+#define REG_PORT_CTRL1             (0x410044A4) /**< \brief (PORT) Control 1 */
+#define REG_PORT_WRCONFIG1         (0x410044A8) /**< \brief (PORT) Write Configuration 1 */
+#define REG_PORT_PMUX1             (0x410044B0) /**< \brief (PORT) Peripheral Multiplexing 1 */
+#define REG_PORT_PINCFG1           (0x410044C0) /**< \brief (PORT) Pin Configuration 1 */
+#define REG_PORT_DIR2              (0x41004500) /**< \brief (PORT) Data Direction 2 */
+#define REG_PORT_DIRCLR2           (0x41004504) /**< \brief (PORT) Data Direction Clear 2 */
+#define REG_PORT_DIRSET2           (0x41004508) /**< \brief (PORT) Data Direction Set 2 */
+#define REG_PORT_DIRTGL2           (0x4100450C) /**< \brief (PORT) Data Direction Toggle 2 */
+#define REG_PORT_OUT2              (0x41004510) /**< \brief (PORT) Data Output Value 2 */
+#define REG_PORT_OUTCLR2           (0x41004514) /**< \brief (PORT) Data Output Value Clear 2 */
+#define REG_PORT_OUTSET2           (0x41004518) /**< \brief (PORT) Data Output Value Set 2 */
+#define REG_PORT_OUTTGL2           (0x4100451C) /**< \brief (PORT) Data Output Value Toggle 2 */
+#define REG_PORT_IN2               (0x41004520) /**< \brief (PORT) Data Input Value 2 */
+#define REG_PORT_CTRL2             (0x41004524) /**< \brief (PORT) Control 2 */
+#define REG_PORT_WRCONFIG2         (0x41004528) /**< \brief (PORT) Write Configuration 2 */
+#define REG_PORT_PMUX2             (0x41004530) /**< \brief (PORT) Peripheral Multiplexing 2 */
+#define REG_PORT_PINCFG2           (0x41004540) /**< \brief (PORT) Pin Configuration 2 */
 #else
-#define REG_PORT_DIR0              (*(RwReg  *)0x41004400U) /**< \brief (PORT) Data Direction 0 */
-#define REG_PORT_DIRCLR0           (*(RwReg  *)0x41004404U) /**< \brief (PORT) Data Direction Clear 0 */
-#define REG_PORT_DIRSET0           (*(RwReg  *)0x41004408U) /**< \brief (PORT) Data Direction Set 0 */
-#define REG_PORT_DIRTGL0           (*(RwReg  *)0x4100440CU) /**< \brief (PORT) Data Direction Toggle 0 */
-#define REG_PORT_OUT0              (*(RwReg  *)0x41004410U) /**< \brief (PORT) Data Output Value 0 */
-#define REG_PORT_OUTCLR0           (*(RwReg  *)0x41004414U) /**< \brief (PORT) Data Output Value Clear 0 */
-#define REG_PORT_OUTSET0           (*(RwReg  *)0x41004418U) /**< \brief (PORT) Data Output Value Set 0 */
-#define REG_PORT_OUTTGL0           (*(RwReg  *)0x4100441CU) /**< \brief (PORT) Data Output Value Toggle 0 */
-#define REG_PORT_IN0               (*(RoReg  *)0x41004420U) /**< \brief (PORT) Data Input Value 0 */
-#define REG_PORT_CTRL0             (*(RwReg  *)0x41004424U) /**< \brief (PORT) Control 0 */
-#define REG_PORT_WRCONFIG0         (*(WoReg  *)0x41004428U) /**< \brief (PORT) Write Configuration 0 */
-#define REG_PORT_PMUX0             (*(RwReg  *)0x41004430U) /**< \brief (PORT) Peripheral Multiplexing 0 */
-#define REG_PORT_PINCFG0           (*(RwReg  *)0x41004440U) /**< \brief (PORT) Pin Configuration 0 */
-#define REG_PORT_DIR1              (*(RwReg  *)0x41004480U) /**< \brief (PORT) Data Direction 1 */
-#define REG_PORT_DIRCLR1           (*(RwReg  *)0x41004484U) /**< \brief (PORT) Data Direction Clear 1 */
-#define REG_PORT_DIRSET1           (*(RwReg  *)0x41004488U) /**< \brief (PORT) Data Direction Set 1 */
-#define REG_PORT_DIRTGL1           (*(RwReg  *)0x4100448CU) /**< \brief (PORT) Data Direction Toggle 1 */
-#define REG_PORT_OUT1              (*(RwReg  *)0x41004490U) /**< \brief (PORT) Data Output Value 1 */
-#define REG_PORT_OUTCLR1           (*(RwReg  *)0x41004494U) /**< \brief (PORT) Data Output Value Clear 1 */
-#define REG_PORT_OUTSET1           (*(RwReg  *)0x41004498U) /**< \brief (PORT) Data Output Value Set 1 */
-#define REG_PORT_OUTTGL1           (*(RwReg  *)0x4100449CU) /**< \brief (PORT) Data Output Value Toggle 1 */
-#define REG_PORT_IN1               (*(RoReg  *)0x410044A0U) /**< \brief (PORT) Data Input Value 1 */
-#define REG_PORT_CTRL1             (*(RwReg  *)0x410044A4U) /**< \brief (PORT) Control 1 */
-#define REG_PORT_WRCONFIG1         (*(WoReg  *)0x410044A8U) /**< \brief (PORT) Write Configuration 1 */
-#define REG_PORT_PMUX1             (*(RwReg  *)0x410044B0U) /**< \brief (PORT) Peripheral Multiplexing 1 */
-#define REG_PORT_PINCFG1           (*(RwReg  *)0x410044C0U) /**< \brief (PORT) Pin Configuration 1 */
-#define REG_PORT_DIR2              (*(RwReg  *)0x41004500U) /**< \brief (PORT) Data Direction 2 */
-#define REG_PORT_DIRCLR2           (*(RwReg  *)0x41004504U) /**< \brief (PORT) Data Direction Clear 2 */
-#define REG_PORT_DIRSET2           (*(RwReg  *)0x41004508U) /**< \brief (PORT) Data Direction Set 2 */
-#define REG_PORT_DIRTGL2           (*(RwReg  *)0x4100450CU) /**< \brief (PORT) Data Direction Toggle 2 */
-#define REG_PORT_OUT2              (*(RwReg  *)0x41004510U) /**< \brief (PORT) Data Output Value 2 */
-#define REG_PORT_OUTCLR2           (*(RwReg  *)0x41004514U) /**< \brief (PORT) Data Output Value Clear 2 */
-#define REG_PORT_OUTSET2           (*(RwReg  *)0x41004518U) /**< \brief (PORT) Data Output Value Set 2 */
-#define REG_PORT_OUTTGL2           (*(RwReg  *)0x4100451CU) /**< \brief (PORT) Data Output Value Toggle 2 */
-#define REG_PORT_IN2               (*(RoReg  *)0x41004520U) /**< \brief (PORT) Data Input Value 2 */
-#define REG_PORT_CTRL2             (*(RwReg  *)0x41004524U) /**< \brief (PORT) Control 2 */
-#define REG_PORT_WRCONFIG2         (*(WoReg  *)0x41004528U) /**< \brief (PORT) Write Configuration 2 */
-#define REG_PORT_PMUX2             (*(RwReg  *)0x41004530U) /**< \brief (PORT) Peripheral Multiplexing 2 */
-#define REG_PORT_PINCFG2           (*(RwReg  *)0x41004540U) /**< \brief (PORT) Pin Configuration 2 */
+#define REG_PORT_DIR0              (*(RwReg  *)0x41004400UL) /**< \brief (PORT) Data Direction 0 */
+#define REG_PORT_DIRCLR0           (*(RwReg  *)0x41004404UL) /**< \brief (PORT) Data Direction Clear 0 */
+#define REG_PORT_DIRSET0           (*(RwReg  *)0x41004408UL) /**< \brief (PORT) Data Direction Set 0 */
+#define REG_PORT_DIRTGL0           (*(RwReg  *)0x4100440CUL) /**< \brief (PORT) Data Direction Toggle 0 */
+#define REG_PORT_OUT0              (*(RwReg  *)0x41004410UL) /**< \brief (PORT) Data Output Value 0 */
+#define REG_PORT_OUTCLR0           (*(RwReg  *)0x41004414UL) /**< \brief (PORT) Data Output Value Clear 0 */
+#define REG_PORT_OUTSET0           (*(RwReg  *)0x41004418UL) /**< \brief (PORT) Data Output Value Set 0 */
+#define REG_PORT_OUTTGL0           (*(RwReg  *)0x4100441CUL) /**< \brief (PORT) Data Output Value Toggle 0 */
+#define REG_PORT_IN0               (*(RoReg  *)0x41004420UL) /**< \brief (PORT) Data Input Value 0 */
+#define REG_PORT_CTRL0             (*(RwReg  *)0x41004424UL) /**< \brief (PORT) Control 0 */
+#define REG_PORT_WRCONFIG0         (*(WoReg  *)0x41004428UL) /**< \brief (PORT) Write Configuration 0 */
+#define REG_PORT_PMUX0             (*(RwReg  *)0x41004430UL) /**< \brief (PORT) Peripheral Multiplexing 0 */
+#define REG_PORT_PINCFG0           (*(RwReg  *)0x41004440UL) /**< \brief (PORT) Pin Configuration 0 */
+#define REG_PORT_DIR1              (*(RwReg  *)0x41004480UL) /**< \brief (PORT) Data Direction 1 */
+#define REG_PORT_DIRCLR1           (*(RwReg  *)0x41004484UL) /**< \brief (PORT) Data Direction Clear 1 */
+#define REG_PORT_DIRSET1           (*(RwReg  *)0x41004488UL) /**< \brief (PORT) Data Direction Set 1 */
+#define REG_PORT_DIRTGL1           (*(RwReg  *)0x4100448CUL) /**< \brief (PORT) Data Direction Toggle 1 */
+#define REG_PORT_OUT1              (*(RwReg  *)0x41004490UL) /**< \brief (PORT) Data Output Value 1 */
+#define REG_PORT_OUTCLR1           (*(RwReg  *)0x41004494UL) /**< \brief (PORT) Data Output Value Clear 1 */
+#define REG_PORT_OUTSET1           (*(RwReg  *)0x41004498UL) /**< \brief (PORT) Data Output Value Set 1 */
+#define REG_PORT_OUTTGL1           (*(RwReg  *)0x4100449CUL) /**< \brief (PORT) Data Output Value Toggle 1 */
+#define REG_PORT_IN1               (*(RoReg  *)0x410044A0UL) /**< \brief (PORT) Data Input Value 1 */
+#define REG_PORT_CTRL1             (*(RwReg  *)0x410044A4UL) /**< \brief (PORT) Control 1 */
+#define REG_PORT_WRCONFIG1         (*(WoReg  *)0x410044A8UL) /**< \brief (PORT) Write Configuration 1 */
+#define REG_PORT_PMUX1             (*(RwReg  *)0x410044B0UL) /**< \brief (PORT) Peripheral Multiplexing 1 */
+#define REG_PORT_PINCFG1           (*(RwReg  *)0x410044C0UL) /**< \brief (PORT) Pin Configuration 1 */
+#define REG_PORT_DIR2              (*(RwReg  *)0x41004500UL) /**< \brief (PORT) Data Direction 2 */
+#define REG_PORT_DIRCLR2           (*(RwReg  *)0x41004504UL) /**< \brief (PORT) Data Direction Clear 2 */
+#define REG_PORT_DIRSET2           (*(RwReg  *)0x41004508UL) /**< \brief (PORT) Data Direction Set 2 */
+#define REG_PORT_DIRTGL2           (*(RwReg  *)0x4100450CUL) /**< \brief (PORT) Data Direction Toggle 2 */
+#define REG_PORT_OUT2              (*(RwReg  *)0x41004510UL) /**< \brief (PORT) Data Output Value 2 */
+#define REG_PORT_OUTCLR2           (*(RwReg  *)0x41004514UL) /**< \brief (PORT) Data Output Value Clear 2 */
+#define REG_PORT_OUTSET2           (*(RwReg  *)0x41004518UL) /**< \brief (PORT) Data Output Value Set 2 */
+#define REG_PORT_OUTTGL2           (*(RwReg  *)0x4100451CUL) /**< \brief (PORT) Data Output Value Toggle 2 */
+#define REG_PORT_IN2               (*(RoReg  *)0x41004520UL) /**< \brief (PORT) Data Input Value 2 */
+#define REG_PORT_CTRL2             (*(RwReg  *)0x41004524UL) /**< \brief (PORT) Control 2 */
+#define REG_PORT_WRCONFIG2         (*(WoReg  *)0x41004528UL) /**< \brief (PORT) Write Configuration 2 */
+#define REG_PORT_PMUX2             (*(RwReg  *)0x41004530UL) /**< \brief (PORT) Peripheral Multiplexing 2 */
+#define REG_PORT_PINCFG2           (*(RwReg  *)0x41004540UL) /**< \brief (PORT) Pin Configuration 2 */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for PORT peripheral ========== */

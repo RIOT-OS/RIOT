@@ -42,7 +42,7 @@ WiFi        | built in
 Vcc         | 2.5 - 3.6 V
 Datasheet   | [Datasheet](https://www.espressif.com/sites/default/files/documentation/0a-esp8266ex_datasheet_en.pdf)
 Technical Reference | [Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf)
-Board Schematic | [Board Schematic](https://github.com/OLIMEX/ESP8266/raw/master/HARDWARE/MOD-WIFI-ESP8266-DEV/MOD-WIFI-ESP8266-DEV_schematic.pdf)
+Board Schematic | [Board Schematic](https://github.com/OLIMEX/ESP8266/blob/master/HARDWARE/MOD-WIFI-ESP8266-DEV/MOD-WiFi-ESP8266-DEV%20revision%20B1/MOD-WiFi-ESP8266-DEV_Rev_B1.pdf)
 </center>
 
 @note For detailed information about ESP8266, see \ref esp8266_riot.

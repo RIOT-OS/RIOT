@@ -20,4 +20,7 @@ USEMODULE += netstats_l2
 #   open(/dev/net/tun): No such file or directory
 TEST_ON_CI_BLACKLIST += native
 
+# sometimes fails on esp32, see #14237.
+TEST_ON_CI_BLACKLIST += esp32-wroom-32
+
 include $(RIOTBASE)/Makefile.include

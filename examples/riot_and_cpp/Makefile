@@ -10,7 +10,7 @@ RIOTBASE ?= $(CURDIR)/../..
 # Uncomment these lines if you want to use platform support from external
 # repositories:
 #RIOTCPU ?= $(CURDIR)/../../../thirdparty_cpu
-#BOARDSDIR ?= $(CURDIR)/../../../thirdparty_boards
+#EXTERNAL_BOARD_DIRS ?= $(CURDIR)/../../../thirdparty_boards
 
 # Uncomment this to enable scheduler statistics for ps:
 #CFLAGS += -DSCHEDSTATISTICS
@@ -28,7 +28,8 @@ DEVELHELP ?= 1
 QUIET ?= 1
 
 # Features required
-FEATURES_REQUIRED += cpp
+FEATURES_REQUIRED += cpp # basic C++ support
+FEATURES_REQUIRED += libstdcpp # libstdc++ support (for #include <cstdio>)
 
 # If you want to add some extra flags when compile c++ files, add these flags
 # to CXXEXFLAGS variable

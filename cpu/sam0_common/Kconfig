@@ -1,0 +1,33 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_COMMON_SAM0
+    bool
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_DMA
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_FLASHPAGE_RWEE
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_I2C_RECONFIGURE
+    select HAS_PERIPH_SPI_RECONFIGURE
+    select HAS_PERIPH_TIMER_PERIODIC
+    select HAS_PERIPH_UART_MODECFG
+    select HAS_PERIPH_UART_NONBLOCKING
+    select HAS_PERIPH_UART_RECONFIGURE
+    select HAS_PERIPH_WDT
+    select HAS_PERIPH_WDT_CB
+    select HAS_PERIPH_WDT_WARNING_PERIOD
+
+if CPU_COMMON_SAM0
+
+rsource "periph/Kconfig"
+
+endif # CPU_COMMON_SAM0
+
+source "$(RIOTCPU)/cortexm_common/Kconfig"

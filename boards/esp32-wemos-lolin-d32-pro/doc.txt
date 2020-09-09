@@ -32,8 +32,11 @@ Wemos LOLIN D32 Pro is a development board that uses the ESP32-WROVER module whi
 
 Wemos LOLIN D32 Pro belongs to the class of general purpose boards where most ESP32 pins are broken out for easier access.
 
-\htmlonly<style>div.image img[src="https://wiki.wemos.cc/_media/products:d32:d32_pro_v2.0.0_1_16x9.jpg"]{width:600px;}</style>\endhtmlonly
-@image html "https://wiki.wemos.cc/_media/products:d32:d32_pro_v2.0.0_1_16x9.jpg" "Wemos LOLIN D32 PRO"
+\htmlonly<style>div.image
+img[src="https://docs.wemos.cc/en/latest/_static/boards/d32_pro_v2.0.0_1_16x16.jpg"]
+{width:400px;}</style>\endhtmlonly
+@image html
+"https://docs.wemos.cc/en/latest/_static/boards/d32_pro_v2.0.0_1_16x16.jpg" "Wemos LOLIN D32 PRO"
 
 ## <a name="hardware"> Hardware </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -46,37 +49,8 @@ This section describes
 
 ### <a name="mcu"> MCU </a> &nbsp;&nbsp; [[TOC](#toc)]
 
-Most features of the board are provided by the ESP32 SoC. The following table summarizes these features and gives an overview of which of these features are supported by RIOT. For detailed information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
-
-<center>
-MCU         | ESP32     | Supported by RIOT
-------------|-----------|------------------
-Vendor      | Espressif | |
-Cores       | 1 or 2 x Tensilica Xtensa LX6 | 1 core
-FPU         | yes (ULP - Ultra low power co-processor) | no
-RAM         | 520 kByte SRAM <br> 16 kByte  RTC SRAM | yes
-ROM         | 448 kByte | yes
-Flash       | 512 kByte ... 16 MByte |  yes
-Frequency   | 240 MHz, 160 MHz, 80 MHz | yes
-Power Consumption | 68 mA @ 240 MHz <br> 44 mA @ 160 MHz <br> 31 mA @ 80 MHz <br> 5 uA in deep sleep mode | yes <br> yes <br> yes <br> no
-Timers      | 4 x 64 bit | yes
-ADCs        | 2 x SAR-ADC with up to 18 x 12 bit channels total | yes
-DACs        | 2 x DAC with 8 bit | yes
-GPIOs       | 34 (6 of them are only inputs) | yes
-I2Cs        | 2 | yes
-SPIs        | 4 | yes
-UARTs       | 3 | yes
-WiFi        | IEEE 802.11 b/g/n built in | yes
-Bluetooth   | v4.2 BR/EDR and BLE | no
-Ethernet    | MAC interface with dedicated DMA and IEEE 1588 support | yes
-CAN         | version 2.0 | yes
-IR          | up to 8 channels TX/RX | no
-Motor PWM   | 2 devices x 6 channels | yes
-LED PWM     | 16 channels | no
-Crypto      | Hardware acceleration of AES, SHA-2, RSA, ECC, RNG | no
-Vcc         | 2.5 - 3.6 V | |
-Documents   | [Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) <br> [Technical Reference](https://www.espressif.com/sites/default/files/documentation/esp32_technical_reference_manual_en.pdf) | |
-</center>
+Most features of the board are provided by the ESP32 SoC. For detailed
+information about the ESP32, see section \ref esp32_mcu "MCU ESP32".
 
 ### <a name="board_configuration"> Board Configuration </a> &nbsp;&nbsp; [[TOC](#toc)]
 
@@ -158,7 +132,8 @@ For other parameters, the default values defined by the drivers can be used.
 
 The following picture shows the pinout of WEMOS LOLIN D32 PRO board as defined by the default board configuration. The light green GPIOs are not used by configured on-board hardware components and can be used for any purpose. However, if optional off-board hardware modules are used, these GPIOs may also be occupied, see \ref esp32_wemos-lolin-d32-pro_table_board_configuration "optional functions" in table board configuration.
 
-The corresponding board schematic can be found [here](https://wiki.wemos.cc/_media/products:d32:sch_d32_pro_v2.0.0.pdf).
+The corresponding board schematic can be found [here]
+(https://docs.wemos.cc/en/latest/_static/files/sch_d32_pro_v2.0.0.pdf).
 
 \anchor esp32_wemos-lolin-d32-pro_pinout
 @image html "https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp32/Wemos_LOLIN_D32_PRO_pinout.png?inline=false" "Wemos LOLIN D32 PRO pinout"

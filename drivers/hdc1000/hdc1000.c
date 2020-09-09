@@ -130,7 +130,7 @@ int hdc1000_read(const hdc1000_t *dev, int16_t *temp, int16_t *hum)
     if (hdc1000_trigger_conversion(dev) != HDC1000_OK) {
         return HDC1000_BUSERR;
     }
-    xtimer_usleep(HDC1000_CONVERSION_TIME);
+    xtimer_usleep(CONFIG_HDC1000_CONVERSION_TIME);
     return hdc1000_get_results(dev, temp, hum);
 }
 

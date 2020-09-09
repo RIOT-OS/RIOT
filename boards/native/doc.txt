@@ -6,8 +6,8 @@
 [Family: native](https://github.com/RIOT-OS/RIOT/wiki/Family:-native)
 
 # Overview
-![Terminal running RIOT native](https://raw.githubusercontent.com/wiki/RIOT-
-OS/RIOT/images/Native.jpg)
+![Terminal running RIOT native]
+(https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/Native.jpg)
 
 # Hardware
 - CPU: Host CPU
@@ -20,4 +20,12 @@ OS/RIOT/images/Native.jpg)
 - PWM: Dummy PWM
 - QDEC: Emulated according to PWM
 - SPI: Runtime configurable - `/dev/spidev*` are supported (Linux host only)
+
+# Building native with debug flags
+@deprecated `make all-debug` is deprecated; `make all` now builds with debugs
+            flags by default. The target will be removed after the 2020.10
+            release.
+
+To build with debug flags for `native` use `make all-debug` instead of
+`make all`
  */

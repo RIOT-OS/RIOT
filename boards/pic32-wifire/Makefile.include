@@ -1,6 +1,3 @@
-export APPDEPS += $(RIOTCPU)/$(CPU)/$(CPU_MODEL)/$(CPU_MODEL).S
-export USE_UHI_SYSCALLS = 1
-
 PORT_LINUX ?= /dev/ttyUSB0
 include $(RIOTMAKE)/tools/serial.inc.mk
 
@@ -17,10 +14,11 @@ ifeq ($(PROGRAMMER),pic32prog)
   # * https://docs.creatordev.io/wifire/guides/wifire-programming/
   # * The triangle `▶` goes into the port number 1 (a hole with a square around it)
   #   opposite side of the JP1 ICSP text.
+  FLASHFILE ?= $(HEXFILE)
   include $(RIOTMAKE)/tools/pic32prog.inc.mk
 else ifeq ($(PROGRAMMER),jlink)
   FLASHFILE ?= $(HEXFILE)
-  export JLINK_DEVICE := PIC32MZ2048EFG100
-  export JLINK_IF := JTAG
+  JLINK_DEVICE = PIC32MZ2048EFG100
+  JLINK_IF = JTAG
   include $(RIOTMAKE)/tools/jlink.inc.mk
 endif

@@ -22,9 +22,9 @@
 #include "periph_cpu.h"
 #include "f7/cfg_clock_216_8_1.h"
 #include "cfg_i2c1_pb8_pb9.h"
-#include "cfg_spi_divtable.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
+#include "cfg_usb_otg_fs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +34,6 @@ extern "C" {
  * @name    DMA streams configuration
  * @{
  */
-#ifdef MODULE_PERIPH_DMA
 static const dma_conf_t dma_config[] = {
     { .stream = 4 },    /* DMA1 Stream 4 - USART3_TX */
     { .stream = 14 },   /* DMA2 Stream 6 - USART6_TX */
@@ -48,7 +47,6 @@ static const dma_conf_t dma_config[] = {
 #define DMA_3_ISR  isr_dma2_stream0
 
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
-#endif
 /** @} */
 
 /**
@@ -109,15 +107,21 @@ static const uart_conf_t uart_config[] = {
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI1,
+        /* PA7 is the default MOSI pin, as it is required for compatibility with
+         * Arduino(ish) shields. Sadly, it is also connected to the RMII_DV of
+         * Ethernet PHY. We work around this by remapping the MOSI to PB5 when
+         * the on-board Ethernet PHY is used.
+         */
+#ifdef MODULE_PERIPH_ETH
+        .mosi_pin = GPIO_PIN(PORT_B, 5),
+#else
         .mosi_pin = GPIO_PIN(PORT_A, 7),
+#endif
         .miso_pin = GPIO_PIN(PORT_A, 6),
         .sclk_pin = GPIO_PIN(PORT_A, 5),
         .cs_pin   = GPIO_UNDEF,
@@ -169,12 +173,6 @@ static const eth_conf_t eth_config = {
         GPIO_PIN(PORT_A, 1),
     }
 };
-
-#define ETH_RX_BUFFER_COUNT (4)
-#define ETH_TX_BUFFER_COUNT (4)
-
-#define ETH_RX_BUFFER_SIZE (1524)
-#define ETH_TX_BUFFER_SIZE (1524)
 
 #define ETH_DMA_ISR        isr_dma2_stream0
 

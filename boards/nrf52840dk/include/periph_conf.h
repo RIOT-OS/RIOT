@@ -32,10 +32,16 @@ extern "C" {
  */
 static const spi_conf_t spi_config[] = {
     {
-        .dev  = NRF_SPI0,
+        .dev  = NRF_SPIM0,
         .sclk = GPIO_PIN(1, 15),
         .mosi = GPIO_PIN(1, 13),
         .miso = GPIO_PIN(1, 14),
+    },
+    {
+        .dev  = NRF_SPIM2,
+        .sclk = GPIO_PIN(0, 19),
+        .mosi = GPIO_PIN(0, 20),
+        .miso = GPIO_PIN(0, 21),
     }
 };
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
@@ -50,16 +56,20 @@ static const uart_conf_t uart_config[] = {
         .dev        = NRF_UARTE0,
         .rx_pin     = GPIO_PIN(0,8),
         .tx_pin     = GPIO_PIN(0,6),
-        .rts_pin    = (uint8_t)GPIO_UNDEF,
-        .cts_pin    = (uint8_t)GPIO_UNDEF,
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin    = GPIO_UNDEF,
+        .cts_pin    = GPIO_UNDEF,
+#endif
         .irqn       = UARTE0_UART0_IRQn,
     },
     { /* Mapped to Arduino D0/D1 pins */
         .dev        = NRF_UARTE1,
         .rx_pin     = GPIO_PIN(1,1),
         .tx_pin     = GPIO_PIN(1,2),
-        .rts_pin    = (uint8_t)GPIO_UNDEF,
-        .cts_pin    = (uint8_t)GPIO_UNDEF,
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin    = GPIO_UNDEF,
+        .cts_pin    = GPIO_UNDEF,
+#endif
         .irqn       = UARTE1_IRQn,
     },
 };

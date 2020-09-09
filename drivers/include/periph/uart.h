@@ -182,6 +182,69 @@ typedef enum {
  */
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg);
 
+#if defined(MODULE_PERIPH_UART_RECONFIGURE) || DOXYGEN
+/**
+ * @brief   Change the pins of the given UART back to plain GPIO functionality
+ *
+ * The pin mux of the RX and TX pins of the bus will be changed back to
+ * default (GPIO) mode and the UART is powered off.
+ * This allows to use the UART pins for another function and return to UART
+ * functionality again by calling @ref uart_init_pins
+ *
+ * If you want the pin to be in a defined state, call @ref gpio_init on it.
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_uart_reconfigure feature to be used.
+ *
+ * @param[in] uart      the device to de-initialize
+ */
+void uart_deinit_pins(uart_t uart);
+
+/**
+ * @brief   Initialize the used UART pins, i.e. RX and TX
+ *
+ *
+ * After calling uart_init, the pins must be initialized (i.e. uart_init is
+ * calling this function internally). In normal cases, this function will not
+ * be used. But there are some devices, that use UART bus lines also for other
+ * purposes and need the option to dynamically re-configure one or more of the
+ * used pins. So they can take control over certain pins and return control back
+ * to the UART driver using this function.
+ *
+ * The pins used are configured in the board's periph_conf.h.
+ *
+ * @param[in] uart      UART device the pins are configure for
+ */
+void uart_init_pins(uart_t uart);
+
+#if DOXYGEN
+/**
+ * @brief   Get the RX pin of the given UART.
+ *
+ * @param[in] uart      The device to query
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_uart_reconfigure feature to be used.
+ *
+ * @return              The GPIO used for the UART RX line.
+ */
+gpio_t uart_pin_rx(uart_t uart);
+
+/**
+ * @brief   Get the TX pin of the given UART.
+ *
+ * @param[in] uart      The device to query
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_uart_reconfigure feature to be used.
+ *
+ * @return              The GPIO used for the UART TX line.
+ */
+gpio_t uart_pin_tx(uart_t uart);
+
+#endif /* DOXYGEN */
+#endif /* MODULE_PERIPH_UART_RECONFIGURE */
+
 /**
  * @brief   Setup parity, data and stop bits for a given UART device
  *

@@ -126,10 +126,10 @@ void i2c_init(i2c_t dev)
     I2C_Init(i2c_config[dev].dev, &init);
 
     /* configure pin functions */
-#ifdef _SILICON_LABS_32B_SERIES_0
+#if defined(_SILICON_LABS_32B_SERIES_0)
     i2c_config[dev].dev->ROUTE = (i2c_config[dev].loc |
                                   I2C_ROUTE_SDAPEN | I2C_ROUTE_SCLPEN);
-#else
+#elif defined(_SILICON_LABS_32B_SERIES_1)
     i2c_config[dev].dev->ROUTEPEN = I2C_ROUTEPEN_SDAPEN | I2C_ROUTEPEN_SCLPEN;
     i2c_config[dev].dev->ROUTELOC0 = i2c_config[dev].loc;
 #endif

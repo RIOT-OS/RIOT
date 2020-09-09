@@ -38,7 +38,7 @@ extern "C" {
 /**
  * @brief   Configuration register values for CC1100/CC1101 transceivers
  */
-extern const char cc110x_conf[CC110X_CONF_SIZE];
+extern const uint8_t cc110x_conf[CC110X_CONF_SIZE];
 
 /**
  * @brief   Magic numbers to write to the TEST2, TEST1 and TEST0 configuration
@@ -51,7 +51,7 @@ extern const char cc110x_conf[CC110X_CONF_SIZE];
  * transceiver configuration, those numbers should be checked again with the
  * SmartRF Studio
  */
-extern const char cc110x_magic_registers[3];
+extern const uint8_t cc110x_magic_registers[3];
 
 /**
  * @name    Configuration data that specify the 8 available output power levels

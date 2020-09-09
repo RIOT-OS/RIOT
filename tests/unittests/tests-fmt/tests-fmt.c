@@ -176,6 +176,9 @@ static void test_fmt_hex_bytes(void)
     TEST_ASSERT_EQUAL_INT(0, val);
     TEST_ASSERT_EQUAL_INT(0, bytes);
 
+    bytes = fmt_hex_bytes(NULL, "ABCDEF");
+    TEST_ASSERT_EQUAL_INT(3, bytes);
+
     char hex2[3] = "00";
     uint8_t val1[1] = { 0 };
     bytes = fmt_hex_bytes(val1, hex2);

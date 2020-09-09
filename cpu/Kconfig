@@ -1,0 +1,66 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+#   +-----------+
+#   | CPU_MODEL |
+#   +-----------+
+#        || selects
+#        \/
+#  +------------+
+#  |  CPU_FAM   |
+#  +------------+
+#        || selects
+#        \/
+#  +------------+
+#  |  CPU_CORE  |
+#  +------------+
+#        || selects
+#        \/
+#   +----------+
+#   | CPU_ARCH |
+#   +----------+
+
+config CPU
+    string
+    help
+        Name of the currently selected CPU. This reflects the Makefile variable
+        used by the build system as entry point in the cpu folder.
+
+config CPU_MODEL
+    string
+    help
+        Model of the currently selected CPU.
+
+config CPU_FAM
+    string
+    help
+        Family of the currently selected CPU. It is an identifier that
+        represents a sub-group of a Manufacturers CPU's. All CPU models
+        belonging to the same family, usually share the same core and have
+        similar register mapping.
+
+config CPU_CORE
+    string
+    help
+        Core of the currently selected CPU.
+
+config CPU_ARCH
+    string
+    help
+        Architecture of the currently selected CPU.
+
+config MODULE_CPU
+    bool
+    default y
+    depends on TEST_KCONFIG
+    help
+        Module which holds all CPU-specific files.
+
+config MODULE_PERIPH
+    bool
+    depends on TEST_KCONFIG
+    help
+        CPU peripheral implementations module.

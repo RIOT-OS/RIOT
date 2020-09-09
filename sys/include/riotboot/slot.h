@@ -94,6 +94,11 @@ static inline void riotboot_slot_print_hdr(unsigned slot)
 }
 
 /**
+ * @brief Get the offset (in flash, in bytes) for a given slot.
+ */
+size_t riotboot_slot_offset(unsigned slot);
+
+/**
  * @brief  Dump the addresses of all configured slots
  *
  */

@@ -16,7 +16,7 @@ import time
 
 from scapy.all import Ether, ICMPv6PacketTooBig, IPv6, IPv6ExtHdrFragment, \
                       UDP, raw, sendp, srp1
-from testrunner import run
+from testrunner import run, check_unittests
 
 
 RECV_BUFSIZE = 2 * 1500
@@ -319,8 +319,8 @@ def testfunc(child):
     tap = get_bridge(os.environ["TAP"])
 
     child.sendline("unittests")
-    child.expect(r"OK \((\d+) tests\)")     # wait for and check result of unittests
-    print("." * int(child.match.group(1)), end="", flush=True)
+    # wait for and check result of unittests
+    print("." * check_unittests(child), end="", flush=True)
 
     lladdr_src = get_host_lladdr(tap)
 

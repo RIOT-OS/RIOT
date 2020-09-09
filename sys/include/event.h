@@ -97,10 +97,13 @@
 #define EVENT_H
 
 #include <stdint.h>
+#include <string.h>
 
-#include "irq.h"
-#include "thread_flags.h"
+#include "assert.h"
 #include "clist.h"
+#include "irq.h"
+#include "thread.h"
+#include "thread_flags.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -116,7 +119,7 @@ extern "C" {
 /**
  * @brief   event_queue_t static initializer
  */
-#define EVENT_QUEUE_INIT    { .waiter = (thread_t *)sched_active_thread }
+#define EVENT_QUEUE_INIT    { .waiter = thread_get_active() }
 
 /**
  * @brief   static initializer for detached event queues
@@ -149,6 +152,26 @@ typedef struct {
     thread_t *waiter;           /**< thread ownning event queue         */
 } event_queue_t;
 
+
+/**
+ * @brief   Initialize an array of event queues
+ *
+ * This will set the calling thread as owner of each queue in @p queues.
+ *
+ * @param[out]  queues      event queue objects to initialize
+ * @param[in]   n_queues    number of queues in @p queues
+ */
+static inline void event_queues_init(event_queue_t *queues,
+                                          size_t n_queues)
+{
+    assert(queues && n_queues);
+    thread_t *me = thread_get_active();
+    for (size_t i = 0; i < n_queues; i++) {
+        memset(&queues[i], '\0', sizeof(queues[0]));
+        queues[i].waiter = me;
+    }
+}
+
 /**
  * @brief   Initialize an event queue
  *
@@ -156,14 +179,56 @@ typedef struct {
  *
  * @param[out]  queue   event queue object to initialize
  */
-void event_queue_init(event_queue_t *queue);
+static inline void event_queue_init(event_queue_t *queue)
+{
+    event_queues_init(queue, 1);
+}
+
+/**
+ * @brief   Initialize an array of event queues not binding it to a thread
+ *
+ * @param[out]  queues      event queue objects to initialize
+ * @param[in]   n_queues    number of queues in @p queues
+ */
+static inline void event_queues_init_detached(event_queue_t *queues,
+                                             size_t n_queues)
+{
+    assert(queues);
+    for (size_t i = 0; i < n_queues; i++) {
+        memset(&queues[i], '\0', sizeof(queues[0]));
+    }
+}
 
 /**
  * @brief   Initialize an event queue not binding it to a thread
  *
  * @param[out]  queue   event queue object to initialize
  */
-void event_queue_init_detached(event_queue_t *queue);
+static inline void event_queue_init_detached(event_queue_t *queue)
+{
+    event_queues_init_detached(queue, 1);
+}
+
+/**
+ * @brief   Bind an array of event queues to the calling thread
+ *
+ * This function must only be called once and only if the given queue is not
+ * yet bound to a thread.
+ *
+ * @pre     (queues[i].waiter == NULL for i in {0, ..., n_queues - 1})
+ *
+ * @param[out]  queues      event queue objects to bind to a thread
+ * @param[in]   n_queues    number of queues in @p queues
+ */
+static inline void event_queues_claim(event_queue_t *queues, size_t n_queues)
+{
+    assert(queues);
+    thread_t *me = thread_get_active();
+    for (size_t i = 0; i < n_queues; i++) {
+        assert(queues[i].waiter == NULL);
+        queues[i].waiter = me;
+    }
+}
 
 /**
  * @brief   Bind an event queue to the calling thread
@@ -175,7 +240,10 @@ void event_queue_init_detached(event_queue_t *queue);
  *
  * @param[out]  queue   event queue object to bind to a thread
  */
-void event_queue_claim(event_queue_t *queue);
+static inline void event_queue_claim(event_queue_t *queue)
+{
+    event_queues_claim(queue, 1);
+}
 
 /**
  * @brief   Queue an event
@@ -216,6 +284,35 @@ void event_cancel(event_queue_t *queue, event_t *event);
 event_t *event_get(event_queue_t *queue);
 
 /**
+ * @brief   Get next event from the given event queues, blocking
+ *
+ * This function will block until an event becomes available. If more than one
+ * queue contains an event, the queue with the lowest index is chosen. Thus,
+ * a lower index in the @p queues array translates into a higher priority of
+ * the queue.
+ *
+ * In order to handle an event retrieved using this function,
+ * call event->handler(event).
+ *
+ * @warning There can only be a single waiter on a queue!
+ *
+ * @note    This function *can* be suitable for having a single thread
+ *          handling both real-time and non-real-time events. However, a real
+ *          time event can be delayed for the whole duration a single
+ *          non-real-time event takes (in addition to all other sources of
+ *          latency). Thus, the slowest to handle non-real-time event must still
+ *          execute fast enough to add an amount of latency (on top of other
+ *          sources of latency) that is acceptable to the real-time event with
+ *          the strictest requirements.
+ *
+ * @param[in]   queues      Array of event queues to get event from
+ * @param[in]   n_queues    Number of event queues passed in @p queues
+ *
+ * @returns     pointer to next event
+ */
+event_t *event_wait_multi(event_queue_t *queues, size_t n_queues);
+
+/**
  * @brief   Get next event from event queue, blocking
  *
  * This function will block until an event becomes available.
@@ -223,13 +320,16 @@ event_t *event_get(event_queue_t *queue);
  * In order to handle an event retrieved using this function,
  * call event->handler(event).
  *
- * @note    There can only be a single waiter on a queue!
+ * @warning     There can only be a single waiter on a queue!
  *
  * @param[in]   queue   event queue to get event from
  *
  * @returns     pointer to next event
  */
-event_t *event_wait(event_queue_t *queue);
+static inline event_t *event_wait(event_queue_t *queue)
+{
+    return event_wait_multi(queue, 1);
+}
 
 #if defined(MODULE_XTIMER) || defined(DOXYGEN)
 /**
@@ -242,7 +342,48 @@ event_t *event_wait(event_queue_t *queue);
  * @return      NULL if timeout expired before an event was posted
  */
 event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout);
+
+/**
+ * @brief   Get next event from event queue, blocking until timeout expires
+ *
+ * @param[in]   queue    queue to query for an event
+ * @param[in]   timeout  maximum time to wait for an event to be posted in us
+ *
+ * @return      pointer to next event if event was taken from the queue
+ * @return      NULL if timeout expired before an event was posted
+ */
+event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout);
 #endif
+
+/**
+ * @brief   Simple event loop with multiple queues
+ *
+ * This function will forever sit in a loop, waiting for events to be queued
+ * and executing their handlers. If more than one queue contains an event, the
+ * queue with the lowest index is chosen. Thus, a lower index in the @p queues
+ * array translates into a higher priority of the queue.
+ *
+ * It is pretty much defined as:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ *     while ((event = event_wait_multi(queues, n_queues))) {
+ *         event->handler(event);
+ *     }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * @see event_wait_multi
+ *
+ * @param[in]   queues      Event queues to process
+ * @param[in]   n_queues    Number of queues passed with @p queues
+ */
+static inline void event_loop_multi(event_queue_t *queues, size_t n_queues)
+{
+    event_t *event;
+
+    while ((event = event_wait_multi(queues, n_queues))) {
+        event->handler(event);
+    }
+}
 
 /**
  * @brief   Simple event loop
@@ -260,7 +401,10 @@ event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout);
  *
  * @param[in]   queue   event queue to process
  */
-void event_loop(event_queue_t *queue);
+static inline void event_loop(event_queue_t *queue)
+{
+    event_loop_multi(queue, 1);
+}
 
 #ifdef __cplusplus
 }

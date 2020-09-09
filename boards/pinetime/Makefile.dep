@@ -1,0 +1,11 @@
+# Use Segger's RTT unless another stdio_% is already used
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_rtt
+endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_spi_nor
+endif
+
+# include common nrf52 dependencies
+include $(RIOTBOARD)/common/nrf52/Makefile.dep

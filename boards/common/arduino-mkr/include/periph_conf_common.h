@@ -90,11 +90,9 @@ static const tc32_conf_t timer_config[] = {
         .pm_mask        = PM_APBCMASK_TC3,
         .gclk_ctrl      = GCLK_CLKCTRL_ID_TCC2_TC3,
 #if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
-        .gclk_src       = GCLK_CLKCTRL_GEN(1),
-        .prescaler      = TC_CTRLA_PRESCALER_DIV1,
+        .gclk_src       = SAM0_GCLK_1MHZ,
 #else
-        .gclk_src       = GCLK_CLKCTRL_GEN(0),
-        .prescaler      = TC_CTRLA_PRESCALER_DIV8,
+        .gclk_src       = SAM0_GCLK_MAIN,
 #endif
         .flags          = TC_CTRLA_MODE_COUNT16,
     },
@@ -104,11 +102,9 @@ static const tc32_conf_t timer_config[] = {
         .pm_mask        = PM_APBCMASK_TC4 | PM_APBCMASK_TC5,
         .gclk_ctrl      = GCLK_CLKCTRL_ID_TC4_TC5,
 #if CLOCK_USE_PLL || CLOCK_USE_XOSC32_DFLL
-        .gclk_src       = GCLK_CLKCTRL_GEN(1),
-        .prescaler      = TC_CTRLA_PRESCALER_DIV1,
+        .gclk_src       = SAM0_GCLK_1MHZ,
 #else
-        .gclk_src       = GCLK_CLKCTRL_GEN(0),
-        .prescaler      = TC_CTRLA_PRESCALER_DIV8,
+        .gclk_src       = SAM0_GCLK_MAIN,
 #endif
         .flags          = TC_CTRLA_MODE_COUNT32,
     }
@@ -128,18 +124,20 @@ static const tc32_conf_t timer_config[] = {
  * @{
  */
 #define PWM_0_EN            1
-#define PWM_MAX_CHANNELS    (2U)
-/* for compatibility with test application */
-#define PWM_0_CHANNELS      PWM_MAX_CHANNELS
+
+#if PWM_0_EN
+/* PWM0 channels */
+static const pwm_conf_chan_t pwm_chan0_config[] = {
+    /* GPIO pin, MUX value, TCC channel */
+    { GPIO_PIN(PA, 10), GPIO_MUX_F, 2 },    /* ~2 */
+    { GPIO_PIN(PA, 11), GPIO_MUX_F, 3 },    /* ~3 */
+};
+#endif
 
 /* PWM device configuration */
 static const pwm_conf_t pwm_config[] = {
 #if PWM_0_EN
-    {TCC0, {
-        /* GPIO pin, MUX value, TCC channel */
-        { GPIO_PIN(PA, 10), GPIO_MUX_F, 2 },    /* ~2 */
-        { GPIO_PIN(PA, 11), GPIO_MUX_F, 3 },    /* ~3 */
-    }}
+    {TCC_CONFIG(TCC0), pwm_chan0_config, ARRAY_SIZE(pwm_chan0_config), SAM0_GCLK_MAIN},
 #endif
 };
 
@@ -184,7 +182,7 @@ static const i2c_conf_t i2c_config[] = {
         .scl_pin  = GPIO_PIN(PA, 9),
         .sda_pin  = GPIO_PIN(PA, 8),
         .mux      = GPIO_MUX_C,
-        .gclk_src = GCLK_CLKCTRL_GEN_GCLK0,
+        .gclk_src = SAM0_GCLK_MAIN,
         .flags    = I2C_FLAG_NONE
      }
 };
@@ -192,23 +190,12 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
- * @name RTC configuration
- * @{
- */
-#define RTC_DEV             RTC->MODE2
-/** @} */
-
-/**
  * @name RTT configuration
  * @{
  */
-#define RTT_DEV             RTC->MODE0
-#define RTT_IRQ             RTC_IRQn
-#define RTT_IRQ_PRIO        10
-#define RTT_ISR             isr_rtc
-#define RTT_MAX_VALUE       (0xffffffff)
+#ifndef RTT_FREQUENCY
 #define RTT_FREQUENCY       (32768U)    /* in Hz. For changes see `rtt.c` */
-#define RTT_RUNSTDBY        (1)         /* Keep RTT running in sleep states */
+#endif
 /** @} */
 
 /**
@@ -221,6 +208,7 @@ static const sam0_common_usb_config_t sam_usbdev_config[] = {
         .dp     = GPIO_PIN(PA, 25),
         .d_mux  = GPIO_MUX_G,
         .device = &USB->DEVICE,
+        .gclk_src = SAM0_GCLK_MAIN,
     }
 };
 /** @} */

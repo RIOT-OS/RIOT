@@ -4,12 +4,12 @@ BOARD_INSUFFICIENT_MEMORY := \
     blackpill \
     bluepill \
     calliope-mini \
-    cc1352-launchpad \
     cc2650-launchpad \
     cc2650stk \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \
+    im880b \
     lsn50 \
     maple-mini \
     microbit \

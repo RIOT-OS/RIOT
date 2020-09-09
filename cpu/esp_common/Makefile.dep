@@ -1,0 +1,86 @@
+# additional modules dependencies
+
+# Modules used by ESP*
+
+USEMODULE += esp_common
+USEMODULE += esp_common_periph
+USEMODULE += esp_freertos
+USEMODULE += esp_idf
+USEMODULE += log
+USEMODULE += newlib
+USEMODULE += periph
+USEMODULE += periph_hwrng
+USEMODULE += periph_flash
+USEMODULE += periph_uart
+USEMODULE += random
+
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_uart
+endif
+
+USEMODULE += xtensa
+
+# Features used by ESP*
+
+FEATURES_REQUIRED += cpp # Vendor code uses C++
+
+ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_wifi_enterprise
+  USEMODULE += esp_wifi
+endif
+
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  ifneq (,$(filter lwip,$(USEMODULE)))
+    # for lwip, use esp_wifi as default netdev if no other netdev is enabled
+    ifeq (,$(filter esp_eth,$(USEMODULE)))
+      USEMODULE += esp_wifi
+    endif
+  else
+    # otherwise use esp_now as default netdev if no other netdev is enabled
+    ifeq (,$(filter esp_wifi esp_eth,$(USEMODULE)))
+      USEMODULE += esp_now
+    endif
+  endif
+endif
+
+ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
+  USEMODULE += esp_gdb
+endif
+
+ifneq (,$(filter log_color,$(USEMODULE)))
+  USEMODULE += esp_log_colored
+endif
+
+ifneq (,$(filter 4 5,$(LOG_LEVEL)))
+  USEMODULE += esp_log_startup
+endif
+
+# each device has SPI flash memory, but it has to be enabled explicitly
+ifneq (,$(filter esp_spiffs,$(USEMODULE)))
+  USEMODULE += spiffs
+endif
+
+ifneq (,$(filter esp_freertos,$(USEMODULE)))
+  USEMODULE += esp_freertos_common
+endif
+
+ifneq (,$(filter esp_now,$(USEMODULE)))
+  USEMODULE += esp_wifi_any
+endif
+
+ifneq (,$(filter esp_wifi,$(USEMODULE)))
+  USEMODULE += esp_wifi_any
+  USEMODULE += netdev_eth
+endif
+
+ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
+  USEMODULE += netopt
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
+  LINKFLAGS += -Wl,-wrap,_malloc_r
+  LINKFLAGS += -Wl,-wrap,_calloc_r
+  LINKFLAGS += -Wl,-wrap,_realloc_r
+  LINKFLAGS += -Wl,-wrap,_free_r
+endif

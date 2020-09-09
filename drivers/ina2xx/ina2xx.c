@@ -52,8 +52,10 @@ static int ina2xx_read_reg(const ina2xx_t *dev, uint8_t reg, uint16_t *out)
     } tmp;
     int status = 0;
 
+    i2c_acquire(dev->params.i2c);
     status = i2c_read_regs(dev->params.i2c, dev->params.addr, reg, &tmp.c[0],
                            2, 0);
+    i2c_release(dev->params.i2c);
 
     if (status < 0) {
         return status;
@@ -74,8 +76,10 @@ static int ina2xx_write_reg(const ina2xx_t *dev, uint8_t reg, uint16_t in)
 
     tmp.u16 = htons(in);
 
+    i2c_acquire(dev->params.i2c);
     status = i2c_write_regs(dev->params.i2c, dev->params.addr, reg, &tmp.c[0],
                             2, 0);
+    i2c_release(dev->params.i2c);
 
     if (status < 0) {
         return status;
@@ -97,12 +101,14 @@ int ina2xx_init(ina2xx_t *dev, const ina2xx_params_t *params)
     /* Reset device */
     status = ina2xx_write_reg(dev, INA2XX_REG_CONFIGURATION, INA2XX_RESET);
     if (status < 0) {
+        DEBUG("[ina2xx]: Sending reset (write reg) failed with %d\n", status);
         return status;
     }
 
     /* Check if default config is preset after reset */
     status = ina2xx_read_reg(dev, INA2XX_REG_CONFIGURATION, &config);
     if (status < 0) {
+        DEBUG("[ina2xx]: Verifying device (read reg) failed with %d\n", status);
         return status;
     }
 
@@ -113,6 +119,7 @@ int ina2xx_init(ina2xx_t *dev, const ina2xx_params_t *params)
 
     status = ina2xx_write_reg(dev, INA2XX_REG_CONFIGURATION, params->config);
     if (status < 0) {
+        DEBUG("[ina2xx]: Setting configuration (write reg)  with %d\n", status);
         return status;
     }
 
@@ -129,7 +136,13 @@ int ina2xx_init(ina2xx_t *dev, const ina2xx_params_t *params)
         return -ERANGE;
     }
 
-    return ina2xx_write_reg(dev, INA2XX_REG_CALIBRATION, (uint16_t)calib);
+    status = ina2xx_write_reg(dev, INA2XX_REG_CALIBRATION, (uint16_t)calib);
+    if (status < 0) {
+        DEBUG("[ina2xx]: Setting calibration (write reg)  with %d\n", status);
+        return status;
+    }
+
+    return status;
 }
 
 int ina2xx_read_shunt(const ina2xx_t *dev, int16_t *voltage)

@@ -33,11 +33,21 @@ extern const void *_isr_vectors;
 
 CORTEXM_STATIC_INLINE void cortexm_init_isr_priorities(void)
 {
+#if CPU_CORTEXM_PRIORITY_GROUPING != 0
+    /* If defined, initialise priority subgrouping, see cpu_conf_common.h */
+    NVIC_SetPriorityGrouping(CPU_CORTEXM_PRIORITY_GROUPING);
+#endif
+
     /* initialize the interrupt priorities */
-    /* set pendSV interrupt to same priority as the rest */
-    NVIC_SetPriority(PendSV_IRQn, CPU_DEFAULT_IRQ_PRIO);
+    /* set pendSV interrupt to its own priority */
+    NVIC_SetPriority(PendSV_IRQn, CPU_CORTEXM_PENDSV_IRQ_PRIO);
     /* set SVC interrupt to same priority as the rest */
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
+    defined(CPU_FAM_STM32L1) || defined(CPU_FAM_STM32G0)
+    NVIC_SetPriority(SVC_IRQn, CPU_DEFAULT_IRQ_PRIO);
+#else
     NVIC_SetPriority(SVCall_IRQn, CPU_DEFAULT_IRQ_PRIO);
+#endif
     /* initialize all vendor specific interrupts with the same value */
     for (unsigned i = 0; i < CPU_IRQ_NUMOF; i++) {
         NVIC_SetPriority((IRQn_Type) i, CPU_DEFAULT_IRQ_PRIO);
@@ -63,9 +73,9 @@ void cortexm_init(void)
     cortexm_init_fpu();
 
     /* configure the vector table location to internal flash */
-#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
-    defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7) || \
-    (defined(CPU_ARCH_CORTEX_M0PLUS) || defined(CPU_ARCH_CORTEX_M23) \
+#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M4) || \
+    defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7) || \
+    (defined(CPU_CORE_CORTEX_M0PLUS) || defined(CPU_CORE_CORTEX_M23) \
     && (__VTOR_PRESENT == 1))
     SCB->VTOR = (uint32_t)&_isr_vectors;
 #endif
@@ -76,8 +86,8 @@ void cortexm_init(void)
 
 bool cpu_check_address(volatile const char *address)
 {
-#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
-    defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
+#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M4) || \
+    defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)
     static const uint32_t BFARVALID_MASK = (0x80 << SCB_CFSR_BUSFAULTSR_Pos);
 
     bool is_valid = true;

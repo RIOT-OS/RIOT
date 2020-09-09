@@ -16,11 +16,12 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <stdio.h>
+#include <kernel_defines.h>
 
 #include "net/gnrc/ipv6/nib/pl.h"
 #include "net/gnrc/netif/internal.h"
 #include "timex.h"
-#include "xtimer.h"
+#include "evtimer.h"
 
 #include "_nib-internal.h"
 #include "_nib-router.h"
@@ -58,7 +59,12 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
         return 0;
     }
     gnrc_netif_acquire(netif);
-    if (!gnrc_netif_is_6ln(netif) &&
+    /* prefixes within a 6Lo-ND-performing network are typically off-link, the
+     * border router however should configure the prefix as on-link to only do
+     * address resolution towards the LoWPAN and not the upstream interface
+     * See https://github.com/RIOT-OS/RIOT/pull/10627 and follow-ups
+     */
+    if ((!gnrc_netif_is_6ln(netif) || gnrc_netif_is_6lbr(netif)) &&
         ((idx = gnrc_netif_ipv6_addr_match(netif, pfx)) >= 0) &&
         (ipv6_addr_match_prefix(&netif->ipv6.addrs[idx], pfx) >= pfx_len)) {
         dst->flags |= _PFX_ON_LINK;
@@ -66,7 +72,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     if (netif->ipv6.aac_mode == GNRC_NETIF_AAC_AUTO) {
         dst->flags |= _PFX_SLAAC;
     }
-#if GNRC_IPV6_NIB_CONF_6LBR && GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     if (gnrc_netif_is_6lbr(netif)) {
         _nib_abr_entry_t *abr = NULL;
 
@@ -79,7 +85,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
     gnrc_netif_release(netif);
 #endif  /* MODULE_GNRC_NETIF */
     _nib_release();
-#if defined(MODULE_GNRC_NETIF) && GNRC_IPV6_NIB_CONF_ROUTER
+#if defined(MODULE_GNRC_NETIF) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
     /* update prefixes down-stream */
     _handle_snd_mc_ra(netif);
 #endif
@@ -100,7 +106,7 @@ void gnrc_ipv6_nib_pl_del(unsigned iface,
             (ipv6_addr_match_prefix(pfx, &dst->pfx) >= pfx_len)) {
             _nib_pl_remove(dst);
             _nib_release();
-#if GNRC_IPV6_NIB_CONF_ROUTER
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)
             gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
 
             if (netif) {
@@ -142,17 +148,17 @@ void gnrc_ipv6_nib_pl_print(gnrc_ipv6_nib_pl_t *entry)
 {
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
     ipv6_addr_t pfx = IPV6_ADDR_UNSPECIFIED;
-    uint32_t now = ((xtimer_now_usec64() / US_PER_MS)) & UINT32_MAX;
+    uint32_t now = evtimer_now_msec();
 
     ipv6_addr_init_prefix(&pfx, &entry->pfx, entry->pfx_len);
     printf("%s/%u ", ipv6_addr_to_str(addr_str, &pfx, sizeof(addr_str)),
            entry->pfx_len);
     printf("dev #%u ", entry->iface);
     if (entry->valid_until < UINT32_MAX) {
-        printf(" expires %" PRIu32 "sec", (entry->valid_until - now) / MS_PER_SEC);
+        printf(" expires %lu sec", (entry->valid_until - now) / MS_PER_SEC);
     }
     if (entry->pref_until < UINT32_MAX) {
-        printf(" deprecates %" PRIu32 "sec", (entry->pref_until - now) / MS_PER_SEC);
+        printf(" deprecates %lu sec", (entry->pref_until - now) / MS_PER_SEC);
     }
     puts("");
 }

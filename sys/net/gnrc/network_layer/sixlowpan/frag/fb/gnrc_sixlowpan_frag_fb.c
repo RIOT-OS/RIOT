@@ -22,7 +22,7 @@
 #include "net/gnrc/sixlowpan/frag/stats.h"
 #endif
 
-static gnrc_sixlowpan_frag_fb_t _fbs[GNRC_SIXLOWPAN_FRAG_FB_SIZE];
+static gnrc_sixlowpan_frag_fb_t _fbs[CONFIG_GNRC_SIXLOWPAN_FRAG_FB_SIZE];
 static uint16_t _current_tag;
 
 #ifdef TEST_SUITES
@@ -35,7 +35,7 @@ void gnrc_sixlowpan_frag_fb_reset(void)
 
 gnrc_sixlowpan_frag_fb_t *gnrc_sixlowpan_frag_fb_get(void)
 {
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_FB_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_FB_SIZE; i++) {
         if (_fbs[i].pkt == NULL) {
             return &_fbs[i];
         }
@@ -48,7 +48,7 @@ gnrc_sixlowpan_frag_fb_t *gnrc_sixlowpan_frag_fb_get(void)
 
 gnrc_sixlowpan_frag_fb_t *gnrc_sixlowpan_frag_fb_get_by_tag(uint16_t tag)
 {
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_FB_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_FB_SIZE; i++) {
         if ((_fbs[i].pkt != NULL) && (_fbs[i].tag == tag)) {
             return &_fbs[i];
         }

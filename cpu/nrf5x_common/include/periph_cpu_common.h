@@ -55,7 +55,7 @@ extern "C" {
 /**
  * @brief   Override GPIO_UNDEF value
  */
-#define GPIO_UNDEF          (UINT_MAX)
+#define GPIO_UNDEF          (UINT8_MAX)
 
 /**
  * @brief   Generate GPIO mode bitfields
@@ -84,6 +84,14 @@ extern "C" {
 /** @} */
 
 #ifndef DOXYGEN
+/**
+ * @brief   Overwrite the default gpio_t type definition
+ * @{
+ */
+#define HAVE_GPIO_T
+typedef uint8_t gpio_t;
+/** @} */
+
 /**
  * @brief   Override GPIO modes
  *
@@ -158,16 +166,6 @@ typedef enum {
 #endif /* ndef DOXYGEN */
 
 /**
- * @brief  SPI configuration values
- */
-typedef struct {
-    NRF_SPI_Type *dev;  /**< SPI device used */
-    uint8_t sclk;       /**< CLK pin */
-    uint8_t mosi;       /**< MOSI pin */
-    uint8_t miso;       /**< MISO pin */
-} spi_conf_t;
-
-/**
  * @name    WDT upper and lower bound times in ms
  * @{
  */
@@ -175,6 +173,16 @@ typedef struct {
 /* Set upper limit to the maximum possible value that could go in CRV register */
 #define NWDT_TIME_UPPER_LIMIT          ((UINT32_MAX >> 15) * US_PER_MS + 1)
 /** @} */
+
+/**
+ * @brief Retrieve the exti(GPIOTE) channel associated with a gpio
+ *
+ * @param   pin     GPIO pin to retrieve the channel for
+ *
+ * @return          the channel number
+ * @return          0xff if no channel is found
+ */
+uint8_t gpio_int_get_exti(gpio_t pin);
 
 #ifdef __cplusplus
 }

@@ -151,7 +151,12 @@ static int _open(vfs_file_t *filp, const char *name, int flags, mode_t mode,
         fatfs_flags |= FA_CREATE_ALWAYS;
     }
     if ((flags & O_CREAT) == O_CREAT) {
-        fatfs_flags |= FA_CREATE_NEW;
+        if ((flags & O_EXCL) == O_EXCL) {
+            fatfs_flags |= FA_CREATE_NEW;
+        }
+        else {
+            fatfs_flags |= FA_OPEN_ALWAYS;
+        }
     }
     else {
         fatfs_flags |= FA_OPEN_EXISTING;
@@ -252,12 +257,9 @@ static off_t _lseek(vfs_file_t *filp, off_t off, int whence)
 
 static int _fstat(vfs_file_t *filp, struct stat *buf)
 {
-    fatfs_file_desc_t *fd = (fatfs_file_desc_t *)filp->private_data.buffer;
     fatfs_desc_t *fs_desc = (fatfs_desc_t *)filp->mp->private_data;
     FILINFO fi;
     FRESULT res;
-
-    _build_abs_path(fs_desc, fd->fname);
 
     memset(buf, 0, sizeof(*buf));
 

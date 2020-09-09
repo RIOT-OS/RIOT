@@ -24,7 +24,7 @@
 #define LIFO_H
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**

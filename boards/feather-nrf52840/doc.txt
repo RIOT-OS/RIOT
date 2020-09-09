@@ -1,0 +1,42 @@
+/**
+@defgroup    boards_feather-nrf52840 Adafruit Feather nRF52840 Express
+@ingroup     boards
+@brief       Support for the Adafruit Feather nRF52840 Express
+
+### General information
+
+[The Feather nRF52840 Express][feather-nrf52840] is a development board
+from Adafruits Feather board family. It provides native USB support, Bluetooth
+Low Energy and IEEE 802.15.4 support via the nRF52840 MCU.
+
+![top-down view on feather-nrf52840][top-down view]
+
+[feather-nrf52840]: https://learn.adafruit.com/introducing-the-adafruit-nrf52840-feather/
+[top-down view]: https://cdn-learn.adafruit.com/assets/assets/000/068/578/medium800/circuitpython_Screenshot_2019-01-02_at_12.04.27.png
+
+### Flash the board
+
+See the **Flashing** section in @ref boards_common_nrf52. The easiest way is to
+use an external Segger J-Link Progammer connected to the [SWD Connector].
+
+[SWD Connector]: https://learn.adafruit.com/introducing-the-adafruit-nrf52840-feather/pinouts#swd-connector-3-12
+
+### Terminal
+To connect a terminal to the Feather, RIOT chooses Segger RTT per default.
+This lets you use the Segger J-Link Programmer as a serial interface to the
+device.
+
+You have several alternative possibilities to connect to the board.
+
+1. With
+   ~~~~~~~~~~~~~~~~~~~~~ {.mk}
+   USEMODULE += stdio_uart
+   ~~~~~~~~~~~~~~~~~~~~~
+   and an FTDI adapter connected to the Feather's RX and TX ports you can use
+   UART-based terminals to connect to the feather
+2. With
+   ~~~~~~~~~~~~~~~~~~~~~ {.mk}
+   USEMODULE += stdio_cdc_acm
+   ~~~~~~~~~~~~~~~~~~~~~
+   you can access the Feather with a terminal directly over USB.
+*/

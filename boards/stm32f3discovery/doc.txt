@@ -15,12 +15,13 @@ and 3-axis magnetometer).
 The board does however not provide any radio capabilities, radio devices have
 to be connected externally via I2C, SPI, UART or similar.
 
-See [this page](https://github.com/RIOT-OS/RIOT/wiki/Getting-started-with-STM32F%5B0%7C3%7C4%5Ddiscovery-boards)
+See [this page]
+(https://github.com/RIOT-OS/RIOT/wiki/Getting-started-with-STM32F%5B0%7C3%7C4%5Ddiscovery-boards)
 for a quick getting started guide.
 
 ## Hardware
 
-![STM32F3discovery image](http://www.st.com/st-web-ui/static/active/en/fragment/product_related/rpn_information/board_photo/stm32f3discovery.jpg)
+![STM32F3discovery image](https://www.st.com/bin/ecommerce/api/image.PF254044.en.feature-description-include-personalized-no-cpn-large.jpg)
 
 
 ### MCU
@@ -38,10 +39,10 @@ for a quick getting started guide.
 | SPIs       | 3                 |
 | I2Cs       | 2                 |
 | Vcc        | 2.0V - 3.6V           |
-| Datasheet  | [Datasheet](http://www.st.com/web/en/resource/technical/document/datasheet/DM00058181.pdf) |
-| Reference Manual | [Reference Manual](http://www.st.com/web/en/resource/technical/document/reference_manual/DM00043574.pdf) |
-| Programming Manual | [Programming Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/programming_manual/DM00046982.pdf) |
-| Board Manual   | [Board Manual](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/user_manual/DM00063382.pdf)|
+| Datasheet  | [Datasheet](https://www.st.com/resource/en/datasheet/stm32f303vc.pdf) |
+| Reference Manual | [Reference Manual](https://www.st.com/resource/en/reference_manual/dm00043574.pdf) |
+| Programming Manual | [Programming Manual](https://www.st.com/resource/en/programming_manual/dm00046982.pdf) |
+| Board Manual   | [Board Manual](https://www.st.com/resource/en/user_manual/dm00063382.pdf)|
 
 ### RIOT static pin mapping
 
@@ -75,8 +76,7 @@ e-compass.
 |:------------- |:--------------------- |
 | Type       | Accelerometer and magnetometer |
 | Vendor | ST Microelectronics   |
-| Datasheet  | [Datasheet](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00027543.pdf)|
-| Errata Sheet  | [Errata Sheet](http://www.st.com/st-web-ui/static/active/en/fragment/legal/statements/disclaimer/disclaimer_errata.pdf)|
+| Datasheet  | [Datasheet](https://www.st.com/resource/en/datasheet/lsm303dlhc.pdf)|
 | Connected to   | I2C_0         |
 | Pin Config:    | |
 | Device | I2C1          |
@@ -96,8 +96,7 @@ An 3-axis gyroscope is soldered on the board.
 |:------------- |:--------------------- |
 | Type       | Gyroscope     |
 | Vendor | ST Microelectronics   |
-| Datasheet  | [Datasheet](http://www.st.com/st-web-ui/static/active/en/resource/technical/document/datasheet/DM00036465.pdf)    |
-| Errata Sheet  | [Errata Sheet](http://www.st.com/st-web-ui/static/active/en/fragment/legal/statements/disclaimer/disclaimer_errata.pdf)|
+| Datasheet  | [Datasheet](https://www.mouser.de/datasheet/2/389/l3gd20-954745.pdf)    |
 | Connected to   | SPI_0         |
 | Pin Config:    | |
 | Device | SPI1          |

@@ -29,23 +29,14 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-static int _get_iid(netdev_t *netdev, eui64_t *value, size_t max_len)
-{
-    if (max_len < sizeof(eui64_t)) {
-        return -EOVERFLOW;
-    }
-
-    eui48_t mac;
-    netdev->driver->get(netdev, NETOPT_ADDRESS, mac.uint8, sizeof(eui48_t));
-    eui48_to_ipv6_iid(value, &mac);
-
-    return sizeof(eui64_t);
-}
-
 int netdev_eth_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 {
     int res = 0;
 
+#ifndef MODULE_L2FILTER
+    (void)dev;
+#endif
+    (void)max_len;  /* only used in assert() */
     switch (opt) {
         case NETOPT_DEVICE_TYPE:
             {
@@ -75,10 +66,6 @@ int netdev_eth_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             {
                 res = 1;
                 break;
-            }
-        case NETOPT_IPV6_IID:
-            {
-                return _get_iid(dev, value, max_len);
             }
 #ifdef MODULE_L2FILTER
         case NETOPT_L2FILTER:

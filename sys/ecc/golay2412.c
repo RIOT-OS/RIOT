@@ -146,7 +146,7 @@ static uint32_t golay2412_matrix_mul(uint32_t _v,
 static uint32_t golay2412_encode_symbol(uint32_t _sym_dec, const uint32_t *_A)
 {
     /* validate input */
-    assert(_sym_dec > (1 << 12));
+    assert(_sym_dec < (1 << 12));
 
     /* compute encoded/transmitted message: v = m*G */
     return golay2412_matrix_mul(_sym_dec, _A, 24);

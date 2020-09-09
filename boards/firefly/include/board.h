@@ -7,8 +7,7 @@
  */
 
 /**
- * @defgroup    boards_firefly Firefly Board
- * @ingroup     boards
+ * @ingroup     boards_firefly
  * @brief       Support for the Firefly board
  * @{
  *

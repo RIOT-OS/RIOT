@@ -5,8 +5,8 @@ pressure and temperature. The BME280 can also measure relative humidity.
 ## Usage
 The application will initialize the BME280/BMP280 device and display its
 calibration coefficients. More information can be found on the
-[Bosch website][1], in the [BST-BME280_DS001-11 datasheet] [2] and in the
-[BST-BMP280-DS001-12  datasheet] [3].
+[Bosch BME280 website][1], on the [Bosch BMP280 website][2],
+in the [BME280 datasheet][3] and in the [BMP280 datasheet][4].
 
 Notice that it is necessary to first read the temperature even if only one
 of the other values (humidity or pressure) is needed. This is described in
@@ -33,6 +33,7 @@ the bmp280, add `DRIVER=bmp280` to the previous command:
 
 
 For more information, see the datasheets:
-[1]: http://www.bosch-sensortec.com/en/bst/products/all_products/bme280
-[2]: https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME280_DS001-11.pdf
-[3]: https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BMP280-DS001-12.pdf
+[1]: https://www.bosch-sensortec.com/products/environmental-sensors/humidity-sensors-bme280/
+[2]: https://www.bosch-sensortec.com/products/environmental-sensors/pressure-sensors/pressure-sensors-bmp280-1.html
+[3]: https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bme280-ds002.pdf
+[4]: https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp280-ds001.pdf

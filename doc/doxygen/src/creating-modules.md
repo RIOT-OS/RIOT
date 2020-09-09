@@ -80,8 +80,108 @@ An example can be found in
 
 Pseudomodules                                                  {#pseudomodules}
 =============
-Pseudomodules are modules that do not have any code. Their main use cases are
-to provide base information for dependencies to other modules or information to
-the code base via the `MODULE_<MODULENAME>` macro. Pseudomodules can provide
-header files too, if need be. To create a pseudomodule just add its name to the
-`PSEUDOMODULES` macro in `Makefile.pseudomodules`.
+Pseudomodules are modules that are not static libraries, i.e. do not generate a
+`<module name>.a` file.
+
+To create a pseudomodule just add its name to `makefiles/pseudomodules.inc.mk`
+with `PSEUDOMODULES += <modulename>` in alphabetical order.
+
+A Pseudomodule may or may not have a source file associated with it. To make the
+distinction between them we will refer to those that don't as true-Pseudomodules.
+
+The main use case for true-Pseudomodules is to provide base information for
+dependencies to other modules or information to the code base via the
+`MODULE_<MODULENAME>` macro.
+
+Pseudomodules with source code exist under a "real" `MODULE` since they will
+generate a `<pseudomodule_name>.o` file grouped under that `MODULE`s
+`<module_name>.a` file.
+
+These modules appear in RIOT under two forms:
+
+1. Conditionally included source files:
+
+  ```
+    foo/
+    |----foo_bar.c
+    |----foo.c
+    |----Makefile
+  ```
+
+In `foo/Makefile` you add the source file to the `SRC` variable, conditioned on
+the Pseudomodule inclusion
+
+  ```mk
+  ifneq (,$(filter foo_bar,$(USEMODULE)))
+    SRC += foo_bar.c
+  endif
+  ```
+
+See `sys/net/ble/skald` for an example in code.
+
+2. Using the `SUBMODULES` mechanism:
+
+  ```
+    foo/
+    |----spam.c
+    |----ham.c
+    |----eggs.c
+    |----Makefile
+  ```
+
+  ```mk
+  # make all code end up in "foo_bar.a", this can be any name
+  MODULE := foo_bar
+
+  # ensure that "foo_ham" or "bar_foo_ham" builds "foo_ham.c".
+  BASE_MODULE := foo
+
+  # list of source files that are not SUBMODULES
+  SRC := spam.c
+
+  # enable submodules by setting SUBMODULES = 1
+  SUBMODULES = 1
+  ```
+
+When using `SUBMODULES` in a `MODULE` all `SRC` file excluded from `foo/Makefile`
+will be considered `SUBMODULES`. In the example above `ham.c` and `eggs.c`.
+These source files will be conditionally included depending if the modules have
+been added, i.e. `USEMODULE += foo_ham foo_eggs` (it's the same as case 1 but
+handled automatically in `Makefile.base`).
+
+The `SUBMODULES` mechanism is more flexible since `BASE_MODULE` allows matching
+the only parts of compounded module names and only match against part of that name.
+
+See `sys/ztimer/Makefile` for an example in code.
+
+`SUBMODULES` can also be true-pseudomodules.
+
+# Helper tools
+
+To help you start writing a module, the RIOT build system provides the
+`generate-module` make target. It is a wrapper around the
+[riotgen](https://pypi.org/project/riotgen/) command line tool that is helpful
+when starting to implement a module: all required files are generated with
+copyright headers, doxygen groups, etc, so you can concentrate on the module
+implementation.
+The module source files are created in the `sys` directory.
+
+**Usage:**
+
+From the RIOT base directory, run:
+```
+make generate-module
+```
+Then answer a few questions about the driver:
+- Module name: enter a name for your module. It will be used as both the name
+  of the module directory under sys, where the source files are created, and
+  the build system module (used with `USEMODULE`).
+- Module doxygen name: Enter the name of module, as displayed in the
+  Doxygen documentation.
+- Brief doxygen description: Describe in one line what is this module about.
+
+Other global information (author name, email, organization) should be retrieved
+automatically from your git configuration.
+
+Once completed, the module files are located in
+`sys/<module name>/<module name>.c` and `sys/include/<module name>.h`.

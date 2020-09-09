@@ -1,0 +1,10 @@
+MODULE = paho-mqtt
+
+RIOT_MQTT_IFACE_H = paho_mqtt.h
+
+CFLAGS += -DMQTTCLIENT_PLATFORM_HEADER="$(RIOT_MQTT_IFACE_H)"
+CFLAGS += -Wno-sign-compare
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-address-of-packed-member
+
+include $(RIOTBASE)/Makefile.base

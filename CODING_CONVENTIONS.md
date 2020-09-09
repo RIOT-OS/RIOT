@@ -7,6 +7,15 @@
 * Avoid dynamic memory allocation (malloc/free, new, etc.)! It will break
   real-time guarantees, increase code complexity, and make it more likely to use
   more memory than available.
+* Avoid the use of floating point arithmetic. Not every MCU has a FPU and software
+  floating point libraries cause unnecessary overhead.
+  Instead use fixed-point integers and transform equations so that they stay within
+  the range of integer math.
+  An easy way to ensure this is by multiplying by a constant factor, ideally a power
+  of two - this is a simple shift operation.
+  Take care that intermediate values do not exceed the range of the data type you are using.
+  When writing drivers, do not convert the measurement data into float, but instead
+  choose an appropriate integer format / SI prefix.
 * Please obey the Linux coding style as described in
   https://www.kernel.org/doc/Documentation/process/coding-style.rst with the
   following modifications and additions:

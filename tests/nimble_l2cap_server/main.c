@@ -26,7 +26,7 @@
 #include "host/ble_gap.h"
 #include "host/util/util.h"
 
-#include "assert.h"
+#include "test_utils/expect.h"
 #include "net/bluetil/ad.h"
 
 #include "nimble_l2cap_test_conf.h"
@@ -54,21 +54,21 @@ static void _on_data(struct ble_l2cap_event *event)
     struct os_mbuf *rxd;
 
     rxd = event->receive.sdu_rx;
-    assert(rxd != NULL);
+    expect(rxd != NULL);
     int rx_len = (int)OS_MBUF_PKTLEN(rxd);
-    assert(rx_len <= (int)APP_MTU);
+    expect(rx_len <= (int)APP_MTU);
 
     res = os_mbuf_copydata(rxd, 0, rx_len, _rxbuf);
-    assert(res == 0);
+    expect(res == 0);
 
     res = ble_l2cap_send(_coc, rxd);
-    assert((res == 0) || (res == BLE_HS_ESTALLED));
+    expect((res == 0) || (res == BLE_HS_ESTALLED));
 
     /* allocate new mbuf for receiving new data */
     rxd = os_mbuf_get_pkthdr(&_coc_mbuf_pool, 0);
-    assert(rxd != NULL);
+    expect(rxd != NULL);
     res = ble_l2cap_recv_ready(_coc, rxd);
-    assert(res == 0);
+    expect(res == 0);
 
     printf("# Received: len %5i, seq %5u\n", rx_len, (unsigned)_rxbuf[POS_SEQ]);
 }
@@ -100,19 +100,22 @@ static int _on_l2cap_evt(struct ble_l2cap_event *event, void *arg)
     (void)arg;
 
     switch (event->type) {
-        case BLE_L2CAP_EVENT_COC_CONNECTED:
+        case BLE_L2CAP_EVENT_COC_CONNECTED: {
             _coc = event->connect.chan;
+            struct ble_l2cap_chan_info info;
+            ble_l2cap_get_chan_info(_coc, &info);
             puts("# L2CAP: CONNECTED");
             printf("# MTUs: our %i, remote %i\n",
-                   ble_l2cap_get_our_mtu(_coc), ble_l2cap_get_peer_mtu(_coc));
+                   (int)info.our_l2cap_mtu, (int)info.peer_l2cap_mtu);
             break;
+        }
         case BLE_L2CAP_EVENT_COC_DISCONNECTED:
             _coc = NULL;
             puts("# L2CAP: DISCONNECTED");
             break;
         case BLE_L2CAP_EVENT_COC_ACCEPT: {
             struct os_mbuf *sdu_rx = os_mbuf_get_pkthdr(&_coc_mbuf_pool, 0);
-            assert(sdu_rx != NULL);
+            expect(sdu_rx != NULL);
             ble_l2cap_recv_ready(event->accept.chan, sdu_rx);
             break;
         }
@@ -123,7 +126,7 @@ static int _on_l2cap_evt(struct ble_l2cap_event *event, void *arg)
             /* this event is expected, but we have nothing to do here */
             break;
         default:
-            assert(0);
+            expect(0);
             break;
     }
 
@@ -134,7 +137,7 @@ static void _advertise_now(void)
 {
     int res = ble_gap_adv_start(nimble_riot_own_addr_type, NULL, BLE_HS_FOREVER,
                                 &_adv_params, _on_gap_evt, NULL);
-    assert(res == 0);
+    expect(res == 0);
 }
 
 int main(void)
@@ -145,13 +148,13 @@ int main(void)
 
     /* initialize buffers and setup the test environment */
     res = os_mempool_init(&_coc_mempool, MBUFCNT, MBUFSIZE, _coc_mem, "appbuf");
-    assert(res == 0);
+    expect(res == 0);
     res = os_mbuf_pool_init(&_coc_mbuf_pool, &_coc_mempool, MBUFSIZE, MBUFCNT);
-    assert(res == 0);
+    expect(res == 0);
 
     /* create l2cap server */
     res = ble_l2cap_create_server(APP_CID, APP_MTU, _on_l2cap_evt, NULL);
-    assert(res == 0);
+    expect(res == 0);
 
     /* initialize advertising data and parameters */
     _adv_params.conn_mode = BLE_GAP_CONN_MODE_UND;
@@ -160,7 +163,7 @@ int main(void)
                                BLUETIL_AD_FLAGS_DEFAULT);
     bluetil_ad_add_name(&_ad, APP_NODENAME);
     res = ble_gap_adv_set_data(_ad.buf, (int)_ad.pos);
-    assert(res == 0);
+    expect(res == 0);
 
     /* start advertising the test server */
     _advertise_now();

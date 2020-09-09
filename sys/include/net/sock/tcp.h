@@ -303,6 +303,13 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
+/* net/sock/async/types.h included by net/sock.h needs to re-typedef the
+ * `sock_tcp_t` and `sock_tcp_queue_t` to prevent cyclic includes */
+#if defined (__clang__)
+# pragma clang diagnostic push
+# pragma clang diagnostic ignored "-Wtypedef-redefinition"
+#endif
+
 #include "net/sock.h"
 
 #ifdef __cplusplus
@@ -326,6 +333,10 @@ typedef struct sock_tcp sock_tcp_t;
  *                          implementation-specific `sock_types.h`.
  */
 typedef struct sock_tcp_queue sock_tcp_queue_t;
+
+#if defined (__clang__)
+# pragma clang diagnostic pop
+#endif
 
 /**
  * @brief   Establishes a new TCP sock connection

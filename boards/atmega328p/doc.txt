@@ -109,6 +109,53 @@ Connect a TTL adapter with pins 2/RXD and 3/TXD an run
 Please note that the supply voltage should be compatible with the logic level of
 the TTL adapter. Usually everything between 3.3 V and 5 V should work.
 
+## On-Chip Debugging (OCD)
+
+E.g. with the AVR Dragon and [AVaRICE](http://avarice.sourceforge.net/) you
+can debug the ATmega328P using the debugWIRE interface. Compared to the ATmega
+MCUs with JTAG interface the debug facilities are however significantly reduced:
+Only a single hardware breakpoint and no watchpoints are supported. The
+hardware breakpoint is used for single-stepping. If you set breakpoints, the
+AVR Dragon will transparently replace the instruction to break upon with a
+break instruction. Once the breakpoint is hit, the break instruction is
+overwritten with the original instruction. Thus, every breakpoint hit cause two
+flash cycles to be performed, which not only results in a slow debugging
+experience, but also causes significant wear.
+
+In order to enable debugWIRE run (replace `<PROGRAMMER>` with the programmer you
+use, e.g. with `dragon_isp` if you use the AVR Dragon):
+
+    avrdude -c <PROGRAMMER> -p m328p -U hfuse:w:0x99:m
+
+You can disable it again via:
+
+    avrdude -c <PROGRAMMER> -p m328p -U hfuse:w:0xd9:m
+
+@warning    As the reset pin is repurposed for debugWIRE, a regular ISP will
+            not be able to disable the debugWIRE interface anymore. The AVR
+            Dragon can temporary disable the debugWIRE interface via a
+            debugWIRE command and avrdude will do so when debugWIRE is used.
+            So only enable debugWIRE if you have an AVR DRagon or other means
+            to disable debugWIRE later on again.
+
+For debugging, the ATmega328P needs to be connected to the AVR Dragon in the
+very same way it needs to be connected for programming (see above). Once the
+MCU is connected and debugWIRE is enabled via the fuse settings, you can start
+debugging via:
+
+    make debug
+
+If this fails after flashing the ATmega328P, it is like due to debugWIRE
+being temporary disabled by avrdude in order to use the ISP feature. Perform a
+cold boot and the ATmega328P will have debugWIRE enabled again.
+
+@note       If you are using a different debugger than the AVR Dragon, you have
+            to export the `AVR_DEBUGDEVICE` environment variable to the required
+            flag to pass to AVaRICE, e.g. when using the Atmel-ICE you have to
+            export `AVR_DEBUGDEVICE=--edbg`. If the debug device is not
+            connected via USB, you also need to export `AVR_DEBUGINTERFACE` to
+            the correct value.
+
 ## Caution
 Don't expect having a working network stack due to very limited resources ;-)
  */

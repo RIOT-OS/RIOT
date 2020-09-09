@@ -56,14 +56,6 @@ extern "C" {
 #define GNRC_SOCK_DYN_PORTRANGE_ERR (0)
 
 /**
- * @brief   Offset for next dynamic port
- *
- * Currently set to a static (prime) offset, but could be random, too
- * see https://tools.ietf.org/html/rfc6056#section-3.3.3
- */
-#define GNRC_SOCK_DYN_PORTRANGE_OFF (17U)
-
-/**
  * @brief   Internal helper functions for GNRC
  * @internal
  * @{
@@ -103,14 +95,14 @@ static inline void gnrc_ep_set(sock_ip_ep_t *out, const sock_ip_ep_t *in,
                                size_t in_size)
 {
     memcpy(out, in, in_size);
-#if GNRC_NETIF_NUMOF == 1
-    /* set interface implicitly */
-    gnrc_netif_t *netif = gnrc_netif_iter(NULL);
+    if (gnrc_netif_highlander()) {
+        /* set interface implicitly */
+        gnrc_netif_t *netif = gnrc_netif_iter(NULL);
 
-    if (netif != NULL) {
-        out->netif = netif->pid;
+        if (netif != NULL) {
+            out->netif = netif->pid;
+        }
     }
-#endif
 }
 
 /**

@@ -31,10 +31,22 @@
 extern "C" {
 #endif
 
- /**
-  * @brief   The sensors default I2C address
-  */
-#define ISL29020_DEFAULT_ADDRESS        0x44
+/**
+ * @defgroup drivers_isl29020_config     ISL29020 light sensor driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+/**
+ * @brief Default address
+ *
+ * The address depends on the status of A0 Pin. Default address corresponds to
+ * A0 connected to GND. For more information refer to the section 'I2C
+ * Interface' in the datasheet.
+ */
+#ifndef CONFIG_ISL29020_DEFAULT_ADDRESS
+#define CONFIG_ISL29020_DEFAULT_ADDRESS        0x44
+#endif
+/** @} */
 
 /**
  * @brief   Possible modes for the ISL29020 sensor

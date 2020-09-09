@@ -35,11 +35,17 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup net_credman_conf (D)TLS Credential Manager compile configurations
+ * @ingroup config
+ * @{
+ */
+/**
  * @brief Maximum number of credentials in credential pool
  */
-#ifndef CREDMAN_MAX_CREDENTIALS
-#define CREDMAN_MAX_CREDENTIALS  (2)
+#ifndef CONFIG_CREDMAN_MAX_CREDENTIALS
+#define CONFIG_CREDMAN_MAX_CREDENTIALS  (2)
 #endif
+/** @} */
 
 /**
  * @brief Buffer of the credential
@@ -173,7 +179,7 @@ void credman_delete(credman_tag_t tag, credman_type_t type);
 /**
  * @brief Gets the number of credentials currently in the credential pool
  *
- * Maximum number of allowed credentials is defined by CREDMAN_MAX_CREDENTIALS
+ * Maximum number of allowed credentials is defined by CONFIG_CREDMAN_MAX_CREDENTIALS
  *
  * @return number of credentials currently in the credential pool
  */

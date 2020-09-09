@@ -24,6 +24,7 @@
 
 #include "board.h"
 #include "cpu.h"
+#include "irq.h"
 
 /**
  * @brief Initialize the boards on-board LEDs (green and red)

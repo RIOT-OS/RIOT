@@ -216,6 +216,67 @@ typedef enum {
 void i2c_init(i2c_t dev);
 
 /**
+ * @brief   Initialize the used I2C bus pins
+ *
+ * After calling i2c_init, the pins must be initialized (i.e. spi_init is
+ * calling this function internally). In normal cases, this function will not be
+ * used. But there are some devices (e.g. ATECC608A), that use I2C bus lines also
+ * for other purposes and need the option to dynamically re-configure one or
+ * more of the used pins.
+ *
+ * @param[in] dev       I2C device the pins are configure for
+ */
+void i2c_init_pins(i2c_t dev);
+
+/**
+ * @brief   Change the pins of the given I2C bus back to plain GPIO functionality
+ *
+ * The pin mux of the SDA and SCL pins of the bus will be changed back to
+ * default (GPIO) mode and the I2C bus is powered off.
+ * This allows to use the I2C pins for another function and return to I2C
+ * functionality again by calling i2c_init_pins()
+ *
+ * If you want the pin to be in a defined state, call gpio_init() on it.
+ *
+ * The bus MUST not be acquired before initializing it, as this is handled
+ * internally by the i2c_deinit function!
+ *
+ * Calls to i2c_acquire() will block until i2c_init_pins() is called.
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_i2c_reconfigure feature to be used.
+ *
+ * @param[in] dev       the device to de-initialize
+ */
+void i2c_deinit_pins(i2c_t dev);
+
+#if DOXYGEN /* functions to be implemented as `#define` in `periph_cpu.h` */
+/**
+ * @brief   Get the SDA pin of the given I2C bus.
+ *
+ * @param[in] dev       The device to query
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_i2c_reconfigure feature to be used.
+ *
+ * @return              The GPIO used for the I2C data line.
+ */
+gpio_t i2c_pin_sda(i2c_t dev);
+
+/**
+ * @brief   Get the SCL pin of the given I2C bus.
+ *
+ * @param[in] dev       The device to query
+ *
+ * @note Until this is implemented on all platforms, this requires the
+ *       periph_i2c_reconfigure feature to be used.
+ *
+ * @return              The GPIO used for the I2C clock line.
+ */
+gpio_t i2c_pin_scl(i2c_t dev);
+#endif /* DOXYGEN */
+
+/**
  * @brief   Get mutually exclusive access to the given I2C bus
  *
  * In case the I2C device is busy, this function will block until the bus is

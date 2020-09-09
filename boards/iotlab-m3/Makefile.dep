@@ -4,3 +4,5 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += isl29020
   USEMODULE += lps331ap
 endif
+
+USEMODULE += boards_common_iotlab

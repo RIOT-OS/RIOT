@@ -23,6 +23,8 @@
 #define CPU_CONF_H
 
 #include <stdint.h>
+
+#include "cpu_conf_common.h"
 #include "esp_common_log.h"
 #include "xtensa_conf.h"
 #include "xtensa/xtensa_context.h"
@@ -32,17 +34,16 @@ extern "C" {
 #endif
 
 /**
- * @brief   Declare the heap_stats function as available
- */
-#define HAVE_HEAP_STATS
-
-/**
  * @name   Stack size configuration
  * @{
  */
 #define THREAD_EXTRA_STACKSIZE_PRINTF (1024)
+#ifndef THREAD_STACKSIZE_DEFAULT
 #define THREAD_STACKSIZE_DEFAULT      (2048)
+#endif
+#ifndef THREAD_STACKSIZE_IDLE
 #define THREAD_STACKSIZE_IDLE         (2048)
+#endif
 /** @} */
 
 /**
@@ -50,9 +51,14 @@ extern "C" {
  */
 #define PRINTF_BUFSIZ 256
 
+/**
+ * @brief   Remaining parts of the various DRAM sections can be used as heap.
+ */
+#define NUM_HEAPS (4)
+
 #ifdef __cplusplus
 }
-#endif /* CPU_CONF_H */
+#endif
 
 #endif /* CPU_CONF_H */
 /** @} */

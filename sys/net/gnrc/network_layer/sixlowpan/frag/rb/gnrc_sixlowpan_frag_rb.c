@@ -49,12 +49,12 @@
 /* same as ((int) ceil((double) N / D)) */
 #define DIV_CEIL(N, D) (((N) + (D) - 1) / (D))
 #define RBUF_INT_SIZE (DIV_CEIL(IPV6_MIN_MTU, GNRC_SIXLOWPAN_FRAG_SIZE) * \
-                       GNRC_SIXLOWPAN_FRAG_RBUF_SIZE)
+                       CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE)
 #endif
 
 static gnrc_sixlowpan_frag_rb_int_t rbuf_int[RBUF_INT_SIZE];
 
-static gnrc_sixlowpan_frag_rb_t rbuf[GNRC_SIXLOWPAN_FRAG_RBUF_SIZE];
+static gnrc_sixlowpan_frag_rb_t rbuf[CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE];
 
 static char l2addr_str[3 * IEEE802154_LONG_ADDRESS_LEN];
 
@@ -150,7 +150,9 @@ void gnrc_sixlowpan_frag_rb_rm_by_datagram(const gnrc_netif_hdr_t *netif_hdr,
     gnrc_sixlowpan_frag_rb_t *e = _rbuf_get_by_tag(netif_hdr, tag);
 
     if (e != NULL) {
-        gnrc_pktbuf_release(e->pkt);
+        if (e->pkt != NULL) {
+            gnrc_pktbuf_release(e->pkt);
+        }
         gnrc_sixlowpan_frag_rb_remove(e);
     }
 }
@@ -164,7 +166,7 @@ static gnrc_sixlowpan_frag_rb_t *_rbuf_get_by_tag(const gnrc_netif_hdr_t *netif_
     const uint8_t src_len = netif_hdr->src_l2addr_len;
     const uint8_t dst_len = netif_hdr->dst_l2addr_len;
 
-    for (unsigned i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         gnrc_sixlowpan_frag_rb_t *e = &rbuf[i];
 
         if ((e->pkt != NULL) && (e->super.tag == tag) &&
@@ -302,6 +304,12 @@ static int _rbuf_add(gnrc_netif_hdr_t *netif_hdr, gnrc_pktsnip_t *pkt,
         memcpy(((uint8_t *)entry->pkt->data) + offset, data,
                frag_size);
     }
+    else {
+        /* no space left in rbuf interval buffer*/
+        gnrc_pktbuf_release(entry->pkt);
+        gnrc_sixlowpan_frag_rb_remove(entry);
+        res = RBUF_ADD_ERROR;
+    }
     /* no errors and not consumed => release packet */
     gnrc_pktbuf_release(pkt);
     return res;
@@ -358,7 +366,7 @@ static bool _rbuf_update_ints(gnrc_sixlowpan_frag_rb_base_t *entry,
 
 static void _gc_pkt(gnrc_sixlowpan_frag_rb_t *rbuf)
 {
-#if GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0
+#if CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0
     if (rbuf->super.current_size == 0) {
         /* packet is scheduled for deletion, but was complete, i.e. pkt is
          * already handed up to other layer, i.e. no need to release */
@@ -373,11 +381,11 @@ void gnrc_sixlowpan_frag_rb_gc(void)
     uint32_t now_usec = xtimer_now_usec();
     unsigned int i;
 
-    for (i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+    for (i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         /* since pkt occupies pktbuf, aggressivly collect garbage */
         if (!gnrc_sixlowpan_frag_rb_entry_empty(&rbuf[i]) &&
               ((now_usec - rbuf[i].super.arrival) >
-               GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
+               CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
             DEBUG("6lo rfrag: entry (%s, ",
                   gnrc_netif_addr_to_str(rbuf[i].super.src,
                                          rbuf[i].super.src_len,
@@ -399,8 +407,8 @@ void gnrc_sixlowpan_frag_rb_gc(void)
 
 static inline void _set_rbuf_timeout(void)
 {
-    xtimer_set_msg(&_gc_timer, GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US,
-                   &_gc_timer_msg, sched_active_pid);
+    xtimer_set_msg(&_gc_timer, CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US,
+                   &_gc_timer_msg, thread_getpid());
 }
 
 static int _rbuf_get(const void *src, size_t src_len,
@@ -411,7 +419,7 @@ static int _rbuf_get(const void *src, size_t src_len,
     gnrc_sixlowpan_frag_rb_t *res = NULL, *oldest = NULL;
     uint32_t now_usec = xtimer_now_usec();
 
-    for (unsigned int i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+    for (unsigned int i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         /* check first if entry already available */
         if ((rbuf[i].pkt != NULL) && (rbuf[i].super.datagram_size == size) &&
             (rbuf[i].super.tag == tag) && (rbuf[i].super.src_len == src_len) &&
@@ -427,7 +435,7 @@ static int _rbuf_get(const void *src, size_t src_len,
                                          rbuf[i].super.dst_len,
                                          l2addr_str),
                   (unsigned)rbuf[i].super.datagram_size, rbuf[i].super.tag);
-#if GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0
+#if CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0
             if (rbuf[i].super.current_size == 0) {
                 /* ensure that only empty reassembly buffer entries and entries
                  * scheduled for deletion have `current_size == 0` */
@@ -461,7 +469,7 @@ static int _rbuf_get(const void *src, size_t src_len,
         assert(!gnrc_sixlowpan_frag_rb_entry_empty(oldest));
         if (GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE ||
             ((now_usec - oldest->super.arrival) >
-            GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
+            CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
             DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
             gnrc_pktbuf_release(oldest->pkt);
             gnrc_sixlowpan_frag_rb_remove(oldest);
@@ -498,8 +506,10 @@ static int _rbuf_get(const void *src, size_t src_len,
         return -1;
     }
 
-    *((uint64_t *)res->pkt->data) = 0;  /* clean first few bytes for later
-                                               * look-ups */
+    if (res->pkt->data) {
+        /* clean first few bytes for later look-ups */
+        memset(res->pkt->data, 0, sizeof(uint64_t));
+    }
     res->super.datagram_size = size;
     res->super.arrival = now_usec;
     memcpy(res->super.src, src, src_len);
@@ -527,7 +537,7 @@ void gnrc_sixlowpan_frag_rb_reset(void)
 {
     xtimer_remove(&_gc_timer);
     memset(rbuf_int, 0, sizeof(rbuf_int));
-    for (unsigned int i = 0; i < GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
+    for (unsigned int i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_SIZE; i++) {
         if ((rbuf[i].pkt != NULL) &&
             (rbuf[i].pkt->users > 0)) {
             _gc_pkt(&rbuf[i]);
@@ -557,22 +567,36 @@ void gnrc_sixlowpan_frag_rb_base_rm(gnrc_sixlowpan_frag_rb_base_t *entry)
 
 static void _tmp_rm(gnrc_sixlowpan_frag_rb_t *rbuf)
 {
-#if GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0U
+#if CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER > 0U
         /* use garbage-collection to leave the entry for at least
-         * GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER in the reassembly buffer by
+         * CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER in the reassembly buffer by
          * setting the arrival time to
-         * (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US - GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER)
+         * (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US - CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER)
          * microseconds in the past */
         rbuf->super.arrival = xtimer_now_usec() -
-                              (GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US -
-                               GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER);
+                              (CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US -
+                               CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER);
         /* reset current size to prevent late duplicates to trigger another
          * dispatch */
         rbuf->super.current_size = 0;
-#else   /* GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER == 0U */
+#else   /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER == 0U */
         gnrc_sixlowpan_frag_rb_remove(rbuf);
-#endif  /* GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER */
+#endif  /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DEL_TIMER */
 }
+
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
+static inline unsigned _count_frags(gnrc_sixlowpan_frag_rb_t *rbuf)
+{
+    unsigned frags = 0;
+    gnrc_sixlowpan_frag_rb_int_t *frag = rbuf->super.ints;
+
+    while (frag) {
+        frag = frag->next;
+        frags++;
+    }
+    return frags;
+}
+#endif
 
 int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf,
                                                    gnrc_netif_hdr_t *netif_hdr)
@@ -604,6 +628,10 @@ int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf
         new_netif_hdr->lqi = netif_hdr->lqi;
         new_netif_hdr->rssi = netif_hdr->rssi;
         LL_APPEND(rbuf->pkt, netif);
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
+        gnrc_sixlowpan_frag_stats_get()->fragments += _count_frags(rbuf);
+        gnrc_sixlowpan_frag_stats_get()->datagrams++;
+#endif
         gnrc_sixlowpan_dispatch_recv(rbuf->pkt, NULL, 0);
         _tmp_rm(rbuf);
     }

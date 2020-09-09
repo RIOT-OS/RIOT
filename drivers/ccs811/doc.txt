@@ -102,7 +102,8 @@ raw data.
 @note
 - After setting the mode, the sensor is in conditioning period that needs
   up to 20 minutes, before accurate readings are generated, see the
-  [data sheet](https://ams.com/documents/20143/36005/CCS811_DS000459_6-00.pdf/c7091525-c7e5-37ac-eedb-b6c6828b0dcf)
+  [data sheet]
+  (https://ams.com/documents/20143/36005/CCS811_DS000459_7-00.pdf/3cfdaea5-b602-fe28-1a14-18776b61a35a)
   for more details.
 - During the early-live (burn-in) period, the CCS811 sensor should run
   for 48 hours in the selected mode of operation to ensure sensor

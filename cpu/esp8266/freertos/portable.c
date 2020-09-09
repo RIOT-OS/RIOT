@@ -13,29 +13,11 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#include <string.h>
-
-#include "esp_common.h"
-#include "log.h"
-#ifdef MCU_ESP8266
 #include "esp_attr.h"
 #include "irq.h"
 #include "rom/ets_sys.h"
-#endif
 
 #include "freertos/FreeRTOS.h"
-
-uint32_t xPortGetTickRateHz(void) {
-    return MSEC_PER_SEC / portTICK_PERIOD_MS;
-}
-
-BaseType_t xPortInIsrContext(void)
-{
-    /* is working on single core in that way */
-    return irq_is_in();
-}
-
-#ifdef MCU_ESP8266
 
 unsigned _xt_tick_divisor = 0;  /* cached number of cycles per tick */
 
@@ -67,9 +49,7 @@ void IRAM_ATTR vPortETSIntrUnlock(void)
 /* source: /path/to/esp8266-rtos-sdk/components/freertos/port/esp8266/port.c */
 void ResetCcountVal(unsigned int cnt_val)
 {
-    asm volatile("wsr a2, ccount");
+    __asm__ volatile("wsr a2, ccount");
 }
-
-#endif /* MCU_ESP8266 */
 
 #endif /* DOXYGEN */

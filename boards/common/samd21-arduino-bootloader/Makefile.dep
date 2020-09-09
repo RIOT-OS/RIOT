@@ -1,0 +1,5 @@
+# This boards requires support for Arduino bootloader.
+USEMODULE += usb_board_reset
+USEMODULE += stdio_cdc_acm
+
+FEATURES_REQUIRED += bootloader_arduino

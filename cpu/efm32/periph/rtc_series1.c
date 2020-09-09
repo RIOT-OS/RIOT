@@ -70,6 +70,8 @@ void rtc_init(void)
 
 int rtc_set_time(struct tm *time)
 {
+    rtc_tm_normalize(time);
+
     RTCC_DateSet(
         RTCC_Year2BCD(time->tm_year - RTC_YEAR_OFFSET) |
         RTCC_Month2BCD(time->tm_mon) |
@@ -101,6 +103,8 @@ int rtc_get_time(struct tm *time)
 
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
+    rtc_tm_normalize(time);
+
     rtc_state.alarm_cb = cb;
     rtc_state.alarm_arg = arg;
     rtc_state.alarm_year = time->tm_year;

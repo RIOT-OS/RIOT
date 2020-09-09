@@ -36,6 +36,7 @@ extern "C" {
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
 #define CPU_IRQ_NUMOF                   (35U)
 #define CPU_FLASH_BASE                  LPC_FLASH_BASE
+#define CPU_HAS_BITBAND                 (1)
 /** @} */
 
 /**

@@ -6,7 +6,7 @@
 #  * reset
 #  * term
 #
-# Tested on m3/a8-m3/wsn430/samr21/arduino-zero nodes
+# Tested on m3/a8-m3/samr21/arduino-zero nodes
 #
 # It can be run:
 # * From your computer by setting IOTLAB_NODE to the full url like
@@ -65,7 +65,7 @@ IOTLAB_NODE_AUTO_NUM ?= 1
 IOTLAB_ARCHI_arduino-zero   = arduino-zero:xbee
 IOTLAB_ARCHI_b-l072z-lrwan1 = st-lrwan1:sx1276
 IOTLAB_ARCHI_b-l475e-iot01a = st-iotnode:multi
-IOTLAB_ARCHI_firefly        = firefly
+IOTLAB_ARCHI_firefly        = firefly:multi
 IOTLAB_ARCHI_frdm-kw41z     = frdm-kw41z:multi
 IOTLAB_ARCHI_iotlab-a8-m3   = a8:at86rf231
 IOTLAB_ARCHI_iotlab-m3      = m3:at86rf231
@@ -78,9 +78,29 @@ IOTLAB_ARCHI_nrf52840-mdk   = nrf52840mdk:multi
 IOTLAB_ARCHI_pba-d-01-kw2x  = phynode:kw2xrf
 IOTLAB_ARCHI_samr21-xpro    = samr21:at86rf233
 IOTLAB_ARCHI_samr30-xpro    = samr30:at86rf212b
-IOTLAB_ARCHI_wsn430-v1_3b   = wsn430:cc1101
-IOTLAB_ARCHI_wsn430-v1_4    = wsn430:cc2420
 IOTLAB_ARCHI := $(IOTLAB_ARCHI_$(BOARD))
+
+# There are several deprecated and incompatible features used here that were
+# introduced between versions 2 and 3 of the IoT-LAB cli tools.
+# For backward compatibility, we manage these changes here.
+_CLI_TOOLS_MAJOR_VERSION ?= $(shell iotlab-experiment --version | cut -f1 -d.)
+ifeq (2,$(_CLI_TOOLS_MAJOR_VERSION))
+  _NODES_DEPLOYED = $(shell iotlab-experiment --jmespath='deploymentresults."0"' --format='" ".join' get $(_IOTLAB_EXP_ID) --print)
+  _NODES_LIST_OPTION = --resources
+  _NODES_FLASH_OPTION = --update
+else
+  _NODES_DEPLOYED = $(shell iotlab-experiment --jmespath='"0"' --format='" ".join' get $(_IOTLAB_EXP_ID) --deployment)
+  _NODES_LIST_OPTION = --nodes
+  _NODES_FLASH_OPTION = --flash
+  ifneq (firefly,$(BOARD))
+    # All boards in IoT-LAB except firefly can be flashed using $(BINFILE).
+    # On IoT-LAB, firefly only accepts $(ELFFILE) and WSN320 boards on accept $(HEXFILE).
+    # Using $(BINFILE) speeds up the firmware upload since the file is much
+    # smaller than an elffile.
+    # This feature is only available in cli-tools version >= 3.
+    FLASHFILE = $(BINFILE)
+  endif
+endif
 
 # Try detecting the node automatically
 #  * It takes the first working node that match BOARD
@@ -92,11 +112,10 @@ ifneq (,$(filter auto auto-ssh,$(IOTLAB_NODE)))
     $(error Could not find 'archi' for $(BOARD), update mapping in $(lastword $(MAKEFILE_LIST)))
   endif
 
-  _NODES_DEPLOYED = $(shell iotlab-experiment --jmespath='deploymentresults."0"' --format='" ".join' get $(_IOTLAB_EXP_ID) --print)
   ifeq (auto,$(IOTLAB_NODE))
     _NODES_DEPLOYED := $(filter %.$(shell hostname).iot-lab.info, $(_NODES_DEPLOYED))
   endif
-  _NODES_FOR_BOARD = $(shell iotlab-experiment --jmespath="items[?archi=='$(IOTLAB_ARCHI)'].network_address" --format='" ".join' get $(_IOTLAB_EXP_ID) --resources)
+  _NODES_FOR_BOARD = $(shell iotlab-experiment --jmespath="items[?archi=='$(IOTLAB_ARCHI)'].network_address" --format='" ".join' get $(_IOTLAB_EXP_ID) $(_NODES_LIST_OPTION))
 
   _IOTLAB_NODE := $(word $(IOTLAB_NODE_AUTO_NUM),$(filter $(_NODES_DEPLOYED),$(_NODES_FOR_BOARD)))
   ifeq (auto,$(IOTLAB_NODE))
@@ -156,11 +175,11 @@ _STDIN_EQ_0 = grep 0
 
 ifneq (iotlab-a8-m3,$(BOARD))
 
-  # M3 and wsn430 nodes
+  # M3 nodes
   FLASHER     = iotlab-node
   RESET       = iotlab-node
   _NODE_FMT   = --jmespath='keys(@)[0]' --format='int'
-  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) --update $(FLASHFILE) | $(_STDIN_EQ_0)
+  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) $(_NODES_FLASH_OPTION) $(FLASHFILE) | $(_STDIN_EQ_0)
   RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) --reset | $(_STDIN_EQ_0)
 
   ifeq (,$(_IOTLAB_ON_FRONTEND))

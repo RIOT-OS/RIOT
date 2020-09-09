@@ -27,11 +27,6 @@
 #include "debug.h"
 
 /**
- * @brief   This timer implementation has three available channels
- */
-#define CC_CHANNELS      (3U)
-
-/**
  * @brief   Timer state memory
  */
 static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
@@ -87,7 +82,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
     TIMER_TypeDef *tim;
 
-    if ((channel < 0) || (channel >= (int)CC_CHANNELS)) {
+    if ((channel < 0) || (channel >= TIMER_CHANNEL_NUMOF)) {
         return -1;
     }
 
@@ -99,7 +94,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 
 int timer_clear(tim_t dev, int channel)
 {
-    if ((channel < 0) || (channel >= (int)CC_CHANNELS)) {
+    if ((channel < 0) || (channel >= TIMER_CHANNEL_NUMOF)) {
         return -1;
     }
 
@@ -131,7 +126,7 @@ void timer_reset(tim_t dev)
 void TIMER_0_ISR(void)
 {
     TIMER_TypeDef *tim = timer_config[0].timer;
-    for (unsigned i = 0; i < CC_CHANNELS; i++) {
+    for (int i = 0; i < TIMER_CHANNEL_NUMOF; i++) {
         if (tim->IF & (TIMER_IF_CC0 << i)) {
             tim->CC[i].CTRL = _TIMER_CC_CTRL_MODE_OFF;
             tim->IFC = (TIMER_IFC_CC0 << i);

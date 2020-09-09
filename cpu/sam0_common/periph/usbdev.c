@@ -15,6 +15,9 @@
  * @author  Koen Zandberg <koen@bergzand.net>
  * @}
  */
+
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -227,8 +230,10 @@ static bool _syncbusy_swrst(sam0_common_usb_t *dev)
     return dev->config->device->SYNCBUSY.bit.SWRST;
 }
 
-static inline void _poweron(void)
+static inline void _poweron(sam0_common_usb_t *dev)
 {
+    sam0_gclk_enable(dev->config->gclk_src);
+
 #if defined(MCLK)
     MCLK->AHBMASK.reg |= MCLK_AHBMASK_USB;
     MCLK->APBBMASK.reg |= MCLK_APBBMASK_USB;
@@ -237,18 +242,13 @@ static inline void _poweron(void)
     PM->APBBMASK.reg |= PM_APBBMASK_USB;
 #endif
 
-#if defined(CPU_FAM_SAMD21)
-    GCLK->CLKCTRL.reg = (uint32_t)(GCLK_CLKCTRL_CLKEN |
-                                   GCLK_CLKCTRL_GEN_GCLK0 |
-                                   (GCLK_CLKCTRL_ID(USB_GCLK_ID)));
-#elif defined(CPU_FAM_SAML21)
-    GCLK->PCHCTRL[USB_GCLK_ID].reg = GCLK_PCHCTRL_CHEN |
-                                     GCLK_PCHCTRL_GEN_GCLK0;
-#elif defined(CPU_FAM_SAMD5X)
-    GCLK->PCHCTRL[USB_GCLK_ID].reg = GCLK_PCHCTRL_CHEN |
-                                     GCLK_PCHCTRL_GEN_GCLK6;
+#if defined(CPU_COMMON_SAMD21)
+    GCLK->CLKCTRL.reg = GCLK_CLKCTRL_CLKEN
+                      | GCLK_CLKCTRL_GEN(dev->config->gclk_src)
+                      | GCLK_CLKCTRL_ID(USB_GCLK_ID);
 #else
-#error "Unknown CPU family for sam0 common usbdev driver"
+    GCLK->PCHCTRL[USB_GCLK_ID].reg = GCLK_PCHCTRL_CHEN
+                                   | GCLK_PCHCTRL_GEN(dev->config->gclk_src);
 #endif
 }
 
@@ -294,14 +294,14 @@ static usbdev_ep_t *_usbdev_new_ep(usbdev_t *dev, usb_ep_type_t type,
 
 static void _block_pm(void)
 {
-#if defined(CPU_FAM_SAMD21)
+#if defined(CPU_COMMON_SAMD21)
     pm_block(SAMD21_PM_IDLE_1);
 #endif
 }
 
 static void _unblock_pm(void)
 {
-#if defined(CPU_FAM_SAMD21)
+#if defined(CPU_COMMON_SAMD21)
     pm_unblock(SAMD21_PM_IDLE_1);
 #endif
 }
@@ -337,7 +337,7 @@ static void _usbdev_init(usbdev_t *dev)
     gpio_init(usbdev->config->dm, GPIO_IN);
     gpio_init_mux(usbdev->config->dm, usbdev->config->d_mux);
     gpio_init_mux(usbdev->config->dp, usbdev->config->d_mux);
-    _poweron();
+    _poweron(usbdev);
 
     /* Reset peripheral */
     usbdev->config->device->CTRLA.reg |= USB_CTRLA_SWRST;
@@ -363,7 +363,7 @@ static void _usbdev_init(usbdev_t *dev)
     _block_pm();
     usbdev->usbdev.cb(&usbdev->usbdev, USBDEV_EVENT_HOST_CONNECT);
     /* Interrupt configuration */
-#ifdef CPU_FAM_SAMD5X
+#ifdef CPU_COMMON_SAMD5X
     NVIC_EnableIRQ(USB_0_IRQn);
     NVIC_EnableIRQ(USB_1_IRQn);
     NVIC_EnableIRQ(USB_2_IRQn);

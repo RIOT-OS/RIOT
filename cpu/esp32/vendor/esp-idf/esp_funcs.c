@@ -86,21 +86,17 @@ uint32_t IRAM_ATTR esp_log_timestamp(void)
     return system_get_time() / USEC_PER_MSEC;
 }
 
+typedef struct {
+    const char *tag;
+    unsigned level;
+} esp_log_level_entry_t;
 
-#if MODULE_ESP_LOG_TAGGED
-#define ESP_LOG_PREFIX(letter, tag)  \
-                        printf(LOG_COLOR_ ## letter #letter " (%d) [%s] ", \
-                               system_get_time_ms(), tag)
-#else
-#define ESP_LOG_PREFIX(letter, tag)  \
-                        printf(LOG_COLOR_ ## letter "[%s] ", tag)
-#endif
+static esp_log_level_entry_t _log_levels[] = {
+    { .tag = "wifi", .level = LOG_INFO },
+    { .tag = "*", .level = LOG_DEBUG },
+};
 
-#if MODULE_ESP_LOG_COLORED
-#define ESP_LOG_SUFFIX()  printf(LOG_RESET_COLOR)
-#else
-#define ESP_LOG_SUFFIX()
-#endif
+static char _printf_buf[PRINTF_BUFSIZ];
 
 /*
  * provided by: /path/to/esp-idf/component/log/log.c
@@ -108,21 +104,37 @@ uint32_t IRAM_ATTR esp_log_timestamp(void)
 void IRAM_ATTR esp_log_write(esp_log_level_t level,
                              const char* tag, const char* format, ...)
 {
-    if ((unsigned)level > CONFIG_LOG_DEFAULT_LEVEL) {
+    /*
+     * We use the log level set for the given tag instead of using
+     * the given log level.
+     */
+    esp_log_level_t act_level = LOG_DEBUG;
+    size_t i;
+    for (i = 0; i < ARRAY_SIZE(_log_levels); i++) {
+        if (strcmp(tag, _log_levels[i].tag) == 0) {
+            act_level = _log_levels[i].level;
+            break;
+        }
+    }
+
+    /* If we didn't find an entry for the tag, we use the log level for "*" */
+    if (i == ARRAY_SIZE(_log_levels)) {
+        act_level = _log_levels[ARRAY_SIZE(_log_levels)-1].level;
+    }
+
+    /* Return if the log output has not the required level */    
+    if ((unsigned)act_level > CONFIG_LOG_DEFAULT_LEVEL) {
         return;
     }
 
-    char _printf_buf[PRINTF_BUFSIZ];
-    const char* prefix = (strchr (format, ':') + 2);
-
-    switch (level) {
-        case LOG_NONE   : return;
-        case LOG_ERROR  : ESP_LOG_PREFIX(E, tag); break;
-        case LOG_WARNING: ESP_LOG_PREFIX(W, tag); break;
-        case LOG_INFO   : ESP_LOG_PREFIX(I, tag); break;
-        case LOG_DEBUG  : ESP_LOG_PREFIX(D, tag); break;
-        case LOG_ALL    : ESP_LOG_PREFIX(V, tag); break;
-    }
+    /*
+     * The format of log output from ESP SDK libraries is "X (s) t: message\n"
+     * where X is the log level, d the system time in milliseconds and t the
+     * tag. To be able to enable these additional information by module
+     * `esp_log_tagged`, we have to separate these information from the
+     * message here.
+     */
+    const char* msg = (strchr (format, ':') + 2);
 
     va_list arglist;
     va_start(arglist, format);
@@ -130,16 +142,17 @@ void IRAM_ATTR esp_log_write(esp_log_level_t level,
     /* remove time and tag argument from argument list */
     va_arg(arglist, unsigned);
     va_arg(arglist, const char*);
-
-    int ret = vsnprintf(_printf_buf, PRINTF_BUFSIZ, prefix, arglist);
-
+    vsnprintf(_printf_buf, PRINTF_BUFSIZ, msg, arglist);
     va_end(arglist);
 
-    if (ret > 0) {
-        printf ("%s", _printf_buf);
+    switch (act_level) {
+        case LOG_NONE   : return;
+        case LOG_ERROR  : LOG_TAG_ERROR  (tag, "%s", _printf_buf); break;
+        case LOG_WARNING: LOG_TAG_WARNING(tag, "%s", _printf_buf); break;
+        case LOG_INFO   : LOG_TAG_INFO   (tag, "%s", _printf_buf); break;
+        case LOG_DEBUG  : LOG_TAG_DEBUG  (tag, "%s", _printf_buf); break;
+        case LOG_ALL    : LOG_TAG_ALL    (tag, "%s", _printf_buf); break;
     }
-
-    ESP_LOG_SUFFIX();
 }
 
 /*
@@ -147,7 +160,19 @@ void IRAM_ATTR esp_log_write(esp_log_level_t level,
  */
 void esp_log_level_set(const char* tag, esp_log_level_t level)
 {
-    /* TODO implementation */
+    size_t i;
+    for (i = 0; i < ARRAY_SIZE(_log_levels); i++) {
+        if (strcmp(tag, _log_levels[i].tag) == 0) {
+            break;
+        }
+    }
+
+    if (i == ARRAY_SIZE(_log_levels)) {
+        LOG_DEBUG("Tag for setting log level not found\n");
+        return;
+    }
+
+    _log_levels[i].level = level;
 }
 
 static bool _spi_ram_initialized = false;
@@ -287,7 +312,7 @@ esp_err_t esp_base_mac_addr_get(uint8_t *mac)
     uint8_t null_mac[6] = {0};
 
     if (memcmp(base_mac_addr, null_mac, 6) == 0) {
-        ESP_LOGI(TAG, "Base MAC address is not set, read default base MAC address from BLK0 of EFUSE");
+        ESP_LOGD(TAG, "Base MAC address is not set, read default base MAC address from BLK0 of EFUSE");
         return ESP_ERR_INVALID_MAC;
     }
 

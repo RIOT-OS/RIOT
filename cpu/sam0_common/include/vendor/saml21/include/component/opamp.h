@@ -3,39 +3,25 @@
  *
  * \brief Component description for OPAMP
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2018 Microchip Technology Inc.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * SPDX-License-Identifier: Apache-2.0
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the Licence at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * \asf_license_stop
  *
@@ -67,15 +53,15 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define OPAMP_CTRLA_OFFSET          0x00         /**< \brief (OPAMP_CTRLA offset) Control A */
-#define OPAMP_CTRLA_RESETVALUE      0x00ul       /**< \brief (OPAMP_CTRLA reset_value) Control A */
+#define OPAMP_CTRLA_RESETVALUE      _U_(0x00)    /**< \brief (OPAMP_CTRLA reset_value) Control A */
 
 #define OPAMP_CTRLA_SWRST_Pos       0            /**< \brief (OPAMP_CTRLA) Software Reset */
-#define OPAMP_CTRLA_SWRST           (0x1ul << OPAMP_CTRLA_SWRST_Pos)
+#define OPAMP_CTRLA_SWRST           (_U_(0x1) << OPAMP_CTRLA_SWRST_Pos)
 #define OPAMP_CTRLA_ENABLE_Pos      1            /**< \brief (OPAMP_CTRLA) Enable */
-#define OPAMP_CTRLA_ENABLE          (0x1ul << OPAMP_CTRLA_ENABLE_Pos)
+#define OPAMP_CTRLA_ENABLE          (_U_(0x1) << OPAMP_CTRLA_ENABLE_Pos)
 #define OPAMP_CTRLA_LPMUX_Pos       7            /**< \brief (OPAMP_CTRLA) Low-Power Mux */
-#define OPAMP_CTRLA_LPMUX           (0x1ul << OPAMP_CTRLA_LPMUX_Pos)
-#define OPAMP_CTRLA_MASK            0x83ul       /**< \brief (OPAMP_CTRLA) MASK Register */
+#define OPAMP_CTRLA_LPMUX           (_U_(0x1) << OPAMP_CTRLA_LPMUX_Pos)
+#define OPAMP_CTRLA_MASK            _U_(0x83)    /**< \brief (OPAMP_CTRLA) MASK Register */
 
 /* -------- OPAMP_STATUS : (OPAMP Offset: 0x02) (R/   8) Status -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -91,15 +77,15 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define OPAMP_STATUS_OFFSET         0x02         /**< \brief (OPAMP_STATUS offset) Status */
-#define OPAMP_STATUS_RESETVALUE     0x00ul       /**< \brief (OPAMP_STATUS reset_value) Status */
+#define OPAMP_STATUS_RESETVALUE     _U_(0x00)    /**< \brief (OPAMP_STATUS reset_value) Status */
 
 #define OPAMP_STATUS_READY0_Pos     0            /**< \brief (OPAMP_STATUS) OPAMP 0 Ready */
-#define OPAMP_STATUS_READY0         (0x1ul << OPAMP_STATUS_READY0_Pos)
+#define OPAMP_STATUS_READY0         (_U_(0x1) << OPAMP_STATUS_READY0_Pos)
 #define OPAMP_STATUS_READY1_Pos     1            /**< \brief (OPAMP_STATUS) OPAMP 1 Ready */
-#define OPAMP_STATUS_READY1         (0x1ul << OPAMP_STATUS_READY1_Pos)
+#define OPAMP_STATUS_READY1         (_U_(0x1) << OPAMP_STATUS_READY1_Pos)
 #define OPAMP_STATUS_READY2_Pos     2            /**< \brief (OPAMP_STATUS) OPAMP 2 Ready */
-#define OPAMP_STATUS_READY2         (0x1ul << OPAMP_STATUS_READY2_Pos)
-#define OPAMP_STATUS_MASK           0x07ul       /**< \brief (OPAMP_STATUS) MASK Register */
+#define OPAMP_STATUS_READY2         (_U_(0x1) << OPAMP_STATUS_READY2_Pos)
+#define OPAMP_STATUS_MASK           _U_(0x07)    /**< \brief (OPAMP_STATUS) MASK Register */
 
 /* -------- OPAMP_OPAMPCTRL : (OPAMP Offset: 0x04) (R/W 32) OPAMP Control n -------- */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
@@ -127,38 +113,38 @@ typedef union {
 #endif /* !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 #define OPAMP_OPAMPCTRL_OFFSET      0x04         /**< \brief (OPAMP_OPAMPCTRL offset) OPAMP Control n */
-#define OPAMP_OPAMPCTRL_RESETVALUE  0x00000000ul /**< \brief (OPAMP_OPAMPCTRL reset_value) OPAMP Control n */
+#define OPAMP_OPAMPCTRL_RESETVALUE  _U_(0x00000000) /**< \brief (OPAMP_OPAMPCTRL reset_value) OPAMP Control n */
 
 #define OPAMP_OPAMPCTRL_ENABLE_Pos  1            /**< \brief (OPAMP_OPAMPCTRL) Operational Amplifier Enable */
-#define OPAMP_OPAMPCTRL_ENABLE      (0x1ul << OPAMP_OPAMPCTRL_ENABLE_Pos)
+#define OPAMP_OPAMPCTRL_ENABLE      (_U_(0x1) << OPAMP_OPAMPCTRL_ENABLE_Pos)
 #define OPAMP_OPAMPCTRL_ANAOUT_Pos  2            /**< \brief (OPAMP_OPAMPCTRL) Analog Output */
-#define OPAMP_OPAMPCTRL_ANAOUT      (0x1ul << OPAMP_OPAMPCTRL_ANAOUT_Pos)
+#define OPAMP_OPAMPCTRL_ANAOUT      (_U_(0x1) << OPAMP_OPAMPCTRL_ANAOUT_Pos)
 #define OPAMP_OPAMPCTRL_BIAS_Pos    3            /**< \brief (OPAMP_OPAMPCTRL) Bias Selection */
-#define OPAMP_OPAMPCTRL_BIAS_Msk    (0x3ul << OPAMP_OPAMPCTRL_BIAS_Pos)
+#define OPAMP_OPAMPCTRL_BIAS_Msk    (_U_(0x3) << OPAMP_OPAMPCTRL_BIAS_Pos)
 #define OPAMP_OPAMPCTRL_BIAS(value) (OPAMP_OPAMPCTRL_BIAS_Msk & ((value) << OPAMP_OPAMPCTRL_BIAS_Pos))
 #define OPAMP_OPAMPCTRL_RUNSTDBY_Pos 6            /**< \brief (OPAMP_OPAMPCTRL) Run in Standby */
-#define OPAMP_OPAMPCTRL_RUNSTDBY    (0x1ul << OPAMP_OPAMPCTRL_RUNSTDBY_Pos)
+#define OPAMP_OPAMPCTRL_RUNSTDBY    (_U_(0x1) << OPAMP_OPAMPCTRL_RUNSTDBY_Pos)
 #define OPAMP_OPAMPCTRL_ONDEMAND_Pos 7            /**< \brief (OPAMP_OPAMPCTRL) On Demand Control */
-#define OPAMP_OPAMPCTRL_ONDEMAND    (0x1ul << OPAMP_OPAMPCTRL_ONDEMAND_Pos)
+#define OPAMP_OPAMPCTRL_ONDEMAND    (_U_(0x1) << OPAMP_OPAMPCTRL_ONDEMAND_Pos)
 #define OPAMP_OPAMPCTRL_RES2OUT_Pos 8            /**< \brief (OPAMP_OPAMPCTRL) Resistor ladder To Output */
-#define OPAMP_OPAMPCTRL_RES2OUT     (0x1ul << OPAMP_OPAMPCTRL_RES2OUT_Pos)
+#define OPAMP_OPAMPCTRL_RES2OUT     (_U_(0x1) << OPAMP_OPAMPCTRL_RES2OUT_Pos)
 #define OPAMP_OPAMPCTRL_RES2VCC_Pos 9            /**< \brief (OPAMP_OPAMPCTRL) Resistor ladder To VCC */
-#define OPAMP_OPAMPCTRL_RES2VCC     (0x1ul << OPAMP_OPAMPCTRL_RES2VCC_Pos)
+#define OPAMP_OPAMPCTRL_RES2VCC     (_U_(0x1) << OPAMP_OPAMPCTRL_RES2VCC_Pos)
 #define OPAMP_OPAMPCTRL_RES1EN_Pos  10           /**< \brief (OPAMP_OPAMPCTRL) Resistor 1 Enable */
-#define OPAMP_OPAMPCTRL_RES1EN      (0x1ul << OPAMP_OPAMPCTRL_RES1EN_Pos)
+#define OPAMP_OPAMPCTRL_RES1EN      (_U_(0x1) << OPAMP_OPAMPCTRL_RES1EN_Pos)
 #define OPAMP_OPAMPCTRL_RES1MUX_Pos 11           /**< \brief (OPAMP_OPAMPCTRL) Resistor 1 Mux */
-#define OPAMP_OPAMPCTRL_RES1MUX_Msk (0x3ul << OPAMP_OPAMPCTRL_RES1MUX_Pos)
+#define OPAMP_OPAMPCTRL_RES1MUX_Msk (_U_(0x3) << OPAMP_OPAMPCTRL_RES1MUX_Pos)
 #define OPAMP_OPAMPCTRL_RES1MUX(value) (OPAMP_OPAMPCTRL_RES1MUX_Msk & ((value) << OPAMP_OPAMPCTRL_RES1MUX_Pos))
 #define OPAMP_OPAMPCTRL_POTMUX_Pos  13           /**< \brief (OPAMP_OPAMPCTRL) Potentiometer Selection */
-#define OPAMP_OPAMPCTRL_POTMUX_Msk  (0x7ul << OPAMP_OPAMPCTRL_POTMUX_Pos)
+#define OPAMP_OPAMPCTRL_POTMUX_Msk  (_U_(0x7) << OPAMP_OPAMPCTRL_POTMUX_Pos)
 #define OPAMP_OPAMPCTRL_POTMUX(value) (OPAMP_OPAMPCTRL_POTMUX_Msk & ((value) << OPAMP_OPAMPCTRL_POTMUX_Pos))
 #define OPAMP_OPAMPCTRL_MUXPOS_Pos  16           /**< \brief (OPAMP_OPAMPCTRL) Positive Input Mux Selection */
-#define OPAMP_OPAMPCTRL_MUXPOS_Msk  (0x7ul << OPAMP_OPAMPCTRL_MUXPOS_Pos)
+#define OPAMP_OPAMPCTRL_MUXPOS_Msk  (_U_(0x7) << OPAMP_OPAMPCTRL_MUXPOS_Pos)
 #define OPAMP_OPAMPCTRL_MUXPOS(value) (OPAMP_OPAMPCTRL_MUXPOS_Msk & ((value) << OPAMP_OPAMPCTRL_MUXPOS_Pos))
 #define OPAMP_OPAMPCTRL_MUXNEG_Pos  20           /**< \brief (OPAMP_OPAMPCTRL) Negative Input Mux Selection */
-#define OPAMP_OPAMPCTRL_MUXNEG_Msk  (0x7ul << OPAMP_OPAMPCTRL_MUXNEG_Pos)
+#define OPAMP_OPAMPCTRL_MUXNEG_Msk  (_U_(0x7) << OPAMP_OPAMPCTRL_MUXNEG_Pos)
 #define OPAMP_OPAMPCTRL_MUXNEG(value) (OPAMP_OPAMPCTRL_MUXNEG_Msk & ((value) << OPAMP_OPAMPCTRL_MUXNEG_Pos))
-#define OPAMP_OPAMPCTRL_MASK        0x0077FFDEul /**< \brief (OPAMP_OPAMPCTRL) MASK Register */
+#define OPAMP_OPAMPCTRL_MASK        _U_(0x0077FFDE) /**< \brief (OPAMP_OPAMPCTRL) MASK Register */
 
 /** \brief OPAMP hardware registers */
 #if !(defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))

@@ -6,8 +6,6 @@ BOARD_WHITELIST = native    # socket_zep is only available on native
 #   ZEP: Unable to connect socket: Cannot assign requested address
 TEST_ON_CI_BLACKLIST += native
 
-DISABLE_MODULE += auto_init
-
 USEMODULE += od
 USEMODULE += socket_zep
 

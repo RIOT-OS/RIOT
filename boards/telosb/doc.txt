@@ -20,8 +20,8 @@
 | SPIs       | 2 |
 | I2Cs       | 1     |
 | Vcc        | 2.0V - 3.6V           |
-| Datasheet / Reference Manual   | [Datasheet](http://www.ti.com/lit/gpn/msp430f1611) |
-| User Guide | [User Guide](http://www.mi.fu-berlin.de/inf/groups/ag-tech/projects/Z_Finished_Projects/ScatterWeb/moduleComponents/MSP430slau049f.pdf?1346661398)|
+| Datasheet / Reference Manual   | [Datasheet](https://www.ti.com/product/MSP430F1611) |
+| User Guide | [User Guide](https://www.ti.com/lit/ug/slau049f/slau049f.pdf)|
 
 ## Radio
 
@@ -53,5 +53,5 @@ The shell is using the UART interface of the TelosB at 115200 baud.
 
 ## More information
 
-[advanticsys](http://www.advanticsys.com/shop/mtmcm5000msp-p-14.html)
+[MEMSIC](http://www.memsic.com/userfiles/files/DataSheets/WSN/telosb_datasheet.pdf)
  */

@@ -65,8 +65,8 @@ int nrf24l01p_write_reg(const nrf24l01p_t *dev, char reg, char write)
 int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq)
 {
     int status;
-    static const char INITIAL_TX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
-    static const char INITIAL_RX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
+    static const uint8_t INITIAL_TX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
+    static const uint8_t INITIAL_RX_ADDRESS[] =  {0xe7, 0xe7, 0xe7, 0xe7, 0xe7,};
 
     dev->spi = spi;
     dev->ce = ce;
@@ -363,7 +363,7 @@ int nrf24l01p_set_payload_width(const nrf24l01p_t *dev,
 
 
 
-int nrf24l01p_set_tx_address(const nrf24l01p_t *dev, const char *saddr, unsigned int length)
+int nrf24l01p_set_tx_address(const nrf24l01p_t *dev, const uint8_t *saddr, unsigned int length)
 {
     /* Acquire exclusive access to the bus. */
     spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
@@ -427,7 +427,7 @@ uint64_t nrf24l01p_get_tx_address_long(const nrf24l01p_t *dev)
 }
 
 
-int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, const char *saddr, unsigned int length)
+int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, const uint8_t *saddr, unsigned int length)
 {
     char pipe_addr;
 
@@ -477,7 +477,7 @@ int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, c
 
 int nrf24l01p_set_rx_address_long(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, uint64_t saddr, unsigned int length)
 {
-    char buf[length];
+    uint8_t buf[length];
 
     if (length <= INITIAL_ADDRESS_WIDTH) {
         for (unsigned int i = 0; i < length; i++) {

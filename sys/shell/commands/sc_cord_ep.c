@@ -32,8 +32,12 @@ static int make_sock_ep(sock_udp_ep_t *ep, const char *addr)
     if (sock_udp_str2ep(ep, addr) < 0) {
         return -1;
     }
+    /* if netif not specified in addr */
+    if ((ep->netif == SOCK_ADDR_ANY_NETIF) && (gnrc_netif_numof() == 1)) {
+        /* assign the single interface found in gnrc_netif_numof() */
+        ep->netif = (uint16_t)gnrc_netif_iter(NULL)->pid;
+    }
     ep->family  = AF_INET6;
-    ep->netif   = SOCK_ADDR_ANY_NETIF;
     if (ep->port == 0) {
         ep->port = COAP_PORT;
     }
@@ -73,7 +77,7 @@ int _cord_ep_handler(int argc, char **argv)
             printf("usage: %s discover <server address>\n", argv[0]);
             return 1;
         }
-        char regif[NANOCOAP_URI_MAX];
+        char regif[CONFIG_NANOCOAP_URI_MAX];
         sock_udp_ep_t remote;
         if (make_sock_ep(&remote, argv[2]) < 0) {
             printf("error: unable to parse address\n");

@@ -149,7 +149,7 @@ int adc_init(adc_t line)
 }
 
 
-int adc_sample(adc_t line, adc_res_t res)
+int32_t adc_sample(adc_t line, adc_res_t res)
 {
     CHECK_PARAM_RET (line < ADC_NUMOF, -1)
     CHECK_PARAM_RET (res <= ADC_RES_12BIT, -1)

@@ -82,13 +82,12 @@
 
 #include <stddef.h>
 #include "kernel_defines.h"
-#include "bitarithm.h"
 #include "kernel_types.h"
 #include "native_sched.h"
 #include "clist.h"
 
 #ifdef __cplusplus
- extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -98,6 +97,8 @@ typedef struct _thread thread_t;
 
 /**
  * @name Thread states supported by RIOT
+ *
+ *       Keep in sync with OpenOCD src/rtos/riot.c
  * @{
  */
 typedef enum {
@@ -123,7 +124,7 @@ typedef enum {
  * @{
  */
 #define STATUS_ON_RUNQUEUE      STATUS_RUNNING  /**< to check if on run queue:
-                                                 `st >= STATUS_ON_RUNQUEUE`   */
+                                                   `st >= STATUS_ON_RUNQUEUE`   */
 #define STATUS_NOT_FOUND ((thread_status_t)-1)  /**< Describes an illegal thread status */
 /** @} */
 /**
@@ -136,9 +137,12 @@ typedef enum {
 
 /**
  * @brief   Triggers the scheduler to schedule the next thread
- * @returns 1 if sched_active_thread/sched_active_pid was changed, 0 otherwise.
+ *
+ * @returns     The new thread to schedule if sched_active_thread/sched_active_pid
+ *              was changed,
+ * @returns     NULL if the active thread was not changed.
  */
-int sched_run(void);
+thread_t *sched_run(void);
 
 /**
  * @brief   Set the status of the specified process
@@ -204,13 +208,39 @@ extern clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
  */
 NORETURN void sched_task_exit(void);
 
-#ifdef MODULE_SCHED_CB
 /**
- *  @brief  Register a callback that will be called on every scheduler run
+ * @brief  Set CPU to idle mode (CPU dependent)
  *
- *  @param[in] callback The callback functions the will be called
+ * Only used when there's no idle thread.
+ *
+ * This function will be called by the scheduler when there's no runnable thread.
+ * It will be called from ISR context, and *must* allow other ISR handlers to be run.
+ * E.g., on Cortex-M, the PendSV priority is temporarily lowered (set to higher
+ * value) in order to enable other exceptions to be run.
+ *
+ * This function should also invoke setting a low power mode, e.g., by calling
+ * 'pm_set_lowest()'.
  */
-void sched_register_cb(void (*callback)(kernel_pid_t, kernel_pid_t));
+void sched_arch_idle(void);
+
+#if IS_USED(MODULE_SCHED_CB) || defined(DOXYGEN)
+/**
+ * @brief   Scheduler run callback
+ *
+ * @note Both @p active and @p next can be KERNEL_PID_UNDEF, but not at the same
+ * time.
+ *
+ * @param   active      Pid of the active thread pid
+ * @param   next        Pid of the next scheduled thread
+ */
+typedef void (*sched_callback_t)(kernel_pid_t active, kernel_pid_t next);
+
+/**
+ * @brief  Register a callback that will be called on every scheduler run
+ *
+ * @param[in] callback The callback functions that will be called
+ */
+void sched_register_cb(sched_callback_t callback);
 #endif /* MODULE_SCHED_CB */
 
 #ifdef __cplusplus

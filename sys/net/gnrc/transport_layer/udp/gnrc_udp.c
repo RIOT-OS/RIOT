@@ -226,7 +226,7 @@ static void *_event_loop(void *arg)
     msg_t msg, reply;
     msg_t msg_queue[GNRC_UDP_MSG_QUEUE_SIZE];
     gnrc_netreg_entry_t netreg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                                            sched_active_pid);
+                                                            thread_getpid());
     /* preset reply message */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
     reply.content.value = (uint32_t)-ENOTSUP;

@@ -1,3 +1,0 @@
-SRCS := jsmn.c
-
-include $(RIOTBASE)/Makefile.base

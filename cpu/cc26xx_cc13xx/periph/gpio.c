@@ -22,6 +22,8 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 
+#include "cc26xx_cc13xx_power.h"
+
 #define DOE_SHIFT               (29U)
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
@@ -38,12 +40,13 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     if ((unsigned int)pin > 31)
         return -1;
 
+    /* enable peripherals power domain */
+    if (!power_is_domain_enabled(POWER_DOMAIN_PERIPHERALS)) {
+        power_enable_domain(POWER_DOMAIN_PERIPHERALS);
+    }
+
     /* enable GPIO clock */
-    PRCM->PDCTL0 |= PDCTL0_PERIPH_ON;
-    while(!(PRCM->PDSTAT0 & PDSTAT0_PERIPH_ON)) ;
-    PRCM->GPIOCLKGR |= 1;
-    PRCM->CLKLOADCTL |= CLKLOADCTL_LOAD;
-    while (!(PRCM->CLKLOADCTL & CLKLOADCTL_LOADDONE)) ;
+    power_clock_enable_gpio();
 
     /* configure the GPIO mode */
     IOC->CFG[pin] = mode;

@@ -178,7 +178,7 @@ int qmc5883l_init_int(const qmc5883l_t *dev, gpio_cb_t cb, void *arg)
     assert(dev);
     assert(cb);
 
-    if (dev->pin_drdy == GPIO_UNDEF) {
+    if (!gpio_is_valid(dev->pin_drdy)) {
         return QMC5883L_NOCFG;
     }
     if (gpio_init_int(dev->pin_drdy, GPIO_IN, GPIO_RISING, cb, arg) != 0) {

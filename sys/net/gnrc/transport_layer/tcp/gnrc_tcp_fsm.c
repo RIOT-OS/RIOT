@@ -85,7 +85,7 @@ static int _clear_retransmit(gnrc_tcp_tcb_t *tcb)
 {
     if (tcb->pkt_retransmit != NULL) {
         gnrc_pktbuf_release(tcb->pkt_retransmit);
-        xtimer_remove(&(tcb->tim_tout));
+        xtimer_remove(&(tcb->timer_retransmit));
         tcb->pkt_retransmit = NULL;
     }
     return 0;
@@ -100,10 +100,11 @@ static int _clear_retransmit(gnrc_tcp_tcb_t *tcb)
  */
 static int _restart_timewait_timer(gnrc_tcp_tcb_t *tcb)
 {
-    xtimer_remove(&tcb->tim_tout);
-    tcb->msg_tout.type = MSG_TYPE_TIMEWAIT;
-    tcb->msg_tout.content.ptr = (void *)tcb;
-    xtimer_set_msg(&tcb->tim_tout, 2 * GNRC_TCP_MSL, &tcb->msg_tout, gnrc_tcp_pid);
+    xtimer_remove(&tcb->timer_retransmit);
+    tcb->msg_retransmit.type = MSG_TYPE_TIMEWAIT;
+    tcb->msg_retransmit.content.ptr = (void *)tcb;
+    xtimer_set_msg(&(tcb->timer_retransmit), 2 * CONFIG_GNRC_TCP_MSL, &(tcb->msg_retransmit),
+                   gnrc_tcp_pid);
     return 0;
 }
 
@@ -114,6 +115,8 @@ static int _restart_timewait_timer(gnrc_tcp_tcb_t *tcb)
  * @param[in]     state   State to transition in.
  *
  * @return   Zero on success.
+ * @return   -EADDRINUSE, if @p state == FSM_STATE_SYN_SENT and tcb->local_port
+ *           is already in use.
  */
 static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
 {
@@ -148,11 +151,6 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
 #endif
             tcb->peer_port = PORT_UNSPEC;
 
-            /* Allocate receive buffer */
-            if (_rcvbuf_get_buffer(tcb) == -ENOMEM) {
-                return -ENOMEM;
-            }
-
             /* Add connection to active connections (if not already active) */
             mutex_lock(&_list_tcb_lock);
             LL_SEARCH(_list_tcb_head, iter, tcb, TCB_EQUAL);
@@ -163,11 +161,6 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
             break;
 
         case FSM_STATE_SYN_SENT:
-            /* Allocate rceveive buffer */
-            if (_rcvbuf_get_buffer(tcb) == -ENOMEM) {
-                return -ENOMEM;
-            }
-
             /* Add connection to active connections (if not already active) */
             mutex_lock(&_list_tcb_lock);
             LL_SEARCH(_list_tcb_head, iter, tcb, TCB_EQUAL);
@@ -175,10 +168,9 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
             if (iter == NULL) {
                 /* Check if port number was specified */
                 if (tcb->local_port != PORT_UNSPEC) {
-                    /* Check if given port number is use: return error and release buffer */
+                    /* Check if given port number is in use: return error */
                     if (_is_local_port_in_use(tcb->local_port)) {
                         mutex_unlock(&_list_tcb_lock);
-                        _rcvbuf_release_buffer(tcb);
                         return -EADDRINUSE;
                     }
                 }
@@ -222,14 +214,17 @@ static int _fsm_call_open(gnrc_tcp_tcb_t *tcb)
     int ret = 0;
 
     DEBUG("gnrc_tcp_fsm.c : _fsm_call_open()\n");
-    tcb->rcv_wnd = GNRC_TCP_DEFAULT_WINDOW;
+
+    /* Allocate receive buffer */
+    if (_rcvbuf_get_buffer(tcb) == -ENOMEM) {
+        return -ENOMEM;
+    }
+
+    tcb->rcv_wnd = CONFIG_GNRC_TCP_DEFAULT_WINDOW;
 
     if (tcb->status & STATUS_PASSIVE) {
         /* Passive open, T: CLOSED -> LISTEN */
-        if (_transition_to(tcb, FSM_STATE_LISTEN) == -ENOMEM) {
-            _transition_to(tcb, FSM_STATE_CLOSED);
-            return -ENOMEM;
-        }
+        _transition_to(tcb, FSM_STATE_LISTEN);
     }
     else {
         /* Active Open, set TCB values, send SYN, T: CLOSED -> SYN_SENT */
@@ -272,7 +267,7 @@ static int _fsm_call_send(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
     /* Check if window is open and all packets were transmitted */
     if (payload > 0 && tcb->snd_wnd > 0 && tcb->pkt_retransmit == NULL) {
         /* Calculate segment size */
-        payload = (payload < GNRC_TCP_MSS) ? payload : GNRC_TCP_MSS;
+        payload = (payload < CONFIG_GNRC_TCP_MSS) ? payload : CONFIG_GNRC_TCP_MSS;
         payload = (payload < tcb->mss) ? payload : tcb->mss;
         payload = (payload < len) ? payload : len;
 
@@ -307,8 +302,8 @@ static int _fsm_call_recv(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
     /* Read data into 'buf' up to 'len' bytes from receive buffer */
     size_t rcvd = ringbuffer_get(&(tcb->rcv_buf), buf, len);
 
-    /* If receive buffer can store more than GNRC_TCP_MSS: open window to available buffer size */
-    if (ringbuffer_get_free(&tcb->rcv_buf) >= GNRC_TCP_MSS) {
+    /* If receive buffer can store more than CONFIG_GNRC_TCP_MSS: open window to available buffer size */
+    if (ringbuffer_get_free(&tcb->rcv_buf) >= CONFIG_GNRC_TCP_MSS) {
         tcb->rcv_wnd = ringbuffer_get_free(&(tcb->rcv_buf));
 
         /* Send ACK to anounce window update */
@@ -402,8 +397,6 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
     uint32_t seg_seq = 0;            /* Sequence number of the incoming packet*/
     uint32_t seg_ack = 0;            /* Acknowledgment number of the incoming packet */
     uint32_t seg_wnd = 0;            /* Receive window of the incoming packet */
-    uint32_t seg_len = 0;            /* Segment length of the incoming packet */
-    uint32_t pay_len = 0;            /* Payload length of the incoming packet */
 
     DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt()\n");
     /* Search for TCP header. */
@@ -468,7 +461,10 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                 lst = lst->next;
             }
             /* Return if connection is already handled (port and addresses match) */
-            if (lst != NULL) {
+            /* cppcheck-suppress knownConditionTrueFalse
+             * (reason: tmp *lst* can be true at runtime
+             */
+            if (lst) {
                 DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() : Connection already handled\n");
                 return 0;
             }
@@ -576,8 +572,8 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
     }
     /* Handle other states */
     else {
-        seg_len = _pkt_get_seg_len(in_pkt);
-        pay_len = _pkt_get_pay_len(in_pkt);
+        uint32_t seg_len = _pkt_get_seg_len(in_pkt);
+        uint32_t pay_len = _pkt_get_pay_len(in_pkt);
         /* 1) Verify sequence number ... */
         if (_pkt_chk_seq_num(tcb, seg_seq, pay_len)) {
             /* ... if invalid, and RST not set, reply with pure ACK, return */
@@ -591,10 +587,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
         if (ctl & MSK_RST) {
             /* .. and state is SYN_RCVD and the connection is passive: SYN_RCVD -> LISTEN */
             if (tcb->state == FSM_STATE_SYN_RCVD && (tcb->status & STATUS_PASSIVE)) {
-                if (_transition_to(tcb, FSM_STATE_LISTEN) == -ENOMEM) {
-                    _transition_to(tcb, FSM_STATE_CLOSED);
-                    return -ENOMEM;
-                }
+                _transition_to(tcb, FSM_STATE_LISTEN);
             }
             else {
                 _transition_to(tcb, FSM_STATE_CLOSED);
@@ -897,12 +890,20 @@ int _fsm(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *b
     int32_t result = _fsm_unprotected(tcb, event, in_pkt, buf, len);
 
     /* Notify blocked thread if something interesting happened */
-    if ((tcb->status & STATUS_NOTIFY_USER) && (tcb->status & STATUS_WAIT_FOR_MSG)) {
+    if ((tcb->status & STATUS_NOTIFY_USER) && tcb->mbox) {
         msg_t msg;
         msg.type = MSG_TYPE_NOTIFY_USER;
-        mbox_try_put(&(tcb->mbox), &msg);
+        msg.content.ptr = tcb;
+        mbox_try_put(tcb->mbox, &msg);
     }
     /* Unlock FSM */
     mutex_unlock(&(tcb->fsm_lock));
     return result;
+}
+
+void _fsm_set_mbox(gnrc_tcp_tcb_t *tcb, mbox_t *mbox)
+{
+    mutex_lock(&(tcb->fsm_lock));
+    tcb->mbox = mbox;
+    mutex_unlock(&(tcb->fsm_lock));
 }

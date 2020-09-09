@@ -21,12 +21,11 @@
 #include <string.h>
 
 #include "dose.h"
-#include "luid.h"
 #include "random.h"
 #include "irq.h"
 
+#include "net/eui_provider.h"
 #include "net/netdev/eth.h"
-#include "net/eui64.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -36,7 +35,7 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal);
 static dose_signal_t state_transit_idle(dose_t *ctx, dose_signal_t signal);
 static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal);
 static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal);
-static void state(dose_t *ctx, uint8_t src);
+static void state(dose_t *ctx, dose_signal_t src);
 static void _isr_uart(void *arg, uint8_t c);
 static void _isr_gpio(void *arg);
 static void _isr_xtimer(void *arg);
@@ -49,7 +48,6 @@ static int _send(netdev_t *dev, const iolist_t *iolist);
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
 static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t len);
 static int _init(netdev_t *dev);
-void dose_setup(dose_t *ctx, const dose_params_t *params);
 
 static uint16_t crc16_update(uint16_t crc, uint8_t octet)
 {
@@ -71,11 +69,13 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
          * if this frame should be processed. By queuing NETDEV_EVENT_ISR,
          * the netif thread will call _isr at some time. */
         SETBIT(ctx->flags, DOSE_FLAG_RECV_BUF_DIRTY);
-        ctx->netdev.event_callback((netdev_t *) ctx, NETDEV_EVENT_ISR);
+        netdev_trigger_event_isr((netdev_t *) ctx);
     }
 
-    /* Enable GPIO interrupt for start bit sensing */
-    gpio_irq_enable(ctx->sense_pin);
+    if (gpio_is_valid(ctx->sense_pin)) {
+        /* Enable GPIO interrupt for start bit sensing */
+        gpio_irq_enable(ctx->sense_pin);
+    }
 
     /* The timeout will bring us back into IDLE state by a random time.
      * If we entered this state from RECV state, the random time lays
@@ -106,7 +106,7 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
 {
     dose_signal_t rc = DOSE_SIGNAL_NONE;
 
-    if (ctx->state != DOSE_STATE_RECV) {
+    if (ctx->state != DOSE_STATE_RECV && gpio_is_valid(ctx->sense_pin)) {
         /* We freshly entered this state. Thus, no start bit sensing is required
          * anymore. Disable GPIO IRQs during the transmission. */
         gpio_irq_disable(ctx->sense_pin);
@@ -115,10 +115,10 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
     if (signal == DOSE_SIGNAL_UART) {
         /* We received a new octet */
         int esc = (ctx->flags & DOSE_FLAG_ESC_RECEIVED);
-        if (!esc && ctx->uart_octet == DOSE_OCTECT_ESC) {
+        if (!esc && ctx->uart_octet == DOSE_OCTET_ESC) {
             SETBIT(ctx->flags, DOSE_FLAG_ESC_RECEIVED);
         }
-        else if (!esc && ctx->uart_octet == DOSE_OCTECT_END) {
+        else if (!esc && ctx->uart_octet == DOSE_OCTET_END) {
             SETBIT(ctx->flags, DOSE_FLAG_END_RECEIVED);
             rc = DOSE_SIGNAL_END;
         }
@@ -148,7 +148,7 @@ static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal)
 {
     (void) signal;
 
-    if (ctx->state != DOSE_STATE_SEND) {
+    if (ctx->state != DOSE_STATE_SEND && gpio_is_valid(ctx->sense_pin)) {
         /* Disable GPIO IRQs during the transmission. */
         gpio_irq_disable(ctx->sense_pin);
     }
@@ -374,8 +374,8 @@ static int send_data_octet(dose_t *ctx, uint8_t c)
     int rc;
 
     /* Escape special octets */
-    if (c == DOSE_OCTECT_ESC || c == DOSE_OCTECT_END) {
-        rc = send_octet(ctx, DOSE_OCTECT_ESC);
+    if (c == DOSE_OCTET_ESC || c == DOSE_OCTET_END) {
+        rc = send_octet(ctx, DOSE_OCTET_ESC);
         if (rc) {
             return rc;
         }
@@ -432,7 +432,7 @@ send:
     }
 
     /* Send END octet */
-    if (send_octet(ctx, DOSE_OCTECT_END)) {
+    if (send_octet(ctx, DOSE_OCTET_END)) {
         goto collision;
     }
 
@@ -487,6 +487,12 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t len)
     dose_t *ctx = (dose_t *) dev;
 
     switch (opt) {
+        case NETOPT_ADDRESS:
+            if (len < ETHERNET_ADDR_LEN) {
+                return -EINVAL;
+            }
+            memcpy(ctx->mac_addr.uint8, value, ETHERNET_ADDR_LEN);
+            return ETHERNET_ADDR_LEN;
         case NETOPT_PROMISCUOUSMODE:
             if (len < sizeof(netopt_enable_t)) {
                 return -EINVAL;
@@ -532,9 +538,9 @@ static const netdev_driver_t netdev_driver_dose = {
     .set = _set
 };
 
-void dose_setup(dose_t *ctx, const dose_params_t *params)
+void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
 {
-    static const xtimer_ticks32_t min_timeout = {.ticks32 = XTIMER_BACKOFF + XTIMER_OVERHEAD};
+    static const xtimer_ticks32_t min_timeout = {.ticks32 = XTIMER_BACKOFF};
 
     ctx->netdev.driver = &netdev_driver_dose;
 
@@ -544,11 +550,15 @@ void dose_setup(dose_t *ctx, const dose_params_t *params)
     uart_init(ctx->uart, params->baudrate, _isr_uart, (void *) ctx);
 
     ctx->sense_pin = params->sense_pin;
-    gpio_init_int(ctx->sense_pin, GPIO_IN, GPIO_FALLING, _isr_gpio, (void *) ctx);
-    gpio_irq_disable(ctx->sense_pin);
+    if (gpio_is_valid(ctx->sense_pin)) {
+        gpio_init_int(ctx->sense_pin, GPIO_IN, GPIO_FALLING, _isr_gpio, (void *) ctx);
+        gpio_irq_disable(ctx->sense_pin);
+    }
+
+    netdev_register(&ctx->netdev, NETDEV_DOSE, index);
 
     assert(sizeof(ctx->mac_addr.uint8) == ETHERNET_ADDR_LEN);
-    luid_get_eui48(&ctx->mac_addr);
+    netdev_eui48_get(&ctx->netdev, &ctx->mac_addr);
     DEBUG("dose dose_setup(): mac addr %02x:%02x:%02x:%02x:%02x:%02x\n",
           ctx->mac_addr.uint8[0], ctx->mac_addr.uint8[1], ctx->mac_addr.uint8[2],
           ctx->mac_addr.uint8[3], ctx->mac_addr.uint8[4], ctx->mac_addr.uint8[5]
@@ -558,7 +568,7 @@ void dose_setup(dose_t *ctx, const dose_params_t *params)
      * We have to ensure it is above the XTIMER_BACKOFF. Otherwise state
      * transitions are triggered from another state transition setting up the
      * timeout. */
-    ctx->timeout_base = DOSE_TIMEOUT_USEC;
+    ctx->timeout_base = CONFIG_DOSE_TIMEOUT_USEC;
     if (ctx->timeout_base < xtimer_usec_from_ticks(min_timeout)) {
         ctx->timeout_base = xtimer_usec_from_ticks(min_timeout);
     }

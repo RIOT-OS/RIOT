@@ -193,13 +193,13 @@ static const spi_conf_t spi_config[] = {
 
 /* software timer */
 #define TIMER_NUMOF         (1U)    /**< number of timer devices */
-#define TIMER_CHANNELS      (10U)   /**< number of channels per timer device */
+#define TIMER_CHANNEL_NUMOF (10U)   /**< number of channels per timer device */
 
 #else /* MODULE_ESP_SW_TIMER */
 
 /* hardware timer */
 #define TIMER_NUMOF         (1U)    /**< number of timer devices */
-#define TIMER_CHANNELS      (1U)    /**< number of channels per timer device */
+#define TIMER_CHANNEL_NUMOF (1U)    /**< number of channels per timer device */
 
 #endif /* MODULE_ESP_SW_TIMER */
 /** @} */
@@ -238,7 +238,7 @@ static const uart_conf_t uart_config[] = {
  *
  * @note UART_NUMOF definition must not be changed.
  */
-#define UART_NUMOF  (sizeof(uart_config)/sizeof(uart_config[0]))
+#define UART_NUMOF  ARRAY_SIZE(uart_config)
 /** @} */
 
 #ifdef __cplusplus

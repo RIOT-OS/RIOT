@@ -19,6 +19,9 @@
  * @author      Koen Zandberg <koen@bergzand.net>
  * @}
  */
+
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -28,6 +31,7 @@
 #include "periph/usbdev.h"
 #include "usb.h"
 #include "usb/descriptor.h"
+#include "bitarithm.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"

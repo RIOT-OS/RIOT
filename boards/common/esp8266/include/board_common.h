@@ -73,8 +73,6 @@ extern "C" {
  * @name    XTimer configuration
  * @{
  */
-#define XTIMER_OVERHEAD             (0U)
-
 #if defined(MODULE_ESP_SW_TIMER)
 #define XTIMER_BACKOFF              (100U)
 #define XTIMER_ISR_BACKOFF          (100U)

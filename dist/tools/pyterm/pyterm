@@ -25,6 +25,7 @@ except ImportError:
     import ConfigParser as configparser
 
 import cmd
+import errno
 import serial
 import socket
 import sys
@@ -96,6 +97,7 @@ defaultprompt = '>'
 
 # repeat command on empty line instead of sending the line
 defaultrepeat_cmd_empty_line = True
+defaultreconnect = True
 
 
 class SerCmd(cmd.Cmd):
@@ -109,7 +111,8 @@ class SerCmd(cmd.Cmd):
                  confdir=None, conffile=None, host=None, run_name=None,
                  log_dir_name=None, newline=None, formatter=None,
                  set_rts=None, set_dtr=None, serprompt=None,
-                 repeat_command_on_empty_line=defaultrepeat_cmd_empty_line):
+                 repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
+                 reconnect=defaultreconnect):
         """Constructor.
 
         Args:
@@ -139,6 +142,7 @@ class SerCmd(cmd.Cmd):
         self.newline = newline
         self.serprompt = serprompt
         self.repeat_command_on_empty_line = repeat_command_on_empty_line
+        self.reconnect = reconnect
         if formatter is not None:
             self.fmt_str = formatter
 
@@ -245,16 +249,27 @@ class SerCmd(cmd.Cmd):
                 sys.exit(1)
         # otherwise go for the serial port
         elif self.port:
+            connected = False
             self.logger.info("Connect to serial port %s" % self.port)
-            try:
-                self.serial_connect()
-            except OSError as e:
-                self.logger.error("Cannot connect to serial port {}: {}"
-                                  .format(self.port, e.strerror))
-                sys.exit(1)
-            except serial.SerialException as e:
-                self.logger.error("%s", e.strerror)
-                sys.exit(1)
+            while not connected:
+                try:
+                    self.serial_connect()
+                except serial.SerialException as e:
+                    self.logger.error("%s", e.strerror)
+                    if (not self.reconnect) or (e.errno == errno.ENOENT):
+                        sys.exit(e.errno)
+                    self.logger.info("Trying to reconnect to {} in 10 sec"
+                                     .format(self.port))
+                    time.sleep(10)
+                except OSError as e:
+                    self.logger.error("Cannot connect to serial port {}: {}"
+                                      .format(self.port, e.strerror))
+                    sys.exit(e.errno)
+                except Exception as e:
+                    self.logger.error("Unexpected exception {}".format(e))
+                    sys.exit(1)
+                else:
+                    connected = True
 
         # wait until connection is established and fire startup
         # commands to the node
@@ -317,6 +332,14 @@ class SerCmd(cmd.Cmd):
         """
         date = time.strftime("%Y-%m-%d %H:%M:%S")
         return ["%s" % (date)]
+
+    def do_PYTERM_sleep(self, line):
+        """Pyterm command: Sleep for n seconds.
+        """
+        if line:
+            time.sleep(float(line))
+        else:
+            self.logger.error("sleep: missing operand")
 
     def do_PYTERM_reset(self, line):
         """Pyterm command: Send a reset to the node.
@@ -828,8 +851,19 @@ if __name__ == "__main__":
                         dest='repeat_command_on_empty_line',
                         action="store_false",
                         help="Do not repeat command on empty line")
+    parser.add_argument("--reconnect",
+                        dest='reconnect',
+                        action='store_true',
+                        help="Try to reconnect when failing on connection "
+                             "setup (Default)")
+    parser.add_argument("--no-reconnect",
+                        dest='reconnect',
+                        action="store_false",
+                        help="Do not try to reconnect when failing on "
+                             "connection setup (Default)")
     parser.set_defaults(
-        repeat_command_on_empty_line=defaultrepeat_cmd_empty_line)
+        repeat_command_on_empty_line=defaultrepeat_cmd_empty_line,
+        reconnect=defaultreconnect)
 
     args = parser.parse_args()
 

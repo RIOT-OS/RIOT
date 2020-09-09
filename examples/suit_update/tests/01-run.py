@@ -67,7 +67,7 @@ def publish(server_dir, server_url, app_ver, keys='default', latest_name=None):
 
 
 def wait_for_update(child):
-    return child.expect([r"riotboot_flashwrite: processing bytes (\d+)-(\d+)",
+    return child.expect([r"Fetching firmware \|[█ ]+\|\s+\d+\%",
                          "riotboot_flashwrite: riotboot flashing "
                          "completed successfully"],
                         timeout=UPDATING_TIMEOUT)
@@ -138,7 +138,7 @@ def _test_invalid_version(child, client, app_ver):
     publish(TMPDIR.name, COAP_HOST, app_ver - 1)
     notify(COAP_HOST, client, app_ver - 1)
     child.expect_exact("suit_coap: trigger received")
-    child.expect_exact("suit: verifying manifest signature...")
+    child.expect_exact("suit: verifying manifest signature")
     child.expect_exact("seq_nr <= running image")
 
 
@@ -146,7 +146,7 @@ def _test_invalid_signature(child, client, app_ver):
     publish(TMPDIR.name, COAP_HOST, app_ver + 1, 'invalid_keys')
     notify(COAP_HOST, client, app_ver + 1)
     child.expect_exact("suit_coap: trigger received")
-    child.expect_exact("suit: verifying manifest signature...")
+    child.expect_exact("suit: verifying manifest signature")
     child.expect_exact("Unable to validate signature")
 
 
@@ -156,7 +156,7 @@ def _test_successful_update(child, client, app_ver):
         publish(TMPDIR.name, COAP_HOST, version)
         notify(COAP_HOST, client, version)
         child.expect_exact("suit_coap: trigger received")
-        child.expect_exact("suit: verifying manifest signature...")
+        child.expect_exact("suit: verifying manifest signature")
         child.expect(
             r"riotboot_flashwrite: initializing update to target slot (\d+)\r\n",
             timeout=MANIFEST_TIMEOUT,

@@ -126,6 +126,16 @@ enum {
 #define GNRC_NETIF_FLAGS_6LN                       (0x00001000U)
 
 /**
+ * @brief   6Lo is activated for this interface
+ *
+ * @note    Most devices supporting 6Lo actually *require* 6Lo so this flag
+ *          should not be configurable for them. As a consequence, this flag
+ *          **must** only be changed by a @ref NETOPT_6LO message to the
+ *          interface.
+ */
+#define GNRC_NETIF_FLAGS_6LO                       (0x00002000U)
+
+/**
  * @brief   Network interface is configured in raw mode
  */
 #define GNRC_NETIF_FLAGS_RAWMODE                   (0x00010000U)

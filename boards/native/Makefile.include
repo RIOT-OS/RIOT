@@ -1,9 +1,7 @@
-export NATIVEINCLUDES += -DNATIVE_INCLUDES
-export NATIVEINCLUDES += -I$(RIOTBOARD)/$(BOARD)/include/
-export NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
-export NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
-
-USEMODULE += native-drivers
+NATIVEINCLUDES += -DNATIVE_INCLUDES
+NATIVEINCLUDES += -I$(RIOTBOARD)/native/include/
+NATIVEINCLUDES += -I$(RIOTBASE)/core/include/
+NATIVEINCLUDES += -I$(RIOTBASE)/drivers/include/
 
 ifeq ($(OS),Darwin)
   DEBUGGER ?= lldb
@@ -11,7 +9,7 @@ else
   DEBUGGER ?= gdb
 endif
 
-RESET ?= $(RIOTBOARD)/$(BOARD)/dist/reset.sh
+RESET ?= $(RIOTBOARD)/native/dist/reset.sh
 FLASHER = true
 FLASHFILE ?= $(ELFFILE)
 
@@ -22,7 +20,9 @@ export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
 # basic cflags:
-CFLAGS += -Wall -Wextra -pedantic
+CFLAGS += -Wall -Wextra -pedantic $(CFLAGS_DBG)
+CFLAGS_DBG ?= -g3
+
 # default std set to gnu99 of not overwritten by user
 ifeq (,$(filter -std=%, $(CFLAGS)))
   CFLAGS += -std=gnu11
@@ -48,32 +48,41 @@ CXXUWFLAGS +=
 CXXEXFLAGS +=
 
 ifeq ($(OS_ARCH),x86_64)
-  export LINKFLAGS += -m32
+  LINKFLAGS += -m32
 endif
 ifeq ($(OS),FreeBSD)
   ifeq ($(OS_ARCH),amd64)
-    export LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
+    LINKFLAGS += -m32 -DCOMPAT_32BIT -L/usr/lib32 -B/usr/lib32
   endif
-  export LINKFLAGS += -L $(BINDIR)
+  LINKFLAGS += -L $(BINDIR)
 else
-  export LINKFLAGS += -ldl
+  LINKFLAGS += -ldl
 endif
 
 # clean up unused functions
 CFLAGS += -ffunction-sections -fdata-sections
 ifeq ($(OS),Darwin)
-  export LINKFLAGS += -Wl,-dead_strip
+  LINKFLAGS += -Wl,-dead_strip
 else
-  export LINKFLAGS += -Wl,--gc-sections
+  LINKFLAGS += -Wl,--gc-sections
 endif
-export LINKFLAGS += -ffunction-sections
+LINKFLAGS += -ffunction-sections
 
 # set the tap interface for term/valgrind
-ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+ifneq (,$(filter netdev_default,$(USEMODULE)))
   PORT ?= tap0
 endif
 
-TERMFLAGS := $(PORT) $(TERMFLAGS)
+# Configure default eeprom file
+EEPROM_FILE ?= $(BINDIR)/native.eeprom
+
+# set the eeprom file flags only when the periph_eeprom feature is used.
+ifneq (,$(filter periph_eeprom,$(FEATURES_USED)))
+  EEPROM_FILE_FLAGS = --eeprom $(EEPROM_FILE)
+  TERMFLAGS += $(EEPROM_FILE_FLAGS)
+endif
+
+TERMFLAGS += $(PORT)
 
 ASFLAGS =
 ifeq ($(shell basename $(DEBUGGER)),lldb)
@@ -91,15 +100,14 @@ debug-valgrind-server: export VALGRIND_FLAGS ?= --vgdb=yes --vgdb-error=0 -v \
 	--read-var-info=yes
 term-cachegrind: export CACHEGRIND_FLAGS += --tool=cachegrind
 term-gprof: TERMPROG = GMON_OUT_PREFIX=gmon.out $(ELFFILE)
-all-valgrind: CFLAGS += -DHAVE_VALGRIND_H -g3
-all-valgrind: export NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
-all-debug: CFLAGS += -g3
-all-cachegrind: CFLAGS += -g3
+all-valgrind: CFLAGS += -DHAVE_VALGRIND_H
+all-valgrind: NATIVEINCLUDES += $(shell pkg-config valgrind --cflags)
 all-gprof: CFLAGS += -pg
-all-gprof: export LINKFLAGS += -pg
-all-asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
-all-asan: CFLAGS += -DNATIVE_IN_CALLOC
-all-asan: export LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer -g3
+all-gprof: LINKFLAGS += -pg
+all-asan: CFLAGS += -fsanitize=address -fno-omit-frame-pointer
+all-asan: CFLAGS += -DNATIVE_MEMORY
+all-asan: LINKFLAGS += -fsanitize=address -fno-omit-frame-pointer
+all-asan: export AFL_USE_ASAN=1
 
 INCLUDES += $(NATIVEINCLUDES)
 
@@ -130,6 +138,7 @@ endif
 all: # do not override first target
 
 all-debug: all
+	@$(COLOR_ECHO) '$(COLOR_RED)`all-debug` is deprecated, just use `all`$(COLOR_RESET)'
 
 all-gprof: all
 
@@ -161,4 +170,4 @@ eval-gprof:
 eval-cachegrind:
 	$(CGANNOTATE) $(shell ls -rt cachegrind.out* | tail -1)
 
-export UNDEF += $(BINDIR)/cpu/startup.o
+UNDEF += $(BINDIR)/cpu/startup.o

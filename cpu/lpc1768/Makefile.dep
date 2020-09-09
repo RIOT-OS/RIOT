@@ -1,0 +1,3 @@
+USEMODULE += pm_layered
+
+include $(RIOTCPU)/cortexm_common/Makefile.dep

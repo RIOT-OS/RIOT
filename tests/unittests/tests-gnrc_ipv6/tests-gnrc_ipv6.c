@@ -21,6 +21,7 @@
 #include "net/gnrc/pktbuf.h"
 
 #include "unittests-constants.h"
+#include "test_utils/expect.h"
 #include "tests-gnrc_ipv6.h"
 
 #define DEFAULT_TEST_SRC    { { \
@@ -56,16 +57,16 @@ static void set_up(void)
 
     gnrc_pktbuf_init();
     _pkt_w_ip_hdr = gnrc_pktbuf_add(NULL, NULL, 1, GNRC_NETTYPE_NETIF);
-    assert(_pkt_w_ip_hdr);
+    expect(_pkt_w_ip_hdr);
     _pkt_w_ip_hdr = gnrc_pktbuf_add(_pkt_w_ip_hdr, &ip, sizeof(ipv6_hdr_t), GNRC_NETTYPE_IPV6);
-    assert(_pkt_w_ip_hdr);
+    expect(_pkt_w_ip_hdr);
     _pkt_w_ip_hdr = gnrc_pktbuf_add(_pkt_w_ip_hdr, NULL, 1, GNRC_NETTYPE_UNDEF);
-    assert(_pkt_w_ip_hdr);
+    expect(_pkt_w_ip_hdr);
 
     _pkt_no_ip_hdr = gnrc_pktbuf_add(NULL, NULL, 1, GNRC_NETTYPE_NETIF);
-    assert(_pkt_no_ip_hdr);
+    expect(_pkt_no_ip_hdr);
     _pkt_no_ip_hdr = gnrc_pktbuf_add(_pkt_no_ip_hdr, NULL, 1, GNRC_NETTYPE_UNDEF);
-    assert(_pkt_no_ip_hdr);
+    expect(_pkt_no_ip_hdr);
 }
 
 static void tear_down(void)

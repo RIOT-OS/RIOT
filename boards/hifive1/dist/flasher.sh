@@ -35,8 +35,6 @@
 # @author       Hauke Peteresen <hauke.petersen@fu-berlin.de>
 # @author       Joakim Nohlgård <joakim.nohlgard@eistec.se>
 
-# Default path to OpenOCD configuration file
-: ${OPENOCD_CONFIG:=${RIOTBOARD}/${BOARD}/dist/openocd.cfg}
 # Default OpenOCD command
 : ${OPENOCD:=openocd}
 # This is an optional offset to the base address that can be used to flash an

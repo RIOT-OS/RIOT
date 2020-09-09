@@ -83,6 +83,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "periph/i2c.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -93,40 +94,67 @@ extern "C"
 #define ADDR                        (dev->p.addr) /**< ADDR */
 
 /**
- * @brief   TMP00X Default Address
+ * @defgroup drivers_tmp00x_config     TMP006/TMP007 Infrared Thermopile Sensor driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
  */
-#ifndef TMP00X_I2C_ADDRESS
-#define TMP00X_I2C_ADDRESS         (0x40)
+/**
+ * @brief   Default Address
+ *
+ * TMP006/TMP007 allows for up to 8 devices on a single bus. The address value
+ * depends on the state of ADR0 and ADR1 pins. Default value (0x40) corresponds
+ * to ADR0 and ADR1 pins tied to GND. For more information refer to the 'Serial
+ * Bus Address' section in the datasheet.
+ */
+#ifndef CONFIG_TMP00X_I2C_ADDRESS
+#define CONFIG_TMP00X_I2C_ADDRESS         (0x40)
 #endif
 
 /**
  * @brief   Default Conversion Time in us
+ *
+ * The duration of the analog-to-digital(A/D) conversion is determined by the
+ * conversion rate bits CR0, CR1 and CR2. For more information refer to the
+ * datasheet.
  */
-#ifndef TMP00X_CONVERSION_TIME
-#define TMP00X_CONVERSION_TIME     (1E6)
+#if IS_ACTIVE(CONFIG_TMP00X_CONVERSION_TIME_0_25S)
+#define CONFIG_TMP00X_CONVERSION_TIME                   (25E4)
+#elif IS_ACTIVE(CONFIG_TMP00X_CONVERSION_TIME_0_5S)
+#define CONFIG_TMP00X_CONVERSION_TIME                   (5E5)
+#elif IS_ACTIVE(CONFIG_TMP00X_CONVERSION_TIME_1S)
+#define CONFIG_TMP00X_CONVERSION_TIME                   (1E6)
+#elif IS_ACTIVE(CONFIG_TMP00X_CONVERSION_TIME_2S)
+#define CONFIG_TMP00X_CONVERSION_TIME                   (2E6)
+#elif IS_ACTIVE(CONFIG_TMP00X_CONVERSION_TIME_4S)
+#define CONFIG_TMP00X_CONVERSION_TIME                   (4E6)
+#endif
+
+#ifndef CONFIG_TMP00X_CONVERSION_TIME
+#define CONFIG_TMP00X_CONVERSION_TIME                   (1E6)
 #endif
 
 /**
  * @brief   Default low power mode
  *
- * If set to 0, the device will be always-on
- * If set to 1, the device will be put in low power mode between measurements.
- * This adds a @c TMP00X_CONVERSION_TIME us delay to each measurement call
- * for bringing the device out of standby.
+ * Set this to 1 to put the device in low power mode between measurements
+ * otherwise the device will always be on.
+ * Enabling this adds a @c CONFIG_TMP00X_CONVERSION_TIME us delay to each
+ * measurement call for bringing the device out of standby.
  */
-#ifndef TMP00X_USE_LOW_POWER
-#define TMP00X_USE_LOW_POWER (0)
+#ifdef DOXYGEN
+#define CONFIG_TMP00X_USE_LOW_POWER
 #endif
 
 /**
  * @brief   Default raw value mode
  *
- * If set to 0, measurements will be converted to Celsius.
- * If set to 1, raw adc readings will be returned.
+ * Set this to 1 to return raw adc readings otherwise measurements will be
+ * converted to Celsius.
  */
-#ifndef TMP00X_USE_RAW_VALUES
-#define TMP00X_USE_RAW_VALUES (0)
+#ifdef DOXYGEN
+#define CONFIG_TMP00X_USE_RAW_VALUES
 #endif
+/** @} */
 
 /**
  * @name    Conversion rate and AVG sampling configuration

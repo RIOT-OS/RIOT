@@ -21,11 +21,25 @@
 
 #include "periph_cpu.h"
 #include "f4/cfg_clock_168_16_0.h"
-#include "cfg_spi_divtable.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name    DMA streams configuration
+ * @{
+ */
+static const dma_conf_t dma_config[] = {
+    { .stream = 11 },   /* DMA2 Stream 3 - SPI1_TX */
+    { .stream = 10 },   /* DMA2 Stream 2 - SPI1_RX */
+};
+
+#define DMA_0_ISR           isr_dma2_stream3
+#define DMA_1_ISR           isr_dma2_stream2
+
+#define DMA_NUMOF           ARRAY_SIZE(dma_config)
+/** @} */
 
 /**
  * @name    Timer configuration
@@ -81,12 +95,12 @@ static const pwm_conf_t pwm_config[] = {
  * PIN, device (ADCx), channel
  * @{
  */
-#define ADC_CONFIG {             \
-    {GPIO_PIN(PORT_B, 0), 0, 8}, \
-    {GPIO_PIN(PORT_B, 1), 0, 9}  \
-}
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_B, 0), 0, 8},
+    {GPIO_PIN(PORT_B, 1), 0, 9}
+};
 
-#define ADC_NUMOF           (2)
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 /**
@@ -115,9 +129,9 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART2_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 6,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     },
     {
@@ -129,9 +143,9 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB2,
         .irqn       = USART1_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 15,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     },
     {
@@ -143,20 +157,17 @@ static const uart_conf_t uart_config[] = {
         .tx_af      = GPIO_AF7,
         .bus        = APB1,
         .irqn       = USART3_IRQn,
-#ifdef UART_USE_DMA
-        .dma_stream = 3,
-        .dma_chan   = 4
+#ifdef MODULE_PERIPH_DMA
+        .dma        = DMA_STREAM_UNDEF,
+        .dma_chan   = UINT8_MAX,
 #endif
     },
 };
 
 /* assign ISR vector names */
 #define UART_0_ISR          (isr_usart2)
-#define UART_0_DMA_ISR      (isr_dma1_stream6)
 #define UART_1_ISR          (isr_usart1)
-#define UART_1_DMA_ISR      (isr_dma2_stream7)
 #define UART_2_ISR          (isr_usart3)
-#define UART_2_DMA_ISR      (isr_dma1_stream3)
 
 /* deduct number of defined UART interfaces */
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
@@ -168,17 +179,23 @@ static const uart_conf_t uart_config[] = {
  */
 static const spi_conf_t spi_config[] = {
     {
-        .dev      = SPI1,
-        .mosi_pin = GPIO_PIN(PORT_A, 7),
-        .miso_pin = GPIO_PIN(PORT_A, 6),
-        .sclk_pin = GPIO_PIN(PORT_A, 5),
-        .cs_pin   = GPIO_PIN(PORT_A, 4),
-        .mosi_af  = GPIO_AF5,
-        .miso_af  = GPIO_AF5,
-        .sclk_af  = GPIO_AF5,
-        .cs_af    = GPIO_AF5,
-        .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2
+        .dev            = SPI1,
+        .mosi_pin       = GPIO_PIN(PORT_A, 7),
+        .miso_pin       = GPIO_PIN(PORT_A, 6),
+        .sclk_pin       = GPIO_PIN(PORT_A, 5),
+        .cs_pin         = GPIO_PIN(PORT_A, 4),
+        .mosi_af        = GPIO_AF5,
+        .miso_af        = GPIO_AF5,
+        .sclk_af        = GPIO_AF5,
+        .cs_af          = GPIO_AF5,
+        .rccmask        = RCC_APB2ENR_SPI1EN,
+        .apbbus         = APB2,
+#ifdef MODULE_PERIPH_DMA
+        .tx_dma         = 0,
+        .tx_dma_chan    = 3,
+        .rx_dma         = 1,
+        .rx_dma_chan    = 3,
+#endif
     }
 };
 

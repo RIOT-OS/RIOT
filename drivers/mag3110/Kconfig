@@ -1,0 +1,23 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_MAG3110
+    bool "Configure MAG3110 driver"
+    depends on USEMODULE_MAG3110
+    help
+        Configure the MAG3110 driver using Kconfig.
+
+if KCONFIG_USEMODULE_MAG3110
+
+config MAG3110_I2C_ADDRESS
+    hex "I2C default address"
+    range 0x0E 0x0F
+    default 0x0E
+    help
+        The address depends on part number of MAG3110.
+        For more information refer to the datasheet.
+
+endif # KCONFIG_USEMODULE_MAG3110

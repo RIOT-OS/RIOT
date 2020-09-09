@@ -16,6 +16,9 @@
  * @}
  */
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
+#include "kernel_defines.h"
 #include "bitarithm.h"
 #include "event.h"
 #include "thread.h"
@@ -178,8 +181,7 @@ static void _set_ep_event(usbus_t *usbus, usbdev_ep_t *ep)
         irq_restore(state);
     }
 
-    thread_flags_set((thread_t *)thread_get(usbus->pid),
-                     USBUS_THREAD_FLAG_USBDEV_EP);
+    thread_flags_set(thread_get(usbus->pid), USBUS_THREAD_FLAG_USBDEV_EP);
 }
 
 static uint32_t _get_and_reset_ep_events(usbus_t *usbus)
@@ -223,11 +225,11 @@ static void *_usbus_thread(void *args)
     usbus_control_init(usbus, &ep0_handler);
 
     usbdev_t *dev = usbus->dev;
-    usbus->pid = sched_active_pid;
+    usbus->pid = thread_getpid();
     usbus->addr = 0;
     usbus->iface = NULL;
     usbus->str_idx = 1;
-    DEBUG("usbus: starting thread %i\n", sched_active_pid);
+    DEBUG("usbus: starting thread %i\n", thread_getpid());
     /* setup the link-layer's message queue */
     /* register the event callback with the device driver */
     dev->cb = _event_cb;
@@ -237,20 +239,20 @@ static void *_usbus_thread(void *args)
     usbdev_init(dev);
 
     usbus_add_string_descriptor(usbus, &usbus->config,
-                                USB_CONFIG_CONFIGURATION_STR);
-    usbus_add_string_descriptor(usbus, &usbus->product, USB_CONFIG_PRODUCT_STR);
-    usbus_add_string_descriptor(usbus, &usbus->manuf, USB_CONFIG_MANUF_STR);
+                                CONFIG_USB_CONFIGURATION_STR);
+    usbus_add_string_descriptor(usbus, &usbus->product, CONFIG_USB_PRODUCT_STR);
+    usbus_add_string_descriptor(usbus, &usbus->manuf, CONFIG_USB_MANUF_STR);
 
     usbus->state = USBUS_STATE_DISCONNECT;
 
     /* Initialize handlers */
     _usbus_init_handlers(usbus);
 
-#if (USBUS_AUTO_ATTACH)
-    static const usbopt_enable_t _enable = USBOPT_ENABLE;
-    usbdev_set(dev, USBOPT_ATTACH, &_enable,
-               sizeof(usbopt_enable_t));
-#endif
+    if (IS_ACTIVE(CONFIG_USBUS_AUTO_ATTACH)) {
+        static const usbopt_enable_t _enable = USBOPT_ENABLE;
+        usbdev_set(dev, USBOPT_ATTACH, &_enable,
+                   sizeof(usbopt_enable_t));
+    }
 
     while (1) {
         thread_flags_t flags = thread_flags_wait_any(
@@ -294,8 +296,7 @@ static void _event_cb(usbdev_t *usbdev, usbdev_event_t event)
     usbus_t *usbus = (usbus_t *)usbdev->context;
 
     if (event == USBDEV_EVENT_ESR) {
-        thread_flags_set((thread_t *)thread_get(usbus->pid),
-                         USBUS_THREAD_FLAG_USBDEV);
+        thread_flags_set(thread_get(usbus->pid), USBUS_THREAD_FLAG_USBDEV);
     }
     else {
         usbus_event_usb_t msg;

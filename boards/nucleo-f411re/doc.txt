@@ -5,36 +5,35 @@
 
 ## Overview
 
-The Nucleo-F411 is a board from ST's Nucleo family supporting a ARM Cortex-M4
+The Nucleo-F411RE is a board from ST's Nucleo family supporting a ARM Cortex-M4
 STM32F411RE microcontroller with 128Kb of SRAM and 512Kb of ROM Flash.
 
 ## Hardware
 
-![Nucleo64 F401](http://www.open-electronics.org/wp-
-content/uploads/2015/08/Figura2-500x467.png)
+![Nucleo64 F411RE](http://www.open-electronics.org/wp-content/uploads/2015/08/Figura2-500x467.png)
 
 ### MCU
 
 | MCU        | STM32F411RE       |
-|:------------- |:--------------------- |
-| Family | ARM Cortex-M4     |
-| Vendor | ST Microelectronics   |
-| RAM        | 128Kb |
+|:---------- |:----------------- |
+| Family     | ARM Cortex-M4     |
+| Vendor     | ST Microelectronics |
+| RAM        | 128Kb             |
 | Flash      | 512Kb             |
-| Frequency  | up to 100MHz |
+| Frequency  | up to 100MHz      |
 | FPU        | yes               |
-| Timers | 11 (2x watchdog, 1 SysTick, 6x 16-bit, 2x 32-bit [TIM2])  |
-| ADCs       | 1x 12-bit         |
+| Timers     | 11 (2x watchdog, 1 SysTick, 7x 16-bit, 1x 32-bit [TIM2]) |
+| ADCs       | 1x 12-bit (16 channels) |
 | UARTs      | 3                 |
 | SPIs       | 5                 |
 | I2Cs       | 3                 |
 | RTC        | 1                 |
-| Vcc        | 2.0V - 3.6V           |
-| Datasheet  |
-[Datasheet](http://www.st.com/resource/en/datasheet/stm32f411re.pdf) |
+| USB        | 1                 |
+| Vcc        | 1.7V - 3.6V       |
+| Datasheet  | [Datasheet](http://www.st.com/resource/en/datasheet/stm32f411re.pdf) |
 | Reference Manual | [Reference Manual](http://www.st.com/resource/en/reference_manual/dm00119316.pdf) |
 | Programming Manual | [Programming Manual](http://www.st.com/resource/en/programming_manual/dm00046982.pdf) |
-| Board Manual   | [Board Manual](http://www.st.com/resource/en/user_manual/dm00105823.pdf)|
+| Board Manual | [Board Manual](http://www.st.com/resource/en/user_manual/dm00105823.pdf) |
 
 ## Implementation Status
 
@@ -57,17 +56,16 @@ OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
 installation instructions), you can flash the board simply by typing
 
 ```
-make BOARD=nucleo-f411 flash
+make BOARD=nucleo-f411re flash
 ```
 and debug via GDB by simply typing
 ```
-make BOARD=nucleo-f411 debug
+make BOARD=nucleo-f411re debug
 ```
 
 ## Supported Toolchains
 
-For using the ST Nucleo-F411 board we strongly recommend the usage of the
-[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-
-embedded)
+For using the ST Nucleo-F411RE board we strongly recommend the usage of the
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
 toolchain.
  */

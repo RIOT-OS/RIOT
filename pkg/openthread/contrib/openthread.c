@@ -30,6 +30,10 @@
 #include "at86rf2xx_params.h"
 #endif
 
+#ifdef MODULE_KW41ZRF
+#include "kw41zrf.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -37,8 +41,16 @@
 #define OPENTHREAD_NETIF_NUMOF        ARRAY_SIZE(at86rf2xx_params)
 #endif
 
+#ifdef MODULE_KW41ZRF
+#define OPENTHREAD_NETIF_NUMOF        (1U)
+#endif
+
 #ifdef MODULE_AT86RF2XX
 static at86rf2xx_t at86rf2xx_dev;
+#endif
+
+#ifdef MODULE_KW41ZRF
+static kw41zrf_t kw41z_dev;
 #endif
 
 static uint8_t rx_buf[OPENTHREAD_NETDEV_BUFLEN];
@@ -52,8 +64,12 @@ void openthread_bootstrap(void)
 
     /* setup netdev modules */
 #ifdef MODULE_AT86RF2XX
-    at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0]);
+    at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0], 0);
     netdev_t *netdev = (netdev_t *) &at86rf2xx_dev;
+#endif
+#ifdef MODULE_KW41ZRF
+    kw41zrf_setup(&kw41z_dev);
+    netdev_t *netdev = (netdev_t *) &kw41z_dev;
 #endif
 
     openthread_radio_init(netdev, tx_buf, rx_buf);

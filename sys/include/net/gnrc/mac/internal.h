@@ -98,12 +98,12 @@ static inline void gnrc_netif_set_tx_feedback(gnrc_netif_t *netif,
 /**
  * @brief Queues the packet into the related transmission packet queue in netdev_t::tx.
  *        Note that, in case the `gnrc_mac_tx_neighbor_t` structure is in used (indicated
- *        by `GNRC_MAC_NEIGHBOR_COUNT != 0`), this function queues the packet to
+ *        by `CONFIG_GNRC_MAC_NEIGHBOR_COUNT != 0`), this function queues the packet to
  *        the queue associated to the pkt's destination neighbor, including a
  *        `broadcast-neighbor` (neighbor id is `0` in netdev_t::tx::neighbors) which
  *        specifically stores broadcasting packets.
  *        On the other hand, if `gnrc_mac_tx_neighbor_t` structure is not in used (indicated
- *        by `GNRC_MAC_NEIGHBOR_COUNT == 0`), this function queues the packet into the single
+ *        by `CONFIG_GNRC_MAC_NEIGHBOR_COUNT == 0`), this function queues the packet into the single
  *        priority TX queue defined in in netdev_t::tx.
  *
  * @param[in,out] tx        gnrc_mac transmission management object

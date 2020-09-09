@@ -1,0 +1,1 @@
+include $(RIOTBOARD)/stm32f429i-disc1/Makefile.features

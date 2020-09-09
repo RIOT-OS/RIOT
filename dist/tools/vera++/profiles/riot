@@ -1,0 +1,7 @@
+#!/usr/bin/tclsh
+
+# L004: Line cannot be too long
+
+set rules {
+  L004
+}

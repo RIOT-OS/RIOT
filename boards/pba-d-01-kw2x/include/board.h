@@ -86,6 +86,14 @@ extern "C"
 /** @}*/
 
 /**
+ * @name TMP006 configuration
+ *
+ * @{
+ */
+#define TMP00X_PARAM_ADDR          (0x41)
+/** @}*/
+
+/**
  * @brief Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);

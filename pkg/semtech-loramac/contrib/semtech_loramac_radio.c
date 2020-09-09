@@ -122,7 +122,7 @@ void SX127XSetTxConfig(RadioModems_t modem, int8_t power, uint32_t fdev,
     sx127x_set_tx_power(&sx127x, power);
     sx127x_set_preamble_length(&sx127x, preambleLen);
     sx127x_set_rx_single(&sx127x, false);
-    sx127x_set_tx_timeout(&sx127x, timeout * US_PER_MS); /* base unit us, LoRaMAC ms */
+    sx127x_set_tx_timeout(&sx127x, timeout); /* base unit ms, LoRaMAC ms */
 }
 
 uint32_t SX127XTimeOnAir(RadioModems_t modem, uint8_t pktLen)
@@ -153,7 +153,7 @@ void SX127XStandby(void)
 
 void SX127XRx(uint32_t timeout)
 {
-    sx127x_set_rx_timeout(&sx127x, timeout * US_PER_MS);
+    sx127x_set_rx_timeout(&sx127x, timeout);
     sx127x_set_rx(&sx127x);
 }
 

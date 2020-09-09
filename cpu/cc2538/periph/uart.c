@@ -99,6 +99,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     u->CC = 0;
 
     /* On the CC2538, hardware flow control is supported only on UART1 */
+#ifdef MODULE_PERIPH_UART_HW_FC
     if (uart_config[uart].rts_pin != GPIO_UNDEF) {
         assert(u != UART0_BASEADDR);
         gpio_init_af(uart_config[uart].rts_pin, UART1_RTS, GPIO_OUT);
@@ -110,6 +111,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         gpio_init_af(uart_config[uart].cts_pin, UART1_CTS, GPIO_IN);
         u->cc2538_uart_ctl.CTLbits.CTSEN = 1;
     }
+#endif
 
     /*
      * UART Interrupt Setup:
@@ -197,6 +199,9 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         while (u->cc2538_uart_fr.FRbits.TXFF) {}
         u->DR = data[i];
     }
+
+    /* Wait for the TX FIFO to clear */
+    while (!uart_config[uart].dev->cc2538_uart_fr.FRbits.TXFE) {}
 }
 
 void uart_poweron(uart_t uart)

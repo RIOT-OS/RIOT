@@ -25,8 +25,6 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include <inttypes.h>
-
 #include "thread.h"
 
 #include "vendor/platform.h"
@@ -40,6 +38,23 @@ extern "C" {
  * @brief   Initialization of the CPU
  */
 void cpu_init(void);
+
+/**
+ * @brief   Initialization of the clock
+ */
+void clock_init(void);
+
+/**
+ * @brief   Get and eventually compute the current CPU core clock frequency
+ *
+ * @return  the cpu core clock frequency in Hz
+ */
+uint32_t cpu_freq(void);
+
+/**
+ * @brief   Initialization of interrupts
+ */
+void irq_init(void);
 
 /**
  * @brief   Print the last instruction's address

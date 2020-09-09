@@ -33,6 +33,11 @@
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
+#ifdef MODULE_GNRC_SIXLOENC
+static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt);
+#else
+#define _set    gnrc_netif_set_from_netdev
+#endif /* MODULE_GNRC_SIXLOENC */
 
 static char addr_str[ETHERNET_ADDR_LEN * 3];
 
@@ -41,14 +46,13 @@ static const gnrc_netif_ops_t ethernet_ops = {
     .send = _send,
     .recv = _recv,
     .get = gnrc_netif_get_from_netdev,
-    .set = gnrc_netif_set_from_netdev,
+    .set = _set,
 };
 
-gnrc_netif_t *gnrc_netif_ethernet_create(char *stack, int stacksize,
-                                         char priority, char *name,
-                                         netdev_t *dev)
+int gnrc_netif_ethernet_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                               char priority, char *name, netdev_t *dev)
 {
-    return gnrc_netif_create(stack, stacksize, priority, name, dev,
+    return gnrc_netif_create(netif, stack, stacksize, priority, name, dev,
                              &ethernet_ops);
 }
 
@@ -253,4 +257,22 @@ safe_out:
     return NULL;
 }
 
+#ifdef MODULE_GNRC_SIXLOENC
+static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
+{
+    if (opt->opt == NETOPT_6LO) {
+        assert(opt->data_len == sizeof(netopt_enable_t));
+        if (*((netopt_enable_t *)opt->data) == NETOPT_ENABLE) {
+            netif->flags |= (GNRC_NETIF_FLAGS_6LO | GNRC_NETIF_FLAGS_6LO_HC |
+                             GNRC_NETIF_FLAGS_6LN);
+        }
+        else {
+            netif->flags &= ~(GNRC_NETIF_FLAGS_6LO | GNRC_NETIF_FLAGS_6LO_HC |
+                              GNRC_NETIF_FLAGS_6LN);
+        }
+        return sizeof(netopt_enable_t);
+    }
+    return gnrc_netif_set_from_netdev(netif, opt);
+}
+#endif /* MODULE_GNRC_SIXLOENC */
 /** @} */

@@ -28,6 +28,13 @@ extern "C" {
 #endif
 
 /**
+ * @name    Xtimer configuration
+ * @{
+ */
+#define XTIMER_HZ                   (32768UL)
+/** @} */
+
+/**
  * @name    Macros for controlling the on-board LEDs
  * @{
  */

@@ -32,13 +32,9 @@ extern "C" {
  * @name RTT configuration
  * @{
  */
-#define RTT_DEV             RTC->MODE0
-#define RTT_IRQ             RTC_IRQn
-#define RTT_IRQ_PRIO        10
-#define RTT_ISR             isr_rtc
-#define RTT_MAX_VALUE       (0xffffffff)
+#ifndef RTT_FREQUENCY
 #define RTT_FREQUENCY       (32768U)    /* in Hz. For changes see `rtt.c` */
-#define RTT_RUNSTDBY        (1)         /* Keep RTT running in sleep states */
+#endif
 /** @} */
 
 #ifdef __cplusplus

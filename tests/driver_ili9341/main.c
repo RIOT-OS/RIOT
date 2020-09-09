@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include "xtimer.h"
+#include "board.h"
 #include "ili9341.h"
 #include "ili9341_params.h"
 
@@ -33,6 +34,11 @@ int main(void)
 
     /* initialize the sensor */
     printf("Initializing display...");
+
+    /* Enable backlight if macro is defined */
+#ifdef BACKLIGHT_ON
+    BACKLIGHT_ON;
+#endif
 
     if (ili9341_init(&dev, &ili9341_params[0]) == 0) {
         puts("[OK]");

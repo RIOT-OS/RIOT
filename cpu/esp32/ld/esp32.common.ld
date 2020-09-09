@@ -41,6 +41,20 @@ SECTIONS
     _rtc_data_end = ABSOLUTE(.);
   } > rtc_slow_seg
 
+  /* This section holds data that should not be initialized at power up
+     and will be retained during deep sleep. The section located in
+     RTC SLOW Memory area. User data marked with RTC_NOINIT_ATTR will be placed
+     into this section. See the file "esp_attr.h" for more information.
+  */
+  .rtc.noinit (NOLOAD):
+  {
+    . = ALIGN(4);
+    _rtc_noinit_start = ABSOLUTE(.);
+    *(.rtc_noinit .rtc_noinit.*)
+    . = ALIGN(4) ;
+    _rtc_noinit_end = ABSOLUTE(.);
+  } > rtc_slow_seg
+
   /* Send .iram0 code to iram */
   .iram0.vectors :
   {
@@ -83,6 +97,13 @@ SECTIONS
     _iram_start = ABSOLUTE(0);
   } > iram0_0_seg
 
+  /* If Bluetooth is not used, this DRAM section can be used as heap */
+  . = _data_start_btdm; /* 0x3ffae6e0 */
+  . = ALIGN (4);
+  _sheap1 = ABSOLUTE(.);
+  . = 0x3ffb0000;
+  _eheap1 = ABSOLUTE(.);
+
   .iram0.text :
   {
     /* Code marked as running out of IRAM */
@@ -90,9 +111,9 @@ SECTIONS
     *(.iram1 .iram1.*)
 
     *libhal.a:(.literal .text .literal.* .text.*)
-    *libgcc.a:lib2funcs.o(.literal .text .literal.* .text.*)
+    *libgcc.a:(.literal .text .literal.* .text.*)
     *libgcov.a:(.literal .text .literal.* .text.*)
-    /* *libc.a:(.literal .text .literal.* .text.*) */
+    *libc.a:*(.literal .text .literal.* .text.*)
 
     /* Xtensa basic functionality written in assembler should be placed in iram */
     *xtensa.a:*(.literal .text .literal.* .text.*)
@@ -101,19 +122,37 @@ SECTIONS
     *esp_idf_spi_flash.a:*(.literal .text .literal.* .text.*)
     /* parts of RIOT that should to run in IRAM */
     *core.a:*(.literal .text .literal.* .text.*)
+    *littlefs.a:*(.literal .text .literal.* .text.*)
+    *littlefs2.a:*(.literal .text .literal.* .text.*)
+    *newlib_syscalls_default.a:*(.literal .text .literal.* .text.*)
     *spiffs_fs.a:*(.literal .text .literal.* .text.*)
     *spiffs.a:*(.literal .text .literal.* .text.*)
+    *syscalls.o(.literal .text .literal.* .text.*)
     *vfs.a:*(.literal .text .literal.* .text.*)
 
-    /* part of RIOT ports that should run in IRAM */
+    /* part of the RIOT port that should run in IRAM */
     *cpu.a:*(.literal .text .literal.* .text.*)
+    *esp_common.a:*(.literal .text .literal.* .text.*)
     *periph.a:*(.literal .text .literal.* .text.*)
     *mtd.a:**(.literal .text .literal.* .text.*)
 
     INCLUDE esp32.spiram.rom-functions-iram.ld
     _iram_text_end = ABSOLUTE(.);
+
+    /* IRAM can't be used as heap since it only allows 32-bit aligned access */
+    /*
+    . = ALIGN (4);
+    _sheap4 = ABSOLUTE(.);
+    */
   } > iram0_0_seg
 
+  /* IRAM can't be used as heap since it only allows 32-bit aligned access */
+  /*
+  . = 0x400a0000;
+  _eheap4 = ABSOLUTE(.);
+  */
+
+  /* Starts at 0x3ffb000 if Bluetooth is not enabled, 0x3ffc0000 otherwise */
   .dram0.data :
   {
     _data_start = ABSOLUTE(.);
@@ -141,6 +180,22 @@ SECTIONS
     . = ALIGN(4);
   } >dram0_0_seg
 
+  /* This section holds data that should not be initialized at power up.
+     The section located in Internal SRAM memory region. The macro _NOINIT
+     can be used as attribute to place data into this section.
+     See the esp_attr.h file for more information.
+  */
+  .noinit (NOLOAD):
+  {
+    . = ALIGN(4);
+    _noinit_start = ABSOLUTE(.);
+    __noinit_start = ABSOLUTE(.);
+    *(.noinit .noinit.*)
+    . = ALIGN(4) ;
+    _noinit_end = ABSOLUTE(.);
+    __noinit_end = ABSOLUTE(.);
+  } > dram0_0_seg
+
   /* Shared RAM */
   .dram0.bss (NOLOAD) :
   {
@@ -166,12 +221,22 @@ SECTIONS
     _sheap = ABSOLUTE(.);
   } >dram0_0_seg
 
-  /* TODO HEAP handling when BT is used
-     ETS system memory seems to start at 0x3FFE0000 if BT is not used.
-     This is the top of the heap for the app */
-    . = 0x3FFE0000;
+  /* Reserved ROM/ETS data start at 0x3ffe000. */
+  . = 0x3ffe0000;
   _heap_top = ABSOLUTE(.);
   _eheap = ABSOLUTE(.);
+
+  /* Reserved ROM/ETS data region for PRO CPU: 0x3ffe0000 ... 0x3ffe440 */
+  . = 0x3ffe0440;
+  _sheap2 = ABSOLUTE(.);
+  . = 0x3ffe4000;
+  _eheap2 = ABSOLUTE(.);
+
+  /* Reserved ROM/ETS data region for APP CPU: 0x3ffe4000 ... 0x3ffe4350 */
+  . = 0x3ffe4350;
+  _sheap3 = ABSOLUTE(.);
+  . = 0x40000000;
+  _eheap3 = ABSOLUTE(.);
 
   .flash.rodata :
   {

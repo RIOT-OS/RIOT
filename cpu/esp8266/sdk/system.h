@@ -47,8 +47,6 @@ extern void system_restart(void);
 
 #define system_wdt_init    esp_task_wdt_init
 #define system_wdt_feed    esp_task_wdt_reset
-#define system_wdt_start   pp_soft_wdt_stop
-#define system_wdt_stop    pp_soft_wdt_restart
 
 /** @} */
 

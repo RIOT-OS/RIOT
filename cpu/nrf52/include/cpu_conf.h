@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Freie Universität Berlin
+ *               2020 Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  * @brief       nRF52 specific CPU configuration
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Philipp-Alexander Blum <philipp-blum@jakiku.de>
  *
  */
 
@@ -27,9 +29,31 @@
 #ifdef CPU_MODEL_NRF52832XXAA
 #include "vendor/nrf52.h"
 #include "vendor/nrf52_bitfields.h"
+#include "vendor/nrf52832_peripherals.h"
+#elif defined(CPU_MODEL_NRF52805XXAA)
+#include "vendor/nrf52805.h"
+#include "vendor/nrf52805_bitfields.h"
+#include "vendor/nrf52805_peripherals.h"
+#elif defined(CPU_MODEL_NRF52810XXAA)
+#include "vendor/nrf52810.h"
+#include "vendor/nrf52810_bitfields.h"
+#include "vendor/nrf52810_peripherals.h"
+#elif defined(CPU_MODEL_NRF52811XXAA)
+#include "vendor/nrf52811.h"
+#include "vendor/nrf52811_bitfields.h"
+#include "vendor/nrf52811_peripherals.h"
+#elif defined(CPU_MODEL_NRF52820XXAA)
+#include "vendor/nrf52820.h"
+#include "vendor/nrf52820_bitfields.h"
+#include "vendor/nrf52820_peripherals.h"
+#elif defined(CPU_MODEL_NRF52833XXAA)
+#include "vendor/nrf52833.h"
+#include "vendor/nrf52833_bitfields.h"
+#include "vendor/nrf52833_peripherals.h"
 #elif defined(CPU_MODEL_NRF52840XXAA)
 #include "vendor/nrf52840.h"
 #include "vendor/nrf52840_bitfields.h"
+#include "vendor/nrf52840_peripherals.h"
 #else
 #error "The CPU_MODEL of your board is currently not supported"
 #endif
@@ -44,10 +68,21 @@ extern "C" {
  */
 #define CPU_DEFAULT_IRQ_PRIO            (2U)
 #define CPU_FLASH_BASE                  (0x00000000)
-#ifdef CPU_MODEL_NRF52832XXAA
-#define CPU_IRQ_NUMOF                   (38U)
-#elif CPU_MODEL_NRF52840XXAA
-#define CPU_IRQ_NUMOF                   (46U)
+
+#if defined(CPU_MODEL_NRF52805XXAA)
+#define CPU_IRQ_NUMOF                   (26U)
+#elif defined(CPU_MODEL_NRF52810XXAA)
+#define CPU_IRQ_NUMOF                   (30U)
+#elif defined(CPU_MODEL_NRF52811XXAA)
+#define CPU_IRQ_NUMOF                   (30U)
+#elif defined(CPU_MODEL_NRF52820XXAA)
+#define CPU_IRQ_NUMOF                   (40U)
+#elif defined(CPU_MODEL_NRF52832XXAA)
+#define CPU_IRQ_NUMOF                   (39U)
+#elif defined(CPU_MODEL_NRF52833XXAA)
+#define CPU_IRQ_NUMOF                   (48U)
+#elif defined(CPU_MODEL_NRF52840XXAA)
+#define CPU_IRQ_NUMOF                   (48U)
 #endif
 /** @} */
 
@@ -55,12 +90,18 @@ extern "C" {
  * @brief   Flash page configuration
  * @{
  */
-#define FLASHPAGE_SIZE                  (4096U)
-
-#if defined(CPU_MODEL_NRF52832XXAA)
-#define FLASHPAGE_NUMOF                 (128U)
+#ifdef BPROT_PRESENT
+#define FLASHPAGE_SIZE              BPROT_REGIONS_SIZE
+#define FLASHPAGE_NUMOF             BPROT_REGIONS_NUM
+#elif defined(CPU_MODEL_NRF52820XXAA)
+#define FLASHPAGE_SIZE              (4096U)
+#define FLASHPAGE_NUMOF             (64U)
+#elif defined(CPU_MODEL_NRF52833XXAA)
+#define FLASHPAGE_SIZE              (4096U)
+#define FLASHPAGE_NUMOF             (128U)
 #elif defined(CPU_MODEL_NRF52840XXAA)
-#define FLASHPAGE_NUMOF                 (256U)
+#define FLASHPAGE_SIZE              (4096U)
+#define FLASHPAGE_NUMOF             (256U)
 #endif
 
 /* The minimum block size which can be written is 4B. However, the erase

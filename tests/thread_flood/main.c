@@ -27,8 +27,6 @@
 #include "thread.h"
 #include "kernel_types.h"
 
-#include "test_utils/interactive_sync.h"
-
 /* One stack for all threads. DON'T TRY THIS AT HOME!! */
 static char dummy_stack[THREAD_STACKSIZE_IDLE];
 
@@ -39,10 +37,9 @@ static void *thread_func(void *arg)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     kernel_pid_t thr_id = KERNEL_PID_UNDEF;
     unsigned thr_cnt = 0;
+    unsigned thr_in_use = sched_num_threads;
 
     puts("[START] Spawning threads");
     do {
@@ -58,12 +55,11 @@ int main(void)
     /* decrease by 1 because last thread_create failed */
     --thr_cnt;
 
-    /* expect (MAXTHREADS - 2), as main and idle thread take a PID each */
-    if (thr_cnt == (MAXTHREADS - 2)) {
+    if (thr_cnt == (MAXTHREADS - thr_in_use)) {
         printf("[SUCCESS]");
     }
     else {
-        printf("[ERROR] expected %u,", (MAXTHREADS - 2));
+        printf("[ERROR] expected %u,", (MAXTHREADS - thr_in_use));
     }
     printf(" created %u\n", thr_cnt);
 

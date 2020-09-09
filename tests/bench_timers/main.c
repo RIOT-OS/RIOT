@@ -39,6 +39,7 @@
 #include "board.h"
 #include "cpu.h"
 #include "periph/timer.h"
+#include "test_utils/expect.h"
 
 #include "print_results.h"
 #include "spin_random.h"
@@ -374,14 +375,10 @@ static void run_test(test_ctx_t *ctx, uint32_t interval, unsigned int variant)
     interval += TEST_MIN;
     unsigned int interval_ref = TIM_TEST_TO_REF(interval);
     xtimer_t xt = {
-        .target = 0,
-        .long_target = 0,
         .callback = cb,
         .arg = ctx,
     };
     xtimer_t xt_parallel = {
-        .target = 0,
-        .long_target = 0,
         .callback = nop,
         .arg = NULL,
     };
@@ -672,7 +669,7 @@ int main(void)
     print_str("state vector total memory usage = ");
     print_u32_dec(sizeof(ref_states));
     print_str(" bytes\n");
-    assert(log2test < TEST_LOG2NUM);
+    expect(log2test < TEST_LOG2NUM);
     print_str("TIM_TEST_DEV = ");
     print_u32_dec(TIM_TEST_DEV);
     print_str(", TIM_TEST_FREQ = ");

@@ -38,6 +38,7 @@ enum {
     PORT_F  = 5,        /**< port F */
     PORT_G  = 6,        /**< port G */
 };
+/** @} */
 
 /**
  * @brief   Available external interrupt pins on the ATmega128rfa1 MCU
@@ -71,6 +72,9 @@ enum {
 #ifdef __cplusplus
 }
 #endif
+
+#include "periph_conf.h"
+#include "default_timer_config.h"
 
 #endif /* PERIPH_CPU_H */
 /** @} */

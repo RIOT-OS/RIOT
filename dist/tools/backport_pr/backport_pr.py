@@ -9,6 +9,8 @@
 #
 # @author   Koen Zandberg <koen@bergzand.net>
 
+"""Script used to backport PRs."""
+
 import os
 import os.path
 import sys
@@ -32,18 +34,19 @@ LABELS_ADD = ['Process: release backport']
 BACKPORT_BRANCH = 'backport/{release}/{origbranch}'
 
 
-def _get_labels(pr):
+def _get_labels(pull_request):
     """
     >>> _get_labels({'labels': [{'name': 'test'}, {'name': 'abcd'}]})
     ['Process: release backport', 'abcd', 'test']
-    >>> _get_labels({'labels': [{'name': 'Reviewed: what'}, {'name': 'Reviewed: 3-testing'}]})
+    >>> _get_labels({'labels': [{'name': 'Reviewed: what'}, \
+        {'name': 'Reviewed: 3-testing'}]})
     ['Process: release backport']
     >>> _get_labels({'labels': [{'name': 'Process: release backport'}]})
     ['Process: release backport']
     >>> _get_labels({'labels': [{'name': 'Process: needs backport'}]})
     ['Process: release backport']
     """
-    labels = set(label['name'] for label in pr['labels']
+    labels = set(label['name'] for label in pull_request['labels']
                  if all(not label['name'].startswith(remove)
                         for remove in LABELS_REMOVE))
     labels.update(LABELS_ADD)
@@ -67,6 +70,18 @@ def _branch_name_strip(branch_name, prefix=RELEASE_PREFIX,
 
 
 def _get_latest_release(branches):
+    """Get latest release from a list of branches.
+
+    >>> _get_latest_release([{'name': '2018.10-branch'}, \
+        {'name': '2020.10-branch'}])
+    ('2020.10', '2020.10-branch')
+    >>> _get_latest_release([{'name': '2020.01-branch'}, \
+        {'name': '2020.04-branch'}])
+    ('2020.04', '2020.04-branch')
+    >>> _get_latest_release([{'name': 'non-release-branch'}, \
+        {'name': '2020.04-branch'}])
+    ('2020.04', '2020.04-branch')
+    """
     version_latest = 0
     release_fullname = ''
     release_short = ''
@@ -103,6 +118,8 @@ def _delete_worktree(repo, workdir):
 
 
 def main():
+    # pylint:disable=too-many-locals,too-many-branches,too-many-statements
+    """Main function of this script."""
     keyfile = os.path.join(os.environ['HOME'], GITHUBTOKEN_FILE)
     parser = argparse.ArgumentParser()
     parser.add_argument("-k", "--keyfile", type=argparse.FileType('r'),
@@ -129,23 +146,37 @@ def main():
     args = parser.parse_args()
 
     gittoken = args.keyfile.read().strip()
-    g = GitHub(token=gittoken)
+    github_api = GitHub(token=gittoken)
     # TODO: exception handling
-    status, user = g.user.get()
+    status, user = github_api.user.get()
     if status != 200:
         print("Could not retrieve user: {}".format(user['message']))
-        exit(1)
+        sys.exit(1)
+    # Token-scope-check: Is the token is powerful enough to complete
+    # the Backport?
+    response_headers = dict(github_api.getheaders())
+    # agithub documentation says it's lower case header field-names but
+    # at this moment it's not
+    if 'X-OAuth-Scopes' in response_headers:
+        scopes = response_headers['X-OAuth-Scopes']
+    else:
+        scopes = response_headers['x-oauth-scopes']
+    scopes_list = [x.strip() for x in scopes.split(',')]
+    if not ('public_repo' in scopes_list or 'repo' in scopes_list):
+        print("missing public_repo scope from token settings."
+              " Please add it on the GitHub webinterface")
+        sys.exit(1)
     username = user['login']
-    status, pulldata = g.repos[ORG][REPO].pulls[args.PR].get()
+    status, pulldata = github_api.repos[ORG][REPO].pulls[args.PR].get()
     if status != 200:
         print("Commit #{} not found: {}".format(args.PR, pulldata['message']))
         sys.exit(2)
     if not pulldata['merged']:
         print("Original PR not yet merged")
-        exit(0)
+        sys.exit(0)
     print("Fetching for commit: #{}: {}".format(args.PR, pulldata['title']))
     orig_branch = pulldata['head']['ref']
-    status, commits = g.repos[ORG][REPO].pulls[args.PR].commits.get()
+    status, commits = github_api.repos[ORG][REPO].pulls[args.PR].commits.get()
     if status != 200:
         print("No commits found for #{}: {}".format(args.PR,
                                                     commits['message']))
@@ -159,7 +190,7 @@ def main():
         release_fullname = args.release_branch
         release_shortname = _branch_name_strip(args.release_branch)
     else:
-        status, branches = g.repos[ORG][REPO].branches.get()
+        status, branches = github_api.repos[ORG][REPO].branches.get()
         if status != 200:
             print("Could not retrieve branches for {}/{}: {}"
                   .format(ORG,
@@ -177,7 +208,7 @@ def main():
     upstream_remote = _get_upstream(repo)
     if not upstream_remote:
         print("No upstream remote found, can't fetch")
-        exit(6)
+        sys.exit(6)
     print("Fetching {} remote".format(upstream_remote))
 
     upstream_remote.fetch()
@@ -222,7 +253,7 @@ def main():
     merger = pulldata['merged_by']['login']
     if not args.noop:
         # Open new PR on github
-        pr = {
+        pull_request = {
             'title': "{} [backport {}]".format(pulldata['title'],
                                                release_shortname),
             'head': '{}:{}'.format(username, new_branch),
@@ -231,22 +262,23 @@ def main():
                                                      pulldata['body']),
             'maintainer_can_modify': True,
         }
-        status, new_pr = g.repos[ORG][REPO].pulls.post(body=pr)
+        status, new_pr = github_api.repos[ORG][REPO].pulls.post(
+            body=pull_request)
         if status != 201:
             print("Error creating the new pr: \"{}\". Is \"Public Repo\""
                   " access enabled for the token"
                   .format(new_pr['message']))
         pr_number = new_pr['number']
         print("Create PR number #{} for backport".format(pr_number))
-        g.repos[ORG][REPO].issues[pr_number].labels.post(body=labels)
+        github_api.repos[ORG][REPO].issues[pr_number].labels.post(body=labels)
         review_request = {"reviewers": [merger]}
-        g.repos[ORG][REPO].pulls[pr_number].\
+        github_api.repos[ORG][REPO].pulls[pr_number].\
             requested_reviewers.post(body=review_request)
 
     # Put commit under old PR
     if args.comment and not args.noop:
         comment = {"body": "Backport provided in #{}".format(pr_number)}
-        status, res = g.repos[ORG][REPO].\
+        status, res = github_api.repos[ORG][REPO].\
             issues[args.PR].comments.post(body=comment)
         if status != 201:
             print("Something went wrong adding the comment: {}"

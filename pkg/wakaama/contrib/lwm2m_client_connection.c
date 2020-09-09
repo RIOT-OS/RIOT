@@ -284,8 +284,8 @@ static char *_parse_schema(char *uri, char **port, int instance_id)
         host = uri + sizeof(SCHEME_COAP) - 1;
     }
 
-    *port = (IS_ACTIVE(LWM2M_BOOTSTRAP) && !instance_id) ?
-                LWM2M_BSSERVER_PORT : LWM2M_STANDARD_PORT;
+    *port = (IS_ACTIVE(CONFIG_LWM2M_BOOTSTRAP) && !instance_id) ?
+                CONFIG_LWM2M_BSSERVER_PORT : CONFIG_LWM2M_STANDARD_PORT;
 out:
     return host;
 }

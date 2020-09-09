@@ -23,6 +23,7 @@
 #include "net/netdev_test.h"
 #include "net/sock.h"
 #include "sched.h"
+#include "test_utils/expect.h"
 #include "xtimer.h"
 
 #include "lwip.h"
@@ -74,7 +75,7 @@ static int _get_addr(netdev_t *dev, void *value, size_t max_len)
     static const uint8_t _local_ip[] = _TEST_ADDR6_LOCAL;
 
     (void)dev;
-    assert(max_len >= ETHERNET_ADDR_LEN);
+    expect(max_len >= ETHERNET_ADDR_LEN);
     return l2util_ipv6_iid_to_addr(NETDEV_TYPE_ETHERNET,
                                    (eui64_t *)&_local_ip[8],
                                    value);
@@ -137,9 +138,8 @@ static int _netdev_send(netdev_t *dev, const iolist_t *iolist)
 
 void _net_init(void)
 {
-    xtimer_init();
     msg_init_queue(_msg_queue, _MSG_QUEUE_SIZE);
-    _check_pid = sched_active_pid;
+    _check_pid = thread_getpid();
 
     netdev_test_setup(&netdev, NULL);
     netdev_test_set_get_cb(&netdev, NETOPT_SRC_LEN, _get_src_len);
@@ -155,7 +155,7 @@ void _net_init(void)
     netdev_test_set_recv_cb(&netdev, _netdev_recv);
     netdev_test_set_isr_cb(&netdev, _netdev_isr);
     /* netdev needs to be set-up */
-    assert(netdev.netdev.driver);
+    expect(netdev.netdev.driver);
 #if LWIP_IPV4
     ip4_addr_t local4, mask4, gw4;
     local4.addr = _TEST_ADDR4_LOCAL;
@@ -199,7 +199,7 @@ void _prepare_send_checks(void)
     netdev_test_set_send_cb(&netdev, _netdev_send);
 #if LWIP_ARP
     const ip4_addr_t remote4 = { .addr = _TEST_ADDR4_REMOTE };
-    assert(ERR_OK == etharp_add_static_entry(&remote4, (struct eth_addr *)mac));
+    expect(ERR_OK == etharp_add_static_entry(&remote4, (struct eth_addr *)mac));
 #endif
 #if LWIP_IPV6
     memset(destination_cache, 0,
@@ -248,7 +248,7 @@ bool _inject_4packet(uint32_t src, uint32_t dst, uint8_t proto, void *data,
     _netdev_buffer_size = sizeof(ethernet_hdr_t) + sizeof(struct ip_hdr) +
                           data_len;
     mutex_unlock(&_netdev_buffer_mutex);
-    ((netdev_t *)&netdev)->event_callback((netdev_t *)&netdev, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr((netdev_t *)&netdev);
 
     return true;
 #else
@@ -280,7 +280,7 @@ bool _inject_6packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
     _netdev_buffer_size = sizeof(ethernet_hdr_t) + sizeof(ipv6_hdr_t) +
                           data_len;
     mutex_unlock(&_netdev_buffer_mutex);
-    ((netdev_t *)&netdev)->event_callback((netdev_t *)&netdev, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr((netdev_t *)&netdev);
 
     return true;
 #else

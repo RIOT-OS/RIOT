@@ -1,0 +1,43 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menu "Drivers"
+
+menu "Actuator Device Drivers"
+rsource "motor_driver/Kconfig"
+endmenu # Actuator Device Drivers
+
+menu "Miscellaneous Device Drivers"
+rsource "at/Kconfig"
+endmenu # Miscellaneous Device Drivers
+
+rsource "Kconfig.net"
+
+menu "Peripherals drivers"
+rsource "periph_common/Kconfig"
+endmenu # Peripherals drivers
+
+menu "Sensor Device Drivers"
+rsource "ads101x/Kconfig"
+rsource "bmx055/Kconfig"
+rsource "fxos8700/Kconfig"
+rsource "hdc1000/Kconfig"
+rsource "isl29020/Kconfig"
+rsource "l3g4200d/Kconfig"
+rsource "lpsxxx/Kconfig"
+rsource "mag3110/Kconfig"
+rsource "mma8x5x/Kconfig"
+rsource "opt3001/Kconfig"
+rsource "sps30/Kconfig"
+rsource "tcs37727/Kconfig"
+rsource "tmp00x/Kconfig"
+endmenu # Sensor Device Drivers
+
+menu "Storage Device Drivers"
+rsource "mtd_sdcard/Kconfig"
+endmenu # Storage Device Drivers
+
+endmenu # Drivers

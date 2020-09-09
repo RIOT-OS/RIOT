@@ -1,11 +1,8 @@
-export NATIVEINCLUDES += -I$(RIOTCPU)/native/include -I$(RIOTBASE)/sys/include
+NATIVEINCLUDES += -I$(RIOTCPU)/native/include -I$(RIOTBASE)/sys/include
 
 # Local include for OSX
 ifeq ($(BUILDOSXNATIVE),1)
-    export NATIVEINCLUDES += -I$(RIOTCPU)/native/osx-libc-extra
+  NATIVEINCLUDES += -I$(RIOTCPU)/native/osx-libc-extra
 endif
 
-USEMODULE += periph
-USEMODULE += periph_uart
-
-TOOLCHAINS_SUPPORTED = gnu llvm
+TOOLCHAINS_SUPPORTED = gnu llvm afl

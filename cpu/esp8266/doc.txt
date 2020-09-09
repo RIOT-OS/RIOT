@@ -53,7 +53,7 @@ can also be used to connect external IEEE802.15.4 modules to integrate
 ESP8266 boards into a GNRC network.
 
 The RIOT-OS port for ESP8266 supports ESP8266 as well as ESP8285 MCUs and requires
-the [ESP8266 RTOS SDK v3.x](https://github.com/espressif/ESP8266_RTOS_SDK).
+the [ESP8266 RTOS SDK v3.x](https://github.com/gschorcht/RIOT-Xtensa-ESP8266-RTOS-SDK.git).
 To build a RIOT application, simply use the `make` command and specify an
 existing ESP8266 board, for example:
 
@@ -326,7 +326,7 @@ required. This modified version can also be downloaded as
 cd $HOME/esp
 git clone https://github.com/gschorcht/RIOT-Xtensa-ESP8266-RTOS-SDK.git ESP8266_RTOS_SDK
 cd ESP8266_RTOS_SDK/
-git checkout release/v3.1-for-riot-os
+git checkout release/v3.1-for-riot-os-v2
 ```
 @note
 - Please be sure to checkout the correct branch that was used for the
@@ -687,7 +687,7 @@ Furthermore, the following configuration parameters have to be defined:
 Parameter           | Default                   | Description
 :-------------------|:--------------------------|:------------
 #ESP_WIFI_SSID      | "RIOT_AP"                 | SSID of the AP to be used.
-#ESP_WIFI_PASS      | "ThisistheRIOTporttoESP"  | Passphrase used for the AP as clear text (max. 64 chars).
+#ESP_WIFI_PASS      | -                         | Passphrase used for the AP as clear text (max. 64 chars).
 #ESP_WIFI_STACKSIZE | #THREAD_STACKSIZE_DEFAULT |Stack size used for the WiFi netdev driver thread.
 
 </center>
@@ -702,10 +702,17 @@ CFLAGS='-DESP_WIFI_SSID=\"MySSID\" -DESP_WIFI_PASS=\"MyPassphrase\"' \
 make -C examples/gnrc_networking BOARD=...
 ```
 
-@note The Wifi network interface (module `esp_wifi`) and the
+@note
+- Module `esp_wifi` is not enabled automatically when module
+`netdev_default` is used.
+- Leave 'ESP_WIFI_PASS' undefined to connect to an open WiFi access point.
+- The Wifi network interface (module `esp_wifi`) and the
 [ESP-NOW network interface](#esp8266_esp_now_network_interface)
 (module `esp_now`) can be used simultaneously, for example, to realize a
 border router for a mesh network which uses ESP-NOW.
+In this case the ESP-NOW interface must use the same channel as the AP of the
+infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
 
 \anchor esp8266_esp_now_network_interface
 ## <a name="esp8266_esp_now_network_interface"> ESP-NOW Network Interface </a> &nbsp;[[TOC](#esp8266_toc)]
@@ -752,6 +759,9 @@ Parameter | Default | Description
 [Wifi network interface](#esp8266_wifi_network_interface) (module `esp_wifi`)
 can be used simultaneously, for example, to realize a border router for
 a mesh network which uses ESP-NOW.
+In this case the ESP-NOW interface must use the same channel as the AP of the
+infrastructure WiFi network. All ESP-NOW nodes must therefore be compiled with
+the channel of the AP asvalue for the parameter 'ESP_NOW_CHANNEL'.
 
 # <a name="esp8266_preconfigured_devices"> Preconfigured Devices </a> &nbsp;[[TOC](#esp8266_toc)]
 
@@ -1164,7 +1174,7 @@ for example:
 ```
 #include "esp/common_macros.h"
 ...
-voir IRAM my_func(void)
+void IRAM my_func(void)
 {
     ...
 }

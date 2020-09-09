@@ -54,6 +54,11 @@ ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
   USEMODULE += bluetil_ad
 endif
 
+ifneq (,$(filter nimble_statconn,$(USEMODULE)))
+  USEMODULE += nimble_netif
+  USEMODULE += nimble_addr
+endif
+
 ifneq (,$(filter nimble_netif,$(USEMODULE)))
   FEATURES_REQUIRED += ble_nimble_netif
   USEMODULE += l2util

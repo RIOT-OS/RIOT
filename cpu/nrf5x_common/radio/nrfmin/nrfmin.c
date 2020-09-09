@@ -187,14 +187,6 @@ uint16_t nrfmin_get_addr(void)
     return my_addr;
 }
 
-void nrfmin_get_iid(uint16_t *iid)
-{
-    iid[0] = 0;
-    iid[1] = 0xff00;
-    iid[2] = 0x00fe;
-    iid[3] = my_addr;
-}
-
 uint16_t nrfmin_get_channel(void)
 {
     return (uint16_t)(NRF_RADIO->FREQUENCY >> 2);
@@ -307,7 +299,7 @@ void isr_radio(void)
             }
             else {
                 rx_lock = 0;
-                nrfmin_dev.event_callback(&nrfmin_dev, NETDEV_EVENT_ISR);
+                netdev_trigger_event_isr(&nrfmin_dev);
             }
         }
         else if (state == STATE_TX) {
@@ -506,10 +498,6 @@ static int nrfmin_get(netdev_t *dev, netopt_t opt, void *val, size_t max_len)
             assert(max_len >= sizeof(uint16_t));
             *((uint16_t *)val) = NETDEV_TYPE_NRFMIN;
             return sizeof(uint16_t);
-        case NETOPT_IPV6_IID:
-            assert(max_len >= sizeof(uint64_t));
-            nrfmin_get_iid((uint16_t *)val);
-            return sizeof(uint64_t);
         default:
             return -ENOTSUP;
     }

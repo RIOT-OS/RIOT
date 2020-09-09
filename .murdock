@@ -1,7 +1,9 @@
 #!/bin/sh
 
-: ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 nrf52dk samr21-xpro"}
+: ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
 : ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+# we can't use '-' in the variable names, convert them to '_' to add new boards
+: ${TEST_KCONFIG_samr21_xpro:="examples/hello-world"}
 
 export RIOT_CI_BUILD=1
 export STATIC_TESTS=${STATIC_TESTS:-1}
@@ -29,7 +31,14 @@ export OPTIONAL_CFLAGS_BLACKLIST="-gz"
 NIGHTLY=${NIGHTLY:-0}
 RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
 
-DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE -E TEST_HASH"
+DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
+         -E TEST_HASH -E CI_PULL_LABELS"
+
+get_kconfig_test_apps() {
+    case "$1" in
+        "samr21_xpro") echo "${TEST_KCONFIG_samr21_xpro}" ;;
+    esac
+}
 
 check_label() {
     local label="${1}"
@@ -168,6 +177,7 @@ get_app_board_toolchain_pairs() {
 
 # use dwqc to create full "appdir board toolchain" compile job list
 get_compile_jobs() {
+    check_label "CI: skip compile test" && return
     get_apps | \
         dwqc ${DWQ_ENV} -s \
         ${DWQ_JOBID:+--subjob} \
@@ -228,12 +238,39 @@ compile() {
     # sanity checks
     [ $# -ne 2 ] && error "$0: compile: invalid parameters (expected \$appdir \$board:\$toolchain)"
     [ ! -d "$appdir" ] && error "$0: compile: error: application directory \"$appdir\" doesn't exist"
-    [ ! -d "boards/$board" ] && error "$0: compile: error: board directory \"boards/$board\" doesn't exist"
 
     # compile
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \
         make -C${appdir} clean all test-input-hash -j${JOBS:-4}
     RES=$?
+
+    test_hash=$(test_hash_calc "$BINDIR")
+
+    # We compile a second time with Kconfig based dependency
+    # resolution for regression purposes. $TEST_KCONFIG contains a
+    # list of board-application tuples that are currently modeled to
+    # run with Kconfig
+    if [ $RES -eq 0 ]; then
+        # we can't use '-' in variable names
+        _board=$(echo ${board} | tr '-' '_')
+
+        for app in $(get_kconfig_test_apps "${_board}")
+        do
+            if [ "${appdir}" = "${app}" ]; then
+                BOARD=$board make -C${appdir} clean
+                CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
+                              make -C${appdir} all test-input-hash -j${JOBS:-4}
+                RES=$?
+                if [ $RES -eq 0 ]; then
+                    new_test_hash=$(test_hash_calc "$BINDIR")
+                    if [ ${new_test_hash} != ${test_hash} ]; then
+                        echo "Hashes of binaries mismatch for ${app}";
+                        RES=1
+                    fi
+                fi
+            fi
+        done
+    fi
 
     # run tests
     if [ $RES -eq 0 ]; then
@@ -243,7 +280,6 @@ compile() {
                     BOARD=$board make -C${appdir} test
                     RES=$?
                 elif is_in_list "$board" "$TEST_BOARDS_AVAILABLE"; then
-                    test_hash=$(test_hash_calc "$BINDIR")
                     echo "-- test_hash=$test_hash"
                     if test_cache_get $test_hash; then
                         echo "-- skipping test due to positive cache hit"
@@ -327,24 +363,13 @@ run_test() {
 
 # execute static tests
 static_tests() {
-    local repo=${CI_BASE_REPO:-https://github.com/RIOT-OS/RIOT}
-    local branch=${CI_BASE_BRANCH:-master}
-
     print_worker
-
-    OUT="$(git remote add upstream $repo 2>&1 && git fetch upstream ${branch}:${branch} 2>&1)"
-    RES=$?
-    if [ $RES -ne 0 ]; then
-        echo "$OUT"
-        exit 1
-    fi
-
-    BUILDTEST_MCU_GROUP=static-tests ./dist/tools/ci/build_and_test.sh
+    ./dist/tools/ci/static_tests.sh
 }
 
 get_non_compile_jobs() {
     [ "$STATIC_TESTS" = "1" ] && \
-        echo "$0 static_tests###{ \"jobdir\" : \"exclusive\" }"
+        echo "$0 static_tests"
 }
 
 get_jobs() {

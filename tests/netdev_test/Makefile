@@ -4,7 +4,7 @@
 CFLAGS += -DNDEBUG
 include ../Makefile.tests_common
 
-DISABLE_MODULE = auto_init
+DISABLE_MODULE += auto_init_gnrc_%
 
 USEMODULE += gnrc
 USEMODULE += gnrc_neterr
@@ -13,6 +13,9 @@ USEMODULE += netdev_eth
 USEMODULE += netdev_test
 USEMODULE += od
 
-CFLAGS += -DGNRC_PKTBUF_SIZE=200
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=200
+endif
 
 include $(RIOTBASE)/Makefile.include

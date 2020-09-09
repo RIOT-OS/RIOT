@@ -26,8 +26,8 @@ endif
 ifneq (,$(filter can_linux,$(USEMODULE)))
   DIRS += can
 endif
-ifneq (,$(filter trace,$(USEMODULE)))
-	DIRS += trace
+ifneq (,$(filter backtrace,$(USEMODULE)))
+  DIRS += backtrace
 endif
 
 include $(RIOTBASE)/Makefile.base

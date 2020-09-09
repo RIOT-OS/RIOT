@@ -9,6 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \
+    im880b \
     lsn50 \
     maple-mini \
     microbit \
@@ -16,12 +17,11 @@ BOARD_INSUFFICIENT_MEMORY := \
     nrf6310 \
     nucleo-f030r8 \
     nucleo-f031k6 \
-    nucleo-f302r8 \
-    nucleo-f303k8 \
     nucleo-f042k6 \
     nucleo-f070rb \
     nucleo-f072rb \
     nucleo-f302r8 \
+    nucleo-f303k8 \
     nucleo-f334r8 \
     nucleo-l031k6 \
     nucleo-l053r8 \

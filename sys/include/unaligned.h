@@ -48,6 +48,16 @@ typedef struct __attribute__((packed)) {
     uint16_t val;       /**< value */
 } uint16_una_t;
 
+/** @brief Unaligned access helper struct (uint32_t version) */
+typedef struct __attribute__((packed)) {
+    uint32_t val;       /**< value */
+} uint32_una_t;
+
+/** @brief Unaligned access helper struct (uint64_t version) */
+typedef struct __attribute__((packed)) {
+    uint64_t val;       /**< value */
+} uint64_una_t;
+
 /**
  * @brief    Get uint16_t from possibly unaligned pointer
  *
@@ -57,7 +67,33 @@ typedef struct __attribute__((packed)) {
  */
 static inline uint16_t unaligned_get_u16(const void *ptr)
 {
-    const uint16_una_t *tmp = ptr;
+    const uint16_una_t *tmp = (const uint16_una_t *)ptr;
+    return tmp->val;
+}
+
+/**
+ * @brief    Get uint32_t from possibly unaligned pointer
+ *
+ * @param[in]   ptr pointer to read from
+ *
+ * @returns value read from @p ptr
+ */
+static inline uint32_t unaligned_get_u32(const void *ptr)
+{
+    const uint32_una_t *tmp = (const uint32_una_t *)ptr;
+    return tmp->val;
+}
+
+/**
+ * @brief    Get uint64_t from possibly unaligned pointer
+ *
+ * @param[in]   ptr pointer to read from
+ *
+ * @returns value read from @p ptr
+ */
+static inline uint64_t unaligned_get_u64(const void *ptr)
+{
+    const uint64_una_t *tmp = (const uint64_una_t *)ptr;
     return tmp->val;
 }
 

@@ -1,0 +1,51 @@
+# Copyright (c) 2019 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEPKG_TINYDTLS
+    bool "Configure tinydtls"
+    depends on USEPKG_TINYDTLS
+    help
+        Configure tinydtls package via Kconfig.
+
+if KCONFIG_USEPKG_TINYDTLS
+
+# TODO change to multiple choice after DTLS application support enabling more than one types of cypher suites
+choice
+    bool "Cipher suite to enable"
+    default DTLS_PSK
+
+config DTLS_PSK
+    bool "TLS_PSK_WITH_AES_128_CCM_8"
+
+config DTLS_ECC
+    bool "TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8"
+
+endchoice
+
+config DTLS_DEBUG
+    bool "Enable debug log"
+    help
+        Enable debug log output for tinydtls
+
+config DTLS_CONTEXT_MAX
+    int "Max DTLS context"
+    default 2
+    help
+        The maximum number of DTLS context at the same time.
+
+config DTLS_PEER_MAX
+    int "Max number of peers"
+    default 1
+    help
+        The maximum number of DTLS peers.
+
+config DTLS_HANDSHAKE_MAX
+    int "Max concurrent handshake"
+    default 1
+    help
+        The maximum number of concurrent DTLS handshakes.
+
+endif # KCONFIG_USEPKG_TINYDTLS

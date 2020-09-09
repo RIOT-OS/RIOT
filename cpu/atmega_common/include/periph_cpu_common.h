@@ -96,7 +96,7 @@ typedef enum {
 #define SPI_MODE_SEL(pol, pha)          ((pol << 3) | (pha << 2))
 
 /**
- * @brief   Override the SPI mode values
+ * @name   Override the SPI mode values
  *
  * As the mode is set in bit 3 and 2 of the configuration register, we put the
  * correct configuration there
@@ -120,7 +120,7 @@ typedef enum {
 #define SPI_CLK_SEL(s2x, pr1, pr0)    ((s2x << 2) | (pr1 << 1) | pr0)
 
 /**
- * @brief   Override SPI speed values
+ * @name   Override SPI speed values
  *
  * We assume a master clock speed of 16MHz here.
  * @{
@@ -134,10 +134,10 @@ typedef enum {
     SPI_CLK_10MHZ  = SPI_CLK_SEL(1, 0, 0)       /**< 16/2   -> 8MHz */
 } spi_clk_t;
 /** @} */
-#endif /* ndef DOXYGEN */
+#endif /* ifndef DOXYGEN */
 
 /**
- * @brief  Bitmasks indicating which are the possible dividers for a timer
+ * @name  Bitmasks indicating which are the possible dividers for a timer
  * @{
  */
 typedef enum {
@@ -147,7 +147,7 @@ typedef enum {
 /** @} */
 
 /**
- * @brief   PWM configuration
+ * @name   PWM configuration
  * @{
  */
 typedef struct {
@@ -156,6 +156,11 @@ typedef struct {
     timer_div_t div;                    /**< Timer divider mask */
 } pwm_conf_t;
 /** @} */
+
+/**
+ * @brief   A low-level timer_set() implementation is provided
+ */
+#define PERIPH_TIMER_PROVIDES_SET
 
 /**
  * @brief   EEPROM clear byte
@@ -174,7 +179,6 @@ typedef struct {
  * @brief   WDT can be stopped on AVR
  */
 #define WDT_HAS_STOP                    (1)
-/** @} */
 
 /**
  * @name RTT configuration

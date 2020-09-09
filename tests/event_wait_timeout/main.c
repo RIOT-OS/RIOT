@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <stdint.h>
+#include <stdatomic.h>
 #include <stdio.h>
 
 #include "event.h"
@@ -25,6 +27,7 @@
 #include "xtimer.h"
 #include "thread_flags.h"
 
+#define STATIC_TIMEOUT  (10U * US_PER_MS)       /* 10ms */
 #define TIMEOUT         (50U * US_PER_MS)       /* 50ms */
 #define PRIO            (THREAD_PRIORITY_MAIN - 5)
 #define STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
@@ -39,13 +42,13 @@ static event_t _evt = { .handler = _on_evt };
 static char _stack[STACKSIZE];
 static thread_t *_thread_main;
 
-static unsigned _wakeup_evt = 0;
-static unsigned _wakeup_timeout = 0;
+static atomic_uint _wakeup_evt = ATOMIC_VAR_INIT(0);
+static atomic_uint _wakeup_timeout = ATOMIC_VAR_INIT(0);
 
 static void _on_evt(event_t *evt)
 {
     (void)evt;
-    ++_wakeup_evt;
+    atomic_fetch_add(&_wakeup_evt, 1);
 }
 
 static void *_cnt_thread(void *arg)
@@ -59,7 +62,7 @@ static void *_cnt_thread(void *arg)
             evt->handler(evt);
         }
         else {
-            ++_wakeup_timeout;
+            atomic_fetch_add(&_wakeup_timeout, 1);
         }
     }
 
@@ -69,7 +72,7 @@ static void *_cnt_thread(void *arg)
 int main(void)
 {
     /* setup */
-    _thread_main = (thread_t *)thread_get(thread_getpid());
+    _thread_main = thread_get_active();
 
     puts("[START] event_wait_timeout test application.\n");
 
@@ -80,6 +83,33 @@ int main(void)
         puts("[FAILED]");
         return 1;
     }
+    tmp_evt = event_wait_timeout64(&tmp_eq, 0);
+    if (tmp_evt != NULL) {
+        puts("[FAILED]");
+        return 1;
+    }
+
+    /* test return in a predefined amount of time */
+    puts("waiting for event with 10ms timeout...");
+    uint32_t before = xtimer_now_usec();
+    tmp_evt = event_wait_timeout(&tmp_eq, STATIC_TIMEOUT);
+    if (tmp_evt != NULL) {
+        puts("[FAILED]");
+        return 1;
+    }
+    uint32_t diff = xtimer_now_usec() - before;
+    printf("event_wait time out after %"PRIu32"us\n", diff);
+
+    puts("waiting for event with 10ms timeout (using uint64)...");
+    uint64_t static_timeout = STATIC_TIMEOUT;
+    before = xtimer_now_usec();
+    tmp_evt = event_wait_timeout64(&tmp_eq, static_timeout);
+    if (tmp_evt != NULL) {
+        puts("[FAILED]");
+        return 1;
+    }
+    diff = xtimer_now_usec() - before;
+    printf("event_wait time out after %"PRIu32"us\n", diff);
 
     thread_create(_stack, sizeof(_stack), PRIO, 0, _cnt_thread, NULL, "cnt");
     /* first, wait 155ms -> should lead to 3 timeout wakeups */
@@ -95,8 +125,8 @@ int main(void)
     /* finally, wait 60ms and collect results -> +1 timeout wakeup */
     xtimer_usleep(60U * US_PER_MS);
 
-    unsigned events = _wakeup_evt;
-    unsigned timeouts = _wakeup_timeout;
+    unsigned events = atomic_load(&_wakeup_evt);
+    unsigned timeouts = atomic_load(&_wakeup_timeout);
 
     /* rate results */
     printf("finished: %u/4 events and %u/4 timeouts recorded\n",

@@ -115,6 +115,7 @@ typedef struct netdev_radio_rx_info cc1xxx_rx_info_t;
 /**
  * @brief   Creates a CC110x/CC1200 network interface
  *
+ * @param[out] netif    The interface. May not be `NULL`.
  * @param[in] stack     The stack for the network interface's thread.
  * @param[in] stacksize Size of @p stack.
  * @param[in] priority  Priority for the network interface's thread.
@@ -123,11 +124,11 @@ typedef struct netdev_radio_rx_info cc1xxx_rx_info_t;
  *
  * @see @ref gnrc_netif_create()
  *
- * @return  The network interface on success.
+ * @return  0 on success
+ * @return  negative number on error
  */
-gnrc_netif_t *gnrc_netif_cc1xxx_create(char *stack, int stacksize,
-                                       char priority, char *name,
-                                       netdev_t *dev);
+int gnrc_netif_cc1xxx_create(gnrc_netif_t *netif, char *stack, int stacksize,
+                             char priority, char *name, netdev_t *dev);
 
 #ifdef __cplusplus
 }

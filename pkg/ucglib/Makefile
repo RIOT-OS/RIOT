@@ -1,15 +1,15 @@
 PKG_NAME=ucglib
 PKG_URL=https://github.com/olikraus/ucglib
-PKG_VERSION=bf48515702dd7c87cbacdd17989738f33f003df2
+PKG_VERSION=230f15e3bcd3c84977780e84bd855ac89c1959ee
 PKG_LICENSE=BSD-2-Clause
 
-.PHONY: all
-
-all:
-	cp $(RIOTBASE)/pkg/ucglib/src/Makefile $(PKG_BUILDDIR)/Makefile
-	cp $(RIOTBASE)/pkg/ucglib/src/csrc/Makefile $(PKG_BUILDDIR)/csrc/Makefile
-	cp $(RIOTBASE)/pkg/ucglib/src/csrc/ucg_riotos.c $(PKG_BUILDDIR)/csrc/ucg_riotos.c
-	cp $(RIOTBASE)/pkg/ucglib/src/sys/sdl/dev/Makefile $(PKG_BUILDDIR)/sys/sdl/dev/Makefile
-	"$(MAKE)" -C $(PKG_BUILDDIR)
-
 include $(RIOTBASE)/pkg/pkg.mk
+
+.PHONY: ucglib_sdl
+
+all: $(filter ucglib_sdl,$(USEMODULE))
+	"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(CURDIR)/Makefile.ucglib
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/csrc -f $(CURDIR)/Makefile.ucglib_csrc
+
+ucglib_sdl:
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/sys/sdl/dev -f $(CURDIR)/Makefile.ucglib_sdl

@@ -26,6 +26,11 @@
 #define PULSE_COUNTER_H
 
 #include <stdint.h>
+#ifdef __cplusplus
+#include "c11_atomics_compat.hpp"
+#else
+#include <stdatomic.h>
+#endif
 #include "periph/gpio.h"
 
 #ifdef __cplusplus
@@ -44,7 +49,7 @@ typedef struct {
   * @brief   Device descriptor for a pulse counter device
   */
 typedef struct {
-    int16_t pulse_count;       /**< pulse counter */
+    atomic_uint_least16_t pulse_count;  /**< pulse counter */
 } pulse_counter_t;
 
 /**
@@ -74,7 +79,7 @@ int16_t pulse_counter_read_with_reset(pulse_counter_t *dev);
  *
  * @return                  Accumulated pulse counts
  */
-int16_t pulse_counter_read_without_reset(const pulse_counter_t *dev);
+int16_t pulse_counter_read_without_reset(pulse_counter_t *dev);
 
 /**
  * @brief   Reset pulse counter value

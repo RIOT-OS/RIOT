@@ -1,7 +1,8 @@
 FEATURES_PROVIDED += periph_cpuid
+FEATURES_PROVIDED += periph_pm
 
-# TRNG driver is not implemented for mkw41z512vht4 model
-_KINETIS_CPU_MODELS_WITHOUT_HWRNG += mkw41z512vht4
+# TRNG driver is not implemented for mkw41z models
+_KINETIS_CPU_MODELS_WITHOUT_HWRNG += mkw41z256vht4 mkw41z512vht4
 # No HWRNG in mk20d7 devices
 _KINETIS_CPU_MODELS_WITHOUT_HWRNG += mk20dx256vlh7
 
@@ -12,8 +13,16 @@ endif
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_gpio_irq
 
-# This applies to all Kinetis EA series, for now this is only s9keaz128aclh48
-ifeq (s9keaz128aclh48,$(CPU_MODEL))
+# Parse parameters from CPU_MODEL using the kinetis-info.mk script in the same
+# directory as this Makefile.
+include $(LAST_MAKEFILEDIR)/kinetis-info.mk
+
+ifneq (,$(filter k w,$(CPU_FAM)))
+  FEATURES_PROVIDED += periph_flashpage
+  FEATURES_PROVIDED += periph_flashpage_raw
+endif
+
+ifeq (ea,$(CPU_FAM))
   FEATURES_PROVIDED += periph_ics
 else
   FEATURES_PROVIDED += periph_mcg

@@ -117,6 +117,11 @@ complete that no input from the original developer or maintainer is required.
 -   Be friendly. Respect the original author, bearing in mind that their coding
     style or their design may be just as valid as the way you would have done
     it. And of course, always follow the [Code of Conduct].
+-   If a contributor has opened a PR, the reviewer should attempt to
+    help the author of the contribution to get it to its best shape and
+    according to the RIOT Standard™. If there is disagreement, it’s important
+    to understand the reasons behind and always give technical arguments,
+    pros and cons or snippets.
 
 
 ### Organisation of reviewing between maintainers
@@ -154,6 +159,28 @@ GitHub's review sidebar.
 
 If there are multiple maintainers reviewing a PR, always give the other
 maintainers reasonable time to ACK before dismissing their review.
+
+### Release, Feature Freeze, and Backports
+
+Before the official release of a new RIOT version, two feature freeze periods
+are announced on the
+[RIOT development email list](https://lists.riot-os.org/mailman/listinfo/devel):
+The soft feature freeze and the hard feature freeze. During the soft feature
+freeze only PRs with minor impact should be merged into master. The hard feature
+freeze begins when the release manager creates a new release branch. Therefore,
+the restriction on merging PRs into the master branch are lifted at that point.
+
+Once the release branch is created, no backports of new features will be
+accepted. Instead, backports should consist only of bug fixes or of reverting
+features that were added during the last development period (and not part of any
+release), but didn't reach the required maturity or API stability yet. For
+bigger changes (which explicitly includes any revert), the PR has to be
+announced to the maintainer mailing list and should be merged no sooner than
+48h after the announcement and needs at least two ACKs.
+
+In case of security relevant backports (both bug fixes and reverts), the
+announcement can be skipped and the fix merged once at least two ACKs are
+there.
 
 [list of maintainers]: https://github.com/RIOT-OS/RIOT/wiki/Maintainers
 [Best Practices]: https://github.com/RIOT-OS/RIOT/wiki/Best-Practice-for-RIOT-Programming

@@ -12,6 +12,7 @@
  * @file
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
+#include <kernel_defines.h>
 
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/ipv6/nib.h"
@@ -23,7 +24,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
@@ -95,6 +96,14 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                     uint16_t ltime = byteorder_ntohs(aro->ltime);
                     uint32_t rereg_time;
                     int idx = gnrc_netif_ipv6_addr_idx(netif, &ipv6->dst);
+
+                    if (idx < 0) {
+                        DEBUG("nib: Address %s is not assigned to interface "
+                              "%d ignoring ARO\n",
+                              ipv6_addr_to_str(addr_str, &ipv6->dst,
+                                               sizeof(addr_str)), netif->pid);
+                        return _ADDR_REG_STATUS_IGNORE;
+                    }
                     /* if ltime 1min, reschedule NS in 30sec, otherwise 1min
                      * before timeout */
                     rereg_time = (ltime == 1U) ? (30 * MS_PER_SEC) :
@@ -109,6 +118,8 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                                  GNRC_IPV6_NIB_REREG_ADDRESS,
                                  &netif->ipv6.addrs_timers[idx],
                                  rereg_time);
+                    gnrc_netif_ipv6_bus_post(netif, GNRC_IPV6_EVENT_ADDR_VALID,
+                                  &netif->ipv6.addrs[idx]);
                     break;
                 }
                 case SIXLOWPAN_ND_STATUS_DUP:
@@ -140,15 +151,15 @@ uint8_t _handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             }
             return aro->status;
         }
-#if GNRC_IPV6_NIB_CONF_6LR
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR)
         else if (gnrc_netif_is_6lr(netif) &&
                  (icmpv6->type == ICMPV6_NBR_SOL)) {
             return _reg_addr_upstream(netif, ipv6, icmpv6, aro, sl2ao, nce);
         }
-#else   /* GNRC_IPV6_NIB_CONF_6LR */
+#else   /* CONFIG_GNRC_IPV6_NIB_6LR */
         (void)sl2ao;
         (void)nce;
-#endif  /* GNRC_IPV6_NIB_CONF_6LR */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LR */
     }
 #if ENABLE_DEBUG
     else if (aro->len != SIXLOWPAN_ND_OPT_AR_LEN) {
@@ -173,7 +184,9 @@ static inline bool _is_valid(const gnrc_netif_t *netif, int idx)
 void _handle_rereg_address(const ipv6_addr_t *addr)
 {
     gnrc_netif_t *netif = gnrc_netif_get_by_ipv6_addr(addr);
-    _nib_dr_entry_t *router = _nib_drl_get_dr();
+
+    gnrc_netif_acquire(netif);
+    _nib_dr_entry_t *router = _nib_drl_get(NULL, netif->pid);
     const bool router_reachable = (router != NULL) &&
                                   _is_reachable(router->next_hop);
 
@@ -194,10 +207,15 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
     if (netif != NULL) {
         int idx = gnrc_netif_ipv6_addr_idx(netif, addr);
 
-        if (router_reachable &&
-            (_is_valid(netif, idx) || (_is_tentative(netif, idx) &&
-             (gnrc_netif_ipv6_addr_dad_trans(netif, idx) <
-              SIXLOWPAN_ND_REG_TRANSMIT_NUMOF)))) {
+        if (idx < 0) {
+            DEBUG("nib: %s is not assigned to interface %d anymore.\n",
+                  ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
+                  netif->pid);
+        }
+        else if (router_reachable &&
+                 (_is_valid(netif, idx) || (_is_tentative(netif, idx) &&
+                 (gnrc_netif_ipv6_addr_dad_trans(netif, idx) <
+                 SIXLOWPAN_ND_REG_TRANSMIT_NUMOF)))) {
             uint32_t retrans_time;
 
             if (_is_valid(netif, idx)) {
@@ -216,9 +234,10 @@ void _handle_rereg_address(const ipv6_addr_t *addr)
             _handle_search_rtr(netif);
         }
     }
+    gnrc_netif_release(netif);
 }
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 _nib_abr_entry_t *_handle_abro(const sixlowpan_nd_opt_abr_t *abro)
 {
     _nib_abr_entry_t *abr = NULL;
@@ -234,7 +253,7 @@ _nib_abr_entry_t *_handle_abro(const sixlowpan_nd_opt_abr_t *abro)
 
         if (abr->version >= abro_version) {
             abr->version = abro_version;
-            abr->valid_until = _now_min() + ltime;
+            abr->valid_until = evtimer_now_min() + ltime;
         }
         /* correct for default value */
         ltime = (ltime == 0) ? SIXLOWPAN_ND_OPT_ABR_LTIME_DEFAULT : ltime;
@@ -244,16 +263,16 @@ _nib_abr_entry_t *_handle_abro(const sixlowpan_nd_opt_abr_t *abro)
     }
     return abr;
 }
-#endif /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
 uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
                      const sixlowpan_nd_opt_6ctx_t *sixco,
                      _nib_abr_entry_t *abr)
-#else   /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#else   /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
                      const sixlowpan_nd_opt_6ctx_t *sixco)
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 {
     uint16_t ltime;
 
@@ -278,7 +297,7 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
     cid = sixlowpan_nd_opt_6ctx_get_cid(sixco);
     gnrc_sixlowpan_ctx_update(cid, (ipv6_addr_t *)(sixco + 1), sixco->ctx_len,
                               ltime, sixlowpan_nd_opt_6ctx_is_comp(sixco));
-#if GNRC_IPV6_NIB_CONF_MULTIHOP_P6C
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)
     assert(abr != NULL);    /* should have been set in _handle_abro() */
     if (ltime == 0) {
         bf_unset(abr->ctxs, cid);
@@ -286,15 +305,15 @@ uint32_t _handle_6co(const icmpv6_hdr_t *icmpv6,
     else {
         bf_set(abr->ctxs, cid);
     }
-#endif  /* GNRC_IPV6_NIB_CONF_MULTIHOP_P6C */
+#endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 #else   /* MODULE_GNRC_SIXLOWPAN_CTX */
     (void)abr;
 #endif  /* MODULE_GNRC_SIXLOWPAN_CTX */
     return ltime * SEC_PER_MIN * MS_PER_SEC;
 }
-#else  /* GNRC_IPV6_NIB_CONF_6LN */
+#else  /* CONFIG_GNRC_IPV6_NIB_6LN */
 typedef int dont_be_pedantic;
-#endif /* GNRC_IPV6_NIB_CONF_6LN */
+#endif /* CONFIG_GNRC_IPV6_NIB_6LN */
 
 
 /** @} */

@@ -41,7 +41,7 @@ typedef struct _unused {
 } _unused_t;
 
 static mutex_t _mutex = MUTEX_INIT;
-static uint8_t _pktbuf[GNRC_PKTBUF_SIZE];
+static uint8_t _pktbuf[CONFIG_GNRC_PKTBUF_SIZE];
 static _unused_t *_first_unused;
 
 #ifdef DEVELHELP
@@ -57,7 +57,7 @@ static void _pktbuf_free(void *data, size_t size);
 
 static inline bool _pktbuf_contains(void *ptr)
 {
-    return (unsigned)((uint8_t *)ptr - _pktbuf) < GNRC_PKTBUF_SIZE;
+    return (unsigned)((uint8_t *)ptr - _pktbuf) < CONFIG_GNRC_PKTBUF_SIZE;
 }
 
 /* fits size to byte alignment */
@@ -93,9 +93,9 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t s
 {
     gnrc_pktsnip_t *pkt;
 
-    if (size > GNRC_PKTBUF_SIZE) {
-        DEBUG("pktbuf: size (%u) > GNRC_PKTBUF_SIZE (%u)\n",
-              (unsigned)size, GNRC_PKTBUF_SIZE);
+    if (size > CONFIG_GNRC_PKTBUF_SIZE) {
+        DEBUG("pktbuf: size (%u) > CONFIG_GNRC_PKTBUF_SIZE (%u)\n",
+              (unsigned)size, CONFIG_GNRC_PKTBUF_SIZE);
         return NULL;
     }
     mutex_lock(&_mutex);
@@ -303,10 +303,10 @@ void gnrc_pktbuf_stats(void)
     int count = 0;
 
     printf("packet buffer: first byte: %p, last byte: %p (size: %u)\n",
-           (void *)&_pktbuf[0], (void *)&_pktbuf[GNRC_PKTBUF_SIZE], GNRC_PKTBUF_SIZE);
+           (void *)&_pktbuf[0], (void *)&_pktbuf[CONFIG_GNRC_PKTBUF_SIZE], CONFIG_GNRC_PKTBUF_SIZE);
     printf("  position of last byte used: %" PRIu16 "\n", max_byte_count);
     if (ptr == NULL) {  /* packet buffer is completely full */
-        _print_chunk(chunk, GNRC_PKTBUF_SIZE, count++);
+        _print_chunk(chunk, CONFIG_GNRC_PKTBUF_SIZE, count++);
     }
 
     if (((void *)ptr) == ((void *)chunk)) { /* _first_unused is at the beginning */
@@ -318,7 +318,7 @@ void gnrc_pktbuf_stats(void)
     while (ptr) {
         size_t size = ((uint8_t *)ptr) - chunk;
         if ((size == 0) && (!_pktbuf_contains(ptr)) &&
-            (!_pktbuf_contains(chunk)) && (size > GNRC_PKTBUF_SIZE)) {
+            (!_pktbuf_contains(chunk)) && (size > CONFIG_GNRC_PKTBUF_SIZE)) {
             puts("ERROR");
             return;
         }
@@ -328,8 +328,8 @@ void gnrc_pktbuf_stats(void)
         ptr = ptr->next;
     }
 
-    if (chunk <= &_pktbuf[GNRC_PKTBUF_SIZE - 1]) {
-        _print_chunk(chunk, &_pktbuf[GNRC_PKTBUF_SIZE] - chunk, count);
+    if (chunk <= &_pktbuf[CONFIG_GNRC_PKTBUF_SIZE - 1]) {
+        _print_chunk(chunk, &_pktbuf[CONFIG_GNRC_PKTBUF_SIZE] - chunk, count);
     }
 #else
     DEBUG("pktbuf: needs od module\n");
@@ -351,14 +351,14 @@ bool gnrc_pktbuf_is_sane(void)
     /* Invariants of this implementation:
      *  - the head of _unused_t list is _first_unused
      *  - if _unused_t list is empty the packet buffer is full and _first_unused is NULL
-     *  - forall ptr_in _unused_t list: &_pktbuf[0] < ptr < &_pktbuf[GNRC_PKTBUF_SIZE]
+     *  - forall ptr_in _unused_t list: &_pktbuf[0] < ptr < &_pktbuf[CONFIG_GNRC_PKTBUF_SIZE]
      *  - forall ptr in _unused_t list: ptr->next == NULL || ptr < ptr->next
      *  - forall ptr in _unused_t list: (ptr->next != NULL && ptr->size <= (ptr->next - ptr)) ||
-     *                                  (ptr->next == NULL && ptr->size == (GNRC_PKTBUF_SIZE - (ptr - &_pktbuf[0])))
+     *                                  (ptr->next == NULL && ptr->size == (CONFIG_GNRC_PKTBUF_SIZE - (ptr - &_pktbuf[0])))
      */
 
     while (ptr) {
-        if (&_pktbuf[0] >= (uint8_t *)ptr && (uint8_t *)ptr >= &_pktbuf[GNRC_PKTBUF_SIZE]) {
+        if (&_pktbuf[0] >= (uint8_t *)ptr && (uint8_t *)ptr >= &_pktbuf[CONFIG_GNRC_PKTBUF_SIZE]) {
             return false;
         }
         if ((ptr->next != NULL) && (ptr >= ptr->next)) {
@@ -366,7 +366,7 @@ bool gnrc_pktbuf_is_sane(void)
         }
         if (((ptr->next == NULL) || (ptr->size > (size_t)((uint8_t *)(ptr->next) - (uint8_t *)ptr))) &&
             ((ptr->next != NULL) ||
-             (ptr->size != (size_t)(GNRC_PKTBUF_SIZE - ((uint8_t *)ptr - &_pktbuf[0]))))) {
+             (ptr->size != (size_t)(CONFIG_GNRC_PKTBUF_SIZE - ((uint8_t *)ptr - &_pktbuf[0]))))) {
             return false;
         }
         ptr = ptr->next;
@@ -426,7 +426,7 @@ static void *_pktbuf_alloc(size_t size)
     else {
         _unused_t *new = (_unused_t *)(((uint8_t *)ptr) + size);
 
-        if (((((uint8_t *)new) - &(_pktbuf[0])) + sizeof(_unused_t)) > GNRC_PKTBUF_SIZE) {
+        if (((((uint8_t *)new) - &(_pktbuf[0])) + sizeof(_unused_t)) > CONFIG_GNRC_PKTBUF_SIZE) {
             /* content of new would exceed packet buffer size so set to NULL */
             _first_unused = NULL;
         }
@@ -478,7 +478,7 @@ static void _pktbuf_free(void *data, size_t size)
     new->size = _align(size);
     /* calculate number of bytes between new _unused_t chunk and end of packet
      * buffer */
-    bytes_at_end = ((&_pktbuf[0] + GNRC_PKTBUF_SIZE) - (((uint8_t *)new) + new->size));
+    bytes_at_end = ((&_pktbuf[0] + CONFIG_GNRC_PKTBUF_SIZE) - (((uint8_t *)new) + new->size));
     if (bytes_at_end < sizeof(_unused_t)) {
         /* new is very last segment and there is a little bit of memory left
          * that wouldn't fit _unused_t (cut of in _pktbuf_alloc()) => re-add it */

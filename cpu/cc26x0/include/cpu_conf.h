@@ -27,6 +27,11 @@
 #include "cc26x0_fcfg.h"
 #include "cc26x0_prcm.h"
 
+/**
+ * @brief   Bit-Band configuration
+ */
+#define CPU_HAS_BITBAND 1
+
 #ifdef __cplusplus
 extern "C" {
 #endif

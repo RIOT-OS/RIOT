@@ -79,23 +79,6 @@ static const pwm_conf_t pwm_config[] = {
  * @name    SPI configuration
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 32000000Hz */
-        7,  /* -> 125000Hz */
-        5,  /* -> 500000Hz */
-        4,  /* -> 1000000Hz */
-        2,  /* -> 4000000Hz */
-        1   /* -> 8000000Hz */
-    },
-    {       /* for APB2 @ 32000000Hz */
-        7,  /* -> 125000Hz */
-        5,  /* -> 500000Hz */
-        4,  /* -> 1000000Hz */
-        2,  /* -> 4000000Hz */
-        1   /* -> 8000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI1,
@@ -119,16 +102,17 @@ static const spi_conf_t spi_config[] = {
  * @name    ADC configuration
  * @{
  */
-#define ADC_CONFIG {                           \
-    { GPIO_PIN(PORT_A, 0), 0 },  /* Pin A0 */  \
-    { GPIO_PIN(PORT_A, 1), 1 },  /* Pin A1 */  \
-    { GPIO_PIN(PORT_A, 3), 3 },  /* Pin A2 */  \
-    { GPIO_PIN(PORT_A, 4), 4 },  /* Pin A3 */  \
-    { GPIO_PIN(PORT_A, 5), 5 },  /* Pin A4 */  \
-    { GPIO_PIN(PORT_A, 6), 6 },  /* Pin A5 */  \
-    { GPIO_PIN(PORT_A, 7), 7 },  /* Pin A6 */  \
-}
-#define ADC_NUMOF           (7U)
+static const adc_conf_t adc_config[] = {
+    { GPIO_PIN(PORT_A, 0), 0 },  /* Pin A0 */
+    { GPIO_PIN(PORT_A, 1), 1 },  /* Pin A1 */
+    { GPIO_PIN(PORT_A, 3), 3 },  /* Pin A2 */
+    { GPIO_PIN(PORT_A, 4), 4 },  /* Pin A3 */
+    { GPIO_PIN(PORT_A, 5), 5 },  /* Pin A4 */
+    { GPIO_PIN(PORT_A, 6), 6 },  /* Pin A5 */
+    { GPIO_PIN(PORT_A, 7), 7 },  /* Pin A6 */
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

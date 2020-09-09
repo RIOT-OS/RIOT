@@ -35,7 +35,7 @@
 #define ASCII_UNPRINTABLE_REPLACEMENT "."
 
 /* this is provided by the sdcard_spi driver
- * see sys/auto_init/storage/auto_init_sdcard_spi.c */
+ * see drivers/sdcard_spi/sdcard_spi.c */
 extern sdcard_spi_t sdcard_spi_devs[ARRAY_SIZE(sdcard_spi_params)];
 sdcard_spi_t *card = &sdcard_spi_devs[0];
 
@@ -369,7 +369,7 @@ static const shell_command_t shell_commands[] = {
     { "read", "'read n m' reads m blocks beginning at block address n and prints the result. "
               "Append -c option to print data readable chars", _read },
     { "write", "'write n data' writes data to block n. Append -r option to "
-               "repeatedly write data to coplete block", _write },
+               "repeatedly write data to complete block", _write },
     { "copy", "'copy src dst' copies block src to block dst", _copy },
     { NULL, NULL, NULL }
 };

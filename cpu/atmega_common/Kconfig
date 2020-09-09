@@ -1,0 +1,70 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+config CPU_ARCH_AVR8
+    bool
+    select HAS_ARCH_8BIT
+    select HAS_ARCH_AVR8
+
+config CPU_CORE_AVR
+    bool
+    select CPU_ARCH_AVR8
+
+config CPU_COMMON_ATMEGA
+    bool
+    select CPU_CORE_AVR
+    select HAS_ATMEGA_PCINT0
+    select HAS_CPP
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_EEPROM
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_PM
+    select HAS_PERIPH_TIMER_PERIODIC
+    select HAS_PERIPH_WDT
+    select HAS_PUF_SRAM
+
+# Define ATMega128 family here as it is used by different CPUs
+config CPU_FAM_ATMEGA128
+    bool
+    select CPU_COMMON_ATMEGA
+    select CPU_CORE_AVR
+
+## Common CPU symbols
+config CPU_ARCH
+    default "avr8" if CPU_ARCH_AVR8
+
+config CPU_CORE
+    default "avr" if CPU_CORE_AVR
+
+config CPU_FAM
+    default "atmega128" if CPU_FAM_ATMEGA128
+
+## Declaration of specific features
+config HAS_ARCH_AVR8
+    bool
+    help
+        Indicates that the current architecture is Atmel AVR8.
+
+config HAS_ATMEGA_PCINT0
+    bool
+    help
+        Indicates that the Pin Change Interrupt bank 0 is present.
+
+config HAS_ATMEGA_PCINT1
+    bool
+    help
+        Indicates that the Pin Change Interrupt bank 1 is present.
+
+config HAS_ATMEGA_PCINT2
+    bool
+    help
+        Indicates that the Pin Change Interrupt bank 2 is present.
+
+config HAS_ATMEGA_PCINT3
+    bool
+    help
+        Indicates that the Pin Change Interrupt bank 3 is present.

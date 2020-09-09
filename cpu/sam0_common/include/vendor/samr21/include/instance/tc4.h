@@ -3,39 +3,24 @@
  *
  * \brief Instance description for TC4
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2016 Atmel Corporation,
+ *                    a wholly owned subsidiary of Microchip Technology Inc.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the Licence at
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * \asf_license_stop
  *
@@ -46,49 +31,49 @@
 
 /* ========== Register definition for TC4 peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-#define REG_TC4_CTRLA              (0x42003000U) /**< \brief (TC4) Control A */
-#define REG_TC4_READREQ            (0x42003002U) /**< \brief (TC4) Read Request */
-#define REG_TC4_CTRLBCLR           (0x42003004U) /**< \brief (TC4) Control B Clear */
-#define REG_TC4_CTRLBSET           (0x42003005U) /**< \brief (TC4) Control B Set */
-#define REG_TC4_CTRLC              (0x42003006U) /**< \brief (TC4) Control C */
-#define REG_TC4_DBGCTRL            (0x42003008U) /**< \brief (TC4) Debug Control */
-#define REG_TC4_EVCTRL             (0x4200300AU) /**< \brief (TC4) Event Control */
-#define REG_TC4_INTENCLR           (0x4200300CU) /**< \brief (TC4) Interrupt Enable Clear */
-#define REG_TC4_INTENSET           (0x4200300DU) /**< \brief (TC4) Interrupt Enable Set */
-#define REG_TC4_INTFLAG            (0x4200300EU) /**< \brief (TC4) Interrupt Flag Status and Clear */
-#define REG_TC4_STATUS             (0x4200300FU) /**< \brief (TC4) Status */
-#define REG_TC4_COUNT16_COUNT      (0x42003010U) /**< \brief (TC4) COUNT16 Counter Value */
-#define REG_TC4_COUNT16_CC0        (0x42003018U) /**< \brief (TC4) COUNT16 Compare/Capture 0 */
-#define REG_TC4_COUNT16_CC1        (0x4200301AU) /**< \brief (TC4) COUNT16 Compare/Capture 1 */
-#define REG_TC4_COUNT32_COUNT      (0x42003010U) /**< \brief (TC4) COUNT32 Counter Value */
-#define REG_TC4_COUNT32_CC0        (0x42003018U) /**< \brief (TC4) COUNT32 Compare/Capture 0 */
-#define REG_TC4_COUNT32_CC1        (0x4200301CU) /**< \brief (TC4) COUNT32 Compare/Capture 1 */
-#define REG_TC4_COUNT8_COUNT       (0x42003010U) /**< \brief (TC4) COUNT8 Counter Value */
-#define REG_TC4_COUNT8_PER         (0x42003014U) /**< \brief (TC4) COUNT8 Period Value */
-#define REG_TC4_COUNT8_CC0         (0x42003018U) /**< \brief (TC4) COUNT8 Compare/Capture 0 */
-#define REG_TC4_COUNT8_CC1         (0x42003019U) /**< \brief (TC4) COUNT8 Compare/Capture 1 */
+#define REG_TC4_CTRLA              (0x42003000) /**< \brief (TC4) Control A */
+#define REG_TC4_READREQ            (0x42003002) /**< \brief (TC4) Read Request */
+#define REG_TC4_CTRLBCLR           (0x42003004) /**< \brief (TC4) Control B Clear */
+#define REG_TC4_CTRLBSET           (0x42003005) /**< \brief (TC4) Control B Set */
+#define REG_TC4_CTRLC              (0x42003006) /**< \brief (TC4) Control C */
+#define REG_TC4_DBGCTRL            (0x42003008) /**< \brief (TC4) Debug Control */
+#define REG_TC4_EVCTRL             (0x4200300A) /**< \brief (TC4) Event Control */
+#define REG_TC4_INTENCLR           (0x4200300C) /**< \brief (TC4) Interrupt Enable Clear */
+#define REG_TC4_INTENSET           (0x4200300D) /**< \brief (TC4) Interrupt Enable Set */
+#define REG_TC4_INTFLAG            (0x4200300E) /**< \brief (TC4) Interrupt Flag Status and Clear */
+#define REG_TC4_STATUS             (0x4200300F) /**< \brief (TC4) Status */
+#define REG_TC4_COUNT16_COUNT      (0x42003010) /**< \brief (TC4) COUNT16 Counter Value */
+#define REG_TC4_COUNT16_CC0        (0x42003018) /**< \brief (TC4) COUNT16 Compare/Capture 0 */
+#define REG_TC4_COUNT16_CC1        (0x4200301A) /**< \brief (TC4) COUNT16 Compare/Capture 1 */
+#define REG_TC4_COUNT32_COUNT      (0x42003010) /**< \brief (TC4) COUNT32 Counter Value */
+#define REG_TC4_COUNT32_CC0        (0x42003018) /**< \brief (TC4) COUNT32 Compare/Capture 0 */
+#define REG_TC4_COUNT32_CC1        (0x4200301C) /**< \brief (TC4) COUNT32 Compare/Capture 1 */
+#define REG_TC4_COUNT8_COUNT       (0x42003010) /**< \brief (TC4) COUNT8 Counter Value */
+#define REG_TC4_COUNT8_PER         (0x42003014) /**< \brief (TC4) COUNT8 Period Value */
+#define REG_TC4_COUNT8_CC0         (0x42003018) /**< \brief (TC4) COUNT8 Compare/Capture 0 */
+#define REG_TC4_COUNT8_CC1         (0x42003019) /**< \brief (TC4) COUNT8 Compare/Capture 1 */
 #else
-#define REG_TC4_CTRLA              (*(RwReg16*)0x42003000U) /**< \brief (TC4) Control A */
-#define REG_TC4_READREQ            (*(RwReg16*)0x42003002U) /**< \brief (TC4) Read Request */
-#define REG_TC4_CTRLBCLR           (*(RwReg8 *)0x42003004U) /**< \brief (TC4) Control B Clear */
-#define REG_TC4_CTRLBSET           (*(RwReg8 *)0x42003005U) /**< \brief (TC4) Control B Set */
-#define REG_TC4_CTRLC              (*(RwReg8 *)0x42003006U) /**< \brief (TC4) Control C */
-#define REG_TC4_DBGCTRL            (*(RwReg8 *)0x42003008U) /**< \brief (TC4) Debug Control */
-#define REG_TC4_EVCTRL             (*(RwReg16*)0x4200300AU) /**< \brief (TC4) Event Control */
-#define REG_TC4_INTENCLR           (*(RwReg8 *)0x4200300CU) /**< \brief (TC4) Interrupt Enable Clear */
-#define REG_TC4_INTENSET           (*(RwReg8 *)0x4200300DU) /**< \brief (TC4) Interrupt Enable Set */
-#define REG_TC4_INTFLAG            (*(RwReg8 *)0x4200300EU) /**< \brief (TC4) Interrupt Flag Status and Clear */
-#define REG_TC4_STATUS             (*(RoReg8 *)0x4200300FU) /**< \brief (TC4) Status */
-#define REG_TC4_COUNT16_COUNT      (*(RwReg16*)0x42003010U) /**< \brief (TC4) COUNT16 Counter Value */
-#define REG_TC4_COUNT16_CC0        (*(RwReg16*)0x42003018U) /**< \brief (TC4) COUNT16 Compare/Capture 0 */
-#define REG_TC4_COUNT16_CC1        (*(RwReg16*)0x4200301AU) /**< \brief (TC4) COUNT16 Compare/Capture 1 */
-#define REG_TC4_COUNT32_COUNT      (*(RwReg  *)0x42003010U) /**< \brief (TC4) COUNT32 Counter Value */
-#define REG_TC4_COUNT32_CC0        (*(RwReg  *)0x42003018U) /**< \brief (TC4) COUNT32 Compare/Capture 0 */
-#define REG_TC4_COUNT32_CC1        (*(RwReg  *)0x4200301CU) /**< \brief (TC4) COUNT32 Compare/Capture 1 */
-#define REG_TC4_COUNT8_COUNT       (*(RwReg8 *)0x42003010U) /**< \brief (TC4) COUNT8 Counter Value */
-#define REG_TC4_COUNT8_PER         (*(RwReg8 *)0x42003014U) /**< \brief (TC4) COUNT8 Period Value */
-#define REG_TC4_COUNT8_CC0         (*(RwReg8 *)0x42003018U) /**< \brief (TC4) COUNT8 Compare/Capture 0 */
-#define REG_TC4_COUNT8_CC1         (*(RwReg8 *)0x42003019U) /**< \brief (TC4) COUNT8 Compare/Capture 1 */
+#define REG_TC4_CTRLA              (*(RwReg16*)0x42003000UL) /**< \brief (TC4) Control A */
+#define REG_TC4_READREQ            (*(RwReg16*)0x42003002UL) /**< \brief (TC4) Read Request */
+#define REG_TC4_CTRLBCLR           (*(RwReg8 *)0x42003004UL) /**< \brief (TC4) Control B Clear */
+#define REG_TC4_CTRLBSET           (*(RwReg8 *)0x42003005UL) /**< \brief (TC4) Control B Set */
+#define REG_TC4_CTRLC              (*(RwReg8 *)0x42003006UL) /**< \brief (TC4) Control C */
+#define REG_TC4_DBGCTRL            (*(RwReg8 *)0x42003008UL) /**< \brief (TC4) Debug Control */
+#define REG_TC4_EVCTRL             (*(RwReg16*)0x4200300AUL) /**< \brief (TC4) Event Control */
+#define REG_TC4_INTENCLR           (*(RwReg8 *)0x4200300CUL) /**< \brief (TC4) Interrupt Enable Clear */
+#define REG_TC4_INTENSET           (*(RwReg8 *)0x4200300DUL) /**< \brief (TC4) Interrupt Enable Set */
+#define REG_TC4_INTFLAG            (*(RwReg8 *)0x4200300EUL) /**< \brief (TC4) Interrupt Flag Status and Clear */
+#define REG_TC4_STATUS             (*(RoReg8 *)0x4200300FUL) /**< \brief (TC4) Status */
+#define REG_TC4_COUNT16_COUNT      (*(RwReg16*)0x42003010UL) /**< \brief (TC4) COUNT16 Counter Value */
+#define REG_TC4_COUNT16_CC0        (*(RwReg16*)0x42003018UL) /**< \brief (TC4) COUNT16 Compare/Capture 0 */
+#define REG_TC4_COUNT16_CC1        (*(RwReg16*)0x4200301AUL) /**< \brief (TC4) COUNT16 Compare/Capture 1 */
+#define REG_TC4_COUNT32_COUNT      (*(RwReg  *)0x42003010UL) /**< \brief (TC4) COUNT32 Counter Value */
+#define REG_TC4_COUNT32_CC0        (*(RwReg  *)0x42003018UL) /**< \brief (TC4) COUNT32 Compare/Capture 0 */
+#define REG_TC4_COUNT32_CC1        (*(RwReg  *)0x4200301CUL) /**< \brief (TC4) COUNT32 Compare/Capture 1 */
+#define REG_TC4_COUNT8_COUNT       (*(RwReg8 *)0x42003010UL) /**< \brief (TC4) COUNT8 Counter Value */
+#define REG_TC4_COUNT8_PER         (*(RwReg8 *)0x42003014UL) /**< \brief (TC4) COUNT8 Period Value */
+#define REG_TC4_COUNT8_CC0         (*(RwReg8 *)0x42003018UL) /**< \brief (TC4) COUNT8 Compare/Capture 0 */
+#define REG_TC4_COUNT8_CC1         (*(RwReg8 *)0x42003019UL) /**< \brief (TC4) COUNT8 Compare/Capture 1 */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for TC4 peripheral ========== */

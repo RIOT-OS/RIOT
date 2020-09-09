@@ -1,4 +1,4 @@
-ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+ifneq (,$(filter netdev_default,$(USEMODULE)))
   USEMODULE += netdev_tap
 endif
 
@@ -19,3 +19,5 @@ ifneq (,$(filter socket_zep,$(USEMODULE)))
   USEMODULE += checksum
   USEMODULE += random
 endif
+
+USEMODULE += native-drivers

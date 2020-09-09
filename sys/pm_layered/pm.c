@@ -30,25 +30,19 @@
 #endif
 
 #ifndef PM_BLOCKER_INITIAL
-#define PM_BLOCKER_INITIAL { .val_u32 = 0x01010101 }
+#define PM_BLOCKER_INITIAL 0x01010101   /* block all by default */
 #endif
-
-/**
- * @brief Power Management mode typedef
- */
-typedef union {
-    uint32_t val_u32;
-    uint8_t val_u8[PM_NUM_MODES];
-} pm_blocker_t;
 
 /**
  * @brief Global variable for keeping track of blocked modes
  */
-volatile pm_blocker_t pm_blocker = PM_BLOCKER_INITIAL;
+static pm_blocker_t pm_blocker = { .val_u32 = PM_BLOCKER_INITIAL };
 
 void pm_set_lowest(void)
 {
+    unsigned state = irq_disable();
     pm_blocker_t blocker = pm_blocker;
+    irq_restore(state);
     unsigned mode = PM_NUM_MODES;
     while (mode) {
         if (blocker.val_u8[mode-1]) {
@@ -58,7 +52,7 @@ void pm_set_lowest(void)
     }
 
     /* set lowest mode if blocker is still the same */
-    unsigned state = irq_disable();
+    state = irq_disable();
     if (blocker.val_u32 == pm_blocker.val_u32) {
         DEBUG("pm: setting mode %u\n", mode);
         pm_set(mode);
@@ -87,11 +81,20 @@ void pm_unblock(unsigned mode)
     irq_restore(state);
 }
 
+pm_blocker_t pm_get_blocker(void)
+{
+    unsigned state = irq_disable();
+    pm_blocker_t result = pm_blocker;
+    irq_restore(state);
+    return result;
+}
+
 #ifndef PROVIDES_PM_LAYERED_OFF
 void pm_off(void)
 {
-    pm_blocker.val_u32 = 0;
-    pm_set_lowest();
-    while(1) {}
+    irq_disable();
+    while(1) {
+        pm_set(0);
+    }
 }
 #endif

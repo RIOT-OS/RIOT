@@ -30,8 +30,21 @@ static inline uint32_t puts_delay(const char* str)
     return LINE_DELAY_MS * 1000;
 }
 
+static void _irq_disabled_print(void)
+{
+    unsigned state = irq_disable();
+    /* fill the transmit buffer */
+    for (uint8_t i = 0; i < UART_TXBUF_SIZE; i++) {
+        printf(" ");
+    }
+    puts("\nputs with disabled interrupts and a full transmit buffer");
+    irq_restore(state);
+}
+
 int main(void)
 {
+    _irq_disabled_print();
+
     uint32_t total_us = 0;
     xtimer_ticks32_t counter = xtimer_now();
 

@@ -1,3 +1,3 @@
-MODULE=riot_freertos
+MODULE=esp_freertos
 
 include $(RIOTBASE)/Makefile.base

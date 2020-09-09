@@ -1,26 +1,30 @@
 # include this module into the build
 INCLUDES += -I$(RIOTBOARD)/common/nrf52/include
 
-# set default port depending on operating system
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-include $(RIOTMAKE)/tools/serial.inc.mk
+ifeq (bmp,$(PROGRAMMER))
+  # On Blackmagic Probe, the first ACM is used to connect to the gdb server,
+  # the second is the BMP's UART interface
+  PORT_LINUX ?= /dev/ttyACM1
+  PORT_DARWIN ?= $(wordlist 2, 2, $(sort $(wildcard /dev/tty.usbmodem*)))
+else
+  # configure the serial terminal
+  PORT_LINUX ?= /dev/ttyACM0
+  PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+endif
 
-# The following configuration is dependencies specific
-# but they are resolved later
-# Hack to know now if 'nordic_softdevice_ble' is used
-include $(RIOTBOARD)/$(BOARD)/Makefile.dep
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
 
 PROGRAMMER ?= jlink
 ifeq (jlink,$(PROGRAMMER))
   # setup JLink for flashing
-  export JLINK_DEVICE := nrf52
+  JLINK_DEVICE = nrf52
 
   # special options when using SoftDevice
   ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
-    export JLINK_PRE_FLASH := loadfile $(BINDIR)/softdevice.hex
-    export FLASH_ADDR := 0x1f000
-    export LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
+    JLINK_PRE_FLASH = loadfile $(BINDIR)/softdevice.hex
+    FLASH_ADDR = 0x1f000
+    LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
     # murdock: softdevice.hex file is used for flashing
     # It must be taken into account for the test input hash and
     # be sent to the separated testing boards
@@ -40,8 +44,8 @@ else ifeq (openocd,$(PROGRAMMER))
   ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
     LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
 
-    export OPENOCD_PRE_FLASH_CMDS += -c 'flash write_image erase "$(BINDIR)/softdevice.hex"'
-    export OPENOCD_PRE_VERIFY_CMDS += -c 'verify_image "$(BINDIR)/softdevice.hex"'
+    OPENOCD_PRE_FLASH_CMDS += -c 'flash write_image erase "$(BINDIR)/softdevice.hex"'
+    OPENOCD_PRE_VERIFY_CMDS += -c 'verify_image "$(BINDIR)/softdevice.hex"'
 
     # Cannot use the 'ELFFILE' here
     # The segments are 0x10000 aligned so padding bytes are copied and verified
@@ -58,6 +62,8 @@ else ifeq (openocd,$(PROGRAMMER))
     $(BINDIR)/softdevice.hex: | $(ELFFILE)
   endif
   DEBUG_ADAPTER ?= jlink
-  export OPENOCD_CONFIG := $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
+  OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
   include $(RIOTMAKE)/tools/openocd.inc.mk
+else ifeq (bmp,$(PROGRAMMER))
+  include $(RIOTMAKE)/tools/bmp.inc.mk
 endif

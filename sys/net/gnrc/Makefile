@@ -1,3 +1,6 @@
+ifneq (,$(filter gnrc_dhcpv6,$(USEMODULE)))
+  DIRS += application_layer/dhcpv6
+endif
 ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
   DIRS += network_layer/icmpv6
 endif
@@ -15,6 +18,9 @@ ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_ipv6_ext_frag,$(USEMODULE)))
   DIRS += network_layer/ipv6/ext/frag
+endif
+ifneq (,$(filter gnrc_ipv6_ext_opt,$(USEMODULE)))
+  DIRS += network_layer/ipv6/ext/opt
 endif
 ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
   DIRS += network_layer/ipv6/ext/rh
@@ -42,9 +48,6 @@ ifneq (,$(filter gnrc_netif gnrc_netif_%,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_netreg,$(USEMODULE)))
   DIRS += netreg
-endif
-ifneq (,$(filter gnrc_nettest,$(USEMODULE)))
-  DIRS += nettest
 endif
 ifneq (,$(filter gnrc_mac,$(USEMODULE)))
   DIRS += link_layer/mac
@@ -126,9 +129,6 @@ ifneq (,$(filter gnrc_udp,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
   DIRS += transport_layer/tcp
-endif
-ifneq (,$(filter gnrc_tftp,$(USEMODULE)))
-  DIRS += application_layer/tftp
 endif
 
 include $(RIOTBASE)/Makefile.base

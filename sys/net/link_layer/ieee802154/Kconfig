@@ -1,0 +1,48 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig KCONFIG_USEMODULE_IEEE802154
+    bool "Configure IEEE802.15.4"
+    depends on USEMODULE_IEEE802154
+    help
+        Configure IEEE802.15.4 module using Kconfig
+
+if KCONFIG_USEMODULE_IEEE802154
+
+    config IEEE802154_DEFAULT_SUBGHZ_CHANNEL
+        int "IEEE802.15.4 default sub-GHZ channel"
+        default 5
+
+    config IEEE802154_DEFAULT_SUBGHZ_PAGE
+        int "IEEE802.15.4 default sub-GHZ page"
+        default 2
+
+    config IEEE802154_DEFAULT_CHANNEL
+        int "IEEE802.15.4 default channel"
+        default 26
+
+    config IEEE802154_DEFAULT_PANID
+        hex "IEEE802.15.4 default PANID"
+        default 0x0023
+        range 0x0 0xFFFF
+
+    config IEEE802154_DEFAULT_TXPOWER
+        int "IEEE802.15.4 default TX power (in dBm)"
+        default 0
+
+    config IEEE802154_DEFAULT_CSMA_CA_MIN
+        int "IEEE802.15.4 default CSMA-CA minimum backoff exponent"
+        default 3
+
+    config IEEE802154_DEFAULT_CSMA_CA_RETRIES
+        int "IEEE802.15.4 default CSMA-CA maximum number of retries"
+        default 4
+
+    config IEEE802154_DEFAULT_CSMA_CA_MAX
+        int "IEEE802.15.4 default CSMA-CA maximum backoff exponent"
+        default 5
+
+endif # KCONFIG_USEMODULE_IEEE802154

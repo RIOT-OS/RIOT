@@ -52,6 +52,13 @@ Test *tests_hashes_md5_tests(void);
 Test *tests_hashes_sha1_tests(void);
 
 /**
+ * @brief   Generates tests for hashes/sha224.h
+ *
+ * @return  embUnit tests if successful, NULL if not.
+ */
+Test *tests_hashes_sha224_tests(void);
+
+/**
  * @brief   Generates tests for hashes/sha256.h
  *
  * @return  embUnit tests if successful, NULL if not.

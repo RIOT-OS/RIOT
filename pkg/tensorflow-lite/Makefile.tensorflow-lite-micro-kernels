@@ -1,0 +1,15 @@
+MODULE = tensorflow-lite-micro-kernels
+
+CXXEXFLAGS += -Wno-missing-field-initializers
+CXXEXFLAGS += -Wno-strict-overflow
+CXXEXFLAGS += -Wno-type-limits
+CXXEXFLAGS += -Wno-unused-parameter
+
+ifeq (llvm,$(TOOLCHAIN))
+  CXXEXFLAGS += -Wno-unused-const-variable
+endif
+
+SRCXXEXT = cc
+SRCXXEXCLUDE = $(wildcard *_test.$(SRCXXEXT))
+
+include $(RIOTBASE)/Makefile.base

@@ -57,8 +57,8 @@ typedef struct {
 #define SOCK_DNS_PORT           (53)
 #define SOCK_DNS_RETRIES        (2)
 
-#define SOCK_DNS_MAX_NAME_LEN   (64U)       /* we're in embedded context. */
-#define SOCK_DNS_QUERYBUF_LEN   (sizeof(sock_dns_hdr_t) + 4 + SOCK_DNS_MAX_NAME_LEN)
+#define SOCK_DNS_BUF_LEN        (128)       /* we're in embedded context. */
+#define SOCK_DNS_MAX_NAME_LEN   (SOCK_DNS_BUF_LEN - sizeof(sock_dns_hdr_t) - 4)
 /** @} */
 
 /**
@@ -80,8 +80,8 @@ typedef struct {
  * @param[out]  addr_out        buffer to write result into
  * @param[in]   family          Either AF_INET, AF_INET6 or AF_UNSPEC
  *
- * @return      0 on success
- * @return      !=0 otherwise
+ * @return      the size of the resolved address on success
+ * @return      < 0 otherwise
  */
 int sock_dns_query(const char *domain_name, void *addr_out, int family);
 

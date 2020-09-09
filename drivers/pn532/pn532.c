@@ -57,8 +57,8 @@
 #define BUFF_CMD_START              (6)
 #define BUFF_DATA_START             (BUFF_CMD_START + 1)
 #define RAPDU_DATA_BEGIN            (1)
-#define RAPDU_MAX_DATA_LEN          (PN532_BUFFER_LEN - BUFF_DATA_START - 5)
-#define CAPDU_MAX_DATA_LEN          (PN532_BUFFER_LEN - BUFF_DATA_START - 1)
+#define RAPDU_MAX_DATA_LEN          (CONFIG_PN532_BUFFER_LEN - BUFF_DATA_START - 5)
+#define CAPDU_MAX_DATA_LEN          (CONFIG_PN532_BUFFER_LEN - BUFF_DATA_START - 1)
 
 /* Constants and magic numbers */
 #define MIFARE_CLASSIC_BLOCK_SIZE   (16)
@@ -383,7 +383,7 @@ static int send_rcv(pn532_t *dev, uint8_t *buff, unsigned sendl, unsigned recvl)
 int pn532_fw_version(pn532_t *dev, uint32_t *fw_ver)
 {
     unsigned ret = -1;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START] = CMD_FIRMWARE_VERSION;
 
@@ -401,7 +401,7 @@ int pn532_fw_version(pn532_t *dev, uint32_t *fw_ver)
 int pn532_read_reg(pn532_t *dev, char *out, unsigned addr)
 {
     int ret = -1;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START     ] = CMD_READ_REG;
     buff[BUFF_DATA_START    ] = (addr >> 8) & 0xff;
@@ -417,7 +417,7 @@ int pn532_read_reg(pn532_t *dev, char *out, unsigned addr)
 
 int pn532_write_reg(pn532_t *dev, unsigned addr, char val)
 {
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START     ] = CMD_WRITE_REG;
     buff[BUFF_DATA_START    ] = (addr >> 8) & 0xff;
@@ -448,7 +448,7 @@ static int _set_act_retries(pn532_t *dev, uint8_t *buff, unsigned max_retries)
 
 int pn532_sam_configuration(pn532_t *dev, pn532_sam_conf_mode_t mode, unsigned timeout)
 {
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START     ] = CMD_SAM_CONFIG;
     buff[BUFF_DATA_START    ] = (char)mode;
@@ -473,7 +473,7 @@ int pn532_get_passive_iso14443a(pn532_t *dev, nfc_iso14443a_t *out,
                                 unsigned max_retries)
 {
     int ret = -1;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     if (_set_act_retries(dev, buff, max_retries) == 0) {
         ret = _list_passive_targets(dev, buff, PN532_BR_106_ISO_14443_A, 1,
@@ -513,7 +513,7 @@ int pn532_get_passive_iso14443a(pn532_t *dev, nfc_iso14443a_t *out,
 
 void pn532_deselect_passive(pn532_t *dev, unsigned target_id)
 {
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START ] = CMD_DESELECT;
     buff[BUFF_DATA_START] = target_id;
@@ -523,7 +523,7 @@ void pn532_deselect_passive(pn532_t *dev, unsigned target_id)
 
 void pn532_release_passive(pn532_t *dev, unsigned target_id)
 {
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START ] = CMD_RELEASE;
     buff[BUFF_DATA_START] = target_id;
@@ -535,7 +535,7 @@ int pn532_mifareclassic_authenticate(pn532_t *dev, nfc_iso14443a_t *card,
                                      pn532_mifare_key_t keyid, char *key, unsigned block)
 {
     int ret = -1;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START     ] = CMD_DATA_EXCHANGE;
     buff[BUFF_DATA_START    ] = card->target;
@@ -567,7 +567,7 @@ int pn532_mifareclassic_write(pn532_t *dev, char *idata, nfc_iso14443a_t *card,
                               unsigned block)
 {
     int ret = -1;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     if (card->auth) {
 
@@ -589,7 +589,7 @@ static int pn532_mifare_read(pn532_t *dev, char *odata, nfc_iso14443a_t *card,
                              unsigned block, unsigned len)
 {
     int ret = -1;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START     ] = CMD_DATA_EXCHANGE;
     buff[BUFF_DATA_START    ] = card->target;
@@ -644,7 +644,7 @@ static int send_rcv_apdu(pn532_t *dev, uint8_t *buff, unsigned slen, unsigned rl
 int pn532_iso14443a_4_activate(pn532_t *dev, nfc_iso14443a_t *card)
 {
     int ret;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     /* select app ndef tag */
     buff[BUFF_CMD_START      ] = CMD_DATA_EXCHANGE;
@@ -689,7 +689,7 @@ int pn532_iso14443a_4_read(pn532_t *dev, char *odata, nfc_iso14443a_t *card,
                            unsigned offset, char len)
 {
     int ret;
-    uint8_t buff[PN532_BUFFER_LEN];
+    uint8_t buff[CONFIG_PN532_BUFFER_LEN];
 
     buff[BUFF_CMD_START     ] = CMD_DATA_EXCHANGE;
     buff[BUFF_DATA_START    ] = card->target;

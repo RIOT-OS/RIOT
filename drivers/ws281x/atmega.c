@@ -203,3 +203,19 @@ void ws281x_write_buffer(ws281x_t *dev, const void *buf, size_t size)
 #error "No low level WS281x implementation for ATmega CPUs for your CPU clock"
 #endif
 }
+
+int ws281x_init(ws281x_t *dev, const ws281x_params_t *params)
+{
+    if (!dev || !params || !params->buf) {
+        return -EINVAL;
+    }
+
+    memset(dev, 0, sizeof(ws281x_t));
+    dev->params = *params;
+
+    if (gpio_init(dev->params.pin, GPIO_OUT)) {
+        return -EIO;
+    }
+
+    return 0;
+}

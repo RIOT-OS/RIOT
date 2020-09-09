@@ -36,16 +36,20 @@ static const uart_conf_t uart_config[] = {
         .dev        = NRF_UARTE0,
         .rx_pin     = GPIO_PIN(0,8),
         .tx_pin     = GPIO_PIN(0,6),
-        .rts_pin    = (uint8_t)GPIO_UNDEF,
-        .cts_pin    = (uint8_t)GPIO_UNDEF,
+#ifdef MODULE_PERIPH_UART_HW_FC
+        .rts_pin    = GPIO_UNDEF,
+        .cts_pin    = GPIO_UNDEF,
+#endif
         .irqn       = UARTE0_UART0_IRQn,
     },
     {
         .dev        = NRF_UARTE1,
         .rx_pin     = GPIO_PIN(1,4),
         .tx_pin     = GPIO_PIN(1,5),
+#ifdef MODULE_PERIPH_UART_HW_FC
         .rts_pin    = GPIO_PIN(1,7),
         .cts_pin    = GPIO_PIN(1,6),
+#endif
         .irqn       = UARTE1_IRQn,
     },
 };
@@ -55,6 +59,12 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
+
+/**
+ * @brief Enable the internal DC/DC converter
+ */
+#define NRF5X_ENABLE_DCDC
+
 #ifdef __cplusplus
 }
 #endif

@@ -340,7 +340,7 @@ int nrf24l01p_set_payload_width(const nrf24l01p_t *dev,
 * @return           Address length on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_tx_address(const nrf24l01p_t *dev, const char *saddr, unsigned int length);
+int nrf24l01p_set_tx_address(const nrf24l01p_t *dev, const uint8_t *saddr, unsigned int length);
 
 /**
 * @brief   Set the TX address for the nrf24l01+ transceiver (long int).
@@ -370,7 +370,7 @@ int nrf24l01p_set_tx_address_long(const nrf24l01p_t *dev, uint64_t saddr, unsign
 * @return           Address length on success.
 * @return           -1 on error.
 */
-int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, const char *saddr, unsigned int length);
+int nrf24l01p_set_rx_address(const nrf24l01p_t *dev, nrf24l01p_rx_pipe_t pipe, const uint8_t *saddr, unsigned int length);
 
 /**
 * @brief   Set the RX address for the nrf24l01+ transceiver (long int).

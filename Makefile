@@ -22,7 +22,11 @@ clean:
 	@echo "Cleaning all build products for the current board"
 	@for dir in $(APPLICATION_DIRS); do "$(MAKE)" -C$$dir clean; done
 
-distclean: docclean
+pkg-clean:
+	@echo "Cleaning all package sources"
+	rm -rf build/pkg
+
+distclean: docclean pkg-clean
 	@echo "Cleaning all build products"
 	@for dir in $(APPLICATION_DIRS); do "$(MAKE)" -C$$dir distclean; done
 
@@ -43,4 +47,5 @@ print-versions:
 include makefiles/boards.inc.mk
 include makefiles/app_dirs.inc.mk
 
+include makefiles/tools/riotgen.inc.mk
 -include makefiles/tests.inc.mk

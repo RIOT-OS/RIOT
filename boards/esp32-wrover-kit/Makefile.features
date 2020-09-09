@@ -1,3 +1,5 @@
+CPU_MODEL = esp32-wrover
+
 # common board and CPU features
 include $(RIOTBOARD)/common/esp32/Makefile.features
 
@@ -10,5 +12,6 @@ FEATURES_PROVIDED += periph_spi
 # unique features provided by the board
 FEATURES_PROVIDED += sdcard_spi
 FEATURES_PROVIDED += esp_spi_ram
+FEATURES_PROVIDED += esp_rtc_timer_32k
 
 FEATURES_PROVIDED += arduino

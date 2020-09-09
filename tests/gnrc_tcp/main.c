@@ -31,17 +31,6 @@ void dump_args(int argc, char **argv)
     printf("\n");
 }
 
-int get_af_family(char *family)
-{
-    if (memcmp(family, "AF_INET6", sizeof("AF_INET6")) == 0) {
-        return AF_INET6;
-    }
-    else if (memcmp(family, "AF_INET", sizeof("AF_INET")) == 0) {
-        return AF_INET;
-    }
-    return AF_UNSPEC;
-}
-
 /* API Export for test script */
 int buffer_init_cmd(int argc, char **argv)
 {
@@ -91,6 +80,44 @@ int buffer_read_cmd(int argc, char **argv)
     return 0;
 }
 
+int gnrc_tcp_ep_from_str_cmd(int argc, char **argv)
+{
+    dump_args(argc, argv);
+
+    gnrc_tcp_ep_t ep;
+    int err = gnrc_tcp_ep_from_str(&ep, argv[1]);
+    switch (err) {
+        case -EINVAL:
+            printf("%s: returns -EINVAL\n", argv[0]);
+            break;
+
+        default:
+            printf("%s: returns %d\n", argv[0], err);
+    }
+
+    if (err == 0) {
+        char addr_as_str[IPV6_ADDR_MAX_STR_LEN];
+        switch (ep.family) {
+            case AF_INET6:
+                printf("Family: AF_INET6\n");
+                ipv6_addr_to_str(addr_as_str, (ipv6_addr_t *) ep.addr.ipv6,
+                                 sizeof(addr_as_str));
+                printf("Addr: %s\n", addr_as_str);
+                break;
+
+            case AF_INET:
+                printf("Family: AF_INET\n");
+                break;
+
+            default:
+                printf("Family: %d\n", ep.family);
+        }
+        printf("Port: %d\n", ep.port);
+        printf("Netif: %d\n", ep.netif);
+    }
+    return err;
+}
+
 int gnrc_tcp_tcb_init_cmd(int argc, char **argv)
 {
     dump_args(argc, argv);
@@ -101,13 +128,12 @@ int gnrc_tcp_tcb_init_cmd(int argc, char **argv)
 int gnrc_tcp_open_active_cmd(int argc, char **argv)
 {
     dump_args(argc, argv);
-    int af_family = get_af_family(argv[1]);
-    char *target_addr = argv[2];
-    uint16_t target_port = atol(argv[3]);
-    uint16_t local_port = atol(argv[4]);
 
-    int err = gnrc_tcp_open_active(&tcb, af_family, target_addr, target_port,
-                                   local_port);
+    gnrc_tcp_ep_t remote;
+    gnrc_tcp_ep_from_str(&remote, argv[1]);
+    uint16_t local_port = atol(argv[2]);
+
+    int err = gnrc_tcp_open_active(&tcb, &remote, local_port);
     switch (err) {
         case -EAFNOSUPPORT:
             printf("%s: returns -EAFNOSUPPORT\n", argv[0]);
@@ -146,19 +172,11 @@ int gnrc_tcp_open_active_cmd(int argc, char **argv)
 int gnrc_tcp_open_passive_cmd(int argc, char **argv)
 {
     dump_args(argc, argv);
-    int af_family = get_af_family(argv[1]);
-    char *local_addr = NULL;
-    uint16_t local_port = 0;
 
-    if (argc == 3) {
-        local_port = atol(argv[2]);
-    }
-    else if (argc == 4) {
-        local_addr = argv[2];
-        local_port = atol(argv[3]);
-    }
+    gnrc_tcp_ep_t local;
+    gnrc_tcp_ep_from_str(&local, argv[1]);
 
-    int err = gnrc_tcp_open_passive(&tcb, af_family, local_addr, local_port);
+    int err = gnrc_tcp_open_passive(&tcb, &local);
     switch (err) {
         case -EAFNOSUPPORT:
             printf("%s: returns -EAFNOSUPPORT\n", argv[0]);
@@ -275,6 +293,8 @@ int gnrc_tcp_abort_cmd(int argc, char **argv)
 
 /* Exporting GNRC TCP Api to for shell usage */
 static const shell_command_t shell_commands[] = {
+    { "gnrc_tcp_ep_from_str", "Build endpoint from string",
+      gnrc_tcp_ep_from_str_cmd },
     { "gnrc_tcp_tcb_init", "gnrc_tcp: init tcb", gnrc_tcp_tcb_init_cmd },
     { "gnrc_tcp_open_active", "gnrc_tcp: open active connection",
       gnrc_tcp_open_active_cmd },

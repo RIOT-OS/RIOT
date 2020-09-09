@@ -54,7 +54,7 @@ static int _read(mtd_dev_t *dev, void *buf, uint32_t addr, uint32_t size)
 
     memcpy(buf, (void *)dst_addr, size);
 
-    return size;
+    return 0;
 }
 
 static int _write(mtd_dev_t *dev, const void *buf, uint32_t addr, uint32_t size)
@@ -82,7 +82,7 @@ static int _write(mtd_dev_t *dev, const void *buf, uint32_t addr, uint32_t size)
 
     flashpage_write_raw((void *)dst_addr, buf, size);
 
-    return size;
+    return 0;
 }
 
 int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)

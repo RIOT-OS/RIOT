@@ -23,21 +23,17 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "test_utils/interactive_sync.h"
-
 #include "board.h"
 
-/* as default we run the test 100k times */
+/* as default we run the test 1k times */
 #ifndef TEST_ITER
-#define TEST_ITER           (100000UL)
+#define TEST_ITER           (1000UL)
 #endif
 
 #define STEP                (0.1)
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     double x = 1234567.0 / 1024.0;
 
     puts("Testing floating point arithmetic...\n");

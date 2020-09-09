@@ -1,0 +1,2 @@
+# Yxml currently doesn't compile for 16bit int machines
+FEATURES_BLACKLIST += arch_8bit arch_16bit

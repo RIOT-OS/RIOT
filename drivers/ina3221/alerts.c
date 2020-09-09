@@ -29,7 +29,7 @@ int _ina3221_enable_alert(ina3221_t *dev, ina3221_alert_t alert,
     if (alert >= INA3221_NUM_ALERTS) {
         return -ERANGE;
     }
-    if (dev->params.upins.apins.alert_pins[alert] == GPIO_UNDEF) {
+    if (!gpio_is_valid(dev->params.upins.apins.alert_pins[alert])) {
         return -ENOTSUP;
     }
     dev->alert_callbacks[alert] = cb;
@@ -49,7 +49,7 @@ int _ina3221_disable_alert(ina3221_t *dev, ina3221_alert_t alert)
     if (alert >= INA3221_NUM_ALERTS) {
         return -ERANGE;
     }
-    if (dev->params.upins.apins.alert_pins[alert] == GPIO_UNDEF) {
+    if (!gpio_is_valid(dev->params.upins.apins.alert_pins[alert])) {
         return -ENOTSUP;
     }
     gpio_irq_disable(dev->params.upins.apins.alert_pins[alert]);

@@ -24,7 +24,9 @@
 #include "periph_cpu.h"
 #include "f4/cfg_clock_100_8_1.h"
 #include "cfg_i2c1_pb8_pb9.h"
+#include "cfg_rtt_default.h"
 #include "cfg_timer_tim5.h"
+#include "cfg_usb_otg_fs.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,23 +36,15 @@ extern "C" {
  * @name    DMA streams configuration
  * @{
  */
-#ifdef MODULE_PERIPH_DMA
 static const dma_conf_t dma_config[] = {
-    { .stream = 4  },
-    { .stream = 14 },
-    { .stream = 6  },
-    { .stream = 10 },
-    { .stream = 8  },
+    { .stream = 11 },   /* DMA2 Stream 3 - SPI1_TX */
+    { .stream = 10 },   /* DMA2 Stream 2 - SPI1_RX */
 };
 
-#define DMA_0_ISR  isr_dma1_stream4
-#define DMA_1_ISR  isr_dma2_stream6
-#define DMA_2_ISR  isr_dma1_stream6
-#define DMA_3_ISR  isr_dma2_stream2
-#define DMA_4_ISR  isr_dma2_stream0
+#define DMA_0_ISR           isr_dma2_stream3
+#define DMA_1_ISR           isr_dma2_stream2
 
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
-#endif
 /** @} */
 
 /**
@@ -103,11 +97,8 @@ static const uart_conf_t uart_config[] = {
 };
 
 #define UART_0_ISR          (isr_usart3)
-#define UART_0_DMA_ISR      (isr_dma1_stream6)
 #define UART_1_ISR          (isr_usart6)
-#define UART_1_DMA_ISR      (isr_dma1_stream5)
 #define UART_2_ISR          (isr_usart2)
-#define UART_2_DMA_ISR      (isr_dma1_stream4)
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
@@ -144,46 +135,26 @@ static const pwm_conf_t pwm_config[] = {
 
 /**
  * @name    SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 50000000Hz */
-        7,  /* -> 195312Hz */
-        6,  /* -> 390625Hz */
-        5,  /* -> 781250Hz */
-        2,  /* -> 6250000Hz */
-        1   /* -> 12500000Hz */
-    },
-    {       /* for APB2 @ 100000000Hz */
-        7,  /* -> 390625Hz */
-        7,  /* -> 390625Hz */
-        6,  /* -> 781250Hz */
-        3,  /* -> 6250000Hz */
-        2   /* -> 12500000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
-        .dev      = SPI1,
-        .mosi_pin = GPIO_PIN(PORT_A, 7),
-        .miso_pin = GPIO_PIN(PORT_A, 6),
-        .sclk_pin = GPIO_PIN(PORT_A, 5),
-        .cs_pin   = GPIO_PIN(PORT_A, 4),
-        .mosi_af  = GPIO_AF5,
-        .miso_af  = GPIO_AF5,
-        .sclk_af  = GPIO_AF5,
-        .cs_af    = GPIO_AF5,
-        .rccmask  = RCC_APB2ENR_SPI1EN,
-        .apbbus   = APB2,
+        .dev            = SPI1,
+        .mosi_pin       = GPIO_PIN(PORT_A, 7),
+        .miso_pin       = GPIO_PIN(PORT_A, 6),
+        .sclk_pin       = GPIO_PIN(PORT_A, 5),
+        .cs_pin         = GPIO_PIN(PORT_A, 4),
+        .mosi_af        = GPIO_AF5,
+        .miso_af        = GPIO_AF5,
+        .sclk_af        = GPIO_AF5,
+        .cs_af          = GPIO_AF5,
+        .rccmask        = RCC_APB2ENR_SPI1EN,
+        .apbbus         = APB2,
 #ifdef MODULE_PERIPH_DMA
-        .tx_dma   = 3,
-        .tx_dma_chan = 2,
-        .rx_dma   = 4,
-        .rx_dma_chan = 3,
+        .tx_dma         = 0,
+        .tx_dma_chan    = 3,
+        .rx_dma         = 1,
+        .rx_dma_chan    = 3,
 #endif
     }
 };
@@ -201,23 +172,25 @@ static const spi_conf_t spi_config[] = {
  *
  * @{
  */
-#define ADC_NUMOF          (6U)
-#define ADC_CONFIG {              \
-    {GPIO_PIN(PORT_A, 3), 0, 3},  \
-    {GPIO_PIN(PORT_C, 0), 0, 10}, \
-    {GPIO_PIN(PORT_C, 3), 0, 13}, \
-    {GPIO_PIN(PORT_C, 1), 0, 11}, \
-    {GPIO_PIN(PORT_C, 4), 0, 14}, \
-    {GPIO_PIN(PORT_C, 5), 0, 15}, \
-}
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 3), 0, 3},
+    {GPIO_PIN(PORT_C, 0), 0, 10},
+    {GPIO_PIN(PORT_C, 3), 0, 13},
+    {GPIO_PIN(PORT_C, 1), 0, 11},
+    {GPIO_PIN(PORT_C, 4), 0, 14},
+    {GPIO_PIN(PORT_C, 5), 0, 15},
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 /**
  * @name    RTT configuration
  * @{
  */
+#ifndef RTT_FREQUENCY
 #define RTT_FREQUENCY       (4096)
-#define RTT_MAX_VALUE       (0xffff)
+#endif
 /** @} */
 
 #ifdef __cplusplus

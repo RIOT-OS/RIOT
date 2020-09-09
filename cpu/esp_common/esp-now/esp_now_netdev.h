@@ -94,16 +94,24 @@ typedef struct
 
     mutex_t dev_lock;                /**< device is already in use */
 
-    uint8_t scan_event;              /**< ESP-NOW peers have to be scannged */
+    uint8_t scan_event;              /**< ESP-NOW peers have to be scanned */
 
 } esp_now_netdev_t;
 
 /**
- * @brief netdev <-> esp_npw glue code initialization function
+ * @brief   ESP-NOW netdev initialization function
  *
- * @return          NULL on error, pointer to esp_now_netdev on success
+ * @return  NULL on error, pointer to esp_now_netdev on success
  */
 esp_now_netdev_t *netdev_esp_now_setup(void);
+
+/**
+ * @brief   Set the channel used by ESP-NOW netdev
+ *
+ * @param   channel Channel to be used
+ * @return  ESP_OK on success, an ESP error code otherwise
+ */
+int esp_now_set_channel(uint8_t channel);
 
 #ifdef __cplusplus
 }

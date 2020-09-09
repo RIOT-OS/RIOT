@@ -3,39 +3,25 @@
  *
  * \brief Instance description for DMAC
  *
- * Copyright (c) 2015 Atmel Corporation. All rights reserved.
+ * Copyright (c) 2018 Microchip Technology Inc.
  *
  * \asf_license_start
  *
  * \page License
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * SPDX-License-Identifier: Apache-2.0
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * 3. The name of Atmel may not be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * 4. This software may only be redistributed and used in connection with an
- *    Atmel microcontroller product.
- *
- * THIS SOFTWARE IS PROVIDED BY ATMEL "AS IS" AND ANY EXPRESS OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT ARE
- * EXPRESSLY AND SPECIFICALLY DISCLAIMED. IN NO EVENT SHALL ATMEL BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the Licence at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  *
  * \asf_license_stop
  *
@@ -46,51 +32,53 @@
 
 /* ========== Register definition for DMAC peripheral ========== */
 #if (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__))
-#define REG_DMAC_CTRL              (0x44000400U) /**< \brief (DMAC) Control */
-#define REG_DMAC_CRCCTRL           (0x44000402U) /**< \brief (DMAC) CRC Control */
-#define REG_DMAC_CRCDATAIN         (0x44000404U) /**< \brief (DMAC) CRC Data Input */
-#define REG_DMAC_CRCCHKSUM         (0x44000408U) /**< \brief (DMAC) CRC Checksum */
-#define REG_DMAC_CRCSTATUS         (0x4400040CU) /**< \brief (DMAC) CRC Status */
-#define REG_DMAC_DBGCTRL           (0x4400040DU) /**< \brief (DMAC) Debug Control */
-#define REG_DMAC_SWTRIGCTRL        (0x44000410U) /**< \brief (DMAC) Software Trigger Control */
-#define REG_DMAC_PRICTRL0          (0x44000414U) /**< \brief (DMAC) Priority Control 0 */
-#define REG_DMAC_INTPEND           (0x44000420U) /**< \brief (DMAC) Interrupt Pending */
-#define REG_DMAC_INTSTATUS         (0x44000424U) /**< \brief (DMAC) Interrupt Status */
-#define REG_DMAC_BUSYCH            (0x44000428U) /**< \brief (DMAC) Busy Channels */
-#define REG_DMAC_PENDCH            (0x4400042CU) /**< \brief (DMAC) Pending Channels */
-#define REG_DMAC_ACTIVE            (0x44000430U) /**< \brief (DMAC) Active Channel and Levels */
-#define REG_DMAC_BASEADDR          (0x44000434U) /**< \brief (DMAC) Descriptor Memory Section Base Address */
-#define REG_DMAC_WRBADDR           (0x44000438U) /**< \brief (DMAC) Write-Back Memory Section Base Address */
-#define REG_DMAC_CHID              (0x4400043FU) /**< \brief (DMAC) Channel ID */
-#define REG_DMAC_CHCTRLA           (0x44000440U) /**< \brief (DMAC) Channel Control A */
-#define REG_DMAC_CHCTRLB           (0x44000444U) /**< \brief (DMAC) Channel Control B */
-#define REG_DMAC_CHINTENCLR        (0x4400044CU) /**< \brief (DMAC) Channel Interrupt Enable Clear */
-#define REG_DMAC_CHINTENSET        (0x4400044DU) /**< \brief (DMAC) Channel Interrupt Enable Set */
-#define REG_DMAC_CHINTFLAG         (0x4400044EU) /**< \brief (DMAC) Channel Interrupt Flag Status and Clear */
-#define REG_DMAC_CHSTATUS          (0x4400044FU) /**< \brief (DMAC) Channel Status */
+#define REG_DMAC_CTRL              (0x44000400) /**< \brief (DMAC) Control */
+#define REG_DMAC_CRCCTRL           (0x44000402) /**< \brief (DMAC) CRC Control */
+#define REG_DMAC_CRCDATAIN         (0x44000404) /**< \brief (DMAC) CRC Data Input */
+#define REG_DMAC_CRCCHKSUM         (0x44000408) /**< \brief (DMAC) CRC Checksum */
+#define REG_DMAC_CRCSTATUS         (0x4400040C) /**< \brief (DMAC) CRC Status */
+#define REG_DMAC_DBGCTRL           (0x4400040D) /**< \brief (DMAC) Debug Control */
+#define REG_DMAC_QOSCTRL           (0x4400040E) /**< \brief (DMAC) QOS Control */
+#define REG_DMAC_SWTRIGCTRL        (0x44000410) /**< \brief (DMAC) Software Trigger Control */
+#define REG_DMAC_PRICTRL0          (0x44000414) /**< \brief (DMAC) Priority Control 0 */
+#define REG_DMAC_INTPEND           (0x44000420) /**< \brief (DMAC) Interrupt Pending */
+#define REG_DMAC_INTSTATUS         (0x44000424) /**< \brief (DMAC) Interrupt Status */
+#define REG_DMAC_BUSYCH            (0x44000428) /**< \brief (DMAC) Busy Channels */
+#define REG_DMAC_PENDCH            (0x4400042C) /**< \brief (DMAC) Pending Channels */
+#define REG_DMAC_ACTIVE            (0x44000430) /**< \brief (DMAC) Active Channel and Levels */
+#define REG_DMAC_BASEADDR          (0x44000434) /**< \brief (DMAC) Descriptor Memory Section Base Address */
+#define REG_DMAC_WRBADDR           (0x44000438) /**< \brief (DMAC) Write-Back Memory Section Base Address */
+#define REG_DMAC_CHID              (0x4400043F) /**< \brief (DMAC) Channel ID */
+#define REG_DMAC_CHCTRLA           (0x44000440) /**< \brief (DMAC) Channel Control A */
+#define REG_DMAC_CHCTRLB           (0x44000444) /**< \brief (DMAC) Channel Control B */
+#define REG_DMAC_CHINTENCLR        (0x4400044C) /**< \brief (DMAC) Channel Interrupt Enable Clear */
+#define REG_DMAC_CHINTENSET        (0x4400044D) /**< \brief (DMAC) Channel Interrupt Enable Set */
+#define REG_DMAC_CHINTFLAG         (0x4400044E) /**< \brief (DMAC) Channel Interrupt Flag Status and Clear */
+#define REG_DMAC_CHSTATUS          (0x4400044F) /**< \brief (DMAC) Channel Status */
 #else
-#define REG_DMAC_CTRL              (*(RwReg16*)0x44000400U) /**< \brief (DMAC) Control */
-#define REG_DMAC_CRCCTRL           (*(RwReg16*)0x44000402U) /**< \brief (DMAC) CRC Control */
-#define REG_DMAC_CRCDATAIN         (*(RwReg  *)0x44000404U) /**< \brief (DMAC) CRC Data Input */
-#define REG_DMAC_CRCCHKSUM         (*(RwReg  *)0x44000408U) /**< \brief (DMAC) CRC Checksum */
-#define REG_DMAC_CRCSTATUS         (*(RwReg8 *)0x4400040CU) /**< \brief (DMAC) CRC Status */
-#define REG_DMAC_DBGCTRL           (*(RwReg8 *)0x4400040DU) /**< \brief (DMAC) Debug Control */
-#define REG_DMAC_SWTRIGCTRL        (*(RwReg  *)0x44000410U) /**< \brief (DMAC) Software Trigger Control */
-#define REG_DMAC_PRICTRL0          (*(RwReg  *)0x44000414U) /**< \brief (DMAC) Priority Control 0 */
-#define REG_DMAC_INTPEND           (*(RwReg16*)0x44000420U) /**< \brief (DMAC) Interrupt Pending */
-#define REG_DMAC_INTSTATUS         (*(RoReg  *)0x44000424U) /**< \brief (DMAC) Interrupt Status */
-#define REG_DMAC_BUSYCH            (*(RoReg  *)0x44000428U) /**< \brief (DMAC) Busy Channels */
-#define REG_DMAC_PENDCH            (*(RoReg  *)0x4400042CU) /**< \brief (DMAC) Pending Channels */
-#define REG_DMAC_ACTIVE            (*(RoReg  *)0x44000430U) /**< \brief (DMAC) Active Channel and Levels */
-#define REG_DMAC_BASEADDR          (*(RwReg  *)0x44000434U) /**< \brief (DMAC) Descriptor Memory Section Base Address */
-#define REG_DMAC_WRBADDR           (*(RwReg  *)0x44000438U) /**< \brief (DMAC) Write-Back Memory Section Base Address */
-#define REG_DMAC_CHID              (*(RwReg8 *)0x4400043FU) /**< \brief (DMAC) Channel ID */
-#define REG_DMAC_CHCTRLA           (*(RwReg8 *)0x44000440U) /**< \brief (DMAC) Channel Control A */
-#define REG_DMAC_CHCTRLB           (*(RwReg  *)0x44000444U) /**< \brief (DMAC) Channel Control B */
-#define REG_DMAC_CHINTENCLR        (*(RwReg8 *)0x4400044CU) /**< \brief (DMAC) Channel Interrupt Enable Clear */
-#define REG_DMAC_CHINTENSET        (*(RwReg8 *)0x4400044DU) /**< \brief (DMAC) Channel Interrupt Enable Set */
-#define REG_DMAC_CHINTFLAG         (*(RwReg8 *)0x4400044EU) /**< \brief (DMAC) Channel Interrupt Flag Status and Clear */
-#define REG_DMAC_CHSTATUS          (*(RoReg8 *)0x4400044FU) /**< \brief (DMAC) Channel Status */
+#define REG_DMAC_CTRL              (*(RwReg16*)0x44000400UL) /**< \brief (DMAC) Control */
+#define REG_DMAC_CRCCTRL           (*(RwReg16*)0x44000402UL) /**< \brief (DMAC) CRC Control */
+#define REG_DMAC_CRCDATAIN         (*(RwReg  *)0x44000404UL) /**< \brief (DMAC) CRC Data Input */
+#define REG_DMAC_CRCCHKSUM         (*(RwReg  *)0x44000408UL) /**< \brief (DMAC) CRC Checksum */
+#define REG_DMAC_CRCSTATUS         (*(RwReg8 *)0x4400040CUL) /**< \brief (DMAC) CRC Status */
+#define REG_DMAC_DBGCTRL           (*(RwReg8 *)0x4400040DUL) /**< \brief (DMAC) Debug Control */
+#define REG_DMAC_QOSCTRL           (*(RwReg8 *)0x4400040EUL) /**< \brief (DMAC) QOS Control */
+#define REG_DMAC_SWTRIGCTRL        (*(RwReg  *)0x44000410UL) /**< \brief (DMAC) Software Trigger Control */
+#define REG_DMAC_PRICTRL0          (*(RwReg  *)0x44000414UL) /**< \brief (DMAC) Priority Control 0 */
+#define REG_DMAC_INTPEND           (*(RwReg16*)0x44000420UL) /**< \brief (DMAC) Interrupt Pending */
+#define REG_DMAC_INTSTATUS         (*(RoReg  *)0x44000424UL) /**< \brief (DMAC) Interrupt Status */
+#define REG_DMAC_BUSYCH            (*(RoReg  *)0x44000428UL) /**< \brief (DMAC) Busy Channels */
+#define REG_DMAC_PENDCH            (*(RoReg  *)0x4400042CUL) /**< \brief (DMAC) Pending Channels */
+#define REG_DMAC_ACTIVE            (*(RoReg  *)0x44000430UL) /**< \brief (DMAC) Active Channel and Levels */
+#define REG_DMAC_BASEADDR          (*(RwReg  *)0x44000434UL) /**< \brief (DMAC) Descriptor Memory Section Base Address */
+#define REG_DMAC_WRBADDR           (*(RwReg  *)0x44000438UL) /**< \brief (DMAC) Write-Back Memory Section Base Address */
+#define REG_DMAC_CHID              (*(RwReg8 *)0x4400043FUL) /**< \brief (DMAC) Channel ID */
+#define REG_DMAC_CHCTRLA           (*(RwReg8 *)0x44000440UL) /**< \brief (DMAC) Channel Control A */
+#define REG_DMAC_CHCTRLB           (*(RwReg  *)0x44000444UL) /**< \brief (DMAC) Channel Control B */
+#define REG_DMAC_CHINTENCLR        (*(RwReg8 *)0x4400044CUL) /**< \brief (DMAC) Channel Interrupt Enable Clear */
+#define REG_DMAC_CHINTENSET        (*(RwReg8 *)0x4400044DUL) /**< \brief (DMAC) Channel Interrupt Enable Set */
+#define REG_DMAC_CHINTFLAG         (*(RwReg8 *)0x4400044EUL) /**< \brief (DMAC) Channel Interrupt Flag Status and Clear */
+#define REG_DMAC_CHSTATUS          (*(RoReg8 *)0x4400044FUL) /**< \brief (DMAC) Channel Status */
 #endif /* (defined(__ASSEMBLY__) || defined(__IAR_SYSTEMS_ASM__)) */
 
 /* ========== Instance parameters for DMAC peripheral ========== */

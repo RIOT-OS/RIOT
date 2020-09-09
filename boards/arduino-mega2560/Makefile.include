@@ -1,18 +1,9 @@
-USEMODULE += boards_common_arduino-atmega
-
 # configure the terminal program
 PORT_LINUX  ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 BAUD        ?= 9600
 
-# PROGRAMMER defaults to stk500v2 which is the internal flasher via USB
-# using avrdude. Can be overridden for debugging (which requires changes
-# that require to use an ISP)
-PROGRAMMER ?= stk500v2
-# configure programmer speed in baud
-FFLAGS_EXTRA += -b 115200
-
-BOOTLOADER_SIZE ?= 8K
-ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+ARDUINO_MEGA2560_BOOTLOADER ?= stk500v2
+BOOTLOADER ?= $(ARDUINO_MEGA2560_BOOTLOADER)
 
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

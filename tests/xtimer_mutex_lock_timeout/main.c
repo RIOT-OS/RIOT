@@ -28,6 +28,9 @@
 /* timeout at one millisecond (1000 us) to make sure it does not spin. */
 #define LONG_MUTEX_TIMEOUT 1000
 
+/* timeout smaller than XTIMER_BACKOFF to make sure it spins. */
+#define SHORT_MUTEX_TIMEOUT ((1 << XTIMER_SHIFT) + 1)
+
 /* main Thread PID */
 static kernel_pid_t main_thread_pid;
 
@@ -40,6 +43,11 @@ static int cmd_test_xtimer_mutex_lock_timeout_long_locked(int argc,
                                                           char **argv);
 static int cmd_test_xtimer_mutex_lock_timeout_low_prio_thread(int argc,
                                                               char **argv);
+static int cmd_test_xtimer_mutex_lock_timeout_short_unlocked(int argc,
+                                                             char **argv);
+static int cmd_test_xtimer_mutex_lock_timeout_short_locked(int argc,
+                                                           char **argv);
+
 
 /**
  * @brief   List of command for this application.
@@ -52,6 +60,10 @@ static const shell_command_t shell_commands[] = {
     { "mutex_timeout_long_locked_low",
       "lock low-prio-locked-mutex from high-prio-thread (no-spin timeout)",
       cmd_test_xtimer_mutex_lock_timeout_low_prio_thread, },
+    { "mutex_timeout_short_unlocked", "unlocked mutex (spin timeout)",
+      cmd_test_xtimer_mutex_lock_timeout_short_unlocked, },
+    { "mutex_timeout_short_locked", "locked mutex (spin timeout)",
+      cmd_test_xtimer_mutex_lock_timeout_short_locked, },
     { NULL, NULL, NULL }
 };
 
@@ -246,6 +258,86 @@ static int cmd_test_xtimer_mutex_lock_timeout_low_prio_thread(int argc,
 
     return 0;
 }
+
+/**
+ * @brief   shell command to test xtimer_mutex_lock_timeout when spinning
+ *
+ * The mutex is locked before the function call and
+ * the timer short. Meaning the timer will trigger before
+ * xtimer_mutex_lock_timeout tries to acquire the mutex.
+ *
+ * @param[in] argc  Number of arguments
+ * @param[in] argv  Array of arguments
+ *
+ * @return 0 on success
+ */
+static int cmd_test_xtimer_mutex_lock_timeout_short_locked(int argc,
+                                                           char **argv)
+{
+    (void)argc;
+    (void)argv;
+    puts(
+        "starting test: xtimer mutex lock timeout with short timeout and locked mutex");
+    mutex_t test_mutex = MUTEX_INIT;
+    mutex_lock(&test_mutex);
+
+    if (xtimer_mutex_lock_timeout(&test_mutex, SHORT_MUTEX_TIMEOUT) == 0) {
+        puts("Error: mutex taken");
+    }
+    else {
+        /* mutex has to be locked */
+        if (mutex_trylock(&test_mutex) == 0) {
+            puts("OK");
+        }
+        else {
+            puts("error mutex not locked");
+        }
+    }
+    /* to make the test easier to read */
+    printf("\n");
+
+    return 0;
+}
+
+/**
+ * @brief   shell command to test xtimer_mutex_lock_timeout when spinning
+ *
+ * the mutex is not locked before the function is called and
+ * the timer is short. Meaning the timer will trigger before
+ * xtimer_mutex_lock_timeout tries to acquire the mutex.
+ *
+ * @param[in] argc  Number of arguments
+ * @param[in] argv  Array of arguments
+ *
+ * @return 0 on success
+ */
+static int cmd_test_xtimer_mutex_lock_timeout_short_unlocked(int argc,
+                                                             char **argv)
+{
+    (void)argc;
+    (void)argv;
+    puts(
+        "starting test: xtimer mutex lock timeout with short timeout and unlocked mutex");
+    mutex_t test_mutex = MUTEX_INIT;
+
+    if (xtimer_mutex_lock_timeout(&test_mutex, SHORT_MUTEX_TIMEOUT) == 0) {
+        /* mutex has to be locked */
+        if (mutex_trylock(&test_mutex) == 0) {
+            puts("OK");
+        }
+        else {
+            puts("error mutex not locked");
+        }
+    }
+    else {
+        puts("Error: mutex timed out");
+    }
+    /* to make the test easier to read */
+    printf("\n");
+
+    return 0;
+}
+
 
 /**
  * @brief   main function starting shell

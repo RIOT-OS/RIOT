@@ -32,10 +32,10 @@
 #include "periph/i2c.h"
 #include "tmp00x.h"
 #include "tmp00x_regs.h"
-#if TMP00X_USE_LOW_POWER
-#include "xtimer.h"
-#endif
 #include "byteorder.h"
+#include "kernel_defines.h"
+#include "xtimer.h"
+
 
 #define ENABLE_DEBUG                (0)
 #include "debug.h"
@@ -200,54 +200,50 @@ void tmp00x_convert(int16_t rawv, int16_t rawt,  float *tamb, float *tobj)
 
 int tmp00x_read_temperature(const tmp00x_t *dev, int16_t *ta, int16_t *to)
 {
-
     uint16_t drdy;
-#if (!TMP00X_USE_RAW_VALUES)
     int16_t rawtemp, rawvolt;
     float tamb, tobj;
-#endif
+    int ret;
 
-#if TMP00X_USE_LOW_POWER
-    if (tmp00x_set_active(dev)) {
-        return TMP00X_ERROR;
-    }
-    xtimer_usleep(TMP00X_CONVERSION_TIME);
-#endif
-
-int ret;
-#if TMP00X_USE_RAW_VALUES
-    if ((ret = tmp00x_read(dev, to, ta, &drdy)) < 0) {
-        return ret;
+    if (IS_ACTIVE(CONFIG_TMP00X_USE_LOW_POWER)) {
+        if (tmp00x_set_active(dev)) {
+            return TMP00X_ERROR;
+        }
+        xtimer_usleep(CONFIG_TMP00X_CONVERSION_TIME);
     }
 
-    if (!drdy) {
-#if TMP00X_USE_LOW_POWER
-        tmp00x_set_standby(dev);
-#endif
-        return -TMP00X_ERROR;
+    if (IS_ACTIVE(CONFIG_TMP00X_USE_RAW_VALUES)) {
+        if ((ret = tmp00x_read(dev, to, ta, &drdy)) < 0) {
+            return ret;
+        }
+
+        if (!drdy) {
+            if (IS_ACTIVE(CONFIG_TMP00X_USE_LOW_POWER)) {
+                tmp00x_set_standby(dev);
+            }
+            return -TMP00X_ERROR;
+        }
     }
-#else
-    if ((ret = tmp00x_read(dev, &rawvolt, &rawtemp, &drdy)) < 0) {
-        return ret;
+    else {
+        if ((ret = tmp00x_read(dev, &rawvolt, &rawtemp, &drdy)) < 0) {
+            return ret;
+        }
+
+        if (!drdy) {
+            if (IS_ACTIVE(CONFIG_TMP00X_USE_LOW_POWER)) {
+                tmp00x_set_standby(dev);
+            }
+            return -TMP00X_ERROR;
+        }
+        tmp00x_convert(rawvolt, rawtemp,  &tamb, &tobj);
+        *ta = (int16_t)(tamb*100);
+        *to = (int16_t)(tobj*100);
     }
 
-    if (!drdy) {
-#if TMP00X_USE_LOW_POWER
-        tmp00x_set_standby(dev);
-#endif
-        return -TMP00X_ERROR;
+    if (IS_ACTIVE(CONFIG_TMP00X_USE_LOW_POWER)) {
+        if (tmp00x_set_standby(dev)) {
+            return -TMP00X_ERROR;
+        }
     }
-
-    tmp00x_convert(rawvolt, rawtemp,  &tamb, &tobj);
-    *ta = (int16_t)(tamb*100);
-    *to = (int16_t)(tobj*100);
-#endif
-
-#if TMP00X_USE_LOW_POWER
-    if (tmp00x_set_standby(dev)) {
-        return -TMP00X_ERROR;
-    }
-#endif
-
     return TMP00X_OK;
 }

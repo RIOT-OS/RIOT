@@ -22,19 +22,19 @@ extern "C" {
 #endif
 
 /**
- * FLASH registers
+ * @brief   FLASH registers
  */
 typedef struct {
-    reg32_t __reserved1[7]; /**< meh */
+    reg32_t __reserved1[7]; /**< Reserved */
     reg32_t STAT; /**< FMC and efuse status */
-    reg32_t CTL; /**< config */
-    reg32_t __reserved2; /**< meh */
+    reg32_t __reserved2; /**< Reserved */
+    reg32_t CFG; /**< Config */
     reg32_t SYSCODE_START; /**< syscode start address offset config */
     reg32_t FLASH_SIZE; /**< flash size config */
-    reg32_t __reserved3[3]; /**< meh */
+    reg32_t __reserved3[3]; /**< Reserved */
     reg32_t FWLOCK; /**< firmware lock */
     reg32_t FWFLAG; /**< firmware flags */
-    reg32_t __reserved4[0x3EF]; /**< meh */
+    reg32_t __reserved4[0x3EF]; /**< Reserved */
     reg32_t EFUSE; /**< efuse instruction */
     reg32_t EFUSEADDR; /**< efuse address */
     reg32_t DATAUPPER; /**< efuse data - upper */
@@ -55,13 +55,13 @@ typedef struct {
     reg32_t TWOBIT; /**< two-bit error status */
     reg32_t SELFTESTCYC; /**< self-test cycles */
     reg32_t SELFTESTSIGN; /**< self-test signature */
-    reg32_t __reserved5[0x3ec]; /**< meh */
+    reg32_t __reserved5[0x3ec]; /**< Reserved */
     reg32_t FRDCTL; /**< FMC read control */
     reg32_t FSPRD; /**< FMC read margin control */
     reg32_t FEDACCTL1; /**< FMC error correction control 1 */
-    reg32_t __reserved6[4]; /**< meh */
+    reg32_t __reserved6[4]; /**< Reserved */
     reg32_t FEDACSTAT; /**< FMC error status */
-    reg32_t __reserved7[4]; /**< meh */
+    reg32_t __reserved7[4]; /**< Reserved */
     reg32_t FBPROT; /**< FMC bank protection */
     reg32_t FBSE; /**< FMC sector enable */
     reg32_t FBBUSY; /**< FMC bank busy */
@@ -72,9 +72,9 @@ typedef struct {
     reg32_t FPAC2; /**< FMC pump access control 2 */
     reg32_t FMAC; /**< FMC module access control */
     reg32_t FMSTAT; /**< FMC module status */
-    reg32_t __reserved8[3]; /**< meh */
+    reg32_t __reserved8[3]; /**< Reserved */
     reg32_t FLOCK; /**< FMC flash lock */
-    reg32_t __reserved9[6]; /**< meh */
+    reg32_t __reserved9[6]; /**< Reserved */
     reg32_t FVREADCT; /**< FMC VREADCT trim */
     reg32_t FVHVCT1; /**< FMC VHVCT1 trim */
     reg32_t FVHVCT2; /**< FMC VHVCT2 trim */
@@ -86,13 +86,13 @@ typedef struct {
     reg32_t FEFUSESTAT; /**< FMC efuse status */
     reg32_t FEFUSEDATA; /**< FMC efuse data */
     reg32_t FSEQPMP; /**< FMC sequential pump information */
-    reg32_t __reserved10[21]; /**< meh */
+    reg32_t __reserved10[21]; /**< Reserved */
     reg32_t FBSTROBES; /**< FMC bank signal strobe */
     reg32_t FPSTROBES; /**< FMC pump signal strobe */
     reg32_t FBMODE; /**< FMC bank and pump mode */
     reg32_t FTCR; /**< FMC test command control */
     reg32_t FADDR; /**< FMC bank address */
-    reg32_t __reserved11[2]; /**< meh */
+    reg32_t __reserved11[2]; /**< Reserved */
     reg32_t FTCTL; /**< FMC test control */
     reg32_t FWPWRITE0; /**< FMC flash wide programming write data 0 */
     reg32_t FWPWRITE1; /**< FMC flash wide programming write data 1 */
@@ -104,7 +104,7 @@ typedef struct {
     reg32_t FWPWRITE7; /**< FMC flash wide programming write data 7 */
     reg32_t FWPWRITE_ECC; /**< FMC flash wide programming ECC */
     reg32_t FSWSTAT; /**< FMC software interface status */
-    reg32_t __reserved12[0x2E]; /**< meh */
+    reg32_t __reserved12[0x2E]; /**< Reserved */
     reg32_t FSM_GLBCTL; /**< FMC FSM global control */
     reg32_t FSM_STATE; /**< FMC FSM state status */
     reg32_t FSM_STAT; /**< FMC FSM status */
@@ -119,10 +119,10 @@ typedef struct {
     reg32_t FSM_ERA_OH; /**< FMC FSM erase operation hold */
     reg32_t FSM_SAV_PPUL; /**< FMC FSM saved program pulses */
     reg32_t FSM_PE_VH; /**< FMC FSM program/erase verify hold */
-    reg32_t __reserved13[2]; /**< meh */
+    reg32_t __reserved13[2]; /**< Reserved */
     reg32_t FSM_PRG_PW; /**< FMC FSM program pulse width */
     reg32_t FSM_ERA_PW; /**< FMC FSM erase pulse width */
-    reg32_t __reserved14[3]; /**< meh */
+    reg32_t __reserved14[3]; /**< Reserved */
     reg32_t FSM_SAV_ERA_PUL; /**< FMC FSM saved erased pulses */
     reg32_t FSM_TIMER; /**< FMC FSM timer */
     reg32_t FSM_MODE; /**< FMC FSM MODE */
@@ -135,32 +135,32 @@ typedef struct {
     reg32_t FSM_EC_STEP_HEIGHT; /**< FMC FSM EC step height */
     reg32_t FSM_ST_MACHINE; /**< FMC FSM ST MACHINE */
     reg32_t FSM_FLES; /**< FMC FSM FLES memory control bits */
-    reg32_t __reserved15; /**< meh */
+    reg32_t __reserved15; /**< Reserved */
     reg32_t FSM_WR_ENA; /**< FMC FSM register write enable */
     reg32_t FSM_ACC_PP; /**< FMC FSM accumulate program pulses */
     reg32_t FSM_ACC_EP; /**< FMC FSM accumulate erase pulses */
-    reg32_t __reserved16[3]; /**< meh */
+    reg32_t __reserved16[3]; /**< Reserved */
     reg32_t FSM_ADDR; /**< FMC FSM address */
     reg32_t FSM_SECTOR; /**< FMC sectors erased */
     reg32_t FMC_REV_ID; /**< FMC revision identification */
     reg32_t FSM_ERR_ADDR; /**< FSM error address */
     reg32_t FSM_PGM_MAXPUL; /**< FMC FSM maximum program pulse */
     reg32_t FSM_EXECUTE; /**< FMC FSM command execute */
-    reg32_t __reserved17[2]; /**< meh */
+    reg32_t __reserved17[2]; /**< Reserved */
     reg32_t FSM_SECTOR1; /**< FMC FSM sector erased 1 */
     reg32_t FSM_SECTOR2; /**< FMC FSM sector erased 2 */
-    reg32_t __reserved18[6]; /**< meh */
+    reg32_t __reserved18[6]; /**< Reserved */
     reg32_t FSM_BSLE0; /**< FMC FSM bank sector lock erase 0 */
     reg32_t FSM_BSLE1; /**< FMC FSM bank sector lock erase 1 */
-    reg32_t __reserved19[2]; /**< meh */
+    reg32_t __reserved19[2]; /**< Reserved */
     reg32_t FSM_BSLP0; /**< FMC FSM bank sector lock program 0 */
     reg32_t FSM_BSLP1; /**< FMC FSM bank sector lock program 1 */
     reg32_t FSM_PGM_128; /**< Enable 128-bit programming. CC26x2_CC13x2 only */
-    reg32_t __reserved20[0x41]; /**< meh */
+    reg32_t __reserved20[0x41]; /**< Reserved */
     reg32_t FCFG_BANK; /**< FMC flash configuration bank */
     reg32_t FCFG_WRAPPER; /**< FMC flash wrapper configuration */
     reg32_t FCFG_BNK_TYPE; /**< FMC flash bank type */
-    reg32_t __reserved21; /**< meh */
+    reg32_t __reserved21; /**< Reserved */
     reg32_t FCFG_B0_START; /**< FMC flash bank 0 starting address */
     reg32_t FCFG_B1_START; /**< FMC flash bank 1 starting address */
     reg32_t FCFG_B2_START; /**< FMC flash bank 2 starting address */
@@ -172,61 +172,86 @@ typedef struct {
     reg32_t FCFG_B0_SSIZE0; /**< FMC flash bank 0 sector size */
 } flash_regs_t;
 
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
-#define FLASH_BASEADDR                           0x40030000 /**< base address of FLASH memory */
-/*@}*/
-
-#define FLASH                                ((flash_regs_t *)(FLASH_BASEADDR + 0x4)) /**< FLASH register bank */
-
+/**
+ * @brief   FLASH register values
+ * @{
+ */
+#define FLASH_CFG_DIS_STANDBY    0x00000002
+#define FLASH_CFG_DIS_EFUSECLK   0x00000020
+#define FLASH_FPAC1_PSLEEPTDIS_m 0x0FFF0000
+#define FLASH_FPAC1_PSLEEPTDIS_s 16
+/** @} */
 
 /**
- * VIMS registers
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
  */
-typedef struct {
-    reg32_t STAT; /**< status */
-    reg32_t CTL; /**< control */
-} vims_regs_t;
-
-/** @ingroup cpu_specific_peripheral_memory_map
-  * @{
-  */
-#define VIMS_BASE                           0x40034000 /**< base address of VIMS memory */
+/**
+ * @brief   FLASH base address
+ */
+#define FLASH_BASEADDR       (PERIPH_BASE + 0x30000)
 /*@}*/
 
-#define VIMS                                ((vims_regs_t *)(VIMS_BASE + 0x4)) /**< VIMS register bank */
+/**
+ * @brief   FLASH register bank
+ */
+#define FLASH                ((flash_regs_t *) (FLASH_BASEADDR))
+
+/**
+ * @brief   VIMS registers
+ */
+typedef struct {
+    reg32_t STAT; /**< Status */
+    reg32_t CTL; /**< Control */
+} vims_regs_t;
+
+/**
+ * @ingroup cpu_specific_peripheral_memory_map
+ * @{
+ */
+/**
+ * @brief   VIMS base address
+ */
+#define VIMS_BASE            (PERIPH_BASE + 0x34000)
+/*@}*/
+
+/**
+ * @brief   VIMS register bank
+ */
+#define VIMS                 ((vims_regs_t *) (VIMS_BASE))
 
 /**
  * @brief   VIMS register values
  * @{
  */
-#define VIMS_CTL_STATS_CLR                  0x80000000
-#define VIMS_CTL_STATS_CLR_m                0x80000000
+#define VIMS_CTL_STATS_CLR       0x80000000
+#define VIMS_CTL_STATS_CLR_m     0x80000000
 
-#define VIMS_CTL_STATS_EN                   0x40000000
-#define VIMS_CTL_STATS_EN_m                 0x40000000
+#define VIMS_CTL_STATS_EN        0x40000000
+#define VIMS_CTL_STATS_EN_m      0x40000000
 
-#define VIMS_CTL_DYN_CG_EN                  0x20000000
-#define VIMS_CTL_DYN_CG_EN_m                0x20000000
+#define VIMS_CTL_DYN_CG_EN       0x20000000
+#define VIMS_CTL_DYN_CG_EN_m     0x20000000
 
-#define VIMS_CTL_IDCODE_LB_DIS              0x00000020
-#define VIMS_CTL_IDCODE_LB_DIS_m            0x00000020
+#define VIMS_CTL_IDCODE_LB_DIS   0x00000020
+#define VIMS_CTL_IDCODE_LB_DIS_m 0x00000020
 
-#define VIMS_CTL_SYSBUS_LB_DIS              0x00000010
-#define VIMS_CTL_SYSBUS_LB_DIS_m            0x00000010
+#define VIMS_CTL_SYSBUS_LB_DIS   0x00000010
+#define VIMS_CTL_SYSBUS_LB_DIS_m 0x00000010
 
-#define VIMS_CTL_ARB_CFG                    0x00000008
-#define VIMS_CTL_ARB_CFG_m                  0x00000008
+#define VIMS_CTL_ARB_CFG         0x00000008
+#define VIMS_CTL_ARB_CFG_m       0x00000008
 
-#define VIMS_CTL_PREF_EN                    0x00000004
-#define VIMS_CTL_PREF_EN_m                  0x00000004
+#define VIMS_CTL_PREF_EN         0x00000004
+#define VIMS_CTL_PREF_EN_m       0x00000004
 
-#define VIMS_CTL_MODE_GPRAM                 0x00000000
-#define VIMS_CTL_MODE_CACHE                 0x00000001
-#define VIMS_CTL_MODE_SPLIT                 0x00000002
-#define VIMS_CTL_MODE_OFF                   0x00000003
-#define VIMS_CTL_MODE_m                     0x00000003
+#define VIMS_CTL_MODE_GPRAM      0x00000000
+#define VIMS_CTL_MODE_CACHE      0x00000001
+#define VIMS_CTL_MODE_SPLIT      0x00000002
+#define VIMS_CTL_MODE_OFF        0x00000003
+#define VIMS_CTL_MODE_m          0x00000003
+
+#define VIMS_STAT_MODE_CHANGING  0x00000008
 /** @} */
 
 #ifdef __cplusplus

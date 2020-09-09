@@ -90,14 +90,14 @@ static size_t get_len(uint8_t *buf, uint16_t *len)
 
 static void time_evt(void *arg)
 {
-    thread_flags_set((thread_t *)arg, TFLAGS_TIMEOUT);
+    thread_flags_set(arg, TFLAGS_TIMEOUT);
 }
 
 static int syncsend(uint8_t resp, size_t len, bool unlock)
 {
     int res = EMCUTE_TIMEOUT;
     waiton = resp;
-    timer.arg = (void *)sched_active_thread;
+    timer.arg = thread_get_active();
     /* clear flags, in case the timer was triggered last time right before the
      * remove was called */
     thread_flags_clear(TFLAGS_ANY);
@@ -129,7 +129,7 @@ static void on_disconnect(void)
     if (waiton == DISCONNECT) {
         gateway.port = 0;
         result = EMCUTE_OK;
-        thread_flags_set((thread_t *)timer.arg, TFLAGS_RESP);
+        thread_flags_set(timer.arg, TFLAGS_RESP);
     }
 }
 
@@ -146,7 +146,7 @@ static void on_ack(uint8_t type, int id_pos, int ret_pos, int res_pos)
         } else {
             result = EMCUTE_REJECT;
         }
-        thread_flags_set((thread_t *)timer.arg, TFLAGS_RESP);
+        thread_flags_set(timer.arg, TFLAGS_RESP);
     }
 }
 

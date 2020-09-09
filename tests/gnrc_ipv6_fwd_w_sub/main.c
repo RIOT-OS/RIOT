@@ -19,7 +19,6 @@
  * @}
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 
@@ -35,6 +34,7 @@
 #include "od.h"
 #include "sched.h"
 #include "shell.h"
+#include "test_utils/expect.h"
 #include "thread.h"
 #include "xtimer.h"
 
@@ -133,11 +133,11 @@ static gnrc_pktsnip_t *_build_recvd_pkt(void)
     gnrc_pktsnip_t *pkt;
 
     netif = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-    assert(netif);
+    expect(netif);
     gnrc_netif_hdr_set_netif(netif->data, _mock_netif);
     pkt = gnrc_pktbuf_add(netif, _l2_payload, sizeof(_l2_payload),
                           GNRC_NETTYPE_IPV6);
-    assert(pkt);
+    expect(pkt);
     return pkt;
 }
 
@@ -153,7 +153,7 @@ static int _run_test(int argc, char **argv)
                                                  THREAD_PRIORITY_MAIN - 1, 0,
                                                  _dumper_thread, NULL,
                                                  "dumper"));
-        assert(_dumper.target.pid > KERNEL_PID_UNDEF);
+        expect(_dumper.target.pid > KERNEL_PID_UNDEF);
         /* give dumper thread time to run */
         xtimer_usleep(200);
     }
@@ -165,15 +165,15 @@ static int _run_test(int argc, char **argv)
                                                GNRC_NETREG_DEMUX_CTX_ALL,
                                                _build_recvd_pkt());
     /* only IPv6 should be subscribed at the moment */
-    assert(subscribers == 1);
+    expect(subscribers == 1);
     /* subscribe dumper thread for any IPv6 packets */
     gnrc_netreg_register(GNRC_NETTYPE_IPV6, &_dumper);
     /* now test forwarding with subscription */
     subscribers = gnrc_netapi_dispatch_receive(GNRC_NETTYPE_IPV6,
                                                GNRC_NETREG_DEMUX_CTX_ALL,
                                                _build_recvd_pkt());
-    /* assert 2 subscribers: IPv6 and gnrc_pktdump as registered above */
-    assert(subscribers == 2);
+    /* expect 2 subscribers: IPv6 and gnrc_pktdump as registered above */
+    expect(subscribers == 2);
     return 0;
 }
 
@@ -186,11 +186,11 @@ int main(void)
     /* define neighbor to forward to */
     res = gnrc_ipv6_nib_nc_set(&_nbr_link_local, _mock_netif->pid,
                                _nbr_mac, sizeof(_nbr_mac));
-    assert(res == 0);
+    expect(res == 0);
     /* set route to neighbor */
     res = gnrc_ipv6_nib_ft_add(&_dst, DST_PFX_LEN, &_nbr_link_local,
                                _mock_netif->pid, 0);
-    assert(res == 0);
+    expect(res == 0);
     /* start shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);

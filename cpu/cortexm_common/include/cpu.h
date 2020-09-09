@@ -99,7 +99,7 @@ void cortexm_init(void);
 static inline void cortexm_init_fpu(void)
 {
     /* initialize the FPU on Cortex-M4F CPUs */
-#if defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
+#if defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)
     /* give full access to the FPU */
     SCB->CPACR |= (uint32_t)CORTEXM_SCB_CPACR_FPU_ACCESS_FULL;
 #endif
@@ -170,12 +170,7 @@ static inline void cortexm_sleep(int deep)
     unsigned state = irq_disable();
     __DSB();
     __WFI();
-#if defined(CPU_MODEL_STM32L152RE)
-    /* STM32L152RE crashes if branching to irq_restore(state). See #11830. */
-    __set_PRIMASK(state);
-#else
     irq_restore(state);
-#endif
 }
 
 /**
@@ -231,9 +226,9 @@ static inline void cpu_jump_to_image(uint32_t image_address)
 
 /* The following register is only present for
    Cortex-M0+, -M3, -M4, -M7 and -M23 CPUs */
-#if defined(CPU_ARCH_CORTEX_M0PLUS) || defined(CPU_ARCH_CORTEX_M3) || \
-    defined(CPU_ARCH_CORTEX_M4) || defined(CPU_ARCH_CORTEX_M4F) || \
-    defined(CPU_ARCH_CORTEX_M7) || defined(CPU_ARCH_CORTEX_M23)
+#if defined(CPU_CORE_CORTEX_M0PLUS) || defined(CPU_CORE_CORTEX_M3) || \
+    defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
+    defined(CPU_CORE_CORTEX_M7) || defined(CPU_CORE_CORTEX_M23)
 static inline uint32_t cpu_get_image_baseaddr(void)
 {
     return SCB->VTOR;

@@ -42,9 +42,9 @@ int gnrc_netreg_register(gnrc_nettype_t type, gnrc_netreg_entry_t *entry)
 #if DEVELHELP
 # if defined(MODULE_GNRC_NETAPI_MBOX) || defined(MODULE_GNRC_NETAPI_CALLBACKS)
     bool has_msg_q = (entry->type != GNRC_NETREG_TYPE_DEFAULT) ||
-                     thread_has_msg_queue(sched_threads[entry->target.pid]);
+                     thread_has_msg_queue(thread_get(entry->target.pid));
 # else
-    bool has_msg_q = thread_has_msg_queue(sched_threads[entry->target.pid]);
+    bool has_msg_q = thread_has_msg_queue(thread_get(entry->target.pid));
 # endif
 
     /* only threads with a message queue are allowed to register at gnrc */

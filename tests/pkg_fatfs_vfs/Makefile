@@ -3,8 +3,6 @@ include ../Makefile.tests_common
 USEMODULE += fatfs_vfs
 FEATURES_OPTIONAL += periph_rtc
 
-CFLAGS += -DVFS_FILE_BUFFER_SIZE=72 -DVFS_DIR_BUFFER_SIZE=44
-
 FATFS_IMAGE_FILE_SIZE_MIB ?= 128
 
 ifeq ($(BOARD),native)

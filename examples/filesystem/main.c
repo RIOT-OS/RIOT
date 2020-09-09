@@ -26,6 +26,29 @@
 #include "shell.h"
 #include "board.h" /* MTD_0 is defined in board.h */
 
+/* Configure MTD device for SD card if none is provided */
+#if !defined(MTD_0) && MODULE_MTD_SDCARD
+#include "mtd_sdcard.h"
+#include "sdcard_spi.h"
+#include "sdcard_spi_params.h"
+
+#define SDCARD_SPI_NUM ARRAY_SIZE(sdcard_spi_params)
+
+/* SD card devices are provided by drivers/sdcard_spi/sdcard_spi.c */
+extern sdcard_spi_t sdcard_spi_devs[SDCARD_SPI_NUM];
+
+/* Configure MTD device for the first SD card */
+static mtd_sdcard_t mtd_sdcard_dev = {
+    .base = {
+        .driver = &mtd_sdcard_driver
+    },
+    .sd_card = &sdcard_spi_devs[0],
+    .params = &sdcard_spi_params[0],
+};
+static mtd_dev_t *mtd0 = (mtd_dev_t*)&mtd_sdcard_dev;
+#define MTD_0 mtd0
+#endif
+
 /* Flash mount point */
 #define FLASH_MOUNT_POINT   "/sda"
 
@@ -49,6 +72,22 @@ static littlefs_desc_t fs_desc = {
 /* littlefs file system driver will be used */
 #define FS_DRIVER littlefs_file_system
 
+#elif defined(MODULE_LITTLEFS2)
+/* include file system header for driver */
+#include "fs/littlefs2_fs.h"
+
+/* file system specific descriptor
+ * for littlefs2, some fields can be tweaked to define the size
+ * of the partition, see header documentation.
+ * In this example, default behavior will be used, i.e. the entire
+ * memory will be used (parameters come from mtd) */
+static littlefs2_desc_t fs_desc = {
+    .lock = MUTEX_INIT,
+};
+
+/* littlefs file system driver will be used */
+#define FS_DRIVER littlefs2_file_system
+
 #elif defined(MODULE_SPIFFS)
 /* include file system header */
 #include "fs/spiffs_fs.h"
@@ -62,6 +101,21 @@ static spiffs_desc_t fs_desc = {
 
 /* spiffs driver will be used */
 #define FS_DRIVER spiffs_file_system
+
+#elif defined(MODULE_FATFS_VFS)
+/* include file system header */
+#include "fs/fatfs.h"
+
+/* file system specific descriptor
+ * as for littlefs, some fields can be changed if needed,
+ * this example focus on basic usage, i.e. entire memory used */
+static fatfs_desc_t fs_desc;
+
+/* provide mtd devices for use within diskio layer of fatfs */
+mtd_dev_t *fatfs_mtd_devs[FF_VOLUMES];
+
+/* fatfs driver will be used */
+#define FS_DRIVER fatfs_file_system
 #endif
 
 /* this structure defines the vfs mount point:
@@ -75,6 +129,18 @@ static vfs_mount_t flash_mount = {
     .private_data = &fs_desc,
 };
 #endif /* MTD_0 */
+
+/* Add simple macro to check if an MTD device together with a filesystem is
+ * compiled in */
+#if  defined(MTD_0) && \
+     (defined(MODULE_SPIFFS) || \
+      defined(MODULE_LITTLEFS) || \
+      defined(MODULE_LITTLEFS2) || \
+      defined(MODULE_FATFS_VFS))
+#define FLASH_AND_FILESYSTEM_PRESENT    1
+#else
+#define FLASH_AND_FILESYSTEM_PRESENT    0
+#endif
 
 /* constfs example */
 #include "fs/constfs.h"
@@ -115,7 +181,7 @@ static int _mount(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS))
+#if FLASH_AND_FILESYSTEM_PRESENT
     int res = vfs_mount(&flash_mount);
     if (res < 0) {
         printf("Error while mounting %s...try format\n", FLASH_MOUNT_POINT);
@@ -134,7 +200,7 @@ static int _format(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS))
+#if FLASH_AND_FILESYSTEM_PRESENT
     int res = vfs_format(&flash_mount);
     if (res < 0) {
         printf("Error while formatting %s\n", FLASH_MOUNT_POINT);
@@ -153,7 +219,7 @@ static int _umount(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS))
+#if FLASH_AND_FILESYSTEM_PRESENT
     int res = vfs_umount(&flash_mount);
     if (res < 0) {
         printf("Error while unmounting %s\n", FLASH_MOUNT_POINT);
@@ -174,9 +240,9 @@ static int _cat(int argc, char **argv)
         printf("Usage: %s <file>\n", argv[0]);
         return 1;
     }
-    /* With newlib, low-level syscalls are plugged to RIOT vfs
+    /* With newlib or picolibc, low-level syscalls are plugged to RIOT vfs
      * on native, open/read/write/close/... are plugged to RIOT vfs */
-#ifdef MODULE_NEWLIB
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     FILE *f = fopen(argv[1], "r");
     if (f == NULL) {
         printf("file %s does not exist\n", argv[1]);
@@ -199,6 +265,7 @@ static int _cat(int argc, char **argv)
     }
     close(fd);
 #endif
+    fflush(stdout);
     return 0;
 }
 
@@ -209,7 +276,7 @@ static int _tee(int argc, char **argv)
         return 1;
     }
 
-#ifdef MODULE_NEWLIB
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     FILE *f = fopen(argv[1], "w+");
     if (f == NULL) {
         printf("error while trying to create %s\n", argv[1]);
@@ -244,10 +311,12 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS))
+#if defined(MTD_0) && (defined(MODULE_SPIFFS) || defined(MODULE_LITTLEFS) || defined(MODULE_LITTLEFS2))
     /* spiffs and littlefs need a mtd pointer
      * by default the whole memory is used */
     fs_desc.dev = MTD_0;
+#elif defined(MTD_0) && defined(MODULE_FATFS_VFS)
+    fatfs_mtd_devs[fs_desc.vol_idx] = MTD_0;
 #endif
     int res = vfs_mount(&const_mount);
     if (res < 0) {

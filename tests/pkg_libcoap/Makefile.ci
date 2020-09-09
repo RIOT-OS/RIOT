@@ -1,5 +1,4 @@
 BOARD_INSUFFICIENT_MEMORY := \
-    chronos \
     i-nucleo-lrwan1 \
     msb-430 \
     msb-430h \
@@ -15,7 +14,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f0discovery \
     stm32l0538-disco \
     telosb \
-    wsn430-v1_3b \
-    wsn430-v1_4 \
     z1 \
     #

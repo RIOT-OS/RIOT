@@ -1,0 +1,18 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "iotlab-m3" if BOARD_IOTLAB_M3
+
+config BOARD_IOTLAB_M3
+    bool
+    default y
+    select BOARD_COMMON_IOTLAB
+
+    select HAS_PERIPH_DMA
+
+source "$(RIOTBOARD)/common/iotlab/Kconfig"

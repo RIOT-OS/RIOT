@@ -38,6 +38,23 @@ extern "C" {
 #define ETHERTYPE_NDN           (0x8624)    /**< NDN Protocol (http://named-data.net/) */
 #define ETHERTYPE_IPV6          (0x86dd)    /**< Internet protocol version 6 */
 #define ETHERTYPE_6LOENC        (0xa0ed)    /**< 6LoWPAN encapsulation */
+
+/**
+ * @defgroup    net_ethertype_custom_config Custom ethertype
+ * @ingroup     config
+ * @brief       Custom ethertype definition
+ * @warning     Do not use a IANA assigned number
+ * @see         https://www.iana.org/assignments/ieee-802-numbers/ieee-802-numbers.xhtml
+ *
+ * @{
+ */
+#ifndef ETHERTYPE_CUSTOM
+#define ETHERTYPE_CUSTOM        (0x0101)    /**< Custom ethertype */
+#endif
+/**
+ * @}
+ */
+
 #define ETHERTYPE_UNKNOWN       (0xffff)    /**< Reserved (no protocol specified) */
 
 #ifdef __cplusplus

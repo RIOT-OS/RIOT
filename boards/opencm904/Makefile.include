@@ -1,3 +1,6 @@
+# Include shared STM32 headers
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
+
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
@@ -5,7 +8,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # custom flasher to use with the bootloader
-FLASHER = $(RIOTBOARD)/$(BOARD)/dist/robotis-loader.py
+FLASHER = $(RIOTBOARD)/opencm904/dist/robotis-loader.py
 DEBUGGER =
 DEBUGSERVER =
 
@@ -14,4 +17,4 @@ FFLAGS = $(PROG_DEV) $(FLASHFILE)
 DEBUGGER_FLAGS =
 
 # Skip the space needed by the embedded bootloader
-export ROM_OFFSET ?= 0x3000
+ROM_OFFSET ?= 0x3000

@@ -79,6 +79,14 @@
  */
 
 /**
+ * @defgroup    sys_auto_init_multimedia Multimedia driver auto-initialization
+ * @ingroup     sys_auto_init
+ * @brief       Provides auto-initialization of Multimedia drivers
+ *
+ * @see @ref drivers_multimedia, @ref sys_auto_init
+ */
+
+/**
  * @{
  *
  * @file

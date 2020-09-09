@@ -8,7 +8,7 @@
 
 /**
  * @defgroup    drivers_dsp0401 DSP0401
- * @ingroup     drivers_actuators
+ * @ingroup     drivers_display
  * @brief       Device driver interface for the DSP0401 alphanumeric display
  * @{
  *

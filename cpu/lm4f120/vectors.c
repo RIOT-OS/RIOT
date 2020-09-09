@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_stm32f4
+ * @ingroup     cpu_lm4f120
  * @{
  *
  * @file        vectors.c

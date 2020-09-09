@@ -1,0 +1,61 @@
+From 6b996a7060a746023011ee60eb4ea2c5b4d76970 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Tue, 25 Feb 2020 15:42:53 +0100
+Subject: [PATCH 1/1] replace assert by expect
+
+---
+ tests.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/tests.c b/tests.c
+index 96f60b8..a7bab89 100644
+--- a/tests.c
++++ b/tests.c
+@@ -31,7 +31,7 @@
+ 
+ #include <time.h>
+ #include <stdio.h>
+-#include <assert.h>
++#include "test_utils/expect.h"
+ #include "ubasic.h"
+ 
+ static const char program_let[] =
+@@ -82,7 +82,7 @@ VARIABLE_TYPE peek(VARIABLE_TYPE arg) {
+ 
+ /*---------------------------------------------------------------------------*/
+ void poke(VARIABLE_TYPE arg, VARIABLE_TYPE value) {
+-    assert(arg == value);
++    expect(arg == value);
+ }
+ 
+ /*---------------------------------------------------------------------------*/
+@@ -114,20 +114,20 @@ int
+ main(void)
+ {
+   run(program_let);
+-  assert(ubasic_get_variable(0) == 42);
++  expect(ubasic_get_variable(0) == 42);
+ 
+   run(program_goto);
+-  assert(ubasic_get_variable(2) == 108);
++  expect(ubasic_get_variable(2) == 108);
+ 
+   run(program_loop);
+-  assert(ubasic_get_variable(0) == (VARIABLE_TYPE)(126 * 126 * 10));
++  expect(ubasic_get_variable(0) == (VARIABLE_TYPE)(126 * 126 * 10));
+ 
+   run(program_fibs);
+-  assert(ubasic_get_variable(1) == 89);
++  expect(ubasic_get_variable(1) == 89);
+ 
+   run(program_peek_poke);
+-  assert(ubasic_get_variable(0) == 123);
+-  assert(ubasic_get_variable(25) == 123);
++  expect(ubasic_get_variable(0) == 123);
++  expect(ubasic_get_variable(25) == 123);
+ 
+   return 0;
+ }
+-- 
+2.17.1
+

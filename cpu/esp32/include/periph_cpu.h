@@ -32,6 +32,22 @@ extern "C" {
 #define PROVIDES_PM_SET_LOWEST
 #define PROVIDES_PM_RESTART
 #define PROVIDES_PM_OFF
+#define PROVIDES_PM_LAYERED_OFF
+
+/**
+ * @brief   Number of usable low power modes
+ */
+#define PM_NUM_MODES            (2U)
+
+/**
+ * @name    Power modes
+ * @{
+ */
+#define ESP_PM_MODEM_SLEEP      (2U)
+#define ESP_PM_LIGHT_SLEEP      (1U)
+#define ESP_PM_DEEP_SLEEP       (0U)
+/** @} */
+
 /** @} */
 
 /**
@@ -383,6 +399,38 @@ typedef struct {
 /** @} */
 
 /**
+ * @name    RNG configuration
+ * @{
+ */
+
+/**
+ * @brief   The address of the register for accessing the hardware RNG.
+ */
+#define RNG_DATA_REG_ADDR   (0x3ff75144)
+/** @} */
+
+/**
+ * @name    RTT and RTC configuration
+ * @{
+ */
+
+/**
+ * @brief   RTT frequency definition
+ *
+ * The RTT frequency is always 32.768 kHz even if no external crystal is
+ * connected. In this case the RTT value counted with the internal 150 kHz
+ * RC oscillator is converted to a value for an RTT with 32.768 kHz.
+ */
+#define RTT_FREQUENCY       (32768UL)
+
+/**
+ * @brief   RTT is a 32-bit counter
+ */
+#define RTT_MAX_VALUE       (0xFFFFFFFFUL)
+
+/** @} */
+
+/**
  * @name   SPI configuration
  *
  * ESP32 has four SPI controllers:
@@ -458,12 +506,12 @@ typedef struct {
  */
 #ifdef MODULE_ESP_HW_COUNTER
 /** hardware ccount/ccompare registers are used for timer implementation */
-#define TIMER_NUMOF     (2)
-#define TIMER_CHANNELS  (1)
+#define TIMER_NUMOF         (2)
+#define TIMER_CHANNEL_NUMOF (1)
 #else
 /** hardware timer modules are used for timer implementation (default) */
-#define TIMER_NUMOF     (3)
-#define TIMER_CHANNELS  (1)
+#define TIMER_NUMOF         (3)
+#define TIMER_CHANNEL_NUMOF (1)
 #endif
 
 /** Timer used for system time */
@@ -509,6 +557,10 @@ typedef struct {
     gpio_t rxd;             /**< GPIO used as RxD pin */
 } uart_conf_t;
 
+/**
+ * @brief   Maximum number of UART interfaces
+ */
+#define UART_NUMOF_MAX  (3)
 /** @} */
 
 #ifdef __cplusplus

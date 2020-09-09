@@ -1,0 +1,19 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_DHCPV6
+    bool "Configure DHCPv6"
+    depends on USEMODULE_DHCPV6
+    help
+        Configure DHCPv6 client using Kconfig.
+
+if KCONFIG_USEMODULE_DHCPV6
+
+config DHCPV6_CLIENT_PFX_LEASE_MAX
+    int "Maximum number of prefix leases to be stored"
+    default 1
+
+endif # KCONFIG_USEMODULE_DHCPv6

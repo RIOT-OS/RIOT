@@ -49,9 +49,9 @@ int genhdr(int argc, char *argv[])
     uint8_t *hdr_buf;
 
     /* arguments storage variables */
-    long app_ver_arg = 0;
-    long start_addr_arg = 0;
-    long hdr_len_arg = 0;
+    unsigned long app_ver_arg = 0;
+    unsigned long start_addr_arg = 0;
+    unsigned long hdr_len_arg = 0;
 
     /* header variables */
     size_t hdr_len = 0;

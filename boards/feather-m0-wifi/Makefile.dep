@@ -1,0 +1,5 @@
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += atwinc15x0
+endif
+
+include $(RIOTBOARD)/feather-m0/Makefile.dep

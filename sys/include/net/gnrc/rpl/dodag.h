@@ -148,6 +148,14 @@ bool gnrc_rpl_parent_remove(gnrc_rpl_parent_t *parent);
 void gnrc_rpl_parent_update(gnrc_rpl_dodag_t *dodag, gnrc_rpl_parent_t *parent);
 
 /**
+ * @brief Removes the dodag state of @p dodag after
+ * CONFIG_GNRC_RPL_CLEANUP_TIME milliseconds
+ *
+ * @param[in] dodag     Pointer to the DODAG
+ */
+void gnrc_rpl_cleanup_start(gnrc_rpl_dodag_t *dodag);
+
+/**
  * @brief   Start a local repair.
  *
  * @param[in] dodag     Pointer to the DODAG

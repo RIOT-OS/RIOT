@@ -63,9 +63,7 @@ static void _irq_handler(void *arg)
     /* We use this counter to avoid filling the message queue with redundant ISR events */
     if (num_irqs_queued == num_irqs_handled) {
         ++num_irqs_queued;
-        if (netdev->event_callback) {
-            netdev->event_callback(netdev, NETDEV_EVENT_ISR);
-        }
+        netdev_trigger_event_isr(netdev);
     }
 }
 
@@ -83,6 +81,10 @@ static int _init(netdev_t *netdev)
 
     /* reset device to default values and put it into RX state */
     kw2xrf_reset_phy(dev);
+
+    /* enable TX End IRQ: the driver uses the event and gnrc_netif_ieee802154
+     * only enables this when MODULE_NETSTATS_L2 is active */
+    kw2xrf_clear_dreg_bit(dev, MKW2XDM_PHY_CTRL2, MKW2XDM_PHY_CTRL2_TXMSK);
 
     return 0;
 }

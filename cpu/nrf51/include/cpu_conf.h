@@ -62,8 +62,8 @@ extern "C" {
  *          buffer size on these CPUs
  * @{
  */
-#ifndef GNRC_PKTBUF_SIZE
-#define GNRC_PKTBUF_SIZE                (2048)
+#ifndef CONFIG_GNRC_PKTBUF_SIZE
+#define CONFIG_GNRC_PKTBUF_SIZE                (2048)
 #endif
 /** @} */
 

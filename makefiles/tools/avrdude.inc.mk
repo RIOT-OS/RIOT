@@ -1,11 +1,23 @@
 FLASHER = avrdude
-DIST_PATH = $(BOARDSDIR)/$(BOARD)/dist
+DIST_PATH = $(BOARDDIR)/dist
+AVARICE_PATH = $(RIOTTOOLS)/avarice
 DEBUGSERVER_PORT = 4242
-DEBUGSERVER = $(DIST_PATH)/debug_srv.sh
-DEBUGSERVER_INTERFACE ?=
-DEBUGSERVER_FLAGS = "-g -j usb $(DEBUGSERVER_INTERFACE) :$(DEBUGSERVER_PORT)"
-DEBUGGER_FLAGS = "-x $(RIOTBOARD)/$(BOARD)/dist/gdb.conf $(ELFFILE)"
-DEBUGGER = $(DIST_PATH)/debug.sh $(DEBUGSERVER_FLAGS) $(DIST_PATH) $(DEBUGSERVER_PORT)
+DEBUGSERVER = $(AVARICE_PATH)/debug_srv.sh
+# Allow choosing debugger hardware via AVR_DEBUGDEVICE, default to Atmel ICE,
+# which is compatible to all AVR devices and since the AVR Dragon is no longer
+# produced, the least expensive option
+AVR_DEBUGDEVICE ?= --edbg
+AVR_DEBUGINTERFACE ?= usb
+ifneq (,$(filter $(CPU),atmega328p))
+  # Use debugWIRE as protocol for debugging (ATmega328P does not support JTAG)
+  DEBUGPROTO := -w
+else
+  # Use JTAG as protocol for debugging
+  DEBUGPROTO := -j $(AVR_DEBUGINTERFACE)
+endif
+DEBUGSERVER_FLAGS = "$(AVR_DEBUGDEVICE) $(DEBUGPROTO) :$(DEBUGSERVER_PORT)"
+DEBUGGER_FLAGS = "-x $(AVARICE_PATH)/gdb.conf $(ELFFILE)"
+DEBUGGER = "$(AVARICE_PATH)/debug.sh" $(DEBUGSERVER_FLAGS) $(AVARICE_PATH) $(DEBUGSERVER_PORT)
 
 PROGRAMMER_FLAGS = -p $(subst atmega,m,$(CPU))
 

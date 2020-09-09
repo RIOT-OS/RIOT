@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2016 Leon George
+ * Copyright (C) 2020 Locha Inc
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -16,6 +17,7 @@
  *
  * @author      Leon M. George <leon@georgemail.eu>
  * @author      Anton Gerasimov <tossel@gmail.com>
+ * @author      Jean Pierre Dudey <jeandudey@hotmail.com>
  *
  * @}
  */
@@ -23,6 +25,8 @@
 #include "cpu.h"
 #include "periph/uart.h"
 #include "periph_conf.h"
+
+#include "cc26xx_cc13xx_power.h"
 
 /**
  * @brief   Bit mask for the fractional part of the baudrate
@@ -33,7 +37,7 @@
 /**
  * @brief   Get the enable mask depending on enabled HW flow control
  */
-#if UART_HW_FLOW_CONTROL
+#ifdef MODULE_PERIPH_UART_HW_FC
 #define ENABLE_MASK         (UART_CTSEN | UART_CTL_RTSEN | \
                              UART_CTL_RXE | UART_CTL_TXE | UART_CTL_UARTEN)
 #else
@@ -53,13 +57,26 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     int tx_pin = uart_config[uart].tx_pin;
     int rx_pin = uart_config[uart].rx_pin;
     int intn = uart_config[uart].intn;
-    int flow = uart_config[uart].flow_control;
+#ifdef MODULE_PERIPH_UART_HW_FC
     int rts_pin = uart_config[uart].rts_pin;
     int cts_pin = uart_config[uart].cts_pin;
+#endif
 
-    /* enable clocks: serial power domain and UART */
-    PRCM->PDCTL0SERIAL = 1;
-    while (!(PRCM->PDSTAT0 & PDSTAT0_SERIAL_ON)) ;
+    if (uart == 0) {
+        /* UART0 requires serial domain to be enabled */
+        if (!power_is_domain_enabled(POWER_DOMAIN_SERIAL)) {
+            power_enable_domain(POWER_DOMAIN_SERIAL);
+        }
+    }
+#ifdef CPU_VARIANT_X2
+    else if (uart == 1) {
+        /* UART1 requires periph domain to be enabled */
+        if (!power_is_domain_enabled(POWER_DOMAIN_PERIPHERALS)) {
+            power_enable_domain(POWER_DOMAIN_PERIPHERALS);
+        }
+    }
+#endif
+
     uart_poweron(uart);
 
     /* disable and reset the UART */
@@ -70,12 +87,28 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     ctx[uart].arg = arg;
 
     /* configure pins */
-    IOC->CFG[tx_pin] =  IOCFG_PORTID_UART0_TX;
-    IOC->CFG[rx_pin] = (IOCFG_PORTID_UART0_RX | IOCFG_INPUT_ENABLE);
-    if (flow == 1) {
-      IOC->CFG[rts_pin] =  IOCFG_PORTID_UART0_RTS;
-      IOC->CFG[cts_pin] = (IOCFG_PORTID_UART0_CTS | IOCFG_INPUT_ENABLE);
+    if (uart == 0) {
+        IOC->CFG[tx_pin] =  IOCFG_PORTID_UART0_TX;
+        IOC->CFG[rx_pin] = (IOCFG_PORTID_UART0_RX | IOCFG_INPUT_ENABLE);
+#ifdef MODULE_PERIPH_UART_HW_FC
+        if (rts_pin != GPIO_UNDEF && cts_pin != GPIO_UNDEF) {
+            IOC->CFG[rts_pin] =  IOCFG_PORTID_UART0_RTS;
+            IOC->CFG[cts_pin] = (IOCFG_PORTID_UART0_CTS | IOCFG_INPUT_ENABLE);
+        }
+#endif
     }
+#ifdef CPU_VARIANT_X2
+    else if (uart == 1) {
+        IOC->CFG[tx_pin] =  IOCFG_PORTID_UART1_TX;
+        IOC->CFG[rx_pin] = (IOCFG_PORTID_UART1_RX | IOCFG_INPUT_ENABLE);
+#ifdef MODULE_PERIPH_UART_HW_FC
+        if (rts_pin != GPIO_UNDEF && cts_pin != GPIO_UNDEF) {
+            IOC->CFG[rts_pin] =  IOCFG_PORTID_UART1_RTS;
+            IOC->CFG[cts_pin] = (IOCFG_PORTID_UART1_CTS | IOCFG_INPUT_ENABLE);
+        }
+#endif
+    }
+#endif
 
     /* calculate baud-rate */
     uint32_t tmp = (CLOCK_CORECLOCK * 4);
@@ -157,9 +190,8 @@ void uart_poweron(uart_t uart)
 
     uart_regs_t *uart_reg = uart_config[uart].regs;
 
-    PRCM->UARTCLKGR |= 0x1;
-    PRCM->CLKLOADCTL = CLKLOADCTL_LOAD;
-    while (!(PRCM->CLKLOADCTL & CLKLOADCTL_LOADDONE)) {}
+    /* Enable clock for this UART */
+    power_clock_enable_uart(uart);
 
     uart_reg->CTL = ENABLE_MASK;
 }
@@ -172,10 +204,8 @@ void uart_poweroff(uart_t uart)
 
     uart_reg->CTL = 0;
 
-    PRCM->UARTCLKGR = 0;
-    PRCM->CLKLOADCTL = CLKLOADCTL_LOAD;
-    while (!(PRCM->CLKLOADCTL & CLKLOADCTL_LOADDONE)) {}
-
+    /* Disable clock for this UART */
+    power_clock_disable_uart(uart);
 }
 
 static void isr_uart(uart_t uart)

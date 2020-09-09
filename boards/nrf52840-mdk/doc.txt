@@ -11,8 +11,7 @@ This board provides 802.15.4 and BLE connectivity.
 
 ### Pinout
 
-<img src="https://github.com/makerdiary/nrf52840-mdk/blob/master/docs/images/nrf52840-mdk-pinout.jpg"
-     alt="pinout" style="height:800px;"/>
+![nRF52840-MDK](https://github.com/makerdiary/nrf52840-mdk/blob/master/docs/images/nrf52840-mdk-pinout.jpg?raw=true)
 
 ### Flash the board
 

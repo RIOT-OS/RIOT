@@ -1,12 +1,7 @@
 # Target architecture for the build. Use arm-none-eabi if you are unsure.
-export TARGET_ARCH ?= arm-none-eabi
+TARGET_ARCH ?= arm-none-eabi
 
 INCLUDES += -I$(RIOTBASE)/cpu/arm7_common/include/
-
-# use common ARM7 periph code
-USEMODULE += arm7_common_periph
-# use the nano-specs of Newlib when available
-USEMODULE += newlib_nano
 
 # currently only arm7tdmi-s is supported by RIOT, but allow overriding MCPU
 # if someone wants to add support for other ARM7 CPUs
@@ -19,8 +14,8 @@ CFLAGS_OPT  ?= -Os
 
 CFLAGS      += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 ASFLAGS     += $(CFLAGS_CPU) $(CFLAGS_DBG)
-export LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU).ld
-export LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
-export LINKFLAGS += -Wl,--gc-sections
+LINKFLAGS   += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU).ld
+LINKFLAGS   += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
+LINKFLAGS   += -Wl,--gc-sections
 
-export UNDEF += $(BINDIR)/cpu/startup.o
+UNDEF += $(BINDIR)/cpu/startup.o

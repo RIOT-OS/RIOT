@@ -31,6 +31,8 @@ Reason for removal:
 - feature was never used and there is no reason for keeping it
 ~~~~~~~~~~~~~~~~~~~
 
+Additionally, a link reference for the commit on GitHub is added to the bottom of this document.
+
 By putting the name of the removed feature and the commit hash in the same line,
 one can very quickly find the commit using `git grep`.
 
@@ -40,7 +42,52 @@ This way, their names are never removed from the RIOT repository.
 
 # Removed Features
 
-### sys/ubjson [868d37708bb674739ab4983441d6df904dd5a25f]
+### sys/net/gnrc/nettest [cdc252ab7bd4161cc046bf93a3e55995704b24d4]
+Author:
+- Martine Lenders <mlenders@inf.fu-berlin.de>
+
+Reasons for removal:
+- Not maintained anymore
+- Not used in GNRC
+
+### boards/chronos [ed3887ac5c1e95308c2827bce3cdca8b0f146c22]
+Author(s):
+- Oliver Hahm <oliver.hahm@inria.fr>
+- Kaspar Schleiser <kaspar@schleiser.de>
+
+Reason for removal:
+- board is quite outdated
+- board cannot be automatically tested for lack of UART
+- board has many special cases, which hurt upgrade to msp430-elf-gcc 9.x
+- the onboard radio has been unsupported for a while
+- noone seems to use the board, noone seems to maintain it
+
+### sys/net/gnrc/application_layer/tftp [0e2a62078850e1ecc74db2db4d639cf2d8fb96d3]
+Author:
+- DipSwitch <dipswitch@ownage4u.nl>
+
+Reasons for removal:
+- Not maintained anymore.
+- Existing quality and security defects.
+
+### pkg/oonf_api [c829f820ee870bffc60c7df688d2da8373553212]
+Author:
+- Benjamin Valentin <benpicco@googlemail.com>
+
+Reasons for removal:
+- Package has not been update since 2013.
+- Tests were never integrated to the CI.
+- NHDP, which was the only upstream user, has been removed.
+
+### sys/net/routing/nhdp [9026823bb906f64168d7d38e52be92f390353dc8]
+Author:
+- Fabian Nack <nack@inf.fu-berlin.de>
+
+Reasons for removal:
+- Not maintained anymore.
+- Does not comply with the current RIOT programming practices.
+
+### sys/ubjson [bea30c3f8949ebd9fdf4a9bf0a987652889930f5]
 Author(s):
 - René Kijewski <rene.kijewski@fu-berlin.de>
 
@@ -146,5 +193,48 @@ Author(s):
 Reason for removal:
 - broke the abstraction of `gnrc_pktbuf`
 - its only user within the RIOT code base `gnrc_ipv6_ext` was reworked in
-  f671a87fe2c539c3aecd595ae03fa4f6f209d042 so it is not needed anymore.
-- the function was deprecated in f2760c033c5f332be076b25aa212aca4007c3d65
+  [f671a87fe2c539c3aecd595ae03fa4f6f209d042] so it is not needed anymore.
+- the function was deprecated in [f2760c033c5f332be076b25aa212aca4007c3d65]
+
+### boards/wsn430-v1_3b, boards/wsn430-v1_4 [e63cd54f3b1e002a7895bb7c46af889b341c1a15]
+
+Author(s):
+- Hauke Petersen <hauke.petersen@fu-berlin.de>
+- Martine Lenders <m.lenders@fu-berlin.de>
+- Milan Babel <babel@inf.fu-berlin.de>
+- Oliver Hahm <oliver.hahm@inria.fr>
+
+Reason for removal:
+- no longer accessible on the IoT-LAB testbed
+
+### pkg/emb6 [4f243c52eabefe709d78560ce7f1d502d737a999]
+Author(s):
+- Martine S. Lenders <m.lenders@fu-berlin.de>
+
+Reason for removal:
+- Stale upstream (last update to date in Mar 2018)
+- Ported version even older (last update Feb 2016)
+- Updating to more recent version would be more effort than its worth
+
+
+[cdc252ab7bd4161cc046bf93a3e55995704b24d4]: https://github.com/RIOT-OS/RIOT/commit/cdc252ab7bd4161cc046bf93a3e55995704b24d4
+[ed3887ac5c1e95308c2827bce3cdca8b0f146c22]: https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22
+[0e2a62078850e1ecc74db2db4d639cf2d8fb96d3]: https://github.com/RIOT-OS/RIOT/commit/0e2a62078850e1ecc74db2db4d639cf2d8fb96d3
+[c829f820ee870bffc60c7df688d2da8373553212]: https://github.com/RIOT-OS/RIOT/commit/c829f820ee870bffc60c7df688d2da8373553212
+[9026823bb906f64168d7d38e52be92f390353dc8]: https://github.com/RIOT-OS/RIOT/commit/9026823bb906f64168d7d38e52be92f390353dc8
+[bea30c3f8949ebd9fdf4a9bf0a987652889930f5]: https://github.com/RIOT-OS/RIOT/commit/bea30c3f8949ebd9fdf4a9bf0a987652889930f5
+[232aed3e18118624b862d36bfec7cd1c21ca2d26]: https://github.com/RIOT-OS/RIOT/commit/232aed3e18118624b862d36bfec7cd1c21ca2d26
+[a2bcd7539ce1931b7aec0077ea71dadd62c96edd]: https://github.com/RIOT-OS/RIOT/commit/a2bcd7539ce1931b7aec0077ea71dadd62c96edd
+[ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7]: https://github.com/RIOT-OS/RIOT/commit/ee6b6b9c388b78fcec7ba6e239a6c76041b9bbb7
+[9447cb303426d7c6348bb84999f88bf929cd6263]: https://github.com/RIOT-OS/RIOT/commit/9447cb303426d7c6348bb84999f88bf929cd6263
+[ea73cc49eacd45640b9660134c4c92b887cb2716]: https://github.com/RIOT-OS/RIOT/commit/ea73cc49eacd45640b9660134c4c92b887cb2716
+[99009af25e201bbc182d376e99df34133417be6c]: https://github.com/RIOT-OS/RIOT/commit/99009af25e201bbc182d376e99df34133417be6c
+[cfa9580f319508f858c8fe30ecce8b2b59b6caa3]: https://github.com/RIOT-OS/RIOT/commit/cfa9580f319508f858c8fe30ecce8b2b59b6caa3
+[b3eb9b8cf23f0702fa725d536df6ad6528f84189]: https://github.com/RIOT-OS/RIOT/commit/b3eb9b8cf23f0702fa725d536df6ad6528f84189
+[7bc271807cecbffbb01a37c56a367b98fb823573]: https://github.com/RIOT-OS/RIOT/commit/7bc271807cecbffbb01a37c56a367b98fb823573
+[fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836]: https://github.com/RIOT-OS/RIOT/commit/fc45d7c5ac3d46bfdfb21c243cd3d4881bc5c836
+[b83430aa625a1d42f11f9badf5e5cfbb8efacd99]: https://github.com/RIOT-OS/RIOT/commit/b83430aa625a1d42f11f9badf5e5cfbb8efacd99
+[f671a87fe2c539c3aecd595ae03fa4f6f209d042]: https://github.com/RIOT-OS/RIOT/commit/f671a87fe2c539c3aecd595ae03fa4f6f209d042
+[f2760c033c5f332be076b25aa212aca4007c3d65]: https://github.com/RIOT-OS/RIOT/commit/f2760c033c5f332be076b25aa212aca4007c3d65
+[e63cd54f3b1e002a7895bb7c46af889b341c1a15]: https://github.com/RIOT-OS/RIOT/commit/e63cd54f3b1e002a7895bb7c46af889b341c1a15
+[4f243c52eabefe709d78560ce7f1d502d737a999]: https://github.com/RIOT-OS/RIOT/commit/4f243c52eabefe709d78560ce7f1d502d737a999

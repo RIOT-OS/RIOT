@@ -88,7 +88,7 @@ static inline void _init_data(void)
 
 #ifdef CPU_HAS_BACKUP_RAM
     /* only initialize battery backup on cold boot */
-    if (cpu_woke_from_backup()) {
+    if (cpu_backup_ram_is_initialized()) {
         return;
     }
 
@@ -127,7 +127,7 @@ void bootloader(void)
     /* cpu specific setup of clocks, peripherals */
     cpu_init();
 
-#ifdef MODULE_NEWLIB
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     extern void __libc_init_array(void);
     __libc_init_array();
 #endif

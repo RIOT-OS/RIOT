@@ -104,7 +104,7 @@ you first need to set up two tap devices and a bridge that connects
 them. This constitutes a virtual network that the RIOT instances can
 use to communicate.
 
-    ./../../dist/tools/tapsetup/tapsetup --create 2
+    sudo ./../../dist/tools/tapsetup/tapsetup --create 2
 
 Then, make sure you've compiled the application by calling `make` and
 start the first RIOT instance by invoking `make term`. In the RIOT

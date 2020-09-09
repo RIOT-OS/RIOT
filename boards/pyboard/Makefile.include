@@ -1,3 +1,6 @@
+# we use shared STM32 configuration snippets
+INCLUDES += -I$(RIOTBOARD)/common/stm32/include
+
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
@@ -6,5 +9,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # this board is flashed using DFU
-DFU_ARGS += --alt 0 -s 0x8000000
+DFU_USB_ID = 1d50:607f
+FFLAGS_OPTS = --reset
 include $(RIOTMAKE)/tools/dfu.inc.mk

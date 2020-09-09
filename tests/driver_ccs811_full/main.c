@@ -75,7 +75,7 @@ int main(void)
     }
 
     /* save the pid of main thread */
-    p_main = sched_active_pid;
+    p_main = thread_getpid();
 
     printf("\n+--------Starting Measurements--------+\n");
 

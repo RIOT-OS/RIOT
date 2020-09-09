@@ -73,7 +73,7 @@ int tx_cmd(int argc, char **argv)
     }
 
     gnrc_netapi_set(interface, NETOPT_LORAWAN_TX_PORT, 0, &port, sizeof(port));
-    gnrc_netapi_send(interface, pkt);
+    gnrc_netif_send(gnrc_netif_get_by_pid(interface), pkt);
 
     msg_t msg;
     /* wait for packet status and check */

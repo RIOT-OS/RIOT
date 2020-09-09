@@ -53,6 +53,14 @@ extern "C" {
 
 #endif
 
+#ifndef LIS2DH12_PARAM_INT_PIN1
+#define LIS2DH12_PARAM_INT_PIN1     GPIO_UNDEF
+#endif
+
+#ifndef LIS2DH12_PARAM_INT_PIN2
+#define LIS2DH12_PARAM_INT_PIN2     GPIO_UNDEF
+#endif
+
 #ifndef LIS2DH12_PARAM_SCALE
 #define LIS2DH12_PARAM_SCALE        LIS2DH12_SCALE_2G
 #endif
@@ -61,10 +69,22 @@ extern "C" {
 #endif
 
 #ifndef LIS2DH12_PARAMS
-#define LIS2DH12_PARAMS             { LIS2DH12_PARAMS_BUSCFG,        \
-                                      .scale = LIS2DH12_PARAM_SCALE, \
-                                      .rate  = LIS2DH12_PARAM_RATE, }
-#endif
+#ifdef MODULE_LIS2DH12_INT
+#define LIS2DH12_PARAMS         {  \
+                                    LIS2DH12_PARAMS_BUSCFG,  \
+                                    .int1_pin = LIS2DH12_PARAM_INT_PIN1,  \
+                                    .int2_pin = LIS2DH12_PARAM_INT_PIN2,  \
+                                    .scale = LIS2DH12_PARAM_SCALE,  \
+                                    .rate  = LIS2DH12_PARAM_RATE,  \
+                                }
+#else /* MODULE_LIS2DH12_INT */
+#define LIS2DH12_PARAMS         {  \
+                                    LIS2DH12_PARAMS_BUSCFG,  \
+                                    .scale = LIS2DH12_PARAM_SCALE,  \
+                                    .rate  = LIS2DH12_PARAM_RATE,  \
+                                }
+#endif /* MODULE_LIS2DH12_INT */
+#endif /* LIS2DH12_PARAMS */
 
 #ifndef LIS2DH12_SAULINFO
 #define LIS2DH12_SAULINFO           { .name = "lis2dh12" }

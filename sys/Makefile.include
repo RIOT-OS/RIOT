@@ -1,7 +1,3 @@
-ifneq (,$(filter nhdp,$(USEMODULE)))
-  USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/routing/nhdp
-endif
-
 ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/gnrc/network_layer/sixlowpan/frag
 endif
@@ -21,6 +17,10 @@ ifneq (,$(filter gnrc_sock_async,$(USEMODULE)))
   CFLAGS += -DSOCK_HAS_ASYNC
 endif
 
+ifneq (,$(filter gnrc_pktbuf,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/gnrc/pktbuf/Makefile.include
+endif
+
 ifneq (,$(filter posix_headers,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
@@ -31,6 +31,10 @@ endif
 
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/oneway-malloc/include
+endif
+
+ifneq (,$(filter eui_provider,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/link_layer/eui_provider/include
 endif
 
 ifneq (,$(filter app_metadata,$(USEMODULE)))
@@ -47,7 +51,7 @@ ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/cpp11-compat/include
   # make sure cppsupport.o is linked explicitly because __dso_handle is not
   # found if it is hidden away inside a static object.
-  export UNDEF += $(BINDIR)/cpp11-compat/cppsupport.o
+  UNDEF += $(BINDIR)/cpp11-compat/cppsupport.o
 endif
 
 ifneq (,$(filter embunit,$(USEMODULE)))
@@ -72,8 +76,16 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   include $(RIOTMAKE)/libc/newlib.mk
 endif
 
+ifneq (,$(filter picolibc,$(USEMODULE)))
+  include $(RIOTMAKE)/libc/picolibc.mk
+endif
+
 ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
   include $(RIOTBASE)/sys/newlib_syscalls_default/Makefile.include
+endif
+
+ifneq (,$(filter picolibc_syscalls_default,$(USEMODULE)))
+  include $(RIOTBASE)/sys/picolibc_syscalls_default/Makefile.include
 endif
 
 ifneq (,$(filter arduino,$(USEMODULE)))
@@ -82,18 +94,22 @@ endif
 
 ifneq (,$(filter printf_float,$(USEMODULE)))
   ifneq (,$(filter newlib_nano,$(USEMODULE)))
-    export LINKFLAGS += -u _printf_float
+    LINKFLAGS += -u _printf_float
   endif
 endif
 
 ifneq (,$(filter scanf_float,$(USEMODULE)))
   ifneq (,$(filter newlib_nano,$(USEMODULE)))
-    export LINKFLAGS += -u _scanf_float
+    LINKFLAGS += -u _scanf_float
   endif
 endif
 
 ifneq (,$(filter riotboot,$(FEATURES_USED)))
   include $(RIOTBASE)/sys/riotboot/Makefile.include
+endif
+
+ifneq (,$(filter sock_async_event,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/sock/async/event/Makefile.include
 endif
 
 ifneq (,$(filter ssp,$(USEMODULE)))
@@ -106,4 +122,18 @@ endif
 
 ifneq (,$(filter clif, $(USEMODULE)))
   INCLUDES += -I$(RIOTBASE)/sys/clif/include
+endif
+
+ifneq (,$(filter zptr,$(USEMODULE)))
+  include $(RIOTBASE)/sys/zptr/Makefile.include
+endif
+
+# Convert xtimer into a pseudo module if its API is already implemented by
+# ztimer's compatibility wrapper
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+  PSEUDOMODULES += xtimer
+endif
+
+ifneq (,$(filter prng,$(USEMODULE)))
+  include $(RIOTBASE)/sys/random/Makefile.include
 endif

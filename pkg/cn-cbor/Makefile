@@ -1,11 +1,12 @@
 PKG_NAME=cn-cbor
-PKG_URL=https://github.com/cabo/cn-cbor
-PKG_VERSION=f1cf9ffdf5cfab935a45900556f9b68af925c256
+PKG_URL=https://github.com/jimsch/cn-cbor
+PKG_VERSION=821797f9421c04dc783561dc465066857839e108 # 1.0.0
 PKG_LICENSE=MIT
 
-.PHONY: all
+include $(RIOTBASE)/pkg/pkg.mk
+
+# Enable code forcing aligned reads
+CFLAGS += -DCBOR_ALIGN_READS
 
 all:
-	"$(MAKE)" -C $(PKG_BUILDDIR)/src -f $(CURDIR)/Makefile.cn-cbor
-
-include $(RIOTBASE)/pkg/pkg.mk
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)

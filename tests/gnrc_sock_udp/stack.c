@@ -35,7 +35,7 @@ void _net_init(void)
 {
     msg_init_queue(_msg_queue, _MSG_QUEUE_SIZE);
     gnrc_netreg_entry_init_pid(&_udp_handler, GNRC_NETREG_DEMUX_CTX_ALL,
-                               sched_active_pid);
+                               thread_getpid());
 }
 
 void _prepare_send_checks(void)

@@ -13,7 +13,7 @@ The Autonomo is available from the SODAQ [shop](http://shop.sodaq.com/).
 
 ## Hardware
 
-![sodaq-autonomo image](http://static.webshopapp.com/shops/104792/files/050759716/sodaq-sodaq-autonomo.jpg)
+![sodaq-autonomo image](https://support.sodaq.com/Boards/Autonomo/sodaq_autonomo.png)
 
 
 ### MCU
@@ -31,7 +31,7 @@ The Autonomo is available from the SODAQ [shop](http://shop.sodaq.com/).
 | SPIs       | max 6 (see UART)                  |
 | I2Cs       | max 6 (see UART)              |
 | Vcc        | 1.8V - 3.6V           |
-| Datasheet  | [Datasheet](http://www.atmel.com/Images/Atmel-42181-SAM-D21_Datasheet.pdf) |
+| Datasheet  | [Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/SAM_D21_DA1_Family_Data%20Sheet_DS40001882E.pdf) |
 
 ### User Interface
 
@@ -93,15 +93,24 @@ Besides the SAMD21 the board has the following features:
 
 ## Flashing the device
 
-1. Put the board in bootloader mode by double tapping the reset button.<br/>
-   When the board is in bootloader mode, the user led (green) oscillates
-   smoothly.
-
-2. Use `BOARD=sodaq-autonomo` with the `make` command.<br/>
-   Example with `hello-world` application:
+Use `BOARD=sodaq-autonomo` with the `make` command.<br/>
+Example with `hello-world` application:
 ```
      make BOARD=sodaq-autonomo -C examples/hello-world flash
 ```
+
+@note     If the application crashes, automatic reflashing via USB, as explained
+          above won't be possible. In this case, the board must be set in
+          bootloader mode by double tapping the reset button before running the
+          flash command.
+
+## Accessing STDIO via UART
+
+STDIO of RIOT is directly available over the USB port.
+
+The `TERM_DELAY` environment variable can be used to add a delay (in second)
+before opening the serial terminal. The default value is 2s which should be
+enough in most of the situation.
 
 ## Supported Toolchains
 

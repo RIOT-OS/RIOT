@@ -121,6 +121,16 @@ static const uint8_t RSSI_value[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
                                       0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 
+static void mrf24j40_baseband_reset(mrf24j40_t *dev)
+{
+    uint8_t softrst;
+
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_SOFTRST, MRF24J40_SOFTRST_RSTBB);
+    do {
+        softrst = mrf24j40_reg_read_short(dev, MRF24J40_REG_SOFTRST);
+    } while (softrst != 0);        /* wait until soft-reset has finished */
+}
+
 uint16_t mrf24j40_get_addr_short(mrf24j40_t *dev)
 {
     network_uint16_t naddr;
@@ -327,6 +337,32 @@ void mrf24j40_set_cca_threshold(mrf24j40_t *dev, int8_t value)
     }
 
     mrf24j40_reg_write_short(dev, MRF24J40_REG_CCAEDTH, RSSI_value[value]);
+}
+
+void mrf24j40_set_turbo(mrf24j40_t *dev, bool on)
+{
+    uint8_t tmp;
+    static const uint8_t cfg[2][2] = {
+        {0xD0, 0x80},   /* IEEE mode */
+        {0x30, 0x40}    /* Turbo mode */
+    };
+
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG0, on);
+
+    /* Set Preamble Search Energy Valid Threshold */
+    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_BBREG3) & 0xF;
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG3, tmp | cfg[on][0]);
+
+    /* Set Carrier Sense Threshold */
+    tmp = mrf24j40_reg_read_short(dev, MRF24J40_REG_BBREG4) & 0x1F;
+    mrf24j40_reg_write_short(dev, MRF24J40_REG_BBREG4, tmp | cfg[on][1]);
+
+    mrf24j40_baseband_reset(dev);
+}
+
+bool mrf24j40_get_turbo(mrf24j40_t *dev)
+{
+    return mrf24j40_reg_read_short(dev, MRF24J40_REG_BBREG0);
 }
 
 void mrf24j40_set_option(mrf24j40_t *dev, uint16_t option, bool state)

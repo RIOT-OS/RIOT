@@ -1,0 +1,5 @@
+INCLUDES += -I$(RIOTBOARD)/common/arduino-zero/include
+
+OPENOCD_CONFIG ?= $(RIOTBOARD)/common/arduino-zero/dist/openocd.cfg
+
+include $(RIOTMAKE)/boards/sam0.inc.mk

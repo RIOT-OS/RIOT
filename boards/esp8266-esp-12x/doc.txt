@@ -52,7 +52,15 @@ For detailed information about ESP8266 as well as configuring and compiling RIOT
 ## <a name="wemos_lolin_d1_mini"> WEMOS LOLIN D1 mini </a>
 
 
-[WEMOS LOLIN D1 mini](https://wiki.wemos.cc/products:retired:d1_mini_v2.2.0) is a very interesting board series as it offers a stackable ESP8266 platform. This board can be easily extended with a large number of compatible peripheral shields, e.g. a micro SD card shield, an IR controller shield, a battery shield, and various sensor and actuator shields, see [D1 mini shields](https://wiki.wemos.cc/start#d1_mini_shields) for more information. This makes it possible to create different hardware configurations without the need for a soldering iron or a breadboard.
+[WEMOS LOLIN D1 mini]
+(https://www.wemos.cc/en/latest/d1/d1_mini.html)
+is a very interesting board series as it offers a stackable ESP8266 platform.
+This board can be easily extended with a large number of compatible peripheral
+shields, e.g. a micro SD card shield, an IR controller shield, a battery
+shield, and various sensor and actuator shields, see [D1 mini shields]
+(https://docs.wemos.cc/en/latest/d1_mini_shiled/index.html) for more
+information. This makes it possible to create different hardware configurations
+without the need for a soldering iron or a breadboard.
 
 \htmlonly
 <style>div.image img[src="https://gitlab.com/gschorcht/RIOT.wiki-Images/raw/master/esp8266/Wemos_D1_mini_Stack.png?inline=false"]{width:400px;}</style>
@@ -68,7 +76,8 @@ There is also a MRF24J40 shield that can be used to extend the board with an IEE
 
 There are several versions of WEMOS LOLIN D1 mini, which only differ in the size of the flash memory and the MCU version used. All versions have a microUSB port with flash / boot / reset logic that makes flashing much easier. Their peripherals are equal and work with the default ESP8266 ESP-12x board definition.
 
-For more information, see [D1 Boards] (https://wiki.wemos.cc/start#d1_boards).
+For more information, see [D1 Boards]
+(https://docs.wemos.cc/en/latest/d1/d1_mini.html).
 
 <center>
 Board        | MCU       | Flash    | Antenna | Remark

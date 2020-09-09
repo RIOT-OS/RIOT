@@ -11,19 +11,21 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill \
     bluepill-128kib \
     calliope-mini \
-    cc1352-launchpad \
     cc2538dk \
     cc2650-launchpad \
     cc2650stk \
+    e104-bt5010a-tb \
     ek-lm4f120xl \
     esp8266-esp-12x \
     esp8266-olimex-mod \
     esp8266-sparkfun-thing \
     feather-m0 \
+    feather-m0-wifi \
     firefly \
     hamilton \
     i-nucleo-lrwan1 \
     ikea-tradfri \
+    im880b \
     limifrog-v1 \
     lobaro-lorabox \
     lsn50 \
@@ -44,10 +46,14 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f303k8 \
     nucleo-f334r8 \
     nucleo-f410rb \
+    nucleo-g070rb \
     nucleo-l031k6 \
     nucleo-l053r8 \
     nucleo-l073rz \
+    nucleo-l412kb \
     nz32-sc151 \
+    olimexino-stm32 \
+    omote \
     opencm904 \
     openmote-b \
     openmote-cc2538 \
@@ -64,6 +70,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     samr34-xpro \
     seeeduino_arch-pro \
     sensebox_samd21 \
+    serpente \
     slstk3401a \
     sltb001a \
     slwstk6000b-slwrb4150a \
@@ -72,11 +79,14 @@ BOARD_INSUFFICIENT_MEMORY := \
     sodaq-explorer \
     sodaq-one \
     sodaq-sara-aff \
+    sodaq-sara-sff \
     spark-core \
     stk3600 \
     stm32f030f4-demo \
     stm32f0discovery \
     stm32f3discovery \
     stm32l0538-disco \
+    wemos-zero \
+    yarm \
     yunjia-nrf51822 \
     #

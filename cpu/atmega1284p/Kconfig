@@ -1,0 +1,29 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+## CPU Models
+config CPU_MODEL_ATMEGA1284P
+    bool
+    select CPU_FAM_ATMEGA128
+    select HAS_ATMEGA_PCINT1
+    select HAS_ATMEGA_PCINT2
+    select HAS_ATMEGA_PCINT3
+    select HAS_CPU_ATMEGA1284P
+
+## Definition of specific features
+config HAS_CPU_ATMEGA1284P
+    bool
+    help
+        Indicates that a 'atmega1284p' cpu is being used.
+
+## Common CPU symbols
+config CPU_MODEL
+    default "atmega1284p" if CPU_MODEL_ATMEGA1284P
+
+config CPU
+    default "atmega1284p" if CPU_MODEL_ATMEGA1284P
+
+source "$(RIOTCPU)/atmega_common/Kconfig"

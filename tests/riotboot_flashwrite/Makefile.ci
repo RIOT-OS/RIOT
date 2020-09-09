@@ -4,7 +4,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mega2560 \
     arduino-uno \
     atmega328p \
-    chronos \
     i-nucleo-lrwan1 \
     msb-430 \
     msb-430h \
@@ -21,7 +20,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f0discovery \
     telosb \
     waspmote-pro \
-    wsn430-v1_3b \
-    wsn430-v1_4 \
     z1 \
     #

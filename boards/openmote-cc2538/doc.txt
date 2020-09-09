@@ -10,8 +10,8 @@ SoC combining an ARM Cortex-M3 microcontroller with an IEEE802.15.4 radio.
 
 ## Hardware
 
-![openmote](https://raw.githubusercontent.com/wiki/RIOT-
-OS/RIOT/images/openmote.jpg)
+![openmote]
+(https://raw.githubusercontent.com/wiki/RIOT-OS/RIOT/images/openmote.jpg)
 
 | MCU        | CC2538SF53        |
 |:------------- |:--------------------- |

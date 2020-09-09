@@ -15,6 +15,8 @@
  * @}
  */
 
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #include "event.h"
 #include "fmt.h"
 #include "kernel_defines.h"
@@ -122,8 +124,8 @@ static void _notify_link_speed(usbus_cdcecm_device_t *cdcecm)
     notification->setup.index = cdcecm->iface_ctrl.idx;
     notification->setup.length = 8;
 
-    notification->down = USBUS_CDC_ECM_CONFIG_SPEED_DOWNSTREAM;
-    notification->up = USBUS_CDC_ECM_CONFIG_SPEED_UPSTREAM;
+    notification->down = CONFIG_USBUS_CDC_ECM_CONFIG_SPEED_DOWNSTREAM;
+    notification->up = CONFIG_USBUS_CDC_ECM_CONFIG_SPEED_UPSTREAM;
     usbdev_ep_ready(cdcecm->ep_ctrl->ep,
                     sizeof(usb_desc_cdcecm_speed_t));
     cdcecm->notif = USBUS_CDCECM_NOTIF_SPEED;
@@ -314,8 +316,8 @@ static void _store_frame_chunk(usbus_cdcecm_device_t *cdcecm)
                   sizeof(size_t));
     memcpy(cdcecm->in_buf + cdcecm->len, buf, len);
     cdcecm->len += len;
-    if (len < USBUS_CDCECM_EP_DATA_SIZE && cdcecm->netdev.event_callback) {
-        cdcecm->netdev.event_callback(&cdcecm->netdev, NETDEV_EVENT_ISR);
+    if (len < USBUS_CDCECM_EP_DATA_SIZE) {
+        netdev_trigger_event_isr(&cdcecm->netdev);
     }
 }
 

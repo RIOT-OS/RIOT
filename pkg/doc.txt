@@ -14,6 +14,24 @@
  * INCLUDE += $(RIOTPKG)/<pkg_name>/...
  * ~~~~~~~~
  *
+ * When the package can be built out-of-source, the source code of external
+ * packages is fetched in a global location in:
+ *
+ * ~~~~~~~~ {.mk}
+ * $(RIOTBASE)/build/pkg/$(PKG_NAME)
+ * ~~~~~~~~
+ *
+ * When out-of-source build is not possible (for example because the package
+ * build system doesn't allow it), the source code is fetched in the build
+ * directory of the application under:
+ *
+ * ~~~~~~~~ {.mk}
+ * $(BINDIR)/pkg/$(PKG_NAME)
+ * ~~~~~~~~
+ *
+ * In this case, the source and the build directory are the same (currently,
+ * this applies to the micropython and openthread packages).
+ *
  * Porting an external library
  * ===========================
  * Structure of a package

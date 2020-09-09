@@ -3,19 +3,89 @@
 @ingroup     boards
 @brief       Support for the Digilent PIC32 WiFire
 
-For instructions on reflashing see:
+## Overview
 
-https://docs.creatordev.io/wifire/guides/wifire-programming/
+The ChipKit Wifire is a development board by Digilent featuring a PIC32MZ and a Wifi module (MRF24WG0MA).
+General information about the board can be found [here](https://store.digilentinc.com/wi-fire-wifi-enabled-pic32mz-microcontroller-board/)
+Please do not use board rev A or B as they use a different MCU (PIC32MZ2048ECG100).
 
-The RIOT build generates a hexfile compatible with MPLAB-IPE.
+Additional documents:
+  * [Schematics](https://reference.digilentinc.com/_media/reference/microprocessor/wi-fire/chipkit_wifire_sch.pdf) for the Wifire board rev C
+  * [Schematics](https://reference.digilentinc.com/_media/reference/microprocessor/wi-fire/wifire_sch.pdf) for the Wifire board rev D
+  * [Reference manual](https://reference.digilentinc.com/_media/reference/microprocessor/wi-fire/wi-fire_rm_revd.pdf) for the Wifire board rev D
 
-More general information on the board and related documentation can be found
-here:
+## Hardware
 
-https://creatordev.io/wifire.html
+### MCU
 
-https://docs.creatordev.io/wifire/
+| MCU        | PIC32MZ2048EFG100    |
+|:---------- |:-------------------- |
+| Family     | PIC32MZ (MIPS M5150) |
+| Vendor     | Microchip            |
+| RAM        | 512Kb                |
+| Flash      | 2048Kb               |
+| Frequency  | 200MHz               |
+| FPU        | yes                  |
+| Timers     | 9 (all 16-bit)       |
+| ADCs       | 1x 40-channel 12-bit |
+| USB 2.0    | 1                    |
+| UARTs      | 6                    |
+| SPIs       | 6                    |
+| I2Cs       | 5                    |
+| RTC        | yes                  |
+| RNG        | yes                  |
+| Vcc        | 2.1V - 3.6V          |
+| Datasheet  | [Datasheet](http://ww1.microchip.com/downloads/en/DeviceDoc/PIC32MZ%20EF%20Family%20Datasheet_DS60001320G.pdf) |
 
 
+### User Interface
+
+3 Buttons:
+
+| NAME   | Reset  |  T1 |  T2 |
+|:-----  |:------ |:--- |:--- |
+| Pin    | nReset | RA5 | RA4 |
+
+4 LEDs:
+
+| NAME  | LD1   | LD2   | LD3   | LD4   |
+| ----- | ----- | ----- | ----- | ----- |
+| Color | green | green | green | green |
+| Pin   | RG6   | RD4   | RB11  | RG15  |
+
+## Implementation Status
+
+| Device           | ID                | Supported | Comments               |
+|:---------------- |:---------------   |:--------- |:---------------------- |
+| MCU              | pic32mz2048efg100 | partly    |                        |
+| Low-level driver | GPIO              | partly    | gpio_irq not supported |
+|                  | ADC               | no        |                        |
+|                  | PWM               | no        |                        |
+|                  | UART              | yes       |                        |
+|                  | I2C               | no        |                        |
+|                  | SPI               | no        |                        |
+|                  | USB               | no        |                        |
+|                  | RTT               | no        |                        |
+|                  | RTC               | no        |                        |
+|                  | RNG               | yes       |                        |
+|                  | Timer             | no        |                        |
+
+## Using UART
+
+This board opens a serial interface through the USB automatically.
+
+## Flashing the device
+
+There are three ways to flash the MCU:
+  * Using MPLAB-IPE and a PICkit 3 (The RIOT build generates a hexfile
+    compatible with MPLAB-IPE)
+  * Using pic32prog and a PICkit 2 or a PICkit 3 (other devices might be
+    supported by pic32prog but were not tested).
+  * Using a SEGGER J-Link probe. JTAG pins are available on the JP3 connector.
+
+## Supported Toolchains
+
+For using the pic32-wifire board we strongly recommend the usage of the
+[Codescape GNU Tools](https://codescape.mips.com) toolchain.
 
  */

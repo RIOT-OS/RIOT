@@ -172,6 +172,13 @@ int lis2dh12_read(const lis2dh12_t *dev, int16_t *data)
 
     /* read sampled data from the device */
     _acquire(dev);
+
+    /* first check if valid data is available */
+    if ((_read(dev, REG_STATUS_REG) & LIS2DH12_STATUS_ZYXDA) == 0) {
+        _release(dev);
+        return LIS2DH12_NODATA;
+    }
+
     _read_burst(dev, REG_OUT_X_L, raw, 6);
     _release(dev);
 
@@ -186,6 +193,78 @@ int lis2dh12_read(const lis2dh12_t *dev, int16_t *data)
 
     return LIS2DH12_OK;
 }
+
+#ifdef MODULE_LIS2DH12_INT
+int lis2dh12_set_int(const lis2dh12_t *dev, const lis2dh12_int_params_t *params, uint8_t int_line)
+{
+    assert (int_line == LIS2DH12_INT1 || int_line == LIS2DH12_INT2);
+    assert (dev && params->int_config && params->int_type);
+    assert (params->int_threshold >= 0);
+    assert (params->int_duration >= 0);
+
+    _acquire(dev);
+
+    gpio_t pin = GPIO_UNDEF;
+
+    switch (int_line){
+        /* first interrupt line (INT1) */
+        case LIS2DH12_INT1:
+            pin = dev->p->int1_pin;
+            assert (gpio_is_valid(pin));
+
+            if (gpio_init_int(pin, GPIO_IN, GPIO_RISING, params->cb, params->arg)) {
+                return LIS2DH12_NOINT;
+            }
+
+            _write(dev, REG_CTRL_REG3, params->int_type);
+            _write(dev, REG_INT1_CFG, params->int_config);
+            _write(dev, REG_INT1_THS, params->int_threshold);
+            _write(dev, REG_INT1_DURATION, params->int_duration);
+            break;
+        /* second interrupt line (INT2) */
+        case LIS2DH12_INT2:
+            pin = dev->p->int2_pin;
+            assert (gpio_is_valid(pin));
+
+            if (gpio_init_int(pin, GPIO_IN, GPIO_RISING, params->cb, params->arg)) {
+                return LIS2DH12_NOINT;
+            }
+
+            _write(dev, REG_CTRL_REG6, params->int_type);
+            _write(dev, REG_INT2_CFG, params->int_config);
+            _write(dev, REG_INT2_THS, params->int_threshold);
+            _write(dev, REG_INT2_DURATION, params->int_duration);
+            break;
+    }
+
+    _release(dev);
+
+    return LIS2DH12_OK;
+}
+
+int lis2dh12_read_int_src(const lis2dh12_t *dev, uint8_t *data, uint8_t int_line)
+{
+    assert(dev && data);
+    assert(int_line == LIS2DH12_INT1 || int_line == LIS2DH12_INT2);
+
+    _acquire(dev);
+
+    switch (int_line) {
+        /* first interrupt line (INT1) */
+        case LIS2DH12_INT1:
+            *data = _read(dev, REG_INT1_SRC);
+            break;
+        /* second interrupt line (INT2) */
+        case LIS2DH12_INT2:
+            *data = _read(dev, REG_INT2_SRC);
+            break;
+    }
+
+    _release(dev);
+
+    return LIS2DH12_OK;
+}
+#endif /* MODULE_LIS2DH12_INT */
 
 int lis2dh12_poweron(const lis2dh12_t *dev)
 {

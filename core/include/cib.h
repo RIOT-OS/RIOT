@@ -7,7 +7,7 @@
  * directory for more details.
  */
 
- /**
+/**
  * @ingroup     core_util
  * @{
  *
@@ -39,15 +39,20 @@ typedef struct {
 
 /**
  * @brief   Initialize cib_t to a given size.
+ *
+ * @param[in]  SIZE     Size of the buffer, must not exceed
+ *                      (`UINT_MAX` + 1) / 2.
+ *                      Should be equal to 0 or power of 2.
  */
-#define CIB_INIT(SIZE) { 0, 0, (SIZE) - 1 }
+#define CIB_INIT(SIZE) { 0, 0, (SIZE)-1 }
 
 /**
  * @brief Initialize @p cib to 0 and set buffer size to @p size.
  *
  * @param[out] cib      Buffer to initialize.
  *                      Must not be NULL.
- * @param[in]  size     Size of the buffer, must not exceed MAXINT/2.
+ * @param[in]  size     Size of the buffer, must not exceed
+ *                      (`UINT_MAX` + 1) / 2.
  *                      Should be equal to 0 or power of 2.
  */
 static inline void cib_init(cib_t *__restrict cib, unsigned int size)
@@ -80,7 +85,7 @@ static inline unsigned int cib_avail(const cib_t *cib)
  */
 static inline unsigned int cib_full(const cib_t *cib)
 {
-    return ((int) cib_avail(cib)) > ((int) cib->mask);
+    return ((int)cib_avail(cib)) > ((int)cib->mask);
 }
 
 /**
@@ -93,7 +98,7 @@ static inline unsigned int cib_full(const cib_t *cib)
 static inline int cib_get(cib_t *__restrict cib)
 {
     if (cib_avail(cib)) {
-        return (int) (cib->read_count++ & cib->mask);
+        return (int)(cib->read_count++ & cib->mask);
     }
 
     return -1;
@@ -109,7 +114,7 @@ static inline int cib_get(cib_t *__restrict cib)
 static inline int cib_peek(cib_t *__restrict cib)
 {
     if (cib_avail(cib)) {
-        return (int) (cib->read_count & cib->mask);
+        return (int)(cib->read_count & cib->mask);
     }
 
     return -1;
@@ -126,7 +131,7 @@ static inline int cib_peek(cib_t *__restrict cib)
  */
 static inline int cib_get_unsafe(cib_t *cib)
 {
-        return (int) (cib->read_count++ & cib->mask);
+    return (int)(cib->read_count++ & cib->mask);
 }
 
 /**
@@ -141,8 +146,8 @@ static inline int cib_put(cib_t *__restrict cib)
     unsigned int avail = cib_avail(cib);
 
     /* We use a signed compare, because the mask is -1u for an empty CIB. */
-    if ((int) avail <= (int) cib->mask) {
-        return (int) (cib->write_count++ & cib->mask);
+    if ((int)avail <= (int)cib->mask) {
+        return (int)(cib->write_count++ & cib->mask);
     }
 
     return -1;
@@ -159,7 +164,7 @@ static inline int cib_put(cib_t *__restrict cib)
  */
 static inline int cib_put_unsafe(cib_t *cib)
 {
-    return (int) (cib->write_count++ & cib->mask);
+    return (int)(cib->write_count++ & cib->mask);
 }
 
 #ifdef __cplusplus

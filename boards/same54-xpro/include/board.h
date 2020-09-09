@@ -21,10 +21,44 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "at24mac.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @name    AT24MAC402 configuration
+ * @{
+ */
+#define AT24MAC_PARAM_I2C_DEV   I2C_DEV(1)
+#define AT24MAC_PARAM_I2C_ADDR  (0x5E)
+#define AT24MAC_PARAM_TYPE      AT24MAC4XX
+#define AT24CXXX_PARAM_ADDR     (0x56)
+/** @} */
+
+/**
+ * @name    ATECC508A configuration
+ * @{
+ */
+#define ATCA_PARAM_I2C           I2C_DEV(1)
+/** @} */
+
+/**
+ * @brief    AT24Mac provides a EUI-48
+ */
+static inline int _at24mac_get_eui48(const void *arg, eui48_t *addr)
+{
+    return at24mac_get_eui48((uintptr_t)arg, addr);
+}
+
+/**
+ * @name    EUI-48 sources on the board
+ *          AT24Mac is present on the board
+ * @{
+ */
+#define EUI48_PROVIDER_FUNC   _at24mac_get_eui48
+/** @} */
 
 /**
  * @name   LED pin definitions and handlers

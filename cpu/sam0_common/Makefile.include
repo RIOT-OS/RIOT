@@ -1,21 +1,22 @@
 # Define the CPU family so we can differentiate between them in the code
 CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 
-# Set ROM and RAM lengths according to CPU model
-ifneq (,$(filter samd21g18a samd21j18a saml21j18b saml21j18a samr21e18a \
-        samr21g18a samr30g18a samr34j18b,$(CPU_MODEL)))
+# Generate ASF compatible model definition
+CFLAGS += -D__$(call uppercase_and_underscore,$(CPU_MODEL))__
 
-  ROM_LEN ?= 0x40000
-  RAM_LEN ?= 0x8000
-endif
-ifneq (,$(filter saml10e16a saml11e16a,$(CPU_MODEL)))
-  ROM_LEN ?= 64K
-  RAM_LEN ?= 16K
-endif
-ifneq (,$(filter samd51j20a same54p20a,$(CPU_MODEL)))
-  ROM_LEN ?= 1024K
-  RAM_LEN ?= 256K
-endif
+# Compute CPU_LINE
+LINE   := $(shell echo $(CPU_MODEL) | sed -E -e 's/^sam([a-z][0-9][0-9])(.)([0-9][0-9])(.)/\1 \2 \3 \4/')
+FAMILY := $(word 1, $(LINE))
+TYPE1  := $(word 2, $(LINE))
+MEMORY := $(word 3, $(LINE))
+TYPE2  := $(word 4, $(LINE))
+
+# ROM length is directly encoded in the part number
+ROM_LEN := $(shell echo $$((1 << $(MEMORY))))
+
+# get vendor file to extract RAM length
+VENDOR_FILE := $(shell find $(RIOTCPU)/sam0_common/include/vendor/sam$(FAMILY) -name $(CPU_MODEL).h | grep include.*/sam)
+RAM_LEN := $(shell sed -E -n 's/\#define (HMCRAMC0_SIZE|HSRAM_SIZE).*(0x[[:xdigit:]]*).*/\2/p' $(VENDOR_FILE))
 
 ROM_START_ADDR ?= 0x00000000
 RAM_START_ADDR ?= 0x20000000
@@ -28,7 +29,7 @@ CFLAGS += -DDONT_USE_PREDEFINED_PERIPHERALS_HANDLERS
 # For Cortex-M cpu we use the common cortexm.ld linker script
 LINKER_SCRIPT ?= cortexm.ld
 
-# include sam0 common periph drivers
-USEMODULE += sam0_common_periph
-
 INCLUDES += -I$(RIOTCPU)/sam0_common/include
+
+PSEUDOMODULES += periph_rtc
+PSEUDOMODULES += periph_rtt

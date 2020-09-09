@@ -17,6 +17,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Daniel Krebs <github@daniel-krebs.net>
  * @author      Joakim Gebart <joakim.gebart@eistec.se>
+ * @author      Sören Tempel <tempel@uni-bremen.de>
  *
  * @}
  */
@@ -31,6 +32,7 @@
 #include "board.h"
 #include "mpu.h"
 #include "panic.h"
+#include "sched.h"
 #include "vectors_cortexm.h"
 #ifdef MODULE_PUF_SRAM
 #include "puf_sram.h"
@@ -139,16 +141,33 @@ void reset_handler_default(void)
     }
 #endif /* CPU_HAS_BACKUP_RAM */
 
+#ifdef MODULE_MPU_NOEXEC_RAM
+    /* Mark the RAM non executable. This is a protection mechanism which
+     * makes exploitation of buffer overflows significantly harder.
+     *
+     * This marks the memory region from 0x20000000 to 0x3FFFFFFF as non
+     * executable. This is the Cortex-M SRAM region used for on-chip RAM.
+     */
+    mpu_configure(
+        0,                                               /* Region 0 (lowest priority) */
+        (uintptr_t)&_sram,                               /* RAM base address */
+        MPU_ATTR(1, AP_RW_RW, 0, 1, 0, 1, MPU_SIZE_512M) /* Allow read/write but no exec */
+    );
+#endif
+
 #ifdef MODULE_MPU_STACK_GUARD
     if (((uintptr_t)&_sstack) != SRAM_BASE) {
         mpu_configure(
-            0,                                              /* MPU region 0 */
+            1,                                              /* MPU region 1 */
             (uintptr_t)&_sstack + 31,                       /* Base Address (rounded up) */
             MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B) /* Attributes and Size */
         );
 
-        mpu_enable();
     }
+#endif
+
+#if defined(MODULE_MPU_STACK_GUARD) || defined(MODULE_MPU_NOEXEC_RAM)
+    mpu_enable();
 #endif
 
     post_startup();
@@ -156,7 +175,7 @@ void reset_handler_default(void)
     /* initialize the board (which also initiates CPU initialization) */
     board_init();
 
-#if MODULE_NEWLIB
+#if MODULE_NEWLIB || MODULE_PICOLIBC
     /* initialize std-c library (this must be done after board_init) */
     extern void __libc_init_array(void);
     __libc_init_array();
@@ -222,7 +241,7 @@ __attribute__((naked)) void hard_fault_default(void)
         " use_psp:                          \n" /* else {                     */
         "mrs r0, psp                        \n" /*   r0 = psp                 */
         " out:                              \n" /* }                          */
-#if (defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS)) \
+#if (defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS)) \
     && defined(MODULE_CPU_CHECK_ADDRESS)
         /* catch intended HardFaults on Cortex-M0 to probe memory addresses */
         "ldr     r1, [r0, #0x04]            \n" /* read R1 from the stack        */
@@ -240,8 +259,8 @@ __attribute__((naked)) void hard_fault_default(void)
         "bx      lr                         \n" /* exit the exception handler    */
         " regular_handler:                  \n"
 #endif
-#if defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS) \
-    || defined(CPU_ARCH_CORTEX_M23)
+#if defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS) \
+    || defined(CPU_CORE_CORTEX_M23)
         "push {r4-r7}                       \n" /* save r4..r7 to the stack   */
         "mov r3, r8                         \n" /*                            */
         "mov r4, r9                         \n" /*                            */
@@ -261,8 +280,8 @@ __attribute__((naked)) void hard_fault_default(void)
     );
 }
 
-#if defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS) \
-    || defined(CPU_ARCH_CORTEX_M23)
+#if defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS) \
+    || defined(CPU_CORE_CORTEX_M23)
 /* Cortex-M0, Cortex-M0+ and Cortex-M23 lack the extended fault status
    registers found in Cortex-M3 and above. */
 #define CPU_HAS_EXTENDED_FAULT_REGISTERS 0
@@ -354,6 +373,20 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
     printf("EXC_RET: 0x%08" PRIx32 "\n", exc_return);
 
     if (!corrupted) {
+        /* Test if the EXC_RETURN returns to thread mode,
+         * to check if the hard fault happened in ISR context */
+        if (exc_return & 0x08) {
+            kernel_pid_t active_pid = thread_getpid();
+            printf("Active thread: %"PRIi16" \"%s\"\n",
+                   active_pid, thread_getname(active_pid));
+        }
+        else {
+            /* Print the interrupt number, NMI being -14, hardfault is -13,
+             * IRQ0 is 0 and so on */
+            uint32_t psr = sp[7];  /* Program status register. */
+            printf("Hard fault occured in ISR number %d\n",
+                   (int)(psr & 0xff) - 16);
+        }
         puts("Attempting to reconstruct state for debugging...");
         printf("In GDB:\n  set $pc=0x%" PRIx32 "\n  frame 0\n  bt\n", pc);
         int stack_left = _stack_size_left(HARDFAULT_HANDLER_REQUIRED_STACK_SPACE);
@@ -370,8 +403,8 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
             "mov lr, r1\n"
             "mov sp, %[orig_sp]\n"
             "mov r1, %[extra_stack]\n"
-#if defined(CPU_ARCH_CORTEX_M0) || defined(CPU_ARCH_CORTEX_M0PLUS) \
-    || defined(CPU_ARCH_CORTEX_M23)
+#if defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS) \
+    || defined(CPU_CORE_CORTEX_M23)
             "ldm r1!, {r4-r7}\n"
             "mov r8, r4\n"
             "mov r9, r5\n"
@@ -404,8 +437,8 @@ void hard_fault_default(void)
 
 #endif /* DEVELHELP */
 
-#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
-    defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
+#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M4) || \
+    defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)
 void mem_manage_default(void)
 {
     core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER");
@@ -437,7 +470,9 @@ __attribute__((weak,alias("dummy_handler_default"))) void isr_svc(void);
 __attribute__((weak,alias("dummy_handler_default"))) void isr_pendsv(void);
 __attribute__((weak,alias("dummy_handler_default"))) void isr_systick(void);
 
-/* define Cortex-M base interrupt vectors */
+/* define Cortex-M base interrupt vectors
+ * IRQ entries -9 to -6 inclusive (offsets 0x1c to 0x2c of cortexm_base_t)
+ * are reserved entries. */
 ISR_VECTOR(0) const cortexm_base_t cortex_vector_base = {
     &_estack,
     {
@@ -454,9 +489,23 @@ ISR_VECTOR(0) const cortexm_base_t cortex_vector_base = {
         /* [-1] SysTick interrupt, not used in RIOT */
         [14] = isr_systick,
 
+        /* -9 to -6 reserved entries can be defined by the cpu module */
+        #ifdef CORTEXM_VECTOR_RESERVED_0X1C
+        [6] = (isr_t)(CORTEXM_VECTOR_RESERVED_0X1C),
+        #endif  /* CORTEXM_VECTOR_RESERVED_0X1C */
+        #ifdef CORTEXM_VECTOR_RESERVED_0X20
+        [7] = (isr_t)(CORTEXM_VECTOR_RESERVED_0X20),
+        #endif  /* CORTEXM_VECTOR_RESERVED_0X20 */
+        #ifdef CORTEXM_VECTOR_RESERVED_0X24
+        [8] = (isr_t)(CORTEXM_VECTOR_RESERVED_0X24),
+        #endif  /* CORTEXM_VECTOR_RESERVED_0X24 */
+        #ifdef CORTEXM_VECTOR_RESERVED_0X28
+        [9] = (isr_t)(CORTEXM_VECTOR_RESERVED_0X28),
+        #endif  /* CORTEXM_VECTOR_RESERVED_0X28 */
+
         /* additional vectors used by M3, M4(F), and M7 */
-#if defined(CPU_ARCH_CORTEX_M3) || defined(CPU_ARCH_CORTEX_M4) || \
-    defined(CPU_ARCH_CORTEX_M4F) || defined(CPU_ARCH_CORTEX_M7)
+#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M4) || \
+    defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)
         /* [-12] memory manage exception */
         [ 3] = mem_manage_default,
         /* [-11] bus fault exception */

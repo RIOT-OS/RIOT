@@ -20,24 +20,22 @@ USEMODULE += shell
 USEMODULE += shell_commands
 
 USEPKG += tinydtls
+# tinydtls needs crypto secure PRNG
+USEMODULE += prng_sha1prng
 
 # UDP Port to use (20220 is default for DTLS).
 DTLS_PORT ?= 20220
 CFLAGS += -DDTLS_DEFAULT_PORT=$(DTLS_PORT)
 
-# NOTE: If not cipher suite is selected, DTLS_PSK is used by default.
+# NOTE: If no cipher suite is selected, CONFIG_DTLS_PSK is used by default.
+# This section should be commented out if using Kconfig
 # This adds support for TLS_PSK_WITH_AES_128_CCM_8
-# CFLAGS += -DDTLS_PSK
+# CFLAGS += -DCONFIG_DTLS_PSK
 # This adds support for TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8
-# CFLAGS += -DDTLS_ECC
-
-# Define the log entry for the tinydtls package.
-# Values: 0:EMERG (Default), 1:ALERT 2:CRIT 3:WARN 4:NOTICE 5:INFO 6:DEBUG
-TINYDTLS_LOG ?= 0
+# CFLAGS += -DCONFIG_DTLS_ECC
 
 # Enable this line for setting tinyDTLS in debug mode.
-# This overrides TINYDTLS_LOG to 6
-# CFLAGS += -DTINYDTLS_DEBUG
+# CFLAGS += -DCONFIG_DTLS_DEBUG
 
 # FIXME: This is a temporary patch
 # TinyDTLS <= 0.8.6 requires around 426 bytes in RAM.

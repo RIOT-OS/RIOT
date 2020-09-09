@@ -1,2 +1,0 @@
-SRC := umorse.c print.c
-include $(RIOTBASE)/Makefile.base

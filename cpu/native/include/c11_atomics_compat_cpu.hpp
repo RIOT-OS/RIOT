@@ -41,10 +41,17 @@
 #define ATOMIC_INT_LEAST64_T_SAME_SIZED_TYPE            uint64_t
 #define ATOMIC_UINT_LEAST64_T_SIZE                      (8U)
 #define ATOMIC_UINT_LEAST64_T_SAME_SIZED_TYPE           uint64_t
+#ifdef __FreeBSD__
+#define ATOMIC_INT_FAST8_T_SIZE                         (4U)
+#define ATOMIC_INT_FAST8_T_SAME_SIZED_TYPE              uint32_t
+#define ATOMIC_UINT_FAST8_T_SIZE                        (4U)
+#define ATOMIC_UINT_FAST8_T_SAME_SIZED_TYPE             uint32_t
+#else
 #define ATOMIC_INT_FAST8_T_SIZE                         (1U)
 #define ATOMIC_INT_FAST8_T_SAME_SIZED_TYPE              uint8_t
 #define ATOMIC_UINT_FAST8_T_SIZE                        (1U)
 #define ATOMIC_UINT_FAST8_T_SAME_SIZED_TYPE             uint8_t
+#endif
 #define ATOMIC_INT_FAST16_T_SIZE                        (4U)
 #define ATOMIC_INT_FAST16_T_SAME_SIZED_TYPE             uint32_t
 #define ATOMIC_UINT_FAST16_T_SIZE                       (4U)

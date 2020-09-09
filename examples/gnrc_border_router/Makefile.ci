@@ -13,13 +13,13 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill \
     bluepill-128kib \
     calliope-mini \
-    cc1352-launchpad \
     cc2650-launchpad \
     cc2650stk \
     derfmega128 \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \
+    im880b \
     lsn50 \
     maple-mini \
     mega-xplained \
@@ -42,6 +42,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l031k6 \
     nucleo-l053r8 \
     nucleo-l073rz \
+    olimexino-stm32 \
     opencm904 \
     saml10-xpro \
     saml11-xpro \
@@ -52,8 +53,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     telosb \
     waspmote-pro \
     weio \
-    wsn430-v1_3b \
-    wsn430-v1_4 \
     yunjia-nrf51822 \
     z1 \
     #

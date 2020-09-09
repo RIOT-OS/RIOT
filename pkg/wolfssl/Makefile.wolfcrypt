@@ -1,9 +1,12 @@
 MODULE = wolfcrypt
 
-SUBMODULES += 1
+CFLAGS += -Wno-unused
 
-# Do not fail for module that do not have a file
-SUBMODULES_NOFORCE = 1
+ifeq (llvm,$(TOOLCHAIN))
+  CFLAGS += -Wno-unused-parameter
+endif
+
+SUBMODULES += 1
 
 NO_AUTO_SRC = 1
 

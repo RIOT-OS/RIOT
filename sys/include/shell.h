@@ -21,6 +21,7 @@
 #define SHELL_H
 
 #include <stdint.h>
+#include "periph/pm.h"
 
 #include "kernel_defines.h"
 
@@ -29,9 +30,54 @@ extern "C" {
 #endif
 
 /**
+ * @brief Shutdown RIOT on shell exit
+ */
+#ifndef CONFIG_SHELL_SHUTDOWN_ON_EXIT
+/* Some systems (e.g Ubuntu 20.04) close stdin on CTRL-D / EOF
+ * That means we can't just re-start the shell.
+ * Instead terminate RIOT, which is also the behavior a user would
+ * expect from a CLI application.
+ */
+#  ifdef CPU_NATIVE
+#    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 1
+#  endif
+#endif
+
+/**
  * @brief Default shell buffer size (maximum line length shell can handle)
  */
 #define SHELL_DEFAULT_BUFSIZE   (128)
+
+/**
+ * @brief           Optional hook after readline has triggered.
+ * @details         User implemented function gets called after the shell
+ *                  readline is complete.
+ * @note            Only executed with the `shell_hooks` module.
+ */
+void shell_post_readline_hook(void);
+
+/**
+ * @brief           Optional hook before shell command is called.
+ * @details         User implemented function gets called before a valid shell
+ *                  command will be called.
+ * @note            Only executed with the `shell_hooks` module.
+ *
+ * @param[in]       argc   Number of arguments supplied to the function invocation.
+ * @param[in]       argv   The supplied argument list.
+ */
+void shell_pre_command_hook(int argc, char **argv);
+
+/**
+ * @brief           Optional hook after shell command is called.
+ * @details         User implemented function gets called before a valid shell
+ *                  command will be called.
+ * @note            Only executed with the `shell_hooks` module.
+ *
+ * @param[in]       ret    Return value of the shell command.
+ * @param[in]       argc   Number of arguments supplied to the function invocation.
+ * @param[in]       argv   The supplied argument list.
+ */
+void shell_post_command_hook(int ret, int argc, char **argv);
 
 /**
  * @brief           Protype of a shell callback handler.
@@ -75,6 +121,9 @@ void shell_run_once(const shell_command_t *commands, char *line_buf, int len);
 /**
  * @brief           Start a shell and restart it if it exits
  *
+ *                  If `CONFIG_SHELL_SHUTDOWN_ON_EXIT` is set (e.g. on native)
+ *                  the shell will instead shut down RIOT once EOF is reached.
+ *
  * @param[in]       commands    ptr to array of command structs
  * @param[in]       line_buf    Buffer that will be used for reading a line
  * @param[in]       len         nr of bytes that fit in line_buf
@@ -84,6 +133,10 @@ static inline void shell_run_forever(const shell_command_t *commands,
 {
     while (1) {
         shell_run_once(commands, line_buf, len);
+
+        if (IS_ACTIVE(CONFIG_SHELL_SHUTDOWN_ON_EXIT)) {
+            pm_off();
+        }
     }
 }
 

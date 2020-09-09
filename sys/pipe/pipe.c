@@ -69,9 +69,9 @@ static ssize_t pipe_rw(ringbuffer_t *rb,
             return 0;
         }
         else {
-            *this_op_blocked = (thread_t *) sched_active_thread;
+            *this_op_blocked = thread_get_active();
 
-            sched_set_status((thread_t *) sched_active_thread, STATUS_SLEEPING);
+            sched_set_status(thread_get_active(), STATUS_SLEEPING);
             irq_restore(old_state);
             thread_yield_higher();
         }

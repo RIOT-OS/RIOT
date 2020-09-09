@@ -15,6 +15,9 @@
  * @author  Koen Zandberg <koen@bergzand.net>
  * @}
  */
+
+#define USB_H_USER_IS_RIOT_INTERNAL
+
 #include "periph/usbdev.h"
 #include "usb/descriptor.h"
 #include "usb/usbus.h"
@@ -123,7 +126,7 @@ static int _req_str(usbus_t *usbus, uint16_t idx)
             desc.length = sizeof(uint16_t) + sizeof(usb_descriptor_string_t);
             usbus_control_slicer_put_bytes(usbus, (uint8_t *)&desc, sizeof(desc));
             /* Only one language ID supported */
-            uint16_t us = USB_CONFIG_DEFAULT_LANGID;
+            uint16_t us = CONFIG_USB_DEFAULT_LANGID;
             usbus_control_slicer_put_bytes(usbus, (uint8_t *)&us, sizeof(uint16_t));
             res = 1;
         }
@@ -328,9 +331,9 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     ep0_handler->control_request_state = USBUS_CONTROL_REQUEST_STATE_READY;
 
     ep0_handler->in = usbus_add_endpoint(usbus, NULL, USB_EP_TYPE_CONTROL,
-                                         USB_EP_DIR_IN, USBUS_EP0_SIZE)->ep;
+                                         USB_EP_DIR_IN, CONFIG_USBUS_EP0_SIZE)->ep;
     ep0_handler->out = usbus_add_endpoint(usbus, NULL, USB_EP_TYPE_CONTROL,
-                                          USB_EP_DIR_OUT, USBUS_EP0_SIZE)->ep;
+                                          USB_EP_DIR_OUT, CONFIG_USBUS_EP0_SIZE)->ep;
 }
 
 static int _handle_tr_complete(usbus_t *usbus,

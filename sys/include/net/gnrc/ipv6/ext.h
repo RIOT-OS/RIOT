@@ -40,9 +40,9 @@ extern "C" {
 #endif
 
 /**
- * @defgroup    net_gnrc_ipv6_ext_conf IPv6 extension header compile configurations
+ * @defgroup    net_gnrc_ipv6_ext_conf GNRC IPv6 extension header compile configurations
  * @ingroup     net_gnrc_ipv6_ext
- * @ingroup     config
+ * @ingroup     net_gnrc_conf
  * @{
  */
 /**
@@ -52,8 +52,8 @@ extern "C" {
  *
  * @note    Only applicable with [gnrc_ipv6_ext_frag](@ref net_gnrc_ipv6_ext_frag) module
  */
-#ifndef GNRC_IPV6_EXT_FRAG_SEND_SIZE
-#define GNRC_IPV6_EXT_FRAG_SEND_SIZE    (1U)
+#ifndef CONFIG_GNRC_IPV6_EXT_FRAG_SEND_SIZE
+#define CONFIG_GNRC_IPV6_EXT_FRAG_SEND_SIZE    (1U)
 #endif
 
 /**
@@ -63,8 +63,8 @@ extern "C" {
  *
  * @note    Only applicable with [gnrc_ipv6_ext_frag](@ref net_gnrc_ipv6_ext_frag) module
  */
-#ifndef GNRC_IPV6_EXT_FRAG_RBUF_SIZE
-#define GNRC_IPV6_EXT_FRAG_RBUF_SIZE        (1U)
+#ifndef CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE
+#define CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE        (1U)
 #endif
 
 /**
@@ -75,8 +75,8 @@ extern "C" {
  *
  * @note    Only applicable with [gnrc_ipv6_ext_frag](@ref net_gnrc_ipv6_ext_frag) module
  */
-#ifndef GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE
-#define GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE (GNRC_IPV6_EXT_FRAG_RBUF_SIZE * 2U)
+#ifndef CONFIG_GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE
+#define CONFIG_GNRC_IPV6_EXT_FRAG_LIMITS_POOL_SIZE (CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_SIZE * 2U)
 #endif
 
 /**
@@ -84,8 +84,21 @@ extern "C" {
  *
  * @note    Only applicable with [gnrc_ipv6_ext_frag](@ref net_gnrc_ipv6_ext_frag) module
  */
-#ifndef GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US
-#define GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US  (10U * US_PER_SEC)
+#ifndef CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US
+#define CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_TIMEOUT_US  (10U * US_PER_SEC)
+#endif
+
+/**
+ * @brief   Do not override oldest datagram when reassembly buffer is full
+ *
+ * @note    Only applicable with [gnrc_ipv6_ext_frag](@ref net_gnrc_ipv6_ext_frag) module
+ *
+ * When not set, it will cause the reassembly buffer to override the oldest
+ * entry when a fragment for a new datagram is received. When set to 1, no entry
+ * will be overwritten (they will still timeout normally)
+ */
+#ifdef DOXYGEN
+#define CONFIG_GNRC_IPV6_EXT_FRAG_RBUF_DO_NOT_OVERRIDE
 #endif
 
 /** @} **/

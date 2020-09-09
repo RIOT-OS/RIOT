@@ -1,0 +1,17 @@
+INCLUDES += -I$(PKGDIRBASE)/utensor
+INCLUDES += -I$(PKGDIRBASE)/utensor/src
+INCLUDES += -I$(PKGDIRBASE)/utensor/src/uTensor
+INCLUDES += -I$(PKGDIRBASE)/utensor/src/uTensor/core
+INCLUDES += -I$(PKGDIRBASE)/utensor/src/uTensor/ops
+INCLUDES += -I$(PKGDIRBASE)/utensor/src/uTensor/util
+
+CXXEXFLAGS += -Wno-sign-compare
+
+ifeq (llvm,$(TOOLCHAIN))
+  CXXEXFLAGS += -Wno-unused-variable
+  CXXEXFLAGS += -Wno-shift-count-negative
+endif
+
+ifneq (native,$(BOARD))
+  CXXEXFLAGS += -std=c++11
+endif

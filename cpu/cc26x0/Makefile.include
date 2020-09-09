@@ -1,4 +1,3 @@
-CPU_ARCH = cortex-m3
 CPU_VARIANT = x0
 
 VECTORS_O = $(BINDIR)/cc26xx_cc13xx/vectors.o

@@ -253,8 +253,7 @@ static void on_int(void *arg)
     /* disable global interrupt enable bit to avoid losing interrupts */
     cmd_bfc((enc28j60_t *)arg, REG_EIE, -1, EIE_INTIE);
 
-    netdev_t *netdev = (netdev_t *)arg;
-    netdev->event_callback(arg, NETDEV_EVENT_ISR);
+    netdev_trigger_event_isr(arg);
 }
 
 static int nd_send(netdev_t *netdev, const iolist_t *iolist)
@@ -506,7 +505,7 @@ static int nd_get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             assert(max_len >= ETHERNET_ADDR_LEN);
             mac_get(dev, (uint8_t *)value);
             return ETHERNET_ADDR_LEN;
-        case NETOPT_LINK_CONNECTED:
+        case NETOPT_LINK:
             if (cmd_r_phy(dev, REG_PHY_PHSTAT2) & PHSTAT2_LSTAT) {
                 *((netopt_enable_t *)value) = NETOPT_ENABLE;
             }

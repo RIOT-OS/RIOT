@@ -14,6 +14,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <kernel_defines.h>
 #include <stdbool.h>
 
 #include "byteorder.h"
@@ -174,7 +175,7 @@ static void *_event_loop(void *args)
 {
     msg_t msg, reply, msg_q[GNRC_IPV6_MSG_QUEUE_SIZE];
     gnrc_netreg_entry_t me_reg = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                                            sched_active_pid);
+                                                            thread_getpid());
 
     (void)args;
     msg_init_queue(msg_q, GNRC_IPV6_MSG_QUEUE_SIZE);
@@ -285,7 +286,7 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         return;
     }
 #endif
-    if (gnrc_netapi_send(netif->pid, pkt) < 1) {
+    if (gnrc_netif_send(netif, pkt) < 1) {
         DEBUG("ipv6: unable to send packet\n");
         gnrc_pktbuf_release(pkt);
     }
@@ -354,7 +355,7 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
 
     if (hdr->hl == 0) {
         if (netif == NULL) {
-            hdr->hl = GNRC_NETIF_DEFAULT_HL;
+            hdr->hl = CONFIG_GNRC_NETIF_DEFAULT_HL;
         }
         else {
             hdr->hl = netif->cur_hl;
@@ -387,7 +388,7 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
             (gnrc_netif_ipv6_addr_get_state(netif, idx) != GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID);
         gnrc_netif_release(netif);
         if (invalid_src) {
-#if GNRC_IPV6_NIB_CONF_6LN
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
             gnrc_pktsnip_t *icmpv6 = gnrc_pktsnip_search_type(ipv6,
                                                               GNRC_NETTYPE_ICMPV6);
             icmpv6_hdr_t *icmpv6_hdr;
@@ -402,11 +403,11 @@ static int _fill_ipv6_hdr(gnrc_netif_t *netif, gnrc_pktsnip_t *ipv6)
                       ipv6_addr_to_str(addr_str, &hdr->src, sizeof(addr_str)));
                 return -EADDRNOTAVAIL;
             }
-#else   /* GNRC_IPV6_NIB_CONF_6LN */
+#else   /* CONFIG_GNRC_IPV6_NIB_6LN */
             DEBUG("ipv6: preset packet source address %s is invalid\n",
                   ipv6_addr_to_str(addr_str, &hdr->src, sizeof(addr_str)));
             return -EADDRNOTAVAIL;
-#endif  /* GNRC_IPV6_NIB_CONF_6LN */
+#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
         }
     }
 
@@ -556,62 +557,62 @@ static void _send_multicast(gnrc_pktsnip_t *pkt, bool prep_hdr,
         }
     }
 
+    if (!gnrc_netif_highlander()) {
+        /* interface not given: send over all interfaces */
+        if (netif == NULL) {
+            /* send packet to link layer */
+            gnrc_pktbuf_hold(pkt, ifnum - 1);
 
-#if GNRC_NETIF_NUMOF > 1
-    /* interface not given: send over all interfaces */
-    if (netif == NULL) {
-        /* send packet to link layer */
-        gnrc_pktbuf_hold(pkt, ifnum - 1);
+            while ((netif = gnrc_netif_iter(netif))) {
+                gnrc_pktsnip_t *send_pkt = pkt;
+                /* for !prep_hdr just use pkt as we don't duplicate IPv6 header as
+                 * it is already filled and thus isn't filled with potentially
+                 * interface-specific data */
+                if (prep_hdr) {
+                    DEBUG("ipv6: prepare IPv6 header for sending\n");
+                    /* need to get second write access (duplication) to fill IPv6
+                     * header with interface-specific data */
+                    send_pkt = gnrc_pktbuf_start_write(pkt);
 
-        while ((netif = gnrc_netif_iter(netif))) {
-            gnrc_pktsnip_t *send_pkt = pkt;
-            /* for !prep_hdr just use pkt as we don't duplicate IPv6 header as
-             * it is already filled and thus isn't filled with potentially
-             * interface-specific data */
-            if (prep_hdr) {
-                DEBUG("ipv6: prepare IPv6 header for sending\n");
-                /* need to get second write access (duplication) to fill IPv6
-                 * header with interface-specific data */
-                send_pkt = gnrc_pktbuf_start_write(pkt);
-
-                if (send_pkt == NULL) {
-                    DEBUG("ipv6: unable to get write access to IPv6 header, "
-                          "for interface %" PRIkernel_pid "\n", netif->pid);
-                    gnrc_pktbuf_release(pkt);
-                    return;
-                }
-                if (_fill_ipv6_hdr(netif, send_pkt) < 0) {
-                    /* error on filling up header */
-                    if (send_pkt != pkt) {
-                        gnrc_pktbuf_release(send_pkt);
+                    if (send_pkt == NULL) {
+                        DEBUG("ipv6: unable to get write access to IPv6 header, "
+                              "for interface %" PRIkernel_pid "\n", netif->pid);
+                        gnrc_pktbuf_release(pkt);
+                        return;
                     }
-                    gnrc_pktbuf_release(pkt);
-                    return;
+                    if (_fill_ipv6_hdr(netif, send_pkt) < 0) {
+                        /* error on filling up header */
+                        if (send_pkt != pkt) {
+                            gnrc_pktbuf_release(send_pkt);
+                        }
+                        gnrc_pktbuf_release(pkt);
+                        return;
+                    }
                 }
+                _send_multicast_over_iface(send_pkt, prep_hdr, netif,
+                                           netif_hdr_flags);
             }
-            _send_multicast_over_iface(send_pkt, prep_hdr, netif,
-                                       netif_hdr_flags);
+        }
+        else {
+            if (_safe_fill_ipv6_hdr(netif, pkt, prep_hdr)) {
+                _send_multicast_over_iface(pkt, prep_hdr, netif, netif_hdr_flags);
+            }
         }
     }
     else {
+        (void)ifnum; /* not used in this build branch */
+        if (netif == NULL) {
+            netif = gnrc_netif_iter(NULL);
+
+            /* allocate interface header */
+            if ((pkt = _create_netif_hdr(NULL, 0, pkt, netif_hdr_flags)) == NULL) {
+                return;
+            }
+        }
         if (_safe_fill_ipv6_hdr(netif, pkt, prep_hdr)) {
             _send_multicast_over_iface(pkt, prep_hdr, netif, netif_hdr_flags);
         }
     }
-#else   /* GNRC_NETIF_NUMOF */
-    (void)ifnum; /* not used in this build branch */
-    if (netif == NULL) {
-        netif = gnrc_netif_iter(NULL);
-
-        /* allocate interface header */
-        if ((pkt = _create_netif_hdr(NULL, 0, pkt, netif_hdr_flags)) == NULL) {
-            return;
-        }
-    }
-    if (_safe_fill_ipv6_hdr(netif, pkt, prep_hdr)) {
-        _send_multicast_over_iface(pkt, prep_hdr, netif, netif_hdr_flags);
-    }
-#endif  /* GNRC_NETIF_NUMOF */
 }
 
 static void _send_to_self(gnrc_pktsnip_t *pkt, bool prep_hdr,

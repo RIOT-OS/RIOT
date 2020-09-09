@@ -24,6 +24,7 @@
 
 #include "board.h"
 #include "cpu.h"
+#include "irq.h"
 #include "thread.h"
 
 #include "periph/timer.h"
@@ -73,6 +74,23 @@ static ctx_t ctx[] = {
 #endif
 };
 
+static unsigned _oneshot;
+
+static inline void set_oneshot(tim_t tim, int chan)
+{
+    _oneshot |= (1 << chan) << (TIMER_CHANNEL_NUMOF * tim);
+}
+
+static inline void clear_oneshot(tim_t tim, int chan)
+{
+    _oneshot &= ~((1 << chan) << (TIMER_CHANNEL_NUMOF * tim));
+}
+
+static inline bool is_oneshot(tim_t tim, int chan)
+{
+    return _oneshot & ((1 << chan) << (TIMER_CHANNEL_NUMOF * tim));
+}
+
 /**
  * @brief Setup the given timer
  */
@@ -90,7 +108,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
     DEBUG_TIMER_DDR |= (1 << DEBUG_TIMER_PIN);
     DEBUG_TIMER_PORT &= ~(1 << DEBUG_TIMER_PIN);
     DEBUG("Debug Pin: DDR 0x%02x Port 0x%02x Pin 0x%02x\n",
-           &DEBUG_TIMER_DDR , &DEBUG_TIMER_PORT,(1<<DEBUG_TIMER_PIN));
+          &DEBUG_TIMER_DDR, &DEBUG_TIMER_PORT, (1 << DEBUG_TIMER_PIN));
 #endif
 
     DEBUG("timer.c: freq = %ld\n", freq);
@@ -108,7 +126,7 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
         }
     }
     if (pre == PRESCALE_NUMOF) {
-        DEBUG("timer.c: prescaling failed!\n");
+        DEBUG("timer.c: prescaling from %lu Hz failed!\n", CLOCK_CORECLOCK);
         return -1;
     }
 
@@ -132,20 +150,92 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
 
 int timer_set_absolute(tim_t tim, int channel, unsigned int value)
 {
-    if (channel >= TIMER_CHANNELS) {
+    if (channel >= TIMER_CHANNEL_NUMOF) {
         return -1;
     }
+
+    unsigned state = irq_disable();
 
     ctx[tim].dev->OCR[channel] = (uint16_t)value;
     *ctx[tim].flag &= ~(1 << (channel + OCF1A));
     *ctx[tim].mask |= (1 << (channel + OCIE1A));
+    set_oneshot(tim, channel);
+
+    irq_restore(state);
 
     return 0;
 }
 
+int timer_set(tim_t tim, int channel, unsigned int timeout)
+{
+    if (channel >= TIMER_CHANNEL_NUMOF) {
+        return -1;
+    }
+
+    unsigned state = irq_disable();
+    unsigned absolute = ctx[tim].dev->CNT + timeout;
+
+    ctx[tim].dev->OCR[channel] = absolute;
+    *ctx[tim].mask |= (1 << (channel + OCIE1A));
+    set_oneshot(tim, channel);
+
+    if ((absolute - ctx[tim].dev->CNT) > timeout) {
+        /* Timer already expired. Trigger the interrupt now and loop until it
+         * is triggered.
+         */
+        while (!(*ctx[tim].flag & (1 << (OCF1A + channel)))) {
+            ctx[tim].dev->OCR[channel] = ctx[tim].dev->CNT;
+        }
+    }
+
+    irq_restore(state);
+
+    return 0;
+}
+
+int timer_set_periodic(tim_t tim, int channel, unsigned int value, uint8_t flags)
+{
+    int res = 0;
+
+    if (channel >= TIMER_CHANNEL_NUMOF) {
+        return -1;
+    }
+
+    if (flags & TIM_FLAG_RESET_ON_SET) {
+        ctx[tim].dev->CNT = 0;
+    }
+
+    unsigned state = irq_disable();
+
+    ctx[tim].dev->OCR[channel] = (uint16_t)value;
+
+    *ctx[tim].flag &= ~(1 << (channel + OCF1A));
+    *ctx[tim].mask |=  (1 << (channel + OCIE1A));
+
+    clear_oneshot(tim, channel);
+
+    /* only OCR0 can be use to set TOP */
+    if (channel == 0) {
+        if (flags & TIM_FLAG_RESET_ON_MATCH) {
+            /* enable CTC mode */
+            ctx[tim].dev->CRB |= (1 << 3);
+        } else {
+            /* disable CTC mode */
+            ctx[tim].dev->CRB &= (1 << 3);
+        }
+    } else {
+        assert((flags & TIM_FLAG_RESET_ON_MATCH) == 0);
+        res = -1;
+    }
+
+    irq_restore(state);
+
+    return res;
+}
+
 int timer_clear(tim_t tim, int channel)
 {
-    if (channel >= TIMER_CHANNELS) {
+    if (channel >= TIMER_CHANNEL_NUMOF) {
         return -1;
     }
 
@@ -156,7 +246,17 @@ int timer_clear(tim_t tim, int channel)
 
 unsigned int timer_read(tim_t tim)
 {
-    return (unsigned int)ctx[tim].dev->CNT;
+    /* CNT is a 16 bit register, but atomic access is implemented by hardware:
+     * A read from the low byte causes the value in the high byte being stored
+     * in parallel into a temporary register. The read of the high byte will
+     * instead access the temporary register. However, the AVR only has one
+     * temporary register that is used to implement atomic access to all 16 bit
+     * registers. Thus, access has to be guarded by disabling IRQs.
+     */
+    unsigned state = irq_disable();
+    unsigned result = ctx[tim].dev->CNT;
+    irq_restore(state);
+    return result;
 }
 
 void timer_stop(tim_t tim)
@@ -178,7 +278,9 @@ static inline void _isr(tim_t tim, int chan)
 
     atmega_enter_isr();
 
-    *ctx[tim].mask &= ~(1 << (chan + OCIE1A));
+    if (is_oneshot(tim, chan)) {
+        *ctx[tim].mask &= ~(1 << (chan + OCIE1A));
+    }
     ctx[tim].cb(ctx[tim].arg, chan);
 
 #if defined(DEBUG_TIMER_PORT)

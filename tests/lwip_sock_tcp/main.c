@@ -17,7 +17,6 @@
  * @}
  */
 
-#include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -27,13 +26,12 @@
 #include "net/ipv6/addr.h"
 #include "net/sock/tcp.h"
 #include "sched.h"
+#include "test_utils/expect.h"
 #include "thread.h"
 #include "xtimer.h"
 
 #include "constants.h"
 #include "stack.h"
-
-#include "test_utils/interactive_sync.h"
 
 #define _TEST_BUFFER_SIZE   (128)
 #define _QUEUE_SIZE         (1)
@@ -103,7 +101,7 @@ static void test_tcp_connect4__EADDRINUSE(void)
 
     msg_send(&msg, _server);    /* start server on _TEST_PORT_REMOTE */
 
-    assert(-EADDRINUSE == sock_tcp_connect(&_sock, &remote, local_port, 0));
+    expect(-EADDRINUSE == sock_tcp_connect(&_sock, &remote, local_port, 0));
 }
 #endif
 
@@ -113,7 +111,7 @@ static void test_tcp_connect4__EAFNOSUPPORT(void)
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
 
-    assert(-EAFNOSUPPORT == sock_tcp_connect(&_sock, &remote, 0,
+    expect(-EAFNOSUPPORT == sock_tcp_connect(&_sock, &remote, 0,
                                              SOCK_FLAGS_REUSE_EP));
 }
 
@@ -126,7 +124,7 @@ static void test_tcp_connect4__EINVAL_addr(void)
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
 
-    assert(-EINVAL == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(-EINVAL == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
 }
 
 static void test_tcp_connect4__EINVAL_netif(void)
@@ -136,7 +134,7 @@ static void test_tcp_connect4__EINVAL_netif(void)
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = (_TEST_NETIF + 1) };
 
-    assert(-EINVAL == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(-EINVAL == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
 }
 
 /* ENETUNREACH not testable in given loopback setup */
@@ -157,12 +155,12 @@ static void test_tcp_connect4__success_without_port(void)
 
     msg_send(&msg, _server);    /* start server on _TEST_PORT_REMOTE */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
-    assert(0 == sock_tcp_get_remote(&_sock, &ep));
-    assert(AF_INET == ep.family);
-    assert(_TEST_ADDR4_REMOTE == ep.addr.ipv4_u32);
-    assert(SOCK_ADDR_ANY_NETIF == ep.netif);
-    assert(_TEST_PORT_REMOTE == ep.port);
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_get_remote(&_sock, &ep));
+    expect(AF_INET == ep.family);
+    expect(_TEST_ADDR4_REMOTE == ep.addr.ipv4_u32);
+    expect(SOCK_ADDR_ANY_NETIF == ep.netif);
+    expect(_TEST_PORT_REMOTE == ep.port);
 }
 static void test_tcp_connect4__success_local_port(void)
 {
@@ -180,15 +178,15 @@ static void test_tcp_connect4__success_local_port(void)
 
     msg_send(&msg, _server);    /* start server on _TEST_PORT_REMOTE */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, local_port, SOCK_FLAGS_REUSE_EP));
-    assert(0 == sock_tcp_get_local(&_sock, &ep));
-    assert(AF_INET == ep.family);
-    assert(_TEST_PORT_LOCAL == ep.port);
-    assert(0 == sock_tcp_get_remote(&_sock, &ep));
-    assert(AF_INET == ep.family);
-    assert(_TEST_ADDR4_REMOTE == ep.addr.ipv4_u32);
-    assert(SOCK_ADDR_ANY_NETIF == ep.netif);
-    assert(_TEST_PORT_REMOTE == ep.port);
+    expect(0 == sock_tcp_connect(&_sock, &remote, local_port, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_get_local(&_sock, &ep));
+    expect(AF_INET == ep.family);
+    expect(_TEST_PORT_LOCAL == ep.port);
+    expect(0 == sock_tcp_get_remote(&_sock, &ep));
+    expect(AF_INET == ep.family);
+    expect(_TEST_ADDR4_REMOTE == ep.addr.ipv4_u32);
+    expect(SOCK_ADDR_ANY_NETIF == ep.netif);
+    expect(_TEST_PORT_REMOTE == ep.port);
 }
 
 #ifdef SO_REUSE
@@ -206,7 +204,7 @@ static void test_tcp_listen4__EADDRINUSE(void)
 
     msg_send(&msg, _server);    /* start server on _TEST_PORT_LOCAL */
 
-    assert(-EADDRINUSE == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(-EADDRINUSE == sock_tcp_listen(&_queue, &local, _queue_array,
                                           _QUEUE_SIZE, 0));
 }
 #endif
@@ -217,7 +215,7 @@ static void test_tcp_listen4__EAFNOSUPPORT(void)
                                          .port = _TEST_PORT_LOCAL,
                                          .netif = SOCK_ADDR_ANY_NETIF };
 
-    assert(-EAFNOSUPPORT == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(-EAFNOSUPPORT == sock_tcp_listen(&_queue, &local, _queue_array,
                                             _QUEUE_SIZE, 0));
 }
 
@@ -228,7 +226,7 @@ static void test_tcp_listen4__EINVAL(void)
                                          .port = _TEST_PORT_LOCAL,
                                          .netif = (_TEST_NETIF + 1) };
 
-    assert(-EINVAL == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(-EINVAL == sock_tcp_listen(&_queue, &local, _queue_array,
                                       _QUEUE_SIZE, 0));
 }
 
@@ -240,13 +238,13 @@ static void test_tcp_listen4__success_any_netif(void)
                                          .netif = SOCK_ADDR_ANY_NETIF };
     sock_tcp_ep_t ep;
 
-    assert(0 == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(0 == sock_tcp_listen(&_queue, &local, _queue_array,
                                 _QUEUE_SIZE, 0));
-    assert(0 == sock_tcp_queue_get_local(&_queue, &ep));
-    assert(AF_INET == ep.family);
-    assert(_TEST_ADDR4_LOCAL == ep.addr.ipv4_u32);
-    assert(SOCK_ADDR_ANY_NETIF == ep.netif);
-    assert(_TEST_PORT_LOCAL == ep.port);
+    expect(0 == sock_tcp_queue_get_local(&_queue, &ep));
+    expect(AF_INET == ep.family);
+    expect(_TEST_ADDR4_LOCAL == ep.addr.ipv4_u32);
+    expect(SOCK_ADDR_ANY_NETIF == ep.netif);
+    expect(_TEST_PORT_LOCAL == ep.port);
 }
 
 static void test_tcp_listen4__success_spec_netif(void)
@@ -256,12 +254,12 @@ static void test_tcp_listen4__success_spec_netif(void)
                                          .netif = _TEST_NETIF };
     sock_tcp_ep_t ep;
 
-    assert(0 == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(0 == sock_tcp_listen(&_queue, &local, _queue_array,
                                 _QUEUE_SIZE, 0));
-    assert(0 == sock_tcp_queue_get_local(&_queue, &ep));
-    assert(AF_INET == ep.family);
-    assert(_TEST_NETIF == ep.netif);
-    assert(_TEST_PORT_LOCAL == ep.port);
+    expect(0 == sock_tcp_queue_get_local(&_queue, &ep));
+    expect(AF_INET == ep.family);
+    expect(_TEST_NETIF == ep.netif);
+    expect(_TEST_PORT_LOCAL == ep.port);
 }
 
 /* ECONNABORTED can't be tested in this setup */
@@ -272,16 +270,16 @@ static void test_tcp_accept4__EAGAIN(void)
                                          .port = _TEST_PORT_LOCAL };
     sock_tcp_t *sock;
 
-    assert(0 == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(0 == sock_tcp_listen(&_queue, &local, _queue_array,
                                 _QUEUE_SIZE, SOCK_FLAGS_REUSE_EP));
-    assert(-EAGAIN == sock_tcp_accept(&_queue, &sock, 0));
+    expect(-EAGAIN == sock_tcp_accept(&_queue, &sock, 0));
 }
 
 static void test_tcp_accept4__EINVAL(void)
 {
     sock_tcp_t *sock;
 
-    assert(-EINVAL == sock_tcp_accept(&_queue, &sock, SOCK_NO_TIMEOUT));
+    expect(-EINVAL == sock_tcp_accept(&_queue, &sock, SOCK_NO_TIMEOUT));
 }
 
 static void test_tcp_accept4__ETIMEDOUT(void)
@@ -290,10 +288,10 @@ static void test_tcp_accept4__ETIMEDOUT(void)
                                          .port = _TEST_PORT_LOCAL };
     sock_tcp_t *sock;
 
-    assert(0 == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(0 == sock_tcp_listen(&_queue, &local, _queue_array,
                                 _QUEUE_SIZE, SOCK_FLAGS_REUSE_EP));
     puts(" * Calling sock_tcp_accept()");
-    assert(-ETIMEDOUT == sock_tcp_accept(&_queue, &sock, _TEST_TIMEOUT));
+    expect(-ETIMEDOUT == sock_tcp_accept(&_queue, &sock, _TEST_TIMEOUT));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
 }
 
@@ -311,19 +309,19 @@ static void test_tcp_accept4__success(void)
     _server_addr.port = _TEST_PORT_LOCAL;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    assert(0 == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(0 == sock_tcp_listen(&_queue, &local, _queue_array,
                                 _QUEUE_SIZE, 0));
     msg_send(&msg, _client);    /* start client on _TEST_PORT_REMOTE, connecting
                                  * to _TEST_PORT_LOCAL */
-    assert(0 == sock_tcp_accept(&_queue, &sock, SOCK_NO_TIMEOUT));
-    assert(0 == sock_tcp_get_local(sock, &ep));
-    assert(AF_INET == ep.family);
-    assert(_TEST_PORT_LOCAL == ep.port);
-    assert(0 == sock_tcp_get_remote(sock, &ep));
-    assert(AF_INET == ep.family);
-    assert(_TEST_ADDR4_REMOTE == ep.addr.ipv4_u32);
-    assert(SOCK_ADDR_ANY_NETIF == ep.netif);
-    assert(_TEST_PORT_REMOTE == ep.port);
+    expect(0 == sock_tcp_accept(&_queue, &sock, SOCK_NO_TIMEOUT));
+    expect(0 == sock_tcp_get_local(sock, &ep));
+    expect(AF_INET == ep.family);
+    expect(_TEST_PORT_LOCAL == ep.port);
+    expect(0 == sock_tcp_get_remote(sock, &ep));
+    expect(AF_INET == ep.family);
+    expect(_TEST_ADDR4_REMOTE == ep.addr.ipv4_u32);
+    expect(SOCK_ADDR_ANY_NETIF == ep.netif);
+    expect(_TEST_PORT_REMOTE == ep.port);
 }
 
 /* ECONNABORTED can't be tested in this setup */
@@ -344,8 +342,8 @@ static void test_tcp_read4__EAGAIN(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
-    assert(-EAGAIN == sock_tcp_read(&_sock, _test_buffer, sizeof(_test_buffer), 0));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(-EAGAIN == sock_tcp_read(&_sock, _test_buffer, sizeof(_test_buffer), 0));
 }
 
 static void test_tcp_read4__ECONNRESET(void)
@@ -364,17 +362,17 @@ static void test_tcp_read4__ECONNRESET(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     msg.type = _SERVER_MSG_CLOSE;
     msg_send(&msg, _server);        /* close connection at server side */
-    assert(-ECONNRESET == sock_tcp_read(&_sock, _test_buffer,
+    expect(-ECONNRESET == sock_tcp_read(&_sock, _test_buffer,
                                         sizeof(_test_buffer),
                                         SOCK_NO_TIMEOUT));
 }
 
 static void test_tcp_read4__ENOTCONN(void)
 {
-    assert(-ENOTCONN == sock_tcp_read(&_sock, _test_buffer,
+    expect(-ENOTCONN == sock_tcp_read(&_sock, _test_buffer,
                                       sizeof(_test_buffer), SOCK_NO_TIMEOUT));
 }
 
@@ -394,9 +392,9 @@ static void test_tcp_read4__ETIMEDOUT(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     puts(" * Calling sock_tcp_read()");
-    assert(-ETIMEDOUT == sock_tcp_read(&_sock, _test_buffer, sizeof(_test_buffer),
+    expect(-ETIMEDOUT == sock_tcp_read(&_sock, _test_buffer, sizeof(_test_buffer),
                                        _TEST_TIMEOUT));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
 }
@@ -419,14 +417,14 @@ static void test_tcp_read4__success(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     msg.type = _SERVER_MSG_WRITE;
     msg.content.ptr = (void *)&exp_data;
     msg_send(&msg, _server);        /* write expected data at server */
-    assert(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
+    expect(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
                                                         sizeof(_test_buffer),
                                                         SOCK_NO_TIMEOUT));
-    assert(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
+    expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
 }
 
 static void test_tcp_read4__success_with_timeout(void)
@@ -447,14 +445,14 @@ static void test_tcp_read4__success_with_timeout(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     msg.type = _SERVER_MSG_WRITE;
     msg.content.ptr = (void *)&exp_data;
     msg_send(&msg, _server);        /* write expected data at server */
-    assert(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
+    expect(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
                                                         sizeof(_test_buffer),
                                                         _TEST_TIMEOUT));
-    assert(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
+    expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
 }
 
 static void test_tcp_read4__success_non_blocking(void)
@@ -475,21 +473,21 @@ static void test_tcp_read4__success_non_blocking(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     msg.type = _SERVER_MSG_WRITE;
     msg.content.ptr = (void *)&exp_data;
     msg_send(&msg, _server);        /* write expected data at server */
-    assert(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
+    expect(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
                                                         sizeof(_test_buffer),
                                                         0));
-    assert(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
+    expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
 }
 
 /* ENOTCONN not applicable since lwIP always tries to send */
 
 static void test_tcp_write4__ENOTCONN(void)
 {
-    assert(-ENOTCONN == sock_tcp_write(&_sock, "Hello!", sizeof("Hello!")));
+    expect(-ENOTCONN == sock_tcp_write(&_sock, "Hello!", sizeof("Hello!")));
 }
 
 static void test_tcp_write4__success(void)
@@ -510,13 +508,13 @@ static void test_tcp_write4__success(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     msg.type = _SERVER_MSG_READ;
     msg.content.ptr = (void *)&exp_data;
     msg_send(&msg, _server);        /* write expected data at server */
-    assert(((ssize_t)exp_data.iov_len) == sock_tcp_write(&_sock, "Hello!",
+    expect(((ssize_t)exp_data.iov_len) == sock_tcp_write(&_sock, "Hello!",
                                                         sizeof("Hello!")));
-    assert(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
+    expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
     xtimer_usleep(5000);            /* wait for server */
 }
 #endif /* MODULE_LWIP_IPV4 */
@@ -538,7 +536,7 @@ static void test_tcp_connect6__EADDRINUSE(void)
 
     msg_send(&msg, _server);    /* start server on _TEST_PORT_REMOTE */
 
-    assert(-EADDRINUSE == sock_tcp_connect(&_sock, &remote, local_port, 0));
+    expect(-EADDRINUSE == sock_tcp_connect(&_sock, &remote, local_port, 0));
 }
 #endif
 
@@ -548,7 +546,7 @@ static void test_tcp_connect6__EAFNOSUPPORT(void)
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
 
-    assert(-EAFNOSUPPORT == sock_tcp_connect(&_sock, &remote, 0,
+    expect(-EAFNOSUPPORT == sock_tcp_connect(&_sock, &remote, 0,
                                              SOCK_FLAGS_REUSE_EP));
 }
 
@@ -561,7 +559,7 @@ static void test_tcp_connect6__EINVAL_addr(void)
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = SOCK_ADDR_ANY_NETIF };
 
-    assert(-EINVAL == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(-EINVAL == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
 }
 
 static void test_tcp_connect6__EINVAL_netif(void)
@@ -571,7 +569,7 @@ static void test_tcp_connect6__EINVAL_netif(void)
                                           .port = _TEST_PORT_REMOTE,
                                           .netif = (_TEST_NETIF + 1) };
 
-    assert(-EINVAL == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(-EINVAL == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
 }
 
 /* ENETUNREACH not testable in given loopback setup */
@@ -593,12 +591,12 @@ static void test_tcp_connect6__success_without_port(void)
 
     msg_send(&msg, _server);    /* start server on _TEST_PORT_REMOTE */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
-    assert(0 == sock_tcp_get_remote(&_sock, &ep));
-    assert(AF_INET6 == ep.family);
-    assert(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
-    assert(SOCK_ADDR_ANY_NETIF == ep.netif);
-    assert(_TEST_PORT_REMOTE == ep.port);
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_get_remote(&_sock, &ep));
+    expect(AF_INET6 == ep.family);
+    expect(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
+    expect(SOCK_ADDR_ANY_NETIF == ep.netif);
+    expect(_TEST_PORT_REMOTE == ep.port);
 }
 static void test_tcp_connect6__success_local_port(void)
 {
@@ -617,33 +615,28 @@ static void test_tcp_connect6__success_local_port(void)
 
     msg_send(&msg, _server);    /* start server on _TEST_PORT_REMOTE */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, local_port, SOCK_FLAGS_REUSE_EP));
-    assert(0 == sock_tcp_get_local(&_sock, &ep));
-    assert(AF_INET6 == ep.family);
-    assert(_TEST_PORT_LOCAL == ep.port);
-    assert(0 == sock_tcp_get_remote(&_sock, &ep));
-    assert(AF_INET6 == ep.family);
-    assert(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
-    assert(SOCK_ADDR_ANY_NETIF == ep.netif);
-    assert(_TEST_PORT_REMOTE == ep.port);
+    expect(0 == sock_tcp_connect(&_sock, &remote, local_port, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_get_local(&_sock, &ep));
+    expect(AF_INET6 == ep.family);
+    expect(_TEST_PORT_LOCAL == ep.port);
+    expect(0 == sock_tcp_get_remote(&_sock, &ep));
+    expect(AF_INET6 == ep.family);
+    expect(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
+    expect(SOCK_ADDR_ANY_NETIF == ep.netif);
+    expect(_TEST_PORT_REMOTE == ep.port);
 }
 
 #ifdef SO_REUSE
 static void test_tcp_listen6__EADDRINUSE(void)
 {
+    static sock_tcp_t queue_array2[_QUEUE_SIZE];
+    static sock_tcp_queue_t queue2;
     static const sock_tcp_ep_t local = { .addr = { .ipv6 = _TEST_ADDR6_LOCAL },
                                          .family = AF_INET6,
                                          .port = _TEST_PORT_LOCAL,
                                          .netif = SOCK_ADDR_ANY_NETIF };
-    msg_t msg = { .type = _SERVER_MSG_START };
-
-    _server_addr.family = AF_INET6;
-    _server_addr.port = _TEST_PORT_LOCAL;
-    _server_addr.netif = SOCK_ADDR_ANY_NETIF;
-
-    msg_send(&msg, _server);    /* start server on _TEST_PORT_LOCAL */
-
-    assert(-EADDRINUSE == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(0 == sock_tcp_listen(&_queue, &local, _queue_array, _QUEUE_SIZE, 0));
+    expect(-EADDRINUSE == sock_tcp_listen(&queue2, &local, queue_array2,
                                           _QUEUE_SIZE, 0));
 }
 #endif
@@ -654,7 +647,7 @@ static void test_tcp_listen6__EAFNOSUPPORT(void)
                                          .port = _TEST_PORT_LOCAL,
                                          .netif = SOCK_ADDR_ANY_NETIF };
 
-    assert(-EAFNOSUPPORT == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(-EAFNOSUPPORT == sock_tcp_listen(&_queue, &local, _queue_array,
                                             _QUEUE_SIZE, 0));
 }
 
@@ -665,7 +658,7 @@ static void test_tcp_listen6__EINVAL(void)
                                          .port = _TEST_PORT_LOCAL,
                                          .netif = (_TEST_NETIF + 1) };
 
-    assert(-EINVAL == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(-EINVAL == sock_tcp_listen(&_queue, &local, _queue_array,
                                       _QUEUE_SIZE, 0));
 }
 
@@ -678,13 +671,13 @@ static void test_tcp_listen6__success_any_netif(void)
                                          .netif = SOCK_ADDR_ANY_NETIF };
     sock_tcp_ep_t ep;
 
-    assert(0 == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(0 == sock_tcp_listen(&_queue, &local, _queue_array,
                                 _QUEUE_SIZE, 0));
-    assert(0 == sock_tcp_queue_get_local(&_queue, &ep));
-    assert(AF_INET6 == ep.family);
-    assert(memcmp(&local_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
-    assert(SOCK_ADDR_ANY_NETIF == ep.netif);
-    assert(_TEST_PORT_LOCAL == ep.port);
+    expect(0 == sock_tcp_queue_get_local(&_queue, &ep));
+    expect(AF_INET6 == ep.family);
+    expect(memcmp(&local_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
+    expect(SOCK_ADDR_ANY_NETIF == ep.netif);
+    expect(_TEST_PORT_LOCAL == ep.port);
 }
 
 static void test_tcp_listen6__success_spec_netif(void)
@@ -694,12 +687,12 @@ static void test_tcp_listen6__success_spec_netif(void)
                                          .netif = _TEST_NETIF };
     sock_tcp_ep_t ep;
 
-    assert(0 == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(0 == sock_tcp_listen(&_queue, &local, _queue_array,
                                 _QUEUE_SIZE, 0));
-    assert(0 == sock_tcp_queue_get_local(&_queue, &ep));
-    assert(AF_INET6 == ep.family);
-    assert(_TEST_NETIF == ep.netif);
-    assert(_TEST_PORT_LOCAL == ep.port);
+    expect(0 == sock_tcp_queue_get_local(&_queue, &ep));
+    expect(AF_INET6 == ep.family);
+    expect(_TEST_NETIF == ep.netif);
+    expect(_TEST_PORT_LOCAL == ep.port);
 }
 
 /* ECONNABORTED can't be tested in this setup */
@@ -710,16 +703,16 @@ static void test_tcp_accept6__EAGAIN(void)
                                          .port = _TEST_PORT_LOCAL };
     sock_tcp_t *sock;
 
-    assert(0 == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(0 == sock_tcp_listen(&_queue, &local, _queue_array,
                                 _QUEUE_SIZE, 0));
-    assert(-EAGAIN == sock_tcp_accept(&_queue, &sock, 0));
+    expect(-EAGAIN == sock_tcp_accept(&_queue, &sock, 0));
 }
 
 static void test_tcp_accept6__EINVAL(void)
 {
     sock_tcp_t *sock;
 
-    assert(-EINVAL == sock_tcp_accept(&_queue, &sock, SOCK_NO_TIMEOUT));
+    expect(-EINVAL == sock_tcp_accept(&_queue, &sock, SOCK_NO_TIMEOUT));
 }
 
 static void test_tcp_accept6__ETIMEDOUT(void)
@@ -728,10 +721,10 @@ static void test_tcp_accept6__ETIMEDOUT(void)
                                          .port = _TEST_PORT_LOCAL };
     sock_tcp_t *sock;
 
-    assert(0 == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(0 == sock_tcp_listen(&_queue, &local, _queue_array,
                                 _QUEUE_SIZE, 0));
     puts(" * Calling sock_tcp_accept()");
-    assert(-ETIMEDOUT == sock_tcp_accept(&_queue, &sock, _TEST_TIMEOUT));
+    expect(-ETIMEDOUT == sock_tcp_accept(&_queue, &sock, _TEST_TIMEOUT));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
 }
 
@@ -750,19 +743,19 @@ static void test_tcp_accept6__success(void)
     _server_addr.port = _TEST_PORT_LOCAL;
     _server_addr.netif = SOCK_ADDR_ANY_NETIF;
 
-    assert(0 == sock_tcp_listen(&_queue, &local, _queue_array,
+    expect(0 == sock_tcp_listen(&_queue, &local, _queue_array,
                                 _QUEUE_SIZE, 0));
     msg_send(&msg, _client);    /* start client on _TEST_PORT_REMOTE, connecting
                                  * to _TEST_PORT_LOCAL */
-    assert(0 == sock_tcp_accept(&_queue, &sock, SOCK_NO_TIMEOUT));
-    assert(0 == sock_tcp_get_local(sock, &ep));
-    assert(AF_INET6 == ep.family);
-    assert(_TEST_PORT_LOCAL == ep.port);
-    assert(0 == sock_tcp_get_remote(sock, &ep));
-    assert(AF_INET6 == ep.family);
-    assert(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
-    assert(SOCK_ADDR_ANY_NETIF == ep.netif);
-    assert(_TEST_PORT_REMOTE == ep.port);
+    expect(0 == sock_tcp_accept(&_queue, &sock, SOCK_NO_TIMEOUT));
+    expect(0 == sock_tcp_get_local(sock, &ep));
+    expect(AF_INET6 == ep.family);
+    expect(_TEST_PORT_LOCAL == ep.port);
+    expect(0 == sock_tcp_get_remote(sock, &ep));
+    expect(AF_INET6 == ep.family);
+    expect(memcmp(&remote_addr, &ep.addr.ipv6, sizeof(ipv6_addr_t)) == 0);
+    expect(SOCK_ADDR_ANY_NETIF == ep.netif);
+    expect(_TEST_PORT_REMOTE == ep.port);
 }
 
 /* ECONNABORTED can't be tested in this setup */
@@ -783,8 +776,8 @@ static void test_tcp_read6__EAGAIN(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
-    assert(-EAGAIN == sock_tcp_read(&_sock, _test_buffer, sizeof(_test_buffer), 0));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(-EAGAIN == sock_tcp_read(&_sock, _test_buffer, sizeof(_test_buffer), 0));
 }
 
 static void test_tcp_read6__ECONNRESET(void)
@@ -803,16 +796,16 @@ static void test_tcp_read6__ECONNRESET(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     msg.type = _SERVER_MSG_CLOSE;
     msg_send(&msg, _server);        /* close connection at server side */
-    assert(-ECONNRESET == sock_tcp_read(&_sock, _test_buffer,
+    expect(-ECONNRESET == sock_tcp_read(&_sock, _test_buffer,
                                         sizeof(_test_buffer), SOCK_NO_TIMEOUT));
 }
 
 static void test_tcp_read6__ENOTCONN(void)
 {
-    assert(-ENOTCONN == sock_tcp_read(&_sock, _test_buffer,
+    expect(-ENOTCONN == sock_tcp_read(&_sock, _test_buffer,
                                       sizeof(_test_buffer), SOCK_NO_TIMEOUT));
 }
 
@@ -832,9 +825,9 @@ static void test_tcp_read6__ETIMEDOUT(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     puts(" * Calling sock_tcp_read()");
-    assert(-ETIMEDOUT == sock_tcp_read(&_sock, _test_buffer,
+    expect(-ETIMEDOUT == sock_tcp_read(&_sock, _test_buffer,
                                        sizeof(_test_buffer), _TEST_TIMEOUT));
     printf(" * (timed out with timeout %u)\n", _TEST_TIMEOUT);
 }
@@ -856,14 +849,14 @@ static void test_tcp_read6__success(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     msg.type = _SERVER_MSG_WRITE;
     msg.content.ptr = (void *)&exp_data;
     msg_send(&msg, _server);        /* write expected data at server */
-    assert(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
+    expect(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
                                                         sizeof(_test_buffer),
                                                         SOCK_NO_TIMEOUT));
-    assert(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
+    expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
 }
 
 static void test_tcp_read6__success_with_timeout(void)
@@ -884,14 +877,14 @@ static void test_tcp_read6__success_with_timeout(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     msg.type = _SERVER_MSG_WRITE;
     msg.content.ptr = (void *)&exp_data;
     msg_send(&msg, _server);        /* write expected data at server */
-    assert(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
+    expect(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
                                                         sizeof(_test_buffer),
                                                         _TEST_TIMEOUT));
-    assert(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
+    expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
 }
 
 static void test_tcp_read6__success_non_blocking(void)
@@ -912,21 +905,21 @@ static void test_tcp_read6__success_non_blocking(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     msg.type = _SERVER_MSG_WRITE;
     msg.content.ptr = (void *)&exp_data;
     msg_send(&msg, _server);        /* write expected data at server */
-    assert(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
+    expect(((ssize_t)exp_data.iov_len) == sock_tcp_read(&_sock, _test_buffer,
                                                         sizeof(_test_buffer),
                                                         0));
-    assert(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
+    expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
 }
 
 /* ENOTCONN not applicable since lwIP always tries to send */
 
 static void test_tcp_write6__ENOTCONN(void)
 {
-    assert(-ENOTCONN == sock_tcp_write(&_sock, "Hello!", sizeof("Hello!")));
+    expect(-ENOTCONN == sock_tcp_write(&_sock, "Hello!", sizeof("Hello!")));
 }
 
 static void test_tcp_write6__success(void)
@@ -947,21 +940,19 @@ static void test_tcp_write6__success(void)
     msg.type = _SERVER_MSG_ACCEPT;
     msg_send(&msg, _server);        /* let server accept */
 
-    assert(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
+    expect(0 == sock_tcp_connect(&_sock, &remote, 0, SOCK_FLAGS_REUSE_EP));
     msg.type = _SERVER_MSG_READ;
     msg.content.ptr = (void *)&exp_data;
     msg_send(&msg, _server);        /* write expected data at server */
-    assert(((ssize_t)exp_data.iov_len) == sock_tcp_write(&_sock, "Hello!",
+    expect(((ssize_t)exp_data.iov_len) == sock_tcp_write(&_sock, "Hello!",
                                                         sizeof("Hello!")));
-    assert(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
+    expect(memcmp(exp_data.iov_base, _test_buffer, exp_data.iov_len) == 0);
     xtimer_usleep(5000);            /* wait for server */
 }
 #endif /* MODULE_LWIP_IPV6 */
 
 int main(void)
 {
-    test_utils_interactive_sync();
-
     uint8_t code = 0;
 
 #ifdef SO_REUSE
@@ -976,10 +967,10 @@ int main(void)
     printf("code 0x%02x\n", code);
     xtimer_init();
     _net_init();
-    assert(0 < thread_create(_client_stack, sizeof(_client_stack),
+    expect(0 < thread_create(_client_stack, sizeof(_client_stack),
                              THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
                              _client_func, NULL, "tcp_client"));
-    assert(0 < thread_create(_server_stack, sizeof(_server_stack),
+    expect(0 < thread_create(_server_stack, sizeof(_server_stack),
                              THREAD_PRIORITY_MAIN - 2, THREAD_CREATE_STACKTEST,
                              _server_func, NULL, "tcp_server"));
     tear_down();
@@ -1082,7 +1073,7 @@ static void *_server_func(void *arg)
 
     (void)arg;
     msg_init_queue(_server_msg_queue, _MSG_QUEUE_SIZE);
-    _server = sched_active_pid;
+    _server = thread_getpid();
     while (1) {
         msg_t msg;
 
@@ -1090,7 +1081,7 @@ static void *_server_func(void *arg)
         switch (msg.type) {
             case _SERVER_MSG_START:
                 if (!server_started) {
-                    assert(0 == sock_tcp_listen(&_server_queue, &_server_addr,
+                    expect(0 == sock_tcp_listen(&_server_queue, &_server_addr,
                                                 _server_queue_array,
                                                 _SERVER_QUEUE_SIZE,
                                                 SOCK_FLAGS_REUSE_EP));
@@ -1099,7 +1090,7 @@ static void *_server_func(void *arg)
                 break;
             case _SERVER_MSG_ACCEPT:
                 if (server_started) {
-                    assert(0 == sock_tcp_accept(&_server_queue, &sock,
+                    expect(0 == sock_tcp_accept(&_server_queue, &sock,
                                                 SOCK_NO_TIMEOUT));
                 }
                 break;
@@ -1107,17 +1098,17 @@ static void *_server_func(void *arg)
                 if (sock != NULL) {
                     const struct iovec *exp = msg.content.ptr;
 
-                    assert(((ssize_t)exp->iov_len) ==
+                    expect(((ssize_t)exp->iov_len) ==
                            sock_tcp_read(sock, _server_buf, sizeof(_server_buf),
                                          SOCK_NO_TIMEOUT));
-                    assert(memcmp(exp->iov_base, _server_buf, exp->iov_len) == 0);
+                    expect(memcmp(exp->iov_base, _server_buf, exp->iov_len) == 0);
                 }
                 break;
             case _SERVER_MSG_WRITE:
                 if (sock != NULL) {
                     const struct iovec *data = msg.content.ptr;
 
-                    assert(((ssize_t)data->iov_len) ==
+                    expect(((ssize_t)data->iov_len) ==
                            sock_tcp_write(sock, data->iov_base, data->iov_len));
                 }
                 break;
@@ -1148,7 +1139,7 @@ static void *_client_func(void *arg)
 
     (void)arg;
     msg_init_queue(_client_msg_queue, _MSG_QUEUE_SIZE);
-    _client = sched_active_pid;
+    _client = thread_getpid();
     while (1) {
         msg_t msg;
 
@@ -1157,7 +1148,7 @@ static void *_client_func(void *arg)
             case _CLIENT_MSG_START:
                 if (!client_started) {
                     const uint16_t local_port = (uint16_t)msg.content.value;
-                    assert(0 == sock_tcp_connect(&_client_sock, &_server_addr,
+                    expect(0 == sock_tcp_connect(&_client_sock, &_server_addr,
                                                  local_port, SOCK_FLAGS_REUSE_EP));
                     client_started = true;
                 }
@@ -1166,17 +1157,17 @@ static void *_client_func(void *arg)
                 if (client_started) {
                     const struct iovec *exp = msg.content.ptr;
 
-                    assert(((ssize_t)exp->iov_len) ==
+                    expect(((ssize_t)exp->iov_len) ==
                            sock_tcp_read(&_client_sock, _client_buf,
                                          sizeof(_client_buf), SOCK_NO_TIMEOUT));
-                    assert(memcmp(exp->iov_base, _client_buf, exp->iov_len) == 0);
+                    expect(memcmp(exp->iov_base, _client_buf, exp->iov_len) == 0);
                 }
                 break;
             case _CLIENT_MSG_WRITE:
                 if (client_started) {
                     const struct iovec *data = msg.content.ptr;
 
-                    assert(((ssize_t)data->iov_len) ==
+                    expect(((ssize_t)data->iov_len) ==
                            sock_tcp_write(&_client_sock, data->iov_base,
                                           data->iov_len));
                 }

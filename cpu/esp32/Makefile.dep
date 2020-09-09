@@ -1,116 +1,100 @@
 # additional modules dependencies
 
-ifneq (,$(filter cpp,$(FEATURES_USED)))
-    USEMODULE += pthread
-    BASELIBS += -lstdc++
-endif
+include $(RIOTCPU)/esp_common/Makefile.dep
+
+USEMODULE += esp_idf_driver
+USEMODULE += esp_idf_esp32
+USEMODULE += esp_idf_soc
+USEMODULE += newlib_nano
+USEMODULE += pm_layered
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
-    USEMODULE += esp_idf_eth
-    USEMODULE += esp_idf_eth_phy
-    USEMODULE += gnrc
-    USEMODULE += netdev_eth
-    USEMODULE += netopt
-    USEMODULE += riot_freertos
-    USEMODULE += xtimer
-    INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/ethernet
-    INCLUDES += -I$(ESP32_SDK_DIR)/components/ethernet/include
-endif
-
-ifneq (,$(filter esp_now,$(USEMODULE)))
-    $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
-    USEMODULE += esp_wifi_any
-    USEMODULE += gnrc
-    USEMODULE += netopt
-endif
-
-ifneq (,$(filter esp_wifi,$(USEMODULE)))
-    $(eval GNRC_NETIF_NUMOF=$(shell echo $$(($(GNRC_NETIF_NUMOF)+1))))
-    USEMODULE += esp_wifi_any
-    USEMODULE += gnrc
-    USEMODULE += netopt
-    USEMODULE += netdev_eth
+  USEMODULE += esp_freertos
+  USEMODULE += esp_idf_eth
+  USEMODULE += esp_idf_eth_phy
+  USEMODULE += netdev_eth
+  USEMODULE += netopt
+  USEMODULE += xtimer
 endif
 
 ifneq (,$(filter esp_wifi_any,$(USEMODULE)))
-    # add additional modules used for any WiFi interface
-    USEMODULE += esp_idf_heap
-    USEMODULE += esp_idf_wpa_supplicant_crypto
-    USEMODULE += esp_idf_wpa_supplicant_port
-    USEMODULE += esp_idf_nvs_flash
-    USEMODULE += riot_freertos
-    USEMODULE += xtimer
+  # add additional modules used for any WiFi interface
+  USEMODULE += esp_freertos
+  USEMODULE += esp_idf_heap
+  USEMODULE += esp_idf_nvs_flash
+  USEMODULE += esp_idf_wpa_supplicant_crypto
+  USEMODULE += esp_idf_wpa_supplicant_port
+endif
+
+ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
+  # add additional modules used for WPA2 Enterprise mode
+  USEMODULE += esp_idf_wpa_supplicant_wpa2_eap_peer
+  USEMODULE += esp_idf_wpa_supplicant_wpa2_tls
+  USEMODULE += esp_idf_wpa_supplicant_wpa2_utils
 endif
 
 ifneq (,$(filter esp_idf_nvs_flash,$(USEMODULE)))
-    # add additional modules required by esp_idf_nvs_flash
-    USEMODULE += mtd
-    USEMODULE += pthread
+  # add additional modules required by esp_idf_nvs_flash
+  USEMODULE += mtd
+endif
+
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
+    FEATURES_OPTIONAL += esp_rtc_timer_32k
+endif
+
+ifneq (,$(filter esp_rtc_timer_32k,$(FEATURES_USED)))
+    USEMODULE += esp_rtc_timer_32k
+endif
+
+ifneq (,$(filter periph_adc periph_dac,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc_ctrl
 endif
 
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
-    ifneq (,$(filter esp_i2c_hw,$(USEMODULE)))
-        USEMODULE += core_thread_flags
-        USEMODULE += xtimer
-        USEMODULE += periph_i2c_hw
-    else
-        # PLEASE NOTE: because of the very poor and faulty hardware implementation
-        # we use software implementation by default for the moment (if module
-        # esp_i2c_hw is not explicitly used)
-        USEMODULE += esp_i2c_sw
-        USEMODULE += periph_i2c_sw
-    endif
+  ifneq (,$(filter esp_i2c_hw,$(USEMODULE)))
+    USEMODULE += core_thread_flags
+    USEMODULE += xtimer
+    USEMODULE += periph_i2c_hw
+  else
+    # PLEASE NOTE: because of the very poor and faulty hardware implementation
+    # we use software implementation by default for the moment (if module
+    # esp_i2c_hw is not explicitly used)
+    USEMODULE += esp_i2c_sw
+    USEMODULE += periph_i2c_sw
+  endif
 endif
 
-ifneq (, $(filter esp_spi_ram, $(DISABLE_MODULE)))
-    USEMODULE := $(filter-out esp_spi_ram, $(USEMODULE))
+ifneq (,$(filter esp_spi_ram,$(DISABLE_MODULE)))
+  USEMODULE := $(filter-out esp_spi_ram,$(USEMODULE))
 endif
 
-# each device has SPI flash memory, but must be explicitly enabled
-ifneq (,$(filter esp_spiffs,$(USEMODULE)))
-    USEMODULE += spiffs
+ifneq (,$(filter esp_now esp_wifi esp_spi_ram,$(USEMODULE)))
+  # the ESP-IDF heap has to be used if SPI RAM is used
+  USEMODULE += esp_idf_heap
 endif
 
 ifneq (,$(filter mtd,$(USEMODULE)))
-    USEMODULE += esp_idf_spi_flash
+  USEMODULE += esp_idf_spi_flash
 endif
 
 ifneq (,$(filter ndn-riot,$(USEPKG)))
-    USEMODULE += crypto
-    USEMODULE += cipher_modes
+  USEMODULE += crypto
+  USEMODULE += cipher_modes
+endif
+
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
+  USEMODULE += rtt_rtc
+endif
+
+ifneq (,$(filter pm_layered,$(USEMODULE)))
+  USEMODULE += periph_rtt
+endif
+
+ifneq (,$(filter periph_rtt,$(USEMODULE)))
+  USEMODULE += periph_rtt_hw_sys
+  USEMODULE += periph_rtt_hw_rtc
 endif
 
 ifneq (,$(filter shell,$(USEMODULE)))
-    USEMODULE += ps
-endif
-
-ifneq (,$(filter log_color,$(USEMODULE)))
-    USEMODULE += esp_log_colored
-endif
-
-# if SPI RAM is enabled, ESP-IDF heap and quot flash mode have to be used
-ifneq (,$(filter esp_spi_ram,$(USEMODULE)))
-    USEMODULE += esp_idf_heap
-    export FLASH_MODE = qout
-    CFLAGS += -DFLASH_MODE_QOUT=1
-else
-    ifeq ($(FLASH_MODE), qio)
-        CFLAGS += -DFLASH_MODE_QIO=1
-    endif
-    ifeq ($(FLASH_MODE), qout)
-        CFLAGS += -DFLASH_MODE_QOUT=1
-    endif
-    ifeq ($(FLASH_MODE), dio)
-        CFLAGS += -DFLASH_MODE_DIO=1
-    endif
-    ifeq ($(FLASH_MODE), dout)
-        CFLAGS += -DFLASH_MODE_DOUT=1
-    endif
-endif
-
-ifneq (,$(filter esp_idf_heap,$(USEMODULE)))
-    LINKFLAGS += -Wl,-wrap,_malloc_r
-    LINKFLAGS += -Wl,-wrap,_calloc_r
-    LINKFLAGS += -Wl,-wrap,_realloc_r
-    LINKFLAGS += -Wl,-wrap,_free_r
+  USEMODULE += ps
 endif

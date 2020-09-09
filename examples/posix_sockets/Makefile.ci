@@ -7,9 +7,9 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega1284p \
     atmega328p \
-    chronos \
     derfmega128 \
     i-nucleo-lrwan1 \
+    im880b \
     mega-xplained \
     microduino-corerf \
     msb-430 \
@@ -31,8 +31,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32l0538-disco \
     telosb \
     waspmote-pro \
-    wsn430-v1_3b \
-    wsn430-v1_4 \
     yunjia-nrf51822 \
     z1 \
     #

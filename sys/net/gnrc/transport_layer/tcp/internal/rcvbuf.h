@@ -42,7 +42,7 @@ typedef struct rcvbuf_entry {
  */
 typedef struct rcvbuf {
     mutex_t lock;                                 /**< Lock for allocation synchronization */
-    rcvbuf_entry_t entries[GNRC_TCP_RCV_BUFFERS]; /**< Maintained receive buffers */
+    rcvbuf_entry_t entries[CONFIG_GNRC_TCP_RCV_BUFFERS]; /**< Maintained receive buffers */
 } rcvbuf_t;
 
 /**

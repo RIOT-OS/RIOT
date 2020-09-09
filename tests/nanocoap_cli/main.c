@@ -86,12 +86,12 @@ static int _list_all_inet6(int argc, char **argv)
     unsigned addr_qty = 0;
 
     while ((netif = gnrc_netif_iter(netif))) {
-        ipv6_addr_t ipv6_addrs[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+        ipv6_addr_t ipv6_addrs[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
         int res = gnrc_netapi_get(netif->pid, NETOPT_IPV6_ADDR, 0, ipv6_addrs,
                                   sizeof(ipv6_addrs));
         if (res >= 0) {
-            uint8_t ipv6_addrs_flags[GNRC_NETIF_IPV6_ADDRS_NUMOF];
+            uint8_t ipv6_addrs_flags[CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF];
 
             memset(ipv6_addrs_flags, 0, sizeof(ipv6_addrs_flags));
             /* assume it to succeed (otherwise array will stay 0) */

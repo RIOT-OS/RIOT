@@ -5,7 +5,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     b-l072z-lrwan1 \
-    chronos \
+    e104-bt5010a-tb \
     lsn50 \
     msb-430 \
     msb-430h \
@@ -15,17 +15,15 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f334r8 \
+    nucleo-g070rb \
     nucleo-l031k6 \
     nucleo-l053r8 \
     nucleo-l073rz \
-    ruuvitag \
+    nucleo-l412kb \
     saml10-xpro \
     saml11-xpro \
     stm32f0discovery \
     telosb \
-    thingy52 \
     waspmote-pro \
-    wsn430-v1_3b \
-    wsn430-v1_4 \
     z1 \
     #

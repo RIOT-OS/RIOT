@@ -23,6 +23,7 @@
 #define DONT_OVERRIDE_NVIC
 
 #include "cpu.h"
+#include "nrfx.h"
 #include "nrf_clock.h"
 #include "periph_conf.h"
 #include "periph/init.h"
@@ -61,12 +62,16 @@ void cpu_init(void)
         NRF_CLOCK->EVENTS_DONE = 0;
         NRF_CLOCK->EVENTS_CTTO = 0;
     }
+    /* Enable the DC/DC power converter */
+    nrfx_dcdc_init();
 
     /* initialize hf clock */
     clock_init_hf();
 
+#ifdef NVMC_ICACHECNF_CACHEEN_Msk
     /* enable instruction cache */
     NRF_NVMC->ICACHECNF = (NVMC_ICACHECNF_CACHEEN_Msk);
+#endif
 
     /* softdevice needs to be enabled from ISR context */
 #ifdef SOFTDEVICE_PRESENT

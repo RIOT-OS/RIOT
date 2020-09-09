@@ -71,8 +71,6 @@ void trickle_start(kernel_pid_t pid, trickle_t *trickle, uint16_t msg_type,
     assert(Imin > 0);
     assert((Imin << Imax) < (UINT32_MAX / 2));
 
-    trickle->pid = pid;
-
     trickle->c = 0;
     trickle->k = k;
     trickle->Imin = Imin;

@@ -1,0 +1,154 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig KCONFIG_USEMODULE_GNRC_RPL
+    bool "Configure RPL routing protocol"
+    depends on USEMODULE_GNRC_RPL
+
+if KCONFIG_USEMODULE_GNRC_RPL
+
+menu "Trickle parameters"
+
+config GNRC_RPL_DEFAULT_DIO_INTERVAL_DOUBLINGS
+    int "DIO interval doublings"
+    default 20
+    help
+        @see https://tools.ietf.org/html/rfc6550#section-8.3.1
+
+config GNRC_RPL_DEFAULT_DIO_INTERVAL_MIN
+    int "DIO interval minimum"
+    default 3
+    help
+        @see https://tools.ietf.org/html/rfc6550#section-8.3.1
+
+config GNRC_RPL_DEFAULT_DIO_REDUNDANCY_CONSTANT
+    int "DIO redundancy constant"
+    default 10
+    help
+        @see https://tools.ietf.org/html/rfc6550#section-8.3.1
+
+endmenu # Trickle parameters
+
+
+menu "Default parent and route entry lifetime"
+
+config GNRC_RPL_DEFAULT_LIFETIME
+    int "Default lifetime"
+    default 5
+    help
+        The default lifetime will be multiplied but the lifetime unit to obtain
+        the resulting lifetime.
+        @see https://tools.ietf.org/html/rfc6550#section-6.7.6
+        "DODAG Configuration"
+
+config GNRC_RPL_LIFETIME_UNIT
+    int "Lifetime unit"
+    default 60
+
+endmenu # Default parent and route entry lifetime
+
+
+menu "Parameters used for DAO handling"
+
+config GNRC_RPL_DAO_SEND_RETRIES
+    int "Send retries"
+    default 4
+
+config GNRC_RPL_DAO_ACK_DELAY
+    int "Acknowledge delay in milliseconds [ms]"
+    default 3000
+
+config GNRC_RPL_DAO_DELAY_LONG
+    int "Long delay for DAOs in milliseconds [ms]"
+    default 60000
+
+config GNRC_RPL_DAO_DELAY_DEFAULT
+    int "Default delay for DAOs in milliseconds [ms]"
+    default 1000
+
+config GNRC_RPL_DAO_DELAY_JITTER
+    int "Jitter for DAOs in milliseconds [ms]"
+    default 1000
+
+config GNRC_RPL_CLEANUP_TIME
+    int "Cleanup interval in milliseconds [ms]"
+    default 5000
+
+endmenu # Parameters used for DAO handling
+
+
+choice
+    bool "Mode of Operation"
+    default GNRC_RPL_MOP_STORING_MODE_NO_MC
+
+config GNRC_RPL_MOP_NO_DOWNWARD_ROUTES
+    bool "No downward routes"
+
+config GNRC_RPL_MOP_NON_STORING_MODE
+    bool "Non storing"
+
+config GNRC_RPL_MOP_STORING_MODE_NO_MC
+    bool "Storing and no multicast"
+
+config GNRC_RPL_MOP_STORING_MODE_MC
+    bool "Storing and multicast"
+
+endchoice
+
+
+config GNRC_RPL_WITHOUT_PIO
+    bool "Exclude Prefix Information Options from DIOs"
+
+config GNRC_RPL_DODAG_CONF_OPTIONAL_ON_JOIN
+    bool "Optional DODAG_CONF when joining a DODAG"
+    help
+        This will use the default trickle parameters until a DODAG_CONF is
+        received from the parent. The DODAG_CONF is requested once from the
+        parent while joining the DODAG. The standard behaviour is to request a
+        DODAG_CONF and join once a DODAG once a DODAG_CONF is received.
+
+config GNRC_RPL_WITHOUT_VALIDATION
+    bool "Disable RPL control message validation"
+    help
+        By default, all incoming control messages get checked for validation.
+        This validation can be disabled in case the involved RPL implementations
+        are known to produce valid messages.
+
+config GNRC_RPL_DEFAULT_MIN_HOP_RANK_INCREASE
+    int "Default minimum hop rank increase"
+    default 256
+    help
+        @see https://tools.ietf.org/html/rfc6550#section-17
+
+config GNRC_RPL_DEFAULT_MAX_RANK_INCREASE
+    int "Maximum rank increase"
+    default 0
+
+config GNRC_RPL_DEFAULT_INSTANCE
+    int "Default Instance ID"
+    default 0
+
+config GNRC_RPL_PARENT_TIMEOUT_DIS_RETRIES
+    int "Number of DIS retries"
+    default 3
+    help
+        This is the number of DIS retries before the parent times out.
+
+config GNRC_RPL_DEFAULT_NETIF
+    int "Default network interface to run the protocol on"
+    default 0
+    depends on USEMODULE_AUTO_INIT_GNRC_RPL
+
+config GNRC_RPL_MSG_QUEUE_SIZE_EXP
+    int "Exponent for the thread's message queue size (as 2^n)"
+    default 3
+    help
+        As the queue size ALWAYS needs to be power of two, this option
+        represents the exponent of 2^n, which will be used as the size of
+        the queue.
+
+endif # KCONFIG_USEMODULE_GNRC_RPL

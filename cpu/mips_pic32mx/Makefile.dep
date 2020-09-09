@@ -1,0 +1,1 @@
+include $(RIOTCPU)/mips_pic32_common/Makefile.dep

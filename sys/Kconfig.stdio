@@ -1,0 +1,30 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "Standard Input/Ouput (STDIO)"
+    depends on TEST_KCONFIG
+
+choice
+    bool "STDIO implementation"
+    default MODULE_STDIO_UART
+
+# TODO: Add MODULE_STDIO_CDC_ACM, MODULE_STDIO_RTT, MODULE_SLIPDEV_STDIO,
+# MODULE_STDIO_NATIVE and MODULE_STDIO_ETHOS
+
+config MODULE_STDIO_NULL
+    bool "Null"
+    help
+        Empty implementation.
+
+config MODULE_STDIO_UART
+    bool "UART"
+    depends on HAS_PERIPH_UART
+    select MODULE_PERIPH_UART
+
+endchoice
+
+endmenu # Standard Input/Ouput (STDIO)

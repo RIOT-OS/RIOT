@@ -10,7 +10,7 @@ RIOTBASE ?= $(CURDIR)/../..
 # Uncomment these lines if you want to use platform support from external
 # repositories:
 #RIOTCPU ?= $(CURDIR)/../../RIOT/thirdparty_cpu
-#BOARDSDIR ?= $(CURDIR)/../../RIOT/thirdparty_boards
+#EXTERNAL_BOARD_DIRS ?= $(CURDIR)/../../RIOT/thirdparty_boards
 
 # Uncomment this to enable scheduler statistics for ps:
 #USEMODULE += schedstatistics
@@ -34,11 +34,13 @@ USEMODULE += ps
 # include and auto-initialize all available sensors
 USEMODULE += saul_default
 
-BOARD_PROVIDES_NETIF := acd52832 airfy-beacon atmega256rfr2-xpro avr-rss2 b-l072z-lrwan1 cc2538dk fox \
+BOARD_PROVIDES_NETIF := acd52832 adafruit-clue airfy-beacon atmega256rfr2-xpro \
+        arduino-nano-33-ble avr-rss2 b-l072z-lrwan1 cc2538dk dwm1001 fox \
         derfmega128 derfmega256 hamilton iotlab-m3 iotlab-a8-m3 lobaro-lorabox lsn50 mulle microbit msba2 \
         microduino-corerf native nrf51dk nrf51dongle nrf52dk nrf52840dk nrf52840-mdk nrf6310 \
         nucleo-f207zg nucleo-f767zi openmote-b openmote-cc2538 pba-d-01-kw2x remote-pa \
-        remote-reva ruuvitag samr21-xpro samr30-xpro spark-core telosb thingy52 yunjia-nrf51822 z1
+        remote-reva ruuvitag samr21-xpro samr30-xpro spark-core telosb thingy52 yunjia-nrf51822 z1 \
+        frdm-kw41z phynode-kw41z usb-kw41z openlabs-kw41z-mini openlabs-kw41z-mini-256kib
 
 ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
   # Use modules for networking
@@ -55,7 +57,10 @@ ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
 
   # We use only the lower layers of the GNRC network stack, hence, we can
   # reduce the size of the packet buffer a bit
-  CFLAGS += -DGNRC_PKTBUF_SIZE=512
+  # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
+endif
 endif
 
 FEATURES_OPTIONAL += periph_rtc

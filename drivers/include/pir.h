@@ -62,11 +62,17 @@ typedef struct {
 } pir_t;
 
 /**
- * @brief   value to configure sensitivity of sensore
+ * @defgroup drivers_pir_config     PIR Motion Sensor driver compile configuration
+ * @ingroup config_drivers_sensors
+ * @{
+ */
+/**
+ * @brief   Sensitivity of sensor
  */
 #ifndef PIR_MSG_T_STATUS_START
 #define PIR_MSG_T_STATUS_START 150
 #endif
+/** @} */
 
 /**
  * @brief   event type for a PIR sensor

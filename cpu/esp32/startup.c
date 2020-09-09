@@ -43,7 +43,9 @@
 
 #include "driver/periph_ctrl.h"
 #include "esp/common_macros.h"
+#include "esp32/esp_sleep.h"
 #include "heap/esp_heap_caps_init.h"
+#include "log/esp_log.h"
 #include "rom/cache.h"
 #include "rom/ets_sys.h"
 #include "rom/rtc.h"
@@ -71,7 +73,7 @@
 #define STRINGIFY2(s) #s
 
 #if MODULE_ESP_LOG_STARTUP
-#define LOG_STARTUP(format, ...) LOG_TAG_EARLY(LOG_DEBUG, D, __func__, format, ##__VA_ARGS__)
+#define LOG_STARTUP(format, ...) LOG_TAG_EARLY(LOG_INFO, D, __func__, format, ##__VA_ARGS__)
 #else
 #define LOG_STARTUP(format, ...)
 #endif
@@ -152,6 +154,13 @@ NORETURN void IRAM call_start_cpu0 (void)
     ets_printf("\n");
 #endif
 
+    if (reset_reason == DEEPSLEEP_RESET) {
+        /* the cause has to be read to clear it */
+        esp_sleep_wakeup_cause_t cause = esp_sleep_get_wakeup_cause();
+        (void)cause;
+        LOG_STARTUP("Restart after deep sleep, wake-up cause: %d\n", cause);
+    }
+
     LOG_STARTUP("Current clocks in Hz: CPU=%d APB=%d XTAL=%d SLOW=%d\n",
                 rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()),
                 rtc_clk_apb_freq_get(), rtc_clk_xtal_freq_get()*MHZ,
@@ -177,7 +186,7 @@ NORETURN void IRAM call_start_cpu0 (void)
     #ifdef MODULE_ESP_IDF_HEAP
     /* init heap */
     heap_caps_init();
-    #ifdef ENABLE_DEBUG
+    #if ENABLE_DEBUG
     ets_printf("Heap free: %u byte\n", get_free_heap_size());
     #endif /* ENABLE_DEBUG */
     #endif /* MODULE_ESP_IDF_HEAP */
@@ -214,8 +223,14 @@ static void IRAM system_clk_init (void)
     /* set FAST_CLK to internal low power clock of 8 MHz */
     rtc_clk_fast_freq_set(RTC_FAST_FREQ_8M);
 
+#if MODULE_ESP_RTC_TIMER_32K
+    /* set SLOW_CLK to external 32.768 kHz crystal clock */
+    rtc_select_slow_clk(RTC_SLOW_FREQ_32K_XTAL);
+#else
     /* set SLOW_CLK to internal low power clock of 150 kHz */
+    rtc_clk_32k_enable(false);
     rtc_select_slow_clk(RTC_SLOW_FREQ_RTC);
+#endif
 
     LOG_STARTUP("Switching system clocks can lead to some unreadable characters\n");
 
@@ -274,9 +289,6 @@ static NORETURN void IRAM system_init (void)
     /* initialize system call tables of ESP32 rom and newlib */
     syscalls_init();
 
-    /* initialize the RTC module (restore timer values from RTC RAM) */
-    rtc_init();
-
     /* install exception handlers */
     init_exceptions();
 
@@ -290,12 +302,9 @@ static NORETURN void IRAM system_init (void)
     /* Disable the hold flag of all RTC GPIO pins */
     RTCCNTL.hold_force.val = 0;
 
-    /*
-     * initialization of newlib, includes the ctors initialization and
-     * and the execution of stdio_init in _init of newlib_syscalls_default
-     */
-    extern void __libc_init_array(void);
-    __libc_init_array();
+    /* set log levels for SDK library outputs */
+    extern void esp_log_level_set(const char* tag, esp_log_level_t level);
+    esp_log_level_set("wifi", LOG_DEBUG);
 
     /* init watchdogs */
     system_wdt_init();
@@ -315,22 +324,22 @@ static NORETURN void IRAM system_init (void)
                 RTC_FAST_FREQ_8M_MHZ, rtc_clk_slow_freq_get_hz());
     LOG_STARTUP("XTAL calibration value: %d\n", esp_clk_slowclk_cal_get());
     LOG_STARTUP("Heap free: %u bytes\n", get_free_heap_size());
-
-    struct tm _sys_time;
-    rtc_get_time(&_sys_time);
-    LOG_STARTUP("System time: %04d-%02d-%02d %02d:%02d:%02d\n",
-                _sys_time.tm_year + 1900, _sys_time.tm_mon + 1, _sys_time.tm_mday,
-                _sys_time.tm_hour, _sys_time.tm_min, _sys_time.tm_sec);
     uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
-
-    /* initialize the board */
-    board_init();
 
     /* initialize stdio */
     stdio_init();
 
     /* trigger static peripheral initialization */
     periph_init();
+
+    /* print system time */
+#ifdef MODULE_PERIPH_RTC
+    struct tm _sys_time;
+    rtc_get_time(&_sys_time);
+    LOG_STARTUP("System time: %04d-%02d-%02d %02d:%02d:%02d\n",
+                _sys_time.tm_year + 1900, _sys_time.tm_mon + 1, _sys_time.tm_mday,
+                _sys_time.tm_hour, _sys_time.tm_min, _sys_time.tm_sec);
+#endif
 
     /* print the board config */
 #ifdef MODULE_ESP_LOG_STARTUP
@@ -342,6 +351,9 @@ static NORETURN void IRAM system_init (void)
     extern void spi_flash_drive_init (void);
     spi_flash_drive_init();
     #endif
+
+    /* initialize the board */
+    board_init();
 
     /* route a software interrupt source to CPU as trigger for thread yields */
     intr_matrix_set(PRO_CPU_NUM, ETS_FROM_CPU_INTR0_SOURCE, CPU_INUM_SOFTWARE);

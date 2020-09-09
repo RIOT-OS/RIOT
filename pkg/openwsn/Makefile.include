@@ -1,0 +1,78 @@
+INCLUDES += -I$(PKGDIRBASE)/openwsn \
+            -I$(PKGDIRBASE)/openwsn/kernel \
+            -I$(PKGDIRBASE)/openwsn/inc \
+            -I$(PKGDIRBASE)/openwsn/drivers/common \
+            -I$(PKGDIRBASE)/openwsn/drivers/common/crypto \
+            -I$(PKGDIRBASE)/openwsn/bsp/boards/ \
+            -I$(PKGDIRBASE)/openwsn/openstack/ \
+            -I$(PKGDIRBASE)/openwsn/openstack/02a-MAClow \
+            -I$(PKGDIRBASE)/openwsn/openstack/02b-MAChigh \
+            -I$(PKGDIRBASE)/openwsn/openstack/03a-IPHC \
+            -I$(PKGDIRBASE)/openwsn/openstack/03b-IPv6 \
+            -I$(PKGDIRBASE)/openwsn/openstack/04-TRAN \
+            -I$(PKGDIRBASE)/openwsn/openstack/cross-layers \
+            -I$(PKGDIRBASE)/openwsn/openapps \
+            -I$(PKGDIRBASE)/openwsn/openapps/cjoin \
+            -I$(PKGDIRBASE)/openwsn/openweb \
+            -I$(PKGDIRBASE)/openwsn/openweb/opencoap \
+            -I$(RIOTBASE)/pkg/openwsn/include \
+
+DIRS += $(RIOTBASE)/pkg/openwsn/contrib
+
+PSEUDOMODULES += openwsn_serial \
+                 openwsn_debugpins \
+                 openwsn_6lo_frag \
+                 openwsn_icmpv6_echo \
+                 openwsn_iee802154e_security \
+                 openwsn_leds \
+                 openwsn_sctimer \
+                 openwsn_sctimer_rtt \
+                 openwsn_sctimer_ztimer \
+                 openwsn_radio \
+                 #
+
+# Set OpenWSN configurations flags, see $(PKG_SOURCE_DIR)/openwsn-fw/inc/config.h
+
+ifneq (,$(filter openwsn_cjoin,$(USEMODULE)))
+  CFLAGS += -DOPENWSN_CJOIN_C
+  CFLAGS += -DBOARD_CRYPTOENGINE_ENABLED
+endif
+
+ifneq (,$(filter openwsn_transport,$(USEMODULE)))
+  CFLAGS += -DOPENWSN_UDP_C
+endif
+
+ifneq (,$(filter openwsn_opencoap,$(USEMODULE)))
+  CFLAGS += -DOPENWSN_COAP_C
+endif
+
+ifneq (,$(filter openwsn_6lo_frag,$(USEMODULE)))
+  CFLAGS += -DOPENWSN_6LO_FRAGMENTATION_C
+endif
+
+ifneq (,$(filter openwsn_icmpv6_echo,$(USEMODULE)))
+  CFLAGS += -DOPENWSN_ICMPV6ECHO_C
+endif
+
+ifneq (,$(filter openwsn_iee802154e_security,$(USEMODULE)))
+  CFLAGS += -DOPENWSN_IEEE802154E_SECURITY_C
+endif
+
+ifneq (,$(filter openwsn_adaptive_msf,$(USEMODULE)))
+  CFLAGS += -DOPENWSN_ADAPTIVE_MSF
+endif
+
+# In OpenWSN the ISR stack is shared with the network stack. OpenWSN stack is
+# 2Kb, this means that the ISR stack in OpenWSN might have up to 2Kb available.
+# To keep the same marging increase the ISR stack to 2Kb as well. In practice
+# 1Kb should be enough.
+CFLAGS += -DISR_STACKSIZE=2048
+
+# at86rf2xx state machine is in enhanced mode by default, OpenWSN requires
+# basic mode.
+ifneq (,$(filter at86rf2xx,$(USEMODULE)))
+  CFLAGS += -DAT86RF2XX_BASIC_MODE
+endif
+
+# LLVM ARM shows issues with missing definitions for stdatomic
+TOOLCHAINS_BLACKLIST += llvm

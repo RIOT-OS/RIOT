@@ -33,7 +33,7 @@ void _rcvbuf_init(void)
 {
     DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_init() : entry\n");
     mutex_init(&(_static_buf.lock));
-    for (size_t i = 0; i < GNRC_TCP_RCV_BUFFERS; ++i) {
+    for (size_t i = 0; i < CONFIG_GNRC_TCP_RCV_BUFFERS; ++i) {
         _static_buf.entries[i].used = 0;
     }
 }
@@ -49,7 +49,7 @@ static void* _rcvbuf_alloc(void)
     void *result = NULL;
     DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_alloc() : Entry\n");
     mutex_lock(&(_static_buf.lock));
-    for (size_t i = 0; i < GNRC_TCP_RCV_BUFFERS; ++i) {
+    for (size_t i = 0; i < CONFIG_GNRC_TCP_RCV_BUFFERS; ++i) {
         if (_static_buf.entries[i].used == 0) {
             _static_buf.entries[i].used = 1;
             result = (void *)(_static_buf.entries[i].buffer);
@@ -69,7 +69,7 @@ static void _rcvbuf_free(void * const buf)
 {
     DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_free() : Entry\n");
     mutex_lock(&(_static_buf.lock));
-    for (size_t i = 0; i < GNRC_TCP_RCV_BUFFERS; ++i) {
+    for (size_t i = 0; i < CONFIG_GNRC_TCP_RCV_BUFFERS; ++i) {
         if ((_static_buf.entries[i].used == 1) && (buf == _static_buf.entries[i].buffer)) {
             _static_buf.entries[i].used = 0;
         }

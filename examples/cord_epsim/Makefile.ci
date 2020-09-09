@@ -5,7 +5,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega328p \
-    chronos \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \
@@ -25,7 +24,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32l0538-disco \
     telosb \
     waspmote-pro \
-    wsn430-v1_3b \
-    wsn430-v1_4 \
     z1 \
     #

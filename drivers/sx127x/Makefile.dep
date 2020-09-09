@@ -1,0 +1,21 @@
+FEATURES_REQUIRED += periph_gpio
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi
+FEATURES_OPTIONAL += periph_spi_gpio_mode
+USEMODULE += iolist
+USEMODULE += ztimer_usec
+USEMODULE += ztimer_msec
+
+# If RTT feature is available use the RTT backend of ztimer
+FEATURES_OPTIONAL += periph_rtt
+ifneq (,$(filter periph_rtt,$(FEATURES_USED)))
+  USEMODULE += ztimer_periph_rtt
+endif
+
+USEMODULE += netif
+USEMODULE += lora
+
+ifneq (,$(filter gnrc,$(USEMODULE)))
+  # Pull in `ifconfig` support for LoRA
+  USEMODULE += gnrc_netif_cmd_lora
+endif

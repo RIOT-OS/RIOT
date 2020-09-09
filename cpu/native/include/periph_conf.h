@@ -44,8 +44,6 @@ extern "C" {
 /**
  * @brief xtimer configuration
  */
-#define XTIMER_OVERHEAD 14
-
 /* timer_set_absolute() has a high margin for possible underflow if set with
  * value not far in the future. To prevent this, we set high backoff values
  * here.
@@ -113,7 +111,7 @@ extern "C" {
  * `--spi` startup parameter with the corresponding SPI device and HWCS-line
  * parameter has been given.
  */
-#define SPI_HWCS(x)     (x)
+#define SPI_HWCS(x)     (UINT_MAX - SPI_MAXCS + x)
 /** @} */
 
 #ifdef __cplusplus

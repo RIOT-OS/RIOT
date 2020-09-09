@@ -30,6 +30,28 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+        <script>
+            function displaySR(){
+            searchBox.Search();
+            var rhtml=(document.getElementById('MSearchResults').contentWindow.document.body.innerHTML).replace(/href=\"\.\.\//g,'href="');
+            document.getElementById('MSearchResultsWindow').style.display='none';
+            document.getElementById('top').append(document.getElementById('MSearchSelectWindow'));
+            document.getElementById('top').append(document.getElementById('MSearchResultsWindow'));
+            document.getElementById('doc-content').innerHTML=rhtml;
+            }
+            function modSearch(){
+            if(!searchBox.doxySearch){
+                searchBox.doxySearch=searchBox.Search
+                searchBox.Search= function(){this.doxySearch();
+                var r=document.getElementById('MSearchResultsWindow');console.log(r.style);
+                if(parseInt(r.style.left)<0)r.style.left=0;
+                var x=document.getElementById('MSearchResults');
+                if(x.scrollWidth>window.screen.width)x.style.width=window.screen.width-2+'px';
+                var f=document.getElementById('riot-searchform');
+                if(parseInt( r.style.top) < f.offsetTop+f.scrollHeight) r.style.top = f.offsetTop+f.scrollHeight+'px';}
+            }
+            }
+        </script>
   </head>
   <body>
       <div id="top">
@@ -51,14 +73,19 @@
               <p class="navbar-text navbar-left"><span id="projectbrief">$projectbrief</span></p>
               <ul id="riot-navlist" class="nav navbar-nav"></ul>
               <!--BEGIN SEARCHENGINE-->
-              <form id="riot-searchform" class="navbar-form navbar-left navbar-right hidden-sm hidden-xs">
+              <form id="riot-searchform" class="navbar-form navbar-left navbar-right"
+                    onsubmit="try{
+                        displaySR();
+                    }finally{
+                            return false;
+                    }">
                  <div class="form-group">
                    <div id="MSearchBox" class="MSearchBoxActive">
                      <div class="input-group">
                        <div class="input-group-addon">
                          <span id="MSearchSelect" class="glyphicon glyphicon-search" aria-hidden="true" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()"></span>
                        </div>
-                       <input class="form-control" type="text" id="MSearchField" placeholder="Search" accesskey="S" onfocus="searchBox.OnSearchFieldFocus(true)" onblur="searchBox.OnSearchFieldFocus(false)" onkeyup="searchBox.OnSearchFieldChange(event)">
+                       <input class="form-control" type="text" id="MSearchField" placeholder="Search" accesskey="S" onfocus="searchBox.OnSearchFieldFocus(true)" onblur="searchBox.OnSearchFieldFocus(false)" onkeyup="searchBox.OnSearchFieldChange(event); modSearch();">
                        <a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()">
                          <span id="search-reset" class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span>
                        </a>

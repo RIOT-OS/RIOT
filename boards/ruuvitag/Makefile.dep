@@ -4,4 +4,11 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += lis2dh12_spi
 endif
 
+# Use Segger's RTT unless another stdio_% is already used
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_rtt
+endif
+
+USEMODULE += boards_common_nrf52xxdk
+
 include $(RIOTBOARD)/common/nrf52/Makefile.dep

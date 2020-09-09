@@ -20,11 +20,16 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include "periph/rtc.h"
 
 #ifndef RTC_NORMALIZE_COMPAT
 #define RTC_NORMALIZE_COMPAT (0)
 #endif
+
+#define MINUTE  (60U)
+#define HOUR    (60U * MINUTE)
+#define DAY     (24U * HOUR)
 
 /*
  * The rules here are (to be checked in that explicit order):
@@ -50,6 +55,26 @@ static int _is_leap_year(int year)
      * multiples of 100, !(year &15) is 0 except for those that are a multiple of 400.
      */
     return !!(year % 25) || !(year & 15);
+}
+
+/*
+ * 1. Every fourth year was a leap year.
+ * 2. Subtract all years divisible by 100, those are divisible by 4 but no leap years.
+ * 3. Add back all years divisible by 400, those are divisible by 100 but leap years.
+ */
+static unsigned _leap_years_before(unsigned year)
+{
+    --year;
+    return (year / 4) - (year / 100) + (year / 400);
+}
+
+static unsigned _leap_years_since_epoch(unsigned year)
+{
+    if (year < RIOT_EPOCH) {
+        return 0;
+    }
+
+    return _leap_years_before(year) - _leap_years_before(RIOT_EPOCH);
 }
 
 static int _month_length(int month, int year)
@@ -81,6 +106,7 @@ static int _wday(int day, int month, int year)
     year -= month < 2;
     return (year + year/4 - year/100 + year/400 + t[month] + day) % 7;
 }
+#endif /* RTC_NORMALIZE_COMPAT */
 
 static int _yday(int day, int month, int year)
 {
@@ -104,11 +130,14 @@ static int _yday(int day, int month, int year)
        2019-01-01 will be be day 0 in year 2019 */
     return d[month] + day - 1;
 }
-#endif /* RTC_NORMALIZE_COMPAT */
 
 void rtc_tm_normalize(struct tm *t)
 {
     div_t d;
+
+    if (t->tm_mday == 0) {
+        t->tm_mday = 1;
+    }
 
     d = div(t->tm_sec, 60);
     t->tm_min += d.quot;
@@ -148,6 +177,40 @@ void rtc_tm_normalize(struct tm *t)
 #endif
 }
 
+uint32_t rtc_mktime(struct tm *t)
+{
+    unsigned year = t->tm_year + 1900;
+    uint32_t time = t->tm_sec
+                  + t->tm_min * MINUTE
+                  + t->tm_hour * HOUR
+                  + _yday(t->tm_mday, t->tm_mon, year) * DAY;
+
+    unsigned leap_years = _leap_years_since_epoch(year);
+    unsigned common_years = (year - RIOT_EPOCH) - leap_years;
+
+    time += (leap_years * 366 + common_years * 365) * DAY;
+
+    return time;
+}
+
+void rtc_localtime(uint32_t time, struct tm *t)
+{
+    uint32_t y_secs = _is_leap_year(RIOT_EPOCH) ? (366 * DAY) : (365 * DAY);
+    unsigned year = RIOT_EPOCH;
+
+    while (time > y_secs) {
+        time -= y_secs;
+        ++year;
+        y_secs = _is_leap_year(year) ? (366 * DAY) : (365 * DAY);
+    }
+
+    memset(t, 0, sizeof(*t));
+    t->tm_sec  = time;
+    t->tm_year = year - 1900;
+
+    rtc_tm_normalize(t);
+}
+
 #define RETURN_IF_DIFFERENT(a, b, member)   \
     if (a->member != b->member) {           \
         return a->member-b->member;         \
@@ -163,4 +226,35 @@ int rtc_tm_compare(const struct tm *a, const struct tm *b)
     RETURN_IF_DIFFERENT(a, b, tm_sec);
 
     return 0;
+}
+
+bool rtc_tm_valid(const struct tm *t)
+{
+    if (t->tm_sec < 0) {
+        return false;
+    }
+
+    if (t->tm_min < 0) {
+        return false;
+    }
+
+    if (t->tm_hour < 0) {
+        return false;
+    }
+
+    if (t->tm_mday < 0) {
+        return false;
+    }
+
+    if (t->tm_mon < 0) {
+        return false;
+    }
+
+    if (t->tm_year < 0) {
+        return false;
+    }
+
+    struct tm norm = *t;
+    rtc_tm_normalize(&norm);
+    return rtc_tm_compare(t, &norm) == 0;
 }

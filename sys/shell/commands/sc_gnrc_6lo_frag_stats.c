@@ -28,6 +28,8 @@ int _gnrc_6lo_frag_stats(int argc, char **argv)
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
     printf("VRB full: %u\n", stats->vrb_full);
 #endif
+    printf("frags complete: %u\n", stats->fragments);
+    printf("dgs complete: %u\n", stats->datagrams);
     return 0;
 }
 

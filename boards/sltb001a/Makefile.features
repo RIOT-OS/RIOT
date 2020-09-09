@@ -1,4 +1,5 @@
 CPU = efm32
+CPU_FAM = efr32mg1p
 CPU_MODEL = efr32mg1p132f256gm48
 
 # Put defined MCU peripherals here (in alphabetical order)
