@@ -119,9 +119,9 @@ extern "C" {
 #define CONFIG_LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT (0U)
 #endif
 
-/** @brief Set fixed header length mode (implicit header) */
-#ifndef LORA_FIXED_HEADER_LEN_MODE_DEFAULT
-#define LORA_FIXED_HEADER_LEN_MODE_DEFAULT     (false)
+/** @brief Set this to true to enable fixed header length mode (implicit header) */
+#ifdef DOXYGEN
+#define CONFIG_LORA_FIXED_HEADER_LEN_MODE_DEFAULT
 #endif
 
 /** @brief Enable payload CRC, optional */
