@@ -183,7 +183,7 @@ int mtd_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t count)
     }
 
     if (mtd->driver->erase) {
-        mtd->driver->erase(mtd, addr, count);
+        return mtd->driver->erase(mtd, addr, count);
     }
 
     uint32_t sector_size = mtd->pages_per_sector * mtd->page_size;
