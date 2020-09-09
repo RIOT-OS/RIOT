@@ -99,6 +99,38 @@ static uint32_t _xtimer_diff_usec(xtimer_ticks32_t stop, xtimer_ticks32_t start)
     return xtimer_usec_from_ticks(xtimer_diff(stop, start));
 }
 
+static int _print_arch_help(void)
+{
+#ifdef CLOCK_APB1 /* STM32 */
+#define HAS_ARBITRARY_BUS_SPEED
+    int clk, tmp;
+
+    for (int i = 0; i < (int)SPI_NUMOF; i++) {
+        printf("\t\tSPI_DEV(%i), ", i);
+        if (spi_config[i].apbbus == APB1) {
+            clk = CLOCK_APB1;
+            printf("CLOCK_APB1 = %luHz\n", (uint32_t)CLOCK_APB1);
+        }
+        else if (spi_config[i].apbbus == APB2) {
+            clk = CLOCK_APB2;
+            printf("CLOCK_APB2 = %luHz\n", (uint32_t)CLOCK_APB2);
+        }
+        else {
+            printf("error: apbbus configuration ");
+            printf("unrecognized parameter for SPI_DEV(%i)\n", i);
+            return 1;
+        }
+        tmp = 256;
+        for (int j = 0; j < 8; j++) {
+            printf("\t\t\t%i: %i/%i\n", (clk / tmp), clk, tmp);
+            tmp /= 2;
+        }
+        puts("\t\t\t*: other values will be rounded.");
+    }
+#endif
+    return 0;
+}
+
 void print_bytes(char* title, uint8_t* data, size_t len)
 {
     printf("%4s\n", title);
@@ -142,30 +174,9 @@ int cmd_init(int argc, char **argv)
         puts("\t\t2: 1 MHz");
         puts("\t\t3: 5 MHz");
         puts("\t\t4: 10 MHz");
-#ifdef CLOCK_APB1
-        for (int i = 0; i < (int)SPI_NUMOF; i++) {
-            printf("\t\tSPI_DEV(%i), ", i);
-            if (spi_config[i].apbbus == APB1) {
-                clk = CLOCK_APB1;
-                printf("CLOCK_APB1 = %luHz\n", (uint32_t)CLOCK_APB1);
-            }
-            else if (spi_config[i].apbbus == APB2) {
-                clk = CLOCK_APB2;
-                printf("CLOCK_APB2 = %luHz\n", (uint32_t)CLOCK_APB2);
-            }
-            else {
-                printf("error: apbbus configuration ");
-                printf("unrecognized parameter for SPI_DEV(%i)\n", i);
-                return 1;
-            }
-            tmp = 256;
-            for (int j = 0; j < 8; j++) {
-                printf("\t\t\t%i: %i/%i\n", (clk / tmp), clk, tmp);
-                tmp /= 2;
-            }
-            puts("\t\t\t*: other values will be rounded.");
+        if (_print_arch_help()) {
+            return 1;
         }
-#endif
         puts("\tcs port:");
         puts("\t\tPort of the CS pin, set to -1 for hardware chip select");
         puts("\tcs pin:");
@@ -203,7 +214,7 @@ int cmd_init(int argc, char **argv)
         case 3: spiconf.clk = SPI_CLK_5MHZ;   break;
         case 4: spiconf.clk = SPI_CLK_10MHZ;  break;
         default:
-#ifdef CLOCK_APB1
+#ifdef HAS_ARBITRARY_BUS_SPEED
             spiconf.clk = clk;
 #else
             puts("error: invalid bus speed specified");
