@@ -4,3 +4,4 @@ INCLUDES += -I$(PKGDIRBASE)/ccn-lite/src/ccnl-pkt/include
 INCLUDES += -I$(PKGDIRBASE)/ccn-lite/src/ccnl-fwd/include
 
 CFLAGS += -DCCNL_RIOT
+ARCHIVES += $(BINDIR)/ccn-lite.a
