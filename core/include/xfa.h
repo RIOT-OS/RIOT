@@ -24,6 +24,14 @@
 #ifndef XFA_H
 #define XFA_H
 
+/*
+ * Unfortunately, current gcc trips over accessing XFA's because of their
+ * zero-size start/end array that are used of symbol markers, with an "array
+ * index out of bounds" warning.  So until a solution for that is found, we
+ * need to disable array bounds checks for files using XFAs.
+ */
+_Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
+
 /**
  * @brief helper macro for other XFA_* macros
  *
