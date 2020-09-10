@@ -220,7 +220,7 @@ typedef struct {
  * @brief   IRQ handler for RF events
  *
  */
-void _irq_handler(void);
+void cc2538_irq_handler(void);
 
 /**
  * @brief   Trigger a clear channel assessment

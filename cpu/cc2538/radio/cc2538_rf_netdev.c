@@ -34,7 +34,7 @@
 /* Reference pointer for the IRQ handler */
 static netdev_t *_dev;
 
-void _irq_handler(void)
+void cc2538_irq_handler(void)
 {
     RFCORE_SFR_RFIRQF0 = 0;
     RFCORE_SFR_RFIRQF1 = 0;

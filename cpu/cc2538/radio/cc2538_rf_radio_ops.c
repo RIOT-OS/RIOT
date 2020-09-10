@@ -307,7 +307,7 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
     return 0;
 }
 
-void _irq_handler(void)
+void cc2538_irq_handler(void)
 {
     uint_fast8_t flags_f0 = RFCORE_SFR_RFIRQF0;
     uint_fast8_t flags_f1 = RFCORE_SFR_RFIRQF1;
