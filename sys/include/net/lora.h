@@ -99,11 +99,6 @@ extern "C" {
 #define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_4_8)
 #endif
 
-/** @brief Set fixed payload length on */
-#ifndef LORA_FIX_LENGTH_PAYLOAD_ON_DEFAULT
-#define LORA_FIX_LENGTH_PAYLOAD_ON_DEFAULT     (false)
-#endif
-
 /** @brief Set this to true to enable inverted IQ mode */
 #ifdef DOXYGEN
 #define CONFIG_LORA_IQ_INVERTED_DEFAULT
