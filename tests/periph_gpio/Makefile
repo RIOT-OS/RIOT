@@ -2,6 +2,7 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_gpio
 FEATURES_OPTIONAL = periph_gpio_irq
+FEATURES_OPTIONAL += periph_gpio_fast_read
 
 USEMODULE += shell
 USEMODULE += shell_commands
