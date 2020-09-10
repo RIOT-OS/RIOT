@@ -75,6 +75,8 @@ typedef uint32_t gpio_t;
  */
 #ifdef CPU_FAM_SAML11
 #define GPIO_PIN(x, y)      (((gpio_t)(&PORT_SEC->Group[x])) | y)
+#elif defined(PORT_IOBUS)   /* Use IOBUS access when available */
+#define GPIO_PIN(x, y)      (((gpio_t)(&PORT_IOBUS->Group[x])) | y)
 #else
 #define GPIO_PIN(x, y)      (((gpio_t)(&PORT->Group[x])) | y)
 #endif
