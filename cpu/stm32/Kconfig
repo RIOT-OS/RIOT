@@ -123,5 +123,6 @@ config CPU
 
 source "$(RIOTCPU)/stm32/Kconfig.fam"
 source "$(RIOTCPU)/stm32/Kconfig.features"
+source "$(RIOTCPU)/stm32/Kconfig.lines"
 source "$(RIOTCPU)/stm32/Kconfig.models"
 source "$(RIOTCPU)/cortexm_common/Kconfig"
