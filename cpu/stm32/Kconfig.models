@@ -72,17 +72,14 @@ config CPU_MODEL_STM32F303K8
 config CPU_MODEL_STM32F303RE
     bool
     select CPU_LINE_STM32F303XE
-    select HAS_CORTEXM_MPU
 
 config CPU_MODEL_STM32F303VC
     bool
     select CPU_LINE_STM32F303XC
-    select HAS_CORTEXM_MPU
 
 config CPU_MODEL_STM32F303ZE
     bool
     select CPU_LINE_STM32F303XE
-    select HAS_CORTEXM_MPU
 
 config CPU_MODEL_STM32F334R8
     bool
@@ -96,17 +93,14 @@ config CPU_MODEL_STM32F401RE
 config CPU_MODEL_STM32F405RG
     bool
     select CPU_LINE_STM32F405XX
-    select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F407VG
     bool
     select CPU_LINE_STM32F407XX
-    select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F410RB
     bool
     select CPU_LINE_STM32F410XB
-    select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F411RE
     bool
@@ -119,27 +113,22 @@ config CPU_MODEL_STM32F411CEU6
 config CPU_MODEL_STM32F412ZG
     bool
     select CPU_LINE_STM32F412XG
-    select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F413ZH
     bool
     select CPU_LINE_STM32F413XX
-    select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F415RG
     bool
     select CPU_LINE_STM32F415XX
-    select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F429ZI
     bool
     select CPU_LINE_STM32F429XX
-    select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F437VG
     bool
     select CPU_LINE_STM32F437XX
-    select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F446RE
     bool
@@ -188,27 +177,22 @@ config CPU_MODEL_STM32L031K6
 config CPU_MODEL_STM32L052T8
     bool
     select CPU_LINE_STM32L052XX
-    select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32L053R8
     bool
     select CPU_LINE_STM32L053XX
-    select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32L053C8
     bool
     select CPU_LINE_STM32L053XX
-    select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32L072CZ
     bool
     select CPU_LINE_STM32L072XX
-    select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32L073RZ
     bool
     select CPU_LINE_STM32L073XX
-    select HAS_PERIPH_HWRNG
 
 # STM32L1
 config CPU_MODEL_STM32L151CB

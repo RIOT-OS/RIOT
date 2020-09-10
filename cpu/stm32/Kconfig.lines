@@ -157,10 +157,12 @@ config CPU_LINE_STM32F302X8
 config CPU_LINE_STM32F302XC
     bool
     select CPU_FAM_F3
+    select HAS_CORTEXM_MPU
 
 config CPU_LINE_STM32F302XE
     bool
     select CPU_FAM_F3
+    select HAS_CORTEXM_MPU
 
 config CPU_LINE_STM32F303X8
     bool
@@ -214,10 +216,12 @@ config CPU_LINE_STM32F401XE
 config CPU_LINE_STM32F405XX
     bool
     select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F407XX
     bool
     select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F410CX
     bool
@@ -226,6 +230,7 @@ config CPU_LINE_STM32F410CX
 config CPU_LINE_STM32F410RX
     bool
     select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F410TX
     bool
@@ -250,14 +255,17 @@ config CPU_LINE_STM32F412VX
 config CPU_LINE_STM32F412ZX
     bool
     select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F413XX
     bool
     select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F415XX
     bool
     select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F417XX
     bool
@@ -274,10 +282,12 @@ config CPU_LINE_STM32F427XX
 config CPU_LINE_STM32F429XX
     bool
     select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F437XX
     bool
     select CPU_FAM_F4
+    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F439XX
     bool
@@ -462,10 +472,12 @@ config CPU_LINE_STM32L051XX
 config CPU_LINE_STM32L052XX
     bool
     select CPU_FAM_L0
+    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32L053XX
     bool
     select CPU_FAM_L0
+    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32L061XX
     bool
@@ -486,10 +498,12 @@ config CPU_LINE_STM32L071XX
 config CPU_LINE_STM32L072XX
     bool
     select CPU_FAM_L0
+    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32L073XX
     bool
     select CPU_FAM_L0
+    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32L081XX
     bool
