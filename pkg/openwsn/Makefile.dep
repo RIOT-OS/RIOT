@@ -1,34 +1,58 @@
-ifneq (,$(filter openwsn_openstack,$(USEMODULE)))
+DEFAULT_MODULE += auto_init_openwsn
+USEMODULE += openwsn_drivers
+USEMODULE += openwsn_sctimer
+USEMODULE += openwsn_radio
+USEMODULE += netdev_default
+USEMODULE += luid
+USEMODULE += netif
+
+# Always include nothing is loaded if unused
+USEMODULE += openwsn_openweb
+USEMODULE += openwsn_openapps
+USEMODULE += openwsn_scheduler
+
+ifneq (,$(filter openwsn_stack,$(USEMODULE)))
+  USEMODULE += openwsn_openstack
+  USEMODULE += openwsn_mac
   USEMODULE += openwsn_iphc
   USEMODULE += openwsn_ipv6
-  USEMODULE += openwsn_mac_low
-  USEMODULE += openwsn_mac_high
   USEMODULE += openwsn_transport
   USEMODULE += openwsn_crosslayers
+endif
 
-  USEMODULE += openwsn_drivers
-  USEMODULE += openwsn_sctimer
-  USEMODULE += openwsn_radio
+ifneq (,$(filter openwsn_mac,$(USEMODULE)))
+  USEMODULE += openwsn_sap
+  USEMODULE += openwsn_openstack
+  USEMODULE += openwsn_mac_low
+  USEMODULE += openwsn_mac_high
+  USEMODULE += openwsn_crosslayers
+  ifeq (,$(filter openwsn_stack,$(USEMODULE)))
+    CFLAGS += -DOPENWSN_MAC_ONLY
+  endif
+endif
 
-  USEMODULE += openwsn_openweb
-  USEMODULE += openwsn_openapps
+ifneq (,$(filter openwsn_scheduler,$(USEMODULE)))
+  ifeq (,$(filter openwsn_openos,$(USEMODULE)))
+    USEMODULE += openwsn_riotos
+  endif
+endif
 
-  DEFAULT_MODULE += auto_init_openwsn
+ifneq (,$(filter openwsn_openos,$(USEMODULE)))
+  USEMODULE += core_thread_flags
+endif
 
-  USEMODULE += luid
-  USEMODULE += netdev_default
+ifneq (,$(filter openwsn_riotos,$(USEMODULE)))
+  USEMODULE += event
+  USEMODULE += event_callback
+  USEMODULE += memarray
 endif
 
 ifneq (,$(filter openwsn_ipv6,$(USEMODULE)))
   DEFAULT_MODULE += openwsn_icmpv6_echo
 endif
 
-ifneq (,$(filter openwsn_scheduler,$(USEMODULE)))
-  USEMODULE += core_thread_flags
-endif
-
 ifneq (,$(filter openwsn_cjoin,$(USEMODULE)))
-  USEMODULE += openwsn_opencoap
+  USEMODULE += openwsn_coap
   USEMODULE += openwsn_crypto
 endif
 

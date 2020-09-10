@@ -79,7 +79,7 @@ static int udp_send(char *addr_str, char *port_str, char *data,
         }
 
         /* don't run on dagroot */
-        if (idmanager_getIsDAGroot()) {
+        if (idmanager_isPanCoordinator()) {
             puts("Error: Node is DAGROOT, exit");
             return 1;
         }
@@ -139,7 +139,7 @@ int udp_cmd(int argc, char **argv)
         uint32_t num = 1;
         uint32_t delay = 1000000LU;
         /* don't send as root */
-        if (idmanager_vars.isDAGroot) {
+        if (idmanager_isPanCoordinator()) {
             puts("Error: Node is root, exit");
             return 1;
         }

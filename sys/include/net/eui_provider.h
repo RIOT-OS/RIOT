@@ -197,8 +197,8 @@ static inline void eui_short_from_eui64(eui64_t *addr_long,
 {
     /* https://tools.ietf.org/html/rfc4944#section-12 requires the first bit to
      * 0 for unicast addresses */
-    addr_short->u8[0] = addr_long->uint8[6] & 0x7F;
-    addr_short->u8[1] = addr_long->uint8[7];
+    addr_short->u8[0] = addr_long->uint8[0] & 0x7F;
+    addr_short->u8[1] ^= addr_long->uint8[1];
 }
 
 #ifdef __cplusplus

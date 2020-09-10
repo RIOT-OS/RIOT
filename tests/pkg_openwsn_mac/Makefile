@@ -14,19 +14,10 @@ BOARD_WHITELIST = \
 
 # OpenWSN Modules
 USEPKG += openwsn
-USEMODULE += openwsn_stack
+USEMODULE += openwsn_mac
+USEMODULE += openwsn_txtsnd
 
-# Optional OpenWSN Modules
-## Enable Constrained Join Protocol (CoJP)
-USEMODULE += openwsn_cjoin
-## Enable 6lowpan fragmentation
-USEMODULE += openwsn_6lo_frag
-## Enable link layer security
-# USEMODULE += openwsn_iee802154e_security
-## Enable MSF dynamic slot allocation
-#  USEMODULE += openwsn_adaptive_msf
-
-## Optional Module, but required for root nodes
+## Optional Module, usefull for debugginf
 # USEMODULE += openwsn_serial
 
 # Optional Modules
@@ -34,15 +25,6 @@ USEMODULE += openwsn_leds
 USEMODULE += openwsn_debugpins
 
 ifneq (,$(filter openwsn_serial,$(USEMODULE)))
-# Uncomment to use STDIO_UART_DEV as the uart for OpenWSN openserial
-# USEMODULE += stdio_null
-  ifneq (,$(filter iotlab-m3 iotlab-a8-m3,$(BOARD)))
-    USEMODULE += stdio_null
-  endif
-  # OpenWSN serial module can't handle data at more than 115200 bauds/s,
-  # depending on the platform this might be even lower (e.g. 57600 bauds
-  # for iotlab-m3, 19200 for samr21-xpro).
-  # NOTE: baudrate can'y be changed when testing over IotLab.
   OPENSERIAL_BAUD ?=
   ifneq (,$(OPENSERIAL_BAUD))
     CFLAGS += -DOPENWSN_UART_BAUDRATE=$(OPENSERIAL_BAUD)
@@ -56,14 +38,9 @@ endif
 # export OPENWSN_LOG_LEVEL ?= LOG_ERROR
 
 ## Test application Modules
-USEMODULE += ipv6_addr
 USEMODULE += ps
-USEMODULE += od_string
 USEMODULE += shell
 USEMODULE += shell_commands
-# ztimer is used instead of xtimer because it's a dependency of some
-# OpenWSN modules.
-USEMODULE += ztimer_usec
 
 CFLAGS += -fms-extensions
 

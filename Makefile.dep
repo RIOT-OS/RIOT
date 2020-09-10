@@ -187,6 +187,10 @@ ifneq (,$(filter eui_provider,$(USEMODULE)))
   USEMODULE += luid
 endif
 
+ifneq (,$(filter netif,$(USEMODULE)))
+  USEMODULE += fmt
+endif
+
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += l2util

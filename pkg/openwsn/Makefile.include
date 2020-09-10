@@ -1,3 +1,22 @@
+PSEUDOMODULES += openwsn_serial \
+                 openwsn_debugpins \
+                 openwsn_6lo_frag \
+                 openwsn_icmpv6_echo \
+                 openwsn_iee802154e_security \
+                 openwsn_leds \
+                 openwsn_mac \
+                 openwsn_stack \
+                 openwsn_scheduler \
+                 openwsn_sctimer \
+                 openwsn_sctimer_rtt \
+                 openwsn_sctimer_ztimer \
+                 openwsn_radio \
+                 openwsn_txtsnd \
+                 #
+
+DIRS += $(RIOTBASE)/pkg/openwsn/contrib \
+        $(RIOTBASE)/pkg/openwsn/sap
+
 INCLUDES += -I$(PKGDIRBASE)/openwsn \
             -I$(PKGDIRBASE)/openwsn/kernel \
             -I$(PKGDIRBASE)/openwsn/inc \
@@ -17,49 +36,17 @@ INCLUDES += -I$(PKGDIRBASE)/openwsn \
             -I$(PKGDIRBASE)/openwsn/openweb/opencoap \
             -I$(RIOTBASE)/pkg/openwsn/include \
 
-DIRS += $(RIOTBASE)/pkg/openwsn/contrib
+ifneq (,$(filter openwsn_openos,$(USEMODULE)))
+  INCLUDES += -I$(PKGDIRBASE)/openwsn/kernel/openos
+endif
 
-PSEUDOMODULES += openwsn_serial \
-                 openwsn_debugpins \
-                 openwsn_6lo_frag \
-                 openwsn_icmpv6_echo \
-                 openwsn_iee802154e_security \
-                 openwsn_leds \
-                 openwsn_sctimer \
-                 openwsn_sctimer_rtt \
-                 openwsn_sctimer_ztimer \
-                 openwsn_radio \
-                 #
-
-# Set OpenWSN configurations flags, see $(PKG_SOURCE_DIR)/openwsn-fw/inc/config.h
+ifneq (,$(filter openwsn_riotos,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/pkg/openwsn/scheduler
+  DIRS += $(RIOTBASE)/pkg/openwsn/scheduler
+endif
 
 ifneq (,$(filter openwsn_cjoin,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_CJOIN_C
   CFLAGS += -DBOARD_CRYPTOENGINE_ENABLED
-endif
-
-ifneq (,$(filter openwsn_transport,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_UDP_C
-endif
-
-ifneq (,$(filter openwsn_opencoap,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_COAP_C
-endif
-
-ifneq (,$(filter openwsn_6lo_frag,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_6LO_FRAGMENTATION_C
-endif
-
-ifneq (,$(filter openwsn_icmpv6_echo,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_ICMPV6ECHO_C
-endif
-
-ifneq (,$(filter openwsn_iee802154e_security,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_IEEE802154E_SECURITY_C
-endif
-
-ifneq (,$(filter openwsn_adaptive_msf,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_ADAPTIVE_MSF
 endif
 
 # In OpenWSN the ISR stack is shared with the network stack. OpenWSN stack is
