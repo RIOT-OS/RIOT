@@ -110,6 +110,10 @@ typedef enum {
      * It's assumed that @ref IEEE802154_CAP_FRAME_RETRANS is present.
      */
     IEEE802154_CAP_FRAME_RETRANS_INFO,
+    /**
+     * @brief the device retains all register values when off.
+     */
+    IEEE802154_CAP_REG_RETENTION,
 } ieee802154_rf_caps_t;
 
 /**
@@ -484,6 +488,18 @@ struct ieee802154_radio_ops {
      * @pre call to @ref ieee802154_radio_ops::request_on was successful.
      *
      * @post the transceiver state is @ref IEEE802154_TRX_STATE_TRX_OFF
+     * During boot or in case the radio doesn't support @ref
+     * IEEE802154_CAP_REG_RETENTION when @ref off was called, the
+     * Physical Information Base will be undefined. Thus, take into
+     * consideration that the following functions should be called right after
+     * the radio is turned on again:
+     * - @ref set_cca_threshold
+     * - @ref set_cca_mode
+     * - @ref config_phy
+     * - @ref set_csma_params
+     * - @ref set_rx_mode
+     * - @ref set_hw_addr_filter
+     * - @ref set_frame_retrans (if available)
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      *
@@ -626,9 +642,6 @@ struct ieee802154_radio_ops {
      * @brief Set IEEE802.15.4 addresses in hardware address filter
      *
      * @pre the device is on
-     *
-     * @note this function pointer can be NULL if the device doesn't support
-     *       hardware address filtering.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] short_addr the IEEE802.15.4 short address. If NULL, the short
