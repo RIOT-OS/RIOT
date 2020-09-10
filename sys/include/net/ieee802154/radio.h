@@ -627,9 +627,6 @@ struct ieee802154_radio_ops {
      *
      * @pre the device is on
      *
-     * @note this function pointer can be NULL if the device doesn't support
-     *       hardware address filtering.
-     *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] short_addr the IEEE802.15.4 short address. If NULL, the short
      *            address is not altered..
