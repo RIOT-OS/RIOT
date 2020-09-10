@@ -10,6 +10,7 @@ config CPU_FAM_SAMD21
     select CPU_COMMON_SAM0
     select CPU_CORE_CORTEX_M0PLUS
     select HAS_CPU_SAMD21
+    select HAS_PERIPH_GPIO_FAST_READ
     select HAS_PUF_SRAM
 
 ## CPU Models

@@ -10,5 +10,6 @@ endif
 
 FEATURES_PROVIDED += cortexm_mpu
 FEATURES_PROVIDED += periph_hwrng
+FEATURES_PROVIDED += periph_gpio_fast_read
 
 include $(RIOTCPU)/sam0_common/Makefile.features

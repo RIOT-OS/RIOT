@@ -4,6 +4,8 @@ CPU_FAM  = saml21
 # The SAMR30 line of MCUs does not contain a TRNG
 CPU_MODELS_WITHOUT_HWRNG += samr30%
 
+FEATURES_PROVIDED += periph_gpio_fast_read
+
 # Low Power SRAM is *not* retained during Backup Sleep.
 # It therefore does not fulfill the requirements  of the 'backup_ram' interface.
 # It can still be used in normal and standby mode, but code that relies on it
