@@ -8,267 +8,267 @@
 # STM32F0
 config CPU_MODEL_STM32F030F4
     bool
-    select CPU_FAM_F0
+    select CPU_LINE_STM32F030X4
 
 config CPU_MODEL_STM32F030R8
     bool
-    select CPU_FAM_F0
+    select CPU_LINE_STM32F030X8
 
 config CPU_MODEL_STM32F031K6
     bool
-    select CPU_FAM_F0
+    select CPU_LINE_STM32F031X6
 
 config CPU_MODEL_STM32F042K6
     bool
-    select CPU_FAM_F0
+    select CPU_LINE_STM32F042X6
 
 config CPU_MODEL_STM32F051R8
     bool
-    select CPU_FAM_F0
+    select CPU_LINE_STM32F051XB
 
 config CPU_MODEL_STM32F070RB
     bool
-    select CPU_FAM_F0
+    select CPU_LINE_STM32F070XB
 
 config CPU_MODEL_STM32F072RB
     bool
-    select CPU_FAM_F0
+    select CPU_LINE_STM32F072XB
 
 config CPU_MODEL_STM32F091RC
     bool
-    select CPU_FAM_F0
+    select CPU_LINE_STM32F091XC
 
 # STM32F1
 config CPU_MODEL_STM32F103C8
     bool
-    select CPU_FAM_F1
+    select CPU_LINE_STM32F103X8
 
 config CPU_MODEL_STM32F103CB
     bool
-    select CPU_FAM_F1
+    select CPU_LINE_STM32F103XB
 
 config CPU_MODEL_STM32F103RB
     bool
-    select CPU_FAM_F1
+    select CPU_LINE_STM32F103XB
 
 config CPU_MODEL_STM32F103RE
     bool
-    select CPU_FAM_F1
+    select CPU_LINE_STM32F103XE
 
 # STM32F2
 config CPU_MODEL_STM32F207ZG
     bool
-    select CPU_FAM_F2
+    select CPU_LINE_STM32F207XX
 
 # STM32F3
 config CPU_MODEL_STM32F302R8
     bool
-    select CPU_FAM_F3
+    select CPU_LINE_STM32F302X8
 
 config CPU_MODEL_STM32F303K8
     bool
-    select CPU_FAM_F3
+    select CPU_LINE_STM32F303X8
 
 config CPU_MODEL_STM32F303RE
     bool
-    select CPU_FAM_F3
+    select CPU_LINE_STM32F303XE
     select HAS_CORTEXM_MPU
 
 config CPU_MODEL_STM32F303VC
     bool
-    select CPU_FAM_F3
+    select CPU_LINE_STM32F303XC
     select HAS_CORTEXM_MPU
 
 config CPU_MODEL_STM32F303ZE
     bool
-    select CPU_FAM_F3
+    select CPU_LINE_STM32F303XE
     select HAS_CORTEXM_MPU
 
 config CPU_MODEL_STM32F334R8
     bool
-    select CPU_FAM_F3
+    select CPU_LINE_STM32F334X8
 
 # STM32F4
 config CPU_MODEL_STM32F401RE
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F401XE
 
 config CPU_MODEL_STM32F405RG
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F405XX
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F407VG
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F407XX
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F410RB
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F410XB
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F411RE
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F411XE
 
 config CPU_MODEL_STM32F411CEU6
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F411XE
 
 config CPU_MODEL_STM32F412ZG
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F412XG
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F413ZH
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F413XX
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F415RG
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F415XX
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F429ZI
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F429XX
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F437VG
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F437XX
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32F446RE
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F446XX
 
 config CPU_MODEL_STM32F446ZE
     bool
-    select CPU_FAM_F4
+    select CPU_LINE_STM32F446XX
 
 # STM32F7
 config CPU_MODEL_STM32F722ZE
     bool
-    select CPU_FAM_F7
+    select CPU_LINE_STM32F722XX
 
 config CPU_MODEL_STM32F723IE
     bool
-    select CPU_FAM_F7
+    select CPU_LINE_STM32F723XX
 
 config CPU_MODEL_STM32F746ZG
     bool
-    select CPU_FAM_F7
+    select CPU_LINE_STM32F746XX
 
 config CPU_MODEL_STM32F767ZI
     bool
-    select CPU_FAM_F7
+    select CPU_LINE_STM32F767XX
 
 config CPU_MODEL_STM32F769NI
     bool
-    select CPU_FAM_F7
+    select CPU_LINE_STM32F769XX
 
 # STM32G0
 config CPU_MODEL_STM32G070RB
     bool
-    select CPU_FAM_G0
+    select CPU_LINE_STM32G070XX
 
 # STM32G4
 config CPU_MODEL_STM32G474RE
     bool
-    select CPU_FAM_G4
+    select CPU_LINE_STM32G474XX
 
 # STM32L0
 config CPU_MODEL_STM32L031K6
     bool
-    select CPU_FAM_L0
+    select CPU_LINE_STM32L031XX
 
 config CPU_MODEL_STM32L052T8
     bool
-    select CPU_FAM_L0
+    select CPU_LINE_STM32L052XX
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32L053R8
     bool
-    select CPU_FAM_L0
+    select CPU_LINE_STM32L053XX
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32L053C8
     bool
-    select CPU_FAM_L0
+    select CPU_LINE_STM32L053XX
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32L072CZ
     bool
-    select CPU_FAM_L0
+    select CPU_LINE_STM32L072XX
     select HAS_PERIPH_HWRNG
 
 config CPU_MODEL_STM32L073RZ
     bool
-    select CPU_FAM_L0
+    select CPU_LINE_STM32L073XX
     select HAS_PERIPH_HWRNG
 
 # STM32L1
 config CPU_MODEL_STM32L151CB
     bool
-    select CPU_FAM_L1
+    select CPU_LINE_STM32L151XB
 
 config CPU_MODEL_STM32L151CB_A
     bool
-    select CPU_FAM_L1
+    select CPU_LINE_STM32L151XBA
 
 config CPU_MODEL_STM32L151RC
     bool
-    select CPU_FAM_L1
+    select CPU_LINE_STM32L151XC
 
 config CPU_MODEL_STM32L152RE
     bool
-    select CPU_FAM_L1
+    select CPU_LINE_STM32L152XE
 
 # STM32L4
 config CPU_MODEL_STM32L412KB
     bool
-    select CPU_FAM_L4
+    select CPU_LINE_STM32L412XX
 
 config CPU_MODEL_STM32L432KC
     bool
-    select CPU_FAM_L4
+    select CPU_LINE_STM32L432XX
 
 config CPU_MODEL_STM32L433RC
     bool
-    select CPU_FAM_L4
+    select CPU_LINE_STM32L433XX
 
 config CPU_MODEL_STM32L452RE
     bool
-    select CPU_FAM_L4
+    select CPU_LINE_STM32L452XX
 
 config CPU_MODEL_STM32L475VG
     bool
-    select CPU_FAM_L4
+    select CPU_LINE_STM32L475XX
 
 config CPU_MODEL_STM32L476RG
     bool
-    select CPU_FAM_L4
+    select CPU_LINE_STM32L476XX
 
 config CPU_MODEL_STM32L476VG
     bool
-    select CPU_FAM_L4
+    select CPU_LINE_STM32L476XX
 
 config CPU_MODEL_STM32L496AG
     bool
-    select CPU_FAM_L4
+    select CPU_LINE_STM32L496XX
 
 config CPU_MODEL_STM32L496ZG
     bool
-    select CPU_FAM_L4
+    select CPU_LINE_STM32L496XX
 
 config CPU_MODEL_STM32L4R5ZI
     bool
-    select CPU_FAM_L4
+    select CPU_LINE_STM32L4R5XX
 
 # STM32WB
 config CPU_MODEL_STM32WB55RG
     bool
-    select CPU_FAM_WB
+    select CPU_LINE_STM32WB55XX
