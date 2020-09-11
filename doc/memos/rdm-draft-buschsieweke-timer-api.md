@@ -108,7 +108,7 @@ been identified:
 | Periodic Software Timers  | ✓             | ✓             | ✓         | ● (2)         | ✓         | ✗         | ● (6)     | ● (6)             |
 | Context of Timer Callback | Thread        | ?             | ?         | Both? (3)     | ?         | n.a.      | Interrupt | Interrupt         |
 | System Time               | ✓             | ✓             | ✓         | ✓             | ✓         | ✓         | ✓         | ● (8)             |
-| System Time Width         | `TickType_t`  | 32bit         | 64 bit    |`clock_time_t` | ?         | 96 bit (7)| 64        | 32                |
+| System Time Width         | `TickType_t`  | 32bit         | 64 bit    |`clock_time_t` | ?         | 96 bit (7)| 64        | 64 (10)             |
 | System Time Unit          | "Tick"        | hw dependent  | µs        | hw dependent  | ?         | µs        | µs        | clock dependent   |
 | Portable System Time (9)  | ✗             | ✗             | ✓         | ✗             | ?         | ✓         | ✓         | ✗                 |
 | Delays                    | ✓             | ● (1)         | ✓         | ● (4)         | ✓ (5)     | ✓         | ✓         | ✓                 |
@@ -135,6 +135,7 @@ been identified:
 9. "Portable System Time" means that two nodes can exchange time stamps over
    network and they still refer to the same point in time, assuming the clocks
    have been synchronized.
+  10. ztimer optionally keep's each clock's time in 64bit (module ztimer_now64)
 
 # 2. Requirements
 
