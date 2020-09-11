@@ -26,6 +26,9 @@ USEMODULE += gnrc_icmpv6_echo
 # Use minimal standard PRNG
 USEMODULE += prng_minstd
 
+# Use picolibc when available
+FEATURES_OPTIONAL += picolibc
+
 CFLAGS += -DLOG_LEVEL=LOG_NONE  # disable log output
 # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
 ifndef CONFIG_GNRC_PKTBUF_SIZE
