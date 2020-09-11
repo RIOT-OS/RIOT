@@ -137,8 +137,8 @@ https://www.riot-os.org
 [matrix-link]: https://matrix.to/#/#riot-os:matrix.org
 [release-badge]: https://img.shields.io/github/release/RIOT-OS/RIOT.svg
 [release-link]: https://github.com/RIOT-OS/RIOT/releases/latest
-[stackoverflow-badge]: https://img.shields.io/stackexchange/stackoverflow.com/t/%5Briot-os%5D?label=stackoverflow%20questions
-[stackoverflow-link]:  https://stackoverflow.com/questions/tagged/riot-os
+[stackoverflow-badge]: https://img.shields.io/badge/stackoverflow-%5Briot--os%5D-yellow
+[stackoverflow-link]: https://stackoverflow.com/questions/tagged/riot-os
 [twitter-badge]: https://img.shields.io/badge/social-Twitter-informational.svg
 [twitter-link]: https://twitter.com/RIOT_OS
 [wiki-badge]: https://img.shields.io/badge/docs-Wiki-informational.svg
