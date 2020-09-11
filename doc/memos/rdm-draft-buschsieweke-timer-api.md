@@ -135,7 +135,7 @@ been identified:
 9. "Portable System Time" means that two nodes can exchange time stamps over
    network and they still refer to the same point in time, assuming the clocks
    have been synchronized.
-  10. ztimer optionally keep's each clock's time in 64bit (module ztimer_now64)
+10. ztimer optionally keeps each clock's time in 64bit (module ztimer_now64)
 
 # 2. Requirements
 
