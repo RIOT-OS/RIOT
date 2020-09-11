@@ -23,6 +23,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <sys/times.h>
+#include <unistd.h>
 
 #include "irq.h"
 #include "log.h"
@@ -157,8 +158,8 @@ void *sbrk(ptrdiff_t incr)
 __attribute__ ((weak))
 int kill(pid_t pid, int sig)
 {
-    (void) pid;
-    (void) sig;
+    (void)pid;
+    (void)sig;
     errno = ESRCH;                         /* not implemented yet */
     return -1;
 }
@@ -253,6 +254,9 @@ pid_t getpid(void)
 
 #if MODULE_VFS
 #include "vfs.h"
+#else
+#include <sys/stat.h>
+#endif
 
 /**
  * @brief Open a file
@@ -268,6 +272,7 @@ pid_t getpid(void)
  */
 int open(const char *name, int flags, int mode)
 {
+#ifdef MODULE_VFS
     int fd = vfs_open(name, flags, mode);
     if (fd < 0) {
         /* vfs returns negative error codes */
@@ -275,6 +280,13 @@ int open(const char *name, int flags, int mode)
         return -1;
     }
     return fd;
+#else
+    (void)name;
+    (void)flags;
+    (void)mode;
+    errno = ENODEV;
+    return -1;
+#endif
 }
 
 /**
@@ -291,6 +303,7 @@ int open(const char *name, int flags, int mode)
  */
 _READ_WRITE_RETURN_TYPE read(int fd, void *dest, size_t count)
 {
+#ifdef MODULE_VFS
     int res = vfs_read(fd, dest, count);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -298,6 +311,14 @@ _READ_WRITE_RETURN_TYPE read(int fd, void *dest, size_t count)
         return -1;
     }
     return res;
+#else
+    if (fd != STDIN_FILENO) {
+        errno = ENOTSUP;
+        return -1;
+    }
+
+    return stdio_read(dest, count);
+#endif
 }
 
 /**
@@ -314,6 +335,7 @@ _READ_WRITE_RETURN_TYPE read(int fd, void *dest, size_t count)
  */
 _READ_WRITE_RETURN_TYPE write(int fd, const void *src, size_t count)
 {
+#ifdef MODULE_VFS
     int res = vfs_write(fd, src, count);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -321,6 +343,14 @@ _READ_WRITE_RETURN_TYPE write(int fd, const void *src, size_t count)
         return -1;
     }
     return res;
+#else
+    if (fd != STDOUT_FILENO && fd != STDERR_FILENO) {
+        errno = ENOTSUP;
+        return -1;
+    }
+
+    return stdio_write(src, count);
+#endif
 }
 
 /**
@@ -338,6 +368,7 @@ _READ_WRITE_RETURN_TYPE write(int fd, const void *src, size_t count)
  */
 int close(int fd)
 {
+#ifdef MODULE_VFS
     int res = vfs_close(fd);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -345,6 +376,11 @@ int close(int fd)
         return -1;
     }
     return res;
+#else
+    (void)fd;
+    errno = ENOTSUP;
+    return -1;
+#endif
 }
 
 /**
@@ -374,8 +410,9 @@ clock_t times(struct tms *ptms)
  * @return       0 on success
  * @return       -1 on error, @c errno set to a constant from errno.h to indicate the error
  */
-int fcntl (int fd, int cmd, int arg)
+int fcntl(int fd, int cmd, int arg)
 {
+#ifdef MODULE_VFS
     int res = vfs_fcntl(fd, cmd, arg);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -383,6 +420,13 @@ int fcntl (int fd, int cmd, int arg)
         return -1;
     }
     return res;
+#else
+    (void)fd;
+    (void)cmd;
+    (void)arg;
+    errno = ENOTSUP;
+    return -1;
+#endif
 }
 
 /**
@@ -406,6 +450,7 @@ int fcntl (int fd, int cmd, int arg)
  */
 off_t lseek(int fd, _off_t off, int whence)
 {
+#ifdef MODULE_VFS
     int res = vfs_lseek(fd, off, whence);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -413,6 +458,23 @@ off_t lseek(int fd, _off_t off, int whence)
         return -1;
     }
     return res;
+#else
+    (void)fd;
+    (void)off;
+    (void)whence;
+    errno = ENOTSUP;
+    return -1;
+#endif
+}
+
+/**
+ * @brief Sets the file position indicator to the the beginning of the file.
+ *
+ * @param[in]  stream   open file descriptor obtained from @c fopen()
+ */
+void rewind(FILE *stream)
+{
+    fseek(stream, 0L, SEEK_SET);
 }
 
 /**
@@ -428,6 +490,7 @@ off_t lseek(int fd, _off_t off, int whence)
  */
 int fstat(int fd, struct stat *buf)
 {
+#ifdef MODULE_VFS
     int res = vfs_fstat(fd, buf);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -435,6 +498,12 @@ int fstat(int fd, struct stat *buf)
         return -1;
     }
     return 0;
+#else
+    (void)fd;
+    (void)buf;
+    errno = ENOTSUP;
+    return -1;
+#endif
 }
 
 /**
@@ -450,6 +519,7 @@ int fstat(int fd, struct stat *buf)
  */
 int stat(const char *name, struct stat *st)
 {
+#ifdef MODULE_VFS
     int res = vfs_stat(name, st);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -457,6 +527,12 @@ int stat(const char *name, struct stat *st)
         return -1;
     }
     return 0;
+#else
+    (void)name;
+    (void)st;
+    errno = ENODEV;
+    return -1;
+#endif
 }
 
 /**
@@ -469,6 +545,7 @@ int stat(const char *name, struct stat *st)
  */
 int unlink(const char *path)
 {
+#ifdef MODULE_VFS
     int res = vfs_unlink(path);
     if (res < 0) {
         /* vfs returns negative error codes */
@@ -476,6 +553,54 @@ int unlink(const char *path)
         return -1;
     }
     return 0;
+#else
+    (void)path;
+    errno = ENODEV;
+    return -1;
+#endif
 }
 
-#endif /* MODULE_VFS */
+/**
+ * @brief  Deletes a directory, which must be empty
+ *
+ * @param[in]  path     path to directory to be deleted
+ *
+ * @return 0 on success
+ * @return -1 on error, @c errno set to a constant from errno.h to indicate the error
+ */
+int rmdir(const char *path)
+{
+#ifdef MODULE_VFS
+    int res = vfs_rmdir(path);
+    if (res < 0) {
+        /* vfs returns negative error codes */
+        errno = -res;
+        return -1;
+    }
+    return 0;
+#else
+    (void)path;
+    errno = ENODEV;
+    return -1;
+#endif
+}
+
+/**
+ * @brief  Remove (delete) a file or directory
+ *
+ * remove()  deletes  a name from the filesystem.
+ * It calls unlink(2) for files, and rmdir(2) for directories.
+ *
+ * @param[in]  path     path to file or directory to be deleted
+ *
+ * @return 0 on success
+ * @return -1 on error, @c errno set to a constant from errno.h to indicate the error
+ */
+int remove(const char *path)
+{
+    if (unlink(path) == 0) {
+        return 0;
+    }
+
+    return rmdir(path);
+}
