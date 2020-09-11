@@ -25,7 +25,6 @@
 #include <errno.h>
 
 #include "cpu.h"
-#include "luid.h"
 #include "mutex.h"
 
 #include "net/ieee802154.h"
@@ -253,6 +252,8 @@ static int _init(netdev_t *dev)
 {
     (void)dev;
 
+    netdev_register(&nrf802154_dev.netdev, NETDEV_NRF802154, 0);
+
     int result = timer_init(NRF802154_TIMER, TIMER_FREQ, _timer_cb, NULL);
     assert(result >= 0);
     (void)result;
@@ -294,9 +295,7 @@ static int _init(netdev_t *dev)
     NRF_RADIO->MODECNF0 |= RADIO_MODECNF0_RU_Msk;
 
     /* assign default addresses */
-    luid_get(nrf802154_dev.long_addr, IEEE802154_LONG_ADDRESS_LEN);
-    memcpy(nrf802154_dev.short_addr, &nrf802154_dev.long_addr[6],
-           IEEE802154_SHORT_ADDRESS_LEN);
+    netdev_ieee802154_setup(&nrf802154_dev);
 
     /* set default channel */
     _set_chan(nrf802154_dev.chan);
