@@ -30,6 +30,10 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
+#ifndef SOFT_SPI_NUMOF
+#define SOFT_SPI_NUMOF (0)
+#endif
+
 /**
  * @brief   Allocate one lock per SPI device
  */
