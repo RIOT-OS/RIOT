@@ -379,6 +379,9 @@ ifeq (1,$(TEST_KCONFIG))
   KCONFIG_MODULES := $(call lowercase,$(patsubst CONFIG_MODULE_%,%,$(filter CONFIG_MODULE_%,$(.VARIABLES))))
   USEMODULE := $(KCONFIG_MODULES)
 else
+  # check if required features are provided and update $(FEATURES_USED)
+  include $(RIOTMAKE)/features_check.inc.mk
+
   # handle removal of default modules
   USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
