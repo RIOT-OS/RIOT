@@ -243,6 +243,12 @@ ifeq ($(DEVELHELP),1)
   CFLAGS += -DDEVELHELP
 endif
 
+# Set this to 1 to enable thread names
+THREAD_NAMES ?= 0
+ifeq ($(THREAD_NAMES),1)
+  CFLAGS += -DCONFIG_THREAD_NAMES
+endif
+
 # Override LOG_LEVEL if variable is set and if CFLAGS doesn't already contain
 # a LOG_LEVEL config
 ifdef LOG_LEVEL

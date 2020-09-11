@@ -37,6 +37,17 @@
 #endif
 
 /**
+ * @def CONFIG_THREAD_NAMES
+ * @brief   This global macro enable storage of thread names to help developers.
+ *
+ *          To activate it set environment variable `THREAD_NAMES=1`, or use Kconfig.
+ *          It is automatically enabled if `DEVELHELP` is.
+ */
+#if DOXYGEN
+#   define CONFIG_THREAD_NAMES
+#endif
+
+/**
  * @def TEST_SUITES
  * @brief   This global macro activates functionality that is needed for
  *          automated testing but not needed otherwise.
