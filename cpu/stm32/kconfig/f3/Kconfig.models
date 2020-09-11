@@ -1,0 +1,40 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# CPU models
+config CPU_MODEL_STM32F302R8
+    bool
+    select CPU_LINE_STM32F302X8
+
+config CPU_MODEL_STM32F303K8
+    bool
+    select CPU_LINE_STM32F303X8
+
+config CPU_MODEL_STM32F303RE
+    bool
+    select CPU_LINE_STM32F303XE
+
+config CPU_MODEL_STM32F303VC
+    bool
+    select CPU_LINE_STM32F303XC
+
+config CPU_MODEL_STM32F303ZE
+    bool
+    select CPU_LINE_STM32F303XE
+
+config CPU_MODEL_STM32F334R8
+    bool
+    select CPU_LINE_STM32F334X8
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32f302r8" if CPU_MODEL_STM32F302R8
+    default "stm32f303k8" if CPU_MODEL_STM32F303K8
+    default "stm32f303re" if CPU_MODEL_STM32F303RE
+    default "stm32f303vc" if CPU_MODEL_STM32F303VC
+    default "stm32f303ze" if CPU_MODEL_STM32F303ZE
+    default "stm32f334r8" if CPU_MODEL_STM32F334R8

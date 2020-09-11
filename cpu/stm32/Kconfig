@@ -17,112 +17,22 @@ config CPU_STM32
     select HAS_PERIPH_UART_NONBLOCKING
     select HAS_PERIPH_WDT
 
-# Common CPU symbols
-config CPU_FAM
-    default "f0" if CPU_FAM_F0
-    default "f1" if CPU_FAM_F1
-    default "f2" if CPU_FAM_F2
-    default "f3" if CPU_FAM_F3
-    default "f4" if CPU_FAM_F4
-    default "f7" if CPU_FAM_F7
-    default "g0" if CPU_FAM_G0
-    default "g4" if CPU_FAM_G4
-    default "l0" if CPU_FAM_L0
-    default "l1" if CPU_FAM_L1
-    default "l4" if CPU_FAM_L4
-    default "wb" if CPU_FAM_WB
-
-config CPU_MODEL
-    # STM32F0
-    default "stm32f030f4" if CPU_MODEL_STM32F030F4
-    default "stm32f030r8" if CPU_MODEL_STM32F030R8
-    default "stm32f031k6" if CPU_MODEL_STM32F031K6
-    default "stm32f042k6" if CPU_MODEL_STM32F042K6
-    default "stm32f051r8" if CPU_MODEL_STM32F051R8
-    default "stm32f070rb" if CPU_MODEL_STM32F070RB
-    default "stm32f072rb" if CPU_MODEL_STM32F072RB
-    default "stm32f091rc" if CPU_MODEL_STM32F091RC
-
-    # STM32F1
-    default "stm32f103c8" if CPU_MODEL_STM32F103C8
-    default "stm32f103cb" if CPU_MODEL_STM32F103CB
-    default "stm32f103rb" if CPU_MODEL_STM32F103RB
-    default "stm32f103re" if CPU_MODEL_STM32F103RE
-
-    # STM32F2
-    default "stm32f207zg" if CPU_MODEL_STM32F207ZG
-
-    # STM32F3
-    default "stm32f302r8" if CPU_MODEL_STM32F302R8
-    default "stm32f303k8" if CPU_MODEL_STM32F303K8
-    default "stm32f303re" if CPU_MODEL_STM32F303RE
-    default "stm32f303vc" if CPU_MODEL_STM32F303VC
-    default "stm32f303ze" if CPU_MODEL_STM32F303ZE
-    default "stm32f334r8" if CPU_MODEL_STM32F334R8
-
-    # STM32F4
-    default "stm32f401re" if CPU_MODEL_STM32F401RE
-    default "stm32f405rg" if CPU_MODEL_STM32F405RG
-    default "stm32f407vg" if CPU_MODEL_STM32F407VG
-    default "stm32f410rb" if CPU_MODEL_STM32F410RB
-    default "stm32f411re" if CPU_MODEL_STM32F411RE
-    default "stm32f411ceu6" if CPU_MODEL_STM32F411CEU6
-    default "stm32f412zg" if CPU_MODEL_STM32F412ZG
-    default "stm32f413zh" if CPU_MODEL_STM32F413ZH
-    default "stm32f415rg" if CPU_MODEL_STM32F415RG
-    default "stm32f429zi" if CPU_MODEL_STM32F429ZI
-    default "stm32f437vg" if CPU_MODEL_STM32F437VG
-    default "stm32f446re" if CPU_MODEL_STM32F446RE
-    default "stm32f446ze" if CPU_MODEL_STM32F446ZE
-
-    # STM32F7
-    default "stm32f722ze" if CPU_MODEL_STM32F722ZE
-    default "stm32f723ie" if CPU_MODEL_STM32F723IE
-    default "stm32f746zg" if CPU_MODEL_STM32F746ZG
-    default "stm32f767zi" if CPU_MODEL_STM32F767ZI
-    default "stm32f769ni" if CPU_MODEL_STM32F769NI
-
-    # STM32G0
-    default "stm32g070rb" if CPU_MODEL_STM32G070RB
-    default "stm32g071rb" if CPU_MODEL_STM32G071RB
-
-    # STM32G4
-    default "stm32g474re" if CPU_MODEL_STM32G474RE
-
-    # STM32L0
-    default "stm32l031k6" if CPU_MODEL_STM32L031K6
-    default "stm32l052t8" if CPU_MODEL_STM32L052T8
-    default "stm32l053r8" if CPU_MODEL_STM32L053R8
-    default "stm32l053c8" if CPU_MODEL_STM32L053C8
-    default "stm32l072cz" if CPU_MODEL_STM32L072CZ
-    default "stm32l073rz" if CPU_MODEL_STM32L073RZ
-
-    # STM32L1
-    default "stm32l151cb" if CPU_MODEL_STM32L151CB
-    default "stm32l151cb_a" if CPU_MODEL_STM32L151CB_A
-    default "stm32l151rc" if CPU_MODEL_STM32L151RC
-    default "stm32l152re" if CPU_MODEL_STM32L152RE
-
-    # STM32L4
-    default "stm32l412kb" if CPU_MODEL_STM32L412KB
-    default "stm32l432kc" if CPU_MODEL_STM32L432KC
-    default "stm32l433rc" if CPU_MODEL_STM32L433RC
-    default "stm32l452re" if CPU_MODEL_STM32L452RE
-    default "stm32l475vg" if CPU_MODEL_STM32L475VG
-    default "stm32l476rg" if CPU_MODEL_STM32L476RG
-    default "stm32l476vg" if CPU_MODEL_STM32L476VG
-    default "stm32l496ag" if CPU_MODEL_STM32L496AG
-    default "stm32l496zg" if CPU_MODEL_STM32L496ZG
-    default "stm32l4r5zi" if CPU_MODEL_STM32L4R5ZI
-
-    # STM32WB
-    default "stm32wb55rg" if CPU_MODEL_STM32WB55RG
-
+# Common CPU symbol
 config CPU
     default "stm32" if CPU_STM32
 
-source "$(RIOTCPU)/stm32/Kconfig.fam"
-source "$(RIOTCPU)/stm32/Kconfig.features"
-source "$(RIOTCPU)/stm32/Kconfig.lines"
-source "$(RIOTCPU)/stm32/Kconfig.models"
+# Definition of specific features
+config HAS_CPU_STM32
+    bool
+    help
+        Indicates that a 'stm32' cpu is being used.
+
+config HAS_BOOTLOADER_STM32
+    bool
+    help
+        Indicates that the stm32 bootloader is being used.
+
+orsource "kconfig/*/Kconfig"
+orsource "kconfig/*/Kconfig.lines"
+orsource "kconfig/*/Kconfig.models"
 source "$(RIOTCPU)/cortexm_common/Kconfig"

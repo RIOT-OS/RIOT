@@ -1,0 +1,60 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# CPU models
+config CPU_MODEL_STM32L412KB
+    bool
+    select CPU_LINE_STM32L412XX
+
+config CPU_MODEL_STM32L432KC
+    bool
+    select CPU_LINE_STM32L432XX
+
+config CPU_MODEL_STM32L433RC
+    bool
+    select CPU_LINE_STM32L433XX
+
+config CPU_MODEL_STM32L452RE
+    bool
+    select CPU_LINE_STM32L452XX
+
+config CPU_MODEL_STM32L475VG
+    bool
+    select CPU_LINE_STM32L475XX
+
+config CPU_MODEL_STM32L476RG
+    bool
+    select CPU_LINE_STM32L476XX
+
+config CPU_MODEL_STM32L476VG
+    bool
+    select CPU_LINE_STM32L476XX
+
+config CPU_MODEL_STM32L496AG
+    bool
+    select CPU_LINE_STM32L496XX
+
+config CPU_MODEL_STM32L496ZG
+    bool
+    select CPU_LINE_STM32L496XX
+
+config CPU_MODEL_STM32L4R5ZI
+    bool
+    select CPU_LINE_STM32L4R5XX
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32l412kb" if CPU_MODEL_STM32L412KB
+    default "stm32l432kc" if CPU_MODEL_STM32L432KC
+    default "stm32l433rc" if CPU_MODEL_STM32L433RC
+    default "stm32l452re" if CPU_MODEL_STM32L452RE
+    default "stm32l475vg" if CPU_MODEL_STM32L475VG
+    default "stm32l476rg" if CPU_MODEL_STM32L476RG
+    default "stm32l476vg" if CPU_MODEL_STM32L476VG
+    default "stm32l496ag" if CPU_MODEL_STM32L496AG
+    default "stm32l496zg" if CPU_MODEL_STM32L496ZG
+    default "stm32l4r5zi" if CPU_MODEL_STM32L4R5ZI

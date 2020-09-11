@@ -1,0 +1,50 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# CPU models
+config CPU_MODEL_STM32F030F4
+    bool
+    select CPU_FAM_F0
+
+config CPU_MODEL_STM32F030R8
+    bool
+    select CPU_LINE_STM32F030X8
+
+config CPU_MODEL_STM32F031K6
+    bool
+    select CPU_LINE_STM32F031X6
+
+config CPU_MODEL_STM32F042K6
+    bool
+    select CPU_LINE_STM32F042X6
+
+config CPU_MODEL_STM32F051R8
+    bool
+    select CPU_LINE_STM32F051X8
+
+config CPU_MODEL_STM32F070RB
+    bool
+    select CPU_LINE_STM32F070XB
+
+config CPU_MODEL_STM32F072RB
+    bool
+    select CPU_LINE_STM32F072XB
+
+config CPU_MODEL_STM32F091RC
+    bool
+    select CPU_LINE_STM32F091XC
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32f030f4" if CPU_MODEL_STM32F030F4
+    default "stm32f030r8" if CPU_MODEL_STM32F030R8
+    default "stm32f031k6" if CPU_MODEL_STM32F031K6
+    default "stm32f042k6" if CPU_MODEL_STM32F042K6
+    default "stm32f051r8" if CPU_MODEL_STM32F051R8
+    default "stm32f070rb" if CPU_MODEL_STM32F070RB
+    default "stm32f072rb" if CPU_MODEL_STM32F072RB
+    default "stm32f091rc" if CPU_MODEL_STM32F091RC
