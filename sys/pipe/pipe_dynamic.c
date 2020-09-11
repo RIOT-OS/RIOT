@@ -39,10 +39,12 @@ struct mallocd_pipe
 pipe_t *pipe_malloc(unsigned size)
 {
     struct mallocd_pipe *m_pipe = malloc(sizeof (*m_pipe) + size);
-    if (m_pipe) {
-        ringbuffer_init(&m_pipe->rb, m_pipe->buffer, size);
-        pipe_init(&m_pipe->pipe, &m_pipe->rb, free);
+    if (!m_pipe) {
+        /* Malloc returned NULL */
+        return NULL;
     }
+    ringbuffer_init(&m_pipe->rb, m_pipe->buffer, size);
+    pipe_init(&m_pipe->pipe, &m_pipe->rb, free);
     return &m_pipe->pipe;
 }
 
