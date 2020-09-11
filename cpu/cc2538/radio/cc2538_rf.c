@@ -198,9 +198,16 @@ void cc2538_setup(cc2538_rf_t *dev)
     netdev->driver = &cc2538_rf_driver;
 
     cc2538_init();
+
+    netdev_register(netdev, NETDEV_CC2538, 0);
+
     cc2538_set_tx_power(CC2538_RF_POWER_DEFAULT);
     cc2538_set_chan(CC2538_RF_CHANNEL_DEFAULT);
-    cc2538_set_addr_long(cc2538_get_eui64_primary());
+
+    /* assign default addresses */
+    netdev_ieee802154_setup(&dev->netdev);
+    cc2538_set_addr_long(dev->netdev.long_addr);
+    cc2538_set_addr_short(dev->netdev.short_addr);
 
     cc2538_on();
 }

@@ -34,7 +34,7 @@
 /* Reference pointer for the IRQ handler */
 static netdev_t *_dev;
 
-void _irq_handler(void)
+void cc2538_irq_handler(void)
 {
     RFCORE_SFR_RFIRQF0 = 0;
     RFCORE_SFR_RFIRQF1 = 0;
@@ -56,7 +56,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
                 return -EOVERFLOW;
             }
             else {
-                *(uint16_t*)value = cc2538_get_addr_short();
+                cc2538_get_addr_short(value);
             }
             return sizeof(uint16_t);
 
@@ -65,7 +65,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
                 return -EOVERFLOW;
             }
             else {
-                *(uint64_t*)value = cc2538_get_addr_long();
+                cc2538_get_addr_long(value);
             }
             return sizeof(uint64_t);
 
@@ -164,7 +164,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
                 res = -EOVERFLOW;
             }
             else {
-                cc2538_set_addr_short(*((const uint16_t*)value));
+                cc2538_set_addr_short(value);
                 res = sizeof(uint16_t);
             }
             break;
@@ -174,7 +174,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
                 res = -EOVERFLOW;
             }
             else {
-                cc2538_set_addr_long(*((const uint64_t*)value));
+                cc2538_set_addr_long(value);
                 res = sizeof(uint64_t);
             }
             break;
@@ -394,18 +394,12 @@ static int _init(netdev_t *netdev)
     _dev = netdev;
 
     uint16_t chan = cc2538_get_chan();
-    uint16_t addr_short = cc2538_get_addr_short();
-    uint64_t addr_long = cc2538_get_addr_long();
 
     netdev_ieee802154_reset(&dev->netdev);
 
     /* Initialise netdev_ieee802154_t struct */
     netdev_ieee802154_set(&dev->netdev, NETOPT_CHANNEL,
                           &chan, sizeof(chan));
-    netdev_ieee802154_set(&dev->netdev, NETOPT_ADDRESS,
-                          &addr_short, sizeof(addr_short));
-    netdev_ieee802154_set(&dev->netdev, NETOPT_ADDRESS_LONG,
-                          &addr_long, sizeof(addr_long));
 
     cc2538_set_state(dev, NETOPT_STATE_IDLE);
 
