@@ -445,6 +445,19 @@ void ztimer_periodic_wakeup(ztimer_clock_t *clock, uint32_t *last_wakeup,
 void ztimer_sleep(ztimer_clock_t *clock, uint32_t duration);
 
 /**
+ * @brief   Busy-wait specified duration
+ *
+ * @note: This blocks lower priority threads. Use only for *very* short delays.
+ *
+ * @param[in]   clock           ztimer clock to use
+ * @param[in]   duration        duration to spin, in @p clock time units
+ */
+static inline void ztimer_spin(ztimer_clock_t *clock, uint32_t duration) {
+    uint32_t end = ztimer_now(clock) + duration;
+    while ((end - ztimer_now(clock)) < duration) {}
+}
+
+/**
  * @brief Set a timer that wakes up a thread
  *
  * This function sets a timer that will wake up a thread when the timer has
