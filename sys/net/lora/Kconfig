@@ -53,7 +53,7 @@ endchoice
 
 choice
     bool "Spreading factor"
-    default LORA_SF_DEFAULT_SF12
+    default LORA_SF_DEFAULT_SF7
     help
         Configure Spreading Factor (SF). SF denotes the amount of spreading code
         applied to the original data signal. A larger SF increases the time on
@@ -88,7 +88,7 @@ endchoice
 
 choice
     bool "Coding rate"
-    default LORA_CR_DEFAULT_CR_4_8
+    default LORA_CR_DEFAULT_CR_4_5
     help
         Configure Coding rate (CR). CR denotes the implementation of forward
         error correction (FEC). This may be done by encoding 4-bit data with

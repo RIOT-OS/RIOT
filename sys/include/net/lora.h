@@ -108,7 +108,7 @@ extern "C" {
 #endif
 
 #ifndef CONFIG_LORA_SF_DEFAULT
-#define CONFIG_LORA_SF_DEFAULT                      (LORA_SF12)
+#define CONFIG_LORA_SF_DEFAULT                      (LORA_SF7)
 #endif
 
 /** @brief Set Coding Rate (CR)
@@ -134,7 +134,7 @@ extern "C" {
 #endif
 
 #ifndef CONFIG_LORA_CR_DEFAULT
-#define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_4_8)
+#define CONFIG_LORA_CR_DEFAULT                      (LORA_CR_4_5)
 #endif
 
 /** @brief Set this to 1 to enable inverted I/Q mode
