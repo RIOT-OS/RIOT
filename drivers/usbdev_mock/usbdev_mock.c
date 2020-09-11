@@ -93,8 +93,9 @@ usbdev_ep_t *_new_ep(usbdev_t *dev, usb_ep_type_t type, usb_ep_dir_t dir,
         res->ep.dir = dir;
         res->ep.type = type;
         res->ep.dev = dev;
+        return &res->ep;
     }
-    return &res->ep;
+    return NULL;
 }
 
 int _get(usbdev_t *usbdev, usbopt_t opt,
