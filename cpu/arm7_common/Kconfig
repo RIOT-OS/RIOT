@@ -23,6 +23,7 @@ config CPU_CORE_ARM7TDMI_S
 ## Declaration of specific features
 config HAS_ARCH_ARM7
     bool
+    select HAS_PICOLIBC
     help
         Indicates that the core is part of the ARM7 group of cores.
 

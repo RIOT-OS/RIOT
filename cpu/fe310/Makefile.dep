@@ -1,4 +1,4 @@
-ifeq (1,$(PICOLIBC))
+ifneq (,$(filter picolibc,$(FEATURES_USED)))
   USEMODULE += picolibc
 else
   USEMODULE += newlib_nano

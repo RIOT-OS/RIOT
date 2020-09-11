@@ -1,7 +1,7 @@
 # use common ARM7 periph code
 USEMODULE += arm7_common_periph
 
-ifeq (1,$(PICOLIBC))
+ifneq (,$(filter picolibc,$(FEATURES_USED)))
   # Use Picolibc when explicitly selected
   USEMODULE += picolibc
 else

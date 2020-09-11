@@ -288,6 +288,11 @@ config HAS_PERIPH_WDT_CB
     help
         Indicates that the WDT peripheral allows setting a callback.
 
+config HAS_PICOLIBC
+    bool
+    help
+        Indicates that the picolibc C library is available for the platform.
+
 config HAS_PUF_SRAM
     bool
     help
