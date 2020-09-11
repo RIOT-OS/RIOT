@@ -240,5 +240,5 @@ TODO: Add revisions, if needed
 The authors of this memo can be contacted via email at ...
 TODO: Add emails of authors prior merging
 
-Additionally, the RIOT developer community be reached via email at
+Additionally, the RIOT developer community can be reached via email at
 devel@riot-os.org.
