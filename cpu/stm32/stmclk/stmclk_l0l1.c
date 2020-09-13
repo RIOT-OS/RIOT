@@ -118,6 +118,13 @@
 #error "Invalid MSI clock value"
 #endif
 
+/* Check whether PLL must be enabled */
+#if IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || IS_USED(MODULE_PERIPH_HWRNG)
+#define CLOCK_ENABLE_PLL            1
+#else
+#define CLOCK_ENABLE_PLL            0
+#endif
+
 /**
  * @brief Configure the controllers clock system
  *
@@ -181,7 +188,8 @@ void stmclk_init_sysclk(void)
         RCC->CFGR &= ~(RCC_CFGR_SW);
         RCC->CFGR |= RCC_CFGR_SW_MSI;
     }
-    else if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
+
+    if (IS_ACTIVE(CLOCK_ENABLE_PLL)) {
         /* Configure PLL clock source and configure the different prescalers */
         RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLDIV | RCC_CFGR_PLLMUL);
         RCC->CFGR |= (CLOCK_PLL_SOURCE | CLOCK_PLL_DIV | CLOCK_PLL_MUL);
@@ -190,11 +198,13 @@ void stmclk_init_sysclk(void)
         /* Wait till PLL is ready */
         while (!(RCC->CR & RCC_CR_PLLRDY)) {}
 
-        /* Select PLL as system clock source */
-        RCC->CFGR &= ~((uint32_t)(RCC_CFGR_SW));
-        RCC->CFGR |= RCC_CFGR_SW_PLL;
-        /* Wait till PLL is used as system clock source */
-        while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
+        if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
+            /* Select PLL as system clock source */
+            RCC->CFGR &= ~((uint32_t)(RCC_CFGR_SW));
+            RCC->CFGR |= RCC_CFGR_SW_PLL;
+            /* Wait till PLL is used as system clock source */
+            while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
+        }
     }
 
     if (!IS_ACTIVE(CONFIG_USE_CLOCK_HSI) ||
