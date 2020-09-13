@@ -250,7 +250,7 @@ For more detailed information on how the signature of the init functions should
 look like, please refer below to the specific requirements for network devices
 and sensors.
 
-## Return values                                  {#driver-guide-return-values}
+## Return Values                                   {#driver-guide-return-values}
 
 As stated above, we check communication of a device during initialization and
 handle error return values from the lower layers, where they exist. To prevent
@@ -266,17 +266,48 @@ int16_t tmpabc_read(const tmpabc_t *dev)
 }
 @endcode
 
-Whenever you implement status/error return values in your driver, they
-should be named, meaning that the driver MUST define an enum assigning names to
-the actual used value, e.g.
+Whenever you implement status/error return values in your driver, magic numbers
+MUST ***NOT*** be used. Instead, use negative `errno` codes (such as `-EIO` for
+an input/output error) and *document* every single error code that can be
+return for each function using the `reval` Doxygen command. E.g. like this:
 
-@code{.c}
-enum {
-    TMPABC_OK    = 0,       /**< all went as expected */
-    TMPABC_NOI2C = -1,      /**< error using the I2C bus */
-    TMPABC_NODEV = -2       /**< no device with the configured address found on the bus */
-};
+@code
+/**
+ * @brief               Initialize the foo device and its descriptor
+ * @param[out]  dev     Device descriptor to initialized
+ * @param[in]   params  Device initialization parameters
+ *
+ * @retval      0       Success
+ * @retval      -ENXIO  No foo device connected to the I2C bus
+ * @retval      -ENODEV Device using the foo I2C address is not a foo device
+ * etc.
+ */
+int foo_init(foo_t *dev, const foo_params_t *params);
 @endcode
+
+You can multiplex this information whenever this is reasonable, as long as a
+negative return value indicates an error without exceptions. E.g. like this:
+
+@code
+/**
+ * @brief               Perform a relative humidity measurement
+ * @param[in]   dev     Humidity sensor to perform the measurement on
+ *
+ * @return              The relative humidity in percent
+ * @retval      -EIO    Communication with the sensor failed
+ */
+int foo_humidity(const foo_t *dev);
+@endcode
+
+### Documenting Return Values                  {#driver-guide-return-values-doc}
+
+With the exception of functions returning `void`, all return values have to be
+documented. Use the `return` Doxygen command to describe what is returned. In
+order to document special return value (such as error codes), use the `retval`
+command. The `retval` command expects the specific value to document as first
+argument (no spaces in the value allowed!), and a description (spaces allowed
+here) as second. It is safe to use both `return` and `retval` commands, or just
+one of them - whatever makes most sense for a given function.
 
 ## General Device Driver Checklist            {#driver-guide-general-checklist}
 
