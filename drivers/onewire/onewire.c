@@ -43,8 +43,8 @@
  * https://www.maximintegrated.com/en/design/technical-documents/app-notes/1/126.html
  * all in microseconds
  */
-#define T_RESET_HOLD_US     (480)
-#define T_RESET_SAMPLE_US   (70)
+#define T_RESET_HOLD_US     (480U)
+#define T_RESET_SAMPLE_US   (70U)
 #define T_RW_START_US       (6U)
 #define T_W_0_HOLD_US       (60U)
 #define T_W_0_END_US        (10U)
@@ -147,7 +147,7 @@ int onewire_reset(const onewire_t *owi, const onewire_rom_t *rom)
 
 void onewire_read(const onewire_t *owi, void *data, size_t len)
 {
-    uint8_t *buf = (uint8_t *)data;
+    uint8_t *buf = data;
     uint32_t t_ref = xtimer_now_usec();
 
     for (size_t pos = 0; pos < len; pos++) {
@@ -162,7 +162,7 @@ void onewire_read(const onewire_t *owi, void *data, size_t len)
 
 void onewire_write(const onewire_t *owi, const void *data, size_t len)
 {
-    const uint8_t *buf = (uint8_t *)data;
+    const uint8_t *buf = data;
     uint32_t t_ref = xtimer_now_usec();
 
     for (size_t pos = 0; pos < len; pos ++) {
