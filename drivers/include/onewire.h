@@ -53,6 +53,7 @@
 
 #include <stdint.h>
 
+#include "fmt.h"
 #include "periph/gpio.h"
 
 #ifdef __cplusplus
@@ -236,7 +237,12 @@ void onewire_rom_to_str(char *str, const onewire_rom_t *rom);
  *
  * @param[in] rom       1-Wire ROM code
  */
-void onewire_rom_print(const onewire_rom_t *rom);
+static inline void onewire_rom_print(const onewire_rom_t *rom)
+{
+    char str[ONEWIRE_ROM_STR_LEN];
+    onewire_rom_to_str(str, rom);
+    print(str, (ONEWIRE_ROM_STR_LEN - 1));
+}
 
 #ifdef __cplusplus
 }

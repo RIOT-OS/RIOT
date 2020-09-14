@@ -45,10 +45,3 @@ void onewire_rom_to_str(char *str, const onewire_rom_t *rom)
     size_t pos = fmt_bytes_hex(str, rom->u8, sizeof(onewire_rom_t));
     str[pos] = '\0';
 }
-
-static inline void onewire_rom_print(const onewire_rom_t *rom)
-{
-    char str[ONEWIRE_ROM_STR_LEN];
-    onewire_rom_to_str(str, rom);
-    print(str, (ONEWIRE_ROM_STR_LEN - 1));
-}
