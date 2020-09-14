@@ -20,16 +20,16 @@
  *
  * Anyhow, this configures ztimer as follows:
  *
- * 1. if ztimer_msec in USEMODULE:
- * 1.1. assume ztimer_msec uses periph_timer
+ * 1. if ztimer_usec in USEMODULE:
+ * 1.1. assume ztimer_usec uses periph_timer
  * 1.2a. if no config given
  * 1.2a.1a. use xtimer config if available
  * 1.2a.1b. default to TIMER_DEV(0), 32bit
  * 1.2b. else, use config
  *
- * 2. if ztimer_usec in USEMODULE:
+ * 2. if ztimer_msec in USEMODULE:
  * 2.1a. if periph_rtt in USEMODULE: use that
- * 2.1b: else: convert from ZTIMER_MSEC
+ * 2.1b: else: convert from ZTIMER_USEC
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
