@@ -26,22 +26,22 @@
 
 int main(void)
 {
-    printf("Found %i configured debug pin(s)\n", dbgpin_cnt());
+    printf("Found %i configured debug pin(s)\n", dbgpin_count());
 
-    for (unsigned p = 0; p < dbgpin_cnt(); p++) {
+    for (unsigned p = 0; p < dbgpin_count(); p++) {
         printf("Testing pin %u\n", p);
         dbgpin_set(p);
         xtimer_usleep(TICK);
-        dbgpin_clr(p);
+        dbgpin_clear(p);
         xtimer_usleep(TICK);
-        dbgpin_tgl(p);
+        dbgpin_toggle(p);
         xtimer_usleep(2 * TICK);
-        dbgpin_tgl(p);
+        dbgpin_toggle(p);
         xtimer_usleep(TICK);
         dbgpin_pulse(p);
         xtimer_usleep(TICK);
         for (unsigned i = 2; i <= 5; i++) {
-            dbgpin_sig(p, i);
+            dbgpin_signal(p, i);
             xtimer_usleep(TICK);
         }
     }
