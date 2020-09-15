@@ -16,6 +16,9 @@ ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
   USEMODULE += tsrb
 endif
 
+# 16 bit GPIO pin mask required
+USEMODULE += gpio_mask_16bit
+
 ifneq (,$(filter stm32_eth,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eth
   USEMODULE += netdev_eth

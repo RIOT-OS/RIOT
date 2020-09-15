@@ -58,51 +58,42 @@ static gpio_isr_ctx_t isr_ctx[EXTI_NUMOF];
 #endif
 
 /**
- * @brief   Extract the port base address from the given pin identifier
+ * @brief   Converts a port into a pointer to its register structure
  */
-static inline GPIO_TypeDef *_port(gpio_t pin)
+static inline GPIO_TypeDef *_port(gpio_port_t port)
 {
-    return (GPIO_TypeDef *)(pin & ~(0x0f));
+    return (GPIO_TypeDef *)port.reg;
 }
 
 /**
- * @brief   Extract the port number form the given identifier
+ * @brief   Convert a port to its port number
  *
  * The port number is extracted by looking at bits 10, 11, 12, 13 of the base
  * register addresses.
  */
-static inline int _port_num(gpio_t pin)
+static inline int _port_num(gpio_port_t port)
 {
-    return ((pin >> 10) & 0x0f);
+    return GPIO_CPU_PORT_NUM(port.reg);
 }
 
-/**
- * @brief   Extract the pin number from the last 4 bit of the pin identifier
- */
-static inline int _pin_num(gpio_t pin)
+static inline void port_init_clock(gpio_port_t port)
 {
-    return (pin & 0x0f);
-}
-
-static inline void port_init_clock(GPIO_TypeDef *port, gpio_t pin)
-{
-    (void)port; /* <-- Only used for when port G requires special handling */
 #if defined(CPU_FAM_STM32F0) || defined (CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L1)
-    periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
+    periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(port)));
 #elif defined (CPU_FAM_STM32L0) || defined(CPU_FAM_STM32G0)
-    periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
+    periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(port)));
 #elif defined (CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
       defined (CPU_FAM_STM32G4)
-    periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
+    periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(port)));
 #ifdef PWR_CR2_IOSV
-    if (port == GPIOG) {
+    if (port.reg == GPIOG_BASE) {
         /* Port G requires external power supply */
         periph_clk_en(APB1, RCC_APB1ENR1_PWREN);
         PWR->CR2 |= PWR_CR2_IOSV;
     }
 #endif /* PWR_CR2_IOSV */
 #else
-    periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
+    periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(port)));
 #endif
 }
 
@@ -114,112 +105,102 @@ static inline void set_mode(GPIO_TypeDef *port, int pin_num, unsigned mode)
     port->MODER = tmp;
 }
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_cpu_init(gpio_port_t port, gpio_pin_t pin, gpio_mode_t mode)
 {
-    GPIO_TypeDef *port = _port(pin);
-    int pin_num = _pin_num(pin);
-
     /* enable clock */
-    port_init_clock(port, pin);
+    port_init_clock(port);
     /* set mode */
-    set_mode(port, pin_num, mode);
+    set_mode(_port(port), pin, mode);
     /* set pull resistor configuration */
-    port->PUPDR &= ~(0x3 << (2 * pin_num));
-    port->PUPDR |=  (((mode >> 2) & 0x3) << (2 * pin_num));
+    _port(port)->PUPDR &= ~(0x3 << (2 * pin));
+    _port(port)->PUPDR |=  (((mode >> 2) & 0x3) << (2 * pin));
     /* set output mode */
-    port->OTYPER &= ~(1 << pin_num);
-    port->OTYPER |=  (((mode >> 4) & 0x1) << pin_num);
+    _port(port)->OTYPER &= ~(1 << pin);
+    _port(port)->OTYPER |=  (((mode >> 4) & 0x1) << pin);
     /* set pin speed to maximum */
-    port->OSPEEDR |= (3 << (2 * pin_num));
+    _port(port)->OSPEEDR |= (3 << (2 * pin));
 
     return 0;
 }
 
-void gpio_init_af(gpio_t pin, gpio_af_t af)
+void gpio_init_af(gpio_t gpio, gpio_af_t af)
 {
-    GPIO_TypeDef *port = _port(pin);
-    uint32_t pin_num = _pin_num(pin);
+    GPIO_TypeDef *port = _port(gpio.port);
+    gpio_pin_t pin =gpio.pin;
 
     /* enable clock */
-    port_init_clock(port, pin);
+    port_init_clock(gpio.port);
     /* set selected function */
-    port->AFR[(pin_num > 7) ? 1 : 0] &= ~(0xf << ((pin_num & 0x07) * 4));
-    port->AFR[(pin_num > 7) ? 1 : 0] |= (af << ((pin_num & 0x07) * 4));
+    port->AFR[(pin > 7) ? 1 : 0] &= ~(0xf << ((pin & 0x07) * 4));
+    port->AFR[(pin > 7) ? 1 : 0] |= (af << ((pin & 0x07) * 4));
     /* set pin to AF mode */
-    set_mode(port, pin_num, 2);
+    set_mode(port, pin, 2);
 }
 
-void gpio_init_analog(gpio_t pin)
+void gpio_init_analog(gpio_t gpio)
 {
     /* enable clock, needed as this function can be used without calling
      * gpio_init first */
 #if defined(CPU_FAM_STM32F0) || defined (CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L1)
-    periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(pin)));
+    periph_clk_en(AHB, (RCC_AHBENR_GPIOAEN << _port_num(gpio.port)));
 #elif defined (CPU_FAM_STM32L0) || defined(CPU_FAM_STM32G0)
-    periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
+    periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(gpio.port)));
 #elif defined (CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
       defined (CPU_FAM_STM32G4)
-    periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
+    periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(gpio.port)));
 #else
-    periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
+    periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(gpio.port)));
 #endif
     /* set to analog mode */
-    _port(pin)->MODER |= (0x3 << (2 * _pin_num(pin)));
+    _port(gpio.port)->MODER |= (0x3 << ((uint32_t)gpio.pin << 1));
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_cpu_irq_enable(gpio_port_t port, gpio_pin_t pin)
 {
-    EXTI_REG_IMR |= (1 << _pin_num(pin));
+    (void)port;
+    EXTI_REG_IMR |= (1 << pin);
 }
 
-void gpio_irq_disable(gpio_t pin)
+void gpio_cpu_irq_disable(gpio_port_t port, gpio_pin_t pin)
 {
-    EXTI_REG_IMR &= ~(1 << _pin_num(pin));
+    (void)port;
+    EXTI_REG_IMR &= ~(1 << pin);
 }
 
-int gpio_read(gpio_t pin)
+gpio_mask_t gpio_cpu_read(gpio_port_t port)
 {
-    return (_port(pin)->IDR & (1 << _pin_num(pin)));
+    return _port(port)->IDR;
 }
 
-void gpio_set(gpio_t pin)
+void gpio_cpu_set(gpio_port_t port, gpio_mask_t pins)
 {
-    _port(pin)->BSRR = (1 << _pin_num(pin));
+    _port(port)->BSRR = pins;
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_cpu_clear(gpio_port_t port, gpio_mask_t pins)
 {
-    _port(pin)->BSRR = (1 << (_pin_num(pin) + 16));
+    _port(port)->BSRR = ((uint32_t)pins << 16);
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_cpu_toggle(gpio_port_t port, gpio_mask_t pins)
 {
-    if (gpio_read(pin)) {
-        gpio_clear(pin);
-    } else {
-        gpio_set(pin);
-    }
+    _port(port)->ODR = _port(port)->ODR ^ pins;
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_cpu_write(gpio_port_t port, gpio_mask_t values)
 {
-    if (value) {
-        gpio_set(pin);
-    } else {
-        gpio_clear(pin);
-    }
+    _port(port)->ODR = values;
 }
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_cpu_init_int(gpio_port_t port, gpio_pin_t pin, gpio_mode_t mode,
+                      gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
-    int pin_num = _pin_num(pin);
-    int port_num = _port_num(pin);
+    int port_num = _port_num(port);
 
     /* set callback */
-    isr_ctx[pin_num].cb = cb;
-    isr_ctx[pin_num].arg = arg;
+    isr_ctx[pin].cb = cb;
+    isr_ctx[pin].arg = arg;
 
     /* enable clock of the SYSCFG module for EXTI configuration */
 #ifndef CPU_FAM_STM32WB
@@ -233,25 +214,25 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 #endif
 
     /* initialize pin as input */
-    gpio_init(pin, mode);
+    gpio_cpu_init(port, pin, mode);
 
     /* enable global pin interrupt */
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32G0)
-    if (pin_num < 2) {
+    if (pin < 2) {
         NVIC_EnableIRQ(EXTI0_1_IRQn);
     }
-    else if (pin_num < 4) {
+    else if (pin < 4) {
         NVIC_EnableIRQ(EXTI2_3_IRQn);
     }
     else {
         NVIC_EnableIRQ(EXTI4_15_IRQn);
     }
 #else
-    if (pin_num < 5) {
-        NVIC_EnableIRQ(EXTI0_IRQn + pin_num);
+    if (pin < 5) {
+        NVIC_EnableIRQ(EXTI0_IRQn + pin);
     }
-    else if (pin_num < 10) {
+    else if (pin < 10) {
         NVIC_EnableIRQ(EXTI9_5_IRQn);
     }
     else {
@@ -259,27 +240,27 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     }
 #endif
     /* configure the active flank */
-    EXTI_REG_RTSR &= ~(1 << pin_num);
-    EXTI_REG_RTSR |=  ((flank & 0x1) << pin_num);
-    EXTI_REG_FTSR &= ~(1 << pin_num);
-    EXTI_REG_FTSR |=  ((flank >> 1) << pin_num);
+    EXTI_REG_RTSR &= ~(1 << pin);
+    EXTI_REG_RTSR |=  ((flank & 0x1) << pin);
+    EXTI_REG_FTSR &= ~(1 << pin);
+    EXTI_REG_FTSR |=  ((flank >> 1) << pin);
 
 #if defined(CPU_FAM_STM32G0)
     /* enable specific pin as exti sources */
-    EXTI->EXTICR[pin_num >> 2] &= ~(0xf << ((pin_num & 0x03) * 8));
-    EXTI->EXTICR[pin_num >> 2] |= (port_num << ((pin_num & 0x03) * 8));
+    EXTI->EXTICR[pin >> 2] &= ~(0xf << ((pin & 0x03) * 8));
+    EXTI->EXTICR[pin >> 2] |= (port_num << ((pin & 0x03) * 8));
     /* clear any pending requests */
-    EXTI->RPR1 = (1 << pin_num);
-    EXTI->FPR1 = (1 << pin_num);
+    EXTI->RPR1 = (1 << pin);
+    EXTI->FPR1 = (1 << pin);
 #else
     /* enable specific pin as exti sources */
-    SYSCFG->EXTICR[pin_num >> 2] &= ~(0xf << ((pin_num & 0x03) * 4));
-    SYSCFG->EXTICR[pin_num >> 2] |= (port_num << ((pin_num & 0x03) * 4));
+    SYSCFG->EXTICR[pin >> 2] &= ~(0xf << ((pin & 0x03) * 4));
+    SYSCFG->EXTICR[pin >> 2] |= (port_num << ((pin & 0x03) * 4));
     /* clear any pending requests */
-    EXTI_REG_PR = (1 << pin_num);
+    EXTI_REG_PR = (1 << pin);
 #endif
     /* unmask the pins interrupt channel */
-    EXTI_REG_IMR |= (1 << pin_num);
+    EXTI_REG_IMR |= (1 << pin);
 
     return 0;
 }

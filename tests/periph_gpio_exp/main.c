@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     tests
+ * @defgroup    tests_periph_gpio_exp
  * @{
  *
  * @file
@@ -20,14 +21,32 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "irq.h"
 #include "shell.h"
 #include "benchmark.h"
 #include "periph/gpio.h"
 
-#define BENCH_RUNS_DEFAULT      (1000UL * 100)
-#define IRQ_TIMEOUT_US          (1000UL)
+#define BENCH_RUNS_DEFAULT      (1000UL * 1000)
+
+/**
+ * BENCHMARK_FUNC disables the interrupts and does not work correctly on
+ * some platforms, e.g. ATmega. On other platforms, such as STM32, the
+ * benchmark test gives the same results with interrupts not disabled.
+ * Therefore a modified version is used here that does not disable the
+ * interrupts.
+ */
+#define MY_BENCHMARK_FUNC(name, runs, func)                     \
+    {                                                           \
+        uint32_t _benchmark_time = xtimer_now_usec();           \
+        for (unsigned long i = 0; i < runs; i++) {              \
+            func;                                               \
+        }                                                       \
+        _benchmark_time = (xtimer_now_usec() - _benchmark_time);\
+        benchmark_print_time(_benchmark_time, runs, name);      \
+    }
+
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 static void cb(void *arg)
@@ -36,6 +55,16 @@ static void cb(void *arg)
            (int)arg >> 8, (int)arg & 0xff);
 }
 #endif
+
+static int str2port(char *port)
+{
+    if (strncmp(port, "exp", 3) == 0) {
+        return GPIO_EXP_PORT + atoi(&port[3]);
+    }
+    else {
+        return atoi(port);
+    }
+}
 
 static int init_pin(int argc, char **argv, gpio_mode_t mode)
 {
@@ -46,11 +75,11 @@ static int init_pin(int argc, char **argv, gpio_mode_t mode)
         return 1;
     }
 
-    po = atoi(argv[1]);
+    po = str2port(argv[1]);
     pi = atoi(argv[2]);
 
     if (gpio_init(GPIO_PIN(po, pi), mode) < 0) {
-        printf("Error to initialize GPIO_PIN(%i, %02i)\n", po, pi);
+        printf("Error to initialize GPIO_PIN(%i, %i)\n", po, pi);
         return 1;
     }
 
@@ -108,7 +137,7 @@ static int init_int(int argc, char **argv)
         return 1;
     }
 
-    po = atoi(argv[1]);
+    po = str2port(argv[1]);
     pi = atoi(argv[2]);
 
     fl = atoi(argv[3]);
@@ -167,7 +196,7 @@ static int enable_int(int argc, char **argv)
         return 1;
     }
 
-    po = atoi(argv[1]);
+    po = str2port(argv[1]);
     pi = atoi(argv[2]);
 
     status = atoi(argv[3]);
@@ -190,7 +219,7 @@ static int enable_int(int argc, char **argv)
 }
 #endif
 
-static int cmd_read(int argc, char **argv)
+static int read(int argc, char **argv)
 {
     int port, pin;
 
@@ -199,180 +228,63 @@ static int cmd_read(int argc, char **argv)
         return 1;
     }
 
-    port = atoi(argv[1]);
+    port = str2port(argv[1]);
     pin = atoi(argv[2]);
 
     if (gpio_read(GPIO_PIN(port, pin))) {
-        printf("GPIO_PIN(%i.%02i) is HIGH\n", port, pin);
+        printf("GPIO_PIN(%i, %i) is HIGH\n", port, pin);
     }
     else {
-        printf("GPIO_PIN(%i.%02i) is LOW\n", port, pin);
+        printf("GPIO_PIN(%i, %i) is LOW\n", port, pin);
     }
 
     return 0;
 }
 
-static int cmd_set(int argc, char **argv)
+static int set(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
         return 1;
     }
 
-    gpio_set(GPIO_PIN(atoi(argv[1]), atoi(argv[2])));
+    gpio_set(GPIO_PIN(str2port(argv[1]), atoi(argv[2])));
 
     return 0;
 }
 
-static int cmd_clear(int argc, char **argv)
+static int clear(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
         return 1;
     }
 
-    gpio_clear(GPIO_PIN(atoi(argv[1]), atoi(argv[2])));
+    gpio_clear(GPIO_PIN(str2port(argv[1]), atoi(argv[2])));
 
     return 0;
 }
 
-static int cmd_toggle(int argc, char **argv)
+static int toggle(int argc, char **argv)
 {
     if (argc < 3) {
         printf("usage: %s <port> <pin>\n", argv[0]);
         return 1;
     }
 
-    gpio_toggle(GPIO_PIN(atoi(argv[1]), atoi(argv[2])));
+    gpio_toggle(GPIO_PIN(str2port(argv[1]), atoi(argv[2])));
 
     return 0;
 }
 
-#ifdef MODULE_PERIPH_GPIO_IRQ
-static void _test_cb(void *ctx)
+static int writep(int argc, char **argv)
 {
-    mutex_unlock(ctx);
-}
-#endif
-
-static int cmd_auto_test(int argc, char **argv)
-{
-    if (argc < 5) {
-        printf("usage: %s <port> <pin> <port> <pin>\n", argv[0]);
+    if (argc < 4) {
+        printf("usage: %s <port> <pin> <value>\n", argv[0]);
         return 1;
     }
 
-    gpio_t pin_in  = GPIO_PIN(atoi(argv[1]), atoi(argv[2]));
-    gpio_t pin_out = GPIO_PIN(atoi(argv[3]), atoi(argv[4]));
-
-    puts("[START]");
-
-    if (gpio_init(pin_in, GPIO_IN)) {
-        printf("Error to initialize GPIO_PIN(%s, %s)\n", argv[1], argv[2]);
-        return -1;
-    }
-
-    if (gpio_init(pin_out, GPIO_OUT)) {
-        printf("Error to initialize GPIO_PIN(%s, %s)\n", argv[3], argv[4]);
-        return -1;
-    }
-
-    /* test set HIGH */
-    gpio_set(pin_out);
-
-    if (gpio_read(pin_in) == 0) {
-        puts("gpio_set() or gpio_read() or failed");
-        return -1;
-    }
-
-    /* test set LOW */
-    gpio_clear(pin_out);
-
-    if (gpio_read(pin_in) != 0) {
-        puts("gpio_clear() or gpio_read() failed");
-        return -1;
-    }
-
-#ifdef MODULE_PERIPH_GPIO_IRQ
-    mutex_t lock = MUTEX_INIT_LOCKED;
-
-    /* test rising interrupt */
-    if (gpio_init_int(pin_in, GPIO_IN, GPIO_RISING, _test_cb, &lock)) {
-        puts("setting rising interrupt failed");
-        return -1;
-    }
-
-    gpio_set(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US)) {
-        puts("rising interrupt timeout");
-        return -1;
-    }
-
-    gpio_clear(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
-        puts("interrupt falsely generated on falling edge");
-        return -1;
-    }
-
-    /* test falling interrupt */
-    if (gpio_init_int(pin_in, GPIO_IN, GPIO_FALLING, _test_cb, &lock)) {
-        puts("setting falling interrupt failed");
-        return -1;
-    }
-
-    gpio_set(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
-        puts("interrupt falsely generated on rising edge");
-        return -1;
-    }
-
-    gpio_clear(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US)) {
-        puts("rising interrupt timeout");
-        return -1;
-    }
-
-    /* test IRQ disable */
-    gpio_irq_disable(pin_in);
-
-    gpio_set(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
-        puts("interrupt falsely generated on rising edge while disabled");
-        return -1;
-    }
-
-    gpio_clear(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
-        puts("interrupt falsely generated while disabled");
-        return -1;
-    }
-
-    /* test IRQ enable */
-
-    gpio_irq_enable(pin_in);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
-        puts("interrupt falsely generated after being re-enabled");
-        return -1;
-    }
-
-    gpio_set(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US) == 0) {
-        puts("interrupt falsely generated on rising edge after re-enabled");
-        return -1;
-    }
-
-    gpio_clear(pin_out);
-    if (xtimer_mutex_lock_timeout(&lock, IRQ_TIMEOUT_US)) {
-        puts("interrupt not re-enabled");
-        return -1;
-    }
-
-    /* disable IRQ to avoid further interrupts */
-    gpio_irq_disable(pin_in);
-
-#endif
-
-    puts("[SUCCESS]");
+    gpio_write(GPIO_PIN(str2port(argv[1]), atoi(argv[2])), atoi(argv[3]));
 
     return 0;
 }
@@ -384,19 +296,19 @@ static int bench(int argc, char **argv)
         return 1;
     }
 
-    gpio_t pin = GPIO_PIN(atoi(argv[1]), atoi(argv[2]));
+    gpio_t pin = GPIO_PIN(str2port(argv[1]), atoi(argv[2]));
     unsigned long runs = BENCH_RUNS_DEFAULT;
     if (argc > 3) {
         runs = (unsigned long)atol(argv[3]);
     }
 
     puts("\nGPIO driver run-time performance benchmark\n");
-    BENCHMARK_FUNC("nop loop", runs, __asm__ volatile("nop"));
-    BENCHMARK_FUNC("gpio_set", runs, gpio_set(pin));
-    BENCHMARK_FUNC("gpio_clear", runs, gpio_clear(pin));
-    BENCHMARK_FUNC("gpio_toggle", runs, gpio_toggle(pin));
-    BENCHMARK_FUNC("gpio_read", runs, (void)gpio_read(pin));
-    BENCHMARK_FUNC("gpio_write", runs, gpio_write(pin, 1));
+    MY_BENCHMARK_FUNC("nop loop", runs, __asm__ volatile("nop"));
+    MY_BENCHMARK_FUNC("gpio_set", runs, gpio_set(pin));
+    MY_BENCHMARK_FUNC("gpio_clear", runs, gpio_clear(pin));
+    MY_BENCHMARK_FUNC("gpio_toggle", runs, gpio_toggle(pin));
+    MY_BENCHMARK_FUNC("gpio_read", runs, (void)gpio_read(pin));
+    MY_BENCHMARK_FUNC("gpio_write", runs, gpio_write(pin, 1));
     puts("\n --- DONE ---");
     return 0;
 }
@@ -412,11 +324,11 @@ static const shell_command_t shell_commands[] = {
     { "init_int", "init as external INT w/o pull resistor", init_int },
     { "enable_int", "enable or disable gpio interrupt", enable_int },
 #endif
-    { "read", "read pin status", cmd_read },
-    { "set", "set pin to HIGH", cmd_set },
-    { "clear", "set pin to LOW", cmd_clear },
-    { "toggle", "toggle pin", cmd_toggle },
-    { "auto_test", "Run a series of automatic tests on two connected GPIOs", cmd_auto_test },
+    { "read", "read pin status", read },
+    { "set", "set pin to HIGH", set },
+    { "clear", "set pin to LOW", clear },
+    { "toggle", "toggle pin", toggle },
+    { "write", "write pin", writep },
     { "bench", "run a set of predefined benchmarks", bench },
     { NULL, NULL, NULL }
 };
@@ -426,7 +338,8 @@ int main(void)
     puts("GPIO peripheral driver test\n");
     puts("In this test, pins are specified by integer port and pin numbers.\n"
          "So if your platform has a pin PA01, it will be port=0 and pin=1,\n"
-         "PC14 would be port=2 and pin=14 etc.\n\n"
+         "PC14 would be port=2 and pin=14 etc. When using exp0, exp1, ...\n"
+         "for the port, the virtual GPIO expander ports are addressed.\n\n"
          "NOTE: make sure the values you use exist on your platform! The\n"
          "      behavior for not existing ports/pins is not defined!");
 

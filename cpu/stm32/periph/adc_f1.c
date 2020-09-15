@@ -88,7 +88,7 @@ int adc_init(adc_t line)
     prep(line);
 
     /* configure the pin */
-    if (adc_config[line].pin != GPIO_UNDEF) {
+    if (gpio_is_valid(adc_config[line].pin)) {
         gpio_init_analog(adc_config[line].pin);
     }
     /* set clock prescaler to get the maximal possible ADC clock value */

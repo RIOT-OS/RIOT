@@ -1,0 +1,28 @@
+From 7891f2d332eb475cae12ccf2c178c58246e16ae6 Mon Sep 17 00:00:00 2001
+From: Gunar Schorcht <gunar@schorcht.net>
+Date: Sun, 26 Jul 2020 10:12:48 +0200
+Subject: [PATCH 1/1] ports/riot: change for structured GPIO type
+
+---
+ ports/riot/machine_pin.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/ports/riot/machine_pin.c b/ports/riot/machine_pin.c
+index 14563b9ed..7308d3db8 100644
+--- a/ports/riot/machine_pin.c
++++ b/ports/riot/machine_pin.c
+@@ -52,7 +52,11 @@ const mp_obj_base_t machine_pin_obj_template = {&machine_pin_type};
+ 
+ STATIC void machine_pin_print(const mp_print_t *print, mp_obj_t self_in, mp_print_kind_t kind) {
+     machine_pin_obj_t *self = self_in;
++#ifndef MODULE_PERIPH_GPIO_EXP
+     mp_printf(print, "<Pin %u>", (unsigned)self->pin);
++#else
++    mp_printf(print, "<Pin (%d,%d)>", gpio_port_num(self->pin), self->pin.pin);
++#endif
+ }
+ 
+ // pin.init(mode, *, value)
+-- 
+2.17.1
+

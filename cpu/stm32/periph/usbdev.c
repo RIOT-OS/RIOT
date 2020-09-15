@@ -26,6 +26,7 @@
 #include "xtimer.h"
 #include "cpu.h"
 #include "cpu_conf.h"
+#include "periph_conf.h"
 #include "periph/pm.h"
 #include "periph/gpio.h"
 #include "periph/usbdev.h"

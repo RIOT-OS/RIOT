@@ -243,11 +243,11 @@ void candev_stm32_set_pins(can_t *dev, gpio_t tx_pin, gpio_t rx_pin,
 void candev_stm32_set_pins(can_t *dev, gpio_t tx_pin, gpio_t rx_pin)
 #endif
 {
-    if (dev->tx_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->tx_pin)) {
         gpio_init(dev->tx_pin, GPIO_IN);
         gpio_init_analog(dev->tx_pin);
     }
-    if (dev->rx_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->rx_pin)) {
         gpio_init(dev->rx_pin, GPIO_IN);
         gpio_init_analog(dev->rx_pin);
     }
