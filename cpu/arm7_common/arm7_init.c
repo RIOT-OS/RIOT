@@ -124,6 +124,10 @@ void bootloader(void)
     puf_sram_init((uint8_t *) &_sheap, SEED_RAM_LEN);
 #endif
 
+#ifdef MODULE_DBGPIN
+    dbgpin_init();
+#endif
+
     /* cpu specific setup of clocks, peripherals */
     cpu_init();
 
