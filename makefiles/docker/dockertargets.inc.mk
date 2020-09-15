@@ -1,20 +1,6 @@
-# TODO
-#        - All code in this section move to common
-#        - docker common, refactoring
-#        - first document only in advanced-build-system-tricks until mature
+# TODO:
+#        - First document only in advanced-build-system-tricks until mature
 #        - We do not care for handling `clean` and other targets in parallel
-
-DOCKER_USER ?= $$(id -u)
-
-DOCKER_RUN_FLAGS ?= --rm --tty --user $(DOCKER_USER)
-
-docker_run_make = \
-	$(DOCKER) run $(DOCKER_RUN_FLAGS) \
-	$(DOCKER_VOLUMES_AND_ENV) \
-	$(DOCKER_ENVIRONMENT_CMDLINE) \
-	$3 \
-	-w '$(DOCKER_APPDIR)' '$2' \
-	make $(DOCKER_OVERRIDE_CMDLINE) $4 $1
 
 # currently the BOARD is not always passed to docker, we always want to
 DOCKER_ENVIRONMENT_CMDLINE += --env BOARD=$(BOARD)
@@ -37,7 +23,7 @@ DOCKER_TARGET_IMAGE ?= $(DOCKER_IMAGE)
 
 # TODO:
 #       - fedora doesn't have this
-#       - how to handle in winows & mac
+#       - how to handle in windows & mac
 DOCKER_TARGET_GROUPS ?= dialout plugdev
 
 # Unless using --privileged every device we want the container to have acces
