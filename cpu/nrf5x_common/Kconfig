@@ -19,7 +19,6 @@ config CPU_COMMON_NRF5X
     select HAS_BLE_NIMBLE
     select HAS_RADIO_NRFBLE
     select HAS_RADIO_NRFMIN
-    select HAS_PUF_SRAM
 
 ## Definition of specific features
 config HAS_BOOTLOADER_NRFUTIL
