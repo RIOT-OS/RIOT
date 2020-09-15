@@ -64,6 +64,10 @@ void software_init_hook(void)
 
 void mips_start(void)
 {
+#ifdef MODULE_DBGPIN
+    dbgpin_init();
+#endif
+
     board_init();
 
     /* kernel_init */
