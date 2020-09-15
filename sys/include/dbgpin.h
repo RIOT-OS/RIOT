@@ -35,8 +35,6 @@ extern "C"
 #error Please specify the pins to use with the dbgpin module (DBGPIN_PINS)
 #endif
 
-// extern const gpio_t dbgpin_pins[];
-
 /**
  * @brief   Set the given debug pin to HIGH
  *
