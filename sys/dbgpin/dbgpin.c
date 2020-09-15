@@ -4,7 +4,7 @@
 
 const gpio_t dbgpin_pins[] = { DBGPIN_PINS };
 
-unsigned dbgpin_cnt(void)
+unsigned dbgpin_count(void)
 {
     return ARRAY_SIZE(dbgpin_pins);
 }

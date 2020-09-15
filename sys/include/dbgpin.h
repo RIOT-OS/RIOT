@@ -37,36 +37,75 @@ extern "C"
 
 extern const gpio_t dbgpin_pins[];
 
+/**
+ * @brief   Set the given debug pin to HIGH
+ *
+ * @param[in] pin       pin to set, pin number is offset to the list of defined
+ *                      debug pins in DBGPIN_PINS
+ */
 static inline void dbgpin_set(unsigned pin)
 {
     gpio_set(dbgpin_pins[pin]);
 }
 
-static inline void dbgpin_clr(unsigned pin)
+/**
+ * @brief   Set the given debug pin to LOW
+ *
+ * @param[in] pin       pin to set, pin number is offset to the list of defined
+ *                      debug pins in DBGPIN_PINS
+ */
+static inline void dbgpin_clear(unsigned pin)
 {
     gpio_clear(dbgpin_pins[pin]);
 }
 
-static inline void dbgpin_tgl(unsigned pin)
+/**
+ * @brief   Toggle the given debug pin
+ *
+ * @param[in] pin       pin to set, pin number is offset to the list of defined
+ *                      debug pins in DBGPIN_PINS
+ */
+static inline void dbgpin_toggle(unsigned pin)
 {
     gpio_toggle(dbgpin_pins[pin]);
 }
 
+/**
+ * @brief   Output a pulse (2 time toggle) on the given debug pin
+ *
+ * @param[in] pin       pin to set, pin number is offset to the list of defined
+ *                      debug pins in DBGPIN_PINS
+ */
 static inline void dbgpin_pulse(unsigned pin)
 {
-    dbgpin_tgl(pin);
-    dbgpin_tgl(pin);
+    dbgpin_toggle(pin);
+    dbgpin_toggle(pin);
 }
 
-static inline void dbgpin_sig(unsigned pin, unsigned num)
+/**
+ * @brief   Output a specified number of pulses on the given debug pin
+ *
+ * @param[in] pin       pin to set, pin number is offset to the list of defined
+ *                      debug pins in DBGPIN_PINS
+ * @param[in] num       number of pulses to output
+ */
+static inline void dbgpin_signal(unsigned pin, unsigned num)
 {
     for (unsigned i = 0; i < num; i++) {
         dbgpin_pulse(pin);
     }
 }
 
-unsigned dbgpin_cnt(void);
+/**
+ * @brief   Get the number of configured debug pins
+ *
+ * @return  number of configured debug pins
+ */
+unsigned dbgpin_count(void);
 
+/**
+ * @brief   Initialize the configured input pins
+ */
 void dbgpin_init(void);
 
 #ifdef __cplusplus
