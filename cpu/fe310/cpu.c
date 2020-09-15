@@ -93,6 +93,10 @@ void flash_init(void)
  */
 void cpu_init(void)
 {
+#ifdef MODULE_DBGPIN
+    dbgpin_init();
+#endif
+
     /* Initialize clock */
     clock_init();
 
