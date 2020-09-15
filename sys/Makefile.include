@@ -126,3 +126,7 @@ endif
 ifneq (,$(filter prng,$(USEMODULE)))
   include $(RIOTBASE)/sys/random/Makefile.include
 endif
+
+ifneq (,$(filter dbgpin,$(USEMODULE)))
+  INCLUDES += -include $(RIOTBASE)/sys/include/dbgpin.h
+endif

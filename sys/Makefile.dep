@@ -46,4 +46,12 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter dbgpin,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  # XXX native segfaults when not using the mock module
+  ifeq (native,$(BOARD))
+    USEMODULE += periph_gpio_mock
+  endif
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
