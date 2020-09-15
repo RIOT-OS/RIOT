@@ -172,6 +172,10 @@ void reset_handler_default(void)
 
     post_startup();
 
+#ifdef MODULE_DBGPIN
+    dbgpin_init();
+#endif
+
     /* initialize the board (which also initiates CPU initialization) */
     board_init();
 
