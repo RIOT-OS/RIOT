@@ -114,11 +114,6 @@ static inline void poweron(nrfusb_t *usbdev)
     usbdev->device->ENABLE = USBD_ENABLE_ENABLE_Msk;
 }
 
-static inline void poweroff(nrfusb_t *usbdev)
-{
-    usbdev->device->ENABLE = 0x00;
-}
-
 static void usb_attach(nrfusb_t *usbdev)
 {
     DEBUG("nrfusb: Enabling pull-up\n");
