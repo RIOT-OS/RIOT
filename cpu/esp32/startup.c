@@ -142,6 +142,10 @@ NORETURN void IRAM call_start_cpu0 (void)
         memset(&_rtc_bss_rtc_start, 0, (&_rtc_bss_rtc_end - &_rtc_bss_rtc_start));
     }
 
+#ifdef MODULE_DBGPIN
+    dbgpin_init();
+#endif
+
     uint8_t cpu_id[CPUID_LEN];
     cpuid_get ((void*)cpu_id);
 

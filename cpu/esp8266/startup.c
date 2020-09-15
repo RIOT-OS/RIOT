@@ -74,6 +74,10 @@ void esp_riot_init(void)
         system_update_cpu_freq(ESP8266_CPU_FREQUENCY);
     }
 
+#ifdef MODULE_DBGPIN
+    dbgpin_init();
+#endif
+
     ets_printf("\n");
 #ifdef MODULE_ESP_LOG_STARTUP
     ets_printf("Starting ESP8266 CPU with ID: %08x\n", system_get_chip_id());
