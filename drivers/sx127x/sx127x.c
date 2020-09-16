@@ -45,20 +45,20 @@
 #include "debug.h"
 
 /* The reset signal must be applied for at least 100 µs to trigger the manual
-   reset of the device. To ensure this value is big enough even with an
-   inaccurate clock source, an additional 10 % error margin is added. */
-#define SX127X_MANUAL_RESET_SIGNAL_LEN_US       (110U)
+   reset of the device. In order to avoid a dependency to the high frequency
+   timers, we round it to 1 ms */
+#define SX127X_MANUAL_RESET_SIGNAL_LEN_MS       (1U)
 
 /* After triggering a manual reset the device needs at least 5 ms to become
-   ready before interacting with it. To ensure this value is big enough even
-   with an inaccurate clock source, an additional 10 % error margin is added. */
-#define SX127X_MANUAL_RESET_WAIT_FOR_READY_US   (5500U)
+   ready before interacting with it. We round up to 6 ms in case the clock
+   source is not accurate enough */
+#define SX127X_MANUAL_RESET_WAIT_FOR_READY_MS   (6U)
 
 /* When the device is started by enabling its power supply for the first time
    i.e. on Power-on-Reset (POR), it needs at least 10 ms after the POR cycle is
    done to become ready. To ensure this value is big enough even with an
    inaccurate clock source, an additional 10 % error margin is added. */
-#define SX127X_POR_WAIT_FOR_READY_US            (11U * US_PER_MS)
+#define SX127X_POR_WAIT_FOR_READY_MS            (11U)
 
 /* Internal functions */
 static int _init_spi(sx127x_t *dev);
@@ -116,12 +116,12 @@ int sx127x_reset(const sx127x_t *dev)
         /* set reset pin to the state that triggers manual reset */
         gpio_write(dev->params.reset_pin, SX127X_POR_ACTIVE_LOGIC_LEVEL);
 
-        ztimer_sleep(ZTIMER_USEC, SX127X_MANUAL_RESET_SIGNAL_LEN_US);
+        ztimer_sleep(ZTIMER_MSEC, SX127X_MANUAL_RESET_SIGNAL_LEN_MS);
 
         /* Put reset pin in High-Z */
         gpio_init(dev->params.reset_pin, GPIO_IN);
 
-        ztimer_sleep(ZTIMER_USEC, SX127X_MANUAL_RESET_WAIT_FOR_READY_US);
+        ztimer_sleep(ZTIMER_MSEC, SX127X_MANUAL_RESET_WAIT_FOR_READY_MS);
     }
 
     return 0;
@@ -153,7 +153,7 @@ int sx127x_init(sx127x_t *dev)
     }
 
     /* wait for the device to become ready */
-    ztimer_sleep(ZTIMER_USEC, SX127X_POR_WAIT_FOR_READY_US);
+    ztimer_sleep(ZTIMER_MSEC, SX127X_POR_WAIT_FOR_READY_MS);
 
     sx127x_reset(dev);
 
