@@ -84,6 +84,26 @@
 #error "PLL configuration: PLL R value is invalid"
 #endif
 #endif
+
+#if defined(CPU_FAM_STM32WB)
+#if (CONFIG_CLOCK_PLL_Q < 1 || CONFIG_CLOCK_PLL_Q > 8)
+#error "PLL configuration: PLL Q value is invalid"
+#else
+#define PLL_Q                       ((CONFIG_CLOCK_PLL_Q - 1) << RCC_PLLCFGR_PLLQ_Pos)
+#endif
+#else
+#if (CONFIG_CLOCK_PLL_Q == 2)
+#define PLL_Q                       (0)
+#elif (CONFIG_CLOCK_PLL_Q == 4)
+#define PLL_Q                       (RCC_PLLCFGR_PLLQ_0)
+#elif (CONFIG_CLOCK_PLL_Q == 6)
+#define PLL_Q                       (RCC_PLLCFGR_PLLQ_1)
+#elif (CONFIG_CLOCK_PLL_Q == 8)
+#define PLL_Q                       (RCC_PLLCFGR_PLLQ_0 | RCC_PLLCFGR_PLLQ_1)
+#else
+#error "PLL configuration: PLL Q value is invalid"
+#endif
+#endif
 /** @} */
 
 #if CONFIG_CLOCK_MSI == KHZ(100)
@@ -168,6 +188,53 @@
 #endif
 #endif /* CPU_FAM_STM32WB */
 
+/* Configure 48MHz clock source */
+#define CLOCK_PLLQ                  ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_M) * CONFIG_CLOCK_PLL_N) / CONFIG_CLOCK_PLL_Q
+
+#if CLOCK_PLLQ == MHZ(48)
+#define CLOCK48MHZ_USE_PLLQ         1
+#elif CONFIG_CLOCK_MSI == MHZ(48)
+#define CLOCK48MHZ_USE_MSI          1
+#else
+#define CLOCK48MHZ_USE_PLLQ         0
+#define CLOCK48MHZ_USE_MSI          0
+#endif
+
+#if IS_ACTIVE(CLOCK48MHZ_USE_PLLQ)
+#define CLOCK48MHZ_SELECT           (RCC_CCIPR_CLK48SEL_1)
+#elif IS_ACTIVE(CLOCK48MHZ_USE_MSI)
+#define CLOCK48MHZ_SELECT           (RCC_CCIPR_CLK48SEL_1 | RCC_CCIPR_CLK48SEL_0)
+#else
+#define CLOCK48MHZ_SELECT           (0)
+#endif
+
+/* Only periph_hwrng requires 48MHz for the moment */
+#if IS_USED(MODULE_PERIPH_HWRNG)
+#if !IS_ACTIVE(CLOCK48MHZ_USE_PLLQ) && !IS_ACTIVE(CLOCK48MHZ_USE_MSI)
+#error "No 48MHz clock source available, HWRNG cannot work"
+#endif
+#define CLOCK_ENABLE_48MHZ          1
+#else
+#define CLOCK_ENABLE_48MHZ          0
+#endif
+
+/* Check if PLL is required */
+#if IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || \
+    (IS_ACTIVE(CLOCK_ENABLE_48MHZ) && IS_ACTIVE(CLOCK48MHZ_USE_PLLQ))
+#define CLOCK_ENABLE_PLL            1
+#else
+#define CLOCK_ENABLE_PLL            0
+#endif
+
+/* Check if MSI is required */
+#if IS_ACTIVE(CONFIG_USE_CLOCK_MSI) || \
+    (IS_ACTIVE(CLOCK_ENABLE_PLL) && IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)) || \
+    (IS_ACTIVE(CLOCK_ENABLE_48MHZ) && IS_ACTIVE(CLOCK48MHZ_USE_MSI))
+#define CLOCK_ENABLE_MSI            1
+#else
+#define CLOCK_ENABLE_MSI            0
+#endif
+
 /**
  * @name    Deduct the needed flash wait states from the core clock frequency
  * @{
@@ -182,7 +249,6 @@
 #define FLASH_WAITSTATES        ((CLOCK_AHB - 1) / 16000000U)
 #endif
 /** @} */
-
 
 void stmclk_init_sysclk(void)
 {
@@ -232,36 +298,28 @@ void stmclk_init_sysclk(void)
         while (!(RCC->CR & RCC_CR_HSERDY)) {}
     }
 
-    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
-        /* Select HSE as system clock and configure the different prescalers */
-        RCC->CFGR &= ~RCC_CFGR_SW;
-        RCC->CFGR |= RCC_CFGR_SW_HSE;
-    }
-    else if (IS_ACTIVE(CONFIG_USE_CLOCK_MSI)) {
+    if (IS_ACTIVE(CLOCK_ENABLE_MSI)) {
 #if defined(CPU_FAM_STM32WB)
         RCC->CR |= (CLOCK_MSIRANGE | RCC_CR_MSION);
 #else
         RCC->CR |= (CLOCK_MSIRANGE | RCC_CR_MSION | RCC_CR_MSIRGSEL);
 #endif
         while (!(RCC->CR & RCC_CR_MSIRDY)) {}
-
-        if (CONFIG_CLOCK_MSI == MHZ(48)) {
-            /* select the MSI clock for the 48MHz clock tree (USB, RNG) */
-            RCC->CCIPR = (RCC_CCIPR_CLK48SEL_0 | RCC_CCIPR_CLK48SEL_1);
-        }
-        /* Select MSI as system clock and configure the different prescalers */
-        RCC->CFGR = (RCC_CFGR_SW_MSI | CLOCK_AHB_DIV | CLOCK_APB1_DIV | CLOCK_APB2_DIV);
     }
-    else if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
-        if (IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)) {
-            /* reset clock to MSI with 48MHz, disables all other clocks */
-#if defined(CPU_FAM_STM32WB)
-            RCC->CR |= (CLOCK_MSIRANGE | RCC_CR_MSION);
-#else
-            RCC->CR |= (CLOCK_MSIRANGE | RCC_CR_MSION | RCC_CR_MSIRGSEL);
-#endif
-            while (!(RCC->CR & RCC_CR_MSIRDY)) {}
 
+    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
+        /* Select HSE as system clock and configure the different prescalers */
+        RCC->CFGR &= ~RCC_CFGR_SW;
+        RCC->CFGR |= RCC_CFGR_SW_HSE;
+    }
+    else if (IS_ACTIVE(CONFIG_USE_CLOCK_MSI)) {
+        /* Select MSI as system clock and configure the different prescalers */
+        RCC->CFGR &= ~RCC_CFGR_SW;
+        RCC->CFGR |= RCC_CFGR_SW_MSI;
+    }
+
+    if (IS_ACTIVE(CLOCK_ENABLE_PLL)) {
+        if (IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)) {
             if (IS_ACTIVE(CONFIG_BOARD_HAS_LSE)) {
                 /* configure the low speed clock domain */
                 stmclk_enable_lfclk();
@@ -269,21 +327,33 @@ void stmclk_init_sysclk(void)
                 RCC->CR |= RCC_CR_MSIPLLEN;
                 while (!(RCC->CR & RCC_CR_MSIRDY)) {}
             }
-
-            if (CONFIG_CLOCK_MSI == MHZ(48)) {
-                /* select the MSI clock for the 48MHz clock tree (USB, RNG) */
-                RCC->CCIPR = (RCC_CCIPR_CLK48SEL_0 | RCC_CCIPR_CLK48SEL_1);
-            }
         }
 
         /* now we can safely configure and start the PLL */
-        RCC->PLLCFGR = (PLL_SRC | PLL_M | PLL_N | PLL_R | RCC_PLLCFGR_PLLREN);
+        RCC->PLLCFGR = (PLL_SRC | PLL_M | PLL_N | PLL_R | PLL_Q);
+        if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
+            /* Enable PLLCLK if PLL is used as system clock */
+            RCC->PLLCFGR |= RCC_PLLCFGR_PLLREN;
+        }
+
+        if (IS_ACTIVE(CLOCK48MHZ_USE_PLLQ)) {
+            /* Enable PLLQ if PLL is used as 48MHz source clock */
+            RCC->PLLCFGR |= RCC_PLLCFGR_PLLQEN;
+        }
+
         RCC->CR |= (RCC_CR_PLLON);
         while (!(RCC->CR & RCC_CR_PLLRDY)) {}
 
-        /* now that the PLL is running, we use it as system clock */
-        RCC->CFGR |= RCC_CFGR_SW_PLL;
-        while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
+        if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
+            /* now that the PLL is running, we use it as system clock if needed */
+            RCC->CFGR |= RCC_CFGR_SW_PLL;
+            while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
+        }
+    }
+
+    if (IS_ACTIVE(CLOCK_ENABLE_48MHZ)) {
+        /* configure the clock used for the 48MHz clock tree (USB, RNG) */
+        RCC->CCIPR = CLOCK48MHZ_SELECT;
     }
 
     if (!IS_ACTIVE(CONFIG_USE_CLOCK_HSI) ||
