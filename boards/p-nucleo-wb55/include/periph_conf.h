@@ -35,10 +35,6 @@
 
 #define CLOCK_HSE                       MHZ(32)
 
-#ifndef CONFIG_CLOCK_PLL_M
-#define CONFIG_CLOCK_PLL_M              (5)
-#endif
-
 /* EXTAHB (HCLK2) max freq 32 Mhz*/
 #define CLOCK_EXTAHB_DIV    RCC_EXTCFGR_C2HPRE_3
 #define CLOCK_EXTAHB        (CLOCK_CORECLOCK / 2)
