@@ -62,6 +62,7 @@ void ztimer_periodic_wakeup(ztimer_clock_t *clock, uint32_t *last_wakeup,
     uint32_t now = ztimer_now(clock);
     uint32_t target = *last_wakeup + period;
     uint32_t offset = target - now;
+
     irq_restore(state);
 
     if (offset <= period) {
