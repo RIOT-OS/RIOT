@@ -26,55 +26,79 @@
 #include "openthread/ip6.h"
 #include "openthread/platform/alarm-milli.h"
 #include "openthread/platform/uart.h"
-#include "openthread/tasklet.h"
 #include "openthread/thread.h"
 #include "random.h"
 #include "ot.h"
+#include "event.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-#define OPENTHREAD_QUEUE_LEN      (8)
-static msg_t _queue[OPENTHREAD_QUEUE_LEN];
+static otInstance *sInstance;   /**< global OpenThread instance */
+static netdev_t *_dev;          /**< netdev descriptor for OpenThread */
+static event_queue_t ev_queue;  /**< the event queue for OpenThread */
 
-static kernel_pid_t _pid;
-static otInstance *sInstance;
-
-uint8_t ot_call_command(char* command, void *arg, void* answer) {
-    ot_job_t job;
-
-    job.command = command;
-    job.arg = arg;
-    job.answer = answer;
-
-    msg_t msg, reply;
-    msg.type = OPENTHREAD_JOB_MSG_TYPE_EVENT;
-    msg.content.ptr = &job;
-    msg_send_receive(&msg, &reply, openthread_get_pid());
-    return (uint8_t)reply.content.value;
+static void _ev_isr_handler(event_t *event)
+{
+    (void) event;
+    _dev->driver->isr(_dev);
 }
 
-/* OpenThread will call this when switching state from empty tasklet to non-empty tasklet. */
-void otTaskletsSignalPending(otInstance *aInstance) {
-    (void) aInstance;
+static event_t ev_isr = {
+    .handler = _ev_isr_handler
+};
+
+event_queue_t *openthread_get_evq(void)
+{
+    return &ev_queue;
 }
 
-static void *_openthread_event_loop(void *arg) {
-    (void)arg;
-    _pid = thread_getpid();
+otInstance* openthread_get_instance(void)
+{
+    return sInstance;
+}
 
-    /* enable OpenThread UART */
-    otPlatUartEnable();
+static void _event_cb(netdev_t *dev, netdev_event_t event) {
+    switch (event) {
+        case NETDEV_EVENT_ISR:
+            event_post(&ev_queue, &ev_isr);
+            break;
+        case NETDEV_EVENT_RX_COMPLETE:
+            DEBUG("openthread_netdev: Reception of a packet\n");
+            recv_pkt(sInstance, dev);
+            break;
+        case NETDEV_EVENT_TX_COMPLETE:
+        case NETDEV_EVENT_TX_NOACK:
+        case NETDEV_EVENT_TX_MEDIUM_BUSY:
+            DEBUG("openthread_netdev: Transmission of a packet\n");
+            send_pkt(sInstance, dev, event);
+            break;
+        default:
+            break;
+    }
+}
+
+static void *_openthread_event_loop(void *arg)
+{
+    _dev = arg;
+    netdev_t *netdev = arg;
+
+    event_queue_init(&ev_queue);
+
+    netdev->driver->init(netdev);
+    netdev->event_callback = _event_cb;
+
+    netopt_enable_t enable = NETOPT_ENABLE;
+    netdev->driver->set(netdev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
+    netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
 
     /* init OpenThread */
     sInstance = otInstanceInitSingle();
 
-    msg_init_queue(_queue, OPENTHREAD_QUEUE_LEN);
-    netdev_t *dev;
-    msg_t msg, reply;
+    /* enable OpenThread UART */
+    otPlatUartEnable();
 
 #if defined(MODULE_OPENTHREAD_CLI)
-    serial_msg_t* serialBuffer;
     otCliUartInit(sInstance);
     /* Init default parameters */
     otPanId panid = OPENTHREAD_PANID;
@@ -91,94 +115,21 @@ static void *_openthread_event_loop(void *arg) {
     diagInit(sInstance);
 #endif
 
-    ot_job_t *job;
     while (1) {
-        otTaskletsProcess(sInstance);
-        if (otTaskletsArePending(sInstance) == false) {
-            msg_receive(&msg);
-            switch (msg.type) {
-                case OPENTHREAD_XTIMER_MSG_TYPE_EVENT:
-                    /* Tell OpenThread a time event was received */
-                    otPlatAlarmMilliFired(sInstance);
-                    break;
-                case OPENTHREAD_NETDEV_MSG_TYPE_EVENT:
-                    /* Received an event from driver */
-                    dev = msg.content.ptr;
-                    dev->driver->isr(dev);
-                    break;
-#ifdef MODULE_OPENTHREAD_CLI
-                case OPENTHREAD_SERIAL_MSG_TYPE_EVENT:
-                    /* Tell OpenThread about the reception of a CLI command */
-                    serialBuffer = (serial_msg_t*)msg.content.ptr;
-                    otPlatUartReceived((uint8_t*) serialBuffer->buf,serialBuffer->length);
-                    serialBuffer->serial_buffer_status = OPENTHREAD_SERIAL_BUFFER_STATUS_FREE;
-                    break;
-#endif
-                case OPENTHREAD_JOB_MSG_TYPE_EVENT:
-                    job = msg.content.ptr;
-                    reply.content.value = ot_exec_command(sInstance, job->command, job->arg, job->answer);
-                    msg_reply(&msg, &reply);
-                    break;
-            }
-        }
+        event_loop(&ev_queue);
     }
 
     return NULL;
 }
 
-static void _event_cb(netdev_t *dev, netdev_event_t event) {
-    switch (event) {
-        case NETDEV_EVENT_ISR:
-            {
-                msg_t msg;
-                assert(_pid != KERNEL_PID_UNDEF);
-
-                msg.type = OPENTHREAD_NETDEV_MSG_TYPE_EVENT;
-                msg.content.ptr = dev;
-
-                if (msg_send(&msg, _pid) <= 0) {
-                    DEBUG("openthread_netdev: possibly lost interrupt.\n");
-                }
-                break;
-            }
-
-        case NETDEV_EVENT_RX_COMPLETE:
-            DEBUG("openthread_netdev: Reception of a packet\n");
-            recv_pkt(sInstance, dev);
-            break;
-        case NETDEV_EVENT_TX_COMPLETE:
-        case NETDEV_EVENT_TX_NOACK:
-        case NETDEV_EVENT_TX_MEDIUM_BUSY:
-            DEBUG("openthread_netdev: Transmission of a packet\n");
-            send_pkt(sInstance, dev, event);
-            break;
-        default:
-            break;
-    }
-}
-
-/* get OpenThread thread pid */
-kernel_pid_t openthread_get_pid(void) {
-    return _pid;
-}
-
 /* starts OpenThread thread */
 int openthread_netdev_init(char *stack, int stacksize, char priority,
                            const char *name, netdev_t *netdev) {
-    netdev->driver->init(netdev);
-    netdev->event_callback = _event_cb;
-
-    netopt_enable_t enable = NETOPT_ENABLE;
-    netdev->driver->set(netdev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
-    netdev->driver->set(netdev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
-
-    _pid = thread_create(stack, stacksize,
+    if (thread_create(stack, stacksize,
                          priority, THREAD_CREATE_STACKTEST,
-                         _openthread_event_loop, NULL, name);
-
-    if (_pid <= 0) {
+                         _openthread_event_loop, netdev, name) < 0) {
         return -EINVAL;
     }
 
-    return _pid;
+    return 0;
 }

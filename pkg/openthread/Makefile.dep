@@ -3,4 +3,5 @@ USEMODULE += openthread_contrib
 USEMODULE += openthread_contrib_netdev
 USEMODULE += l2util
 USEMODULE += xtimer
+USEMODULE += event
 FEATURES_REQUIRED += cpp
