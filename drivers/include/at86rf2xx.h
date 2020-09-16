@@ -95,19 +95,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Max Receiver sensitivity value in dBm
- */
-#if MODULE_AT86RF233
-#   define MAX_RX_SENSITIVITY              (-52)
-#elif MODULE_AT86RF212B
-#   define MAX_RX_SENSITIVITY              (-54)
-#elif MODULE_AT86RFA1 || MODULE_AT86RFR2
-#   define MAX_RX_SENSITIVITY              (-48)
-#else
-#   define MAX_RX_SENSITIVITY              (-49)
-#endif
-
-/**
  * @brief   Min Receiver sensitivity value in dBm
  */
 #if MODULE_AT86RF233
@@ -455,7 +442,7 @@ void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower);
  *
  * @return                  configured receiver sensitivity in dBm
  */
-int16_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev);
+int8_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev);
 
 /**
  * @brief   Set the receiver sensitivity of the given device [in dBm]
@@ -468,7 +455,7 @@ int16_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev);
  * @param[in] dev           device to write to
  * @param[in] rxsens        rx sensitivity in dBm
  */
-void at86rf2xx_set_rxsensitivity(const at86rf2xx_t *dev, int16_t rxsens);
+void at86rf2xx_set_rxsensitivity(const at86rf2xx_t *dev, int8_t rxsens);
 
 /**
  * @brief   Get the maximum number of retransmissions
