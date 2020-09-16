@@ -307,17 +307,6 @@ void stmclk_init_sysclk(void)
         while (!(RCC->CR & RCC_CR_MSIRDY)) {}
     }
 
-    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
-        /* Select HSE as system clock and configure the different prescalers */
-        RCC->CFGR &= ~RCC_CFGR_SW;
-        RCC->CFGR |= RCC_CFGR_SW_HSE;
-    }
-    else if (IS_ACTIVE(CONFIG_USE_CLOCK_MSI)) {
-        /* Select MSI as system clock and configure the different prescalers */
-        RCC->CFGR &= ~RCC_CFGR_SW;
-        RCC->CFGR |= RCC_CFGR_SW_MSI;
-    }
-
     if (IS_ACTIVE(CLOCK_ENABLE_PLL)) {
         if (IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)) {
             if (IS_ACTIVE(CONFIG_BOARD_HAS_LSE)) {
@@ -343,12 +332,24 @@ void stmclk_init_sysclk(void)
 
         RCC->CR |= (RCC_CR_PLLON);
         while (!(RCC->CR & RCC_CR_PLLRDY)) {}
+    }
 
-        if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
-            /* now that the PLL is running, we use it as system clock if needed */
-            RCC->CFGR |= RCC_CFGR_SW_PLL;
-            while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
-        }
+    /* Configure the system clock (SYSCLK) */
+    RCC->CFGR &= ~RCC_CFGR_SW;
+    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
+        /* Select HSE as system clock */
+        RCC->CFGR |= RCC_CFGR_SW_HSE;
+        while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSE) {}
+    }
+    else if (IS_ACTIVE(CONFIG_USE_CLOCK_MSI)) {
+        /* Select MSI as system clock */
+        RCC->CFGR |= RCC_CFGR_SW_MSI;
+        while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_MSI) {}
+    }
+    else if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
+        /* Select PLL as system clock */
+        RCC->CFGR |= RCC_CFGR_SW_PLL;
+        while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
     }
 
     if (IS_ACTIVE(CLOCK_ENABLE_48MHZ)) {
