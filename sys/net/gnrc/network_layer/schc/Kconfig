@@ -1,0 +1,24 @@
+# Copyright (c) 2020 University of Ghent
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig KCONFIG_MODULE_GNRC_SCHC
+    bool "Configure GNRC SCHC"
+    depends on MODULE_GNRC_SCHC
+    help
+        Configure GNRC SCHC module using Kconfig.
+
+if KCONFIG_MODULE_GNRC_SCHC
+
+config GNRC_SCHC_MSG_QUEUE_SIZE_EXP
+    int "Exponent for the message queue size for the SCHC thread (as 2^n)"
+    default 3
+    help
+        As the queue size ALWAYS needs to be power of two, this option
+        represents the exponent of 2^n, which will be used as the size of
+        the queue.
+
+endif # KCONFIG_MODULE_GNRC_SCHC

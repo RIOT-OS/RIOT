@@ -83,6 +83,11 @@ void auto_init(void)
         extern void gnrc_sixlowpan_init(void);
         gnrc_sixlowpan_init();
     }
+    if (IS_USED(MODULE_AUTO_INIT_GNRC_SCHC)) {
+        LOG_DEBUG("Auto init gnrc_schc.\n");
+        extern void gnrc_schc_init(void);
+        gnrc_schc_init();
+    }
     if (IS_USED(MODULE_AUTO_INIT_GNRC_IPV6)) {
         LOG_DEBUG("Auto init gnrc_ipv6.\n");
         extern void gnrc_ipv6_init(void);

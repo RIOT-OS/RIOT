@@ -43,7 +43,7 @@ extern "C" {
  * 1000 ms => triggers after 1001 ms)
  */
 #ifndef CONFIG_GNRC_LORAWAN_TIMER_DRIFT
-#define CONFIG_GNRC_LORAWAN_TIMER_DRIFT 10
+#define CONFIG_GNRC_LORAWAN_TIMER_DRIFT 0
 #endif
 
 /**

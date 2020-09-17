@@ -1,0 +1,2 @@
+INCLUDES += -I$(RIOTBASE)/pkg/libschc/include
+INCLUDES += -I$(PKGDIRBASE)/libschc
