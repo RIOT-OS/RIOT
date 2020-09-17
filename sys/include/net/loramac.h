@@ -25,6 +25,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include "kernel_defines.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -103,6 +105,14 @@ extern "C" {
  * @{
  */
 /**
+ * @brief Default LoRaWAN region
+ */
+#if !IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868) \
+    && !IS_ACTIVE(CONFIG_LORAMAC_REGION_IN_865)
+#define CONFIG_LORAMAC_REGION_EU_868           1
+#endif
+
+/**
  * @brief   Default device class (A, B or C)
  */
 #ifndef LORAMAC_DEFAULT_DEVICE_CLASS
@@ -123,14 +133,14 @@ extern "C" {
 #define LORAMAC_DEFAULT_PUBLIC_NETWORK         (true)
 #endif
 /**
- * @brief   Default datarate (only valid for EU)
+ * @brief   Default datarate
  */
 #ifndef LORAMAC_DEFAULT_DR
 #define LORAMAC_DEFAULT_DR                     (LORAMAC_DR_0)
 #endif
 
 /**
- * @brief   Default MAC TX power (14dBm in EU)
+ * @brief   Default MAC TX power
  */
 #ifndef LORAMAC_DEFAULT_TX_POWER
 #define LORAMAC_DEFAULT_TX_POWER               (LORAMAC_TX_PWR_1)
@@ -151,7 +161,7 @@ extern "C" {
  #endif
 
 /**
- * @brief   Default MAC TX power (14dBm in EU)
+ * @brief   Default MAC TX power
  */
 #ifndef LORAMAC_DEFAULT_TX_POWER
 #define LORAMAC_DEFAULT_TX_POWER               (LORAMAC_TX_PWR_1)
@@ -203,14 +213,22 @@ extern "C" {
  * @brief   Default second RX window datarate index
  */
 #ifndef LORAMAC_DEFAULT_RX2_DR
+#if IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868)
 #define LORAMAC_DEFAULT_RX2_DR                 (LORAMAC_DR_0)
+#elif IS_ACTIVE(CONFIG_LORAMAC_REGION_IN_865)
+#define LORAMAC_DEFAULT_RX2_DR                 (LORAMAC_DR_2)
+#endif
 #endif
 
 /**
  * @brief   Default second RX window frequency (in Hz)
  */
 #ifndef LORAMAC_DEFAULT_RX2_FREQ
+#if IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868)
 #define LORAMAC_DEFAULT_RX2_FREQ               (869525000UL)
+#elif IS_ACTIVE(CONFIG_LORAMAC_REGION_IN_865)
+#define LORAMAC_DEFAULT_RX2_FREQ               (866550000UL)
+#endif
 #endif
 
 /**
