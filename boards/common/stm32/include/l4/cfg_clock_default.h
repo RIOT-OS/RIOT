@@ -152,9 +152,6 @@ extern "C" {
 #define CLOCK_CORECLOCK                 (CLOCK_HSI)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_HSE)
-#if !IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
-#error "The board doesn't provide an HSE oscillator"
-#endif
 #define CLOCK_CORECLOCK                 (CLOCK_HSE)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_MSI)
