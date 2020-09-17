@@ -1,145 +1,62 @@
-GNRC LoRaWAN application
-=============================
+# gnrc_networking example
 
-This application is a showcase for testing GNRC LoRaWAN stack. You should be
-able to send and receive LoRaWAN packets and perform basic LoRaWAN commands
-(Link Check).
+This example shows you how to try out the code
 
-The MAC layers still doesn't implement any duty cycle restriction mechanism.
-However, it respects the retransmission procedure.
+## Connecting two RIOT instances
 
-Only Class A and EU868 region are supported so far.
+When using native (i.e. when you're trying this on your Linux machine),
+you first need to set up two tap devices and a bridge that connects
+them. This constitutes a virtual network that the RIOT instances can
+use to communicate.
 
-Usage
-=====
+    sudo ./../../dist/tools/tapsetup/tapsetup --create 2
 
-It's necessary to join the LoRaWAN network either via OTAA or ABP.
-All keys, addresses and EUIs are in network endian (big endian).
+Then, make sure you've compiled the application by calling `make` and
+start the first RIOT instance by invoking `make term`. In the RIOT
+shell, get to know the IP address of this node:
 
-## OTAA
+    > ifconfig
+    Iface  7   HWaddr: ce:f5:e1:c5:f7:5a
+               inet6 addr: ff02::1/128  scope: local [multicast]
+               inet6 addr: fe80::ccf5:e1ff:fec5:f75a/64  scope: local
+               inet6 addr: ff02::1:ffc5:f75a/128  scope: local [multicast]
 
-Join by OTAA is set by default.
-Set the Application Key, Device EUI and Application EUI using ifconfig. Assuming
-the interface pid is 3:
+and start a UDP server.
 
-```
-ifconfig 3 set deveui AAAAAAAAAAAAAAAA
-ifconfig 3 set appeui BBBBBBBBBBBBBBBB
-ifconfig 3 set appkey CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
-ifconfig 3 up
-```
+    > udp server start 8808
 
-Wait for 5-6 seconds. Type `ifconfig`. The link status should be `up`:
+This node is now ready to receive data on port `8808`.
 
-```
-Iface  3  HWaddr: 26:01:27:2F  Frequency: 868500000Hz  BW: 125kHz  SF: 7
-          CR: 4/5  Link: up
-          TX-Power: 14dBm  State: SLEEP  Demod margin.: 0  Num gateways.: 0
-          IQ_INVERT
-          RX_SINGLE OTAA
+In a second terminal, start a second RIOT instance, this time listening
+on `tap1`:
 
-```
+    PORT=tap1 make term
 
-## ABP
+In the RIOT shell, you can now send a message to the first RIOT
+instance:
 
-Deactivate OTAA using ifconfig and set the AppSKey, NwkSKey and DevAddr;
+    > udp send fe80::ccf5:e1ff:fec5:f75a 8808 testmessage
 
-```
-ifconfig 3 -otaa
-ifconfig 3 set appskey DDDDDDDDDDDDDDDD
-ifconfig 3 set nwkskey EEEEEEEEEEEEEEEE
-ifconfig 3 set addr FFFFFFFF
-ifconfig 3 up
-```
+*(Make sure to copy the actual
+[link-local address](https://en.wikipedia.org/wiki/Link-local_address)
+of your first RIOT instance into the above command)*
 
-The join by ABP occurs immediately.
+In your first terminal, you should now see output that looks like this.
 
-Alternatively all keys can be set using CFLAGS so it's only required to
-select join mode and type `ifconfig <if_pid> up`.
-
-E.g in the application Makefile:
-
-```
-CFLAGS += -DLORAMAC_DEV_EUI_DEFAULT=\{0xAA\,0xAA\,0xAA\,0xAA\,0xAA\,0xAA\,0xAA\,0xAA\}
-CFLAGS += -DLORAMAC_APP_EUI_DEFAULT=\{0xBB\,0xBB\,0xBB\,0xBB\,0xBB\,0xBB\,0xBB\,0xBB\}
-CFLAGS += -DLORAMAC_APP_KEY_DEFAULT=\{0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\}
-CFLAGS += -DLORAMAC_APP_SKEY_DEFAULT=\{0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\}
-CFLAGS += -DLORAMAC_NWK_SKEY_DEFAULT=\{0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\}
-CFLAGS += -DLORAMAC_DEV_ADDR_DEFAULT=\{0xFF\,0xFF\,0xFF\,0xFF\}
-```
-
-## Send data
-
-After join, send data using `send` command. E.g to send "Hello RIOT!" to port 2:
-
-```
-send 3 "Hello RIOT!" 2
-```
-
-## Changing datarate of transmission
-Use `ifconfig` to change the datarate of the transmission. E.g to set the DR to
-2:
-
-```
-ifconfig 3 set dr 2
-```
-
-## Perform a Link Check
-
-Use `ifconfig` to request a Link Check on the next transmission:
-
-```
-ifconfig 3 link_check
-```
-
-Send some data. The result of the Link Check request can be seen with
-`ifconfig`.
-
-```
-ifconfig 3 link_check
-send 3 "Join the RIOT!"
-```
-
-Check demodulation margin and number of gateways using `ifconfig`
-
-```
-ifconfig
-Iface  3  HWaddr: 26:01:2C:EA  Frequency: 867500000Hz  BW: 125kHz  SF: 7
-          CR: 4/5  Link: up
-          TX-Power: 14dBm  State: SLEEP  Demod margin.: 14  Num gateways.: 2
-          IQ_INVERT
-          RX_SINGLE OTAA
-
-```
-
-## Confirmable and unconfirmable messages
-
-Use `ifconfig` to set the `ack_req` flag. With this flag on, messages are
-confirmable.
-
-E.g send confirmable messages:
-
-```
-ifconfig 3 ack_req
-send 3 "My confirmable message"
-```
-
-And unconfirmable messages:
-
-```
-ifconfig 3 -ack_req
-send 3 "My unconfirmable message"
-```
-
-Current state and future plans
-============
-
-The current GNRC LoRaWAN stack is still in an experimental state. It's still
-not compliant with the LoRaWAN specification because some features like duty
-cycle restrictions and some FOps are missing. Work in progress.
-
-Next steps:
-- Add other regions (US915, etc)
-- Add Adaptive Data Rate
-- Add Duty Cycle restrictions
-- Add support for RTC
+    > PKTDUMP: data received:
+    ~~ SNIP  0 - size:  11 byte, type: NETTYPE_UNDEF (0)
+    000000 74 65 73 74 6d 65 73 73 61 67 65
+    ~~ SNIP  1 - size:   8 byte, type: NETTYPE_UDP (3)
+       src-port:  8808  dst-port:  8808
+       length: 19  cksum: 0x4d95f
+    ~~ SNIP  2 - size:  40 byte, type: NETTYPE_IPV6 (1)
+    traffic class: 0x00 (ECN: 0x0, DSCP: 0x00)
+    flow label: 0x00000
+    length: 19  next header: 17  hop limit: 64
+    source address: fe80::a08a:84ff:fe68:544f
+    destination address: fe80::60fc:3cff:fe5e:40df
+    ~~ SNIP  3 - size:  20 byte, type: NETTYPE_NETIF (-1)
+    if_pid: 6  rssi: 0  lqi: 0
+    src_l2addr: a2:8a:84:68:54:4f
+    dst_l2addr: 62:fc:3c:5e:40:df
+    ~~ PKT    -  4 snips, total size:  79 byte

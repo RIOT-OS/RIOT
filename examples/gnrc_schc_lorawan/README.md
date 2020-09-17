@@ -1,86 +1,152 @@
-LoRaWAN
-=======
+GNRC LoRaWAN application
+=============================
 
-Description
------------
+This application is a showcase for testing GNRC SCHC LoRaWAN stack. You should be
+able to send and receive LoRaWAN packets and perform basic LoRaWAN commands
+(Link Check).
 
-This application shows a simple use case of LoRaWAN with RIOT.
+The MAC layers still doesn't implement any duty cycle restriction mechanism.
+However, it respects the retransmission procedure.
 
-By using the real time clock and low-power capabilities of a board, this
-application shows how to program a LoRaWAN Class A device using RIOT.
-
-This application is using the Over-The-Air Activation procedure.
+Only Class A and EU868 region are supported so far.
 
 Usage
------
+=====
 
-Simply build and flash the application for a ST B-L072Z-LRWAN1 board:
+It's necessary to join the LoRaWAN network either via OTAA or ABP.
+All keys, addresses and EUIs are in network endian (big endian).
 
-    make flash term
+## OTAA
 
-Use the `BOARD`, `DRIVER` and `LORA_REGION` make variables to adapt the application
-to your hardware setup and region of use:
+Join by OTAA is set by default.
+Set the Application Key, Device EUI and Application EUI using ifconfig. Assuming
+the interface pid is 3:
 
-- `BOARD` can be one of the nucleo-64 boards
-- `DRIVER` can be either `sx1276` or `sx1272`
-- `LORA_REGION` can be `EU868`, `US915`, etc (see LoRaWAN regional parameters for
-  details).
+```
+ifconfig 3 set deveui AAAAAAAAAAAAAAAA
+ifconfig 3 set appeui BBBBBBBBBBBBBBBB
+ifconfig 3 set appkey CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+ifconfig 3 up
+```
 
-ST Nucleo-64 can be used with mbed LoRa shields: there's one based on
-[the sx1276 radio](https://os.mbed.com/components/SX1276MB1xAS/) and one based
-on the [the sx1272 radio](https://os.mbed.com/components/SX1272MB2xAS/).
+Wait for 5-6 seconds. Type `ifconfig`. The link status should be `up`:
 
-Finally, to join a LoRaWAN network using OTAA activation, edit the application
-`Makefile` and set your device information:
+```
+Iface  3  HWaddr: 26:01:27:2F  Frequency: 868500000Hz  BW: 125kHz  SF: 7
+          CR: 4/5  Link: up
+          TX-Power: 14dBm  State: SLEEP  Demod margin.: 0  Num gateways.: 0
+          IQ_INVERT
+          RX_SINGLE OTAA
 
-    DEVEUI ?= 0000000000000000
-    APPEUI ?= 0000000000000000
-    APPKEY ?= 00000000000000000000000000000000
+```
 
-## Automatic test
+## ABP
 
-The automatic test replicates 11-lorawan release specs test:
+Deactivate OTAA using ifconfig and set the AppSKey, NwkSKey and DevAddr;
 
-- [11-lorawan](https://github.com/RIOT-OS/Release-Specs/blob/ba236c4a1d1258ab63d21b0a860d0f5a5935bbd4/11-lorawan/11-lorawan.md)
-  - [Task #01 - LoRaWAN example](https://github.com/RIOT-OS/Release-Specs/blob/ba236c4a1d1258ab63d21b0a860d0f5a5935bbd4/11-lorawan/11-lorawan.md#task-01---lorawan-example)
+```
+ifconfig 3 -otaa
+ifconfig 3 set appskey DDDDDDDDDDDDDDDD
+ifconfig 3 set nwkskey EEEEEEEEEEEEEEEE
+ifconfig 3 set addr FFFFFFFF
+ifconfig 3 up
+```
 
-It is recommended to test using iotlab-nodes. The default configuration is already
-set on the application Makefile.
+The join by ABP occurs immediately.
 
-### Requirements
+Alternatively all keys can be set using CFLAGS so it's only required to
+select join mode and type `ifconfig <if_pid> up`.
 
-- The tests assumes that there is a gateway in all DR distance to the device and the
-device was flashed with the correct keys.
+E.g in the application Makefile:
 
-- To use iotlab it is required to have a valid account for the FIT IoT-LAB
-(registration there is open for everyone) and the [iot-lab/cli-tools](https://github.com/iot-lab/cli-tools) need to be installed.
+```
+CFLAGS += -DLORAMAC_DEV_EUI_DEFAULT=\{0xAA\,0xAA\,0xAA\,0xAA\,0xAA\,0xAA\,0xAA\,0xAA\}
+CFLAGS += -DLORAMAC_APP_EUI_DEFAULT=\{0xBB\,0xBB\,0xBB\,0xBB\,0xBB\,0xBB\,0xBB\,0xBB\}
+CFLAGS += -DLORAMAC_APP_KEY_DEFAULT=\{0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\,0xCC\}
+CFLAGS += -DLORAMAC_APP_SKEY_DEFAULT=\{0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\,0xDD\}
+CFLAGS += -DLORAMAC_NWK_SKEY_DEFAULT=\{0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\,0xEE\}
+CFLAGS += -DLORAMAC_DEV_ADDR_DEFAULT=\{0xFF\,0xFF\,0xFF\,0xFF\}
+```
 
-- iotlab uses TTN lorawan gateways, to run the test you will need to create an
-[account](https://account.thethingsnetwork.org/) add an [application](https://www.thethingsnetwork.org/docs/applications/add.html) and [register](https://www.thethingsnetwork.org/docs/devices/registration.html) a device. For this
-test you need to take note of the Device EUI, Application EUI & Application Key
-for that device.
+## Send data
 
-### Usage
+After join, send data using `send` command. E.g to send "Hello RIOT!" to port 2:
 
-1. flash device with appropriate keys and test
+```
+send 3 "Hello RIOT!" 2
+```
 
-    $ DEVEUI=<device eui> APPEUI=<application eui> APPKEY=<application key> make -C examples/lorawan/ flash test
+## Changing datarate of transmission
+Use `ifconfig` to change the datarate of the transmission. E.g to set the DR to
+2:
 
-#### With iotlab
+```
+ifconfig 3 set dr 2
+```
 
-1. setup the iotlab experiment:
+## Perform a Link Check
 
-    $ make -C examples/lorawan/ iotlab-exp
+Use `ifconfig` to request a Link Check on the next transmission:
 
-2. flash device, set appropriate keys and test
+```
+ifconfig 3 link_check
+```
 
-    $ DEVEUI=<device eui> APPEUI=<application eui> APPKEY=<application key> IOTLAB_NODE=auto-ssh make -C examples/lorawan/ flash test
+Send some data. The result of the Link Check request can be seen with
+`ifconfig`.
 
-3. stop the iotlab experiment:
+```
+ifconfig 3 link_check
+send 3 "Join the RIOT!"
+```
 
-    $ make -C examples/lorawan/ iotlab-stop
+Check demodulation margin and number of gateways using `ifconfig`
 
-_note_: if you have multiple running experiments you will need to set `IOTLAB_EXP_ID`
-        to the appropriate experiment, when using the `iotlab-exp` you will see a:
-        `Waiting that experiment 175694 gets in state Running`. That number matches
-        the experiment id you started.
+```
+ifconfig
+Iface  3  HWaddr: 26:01:2C:EA  Frequency: 867500000Hz  BW: 125kHz  SF: 7
+          CR: 4/5  Link: up
+          TX-Power: 14dBm  State: SLEEP  Demod margin.: 14  Num gateways.: 2
+          IQ_INVERT
+          RX_SINGLE OTAA
+
+```
+
+## Confirmable and unconfirmable messages
+
+Use `ifconfig` to set the `ack_req` flag. With this flag on, messages are
+confirmable.
+
+E.g send confirmable messages:
+
+```
+ifconfig 3 ack_req
+send 3 "My confirmable message"
+```
+
+And unconfirmable messages:
+
+```
+ifconfig 3 -ack_req
+send 3 "My unconfirmable message"
+```
+
+## Send a UDP packet over LoRaWAN
+
+```
+udp send fe80:: 8000 test
+```
+
+
+Current state and future plans
+============
+
+The current GNRC LoRaWAN stack is still in an experimental state. It's still
+not compliant with the LoRaWAN specification because some features like duty
+cycle restrictions and some FOps are missing. Work in progress.
+
+Next steps:
+- Add other regions (US915, etc)
+- Add Adaptive Data Rate
+- Add Duty Cycle restrictions
+- Add support for RTC
