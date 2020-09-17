@@ -472,6 +472,44 @@ static inline bool gnrc_netif_is_6lbr(const gnrc_netif_t *netif)
 }
 
 /**
+ * @brief   Checks if the device type associated to a @ref gnrc_netif_t
+ *          requires SCHC to run
+ *
+ * @param[in] netif the network interface
+ *
+ * @return true if the device requires 6Lo
+ * @return false otherwise
+ */
+bool gnrc_netif_dev_is_schc(const gnrc_netif_t *netif);
+
+/**
+ * @brief   Checks if the interface uses a protocol that requires SCHC to run
+ *
+ * @attention   Requires prior locking
+ * @note        Assumed to be true, when @ref gnrc_netif_highlander() return true and
+ *              @ref net_gnrc_schc module is included. When the
+ *              @ref net_gnrc_schc module is not included, it is assumed
+ *              to be false.
+ *
+ * @param[in] netif the network interface
+ *
+ * @return  true, if the interface uses SCHC
+ * @return  false, if the interface does not use SCHC
+ */
+static inline bool gnrc_netif_is_schc(const gnrc_netif_t *netif)
+{
+    if (!gnrc_netif_highlander() && IS_USED(MODULE_GNRC_SCHC)) {
+        return gnrc_netif_dev_is_schc(netif);
+    }
+    else if (gnrc_netif_highlander() && IS_USED(MODULE_GNRC_SCHC)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+/**
  * @name    Device type based function
  *
  * These functions' behavior is based around the gnrc_netif_t::device_type of

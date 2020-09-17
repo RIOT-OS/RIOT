@@ -202,6 +202,12 @@ PSEUDOMODULES += gnrc_nettype_lwmac
 PSEUDOMODULES += gnrc_nettype_ndn
 ## @}
 
+## @defgroup 	net_gnrc_nettype_schc  		gnrc_nettype_schc
+## Enables @ref GNRC_NETTYPE_SCHC
+## @{
+PSEUDOMODULES += gnrc_nettype_schc
+## @}
+
 ## @defgroup 	net_gnrc_nettype_sixlowpan  gnrc_nettype_sixlowpan
 ## Enables @ref GNRC_NETTYPE_SIXLOWPAN
 ## @{

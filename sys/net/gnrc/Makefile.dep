@@ -172,6 +172,12 @@ ifneq (,$(filter gnrc_netif_bus,$(USEMODULE)))
   USEMODULE += core_msg_bus
 endif
 
+ifneq (,$(filter gnrc_netif_lorawan,$(USEMODULE)))
+  ifneq (,$(filter gnrc_schc,$(USEMODULE)))
+    USEMODULE += hashes
+  endif
+endif
+
 ifneq (,$(filter ieee802154 nrfmin esp_now cc110x gnrc_sixloenc,$(USEMODULE)))
   ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
     USEMODULE += gnrc_sixlowpan
@@ -512,4 +518,10 @@ ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
   USEMODULE += gnrc_mac
   USEMODULE += xtimer
   FEATURES_REQUIRED += periph_rtt
+endif
+
+
+ifneq (,$(filter gnrc_schc,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_gnrc_schc
+  USEMODULE += gnrc_nettype_schc
 endif

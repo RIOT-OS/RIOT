@@ -49,6 +49,9 @@
 #if IS_USED(MODULE_GNRC_NETIF_6LO)
 #include "net/gnrc/netif/6lo.h"
 #endif
+#if IS_USED(MODULE_GNRC_SCHC)
+#include "net/gnrc/netif/schc.h"
+#endif
 #if defined(MODULE_GNRC_NETIF_DEDUP) && (GNRC_NETIF_L2ADDR_MAXLEN > 0)
 #include "net/gnrc/netif/dedup.h"
 #endif
@@ -142,6 +145,9 @@ typedef struct {
 #endif
 #if IS_USED(MODULE_GNRC_NETIF_LORAWAN) || defined(DOXYGEN)
     gnrc_netif_lorawan_t lorawan;           /**< LoRaWAN component */
+#endif
+#if IS_USED(MODULE_GNRC_SCHC) || defined(DOXYGEN)
+    gnrc_netif_schc_t schc;                 /**< SCHC component */
 #endif
 #if IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN)
     gnrc_netif_ipv6_t ipv6;                 /**< IPv6 component */

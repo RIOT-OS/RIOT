@@ -30,6 +30,7 @@
 #if IS_USED(MODULE_GNRC_NETIF_PKTQ)
 #include "net/gnrc/netif/pktq.h"
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+#include "net/gnrc/schc.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
 #include "net/gnrc/sixlowpan/frag/sfr.h"
@@ -119,6 +120,14 @@ bool gnrc_netif_dev_is_6lo(const gnrc_netif_t *netif)
             return true;
         default:
             return false;
+    }
+}
+
+bool gnrc_netif_dev_is_schc(const gnrc_netif_t *netif)
+{
+    switch (netif->device_type) {
+    default:
+        return false;
     }
 }
 
@@ -304,6 +313,15 @@ int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* MODULE_GNRC_SIXLOWPAN_IPHC */
+#ifdef MODULE_GNRC_SCHC
+        case NETOPT_SCHC:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            *((netopt_enable_t *)opt->data) = (netif->flags &
+                                               GNRC_NETIF_FLAGS_SCHC)
+                                            ? NETOPT_ENABLE : NETOPT_DISABLE;
+            res = sizeof(netopt_enable_t);
+            break;
+#endif  /* MODULE_GNRC_SCHC */
         default:
             break;
     }
@@ -409,6 +427,18 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
             res = sizeof(netopt_enable_t);
             break;
 #endif  /* MODULE_GNRC_SIXLOWPAN_IPHC */
+#ifdef MODULE_GNRC_SCHC
+        case NETOPT_SCHC:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
+                netif->flags |= GNRC_NETIF_FLAGS_SCHC;
+            }
+            else {
+                netif->flags &= ~GNRC_NETIF_FLAGS_SCHC;
+            }
+            res = sizeof(netopt_enable_t);
+            break;
+#endif  /* MODULE_GNRC_SCHC */
         case NETOPT_RAWMODE:
             if (*(((netopt_enable_t *)opt->data)) == NETOPT_ENABLE) {
                 netif->flags |= GNRC_NETIF_FLAGS_RAWMODE;
@@ -1623,6 +1653,7 @@ int gnrc_netif_default_init(gnrc_netif_t *netif)
     netif_register(&netif->netif);
     _check_netdev_capabilities(dev);
     _init_from_device(netif);
+    gnrc_schc_netif_init(netif);
 #ifdef DEVELHELP
     _test_options(netif);
 #endif

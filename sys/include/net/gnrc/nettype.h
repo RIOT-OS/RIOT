@@ -80,6 +80,10 @@ typedef enum {
     GNRC_NETTYPE_SIXLOWPAN,     /**< Protocol is 6LoWPAN */
 #endif
 
+#if IS_USED(MODULE_GNRC_NETTYPE_SCHC) || defined(DOXYGEN)
+    GNRC_NETTYPE_SCHC,          /**< Protocol is SCHC */
+#endif
+
 #if IS_USED(MODULE_GNRC_NETTYPE_LORAWAN) || defined(DOXYGEN)
     GNRC_NETTYPE_LORAWAN,       /**< Protocol is LoRaWAN */
 #endif

@@ -295,6 +295,16 @@ static void _send_to_iface(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
         return;
     }
 #endif
+#ifdef MODULE_GNRC_SCHC
+    if (gnrc_netif_is_schc(netif)) {
+        DEBUG("ipv6: send to SCHC instead\n");
+        if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_SCHC, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
+            DEBUG("ipv6: no SCHC thread found\n");
+            gnrc_pktbuf_release(pkt);
+        }
+        return;
+    }
+#endif
     if (gnrc_netif_send(netif, pkt) < 1) {
         DEBUG("ipv6: unable to send packet\n");
         gnrc_pktbuf_release(pkt);
