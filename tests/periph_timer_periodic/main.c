@@ -22,11 +22,20 @@
 #include <stdint.h>
 
 #include "board.h"
-#include "test_utils/expect.h"
-
+#include "macros/units.h"
 #include "mutex.h"
 #include "periph/timer.h"
-#include "xtimer.h"
+#include "test_utils/expect.h"
+
+/* recreate logic to obtain valid XTIMER_DEV used in xtimer.h, but don't include
+ * xtimer.h, as this leads to issues on some boards when the xtimer module is
+ * not used */
+#ifndef XTIMER_DEV
+#define XTIMER_DEV  TIMER_DEV(0)
+#endif
+#ifndef XTIMER_HZ
+#define XTIMER_HZ   MHZ(1)
+#endif
 
 /* We use the timer used for xtimer with the frequency used by xtimer here
  * to make sure we have a known valid timer configuration.
