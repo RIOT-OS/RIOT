@@ -21,9 +21,11 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "cpu_conf.h"
 #include "periph/cpuid.h"
+#include "test_utils/result_output.h"
 
 int main(void)
 {
@@ -38,11 +40,8 @@ int main(void)
     cpuid_get(id);
 
     /* print the CPUID */
-    printf("CPUID:");
-    for (unsigned int i = 0; i < CPUID_LEN; i++) {
-        printf(" 0x%02x", id[i]);
-    }
-    printf("\n");
+    turo_data_u8_array(0, id, CPUID_LEN);
+    turo_result_success(0);
 
     return 0;
 }
