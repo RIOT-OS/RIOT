@@ -118,11 +118,47 @@
 #error "Invalid MSI clock value"
 #endif
 
-/* Check whether PLL must be enabled */
+/* Check whether PLL must be enabled:
+  - When PLLCLK is used as SYSCLK
+  - When HWRNG feature is used (for the 48MHz clock)
+*/
 #if IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || IS_USED(MODULE_PERIPH_HWRNG)
 #define CLOCK_ENABLE_PLL            1
 #else
 #define CLOCK_ENABLE_PLL            0
+#endif
+
+/* Check whether HSE must be enabled:
+  - When HSE is used as SYSCLK
+  - When PLL is used as SYSCLK and the board provides HSE (since HSE will be
+    used as PLL input clock)
+*/
+#if IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || \
+    (IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && IS_ACTIVE(CONFIG_USE_CLOCK_PLL))
+#define CLOCK_ENABLE_HSE            1
+#else
+#define CLOCK_ENABLE_HSE            0
+#endif
+
+/* Check whether HSI must be enabled:
+  - When HSI is used as SYSCLK
+  - When PLL is used as SYSCLK and the board doesn't provide HSE (since HSI will be
+    used as PLL input clock)
+*/
+#if IS_ACTIVE(CONFIG_USE_CLOCK_HSI) || \
+    (!IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && IS_ACTIVE(CONFIG_USE_CLOCK_PLL))
+#define CLOCK_ENABLE_HSI            1
+#else
+#define CLOCK_ENABLE_HSI            0
+#endif
+
+/* Check whether MSI must be enabled:
+  - When MSI is used as SYSCLK
+*/
+#if IS_ACTIVE(CONFIG_USE_CLOCK_MSI)
+#define CLOCK_ENABLE_MSI            1
+#else
+#define CLOCK_ENABLE_MSI            0
 #endif
 
 /**
@@ -162,33 +198,21 @@ void stmclk_init_sysclk(void)
     /* Wait Until the Voltage Regulator is ready */
     while((PWR->CSR & PWR_CSR_VOSF) != 0) {}
 
-    /* Only enable the HSE clock when it's provided by the board and required:
-        - when HSE is used as system clock
-        - when PLL is used as system clock (because HSE is used automatically
-          as PLL input if it's available)
-     */
-    if (IS_ACTIVE(CONFIG_BOARD_HAS_HSE) &&
-        (IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || IS_ACTIVE(CONFIG_USE_CLOCK_PLL))) {
+    /* Enable HSE if needed */
+    if (IS_ACTIVE(CLOCK_ENABLE_HSE)) {
         RCC->CR |= (RCC_CR_HSEON);
         while (!(RCC->CR & RCC_CR_HSERDY)) {}
     }
 
-    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
-        /* Select HSE as system clock and configure the different prescalers */
-        RCC->CFGR &= ~(RCC_CFGR_SW);
-        RCC->CFGR |= RCC_CFGR_SW_HSE;
-    }
-    else if (IS_ACTIVE(CONFIG_USE_CLOCK_MSI)) {
+    /* Enable MSI if needed */
+    if (IS_ACTIVE(CLOCK_ENABLE_MSI)) {
         /* Configure MSI range and enable it */
         RCC->ICSCR |= CLOCK_MSIRANGE;
         RCC->CR |= (RCC_CR_MSION);
         while (!(RCC->CR & RCC_CR_MSIRDY)) {}
-
-        /* Select MSI as system clock and configure the different prescalers */
-        RCC->CFGR &= ~(RCC_CFGR_SW);
-        RCC->CFGR |= RCC_CFGR_SW_MSI;
     }
 
+    /* Enable PLL if needed */
     if (IS_ACTIVE(CLOCK_ENABLE_PLL)) {
         /* Configure PLL clock source and configure the different prescalers */
         RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLDIV | RCC_CFGR_PLLMUL);
@@ -197,19 +221,32 @@ void stmclk_init_sysclk(void)
         RCC->CR |= RCC_CR_PLLON;
         /* Wait till PLL is ready */
         while (!(RCC->CR & RCC_CR_PLLRDY)) {}
-
-        if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
-            /* Select PLL as system clock source */
-            RCC->CFGR &= ~((uint32_t)(RCC_CFGR_SW));
-            RCC->CFGR |= RCC_CFGR_SW_PLL;
-            /* Wait till PLL is used as system clock source */
-            while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
-        }
     }
 
-    if (!IS_ACTIVE(CONFIG_USE_CLOCK_HSI) ||
-        (IS_ACTIVE(CONFIG_USE_CLOCK_PLL) && IS_ACTIVE(CONFIG_BOARD_HAS_HSE))) {
-        /* Disable HSI only if not used */
+    /* Disable HSI if it's unused */
+    if (!IS_ACTIVE(CLOCK_ENABLE_HSI)) {
+        RCC->CFGR &= ~(RCC_CFGR_SW);
+    }
+
+    /* Configure SYSCLK input source */
+    if (IS_ACTIVE(CONFIG_USE_CLOCK_HSE)) {
+        /* Select HSE as system clock and wait till it's used as system clock */
+        RCC->CFGR |= RCC_CFGR_SW_HSE;
+        while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSE) {}
+    }
+    else if (IS_ACTIVE(CONFIG_USE_CLOCK_MSI)) {
+        /* Select MSI as system clock and wait till it's used as system clock */
+        RCC->CFGR |= RCC_CFGR_SW_MSI;
+        while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_MSI) {}
+    }
+    else if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
+        RCC->CFGR |= RCC_CFGR_SW_PLL;
+        /* Select PLL as system clock and wait till it's used as system clock */
+        while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
+    }
+
+    if (!IS_ACTIVE(CLOCK_ENABLE_HSI)) {
+        /* Disable HSI only if not needed */
         stmclk_disable_hsi();
     }
 
