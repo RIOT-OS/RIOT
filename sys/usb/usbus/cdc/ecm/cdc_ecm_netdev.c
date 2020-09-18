@@ -128,19 +128,23 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
 static int _recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
 {
+    (void)info;
     usbus_cdcecm_device_t *cdcecm = _netdev_to_cdcecm(netdev);
 
-    (void)info;
+    size_t pktlen = cdcecm->len;
+
     if (max_len == 0 && buf == NULL) {
-        return cdcecm->len;
+        return pktlen;
     }
     if (max_len && buf == NULL) {
         _signal_rx_flush(cdcecm);
-        return cdcecm->len;
+        return pktlen;
     }
-    memcpy(buf, cdcecm->in_buf, max_len);
+    if (pktlen <= max_len) {
+        memcpy(buf, cdcecm->in_buf, pktlen);
+    }
     _signal_rx_flush(cdcecm);
-    return max_len;
+    return (pktlen <= max_len) ? (int)pktlen : -ENOBUFS;
 }
 
 static int _init(netdev_t *netdev)
