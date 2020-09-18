@@ -30,7 +30,7 @@
 #endif
 
 #include "periph_cpu.h"
-#include "f2f4f7/cfg_clock_default_168.h"
+#include "f2f4f7/cfg_clock_default_180.h"
 #include "cfg_timer_tim5.h"
 #include "cfg_usb_otg_hs_fs.h"
 
