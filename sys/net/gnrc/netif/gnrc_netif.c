@@ -27,7 +27,9 @@
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6.h"
 #endif /* IS_USED(MODULE_GNRC_IPV6_NIB) */
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
 #include "net/gnrc/netif/pktq.h"
+#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 #if IS_USED(MODULE_NETSTATS)
 #include "net/netstats.h"
 #endif /* IS_USED(MODULE_NETSTATS) */
@@ -1386,42 +1388,45 @@ static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
 
 static void _send_queued_pkt(gnrc_netif_t *netif)
 {
-    if (IS_USED(MODULE_GNRC_NETIF_PKTQ)) {
-        gnrc_pktsnip_t *pkt;
+    (void)netif;
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+    gnrc_pktsnip_t *pkt;
 
-        if ((pkt = gnrc_netif_pktq_get(netif)) != NULL) {
-            _send(netif, pkt, true);
-            gnrc_netif_pktq_sched_get(netif);
-        }
+    if ((pkt = gnrc_netif_pktq_get(netif)) != NULL) {
+        _send(netif, pkt, true);
+        gnrc_netif_pktq_sched_get(netif);
     }
+#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 }
 
 static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
 {
+    (void)push_back; /* only used with IS_USED(MODULE_GNRC_NETIF_PKTQ) */
     int res;
 
-    if (IS_USED(MODULE_GNRC_NETIF_PKTQ)) {
-        /* send queued packets first to keep order */
-        if (!push_back && !gnrc_netif_pktq_empty(netif)) {
-            int put_res;
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+    /* send queued packets first to keep order */
+    if (!push_back && !gnrc_netif_pktq_empty(netif)) {
+        int put_res;
 
-            put_res = gnrc_netif_pktq_put(netif, pkt);
-            if (put_res == 0) {
-                DEBUG("gnrc_netif: (re-)queued pkt %p\n", (void *)pkt);
-                _send_queued_pkt(netif);
-                return;
-            }
-            else {
-                LOG_WARNING("gnrc_netif: can't queue packet for sending\n");
-                /* try to send anyway */
-            }
+        put_res = gnrc_netif_pktq_put(netif, pkt);
+        if (put_res == 0) {
+            DEBUG("gnrc_netif: (re-)queued pkt %p\n", (void *)pkt);
+            _send_queued_pkt(netif);
+            return;
         }
-        /* hold in case device was busy to not having to rewrite *all* the link
-         * layer implementations in case `gnrc_netif_pktq` is included */
-        gnrc_pktbuf_hold(pkt, 1);
+        else {
+            LOG_WARNING("gnrc_netif: can't queue packet for sending\n");
+            /* try to send anyway */
+        }
     }
+    /* hold in case device was busy to not having to rewrite *all* the link
+     * layer implementations in case `gnrc_netif_pktq` is included */
+    gnrc_pktbuf_hold(pkt, 1);
+#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
     res = netif->ops->send(netif, pkt);
-    if (IS_USED(MODULE_GNRC_NETIF_PKTQ) && (res == -EBUSY)) {
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+    if (res == -EBUSY) {
         int put_res;
 
         /* Lower layer was busy.
@@ -1446,10 +1451,11 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
         }
         return;
     }
-    else if (IS_USED(MODULE_GNRC_NETIF_PKTQ)) {
+    else {
         /* remove previously held packet */
         gnrc_pktbuf_release(pkt);
     }
+#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
     if (res < 0) {
         DEBUG("gnrc_netif: error sending packet %p (code: %i)\n",
               (void *)pkt, res);
