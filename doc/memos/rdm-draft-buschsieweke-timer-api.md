@@ -156,6 +156,11 @@ future changes.
       `timer_reset()` like in Contiki is fine)
     - Long term low resolution software timers that play well with power management
     - Short term high resolution software timers
+    - High resolution real time timers
+        - Timers that expire at a specific absolute portable time stamp (e.g. a UNIX timestamp)
+        - Time synchronization (when enabled and used) must update the timeouts, if needed
+        - Justification: E.g. sensor networks for pressure fluctuation monitoring need measurements to be performed synchronized with high accuracy.
+        - Note: Real time timers should be optional (so that only applicaitons actually using them pay the overhead in terms of ROM and runtime overhead).
 - Delay of program execution
     - API to block calling thread for long periods and allows other threads to run
     - Long term delays must play well with power management
@@ -167,12 +172,14 @@ future changes.
         - Justification: Sensor networks e.g. for monitoring pressure fluctuations require the system time of nodes to be synchronized with high accuracy. E.g. the PTP protocol can provide sub microsecond synchronization accuracy. Thus, there are use cases requiring resolutions below micro seconds and there is hardware providing these resolutions and synchronization accuracy.
     - UNIX epoch as common reference point for high interoperability
     - Support for 64 bit time stamps
-        - Devices running for detects might want to log events with milli second
-          resolution timestamps on flash / sd card / ...
+        - Justification: Devices running for decades might want to log events
+          with milli second resolution timestamps on flash / sd card / ...
         - Note: The rest of the API can be 32 bit, only for time stamps 64 bit
           support is mandatory
     - Optional feature to auto-initialize system time from RTC/RTT during boot
     - APIs to allow implementing network time synchronization
+        - The synchronization mechanism should be highly accurate. (E.g. consider the mechanism would read the value from hardware, modify it by adding a time offset determined by some network time synchronization mechanism to it, and store the new value in the hardware: The actually applied offset would be lower by the time that has passed between the read from the hardware and the write to it, reducing accuracy. The actual implementation should be smarter.)
+        - Only the system time (the portable 64 bit time stamps) need to be synchronized.
 - Utilities for convenience
     - Timer utilities
         - Timer that send a message upon expiration
@@ -216,9 +223,6 @@ future changes.
     - The timer implementation should minimize system wake ups
 - Efficient use of CPU cycles
 
-# 3. Design Decisions
-
-TODO: Add these after some discussion.
 
 ## Acknowledgements
 
@@ -231,10 +235,6 @@ TODO: Extend as needed.
 
 - [RFC7228 - Terminology for Constrained-Node Networks](https://tools.ietf.org/html/rfc7228)
 - TODO: Extend as needed
-
-## Revision
-
-TODO: Add revisions, if needed
 
 ## Contact
 
