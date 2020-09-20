@@ -163,7 +163,8 @@ future changes.
 - System time
     - APIs to get the current system time in reasonable, hardware independent
       units
-        - At least: seconds, milli seconds
+        - At least: seconds, milli seconds, micro seconds, nano seconds.
+        - Justification: Sensor networks e.g. for monitoring pressure fluctuations require the system time of nodes to be synchronized with high accuracy. E.g. the PTP protocol can provide sub microsecond synchronization accuracy. Thus, there are use cases requiring resolutions below micro seconds and there is hardware providing these resolutions and synchronization accuracy.
     - UNIX epoch as common reference point for high interoperability
     - Support for 64 bit time stamps
         - Devices running for detects might want to log events with milli second
