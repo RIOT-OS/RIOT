@@ -49,8 +49,6 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, const lsm303dlhc_params_t *params)
     /* reboot sensor */
     res = i2c_write_reg(DEV_I2C, DEV_ACC_ADDR,
                         LSM303DLHC_REG_CTRL5_A, LSM303DLHC_REG_CTRL5_A_BOOT, 0);
-    /* Release the bus for other threads. */
-    i2c_release(DEV_I2C);
 
     /* configure accelerometer */
     /* enable all three axis and set sample rate */
@@ -58,7 +56,6 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, const lsm303dlhc_params_t *params)
           | LSM303DLHC_CTRL1_A_YEN
           | LSM303DLHC_CTRL1_A_ZEN
           | DEV_ACC_RATE);
-    i2c_acquire(DEV_I2C);
     res += i2c_write_reg(DEV_I2C, DEV_ACC_ADDR,
                          LSM303DLHC_REG_CTRL1_A, tmp, 0);
     /* update on read, MSB @ low address, scale and high-resolution */
