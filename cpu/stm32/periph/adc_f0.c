@@ -24,16 +24,6 @@
 #include "periph/adc.h"
 
 /**
- * @brief   Maximum allowed ADC clock speed
- */
-#define MAX_ADC_SPEED           (12000000U)
-
-/**
- * @brief   Load the ADC configuration
- */
-static const adc_conf_t adc_config[] = ADC_CONFIG;
-
-/**
  * @brief   Allocate locks for all three available ADC device
  *
  * All STM32F0 CPUs we support so far only come with a single ADC device.
@@ -61,7 +51,7 @@ int adc_init(adc_t line)
 
     /* lock and power on the device */
     prep();
-    /*configure the pin */
+    /* configure the pin */
     gpio_init_analog(adc_config[line].pin);
     /* reset configuration */
     ADC1->CFGR2 = 0;

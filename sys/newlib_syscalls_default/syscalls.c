@@ -243,7 +243,7 @@ __attribute__((weak)) void heap_stats(void)
  */
 pid_t _getpid(void)
 {
-    return sched_active_pid;
+    return thread_getpid();
 }
 
 /**
@@ -254,7 +254,7 @@ pid_t _getpid(void)
 pid_t _getpid_r(struct _reent *ptr)
 {
     (void) ptr;
-    return sched_active_pid;
+    return thread_getpid();
 }
 
 /**

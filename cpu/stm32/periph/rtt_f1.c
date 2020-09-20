@@ -123,6 +123,12 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
 {
     _rtt_enter_config_mode();
 
+    /* Disable alarm*/
+    RTT_DEV->CRH &= ~RTC_CRH_ALRIE;
+    /* Save new cb and argument */
+    alarm_cb = cb;
+    alarm_arg = arg;
+
     /* Set the alarm MSB word */
     RTT_DEV->ALRH = alarm >> 16;
     /* Set the alarm LSB word */
@@ -132,9 +138,6 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     RTT_DEV->CRH |= RTC_CRH_ALRIE;
 
     _rtt_leave_config_mode();
-
-    alarm_cb = cb;
-    alarm_arg = arg;
 }
 
 void rtt_clear_alarm(void)
@@ -189,11 +192,15 @@ void RTT_ISR(void)
 {
     if (RTT_DEV->CRL & RTC_CRL_ALRF) {
         RTT_DEV->CRL &= ~(RTC_CRL_ALRF);
-        alarm_cb(alarm_arg);
+        if (alarm_cb) {
+            alarm_cb(alarm_arg);
+        }
     }
     if (RTT_DEV->CRL & RTC_CRL_OWF) {
         RTT_DEV->CRL &= ~(RTC_CRL_OWF);
-        overflow_cb(overflow_arg);
+        if (overflow_cb) {
+            overflow_cb(overflow_arg);
+        }
     }
     cortexm_isr_end();
 }

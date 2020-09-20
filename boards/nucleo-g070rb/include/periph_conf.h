@@ -20,6 +20,12 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+
+/* Add specific clock configuration (HSE, LSE) for this board here */
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE            (1)
+#endif
+
 #include "g0/cfg_clock_default.h"
 #include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_rtt_default.h"
@@ -82,28 +88,8 @@ static const uart_conf_t uart_config[] = {
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for 64000000Hz */
-        7,  /* -> 250000Hz */
-        6,  /* -> 500000Hz */
-        5,  /* -> 1000000Hz */
-        3,  /* -> 4000000Hz */
-        2   /* -> 8000000Hz */
-    },
-    {       /* for 64000000Hz */
-        7,  /* -> 250000Hz */
-        6,  /* -> 500000Hz */
-        5,  /* -> 1000000Hz */
-        3,  /* -> 4000000Hz */
-        2   /* -> 8000000Hz */
-    },
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev            = SPI1,

@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_GNRC_SIXLOWPAN_FRAG_VRB
+menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_VRB
     bool "Configure GNRC 6LoWPAN Virtual reassembly buffer"
-    depends on MODULE_GNRC_SIXLOWPAN_FRAG_VRB
+    depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_VRB
     help
         Configure GNRC 6LoWPAN Virtual reassembly buffer module using Kconfig.
 
-if KCONFIG_MODULE_GNRC_SIXLOWPAN_FRAG_VRB
+if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_VRB
 
 config GNRC_SIXLOWPAN_FRAG_VRB_SIZE
     int "Size of the virtual reassembly buffer"
@@ -23,4 +23,4 @@ config GNRC_SIXLOWPAN_FRAG_VRB_TIMEOUT_US
     int "Timeout for a virtual reassembly buffer entry in microseconds"
     default 3000000
 
-endif # KCONFIG_MODULE_GNRC_SIXLOWPAN_FRAG_VRB
+endif # KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_VRB

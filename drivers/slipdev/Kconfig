@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_SLIPDEV
+menuconfig KCONFIG_USEMODULE_SLIPDEV
     bool "Configure SLIPDEV driver"
-    depends on MODULE_SLIPDEV
+    depends on USEMODULE_SLIPDEV
     help
         Configure the SLIPDEV driver using Kconfig.
 
-if KCONFIG_MODULE_SLIPDEV
+if KCONFIG_USEMODULE_SLIPDEV
 
 config SLIPDEV_BUFSIZE_EXP
     int "Buffer size (as exponent of 2^n)"
@@ -22,4 +22,4 @@ config SLIPDEV_BUFSIZE_EXP
         not include full IPv6 MTU.
         Value represents the exponent n of 2^n.
 
-endif # KCONFIG_MODULE_SLIPDEV
+endif # KCONFIG_USEMODULE_SLIPDEV

@@ -5,7 +5,7 @@
 # directory for more details.
 #
 
-config MOD_AUTO_INIT
+config MODULE_AUTO_INIT
     bool "Auto-initialization system"
     default y
     depends on TEST_KCONFIG

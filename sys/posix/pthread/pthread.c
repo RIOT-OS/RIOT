@@ -252,7 +252,7 @@ int pthread_join(pthread_t th, void **thread_return)
 
     switch (other->status) {
         case (PTS_RUNNING):
-            other->joining_thread = sched_active_pid;
+            other->joining_thread = thread_getpid();
             /* go blocked, I'm waking up if other thread exits */
             thread_sleep();
             /* falls through */
@@ -300,7 +300,7 @@ pthread_t pthread_self(void)
 {
     pthread_t result = 0;
     mutex_lock(&pthread_mutex);
-    kernel_pid_t pid = sched_active_pid; /* sched_active_pid is volatile */
+    kernel_pid_t pid = thread_getpid(); /* thread_getpid() is volatile */
     for (int i = 0; i < MAXTHREADS; i++) {
         if (pthread_sched_threads[i] && pthread_sched_threads[i]->thread_pid == pid) {
             result = i+1;

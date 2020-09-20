@@ -17,6 +17,10 @@ ifneq (,$(filter gnrc_sock_async,$(USEMODULE)))
   CFLAGS += -DSOCK_HAS_ASYNC
 endif
 
+ifneq (,$(filter gnrc_pktbuf,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/gnrc/pktbuf/Makefile.include
+endif
+
 ifneq (,$(filter posix_headers,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/posix/include
 endif
@@ -27,6 +31,10 @@ endif
 
 ifneq (,$(filter oneway_malloc,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/oneway-malloc/include
+endif
+
+ifneq (,$(filter eui_provider,$(USEMODULE)))
+  USEMODULE_INCLUDES += $(RIOTBASE)/sys/net/link_layer/eui_provider/include
 endif
 
 ifneq (,$(filter app_metadata,$(USEMODULE)))
@@ -41,9 +49,6 @@ endif
 
 ifneq (,$(filter cpp11-compat,$(USEMODULE)))
   USEMODULE_INCLUDES += $(RIOTBASE)/sys/cpp11-compat/include
-  # make sure cppsupport.o is linked explicitly because __dso_handle is not
-  # found if it is hidden away inside a static object.
-  UNDEF += $(BINDIR)/cpp11-compat/cppsupport.o
 endif
 
 ifneq (,$(filter embunit,$(USEMODULE)))
@@ -68,8 +73,8 @@ ifneq (,$(filter newlib,$(USEMODULE)))
   include $(RIOTMAKE)/libc/newlib.mk
 endif
 
-ifneq (,$(filter newlib_syscalls_default,$(USEMODULE)))
-  include $(RIOTBASE)/sys/newlib_syscalls_default/Makefile.include
+ifneq (,$(filter picolibc,$(USEMODULE)))
+  include $(RIOTMAKE)/libc/picolibc.mk
 endif
 
 ifneq (,$(filter arduino,$(USEMODULE)))
@@ -116,4 +121,8 @@ endif
 # ztimer's compatibility wrapper
 ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   PSEUDOMODULES += xtimer
+endif
+
+ifneq (,$(filter prng,$(USEMODULE)))
+  include $(RIOTBASE)/sys/random/Makefile.include
 endif

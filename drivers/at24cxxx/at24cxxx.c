@@ -104,6 +104,42 @@ int _read(const at24cxxx_t *dev, uint32_t pos, void *data, size_t len)
 }
 
 static
+int _write_page(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t len)
+{
+    int check;
+    uint8_t polls = DEV_MAX_POLLS;
+    uint8_t dev_addr;
+    uint16_t _pos;
+    uint8_t flags = 0;
+
+    if (DEV_EEPROM_SIZE > 2048) {
+        /* 2 bytes word address length if more than 11 bits are
+           used for addressing */
+        /* append page address bits to device address (if any) */
+        dev_addr  = (DEV_I2C_ADDR | ((pos & 0xFF0000) >> 16));
+        _pos = (pos & 0xFFFF);
+        flags = I2C_REG16;
+    }
+    else {
+        /* append page address bits to device address (if any) */
+        dev_addr = (DEV_I2C_ADDR | ((pos & 0xFF00) >> 8));
+        _pos = pos & 0xFF;
+    }
+
+    while (-ENXIO == (check = i2c_write_regs(DEV_I2C_BUS, dev_addr,
+                                             _pos, data, len, flags))) {
+        if (--polls == 0) {
+            break;
+        }
+        xtimer_usleep(AT24CXXX_POLL_DELAY_US);
+    }
+
+    DEBUG("[at24cxxx] i2c_write_regs(): %d; polls: %d\n", check, polls);
+
+    return check;
+}
+
+static
 int _write(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t len)
 {
     int check = 0;
@@ -111,31 +147,9 @@ int _write(const at24cxxx_t *dev, uint32_t pos, const void *data, size_t len)
 
     while (len) {
         size_t clen = MIN(len, DEV_PAGE_SIZE - MOD_POW2(pos, DEV_PAGE_SIZE));
-        uint8_t polls = DEV_MAX_POLLS;
-        uint8_t dev_addr;
-        uint16_t _pos;
-        uint8_t flags = 0;
-        if (DEV_EEPROM_SIZE > 2048) {
-            /* 2 bytes word address length if more than 11 bits are
-               used for addressing */
-            /* append page address bits to device address (if any) */
-            dev_addr  = (DEV_I2C_ADDR | ((pos & 0xFF0000) >> 16));
-            _pos = (pos & 0xFFFF);
-            flags = I2C_REG16;
-        }
-        else {
-            /* append page address bits to device address (if any) */
-            dev_addr = (DEV_I2C_ADDR | ((pos & 0xFF00) >> 8));
-            _pos = pos & 0xFF;
-        }
-        while (-ENXIO == (check = i2c_write_regs(DEV_I2C_BUS, dev_addr,
-                                                 _pos, cdata, clen, flags))) {
-            if (--polls == 0) {
-                break;
-            }
-            xtimer_usleep(AT24CXXX_POLL_DELAY_US);
-        }
-        DEBUG("[at24cxxx] i2c_write_regs(): %d; polls: %d\n", check, polls);
+
+        check = _write_page(dev, pos, cdata, clen);
+
         if (!check) {
             len -= clen;
             pos += clen;
@@ -175,7 +189,7 @@ int at24cxxx_init(at24cxxx_t *dev, const at24cxxx_params_t *params)
         return -EINVAL;
     }
     dev->params = *params;
-    if (DEV_PIN_WP != GPIO_UNDEF) {
+    if (gpio_is_valid(DEV_PIN_WP)) {
         gpio_init(DEV_PIN_WP, GPIO_OUT);
         at24cxxx_disable_write_protect(dev);
     }
@@ -243,6 +257,24 @@ int at24cxxx_write(const at24cxxx_t *dev, uint32_t pos, const void *data,
     return check;
 }
 
+int at24cxxx_write_page(const at24cxxx_t *dev, uint32_t page, uint32_t offset,
+                        const void *data, size_t len)
+{
+    int check;
+
+    assert(offset < DEV_PAGE_SIZE);
+
+    /* write no more than to the end of the current page to prevent wrap-around */
+    size_t remaining = DEV_PAGE_SIZE - offset;
+    len = MIN(len, remaining);
+
+    i2c_acquire(DEV_I2C_BUS);
+    check = _write_page(dev, page * DEV_PAGE_SIZE + offset, data, len);
+    i2c_release(DEV_I2C_BUS);
+
+    return check ? check : (int) len;
+}
+
 int at24cxxx_set(const at24cxxx_t *dev, uint32_t pos, uint8_t val,
                      size_t len)
 {
@@ -271,7 +303,7 @@ int at24cxxx_erase(const at24cxxx_t *dev)
 
 int at24cxxx_enable_write_protect(const at24cxxx_t *dev)
 {
-    if (DEV_PIN_WP == GPIO_UNDEF) {
+    if (!gpio_is_valid(DEV_PIN_WP)) {
         return -ENOTSUP;
     }
     gpio_set(DEV_PIN_WP);
@@ -280,7 +312,7 @@ int at24cxxx_enable_write_protect(const at24cxxx_t *dev)
 
 int at24cxxx_disable_write_protect(const at24cxxx_t *dev)
 {
-    if (DEV_PIN_WP == GPIO_UNDEF) {
+    if (!gpio_is_valid(DEV_PIN_WP)) {
         return -ENOTSUP;
     }
     gpio_clear(DEV_PIN_WP);

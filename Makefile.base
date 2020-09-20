@@ -17,9 +17,9 @@ DIRS := $(sort $(abspath $(DIRS)))
 _MOD := $(shell basename $(CURDIR))
 MODULE ?= $(_MOD)
 
-.PHONY: all clean $(DIRS:%=ALL--%) $(DIRS:%=CLEAN--%)
+.PHONY: all clean $(DIRS:%=ALL--%) $(DIRS:%=CLEAN--%) $(MODULE).module
 
-all: $(BINDIR)/$(MODULE).a ..nothing
+all: $(MODULE).module ..nothing
 
 ..nothing:
 	@:
@@ -89,14 +89,9 @@ include $(RIOTMAKE)/tools/fixdep.inc.mk
 $(BINDIR)/$(MODULE)/:
 	$(Q)mkdir -p $@
 
-$(BINDIR)/$(MODULE).a $(OBJ): | $(BINDIR)/$(MODULE)/
+$(MODULE).module $(OBJ): | $(BINDIR)/$(MODULE)/
 
-# Build the archive from the output directory to create relative thin archives
-# This allows having them valid in and outside of docker
-$(BINDIR)/$(MODULE).a: $(OBJ) | $(DIRS:%=ALL--%)
-	@# Recreate archive to cleanup deleted/non selected source files objects
-	$(Q)$(RM) $@
-	$(Q)cd $(@D) && $(AR) $(ARFLAGS) $(@F) $(subst $(@D)/,,$^)
+$(MODULE).module: $(OBJ) | $(DIRS:%=ALL--%)
 
 CXXFLAGS = $(filter-out $(CXXUWFLAGS), $(CFLAGS)) $(CXXEXFLAGS)
 CCASFLAGS = $(filter-out $(CCASUWFLAGS), $(CFLAGS)) $(CCASEXFLAGS)

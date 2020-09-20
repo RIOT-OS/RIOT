@@ -21,45 +21,12 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
+#include "l1/cfg_clock_default.h"
 #include "cfg_timer_tim5.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name Clock system configuration
- * @{
- **/
-#define CLOCK_HSI           (16000000U)             /* frequency of internal oscillator */
-#define CLOCK_CORECLOCK     (32000000U)             /* targeted core clock frequency */
-/*
- * 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz)
- *
- * LSE might not be available by default in early (C-01) Nucleo boards.
- * For newer revisions, an LSE crystal is present and CLOCK_LSE can be set to 1
- * if one wants to use it.
- */
-#ifndef CLOCK_LSE
-#define CLOCK_LSE           (0)
-#endif
-/* configuration of PLL prescaler and multiply values */
-/* CORECLOCK := HSI / CLOCK_PLL_DIV * CLOCK_PLL_MUL */
-#define CLOCK_PLL_DIV       RCC_CFGR_PLLDIV2
-#define CLOCK_PLL_MUL       RCC_CFGR_PLLMUL4
-/* configuration of peripheral bus clock prescalers */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* AHB clock -> 32MHz */
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1     /* APB2 clock -> 32MHz */
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV1     /* APB1 clock -> 32MHz */
-/* configuration of flash access cycles */
-#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY
-
-/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
-/** @} */
 
 /**
  * @name    DMA streams configuration
@@ -168,28 +135,8 @@ static const pwm_conf_t pwm_config[] = {
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 32000000Hz */
-        7,  /* -> 125000Hz */
-        5,  /* -> 500000Hz */
-        4,  /* -> 1000000Hz */
-        2,  /* -> 4000000Hz */
-        1   /* -> 8000000Hz */
-    },
-    {       /* for APB2 @ 32000000Hz */
-        7,  /* -> 125000Hz */
-        5,  /* -> 500000Hz */
-        4,  /* -> 1000000Hz */
-        2,  /* -> 4000000Hz */
-        1   /* -> 8000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI1,
@@ -256,16 +203,16 @@ static const i2c_conf_t i2c_config[] = {
  * @name   ADC configuration
  * @{
  */
-#define ADC_CONFIG {             \
-    { GPIO_PIN(PORT_A, 0), 0 },  \
-    { GPIO_PIN(PORT_A, 1), 1 },  \
-    { GPIO_PIN(PORT_A, 4), 4 },  \
-    { GPIO_PIN(PORT_B, 0), 8 },  \
-    { GPIO_PIN(PORT_C, 1), 11 }, \
-    { GPIO_PIN(PORT_C, 0), 10 }, \
-}
+static const adc_conf_t adc_config[] = {
+    { GPIO_PIN(PORT_A, 0), 0 },
+    { GPIO_PIN(PORT_A, 1), 1 },
+    { GPIO_PIN(PORT_A, 4), 4 },
+    { GPIO_PIN(PORT_B, 0), 8 },
+    { GPIO_PIN(PORT_C, 1), 11 },
+    { GPIO_PIN(PORT_C, 0), 10 },
+};
 
-#define ADC_NUMOF           (6U)
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 /**

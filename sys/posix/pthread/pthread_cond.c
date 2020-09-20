@@ -95,8 +95,8 @@ int pthread_cond_destroy(pthread_cond_t *cond)
 
 void _init_cond_wait(pthread_cond_t *cond, priority_queue_node_t *n)
 {
-    n->priority = sched_active_thread->priority;
-    n->data = sched_active_pid;
+    n->priority = thread_get_active()->priority;
+    n->data = thread_getpid();
     n->next = NULL;
 
     /* the signaling thread may not hold the mutex, the queue is not thread safe */
@@ -136,7 +136,7 @@ int pthread_cond_timedwait(pthread_cond_t *cond, mutex_t *mutex, const struct ti
         priority_queue_node_t n;
 
         _init_cond_wait(cond, &n);
-        xtimer_set_wakeup64(&timer, (then - now), sched_active_pid);
+        xtimer_set_wakeup64(&timer, (then - now), thread_getpid());
 
         mutex_unlock_and_sleep(mutex);
 
@@ -165,7 +165,7 @@ int pthread_cond_signal(pthread_cond_t *cond)
     priority_queue_node_t *head = priority_queue_remove_head(&(cond->queue));
     int other_prio = -1;
     if (head != NULL) {
-        thread_t *other_thread = (thread_t *) sched_threads[head->data];
+        thread_t *other_thread = thread_get(head->data);
         if (other_thread) {
             other_prio = other_thread->priority;
             sched_set_status(other_thread, STATUS_PENDING);
@@ -199,7 +199,7 @@ int pthread_cond_broadcast(pthread_cond_t *cond)
             break;
         }
 
-        thread_t *other_thread = (thread_t *) sched_threads[head->data];
+        thread_t *other_thread = thread_get(head->data);
         if (other_thread) {
             other_prio = max_prio(other_prio, other_thread->priority);
             sched_set_status(other_thread, STATUS_PENDING);

@@ -21,10 +21,6 @@
 #include "stmclk.h"
 #include "periph_conf.h"
 
-#if CLOCK_USE_HSE && CLOCK_HSE == 0
-#error "HSE is selected as input clock source but CLOCK_HSE is not set"
-#endif
-
 #if defined(CPU_FAM_STM32G0)
 #define PLL_M_MIN                   (1)
 #define PLL_M_MAX                   (8)
@@ -41,28 +37,28 @@
 #define PLL_R_MAX                   (8)
 #endif
 
-#if CLOCK_USE_PLL
-#if (CLOCK_PLL_M < PLL_M_MIN || CLOCK_PLL_M > PLL_M_MAX)
+#if CONFIG_USE_CLOCK_PLL
+#if (CONFIG_CLOCK_PLL_M < PLL_M_MIN || CONFIG_CLOCK_PLL_M > PLL_M_MAX)
 #error "PLL configuration: PLL M value is out of range"
 #endif
-#define PLL_M                       ((CLOCK_PLL_M - 1) << RCC_PLLCFGR_PLLM_Pos)
+#define PLL_M                       ((CONFIG_CLOCK_PLL_M - 1) << RCC_PLLCFGR_PLLM_Pos)
 
-#if (CLOCK_PLL_N < PLL_N_MIN || CLOCK_PLL_N > PLL_N_MAX)
+#if (CONFIG_CLOCK_PLL_N < PLL_N_MIN || CONFIG_CLOCK_PLL_N > PLL_N_MAX)
 #error "PLL configuration: PLL N value is out of range"
 #endif
-#define PLL_N                       (CLOCK_PLL_N << RCC_PLLCFGR_PLLN_Pos)
+#define PLL_N                       (CONFIG_CLOCK_PLL_N << RCC_PLLCFGR_PLLN_Pos)
 
-#if (CLOCK_PLL_R < PLL_R_MIN || CLOCK_PLL_R > PLL_R_MAX)
+#if (CONFIG_CLOCK_PLL_R < PLL_R_MIN || CONFIG_CLOCK_PLL_R > PLL_R_MAX)
 #error "PLL configuration: PLL R value is out of range"
 #endif
 
 #if defined(CPU_FAM_STM32G0)
-#define PLL_R                       ((CLOCK_PLL_R - 1) << RCC_PLLCFGR_PLLR_Pos)
+#define PLL_R                       ((CONFIG_CLOCK_PLL_R - 1) << RCC_PLLCFGR_PLLR_Pos)
 #else /* CPU_FAM_STM32G4 */
-#define PLL_R                       (((CLOCK_PLL_R >> 1) - 1) << RCC_PLLCFGR_PLLR_Pos)
+#define PLL_R                       (((CONFIG_CLOCK_PLL_R >> 1) - 1) << RCC_PLLCFGR_PLLR_Pos)
 #endif
 
-#if CLOCK_HSE
+#if CONFIG_BOARD_HAS_HSE
 #define PLL_IN                      CLOCK_HSE
 #define PLL_SRC                     RCC_PLLCFGR_PLLSRC_HSE
 #else
@@ -70,13 +66,75 @@
 #define PLL_SRC                     RCC_PLLCFGR_PLLSRC_HSI
 #endif
 
-#endif /* CLOCK_USE_PLL */
+#endif /* CONFIG_USE_CLOCK_PLL */
 
 #if defined(CPU_FAM_STM32G0)
 #define RCC_CFGR_SW_HSI             (0)
 #define RCC_CFGR_SW_HSE             (RCC_CFGR_SW_0)
 #define RCC_CFGR_SW_PLL             (RCC_CFGR_SW_1)
+
+#if CONFIG_USE_CLOCK_HSI
+#if CONFIG_CLOCK_HSISYS_DIV == 1
+#define CLOCK_HSI_DIV               (0)
+#elif CONFIG_CLOCK_HSISYS_DIV == 2
+#define CLOCK_HSI_DIV               (RCC_CR_HSIDIV_0)
+#elif CONFIG_CLOCK_HSISYS_DIV == 4
+#define CLOCK_HSI_DIV               (RCC_CR_HSIDIV_1)
+#elif CONFIG_CLOCK_HSISYS_DIV == 8
+#define CLOCK_HSI_DIV               (RCC_CR_HSIDIV_1 | RCC_CR_HSIDIV_0)
+#elif CONFIG_CLOCK_HSISYS_DIV == 16
+#define CLOCK_HSI_DIV               (RCC_CR_HSIDIV_2)
+#elif CONFIG_CLOCK_HSISYS_DIV == 32
+#define CLOCK_HSI_DIV               (RCC_CR_HSIDIV_2 | RCC_CR_HSIDIV_0)
+#elif CONFIG_CLOCK_HSISYS_DIV == 64
+#define CLOCK_HSI_DIV               (RCC_CR_HSIDIV_2 | RCC_CR_HSIDIV_1)
+#elif CONFIG_CLOCK_HSISYS_DIV == 128
+#define CLOCK_HSI_DIV               (RCC_CR_HSIDIV_2 | RCC_CR_HSIDIV_1 | RCC_CR_HSIDIV_0)
 #endif
+#endif /* CONFIG_USE_CLOCK_HSI */
+
+#define CLOCK_AHB_DIV               (0)
+
+#if CONFIG_CLOCK_APB1_DIV == 1
+#define CLOCK_APB1_DIV              (0)
+#elif CONFIG_CLOCK_APB1_DIV == 2
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE_2)
+#elif CONFIG_CLOCK_APB1_DIV == 4
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE_2 | RCC_CFGR_PPRE_0)
+#elif CONFIG_CLOCK_APB1_DIV == 8
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE_2 | RCC_CFGR_PPRE_1)
+#elif CONFIG_CLOCK_APB1_DIV == 16
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE_2 | RCC_CFGR_PPRE_1 | RCC_CFGR_PPRE_0)
+#endif
+#endif /* CPU_FAM_STM32G0 */
+
+#if defined(CPU_FAM_STM32G4)
+#define CLOCK_AHB_DIV               (RCC_CFGR_HPRE_DIV1)
+
+#if CONFIG_CLOCK_APB1_DIV == 1
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_DIV1)
+#elif CONFIG_CLOCK_APB1_DIV == 2
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_DIV2)
+#elif CONFIG_CLOCK_APB1_DIV == 4
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_DIV4)
+#elif CONFIG_CLOCK_APB1_DIV == 8
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_DIV8)
+#elif CONFIG_CLOCK_APB1_DIV == 16
+#define CLOCK_APB1_DIV              (RCC_CFGR_PPRE1_DIV16)
+#endif
+
+#if CONFIG_CLOCK_APB2_DIV == 1
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_DIV1)
+#elif CONFIG_CLOCK_APB2_DIV == 2
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_DIV2)
+#elif CONFIG_CLOCK_APB2_DIV == 4
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_DIV4)
+#elif CONFIG_CLOCK_APB2_DIV == 8
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_DIV8)
+#elif CONFIG_CLOCK_APB2_DIV == 16
+#define CLOCK_APB2_DIV              (RCC_CFGR_PPRE2_DIV16)
+#endif
+#endif /* CPU_FAM_STM32G4 */
 
 /** Determine the required flash wait states from the core clock frequency */
 #if defined(CPU_FAM_STM32G0)
@@ -137,15 +195,25 @@ void stmclk_init_sysclk(void)
     stmclk_enable_lfclk();
 #endif
 
-#if CLOCK_USE_HSE
+#if CONFIG_USE_CLOCK_HSI && defined(CPU_FAM_STM32G0)
+    /* configure HSISYS divider, only available on G0 */
+    RCC->CR |= CLOCK_HSI_DIV;
+    while (!(RCC->CR & RCC_CR_HSIRDY)) {}
+
+#elif CONFIG_USE_CLOCK_HSE
     /* if configured, we need to enable the HSE clock now */
     RCC->CR |= RCC_CR_HSEON;
     while (!(RCC->CR & RCC_CR_HSERDY)) {}
 
+#if defined(CPU_FAM_STM32G0)
+    RCC->CFGR = (RCC_CFGR_SW_HSE | CLOCK_AHB_DIV | CLOCK_APB1_DIV);
+#elif defined(CPU_FAM_STM32G4)
     RCC->CFGR = (RCC_CFGR_SW_HSE | CLOCK_AHB_DIV | CLOCK_APB1_DIV | CLOCK_APB2_DIV);
+#endif
     while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSE) {}
-#elif CLOCK_USE_PLL
-#if CLOCK_HSE
+
+#elif CONFIG_USE_CLOCK_PLL
+#if CONFIG_BOARD_HAS_HSE
     /* if configured, we need to enable the HSE clock now */
     RCC->CR |= RCC_CR_HSEON;
     while (!(RCC->CR & RCC_CR_HSERDY)) {}
@@ -155,9 +223,23 @@ void stmclk_init_sysclk(void)
     RCC->CR |= RCC_CR_PLLON;
     while (!(RCC->CR & RCC_CR_PLLRDY)) {}
 
+#if CLOCK_AHB > MHZ(80)
+    /* Divide HCLK by before enabling the PLL */
+    RCC->CFGR |= RCC_CFGR_HPRE_DIV2;
+#endif
+
     /* now that the PLL is running, we use it as system clock */
     RCC->CFGR |= RCC_CFGR_SW_PLL;
     while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
+
+#if CLOCK_AHB > MHZ(80)
+    /* Wait 1us before switching back to full speed */
+    /* Use volatile to prevent the compiler from optimizing the loop */
+    volatile uint8_t count = CLOCK_CORECLOCK / MHZ(1);
+    while (count--) {}
+    RCC->CFGR &= ~RCC_CFGR_HPRE_DIV2;
+#endif
+
 #endif
 
     stmclk_disable_hsi();

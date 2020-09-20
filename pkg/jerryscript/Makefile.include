@@ -1,6 +1,9 @@
 INCLUDES += -I$(PKGDIRBASE)/jerryscript/jerry-core/include
 INCLUDES += -I$(PKGDIRBASE)/jerryscript/jerry-ext/include
 
+ARCHIVES += $(BINDIR)/jerryscript.a $(BINDIR)/jerryscript-ext.a
+ARCHIVES += $(BINDIR)/jerryport-minimal.a
+
 # Ensure MCPU is correctly exported to CMake variables when configuring the
 # Jerrycript build
 $(call target-export-variables,libjerry,MCPU)

@@ -18,6 +18,7 @@
 
 #include "log.h"
 #include "luid.h"
+#include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/netif/internal.h"
 
 #include "_nib-6ln.h"

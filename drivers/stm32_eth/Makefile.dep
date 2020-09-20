@@ -1,5 +1,0 @@
-FEATURES_REQUIRED += periph_eth
-FEATURES_REQUIRED += periph_dma
-USEMODULE += netdev_eth
-USEMODULE += iolist
-USEMODULE += luid

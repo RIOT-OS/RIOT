@@ -685,6 +685,7 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
                 LOG_WARNING("WARNING: [LWMAC-tx] No response from destination\n");
                 netif->mac.tx.state = GNRC_LWMAC_TX_STATE_FAILED;
                 reschedule = true;
+                netif->mac.tx.preamble_fail_counts++;
                 break;
             }
 
@@ -735,6 +736,7 @@ static bool _lwmac_tx_update(gnrc_netif_t *netif)
             if (tx_info & GNRC_LWMAC_TX_SUCCESS) {
                 netif->mac.tx.state = GNRC_LWMAC_TX_STATE_SEND_DATA;
                 reschedule = true;
+                netif->mac.tx.preamble_fail_counts = 0;
                 break;
             }
             else {

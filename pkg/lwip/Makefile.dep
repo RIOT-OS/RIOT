@@ -4,6 +4,21 @@ FEATURES_REQUIRED += arch_32bit
 
 DEFAULT_MODULE += auto_init_lwip
 
-ifneq (,$(filter lwip_sock_async,$(USEMODULE)))
-  USEMODULE += sock_async
+ifneq (,$(filter sock_async,$(USEMODULE)))
+  USEMODULE += lwip_sock_async
+endif
+ifneq (,$(filter sock_ip,$(USEMODULE)))
+  USEMODULE += lwip_sock_ip
+endif
+ifneq (,$(filter sock_tcp,$(USEMODULE)))
+  USEMODULE += lwip_sock_tcp
+endif
+ifneq (,$(filter sock_udp,$(USEMODULE)))
+  USEMODULE += lwip_sock_udp
+endif
+
+ifneq (,$(filter stm32_eth,$(USEMODULE)))
+  ifneq (,$(filter lwip_dhcp_auto,$(USEMODULE)))
+    USEMODULE += stm32_eth_link_up
+  endif
 endif

@@ -175,8 +175,10 @@ typedef struct {
  * @brief   Setup a DOSE based device state
  * @param[out]  dev         Handle of the device to initialize
  * @param[in]   params      Parameters for device initialization
+ * @param[in]   index       Index of @p params in a global parameter struct array.
+ *                          If initialized manually, pass a unique identifier instead.
  */
-void dose_setup(dose_t *dev, const dose_params_t *params);
+void dose_setup(dose_t *dev, const dose_params_t *params, uint8_t index);
 
 #ifdef __cplusplus
 }

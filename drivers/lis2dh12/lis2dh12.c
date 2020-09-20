@@ -210,7 +210,7 @@ int lis2dh12_set_int(const lis2dh12_t *dev, const lis2dh12_int_params_t *params,
         /* first interrupt line (INT1) */
         case LIS2DH12_INT1:
             pin = dev->p->int1_pin;
-            assert (pin != GPIO_UNDEF);
+            assert (gpio_is_valid(pin));
 
             if (gpio_init_int(pin, GPIO_IN, GPIO_RISING, params->cb, params->arg)) {
                 return LIS2DH12_NOINT;
@@ -224,7 +224,7 @@ int lis2dh12_set_int(const lis2dh12_t *dev, const lis2dh12_int_params_t *params,
         /* second interrupt line (INT2) */
         case LIS2DH12_INT2:
             pin = dev->p->int2_pin;
-            assert (pin != GPIO_UNDEF);
+            assert (gpio_is_valid(pin));
 
             if (gpio_init_int(pin, GPIO_IN, GPIO_RISING, params->cb, params->arg)) {
                 return LIS2DH12_NOINT;

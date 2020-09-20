@@ -26,11 +26,6 @@
 #include "periph/adc.h"
 
 /**
- * @brief   Maximum allowed ADC clock speed
- */
-#define MAX_ADC_SPEED           (12000000U)
-
-/**
  * @brief   ADC clock settings
  *
  * NB: with ADC_CLOCK_HIGH, Vdda should be 2.4V min
@@ -51,11 +46,6 @@
 #define ADC_SAMPLE_TIME_96C   (5)
 #define ADC_SAMPLE_TIME_192C  (6)
 #define ADC_SAMPLE_TIME_384C  (7)
-
-/**
- * @brief   Load the ADC configuration
- */
-static const adc_conf_t adc_config[] = ADC_CONFIG;
 
 /**
  * @brief   Allocate locks for all three available ADC device

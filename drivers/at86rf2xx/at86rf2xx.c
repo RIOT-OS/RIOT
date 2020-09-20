@@ -37,9 +37,9 @@
 #include "debug.h"
 
 
-void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
+void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t index)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    netdev_t *netdev = &dev->netdev.netdev;
 
     netdev->driver = &at86rf2xx_driver;
     /* State to return after receiving or transmitting */
@@ -56,6 +56,10 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params)
     /* initialize device descriptor */
     dev->params = *params;
 #endif
+
+    netdev_register(netdev, NETDEV_AT86RF2XX, index);
+    /* set device address */
+    netdev_ieee802154_setup(&dev->netdev);
 }
 
 static void at86rf2xx_disable_clock_output(at86rf2xx_t *dev)
@@ -89,9 +93,6 @@ static void at86rf2xx_enable_smart_idle(at86rf2xx_t *dev)
 
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
-    eui64_t addr_long;
-    network_uint16_t addr_short;
-
     netdev_ieee802154_reset(&dev->netdev);
 
     /* Reset state machine to ensure a known state */
@@ -99,13 +100,9 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
         at86rf2xx_set_state(dev, AT86RF2XX_STATE_FORCE_TRX_OFF);
     }
 
-    /* generate EUI-64 and short address */
-    luid_get_eui64(&addr_long);
-    luid_get_short(&addr_short);
-
     /* set short and long address */
-    at86rf2xx_set_addr_long(dev, &addr_long);
-    at86rf2xx_set_addr_short(dev, &addr_short);
+    at86rf2xx_set_addr_long(dev, (eui64_t *)dev->netdev.long_addr);
+    at86rf2xx_set_addr_short(dev, (network_uint16_t *)dev->netdev.short_addr);
 
     /* set default channel */
     at86rf2xx_set_chan(dev, AT86RF2XX_DEFAULT_CHANNEL);
@@ -145,6 +142,13 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     /* enable interrupts */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK,
                         AT86RF2XX_IRQ_STATUS_MASK__TRX_END);
+
+    /* enable TX start interrupt for retry counter */
+#ifdef AT86RF2XX_REG__IRQ_MASK1
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK1,
+                             AT86RF2XX_IRQ_STATUS_MASK1__TX_START);
+#endif
+
     /* clear interrupt flags */
     at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
 
@@ -189,9 +193,13 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, const uint8_t *data,
     return offset + len;
 }
 
-void at86rf2xx_tx_exec(const at86rf2xx_t *dev)
+void at86rf2xx_tx_exec(at86rf2xx_t *dev)
 {
     netdev_t *netdev = (netdev_t *)dev;
+
+#if AT86RF2XX_HAVE_RETRIES
+    dev->tx_retries = -1;
+#endif
 
     /* write frame length field in FIFO */
     at86rf2xx_sram_write(dev, 0, &(dev->tx_frame_len), 1);

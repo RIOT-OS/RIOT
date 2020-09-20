@@ -5,37 +5,37 @@
 # directory for more details.
 #
 
-menuconfig MOD_PERIPH_UART
+menuconfig MODULE_PERIPH_UART
     bool "UART peripheral driver"
     depends on HAS_PERIPH_UART
-    select MOD_PERIPH_COMMON
+    select MODULE_PERIPH_COMMON
 
-if MOD_PERIPH_UART
+if MODULE_PERIPH_UART
 
 # TODO: the 'init' modules are actually just artifacts from the way
 # periph_init_% modules are handled in Makefile. We need to define them to keep
 # the list the same for now. We should be able to remove them later on.
 
-config MOD_PERIPH_INIT_UART
+config MODULE_PERIPH_INIT_UART
     bool "Auto initialize UART peripheral"
-    default y if MOD_PERIPH_INIT
+    default y if MODULE_PERIPH_INIT
 
-config MOD_PERIPH_UART_MODECFG
+config MODULE_PERIPH_UART_MODECFG
     bool "Mode configuration support"
     depends on HAS_PERIPH_UART_MODECFG
 
-config MOD_PERIPH_UART_NONBLOCKING
+config MODULE_PERIPH_UART_NONBLOCKING
     bool "Non-blocking support"
     depends on HAS_PERIPH_UART_NONBLOCKING
 
-config MOD_PERIPH_INIT_UART_MODECFG
+config MODULE_PERIPH_INIT_UART_MODECFG
     bool
-    depends on MOD_PERIPH_UART_MODECFG
-    default y if MOD_PERIPH_INIT
+    depends on MODULE_PERIPH_UART_MODECFG
+    default y if MODULE_PERIPH_INIT
 
-config MOD_PERIPH_INIT_UART_NONBLOCKING
+config MODULE_PERIPH_INIT_UART_NONBLOCKING
     bool
-    depends on MOD_PERIPH_UART_NONBLOCKING
-    default y if MOD_PERIPH_INIT
+    depends on MODULE_PERIPH_UART_NONBLOCKING
+    default y if MODULE_PERIPH_INIT
 
-endif # MOD_PERIPH_UART
+endif # MODULE_PERIPH_UART

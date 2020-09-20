@@ -1,5 +1,6 @@
 # Target architecture for the build. Use avr if you are unsure.
-TARGET_ARCH ?= avr
+TARGET_ARCH_AVR ?= avr
+TARGET_ARCH ?= $(TARGET_ARCH_AVR)
 
 CFLAGS_CPU   = -mmcu=$(CPU) $(CFLAGS_FPU)
 CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
@@ -10,10 +11,6 @@ CFLAGS    += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
 ASFLAGS   += $(CFLAGS_CPU) $(CFLAGS_DBG)
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -e reset_handler -Wl,--gc-sections
 OFLAGS    += -j .text -j .data
-
-# explicitly tell the linker to link the syscalls and startup code.
-# without this the interrupt vectors will not be linked correctly!
-UNDEF += $(BINDIR)/atmega_common/startup.o
 
 # Use ROM_LEN and RAM_LEN during link
 $(if $(ROM_LEN),,$(error ROM_LEN is not defined))

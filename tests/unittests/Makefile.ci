@@ -22,6 +22,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     cc2650stk \
     derfmega128 \
     derfmega256 \
+    e104-bt5010a-tb \
     ek-lm4f120xl \
     esp8266-esp-12x \
     esp8266-olimex-mod \
@@ -94,6 +95,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     teensy31 \
     telosb \
     waspmote-pro \
+    yarm \
     yunjia-nrf51822 \
     z1 \
     #

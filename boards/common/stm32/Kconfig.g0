@@ -1,0 +1,118 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "STM32 G0 clock configuration"
+    depends on CPU_FAM_G0
+
+choice
+bool "Clock source selection"
+default USE_CLOCK_PLL
+
+config USE_CLOCK_PLL
+    bool "PLL"
+
+config USE_CLOCK_HSE
+    bool "Direct High frequency external oscillator (HSE)"
+    depends on BOARD_HAS_HSE
+
+config USE_CLOCK_HSI
+    bool "Direct High frequency internal oscillator (HSI16)"
+
+endchoice
+
+if USE_CLOCK_PLL
+config CLOCK_PLL_M
+    int "M: PLLIN division factor"
+    default 1
+    range 1 8
+
+config CLOCK_PLL_N
+    int "N: PLLIN multiply factor"
+    default 20
+    range 8 86
+
+config CLOCK_PLL_R
+    int "Q: VCO division factor"
+    default 6 if BOARD_HAS_HSE
+    default 5 if !BOARD_HAS_HSE
+    range 2 8
+endif
+
+choice
+bool "HSISYS division factor"
+default CLOCK_HSISYS_DIV_1
+depends on USE_CLOCK_HSI
+
+config CLOCK_HSISYS_DIV_1
+    bool "Divide HSISYS by 1"
+
+config CLOCK_HSISYS_DIV_2
+    bool "Divide HSISYS by 2"
+
+config CLOCK_HSISYS_DIV_4
+    bool "Divide HSISYS by 4"
+
+config CLOCK_HSISYS_DIV_8
+    bool "Divide HSISYS by 8"
+
+config CLOCK_HSISYS_DIV_16
+    bool "Divide HSISYS by 16"
+
+config CLOCK_HSISYS_DIV_32
+    bool "Divide HSISYS by 32"
+
+config CLOCK_HSISYS_DIV_64
+    bool "Divide HSISYS by 64"
+
+config CLOCK_HSISYS_DIV_128
+    bool "Divide HSISYS by 128"
+
+endchoice
+
+config CLOCK_HSISYS_DIV
+    int
+    default 1 if CLOCK_HSISYS_DIV_1
+    default 2 if CLOCK_HSISYS_DIV_2
+    default 4 if CLOCK_HSISYS_DIV_4
+    default 8 if CLOCK_HSISYS_DIV_8
+    default 16 if CLOCK_HSISYS_DIV_16
+    default 32 if CLOCK_HSISYS_DIV_32
+    default 64 if CLOCK_HSISYS_DIV_64
+    default 128 if CLOCK_HSISYS_DIV_128
+
+choice
+bool "APB prescaler (division factor of HCLK to produce PCLK)"
+default CLOCK_APB1_DIV_1
+
+config CLOCK_APB1_DIV_1
+    bool "Divide HCLK by 1"
+
+config CLOCK_APB1_DIV_2
+    bool "Divide HCLK by 2"
+
+config CLOCK_APB1_DIV_4
+    bool "Divide HCLK by 4"
+
+config CLOCK_APB1_DIV_8
+    bool "Divide HCLK by 8"
+
+config CLOCK_APB1_DIV_16
+    bool "Divide HCLK by 16"
+
+endchoice
+
+config CLOCK_APB1_DIV
+    int
+    default 1 if CLOCK_APB1_DIV_1
+    default 2 if CLOCK_APB1_DIV_2
+    default 4 if CLOCK_APB1_DIV_4
+    default 8 if CLOCK_APB1_DIV_8
+    default 16 if CLOCK_APB1_DIV_16
+
+endmenu
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

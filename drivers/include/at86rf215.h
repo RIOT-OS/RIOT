@@ -115,6 +115,15 @@ enum {
 /** @} */
 
 /**
+ * @name    Enable Reduced Power Consumption
+ * @{
+ */
+#ifndef CONFIG_AT86RF215_RPC_EN
+#define CONFIG_AT86RF215_RPC_EN                 (0)
+#endif
+/** @} */
+
+/**
  * @name    Default PHY Mode
  * @{
  */
@@ -292,8 +301,10 @@ typedef struct at86rf215 {
  * @param[out] dev_09       sub-GHz device descriptor
  * @param[out] dev_24       2.4 GHz device descriptor
  * @param[in]  params       parameters for device initialization
+ * @param[in]  index        index of @p params in a global parameter struct array.
+ *                          If initialized manually, pass a unique identifier instead.
  */
-void at86rf215_setup(at86rf215_t *dev_09, at86rf215_t *dev_24, const at86rf215_params_t *params);
+void at86rf215_setup(at86rf215_t *dev_09, at86rf215_t *dev_24, const at86rf215_params_t *params, uint8_t index);
 
 /**
  * @brief   Trigger a hardware reset and configure radio with default values.

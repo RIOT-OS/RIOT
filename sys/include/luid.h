@@ -57,6 +57,7 @@
 
 #include "net/eui48.h"
 #include "net/eui64.h"
+#include "net/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -128,6 +129,19 @@ void luid_get_short(network_uint16_t *addr);
 void luid_get_eui48(eui48_t *addr);
 
 /**
+ * @brief   Get a unique EUI48 address
+ *
+ * The resulting address is built from the base ID generated with luid_base(), which
+ * isXORed with the netdev type and netdev index in the least significant bytes.
+ *
+ * @pre the netdev registered itself with @see netdev_register
+ *
+ * @param[in]  netdev   Netdev to generate the EUI48 for.
+ * @param[out] addr     memory location to copy the address into.
+ */
+void luid_netdev_get_eui48(const netdev_t *netdev, eui48_t *addr);
+
+/**
  * @brief   Get a unique EUI64 address
  *
  * The resulting address is built from the base ID generated with luid_base(), which
@@ -138,6 +152,19 @@ void luid_get_eui48(eui48_t *addr);
  * @param[out] addr     memory location to copy the address into.
  */
 void luid_get_eui64(eui64_t *addr);
+
+/**
+ * @brief   Get a unique EUI64 address
+ *
+ * The resulting address is built from the base ID generated with luid_base(), which
+ * isXORed with the netdev type and netdev index in the least significant bytes.
+ *
+ * @pre the netdev registered itself with @see netdev_register
+ *
+ * @param[in]  netdev   Netdev to generate the EUI64 for.
+ * @param[out] addr     memory location to copy the address into.
+ */
+void luid_netdev_get_eui64(const netdev_t *netdev, eui64_t *addr);
 
 /**
  * @brief   Get a custom unique ID based on a user given generator value

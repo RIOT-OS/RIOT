@@ -5,7 +5,7 @@
 # directory for more details.
 #
 
-menuconfig MOD_CORE
+menuconfig MODULE_CORE
     bool "RIOT Core"
     default y
     depends on TEST_KCONFIG
@@ -13,36 +13,52 @@ menuconfig MOD_CORE
         RIOT's core module. Only change this if you know what you are doing. If
         unsure, say Y.
 
-if MOD_CORE
+if MODULE_CORE
 
-config MOD_CORE_IDLE_THREAD
+config MODULE_CORE_IDLE_THREAD
     bool
     prompt "Use Idle thread"  if HAS_NO_IDLE_THREAD
     default y if !HAS_NO_IDLE_THREAD
     help
         Select y to include the Idle thread. This is mandatory for some CPUs.
 
-config MOD_CORE_INIT
+config MODULE_CORE_INIT
     bool "Kernel initialization module"
     default y
 
-config MOD_CORE_MBOX
+config MODULE_CORE_MBOX
     bool "Kernel message box module"
 
-config MOD_CORE_MSG
+config MODULE_CORE_MSG
     bool "Kernel messaging module"
     default y
 
-config MOD_CORE_MSG_BUS
+config MODULE_CORE_MSG_BUS
     bool "Messaging Bus module"
     help
         Messaging Bus API for inter process message broadcast.
 
-config MOD_CORE_PANIC
+config MODULE_CORE_PANIC
     bool "Kernel crash handling module"
     default y
 
-config MOD_CORE_THREAD_FLAGS
+config MODULE_CORE_THREAD_FLAGS
     bool "Thread flags"
 
-endif # MOD_CORE
+endif # MODULE_CORE
+
+menuconfig KCONFIG_USEMODULE_CORE
+    bool "Configure RIOT Core"
+    depends on USEMODULE_CORE
+    help
+        Configure RIOT Core using Kconfig.
+
+if KCONFIG_USEMODULE_CORE
+
+config THREAD_NAMES
+    bool "Store thread name strings"
+    help
+        By default, thread names are not stored if DEVELHELP is not used.
+        Use this parameter to store them for non-devel builds.
+
+endif # KCONFIG_USEMODULE_CORE

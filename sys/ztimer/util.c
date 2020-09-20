@@ -55,14 +55,13 @@ void ztimer_sleep(ztimer_clock_t *clock, uint32_t duration)
     mutex_lock(&mutex);
 }
 
-void ztimer_periodic_wakeup(ztimer_clock_t *clock, ztimer_now_t *last_wakeup,
+void ztimer_periodic_wakeup(ztimer_clock_t *clock, uint32_t *last_wakeup,
                             uint32_t period)
 {
     unsigned state = irq_disable();
-    ztimer_now_t now = ztimer_now(clock);
-    ztimer_now_t target = *last_wakeup + period;
-    ztimer_now_t offset = target - now;
-
+    uint32_t now = ztimer_now(clock);
+    uint32_t target = *last_wakeup + period;
+    uint32_t offset = target - now;
     irq_restore(state);
 
     if (offset <= period) {
@@ -109,7 +108,7 @@ int ztimer_msg_receive_timeout(ztimer_clock_t *clock, msg_t *msg,
     ztimer_t t;
     msg_t m = { .type = MSG_ZTIMER, .content.ptr = &m };
 
-    ztimer_set_msg(clock, &t, timeout, &m, sched_active_pid);
+    ztimer_set_msg(clock, &t, timeout, &m, thread_getpid());
 
     msg_receive(msg);
     ztimer_remove(clock, &t);
@@ -134,7 +133,7 @@ void ztimer_set_timeout_flag(ztimer_clock_t *clock, ztimer_t *t,
                              uint32_t timeout)
 {
     t->callback = _set_timeout_flag_callback;
-    t->arg = (thread_t *)sched_active_thread;
+    t->arg = thread_get_active();
     thread_flags_clear(THREAD_FLAG_TIMEOUT);
     ztimer_set(clock, t, timeout);
 }

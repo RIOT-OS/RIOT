@@ -7,13 +7,27 @@
 # directory for more details.
 
 import sys
+import os
 import pexpect
 import time
+import subprocess
 from testrunner import run
+
+# nucleo-l152re is the default platform for this test
+BOARD = os.environ.get("BOARD", "nucleo-l152re")
+BOARD_CPU = subprocess.check_output([
+    'make',
+    'info-debug-variable-CPU',
+    'BOARD={}'.format(BOARD),
+    '--no-print-directory']).strip()
 
 # We test only up to 10ms, with smaller times mcu doesn't have time to
 # print system time before resetting
-reset_times_ms = [128, 512, 1024, 8192]
+# cc2538 only supports 4 intervals [2ms, 16ms, 250ms, 1s]
+if BOARD_CPU.decode("utf-8") == 'cc2538':
+    reset_times_ms = [16, 250, 1000]
+else:
+    reset_times_ms = [128, 512, 1024, 8192]
 
 # We don't check for accuracy, only order of magnitude. Some MCU use an
 # an internal un-calibrated clock as reference which can deviate in

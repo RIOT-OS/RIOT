@@ -117,10 +117,10 @@ static void _ecb(at86rf2xx_t *dev,
                  uint8_t nblocks)
 {
     at86rf2xx_aes_key_write_encrypt(dev, key);
-    at86rf2xx_aes_ecb_encrypt(dev, cipher, key, plain, nblocks);
+    at86rf2xx_aes_ecb_encrypt(dev, cipher, key, (void*)plain, nblocks);
     memset(plain, 0, AT86RF2XX_AES_BLOCK_SIZE * nblocks);
     at86rf2xx_aes_key_write_decrypt(dev, key);
-    at86rf2xx_aes_ecb_decrypt(dev, plain, key, cipher, nblocks);
+    at86rf2xx_aes_ecb_decrypt(dev, plain, key, (void*)cipher, nblocks);
 }
 
 static void _cbc(at86rf2xx_t *dev,
@@ -131,17 +131,17 @@ static void _cbc(at86rf2xx_t *dev,
                  uint8_t nblocks)
 {
     at86rf2xx_aes_key_write_encrypt(dev, key);
-    at86rf2xx_aes_cbc_encrypt(dev, cipher, key, iv, plain, nblocks);
+    at86rf2xx_aes_cbc_encrypt(dev, cipher, key, iv, (void*)plain, nblocks);
     memset(plain, 0, AT86RF2XX_AES_BLOCK_SIZE * nblocks);
     at86rf2xx_aes_key_write_decrypt(dev, key);
-    at86rf2xx_aes_cbc_decrypt(dev, plain, key, iv, cipher, nblocks);
+    at86rf2xx_aes_cbc_decrypt(dev, plain, key, iv, (void*)cipher, nblocks);
 }
 
 int main(void)
 {
     at86rf2xx_t dev;
     bool success = true;
-    at86rf2xx_setup(&dev, &at86rf2xx_params[0]);
+    at86rf2xx_setup(&dev, &at86rf2xx_params[0], 0);
     dev.netdev.netdev.event_callback = _event_cb;
     if (dev.netdev.netdev.driver->init(&dev.netdev.netdev) != 0) {
         return EXIT_FAILURE;

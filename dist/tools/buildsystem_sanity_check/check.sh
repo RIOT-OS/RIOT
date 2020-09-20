@@ -142,6 +142,7 @@ check_not_exporting_variables() {
     # only place that should export common variables
     pathspec+=('*')
     pathspec+=(':!makefiles/vars.inc.mk')
+    pathspec+=(':!**/Vagrantfile')
 
     patterns=()
     for variable in "${EXPORTED_VARIABLES_ONLY_IN_VARS[@]}"; do

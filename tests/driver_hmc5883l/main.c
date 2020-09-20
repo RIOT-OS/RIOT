@@ -79,7 +79,7 @@ int main(void)
 {
     hmc5883l_t dev;
 
-    p_main = sched_active_pid;
+    p_main = thread_getpid();
 
     puts("HMC5883L magnetometer driver test application\n");
     puts("Initializing HMC5883L sensor");

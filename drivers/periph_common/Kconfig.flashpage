@@ -5,36 +5,36 @@
 # directory for more details.
 #
 
-menuconfig MOD_PERIPH_FLASHPAGE
+menuconfig MODULE_PERIPH_FLASHPAGE
     bool "Flashpage peripheral driver"
     depends on HAS_PERIPH_FLASHPAGE
-    select MOD_PERIPH_COMMON
+    select MODULE_PERIPH_COMMON
 
 # TODO: the 'init' modules are actually just artifacts from the way
 # periph_init_% modules are handled in Makefile. We need to define them to keep
 # the list the same for now. We should be able to remove them later on.
 
-config MOD_PERIPH_INIT_FLASHPAGE
+config MODULE_PERIPH_INIT_FLASHPAGE
     bool "Auto initialize Flashpage peripheral"
-    default y if MOD_PERIPH_INIT
-    depends on MOD_PERIPH_FLASHPAGE
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_FLASHPAGE
 
-config MOD_PERIPH_FLASHPAGE_RAW
+config MODULE_PERIPH_FLASHPAGE_RAW
     bool "Raw writing support"
     depends on HAS_PERIPH_FLASHPAGE_RAW
-    depends on MOD_PERIPH_FLASHPAGE
+    depends on MODULE_PERIPH_FLASHPAGE
 
-config MOD_PERIPH_INIT_FLASHPAGE_RAW
+config MODULE_PERIPH_INIT_FLASHPAGE_RAW
     bool "Auto initialize Flashpage raw"
-    default y if MOD_PERIPH_INIT
-    depends on MOD_PERIPH_FLASHPAGE_RAW
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_FLASHPAGE_RAW
 
-config MOD_PERIPH_FLASHPAGE_RWEE
+config MODULE_PERIPH_FLASHPAGE_RWEE
     bool "Read while Write support"
     depends on HAS_PERIPH_FLASHPAGE_RWEE
-    depends on MOD_PERIPH_FLASHPAGE
+    depends on MODULE_PERIPH_FLASHPAGE
 
-config MOD_PERIPH_INIT_FLASHPAGE_RWEE
+config MODULE_PERIPH_INIT_FLASHPAGE_RWEE
     bool "Auto initialize Flashpage RWEE"
-    default y if MOD_PERIPH_INIT
-    depends on MOD_PERIPH_FLASHPAGE_RWEE
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_FLASHPAGE_RWEE

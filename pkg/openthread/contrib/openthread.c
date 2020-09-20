@@ -64,7 +64,7 @@ void openthread_bootstrap(void)
 
     /* setup netdev modules */
 #ifdef MODULE_AT86RF2XX
-    at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0]);
+    at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0], 0);
     netdev_t *netdev = (netdev_t *) &at86rf2xx_dev;
 #endif
 #ifdef MODULE_KW41ZRF

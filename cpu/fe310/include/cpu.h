@@ -26,6 +26,7 @@
 #define CPU_H
 
 #include "thread.h"
+#include "macros/units.h"
 
 #include "vendor/platform.h"
 #include "vendor/plic_driver.h"
@@ -55,16 +56,6 @@ uint32_t cpu_freq(void);
  * @brief   Initialization of interrupts
  */
 void irq_init(void);
-
-/**
- * @brief   External ISR callback
- */
-typedef void (*external_isr_ptr_t)(int intNum);
-
-/**
- * @brief   Set External ISR callback
- */
-void set_external_isr_cb(int intNum, external_isr_ptr_t cbFunc);
 
 /**
  * @brief   Print the last instruction's address

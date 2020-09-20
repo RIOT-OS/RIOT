@@ -20,7 +20,7 @@
  * # Design Decisions and Limitations
  * - support for local addresses only (using `luid` to generate them)
  * - advertising interval is configured during compile time, override by setting
- *   `CFLAGS+=-DSKALD_INTERVAL=xxx`
+ *   `CFLAGS+=-DCONFIG_SKALD_INTERVAL=xxx`
  * - advertising channels are configured during compile time, override by
  *   setting `CFLAGS+=-DSKALD_ADV_CHAN={37,39}`
  *
@@ -55,17 +55,80 @@ extern "C" {
 #endif
 
 /**
- * @brief   Static advertising interval
+ * @defgroup net_skald_conf Skald compile configurations
+ * @ingroup config
+ * @{
  */
-#ifndef SKALD_INTERVAL
-#define SKALD_INTERVAL          (1 * US_PER_SEC)
+/**
+ * @brief   Advertising interval in microseconds
+ */
+#ifndef CONFIG_SKALD_INTERVAL
+#define CONFIG_SKALD_INTERVAL          (1 * US_PER_SEC)
 #endif
 
 /**
- * @brief   Static list of used advertising channels
+ * @brief   Configure advertising channel 37
+ *
+ * Set CONFIG_ADV_CH_37_DISABLE to disable channel 37
+ */
+#ifdef DOXYGEN
+#define CONFIG_ADV_CH_37_DISABLE
+#endif
+
+/**
+ * @brief   Configure advertising channel 38
+ *
+ * Set CONFIG_ADV_CH_38_DISABLE to disable channel 38
+ */
+#ifdef DOXYGEN
+#define CONFIG_ADV_CH_38_DISABLE
+#endif
+
+/**
+ * @brief   Configure advertising channel 39
+ *
+ * Set CONFIG_ADV_CH_39_DISABLE to disable channel 39
+ */
+#ifdef DOXYGEN
+#define CONFIG_ADV_CH_39_DISABLE
+#endif
+/** @} */
+
+/**
+ * @brief   Define advertising channel 37 if @ref CONFIG_ADV_CH_37_DISABLE is
+ *          not set
+ */
+#if !defined(CONFIG_ADV_CH_37_DISABLE) || defined(DOXYGEN)
+#define ADV_CH_37 37,
+#else
+#define ADV_CH_37
+#endif
+
+/**
+ * @brief   Define advertising channel 38 if @ref CONFIG_ADV_CH_38_DISABLE is
+ *          not set
+ */
+#if !defined(CONFIG_ADV_CH_38_DISABLE) || defined(DOXYGEN)
+#define ADV_CH_38 38,
+#else
+#define ADV_CH_38
+#endif
+
+/**
+ * @brief   Define advertising channel 39 if @ref CONFIG_ADV_CH_39_DISABLE is
+ *          not set
+ */
+#if !defined(CONFIG_ADV_CH_39_DISABLE) || defined(DOXYGEN)
+#define ADV_CH_39 39
+#else
+#define ADV_CH_39
+#endif
+
+/**
+ * @brief   List of advertising channels
  */
 #ifndef SKALD_ADV_CHAN
-#define SKALD_ADV_CHAN          { 37, 38, 39 }
+#define SKALD_ADV_CHAN { ADV_CH_37 ADV_CH_38 ADV_CH_39 }
 #endif
 
 /**
@@ -93,7 +156,7 @@ void skald_init(void);
 /**
  * @brief   Start advertising the given packet
  *
- * The packet will be send out each advertising interval (see SKALD_INTERVAL) on
+ * The packet will be send out each advertising interval (see CONFIG_SKALD_INTERVAL) on
  * each of the defined advertising channels (see SKALD_ADV_CHAN).
  *
  * @param[in,out] ctx   start advertising this context

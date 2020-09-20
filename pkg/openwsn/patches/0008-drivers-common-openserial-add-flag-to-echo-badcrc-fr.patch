@@ -1,15 +1,14 @@
-From 555aa9d9b00ecfa8a0c3982de5520d8eb1b23076 Mon Sep 17 00:00:00 2001
+From a66e2713eb76a1c8b555760f73ce7418312b58d6 Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Thu, 4 Jun 2020 15:39:07 +0200
-Subject: [PATCH 08/10] drivers/common/openserial: add flag to echo badcrc
- frames
+Subject: [PATCH 8/9] drivers/common/openserial: add flag to echo badcrc frames
 
 ---
  drivers/common/openserial.c | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/common/openserial.c b/drivers/common/openserial.c
-index 2e417071..4f13baf3 100644
+index f0dcb19e..2fc2c858 100644
 --- a/drivers/common/openserial.c
 +++ b/drivers/common/openserial.c
 @@ -733,9 +733,13 @@ port_INLINE void inputHdlcClose(void) {
@@ -28,5 +27,5 @@ index 2e417071..4f13baf3 100644
  }
  
 -- 
-2.27.0
+2.28.0
 

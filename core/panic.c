@@ -48,9 +48,11 @@ const char assert_crash_message[] = "FAILED ASSERTION.";
 /* flag preventing "recursive crash printing loop" */
 static int crashed = 0;
 
-void __attribute__((weak)) panic_arch(void)
+void __attribute__((weak)) panic_arch(void) {}
+void __attribute__((weak)) panic_app(core_panic_t crash_code, const char *message)
 {
-    return;
+    (void)crash_code;
+    (void)message;
 }
 
 /* WARNING: this function NEVER returns! */
@@ -68,6 +70,8 @@ NORETURN void core_panic(core_panic_t crash_code, const char *message)
             cpu_print_last_instruction();
         }
 #endif
+        /* Call back app in case it wants to store some context */
+        panic_app(crash_code, message);
         LOG_ERROR("*** RIOT kernel panic:\n%s\n\n", message);
 #ifdef DEVELHELP
 #ifdef MODULE_PS

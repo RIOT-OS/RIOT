@@ -15,7 +15,10 @@ rsource "at/Kconfig"
 endmenu # Miscellaneous Device Drivers
 
 rsource "Kconfig.net"
+
+menu "Peripherals drivers"
 rsource "periph_common/Kconfig"
+endmenu # Peripherals drivers
 
 menu "Sensor Device Drivers"
 rsource "ads101x/Kconfig"

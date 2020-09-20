@@ -33,7 +33,7 @@ static void pulse_cb(void *_dev)
     ltc4150_dir_t dir;
     ltc4150_dev_t *dev = _dev;
 
-    if ((dev->params.polarity == GPIO_UNDEF) ||
+    if ((!gpio_is_valid(dev->params.polarity)) ||
         (!gpio_read(dev->params.polarity))
         ) {
         dev->discharged++;
@@ -66,7 +66,7 @@ int ltc4150_init(ltc4150_dev_t *dev, const ltc4150_params_t *params)
     memset(dev, 0, sizeof(ltc4150_dev_t));
     dev->params = *params;
 
-    if (dev->params.shutdown != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.shutdown)) {
         /* Activate LTC4150 */
         if (gpio_init(dev->params.shutdown, GPIO_OUT)) {
             DEBUG("[ltc4150] Failed to initialize shutdown pin");
@@ -75,7 +75,7 @@ int ltc4150_init(ltc4150_dev_t *dev, const ltc4150_params_t *params)
         gpio_set(dev->params.shutdown);
     }
 
-    if (dev->params.polarity != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.polarity)) {
         gpio_mode_t mode = (dev->params.flags & LTC4150_POL_EXT_PULL_UP) ?
                            GPIO_IN : GPIO_IN_PU;
         if (gpio_init(dev->params.polarity, mode)) {
@@ -132,7 +132,7 @@ int ltc4150_shutdown(ltc4150_dev_t *dev)
 
     gpio_irq_disable(dev->params.interrupt);
 
-    if (dev->params.shutdown != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.shutdown)) {
         gpio_clear(dev->params.shutdown);
     }
 

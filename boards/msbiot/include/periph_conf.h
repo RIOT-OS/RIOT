@@ -21,7 +21,6 @@
 
 #include "periph_cpu.h"
 #include "f4/cfg_clock_168_16_0.h"
-#include "cfg_spi_divtable.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -96,12 +95,12 @@ static const pwm_conf_t pwm_config[] = {
  * PIN, device (ADCx), channel
  * @{
  */
-#define ADC_CONFIG {             \
-    {GPIO_PIN(PORT_B, 0), 0, 8}, \
-    {GPIO_PIN(PORT_B, 1), 0, 9}  \
-}
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_B, 0), 0, 8},
+    {GPIO_PIN(PORT_B, 1), 0, 9}
+};
 
-#define ADC_NUMOF           (2)
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 /**

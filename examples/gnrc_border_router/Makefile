@@ -39,7 +39,8 @@ USEMODULE += ps
 # Optionally include DNS support. This includes resolution of names at an
 # upstream DNS server and the handling of RDNSS options in Router Advertisements
 # to auto-configure that upstream DNS server.
-#USEMODULE += sock_dns
+#USEMODULE += sock_dns              # include DNS client
+#USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
 
 # When using a WiFi uplink we should use DHCPv6
 ifeq (wifi,$(UPLINK))

@@ -4,7 +4,6 @@ FEATURES_PROVIDED += bootloader_stm32
 FEATURES_PROVIDED += cpu_stm32$(CPU_FAM)
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
-FEATURES_PROVIDED += puf_sram
 FEATURES_PROVIDED += periph_timer_periodic
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_uart_nonblocking
@@ -32,12 +31,13 @@ ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l0 l4 wb))
   endif
 endif
 
-ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g0 g4 l1 l4))
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l1 l4))
   FEATURES_PROVIDED += cortexm_mpu
 endif
 
-# only some stm32f3 and stm32l0 have an MPU
-STM32_WITH_MPU += stm32f303re stm32f303vc stm32f303ze stm32l052t8
+# only some stm32f3 have an MPU, stm32l052t8 provides an MPU but support is
+# broken for cortex-m0+
+STM32_WITH_MPU += stm32f303re stm32f303vc stm32f303ze
 ifneq (,$(filter $(CPU_MODEL),$(STM32_WITH_MPU)))
   FEATURES_PROVIDED += cortexm_mpu
 endif

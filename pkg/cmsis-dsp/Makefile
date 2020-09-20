@@ -5,7 +5,21 @@ PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-CFLAGS += -Wno-strict-aliasing -Wno-unused-parameter
+CMSIS_DSP_MODULES =                \
+    cmsis-dsp_BasicMathFunctions   \
+    cmsis-dsp_CommonTables         \
+    cmsis-dsp_ComplexMathFunctions \
+    cmsis-dsp_ControllerFunctions  \
+    cmsis-dsp_FastMathFunctions    \
+    cmsis-dsp_FilteringFunctions   \
+    cmsis-dsp_MatrixFunctions      \
+    cmsis-dsp_StatisticsFunctions  \
+    cmsis-dsp_SupportFunctions     \
+    cmsis-dsp_TransformFunctions   \
 
-all:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(CURDIR)/Makefile.$(PKG_NAME) all
+.PHONY: cmsis-dsp_%
+
+all: $(CMSIS_DSP_MODULES)
+
+cmsis-dsp_%:
+	$(MAKE) -C $(PKG_SOURCE_DIR)/CMSIS/DSP/Source/$* -f $(CURDIR)/Makefile.cmsis-dsp MODULE=$@

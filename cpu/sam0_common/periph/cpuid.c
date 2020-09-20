@@ -25,7 +25,7 @@
 
 #include "periph/cpuid.h"
 
-#ifdef CPU_SAMD5X
+#ifdef CPU_COMMON_SAMD5X
 #define WORD0               (*(volatile uint32_t *)0x008061FC)
 #define WORD1               (*(volatile uint32_t *)0x00806010)
 #define WORD2               (*(volatile uint32_t *)0x00806014)

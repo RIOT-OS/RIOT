@@ -32,6 +32,61 @@ extern "C" {
 #define CPUID_LEN           (4U)
 #endif
 
+/* GPIO configuration only if the module is available (=Linux) */
+#if defined(MODULE_PERIPH_GPIO_LINUX) || defined(DOXYGEN)
+#include <linux/gpio.h>
+
+/**
+ * @name GPIO Configuration
+ * @{
+ */
+
+/**
+ * @brief   The offset between Port and Pin
+ */
+#define GPIO_PORT_SHIFT     (24)
+
+/**
+ * @brief   Define a custom GPIO_PIN macro for native
+ */
+#define GPIO_PIN(port, pin) (gpio_t)((port << GPIO_PORT_SHIFT) | pin)
+
+#define HAVE_GPIO_MODE_T
+#ifndef GPIOHANDLE_REQUEST_PULL_DOWN
+#define GPIOHANDLE_REQUEST_PULL_DOWN    (0xFF)
+#endif
+#ifndef GPIOHANDLE_REQUEST_PULL_UP
+#define GPIOHANDLE_REQUEST_PULL_UP      (0xFF)
+#endif
+
+/**
+ * @brief   Available pin modes
+ *
+ * Generally, a pin can be configured to be input or output. In output mode, a
+ * pin can further be put into push-pull or open drain configuration. Though
+ * this is supported by most platforms, this is not always the case, so driver
+ * implementations may return an error code if a mode is not supported.
+ */
+typedef enum {
+    GPIO_IN    = GPIOHANDLE_REQUEST_INPUT,
+    GPIO_IN_PD = GPIOHANDLE_REQUEST_INPUT | GPIOHANDLE_REQUEST_PULL_DOWN,
+    GPIO_IN_PU = GPIOHANDLE_REQUEST_INPUT | GPIOHANDLE_REQUEST_PULL_UP,
+    GPIO_OUT   = GPIOHANDLE_REQUEST_OUTPUT,
+    GPIO_OD    = GPIOHANDLE_REQUEST_OPEN_DRAIN,
+    GPIO_OD_PU = GPIOHANDLE_REQUEST_OPEN_DRAIN | GPIOHANDLE_REQUEST_PULL_UP
+} gpio_mode_t;
+
+#define HAVE_GPIO_FLANK_T
+typedef enum {
+    GPIO_FALLING = GPIOEVENT_EVENT_FALLING_EDGE,    /**< emit interrupt on falling flank */
+    GPIO_RISING = GPIOEVENT_EVENT_RISING_EDGE,      /**< emit interrupt on rising flank */
+    GPIO_BOTH = GPIO_FALLING | GPIO_RISING          /**< emit interrupt on both flanks */
+} gpio_flank_t;
+
+/** @} */
+
+#endif /* MODULE_PERIPH_GPIO_LINUX | DOXYGEN */
+
 /**
  * @brief   Prevent shared timer functions from being used
  */

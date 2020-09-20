@@ -641,7 +641,7 @@ int fib_register_rp(fib_table_t *table, uint8_t *prefix, size_t prefix_addr_type
     }
 
     if (table->notify_rp_pos < FIB_MAX_REGISTERED_RP) {
-        table->notify_rp[table->notify_rp_pos] = sched_active_pid;
+        table->notify_rp[table->notify_rp_pos] = thread_getpid();
         universal_address_container_t *container = universal_address_add(prefix,
                                                                          prefix_addr_type_size);
         table->prefix_rp[table->notify_rp_pos] = container;

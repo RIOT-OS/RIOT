@@ -19,6 +19,19 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* Add specific clock configuration (HSE, LSE) for this board here */
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE            (1)
+#endif
+/* This board provides a 24MHz HSE oscillator */
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE            (1)
+#endif
+/* By default, configure a 80MHz SYSCLK with PLL using HSE as input clock */
+#ifndef CONFIG_CLOCK_PLL_M
+#define CONFIG_CLOCK_PLL_M              (6)
+#endif
+
 #include "periph_cpu.h"
 #include "g4/cfg_clock_default.h"
 #include "cfg_i2c1_pb8_pb9.h"
@@ -68,28 +81,8 @@ static const uart_conf_t uart_config[] = {
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 80000000Hz */
-        7,  /* -> 312500Hz */
-        7,  /* -> 312500Hz */
-        5,  /* -> 1250000Hz */
-        3,  /* -> 5000000Hz */
-        2   /* -> 10000000Hz */
-    },
-    {       /* for APB2 @ 80000000Hz */
-        7,  /* -> 312500Hz */
-        7,  /* -> 312500Hz */
-        5,  /* -> 1250000Hz */
-        3,  /* -> 5000000Hz */
-        2   /* -> 10000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev            = SPI1,

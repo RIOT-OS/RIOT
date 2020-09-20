@@ -79,8 +79,7 @@ static inline void _setup_netif(gnrc_netif_t *netif, void* netdev, void* stack,
 void auto_init_at86rf215(void)
 {
     unsigned i = 0;
-    unsigned j = 0;
-    while (j < AT86RF215_NUM) {
+    for (unsigned j = 0; j < AT86RF215_NUM; ++j) {
 
         at86rf215_t *dev_09 = NULL;
         at86rf215_t *dev_24 = NULL;
@@ -103,7 +102,7 @@ void auto_init_at86rf215(void)
             ++i;
         }
 
-        at86rf215_setup(dev_09, dev_24, &at86rf215_params[j++]);
+        at86rf215_setup(dev_09, dev_24, &at86rf215_params[j], j);
 
         /* setup sub-GHz interface */
         _setup_netif(netif_09, dev_09, stack_09, AT86RF215_MAC_PRIO_SUBGHZ);

@@ -35,9 +35,9 @@
 
 #include <stdio.h>
 
+#include "mutex.h"
 #include "thread.h"
 #include "thread_flags.h"
-#include "xtimer.h"
 
 #include "apds99xx.h"
 #include "apds99xx_params.h"

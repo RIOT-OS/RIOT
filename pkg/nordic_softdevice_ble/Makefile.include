@@ -25,6 +25,7 @@ CFLAGS += -Wno-pedantic -Wno-unused-parameter -Wno-sign-compare
 # Nordic's ble_6lowpan.a is compiled with hard-float
 # so set this, otherwise linking fails
 CFLAGS_FPU := -mfloat-abi=hard -mfpu=fpv4-sp-d16
+ARCHIVES += $(BINDIR)/ble_6lowpan.a
 
 DIRS += $(RIOTBASE)/pkg/nordic_softdevice_ble/src
 

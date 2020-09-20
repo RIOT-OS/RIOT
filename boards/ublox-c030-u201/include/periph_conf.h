@@ -169,28 +169,8 @@ static const uart_conf_t uart_config[] = {
 
 /**
  * @name    SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 42000000Hz */
-        7,  /* -> 164062Hz */
-        6,  /* -> 328125Hz */
-        4,  /* -> 1312500Hz */
-        2,  /* -> 5250000Hz */
-        1   /* -> 10500000Hz */
-    },
-    {       /* for APB2 @ 84000000Hz */
-        7,  /* -> 328125Hz */
-        7,  /* -> 328125Hz */
-        5,  /* -> 1312500Hz */
-        3,  /* -> 5250000Hz */
-        2   /* -> 10500000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev            = SPI4,
@@ -263,15 +243,16 @@ static const i2c_conf_t i2c_config[] = {
  *
  * @{
  */
-#define ADC_NUMOF          (6U)
-#define ADC_CONFIG {             \
-    {GPIO_PIN(PORT_A, 3), 0, 3}, \
-    {GPIO_PIN(PORT_C, 0), 0, 10}, \
-    {GPIO_PIN(PORT_C, 3), 0, 4}, \
-    {GPIO_PIN(PORT_A, 4), 0, 14}, \
-    {GPIO_PIN(PORT_B, 7), 0, 7}, \
-    {GPIO_PIN(PORT_B, 6), 0, 6}, \
-}
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 3), 0, 3},
+    {GPIO_PIN(PORT_C, 0), 0, 10},
+    {GPIO_PIN(PORT_C, 3), 0, 4},
+    {GPIO_PIN(PORT_A, 4), 0, 14},
+    {GPIO_PIN(PORT_B, 7), 0, 7},
+    {GPIO_PIN(PORT_B, 6), 0, 6},
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

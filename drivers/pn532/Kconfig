@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_PN532
+menuconfig KCONFIG_USEMODULE_PN532
     bool "Configure PN532 driver"
-    depends on MODULE_PN532
+    depends on USEMODULE_PN532
     help
         Configure the PN532 driver using Kconfig.
 
-if KCONFIG_MODULE_PN532
+if KCONFIG_USEMODULE_PN532
 
 config PN532_BUFFER_LEN
     int "Internal buffer size"
@@ -20,4 +20,4 @@ config PN532_BUFFER_LEN
         For large NDEF files, the buffer size may be increased.
         Otherwise the files may be written in chunks.
 
-endif # KCONFIG_MODULE_PN532
+endif # KCONFIG_USEMODULE_PN532

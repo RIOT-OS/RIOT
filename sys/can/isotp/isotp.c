@@ -670,7 +670,7 @@ static void *_isotp_thread(void *args)
     /* setup the device layers message queue */
     msg_init_queue(msg_queue, CAN_ISOTP_MSG_QUEUE_SIZE);
 
-    isotp_pid = sched_active_pid;
+    isotp_pid = thread_getpid();
 
     while (1) {
         msg_receive(&msg);

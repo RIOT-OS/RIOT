@@ -51,20 +51,6 @@ static const uint8_t dbm_to_tx_pow_915[] = { 0x1d, 0x1c, 0x1b, 0x1a, 0x19, 0x17,
                                              0x04, 0x03, 0x02, 0x01, 0x00, 0x86,
                                              0x40, 0x84, 0x83, 0x82, 0x80, 0xc1,
                                              0xc0 };
-static const int16_t rx_sens_to_dbm[] = { -110, -98, -94, -91, -88, -85, -82,
-                                          -79, -76, -73, -70, -67, -63, -60, -57,
-                                          -54 };
-static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                          0x01, 0x01, 0x01, 0x01, 0x02, 0x02,
-                                          0x02, 0x03, 0x03, 0x03, 0x04, 0x04,
-                                          0x04, 0x05, 0x05, 0x05, 0x06, 0x06,
-                                          0x06, 0x07, 0x07, 0x07, 0x08, 0x08,
-                                          0x08, 0x09, 0x09, 0x09, 0x0a, 0x0a,
-                                          0x0a, 0x0b, 0x0b, 0x0b, 0x0b, 0x0c,
-                                          0x0c, 0x0c, 0x0d, 0x0d, 0x0d, 0x0e,
-                                          0x0e, 0x0e, 0x0f };
-
 static int16_t _tx_pow_to_dbm_212b(uint8_t channel, uint8_t page, uint8_t reg)
 {
     if (page == 0 || page == 2) {
@@ -99,18 +85,6 @@ static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
                                          0x0e, 0x0d, 0x0d, 0x0d, 0x0c, 0x0c,
                                          0x0b, 0x0b, 0x0a, 0x09, 0x08, 0x07,
                                          0x06, 0x05, 0x03, 0x00 };
-static const int16_t rx_sens_to_dbm[] = { -101, -94, -91, -88, -85, -82, -79,
-                                          -76, -73, -70, -67, -64, -61, -58, -55,
-                                          -52 };
-static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                          0x00, 0x01, 0x01, 0x01, 0x02, 0x02,
-                                          0x02, 0x03, 0x03, 0x03, 0x04, 0x04,
-                                          0x04, 0x05, 0x05, 0x05, 0x06, 0x06,
-                                          0x06, 0x07, 0x07, 0x07, 0x08, 0x08,
-                                          0x08, 0x09, 0x09, 0x09, 0x0a, 0x0a,
-                                          0x0a, 0x0b, 0x0b, 0x0b, 0x0c, 0x0c,
-                                          0x0c, 0x0d, 0x0d, 0x0d, 0x0e, 0x0e,
-                                          0x0e, 0x0f };
 #else
 static const int16_t tx_pow_to_dbm[] = { 3, 3, 2, 2, 1, 1, 0,
                                          -1, -2, -3, -4, -5, -7, -9, -12, -17 };
@@ -118,18 +92,6 @@ static const uint8_t dbm_to_tx_pow[] = { 0x0f, 0x0f, 0x0f, 0x0e, 0x0e, 0x0e,
                                          0x0e, 0x0d, 0x0d, 0x0c, 0x0c, 0x0b,
                                          0x0b, 0x0a, 0x09, 0x08, 0x07, 0x06,
                                          0x05, 0x03, 0x00 };
-static const int16_t rx_sens_to_dbm[] = { -101, -91, -88, -85, -82, -79, -76
-                                          -73, -70, -67, -64, -61, -58, -55, -52,
-                                          -49 };
-static const uint8_t dbm_to_rx_sens[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                                          0x00, 0x00, 0x00, 0x00, 0x01, 0x01,
-                                          0x01, 0x02, 0x02, 0x02, 0x03, 0x03,
-                                          0x03, 0x04, 0x04, 0x04, 0x05, 0x05,
-                                          0x05, 0x06, 0x06, 0x06, 0x07, 0x07,
-                                          0x07, 0x08, 0x08, 0x08, 0x09, 0x09,
-                                          0x09, 0x0a, 0x0a, 0x0a, 0x0b, 0x0b,
-                                          0x0b, 0x0c, 0x0c, 0x0c, 0x0d, 0x0d,
-                                          0x0d, 0x0e, 0x0e, 0x0e, 0x0f };
 #endif
 
 void at86rf2xx_get_addr_short(const at86rf2xx_t *dev, network_uint16_t *addr)
@@ -304,27 +266,34 @@ void at86rf2xx_set_txpower(const at86rf2xx_t *dev, int16_t txpower)
 #endif
 }
 
-int16_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev)
+int8_t at86rf2xx_get_rxsensitivity(const at86rf2xx_t *dev)
 {
     uint8_t rxsens = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN)
                      & AT86RF2XX_RX_SYN__RX_PDT_LEVEL;
-    return rx_sens_to_dbm[rxsens];
+    /* From datasheet (see below) */
+    return rxsens > 0 ? RSSI_BASE_VAL + ((rxsens - 1) * 3) : MIN_RX_SENSITIVITY;
 }
 
-void at86rf2xx_set_rxsensitivity(const at86rf2xx_t *dev, int16_t rxsens)
+void at86rf2xx_set_rxsensitivity(const at86rf2xx_t *dev, int8_t rxsens)
 {
-    rxsens += MIN_RX_SENSITIVITY;
-
-    if (rxsens < 0) {
-        rxsens = 0;
+    uint8_t hwval;
+    /* From datasheet, rxsens = @ref RSSI_BASE_VAL + (3 * (RX_PDT_LEVEL-1)).
+     * If rxsens < @ref RSSI_BASE_VAL, the RX sensitivity is equal to @ref
+     * MIN_RX_SENSITIVITY.
+     */
+    if (rxsens < RSSI_BASE_VAL) {
+        hwval = 0;
     }
-    else if (rxsens > MAX_RX_SENSITIVITY) {
-        rxsens = MAX_RX_SENSITIVITY;
+    else if (rxsens > RSSI_BASE_VAL + (3 * (AT86RF2XX_RX_SYN__RX_PDT_LEVEL)) - 1) {
+        hwval = AT86RF2XX_RX_SYN__RX_PDT_LEVEL;
+    }
+    else {
+        hwval = ((rxsens - RSSI_BASE_VAL + 3) / 3);
     }
 
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__RX_SYN);
     tmp &= ~(AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
-    tmp |= (dbm_to_rx_sens[rxsens] & AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
+    tmp |= (hwval & AT86RF2XX_RX_SYN__RX_PDT_LEVEL);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__RX_SYN, tmp);
 }
 

@@ -3,7 +3,8 @@ ifeq (,$(CPU_MODEL))
 endif
 
 # Target triple for the build. Use arm-none-eabi if you are unsure.
-TARGET_ARCH ?= arm-none-eabi
+TARGET_ARCH_CORTEXM ?= arm-none-eabi
+TARGET_ARCH ?= $(TARGET_ARCH_CORTEXM)
 
 # define build specific options
 CFLAGS_CPU   = -mcpu=$(MCPU) -mlittle-endian -mthumb $(CFLAGS_FPU)
@@ -100,13 +101,6 @@ ifneq (,$(filter cmsis-dsp,$(USEPKG)))
   else ifeq ($(CPU_CORE),cortex-m23)
     CFLAGS += -DARM_MATH_CM23
   endif
-endif
-
-# Explicitly tell the linker to link the startup code.
-#   Without this the interrupt vectors will not be linked correctly!
-VECTORS_O ?= $(BINDIR)/cpu/vectors.o
-ifeq ($(COMMON_STARTUP),)
-  UNDEF += $(VECTORS_O)
 endif
 
 # CPU depends on the cortex-m common module, so include it:

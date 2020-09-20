@@ -415,7 +415,7 @@ int dfplayer_file_cmd(dfplayer_t *dev, uint8_t cmd, uint8_t p1, uint8_t p2)
          *
          * We just check if the DFPlayer is actually playing
          */
-        if (dev->busy_pin != GPIO_UNDEF) {
+        if (gpio_is_valid(dev->busy_pin)) {
             /* Using BUSY pin to check if device is playing */
             if (gpio_read(dev->busy_pin)) {
                 /* Device not playing, file does not exist */

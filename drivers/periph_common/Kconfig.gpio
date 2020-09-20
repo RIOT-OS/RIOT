@@ -5,30 +5,30 @@
 # directory for more details.
 #
 
-menuconfig MOD_PERIPH_GPIO
+menuconfig MODULE_PERIPH_GPIO
     bool "GPIO peripheral driver"
     default y
     depends on HAS_PERIPH_GPIO
-    select MOD_PERIPH_COMMON
+    select MODULE_PERIPH_COMMON
 
-if MOD_PERIPH_GPIO
+if MODULE_PERIPH_GPIO
 
-config MOD_PERIPH_INIT_GPIO
+config MODULE_PERIPH_INIT_GPIO
     bool "Auto initialize GPIO peripheral"
-    default y if MOD_PERIPH_INIT
+    default y if MODULE_PERIPH_INIT
 
-config MOD_PERIPH_GPIO_IRQ
+config MODULE_PERIPH_GPIO_IRQ
     bool "GPIO interrupt peripheral driver"
     depends on HAS_PERIPH_GPIO_IRQ
-    select MOD_PERIPH_COMMON
+    select MODULE_PERIPH_COMMON
 
 # TODO: this module is actually just an artifact from the way periph_init_%
 # modules are handled in Makefile. We need to define it to keep the list the
 # same for now. We should be able to remove it later on.
 
-config MOD_PERIPH_INIT_GPIO_IRQ
+config MODULE_PERIPH_INIT_GPIO_IRQ
     bool "Auto initialize GPIO interrupt peripheral"
-    default y if MOD_PERIPH_INIT
-    depends on MOD_PERIPH_GPIO_IRQ
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_GPIO_IRQ
 
-endif # MOD_PERIPH_GPIO
+endif # MODULE_PERIPH_GPIO

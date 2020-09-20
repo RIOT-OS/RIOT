@@ -38,9 +38,6 @@ extern "C" {
 
 #define CC2538_RF_MAX_DATA_LEN (CC2538_RF_FIFO_SIZE - CC2538_PACKET_LENGTH_SIZE)
 
-#define CC2538_EUI64_LOCATION_PRI   (0x00280028) /**< Primary EUI-64 address location */
-#define CC2538_EUI64_LOCATION_SEC   (0x0027FFCC) /**< Secondary EUI-64 address location */
-
 /* TODO: Move these to sys/include/net/ieee802154.h somehow */
 /* IEEE 802.15.4 defined constants (2.4 GHz logical channels) */
 #define IEEE802154_MIN_FREQ         (2405) /**< Min. frequency (2405 MHz) */
@@ -68,8 +65,40 @@ extern "C" {
 
 #define CC2538_CRC_BIT_MASK         (0x80)
 
+#define CC2538_CCA_THR_MASK         (0x000000FF)    /**< CCA Threshold mask */
+
+#define CC2538_CCA_MODE_MASK        (0x18)          /**< CCA Mode mask */
+#define CC2538_CCA_MODE_POS         (3U)            /**< CCA Mode pos */
+
+#define CC2538_CSP_SKIP_INST_MASK   (0x70)          /**< CSP Skip instruction mask */
+#define CC2538_CSP_SKIP_INST_POS    (4U)            /**< CSP Skip instruction pos */
+
+#define CC2538_CSP_SKIP_N_MASK      (0x08)          /**< CSP Skip condition negation mask */
+
+#define CC2538_CSP_SKIP_COND_CCA    (0x00)          /**< CSP Skip condition is valid CCA */
+#define CC2538_CSP_SKIP_COND_CSPZ   (0x06)          /**< CSP Skip condition is CSPZ is 0 */
+#define CC2538_CSP_SKIP_COND_RSSI   (0x07)          /**< CSP Skip condition is valid RSSI */
+
+#define CC2538_SFR_MTMSEL_MASK      (0x7)           /**< MAC Timer selection mask */
+#define CC2538_SFR_MTMSEL_TIMER_P   (0x2)           /**< Selects Timer period */
+#define CC2538_MCTRL_SYNC_MASK      (0x2)           /**< Sync MAC Timer to external clock */
+#define CC2538_MCTRL_RUN_MASK       (0x1)           /**< Run MAC Timer */
+
+#define CC2538_CSP_MCU_CTRL_MASK    (0x1)           /**< MCU Ctrl mask */
+
+#define CC2538_CSP_INCMAXY_MAX_MASK (0x7)           /**< CSP INCMAXY instruction (increment Register CSPX
+                                                         without exceeding CSPY) */
+
+#define CC2538_RXENABLE_RXON_MASK   (0x80)          /**< RX on mask */
+
 #define CC2538_RSSI_OFFSET          (-73)  /**< Signal strength offset value */
 #define CC2538_RF_SENSITIVITY       (-97)  /**< dBm typical, normal conditions */
+
+#define CC2538_ACCEPT_FT_2_ACK           (1 << 5) /**< enable or disable the ACK filter */
+#define CC2538_STATE_SFD_WAIT_RANGE_MIN  (0x03U)  /**< min range value of SFD wait state */
+#define CC2538_STATE_SFD_WAIT_RANGE_MAX  (0x06U)  /**< max range value of SFD wait state */
+#define CC2538_FRMCTRL1_PENDING_OR_MASK  (0x04)   /**< mask for enabling or disabling the
+                                                       frame pending bit */
 
 #define RFCORE_ASSERT(expr) (void)( (expr) || RFCORE_ASSERT_failure(#expr, __FUNCTION__, __LINE__) )
 
@@ -134,6 +163,18 @@ enum {
     RXMASKZERO       = BIT(7),
 };
 
+/*
+ * @brief RFCORE_XREG_RFIRQM1 / RFCORE_XREG_RFIRQF1 bits
+ */
+enum {
+    TXACKDONE        = BIT(0),
+    TXDONE           = BIT(1),
+    RF_IDLE          = BIT(2),
+    CSP_MANINT       = BIT(3),
+    CSP_STOP         = BIT(4),
+    CSP_WAIT         = BIT(5),
+};
+
 /* Values for use with CCTEST_OBSSELx registers: */
 #define OBSSEL_EN BIT(7)
 enum {
@@ -179,7 +220,7 @@ typedef struct {
  * @brief   IRQ handler for RF events
  *
  */
-void _irq_handler(void);
+void cc2538_irq_handler(void);
 
 /**
  * @brief   Trigger a clear channel assessment
@@ -192,23 +233,16 @@ bool cc2538_channel_clear(void);
 /**
  * @brief   Get the configured long address of the device
  *
- * @return  The currently set (8-byte) long address
+ * @param[out] addr The currently set (8-byte) long address
  */
-uint64_t cc2538_get_addr_long(void);
+void cc2538_get_addr_long(uint8_t *addr);
 
 /**
  * @brief   Get the configured short address of the device
  *
- * @return  The currently set (2-byte) short address
+ * @param[out] addr The currently set (2-byte) short address
  */
-uint16_t cc2538_get_addr_short(void);
-
-/**
- * @brief   Get the primary (burned-in) EUI-64 of the device
- *
- * @return  The primary EUI-64 of the device
- */
-uint64_t cc2538_get_eui64_primary(void);
+void cc2538_get_addr_short(uint8_t *addr);
 
 /**
  * @brief   Get the configured channel number of the device
@@ -277,14 +311,14 @@ void cc2538_setup(cc2538_rf_t *dev);
  *
  * @param[in] addr          (2-byte) short address to set
  */
-void cc2538_set_addr_short(uint16_t addr);
+void cc2538_set_addr_short(const uint8_t *addr);
 
 /**
  * @brief   Set the long address of the device
  *
  * @param[in] addr          (8-byte) short address to set
  */
-void cc2538_set_addr_long(uint64_t addr);
+void cc2538_set_addr_long(const uint8_t *addr);
 
 /**
  * @brief   Set the channel number of the device

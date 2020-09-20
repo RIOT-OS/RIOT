@@ -687,7 +687,7 @@ static inline void ipv6_addr_set_all_routers_multicast(ipv6_addr_t *addr, unsign
  */
 static inline void ipv6_addr_set_solicited_nodes(ipv6_addr_t *out, const ipv6_addr_t *in)
 {
-    out->u64[0] = byteorder_htonll(0xff02000000000000);
+    out->u64[0] = byteorder_htonll(0xff02000000000000ull);
     out->u32[2] = byteorder_htonl(1);
     out->u8[12] = 0xff;
     out->u8[13] = in->u8[13];

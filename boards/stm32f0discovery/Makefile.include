@@ -1,3 +1,6 @@
+# we use shared STM32 configuration snippets
+INCLUDES += -I$(RIOTBASE)/boards/common/stm32/include
+
 # define the default port depending on the host OS
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))

@@ -200,7 +200,7 @@ void lwip_bootstrap(void)
     }
 #elif defined(MODULE_AT86RF2XX)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
-        at86rf2xx_setup(&at86rf2xx_devs[i], &at86rf2xx_params[i]);
+        at86rf2xx_setup(&at86rf2xx_devs[i], &at86rf2xx_params[i], i);
         if (netif_add(&netif[i], &at86rf2xx_devs[i], lwip_netdev_init,
                       tcpip_6lowpan_input) == NULL) {
             DEBUG("Could not add at86rf2xx device\n");

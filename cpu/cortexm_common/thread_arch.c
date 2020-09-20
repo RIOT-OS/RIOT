@@ -37,6 +37,8 @@
  * --------
  * | R0   | <- the registers from xPSR to R0 are handled by hardware
  * --------
+ * | RET  | <- exception return code
+ * --------
  * | R11  |
  * --------
  * | R10  |
@@ -51,10 +53,8 @@
  * --------
  * | R5   |
  * --------
- * | R4   |
+ * | R4   | <- R4 lowest address (top of stack)
  * --------
- * | RET  | <- exception return code
- * -------- lowest address (top of stack)
  *
  * For the Cortex-M0 and Cortex-M0plus we use a slightly different layout by
  * switching the blocks R11-R8 and R7-R4. This allows more efficient code when
@@ -63,6 +63,8 @@
  * ------------- highest address (bottom of stack)
  * | xPSR - R0 | <- same as for Cortex-M3/4
  * -------------
+ * | RET  | <- exception return code
+ * --------
  * | R7   |
  * --------
  * | R6   |
@@ -77,10 +79,8 @@
  * --------
  * | R9   |
  * --------
- * | R8   |
+ * | R8   | <- lowest address (top of stack)
  * --------
- * | RET  | <- exception return code
- * -------- lowest address (top of stack)
  *
  * TODO: Implement handling of FPU registers for Cortex-M4 CPUs
  *
@@ -88,6 +88,7 @@
  * @author      Stefan Pfeiffer <stefan.pfeiffer@fu-berlin.de>
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Koen Zandberg <koen@bergzand.net>
  *
  * @}
  */
@@ -104,6 +105,18 @@
 
 extern uint32_t _estack;
 extern uint32_t _sstack;
+
+/**
+ * @brief   CPU core supports full Thumb instruction set
+ */
+#if defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS) \
+    || defined(CPU_CORE_CORTEX_M23)
+#define CPU_CORE_CORTEXM_FULL_THUMB 0
+#else
+#define CPU_CORE_CORTEXM_FULL_THUMB 1
+#endif
+
+
 
 /**
  * @brief   Noticeable marker marking the beginning of a stack segment
@@ -190,8 +203,10 @@ char *thread_stack_init(thread_task_func_t task_func,
      * For the Cortex-M3 and Cortex-M4 we write them continuously onto the stack
      * as they can be read/written continuously by stack instructions. */
 
-#if defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS) \
-    || defined(CPU_CORE_CORTEX_M23)
+    /* exception return code  - return to task-mode process stack pointer */
+    stk--;
+    *stk = (uint32_t)EXCEPT_RET_TASK_MODE;
+#if !CPU_CORE_CORTEXM_FULL_THUMB
     /* start with r7 - r4 */
     for (int i = 7; i >= 4; i--) {
         stk--;
@@ -210,9 +225,6 @@ char *thread_stack_init(thread_task_func_t task_func,
     }
 #endif
 
-    /* exception return code  - return to task-mode process stack pointer */
-    stk--;
-    *stk = (uint32_t)EXCEPT_RET_TASK_MODE;
 
     /* The returned stack pointer will be aligned on a 32 bit boundary not on a
      * 64 bit boundary because of the odd number of registers above (8+9).
@@ -293,87 +305,115 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     /* save context by pushing unsaved registers to the stack */
     /* {r0-r3,r12,LR,PC,xPSR,s0-s15,FPSCR} are saved automatically on exception entry */
     ".thumb_func                      \n"
+    ".syntax unified                  \n"
 
     /* skip context saving if sched_active_thread == NULL */
     "ldr    r1, =sched_active_thread  \n" /* r1 = &sched_active_thread  */
-    "ldr    r1, [r1]                  \n" /* r1 = sched_active_thread   */
-    "cmp    r1, #0                    \n" /* if r1 == NULL:             */
-    "beq select_and_restore_context   \n" /*   goto select_and_restore_context */
+#if CPU_CORE_CORTEXM_FULL_THUMB
+    "ldr    r12, [r1]                 \n" /* r12 = sched_active_thread   */
+#else
+    "ldr    r1, [r1]                  \n"
+    "mov    r12, r1                   \n" /* r12 = sched_active_thread   */
+#endif
+    "push   {lr}                      \n" /* push exception return code */
+
+    "bl     sched_run                 \n" /* perform scheduling */
+
+#if CPU_CORE_CORTEXM_FULL_THUMB
+    "cmp    r0, r12                   \n" /* if r0 == 0: (no switch required) */
+    "it     eq                        \n"
+    "popeq  {pc}                      \n" /* Pop exception to pc to return */
+
+    "pop    {lr}                      \n" /* Pop exception from the exception stack */
+
+    "mov    r1,r12                    \n" /* r1 = sched_active_thread */
+    "cbz    r1, restore_context       \n" /* goto restore_context if r1 == 0 */
+
+    "mrs    r2, psp                   \n" /* get stack pointer from user mode */
+
+#ifdef MODULE_CORTEXM_FPU
+    "tst    lr, #0x10                 \n"
+    "it     eq                        \n"
+    "vstmdbeq r2!, {s16-s31}          \n" /* save FPU registers if FPU is used */
+#endif
+    "stmdb  r2!,{r4-r11,lr}           \n" /* save regs, including lr */
+    "str    r2, [r1]                  \n" /* write r0 to thread->sp */
+
+    /* current thread context is now saved */
+    "restore_context:                 \n" /* Label to skip thread state saving */
+
+    "ldr    r0, [r0]                  \n" /* load tcb->sp to register 1 */
+    "ldmia  r0!, {r4-r11,lr}          \n" /* restore other registers, including lr */
+#ifdef MODULE_CORTEXM_FPU
+    "tst    lr, #0x10                 \n"
+    "it     eq                        \n"
+    "vldmiaeq r0!, {s16-s31}          \n" /* load FPU registers if saved */
+#endif
+    "msr    psp, r0                   \n" /* restore user mode SP to PSP reg */
+    "bx     lr                        \n" /* load exception return value to PC,
+                                           * causes end of exception*/
+#else /* CPU_CORE_CORTEXM_FULL_THUMB */
+
+    /* Cortex-M0(+) and Cortex-M23 */
+    "cmp    r0, r12                   \n" /* if r0 == previous_thread: */
+    "bne    cont_schedule             \n" /*   jump over pop if r0 != 0 */
+    "pop    {pc}                      \n" /*   Pop exception return to PC */
+
+    "cont_schedule:                   \n" /* Otherwise continue the ctx switch */
+
+    "pop    {r2}                      \n" /* Pop LR from the exception stack */
+    "mov    lr, r2                    \n" /* Store LR in lr */
+    "mov    r1,r12                    \n" /* r1 = sched_active_thread */
+    "cmp    r1, #0                    \n" /* Test if r1 == NULL */
+    "mov    r12, sp                   \n" /* remember the exception SP in r12 */
+    "beq    restore_context           \n" /* goto restore_context if r1 == NULL */
 
     "mrs    r0, psp                   \n" /* get stack pointer from user mode */
-#if defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS) \
-    || defined(CPU_CORE_CORTEX_M23)
-    "push   {r1}                      \n" /* push sched_active_thread */
-    "mov    r12, sp                   \n" /* remember the exception SP */
     "mov    sp, r0                    \n" /* set user mode SP as active SP */
+
+    /* Calculate the expected stack offset beforehand so that we don't have to
+     * store the old SP from here on, saves a register we don't have */
+    "subs   r0, #36                   \n" /* Move saved SP with 9 words */
+    "str    r0, [r1]                  \n" /* And store */
+
     /* we can not push high registers directly, so we move R11-R8 into
      * R4-R0, as these are already saved */
     "mov    r0, r8                    \n" /* move R11-R8 into R3-R0 */
     "mov    r1, r9                    \n"
     "mov    r2, r10                   \n"
     "mov    r3, r11                   \n"
-    "push   {r0-r7}                   \n" /* now push them onto the stack */
-    "mov    r0, lr                    \n" /* next we save the link register */
-    "push   {r0}                      \n"
-    "mov    r0, sp                    \n" /* switch back to the exception SP */
-    "mov    sp, r12                   \n"
-    "pop    {r1}                      \n" /* r1 = sched_active_thread */
-#else
-#if (defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)) && defined(MODULE_CORTEXM_FPU)
-    "tst    lr, #0x10                 \n"
-    "it     eq                        \n"
-    "vstmdbeq r0!, {s16-s31}          \n" /* save FPU registers if FPU is used */
-#endif
-    "stmdb  r0!,{r4-r11}              \n" /* save regs */
-    "stmdb  r0!,{lr}                  \n" /* exception return value */
-#endif
-    "str    r0, [r1]                  \n" /* write r0 to thread->sp */
+    "push   {r0-r7,lr}                   \n" /* now push them onto the stack */
+    /* SP should match the expected SP calculated above from here on */
 
     /* current thread context is now saved */
 
-    "select_and_restore_context:      \n"
+    "restore_context:                 \n" /* Label to skip thread state saving */
 
-    "bl     sched_run                 \n" /* perform scheduling */
-
-    /* restore now current thread context */
-#if defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS) \
-    || defined(CPU_CORE_CORTEX_M23)
-    "mov    lr, sp                    \n" /* save MSR stack pointer for later */
     "ldr    r0, =sched_active_thread  \n" /* load address of current TCB */
     "ldr    r0, [r0]                  \n" /* dereference TCB */
     "ldr    r0, [r0]                  \n" /* load tcb-sp to R0 */
     "mov    sp, r0                    \n" /* make user mode SP active SP */
-    "pop    {r0}                      \n" /* restore LR from stack */
-    "mov    r12, r0                   \n" /* remember LR by parking it in R12 */
     "pop    {r0-r7}                   \n" /* get R11-R8 and R7-R4 from stack */
     "mov    r8, r0                    \n" /* move R11-R8 to correct registers */
     "mov    r9, r1                    \n"
     "mov    r10, r2                   \n"
     "mov    r11, r3                   \n"
+    "pop    {r0}                      \n" /* restore LR from stack */
     /* restore the application mode stack pointer PSP */
-    "mov    r0, sp                    \n" /* restore the user mode SP */
-    "msr    psp, r0                   \n" /* for this write it to the PSP reg */
-    "mov    sp, lr                    \n" /* and get the parked MSR SP back */
-    /* return from exception mode to application mode */
-    "bx     r12                       \n" /* return from exception mode */
-#else
-    "ldr    r0, =sched_active_thread  \n" /* load address of current TCB */
-    "ldr    r0, [r0]                  \n" /* dereference TCB */
-    "ldr    r1, [r0]                  \n" /* load tcb->sp to register 1 */
-    "ldmia  r1!, {r0}                 \n" /* restore exception return value */
-    "ldmia  r1!, {r4-r11}             \n" /* restore other registers */
-#if (defined(CPU_CORE_CORTEX_M4F) || defined(CPU_CORE_CORTEX_M7)) && defined(MODULE_CORTEXM_FPU)
-    "tst    r0, #0x10                 \n"
-    "it     eq                        \n"
-    "vldmiaeq r1!, {s16-s31}          \n" /* load FPU registers if saved */
-#endif
-    "msr    psp, r1                   \n" /* restore user mode SP to PSP reg */
+    "mov    r1, sp                    \n" /* restore the user mode SP */
+    "msr    psp, r1                   \n" /* for this write it to the PSP reg */
+    "mov    sp, r12                    \n" /* and get the parked MSR SP back */
     "bx     r0                        \n" /* load exception return value to PC,
                                            * causes end of exception*/
 #endif
+
+    /* return from exception mode to application mode */
     /* {r0-r3,r12,LR,PC,xPSR,s0-s15,FPSCR} are restored automatically on exception return */
      ".ltorg                           \n" /* literal pool needed to access
                                             * sched_active_thread */
+     :
+     :
+     :
     );
 }
 

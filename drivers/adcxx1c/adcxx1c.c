@@ -103,7 +103,7 @@ int adcxx1c_enable_alert(adcxx1c_t *dev, adcxx1c_cb_t cb, void *arg)
 
     i2c_acquire(DEV);
     i2c_read_reg(DEV, ADDR, ADCXX1C_CONF_ADDR, &reg, 0);
-    reg |= (dev->params.alert_pin != GPIO_UNDEF ? ADCXX1C_CONF_ALERT_PIN_EN : 0)
+    reg |= (gpio_is_valid(dev->params.alert_pin) ? ADCXX1C_CONF_ALERT_PIN_EN : 0)
             | ADCXX1C_CONF_ALERT_FLAG_EN;
     status = i2c_write_reg(DEV, ADDR, ADCXX1C_CONF_ADDR, reg, 0);
     i2c_release(DEV);
@@ -113,7 +113,7 @@ int adcxx1c_enable_alert(adcxx1c_t *dev, adcxx1c_cb_t cb, void *arg)
         return ADCXX1C_NOI2C;
     }
 
-    if (dev->params.alert_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.alert_pin)) {
         dev->cb = cb;
         dev->arg = arg;
         /* alert active low */

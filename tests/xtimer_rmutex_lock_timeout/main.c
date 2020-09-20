@@ -26,6 +26,13 @@
 #include "msg.h"
 #include "irq.h"
 
+/* XTIMER_SHIFT can be undefined when using xtimer_on_ztimer on boards
+ * incompatible with xtimers tick conversion, e.g. the waspmote-pro
+ */
+#ifndef XTIMER_SHIFT
+#define XTIMER_SHIFT    (0)
+#endif
+
 /* timeout at one millisecond (1000 us) to make sure it does not spin. */
 #define LONG_RMUTEX_TIMEOUT 1000
 

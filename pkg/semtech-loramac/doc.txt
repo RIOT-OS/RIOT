@@ -152,6 +152,23 @@
  * This mechanism is especially useful when using deep sleep power modes that
  * don't preserve RAM.
  *
+ * # Low power considerations
+ *
+ * The internal implementation of the required LoRaWAN timings (delay before
+ * opening RX windows, duty-cycle delays) automatically achieves the lowest
+ * possible power consumption while remaining usable when RIOT's low power modes
+ * are not blocked. All timings are managed by the @ref sys_ztimer
+ * running on the low-level @ref drivers_periph_rtt peripheral which
+ * allows for:
+ * - going to a deep-sleep mode with RAM retention (no reboot) between TX and
+ * RX1 and between RX1 and RX2 windows, and as a result reduces the power
+ * consumption
+ * - using deep-sleep mode with RAM retention and have the duty-cycle
+ * restriction still usable between each active cycle (wake-up, measure, send,
+ * receive, sleep).
+ * As a result, this package can only be used on boards that provide the
+ * `periph_rtt` feature.
+ *
  * @warning It is not possible to directly call the original LoRaMAC-node API
  *          using this package. This package should only be considered as a
  *          wrapper around the original LoRaMAC-node API and only the API

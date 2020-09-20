@@ -5,10 +5,10 @@
 # directory for more details.
 
 config WDT_WARNING_PERIOD
-    depends on HAS_PERIPH_WDT_WARNING_PERIOD && KCONFIG_MODULE_PERIPH_WDT
+    depends on HAS_PERIPH_WDT_WARNING_PERIOD && KCONFIG_USEMODULE_PERIPH_WDT
     default 1
 
-config MOD_SAM0_COMMON_PERIPH
+config MODULE_SAM0_COMMON_PERIPH
     bool
     default y
     depends on TEST_KCONFIG

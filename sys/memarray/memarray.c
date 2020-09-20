@@ -44,6 +44,15 @@ void *memarray_alloc(memarray_t *mem)
     return free;
 }
 
+void *memarray_calloc(memarray_t *mem)
+{
+    void *new = memarray_alloc(mem);
+    if (new) {
+        memset(new, 0, mem->size);
+    }
+    return new;
+}
+
 void memarray_free(memarray_t *mem, void *ptr)
 {
     assert((mem != NULL) && (ptr != NULL));

@@ -82,14 +82,14 @@ static struct {
  */
 static void _sched_statistics_trigger(void)
 {
-    sched_statistics_cb(sched_active_pid, sched_active_pid);
+    sched_statistics_cb(thread_getpid(), thread_getpid());
 }
 
 static xtimer_ticks32_t _sched_ticks(void)
 {
     _sched_statistics_trigger();
     xtimer_ticks32_t runtime_ticks = {
-        .ticks32 = sched_pidlist[sched_active_pid].runtime_ticks
+        .ticks32 = sched_pidlist[thread_getpid()].runtime_ticks
     };
     return runtime_ticks;
 }

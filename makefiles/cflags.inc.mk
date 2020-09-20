@@ -38,6 +38,10 @@ endif
 # Forbid common symbols to prevent accidental aliasing.
 CFLAGS += -fno-common
 
+# Place data and functions into their own sections. This helps the linker
+# garbage collection to remove unused symbols when linking statically.
+CFLAGS += -ffunction-sections -fdata-sections
+
 # Compress debug info. This saves approximately 50% of disk usage.
 # It has no effect if debugging information is not emitted, so it can be left
 # on unconditionally.
@@ -61,9 +65,3 @@ endif
 
 # Add the optional flags that are not architecture/toolchain blacklisted
 CFLAGS += $(filter-out $(OPTIONAL_CFLAGS_BLACKLIST),$(OPTIONAL_CFLAGS))
-
-# Default ARFLAGS for platforms which do not specify it.
-# Note: make by default provides ARFLAGS=rv which we want to override
-ifeq ($(origin ARFLAGS),default)
-  ARFLAGS = rcTs
-endif

@@ -174,12 +174,14 @@ typedef enum {
  *          always start with channel 0 to x and the undefined ones are from x+1
  *          to PWM_CHANNELS.
  */
+#if defined(PWM_PRESENT) || DOXYGEN
 typedef struct {
     NRF_PWM_Type *dev;                  /**< PWM device descriptor */
     gpio_t pin[PWM_CHANNELS];           /**< PWM out pins */
 } pwm_conf_t;
+#endif
 
-#if defined(CPU_MODEL_NRF52811XXAA) || defined(CPU_MODEL_NRF52840XXAA)
+#if !defined(CPU_MODEL_NRF52832XXAA)
 /**
  * @brief   Structure for UART configuration data
  */

@@ -5,5 +5,7 @@ ifneq (,$(filter saml11%,$(CPU_MODEL)))
   CFLAGS += -DCPU_SAML11
 endif
 
+CFLAGS += -DCPU_COMMON_SAML1X
+
 include $(RIOTCPU)/sam0_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk

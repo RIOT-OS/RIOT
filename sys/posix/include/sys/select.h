@@ -30,8 +30,9 @@
 #define SYS_SELECT_H
 
 #include <string.h>
-/* prevent cyclic dependency with newlib's `sys/types.h` */
-#if defined(MODULE_NEWLIB) && !defined(CPU_ESP32) && !defined(CPU_ESP8266)
+/* prevent cyclic dependency with newlib/picolibc's `sys/types.h` */
+#if (defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)) && \
+    !defined(CPU_ESP32) && !defined(CPU_ESP8266)
 #include <sys/_timeval.h>
 #else
 #include <sys/time.h>

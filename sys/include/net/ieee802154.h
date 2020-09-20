@@ -99,6 +99,28 @@ extern "C" {
 #define IEEE802154_ACK_FRAME_LEN          (5U)  /**< ACK frame length */
 
 /**
+ * @brief Number of symbols to wait during Long Inter Frame Spacing
+ */
+#define IEEE802154_LIFS_SYMS            (40U)
+
+/**
+ * @brief Number of symbols to wait during Short Inter Frame Spacing
+ */
+#define IEEE802154_SIFS_SYMS            (12U)
+
+/**
+ * @brief Maximum frame size to consider a frame as short.
+ */
+#define IEEE802154_SIFS_MAX_FRAME_SIZE  (18U)
+
+/**
+ * @brief value of measured power when RSSI is zero.
+ *
+ * This value is defined in the IEEE 802.15.4 standard
+ */
+#define IEEE802154_RADIO_RSSI_OFFSET        (-174)
+
+/**
  * For the SUN PHYs, the value is 1 ms expressed in symbol periods, rounded
  * up to the next integer number of symbol periods using the ceiling() function.
  *
@@ -195,6 +217,27 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 #define CONFIG_IEEE802154_DEFAULT_TXPOWER          (0)
 #endif
 /** @} */
+
+/**
+ * @brief IEEE802.15.4 default value for minimum backoff exponent
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE
+#define CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE   (3U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 default value for maximum number of CSMA-CA retries.
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES
+#define CONFIG_IEEE802154_DEFAULT_CSMA_CA_RETRIES  (4U)
+#endif
+
+/**
+ * @brief IEEE802.15.4 default value for maximum backoff exponent
+ */
+#ifndef CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE
+#define CONFIG_IEEE802154_DEFAULT_CSMA_CA_MAX_BE   (5U)
+#endif
 
 /**
  * @brief   Initializes an IEEE 802.15.4 MAC frame header in @p buf.

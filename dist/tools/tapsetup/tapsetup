@@ -6,6 +6,10 @@ COMMAND=""
 BRNAME="tapbr0"
 TAPNAME="tap"
 DEACTIVATE_IPV6=""
+ENABLE_FORWARDING=0
+BRIDGE_ADDRS=""
+BRIDGE_ROUTES=""
+DEFAULT_PREFIX_LEN=128
 UPLINK=""
 
 usage() {
@@ -17,6 +21,17 @@ usage() {
     echo "Options:" >&2
     echo "   -c [<num>], --create [<num>]: Create <num> tap interfaces (default: 2)" >&2
     echo "   -d, --delete:                 Delete all interface" >&2
+    echo "   -l <iface>, --list <iface>:   If <iface> belongs to a bridge, list the bridge and" >&2
+    echo "                                 all interfaces that belong to it. If <iface> does " >&2
+    echo"                                  not belong to a bridge, just print <iface>." >&2
+    echo "   -a <address>[/<prefix_len>], --address <address>[/<prefix_len>]:" >&2
+    echo "                                 Address to add to the created bridge. Can be used" >&2
+    echo "                                 multiple times." >&2
+    echo "   -r <route>[/<prefix_len>] <next_hop>, --route <route>[/<prefix_len>] <next_hop>:" >&2
+    echo "                                 Route to add to via the created bridge. Can be used" >&2
+    echo "                                 multiple times." >&2
+    echo "   -f, --forwarding              Enable forwarding system-wide on creation and " >&2
+    echo "                                 disable on deletion." >&2
     echo "   -b <name>, --bridge <name>:   Give name for the bridge (default: tapbr)" >&2
     echo "   -t <name>, --tap <name>:      Name base for the tap interfaces; the" >&2
     echo "                                 generated names will be <name>x" >&2
@@ -28,9 +43,9 @@ usage() {
     echo "   -h, --help:                   Prints this text" >&2
 }
 
-unsupported_plattform() {
+unsupported_platform() {
     echo "unsupported platform" >&2
-    echo "(currently supported \`uname -s\` 'Darvin', 'FreeBSD', and 'Linux')" >&2
+    echo "(currently supported \`uname -s\` 'Darwin', 'FreeBSD', and 'Linux')" >&2
 }
 
 update_uplink() {
@@ -43,8 +58,66 @@ update_uplink() {
     fi
 }
 
+activate_forwarding() {
+    if [ ${ENABLE_FORWARDING} -eq 1 ]; then
+        case "${PLATFORM}" in
+            FreeBSD|OSX)
+                sysctl -w net.inet.ip.forwarding=1 || exit 1 ;;
+            Linux)
+                sysctl -w net.ipv6.conf.${BRNAME}.forwarding=1 || exit 1
+                sysctl -w net.ipv6.conf.${BRNAME}.accept_ra=0 || exit 1
+                sysctl -w net.ipv6.conf.all.forwarding=1 || exit 1 ;;
+            *)  ;;
+        esac
+    fi
+}
+
+add_ipv6_addrs() {
+    for a in ${BRIDGE_ADDRS}; do
+        address_addr=$(echo "${a}" | cut -d/ -f1)
+        prefix_len=$(echo "${a}" | cut -d/ -f2)
+        if [ "${a}" = "${prefix_len}" ]; then
+            # prefix length is not defined
+            prefix_len=${DEFAULT_PREFIX_LEN}
+        fi
+        case "${PLATFORM}" in
+            FreeBSD|OSX)
+                ifconfig ${BRNAME} inet6 ${address_addr} prefixlen ${prefix_len} || exit 1
+                ;;
+            Linux)
+                ip address add ${address_addr}/${prefix_len} dev ${BRNAME} || exit 1
+                ;;
+            *)  ;;
+        esac
+    done
+}
+
+add_ipv6_routes() {
+    for r in ${BRIDGE_ROUTES}; do
+        route=$(echo "${r}" | cut -d- -f1)
+        next_hop=$(echo "${r}" | cut -d- -f2)
+        route_prefix=$(echo "${route}" | cut -d/ -f1)
+        route_prefix_len=$(echo "${route}" | cut -d/ -f2)
+        if [ "${route}" = "${route_prefix_len}" ]; then
+            # prefix length is not defined
+            route_prefix_len=${DEFAULT_PREFIX_LEN}
+        fi
+        case "${PLATFORM}" in
+            FreeBSD|OSX)
+                route -6n add ${route_prefix} -interface ${BRNAME} \
+                    ${next_hop} || exit 1
+                ;;
+            Linux)
+                ip route add ${route_prefix}/${route_prefix_len} \
+                    via ${next_hop} dev ${BRNAME} || exit 1
+                ;;
+            *)  ;;
+        esac
+    done
+}
+
 create_bridge() {
-    echo "creating ${BRNAME}"
+    echo "creating bridge ${BRNAME}"
 
     case "${PLATFORM}" in
         FreeBSD)
@@ -82,12 +155,73 @@ up_bridge() {
     esac
 }
 
+deactivate_forwarding() {
+    if [ ${ENABLE_FORWARDING} -eq 1 ]; then
+        case "${PLATFORM}" in
+            FreeBSD|OSX)
+                sysctl -w net.inet.ip.forwarding=0 || exit 1 ;;
+            Linux)
+                sysctl -w net.ipv6.conf.${BRNAME}.forwarding=0 || exit 1
+                sysctl -w net.ipv6.conf.${BRNAME}.accept_ra=1 || exit 1
+                sysctl -w net.ipv6.conf.all.forwarding=0 || exit 1 ;;
+            *)  ;;
+        esac
+    fi
+}
+
+del_ipv6_addrs() {
+    for a in ${BRIDGE_ADDRS}; do
+        address_addr=$(echo "${a}" | cut -d/ -f1)
+        prefix_len=$(echo "${a}" | cut -d/ -f2)
+        if [ "${a}" = "${prefix_len}" ]; then
+            # prefix length is not defined
+            prefix_len=${DEFAULT_PREFIX_LEN}
+        fi
+        case "${PLATFORM}" in
+            FreeBSD|OSX)
+                ifconfig ${BRNAME} inet6 ${address_addr} prefixlen ${prefix_len} delete || exit 1
+                ;;
+            Linux)
+                ip address delete ${address_addr}/${prefix_len} dev ${BRNAME} || exit 1
+                ;;
+            *)  ;;
+        esac
+    done
+}
+
+del_ipv6_routes() {
+    for r in ${BRIDGE_ROUTES}; do
+        route=$(echo "${r}" | cut -d- -f1)
+        next_hop=$(echo "${r}" | cut -d- -f2)
+        route_prefix=$(echo "${route}" | cut -d/ -f1)
+        route_prefix_len=$(echo "${route}" | cut -d/ -f2)
+        if [ "${route}" = "${route_prefix_len}" ]; then
+            # prefix length is not defined
+            route_prefix_len=${DEFAULT_PREFIX_LEN}
+        fi
+        case "${PLATFORM}" in
+            FreeBSD|OSX)
+                route -6 delete ${route_prefix}/${route_prefix_len} \
+                    -interface ${BRNAME} ${next_hop} || exit 1
+                ;;
+            Linux)
+                ip route delete ${route_prefix}/${route_prefix_len} \
+                    via ${next_hop} dev ${BRNAME} || exit 1
+                ;;
+            *)  ;;
+        esac
+    done
+}
+
 delete_bridge() {
     echo "deleting ${BRNAME}"
 
     case "${PLATFORM}" in
         FreeBSD)
             sysctl net.link.tap.user_open=0
+            for IF in $(ifconfig ${BRIDGE} | grep -oiE "member: .+ " | cut -d' ' -f2); do
+                ifconfig $IF destroy || exit 1
+            done
             ifconfig ${BRNAME} destroy || exit 1
             kldunload if_tap        # unloading might fail due to dependencies
             kldunload if_bridge ;;
@@ -105,6 +239,9 @@ delete_bridge() {
                 update_uplink ${UPLINK}
             fi ;;
         OSX)
+            for IF in $(ifconfig ${BRIDGE} | grep -oiE "member: .+ " | cut -d' ' -f2); do
+                ifconfig $IF destroy || exit 1
+            done
             ifconfig ${BRNAME} destroy || exit 1 ;;
         *)
             ;;
@@ -148,11 +285,64 @@ create_tap() {
     esac
 }
 
+get_master() {
+    IFACE=$1
+    case "${PLATFORM}" in
+        Linux)
+            MASTER=$(ip link show ${IFACE} | grep -o "master \S\+" | cut -d' ' -f2)
+            ;;
+        FreeBSD|OSX)
+            for IF in $(ifconfig | grep -oiE "^[a-z0-9_-]+"); do
+                if ifconfig $IF | grep -q "member: $IFACE"; then
+                    MASTER=${IF}
+                    break
+                fi
+            done
+            ;;
+        *)
+            ;;
+    esac
+    if [ -z "$MASTER" ]; then
+        # IFACE is its own master
+        echo "$IFACE"
+    else
+        echo "$MASTER"
+    fi
+}
+
+list_bridge() {
+    BRIDGE=$1
+    echo "$BRIDGE:"
+    case "${PLATFORM}" in
+        Linux)
+            for IF in $(ls /sys/class/net/${BRIDGE}/brif); do
+                echo "- $IF"
+            done
+            ;;
+        FreeBSD|OSX)
+            for IF in $(ifconfig ${BRIDGE} | grep -oiE "member: .+ " | cut -d' ' -f2); do
+                echo "- $IF"
+            done
+            ;;
+        *)
+            ;;
+    esac
+}
+
 while true ; do
     case "$1" in
         -6)
             DEACTIVATE_IPV6=1
             shift ;;
+        -a|--address)
+            # check if valid address + optional prefix length
+            if echo "$2" | grep -q "^[a-f0-9:]\+\(/[0-9]\+\)\?$"; then
+                BRIDGE_ADDRS="${BRIDGE_ADDRS} $2"
+                shift 2
+            else
+                usage
+                exit 2
+            fi ;;
         -b|--bridge)
             case "$2" in
                 "")
@@ -185,9 +375,39 @@ while true ; do
             fi
             COMMAND="delete"
             shift ;;
+        -f|--forwarding)
+            ENABLE_FORWARDING=1
+            shift ;;
+        -l|--list)
+            if [ -n "${COMMAND}" ]; then
+                usage
+                exit 2
+            fi
+            COMMAND="list"
+            case "$2" in
+                "")
+                    usage
+                    exit 2 ;;
+                *)
+                    BRNAME="$2"
+                    shift 2 ;;
+            esac ;;
         -h|--help)
             usage
             exit ;;
+        -r|--route)
+            # check if valid address + optional prefix length
+            if ! echo "$2" | grep -q "^[a-f0-9:]\+\(/[0-9]\+\)\?$"; then
+                usage
+                exit 2
+            fi
+            # check if valid next hop
+            if ! echo "$3" | grep -q "^[a-f0-9:]\+$"; then
+                usage
+                exit 2
+            fi
+            BRIDGE_ROUTES="${BRIDGE_ROUTES} $2-$3"
+            shift 3 ;;
         -u|--uplink)
             case "$2" in
                 "")
@@ -213,12 +433,12 @@ while true ; do
     esac
 done
 
-if [ -z "${SUDO_USER}" ]; then
-    echo 'Environment variable $SUDO_USER required; Please run with `sudo`'
-    exit 1
-fi
 if [ -z "${COMMAND}" ]; then
     COMMAND="create"
+fi
+if [ -z "${SUDO_USER}" ] && [ "${COMMAND}" != "list" ]; then
+    echo 'Environment variable $SUDO_USER required; Please run with `sudo`'
+    exit 1
 fi
 case "$(uname -s)" in
     Darwin)
@@ -234,7 +454,7 @@ case "$(uname -s)" in
     Linux)
         PLATFORM="Linux" ;;
     *)
-        unsupported_plattform
+        unsupported_platform
         exit 1 ;;
 esac
 
@@ -247,10 +467,18 @@ if [ "${COMMAND}" = 'create' ]; then
         create_tap || exit 1
     done
 
+    activate_forwarding || exit 1
     up_bridge || exit 1
+    add_ipv6_addrs || exit 1
+    add_ipv6_routes || exit 1
 
 elif [ "${COMMAND}" = 'delete' ]; then
+    del_ipv6_routes || exit 1
+    del_ipv6_addrs || exit 1
+    deactivate_forwarding || exit 1
     delete_bridge
+elif [ "${COMMAND}" = 'list' ]; then
+    list_bridge $(get_master "$BRNAME")
 else
     echo 'unknown command'
     exit 1

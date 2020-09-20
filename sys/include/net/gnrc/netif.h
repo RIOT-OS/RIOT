@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Freie Universität Berlin
+ * Copyright (C) 2017-20 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -58,6 +58,9 @@
 #endif
 #if IS_USED(MODULE_GNRC_NETIF_MAC)
 #include "net/gnrc/netif/mac.h"
+#endif
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+#include "net/gnrc/netif/pktq/type.h"
 #endif
 #include "net/ndp.h"
 #include "net/netdev.h"
@@ -171,6 +174,14 @@ typedef struct {
 #endif
 #if IS_USED(MODULE_GNRC_NETIF_6LO) || defined(DOXYGEN)
     gnrc_netif_6lo_t sixlo;                 /**< 6Lo component */
+#endif
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ) || defined(DOXYGEN)
+    /**
+     * @brief   Packet queue for sending
+     *
+     * @note    Only available with @ref net_gnrc_netif_pktq.
+     */
+    gnrc_netif_pktq_t send_queue;
 #endif
     uint8_t cur_hl;                         /**< Current hop-limit for out-going packets */
     uint8_t device_type;                    /**< Device type */
@@ -557,6 +568,8 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
 /**
  * @brief   Converts a hardware address to a human readable string.
  *
+ * @note    Compatibility wrapper for @see netif_addr_to_str
+ *
  * @details The format will be like `xx:xx:xx:xx` where `xx` are the bytes
  *          of @p addr in hexadecimal representation.
  *
@@ -570,11 +583,16 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
  *
  * @return  @p out.
  */
-char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
+static inline char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out)
+{
+    return netif_addr_to_str(addr, addr_len, out);
+}
 
 /**
  * @brief   Parses a string of colon-separated hexadecimals to a hardware
  *          address.
+ *
+ * @note    Compatibility wrapper for @see netif_addr_from_str
  *
  * @details The input format must be like `xx:xx:xx:xx` where `xx` will be the
  *          bytes of @p addr in hexadecimal representation.
@@ -590,7 +608,10 @@ char *gnrc_netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
  * @return  Actual length of @p out on success.
  * @return  0, on failure.
  */
-size_t gnrc_netif_addr_from_str(const char *str, uint8_t *out);
+static inline size_t gnrc_netif_addr_from_str(const char *str, uint8_t *out)
+{
+    return netif_addr_from_str(str, out);
+}
 
 /**
  * @brief   Send a GNRC packet via a given @ref gnrc_netif_t interface.

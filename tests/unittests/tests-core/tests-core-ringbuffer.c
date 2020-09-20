@@ -106,7 +106,7 @@ static void *run_get(void *arg)
 
 static void tests_core_ringbuffer(void)
 {
-    pid_add = sched_active_pid;
+    pid_add = thread_getpid();
     pid_get = thread_create(stack_get, sizeof (stack_get),
                             THREAD_PRIORITY_MAIN,
                             THREAD_CREATE_SLEEPING | THREAD_CREATE_STACKTEST,

@@ -13,7 +13,11 @@ USEMODULE += periph_hwrng
 USEMODULE += periph_flash
 USEMODULE += periph_uart
 USEMODULE += random
-USEMODULE += stdio_uart
+
+ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
+  USEMODULE += stdio_uart
+endif
+
 USEMODULE += xtensa
 
 # Features used by ESP*
@@ -25,7 +29,7 @@ ifneq (,$(filter esp_wifi_enterprise,$(USEMODULE)))
   USEMODULE += esp_wifi
 endif
 
-ifneq (,$(filter netdev_default gnrc_netdev_default,$(USEMODULE)))
+ifneq (,$(filter netdev_default,$(USEMODULE)))
   ifneq (,$(filter lwip,$(USEMODULE)))
     # for lwip, use esp_wifi as default netdev if no other netdev is enabled
     ifeq (,$(filter esp_eth,$(USEMODULE)))

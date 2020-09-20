@@ -389,7 +389,7 @@ void test_entropy(uint32_t samples)
     /* Use 'fmt/print_float' to work on all platforms (atmega)
      * Stdout should be flushed before to prevent garbled output. */
     printf("Calculated ");
-#ifdef MODULE_NEWLIB
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     /* no fflush on msp430 */
     fflush(stdout);
 #endif

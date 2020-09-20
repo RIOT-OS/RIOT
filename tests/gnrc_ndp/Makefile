@@ -3,6 +3,7 @@ include ../Makefile.tests_common
 USEMODULE += gnrc_ipv6_nib_router
 USEMODULE += gnrc_ndp
 USEMODULE += gnrc_netif
+USEMODULE += gnrc_nettype_ipv6
 USEMODULE += embunit
 USEMODULE += netdev_ieee802154
 USEMODULE += netdev_test

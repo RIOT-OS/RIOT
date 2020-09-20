@@ -23,9 +23,13 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* Add specific clock configuration (HSE, LSE) for this board here */
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE            1
+#endif
+
 #include "periph_cpu.h"
-#include "l4/cfg_clock_80_1.h"
-#include "cfg_spi_divtable.h"
+#include "l4/cfg_clock_default.h"
 #include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_rtt_default.h"
 
@@ -210,15 +214,16 @@ static const spi_conf_t spi_config[] = {
  *
  * @{
  */
-#define ADC_NUMOF           (6U)
-#define ADC_CONFIG {             \
-    {GPIO_PIN(PORT_A, 0), 0, 5},  /*< ADC12_IN5 */   \
-    {GPIO_PIN(PORT_A, 1), 0, 6},  /*< ADC12_IN6 */   \
-    {GPIO_PIN(PORT_A, 4), 1, 9},  /*< ADC12_IN9 */   \
-    {GPIO_PIN(PORT_B, 0), 1, 15}, /*< ADC12_IN15 */  \
-    {GPIO_PIN(PORT_C, 1), 2, 2},  /*< ADC123_IN_2 */ \
-    {GPIO_PIN(PORT_C, 0), 2, 1},  /*< ADC123_IN_1 */ \
-}
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 0), 0, 5},  /*< ADC12_IN5 */
+    {GPIO_PIN(PORT_A, 1), 0, 6},  /*< ADC12_IN6 */
+    {GPIO_PIN(PORT_A, 4), 1, 9},  /*< ADC12_IN9 */
+    {GPIO_PIN(PORT_B, 0), 1, 15}, /*< ADC12_IN15 */
+    {GPIO_PIN(PORT_C, 1), 2, 2},  /*< ADC123_IN_2 */
+    {GPIO_PIN(PORT_C, 0), 2, 1},  /*< ADC123_IN_1 */
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

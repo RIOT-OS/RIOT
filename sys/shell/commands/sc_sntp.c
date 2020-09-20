@@ -82,7 +82,7 @@ int _ntpdate(int argc, char **argv)
         puts("Error in synchronization");
         return 1;
     }
-#ifdef MODULE_NEWLIB
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     struct tm *tm;
     time_t time = (time_t)(sntp_get_unix_usec() / US_PER_SEC);
 

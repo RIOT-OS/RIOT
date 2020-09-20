@@ -17,7 +17,9 @@ FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += ssp
 
-# Access to hardware SPI bus is only supported on Linux hosts
 ifeq ($(OS),Linux)
+  # Access to hardware SPI bus is only supported on Linux hosts
   FEATURES_PROVIDED += periph_spi
+  # Hardware GPIO access is only available on Linux hosts
+  FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 endif

@@ -20,16 +20,16 @@
  *
  * Anyhow, this configures ztimer as follows:
  *
- * 1. if ztimer_msec in USEMODULE:
- * 1.1. assume ztimer_msec uses periph_timer
+ * 1. if ztimer_usec in USEMODULE:
+ * 1.1. assume ztimer_usec uses periph_timer
  * 1.2a. if no config given
  * 1.2a.1a. use xtimer config if available
  * 1.2a.1b. default to TIMER_DEV(0), 32bit
  * 1.2b. else, use config
  *
- * 2. if ztimer_usec in USEMODULE:
+ * 2. if ztimer_msec in USEMODULE:
  * 2.1a. if periph_rtt in USEMODULE: use that
- * 2.1b: else: convert from ZTIMER_MSEC
+ * 2.1b: else: convert from ZTIMER_USEC
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
@@ -68,7 +68,6 @@ ztimer_clock_t *const ZTIMER_USEC = &_ztimer_convert_shift_usec.super.super;
 #    else
 static ztimer_convert_frac_t _ztimer_convert_frac_usec;
 ztimer_clock_t *const ZTIMER_USEC = &_ztimer_convert_frac_usec.super.super;
-#  define ZTIMER_USEC_CONVERT_LOWER (&_ztimer_periph_timer_usec.super)
 #    endif
 #   else
 #     error ztimer_usec selected, but no configuration available!
@@ -92,13 +91,8 @@ ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_periph_timer_rtt_msec;
 static ztimer_convert_frac_t _ztimer_convert_frac_msec;
 ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_convert_frac_msec.super.super;
 ztimer_clock_t *const ZTIMER_MSEC_BASE = &_ztimer_periph_timer_usec.super;
-#    if CONFIG_ZTIMER_USEC_BASE_FREQ < FREQ_1MHZ
-#      define ZTIMER_MSEC_CONVERT_LOWER         ZTIMER_USEC_CONVERT_LOWER
-#      define ZTIMER_MSEC_CONVERT_LOWER_FREQ    CONFIG_ZTIMER_USEC_BASE_FREQ
-#    else
-#      define ZTIMER_MSEC_CONVERT_LOWER (ZTIMER_USEC)
-#      define ZTIMER_MSEC_CONVERT_LOWER_FREQ    FREQ_1MHZ
-#    endif
+#    define ZTIMER_MSEC_CONVERT_LOWER       ZTIMER_USEC_BASE
+#    define ZTIMER_MSEC_CONVERT_LOWER_FREQ  CONFIG_ZTIMER_USEC_BASE_FREQ
 #  else
 #  error No suitable ZTIMER_MSEC config. Maybe add USEMODULE += ztimer_usec?
 #  endif

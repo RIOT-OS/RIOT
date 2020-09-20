@@ -237,7 +237,10 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                       "search neighbor cache\n",
                       ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
 
-                if (res == 0) {
+                if ((res == 0) &&
+                    /* If ARSM is not active only use link-local as next hop */
+                    (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM) ||
+                     ipv6_addr_is_link_local(dst))) {
                     DEBUG("nib: prefix list entry => taking dst as next hop\n");
                     memcpy(&route.next_hop, dst, sizeof(route.next_hop));
                 }
@@ -913,21 +916,33 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     gnrc_netif_t *tgt_netif = gnrc_netif_get_by_ipv6_addr(&nbr_sol->tgt);
 
     if (tgt_netif != NULL) {
-        int idx = gnrc_netif_ipv6_addr_idx(tgt_netif, &nbr_sol->tgt);
+        int idx;
 
-        if (gnrc_netif_ipv6_addr_dad_trans(tgt_netif, idx)) {
+        gnrc_netif_acquire(tgt_netif);
+        idx = gnrc_netif_ipv6_addr_idx(tgt_netif, &nbr_sol->tgt);
+        /* if idx < 0:
+         * nbr_sol->tgt was removed between getting tgt_netif by nbr_sol->tgt
+         * and gnrc_netif_acquire(tgt_netif). This is like `tgt_netif` would
+         * have been NULL in the first place so just continue as if it would
+         * have. */
+        if ((idx >= 0) && gnrc_netif_ipv6_addr_dad_trans(tgt_netif, idx)) {
             if (!ipv6_addr_is_unspecified(&ipv6->src)) {
                 /* (see https://tools.ietf.org/html/rfc4862#section-5.4.3) */
                 DEBUG("nib: Neighbor is performing AR, but target address is "
                       "still TENTATIVE for us => Ignoring NS\n");
+                gnrc_netif_release(tgt_netif);
                 return;
             }
             /* cancel validation timer */
             evtimer_del(&_nib_evtimer,
                         &tgt_netif->ipv6.addrs_timers[idx].event);
+            /* _remove_tentative_addr() context switches to `tgt_netif->pid` so
+             * release `tgt_netif`. We are done here anyway. */
+            gnrc_netif_release(tgt_netif);
             _remove_tentative_addr(tgt_netif, &nbr_sol->tgt);
             return;
         }
+        gnrc_netif_release(tgt_netif);
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC */
     if (ipv6_addr_is_unspecified(&ipv6->src)) {
@@ -1045,19 +1060,30 @@ static void _handle_nbr_adv(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     gnrc_netif_t *tgt_netif = gnrc_netif_get_by_ipv6_addr(&nbr_adv->tgt);
 
     if (tgt_netif != NULL) {
-        int idx = gnrc_netif_ipv6_addr_idx(tgt_netif, &nbr_adv->tgt);
+        int idx;
 
-        if (gnrc_netif_ipv6_addr_dad_trans(tgt_netif, idx)) {
+        gnrc_netif_acquire(tgt_netif);
+        idx = gnrc_netif_ipv6_addr_idx(tgt_netif, &nbr_adv->tgt);
+        /* if idx < 0:
+         * nbr_sol->tgt was removed between getting tgt_netif by nbr_sol->tgt
+         * and gnrc_netif_acquire(tgt_netif). This is like `tgt_netif` would
+         * have been NULL in the first place so just continue as if it would
+         * have. */
+        if ((idx >= 0) && gnrc_netif_ipv6_addr_dad_trans(tgt_netif, idx)) {
             DEBUG("nib: duplicate address detected, removing target address "
                   "from this interface\n");
             /* cancel validation timer */
             evtimer_del(&_nib_evtimer,
                         &tgt_netif->ipv6.addrs_timers[idx].event);
+            /* _remove_tentative_addr() context switches to `tgt_netif->pid` so
+             * release `tgt_netif`. We are done here anyway. */
+            gnrc_netif_release(tgt_netif);
             _remove_tentative_addr(tgt_netif, &nbr_adv->tgt);
             return;
         }
         /* else case beyond scope of RFC4862:
          * https://tools.ietf.org/html/rfc4862#section-5.4.4 */
+        gnrc_netif_release(tgt_netif);
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC */
     if (((nce = _nib_onl_get(&nbr_adv->tgt, netif->pid)) != NULL) &&

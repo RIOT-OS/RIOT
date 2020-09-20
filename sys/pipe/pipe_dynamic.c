@@ -42,8 +42,9 @@ pipe_t *pipe_malloc(unsigned size)
     if (m_pipe) {
         ringbuffer_init(&m_pipe->rb, m_pipe->buffer, size);
         pipe_init(&m_pipe->pipe, &m_pipe->rb, free);
+        return &m_pipe->pipe;
     }
-    return &m_pipe->pipe;
+    return NULL;
 }
 
 void pipe_free(pipe_t *rp)

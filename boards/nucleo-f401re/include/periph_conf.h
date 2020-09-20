@@ -162,28 +162,8 @@ static const qdec_conf_t qdec_config[] = {
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 42000000Hz */
-        7,  /* -> 164062Hz */
-        6,  /* -> 328125Hz */
-        4,  /* -> 1312500Hz */
-        2,  /* -> 5250000Hz */
-        1   /* -> 10500000Hz */
-    },
-    {       /* for APB2 @ 84000000Hz */
-        7,  /* -> 328125Hz */
-        7,  /* -> 328125Hz */
-        5,  /* -> 1312500Hz */
-        3,  /* -> 5250000Hz */
-        2   /* -> 10500000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev            = SPI1,
@@ -257,15 +237,16 @@ static const spi_conf_t spi_config[] = {
  *
  * @{
  */
-#define ADC_NUMOF          (6U)
-#define ADC_CONFIG {             \
-    {GPIO_PIN(PORT_A, 0), 0, 0}, \
-    {GPIO_PIN(PORT_A, 1), 0, 1}, \
-    {GPIO_PIN(PORT_A, 4), 0, 4}, \
-    {GPIO_PIN(PORT_B, 0), 0, 8}, \
-    {GPIO_PIN(PORT_C, 1), 0, 11}, \
-    {GPIO_PIN(PORT_C, 0), 0, 10}, \
-}
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 0), 0, 0},
+    {GPIO_PIN(PORT_A, 1), 0, 1},
+    {GPIO_PIN(PORT_A, 4), 0, 4},
+    {GPIO_PIN(PORT_B, 0), 0, 8},
+    {GPIO_PIN(PORT_C, 1), 0, 11},
+    {GPIO_PIN(PORT_C, 0), 0, 10},
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

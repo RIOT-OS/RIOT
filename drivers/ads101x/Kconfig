@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_ADS101X
+menuconfig KCONFIG_USEMODULE_ADS101X
     bool "Configure ADS101X driver"
-    depends on MODULE_ADS101X
+    depends on USEMODULE_ADS101X
     help
         Configure the ADS101X driver using Kconfig.
 
-if KCONFIG_MODULE_ADS101X
+if KCONFIG_USEMODULE_ADS101X
 
 config ADS101X_I2C_ADDRESS
     hex "Default I2C address"
@@ -21,4 +21,4 @@ config ADS101X_I2C_ADDRESS
         the state of ADDR Pin. Default value (0x48) corresponds to ADDR pin tied
         to GND. For more information refer I2C Address Selection in Datasheet.
 
-endif # KCONFIG_MODULE_ADS101X
+endif # KCONFIG_USEMODULE_ADS101X

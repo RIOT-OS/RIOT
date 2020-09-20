@@ -82,7 +82,7 @@ void ps(void)
 #endif
 
     printf("\tpid | "
-#ifdef DEVELHELP
+#ifdef CONFIG_THREAD_NAMES
             "%-21s| "
 #endif
             "%-9sQ | pri "
@@ -93,7 +93,7 @@ void ps(void)
            "| runtime  | switches"
 #endif
            "\n",
-#ifdef DEVELHELP
+#ifdef CONFIG_THREAD_NAMES
            "name",
 #endif
            "state");
@@ -115,7 +115,7 @@ void ps(void)
 #ifdef MODULE_SCHEDSTATISTICS
     uint64_t rt_sum = 0;
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
-        thread_t *p = (thread_t *)sched_threads[i];
+        thread_t *p = thread_get(i);
         if (p != NULL) {
             rt_sum += sched_pidlist[i].runtime_ticks;
         }
@@ -123,7 +123,7 @@ void ps(void)
 #endif /* MODULE_SCHEDSTATISTICS */
 
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
-        thread_t *p = (thread_t *)sched_threads[i];
+        thread_t *p = thread_get(i);
 
         if (p != NULL) {
             thread_status_t state = p->status;                                     /* copy state */
@@ -144,7 +144,7 @@ void ps(void)
             unsigned switches = sched_pidlist[i].schedules;
 #endif
             printf("\t%3" PRIkernel_pid
-#ifdef DEVELHELP
+#ifdef CONFIG_THREAD_NAMES
                    " | %-20s"
 #endif
                    " | %-8s %.1s | %3i"
@@ -156,7 +156,7 @@ void ps(void)
 #endif
                    "\n",
                    p->pid,
-#ifdef DEVELHELP
+#ifdef CONFIG_THREAD_NAMES
                    p->name,
 #endif
                    sname, queued, p->priority

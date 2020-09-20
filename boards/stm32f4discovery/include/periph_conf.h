@@ -22,7 +22,6 @@
 
 #include "periph_cpu.h"
 #include "f4/cfg_clock_168_8_0.h"
-#include "cfg_spi_divtable.h"
 #include "cfg_usb_otg_fs.h"
 
 #ifdef __cplusplus
@@ -123,14 +122,14 @@ static const uart_conf_t uart_config[] = {
  * PIN, device (ADCx), channel
  * @{
  */
-#define ADC_CONFIG {              \
-    {GPIO_PIN(PORT_A, 1), 0, 1},  \
-    {GPIO_PIN(PORT_A, 4), 0, 4},  \
-    {GPIO_PIN(PORT_C, 1), 1, 11}, \
-    {GPIO_PIN(PORT_C, 2), 1, 12}  \
-}
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 1), 0, 1},
+    {GPIO_PIN(PORT_A, 4), 0, 4},
+    {GPIO_PIN(PORT_C, 1), 1, 11},
+    {GPIO_PIN(PORT_C, 2), 1, 12}
+};
 
-#define ADC_NUMOF           (4)
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 /**

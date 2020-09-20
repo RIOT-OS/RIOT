@@ -11,6 +11,15 @@ INCLUDES += -I$(PKG_BUILDDIR)
 # Mandatory for tinyDTLS
 CFLAGS += -DDTLSv12 -DWITH_SHA256
 
+# Check that the used PRNG implementation is cryptographically secure
+CRYPTO_SECURE_IMPLEMENTATIONS := prng_sha256prng prng_sha1prng prng_hwrng
+USED_PRNG_IMPLEMENTATIONS := $(filter prng_%,$(USEMODULE))
+ifeq (,$(filter $(CRYPTO_SECURE_IMPLEMENTATIONS),$(USEMODULE)))
+  $(info TinyDTLS needs a cryptographically secure implementation of the PRNG module.)
+  $(info Currently using: $(USED_PRNG_IMPLEMENTATIONS))
+  $(error Please use one of: $(CRYPTO_SECURE_IMPLEMENTATIONS))
+endif
+
 # Dependencies partially under control of the App's requirements
 
 # The configuration for socket overrides Sock

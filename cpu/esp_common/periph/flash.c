@@ -58,8 +58,8 @@
 /* the external pointer to the system MTD device */
 mtd_dev_t* mtd0 = 0;
 
-mtd_dev_t  _flash_dev;
-mtd_desc_t _flash_driver;
+static mtd_dev_t  _flash_dev;
+static mtd_desc_t _flash_driver;
 
 #ifdef MCU_ESP8266
 
@@ -77,6 +77,8 @@ extern uint32_t spi_flash_get_id(void);
 static int _flash_init  (mtd_dev_t *dev);
 static int _flash_read  (mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size);
 static int _flash_write (mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size);
+static int _flash_write_page (mtd_dev_t *dev, const void *buff, uint32_t page,
+                              uint32_t offset, uint32_t size);
 static int _flash_erase (mtd_dev_t *dev, uint32_t addr, uint32_t size);
 static int _flash_power (mtd_dev_t *dev, enum mtd_power_state power);
 
@@ -120,6 +122,7 @@ void spi_flash_drive_init (void)
     _flash_driver.init  = &_flash_init;
     _flash_driver.read  = &_flash_read;
     _flash_driver.write = &_flash_write;
+    _flash_driver.write_page = &_flash_write_page;
     _flash_driver.erase = &_flash_erase;
     _flash_driver.power = &_flash_power;
 
@@ -526,6 +529,16 @@ static int _flash_write (mtd_dev_t *dev, const void *buff, uint32_t addr, uint32
     CHECK_PARAM_RET ((addr % _flashchip->page_size) + size <= _flashchip->page_size, -EOVERFLOW);
 
     return (spi_flash_write(_flash_beg + addr, buff, size) == ESP_OK) ? 0 : -EIO;
+}
+
+static int _flash_write_page (mtd_dev_t *dev, const void *buff, uint32_t page,  uint32_t offset,
+                              uint32_t size)
+{
+    uint32_t addr = _flash_beg + page * _flashchip->page_size + offset;
+    uint32_t remaining = _flashchip->page_size - offset;
+    size = MIN(size, remaining);
+
+    return (spi_flash_write(addr, buff, size) == ESP_OK) ? (int) size : -EIO;
 }
 
 static int _flash_erase (mtd_dev_t *dev, uint32_t addr, uint32_t size)

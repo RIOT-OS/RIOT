@@ -1,4 +1,10 @@
 [![Nightly CI status master][master-ci-badge]][master-ci-link]
+[![GitHub release][release-badge]][release-link]
+[![License][license-badge]][license-link]
+[![API docs][api-badge]][api-link]
+[![Wiki][wiki-badge]][wiki-link]
+[![Stack Overflow questions][stackoverflow-badge]][stackoverflow-link]
+[![Twitter][twitter-badge]][twitter-link]
 [![IRC][irc-badge]][irc-link]
 [![Matrix][matrix-badge]][matrix-link]
 
@@ -100,15 +106,10 @@ To contribute something to RIOT, please refer to our
 [contributing document](CONTRIBUTING.md).
 
 ## MAILING LISTS
-* RIOT OS kernel developers list
- * devel@riot-os.org (https://lists.riot-os.org/mailman/listinfo/devel)
-* RIOT OS users list
- * users@riot-os.org (https://lists.riot-os.org/mailman/listinfo/users)
-* RIOT commits
- * commits@riot-os.org (https://lists.riot-os.org/mailman/listinfo/commits)
-* Github notifications
- * notifications@riot-os.org
-   (https://lists.riot-os.org/mailman/listinfo/notifications)
+* RIOT OS kernel developers list: [devel@riot-os.org](https://lists.riot-os.org/mailman/listinfo/devel)
+* RIOT OS users list: [users@riot-os.org](https://lists.riot-os.org/mailman/listinfo/users)
+* RIOT commits: [commits@riot-os.org](https://lists.riot-os.org/mailman/listinfo/commits)
+* Github notifications: [notifications@riot-os.org](https://lists.riot-os.org/mailman/listinfo/notifications)
 
 ## LICENSE
 * Most of the code developed by the RIOT community is licensed under the GNU
@@ -124,9 +125,21 @@ For more information, see the RIOT website:
 https://www.riot-os.org
 
 
+[api-badge]: https://img.shields.io/badge/docs-API-informational.svg
+[api-link]: https://riot-os.org/api/
+[irc-badge]: https://img.shields.io/badge/chat-IRC-brightgreen.svg
+[irc-link]: https://webchat.freenode.net?channels=%23riot-os
+[license-badge]: https://img.shields.io/github/license/RIOT-OS/RIOT
+[license-link]: https://github.com/RIOT-OS/RIOT/blob/master/LICENSE
 [master-ci-badge]: https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/badge.svg
 [master-ci-link]: https://ci.riot-os.org/nightlies.html#master
-[irc-badge]: https://img.shields.io/badge/IRC-join%20chat%20%E2%86%92-blue.svg
-[irc-link]: https://webchat.freenode.net?channels=%23riot-os
-[matrix-badge]: https://img.shields.io/badge/Matrix-join%20chat%20%E2%86%92-blue.svg
+[matrix-badge]: https://img.shields.io/badge/chat-Matrix-brightgreen.svg
 [matrix-link]: https://matrix.to/#/#riot-os:matrix.org
+[release-badge]: https://img.shields.io/github/release/RIOT-OS/RIOT.svg
+[release-link]: https://github.com/RIOT-OS/RIOT/releases/latest
+[stackoverflow-badge]: https://img.shields.io/badge/stackoverflow-%5Briot--os%5D-yellow
+[stackoverflow-link]: https://stackoverflow.com/questions/tagged/riot-os
+[twitter-badge]: https://img.shields.io/badge/social-Twitter-informational.svg
+[twitter-link]: https://twitter.com/RIOT_OS
+[wiki-badge]: https://img.shields.io/badge/docs-Wiki-informational.svg
+[wiki-link]: https://github.com/RIOT-OS/RIOT/wiki

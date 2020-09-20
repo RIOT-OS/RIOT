@@ -1,7 +1,7 @@
-From c24730d5265dd487ae0f61612f67753ff89b3246 Mon Sep 17 00:00:00 2001
+From ede0403eb8774674e2194d30f573fa31b07b9d8a Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Fri, 27 Mar 2020 10:18:16 +0100
-Subject: [PATCH 07/10] openstack/openapps: add debugging
+Subject: [PATCH 7/9] openstack/openapps: add debugging
 
 Debugging info that can be also be obtained through ifconfig in
 tests/openwsn.
@@ -14,7 +14,7 @@ tests/openwsn.
  5 files changed, 24 insertions(+), 3 deletions(-)
 
 diff --git a/kernel/openos/scheduler.c b/kernel/openos/scheduler.c
-index 28bfe5c2..b7c74814 100644
+index 41be092f..b9eec910 100644
 --- a/kernel/openos/scheduler.c
 +++ b/kernel/openos/scheduler.c
 @@ -13,6 +13,8 @@
@@ -26,7 +26,7 @@ index 28bfe5c2..b7c74814 100644
  #define OPENWSN_SCHEDULER_FLAG    (1u << 8)
  
  //=========================== variables =======================================
-@@ -87,7 +89,7 @@ void scheduler_push_task(task_cbt cb, task_prio_t prio) {
+@@ -94,7 +96,7 @@ void scheduler_push_task(task_cbt cb, task_prio_t prio) {
      }
      if (taskContainer>&scheduler_vars.taskBuf[TASK_LIST_DEPTH-1]) {
         // task list has overflown. This should never happpen!
@@ -36,7 +36,7 @@ index 28bfe5c2..b7c74814 100644
         // blink the error LED
         leds_error_blink();
 diff --git a/openapps/cjoin/cjoin.c b/openapps/cjoin/cjoin.c
-index e155717b..6527c5ee 100644
+index 1e040dee..6431cbf7 100644
 --- a/openapps/cjoin/cjoin.c
 +++ b/openapps/cjoin/cjoin.c
 @@ -22,6 +22,8 @@
@@ -86,7 +86,7 @@ index e155717b..6527c5ee 100644
      outcome = coap_send(
              pkt,
 diff --git a/openstack/02a-MAClow/IEEE802154E.c b/openstack/02a-MAClow/IEEE802154E.c
-index 70017ab7..09e0851d 100644
+index 76e7ee56..83de4296 100644
 --- a/openstack/02a-MAClow/IEEE802154E.c
 +++ b/openstack/02a-MAClow/IEEE802154E.c
 @@ -19,6 +19,8 @@
@@ -115,7 +115,7 @@ index 70017ab7..09e0851d 100644
  
              // log the error
 diff --git a/openstack/02b-MAChigh/neighbors.c b/openstack/02b-MAChigh/neighbors.c
-index eff3bb34..c379538d 100644
+index f104aad5..50fc87c0 100644
 --- a/openstack/02b-MAChigh/neighbors.c
 +++ b/openstack/02b-MAChigh/neighbors.c
 @@ -8,6 +8,8 @@
@@ -145,7 +145,7 @@ index eff3bb34..c379538d 100644
      neighbors_vars.neighbors[neighborIndex].parentPreference = 0;
      neighbors_vars.neighbors[neighborIndex].stableNeighbor = FALSE;
 diff --git a/openstack/03b-IPv6/icmpv6rpl.c b/openstack/03b-IPv6/icmpv6rpl.c
-index 21bc54ac..e7e911ba 100644
+index efed533a..3ebf1ec3 100644
 --- a/openstack/03b-IPv6/icmpv6rpl.c
 +++ b/openstack/03b-IPv6/icmpv6rpl.c
 @@ -14,6 +14,8 @@
@@ -174,5 +174,5 @@ index 21bc54ac..e7e911ba 100644
      if (idmanager_getIsDAGroot() == TRUE) {
          icmpv6rpl_vars.myDAGrank = MINHOPRANKINCREASE;
 -- 
-2.27.0
+2.28.0
 

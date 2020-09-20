@@ -127,7 +127,7 @@ void bootloader(void)
     /* cpu specific setup of clocks, peripherals */
     cpu_init();
 
-#ifdef MODULE_NEWLIB
+#if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     extern void __libc_init_array(void);
     __libc_init_array();
 #endif

@@ -258,7 +258,7 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
         while (err_report.type != GNRC_NETERR_MSG_TYPE) {
             msg_try_receive(&err_report);
             if (err_report.type != GNRC_NETERR_MSG_TYPE) {
-                msg_try_send(&err_report, sched_active_pid);
+                msg_try_send(&err_report, thread_getpid());
             }
         }
         if (err_report.content.value != last_status) {
@@ -270,7 +270,7 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
                 while (err_report.type != GNRC_NETERR_MSG_TYPE) {
                     msg_try_receive(&err_report);
                     if (err_report.type != GNRC_NETERR_MSG_TYPE) {
-                        msg_try_send(&err_report, sched_active_pid);
+                        msg_try_send(&err_report, thread_getpid());
                     }
                 }
             }

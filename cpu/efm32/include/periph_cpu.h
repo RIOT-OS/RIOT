@@ -20,6 +20,7 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
+#include "kernel_defines.h"
 #include "mutex.h"
 
 #include "cpu_conf.h"
@@ -92,6 +93,11 @@ typedef struct {
  * @brief   Length of CPU ID in octets.
  */
 #define CPUID_LEN           (8U)
+
+/**
+ * @brief   CPU Frequency Define
+ */
+#define CLOCK_CORECLOCK     SystemCoreClock
 
 #if defined(DAC_COUNT) && DAC_COUNT > 0
 /**
@@ -356,28 +362,18 @@ typedef struct {
     timer_dev_t prescaler;  /**< the lower neighboring timer (not initialized for LETIMER) */
     timer_dev_t timer;      /**< the higher numbered timer */
     IRQn_Type irq;          /**< number of the higher timer IRQ channel */
+    uint8_t channel_numof;       /**< number of channels per timer */
 } timer_conf_t;
 /** @} */
 
 
 /**
- * @brief   The implementation can use one LETIMER or two regular timers cascaded
+ * @brief   Use LETIMER as the base timer for XTIMER
  */
-#ifndef EFM32_USE_LETIMER
-#define EFM32_USE_LETIMER   0
+#ifndef CONFIG_EFM32_XTIMER_USE_LETIMER
+#define CONFIG_EFM32_XTIMER_USE_LETIMER   0
 #endif
 
-#ifdef EFM32_USE_LETIMER
-/**
- * @brief   This timer implementation has two available channels
- */
-#define TIMER_CHANNEL_NUMOF     (2)
-#else
-/**
- * @brief   This timer implementation has three available channels
- */
-#define TIMER_CHANNEL_NUMOF     (3)
-#endif
 
 /**
  * @brief   UART device configuration.

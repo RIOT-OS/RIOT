@@ -48,7 +48,7 @@ static void _thread_wake_wo_yield(kernel_pid_t pid)
 {
     unsigned old_state = irq_disable();
 
-    thread_t *other_thread = (thread_t *) thread_get(pid);
+    thread_t *other_thread = thread_get(pid);
 
     sched_set_status(other_thread, STATUS_RUNNING);
 

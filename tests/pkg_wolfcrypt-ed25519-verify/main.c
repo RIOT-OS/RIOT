@@ -49,20 +49,20 @@ int main(void)
     int stat;
     int ret;
     ed25519_key key;
-    LOG(LOG_INFO, "You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
-    LOG(LOG_INFO, "This board features a(n) %s MCU.\n", RIOT_MCU);
+    LOG_INFO("You are running RIOT on a(n) %s board.\n", RIOT_BOARD);
+    LOG_INFO("This board features a(n) %s MCU.\n", RIOT_MCU);
     wc_ed25519_init(&key);
-    LOG(LOG_INFO, "Starting ed25519 test.");
+    LOG_INFO("Starting ed25519 test.\n");
 
     ret = wc_ed25519_import_public(ed_public_key, ED25519_KEY_SIZE, &key);
     if (ret != 0) {
-        LOG(LOG_ERROR, "Error importing public key for signature verification (%d)\n", ret);
+        LOG_ERROR("Error importing public key for signature verification (%d)\n", ret);
         return 1;
     }
     if ((wc_ed25519_verify_msg(msg_signature, ED25519_SIG_SIZE, msg, 12, &stat, &key) < 0) || (stat == 0)) {
-        LOG(LOG_WARNING, "The signature is not valid!\n");
+        LOG_WARNING("The signature is not valid!\n");
     } else {
-        LOG(LOG_INFO, "The signature is valid!\n");
+        LOG_INFO("The signature is valid!\n");
     }
 
     return 0;

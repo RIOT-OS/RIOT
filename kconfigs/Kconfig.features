@@ -143,6 +143,13 @@ config HAS_PERIPH_GPIO_IRQ
         Indicates that the GPIO peripheral supports external interrupts is
         present.
 
+config HAS_PERIPH_GPIO_FAST_READ
+    bool
+    help
+	Indicates that the GPIO peripheral supports a mode in which pin read
+	operations are faster, usually with a tradeoff against a different
+	property.
+
 config HAS_PERIPH_HWRNG
     bool
     help
@@ -179,6 +186,11 @@ config HAS_PERIPH_MCG
     bool
     help
         Indicates that an MCG peripheral is present.
+
+config HAS_PERIPH_PLIC
+    bool
+    help
+        Indicates that a RISC-V Platform-local Interrupt Controller (PLIC) peripheral is present.
 
 config HAS_PERIPH_PM
     bool

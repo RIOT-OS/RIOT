@@ -206,11 +206,9 @@ static inline bool sock_udp_ep_equal(const sock_udp_ep_t *a,
 
 /**
  * @defgroup    net_sock_util_conf SOCK utility functions compile configurations
- * @ingroup     net_sock_util
- * @ingroup     config
+ * @ingroup     net_sock_conf
  * @{
  */
-
 /**
  * @brief maximum length of the scheme part for sock_urlsplit.
  *
@@ -233,7 +231,6 @@ static inline bool sock_udp_ep_equal(const sock_udp_ep_t *a,
 #ifndef CONFIG_SOCK_URLPATH_MAXLEN
 #define CONFIG_SOCK_URLPATH_MAXLEN     (64U)
 #endif
-
 /** @} */
 
 #ifdef __cplusplus

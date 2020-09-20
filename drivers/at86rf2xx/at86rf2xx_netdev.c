@@ -498,17 +498,17 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
     switch (opt) {
         case NETOPT_ADDRESS:
-            assert(len >= sizeof(network_uint16_t));
+            assert(len == sizeof(network_uint16_t));
             at86rf2xx_set_addr_short(dev, val);
             /* don't set res to set netdev_ieee802154_t::short_addr */
             break;
         case NETOPT_ADDRESS_LONG:
-            assert(len >= sizeof(eui64_t));
+            assert(len == sizeof(eui64_t));
             at86rf2xx_set_addr_long(dev, val);
             /* don't set res to set netdev_ieee802154_t::long_addr */
             break;
         case NETOPT_NID:
-            assert(len <= sizeof(uint16_t));
+            assert(len == sizeof(uint16_t));
             at86rf2xx_set_pan(dev, *((const uint16_t *)val));
             /* don't set res to set netdev_ieee802154_t::pan */
             break;
@@ -690,7 +690,7 @@ static void _isr_send_complete(at86rf2xx_t *dev, uint8_t trac_status)
         return;
     }
 /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
-#if AT86RF2XX_HAVE_RETRIES
+#if AT86RF2XX_HAVE_RETRIES && defined(AT86RF2XX_REG__XAH_CTRL_2)
     dev->tx_retries = (at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2)
                        & AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK) >>
                       AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
@@ -820,6 +820,26 @@ static void _isr(netdev_t *netdev)
 }
 
 #if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
+
+/**
+ * @brief ISR for transceiver's TX_START interrupt
+ *
+ * In procedure TX_ARET the TRX24_TX_START interrupt is issued separately for every
+ * frame transmission and frame retransmission.
+ * Indicates the frame start of a transmitted acknowledge frame in procedure RX_AACK.
+ *
+ * Flow Diagram Manual p. 52 / 63
+ */
+#if AT86RF2XX_HAVE_RETRIES
+ISR(TRX24_TX_START_vect){
+    /* __enter_isr(); is not neccessary as there is nothing which causes a
+     * thread_yield and the interrupt can not be interrupted by an other ISR */
+
+    at86rf2xx_t *dev = (at86rf2xx_t *) at86rfmega_dev;
+
+    dev->tx_retries++;
+}
+#endif
 
 /**
  * @brief ISR for transceiver's receive end interrupt

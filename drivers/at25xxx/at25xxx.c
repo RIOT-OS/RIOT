@@ -26,6 +26,7 @@
 #include "at25xxx.h"
 #include "at25xxx_constants.h"
 #include "at25xxx_params.h"
+#include "bitarithm.h"
 #include "byteorder.h"
 
 #include "xtimer.h"
@@ -81,12 +82,14 @@ static inline int _wait_until_eeprom_ready(const at25xxx_t *dev)
     return tries == 0 ? -ETIMEDOUT : 0;
 }
 
-static ssize_t _write_page(const at25xxx_t *dev, uint32_t pos, const void *data, size_t len)
+static int _at25xxx_write_page(const at25xxx_t *dev, uint32_t page, uint32_t offset, const void *data, size_t len)
 {
+    assert(offset < PAGE_SIZE);
+
     /* write no more than to the end of the current page to prevent wrap-around */
-    size_t remaining = PAGE_SIZE - (pos & (PAGE_SIZE - 1));
+    size_t remaining = PAGE_SIZE - offset;
     len = min(len, remaining);
-    pos = _pos(CMD_WRITE, pos);
+    uint32_t pos = _pos(CMD_WRITE, page * PAGE_SIZE + offset);
 
     /* wait for previous write to finish - may take up to 5 ms */
     int res = _wait_until_eeprom_ready(dev);
@@ -111,6 +114,17 @@ static ssize_t _write_page(const at25xxx_t *dev, uint32_t pos, const void *data,
     return len;
 }
 
+int at25xxx_write_page(const at25xxx_t *dev, uint32_t page, uint32_t offset, const void *data, size_t len)
+{
+    int res;
+
+    getbus(dev);
+    res = _at25xxx_write_page(dev, page, offset, data, len);
+    spi_release(dev->params.spi);
+
+    return res;
+}
+
 int at25xxx_write(const at25xxx_t *dev, uint32_t pos, const void *data, size_t len)
 {
     int res = 0;
@@ -120,18 +134,32 @@ int at25xxx_write(const at25xxx_t *dev, uint32_t pos, const void *data, size_t l
         return -ERANGE;
     }
 
+    /* page size is always a power of two */
+    const uint32_t page_shift = bitarithm_msb(PAGE_SIZE);
+    const uint32_t page_mask = PAGE_SIZE - 1;
+
+    uint32_t page   = pos >> page_shift;
+    uint32_t offset = pos & page_mask;
+
     getbus(dev);
 
     while (len) {
-        ssize_t written = _write_page(dev, pos, d, len);
+        ssize_t written = _at25xxx_write_page(dev, page, offset, d, len);
+
         if (written < 0) {
             res = written;
             break;
         }
 
         len -= written;
-        pos += written;
-        d   += written;
+
+        if (len == 0) {
+            break;
+        }
+
+        d      += written;
+        page   += (offset + written) >> page_shift;
+        offset  = (offset + written) & page_mask;
     }
 
     spi_release(dev->params.spi);
@@ -177,7 +205,6 @@ uint8_t at25xxx_read_byte(const at25xxx_t *dev, uint32_t pos)
 int at25xxx_set(const at25xxx_t *dev, uint32_t pos, uint8_t val, size_t len)
 {
     uint8_t data[AT225XXXX_SET_BUF_SIZE];
-    size_t total = 0;
 
     if (pos + len > dev->params.size) {
         return -ERANGE;
@@ -185,13 +212,20 @@ int at25xxx_set(const at25xxx_t *dev, uint32_t pos, uint8_t val, size_t len)
 
     memset(data, val, sizeof(data));
 
+    /* page size is always a power of two */
+    const uint32_t page_shift = bitarithm_msb(PAGE_SIZE);
+    const uint32_t page_mask = PAGE_SIZE - 1;
+
+    uint32_t page   = pos >> page_shift;
+    uint32_t offset = pos & page_mask;
+
     getbus(dev);
 
     while (len) {
-        size_t written = _write_page(dev, pos, data, min(len, sizeof(data)));
-        len   -= written;
-        pos   += written;
-        total += written;
+        size_t written = _at25xxx_write_page(dev, page, offset, data, min(len, sizeof(data)));
+        len    -= written;
+        page   += (offset + written) >> page_shift;
+        offset  = (offset + written) & page_mask;
     }
 
     spi_release(dev->params.spi);
@@ -209,12 +243,12 @@ int at25xxx_init(at25xxx_t *dev, const at25xxx_params_t *params)
     dev->params = *params;
     spi_init_cs(dev->params.spi, dev->params.cs_pin);
 
-    if (dev->params.wp_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.wp_pin)) {
         gpio_init(dev->params.wp_pin, GPIO_OUT);
         gpio_set(dev->params.wp_pin);
     }
 
-    if (dev->params.hold_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(dev->params.hold_pin)) {
         gpio_init(dev->params.hold_pin, GPIO_OUT);
         gpio_set(dev->params.hold_pin);
     }

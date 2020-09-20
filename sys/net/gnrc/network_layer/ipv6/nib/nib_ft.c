@@ -18,6 +18,7 @@
 
 #include "_nib-internal.h"
 
+#include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6/nib/ft.h"
 
 int gnrc_ipv6_nib_ft_get(const ipv6_addr_t *dst, gnrc_pktsnip_t *pkt,
@@ -162,4 +163,4 @@ void gnrc_ipv6_nib_ft_print(const gnrc_ipv6_nib_ft_t *fte)
     printf("dev #%u\n", fte->iface);
 }
 
-/**i @} */
+/** @} */

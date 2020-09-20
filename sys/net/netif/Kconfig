@@ -4,16 +4,16 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-menuconfig KCONFIG_MODULE_NETIF
+menuconfig KCONFIG_USEMODULE_NETIF
     bool "Configure Network Interfaces"
-    depends on MODULE_NETIF
+    depends on USEMODULE_NETIF
     help
         Configure Network Interfaces (NETIF) using Kconfig.
 
-if KCONFIG_MODULE_NETIF
+if KCONFIG_USEMODULE_NETIF
 
 config NETIF_NAMELENMAX
     int "Maximum length for an interface name"
     default 8
 
-endif # KCONFIG_MODULE_NETIF
+endif # KCONFIG_USEMODULE_NETIF

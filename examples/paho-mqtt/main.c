@@ -139,7 +139,7 @@ static int _cmd_con(int argc, char **argv)
 
     data.clientID.cstring = DEFAULT_MQTT_CLIENT_ID;
     if (argc > 3) {
-        data.username.cstring = argv[3];
+        data.clientID.cstring = argv[3];
     }
 
     data.username.cstring = DEFAULT_MQTT_USER;

@@ -1,7 +1,10 @@
 MODULE = cpu
 
 DIRS += periph
-DIRS += vfs
+
+ifneq (,$(filter native_vfs,$(USEMODULE)))
+  DIRS += vfs
+endif
 
 ifeq ($(OS),Darwin)
   CFLAGS += -D_XOPEN_SOURCE=600 -D_DARWIN_C_SOURCE

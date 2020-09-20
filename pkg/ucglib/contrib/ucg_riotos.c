@@ -59,15 +59,15 @@ static void _enable_pins(const ucg_riotos_t *ucg_riot_ptr)
         return;
     }
 
-    if (ucg_riot_ptr->pin_cs != GPIO_UNDEF) {
+    if (gpio_is_valid(ucg_riot_ptr->pin_cs)) {
         gpio_init(ucg_riot_ptr->pin_cs, GPIO_OUT);
     }
 
-    if (ucg_riot_ptr->pin_cd != GPIO_UNDEF) {
+    if (gpio_is_valid(ucg_riot_ptr->pin_cd)) {
         gpio_init(ucg_riot_ptr->pin_cd, GPIO_OUT);
     }
 
-    if (ucg_riot_ptr->pin_reset != GPIO_UNDEF) {
+    if (gpio_is_valid(ucg_riot_ptr->pin_reset)) {
         gpio_init(ucg_riot_ptr->pin_reset, GPIO_OUT);
     }
 }
@@ -100,17 +100,17 @@ int16_t ucg_com_hw_spi_riotos(ucg_t *ucg, int16_t msg, uint16_t arg, uint8_t *da
             xtimer_usleep(arg);
             break;
         case UCG_COM_MSG_CHANGE_RESET_LINE:
-            if (ucg_riot_ptr != NULL &&  ucg_riot_ptr->pin_reset != GPIO_UNDEF) {
+            if (ucg_riot_ptr != NULL && gpio_is_valid(ucg_riot_ptr->pin_reset)) {
                 gpio_write(ucg_riot_ptr->pin_reset, arg);
             }
             break;
         case UCG_COM_MSG_CHANGE_CS_LINE:
-            if (ucg_riot_ptr != NULL &&  ucg_riot_ptr->pin_cs != GPIO_UNDEF) {
+            if (ucg_riot_ptr != NULL && gpio_is_valid(ucg_riot_ptr->pin_cs)) {
                 gpio_write(ucg_riot_ptr->pin_cs, arg);
             }
             break;
         case UCG_COM_MSG_CHANGE_CD_LINE:
-            if (ucg_riot_ptr != NULL &&  ucg_riot_ptr->pin_cd != GPIO_UNDEF) {
+            if (ucg_riot_ptr != NULL && gpio_is_valid(ucg_riot_ptr->pin_cd)) {
                 gpio_write(ucg_riot_ptr->pin_cd, arg);
             }
             break;

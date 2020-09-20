@@ -19,10 +19,10 @@ endif
 
 USEMODULE += inet_csum
 USEMODULE += lwip_netdev
-USEMODULE += lwip_sock_tcp
 USEMODULE += netdev_eth
 USEMODULE += netdev_test
 USEMODULE += ps
+USEMODULE += sock_tcp
 
 DISABLE_MODULE += auto_init_lwip
 

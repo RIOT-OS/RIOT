@@ -20,52 +20,33 @@
 #ifndef PERIPH_CONF_COMMON_H
 #define PERIPH_CONF_COMMON_H
 
+/* iotlab boards provide an LSE */
+#define CLOCK_LSE            (1)
+
+/* HSE is clocked at 16MHz */
+#define CLOCK_HSE            MHZ(16)
+
+/* Adjust PLL predevider to reach 72MHz sysclock */
+#define CLOCK_PLL_PREDIV     (2)
+
 #include "periph_cpu.h"
+#include "f1f3/cfg_clock_default.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-/**
- * @name    Clock settings
- *
- * @note    This is auto-generated from
- *          `cpu/stm32_common/dist/clk_conf/clk_conf.c`
- * @{
- */
-/* give the target core clock (HCLK) frequency [in Hz],
- * maximum: 72MHz */
- #define CLOCK_CORECLOCK      (72000000U)
- /* 0: no external high speed crystal available
-  * else: actual crystal frequency [in Hz] */
- #define CLOCK_HSE            (16000000U)
- /* 0: no external low speed crystal available,
-  * 1: external crystal available (always 32.768kHz) */
- #define CLOCK_LSE            (1)
- /* peripheral clock setup */
- #define CLOCK_AHB_DIV        RCC_CFGR_HPRE_DIV1
- #define CLOCK_AHB            (CLOCK_CORECLOCK / 1)
- #define CLOCK_APB1_DIV       RCC_CFGR_PPRE1_DIV2     /* max 36MHz */
- #define CLOCK_APB1           (CLOCK_CORECLOCK / 2)
- #define CLOCK_APB2_DIV       RCC_CFGR_PPRE2_DIV1     /* max 72MHz */
- #define CLOCK_APB2           (CLOCK_CORECLOCK / 1)
-
- /* PLL factors */
- #define CLOCK_PLL_PREDIV     (2)
- #define CLOCK_PLL_MUL        (9)
- /** @} */
-
 /**
  * @name    ADC configuration
  * @{
  */
-#define ADC_CONFIG          {       \
-    { GPIO_PIN(PORT_A,3), 0, 3  },  \
-    { GPIO_UNDEF        , 0, 16 },  \
-    { GPIO_UNDEF        , 0, 17 } }
+static const adc_conf_t adc_config[] = {
+    { GPIO_PIN(PORT_A,3), 0, 3  },
+    { GPIO_UNDEF        , 0, 16 },
+    { GPIO_UNDEF        , 0, 17 }
+};
 
-#define ADC_NUMOF           (3)
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 /**
@@ -177,29 +158,6 @@ static const i2c_conf_t i2c_config[] = {
 
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
-
-/**
- * @brief   Shared SPI clock div table
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
- */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 36000000Hz */
-        7,  /* -> 140625Hz */
-        6,  /* -> 281250Hz */
-        4,  /* -> 1125000Hz */
-        2,  /* -> 4500000Hz */
-        1   /* -> 9000000Hz */
-    },
-    {       /* for APB2 @ 72000000Hz */
-        7,  /* -> 281250Hz */
-        7,  /* -> 281250Hz */
-        5,  /* -> 1125000Hz */
-        3,  /* -> 4500000Hz */
-        2   /* -> 9000000Hz */
-    }
-};
 
 #ifdef __cplusplus
 }

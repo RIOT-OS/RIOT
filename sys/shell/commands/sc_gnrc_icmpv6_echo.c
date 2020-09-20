@@ -88,7 +88,7 @@ int _gnrc_icmpv6_ping(int argc, char **argv)
 {
     _ping_data_t data = {
         .netreg = GNRC_NETREG_ENTRY_INIT_PID(ICMPV6_ECHO_REP,
-                                                 sched_active_pid),
+                                                 thread_getpid()),
         .count = DEFAULT_COUNT,
         .tmin = UINT_MAX,
         .datalen = DEFAULT_DATALEN,
@@ -121,7 +121,7 @@ int _gnrc_icmpv6_ping(int argc, char **argv)
                 goto finish;
             default:
                 /* requeue wrong packets */
-                msg_send(&msg, sched_active_pid);
+                msg_send(&msg, thread_getpid());
                 break;
         }
     } while (data.num_recv < data.count);
@@ -130,7 +130,7 @@ finish:
     res = _finish(&data);
     gnrc_netreg_unregister(GNRC_NETTYPE_ICMPV6, &data.netreg);
     for (unsigned i = 0;
-         i < cib_avail((cib_t *)&sched_active_thread->msg_queue);
+         i < cib_avail(&thread_get_active()->msg_queue);
          i++) {
         msg_t msg;
 
@@ -142,7 +142,7 @@ finish:
         }
         else {
             /* requeue other packets */
-            msg_send(&msg, sched_active_pid);
+            msg_send(&msg, thread_getpid());
         }
     }
     return res;
@@ -293,7 +293,7 @@ static void _pinger(_ping_data_t *data)
         }
     }
     xtimer_set_msg(&data->sched_timer, timer, &data->sched_msg,
-                   sched_active_pid);
+                   thread_getpid());
     bf_unset(data->cktab, (size_t)data->num_sent % CKTAB_SIZE);
     pkt = gnrc_icmpv6_echo_build(ICMPV6_ECHO_REQ, data->id,
                                  (uint16_t)data->num_sent++,

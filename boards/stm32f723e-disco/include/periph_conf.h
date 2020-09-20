@@ -182,28 +182,8 @@ static const i2c_conf_t i2c_config[] = {
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 54000000Hz */
-        7,  /* -> 210937Hz */
-        6,  /* -> 421875Hz */
-        5,  /* -> 843750Hz */
-        3,  /* -> 3375000Hz */
-        2   /* -> 6750000Hz */
-    },
-    {       /* for APB2 @ 108000000Hz */
-        7,  /* -> 421875Hz */
-        7,  /* -> 421875Hz */
-        6,  /* -> 843750Hz */
-        4,  /* -> 3375000Hz */
-        3   /* -> 6750000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     { /* Arduino connector */
         .dev      = SPI1,

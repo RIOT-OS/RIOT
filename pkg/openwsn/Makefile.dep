@@ -12,6 +12,7 @@ ifneq (,$(filter openwsn_openstack,$(USEMODULE)))
 
   USEMODULE += openwsn_openweb
   USEMODULE += openwsn_openapps
+  USEMODULE += openwsn_scheduler
 
   DEFAULT_MODULE += auto_init_openwsn
 
@@ -19,12 +20,24 @@ ifneq (,$(filter openwsn_openstack,$(USEMODULE)))
   USEMODULE += netdev_default
 endif
 
-ifneq (,$(filter openwsn_ipv6,$(USEMODULE)))
-  DEFAULT_MODULE += openwsn_icmpv6_echo
+ifneq (,$(filter openwsn_scheduler,$(USEMODULE)))
+  ifeq (,$(filter openwsn_openos,$(USEMODULE)))
+    USEMODULE += openwsn_riotos
+  endif
 endif
 
-ifneq (,$(filter openwsn_scheduler,$(USEMODULE)))
+ifneq (,$(filter openwsn_openos,$(USEMODULE)))
   USEMODULE += core_thread_flags
+endif
+
+ifneq (,$(filter openwsn_riotos,$(USEMODULE)))
+  USEMODULE += event
+  USEMODULE += event_callback
+  USEMODULE += memarray
+endif
+
+ifneq (,$(filter openwsn_ipv6,$(USEMODULE)))
+  DEFAULT_MODULE += openwsn_icmpv6_echo
 endif
 
 ifneq (,$(filter openwsn_cjoin,$(USEMODULE)))

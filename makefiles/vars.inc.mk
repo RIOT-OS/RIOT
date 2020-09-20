@@ -64,14 +64,13 @@ export CXXUWFLAGS            # (Patterns of) flags in CFLAGS that should not be 
 export CXXEXFLAGS            # Additional flags that should be passed to CXX.
 export CCASUWFLAGS           # (Patterns of) flags in CFLAGS that should not be passed to CCAS.
 export CCASEXFLAGS           # Additional flags that should be passed to CCAS.
-export AR                    # The command to create the object file archives.
-export ARFLAGS               # Command-line options to pass to AR, default `rcs`.
 export AS                    # The assembler.
 export ASFLAGS               # Flags for the assembler.
 export LINK                  # The command used to link the files. Must take the same parameters as GCC, i.e. "ld" won't work.
 export NM                    # The command used to list symbols from objet files
 export RANLIB                # The command used to generate an index to the contents of an archive
 # LINKFLAGS                  # Flags to supply in the linking step.
+export ARCHIVES              # List of archives to add in the linking step
 export LTOFLAGS              # extra CFLAGS for compiling with link time optimization
 export OBJCOPY               # The command used to create the HEXFILE and BINFILE.
 export OFLAGS                # The parameter for OBJCOPY, e.g. to strip the debug information.

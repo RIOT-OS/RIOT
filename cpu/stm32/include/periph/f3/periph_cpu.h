@@ -23,6 +23,24 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Available number of ADC devices
+ */
+#if defined(ADC4)
+#define ADC_DEVS            (4U)
+#elif defined(ADC3)
+#define ADC_DEVS            (3U)
+#elif defined(ADC2)
+#define ADC_DEVS            (2U)
+#elif defined(ADC1)
+#define ADC_DEVS            (1U)
+#endif
+
+/**
+ * @brief   ADC voltage regulator start-up time [us]
+ */
+#define ADC_T_ADCVREG_STUP_US (10)
+
 #ifndef DOXYGEN
 
 /**
@@ -31,6 +49,20 @@ extern "C" {
  */
 #define STM32_BOOTLOADER_ADDR   (0x1FFFD800)
 
+/**
+ * @brief   Override ADC resolution values
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = (ADC_CFGR_RES),   /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = (ADC_CFGR_RES_1), /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = (ADC_CFGR_RES_0), /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = (0x0),            /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = (0x1),            /**< not applicable */
+    ADC_RES_16BIT = (0x2)             /**< not applicable */
+} adc_res_t;
+/** @} */
 #endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus

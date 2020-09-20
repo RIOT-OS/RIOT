@@ -22,11 +22,20 @@
 #include <stdint.h>
 
 #include "board.h"
-#include "test_utils/expect.h"
-
+#include "macros/units.h"
 #include "mutex.h"
 #include "periph/timer.h"
-#include "xtimer.h"
+#include "test_utils/expect.h"
+
+/* recreate logic to obtain valid XTIMER_DEV used in xtimer.h, but don't include
+ * xtimer.h, as this leads to issues on some boards when the xtimer module is
+ * not used */
+#ifndef XTIMER_DEV
+#define XTIMER_DEV  TIMER_DEV(0)
+#endif
+#ifndef XTIMER_HZ
+#define XTIMER_HZ   MHZ(1)
+#endif
 
 /* We use the timer used for xtimer with the frequency used by xtimer here
  * to make sure we have a known valid timer configuration.
@@ -37,11 +46,16 @@
  * as xtimer is not used in this test, we can use it and the fact that every board
  * provides a configuration for it.
  */
-#define TIMER_CYCL  XTIMER_DEV
-#define CYCLE_MS    25UL
-#define CYCLES_MAX   10
+#define TIMER_CYCL      (XTIMER_DEV)
+#define CYCLE_MS        (25UL)
+#define CYCLES_MAX      (10)
+#ifdef TIMER_CHANNEL_NUMOF
+#define MAX_CHANNELS    (TIMER_CHANNEL_NUMOF)
+#else
+#define MAX_CHANNELS    (10)
+#endif
 
-static unsigned count[TIMER_CHANNEL_NUMOF];
+static unsigned count[MAX_CHANNELS];
 
 static void cb(void *arg, int chan)
 {
@@ -85,7 +99,13 @@ int main(void)
 
     /* Only the first channel should trigger and reset the counter */
     /* If subsequent channels trigger this is an error. */
-    timer_set_periodic(TIMER_CYCL, 1, 2 * steps, TIM_FLAG_RESET_ON_SET);
+    unsigned channel_numof = 1;
+    for(unsigned i = 1; i < MAX_CHANNELS; i++) {
+        if(!timer_set_periodic(TIMER_CYCL, i, (1 + i) * steps, TIM_FLAG_RESET_ON_SET)) {
+            channel_numof = i;
+            break;
+        }
+    }
     timer_set_periodic(TIMER_CYCL, 0, steps, TIM_FLAG_RESET_ON_MATCH);
 
     mutex_lock(&lock);
@@ -93,7 +113,7 @@ int main(void)
     puts("\nCycles:");
 
     bool succeeded = true;
-    for (unsigned i = 0; i < TIMER_CHANNEL_NUMOF; ++i) {
+    for (unsigned i = 0; i < channel_numof; ++i) {
         printf("channel %u = %02u\t[%s]\n", i, count[i], _print_ok(i, &succeeded));
     }
 

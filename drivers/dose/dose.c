@@ -21,12 +21,11 @@
 #include <string.h>
 
 #include "dose.h"
-#include "luid.h"
 #include "random.h"
 #include "irq.h"
 
+#include "net/eui_provider.h"
 #include "net/netdev/eth.h"
-#include "net/eui64.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -49,7 +48,6 @@ static int _send(netdev_t *dev, const iolist_t *iolist);
 static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len);
 static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t len);
 static int _init(netdev_t *dev);
-void dose_setup(dose_t *ctx, const dose_params_t *params);
 
 static uint16_t crc16_update(uint16_t crc, uint8_t octet)
 {
@@ -74,7 +72,7 @@ static dose_signal_t state_transit_blocked(dose_t *ctx, dose_signal_t signal)
         netdev_trigger_event_isr((netdev_t *) ctx);
     }
 
-    if (ctx->sense_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(ctx->sense_pin)) {
         /* Enable GPIO interrupt for start bit sensing */
         gpio_irq_enable(ctx->sense_pin);
     }
@@ -108,7 +106,7 @@ static dose_signal_t state_transit_recv(dose_t *ctx, dose_signal_t signal)
 {
     dose_signal_t rc = DOSE_SIGNAL_NONE;
 
-    if (ctx->state != DOSE_STATE_RECV && ctx->sense_pin != GPIO_UNDEF) {
+    if (ctx->state != DOSE_STATE_RECV && gpio_is_valid(ctx->sense_pin)) {
         /* We freshly entered this state. Thus, no start bit sensing is required
          * anymore. Disable GPIO IRQs during the transmission. */
         gpio_irq_disable(ctx->sense_pin);
@@ -150,7 +148,7 @@ static dose_signal_t state_transit_send(dose_t *ctx, dose_signal_t signal)
 {
     (void) signal;
 
-    if (ctx->state != DOSE_STATE_SEND && ctx->sense_pin != GPIO_UNDEF) {
+    if (ctx->state != DOSE_STATE_SEND && gpio_is_valid(ctx->sense_pin)) {
         /* Disable GPIO IRQs during the transmission. */
         gpio_irq_disable(ctx->sense_pin);
     }
@@ -540,7 +538,7 @@ static const netdev_driver_t netdev_driver_dose = {
     .set = _set
 };
 
-void dose_setup(dose_t *ctx, const dose_params_t *params)
+void dose_setup(dose_t *ctx, const dose_params_t *params, uint8_t index)
 {
     static const xtimer_ticks32_t min_timeout = {.ticks32 = XTIMER_BACKOFF};
 
@@ -552,13 +550,15 @@ void dose_setup(dose_t *ctx, const dose_params_t *params)
     uart_init(ctx->uart, params->baudrate, _isr_uart, (void *) ctx);
 
     ctx->sense_pin = params->sense_pin;
-    if (ctx->sense_pin != GPIO_UNDEF) {
+    if (gpio_is_valid(ctx->sense_pin)) {
         gpio_init_int(ctx->sense_pin, GPIO_IN, GPIO_FALLING, _isr_gpio, (void *) ctx);
         gpio_irq_disable(ctx->sense_pin);
     }
 
+    netdev_register(&ctx->netdev, NETDEV_DOSE, index);
+
     assert(sizeof(ctx->mac_addr.uint8) == ETHERNET_ADDR_LEN);
-    luid_get_eui48(&ctx->mac_addr);
+    netdev_eui48_get(&ctx->netdev, &ctx->mac_addr);
     DEBUG("dose dose_setup(): mac addr %02x:%02x:%02x:%02x:%02x:%02x\n",
           ctx->mac_addr.uint8[0], ctx->mac_addr.uint8[1], ctx->mac_addr.uint8[2],
           ctx->mac_addr.uint8[3], ctx->mac_addr.uint8[4], ctx->mac_addr.uint8[5]

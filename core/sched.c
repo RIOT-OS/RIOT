@@ -40,6 +40,10 @@
 #include <inttypes.h>
 #endif
 
+#ifdef PICOLIBC_TLS
+#include <picotls.h>
+#endif
+
 /* Needed by OpenOCD to read sched_threads */
 #if defined(__APPLE__) && defined(__MACH__)
  #define FORCE_USED_SECTION __attribute__((used)) __attribute__((section( \
@@ -79,6 +83,40 @@ static void (*sched_cb) (kernel_pid_t active_thread,
                          kernel_pid_t next_thread) = NULL;
 #endif
 
+/* Depending on whether the CLZ instruction is available, the order of the
+ * runqueue_bitcache is reversed. When the instruction is available, it is
+ * faster to determine the MSBit set. When it is not available it is faster to
+ * determine the LSBit set. These functions abstract the runqueue modifications
+ * and readout away, switching between the two orders depending on the CLZ
+ * instruction availability
+ */
+static inline void _set_runqueue_bit(thread_t *process)
+{
+#if defined(BITARITHM_HAS_CLZ)
+    runqueue_bitcache |= BIT31 >> process->priority;
+#else
+    runqueue_bitcache |= 1 << process->priority;
+#endif
+}
+
+static inline void _clear_runqueue_bit(thread_t *process)
+{
+#if defined(BITARITHM_HAS_CLZ)
+    runqueue_bitcache &= ~(BIT31 >> process->priority);
+#else
+    runqueue_bitcache &= ~(1 << process->priority);
+#endif
+}
+
+static inline unsigned _get_prio_queue_from_runqueue(void)
+{
+#if defined(BITARITHM_HAS_CLZ)
+    return 31 - bitarithm_msb(runqueue_bitcache);
+#else
+    return bitarithm_lsb(runqueue_bitcache);
+#endif
+}
+
 static void _unschedule(thread_t *active_thread)
 {
     if (active_thread->status == STATUS_RUNNING) {
@@ -100,26 +138,25 @@ static void _unschedule(thread_t *active_thread)
 #endif
 }
 
-int __attribute__((used)) sched_run(void)
+thread_t *__attribute__((used)) sched_run(void)
 {
     thread_t *active_thread = thread_get_active();
+    thread_t *previous_thread = active_thread;
 
-    if (!IS_USED(MODULE_CORE_IDLE_THREAD)) {
-        if (!runqueue_bitcache) {
-            if (active_thread) {
-                _unschedule(active_thread);
-                active_thread = NULL;
-            }
-
-            do {
-                sched_arch_idle();
-            } while (!runqueue_bitcache);
+    if (!IS_USED(MODULE_CORE_IDLE_THREAD) && !runqueue_bitcache) {
+        if (active_thread) {
+            _unschedule(active_thread);
+            active_thread = NULL;
         }
+
+        do {
+            sched_arch_idle();
+        } while (!runqueue_bitcache);
     }
 
     sched_context_switch_request = 0;
 
-    int nextrq = bitarithm_lsb(runqueue_bitcache);
+    unsigned nextrq = _get_prio_queue_from_runqueue();
     thread_t *next_thread = container_of(sched_runqueues[nextrq].next->next,
                                          thread_t, rq_entry);
 
@@ -130,38 +167,51 @@ int __attribute__((used)) sched_run(void)
                        : active_thread->pid),
         next_thread->pid);
 
-    if (active_thread == next_thread) {
-        DEBUG("sched_run: done, sched_active_thread was not changed.\n");
-        return 0;
-    }
+    next_thread->status = STATUS_RUNNING;
 
-    if (active_thread) {
-        _unschedule(active_thread);
+    if (previous_thread == next_thread) {
+#ifdef MODULE_SCHED_CB
+        /* Call the sched callback again only if the active thread is NULL. When
+         * active_thread is NULL, there was a sleep in between descheduling the
+         * previous thread and scheduling the new thread. Call the callback here
+         * again ensures that the time sleeping doesn't count as running the
+         * previous thread
+         */
+        if (sched_cb && !active_thread) {
+            sched_cb(KERNEL_PID_UNDEF, next_thread->pid);
+        }
+#endif
+        DEBUG("sched_run: done, sched_active_thread was not changed.\n");
     }
+    else {
+        if (active_thread) {
+            _unschedule(active_thread);
+        }
+
+        sched_active_pid = next_thread->pid;
+        sched_active_thread = next_thread;
 
 #ifdef MODULE_SCHED_CB
-    if (sched_cb) {
-        sched_cb(KERNEL_PID_UNDEF, next_thread->pid);
-    }
+        if (sched_cb) {
+            sched_cb(KERNEL_PID_UNDEF, next_thread->pid);
+        }
 #endif
 
-    next_thread->status = STATUS_RUNNING;
-    sched_active_pid = next_thread->pid;
-    sched_active_thread = next_thread;
+#ifdef PICOLIBC_TLS
+        _set_tls(next_thread->tls);
+#endif
 
 #ifdef MODULE_MPU_STACK_GUARD
-    mpu_configure(
-        2,                                                  /* MPU region 2 */
-        (uintptr_t)sched_active_thread->stack_start + 31,   /* Base Address (rounded up) */
-        MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B)     /* Attributes and Size */
-        );
-
-    mpu_enable();
+        mpu_configure(
+            2,                                              /* MPU region 2 */
+            (uintptr_t)next_thread->stack_start + 31,       /* Base Address (rounded up) */
+            MPU_ATTR(1, AP_RO_RO, 0, 1, 0, 1, MPU_SIZE_32B) /* Attributes and Size */
+            );
 #endif
+        DEBUG("sched_run: done, changed sched_active_thread.\n");
+    }
 
-    DEBUG("sched_run: done, changed sched_active_thread.\n");
-
-    return 1;
+    return next_thread;
 }
 
 void sched_set_status(thread_t *process, thread_status_t status)
@@ -173,7 +223,7 @@ void sched_set_status(thread_t *process, thread_status_t status)
                 process->pid, process->priority);
             clist_rpush(&sched_runqueues[process->priority],
                         &(process->rq_entry));
-            runqueue_bitcache |= 1 << process->priority;
+            _set_runqueue_bit(process);
         }
     }
     else {
@@ -184,7 +234,7 @@ void sched_set_status(thread_t *process, thread_status_t status)
             clist_lpop(&sched_runqueues[process->priority]);
 
             if (!sched_runqueues[process->priority].next) {
-                runqueue_bitcache &= ~(1 << process->priority);
+                _clear_runqueue_bit(process);
             }
         }
     }

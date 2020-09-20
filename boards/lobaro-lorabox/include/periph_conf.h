@@ -24,52 +24,20 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/*
+ * This board provides an LSE, so enable it before including the default clock config
+ */
+#ifndef CLOCK_LSE
+#define CLOCK_LSE           (1)
+#endif
+
 #include "periph_cpu.h"
+#include "l1/cfg_clock_default.h"
 #include "cfg_timer_tim2.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-/**
- * @name    xtimer configuration
- * @{
- */
-#define XTIMER_WIDTH        (16)
-#define XTIMER_BACKOFF      (50)
-#define XTIMER_ISR_BACKOFF  (40)
-/** @} */
-
-/**
- * @name Clock system configuration
- * @{
- **/
-#define CLOCK_HSI           (16000000U)             /* frequency of internal oscillator */
-#define CLOCK_CORECLOCK     (32000000U)             /* targeted core clock frequency */
-/*
- * 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz)
- */
-#ifndef CLOCK_LSE
-#define CLOCK_LSE           (1)
-#endif
-/* configuration of PLL prescaler and multiply values */
-/* CORECLOCK := HSI / CLOCK_PLL_DIV * CLOCK_PLL_MUL */
-#define CLOCK_PLL_DIV       RCC_CFGR_PLLDIV2
-#define CLOCK_PLL_MUL       RCC_CFGR_PLLMUL4
-/* configuration of peripheral bus clock prescalers */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1      /* AHB clock -> 32MHz */
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV1     /* APB2 clock -> 32MHz */
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV1     /* APB1 clock -> 32MHz */
-/* configuration of flash access cycles */
-#define CLOCK_FLASH_LATENCY FLASH_ACR_LATENCY
-
-/* bus clocks for simplified peripheral initialization, UPDATE MANUALLY! */
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 1)
-/** @} */
 
 /**
  * @name   UART configuration
@@ -113,28 +81,8 @@ static const uart_conf_t uart_config[] = {
 
 /**
  * @name   SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 32000000Hz */
-        7,  /* -> 125000Hz */
-        5,  /* -> 500000Hz */
-        4,  /* -> 1000000Hz */
-        2,  /* -> 4000000Hz */
-        1   /* -> 8000000Hz */
-    },
-    {       /* for APB2 @ 32000000Hz */
-        7,  /* -> 125000Hz */
-        5,  /* -> 500000Hz */
-        4,  /* -> 1000000Hz */
-        2,  /* -> 4000000Hz */
-        1   /* -> 8000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {
         .dev      = SPI1,

@@ -44,7 +44,7 @@
 /cpu/cortexm_common/                        @haukepetersen @thomaseichinger @DipSwitch
 /cpu/efm32/                                 @basilfx
 /cpu/esp*/                                  @gschorcht
-/cpu/fe310/                                 @aabadie @kaspar030
+/cpu/fe310/                                 @aabadie @kaspar030 @bergzand
 /cpu/kinetis/                               @fjmolinas
 /cpu/lpc2387/                               @benpicco @maribu
 /cpu/mips*/                                 @kaspar030 @francois-berder

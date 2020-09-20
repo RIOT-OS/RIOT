@@ -106,28 +106,8 @@ static const pwm_conf_t pwm_config[] = {
 
 /**
  * @name    SPI configuration
- *
- * @note    The spi_divtable is auto-generated from
- *          `cpu/stm32_common/dist/spi_divtable/spi_divtable.c`
  * @{
  */
-static const uint8_t spi_divtable[2][5] = {
-    {       /* for APB1 @ 48000000Hz */
-        7,  /* -> 187500Hz */
-        6,  /* -> 375000Hz */
-        5,  /* -> 750000Hz */
-        2,  /* -> 6000000Hz */
-        1   /* -> 12000000Hz */
-    },
-    {       /* for APB2 @ 96000000Hz */
-        7,  /* -> 375000Hz */
-        7,  /* -> 375000Hz */
-        6,  /* -> 750000Hz */
-        3,  /* -> 6000000Hz */
-        2   /* -> 12000000Hz */
-    }
-};
-
 static const spi_conf_t spi_config[] = {
     {   /* U3 - SPI flash */
         .dev      = SPI1,
@@ -182,15 +162,14 @@ static const spi_conf_t spi_config[] = {
  *
  * @{
  */
+static const adc_conf_t adc_config[] = {
+    {GPIO_PIN(PORT_A, 0), 0, 0},
+    {GPIO_PIN(PORT_A, 1), 0, 1},
+    {GPIO_PIN(PORT_A, 4), 0, 4},
+    {GPIO_PIN(PORT_B, 0), 0, 8},
+};
 
-#define ADC_CONFIG {             \
-    {GPIO_PIN(PORT_A, 0), 0, 0}, \
-    {GPIO_PIN(PORT_A, 1), 0, 1}, \
-    {GPIO_PIN(PORT_A, 4), 0, 4}, \
-    {GPIO_PIN(PORT_B, 0), 0, 8}, \
-}
-
-#define ADC_NUMOF           (4)
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

@@ -32,15 +32,15 @@ static inline int __attribute__((always_inline)) _thread_flags_wake(thread_t *th
     thread_flags_t mask = (uint16_t)(unsigned)thread->wait_data;
 
     switch (thread->status) {
-        case STATUS_FLAG_BLOCKED_ANY:
-            wakeup = (thread->flags & mask);
-            break;
-        case STATUS_FLAG_BLOCKED_ALL:
-            wakeup = ((thread->flags & mask) == mask);
-            break;
-        default:
-            wakeup = 0;
-            break;
+    case STATUS_FLAG_BLOCKED_ANY:
+        wakeup = (thread->flags & mask);
+        break;
+    case STATUS_FLAG_BLOCKED_ALL:
+        wakeup = ((thread->flags & mask) == mask);
+        break;
+    default:
+        wakeup = 0;
+        break;
     }
 
     if (wakeup) {

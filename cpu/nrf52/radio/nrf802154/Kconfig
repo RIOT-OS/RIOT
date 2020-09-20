@@ -4,13 +4,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-menuconfig KCONFIG_MODULE_NRF802154
+menuconfig KCONFIG_USEMODULE_NRF802154
     bool    "Configure nRF802154"
-    depends on MODULE_NRF802154
+    depends on USEMODULE_NRF802154
     help
         Configure nRF802154 module using Kconfig.
 
-if KCONFIG_MODULE_NRF802154
+if KCONFIG_USEMODULE_NRF802154
 
 config NRF802154_CCA_THRESH_DEFAULT
     hex "Default CCA threshold value"
@@ -19,7 +19,7 @@ config NRF802154_CCA_THRESH_DEFAULT
     help
         Default CCA threshold value for the CCACTRL register.
 
-endif # KCONFIG_MODULE_NRF802154
+endif # KCONFIG_USEMODULE_NRF802154
 
 ## Related features
 config HAS_RADIO_NRF802154

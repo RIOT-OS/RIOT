@@ -997,6 +997,10 @@ void gnrc_rpl_send_DAO(gnrc_rpl_instance_t *inst, ipv6_addr_t *destination, uint
         return;
     }
     idx = gnrc_netif_ipv6_addr_match(netif, &dodag->dodag_id);
+    if (idx < 0) {
+        DEBUG("RPL: no address matching DODAG ID found\n");
+        return;
+    }
     me = &netif->ipv6.addrs[idx];
 
     /* add external and RPL FT entries */

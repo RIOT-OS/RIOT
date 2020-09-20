@@ -16,7 +16,7 @@
  */
 
 #ifndef DOXYGEN
-#if defined(CPU_NATIVE) || MODULE_NEWLIB
+#if defined(CPU_NATIVE) || MODULE_NEWLIB || MODULE_PICOLIBC
 /* If building on native or newlib we need to use the system header instead */
 #pragma GCC system_header
 /* without the GCC pragma above #include_next will trigger a pedantic error */

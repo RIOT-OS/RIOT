@@ -317,6 +317,19 @@ extern "C" {
 /** @} */
 
 /**
+* @brief Maximum preamble attempts before re-initialize radio in LWMAC.
+*
+* After a long period of run time, a radio may be in wrong condition which needs to be
+* re-calibrated. This is indicated by having a series of continuous preamble failure (no WA)
+* in LWMAC. In case we have @ref CONFIG_GNRC_LWMAC_RADIO_REINIT_THRESHOLD number of preamble
+* failure, then we re-initialize the radio, trying to re-calibrate the radio for bringing it
+* back to normal condition.
+*/
+#ifndef CONFIG_GNRC_LWMAC_RADIO_REINIT_THRESHOLD
+#define CONFIG_GNRC_LWMAC_RADIO_REINIT_THRESHOLD     (10U)
+#endif
+
+/**
  * @brief   Creates an IEEE 802.15.4 LWMAC network interface
  *
  * @param[out] netif    The interface. May not be `NULL`.

@@ -31,16 +31,6 @@
 #define MAX_ADC_SPEED           (12000000U)
 
 /**
- * @brief   Load the ADC configuration
- * @{
- */
-#ifdef ADC_CONFIG
-static const adc_conf_t adc_config[] = ADC_CONFIG;
-#else
-static const adc_conf_t adc_config[] = {};
-#endif
-
-/**
  * @brief   Allocate locks for all three available ADC devices
  */
 static mutex_t locks[] = {
