@@ -202,6 +202,18 @@ future changes.
 - The implementation should provide means to execute callbacks in thread
   context
 
+Justification: Real time capable systems require an upper bound for the latency
+a high level timer implementation provides. For most application - if not all -
+it is trivial to get an upper bound for the number of software timers being
+active in parallel. Hence, an *O(f(n))* latency with *n* being the number of
+active software timers makes the real time behavior of a system predictable and
+easy to estimate. In addition, *f(n)* should increase as slowly as possible,
+while not being to strict to rule out reasonable trade-offs e.g. between
+ROM/RAM requirements and latency. An *O(n)* latency is e.g. feasible to
+implement with a sorted linked list and therefore a reasonable lower bar.
+
+```
+
 ## Precision Requirements
 
 - Timer callbacks should never fire prematurely (±1 tick of the underlying
