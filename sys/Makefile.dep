@@ -990,4 +990,9 @@ ifneq (,$(filter ecc_%,$(USEMODULE)))
   USEMODULE += ecc
 endif
 
+ifneq (,$(filter xtimer_mutex_lock_timeout xtimer_rmutex_lock_timeout,$(USEMODULE)))
+  USEMODULE += xtimer
+  USEMODULE += core_mutex_cancel
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
