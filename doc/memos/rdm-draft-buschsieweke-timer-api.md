@@ -1,6 +1,8 @@
 - RDM: 2
-- Title: RIOT's High Level Timer API
-- Author: TODO: Add authors prior merging
+- Title: High Level Timer API: Survey of Common Features and Requirement Analysis
+- Author: Alexandre Abadie, José Alamos, Emmanuel Baccelli, Marian Buschsieweke,
+          Niels Gandraß, Martine Lenders, Michel Rottleuthner, Kaspar Schleiser,
+          Thomas C. Schmidt, Benjamin Valentin,
 - Status: Active
 - Type: Consensus
 - Created: October 2018
