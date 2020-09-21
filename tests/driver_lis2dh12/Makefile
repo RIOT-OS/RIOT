@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 DRIVER ?= lis2dh12_spi
 
 USEMODULE += fmt
-USEMODULE += xtimer
+USEMODULE += xtimer_mutex_lock_timeout
 USEMODULE += $(DRIVER)
 
 # for using lis2dh12 with interrupt function

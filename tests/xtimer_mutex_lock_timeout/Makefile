@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEMODULE += xtimer
+USEMODULE += xtimer_mutex_lock_timeout
 USEMODULE += shell
 
 #for testing
