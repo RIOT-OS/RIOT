@@ -76,6 +76,8 @@
 
 # Default GDB port, set to 0 to disable, required != 0 for debug and debug-server targets
 : ${GDB_PORT:=3333}
+# Default GDB port core offset
+: ${GDB_PORT_CORE_OFFSET:=0}
 # Default telnet port, set to 0 to disable
 : ${TELNET_PORT:=4444}
 # Default TCL port, set to 0 to disable
@@ -95,7 +97,7 @@
 # Debugger client command, can be used to wrap GDB in a front-end
 : ${DBG:=${GDB}}
 # Default debugger flags,
-: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext :${GDB_PORT}\"}
+: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext :$(( GDB_PORT + GDB_PORT_CORE_OFFSET ))\"}
 # Extra debugger flags, added by the user
 : ${DBG_EXTRA_FLAGS:=}
 # Debugger flags, will be passed to sh -c, remember to escape any quotation signs.
