@@ -990,6 +990,10 @@ ifneq (,$(filter ecc_%,$(USEMODULE)))
   USEMODULE += ecc
 endif
 
+ifneq (,$(filter sema,$(USEMODULE)))
+  USEMODULE += xtimer_mutex_lock_timeout
+endif
+
 ifneq (,$(filter xtimer_mutex_lock_timeout xtimer_rmutex_lock_timeout,$(USEMODULE)))
   USEMODULE += xtimer
   USEMODULE += core_mutex_cancel
