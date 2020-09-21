@@ -61,18 +61,13 @@ endif # BUILD_IN_DOCKER
 CFLAGS += -DCPU_MODEL_$(call uppercase_and_underscore,$(CPU_MODEL))
 CFLAGS += -DCPU_CORE_$(call uppercase_and_underscore,$(CPU_CORE))
 
-# Add corresponding FPU CFLAGS
-# clang assumes there is an FPU, no CFLAGS necessary
-ifneq (llvm, $(TOOLCHAIN))
-  ifeq ($(CPU_CORE),cortex-m7)
-    _CORTEX_HW_FPU_CFLAGS = -mfloat-abi=hard -mfpu=fpv5-sp-d16
-  else
-    _CORTEX_HW_FPU_CFLAGS = -mfloat-abi=hard -mfpu=fpv4-sp-d16
-  endif
-endif
 # Add soft or hard FPU CFLAGS depending on the module
 ifneq (,$(filter cortexm_fpu,$(USEMODULE)))
-  CFLAGS_FPU ?= $(_CORTEX_HW_FPU_CFLAGS)
+  ifeq ($(CPU_CORE),cortex-m7)
+    CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv5-sp-d16
+  else
+    CFLAGS_FPU ?= -mfloat-abi=hard -mfpu=fpv4-sp-d16
+  endif
 else
   CFLAGS_FPU ?= -mfloat-abi=soft
 endif
