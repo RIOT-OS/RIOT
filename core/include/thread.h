@@ -165,9 +165,10 @@ struct _thread {
     clist_node_t rq_entry;          /**< run queue entry                */
 
 #if defined(MODULE_CORE_MSG) || defined(MODULE_CORE_THREAD_FLAGS) \
-    || defined(MODULE_CORE_MBOX) || defined(DOXYGEN)
-    void *wait_data;                /**< used by msg, mbox and thread
-                                         flags                          */
+    || defined(MODULE_CORE_MBOX) || defined(MODULE_CORE_MUTEX_CANCEL) \
+    || defined(DOXYGEN)
+    void *wait_data;                /**< used by msg, mbox, thread flags,
+                                     *   and mutex_cancel */
 #endif
 #if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
     list_node_t msg_waiters;        /**< threads waiting for their message

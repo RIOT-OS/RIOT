@@ -25,7 +25,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "irq.h"
+#include "kernel_defines.h"
 #include "list.h"
+#include "thread.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,10 +68,10 @@ typedef struct {
  */
 
 /**
- * @brief Initializes a mutex object.
+ * @brief   Initializes a mutex object.
  * @details For initialization of variables use MUTEX_INIT instead.
  *          Only use the function call for dynamically allocated mutexes.
- * @param[out] mutex    pre-allocated mutex structure, must not be NULL.
+ * @param[out]      mutex   pre-allocated mutex structure, must not be NULL.
  */
 static inline void mutex_init(mutex_t *mutex)
 {
@@ -76,61 +79,87 @@ static inline void mutex_init(mutex_t *mutex)
 }
 
 /**
- * @brief Lock a mutex, blocking or non-blocking.
+ * @brief   Tries to get a mutex, non-blocking.
  *
- * @details For commit purposes you should probably use mutex_trylock() and
- *          mutex_lock() instead.
+ * @param[in,out]   mutex   Mutex object to lock.
  *
- * @param[in] mutex         Mutex object to lock. Has to be initialized first.
- *                          Must not be NULL.
- * @param[in] blocking      if true, block until mutex is available.
+ * @retval  1               if mutex was unlocked, now it is locked.
+ * @retval  0               if the mutex was locked.
  *
- * @return 1 if mutex was unlocked, now it is locked.
- * @return 0 if the mutex was locked.
- */
-int _mutex_lock(mutex_t *mutex, volatile uint8_t *blocking);
-
-/**
- * @brief Tries to get a mutex, non-blocking.
- *
- * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not
- *                  be NULL.
- *
- * @return 1 if mutex was unlocked, now it is locked.
- * @return 0 if the mutex was locked.
+ * @pre     @p mutex is not `NULL`
+ * @pre     Mutex at @p mutex has been initialized
+ * @pre     Must be called in thread context
  */
 static inline int mutex_trylock(mutex_t *mutex)
 {
-    volatile uint8_t blocking = 0;
-
-    return _mutex_lock(mutex, &blocking);
+    unsigned irq_state = irq_disable();
+    int retval = 0;
+    if (mutex->queue.next == NULL) {
+        mutex->queue.next = MUTEX_LOCKED;
+        retval = 1;
+    };
+    irq_restore(irq_state);
+    return retval;
 }
 
 /**
- * @brief Locks a mutex, blocking.
+ * @brief   Locks a mutex, blocking.
  *
- * @param[in] mutex Mutex object to lock. Has to be initialized first. Must not be NULL.
+ * @param[in,out]   mutex   Mutex object to lock.
+ *
+ * @retval  0               The mutex was locked by the caller
+ * @retval  -ECANCELED      The mutex was ***NOT*** locked, operation was
+ *                          canceled. See @ref mutex_cancel
+ *
+ * @pre     @p mutex is not `NULL`
+ * @pre     Mutex at @p mutex has been initialized
+ * @pre     Must be called in thread context
+ *
+ * @post    The mutex @p is locked and held by the calling thread, unless
+ *          `-ECANCELED` was returned. This can only occur when
+ *          @ref mutex_cancel is called for the given mutex and the calling
+ *          thread.
  */
-static inline void mutex_lock(mutex_t *mutex)
-{
-    volatile uint8_t blocking = 1;
-
-    _mutex_lock(mutex, &blocking);
-}
+int mutex_lock(mutex_t *mutex);
 
 /**
- * @brief Unlocks the mutex.
+ * @brief   Unlocks the mutex.
  *
- * @param[in] mutex Mutex object to unlock, must not be NULL.
+ * @param[in,out]   mutex   Mutex object to unlock.
+ *
+ * @pre     @p mutex is not `NULL`
+ * @note    It is safe to unlock a mutex held by a different thread.
+ * @note    It is safe to call this function from IRQ context.
  */
 void mutex_unlock(mutex_t *mutex);
 
 /**
- * @brief Unlocks the mutex and sends the current thread to sleep
+ * @brief   Unlocks the mutex and sends the current thread to sleep
  *
- * @param[in] mutex Mutex object to unlock, must not be NULL.
+ * @param[in,out]   mutex   Mutex object to unlock.
+ * @pre     @p mutex is not `NULL`
+ * @pre     Must be called in thread context.
  */
 void mutex_unlock_and_sleep(mutex_t *mutex);
+
+/**
+ * @brief   If @p thread is currently blocked waiting for @p mutex, it will
+ *          be unblocked without obtaining the mutex
+ *
+ * @param[in,out]   mutex   Mutex to perform the cancel action on
+ * @param[in,out]   thread  Thread to remove from the @p mutex 's wait queue
+ *
+ * @note    This function is only provided when module `core_mutex_cancel` is
+ *          used.
+ * @note    It is safe to call this function from IRQ context, e.g. from a timer
+ *          interrupt.
+ *
+ * @details If @p thread is currently running (or pending), a subsequent call
+ *          from @p thread to @ref mutex_lock will also be canceled if @p mutex
+ *          is passed as parameter. This avoids race conditions when @ref
+ *          mutex_cancel get called just before @ref mutex_lock is called.
+ */
+void mutex_cancel(mutex_t *mutex, thread_t *thread);
 
 #ifdef __cplusplus
 }
