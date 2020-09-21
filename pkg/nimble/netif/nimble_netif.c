@@ -62,6 +62,8 @@
 
 /* thread flag used for signaling transmit readiness */
 #define FLAG_TX_UNSTALLED       (1u << 13)
+#define FLAG_TX_NOTCONN         (1u << 12)
+#define FLAG_ALL                (FLAG_TX_UNSTALLED | FLAG_TX_NOTCONN)
 
 /* allocate a stack for the netif device */
 static char _stack[THREAD_STACKSIZE_DEFAULT];
@@ -130,7 +132,11 @@ static int _send_pkt(nimble_netif_conn_t *conn, gnrc_pktsnip_t *pkt)
     do {
         res = ble_l2cap_send(conn->coc, sdu);
         if (res == BLE_HS_EBUSY) {
-            thread_flags_wait_all(FLAG_TX_UNSTALLED);
+            thread_flags_t state = thread_flags_wait_any(FLAG_ALL);
+            /* abort if the active connection was lost in the mean time */
+            if ((state & FLAG_TX_NOTCONN) && !nimble_netif_conn_is_open(conn)) {
+                return -ECONNRESET;
+            }
         }
     } while (res == BLE_HS_EBUSY);
 
@@ -455,6 +461,7 @@ static int _on_gap_master_evt(struct ble_gap_event *event, void *arg)
                                        : NIMBLE_NETIF_ABORT_MASTER;
             uint8_t addr[BLE_ADDR_LEN];
             nimble_netif_conn_free(handle, addr);
+            thread_flags_set(_netif_thread, FLAG_TX_NOTCONN);
             _notify(handle, type, addr);
             break;
         }
@@ -498,6 +505,7 @@ static int _on_gap_slave_evt(struct ble_gap_event *event, void *arg)
                                        : NIMBLE_NETIF_ABORT_SLAVE;
             uint8_t addr[BLE_ADDR_LEN];
             nimble_netif_conn_free(handle, addr);
+            thread_flags_set(_netif_thread, FLAG_TX_NOTCONN);
             _notify(handle, type, addr);
             break;
         }

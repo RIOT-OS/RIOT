@@ -216,6 +216,18 @@ static inline int nimble_netif_conn_connected(const uint8_t *addr)
     return (nimble_netif_conn_get_by_addr(addr) != NIMBLE_NETIF_CONN_INVALID);
 }
 
+/**
+ * @brief   Test if the given connection is (still) open
+ *
+ * @param[in] conn          Connection to test
+ *
+ * @return  != 0 if true
+ * @return  0 if false
+ */
+static inline int nimble_netif_conn_is_open(const nimble_netif_conn_t *conn)
+{
+    return (conn->coc != NULL);
+}
 
 /**
  * @brief   Convenience function to check if any context is currently in the
