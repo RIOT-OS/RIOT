@@ -103,6 +103,7 @@ BaseType_t xTaskCreate (TaskFunction_t pvTaskCode,
 
 void vTaskDelete (TaskHandle_t xTaskToDelete)
 {
+    extern volatile thread_t *sched_active_thread;
     DEBUG("%s pid=%d task=%p\n", __func__, thread_getpid(), xTaskToDelete);
 
     assert(xTaskToDelete != NULL);

@@ -86,7 +86,7 @@ static void kw41zrf_irq_handler(void *arg)
 static int kw41zrf_netdev_init(netdev_t *netdev)
 {
     kw41zrf_t *dev = (kw41zrf_t *)netdev;
-    dev->thread = (thread_t *)thread_get(thread_getpid());
+    dev->thread = thread_get_active();
 
     /* initialize hardware */
     if (kw41zrf_init(dev, kw41zrf_irq_handler)) {
