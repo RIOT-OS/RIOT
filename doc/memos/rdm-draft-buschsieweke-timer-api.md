@@ -128,7 +128,7 @@ been identified:
 5. Only available when using TOSTThreads
 6. `xtimer_periodic_wakeup()`/`ztimer_periodic_wakeup()` can be used, but
    requires a dedicated thread allocated for the periodic task
-7. Mynwest uses a `struct` with a members `tv_sec` (64 bit) and `tv_usec`
+7. Mynewt uses a `struct` with a members `tv_sec` (64 bit) and `tv_usec`
    (32 bit)
 8. `ztimer_now()` returns the current time of the given clock. This can be used
    as system timer
