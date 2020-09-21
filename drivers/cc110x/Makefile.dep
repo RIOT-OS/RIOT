@@ -2,6 +2,7 @@ USEMODULE += cc1xxx_common
 USEMODULE += luid
 USEMODULE += netif
 USEMODULE += xtimer
+USEMODULE += xtimer_mutex_lock_timeout
 FEATURES_REQUIRED += periph_gpio
 FEATURES_REQUIRED += periph_gpio_irq
 FEATURES_REQUIRED += periph_spi

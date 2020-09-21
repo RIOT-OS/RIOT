@@ -1,6 +1,7 @@
 FEATURES_REQUIRED += periph_i2c
 USEMODULE += checksum
 USEMODULE += xtimer
+USEMODULE += xtimer_mutex_lock_timeout
 
 ifneq (,$(filter sdp3x_irq,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio_irq

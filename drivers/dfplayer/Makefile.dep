@@ -1,3 +1,4 @@
 FEATURES_REQUIRED += periph_uart
 FEATURES_REQUIRED += periph_gpio
 USEMODULE += xtimer
+USEMODULE += xtimer_mutex_lock_timeout
