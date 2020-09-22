@@ -9,7 +9,7 @@ endif
 
 # enable bootloader reset over USB, requires USB bootloader to be used
 ifneq (,$(filter stdio_cdc_acm,$(USEMODULE)))
-  FEATURES_REQUIRED += bootloader_nrfutil
+  FEATURES_REQUIRED += highlevel_stdio
   USEMODULE += usb_board_reset
 endif
 
