@@ -23,14 +23,14 @@
 #include "net/ethernet.h"
 #include "net/ipv6.h"
 #include "net/gnrc.h"
-#ifdef MODULE_GNRC_IPV6_NIB
+#if IS_USED(MODULE_GNRC_IPV6_NIB)
 #include "net/gnrc/ipv6/nib.h"
 #include "net/gnrc/ipv6.h"
-#endif /* MODULE_GNRC_IPV6_NIB */
+#endif /* IS_USED(MODULE_GNRC_IPV6_NIB) */
 #include "net/gnrc/netif/pktq.h"
-#ifdef MODULE_NETSTATS
+#if IS_USED(MODULE_NETSTATS)
 #include "net/netstats.h"
-#endif
+#endif /* IS_USED(MODULE_NETSTATS) */
 #include "fmt.h"
 #include "log.h"
 #include "sched.h"
