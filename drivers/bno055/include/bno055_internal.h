@@ -100,8 +100,8 @@ extern "C" {
 #define BNO055_DIV_SCALE_EUL_RAD (900.0)    /**> Euler Data Raw to rad scaling */
 #define BNO055_DIV_SCALE_EUL_DEG (16)       /**> Euler Data Raw to deg scaling */
 #define BNO055_DIV_SCALE_QUAT_UN (16384.0)  /**> Quaternion data Raw to 0..1 (unit less) scaling */
-#define BNO055_DIV_SCALE_TEMP_DC (1.0)      /**> Tempature Data Raw to Celsius scaling */
-#define BNO055_DIV_SCALE_TEMP_DF (0.5)      /**> Tempature Data Raw to Fahrenheid scaling */
+#define BNO055_DIV_SCALE_TEMP_DC (1.0)      /**> Temperature Data Raw to Celsius scaling */
+#define BNO055_DIV_SCALE_TEMP_DF (0.5)      /**> Temperature Data Raw to Fahrenheid scaling */
 #define BNO055_DIV_SCALE_MAG (16.0)         /**> Magnetometer Data Raw to microtesla scaling */
 /** @} */
 

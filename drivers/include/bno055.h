@@ -229,9 +229,9 @@ int bno055_init(bno055_t *dev, const bno055_params_t *params);
 int bno055_quat_read(const bno055_t *dev, bno055_4bit16_t *data);
 
 /**
- * @brief   Read orientaion in Euler representation.
+ * @brief   Read orientation in Euler representation.
  *
- * | Unit    | Representation      | #define BNO055_PARAM_EUL_UNIT  | Scaling                  |         |
+ * | Unit    | Representation      | \#define BNO055_PARAM_EUL_UNIT  | Scaling                  |         |
  * |---------|---------------------|--------------------------------|--------------------------|---------|
  * | degrees | 1 degree = 16 LSB   | BNO055_BIT_EUL_DEG             | BNO055_DIV_SCALE_EUL_DEG |         |
  * | radians | 1 radians = 900 LSB | BNO055_BIT_EUL_RAD             | BNO055_DIV_SCALE_EUL_RAD | default |
@@ -248,7 +248,7 @@ int bno055_eul_read(const bno055_t *dev, bno055_3bit16_t *data);
 /**
  * @brief   Read linear acceleration as euclidian vector.
  *
- * | Unit | Representation   | #define BNO055_PARAM_ACC_UNIT | Scaling                  |          |
+ * | Unit | Representation   | \#define BNO055_PARAM_ACC_UNIT | Scaling                  |          |
  * |------|------------------|-------------------------------|--------------------------|----------|
  * | m/s2 | 1 m/s2 = 100 LSB | BNO055_BIT_ACC_MSS            | BNO055_DIV_SCALE_ACC_MSS | (default)|
  * | mg   | 1 mg = 1 LSB     | BNO055_BIT_ACC_G              | BNO055_DIV_SCALE_ACC_G   |          |
@@ -263,9 +263,9 @@ int bno055_eul_read(const bno055_t *dev, bno055_3bit16_t *data);
 int bno055_lia_read(const bno055_t *dev, bno055_3bit16_t *data);
 
 /**
- * @brief   Read orientaion as gravity vector.
+ * @brief   Read orientation as gravity vector.
  *
- * | Unit | Representation   | #define BNO055_PARAM_ACC_UNIT | Scaling                  |          |
+ * | Unit | Representation   | \#define BNO055_PARAM_ACC_UNIT | Scaling                  |          |
  * |------|------------------|-------------------------------|--------------------------|----------|
  * | m/s2 | 1 m/s2 = 100 LSB | BNO055_BIT_ACC_MSS            | BNO055_DIV_SCALE_ACC_MSS | (default)|
  * | mg   | 1 mg = 1 LSB     | BNO055_BIT_ACC_G              | BNO055_DIV_SCALE_ACC_G   |          |
@@ -282,7 +282,7 @@ int bno055_grv_read(const bno055_t *dev, bno055_3bit16_t *data);
 /**
  * @brief   Read raw acceleration data.
  *
- * | Unit | Representation   | #define BNO055_PARAM_ACC_UNIT | Scaling                  |          |
+ * | Unit | Representation   | \#define BNO055_PARAM_ACC_UNIT | Scaling                  |          |
  * |------|------------------|-------------------------------|--------------------------|----------|
  * | m/s2 | 1 m/s2 = 100 LSB | BNO055_BIT_ACC_MSS            | BNO055_DIV_SCALE_ACC_MSS | (default)|
  * | mg   | 1 mg = 1 LSB     | BNO055_BIT_ACC_G              | BNO055_DIV_SCALE_ACC_G   |          |
@@ -315,7 +315,7 @@ int bno055_mag_read(const bno055_t *dev, bno055_3bit16_t *data);
 /**
  * @brief   Read raw gyroscope data.
  *
- * | Unit     | Representation      | #define BNO055_PARAM_GYR_UNIT  | Scaling                  |         |
+ * | Unit     | Representation      | \#define BNO055_PARAM_GYR_UNIT  | Scaling                  |         |
  * |----------|---------------------|--------------------------------|--------------------------|---------|
  * | degree/s | 1 degree/s = 16 LSB | BNO055_BIT_GYR_DPS             | BNO055_DIV_SCALE_GYR_DPS |         |
  * | rad/s    | 1 rad/s = 900 LSB   | BNO055_BIT_GYR_RPS             | BNO055_DIV_SCALE_GYR_RPS | default |

@@ -37,7 +37,7 @@ int main(void)
         printf("[Error] Failed to connect with the i2c device\n");
     }
 
-    printf("Initialized succesful\n");
+    printf("Initialized successful\n");
 
     quat_t quat_data;
     eul_t eul_data;
