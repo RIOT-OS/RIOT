@@ -41,7 +41,11 @@ typedef struct _unused {
 } _unused_t;
 
 static mutex_t _mutex = MUTEX_INIT;
-static uint8_t _pktbuf[CONFIG_GNRC_PKTBUF_SIZE];
+/* The static buffer needs to be aligned to word size, so that its start
+ * address can be casted to `_unused_t *` safely. Just allocating an array of
+ * (word sized) uintptr_t is a trivial way to do this */
+static uintptr_t _pktbuf_buf[CONFIG_GNRC_PKTBUF_SIZE / sizeof(uintptr_t)];
+static uint8_t *_pktbuf = (uint8_t *)_pktbuf_buf;
 static _unused_t *_first_unused;
 
 #ifdef DEVELHELP
@@ -82,9 +86,9 @@ static inline void _set_pktsnip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *next,
 void gnrc_pktbuf_init(void)
 {
     mutex_lock(&_mutex);
-    _first_unused = (_unused_t *)_pktbuf;
+    _first_unused = (_unused_t *)_pktbuf_buf;
     _first_unused->next = NULL;
-    _first_unused->size = sizeof(_pktbuf);
+    _first_unused->size = sizeof(_pktbuf_buf);
     mutex_unlock(&_mutex);
 }
 
@@ -341,7 +345,7 @@ void gnrc_pktbuf_stats(void)
 bool gnrc_pktbuf_is_empty(void)
 {
     return (_first_unused == (_unused_t *)_pktbuf) &&
-           (_first_unused->size == sizeof(_pktbuf));
+           (_first_unused->size == sizeof(_pktbuf_buf));
 }
 
 bool gnrc_pktbuf_is_sane(void)
@@ -424,7 +428,9 @@ static void *_pktbuf_alloc(size_t size)
         }
     }
     else {
-        _unused_t *new = (_unused_t *)(((uint8_t *)ptr) + size);
+        /* alignment is ensured by rounding size up in the _align() function.
+         * We cast to uintptr_t as intermediate step to silence -Wcast-align */
+        _unused_t *new = (_unused_t *)((uintptr_t)ptr + size);
 
         if (((((uint8_t *)new) - &(_pktbuf[0])) + sizeof(_unused_t)) > CONFIG_GNRC_PKTBUF_SIZE) {
             /* content of new would exceed packet buffer size so set to NULL */
