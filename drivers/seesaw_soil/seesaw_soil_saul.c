@@ -41,4 +41,3 @@ const saul_driver_t seesaw_soil_saul_temp_driver = {
     .write = saul_notsup,
     .type = SAUL_SENSE_TEMP,
 };
-
