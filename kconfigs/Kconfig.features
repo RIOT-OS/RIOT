@@ -42,11 +42,6 @@ config HAS_BACKUP_RAM
     help
         Indicates that Backup RAM is supported.
 
-config HAS_BOOTLOADER_ARDUINO
-    bool
-    help
-        Indicates that the Arduino bootloader is used.
-
 config HAS_CPP
     bool
     help
@@ -66,6 +61,13 @@ config HAS_ETHERNET
     bool
     help
         Indicates that Ethernet connectivity is present.
+
+config HAS_HIGHLEVEL_STDIO
+    bool
+    help
+        Indicates that a high-level stdio method (such as CDC ACM) is used.
+        This requires a running thread and set-up and will not print during
+        a crash.
 
 config HAS_LIBSTDCPP
     bool

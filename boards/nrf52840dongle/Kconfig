@@ -15,6 +15,6 @@ config BOARD_NRF52840DONGLE
     select HAS_PERIPH_PWM
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
-    select HAS_BOOTLOADER_NRFUTIL
+    select HAS_HIGHLEVEL_STDIO
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

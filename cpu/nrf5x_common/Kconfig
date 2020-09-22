@@ -21,11 +21,6 @@ config CPU_COMMON_NRF5X
     select HAS_RADIO_NRFMIN
 
 ## Definition of specific features
-config HAS_BOOTLOADER_NRFUTIL
-    bool
-    help
-        Indicates that the nRF Util bootloader is being used.
-
 config HAS_BLE_NIMBLE
     bool
     help

@@ -12,6 +12,6 @@ config BOARD_WEMOS_ZERO
     bool
     default y
     select BOARD_COMMON_ARDUINO_ZERO
-    select HAS_BOOTLOADER_ARDUINO
+    select HAS_HIGHLEVEL_STDIO
 
 source "$(RIOTBOARD)/common/arduino-zero/Kconfig"
