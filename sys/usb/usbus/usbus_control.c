@@ -263,12 +263,14 @@ static void _recv_setup(usbus_t *usbus, usbus_control_handler_t *handler)
     DEBUG("usbus_control: Received setup %x %x @ %d\n", pkt->type,
           pkt->request, pkt->length);
 
+#ifdef MODULE_USBUS_DFU
     if (pkt->type & USB_SETUP_REQUEST_TYPE_CLASS) {
         if (pkt->type & USB_SETUP_REQUEST_RECIPIENT_INTERFACE) {
             dfu_control_req(usbus, handler);
             res = 1;
         }
     }
+#endif
 
     uint8_t destination = pkt->type & USB_SETUP_REQUEST_RECIPIENT_MASK;
 
