@@ -22,6 +22,8 @@
 
 #define USB_H_USER_IS_RIOT_INTERNAL
 
+#include "periph_cpu.h"
+
 #ifdef MODULE_PERIPH_INIT
 #ifdef MODULE_PERIPH_INIT_I2C
 #include "periph/i2c.h"
@@ -71,6 +73,11 @@ void periph_init(void)
     /* Initialize RTC */
 #ifdef MODULE_PERIPH_INIT_RTC
     rtc_init();
+#endif
+
+    /* Initialize Tamper Detection */
+#ifdef MODULE_PERIPH_INIT_GPIO_TAMPER_WAKE
+    rtc_tamper_init();
 #endif
 
 #ifdef MODULE_PERIPH_INIT_HWRNG

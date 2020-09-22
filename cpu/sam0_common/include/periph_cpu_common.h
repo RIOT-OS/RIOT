@@ -1069,6 +1069,32 @@ void dma_wait(dma_t dma);
 void dma_cancel(dma_t dma);
 /** @} */
 
+/**
+ * @name sam0 RTC Tamper Detection
+ * @{
+ */
+
+/**
+ * @brief   Power on the RTC (if the RTC/RTT is not otherwise used)
+ */
+void rtc_tamper_init(void);
+
+/**
+ * @brief   Enable Tamper Detection IRQs
+ *
+ * @param   pin     The GPIO pin to be used for tamper detection
+ * @param   flank   The Flank to trigger the even
+ *
+ * @return  0 on success, -1 if pin is not RTC pin
+ */
+int rtc_tamper_register(gpio_t pin, gpio_flank_t flank);
+
+/**
+ * @brief   Enable Tamper Detection IRQs
+ */
+void rtc_tamper_enable(void);
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

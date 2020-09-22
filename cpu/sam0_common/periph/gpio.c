@@ -16,6 +16,15 @@
  * @file        gpio.c
  * @brief       Low-level GPIO driver implementation
  *
+ * On processors that support Deep Sleep the External Interrupt Controller
+ * will be off during Deep Sleep.
+ * To wake the CPU up from Deep Sleep the RTC Tamper Detection will be
+ * used instead.
+ * Only a few pins (@ref rtc_tamper_pins) can be used for that purpose.
+ *
+ * Note that when configuring those pins as interrupt, the RTC/RTT will be
+ * stopped briefly as the RTC configuration is enable protected.
+ *
  * @author      Troels Hoffmeyer <troels.d.hoffmeyer@gmail.com>
  * @author      Thomas Eichinger <thomas.eichinger@fu-berlin.de>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
@@ -240,10 +249,40 @@ static int _exti(gpio_t pin)
     return exti_config[port_num][_pin_pos(pin)];
 }
 
+/* check if an RTC tamper pin was configured as interrupt */
+__attribute__ ((unused))
+static bool _rtc_irq_enabled(void)
+{
+#if MODULE_PERIPH_GPIO_TAMPER_WAKE
+    for (unsigned i = 0; i < ARRAY_SIZE(rtc_tamper_pins); ++i) {
+        int exti = _exti(rtc_tamper_pins[i]);
+
+        if (exti == -1) {
+            continue;
+        }
+
+        if (_EIC->INTENSET.reg & (1 << exti)) {
+            return true;
+        }
+    }
+#endif
+    return false;
+}
+
+static void _init_rtc_pin(gpio_t pin, gpio_flank_t flank)
+{
+    if (IS_ACTIVE(MODULE_PERIPH_GPIO_TAMPER_WAKE)) {
+        rtc_tamper_register(pin, flank);
+    }
+}
+
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
     int exti = _exti(pin);
+
+    /* if it's a tamper pin configure wake from Deep Sleep */
+    _init_rtc_pin(pin, flank);
 
     /* make sure EIC channel is valid */
     if (exti == -1) {
@@ -330,10 +369,16 @@ void gpio_pm_cb_enter(int deep)
 {
 #if defined(PM_SLEEPCFG_SLEEPMODE_STANDBY)
     (void) deep;
+    unsigned mode = PM->SLEEPCFG.bit.SLEEPMODE;
 
-    if (PM->SLEEPCFG.bit.SLEEPMODE == PM_SLEEPCFG_SLEEPMODE_STANDBY) {
+    if (mode == PM_SLEEPCFG_SLEEPMODE_STANDBY) {
         DEBUG_PUTS("gpio: switching EIC to slow clock");
         reenable_eic(_EIC_CLOCK_SLOW);
+    }
+    else if (IS_ACTIVE(MODULE_PERIPH_GPIO_TAMPER_WAKE)
+          && mode > PM_SLEEPCFG_SLEEPMODE_STANDBY
+          && _rtc_irq_enabled()) {
+        rtc_tamper_enable();
     }
 #else
     if (deep) {
