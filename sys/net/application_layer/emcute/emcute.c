@@ -483,11 +483,10 @@ int emcute_willupd_msg(const void *data, size_t len)
     mutex_lock(&txlock);
 
     size_t pos = set_len(tbuf, (len + 1));
-    len += (pos + 1);
     tbuf[pos++] = WILLMSGUPD;
     memcpy(&tbuf[pos], data, len);
 
-    return syncsend(WILLMSGRESP, len, true);
+    return syncsend(WILLMSGRESP, (pos + len), true);
 }
 
 void emcute_run(uint16_t port, const char *id)
