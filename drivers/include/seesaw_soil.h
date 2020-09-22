@@ -20,7 +20,7 @@
  * @file
  * @brief       Interface definition for the Adafruit Seesaw Soil sensor.
  *
- * @author      Viktor Gal <viktor.gal@maeth.com
+ * @author      Viktor Gal <viktor.gal@maeth.com>
  */
 
 #ifndef SEESAW_SOIL_H
