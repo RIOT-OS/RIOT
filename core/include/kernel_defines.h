@@ -22,6 +22,7 @@
 #define KERNEL_DEFINES_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,15 +48,15 @@ extern "C" {
 #   define container_of(PTR, TYPE, MEMBER) \
         (_Generic((PTR), \
             const __typeof__ (((TYPE *) 0)->MEMBER) *: \
-                ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER))), \
+                ((TYPE *) ((uintptr_t) (PTR) - offsetof(TYPE, MEMBER))), \
             __typeof__ (((TYPE *) 0)->MEMBER) *: \
-                ((TYPE *) ((char *) (PTR) - offsetof(TYPE, MEMBER))) \
+                ((TYPE *) ((uintptr_t) (PTR) - offsetof(TYPE, MEMBER))) \
         ))
 #elif defined __GNUC__
 #   define container_of(PTR, TYPE, MEMBER) \
         (__extension__ ({ \
             __extension__ const __typeof__ (((TYPE *) 0)->MEMBER) *__m____ = (PTR); \
-            ((TYPE *) ((char *) __m____ - offsetof(TYPE, MEMBER))); \
+            ((TYPE *) ((uintptr_t) __m____ - offsetof(TYPE, MEMBER))); \
         }))
 #else
 #   define container_of(PTR, TYPE, MEMBER) \
