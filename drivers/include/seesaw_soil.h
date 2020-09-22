@@ -49,6 +49,7 @@ extern "C"
 #ifndef CONFIG_SEESAW_SOIL_I2C_ADDRESS
 #define CONFIG_SEESAW_SOIL_I2C_ADDRESS           (0x36)
 #endif
+/** @} */
 
 /**
  * @brief   Seesaw Soil specific return values
