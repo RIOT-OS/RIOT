@@ -125,10 +125,15 @@ void ztimer_init(void)
                              FREQ_1MHZ, CONFIG_ZTIMER_USEC_BASE_FREQ);
 #    endif
 #  endif
-#  ifdef CONFIG_ZTIMER_USEC_ADJUST
-    LOG_DEBUG("ztimer_init(): ZTIMER_USEC setting adjust value to %i\n",
-              CONFIG_ZTIMER_USEC_ADJUST);
-    ZTIMER_USEC->adjust = CONFIG_ZTIMER_USEC_ADJUST;
+#  ifdef CONFIG_ZTIMER_USEC_ADJUST_SET
+    LOG_DEBUG("ztimer_init(): ZTIMER_USEC setting adjust_set value to %i\n",
+              CONFIG_ZTIMER_USEC_ADJUST_SET );
+    ZTIMER_USEC->adjust_set = CONFIG_ZTIMER_USEC_ADJUST_SET;
+#  endif
+#  ifdef CONFIG_ZTIMER_USEC_ADJUST_SLEEP
+    LOG_DEBUG("ztimer_init(): ZTIMER_USEC setting adjust_sleep value to %i\n",
+              CONFIG_ZTIMER_USEC_ADJUST_SLEEP );
+    ZTIMER_USEC->adjust_sleep = CONFIG_ZTIMER_USEC_ADJUST_SLEEP;
 #  endif
 #  ifdef MODULE_PM_LAYERED
     LOG_DEBUG("ztimer_init(): ZTIMER_USEC setting required_pm_mode to %i\n",

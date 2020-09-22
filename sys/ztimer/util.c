@@ -51,6 +51,14 @@ void ztimer_sleep(ztimer_clock_t *clock, uint32_t duration)
         .arg = (void *)&mutex,
     };
 
+    /* correct board / MCU specific overhead */
+    if (duration > clock->adjust_sleep) {
+        duration -= clock->adjust_sleep;
+    }
+    else {
+        duration = 0;
+    }
+
     ztimer_set(clock, &timer, duration);
     mutex_lock(&mutex);
 }

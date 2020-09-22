@@ -84,8 +84,8 @@ void ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, uint32_t val)
     }
 
     /* optionally subtract a configurable adjustment value */
-    if (val > clock->adjust) {
-        val -= clock->adjust;
+    if (val > clock->adjust_set) {
+        val -= clock->adjust_set;
     }
     else {
         val = 0;
