@@ -32,6 +32,10 @@
 #include "mpu.h"
 #endif
 
+#ifdef MODULE_SCHED_ROUND_ROBIN
+#include "sched_round_robin.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -160,6 +164,10 @@ thread_t *__attribute__((used)) sched_run(void)
     thread_t *next_thread = container_of(sched_runqueues[nextrq].next->next,
                                          thread_t, rq_entry);
 
+#ifdef MODULE_SCHED_ROUND_ROBIN
+    sched_round_robin_check_set(nextrq);
+#endif
+
     DEBUG(
         "sched_run: active thread: %" PRIkernel_pid ", next thread: %" PRIkernel_pid "\n",
         (kernel_pid_t)((active_thread == NULL)
@@ -224,6 +232,17 @@ void sched_set_status(thread_t *process, thread_status_t status)
             clist_rpush(&sched_runqueues[process->priority],
                         &(process->rq_entry));
             _set_runqueue_bit(process);
+
+#ifdef MODULE_SCHED_ROUND_ROBIN
+            /* some thread entered a runqueue lets check if we need to activate RR */
+            /* might be more efficient to check using
+             * if(runqueue_bitcache & 1 << process->priority);*/
+            thread_t * active_thread = thread_get_active();
+            if (active_thread && active_thread->priority == process->priority){
+                    uint8_t prio = process->priority;
+                    sched_round_robin_check_set(prio);
+            }
+#endif
         }
     }
     else {
@@ -235,6 +254,9 @@ void sched_set_status(thread_t *process, thread_status_t status)
 
             if (!sched_runqueues[process->priority].next) {
                 _clear_runqueue_bit(process);
+#ifdef MODULE_SCHED_ROUND_ROBIN
+                sched_round_robin_check_remove_set(process->priority);
+ #endif
             }
         }
     }

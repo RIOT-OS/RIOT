@@ -101,6 +101,7 @@ PSEUDOMODULES += saul_gpio
 PSEUDOMODULES += saul_nrf_temperature
 PSEUDOMODULES += scanf_float
 PSEUDOMODULES += sched_cb
+PSEUDOMODULES += sched_round_robin
 PSEUDOMODULES += semtech_loramac_rx
 PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += slipdev_stdio
