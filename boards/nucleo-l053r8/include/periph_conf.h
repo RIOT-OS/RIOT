@@ -21,8 +21,13 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* Add specific clock configuration (HSE, LSE) for this board here */
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE            1
+#endif
+
 #include "periph_cpu.h"
-#include "l0/cfg_clock_32_16_1.h"
+#include "l0l1/cfg_clock_default.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
 
