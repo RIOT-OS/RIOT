@@ -131,7 +131,7 @@ extern "C" {
  * @brief   Bit-Band configuration
  * @{
  */
-#ifdef SRAM_BB_BASE
+#if defined(SRAM_BB_BASE) && !defined(CPU_FAM_STM32F1)
 #define CPU_HAS_BITBAND 1
 #endif
 /** @} */
