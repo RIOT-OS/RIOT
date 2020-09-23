@@ -31,7 +31,6 @@ extern "C" {
  * @{
  */
 #define TIMER_NUMOF         (1U)
-#define TIMER_0_EN          1
 #define TIMER_IRQ_PRIO      1
 
 /* Timer 0 configuration */

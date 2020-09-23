@@ -40,35 +40,32 @@ extern "C" {
 /** @} */
 
 /**
- * @name Timer configuration
+ * @name    Timer configuration
  * @{
  */
-#define TIMER_NUMOF         (2U)
-#define TIMER_0_EN          1
-#define TIMER_1_EN          1
-#define TIMER_IRQ_PRIO      1
+static const timer_conf_t timer_config[] = {
+    {
+        .dev      = WTIMER0_BASE,
+        .max      = 0xffffffff,
+        .irqn     = Timer0A_IRQn,
+        .sysctl   = SYSCTL_PERIPH_WTIMER0,
+        .intbase  = INT_WTIMER0A,
+        .channels = 1
+    },
+    {
+        .dev      = WTIMER1_BASE,
+        .max      = 0xffffffff,
+        .irqn     = Timer1A_IRQn,
+        .sysctl   = SYSCTL_PERIPH_WTIMER1,
+        .intbase  = INT_WTIMER1A,
+        .channels = 1
+    },
+};
 
-/* Timer 0 configuration
- *
- * WTIMER0 is a 32/64bits timer.
- * We use timer_a as TIMER_0
- */
-#define TIMER_0_CHANNELS    1
-#define TIMER_0_MAX_VALUE   (0xffffffff)
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
+
 #define TIMER_0_ISR         isr_wtimer0a
-#define TIMER_0_IRQ_CHAN    Timer0A_IRQn
-
-/* Timer 1 configuration
- *
- * WTIMER1 is a 32/64bits timer.
- * We use timer_a as TIMER_1
- */
-
-#define TIMER_1_CHANNELS    1
-#define TIMER_1_MAX_VALUE   (0xffffffff)
 #define TIMER_1_ISR         isr_wtimer1a
-#define TIMER_1_IRQ_CHAN    Timer1A_IRQn
-/** @} */
 
 /**
  * @name UART configuration
