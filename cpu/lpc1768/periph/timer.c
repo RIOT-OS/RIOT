@@ -105,6 +105,14 @@ unsigned int timer_read(tim_t dev)
     return 0;
 }
 
+unsigned int timer_max(tim_t dev)
+{
+    if (dev == TIMER_0) {
+        return UINT32_MAX;
+    }
+    return 0;
+}
+
 void timer_start(tim_t dev)
 {
     if (dev == TIMER_0) {

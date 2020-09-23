@@ -189,6 +189,15 @@ int timer_clear(tim_t tim, int channel)
     return 0;
 }
 
+unsigned int timer_max(tim_t tim)
+{
+    /* check if device is valid */
+    if (tim >= TIMER_NUMOF) {
+        return 0;
+    }
+    return timer_config[tim].max;
+}
+
 unsigned int timer_read(tim_t tim)
 {
     return (unsigned int)dev(tim)->CNT;

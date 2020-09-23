@@ -241,6 +241,14 @@ unsigned int timer_read(tim_t dev)
     return scaled_value;
 }
 
+unsigned int timer_max(tim_t dev)
+{
+    if (dev < TIMER_NUMOF) {
+        return UINT32_MAX;
+    }
+    return 0;
+}
+
 void timer_start(tim_t dev)
 {
     unsigned int timer_base;

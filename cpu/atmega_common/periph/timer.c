@@ -21,6 +21,7 @@
  */
 
 #include <avr/interrupt.h>
+#include <stdint.h>
 
 #include "board.h"
 #include "cpu.h"
@@ -257,6 +258,13 @@ unsigned int timer_read(tim_t tim)
     unsigned result = ctx[tim].dev->CNT;
     irq_restore(state);
     return result;
+}
+
+unsigned int timer_max(tim_t dev)
+{
+    (void)dev;
+    /* all atmega timers are configured to be 16bits */
+    return UINT16_MAX;
 }
 
 void timer_stop(tim_t tim)

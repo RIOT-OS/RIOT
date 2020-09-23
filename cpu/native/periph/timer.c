@@ -202,3 +202,11 @@ unsigned int timer_read(tim_t dev)
 
     return ts2ticks(&t) - time_null;
 }
+
+unsigned int timer_max(tim_t dev)
+{
+    if (dev < TIMER_NUMOF) {
+        return UINT32_MAX;
+    }
+    return 0;
+}
