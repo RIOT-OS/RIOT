@@ -128,6 +128,10 @@ static void _timer_init(tim_t dev, unsigned long freq)
         freq_timer / TIMER_Prescaler2Div(init_pre.prescale) / freq) - 1;
 
     TIMER_TopSet(pre, top);
+
+    /* note: when changing this, update timer_set_absolute()'s TopGet,
+     * which assumes either 0xffffffff or 0xffff
+     */
     TIMER_TopSet(tim, _is_wtimer(dev) ? 0xffffffff : 0xffff);
 
     /* enable interrupts for the channels */
@@ -169,9 +173,8 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
             return -1;
         }
 
-        /* this accounts for some timer being 16-bit and others 32-bit */
-        if (value > TIMER_TopGet(tim)) {
-            return -1;
+        if (TIMER_TopGet(tim) == 0xFFFF) {
+            value &= 0xFFFF;
         }
 
         tim->CC[channel].CCV = (uint32_t) value;
