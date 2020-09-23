@@ -227,6 +227,10 @@ void saul_init_devs(void)
         extern void auto_init_sdp3x(void);
         auto_init_sdp3x();
     }
+    if (IS_USED(MODULE_SEESAW_SOIL)) {
+        extern void auto_init_seesaw_soil(void);
+        auto_init_seesaw_soil();
+    }
     if (IS_USED(MODULE_SHT3X)) {
         extern void auto_init_sht3x(void);
         auto_init_sht3x();
