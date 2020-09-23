@@ -16,6 +16,7 @@ config CPU_ARCH_ARMV6M
     bool
     select HAS_ARCH_ARM
     select HAS_ARCH_32BIT
+    select HAS_NO_IDLE_THREAD
 
 config CPU_ARCH_ARMV7M
     bool

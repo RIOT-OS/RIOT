@@ -142,7 +142,7 @@ extern "C" {
  * If you want to set this, define it in your `cpu_conf.h`.
  */
 #ifndef CPU_CORTEXM_PENDSV_IRQ_PRIO
-#define CPU_CORTEXM_PENDSV_IRQ_PRIO (CPU_DEFAULT_IRQ_PRIO)
+#define CPU_CORTEXM_PENDSV_IRQ_PRIO (UINT8_MAX)
 #endif
 /** @} */
 

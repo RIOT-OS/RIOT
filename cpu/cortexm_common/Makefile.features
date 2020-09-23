@@ -33,9 +33,6 @@ else
   $(error Unkwnown cortexm core: $(CPU_CORE))
 endif
 
-# cortex-m3 and higher don't need the idle thread
-ifneq (,$(filter armv7m armv8m,$(CPU_ARCH)))
-  FEATURES_PROVIDED += no_idle_thread
-endif
+FEATURES_PROVIDED += no_idle_thread
 
 KCONFIG_ADD_CONFIG += $(RIOTCPU)/cortexm_common/cortexm_common.config
