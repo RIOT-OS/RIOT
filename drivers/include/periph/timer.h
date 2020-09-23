@@ -149,6 +149,9 @@ int timer_set(tim_t dev, int channel, unsigned int timeout);
 /**
  * @brief Set an absolute timeout value for the given channel of the given timer
  *
+ * Timers that are less wide than `unsigned int` accept and truncate overflown
+ * values.
+ *
  * @param[in] dev           the timer device to set
  * @param[in] channel       the channel to set
  * @param[in] value         the absolute compare value when the callback will be
