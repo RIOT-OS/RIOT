@@ -27,7 +27,8 @@
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
-static uint8_t _update_nce_ar_state(const sixlowpan_nd_opt_ar_t *aro,
+static uint8_t _update_nce_ar_state(gnrc_netif_t *netif,
+                                    const sixlowpan_nd_opt_ar_t *aro,
                                     _nib_onl_entry_t *nce)
 {
     if (nce != NULL) {
@@ -35,6 +36,20 @@ static uint8_t _update_nce_ar_state(const sixlowpan_nd_opt_ar_t *aro,
         _evtimer_add(nce, GNRC_IPV6_NIB_ADDR_REG_TIMEOUT,
                      &nce->addr_reg_timeout,
                      byteorder_ntohs(aro->ltime) * SEC_PER_MIN * MS_PER_SEC);
+        if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ARSM)) {
+            switch (_get_nud_state(nce)) {
+            case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNMANAGED:
+            case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_REACHABLE:
+                /* nothing to do */
+                break;
+            default:
+                assert(netif != NULL);
+                evtimer_del(&_nib_evtimer, &nce->nud_timeout.event);
+                _set_nud_state(netif, nce,
+                               GNRC_IPV6_NIB_NC_INFO_NUD_STATE_STALE);
+                break;
+            }
+        }
         _set_ar_state(nce,
                       GNRC_IPV6_NIB_NC_INFO_AR_STATE_REGISTERED);
         DEBUG("nib: Successfully registered %s\n",
@@ -84,7 +99,7 @@ uint8_t _reg_addr_upstream(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                           nce->eui64.uint8[6], nce->eui64.uint8[7]);
                     return SIXLOWPAN_ND_STATUS_DUP;
                 }
-                return _update_nce_ar_state(aro, nce);
+                return _update_nce_ar_state(netif, aro, nce);
             }
             else if (nce != NULL) {
                 _nib_nc_remove(nce);
