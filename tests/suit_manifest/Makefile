@@ -17,8 +17,11 @@ BLOBS += $(MANIFEST_DIR)/manifest0.bin
 BLOBS += $(MANIFEST_DIR)/manifest1.bin
 BLOBS += $(MANIFEST_DIR)/manifest2.bin
 BLOBS += $(MANIFEST_DIR)/manifest3.bin
+BLOBS += $(MANIFEST_DIR)/manifest4.bin
 
 USEMODULE += suit_transport_mock
+
+CFLAGS += -DCONFIG_SUIT_COMPONENT_MAX=2
 
 # Use a version of 'native' that includes flash page support
 ifeq (native, $(BOARD))

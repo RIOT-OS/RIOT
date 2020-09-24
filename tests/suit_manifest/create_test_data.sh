@@ -15,7 +15,7 @@ gen_manifest() {
      --uuid-vendor "riot-os.org" \
      --uuid-class "${BOARD}" \
      -o "$out.tmp" \
-     "${1}:$((0x1000))" "${2}:$((0x2000))"
+     "${@}"
 
     ${SUIT_TOOL} create -f suit -i "$out.tmp" -o "$out"
 
@@ -34,14 +34,18 @@ echo foo > "${MANIFEST_DIR}/file1.bin"
 echo bar > "${MANIFEST_DIR}/file2.bin"
 
 # random valid cbor (manifest but not signed, missing cose auth)
-gen_manifest "${MANIFEST_DIR}/manifest0.bin" 1 "${MANIFEST_DIR}/file1.bin" "${MANIFEST_DIR}/file2.bin"
+gen_manifest "${MANIFEST_DIR}/manifest0.bin" 1 "${MANIFEST_DIR}/file1.bin:$((0x1000))" "${MANIFEST_DIR}/file2.bin:$((0x2000))"
 
 # manifest with invalid seqnr
 sign_manifest "${MANIFEST_DIR}/manifest0.bin" "${MANIFEST_DIR}/manifest1.bin"
 
-(BOARD=invalid gen_manifest "${MANIFEST_DIR}/manifest2.bin".unsigned 2 "${MANIFEST_DIR}/file1.bin" "${MANIFEST_DIR}/file2.bin")
+(BOARD=invalid gen_manifest "${MANIFEST_DIR}/manifest2.bin".unsigned 2 "${MANIFEST_DIR}/file1.bin:$((0x1000))" "${MANIFEST_DIR}/file2.bin:$((0x2000))")
 sign_manifest "${MANIFEST_DIR}/manifest2.bin".unsigned "${MANIFEST_DIR}/manifest2.bin"
 
 # valid manifest, valid seqnr, signed
-gen_manifest "${MANIFEST_DIR}/manifest3.bin".unsigned 2 "${MANIFEST_DIR}/file1.bin" "${MANIFEST_DIR}/file2.bin"
+gen_manifest "${MANIFEST_DIR}/manifest3.bin".unsigned 2 "${MANIFEST_DIR}/file1.bin:$((0x1000))" "${MANIFEST_DIR}/file2.bin:$((0x2000))"
 sign_manifest "${MANIFEST_DIR}/manifest3.bin".unsigned "${MANIFEST_DIR}/manifest3.bin"
+
+# valid manifest, valid seqnr, signed, 2 components
+gen_manifest "${MANIFEST_DIR}/manifest4.bin".unsigned 2 "${MANIFEST_DIR}/file1.bin" "${MANIFEST_DIR}/file2.bin"
+sign_manifest "${MANIFEST_DIR}/manifest4.bin".unsigned "${MANIFEST_DIR}/manifest4.bin"
