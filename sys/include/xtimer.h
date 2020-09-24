@@ -147,6 +147,13 @@ void xtimer_init(void);
 static inline void xtimer_sleep(uint32_t seconds);
 
 /**
+ * @brief Pause the execution of a thread for some milliseconds
+ *
+ * @param[in] milliseconds  the amount of milliseconds the thread should sleep
+ */
+static inline void xtimer_msleep(uint32_t milliseconds);
+
+/**
  * @brief Pause the execution of a thread for some microseconds
  *
  * When called from an ISR, this function will spin and thus block the MCU for
