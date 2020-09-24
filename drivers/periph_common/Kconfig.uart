@@ -24,6 +24,10 @@ config MODULE_PERIPH_UART_MODECFG
     bool "Mode configuration support"
     depends on HAS_PERIPH_UART_MODECFG
 
+config MODULE_PERIPH_LPUART
+    bool "Enable Low Power UART (LPUART)"
+    depends on HAS_PERIPH_LPUART
+
 config MODULE_PERIPH_UART_NONBLOCKING
     bool "Non-blocking support"
     depends on HAS_PERIPH_UART_NONBLOCKING
@@ -36,6 +40,11 @@ config MODULE_PERIPH_INIT_UART_MODECFG
 config MODULE_PERIPH_INIT_UART_NONBLOCKING
     bool
     depends on MODULE_PERIPH_UART_NONBLOCKING
+    default y if MODULE_PERIPH_INIT
+
+config MODULE_PERIPH_INIT_LPUART
+    bool
+    depends on MODULE_PERIPH_LPUART
     default y if MODULE_PERIPH_INIT
 
 endif # MODULE_PERIPH_UART
