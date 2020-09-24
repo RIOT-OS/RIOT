@@ -1,7 +1,7 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ----------------------------------------------------------------------------
-# Copyright 2019 ARM Limited or its affiliates
+# Copyright 2016-2020 ARM Limited or its affiliates
 #
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -17,25 +17,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ----------------------------------------------------------------------------
-from suit_tool.compile import compile_manifest
-import json
-import cbor
-import itertools
-import textwrap
 
-def main(options):
-    m = json.loads(options.input_file.read())
+import sys
+import os
+suittoolPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),'..')
+sys.path.insert(0,suittoolPath)
+from suit_tool import clidriver
 
-    nm = compile_manifest(options, m)
-    if hasattr(options, 'severable') and options.severable:
-        nm = nm.to_severable()
-    output = {
-        'suit' : lambda x: cbor.dumps(x.to_suit(), sort_keys=True),
-        'suit-debug' : lambda x: '\n'.join(itertools.chain.from_iterable(
-            map(textwrap.wrap, x.to_debug('').split('\n'))
-        )).encode('utf-8'),
-        'json' : lambda x : json.dumps(x.to_json(), indent=2).encode('utf-8')
-    }.get(options.format)(nm)
-    options.output_file.write(output)
+def main():
+  return clidriver.main()
 
-    return 0
+if __name__ == "__main__":
+  sys.exit(main())

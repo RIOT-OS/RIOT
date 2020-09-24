@@ -32,6 +32,7 @@
 #include TEST_MANIFEST_INCLUDE(manifest1.bin.h)
 #include TEST_MANIFEST_INCLUDE(manifest2.bin.h)
 #include TEST_MANIFEST_INCLUDE(manifest3.bin.h)
+#include TEST_MANIFEST_INCLUDE(manifest4.bin.h)
 
 #define SUIT_URL_MAX            128
 
@@ -47,6 +48,7 @@ const manifest_blob_t manifest_blobs[] = {
     { manifest1_bin, sizeof(manifest1_bin), SUIT_ERR_SEQUENCE_NUMBER },
     { manifest2_bin, sizeof(manifest2_bin), SUIT_ERR_COND },
     { manifest3_bin, sizeof(manifest3_bin), SUIT_OK },
+    { manifest4_bin, sizeof(manifest4_bin), SUIT_OK },
 };
 
 const unsigned manifest_blobs_numof = ARRAY_SIZE(manifest_blobs);

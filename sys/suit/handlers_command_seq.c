@@ -24,6 +24,7 @@
 
 #include <inttypes.h>
 #include <nanocbor/nanocbor.h>
+#include <assert.h>
 
 #include "kernel_defines.h"
 #include "suit/conditions.h"
@@ -39,22 +40,33 @@
 
 #include "log.h"
 
+static suit_component_t *_get_component(suit_manifest_t *manifest)
+{
+    /* Out-of-bounds check has been done in the _dtv_set_comp_idx, True/False
+     * not handled here intentionally */
+    assert(manifest->component_current < CONFIG_SUIT_COMPONENT_MAX);
+    return &manifest->components[manifest->component_current];
+}
+
 static int _validate_uuid(suit_manifest_t *manifest,
-                          nanocbor_value_t *it,
+                          suit_param_ref_t *ref,
                           uuid_t *uuid)
 {
-    (void)manifest;
     const uint8_t *uuid_manifest_ptr;
     size_t len = sizeof(uuid_t);
-    char uuid_str[UUID_STR_LEN + 1];
-    char uuid_str2[UUID_STR_LEN + 1];
-    if (nanocbor_get_bstr(it, &uuid_manifest_ptr, &len) < 0) {
+    nanocbor_value_t it;
+
+    if ((suit_param_ref_to_cbor(manifest, ref, &it) == 0) ||
+            (nanocbor_get_bstr(&it, &uuid_manifest_ptr, &len) < 0)) {
         return SUIT_ERR_INVALID_MANIFEST;
     }
 
+    char uuid_str[UUID_STR_LEN + 1];
+    char uuid_str2[UUID_STR_LEN + 1];
     uuid_to_string((uuid_t *)uuid_manifest_ptr, uuid_str);
     uuid_to_string(uuid, uuid_str2);
     LOG_INFO("Comparing %s to %s from manifest\n", uuid_str2, uuid_str);
+
     return uuid_equal(uuid, (uuid_t *)uuid_manifest_ptr)
            ? SUIT_OK
            : SUIT_ERR_COND;
@@ -65,8 +77,11 @@ static int _cond_vendor_handler(suit_manifest_t *manifest,
                                 nanocbor_value_t *it)
 {
     (void)key;
+    (void)it;
     LOG_INFO("validating vendor ID\n");
-    int rc = _validate_uuid(manifest, it, suit_get_vendor_id());
+    suit_component_t *comp = _get_component(manifest);
+    int rc = _validate_uuid(manifest, &comp->param_vendor_id,
+                            suit_get_vendor_id());
     if (rc == SUIT_OK) {
         LOG_INFO("validating vendor ID: OK\n");
         manifest->validated |= SUIT_VALIDATED_VENDOR;
@@ -79,8 +94,11 @@ static int _cond_class_handler(suit_manifest_t *manifest,
                                nanocbor_value_t *it)
 {
     (void)key;
+    (void)it;
     LOG_INFO("validating class id\n");
-    int rc = _validate_uuid(manifest, it, suit_get_class_id());
+    suit_component_t *comp = _get_component(manifest);
+    int rc = _validate_uuid(manifest, &comp->param_class_id,
+                            suit_get_class_id());
     if (rc == SUIT_OK) {
         LOG_INFO("validating class id: OK\n");
         manifest->validated |= SUIT_VALIDATED_CLASS;
@@ -95,18 +113,24 @@ static int _cond_comp_offset(suit_manifest_t *manifest,
     (void)manifest;
     (void)key;
     uint32_t offset;
+    uint32_t report;
 
-    int rc = nanocbor_get_uint32(it, &offset);
-    if (rc < 0) {
-        LOG_WARNING("_cond_comp_offset(): expected int, got rc=%i type=%i\n",
-                    rc, nanocbor_get_type(it));
+    suit_component_t *comp = _get_component(manifest);
+
+    /* Grab offset from param */
+    if (nanocbor_get_uint32(it, &report) < 0) {
+        LOG_WARNING("_cond_comp_offset(): expected None param\n");
         return SUIT_ERR_INVALID_MANIFEST;
     }
+    nanocbor_value_t param_offset;
+    suit_param_ref_to_cbor(manifest, &comp->param_component_offset,
+                           &param_offset);
+    nanocbor_get_uint32(&param_offset, &offset);
     uint32_t other_offset = (uint32_t)riotboot_slot_offset(
         riotboot_slot_other());
 
-    LOG_INFO("Comparing manifest offset %u with other slot offset %u\n",
-             (unsigned)offset, (unsigned)other_offset);
+    LOG_INFO("Comparing manifest offset %"PRIx32" with other slot offset %"PRIx32"\n",
+             offset, other_offset);
     return other_offset == offset ? SUIT_OK : SUIT_ERR_COND;
 }
 
@@ -115,17 +139,26 @@ static int _dtv_set_comp_idx(suit_manifest_t *manifest,
                              nanocbor_value_t *it)
 {
     (void)key;
-    if (nanocbor_get_type(it) == NANOCBOR_TYPE_FLOAT) {
-        LOG_DEBUG("_dtv_set_comp_idx() ignoring boolean and floats\n)");
-        nanocbor_skip(it);
+    bool index = false;
+    uint32_t new_index;
+
+    /* It can be a bool, meaning all or none of the components */
+    if (nanocbor_get_bool(it, &index) >= 0) {
+        new_index = index ?
+            SUIT_MANIFEST_COMPONENT_ALL : SUIT_MANIFEST_COMPONENT_NONE;
     }
-    else if (nanocbor_get_uint32(it, &manifest->component_current) < 0) {
+    /* It can be a positive integer, meaning one of the components */
+    else if (nanocbor_get_uint32(it, &new_index) < 0) {
         return SUIT_ERR_INVALID_MANIFEST;
     }
-    if (manifest->component_current >= SUIT_COMPONENT_MAX) {
+    /* And if it is an integer it must be within the allowed bounds */
+    else if (new_index >= CONFIG_SUIT_COMPONENT_MAX) {
         return SUIT_ERR_INVALID_MANIFEST;
     }
-    LOG_DEBUG("Setting component index to %d\n",
+
+    /* Update the manifest context */
+    manifest->component_current = new_index;
+    LOG_INFO("Setting component index to %d\n",
               (int)manifest->component_current);
     return 0;
 }
@@ -158,9 +191,9 @@ static int _dtv_try_each(suit_manifest_t *manifest,
         nanocbor_value_t _container = container;
         /* `_container` should be CBOR _bstr wrapped according to the spec, but
          * it is not */
-        res = suit_handle_manifest_structure(manifest, &_container,
-                                             suit_command_sequence_handlers,
-                                             suit_command_sequence_handlers_len);
+        res = suit_handle_manifest_structure_bstr(manifest, &_container,
+                                                  suit_command_sequence_handlers,
+                                                  suit_command_sequence_handlers_len);
 
         nanocbor_skip(&container);
 
@@ -169,32 +202,6 @@ static int _dtv_try_each(suit_manifest_t *manifest,
         }
     }
 
-    return res;
-}
-
-static int _param_get_uri_list(suit_manifest_t *manifest,
-                               nanocbor_value_t *it)
-{
-    LOG_DEBUG("got url list\n");
-    manifest->components[manifest->component_current].url = *it;
-    return 0;
-}
-static int _param_get_digest(suit_manifest_t *manifest, nanocbor_value_t *it)
-{
-    LOG_DEBUG("got digest\n");
-    manifest->components[manifest->component_current].digest = *it;
-    return 0;
-}
-
-static int _param_get_img_size(suit_manifest_t *manifest,
-                               nanocbor_value_t *it)
-{
-    int res = nanocbor_get_uint32(it, &manifest->components[0].size);
-
-    if (res < 0) {
-        LOG_DEBUG("error getting image size\n");
-        return res;
-    }
     return res;
 }
 
@@ -207,34 +214,50 @@ static int _dtv_set_param(suit_manifest_t *manifest, int key,
 
     nanocbor_enter_map(it, &map);
 
+    suit_component_t *comp = _get_component(manifest);
+
     while (!nanocbor_at_end(&map)) {
         /* map points to the key of the param */
         int32_t param_key;
-        nanocbor_get_int32(&map, &param_key);
-        LOG_DEBUG("Current component index: %" PRIi32 "\n",
-                  manifest->component_current);
+        if (nanocbor_get_int32(&map, &param_key) < 0) {
+            return SUIT_ERR_INVALID_MANIFEST;
+        }
         LOG_DEBUG("param_key=%" PRIi32 "\n", param_key);
-        int res;
+        unsigned int type = nanocbor_get_type(&map);
+        /* Filter 'complex' types and only allow int, nint, bstr and tstr types
+         * for parameter values */
+        if (type > NANOCBOR_TYPE_TSTR) {
+            return SUIT_ERR_INVALID_MANIFEST;
+        }
+        suit_param_ref_t *ref;
         switch (param_key) {
-            case 6: /* SUIT URI LIST */
-                res = _param_get_uri_list(manifest, &map);
+            case SUIT_PARAMETER_VENDOR_IDENTIFIER:
+                ref = &comp->param_vendor_id;
                 break;
-            case 11: /* SUIT DIGEST */
-                res = _param_get_digest(manifest, &map);
+            case SUIT_PARAMETER_CLASS_IDENTIFIER:
+                ref = &comp->param_class_id;
                 break;
-            case 12: /* SUIT IMAGE SIZE */
-                res = _param_get_img_size(manifest, &map);
+            case SUIT_PARAMETER_IMAGE_DIGEST:
+                ref = &comp->param_digest;
+                break;
+            case SUIT_PARAMETER_COMPONENT_OFFSET:
+                ref = &comp->param_component_offset;
+                break;
+            case SUIT_PARAMETER_IMAGE_SIZE:
+                ref = &comp->param_size;
+                break;
+            case SUIT_PARAMETER_URI:
+                ref = &comp->param_uri;
                 break;
             default:
                 LOG_DEBUG("Unsupported parameter %" PRIi32 "\n", param_key);
-                res = SUIT_ERR_UNSUPPORTED;
+                return SUIT_ERR_UNSUPPORTED;
         }
 
+        suit_param_cbor_to_ref(manifest, ref, &map);
+
+        /* Simple skip is sufficient to skip non-complex types */
         nanocbor_skip(&map);
-
-        if (res) {
-            return res;
-        }
     }
     return SUIT_OK;
 }
@@ -247,8 +270,12 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
 
     const uint8_t *url;
     size_t url_len;
+    suit_component_t *comp = _get_component(manifest);
 
-    int err = nanocbor_get_tstr(&manifest->components[0].url, &url, &url_len);
+    nanocbor_value_t param_uri;
+    suit_param_ref_to_cbor(manifest, &comp->param_uri,
+                           &param_uri);
+    int err = nanocbor_get_tstr(&param_uri, &url, &url_len);
     if (err < 0) {
         LOG_DEBUG("URL parsing failed\n)");
         return err;
@@ -293,6 +320,25 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
     return SUIT_OK;
 }
 
+static int _get_digest(nanocbor_value_t *bstr, const uint8_t **digest, size_t *digest_len)
+{
+    /* Bstr is a byte string with a cbor array containing the type and the
+     * digest */
+
+    const uint8_t *digest_struct;
+    size_t digest_struct_len;
+    uint32_t digest_type;
+    nanocbor_value_t digest_it;
+    nanocbor_value_t arr_it;
+
+    nanocbor_get_bstr(bstr, &digest_struct, &digest_struct_len);
+
+    nanocbor_decoder_init(&digest_it, digest_struct, digest_struct_len);
+    nanocbor_enter_array(&digest_it, &arr_it);
+    nanocbor_get_uint32(&arr_it, &digest_type);
+    return nanocbor_get_bstr(&arr_it, digest, digest_len);
+}
+
 static int _dtv_verify_image_match(suit_manifest_t *manifest, int key,
                                    nanocbor_value_t *_it)
 {
@@ -301,21 +347,30 @@ static int _dtv_verify_image_match(suit_manifest_t *manifest, int key,
     const uint8_t *digest;
     size_t digest_len;
     int target_slot = riotboot_slot_other();
+    suit_component_t *comp = _get_component(manifest);
+
+    uint32_t img_size;
+    nanocbor_value_t param_size;
+    if ((suit_param_ref_to_cbor(manifest, &comp->param_size, &param_size) == 0) ||
+            (nanocbor_get_uint32(&param_size, &img_size) < 0)) {
+        return SUIT_ERR_INVALID_MANIFEST;
+    }
 
     LOG_INFO("Verifying image digest\n");
-    nanocbor_value_t _v = manifest->components[0].digest;
-    int res = nanocbor_get_subcbor(&_v, &digest, &digest_len);
+    nanocbor_value_t _v;
+    if (suit_param_ref_to_cbor(manifest, &comp->param_digest, &_v) == 0) {
+        return SUIT_ERR_INVALID_MANIFEST;
+    }
+
+    int res = _get_digest(&_v, &digest, &digest_len);
+
     if (res < 0) {
         LOG_DEBUG("Unable to parse digest structure\n");
         return SUIT_ERR_INVALID_MANIFEST;
     }
 
-    /* "digest" points to a 36 byte string that includes the digest type.
-     * riotboot_flashwrite_verify_sha256() is only interested in the 32b digest,
-     * so shift the pointer accordingly.
-     */
-    res = riotboot_flashwrite_verify_sha256(digest + 4,
-                                            manifest->components[0].size,
+    res = riotboot_flashwrite_verify_sha256(digest,
+                                            img_size,
                                             target_slot);
     if (res != 0) {
         return SUIT_ERR_COND;

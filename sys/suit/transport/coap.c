@@ -42,6 +42,7 @@
 
 #ifdef MODULE_SUIT
 #include "suit.h"
+#include "suit/handlers.h"
 #endif
 
 #if defined(MODULE_PROGRESS_BAR)
@@ -75,14 +76,26 @@ static char _url[SUIT_URL_MAX];
 static uint8_t _manifest_buf[SUIT_MANIFEST_BUFSIZE];
 
 #ifdef MODULE_SUIT
-static inline void _print_download_progress(size_t offset, size_t len,
-                                            uint32_t image_size)
+static inline void _print_download_progress(suit_manifest_t *manifest,
+                                            size_t offset, size_t len)
 {
+    (void)manifest;
     (void)offset;
     (void)len;
-    (void)image_size;
     DEBUG("_suit_flashwrite(): writing %u bytes at pos %u\n", len, offset);
 #if defined(MODULE_PROGRESS_BAR)
+    uint32_t image_size;
+    nanocbor_value_t param_size;
+    suit_param_ref_t *ref_size =
+        &manifest->components[manifest->component_current].param_size;
+
+    /* Grab the total image size from the manifest */
+    if ((suit_param_ref_to_cbor(manifest, ref_size, &param_size) == 0) ||
+            (nanocbor_get_uint32(&param_size, &image_size) < 0)) {
+        /* Early exit if the total image size can't be determined */
+        return;
+    }
+
     if (image_size != 0) {
         char _suffix[7] = { 0 };
         uint8_t _progress = 100 * (offset + len) / image_size;
@@ -419,7 +432,7 @@ int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
         return -1;
     }
 
-    _print_download_progress(offset, len, manifest->components[0].size);
+    _print_download_progress(manifest, offset, len);
 
     return riotboot_flashwrite_putbytes(writer, buf, len, more);
 }

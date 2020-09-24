@@ -38,45 +38,12 @@ static int _auth_handler(suit_manifest_t *manifest, int key,
     (void)key;
     cose_sign_dec_t verify;
     const uint8_t *cose_buf;
-    const uint8_t *cose_container;
-    size_t container_len;
+    const uint8_t *auth_container;
+    size_t auth_container_len;
     size_t cose_len = 0;
     /* It is a list of cose signatures */
-    int res = nanocbor_get_bstr(it, &cose_container, &container_len);
-    if (res < 0) {
-        LOG_INFO("Unable to get COSE signature\n");
-        return SUIT_ERR_INVALID_MANIFEST;
-    }
-
-    nanocbor_value_t _cont, arr;
-    nanocbor_decoder_init(&_cont, cose_container, container_len);
-
-    int rc = nanocbor_enter_array(&_cont, &arr);
-    if (rc < 0) {
-        LOG_INFO("Unable to enter COSE signatures\n");
-        return SUIT_ERR_INVALID_MANIFEST;
-    }
-
-    uint32_t tag;
-    nanocbor_get_tag(&arr, &tag);
-    arr.remaining++;
-    res = nanocbor_get_subcbor(&arr, &cose_buf, &cose_len);
-    if (res < 0) {
-        LOG_INFO("Unable to get subcbor: %d\n", res);
-    }
-
-    res = cose_sign_decode(&verify, cose_buf, cose_len);
-    if (res < 0) {
-        LOG_INFO("Unable to parse COSE signature\n");
-        return SUIT_ERR_INVALID_MANIFEST;
-    }
-
-    /* Iterate over signatures, should only be a single signature */
-    cose_signature_dec_t signature;
-
-    cose_sign_signature_iter_init(&signature);
-    if (!cose_sign_signature_iter(&verify, &signature)) {
-        LOG_INFO("Unable to get signature iteration\n");
+    if (nanocbor_get_bstr(it, &auth_container, &auth_container_len) < 0) {
+        LOG_INFO("Unable to get auth container\n");
         return SUIT_ERR_INVALID_MANIFEST;
     }
 
@@ -86,20 +53,55 @@ static int _auth_handler(suit_manifest_t *manifest, int key,
     cose_key_set_keys(&pkey, COSE_EC_CURVE_ED25519, COSE_ALGO_EDDSA,
                       (uint8_t *)public_key, NULL, NULL);
 
-    LOG_INFO("suit: verifying manifest signature\n");
-    int verification = cose_sign_verify(&verify, &signature,
-                                        &pkey, manifest->validation_buf,
-                                        SUIT_COSE_BUF_SIZE);
-    if (verification != 0) {
-        LOG_INFO("Unable to validate signature: %d\n", verification);
-        return SUIT_ERR_SIGNATURE;
+    nanocbor_value_t _cont, arr;
+    nanocbor_decoder_init(&_cont, auth_container, auth_container_len);
+
+    int rc = nanocbor_enter_array(&_cont, &arr);
+    if (rc < 0) {
+        LOG_INFO("Unable to enter COSE signatures\n");
+        return SUIT_ERR_INVALID_MANIFEST;
     }
 
-    manifest->cose_payload = verify.payload;
-    manifest->cose_payload_len = verify.payload_len;
-    manifest->state |= SUIT_STATE_COSE_AUTHENTICATED;
+    int res = SUIT_ERR_SIGNATURE;
 
-    return 0;
+    while (!nanocbor_at_end(&arr)) {
+        res = nanocbor_get_bstr(&arr, &cose_buf, &cose_len);
+        if (res < 0) {
+            LOG_INFO("Unable to get COSE bstr: %d\n", res);
+            return SUIT_ERR_INVALID_MANIFEST;
+        }
+        if (!(manifest->state & SUIT_STATE_COSE_AUTHENTICATED)) {
+            res = cose_sign_decode(&verify, cose_buf, cose_len);
+            if (res < 0) {
+                LOG_INFO("Unable to parse COSE signature\n");
+                return SUIT_ERR_INVALID_MANIFEST;
+            }
+            /* Iterate over signatures, should only be a single signature */
+            cose_signature_dec_t signature;
+
+            cose_sign_signature_iter_init(&signature);
+            if (!cose_sign_signature_iter(&verify, &signature)) {
+                LOG_INFO("Unable to get signature iteration\n");
+                return SUIT_ERR_INVALID_MANIFEST;
+            }
+            LOG_INFO("suit: verifying manifest signature\n");
+            int verification = cose_sign_verify(&verify, &signature,
+                                                &pkey, manifest->validation_buf,
+                                                SUIT_COSE_BUF_SIZE);
+            if (verification == 0) {
+                manifest->state |= SUIT_STATE_COSE_AUTHENTICATED;
+                res = SUIT_OK;
+                manifest->cose_payload = verify.payload;
+                manifest->cose_payload_len = verify.payload_len;
+            }
+            else {
+                LOG_INFO("Unable to validate signature: %d\n", verification);
+            }
+        }
+    }
+
+
+    return res;
 }
 
 static int _manifest_handler(suit_manifest_t *manifest, int key,
@@ -142,10 +144,10 @@ static int _manifest_handler(suit_manifest_t *manifest, int key,
 }
 
 /* begin{code-style-ignore} */
-const suit_manifest_handler_t suit_container_handlers[] = {
+const suit_manifest_handler_t suit_envelope_handlers[] = {
     [SUIT_WRAPPER_AUTHENTICATION] = _auth_handler,
     [SUIT_WRAPPER_MANIFEST]       = _manifest_handler,
 };
 /* end{code-style-ignore} */
 
-const size_t suit_container_handlers_len = ARRAY_SIZE(suit_container_handlers);
+const size_t suit_envelope_handlers_len = ARRAY_SIZE(suit_envelope_handlers);

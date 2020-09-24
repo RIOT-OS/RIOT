@@ -20,6 +20,7 @@
 
 #include <inttypes.h>
 #include <nanocbor/nanocbor.h>
+#include <assert.h>
 
 #include "suit/handlers.h"
 #include "suit.h"
@@ -34,6 +35,24 @@ static suit_manifest_handler_t _get_handler(int key,
         return NULL;
     }
     return map[key];
+}
+
+uint16_t suit_param_ref_to_cbor(suit_manifest_t *manifest,
+                                suit_param_ref_t *ref,
+                                nanocbor_value_t *val)
+{
+    size_t len = manifest->len - ref->offset;
+    const uint8_t *start = manifest->buf + ref->offset;
+    nanocbor_decoder_init(val, start, len);
+    return ref->offset;
+}
+
+void suit_param_cbor_to_ref(suit_manifest_t *manifest,
+                            suit_param_ref_t *ref,
+                            nanocbor_value_t *val)
+{
+    assert(val->cur >= manifest->buf);
+    ref->offset = val->cur - manifest->buf;
 }
 
 int suit_handle_manifest_structure(suit_manifest_t *manifest,
