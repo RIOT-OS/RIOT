@@ -9,7 +9,6 @@ BOARDS_TIMER_250kHz := \
     arduino-uno \
     atmega256rfr2-xpro \
     atmega328p \
-    waspmote-pro \
     #
 
 BOARDS_TIMER_32kHz := \
@@ -32,6 +31,7 @@ BOARDS_TIMER_CLOCK_CORECLOCK := \
   openmote-cc2538 \
   remote-reva \
   remote-revb \
+  waspmote-pro \
   #
 
 ifneq (,$(filter $(BOARDS_TIMER_250kHz),$(BOARD)))

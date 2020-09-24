@@ -159,11 +159,25 @@ extern "C" {
 
 /**
  * @name    xtimer configuration values
+ * @warning This configuration is not actually compatible with xtimer. Sadly,
+ *          no compatible clock frequency can be generated with the given core
+ *          frequency
  * @{
  */
 #define XTIMER_WIDTH                (16)
-#define XTIMER_HZ                   (62500UL)
-#define XTIMER_BACKOFF              (40)
+#define XTIMER_HZ                   (230400LU)
+#define XTIMER_BACKOFF              (80)
+#define XTIMER_ISR_BACKOFF          (120)
+/** @} */
+
+/**
+ * @name    ztimer configuration values
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_TYPE     ZTIMER_TYPE_PERIPH_TIMER
+#define CONFIG_ZTIMER_USEC_DEV      (TIMER_DEV(0))
+#define CONFIG_ZTIMER_USEC_FREQ     (230400LU)
+#define CONFIG_ZTIMER_USEC_WIDTH    (16)
 /** @} */
 
 /**
