@@ -78,6 +78,10 @@ typedef struct {
 /**
  * @brief   Initializes an event timer
  *
+ * @warning BEWARE! Callbacks from evtimer_init() are being executed
+ * in interrupt context.
+ * DON'T USE THIS FUNCTION unless you know *exactly* what that means.
+ *
  * @param[in] evtimer   An event timer
  * @param[in] handler   An event handler function
  */
