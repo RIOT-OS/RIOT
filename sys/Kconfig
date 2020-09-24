@@ -11,6 +11,7 @@ rsource "net/Kconfig"
 rsource "Kconfig.newlib"
 rsource "Kconfig.stdio"
 rsource "pm_layered/Kconfig"
+rsource "test_utils/Kconfig"
 rsource "usb/Kconfig"
 
 config MODULE_SYS
