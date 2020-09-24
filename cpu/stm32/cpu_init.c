@@ -154,14 +154,14 @@ void cpu_init(void)
 #ifndef CPU_FAM_STM32WB
     periph_clk_en(APB1, BIT_APB_PWREN);
 #endif
-    /* initialize the system clock as configured in the periph_conf.h */
-    stmclk_init_sysclk();
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F3) || \
     defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7) || \
     defined(CPU_FAM_STM32L1)
     _gpio_init_ain();
 #endif
+    /* initialize the system clock as configured in the periph_conf.h */
+    stmclk_init_sysclk();
 #ifdef MODULE_PERIPH_DMA
     /*  initialize DMA streams */
     dma_init();
