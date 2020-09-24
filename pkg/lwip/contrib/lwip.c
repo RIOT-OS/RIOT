@@ -218,7 +218,7 @@ void lwip_bootstrap(void)
     }
 #elif defined(MODULE_ENC28J60)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
-        enc28j60_setup(&enc28j60_devs[i], &enc28j60_params[i]);
+        enc28j60_setup(&enc28j60_devs[i], &enc28j60_params[i], i);
         if (_netif_add(&netif[0], &enc28j60_devs[i], lwip_netdev_init,
                        tcpip_input) == NULL) {
             DEBUG("Could not add enc28j60 device\n");

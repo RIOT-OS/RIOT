@@ -57,8 +57,10 @@ typedef struct {
  *
  * @param[in] dev           device descriptor
  * @param[in] params        peripheral configuration to use
+ * @param[in]   index       Index of @p params in a global parameter struct array.
+ *                          If initialized manually, pass a unique identifier instead.
  */
-void enc28j60_setup(enc28j60_t *dev, const enc28j60_params_t *params);
+void enc28j60_setup(enc28j60_t *dev, const enc28j60_params_t *params, uint8_t index);
 
 #ifdef __cplusplus
 }
