@@ -126,10 +126,23 @@ $(KCONFIG_GENERATED_DEPENDENCIES): FORCE | $(GENERATED_DIR)
 	      printf "config %s\n\tbool\n\tdefault y\n", toupper($$0)}' \
 	  | $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@
 
+# When the 'clean' target is called, the files inside GENERATED_DIR should be
+# regenerated. For that, we conditionally change GENERATED_DIR from an 'order
+# only' requisite to a normal one.
+#
+# - When clean is called, Make will look at the modification time of the folder
+#   and will regenerate the files accordingly.
+# - When clean is not called Make will ensure that the folder exists, without
+#   paying attention to the modification date.
+#
+# This allows use to generate the files only when needed, instead of using
+# FORCE.
+GENERATED_DIR_DEP := $(if $(CLEAN),,|) $(GENERATED_DIR)
+
 # Generates a .config file by merging multiple sources specified in
 # MERGE_SOURCES. This will also generate KCONFIG_OUT_DEP with the list of used
 # Kconfig files.
-$(KCONFIG_OUT_CONFIG): $(GENERATED_DEPENDENCIES_DEP) $(GENCONFIG) $(MERGE_SOURCES) | $(GENERATED_DIR)
+$(KCONFIG_OUT_CONFIG): $(GENERATED_DEPENDENCIES_DEP) $(GENCONFIG) $(MERGE_SOURCES) $(GENERATED_DIR_DEP)
 	$(Q) $(GENCONFIG) \
 	  --config-out=$(KCONFIG_OUT_CONFIG) \
 	  --file-list $(KCONFIG_OUT_DEP) \
@@ -144,7 +157,7 @@ endif # eq (clean, $(MAKECMDGOALS))
 # compilation.
 #
 # This will generate the 'dummy' header files needed for incremental builds.
-$(KCONFIG_GENERATED_AUTOCONF_HEADER_C): $(KCONFIG_OUT_CONFIG)
+$(KCONFIG_GENERATED_AUTOCONF_HEADER_C): $(KCONFIG_OUT_CONFIG) $(GENERATED_DIR_DEP)
 	$(Q) $(GENCONFIG) \
 	  --header-path $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) \
 	  --sync-deps $(KCONFIG_SYNC_DIR) \
