@@ -7,4 +7,7 @@ FEATURES_OPTIONAL += periph_uart_modecfg
 USEMODULE += shell
 USEMODULE += xtimer
 
+# avoid running Kconfig by default
+SHOULD_RUN_KCONFIG ?=
+
 include $(RIOTBASE)/Makefile.include

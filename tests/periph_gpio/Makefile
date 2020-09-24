@@ -28,6 +28,9 @@ else
   PORT_UNDER_TEST ?= 0
 endif
 
+# avoid running Kconfig by default
+SHOULD_RUN_KCONFIG ?=
+
 include $(RIOTBASE)/Makefile.include
 
 $(call target-export-variables,test,PORT_UNDER_TEST)

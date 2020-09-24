@@ -54,7 +54,15 @@ KCONFIG_OUT_DEP = $(KCONFIG_OUT_CONFIG).d
 # KCONFIG_ADD_CONFIG holds a list of .config files that are merged for the
 # initial configuration. This allows to split configurations in common files
 # and share them among boards or cpus.
+# This file will contain application default configurations used for Kconfig Test
 MERGE_SOURCES += $(KCONFIG_ADD_CONFIG)
+
+# Add configurations that only work when running the Kconfig test so far,
+# because they activate modules.
+ifeq (1,$(TEST_KCONFIG))
+  MERGE_SOURCES += $(wildcard $(APPDIR)/app.config.test)
+endif
+
 MERGE_SOURCES += $(wildcard $(KCONFIG_APP_CONFIG))
 MERGE_SOURCES += $(wildcard $(KCONFIG_USER_CONFIG))
 
@@ -79,6 +87,11 @@ SHOULD_RUN_KCONFIG ?= $(or $(wildcard $(APPDIR)/*.config), \
                            $(wildcard $(APPDIR)/Kconfig), \
                            $(if $(CLEAN),,$(wildcard $(KCONFIG_OUT_CONFIG))), \
                            $(filter menuconfig, $(MAKECMDGOALS)))
+
+# When testing Kconfig we should always run it
+ifeq (1,$(TEST_KCONFIG))
+  SHOULD_RUN_KCONFIG := 1
+endif
 
 # export variable to make it visible in other Makefiles
 export SHOULD_RUN_KCONFIG

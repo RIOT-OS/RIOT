@@ -1,0 +1,9 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+CONFIG_MODULE_TEST_UTILS_INTERACTIVE_SYNC=y
+CONFIG_MODULE_PERIPH_GPIO=y
+
+CONFIG_MODULE_SHELL=y
+CONFIG_MODULE_SHELL_COMMANDS=y
+CONFIG_MODULE_BENCHMARK=y
+CONFIG_MODULE_XTIMER=y
