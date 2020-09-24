@@ -37,5 +37,9 @@ config HAS_CPU_EFM32
 config CPU
     default "efm32" if CPU_COMMON_EFM32
 
+config ERROR_MODULES_CONFLICT
+    default "On the EFM32, the RTC and RTT map to the same hardware peripheral." if MODULE_PERIPH_RTC && MODULE_PERIPH_RTT
+    depends on CPU_COMMON_EFM32
+
 orsource "families/*/Kconfig"
 source "$(RIOTCPU)/cortexm_common/Kconfig"
