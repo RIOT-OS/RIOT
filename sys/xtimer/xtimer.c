@@ -253,6 +253,44 @@ static void _mutex_timeout(void *arg)
     irq_restore(irqstate);
 }
 
+static int _mutex_lock_internal(mutex_t *mutex, volatile uint8_t *blocking)
+{
+    unsigned irqstate = irq_disable();
+
+    DEBUG("PID[%" PRIkernel_pid "]: Mutex in use.\n", thread_getpid());
+
+    if (mutex->queue.next == NULL) {
+        /* mutex is unlocked. */
+        mutex->queue.next = MUTEX_LOCKED;
+        DEBUG("PID[%" PRIkernel_pid "]: mutex_wait early out.\n",
+              thread_getpid());
+        irq_restore(irqstate);
+        return 1;
+    }
+    else if (*blocking) {
+        thread_t *me = thread_get_active();
+        DEBUG("PID[%" PRIkernel_pid "]: Adding node to mutex queue: prio: %"
+              PRIu32 "\n", thread_getpid(), (uint32_t)me->priority);
+        sched_set_status(me, STATUS_MUTEX_BLOCKED);
+        if (mutex->queue.next == MUTEX_LOCKED) {
+            mutex->queue.next = (list_node_t *)&me->rq_entry;
+            mutex->queue.next->next = NULL;
+        }
+        else {
+            thread_add_to_list(&mutex->queue, me);
+        }
+        irq_restore(irqstate);
+        thread_yield_higher();
+        /* We were woken up by scheduler. Waker removed us from queue.
+         * We have the mutex now. */
+        return 1;
+    }
+    else {
+        irq_restore(irqstate);
+        return 0;
+    }
+}
+
 int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
 {
     xtimer_t t;
@@ -265,7 +303,7 @@ int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t timeout)
         t.arg = &mt;
         xtimer_set64(&t, timeout);
     }
-    int ret = _mutex_lock(mutex, &mt.blocking);
+    int ret = _mutex_lock_internal(mutex, &mt.blocking);
     if (ret == 0) {
         return -1;
     }
