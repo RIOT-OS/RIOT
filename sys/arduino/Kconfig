@@ -1,0 +1,22 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_ARDUINO
+    bool "Arduino support"
+    imply MODULE_ARDUINO_PWM
+    imply MODULE_PERIPH_ADC
+    depends on HAS_ARDUINO
+    depends on HAS_PERIPH_GPIO
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_GPIO
+
+config MODULE_ARDUINO_PWM
+    bool "PWM support for Arduino"
+    depends on HAS_PERIPH_PWM
+    depends on MODULE_ARDUINO
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_PWM
