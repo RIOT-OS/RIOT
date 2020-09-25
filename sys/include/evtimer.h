@@ -29,7 +29,9 @@
  *   the necessary fields, which can be extended as needed, and handlers define
  *   actions taken on timer triggers. Check out @ref evtimer_msg_event_t as
  *   example.
- * - uses @ref sys_xtimer "xtimer" as backend
+ * - uses @ref sys_xtimer "xtimer" as backend by default. Alternatively, with
+ *   the pseudomodule "evtimer_on_ztimer" compiled in, evtimer is backend by
+ *   @ref sys_ztimer "ZTIMER_MSEC".
  *
  * @{
  *
