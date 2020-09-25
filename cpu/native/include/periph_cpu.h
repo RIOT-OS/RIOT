@@ -19,7 +19,7 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
-#include "periph/dev_enums.h"
+#include "periph_conf.h"
 
 #ifdef __cplusplus
 extern "C" {

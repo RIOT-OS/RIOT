@@ -126,12 +126,6 @@ extern "C" {
 #endif
 
 /**
- * @todo    Remove dev_enums.h include once all platforms are ported to the
- *          updated periph interface
- */
-#include "periph/dev_enums.h"
-
-/**
  * @brief   Default I2C device access macro
  * @{
  */
