@@ -147,6 +147,15 @@ enum {
   * @brief RFCORE_XREG_FRMCTRL0 bits
   */
 enum {
+    SET_RXENMASK_ON_TX  = BIT(0),
+    IGNORE_TX_UNDERF    = BIT(1),
+    PENDING_OR          = BIT(2),
+};
+
+ /*
+  * @brief RFCORE_XREG_FRMCTRL1 bits
+  */
+enum {
     ENERGY_SCAN      = BIT(4),
     AUTOACK          = BIT(5),
     AUTOCRC          = BIT(6),
@@ -180,7 +189,6 @@ enum {
 };
 
 /* Values for use with CCTEST_OBSSELx registers: */
-#define OBSSEL_EN BIT(7)
 enum {
     rfc_obs_sig0 = 0,
     rfc_obs_sig1 = 1,
@@ -208,7 +216,40 @@ enum {
     lock_status      = 0x19,
     pa_pd            = 0x20,
     lna_pd           = 0x2a,
+    disabled         = 0x2b,
 };
+
+/** @} */
+
+/**
+ * @name    RF CORE observable signals settings
+ */
+#ifndef CONFIG_CC2538_RF_OBS_0
+#define CONFIG_CC2538_RF_OBS_0      tx_active
+#endif
+#ifndef CONFIG_CC2538_RF_OBS_1
+#define CONFIG_CC2538_RF_OBS_1      rx_active
+#endif
+#ifndef CONFIG_CC2538_RF_OBS_2
+#define CONFIG_CC2538_RF_OBS_2      ffctrl_fifo
+#endif
+
+/* Default configration for cc2538dk or similar */
+#ifndef CONFIG_CC2538_RF_OBS_SIG_0_PCX
+#define CONFIG_CC2538_RF_OBS_SIG_0_PCX  0   /* PC0 = LED_1 (red) */
+#endif
+#ifndef CONFIG_CC2538_RF_OBS_SIG_1_PCX
+#define CONFIG_CC2538_RF_OBS_SIG_1_PCX  1   /* PC0 = LED_2 (red) */
+#endif
+#ifndef CONFIG_CC2538_RF_OBS_SIG_2_PCX
+#define CONFIG_CC2538_RF_OBS_SIG_2_PCX  2   /* PC0 = LED_3 (red) */
+#endif
+#if ((CONFIG_CC2538_RF_OBS_SIG_2_PCX > 7) || \
+     (CONFIG_CC2538_RF_OBS_SIG_1_PCX > 7) || \
+     (CONFIG_CC2538_RF_OBS_SIG_0_PCX > 7))
+#error "CONFIG_CC2538_RF_OBS_SIG_X_PCX must be between 0-7 (PC0-PC7)"
+#endif
+/** @} */
 
 /**
  * @name    CC2538 RF interrupts flags

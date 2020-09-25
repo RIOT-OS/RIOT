@@ -82,6 +82,16 @@
 /** @} */
 
 /**
+ * @name    RF CORE observable signals settings
+ * @{
+ */
+#define CONFIG_CC2538_RF_OBS_SIG_0_PCX  0   /* PC4 */
+#define CONFIG_CC2538_RF_OBS_SIG_1_PCX  1   /* PC6 */
+#define CONFIG_CC2538_RF_OBS_SIG_2_PCX  2   /* PC7 */
+#endif
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
