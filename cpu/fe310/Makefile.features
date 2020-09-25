@@ -8,3 +8,7 @@ FEATURES_PROVIDED += periph_plic
 FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += periph_wdt
 FEATURES_PROVIDED += ssp
+
+ifneq (,$(filter periph_rtt,$(FEATURES_PROVIDED)))
+  FEATURES_PROVIDED += periph_rtc
+endif

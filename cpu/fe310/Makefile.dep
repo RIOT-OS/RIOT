@@ -5,6 +5,10 @@ else
   USEMODULE += newlib_syscalls_fe310
 endif
 
+ifneq (,$(filter periph_rtc,$(USEMODULE)))
+  USEMODULE += rtt_rtc
+endif
+
 USEMODULE += sifive_drivers_fe310
 
 USEMODULE += periph
