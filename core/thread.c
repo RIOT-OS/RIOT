@@ -169,7 +169,7 @@ void thread_add_to_list(list_node_t *list, thread_t *thread)
 }
 
 #ifdef DEVELHELP
-uintptr_t thread_measure_stack_free(char *stack)
+uintptr_t thread_measure_stack_free(const char *stack)
 {
     /* Alignment of stack has been fixed (if needed) by thread_create(), so
      * we can silence -Wcast-align here */
