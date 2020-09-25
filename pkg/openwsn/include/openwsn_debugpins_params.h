@@ -22,6 +22,7 @@
 #ifndef OPENWSN_DEBUGPINS_PARAMS_H
 #define OPENWSN_DEBUGPINS_PARAMS_H
 
+#include "board.h"
 #include "openwsn_debugpins.h"
 
 #ifdef __cplusplus

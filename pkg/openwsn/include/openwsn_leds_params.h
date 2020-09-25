@@ -34,28 +34,36 @@ extern "C" {
  * @note On Nucleo boards the LED pin is shared with SPI -> don't use it!
  * @{
  */
+#ifndef OPENWSN_LEDPIN_ERROR
 #if defined (LED0_PIN) && !defined(MODULE_BOARDS_COMMON_NUCLEO)
 #define OPENWSN_LEDPIN_ERROR            LED0_PIN
 #else
 #define OPENWSN_LEDPIN_ERROR            GPIO_UNDEF
 #endif
+#endif
 
+#ifndef OPENWSN_LEDPIN_SYNC
 #ifdef LED1_PIN
 #define OPENWSN_LEDPIN_SYNC             LED1_PIN
 #else
 #define OPENWSN_LEDPIN_SYNC             GPIO_UNDEF
 #endif
+#endif
 
+#ifndef OPENWSN_LEDPIN_RADIO
 #ifdef LED2_PIN
 #define OPENWSN_LEDPIN_RADIO            LED2_PIN
 #else
 #define OPENWSN_LEDPIN_RADIO            GPIO_UNDEF
 #endif
+#endif
 
+#ifndef OPENWSN_LEDPIN_DEBUG
 #ifdef LED3_PIN
 #define OPENWSN_LEDPIN_DEBUG            LED3_PIN
 #else
 #define OPENWSN_LEDPIN_DEBUG            GPIO_UNDEF
+#endif
 #endif
 
 #ifndef OPENWSN_LED_ON_STATE
