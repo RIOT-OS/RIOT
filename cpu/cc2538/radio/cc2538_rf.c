@@ -211,3 +211,27 @@ void cc2538_setup(cc2538_rf_t *dev)
 
     cc2538_on();
 }
+
+void cc2538_tx_exec(cc2538_rf_t *dev)
+{
+    netdev_t *netdev = (netdev_t *)dev;
+
+    RFCORE_SFR_RFST = ISTXON;
+
+    /* Transmission does not trigger an SFD interrupt, so we need to
+       poll and wait fot the SFD bit to be set */
+    while (RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE) {
+        if(RFCORE->XREG_FSMSTAT1bits.SFD) {
+            DEBUG_PUTS("[cc2538_rf] EVT - TX_STARTED");
+            netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
+            break;
+        } else {
+            thread_yield();
+        }
+    }
+
+    /* Wait for transmission to complete */
+    RFCORE_WAIT_UNTIL(RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE == 0);
+
+    dev->state = NETOPT_STATE_IDLE;
+}

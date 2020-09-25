@@ -214,6 +214,7 @@ enum {
 typedef struct {
     netdev_ieee802154_t netdev;   /**< netdev parent struct */
     uint8_t state;                /**< current state of the radio */
+    uint8_t flags;                /**< Device specific flags */
 } cc2538_rf_t;
 
 /**

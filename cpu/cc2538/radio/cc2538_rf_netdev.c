@@ -128,6 +128,15 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             *((netopt_state_t *)value) = dev->state;
             return sizeof(netopt_state_t);
 
+        case NETOPT_PRELOADING:
+            if (dev->flags & CC2538_OPT_PRELOADING) {
+                *((netopt_enable_t *)value) = NETOPT_ENABLE;
+            }
+            else {
+                *((netopt_enable_t *)value) = NETOPT_DISABLE;
+            }
+            return sizeof(netopt_enable_t);
+
         case NETOPT_TX_POWER:
             if (max_len < sizeof(int16_t)) {
                 return -EOVERFLOW;
@@ -237,6 +246,12 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
             res = sizeof(netopt_state_t);
             break;
 
+        case NETOPT_PRELOADING:
+            dev->flags = (((const bool *)value)[0]) ? (dev->flags | CC2538_OPT_PRELOADING)
+                         : (dev->flags & ~CC2538_OPT_PRELOADING);
+            res = sizeof(netopt_enable_t);
+            break;
+
         case NETOPT_TX_POWER:
             if (value_len > sizeof(int16_t)) {
                 return -EOVERFLOW;
@@ -259,7 +274,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t value_
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    (void) netdev;
+    cc2538_rf_t *dev = (cc2538_rf_t *) netdev;
 
     int pkt_len = 0;
 
@@ -287,10 +302,9 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* Set first byte of TX FIFO to the packet length */
     rfcore_poke_tx_fifo(0, pkt_len + CC2538_AUTOCRC_LEN);
 
-    RFCORE_SFR_RFST = ISTXON;
-
-    /* Wait for transmission to complete */
-    RFCORE_WAIT_UNTIL(RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE == 0);
+    if (!(dev->flags & CC2538_OPT_PRELOADING)) {
+        RFCORE_SFR_RFST = ISTXON;
+    }
 
     return pkt_len;
 }
