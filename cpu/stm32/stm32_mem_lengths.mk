@@ -187,7 +187,9 @@ else ifeq ($(STM32_TYPE), G)
     endif
   endif
   ifeq ($(STM32_FAMILY), 4)
-    ifeq ($(STM32_MODEL), 474)
+    ifeq ($(STM32_MODEL), 431)
+      RAM_LEN = 32K
+    else ifeq ($(STM32_MODEL), 474)
       RAM_LEN = 96K
       CCMRAM_LEN = 32K
     endif
