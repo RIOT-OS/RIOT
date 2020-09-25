@@ -312,21 +312,31 @@ get_master() {
 
 list_bridge() {
     BRIDGE=$1
-    echo "$BRIDGE:"
+    IFACES=0
+    echo -n "$BRIDGE:"
     case "${PLATFORM}" in
         Linux)
-            for IF in $(ls /sys/class/net/${BRIDGE}/brif); do
-                echo "- $IF"
+            for IF in $(ls /sys/class/net/${BRIDGE}/brif 2> /dev/null); do
+                echo ""
+                echo -n "- $IF"
+                IFACES=$(( ${IFACES} + 1 ))
             done
             ;;
         FreeBSD|OSX)
             for IF in $(ifconfig ${BRIDGE} | grep -oiE "member: .+ " | cut -d' ' -f2); do
-                echo "- $IF"
+                echo ""
+                echo -n "- $IF"
+                IFACES=$(( ${IFACES} + 1 ))
             done
             ;;
         *)
             ;;
     esac
+    if [ "${IFACES}" -eq 0 ]; then
+        echo " []"
+    else
+        echo ""
+    fi
 }
 
 while true ; do
