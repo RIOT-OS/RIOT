@@ -70,7 +70,7 @@ def parse_cmsis(cpu_line):
             # skip line that contains non unicode characters
             continue
         # start filling lines after interrupt Doxygen comment
-        if line.startswith("typedef enum"):
+        if "typedef enum" in line:
             use_line = True
 
         # use a regexp to get the available IRQs
