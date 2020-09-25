@@ -108,13 +108,6 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
-/**
- * @name    Radio peripheral configuration
- * @{
- */
-#define RADIO_IRQ_PRIO      1
-/** @} */
-
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

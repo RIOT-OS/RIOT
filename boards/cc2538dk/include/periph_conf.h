@@ -100,13 +100,6 @@ static const adc_conf_t adc_config[] = {
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
-/**
- * @name Radio peripheral configuration
- * @{
- */
-#define RADIO_IRQ_PRIO      1
-/** @} */
-
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif
