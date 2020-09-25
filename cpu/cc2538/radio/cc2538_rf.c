@@ -130,20 +130,20 @@ void cc2538_init(void)
         NVIC_SetPriority(RF_RXTX_ALT_IRQn, RADIO_IRQ_PRIO);
         NVIC_EnableIRQ(RF_RXTX_ALT_IRQn);
 
-        NVIC_SetPriority(RF_ERR_ALT_IRQn, RADIO_IRQ_PRIO);
+        NVIC_SetPriority(RF_ERR_ALT_IRQn, CPU_DEFAULT_IRQ_PRIO);
         NVIC_EnableIRQ(RF_ERR_ALT_IRQn);
 
-        NVIC_SetPriority(MAC_TIMER_ALT_IRQn, RADIO_IRQ_PRIO);
+        NVIC_SetPriority(MAC_TIMER_ALT_IRQn, CPU_DEFAULT_IRQ_PRIO);
         NVIC_EnableIRQ(MAC_TIMER_ALT_IRQn);
     }
     else {
-        NVIC_SetPriority(RF_RXTX_IRQn, RADIO_IRQ_PRIO);
+        NVIC_SetPriority(RF_RXTX_IRQn, CPU_DEFAULT_IRQ_PRIO);
         NVIC_EnableIRQ(RF_RXTX_IRQn);
 
-        NVIC_SetPriority(RF_ERR_IRQn, RADIO_IRQ_PRIO);
+        NVIC_SetPriority(RF_ERR_IRQn, CPU_DEFAULT_IRQ_PRIO);
         NVIC_EnableIRQ(RF_ERR_IRQn);
 
-        NVIC_SetPriority(MACTIMER_IRQn, RADIO_IRQ_PRIO);
+        NVIC_SetPriority(MACTIMER_IRQn, CPU_DEFAULT_IRQ_PRIO);
         NVIC_EnableIRQ(MACTIMER_IRQn);
     }
 
