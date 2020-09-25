@@ -20,6 +20,7 @@
 #define BOARD_H
 
 #include "lpc23xx.h"
+#include "mtd.h"
 #include "bitarithm.h"
 
 #ifdef __cplusplus
@@ -43,6 +44,16 @@ extern "C" {
 #define LED1_OFF            (FIO3SET  = LED1_MASK)
 #define LED1_ON             (FIO3CLR  = LED1_MASK)
 #define LED1_TOGGLE         (FIO3PIN ^= LED1_MASK)
+/** @} */
+
+/**
+ * @name MTD configuration
+ * @{
+ */
+#ifdef MODULE_MTD_MCI
+extern mtd_dev_t *mtd0;
+#define MTD_0 mtd0
+#endif
 /** @} */
 
 #ifdef __cplusplus

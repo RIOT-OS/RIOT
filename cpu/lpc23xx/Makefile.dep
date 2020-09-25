@@ -3,4 +3,8 @@ USEMODULE += bitfield
 USEMODULE += periph
 USEMODULE += pm_layered
 
+ifneq (,$(filter mci,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 include $(RIOTCPU)/arm7_common/Makefile.dep
