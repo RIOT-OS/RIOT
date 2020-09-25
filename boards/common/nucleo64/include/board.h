@@ -54,7 +54,8 @@ extern "C" {
  * @{
  */
 #define BTN0_PIN            GPIO_PIN(PORT_C, 13)
-#if defined(CPU_MODEL_STM32L433RC) || defined(CPU_MODEL_STM32G474RE)
+#if defined(CPU_MODEL_STM32L433RC) || defined(CPU_MODEL_STM32G474RE) || \
+    defined(CPU_MODEL_STM32G431RB)
 #define BTN0_MODE           GPIO_IN_PD
 #else
 #define BTN0_MODE           GPIO_IN_PU
