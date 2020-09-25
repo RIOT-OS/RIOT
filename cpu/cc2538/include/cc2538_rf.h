@@ -23,6 +23,10 @@
 #define CC2538_RF_H
 
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdatomic.h>
+
+#include "cc2538_rfcore.h"
 
 #include "net/ieee802154.h"
 #include "net/netdev.h"
@@ -207,6 +211,24 @@ enum {
 };
 
 /**
+ * @name    CC2538 RF interrupts flags
+ *
+ * @{
+ */
+#define CC2538_RF_SFD_RX       (1 << 0)
+#define CC2538_RF_TXDONE       (1 << 1)
+#define CC2538_RF_RXPKTDONE    (1 << 2)
+/** @} */
+
+/**
+ * @name    Internal device option flags
+ * @{
+ */
+#define CC2538_OPT_PRELOADING     (0x01)       /**< preloading enabled */
+
+/** @} */
+
+/**
  * @brief   Device descriptor for CC2538 transceiver
  *
  * @extends netdev_ieee802154_t
@@ -214,7 +236,8 @@ enum {
 typedef struct {
     netdev_ieee802154_t netdev;   /**< netdev parent struct */
     uint8_t state;                /**< current state of the radio */
-    uint8_t flags;                /**< Device specific flags */
+    atomic_uint isr_flags;        /**< interrupt flags */
+    uint8_t flags;                /**< device specific flags */
 } cc2538_rf_t;
 
 /**
@@ -356,6 +379,13 @@ void cc2538_set_pan(uint16_t pan);
  * @param[in]  state        State to set device to
  */
 void cc2538_set_state(cc2538_rf_t *dev, netopt_state_t state);
+
+/**
+ * @brief   Start transmiting
+ *
+ * @param[in]  dev          Device descriptor
+ */
+void cc2538_tx_now(cc2538_rf_t * dev);
 
 /**
  * @brief   Set the transmission power for the device

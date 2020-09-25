@@ -174,6 +174,7 @@ void cc2538_set_monitor(bool mode)
 void cc2538_set_state(cc2538_rf_t *dev, netopt_state_t state)
 {
     switch (state) {
+        case NETOPT_STATE_STANDBY:
         case NETOPT_STATE_OFF:
         case NETOPT_STATE_SLEEP:
             cc2538_off();
@@ -191,7 +192,7 @@ void cc2538_set_state(cc2538_rf_t *dev, netopt_state_t state)
         case NETOPT_STATE_TX:
             dev->state = state;
             if (dev->flags & CC2538_OPT_PRELOADING) {
-                RFCORE_SFR_RFST = ISTXON;
+                cc2538_tx_now(dev);
             }
             break;
         case NETOPT_STATE_RESET:

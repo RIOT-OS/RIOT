@@ -171,18 +171,17 @@ void cc2538_off(void)
     /* Wait for ongoing TX to complete (e.g. this could be an outgoing ACK) */
     RFCORE_WAIT_UNTIL(RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE == 0);
 
-    /* Flush RX FIFO */
-    RFCORE_SFR_RFST = ISFLUSHRX;
-
     /* Don't turn off if we are off as this will trigger a Strobe Error */
     if (RFCORE_XREG_RXENABLE != 0) {
         RFCORE_SFR_RFST = ISRFOFF;
+        /* Clear FIFO IRQ */
+        RFCORE_SFR_RFIRQF0 &= ~(RXPKTDONE | FIFOP | SFD);
     }
 }
 
 bool cc2538_on(void)
 {
-    /* Flush RX FIFO */
+    /* Flush RX FIFO and reset demodulator */
     RFCORE_SFR_RFST = ISFLUSHRX;
 
     /* Enable/calibrate RX */
@@ -221,7 +220,7 @@ void cc2538_tx_exec(cc2538_rf_t *dev)
     /* Transmission does not trigger an SFD interrupt, so we need to
        poll and wait fot the SFD bit to be set */
     while (RFCORE->XREG_FSMSTAT1bits.TX_ACTIVE) {
-        if(RFCORE->XREG_FSMSTAT1bits.SFD) {
+        if (RFCORE->XREG_FSMSTAT1bits.SFD) {
             DEBUG_PUTS("[cc2538_rf] EVT - TX_STARTED");
             netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
             break;
