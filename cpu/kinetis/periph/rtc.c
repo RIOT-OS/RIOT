@@ -20,8 +20,6 @@
  * @}
  */
 
-#include <stdint.h>
-#include <time.h>
 #include "cpu.h"
 #include "periph/rtc.h"
 #include "periph/rtt.h"
@@ -41,7 +39,7 @@ static rtc_state_t rtc_callback;
  *
  * @param[inout] arg    argument passed from the RTT interrupt
  */
-static void rtc_cb(void* arg);
+static void rtc_cb(void *arg);
 
 void rtc_init(void)
 {
@@ -50,38 +48,38 @@ void rtc_init(void)
 
 int rtc_set_time(struct tm *time)
 {
-    time_t t = mktime(time);
+    uint32_t t = rtc_mktime(time);
 
-    rtt_set_counter((uint32_t)t);
+    rtt_set_counter(t);
 
     return 0;
 }
 
 int rtc_get_time(struct tm *time)
 {
-    time_t t = (time_t)rtt_get_counter();
+    uint32_t t = rtt_get_counter();
 
-    gmtime_r(&t, time);
+    rtc_localtime(t, time);
 
     return 0;
 }
 
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
-    time_t t = mktime(time);
+    uint32_t t = rtc_mktime(time);
 
     rtc_callback.cb = cb;
 
-    rtt_set_alarm((uint32_t)t, rtc_cb, arg);
+    rtt_set_alarm(t, rtc_cb, arg);
 
     return 0;
 }
 
 int rtc_get_alarm(struct tm *time)
 {
-    time_t t = (time_t)rtt_get_alarm();
+    uint32_t t = rtt_get_alarm();
 
-    gmtime_r(&t, time);
+    rtc_localtime(t, time);
 
     return 0;
 }
@@ -102,7 +100,7 @@ void rtc_poweroff(void)
     rtt_poweroff();
 }
 
-static void rtc_cb(void* arg)
+static void rtc_cb(void *arg)
 {
     if (rtc_callback.cb != NULL) {
         rtc_callback.cb(arg);
