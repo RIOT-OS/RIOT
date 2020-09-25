@@ -213,26 +213,36 @@ del_ipv6_routes() {
     done
 }
 
-delete_bridge() {
-    echo "deleting ${BRNAME}"
+delete_iface() {
+    IFACE="$1"
+    echo "deleting ${IFACE}"
+    case "${PLATFORM}" in
+        FreeBSD|OSX)
+            ifconfig "${IFACE}" destroy ;;
+        Linux)
+            ip link delete "${IFACE}" ;;
+        *) ;;
+    esac
+}
 
+delete_bridge() {
     case "${PLATFORM}" in
         FreeBSD)
             sysctl net.link.tap.user_open=0
             for IF in $(ifconfig ${BRIDGE} | grep -oiE "member: .+ " | cut -d' ' -f2); do
-                ifconfig $IF destroy || exit 1
+                delete_iface ${IF}
             done
-            ifconfig ${BRNAME} destroy || exit 1
+            delete_iface ${BRNAME} || exit 1
             kldunload if_tap        # unloading might fail due to dependencies
             kldunload if_bridge ;;
         Linux)
             for IF in $(ls /sys/class/net/${BRNAME}/brif); do
                 if [ "${IF}" != "${UPLINK}" ]; then
-                    ip link delete "${IF}"
+                    delete_iface ${IF}
                 fi
             done
 
-            ip link delete ${BRNAME} || exit 1
+            delete_iface ${BRNAME} || exit 1
 
             # restore the old uplink
             if [ -n "${UPLINK}" ]; then
@@ -240,7 +250,7 @@ delete_bridge() {
             fi ;;
         OSX)
             for IF in $(ifconfig ${BRIDGE} | grep -oiE "member: .+ " | cut -d' ' -f2); do
-                ifconfig $IF destroy || exit 1
+                delete_iface ${IF}
             done
             ifconfig ${BRNAME} destroy || exit 1 ;;
         *)
