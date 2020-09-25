@@ -37,7 +37,8 @@ static const timer_conf_t timer_config[] = {
 #else
         .max      = 0xffffffff,
 #endif
-#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
+    defined(CPU_FAM_STM32G4)
         .rcc_mask = RCC_APB1ENR1_TIM2EN,
 #else
         .rcc_mask = RCC_APB1ENR_TIM2EN,
