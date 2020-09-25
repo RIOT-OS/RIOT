@@ -24,6 +24,8 @@
 
 #include <stdbool.h>
 
+#include "board.h"
+
 #include "net/ieee802154.h"
 #include "kernel_defines.h"
 
@@ -154,6 +156,15 @@ enum {
   * @brief RFCORE_XREG_FRMCTRL0 bits
   */
 enum {
+    SET_RXENMASK_ON_TX  = BIT(0),
+    IGNORE_TX_UNDERF    = BIT(1),
+    PENDING_OR          = BIT(2),
+};
+
+ /*
+  * @brief RFCORE_XREG_FRMCTRL1 bits
+  */
+enum {
     ENERGY_SCAN      = BIT(4),
     AUTOACK          = BIT(5),
     AUTOCRC          = BIT(6),
@@ -187,7 +198,6 @@ enum {
 };
 
 /* Values for use with CCTEST_OBSSELx registers: */
-#define OBSSEL_EN BIT(7)
 enum {
     rfc_obs_sig0 = 0,
     rfc_obs_sig1 = 1,
@@ -196,26 +206,82 @@ enum {
 
 /* Values for RFCORE_XREG_RFC_OBS_CTRLx registers: */
 enum {
-    constant_value_0 = 0x00,
-    constant_value_1 = 0x01,
-    rfc_sniff_data   = 0x08,
-    rfc_sniff_clk    = 0x09,
-    rssi_valid       = 0x0c,
-    demod_cca        = 0x0d,
-    sampled_cca      = 0x0e,
-    sfd_sync         = 0x0f,
-    tx_active        = 0x10,
-    rx_active        = 0x11,
-    ffctrl_fifo      = 0x12,
-    ffctrl_fifop     = 0x13,
-    packet_done      = 0x14,
-    rfc_xor_rand_i_q = 0x16,
-    rfc_rand_q       = 0x17,
-    rfc_rand_i       = 0x18,
-    lock_status      = 0x19,
-    pa_pd            = 0x20,
-    lna_pd           = 0x2a,
+    constant_value_0 = 0x00, /**< Constant value 0 */
+    constant_value_1 = 0x01, /**< Constant value 1*/
+    rfc_sniff_data   = 0x08, /**< Data from packet sniffer. Sample data
+                                  on rising edges of sniff_clk.*/
+    rfc_sniff_clk    = 0x09, /**< 250kHz clock for packet sniffer data.*/
+    rssi_valid       = 0x0c, /**< Pin is high when the RSSI value has
+                                  been updated at least once since RX was
+                                  started. Cleared when leaving RX.*/
+    demod_cca        = 0x0d, /**< Clear channel assessment. See FSMSTAT1
+                                  register for details on how to configure
+                                  the behavior of this signal. */
+    sampled_cca      = 0x0e, /**< A sampled version of the CCA bit from
+                                  demodulator. The value is updated whenever
+                                  a SSAMPLECCA or STXONCCA strobe is issued.*/
+    sfd_sync         = 0x0f, /**< Pin is high when a SFD has been received
+                                  or transmitted. Cleared when leaving
+                                  RX/TX respectively. Not to be confused
+                                  with the SFD exception.*/
+    tx_active        = 0x10, /**< Indicates that FFCTRL is in one of the TX
+                                  states. Active-high.*/
+    rx_active        = 0x11, /**< Indicates that FFCTRL is in one of the
+                                  RX states. Active-high. */
+    ffctrl_fifo      = 0x12, /**< Pin is high when one or more bytes are
+                                  in the RXFIFO. Low during RXFIFO overflow. */
+    ffctrl_fifop     = 0x13, /**< Pin is high when the number of bytes
+                                  in the RXFIFO exceeds the programmable
+                                  threshold or at least  one complete
+                                  frame is in the RXFIFO. Also highduring
+                                  RXFIFO overflow. Not to be confused with
+                                  the FIFOP exception.*/
+    packet_done      = 0x14, /**< A complete frame has been received.
+                                  I.e., the number of bytes set by the
+                                  frame-length field has been received.*/
+    rfc_xor_rand_i_q = 0x16, /**< XOR between I and Q random outputs.
+                                  Updated at 8 MHz.*/
+    rfc_rand_q       = 0x17, /**< Random data output from the Q channel
+                                  of the receiver. Updated at 8 MHz.*/
+    rfc_rand_i       = 0x18, /**< Random data output from the I channel
+                                  of the receiver. Updated at 8 MHz */
+    lock_status      = 0x19, /**< 1 when PLL is in lock, otherwise 0 */
+    pa_pd            = 0x20, /**< Power amplifier power-down signal */
+    lna_pd           = 0x2a, /**< LNA power-down signal*/
+    disabled         = 0xff, /**< disabled */
 };
+
+/** @} */
+
+/**
+ * @name    RF CORE observable signals settings
+ */
+#ifndef CONFIG_CC2538_RF_OBS_0
+#define CONFIG_CC2538_RF_OBS_0      tx_active
+#endif
+#ifndef CONFIG_CC2538_RF_OBS_1
+#define CONFIG_CC2538_RF_OBS_1      rx_active
+#endif
+#ifndef CONFIG_CC2538_RF_OBS_2
+#define CONFIG_CC2538_RF_OBS_2      rssi_valid
+#endif
+
+/* Default configration for cc2538dk or similar */
+#ifndef CONFIG_CC2538_RF_OBS_SIG_0_PCX
+#define CONFIG_CC2538_RF_OBS_SIG_0_PCX  0   /* PC0 = LED_1 (red) */
+#endif
+#ifndef CONFIG_CC2538_RF_OBS_SIG_1_PCX
+#define CONFIG_CC2538_RF_OBS_SIG_1_PCX  1   /* PC0 = LED_2 (red) */
+#endif
+#ifndef CONFIG_CC2538_RF_OBS_SIG_2_PCX
+#define CONFIG_CC2538_RF_OBS_SIG_2_PCX  2   /* PC0 = LED_3 (red) */
+#endif
+#if ((CONFIG_CC2538_RF_OBS_SIG_2_PCX > 7) || \
+     (CONFIG_CC2538_RF_OBS_SIG_1_PCX > 7) || \
+     (CONFIG_CC2538_RF_OBS_SIG_0_PCX > 7))
+#error "CONFIG_CC2538_RF_OBS_SIG_X_PCX must be between 0-7 (PC0-PC7)"
+#endif
+/** @} */
 
 /**
  * @brief   Device descriptor for CC2538 transceiver

@@ -64,7 +64,7 @@ void isr_rfcoreerr(void)
 
 void isr_rfcorerxtx(void)
 {
-   cc2538_irq_handler();
+    cc2538_irq_handler();
 
     cortexm_isr_end();
 }
