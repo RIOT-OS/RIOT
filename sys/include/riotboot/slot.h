@@ -105,6 +105,27 @@ size_t riotboot_slot_offset(unsigned slot);
 void riotboot_slot_dump_addrs(void);
 
 /**
+ * @brief  Get the size of a slot
+ *
+ * @param[in]   slot    slot nr to get the size from
+ *
+ * @returns             The slot size in bytes
+ */
+static inline size_t riotboot_slot_size(unsigned slot)
+{
+    switch(slot) {
+        case 0:
+            return SLOT0_LEN;
+#if NUM_SLOTS==2
+        case 1:
+            return SLOT1_LEN;
+#endif
+        default:
+            return 0;
+    }
+}
+
+/**
  * @brief   Number of configured firmware slots (incl. bootloader slot)
  */
 extern const unsigned riotboot_slot_numof;

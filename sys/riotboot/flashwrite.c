@@ -34,15 +34,10 @@ static inline size_t min(size_t a, size_t b)
     return a <= b ? a : b;
 }
 
-size_t riotboot_flashwrite_slotsize(const riotboot_flashwrite_t *state)
+size_t riotboot_flashwrite_slotsize(
+        const riotboot_flashwrite_t *state)
 {
-    switch (state->target_slot) {
-        case 0: return SLOT0_LEN;
-#if NUM_SLOTS==2
-        case 1: return SLOT1_LEN;
-#endif
-        default: return 0;
-    }
+    return riotboot_slot_size(state->target_slot);
 }
 
 int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
