@@ -87,6 +87,7 @@ typedef enum {
                                          current sequence number */
     SUIT_ERR_SIGNATURE        = -6, /**< Unable to verify signature */
     SUIT_ERR_DIGEST_MISMATCH  = -7, /**< Digest mismatch with COSE and SUIT */
+    SUIT_ERR_POLICY_FORBIDDEN = -8, /**< Denied because of policy mismatch */
 } suit_error_t;
 
 /**

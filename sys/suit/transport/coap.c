@@ -379,12 +379,6 @@ static void _suit_handle_url(const char *url)
             LOG_INFO("manifest parsed, but no image fetched\n");
             return;
         }
-
-        res = suit_policy_check(&manifest);
-        if (res) {
-            return;
-        }
-
 #endif
         if (res == 0) {
             LOG_INFO("suit_coap: finalizing image flash\n");
