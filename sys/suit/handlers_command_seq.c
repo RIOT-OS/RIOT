@@ -375,6 +375,7 @@ static int _dtv_verify_image_match(suit_manifest_t *manifest, int key,
     if (res != 0) {
         return SUIT_ERR_COND;
     }
+    riotboot_flashwrite_finish(manifest->writer);
     return SUIT_OK;
 }
 

@@ -348,8 +348,8 @@ static void _suit_handle_url(const char *url)
     if (size >= 0) {
         LOG_INFO("suit_coap: got manifest with size %u\n", (unsigned)size);
 
-        riotboot_flashwrite_t writer;
 #ifdef MODULE_SUIT
+        riotboot_flashwrite_t writer;
         suit_manifest_t manifest;
         memset(&manifest, 0, sizeof(manifest));
 
@@ -376,9 +376,6 @@ static void _suit_handle_url(const char *url)
 
 #endif
         if (res == 0) {
-            LOG_INFO("suit_coap: finalizing image flash\n");
-            riotboot_flashwrite_finish(&writer);
-
             const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(
                 riotboot_slot_other());
             riotboot_hdr_print(hdr);
