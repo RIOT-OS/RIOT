@@ -270,6 +270,13 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
 
     const uint8_t *url;
     size_t url_len;
+
+    /* Check the policy before fetching anything */
+    int res = suit_policy_check(manifest);
+    if (res) {
+        return SUIT_ERR_POLICY_FORBIDDEN;
+    }
+
     suit_component_t *comp = _get_component(manifest);
 
     nanocbor_value_t param_uri;
@@ -289,7 +296,7 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
     int target_slot = riotboot_slot_other();
     riotboot_flashwrite_init(manifest->writer, target_slot);
 
-    int res = -1;
+    res = -1;
 
     if (0) {}
 #ifdef MODULE_SUIT_TRANSPORT_COAP
