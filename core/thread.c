@@ -169,9 +169,11 @@ void thread_add_to_list(list_node_t *list, thread_t *thread)
 }
 
 #ifdef DEVELHELP
-uintptr_t thread_measure_stack_free(char *stack)
+uintptr_t thread_measure_stack_free(const char *stack)
 {
-    uintptr_t *stackp = (uintptr_t *)stack;
+    /* Alignment of stack has been fixed (if needed) by thread_create(), so
+     * we can silence -Wcast-align here */
+    uintptr_t *stackp = (uintptr_t *)(uintptr_t)stack;
 
     /* assume that the comparison fails before or after end of stack */
     /* assume that the stack grows "downwards" */
@@ -216,8 +218,10 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     if (stacksize < 0) {
         DEBUG("thread_create: stacksize is too small!\n");
     }
-    /* allocate our thread control block at the top of our stackspace */
-    thread_t *thread = (thread_t *)(stack + stacksize);
+    /* allocate our thread control block at the top of our stackspace. Cast to
+     * (uintptr_t) intermediately to silence -Wcast-align. (We manually made
+     * sure alignment is correct above.) */
+    thread_t *thread = (thread_t *)(uintptr_t)(stack + stacksize);
 
 #ifdef PICOLIBC_TLS
     stacksize -= _tls_size();
@@ -228,9 +232,10 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
 
 #if defined(DEVELHELP) || defined(SCHED_TEST_STACK)
     if (flags & THREAD_CREATE_STACKTEST) {
-        /* assign each int of the stack the value of it's address */
-        uintptr_t *stackmax = (uintptr_t *)(stack + stacksize);
-        uintptr_t *stackp = (uintptr_t *)stack;
+        /* assign each int of the stack the value of it's address. Alignment
+         * has been handled above, so silence -Wcast-align */
+        uintptr_t *stackmax = (uintptr_t *)(uintptr_t)(stack + stacksize);
+        uintptr_t *stackp = (uintptr_t *)(uintptr_t)stack;
 
         while (stackp < stackmax) {
             *stackp = (uintptr_t)stackp;
@@ -238,8 +243,9 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
         }
     }
     else {
-        /* create stack guard */
-        *(uintptr_t *)stack = (uintptr_t)stack;
+        /* create stack guard. Alignment has been handled above, so silence
+         * -Wcast-align */
+        *(uintptr_t *)(uintptr_t)stack = (uintptr_t)stack;
     }
 #endif
 
