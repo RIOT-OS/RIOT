@@ -297,6 +297,9 @@ void thread_yield_higher(void)
     /* trigger the PENDSV interrupt to run scheduler and schedule new thread if
      * applicable */
     SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
+    /* flush the pipeline. Otherwise we risk that subsequent instructions are
+     * executed before the IRQ has actually triggered */
+    __ISB();
 }
 
 void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
@@ -384,7 +387,7 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     "mov    r1, r9                    \n"
     "mov    r2, r10                   \n"
     "mov    r3, r11                   \n"
-    "push   {r0-r7,lr}                   \n" /* now push them onto the stack */
+    "push   {r0-r7,lr}                \n" /* now push them onto the stack */
     /* SP should match the expected SP calculated above from here on */
 
     /* current thread context is now saved */
@@ -404,7 +407,7 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     /* restore the application mode stack pointer PSP */
     "mov    r1, sp                    \n" /* restore the user mode SP */
     "msr    psp, r1                   \n" /* for this write it to the PSP reg */
-    "mov    sp, r12                    \n" /* and get the parked MSR SP back */
+    "mov    sp, r12                   \n" /* and get the parked MSR SP back */
     "bx     r0                        \n" /* load exception return value to PC,
                                            * causes end of exception*/
 #endif
