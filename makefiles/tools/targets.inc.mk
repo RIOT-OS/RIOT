@@ -40,6 +40,11 @@ $(RIOTTOOLS)/setsid/setsid: $(RIOTTOOLS)/setsid/Makefile
 	@$(MAKE) -C $(RIOTTOOLS)/setsid
 	@echo "[INFO] setsid binary successfully built!"
 
+$(RIOTTOOLS)/suit/suit-manifest-generator/bin/suit-tool: $(RIOTTOOLS)/suit/Makefile
+	@echo "[INFO] suit-manifest-generator not found - fetching it now"
+	@$(MAKE) -C $(RIOTTOOLS)/suit
+	@echo "[INFO] suit-manifest-generator successfully fetched!"
+
 $(RIOTTOOLS)/flatc/flatc: $(RIOTTOOLS)/flatc/Makefile
 	@echo "[INFO] flatc binary not found - building it from source now"
 	$(MAKE) -C $(RIOTTOOLS)/flatc

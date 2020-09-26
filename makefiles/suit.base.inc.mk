@@ -1,6 +1,6 @@
 #
 # path to suit-tool
-SUIT_TOOL ?= $(RIOTBASE)/dist/tools/suit/suit-manifest-generator/bin/suit-tool
+SUIT_TOOL ?= $(PKGDIRBASE)/suit-manifest-generator/bin/suit-tool
 
 #
 # SUIT encryption keys
@@ -24,7 +24,7 @@ SUIT_PUB_HDR_DIR = $(dir $(SUIT_PUB_HDR))
 CFLAGS += -I$(SUIT_PUB_HDR_DIR)
 BUILDDEPS += $(SUIT_PUB_HDR)
 
-$(SUIT_SEC): $(CLEAN)
+$(SUIT_SEC): $(CLEAN) $(SUIT_TOOL)
 	@echo suit: generating key in $(SUIT_KEY_DIR)
 	@mkdir -p $(SUIT_KEY_DIR)
 	@$(RIOTBASE)/dist/tools/suit/gen_key.py $(SUIT_SEC)

@@ -1,0 +1,66 @@
+From 6a4b622d3628a201758c89f8dfd20456bf658623 Mon Sep 17 00:00:00 2001
+From: Koen Zandberg <koen@bergzand.net>
+Date: Sat, 26 Sep 2020 14:42:52 +0200
+Subject: [PATCH] get_pubkey.py: add header output option
+
+---
+ suit_tool/get_pubkey.py | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
+
+diff --git a/suit_tool/get_pubkey.py b/suit_tool/get_pubkey.py
+index 2799b3f..36309ef 100644
+--- a/suit_tool/get_pubkey.py
++++ b/suit_tool/get_pubkey.py
+@@ -21,7 +21,7 @@ import binascii
+ import pyhsslms
+ 
+ from cryptography.hazmat.backends import default_backend
+-from cryptography.hazmat.primitives.asymmetric import ec
++from cryptography.hazmat.primitives.asymmetric import ec, ed25519
+ from cryptography.hazmat.primitives.asymmetric import utils as asymmetric_utils
+ from cryptography.hazmat.primitives import serialization as ks
+ 
+@@ -43,8 +43,23 @@ def to_uecc_pubkey(pk):
+     )
+     return '\n    '.join(uecc_c_def) + '\n};\n'
+ 
++
++def to_header(pk):
++    if isinstance(pk, ec.EllipticCurvePrivateKey):
++        return to_uecc_pubkey(pk)
++    if isinstance(pk, ed25519.Ed25519PrivateKey):
++        public_bytes = pk.public_key().public_bytes(
++            ks.Encoding.Raw, ks.PublicFormat.Raw)
++        public_c_def = ['const uint8_t public_key[] = {'] + textwrap.wrap(
++            ', '.join(['{:0=#4x}'.format(x) for x in public_bytes]),
++            76
++        )
++        return str.encode('\n    '.join(public_c_def) + '\n};\n')
++
++
+ OutputFormaters = {
+     'uecc' : to_uecc_pubkey,
++    'header': to_header,
+     'pem' : lambda pk: pk.public_key().public_bytes(ks.Encoding.PEM, ks.PublicFormat.SubjectPublicKeyInfo),
+     'der' : lambda pk: pk.public_key().public_bytes(ks.Encoding.DER, ks.PublicFormat.SubjectPublicKeyInfo),
+     'hsslms' : lambda pk: pk.publicKey().serialize(),
+@@ -58,7 +73,7 @@ OutputFormaters = {
+ def main(options):
+     private_key = None
+     # This test is here because the cryptography module doesn't know about hss-lms keys
+-    if options.output_format in ('pem', 'der', 'uecc'):
++    if options.output_format in ('pem', 'der', 'uecc', 'header'):
+         private_key = ks.load_pem_private_key(
+             options.private_key.read(),
+             password=None,
+@@ -69,7 +84,7 @@ def main(options):
+ 
+     odata = OutputFormaters.get(options.output_format)(private_key)
+ 
+-    if options.output_file.isatty():
++    if options.output_file.isatty() or options.output_format == 'header':
+         try:
+             odata = odata.decode('utf-8')
+         except:
+-- 
+2.25.1
