@@ -112,6 +112,9 @@ static int _receive(int argc, char **argv)
                  ((uint32_t)buf[3]);
         isrpipe_read(&rxbuf, buf, 1);       /* can-dlc */
         can_dlc = buf[0];
+        if (can_dlc > 0) {
+            isrpipe_read(&rxbuf, buf, can_dlc); /* data */
+        }
 
         printf("id: %" PRIx32 " dlc: %" PRIx8 " Data: \n", can_id, can_dlc);
         for (int i = 0; i < can_dlc; i++) {
