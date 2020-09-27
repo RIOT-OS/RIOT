@@ -21,6 +21,14 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#ifndef SET_MODE_CONF_1_ALT_DCDC_IPEAK
+#define SET_MODE_CONF_1_ALT_DCDC_IPEAK 0x2 /**< 32 mA */
+#endif
+
+#ifndef SET_MODE_CONF_XOSC_FREQ
+#define SET_MODE_CONF_XOSC_FREQ        0x3 /**< 24 MHz xtal */
+#endif
+
 #include "cpu_conf_cc26xx_cc13xx.h"
 
 #include "cc26x0_aux.h"
