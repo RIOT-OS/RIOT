@@ -137,3 +137,10 @@ ifeq (L,$(STM32_TYPE))
     endif
   endif
 endif
+ifeq (MP,$(STM32_TYPE))
+  ifeq (157,$(STM32_MODEL))
+    ifeq (C,$(STM32_MODEL2))
+      CPU_LINE = STM32MP157Cxx
+    endif
+  endif
+endif
