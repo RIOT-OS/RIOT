@@ -62,6 +62,145 @@ extern "C"
 /** @} */
 
 /**
+ * @brief Mapping internal module interrupts to LLWU wake up sources
+ *
+ * @note Modules not listed here CAN NOT be used to wake the CPU from LLS or
+ * VLLSx power modes.
+ *
+ * The numbers are hardware specific, but have the same values across all the
+ * supported Kinetis CPUs
+ */
+typedef enum llwu_wakeup_module {
+    LLWU_WAKEUP_MODULE_LPTMR0      = 0,
+    LLWU_WAKEUP_MODULE_CMP0        = 1,
+    LLWU_WAKEUP_MODULE_RADIO       = 2, /* KWx1Z devices */
+    LLWU_WAKEUP_MODULE_CMP1        = 2, /* others */
+    LLWU_WAKEUP_MODULE_DCDC        = 3, /* KWx1Z devices */
+    LLWU_WAKEUP_MODULE_CMP2        = 3, /* others */
+    LLWU_WAKEUP_MODULE_TSI         = 4,
+    LLWU_WAKEUP_MODULE_RTC_ALARM   = 5,
+    LLWU_WAKEUP_MODULE_RESERVED    = 6,
+    LLWU_WAKEUP_MODULE_RTC_SECONDS = 7,
+    LLWU_WAKEUP_MODULE_NUMOF
+} llwu_wakeup_module_t;
+
+/**
+ * @brief   Mapping LLWU wakeup pin sources to PORT interrupt numbers
+ */
+typedef struct {
+    PORT_Type *port; /**< PORT register */
+    uint32_t isfr_mask; /**< ISFR bitmask */
+} llwu_wakeup_pin_to_port_t;
+
+/**
+ * @brief   Mapping physical pins to LLWU wakeup pin source numbers
+ *
+ * @note Pins not listed here CAN NOT be used to wake the CPU from LLS or
+ * VLLSx power modes.
+ *
+ * The numbers are hardware specific, but have the same values across all the
+ * supported Kinetis CPUs.
+ */
+#if defined(KINETIS_SERIES_W) && defined(KINETIS_CORE_Z) && (KINETIS_SUBFAMILY == 1)
+/* KW41Z has different LLWU pins */
+typedef enum llwu_wakeup_pin {
+    LLWU_WAKEUP_PIN_PTC16 =  0,
+    LLWU_WAKEUP_PIN_PTC17 =  1,
+    LLWU_WAKEUP_PIN_PTC18 =  2,
+    LLWU_WAKEUP_PIN_PTC19 =  3,
+    LLWU_WAKEUP_PIN_PTA16 =  4,
+    LLWU_WAKEUP_PIN_PTA17 =  5,
+    LLWU_WAKEUP_PIN_PTA18 =  6,
+    LLWU_WAKEUP_PIN_PTA19 =  7,
+    LLWU_WAKEUP_PIN_PTB0  =  8,
+    LLWU_WAKEUP_PIN_PTC0  =  9,
+    LLWU_WAKEUP_PIN_PTC2  = 10,
+    LLWU_WAKEUP_PIN_PTC3  = 11,
+    LLWU_WAKEUP_PIN_PTC4  = 12,
+    LLWU_WAKEUP_PIN_PTC5  = 13,
+    LLWU_WAKEUP_PIN_PTC6  = 14,
+    LLWU_WAKEUP_PIN_PTC7  = 15,
+    LLWU_WAKEUP_PIN_NUMOF,
+    LLWU_WAKEUP_PIN_UNDEF
+} llwu_wakeup_pin_t;
+
+/**
+ * @brief   Mapping LLWU wakeup pin number to PORT module interrupt flags
+ */
+static const llwu_wakeup_pin_to_port_t llwu_wakeup_pin_to_port[LLWU_WAKEUP_PIN_NUMOF] = {
+    [LLWU_WAKEUP_PIN_PTC16] = { .port = PORTC, .isfr_mask = (1u << 16), },
+    [LLWU_WAKEUP_PIN_PTC17] = { .port = PORTC, .isfr_mask = (1u << 17), },
+    [LLWU_WAKEUP_PIN_PTC18] = { .port = PORTC, .isfr_mask = (1u << 18), },
+    [LLWU_WAKEUP_PIN_PTC19] = { .port = PORTC, .isfr_mask = (1u << 19), },
+    [LLWU_WAKEUP_PIN_PTA16] = { .port = PORTA, .isfr_mask = (1u << 16), },
+    [LLWU_WAKEUP_PIN_PTA17] = { .port = PORTA, .isfr_mask = (1u << 17), },
+    [LLWU_WAKEUP_PIN_PTA18] = { .port = PORTA, .isfr_mask = (1u << 18), },
+    [LLWU_WAKEUP_PIN_PTA19] = { .port = PORTA, .isfr_mask = (1u << 19), },
+    [LLWU_WAKEUP_PIN_PTB0 ] = { .port = PORTB, .isfr_mask = (1u <<  0), },
+    [LLWU_WAKEUP_PIN_PTC0 ] = { .port = PORTC, .isfr_mask = (1u <<  0), },
+    [LLWU_WAKEUP_PIN_PTC2 ] = { .port = PORTC, .isfr_mask = (1u <<  2), },
+    [LLWU_WAKEUP_PIN_PTC3 ] = { .port = PORTC, .isfr_mask = (1u <<  3), },
+    [LLWU_WAKEUP_PIN_PTC4 ] = { .port = PORTC, .isfr_mask = (1u <<  4), },
+    [LLWU_WAKEUP_PIN_PTC5 ] = { .port = PORTC, .isfr_mask = (1u <<  5), },
+    [LLWU_WAKEUP_PIN_PTC6 ] = { .port = PORTC, .isfr_mask = (1u <<  6), },
+    [LLWU_WAKEUP_PIN_PTC7 ] = { .port = PORTC, .isfr_mask = (1u <<  7), },
+};
+#else
+typedef enum llwu_wakeup_pin {
+    LLWU_WAKEUP_PIN_PTE1  =  0,
+    LLWU_WAKEUP_PIN_PTE2  =  1,
+    LLWU_WAKEUP_PIN_PTE4  =  2,
+    LLWU_WAKEUP_PIN_PTA4  =  3,
+    LLWU_WAKEUP_PIN_PTA13 =  4,
+    LLWU_WAKEUP_PIN_PTB0  =  5,
+    LLWU_WAKEUP_PIN_PTC1  =  6,
+    LLWU_WAKEUP_PIN_PTC3  =  7,
+    LLWU_WAKEUP_PIN_PTC4  =  8,
+    LLWU_WAKEUP_PIN_PTC5  =  9,
+    LLWU_WAKEUP_PIN_PTC6  = 10,
+    LLWU_WAKEUP_PIN_PTC11 = 11,
+    LLWU_WAKEUP_PIN_PTD0  = 12,
+    LLWU_WAKEUP_PIN_PTD2  = 13,
+    LLWU_WAKEUP_PIN_PTD4  = 14,
+    LLWU_WAKEUP_PIN_PTD6  = 15,
+    LLWU_WAKEUP_PIN_NUMOF,
+    LLWU_WAKEUP_PIN_UNDEF
+} llwu_wakeup_pin_t;
+
+/**
+ * @brief   Mapping LLWU wakeup pin number to PORT module interrupt flags
+ */
+static const llwu_wakeup_pin_to_port_t llwu_wakeup_pin_to_port[LLWU_WAKEUP_PIN_NUMOF] = {
+    [LLWU_WAKEUP_PIN_PTE1 ] = { .port = PORTE, .isfr_mask = (1u <<  1), },
+    [LLWU_WAKEUP_PIN_PTE2 ] = { .port = PORTE, .isfr_mask = (1u <<  2), },
+    [LLWU_WAKEUP_PIN_PTE4 ] = { .port = PORTE, .isfr_mask = (1u <<  4), },
+    [LLWU_WAKEUP_PIN_PTA4 ] = { .port = PORTA, .isfr_mask = (1u <<  4), },
+    [LLWU_WAKEUP_PIN_PTA13] = { .port = PORTA, .isfr_mask = (1u << 13), },
+    [LLWU_WAKEUP_PIN_PTB0 ] = { .port = PORTB, .isfr_mask = (1u <<  0), },
+    [LLWU_WAKEUP_PIN_PTC1 ] = { .port = PORTC, .isfr_mask = (1u <<  1), },
+    [LLWU_WAKEUP_PIN_PTC3 ] = { .port = PORTC, .isfr_mask = (1u <<  3), },
+    [LLWU_WAKEUP_PIN_PTC4 ] = { .port = PORTC, .isfr_mask = (1u <<  4), },
+    [LLWU_WAKEUP_PIN_PTC5 ] = { .port = PORTC, .isfr_mask = (1u <<  5), },
+    [LLWU_WAKEUP_PIN_PTC6 ] = { .port = PORTC, .isfr_mask = (1u <<  6), },
+    [LLWU_WAKEUP_PIN_PTC11] = { .port = PORTC, .isfr_mask = (1u << 11), },
+    [LLWU_WAKEUP_PIN_PTD0 ] = { .port = PORTD, .isfr_mask = (1u <<  0), },
+    [LLWU_WAKEUP_PIN_PTD2 ] = { .port = PORTD, .isfr_mask = (1u <<  2), },
+    [LLWU_WAKEUP_PIN_PTD4 ] = { .port = PORTD, .isfr_mask = (1u <<  4), },
+    [LLWU_WAKEUP_PIN_PTD6 ] = { .port = PORTD, .isfr_mask = (1u <<  6), },
+};
+#endif
+
+/**
+ * @brief   LLWU wakeup pin edge settings
+ */
+typedef enum llwu_wakeup_edge {
+    LLWU_WAKEUP_EDGE_NONE = 0,
+    LLWU_WAKEUP_EDGE_RISING = 1,
+    LLWU_WAKEUP_EDGE_FALLING = 2,
+    LLWU_WAKEUP_EDGE_BOTH = 3,
+} llwu_wakeup_edge_t;
+
+/**
  * @name Compatibility definitions between vendor headers
  * @{
  */

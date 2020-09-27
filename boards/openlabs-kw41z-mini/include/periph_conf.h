@@ -142,9 +142,6 @@ static const uart_conf_t uart_config[] = {
         .scgc_bit = SIM_SCGC5_LPUART0_SHIFT,
         .mode   = UART_MODE_8N1,
         .type   = KINETIS_LPUART,
-#ifdef MODULE_PERIPH_LLWU /* TODO remove ifdef after #11789 is merged */
-        .llwu_rx = LLWU_WAKEUP_PIN_PTC6,
-#endif
     },
 };
 #define UART_NUMOF          ARRAY_SIZE(uart_config)

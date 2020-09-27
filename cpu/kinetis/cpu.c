@@ -23,6 +23,11 @@
 #ifdef MODULE_PERIPH_MCG
 #include "mcg.h"
 #endif
+#if defined(MODULE_PERIPH_LLWU)
+#include "llwu.h"
+#elif defined(MODULE_PM_LAYERED)
+#include "pm_layered.h"
+#endif
 
 /**
  * @brief Initialize the CPU, set IRQ priorities
@@ -45,6 +50,15 @@ void cpu_init(void)
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
     stdio_init();
+
+#if defined(MODULE_PERIPH_LLWU)
+    /* initialize the LLWU module for sleep/wakeup management */
+    llwu_init();
+#elif defined(MODULE_PM_LAYERED)
+    /* Block LLS mode since we are not using the LLWU module, which is required
+     * to be able to wake up from LLS */
+    pm_block(KINETIS_PM_LLS);
+#endif
 
     /* trigger static peripheral initialization */
     periph_init();

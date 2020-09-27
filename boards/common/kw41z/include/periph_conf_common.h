@@ -83,15 +83,16 @@ static const clock_config_t clock_config = {
             .count_ch = 1,           \
         },                           \
     }
-#define LPTMR_NUMOF             (1U)
-#define LPTMR_CONFIG { \
-        { \
-            .dev = LPTMR0, \
-            .irqn = LPTMR0_IRQn, \
-            .src = 2, \
-            .base_freq = 32768u, \
-        } \
-    }
+#define LPTMR_NUMOF                                (1U)
+#define LPTMR_CONFIG {                              \
+    {                                               \
+        .dev =          LPTMR0,                     \
+        .irqn =         LPTMR0_IRQn,                \
+        .base_freq =    32768u,                     \
+        .src =          2,                          \
+        .llwu =         LLWU_WAKEUP_MODULE_LPTMR0,  \
+    },                                              \
+}
 #define TIMER_NUMOF             ((PIT_NUMOF) + (LPTMR_NUMOF))
 #define PIT_BASECLOCK           (CLOCK_BUSCLOCK)
 #define LPTMR_ISR_0             isr_lptmr0
@@ -118,8 +119,10 @@ static const uart_conf_t uart_config[] = {
 };
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 #define LPUART_0_ISR        isr_lpuart0
-/* Use MCGIRCLK (internal reference 4 MHz clock) */
-#define LPUART_0_SRC        3
+/* Use MCGIRCLK (4 MHz internal reference - not available <= KINETIS_PM_LLS) */
+#define LPUART_0_SRC                    3
+#define UART_CLOCK_PM_BLOCKER           KINETIS_PM_LLS
+#define UART_MAX_UNCLOCKED_BAUDRATE     19200ul
 /** @} */
 
 /**

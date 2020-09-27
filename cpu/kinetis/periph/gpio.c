@@ -21,16 +21,26 @@
  * @author      Johann Fischer <j.fischer@phytec.de>
  * @author      Jonas Remmert <j.remmert@phytec.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
+ * @author      Thomas Stilwell <stilwellt@openlabs.co>
  *
  * @}
  */
 
 #include <stddef.h>
 #include <stdint.h>
+
+#include "log.h"
 #include "cpu.h"
-#include "bitarithm.h"
 #include "bit.h"
+#include "bitarithm.h"
 #include "periph/gpio.h"
+
+#if MODULE_PERIPH_LLWU
+#include "llwu.h"
+#endif
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 /* Single-port MCU*/
 #if !defined(PORTA_BASE) && defined(PORT_BASE)
@@ -86,15 +96,14 @@
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
 /**
- * @brief   Calculate the needed memory (in byte) needed to save 4 bits per MCU
- *          pin
+ * @brief   Calculate the needed memory (in bytes) to store 4 bits per MCU pin
  */
-#define ISR_MAP_SIZE        (GPIO_PORTS_NUMOF * PINS_PER_PORT * 4 / 8)
+#define ISR_MAP_SIZE (GPIO_PORTS_NUMOF * PINS_PER_PORT * 4 / 8 / sizeof(uint32_t))
 
 /**
  * @brief   Define the number of simultaneously configurable interrupt channels
  *
- * We have configured 4-bits per pin, so we can go up to 16 simultaneous active
+ * We have configured 4-bits per pin, so we can go up to 15 simultaneous active
  * extern interrupt sources.
  */
 #define CTX_NUMOF           (8U)
@@ -148,10 +157,13 @@ static inline int pin_num(gpio_t pin)
 
 /**
  * @brief   Get context for a specific pin
+ *
+ * @return  index of context for specified pin
+ * @return  -1 if pin has no context
  */
 static inline int get_ctx(int port, int pin)
 {
-    return (isr_map[(port * 4) + (pin >> 3)] >> ((pin & 0x7) * 4)) & 0xf;
+    return ((isr_map[(port * 4) + (pin >> 3)] >> ((pin & 0x7) * 4)) & 0xf) - 1;
 }
 
 /**
@@ -177,13 +189,15 @@ static void write_map(int port, int pin, int ctx)
 }
 
 /**
- * @brief   Clear the context for the given pin
+ * @brief   Free the context for the given pin
  */
-static void ctx_clear(int port, int pin)
+static void ctx_free(int port, int pin)
 {
     int ctx = get_ctx(port, pin);
-
-    write_map(port, pin, ctx);
+    /* clear the context pointer for this pin */
+    write_map(port, pin, 0);
+    /* mark the context entry as free */
+    isr_ctx[ctx].cb = NULL;
 }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
@@ -225,21 +239,21 @@ void gpio_init_port(gpio_t pin, uint32_t pcr)
     /* enable PORT clock in case it was not active before */
     clk_en(pin);
 
+    /* We don't support setting IRQC this way. It's managed in this file only */
+    assert(!(pcr & PORT_PCR_IRQC_MASK));
+
 #ifdef KINETIS_HAVE_PCR
-#ifdef MODULE_PERIPH_GPIO_IRQ
-    /* if the given interrupt was previously configured as interrupt source, we
-     * need to free its interrupt context. We to this only after we
-     * re-configured the pin in case an event is happening just in between... */
-    uint32_t isr_state = port(pin)->PCR[pin_num(pin)];
-#endif /* MODULE_PERIPH_GPIO_IRQ */
-
-    /* set new PCR value */
-    port(pin)->PCR[pin_num(pin)] = pcr;
+    /* set new PCR value, keeping the existing IRQC value */
+    uint32_t old_pcr = port(pin)->PCR[pin_num(pin)];
+    port(pin)->PCR[pin_num(pin)] = pcr | (old_pcr & PORT_PCR_IRQC_MASK);
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-    /* and clear the interrupt context if needed */
-    if (isr_state & PORT_PCR_IRQC_MASK) {
-        ctx_clear(port_num(pin), pin_num(pin));
+    /* Pin interrupts can only be used in digital muxing modes, so disable
+     * them if we're configuring for analog. Also gpio_init() triggers this. */
+    if ((pcr & PORT_PCR_MUX_MASK) == GPIO_AF_ANALOG
+        && get_ctx(port_num(pin), pin_num(pin)) >= 0) {
+        gpio_irq_disable(pin);
+        ctx_free(port_num(pin), pin_num(pin));
     }
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 #else
@@ -283,11 +297,35 @@ void gpio_write(gpio_t pin, int value)
 }
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
+#ifdef MODULE_PERIPH_LLWU
+static llwu_wakeup_pin_t llwu_pin_from_gpio(gpio_t pin)
+{
+    for (unsigned i = 0; i < LLWU_WAKEUP_PIN_NUMOF; ++i) {
+        if (llwu_wakeup_pin_to_port[i].port == port(pin)
+            && llwu_wakeup_pin_to_port[i].isfr_mask == (1u << pin_num(pin))
+        ) {
+            return i;
+        }
+    }
+    return LLWU_WAKEUP_PIN_UNDEF;
+}
+#endif /* MODULE_PERIPH_LLWU */
+
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
                   gpio_cb_t cb, void *arg)
 {
     if (gpio_init(pin, mode) < 0) {
         return -1;
+    }
+
+#ifdef MODULE_PERIPH_LLWU
+    if (llwu_pin_from_gpio(pin) == LLWU_WAKEUP_PIN_UNDEF)
+    {
+#else
+    {
+#endif
+        LOG_INFO("[gpio] will block power mode %u for pin interrupt while enabled\n",
+                 KINETIS_PM_LLS);
     }
 
     /* try go grab a free spot in the context array */
@@ -300,7 +338,8 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     isr_ctx[ctx_num].cb = cb;
     isr_ctx[ctx_num].arg = arg;
     isr_ctx[ctx_num].state = flank;
-    write_map(port_num(pin), pin_num(pin), ctx_num);
+    /* context map requires ctx_num + 1, as 0 is the no-context value */
+    write_map(port_num(pin), pin_num(pin), ctx_num + 1);
 
     /* clear interrupt flags */
     port(pin)->ISFR &= ~(1 << pin_num(pin));
@@ -309,21 +348,76 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     NVIC_EnableIRQ(port_irqs[port_num(pin)]);
 
     /* finally, enable the interrupt for the selected pin */
-    port(pin)->PCR[pin_num(pin)] |= flank;
+    gpio_irq_enable(pin);
+
     return 0;
 }
 
 void gpio_irq_enable(gpio_t pin)
 {
+    /* mustn't proceed if interrupts are enabled already */
+    if (port(pin)->PCR[pin_num(pin)] & PORT_PCR_IRQC_MASK) {
+        return;
+    }
+
     int ctx = get_ctx(port_num(pin), pin_num(pin));
     port(pin)->PCR[pin_num(pin)] |= isr_ctx[ctx].state;
+
+#ifdef MODULE_PERIPH_LLWU
+    /* Check if the pin can be used as LLWU source. Configure LLWU if so,
+     * but also leave the pin configured as a GPIO IRQ source because LLWU is
+     * not active in any non-LL mode. If not, block PM_LLS as we can't otherwise
+     * provide the requested pin interrupt.
+     */
+    llwu_wakeup_pin_t llwu_pin = llwu_pin_from_gpio(pin);
+    if (llwu_pin != LLWU_WAKEUP_PIN_UNDEF) {
+        llwu_wakeup_edge_t edge = (isr_ctx[ctx].state >> PORT_PCR_IRQC_SHIFT)
+                                  - (GPIO_RISING >> PORT_PCR_IRQC_SHIFT)
+                                  + LLWU_WAKEUP_EDGE_RISING;
+        llwu_wakeup_pin_set(llwu_pin, edge, isr_ctx[ctx].cb, isr_ctx[ctx].arg);
+    }
+
+    else
+    {
+#else /* MODULE_PERIPH_LLWU */
+    {
+#endif
+        DEBUG("[gpio] blocking power mode %u for pin interrupt\n",
+                 KINETIS_PM_LLS);
+        PM_BLOCK(KINETIS_PM_LLS);
+    }
 }
 
 void gpio_irq_disable(gpio_t pin)
 {
     int ctx = get_ctx(port_num(pin), pin_num(pin));
     isr_ctx[ctx].state = port(pin)->PCR[pin_num(pin)] & PORT_PCR_IRQC_MASK;
+
+    /* mustn't proceed if interrupts are disabled already */
+    if (!isr_ctx[ctx].state) {
+        return;
+    }
+
     port(pin)->PCR[pin_num(pin)] &= ~(PORT_PCR_IRQC_MASK);
+
+#ifdef MODULE_PERIPH_LLWU
+    /* Disable LLWU for this pin if we had enabled it */
+    llwu_wakeup_pin_t llwu_pin = llwu_pin_from_gpio(pin);
+    if (llwu_pin != LLWU_WAKEUP_PIN_UNDEF)
+    {
+        llwu_wakeup_pin_set(llwu_pin, LLWU_WAKEUP_EDGE_NONE,
+                            NULL, NULL);
+    }
+
+    else
+    {
+#else /* MODULE_PERIPH_LLWU */
+    {
+#endif
+        DEBUG("[gpio] unblocking power mode %u for pin interrupt\n",
+                 KINETIS_PM_LLS);
+        PM_UNBLOCK(KINETIS_PM_LLS);
+    }
 }
 
 static inline void irq_handler(PORT_Type *port, int port_num)

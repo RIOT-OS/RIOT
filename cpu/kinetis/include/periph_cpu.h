@@ -140,6 +140,14 @@ enum {
     KINETIS_PM_STOP = 2,
     KINETIS_PM_WAIT = 3,
 };
+
+/**
+ * @brief   Override the default initial PM blocker to unblock all modes
+ */
+#ifndef PM_BLOCKER_INITIAL
+#define PM_BLOCKER_INITIAL  0x00000000
+#endif
+
 #if MODULE_PM_LAYERED
 #include "pm_layered.h"
 /**
@@ -388,6 +396,8 @@ typedef struct {
     LPTMR_Type *dev;
     /** Input clock frequency */
     uint32_t base_freq;
+    /** LLWU wakeup module number for this timer */
+    llwu_wakeup_module_t llwu;
     /** Clock source setting */
     uint8_t src;
     /** IRQn interrupt number */
@@ -524,6 +534,11 @@ typedef struct {
     uart_mode_t mode;             /**< UART mode: data bits, parity, stop bits */
     uart_type_t type;             /**< Hardware module type (KINETIS_UART or KINETIS_LPUART)*/
 } uart_conf_t;
+
+/**
+ * @brief  Override the default uart_isr_ctx_t in uart.c
+ */
+#define HAVE_UART_ISR_CTX_T
 
 #if !defined(KINETIS_HAVE_PLL)
 #if defined(MCG_C6_PLLS_MASK) || DOXYGEN
@@ -786,6 +801,10 @@ typedef struct {
 #endif /* MODULE_PERIPH_MCG */
 /**
  * @brief   CPU internal function for initializing PORTs
+ *
+ * Sets the pin's PORT.PCR to the specified value, excluding PCR.IRQC
+ * which is not allowed to be set with this function. If pcr has GPIO_AF_ANALOG
+ * then PCR.IRQC will be cleared, as interrupts do not work in analog mode.
  *
  * @param[in] pin       pin to initialize
  * @param[in] pcr       value for the PORT's PCR register

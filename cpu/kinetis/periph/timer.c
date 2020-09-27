@@ -30,7 +30,11 @@
 #include "bit.h"
 #include "board.h"
 #include "periph_conf.h"
+#if MODULE_PERIPH_LLWU
+#include "llwu.h"
+#endif
 #include "periph/timer.h"
+
 
 #ifdef PIT_LTMR64H_LTH_MASK
 /* The KW41Z PIT module provides only one IRQ for all PIT channels combined. */
@@ -203,6 +207,11 @@ static inline int pit_set(uint8_t dev, uint32_t timeout)
     const uint8_t ch = pit_config[dev].count_ch;
     /* Disable IRQs to minimize the number of lost ticks */
     unsigned int mask = irq_disable();
+    if (!(PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TIE_MASK)) {
+        /* The PIT is halted in low power modes, block them when a timer target
+         * has been set */
+        PM_BLOCK(KINETIS_PM_STOP);
+    }
     /* Subtract if there was anything left on the counter */
     pit[dev].count -= PIT->CHANNEL[ch].CVAL;
     /* Set new timeout */
@@ -224,6 +233,11 @@ static inline int pit_set_absolute(uint8_t dev, uint32_t target)
     uint8_t ch = pit_config[dev].count_ch;
     /* Disable IRQs to minimize the number of lost ticks */
     unsigned int mask = irq_disable();
+    if (!(PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TIE_MASK)) {
+        /* The PIT is halted in low power modes, block them when a timer target
+         * has been set */
+        PM_BLOCK(KINETIS_PM_STOP);
+    }
     uint32_t now = pit[dev].count - PIT->CHANNEL[ch].CVAL;
     uint32_t offset = target - now;
 
@@ -246,6 +260,11 @@ static inline int pit_clear(uint8_t dev)
     uint8_t ch = pit_config[dev].count_ch;
     /* Disable IRQs to minimize the number of lost ticks */
     unsigned int mask = irq_disable();
+
+    if (PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TIE_MASK) {
+        /* Allow low power modes again */
+        PM_UNBLOCK(KINETIS_PM_STOP);
+    }
 
     /* Subtract if there was anything left on the counter */
     pit[dev].count -= PIT->CHANNEL[ch].CVAL;
@@ -274,12 +293,22 @@ static inline void pit_start(uint8_t dev)
 {
     uint8_t ch = pit_config[dev].prescaler_ch;
 
+    if (PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK) {
+        /* Already running */
+        return;
+    }
+
     PIT->CHANNEL[ch].TCTRL = PIT_TCTRL_TEN_MASK;
 }
 
 static inline void pit_stop(uint8_t dev)
 {
     uint8_t ch = pit_config[dev].prescaler_ch;
+
+    if (!(PIT->CHANNEL[ch].TCTRL & PIT_TCTRL_TEN_MASK)) {
+        /* Already stopped */
+        return;
+    }
 
     PIT->CHANNEL[ch].TCTRL = 0;
 }
@@ -301,6 +330,8 @@ static inline void pit_irq_handler(tim_t dev)
     PIT->CHANNEL[ch].LDVAL = PIT_MAX_VALUE;
     PIT->CHANNEL[ch].TFLG = PIT_TFLG_TIF_MASK;
     PIT->CHANNEL[ch].TCTRL = PIT_TCTRL_CHN_MASK | PIT_TCTRL_TEN_MASK;
+    /* Allow low power modes again */
+    PM_UNBLOCK(KINETIS_PM_STOP);
 
     if (pit_ctx->isr_ctx.cb != NULL) {
         pit_ctx->isr_ctx.cb(pit_ctx->isr_ctx.arg, 0);
@@ -382,6 +413,9 @@ static inline int lptmr_init(uint8_t dev, uint32_t freq, timer_cb_t cb, void *ar
     /* Enable IRQs on the counting channel */
     NVIC_ClearPendingIRQ(lptmr_config[dev].irqn);
     NVIC_EnableIRQ(lptmr_config[dev].irqn);
+#if MODULE_PERIPH_LLWU
+    llwu_wakeup_module_enable(lptmr_config[dev].llwu);
+#endif
 
     _lptmr_set_cb_config(dev, cb, arg);
 

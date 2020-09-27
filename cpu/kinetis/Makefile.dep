@@ -17,7 +17,11 @@ else ifneq (,$(filter periph_mcg,$(FEATURES_USED)))
   USEMODULE += periph_mcg
 endif
 
+USEMODULE += periph_llwu
 USEMODULE += periph_wdog
 USEMODULE += pm_layered
 
 include $(RIOTCPU)/cortexm_common/Makefile.dep
+ifneq (,$(filter periph_uart,$(USEMODULE)))
+  FEATURES_OPTIONAL += periph_gpio_irq
+endif
