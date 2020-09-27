@@ -54,7 +54,7 @@ void *worker_thread(void *arg)
         uint32_t now;
 
         msg_receive(&m);
-        now = xtimer_now_usec() / US_PER_MS;
+        now = evtimer_now_msec();
         ctx = m.content.ptr;
         printf("At %6" PRIu32 " ms received msg %i: \"%s\"\n", now, count++, ctx);
     }
@@ -77,7 +77,7 @@ int main(void)
     /* Add all the events */
     for (unsigned i = 0; i < NEVENTS; i++) {
         events[i].event.offset = offsets[i];
-        now = xtimer_now_usec() / US_PER_MS;
+        now = evtimer_now_msec();
         snprintf(texts[i], sizeof(texts[i]) - 1, "#%u supposed to be %" PRIu32, i, now + events[i].event.offset);
         events[i].msg.content.ptr = texts[i];
         evtimer_add_msg(&evtimer, &events[i], pid);
@@ -99,7 +99,7 @@ int main(void)
     /* Add all the events, again */
     for (unsigned i = 0; i < NEVENTS; i++) {
         events[i].event.offset = offsets[i];
-        now = xtimer_now_usec() / US_PER_MS;
+        now = evtimer_now_msec();
         snprintf(texts[i], sizeof(texts[i]) - 1, "#%u supposed to be %" PRIu32, i, now + events[i].event.offset);
         events[i].msg.content.ptr = texts[i];
         evtimer_add_msg(&evtimer, &events[i], pid);

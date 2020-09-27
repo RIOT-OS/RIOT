@@ -737,10 +737,6 @@ ifneq (,$(filter phydat,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
-ifneq (,$(filter evtimer,$(USEMODULE)))
-  USEMODULE += xtimer
-endif
-
 ifneq (,$(filter evtimer_mbox,$(USEMODULE)))
   USEMODULE += evtimer
   USEMODULE += core_mbox
@@ -1065,6 +1061,13 @@ endif
 # include ztimer dependencies
 ifneq (,$(filter ztimer% %ztimer,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer/Makefile.dep
+endif
+
+# handle evtimer's deps. Needs to be done *after* ztimer
+ifneq (,$(filter evtimer,$(USEMODULE)))
+  ifeq (,$(filter evtimer_on_ztimer,$(USEMODULE)))
+    USEMODULE += xtimer
+  endif
 endif
 
 # handle xtimer's deps. Needs to be done *after* ztimer

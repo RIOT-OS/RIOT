@@ -29,7 +29,9 @@
  *   the necessary fields, which can be extended as needed, and handlers define
  *   actions taken on timer triggers. Check out @ref evtimer_msg_event_t as
  *   example.
- * - uses @ref sys_xtimer "xtimer" as backend
+ * - uses @ref sys_xtimer "xtimer" as backend by default. Alternatively, with
+ *   the pseudomodule "evtimer_on_ztimer" compiled in, evtimer is backend by
+ *   @ref sys_ztimer "ZTIMER_MSEC".
  *
  * @{
  *
@@ -44,8 +46,14 @@
 #define EVTIMER_H
 
 #include <stdint.h>
+#include "kernel_defines.h"
 
+#if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
+#include "ztimer.h"
+#else
 #include "xtimer.h"
+#endif
+
 #include "timex.h"
 
 #ifdef __cplusplus
@@ -69,7 +77,12 @@ typedef void(*evtimer_callback_t)(evtimer_event_t* event);
  * @brief   Event timer
  */
 typedef struct {
+#if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
+    ztimer_t timer;                 /**< Timer */
+    uint32_t base;                  /**< Absolute time the first event is built on */
+#else
     xtimer_t timer;                 /**< Timer */
+#endif
     evtimer_callback_t callback;    /**< Handler function for this evtimer's
                                          event type */
     evtimer_event_t *events;        /**< Event queue */
@@ -115,7 +128,11 @@ void evtimer_print(const evtimer_t *evtimer);
  */
 static inline uint32_t evtimer_now_msec(void)
 {
+#if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
+    return ztimer_now(ZTIMER_MSEC);
+#else
     return xtimer_now_usec64() / US_PER_MS;
+#endif
 }
 
 /**
@@ -123,7 +140,11 @@ static inline uint32_t evtimer_now_msec(void)
  */
 static inline uint32_t evtimer_now_min(void)
 {
+#if IS_USED(MODULE_EVTIMER_ON_ZTIMER)
+    return ztimer_now(ZTIMER_MSEC) / (MS_PER_SEC * SEC_PER_MIN);
+#else
     return xtimer_now_usec64() / (US_PER_SEC * SEC_PER_MIN);
+#endif
 }
 
 #ifdef __cplusplus
