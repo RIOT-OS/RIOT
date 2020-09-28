@@ -77,25 +77,14 @@ static uint8_t _manifest_buf[SUIT_MANIFEST_BUFSIZE];
 
 #ifdef MODULE_SUIT
 static inline void _print_download_progress(suit_manifest_t *manifest,
-                                            size_t offset, size_t len)
+                                            size_t offset, size_t len,
+                                            size_t image_size)
 {
     (void)manifest;
     (void)offset;
     (void)len;
     DEBUG("_suit_flashwrite(): writing %u bytes at pos %u\n", len, offset);
 #if defined(MODULE_PROGRESS_BAR)
-    uint32_t image_size;
-    nanocbor_value_t param_size;
-    suit_param_ref_t *ref_size =
-        &manifest->components[manifest->component_current].param_size;
-
-    /* Grab the total image size from the manifest */
-    if ((suit_param_ref_to_cbor(manifest, ref_size, &param_size) == 0) ||
-            (nanocbor_get_uint32(&param_size, &image_size) < 0)) {
-        /* Early exit if the total image size can't be determined */
-        return;
-    }
-
     if (image_size != 0) {
         char _suffix[7] = { 0 };
         uint8_t _progress = 100 * (offset + len) / image_size;
@@ -359,8 +348,8 @@ static void _suit_handle_url(const char *url)
     if (size >= 0) {
         LOG_INFO("suit_coap: got manifest with size %u\n", (unsigned)size);
 
-        riotboot_flashwrite_t writer;
 #ifdef MODULE_SUIT
+        riotboot_flashwrite_t writer;
         suit_manifest_t manifest;
         memset(&manifest, 0, sizeof(manifest));
 
@@ -381,20 +370,17 @@ static void _suit_handle_url(const char *url)
         }
 #endif
         if (res == 0) {
-            LOG_INFO("suit_coap: finalizing image flash\n");
-            riotboot_flashwrite_finish(&writer);
-
             const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(
                 riotboot_slot_other());
             riotboot_hdr_print(hdr);
             xtimer_sleep(1);
 
             if (riotboot_hdr_validate(hdr) == 0) {
-                LOG_INFO("suit_coap: rebooting...");
+                LOG_INFO("suit_coap: rebooting...\n");
                 pm_reboot();
             }
             else {
-                LOG_INFO("suit_coap: update failed, hdr invalid");
+                LOG_INFO("suit_coap: update failed, hdr invalid\n ");
             }
         }
     }
@@ -408,6 +394,20 @@ int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
 {
     suit_manifest_t *manifest = (suit_manifest_t *)arg;
     riotboot_flashwrite_t *writer = manifest->writer;
+
+    uint32_t image_size;
+    nanocbor_value_t param_size;
+    size_t total = offset + len;
+    suit_param_ref_t *ref_size =
+        &manifest->components[manifest->component_current].param_size;
+
+    /* Grab the total image size from the manifest */
+    if ((suit_param_ref_to_cbor(manifest, ref_size, &param_size) == 0) ||
+            (nanocbor_get_uint32(&param_size, &image_size) < 0)) {
+        /* Early exit if the total image size can't be determined */
+        return -1;
+    }
+
 
     if (offset == 0) {
         if (len < RIOTBOOT_FLASHWRITE_SKIPLEN) {
@@ -426,7 +426,21 @@ int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
         return -1;
     }
 
-    _print_download_progress(manifest, offset, len);
+    if (image_size < offset + len) {
+        /* Extra newline at the start to compensate for the progress bar */
+        LOG_ERROR(
+            "\n_suit_flashwrite(): Image beyond size, offset + len=%u, "
+            "image_size=%u\n", (unsigned)(total), (unsigned)image_size);
+        return -1;
+    }
+
+    if (!more && image_size != total) {
+        LOG_INFO("Incorrect size received, got %u, expected %u\n",
+                 (unsigned)total, (unsigned)image_size);
+        return -1;
+    }
+
+    _print_download_progress(manifest, offset, len, image_size);
 
     return riotboot_flashwrite_putbytes(writer, buf, len, more);
 }

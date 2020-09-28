@@ -382,6 +382,14 @@ static int _dtv_verify_image_match(suit_manifest_t *manifest, int key,
     if (res != 0) {
         return SUIT_ERR_COND;
     }
+
+    /**
+     * SUIT transport mock doesn't implement the the 'finish' function. Can be
+     * removed as soon as there is a proper storage abstraction layer for SUIT
+     */
+    if (!IS_ACTIVE(MODULE_SUIT_TRANSPORT_MOCK)) {
+        riotboot_flashwrite_finish(manifest->writer);
+    }
     return SUIT_OK;
 }
 
