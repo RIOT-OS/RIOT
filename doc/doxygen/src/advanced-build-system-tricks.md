@@ -164,6 +164,7 @@ So the current filename should be higher than 60-serial.rules
 If for some reason re-writing the serial is needed there is a windows tool:
   https://remoteqth.com/wiki/index.php?page=How+to+set+usb+device+SerialNumber
 
+
 Documentation:
 --------------
 * The whole documentation
@@ -171,6 +172,63 @@ Documentation:
 * Udev manpage
   http://manpages.ubuntu.com/manpages/eoan/en/man7/udev.7.html
 
+# Handling multiple boards without udev-rules
+=============================================
+
+This is a simpler approach to the above mentioned issue. The solution here only
+uses a makefile script for selecting the debugger and serial port. No
+adminstrative privileges (e.g. to configure Udev) are required.
+
+One of the limitations of the solution described here is that it currently
+doesn't work with multiple boards of the same type. This limitation is a
+limitation of the script and not of the mechanism used, it is possible to adapt
+the script to support multiple boards of the same type. This modification is
+left as an exercise to the reader.
+
+The following Make snippet is used:
+
+~~~~~~~~~~~~~~~~~~~
+    LOCAL_BOARD_MAP ?= 1
+
+    # Adapt this list to your board collection
+    SERIAL_nucleo-f103rb ?= 066BFF343633464257254156
+    SERIAL_same54-xpro ?= ATML2748051800005053
+    SERIAL_samr21-xpro ?= ATML2127031800008360
+    SERIAL_nrf52dk ?= 000682223007
+
+    ifeq (1,$(LOCAL_BOARD_MAP))
+
+      # Retrieve the serial of the selected board
+      BOARD_SERIAL = $(SERIAL_$(BOARD))
+
+      # Check if there is a serial for the board
+      ifneq (,$(BOARD_SERIAL))
+
+        # Set the variables used by various debug tools to the selected serial
+        SERIAL ?= $(BOARD_SERIAL)
+        DEBUG_ADAPTER_ID ?= $(BOARD_SERIAL)
+        JLINK_SERIAL ?= $(BOARD_SERIAL)
+
+        # Use the existing script to grab the matching /dev/ttyACM* device
+        PORT_LINUX ?= $(firstword $(shell $(RIOTTOOLS)/usb-serial/find-tty.sh $(SERIAL)))
+      endif
+    endif
+~~~~~~~~~~~~~~~~~~~
+
+The array of board serial numbers has to be edited to match your local boards.
+The serial numbers used here is the USB device serial number as reported by
+the debugger hardware. With the `make list-ttys` it is reported as the 'serial':
+
+~~~~~~~~~~~~~~~~~~~
+$ make list-ttys
+/sys/bus/usb/devices/1-1.4.4: Atmel Corp. EDBG CMSIS-DAP, serial: 'ATML2127031800008360', tty(s): ttyACM1
+/sys/bus/usb/devices/1-1.4.3: SEGGER J-Link, serial: '000683806234', tty(s): ttyACM0
+~~~~~~~~~~~~~~~~~~~
+
+When the above make snippet is included as `RIOT_MAKEFILES_GLOBAL_PRE`, the
+serial number of the USB device is automatically set if the used board is
+included in the script. This will then ensure that the board debugger is used
+for flashing and the board serial device is used when starting the serial console.
 
 Analyze dependency resolution                   {#analyze-depedency-resolution}
 =============================
