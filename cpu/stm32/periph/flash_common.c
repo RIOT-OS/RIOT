@@ -31,6 +31,13 @@
 #define CNTRL_REG              (FLASH->PECR)
 #define CNTRL_REG_LOCK         (FLASH_PECR_PELOCK)
 #define KEY_REG                (FLASH->PEKEYR)
+#elif defined(CPU_FAM_STM32L5)
+#define FLASH_KEY1             ((uint32_t)0x45670123)
+#define FLASH_KEY2             ((uint32_t)0xCDEF89AB)
+#define CNTRL_REG              (FLASH->NSCR)
+#define CNTRL_REG_LOCK         (FLASH_NSCR_NSLOCK)
+#define KEY_REG                (FLASH->NSKEYR)
+#define FLASH_SR_EOP           (FLASH_NSSR_NSEOP)
 #else
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
@@ -44,6 +51,13 @@
 
 #if defined(CPU_FAM_STM32G0)
 #define FLASH_SR_BSY           (FLASH_SR_BSY1)
+#endif
+
+#if defined(CPU_FAM_STM32L5)
+#define FLASH_SR_BSY            (FLASH_NSSR_NSBSY)
+#define FLASH_SR_REG            (FLASH->NSSR)
+#else
+#define FLASH_SR_REG            (FLASH->SR)
 #endif
 
 void _unlock(void)
@@ -65,9 +79,9 @@ void _lock(void)
 
 void _wait_for_pending_operations(void)
 {
-    if (FLASH->SR & FLASH_SR_BSY) {
+    if (FLASH_SR_REG & FLASH_SR_BSY) {
         DEBUG("[flash-common] waiting for any pending operation to finish\n");
-        while (FLASH->SR & FLASH_SR_BSY) {}
+        while (FLASH_SR_REG & FLASH_SR_BSY) {}
     }
 
     /* Clear 'end of operation' bit in status register, for other STM32 boards
@@ -75,6 +89,6 @@ void _wait_for_pending_operations(void)
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L1)
-    FLASH->SR |= FLASH_SR_EOP;
+    FLASH_SR_REG |= FLASH_SR_EOP;
 #endif
 }

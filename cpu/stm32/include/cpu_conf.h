@@ -89,12 +89,13 @@ extern "C" {
  * @brief   Flash page configuration
  * @{
  */
-#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32L5)
+#if defined(CPU_FAM_STM32WB)
 #define FLASHPAGE_SIZE                  (4096U)
 #elif defined(CPU_LINE_STM32F091xC) || defined(CPU_LINE_STM32F072xB) \
    || defined(CPU_LINE_STM32F030xC) || defined(CPU_LINE_STM32F103xE) \
    || defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) \
-   || defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
+   || defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) \
+   || defined(CPU_FAM_STM32L5)
 #define FLASHPAGE_SIZE                  (2048U)
 #elif defined(CPU_LINE_STM32F051x8) || defined(CPU_LINE_STM32F042x6) \
    || defined(CPU_LINE_STM32F070xB) || defined(CPU_LINE_STM32F030x8) \

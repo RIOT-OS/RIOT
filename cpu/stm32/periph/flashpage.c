@@ -39,9 +39,20 @@
 #define CNTRL_REG_LOCK         (FLASH_PECR_PELOCK)
 #define FLASH_CR_PER           (FLASH_PECR_ERASE | FLASH_PECR_PROG)
 #define FLASHPAGE_DIV          (4U) /* write 4 bytes in one go */
+#elif defined(CPU_FAM_STM32L5)
+#define FLASHPAGE_DIV          (8U)
+#define CNTRL_REG              (FLASH->NSCR)
+#define CNTRL_REG_LOCK         (FLASH_NSCR_NSLOCK)
+#define FLASH_CR_PNB           (FLASH_NSCR_NSPNB)
+#define FLASH_CR_PNB_Pos       (FLASH_NSCR_NSPNB_Pos)
+#define FLASH_CR_STRT          (FLASH_NSCR_NSSTRT)
+#define FLASH_CR_PER           (FLASH_NSCR_NSPER)
+#define FLASH_CR_BKER          (FLASH_NSCR_NSBKER)
+#define FLASH_CR_PG            (FLASH_NSCR_NSPG)
 #else
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
+    defined(CPU_FAM_STM32L5)
 #define FLASHPAGE_DIV          (8U)
 #else
 #define FLASHPAGE_DIV          (2U)
@@ -54,7 +65,7 @@ extern void _lock(void);
 extern void _unlock(void);
 extern void _wait_for_pending_operations(void);
 
-#if defined(CPU_FAM_STM32G4)
+#if defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5)
 #define MAX_PAGES_PER_BANK      (128)
 #else /* CPU_FAM_STM32L4 */
 #define MAX_PAGES_PER_BANK      (256)
@@ -80,7 +91,8 @@ static void _erase_page(void *page_addr)
 {
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
+    defined(CPU_FAM_STM32L5)
     uint32_t *dst = page_addr;
 #else
     uint16_t *dst = page_addr;
@@ -106,7 +118,8 @@ static void _erase_page(void *page_addr)
     DEBUG("[flashpage] erase: trigger the page erase\n");
     *dst = (uint32_t)0;
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-      defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
+      defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
+      defined(CPU_FAM_STM32L5)
     DEBUG("[flashpage] erase: setting the page address\n");
     uint8_t pn;
 #if (FLASHPAGE_NUMOF <= MAX_PAGES_PER_BANK) || defined(CPU_FAM_STM32WB)
@@ -168,7 +181,8 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     uint32_t *dst = target_addr;
     const uint32_t *data_addr = data;
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-      defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
+      defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
+      defined(CPU_FAM_STM32L5)
     uint64_t *dst = target_addr;
     const uint64_t *data_addr = data;
 #else
@@ -193,7 +207,7 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) || \
     defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5)
     /* set PG bit and program page to flash */
     CNTRL_REG |= FLASH_CR_PG;
 #endif
@@ -208,7 +222,7 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) || \
     defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5)
     CNTRL_REG &= ~(FLASH_CR_PG);
 #endif
     DEBUG("[flashpage_raw] write: done writing data\n");
@@ -238,7 +252,7 @@ void flashpage_write(int page, const void *data)
     /* STM32L0/L1 only supports word sizes */
     uint32_t *page_addr = flashpage_addr(page);
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4) || \
-      defined(CPU_FAM_STM32G0)
+      defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5)
     uint64_t *page_addr = flashpage_addr(page);
 #else
     /* Default is to support half-word sizes */
