@@ -42,6 +42,7 @@
 #include "net/icmpv6.h"
 #include "net/ipv6.h"
 #include "timex.h"
+#include "unaligned.h"
 #include "utlist.h"
 #include "xtimer.h"
 
@@ -323,7 +324,8 @@ static void _pinger(_ping_data_t *data)
         LL_PREPEND(pkt, tmp);
     }
     if (data->datalen >= sizeof(uint32_t)) {
-        *((uint32_t *)databuf) = xtimer_now_usec();
+        uint32_t now = xtimer_now_usec();
+        memcpy(databuf, &now, sizeof(now));
     }
     if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6,
                                    GNRC_NETREG_DEMUX_CTX_ALL,
@@ -366,7 +368,7 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
         recv_seq = byteorder_ntohs(icmpv6_hdr->seq);
         ipv6_addr_to_str(&from_str[0], from, sizeof(from_str));
         if (data->datalen >= sizeof(uint32_t)) {
-            triptime = xtimer_now_usec() - *((uint32_t *)(icmpv6_hdr + 1));
+            triptime = xtimer_now_usec() - unaligned_get_u32(icmpv6_hdr + 1);
             data->tsum += triptime;
             if (triptime < data->tmin) {
                 data->tmin = triptime;
