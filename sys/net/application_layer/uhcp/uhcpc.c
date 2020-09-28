@@ -7,8 +7,8 @@
  */
 
 #include <arpa/inet.h>
-#include <stdio.h>
 
+#include "log.h"
 #include "net/af.h"
 #include "net/sock/udp.h"
 #include "net/uhcp.h"
@@ -39,14 +39,14 @@ void uhcp_client(uhcp_iface_t iface)
     /* create listening socket */
     int res = sock_udp_create(&sock, &local, NULL, 0);
     if (res < 0) {
-        puts("uhcp_client(): cannot create listening socket");
+        LOG_ERROR("uhcp_client(): cannot create listening socket\n");
         return;
     }
 
     uint8_t buf[sizeof(uhcp_push_t) + 16];
 
     while(1) {
-        puts("uhcp_client(): sending REQ...");
+        LOG_INFO("uhcp_client(): sending REQ...\n");
         sock_udp_send(&sock, &req, sizeof(uhcp_req_t), &req_target);
         res = sock_udp_recv(&sock, buf, sizeof(buf), 10U*US_PER_SEC, &remote);
         if (res > 0) {
@@ -54,7 +54,7 @@ void uhcp_client(uhcp_iface_t iface)
             xtimer_sleep(60);
         }
         else {
-            puts("uhcp_client(): no reply received");
+            LOG_ERROR("uhcp_client(): no reply received\n");
         }
     }
 }

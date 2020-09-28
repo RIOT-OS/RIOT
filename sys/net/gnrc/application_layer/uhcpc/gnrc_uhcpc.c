@@ -146,8 +146,8 @@ void uhcp_handle_prefix(uint8_t *prefix, uint8_t prefix_len, uint16_t lifetime,
     if ((_prefix_len == prefix_len) &&
         (ipv6_addr_match_prefix(&_prefix,
                                 (ipv6_addr_t *)prefix) >= prefix_len)) {
-        LOG_WARNING("gnrc_uhcpc: uhcp_handle_prefix(): got same prefix "
-                    "again\n");
+        LOG_INFO("gnrc_uhcpc: uhcp_handle_prefix(): got same prefix "
+                 "again\n");
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
         if (gnrc_netif_is_6ln(gnrc_netif_get_by_pid(gnrc_wireless_interface))) {
             /* always update 6LoWPAN compression context so it does not time
