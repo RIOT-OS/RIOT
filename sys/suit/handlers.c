@@ -55,6 +55,48 @@ void suit_param_cbor_to_ref(const suit_manifest_t *manifest,
     ref->offset = val->cur - manifest->buf;
 }
 
+int suit_component_name_to_string(const suit_manifest_t *manifest,
+                                  const suit_component_t *component,
+                                  char separator, char *buf, size_t buf_len)
+{
+    assert(buf_len);
+    nanocbor_value_t comp_id, arr;
+    suit_param_ref_to_cbor(manifest, &component->identifier, &comp_id);
+
+    if (nanocbor_enter_array(&comp_id, &arr) < 0) {
+        return SUIT_ERR_INVALID_MANIFEST;
+    }
+
+    size_t pos = 0;
+    while (!nanocbor_at_end(&arr)) {
+        const uint8_t *bstr;
+        size_t bstr_len;
+
+        if (separator) {
+            buf[pos++] = separator;
+        }
+
+        if (nanocbor_get_bstr(&arr, &bstr, &bstr_len) < 0) {
+            return SUIT_ERR_INVALID_MANIFEST;
+        }
+
+        if ((buf_len - pos - 1) < bstr_len) {
+            /* No space */
+            return SUIT_ERR_NO_MEM;
+        }
+
+        memcpy(&buf[pos], bstr, bstr_len);
+        pos += bstr_len;
+    }
+
+    buf[pos] = '\0';
+
+    LOG_INFO("Formatted component name: %s\n", buf);
+
+    return SUIT_OK;
+
+}
+
 int suit_handle_manifest_structure(suit_manifest_t *manifest,
                                    nanocbor_value_t *it,
                                    const suit_manifest_handler_t *handlers,

@@ -57,6 +57,13 @@ extern "C" {
 #endif
 
 /**
+ * @brief Maximum name of component, includes separator
+ */
+#ifndef CONFIG_SUIT_COMPONENT_MAX_NAME_LEN
+#define CONFIG_SUIT_COMPONENT_MAX_NAME_LEN          (32U)
+#endif
+
+/**
  * @brief Current SUIT serialization format version
  *
  * see https://tools.ietf.org/html/draft-ietf-suit-manifest-03#section-7 for
@@ -100,6 +107,10 @@ typedef enum {
     SUIT_ERR_SIGNATURE        = -6, /**< Unable to verify signature */
     SUIT_ERR_DIGEST_MISMATCH  = -7, /**< Digest mismatch with COSE and SUIT */
     SUIT_ERR_POLICY_FORBIDDEN = -8, /**< Denied because of policy mismatch */
+    SUIT_ERR_NO_MEM           = -9, /**< Out of memory condition */
+    SUIT_ERR_STORAGE          = -50, /**< Backend returned an error */
+    SUIT_ERR_STORAGE_EXCEEDED = -51, /**< Backend out of space */
+    SUIT_ERR_STORAGE_UNAVAILABLE = -52, /**< Backend location not available */
 } suit_error_t;
 
 /**
@@ -190,11 +201,20 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   Forward declaration for storage struct
+ *
+ * Breaks a dependency chain
+ */
+typedef struct suit_storage suit_storage_t;
+
+
+/**
  * @brief SUIT component struct as decoded from the manifest
  *
  * The parameters are references to CBOR-encoded information in the manifest.
  */
 typedef struct {
+    suit_storage_t *storage_backend;            /**< Storage backend used */
     uint16_t state;                             /**< Component status flags */
     suit_param_ref_t identifier;                /**< Component identifier */
     suit_param_ref_t param_vendor_id;           /**< Vendor ID */
@@ -295,6 +315,18 @@ static inline bool suit_component_check_flag(suit_component_t *component,
 {
     return (component->state & flag);
 }
+
+/**
+ * @brief Convert a component name to a string
+ *
+ * Each component part is prefixed with @p separator
+ *
+ * @return          SUIT_OK if succesful
+ * @return          negative error code on error
+ */
+int suit_component_name_to_string(const suit_manifest_t *manifest,
+                                  const suit_component_t *component,
+                                  char separator, char *buf, size_t buf_len);
 
 /**
  * @brief Helper function for writing bytes on flash a specified offset
