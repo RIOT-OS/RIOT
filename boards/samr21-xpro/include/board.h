@@ -65,7 +65,11 @@ extern "C" {
 static inline int _edbg_get_eui64(const void *arg, eui64_t *addr)
 {
     (void) arg;
-    return edbg_get_eui64(addr);
+
+    /* EDBG can take a while to respond on cold boot */
+    unsigned tries = 10000;
+    while (--tries && edbg_get_eui64(addr)) {}
+    return tries ? 0 : -1;
 }
 
 /**
