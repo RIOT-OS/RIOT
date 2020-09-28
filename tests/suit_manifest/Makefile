@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
-USEMODULE += suit
+USEMODULE += suit suit_storage_ram
+USEMODULE += suit_transport_mock
 USEMODULE += riotboot_hdr
 USEMODULE += embunit
 
@@ -19,7 +20,8 @@ BLOBS += $(MANIFEST_DIR)/manifest2.bin
 BLOBS += $(MANIFEST_DIR)/manifest3.bin
 BLOBS += $(MANIFEST_DIR)/manifest4.bin
 
-USEMODULE += suit_transport_mock
+BLOBS += $(MANIFEST_DIR)/file1.bin
+BLOBS += $(MANIFEST_DIR)/file2.bin
 
 CFLAGS += -DCONFIG_SUIT_COMPONENT_MAX=2
 

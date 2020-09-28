@@ -39,13 +39,13 @@ gen_manifest "${MANIFEST_DIR}/manifest0.bin" 1 "${MANIFEST_DIR}/file1.bin:$((0x1
 # manifest with invalid seqnr
 sign_manifest "${MANIFEST_DIR}/manifest0.bin" "${MANIFEST_DIR}/manifest1.bin"
 
-(BOARD=invalid gen_manifest "${MANIFEST_DIR}/manifest2.bin".unsigned 2 "${MANIFEST_DIR}/file1.bin:$((0x1000))" "${MANIFEST_DIR}/file2.bin:$((0x2000))")
+(BOARD=invalid gen_manifest "${MANIFEST_DIR}/manifest2.bin".unsigned 2 "${MANIFEST_DIR}/file1.bin:$((0x1000)):ram:0" "${MANIFEST_DIR}/file2.bin:$((0x2000)):ram:0")
 sign_manifest "${MANIFEST_DIR}/manifest2.bin".unsigned "${MANIFEST_DIR}/manifest2.bin"
 
 # valid manifest, valid seqnr, signed
-gen_manifest "${MANIFEST_DIR}/manifest3.bin".unsigned 2 "${MANIFEST_DIR}/file1.bin:$((0x1000))" "${MANIFEST_DIR}/file2.bin:$((0x2000))"
+gen_manifest "${MANIFEST_DIR}/manifest3.bin".unsigned 2 "${MANIFEST_DIR}/file1.bin:0:ram:0"
 sign_manifest "${MANIFEST_DIR}/manifest3.bin".unsigned "${MANIFEST_DIR}/manifest3.bin"
 
 # valid manifest, valid seqnr, signed, 2 components
-gen_manifest "${MANIFEST_DIR}/manifest4.bin".unsigned 2 "${MANIFEST_DIR}/file1.bin" "${MANIFEST_DIR}/file2.bin"
+gen_manifest "${MANIFEST_DIR}/manifest4.bin".unsigned 2 "${MANIFEST_DIR}/file1.bin:0:ram:0" "${MANIFEST_DIR}/file2.bin:0:ram:1"
 sign_manifest "${MANIFEST_DIR}/manifest4.bin".unsigned "${MANIFEST_DIR}/manifest4.bin"
