@@ -168,3 +168,29 @@ int adcxx1c_set_alert_parameters(const adcxx1c_t *dev, int16_t low_limit,
 
     return ADCXX1C_OK;
 }
+
+int adcxx1c_get_and_clear_alert(const adcxx1c_t *dev)
+{
+    int status;
+    uint8_t alert;
+
+    i2c_acquire(DEV);
+
+    status = i2c_read_reg(DEV, ADDR, ADCXX1C_ALERT_STATUS_ADDR, &alert, 0);
+    if (status < 0) {
+        i2c_release(DEV);
+        DEBUG("[adcxx1c] get_and_clear_alert - error: unable to read reg (%d)\n", status);
+        return ADCXX1C_NOI2C;
+    }
+
+    status = i2c_write_reg(DEV, ADDR, ADCXX1C_ALERT_STATUS_ADDR, alert, 0);
+    if (status < 0) {
+        i2c_release(DEV);
+        DEBUG("[adcxx1c] get_and_clear_alert - error: unable to write reg (%d)\n", status);
+        return ADCXX1C_NOI2C;
+    }
+
+    i2c_release(DEV);
+
+    return alert;
+}
