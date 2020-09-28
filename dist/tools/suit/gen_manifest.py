@@ -51,28 +51,31 @@ def main(args):
 
     images = []
     for filename_offset in args.slotfiles:
-        split = filename_offset.split(":")
+        comp_name = ["00"]
+        split = filename_offset.split(":", maxsplit=2)
         if len(split) == 1:
             filename, offset = split[0], 0
-        else:
+        elif len(split) == 2:
             filename, offset = split[0], str2int(split[1])
+        else:
+            filename, offset, comp_name = split[0], str2int(split[1]), split[2].split(":")
 
-        images.append((filename, offset))
+        images.append((filename, offset, comp_name))
 
     template["components"] = []
 
     for slot, image in enumerate(images):
-        filename, offset = image
+        filename, offset, comp_name = image
 
         uri = os.path.join(args.urlroot, os.path.basename(filename))
 
         component = {
-            "install-id": ["00"],
+            "install-id": comp_name,
             "vendor-id": uuid_vendor.hex,
             "class-id": uuid_class.hex,
             "file": filename,
             "uri": uri,
-            "bootable": True,
+            "bootable": False,
         }
 
         if offset:
