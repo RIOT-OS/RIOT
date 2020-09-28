@@ -57,6 +57,15 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
     return 0;
 }
 
+int riotboot_flashwrite_flush(riotboot_flashwrite_t *state)
+{
+    if (flashpage_write_and_verify(state->flashpage, state->flashpage_buf) != FLASHPAGE_OK) {
+        LOG_WARNING(LOG_PREFIX "error writing flashpage %u!\n", state->flashpage);
+        return -1;
+    }
+    return 0;
+}
+
 int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
                                  const uint8_t *bytes, size_t len, bool more)
 {

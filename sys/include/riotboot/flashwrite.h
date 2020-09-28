@@ -132,6 +132,14 @@ static inline int riotboot_flashwrite_init(riotboot_flashwrite_t *state,
  */
 int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
                                  const uint8_t *bytes, size_t len, bool more);
+/**
+ * @brief   Force flush the buffer onto the flash
+ *
+ * @param[in,out]   state   ptr to previously used update state
+ *
+ * @returns         0 on success, <0 otherwise
+ */
+int riotboot_flashwrite_flush(riotboot_flashwrite_t *state);
 
 /**
  * @brief   Finish a firmware update (raw version)
