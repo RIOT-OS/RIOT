@@ -30,6 +30,9 @@ extern "C" {
 /**
  * @brief   Get the unique EUI64 address from a Atmel EDBG debugger
  *
+ * @note    The EDBG firmware may take a while to start up, so on cold
+ *          boot this function can return error when called to soon.
+ *
  * @param[out] addr     memory location to copy the address into.
  *
  * @return              0 on success, error otherwise.
