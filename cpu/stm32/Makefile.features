@@ -25,7 +25,7 @@ endif
 
 # Not all F4 and L0 parts implement a RNG.
 CPU_MODELS_WITHOUT_HWRNG = stm32f401% stm32f411% stm32f446% stm32l031% stm32l011%
-ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l0 l4 wb))
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l0 l4 l5 wb))
   ifeq (,$(filter $(CPU_MODELS_WITHOUT_HWRNG),$(CPU_MODEL)))
     FEATURES_PROVIDED += periph_hwrng
   endif

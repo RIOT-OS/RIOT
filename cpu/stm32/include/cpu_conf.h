@@ -58,6 +58,9 @@
 #elif CPU_FAM_STM32L4
 #include "stm32l4xx.h"
 #include "irqs/l4/irqs.h"
+#elif CPU_FAM_STM32L5
+#include "stm32l5xx.h"
+#include "irqs/l5/irqs.h"
 #elif CPU_FAM_STM32WB
 #include "stm32wbxx.h"
 #include "irqs/wb/irqs.h"
@@ -86,7 +89,7 @@ extern "C" {
  * @brief   Flash page configuration
  * @{
  */
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32L5)
 #define FLASHPAGE_SIZE                  (4096U)
 #elif defined(CPU_LINE_STM32F091xC) || defined(CPU_LINE_STM32F072xB) \
    || defined(CPU_LINE_STM32F030xC) || defined(CPU_LINE_STM32F103xE) \
@@ -110,7 +113,8 @@ extern "C" {
  * However, the erase block is always FLASHPAGE_SIZE.
  */
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
+    defined(CPU_FAM_STM32L5)
 #define FLASHPAGE_RAW_BLOCKSIZE         (8U)
 #elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 #define FLASHPAGE_RAW_BLOCKSIZE         (4U)
@@ -119,7 +123,8 @@ extern "C" {
 #endif
 
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
+    defined(CPU_FAM_STM32L5)
 #define FLASHPAGE_RAW_ALIGNMENT         (8U)
 #else
 /* Writing should be always 4 bytes aligned */

@@ -39,7 +39,8 @@
 #include "periph/init.h"
 #include "board.h"
 
-#if defined (CPU_FAM_STM32L4) || defined (CPU_FAM_STM32G4)
+#if defined (CPU_FAM_STM32L4) || defined (CPU_FAM_STM32G4) || \
+    defined(CPU_FAM_STM32L5)
 #define BIT_APB_PWREN       RCC_APB1ENR1_PWREN
 #elif defined (CPU_FAM_STM32G0)
 #define BIT_APB_PWREN       RCC_APBENR1_PWREN

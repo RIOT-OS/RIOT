@@ -17,7 +17,7 @@
  * @file
  * @brief       Low-level I2C driver implementation
  *
- * This driver supports the STM32 F0, F3, F7, L0, L4 & WB families.
+ * This driver supports the STM32 F0, F3, F7, L0, L4, L5 & WB families.
  * @note This implementation only implements the 7-bit addressing polling mode
  * (for now interrupt mode is not available)
  *
