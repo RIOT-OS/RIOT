@@ -25,12 +25,12 @@
 #define STACK_MARKER    (0x77777777)
 #define REGISTER_CNT    (12)
 
-__attribute__((used, section(".usr_stack"))) uint8_t usr_stack[USR_STACKSIZE];
-__attribute__((used, section(".und_stack"))) uint8_t und_stack[UND_STACKSIZE];
-__attribute__((used, section(".fiq_stack"))) uint8_t fiq_stack[FIQ_STACKSIZE];
-__attribute__((used, section(".irq_stack"))) uint8_t irq_stack[ISR_STACKSIZE];
-__attribute__((used, section(".abt_stack"))) uint8_t abt_stack[ABT_STACKSIZE];
-__attribute__((used, section(".svc_stack"))) uint8_t svc_stack[ISR_STACKSIZE];
+__attribute__((used, section(".usr_stack"), aligned(4))) uint8_t usr_stack[USR_STACKSIZE];
+__attribute__((used, section(".und_stack"), aligned(4))) uint8_t und_stack[UND_STACKSIZE];
+__attribute__((used, section(".fiq_stack"), aligned(4))) uint8_t fiq_stack[FIQ_STACKSIZE];
+__attribute__((used, section(".irq_stack"), aligned(4))) uint8_t irq_stack[ISR_STACKSIZE];
+__attribute__((used, section(".abt_stack"), aligned(4))) uint8_t abt_stack[ABT_STACKSIZE];
+__attribute__((used, section(".svc_stack"), aligned(4))) uint8_t svc_stack[ISR_STACKSIZE];
 
 void thread_yield_higher(void)
 {
