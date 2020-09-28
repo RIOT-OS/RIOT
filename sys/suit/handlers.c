@@ -37,8 +37,8 @@ static suit_manifest_handler_t _get_handler(int key,
     return map[key];
 }
 
-uint16_t suit_param_ref_to_cbor(suit_manifest_t *manifest,
-                                suit_param_ref_t *ref,
+uint16_t suit_param_ref_to_cbor(const suit_manifest_t *manifest,
+                                const suit_param_ref_t *ref,
                                 nanocbor_value_t *val)
 {
     size_t len = manifest->len - ref->offset;
@@ -47,9 +47,9 @@ uint16_t suit_param_ref_to_cbor(suit_manifest_t *manifest,
     return ref->offset;
 }
 
-void suit_param_cbor_to_ref(suit_manifest_t *manifest,
+void suit_param_cbor_to_ref(const suit_manifest_t *manifest,
                             suit_param_ref_t *ref,
-                            nanocbor_value_t *val)
+                            const nanocbor_value_t *val)
 {
     assert(val->cur >= manifest->buf);
     ref->offset = val->cur - manifest->buf;
