@@ -52,6 +52,10 @@ extern "C" {{
 def list_cpu_lines(cpu_fam):
     """Returns the list CPU lines for a given family"""
     headers = os.listdir(STM32_CMSIS_INCLUDE_DIR.format(cpu_fam))
+    if "Templates" in headers:
+        headers.remove("Templates")
+    if "partition_stm32l5xx.h" in headers:
+        headers.remove("partition_stm32l5xx.h")
     headers.remove("stm32{}xx.h".format(cpu_fam))
     headers.remove("system_stm32{}xx.h".format(cpu_fam))
     return [header.split(".")[0] for header in headers]
