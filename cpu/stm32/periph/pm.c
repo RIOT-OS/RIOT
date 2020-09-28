@@ -108,7 +108,7 @@ void pm_set(unsigned mode)
     int deep;
 
     switch (mode) {
-#if defined(STM32_PM_STANDBY) && !defined(CPU_FAM_STM32MP1)
+#if !defined(CPU_FAM_STM32MP1)
         case STM32_PM_STANDBY:
             PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
             PWR_CR_REG |= PM_STANDBY_CONFIG;
@@ -131,14 +131,12 @@ void pm_set(unsigned mode)
             deep = 1;
             break;
 #endif
-#ifdef STM32_PM_STOP
         case STM32_PM_STOP:
             PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
             PWR_CR_REG |= PM_STOP_CONFIG;
             /* Set SLEEPDEEP bit of system control block */
             deep = 1;
             break;
-#endif
         default:
             deep = 0;
             break;
