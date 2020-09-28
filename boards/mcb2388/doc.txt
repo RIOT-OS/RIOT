@@ -9,10 +9,64 @@
 
 ## Hardware
 
-| MCU:      | LPC2388 ARM7-TDMI |
-|-----------|-------------------|
-| RAM:      | 96KiB             |
-| Flash:    | 512KiB            |
+| MCU:         | LPC2388            |
+|--------------|--------------------|
+| Family       | ARM7TDMI-S         |
+| Vendor       | NXP                |
+| RAM          | 64KiB              |
+|              | 16KiB USB RAM      |
+|              | 16KiB Ethernet RAM |
+|              |  2KiB Backup RAM   |
+| Flash        | 512KiB             |
+| Frequency    | up to 72 MHz       |
+| FPU          | no                 |
+| Timers       | 4 (32-bit)         |
+| ADCs         | 1x 10-bit (8 channels) |
+| DACs         | 1x 10-bit (1 channel)  |
+| UARTs        | 4                  |
+| SPIs         | 2                  |
+| I2Cs         | 3                  |
+| Vcc          | 3.0V - 3.63V       |
+| Datasheet    | [Datasheet](https://www.nxp.com/docs/en/user-guide/UM10211.pdf) |
+| Board Manual | [Board Manual](https://www.keil.com/mcb2300/mcb2388.asp)        |
+
+### User Interface
+
+1 User button, 8 LED, 1 potentiometer, 1 speaker:
+
+| Device | PIN   |
+|:------ |:----- |
+| LED0   | P2.0  |
+| LED1   | P2.1  |
+| LED2   | P2.2  |
+| LED3   | P2.3  |
+| LED4   | P2.4  |
+| LED5   | P2.5  |
+| LED6   | P2.6  |
+| LED7   | P2.7  |
+| SW0    | P2.10 |
+| POT0   | P0.23 |
+| SPK0   | P0.26 |
+
+## Implementation Status
+
+| Peripheral | Supported | Comments                      |
+|:---------- |:--------- |:----------------------------- |
+| ADC        | yes       |                               |
+| CAN        | no        |                               |
+| DMA        | partly    | only for MCI                  |
+| Ethernet   | no        |                               |
+| GPIO       | yes       |                               |
+| I2C        | yes       |                               |
+| I2S        | no        |                               |
+| MCI        | yes       | Media Card (SD/MMC) Interface |
+| PWM        | yes       |                               |
+| RTC        | yes       |                               |
+| SPI        | yes       |                               |
+| Timer      | yes       |                               |
+| UART       | yes       |                               |
+| USB        | no        |                               |
+| Watchdog   | no        |                               |
 
 # More info
 
