@@ -18,6 +18,12 @@
  *
  * @attention   Buffer size must be a power of two!
  *
+ * @warning     This is only safe to use when (in addition to only one reader
+ *              and one writer being present) the target platforms implements
+ *              writes to `unsigned int` atomically (e.g. not on AVR) *and*
+ *              the compiler does not reorder code across memory accesses to
+ *              `volatile`. Improving this situation is planned.
+ *
  * @file
  * @brief       Thread-safe ringbuffer for one writer and one reader interface
  *              definition
