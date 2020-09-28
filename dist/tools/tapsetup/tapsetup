@@ -5,6 +5,7 @@ COUNT="2"
 COMMAND=""
 BRNAME="tapbr0"
 TAPNAME="tap"
+TUNNAME=""
 DEACTIVATE_IPV6=""
 ENABLE_FORWARDING=0
 BRIDGE_ADDRS=""
@@ -32,6 +33,10 @@ usage() {
     echo "                                 multiple times." >&2
     echo "   -f, --forwarding              Enable forwarding system-wide on creation and " >&2
     echo "                                 disable on deletion." >&2
+    echo "   --tun [<name>]                Create a single, unbridged TUN interface" >&2
+    echo "                                 named <name>0 (default for <name>: tun)." >&2
+    echo "                                 No bridge will be created in that case." >&2
+    echo "                                 <name> will be ignored on OSX and FreeBSD." >&2
     echo "   -b <name>, --bridge <name>:   Give name for the bridge (default: tapbr)" >&2
     echo "   -t <name>, --tap <name>:      Name base for the tap interfaces; the" >&2
     echo "                                 generated names will be <name>x" >&2
@@ -65,7 +70,15 @@ activate_forwarding() {
                 sysctl -w net.inet.ip.forwarding=1 || exit 1 ;;
             Linux)
                 sysctl -w net.ipv6.conf.${BRNAME}.forwarding=1 || exit 1
-                sysctl -w net.ipv6.conf.${BRNAME}.accept_ra=0 || exit 1
+                if [ -z ${TUNNAME} ]; then
+                    sysctl -w net.ipv6.conf.${BRNAME}.accept_ra=0 || exit 1
+                else
+                    echo "Setting accept_ra=2 for all interfaces!" >&2
+                    # See https://github.com/RIOT-OS/RIOT/issues/14689#issuecomment-668500682
+                    for iface in $(ip link | grep -o "^[0-9]\+: [^:]\+" | cut -f2 -d' '); do
+                        sysctl -w net.ipv6.conf.${iface}.accept_ra=2 || exit 1
+                    done
+                fi
                 sysctl -w net.ipv6.conf.all.forwarding=1 || exit 1 ;;
             *)  ;;
         esac
@@ -162,7 +175,15 @@ deactivate_forwarding() {
                 sysctl -w net.inet.ip.forwarding=0 || exit 1 ;;
             Linux)
                 sysctl -w net.ipv6.conf.${BRNAME}.forwarding=0 || exit 1
-                sysctl -w net.ipv6.conf.${BRNAME}.accept_ra=1 || exit 1
+                if [ -z ${TUNNAME} ]; then
+                    sysctl -w net.ipv6.conf.${BRNAME}.accept_ra=1 || exit 1
+                else
+                    echo "Setting accept_ra=1 for all interfaces!" >&2
+                    # See https://github.com/RIOT-OS/RIOT/issues/14689#issuecomment-668500682
+                    for iface in $(ip link | grep -o "^[0-9]\+: [^:]\+" | cut -f2 -d' '); do
+                        sysctl -w net.ipv6.conf.${iface}.accept_ra=1 || exit 1
+                    done
+                fi
                 sysctl -w net.ipv6.conf.all.forwarding=0 || exit 1 ;;
             *)  ;;
         esac
@@ -213,26 +234,36 @@ del_ipv6_routes() {
     done
 }
 
-delete_bridge() {
-    echo "deleting ${BRNAME}"
+delete_iface() {
+    IFACE="$1"
+    echo "deleting ${IFACE}"
+    case "${PLATFORM}" in
+        FreeBSD|OSX)
+            ifconfig "${IFACE}" destroy ;;
+        Linux)
+            ip link delete "${IFACE}" ;;
+        *) ;;
+    esac
+}
 
+delete_bridge() {
     case "${PLATFORM}" in
         FreeBSD)
             sysctl net.link.tap.user_open=0
             for IF in $(ifconfig ${BRIDGE} | grep -oiE "member: .+ " | cut -d' ' -f2); do
-                ifconfig $IF destroy || exit 1
+                delete_iface ${IF}
             done
-            ifconfig ${BRNAME} destroy || exit 1
+            delete_iface ${BRNAME} || exit 1
             kldunload if_tap        # unloading might fail due to dependencies
             kldunload if_bridge ;;
         Linux)
             for IF in $(ls /sys/class/net/${BRNAME}/brif); do
                 if [ "${IF}" != "${UPLINK}" ]; then
-                    ip link delete "${IF}"
+                    delete_iface ${IF}
                 fi
             done
 
-            ip link delete ${BRNAME} || exit 1
+            delete_iface ${BRNAME} || exit 1
 
             # restore the old uplink
             if [ -n "${UPLINK}" ]; then
@@ -240,46 +271,64 @@ delete_bridge() {
             fi ;;
         OSX)
             for IF in $(ifconfig ${BRIDGE} | grep -oiE "member: .+ " | cut -d' ' -f2); do
-                ifconfig $IF destroy || exit 1
+                delete_iface ${IF}
             done
-            ifconfig ${BRNAME} destroy || exit 1 ;;
+            delete_iface ${BRNAME} || exit 1 ;;
         *)
             ;;
     esac
 }
 
-begin_tap() {
+begin_iface() {
+    if [ -z "${TUNNAME}" ]; then
+        MODE="tun"
+    else
+        MODE="tap"
+    fi
     case "${PLATFORM}" in
         FreeBSD)
-            kldload if_tap          # module might be already loaded => error
-            sysctl net.link.tap.user_open=1 ;;
+            kldload if_${MODE}      # module might be already loaded => error
+            sysctl net.link.${MODE}.user_open=1 ;;
         *)
             ;;
     esac
 }
 
-create_tap() {
+create_iface() {
+    if [ -z "${TUNNAME}" ]; then
+        NAME="${TAPNAME}"
+        MODE="tap"
+    else
+        NAME="${TUNNAME}"
+        MODE="tun"
+    fi
     case "${PLATFORM}" in
         FreeBSD)
-            echo "creating ${TAPNAME}${N}" || exit 1
-            ifconfig tap${N} create || exit 1
-            chown ${SUDO_USER} /dev/tap${N} || exit 1
-            ifconfig ${BRNAME} addm tap${N} || exit 1
+            echo "creating ${NAME}${N}" || exit 1
+            ifconfig ${NAME}${N} create || exit 1
+            chown ${SUDO_USER} /dev/${MODE}${N} || exit 1
+            if [ -z "${TUNNAME}" ]; then
+                ifconfig ${BRNAME} addm ${NAME}${N} || exit 1
+            fi
             ifconfig tap${N} up || exit 1 ;;
         Linux)
-            echo "creating ${TAPNAME}${N}"
-            ip tuntap add dev ${TAPNAME}${N} mode tap user ${SUDO_USER} || exit 1
+            echo "creating ${NAME}${N}"
+            ip tuntap add dev ${NAME}${N} mode ${MODE} user ${SUDO_USER} || exit 1
             if [ -n "${DEACTIVATE_IPV6}" ]; then
-                echo 1 > /proc/sys/net/ipv6/conf/${TAPNAME}${N}/disable_ipv6 || exit 1
+                echo 1 > /proc/sys/net/ipv6/conf/${NAME}${N}/disable_ipv6 || exit 1
             fi
-            ip link set dev ${TAPNAME}${N} master ${BRNAME} || exit 1
-            ip link set ${TAPNAME}${N} up || exit 1 ;;
+            if [ -z "${TUNNAME}" ]; then
+                ip link set dev ${NAME}${N} master ${BRNAME} || exit 1
+            fi
+            ip link set ${NAME}${N} up || exit 1 ;;
         OSX)
-            chown ${SUDO_USER} /dev/tap${N} || exit 1
-            echo "start RIOT instance for tap${N} now and hit enter"
+            chown ${SUDO_USER} /dev/${NAME}${N} || exit 1
+            echo "start RIOT instance for ${NAME}${N} now and hit enter"
             read
-            ifconfig ${BRNAME} addm tap${N} || exit 1
-            ifconfig tap${N} up || exit 1 ;;
+            if [ -z "${TUNNAME}" ]; then
+                ifconfig ${BRNAME} addm ${NAME}${N} || exit 1
+            fi
+            ifconfig ${NAME}${N} up || exit 1 ;;
         *)
             ;;
     esac
@@ -312,21 +361,31 @@ get_master() {
 
 list_bridge() {
     BRIDGE=$1
-    echo "$BRIDGE:"
+    IFACES=0
+    echo -n "$BRIDGE:"
     case "${PLATFORM}" in
         Linux)
-            for IF in $(ls /sys/class/net/${BRIDGE}/brif); do
-                echo "- $IF"
+            for IF in $(ls /sys/class/net/${BRIDGE}/brif 2> /dev/null); do
+                echo ""
+                echo -n "- $IF"
+                IFACES=$(( ${IFACES} + 1 ))
             done
             ;;
         FreeBSD|OSX)
             for IF in $(ifconfig ${BRIDGE} | grep -oiE "member: .+ " | cut -d' ' -f2); do
-                echo "- $IF"
+                echo ""
+                echo -n "- $IF"
+                IFACES=$(( ${IFACES} + 1 ))
             done
             ;;
         *)
             ;;
     esac
+    if [ "${IFACES}" -eq 0 ]; then
+        echo " []"
+    else
+        echo ""
+    fi
 }
 
 while true ; do
@@ -426,6 +485,15 @@ while true ; do
                     TAPNAME="$2"
                     shift 2 ;;
             esac ;;
+        --tun)
+            case "$2" in
+                "")
+                    TUNNAME="tun"
+                    shift 1 ;;
+                *)
+                    TUNNAME="$2"
+                    shift 2 ;;
+            esac ;;
         "")
             break ;;
         *)  usage
@@ -445,12 +513,20 @@ case "$(uname -s)" in
         PLATFORM="OSX"
         if echo "$BRNAME" | grep -v -q "^bridge"; then
             BRNAME=bridge42
-        fi ;;
+        fi
+        if [ -n "${TUNNAME}" ]; then
+            TUNNAME="tun"
+        fi
+        ;;
     FreeBSD)
         PLATFORM="FreeBSD"
         if echo "$BRNAME" | grep -v -q "^bridge"; then
             BRNAME=bridge0
-        fi ;;
+        fi
+        if [ -n "${TUNNAME}" ]; then
+            TUNNAME="tun"
+        fi
+        ;;
     Linux)
         PLATFORM="Linux" ;;
     *)
@@ -458,17 +534,27 @@ case "$(uname -s)" in
         exit 1 ;;
 esac
 
-if [ "${COMMAND}" = 'create' ]; then
-    create_bridge || exit 1
+if [ -n "${TUNNAME}" ]; then
+    echo "Only creating TUN interface ${TUNNAME}0 but no bridge"
+    COUNT=1
+    BRNAME="${TUNNAME}0"
+fi
 
-    begin_tap || exit 1
+if [ "${COMMAND}" = 'create' ]; then
+    if [ -z "${TUNNAME}" ]; then
+        create_bridge || exit 1
+    fi
+
+    begin_iface || exit 1
 
     for N in $(seq 0 "$((COUNT - 1))"); do
-        create_tap || exit 1
+        create_iface || exit 1
     done
 
     activate_forwarding || exit 1
-    up_bridge || exit 1
+    if [ -z "${TUNNAME}" ]; then
+        up_bridge || exit 1
+    fi
     add_ipv6_addrs || exit 1
     add_ipv6_routes || exit 1
 
@@ -476,7 +562,13 @@ elif [ "${COMMAND}" = 'delete' ]; then
     del_ipv6_routes || exit 1
     del_ipv6_addrs || exit 1
     deactivate_forwarding || exit 1
-    delete_bridge
+    if [ -z "${TUNNAME}" ]; then
+        delete_bridge
+    else
+        for N in $(seq 0 "$((COUNT - 1))"); do
+            delete_iface "${TUNNAME}${N}"
+        done
+    fi
 elif [ "${COMMAND}" = 'list' ]; then
     list_bridge $(get_master "$BRNAME")
 else
