@@ -26,19 +26,33 @@
 #include <nanocbor/nanocbor.h>
 #include <assert.h>
 
+#include "hashes/sha256.h"
+
 #include "kernel_defines.h"
 #include "suit/conditions.h"
 #include "suit/handlers.h"
 #include "suit/policy.h"
+#include "suit/storage.h"
 #include "suit.h"
-#include "riotboot/hdr.h"
-#include "riotboot/slot.h"
 
 #ifdef MODULE_SUIT_TRANSPORT_COAP
 #include "suit/transport/coap.h"
 #endif
+#include "suit/transport/mock.h"
 
 #include "log.h"
+
+static int _get_component_size(suit_manifest_t *manifest,
+                               suit_component_t *comp,
+                               uint32_t *img_size)
+{
+    nanocbor_value_t param_size;
+    if ((suit_param_ref_to_cbor(manifest, &comp->param_size, &param_size) == 0) ||
+            (nanocbor_get_uint32(&param_size, img_size) < 0)) {
+        return SUIT_ERR_INVALID_MANIFEST;
+    }
+    return SUIT_OK;
+}
 
 static suit_component_t *_get_component(suit_manifest_t *manifest)
 {
@@ -126,12 +140,16 @@ static int _cond_comp_offset(suit_manifest_t *manifest,
     suit_param_ref_to_cbor(manifest, &comp->param_component_offset,
                            &param_offset);
     nanocbor_get_uint32(&param_offset, &offset);
-    uint32_t other_offset = (uint32_t)riotboot_slot_offset(
-        riotboot_slot_other());
 
-    LOG_INFO("Comparing manifest offset %"PRIx32" with other slot offset %"PRIx32"\n",
-             offset, other_offset);
-    return other_offset == offset ? SUIT_OK : SUIT_ERR_COND;
+    if (!suit_storage_has_offset(comp->storage_backend)) {
+        return SUIT_ERR_COND;
+    }
+
+    LOG_INFO("Comparing manifest offset %"PRIx32" with other slot offset\n",
+             offset);
+
+    return suit_storage_match_offset(comp->storage_backend, offset) ?
+        SUIT_OK : SUIT_ERR_COND;
 }
 
 static int _dtv_set_comp_idx(suit_manifest_t *manifest,
@@ -156,8 +174,21 @@ static int _dtv_set_comp_idx(suit_manifest_t *manifest,
         return SUIT_ERR_INVALID_MANIFEST;
     }
 
+    suit_component_t *component = &manifest->components[new_index];
+    char name[CONFIG_SUIT_COMPONENT_MAX_NAME_LEN];
+
+    suit_storage_t *storage = component->storage_backend;
+    char separator = suit_storage_get_separator(storage);
+
+    /* Done this before in the component stage, shouldn't be different now */
+    suit_component_name_to_string(manifest, component,
+                                  separator, name, sizeof(name));
+
+    suit_storage_set_active_location(storage, name);
+
     /* Update the manifest context */
     manifest->component_current = new_index;
+
     LOG_INFO("Setting component index to %d\n",
               (int)manifest->component_current);
     return 0;
@@ -262,6 +293,25 @@ static int _dtv_set_param(suit_manifest_t *manifest, int key,
     return SUIT_OK;
 }
 
+static int _start_storage(suit_manifest_t *manifest, suit_component_t *comp)
+{
+    uint32_t img_size = 0;
+    char name[CONFIG_SUIT_COMPONENT_MAX_NAME_LEN];
+    char separator = suit_storage_get_separator(comp->storage_backend);
+
+    if (_get_component_size(manifest, comp, &img_size) < 0) {
+        return SUIT_ERR_INVALID_MANIFEST;
+    }
+
+    /* Done this before in the component stage, shouldn't be different now */
+    suit_component_name_to_string(manifest, comp,
+                                  separator, name, sizeof(name));
+
+    suit_storage_set_active_location(comp->storage_backend, name);
+
+    return suit_storage_start(comp->storage_backend, manifest, img_size);
+}
+
 static int _dtv_fetch(suit_manifest_t *manifest, int key,
                       nanocbor_value_t *_it)
 {
@@ -299,8 +349,10 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
     LOG_DEBUG("_dtv_fetch() fetching \"%s\" (url_len=%u)\n", manifest->urlbuf,
               (unsigned)url_len);
 
-    int target_slot = riotboot_slot_other();
-    riotboot_flashwrite_init(manifest->writer, target_slot);
+    if (_start_storage(manifest, comp) < 0) {
+        LOG_ERROR("Unable to start storage backend\n");
+        return SUIT_ERR_STORAGE;
+    }
 
     res = -1;
 
@@ -308,7 +360,7 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
 #ifdef MODULE_SUIT_TRANSPORT_COAP
     else if (strncmp(manifest->urlbuf, "coap://", 7) == 0) {
         res = suit_coap_get_blockwise_url(manifest->urlbuf, COAP_BLOCKSIZE_64,
-                                          suit_flashwrite_helper,
+                                          suit_storage_helper,
                                           manifest);
     }
 #endif
@@ -355,6 +407,46 @@ static int _get_digest(nanocbor_value_t *bstr, const uint8_t **digest, size_t *d
     return nanocbor_get_bstr(&arr_it, digest, digest_len);
 }
 
+static int _validate_payload(suit_component_t *component, const uint8_t *digest, size_t payload_size)
+{
+    uint8_t payload_digest[SHA256_DIGEST_LENGTH];
+    suit_storage_t *storage = component->storage_backend;
+
+    if (suit_storage_has_readptr(storage)) {
+        /* Direct read possible */
+        const uint8_t *payload = NULL;
+        size_t payload_len = 0;
+
+        suit_storage_read_ptr(storage, &payload, &payload_len);
+        if (payload_size != payload_len) {
+            return SUIT_ERR_STORAGE_EXCEEDED;
+        }
+        sha256(payload, payload_len, payload_digest);
+    }
+    else {
+        /* Piecewise feeding */
+        sha256_context_t ctx;
+        sha256_init(&ctx);
+        size_t pos = 0;
+        while (pos < payload_size) {
+            uint8_t buf[64];
+
+            size_t read_len = (payload_size - pos) > sizeof(buf) ?
+                              sizeof(buf) : payload_size - pos;
+
+            suit_storage_read(storage, buf, pos, read_len);
+            sha256_update(&ctx, buf, read_len);
+
+            pos += read_len;
+        }
+        sha256_final(&ctx, payload_digest);
+    }
+
+    return (memcmp(digest, payload_digest, SHA256_DIGEST_LENGTH) == 0) ?
+        SUIT_OK : SUIT_ERR_DIGEST_MISMATCH;
+}
+
+
 static int _dtv_verify_image_match(suit_manifest_t *manifest, int key,
                                    nanocbor_value_t *_it)
 {
@@ -362,13 +454,10 @@ static int _dtv_verify_image_match(suit_manifest_t *manifest, int key,
     LOG_DEBUG("dtv_image_match\n");
     const uint8_t *digest;
     size_t digest_len;
-    int target_slot = riotboot_slot_other();
     suit_component_t *comp = _get_component(manifest);
 
     uint32_t img_size;
-    nanocbor_value_t param_size;
-    if ((suit_param_ref_to_cbor(manifest, &comp->param_size, &param_size) == 0) ||
-            (nanocbor_get_uint32(&param_size, &img_size) < 0)) {
+    if (_get_component_size(manifest, comp, &img_size) < 0) {
         return SUIT_ERR_INVALID_MANIFEST;
     }
 
@@ -393,21 +482,20 @@ static int _dtv_verify_image_match(suit_manifest_t *manifest, int key,
         return SUIT_ERR_INVALID_MANIFEST;
     }
 
-    res = riotboot_flashwrite_verify_sha256(digest,
-                                            img_size,
-                                            target_slot);
-    if (res != 0) {
-        return SUIT_ERR_COND;
+    /* TODO: replace with generic verification (not only sha256) */
+    LOG_INFO("Starting digest verification against image\n");
+    res = _validate_payload(comp, digest, img_size);
+    if (res == SUIT_OK) {
+        LOG_INFO("Install correct payload\n");
+        suit_storage_install(comp->storage_backend, manifest);
     }
-
-    /**
-     * SUIT transport mock doesn't implement the the 'finish' function. Can be
-     * removed as soon as there is a proper storage abstraction layer for SUIT
-     */
-    if (!IS_ACTIVE(MODULE_SUIT_TRANSPORT_MOCK)) {
-        riotboot_flashwrite_finish(manifest->writer);
+    else {
+        LOG_INFO("Erasing bad payload\n");
+        if (comp->storage_backend->driver->erase) {
+            suit_storage_erase(comp->storage_backend);
+        }
     }
-    return SUIT_OK;
+    return res;
 }
 
 /* begin{code-style-ignore} */

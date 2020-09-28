@@ -37,12 +37,12 @@
 
 #ifdef MODULE_RIOTBOOT_SLOT
 #include "riotboot/slot.h"
-#include "riotboot/flashwrite.h"
 #endif
 
 #ifdef MODULE_SUIT
 #include "suit.h"
 #include "suit/handlers.h"
+#include "suit/storage.h"
 #endif
 
 #if defined(MODULE_PROGRESS_BAR)
@@ -53,8 +53,8 @@
 #include "debug.h"
 
 #ifndef SUIT_COAP_STACKSIZE
-/* allocate stack needed to keep a page buffer and do manifest validation */
-#define SUIT_COAP_STACKSIZE (3 * THREAD_STACKSIZE_LARGE + FLASHPAGE_SIZE)
+/* allocate stack needed to do manifest validation */
+#define SUIT_COAP_STACKSIZE (3 * THREAD_STACKSIZE_LARGE)
 #endif
 
 #ifndef SUIT_COAP_PRIO
@@ -349,11 +349,9 @@ static void _suit_handle_url(const char *url)
         LOG_INFO("suit_coap: got manifest with size %u\n", (unsigned)size);
 
 #ifdef MODULE_SUIT
-        riotboot_flashwrite_t writer;
         suit_manifest_t manifest;
         memset(&manifest, 0, sizeof(manifest));
 
-        manifest.writer = &writer;
         manifest.urlbuf = _url;
         manifest.urlbuf_len = SUIT_URL_MAX;
 
@@ -384,17 +382,16 @@ static void _suit_handle_url(const char *url)
     }
 }
 
-int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
-                           int more)
+int suit_storage_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
+                        int more)
 {
     suit_manifest_t *manifest = (suit_manifest_t *)arg;
-    riotboot_flashwrite_t *writer = manifest->writer;
 
     uint32_t image_size;
     nanocbor_value_t param_size;
     size_t total = offset + len;
-    suit_param_ref_t *ref_size =
-        &manifest->components[manifest->component_current].param_size;
+    suit_component_t *comp = &manifest->components[manifest->component_current];
+    suit_param_ref_t *ref_size = &comp->param_size;
 
     /* Grab the total image size from the manifest */
     if ((suit_param_ref_to_cbor(manifest, ref_size, &param_size) == 0) ||
@@ -403,28 +400,10 @@ int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
         return -1;
     }
 
-
-    if (offset == 0) {
-        if (len < RIOTBOOT_FLASHWRITE_SKIPLEN) {
-            LOG_WARNING("_suit_flashwrite(): offset==0, len<4. aborting\n");
-            return -1;
-        }
-        offset = RIOTBOOT_FLASHWRITE_SKIPLEN;
-        buf += RIOTBOOT_FLASHWRITE_SKIPLEN;
-        len -= RIOTBOOT_FLASHWRITE_SKIPLEN;
-    }
-
-    if (writer->offset != offset) {
-        LOG_WARNING(
-            "_suit_flashwrite(): writer->offset=%u, offset==%u, aborting\n",
-            (unsigned)writer->offset, (unsigned)offset);
-        return -1;
-    }
-
     if (image_size < offset + len) {
         /* Extra newline at the start to compensate for the progress bar */
         LOG_ERROR(
-            "\n_suit_flashwrite(): Image beyond size, offset + len=%u, "
+            "\n_suit_coap(): Image beyond size, offset + len=%u, "
             "image_size=%u\n", (unsigned)(total), (unsigned)image_size);
         return -1;
     }
@@ -437,7 +416,13 @@ int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
 
     _print_download_progress(manifest, offset, len, image_size);
 
-    return riotboot_flashwrite_putbytes(writer, buf, len, more);
+    int res = suit_storage_write(comp->storage_backend, manifest, buf, offset, len);
+    if (!more) {
+        LOG_INFO("Finalizing payload store\n");
+        /* Finalize the write if no more data available */
+        res = suit_storage_finish(comp->storage_backend, manifest);
+    }
+    return res;
 }
 
 static void *_suit_coap_thread(void *arg)

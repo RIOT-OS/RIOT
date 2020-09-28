@@ -36,7 +36,6 @@
 #include "cose/sign.h"
 #include "nanocbor/nanocbor.h"
 #include "uuid.h"
-#include "riotboot/flashwrite.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -205,8 +204,7 @@ typedef struct {
  *
  * Breaks a dependency chain
  */
-typedef struct suit_storage suit_storage_t;
-
+typedef struct suit_storage suit_storage_ref_t;
 
 /**
  * @brief SUIT component struct as decoded from the manifest
@@ -214,7 +212,7 @@ typedef struct suit_storage suit_storage_t;
  * The parameters are references to CBOR-encoded information in the manifest.
  */
 typedef struct {
-    suit_storage_t *storage_backend;            /**< Storage backend used */
+    suit_storage_ref_t *storage_backend;        /**< Storage backend used */
     uint16_t state;                             /**< Component status flags */
     suit_param_ref_t identifier;                /**< Component identifier */
     suit_param_ref_t param_vendor_id;           /**< Vendor ID */
@@ -243,13 +241,11 @@ typedef struct {
     suit_component_t components[CONFIG_SUIT_COMPONENT_MAX];
     unsigned components_len;        /**< Current number of components */
     uint8_t component_current;      /**< Current component index */
-    riotboot_flashwrite_t *writer;  /**< Pointer to the riotboot flash writer */
     /** Manifest validation buffer */
     uint8_t validation_buf[SUIT_COSE_BUF_SIZE];
     char *urlbuf;                   /**< Buffer containing the manifest url */
     size_t urlbuf_len;              /**< Length of the manifest url */
 } suit_manifest_t;
-
 
 /**
  * @brief Component index representing all components
@@ -321,7 +317,7 @@ static inline bool suit_component_check_flag(suit_component_t *component,
  *
  * Each component part is prefixed with @p separator
  *
- * @return          SUIT_OK if succesful
+ * @return          SUIT_OK if successful
  * @return          negative error code on error
  */
 int suit_component_name_to_string(const suit_manifest_t *manifest,
@@ -340,8 +336,8 @@ int suit_component_name_to_string(const suit_manifest_t *manifest,
  * @return              0 on success
  * @return              <0 on error
  */
-int suit_flashwrite_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
-                           int more);
+int suit_storage_helper(void *arg, size_t offset, uint8_t *buf, size_t len,
+                        int more);
 
 #ifdef __cplusplus
 }
