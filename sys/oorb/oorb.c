@@ -10,28 +10,29 @@
  * @ingroup sys
  * @{
  * @file
- * @brief       thread-safe ringbuffer implementation
+ * @brief       thread-safe ringbuffer for one writer and one reader
+ *              implementation
  *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
 
-#include "tsrb.h"
+#include "oorb.h"
 
-static void _push(tsrb_t *rb, uint8_t c)
+static void _push(oorb_t *rb, uint8_t c)
 {
     rb->buf[rb->writes++ & (rb->size - 1)] = c;
 }
 
-static uint8_t _pop(tsrb_t *rb)
+static uint8_t _pop(oorb_t *rb)
 {
     return rb->buf[rb->reads++ & (rb->size - 1)];
 }
 
-int tsrb_get_one(tsrb_t *rb)
+int oorb_get_one(oorb_t *rb)
 {
-    if (!tsrb_empty(rb)) {
+    if (!oorb_empty(rb)) {
         return _pop(rb);
     }
     else {
@@ -39,29 +40,29 @@ int tsrb_get_one(tsrb_t *rb)
     }
 }
 
-int tsrb_get(tsrb_t *rb, uint8_t *dst, size_t n)
+int oorb_get(oorb_t *rb, uint8_t *dst, size_t n)
 {
     size_t tmp = n;
-    while (tmp && !tsrb_empty(rb)) {
+    while (tmp && !oorb_empty(rb)) {
         *dst++ = _pop(rb);
         tmp--;
     }
     return (n - tmp);
 }
 
-int tsrb_drop(tsrb_t *rb, size_t n)
+int oorb_drop(oorb_t *rb, size_t n)
 {
     size_t tmp = n;
-    while (tmp && !tsrb_empty(rb)) {
+    while (tmp && !oorb_empty(rb)) {
         _pop(rb);
         tmp--;
     }
     return (n - tmp);
 }
 
-int tsrb_add_one(tsrb_t *rb, uint8_t c)
+int oorb_add_one(oorb_t *rb, uint8_t c)
 {
-    if (!tsrb_full(rb)) {
+    if (!oorb_full(rb)) {
         _push(rb, c);
         return 0;
     }
@@ -70,10 +71,10 @@ int tsrb_add_one(tsrb_t *rb, uint8_t c)
     }
 }
 
-int tsrb_add(tsrb_t *rb, const uint8_t *src, size_t n)
+int oorb_add(oorb_t *rb, const uint8_t *src, size_t n)
 {
     size_t tmp = n;
-    while (tmp && !tsrb_full(rb)) {
+    while (tmp && !oorb_full(rb)) {
         _push(rb, *src++);
         tmp--;
     }
