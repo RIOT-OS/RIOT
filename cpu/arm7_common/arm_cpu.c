@@ -32,6 +32,10 @@ __attribute__((used, section(".irq_stack"), aligned(4))) uint8_t irq_stack[ISR_S
 __attribute__((used, section(".abt_stack"), aligned(4))) uint8_t abt_stack[ABT_STACKSIZE];
 __attribute__((used, section(".svc_stack"), aligned(4))) uint8_t svc_stack[ISR_STACKSIZE];
 
+#if (ISR_STACKSIZE % 4)
+#error "ISR_STACKSIZE must be a multiple of 4"
+#endif
+
 void thread_yield_higher(void)
 {
     if (irq_is_in()) {
@@ -129,13 +133,14 @@ void *thread_isr_stack_pointer(void)
 /* This function returns the number of bytes used on the ISR stack */
 int thread_isr_stack_usage(void)
 {
-    uint32_t *ptr = (uint32_t*) &irq_stack[0];
+    uint32_t *ptr = (uint32_t *)(uintptr_t)&irq_stack[0];
+    uint32_t *end = (uint32_t *)(uintptr_t)&irq_stack[ISR_STACKSIZE];
 
-    while(((*ptr) == STACK_CANARY_WORD) && (ptr < (uint32_t*) &irq_stack[ISR_STACKSIZE])) {
+    while(((*ptr) == STACK_CANARY_WORD) && (ptr < end)) {
         ++ptr;
     }
 
-    ptrdiff_t num_used_words = (uint32_t*) &irq_stack[ISR_STACKSIZE] - ptr;
+    ptrdiff_t num_used_words = (uintptr_t)end - (uintptr_t)ptr;
 
     return num_used_words;
 }
