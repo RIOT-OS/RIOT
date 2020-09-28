@@ -28,6 +28,12 @@
 #define SMP_SLOW    (0x2) /*< Sampling time for slow channels
                                 (0x2 = 4.5 ADC clock cycles) */
 
+#ifdef ADC1_COMMON
+#define ADC_INSTANCE    ADC1_COMMON
+#else
+#define ADC_INSTANCE    ADC12_COMMON
+#endif
+
 /**
  * @brief   Allocate locks for all available ADC devices
  */
@@ -77,11 +83,11 @@ int adc_init(adc_t line)
      * prescaler is 1 */
     if (!(RCC->CFGR & RCC_CFGR_HPRE_3)) {
         /* set ADC clock to HCLK/1 */
-        ADC12_COMMON->CCR |= ADC_CCR_CKMODE_0;
+        ADC_INSTANCE->CCR |= ADC_CCR_CKMODE_0;
     }
     else {
         /* set ADC clock to HCLK/2 otherwise */
-        ADC12_COMMON->CCR |= ADC_CCR_CKMODE_1;
+        ADC_INSTANCE->CCR |= ADC_CCR_CKMODE_1;
     }
 
     /* Configure the pin */
