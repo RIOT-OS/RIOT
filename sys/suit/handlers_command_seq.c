@@ -47,9 +47,9 @@ static int _get_component_size(suit_manifest_t *manifest,
                                uint32_t *img_size)
 {
     nanocbor_value_t param_size;
-    if ((suit_param_ref_to_cbor(manifest, &comp->param_size, &param_size) == 0) ||
-            (nanocbor_get_uint32(&param_size, img_size) < 0)) {
-        return SUIT_ERR_INVALID_MANIFEST;
+    if ((suit_param_ref_to_cbor(manifest, &comp->param_size, &param_size) == 0)
+            || (nanocbor_get_uint32(&param_size, img_size) < 0)) { return
+        SUIT_ERR_INVALID_MANIFEST;
     }
     return SUIT_OK;
 }
@@ -201,8 +201,7 @@ static int _dtv_run_seq_cond(suit_manifest_t *manifest,
     (void)key;
     LOG_DEBUG("Starting conditional sequence handler\n");
     return suit_handle_manifest_structure_bstr(manifest, it,
-                                               suit_command_sequence_handlers,
-                                               suit_command_sequence_handlers_len);
+            suit_command_sequence_handlers, suit_command_sequence_handlers_len);
 }
 
 static int _dtv_try_each(suit_manifest_t *manifest,
@@ -223,8 +222,8 @@ static int _dtv_try_each(suit_manifest_t *manifest,
         /* `_container` should be CBOR _bstr wrapped according to the spec, but
          * it is not */
         res = suit_handle_manifest_structure_bstr(manifest, &_container,
-                                                  suit_command_sequence_handlers,
-                                                  suit_command_sequence_handlers_len);
+                suit_command_sequence_handlers,
+                suit_command_sequence_handlers_len);
 
         nanocbor_skip(&container);
 
@@ -366,7 +365,7 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
 #endif
 #ifdef MODULE_SUIT_TRANSPORT_MOCK
     else if (strncmp(manifest->urlbuf, "test://", 7) == 0) {
-        res = SUIT_OK;
+        res = suit_transport_mock_fetch(manifest);
     }
 #endif
     else {
@@ -379,7 +378,7 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
     if (res) {
         suit_component_set_flag(comp, SUIT_COMPONENT_STATE_FETCH_FAILED);
         /* TODO: The leftover data from a failed fetch should be purged. It
-         * could contain potential malicous data from an attacker */
+         * could contain potential malicious data from an attacker */
         LOG_INFO("image download failed with code %i\n", res);
         return res;
     }
@@ -388,7 +387,8 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
     return SUIT_OK;
 }
 
-static int _get_digest(nanocbor_value_t *bstr, const uint8_t **digest, size_t *digest_len)
+static int _get_digest(nanocbor_value_t *bstr, const uint8_t **digest, size_t
+                       *digest_len)
 {
     /* Bstr is a byte string with a cbor array containing the type and the
      * digest */
@@ -407,7 +407,8 @@ static int _get_digest(nanocbor_value_t *bstr, const uint8_t **digest, size_t *d
     return nanocbor_get_bstr(&arr_it, digest, digest_len);
 }
 
-static int _validate_payload(suit_component_t *component, const uint8_t *digest, size_t payload_size)
+static int _validate_payload(suit_component_t *component, const uint8_t *digest,
+                             size_t payload_size)
 {
     uint8_t payload_digest[SHA256_DIGEST_LENGTH];
     suit_storage_t *storage = component->storage_backend;
@@ -446,7 +447,6 @@ static int _validate_payload(suit_component_t *component, const uint8_t *digest,
         SUIT_OK : SUIT_ERR_DIGEST_MISMATCH;
 }
 
-
 static int _dtv_verify_image_match(suit_manifest_t *manifest, int key,
                                    nanocbor_value_t *_it)
 {
@@ -463,7 +463,8 @@ static int _dtv_verify_image_match(suit_manifest_t *manifest, int key,
 
     /* Only check the component if it is fetched, but not failed */
     if (!suit_component_check_flag(comp, SUIT_COMPONENT_STATE_FETCHED) ||
-            suit_component_check_flag(comp, SUIT_COMPONENT_STATE_FETCH_FAILED)) {
+            suit_component_check_flag(comp,
+                                      SUIT_COMPONENT_STATE_FETCH_FAILED)) {
         LOG_ERROR("Fetch failed, or nothing fetched, nothing to check: %u\n",
                   comp->state);
         return SUIT_ERR_INVALID_MANIFEST;
@@ -513,4 +514,5 @@ const suit_manifest_handler_t suit_command_sequence_handlers[] = {
 };
 /* end{code-style-ignore} */
 
-const size_t suit_command_sequence_handlers_len = ARRAY_SIZE(suit_command_sequence_handlers);
+const size_t suit_command_sequence_handlers_len =
+        ARRAY_SIZE(suit_command_sequence_handlers);
