@@ -563,6 +563,10 @@ typedef struct {
 #define UART_NUMOF_MAX  (3)
 /** @} */
 
+#ifdef MODULE_PERIPH_CAN
+#include "can_esp.h"
+#endif
+
 #ifdef __cplusplus
 }
 #endif
