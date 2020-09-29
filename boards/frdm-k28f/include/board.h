@@ -82,7 +82,7 @@ extern "C"
 #define FRDM_K28F_NOR_FLAGS              (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K)
 #define FRDM_K28F_NOR_SPI_DEV            SPI_DEV(1)
 #define FRDM_K28F_NOR_SPI_CLK            SPI_CLK_10MHZ
-#define FRDM_K28F_NOR_SPI_CS             SPI_HWCS(1)
+#define FRDM_K28F_NOR_SPI_CS             SPI_HWCS(0)
 #define FRDM_K28F_NOR_SPI_MODE           SPI_MODE_0
 /** @} */
 
