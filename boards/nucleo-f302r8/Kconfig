@@ -15,6 +15,7 @@ config BOARD_NUCLEO_F302R8
     select CPU_MODEL_STM32F302R8
 
     # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_RTC
