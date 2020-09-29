@@ -77,25 +77,36 @@ const ot_command_t otCommands[] =
     { "thread", &ot_thread },
 };
 
-uint8_t ot_exec_command(otInstance *ot_instance, const char* command, void *arg, void* answer) {
+void _exec_cmd(event_t *event) {
+    ot_job_t *job = (ot_job_t*) event;
+
     uint8_t res = 0xFF;
     /* Check running thread */
-    if (openthread_get_pid() == thread_getpid()) {
-        for (uint8_t i = 0; i < ARRAY_SIZE(otCommands); i++) {
-            if (strcmp(command, otCommands[i].name) == 0) {
-                res = (*otCommands[i].function)(ot_instance, arg, answer);
-                break;
-            }
+    for (uint8_t i = 0; i < ARRAY_SIZE(otCommands); i++) {
+        if (strcmp(job->command, otCommands[i].name) == 0) {
+            res = (*otCommands[i].function)(openthread_get_instance(), job->arg, job->answer);
+            break;
         }
-        if (res == 0xFF) {
-            DEBUG("Wrong ot_COMMAND name\n");
-            res = 1;
-        }
-    } else {
-        DEBUG("ERROR: ot_exec_job needs to run in OpenThread thread\n");
     }
-    return res;
+    if (res == 0xFF) {
+        DEBUG("Wrong ot_COMMAND name\n");
+        res = 1;
+    }
+    job->status = res;
 }
+
+uint8_t ot_call_command(char* command, void *arg, void* answer)
+{
+    ot_job_t job = {.ev.handler = _exec_cmd};
+
+    job.command = command;
+    job.arg = arg;
+    job.answer = answer;
+
+    event_post(openthread_get_evq(), &job.ev);
+    return job.status;
+}
+
 
 void output_bytes(const char* name, const uint8_t *aBytes, uint8_t aLength)
 {
