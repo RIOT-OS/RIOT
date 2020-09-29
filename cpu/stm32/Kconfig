@@ -297,6 +297,10 @@ config CPU_MODEL_STM32G071RB
     select CPU_FAM_G0
 
 # STM32G4
+config CPU_MODEL_STM32G431RB
+    bool
+    select CPU_FAM_G4
+
 config CPU_MODEL_STM32G474RE
     bool
     select CPU_FAM_G4
@@ -535,6 +539,7 @@ config CPU_MODEL
     default "stm32g071rb" if CPU_MODEL_STM32G071RB
 
     # STM32G4
+    default "stm32g431rb" if CPU_MODEL_STM32G431RB
     default "stm32g474re" if CPU_MODEL_STM32G474RE
 
     # STM32L0
