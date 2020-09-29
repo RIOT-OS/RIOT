@@ -34,7 +34,6 @@
 extern "C" {
 #endif
 
-#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || defined(DOXYGEN)
 /**
  * @brief   Additional (local) status to ARO status values for tentative
  *          addresses
@@ -57,6 +56,7 @@ extern "C" {
  */
 #define _ADDR_REG_STATUS_UNAVAIL        (255)
 
+#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN) || defined(DOXYGEN)
 /**
  * @brief   Resolves address statically from destination address using reverse
  *          translation of the IID
