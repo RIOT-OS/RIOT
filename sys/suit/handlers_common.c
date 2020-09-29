@@ -76,7 +76,7 @@ static int _component_handler(suit_manifest_t *manifest, int key,
     }
     manifest->components_len = n;
     if (n) {
-        manifest->state |= SUIT_MANIFEST_HAVE_COMPONENTS;
+        manifest->state |= SUIT_STATE_HAVE_COMPONENTS;
     }
     return 0;
 }

@@ -71,6 +71,11 @@ extern "C" {
  * @{
  */
 /**
+ * @brief Bit flags used to determine if SUIT manifest contains components
+ */
+#define SUIT_STATE_HAVE_COMPONENTS          (1 << 0)
+
+/**
  * @brief COSE signature OK
  */
 #define SUIT_STATE_COSE_AUTHENTICATED       (1 << 1)
@@ -178,10 +183,10 @@ typedef struct {
  * These state flags apply to individual components inside a manifest.
  * @{
  */
-#define SUIT_COMPONENT_STATE_FETCHED       0x01 /**< Component is fetched */
-#define SUIT_COMPONENT_STATE_FETCH_FAILED  0x02 /**< Component fetched but failed */
-#define SUIT_COMPONENT_STATE_VERIFIED      0x04 /**< Component is verified */
-#define SUIT_COMPONENT_STATE_FINALIZED     0x08 /**< Component successfully installed */
+#define SUIT_COMPONENT_STATE_FETCHED       (1 << 0) /**< Component is fetched */
+#define SUIT_COMPONENT_STATE_FETCH_FAILED  (1 << 1) /**< Component fetched but failed */
+#define SUIT_COMPONENT_STATE_VERIFIED      (1 << 2) /**< Component is verified */
+#define SUIT_COMPONENT_STATE_FINALIZED     (1 << 3) /**< Component successfully installed */
 /** @} */
 
 /**
@@ -225,10 +230,6 @@ typedef struct {
     size_t urlbuf_len;              /**< Length of the manifest url */
 } suit_manifest_t;
 
-/**
- * @brief Bit flags used to determine if SUIT manifest contains components
- */
-#define SUIT_MANIFEST_HAVE_COMPONENTS   (0x1)
 
 /**
  * @brief Component index representing all components
