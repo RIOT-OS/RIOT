@@ -56,7 +56,8 @@
 static int _is_local_port_in_use(const uint16_t port_number)
 {
     gnrc_tcp_tcb_t *iter = NULL;
-    LL_SEARCH_SCALAR(_list_tcb_head, iter, local_port, port_number);
+    tcb_list_t *list = _gnrc_tcp_common_get_tcb_list();
+    LL_SEARCH_SCALAR(list->head, iter, local_port, port_number);
     return (iter != NULL);
 }
 
@@ -124,6 +125,7 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
     DEBUG("_transition_to: %d\n", state);
 
     gnrc_tcp_tcb_t *iter = NULL;
+    tcb_list_t *list = _gnrc_tcp_common_get_tcb_list();
 
     switch (state) {
         case FSM_STATE_CLOSED:
@@ -131,9 +133,9 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
             _clear_retransmit(tcb);
 
             /* Remove connection from active connections */
-            mutex_lock(&_list_tcb_lock);
-            LL_DELETE(_list_tcb_head, tcb);
-            mutex_unlock(&_list_tcb_lock);
+            mutex_lock(&list->lock);
+            LL_DELETE(list->head, tcb);
+            mutex_unlock(&list->lock);
 
             /* Free potentially allocated receive buffer */
             _rcvbuf_release_buffer(tcb);
@@ -153,25 +155,25 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
             tcb->peer_port = PORT_UNSPEC;
 
             /* Add connection to active connections (if not already active) */
-            mutex_lock(&_list_tcb_lock);
-            LL_SEARCH(_list_tcb_head, iter, tcb, TCB_EQUAL);
+            mutex_lock(&list->lock);
+            LL_SEARCH(list->head, iter, tcb, TCB_EQUAL);
             if (iter == NULL) {
-                LL_PREPEND(_list_tcb_head, tcb);
+                LL_PREPEND(list->head, tcb);
             }
-            mutex_unlock(&_list_tcb_lock);
+            mutex_unlock(&list->lock);
             break;
 
         case FSM_STATE_SYN_SENT:
             /* Add connection to active connections (if not already active) */
-            mutex_lock(&_list_tcb_lock);
-            LL_SEARCH(_list_tcb_head, iter, tcb, TCB_EQUAL);
+            mutex_lock(&list->lock);
+            LL_SEARCH(list->head, iter, tcb, TCB_EQUAL);
             /* If connection is not already active: Check port number, append TCB */
             if (iter == NULL) {
                 /* Check if port number was specified */
                 if (tcb->local_port != PORT_UNSPEC) {
                     /* Check if given port number is in use: return error */
                     if (_is_local_port_in_use(tcb->local_port)) {
-                        mutex_unlock(&_list_tcb_lock);
+                        mutex_unlock(&list->lock);
                         return -EADDRINUSE;
                     }
                 }
@@ -179,9 +181,9 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
                 else {
                     tcb->local_port = _get_random_local_port();
                 }
-                LL_PREPEND(_list_tcb_head, tcb);
+                LL_PREPEND(list->head, tcb);
             }
-            mutex_unlock(&_list_tcb_lock);
+            mutex_unlock(&list->lock);
             break;
 
         case FSM_STATE_SYN_RCVD:
@@ -443,7 +445,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             uint16_t dst = byteorder_ntohs(tcp_hdr->dst_port);
 
             /* Check if SYN request is handled by another connection */
-            lst = _list_tcb_head;
+            lst = _gnrc_tcp_common_get_tcb_list()->head;
             while (lst) {
                 /* Compare port numbers and network layer addresses */
                 if (lst->local_port == dst && lst->peer_port == src) {

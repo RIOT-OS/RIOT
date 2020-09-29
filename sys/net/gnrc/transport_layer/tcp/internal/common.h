@@ -115,14 +115,19 @@ extern "C" {
 #define GET_OFFSET( x ) (((x) & MSK_OFFSET) >> 12)
 
 /**
- * @brief Head of linked TCB list.
+ * @brief TCB list type.
  */
-extern gnrc_tcp_tcb_t *_list_tcb_head;
+typedef struct {
+    gnrc_tcp_tcb_t *head; /**< Head of TCB list */
+    mutex_t lock;         /**< Lock of TCB list */
+} tcb_list_t;
 
 /**
- * @brief Mutex to protect TCB list.
+ * @brief Function to access to TCB list
+ *
+ * @returns Pointer to global TCB list.
  */
-extern mutex_t _list_tcb_lock;
+tcb_list_t *_gnrc_tcp_common_get_tcb_list(void);
 
 #ifdef __cplusplus
 }

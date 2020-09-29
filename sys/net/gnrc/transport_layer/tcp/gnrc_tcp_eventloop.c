@@ -216,8 +216,9 @@ static int _receive(gnrc_pktsnip_t *pkt)
     }
 
     /* Find TCB to for this packet */
-    mutex_lock(&_list_tcb_lock);
-    tcb = _list_tcb_head;
+    tcb_list_t *list = _gnrc_tcp_common_get_tcb_list();
+    mutex_lock(&list->lock);
+    tcb = list->head;
     while (tcb) {
 #ifdef MODULE_GNRC_IPV6
         /* Check if current TCB is fitting for the incoming packet */
@@ -250,7 +251,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
 #endif
         tcb = tcb->next;
     }
-    mutex_unlock(&_list_tcb_lock);
+    mutex_unlock(&list->lock);
 
     /* Call FSM with event RCVD_PKT if a fitting TCB was found */
     /* cppcheck-suppress knownConditionTrueFalse
