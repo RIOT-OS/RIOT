@@ -38,8 +38,6 @@
  * @name    PLL configuration
  * @{
  */
-#if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
-    defined(CPU_FAM_STM32F7)
 /* figure out which input to use */
 #if (CLOCK_HSE)
 #define PLL_SRC                  RCC_PLLCFGR_PLLSRC_HSE
@@ -111,55 +109,19 @@
 #else
 #define PLL_R                   (0)
 #endif
-
-#elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3)
-#if (CLOCK_HSE)
-#define PLL_SRC                 (RCC_CFGR_PLLSRC_HSE_PREDIV | RCC_CFGR_PLLXTPRE_HSE_PREDIV_DIV1)
-#else
-#define PLL_SRC                 (RCC_CFGR_PLLSRC_HSI_DIV2)
-#endif
-
-#define PLL_MUL                 ((CLOCK_PLL_MUL - 2) << 18)
-#define PLL_PREDIV              (CLOCK_PLL_PREDIV - 1)
-
-#if defined(CPU_FAM_STM32F0)
-#define CLOCK_APB2_DIV          (0)
-#endif
-
-#elif defined(CPU_FAM_STM32F1)
-#if CLOCK_HSE
-#define PLL_SRC                 (RCC_CFGR_PLLSRC) /* HSE */
-#else
-#define PLL_SRC                 (0) /* HSI / 2 */
-#endif
-
-#define PLL_MUL                 ((CLOCK_PLL_MUL - 2) << 18)
-#define PLL_PREDIV              (CLOCK_PLL_PREDIV - 1)
-
-#define RCC_CR_HSITRIM_4        (1 << 7)
-#define RCC_CFGR_PLLMUL         RCC_CFGR_PLLMULL
-#endif
 /** @} */
 
 /**
  * @name    Deduct the needed flash wait states from the core clock frequency
  * @{
  */
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
-    defined(CPU_FAM_STM32F3)
-#define FLASH_WAITSTATES        ((CLOCK_CORECLOCK - 1) / 24000000U)
-#else
 #define FLASH_WAITSTATES        (CLOCK_CORECLOCK / 30000000U)
-#endif
 /* we enable I+D cashes, pre-fetch, and we set the actual number of
  * needed flash wait states */
 #if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
 #define FLASH_ACR_CONFIG        (FLASH_ACR_ICEN | FLASH_ACR_DCEN | FLASH_ACR_PRFTEN | FLASH_WAITSTATES)
 #elif defined(CPU_FAM_STM32F7)
 #define FLASH_ACR_CONFIG        (FLASH_ACR_ARTEN | FLASH_ACR_PRFTEN | FLASH_WAITSTATES)
-#elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
-      defined(CPU_FAM_STM32F3)
-#define FLASH_ACR_CONFIG        (FLASH_ACR_PRFTBE | FLASH_WAITSTATES)
 #endif
 /** @} */
 
@@ -208,23 +170,7 @@ void stmclk_init_sysclk(void)
     RCC->DCKCFGR2 |= RCC_DCKCFGR2_CK48MSEL;
 #endif
     /* now we can safely configure and start the PLL */
-#if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
-    defined(CPU_FAM_STM32F7)
     RCC->PLLCFGR = (PLL_SRC | PLL_M | PLL_N | PLL_P | PLL_Q | PLL_R);
-#elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
-      defined(CPU_FAM_STM32F3)
-    /* reset PLL configuration bits */
-    RCC->CFGR &= ~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMUL);
-    /* set PLL configuration */
-    RCC->CFGR |= PLL_SRC | PLL_MUL;
-#if CLOCK_PLL_PREDIV == 2
-    RCC->CFGR |= RCC_CFGR_PLLXTPRE; /* PREDIV == 2 */
-#elif CLOCK_PLL_PREDIV > 2
-    RCC->CFGR2 = PLL_PREDIV;        /* PREDIV > 2 */
-#elif CLOCK_PLL_PREDIV == 0
-#error "CLOCK_PLL_PREDIV invalid"
-#endif
-#endif
     RCC->CR |= (RCC_CR_PLLON);
     while (!(RCC->CR & RCC_CR_PLLRDY)) {}
 
