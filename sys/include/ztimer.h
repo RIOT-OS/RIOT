@@ -456,7 +456,7 @@ void ztimer_sleep(ztimer_clock_t *clock, uint32_t duration);
  */
 static inline void ztimer_spin(ztimer_clock_t *clock, uint32_t duration) {
     uint32_t end = ztimer_now(clock) + duration;
-    while ((end - ztimer_now(clock)) < duration) {}
+    while ((end - ztimer_now(clock)) <= duration) {}
 }
 
 /**
