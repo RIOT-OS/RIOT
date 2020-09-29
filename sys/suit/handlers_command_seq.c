@@ -279,6 +279,12 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
 
     suit_component_t *comp = _get_component(manifest);
 
+    /* Deny the fetch if the component was already fetched before */
+    if (suit_component_check_flag(comp, SUIT_COMPONENT_STATE_FETCHED)) {
+        LOG_ERROR("Component already fetched before\n");
+        return SUIT_ERR_INVALID_MANIFEST;
+    }
+
     nanocbor_value_t param_uri;
     suit_param_ref_to_cbor(manifest, &comp->param_uri,
                            &param_uri);
@@ -316,12 +322,15 @@ static int _dtv_fetch(suit_manifest_t *manifest, int key,
         return res;
     }
 
+    suit_component_set_flag(comp, SUIT_COMPONENT_STATE_FETCHED);
+
     if (res) {
-        LOG_INFO("image download failed\n)");
+        suit_component_set_flag(comp, SUIT_COMPONENT_STATE_FETCH_FAILED);
+        /* TODO: The leftover data from a failed fetch should be purged. It
+         * could contain potential malicous data from an attacker */
+        LOG_INFO("image download failed with code %i\n", res);
         return res;
     }
-
-    manifest->state |= SUIT_MANIFEST_HAVE_IMAGE;
 
     LOG_DEBUG("Update OK\n");
     return SUIT_OK;
@@ -360,6 +369,14 @@ static int _dtv_verify_image_match(suit_manifest_t *manifest, int key,
     nanocbor_value_t param_size;
     if ((suit_param_ref_to_cbor(manifest, &comp->param_size, &param_size) == 0) ||
             (nanocbor_get_uint32(&param_size, &img_size) < 0)) {
+        return SUIT_ERR_INVALID_MANIFEST;
+    }
+
+    /* Only check the component if it is fetched, but not failed */
+    if (!suit_component_check_flag(comp, SUIT_COMPONENT_STATE_FETCHED) ||
+            suit_component_check_flag(comp, SUIT_COMPONENT_STATE_FETCH_FAILED)) {
+        LOG_ERROR("Fetch failed, or nothing fetched, nothing to check: %u\n",
+                  comp->state);
         return SUIT_ERR_INVALID_MANIFEST;
     }
 

@@ -363,11 +363,6 @@ static void _suit_handle_url(const char *url)
             return;
         }
 
-        LOG_INFO("suit_parse() success\n");
-        if (!(manifest.state & SUIT_MANIFEST_HAVE_IMAGE)) {
-            LOG_INFO("manifest parsed, but no image fetched\n");
-            return;
-        }
 #endif
         if (res == 0) {
             const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(

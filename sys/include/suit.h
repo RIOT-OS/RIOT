@@ -65,6 +65,17 @@ extern "C" {
 #define SUIT_VERSION                        (1)
 
 /**
+ * @name SUIT manifest status flags
+ *
+ * These flags apply to the full manifest.
+ * @{
+ */
+/**
+ * @brief Bit flags used to determine if SUIT manifest contains components
+ */
+#define SUIT_STATE_HAVE_COMPONENTS          (1 << 0)
+
+/**
  * @brief COSE signature OK
  */
 #define SUIT_STATE_COSE_AUTHENTICATED       (1 << 1)
@@ -73,6 +84,7 @@ extern "C" {
  * @brief COSE payload matches SUIT manifest digest
  */
 #define SUIT_STATE_FULLY_AUTHENTICATED      (1 << 2)
+/** @} */
 
 /**
  * @brief SUIT error codes
@@ -166,11 +178,24 @@ typedef struct {
 } suit_param_ref_t;
 
 /**
+ * @name SUIT component flags.
+ *
+ * These state flags apply to individual components inside a manifest.
+ * @{
+ */
+#define SUIT_COMPONENT_STATE_FETCHED       (1 << 0) /**< Component is fetched */
+#define SUIT_COMPONENT_STATE_FETCH_FAILED  (1 << 1) /**< Component fetched but failed */
+#define SUIT_COMPONENT_STATE_VERIFIED      (1 << 2) /**< Component is verified */
+#define SUIT_COMPONENT_STATE_FINALIZED     (1 << 3) /**< Component successfully installed */
+/** @} */
+
+/**
  * @brief SUIT component struct as decoded from the manifest
  *
  * The parameters are references to CBOR-encoded information in the manifest.
  */
 typedef struct {
+    uint16_t state;                             /**< Component status flags */
     suit_param_ref_t identifier;                /**< Component identifier */
     suit_param_ref_t param_vendor_id;           /**< Vendor ID */
     suit_param_ref_t param_class_id;            /**< Class ID */
@@ -205,14 +230,6 @@ typedef struct {
     size_t urlbuf_len;              /**< Length of the manifest url */
 } suit_manifest_t;
 
-/**
- * @brief Bit flags used to determine if SUIT manifest contains components
- */
-#define SUIT_MANIFEST_HAVE_COMPONENTS   (0x1)
-/**
- * @brief Bit flags used to determine if SUIT manifest contains an image
- */
-#define SUIT_MANIFEST_HAVE_IMAGE        (0x2)
 
 /**
  * @brief Component index representing all components
@@ -252,6 +269,32 @@ int suit_parse(suit_manifest_t *manifest, const uint8_t *buf, size_t len);
  * @return                  -1 on invalid manifest policy
  */
 int suit_policy_check(suit_manifest_t *manifest);
+
+/**
+ * @brief Set a component flag
+ *
+ * @param   component   Component to set flag for
+ * @param   flag        Flag to set
+ */
+static inline void suit_component_set_flag(suit_component_t *component,
+                                           uint16_t flag)
+{
+    component->state |= flag;
+}
+
+/**
+ * @brief Check a component flag
+ *
+ * @param   component   Component to check a flag for
+ * @param   flag        Flag to check
+ *
+ * @returns             True if the flag is set
+ */
+static inline bool suit_component_check_flag(suit_component_t *component,
+                                             uint16_t flag)
+{
+    return (component->state & flag);
+}
 
 /**
  * @brief Helper function for writing bytes on flash a specified offset
