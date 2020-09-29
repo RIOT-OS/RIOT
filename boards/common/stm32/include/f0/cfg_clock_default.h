@@ -129,6 +129,10 @@ extern "C" {
 #define CONFIG_CLOCK_APB1_DIV           (1)
 #endif
 #define CLOCK_APB1                      (CLOCK_AHB / CONFIG_CLOCK_APB1_DIV)   /* max: 48MHz */
+/* APB2 and APB1 are the same bus but configuration registers still follows the
+ * split between APB1 and APB2. Since it's the same bus, APB2 clock is equal to APB1 clock.
+ */
+#define CLOCK_APB2                      (CLOCK_APB1)
 /** @} */
 
 #ifdef __cplusplus
