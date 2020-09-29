@@ -5,7 +5,7 @@ MODULE := ztimer_core
 BASE_MODULE := ztimer
 
 # ztimer_core files
-SRC := core.c util.c
+SRC := core.c util.c periodic.c
 
 # enable submodules
 SUBMODULES := 1
