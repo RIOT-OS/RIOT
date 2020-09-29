@@ -90,9 +90,6 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* pin configuration */
     for (unsigned i = 0; i < PWM_CHANNELS; i++) {
-        if (pwm_config[pwm].pin[i] != GPIO_UNDEF) {
-            NRF_P0->PIN_CNF[pwm_config[pwm].pin[i]] = PIN_CNF_SET;
-        }
         /* either left aligned pol or inverted duty cycle */
         pwm_seq[pwm][i] = (POL_MASK & mode) ? POL_MASK : res;
         dev(pwm)->PSEL.OUT[i] = pwm_config[pwm].pin[i];
