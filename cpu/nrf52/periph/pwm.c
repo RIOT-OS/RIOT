@@ -115,7 +115,7 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
 
     /* setup the sequence */
     dev(pwm)->SEQ[0].PTR = (uint32_t)pwm_seq[pwm];
-    dev(pwm)->SEQ[0].CNT = pwm_channels(pwm);
+    dev(pwm)->SEQ[0].CNT = PWM_CHANNELS;
     dev(pwm)->SEQ[0].REFRESH = 0;
     dev(pwm)->SEQ[0].ENDDELAY = 0;
 
