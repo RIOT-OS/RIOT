@@ -24,4 +24,9 @@ ifneq (,$(filter stm32_eth,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter periph_can,$(FEATURES_USED)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_gpio_irq
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep
