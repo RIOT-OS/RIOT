@@ -25,9 +25,8 @@
 #include "periph_conf.h"
 #include "xtimer.h"
 
-#define SMP_SLOW    (0x2) /*< Sampling time for slow channels
-                                (0x2 = 4.5 ADC clock cycles) */
-
+#define SMP_MIN         (0x2) /*< Sampling time for slow channels
+                                  (0x2 = 4.5 ADC clock cycles) */
 #ifdef ADC1_COMMON
 #define ADC_INSTANCE    ADC1_COMMON
 #else
@@ -41,7 +40,24 @@ static mutex_t locks[ADC_DEVS];
 
 static inline ADC_TypeDef *dev(adc_t line)
 {
-    return (ADC_TypeDef *)(ADC1_BASE + (adc_config[line].dev << 8));
+    switch (adc_config[line].dev) {
+#ifdef ADC2_BASE
+        case 1:
+            return (ADC_TypeDef *)(ADC2_BASE);
+            break;
+#endif
+#ifdef ADC34_COMMON
+        case 2:
+            return (ADC_TypeDef *)(ADC3_BASE);
+            break;
+        case 3:
+            return (ADC_TypeDef *)(ADC4_BASE);
+            break;
+#endif
+        default:
+            return (ADC_TypeDef *)(ADC1_BASE);
+            break;
+    }
 }
 
 static inline void prep(adc_t line)
@@ -50,7 +66,7 @@ static inline void prep(adc_t line)
 /* Enable the clock here only if it will be disabled by done, else just
  * enable it once in adc_init() */
 #if defined(RCC_AHBENR_ADC1EN)
-    periph_clk_en(AHB, (RCC_AHBENR_ADC1EN << adc_config[line].dev));
+    periph_clk_en(AHB, RCC_AHBENR_ADC1EN);
 #endif
 }
 
@@ -59,7 +75,7 @@ static inline void done(adc_t line)
 /* On some STM32F3 ADC are grouped by paire (ADC12EN or ADC34EN) so
  * don't disable the clock as the other device may still use it. */
 #if defined(RCC_AHBENR_ADC1EN)
-    periph_clk_dis(AHB, (RCC_AHBENR_ADC1EN << adc_config[line].dev));
+    periph_clk_dis(AHB, RCC_AHBENR_ADC1EN);
 #endif
     mutex_unlock(&locks[adc_config[line].dev]);
 }
@@ -75,19 +91,40 @@ int adc_init(adc_t line)
     prep(line);
 /* On some STM32F3 ADC are grouped by paire (ADC12EN or ADC34EN) so
  * enable the clock only once here. */
-#if !defined(RCC_AHBENR_ADC1EN)
-    periph_clk_en(AHB, (RCC_AHBENR_ADC12EN << adc_config[line].dev));
+#if defined(RCC_AHBENR_ADC12EN)
+    if (adc_config[line].dev <= 1) {
+        periph_clk_en(AHB, RCC_AHBENR_ADC12EN);
+    }
+#endif
+#if defined(RCC_AHBENR_ADC34EN)
+    if (adc_config[line].dev >= 2) {
+        periph_clk_en(AHB, RCC_AHBENR_ADC34EN);
+    }
 #endif
 
     /* Setting ADC clock to HCLK/1 is only allowed if AHB clock
      * prescaler is 1 */
     if (!(RCC->CFGR & RCC_CFGR_HPRE_3)) {
         /* set ADC clock to HCLK/1 */
-        ADC_INSTANCE->CCR |= ADC_CCR_CKMODE_0;
+        if (adc_config[line].dev <= 1) {
+            ADC_INSTANCE->CCR |= ADC_CCR_CKMODE_0;
+        }
+#ifdef ADC34_COMMON
+        if (adc_config[line].dev >= 2) {
+            ADC34_COMMON->CCR |= ADC_CCR_CKMODE_0;
+        }
+#endif
     }
     else {
         /* set ADC clock to HCLK/2 otherwise */
-        ADC_INSTANCE->CCR |= ADC_CCR_CKMODE_1;
+        if (adc_config[line].dev <= 1) {
+            ADC_INSTANCE->CCR |= ADC_CCR_CKMODE_1;
+        }
+#ifdef ADC34_COMMON
+        if (adc_config[line].dev >= 2) {
+            ADC34_COMMON->CCR |= ADC_CCR_CKMODE_1;
+        }
+#endif
     }
 
     /* Configure the pin */
@@ -99,12 +136,18 @@ int adc_init(adc_t line)
         dev(line)->CR |= ADC_CR_ADVREGEN;
         xtimer_usleep(ADC_T_ADCVREG_STUP_US);
 
-        /* Configure calibration for single ended input */
-        dev(line)->CR &= ~ADC_CR_ADCALDIF;
+        if (dev(line)->DIFSEL & (1 << adc_config[line].chan)) {
+            /* Configure calibration for differential inputs */
+            dev(line)->CR |= ADC_CR_ADCALDIF;
+        }
+        else {
+            /* Configure calibration for single ended inputs */
+            dev(line)->CR &= ~ADC_CR_ADCALDIF;
+        }
 
         /* Start automatic calibration and wait for it to complete */
         dev(line)->CR |= ADC_CR_ADCAL;
-        while (dev(line)->CR  & ADC_CR_ADCAL) {}
+        while (dev(line)->CR & ADC_CR_ADCAL) {}
 
         /* Clear ADRDY by writing it */
         dev(line)->ISR |= ADC_ISR_ADRDY;
@@ -117,20 +160,13 @@ int adc_init(adc_t line)
         dev(line)->SQR1 |= (0 & ADC_SQR1_L);
     }
 
-    /* Configure sampling time for the given channel (6 to 18) */
-    dev(line)->SMPR1 = (SMP_SLOW << ADC_SMPR1_SMP6_Pos)
-                        | (SMP_SLOW << ADC_SMPR1_SMP7_Pos)
-                        | (SMP_SLOW << ADC_SMPR1_SMP8_Pos)
-                        | (SMP_SLOW << ADC_SMPR1_SMP9_Pos);
-    dev(line)->SMPR2 = (SMP_SLOW << ADC_SMPR2_SMP10_Pos)
-                        | (SMP_SLOW << ADC_SMPR2_SMP11_Pos)
-                        | (SMP_SLOW << ADC_SMPR2_SMP12_Pos)
-                        | (SMP_SLOW << ADC_SMPR2_SMP13_Pos)
-                        | (SMP_SLOW << ADC_SMPR2_SMP14_Pos)
-                        | (SMP_SLOW << ADC_SMPR2_SMP15_Pos)
-                        | (SMP_SLOW << ADC_SMPR2_SMP16_Pos)
-                        | (SMP_SLOW << ADC_SMPR2_SMP17_Pos)
-                        | (SMP_SLOW << ADC_SMPR2_SMP18_Pos);
+    /* Configure sampling time for the given channel */
+    if (adc_config[line].chan < 10) {
+        dev(line)->SMPR1 =  (SMP_MIN << (adc_config[line].chan * 3));
+    }
+    else {
+        dev(line)->SMPR2 =  (SMP_MIN << ((adc_config[line].chan - 10) * 3));
+    }
 
     /* Power off and unlock device again */
     done(line);
