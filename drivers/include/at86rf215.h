@@ -273,6 +273,33 @@ enum {
 };
 
 /**
+ * @name    Clock Output Driver Strength
+ * @{
+ */
+typedef enum {
+    AT86RF215_CLKO_2mA = 0 << 3,    /**< 2 mA */
+    AT86RF215_CLKO_4mA = 1 << 3,    /**< 4 mA */
+    AT86RF215_CLKO_6mA = 2 << 3,    /**< 6 mA */
+    AT86RF215_CLKO_8mA = 3 << 3,    /**< 8 mA */
+} at86rf215_clko_cur_t;
+/** @} */
+
+/**
+ * @name    Clock Output Frequency
+ * @{
+ */
+typedef enum {
+    AT86RF215_CLKO_OFF = 0,         /**< Clock Output Disabled  */
+    AT86RF215_CLKO_26_MHz,          /**< 26 MHz */
+    AT86RF215_CLKO_32_MHz,          /**< 32 MHz */
+    AT86RF215_CLKO_16_MHz,          /**< 16 MHz */
+    AT86RF215_CLKO_8_MHz,           /**<  8 MHz */
+    AT86RF215_CLKO_4_MHz,           /**<  4 MHz */
+    AT86RF215_CLKO_2_MHz,           /**<  2 MHz */
+    AT86RF215_CLKO_1_MHz,           /**<  1 MHz */
+} at86rf215_clko_freq_t;
+
+/**
  * @name    Internal device option flags
  * @{
  */
@@ -525,6 +552,42 @@ int8_t at86rf215_get_ed_level(at86rf215_t *dev);
  * @param[in] state         true for enable, false for disable
  */
 void at86rf215_set_option(at86rf215_t *dev, uint16_t option, bool state);
+
+/**
+ * @brief   Set crystal oscillator trim value.
+ *
+ *          An internal capacitance array is connected to the
+ *          crystal oscillator pins TCXO and XTAL2.
+ *
+ *          Each increment of the trim value adds 0.3pF capacitance
+ *          to the oscillator circuit.
+ *
+ *          To trim a board, enable the clock output with
+ *          @ref at86rf215_set_clock_output and connect a frequency
+ *          counter to the clock output pin.
+ *          Then adjust the trim value until it the measured frequency
+ *          closely matches the configured output frequency.
+ *
+ *          It is recommended to use a 26 MHz output frequency for the
+ *          test as this is the raw frequency of the external oscillator.
+ *
+ *          The resulting trim value must then be stored in a persistent
+ *          memory area of the board to be set via @ref CONFIG_AT86RF215_TRIM_VAL
+ *
+ * @param[in] dev           device to configure
+ * @param[in] trim          trim value
+ */
+void at86rf215_set_trim(at86rf215_t *dev, uint8_t trim);
+
+/**
+ * @brief   Configure the Clock Output pin
+ *
+ * @param[in] dev           device to configure
+ * @param[in] cur           Clock output current
+ * @param[in] freq          Clock output frequency
+ */
+void at86rf215_set_clock_output(at86rf215_t *dev,
+                                at86rf215_clko_cur_t cur, at86rf215_clko_freq_t freq);
 
 /**
  * @brief   Convenience function for simply sending data
