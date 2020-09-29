@@ -292,6 +292,11 @@ typedef enum {
 /** @} */
 
 /**
+ * @brief   Will match any device index
+ */
+#define NETDEV_INDEX_ANY    (0xFF)
+
+/**
  * @brief Structure to hold driver state
  *
  * Supposed to be extended by driver implementations.

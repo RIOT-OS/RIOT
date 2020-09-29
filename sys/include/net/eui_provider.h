@@ -104,11 +104,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Will match any device index
- */
-#define NETDEV_INDEX_ANY    (0xFF)
-
-/**
  * @brief   Function for providing a EUI-48 to a device
  *
  * @param[in]   arg     Optional argument provided by eui48_conf_t
