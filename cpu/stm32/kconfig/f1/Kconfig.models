@@ -1,0 +1,30 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# CPU models
+config CPU_MODEL_STM32F103C8
+    bool
+    select CPU_FAM_F1
+
+config CPU_MODEL_STM32F103CB
+    bool
+    select CPU_LINE_STM32F103XB
+
+config CPU_MODEL_STM32F103RB
+    bool
+    select CPU_LINE_STM32F103XB
+
+config CPU_MODEL_STM32F103RE
+    bool
+    select CPU_LINE_STM32F103XE
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32f103c8" if CPU_MODEL_STM32F103C8
+    default "stm32f103cb" if CPU_MODEL_STM32F103CB
+    default "stm32f103rb" if CPU_MODEL_STM32F103RB
+    default "stm32f103re" if CPU_MODEL_STM32F103RE

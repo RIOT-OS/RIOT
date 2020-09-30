@@ -1,0 +1,35 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# CPU models
+config CPU_MODEL_STM32F722ZE
+    bool
+    select CPU_LINE_STM32F722XX
+
+config CPU_MODEL_STM32F723IE
+    bool
+    select CPU_LINE_STM32F723XX
+
+config CPU_MODEL_STM32F746ZG
+    bool
+    select CPU_LINE_STM32F746XX
+
+config CPU_MODEL_STM32F767ZI
+    bool
+    select CPU_LINE_STM32F767XX
+
+config CPU_MODEL_STM32F769NI
+    bool
+    select CPU_LINE_STM32F769XX
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32f722ze" if CPU_MODEL_STM32F722ZE
+    default "stm32f723ie" if CPU_MODEL_STM32F723IE
+    default "stm32f746zg" if CPU_MODEL_STM32F746ZG
+    default "stm32f767zi" if CPU_MODEL_STM32F767ZI
+    default "stm32f769ni" if CPU_MODEL_STM32F769NI

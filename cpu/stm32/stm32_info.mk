@@ -1,4 +1,12 @@
 # Extract STM32 infos from CPU_MODEL
+# Example for STM32L476RG:
+#  - STM32_TYPE: L
+#  - STM32_FAMILY: 4
+#  - STM32_MODEL: 476
+#  - STM32_MODEL2: 7
+#  - STM32_MODEL3: 6
+#  - STM32_PINCOUNT: R (64)
+#  - STM32_ROMSIZE: G (1024K)
 CPU_MODEL_UPPERCASE = $(call uppercase,$(CPU_MODEL))
 STM32_INFO     := $(shell echo $(CPU_MODEL_UPPERCASE) | sed -E -e 's/^STM32(F|L|W|G)([0-7]|B)([A-Z0-9])([0-9])(.)(.)(_A)?/\1 \2 \2\3\4 \3 \4 \5 \6 \7/')
 STM32_TYPE     = $(word 1, $(STM32_INFO))

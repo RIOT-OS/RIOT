@@ -1,0 +1,75 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# CPU models
+config CPU_MODEL_STM32F401RE
+    bool
+    select CPU_LINE_STM32F401XE
+
+config CPU_MODEL_STM32F405RG
+    bool
+    select CPU_LINE_STM32F405XX
+
+config CPU_MODEL_STM32F407VG
+    bool
+    select CPU_LINE_STM32F407XX
+
+config CPU_MODEL_STM32F410RB
+    bool
+    select CPU_LINE_STM32F410RX
+
+config CPU_MODEL_STM32F411RE
+    bool
+    select CPU_LINE_STM32F411XE
+
+config CPU_MODEL_STM32F411CEU6
+    bool
+    select CPU_LINE_STM32F411XE
+
+config CPU_MODEL_STM32F412ZG
+    bool
+    select CPU_LINE_STM32F412ZX
+
+config CPU_MODEL_STM32F413ZH
+    bool
+    select CPU_LINE_STM32F413XX
+
+config CPU_MODEL_STM32F415RG
+    bool
+    select CPU_LINE_STM32F415XX
+
+config CPU_MODEL_STM32F429ZI
+    bool
+    select CPU_LINE_STM32F429XX
+
+config CPU_MODEL_STM32F437VG
+    bool
+    select CPU_LINE_STM32F437XX
+
+config CPU_MODEL_STM32F446RE
+    bool
+    select CPU_LINE_STM32F446XX
+
+config CPU_MODEL_STM32F446ZE
+    bool
+    select CPU_LINE_STM32F446XX
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32f401re" if CPU_MODEL_STM32F401RE
+    default "stm32f405rg" if CPU_MODEL_STM32F405RG
+    default "stm32f407vg" if CPU_MODEL_STM32F407VG
+    default "stm32f410rb" if CPU_MODEL_STM32F410RB
+    default "stm32f411re" if CPU_MODEL_STM32F411RE
+    default "stm32f411ceu6" if CPU_MODEL_STM32F411CEU6
+    default "stm32f412zg" if CPU_MODEL_STM32F412ZG
+    default "stm32f413zh" if CPU_MODEL_STM32F413ZH
+    default "stm32f415rg" if CPU_MODEL_STM32F415RG
+    default "stm32f429zi" if CPU_MODEL_STM32F429ZI
+    default "stm32f437vg" if CPU_MODEL_STM32F437VG
+    default "stm32f446re" if CPU_MODEL_STM32F446RE
+    default "stm32f446ze" if CPU_MODEL_STM32F446ZE
