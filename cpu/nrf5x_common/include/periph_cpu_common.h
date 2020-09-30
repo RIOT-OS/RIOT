@@ -55,6 +55,8 @@ extern "C" {
 /**
  * @brief   Override GPIO_UNDEF value
  */
+/* The precise value matters where GPIO_UNDEF is set in registers like
+ * PWM.PSEL.OUT where it is used in sign-extended form to get a UINT32_MAX */
 #define GPIO_UNDEF          (UINT8_MAX)
 
 /**

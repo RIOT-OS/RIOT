@@ -92,7 +92,10 @@ uint32_t pwm_init(pwm_t pwm, pwm_mode_t mode, uint32_t freq, uint16_t res)
     for (unsigned i = 0; i < PWM_CHANNELS; i++) {
         /* either left aligned pol or inverted duty cycle */
         pwm_seq[pwm][i] = (POL_MASK & mode) ? POL_MASK : res;
-        dev(pwm)->PSEL.OUT[i] = pwm_config[pwm].pin[i];
+        /* Sign-extend the undefined pin into a value that also sets the
+         * 'Disconnected' field, and is also that register's reset state */
+        uint32_t extended_pin = (int32_t)(int8_t)pwm_config[pwm].pin[i];
+        dev(pwm)->PSEL.OUT[i] = extended_pin;
         DEBUG("set PIN[%i] to %i with 0x%x\n",
               (int)i, (int)pwm_config[pwm].pin[i], pwm_seq[pwm][i]);
     }
