@@ -8,6 +8,7 @@
 config CPU_FAM_CC13X2
     bool
     select CPU_COMMON_CC26XX_CC13XX
+    select CPU_FAM_CC13XX
     select CPU_CORE_CORTEX_M4F
     select HAS_CPU_CC26X2_CC13X2
     select HAS_CORTEXM_MPU
