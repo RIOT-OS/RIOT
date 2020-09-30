@@ -100,6 +100,31 @@ static inline void eui48_to_eui64(eui64_t *eui64, const eui48_t *addr)
 }
 
 /**
+ * @brief   Generates an EUI-48 from a 64-bit device address
+ *
+ * @warning The resulting EUI-48 is not guaranteed to be unique
+ *          and, hence, marked as only locally unique.
+ *
+ * @param[out] eui48    the resulting EUI-48.
+ * @param[in]  addr     a 64-bit device address
+ */
+static inline void eui64_to_eui48(eui48_t *eui48, const eui64_t *addr)
+{
+    /* Preserve vendor id */
+    eui48->uint8[0] = addr->uint8[0];
+    eui48->uint8[1] = addr->uint8[1];
+    eui48->uint8[2] = addr->uint8[2];
+
+    /* Use most volatile bits */
+    eui48->uint8[3] = addr->uint8[5];
+    eui48->uint8[4] = addr->uint8[6];
+    eui48->uint8[5] = addr->uint8[7];
+
+    /* EUI is only locally unique */
+    eui48_set_local(eui48);
+}
+
+/**
  * @brief   Generates an IPv6 interface identifier from a 48-bit device address
  *
  * @note    The IPv6 IID is derived from the EUI-64 by flipping the U/L bit.
