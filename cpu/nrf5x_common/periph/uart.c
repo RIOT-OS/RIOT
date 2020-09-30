@@ -194,6 +194,9 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         case 921600:
             REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud921600;
             break;
+        case 1000000:
+            REG_BAUDRATE = UART_BAUDRATE_BAUDRATE_Baud1M;
+            break;
         default:
             return UART_NOBAUD;
     }
