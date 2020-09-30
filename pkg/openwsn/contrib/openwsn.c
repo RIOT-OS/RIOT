@@ -19,7 +19,6 @@
 #include "scheduler.h"
 #include "openstack.h"
 #include "radio.h"
-#include "idmanager.h"
 
 #include "openwsn.h"
 #include "openwsn_board.h"
@@ -30,6 +29,14 @@
 #include "at86rf2xx_params.h"
 #endif
 
+#ifdef MODULE_CC2538_RF
+#include "cc2538_rf.h"
+#endif
+
+#ifdef MODULE_NRF802154
+#include "nrf802154.h"
+#endif
+
 #define LOG_LEVEL LOG_NONE
 #include "log.h"
 
@@ -37,8 +44,10 @@
 #define OPENWSN_SCHED_PRIO            (THREAD_PRIORITY_MAIN - 4)
 #define OPENWSN_SCHED_STACKSIZE       (2048)
 
+#ifdef MODULE_OPENWSN_RADIO_NETDEV
 #ifdef MODULE_AT86RF2XX
 static at86rf2xx_t at86rf2xx_dev;
+#endif
 #endif
 
 static char _stack[OPENWSN_SCHED_STACKSIZE];
@@ -52,46 +61,42 @@ kernel_pid_t openwsn_get_pid(void)
     return _pid;
 }
 
-#ifdef MODULE_OPENWSN_RADIO
-void openwsn_set_addr_16b(netdev_t* dev)
+void* _radio_init_dev(void)
 {
-    uint8_t addr[IEEE802154_SHORT_ADDRESS_LEN];
-    dev->driver->get(dev, NETOPT_ADDRESS, addr, IEEE802154_SHORT_ADDRESS_LEN);
-    open_addr_t id;
-    id.type = ADDR_16B;
-    memcpy(&id.addr_16b, addr, IEEE802154_SHORT_ADDRESS_LEN);
-    idmanager_setMyID(&id);
-}
+    void* dev = NULL;
+    /* avoid cppcheck style (redundantAssignment)*/
+    (void) dev;
+#ifdef MODULE_OPENWSN_RADIO_NETDEV
+    #ifdef MODULE_AT86RF2XX
+        dev = &at86rf2xx_dev.netdev.netdev;
+        at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0], 0);
+    #endif
+#else
+    #ifdef MODULE_CC2538_RF
+        extern ieee802154_dev_t cc2538_rf_dev;
+        dev = &cc2538_rf_dev;
+        cc2538_init();
+    #endif
+    #ifdef MODULE_NRF802154
+        extern ieee802154_dev_t nrf802154_hal_dev;
+        dev = &nrf802154_hal_dev;
+        nrf802154_init();
+    #endif
 #endif
+    return dev;
+}
 
 int openwsn_bootstrap(void)
 {
     LOG_DEBUG("[openwsn]: init RIOT board\n");
     board_init_openwsn();
 
-#ifdef MODULE_AT86RF2XX
-    netdev_t *netdev = (netdev_t *)&at86rf2xx_dev.netdev.netdev;
-    at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0], 0);
-    (void) netdev;
-#endif
-
-#ifdef MODULE_OPENWSN_RADIO
     LOG_DEBUG("[openwsn]: init radio\n");
-    if (openwsn_radio_init(netdev)) {
+    void* dev = _radio_init_dev();
+    if (openwsn_radio_init(dev)) {
         LOG_ERROR("[openwsn]: failed to init radio\n");
         return -1;
     }
-#endif
-
-    /* Initiate Id manager here and not in `openstack_init` function to allow
-       overriding the short id address before additional stack components are
-       initiated */
-    idmanager_init();
-
-#ifdef MODULE_OPENWSN_RADIO
-    /* override 16b address to avoid short address collision */
-    openwsn_set_addr_16b(netdev);
-#endif
 
     LOG_DEBUG("[openwsn]: network thread\n");
     _pid = thread_create(_stack, OPENWSN_SCHED_STACKSIZE, OPENWSN_SCHED_PRIO,

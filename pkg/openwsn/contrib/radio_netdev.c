@@ -26,6 +26,7 @@
 #include "leds.h"
 #include "debugpins.h"
 #include "sctimer.h"
+#include "idmanager.h"
 
 #include "net/netopt.h"
 #include "net/ieee802154.h"
@@ -33,6 +34,15 @@
 
 #include "openwsn.h"
 #include "openwsn_radio.h"
+
+#ifdef MODULE_AT86RF2XX
+#include "at86rf2xx.h"
+#include "at86rf2xx_params.h"
+#endif
+
+#ifdef MODULE_CC2538_RF
+#include "cc2538_rf.h"
+#endif
 
 #define LOG_LEVEL LOG_NONE
 #include "log.h"
@@ -44,9 +54,32 @@ static void _event_cb(netdev_t *dev, netdev_event_t event);
 /* stores the NETDEV_EVENT_ISR capture time to tag the following NETDEV_EVENT */
 static PORT_TIMER_WIDTH _txrx_event_capture_time = 0;
 
-int openwsn_radio_init(netdev_t *netdev)
+static void _set_addr(void)
 {
-    assert(netdev);
+    netdev_t* dev = openwsn_radio.dev;
+    /* Initiate Id manager here and not in `openstack_init` function to allow
+       overriding the short id address before additional stack components are
+       initiated */
+    idmanager_init();
+
+    /* override 16b address to avoid short address collision */
+    uint8_t addr[IEEE802154_SHORT_ADDRESS_LEN];
+    dev->driver->get(dev, NETOPT_ADDRESS, addr, IEEE802154_SHORT_ADDRESS_LEN);
+    open_addr_t id;
+    id.type = ADDR_16B;
+    memcpy(&id.addr_16b, addr, IEEE802154_SHORT_ADDRESS_LEN);
+    idmanager_setMyID(&id);
+    /* override PANID */
+    id.type = ADDR_PANID;
+    uint16_t panid = OPENWSN_PANID;
+    memcpy(&id.addr_16b, &panid, IEEE802154_SHORT_ADDRESS_LEN);
+    idmanager_setMyID(&id);
+}
+
+int openwsn_radio_init(void *radio_dev)
+{
+    assert(radio_dev);
+    netdev_t *netdev = (netdev_t *)radio_dev;
 
     LOG_DEBUG("[openwsn/radio]: initialize riot-adaptation\n");
     openwsn_radio.dev = netdev;
@@ -88,6 +121,8 @@ int openwsn_radio_init(netdev_t *netdev)
     /* Set default PANID */
     uint16_t panid = OPENWSN_PANID;
     netdev->driver->set(netdev, NETOPT_NID, &(panid), sizeof(uint16_t));
+
+    _set_addr();
 
     return 0;
 }

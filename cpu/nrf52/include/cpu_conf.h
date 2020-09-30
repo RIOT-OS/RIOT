@@ -125,6 +125,23 @@ extern "C" {
 #endif /* SOFTDEVICE_PRESENT */
 /** @} */
 
+
+#ifdef CPU_MODEL_NRF52840XXAA
+/**
+ * @name    OpenWSN timing constants
+ *
+ * @{
+ */
+/* Taken from OpenWSN @32.768Hz */
+#define PORT_maxTxDataPrepare   (400/PORT_US_PER_TICK)
+#define PORT_maxRxAckPrepare    (400/PORT_US_PER_TICK)
+#define PORT_maxRxDataPrepare   (400/PORT_US_PER_TICK)
+#define PORT_maxTxAckPrepare    (400/PORT_US_PER_TICK)
+/* Measured 40us @32.768Hz */
+#define PORT_delayTx            (40/PORT_US_PER_TICK)
+/** @} */
+#endif
+
 /**
  * @brief   Put the CPU in the low-power 'wait for event' state
  */
