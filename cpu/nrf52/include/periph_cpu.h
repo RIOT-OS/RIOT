@@ -173,6 +173,10 @@ typedef enum {
  * @note    define unused pins only from right to left, so the defined channels
  *          always start with channel 0 to x and the undefined ones are from x+1
  *          to PWM_CHANNELS.
+ *
+ * @warning All the channels not in active use must be set to GPIO_UNDEF; just
+ *          initializing fewer members of pin would insert a 0 value, which
+ *          would be interpreted as the P0.00 pin that's then driven.
  */
 #if defined(PWM_PRESENT) || DOXYGEN
 typedef struct {
