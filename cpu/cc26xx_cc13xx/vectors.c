@@ -158,12 +158,14 @@ ccfg_regs_t cc26xx_cc13xx_ccfg = {
                         & CCFG_SET_BITS(SET_MODE_CONF_1_TCXO_MAX_START,
                                         CCFG_MODE_CONF_1_TCXO_MAX_START_s,
                                         CCFG_MODE_CONF_1_TCXO_MAX_START_m)
-#else
-                        0
-#endif /* CPU_VARIANT_X2 */
                         & CCFG_SET_BITS(SET_MODE_CONF_1_ALT_DCDC_VMIN,
                                         CCFG_MODE_CONF_1_ALT_DCDC_VMIN_s,
                                         CCFG_MODE_CONF_1_ALT_DCDC_VMIN_m)
+#else
+                          CCFG_SET_BITS(SET_MODE_CONF_1_ALT_DCDC_VMIN,
+                                        CCFG_MODE_CONF_1_ALT_DCDC_VMIN_s,
+                                        CCFG_MODE_CONF_1_ALT_DCDC_VMIN_m)
+#endif /* CPU_VARIANT_X2 */
                         & CCFG_SET_BITS(SET_MODE_CONF_1_ALT_DCDC_DITHER_EN,
                                         CCFG_MODE_CONF_1_ALT_DCDC_DITHER_EN_s,
                                         CCFG_MODE_CONF_1_ALT_DCDC_DITHER_EN_m)
