@@ -22,7 +22,8 @@ INCLUDE cortexm_rom_offset.ld
 MEMORY
 {
     rom      (rx)   : ORIGIN = _rom_start_addr + _rom_offset, LENGTH = _fw_rom_length
-    ccfg     (rx)   : ORIGIN = 0x00057FA8,                    LENGTH = 88
+    /* CCFG starts at the end of ROM */
+    ccfg     (rx)   : ORIGIN = _rom_length - 88,              LENGTH = 88
     /* GPRAM is only available when cache is disabled. When GPRAM is enabled it
      * is used as a backup RAM at the expense of slower CPU execution time */
     gpram           : ORIGIN = 0x11000000,                    LENGTH = 8K
