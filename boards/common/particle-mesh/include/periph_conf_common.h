@@ -26,6 +26,8 @@
 #include "cfg_rtt_default.h"
 #include "cfg_timer_default.h"
 
+#include "board.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,6 +46,22 @@ static const spi_conf_t spi_config[] = {
 };
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
+/**
+ * @name    PWM configuration
+ *
+ * A single PWM device is used to map the three channels of the on-board RGB
+ * LED
+ *
+ * @{
+ */
+
+static const pwm_conf_t pwm_config[] = {
+    { NRF_PWM0, { LED0_PIN, LED1_PIN, LED2_PIN, GPIO_UNDEF } }
+};
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+
 /** @} */
 
 #ifdef __cplusplus
