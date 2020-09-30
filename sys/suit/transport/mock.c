@@ -11,71 +11,32 @@
 #include <stdbool.h>
 
 #include "kernel_defines.h"
-#include "cpu_conf.h"
+#include "log.h"
 
-#include "riotboot/flashwrite.h"
-#include "riotboot/hdr.h"
+#include "suit.h"
+#include "suit/storage.h"
+#include "suit/transport/mock.h"
 
-#define SLOT0_OFFSET 0x1000
-#define SLOT1_OFFSET 0x2000
+/* Must be defined by the test */
+extern const suit_transport_mock_payload_t payloads[];
+extern const size_t num_payloads;
 
-static riotboot_hdr_t _riotboot_slots[] = {
-    { .magic_number = RIOTBOOT_MAGIC,
-      .version = 1,
-      .start_addr=0x100000,
-    },
-    { .magic_number = RIOTBOOT_MAGIC,
-      .version = 2,
-      .start_addr=0x200000,
-    },
-};
-
-const riotboot_hdr_t * const riotboot_slots[] = {
-    &_riotboot_slots[0],
-    &_riotboot_slots[1],
-};
-
-const unsigned riotboot_slot_numof = ARRAY_SIZE(riotboot_slots);
-
-static int _current_slot;
-
-int riotboot_slot_current(void)
+static const suit_component_t *_get_component(const suit_manifest_t *manifest)
 {
-    return _current_slot;
+    assert(manifest->component_current < CONFIG_SUIT_COMPONENT_MAX);
+    return &manifest->components[manifest->component_current];
 }
 
-int riotboot_slot_other(void)
+int suit_transport_mock_fetch(const suit_manifest_t *manifest)
 {
-    return (_current_slot == 0) ? 1 : 0;
-}
+    size_t file = manifest->component_current;
+    const suit_component_t *comp = _get_component(manifest);
 
-const riotboot_hdr_t *riotboot_slot_get_hdr(unsigned slot)
-{
-    assert(slot < riotboot_slot_numof);
+    assert(file < num_payloads);
 
-    return riotboot_slots[slot];
-}
+    LOG_INFO("Mock writing payload %d\n", (unsigned)file);
 
-size_t riotboot_slot_offset(unsigned slot)
-{
-    return (slot == 0) ? SLOT0_OFFSET : SLOT1_OFFSET;
-}
-
-int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
-                                 size_t offset)
-{
-    (void)state;
-    (void)target_slot;
-    (void)offset;
-    puts("riotboot_flashwrite_init_raw() empty mock");
-    return 0;
-}
-
-int riotboot_flashwrite_verify_sha256(const uint8_t *sha256_digest,
-                                      size_t img_size, int target_slot)
-{
-    (void)sha256_digest;
-    (void)img_size;
-    (void)target_slot;
+    suit_storage_write(comp->storage_backend, manifest, payloads[file].buf, 0,
+                       payloads[file].len);
     return 0;
 }

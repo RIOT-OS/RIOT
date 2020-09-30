@@ -29,6 +29,7 @@
 #include "suit/handlers.h"
 #include "suit/policy.h"
 #include "suit.h"
+#include "suit/storage.h"
 
 extern int _common_sequence_handler(suit_manifest_t *manifest, int key,
                                     nanocbor_value_t *it);
@@ -55,27 +56,25 @@ static int _seq_no_handler(suit_manifest_t *manifest, int key,
 {
     (void)key;
 
-    int32_t seq_nr;
+    uint32_t seq_nr;
 
-    if (nanocbor_get_int32(it, &seq_nr) < 0) {
+    if (nanocbor_get_uint32(it, &seq_nr) < 0) {
         LOG_INFO("Unable to get sequence number\n");
         return SUIT_ERR_INVALID_MANIFEST;
     }
-    const riotboot_hdr_t *hdr = riotboot_slot_get_hdr(riotboot_slot_current());
-    if (seq_nr <= (int32_t)hdr->version) {
-        LOG_INFO("%" PRId32 " <= %" PRId32 "\n", seq_nr, hdr->version);
-        LOG_INFO("seq_nr <= running image\n)");
+
+    uint32_t stored_seq_no = 0;
+    if (suit_storage_get_highest_seq_no(&stored_seq_no) < 0) {
+        return SUIT_ERR_STORAGE;
+    }
+    LOG_INFO("Manifest seq_no: %"PRIu32", highest available: %"PRIu32"\n",
+             seq_nr, stored_seq_no);
+
+    if (seq_nr <= stored_seq_no) {
+        LOG_ERROR("seq_nr <= running image\n)");
         return SUIT_ERR_SEQUENCE_NUMBER;
     }
 
-    hdr = riotboot_slot_get_hdr(riotboot_slot_other());
-    if (riotboot_hdr_validate(hdr) == 0) {
-        if (seq_nr <= (int32_t)hdr->version) {
-            LOG_INFO("%" PRIu32 " <= %" PRIu32 "\n", seq_nr, hdr->version);
-            LOG_INFO("seq_nr <= other image\n)");
-            return SUIT_ERR_SEQUENCE_NUMBER;
-        }
-    }
     LOG_INFO("suit: validated sequence number\n)");
     manifest->validated |= SUIT_VALIDATED_SEQ_NR;
     return SUIT_OK;

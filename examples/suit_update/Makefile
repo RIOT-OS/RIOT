@@ -46,7 +46,7 @@ QUIET ?= 1
 #
 
 USEMODULE += nanocoap_sock sock_util
-USEMODULE += suit suit_transport_coap
+USEMODULE += suit suit_transport_coap suit_storage_flashwrite
 
 # Display a progress bar during firmware download
 USEMODULE += progress_bar

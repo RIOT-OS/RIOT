@@ -1049,6 +1049,10 @@ ifneq (,$(filter suit_transport_coap, $(USEMODULE)))
   USEMODULE += nanocoap
 endif
 
+ifneq (,$(filter suit_storage_%, $(USEMODULE)))
+  USEMODULE += suit_storage
+endif
+
 ifneq (,$(filter suit_%,$(USEMODULE)))
   USEMODULE += suit
 endif

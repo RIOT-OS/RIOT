@@ -34,15 +34,10 @@ static inline size_t min(size_t a, size_t b)
     return a <= b ? a : b;
 }
 
-size_t riotboot_flashwrite_slotsize(const riotboot_flashwrite_t *state)
+size_t riotboot_flashwrite_slotsize(
+        const riotboot_flashwrite_t *state)
 {
-    switch (state->target_slot) {
-        case 0: return SLOT0_LEN;
-#if NUM_SLOTS==2
-        case 1: return SLOT1_LEN;
-#endif
-        default: return 0;
-    }
+    return riotboot_slot_size(state->target_slot);
 }
 
 int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
@@ -59,6 +54,15 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
     state->target_slot = target_slot;
     state->flashpage = flashpage_page((void *)riotboot_slot_get_hdr(target_slot));
 
+    return 0;
+}
+
+int riotboot_flashwrite_flush(riotboot_flashwrite_t *state)
+{
+    if (flashpage_write_and_verify(state->flashpage, state->flashpage_buf) != FLASHPAGE_OK) {
+        LOG_WARNING(LOG_PREFIX "error writing flashpage %u!\n", state->flashpage);
+        return -1;
+    }
     return 0;
 }
 
