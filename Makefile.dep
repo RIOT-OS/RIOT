@@ -69,11 +69,6 @@ ifneq (,$(filter gnrc_mac,$(USEMODULE)))
   endif
 endif
 
-# Don't register netdevs if there is only a single one  of them
-ifeq (,$(filter gnrc_netif_single,$(USEMODULE)))
-  USEMODULE += netdev_register
-endif
-
 ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_nettype_gomach
