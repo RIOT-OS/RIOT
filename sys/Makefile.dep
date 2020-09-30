@@ -622,6 +622,9 @@ ifneq (,$(filter gnrc,$(USEMODULE)))
   ifneq (,$(filter sock_udp, $(USEMODULE)))
     USEMODULE += gnrc_sock_udp
   endif
+  ifneq (,$(filter netdev_single, $(USEMODULE)))
+    USEMODULE += gnrc_netif_single
+  endif
 endif
 
 ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))

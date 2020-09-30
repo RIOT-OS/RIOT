@@ -82,6 +82,7 @@ PSEUDOMODULES += netdev_ieee802154
 PSEUDOMODULES += netdev_eth
 PSEUDOMODULES += netdev_layer
 PSEUDOMODULES += netdev_register
+PSEUDOMODULES += netdev_single
 PSEUDOMODULES += netstats
 PSEUDOMODULES += netstats_l2
 PSEUDOMODULES += netstats_ipv6
