@@ -101,6 +101,10 @@ typedef enum {
      */
     IEEE802154_CAP_IRQ_RX_START,
     /**
+     * @brief the device reports the start of a frame (SFD) was sent.
+     */
+    IEEE802154_CAP_IRQ_TX_START,
+    /**
      * @brief the device reports the end of the CCA procedure
      */
     IEEE802154_CAP_IRQ_CCA_DONE,
@@ -185,6 +189,15 @@ typedef enum {
      * This event is present if radio has @ref IEEE802154_CAP_IRQ_RX_START cap.
      */
     IEEE802154_RADIO_INDICATION_RX_START,
+
+    /**
+     * @brief the transceiver sent out a valid SFD
+     *
+     * This event is present if radio has @ref IEEE802154_CAP_IRQ_TX_START cap.
+     *
+     * @note The SFD of an outgoing ACK (AUTOACK) should not be indicated
+     */
+    IEEE802154_RADIO_INDICATION_TX_START,
 
     /**
      * @brief the transceiver received a frame and lies in the
@@ -1071,6 +1084,22 @@ static inline bool ieee802154_radio_has_irq_tx_done(ieee802154_dev_t *dev)
 static inline bool ieee802154_radio_has_irq_rx_start(ieee802154_dev_t *dev)
 {
     return dev->driver->get_cap(dev, IEEE802154_CAP_IRQ_RX_START);
+}
+
+/**
+ * @brief Check if the device supports TX start interrupt
+ *
+ * Internally this function calls ieee802154_radio_ops::get_cap with @ref
+ * IEEE802154_CAP_IRQ_TX_START.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_irq_tx_start(ieee802154_dev_t *dev)
+{
+    return dev->driver->get_cap(dev, IEEE802154_CAP_IRQ_TX_START);
 }
 
 /**
