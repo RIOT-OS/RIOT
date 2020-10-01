@@ -1,0 +1,23 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+{%- for item in models %}
+config CPU_MODEL_{{ item.model }}
+    bool
+    select {{ item.line | upper }}
+{% endfor %}
+
+# Configure CPU model
+config CPU_MODEL
+{%- for item in models %}
+    default "{{ item.model | lower }}" if CPU_MODEL_{{ item.model }}
+{%- endfor %}
