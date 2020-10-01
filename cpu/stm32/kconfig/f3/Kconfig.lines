@@ -33,10 +33,12 @@ config CPU_LINE_STM32F303X8
 config CPU_LINE_STM32F303XC
     bool
     select CPU_FAM_F3
+    select HAS_CORTEXM_MPU
 
 config CPU_LINE_STM32F303XE
     bool
     select CPU_FAM_F3
+    select HAS_CORTEXM_MPU
 
 config CPU_LINE_STM32F318XX
     bool
