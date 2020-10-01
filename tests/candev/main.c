@@ -30,11 +30,12 @@
 #include "shell.h"
 #include "can/device.h"
 
-#if IS_USED(MODULE_CAN_LINUX)
+#if IS_USED(MODULE_PERIPH_CAN)
 
-#include <candev_linux.h>
+#include "periph/can.h"
+#include "can_params.h"
 
-static candev_linux_t linux_dev;
+static can_t periph_dev;
 
 #else
 /* add other candev drivers here */
@@ -192,10 +193,10 @@ int main(void)
     puts("candev test application\n");
 
     isrpipe_init(&rxbuf, (uint8_t *)rx_ringbuf, sizeof(rx_ringbuf));
-#if IS_USED(MODULE_CAN_LINUX)
-    puts("Initializing Linux Can device");
-    candev_linux_init( &linux_dev, &(candev_linux_conf[0]));    /* vcan0 */
-    candev = (candev_t *)&linux_dev;
+#if IS_USED(MODULE_PERIPH_CAN)
+    puts("Initializing CAN periph device");
+    can_init(&periph_dev, &(candev_conf[0]));    /* vcan0 on native */
+    candev = (candev_t *)&periph_dev;
 #else
     /* add initialization for other candev drivers here */
 #endif

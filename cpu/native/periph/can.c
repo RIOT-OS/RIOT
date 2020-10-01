@@ -53,7 +53,7 @@ static int _remove_filter(candev_t *candev, const struct can_filter *filter);
 static int _power_up(candev_t *candev);
 static int _power_down(candev_t *candev);
 
-static int _set_bittiming(candev_linux_t *dev, struct can_bittiming *bittiming);
+static int _set_bittiming(can_t *dev, struct can_bittiming *bittiming);
 
 static const candev_driver_t candev_linux_driver = {
     .send = _send,
@@ -69,7 +69,7 @@ static const candev_driver_t candev_linux_driver = {
 static candev_event_t _can_error_to_can_evt(struct can_frame can_frame_err);
 static void _callback_can_sigio(int sock, void *arg);
 
-candev_linux_conf_t candev_linux_conf[CAN_DLL_NUMOF] = {
+can_conf_t candev_conf[CAN_DLL_NUMOF] = {
 #if CAN_DLL_NUMOF >= 1
    {
         .interface_name = "vcan0",
@@ -82,9 +82,9 @@ candev_linux_conf_t candev_linux_conf[CAN_DLL_NUMOF] = {
 #endif
 };
 
-int candev_linux_init(candev_linux_t *dev, const candev_linux_conf_t *conf)
+int can_init(can_t *dev, const can_conf_t *conf)
 {
-    memset(dev, 0, sizeof(candev_linux_t));
+    memset(dev, 0, sizeof(can_t));
     dev->candev.driver = &candev_linux_driver;
     dev->conf = conf;
     dev->candev.bittiming.bitrate = CANDEV_LINUX_DEFAULT_BITRATE;
@@ -129,7 +129,7 @@ static candev_event_t _can_error_to_can_evt(struct can_frame can_frame_err)
 static void _callback_can_sigio(int sockfd, void *arg)
 {
     (void) sockfd;
-    candev_linux_t *dev = (candev_linux_t *) arg;
+    can_t *dev = (can_t *) arg;
 
     if (dev->candev.event_callback) {
         dev->candev.event_callback(&dev->candev, CANDEV_EVENT_ISR, NULL);
@@ -149,7 +149,7 @@ static int _init(candev_t *candev)
     int ret;
 
     DEBUG("Will start linux CAN init\n");
-    candev_linux_t *dev = (candev_linux_t *)candev;
+    can_t *dev = (can_t *)candev;
 
     if ((strlen(dev->conf->interface_name) == 0)
             || (strlen(dev->conf->interface_name) > CAN_MAX_SIZE_INTERFACE_NAME)) {
@@ -212,7 +212,7 @@ static int _init(candev_t *candev)
 static int _send(candev_t *candev, const struct can_frame *frame)
 {
     int nbytes;
-    candev_linux_t *dev = (candev_linux_t *)candev;
+    can_t *dev = (can_t *)candev;
 
     nbytes = real_write(dev->sock, frame, sizeof(struct can_frame));
 
@@ -232,7 +232,7 @@ static void _isr(candev_t *candev)
 {
     int nbytes;
     struct can_frame rcv_frame;
-    candev_linux_t *dev = (candev_linux_t *)candev;
+    can_t *dev = (can_t *)candev;
 
     if (dev == NULL) {
         return;
@@ -272,7 +272,7 @@ static void _isr(candev_t *candev)
 
 }
 
-static int _set_bittiming(candev_linux_t *dev, struct can_bittiming *bittiming)
+static int _set_bittiming(can_t *dev, struct can_bittiming *bittiming)
 {
     int res;
 
@@ -300,7 +300,7 @@ static int _set_bittiming(candev_linux_t *dev, struct can_bittiming *bittiming)
 
 static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
 {
-    candev_linux_t *dev = (candev_linux_t *) candev;
+    can_t *dev = (can_t *) candev;
     int res = 0;
 
     switch (opt) {
@@ -349,7 +349,7 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
 
 static int _get(candev_t *candev, canopt_t opt, void *value, size_t max_len)
 {
-    candev_linux_t *dev = (candev_linux_t *) candev;
+    can_t *dev = (can_t *) candev;
     int res = 0;
 
     switch (opt) {
@@ -456,7 +456,7 @@ static int _get(candev_t *candev, canopt_t opt, void *value, size_t max_len)
 
 static int _set_filter(candev_t *candev, const struct can_filter *filter)
 {
-    candev_linux_t *dev = (candev_linux_t *)candev;
+    can_t *dev = (can_t *)candev;
 
     if (filter == NULL) {
         DEBUG("candev_native: _set_filter: error filter NULL\n");
@@ -500,7 +500,7 @@ static int _set_filter(candev_t *candev, const struct can_filter *filter)
 
 static int _remove_filter(candev_t *candev, const struct can_filter *filter)
 {
-    candev_linux_t *dev = (candev_linux_t *)candev;
+    can_t *dev = (can_t *)candev;
 
     if (filter == NULL) {
         DEBUG("candev_native: _remove_filter: error filter NULL\n");

@@ -16,8 +16,8 @@
  * @author      Vincent Dupont <vincent@otakeys.com>
  */
 
-#ifndef CANDEV_LINUX_PARAMS_H
-#define CANDEV_LINUX_PARAMS_H
+#ifndef CAN_PARAMS_H
+#define CAN_PARAMS_H
 
 #include "candev_linux.h"
 #include "can/device.h"
@@ -29,7 +29,7 @@ extern "C" {
 /**
  * @brief Default parameters (device names)
  */
-static candev_params_t candev_linux_params[] = {
+static const candev_params_t candev_params[] = {
     { .name = "can0", },
     { .name = "can1", },
 };
@@ -38,5 +38,5 @@ static candev_params_t candev_linux_params[] = {
 }
 #endif
 
-#endif /* CANDEV_LINUX_PARAMS_H */
+#endif /* CAN_PARAMS_H */
 /** @} */

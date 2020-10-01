@@ -51,6 +51,7 @@ config NATIVE_OS_DARWIN
 
 config NATIVE_OS_LINUX
     bool
+    select HAS_PERIPH_CAN
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_SPI

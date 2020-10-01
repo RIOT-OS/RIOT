@@ -470,7 +470,9 @@ int raw_can_power_up(int ifnum)
 
 int raw_can_set_bitrate(int ifnum, uint32_t bitrate, uint32_t sample_point)
 {
-    assert(ifnum < candev_nb);
+    if (ifnum < 0 || ifnum >= candev_nb) {
+        return -1;
+    }
 
     int res = 0;
     int ret;

@@ -42,7 +42,11 @@ int conn_can_raw_create(conn_can_raw_t *conn, struct can_filter *filter, size_t 
                         int ifnum, int flags)
 {
     assert(conn != NULL);
-    assert(ifnum < CAN_DLL_NUMOF);
+    if (ifnum < 0 || ifnum >= CAN_DLL_NUMOF) {
+        memset(conn, 0, sizeof (*conn));
+        conn->ifnum = -1;
+        return -ENODEV;
+    }
 
     DEBUG("conn_can_raw_create: create conn=%p, ifnum=%d flags=%d\n", (void *)conn, ifnum, flags);
 
@@ -121,7 +125,11 @@ static void _tx_conf_timeout(void *arg)
 int conn_can_raw_send(conn_can_raw_t *conn, const struct can_frame *frame, int flags)
 {
     assert(conn != NULL);
-    assert(conn->ifnum < CAN_DLL_NUMOF);
+
+    if (conn->ifnum < 0 || conn->ifnum >= CAN_DLL_NUMOF) {
+        return -ENODEV;
+    }
+
     assert((conn->flags & CONN_CAN_RECVONLY) == 0);
     assert(frame != NULL);
 
@@ -201,7 +209,11 @@ static void _rx_timeout(void *arg)
 int conn_can_raw_recv(conn_can_raw_t *conn, struct can_frame *frame, uint32_t timeout)
 {
     assert(conn != NULL);
-    assert(conn->ifnum < CAN_DLL_NUMOF);
+
+    if (conn->ifnum < 0 || conn->ifnum >= CAN_DLL_NUMOF) {
+        return -ENODEV;
+    }
+
     assert(frame != NULL);
 
     xtimer_t timer;
@@ -256,7 +268,10 @@ int conn_can_raw_recv(conn_can_raw_t *conn, struct can_frame *frame, uint32_t ti
 int conn_can_raw_close(conn_can_raw_t *conn)
 {
     assert(conn != NULL);
-    assert(conn->ifnum < CAN_DLL_NUMOF);
+
+    if (conn->ifnum < 0 || conn->ifnum >= CAN_DLL_NUMOF) {
+        return -ENODEV;
+    }
 
     DEBUG("conn_can_raw_close: conn=%p\n", (void *)conn);
 
