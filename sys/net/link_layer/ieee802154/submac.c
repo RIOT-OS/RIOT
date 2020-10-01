@@ -15,11 +15,12 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "net/eui_provider.h"
 #include "net/ieee802154/submac.h"
 #include "net/ieee802154.h"
+#include "net/netdev/ieee802154_submac.h"
 #include "xtimer.h"
 #include "random.h"
-#include "luid.h"
 #include "kernel_defines.h"
 #include "errno.h"
 #include <assert.h>
@@ -277,6 +278,7 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
 
 int ieee802154_submac_init(ieee802154_submac_t *submac)
 {
+    netdev_ieee802154_submac_t *netdev = container_of(submac, netdev_ieee802154_submac_t, submac);
     ieee802154_dev_t *dev = submac->dev;
 
     submac->tx = false;
@@ -285,8 +287,8 @@ int ieee802154_submac_init(ieee802154_submac_t *submac)
     ieee802154_radio_request_on(dev);
 
     /* generate EUI-64 and short address */
-    luid_get_eui64(&submac->ext_addr);
-    luid_get_short(&submac->short_addr);
+    netdev_eui64_get(&netdev->dev.netdev, &submac->ext_addr);
+    eui_short_from_eui64(&submac->ext_addr, &submac->short_addr);
     submac->panid = CONFIG_IEEE802154_DEFAULT_PANID;
 
     submac->be.min = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE;
