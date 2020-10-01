@@ -341,6 +341,14 @@ typedef struct {
 #define GPIOCLKGR_CLK_EN       0x1
 #define I2CCLKGR_CLK_EN        0x1
 #define UARTCLKGR_CLK_EN_UART0 0x1
+
+#define GPIOCLKGS_CLK_EN       0x1
+#define I2CCLKGS_CLK_EN        0x1
+#define UARTCLKGS_CLK_EN_UART0 0x1
+
+#define GPIOCLKGDS_CLK_EN       0x1
+#define I2CCLKGDS_CLK_EN        0x1
+#define UARTCLKGDS_CLK_EN_UART0 0x1
 /** @} */
 
 /** @ingroup cpu_specific_peripheral_memory_map
