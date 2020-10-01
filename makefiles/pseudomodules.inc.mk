@@ -60,6 +60,7 @@ PSEUDOMODULES += gnrc_txtsnd
 PSEUDOMODULES += heap_cmd
 PSEUDOMODULES += i2c_scan
 PSEUDOMODULES += ieee802154_radio_hal
+PSEUDOMODULES += ieee802154_submac
 PSEUDOMODULES += ina3221_alerts
 PSEUDOMODULES += l2filter_blacklist
 PSEUDOMODULES += l2filter_whitelist
@@ -131,6 +132,7 @@ PSEUDOMODULES += ztimer%
 
 # ztimer's main module is called "ztimer_core"
 NO_PSEUDOMODULES += ztimer_core
+NO_PSEUDOMODULES += netdev_ieee802154_submac
 
 # print ascii representation in function od_hex_dump()
 PSEUDOMODULES += od_string
