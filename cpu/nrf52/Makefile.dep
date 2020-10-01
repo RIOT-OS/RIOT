@@ -5,6 +5,9 @@ ifneq (,$(filter nrf802154,$(USEMODULE)))
   FEATURES_REQUIRED += radio_nrf802154
   USEMODULE += luid
   USEMODULE += netdev_ieee802154
+  ifeq (,$(filter netdev_ieee802154_legacy,$(USEMODULE)))
+    USEMODULE += netdev_ieee802154_submac
+  endif
 endif
 
 # The nrf52832 requires gpio IRQ with SPI to work around errata 58
