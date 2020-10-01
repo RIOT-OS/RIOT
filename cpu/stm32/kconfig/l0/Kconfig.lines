@@ -5,6 +5,10 @@
 # directory for more details.
 #
 
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
 # CPU lines
 config CPU_LINE_STM32L010X4
     bool
@@ -45,12 +49,10 @@ config CPU_LINE_STM32L051XX
 config CPU_LINE_STM32L052XX
     bool
     select CPU_FAM_L0
-    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32L053XX
     bool
     select CPU_FAM_L0
-    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32L061XX
     bool
@@ -71,12 +73,10 @@ config CPU_LINE_STM32L071XX
 config CPU_LINE_STM32L072XX
     bool
     select CPU_FAM_L0
-    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32L073XX
     bool
     select CPU_FAM_L0
-    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32L081XX
     bool
