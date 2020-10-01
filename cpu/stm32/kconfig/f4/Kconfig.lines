@@ -5,6 +5,10 @@
 # directory for more details.
 #
 
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
 # CPU lines
 config CPU_LINE_STM32F401XC
     bool
@@ -17,12 +21,10 @@ config CPU_LINE_STM32F401XE
 config CPU_LINE_STM32F405XX
     bool
     select CPU_FAM_F4
-    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F407XX
     bool
     select CPU_FAM_F4
-    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F410CX
     bool
@@ -31,7 +33,6 @@ config CPU_LINE_STM32F410CX
 config CPU_LINE_STM32F410RX
     bool
     select CPU_FAM_F4
-    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F410TX
     bool
@@ -56,17 +57,14 @@ config CPU_LINE_STM32F412VX
 config CPU_LINE_STM32F412ZX
     bool
     select CPU_FAM_F4
-    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F413XX
     bool
     select CPU_FAM_F4
-    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F415XX
     bool
     select CPU_FAM_F4
-    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F417XX
     bool
@@ -83,12 +81,10 @@ config CPU_LINE_STM32F427XX
 config CPU_LINE_STM32F429XX
     bool
     select CPU_FAM_F4
-    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F437XX
     bool
     select CPU_FAM_F4
-    select HAS_PERIPH_HWRNG
 
 config CPU_LINE_STM32F439XX
     bool
