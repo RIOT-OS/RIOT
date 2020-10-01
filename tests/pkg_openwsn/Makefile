@@ -66,11 +66,3 @@ USEMODULE += shell_commands
 USEMODULE += ztimer_usec
 
 include $(RIOTBASE)/Makefile.include
-
-# We want the highest possible frequency set for periph_rtt, but not all
-# platforms can configure this value. use highest possible RTT_FREQUENCY
-# for platforms that allow it
-ifneq (,$(filter stm32,$(CPU)))
-  RTT_FREQUENCY ?= RTT_MAX_FREQUENCY
-  CFLAGS += -DRTT_FREQUENCY=$(RTT_FREQUENCY)
-endif
