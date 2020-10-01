@@ -455,6 +455,16 @@ void isr_radio(void)
 {
     ieee802154_dev_t *dev = &nrf802154_hal_dev;
 
+    if (NRF_RADIO->EVENTS_FRAMESTART) {
+        NRF_RADIO->EVENTS_FRAMESTART = 0;
+        if (_state == STATE_TX) {
+            dev->cb(dev, IEEE802154_RADIO_INDICATION_TX_START);
+        }
+        else if (_state == STATE_RX) {
+            dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_START);
+        }
+    }
+
     if (NRF_RADIO->EVENTS_CCAIDLE) {
         NRF_RADIO->EVENTS_CCAIDLE = 0;
         if (_state != STATE_TX) {
@@ -585,6 +595,7 @@ static int _request_on(ieee802154_dev_t *dev)
     /* enable interrupts */
     NVIC_EnableIRQ(RADIO_IRQn);
     NRF_RADIO->INTENSET = RADIO_INTENSET_END_Msk |
+                          RADIO_INTENSET_FRAMESTART_Msk |
                           RADIO_INTENSET_CCAIDLE_Msk |
                           RADIO_INTENSET_CCABUSY_Msk;
 
@@ -639,6 +650,8 @@ static bool _get_cap(ieee802154_dev_t *dev, ieee802154_rf_caps_t cap)
     (void) dev;
     switch (cap) {
     case IEEE802154_CAP_24_GHZ:
+    case IEEE802154_CAP_IRQ_RX_START:
+    case IEEE802154_CAP_IRQ_TX_START:
     case IEEE802154_CAP_IRQ_TX_DONE:
     case IEEE802154_CAP_IRQ_CCA_DONE:
         return true;
