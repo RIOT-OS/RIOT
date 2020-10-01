@@ -1,5 +1,5 @@
 CPU = stm32
-CPU_MODEL = stm32f411ceu6
+CPU_MODEL = stm32f411ce
 
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
