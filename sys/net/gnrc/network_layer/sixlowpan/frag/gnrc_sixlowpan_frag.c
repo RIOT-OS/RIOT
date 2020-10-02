@@ -148,7 +148,7 @@ static uint16_t _send_1st_fragment(gnrc_netif_t *iface,
      * datagram_size: size of the uncompressed IPv6 packet */
     int payload_diff = _payload_diff(fbuf, payload_len);
     uint16_t local_offset;
-    /* virtually add payload_diff to flooring to account for offset (must be divisable by 8)
+    /* virtually add payload_diff to flooring to account for offset (must be dividable by 8)
      * in uncompressed datagram */
     uint16_t max_frag_size = _floor8(_max_frag_size(iface, fbuf) +
                                      payload_diff - sizeof(sixlowpan_frag_t)) -

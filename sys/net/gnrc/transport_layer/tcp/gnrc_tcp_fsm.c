@@ -306,7 +306,7 @@ static int _fsm_call_recv(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
     if (ringbuffer_get_free(&tcb->rcv_buf) >= CONFIG_GNRC_TCP_MSS) {
         tcb->rcv_wnd = ringbuffer_get_free(&(tcb->rcv_buf));
 
-        /* Send ACK to anounce window update */
+        /* Send ACK to announce window update */
         gnrc_pktsnip_t *out_pkt = NULL;
         uint16_t seq_con = 0;
         _pkt_build(tcb, &out_pkt, &seq_con, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0);

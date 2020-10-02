@@ -45,7 +45,7 @@ typedef struct {
     uint8_t datarate;                       /**< LoRaWAN datarate for the next transmission */
     uint8_t port;                           /**< LoRaWAN port for the next transmission */
     uint8_t ack_req;                        /**< Request ACK in the next transmission */
-    uint8_t otaa;                           /**< wether the next transmission is OTAA or not */
+    uint8_t otaa;                           /**< whether the next transmission is OTAA or not */
 } gnrc_netif_lorawan_t;
 
 #ifdef __cplusplus

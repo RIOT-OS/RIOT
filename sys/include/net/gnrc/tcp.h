@@ -58,7 +58,7 @@ typedef struct {
  * @param[in]     addr        Address for endpoint.
  * @param[in]     addr_size   Size of @p addr.
  * @param[in]     port        Port number for endpoint.
- * @param[in]     netif       Network inferface to use.
+ * @param[in]     netif       Network interface to use.
  *
  * @return   0 on success.
  * @return   -EAFNOSUPPORT if @p address_family is not supported.

@@ -76,7 +76,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Per-Interface Event Message Busses
+ * @brief   Per-Interface Event Message Buses
  */
 typedef enum {
 #ifdef MODULE_GNRC_IPV6
