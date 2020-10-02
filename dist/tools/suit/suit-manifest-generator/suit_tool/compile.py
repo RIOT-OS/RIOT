@@ -373,7 +373,6 @@ def compile_manifest(options, m):
                 'command-arg' : None
             }))
         else:
-            te = []
             for c in bootable_components:
                 pass
                 # TODO: conditions
