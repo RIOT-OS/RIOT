@@ -182,7 +182,7 @@ void __pthread_keys_exit(int self_id)
 {
     tls_data_t **tls = __pthread_get_tls_head(self_id);
 
-    /* Calling the dtor could cause another pthread_exit(), so we dehead and free defore calling it. */
+    /* Calling the dtor could cause another pthread_exit(), so we dehead and free before calling it. */
     mutex_lock(&tls_mutex);
     for (tls_data_t *specific; (specific = *tls); ) {
         *tls = specific->next;
