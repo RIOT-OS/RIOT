@@ -344,6 +344,10 @@ typedef gpio_t adc_conf_t;
 #define RTT_ISR             isr_sleepmode
 #define RTT_MAX_VALUE       (0xffffffff)
 #define RTT_FREQUENCY       (CLOCK_OSC32K)
+/* When setting a new compare value, the value must be at least 5 more
+   than the current sleep timer value. Otherwise, the timer compare
+   event may be lost. */
+#define RTT_MIN_OFFSET      (5U)
 /** @} */
 
 /**
