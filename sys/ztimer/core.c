@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief       ztimer core functinality
+ * @brief       ztimer core functionality
  *
  * This file contains ztimer's main API implementation and functionality
  * present in all ztimer clocks (most notably multiplexing ant extension).
