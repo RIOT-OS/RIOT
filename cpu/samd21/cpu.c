@@ -251,11 +251,8 @@ static void clk_init(void)
                       | GCLK_GENCTRL_SRC_XOSC32K);
 #endif
 
-    /* redirect all peripherals to a disabled clock generator (7) by default */
-    for (int i = 0x3; i <= 0x22; i++) {
-        GCLK->CLKCTRL.reg = ( GCLK_CLKCTRL_ID(i) | GCLK_CLKCTRL_GEN_GCLK7 );
-        while (GCLK->STATUS.bit.SYNCBUSY) {}
-    }
+    /* make sure we synchronize clock generator 0 before we go on */
+    while (GCLK->STATUS.reg & GCLK_STATUS_SYNCBUSY) {}
 }
 
 void cpu_init(void)
