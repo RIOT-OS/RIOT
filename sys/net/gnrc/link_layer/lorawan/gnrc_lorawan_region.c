@@ -12,9 +12,13 @@
  * @file
  * @author  José Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
+#include "kernel_defines.h"
 #include "net/gnrc/lorawan/region.h"
 
 #define GNRC_LORAWAN_DATARATES_NUMOF (6U)
+
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 static uint8_t dr_sf[GNRC_LORAWAN_DATARATES_NUMOF] =
 { LORA_SF12, LORA_SF11, LORA_SF10, LORA_SF9, LORA_SF8, LORA_SF7 };
@@ -38,10 +42,19 @@ int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate)
     return 0;
 }
 
+#if (IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868))
 uint8_t gnrc_lorawan_rx1_get_dr_offset(uint8_t dr_up, uint8_t dr_offset)
 {
     return (dr_up > dr_offset) ? (dr_up - dr_offset) : 0;
 }
+
+#elif (IS_ACTIVE(CONFIG_LORAMAC_REGION_IN_865))
+uint8_t gnrc_lorawan_rx1_get_dr_offset(uint8_t dr_up, uint8_t dr_offset)
+{
+    int dr_eff = dr_offset > 5 ? 5 - dr_offset : dr_offset;
+    return MIN(5, MAX(0, dr_up - dr_eff));
+}
+#endif
 
 static size_t _get_num_used_channels(gnrc_lorawan_t *mac)
 {
