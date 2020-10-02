@@ -252,8 +252,8 @@ static void clk_init(void)
 #endif
 
     /* redirect all peripherals to a disabled clock generator (7) by default */
-    for (int i = 0x3; i <= 0x22; i++) {
-        GCLK->CLKCTRL.reg = ( GCLK_CLKCTRL_ID(i) | GCLK_CLKCTRL_GEN_GCLK7 );
+    for (unsigned i = 0x3; i <= GCLK_CLKCTRL_ID_Msk; i++) {
+        GCLK->CLKCTRL.reg = GCLK_CLKCTRL_ID(i) | GCLK_CLKCTRL_GEN(SAM0_GCLK_DISABLED);
         while (GCLK->STATUS.bit.SYNCBUSY) {}
     }
 }
