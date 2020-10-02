@@ -16,6 +16,5 @@ config BOARD_REEL
     select HAS_PERIPH_SPI
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
-    select HAS_RADIO_NRF802154
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

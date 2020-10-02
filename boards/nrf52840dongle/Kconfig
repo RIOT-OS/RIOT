@@ -15,7 +15,6 @@ config BOARD_NRF52840DONGLE
     select HAS_PERIPH_PWM
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
-    select HAS_RADIO_NRF802154
     select HAS_BOOTLOADER_NRFUTIL
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"
