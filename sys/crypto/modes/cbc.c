@@ -22,7 +22,7 @@
 #include <string.h>
 #include "crypto/modes/cbc.h"
 
-int cipher_encrypt_cbc(cipher_t *cipher, uint8_t iv[16],
+int cipher_encrypt_cbc(const cipher_t *cipher, uint8_t iv[16],
                        const uint8_t *input, size_t length, uint8_t *output)
 {
     size_t offset = 0;
@@ -54,7 +54,7 @@ int cipher_encrypt_cbc(cipher_t *cipher, uint8_t iv[16],
 }
 
 
-int cipher_decrypt_cbc(cipher_t *cipher, uint8_t iv[16],
+int cipher_decrypt_cbc(const cipher_t *cipher, uint8_t iv[16],
                        const uint8_t *input, size_t length, uint8_t *output)
 {
     size_t offset = 0;
