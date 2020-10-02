@@ -29,7 +29,7 @@ static const char long_str[] = "\xff,a\xff.bcdefghijklmnop";
 
 int main(void)
 {
-    /* test data width vs. output width discrepency */
+    /* test data width vs. output width discrepancy */
     CALL(od_hex_dump(short_str, sizeof(short_str), OD_WIDTH_DEFAULT));
 
     /* Test different output width in default configuration*/
