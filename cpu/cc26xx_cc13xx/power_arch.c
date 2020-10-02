@@ -8,6 +8,7 @@
 
 /**
  * @ingroup     cpu_cc26xx_cc13xx
+ *
  * @{
  *
  * @file
@@ -95,31 +96,42 @@ void power_enable_domain(const power_domain_t domain)
 
 void power_clock_enable_gpio(void)
 {
-    PRCM->GPIOCLKGR = GPIOCLKGR_CLK_EN;
+    /* enable clock gates for GPIO peripheral, for run mode
+     * and sleep mode */
+    PRCM->GPIOCLKGR |= GPIOCLKGR_CLK_EN;
+    PRCM->GPIOCLKGS |= GPIOCLKGS_CLK_EN;
 
     prcm_commit();
 }
 
 void power_clock_enable_gpt(uint32_t tim)
 {
+    /* enable clock gates for GPT peripheral, for run mode and sleep mode */
     PRCM->GPTCLKGR |= (1 << tim);
+    PRCM->GPTCLKGS |= (1 << tim);
 
     prcm_commit();
 }
 void power_clock_enable_i2c(void) {
-    PRCM->I2CCLKGR = I2CCLKGR_CLK_EN;
+    /* I2C peripheral is only enabled for run mode as it isn't necessary to
+     * keep it running at sleep or deep sleep, as the I2C interrupt is mainly
+     * for the slave mode ;-) */
+    PRCM->I2CCLKGR |= I2CCLKGR_CLK_EN;
 
     prcm_commit();
 }
 
 void power_clock_enable_uart(uart_t uart)
 {
+    /* enable clock gates for UART peripheral, for run mode and sleep mode. */
     if (uart == 0) {
         PRCM->UARTCLKGR |= UARTCLKGR_CLK_EN_UART0;
+        PRCM->UARTCLKGS |= UARTCLKGS_CLK_EN_UART0;
     }
 #ifdef UARTCLKGR_CLK_EN_UART1
     else if (uart == 1) {
         PRCM->UARTCLKGR |= UARTCLKGR_CLK_EN_UART1;
+        PRCM->UARTCLKGS |= UARTCLKGS_CLK_EN_UART1;
     }
 #endif
 
@@ -128,12 +140,15 @@ void power_clock_enable_uart(uart_t uart)
 
 void power_clock_disable_uart(uart_t uart)
 {
+    /* disable clock gates for UART peripheral, for run and sleep mode */
     if (uart == 0) {
         PRCM->UARTCLKGR &= ~UARTCLKGR_CLK_EN_UART0;
+        PRCM->UARTCLKGS &= ~UARTCLKGS_CLK_EN_UART0;
     }
 #ifdef UARTCLKGR_CLK_EN_UART1
     else if (uart == 1) {
         PRCM->UARTCLKGR &= ~UARTCLKGR_CLK_EN_UART1;
+        PRCM->UARTCLKGS &= ~UARTCLKGS_CLK_EN_UART1;
     }
 #endif
 
