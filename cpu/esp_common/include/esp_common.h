@@ -51,7 +51,7 @@ extern "C" {
 #define RTC_DATA_ATTR __attribute__((section(".rtc.data")))
 #endif
 
-/** Print out a message that function is not yet implementd */
+/** Print out a message that function is not yet implemented */
 #define NOT_YET_IMPLEMENTED()     LOG_INFO("%s not yet implemented\n", __func__)
 /** Print out a message that function is not supported */
 #define NOT_SUPPORTED()           LOG_INFO("%s not supported\n", __func__)
