@@ -887,7 +887,7 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
     ctx.flags = COAP_LINK_FLAG_INIT_RESLIST;
 
     /* write payload */
-    while (listener) {
+    for (; listener != NULL; listener = listener->next) {
         if (!listener->link_encoder) {
             continue;
         }
@@ -912,8 +912,6 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
                 break;
             }
         }
-
-        listener = listener->next;
     }
 
     return (int)pos;
