@@ -636,17 +636,12 @@ kernel_pid_t gcoap_init(void)
 
 void gcoap_register_listener(gcoap_listener_t *listener)
 {
-    /* Add the listener to the end of the linked list. */
-    gcoap_listener_t *_last = _coap_state.listeners;
-    while (_last->next) {
-        _last = _last->next;
-    }
-
-    listener->next = NULL;
     if (!listener->link_encoder) {
         listener->link_encoder = gcoap_encode_link;
     }
-    _last->next = listener;
+
+    listener->next = _coap_state.listeners;
+    _coap_state.listeners = listener;
 }
 
 int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
@@ -875,8 +870,7 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf)
 {
     assert(cf == COAP_FORMAT_LINK);
 
-    /* skip the first listener, gcoap itself (we skip /.well-known/core) */
-    gcoap_listener_t *listener = _coap_state.listeners->next;
+    gcoap_listener_t *listener = _coap_state.listeners;
 
     char *out = (char *)buf;
     size_t pos = 0;
