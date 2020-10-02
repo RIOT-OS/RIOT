@@ -4,5 +4,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega328p \
+    stk3200 \
     stm32f030f4-demo \
     #
