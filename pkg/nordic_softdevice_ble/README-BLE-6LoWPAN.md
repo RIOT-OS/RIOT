@@ -1,4 +1,4 @@
-This README contains information how to establish an IPv6 connecton between
+This README contains information how to establish an IPv6 connection between
 Linux BLE router and an IPSP enabled BLE device.
 
 Prerequisites
