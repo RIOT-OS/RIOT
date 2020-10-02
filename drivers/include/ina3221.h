@@ -53,7 +53,7 @@
  *              low.
  *
  *              For all enabled channels (1 <= i <= INA3221_NUM_CH),
- *              the time to complete a full measurment cycle is:
+ *              the time to complete a full measurement cycle is:
  *
  *              num_samples * (shunt_conv_time_ch_i + bus_voltage_conv_time_ch_i)
  *
@@ -369,7 +369,7 @@ int _ina3221_enable_alert(ina3221_t *dev, ina3221_alert_t alert,
 
 /**
  * @brief   Wrapper around @see _ina3221_enable_alert, to
- *          enble warning alert
+ *          enable warning alert
  *
  * @param[in,out] dev       Device handle
  * @param[in] cb            Alert callback
