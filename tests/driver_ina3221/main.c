@@ -27,7 +27,7 @@
 #include "ina3221_params.h"
 #include "ina3221.h"
 
-/* Issue critical alert if shunt voltage is above thist value */
+/* Issue critical alert if shunt voltage is above this value */
 #define CRIT_ALERT_LIM_UV      (2500)
 /* Issue warning alert if shunt voltage is above this value */
 #define WARN_ALERT_LIM_UV      (1600)
