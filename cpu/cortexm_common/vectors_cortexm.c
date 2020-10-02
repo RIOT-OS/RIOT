@@ -384,7 +384,7 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
             /* Print the interrupt number, NMI being -14, hardfault is -13,
              * IRQ0 is 0 and so on */
             uint32_t psr = sp[7];  /* Program status register. */
-            printf("Hard fault occured in ISR number %d\n",
+            printf("Hard fault occurred in ISR number %d\n",
                    (int)(psr & 0xff) - 16);
         }
         puts("Attempting to reconstruct state for debugging...");
