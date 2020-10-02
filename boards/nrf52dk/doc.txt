@@ -6,7 +6,7 @@
 ## Overview:
 There are some nameless simple development Boards with an nRF52832 available.
 These boards providing access to most SoC ports. There are two buttons (RST,
-KEY), two LED’s (Pin 30, 31), a voltage regulator and a current messurment shunt
+KEY), two LED’s (Pin 30, 31), a voltage regulator and a current measurement shunt
 on board. A serial connection and flashing must be provided by external
 Hardware.
 
