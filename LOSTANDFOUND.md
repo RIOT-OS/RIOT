@@ -60,7 +60,7 @@ Reason for removal:
 - board cannot be automatically tested for lack of UART
 - board has many special cases, which hurt upgrade to msp430-elf-gcc 9.x
 - the onboard radio has been unsupported for a while
-- noone seems to use the board, noone seems to maintain it
+- no one seems to use the board, no one seems to maintain it
 
 ### sys/net/gnrc/application_layer/tftp [0e2a62078850e1ecc74db2db4d639cf2d8fb96d3]
 Author:
