@@ -74,7 +74,7 @@ extern "C" {
 /** @} */
 
 /**
- * @name    DW1000 UWB tranceiver
+ * @name    DW1000 UWB transceiver
  * @{
  */
 #define DW1000_PARAM_SPI_DEV        SPI_DEV(1)
