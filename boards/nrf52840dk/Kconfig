@@ -12,7 +12,6 @@ config BOARD_NRF52840DK
     default y
     select BOARD_COMMON_NRF52XXXDK
     select CPU_MODEL_NRF52840XXAA
-    select HAS_RADIO_NRF802154
     select HAS_PERIPH_PWM
     select HAS_PERIPH_USBDEV
 
