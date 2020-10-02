@@ -50,7 +50,7 @@ static const i2c_conf_t i2c_config[] = {
         .rcc_mask       = RCC_APB1ENR_I2C1EN,
         .clk            = CLOCK_APB1,
         .irqn           = I2C1_EV_IRQn,
-#elif CPU_FAM_STM32L4 || CPU_FAM_STM32WB || CPU_FAM_STM32G4
+#elif CPU_FAM_STM32L4 || CPU_FAM_STM32WB || CPU_FAM_STM32G4 || CPU_FAM_STM32L5
         .rcc_mask       = RCC_APB1ENR1_I2C1EN,
         .irqn           = I2C1_ER_IRQn,
 #elif CPU_FAM_STM32G0
@@ -71,7 +71,7 @@ static const i2c_conf_t i2c_config[] = {
 
 #if CPU_FAM_STM32F4 || CPU_FAM_STM32F2
 #define I2C_0_ISR           isr_i2c1_ev
-#elif CPU_FAM_STM32L4 || CPU_FAM_STM32F7 || CPU_FAM_STM32WB
+#elif CPU_FAM_STM32L4 || CPU_FAM_STM32F7 || CPU_FAM_STM32WB || CPU_FAM_STM32L5
 #define I2C_0_ISR           isr_i2c1_er
 #elif CPU_FAM_STM32F0 || CPU_FAM_STM32L0 || CPU_FAM_STM32G0
 #define I2C_0_ISR           isr_i2c1
