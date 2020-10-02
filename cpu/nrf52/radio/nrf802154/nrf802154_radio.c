@@ -589,7 +589,7 @@ static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
 
     /* The value of this register represents the frequency offset (in MHz) from
      * 2400 MHz.  Channel 11 (first 2.4 GHz band channel) starts at 2405 MHz
-     * and all channels have a bandwidth of 5 MHz. Thus, we substract 10 to the
+     * and all channels have a bandwidth of 5 MHz. Thus, we subtract 10 to the
      * channel number and multiply by 5 to calculate the offset.
      */
     NRF_RADIO->FREQUENCY = (((uint8_t) conf->channel) - 10) * 5;
