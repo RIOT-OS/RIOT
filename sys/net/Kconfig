@@ -12,6 +12,7 @@ rsource "credman/Kconfig"
 rsource "gnrc/Kconfig"
 rsource "sock/Kconfig"
 rsource "link_layer/Kconfig"
+rsource "lora/Kconfig"
 rsource "netif/Kconfig"
 
 endmenu # Networking
