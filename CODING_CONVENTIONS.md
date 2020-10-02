@@ -58,7 +58,7 @@
         uint8_t b;
     } foobar_t;
 ```
-* Use of a seperate line typedef for structs is allowed for forward
+* Use of a separate line typedef for structs is allowed for forward
   declarations, e.g.,
 ```
     typedef struct mystruct mystruct_t;

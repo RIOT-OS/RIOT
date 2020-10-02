@@ -234,7 +234,7 @@ void _handle_snd_ns(_nib_onl_entry_t *nbr)
             /* intentionally falls through */
         case GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE:
             if (!IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR) ||
-                /* if neighbor is a 6LoWPAN node (i.e. address registartion
+                /* if neighbor is a 6LoWPAN node (i.e. address registration
                  * state is non-garbage-collectible), only probe if it is a
                  * router (where the solicited-nodes multicast address MUST
                  * be set; only MAY otherwise).

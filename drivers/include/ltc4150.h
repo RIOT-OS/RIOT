@@ -153,7 +153,7 @@ typedef struct {
     /**
      * @brief Pin indicating (dis-)charging, labeled POL
      *
-     * Set this pin to `GPIO_UNDEF` to tread every pulse as discharging. This
+     * Set this pin to `GPIO_UNDEF` to treat every pulse as discharging. This
      * pin is pulled low by the LTC4150 in case the battery is discharging.
      */
     gpio_t polarity;

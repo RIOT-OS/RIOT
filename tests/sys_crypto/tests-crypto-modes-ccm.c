@@ -892,7 +892,7 @@ static const size_t TEST_WYCHEPROOF_28_EXPECTED_LEN = 63;
 
 
 /* Manually created test vectors */
-/* This is neccessary, because no test vectors are published with input length > 256 */
+/* This is necessary, because no test vectors are published with input length > 256 */
 /* Data has been verified against BouncyCastle (.NET Core) and pycryptodome */
 
 static const uint8_t TEST_MANUAL_01_KEY[] = {

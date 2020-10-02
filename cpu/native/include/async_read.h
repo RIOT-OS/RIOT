@@ -42,7 +42,7 @@ typedef void (*native_async_read_callback_t)(int fd, void *arg);
  */
 typedef struct {
     pid_t child_pid;                    /**< PID of the interrupt listener */
-    native_async_read_callback_t cb;    /**< Interrupt callback funtion */
+    native_async_read_callback_t cb;    /**< Interrupt callback function */
     void *arg;                          /**< Argument ptr for the callback */
     struct pollfd *fd;                  /**< sysfs gpio fd */
 } async_read_t;

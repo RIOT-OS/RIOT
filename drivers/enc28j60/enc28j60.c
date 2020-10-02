@@ -83,7 +83,7 @@
  * @brief  Maximum transmission time
  *
  * The time in us that is required to send an Ethernet frame of maximum length
- * (Preamle + SFD + 1518 byte) at 10 Mbps in full duplex mode with a guard
+ * (Preamble + SFD + 1518 byte) at 10 Mbps in full duplex mode with a guard
  * period of 9,6 us. This time is used as time out for send operations.
  */
 #define MAX_TX_TIME                 (1230U)

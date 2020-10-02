@@ -177,7 +177,7 @@ Documentation:
 
 This is a simpler approach to the above mentioned issue. The solution here only
 uses a makefile script for selecting the debugger and serial port. No
-adminstrative privileges (e.g. to configure Udev) are required.
+administrative privileges (e.g. to configure Udev) are required.
 
 One of the limitations of the solution described here is that it currently
 doesn't work with multiple boards of the same type. This limitation is a

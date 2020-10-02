@@ -42,7 +42,7 @@
 
 #define ARG_ERROR       (-1)
 
-/* i2c_buf is global to reduce stack memory consumtion */
+/* i2c_buf is global to reduce stack memory consumption */
 static uint8_t i2c_buf[BUFSIZE];
 
 static inline void _print_i2c_read(i2c_t dev, uint16_t *reg, uint8_t *buf,

@@ -100,7 +100,7 @@ The integration of Kconfig into the build system is mainly done in
 
 ## Steps during the build process                {#kconfig-steps-build-process}
 
-![Ouput of every step of the build process](kconfig_integration.svg)
+![Output of every step of the build process](kconfig_integration.svg)
 
 ### 0. Module dependency resolution
 Currently, the resolution of module dependencies is performed by the build

@@ -31,7 +31,7 @@
 
 #define min(a, b) ((a) > (b) ? (b) : (a))
 
-/* MCI driver only suports whole page reads / writes */
+/* MCI driver only supports whole page reads / writes */
 static uint8_t _page_buffer[SD_HC_BLOCK_SIZE];
 
 static int mtd_mci_init(mtd_dev_t *dev)

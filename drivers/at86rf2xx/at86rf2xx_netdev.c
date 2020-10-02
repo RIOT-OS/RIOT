@@ -832,7 +832,7 @@ static void _isr(netdev_t *netdev)
  */
 #if AT86RF2XX_HAVE_RETRIES
 ISR(TRX24_TX_START_vect){
-    /* __enter_isr(); is not neccessary as there is nothing which causes a
+    /* __enter_isr(); is not necessary as there is nothing which causes a
      * thread_yield and the interrupt can not be interrupted by an other ISR */
 
     at86rf2xx_t *dev = (at86rf2xx_t *) at86rfmega_dev;

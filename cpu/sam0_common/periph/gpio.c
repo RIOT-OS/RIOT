@@ -40,7 +40,7 @@
  * ```
  *
  * This switches the GPIO reads to use the Cortex-M0+ single-cycle I/O port
- * instead of the regular APB acces. The single-cycle I/O port is always used
+ * instead of the regular APB access. The single-cycle I/O port is always used
  * for writes when it is available on the device.
  *
  * @}

@@ -172,10 +172,10 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data, size_t length
 static inline int _wait_busy(i2c_t dev, uint32_t max_timeout_counter)
 {
     uint32_t timeout_counter = 0;
-    DEBUG("[i2c] wait for transfert\n");
+    DEBUG("[i2c] wait for transfer\n");
     while (_REG32(i2c_config[dev].addr, I2C_STATUS) & I2C_STATUS_TIP) {
         if (++timeout_counter >= max_timeout_counter) {
-            DEBUG("[i2c] transfert timeout\n");
+            DEBUG("[i2c] transfer timeout\n");
             return -ETIMEDOUT;
         }
         else if ((_REG32(i2c_config[dev].addr, I2C_STATUS) & I2C_STATUS_ALOST) == I2C_STATUS_ALOST) {

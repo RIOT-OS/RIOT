@@ -14,7 +14,7 @@ actually triggers.
 
 ### set() one
 
-This repeatedly sets one timer in an otherwise emtpy list.
+This repeatedly sets one timer in an otherwise empty list.
 All but the first iteration will cause xtimer to implicitly remove the timer
 first.
 All iterations will cause the underlying periph timer to be updated.

@@ -121,7 +121,7 @@ enum {
 typedef enum {
     NIMBLE_NETIF_ACCEPTING,         /**< accepting incoming connections */
     NIMBLE_NETIF_ACCEPT_STOP,       /**< stop accepting incoming connections */
-    NIMBLE_NETIF_INIT_MASTER,       /**< conn. procedure started (as mater) */
+    NIMBLE_NETIF_INIT_MASTER,       /**< conn. procedure started (as master) */
     NIMBLE_NETIF_INIT_SLAVE,        /**< conn. procedure started (as slave) */
     NIMBLE_NETIF_CONNECTED_MASTER,  /**< connection established as master */
     NIMBLE_NETIF_CONNECTED_SLAVE,   /**< connection established as slave */

@@ -183,7 +183,7 @@ extern "C" {
 #define CONFIG_LWM2M_DEVICE_BINDING_US
 
 /**
- * @brief UDP and SMS bindins with Queue mode
+ * @brief UDP and SMS bindings with Queue mode
  */
 #define CONFIG_LWM2M_DEVICE_BINDING_UQS
 #endif

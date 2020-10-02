@@ -12,7 +12,7 @@
  * @brief       Provides 32bit -> 16bit pointer compression
  *
  * On many platforms, some pointers may have to be aligned, e.g., to 4 byte
- * bounderies.
+ * boundaries.
  * On 32bit platforms, that makes it possible to store all possible aligned
  * 32bit pointers in a 16bit value as long as the total memory is small (e.g.,
  * with 4 byte alignment, all pointers within 256kb RAM can be represented by a
@@ -83,7 +83,7 @@ typedef uint16_t zptr_t;
 #define ZPTR_MAX_ADDR   ((uintptr_t)ZPTR_BASE + (1 << 18))
 
 /**
- * @brief Determine if a pointer is compressable by zptrc()
+ * @brief Determine if a pointer is compressible by zptrc()
  * @param[in]   pointer     pointer to check
  * @returns     1 if pointer can be compressed, 0 if not
  */
@@ -98,7 +98,7 @@ static inline int zptr_check(void *pointer)
 /**
  * @brief Compress a pointer (if possible)
  *
- * Substracts ZPTR_BASE, then right-shifts @p pointer by two.
+ * Subtracts ZPTR_BASE, then right-shifts @p pointer by two.
  *
  * @param[in]   pointer     pointer to compress
  * @returns     compressed pointer

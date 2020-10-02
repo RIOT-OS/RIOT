@@ -1982,8 +1982,8 @@ API Changes
 - static inline int ipv6_addr_split_iface(char *addr_str)
 + static inline char *ipv6_addr_split_iface(char *addr_str)
 
-- int ipv6_addr_split(char *addr_str, char seperator, int _default);
-+ int ipv6_addr_split_int(char *addr_str, char seperator, int _default);
+- int ipv6_addr_split(char *addr_str, char separator, int _default);
++ int ipv6_addr_split_int(char *addr_str, char separator, int _default);
 + char *ipv6_addr_split_str(char *addr_str, char separator);
 
 /* change address getter and setter functions to avoid byte order confusion */
@@ -2857,7 +2857,7 @@ Networking
     * gnrc_ipv6_nib: add address from netif to address validation timer
     + netdev_ieee802154: add txpower and page
     + net/lorawan/hdr: add lorawan header helpers
-    + ble/nimble: add support for build-in IPSS service
+    + ble/nimble: add support for built-in IPSS service
     * pkg/semtech-loramac: rework interaction with the MAC
     * pkg/semtech-loramac: provide basic persistence for MAC state
     * RPL: API update suggestions
@@ -3082,7 +3082,7 @@ Networking related issues
 #11859: examples: dtls-echo fails silently when DTLS_ECC flag enabled
 #11519: shell/ping6: Incorrect handling of unexpected pongs
 #11405: nrfmin: communication not possible after multicast ping with no interval
-#11390: gnrc networking crashs on nRF51dk
+#11390: gnrc networking crashes on nRF51dk
 #11212: POSIX sockets + lwIP: bad file descriptor
 #11033: 6lo: RIOT does not receive packets from Linux when short_addr is set
 #10969: net: netdev_driver_t::send() doc unclear
@@ -4309,7 +4309,7 @@ Networking related issues
 #7474: 6lo: gnrc fragmentation expects driver to block on TX
 #7737: pkg: libcoap is partially broken and outdated
 #8086: gnrc_rpl_p2p: not compiling
-#8130: gcoap: can't build witth network stacks other than gnrc
+#8130: gcoap: can't build with network stacks other than gnrc
 #8172: gnrc_netif, gnrc_uhcpc: Replacing prefix on border router results in no
        configured prefix
 #8271: app/netdev: application stops working after receiving frames with
@@ -4401,7 +4401,7 @@ Fixed Issues from the last release (2018.07)
 #9573: pkg/lwip: assert on samr21-xpro
 #9584: drivers/cc2420: add netopt NETOPT_MAX_PACKET_SIZE
 #6437: periph/spi: Leftovers from SPI rework in #4780
-#6650: GPIO Port shift in cc2538 is unconsistent
+#6650: GPIO Port shift in cc2538 is inconsistent
 #6836: Issuing a reboot on ATmega328p makes the board loop-reboot
 #7846: stm32f1: I2C read functions return bogus values with unconnected devices
 #9616: at86rf2xx: can not correctly set channel after `NETOPT_STATE_RESET`
@@ -4602,7 +4602,7 @@ Networking related issues
 #7474: 6lo: gnrc fragmentation expects driver to block on TX
 #7737: pkg: libcoap is partially broken and outdated
 #8086: gnrc_rpl_p2p: not compiling
-#8130: gcoap: can't build witth network stacks other than gnrc
+#8130: gcoap: can't build with network stacks other than gnrc
 #8172: gnrc_netif, gnrc_uhcpc: Replacing prefix on border router results in no
        configured prefix
 #8271: app/netdev: application stops working after receiving frames with
@@ -4651,7 +4651,7 @@ Other platforms related issues
 #6437: periph/spi: Leftovers from SPI rework in #4780
 #6567: periph/spi: Switching between CPOL=0,1 problems on Kinetis with software
        CS
-#6650: GPIO Port shift in cc2538 is unconsistent
+#6650: GPIO Port shift in cc2538 is inconsistent
 #6838: Issuing a reboot on ATmega328p makes the board loop-reboot
 #6874: SAMD21: possible CMSIS bug
 #7020: isr_rfcoreerrors while pinging between CC2538DKs
@@ -5201,7 +5201,7 @@ Networking related issues
        network interfaces need to get unlocked in the current implementation to not get deadlocked.
        Recursive mutexes as provided in #5731 might help to solve this problem.
 #5748: gnrc: nodes crashing with too small packet buffer: A packet buffer of size ~512 B might lead
-       to crashes. The issue describes this for several hundret nodes, but agressive flooding with
+       to crashes. The issue describes this for several hundred nodes, but aggressive flooding with
        just two nodes was also shown to lead to this problem.
 #5858: gnrc: 6lo: potential problem with reassembly of fragments: If one frame gets lost the reassembly
        state machine might get out of sync
@@ -5258,7 +5258,7 @@ other platform related issues
        some pin configurations might get lost.
 #5009: RIOT is saw-toothing in energy consumption (even when idling)
 #5103: xtimer: weird behavior of tests/xtimer_drift: xtimer_drift randomly jumps a few seconds on nrf52
-#5405: Eratic timings on iotlab-m3 with compression context activated
+#5405: Erratic timings on iotlab-m3 with compression context activated
 #5486: at86rf2xx: lost interrupts
 #5678: at86rf2xx: failed assertion in _isr
 #5944: msp430: ipv6_hdr unittests fail
@@ -5689,7 +5689,7 @@ Drivers
 + SD Card driver (SPI)
 + NXP PN532 NFC driver
 + Initial (experimental) Microchip MRF24J40 radio driver
-+ JEDEC JC42.4 temperatur sensors
++ JEDEC JC42.4 temperature sensors
 + Bosch BME280 pressure, humidity and temperature sensor
 * NXP MMA8x5x accelerometer (previously MMA8652)
 * Unified STM32 RTC driver
@@ -5741,7 +5741,7 @@ Networking related issues
        network interfaces need to get unlocked in the current implementation to not get deadlocked.
        Recursive mutexes as provided in #5731 might help to solve this problem.
 #5748: gnrc: nodes crashing with too small packet buffer: A packet buffer of size ~512 B might lead
-       to crashes. The issue describes this for several hundret nodes, but agressive flooding with
+       to crashes. The issue describes this for several hundred nodes, but aggressive flooding with
        just two nodes was also shown to lead to this problem.
 #5858: gnrc: 6lo: potential problem with reassembly of fragments: If one frame gets lost the reassembly
        state machine might get out of sync
@@ -5808,7 +5808,7 @@ other platform related issues
 #5009: RIOT is saw-toothing in energy consumption (even when idling)
 #5103: xtimer: weird behavior of tests/xtimer_drift: xtimer_drift randomly jumps a few seconds on nrf52
 #5361: cpu/cc26x0: timer broken
-#5405: Eratic timings on iotlab-m3 with compression context activated
+#5405: Erratic timings on iotlab-m3 with compression context activated
 #5460: cpu/samd21: i2c timing with compiler optimization
 #5486: at86rf2xx: lost interrupts
 #5489: cpu/lpc11u34: ADC broken
@@ -6041,7 +6041,7 @@ Networking related issues
        provided in #5731 might help to solve this problem.
 #5748: gnrc: nodes crashing with too small packet buffer: A packet buffer of
        size ~512 B might lead to crashes. The issue describes this for several
-       hundret nodes, but agressive flooding with just two nodes was also
+       hundred nodes, but aggressive flooding with just two nodes was also
        shown to lead to this problem.
 #5858: gnrc: 6lo: potential problem with reassembly of fragments: If one frame
        gets lost the reassembly state machine might get out of sync
@@ -6091,7 +6091,7 @@ native related issues
 
 other platform related issues
 -----------------------------
-#1891: newlib-nano: Printf formatting does not work properly for some numberic
+#1891: newlib-nano: Printf formatting does not work properly for some numeric
        types: PRI[uxdi]64, PRI[uxdi]8 and float are not parsed in newlib-nano
 #2006: cpu/nrf51822: timer callback may be fired too early
 #2143: unittests: tests-core doesn't compile for all platforms: GCC build-ins
@@ -6113,7 +6113,7 @@ other platform related issues
 #5103: xtimer: weird behavior of tests/xtimer_drift: xtimer_drift randomly
        jumps a few seconds on nrf52
 #5361: cpu/cc26x0: timer broken
-#5405: Eratic timings on iotlab-m3 with compression context activated
+#5405: Erratic timings on iotlab-m3 with compression context activated
 #5460: cpu/samd21: i2c timing with compiler optimization
 #5486: at86rf2xx: lost interrupts
 #5489: cpu/lpc11u34: ADC broken
@@ -6489,7 +6489,7 @@ Drivers
 + AES encryption for xbee radio driver
 + added ADC mapping to SAUL
 
-Sytem libraries
+System libraries
 ---
 - vtimer support was dropped completely and removed
 
@@ -7337,7 +7337,7 @@ other issues:
 --------------
 #1449: a removed vtimer might still get called back by hwtimer
     The timer callback might still fire even after vtimer_remove() was called.
-#2175: valgrind registeres "Invalid write of size 4" in unittests for ubjson
+#2175: valgrind registers "Invalid write of size 4" in unittests for ubjson
      According to valgrind the stack gets corrupted in UBJSON.
 
 For all issues and open pull requests please check the RIOT issue tracker:
