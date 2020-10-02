@@ -189,7 +189,7 @@ int _sht_config_handler(int argc, char **argv)
                "\n"
                "  -r l/h\n"
                "    Set resolution to low/high. Low resolution trades "
-               "presicion for speed\n"
+               "precision for speed\n"
                "\n"
                "  -H y/n\n"
                "    Turns heater on/off. Can increase temperature by up to "
