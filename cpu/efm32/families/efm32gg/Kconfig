@@ -8,6 +8,7 @@ config CPU_FAM_EFM32GG
     bool
     select CPU_CORE_CORTEX_M3
     select CPU_COMMON_EFM32
+    select HAS_CORTEXM_MPU
 
 ## CPU Models
 config CPU_MODEL_EFM32GG330F512

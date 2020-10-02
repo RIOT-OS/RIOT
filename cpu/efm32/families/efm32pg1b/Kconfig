@@ -8,6 +8,7 @@ config CPU_FAM_EFM32PG1B
     bool
     select CPU_CORE_CORTEX_M4F
     select CPU_COMMON_EFM32
+    select HAS_CORTEXM_MPU
 
 ## CPU Models
 config CPU_MODEL_EFM32PG1B200F256GM48
