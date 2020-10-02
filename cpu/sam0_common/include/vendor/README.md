@@ -41,6 +41,13 @@ changes will be lost when a new ASF release is going to be used.
 A SAM based CPU should include `sam0.h` in this directory, which will
 resolve  any CPU family specific includes required.
 
+## SAMD10 files
+
+samd10: `Atmel.SAMD10_DFP.1.1.77.atpack`
+
+Each atpack has an include subdirectory with the files we copy into
+RIOT. The files are copied unmodified.
+
 ## SAMD21 files
 
 samd21: `Atmel.SAMD21_DFP.1.3.395.atpack`
