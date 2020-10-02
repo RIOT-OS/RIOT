@@ -22,6 +22,9 @@
 
 #include "net/eui_provider.h"
 #include "net/ieee802154.h"
+#if IS_USED(MODULE_IEEE802154_SECURITY)
+#include "net/ieee802154_security.h"
+#endif
 #include "net/gnrc/nettype.h"
 #include "net/netopt.h"
 #include "net/netdev.h"
@@ -116,6 +119,9 @@ typedef struct {
     uint8_t page;                           /**< channel page */
     uint16_t flags;                         /**< flags as defined above */
     int16_t txpower;                        /**< tx power in dBm */
+#if IS_USED(MODULE_IEEE802154_SECURITY) || defined (Doxygen)
+    ieee802154_sec_context_t sec_ctx;       /**< security context */
+#endif
     /** @} */
 } netdev_ieee802154_t;
 
