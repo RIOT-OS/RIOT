@@ -55,10 +55,10 @@ typedef struct {
  *
  * Must be called by the owner of a ``msg_bus_t`` struct.
  *
- * Message busses are considered to be long-running and must be
+ * Message buses are considered to be long-running and must be
  * created before any threads can attach to them.
  *
- * There can be a maximum number of 2047 busses in total.
+ * There can be a maximum number of 2047 buses in total.
  */
 void msg_bus_init(msg_bus_t *bus);
 
@@ -80,7 +80,7 @@ static inline uint8_t msg_bus_get_type(const msg_t *msg)
 /**
  * @brief Check if a message originates from a certain bus
  *
- * If a thread is attached to multiple busses, this function can be used
+ * If a thread is attached to multiple buses, this function can be used
  * to determine if a message originated from a certain bus.
  *
  * @param[in] bus           The bus to check for
@@ -128,7 +128,7 @@ void msg_bus_detach(msg_bus_t *bus, msg_bus_entry_t *entry);
  * Traverse the message bus to find the subscriber entry for the
  * current thread.
  *
- * @param[in] bus           The message bus to seach
+ * @param[in] bus           The message bus to search
  *
  * @return                  The subscriber entry for the current thread.
  *                          NULL if the thread is not attached to @p bus.
