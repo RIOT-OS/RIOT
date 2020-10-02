@@ -164,7 +164,7 @@ extern "C" {
  *
  * `EXT_LF_CLK.RTC_INCREMENT = 2^38/InputClockFrequency in Hertz`
  *
- * For exmaple:
+ * For example:
  *
  * `RTC_INCREMENT=0x800000` for `InputClockFrequency=32768 Hz`
  */
