@@ -37,4 +37,6 @@ config CPU
 source "$(RIOTCPU)/samd21/Kconfig.samd21"
 source "$(RIOTCPU)/samd21/Kconfig.samr21"
 
+source "$(RIOTCPU)/samd21/vectors/Kconfig"
+
 source "$(RIOTCPU)/sam0_common/Kconfig"
