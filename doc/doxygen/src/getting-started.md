@@ -152,3 +152,22 @@ subset of modules).
 For instructions on how to configure via `CFLAGS` check the
 @ref config "identified compile-time configurations". To learn how to use
 Kconfig in RIOT, please refer to the @ref kconfig-users-guide.
+
+Using the native port with networking
+=====================================
+
+If you compile RIOT for the native cpu and include the `netdev_tap` module,
+you can specify a network interface like this: `PORT=tap0 make term`
+
+Setting up a tap network
+------------------------
+
+There is a shell script in `RIOT/dist/tools/tapsetup` called `tapsetup` which
+you can use to create a network of tap interfaces.
+
+*USAGE*
+
+To create a bridge and two (or `count` at your option) tap interfaces:
+~~~~~~~{.sh}
+    sudo ./dist/tools/tapsetup/tapsetup [-c [<count>]]
+~~~~~~~
