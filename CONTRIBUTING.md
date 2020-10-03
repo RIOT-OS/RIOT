@@ -5,7 +5,7 @@ contribute, and we appreciate all of them. You can jump to the major sections
 of this document using the following links:
 
 * [Getting Started][getting-started]
-* [Help wanted][help-wanted]
+* [Contributing code][contributing-code]
 * [General Tips][general-tips]
 * [Feature Requests][feature-requests]
 * [Bug Reports][bug-reports]
@@ -54,47 +54,8 @@ contribution into RIOT master faster:
   Alternatively comprehensive testing procedures should be provided with your
   pull request.
 
-## Help Wanted
-[help-wanted]: #help-wanted
-In case you're not really sure where to start, we've created a list of suggestions.
-
-### Documentation
-If you've found yourself struggling to understand a particular aspect, chances
-are you're not the first and won't be the last. Writing down what you've learned
-is a great way to recap your new knowledge and share it with others. You can
-also start to learn about RIOT by combing through existing documentation and
-fixing errors and typos. Any help with improving the documentation is greatly
-appreciated and makes a big difference to the RIOT project.
-After you've finished writing, please publish your documentation in one of the
-following ways, depending on its type.
-
-#### General knowledge, HOWTOs
-Articles that focus on design aspects or how to use a particular module should
-be contributed to the [RIOT wiki](https://github.com/RIOT-OS/RIOT/wiki). After
-you've added your entry, please share it on the riot-dev mailing list so
-everyone is aware of its existence (and thank you).
-If you'd like to document a solution to minor annoyances or common pitfalls,
-please do not hesitate to extend the [Troubleshooting wiki
-page](https://github.com/RIOT-OS/RIOT/wiki/Troubleshooting). Again, please share
-your additions with the riot-dev mailing list.
-
-#### Code comments, HOWTOs for particular projects
-Documentation that relates directly to the code at hand like the HOWTO files
-that can be found in some of the directories in ``RIOT/examples/`` or comments
-in the code itself should be submitted through a [pull request][pull-requests].
-
-If you're not sure about the correct way to submit your writing, please ask on
-the mailing list or open an issue saying which documentation is missing. The
-other RIOTers will help you find the right format.
-
-### Issues
-If RIOT behaves oddly, please do not hesitate to [open an issue][open-an-issue].
-Other RIOT developers will be happy to help figure out what the problem is and
-fix possible bugs. Please notice that we use a bunch of tags to label the
-issues. If you have permission to use them, do it. Their meanings are explained
-[here][labels].
-
-### Contribute code
+## Contributing code
+[contributing-code]: #contributing-code
 If you think your work should be integrated in the main RIOT repository, take
 the following steps: (short version, the more detailed version can be found
 [below][pull-requests])
