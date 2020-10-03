@@ -105,8 +105,11 @@ It is possible to check if your code follows these conventions:
 * You can [uncrustify] `.c` and `.h` files:
 
   ```console
-  $ uncrustify -c $RIOTBASE/uncrustify-riot.cfg <your file>
+  $ uncrustify -c $RIOTBASE/uncrustify-riot.cfg --no-backup <your file>
   ```
+
+  **Note**: The `--no-backup` flag makes uncrustify *replace* the current file
+   with a formatted version.
 
 * RIOT provides static test tools to verify the quality of changes (cppcheck,
   trailing whitespaces, documentation, etc). These tools are wrapped in a
