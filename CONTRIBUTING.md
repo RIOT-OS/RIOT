@@ -12,13 +12,15 @@ of this document using the following links:
 * [Pull Requests][pull-requests]
 * [Writing Documentation][writing-documentation]
 
-If you have questions, please send an email to users@riot-os.org or
-devel@riot-os.org mailing list or chat on [#riot-os][riot-chat].
+
+If you have questions, please send an email to <users@riot-os.org> or
+<devel@riot-os.org> mailing list or chat on `#riot-os` on [IRC] or [Matrix].
 
 As a reminder, all contributors are expected to follow our
 [Code of Conduct](CODE_OF_CONDUCT.md).
 
-[riot-chat]: http://webchat.freenode.net?channels=riot-os
+[IRC]: http://webchat.freenode.net?channels=riot-os
+[Matrix]: https://matrix.to/#/#riot-os:matrix.org
 
 ## Getting Started
 [getting-started]: #getting-started
