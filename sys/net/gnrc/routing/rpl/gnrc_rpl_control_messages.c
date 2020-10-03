@@ -547,7 +547,7 @@ bool _parse_options(int msg_type, gnrc_rpl_instance_t *inst, gnrc_rpl_opt_t *opt
                 }
                 else {
                     DEBUG("RPL: Unsupported OCP 0x%02x\n", byteorder_ntohs(dc->ocp));
-                    inst->of = gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
+                    inst->of = gnrc_rpl_get_of_for_ocp(CONFIG_GNRC_RPL_DEFAULT_OCP);
                 }
                 dodag->dio_interval_doubl = dc->dio_int_doubl;
                 dodag->dio_min = dc->dio_int_min;
@@ -760,7 +760,7 @@ void gnrc_rpl_recv_DIO(gnrc_rpl_dio_t *dio, kernel_pid_t iface, ipv6_addr_t *src
         }
 
         inst->mop = (dio->g_mop_prf >> GNRC_RPL_MOP_SHIFT) & GNRC_RPL_SHIFTED_MOP_MASK;
-        inst->of = gnrc_rpl_get_of_for_ocp(GNRC_RPL_DEFAULT_OCP);
+        inst->of = gnrc_rpl_get_of_for_ocp(CONFIG_GNRC_RPL_DEFAULT_OCP);
 
         if (iface == KERNEL_PID_UNDEF) {
             netif = _find_interface_with_rpl_mcast();
