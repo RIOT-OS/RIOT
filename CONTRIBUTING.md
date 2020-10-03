@@ -104,7 +104,9 @@ It is possible to check if your code follows these conventions:
 
 * You can [uncrustify] `.c` and `.h` files:
 
-      $ uncrustify -c $RIOTBASE/uncrustify-riot.cfg <your file>
+  ```console
+  $ uncrustify -c $RIOTBASE/uncrustify-riot.cfg <your file>
+  ```
 
 * RIOT provides static test tools to verify the quality of changes (cppcheck,
   trailing whitespaces, documentation, etc). These tools are wrapped in a
@@ -113,7 +115,9 @@ It is possible to check if your code follows these conventions:
   *Watch out:* the command below will rebase your branch on your master branch,
   so make sure they can be rebased (e.g. there's no potential conflict).
 
-      $ make static-test
+  ```console
+  $ make static-test
+  ```
 
   Use it before opening a PR to perform last time checks.
 
@@ -125,17 +129,21 @@ It is possible to check if your code follows these conventions:
 * Each commit should target changes of specific parts/modules of RIOT. The
   commits use the following pattern:
 
-      area of code: description of changes
+  ```
+  area of code: description of changes
+  ```
 
   You can use multi-line commit messages if you want to detail more the
   changes.
   For example:
 
-      periph/timer: Document that set_absolute is expected to wrap
-      
-      Most timers are implemented this way already, and keeping (documenting)
-      it that way allows the generic timer_set implementation to stay as
-      simple as it is.
+  ```
+  periph/timer: Document that set_absolute is expected to wrap
+
+  Most timers are implemented this way already, and keeping (documenting)
+  it that way allows the generic timer_set implementation to stay as
+  simple as it is.
+  ```
 
 ### Pull Requests
 [pull requests]: #pull-requests
@@ -208,8 +216,9 @@ General documentation pages are written in Markdown and located in
 To generate the documentation, simply run the following
 from the base directory of the RIOT source code.
 
-
-    $ make doc
+```console
+$ make doc
+```
 
 The generated documentation is located in `doc/doxygen/html`
 
@@ -234,19 +243,25 @@ from the [RIOT main GitHub page][riot-github].
 
 If it's your first time with git, configure your name and emails:
 
-    $ git config --global user.name = "<your name here>"
-    $ git config --global user.email = "<your email address here>"
+```console
+$ git config --global user.name = "<your name here>"
+$ git config --global user.email = "<your email address here>"
+```
 
 Then clone locally your fork of RIOT (replace `account name` with your actual
 login on GitHub):
 
-    $ git clone git@github.com:<account name>/RIOT.git
+```console
+$ git clone git@github.com:<account name>/RIOT.git
+```
 
 You can keep any branch of your local repository up-to-date with the upstream
 master branch with the following commands:
 
-    $ git checkout <branch name>
-    $ git pull --rebase https://github.com/RIOT-OS/RIOT.git
+```console
+$ git checkout <branch name>
+$ git pull --rebase https://github.com/RIOT-OS/RIOT.git
+```
 
 Use it before opening a PR. This will at least ensure the PR is mergeable but
 also that it is up-to-date with the upstream repository.
@@ -259,11 +274,17 @@ Avoid opening PR from the `master` branch of your fork to the master branch of
 the RIOT upstream repository: update your master branch and start a new branch
 from it.
 
-    $ git checkout master
-    $ git pull --rebase https://github.com/RIOT-OS/RIOT.git
-    $ git checkout -b <new branch>
-    # Do your changes, commit, update with latest upstream master
-    $ git push
+```console
+$ git checkout master
+$ git pull --rebase https://github.com/RIOT-OS/RIOT.git
+$ git checkout -b <new branch>
+```
+
+Do your changes, commit, update with latest upstream master
+
+```console
+$ git push
+```
 
 ### Add fixup commits during review
 
@@ -276,15 +297,19 @@ Let's say your PR contains 3 commits with comments: `prefix1: change 1`,
 Instead of committing changes in `prefix2` in a 4th commit `prefix2: change 4`,
 you can use the `--fixup` option:
 
-    $ git add /path/of/prefix2
-    $ git commit --fixup <prefix2 commit hash>
+```console
+$ git add /path/of/prefix2
+$ git commit --fixup <prefix2 commit hash>
+```
 
 ### Squash commits after review
 
 Squashing a commit is done using the rebase subcommand of git in interactive
 mode:
 
-    $ git rebase master -i
+```console
+$ git rebase master -i
+```
 
 You can find information on rebasing in
 [GitHub rebase documentation][about-git-rebase].
@@ -294,7 +319,9 @@ You can find information on rebasing in
 If you used [fixup commits](#add-fixup-commits-during-review) during the review
 phase, squashing commits can be performed in a single command:
 
-    $ git rebase -i --autosquash
+```console
+$ git rebase -i --autosquash
+```
 
 **Watch out: Don't squash your commit until a maintainer asks you to do it.**
 
@@ -306,18 +333,26 @@ commits.
 If you encounter a merge conflict you could either resolve it by hand with an
 editor and use
 
-    $ git add -p
+```console
+$ git add -p
+```
 
 To add your changes or use a merge tool like [meld](https://meldmerge.org/) to
 resolve your merge conflict.
 
-    $ git mergetool
+```console
+$ git mergetool
+```
 
 After the merge conflict is resolved you can continue to rebase by using
 
-    $ git rebase --continue
+```console
+$ git rebase --continue
+```
 
 Once squashing is done, you will have to force push your branch to update the
 PR:
 
-    $ git push --force-with-lease
+```console
+$ git push --force-with-lease
+```
