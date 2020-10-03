@@ -187,6 +187,28 @@ You can find more information about RIOT development procedure on this
 [uncrustify]: http://uncrustify.sourceforge.net
 [development-procedures]: https://github.com/RIOT-OS/RIOT/wiki/Development-procedures
 
+## Writing Documentation
+[writing-documentation]: #writing-documentation
+
+Documentation improvements are always welcome and a good starting point for
+new contributors. This kind of contribution is merged quite quickly in general.
+
+RIOT documentation is built with [doxygen][doxygen]. Doxygen is configured to
+parse header (.h) and `doc.txt` files in the RIOT source code to generate
+the modules, cpus, boards and packages documentation.
+General documentation pages are written in Markdown and located in
+`doc/doxygen/src`.
+
+To generate the documentation, simply run the following
+from the base directory of the RIOT source code.
+
+
+    $ make doc
+
+The generated documentation is located in `doc/doxygen/html`
+
+[doxygen]: http://www.doxygen.nl/
+
 ## Working with Git
 [working with git]: #working-with-git
 Using git is a bit difficult for newcomers. If you are completely new to git,
@@ -293,25 +315,3 @@ Once squashing is done, you will have to force push your branch to update the
 PR:
 
     $ git push --force-with-lease
-
-## Writing Documentation
-[writing-documentation]: #writing-documentation
-
-Documentation improvements are always welcome and a good starting point for
-new contributors. This kind of contribution is merged quite quickly in general.
-
-RIOT documentation is built with [doxygen][doxygen]. Doxygen is configured to
-parse header (.h) and `doc.txt` files in the RIOT source code to generate
-the modules, cpus, boards and packages documentation.
-General documentation pages are written in Markdown and located in
-`doc/doxygen/src`.
-
-To generate the documentation, simply run:
-
-    $ make doc
-
-from the base directory of the RIOT source code.
-
-The generated documentation is located in `doc/doxygen/html`
-
-[doxygen]: http://www.doxygen.nl/
