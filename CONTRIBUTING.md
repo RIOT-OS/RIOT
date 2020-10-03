@@ -129,6 +129,13 @@ It is possible to check if your code follows these conventions:
 
   You can use multi-line commit messages if you want to detail more the
   changes.
+  For example:
+
+      periph/timer: Document that set_absolute is expected to wrap
+      
+      Most timers are implemented this way already, and keeping (documenting)
+      it that way allows the generic timer_set implementation to stay as
+      simple as it is.
 
 ### Pull Requests
 [pull requests]: #pull-requests
@@ -148,9 +155,8 @@ into the source repository.
   Old and stalled [PRs are sometimes archived][archived-pull-requests] with the
   "State: archived" label, maybe one of them is also about the same topic.
 
-* The Pull Request title should reflect what it is about and be in the form:
-
-      area of change: description of changes
+* The Pull Request title should reflect what it is about and be in the same form
+  as the [commit conventions].
 
 * Each Pull Request form uses a template that is there to help
   maintainers understand your contribution and help them in testing it.
