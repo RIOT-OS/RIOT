@@ -6,7 +6,6 @@ of this document using the following links:
 
 * [Getting Started][getting-started]
 * [Bug Reports and Feature Requests][issues]
-* [General Tips][general-tips]
 * [Contributing code][contributing-code]
 * [Writing Documentation][writing-documentation]
 * [Working with Git][working with git]
@@ -56,8 +55,29 @@ public channels, to allow us adequate time to release the fix.
 [existing-bug]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+bug"
 [bug-report]: https://github.com/RIOT-OS/RIOT/issues/new?template=bug_report.md&title=Bug:
 
-## General Tips
-[general-tips]: #general-tips
+## Contributing code
+[contributing-code]: #contributing-code
+If you think your work should be integrated in the main RIOT repository, take
+the following steps:
+
+  1. Fork the RIOT git repository (if you haven't done this already).
+  1. Create a branch for your contribution.
+  1. Make sure your code is in compliance with RIOTs [coding conventions].
+  1. Make commits. Make sure to follow RIOTs [commit conventions].
+  1. Push this branch to your fork on GitHub.
+  1. Open a [pull request][open-a-pull-request]. See [pull requests].
+  1. RIOT maintainers will set [labels] and provide feedback.
+  1. Address this feedback. See [working with git].
+  1. Your code is merged in RIOT master branch when it passes review.
+
+Be sure to read the [general tips] below.
+
+[open-an-issue]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+bug"
+[labels]: https://github.com/RIOT-OS/RIOT/wiki/RIOT%27s-labeling-system
+[open-a-pull-request]: https://help.github.com/articles/using-pull-requests
+
+### General Tips
+[general tips]: #general-tips
 From experience, the following recommendations help to get a software
 contribution into RIOT master faster:
 
@@ -76,25 +96,6 @@ contribution into RIOT master faster:
 - **Provide tests!** They should be comprehensible and easy to be executed.
   Alternatively comprehensive testing procedures should be provided with your
   pull request.
-
-## Contributing code
-[contributing-code]: #contributing-code
-If you think your work should be integrated in the main RIOT repository, take
-the following steps:
-
-  1. Fork the RIOT git repository (if you haven't done this already).
-  1. Create a branch for your contribution.
-  1. Make sure your code is in compliance with RIOTs [coding conventions].
-  1. Make commits. Make sure to follow RIOTs [commit conventions].
-  1. Push this branch to your fork on GitHub.
-  1. Open a [pull request][open-a-pull-request]. See [pull requests].
-  1. RIOT maintainers will set [labels] and provide feedback.
-  1. Address this feedback. See [working with git].
-  1. Your code is merged in RIOT master branch when it passes review.
-
-[open-an-issue]: https://github.com/RIOT-OS/RIOT/issues?q=state:open+type:issue+label:"Type:+bug"
-[labels]: https://github.com/RIOT-OS/RIOT/wiki/RIOT%27s-labeling-system
-[open-a-pull-request]: https://help.github.com/articles/using-pull-requests
 
 ### Coding conventions
 [coding conventions]: #coding-conventions
