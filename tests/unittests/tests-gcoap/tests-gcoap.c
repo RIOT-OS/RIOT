@@ -49,7 +49,7 @@ static gcoap_listener_t listener_second = {
     .next          = NULL
 };
 
-static const char *resource_list_str = "</act/switch>,</sensor/temp>,</test/info/all>,</second/part>";
+static const char *resource_list_str = "</second/part>,</act/switch>,</sensor/temp>,</test/info/all>";
 
 /*
  * Client GET request success case. Test request generation.
