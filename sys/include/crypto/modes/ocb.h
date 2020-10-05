@@ -77,10 +77,12 @@ extern "C" {
  *                         It has to be of size data_len + tag_len.
  * @return                 Length of the encrypted data (including the tag) or a (negative) error code
  */
-int32_t cipher_encrypt_ocb(cipher_t *cipher, uint8_t *auth_data,
-                           size_t auth_data_len,
-                           uint8_t tag_len, uint8_t *nonce, size_t nonce_len,
-                           uint8_t *input, size_t input_len, uint8_t *output);
+int32_t cipher_encrypt_ocb(const cipher_t *cipher,
+                           const uint8_t *auth_data, size_t auth_data_len,
+                           uint8_t tag_len,
+                           const uint8_t *nonce, size_t nonce_len,
+                           const uint8_t *input, size_t input_len,
+                           uint8_t *output);
 
 /**
  * @brief Decrypt and verify the authentication of OCB encrypted data.
@@ -100,10 +102,12 @@ int32_t cipher_encrypt_ocb(cipher_t *cipher, uint8_t *auth_data,
  *                         Will contain only zeroes, if the authentication fails.
  * @return                 Length of the plaintext data or a (negative) error code
  */
-int32_t cipher_decrypt_ocb(cipher_t *cipher, uint8_t *auth_data,
-                           size_t auth_data_len,
-                           uint8_t tag_len, uint8_t *nonce, size_t nonce_len,
-                           uint8_t *input, size_t input_len, uint8_t *output);
+int32_t cipher_decrypt_ocb(const cipher_t *cipher,
+                           const uint8_t *auth_data, size_t auth_data_len,
+                           uint8_t tag_len,
+                           const uint8_t *nonce, size_t nonce_len,
+                           const uint8_t *input, size_t input_len,
+                           uint8_t *output);
 #ifdef __cplusplus
 }
 #endif
