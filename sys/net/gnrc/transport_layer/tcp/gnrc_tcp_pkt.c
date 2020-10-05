@@ -20,9 +20,12 @@
 #include <utlist.h>
 #include <errno.h>
 #include "byteorder.h"
+#include "evtimer.h"
+#include "evtimer_msg.h"
 #include "net/inet_csum.h"
 #include "net/gnrc.h"
 #include "internal/common.h"
+#include "internal/eventloop.h"
 #include "internal/option.h"
 #include "internal/pkt.h"
 
@@ -271,14 +274,15 @@ int _pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_c
     if (!retransmit) {
         tcb->retries = 0;
         tcb->snd_nxt += seq_con;
-        tcb->rtt_start = xtimer_now().ticks32;
+        tcb->rtt_start = evtimer_now_msec();
     }
     else {
         tcb->retries += 1;
     }
 
     /* Pass packet down the network stack */
-    if (gnrc_netapi_send(gnrc_tcp_pid, out_pkt) < 1) {
+    if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_TCP, GNRC_NETREG_DEMUX_CTX_ALL,
+                                   out_pkt)) {
         DEBUG("gnrc_tcp_pkt.c : _pkt_send() : unable to send packet\n");
         gnrc_pktbuf_release(out_pkt);
     }
@@ -385,10 +389,11 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
     if (!retransmit) {
         /* If this is the first transmission: rto is 1 sec (Lower Bound) */
         if (tcb->srtt == RTO_UNINITIALIZED || tcb->rtt_var == RTO_UNINITIALIZED) {
-            tcb->rto = CONFIG_GNRC_TCP_RTO_LOWER_BOUND;
+            tcb->rto = CONFIG_GNRC_TCP_RTO_LOWER_BOUND_MS;
         }
         else {
-            tcb->rto = tcb->srtt + _max(CONFIG_GNRC_TCP_RTO_GRANULARITY, CONFIG_GNRC_TCP_RTO_K * tcb->rtt_var);
+            tcb->rto = tcb->srtt + _max(CONFIG_GNRC_TCP_RTO_GRANULARITY_MS,
+                                        CONFIG_GNRC_TCP_RTO_K * tcb->rtt_var);
         }
     }
     else {
@@ -404,17 +409,16 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
     }
 
     /* Perform boundary checks on current RTO before usage */
-    if (tcb->rto < (int32_t) CONFIG_GNRC_TCP_RTO_LOWER_BOUND) {
-        tcb->rto = CONFIG_GNRC_TCP_RTO_LOWER_BOUND;
+    if (tcb->rto < (int32_t) CONFIG_GNRC_TCP_RTO_LOWER_BOUND_MS) {
+        tcb->rto = CONFIG_GNRC_TCP_RTO_LOWER_BOUND_MS;
     }
-    else if (tcb->rto > (int32_t) CONFIG_GNRC_TCP_RTO_UPPER_BOUND) {
-        tcb->rto = CONFIG_GNRC_TCP_RTO_UPPER_BOUND;
+    else if (tcb->rto > (int32_t) CONFIG_GNRC_TCP_RTO_UPPER_BOUND_MS) {
+        tcb->rto = CONFIG_GNRC_TCP_RTO_UPPER_BOUND_MS;
     }
 
     /* Setup retransmission timer, msg to TCP thread with ptr to TCB */
-    tcb->msg_retransmit.type = MSG_TYPE_RETRANSMISSION;
-    tcb->msg_retransmit.content.ptr = (void *) tcb;
-    xtimer_set_msg(&tcb->timer_retransmit, tcb->rto, &tcb->msg_retransmit, gnrc_tcp_pid);
+    _gnrc_tcp_event_loop_sched(&tcb->event_retransmit, tcb->rto,
+                               MSG_TYPE_RETRANSMISSION, tcb);
     return 0;
 }
 
@@ -438,12 +442,12 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
 
     /* If segment can be acknowledged -> stop timer, release packet from pktbuf and update rto. */
     if (LSS_32_BIT(seg, ack)) {
-        xtimer_remove(&(tcb->timer_retransmit));
+        _gnrc_tcp_event_loop_unsched(&tcb->event_retransmit);
         gnrc_pktbuf_release(tcb->pkt_retransmit);
         tcb->pkt_retransmit = NULL;
 
         /* Measure round trip time */
-        int32_t rtt = xtimer_now().ticks32 - tcb->rtt_start;
+        int32_t rtt = evtimer_now_msec() - tcb->rtt_start;
 
         /* Use time only if there was no timer overflow and no retransmission (Karns Algorithm) */
         if (tcb->retries == 0 && rtt > 0) {

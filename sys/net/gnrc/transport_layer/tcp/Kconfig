@@ -12,18 +12,18 @@ menuconfig KCONFIG_USEMODULE_GNRC_TCP
 
 if KCONFIG_USEMODULE_GNRC_TCP
 
-config GNRC_TCP_CONNECTION_TIMEOUT_DURATION
-    int "Timeout duration for user calls in microseconds"
-    default 120000000
+config GNRC_TCP_CONNECTION_TIMEOUT_DURATION_MS
+    int "Timeout duration for user calls in milliseconds"
+    default 120000
     help
-        Timeout duration for user calls. Default value is 120000000 microseconds
+        Timeout duration for user calls. Default value is 120000 milliseconds
         (2 minutes).
 
-config GNRC_TCP_MSL
-    int "Maximum segment lifetime (MSL) in microseconds"
-    default 30000000
+config GNRC_TCP_MSL_MS
+    int "Maximum segment lifetime (MSL) in milliseconds"
+    default 30000
     help
-        Maximum segment lifetime (MSL) in microseconds. Default value is 30
+        Maximum segment lifetime (MSL) in milliseconds. Default value is 30
         seconds.
 
 config GNRC_TCP_MSS
@@ -59,29 +59,29 @@ config GNRC_TCP_RCV_BUFFERS
     int "Number of preallocated receive buffers"
     default 1
 
-config GNRC_TCP_RTO_LOWER_BOUND
-    int "Lower bound for RTO in microseconds"
-    default 1000000
+config GNRC_TCP_RTO_LOWER_BOUND_MS
+    int "Lower bound for RTO in milliseconds"
+    default 1000
     help
-        Lower bound value for retransmission timeout (RTO) in microseconds.
-        Default value is 1000000 microseconds (1 second). Retransmission
+        Lower bound value for retransmission timeout (RTO) in milliseconds.
+        Default value is 1000 milliseconds (1 second). Retransmission
         timeout determines how long TCP waits for acknowledgment (ACK) of
         transmitted segment. Refer to RFC 6298 for more information.
 
-config GNRC_TCP_RTO_UPPER_BOUND
-    int "Upper bound for RTO in microseconds"
-    default 60000000
+config GNRC_TCP_RTO_UPPER_BOUND_MS
+    int "Upper bound for RTO in milliseconds"
+    default 60000
     help
-        Upper bound value for retransmission timeout (RTO) in microseconds.
-        Default value is 60000000 microseconds (60 seconds). Refer to RFC 6298
+        Upper bound value for retransmission timeout (RTO) in milliseconds.
+        Default value is 60000 milliseconds (60 seconds). Refer to RFC 6298
         for more information.
 
-config GNRC_TCP_RTO_GRANULARITY
-    int "Clock granularity for RTO in microseconds"
-    default 10000
+config GNRC_TCP_RTO_GRANULARITY_MS
+    int "Clock granularity for RTO in milliseconds"
+    default 10
     help
         Clock granularity for retransmission timeout (RTO) for TCP in
-        microseconds. Default value is 10000 microseconds (10 milliseconds).
+        milliseconds. Default value is 10 milliseconds.
         Refer to RFC 6298 for more information.
 
 config GNRC_TCP_RTO_A_DIV
@@ -104,13 +104,21 @@ config GNRC_TCP_RTO_K
     int "K value for RTO calculation"
     default 4
 
-config GNRC_TCP_PROBE_LOWER_BOUND
-    int "Lower bound for the duration between probes in microseconds"
-    default 1000000
+config GNRC_TCP_PROBE_LOWER_BOUND_MS
+    int "Lower bound for the duration between probes in milliseconds"
+    default 1000
+    help
+        Lower bound value for window probes in milliseconds.
+        Default value is 1000 milliseconds (1 second).
+        Refer to RFC 6298 for more information.
 
-config GNRC_TCP_PROBE_UPPER_BOUND
-    int "Lower bound for the duration between probes in microseconds"
-    default 60000000
+config GNRC_TCP_PROBE_UPPER_BOUND_MS
+    int "Lower bound for the duration between probes in milliseconds"
+    default 60000
+    help
+        Upper bound value for window probes in milliseconds.
+        Default value is 60000 milliseconds (60 seconds). Refer to RFC 6298
+        for more information.
 
 config GNRC_TCP_MSG_QUEUE_SIZE_SIZE_EXP
     int "Message queue size for TCP API internal messaging (as exponent of 2^n)"

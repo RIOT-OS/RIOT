@@ -166,18 +166,18 @@ int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *local);
  * @param[in,out] tcb                        TCB holding the connection information.
  * @param[in]     data                       Pointer to the data that should be transmitted.
  * @param[in]     len                        Number of bytes that should be transmitted.
- * @param[in]     user_timeout_duration_us   If not zero and there was not data transmitted
- *                                           the function returns after user_timeout_duration_us.
+ * @param[in]     user_timeout_duration_ms   If not zero and there was not data transmitted
+ *                                           the function returns after user_timeout_duration_ms.
  *                                           If zero, no timeout will be triggered.
  *
  * @return   The number of successfully transmitted bytes.
  * @return   -ENOTCONN if connection is not established.
  * @return   -ECONNRESET if connection was reset by the peer.
  * @return   -ECONNABORTED if the connection was aborted.
- * @return   -ETIMEDOUT if @p user_timeout_duration_us expired.
+ * @return   -ETIMEDOUT if @p user_timeout_duration_ms expired.
  */
 ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
-                      const uint32_t user_timeout_duration_us);
+                      const uint32_t user_timeout_duration_ms);
 
 /**
  * @brief Receive Data from the peer.
@@ -193,11 +193,11 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
  *                                           should be copied into.
  * @param[in]     max_len                    Maximum amount to bytes that should be read
  *                                           into @p data.
- * @param[in]     user_timeout_duration_us   Timeout for receive in microseconds.
+ * @param[in]     user_timeout_duration_ms   Timeout for receive in milliseconds.
  *                                           If zero and no data is available, the function
  *                                           returns immediately. If not zero the function
  *                                           blocks until data is available or
- *                                           @p user_timeout_duration_us microseconds passed.
+ *                                           @p user_timeout_duration_ms milliseconds passed.
  *
  * @return   The number of bytes read into @p data.
  * @return   0, if the connection is closing and no further data can be read.
@@ -205,10 +205,10 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
  * @return   -EAGAIN if  user_timeout_duration_us is zero and no data is available.
  * @return   -ECONNRESET if connection was reset by the peer.
  * @return   -ECONNABORTED if the connection was aborted.
- * @return   -ETIMEDOUT if @p user_timeout_duration_us expired.
+ * @return   -ETIMEDOUT if @p user_timeout_duration_ms expired.
  */
 ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
-                      const uint32_t user_timeout_duration_us);
+                      const uint32_t user_timeout_duration_ms);
 
 /**
  * @brief Close a TCP connection.

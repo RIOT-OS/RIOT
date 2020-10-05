@@ -25,6 +25,7 @@
 #include "kernel_types.h"
 #include "thread.h"
 #include "mutex.h"
+#include "evtimer.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/tcp/tcb.h"
 
@@ -112,11 +113,6 @@ extern "C" {
  * @brief Extract offset value from "offctl" field in TCP header.
  */
 #define GET_OFFSET( x ) (((x) & MSK_OFFSET) >> 12)
-
-/**
- * @brief PID of GNRC TCP event handling thread
- */
-extern kernel_pid_t gnrc_tcp_pid;
 
 /**
  * @brief Head of linked TCB list.
