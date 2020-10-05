@@ -2,7 +2,7 @@ Expected result
 ===============
 You should be able to initialize all the timings units with a given
 frequency and a given deadtime, then manage duty-cycle and phase
-positionning of 5 or 6 complementary PWM outputs.
+positioning of 5 or 6 complementary PWM outputs.
 
 You should also be able to perform some basic HRTIM operations and
 produce the oscillograms of the HRTIM cookbook's section 2.
@@ -11,7 +11,7 @@ Background
 ==========
 Test for the low-level HRTIM driver.
 
-## Complementary pwm outputs with deadtime and phase positionning
+## Complementary pwm outputs with deadtime and phase positioning
 
 5 phase interlaced pwm with 100ns deadtime, 50% duty-cycle example.
 
