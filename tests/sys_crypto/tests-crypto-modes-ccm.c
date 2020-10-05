@@ -1255,7 +1255,7 @@ static void test_crypto_modes_ccm_decrypt(void)
 }
 
 
-typedef int (*func_ccm_t)(cipher_t *, const uint8_t *, uint32_t,
+typedef int (*func_ccm_t)(const cipher_t *, const uint8_t *, uint32_t,
                           uint8_t, uint8_t, const uint8_t *, size_t,
                           const uint8_t *, size_t, uint8_t *);
 
