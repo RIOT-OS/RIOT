@@ -1259,6 +1259,39 @@ typedef struct eth_dma_desc {
 #define ANER_LP_AN_ABLE                    (0x0001)
 /** @} */
 
+#ifdef MODULE_PERIPH_HRTIM
+/**
+ * @brief   HRTIM have 5 or 6 timing units
+ */
+#ifdef HRTIM_MCR_TFCEN
+#define HRTIM_STU_NUMOF (6U)        /**< number of slave timing units */
+#else
+#define HRTIM_STU_NUMOF (5U)
+#endif
+
+/**
+ * @brief   HRTIM timing unit
+ */
+typedef struct {
+    gpio_t pin[2];                  /**< GPIO pins mapped to this output */
+    gpio_af_t af;                   /**< alternate function used */
+} hrtim_tu_conf_t;
+
+/**
+ * @brief   HRTIM configuration
+ */
+typedef struct {
+    HRTIM_TypeDef *dev;             /**< Timer used */
+    uint32_t rcc_sw_mask;           /**< bit in clock configuration register */
+    uint32_t rcc_mask;              /**< bit in clock enable register */
+    hrtim_tu_conf_t tu[HRTIM_STU_NUMOF];    /**< output mapping
+                                              * set to {GPIO_UNDEF, 0}
+                                              * if not used */
+    uint8_t bus;                    /**< APB bus */
+} hrtim_conf_t;
+
+#endif /* MODULE_PERIPH_HRTIM */
+
 #ifdef __cplusplus
 }
 #endif
