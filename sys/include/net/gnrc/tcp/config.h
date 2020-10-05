@@ -127,7 +127,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Clock granularity for TCP in milliseconds. Dedault is 10 milliseconds (see RFC 6298)
+ * @brief Clock granularity for TCP in milliseconds. Default is 10 milliseconds (see RFC 6298)
  */
 #ifndef CONFIG_GNRC_TCP_RTO_GRANULARITY_MS
 #define CONFIG_GNRC_TCP_RTO_GRANULARITY_MS (10U)
