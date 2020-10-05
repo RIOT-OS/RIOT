@@ -135,7 +135,7 @@ static inline void _phy_write(uint16_t addr, uint8_t reg, uint16_t value)
     _rw_phy(addr, reg, (value & 0xffff) | (ETH_MACMIIAR_MW << 16));
 }
 
-static void stm32_eth_get_mac(char *out)
+static void stm32_eth_get_addr(char *out)
 {
     unsigned t;
 
@@ -152,11 +152,11 @@ static void stm32_eth_get_mac(char *out)
 
 /** Set the mac address. The peripheral supports up to 4 MACs but only one is
  * implemented */
-static void stm32_eth_set_mac(const char *mac)
+static void stm32_eth_set_addr(const uint8_t *addr)
 {
     ETH->MACA0HR &= 0xffff0000;
-    ETH->MACA0HR |= ((mac[5] << 8) | mac[4]);
-    ETH->MACA0LR = ((mac[3] << 24) | (mac[2] << 16) | (mac[1] << 8) | mac[0]);
+    ETH->MACA0HR |= ((addr[5] << 8) | addr[4]);
+    ETH->MACA0LR = ((addr[3] << 24) | (addr[2] << 16) | (addr[1] << 8) | addr[0]);
 }
 
 /** Initialization of the DMA descriptors to be used */
@@ -193,7 +193,7 @@ static int stm32_eth_set(netdev_t *dev, netopt_t opt,
     switch (opt) {
     case NETOPT_ADDRESS:
         assert(max_len >= ETHERNET_ADDR_LEN);
-        stm32_eth_set_mac((char *)value);
+        stm32_eth_set_addr(value);
         res = ETHERNET_ADDR_LEN;
         break;
     default:
@@ -212,7 +212,7 @@ static int stm32_eth_get(netdev_t *dev, netopt_t opt,
     switch (opt) {
     case NETOPT_ADDRESS:
         assert(max_len >= ETHERNET_ADDR_LEN);
-        stm32_eth_get_mac((char *)value);
+        stm32_eth_get_addr(value);
         res = ETHERNET_ADDR_LEN;
         break;
     case NETOPT_LINK:
@@ -301,13 +301,13 @@ static int stm32_eth_init(netdev_t *netdev)
     ETH->DMABMR = (ETH_DMABMR_DA | ETH_DMABMR_AAB | ETH_DMABMR_FB |
                    ETH_DMABMR_RDP_32Beat | ETH_DMABMR_PBL_32Beat | ETH_DMABMR_EDE);
 
-    if(eth_config.mac[0] != 0) {
-      stm32_eth_set_mac(eth_config.mac);
+    if(eth_config.addr[0] != 0) {
+        stm32_eth_set_addr(eth_config.addr);
     }
     else {
-      eui48_t hwaddr;
-      luid_get_eui48(&hwaddr);
-      stm32_eth_set_mac((const char *)hwaddr.uint8);
+        eui48_t hwaddr;
+        luid_get_eui48(&hwaddr);
+        stm32_eth_set_addr(hwaddr.uint8);
     }
 
     _init_buffer();
