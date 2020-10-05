@@ -7,16 +7,15 @@
  */
 
 /**
- * @ingroup     cpu_stm32
- * @ingroup     drivers_periph_hrtim
- * @{
- *
- * @file
+ * @defgroup    drivers_periph_hrtim HRTIM
+ * @ingroup     drivers_periph
  * @brief       Low-level HRTIM peripheral driver
  *
- * @author      Hugues Larrive <hugues.larrive@laas.fr>
+ * @{
+ * @file
+ * @brief       Low-level HRTIM peripheral driver interface definitions
  *
- * @}
+ * @author      Hugues Larrive <hugues.larrive@laas.fr>
  */
 
 #ifndef PERIPH_HRTIM_H
