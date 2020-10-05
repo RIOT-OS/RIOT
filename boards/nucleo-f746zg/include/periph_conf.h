@@ -208,7 +208,7 @@ static const spi_conf_t spi_config[] = {
  */
 static const eth_conf_t eth_config = {
     .mode = RMII,
-    .mac = { 0 },
+    .addr = { 0 },
     .speed = ETH_SPEED_100TX_FD,
     .dma = 7,
     .dma_chan = 8,

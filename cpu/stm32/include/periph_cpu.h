@@ -1037,15 +1037,15 @@ typedef enum {
  * @brief   Ethernet Peripheral configuration
  */
 typedef struct {
-    eth_mode_t mode;      /**< Select configuration mode */
-    char mac[6];                /**< Ethernet MAC address */
-    eth_speed_t speed;    /**< Speed selection */
+    eth_mode_t mode;            /**< Select configuration mode */
+    uint8_t addr[6];            /**< Ethernet MAC address */
+    eth_speed_t speed;          /**< Speed selection */
     uint8_t dma;                /**< Locical CMA Descriptor used for TX */
     uint8_t dma_chan;           /**< DMA channel used for TX */
     char phy_addr;              /**< PHY address */
     gpio_t pins[];              /**< Pins to use. MII requires 18 pins,
-                                        RMII 9 and SMI 9. Not all speeds are
-                                        supported by all modes. */
+                                    RMII 9 and SMI 9. Not all speeds are
+                                    supported by all modes. */
 } eth_conf_t;
 
 /**
