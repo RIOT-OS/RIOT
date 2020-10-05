@@ -115,6 +115,9 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_nd,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/nd
 endif
+ifneq (,$(filter gnrc_schc,$(USEMODULE)))
+  DIRS += network_layer/schc
+endif
 ifneq (,$(filter gnrc_sock,$(USEMODULE)))
   DIRS += sock
 endif

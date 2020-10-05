@@ -38,6 +38,7 @@ extern "C" {
 #define ETHERTYPE_NDN           (0x8624)    /**< NDN Protocol (http://named-data.net/) */
 #define ETHERTYPE_IPV6          (0x86dd)    /**< Internet protocol version 6 */
 #define ETHERTYPE_6LOENC        (0xa0ed)    /**< 6LoWPAN encapsulation */
+#define ETHERTYPE_802EXP        (0x88b5)    /**< IEEE Std 802 - Local Experimental Ethertype */
 
 /**
  * @defgroup    net_ethertype_custom_config Custom ethertype

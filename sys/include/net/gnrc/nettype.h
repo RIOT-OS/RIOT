@@ -64,6 +64,10 @@ typedef enum {
     GNRC_NETTYPE_NETIF = -1,
     GNRC_NETTYPE_UNDEF = 0,     /**< Protocol is undefined */
 
+#if IS_USED(MODULE_GNRC_NETTYPE_SCHC)
+    GNRC_NETTYPE_SCHC,     /**< Protocol is SCHC */
+#endif
+
 #if IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN) || defined(DOXYGEN)
     GNRC_NETTYPE_SIXLOWPAN,     /**< Protocol is 6LoWPAN */
 #endif
@@ -193,6 +197,10 @@ static inline gnrc_nettype_t gnrc_nettype_from_ethertype(uint16_t type)
         case ETHERTYPE_CUSTOM:
             return GNRC_NETTYPE_CUSTOM;
 #endif
+#if IS_USED(MODULE_GNRC_NETTYPE_SCHC)
+        case ETHERTYPE_802EXP:
+            return GNRC_NETTYPE_SCHC;
+#endif
         default:
             return GNRC_NETTYPE_UNDEF;
     }
@@ -214,6 +222,10 @@ static inline uint16_t gnrc_nettype_to_ethertype(gnrc_nettype_t type)
 #if IS_USED(MODULE_GNRC_SIXLOENC) && IS_USED(MODULE_GNRC_NETTYPE_SIXLOWPAN)
         case GNRC_NETTYPE_SIXLOWPAN:
             return ETHERTYPE_6LOENC;
+#endif
+#if IS_USED(MODULE_GNRC_NETTYPE_SCHC)
+        case GNRC_NETTYPE_SCHC:
+            return ETHERTYPE_802EXP; // experimental for now
 #endif
 #if IS_USED(MODULE_GNRC_NETTYPE_IPV6)
         case GNRC_NETTYPE_IPV6:
