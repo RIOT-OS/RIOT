@@ -35,7 +35,8 @@
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc/netreg.h"
 
-#define LORAWAN_PORT (2U)
+#define LORAWAN_PORT       (2U)
+#define LORAWAN_QUEUE_SIZE (4U)
 
 static void _usage(void)
 {
@@ -48,7 +49,7 @@ int tx_cmd(int argc, char **argv)
     uint8_t port = LORAWAN_PORT; /* Default: 2 */
     int interface;
 
-    if(argc < 3) {
+    if (argc < 3) {
         _usage();
         return 1;
     }
@@ -75,21 +76,22 @@ int tx_cmd(int argc, char **argv)
     gnrc_netapi_set(interface, NETOPT_LORAWAN_TX_PORT, 0, &port, sizeof(port));
     gnrc_netif_send(gnrc_netif_get_by_pid(interface), pkt);
 
-    msg_t msg;
     /* wait for packet status and check */
+    msg_t msg;
     msg_receive(&msg);
     if ((msg.type != GNRC_NETERR_MSG_TYPE) ||
         (msg.content.value != GNRC_NETERR_SUCCESS)) {
-        puts("Error sending packet (not joined?)");
+        printf("Error sending packet: (status: %d\n)", (int) msg.content.value);
     }
     else {
         puts("Successfully sent packet");
     }
+
     return 0;
 }
 
 static const shell_command_t shell_commands[] = {
-    { "send",       "Send LoRaWAN data",     tx_cmd},
+    { "send",       "Send LoRaWAN data",     tx_cmd },
     { NULL, NULL, NULL }
 };
 
@@ -100,6 +102,7 @@ int main(void)
     puts("Initialization successful - starting the shell now");
     gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(LORAWAN_PORT,
                                                           gnrc_pktdump_pid);
+
     gnrc_netreg_register(GNRC_NETTYPE_LORAWAN, &dump);
     char line_buf[SHELL_DEFAULT_BUFSIZE];
 
