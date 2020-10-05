@@ -16,6 +16,7 @@ Test for the low-level HRTIM driver.
 5 phase interlaced pwm with 100ns deadtime, 50% duty-cycle example.
 
 Shell:
+```shell
     init 0 100000 100
    The effective frequency is 100000Hz
    The period is set to 46080
@@ -24,11 +25,12 @@ Shell:
     pwm_set 0 2 23040 18432
     pwm_set 0 3 23040 27648
     pwm_set 0 4 23040 36864
-
+```
 ## an4539 - HRTIM cookbook - 2 Basic operating principles
 
 ### 2.1 Single PWM generation
 C:
+```c
     uint32_t freq;
     uint16_t period;
 
@@ -49,8 +51,9 @@ C:
 
     /* Enable TD1 output */
     hrtim_out_en(0, TIMD, OUT1);
-
+```
 Shell:
+```shell
     init_mstr 0 100000
     init_tu 0 3 100000
     cmp_set 0 3 1 23040
@@ -58,9 +61,10 @@ Shell:
     rst_cb_set 0 3 1 3
     cnt_en 0 17
     out_en 0 3 1
-
+```
 ### 2.2 Generating multiple PWMs
 C:
+```c
     uint32_t freq;
     uint16_t period;
 
@@ -107,10 +111,11 @@ C:
     /* Timer A and Timer D counters reset on Master period event */
     hrtim_rst_evt_en(0, TIMA, RST_MSTPER);
     hrtim_rst_evt_en(0, TIMD, RST_MSTPER);
-
+```
 
 ### 2.3 Generating PWM with other timing units and the master timer
 C:
+```c
     uint32_t freq;
     uint16_t period;
 
@@ -139,9 +144,10 @@ C:
 
     /* Start Master Timer and Timer D counters*/
     hrtim_cnt_en(0, MCEN | TDCEN);
-
+```
 ### 2.4 Arbitrary waveform generation
 C:
+```c
     uint32_t freq;
     uint16_t period;
 
@@ -169,3 +175,4 @@ C:
 
     /* Start Timer D */
     hrtim_cnt_en(0, TDCEN);
+```
