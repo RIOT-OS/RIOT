@@ -72,6 +72,32 @@ static const dma_conf_t dma_config[] = {
 /** @} */
 
 /**
+ * @name    HRTIM configuration
+ * @{
+ */
+static const hrtim_conf_t hrtim_config[] = {
+    {
+        .dev = HRTIM1,
+        .rcc_sw_mask = RCC_CFGR3_HRTIMSW,
+        .rcc_mask = RCC_APB2ENR_HRTIM1EN,
+        .tu = { { .pin = { GPIO_PIN(PORT_A,  8), GPIO_PIN(PORT_A,  9) },
+                  .af = GPIO_AF13 },
+                { .pin = { GPIO_PIN(PORT_A, 10), GPIO_PIN(PORT_A, 11) },
+                  .af = GPIO_AF13 },
+                { .pin = { GPIO_PIN(PORT_B, 12), GPIO_PIN(PORT_B, 13) },
+                  .af = GPIO_AF13 },
+                { .pin = { GPIO_PIN(PORT_B, 14), GPIO_PIN(PORT_B, 15) },
+                  .af = GPIO_AF13 },
+                { .pin = { GPIO_PIN(PORT_C,  8), GPIO_PIN(PORT_C,  9) },
+                  .af = GPIO_AF3  } },
+        .bus = APB2
+    }
+};
+
+#define HRTIM_NUMOF           ARRAY_SIZE(hrtim_config)
+/** @} */
+
+/**
  * @name   UART configuration
  * @{
  */
