@@ -159,7 +159,7 @@ static int cmd_init_mstr(int argc, char** argv)
 
 static int cmd_init_tu(int argc, char** argv)
 {
-    if (argc != 4) {
+    if (argc != 5) {
         uint32_t f_hrtim = periph_apb_clk(hrtim_config[0].bus) * 2;
         uint32_t max_freq = f_hrtim / 3;
         uint16_t min_freq = f_hrtim / 4 / 0xfffd;
