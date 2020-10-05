@@ -149,30 +149,30 @@ void hrtim_pwm_set(hrtim_t hrtim, hrtim_tu_t tu, uint16_t value, uint16_t shift)
     if (shift != prev_shift[tu]) {
         prev_shift[tu] = shift;
 
-        /* Set reset comparator for phase positionning */
+        /* Set reset comparator for phase positioning */
         if (shift) {
             dev(hrtim)->sTimerxRegs[tu].RSTxR &= ~RST_MSTPER;
             switch (tu) {
-                /* TimerA is the phase shift reference so it can't be phase
+                /* Timer A is the phase shift reference so it can't be phase
                  * shifted */
-                case TIMB: /* TimerB reset on master cmp1 */
+                case TIMB: /* Timer B reset on master cmp1 */
                     dev(hrtim)->sMasterRegs.MCMP1R = shift;
                     dev(hrtim)->sTimerxRegs[tu].RSTxR |= RST_MSTCMP1;
                     break;
-                case TIMC: /* TimerC reset on master cmp2 */
+                case TIMC: /* Timer C reset on master cmp2 */
                     dev(hrtim)->sMasterRegs.MCMP2R = shift;
                     dev(hrtim)->sTimerxRegs[tu].RSTxR |= RST_MSTCMP2;
                     break;
-                case TIMD: /* TimerD reset on master cmp3 */
+                case TIMD: /* Timer D reset on master cmp3 */
                     dev(hrtim)->sMasterRegs.MCMP3R = shift;
                     dev(hrtim)->sTimerxRegs[tu].RSTxR |= RST_MSTCMP3;
                     break;
-                case TIME: /* TimerE reset on master cmp4 */
+                case TIME: /* Timer E reset on master cmp4 */
                     dev(hrtim)->sMasterRegs.MCMP4R = shift;
                     dev(hrtim)->sTimerxRegs[tu].RSTxR |= RST_MSTCMP4;
                     break;
     #if (HRTIM_STU_NUMOF == 6)
-                case TIMF: /* TimerF reset on timerA cmp2 */
+                case TIMF: /* Timer F reset on timerA cmp2 */
                     dev(hrtim)->sTimerxRegs[0].CMP2xR = shift;
                     dev(hrtim)->sTimerxRegs[tu].RSTxR |= RSTF_TACMP2;
                     break;
