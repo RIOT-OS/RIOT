@@ -135,6 +135,11 @@ static inline void _phy_write(uint16_t addr, uint8_t reg, uint16_t value)
     _rw_phy(addr, reg, (value & 0xffff) | (ETH_MACMIIAR_MW << 16));
 }
 
+static inline bool _get_link_status(void)
+{
+    return (_phy_read(0, PHY_BSMR) & BSMR_LINK_STATUS);
+}
+
 static void stm32_eth_get_mac(char *out)
 {
     unsigned t;
@@ -216,7 +221,12 @@ static int stm32_eth_get(netdev_t *dev, netopt_t opt,
         res = ETHERNET_ADDR_LEN;
         break;
     case NETOPT_LINK:
-        res = (_phy_read(0, PHY_BSMR) & BSMR_LINK_STATUS);
+        assert(max_len == sizeof(netopt_enable_t));
+        {
+            netopt_enable_t tmp = _get_link_status();
+            memcpy(value, &tmp, sizeof(tmp));
+        }
+        res = sizeof(netopt_enable_t);
         break;
     default:
         res = netdev_eth_get(dev, opt, value, max_len);
@@ -230,7 +240,7 @@ static int stm32_eth_get(netdev_t *dev, netopt_t opt,
 static void _timer_cb(void *arg)
 {
     netdev_t *dev = (netdev_t *)arg;
-    if (stm32_eth_get(dev, NETOPT_LINK, NULL, 0)) {
+    if (_get_link_status()) {
         _link_state = LINK_STATE_UP;
         dev->event_callback(dev, NETDEV_EVENT_ISR);
     }
