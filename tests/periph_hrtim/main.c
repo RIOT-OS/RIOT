@@ -59,7 +59,7 @@ static int cmd_init(int argc, char** argv)
     }
 
     uint16_t period;
-    uint32_t freq = (uint32_t)atoi(argv[2]);
+    uint32_t freq = atoi(argv[2]);
     period = hrtim_init(HRTIM_DEV(dev), &freq, (uint16_t)atoi(argv[3]));
 
     if (period != 0) {
@@ -142,7 +142,7 @@ static int cmd_init_mstr(int argc, char** argv)
         return 1;
     }
 
-    uint32_t freq = (uint32_t)atoi(argv[2]);
+    uint32_t freq = atoi(argv[2]);
     uint16_t period;
     period = hrtim_init_mstr(HRTIM_DEV(dev), &freq);
 
@@ -192,14 +192,14 @@ static int cmd_init_tu(int argc, char** argv)
         return 1;
     }
 
-    hrtim_tu_t tu = (uint8_t)atoi(argv[2]);
+    hrtim_tu_t tu = atoi(argv[2]);
     if (tu >= HRTIM_STU_NUMOF) {
         printf("Error: tu %d is unknown.\n", tu);
         return 1;
     }
 
     uint16_t period;
-    uint32_t freq = (uint32_t)atoi(argv[3]);
+    uint32_t freq = atoi(argv[3]);
     period = hrtim_init_tu(HRTIM_DEV(dev), tu, &freq);
 
     if (period != 0) {
