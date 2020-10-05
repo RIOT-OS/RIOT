@@ -43,7 +43,7 @@ extern "C" {
  * @return            CIPHER_ERR_ENC_FAILED on internal encryption error
  * @return            otherwise number of input bytes that aren't consumed
  */
-int cipher_encrypt_cbc(cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
+int cipher_encrypt_cbc(const cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
                        size_t input_len, uint8_t *output);
 
 
@@ -62,7 +62,7 @@ int cipher_encrypt_cbc(cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
  * @return            CIPHER_ERR_DEC_FAILED on internal decryption error
  * @return            otherwise number of bytes decrypted
  */
-int cipher_decrypt_cbc(cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
+int cipher_decrypt_cbc(const cipher_t *cipher, uint8_t iv[16], const uint8_t *input,
                        size_t input_len, uint8_t *output);
 
 #ifdef __cplusplus
