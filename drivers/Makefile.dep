@@ -44,6 +44,10 @@ ifneq (,$(filter ccs811_%,$(USEMODULE)))
   USEMODULE += ccs811
 endif
 
+ifneq (,$(filter gpio_exp,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio_exp
+endif
+
 ifneq (,$(filter hmc5883l_%,$(USEMODULE)))
   USEMODULE += hmc5883l
 endif

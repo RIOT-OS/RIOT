@@ -75,7 +75,12 @@ static void _init_checked(gpio_t pin)
 void openwsn_debugpins_init(const debugpins_config_t *user_config)
 {
     if (IS_USED(MODULE_OPENWSN_DEBUGPINS)) {
-        memset(&_configuration, GPIO_UNDEF, sizeof(debugpins_config_t));
+        _configuration.frame = GPIO_UNDEF;
+        _configuration.slot = GPIO_UNDEF;
+        _configuration.fsm = GPIO_UNDEF;
+        _configuration.task = GPIO_UNDEF;
+        _configuration.isr = GPIO_UNDEF,
+        _configuration.radio = GPIO_UNDEF;
 
         if (user_config != NULL) {
             memcpy(&_configuration, user_config, sizeof(debugpins_config_t));
