@@ -49,16 +49,6 @@
  */
 static evtimer_t _tcp_mbox_timer;
 
-/**
- * @brief Head of liked TCB list.
- */
-gnrc_tcp_tcb_t *_list_tcb_head;
-
-/**
- * @brief Mutex for TCB list synchronization.
- */
-mutex_t _list_tcb_lock;
-
 static void _sched_mbox(evtimer_mbox_event_t *event, uint32_t offset,
                         uint16_t type, mbox_t *mbox)
 {
@@ -352,11 +342,7 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
 
 int gnrc_tcp_init(void)
 {
-    /* Initialize mutex for TCB list synchronization */
-    mutex_init(&(_list_tcb_lock));
-
     /* Initialize TCB list */
-    _list_tcb_head = NULL;
     _rcvbuf_init();
 
     /* Initialize timers */
