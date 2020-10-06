@@ -31,17 +31,18 @@ extern "C" {
  * @brief   Available ports on the ATmega2560 family
  */
 enum {
-    PORT_A = 0,       /**< port A */
-    PORT_B = 1,       /**< port B */
-    PORT_C = 2,       /**< port C */
-    PORT_D = 3,       /**< port D */
-    PORT_E = 4,       /**< port E */
-    PORT_F = 5,       /**< port F */
-    PORT_G = 6,       /**< port G */
-    PORT_H = 7,       /**< port H */
-    PORT_J = 8,       /**< port J */
-    PORT_K = 9,       /**< port K */
-    PORT_L = 10       /**< port L */
+    PORT_A = 0,         /**< port A */
+    PORT_B = 1,         /**< port B */
+    PORT_C = 2,         /**< port C */
+    PORT_D = 3,         /**< port D */
+    PORT_E = 4,         /**< port E */
+    PORT_F = 5,         /**< port F */
+    PORT_G = 6,         /**< port G */
+    PORT_H = 7,         /**< port H */
+    PORT_J = 8,         /**< port J */
+    PORT_K = 9,         /**< port K */
+    PORT_L = 10,        /**< port L */
+    GPIO_EXP_PORT = 11  /**< first GPIO expander port */
 };
 
 /**

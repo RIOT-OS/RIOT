@@ -57,6 +57,9 @@ PSEUDOMODULES += gnrc_sixlowpan_router_default
 PSEUDOMODULES += gnrc_sock_async
 PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd
+PSEUDOMODULES += gpio_mask_32bit
+PSEUDOMODULES += gpio_mask_16bit
+PSEUDOMODULES += gpio_mask_8bit
 PSEUDOMODULES += heap_cmd
 PSEUDOMODULES += i2c_scan
 PSEUDOMODULES += ieee802154_radio_hal
@@ -179,6 +182,9 @@ PSEUDOMODULES += ccs811_full
 PSEUDOMODULES += cc1100
 PSEUDOMODULES += cc1100e
 PSEUDOMODULES += cc1101
+
+# GPIO expanders are used, requires feature periph_gpio_exp
+PSEUDOMODULES += gpio_exp
 
 # interrupt variant of the HMC5883L driver
 PSEUDOMODULES += hmc5883l_int

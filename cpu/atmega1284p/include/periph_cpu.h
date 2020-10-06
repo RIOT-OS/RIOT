@@ -30,18 +30,14 @@ extern "C" {
 #endif
 
 /**
- * @brief   Define a CPU specific GPIO pin generator macro
- */
-#define GPIO_PIN(x, y)          ((x << 4) | y)
-
-/**
  * @brief   Available ports on the ATmega1284p family
  */
 enum {
     PORT_A = 0,       /**< port A */
     PORT_B = 1,       /**< port B */
     PORT_C = 2,       /**< port C */
-    PORT_D = 3        /**< port D */
+    PORT_D = 3,       /**< port D */
+    GPIO_EXP_PORT = 4 /**< first GPIO expander port */
 };
 
 /**

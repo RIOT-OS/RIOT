@@ -150,21 +150,21 @@ static gpio_isr_ctx_pcint_t pcint_config[8 * PCINT_NUM_BANKS];
 
 #endif  /* MODULE_PERIPH_GPIO_IRQ */
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
+int gpio_cpu_init(gpio_port_t port, gpio_pin_t pin, gpio_mode_t mode)
 {
     uint8_t pin_mask = (1 << atmega_pin_num(pin));
 
     switch (mode) {
         case GPIO_OUT:
-            _SFR_MEM8(atmega_ddr_addr(pin)) |= pin_mask;
+            _SFR_MEM8(atmega_ddr_addr(port)) |= pin_mask;
             break;
         case GPIO_IN:
-            _SFR_MEM8(atmega_ddr_addr(pin)) &= ~pin_mask;
-            _SFR_MEM8(atmega_port_addr(pin)) &= ~pin_mask;
+            _SFR_MEM8(atmega_ddr_addr(port)) &= ~pin_mask;
+            _SFR_MEM8(atmega_port_addr(port)) &= ~pin_mask;
             break;
         case GPIO_IN_PU:
-            _SFR_MEM8(atmega_ddr_addr(pin)) &= ~pin_mask;
-            _SFR_MEM8(atmega_port_addr(pin)) |= pin_mask;
+            _SFR_MEM8(atmega_ddr_addr(port)) &= ~pin_mask;
+            _SFR_MEM8(atmega_port_addr(port)) |= pin_mask;
             break;
         default:
             return -1;
@@ -173,50 +173,44 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-int gpio_read(gpio_t pin)
+gpio_mask_t gpio_cpu_read(gpio_port_t port)
 {
-    return (_SFR_MEM8(atmega_pin_addr(pin)) & (1 << atmega_pin_num(pin)));
+    return _SFR_MEM8(atmega_pin_addr(port));
 }
 
-void gpio_set(gpio_t pin)
+void gpio_cpu_set(gpio_port_t port, gpio_mask_t pins)
 {
-    _SFR_MEM8(atmega_port_addr(pin)) |= (1 << atmega_pin_num(pin));
+    _SFR_MEM8(atmega_port_addr(port)) |= pins;
 }
 
-void gpio_clear(gpio_t pin)
+void gpio_cpu_clear(gpio_port_t port, gpio_mask_t pins)
 {
-    _SFR_MEM8(atmega_port_addr(pin)) &= ~(1 << atmega_pin_num(pin));
+    _SFR_MEM8(atmega_port_addr(port)) &= ~pins;
 }
 
-void gpio_toggle(gpio_t pin)
+void gpio_cpu_toggle(gpio_port_t port, gpio_mask_t pins)
 {
-    if (gpio_read(pin)) {
-        gpio_clear(pin);
-    }
-    else {
-        gpio_set(pin);
-    }
+    /*
+     * According to the data sheet, writing a one to PIN toggles the bit in
+     * the PORT register, independent on the value of DDR.
+     */
+    _SFR_MEM8(atmega_pin_addr(port)) = _SFR_MEM8(atmega_ddr_addr(port)) & pins;
 }
 
-void gpio_write(gpio_t pin, int value)
+void gpio_cpu_write(gpio_port_t port, gpio_mask_t values)
 {
-    if (value) {
-        gpio_set(pin);
-    }
-    else {
-        gpio_clear(pin);
-    }
+    _SFR_MEM8(atmega_port_addr(port)) &= _SFR_MEM8(atmega_ddr_addr(port)) & values;
 }
 
 #ifdef MODULE_PERIPH_GPIO_IRQ
-static inline int8_t _int_num(gpio_t pin)
+static inline int8_t _int_num(gpio_port_t port, gpio_pin_t pin)
 {
     uint8_t num;
     const gpio_t ext_ints[GPIO_EXT_INT_NUMOF] = CPU_ATMEGA_EXT_INTS;
 
     /* find pin in ext_ints array to get the interrupt number */
     for (num = 0; num < GPIO_EXT_INT_NUMOF; num++) {
-        if (pin == ext_ints[num]) {
+        if (port.reg == ext_ints[num].port.reg && pin == ext_ints[num].pin) {
             return num;
         }
     }
@@ -225,15 +219,16 @@ static inline int8_t _int_num(gpio_t pin)
 }
 
 #ifdef ENABLE_PCINT
-static inline int pcint_init_int(gpio_t pin, gpio_mode_t mode,
-                                 gpio_flank_t flank,
+static inline int pcint_init_int(gpio_port_t port, gpio_pin_t pin,
+                                 gpio_mode_t mode, gpio_flank_t flank,
                                  gpio_cb_t cb, void *arg)
 {
     int8_t offset = -1;
     uint8_t pin_num = atmega_pin_num(pin);
 
     for (unsigned i = 0; i < ARRAY_SIZE(pcint_mapping); i++) {
-        if (pin != GPIO_UNDEF && pin == pcint_mapping[i]) {
+        if (port.dev != NULL && pin != GPIO_PIN_UNDEF &&
+            port.dev == pcint_mapping[i].port.dev && pin == pcint_mapping[i].pin) {
             offset = i;
             break;
         }
@@ -255,7 +250,7 @@ static inline int pcint_init_int(gpio_t pin, gpio_mode_t mode,
     pcint_config[offset].cb = cb;
 
     /* init gpio */
-    gpio_init(pin, mode);
+    gpio_cpu_init(port, pin, mode);
     /* configure pcint */
     cli();
     switch (bank) {
@@ -288,7 +283,7 @@ static inline int pcint_init_int(gpio_t pin, gpio_mode_t mode,
             break;
     }
     /* As ports are mixed in a bank (e.g. PCINT0), we can only save a single bit here! */
-    uint8_t port_value = (_SFR_MEM8(atmega_pin_addr( pin )));
+    uint8_t port_value = (_SFR_MEM8(atmega_pin_addr( port )));
     uint8_t pin_mask = (1 << pin_num);
     uint8_t pin_value = ((port_value & pin_mask) != 0);
     if (pin_value) {
@@ -302,10 +297,10 @@ static inline int pcint_init_int(gpio_t pin, gpio_mode_t mode,
 }
 #endif /* ENABLE_PCINT */
 
-int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
-                  gpio_cb_t cb, void *arg)
+int gpio_cpu_init_int(gpio_port_t port, gpio_pin_t pin, gpio_mode_t mode,
+                      gpio_flank_t flank, gpio_cb_t cb, void *arg)
 {
-    int8_t int_num = _int_num(pin);
+    int8_t int_num = _int_num(port, pin);
 
     /* mode not supported */
     if ((mode != GPIO_IN) && (mode != GPIO_IN_PU)) {
@@ -316,7 +311,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     if (int_num < 0) {
 #ifdef ENABLE_PCINT
         /* If pin change interrupts are enabled, enable mask and interrupt */
-        return pcint_init_int(pin, mode, flank, cb, arg);
+        return pcint_init_int(port, pin, mode, flank, cb, arg);
 #else
         return -1;
 #endif /* ENABLE_PCINT */
@@ -327,7 +322,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
         return -1;
     }
 
-    gpio_init(pin, mode);
+    gpio_cpu_init(port, pin, mode);
 
     /* clear global interrupt flag */
     cli();
@@ -358,15 +353,18 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     return 0;
 }
 
-void gpio_irq_enable(gpio_t pin)
+void gpio_cpu_irq_enable(gpio_port_t port, gpio_pin_t pin)
 {
-    EIFR |= (1 << _int_num(pin));
-    EIMSK |= (1 << _int_num(pin));
+    (void)port;
+    int8_t int_num = _int_num(port, pin);
+    EIFR |= (1 << int_num);
+    EIMSK |= (1 << int_num);
 }
 
-void gpio_irq_disable(gpio_t pin)
+void gpio_cpu_irq_disable(gpio_port_t port, gpio_pin_t pin)
 {
-    EIMSK &= ~(1 << _int_num(pin));
+    (void)port;
+    EIMSK &= ~(1 << _int_num(port, pin));
 }
 
 static inline void irq_handler(uint8_t int_num)
@@ -390,9 +388,9 @@ static inline void pcint_handler(uint8_t bank, uint8_t enabled_pcints)
             /* get pin from mapping (assumes 8 entries per bank!) */
             gpio_t pin = pcint_mapping[bank * 8 + idx];
             /* re-construct mask from pin */
-            uint8_t pin_mask = (1 << (atmega_pin_num(pin)));
+            uint8_t pin_mask = (1 << (atmega_pin_num(pin.pin)));
             uint8_t idx_mask = (1 << idx);
-            uint8_t port_value = (_SFR_MEM8(atmega_pin_addr( pin )));
+            uint8_t port_value = (_SFR_MEM8(atmega_pin_addr( pin.port )));
             uint8_t pin_value = ((port_value & pin_mask) != 0);
             uint8_t old_state = ((pcint_state[bank] & idx_mask) != 0);
             gpio_isr_ctx_pcint_t *conf = &pcint_config[bank * 8 + idx];

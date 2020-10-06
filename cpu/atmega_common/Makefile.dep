@@ -7,6 +7,9 @@ USEMODULE += atmega_common
 # peripheral drivers are linked into the final binary
 USEMODULE += atmega_common_periph
 
+# 8 bit GPIO pin mask required
+USEMODULE += gpio_mask_8bit
+
 # the atmel port uses stdio_uart by default
 ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_uart

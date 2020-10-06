@@ -20,6 +20,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "periph_cpu.h"
 #include "periph/gpio.h"
 
 #ifdef __cplusplus
@@ -48,10 +49,10 @@ extern "C" {
  */
 #define LED0_PIN            GPIO_PIN(PORT_B, 4)
 #define LED0_MODE           GPIO_OUT
-#define LED0_ENABLE_PORT    DDRB  |=  LED0_PIN
-#define LED0_ON             PORTB |=  LED0_PIN
-#define LED0_OFF            PORTB &= ~LED0_PIN
-#define LED0_TOGGLE         PORTB ^=  LED0_PIN
+#define LED0_ENABLE_PORT    DDRB  |=  LED0_PIN.pin
+#define LED0_ON             PORTB |=  LED0_PIN.pin
+#define LED0_OFF            PORTB &= ~LED0_PIN.pin
+#define LED0_TOGGLE         PORTB ^=  LED0_PIN.pin
 /** @} */
 
 /**

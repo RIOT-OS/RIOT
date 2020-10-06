@@ -65,14 +65,14 @@ static inline void compute_cra_and_crb(pwm_t dev, uint8_t pre)
     uint8_t cra = (1 << WGM1) | (1 << WGM0);
     uint8_t crb = pre;
 
-    if (pwm_conf[dev].pin_ch[0] != GPIO_UNDEF) {
+    if (gpio_is_valid(pwm_conf[dev].pin_ch[0])) {
         cra |= (1 << COMA1);
     }
     else {
         crb |= (1 << WGM2);
     }
 
-    if (pwm_conf[dev].pin_ch[1] != GPIO_UNDEF) {
+    if (gpio_is_valid(pwm_conf[dev].pin_ch[1])) {
         cra |= (1 << COMB1);
     }
 
@@ -85,7 +85,7 @@ static inline void apply_config(pwm_t dev)
     pwm_conf[dev].dev->CRA = state[dev].CRA;
     pwm_conf[dev].dev->CRB = state[dev].CRB;
 
-    if (pwm_conf[dev].pin_ch[0] == GPIO_UNDEF) {
+    if (!gpio_is_valid(pwm_conf[dev].pin_ch[0])) {
         /* If channel 0 is not used, variable resolutions can be used for
          * channel 1 */
         pwm_conf[dev].dev->OCR[0] = state[dev].res;
@@ -98,7 +98,7 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     /* only left implemented, max resolution 256 */
     assert(dev < PWM_NUMOF && mode == PWM_LEFT && res <= 256);
     /* resolution != 256 only valid if ch0 not used */
-    assert(!(res != 256 && pwm_conf[dev].pin_ch[0] != GPIO_UNDEF));
+    assert(!(res != 256 && gpio_is_valid(pwm_conf[dev].pin_ch[0])));
 
     /* disable PWM */
     pwm_conf[dev].dev->CRA = 0x00;
@@ -128,10 +128,10 @@ uint32_t pwm_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res)
     apply_config(dev);
 
     /* Enable outputs */
-    if (pwm_conf[dev].pin_ch[0] != GPIO_UNDEF) {
+    if (gpio_is_valid(pwm_conf[dev].pin_ch[0])) {
         gpio_init(pwm_conf[dev].pin_ch[0], GPIO_OUT);
     }
-    if (pwm_conf[dev].pin_ch[1] != GPIO_UNDEF) {
+    if (gpio_is_valid(pwm_conf[dev].pin_ch[1])) {
         gpio_init(pwm_conf[dev].pin_ch[1], GPIO_OUT);
     }
 
@@ -145,8 +145,8 @@ uint8_t pwm_channels(pwm_t dev)
 
     /* a pwm with no channels enabled makes no sense. Assume at least one is
      * enabled */
-    if (pwm_conf[dev].pin_ch[0] == GPIO_UNDEF ||
-        pwm_conf[dev].pin_ch[1] == GPIO_UNDEF) {
+    if (!gpio_is_valid(pwm_conf[dev].pin_ch[0]) ||
+        !gpio_is_valid(pwm_conf[dev].pin_ch[1])) {
         return 1;
     }
 
@@ -155,7 +155,7 @@ uint8_t pwm_channels(pwm_t dev)
 
 void pwm_set(pwm_t dev, uint8_t ch, uint16_t value)
 {
-    assert(dev < PWM_NUMOF && ch <= 1 && pwm_conf[dev].pin_ch[ch] != GPIO_UNDEF);
+    assert(dev < PWM_NUMOF && ch <= 1 && gpio_is_valid(pwm_conf[dev].pin_ch[ch]));
     if (value > state[dev].res) {
         pwm_conf[dev].dev->OCR[ch] = state[dev].res;
     }
@@ -191,11 +191,11 @@ void pwm_poweroff(pwm_t dev)
         power_timer0_disable();
     }
 
-    if (pwm_conf[dev].pin_ch[0] != GPIO_UNDEF) {
+    if (gpio_is_valid(pwm_conf[dev].pin_ch[0])) {
         gpio_clear(pwm_conf[dev].pin_ch[0]);
     }
 
-    if (pwm_conf[dev].pin_ch[1] != GPIO_UNDEF) {
+    if (gpio_is_valid(pwm_conf[dev].pin_ch[1])) {
         gpio_clear(pwm_conf[dev].pin_ch[1]);
     }
 }

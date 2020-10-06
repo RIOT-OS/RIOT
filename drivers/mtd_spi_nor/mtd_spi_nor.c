@@ -369,8 +369,15 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     DEBUG("mtd_spi_nor_init: %p\n", (void *)mtd);
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
 
+#ifdef MODULE_PERIPH_GPIO_EXP
+    DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %ld-%ld, opcodes: %p\n",
+          (unsigned long)dev->params->spi,
+          (unsigned long)gpio_port_num(dev->params->cs),
+          (unsigned long)dev->params->cs.pin, (void *)dev->params->opcode);
+#else
     DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %lx, opcodes: %p\n",
           (unsigned long)dev->params->spi, (unsigned long)dev->params->cs, (void *)dev->params->opcode);
+#endif
 
     if (dev->params->addr_width == 0) {
         return -EINVAL;
