@@ -177,6 +177,8 @@ extern "C" {
 #error "SYSCLK cannot exceed 64MHz"
 #elif CLOCK_CORECLOCK_MAX == MHZ(80)
 #error "SYSCLK cannot exceed 80MHz"
+#elif CLOCK_CORECLOCK_MAX == MHZ(110)
+#error "SYSCLK cannot exceed 110MHz"
 #elif CLOCK_CORECLOCK_MAX == MHZ(120)
 #error "SYSCLK cannot exceed 120MHz"
 #else
