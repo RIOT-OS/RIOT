@@ -7,7 +7,6 @@
 config CPU_COMMON_EFM32
     bool
     select HAS_ARCH_EFM32
-    select HAS_CORTEXM_MPU
     select HAS_CPU_EFM32
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_FLASHPAGE

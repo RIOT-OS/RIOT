@@ -5,4 +5,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p \
     im880b \
     olimexino-stm32 \
+    stk3200 \
     #

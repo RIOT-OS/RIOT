@@ -15,6 +15,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f031k6 \
     nucleo-f042k6 \
     nucleo-l031k6 \
+    stk3200 \
     stm32f030f4-demo \
     telosb \
     waspmote-pro \

@@ -9,6 +9,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     derfmega128 \
     mega-xplained \
     microduino-corerf \
+    stk3200 \
     stm32f030f4-demo \
     waspmote-pro \
     #

@@ -12,5 +12,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     microduino-corerf \
     nucleo-f031k6 \
     nucleo-f042k6 \
+    stk3200 \
     stm32f030f4-demo \
     #

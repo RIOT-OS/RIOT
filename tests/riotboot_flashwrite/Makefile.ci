@@ -17,6 +17,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l053r8 \
     saml10-xpro \
     saml11-xpro \
+    stk3200 \
     stm32f0discovery \
     telosb \
     waspmote-pro \
