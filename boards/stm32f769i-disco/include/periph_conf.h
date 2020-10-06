@@ -19,7 +19,21 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+/* This board provides an LSE */
+#ifndef CONFIG_BOARD_HAS_LSE
+#define CONFIG_BOARD_HAS_LSE    1
+#endif
+
+/* This board provides an HSE */
+#ifndef CONFIG_BOARD_HAS_HSE
+#define CONFIG_BOARD_HAS_HSE    1
+#endif
+
+/* The HSE provides a 25MHz clock */
+#define CLOCK_HSE               MHZ(25)
+
 #include "periph_cpu.h"
+#include "f2f4f7/cfg_clock_default_216.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
 #include "cfg_usb_otg_fs.h"
@@ -27,37 +41,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @name    Clock settings
- *
- * @note    This is auto-generated from
- *          `cpu/stm32_common/dist/clk_conf/clk_conf.c`
- * @{
- */
-/* give the target core clock (HCLK) frequency [in Hz],
- * maximum: 216MHz */
-#define CLOCK_CORECLOCK     (216000000U)
-/* 0: no external high speed crystal available
- * else: actual crystal frequency [in Hz] */
-#define CLOCK_HSE           (25000000U)
-/* 0: no external low speed crystal available,
- * 1: external crystal available (always 32.768kHz) */
-#define CLOCK_LSE           (1)
-/* peripheral clock setup */
-#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1
-#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)
-#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV4     /* max 54MHz */
-#define CLOCK_APB1          (CLOCK_CORECLOCK / 4)
-#define CLOCK_APB2_DIV      RCC_CFGR_PPRE2_DIV2     /* max 108MHz */
-#define CLOCK_APB2          (CLOCK_CORECLOCK / 2)
-
-/* Main PLL factors */
-#define CLOCK_PLL_M          (25)
-#define CLOCK_PLL_N          (432)
-#define CLOCK_PLL_P          (2)
-#define CLOCK_PLL_Q          (9)
-/** @} */
 
 /**
  * @name    UART configuration
