@@ -5,4 +5,8 @@ ifeq ($(BUILDOSXNATIVE),1)
   NATIVEINCLUDES += -I$(RIOTCPU)/native/osx-libc-extra
 endif
 
+ifneq (,$(filter can_linux,$(USEMODULE)))
+  LINKFLAGS += -lsocketcan
+endif
+
 TOOLCHAINS_SUPPORTED = gnu llvm afl
