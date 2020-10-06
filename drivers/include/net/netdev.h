@@ -433,6 +433,8 @@ typedef struct netdev_driver {
      * @pre     for array types of @ref netopt_t @p max_len must greater or
      *          equal the required length (see
      *          [netopt documentation](@ref net_netopt) for type)
+     * @pre     @p value must have the natural alignment of its type (see
+     *          [netopt documentation](@ref net_netopt) for type)
      *
      * @param[in]   dev     network device descriptor
      * @param[in]   opt     option type
@@ -454,6 +456,8 @@ typedef struct netdev_driver {
      *          for type)
      * @pre     for array types of @ref netopt_t @p value_len must lesser or
      *          equal the required length (see
+     *          [netopt documentation](@ref net_netopt) for type)
+     * @pre     @p value must have the natural alignment of its type (see
      *          [netopt documentation](@ref net_netopt) for type)
      *
      * @param[in]   dev         network device descriptor
