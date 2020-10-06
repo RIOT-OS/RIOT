@@ -24,7 +24,7 @@
 /**
  * @brief Internal struct holding receive buffers.
  */
-rcvbuf_t _static_buf;
+static rcvbuf_t _static_buf;
 
 /**
  * @brief Initializes all receive buffers.
