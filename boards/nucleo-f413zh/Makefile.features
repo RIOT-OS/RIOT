@@ -3,7 +3,6 @@ CPU_MODEL = stm32f413zh
 
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_adc
-FEATURES_PROVIDED += periph_dma
 FEATURES_PROVIDED += periph_can
 FEATURES_PROVIDED += periph_dma
 FEATURES_PROVIDED += periph_i2c
