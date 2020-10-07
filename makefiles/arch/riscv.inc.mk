@@ -30,8 +30,15 @@ TARGET_ARCH_RISCV ?= \
 TARGET_ARCH ?= $(TARGET_ARCH_RISCV)
 
 # define build specific options
-CFLAGS_CPU   = -march=rv32imac -mabi=ilp32 -mcmodel=medlow -msmall-data-limit=8
-CFLAGS_LINK  = -nostartfiles -ffunction-sections -fdata-sections
+CFLAGS_CPU   = -march=rv32imac -mabi=ilp32
+ifeq ($(TOOLCHAIN),llvm)
+  # Always use riscv32-none-elf as target triple for clang, as some
+  # autodetected gcc target triples are incompatible with clang
+  TARGET_ARCH_LLVM := riscv32-none-elf
+else
+  CFLAGS_CPU += -mcmodel=medlow -msmall-data-limit=8
+endif
+CFLAGS_LINK  = -ffunction-sections -fdata-sections
 CFLAGS_DBG  ?= -g3
 CFLAGS_OPT  ?= -Os
 
@@ -42,4 +49,4 @@ LINKFLAGS += -T$(LINKER_SCRIPT)
 CFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) $(CFLAGS_LINK)
 ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 # export linker flags
-LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) -Wl,--gc-sections -static -lgcc
+LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) -nostartfiles -Wl,--gc-sections -static -lgcc
