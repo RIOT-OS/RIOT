@@ -18,7 +18,7 @@ def testfunc(child):
     end = time.time()
     # test should run 10 cycles with 25ms each
     assert (end - start) > 0.25
-    assert (end - start) < 0.35
+    assert (end - start) < 0.40
 
 
 if __name__ == "__main__":
