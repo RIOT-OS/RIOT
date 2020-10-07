@@ -31,6 +31,7 @@
 #include "em_gpio.h"
 #include "em_timer.h"
 #include "em_usart.h"
+#include "em_wdog.h"
 #if defined(_SILICON_LABS_32B_SERIES_0)
 #include "em_dac.h"
 #endif
@@ -436,6 +437,23 @@ typedef struct {
  * @brief   Number of usable power modes.
  */
 #define PM_NUM_MODES    (2U)
+
+/**
+ * @name    Watchdog timer (WDT) configuration
+ * @{
+ */
+#define WDT_CLOCK_HZ            (1000U)
+
+#define NWDT_TIME_LOWER_LIMIT   ((1U << (3U + wdogPeriod_9)) + 1U)
+#define NWDT_TIME_UPPER_LIMIT   ((1U << (3U + wdogPeriod_256k)) + 1U)
+
+#ifdef _SILICON_LABS_32B_SERIES_1
+#define WDT_TIME_LOWER_LIMIT    NWDT_TIME_LOWER_LIMIT
+#define WDT_TIME_UPPER_LIMIT    NWDT_TIME_UPPER_LIMIT
+#endif
+
+#define WDT_HAS_STOP            (1U)
+/** @} */
 
 #ifdef __cplusplus
 }

@@ -8,6 +8,7 @@ config CPU_FAM_EFM32ZG
     bool
     select CPU_CORE_CORTEX_M0PLUS
     select CPU_COMMON_EFM32
+    select CPU_EFM32_SERIES0
 
 ## CPU Models
 config CPU_MODEL_EFM32ZG222F16
