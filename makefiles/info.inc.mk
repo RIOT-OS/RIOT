@@ -14,11 +14,14 @@ info-objsize:
 	  "") SORTROW=4 ;; \
 	  *) echo "Usage: $(MAKE) info-objsize SORTROW=[text|data|bss|dec]" ; return ;; \
 	esac; \
-	printf '   text\t   data\t    bss\t    dec\t    hex\tfilename\n'; \
-	$(SIZE) -d -B $(BASELIBS) | \
-	  tail -n+2 | \
-	  sed -e 's#$(BINDIR)##' | \
-	  sort -rnk$${SORTROW}
+	printf '   text\t   data\t    bss\t    dec\t    hex\tmodule\n'; \
+	for i in $(sort $(BASELIBS:%.module=%)); \
+	do \
+	$(SIZE) -t -d -B $(BINDIR)/$$i/*.o 2> /dev/null | \
+	  tail -n1 | \
+	  sed -e "s#(TOTALS)#$$i#" | \
+	  sed -e 's#$(BINDIR)##'; \
+	done | sort -n -r -k $${SORTROW}
 
 info-buildsize:
 	@$(SIZE) -d -B $(ELFFILE) || echo ''
