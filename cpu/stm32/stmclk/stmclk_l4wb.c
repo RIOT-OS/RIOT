@@ -382,9 +382,26 @@ void stmclk_init_sysclk(void)
         while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_MSI) {}
     }
     else if (IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) {
+#ifdef CPU_FAM_STM32L4
+        if (CLOCK_AHB > MHZ(80)) {
+            /* Divide HCLK by 2 before enabling the PLL */
+            RCC->CFGR |= RCC_CFGR_HPRE_DIV2;
+        }
+#endif
+
         /* Select PLL as system clock */
         RCC->CFGR |= RCC_CFGR_SW_PLL;
         while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL) {}
+
+#ifdef CPU_FAM_STM32L4
+        if (CLOCK_AHB > MHZ(80)) {
+            /* Wait 1us before switching back to full speed */
+            /* Use volatile to prevent the compiler from optimizing the loop */
+            volatile uint8_t count = CLOCK_CORECLOCK / MHZ(1);
+            while (count--) {}
+            RCC->CFGR &= ~RCC_CFGR_HPRE_DIV2;
+        }
+#endif
     }
 
     if (IS_ACTIVE(CLOCK_ENABLE_48MHZ)) {
