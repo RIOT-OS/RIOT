@@ -9,6 +9,10 @@
 import sys
 from testrunner import run
 
+# For BOARD's with large amount of RAM allocating all chunks takes longer
+# than 10s
+ALLOCATION_TIMEOUT = 20
+
 
 def testfunc(child):
     child.expect(r'CHUNK_SIZE: (\d+)\r\n')
@@ -19,7 +23,8 @@ def testfunc(child):
     for _ in range(number_of_tests):
         child.expect(r"Allocated {} Bytes at 0x[a-z0-9]+, total [a-z0-9]+\r\n"
                      .format(chunk_size))
-        child.expect(r'Allocations count: (\d+)\r\n')
+        child.expect(r'Allocations count: (\d+)\r\n',
+                     timeout=ALLOCATION_TIMEOUT)
         allocations = int(child.match.group(1))
         assert allocations > 0
         if initial_allocations == 0:
