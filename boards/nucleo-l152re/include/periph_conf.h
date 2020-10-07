@@ -39,10 +39,10 @@ static const dma_conf_t dma_config[] = {
     { .stream = 4 },    /* DMA1 Channel 4 - USART1_TX */
 };
 
-#define DMA_0_ISR  isr_dma1_ch2
-#define DMA_1_ISR  isr_dma1_ch3
-#define DMA_2_ISR  isr_dma1_ch7
-#define DMA_3_ISR  isr_dma1_ch4
+#define DMA_0_ISR  isr_dma1_channel2
+#define DMA_1_ISR  isr_dma1_channel3
+#define DMA_2_ISR  isr_dma1_channel7
+#define DMA_3_ISR  isr_dma1_channel4
 
 #define DMA_NUMOF           ARRAY_SIZE(dma_config)
 /** @} */
