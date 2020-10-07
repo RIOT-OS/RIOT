@@ -116,8 +116,8 @@ void handle_trap(uint32_t mcause)
 #ifdef DEVELHELP
             printf("Unhandled trap:\n");
             printf("  mcause: 0x%" PRIx32 "\n", mcause);
-            printf("  mepc:   0x%" PRIx32 "\n", read_csr(mepc));
-            printf("  mtval:  0x%" PRIx32 "\n", read_csr(mtval));
+            printf("  mepc:   0x%lx\n", read_csr(mepc));
+            printf("  mtval:  0x%lx\n", read_csr(mtval));
 #endif
             /* Unknown trap */
             core_panic(PANIC_GENERAL_ERROR, "Unhandled trap");
