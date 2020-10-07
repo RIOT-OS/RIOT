@@ -343,16 +343,16 @@ void hrtim_cmp_set(hrtim_t hrtim, hrtim_tu_t tu, hrtim_cmp_t cmp,
 {
     if (tu == MSTR) {
         switch (cmp) {
-            case CMP1xR:
+            case MCMP1R:
                 dev(hrtim)->sMasterRegs.MCMP1R = value;
                 break;
-            case CMP2xR:
+            case MCMP2R:
                 dev(hrtim)->sMasterRegs.MCMP2R = value;
                 break;
-            case CMP3xR:
+            case MCMP3R:
                 dev(hrtim)->sMasterRegs.MCMP3R = value;
                 break;
-            case CMP4xR:
+            case MCMP4R:
                 dev(hrtim)->sMasterRegs.MCMP4R = value;
                 break;
             default:
