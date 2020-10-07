@@ -150,6 +150,7 @@ static int cmd_init_mstr(int argc, char** argv)
         printf("The effective frequency is %" PRIu32 "Hz\n", freq);
         printf("The period is set to %" PRIu16 "\n", period);
         initiated |= (1 << dev);
+        tu_initiated |= (1 << 5);
         return 0;
     }
 
@@ -159,12 +160,12 @@ static int cmd_init_mstr(int argc, char** argv)
 
 static int cmd_init_tu(int argc, char** argv)
 {
-    if (argc != 5) {
+    if (argc != 4) {
         uint32_t f_hrtim = periph_apb_clk(hrtim_config[0].bus) * 2;
         uint32_t max_freq = f_hrtim / 3;
         uint16_t min_freq = f_hrtim / 4 / 0xfffd;
         min_freq++;
-        printf("usage: %s <dev> <tu> <frequency> <dt>\n", argv[0]);
+        printf("usage: %s <dev> <tu> <frequency>\n", argv[0]);
         printf("\tdev: device by number between 0 and %u\n", HRTIM_NUMOF - 1);
         printf("\ttu: timing unit by number between 0 and %d\n",
                 HRTIM_STU_NUMOF - 1);
@@ -483,6 +484,162 @@ static int cmd_cnt_dis(int argc, char**argv)
     return 0;
 }
 
+static inline void _rst_evt_help(void)
+{
+        puts("\tevt: event to enable");
+        puts("\t\t1: RST_UPDT");
+        puts("\t\t2: RST_CMP2");
+        puts("\t\t3: RST_CMP4");
+        puts("\t\t4: RST_MSTPER");
+        puts("\t\t5: RST_MSTCMP1");
+        puts("\t\t6: RST_MSTCMP2");
+        puts("\t\t7: RST_MSTCMP3");
+        puts("\t\t8: RST_MSTCMP4");
+        puts("\t\t9: RST_EXTEVNT1");
+        puts("\t\t10: RST_EXTEVNT2");
+        puts("\t\t11: RST_EXTEVNT3");
+        puts("\t\t12: RST_EXTEVNT4");
+        puts("\t\t13: RST_EXTEVNT5");
+        puts("\t\t14: RST_EXTEVNT6");
+        puts("\t\t15: RST_EXTEVNT7");
+        puts("\t\t16: RST_EXTEVNT8");
+        puts("\t\t17: RST_EXTEVNT9");
+        puts("\t\t18: RST_EXTEVNT10");
+#if (HRTIM_STU_NUMOF == 6)
+#define OPT_RSTF19  " RSTF_TACMP1"
+#define OPT_RSTF20  " RSTF_TACMP2"
+#define OPT_RSTF21  " RSTF_TACMP4"
+#define OPT_RSTF22  " RSTF_TBCMP1"
+#define OPT_RSTF23  " RSTF_TBCMP2"
+#define OPT_RSTF24  " RSTF_TBCMP4"
+#define OPT_RSTF25  " RSTF_TCCMP1"
+#define OPT_RSTF26  " RSTF_TCCMP2"
+#define OPT_RSTF27  " RSTF_TCCMP4"
+#define OPT_RSTF28  " RSTF_TDCMP1"
+#define OPT_RSTF29  " RSTF_TDCMP2"
+#define OPT_RSTF30  " RSTF_TDCMP4"
+#else
+#define OPT_RSTF19  ""
+#define OPT_RSTF20  ""
+#define OPT_RSTF21  ""
+#define OPT_RSTF22  ""
+#define OPT_RSTF23  ""
+#define OPT_RSTF24  ""
+#define OPT_RSTF25  ""
+#define OPT_RSTF26  ""
+#define OPT_RSTF27  ""
+#define OPT_RSTF28  ""
+#define OPT_RSTF29  ""
+#define OPT_RSTF30  ""
+#endif
+        puts("\t\t19: RSTA_TBCMP1 RSTB_TACMP1 RSTC_TACMP1 RSTD_TACMP1"
+            " RSTE_TACMP1" OPT_RSTF19);
+        puts("\t\t20: RSTA_TBCMP2 RSTB_TACMP2 RSTC_TACMP2 RSTD_TACMP2"
+            " RSTE_TACMP2" OPT_RSTF20);
+        puts("\t\t21: RSTA_TBCMP4 RSTB_TACMP4 RSTC_TACMP4 RSTD_TACMP4"
+            " RSTE_TACMP4" OPT_RSTF21);
+        puts("\t\t22: RSTA_TCCMP1 RSTB_TCCMP1 RSTC_TBCMP1 RSTD_TBCMP1"
+            " RSTE_TBCMP1" OPT_RSTF22);
+        puts("\t\t23: RSTA_TCCMP2 RSTB_TCCMP2 RSTC_TBCMP2 RSTD_TBCMP2"
+            " RSTE_TBCMP2" OPT_RSTF23);
+        puts("\t\t24: RSTA_TCCMP4 RSTB_TCCMP4 RSTC_TBCMP4 RSTD_TBCMP4"
+            " RSTE_TBCMP4" OPT_RSTF24);
+        puts("\t\t25: RSTA_TDCMP1 RSTB_TDCMP1 RSTC_TDCMP1 RSTD_TCCMP1"
+            " RSTE_TCCMP1" OPT_RSTF25);
+        puts("\t\t26: RSTA_TDCMP2 RSTB_TDCMP2 RSTC_TDCMP2 RSTD_TCCMP2"
+            " RSTE_TCCMP2" OPT_RSTF26);
+        puts("\t\t27: RSTA_TDCMP4 RSTB_TDCMP4 RSTC_TDCMP4 RSTD_TCCMP4"
+            " RSTE_TCCMP4" OPT_RSTF27);
+        puts("\t\t28: RSTA_TECMP1 RSTB_TECMP1 RSTC_TECMP1 RSTD_TECMP1"
+            " RSTE_TDCMP1" OPT_RSTF28);
+        puts("\t\t29: RSTA_TECMP2 RSTB_TECMP2 RSTC_TECMP2 RSTD_TECMP2"
+            " RSTE_TDCMP2" OPT_RSTF29);
+        puts("\t\t30: RSTA_TECMP4 RSTB_TECMP4 RSTC_TECMP4 RSTD_TECMP4"
+            " RSTE_TDCMP4" OPT_RSTF30);
+#if (HRTIM_STU_NUMOF == 6)
+        puts("\t\t31: RSTA_TFCMP2 RSTB_TFCMP2 RSTC_TFCMP2 RSTD_TFCMP2"
+            " RSTE_TFCMP2 RSTF_TECMP2");    
+#endif
+}
+
+static int cmd_rst_evt_en(int argc, char**argv)
+{
+    if (argc != 4) {
+        printf("usage: %s <dev> <tu> <evt>\n", argv[0]);
+        printf("\tdev: device by number between 0 and %d\n", HRTIM_NUMOF - 1);
+        printf("\ttu: timing unit by number between 0 and %d\n", HRTIM_STU_NUMOF - 1);
+        puts("\t\t0: TIMA");
+        puts("\t\t1: TIMB");
+        puts("\t\t2: TIMC");
+        puts("\t\t3: TIMD");
+        puts("\t\t4: TIME");
+#if (HRTIM_STU_NUMOF == 6)
+        puts("\t\t5: TIMF");
+#endif
+        _rst_evt_help();
+        return 1;
+    }
+
+    unsigned dev = _get_dev(argv[1]);
+    if (dev == UINT_MAX) {
+        return 1;
+    }
+
+    hrtim_tu_t tu = atoi(argv[2]);
+    if (tu >= HRTIM_STU_NUMOF) {
+        printf("Error: tu %d is unknown.\n", tu);
+        return 1;
+    }
+
+    hrtim_out_t evt = atoi(argv[3]);
+    if (evt < 1 || evt > 31) {
+        printf("Error: evt = %d is invalid.\n", evt);
+        return 1;
+    }
+
+    hrtim_rst_evt_en(HRTIM_DEV(dev), tu, (1 << evt));
+    return 0;
+}
+
+static int cmd_rst_evt_dis(int argc, char**argv)
+{
+    if (argc != 4) {
+        printf("usage: %s <dev> <tu> <evt>\n", argv[0]);
+        printf("\tdev: device by number between 0 and %d\n", HRTIM_NUMOF - 1);
+        printf("\ttu: timing unit by number between 0 and %d\n", HRTIM_STU_NUMOF - 1);
+        puts("\t\t0: TIMA");
+        puts("\t\t1: TIMB");
+        puts("\t\t2: TIMC");
+        puts("\t\t3: TIMD");
+        puts("\t\t4: TIME");
+#if (HRTIM_STU_NUMOF == 6)
+        puts("\t\t5: TIMF");
+#endif
+        _rst_evt_help();
+        return 1;
+    }
+
+    unsigned dev = _get_dev(argv[1]);
+    if (dev == UINT_MAX) {
+        return 1;
+    }
+
+    hrtim_tu_t tu = atoi(argv[2]);
+    if (tu >= HRTIM_STU_NUMOF) {
+        printf("Error: tu %d is unknown.\n", tu);
+        return 1;
+    }
+
+    hrtim_out_t evt = atoi(argv[3]);
+    if (evt < 1 || evt > 31) {
+        printf("Error: evt = %d is invalid.\n", evt);
+        return 1;
+    }
+
+    hrtim_rst_evt_dis(HRTIM_DEV(dev), tu, (1 << evt));
+    return 0;
+}
+
 static int cmd_out_en(int argc, char**argv)
 {
     if (argc != 4) {
@@ -706,7 +863,7 @@ static int cmd_an4539(int argc, char**argv)
             /* Initialize timer D, set period for 100kHz frequency
              * and duty cycle to 50% */
             freq = KHZ(100);
-            period = hrtim_init_tu(0, 3, &freq);
+            period = hrtim_init_tu(0, TIMD, &freq);
             hrtim_cmp_set(0, TIMD, CMP1xR, period / 4);
 
             /* TD1 output set on TIMD period and reset on TIMD CMP1 event*/
@@ -771,6 +928,8 @@ static const shell_command_t shell_commands[] = {
     { "cmp_set", "set a comparator value", cmd_cmp_set },
     { "cnt_en", "enable a timing unit counter", cmd_cnt_en },
     { "cnt_dis", "disable a timing unit counter", cmd_cnt_dis },
+    { "rst_evt_en", "enable a Timerx reset event", cmd_rst_evt_en },
+    { "rst_evt_dis", "disable a Timerx reset event", cmd_rst_evt_dis },
     { "out_en", "enable the given timing unit output(s)", cmd_out_en },
     { "out_dis", "disable the given timing unit output(s)", cmd_out_dis },
     { "pwm_dt", "add a dead-time to a complementary pwm output", cmd_pwm_dt },

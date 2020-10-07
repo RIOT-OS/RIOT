@@ -55,7 +55,11 @@ C:
 Shell:
 ```shell
     init_mstr 0 100000
+   The effective frequency is 100000Hz
+   The period is set to 46080
     init_tu 0 3 100000
+   The effective frequency is 100000Hz
+   The period is set to 46080
     cmp_set 0 3 1 23040
     set_cb_set 0 3 1 2
     rst_cb_set 0 3 1 3
@@ -112,6 +116,36 @@ C:
     hrtim_rst_evt_en(0, TIMA, RST_MSTPER);
     hrtim_rst_evt_en(0, TIMD, RST_MSTPER);
 ```
+Shell:
+```shell
+    init_mstr 0 33333
+   The effective frequency is 33333Hz
+   The period is set to 34560
+    init_tu 0 3 100000
+   The effective frequency is 100000Hz
+   The period is set to 46080
+    cmp_set 0 3 1 11520
+    cmp_set 0 3 2 34560
+    set_cb_set 0 3 1 2
+    rst_cb_set 0 3 1 3
+    set_cb_set 0 3 2 4
+    rst_cb_set 0 3 2 2
+    init_tu 0 0 33333
+   The effective frequency is 33333Hz
+   The period is set to 34560
+    cmp_set 0 0 1 8640
+    cmp_set 0 0 2 17280
+    cmp_set 0 0 3 25920
+    set_cb_set 0 0 1 2
+    rst_cb_set 0 0 1 3
+    set_cb_set 0 0 2 4
+    rst_cb_set 0 0 2 5
+    out_en 0 0 3
+    out_en 0 3 3
+    cnt_en 0 19
+    rst_evt_en 0 0 4
+    rst_evt_en 0 3 4
+```
 
 ### 2.3 Generating PWM with other timing units and the master timer
 C:
@@ -128,7 +162,7 @@ C:
     /* Initialize timer D, set period for 100kHz frequency
      * and duty cycle to 50% */
     freq = KHZ(100);
-    period = hrtim_init_tu(0, 3, &freq);
+    period = hrtim_init_tu(0, TIMD, &freq);
     hrtim_cmp_set(0, TIMD, CMP1xR, period / 4);
 
     /* TD1 output set on TIMD period and reset on TIMD CMP1 event*/
@@ -144,6 +178,23 @@ C:
 
     /* Start Master Timer and Timer D counters*/
     hrtim_cnt_en(0, MCEN | TDCEN);
+```
+Shell:
+```shell
+    init_mstr 0 100002
+   The effective frequency is 100002Hz
+   The period is set to 46079
+    cmp_set 0 5 1 23039
+    init_tu 0 3 100000
+   The effective frequency is 100000Hz
+   The period is set to 46080
+    cmp_set 0 3 1 11520
+    set_cb_set 0 3 1 2
+    rst_cb_set 0 3 1 3
+    set_cb_set 0 3 2 7
+    rst_cb_set 0 3 2 8
+    out_en 0 3 3
+    cnt_en 0 17
 ```
 ### 2.4 Arbitrary waveform generation
 C:
@@ -175,4 +226,28 @@ C:
 
     /* Start Timer D */
     hrtim_cnt_en(0, TDCEN);
+```
+Shell:
+```shell
+    init_mstr 0 100000
+   The effective frequency is 100000Hz
+   The period is set to 46080
+    init_tu 0 3 100000
+   The effective frequency is 100000Hz
+   The period is set to 46080
+    cmp_set 0 3 1 11520
+    cmp_set 0 3 2 17280
+    cmp_set 0 3 3 23040
+    set_cb_set 0 3 1 2
+    set_cb_set 0 3 1 3
+    set_cb_set 0 3 1 4
+    rst_cb_set 0 3 1 2
+    rst_cb_set 0 3 1 3
+    rst_cb_set 0 3 1 4
+    set_cb_set 0 3 2 2
+    set_cb_set 0 3 2 4
+    rst_cb_set 0 3 2 3
+    rst_cb_set 0 3 2 5
+    out_en 0 3 3
+    cnt_en 0 16
 ```
