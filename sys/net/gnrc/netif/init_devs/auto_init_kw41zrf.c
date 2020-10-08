@@ -56,7 +56,7 @@ void auto_init_kw41zrf(void)
 {
     for (unsigned i = 0; i < KW41ZRF_NUMOF; i++) {
         LOG_DEBUG("[auto_init_netif] initializing kw41zrf #%u\n", i);
-        kw41zrf_setup(&kw41zrf_devs[i]);
+        kw41zrf_setup(&kw41zrf_devs[i], i);
 
 #if defined(MODULE_GNRC_GOMACH)
         gnrc_netif_gomach_create(&_netif[i], _kw41zrf_stacks[i], KW41ZRF_NETIF_STACKSIZE,
