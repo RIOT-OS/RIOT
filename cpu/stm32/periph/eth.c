@@ -104,40 +104,54 @@ netdev_t *_netdev;
 static uint8_t _link_state = LINK_STATE_DOWN;
 #endif
 
-/** Read or write a phy register, to write the register ETH_MACMIIAR_MW is to
- * be passed as the higher nibble of the value */
-static unsigned _rw_phy(unsigned addr, unsigned reg, unsigned value)
+/**
+ * @brief   Read or write a MII register
+ *
+ * @param[in]   addr    Which of the 32 possible PHY devices to access
+ * @param[in]   reg     MII register to access
+ * @param[in]   value   Value to write (ignored when @p write is `false`)
+ * @param[in]   write   Whether to write (`true`) or read (`false`) to/from the
+ *                      register
+ *
+ * @return  The value of the MII register accessed. (This should be equal to
+ *          @p value, if @p write was `true`.)
+ */
+static uint16_t _mii_reg_transfer(unsigned addr, unsigned reg, uint16_t value,
+                                  bool write)
 {
     unsigned tmp;
 
     while (ETH->MACMIIAR & ETH_MACMIIAR_MB) {}
     DEBUG("[stm32_eth] rw_phy %x (%x): %x\n", addr, reg, value);
 
-    tmp = (ETH->MACMIIAR & ETH_MACMIIAR_CR) | ETH_MACMIIAR_MB;
-    tmp |= (((addr & 0x1f) << 11) | ((reg & 0x1f) << 6));
-    tmp |= (value >> 16);
+    tmp = CLOCK_RANGE | ETH_MACMIIAR_MB
+        | (((addr & 0x1f) << 11) | ((reg & 0x1f) << 6));
 
-    ETH->MACMIIDR = (value & 0xffff);
+    if (write) {
+        tmp |= ETH_MACMIIAR_MW;
+        ETH->MACMIIDR = value;
+    }
+
     ETH->MACMIIAR = tmp;
     while (ETH->MACMIIAR & ETH_MACMIIAR_MB) {}
 
     DEBUG("[stm32_eth] %lx\n", ETH->MACMIIDR);
-    return (ETH->MACMIIDR & 0x0000ffff);
+    return ETH->MACMIIDR;
 }
 
-static inline int32_t _phy_read(uint16_t addr, uint8_t reg)
+static inline int16_t _mii_reg_read(uint16_t addr, uint8_t reg)
 {
-    return _rw_phy(addr, reg, 0);
+    return _mii_reg_transfer(addr, reg, 0, false);
 }
 
-static inline void _phy_write(uint16_t addr, uint8_t reg, uint16_t value)
+static inline void _mii_reg_write(uint16_t addr, uint8_t reg, uint16_t value)
 {
-    _rw_phy(addr, reg, (value & 0xffff) | (ETH_MACMIIAR_MW << 16));
+    _mii_reg_transfer(addr, reg, value, true);
 }
 
 static inline bool _get_link_status(void)
 {
-    return (_phy_read(0, PHY_BSMR) & BSMR_LINK_STATUS);
+    return (_mii_reg_read(0, PHY_BSMR) & BSMR_LINK_STATUS);
 }
 
 static void stm32_eth_get_addr(char *out)
@@ -160,8 +174,8 @@ static void stm32_eth_get_addr(char *out)
 static void stm32_eth_set_addr(const uint8_t *addr)
 {
     ETH->MACA0HR &= 0xffff0000;
-    ETH->MACA0HR |= ((addr[5] << 8) | addr[4]);
-    ETH->MACA0LR = ((addr[3] << 24) | (addr[2] << 16) | (addr[1] << 8) | addr[0]);
+    ETH->MACA0HR |= (addr[5] << 8) | addr[4];
+    ETH->MACA0LR = (addr[3] << 24) | (addr[2] << 16) | (addr[1] << 8) | addr[0];
 }
 
 /** Initialization of the DMA descriptors to be used */
@@ -292,7 +306,7 @@ static int stm32_eth_init(netdev_t *netdev)
 
     /* configure the PHY (standard for all PHY's) */
     /* if there's no PHY, this has no effect */
-    _phy_write(eth_config.phy_addr, PHY_BMCR, BMCR_RESET);
+    _mii_reg_write(eth_config.phy_addr, PHY_BMCR, BMCR_RESET);
 
     /* speed from conf */
     ETH->MACCR |= (ETH_MACCR_ROD | ETH_MACCR_IPCO | ETH_MACCR_APCS |
@@ -308,10 +322,11 @@ static int stm32_eth_init(netdev_t *netdev)
     ETH->DMAOMR |= (ETH_DMAOMR_RSF | ETH_DMAOMR_TSF | ETH_DMAOMR_OSF);
 
     /* configure DMA */
-    ETH->DMABMR = (ETH_DMABMR_DA | ETH_DMABMR_AAB | ETH_DMABMR_FB |
-                   ETH_DMABMR_RDP_32Beat | ETH_DMABMR_PBL_32Beat | ETH_DMABMR_EDE);
+    ETH->DMABMR = ETH_DMABMR_DA | ETH_DMABMR_AAB | ETH_DMABMR_FB
+                | ETH_DMABMR_RDP_32Beat | ETH_DMABMR_PBL_32Beat
+                | ETH_DMABMR_EDE;
 
-    if(eth_config.addr[0] != 0) {
+    if (eth_config.addr[0] != 0) {
         stm32_eth_set_addr(eth_config.addr);
     }
     else {
@@ -337,7 +352,7 @@ static int stm32_eth_init(netdev_t *netdev)
 
     /* configure speed, do it at the end so the PHY had time to
      * reset */
-    _phy_write(eth_config.phy_addr, PHY_BMCR, eth_config.speed);
+    _mii_reg_write(eth_config.phy_addr, PHY_BMCR, eth_config.speed);
 
     return 0;
 }
@@ -415,7 +430,8 @@ static int get_rx_frame_size(void)
             DEBUG("[stm32_eth] RX not completed (spurious interrupt?)\n");
             return -EAGAIN;
         }
-        DEBUG("[stm32_eth] get_rx_frame_size(): FS=%c, LS=%c, ES=%c, DE=%c, FL=%lu\n",
+        DEBUG("[stm32_eth] get_rx_frame_size(): "
+              "FS=%c, LS=%c, ES=%c, DE=%c, FL=%lu\n",
               (status & RX_DESC_STAT_FS) ? '1' : '0',
               (status & RX_DESC_STAT_LS) ? '1' : '0',
               (status & RX_DESC_STAT_ES) ? '1' : '0',
@@ -462,11 +478,12 @@ static void handle_lost_rx_irqs(void)
             break;
         }
         if (status & RX_DESC_STAT_LS) {
-            DEBUG("[stm32_eth] Lost RX IRQ, sending event to upper layer now\n");
+            DEBUG("[stm32_eth] Lost RX IRQ, sending event to upper layer\n");
             /* we use the ISR event for this, as the upper layer calls recv()
              * right away on an NETDEV_EVENT_RX_COMPLETE. Because there could be
              * potentially quite a lot of received frames in the queue, we might
-             * risk a stack overflow if we would send an NETDEV_EVENT_RX_COMPLETE
+             * risk a stack overflow if we would send an
+             * NETDEV_EVENT_RX_COMPLETE
              */
             netdev_trigger_event_isr(_netdev);
             break;
