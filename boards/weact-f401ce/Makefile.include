@@ -1,0 +1,5 @@
+# Product & Vendor ID taken from example firmware that the board was shipped with.
+CFLAGS += -DINTERNAL_PERIPHERAL_VID=0x0483
+CFLAGS += -DINTERNAL_PERIPHERAL_PID=0x572a
+
+include $(RIOTBOARD)/common/weact-f4x1cx/Makefile.include

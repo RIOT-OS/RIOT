@@ -1,0 +1,3 @@
+USEMODULE += boards_common_weact-f4x1cx
+
+include $(RIOTBOARD)/common/weact-f4x1cx/Makefile.dep

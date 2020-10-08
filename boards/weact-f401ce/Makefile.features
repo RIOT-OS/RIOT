@@ -1,0 +1,3 @@
+CPU_MODEL = stm32f401ce
+
+include $(RIOTBOARD)/common/weact-f4x1cx/Makefile.features
