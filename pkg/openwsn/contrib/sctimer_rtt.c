@@ -67,6 +67,15 @@ static uint32_t _prescaler;
 static atomic_bool _enable;
 #endif
 
+#if RTT_MAX_VALUE < UINT32_MAX
+/* If RTT_MAX_VALUE is smaller the UINT32_MAX then handle the remaining
+   bits here, sctimer is scheduled at least every slot (20ms) so no
+   overflow will be missed */
+#define SCTIMER_RTT_EXTEND_MSB  (1 << (32UL - __builtin_clz(RTT_MAX_VALUE)))
+static atomic_uint_fast32_t _counter_msb;
+static atomic_uint_fast32_t _now_last;
+#endif
+
 static sctimer_cbt sctimer_cb;
 
 static void sctimer_isr_internal(void *arg)
@@ -84,6 +93,10 @@ void sctimer_init(void)
 {
     rtt_init();
     sctimer_cb = NULL;
+#ifdef SCTIMER_RTT_EXTEND_MSB
+    atomic_store(&_counter_msb, 0);
+    atomic_store(&_now_last, 0);
+#endif
 #ifdef SCTIMER_TIME_DIVISION
     _prescaler = 0;
     _enable = false;
@@ -115,11 +128,33 @@ uint32_t _update_val(uint32_t val, uint32_t now)
 }
 #endif
 
+#ifdef SCTIMER_RTT_EXTEND_MSB
+uint32_t _sctimer_extend(uint32_t now)
+{
+    unsigned state = irq_disable();
+    uint32_t now_last = atomic_load(&_now_last);
+    uint32_t counter_msb = atomic_load(&_counter_msb);
+    if (now < now_last) {
+        /* account for overflow */
+        counter_msb += SCTIMER_RTT_EXTEND_MSB;
+        atomic_store(&_counter_msb, counter_msb);
+    }
+    atomic_store(&_now_last, now);
+    now += counter_msb;
+    irq_restore(state);
+    return now;
+}
+#endif
+
 void sctimer_setCompare(uint32_t val)
 {
     unsigned state = irq_disable();
 
     uint32_t now = rtt_get_counter();
+
+#ifdef SCTIMER_RTT_EXTEND_MSB
+    now = _sctimer_extend(now);
+#endif
 
 #ifdef SCTIMER_TIME_DIVISION
     val = _update_val(val, now);
@@ -149,6 +184,10 @@ void sctimer_setCompare(uint32_t val)
 uint32_t sctimer_readCounter(void)
 {
     uint32_t now = rtt_get_counter();
+
+#ifdef SCTIMER_RTT_EXTEND_MSB
+    now = _sctimer_extend(now);
+#endif
 
 #ifdef SCTIMER_TIME_DIVISION
     now &= SCTIMER_TIME_DIVISION_MASK;
