@@ -13,8 +13,8 @@
  * @file
  * @brief       Test application for the candev abstraction
  *
+ * @author      Wouter Symons <wosym@airsantelmo.com>
  * @author      Toon Stegen <tstegen@nalys-group.com>
- * @author      Wouter Symons <wsymons@nalys-group.com>
  *
  * @}
  */
@@ -23,10 +23,10 @@
 
 #include <debug.h>
 #include <errno.h>
+#include <isrpipe.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <isrpipe.h>
 #include "shell.h"
 #include "can/device.h"
 
@@ -37,8 +37,14 @@
 
 static can_t periph_dev;
 
+#elif defined(MODULE_MCP2515)
+#include "candev_mcp2515.h"
+#include "mcp2515_params.h"
+
+static candev_mcp2515_t mcp2515_dev;
+
 #else
-/* add other candev drivers here */
+/* add includes for other candev drivers here */
 #endif
 
 #define RX_RINGBUFFER_SIZE 128      /* Needs to be a power of 2! */
@@ -101,12 +107,14 @@ static int _receive(int argc, char **argv)
         puts("Reading from Rxbuf...");
         isrpipe_read(&rxbuf, buf, 4);       /* can-id */
         can_id = ((uint32_t)buf[0] << 24) |
-                ((uint32_t)buf[1] << 16) |
-                ((uint32_t)buf[2] << 8) |
-                ((uint32_t)buf[3]);
+                 ((uint32_t)buf[1] << 16) |
+                 ((uint32_t)buf[2] << 8) |
+                 ((uint32_t)buf[3]);
         isrpipe_read(&rxbuf, buf, 1);       /* can-dlc */
         can_dlc = buf[0];
-        isrpipe_read(&rxbuf, buf, can_dlc); /* data */
+        if (can_dlc > 0) {
+            isrpipe_read(&rxbuf, buf, can_dlc); /* data */
+        }
 
         printf("id: %" PRIx32 " dlc: %" PRIx8 " Data: \n", can_id, can_dlc);
         for (int i = 0; i < can_dlc; i++) {
@@ -130,60 +138,60 @@ static void _can_event_callback(candev_t *dev, candev_event_t event, void *arg)
     struct can_frame *frame;
 
     switch (event) {
-        case CANDEV_EVENT_ISR:
-            DEBUG("_can_event: CANDEV_EVENT_ISR\n");
-            dev->driver->isr(candev);
-            break;
-        case CANDEV_EVENT_WAKE_UP:
-            DEBUG("_can_event: CANDEV_EVENT_WAKE_UP\n");
-            break;
-        case CANDEV_EVENT_TX_CONFIRMATION:
-            DEBUG("_can_event: CANDEV_EVENT_TX_CONFIRMATION\n");
-            break;
-        case CANDEV_EVENT_TX_ERROR:
-            DEBUG("_can_event: CANDEV_EVENT_TX_ERROR\n");
-            break;
-        case CANDEV_EVENT_RX_INDICATION:
-            DEBUG("_can_event: CANDEV_EVENT_RX_INDICATION\n");
+    case CANDEV_EVENT_ISR:
+        DEBUG("_can_event: CANDEV_EVENT_ISR\n");
+        dev->driver->isr(candev);
+        break;
+    case CANDEV_EVENT_WAKE_UP:
+        DEBUG("_can_event: CANDEV_EVENT_WAKE_UP\n");
+        break;
+    case CANDEV_EVENT_TX_CONFIRMATION:
+        DEBUG("_can_event: CANDEV_EVENT_TX_CONFIRMATION\n");
+        break;
+    case CANDEV_EVENT_TX_ERROR:
+        DEBUG("_can_event: CANDEV_EVENT_TX_ERROR\n");
+        break;
+    case CANDEV_EVENT_RX_INDICATION:
+        DEBUG("_can_event: CANDEV_EVENT_RX_INDICATION\n");
 
-            frame = (struct can_frame *)arg;
+        frame = (struct can_frame *)arg;
 
-            DEBUG("\tid: %" PRIx32 " dlc: %" PRIx8 " Data: \n\t", frame->can_id,
-                  frame->can_dlc);
-            for (uint8_t i = 0; i < frame->can_dlc; i++) {
-                DEBUG("0x%X ", frame->data[i]);
-            }
-            DEBUG(" ");
+        DEBUG("\tid: %" PRIx32 " dlc: %" PRIx8 " Data: \n\t", frame->can_id,
+              frame->can_dlc);
+        for (uint8_t i = 0; i < frame->can_dlc; i++) {
+            DEBUG("0x%X ", frame->data[i]);
+        }
+        DEBUG(" ");
 
-            /* Store in buffer until user requests the data */
-            isrpipe_write_one(&rxbuf,
-                              (uint8_t)((frame->can_id & 0x1FFFFFFF) >> 24));
-            isrpipe_write_one(&rxbuf,
-                              (uint8_t)((frame->can_id & 0xFF0000) >> 16));
-            isrpipe_write_one(&rxbuf, (uint8_t)((frame->can_id & 0xFF00) >> 8));
-            isrpipe_write_one(&rxbuf, (uint8_t)((frame->can_id & 0xFF)));
+        /* Store in buffer until user requests the data */
+        isrpipe_write_one(&rxbuf,
+                          (uint8_t)((frame->can_id & 0x1FFFFFFF) >> 24));
+        isrpipe_write_one(&rxbuf,
+                          (uint8_t)((frame->can_id & 0xFF0000) >> 16));
+        isrpipe_write_one(&rxbuf, (uint8_t)((frame->can_id & 0xFF00) >> 8));
+        isrpipe_write_one(&rxbuf, (uint8_t)((frame->can_id & 0xFF)));
 
-            isrpipe_write_one(&rxbuf, frame->can_dlc);
-            for (uint8_t i = 0; i < frame->can_dlc; i++) {
-                isrpipe_write_one(&rxbuf, frame->data[i]);
-            }
+        isrpipe_write_one(&rxbuf, frame->can_dlc);
+        for (uint8_t i = 0; i < frame->can_dlc; i++) {
+            isrpipe_write_one(&rxbuf, frame->data[i]);
+        }
 
-            break;
-        case CANDEV_EVENT_RX_ERROR:
-            DEBUG("_can_event: CANDEV_EVENT_RX_ERROR\n");
-            break;
-        case CANDEV_EVENT_BUS_OFF:
-            dev->state = CAN_STATE_BUS_OFF;
-            break;
-        case CANDEV_EVENT_ERROR_PASSIVE:
-            dev->state = CAN_STATE_ERROR_PASSIVE;
-            break;
-        case CANDEV_EVENT_ERROR_WARNING:
-            dev->state = CAN_STATE_ERROR_WARNING;
-            break;
-        default:
-            DEBUG("_can_event: unknown event\n");
-            break;
+        break;
+    case CANDEV_EVENT_RX_ERROR:
+        DEBUG("_can_event: CANDEV_EVENT_RX_ERROR\n");
+        break;
+    case CANDEV_EVENT_BUS_OFF:
+        dev->state = CAN_STATE_BUS_OFF;
+        break;
+    case CANDEV_EVENT_ERROR_PASSIVE:
+        dev->state = CAN_STATE_ERROR_PASSIVE;
+        break;
+    case CANDEV_EVENT_ERROR_WARNING:
+        dev->state = CAN_STATE_ERROR_WARNING;
+        break;
+    default:
+        DEBUG("_can_event: unknown event\n");
+        break;
     }
 }
 
@@ -197,6 +205,11 @@ int main(void)
     puts("Initializing CAN periph device");
     can_init(&periph_dev, &(candev_conf[0]));    /* vcan0 on native */
     candev = (candev_t *)&periph_dev;
+#elif  defined(MODULE_MCP2515)
+    puts("Initializing MCP2515");
+    candev_mcp2515_init(&mcp2515_dev, &candev_mcp2515_conf[0]);
+    candev = (candev_t *)&mcp2515_dev;
+
 #else
     /* add initialization for other candev drivers here */
 #endif
