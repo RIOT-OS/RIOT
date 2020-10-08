@@ -157,24 +157,17 @@ void mrf24j40_set_addr_short(mrf24j40_t *dev, uint16_t addr)
                              naddr.u8[0]);
 }
 
-uint64_t mrf24j40_get_addr_long(mrf24j40_t *dev)
+void mrf24j40_get_addr_long(mrf24j40_t *dev, uint8_t *addr)
 {
-    network_uint64_t naddr;
-
     for (int i = 0; i < 8; i++) {
-        naddr.u8[7 - i] = mrf24j40_reg_read_short(dev, (MRF24J40_REG_EADR0 + i));
+        addr[7 - i] = mrf24j40_reg_read_short(dev, MRF24J40_REG_EADR0 + i);
     }
-    return naddr.u64;
 }
 
-void mrf24j40_set_addr_long(mrf24j40_t *dev, uint64_t addr)
+void mrf24j40_set_addr_long(mrf24j40_t *dev, const uint8_t *addr)
 {
-    network_uint64_t naddr;
-    naddr.u64 = addr;
-
     for (int i = 0; i < 8; i++) {
-        mrf24j40_reg_write_short(dev, (MRF24J40_REG_EADR0 + i),
-                                 (naddr.u8[7 - i]));
+        mrf24j40_reg_write_short(dev, MRF24J40_REG_EADR0 + i, addr[7 - i]);
     }
 }
 

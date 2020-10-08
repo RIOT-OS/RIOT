@@ -46,7 +46,7 @@ void auto_init_mrf24j40(void)
     for (unsigned i = 0; i < MRF24J40_NUM; i++) {
         LOG_DEBUG("[auto_init_netif] initializing mrf24j40 #%u\n", i);
 
-        mrf24j40_setup(&mrf24j40_devs[i], &mrf24j40_params[i]);
+        mrf24j40_setup(&mrf24j40_devs[i], &mrf24j40_params[i], i);
         gnrc_netif_ieee802154_create(&_netif[i], _mrf24j40_stacks[i],
                                      MRF24J40_MAC_STACKSIZE, MRF24J40_MAC_PRIO,
                                      "mrf24j40",

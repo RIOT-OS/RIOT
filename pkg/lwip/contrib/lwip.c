@@ -191,7 +191,7 @@ void lwip_bootstrap(void)
     }
 #elif defined(MODULE_MRF24J40)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
-        mrf24j40_setup(&mrf24j40_devs[i], &mrf24j40_params[i]);
+        mrf24j40_setup(&mrf24j40_devs[i], &mrf24j40_params[i], i);
         if (netif_add(&netif[i], &mrf24j40_devs[i], lwip_netdev_init,
                       tcpip_6lowpan_input) == NULL) {
             DEBUG("Could not add mrf24j40 device\n");
