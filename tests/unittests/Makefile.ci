@@ -99,6 +99,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     teensy31 \
     telosb \
     waspmote-pro \
+    weact-f401cc \
     yarm \
     yunjia-nrf51822 \
     z1 \
