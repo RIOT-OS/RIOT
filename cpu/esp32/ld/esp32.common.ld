@@ -116,25 +116,25 @@ SECTIONS
     *libc.a:*(.literal .text .literal.* .text.*)
 
     /* Xtensa basic functionality written in assembler should be placed in iram */
-    *xtensa.a:*(.literal .text .literal.* .text.*)
+    *xtensa/*(.literal .text .literal.* .text.*)
     /* ESP-IDF parts that have to run in IRAM */
-    *esp_idf_heap.a:*(.literal .text .literal.* .text.*)
-    *esp_idf_spi_flash.a:*(.literal .text .literal.* .text.*)
+    *esp_idf_heap/*(.literal .text .literal.* .text.*)
+    *esp_idf_spi_flash/*(.literal .text .literal.* .text.*)
     /* parts of RIOT that should to run in IRAM */
-    *core.a:*(.literal .text .literal.* .text.*)
-    *littlefs.a:*(.literal .text .literal.* .text.*)
-    *littlefs2.a:*(.literal .text .literal.* .text.*)
-    *newlib_syscalls_default.a:*(.literal .text .literal.* .text.*)
-    *spiffs_fs.a:*(.literal .text .literal.* .text.*)
-    *spiffs.a:*(.literal .text .literal.* .text.*)
+    *core/*(.literal .text .literal.* .text.*)
+    *littlefs/*(.literal .text .literal.* .text.*)
+    *littlefs2/*(.literal .text .literal.* .text.*)
+    *newlib_syscalls_default/*(.literal .text .literal.* .text.*)
+    *spiffs_fs/*(.literal .text .literal.* .text.*)
+    *spiffs/*(.literal .text .literal.* .text.*)
     *syscalls.o(.literal .text .literal.* .text.*)
-    *vfs.a:*(.literal .text .literal.* .text.*)
+    *vfs/*(.literal .text .literal.* .text.*)
 
     /* part of the RIOT port that should run in IRAM */
-    *cpu.a:*(.literal .text .literal.* .text.*)
-    *esp_common.a:*(.literal .text .literal.* .text.*)
-    *periph.a:*(.literal .text .literal.* .text.*)
-    *mtd.a:**(.literal .text .literal.* .text.*)
+    *cpu/*(.literal .text .literal.* .text.*)
+    *esp_common/*(.literal .text .literal.* .text.*)
+    *periph/*(.literal .text .literal.* .text.*)
+    *mtd/**(.literal .text .literal.* .text.*)
 
     INCLUDE esp32.spiram.rom-functions-iram.ld
     _iram_text_end = ABSOLUTE(.);
