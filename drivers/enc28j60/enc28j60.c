@@ -21,12 +21,11 @@
 #include <errno.h>
 #include <string.h>
 
-#include "luid.h"
 #include "mutex.h"
 #include "xtimer.h"
 #include "assert.h"
 #include "net/ethernet.h"
-#include "net/eui48.h"
+#include "net/eui_provider.h"
 #include "net/netdev/eth.h"
 
 #include "enc28j60.h"
@@ -424,12 +423,11 @@ static int nd_init(netdev_t *netdev)
     cmd_wcr(dev, REG_B2_MABBIPG, 2, MABBIPG_FD);
     /* set non-back-to-back inter packet gap -> 0x12 is default */
     cmd_wcr(dev, REG_B2_MAIPGL, 2, MAIPGL_FD);
+
     /* set default MAC address */
-    uint8_t macbuf[ETHERNET_ADDR_LEN];
-    luid_get(macbuf, ETHERNET_ADDR_LEN);
-    eui48_set_local((eui48_t*)macbuf);      /* locally administered address */
-    eui48_clear_group((eui48_t*)macbuf);    /* unicast address */
-    mac_set(dev, macbuf);
+    eui48_t addr;
+    netdev_eui48_get(netdev, &addr);
+    mac_set(dev, addr.uint8);
 
     /* PHY configuration */
     cmd_w_phy(dev, REG_PHY_PHCON1, PHCON1_PDPXMD);
@@ -541,10 +539,12 @@ static const netdev_driver_t netdev_driver_enc28j60 = {
     .set = nd_set,
 };
 
-void enc28j60_setup(enc28j60_t *dev, const enc28j60_params_t *params)
+void enc28j60_setup(enc28j60_t *dev, const enc28j60_params_t *params, uint8_t index)
 {
     dev->netdev.driver = &netdev_driver_enc28j60;
     dev->p = *params;
     mutex_init(&dev->lock);
     dev->tx_time = 0;
+
+    netdev_register(&dev->netdev, NETDEV_ENC28J60, index);
 }
