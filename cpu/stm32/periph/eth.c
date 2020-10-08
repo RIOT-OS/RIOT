@@ -174,8 +174,8 @@ static void stm32_eth_get_addr(char *out)
 static void stm32_eth_set_addr(const uint8_t *addr)
 {
     ETH->MACA0HR &= 0xffff0000;
-    ETH->MACA0HR |= ((addr[5] << 8) | addr[4]);
-    ETH->MACA0LR = ((addr[3] << 24) | (addr[2] << 16) | (addr[1] << 8) | addr[0]);
+    ETH->MACA0HR |= (addr[5] << 8) | addr[4];
+    ETH->MACA0LR = (addr[3] << 24) | (addr[2] << 16) | (addr[1] << 8) | addr[0];
 }
 
 /** Initialization of the DMA descriptors to be used */
@@ -322,10 +322,11 @@ static int stm32_eth_init(netdev_t *netdev)
     ETH->DMAOMR |= (ETH_DMAOMR_RSF | ETH_DMAOMR_TSF | ETH_DMAOMR_OSF);
 
     /* configure DMA */
-    ETH->DMABMR = (ETH_DMABMR_DA | ETH_DMABMR_AAB | ETH_DMABMR_FB |
-                   ETH_DMABMR_RDP_32Beat | ETH_DMABMR_PBL_32Beat | ETH_DMABMR_EDE);
+    ETH->DMABMR = ETH_DMABMR_DA | ETH_DMABMR_AAB | ETH_DMABMR_FB
+                | ETH_DMABMR_RDP_32Beat | ETH_DMABMR_PBL_32Beat
+                | ETH_DMABMR_EDE;
 
-    if(eth_config.addr[0] != 0) {
+    if (eth_config.addr[0] != 0) {
         stm32_eth_set_addr(eth_config.addr);
     }
     else {
@@ -429,7 +430,8 @@ static int get_rx_frame_size(void)
             DEBUG("[stm32_eth] RX not completed (spurious interrupt?)\n");
             return -EAGAIN;
         }
-        DEBUG("[stm32_eth] get_rx_frame_size(): FS=%c, LS=%c, ES=%c, DE=%c, FL=%lu\n",
+        DEBUG("[stm32_eth] get_rx_frame_size(): "
+              "FS=%c, LS=%c, ES=%c, DE=%c, FL=%lu\n",
               (status & RX_DESC_STAT_FS) ? '1' : '0',
               (status & RX_DESC_STAT_LS) ? '1' : '0',
               (status & RX_DESC_STAT_ES) ? '1' : '0',
@@ -476,11 +478,12 @@ static void handle_lost_rx_irqs(void)
             break;
         }
         if (status & RX_DESC_STAT_LS) {
-            DEBUG("[stm32_eth] Lost RX IRQ, sending event to upper layer now\n");
+            DEBUG("[stm32_eth] Lost RX IRQ, sending event to upper layer\n");
             /* we use the ISR event for this, as the upper layer calls recv()
              * right away on an NETDEV_EVENT_RX_COMPLETE. Because there could be
              * potentially quite a lot of received frames in the queue, we might
-             * risk a stack overflow if we would send an NETDEV_EVENT_RX_COMPLETE
+             * risk a stack overflow if we would send an
+             * NETDEV_EVENT_RX_COMPLETE
              */
             netdev_trigger_event_isr(_netdev);
             break;
