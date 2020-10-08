@@ -74,7 +74,7 @@ def parse_cmsis(cpu_line):
             use_line = True
 
         # use a regexp to get the available IRQs
-        match = re.match(r"[ ]+([a-zA-Z0-9_]+_IRQn)[ ]+= \d+,", line)
+        match = re.match(r"[ ]+([a-zA-Z0-9_]+_IRQn)[ ]+= \d+", line)
 
         # Skip lines that don't match
         if match is None:
