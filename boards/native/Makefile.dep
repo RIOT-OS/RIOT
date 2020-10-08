@@ -6,7 +6,7 @@ ifneq (,$(filter mtd,$(USEMODULE)))
   USEMODULE += mtd_native
 endif
 
-ifneq (,$(filter can,$(USEMODULE)))
+ifneq (,$(filter periph_can,$(FEATURES_USED)))
   ifeq ($(OS),Linux)
     USEMODULE += can_linux
     CFLAGS += -DCAN_DLL_NUMOF=2
