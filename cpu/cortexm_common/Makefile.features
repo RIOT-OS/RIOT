@@ -19,16 +19,18 @@ ifeq ($(CPU_CORE),cortex-m0)
   CPU_ARCH := armv6m
 else ifeq ($(CPU_CORE),cortex-m0plus)
   CPU_ARCH := armv6m
+else ifeq ($(CPU_CORE),cortex-m23)
+  CPU_ARCH := armv8m
 else ifeq ($(CPU_CORE),cortex-m3)
   CPU_ARCH := armv7m
+else ifeq ($(CPU_CORE),cortex-m33)
+  CPU_ARCH := armv8m
 else ifeq ($(CPU_CORE),cortex-m4)
   CPU_ARCH := armv7m
 else ifeq ($(CPU_CORE),cortex-m4f)
   CPU_ARCH := armv7m
 else ifeq ($(CPU_CORE),cortex-m7)
   CPU_ARCH := armv7m
-else ifeq ($(CPU_CORE),cortex-m23)
-  CPU_ARCH := armv8m
 else
   $(error Unkwnown cortexm core: $(CPU_CORE))
 endif
