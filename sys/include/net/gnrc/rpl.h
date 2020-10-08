@@ -82,6 +82,48 @@
  *   CFLAGS += -DCONFIG_GNRC_RPL_WITHOUT_VALIDATION
  *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
+ * - This RPL implementation currently only supports storing mode.
+ *   That means, in order to have downwards routes to all nodes the
+ *   storage space within [@c gnrc_ipv6's Neighbor Information Base](@ref net_gnrc_ipv6_nib)
+ *   must be big enough to store information for each node.
+ *
+ *   For a random topology of n nodes, to ensure you can reach every node from the root,
+ *   set `CONFIG_GNRC_IPV6_NIB_NUMOF` == `CONFIG_GNRC_IPV6_NIB_OFFL_NUMOF` == n.
+ *
+ *   e.g. for n = 50 set
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   CFLAGS += -DCONFIG_GNRC_IPV6_NIB_NUMOF=50
+ *   CFLAGS += -DCONFIG_GNRC_IPV6_NIB_OFFL_NUMOF=50
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * - If you want to allow for alternative parents, increase the number of
+ *   default routers in the NIB.
+ *
+ *   e.g. for one alternative parent, set
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.mk}
+ *   CFLAGS += -DCONFIG_GNRC_IPV6_NIB_DEFAULT_ROUTER_NUMOF=2
+ *   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * TODO
+ * ------
+ *
+ * The GNRC RPL implementation only implements storing mode
+ * with OF0 ([RFC6552](https://tools.ietf.org/html/rfc6552)).
+ * The RPL routing header is parsed by the nodes when the [@c gnrc_rpl_srh](@ref net_gnrc_rpl_srh)
+ * module is used, but anything else
+ * for non-storing mode is missing.
+ * For interoperability with other RPL implementations, open task include:
+ *
+ * - IPv6 Hop-by-hop RPL option
+ *   (see [#7231](https://github.com/RIOT-OS/RIOT/pull/7231#issuecomment-651237343))
+ * - Metric based routing ([RFC6551](https://tools.ietf.org/html/rfc6551)
+ *   and [RFC6719](https://tools.ietf.org/html/rfc6719))
+ *   (see [14448](https://github.com/RIOT-OS/RIOT/pull/14448) and
+ *   [#14623](https://github.com/RIOT-OS/RIOT/pull/14623))
+ * - Non-Storing mode
+ * - DAG-Metric Container ([RFC6550#6.7.4](https://tools.ietf.org/html/rfc6550#section-6.7.4)
+ *   and [RFC6551](https://tools.ietf.org/html/rfc6551))
+ *
  * @{
  *
  * @file
