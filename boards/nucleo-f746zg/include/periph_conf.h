@@ -35,6 +35,7 @@
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
 #include "cfg_usb_otg_fs.h"
+#include "mii.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -219,7 +220,7 @@ static const spi_conf_t spi_config[] = {
 static const eth_conf_t eth_config = {
     .mode = RMII,
     .addr = { 0 },
-    .speed = ETH_SPEED_100TX_FD,
+    .speed = MII_BMCR_SPEED_100 | MII_BMCR_FULL_DPLX,
     .dma = 7,
     .dma_chan = 8,
     .phy_addr = 0x00,
