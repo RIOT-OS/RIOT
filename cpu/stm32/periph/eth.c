@@ -107,7 +107,6 @@ static uint8_t _link_state = LINK_STATE_DOWN;
 /**
  * @brief   Read or write a MII register
  *
- * @param[in]   addr    Which of the 32 possible PHY devices to access
  * @param[in]   reg     MII register to access
  * @param[in]   value   Value to write (ignored when @p write is `false`)
  * @param[in]   write   Whether to write (`true`) or read (`false`) to/from the
@@ -116,16 +115,16 @@ static uint8_t _link_state = LINK_STATE_DOWN;
  * @return  The value of the MII register accessed. (This should be equal to
  *          @p value, if @p write was `true`.)
  */
-static uint16_t _mii_reg_transfer(unsigned addr, unsigned reg, uint16_t value,
-                                  bool write)
+static uint16_t _mii_reg_transfer(unsigned reg, uint16_t value, bool write)
 {
     unsigned tmp;
+    const uint16_t phy_addr = eth_config.phy_addr;
 
     while (ETH->MACMIIAR & ETH_MACMIIAR_MB) {}
-    DEBUG("[stm32_eth] rw_phy %x (%x): %x\n", addr, reg, value);
+    DEBUG("[stm32_eth] rw_phy %x (%x): %x\n", (unsigned)phy_addr, reg, value);
 
     tmp = CLOCK_RANGE | ETH_MACMIIAR_MB
-        | (((addr & 0x1f) << 11) | ((reg & 0x1f) << 6));
+        | (((phy_addr & 0x1f) << 11) | ((reg & 0x1f) << 6));
 
     if (write) {
         tmp |= ETH_MACMIIAR_MW;
@@ -139,19 +138,19 @@ static uint16_t _mii_reg_transfer(unsigned addr, unsigned reg, uint16_t value,
     return ETH->MACMIIDR;
 }
 
-static inline int16_t _mii_reg_read(uint16_t addr, uint8_t reg)
+static inline int16_t _mii_reg_read(uint8_t reg)
 {
-    return _mii_reg_transfer(addr, reg, 0, false);
+    return _mii_reg_transfer(reg, 0, false);
 }
 
-static inline void _mii_reg_write(uint16_t addr, uint8_t reg, uint16_t value)
+static inline void _mii_reg_write(uint8_t reg, uint16_t value)
 {
-    _mii_reg_transfer(addr, reg, value, true);
+    _mii_reg_transfer(reg, value, true);
 }
 
 static inline bool _get_link_status(void)
 {
-    return (_mii_reg_read(0, PHY_BSMR) & BSMR_LINK_STATUS);
+    return (_mii_reg_read(PHY_BSMR) & BSMR_LINK_STATUS);
 }
 
 static void stm32_eth_get_addr(char *out)
@@ -306,7 +305,7 @@ static int stm32_eth_init(netdev_t *netdev)
 
     /* configure the PHY (standard for all PHY's) */
     /* if there's no PHY, this has no effect */
-    _mii_reg_write(eth_config.phy_addr, PHY_BMCR, BMCR_RESET);
+    _mii_reg_write(PHY_BMCR, BMCR_RESET);
 
     /* speed from conf */
     ETH->MACCR |= (ETH_MACCR_ROD | ETH_MACCR_IPCO | ETH_MACCR_APCS |
@@ -352,7 +351,7 @@ static int stm32_eth_init(netdev_t *netdev)
 
     /* configure speed, do it at the end so the PHY had time to
      * reset */
-    _mii_reg_write(eth_config.phy_addr, PHY_BMCR, eth_config.speed);
+    _mii_reg_write(PHY_BMCR, eth_config.speed);
 
     return 0;
 }
