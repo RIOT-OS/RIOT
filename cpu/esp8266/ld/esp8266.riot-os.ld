@@ -114,8 +114,8 @@ SECTIONS
     /* TODO put only necessary .rodata to dram */
     /* *(.rodata .rodata.*) */
     *libc.a:*.o(.rodata.* .rodata)
-    *core.a:*(.rodata.* .rodata)
-    *cpu.a:*(.rodata .rodata.*)
+    *core/*(.rodata.* .rodata)
+    *cpu/*(.rodata .rodata.*)
     *libpp.a:(.rodata.* .rodata)
     *liblog.a:(.rodata.* .rodata)
 
@@ -222,7 +222,7 @@ SECTIONS
     *(.literal .text)
     *core.a:*(.literal .text .literal.* .text.*)
     */
-    *gdbstub.a:*(.literal .text .literal.* .text.*)
+    *gdbstub/*(.literal .text .literal.* .text.*)
     *(.stub .gnu.warning .gnu.linkonce.literal.* .gnu.linkonce.t.*.literal .gnu.linkonce.t.*)
     /* RIOT-OS compiled source files that use the .iram1.* section names for IRAM
        functions, etc. */
@@ -230,16 +230,16 @@ SECTIONS
 
     /* SDK libraries that expect their .text or .data sections to link to iram */
     /* TODO *libcore.a:(.bss .data .bss.* .data.* COMMON) */
-    *esp_idf_spi_flash.a:spi_flash_raw.o(.literal .text .literal.* .text.*)
-    *esp_idf_esp8266.a:ets_printf.o(.literal .text .literal.* .text.*)
+    *esp_idf_spi_flash/spi_flash_raw.o(.literal .text .literal.* .text.*)
+    *esp_idf_esp8266/ets_printf.o(.literal .text .literal.* .text.*)
     /*
     *cpu.a:*.o(.literal .text .literal.* .text.*)
     */
-    *core.a:sched.o(.literal .text .literal.* .text.*)
-    *esp_wifi.a:*(.literal .text .literal.* .text.*)
-    *freertos.a:*(.literal .text .literal.* .text.*)
-    *periph.a:*(.literal .text .literal.* .text.*)
-    *xtimer.a:*(.literal .text .literal.* .text.*)
+    *core/sched.o(.literal .text .literal.* .text.*)
+    *esp_wifi/*(.literal .text .literal.* .text.*)
+    *freertos/*(.literal .text .literal.* .text.*)
+    *periph/*(.literal .text .literal.* .text.*)
+    *xtimer/*(.literal .text .literal.* .text.*)
 
     *libhal.a:clock.o(.literal .text .literal.* .text.*)
     *libhal.a:int_asm--set_intclear.o(.literal .text .literal.* .text.*)
@@ -254,7 +254,7 @@ SECTIONS
     *libphy.a:phy_sleep.o(.literal .text .literal.* .text.*)
 
     /* Xtensa basic functionality written in assembler should be placed in iram */
-    *xtensa.a:*(.literal .text .literal.* .text.*)
+    *xtensa/*(.literal .text .literal.* .text.*)
 
     /* libgcc functions required for debugging have to be in IRAM */
     *libgcc.a:unwind-dw2.o(.literal .text .literal.* .text.*)
@@ -286,7 +286,7 @@ SECTIONS
     *libc.a:*fputwc.o(.literal .text .literal.* .text.*)
     */
 
-    enc28j60.a:*(.literal .text .literal.* .text.*)
+    *enc28j60/*(.literal .text .literal.* .text.*)
 
     *(.fini.literal)
     *(.fini)
