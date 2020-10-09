@@ -644,7 +644,7 @@ endif
 ..compiler-check:
 	$(call check_cmd,$(CC),Compiler)
 
-..build-message:
+..build-message: $(if $(SHOULD_RUN_KCONFIG), check-kconfig-errors)
 	@$(COLOR_ECHO) '$(COLOR_GREEN)Building application "$(APPLICATION)" for "$(BOARD)" with MCU "$(MCU)".$(COLOR_RESET)'
 	@$(COLOR_ECHO)
 

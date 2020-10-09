@@ -168,4 +168,19 @@ $(KCONFIG_GENERATED_AUTOCONF_HEADER_C): $(KCONFIG_OUT_CONFIG) $(GENERATED_DIR_DE
 # Try to load the list of Kconfig files used
 -include $(KCONFIG_OUT_DEP)
 
+# capture all ERROR_ prefixed Kconfig symbols
+_KCONFIG_ERROR_VARS = $(filter CONFIG_ERROR_%,$(.VARIABLES))
+_KCONFIG_ERRORS = $(foreach v,$(_KCONFIG_ERROR_VARS),$($(v)))
+
+# this checks that no Kconfig error symbols are set. These symbols are used
+# to indicate invalid conditions
+check-kconfig-errors: $(KCONFIG_OUT_CONFIG) $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
+ifneq (,$(_KCONFIG_ERRORS))
+	@$(COLOR_ECHO) "$(COLOR_RED) !! There are ERRORS in the configuration !! $(COLOR_RESET)"
+	@for err in $(_KCONFIG_ERRORS); do \
+	  echo "- $$err"; \
+	done
+	@false
+endif
+
 endif
