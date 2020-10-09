@@ -5,43 +5,11 @@
 # directory for more details.
 #
 
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
 # CPU lines
-config CPU_LINE_STM32L4A6XX
-    bool
-    select CPU_FAM_L4
-
-config CPU_LINE_STM32L4P5XX
-    bool
-    select CPU_FAM_L4
-
-config CPU_LINE_STM32L4Q5XX
-    bool
-    select CPU_FAM_L4
-
-config CPU_LINE_STM32L4R5XX
-    bool
-    select CPU_FAM_L4
-
-config CPU_LINE_STM32L4R7XX
-    bool
-    select CPU_FAM_L4
-
-config CPU_LINE_STM32L4R9XX
-    bool
-    select CPU_FAM_L4
-
-config CPU_LINE_STM32L4S5XX
-    bool
-    select CPU_FAM_L4
-
-config CPU_LINE_STM32L4S7XX
-    bool
-    select CPU_FAM_L4
-
-config CPU_LINE_STM32L4S9XX
-    bool
-    select CPU_FAM_L4
-
 config CPU_LINE_STM32L412XX
     bool
     select CPU_FAM_L4
@@ -103,5 +71,41 @@ config CPU_LINE_STM32L486XX
     select CPU_FAM_L4
 
 config CPU_LINE_STM32L496XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4A6XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4P5XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4Q5XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4R5XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4R7XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4R9XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4S5XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4S7XX
+    bool
+    select CPU_FAM_L4
+
+config CPU_LINE_STM32L4S9XX
     bool
     select CPU_FAM_L4

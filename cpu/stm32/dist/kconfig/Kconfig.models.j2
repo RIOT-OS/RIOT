@@ -9,23 +9,15 @@
 # script in cpu/stm32/dist/kconfig/gen_kconfig.py
 # See cpu/stm32/dist/kconfig/README.md for details
 
-# CPU lines
-config CPU_LINE_STM32WB30XX
+# CPU models
+{%- for item in models %}
+config CPU_MODEL_{{ item.model }}
     bool
-    select CPU_FAM_WB
+    select {{ item.line | upper }}
+{% endfor %}
 
-config CPU_LINE_STM32WB35XX
-    bool
-    select CPU_FAM_WB
-
-config CPU_LINE_STM32WB50XX
-    bool
-    select CPU_FAM_WB
-
-config CPU_LINE_STM32WB55XX
-    bool
-    select CPU_FAM_WB
-
-config CPU_LINE_STM32WB5MXX
-    bool
-    select CPU_FAM_WB
+# Configure CPU model
+config CPU_MODEL
+{%- for item in models %}
+    default "{{ item.model | lower }}" if CPU_MODEL_{{ item.model }}
+{%- endfor %}

@@ -10,22 +10,8 @@
 # See cpu/stm32/dist/kconfig/README.md for details
 
 # CPU lines
-config CPU_LINE_STM32WB30XX
+{%- for line in lines %}
+config CPU_LINE_{{ line }}
     bool
-    select CPU_FAM_WB
-
-config CPU_LINE_STM32WB35XX
-    bool
-    select CPU_FAM_WB
-
-config CPU_LINE_STM32WB50XX
-    bool
-    select CPU_FAM_WB
-
-config CPU_LINE_STM32WB55XX
-    bool
-    select CPU_FAM_WB
-
-config CPU_LINE_STM32WB5MXX
-    bool
-    select CPU_FAM_WB
+    select CPU_FAM_{{ fam | upper }}
+{% endfor -%}
