@@ -96,6 +96,30 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Bits in the MII Extended Mode Advertisement Register
+ * @{
+ */
+#define MII_ADVERTISE_100_F BIT8    /**< Advertise 100BASE-T, full duplex */
+#define MII_ADVERTISE_100_H BIT7    /**< Advertise 100BASE-T, half duplex */
+#define MII_ADVERTISE_10_F  BIT6    /**< Advertise 10BASE-T, full duplex */
+#define MII_ADVERTISE_10_H  BIT5    /**< Advertise 10BASE-T, half duplex */
+#define MII_ADVERTISE_100   (BIT7 | BIT8)   /**< Advertise 100BASE-T */
+#define MII_ADVERTISE_10    (BIT5 | BIT6)   /**< Advertise 10BASE-T */
+/** @} */
+
+/**
+ * @name    Bits in the MII Extended Mode Advertisement Register
+ * @{
+ */
+#define MII_LPA_100_F       BIT8    /**< Partner can 100BASE-T, full duplex */
+#define MII_LPA_100_H       BIT7    /**< Partner can 100BASE-T, half duplex */
+#define MII_LPA_10_F        BIT6    /**< Partner can 10BASE-T, full duplex */
+#define MII_LPA_10_H        BIT5    /**< Partner can 10BASE-T, half duplex */
+#define MII_LPA_100         (BIT7 | BIT8)   /**< Partner can 100BASE-T */
+#define MII_LPA_10          (BIT5 | BIT6)   /**< Partner can 10BASE-T */
+/** @} */
+
+/**
  * @brief   Check if an Ethernet PHY supports 100 Mbps at full duplex
  *
  * @param[in]   bmsr    Value of the MII basic mode status register
