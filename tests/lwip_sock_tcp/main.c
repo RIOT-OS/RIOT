@@ -965,7 +965,6 @@ int main(void)
     code |= (1 << 6);
 #endif
     printf("code 0x%02x\n", code);
-    xtimer_init();
     _net_init();
     expect(0 < thread_create(_client_stack, sizeof(_client_stack),
                              THREAD_PRIORITY_MAIN - 1, THREAD_CREATE_STACKTEST,
