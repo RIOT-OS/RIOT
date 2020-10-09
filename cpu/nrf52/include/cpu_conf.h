@@ -125,7 +125,6 @@ extern "C" {
 #endif /* SOFTDEVICE_PRESENT */
 /** @} */
 
-
 #ifdef CPU_MODEL_NRF52840XXAA
 /**
  * @name    OpenWSN timing constants
@@ -137,8 +136,9 @@ extern "C" {
 #define PORT_maxRxAckPrepare    (400/PORT_US_PER_TICK)
 #define PORT_maxRxDataPrepare   (400/PORT_US_PER_TICK)
 #define PORT_maxTxAckPrepare    (400/PORT_US_PER_TICK)
-/* Measured 40us @32.768Hz */
-#define PORT_delayTx            (40/PORT_US_PER_TICK)
+/* Measured 220us */
+#define PORT_delayTx            (300/PORT_US_PER_TICK)
+#define PORT_delayRx            (150/PORT_US_PER_TICK)
 /** @} */
 #endif
 
