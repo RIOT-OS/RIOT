@@ -212,7 +212,7 @@ static const eth_conf_t eth_config = {
     .speed = ETH_SPEED_100TX_FD,
     .dma = 7,
     .dma_chan = 8,
-    .phy_addr = 0x01,
+    .phy_addr = 0x00,
     .pins = {
         GPIO_PIN(PORT_G, 13),
         GPIO_PIN(PORT_B, 13),
