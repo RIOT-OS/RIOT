@@ -52,20 +52,26 @@ static evtimer_t _tcp_mbox_timer;
 static void _sched_mbox(evtimer_mbox_event_t *event, uint32_t offset,
                         uint16_t type, mbox_t *mbox)
 {
+    TCP_DEBUG_ENTER;
     event->event.offset = offset;
     event->msg.type = type;
     evtimer_add_mbox(&_tcp_mbox_timer, event, mbox);
+    TCP_DEBUG_LEAVE;
 }
 
 static void _sched_connection_timeout(evtimer_mbox_event_t *event, mbox_t *mbox)
 {
+    TCP_DEBUG_ENTER;
     _sched_mbox(event, CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION_MS,
                 MSG_TYPE_CONNECTION_TIMEOUT, mbox);
+    TCP_DEBUG_LEAVE;
 }
 
 static void _unsched_mbox(evtimer_mbox_event_t *event)
 {
+    TCP_DEBUG_ENTER;
     evtimer_del(&_tcp_mbox_timer, (evtimer_event_t *)event);
+    TCP_DEBUG_LEAVE;
 }
 
 /**
@@ -88,6 +94,7 @@ static void _unsched_mbox(evtimer_mbox_event_t *event)
 static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
                           const uint8_t *local_addr, uint16_t local_port, int passive)
 {
+    TCP_DEBUG_ENTER;
     msg_t msg;
     msg_t msg_queue[TCP_MSG_QUEUE_SIZE];
     mbox_t mbox = MBOX_INIT(msg_queue, TCP_MSG_QUEUE_SIZE);
@@ -99,6 +106,8 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
     /* TCB is already connected: Return -EISCONN */
     if (tcb->state != FSM_STATE_CLOSED) {
         mutex_unlock(&(tcb->function_lock));
+        TCP_DEBUG_ERROR("-EISCONN: TCB already connected.");
+        TCP_DEBUG_LEAVE;
         return -EISCONN;
     }
 
@@ -114,7 +123,8 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
         if (local_addr && tcb->address_family == AF_INET6) {
             /* Store given address in TCB */
             if (memcpy(tcb->local_addr, local_addr, sizeof(tcb->local_addr)) == NULL) {
-                DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : Invalid peer addr\n");
+                TCP_DEBUG_ERROR("-EINVAL: Invalid peer address.");
+                TCP_DEBUG_LEAVE;
                 return -EINVAL;
             }
 
@@ -140,7 +150,8 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
 
             /* Store Address information in TCB */
             if (memcpy(tcb->peer_addr, remote->addr.ipv6, sizeof(tcb->peer_addr)) == NULL) {
-                DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : Invalid peer addr\n");
+                TCP_DEBUG_ERROR("-EINVAL: Invalid peer address.");
+                TCP_DEBUG_LEAVE;
                 return -EINVAL;
             }
             tcb->ll_iface = remote->netif;
@@ -158,10 +169,10 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
     /* Call FSM with event: CALL_OPEN */
     ret = _fsm(tcb, FSM_EVENT_CALL_OPEN, NULL, NULL, 0);
     if (ret == -ENOMEM) {
-        DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : Out of receive buffers.\n");
+        TCP_DEBUG_ERROR("-ENOMEM: All receive buffers are in use.");
     }
     else if (ret == -EADDRINUSE) {
-        DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : local_port is already in use.\n");
+        TCP_DEBUG_ERROR("-EADDRINUSE: local_port is already in use.");
     }
 
     /* Wait until a connection was established or closed */
@@ -170,7 +181,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
         mbox_get(&mbox, &msg);
         switch (msg.type) {
             case MSG_TYPE_NOTIFY_USER:
-                DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : MSG_TYPE_NOTIFY_USER\n");
+                TCP_DEBUG_INFO("Received MSG_TYPE_NOTIFY_USER.");
 
                 /* Setup a timeout to be able to revert back to LISTEN state, in case the
                  * send SYN+ACK we received upon entering SYN_RCVD is never acknowledged
@@ -182,7 +193,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
                 break;
 
             case MSG_TYPE_CONNECTION_TIMEOUT:
-                DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : CONNECTION_TIMEOUT\n");
+                TCP_DEBUG_INFO("Received MSG_TYPE_CONNECTION_TIMEOUT.");
 
                 /* The connection establishment attempt timed out:
                  * 1) Active connections return -ETIMEOUT.
@@ -194,12 +205,13 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
                 }
                 else {
                     _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                    TCP_DEBUG_ERROR("-ETIMEDOUT: Connection timed out.");
                     ret = -ETIMEDOUT;
                 }
                 break;
 
             default:
-                DEBUG("gnrc_tcp.c : _gnrc_tcp_open() : other message type\n");
+                TCP_DEBUG_ERROR("Received unexpected message.");
         }
     }
 
@@ -207,9 +219,11 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
     _fsm_set_mbox(tcb, NULL);
     _unsched_mbox(&tcb->event_misc);
     if (tcb->state == FSM_STATE_CLOSED && ret == 0) {
+        TCP_DEBUG_ERROR("-ECONNREFUSED: Connection refused by peer.");
         ret = -ECONNREFUSED;
     }
     mutex_unlock(&(tcb->function_lock));
+    TCP_DEBUG_LEAVE;
     return ret;
 }
 
@@ -217,8 +231,11 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
 int gnrc_tcp_ep_init(gnrc_tcp_ep_t *ep, int family, const uint8_t *addr, size_t addr_size,
                      uint16_t port, uint16_t netif)
 {
+    TCP_DEBUG_ENTER;
 #ifdef MODULE_GNRC_IPV6
     if (family != AF_INET6) {
+        TCP_DEBUG_ERROR("-EAFNOSUPPORT: Parameter family is not AF_INET6.")
+        TCP_DEBUG_LEAVE;
         return -EAFNOSUPPORT;
     }
 
@@ -229,23 +246,29 @@ int gnrc_tcp_ep_init(gnrc_tcp_ep_t *ep, int family, const uint8_t *addr, size_t 
         memcpy(ep->addr.ipv6, addr, sizeof(ipv6_addr_t));
     }
     else {
+        TCP_DEBUG_ERROR("-EINVAL: Parameter addr is invalid.")
+        TCP_DEBUG_LEAVE;
         return -EINVAL;
     }
 #else
     /* Suppress Compiler Warnings */
     (void) addr;
     (void) addr_size;
+    TCP_DEBUG_ERROR("-EAFNOSUPPORT: No network layer configured.")
+    TCP_DEBUG_LEAVE;
     return -EAFNOSUPPORT;
 #endif
 
     ep->family = family;
     ep->port = port;
     ep->netif = netif;
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
 int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
 {
+    TCP_DEBUG_ENTER;
     assert(str);
 
     unsigned port = 0;
@@ -257,10 +280,14 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
 
     /* 1) Ensure that str contains a single pair of brackets */
     if (!addr_begin || !addr_end || strchr(addr_begin + 1, '[') || strchr(addr_end + 1, ']')) {
+        TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
+        TCP_DEBUG_LEAVE;
         return -EINVAL;
     }
     /* 2) Ensure that the first character is the opening bracket */
     else if (addr_begin != str) {
+        TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
+        TCP_DEBUG_LEAVE;
         return -EINVAL;
     }
 
@@ -269,12 +296,16 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
     if (port_begin) {
         /* 3.1) Ensure that there are characters left to parse after ':'. */
         if (*(++port_begin) == '\0') {
+            TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
+            TCP_DEBUG_LEAVE;
             return -EINVAL;
         }
 
         /* 3.2) Ensure that port is a number (atol, does not report errors) */
         for (char *ptr = port_begin; *ptr; ++ptr) {
             if ((*ptr < '0') || ('9' < *ptr)) {
+                TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
+                TCP_DEBUG_LEAVE;
                 return -EINVAL;
             }
         }
@@ -282,6 +313,8 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
         /* 3.3) Read and verify that given number port is within range */
         port = atol(port_begin);
         if (port > 0xFFFF) {
+            TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
+            TCP_DEBUG_LEAVE;
             return -EINVAL;
         }
     }
@@ -291,12 +324,16 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
     if (if_begin) {
         /* 4.1) Ensure that the identifier is not empty and within brackets. */
         if (addr_end <= (++if_begin)) {
+            TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
+            TCP_DEBUG_LEAVE;
             return -EINVAL;
         }
 
         /* 4.2) Ensure that the identifier is a number (atol, does not report errors) */
         for (char *ptr = if_begin; ptr != addr_end; ++ptr) {
             if ((*ptr < '0') || ('9' < *ptr)) {
+                TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
+                TCP_DEBUG_LEAVE;
                 return -EINVAL;
             }
         }
@@ -320,11 +357,15 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
         tmp[len] = '\0';
     }
     else {
+        TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
+        TCP_DEBUG_LEAVE;
         return -EINVAL;
     }
 
     /* 5.2) Try to read address into endpoint. */
     if (ipv6_addr_from_str((ipv6_addr_t *) ep->addr.ipv6, tmp) == NULL) {
+        TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
+        TCP_DEBUG_LEAVE;
         return -EINVAL;
     }
     ep->family = AF_INET6;
@@ -332,16 +373,20 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
     /* Suppress Compiler Warnings */
     (void) port;
     (void) netif;
+    TCP_DEBUG_ERROR("-EINVAL: Invalid address string.");
+    TCP_DEBUG_LEAVE;
     return -EINVAL;
 #endif
 
     ep->port = (uint16_t) port;
     ep->netif = (uint16_t) netif;
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
 int gnrc_tcp_init(void)
 {
+    TCP_DEBUG_ENTER;
     /* Initialize TCB list */
     _rcvbuf_init();
 
@@ -349,26 +394,31 @@ int gnrc_tcp_init(void)
     evtimer_init_mbox(&_tcp_mbox_timer);
 
     /* Start TCP processing thread */
-    return _gnrc_tcp_event_loop_init();
+    kernel_pid_t pid = _gnrc_tcp_event_loop_init();
+    TCP_DEBUG_LEAVE;
+    return pid;
 }
 
 void gnrc_tcp_tcb_init(gnrc_tcp_tcb_t *tcb)
 {
+    TCP_DEBUG_ENTER;
     memset(tcb, 0, sizeof(gnrc_tcp_tcb_t));
 #ifdef MODULE_GNRC_IPV6
     tcb->address_family = AF_INET6;
 #else
-    DEBUG("gnrc_tcp.c : gnrc_tcp_tcb_init() : Address unspec, add netlayer module to makefile\n");
+    TCP_DEBUG_ERROR("Missing network layer. Add module to makefile.");
 #endif
     tcb->rtt_var = RTO_UNINITIALIZED;
     tcb->srtt = RTO_UNINITIALIZED;
     tcb->rto = RTO_UNINITIALIZED;
     mutex_init(&(tcb->fsm_lock));
     mutex_init(&(tcb->function_lock));
+    TCP_DEBUG_LEAVE;
 }
 
 int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote, uint16_t local_port)
 {
+    TCP_DEBUG_ENTER;
     assert(tcb != NULL);
     assert(remote != NULL);
     assert(remote->port != PORT_UNSPEC);
@@ -376,23 +426,32 @@ int gnrc_tcp_open_active(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote, uint1
     /* Check if given AF-Family in remote is supported */
 #ifdef MODULE_GNRC_IPV6
     if (remote->family != AF_INET6) {
+        TCP_DEBUG_ERROR("-EAFNOSUPPORT: remote AF-Family not supported.");
+        TCP_DEBUG_LEAVE;
         return -EAFNOSUPPORT;
     }
 #else
+    TCP_DEBUG_ERROR("-EAFNOSUPPORT: AF-Family not supported.");
+    TCP_DEBUG_LEAVE;
     return -EAFNOSUPPORT;
 #endif
 
     /* Check if AF-Family for target address matches internally used AF-Family */
     if (remote->family != tcb->address_family) {
+        TCP_DEBUG_ERROR("-EINVAL: local and remote AF-Family don't match.");
+        TCP_DEBUG_LEAVE;
         return -EINVAL;
     }
 
     /* Proceed with connection opening */
-    return _gnrc_tcp_open(tcb, remote, NULL, local_port, 0);
+    int res = _gnrc_tcp_open(tcb, remote, NULL, local_port, 0);
+    TCP_DEBUG_LEAVE;
+    return res;
 }
 
 int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *local)
 {
+    TCP_DEBUG_ENTER;
     assert(tcb != NULL);
     assert(local != NULL);
     assert(local->port != PORT_UNSPEC);
@@ -400,17 +459,25 @@ int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *local)
     /* Check if given AF-Family in local is supported */
 #ifdef MODULE_GNRC_IPV6
     if (local->family != AF_INET6) {
+        TCP_DEBUG_ERROR("-EAFNOSUPPORT: AF-Family not supported.");
+        TCP_DEBUG_LEAVE;
         return -EAFNOSUPPORT;
     }
 
     /* Check if AF-Family matches internally used AF-Family */
     if (local->family != tcb->address_family) {
+        TCP_DEBUG_ERROR("-EINVAL: AF-Family doesn't match.");
+        TCP_DEBUG_LEAVE;
         return -EINVAL;
     }
 
     /* Proceed with connection opening */
-    return _gnrc_tcp_open(tcb, NULL, local->addr.ipv6, local->port, 1);
+    int res = _gnrc_tcp_open(tcb, NULL, local->addr.ipv6, local->port, 1);
+    TCP_DEBUG_LEAVE;
+    return res;
 #else
+    TCP_DEBUG_ERROR("-EAFNOSUPPORT: AF-Family not supported.");
+    TCP_DEBUG_LEAVE;
     return -EAFNOSUPPORT;
 #endif
 }
@@ -418,6 +485,7 @@ int gnrc_tcp_open_passive(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *local)
 ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
                       const uint32_t timeout_duration_ms)
 {
+    TCP_DEBUG_ENTER;
     assert(tcb != NULL);
     assert(data != NULL);
 
@@ -436,6 +504,8 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     /* Check if connection is in a valid state */
     if (tcb->state != FSM_STATE_ESTABLISHED && tcb->state != FSM_STATE_CLOSE_WAIT) {
         mutex_unlock(&(tcb->function_lock));
+        TCP_DEBUG_ERROR("-ENOTCONN: TCB is not connected.");
+        TCP_DEBUG_LEAVE;
         return -ENOTCONN;
     }
 
@@ -454,6 +524,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     while (ret == 0 || tcb->pkt_retransmit != NULL) {
         /* Check if the connections state is closed. If so, a reset was received */
         if (tcb->state == FSM_STATE_CLOSED) {
+            TCP_DEBUG_ERROR("-ECONNRESET: Connection was reset by peer.");
             ret = -ECONNRESET;
             break;
         }
@@ -480,19 +551,21 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
         mbox_get(&mbox, &msg);
         switch (msg.type) {
             case MSG_TYPE_CONNECTION_TIMEOUT:
-                DEBUG("gnrc_tcp.c : gnrc_tcp_send() : CONNECTION_TIMEOUT\n");
+                TCP_DEBUG_INFO("Received MSG_TYPE_CONNECTION_TIMEOUT.");
                 _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                TCP_DEBUG_ERROR("-ECONNABORTED: Connection timed out.");
                 ret = -ECONNABORTED;
                 break;
 
             case MSG_TYPE_USER_SPEC_TIMEOUT:
-                DEBUG("gnrc_tcp.c : gnrc_tcp_send() : USER_SPEC_TIMEOUT\n");
+                TCP_DEBUG_INFO("Received MSG_TYPE_USER_SPEC_TIMEOUT.");
                 _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
+                TCP_DEBUG_ERROR("-ETIMEDOUT: User specified timeout expired.");
                 ret = -ETIMEDOUT;
                 break;
 
             case MSG_TYPE_PROBE_TIMEOUT:
-                DEBUG("gnrc_tcp.c : gnrc_tcp_send() : PROBE_TIMEOUT\n");
+                TCP_DEBUG_INFO("Received MSG_TYPE_PROBE_TIMEOUT.");
                 /* Send probe */
                 _fsm(tcb, FSM_EVENT_SEND_PROBE, NULL, NULL, 0);
                 probe_timeout_duration_ms += probe_timeout_duration_ms;
@@ -507,7 +580,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
                 break;
 
             case MSG_TYPE_NOTIFY_USER:
-                DEBUG("gnrc_tcp.c : gnrc_tcp_send() : NOTIFY_USER\n");
+                TCP_DEBUG_INFO("Received MSG_TYPE_NOTIFY_USER.");
 
                 /* Connection is alive: Reset Connection Timeout */
                 _unsched_mbox(&tcb->event_misc);
@@ -521,7 +594,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
                 break;
 
             default:
-                DEBUG("gnrc_tcp.c : gnrc_tcp_send() : other message type\n");
+                TCP_DEBUG_ERROR("Received unexpected message.");
         }
     }
 
@@ -531,12 +604,14 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     _unsched_mbox(&event_probe_timeout);
     _unsched_mbox(&event_user_timeout);
     mutex_unlock(&(tcb->function_lock));
+    TCP_DEBUG_LEAVE;
     return ret;
 }
 
 ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
                       const uint32_t timeout_duration_ms)
 {
+    TCP_DEBUG_ENTER;
     assert(tcb != NULL);
     assert(data != NULL);
 
@@ -553,6 +628,8 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     if (tcb->state != FSM_STATE_ESTABLISHED && tcb->state != FSM_STATE_FIN_WAIT_1 &&
         tcb->state != FSM_STATE_FIN_WAIT_2 && tcb->state != FSM_STATE_CLOSE_WAIT) {
         mutex_unlock(&(tcb->function_lock));
+        TCP_DEBUG_ERROR("-ENOTCONN: TCB is not connected.");
+        TCP_DEBUG_LEAVE;
         return -ENOTCONN;
     }
 
@@ -561,6 +638,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     if (tcb->state == FSM_STATE_CLOSE_WAIT) {
         ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
         mutex_unlock(&(tcb->function_lock));
+        TCP_DEBUG_LEAVE;
         return ret;
     }
 
@@ -568,9 +646,11 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     if (timeout_duration_ms == 0) {
         ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
         if (ret == 0) {
+            TCP_DEBUG_ERROR("-EAGAIN: Not data available, try later again.");
             ret = -EAGAIN;
         }
         mutex_unlock(&(tcb->function_lock));
+        TCP_DEBUG_LEAVE;
         return ret;
     }
 
@@ -589,6 +669,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     while (ret == 0) {
         /* Check if the connections state is closed. If so, a reset was received */
         if (tcb->state == FSM_STATE_CLOSED) {
+            TCP_DEBUG_ERROR("-ECONNRESET: Connection was reset by peer.");
             ret = -ECONNRESET;
             break;
         }
@@ -606,23 +687,25 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
             mbox_get(&mbox, &msg);
             switch (msg.type) {
                 case MSG_TYPE_CONNECTION_TIMEOUT:
-                    DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : CONNECTION_TIMEOUT\n");
+                    TCP_DEBUG_INFO("Received MSG_TYPE_CONNECTION_TIMEOUT.");
                     _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                    TCP_DEBUG_ERROR("-ECONNABORTED: Connection timed out.");
                     ret = -ECONNABORTED;
                     break;
 
                 case MSG_TYPE_USER_SPEC_TIMEOUT:
-                    DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : USER_SPEC_TIMEOUT\n");
+                    TCP_DEBUG_INFO("Received MSG_TYPE_USER_SPEC_TIMEOUT.");
                     _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
+                    TCP_DEBUG_ERROR("-ETIMEDOUT: User specified timeout expired.");
                     ret = -ETIMEDOUT;
                     break;
 
                 case MSG_TYPE_NOTIFY_USER:
-                    DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : NOTIFY_USER\n");
+                    TCP_DEBUG_INFO("Received MSG_TYPE_NOTIFY_USER.");
                     break;
 
                 default:
-                    DEBUG("gnrc_tcp.c : gnrc_tcp_recv() : other message type\n");
+                    TCP_DEBUG_ERROR("Received unexpected message.");
             }
         }
     }
@@ -632,11 +715,13 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     _unsched_mbox(&tcb->event_misc);
     _unsched_mbox(&event_user_timeout);
     mutex_unlock(&(tcb->function_lock));
+    TCP_DEBUG_LEAVE;
     return ret;
 }
 
 void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
 {
+    TCP_DEBUG_ENTER;
     assert(tcb != NULL);
 
     msg_t msg;
@@ -649,6 +734,7 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     /* Return if connection is closed */
     if (tcb->state == FSM_STATE_CLOSED) {
         mutex_unlock(&(tcb->function_lock));
+        TCP_DEBUG_LEAVE;
         return;
     }
 
@@ -666,16 +752,16 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
         mbox_get(&mbox, &msg);
         switch (msg.type) {
             case MSG_TYPE_CONNECTION_TIMEOUT:
-                DEBUG("gnrc_tcp.c : gnrc_tcp_close() : CONNECTION_TIMEOUT\n");
+                TCP_DEBUG_INFO("Received MSG_TYPE_CONNECTION_TIMEOUT.");
                 _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
                 break;
 
             case MSG_TYPE_NOTIFY_USER:
-                DEBUG("gnrc_tcp.c : gnrc_tcp_close() : NOTIFY_USER\n");
+                TCP_DEBUG_INFO("Received MSG_TYPE_NOTIFY_USER.");
                 break;
 
             default:
-                DEBUG("gnrc_tcp.c : gnrc_tcp_close() : other message type\n");
+                TCP_DEBUG_ERROR("Received unexpected message.");
         }
     }
 
@@ -683,10 +769,12 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     _fsm_set_mbox(tcb, NULL);
     _unsched_mbox(&tcb->event_misc);
     mutex_unlock(&(tcb->function_lock));
+    TCP_DEBUG_LEAVE;
 }
 
 void gnrc_tcp_abort(gnrc_tcp_tcb_t *tcb)
 {
+    TCP_DEBUG_ENTER;
     assert(tcb != NULL);
 
     /* Lock the TCB for this function call */
@@ -696,36 +784,48 @@ void gnrc_tcp_abort(gnrc_tcp_tcb_t *tcb)
         _fsm(tcb, FSM_EVENT_CALL_ABORT, NULL, NULL, 0);
     }
     mutex_unlock(&(tcb->function_lock));
+    TCP_DEBUG_LEAVE;
 }
 
 int gnrc_tcp_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_hdr)
 {
+    TCP_DEBUG_ENTER;
     uint16_t csum;
 
     if ((hdr == NULL) || (pseudo_hdr == NULL)) {
+        TCP_DEBUG_ERROR("-EFAULT: hdr or pseudo_hdr is NULL.");
+        TCP_DEBUG_LEAVE;
         return -EFAULT;
     }
     if (hdr->type != GNRC_NETTYPE_TCP) {
+        TCP_DEBUG_ERROR("-EBADMSG: Variable hdr is no TCP header.");
+        TCP_DEBUG_LEAVE;
         return -EBADMSG;
     }
 
     csum = _pkt_calc_csum(hdr, pseudo_hdr, hdr->next);
     if (csum == 0) {
+        TCP_DEBUG_ERROR("-ENOENT");
+        TCP_DEBUG_LEAVE;
         return -ENOENT;
     }
     ((tcp_hdr_t *)hdr->data)->checksum = byteorder_htons(csum);
+
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
 gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16_t dst)
 {
+    TCP_DEBUG_ENTER;
     gnrc_pktsnip_t *res;
     tcp_hdr_t *hdr;
 
     /* Allocate header */
     res = gnrc_pktbuf_add(payload, NULL, sizeof(tcp_hdr_t), GNRC_NETTYPE_TCP);
     if (res == NULL) {
-        DEBUG("gnrc_tcp.c : gnrc_tcp_hdr_build() : No space left in packet buffer\n");
+        TCP_DEBUG_ERROR("pktbuf is full.");
+        TCP_DEBUG_LEAVE;
         return NULL;
     }
     hdr = (tcp_hdr_t *) res->data;
@@ -738,5 +838,7 @@ gnrc_pktsnip_t *gnrc_tcp_hdr_build(gnrc_pktsnip_t *payload, uint16_t src, uint16
     hdr->dst_port = byteorder_htons(dst);
     hdr->checksum = byteorder_htons(0);
     hdr->off_ctl = byteorder_htons(TCP_HDR_OFFSET_MIN);
+
+    TCP_DEBUG_LEAVE;
     return res;
 }

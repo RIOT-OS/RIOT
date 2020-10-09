@@ -55,9 +55,11 @@
  */
 static int _is_local_port_in_use(const uint16_t port_number)
 {
+    TCP_DEBUG_ENTER;
     gnrc_tcp_tcb_t *iter = NULL;
     tcb_list_t *list = _gnrc_tcp_common_get_tcb_list();
     LL_SEARCH_SCALAR(list->head, iter, local_port, port_number);
+    TCP_DEBUG_LEAVE;
     return (iter != NULL);
 }
 
@@ -68,6 +70,7 @@ static int _is_local_port_in_use(const uint16_t port_number)
  */
 static uint16_t _get_random_local_port(void)
 {
+    TCP_DEBUG_ENTER;
     uint16_t ret = 0;
     do {
         ret = random_uint32();
@@ -75,6 +78,7 @@ static uint16_t _get_random_local_port(void)
             continue;
         }
     } while(_is_local_port_in_use(ret));
+    TCP_DEBUG_LEAVE;
     return ret;
 }
 
@@ -87,11 +91,13 @@ static uint16_t _get_random_local_port(void)
  */
 static int _clear_retransmit(gnrc_tcp_tcb_t *tcb)
 {
+    TCP_DEBUG_ENTER;
     if (tcb->pkt_retransmit != NULL) {
         _gnrc_tcp_event_loop_unsched(&tcb->event_retransmit);
         gnrc_pktbuf_release(tcb->pkt_retransmit);
         tcb->pkt_retransmit = NULL;
     }
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -104,9 +110,11 @@ static int _clear_retransmit(gnrc_tcp_tcb_t *tcb)
  */
 static int _restart_timewait_timer(gnrc_tcp_tcb_t *tcb)
 {
+    TCP_DEBUG_ENTER;
     _gnrc_tcp_event_loop_unsched(&tcb->event_retransmit);
     _gnrc_tcp_event_loop_sched(&tcb->event_retransmit, 2 * CONFIG_GNRC_TCP_MSL_MS,
                                MSG_TYPE_TIMEWAIT, tcb);
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -122,8 +130,7 @@ static int _restart_timewait_timer(gnrc_tcp_tcb_t *tcb)
  */
 static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
 {
-    DEBUG("_transition_to: %d\n", state);
-
+    TCP_DEBUG_ENTER;
     gnrc_tcp_tcb_t *iter = NULL;
     tcb_list_t *list = _gnrc_tcp_common_get_tcb_list();
 
@@ -174,6 +181,8 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
                     /* Check if given port number is in use: return error */
                     if (_is_local_port_in_use(tcb->local_port)) {
                         mutex_unlock(&list->lock);
+                        TCP_DEBUG_ERROR("-EADDRINUSE: Port already used.")
+                        TCP_DEBUG_LEAVE;
                         return -EADDRINUSE;
                     }
                 }
@@ -200,6 +209,7 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
             break;
     }
     tcb->state = state;
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -214,12 +224,13 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, fsm_state_t state)
  */
 static int _fsm_call_open(gnrc_tcp_tcb_t *tcb)
 {
+    TCP_DEBUG_ENTER;
     int ret = 0;
-
-    DEBUG("gnrc_tcp_fsm.c : _fsm_call_open()\n");
 
     /* Allocate receive buffer */
     if (_rcvbuf_get_buffer(tcb) == -ENOMEM) {
+        TCP_DEBUG_ERROR("-ENOMEM: Can't allocate receive buffer.");
+        TCP_DEBUG_LEAVE;
         return -ENOMEM;
     }
 
@@ -239,6 +250,7 @@ static int _fsm_call_open(gnrc_tcp_tcb_t *tcb)
         ret = _transition_to(tcb, FSM_STATE_SYN_SENT);
         if (ret < 0) {
             _transition_to(tcb, FSM_STATE_CLOSED);
+            TCP_DEBUG_LEAVE;
             return ret;
         }
 
@@ -249,6 +261,7 @@ static int _fsm_call_open(gnrc_tcp_tcb_t *tcb)
         _pkt_setup_retransmit(tcb, out_pkt, false);
         _pkt_send(tcb, out_pkt, seq_con, false);
     }
+    TCP_DEBUG_LEAVE;
     return ret;
 }
 
@@ -263,8 +276,7 @@ static int _fsm_call_open(gnrc_tcp_tcb_t *tcb)
  */
 static int _fsm_call_send(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
 {
-    DEBUG("gnrc_tcp_fsm.c : _fsm_call_send()\n");
-
+    TCP_DEBUG_ENTER;
     size_t payload = (tcb->snd_una + tcb->snd_wnd) - tcb->snd_nxt;
 
     /* Check if window is open and all packets were transmitted */
@@ -280,8 +292,10 @@ static int _fsm_call_send(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
         _pkt_build(tcb, &out_pkt, &seq_con, MSK_ACK | MSK_PSH, tcb->snd_nxt, tcb->rcv_nxt, buf, payload);
         _pkt_setup_retransmit(tcb, out_pkt, false);
         _pkt_send(tcb, out_pkt, seq_con, false);
+        TCP_DEBUG_LEAVE;
         return payload;
     }
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -296,9 +310,10 @@ static int _fsm_call_send(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
  */
 static int _fsm_call_recv(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
 {
-    DEBUG("gnrc_tcp_fsm.c : _fsm_call_recv()\n");
+    TCP_DEBUG_ENTER;
 
     if (ringbuffer_empty(&tcb->rcv_buf)) {
+        TCP_DEBUG_LEAVE;
         return 0;
     }
 
@@ -315,6 +330,7 @@ static int _fsm_call_recv(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
         _pkt_build(tcb, &out_pkt, &seq_con, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0);
         _pkt_send(tcb, out_pkt, seq_con, false);
     }
+    TCP_DEBUG_LEAVE;
     return rcvd;
 }
 
@@ -327,7 +343,7 @@ static int _fsm_call_recv(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
  */
 static int _fsm_call_close(gnrc_tcp_tcb_t *tcb)
 {
-    DEBUG("gnrc_tcp_fsm.c : _fsm_call_close()\n");
+    TCP_DEBUG_ENTER;
 
     if (tcb->state == FSM_STATE_SYN_RCVD || tcb->state == FSM_STATE_ESTABLISHED ||
         tcb->state == FSM_STATE_CLOSE_WAIT) {
@@ -349,6 +365,7 @@ static int _fsm_call_close(gnrc_tcp_tcb_t *tcb)
     else if (tcb->state == FSM_STATE_CLOSE_WAIT) {
         _transition_to(tcb, FSM_STATE_LAST_ACK);
     }
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -361,7 +378,7 @@ static int _fsm_call_close(gnrc_tcp_tcb_t *tcb)
  */
 static int _fsm_call_abort(gnrc_tcp_tcb_t *tcb)
 {
-    DEBUG("gnrc_tcp_fsm.c : _fsm_call_abort()\n");
+    TCP_DEBUG_ENTER;
 
     /* A reset must be sent in case the TCB state is in one of those cases */
     if (tcb->state == FSM_STATE_SYN_RCVD || tcb->state == FSM_STATE_ESTABLISHED ||
@@ -378,6 +395,7 @@ static int _fsm_call_abort(gnrc_tcp_tcb_t *tcb)
     /* From here on any state must transition into CLOSED state */
     _transition_to(tcb, FSM_STATE_CLOSED);
 
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -392,6 +410,7 @@ static int _fsm_call_abort(gnrc_tcp_tcb_t *tcb)
  */
 static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
 {
+    TCP_DEBUG_ENTER;
     gnrc_pktsnip_t *out_pkt = NULL;  /* Outgoing packet */
     uint16_t seq_con = 0;            /* Sequence number consumption of outgoing packet */
     gnrc_pktsnip_t *snp;             /* Temporary packet snip */
@@ -401,13 +420,14 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
     uint32_t seg_ack = 0;            /* Acknowledgment number of the incoming packet */
     uint32_t seg_wnd = 0;            /* Receive window of the incoming packet */
 
-    DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt()\n");
     /* Search for TCP header. */
     snp = gnrc_pktsnip_search_type(in_pkt, GNRC_NETTYPE_TCP);
     tcp_hdr_t *tcp_hdr = (tcp_hdr_t *) snp->data;
 
     /* Parse packet options, return if they are malformed */
     if (_option_parse(tcb, tcp_hdr) < 0) {
+        TCP_DEBUG_ERROR("Failed to parse TCP header options.");
+        TCP_DEBUG_LEAVE;
         return 0;
     }
 
@@ -421,7 +441,8 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
 #ifdef MODULE_GNRC_IPV6
     snp = gnrc_pktsnip_search_type(in_pkt, GNRC_NETTYPE_IPV6);
     if (snp == NULL) {
-        DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() : incoming packet had no IPv6 header\n");
+        TCP_DEBUG_ERROR("Packet contains no IPv6 header.");
+        TCP_DEBUG_LEAVE;
         return 0;
     }
     void *ip = snp->data;
@@ -431,12 +452,16 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
     if (tcb->state == FSM_STATE_LISTEN) {
         /* 1) Check RST: if RST is set: return */
         if (ctl & MSK_RST) {
+            TCP_DEBUG_INFO("RST flag set in packet.");
+            TCP_DEBUG_LEAVE;
             return 0;
         }
         /* 2) Check ACK: if ACK is set: send RST with seq_no = ack_no and return */
         if (ctl & MSK_ACK) {
             _pkt_build_reset_from_pkt(&out_pkt, in_pkt);
             _pkt_send(tcb, out_pkt, 0, false);
+            TCP_DEBUG_INFO("ACK flag set in packet. Send reset.");
+            TCP_DEBUG_LEAVE;
             return 0;
         }
         /* 3) Check SYN: if SYN is set prepare for incoming connection */
@@ -468,7 +493,8 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
              * (reason: tmp *lst* can be true at runtime
              */
             if (lst) {
-                DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() : Connection already handled\n");
+                TCP_DEBUG_INFO("Connection is handled by another TCB.");
+                TCP_DEBUG_LEAVE;
                 return 0;
             }
 
@@ -478,19 +504,20 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                 memcpy(tcb->local_addr, &((ipv6_hdr_t *)ip)->dst, sizeof(ipv6_addr_t));
                 memcpy(tcb->peer_addr, &((ipv6_hdr_t *)ip)->src, sizeof(ipv6_addr_t));
 
-                /* In case peer_addr is link local: Store interface Id in tcb */
+                /* In case peer_addr is link local: Store interface Id in TCB */
                 if (ipv6_addr_is_link_local((ipv6_addr_t *) tcb->peer_addr)) {
                     gnrc_pktsnip_t *tmp = gnrc_pktsnip_search_type(in_pkt, GNRC_NETTYPE_NETIF);
                     if (tmp == NULL) {
-                        DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() :\
-                               incoming packet had no netif header\n");
+                        TCP_DEBUG_ERROR("Packet contains no netif header.");
+                        TCP_DEBUG_LEAVE;
                         return 0;
                     }
                     tcb->ll_iface = ((gnrc_netif_hdr_t *)tmp->data)->if_pid;
                 }
             }
 #else
-            DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() : Received address was not stored\n");
+            TCP_DEBUG_ERROR("Missing network layer. Add module to makefile.");
+            TCP_DEBUG_LEAVE;
             return 0;
 #endif
 
@@ -509,6 +536,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             _pkt_send(tcb, out_pkt, seq_con, false);
             _transition_to(tcb, FSM_STATE_SYN_RCVD);
         }
+        TCP_DEBUG_LEAVE;
         return 0;
     }
     /* Handle state SYN_SENT */
@@ -522,6 +550,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                     _pkt_build(tcb, &out_pkt, &seq_con, MSK_RST, seg_ack, 0, NULL, 0);
                     _pkt_send(tcb, out_pkt, seq_con, false);
                 }
+                TCP_DEBUG_LEAVE;
                 return 0;
             }
         }
@@ -531,6 +560,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             if (ctl & MSK_ACK) {
                 _transition_to(tcb, FSM_STATE_CLOSED);
             }
+            TCP_DEBUG_LEAVE;
             return 0;
         }
         /* 3) Check SYN: Set TCB values accordingly */
@@ -547,7 +577,8 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                 memcpy(tcb->local_addr, &((ipv6_hdr_t *)ip)->dst, sizeof(ipv6_addr_t));
             }
 #else
-            DEBUG("gnrc_tcp_fsm.c : _fsm_rcvd_pkt() : Received address was not stored\n");
+            TCP_DEBUG_ERROR("Missing network layer. Add module to makefile.");
+            TCP_DEBUG_LEAVE;
             return 0;
 #endif
 
@@ -568,6 +599,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             tcb->snd_wl1 = seg_seq;
             tcb->snd_wl2 = seg_ack;
         }
+        TCP_DEBUG_LEAVE;
         return 0;
     }
     /* Handle other states */
@@ -581,6 +613,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                 _pkt_build(tcb, &out_pkt, &seq_con, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0);
                 _pkt_send(tcb, out_pkt, seq_con, false);
             }
+            TCP_DEBUG_LEAVE;
             return 0;
         }
         /* 2) Check RST: If RST is set ... */
@@ -592,6 +625,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             else {
                 _transition_to(tcb, FSM_STATE_CLOSED);
             }
+            TCP_DEBUG_LEAVE;
             return 0;
         }
         /* 3) Check SYN: If SYN is set ... */
@@ -600,10 +634,12 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             _pkt_build(tcb, &out_pkt, &seq_con, MSK_RST, tcb->snd_nxt, tcb->rcv_nxt, NULL, 0);
             _pkt_send(tcb, out_pkt, seq_con, false);
             _transition_to(tcb, FSM_STATE_CLOSED);
+            TCP_DEBUG_LEAVE;
             return 0;
         }
         /* 4) Check ACK */
         if (!(ctl & MSK_ACK)) {
+            TCP_DEBUG_LEAVE;
             return 0;
         }
         else {
@@ -633,6 +669,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                     _pkt_build(tcb, &out_pkt, &seq_con, MSK_ACK, tcb->snd_nxt, tcb->rcv_nxt,
                                NULL, 0);
                     _pkt_send(tcb, out_pkt, seq_con, false);
+                    TCP_DEBUG_LEAVE;
                     return 0;
                 }
                 /* Update receive window */
@@ -670,6 +707,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
                 if (tcb->state == FSM_STATE_LAST_ACK) {
                     if (tcb->pkt_retransmit == NULL) {
                         _transition_to(tcb, FSM_STATE_CLOSED);
+                        TCP_DEBUG_LEAVE;
                         return 0;
                     }
                 }
@@ -711,6 +749,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
         if (ctl & MSK_FIN) {
             if (tcb->state == FSM_STATE_CLOSED || tcb->state == FSM_STATE_LISTEN ||
                 tcb->state == FSM_STATE_SYN_SENT) {
+                TCP_DEBUG_LEAVE;
                 return 0;
             }
             /* Advance rcv_nxt over FIN bit */
@@ -737,6 +776,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
             }
         }
     }
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -749,8 +789,9 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
  */
 static int _fsm_timeout_timewait(gnrc_tcp_tcb_t *tcb)
 {
-    DEBUG("gnrc_tcp_fsm.c : _fsm_timeout_timewait()\n");
+    TCP_DEBUG_ENTER;
     _transition_to(tcb, FSM_STATE_CLOSED);
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -763,14 +804,15 @@ static int _fsm_timeout_timewait(gnrc_tcp_tcb_t *tcb)
  */
 static int _fsm_timeout_retransmit(gnrc_tcp_tcb_t *tcb)
 {
-    DEBUG("gnrc_tcp_fsm.c : _fsm_timeout_retransmit()\n");
+    TCP_DEBUG_ENTER;
     if (tcb->pkt_retransmit != NULL) {
         _pkt_setup_retransmit(tcb, tcb->pkt_retransmit, true);
         _pkt_send(tcb, tcb->pkt_retransmit, 0, true);
     }
     else {
-        DEBUG("gnrc_tcp_fsm.c : _fsm_timeout_retransmit() : Retransmit queue is empty\n");
+        TCP_DEBUG_INFO("Retransmission queue is empty.");
     }
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -783,8 +825,9 @@ static int _fsm_timeout_retransmit(gnrc_tcp_tcb_t *tcb)
  */
 static int _fsm_timeout_connection(gnrc_tcp_tcb_t *tcb)
 {
-    DEBUG("gnrc_tcp_fsm.c : _fsm_timeout_connection()\n");
+    TCP_DEBUG_ENTER;
     _transition_to(tcb, FSM_STATE_CLOSED);
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -797,14 +840,15 @@ static int _fsm_timeout_connection(gnrc_tcp_tcb_t *tcb)
  */
 static int _fsm_send_probe(gnrc_tcp_tcb_t *tcb)
 {
+    TCP_DEBUG_ENTER;
     gnrc_pktsnip_t *out_pkt = NULL;  /* Outgoing packet */
     uint8_t probe_pay[] = {1};       /* Probe payload */
 
-    DEBUG("gnrc_tcp_fsm.c : _fsm_send_probe()\n");
     /* The probe sends a already acknowledged sequence no. with a garbage byte. */
     _pkt_build(tcb, &out_pkt, NULL, MSK_ACK, tcb->snd_una - 1, tcb->rcv_nxt, probe_pay,
                sizeof(probe_pay));
     _pkt_send(tcb, out_pkt, 0, false);
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -817,8 +861,9 @@ static int _fsm_send_probe(gnrc_tcp_tcb_t *tcb)
  */
 static int _fsm_clear_retransmit(gnrc_tcp_tcb_t *tcb)
 {
-    DEBUG("gnrc_tcp_fsm.c : _fsm_clear_retransmit()\n");
+    TCP_DEBUG_ENTER;
     _clear_retransmit(tcb);
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -839,9 +884,9 @@ static int _fsm_clear_retransmit(gnrc_tcp_tcb_t *tcb)
 static int _fsm_unprotected(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt,
                             void *buf, size_t len)
 {
+    TCP_DEBUG_ENTER;
     int ret = 0;
 
-    DEBUG("gnrc_tcp_fsm.c : _fsm_unprotected()\n");
     switch (event) {
         case FSM_EVENT_CALL_OPEN :
             ret = _fsm_call_open(tcb);
@@ -877,11 +922,13 @@ static int _fsm_unprotected(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip
             ret = _fsm_clear_retransmit(tcb);
             break;
     }
+    TCP_DEBUG_LEAVE;
     return ret;
 }
 
 int _fsm(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *buf, size_t len)
 {
+    TCP_DEBUG_ENTER;
     /* Lock FSM */
     mutex_lock(&(tcb->fsm_lock));
 
@@ -898,12 +945,15 @@ int _fsm(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *b
     }
     /* Unlock FSM */
     mutex_unlock(&(tcb->fsm_lock));
+    TCP_DEBUG_LEAVE;
     return result;
 }
 
 void _fsm_set_mbox(gnrc_tcp_tcb_t *tcb, mbox_t *mbox)
 {
+    TCP_DEBUG_ENTER;
     mutex_lock(&(tcb->fsm_lock));
     tcb->mbox = mbox;
     mutex_unlock(&(tcb->fsm_lock));
+    TCP_DEBUG_LEAVE;
 }

@@ -115,6 +115,38 @@ extern "C" {
 #define GET_OFFSET( x ) (((x) & MSK_OFFSET) >> 12)
 
 /**
+ * @brief Helper macro used to create debug message on function entry.
+ *
+ * @note Compilation units using TCP_DEBUG_ENTER must set ENABLE_DEBUG and include debug.h.
+ */
+#define TCP_DEBUG_ENTER DEBUG("GNRC_TCP: Enter \"%s\", File: %s(%d)\n", \
+                              DEBUG_FUNC, RIOT_FILE_RELATIVE, __LINE__)
+
+/**
+ * @brief Helper macro used to create debug message on function exit.
+ *
+ * @note Compilation units using TCP_DEBUG_LEAVE must set ENABLE_DEBUG and include debug.h.
+ */
+#define TCP_DEBUG_LEAVE DEBUG("GNRC_TCP: Leave \"%s\", File: %s(%d)\n", \
+                              DEBUG_FUNC, RIOT_FILE_RELATIVE, __LINE__)
+
+/**
+ * @brief Helper macro used to create debug message on error.
+ *
+ * @note Compilation units using TCP_DEBUG_ERROR must set ENABLE_DEBUG and include debug.h.
+ */
+#define TCP_DEBUG_ERROR(msg) DEBUG("GNRC_TCP: Error: \"%s\", Func: %s, File: %s(%d)\n", \
+                                   msg, DEBUG_FUNC, RIOT_FILE_RELATIVE, __LINE__)
+
+/**
+ * @brief Helper macro used to create informational debug message.
+ *
+ * @note Compilation units using TCP_DEBUG_INFO must set ENABLE_DEBUG and include debug.h.
+ */
+#define TCP_DEBUG_INFO(msg) DEBUG("GNRC_TCP: Info: \"%s\", Func: %s, File: %s(%d)\n", \
+                                  msg, DEBUG_FUNC, RIOT_FILE_RELATIVE, __LINE__)
+
+/**
  * @brief TCB list type.
  */
 typedef struct {

@@ -51,6 +51,7 @@ static inline uint32_t _max(const uint32_t x, const uint32_t y)
 
 int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
 {
+    TCP_DEBUG_ENTER;
     tcp_hdr_t tcp_hdr_out;
 
     /* Extract headers */
@@ -94,9 +95,9 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
     /* Allocate new TCB header */
     tcp_snp = gnrc_pktbuf_add(NULL, &tcp_hdr_out, TCP_HDR_OFFSET_MIN * 4, GNRC_NETTYPE_TCP);
     if (tcp_snp == NULL) {
-        DEBUG("gnrc_tcp_pkt.c : _pkt_build_reset_from_pkt() :\
-               Can't alloc buffer for TCP Header\n.");
         *(out_pkt) = NULL;
+        TCP_DEBUG_ERROR("-ENOMEM: Can't alloc buffer for TCP header.");
+        TCP_DEBUG_LEAVE;
         return -ENOMEM;
     }
     *out_pkt = tcp_snp;
@@ -105,10 +106,10 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
 #ifdef MODULE_GNRC_IPV6
     ip6_snp = gnrc_ipv6_hdr_build(tcp_snp, &(ip6_hdr->dst), &(ip6_hdr->src));
     if (ip6_snp == NULL) {
-        DEBUG("gnrc_tcp_pkt.c : _pkt_build_reset_from_pkt() :\
-               Can't alloc buffer for IPv6 Header.\n");
         gnrc_pktbuf_release(tcp_snp);
         *(out_pkt) = NULL;
+        TCP_DEBUG_ERROR("-ENOMEM: Can't alloc buffer for IPv6 header.");
+        TCP_DEBUG_LEAVE;
         return -ENOMEM;
     }
     *out_pkt = ip6_snp;
@@ -124,10 +125,10 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
         /* Allocate new header and set interface id */
         net_snp = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
         if (net_snp == NULL) {
-            DEBUG("gnrc_tcp_pkt.c : _pkt_build_reset_from_pkt() :\
-                   Can't alloc buffer for netif Header.\n");
             gnrc_pktbuf_release(ip6_snp);
             *(out_pkt) = NULL;
+            TCP_DEBUG_ERROR("-ENOMEM: Can't alloc buffer for netif header.");
+            TCP_DEBUG_LEAVE;
             return -ENOMEM;
         }
         else {
@@ -137,8 +138,9 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
         }
     }
 #else
-    DEBUG("gnrc_tcp_pkt.c : _pkt_build_reset_from_pkt() : Network Layer Module Missing\n");
+    TCP_DEBUG_ERROR("Missing network layer. Add module to makefile.");
 #endif
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
@@ -146,6 +148,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
                const uint16_t ctl, const uint32_t seq_num, const uint32_t ack_num,
                void *payload, const size_t payload_len)
 {
+    TCP_DEBUG_ENTER;
     gnrc_pktsnip_t *pay_snp = NULL;
     gnrc_pktsnip_t *tcp_snp = NULL;
     tcp_hdr_t tcp_hdr;
@@ -155,8 +158,9 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
     if (payload != NULL && payload_len > 0) {
         pay_snp = gnrc_pktbuf_add(pay_snp, payload, payload_len, GNRC_NETTYPE_UNDEF);
         if (pay_snp == NULL) {
-            DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Can't allocate buffer for payload\n.");
             *(out_pkt) = NULL;
+            TCP_DEBUG_ERROR("-ENOMEM: Can't alloc buffer for payload.");
+            TCP_DEBUG_LEAVE;
             return -ENOMEM;
         }
     }
@@ -180,17 +184,19 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
 
     tcp_snp = gnrc_pktbuf_add(pay_snp, &tcp_hdr, sizeof(tcp_hdr), GNRC_NETTYPE_TCP);
     if (tcp_snp == NULL) {
-        DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Can't allocate buffer for TCP Header\n.");
         gnrc_pktbuf_release(pay_snp);
         *(out_pkt) = NULL;
+        TCP_DEBUG_ERROR("-ENOMEM: Can't alloc buffer for TCP header.");
+        TCP_DEBUG_LEAVE;
         return -ENOMEM;
     }
     else {
         /* Resize TCP header: size = offset * 4 bytes */
         if (gnrc_pktbuf_realloc_data(tcp_snp, offset * 4)) {
-            DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Couldn't set size of TCP header\n");
             gnrc_pktbuf_release(tcp_snp);
             *(out_pkt) = NULL;
+            TCP_DEBUG_ERROR("-ENOMEM: Can't realloc buffer for TCP header.");
+            TCP_DEBUG_LEAVE;
             return -ENOMEM;
         }
 
@@ -220,9 +226,10 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
 
     gnrc_pktsnip_t *ip6_snp = gnrc_ipv6_hdr_build(tcp_snp, src_addr, dst_addr);
     if (ip6_snp == NULL) {
-        DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Can't allocate buffer for IPv6 Header.\n");
         gnrc_pktbuf_release(tcp_snp);
         *(out_pkt) = NULL;
+        TCP_DEBUG_ERROR("-ENOMEM: Can't allocate buffer for IPv6 header.");
+        TCP_DEBUG_LEAVE;
         return -ENOMEM;
     }
     else {
@@ -233,9 +240,10 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
     if (tcb->ll_iface > 0) {
         gnrc_pktsnip_t *net_snp = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
         if (net_snp == NULL) {
-            DEBUG("gnrc_tcp_pkt.c : _pkt_build() : Can't allocate buffer for netif header.\n");
             gnrc_pktbuf_release(ip6_snp);
             *(out_pkt) = NULL;
+            TCP_DEBUG_ERROR("-ENOMEM: Can't allocate buffer for netif header.");
+            TCP_DEBUG_LEAVE;
             return -ENOMEM;
         }
         else {
@@ -245,7 +253,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
         }
     }
 #else
-        DEBUG("gnrc_tcp_pkt.c : _pkt_build_reset_from_pkt() : Network Layer Module Missing\n");
+    TCP_DEBUG_ERROR("Missing network layer. Add module to makefile.");
 #endif
 
     /* Calculate sequence space number consumption for this packet */
@@ -259,14 +267,17 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
         }
         *seq_con += payload_len;
     }
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
 int _pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_con,
               const bool retransmit)
 {
+    TCP_DEBUG_ENTER;
     if (out_pkt == NULL) {
-        DEBUG("gnrc_tcp_pkt.c : _pkt_send() : Packet to send is null\n");
+        TCP_DEBUG_ERROR("-EINVAL: out_pkt is null.");
+        TCP_DEBUG_LEAVE;
         return -EINVAL;
     }
 
@@ -283,14 +294,16 @@ int _pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_c
     /* Pass packet down the network stack */
     if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_TCP, GNRC_NETREG_DEMUX_CTX_ALL,
                                    out_pkt)) {
-        DEBUG("gnrc_tcp_pkt.c : _pkt_send() : unable to send packet\n");
         gnrc_pktbuf_release(out_pkt);
+        TCP_DEBUG_ERROR("Can't dispatch to network layer.");
     }
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
 int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const uint32_t seg_len)
 {
+    TCP_DEBUG_ENTER;
     uint32_t l_edge = tcb->rcv_nxt;
     uint32_t r_edge = tcb->rcv_nxt + tcb->rcv_wnd;
     uint32_t last_seq = seq_num + seg_len - 1;
@@ -299,6 +312,7 @@ int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const ui
     /* Segment contains no payload and receive window is closed and */
     /* sequence number is next expected number */
     if (seg_len == 0 && tcb->rcv_wnd == 0 && l_edge == seq_num) {
+        TCP_DEBUG_LEAVE;
         return 0;
     }
 
@@ -306,6 +320,7 @@ int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const ui
     /* Segment contains no payload and receive window is open and */
     /* sequence number falls inside the receive window */
     if (seg_len == 0 && tcb->rcv_wnd > 0 && INSIDE_WND(l_edge, seq_num, r_edge)) {
+        TCP_DEBUG_LEAVE;
         return 0;
     }
 
@@ -314,15 +329,18 @@ int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const ui
     /* sequence number overlaps with receive window */
     if (seg_len > 0 && tcb->rcv_wnd > 0 && (INSIDE_WND(l_edge, seq_num, r_edge) ||
         INSIDE_WND(l_edge, last_seq, r_edge))) {
+        TCP_DEBUG_LEAVE;
         return 0;
     }
 
     /* Everything else is not acceptable */
+    TCP_DEBUG_LEAVE;
     return -1;
 }
 
 uint32_t _pkt_get_seg_len(gnrc_pktsnip_t *pkt)
 {
+    TCP_DEBUG_ENTER;
     uint32_t seq = 0;
     uint16_t ctl = 0;
     gnrc_pktsnip_t *snp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_TCP);
@@ -335,35 +353,41 @@ uint32_t _pkt_get_seg_len(gnrc_pktsnip_t *pkt)
     if (ctl & MSK_FIN) {
         seq += 1;
     }
+    TCP_DEBUG_LEAVE;
     return seq;
 }
 
 uint32_t _pkt_get_pay_len(gnrc_pktsnip_t *pkt)
 {
+    TCP_DEBUG_ENTER;
     uint32_t seg_len = 0;
     gnrc_pktsnip_t *snp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UNDEF);
     while (snp && snp->type == GNRC_NETTYPE_UNDEF) {
         seg_len += snp->size;
         snp = snp->next;
     }
+    TCP_DEBUG_LEAVE;
     return seg_len;
 }
 
 int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool retransmit)
 {
+    TCP_DEBUG_ENTER;
     gnrc_pktsnip_t *snp = NULL;
     uint32_t ctl = 0;
     uint32_t len = 0;
 
     /* No packet received */
     if (pkt == NULL) {
-        DEBUG("gnrc_tcp_pkt.c : _pkt_setup_retransmit() : pkt=NULL\n");
+        TCP_DEBUG_ERROR("-EINVAL: pkt == NULL.");
+        TCP_DEBUG_LEAVE;
         return -EINVAL;
     }
 
     /* Check if retransmit queue is full and pkt is not already in retransmit queue */
     if (tcb->pkt_retransmit != NULL && tcb->pkt_retransmit != pkt) {
-        DEBUG("gnrc_tcp_pkt.c : _pkt_setup_retransmit() : Nothing to do\n");
+        TCP_DEBUG_ERROR("-ENOMEM: Retransmit queue is full.");
+        TCP_DEBUG_LEAVE;
         return -ENOMEM;
     }
 
@@ -374,6 +398,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
 
     /* Check if pkt contains reset or is a pure ACK, return */
     if ((ctl & MSK_RST) || (((ctl & MSK_SYN_FIN_ACK) == MSK_ACK) && len == 0)) {
+        TCP_DEBUG_LEAVE;
         return 0;
     }
 
@@ -415,18 +440,21 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
     /* Setup retransmission timer, msg to TCP thread with ptr to TCB */
     _gnrc_tcp_event_loop_sched(&tcb->event_retransmit, tcb->rto,
                                MSG_TYPE_RETRANSMISSION, tcb);
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
 int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
 {
+    TCP_DEBUG_ENTER;
     uint32_t seg = 0;
     gnrc_pktsnip_t *snp = NULL;
     tcp_hdr_t *hdr;
 
     /* Retransmission queue is empty. Nothing to ACK there */
     if (tcb->pkt_retransmit == NULL) {
-        DEBUG("gnrc_tcp_pkt.c : _pkt_acknowledge() : There is no packet to ack\n");
+        TCP_DEBUG_ERROR("-ENODATA: No packet to acknowledge.");
+        TCP_DEBUG_LEAVE;
         return -ENODATA;
     }
 
@@ -461,16 +489,19 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
             }
         }
     }
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
 uint16_t _pkt_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_hdr,
                         const gnrc_pktsnip_t *payload)
 {
+    TCP_DEBUG_ENTER;
     uint16_t csum = 0;
     uint16_t len = (uint16_t) hdr->size;
 
     if (pseudo_hdr == NULL) {
+        TCP_DEBUG_LEAVE;
         return 0;
     }
 
@@ -496,7 +527,10 @@ uint16_t _pkt_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_
         default:
             /* Suppress compiler warnings */
             (void) len;
+            TCP_DEBUG_ERROR("Missing network layer. Add module to makefile.");
+            TCP_DEBUG_LEAVE;
             return 0;
     }
+    TCP_DEBUG_LEAVE;
     return ~csum;
 }
