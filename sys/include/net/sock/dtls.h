@@ -794,7 +794,8 @@ static inline int sock_dtls_session_create(sock_dtls_t *sock,
         return res;
     }
 
-    return sock_dtls_recv(sock, remote, buf, sizeof(buf), timeout);
+    res = sock_dtls_recv(sock, remote, buf, sizeof(buf), timeout);
+    return res == -SOCK_DTLS_HANDSHAKE ? 0 : res;
 }
 
 #include "sock_dtls_types.h"
