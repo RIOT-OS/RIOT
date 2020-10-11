@@ -178,8 +178,6 @@ typedef enum {
     UART_FLAG_NONE            = 0x0,    /**< No flags set */
     UART_FLAG_RUN_STANDBY     = 0x1,    /**< run SERCOM in standby mode */
     UART_FLAG_WAKEUP          = 0x2,    /**< wake from sleep on receive */
-    UART_FLAG_RXINV           = 0x4,    /**< invert RX signal */
-    UART_FLAG_TXINV           = 0x8,    /**< invert TX signal */
 } uart_flag_t;
 
 #ifndef DOXYGEN
