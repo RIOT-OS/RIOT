@@ -36,7 +36,6 @@
 
 #if IS_USED(MODULE_STM32_ETH_LINK_UP)
 #include "xtimer.h"
-
 #define STM32_ETH_LINK_UP_TIMEOUT_US    (1UL * US_PER_SEC)
 
 static xtimer_t _link_status_timer;
@@ -59,18 +58,23 @@ static xtimer_t _link_status_timer;
 
 /* Default DMA buffer setup */
 #ifndef ETH_RX_DESCRIPTOR_COUNT
-#define ETH_RX_DESCRIPTOR_COUNT (6U)
+#define ETH_RX_DESCRIPTOR_COUNT     (6U)
 #endif
 #ifndef ETH_TX_DESCRIPTOR_COUNT
-#define ETH_TX_DESCRIPTOR_COUNT (8U)
+#define ETH_TX_DESCRIPTOR_COUNT     (8U)
 #endif
 #ifndef ETH_RX_BUFFER_SIZE
-#define ETH_RX_BUFFER_SIZE  (256U)
+#define ETH_RX_BUFFER_SIZE          (256U)
 #endif
 
-#define LINK_STATE_DOWN         (0x00)
-#define LINK_STATE_UP           (0x01)
-#define LINK_STATE_NOTIFIED_UP  (0x02)
+/* Bitmask to extract link state */
+#define LINK_STATE                  (0x01)
+/* Bitmask to extract notification state */
+#define LINK_STATE_NOTIFIED         (0x02)
+#define LINK_STATE_DOWN             (0x00)
+#define LINK_STATE_UP               (0x01)
+#define LINK_STATE_NOTIFIED_DOWN    (LINK_STATE_NOTIFIED | LINK_STATE_DOWN)
+#define LINK_STATE_NOTIFIED_UP      (LINK_STATE_NOTIFIED | LINK_STATE_UP)
 
 #if (ETH_RX_BUFFER_SIZE % 16) != 0
 /* For compatibility with 128bit memory interfaces, the buffer size needs to
@@ -122,7 +126,6 @@ static uint16_t _mii_reg_transfer(unsigned reg, uint16_t value, bool write)
     const uint16_t phy_addr = eth_config.phy_addr;
 
     while (ETH->MACMIIAR & ETH_MACMIIAR_MB) {}
-    DEBUG("[stm32_eth] rw_phy %x (%x): %x\n", (unsigned)phy_addr, reg, value);
 
     tmp = CLOCK_RANGE | ETH_MACMIIAR_MB
         | (((phy_addr & 0x1f) << 11) | ((reg & 0x1f) << 6));
@@ -135,7 +138,6 @@ static uint16_t _mii_reg_transfer(unsigned reg, uint16_t value, bool write)
     ETH->MACMIIAR = tmp;
     while (ETH->MACMIIAR & ETH_MACMIIAR_MB) {}
 
-    DEBUG("[stm32_eth] %lx\n", ETH->MACMIIDR);
     return ETH->MACMIIDR;
 }
 
@@ -254,14 +256,18 @@ static int stm32_eth_get(netdev_t *dev, netopt_t opt,
 static void _timer_cb(void *arg)
 {
     netdev_t *dev = (netdev_t *)arg;
+    uint8_t state = LINK_STATE_DOWN;
     if (_get_link_status()) {
-        _link_state = LINK_STATE_UP;
+        state = LINK_STATE_UP;
+    }
+
+    if ((_link_state & LINK_STATE) != state) {
+        /* link state changed, notify upper layer */
+        _link_state = state;
         dev->event_callback(dev, NETDEV_EVENT_ISR);
     }
-    else {
-        _link_state = LINK_STATE_DOWN;
-        xtimer_set(&_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_US);
-    }
+
+    xtimer_set(&_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_US);
 }
 #endif
 
@@ -303,10 +309,6 @@ static int stm32_eth_init(netdev_t *netdev)
     /* set the clock divider */
     while (ETH->MACMIIAR & ETH_MACMIIAR_MB) {}
     ETH->MACMIIAR = CLOCK_RANGE;
-
-    /* configure the PHY (standard for all PHY's) */
-    /* if there's no PHY, this has no effect */
-    _mii_reg_write(MII_BMCR, MII_BMCR_RESET);
 
     /* speed from conf */
     ETH->MACCR |= (ETH_MACCR_ROD | ETH_MACCR_IPCO | ETH_MACCR_APCS |
@@ -549,8 +551,14 @@ static void stm32_eth_isr(netdev_t *netdev)
 #if IS_USED(MODULE_STM32_ETH_LINK_UP)
     switch (_link_state) {
     case LINK_STATE_UP:
+        DEBUG("[stm32_eth] Link UP\n");
         netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
         _link_state = LINK_STATE_NOTIFIED_UP;
+        return;
+    case LINK_STATE_DOWN:
+        DEBUG("[stm32_eth] Link DOWN\n");
+        netdev->event_callback(netdev, NETDEV_EVENT_LINK_DOWN);
+        _link_state = LINK_STATE_NOTIFIED_DOWN;
         return;
     default:
         break;
