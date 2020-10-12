@@ -101,7 +101,7 @@ void gnrc_icmpv6_echo_req_handle(gnrc_netif_t *netif, ipv6_hdr_t *ipv6_hdr,
     /* (netif == NULL) => ipv6_hdr->dst is loopback address */
     gnrc_netif_hdr_set_netif(hdr->data, netif);
 
-    LL_PREPEND(pkt, hdr);
+    pkt = gnrc_pkt_prepend(pkt, hdr);
 
     if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6, GNRC_NETREG_DEMUX_CTX_ALL,
                                    pkt)) {

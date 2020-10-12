@@ -1189,7 +1189,7 @@ static void test_netapi_send__raw_unicast_ethernet_packet(void)
     TEST_ASSERT_NOT_NULL(pkt);
     gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst, sizeof(dst));
     TEST_ASSERT_NOT_NULL(netif);
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ethernet_netif, pkt);
 }
 
@@ -1204,7 +1204,7 @@ static void test_netapi_send__raw_broadcast_ethernet_packet(void)
     TEST_ASSERT_NOT_NULL(netif);
     hdr = netif->data;
     hdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ethernet_netif, pkt);
 }
 
@@ -1217,7 +1217,7 @@ static void test_netapi_send__raw_unicast_ieee802154_long_long_packet(void)
     TEST_ASSERT_NOT_NULL(pkt);
     gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst, sizeof(dst));
     TEST_ASSERT_NOT_NULL(netif);
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ieee802154_netif, pkt);
 }
 
@@ -1230,7 +1230,7 @@ static void test_netapi_send__raw_unicast_ieee802154_long_short_packet(void)
     TEST_ASSERT_NOT_NULL(pkt);
     gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst, sizeof(dst));
     TEST_ASSERT_NOT_NULL(netif);
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ieee802154_netif, pkt);
 }
 
@@ -1248,7 +1248,7 @@ static void test_netapi_send__raw_unicast_ieee802154_short_long_packet1(void)
                 0, &src_len, sizeof(src_len)));
     gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst, sizeof(dst));
     TEST_ASSERT_NOT_NULL(netif);
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ieee802154_netif, pkt);
     /* reset src_len */
     src_len = 8U;
@@ -1268,7 +1268,7 @@ static void test_netapi_send__raw_unicast_ieee802154_short_long_packet2(void)
     gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(src, sizeof(src),
             dst, sizeof(dst));
     TEST_ASSERT_NOT_NULL(netif);
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ieee802154_netif, pkt);
 }
 
@@ -1286,7 +1286,7 @@ static void test_netapi_send__raw_unicast_ieee802154_short_short_packet(void)
                 0, &src_len, sizeof(src_len)));
     gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst, sizeof(dst));
     TEST_ASSERT_NOT_NULL(netif);
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ieee802154_netif, pkt);
     /* reset src_len */
     src_len = 8U;
@@ -1306,7 +1306,7 @@ static void test_netapi_send__raw_broadcast_ieee802154_long_packet(void)
     TEST_ASSERT_NOT_NULL(netif);
     hdr = netif->data;
     hdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ieee802154_netif, pkt);
 }
 
@@ -1326,7 +1326,7 @@ static void test_netapi_send__raw_broadcast_ieee802154_short_packet(void)
     TEST_ASSERT_NOT_NULL(netif);
     hdr = netif->data;
     hdr->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ieee802154_netif, pkt);
     /* reset src_len */
     src_len = 8U;
@@ -1360,7 +1360,7 @@ static void test_netapi_send__ipv6_unicast_ethernet_packet(void)
     gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst_netif,
             sizeof(dst_netif));
     TEST_ASSERT_NOT_NULL(netif);
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ethernet_netif, pkt);
 }
 
@@ -1387,7 +1387,7 @@ static void test_netapi_send__ipv6_multicast_ethernet_packet(void)
     TEST_ASSERT_NOT_NULL(netif);
     netif_hdr = netif->data;
     netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MULTICAST;
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ethernet_netif, pkt);
 }
 
@@ -1416,7 +1416,7 @@ static void test_netapi_send__ipv6_unicast_ieee802154_packet(void)
     gnrc_pktsnip_t *netif = gnrc_netif_hdr_build(NULL, 0, dst_netif,
             sizeof(dst_netif));
     TEST_ASSERT_NOT_NULL(netif);
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ieee802154_netif, pkt);
 }
 
@@ -1443,7 +1443,7 @@ static void test_netapi_send__ipv6_multicast_ieee802154_packet(void)
     TEST_ASSERT_NOT_NULL(netif);
     netif_hdr = netif->data;
     netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MULTICAST;
-    LL_PREPEND(pkt, netif);
+    pkt = gnrc_pkt_prepend(pkt, netif);
     gnrc_netif_send(&ieee802154_netif, pkt);
 }
 

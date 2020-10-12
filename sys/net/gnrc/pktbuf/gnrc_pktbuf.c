@@ -18,7 +18,7 @@
 gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt,
                                         gnrc_pktsnip_t *snip)
 {
-    LL_DELETE(pkt, snip);
+    pkt = gnrc_pkt_delete(pkt, snip);
     snip->next = NULL;
     gnrc_pktbuf_release(snip);
 
@@ -32,8 +32,8 @@ gnrc_pktsnip_t *gnrc_pktbuf_replace_snip(gnrc_pktsnip_t *pkt,
     /* If add is a list we need to preserve its tail */
     if (add->next != NULL) {
         gnrc_pktsnip_t *tail = add->next;
-        gnrc_pktsnip_t *back;
-        LL_SEARCH_SCALAR(tail, back, next, NULL); /* find the last snip in add */
+        /* find the last snip in tail */
+        gnrc_pktsnip_t *back = gnrc_pkt_prev_snip(tail, NULL);
         /* Replace old */
         LL_REPLACE_ELEM(pkt, old, add);
         /* and wire in the tail between */

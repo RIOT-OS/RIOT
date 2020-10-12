@@ -1593,7 +1593,7 @@ int _gnrc_netif_send(int argc, char **argv)
         gnrc_pktbuf_release(pkt);
         return 1;
     }
-    LL_PREPEND(pkt, hdr);
+    pkt = gnrc_pkt_prepend(pkt, hdr);
     nethdr = (gnrc_netif_hdr_t *)hdr->data;
     nethdr->flags = flags;
     /* and send it */

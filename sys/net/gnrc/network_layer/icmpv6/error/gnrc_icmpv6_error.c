@@ -221,7 +221,7 @@ static void _send(gnrc_pktsnip_t *pkt, const gnrc_pktsnip_t *orig_pkt,
                 return;
             }
             gnrc_netif_hdr_set_netif(netif->data, iface);
-            LL_PREPEND(pkt, netif);
+            pkt = gnrc_pkt_prepend(pkt, netif);
         }
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6,
                                        GNRC_NETREG_DEMUX_CTX_ALL,

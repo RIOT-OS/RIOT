@@ -246,7 +246,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
 
         gnrc_pktbuf_remove_snip(pkt, eth_hdr);
-        LL_APPEND(pkt, netif_hdr);
+        pkt = gnrc_pkt_append(pkt, netif_hdr);
     }
 
 out:

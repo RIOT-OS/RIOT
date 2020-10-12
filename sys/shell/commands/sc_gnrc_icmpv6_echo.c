@@ -321,7 +321,7 @@ static void _pinger(_ping_data_t *data)
             goto error_exit;
         }
         gnrc_netif_hdr_set_netif(tmp->data, data->netif);
-        LL_PREPEND(pkt, tmp);
+        pkt = gnrc_pkt_prepend(pkt, tmp);
     }
     if (data->datalen >= sizeof(uint32_t)) {
         uint32_t now = xtimer_now_usec();

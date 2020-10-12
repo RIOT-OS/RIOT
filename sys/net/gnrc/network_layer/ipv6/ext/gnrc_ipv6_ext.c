@@ -344,7 +344,7 @@ gnrc_pktsnip_t *gnrc_ipv6_ext_build(gnrc_pktsnip_t *ipv6, gnrc_pktsnip_t *next,
     }
 
     if (ipv6 != NULL) {
-        LL_SEARCH_SCALAR(ipv6, prev, next, next);
+        prev = gnrc_pkt_prev_snip(ipv6, next);
 
         if (prev == NULL) {
             return NULL;

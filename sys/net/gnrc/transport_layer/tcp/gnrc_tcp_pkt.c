@@ -132,8 +132,7 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
         }
         else {
             ((gnrc_netif_hdr_t *)net_snp->data)->if_pid = net_hdr->if_pid;
-            LL_PREPEND(ip6_snp, net_snp);
-            *(out_pkt) = net_snp;
+            *(out_pkt) = gnrc_pkt_prepend(ip6_snp, net_snp);
         }
     }
 #else
@@ -240,8 +239,7 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
         }
         else {
             ((gnrc_netif_hdr_t *)net_snp->data)->if_pid = (kernel_pid_t)tcb->ll_iface;
-            LL_PREPEND(ip6_snp, net_snp);
-            *(out_pkt) = net_snp;
+            *(out_pkt) = gnrc_pkt_prepend(ip6_snp, net_snp);
         }
     }
 #else

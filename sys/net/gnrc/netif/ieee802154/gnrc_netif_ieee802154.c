@@ -132,7 +132,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
             gnrc_netif_hdr_set_netif(hdr, netif);
-            LL_APPEND(pkt, netif_snip);
+            pkt = gnrc_pkt_append(pkt, netif_snip);
         }
         else {
             /* Normal mode, try to parse the frame according to IEEE 802.15.4 */
@@ -204,7 +204,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 #endif
 #endif
             gnrc_pktbuf_remove_snip(pkt, ieee802154_hdr);
-            LL_APPEND(pkt, netif_hdr);
+            pkt = gnrc_pkt_append(pkt, netif_hdr);
         }
 
         DEBUG("_recv_ieee802154: reallocating.\n");

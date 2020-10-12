@@ -178,10 +178,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 
     gnrc_pktbuf_remove_snip(pkt, mac_hdr);
     gnrc_pktbuf_remove_snip(pkt, esp_hdr);
-    LL_APPEND(pkt, netif_hdr);
-
-    return pkt;
-
+    return gnrc_pkt_append(pkt, netif_hdr);
 err:
     gnrc_pktbuf_release(pkt);
     return NULL;

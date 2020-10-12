@@ -116,9 +116,7 @@ static gnrc_pktsnip_t *_build_frag_pkt(gnrc_pktsnip_t *pkt,
     frag_hdr->tag = byteorder_htons(fbuf->tag);
 
 
-    LL_PREPEND(frag, netif);
-
-    return frag;
+    return gnrc_pkt_prepend(frag, netif);
 }
 
 static uint16_t _copy_pkt_to_frag(uint8_t *data, const gnrc_pktsnip_t *pkt,
