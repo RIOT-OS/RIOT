@@ -279,6 +279,7 @@ static int _init(netdev_t *netdev)
 
     uint16_t chan = CONFIG_IEEE802154_DEFAULT_CHANNEL;
     int16_t tx_power = CONFIG_IEEE802154_DEFAULT_TXPOWER;
+    netopt_enable_t enable = NETOPT_ENABLE;
 
     /* Initialise netdev_ieee802154_t struct */
     netdev_ieee802154_set(netdev_ieee802154, NETOPT_CHANNEL,
@@ -287,6 +288,8 @@ static int _init(netdev_t *netdev)
                           &submac->short_addr, sizeof(submac->short_addr));
     netdev_ieee802154_set(netdev_ieee802154, NETOPT_ADDRESS_LONG,
                           &submac->ext_addr, sizeof(submac->ext_addr));
+    netdev_ieee802154_set(netdev_ieee802154, NETOPT_ACK_REQ,
+                          &enable, sizeof(enable));
 
     netdev_submac->dev.txpower = tx_power;
 
