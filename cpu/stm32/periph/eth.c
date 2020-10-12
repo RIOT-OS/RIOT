@@ -39,7 +39,7 @@
 #define STM32_ETH_LINK_UP_TIMEOUT_US    (1UL * US_PER_SEC)
 
 static xtimer_t _link_status_timer;
-#endif
+#endif /* IS_USED(MODULE_STM32_ETH_LINK_UP)  */
 
 /* Set the value of the divider with the clock configured */
 #if !defined(CLOCK_CORECLOCK) || CLOCK_CORECLOCK < (20000000U)
@@ -107,7 +107,7 @@ netdev_t *_netdev;
 #if IS_USED(MODULE_STM32_ETH_LINK_UP)
 /* Used for checking the link status */
 static uint8_t _link_state = LINK_STATE_DOWN;
-#endif
+#endif /* IS_USED(MODULE_STM32_ETH_LINK_UP) */
 
 /**
  * @brief   Read or write a MII register
@@ -269,7 +269,89 @@ static void _timer_cb(void *arg)
 
     xtimer_set(&_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_US);
 }
-#endif
+#endif /* IS_USED(MODULE_STM32_ETH_LINK_UP) */
+
+static bool _phy_can_negotiate(void)
+{
+    return (_mii_reg_read(MII_BMSR) & MII_BMSR_HAS_AN);
+}
+
+#if IS_USED(MODULE_STM32_ETH_AUTO)
+static void _complete_auto_negotiation(void)
+{
+    /* first, wait until auto-negotiation really has completed */
+    uint16_t bmsr;
+
+    do {
+        bmsr = _mii_reg_read(MII_BMSR);
+        if (!(bmsr & MII_BMSR_LINK)) {
+            /* disconnected during auto-negotiation */
+            return;
+        }
+    } while (!(bmsr & MII_BMSR_AN_DONE));
+    DEBUG("[stm32_eth] PHY auto-negotiation completed, PHY link up\n");
+    /* Get current MACCR state without speed config */
+    uint32_t maccr = ETH->MACCR & ~(ETH_MACCR_FES | ETH_MACCR_DM);
+    /* stupidly, there is seemingly no way to get current connection speed
+     * and duplex mode. But we can deduce it from our advertised capabilities
+     * and the link partner abilities */
+    uint16_t adv = _mii_reg_read(MII_ADVERTISE);
+    uint16_t lpa = _mii_reg_read(MII_LPA);
+
+    if ((adv & MII_ADVERTISE_100) && (lpa & MII_LPA_100)) {
+        /* 100 Mbps */
+        maccr |= ETH_MACCR_FES;
+        if ((adv & MII_ADVERTISE_100_F) && (lpa & MII_LPA_100_F)) {
+            /* full duplex */
+            maccr |= ETH_MACCR_DM;
+        }
+    }
+    else if ((adv & MII_ADVERTISE_10_F) && (lpa & MII_LPA_10_F)) {
+        /* full duplex */
+        maccr |= ETH_MACCR_DM;
+    }
+    DEBUG("[stm32_eth] %s Mbps %s duplex \n",
+          (maccr & ETH_MACCR_FES) ? "100" : "10",
+          (maccr & ETH_MACCR_DM) ? "full" : "half");
+    ETH->MACCR = maccr;
+}
+#endif /* IS_USED(MODULE_STM32_ETH_AUTO) */
+
+static void _setup_phy(void)
+{
+    DEBUG("[stm32_eth] Reset PHY\n");
+    /* reset PHY */
+    _mii_reg_write(MII_BMCR, MII_BMCR_RESET);
+    /* wait till PHY reset is completed */
+    while (MII_BMCR_RESET & _mii_reg_read(MII_BMCR)) {}
+
+    /* check if auto-negotiation is enabled and supported */
+    if (IS_USED(MODULE_STM32_ETH_AUTO) && _phy_can_negotiate()) {
+        _mii_reg_write(MII_BMCR, MII_BMCR_AN_ENABLE);
+        DEBUG("[stm32_eth] Enabled auto-negotiation\n");
+        /* We'll continue link setup once auto-negotiation is done */
+        return;
+    }
+
+    /* Get current MACCR state without speed config */
+    uint32_t maccr = ETH->MACCR & ~(ETH_MACCR_FES | ETH_MACCR_DM);
+    DEBUG("[stm32_eth] No PHY auto-negotiation disabled or unsupported\n");
+    /* disable auto-negotiation and force manually configured speed to be
+     * used */
+    _mii_reg_write(MII_BMCR, eth_config.speed);
+    /* configure MACCR to match PHY speed */
+    if (eth_config.speed & MII_BMCR_FULL_DPLX) {
+        maccr |= ETH_MACCR_DM;
+    }
+    if (eth_config.speed & MII_BMCR_SPEED_100) {
+        maccr |= ETH_MACCR_FES;
+    }
+    DEBUG("[stm32_eth] %s Mbps %s duplex \n",
+          (maccr & ETH_MACCR_FES) ? "100" : "10",
+          (maccr & ETH_MACCR_DM) ? "full" : "half");
+    /* Apply new duplex & speed configuration in MAC */
+    ETH->MACCR = maccr;
+}
 
 static int stm32_eth_init(netdev_t *netdev)
 {
@@ -310,10 +392,11 @@ static int stm32_eth_init(netdev_t *netdev)
     while (ETH->MACMIIAR & ETH_MACMIIAR_MB) {}
     ETH->MACMIIAR = CLOCK_RANGE;
 
-    /* speed from conf */
-    ETH->MACCR |= (ETH_MACCR_ROD | ETH_MACCR_IPCO | ETH_MACCR_APCS |
-                   ((eth_config.speed & 0x0100) << 3) |
-                   ((eth_config.speed & 0x2000) << 1));
+    /* ROD  = Don't receive own frames in half-duplex mode
+     * IPCO = Drop IPv4 packets carrying TCP/UDP/ICMP when checksum is invalid
+     * APCS = Do not pass padding and CRC fields to application (CRC is checked
+     *        by hardware already) */
+    ETH->MACCR |= ETH_MACCR_ROD | ETH_MACCR_IPCO | ETH_MACCR_APCS;
 
     /* pass all */
     //ETH->MACFFR |= ETH_MACFFR_RA;
@@ -352,9 +435,7 @@ static int stm32_eth_init(netdev_t *netdev)
     /* enable DMA TX and RX */
     ETH->DMAOMR |= ETH_DMAOMR_ST | ETH_DMAOMR_SR;
 
-    /* configure speed, do it at the end so the PHY had time to
-     * reset */
-    _mii_reg_write(MII_BMCR, eth_config.speed);
+    _setup_phy();
 
     return 0;
 }
@@ -552,6 +633,10 @@ static void stm32_eth_isr(netdev_t *netdev)
     switch (_link_state) {
     case LINK_STATE_UP:
         DEBUG("[stm32_eth] Link UP\n");
+        if (IS_USED(MODULE_STM32_ETH_AUTO)) {
+            /* Complete auto-negotiation of the link */
+            _complete_auto_negotiation();
+        }
         netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
         _link_state = LINK_STATE_NOTIFIED_UP;
         return;
