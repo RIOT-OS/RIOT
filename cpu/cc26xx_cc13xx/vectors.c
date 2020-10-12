@@ -227,7 +227,7 @@ ccfg_regs_t cc26xx_cc13xx_ccfg = {
                                         CCFG_MODE_CONF_RTC_COMP_m)
                         & CCFG_SET_BITS(SET_MODE_CONF_XOSC_FREQ,
                                         CCFG_MODE_CONF_XOSC_FREQ_s,
-                                        CCFG_MODE_CONF_RTC_COMP_m)
+                                        CCFG_MODE_CONF_XOSC_FREQ_m)
                         & CCFG_SET_BITS(SET_MODE_CONF_XOSC_CAP_MOD,
                                         CCFG_MODE_CONF_XOSC_CAP_MOD_s,
                                         CCFG_MODE_CONF_XOSC_CAP_MOD_m)
@@ -264,9 +264,9 @@ ccfg_regs_t cc26xx_cc13xx_ccfg = {
                         & CCFG_SET_BITS(SET_BL_CONFIG_BL_ENABLE,
                                         CCFG_BL_CONFIG_BL_ENABLE_s,
                                         CCFG_BL_CONFIG_BL_ENABLE_m),
-    .ERASE_CONF         = 0,
+    .ERASE_CONF         = 0xFFFFFFFF,
     /* debugging */
-    .CCFG_TI_OPTIONS    = 0,
+    .CCFG_TI_OPTIONS    = 0xFFFFFF00,
     .CCFG_TAP_DAP_0     = CCFG_SET_BITS(SET_CCFG_TAP_DAP_0_CPU_DAP_ENABLE,
                                         CCFG_CCFG_TAP_DAP_0_CPU_DAP_ENABLE_s,
                                         CCFG_CCFG_TAP_DAP_0_CPU_DAP_ENABLE_m)
@@ -277,7 +277,7 @@ ccfg_regs_t cc26xx_cc13xx_ccfg = {
                                         CCFG_CCFG_TAP_DAP_0_TEST_TAP_ENABLE_s,
                                         CCFG_CCFG_TAP_DAP_0_TEST_TAP_ENABLE_m),
     /* PBIST2, PBIST1 and AON disabled by default */
-    .CCFG_TAP_DAP_1     = 0,
+    .CCFG_TAP_DAP_1     = 0xFF000000,
     /* flash image vector table */
     .IMAGE_VALID_CONF   = (reg32_t)&cortex_vector_base,
     /* flash sector write protections */
