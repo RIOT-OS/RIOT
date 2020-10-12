@@ -81,7 +81,7 @@ void pca9633_wakeup(pca9633_t* dev)
 {
     uint8_t reg;
     _read_reg(dev, PCA9633_REG_MODE1, &reg);
-    reg = reg & ~(1 << PCA9633_BIT_SLEEP);
+    CLRBIT(reg, PCA9633_BIT_SLEEP);
 
     _write_reg(dev, PCA9633_REG_MODE1, reg);
 }
@@ -90,7 +90,7 @@ void pca9633_sleep(pca9633_t* dev)
 {
     uint8_t reg;
     _read_reg(dev, PCA9633_REG_MODE1, &reg);
-    reg = reg | (1 << PCA9633_BIT_SLEEP);
+    SETBIT(reg, PCA9633_BIT_SLEEP);
 
     _write_reg(dev, PCA9633_REG_MODE1, reg);
 }
@@ -149,19 +149,19 @@ void pca9633_set_rgba(pca9633_t* dev, uint8_t r, uint8_t g, uint8_t b, uint8_t a
 void pca9633_set_ldr_state(pca9633_t* dev,
         pca9633_ldr_state_t state, pca9633_pwm_channel_t pwm_channel)
 {
-    uint8_t ldr_bit;
+    uint8_t ldr_bitmask;
     switch (pwm_channel) {
         case PCA9633_PWM_CHANNEL_0:
-            ldr_bit = PCA9633_BIT_LDR0;
+            ldr_bitmask = PCA9633_BITMASK_LDR0;
             break;
         case PCA9633_PWM_CHANNEL_1:
-            ldr_bit = PCA9633_BIT_LDR1;
+            ldr_bitmask = PCA9633_BITMASK_LDR1;
             break;
         case PCA9633_PWM_CHANNEL_2:
-            ldr_bit = PCA9633_BIT_LDR2;
+            ldr_bitmask = PCA9633_BITMASK_LDR2;
             break;
         case PCA9633_PWM_CHANNEL_3:
-            ldr_bit = PCA9633_BIT_LDR3;
+            ldr_bitmask = PCA9633_BITMASK_LDR3;
             break;
         default:
             return;
@@ -171,60 +171,62 @@ void pca9633_set_ldr_state(pca9633_t* dev,
     _read_reg(dev, PCA9633_REG_LEDOUT, &reg);
 
     /* first clear both bits of ldr */
-    reg = reg & ~(0b11 << ldr_bit);
+    CLRBIT(reg, ldr_bitmask);
 
-    /* second set new state to specified ldr */
-    reg |= (state << ldr_bit);
+    /* secondly set new state to specified ldr */
+    SETBIT(reg, (state << bitarithm_lsb(ldr_bitmask)));
 
     _write_reg(dev, PCA9633_REG_LEDOUT, reg);
 }
 
 void pca9633_set_ldr_state_all(pca9633_t* dev, pca9633_ldr_state_t state)
 {
-    uint8_t reg = (state << PCA9633_BIT_LDR3)
-                | (state << PCA9633_BIT_LDR2)
-                | (state << PCA9633_BIT_LDR1)
-                | (state << PCA9633_BIT_LDR0);
+    uint8_t reg = 0;
+
+    SETBIT(reg, (state << bitarithm_lsb(PCA9633_BITMASK_LDR3)));
+    SETBIT(reg, (state << bitarithm_lsb(PCA9633_BITMASK_LDR2)));
+    SETBIT(reg, (state << bitarithm_lsb(PCA9633_BITMASK_LDR1)));
+    SETBIT(reg, (state << bitarithm_lsb(PCA9633_BITMASK_LDR0)));
 
     _write_reg(dev, PCA9633_REG_LEDOUT, reg);
 }
 
 void pca9633_set_auto_increment(pca9633_t* dev, pca9633_auto_inc_option_t option)
 {
-    uint8_t new_reg;
+    uint8_t new_reg = 0;
 
     switch (option) {
 
         case PCA9633_AI_ALL:
-            new_reg = (1 << PCA9633_BIT_AI2)
-                    | (0 << PCA9633_BIT_AI1)
-                    | (0 << PCA9633_BIT_AI0);
+            SETBIT(new_reg, PCA9633_BIT_AI2);
+            CLRBIT(new_reg, PCA9633_BIT_AI1);
+            CLRBIT(new_reg, PCA9633_BIT_AI0);
             break;
 
         case PCA9633_AI_IND:
-            new_reg = (1 << PCA9633_BIT_AI2)
-                    | (1 << PCA9633_BIT_AI1)
-                    | (0 << PCA9633_BIT_AI0);
+            SETBIT(new_reg, PCA9633_BIT_AI2);
+            SETBIT(new_reg, PCA9633_BIT_AI1);
+            CLRBIT(new_reg, PCA9633_BIT_AI0);
             break;
 
         case PCA9633_AI_GBL:
-            new_reg = (1 << PCA9633_BIT_AI2)
-                    | (0 << PCA9633_BIT_AI1)
-                    | (1 << PCA9633_BIT_AI0);
+            SETBIT(new_reg, PCA9633_BIT_AI2);
+            CLRBIT(new_reg, PCA9633_BIT_AI1);
+            SETBIT(new_reg, PCA9633_BIT_AI0);
             break;
 
         case PCA9633_AI_IND_GBL:
-            new_reg = (1 << PCA9633_BIT_AI2)
-                    | (1 << PCA9633_BIT_AI1)
-                    | (1 << PCA9633_BIT_AI0);
+            SETBIT(new_reg, PCA9633_BIT_AI2);
+            SETBIT(new_reg, PCA9633_BIT_AI1);
+            SETBIT(new_reg, PCA9633_BIT_AI0);
             break;
 
         case PCA9633_AI_DISABLED:
             /* fall-thru */
         default:
-            new_reg = (0 << PCA9633_BIT_AI2)
-                    | (0 << PCA9633_BIT_AI1)
-                    | (0 << PCA9633_BIT_AI0);
+            CLRBIT(new_reg, PCA9633_BIT_AI2);
+            CLRBIT(new_reg, PCA9633_BIT_AI1);
+            CLRBIT(new_reg, PCA9633_BIT_AI0);
             break;
     }
 
@@ -240,14 +242,16 @@ void pca9633_set_group_control_mode(pca9633_t* dev,
     switch (mode) {
 
         case PCA9633_GROUP_CONTROL_MODE_BLINKING:
-            _write_reg(dev, PCA9633_REG_MODE2, prev_reg | (1 << PCA9633_BIT_DMBLNK));
+            SETBIT(prev_reg, PCA9633_BIT_DMBLNK);
             break;
 
         case PCA9633_GROUP_CONTROL_MODE_DIMMING:
         default:
-            _write_reg(dev, PCA9633_REG_MODE2, prev_reg & ~(1 << PCA9633_BIT_DMBLNK));
+            CLRBIT(prev_reg, PCA9633_BIT_DMBLNK);
             break;
     }
+
+    _write_reg(dev, PCA9633_REG_MODE2, prev_reg);
 }
 
 int _write_reg(pca9633_t* dev, uint8_t reg, uint8_t data)
