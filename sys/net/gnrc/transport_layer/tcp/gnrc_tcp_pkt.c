@@ -54,12 +54,12 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
     tcp_hdr_t tcp_hdr_out;
 
     /* Extract headers */
-    gnrc_pktsnip_t *tcp_snp;
-    LL_SEARCH_SCALAR(in_pkt, tcp_snp, type, GNRC_NETTYPE_TCP);
+    gnrc_pktsnip_t *tcp_snp = gnrc_pktsnip_search_type(in_pkt,
+                                                       GNRC_NETTYPE_TCP);
     tcp_hdr_t *tcp_hdr_in = (tcp_hdr_t *)tcp_snp->data;
 #ifdef MODULE_GNRC_IPV6
-    gnrc_pktsnip_t *ip6_snp;
-    LL_SEARCH_SCALAR(in_pkt, ip6_snp, type, GNRC_NETTYPE_IPV6);
+    gnrc_pktsnip_t *ip6_snp = gnrc_pktsnip_search_type(in_pkt,
+                                                       GNRC_NETTYPE_IPV6);
     ipv6_hdr_t *ip6_hdr = (ipv6_hdr_t *)ip6_snp->data;
 #endif
 
@@ -117,8 +117,8 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
     if (ipv6_addr_is_link_local(&ip6_hdr->src)) {
 
         /* Search for netif header in received packet */
-        gnrc_pktsnip_t *net_snp;
-        LL_SEARCH_SCALAR(in_pkt, net_snp, type, GNRC_NETTYPE_NETIF);
+        gnrc_pktsnip_t *net_snp = gnrc_pktsnip_search_type(in_pkt,
+                                                           GNRC_NETTYPE_NETIF);
         gnrc_netif_hdr_t *net_hdr = (gnrc_netif_hdr_t *)net_snp->data;
 
         /* Allocate new header and set interface id */
@@ -325,9 +325,7 @@ uint32_t _pkt_get_seg_len(gnrc_pktsnip_t *pkt)
 {
     uint32_t seq = 0;
     uint16_t ctl = 0;
-    gnrc_pktsnip_t *snp = NULL;
-
-    LL_SEARCH_SCALAR(pkt, snp, type, GNRC_NETTYPE_TCP);
+    gnrc_pktsnip_t *snp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_TCP);
     tcp_hdr_t *hdr = (tcp_hdr_t *) snp->data;
     ctl = byteorder_ntohs(hdr->off_ctl);
     seq = _pkt_get_pay_len(pkt);
@@ -343,9 +341,7 @@ uint32_t _pkt_get_seg_len(gnrc_pktsnip_t *pkt)
 uint32_t _pkt_get_pay_len(gnrc_pktsnip_t *pkt)
 {
     uint32_t seg_len = 0;
-    gnrc_pktsnip_t *snp = NULL;
-
-    LL_SEARCH_SCALAR(pkt, snp, type, GNRC_NETTYPE_UNDEF);
+    gnrc_pktsnip_t *snp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UNDEF);
     while (snp && snp->type == GNRC_NETTYPE_UNDEF) {
         seg_len += snp->size;
         snp = snp->next;
@@ -372,7 +368,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
     }
 
     /* Extract control bits and segment length */
-    LL_SEARCH_SCALAR(pkt, snp, type, GNRC_NETTYPE_TCP);
+    snp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_TCP);
     ctl = byteorder_ntohs(((tcp_hdr_t *) snp->data)->off_ctl);
     len = _pkt_get_pay_len(pkt);
 
@@ -434,7 +430,7 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
         return -ENODATA;
     }
 
-    LL_SEARCH_SCALAR(tcb->pkt_retransmit, snp, type, GNRC_NETTYPE_TCP);
+    snp = gnrc_pktsnip_search_type(tcb->pkt_retransmit, GNRC_NETTYPE_TCP);
     hdr = (tcp_hdr_t *) snp->data;
 
     /* There must be a packet, waiting to be acknowledged. */

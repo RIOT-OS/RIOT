@@ -85,13 +85,10 @@ static int _send(gnrc_pktsnip_t *pkt)
     assert(pkt != NULL);
 
     /* NOTE: In sending direction: pkt = nw, nw->next = tcp, tcp->next = payload */
-    gnrc_pktsnip_t *tcp = NULL;
+    /* Search for TCP header */
+    gnrc_pktsnip_t *tcp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_TCP);
     gnrc_pktsnip_t *nw = NULL;
 
-    /* Search for TCP header */
-    LL_SEARCH_SCALAR(pkt, tcp, type, GNRC_NETTYPE_TCP);
-    /* cppcheck-suppress knownConditionTrueFalse
-     * (reason: tcp *can* be != NULL after LL_SEARCH_SCALAR) */
     if (tcp == NULL) {
         DEBUG("gnrc_tcp_eventloop : _send() : tcp header missing.\n");
         gnrc_pktbuf_release(pkt);
@@ -101,7 +98,7 @@ static int _send(gnrc_pktsnip_t *pkt)
     /* Search for network layer */
 #ifdef MODULE_GNRC_IPV6
     /* Get IPv6 header, discard packet if doesn't contain an ipv6 header */
-    LL_SEARCH_SCALAR(pkt, nw, type, GNRC_NETTYPE_IPV6);
+    nw = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
     if (nw == NULL) {
         DEBUG("gnrc_tcp_eventloop.c : _send() : pkt contains no ipv6 layer header\n");
         gnrc_pktbuf_release(pkt);
@@ -155,7 +152,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
 
 #ifdef MODULE_GNRC_IPV6
     /* Get IPv6 header, discard packet if doesn't contain an ip header */
-    LL_SEARCH_SCALAR(pkt, ip, type, GNRC_NETTYPE_IPV6);
+    ip = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_IPV6);
     if (ip == NULL) {
         DEBUG("gnrc_tcp_eventloop.c : _receive() : pkt contains no IP Header\n");
         gnrc_pktbuf_release(pkt);
@@ -164,7 +161,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
 #endif
 
     /* Get TCP header */
-    LL_SEARCH_SCALAR(pkt, tcp, type, GNRC_NETTYPE_TCP);
+    tcp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_TCP);
     if (tcp == NULL) {
         DEBUG("gnrc_tcp_eventloop.c : _receive() : pkt contains no TCP Header\n");
         gnrc_pktbuf_release(pkt);
