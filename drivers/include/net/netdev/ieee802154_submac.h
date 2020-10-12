@@ -49,6 +49,7 @@ typedef struct {
     ieee802154_submac_t submac;         /**< IEEE 802.15.4 SubMAC descriptor */
     xtimer_t ack_timer;                 /**< xtimer descriptor for the ACK timeout timer */
     int isr_flags;                      /**< netdev submac @ref NETDEV_EVENT_ISR flags */
+    int8_t retrans;                     /**< number of frame retransmissions of the last TX */
 } netdev_ieee802154_submac_t;
 
 /**
