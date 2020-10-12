@@ -25,6 +25,7 @@
 #include "bitarithm.h"
 #include "iolist.h"
 #include "luid.h"
+#include "mii.h"
 #include "mutex.h"
 #include "net/ethernet.h"
 #include "net/netdev/eth.h"
@@ -150,7 +151,7 @@ static inline void _mii_reg_write(uint8_t reg, uint16_t value)
 
 static inline bool _get_link_status(void)
 {
-    return (_mii_reg_read(PHY_BSMR) & BSMR_LINK_STATUS);
+    return (_mii_reg_read(MII_BMSR) & MII_BMSR_LINK);
 }
 
 static void stm32_eth_get_addr(char *out)
@@ -305,7 +306,7 @@ static int stm32_eth_init(netdev_t *netdev)
 
     /* configure the PHY (standard for all PHY's) */
     /* if there's no PHY, this has no effect */
-    _mii_reg_write(PHY_BMCR, BMCR_RESET);
+    _mii_reg_write(MII_BMCR, MII_BMCR_RESET);
 
     /* speed from conf */
     ETH->MACCR |= (ETH_MACCR_ROD | ETH_MACCR_IPCO | ETH_MACCR_APCS |
@@ -351,7 +352,7 @@ static int stm32_eth_init(netdev_t *netdev)
 
     /* configure speed, do it at the end so the PHY had time to
      * reset */
-    _mii_reg_write(PHY_BMCR, eth_config.speed);
+    _mii_reg_write(MII_BMCR, eth_config.speed);
 
     return 0;
 }
