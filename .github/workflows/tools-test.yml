@@ -23,9 +23,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install tox
+        python -m pip install kconfiglib
     - name: Test backport_pr
       run: cd dist/tools/backport_pr && tox
     - name: Test compile_and_test_for_board
       run: cd dist/tools/compile_and_test_for_board && tox
     - name: Test riotctrl_shell
       run: cd dist/pythonlibs/riotctrl_shell && tox
+    - name: Test kconfig script
+      run: cd dist/tools/kconfiglib/tests && ./test.sh
