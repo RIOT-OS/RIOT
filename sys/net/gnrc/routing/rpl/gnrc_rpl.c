@@ -69,16 +69,23 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
 {
     /* check if RPL was initialized before */
     if (gnrc_rpl_pid == KERNEL_PID_UNDEF) {
+        mutex_t eventloop_startup = MUTEX_INIT_LOCKED;
+
         _instance_id = 0;
         /* start the event loop */
         gnrc_rpl_pid = thread_create(_stack, sizeof(_stack), GNRC_RPL_PRIO,
                                      THREAD_CREATE_STACKTEST,
-                                     _event_loop, NULL, "RPL");
+                                     _event_loop, (void*)&eventloop_startup,
+                                     "RPL");
 
         if (gnrc_rpl_pid == KERNEL_PID_UNDEF) {
             DEBUG("RPL: could not start the event loop\n");
             return KERNEL_PID_UNDEF;
         }
+
+        /* Wait for the event loop to indicate that it set up its message
+         * queue, and registration with netreg can commence. */
+        mutex_lock(&eventloop_startup);
 
         _me_reg.demux_ctx = ICMPV6_RPL_CTRL;
         _me_reg.target.pid = gnrc_rpl_pid;
@@ -246,8 +253,15 @@ static void *_event_loop(void *args)
 {
     msg_t msg, reply;
 
-    (void)args;
-    msg_init_queue(_msg_q, GNRC_RPL_MSG_QUEUE_SIZE);
+    {
+        mutex_t *eventloop_startup = (mutex_t*)args;
+
+        msg_init_queue(_msg_q, GNRC_RPL_MSG_QUEUE_SIZE);
+
+        /* Message queue is initialized, gnrc_rpl_init can continue and will
+         * pop the underlying mutex off its stack. */
+        mutex_unlock(eventloop_startup);
+    }
 
     /* preinitialize ACK */
     reply.type = GNRC_NETAPI_MSG_TYPE_ACK;
