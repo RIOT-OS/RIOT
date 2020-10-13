@@ -28,6 +28,9 @@ if CPU_COMMON_SAM0
 
 rsource "periph/Kconfig"
 
+config ERROR_MODULES_CONFLICT
+    default "On SAM0, the RTC and RTT map to the same hardware peripheral." if MODULE_PERIPH_RTC && MODULE_PERIPH_RTT
+
 endif # CPU_COMMON_SAM0
 
 source "$(RIOTCPU)/cortexm_common/Kconfig"

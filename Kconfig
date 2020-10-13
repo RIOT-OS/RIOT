@@ -12,6 +12,9 @@ rsource "kconfigs/Kconfig.consts"
 # Load feature declarations
 rsource "kconfigs/Kconfig.features"
 
+# Load error symbols
+rsource "kconfigs/Kconfig.errors"
+
 # For now, get used modules as macros from this file (see kconfig.mk)
 osource "$(KCONFIG_GENERATED_DEPENDENCIES)"
 
@@ -32,6 +35,9 @@ rsource "pkg/Kconfig"
 
 comment "RIOT is in a migration phase."
 comment "Some configuration options may not be here. Use CFLAGS instead."
+
+comment "!! ERROR: There are conflicting modules active !!"
+    depends on ERROR_MODULES_CONFLICT != ""
 
 config TEST_KCONFIG
     bool

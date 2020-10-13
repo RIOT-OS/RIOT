@@ -68,3 +68,7 @@ config HAS_ATMEGA_PCINT3
     bool
     help
         Indicates that the Pin Change Interrupt bank 3 is present.
+
+config ERROR_MODULES_CONFLICT
+    default "On ATmega, the RTC and RTT use to the same hardware timer." if MODULE_PERIPH_RTC && MODULE_PERIPH_RTT
+    depends on CPU_COMMON_ATMEGA
