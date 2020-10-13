@@ -10,7 +10,7 @@ import sys
 from testrunner import run
 
 
-PRECISION = 1.002
+PRECISION = 1.005
 
 
 def testfunc(child):
