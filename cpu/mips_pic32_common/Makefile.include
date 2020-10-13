@@ -1,5 +1,10 @@
 include $(RIOTCPU)/mips32r2_common/Makefile.include
 
+# The 2020.06-01 toolchain provides POSIX defines for pthread which conflicts
+# with the one in RIOT. The following CFLAGS skip the inclusion of the types
+# shipped by the toolchain.
+CFLAGS += -D_SYS__PTHREADTYPES_H_
+
 CFLAGS += -DCPU_FAM_$(call uppercase_and_underscore,$(CPU_FAM))
 
 INCLUDES += -I$(RIOTCPU)/mips_pic32_common/include
