@@ -180,7 +180,11 @@ void stmclk_init_sysclk(void)
 
     /* Reset the RCC clock configuration to the default reset state(for debug purpose) */
     /* Reset MSION, HSEON, CSSON and PLLON bits */
+#ifdef RCC_CR_CSSON
     RCC->CR &= ~(RCC_CR_MSION | RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_CSSON | RCC_CR_PLLON);
+#else
+    RCC->CR &= ~(RCC_CR_MSION | RCC_CR_HSEON | RCC_CR_HSEBYP | RCC_CR_PLLON);
+#endif
 
     /* use HSI as system clock while we do any further configuration and
     * configure the AHB and APB clock dividers as configured by the board */
