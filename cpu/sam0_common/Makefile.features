@@ -17,9 +17,11 @@ FEATURES_PROVIDED += periph_wdt periph_wdt_cb periph_wdt_warning_period
 FEATURES_CONFLICT += periph_rtc:periph_rtt
 FEATURES_CONFLICT_MSG += "The RTC and RTT map to the same hardware peripheral."
 
-KCONFIG_ADD_CONFIG += $(RIOTCPU)/cortexm_common/cortexm_common.config
+include $(RIOTCPU)/cortexm_common/Makefile.features
 
--include $(RIOTCPU)/cortexm_common/Makefile.features
-
-# add sam0 configurations after including cortexm_common so sam0 takes precendence
-KCONFIG_ADD_CONFIG += $(RIOTCPU)/sam0_common/sam0_common.config
+# Add sam0 configurations after including cortexm_common so sam0 takes precendence
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_ADD_CONFIG += $(RIOTCPU)/sam0_common/sam0_common.config
+endif
