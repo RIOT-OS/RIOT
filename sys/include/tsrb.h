@@ -12,9 +12,6 @@
  * @brief       Thread-safe ringbuffer implementation
  * @{
  *
- * @note        This ringbuffer implementation can be used without locking if
- *              there's only one producer and one consumer.
- *
  * @attention   Buffer size must be a power of two!
  *
  * @file
@@ -30,6 +27,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "irq.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -40,8 +39,8 @@ extern "C" {
 typedef struct tsrb {
     uint8_t *buf;               /**< Buffer to operate on. */
     unsigned int size;          /**< Size of buffer, must be power of 2. */
-    volatile unsigned reads;    /**< total number of reads */
-    volatile unsigned writes;   /**< total number of writes */
+    unsigned reads;             /**< total number of reads */
+    unsigned writes;            /**< total number of writes */
 } tsrb_t;
 
 /**
@@ -76,7 +75,10 @@ static inline void tsrb_init(tsrb_t *rb, uint8_t *buffer, unsigned bufsize)
  */
 static inline int tsrb_empty(const tsrb_t *rb)
 {
-    return (rb->reads == rb->writes);
+    unsigned irq_state = irq_disable();
+    int retval = (rb->reads == rb->writes);
+    irq_restore(irq_state);
+    return retval;
 }
 
 
@@ -87,7 +89,10 @@ static inline int tsrb_empty(const tsrb_t *rb)
  */
 static inline unsigned int tsrb_avail(const tsrb_t *rb)
 {
-    return (rb->writes - rb->reads);
+    unsigned irq_state = irq_disable();
+    int retval = (rb->writes - rb->reads);
+    irq_restore(irq_state);
+    return retval;
 }
 
 /**
@@ -98,7 +103,10 @@ static inline unsigned int tsrb_avail(const tsrb_t *rb)
  */
 static inline int tsrb_full(const tsrb_t *rb)
 {
-    return (rb->writes - rb->reads) == rb->size;
+    unsigned irq_state = irq_disable();
+    int retval = (rb->writes - rb->reads) == rb->size;
+    irq_restore(irq_state);
+    return retval;
 }
 
 /**
@@ -108,7 +116,10 @@ static inline int tsrb_full(const tsrb_t *rb)
  */
 static inline unsigned int tsrb_free(const tsrb_t *rb)
 {
-    return (rb->size - rb->writes + rb->reads);
+    unsigned irq_state = irq_disable();
+    int retval = (rb->size - rb->writes + rb->reads);
+    irq_restore(irq_state);
+    return retval;
 }
 
 /**
