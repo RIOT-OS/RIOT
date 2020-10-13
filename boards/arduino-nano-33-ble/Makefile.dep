@@ -9,7 +9,7 @@ ifeq (,$(filter-out stdio_cdc_acm,$(filter stdio_% slipdev_stdio,$(USEMODULE))))
   USEMODULE += stdio_cdc_acm
 
   # This board requires support for Arduino bootloader.
-  FEATURES_REQUIRED += bootloader_arduino
+  FEATURES_REQUIRED += highlevel_stdio
   USEMODULE += usb_board_reset
 endif
 

@@ -1,3 +1,3 @@
 include $(RIOTBOARD)/common/arduino-zero/Makefile.features
 
-FEATURES_PROVIDED += bootloader_arduino
+FEATURES_PROVIDED += highlevel_stdio

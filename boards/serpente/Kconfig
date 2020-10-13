@@ -11,7 +11,7 @@ config BOARD_SERPENTE
     bool
     default y
     select CPU_MODEL_SAMD21E18A
-    select HAS_BOOTLOADER_ARDUINO
+    select HAS_HIGHLEVEL_STDIO
     select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM

@@ -2,10 +2,9 @@ include ../Makefile.tests_common
 
 USEMODULE += ssp
 
-# This test intentionally crashes the firmware and when using a board with a
-# preflashed bootloader, it cannot be reflashed automatically afterwards.
-FEATURES_BLACKLIST += bootloader_arduino
-FEATURES_BLACKLIST += bootloader_nrfutil
+# This test intentionally crashes the firmware and when using a board with
+# stdio via CDC ACM, RIOT can't print anything after the crash.
+FEATURES_BLACKLIST += highlevel_stdio
 
 include $(RIOTBASE)/Makefile.include
 

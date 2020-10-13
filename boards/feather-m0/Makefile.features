@@ -13,4 +13,4 @@ FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_usbdev
 
 # Put other features for this board (in alphabetical order)
-FEATURES_PROVIDED += bootloader_arduino
+FEATURES_PROVIDED += highlevel_stdio
