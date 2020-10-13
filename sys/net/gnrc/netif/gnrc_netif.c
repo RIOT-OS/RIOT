@@ -561,6 +561,7 @@ int gnrc_netif_ipv6_addr_add_internal(gnrc_netif_t *netif,
               PRIkernel_pid "\n",
               ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)),
               netif->pid);
+        gnrc_netif_release(netif);
         return res;
     }
 #else  /* CONFIG_GNRC_IPV6_NIB_ARSM */
