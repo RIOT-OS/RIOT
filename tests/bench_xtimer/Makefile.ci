@@ -4,6 +4,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     im880b \
+    nucleo-l011k4 \
     olimexino-stm32 \
     stk3200 \
     #

@@ -25,6 +25,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-g070rb \
     nucleo-g071rb \
     nucleo-g431rb \
+    nucleo-l011k4 \
     nucleo-l031k6 \
     nucleo-l053r8 \
     nucleo-l412kb \

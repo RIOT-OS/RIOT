@@ -13,6 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nrf6310 \
     nucleo-f031k6 \
     nucleo-f042k6 \
+    nucleo-l011k4 \
     opencm9-04 \
     pca10000 \
     pca10005 \

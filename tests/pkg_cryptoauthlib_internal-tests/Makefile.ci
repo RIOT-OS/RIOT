@@ -19,5 +19,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     derfmega256 \
     mega-xplained \
     microduino-corerf \
+    nucleo-l011k4 \
     saml10-xpro \
     waspmote-pro

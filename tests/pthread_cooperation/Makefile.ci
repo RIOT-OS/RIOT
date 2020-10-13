@@ -10,11 +10,12 @@ BOARD_INSUFFICIENT_MEMORY := \
     derfmega256 \
     hifive1 \
     hifive1b \
-    im880b \
     i-nucleo-lrwan1 \
+    im880b \
     mega-xplained \
     microduino-corerf \
     nucleo-f031k6 \
+    nucleo-l011k4 \
     stm32l0538-disco \
     waspmote-pro \
     #
