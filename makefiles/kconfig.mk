@@ -50,13 +50,11 @@ KCONFIG_OUT_DEP = $(KCONFIG_OUT_CONFIG).d
 
 # Add configurations to merge, in ascendent priority (i.e. a file overrides the
 # previous ones).
-ifeq (1, $(TEST_KCONFIG))
-  # KCONFIG_ADD_CONFIG holds a list of .config files that are merged for the
-  # initial configuration. This allows to split configurations in common files
-  # and share them among boards or cpus.
-  MERGE_SOURCES += $(KCONFIG_ADD_CONFIG)
-endif
-
+#
+# KCONFIG_ADD_CONFIG holds a list of .config files that are merged for the
+# initial configuration. This allows to split configurations in common files
+# and share them among boards or cpus.
+MERGE_SOURCES += $(KCONFIG_ADD_CONFIG)
 MERGE_SOURCES += $(wildcard $(KCONFIG_APP_CONFIG))
 MERGE_SOURCES += $(wildcard $(KCONFIG_USER_CONFIG))
 

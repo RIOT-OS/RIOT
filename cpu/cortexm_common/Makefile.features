@@ -37,4 +37,8 @@ endif
 
 FEATURES_PROVIDED += no_idle_thread
 
-KCONFIG_ADD_CONFIG += $(RIOTCPU)/cortexm_common/cortexm_common.config
+# This configuration enables modules that are only available when using Kconfig
+# module modelling
+ifeq (1, $(TEST_KCONFIG))
+  KCONFIG_ADD_CONFIG += $(RIOTCPU)/cortexm_common/cortexm_common.config
+endif
