@@ -304,7 +304,7 @@ static void _riot_board_handler_flush(void *arg)
     } else {
         puts("gcoap_cli: msg buffer too small");
         pdu->hdr->code = COAP_CODE_INTERNAL_SERVER_ERROR;
-        /* unwinding the TEXXT option*/
+        /* unwinding the TEXT option*/
         resp_len = resp_len - 1;
     }
 
