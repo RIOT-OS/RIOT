@@ -7,6 +7,7 @@
 # directory for more details.
 
 import base64
+import pexpect
 import os
 import socket
 import sys
@@ -96,6 +97,16 @@ def test_short_header(child, src_if, src_ll, dst_if, dst_l2, dst_ll, dst_port):
 @testfunc
 def test_send_ack_instead_of_syn(child, src_if, src_ll,
                                  dst_if, dst_l2, dst_ll, dst_port):
+    # check if any debug output is generated during `@testfunc` decorator
+    # execution. If so, send fewer packets to prevent the target node
+    # from being overwhelmed by packets and output.
+    debug = child.expect([pexpect.TIMEOUT,
+                          r'GNRC_TCP: Enter "\S+", File: .+\(\d+\)\s'], timeout=1)
+    if debug:
+        count = 10
+    else:
+        count = 1000
+
     # see https://github.com/RIOT-OS/RIOT/pull/12001
     provided_data = base64.b64decode("rwsQf2pekYLaU+exUBBwgPDKAAA=")
     tcp_hdr = TCP(provided_data)
@@ -103,7 +114,7 @@ def test_send_ack_instead_of_syn(child, src_if, src_ll,
     # set destination port to application specific port
     tcp_hdr.dport = dst_port
     sendp(Ether(dst=dst_l2) / IPv6(src=src_ll, dst=dst_ll) / tcp_hdr,
-          iface=src_if, verbose=0, count=1000)
+          iface=src_if, verbose=0, count=count)
 
     # check if server actually still works
     with socket.socket(socket.AF_INET6, socket.SOCK_STREAM) as sock:

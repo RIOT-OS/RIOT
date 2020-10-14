@@ -16,6 +16,7 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 #include <errno.h>
+#include "internal/common.h"
 #include "internal/rcvbuf.h"
 
 #define ENABLE_DEBUG (0)
@@ -31,11 +32,12 @@ static rcvbuf_t _static_buf;
  */
 void _rcvbuf_init(void)
 {
-    DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_init() : entry\n");
+    TCP_DEBUG_ENTER;
     mutex_init(&(_static_buf.lock));
     for (size_t i = 0; i < CONFIG_GNRC_TCP_RCV_BUFFERS; ++i) {
         _static_buf.entries[i].used = 0;
     }
+    TCP_DEBUG_LEAVE;
 }
 
 /**
@@ -46,8 +48,8 @@ void _rcvbuf_init(void)
  */
 static void* _rcvbuf_alloc(void)
 {
+    TCP_DEBUG_ENTER;
     void *result = NULL;
-    DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_alloc() : Entry\n");
     mutex_lock(&(_static_buf.lock));
     for (size_t i = 0; i < CONFIG_GNRC_TCP_RCV_BUFFERS; ++i) {
         if (_static_buf.entries[i].used == 0) {
@@ -57,6 +59,7 @@ static void* _rcvbuf_alloc(void)
         }
     }
     mutex_unlock(&(_static_buf.lock));
+    TCP_DEBUG_LEAVE;
     return result;
 }
 
@@ -67,7 +70,7 @@ static void* _rcvbuf_alloc(void)
  */
 static void _rcvbuf_free(void * const buf)
 {
-    DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_free() : Entry\n");
+    TCP_DEBUG_ENTER;
     mutex_lock(&(_static_buf.lock));
     for (size_t i = 0; i < CONFIG_GNRC_TCP_RCV_BUFFERS; ++i) {
         if ((_static_buf.entries[i].used == 1) && (buf == _static_buf.entries[i].buffer)) {
@@ -75,27 +78,33 @@ static void _rcvbuf_free(void * const buf)
         }
     }
     mutex_unlock(&(_static_buf.lock));
+    TCP_DEBUG_LEAVE;
 }
 
 int _rcvbuf_get_buffer(gnrc_tcp_tcb_t *tcb)
 {
+    TCP_DEBUG_ENTER;
     if (tcb->rcv_buf_raw == NULL) {
         tcb->rcv_buf_raw = _rcvbuf_alloc();
         if (tcb->rcv_buf_raw == NULL) {
-            DEBUG("gnrc_tcp_rcvbuf.c : _rcvbuf_get_buffer() : Can't allocate rcv_buf_raw\n");
+            TCP_DEBUG_ERROR("-ENOMEM: Failed to allocate receive buffer.");
+            TCP_DEBUG_LEAVE;
             return -ENOMEM;
         }
         else {
             ringbuffer_init(&tcb->rcv_buf, (char *) tcb->rcv_buf_raw, GNRC_TCP_RCV_BUF_SIZE);
         }
     }
+    TCP_DEBUG_LEAVE;
     return 0;
 }
 
 void _rcvbuf_release_buffer(gnrc_tcp_tcb_t *tcb)
 {
+    TCP_DEBUG_ENTER;
     if (tcb->rcv_buf_raw != NULL) {
         _rcvbuf_free(tcb->rcv_buf_raw);
         tcb->rcv_buf_raw = NULL;
     }
+    TCP_DEBUG_LEAVE;
 }
