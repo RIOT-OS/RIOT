@@ -26,6 +26,7 @@
 #include "net/gcoap.h"
 #include "od.h"
 #include "fmt.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
@@ -40,11 +41,15 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
                           const sock_udp_ep_t *remote);
 static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
+static ssize_t _riot_board_handler_blocking(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
+static ssize_t _riot_board_handler_nonblocking(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 
 /* CoAP resources. Must be sorted by path (ASCII order). */
 static const coap_resource_t _resources[] = {
     { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler, NULL },
     { "/riot/board", COAP_GET, _riot_board_handler, NULL },
+    { "/riot/board+block", COAP_GET, _riot_board_handler_blocking, NULL },
+    { "/riot/board+nonblock", COAP_GET, _riot_board_handler_nonblocking, NULL },
 };
 
 static const char *_link_params[] = {
@@ -229,6 +234,115 @@ static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, vo
         return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
     }
 }
+
+static ssize_t _riot_board_handler_blocking(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
+{
+    (void)ctx;
+    gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
+    coap_opt_add_format(pdu, COAP_FORMAT_TEXT);
+    size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
+
+    xtimer_sleep(3);
+
+    /* write the RIOT board name in the response buffer */
+    if (pdu->payload_len >= strlen(RIOT_BOARD)) {
+        memcpy(pdu->payload, RIOT_BOARD, strlen(RIOT_BOARD));
+        return resp_len + strlen(RIOT_BOARD);
+    }
+    else {
+        puts("gcoap_cli: msg buffer too small");
+        return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
+    }
+}
+
+/* This is the information needed when the operation is known to take some time
+ * and a separate response is sent unconditionally. See the proxy application
+ * for an example of how to use a timer to send an empty ACK when the operation
+ * takes too long. */
+#define NONBLOCKING_READY (-1)
+static struct nonblocking_info {
+    /** A value of NONBLOCKING_READY indicates that none of this is initialized */
+    ssize_t token_length;
+    uint8_t token[GCOAP_TOKENLEN_MAX];
+    sock_udp_ep_t remote;
+    xtimer_t response_timer;
+} nonblocking = { .token_length = NONBLOCKING_READY };
+
+static void _riot_board_handler_flush(void *arg)
+{
+    struct nonblocking_info *nonblocking = (struct nonblocking_info *)arg;
+    uint8_t buf[64];
+
+    printf("Timer!\n");
+
+    coap_pkt_t pdu_backend;
+    /* Just to make copy-pasted code easier (and I trust the compiler
+     * simplifies this again) */
+    coap_pkt_t *pdu = &pdu_backend;
+
+    /* Can't do that as it won't expose the token; copy/pasting instead
+    gcoap_req_init(&pdu, &buf[0], sizeof(buf), COAP_CODE_CONTENT, NULL);
+    */
+    pdu->hdr = (coap_hdr_t *)buf;
+
+    /* generate token */
+    uint16_t msgid = 4; /* FIXME determined by random dice roll as we can't access gcoap internals */
+    ssize_t res;
+    /* Responding CON because we can -- could also respond with whatever the
+     * original request came in had we persisted that */
+    res = coap_build_hdr(pdu->hdr, COAP_TYPE_CON, &nonblocking->token[0],
+                         nonblocking->token_length, COAP_CODE_CONTENT, msgid);
+
+    coap_pkt_init(pdu, buf, sizeof(buf), res);
+
+    /* end actually gcoap_req_init */
+    coap_opt_add_format(pdu, COAP_FORMAT_TEXT);
+    size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
+    if (pdu->payload_len >= strlen(RIOT_BOARD)) {
+        memcpy(pdu->payload, RIOT_BOARD, strlen(RIOT_BOARD));
+        resp_len = resp_len + strlen(RIOT_BOARD);
+    } else {
+        puts("gcoap_cli: msg buffer too small");
+        pdu->hdr->code = COAP_CODE_INTERNAL_SERVER_ERROR;
+        /* unwinding the TEXT option*/
+        resp_len = resp_len - 1;
+    }
+
+    if (gcoap_req_send(buf, resp_len, &nonblocking->remote, NULL, NULL) == 0) {
+        /* No (re)transmit slots, better keep occupying this slot and try later
+         * than leave the client all hanging. Try again soon. */
+        xtimer_set(&nonblocking->response_timer, 1000000);
+        return;
+    }
+
+    nonblocking->token_length = NONBLOCKING_READY;
+}
+
+static ssize_t _riot_board_handler_nonblocking(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
+{
+    // (void)ctx;
+    /* hacked into gcoap.c */
+    const sock_udp_ep_t *remote = (sock_udp_ep_t*)ctx;
+
+    if (nonblocking.token_length != NONBLOCKING_READY) {
+        return gcoap_response(pdu, buf, len, COAP_CODE_SERVICE_UNAVAILABLE);
+    }
+
+    nonblocking.token_length = pdu->hdr->ver_t_tkl & 0x0f;
+    memcpy(&nonblocking.token[0], (uint8_t*)pdu->hdr + sizeof(coap_hdr_t), nonblocking.token_length);
+    nonblocking.remote = *remote;
+
+    coap_hdr_set_type(pdu->hdr, COAP_TYPE_ACK);
+    pdu->hdr->ver_t_tkl &= 0xf0;
+    coap_hdr_set_code(pdu->hdr, 0);
+
+    nonblocking.response_timer.callback = _riot_board_handler_flush;
+    nonblocking.response_timer.arg = &nonblocking;
+    xtimer_set(&nonblocking.response_timer, 3000000);
+
+    return sizeof(coap_hdr_t);
+}
+
 
 static bool _parse_endpoint(sock_udp_ep_t *remote,
                             char *addr_str, char *port_str)
