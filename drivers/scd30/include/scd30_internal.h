@@ -44,6 +44,7 @@ extern "C" {
                           1013.25 mBar */
 
 #define SCD30_READ_WRITE_SLEEP_US       (4 * US_PER_MS)
+#define SCD30_RESET_SLEEP_US            (25 * US_PER_MS)
 #define SCD30_DATA_RDY_TIMEOUT          (1 * US_PER_SEC)
 
 #define SCD30_MIN_INTERVAL              2

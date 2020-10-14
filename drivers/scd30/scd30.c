@@ -45,11 +45,18 @@ static float _raw_val_to_float(const uint8_t *buffer);
 int8_t scd30_init(scd30_t *dev, const scd30_params_t *params)
 {
     DEBUG("[scd30] init\n");
+    int ret = 0;
+    uint16_t version;
+
     dev->params = *params;
 
-    int ret = 0;
+    /* Soft reset sensor */
+    ret = scd30_reset(dev);
+    if (ret < 0) {
+        DEBUG("[scd30] Failed to reset sensor in init\n");
+        return ret;
+    }
 
-    uint16_t version;
     ret = scd30_get_param(dev, SCD30_VERSION, &version);
     DEBUG("[scd30] --- Version 0x%02x%02x\n", (version >> 8), version);
     if (ret < 0) {
@@ -234,6 +241,23 @@ int8_t scd30_stop_measurements(const scd30_t *dev)
     if (ret != 0) {
         DEBUG("[scd30]: Error stopping measurements.\n");
     }
+    return SCD30_OK;
+}
+
+int8_t scd30_reset(scd30_t *dev)
+{
+    const uint16_t cmd = htons(SCD30_SOFT_RESET);
+    int ret;
+
+    i2c_acquire(SCD30_I2C);
+    ret = i2c_write_bytes(SCD30_I2C, SCD30_I2C_ADDRESS, &cmd, 2, 0);
+    i2c_release(SCD30_I2C);
+
+    if (ret != 0) {
+        DEBUG("[scd30]: Error resetting sensor.\n");
+        return ret;
+    }
+    xtimer_usleep(SCD30_RESET_SLEEP_US);
     return SCD30_OK;
 }
 
