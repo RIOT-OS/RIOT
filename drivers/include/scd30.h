@@ -167,6 +167,15 @@ int scd30_start_periodic_measurement(scd30_t *dev, uint16_t *interval,
  */
 int8_t scd30_stop_measurements(const scd30_t *dev);
 
+/**
+ *  @brief  Soft reset sensor
+ *
+ *  @param dev          scd30 dev device
+ *
+ *  @return             SCD30_OK if soft reset successful
+ */
+int8_t scd30_reset(scd30_t *dev);
+
 #ifdef __cplusplus
 }
 #endif
