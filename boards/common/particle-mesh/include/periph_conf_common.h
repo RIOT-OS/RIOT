@@ -39,9 +39,9 @@ extern "C" {
 static const spi_conf_t spi_config[] = {
     {
         .dev  = NRF_SPIM0,
-        .sclk = 15,
-        .mosi = 13,
-        .miso = 14,
+        .sclk = GPIO_PIN(1,15),
+        .mosi = GPIO_PIN(1,13),
+        .miso = GPIO_PIN(1,14),
     }
 };
 
