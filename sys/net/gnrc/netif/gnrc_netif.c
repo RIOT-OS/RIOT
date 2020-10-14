@@ -46,16 +46,6 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#ifdef MODULE_GNRC_NETIF_EVENTS
-/**
- * @brief   Event type used for passing netdev pointers together with the event
- */
-typedef struct {
-    event_t super;
-    netdev_t *dev;
-} event_netdev_t;
-#endif /* MODULE_GNRC_NETIF_EVENTS */
-
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);
 static void _configure_netdev(netdev_t *dev);
 static void *_gnrc_netif_thread(void *args);
