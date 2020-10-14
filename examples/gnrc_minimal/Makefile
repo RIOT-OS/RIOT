@@ -26,6 +26,12 @@ USEMODULE += gnrc_icmpv6_echo
 # Use minimal standard PRNG
 USEMODULE += prng_minstd
 
+# llvm compatibility requires yet to be released picolibc 1.4.7
+ifneq (llvm, $(TOOLCHAIN))
+  # Use picolibc when available
+  FEATURES_OPTIONAL += picolibc
+endif
+
 CFLAGS += -DLOG_LEVEL=LOG_NONE  # disable log output
 # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
 ifndef CONFIG_GNRC_PKTBUF_SIZE

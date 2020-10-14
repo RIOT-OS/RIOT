@@ -8,3 +8,8 @@ FEATURES_PROVIDED += periph_plic
 FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += periph_wdt
 FEATURES_PROVIDED += ssp
+
+# RISC-V toolchain on CI does not work properly with picolibc yet
+ifeq (,$(RIOT_CI_BUILD))
+  FEATURES_PROVIDED += picolibc
+endif
