@@ -197,14 +197,11 @@ typedef enum {
      * The transceiver or driver MUST handle the ACK reply if the Ack Request
      * bit is set in the received frame and promiscuous mode is disabled.
      *
-     * The transceiver is in @ref IEEE802154_TRX_STATE_RX_ON state when
-     * this function is called, but with framebuffer protection (either
-     * dynamic framebuffer protection or disabled RX). Thus, the frame
-     * won't be overwritten before calling the @ref ieee802154_radio_indication_rx
-     * function. However, @ref ieee802154_radio_indication_rx MUST be called in
-     * order to receive new frames. If there's no interest in the
-     * frame, the function can be called with a NULL buffer to drop
-     * the frame.
+     * The transceiver will be in a "FB Lock" state where no more frames are
+     * received. This is done in order to avoid overwriting the Frame Buffer
+     * with new frame arrivals.  In order to leave this state, the upper layer
+     * must set the transceiver state (@ref
+     * ieee802154_radio_ops::request_set_trx_state).
      */
     IEEE802154_RADIO_INDICATION_RX_DONE,
 
@@ -359,7 +356,8 @@ struct ieee802154_radio_ops {
     /**
      * @brief Write a frame into the framebuffer.
      *
-     * This function shouldn't do any checks, so the frame MUST be valid.
+     * This function shouldn't do any checks, so the frame MUST be valid. The
+     * previous content of the framebuffer is replaced by @p psdu.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] psdu PSDU frame to be sent
@@ -427,21 +425,17 @@ struct ieee802154_radio_ops {
     int (*len)(ieee802154_dev_t *dev);
 
     /**
-     * @brief Process the RX done indication
+     * @brief Read a frame from the internal framebuffer
      *
      * This function reads the received frame from the internal framebuffer.
-     * It should try to copy the received frame into @p buf and
-     * then unlock the framebuffer (in order to be able to receive more
-     * frames).
+     * It should try to copy the received frame into @p buf
      *
-     * @pre the device is on and an @ref IEEE802154_RADIO_INDICATION_RX_DONE
-     *      event was issued.
-     *
-     * @post the state is @ref IEEE802154_TRX_STATE_RX_ON
+     * @post It's not safe to call this function again before setting the
+     *       transceiver state to @ref IEEE802154_TRX_STATE_RX_ON (thus flushing
+     *       the RX FIFO).
      *
      * @param[in] dev IEEE802.15.4 device descriptor
-     * @param[out] buf buffer to write the received PSDU frame into. If NULL,
-     *             the frame is not copied.
+     * @param[out] buf buffer to write the received PSDU frame into.
      * @param[in] size size of @p buf
      * @param[in] info information of the received frame (LQI, RSSI). Can be
      *            NULL if this information is not needed.
@@ -449,9 +443,7 @@ struct ieee802154_radio_ops {
      * @return number of bytes written in @p buffer (0 if @p buf == NULL)
      * @return -ENOBUFS if the frame doesn't fit in @p
      */
-    int (*indication_rx)(ieee802154_dev_t *dev, void *buf, size_t size,
-                         ieee802154_rx_info_t *info);
-
+    int (*read)(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_info_t *info);
     /**
      * @brief Turn off the device
      *
@@ -513,7 +505,8 @@ struct ieee802154_radio_ops {
      * @brief Request a PHY state change
      *
      * @note @ref ieee802154_radio_ops::confirm_set_trx_state MUST be used to
-     * finish the state transition.
+     * finish the state transition. Also, setting the state to
+     * @ref IEEE802154_TRX_STATE_RX_ON flushes the RX FIFO.
      *
      * @pre the device is on
      *
@@ -759,23 +752,22 @@ static inline int ieee802154_radio_len(ieee802154_dev_t *dev)
 }
 
 /**
- * @brief Shortcut to @ref ieee802154_radio_ops::indication_rx
+ * @brief Shortcut to @ref ieee802154_radio_ops::read
  *
  * @param[in] dev IEEE802.15.4 device descriptor
- * @param[out] buf buffer to write the received frame into. If NULL, the
- *             frame is not copied.
+ * @param[out] buf buffer to write the received frame into.
  * @param[in] size size of @p buf
  * @param[in] info information of the received frame (LQI, RSSI). Can be
  *            NULL if this information is not needed.
  *
- * @return result of @ref ieee802154_radio_ops::indication_rx
+ * @return result of @ref ieee802154_radio_ops::read
  */
-static inline int ieee802154_radio_indication_rx(ieee802154_dev_t *dev,
+static inline int ieee802154_radio_read(ieee802154_dev_t *dev,
                                                  void *buf,
                                                  size_t size,
                                                  ieee802154_rx_info_t *info)
 {
-    return dev->driver->indication_rx(dev, buf, size, info);
+    return dev->driver->read(dev, buf, size, info);
 }
 
 /**

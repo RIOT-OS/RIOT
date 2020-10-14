@@ -204,7 +204,7 @@ static inline int8_t _hwval_to_ieee802154_dbm(uint8_t hwval)
     return (ED_RSSISCALE * hwval) + ED_RSSIOFFS;
 }
 
-static int _indication_rx(ieee802154_dev_t *dev, void *buf, size_t max_size,
+static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
                           ieee802154_rx_info_t *info)
 {
     (void) dev;
@@ -233,8 +233,6 @@ static int _indication_rx(ieee802154_dev_t *dev, void *buf, size_t max_size,
         }
         memcpy(buf, &rxbuf[1], pktlen);
     }
-
-    NRF_RADIO->TASKS_START = 1;
 
     return pktlen;
 }
@@ -718,10 +716,10 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
 
 static const ieee802154_radio_ops_t nrf802154_ops = {
     .write = _write,
+    .read = _read,
     .request_transmit = _request_transmit,
     .confirm_transmit = _confirm_transmit,
     .len = _len,
-    .indication_rx = _indication_rx,
     .off = _off,
     .request_on = _request_on,
     .confirm_on = _confirm_on,

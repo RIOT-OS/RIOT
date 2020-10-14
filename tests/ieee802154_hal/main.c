@@ -111,7 +111,7 @@ void _rx_done_handler(event_t *event)
      * NOTE: It's possible to call `ieee802154_radio_len` to retrieve the packet
      * length. Since the buffer is fixed in this test, we don't use it
      */
-    int size = ieee802154_radio_indication_rx(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), buffer, 127, &info);
+    int size = ieee802154_radio_read(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), buffer, 127, &info);
     if (size > 0) {
         /* Print packet while we wait for the state transition */
         _print_packet(size, info.lqi, info.rssi);

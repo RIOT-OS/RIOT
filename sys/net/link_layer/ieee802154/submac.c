@@ -154,7 +154,7 @@ void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac)
     if (!_does_handle_ack(dev) && submac->wait_for_ack) {
         uint8_t ack[3];
 
-        if (ieee802154_radio_indication_rx(dev, ack, 3, NULL) &&
+        if (ieee802154_radio_read(dev, ack, 3, NULL) &&
             ack[0] & IEEE802154_FCF_TYPE_ACK) {
             ieee802154_submac_ack_timer_cancel(submac);
             ieee802154_tx_info_t tx_info;

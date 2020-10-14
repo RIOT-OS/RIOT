@@ -325,7 +325,7 @@ static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
 static inline int ieee802154_read_frame(ieee802154_submac_t *submac, void *buf,
                                         size_t len, ieee802154_rx_info_t *info)
 {
-    return ieee802154_radio_indication_rx(submac->dev, buf, len, info);
+    return ieee802154_radio_read(submac->dev, buf, len, info);
 }
 
 /**

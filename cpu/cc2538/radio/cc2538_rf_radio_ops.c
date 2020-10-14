@@ -160,7 +160,7 @@ static int _len(ieee802154_dev_t *dev)
     return rfcore_peek_rx_fifo(0) - IEEE802154_FCS_LEN;
 }
 
-static int _indication_rx(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_info_t *info)
+static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_info_t *info)
 {
     (void) dev;
     int res;
@@ -169,7 +169,6 @@ static int _indication_rx(ieee802154_dev_t *dev, void *buf, size_t size, ieee802
     pkt_len -= IEEE802154_FCS_LEN;
 
     if (pkt_len > size) {
-        RFCORE_SFR_RFST = ISFLUSHRX;
         return -ENOBUFS;
     }
 
@@ -204,7 +203,6 @@ static int _indication_rx(ieee802154_dev_t *dev, void *buf, size_t size, ieee802
         res = 0;
     }
 
-    RFCORE_SFR_RFST = ISFLUSHRX;
 
     return res;
 }
@@ -300,6 +298,7 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
             break;
         case IEEE802154_TRX_STATE_RX_ON:
             RFCORE_XREG_RFIRQM0 |= RXPKTDONE;
+            RFCORE_SFR_RFST = ISFLUSHRX;
             RFCORE_SFR_RFST = ISRXON;
             break;
     }
@@ -323,6 +322,7 @@ void cc2538_irq_handler(void)
         /* CRC check */
         uint8_t pkt_len = rfcore_peek_rx_fifo(0);
         if (rfcore_peek_rx_fifo(pkt_len) & CC2538_CRC_BIT_MASK) {
+            RFCORE_XREG_RFIRQM0 &= RXPKTDONE;
             cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_INDICATION_RX_DONE);
         }
         else {
@@ -492,10 +492,10 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
 
 static const ieee802154_radio_ops_t cc2538_rf_ops = {
     .write = _write,
+    .read = _read,
     .request_transmit = _request_transmit,
     .confirm_transmit = _confirm_transmit,
     .len = _len,
-    .indication_rx = _indication_rx,
     .off = _off,
     .request_on = _request_on,
     .confirm_on = _confirm_on,
