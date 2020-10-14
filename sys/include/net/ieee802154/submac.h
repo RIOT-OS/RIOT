@@ -76,8 +76,8 @@ typedef struct {
      * This function is called from the SubMAC to indicate a IEEE 802.15.4
      * frame is ready to be fetched from the device.
      *
-     * If @ref ieee802154_submac_t::state is @ref IEEE802154_STATE_LISTEN, the
-     * SubMAC is ready to receive frames.
+     * @post If @ref ieee802154_submac_t::state is @ref IEEE802154_STATE_LISTEN, the
+     * SubMAC is ready to receive frames
      *
      * @note ACK frames are automatically handled and discarded by the SubMAC.
      * @param[in] submac pointer to the SubMAC descriptor
@@ -89,7 +89,7 @@ typedef struct {
      * This function is called from the SubMAC to indicate that the TX
      * procedure finished.
      *
-     * If @ref ieee802154_submac_t::state is @ref IEEE802154_STATE_LISTEN, the
+     * @pre If @ref ieee802154_submac_t::state is @ref IEEE802154_STATE_LISTEN, the
      * SubMAC is ready to receive frames.
      *
      * @param[in] submac pointer to the SubMAC descriptor

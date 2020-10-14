@@ -169,6 +169,18 @@ void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac)
     }
     else {
         submac->cb->rx_done(submac);
+
+        /* The Radio HAL will be in "FB Lock" state. We need to do a state
+         * transition here in order to release it */
+        ieee802154_trx_state_t next_state = submac->state == IEEE802154_STATE_LISTEN ? IEEE802154_TRX_STATE_RX_ON : IEEE802154_TRX_STATE_TRX_OFF;
+
+        /* Some radios will run some house keeping tasks on RX_DONE (e.g
+         * sending ACK frames). In such case we need to wait until the radio is
+         * not busy
+         */
+        while (ieee802154_radio_request_set_trx_state(submac->dev, next_state) == -EBUSY);
+
+        while (ieee802154_radio_confirm_set_trx_state(submac->dev) == -EAGAIN) {}
     }
 }
 
