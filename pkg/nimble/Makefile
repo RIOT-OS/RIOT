@@ -19,8 +19,6 @@ ifeq (llvm,$(TOOLCHAIN))
 # Workaround, until https://github.com/apache/mynewt-nimble/pull/566 is merged
 # upstream and the NimBLE version in RIOT is updated.
   CFLAGS += -Wno-sometimes-uninitialized
-else
-  CFLAGS += -Wno-unused-but-set-variable
 endif
 
 IGNORE := nimble_autoconn_%
