@@ -8,8 +8,4 @@ BAUD        ?= 115200
 PROGRAMMER_MICRODUINO_CORERF ?= UM232H
 PROGRAMMER ?= $(PROGRAMMER_MICRODUINO_CORERF)
 
-# We don't use a bootloader
-BOOTLOADER_SIZE ?= 0
-ROM_RESERVED ?= $(BOOTLOADER_SIZE)
-
 include $(RIOTBOARD)/common/atmega/Makefile.include
