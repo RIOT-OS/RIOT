@@ -17,8 +17,8 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef PKT_H
-#define PKT_H
+#ifndef GNRC_TCP_PKT_H
+#define GNRC_TCP_PKT_H
 
 #include <stdint.h>
 #include "net/gnrc.h"
@@ -40,7 +40,8 @@ extern "C" {
  * @returns   Zero on success
  *            -ENOMEM if pktbuf is full.
  */
-int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt);
+int _gnrc_tcp_pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt,
+                                       gnrc_pktsnip_t *in_pkt);
 
 /**
  * @brief Build and allocate a TCB packet, TCB stores pointer to new packet.
@@ -57,9 +58,10 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt);
  * @returns   Zero on success.
  *            -ENOMEM if pktbuf is full.
  */
-int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
-               const uint16_t ctl, const uint32_t seq_num, const uint32_t ack_num,
-               void *payload, const size_t payload_len);
+int _gnrc_tcp_pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt,
+                        uint16_t *seq_con, const uint16_t ctl,
+                        const uint32_t seq_num, const uint32_t ack_num,
+                        void *payload, const size_t payload_len);
 
 /**
  * @brief Sends packet to peer.
@@ -72,8 +74,8 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
  * @returns   Zero on success.
  *            -EINVAL if out_pkt was NULL.
  */
-int _pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_con,
-              const bool retransmit);
+int _gnrc_tcp_pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt,
+                       const uint16_t seq_con, const bool retransmit);
 
 /**
  * @brief Verify sequence number.
@@ -85,7 +87,8 @@ int _pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_c
  * @returns    Zero if the sequence number is acceptable.
  *             Negative value if the sequence number is not acceptable.
  */
-int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const uint32_t seg_len);
+int _gnrc_tcp_pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num,
+                              const uint32_t seg_len);
 
 /**
  * @brief Extracts the length of a segment.
@@ -94,7 +97,7 @@ int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const ui
  *
  * @returns   Segments length in bytes (== sequence number consumption).
  */
-uint32_t _pkt_get_seg_len(gnrc_pktsnip_t *pkt);
+uint32_t _gnrc_tcp_pkt_get_seg_len(gnrc_pktsnip_t *pkt);
 
 /**
  * @brief Calculates a packets payload length.
@@ -103,7 +106,7 @@ uint32_t _pkt_get_seg_len(gnrc_pktsnip_t *pkt);
  *
  * @returns   The packets payload length in bytes.
  */
-uint32_t _pkt_get_pay_len(gnrc_pktsnip_t *pkt);
+uint32_t _gnrc_tcp_pkt_get_pay_len(gnrc_pktsnip_t *pkt);
 
 /**
  * @brief Adds a packet to the retransmission mechanism.
@@ -116,7 +119,8 @@ uint32_t _pkt_get_pay_len(gnrc_pktsnip_t *pkt);
  *            -ENOMEM if the retransmission queue is full.
  *            -EINVAL if pkt is null.
  */
-int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool retransmit);
+int _gnrc_tcp_pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt,
+                                   const bool retransmit);
 
 /**
  * @brief Acknowledges and removes packet from the retransmission mechanism.
@@ -127,7 +131,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
  * @returns   Zero on success.
  *            -ENODATA if there is nothing to acknowledge.
  */
-int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack);
+int _gnrc_tcp_pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack);
 
 /**
  * @brief Calculates checksum over payload, TCP header and network layer header.
@@ -139,12 +143,13 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack);
  * @returns   Non-zero checksum if given network layer is supported.
  *            Zero if given network layer is not supported.
  */
-uint16_t _pkt_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_hdr,
-                        const gnrc_pktsnip_t *payload);
+uint16_t _gnrc_tcp_pkt_calc_csum(const gnrc_pktsnip_t *hdr,
+                                 const gnrc_pktsnip_t *pseudo_hdr,
+                                 const gnrc_pktsnip_t *payload);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* PKT_H */
+#endif /* GNRC_TCP_PKT_H */
 /** @} */

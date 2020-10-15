@@ -17,8 +17,8 @@
 * @author       Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef EVENTLOOP_H
-#define EVENTLOOP_H
+#ifndef GNRC_TCP_EVENTLOOP_H
+#define GNRC_TCP_EVENTLOOP_H
 
 #include <stdint.h>
 
@@ -35,7 +35,7 @@ extern "C" {
  * @retval  -EEXIST if processing thread was already started
  * @retval  see @ref thread_create() for more error cases.
  */
-int _gnrc_tcp_event_loop_init(void);
+int _gnrc_tcp_eventloop_init(void);
 
 /**
  * @brief   Schedule event to event loop
@@ -46,8 +46,8 @@ int _gnrc_tcp_event_loop_init(void);
  * @param[in] type      Type of the message for the event
  * @param[in] context   Context of the event.
  */
-void _gnrc_tcp_event_loop_sched(evtimer_msg_event_t *event, uint32_t offset,
-                                uint16_t type, void *context);
+void _gnrc_tcp_eventloop_sched(evtimer_msg_event_t *event, uint32_t offset,
+                               uint16_t type, void *context);
 
 /**
  * @brief   Unschedule event to event loop
@@ -56,11 +56,11 @@ void _gnrc_tcp_event_loop_sched(evtimer_msg_event_t *event, uint32_t offset,
  *
  * @param[in] event The event to unschedule
  */
-void _gnrc_tcp_event_loop_unsched(evtimer_msg_event_t *event);
+void _gnrc_tcp_eventloop_unsched(evtimer_msg_event_t *event);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* EVENTLOOP_H */
+#endif /* GNRC_TCP_EVENTLOOP_H */
 /** @} */

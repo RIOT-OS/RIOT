@@ -17,8 +17,8 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef FSM_H
-#define FSM_H
+#ifndef GNRC_TCP_FSM_H
+#define GNRC_TCP_FSM_H
 
 #include <stdint.h>
 #include "mbox.h"
@@ -44,7 +44,7 @@ typedef enum {
     FSM_STATE_FIN_WAIT_2,
     FSM_STATE_CLOSING,
     FSM_STATE_TIME_WAIT
-} fsm_state_t;
+} _gnrc_tcp_fsm_state_t;
 
 /**
  *  @brief Events that trigger transitions in TCP FSM.
@@ -61,7 +61,7 @@ typedef enum {
     FSM_EVENT_TIMEOUT_CONNECTION, /* Timeout: connection */
     FSM_EVENT_SEND_PROBE,         /* Send zero window probe */
     FSM_EVENT_CLEAR_RETRANSMIT    /* Clear retransmission mechanism */
-} fsm_event_t;
+} _gnrc_tcp_fsm_event_t;
 
 /**
  * @brief TCP finite state maschine
@@ -76,7 +76,8 @@ typedef enum {
  *            Positive Number, number of bytes sent from or copied into @p buf.
  *            -ENOSYS if event is not implemented
  */
-int _fsm(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *buf, size_t len);
+int _gnrc_tcp_fsm(gnrc_tcp_tcb_t *tcb, _gnrc_tcp_fsm_event_t event,
+                  gnrc_pktsnip_t *in_pkt, void *buf, size_t len);
 
 /**
  * @brief Associate mbox with tcb. Messages sent from the FSM will be stored in the mbox.
@@ -85,11 +86,11 @@ int _fsm(gnrc_tcp_tcb_t *tcb, fsm_event_t event, gnrc_pktsnip_t *in_pkt, void *b
  * @param[in]      mbox  Message box used to store messages from the FSM.
  *                       If @p mbox is NULL, no messages will be stored.
  */
-void _fsm_set_mbox(gnrc_tcp_tcb_t *tcb, mbox_t *mbox);
+void _gnrc_tcp_fsm_set_mbox(gnrc_tcp_tcb_t *tcb, mbox_t *mbox);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* FSM_H */
+#endif /* GNRC_TCP_FSM_H */
 /** @} */

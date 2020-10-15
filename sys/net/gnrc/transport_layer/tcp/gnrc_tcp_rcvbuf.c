@@ -16,29 +16,35 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 #include <errno.h>
-#include "internal/common.h"
-#include "internal/rcvbuf.h"
+#include <mutex.h>
+#include <stdint.h>
+#include "net/gnrc/tcp/config.h"
+#include "include/gnrc_tcp_common.h"
+#include "include/gnrc_tcp_rcvbuf.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
 /**
- * @brief Internal struct holding receive buffers.
+ * @brief Receive buffer entry.
  */
-static rcvbuf_t _static_buf;
+typedef struct {
+    uint8_t used;                          /**< Flag: Is buffer in use? */
+    uint8_t buffer[GNRC_TCP_RCV_BUF_SIZE]; /**< Receive buffer storage */
+} _rcvbuf_entry_t;
 
 /**
- * @brief Initializes all receive buffers.
+ * @brief Struct holding receive buffers.
  */
-void _rcvbuf_init(void)
-{
-    TCP_DEBUG_ENTER;
-    mutex_init(&(_static_buf.lock));
-    for (size_t i = 0; i < CONFIG_GNRC_TCP_RCV_BUFFERS; ++i) {
-        _static_buf.entries[i].used = 0;
-    }
-    TCP_DEBUG_LEAVE;
-}
+typedef struct {
+    mutex_t lock;                                         /**< Access lock */
+    _rcvbuf_entry_t entries[CONFIG_GNRC_TCP_RCV_BUFFERS]; /**< Buffers */
+} _rcvbuf_t;
+
+/**
+ * @brief Internal struct holding receive buffers.
+ */
+static _rcvbuf_t _static_buf;
 
 /**
  * @brief Allocate receive buffer.
@@ -81,7 +87,17 @@ static void _rcvbuf_free(void * const buf)
     TCP_DEBUG_LEAVE;
 }
 
-int _rcvbuf_get_buffer(gnrc_tcp_tcb_t *tcb)
+void _gnrc_tcp_rcvbuf_init(void)
+{
+    TCP_DEBUG_ENTER;
+    mutex_init(&(_static_buf.lock));
+    for (size_t i = 0; i < CONFIG_GNRC_TCP_RCV_BUFFERS; ++i) {
+        _static_buf.entries[i].used = 0;
+    }
+    TCP_DEBUG_LEAVE;
+}
+
+int _gnrc_tcp_rcvbuf_get_buffer(gnrc_tcp_tcb_t *tcb)
 {
     TCP_DEBUG_ENTER;
     if (tcb->rcv_buf_raw == NULL) {
@@ -99,7 +115,7 @@ int _rcvbuf_get_buffer(gnrc_tcp_tcb_t *tcb)
     return 0;
 }
 
-void _rcvbuf_release_buffer(gnrc_tcp_tcb_t *tcb)
+void _gnrc_tcp_rcvbuf_release_buffer(gnrc_tcp_tcb_t *tcb)
 {
     TCP_DEBUG_ENTER;
     if (tcb->rcv_buf_raw != NULL) {
