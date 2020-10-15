@@ -82,19 +82,23 @@ static void test_pkt_hdr_extra__tlv_block(void)
         4,
         /* TLV */
         TLV_TYPE,
-        0,
+        RFC5444_TLV_FLAG_HAS_VALUE,
         TLV_LEN,
         TLV_VALUE,
     };
-    const rfc5444_pkt_hdr_t *hdr = (rfc5444_pkt_hdr_t *)pkt;
+    rfc5444_pkt_hdr_t *hdr = (rfc5444_pkt_hdr_t *)pkt;
 
     tlv_block = rfc5444_pkt_hdr_tlv_block(hdr);
     TEST_ASSERT_NOT_NULL(tlv_block);
-    TEST_ASSERT_EQUAL_INT(4, rfc5444_tlv_block_sizeof(tlv_block));
+    TEST_ASSERT_EQUAL_INT(6, rfc5444_tlv_block_sizeof(tlv_block));
+    TEST_ASSERT_EQUAL_INT(4, rfc5444_tlv_block_len(tlv_block));
 
     rfc5444_tlv_iter_init(&iter, tlv_block);
-    tlv = rfc5444_tlv_iter_next(&next);
+    tlv = rfc5444_tlv_iter_next(&iter);
     TEST_ASSERT_NOT_NULL(tlv);
+
+    /* we don't have more TLVs */
+    TEST_ASSERT_NULL(rfc5444_tlv_iter_next(&iter));
 
     TEST_ASSERT_EQUAL_INT(TLV_TYPE, tlv->type);
     TEST_ASSERT_EQUAL_INT(TLV_LEN, rfc5444_tlv_len(tlv));
@@ -103,8 +107,46 @@ static void test_pkt_hdr_extra__tlv_block(void)
 
 static void test_pkt_hdr_extra__seq_num_tlv_block(void)
 {
-}
+    rfc5444_tlv_block_t *tlv_block;
+    rfc5444_tlv_iter_t iter;
+    rfc5444_tlv_t *tlv;
+    uint8_t pkt[] = {
+          (RFC5444_VERSION << 4)
+        | RFC5444_PKT_HDR_FLAG_HAS_TLV
+        | RFC5444_PKT_HDR_FLAG_HAS_SEQ_NUM,
+        /* seqnum, set with byteorder functions */
+        0,
+        0,
+        /* length of TLV block */
+        0,
+        4,
+        /* TLV */
+        TLV_TYPE,
+        RFC5444_TLV_FLAG_HAS_VALUE,
+        TLV_LEN,
+        TLV_VALUE,
+    };
+    rfc5444_pkt_hdr_t *hdr = (rfc5444_pkt_hdr_t *)pkt;
 
+    byteorder_htobebufs(&pkt[1], SEQ_NUM);
+    TEST_ASSERT_EQUAL_INT(SEQ_NUM, rfc5444_pkt_hdr_seq_num(hdr));
+
+    tlv_block = rfc5444_pkt_hdr_tlv_block(hdr);
+    TEST_ASSERT_NOT_NULL(tlv_block);
+    TEST_ASSERT_EQUAL_INT(6, rfc5444_tlv_block_sizeof(tlv_block));
+    TEST_ASSERT_EQUAL_INT(4, rfc5444_tlv_block_len(tlv_block));
+
+    rfc5444_tlv_iter_init(&iter, tlv_block);
+    tlv = rfc5444_tlv_iter_next(&iter);
+    TEST_ASSERT_NOT_NULL(tlv);
+
+    /* we don't have more TLVs */
+    TEST_ASSERT_NULL(rfc5444_tlv_iter_next(&iter));
+
+    TEST_ASSERT_EQUAL_INT(TLV_TYPE, tlv->type);
+    TEST_ASSERT_EQUAL_INT(TLV_LEN, rfc5444_tlv_len(tlv));
+    TEST_ASSERT_EQUAL_INT(TLV_VALUE, *rfc5444_tlv_value(tlv));
+}
 
 Test *tests_rfc5444_tests(void)
 {

@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <errno.h>
 
 #include "bitarithm.h"
@@ -99,7 +100,7 @@ static inline size_t rfc5444_tlv_block_sizeof(const rfc5444_tlv_block_t *block)
 static inline int rfc5444_tlv_type_ext(const rfc5444_tlv_t *tlv)
 {
     if ((tlv == NULL) ||
-        !(tlv & RFC5444_TLV_FLAG_HAS_TYPE_EXT)) {
+        !(tlv->flags & RFC5444_TLV_FLAG_HAS_TYPE_EXT)) {
         return -1;
     }
 
@@ -116,33 +117,53 @@ static inline int rfc5444_tlv_index_start(const rfc5444_tlv_t *tlv)
         return -1;
     }
 
-    /* <type>, <flags> */
-    pos = sizeof(rfc5444_tlv_t);
-    /* <type-ext> */
-    if (tlv->flags & RFC5444_TLV_FLAG_HAS_TYPE_EXT) {
-        pos += sizeof(uint8_t);
-    }
+    /* <type><flags><type-ext> */
+    pos = sizeof(rfc5444_tlv_t)
+        + (tlv->flags & RFC5444_TLV_FLAG_HAS_TYPE_EXT ? sizeof(uint8_t) : 0);
 
+    /* <index-start> */
     return *(uint8_t *)((uintptr_t)(tlv) + pos);
 }
 
+/**
+ * @brief   Get the index-stop value of a TLV.
+ *
+ * @param[in]   tlv The TLV.
+ *
+ * @return index-stop value, positive integer.
+ * @return -1 If the TLV doesn't have at least an <index-start> value.
+ */
 static inline int rfc5444_tlv_index_stop(const rfc5444_tlv_t *tlv)
 {
     size_t pos;
     if ((tlv == NULL) ||
-        !(tlv->flags & RFC5444_TLV_FLAG_HAS_MULTI_INDEX)) {
+        !((tlv->flags & RFC5444_TLV_FLAG_HAS_SINGLE_INDEX) ||
+          (tlv->flags & RFC5444_TLV_FLAG_HAS_MULTI_INDEX))) {
         return -1;
     }
+    /* if it's only single index, then index-stop is equal to index-start */
+    else if (!(tlv->flags & RFC5444_TLV_FLAG_HAS_MULTI_INDEX)) {
+        return rfc5444_tlv_index_start(tlv);
+    }
 
-    /* <type>, <flags>, <type-ext>, <index-start> */
-    pos = sizeof(rfc5444_tlv_t);
+    /* <type><flags><type-ext><index-start> */
+    pos = sizeof(rfc5444_tlv_t)
         + (tlv->flags & RFC5444_TLV_FLAG_HAS_TYPE_EXT) ? sizeof(uint8_t) : 0
         + sizeof(uint8_t);
 
     /* <index-stop> */
-    return *(uint8_t)((uintptr_t)(tlv) + pos);
+    return *(uint8_t *)((uintptr_t)(tlv) + pos);
 }
 
+/**
+ * @brief   Get the length of a TLV.
+ *
+ * @param[in]   tlv The TLV.
+ *
+ * @return Length of the TLV in bytes, can be 0 if specified like that
+ *         on the TLV.
+ * @return -1 if TLV doesn't have a value, nor a length.
+ */
 static inline int rfc5444_tlv_len(const rfc5444_tlv_t *tlv)
 {
     size_t pos;
@@ -151,27 +172,15 @@ static inline int rfc5444_tlv_len(const rfc5444_tlv_t *tlv)
         return -1;
     }
 
-    /* <type><flags><type-ext> */
-    pos = sizeof(rfc5444_tlv_t);
-        + (tlv->flags & RFC5444_TLV_FLAG_HAS_TYPE_EXT) ? sizeof(uint8_t) : 0;
+    bool is_single_idx = (tlv->flags & RFC5444_TLV_FLAG_HAS_SINGLE_INDEX) &&
+                         !(tlv->flags & RFC5444_TLV_FLAG_HAS_MULTI_INDEX);
+    bool is_multi_idx = tlv->flags & RFC5444_TLV_FLAG_HAS_MULTI_INDEX;
 
-    /* guard against invalid combination of thassingleindex and
-     * thasmultiindex, according to the truth table on the spec. both flags
-     * aren't allowed at the same time. You can't have a cake and eat it
-     * too, pick one :-) */
-    if ((tlv->flags & RFC5444_TLV_FLAG_HAS_SINGLE_INDEX) &&
-        (tlv->flags & RFC5444_TLV_FLAG_HAS_MULTI_INDEX)) {
-        return -1;
-    }
-
-    /* <index-start>> */
-    if (tlv->flags & RFC5444_TLV_FLAG_HAS_SINGLE_INDEX) {
-        pos += sizeof(uint8_t);
-    }
-    /* <index-start><index-stop> */
-    else if (tlv->flags & RFC5444_TLV_FLAG_HAS_MULTI_INDEX) {
-        pos += sizeof(uint8_t) * 2;
-    }
+    /* <type><flags><type-ext>(<index-start><index-stop>)? */
+    pos = sizeof(rfc5444_tlv_t)
+        + (tlv->flags & RFC5444_TLV_FLAG_HAS_TYPE_EXT ? sizeof(uint8_t) : 0)
+        + (is_single_idx ? sizeof(uint8_t) : (is_multi_idx ? sizeof(uint8_t) * 2
+                                                           : 0));
 
     int len;
     /* <length> 16-bits */
@@ -186,24 +195,135 @@ static inline int rfc5444_tlv_len(const rfc5444_tlv_t *tlv)
     return len;
 }
 
-static inline int rfc5444_tlv_value(const rfc5444_tlv_t *tlv)
+/**
+ * @brief   Get the value of a TLV.
+ *
+ * @param[in]   tlv The TLV.
+ *
+ * @return Pointer to the bytes of the value, with a length of
+ *         @ref rfc5444_tlv_len.
+ * @return NULL if the TLV doesn't provide a value.
+ * @return NULL if the TLV length is 0.
+ */
+static inline uint8_t *rfc5444_tlv_value(rfc5444_tlv_t *tlv)
 {
-    return -1;
+    int pos;
+
+    int len;
+    if ((len = rfc5444_tlv_len(tlv)) < 0) {
+        return NULL;
+    }
+
+    /* provides a value but with a length of 0 */
+    if (len == 0) {
+        return NULL;
+    }
+
+    bool is_single_idx = (tlv->flags & RFC5444_TLV_FLAG_HAS_SINGLE_INDEX) &&
+                         !(tlv->flags & RFC5444_TLV_FLAG_HAS_MULTI_INDEX);
+    bool is_multi_idx = tlv->flags & RFC5444_TLV_FLAG_HAS_MULTI_INDEX;
+
+    /* <type><flags><type-ext>(<index-start><index-stop>)?<length> */
+    pos = sizeof(rfc5444_tlv_t)
+        + (tlv->flags & RFC5444_TLV_FLAG_HAS_TYPE_EXT ? sizeof(uint8_t) : 0)
+        + (is_single_idx ? sizeof(uint8_t) : (is_multi_idx ? sizeof(uint8_t) * 2
+                                                           : 0))
+        + (tlv->flags & RFC5444_TLV_FLAG_HAS_EXT_LEN ? sizeof(uint16_t)
+                                                     : sizeof(uint8_t));
+
+    /* <value> */
+    return (uint8_t *)((uintptr_t)(tlv) + pos);
 }
 
+/**
+ * @brief   Calculate the number of values in the <value> field
+ *          of the TLV.
+ *
+ * If the flag #RFC5444_TLV_FLAG_IS_MULTIVALUE is present this function
+ * can be used to calculate the number of values in the <value> field.
+ *
+ * This way each single value is equal to:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * int single_value_len = rfc5444_tlv_len(tlv) /
+ *                        rfc5444_tlv_number_values(tlv);
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * @param[in]   tlv The TLV.
+ *
+ * @return Number of values in a single TLV.
+ * @return -1 if the TLV doesn't provide at least the <index-start> value.
+ */
+static inline int rfc5444_tlv_number_values(const rfc5444_tlv_t *tlv)
+{
+    int index_start;
+    int index_stop;
+    if ((index_start = rfc5444_tlv_index_start(tlv)) < 0 ||
+        (index_stop = rfc5444_tlv_index_stop(tlv)) < 0) {
+        return -1;
+    }
+
+    return index_stop - index_start + 1;
+}
+
+/**
+ * @brief   Calculate the full type of a TLV.
+ *
+ * A full type is defined to be:
+ *
+ * `256 * <tlv-type> + tlv-type-ext`
+ *
+ * Where tlv-type-ext is equal to 0 if it isn't provided by the
+ * TLV.
+ *
+ * @param[in]   tlv The TLV.
+ *
+ * @return Type extension, positive integer.
+ */
 static inline int rfc5444_tlv_full_type(const rfc5444_tlv_t *tlv)
 {
+    /* tlv-type-ext is 0 if not defined */
     int type_ext;
     if ((type_ext = rfc5444_tlv_type_ext(tlv)) < 0) {
-        return -1;
+        type_ext = 0;
     }
 
     return (256 * (int)tlv->type) + type_ext;
 }
 
-static inline int rfc5444_tlv_sizeof(const rfc5444_tlv_t *tlv)
+/**
+ * @brief   Total length of a single TLV, in bytes.
+ *
+ * @param[in]   tlv The TLV.
+ *
+ * @return TLV size in bytes.
+ */
+static inline size_t rfc5444_tlv_sizeof(const rfc5444_tlv_t *tlv)
 {
-    return -1;
+    size_t size;
+
+    bool is_single_idx = (tlv->flags & RFC5444_TLV_FLAG_HAS_SINGLE_INDEX) &&
+                         !(tlv->flags & RFC5444_TLV_FLAG_HAS_MULTI_INDEX);
+    bool is_multi_idx = tlv->flags & RFC5444_TLV_FLAG_HAS_MULTI_INDEX;
+
+    /* <type><flags><type-ext>(<index-start><index-stop>)? */
+    size = sizeof(rfc5444_tlv_t)
+         + (tlv->flags & RFC5444_TLV_FLAG_HAS_TYPE_EXT ? sizeof(uint8_t) : 0)
+         + (is_single_idx ? sizeof(uint8_t) : (is_multi_idx ? sizeof(uint8_t) * 2
+                                                            : 0));
+
+    /* <length><value> */
+    if (tlv->flags & RFC5444_TLV_FLAG_HAS_VALUE) {
+        size += (tlv->flags & RFC5444_TLV_FLAG_HAS_EXT_LEN ? sizeof(uint16_t)
+                                                           : sizeof(uint8_t));
+
+        int tlv_len;
+        if ((tlv_len = rfc5444_tlv_len(tlv)) > 0) {
+            size += (size_t)tlv_len;
+        }
+    }
+
+    return size;
 }
 
 /**
@@ -230,7 +350,7 @@ typedef struct {
 static inline void rfc5444_tlv_iter_init(rfc5444_tlv_iter_t *iter, rfc5444_tlv_block_t *block)
 {
     iter->ptr = (uintptr_t)block + sizeof(rfc5444_tlv_block_t);
-    iter->len = ;
+    iter->len = rfc5444_tlv_block_len(block);
     iter->pos = 0;
 }
 
@@ -243,21 +363,17 @@ static inline void rfc5444_tlv_iter_init(rfc5444_tlv_iter_t *iter, rfc5444_tlv_b
  * @return NULL on finished parsing.
  * @return Pointer to next TLV on success.
  */
-static inline void rfc5444_tlv_t *rfc5444_tlv_iter_next(rfc5444_tlv_iter_t *iter)
+static inline rfc5444_tlv_t *rfc5444_tlv_iter_next(rfc5444_tlv_iter_t *iter)
 {
     /* verify if we have something to iterate */
-    if ((iter != NULL) ||
+    if ((iter == NULL) ||
         (iter->pos >= iter->len) ||
         ((iter->len - iter->pos) <= sizeof(rfc5444_tlv_t))) {
         return NULL;
     }
 
     rfc5444_tlv_t *current = (rfc5444_tlv_t *)(iter->ptr + iter->pos);
-    iter->pos += (size_t)byteorder_ntohs(current->size);
-    /* verify that the buffer contains the said length by the TLV */
-    if (iter->pos >= iter->len) {
-        return NULL;
-    }
+    iter->pos += rfc5444_tlv_sizeof(current);
 
     return current;
 }
