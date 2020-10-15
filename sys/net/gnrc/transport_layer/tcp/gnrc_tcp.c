@@ -25,14 +25,14 @@
 #include "evtimer_mbox.h"
 #include "mbox.h"
 #include "net/af.h"
+#include "net/tcp.h"
 #include "net/gnrc.h"
 #include "net/gnrc/tcp.h"
-#include "internal/common.h"
-#include "internal/fsm.h"
-#include "internal/pkt.h"
-#include "internal/option.h"
-#include "internal/eventloop.h"
-#include "internal/rcvbuf.h"
+#include "include/gnrc_tcp_common.h"
+#include "include/gnrc_tcp_fsm.h"
+#include "include/gnrc_tcp_pkt.h"
+#include "include/gnrc_tcp_eventloop.h"
+#include "include/gnrc_tcp_rcvbuf.h"
 
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
@@ -112,7 +112,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
     }
 
     /* Setup messaging */
-    _fsm_set_mbox(tcb, &mbox);
+    _gnrc_tcp_fsm_set_mbox(tcb, &mbox);
 
     /* Setup passive connection */
     if (passive) {
@@ -167,7 +167,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
     }
 
     /* Call FSM with event: CALL_OPEN */
-    ret = _fsm(tcb, FSM_EVENT_CALL_OPEN, NULL, NULL, 0);
+    ret = _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_OPEN, NULL, NULL, 0);
     if (ret == -ENOMEM) {
         TCP_DEBUG_ERROR("-ENOMEM: All receive buffers are in use.");
     }
@@ -200,11 +200,11 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
                  * 2) Passive connections stop the ongoing retransmissions and repeat the
                  *    open call to wait for the next connection attempt. */
                 if (tcb->status & STATUS_PASSIVE) {
-                    _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
-                    _fsm(tcb, FSM_EVENT_CALL_OPEN, NULL, NULL, 0);
+                    _gnrc_tcp_fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
+                    _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_OPEN, NULL, NULL, 0);
                 }
                 else {
-                    _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                    _gnrc_tcp_fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
                     TCP_DEBUG_ERROR("-ETIMEDOUT: Connection timed out.");
                     ret = -ETIMEDOUT;
                 }
@@ -216,7 +216,7 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
     }
 
     /* Cleanup */
-    _fsm_set_mbox(tcb, NULL);
+    _gnrc_tcp_fsm_set_mbox(tcb, NULL);
     _unsched_mbox(&tcb->event_misc);
     if (tcb->state == FSM_STATE_CLOSED && ret == 0) {
         TCP_DEBUG_ERROR("-ECONNREFUSED: Connection refused by peer.");
@@ -387,14 +387,14 @@ int gnrc_tcp_ep_from_str(gnrc_tcp_ep_t *ep, const char *str)
 int gnrc_tcp_init(void)
 {
     TCP_DEBUG_ENTER;
-    /* Initialize TCB list */
-    _rcvbuf_init();
+    /* Initialize receive buffers */
+    _gnrc_tcp_rcvbuf_init();
 
     /* Initialize timers */
     evtimer_init_mbox(&_tcp_mbox_timer);
 
     /* Start TCP processing thread */
-    kernel_pid_t pid = _gnrc_tcp_event_loop_init();
+    kernel_pid_t pid = _gnrc_tcp_eventloop_init();
     TCP_DEBUG_LEAVE;
     return pid;
 }
@@ -510,7 +510,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     }
 
     /* Setup messaging */
-    _fsm_set_mbox(tcb, &mbox);
+    _gnrc_tcp_fsm_set_mbox(tcb, &mbox);
 
     /* Setup connection timeout */
     _sched_connection_timeout(&tcb->event_misc, &mbox);
@@ -544,7 +544,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
 
         /* Try to send data in case there nothing has been sent and we are not probing */
         if (ret == 0 && !probing_mode) {
-            ret = _fsm(tcb, FSM_EVENT_CALL_SEND, NULL, (void *) data, len);
+            ret = _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_SEND, NULL, (void *) data, len);
         }
 
         /* Wait for responses */
@@ -552,14 +552,14 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
         switch (msg.type) {
             case MSG_TYPE_CONNECTION_TIMEOUT:
                 TCP_DEBUG_INFO("Received MSG_TYPE_CONNECTION_TIMEOUT.");
-                _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                _gnrc_tcp_fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
                 TCP_DEBUG_ERROR("-ECONNABORTED: Connection timed out.");
                 ret = -ECONNABORTED;
                 break;
 
             case MSG_TYPE_USER_SPEC_TIMEOUT:
                 TCP_DEBUG_INFO("Received MSG_TYPE_USER_SPEC_TIMEOUT.");
-                _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
+                _gnrc_tcp_fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
                 TCP_DEBUG_ERROR("-ETIMEDOUT: User specified timeout expired.");
                 ret = -ETIMEDOUT;
                 break;
@@ -567,7 +567,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
             case MSG_TYPE_PROBE_TIMEOUT:
                 TCP_DEBUG_INFO("Received MSG_TYPE_PROBE_TIMEOUT.");
                 /* Send probe */
-                _fsm(tcb, FSM_EVENT_SEND_PROBE, NULL, NULL, 0);
+                _gnrc_tcp_fsm(tcb, FSM_EVENT_SEND_PROBE, NULL, NULL, 0);
                 probe_timeout_duration_ms += probe_timeout_duration_ms;
 
                 /* Boundary check for time interval between probes */
@@ -599,7 +599,7 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     }
 
     /* Cleanup */
-    _fsm_set_mbox(tcb, NULL);
+    _gnrc_tcp_fsm_set_mbox(tcb, NULL);
     _unsched_mbox(&tcb->event_misc);
     _unsched_mbox(&event_probe_timeout);
     _unsched_mbox(&event_user_timeout);
@@ -636,7 +636,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     /* If FIN was received (CLOSE_WAIT), no further data can be received. */
     /* Copy received data into given buffer and return number of bytes. Can be zero. */
     if (tcb->state == FSM_STATE_CLOSE_WAIT) {
-        ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
+        ret = _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
         mutex_unlock(&(tcb->function_lock));
         TCP_DEBUG_LEAVE;
         return ret;
@@ -644,7 +644,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
 
     /* If this call is non-blocking (timeout_duration_ms == 0): Try to read data and return */
     if (timeout_duration_ms == 0) {
-        ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
+        ret = _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
         if (ret == 0) {
             TCP_DEBUG_ERROR("-EAGAIN: Not data available, try later again.");
             ret = -EAGAIN;
@@ -655,7 +655,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     }
 
     /* Setup messaging */
-    _fsm_set_mbox(tcb, &mbox);
+    _gnrc_tcp_fsm_set_mbox(tcb, &mbox);
 
     /* Setup connection timeout */
     _sched_connection_timeout(&tcb->event_misc, &mbox);
@@ -675,7 +675,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         }
 
         /* Try to read available data */
-        ret = _fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
+        ret = _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
 
         /* If FIN was received (CLOSE_WAIT), no further data can be received. Leave event loop */
         if (tcb->state == FSM_STATE_CLOSE_WAIT) {
@@ -688,14 +688,14 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
             switch (msg.type) {
                 case MSG_TYPE_CONNECTION_TIMEOUT:
                     TCP_DEBUG_INFO("Received MSG_TYPE_CONNECTION_TIMEOUT.");
-                    _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                    _gnrc_tcp_fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
                     TCP_DEBUG_ERROR("-ECONNABORTED: Connection timed out.");
                     ret = -ECONNABORTED;
                     break;
 
                 case MSG_TYPE_USER_SPEC_TIMEOUT:
                     TCP_DEBUG_INFO("Received MSG_TYPE_USER_SPEC_TIMEOUT.");
-                    _fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
+                    _gnrc_tcp_fsm(tcb, FSM_EVENT_CLEAR_RETRANSMIT, NULL, NULL, 0);
                     TCP_DEBUG_ERROR("-ETIMEDOUT: User specified timeout expired.");
                     ret = -ETIMEDOUT;
                     break;
@@ -711,7 +711,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     }
 
     /* Cleanup */
-    _fsm_set_mbox(tcb, NULL);
+    _gnrc_tcp_fsm_set_mbox(tcb, NULL);
     _unsched_mbox(&tcb->event_misc);
     _unsched_mbox(&event_user_timeout);
     mutex_unlock(&(tcb->function_lock));
@@ -739,13 +739,13 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     }
 
     /* Setup messaging */
-    _fsm_set_mbox(tcb, &mbox);
+    _gnrc_tcp_fsm_set_mbox(tcb, &mbox);
 
     /* Setup connection timeout */
     _sched_connection_timeout(&tcb->event_misc, &mbox);
 
     /* Start connection teardown sequence */
-    _fsm(tcb, FSM_EVENT_CALL_CLOSE, NULL, NULL, 0);
+    _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_CLOSE, NULL, NULL, 0);
 
     /* Loop until the connection has been closed */
     while (tcb->state != FSM_STATE_CLOSED) {
@@ -753,7 +753,7 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
         switch (msg.type) {
             case MSG_TYPE_CONNECTION_TIMEOUT:
                 TCP_DEBUG_INFO("Received MSG_TYPE_CONNECTION_TIMEOUT.");
-                _fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
+                _gnrc_tcp_fsm(tcb, FSM_EVENT_TIMEOUT_CONNECTION, NULL, NULL, 0);
                 break;
 
             case MSG_TYPE_NOTIFY_USER:
@@ -766,7 +766,7 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     }
 
     /* Cleanup */
-    _fsm_set_mbox(tcb, NULL);
+    _gnrc_tcp_fsm_set_mbox(tcb, NULL);
     _unsched_mbox(&tcb->event_misc);
     mutex_unlock(&(tcb->function_lock));
     TCP_DEBUG_LEAVE;
@@ -781,7 +781,7 @@ void gnrc_tcp_abort(gnrc_tcp_tcb_t *tcb)
     mutex_lock(&(tcb->function_lock));
     if (tcb->state != FSM_STATE_CLOSED) {
         /* Call FSM ABORT event */
-        _fsm(tcb, FSM_EVENT_CALL_ABORT, NULL, NULL, 0);
+        _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_ABORT, NULL, NULL, 0);
     }
     mutex_unlock(&(tcb->function_lock));
     TCP_DEBUG_LEAVE;
@@ -803,7 +803,7 @@ int gnrc_tcp_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_h
         return -EBADMSG;
     }
 
-    csum = _pkt_calc_csum(hdr, pseudo_hdr, hdr->next);
+    csum = _gnrc_tcp_pkt_calc_csum(hdr, pseudo_hdr, hdr->next);
     if (csum == 0) {
         TCP_DEBUG_ERROR("-ENOENT");
         TCP_DEBUG_LEAVE;

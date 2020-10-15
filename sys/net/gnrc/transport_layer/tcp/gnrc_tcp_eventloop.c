@@ -22,10 +22,10 @@
 #include "net/af.h"
 #include "net/tcp.h"
 #include "net/gnrc.h"
-#include "internal/common.h"
-#include "internal/pkt.h"
-#include "internal/fsm.h"
-#include "internal/eventloop.h"
+#include "include/gnrc_tcp_common.h"
+#include "include/gnrc_tcp_pkt.h"
+#include "include/gnrc_tcp_fsm.h"
+#include "include/gnrc_tcp_eventloop.h"
 
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
@@ -56,24 +56,6 @@ static evtimer_t _tcp_msg_timer;
  * @brief TCPs eventloop pid
  */
 static kernel_pid_t _tcp_eventloop_pid = KERNEL_PID_UNDEF;
-
-void _gnrc_tcp_event_loop_sched(evtimer_msg_event_t *event, uint32_t offset,
-                                uint16_t type, void *context)
-{
-    TCP_DEBUG_ENTER;
-    event->event.offset = offset;
-    event->msg.type = type;
-    event->msg.content.ptr = context;
-    evtimer_add_msg(&_tcp_msg_timer, event, _tcp_eventloop_pid);
-    TCP_DEBUG_LEAVE;
-}
-
-void _gnrc_tcp_event_loop_unsched(evtimer_msg_event_t *event)
-{
-    TCP_DEBUG_ENTER;
-    evtimer_del(&_tcp_msg_timer, (evtimer_event_t *)event);
-    TCP_DEBUG_LEAVE;
-}
 
 /**
  * @brief Send function, pass packet down the network stack.
@@ -219,7 +201,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
     }
 
     /* Validate checksum */
-    if (byteorder_ntohs(hdr->checksum) != _pkt_calc_csum(tcp, ip, pkt)) {
+    if (byteorder_ntohs(hdr->checksum) != _gnrc_tcp_pkt_calc_csum(tcp, ip, pkt)) {
 #ifndef MODULE_FUZZING
         gnrc_pktbuf_release(pkt);
         TCP_DEBUG_ERROR("-EINVAL: Invalid checksum.");
@@ -229,7 +211,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
     }
 
     /* Find TCB to for this packet */
-    tcb_list_t *list = _gnrc_tcp_common_get_tcb_list();
+    _gnrc_tcp_common_tcb_list_t *list = _gnrc_tcp_common_get_tcb_list();
     mutex_lock(&list->lock);
     tcb = list->head;
     while (tcb) {
@@ -272,12 +254,12 @@ static int _receive(gnrc_pktsnip_t *pkt)
      * (reason: tcb can be NULL at runtime)
      */
     if (tcb != NULL) {
-        _fsm(tcb, FSM_EVENT_RCVD_PKT, pkt, NULL, 0);
+        _gnrc_tcp_fsm(tcb, FSM_EVENT_RCVD_PKT, pkt, NULL, 0);
     }
     /* No fitting TCB has been found. Respond with reset */
     else {
         if ((ctl & MSK_RST) != MSK_RST) {
-            _pkt_build_reset_from_pkt(&reset, pkt);
+            _gnrc_tcp_pkt_build_reset_from_pkt(&reset, pkt);
             if (gnrc_netapi_send(_tcp_eventloop_pid, reset) < 1) {
                 gnrc_pktbuf_release(reset);
                 TCP_DEBUG_ERROR("Can't dispatch to network layer.");
@@ -293,7 +275,7 @@ static int _receive(gnrc_pktsnip_t *pkt)
     return 0;
 }
 
-static void *_event_loop(__attribute__((unused)) void *arg)
+static void *_eventloop(__attribute__((unused)) void *arg)
 {
     TCP_DEBUG_ENTER;
     msg_t msg;
@@ -339,15 +321,15 @@ static void *_event_loop(__attribute__((unused)) void *arg)
             /* Retransmission timer expired: Call FSM with retransmission event */
             case MSG_TYPE_RETRANSMISSION:
                 TCP_DEBUG_INFO("Received MSG_TYPE_RETRANSMISSION.");
-                _fsm((gnrc_tcp_tcb_t *)msg.content.ptr, FSM_EVENT_TIMEOUT_RETRANSMIT,
-                     NULL, NULL, 0);
+                _gnrc_tcp_fsm((gnrc_tcp_tcb_t *)msg.content.ptr,
+                              FSM_EVENT_TIMEOUT_RETRANSMIT, NULL, NULL, 0);
                 break;
 
             /* Timewait timer expired: Call FSM with timewait event */
             case MSG_TYPE_TIMEWAIT:
                 TCP_DEBUG_INFO("Received MSG_TYPE_TIMEWAIT.");
-                _fsm((gnrc_tcp_tcb_t *)msg.content.ptr, FSM_EVENT_TIMEOUT_TIMEWAIT,
-                     NULL, NULL, 0);
+                _gnrc_tcp_fsm((gnrc_tcp_tcb_t *)msg.content.ptr,
+                              FSM_EVENT_TIMEOUT_TIMEWAIT, NULL, NULL, 0);
                 break;
 
             default:
@@ -360,7 +342,25 @@ static void *_event_loop(__attribute__((unused)) void *arg)
     return NULL;
 }
 
-int _gnrc_tcp_event_loop_init(void)
+void _gnrc_tcp_eventloop_sched(evtimer_msg_event_t *event, uint32_t offset,
+                               uint16_t type, void *context)
+{
+    TCP_DEBUG_ENTER;
+    event->event.offset = offset;
+    event->msg.type = type;
+    event->msg.content.ptr = context;
+    evtimer_add_msg(&_tcp_msg_timer, event, _tcp_eventloop_pid);
+    TCP_DEBUG_LEAVE;
+}
+
+void _gnrc_tcp_eventloop_unsched(evtimer_msg_event_t *event)
+{
+    TCP_DEBUG_ENTER;
+    evtimer_del(&_tcp_msg_timer, (evtimer_event_t *)event);
+    TCP_DEBUG_LEAVE;
+}
+
+int _gnrc_tcp_eventloop_init(void)
 {
     TCP_DEBUG_ENTER;
     /* Guard: Check if thread is already running */
@@ -374,7 +374,7 @@ int _gnrc_tcp_event_loop_init(void)
     evtimer_init_msg(&_tcp_msg_timer);
 
     kernel_pid_t pid = thread_create(_stack, sizeof(_stack), TCP_EVENTLOOP_PRIO,
-                                     THREAD_CREATE_STACKTEST, _event_loop, NULL,
+                                     THREAD_CREATE_STACKTEST, _eventloop, NULL,
                                      "gnrc_tcp");
     TCP_DEBUG_LEAVE;
     return pid;

@@ -17,11 +17,11 @@
  * @}
  */
 
-#include "internal/common.h"
+#include "include/gnrc_tcp_common.h"
 
-static tcb_list_t _list = {NULL, MUTEX_INIT};
+static _gnrc_tcp_common_tcb_list_t _list = {NULL, MUTEX_INIT};
 
-tcb_list_t *_gnrc_tcp_common_get_tcb_list(void)
+_gnrc_tcp_common_tcb_list_t *_gnrc_tcp_common_get_tcb_list(void)
 {
     return &_list;
 }

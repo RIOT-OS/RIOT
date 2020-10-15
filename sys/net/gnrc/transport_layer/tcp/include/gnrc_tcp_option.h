@@ -17,8 +17,8 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef OPTION_H
-#define OPTION_H
+#ifndef GNRC_TCP_OPTION_H
+#define GNRC_TCP_OPTION_H
 
 #include <stdint.h>
 #include "assert.h"
@@ -36,7 +36,7 @@ extern "C" {
  *
  * @returns   MSS option value.
  */
-static inline uint32_t _option_build_mss(uint16_t mss)
+static inline uint32_t _gnrc_tcp_option_build_mss(uint16_t mss)
 {
     return (((uint32_t) TCP_OPTION_KIND_MSS << 24) |
             ((uint32_t) TCP_OPTION_LENGTH_MSS << 16) | mss);
@@ -50,7 +50,7 @@ static inline uint32_t _option_build_mss(uint16_t mss)
  *
  * @returns   Bitfield with encoded control bits and number of options.
  */
-static inline uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl)
+static inline uint16_t _gnrc_tcp_option_build_offset_control(uint16_t nopts, uint16_t ctl)
 {
     assert(TCP_HDR_OFFSET_MIN <= nopts && nopts <= TCP_HDR_OFFSET_MAX);
     return (nopts << 12) | ctl;
@@ -65,11 +65,11 @@ static inline uint16_t _option_build_offset_control(uint16_t nopts, uint16_t ctl
  * @returns   Zero on success.
  *            Negative value on error.
  */
-int _option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr);
+int _gnrc_tcp_option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* OPTION_H */
+#endif /* GNRC_TCP_OPTION_H */
 /** @} */

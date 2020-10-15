@@ -24,10 +24,10 @@
 #include "evtimer_msg.h"
 #include "net/inet_csum.h"
 #include "net/gnrc.h"
-#include "internal/common.h"
-#include "internal/eventloop.h"
-#include "internal/option.h"
-#include "internal/pkt.h"
+#include "include/gnrc_tcp_common.h"
+#include "include/gnrc_tcp_eventloop.h"
+#include "include/gnrc_tcp_option.h"
+#include "include/gnrc_tcp_pkt.h"
 
 #ifdef MODULE_GNRC_IPV6
 #include "net/gnrc/ipv6.h"
@@ -49,7 +49,8 @@ static inline uint32_t _max(const uint32_t x, const uint32_t y)
   return (x > y) ? x : y;
 }
 
-int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
+int _gnrc_tcp_pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt,
+                                       gnrc_pktsnip_t *in_pkt)
 {
     TCP_DEBUG_ENTER;
     tcp_hdr_t tcp_hdr_out;
@@ -89,7 +90,8 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
             seq_no += 1;
         }
         uint32_t tmp = byteorder_ntohl(tcp_hdr_in->seq_num);
-        tcp_hdr_out.ack_num = byteorder_htonl(seq_no + tmp  + _pkt_get_pay_len(in_pkt));
+        tcp_hdr_out.ack_num = byteorder_htonl(
+            seq_no + tmp + _gnrc_tcp_pkt_get_pay_len(in_pkt));
     }
 
     /* Allocate new TCB header */
@@ -144,9 +146,10 @@ int _pkt_build_reset_from_pkt(gnrc_pktsnip_t **out_pkt, gnrc_pktsnip_t *in_pkt)
     return 0;
 }
 
-int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
-               const uint16_t ctl, const uint32_t seq_num, const uint32_t ack_num,
-               void *payload, const size_t payload_len)
+int _gnrc_tcp_pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt,
+                        uint16_t *seq_con, const uint16_t ctl,
+                        const uint32_t seq_num, const uint32_t ack_num,
+                        void *payload, const size_t payload_len)
 {
     TCP_DEBUG_ENTER;
     gnrc_pktsnip_t *pay_snp = NULL;
@@ -180,7 +183,8 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
         offset += 1;
     }
     /* Set offset and control bit accordingly */
-    tcp_hdr.off_ctl = byteorder_htons(_option_build_offset_control(offset, ctl));
+    tcp_hdr.off_ctl = byteorder_htons(
+        _gnrc_tcp_option_build_offset_control(offset, ctl));
 
     tcp_snp = gnrc_pktbuf_add(pay_snp, &tcp_hdr, sizeof(tcp_hdr), GNRC_NETTYPE_TCP);
     if (tcp_snp == NULL) {
@@ -210,7 +214,9 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
 
             /* If SYN flag is set: Add MSS option */
             if (ctl & MSK_SYN) {
-                network_uint32_t mss_option = byteorder_htonl(_option_build_mss(CONFIG_GNRC_TCP_MSS));
+                network_uint32_t mss_option = byteorder_htonl(
+                    _gnrc_tcp_option_build_mss(CONFIG_GNRC_TCP_MSS));
+
                 memcpy(opt_ptr, &mss_option, sizeof(mss_option));
             }
             /* Increase opt_ptr and decrease opt_left, if other options are added */
@@ -271,8 +277,8 @@ int _pkt_build(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t **out_pkt, uint16_t *seq_con,
     return 0;
 }
 
-int _pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_con,
-              const bool retransmit)
+int _gnrc_tcp_pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt,
+                       const uint16_t seq_con, const bool retransmit)
 {
     TCP_DEBUG_ENTER;
     if (out_pkt == NULL) {
@@ -301,7 +307,8 @@ int _pkt_send(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *out_pkt, const uint16_t seq_c
     return 0;
 }
 
-int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const uint32_t seg_len)
+int _gnrc_tcp_pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num,
+                              const uint32_t seg_len)
 {
     TCP_DEBUG_ENTER;
     uint32_t l_edge = tcb->rcv_nxt;
@@ -338,7 +345,7 @@ int _pkt_chk_seq_num(const gnrc_tcp_tcb_t *tcb, const uint32_t seq_num, const ui
     return -1;
 }
 
-uint32_t _pkt_get_seg_len(gnrc_pktsnip_t *pkt)
+uint32_t _gnrc_tcp_pkt_get_seg_len(gnrc_pktsnip_t *pkt)
 {
     TCP_DEBUG_ENTER;
     uint32_t seq = 0;
@@ -346,7 +353,7 @@ uint32_t _pkt_get_seg_len(gnrc_pktsnip_t *pkt)
     gnrc_pktsnip_t *snp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_TCP);
     tcp_hdr_t *hdr = (tcp_hdr_t *) snp->data;
     ctl = byteorder_ntohs(hdr->off_ctl);
-    seq = _pkt_get_pay_len(pkt);
+    seq = _gnrc_tcp_pkt_get_pay_len(pkt);
     if (ctl & MSK_SYN) {
         seq += 1;
     }
@@ -357,7 +364,7 @@ uint32_t _pkt_get_seg_len(gnrc_pktsnip_t *pkt)
     return seq;
 }
 
-uint32_t _pkt_get_pay_len(gnrc_pktsnip_t *pkt)
+uint32_t _gnrc_tcp_pkt_get_pay_len(gnrc_pktsnip_t *pkt)
 {
     TCP_DEBUG_ENTER;
     uint32_t seg_len = 0;
@@ -370,7 +377,8 @@ uint32_t _pkt_get_pay_len(gnrc_pktsnip_t *pkt)
     return seg_len;
 }
 
-int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool retransmit)
+int _gnrc_tcp_pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt,
+                                   const bool retransmit)
 {
     TCP_DEBUG_ENTER;
     gnrc_pktsnip_t *snp = NULL;
@@ -394,7 +402,7 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
     /* Extract control bits and segment length */
     snp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_TCP);
     ctl = byteorder_ntohs(((tcp_hdr_t *) snp->data)->off_ctl);
-    len = _pkt_get_pay_len(pkt);
+    len = _gnrc_tcp_pkt_get_pay_len(pkt);
 
     /* Check if pkt contains reset or is a pure ACK, return */
     if ((ctl & MSK_RST) || (((ctl & MSK_SYN_FIN_ACK) == MSK_ACK) && len == 0)) {
@@ -438,13 +446,13 @@ int _pkt_setup_retransmit(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *pkt, const bool r
     }
 
     /* Setup retransmission timer, msg to TCP thread with ptr to TCB */
-    _gnrc_tcp_event_loop_sched(&tcb->event_retransmit, tcb->rto,
-                               MSG_TYPE_RETRANSMISSION, tcb);
+    _gnrc_tcp_eventloop_sched(&tcb->event_retransmit, tcb->rto,
+                              MSG_TYPE_RETRANSMISSION, tcb);
     TCP_DEBUG_LEAVE;
     return 0;
 }
 
-int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
+int _gnrc_tcp_pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
 {
     TCP_DEBUG_ENTER;
     uint32_t seg = 0;
@@ -462,11 +470,12 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
     hdr = (tcp_hdr_t *) snp->data;
 
     /* There must be a packet, waiting to be acknowledged. */
-    seg = byteorder_ntohl(hdr->seq_num) + _pkt_get_seg_len(tcb->pkt_retransmit) - 1;
+    seg = byteorder_ntohl(hdr->seq_num) + _gnrc_tcp_pkt_get_seg_len(
+        tcb->pkt_retransmit) - 1;
 
-    /* If segment can be acknowledged -> stop timer, release packet from pktbuf and update rto. */
+        /* If segment can be acknowledged -> stop timer, release packet from pktbuf and update rto. */
     if (LSS_32_BIT(seg, ack)) {
-        _gnrc_tcp_event_loop_unsched(&tcb->event_retransmit);
+        _gnrc_tcp_eventloop_unsched(&tcb->event_retransmit);
         gnrc_pktbuf_release(tcb->pkt_retransmit);
         tcb->pkt_retransmit = NULL;
 
@@ -493,8 +502,9 @@ int _pkt_acknowledge(gnrc_tcp_tcb_t *tcb, const uint32_t ack)
     return 0;
 }
 
-uint16_t _pkt_calc_csum(const gnrc_pktsnip_t *hdr, const gnrc_pktsnip_t *pseudo_hdr,
-                        const gnrc_pktsnip_t *payload)
+uint16_t _gnrc_tcp_pkt_calc_csum(const gnrc_pktsnip_t *hdr,
+                                 const gnrc_pktsnip_t *pseudo_hdr,
+                                 const gnrc_pktsnip_t *payload)
 {
     TCP_DEBUG_ENTER;
     uint16_t csum = 0;

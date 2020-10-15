@@ -17,8 +17,8 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef GNRC_TCP_COMMON_H
+#define GNRC_TCP_COMMON_H
 
 #include <stdint.h>
 #include "assert.h"
@@ -152,18 +152,18 @@ extern "C" {
 typedef struct {
     gnrc_tcp_tcb_t *head; /**< Head of TCB list */
     mutex_t lock;         /**< Lock of TCB list */
-} tcb_list_t;
+} _gnrc_tcp_common_tcb_list_t;
 
 /**
  * @brief Function to access to TCB list
  *
  * @returns Pointer to global TCB list.
  */
-tcb_list_t *_gnrc_tcp_common_get_tcb_list(void);
+_gnrc_tcp_common_tcb_list_t *_gnrc_tcp_common_get_tcb_list(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* COMMON_H */
+#endif /* GNRC_TCP_COMMON_H */
 /** @} */

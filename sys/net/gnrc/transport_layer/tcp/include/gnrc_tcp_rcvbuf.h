@@ -17,12 +17,9 @@
  * @author      Simon Brummer <simon.brummer@posteo.de>
  */
 
-#ifndef RCVBUF_H
-#define RCVBUF_H
+#ifndef GNRC_TCP_RCVBUF_H
+#define GNRC_TCP_RCVBUF_H
 
-#include <stdint.h>
-#include "mutex.h"
-#include "net/gnrc/tcp/config.h"
 #include "net/gnrc/tcp/tcb.h"
 
 #ifdef __cplusplus
@@ -30,25 +27,9 @@ extern "C" {
 #endif
 
 /**
- * @brief Receive buffer entry.
+ * @brief Initializes global receive buffer.
  */
-typedef struct rcvbuf_entry {
-    uint8_t used;                          /**< Flag: Is buffer in use? */
-    uint8_t buffer[GNRC_TCP_RCV_BUF_SIZE]; /**< Receive buffer storage */
-} rcvbuf_entry_t;
-
-/**
- * @brief   Struct holding receive buffers.
- */
-typedef struct rcvbuf {
-    mutex_t lock;                                 /**< Lock for allocation synchronization */
-    rcvbuf_entry_t entries[CONFIG_GNRC_TCP_RCV_BUFFERS]; /**< Maintained receive buffers */
-} rcvbuf_t;
-
-/**
- * @brief   Initializes global receive buffer.
- */
-void _rcvbuf_init(void);
+void _gnrc_tcp_rcvbuf_init(void);
 
 /**
  * @brief Allocate receive buffer and assign it to TCB.
@@ -58,18 +39,18 @@ void _rcvbuf_init(void);
  * @returns   Zero  on success.
  *            -ENOMEM if all receive buffers are currently used.
  */
-int _rcvbuf_get_buffer(gnrc_tcp_tcb_t *tcb);
+int _gnrc_tcp_rcvbuf_get_buffer(gnrc_tcp_tcb_t *tcb);
 
 /**
  * @brief Release allocated receive buffer.
  *
  * @param[in,out] tcb   TCB holding the receive buffer that should be released.
  */
-void _rcvbuf_release_buffer(gnrc_tcp_tcb_t *tcb);
+void _gnrc_tcp_rcvbuf_release_buffer(gnrc_tcp_tcb_t *tcb);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* RCVBUF_H */
+#endif /* GNRC_TCP_RCVBUF_H */
 /** @} */
