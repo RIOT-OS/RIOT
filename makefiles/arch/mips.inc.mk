@@ -14,8 +14,6 @@ priv_symbols += FLUSH_TO_ZERO
 priv_symbols += FLASH_START APP_START FLASH_APP_START
 priv_symbols += ISR_VEC_SPACE ISR_VECTOR_COUNT
 
-comma := ,
-
 # A bit of makefile magic:
 # foreach symbol in overridable ld-symbols :
 #   If symbol has a value, produce a linker argument for that symbol.

@@ -39,11 +39,9 @@ info-unittests:
 
 $(UNIT_TESTS): all
 
-charCOMMA := ,
-
 ifeq (, $(UNIT_TESTS))
   CFLAGS += -DNO_TEST_SUITES
   $(warning There was no test suite specified!)
 else
-  CFLAGS += -DTEST_SUITES='$(subst $() $(),$(charCOMMA),$(UNIT_TESTS:tests-%=%))'
+  CFLAGS += -DTEST_SUITES='$(subst $() $(),$(comma),$(UNIT_TESTS:tests-%=%))'
 endif
