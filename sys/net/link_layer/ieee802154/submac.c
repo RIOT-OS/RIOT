@@ -154,7 +154,7 @@ void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac)
     if (!_does_handle_ack(dev) && submac->wait_for_ack) {
         uint8_t ack[3];
 
-        if (ieee802154_radio_indication_rx(dev, ack, 3, NULL) &&
+        if (ieee802154_radio_read(dev, ack, 3, NULL) &&
             ack[0] & IEEE802154_FCF_TYPE_ACK) {
             ieee802154_submac_ack_timer_cancel(submac);
             ieee802154_tx_info_t tx_info;
@@ -169,6 +169,18 @@ void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac)
     }
     else {
         submac->cb->rx_done(submac);
+
+        /* The Radio HAL will be in "FB Lock" state. We need to do a state
+         * transition here in order to release it */
+        ieee802154_trx_state_t next_state = submac->state == IEEE802154_STATE_LISTEN ? IEEE802154_TRX_STATE_RX_ON : IEEE802154_TRX_STATE_TRX_OFF;
+
+        /* Some radios will run some house keeping tasks on RX_DONE (e.g
+         * sending ACK frames). In such case we need to wait until the radio is
+         * not busy
+         */
+        while (ieee802154_radio_request_set_trx_state(submac->dev, next_state) == -EBUSY);
+
+        while (ieee802154_radio_confirm_set_trx_state(submac->dev) == -EAGAIN) {}
     }
 }
 
