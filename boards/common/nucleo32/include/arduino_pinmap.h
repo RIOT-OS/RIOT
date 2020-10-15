@@ -40,7 +40,7 @@ extern "C" {
 #define ARDUINO_PIN_5           GPIO_PIN(PORT_B, 6)
 #define ARDUINO_PIN_6           GPIO_PIN(PORT_B, 1)
 #if defined(CPU_MODEL_STM32L031K6) || defined(CPU_MODEL_STM32L432KC) || \
-    defined(CPU_MODEL_STM32L412KB)
+    defined(CPU_MODEL_STM32L412KB) || defined(CPU_MODEL_STM32L011K4)
 #define ARDUINO_PIN_7           GPIO_PIN(PORT_C, 14)
 #define ARDUINO_PIN_8           GPIO_PIN(PORT_C, 15)
 #else
