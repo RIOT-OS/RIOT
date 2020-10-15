@@ -479,6 +479,25 @@ void stmclk_init_sysclk(void)
     /* Flash config */
     FLASH->ACR = FLASH_ACR_CONFIG;
 
+    /* Enable Over-Drive if HCLK > 168MHz on F4 or HCLK > 180MHz on F7 */
+#if defined(CPU_FAM_STM32F4) && defined(PWR_CR_ODEN)
+    if (CLOCK_AHB > MHZ(168)) {
+        PWR->CR |= PWR_CR_ODEN;
+        while (!(PWR->CSR & PWR_CSR_ODRDY)) {}
+        PWR->CR |= PWR_CR_ODSWEN;
+        while (!(PWR->CSR & PWR_CSR_ODSWRDY)) {}
+    }
+#endif
+
+#if defined(CPU_FAM_STM32F7)
+    if (CLOCK_AHB > MHZ(180)) {
+        PWR->CR1 |= PWR_CR1_ODEN;
+        while (!(PWR->CSR1 & PWR_CSR1_ODRDY)) {}
+        PWR->CR1 |= PWR_CR1_ODSWEN;
+        while (!(PWR->CSR1 & PWR_CSR1_ODSWRDY)) {}
+    }
+#endif
+
     /* disable all active clocks except HSI -> resets the clk configuration */
     RCC->CR = (RCC_CR_HSION | RCC_CR_HSITRIM_4);
 
