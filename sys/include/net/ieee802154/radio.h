@@ -252,7 +252,7 @@ typedef struct {
  */
 typedef struct {
     ieee802154_tx_status_t status;      /**< status of the last transmission */
-    uint8_t retrans;                    /**< number of frame retransmissions of the last TX */
+    int8_t retrans;                     /**< number of frame retransmissions of the last TX */
 } ieee802154_tx_info_t;
 
 /**

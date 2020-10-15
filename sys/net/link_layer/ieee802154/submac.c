@@ -182,6 +182,9 @@ static void _handle_tx_success(ieee802154_submac_t *submac,
 
     if (ieee802154_radio_has_frame_retrans(dev) ||
         ieee802154_radio_has_irq_ack_timeout(dev) || !submac->wait_for_ack) {
+        if (!ieee802154_radio_has_frame_retrans_info(dev)) {
+            info->retrans = -1;
+        }
         _tx_end(submac, info->status, info);
     }
     else {
