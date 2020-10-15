@@ -27,7 +27,7 @@
 
 #include "kernel_types.h"
 #include "net/gnrc/nettype.h"
-#include "utlist.h"
+#include "list.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -135,9 +135,10 @@ typedef struct gnrc_pktsnip {
 static inline gnrc_pktsnip_t *gnrc_pkt_prev_snip(gnrc_pktsnip_t *pkt,
                                                  gnrc_pktsnip_t *snip)
 {
-    gnrc_pktsnip_t *prev;
-    LL_SEARCH_SCALAR(pkt, prev, next, snip);
-    return prev;
+    while ((pkt != NULL) && (pkt->next != snip)) {
+        pkt = pkt->next;
+    }
+    return pkt;
 }
 
 /**
@@ -170,7 +171,16 @@ static inline size_t gnrc_pkt_len(const gnrc_pktsnip_t *pkt)
 static inline gnrc_pktsnip_t *gnrc_pkt_append(gnrc_pktsnip_t *pkt,
                                               gnrc_pktsnip_t *snip)
 {
-    LL_APPEND(pkt, snip);
+    /* find last snip in pkt */
+    gnrc_pktsnip_t *last = gnrc_pkt_prev_snip(pkt, NULL);
+
+    if (last != NULL) {
+        last->next = snip;
+    }
+    else {
+        /* last == NULL means snip */
+        pkt = snip;
+    }
     return pkt;
 }
 
@@ -185,8 +195,8 @@ static inline gnrc_pktsnip_t *gnrc_pkt_append(gnrc_pktsnip_t *pkt,
 static inline gnrc_pktsnip_t *gnrc_pkt_prepend(gnrc_pktsnip_t *pkt,
                                                gnrc_pktsnip_t *snip)
 {
-    LL_PREPEND(pkt, snip);
-    return pkt;
+    snip->next = pkt;
+    return snip;
 }
 
 /**
@@ -200,8 +210,10 @@ static inline gnrc_pktsnip_t *gnrc_pkt_prepend(gnrc_pktsnip_t *pkt,
 static inline gnrc_pktsnip_t *gnrc_pkt_delete(gnrc_pktsnip_t *pkt,
                                               gnrc_pktsnip_t *snip)
 {
-    LL_DELETE(pkt, snip);
-    return pkt;
+    list_node_t list = { .next = (list_node_t *)pkt };
+
+    list_remove(&list, (list_node_t *)snip);
+    return (gnrc_pktsnip_t *)list.next;
 }
 
 
