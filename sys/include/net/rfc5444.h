@@ -11,8 +11,8 @@
  * @ingroup     net
  * @brief       Provides types and helper functions related to the Generalized
  *              Mobile Ad Hoc Network (MANET) Packet/Message Format (RFC 5444).
+ * @see [RFC 5444](https://tools.ietf.org/html/rfc5444)
  *
- * @see [RFC 5444](https://tools.ietf.org/html/rfc5444).
  * @{
  *
  * @file

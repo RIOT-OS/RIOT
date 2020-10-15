@@ -7,8 +7,14 @@
  */
 
 /**
+ * @defgroup    net_rfc5444_tlv RFC 5444 TLVs
  * @ingroup     net_rfc5444
- * @ingroup     net
+ * @brief       RFC 5444 type-length value representation and helper
+ *              functions.
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc5444#section-5.4">
+ *          RFC 5444, Section 5.4
+ *      </a>
  *
  * @{
  *
@@ -108,6 +114,17 @@ static inline int rfc5444_tlv_type_ext(const rfc5444_tlv_t *tlv)
     return *(uint8_t *)((uintptr_t)(tlv) + sizeof(rfc5444_tlv_t));
 }
 
+/**
+ * @brief   Get the index-start value of this TLV, if any.
+ *
+ * @pre @p tlv != NULL
+ *
+ * @param[in]   tlv Pointer to a TLV.
+ *
+ * @return index-start value.
+ * @return -1 if @p tlv is NULL.
+ * @return -1 if index-start is not provided.
+ */
 static inline int rfc5444_tlv_index_start(const rfc5444_tlv_t *tlv)
 {
     size_t pos;
@@ -359,7 +376,7 @@ static inline void rfc5444_tlv_iter_init(rfc5444_tlv_iter_t *iter, rfc5444_tlv_b
  *
  * @param[in]   iter The message iterator.
  *
- * @reutrn NULL on invalid TLV length.
+ * @return NULL on invalid TLV length.
  * @return NULL on finished parsing.
  * @return Pointer to next TLV on success.
  */

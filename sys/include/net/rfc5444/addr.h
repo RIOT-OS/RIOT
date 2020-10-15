@@ -7,16 +7,18 @@
  */
 
 /**
+ * @defgroup    net_rfc5444_addr RFC 5444 address blocks
  * @ingroup     net_rfc5444
- * @ingroup     net
- * @brief       Address block structures for RFC 5444.
- * @see         <a href="https://tools.ietf.org/html/rfc5444">
- *                  RFC 5444 - Generalized Mobile Ad Hoc Network (MANET) Packet/Message Format
- *              </a>
+ * @brief       RFC 54444 address block structures.
+ *
+ * @see <a href="https://tools.ietf.org/html/rfc5444#section-5.3">
+ *          RFC 5444, Section 5.3
+ *      </a>
+ *
  * @{
  *
  * @file
- * @brief       Address block structures definitions for RFC 5444.
+ * @brief       Definitions for RFC 5444 address block structures
  *
  * @author      Jean Pierre Dudey <jeandudey@hotmail.com>
  */

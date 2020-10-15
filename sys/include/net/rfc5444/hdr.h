@@ -7,16 +7,14 @@
  */
 
 /**
- * @defgroup    net_rfc5444 RFC 5444
- * @ingroup     net
- * @brief
- * @see         <a href="https://tools.ietf.org/html/rfc5444">
- *                  RFC 5444 - Generalized Mobile Ad Hoc Network (MANET) Packet/Message Format
- *              </a>
+ * @defgroup    net_rfc5444_hdr RFC 5444 packet header
+ * @ingroup     net_rfc5444
+ * @brief       RFC 5444 packet header structures and definitions.
+ *
  * @{
  *
  * @file
- * @brief
+ * @brief       RFC 5444 packet header structures.
  *
  * @author      Jean Pierre Dudey <jeandudey@hotmail.com>
  */
@@ -40,8 +38,8 @@ extern "C" {
  * @name Packet header flags
  * @{
  */
-#define RFC5444_PKT_HDR_FLAG_HAS_SEQ_NUM (BIT3) /**< Has seq num? */
-#define RFC5444_PKT_HDR_FLAG_HAS_TLV     (BIT2) /**< Has TLV block? */
+#define RFC5444_PKT_HDR_FLAG_HAS_SEQ_NUM (BIT3) /**< Has a sequence number? */
+#define RFC5444_PKT_HDR_FLAG_HAS_TLV     (BIT2) /**< Has a TLV block? */
 /** @} */
 
 /**
