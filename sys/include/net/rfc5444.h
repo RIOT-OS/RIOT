@@ -40,6 +40,20 @@ extern "C" {
  */
 #define RFC5444_VERSION (0U)
 
+/**
+ * @brief   Verify if the packet header is a valid header.
+ *
+ * @param[in]   hdr Pointer to packet header.
+ *
+ * @return true if it is valid.
+ * @return false otherwise.
+ */
+static inline bool rfc5444_pkt_hdr_is(const rfc5444_pkt_hdr_t *hdr)
+{
+    return rfc5444_pkt_hdr_version(hdr) == RFC5444_VERSION;
+}
+
+
 #ifdef __cplusplus
 }
 #endif
