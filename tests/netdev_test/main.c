@@ -104,7 +104,7 @@ static int test_send(void)
         puts("Could not allocate send header");
         return 0;
     }
-    LL_PREPEND(pkt, hdr);
+    pkt = gnrc_pkt_prepend(pkt, hdr);
     /* prepare expected data */
     memcpy(exp_mac->dst, _test_dst, sizeof(_test_dst));
     memcpy(exp_mac->src, _dev_addr, sizeof(_dev_addr));

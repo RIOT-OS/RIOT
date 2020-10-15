@@ -231,7 +231,7 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
         }
         netif_hdr = netif->data;
         netif_hdr->if_pid = iface;
-        LL_PREPEND(pkt, netif);
+        pkt = gnrc_pkt_prepend(pkt, netif);
     }
 #ifdef MODULE_GNRC_NETERR
     /* cppcheck-suppress uninitvar

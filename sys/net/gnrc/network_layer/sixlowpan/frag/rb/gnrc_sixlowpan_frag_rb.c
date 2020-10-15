@@ -627,7 +627,7 @@ int gnrc_sixlowpan_frag_rb_dispatch_when_complete(gnrc_sixlowpan_frag_rb_t *rbuf
         new_netif_hdr->flags = netif_hdr->flags;
         new_netif_hdr->lqi = netif_hdr->lqi;
         new_netif_hdr->rssi = netif_hdr->rssi;
-        LL_APPEND(rbuf->pkt, netif);
+        rbuf->pkt = gnrc_pkt_append(rbuf->pkt, netif);
 #if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
         gnrc_sixlowpan_frag_stats_get()->fragments += _count_frags(rbuf);
         gnrc_sixlowpan_frag_stats_get()->datagrams++;

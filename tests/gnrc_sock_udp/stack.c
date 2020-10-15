@@ -85,14 +85,13 @@ static gnrc_pktsnip_t *_build_udp_packet(const ipv6_addr_t *src,
     else {
         udp_hdr->checksum = byteorder_htons(~csum);
     }
-    LL_APPEND(udp, ipv6);
+    udp = gnrc_pkt_append(udp, ipv6);
     netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
     if (netif_hdr == NULL) {
         return NULL;
     }
     ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = (kernel_pid_t)netif;
-    LL_APPEND(udp, netif_hdr);
-    return udp;
+    return gnrc_pkt_append(udp, netif_hdr);
 }
 
 

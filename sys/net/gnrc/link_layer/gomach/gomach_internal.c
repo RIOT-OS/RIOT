@@ -175,7 +175,7 @@ static int _parse_packet(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
     gnrc_netif_hdr_set_netif(netif_hdr, netif);
     pkt->type = state->proto;
     gnrc_pktbuf_remove_snip(pkt, pkt->next);
-    LL_APPEND(pkt, netif_snip);
+    pkt = gnrc_pkt_append(pkt, netif_snip);
 
     gnrc_pktsnip_t *gomach_snip = NULL;
     gnrc_gomach_hdr_t *gomach_hdr = NULL;

@@ -311,9 +311,7 @@ static gnrc_pktsnip_t *_create_netif_hdr(uint8_t *dst_l2addr,
     hdr->flags = flags;
 
     /* add netif_hdr to front of the pkt list */
-    LL_PREPEND(pkt, netif_hdr);
-
-    return pkt;
+    return gnrc_pkt_prepend(pkt, netif_hdr);
 }
 
 static bool _is_ipv6_hdr(gnrc_pktsnip_t *hdr)

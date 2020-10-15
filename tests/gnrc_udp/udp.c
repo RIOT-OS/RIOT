@@ -148,7 +148,7 @@ static void send(char *addr_str, char *port_str, char *data_len_str, unsigned in
                 return;
             }
             gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
-            LL_PREPEND(ip, netif_hdr);
+            ip = gnrc_pkt_prepend(ip, netif_hdr);
         }
         /* send packet */
         if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {

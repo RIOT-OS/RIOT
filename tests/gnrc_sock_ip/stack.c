@@ -62,14 +62,13 @@ static gnrc_pktsnip_t *_build_ipv6_packet(const ipv6_addr_t *src,
     ipv6_hdr->len = byteorder_htons((uint16_t)payload->size);
     ipv6_hdr->nh = nh;
     ipv6_hdr->hl = 64;
-    LL_APPEND(payload, ipv6);
+    payload = gnrc_pkt_append(payload, ipv6);
     netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
     if (netif_hdr == NULL) {
         return NULL;
     }
     ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = (kernel_pid_t)netif;
-    LL_APPEND(payload, netif_hdr);
-    return payload;
+    return gnrc_pkt_append(payload, netif_hdr);
 }
 
 

@@ -851,7 +851,7 @@ static void _send_delayed_nbr_adv(const gnrc_netif_t *netif,
         return;
     }
     gnrc_netif_hdr_set_netif(pkt->data, netif);
-    LL_PREPEND(payload, pkt);
+    pkt = gnrc_pkt_prepend(payload, pkt);
     _evtimer_add(pkt, GNRC_IPV6_NIB_SND_NA, &nce->snd_na,
                  random_uint32_range(0, NDP_MAX_ANYCAST_MS_DELAY));
 }
@@ -1240,7 +1240,8 @@ static bool _resolve_addr(const ipv6_addr_t *dst, gnrc_netif_t *netif,
                             return false;
                         }
                         gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
-                        LL_PREPEND(queue_entry->pkt, netif_hdr);
+                        queue_entry->pkt = gnrc_pkt_prepend(queue_entry->pkt,
+                                                            netif_hdr);
                     }
                     gnrc_pktqueue_add(&entry->pktqueue, queue_entry);
                 }

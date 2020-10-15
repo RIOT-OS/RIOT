@@ -168,9 +168,7 @@ static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netif_t *dev)
 
     /* finally: remove the nrfmin header and append the netif header */
     gnrc_pktbuf_remove_snip(pkt_snip, hdr_snip);
-    LL_APPEND(pkt_snip, netif_snip);
-
-    return pkt_snip;
+    return gnrc_pkt_append(pkt_snip, netif_snip);
 }
 
 static const gnrc_netif_ops_t gnrc_nrfmin_ops = {

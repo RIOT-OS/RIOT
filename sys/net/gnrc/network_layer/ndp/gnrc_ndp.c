@@ -610,8 +610,7 @@ static gnrc_pktsnip_t *_build_headers(gnrc_netif_t *netif,
         return NULL;
     }
     gnrc_netif_hdr_set_netif(l2hdr->data, netif);
-    LL_PREPEND(iphdr, l2hdr);
-    return l2hdr;
+    return gnrc_pkt_prepend(iphdr, l2hdr);
 }
 
 static inline size_t _get_l2src(const gnrc_netif_t *netif, uint8_t *l2src)

@@ -96,7 +96,7 @@ static gnrc_pktsnip_t *cc1xxx_adpt_recv(gnrc_netif_t *netif)
     DEBUG("[cc1xxx-gnrc] recv: successfully parsed packet\n");
 
     /* and append the netif header */
-    LL_APPEND(payload, hdr);
+    payload = gnrc_pkt_append(payload, hdr);
 
 #ifdef MODULE_NETSTATS_L2
     netif->stats.rx_count++;
