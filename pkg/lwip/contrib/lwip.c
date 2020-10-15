@@ -158,7 +158,7 @@ extern void stm32_eth_netdev_setup(netdev_t *netdev);
 #endif
 
 #ifdef MODULE_NRF802154
-extern netdev_ieee802154_t nrf802154_dev;
+static nrf802154_t nrf802154_dev;
 #endif
 
 /**
@@ -256,7 +256,8 @@ void lwip_bootstrap(void)
         return;
     }
 #elif defined(MODULE_NRF802154)
-    if (netif_add(&netif[0], &nrf802154_dev, lwip_netdev_init,
+    nrf802154_setup(&nrf802154_dev);
+    if (netif_add(&netif[0], (netdev_ieee802154_t *)&nrf802154_dev, lwip_netdev_init,
                 tcpip_6lowpan_input) == NULL) {
         DEBUG("Could not add nrf802154 device\n");
         return;
