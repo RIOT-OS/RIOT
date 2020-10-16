@@ -12,9 +12,16 @@
  * @file
  * @author  José Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
+#include "kernel_defines.h"
 #include "net/gnrc/lorawan/region.h"
 
+#define ENABLE_DEBUG (0)
+#include "debug.h"
+
 #define GNRC_LORAWAN_DATARATES_NUMOF (6U)
+
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 static uint8_t dr_sf[GNRC_LORAWAN_DATARATES_NUMOF] =
 { LORA_SF12, LORA_SF11, LORA_SF10, LORA_SF9, LORA_SF8, LORA_SF7 };
@@ -29,6 +36,7 @@ int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate)
     if (!gnrc_lorawan_validate_dr(datarate)) {
         return -EINVAL;
     }
+    DEBUG("gnrc_lorawan_region: Data Rate: DR%u \n",datarate);
     uint8_t bw = dr_bw[datarate];
     uint8_t sf = dr_sf[datarate];
 
@@ -38,10 +46,21 @@ int gnrc_lorawan_set_dr(gnrc_lorawan_t *mac, uint8_t datarate)
     return 0;
 }
 
+#if (IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868))
 uint8_t gnrc_lorawan_rx1_get_dr_offset(uint8_t dr_up, uint8_t dr_offset)
 {
+    DEBUG("gnrc_lorawan_region: RX1DRoffset: %u \n", dr_offset);
     return (dr_up > dr_offset) ? (dr_up - dr_offset) : 0;
 }
+
+#elif (IS_ACTIVE(CONFIG_LORAMAC_REGION_IN_865))
+uint8_t gnrc_lorawan_rx1_get_dr_offset(uint8_t dr_up, uint8_t dr_offset)
+{
+    DEBUG("gnrc_lorawan_region: RX1DRoffset: %u \n", dr_offset);
+    int dr_eff = dr_offset > 5 ? 5 - dr_offset : dr_offset;
+    return MIN(5, MAX(0, dr_up - dr_eff));
+}
+#endif
 
 static size_t _get_num_used_channels(gnrc_lorawan_t *mac)
 {
@@ -74,6 +93,7 @@ void gnrc_lorawan_channels_init(gnrc_lorawan_t *mac)
 {
     for (unsigned i = 0; i < GNRC_LORAWAN_DEFAULT_CHANNELS_NUMOF; i++) {
         mac->channel[i] = gnrc_lorawan_default_channels[i];
+        DEBUG("gnrc_lorawan_region: Mac -> Channel %u %" PRIu32 " \n", i, mac->channel[i]);
     }
 
     for (unsigned i = GNRC_LORAWAN_DEFAULT_CHANNELS_NUMOF;
@@ -103,6 +123,7 @@ void gnrc_lorawan_process_cflist(gnrc_lorawan_t *mac, uint8_t *cflist)
         memcpy(&cl, cflist, GNRC_LORAWAN_CFLIST_ENTRY_SIZE);
         mac->channel[i] = byteorder_ntohl(byteorder_ltobl(cl)) * 100;
         cflist += GNRC_LORAWAN_CFLIST_ENTRY_SIZE;
+        DEBUG("gnrc_lorawan_region: Mac -> Channel %u %" PRIu32 " \n", i, mac->channel[i]);
     }
 }
 
@@ -124,6 +145,7 @@ bool gnrc_lorawan_validate_dr(uint8_t dr)
     if (dr < GNRC_LORAWAN_DATARATES_NUMOF) {
         return true;
     }
+    DEBUG("gnrc_lorawan_region: Invalid DR.\n");
     return false;
 }
 

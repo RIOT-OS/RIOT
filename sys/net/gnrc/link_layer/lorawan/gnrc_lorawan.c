@@ -185,12 +185,14 @@ void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac)
     (void)mac;
     switch (mac->state) {
         case LORAWAN_STATE_RX_1:
+            DEBUG("gnrc_lorawan: RX1 timeout.\n");
             _configure_rx_window(mac, LORAMAC_DEFAULT_RX2_FREQ,
                                  mac->dl_settings &
                                  GNRC_LORAWAN_DL_RX2_DR_MASK);
             mac->state = LORAWAN_STATE_RX_2;
             break;
         case LORAWAN_STATE_RX_2:
+            DEBUG("gnrc_lorawan: RX2 timeout.\n");
             gnrc_lorawan_event_no_rx(mac);
             mac->state = LORAWAN_STATE_IDLE;
             break;
@@ -245,6 +247,8 @@ void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, iolist_t *psdu, uint8_t dr)
     mac->state = LORAWAN_STATE_TX;
 
     uint32_t chan = gnrc_lorawan_pick_channel(mac);
+
+    DEBUG("gnrc_lorawan: Channel: %" PRIu32 "Hz \n", chan);
 
     _config_radio(mac, chan, dr, false);
 

@@ -46,6 +46,7 @@ void _on_dio3_irq(void *arg);
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
+    DEBUG("[sx127x] Sending packet now.\n");
     sx127x_t *dev = (sx127x_t*) netdev;
 
     if (sx127x_get_state(dev) == SX127X_RF_TX_RUNNING) {
@@ -68,6 +69,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
         case SX127X_MODEM_LORA:
             /* Initializes the payload size */
             if (!sx127x_get_fixed_header_len_mode(dev)) {
+                DEBUG("[sx127x] Modem option is LoRa.\n");
                 sx127x_set_payload_length(dev, size);
             }
 
@@ -79,6 +81,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
              * So wake up the chip */
             if (sx127x_get_op_mode(dev) == SX127X_RF_OPMODE_SLEEP) {
                 sx127x_set_standby(dev);
+                DEBUG("[sx127x] Waiting for chip to wake up.\n");
                 ztimer_sleep(ZTIMER_MSEC, SX127X_RADIO_WAKEUP_TIME); /* wait for chip wake up */
             }
 
@@ -86,6 +89,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
             for (const iolist_t *iol = iolist; iol; iol = iol->iol_next) {
                 if(iol->iol_len > 0) {
                     sx127x_write_fifo(dev, iol->iol_base, iol->iol_len);
+                    DEBUG("[sx127x] Wrote to payload buffer.\n");
                 }
             }
             break;
