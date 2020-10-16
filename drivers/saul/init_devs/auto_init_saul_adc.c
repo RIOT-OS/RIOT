@@ -48,7 +48,7 @@ static saul_reg_t saul_reg_entries[SAUL_ADC_NUMOF];
  */
 extern saul_driver_t adc_saul_driver;
 
-void audo_init_saul_adc(void)
+void auto_init_saul_adc(void)
 {
     for (unsigned i = 0; i < SAUL_ADC_NUMOF; i++) {
         const saul_adc_params_t *p = &saul_adc_params[i];
