@@ -514,12 +514,7 @@ void isr_radio(void)
             }
             break;
         case STATE_ACK:
-            _state = STATE_RX;
-            NRF_RADIO->PACKETPTR = (uint32_t) rxbuf;
-            _disable();
-            /* This will take around 0.5 us */
-            while (NRF_RADIO->STATE != RADIO_STATE_STATE_Disabled) {};
-            NRF_RADIO->TASKS_RXEN = 1;
+            _state = STATE_IDLE;
             _set_ifs_timer(false);
             break;
         default:
@@ -578,12 +573,16 @@ static int _request_on(ieee802154_dev_t *dev)
 static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
 {
     (void) dev;
-    _disable();
     int8_t pow = conf->pow;
 
     if (pow < TX_POWER_MIN || pow > TX_POWER_MAX) {
         return -EINVAL;
     }
+
+    _disable();
+
+    /* This will take in worst case 21 us */
+    while (NRF_RADIO->STATE != RADIO_STATE_STATE_Disabled) {};
 
     /* The value of this register represents the frequency offset (in MHz) from
      * 2400 MHz.  Channel 11 (first 2.4 GHz band channel) starts at 2405 MHz
@@ -593,6 +592,14 @@ static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
     NRF_RADIO->FREQUENCY = (((uint8_t) conf->channel) - 10) * 5;
 
     _set_txpower(pow);
+
+    if (_state == STATE_RX) {
+        NRF_RADIO->TASKS_RXEN = 1;
+
+        /* This takes in worst case 40 us */
+        while (NRF_RADIO->STATE == RADIO_STATE_STATE_RxRu) {}
+    }
+
     return 0;
 }
 
