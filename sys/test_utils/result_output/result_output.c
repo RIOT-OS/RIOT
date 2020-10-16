@@ -25,7 +25,7 @@
 
 #include "test_utils/result_output.h"
 
-#define _DATA_STR   "metrics"
+#define _DATA_STR   "data"
 
 void turo_data_int(int turo, int32_t data)
 {

@@ -15,8 +15,9 @@ def testfunc(child):
     child.expect_exact('This test is reading out the CPUID of the platforms CPU')
     child.expect(r'CPUID_LEN: (\d+)\r\n')
     cpuid_len = int(child.match.group(1))
-    child.expect(r'CPUID:( 0x[0-9a-fA-F]{2})+\s*\r\n')
-    assert child.match.group(0).count(' 0x') == cpuid_len
+    child.expect(r'{ \"data\": \[( \d*,)* \d* \] }')
+    assert child.match.group(0).count(',') == cpuid_len - 1
+    child.expect(r'{ \"result\": \"Success\" }')
 
 
 if __name__ == "__main__":
