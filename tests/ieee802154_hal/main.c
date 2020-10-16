@@ -486,9 +486,6 @@ int config_phy(int argc, char **argv)
         puts("Success!");
     }
 
-    /* Set the transceiver state to RX_ON in order to receive packets */
-    _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
-
     return 0;
 }
 
