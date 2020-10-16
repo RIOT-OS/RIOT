@@ -241,7 +241,7 @@ int emcute_con(sock_udp_ep_t *remote, bool clean, const char *will_topic,
     tbuf[1] = CONNECT;
     tbuf[2] = flags;
     tbuf[3] = PROTOCOL_VERSION;
-    byteorder_htobebufs(&tbuf[4], EMCUTE_KEEPALIVE);
+    byteorder_htobebufs(&tbuf[4], CONFIG_EMCUTE_KEEPALIVE);
     memcpy(&tbuf[6], cli_id, strlen(cli_id));
 
     /* configure 'state machine' and send the connection request */
@@ -509,7 +509,7 @@ void emcute_run(uint16_t port, const char *id)
     }
 
     uint32_t start = xtimer_now_usec();
-    uint32_t t_out = (EMCUTE_KEEPALIVE * US_PER_SEC);
+    uint32_t t_out = (CONFIG_EMCUTE_KEEPALIVE * US_PER_SEC);
 
     while (1) {
         ssize_t len = sock_udp_recv(&sock, rbuf, sizeof(rbuf), t_out, &remote);
@@ -556,13 +556,13 @@ void emcute_run(uint16_t port, const char *id)
         }
 
         uint32_t now = xtimer_now_usec();
-        if ((now - start) >= (EMCUTE_KEEPALIVE * US_PER_SEC)) {
+        if ((now - start) >= (CONFIG_EMCUTE_KEEPALIVE * US_PER_SEC)) {
             send_ping();
             start = now;
-            t_out = (EMCUTE_KEEPALIVE * US_PER_SEC);
+            t_out = (CONFIG_EMCUTE_KEEPALIVE * US_PER_SEC);
         }
         else {
-            t_out = (EMCUTE_KEEPALIVE * US_PER_SEC) - (now - start);
+            t_out = (CONFIG_EMCUTE_KEEPALIVE * US_PER_SEC) - (now - start);
         }
     }
 }
