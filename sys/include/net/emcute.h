@@ -145,13 +145,13 @@ extern "C" {
 #define CONFIG_EMCUTE_T_RETRY               (15U)       /* -> 15 sec */
 #endif
 
-#ifndef EMCUTE_N_RETRY
+#ifndef CONFIG_EMCUTE_N_RETRY
 /**
  * @brief   Number of retries when sending packets
  *
  * For the default value, see spec v1.2, section 7.2 -> N_RETRY: 3-5
  */
-#define EMCUTE_N_RETRY          (3U)
+#define CONFIG_EMCUTE_N_RETRY               (3U)
 #endif
 
 /**
