@@ -54,13 +54,6 @@ ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
   USEMODULE += gnrc_txtsnd
   # the application dumps received packets to stdout
   USEMODULE += gnrc_pktdump
-
-  # We use only the lower layers of the GNRC network stack, hence, we can
-  # reduce the size of the packet buffer a bit
-  # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
-ifndef CONFIG_GNRC_PKTBUF_SIZE
-  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
-endif
 endif
 
 FEATURES_OPTIONAL += periph_rtc
@@ -71,6 +64,15 @@ ifneq (,$(filter msba2,$(BOARD)))
 endif
 
 include $(RIOTBASE)/Makefile.include
+
+ifneq (,$(filter $(BOARD),$(BOARD_PROVIDES_NETIF)))
+  # We use only the lower layers of the GNRC network stack, hence, we can
+  # reduce the size of the packet buffer a bit
+  # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+  ifndef CONFIG_GNRC_PKTBUF_SIZE
+    CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
+  endif
+endif
 
 # Set a custom channel if needed
 include $(RIOTMAKE)/default-radio-settings.inc.mk

@@ -23,9 +23,15 @@ LOW_MEMORY_BOARDS := nucleo-f334r8
 ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
   $(info Using low-memory configuration for microcoap_server.)
   ## low-memory tuning values
-  # lower pktbuf buffer size
-  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=1000
   USEMODULE += prng_minstd
 endif
 
 include $(RIOTBASE)/Makefile.include
+
+ifneq (,$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
+  # lower pktbuf buffer size
+  # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+  ifndef CONFIG_GNRC_PKTBUF_SIZE
+    CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=1000
+  endif
+endif
