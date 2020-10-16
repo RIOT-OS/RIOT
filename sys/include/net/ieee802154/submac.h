@@ -332,11 +332,14 @@ static inline int ieee802154_read_frame(ieee802154_submac_t *submac, void *buf,
  * @brief Init the IEEE 802.15.4 SubMAC
  *
  * @param[in] submac pointer to the SubMAC descriptor
+ * @param[in] short_addr pointer to the IEEE 802.15.4 short address
+ * @param[in] ext_addr pointer to the IEEE 802.15.4 extended address
  *
  * @return 0 on success
  * @return negative errno on error
  */
-int ieee802154_submac_init(ieee802154_submac_t *submac);
+int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *short_addr,
+                           const eui64_t *ext_addr);
 
 /**
  * @brief Set the ACK timeout timer

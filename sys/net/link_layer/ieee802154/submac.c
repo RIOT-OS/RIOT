@@ -290,7 +290,8 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     return 0;
 }
 
-int ieee802154_submac_init(ieee802154_submac_t *submac)
+int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *short_addr,
+                           const eui64_t *ext_addr)
 {
     ieee802154_dev_t *dev = submac->dev;
 
@@ -300,8 +301,8 @@ int ieee802154_submac_init(ieee802154_submac_t *submac)
     ieee802154_radio_request_on(dev);
 
     /* generate EUI-64 and short address */
-    luid_get_eui64(&submac->ext_addr);
-    luid_get_short(&submac->short_addr);
+    memcpy(&submac->ext_addr, ext_addr, sizeof(eui64_t));
+    memcpy(&submac->short_addr, short_addr, sizeof(network_uint16_t));
     submac->panid = CONFIG_IEEE802154_DEFAULT_PANID;
 
     submac->be.min = CONFIG_IEEE802154_DEFAULT_CSMA_CA_MIN_BE;
