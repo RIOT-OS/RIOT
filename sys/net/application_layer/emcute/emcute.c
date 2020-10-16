@@ -247,7 +247,7 @@ int emcute_con(sock_udp_ep_t *remote, bool clean, const char *will_topic,
     /* configure 'state machine' and send the connection request */
     if (will_topic) {
         size_t topic_len = strlen(will_topic);
-        if ((topic_len > EMCUTE_TOPIC_MAXLEN) ||
+        if ((topic_len > CONFIG_EMCUTE_TOPIC_MAXLEN) ||
             ((will_msg_len + 4) > CONFIG_EMCUTE_BUFSIZE)) {
             gateway.port = 0;
             return EMCUTE_OVERFLOW;
@@ -307,7 +307,7 @@ int emcute_reg(emcute_topic_t *topic)
     if (gateway.port == 0) {
         return EMCUTE_NOGW;
     }
-    if (strlen(topic->name) > EMCUTE_TOPIC_MAXLEN) {
+    if (strlen(topic->name) > CONFIG_EMCUTE_TOPIC_MAXLEN) {
         return EMCUTE_OVERFLOW;
     }
 
@@ -375,7 +375,7 @@ int emcute_sub(emcute_sub_t *sub, unsigned flags)
     if (gateway.port == 0) {
         return EMCUTE_NOGW;
     }
-    if (strlen(sub->topic.name) > EMCUTE_TOPIC_MAXLEN) {
+    if (strlen(sub->topic.name) > CONFIG_EMCUTE_TOPIC_MAXLEN) {
         return EMCUTE_OVERFLOW;
     }
 
@@ -451,7 +451,7 @@ int emcute_willupd_topic(const char *topic, unsigned flags)
     if (gateway.port == 0) {
         return EMCUTE_NOGW;
     }
-    if (topic && (strlen(topic) > EMCUTE_TOPIC_MAXLEN)) {
+    if (topic && (strlen(topic) > CONFIG_EMCUTE_TOPIC_MAXLEN)) {
         return EMCUTE_OVERFLOW;
     }
 

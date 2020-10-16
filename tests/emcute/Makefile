@@ -25,7 +25,7 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += sock_util
 
-CFLAGS += -DEMCUTE_TOPIC_MAXLEN="249"   # 256 - 7
+CFLAGS += -DCONFIG_EMCUTE_TOPIC_MAXLEN="249"   # 256 - 7
 CFLAGS += -DSTDIO_UART_RX_BUFSIZE="512" # Adapt to SHELL_BUFSIZE in app
 
 # The test requires some setup and to be run as root
