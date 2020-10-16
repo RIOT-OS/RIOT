@@ -39,7 +39,7 @@
 
 static char _emcute_stack[THREAD_STACKSIZE_DEFAULT];
 static char _shell_buffer[SHELL_BUFSIZE];
-static uint8_t _pub_buf[EMCUTE_BUFSIZE];
+static uint8_t _pub_buf[CONFIG_EMCUTE_BUFSIZE];
 
 static emcute_topic_t _topics[NUMOFTOPS];
 static emcute_sub_t _subscriptions[NUMOFTOPS];

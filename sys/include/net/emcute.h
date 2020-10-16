@@ -102,7 +102,7 @@ extern "C" {
 #define EMCUTE_DEFAULT_PORT     (1883U)
 #endif
 
-#ifndef EMCUTE_BUFSIZE
+#ifndef CONFIG_EMCUTE_BUFSIZE
 /**
  * @brief   Buffer size used for emCute's transmit and receive buffers
  *
@@ -111,7 +111,7 @@ extern "C" {
  *
  * The overall buffer size used by emCute is this value time two (Rx + Tx).
  */
-#define EMCUTE_BUFSIZE          (512U)
+#define CONFIG_EMCUTE_BUFSIZE               (512U)
 #endif
 
 #ifndef EMCUTE_TOPIC_MAXLEN
@@ -119,7 +119,7 @@ extern "C" {
  * @brief   Maximum topic length
  *
  * @note    **Must** be less than (256 - 6) AND less than
- *          (@ref EMCUTE_BUFSIZE - 6).
+ *          (@ref CONFIG_EMCUTE_BUFSIZE - 6).
  */
 #define EMCUTE_TOPIC_MAXLEN     (196U)
 #endif
@@ -276,7 +276,7 @@ int emcute_reg(emcute_topic_t *topic);
  * @return  EMCUTE_OK on success
  * @return  EMCUTE_NOGW if not connected to a gateway
  * @return  EMCUTE_REJECT if publish message was rejected (QoS > 0 only)
- * @return  EMCUTE_OVERFLOW if length of data exceeds @ref EMCUTE_BUFSIZE
+ * @return  EMCUTE_OVERFLOW if length of data exceeds @ref CONFIG_EMCUTE_BUFSIZE
  * @return  EMCUTE_TIMEOUT on connection timeout (QoS > 0 only)
  * @return  EMCUTE_NOTSUP on unsupported flag values
  */
@@ -337,7 +337,7 @@ int emcute_willupd_topic(const char *topic, unsigned flags);
  * @return  EMCUTE_OK on success
  * @return  EMCUTE_NOGW if not connected to a gateway
  * @return  EMCUTE_OVERFLOW if length of the given message exceeds
- *          @ref EMCUTE_BUFSIZE
+ *          @ref CONFIG_EMCUTE_BUFSIZE
  * @return  EMCUTE_REJECT on rejection by the gateway
  * @return  EMCUTE_TIMEOUT on response timeout
  */

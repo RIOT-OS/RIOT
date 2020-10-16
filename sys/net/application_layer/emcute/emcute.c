@@ -49,8 +49,8 @@ static const char *cli_id;
 static sock_udp_t sock;
 static sock_udp_ep_t gateway;
 
-static uint8_t rbuf[EMCUTE_BUFSIZE];
-static uint8_t tbuf[EMCUTE_BUFSIZE];
+static uint8_t rbuf[CONFIG_EMCUTE_BUFSIZE];
+static uint8_t tbuf[CONFIG_EMCUTE_BUFSIZE];
 
 static emcute_sub_t *subs = NULL;
 
@@ -248,7 +248,7 @@ int emcute_con(sock_udp_ep_t *remote, bool clean, const char *will_topic,
     if (will_topic) {
         size_t topic_len = strlen(will_topic);
         if ((topic_len > EMCUTE_TOPIC_MAXLEN) ||
-            ((will_msg_len + 4) > EMCUTE_BUFSIZE)) {
+            ((will_msg_len + 4) > CONFIG_EMCUTE_BUFSIZE)) {
             gateway.port = 0;
             return EMCUTE_OVERFLOW;
         }
@@ -338,7 +338,7 @@ int emcute_pub(emcute_topic_t *topic, const void *data, size_t len,
     if (gateway.port == 0) {
         return EMCUTE_NOGW;
     }
-    if (len >= (EMCUTE_BUFSIZE - 9)) {
+    if (len >= (CONFIG_EMCUTE_BUFSIZE - 9)) {
         return EMCUTE_OVERFLOW;
     }
     if (flags & EMCUTE_QOS_2) {
@@ -477,7 +477,7 @@ int emcute_willupd_msg(const void *data, size_t len)
     if (gateway.port == 0) {
         return EMCUTE_NOGW;
     }
-    if (len > (EMCUTE_BUFSIZE - 4)) {
+    if (len > (CONFIG_EMCUTE_BUFSIZE - 4)) {
         return EMCUTE_OVERFLOW;
     }
 
