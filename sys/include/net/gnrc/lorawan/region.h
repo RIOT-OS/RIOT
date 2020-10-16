@@ -29,10 +29,15 @@ extern "C" {
  * @brief Default LoRaWAN channels for current region (EU868)
  */
 static const uint32_t gnrc_lorawan_default_channels[] = {
+#ifdef GNRC_LORAWAN_SINGLE_CHANNEL
+    GNRC_LORAWAN_SINGLE_CHANNEL
+#else
     868100000UL,
     868300000UL,
     868500000UL
+#endif
 };
+
 
 #define GNRC_LORAWAN_DEFAULT_CHANNELS_NUMOF \
     ARRAY_SIZE(gnrc_lorawan_default_channels) /**< Number of default channels */
