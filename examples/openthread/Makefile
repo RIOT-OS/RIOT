@@ -19,6 +19,9 @@ BOARD_WHITELIST := \
                     remote-revb \
                     omote \
                     openmote-cc2538 \
+                    nrf52840dk \
+                    nrf52840-mdk \
+                    reel \
                     #
 
 # This has to be the absolute path to the RIOT base directory:

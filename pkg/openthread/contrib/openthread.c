@@ -38,6 +38,10 @@
 #include "cc2538_rf.h"
 #endif
 
+#ifdef MODULE_NRF802154
+#include "nrf802154.h"
+#endif
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
@@ -61,6 +65,10 @@ static at86rf2xx_t at86rf2xx_dev;
 static kw41zrf_t kw41z_dev;
 #endif
 
+#ifdef MODULE_NRF802154
+static nrf802154_t nrf802154_dev;
+#endif
+
 static uint8_t rx_buf[OPENTHREAD_NETDEV_BUFLEN];
 static uint8_t tx_buf[OPENTHREAD_NETDEV_BUFLEN];
 static char ot_thread_stack[2 * THREAD_STACKSIZE_MAIN];
@@ -82,6 +90,10 @@ void openthread_bootstrap(void)
 #ifdef MODULE_CC2538_RF
     cc2538_setup(&cc2538_rf_dev);
     netdev_t *netdev = (netdev_t*) &cc2538_rf_dev;
+#endif
+#ifdef MODULE_NRF802154
+    nrf802154_setup(&nrf802154_dev);
+    netdev_t *netdev = (netdev_t*) &nrf802154_dev;
 #endif
 
     openthread_radio_init(netdev, tx_buf, rx_buf);

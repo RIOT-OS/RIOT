@@ -5,7 +5,7 @@ USEMODULE += l2util
 USEMODULE += xtimer
 USEMODULE += event
 
-ifneq (,$(filter cc2538_rf,$(USEMODULE)))
+ifneq (,$(filter cc2538_rf nrf802154,$(USEMODULE)))
   USEMODULE += netdev_ieee802154_submac
 endif
 
