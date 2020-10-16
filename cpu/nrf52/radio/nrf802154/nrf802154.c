@@ -233,8 +233,6 @@ static int _init(netdev_t *dev)
 {
     (void)dev;
 
-    netdev_register(&nrf802154_dev->netdev, NETDEV_NRF802154, 0);
-
     int result = timer_init(NRF802154_TIMER, TIMER_FREQ, _timer_cb, NULL);
     assert(result >= 0);
     (void)result;
