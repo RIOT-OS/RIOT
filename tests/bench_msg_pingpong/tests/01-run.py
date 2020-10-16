@@ -12,7 +12,7 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect(r"{ \"result\" : \d+(, \"ticks\" : \d+)? }")
+    child.expect(r"{ \"result\" : \"Success\" }")
 
 
 if __name__ == "__main__":
