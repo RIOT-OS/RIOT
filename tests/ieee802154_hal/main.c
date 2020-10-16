@@ -116,6 +116,10 @@ void _rx_done_handler(event_t *event)
         /* Print packet while we wait for the state transition */
         _print_packet(size, info.lqi, info.rssi);
     }
+
+    /* Go out of the HAL's FB Lock state after frame reception and trigger a
+     * state change */
+    _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
 }
 
 static event_t _rx_done_event = {
