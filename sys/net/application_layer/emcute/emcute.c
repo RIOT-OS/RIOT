@@ -107,7 +107,7 @@ static int syncsend(uint8_t resp, size_t len, bool unlock)
         DEBUG("[emcute] syncsend: sending round %i\n", retries);
         sock_udp_send(&sock, tbuf, len, &gateway);
 
-        xtimer_set(&timer, (EMCUTE_T_RETRY * US_PER_SEC));
+        xtimer_set(&timer, (CONFIG_EMCUTE_T_RETRY * US_PER_SEC));
         thread_flags_t flags = thread_flags_wait_any(TFLAGS_ANY);
         if (flags & TFLAGS_RESP) {
             DEBUG("[emcute] syncsend: got response [%i]\n", result);

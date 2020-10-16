@@ -136,13 +136,13 @@ extern "C" {
 #define CONFIG_EMCUTE_KEEPALIVE             (360)       /* -> 6 min*/
 #endif
 
-#ifndef EMCUTE_T_RETRY
+#ifndef CONFIG_EMCUTE_T_RETRY
 /**
  * @brief   Re-send interval [in seconds]
  *
  * For the default value, see spec v1.2, section 7.2 -> T_RETRY: 10 to 15 sec
  */
-#define EMCUTE_T_RETRY          (15U)       /* -> 15 sec */
+#define CONFIG_EMCUTE_T_RETRY               (15U)       /* -> 15 sec */
 #endif
 
 #ifndef EMCUTE_N_RETRY
