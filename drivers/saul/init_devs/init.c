@@ -28,8 +28,8 @@
 void saul_init_devs(void)
 {
     if (IS_USED(MODULE_SAUL_ADC)) {
-        extern void auto_init_adc(void);
-        auto_init_adc();
+        extern void audo_init_saul_adc(void);
+        audo_init_saul_adc();
     }
     if (IS_USED(MODULE_SAUL_GPIO)) {
         extern void auto_init_gpio(void);
