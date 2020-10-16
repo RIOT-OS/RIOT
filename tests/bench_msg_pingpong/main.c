@@ -24,6 +24,7 @@
 
 #include "msg.h"
 #include "xtimer.h"
+#include "test_utils/result_output.h"
 
 #ifndef TEST_DURATION
 #define TEST_DURATION       (1000000U)
@@ -53,8 +54,6 @@ static void *_second_thread(void *arg)
 
 int main(void)
 {
-    printf("main starting\n");
-
     kernel_pid_t other = thread_create(_stack,
                                        sizeof(_stack),
                                        (THREAD_PRIORITY_MAIN - 1),
@@ -76,12 +75,12 @@ int main(void)
         n++;
     }
 
-    printf("{ \"result\" : %"PRIu32, n);
+    turo_data_int_dict(0, "n", n);
 #ifdef CLOCK_CORECLOCK
-    printf(", \"ticks\" : %"PRIu32,
-           (uint32_t)((TEST_DURATION/US_PER_MS) * (CLOCK_CORECLOCK/KHZ(1)))/n);
+    turo_data_int_dict(0, "ticks", (uint32_t)((TEST_DURATION/US_PER_MS) *
+                                     (CLOCK_CORECLOCK/KHZ(1)))/n);
 #endif
-    puts(" }");
+    turo_result_success(0);
 
     return 0;
 }
