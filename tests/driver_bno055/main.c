@@ -34,10 +34,10 @@ int main(void)
     printf("Initialize BNO055\n");
     result = bno055_init(&dev, &bno055_params[0]);
     if (result != BNO055_OK) {
-        printf("[Error] Failed to connect with the i2c device\n");
+        printf("[Error] Failed to initialize the i2c device\n");
     }
 
-    printf("Initialized successful\n");
+    printf("Initialization successful\n");
 
     quat_t quat_data;
     eul_t eul_data;

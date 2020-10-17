@@ -44,7 +44,7 @@ int bno055_init(bno055_t *dev, const bno055_params_t *params)
     int ret = read_u8_regs(dev, BNO055_REG_CHIPID, &id, 4);
     if (ret) {
         i2c_release(dev->p->i2c);
-        return BNO055_NOREAD;
+        return BNO055_NORW;
     }
     if (id[0] != BNO055_VAL_MCU_WHO_AM_I ||
         id[1] != BNO055_VAL_ACC_WHO_AM_I ||
@@ -58,17 +58,17 @@ int bno055_init(bno055_t *dev, const bno055_params_t *params)
     ret = write_u8_reg(dev, BNO055_REG_OPR_MOD, dev->p->opr);
     if (ret) {
         i2c_release(dev->p->i2c);
-        return BNO055_NOWRITE;
+        return BNO055_NORW;
     }
     ret = write_u8_reg(dev, BNO055_REG_PWR_MOD, dev->p->pwr);
     if (ret) {
         i2c_release(dev->p->i2c);
-        return BNO055_NOWRITE;
+        return BNO055_NORW;
     }
     ret = write_u8_reg(dev, BNO055_REG_UNIT_SEL, dev->p->unit_sel);
     if (ret) {
         i2c_release(dev->p->i2c);
-        return BNO055_NOWRITE;
+        return BNO055_NORW;
     }
     i2c_release(dev->p->i2c);
     return BNO055_OK;
@@ -83,7 +83,7 @@ int bno055_set_page(const bno055_t *dev, uint8_t page)
     int ret = write_u8_reg(dev, BNO055_REG_PAGEID, page);
     i2c_release(dev->p->i2c);
     if (ret) {
-        return BNO055_NOWRITE;
+        return BNO055_NORW;
     }
     return BNO055_OK;
 }
@@ -96,7 +96,7 @@ int bno055_set_mode(const bno055_t *dev, bno055_opr_mode_t mode)
     int ret = write_u8_reg(dev, BNO055_REG_OPR_MOD, mode);
     i2c_release(dev->p->i2c);
     if (ret) {
-        return BNO055_NOWRITE;
+        return BNO055_NORW;
     }
     return BNO055_OK;
 }
@@ -109,7 +109,7 @@ int bno055_quat_read(const bno055_t *dev, bno055_4bit16_t *data)
     int ret = read_u8_regs(dev, BNO055_REG_QUA_DAT, data->u8bit, 8);
     i2c_release(dev->p->i2c);
     if (ret) {
-        return BNO055_NOWRITE;
+        return BNO055_NORW;
     }
     return BNO055_OK;
 }
@@ -122,7 +122,7 @@ int bno055_eul_read(const bno055_t *dev, bno055_3bit16_t *data)
     int ret = read_u8_regs(dev, BNO055_REG_EUL_DAT, data, 6);
     i2c_release(dev->p->i2c);
     if (ret) {
-        return BNO055_NOWRITE;
+        return BNO055_NORW;
     }
     return BNO055_OK;
 }
@@ -135,7 +135,7 @@ int bno055_lia_read(const bno055_t *dev, bno055_3bit16_t *data)
     int ret = read_u8_regs(dev, BNO055_REG_LIA_DAT, data, 6);
     i2c_release(dev->p->i2c);
     if (ret) {
-        return BNO055_NOWRITE;
+        return BNO055_NORW;
     }
     return BNO055_OK;
 }
@@ -148,7 +148,7 @@ int bno055_grv_read(const bno055_t *dev, bno055_3bit16_t *data)
     int ret = read_u8_regs(dev, BNO055_REG_GRV_DAT, data, 6);
     i2c_release(dev->p->i2c);
     if (ret) {
-        return BNO055_NOWRITE;
+        return BNO055_NORW;
     }
     return BNO055_OK;
 }
@@ -161,7 +161,7 @@ int bno055_acc_read(const bno055_t *dev, bno055_3bit16_t *data)
     int ret = read_u8_regs(dev, BNO055_REG_ACC_DAT, data, 6);
     i2c_release(dev->p->i2c);
     if (ret) {
-        return BNO055_NOWRITE;
+        return BNO055_NORW;
     }
     return BNO055_OK;
 }
@@ -174,7 +174,7 @@ int bno055_mag_read(const bno055_t *dev, bno055_3bit16_t *data)
     int ret = read_u8_regs(dev, BNO055_REG_MAG_DAT, data, 6);
     i2c_release(dev->p->i2c);
     if (ret) {
-        return BNO055_NOWRITE;
+        return BNO055_NORW;
     }
     return BNO055_OK;
 }
@@ -187,7 +187,7 @@ int bno055_gyr_read(const bno055_t *dev, bno055_3bit16_t *data)
     int ret = read_u8_regs(dev, BNO055_REG_GYR_DAT, data, 6);
     i2c_release(dev->p->i2c);
     if (ret) {
-        return BNO055_NOWRITE;
+        return BNO055_NORW;
     }
     return BNO055_OK;
 }

@@ -72,21 +72,21 @@ extern "C" {
 #define BNO055_PARAM_GYR_UNIT BNO055_BIT_GYR_RPS
 #endif
 #ifndef BNO055_PARAMS
-#define BNO055_PARAMS                           \
-    {   .i2c        = BNO055_PARAM_I2C,         \
-        .addr       = BNO055_PARAM_ADDR,        \
-        .opr        = BNO055_PARAM_OPR_MODE,    \
-        .pwr        = BNO055_PARAM_PWR_MODE,    \
-        .unit_sel   = BNO055_PARAM_TEMP_UNIT |  \
-                      BNO055_PARAM_EUL_UNIT |   \
-                      BNO055_PARAM_GYR_UNIT |   \
-                      BNO055_PARAM_ACC_UNIT,    \
-        .gpio1      = BNO055_PARAM_INT1,        \
-        .gpio2      = BNO055_PARAM_INT2,        \
-        .mag_rate   = BNO055_PARAM_MAG_RATE,    \
-        .acc_range  = BNO055_PARAM_ACC_RANGE,   \
-        .acc_unit   = BNO055_PARAM_ACC_UNIT,    \
-        .gyro_scale = BNO055_PARAM_GYRO_SCALE   \
+#define BNO055_PARAMS                         \
+    {   .i2c = BNO055_PARAM_I2C,              \
+        .addr = BNO055_PARAM_ADDR,            \
+        .opr = BNO055_PARAM_OPR_MODE,         \
+        .pwr = BNO055_PARAM_PWR_MODE,         \
+        .unit_sel = BNO055_PARAM_TEMP_UNIT |  \
+                    BNO055_PARAM_EUL_UNIT |   \
+                    BNO055_PARAM_GYR_UNIT |   \
+                    BNO055_PARAM_ACC_UNIT,    \
+        .gpio1 = BNO055_PARAM_INT1,           \
+        .gpio2 = BNO055_PARAM_INT2,           \
+        .mag_rate = BNO055_PARAM_MAG_RATE,    \
+        .acc_range = BNO055_PARAM_ACC_RANGE,  \
+        .acc_unit = BNO055_PARAM_ACC_UNIT,    \
+        .gyro_scale = BNO055_PARAM_GYRO_SCALE \
     }
 #endif
 
@@ -95,9 +95,9 @@ extern "C" {
 /**
  * @brief   BNO055 configuration
  */
-    static const bno055_params_t bno055_params[] = {
-        BNO055_PARAMS
-    };
+static const bno055_params_t bno055_params[] = {
+    BNO055_PARAMS
+};
 
 #ifdef __cplusplus
 }

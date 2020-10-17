@@ -39,6 +39,7 @@
 #define BNO055_H
 
 #include <stdint.h>
+#include <errno.h>
 
 #include "periph/i2c.h"
 #include "periph/gpio.h"
@@ -104,12 +105,11 @@ typedef struct {
  * @brief   Status and error return codes
  */
 enum {
-    BNO055_OK       =  0,               /**< exit without error */
-    BNO055_NOBUS    = -1,               /**< cannot connect to module on i2c bus */
-    BNO055_NODEV    = -2,               /**< cannot read any data from module */
-    BNO055_NOREAD   = -3,               /**< cannot read data from module */
-    BNO055_NOWRITE  = -4,               /**< cannot write data to module */
-    BNO055_NOTREADY = -5,               /**< no new data ready for reading */
+    BNO055_OK       = 0,      /**< exit without error */
+    BNO055_NOBUS    = ENXIO,  /**< cannot connect to module on i2c bus */
+    BNO055_NODEV    = ENODEV, /**< cannot read any data from module */
+    BNO055_NORW     = EIO,    /**< cannot read data from module */
+    BNO055_NOTREADY = EBUSY,  /**< no new data ready for reading */
 };
 
 /**
@@ -135,9 +135,12 @@ typedef enum {
  * @brief   Power mode for sensor
  */
 typedef enum {
-    BNO055_PWR_MODE_NORMAL  = 0x0,
-    BNO055_PWR_MODE_LOW     = 0x1,
-    BNO055_PWR_MODE_SUSPEND = 0x2,
+    BNO055_PWR_MODE_NORMAL  = 0x0, /**< All sensors required are always switched ON */
+    BNO055_PWR_MODE_LOW     = 0x1, /**< If no motion is detected for a specified duration, all sensors except
+                                     *  the accelerometer is switched off. Once motion is detected, the system
+                                     *  is woken and normal mode is entered. */
+    BNO055_PWR_MODE_SUSPEND = 0x2, /**< Sensors and MCU are put into sleep mode. Exit from mode by switching
+                                     *  to Normal or low Power mode. */
 } bno055_pwr_mode_t;
 
 /**
@@ -147,7 +150,7 @@ typedef enum {
     BNO055_MAG_DRATE_DEFAULT    = 0x0,  /**< output data rate: 10 Hz */
     BNO055_MAG_DRATE_02HZ       = 0x1,  /**< output data rate:  2 Hz */
     BNO055_MAG_DRATE_06HZ       = 0x2,  /**< output data rate:  6 Hz */
-    BNO055_MAG_DRATE_08HZ       = 0x3,  /**< output data rate:  8 Hz*/
+    BNO055_MAG_DRATE_08HZ       = 0x3,  /**< output data rate:  8 Hz */
     BNO055_MAG_DRATE_15HZ       = 0x4,  /**< output data rate: 15 Hz */
     BNO055_MAG_DRATE_20HZ       = 0x5,  /**< output data rate: 20 Hz */
     BNO055_MAG_DRATE_25HZ       = 0x6,  /**< output data rate: 25 Hz */
@@ -205,10 +208,10 @@ typedef struct {
  * @param[out] dev      device descriptor of sensor to initialize
  * @param[in]  params   default parameter values
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOBUS if i2C connection can not be establish
- * @return              BNO055_NODEV if the register of a  module can not be read
- * @return              BNO055_NOWRITE if a register can not be written
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOBUS if i2C connection can not be establish
+ * @retval              BNO055_NODEV if the register of a  module can not be read
+ * @retval              BNO055_NOWRITE if a register can not be written
  */
 int bno055_init(bno055_t *dev, const bno055_params_t *params);
 
@@ -222,9 +225,9 @@ int bno055_init(bno055_t *dev, const bno055_params_t *params);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     4 word struct 'bno055_4bit16_t' with quaternion vector
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_quat_read(const bno055_t *dev, bno055_4bit16_t *data);
 
@@ -239,9 +242,9 @@ int bno055_quat_read(const bno055_t *dev, bno055_4bit16_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     3 word struct 'bno055_3bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_eul_read(const bno055_t *dev, bno055_3bit16_t *data);
 
@@ -256,9 +259,9 @@ int bno055_eul_read(const bno055_t *dev, bno055_3bit16_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     3 word struct 'bno055_3bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_lia_read(const bno055_t *dev, bno055_3bit16_t *data);
 
@@ -273,9 +276,9 @@ int bno055_lia_read(const bno055_t *dev, bno055_3bit16_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     3 word struct 'bno055_3bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_grv_read(const bno055_t *dev, bno055_3bit16_t *data);
 
@@ -290,9 +293,9 @@ int bno055_grv_read(const bno055_t *dev, bno055_3bit16_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     3 word struct 'bno055_3bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_acc_read(const bno055_t *dev, bno055_3bit16_t *data);
 
@@ -306,9 +309,9 @@ int bno055_acc_read(const bno055_t *dev, bno055_3bit16_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     3 word struct 'bno055_3bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_mag_read(const bno055_t *dev, bno055_3bit16_t *data);
 
@@ -322,9 +325,9 @@ int bno055_mag_read(const bno055_t *dev, bno055_3bit16_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     3 word struct 'bno055_3bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_gyr_read(const bno055_t *dev, bno055_3bit16_t *data);
 
@@ -334,9 +337,9 @@ int bno055_gyr_read(const bno055_t *dev, bno055_3bit16_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[in]  page     desired page number (0 or 1)
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_set_page(const bno055_t *dev, uint8_t page);
 
@@ -346,9 +349,9 @@ int bno055_set_page(const bno055_t *dev, uint8_t page);
  * @param[in]  dev      device descriptor of IMU
  * @param[in]  mode     bno055_opr_mode_t with the desired mode
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_set_mode(const bno055_t *dev, bno055_opr_mode_t mode);
 
@@ -358,9 +361,9 @@ int bno055_set_mode(const bno055_t *dev, bno055_opr_mode_t mode);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     4 word struct 'bno055_4bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_quat_float(const bno055_t *dev, quat_t *data);
 
@@ -370,9 +373,9 @@ int bno055_quat_float(const bno055_t *dev, quat_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     3 word struct 'bno055_3bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_eul_float(const bno055_t *dev, eul_t *data);
 
@@ -384,9 +387,9 @@ int bno055_eul_float(const bno055_t *dev, eul_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     3 word struct 'bno055_3bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_grv_float(const bno055_t *dev, euclid_t *data);
 
@@ -398,9 +401,9 @@ int bno055_grv_float(const bno055_t *dev, euclid_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     3 word struct 'bno055_3bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_lia_float(const bno055_t *dev, euclid_t *data);
 
@@ -413,9 +416,9 @@ int bno055_lia_float(const bno055_t *dev, euclid_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     3 word struct 'bno055_3bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_acc_float(const bno055_t *dev, euclid_t *data);
 
@@ -426,9 +429,9 @@ int bno055_acc_float(const bno055_t *dev, euclid_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     3 word struct 'bno055_3bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_mag_float(const bno055_t *dev, euclid_t *data);
 
@@ -439,9 +442,9 @@ int bno055_mag_float(const bno055_t *dev, euclid_t *data);
  * @param[in]  dev      device descriptor of IMU
  * @param[out] data     3 word struct 'bno055_3bit16_t'
  *
- * @return              BNO055_OK on success
- * @return              BNO055_NOREAD if reading mag data is not possible
- * @return              BNO055_NOTRDY if no new data is available
+ * @retval              BNO055_OK on success
+ * @retval              BNO055_NOREAD if reading mag data is not possible
+ * @retval              BNO055_NOTRDY if no new data is available
  */
 int bno055_gyr_float(const bno055_t *dev, euclid_t *data);
 
