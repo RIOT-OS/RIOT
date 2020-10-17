@@ -509,5 +509,6 @@ void sched_arch_idle(void)
     /* Briefly re-enable IRQs to allow pending interrupts to be serviced and
      * have them update the runqueue */
     __enable_irq();
+    __ISB();
     __disable_irq();
 }
