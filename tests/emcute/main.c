@@ -72,7 +72,7 @@ static const shell_command_t _shell_commands[] = {
 static void *_emcute_thread(void *arg)
 {
     (void)arg;
-    emcute_run(MQTTSN_DEFAULT_PORT, EMCUTE_ID);
+    emcute_run(CONFIG_EMCUTE_DEFAULT_PORT, EMCUTE_ID);
     return NULL;    /* should never be reached */
 }
 
@@ -111,7 +111,7 @@ static int _con(int argc, char **argv)
         return 1;
     }
     if (_gw.port == 0) {
-        _gw.port = MQTTSN_DEFAULT_PORT;
+        _gw.port = CONFIG_EMCUTE_DEFAULT_PORT;
     }
     if (argc >= 4) {
         topic = argv[2];

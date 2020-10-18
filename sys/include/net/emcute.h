@@ -95,11 +95,11 @@
 extern "C" {
 #endif
 
-#ifndef EMCUTE_DEFAULT_PORT
+#ifndef CONFIG_EMCUTE_DEFAULT_PORT
 /**
  * @brief   Default UDP port to listen on (also used as SRC port)
  */
-#define EMCUTE_DEFAULT_PORT     (1883U)
+#define CONFIG_EMCUTE_DEFAULT_PORT          (1883U)
 #endif
 
 #ifndef CONFIG_EMCUTE_BUFSIZE
