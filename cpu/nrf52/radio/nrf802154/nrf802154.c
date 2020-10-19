@@ -37,28 +37,9 @@
 
 static const netdev_driver_t nrf802154_netdev_driver;
 
-netdev_ieee802154_t nrf802154_dev = {
-    {
-        .driver = &nrf802154_netdev_driver,
-        .event_callback = NULL,
-        .context = NULL,
-    },
-#ifdef MODULE_GNRC
-#ifdef MODULE_GNRC_SIXLOWPAN
-    .proto = GNRC_NETTYPE_SIXLOWPAN,
-#else
-    .proto = GNRC_NETTYPE_UNDEF,
-#endif
-#endif
-    .pan = CONFIG_IEEE802154_DEFAULT_PANID,
-    .short_addr = { 0, 0 },
-    .long_addr = { 0, 0, 0, 0, 0, 0, 0, 0 },
-    .chan = CONFIG_IEEE802154_DEFAULT_CHANNEL,
-    .flags = 0
-};
-
 static uint8_t rxbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
 static uint8_t txbuf[IEEE802154_FRAME_LEN_MAX + 3]; /* len PHR + PSDU + LQI */
+static netdev_ieee802154_t *nrf802154_dev;
 
 #define ED_RSSISCALE        (4U)
 #define ED_RSSIOFFS         (-92)
@@ -197,7 +178,7 @@ static void _set_chan(uint16_t chan)
     /* Channel map between 2400 MHZ ... 2500 MHz
      * -> Frequency = 2400 + FREQUENCY (MHz) */
     NRF_RADIO->FREQUENCY = (chan - 10) * 5;
-    nrf802154_dev.chan = chan;
+    nrf802154_dev->chan = chan;
 }
 
 static int16_t _get_txpower(void)
@@ -252,8 +233,6 @@ static int _init(netdev_t *dev)
 {
     (void)dev;
 
-    netdev_register(&nrf802154_dev.netdev, NETDEV_NRF802154, 0);
-
     int result = timer_init(NRF802154_TIMER, TIMER_FREQ, _timer_cb, NULL);
     assert(result >= 0);
     (void)result;
@@ -295,10 +274,11 @@ static int _init(netdev_t *dev)
     NRF_RADIO->MODECNF0 |= RADIO_MODECNF0_RU_Msk;
 
     /* assign default addresses */
-    netdev_ieee802154_setup(&nrf802154_dev);
+    netdev_ieee802154_setup(nrf802154_dev);
 
+    nrf802154_dev->chan = CONFIG_IEEE802154_DEFAULT_CHANNEL;
     /* set default channel */
-    _set_chan(nrf802154_dev.chan);
+    _set_chan(nrf802154_dev->chan);
 
     /* set default CCA threshold */
     _set_cca_thresh(CONFIG_NRF802154_CCA_THRESH_DEFAULT);
@@ -411,14 +391,14 @@ static int _recv(netdev_t *dev, void *buf, size_t len, void *info)
 
 static void _isr(netdev_t *dev)
 {
-    if (!nrf802154_dev.netdev.event_callback) {
+    if (!nrf802154_dev->netdev.event_callback) {
         return;
     }
     if (_state & RX_COMPLETE) {
-        nrf802154_dev.netdev.event_callback(dev, NETDEV_EVENT_RX_COMPLETE);
+        nrf802154_dev->netdev.event_callback(dev, NETDEV_EVENT_RX_COMPLETE);
     }
     if (_state & TX_COMPLETE) {
-        nrf802154_dev.netdev.event_callback(dev, NETDEV_EVENT_TX_COMPLETE);
+        nrf802154_dev->netdev.event_callback(dev, NETDEV_EVENT_TX_COMPLETE);
         _state &= ~TX_COMPLETE;
     }
 }
@@ -436,7 +416,7 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
     switch (opt) {
         case NETOPT_CHANNEL:
             assert(max_len >= sizeof(uint16_t));
-            *((uint16_t *)value) = nrf802154_dev.chan;
+            *((uint16_t *)value) = nrf802154_dev->chan;
             return sizeof(uint16_t);
         case NETOPT_TX_POWER:
             assert(max_len >= sizeof(int16_t));
@@ -503,9 +483,9 @@ void isr_radio(void)
         switch(state) {
             case RADIO_STATE_STATE_RxIdle:
                 /* only process packet if event callback is set and CRC is valid */
-                if ((nrf802154_dev.netdev.event_callback) &&
+                if ((nrf802154_dev->netdev.event_callback) &&
                     (NRF_RADIO->CRCSTATUS == 1) &&
-                    (netdev_ieee802154_dst_filter(&nrf802154_dev,
+                    (netdev_ieee802154_dst_filter(nrf802154_dev,
                                                   &rxbuf[1]) == 0)) {
                     _state |= RX_COMPLETE;
                 }
@@ -525,7 +505,7 @@ void isr_radio(void)
                 DEBUG("[nrf802154] Unhandled state: %x\n", (uint8_t)NRF_RADIO->STATE);
         }
         if (_state) {
-            netdev_trigger_event_isr(&nrf802154_dev.netdev);
+            netdev_trigger_event_isr(&nrf802154_dev->netdev);
         }
     }
     else {
@@ -533,6 +513,17 @@ void isr_radio(void)
     }
 
     cortexm_isr_end();
+}
+
+void nrf802154_setup(nrf802154_t *dev)
+{
+    netdev_t *netdev = (netdev_t*) dev;
+    netdev_ieee802154_t *netdev_ieee802154 = (netdev_ieee802154_t*) dev;
+    nrf802154_dev = netdev_ieee802154;
+
+    netdev->driver = &nrf802154_netdev_driver;
+    netdev_register(netdev, NETDEV_NRF802154, 0);
+    netdev_ieee802154_reset(netdev_ieee802154);
 }
 
 /**

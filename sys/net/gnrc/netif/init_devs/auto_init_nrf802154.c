@@ -22,9 +22,6 @@
 #include "nrf802154.h"
 #include "net/gnrc/netif/ieee802154.h"
 
-#include "net/ieee802154/radio.h"
-#include "net/netdev/ieee802154_submac.h"
-
 /**
  * @brief   Define stack parameters for the MAC layer thread
  * @{
@@ -40,27 +37,16 @@
 static char _stack[NRF802154_MAC_STACKSIZE];
 static gnrc_netif_t _netif;
 
-#if IS_USED(MODULE_IEEE802154_RADIO_HAL)
-extern ieee802154_dev_t nrf802154_hal_dev;
-static netdev_ieee802154_submac_t nrf802154_submac;
-#endif
+static nrf802154_t nrf802154_dev;
 
 void auto_init_nrf802154(void)
 {
     LOG_DEBUG("[auto_init_netif] initializing nrf802154\n");
 
-    netdev_t *netdev;
-#if IS_USED(MODULE_IEEE802154_RADIO_HAL)
-    netdev_ieee802154_submac_init(&nrf802154_submac, &nrf802154_hal_dev);
-    netdev = (netdev_t*) &nrf802154_submac;
-    nrf802154_init();
-#else
-    netdev = (netdev_t*) &nrf802154_dev;
-#endif
-
+    nrf802154_setup(&nrf802154_dev);
     gnrc_netif_ieee802154_create(&_netif, _stack,
                                  NRF802154_MAC_STACKSIZE,
                                  NRF802154_MAC_PRIO, "nrf802154",
-                                 netdev);
+                                 (netdev_t *)&nrf802154_dev);
 }
 /** @} */

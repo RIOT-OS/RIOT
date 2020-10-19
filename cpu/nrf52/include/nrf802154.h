@@ -36,13 +36,32 @@
 #ifndef NRF802154_H
 #define NRF802154_H
 
-#if !IS_USED(MODULE_IEEE802154_RADIO_HAL)
+#if IS_USED(MODULE_IEEE802154_RADIO_HAL)
+#include "net/ieee802154/radio.h"
+#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
+#include "net/netdev/ieee802154_submac.h"
+#endif
+#else
 #include "net/netdev/ieee802154.h"
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief   Device descriptor for NRF802154 transceiver
+ *
+ * @extends netdev_ieee802154_t if using legacy radio
+ * @extends netdev_ieee802154_submac_t if using radio HAL
+ */
+typedef struct {
+#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
+    netdev_ieee802154_submac_t netdev;      /**< netdev SubMAC descriptor */
+#elif !IS_USED(MODULE_IEEE802154_RADIO_HAL)
+    netdev_ieee802154_t netdev;             /**< ieee802154 device descriptor */
+#endif
+} nrf802154_t;
 
 /**
  * @defgroup drivers_nrf52_802154_conf  nrf802154 driver compile configuration
@@ -61,13 +80,6 @@ extern "C" {
 #endif
 /** @} */
 
-#if !IS_USED(MODULE_IEEE802154_RADIO_HAL)
-/**
- * @brief   Export the netdev device descriptor
- */
-extern netdev_ieee802154_t nrf802154_dev;
-#endif
-
 /**
  * @brief   IEEE 802.15.4 radio timer configuration
  *
@@ -85,6 +97,13 @@ extern netdev_ieee802154_t nrf802154_dev;
  * @return negative errno on error
  */
 int nrf802154_init(void);
+
+/**
+ * @brief   Setup a NRF802154 radio device for use with netdev
+ *
+ * @param[out] dev          Device descriptor
+ */
+void nrf802154_setup(nrf802154_t *dev);
 
 #endif /* NRF802154_H */
 /** @} */
