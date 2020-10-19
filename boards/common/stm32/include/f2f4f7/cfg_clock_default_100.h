@@ -33,17 +33,36 @@ extern "C" {
  * @name    Clock PLL settings (100MHz)
  * @{
  */
-/* The following parameters configure a 100MHz system clock with HSE (8MHz or
-   16MHz) or HSI (16MHz) as PLL input clock */
+/* The following parameters configure a 100MHz system clock with HSE (8MHz, 16MHz or
+   25MHz) or HSI (16MHz) as PLL input clock.
+   If USB is used and no alternative 48MHz is available, the clock frequency is
+   decreased to 96MHZ so the PLLQ can output 48MHz.
+   */
 #ifndef CONFIG_CLOCK_PLL_M
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(25))
+#define CONFIG_CLOCK_PLL_M              (25)
+#else
 #define CONFIG_CLOCK_PLL_M              (4)
 #endif
+#endif
 #ifndef CONFIG_CLOCK_PLL_N
+#if IS_USED(MODULE_PERIPH_USBDEV) && defined(CPU_LINE_STM32F411xE)
+#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(8))
+#define CONFIG_CLOCK_PLL_N              (96)
+#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(25))
+#define CONFIG_CLOCK_PLL_N              (192)
+#else
+#define CONFIG_CLOCK_PLL_N              (48)
+#endif
+#else
 #if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(8))
 #define CONFIG_CLOCK_PLL_N              (100)
+#elif IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(25))
+#define CONFIG_CLOCK_PLL_N              (200)
 #else
 #define CONFIG_CLOCK_PLL_N              (50)
 #endif
+#endif /* MODULE_PERIPH_USBDEV */
 #endif
 #ifndef CONFIG_CLOCK_PLL_P
 #define CONFIG_CLOCK_PLL_P              (2)
