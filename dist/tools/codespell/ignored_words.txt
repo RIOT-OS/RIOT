@@ -101,3 +101,6 @@ files'
 
 # dedup (used in a GNRC header file name) => dedupe
 dedup
+
+# circularly (used in "circularly linked list" in clist.h) => circular
+circularly
