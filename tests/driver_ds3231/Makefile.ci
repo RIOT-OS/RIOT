@@ -1,0 +1,12 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    arduino-duemilanove \
+    arduino-leonardo \
+    arduino-nano \
+    arduino-uno \
+    atmega328p \
+    nucleo-f031k6 \
+    nucleo-f042k6 \
+    nucleo-l011k4 \
+    stk3200 \
+    stm32f030f4-demo \
+    #
