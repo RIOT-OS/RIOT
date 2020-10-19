@@ -177,16 +177,13 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
     }
 
     int flashpage = flashpage_page((void *)slot_start);
-    if (flashpage_write_and_verify(flashpage, firstpage) != FLASHPAGE_OK) {
+    if (flashpage_write_and_verify(flashpage, firstpage) == FLASHPAGE_OK) {
+        LOG_INFO(LOG_PREFIX "riotboot flashing completed successfully\n");
+        res = 0;
+    }
+    else {
         LOG_WARNING(LOG_PREFIX "re-flashing first block failed!\n");
-        goto out;
     }
 #endif /* !CONFIG_RIOTBOOT_FLASHWRITE_RAW */
-    LOG_INFO(LOG_PREFIX "riotboot flashing completed successfully\n");
-    res = 0;
-
-#if !CONFIG_RIOTBOOT_FLASHWRITE_RAW
-out:
-#endif
     return res;
 }
