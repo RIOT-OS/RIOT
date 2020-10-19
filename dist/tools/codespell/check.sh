@@ -56,8 +56,8 @@ if [ -n "${ERRORS}" ]
 then
     printf "%sThere are typos in the following files:%s\n\n" "${CERROR}" "${CRESET}"
     printf "%s\n" "${ERRORS}"
-    # TODO: return 1 when all typos are fixed
-    exit 0
+    printf "If those are false positives, add them to %s\n" "${RIOTTOOLS}/codespell/ignored_words.txt"
+    exit 1
 else
     exit 0
 fi
