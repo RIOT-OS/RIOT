@@ -1,5 +1,7 @@
 # Object files
 *.o
+# Target files
+*.elf
 # Documentation artifacts
 doc/doxygen/html
 doc/doxygen/latex
