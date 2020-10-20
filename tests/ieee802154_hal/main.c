@@ -116,6 +116,10 @@ void _rx_done_handler(event_t *event)
         /* Print packet while we wait for the state transition */
         _print_packet(size, info.lqi, info.rssi);
     }
+
+    /* Go out of the HAL's FB Lock state after frame reception and trigger a
+     * state change */
+    _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
 }
 
 static event_t _rx_done_event = {
@@ -228,6 +232,7 @@ static int _init(void)
     ieee802154_phy_conf_t conf = {.channel=CONFIG_IEEE802154_DEFAULT_CHANNEL, .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE, .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER};
 
     ieee802154_radio_config_phy(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), &conf);
+    ieee802154_radio_set_cca_threshold(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
 
     /* Set the transceiver state to RX_ON in order to receive packets */
     _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
@@ -481,9 +486,6 @@ int config_phy(int argc, char **argv)
     else {
         puts("Success!");
     }
-
-    /* Set the transceiver state to RX_ON in order to receive packets */
-    _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
 
     return 0;
 }
