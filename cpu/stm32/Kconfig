@@ -32,7 +32,7 @@ config HAS_BOOTLOADER_STM32
     help
         Indicates that the stm32 bootloader is being used.
 
-orsource "kconfig/*/Kconfig"
-orsource "kconfig/*/Kconfig.lines"
-orsource "kconfig/*/Kconfig.models"
+orsource "kconfigs/*/Kconfig"
+orsource "kconfigs/*/Kconfig.lines"
+orsource "kconfigs/*/Kconfig.models"
 source "$(RIOTCPU)/cortexm_common/Kconfig"
