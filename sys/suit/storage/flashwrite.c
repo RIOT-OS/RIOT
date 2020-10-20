@@ -37,6 +37,9 @@ static inline suit_storage_flashwrite_t *_get_fw(suit_storage_t *storage)
 static int _flashwrite_init(suit_storage_t *storage)
 {
     (void)storage;
+
+    LOG_INFO("Storage size %u\n", (unsigned)sizeof(suit_storage_flashwrite_t));
+
     return 0;
 }
 
@@ -100,7 +103,7 @@ static int _flashwrite_install(suit_storage_t *storage,
 static int _flashwrite_read(suit_storage_t *storage, uint8_t *buf,
                             size_t offset, size_t len)
 {
-    (void)storage;
+    suit_storage_flashwrite_t *fw = _get_fw(storage);
 
     static const char _prefix[] = "RIOT";
     static const size_t _prefix_len = sizeof(_prefix) - 1;
@@ -116,6 +119,28 @@ static int _flashwrite_read(suit_storage_t *storage, uint8_t *buf,
         buf += prefix_to_copy;
 
     }
+
+#if CONFIG_RIOTBOOT_FLASHWRITE_RAW
+    /* Insert the first chunk from the separate buffer here, there are cases
+     * where the chunk size is 4 bytes and we can skip this because it only
+     * contains the magic number already copied above. */
+    if (offset < RIOTBOOT_FLASHPAGE_BUFFER_SIZE) {
+        const size_t chunk_remaining =
+            RIOTBOOT_FLASHPAGE_BUFFER_SIZE - _prefix_len;
+        /* How much of the first page must be copied */
+        size_t firstpage_to_copy = len > chunk_remaining ?
+            (chunk_remaining) : len;
+        /* Copy the first buffer */
+        memcpy(buf, fw->writer.firstblock_buf + offset, firstpage_to_copy);
+
+        offset += firstpage_to_copy;
+        buf += firstpage_to_copy;
+        len -= firstpage_to_copy;
+    }
+#else
+    (void)fw;
+#endif /* CONFIG_RIOTBOOT_FLASHWRITE_RAW */
+
     if (offset + len > slot_size) {
         return -1;
     }

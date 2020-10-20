@@ -41,6 +41,15 @@
  * 2. write image starting at second block
  * 3. write first block
  *
+ * When using periph_flashpage_raw with this module, the need to buffer a full
+ * flashpage page is removed, instead it must buffer two times the
+ * FLASHPAGE_RAW_BLOCKSIZE. One is used to buffer the current write block,
+ * the other buffers the first chunk (offset zero, page zero). This first
+ * chunk is written when finalizing the flash operation. The minimal size for
+ * RIOTBOOT_FLASHPAGE_BUFFER_SIZE is 4, at least the riotboot magic number must
+ * fit into this and FLASHPAGE_SIZE must be a multiple of
+ * RIOTBOOT_FLASHPAGE_BUFFER_SIZE
+ *
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  * @author      Koen Zandberg <koen@bergzand.net>
  *
@@ -58,6 +67,36 @@ extern "C" {
 #include "periph/flashpage.h"
 
 /**
+ * @brief Enable/disable raw writes to flash
+ */
+#ifndef CONFIG_RIOTBOOT_FLASHWRITE_RAW
+#define CONFIG_RIOTBOOT_FLASHWRITE_RAW  IS_ACTIVE(MODULE_PERIPH_FLASHPAGE_RAW)
+#endif
+
+/**
+ * @brief Intermediate buffer size for firmware image data
+ */
+#if CONFIG_RIOTBOOT_FLASHWRITE_RAW
+
+#if (FLASHPAGE_RAW_BLOCKSIZE < 4)
+#define RIOTBOOT_FLASHPAGE_BUFFER_SIZE 4
+#else
+#define RIOTBOOT_FLASHPAGE_BUFFER_SIZE FLASHPAGE_RAW_BLOCKSIZE
+#endif
+
+#else /* CONFIG_RIOTBOOT_FLASHWRITE_RAW */
+
+#define RIOTBOOT_FLASHPAGE_BUFFER_SIZE FLASHPAGE_SIZE
+
+#endif /* !CONFIG_RIOTBOOT_FLASHWRITE_RAW */
+
+/**
+ * @brief Extra attributes required for the firmware intermediate buffer
+ */
+#define RIOTBOOT_FLASHPAGE_BUFFER_ATTRS \
+    __attribute__((aligned(FLASHPAGE_RAW_ALIGNMENT)))
+
+/**
  * @brief   firmware update state structure
  *
  * @note    @ref FLASHPAGE_SIZE can be very large on some platforms, don't place
@@ -67,7 +106,20 @@ typedef struct {
     int target_slot;                        /**< update targets this slot     */
     size_t offset;                          /**< update is at this position   */
     unsigned flashpage;                     /**< update is at this flashpage  */
-    uint8_t flashpage_buf[FLASHPAGE_SIZE];  /**< flash writing buffer         */
+
+    /**
+     * @brief flash writing buffer
+     */
+    uint8_t RIOTBOOT_FLASHPAGE_BUFFER_ATTRS
+        flashpage_buf[RIOTBOOT_FLASHPAGE_BUFFER_SIZE];
+#if CONFIG_RIOTBOOT_FLASHWRITE_RAW || DOXYGEN
+    /**
+     * @brief Buffer for the first chunk containing the checksum when using
+     *        FLASHWRITE_RAW
+     */
+    uint8_t RIOTBOOT_FLASHPAGE_BUFFER_ATTRS
+        firstblock_buf[RIOTBOOT_FLASHPAGE_BUFFER_SIZE];
+#endif
 } riotboot_flashwrite_t;
 
 /**
