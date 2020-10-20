@@ -107,7 +107,7 @@ extern "C" {
     IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
 #define CONFIG_CLOCK_PLL_SRC_MSI        0
 #else
-#define CONFIG_CLOCK_PLL_SRC_MSI        1       /* Use MSI an input clock by default */
+#define CONFIG_CLOCK_PLL_SRC_MSI        1       /* Use MSI as input clock by default */
 #endif
 #endif /* CONFIG_CLOCK_PLL_SRC_MSI */
 #ifndef CONFIG_CLOCK_PLL_SRC_HSE
@@ -120,11 +120,29 @@ extern "C" {
 #ifndef CONFIG_CLOCK_PLL_SRC_HSI
 #define CONFIG_CLOCK_PLL_SRC_HSI        0
 #endif
+#if IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)
+#define CLOCK_PLL_SRC                   (CONFIG_CLOCK_MSI)
+#elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE)
+#define CLOCK_PLL_SRC                   (CLOCK_HSE)
+#else /* CONFIG_CLOCK_PLL_SRC_ */
+#define CLOCK_PLL_SRC                   (CLOCK_HSI)
+#endif
 #ifndef CONFIG_CLOCK_PLL_M
-#define CONFIG_CLOCK_PLL_M              (6)
+#if IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)
+#define CONFIG_CLOCK_PLL_M              (6)     /* MSI at 48MHz */
+#elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CLOCK_HSE == MHZ(8))
+#define CONFIG_CLOCK_PLL_M              (1)     /* HSE at 8MHz */
+#elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CLOCK_HSE == MHZ(32))
+#define CONFIG_CLOCK_PLL_M              (5)     /* HSE at 32MHz */
+#else
+#define CONFIG_CLOCK_PLL_M              (2)     /* HSI at 16MHz */
+#endif
 #endif
 #ifndef CONFIG_CLOCK_PLL_N
 #define CONFIG_CLOCK_PLL_N              (20)
+#endif
+#ifndef CONFIG_CLOCK_PLL_Q
+#define CONFIG_CLOCK_PLL_Q              (2)
 #endif
 #ifndef CONFIG_CLOCK_PLL_R
 #define CONFIG_CLOCK_PLL_R              (2)
@@ -134,22 +152,12 @@ extern "C" {
 #define CLOCK_CORECLOCK                 (CLOCK_HSI)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_HSE)
-#if !IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
-#error "The board doesn't provide an HSE oscillator"
-#endif
 #define CLOCK_CORECLOCK                 (CLOCK_HSE)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_MSI)
 #define CLOCK_CORECLOCK                 (CONFIG_CLOCK_MSI)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_PLL)
-#if IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_MSI)
-#define CLOCK_PLL_SRC                   (CONFIG_CLOCK_MSI)
-#elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE)
-#define CLOCK_PLL_SRC                   (CLOCK_HSE)
-#else /* CONFIG_CLOCK_PLL_SRC_ */
-#define CLOCK_PLL_SRC                   (CLOCK_HSI)
-#endif
 /* PLL configuration: make sure your values are legit!
  *
  * compute by: CORECLOCK = (((PLL_IN / M) * N) / R)
