@@ -52,15 +52,15 @@ static uint32_t u8to32(const uint8_t *p)
 }
 
 /* Single round */
-void _r(uint32_t *a, uint32_t *b, uint32_t *d, unsigned c)
+static void _r(uint32_t *a, uint32_t *b, uint32_t *d, unsigned c)
 {
     *a += *b;
     uint32_t tmp = *a ^ *d;
     *d = (tmp << c) | (tmp >> (32 - c));
 }
 
-void _add_initial(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
-                  const uint8_t *nonce, uint32_t blk)
+static void _add_initial(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
+                         const uint8_t *nonce, uint32_t blk)
 {
     for (unsigned i = 0; i < 4; i++) {
         ctx->state[i] += constant[i];
@@ -74,8 +74,8 @@ void _add_initial(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
     ctx->state[15] += u8to32(nonce+8);
 }
 
-void _keystream(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
-                const uint8_t *nonce, uint32_t blk)
+static void _keystream(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
+                       const uint8_t *nonce, uint32_t blk)
 {
     /* Initialize block state */
     memset(ctx->state, 0, sizeof(ctx->state));
@@ -96,8 +96,8 @@ void _keystream(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
     _add_initial(ctx, key, nonce, blk);
 }
 
-void _xcrypt(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
-              const uint8_t *nonce, const uint8_t *in, uint8_t *out, size_t len)
+static void _xcrypt(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
+                    const uint8_t *nonce, const uint8_t *in, uint8_t *out, size_t len)
 {
     /* Number of full 64 byte blocks */
     const size_t num_blocks = len >> 6;
@@ -118,7 +118,7 @@ void _xcrypt(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
     }
 }
 
-void _poly1305_padded(poly1305_ctx_t *pctx, const uint8_t *data, size_t len)
+static void _poly1305_padded(poly1305_ctx_t *pctx, const uint8_t *data, size_t len)
 {
     poly1305_update(pctx, data, len);
     const size_t padlen = (16 - len) & 0xF;
@@ -126,9 +126,9 @@ void _poly1305_padded(poly1305_ctx_t *pctx, const uint8_t *data, size_t len)
 }
 
 /* Generate a poly1305 tag */
-void _poly1305_gentag(uint8_t *mac, const uint8_t *key, const uint8_t *nonce,
-                      const uint8_t *cipher, size_t cipherlen,
-                      const uint8_t *aad, size_t aadlen)
+static void _poly1305_gentag(uint8_t *mac, const uint8_t *key, const uint8_t *nonce,
+                             const uint8_t *cipher, size_t cipherlen,
+                             const uint8_t *aad, size_t aadlen)
 {
     chacha20poly1305_ctx_t ctx;
     /* generate one time key */
