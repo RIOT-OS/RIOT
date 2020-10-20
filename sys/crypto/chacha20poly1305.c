@@ -26,6 +26,7 @@
 #include "crypto/helper.h"
 #include "crypto/chacha20poly1305.h"
 #include "crypto/poly1305.h"
+#include "unaligned.h"
 
 /* Missing operations to convert numbers to little endian prevents this from
  * working on big endian systems */
@@ -42,15 +43,6 @@ static const uint32_t constant[] = {0x61707865,
 /* Padding to add to the poly1305 authentication tag */
 static const uint8_t padding[15] = {0};
 
-static uint32_t u8to32(const uint8_t *p)
-{
-    return
-        ((uint32_t)p[0] |
-        ((uint32_t)p[1] <<  8) |
-        ((uint32_t)p[2] << 16) |
-        ((uint32_t)p[3] << 24));
-}
-
 /* Single round */
 static void _r(uint32_t *a, uint32_t *b, uint32_t *d, unsigned c)
 {
@@ -66,12 +58,12 @@ static void _add_initial(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
         ctx->state[i] += constant[i];
     }
     for (unsigned i = 0; i < 8; i++) {
-        ctx->state[i+4] += u8to32(key + 4*i);
+        ctx->state[i+4] += unaligned_get_u32(key + 4*i);
     }
-    ctx->state[12] += u8to32((uint8_t*)&blk);
-    ctx->state[13] += u8to32(nonce);
-    ctx->state[14] += u8to32(nonce+4);
-    ctx->state[15] += u8to32(nonce+8);
+    ctx->state[12] += unaligned_get_u32((uint8_t*)&blk);
+    ctx->state[13] += unaligned_get_u32(nonce);
+    ctx->state[14] += unaligned_get_u32(nonce+4);
+    ctx->state[15] += unaligned_get_u32(nonce+8);
 }
 
 static void _keystream(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
