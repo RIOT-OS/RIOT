@@ -24,28 +24,25 @@ config USE_CLOCK_HSI
 
 endchoice
 
-if USE_CLOCK_PLL
 config CLOCK_PLL_M
-    int "M: PLLIN division factor"
+    int "M: PLLIN division factor" if USE_CLOCK_PLL
     default 1
     range 1 8
 
 config CLOCK_PLL_N
-    int "N: PLLIN multiply factor"
+    int "N: PLLIN multiply factor" if USE_CLOCK_PLL
     default 20
     range 8 86
 
 config CLOCK_PLL_R
-    int "Q: VCO division factor"
+    int "Q: VCO division factor" if USE_CLOCK_PLL
     default 6 if BOARD_HAS_HSE
-    default 5 if !BOARD_HAS_HSE
+    default 5
     range 2 8
-endif
 
 choice
-bool "HSISYS division factor"
+bool "HSISYS division factor" if USE_CLOCK_HSI
 default CLOCK_HSISYS_DIV_1
-depends on USE_CLOCK_HSI
 
 config CLOCK_HSISYS_DIV_1
     bool "Divide HSISYS by 1"
@@ -75,7 +72,7 @@ endchoice
 
 config CLOCK_HSISYS_DIV
     int
-    default 1 if CLOCK_HSISYS_DIV_1
+    default 1
     default 2 if CLOCK_HSISYS_DIV_2
     default 4 if CLOCK_HSISYS_DIV_4
     default 8 if CLOCK_HSISYS_DIV_8

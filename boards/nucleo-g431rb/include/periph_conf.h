@@ -21,11 +21,11 @@
 
 /* Add specific clock configuration (HSE, LSE) for this board here */
 #ifndef CONFIG_BOARD_HAS_LSE
-#define CONFIG_BOARD_HAS_LSE            (1)
+#define CONFIG_BOARD_HAS_LSE            1
 #endif
 /* This board provides a 24MHz HSE oscillator */
 #ifndef CONFIG_BOARD_HAS_HSE
-#define CONFIG_BOARD_HAS_HSE            (1)
+#define CONFIG_BOARD_HAS_HSE            1
 #endif
 /* By default, configure a 170MHz SYSCLK with PLL using HSE as input clock */
 #ifndef CONFIG_CLOCK_PLL_M
