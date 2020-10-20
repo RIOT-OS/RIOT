@@ -147,7 +147,7 @@
 #endif
 
 /* figure out sync and async prescaler */
-#if CLOCK_LSE
+#if IS_ACTIVE(CONFIG_BOARD_HAS_LSE)
 #define PRE_SYNC            (255)
 #define PRE_ASYNC           (127)
 #elif (CLOCK_LSI == 40000)
@@ -168,7 +168,7 @@
 
 /* Use a magic number to determine the initial RTC source. This will be used
    to know if a reset of the RTC is required at initialization. */
-#if CLOCK_LSE
+#if IS_ACTIVE(CONFIG_BOARD_HAS_LSE)
 #define MAGIC_CLCK_NUMBER       (0x1970)
 #else
 #define MAGIC_CLCK_NUMBER       (0x1971)
@@ -241,7 +241,7 @@ void rtc_init(void)
     /* select input clock and enable the RTC */
     stmclk_dbp_unlock();
     EN_REG &= ~(CLKSEL_MASK);
-#if CLOCK_LSE
+#if IS_ACTIVE(CONFIG_BOARD_HAS_LSE)
     EN_REG |= (CLKSEL_LSE | EN_BIT);
 #else
     EN_REG |= (CLKSEL_LSI | EN_BIT);
