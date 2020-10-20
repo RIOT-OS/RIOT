@@ -26,6 +26,7 @@
 #include "crypto/helper.h"
 #include "crypto/chacha20poly1305.h"
 #include "crypto/poly1305.h"
+#include "unaligned.h"
 
 /* Missing operations to convert numbers to little endian prevents this from
  * working on big endian systems */
@@ -42,40 +43,31 @@ static const uint32_t constant[] = {0x61707865,
 /* Padding to add to the poly1305 authentication tag */
 static const uint8_t padding[15] = {0};
 
-static uint32_t u8to32(const uint8_t *p)
-{
-    return
-        ((uint32_t)p[0] |
-        ((uint32_t)p[1] <<  8) |
-        ((uint32_t)p[2] << 16) |
-        ((uint32_t)p[3] << 24));
-}
-
 /* Single round */
-void _r(uint32_t *a, uint32_t *b, uint32_t *d, unsigned c)
+static void _r(uint32_t *a, uint32_t *b, uint32_t *d, unsigned c)
 {
     *a += *b;
     uint32_t tmp = *a ^ *d;
     *d = (tmp << c) | (tmp >> (32 - c));
 }
 
-void _add_initial(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
-                  const uint8_t *nonce, uint32_t blk)
+static void _add_initial(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
+                         const uint8_t *nonce, uint32_t blk)
 {
     for (unsigned i = 0; i < 4; i++) {
         ctx->state[i] += constant[i];
     }
     for (unsigned i = 0; i < 8; i++) {
-        ctx->state[i+4] += u8to32(key + 4*i);
+        ctx->state[i+4] += unaligned_get_u32(key + 4*i);
     }
-    ctx->state[12] += u8to32((uint8_t*)&blk);
-    ctx->state[13] += u8to32(nonce);
-    ctx->state[14] += u8to32(nonce+4);
-    ctx->state[15] += u8to32(nonce+8);
+    ctx->state[12] += unaligned_get_u32((uint8_t*)&blk);
+    ctx->state[13] += unaligned_get_u32(nonce);
+    ctx->state[14] += unaligned_get_u32(nonce+4);
+    ctx->state[15] += unaligned_get_u32(nonce+8);
 }
 
-void _keystream(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
-                const uint8_t *nonce, uint32_t blk)
+static void _keystream(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
+                       const uint8_t *nonce, uint32_t blk)
 {
     /* Initialize block state */
     memset(ctx->state, 0, sizeof(ctx->state));
@@ -96,8 +88,8 @@ void _keystream(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
     _add_initial(ctx, key, nonce, blk);
 }
 
-void _xcrypt(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
-              const uint8_t *nonce, const uint8_t *in, uint8_t *out, size_t len)
+static void _xcrypt(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
+                    const uint8_t *nonce, const uint8_t *in, uint8_t *out, size_t len)
 {
     /* Number of full 64 byte blocks */
     const size_t num_blocks = len >> 6;
@@ -118,7 +110,7 @@ void _xcrypt(chacha20poly1305_ctx_t *ctx, const uint8_t *key,
     }
 }
 
-void _poly1305_padded(poly1305_ctx_t *pctx, const uint8_t *data, size_t len)
+static void _poly1305_padded(poly1305_ctx_t *pctx, const uint8_t *data, size_t len)
 {
     poly1305_update(pctx, data, len);
     const size_t padlen = (16 - len) & 0xF;
@@ -126,9 +118,9 @@ void _poly1305_padded(poly1305_ctx_t *pctx, const uint8_t *data, size_t len)
 }
 
 /* Generate a poly1305 tag */
-void _poly1305_gentag(uint8_t *mac, const uint8_t *key, const uint8_t *nonce,
-                      const uint8_t *cipher, size_t cipherlen,
-                      const uint8_t *aad, size_t aadlen)
+static void _poly1305_gentag(uint8_t *mac, const uint8_t *key, const uint8_t *nonce,
+                             const uint8_t *cipher, size_t cipherlen,
+                             const uint8_t *aad, size_t aadlen)
 {
     chacha20poly1305_ctx_t ctx;
     /* generate one time key */
