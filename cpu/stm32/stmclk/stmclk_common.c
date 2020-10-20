@@ -49,9 +49,6 @@
 #define RCC_CSR_LSIRDY          RCC_CSR_LSI1RDY
 #endif
 
-#ifndef CONFIG_BOARD_HAS_LSE
-#define CONFIG_BOARD_HAS_LSE    0
-#endif
 
 void stmclk_enable_hsi(void)
 {
