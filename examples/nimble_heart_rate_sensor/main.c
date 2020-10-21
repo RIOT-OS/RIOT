@@ -25,6 +25,7 @@
 #include "event/timeout.h"
 #include "nimble_riot.h"
 #include "net/bluetil/ad.h"
+#include "timex.h"
 
 #include "host/ble_hs.h"
 #include "host/ble_gatt.h"
