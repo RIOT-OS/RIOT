@@ -56,6 +56,16 @@ typedef struct {
 } frac_t;
 
 /**
+ * @brief   Compute greatest common divisor of @p u and @p v
+ *
+ * @param[in]   u    first operand
+ * @param[in]   v    second operand
+ *
+ * @return  Greatest common divisor of @p u and @p v
+ */
+uint32_t gcd32(uint32_t u, uint32_t v);
+
+/**
  * @brief   Initialize frac_t struct
  *
  * This function computes the mathematical parameters used by the frac algorithm.

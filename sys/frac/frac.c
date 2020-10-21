@@ -24,15 +24,7 @@
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-/**
- * @brief   compute greatest common divisor of @p u and @p v
- *
- * @param[in]   u    first operand
- * @param[in]   v    second operand
- *
- * @return  Greatest common divisor of @p u and @p v
- */
-static uint32_t gcd32(uint32_t u, uint32_t v)
+uint32_t gcd32(uint32_t u, uint32_t v)
 {
     /* Source: https://en.wikipedia.org/wiki/Binary_GCD_algorithm#Iterative_version_in_C */
     unsigned shift;
@@ -81,7 +73,7 @@ static uint32_t gcd32(uint32_t u, uint32_t v)
     return u << shift;
 }
 
-uint32_t frac_long_divide(uint32_t num, uint32_t den, int *prec, uint32_t *rem)
+static uint32_t frac_long_divide(uint32_t num, uint32_t den, int *prec, uint32_t *rem)
 {
     /* Binary long division with adaptive number of fractional bits */
     /* The result will be a Qx.y number where x is the number of bits in the
