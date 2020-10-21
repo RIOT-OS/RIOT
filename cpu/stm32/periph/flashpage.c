@@ -26,10 +26,10 @@
 #include "stmclk.h"
 #include "assert.h"
 
-#define ENABLE_DEBUG        (0)
-#include "debug.h"
-
 #include "periph/flashpage.h"
+
+#define ENABLE_DEBUG           0
+#include "debug.h"
 
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 /* Program memory unlock keys */

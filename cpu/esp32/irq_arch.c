@@ -18,15 +18,15 @@
  * @}
  */
 
-#define ENABLE_DEBUG    0
-#include "debug.h"
-
 #include "irq_arch.h"
 
 #include "esp_err.h"
 #include "rom/ets_sys.h"
 #include "soc/dport_reg.h"
 #include "xtensa/xtensa_api.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 struct _irq_alloc_table_t {
     int      src;   /* peripheral interrupt source */

@@ -22,8 +22,6 @@
 #include <assert.h>
 #include <string.h>
 
-#define ENABLE_DEBUG (0)
-#include "debug.h"
 #include "esp_common.h"
 #include "log.h"
 
@@ -33,6 +31,9 @@
 
 #include "esp_attr.h"
 #include "gpio_arch.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 #ifdef MCU_ESP32
 

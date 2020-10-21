@@ -21,10 +21,10 @@
 #include "cpu.h"
 #include "assert.h"
 
-#define ENABLE_DEBUG        (0)
-#include "debug.h"
-
 #include "periph/flashpage.h"
+
+#define ENABLE_DEBUG                0
+#include "debug.h"
 
 /**
  * @brief   Flash controller commands

@@ -18,9 +18,6 @@
  * @}
  */
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 #include <stdbool.h>
 
 #include "log.h"
@@ -39,6 +36,9 @@
 #include "gpio_arch.h"
 #include "irq_arch.h"
 #include "syscalls.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 /*
  * IOMUX to GPIO mapping

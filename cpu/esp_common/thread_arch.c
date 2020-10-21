@@ -45,9 +45,6 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 #include <stdio.h>
 #include <string.h>
 
@@ -74,6 +71,9 @@
 #include "esp8266/rom_functions.h"
 #include "sdk/sdk.h"
 #endif /* MCU_ESP32 */
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 /* User exception dispatcher when exiting */
 extern void _xt_user_exit(void);

@@ -16,8 +16,6 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  * @}
  */
-#define ENABLE_DEBUG  0
-#include "debug.h"
 
 #include <stdint.h>
 #include <stdio.h>
@@ -45,6 +43,9 @@
 #if MODULE_ESP_GDBSTUB
 #include "gdbstub.h"
 #endif
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 /* external esp function declarations */
 extern uint32_t hwrand (void);

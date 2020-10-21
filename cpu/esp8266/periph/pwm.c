@@ -20,9 +20,6 @@
 
 #include <assert.h>
 
-#define ENABLE_DEBUG (0)
-#include "debug.h"
-
 #include "cpu.h"
 #include "log.h"
 #include "irq_arch.h"
@@ -35,6 +32,9 @@
 #include "gpio_arch.h"
 #include "sdk/sdk.h"
 #include "xtensa/xtensa_api.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 #define TIMER_FRC1_CLKDIV_16    BIT(2)
 #define TIMER_FRC1_CLKDIV_256   BIT(3)
