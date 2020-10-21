@@ -22,7 +22,6 @@
 #ifdef MODULE_DFPLAYER
 
 #include "log.h"
-#include "assert.h"
 #include "dfplayer.h"
 #include "dfplayer_params.h"
 
