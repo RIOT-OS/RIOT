@@ -35,6 +35,7 @@
 #include "net/ndp.h"
 #include "net/sixlowpan/nd.h"
 #include "sched.h"
+#include "timex.h"
 
 #define _BUFFER_SIZE    (196)
 #define _ARO_LTIME      (4224)

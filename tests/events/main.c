@@ -27,6 +27,7 @@
 #include "event.h"
 #include "event/timeout.h"
 #include "event/callback.h"
+#include "xtimer.h"
 
 #define STACKSIZE               THREAD_STACKSIZE_DEFAULT
 #define PRIO                    (THREAD_PRIORITY_MAIN - 1)

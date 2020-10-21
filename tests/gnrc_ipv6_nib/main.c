@@ -32,6 +32,7 @@
 #include "net/gnrc/netif/internal.h"
 #include "net/ndp.h"
 #include "sched.h"
+#include "timex.h"
 
 #define _BUFFER_SIZE    (128)
 #define _CUR_HL         (155)
