@@ -24,6 +24,7 @@
 #include "net/gnrc/rpl/dodag.h"
 #include "utlist.h"
 #include "trickle.h"
+#include "xtimer.h"
 #ifdef MODULE_GNRC_RPL_P2P
 #include "net/gnrc/rpl/p2p.h"
 #include "net/gnrc/rpl/p2p_dodag.h"

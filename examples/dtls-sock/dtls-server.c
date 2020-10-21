@@ -23,6 +23,7 @@
 #include "net/credman.h"
 #include "msg.h"
 #include "thread.h"
+#include "timex.h"
 
 #include "tinydtls_keys.h"
 

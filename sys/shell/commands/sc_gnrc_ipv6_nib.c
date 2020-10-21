@@ -20,6 +20,8 @@
 #include "net/gnrc/netif.h"
 #include "net/ipv6/addr.h"
 
+#include "timex.h"
+
 static void _usage(char **argv);
 static int _nib_neigh(int argc, char **argv);
 static int _nib_prefix(int argc, char **argv);

@@ -41,6 +41,7 @@
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/ndp.h"
 #include "random.h"
+#include "timex.h"
 
 #ifdef __cplusplus
 extern "C" {

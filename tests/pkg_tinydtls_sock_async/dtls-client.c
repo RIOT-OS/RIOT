@@ -26,6 +26,7 @@
 #include "net/sock/dtls.h"
 #include "net/ipv6/addr.h"
 #include "net/credman.h"
+#include "timex.h"
 
 #include "tinydtls_common.h"
 #include "tinydtls_keys.h"

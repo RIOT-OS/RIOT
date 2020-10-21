@@ -23,6 +23,7 @@
 #include "log.h"
 #include "random.h"
 #include "byteorder.h"
+#include "timex.h"
 
 #include "net/asymcute.h"
 

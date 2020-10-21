@@ -27,6 +27,7 @@
 
 #include "net/sock/udp.h"
 #include "msg.h"
+#include "timex.h"
 #include "tinydtls_keys.h"
 
 /* TinyDTLS */

@@ -31,6 +31,7 @@
 #include "net/nanocoap_sock.h"
 #include "thread.h"
 #include "periph/pm.h"
+#include "xtimer.h"
 
 #include "suit/transport/coap.h"
 #include "net/sock/util.h"
