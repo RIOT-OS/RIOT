@@ -20,6 +20,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "xtimer.h"
 
 #include "lsm6dsl.h"

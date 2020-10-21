@@ -19,6 +19,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "opt3001.h"
 #include "opt3001_regs.h"
 #include "periph/i2c.h"

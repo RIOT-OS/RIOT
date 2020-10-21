@@ -22,6 +22,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "log.h"
 #include "saul_reg.h"
 #include "tsl4531x.h"

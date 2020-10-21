@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "atwinc15x0_internal.h"
 #include "mutex.h"
 #include "periph/spi.h"

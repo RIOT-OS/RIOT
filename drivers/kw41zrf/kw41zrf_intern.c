@@ -16,6 +16,7 @@
  * @}
  */
 
+#include <assert.h>
 #include "log.h"
 #include "irq.h"
 #include "panic.h"

@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "atwinc15x0_internal.h"
 #include "bus_wrapper/include/nm_bus_wrapper.h"
 
