@@ -19,6 +19,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "periph/pm.h"
 #include "periph/wdt.h"

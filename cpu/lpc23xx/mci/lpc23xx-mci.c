@@ -12,6 +12,7 @@
 /
 /---------------------------------------------------------------------------*/
 
+#include <assert.h>
 #include <string.h>
 #include "cpu.h"
 #include "VIC.h"

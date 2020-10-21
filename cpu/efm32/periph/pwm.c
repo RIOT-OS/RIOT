@@ -17,6 +17,8 @@
  * @author      Bas Stottelaar <basstottelaar@gmail.com>
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 
 #include "periph_conf.h"

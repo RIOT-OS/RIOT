@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "periph/init.h"
 #include "periph_conf.h"

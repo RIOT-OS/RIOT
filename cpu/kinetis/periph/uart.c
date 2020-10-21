@@ -24,6 +24,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "bit.h"
 #include "periph_conf.h"

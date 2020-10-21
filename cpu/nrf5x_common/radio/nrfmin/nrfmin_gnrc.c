@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "net/gnrc.h"
 #include "thread.h"
 #include "net/gnrc/netif.h"

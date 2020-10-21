@@ -20,6 +20,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stddef.h>
 
 #include "board.h"

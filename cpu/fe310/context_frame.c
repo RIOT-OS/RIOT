@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "context_frame.h"
 #include "thread.h"
 
