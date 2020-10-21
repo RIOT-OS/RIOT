@@ -21,13 +21,14 @@
 #include <errno.h>
 #include <string.h>
 
-#define ENABLE_DEBUG  (0)
-#include "debug.h"
 #include "assert.h"
 #include "xtimer.h"
 
 #include "at24cxxx_defines.h"
 #include "at24cxxx.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 #ifndef MIN
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
