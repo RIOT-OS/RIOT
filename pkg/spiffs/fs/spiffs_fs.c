@@ -19,6 +19,7 @@
  */
 
 
+#include <assert.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <inttypes.h>

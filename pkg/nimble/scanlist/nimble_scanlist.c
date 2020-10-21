@@ -17,6 +17,8 @@
  *
  * @}
  */
+
+#include <assert.h>
 #include <limits.h>
 
 #include "xtimer.h"

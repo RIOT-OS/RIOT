@@ -13,6 +13,8 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <assert.h>
+
 #include "mutex.h"
 
 #include "net/sock/tcp.h"

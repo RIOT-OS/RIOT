@@ -16,6 +16,8 @@
  * @author  Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
  */
 
+#include <assert.h>
+
 #include "dtls.h"
 #include "log.h"
 #include "net/sock/dtls.h"

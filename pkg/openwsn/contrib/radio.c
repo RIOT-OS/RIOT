@@ -19,6 +19,8 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+
+#include <assert.h>
 #include <sys/uio.h>
 
 #include "leds.h"
