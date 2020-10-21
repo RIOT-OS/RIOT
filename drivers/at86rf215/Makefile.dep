@@ -1,5 +1,13 @@
 DEFAULT_MODULE += auto_init_at86rf215
-DEFAULT_MODULE += at86rf215_subghz
+
+ifeq (,$(filter at86rf215m,$(USEMODULE)))
+  USEMODULE += at86rf215_subghz
+endif
+
+ifeq (,$(filter at86rf215_subghz at86rf215_24ghz,$(USEMODULE)))
+  DEFAULT_MODULE += at86rf215_subghz
+  DEFAULT_MODULE += at86rf215_24ghz
+endif
 
 DEFAULT_MODULE += netdev_ieee802154_multimode
 
@@ -10,10 +18,6 @@ DEFAULT_MODULE += netdev_ieee802154_mr_ofdm
 FEATURES_REQUIRED += periph_gpio
 FEATURES_REQUIRED += periph_gpio_irq
 FEATURES_REQUIRED += periph_spi
-
-ifeq (,$(filter at86rf215m,$(USEMODULE)))
-  DEFAULT_MODULE += at86rf215_24ghz
-endif
 
 USEMODULE += xtimer
 USEMODULE += netif
