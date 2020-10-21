@@ -38,9 +38,6 @@
 #include "net/gnrc/gomach/timeout.h"
 #include "include/gomach_internal.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 #ifndef LOG_LEVEL
 /**
  * @brief Default log level define
@@ -49,6 +46,9 @@
 #endif
 
 #include "log.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 /**
  * @brief  GoMacH thread's PID
