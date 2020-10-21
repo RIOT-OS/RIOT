@@ -29,6 +29,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdatomic.h>
 #include <stdio.h>
