@@ -28,10 +28,11 @@
 #include "thread.h"
 #include "irq.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
 #include "bitarithm.h"
 #include "sched.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 thread_status_t thread_getstatus(kernel_pid_t pid)
 {
