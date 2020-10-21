@@ -17,6 +17,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdbool.h>
 
 #include "periph/rtt.h"

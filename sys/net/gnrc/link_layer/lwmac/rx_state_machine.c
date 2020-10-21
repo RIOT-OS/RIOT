@@ -19,6 +19,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "net/gnrc.h"
 #include "net/gnrc/lwmac/lwmac.h"
 #include "net/gnrc/mac/internal.h"

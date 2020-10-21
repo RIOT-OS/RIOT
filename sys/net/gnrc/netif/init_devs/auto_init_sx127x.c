@@ -17,6 +17,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
+#include <assert.h>
+
 #include "log.h"
 #include "board.h"
 #include "net/gnrc/netif/lorawan_base.h"

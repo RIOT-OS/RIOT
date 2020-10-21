@@ -17,6 +17,7 @@
 
 #define USB_H_USER_IS_RIOT_INTERNAL
 
+#include <assert.h>
 #include <string.h>
 
 #include "kernel_defines.h"

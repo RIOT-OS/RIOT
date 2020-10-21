@@ -20,6 +20,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdint.h>
 #include "phydat.h"
 

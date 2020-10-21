@@ -13,6 +13,8 @@
  * @author  Jose Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
 
+#include <assert.h>
+
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/lorawan.h"

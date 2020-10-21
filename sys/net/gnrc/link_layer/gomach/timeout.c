@@ -17,6 +17,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "xtimer.h"
 #include "net/gnrc/gomach/gomach.h"
 #include "net/gnrc/gomach/timeout.h"

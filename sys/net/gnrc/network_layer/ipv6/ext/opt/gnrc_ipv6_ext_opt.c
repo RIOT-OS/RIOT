@@ -13,6 +13,8 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <assert.h>
+
 #include "net/ipv6.h"
 #include "net/ipv6/ext.h"
 #include "net/ipv6/ext/opt.h"

@@ -6,6 +6,7 @@
  * directory for more details.
  */
 
+#include <assert.h>
 #include <string.h>
 #include "memarray.h"
 

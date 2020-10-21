@@ -17,6 +17,7 @@
  */
 
 #ifdef MODULE_CAN_ISOTP
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 

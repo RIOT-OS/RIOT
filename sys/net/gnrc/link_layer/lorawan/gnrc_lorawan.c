@@ -13,6 +13,8 @@
  * @author  José Ignacio Alamos <jose.alamos@haw-hamburg.de>
  * @}
  */
+
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include "net/lora.h"

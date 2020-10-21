@@ -13,6 +13,7 @@
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <kernel_defines.h>
 

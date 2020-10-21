@@ -19,6 +19,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdbool.h>
 
 #include "net/gnrc.h"

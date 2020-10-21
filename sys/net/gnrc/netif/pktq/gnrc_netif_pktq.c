@@ -13,6 +13,8 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <assert.h>
+
 #include "net/gnrc/pktqueue.h"
 #include "net/gnrc/netif/conf.h"
 #include "net/gnrc/netif/internal.h"

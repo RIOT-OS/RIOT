@@ -19,6 +19,7 @@
 #include "net/credman.h"
 #include "mutex.h"
 
+#include <assert.h>
 #include <string.h>
 
 #define ENABLE_DEBUG (0)
