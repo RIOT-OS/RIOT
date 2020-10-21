@@ -21,6 +21,7 @@
 
 #include "soft_uart.h"
 #include "macros/units.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
