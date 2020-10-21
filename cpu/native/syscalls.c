@@ -277,8 +277,10 @@ char *make_message(const char *format, va_list argp)
 
     while (1) {
         int n = vsnprintf(message, size, format, argp);
-        if (n < 0)
+        if (n < 0) {
+            free(message);
             return NULL;
+        }
         if (n < size)
             return message;
         size = n + 1;
