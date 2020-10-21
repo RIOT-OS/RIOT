@@ -7,17 +7,21 @@
  */
 
 /**
- * @ingroup     boards_common_stm32
+ * @ingroup     cpu_stm32
  * @{
  *
  * @file
- * @brief       Configure STM32G4 clock
+ * @brief       Configure STM32G0 clock
+ *
+ * CORECLOCK cannot exceeds 64MHz core clock. LSE is 32768Hz.
+ * Default configuration use PLL clock as system clock. PLL input clock is HSI
+ * by default.
  *
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef G4_CFG_CLOCK_DEFAULT_H
-#define G4_CFG_CLOCK_DEFAULT_H
+#ifndef CLK_G0_CFG_CLOCK_DEFAULT_H
+#define CLK_G0_CFG_CLOCK_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -27,8 +31,10 @@ extern "C" {
 
 /**
  * @name    Clock settings
+ *
  * @{
  */
+/* Select the desired system clock source between PLL, HSE or HSI */
 #ifndef CONFIG_USE_CLOCK_PLL
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
 #define CONFIG_USE_CLOCK_PLL            0
@@ -63,6 +69,7 @@ extern "C" {
 #ifndef CONFIG_BOARD_HAS_HSE
 #define CONFIG_BOARD_HAS_HSE            0
 #endif
+
 #ifndef CLOCK_HSE
 #define CLOCK_HSE                       MHZ(24)
 #endif
@@ -76,25 +83,29 @@ extern "C" {
 
 #define CLOCK_HSI                       MHZ(16)
 
+#ifndef CONFIG_CLOCK_HSISYS_DIV
+#define CONFIG_CLOCK_HSISYS_DIV         (1)
+#endif
+
 #if IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
 #define CLOCK_PLL_SRC                   (CLOCK_HSE)
 #else /* CLOCK_HSI */
 #define CLOCK_PLL_SRC                   (CLOCK_HSI)
 #endif
 
-/* The following parameters configure a 170MHz system clock with HSI16 as input clock */
+/* The following parameters configure a 64MHz system clock with HSI as input clock */
 #ifndef CONFIG_CLOCK_PLL_M
-#define CONFIG_CLOCK_PLL_M              (4)
+#define CONFIG_CLOCK_PLL_M              (1)
 #endif
 #ifndef CONFIG_CLOCK_PLL_N
-#define CONFIG_CLOCK_PLL_N              (85)
+#define CONFIG_CLOCK_PLL_N              (20)
 #endif
 #ifndef CONFIG_CLOCK_PLL_R
-#define CONFIG_CLOCK_PLL_R              (2)
+#define CONFIG_CLOCK_PLL_R              (5)
 #endif
 
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
-#define CLOCK_CORECLOCK                 (CLOCK_HSI)
+#define CLOCK_CORECLOCK                 (CLOCK_HSI / CONFIG_CLOCK_HSISYS_DIV)
 
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_HSE)
 #if !IS_ACTIVE(CONFIG_BOARD_HAS_HSE)
@@ -105,25 +116,22 @@ extern "C" {
 #elif IS_ACTIVE(CONFIG_USE_CLOCK_PLL)
 #define CLOCK_CORECLOCK                 \
         ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_M) * CONFIG_CLOCK_PLL_N) / CONFIG_CLOCK_PLL_R
-#if CLOCK_CORECLOCK > MHZ(170)
-#error "SYSCLK cannot exceed 170MHz"
+#if CLOCK_CORECLOCK > MHZ(64)
+#error "SYSCLK cannot exceed 64MHz"
 #endif
 #endif /* CONFIG_USE_CLOCK_PLL */
 
-#define CLOCK_AHB                       CLOCK_CORECLOCK /* max: 170MHz */
+#define CLOCK_AHB                       CLOCK_CORECLOCK  /* max: 64MHz */
 
 #ifndef CONFIG_CLOCK_APB1_DIV
 #define CONFIG_CLOCK_APB1_DIV           (1)
 #endif
-#define CLOCK_APB1                      (CLOCK_AHB / CONFIG_CLOCK_APB1_DIV)     /* max: 170MHz */
-#ifndef CONFIG_CLOCK_APB2_DIV
-#define CONFIG_CLOCK_APB2_DIV           (1)
-#endif
-#define CLOCK_APB2                      (CLOCK_AHB / CONFIG_CLOCK_APB2_DIV)     /* max: 170MHz */
+#define CLOCK_APB1                      (CLOCK_CORECLOCK / CONFIG_CLOCK_APB1_DIV)   /* max: 64MHz */
+/** @} */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* G4_CFG_CLOCK_DEFAULT_H */
+#endif /* CLK_G0_CFG_CLOCK_DEFAULT_H */
 /** @} */

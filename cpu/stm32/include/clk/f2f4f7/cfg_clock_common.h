@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     boards_common_stm32
+ * @ingroup     cpu_stm32
  * @{
  *
  * @file
@@ -20,8 +20,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef F2F4F7_CFG_CLOCK_COMMON_H
-#define F2F4F7_CFG_CLOCK_COMMON_H
+#ifndef CLK_F2F4F7_CFG_CLOCK_COMMON_H
+#define CLK_F2F4F7_CFG_CLOCK_COMMON_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -81,5 +81,5 @@ extern "C" {
 }
 #endif
 
-#endif /* F2F4F7_CFG_CLOCK_COMMON_H */
+#endif /* CLK_F2F4F7_CFG_CLOCK_COMMON_H */
 /** @} */
