@@ -1,21 +1,24 @@
 #!/bin/sh
 #
-# Unified Segger JLink script for RIOT
+# Unified Segger J-Link script for RIOT
 #
-# This script is supposed to be called from RIOTs make system,
-# as it depends on certain environment variables. An
+# This script is supposed to be called from RIOTs build system,
+# as it depends on certain environment variables.
+#
+# The minimum supported version of J-Link is V6.74.
 #
 # Global environment variables used:
-# JLINK:            JLink command name, default: "JLinkExe"
-# JLINK_SERVER:     JLink GCB server command name, default: "JLinkGDBDerver"
-# JLINK_DEVICE:     Device identifier used by JLink
-# JLINK_SERIAL:     Device serial used by JLink
-# JLINK_IF:         Interface used by JLink, default: "SWD"
+# JLINK:            J-Link Commander command name, default: "JLinkExe"
+# JLINK_SERVER:     J-Link GDB Server command name, default: "JLinkGDBServer"
+# JLINK_DEVICE:     Device identifier used by J-Link
+# JLINK_SERIAL:     Device serial used by J-Link
+# JLINK_IF:         Interface used by J-Link, default: "SWD"
 # JLINK_SPEED:      Interface clock speed to use (in kHz), default "2000"
 # FLASH_ADDR:       Starting address of the target's flash memory, default: "0"
-# IMAGE_OFFSET:     Offset from the targets flash memory, for flashing the image
-# JLINK_PRE_FLASH:  Additional JLink commands to execute before flashing
-# JLINK_POST_FLASH: Additional JLink commands to execute after flashing
+# IMAGE_OFFSET:     Offset from the targets flash memory, for flashing the
+#                   image
+# JLINK_PRE_FLASH:  Additional J-Link commands to execute before flashing
+# JLINK_POST_FLASH: Additional J-Link commands to execute after flashing
 #
 # The script supports the following actions:
 #
@@ -28,7 +31,7 @@
 #
 # debug:        debug <elffile>
 #
-#               starts JLink as GDB server in the background and
+#               starts J-Link as GDB server in the background and
 #               connects to the server with the GDB client specified by
 #               the board (DBG environment variable)
 #
@@ -39,7 +42,7 @@
 #               DBG:            debugger client command, default: 'gdb -q'
 #               TUI:            if TUI!=null, the -tui option will be used
 #
-# debug-server: starts JLink as GDB server, but does not connect to
+# debug-server: starts J-Link as GDB server, but does not connect to
 #               to it with any frontend. This might be useful when using
 #               IDEs.
 #
@@ -50,7 +53,7 @@
 # reset:        triggers a hardware reset of the target board
 #
 #
-# term-rtt:     opens a serial terminal using jlink RTT(reak time transfer)
+# term-rtt:     opens a serial terminal using J-Link RTT (Real-Time Transfer)
 #
 #
 # @author       Hauke Peteresen <hauke.petersen@fu-berlin.de>
@@ -64,7 +67,7 @@
 _GDB_PORT=3333
 # default telnet port
 _TELNET_PORT=4444
-# default JLink command, interface and speed
+# default J-Link command names, interface and speed
 _JLINK=JLinkExe
 _JLINK_SERVER=JLinkGDBServer
 _JLINK_IF=SWD
@@ -133,7 +136,7 @@ test_tui() {
 test_serial() {
     if [ -n "${JLINK_SERIAL}" ]; then
         JLINK_SERIAL_SERVER="-select usb='${JLINK_SERIAL}'"
-        JLINK_SERIAL="-SelectEmuBySN '${JLINK_SERIAL}'"
+        JLINK_SERIAL="-selectemubysn '${JLINK_SERIAL}'"
     fi
 }
 
@@ -152,12 +155,30 @@ test_term() {
     fi
 }
 
+test_version() {
+    JLINK_MINIMUM_VERSION="6.74"
+    JLINK_VERSION=$(echo q | "$JLINK" 2> /dev/null | grep "^DLL version*" | grep -oP "\d+\.\d+")
+
+    if [ $? -ne 0 ]; then
+        echo "Error: J-Link appears not to be installed on your PATH"
+        exit 1
+    fi
+
+    "$RIOTTOOLS"/has_minimal_version/has_minimal_version.sh "$JLINK_VERSION" "$JLINK_MINIMUM_VERSION" 2> /dev/null
+
+    if [ $? -ne 0 ]; then
+        echo "Error: J-Link V$JLINK_MINIMUM_VERSION is required, but V${JLINK_VERSION} is installed"
+        exit 1
+    fi
+}
+
 #
 # now comes the actual actions
 #
 do_flash() {
     BINFILE=$1
     test_config
+    test_version
     test_serial
     test_binfile
     # clear any existing contents in burn file
@@ -175,7 +196,8 @@ do_flash() {
     cat ${JLINK_RESET_FILE} >> ${BINDIR}/burn.seg
     # flash device
     sh -c "${JLINK} ${JLINK_SERIAL} \
-                    -ExitOnError 1 \
+                    -nogui 1 \
+                    -exitonerror 1 \
                     -device '${JLINK_DEVICE}' \
                     -speed '${JLINK_SPEED}' \
                     -if '${JLINK_IF}' \
@@ -186,13 +208,15 @@ do_flash() {
 do_debug() {
     ELFFILE=$1
     test_config
+    test_version
     test_serial
     test_elffile
     test_ports
     test_tui
     test_dbg
-    # start the JLink GDB server
+    # start the J-Link GDB server
     sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
+                           -nogui \
                            -device '${JLINK_DEVICE}' \
                            -speed '${JLINK_SPEED}' \
                            -if '${JLINK_IF}' \
@@ -207,11 +231,13 @@ do_debug() {
 }
 
 do_debugserver() {
+    test_version
     test_ports
     test_config
     test_serial
-    # start the JLink GDB server
+    # start the J-Link GDB server
     sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
+                           -nogui \
                            -device '${JLINK_DEVICE}' \
                            -speed '${JLINK_SPEED}' \
                            -if '${JLINK_IF}' \
@@ -221,10 +247,12 @@ do_debugserver() {
 
 do_reset() {
     test_config
+    test_version
     test_serial
     # reset the board
     sh -c "${JLINK} ${JLINK_SERIAL} \
-                    -ExitOnError 1 \
+                    -nogui 1 \
+                    -exitonerror 1 \
                     -device '${JLINK_DEVICE}' \
                     -speed '${JLINK_SPEED}' \
                     -if '${JLINK_IF}' \
@@ -234,10 +262,11 @@ do_reset() {
 
 do_term() {
     test_config
+    test_version
     test_serial
     test_term
 
-    # temporary file that save the JLink pid
+    # temporary file that save the J-Link Commander pid
     JLINK_PIDFILE=$(mktemp -t "jilnk_pid.XXXXXXXXXX")
     # will be called by trap
     cleanup() {
@@ -251,9 +280,10 @@ do_term() {
     # cleanup after script terminates
     trap "cleanup ${JLINK_PIDFILE}" EXIT INT
 
-    # start Jlink as RTT server
+    # start J-link as RTT server
     sh -c "${JLINK} ${JLINK_SERIAL} \
-            -ExitOnError 1 \
+            -nogui 1 \
+            -exitonerror 1 \
             -device '${JLINK_DEVICE}' \
             -speed '${JLINK_SPEED}' \
             -if '${JLINK_IF}' \
