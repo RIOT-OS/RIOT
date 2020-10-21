@@ -49,9 +49,6 @@
 #define RCC_CSR_LSIRDY          RCC_CSR_LSI1RDY
 #endif
 
-#ifndef CLOCK_HSE
-#define CLOCK_HSE   (0U)
-#endif
 #ifndef CLOCK_LSE
 #define CLOCK_LSE   (0U)
 #endif
@@ -64,13 +61,7 @@ void stmclk_enable_hsi(void)
 
 void stmclk_disable_hsi(void)
 {
-    /* we only disable the HSI clock if not used as input for the PLL and if
-     * not used directly as system clock */
-    if (CLOCK_HSE) {
-        if ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_HSI) {
-            RCC->CR &= ~(RCC_CR_HSION);
-        }
-    }
+    RCC->CR &= ~RCC_CR_HSION;
 }
 
 void stmclk_enable_lfclk(void)
