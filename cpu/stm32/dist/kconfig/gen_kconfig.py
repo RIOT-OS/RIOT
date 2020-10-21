@@ -16,7 +16,7 @@ from jinja2 import FileSystemLoader, Environment
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 RIOTBASE = os.getenv(
     "RIOTBASE", os.path.abspath(os.path.join(CURRENT_DIR, "../../../..")))
-STM32_KCONFIG_DIR = os.path.join(RIOTBASE, "cpu/stm32/kconfig")
+STM32_KCONFIG_DIR = os.path.join(RIOTBASE, "cpu/stm32/kconfigs")
 STM32_VENDOR_DIR = os.path.join(RIOTBASE, "cpu/stm32/include/vendor/cmsis")
 
 
