@@ -155,12 +155,30 @@ test_term() {
     fi
 }
 
+test_version() {
+    JLINK_MINIMUM_VERSION="6.74"
+    JLINK_VERSION=$(echo q | "$JLINK" 2> /dev/null | grep "^DLL version*" | grep -oP "\d+\.\d+")
+
+    if [ $? -ne 0 ]; then
+        echo "Error: J-Link appears not to be installed on your PATH"
+        exit 1
+    fi
+
+    "$RIOTTOOLS"/has_minimal_version/has_minimal_version.sh "$JLINK_VERSION" "$JLINK_MINIMUM_VERSION" 2> /dev/null
+
+    if [ $? -ne 0 ]; then
+        echo "Error: J-Link V$JLINK_MINIMUM_VERSION is required, but V${JLINK_VERSION} is installed"
+        exit 1
+    fi
+}
+
 #
 # now comes the actual actions
 #
 do_flash() {
     BINFILE=$1
     test_config
+    test_version
     test_serial
     test_binfile
     # clear any existing contents in burn file
@@ -190,6 +208,7 @@ do_flash() {
 do_debug() {
     ELFFILE=$1
     test_config
+    test_version
     test_serial
     test_elffile
     test_ports
@@ -212,6 +231,7 @@ do_debug() {
 }
 
 do_debugserver() {
+    test_version
     test_ports
     test_config
     test_serial
@@ -227,6 +247,7 @@ do_debugserver() {
 
 do_reset() {
     test_config
+    test_version
     test_serial
     # reset the board
     sh -c "${JLINK} ${JLINK_SERIAL} \
@@ -241,6 +262,7 @@ do_reset() {
 
 do_term() {
     test_config
+    test_version
     test_serial
     test_term
 
