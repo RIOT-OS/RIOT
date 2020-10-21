@@ -182,6 +182,19 @@ def check_erase_long_line(child, longline):
         child.expect_exact('"echo"')
 
 
+def check_control_d(child):
+    # The current shell instance was initiated by shell_run_once(). The shell will exit.
+    child.sendline(CONTROL_D)
+    child.expect_exact('shell exited')
+
+    # The current shell instance was initiated by shell_run(). The shell will respawn
+    # automatically except on native. On native, RIOT is shut down completely,
+    # therefore exclude this part.
+    if BOARD != 'native':
+        child.sendline(CONTROL_D)
+        child.expect_exact(PROMPT)
+
+
 def testfunc(child):
     # avoid sending an extra empty line on native.
     if BOARD == 'native':
@@ -198,6 +211,8 @@ def testfunc(child):
         print("skipping check_line_canceling()")
 
     check_erase_long_line(child, longline)
+
+    check_control_d(child)
 
     # loop other defined commands and expected output
     for cmd, expected in CMDS:
