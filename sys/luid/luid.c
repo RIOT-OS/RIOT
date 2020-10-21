@@ -21,7 +21,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "assert.h"
 #include "periph/cpuid.h"
 
 #include "luid.h"
