@@ -17,6 +17,7 @@
 
 #include "esp_common.h"
 #include "log.h"
+#include "timex.h"
 
 #include "freertos/FreeRTOS.h"
 
