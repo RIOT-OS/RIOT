@@ -18,7 +18,6 @@
  */
 
 #include <stdio.h>
-#include <assert.h>
 #include <inttypes.h>
 
 #include "macros/xtstr.h"

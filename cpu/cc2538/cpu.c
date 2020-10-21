@@ -17,7 +17,6 @@
  * @}
  */
 
-#include <assert.h>
 #include "stdio_base.h"
 
 #include "cpu.h"

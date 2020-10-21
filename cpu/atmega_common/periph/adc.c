@@ -22,7 +22,6 @@
 
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/adc.h"
 #include "periph_conf.h"
 

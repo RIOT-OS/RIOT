@@ -21,7 +21,6 @@
 #include "periph_cpu.h"
 #include "periph_conf.h"
 #include "mutex.h"
-#include "assert.h"
 #include "bitarithm.h"
 #include "pm_layered.h"
 #include "thread_flags.h"
