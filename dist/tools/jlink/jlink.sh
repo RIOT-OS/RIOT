@@ -5,6 +5,8 @@
 # This script is supposed to be called from RIOTs build system,
 # as it depends on certain environment variables.
 #
+# The minimum supported version of J-Link is V6.74.
+#
 # Global environment variables used:
 # JLINK:            J-Link Commander command name, default: "JLinkExe"
 # JLINK_SERVER:     J-Link GDB Server command name, default: "JLinkGDBServer"
@@ -176,6 +178,7 @@ do_flash() {
     cat ${JLINK_RESET_FILE} >> ${BINDIR}/burn.seg
     # flash device
     sh -c "${JLINK} ${JLINK_SERIAL} \
+                    -nogui 1 \
                     -exitonerror 1 \
                     -device '${JLINK_DEVICE}' \
                     -speed '${JLINK_SPEED}' \
@@ -194,6 +197,7 @@ do_debug() {
     test_dbg
     # start the J-Link GDB server
     sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
+                           -nogui \
                            -device '${JLINK_DEVICE}' \
                            -speed '${JLINK_SPEED}' \
                            -if '${JLINK_IF}' \
@@ -213,6 +217,7 @@ do_debugserver() {
     test_serial
     # start the J-Link GDB server
     sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
+                           -nogui \
                            -device '${JLINK_DEVICE}' \
                            -speed '${JLINK_SPEED}' \
                            -if '${JLINK_IF}' \
@@ -225,6 +230,7 @@ do_reset() {
     test_serial
     # reset the board
     sh -c "${JLINK} ${JLINK_SERIAL} \
+                    -nogui 1 \
                     -exitonerror 1 \
                     -device '${JLINK_DEVICE}' \
                     -speed '${JLINK_SPEED}' \
@@ -254,6 +260,7 @@ do_term() {
 
     # start J-link as RTT server
     sh -c "${JLINK} ${JLINK_SERIAL} \
+            -nogui 1 \
             -exitonerror 1 \
             -device '${JLINK_DEVICE}' \
             -speed '${JLINK_SPEED}' \
