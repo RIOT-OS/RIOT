@@ -19,8 +19,6 @@
 #ifndef CLK_G4_CFG_CLOCK_DEFAULT_H
 #define CLK_G4_CFG_CLOCK_DEFAULT_H
 
-#include "periph_cpu.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

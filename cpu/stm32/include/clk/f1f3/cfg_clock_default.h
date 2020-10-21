@@ -26,8 +26,6 @@
 #ifndef CLK_F1F3_CFG_CLOCK_DEFAULT_H
 #define CLK_F1F3_CFG_CLOCK_DEFAULT_H
 
-#include "periph_cpu.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
