@@ -45,8 +45,9 @@ CONTROL_D = DLE+'\x04'
 PROMPT = '> '
 
 CMDS = (
-    # test start
     ('start_test', '[TEST_START]'),
+
+    # test empty line input
     ('\n', PROMPT),
 
     # test simple word separation
@@ -54,10 +55,7 @@ CMDS = (
     ('echo   multiple   spaces   between   argv', '"echo""multiple""spaces""between""argv"'),
     ('echo \t tabs\t\t processed \t\tlike\t \t\tspaces', '"echo""tabs""processed""like""spaces"'),
 
-    # test long line
-    ('123456789012345678901234567890123456789012345678901234567890',
-     'shell: command not found: '
-     '123456789012345678901234567890123456789012345678901234567890'),
+    # test unknown commands
     ('unknown_command', 'shell: command not found: unknown_command'),
 
     # test leading/trailing BLANK
@@ -98,8 +96,9 @@ CMDS = (
     ('ps', EXPECTED_PS),
     ('help', EXPECTED_HELP),
 
-    # test end
+    # test reboot
     ('reboot', 'test_shell.'),
+
     ('end_test', '[TEST_END]'),
 )
 
@@ -110,6 +109,16 @@ CMDS_CLEANTERM = {
 CMDS_REGEX = {'ps'}
 
 BOARD = os.environ['BOARD']
+
+# there's an issue with some boards' serial that causes lost characters.
+LINE_EXCEEDED_BLACKLIST = {
+    # There is an issue with nrf52dk when the Virtual COM port is connected
+    # and sending more than 64 bytes over UART. If no terminal is connected
+    # to the Virtual COM and interfacing directly to the nrf52832 UART pins
+    # the issue is not present. See issue #10639 on GitHub.
+    'nrf52dk',
+    'z1',
+}
 
 
 def print_error(message):
@@ -140,17 +149,6 @@ def check_and_get_bufsize(child):
     bufsize = int(child.match.group(1))
 
     return bufsize
-
-
-# there's an issue with some boards' serial that causes lost characters.
-LINE_EXCEEDED_BLACKLIST = {
-    # There is an issue with nrf52dk when the Virtual COM port is connected
-    # and sending more than 64 bytes over UART. If no terminal is connected
-    # to the Virtual COM and interfacing directly to the nrf52832 UART pins
-    # the issue is not present. See issue #10639 on GitHub.
-    'nrf52dk',
-    'z1',
-}
 
 
 def check_line_exceeded(child, longline):
