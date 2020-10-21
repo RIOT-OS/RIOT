@@ -21,6 +21,8 @@
 
 #include <string.h>
 
+#include "timex.h"
+
 #include "liblwm2m.h"
 
 #include "lwm2m_platform.h"
