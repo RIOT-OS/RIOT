@@ -133,7 +133,7 @@ test_tui() {
 test_serial() {
     if [ -n "${JLINK_SERIAL}" ]; then
         JLINK_SERIAL_SERVER="-select usb='${JLINK_SERIAL}'"
-        JLINK_SERIAL="-SelectEmuBySN '${JLINK_SERIAL}'"
+        JLINK_SERIAL="-selectemubysn '${JLINK_SERIAL}'"
     fi
 }
 
@@ -175,7 +175,7 @@ do_flash() {
     cat ${JLINK_RESET_FILE} >> ${BINDIR}/burn.seg
     # flash device
     sh -c "${JLINK} ${JLINK_SERIAL} \
-                    -ExitOnError 1 \
+                    -exitonerror 1 \
                     -device '${JLINK_DEVICE}' \
                     -speed '${JLINK_SPEED}' \
                     -if '${JLINK_IF}' \
@@ -224,7 +224,7 @@ do_reset() {
     test_serial
     # reset the board
     sh -c "${JLINK} ${JLINK_SERIAL} \
-                    -ExitOnError 1 \
+                    -exitonerror 1 \
                     -device '${JLINK_DEVICE}' \
                     -speed '${JLINK_SPEED}' \
                     -if '${JLINK_IF}' \
@@ -253,7 +253,7 @@ do_term() {
 
     # start Jlink as RTT server
     sh -c "${JLINK} ${JLINK_SERIAL} \
-            -ExitOnError 1 \
+            -exitonerror 1 \
             -device '${JLINK_DEVICE}' \
             -speed '${JLINK_SPEED}' \
             -if '${JLINK_IF}' \
