@@ -26,6 +26,7 @@
 
 #include "net/nanocoap_sock.h"
 #include "net/sock/udp.h"
+#include "timex.h"
 
 #define ENABLE_DEBUG (0)
 #include "debug.h"

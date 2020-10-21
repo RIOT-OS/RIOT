@@ -25,6 +25,8 @@
 
 #include "net/gnrc/ndp.h"
 
+#include "timex.h"
+
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
