@@ -27,7 +27,6 @@ extern "C" {
 
 #include "mtd.h"
 #include "periph_cpu.h"
-#include "timex.h"
 
 /**
  * @name    Xtimer configuration

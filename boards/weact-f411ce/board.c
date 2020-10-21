@@ -21,6 +21,7 @@
 #include "board.h"
 #include "cpu.h"
 #include "mtd.h"
+#include "timex.h"
 #include "mtd_spi_nor.h"
 #include "periph/gpio.h"
 
