@@ -49,9 +49,6 @@
 #define RCC_CSR_LSIRDY          RCC_CSR_LSI1RDY
 #endif
 
-#ifndef CLOCK_HSE
-#define CLOCK_HSE   (0U)
-#endif
 #ifndef CLOCK_LSE
 #define CLOCK_LSE   (0U)
 #endif
