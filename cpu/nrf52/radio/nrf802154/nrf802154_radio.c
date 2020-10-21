@@ -497,6 +497,7 @@ void isr_radio(void)
                  * don't event think of sending an ACK frame :) */
                 if (cfg.promisc) {
                     DEBUG("[nrf802154] Promiscuous mode is enabled.\n");
+                    _state = STATE_IDLE;
                     dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
                 }
                 /* If the L2 filter passes, device if the frame is indicated
@@ -511,6 +512,7 @@ void isr_radio(void)
                     }
                     else {
                         DEBUG("[nrf802154] RX frame doesn't require ACK frame.\n");
+                        _state = STATE_IDLE;
                         dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
                     }
                 }
@@ -518,6 +520,7 @@ void isr_radio(void)
                  * indicate the frame reception */
                 else if (is_ack && !cfg.ack_filter) {
                     DEBUG("[nrf802154] Received ACK.\n");
+                    _state = STATE_IDLE;
                     dev->cb(dev, IEEE802154_RADIO_INDICATION_RX_DONE);
                 }
                 /* If all failed, simply drop the frame and continue listening
