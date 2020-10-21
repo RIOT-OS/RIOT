@@ -182,8 +182,8 @@ extern "C" {
  *
  * @experimental
  *
- * This feature is non compliant with RFC 4944 and might not be supported by
- * other implementations.
+ * This feature is non compliant with RFC 4944 and RFC 7668 and might not be
+ * supported by other implementations.
  */
 #ifndef CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU
 #define CONFIG_GNRC_NETIF_NONSTANDARD_6LO_MTU 0
