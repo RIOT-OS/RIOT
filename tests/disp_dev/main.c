@@ -19,7 +19,6 @@
  */
 
 #include <stdio.h>
-#include <assert.h>
 
 #include "disp_dev.h"
 
