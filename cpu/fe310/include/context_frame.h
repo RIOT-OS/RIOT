@@ -21,7 +21,6 @@
 
 #if !defined(__ASSEMBLER__)
 #include <stdint.h>
-#include <assert.h>
 #endif /* __ASSEMBLER__ */
 
 

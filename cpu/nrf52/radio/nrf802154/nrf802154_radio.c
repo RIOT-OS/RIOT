@@ -16,6 +16,8 @@
  * @author      José I. Alamos <jose.alamos@haw-hamburg.de>
  * @}
  */
+
+#include <assert.h>
 #include <string.h>
 #include <errno.h>
 

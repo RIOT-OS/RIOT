@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <string.h>
 #include <stdio_ext.h>
 #include <sys/unistd.h>

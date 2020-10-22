@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "uri_parser.h"
 
 #define ENABLE_DEBUG (0)

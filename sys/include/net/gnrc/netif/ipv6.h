@@ -18,7 +18,6 @@
 #ifndef NET_GNRC_NETIF_IPV6_H
 #define NET_GNRC_NETIF_IPV6_H
 
-#include <assert.h>
 #include <kernel_defines.h>
 
 #include "evtimer_msg.h"

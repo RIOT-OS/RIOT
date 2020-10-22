@@ -21,7 +21,6 @@
 
 #include <string.h>
 
-#include "assert.h"
 #include "byteorder.h"
 #include "xtimer.h"
 #include "periph/i2c.h"

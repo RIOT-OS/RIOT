@@ -17,6 +17,7 @@
 #include "debug.h"
 #include "log.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 

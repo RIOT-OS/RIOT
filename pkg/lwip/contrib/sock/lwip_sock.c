@@ -340,6 +340,7 @@ static int _create(int type, int proto, uint16_t flags, struct netconn **out)
     return 0;
 }
 
+#include <assert.h>
 #include <stdio.h>
 
 int lwip_sock_create(struct netconn **conn, const struct _sock_tl_ep *local,

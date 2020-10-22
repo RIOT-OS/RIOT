@@ -16,8 +16,6 @@
  * @}
  */
 
-#include <assert.h>
-
 #include "openthread/platform/alarm-milli.h"
 #include "openthread/platform/uart.h"
 #include "ot.h"

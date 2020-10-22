@@ -11,6 +11,8 @@
  *
  * @author      Javier FILEIV <javier.fileiv@gmail.com>
  */
+
+#include <assert.h>
 #include <string.h>
 #include <errno.h>
 

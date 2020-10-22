@@ -19,7 +19,6 @@
  */
 
 #include <string.h>
-#include <assert.h>
 
 #include "hashes/sha224.h"
 #include "hashes/sha2xx_common.h"

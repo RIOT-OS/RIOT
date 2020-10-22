@@ -19,6 +19,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "net/bluetil/ad.h"
 #include "nimble_scanlist.h"
 #include "nimble/hci_common.h"

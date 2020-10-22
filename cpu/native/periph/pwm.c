@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <errno.h>
 
 #include "periph/pwm.h"

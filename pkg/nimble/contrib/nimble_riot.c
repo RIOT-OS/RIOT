@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "thread.h"
 #include "nimble_riot.h"
 

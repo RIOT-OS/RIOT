@@ -19,6 +19,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <errno.h>
 
 #include "net/gnrc/lwmac/timeout.h"

@@ -19,12 +19,13 @@
  * @}
  */
 
+#include <assert.h>
+#include <string.h>
+
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 #include "esp_common.h"
 #include "log.h"
-
-#include <string.h>
 
 #include "cpu.h"
 #include "mutex.h"

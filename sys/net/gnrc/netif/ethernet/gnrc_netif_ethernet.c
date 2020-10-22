@@ -15,6 +15,7 @@
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
  */
 
+#include <assert.h>
 #include <string.h>
 
 #include "net/ethernet/hdr.h"

@@ -21,7 +21,6 @@
 #include "tools.h"
 
 #include <string.h>
-#include <assert.h>
 #include <errno.h>
 
 #include "net/gnrc.h"

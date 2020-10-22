@@ -32,6 +32,8 @@
 
 #if ENABLE_DEBUG
 /* For PRIu16 etc. */
+
+#include <assert.h>
 #include <inttypes.h>
 #endif
 

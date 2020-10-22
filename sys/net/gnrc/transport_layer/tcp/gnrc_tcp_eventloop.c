@@ -17,6 +17,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <utlist.h>
 #include <errno.h>
 #include "net/af.h"

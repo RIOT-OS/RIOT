@@ -18,6 +18,7 @@
  *
  * @}
  */
+
 #include "fatfs/diskio.h"       /**< FatFs lower layer API */
 #include "fatfs_diskio_mtd.h"
 #include "fatfs/ffconf.h"

@@ -18,6 +18,7 @@
 
 #define USB_H_USER_IS_RIOT_INTERNAL
 
+#include <assert.h>
 #include <string.h>
 #include <stdio.h>
 #include "usb/descriptor.h"

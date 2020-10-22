@@ -16,7 +16,6 @@
  * @}
  */
 
-#include "assert.h"
 #include "openthread/error.h"
 #include "openthread/instance.h"
 

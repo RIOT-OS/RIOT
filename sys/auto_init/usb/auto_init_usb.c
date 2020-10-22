@@ -24,6 +24,8 @@
 
 #define USB_H_USER_IS_RIOT_INTERNAL
 
+#include <assert.h>
+
 #include "usb/usbus.h"
 
 #ifdef MODULE_USBUS_CDC_ECM

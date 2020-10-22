@@ -17,6 +17,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "adcxx1c.h"
 #include "adcxx1c_params.h"
 #include "adcxx1c_regs.h"

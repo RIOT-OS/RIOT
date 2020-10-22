@@ -13,8 +13,6 @@
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
 
-#include <assert.h>
-
 #include "event.h"
 #include "log.h"
 #include "net/dhcpv6/client.h"

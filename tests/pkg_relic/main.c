@@ -12,7 +12,6 @@
 #if (TEST_RELIC_SHOW_OUTPUT == 1)
 #include <stdio.h>
 #endif
-#include <assert.h>
 #include <stdlib.h>
 
 #include "relic.h"

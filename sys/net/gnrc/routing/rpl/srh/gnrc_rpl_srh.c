@@ -15,6 +15,7 @@
  * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <assert.h>
 #include <string.h>
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/ipv6/ext/rh.h"

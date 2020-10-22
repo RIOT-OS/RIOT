@@ -32,6 +32,7 @@
 #include "usb.h"
 #include "cpu.h"
 
+#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 #include <errno.h>

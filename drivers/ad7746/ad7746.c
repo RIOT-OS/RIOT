@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "ad7746.h"
 #include "ad7746_params.h"
 #include "ad7746_internal.h"

@@ -21,7 +21,6 @@
 #define GNRC_TCP_COMMON_H
 
 #include <stdint.h>
-#include "assert.h"
 #include "kernel_types.h"
 #include "thread.h"
 #include "mutex.h"

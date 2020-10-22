@@ -17,7 +17,6 @@
  * @}
  */
 
-#include <assert.h>
 #include "cpu.h"
 
 static inline bool _hf_source_ready(void)

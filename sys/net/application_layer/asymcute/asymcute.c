@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <limits.h>
 
 #include "log.h"

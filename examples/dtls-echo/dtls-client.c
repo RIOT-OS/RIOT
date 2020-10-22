@@ -21,6 +21,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <inttypes.h>
 

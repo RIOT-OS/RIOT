@@ -17,6 +17,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "vendor/encoding.h"
 #include "vendor/platform.h"
 #include "cpu.h"

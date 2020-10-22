@@ -12,6 +12,8 @@
  * @file
  * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
+
+#include <assert.h>
 #include <kernel_defines.h>
 
 #include "net/gnrc/ipv6/nib.h"

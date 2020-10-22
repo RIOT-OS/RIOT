@@ -22,6 +22,7 @@
 
 #define USB_H_USER_IS_RIOT_INTERNAL
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <errno.h>

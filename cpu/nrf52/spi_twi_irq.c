@@ -20,6 +20,9 @@
  *
  * @}
  */
+
+#include <assert.h>
+
 #include "cpu.h"
 #include "periph_cpu.h"
 

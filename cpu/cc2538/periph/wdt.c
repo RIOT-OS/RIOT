@@ -20,6 +20,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cc2538.h"
 #include "periph/wdt.h"
 

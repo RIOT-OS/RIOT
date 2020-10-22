@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "irq.h"
 #include "periph/pm.h"
 #include "pm_layered.h"

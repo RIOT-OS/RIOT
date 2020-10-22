@@ -22,6 +22,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "periph/uart.h"
 #include "periph_conf.h"

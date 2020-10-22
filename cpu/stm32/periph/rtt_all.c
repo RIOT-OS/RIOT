@@ -19,6 +19,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "irq.h"
 #include "periph/rtt.h"

@@ -6,6 +6,8 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
+
+#include <assert.h>
 #include <mips/cpu.h>
 #include <mips/hal.h>
 #include <unistd.h>

@@ -13,6 +13,7 @@
  * @file
  */
 
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>

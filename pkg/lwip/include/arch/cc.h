@@ -20,7 +20,6 @@
 #ifndef ARCH_CC_H
 #define ARCH_CC_H
 
-#include <assert.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -19,6 +19,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  * @}
  */
+
+#include <assert.h>
 #include <stdbool.h>
 #include <math.h>
 #include <string.h>

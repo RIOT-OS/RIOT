@@ -16,6 +16,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "xtimer.h"
 #include "periph/spi.h"
 #include "at86rf2xx_aes.h"

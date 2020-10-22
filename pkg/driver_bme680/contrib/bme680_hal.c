@@ -19,6 +19,7 @@
  * @author      Gunar Schorcht <gunar@schorcht.net>
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 

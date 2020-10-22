@@ -15,6 +15,8 @@
  * @author Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <assert.h>
+
 #include "net/ipv6/ext/rh.h"
 #include "net/gnrc.h"
 

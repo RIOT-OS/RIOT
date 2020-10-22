@@ -15,6 +15,7 @@
 #define LOG_LEVEL LOG_DEBUG
 #include "log.h"
 
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 

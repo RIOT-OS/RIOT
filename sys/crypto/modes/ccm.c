@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <assert.h>
 #include <string.h>
 #include "debug.h"
 #include "crypto/helper.h"

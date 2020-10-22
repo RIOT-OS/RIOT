@@ -13,6 +13,8 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include <assert.h>
+
 #include "log.h"
 #include "net/arp.h"
 #include "net/dhcpv6.h"

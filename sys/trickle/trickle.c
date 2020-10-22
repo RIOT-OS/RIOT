@@ -14,6 +14,8 @@
  * @author  Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
+#include <assert.h>
+
 #include "inttypes.h"
 #include "random.h"
 #include "trickle.h"

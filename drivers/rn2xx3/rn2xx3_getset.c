@@ -19,7 +19,6 @@
 #include <string.h>
 #include <errno.h>
 
-#include "assert.h"
 #include "fmt.h"
 
 #include "net/loramac.h"

@@ -21,6 +21,7 @@
 
 #define ENABLE_DEBUG (0)
 
+#include <assert.h>
 #include <debug.h>
 #include <errno.h>
 #include <isrpipe.h>

@@ -16,6 +16,7 @@
  * @author      Cenk Gündoğan <cenk.guendogan@haw-hamburg.de>
  */
 
+#include <assert.h>
 #include <stdbool.h>
 #include <string.h>
 

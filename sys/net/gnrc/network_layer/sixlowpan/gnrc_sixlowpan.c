@@ -12,6 +12,8 @@
  * @file
  */
 
+#include <assert.h>
+
 #include "kernel_types.h"
 #include "net/gnrc.h"
 #include "thread.h"

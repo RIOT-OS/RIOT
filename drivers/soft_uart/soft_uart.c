@@ -17,7 +17,6 @@
  */
 
 #include <stdio.h>
-#include <assert.h>
 
 #include "mutex.h"
 #include "soft_uart.h"

@@ -17,6 +17,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "macros/units.h"
 #include "periph_conf.h"

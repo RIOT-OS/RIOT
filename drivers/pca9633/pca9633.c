@@ -14,6 +14,7 @@
  * @{
  */
 
+#include <assert.h>
 #include <stdio.h>
 
 #include "pca9633.h"

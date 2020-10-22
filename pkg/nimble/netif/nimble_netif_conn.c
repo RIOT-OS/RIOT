@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "nimble_netif_conn.h"
 
 #define ENABLE_DEBUG            (0)

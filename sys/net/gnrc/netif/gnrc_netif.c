@@ -15,6 +15,7 @@
  * @author  Oliver Hahm <oliver.hahm@inria.fr>
  */
 
+#include <assert.h>
 #include <string.h>
 #include <kernel_defines.h>
 

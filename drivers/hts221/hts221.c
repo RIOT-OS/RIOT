@@ -22,7 +22,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "assert.h"
 #include "hts221.h"
 #include "periph/i2c.h"
 #include "xtimer.h"
