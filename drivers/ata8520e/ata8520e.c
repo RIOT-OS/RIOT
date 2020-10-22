@@ -205,7 +205,7 @@ static void _status(const ata8520e_t *dev)
     uint8_t sigfox2 = spi_transfer_byte(SPIDEV, CSPIN, false, 0);
     spi_release(SPIDEV);
 
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         _print_atmel_status(atmel);
         _print_sigfox_status(sigfox);
         _print_sigfox_status(sigfox2);
@@ -272,7 +272,7 @@ int ata8520e_init(ata8520e_t *dev, const ata8520e_params_t *params)
 
     xtimer_usleep(100 * US_PER_MS); /* 100 ms */
 
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         char sigfox_id[SIGFOX_ID_LENGTH + 1];
         ata8520e_read_id(dev, sigfox_id);
 

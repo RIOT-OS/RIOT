@@ -44,22 +44,22 @@ uint8_t sx127x_get_state(const sx127x_t *dev)
 
 void sx127x_set_state(sx127x_t *dev, uint8_t state)
 {
-#if ENABLE_DEBUG
-    switch (state) {
-    case SX127X_RF_IDLE:
-        DEBUG("[sx127x] Change state: IDLE\n");
-        break;
-    case SX127X_RF_RX_RUNNING:
-        DEBUG("[sx127x] Change state: RX\n");
-        break;
-    case SX127X_RF_TX_RUNNING:
-        DEBUG("[sx127x] Change state: TX\n");
-        break;
-    default:
-        DEBUG("[sx127x] Change state: UNKNOWN\n");
-        break;
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        switch (state) {
+        case SX127X_RF_IDLE:
+            DEBUG("[sx127x] Change state: IDLE\n");
+            break;
+        case SX127X_RF_RX_RUNNING:
+            DEBUG("[sx127x] Change state: RX\n");
+            break;
+        case SX127X_RF_TX_RUNNING:
+            DEBUG("[sx127x] Change state: TX\n");
+            break;
+        default:
+            DEBUG("[sx127x] Change state: UNKNOWN\n");
+            break;
+        }
     }
-#endif
 
     dev->settings.state = state;
 }
@@ -440,28 +440,28 @@ uint8_t sx127x_get_op_mode(const sx127x_t *dev)
 
 void sx127x_set_op_mode(const sx127x_t *dev, uint8_t op_mode)
 {
-#if ENABLE_DEBUG
-    switch(op_mode) {
-    case SX127X_RF_OPMODE_SLEEP:
-        DEBUG("[sx127x] Set op mode: SLEEP\n");
-        break;
-    case SX127X_RF_OPMODE_STANDBY:
-        DEBUG("[sx127x] Set op mode: STANDBY\n");
-        break;
-    case SX127X_RF_OPMODE_RECEIVER_SINGLE:
-        DEBUG("[sx127x] Set op mode: RECEIVER SINGLE\n");
-        break;
-    case SX127X_RF_OPMODE_RECEIVER:
-        DEBUG("[sx127x] Set op mode: RECEIVER\n");
-        break;
-    case SX127X_RF_OPMODE_TRANSMITTER:
-        DEBUG("[sx127x] Set op mode: TRANSMITTER\n");
-        break;
-    default:
-        DEBUG("[sx127x] Set op mode: UNKNOWN (%d)\n", op_mode);
-        break;
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        switch(op_mode) {
+        case SX127X_RF_OPMODE_SLEEP:
+            DEBUG("[sx127x] Set op mode: SLEEP\n");
+            break;
+        case SX127X_RF_OPMODE_STANDBY:
+            DEBUG("[sx127x] Set op mode: STANDBY\n");
+            break;
+        case SX127X_RF_OPMODE_RECEIVER_SINGLE:
+            DEBUG("[sx127x] Set op mode: RECEIVER SINGLE\n");
+            break;
+        case SX127X_RF_OPMODE_RECEIVER:
+            DEBUG("[sx127x] Set op mode: RECEIVER\n");
+            break;
+        case SX127X_RF_OPMODE_TRANSMITTER:
+            DEBUG("[sx127x] Set op mode: TRANSMITTER\n");
+            break;
+        default:
+            DEBUG("[sx127x] Set op mode: UNKNOWN (%d)\n", op_mode);
+            break;
+        }
     }
-#endif
 
     /* Replace previous mode value and setup new mode value */
     sx127x_reg_write(dev, SX127X_REG_OPMODE,

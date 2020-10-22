@@ -78,7 +78,7 @@
 /* Length for passive listings */
 #define LIST_PASSIVE_LEN_14443(num)   (num * 20)
 
-#if ENABLE_DEBUG
+#if IS_ACTIVE(ENABLE_DEBUG)
 #define PRINTBUFF printbuff
 static void printbuff(uint8_t *buff, unsigned len)
 {

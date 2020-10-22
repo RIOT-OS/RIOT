@@ -798,7 +798,7 @@ static void _isr(netdev_t *netdev)
     }
     kw2xrf_write_dreg(dev, MKW2XDM_IRQSTS2, irqsts2);
 
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         /* for debugging only */
         kw2xrf_read_dregs(dev, MKW2XDM_IRQSTS1, dregs, MKW2XDM_IRQSTS1 + 3);
         if (dregs[MKW2XDM_IRQSTS1] & 0x7f) {

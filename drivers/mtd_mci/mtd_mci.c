@@ -40,7 +40,7 @@ static int mtd_mci_init(mtd_dev_t *dev)
         return -EIO;
     }
 
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         uint32_t block_size;
         mci_ioctl(GET_BLOCK_SIZE, &block_size);
         DEBUG("block size: %lu\n", block_size);
