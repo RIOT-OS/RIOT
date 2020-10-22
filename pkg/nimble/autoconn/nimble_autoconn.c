@@ -164,20 +164,16 @@ static void _on_scan_evt(uint8_t type, const ble_addr_t *addr, int8_t rssi,
 
 static void _evt_dbg(const char *msg, int handle, const uint8_t *addr)
 {
-#if ENABLE_DEBUG
-    printf("[autoconn] %s (%i|", msg, handle);
-    if (addr) {
-        bluetil_addr_print(addr);
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        printf("[autoconn] %s (%i|", msg, handle);
+        if (addr) {
+            bluetil_addr_print(addr);
+        }
+        else {
+            printf("n/a");
+        }
+        puts(")");
     }
-    else {
-        printf("n/a");
-    }
-    puts(")");
-#else
-    (void)msg;
-    (void)handle;
-    (void)addr;
-#endif
 }
 
 static void _on_netif_evt(int handle, nimble_netif_event_t event,
