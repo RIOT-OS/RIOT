@@ -33,7 +33,7 @@
 #include "dtls_debug.h"
 #include "dtls.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef DTLS_DEFAULT_PORT
