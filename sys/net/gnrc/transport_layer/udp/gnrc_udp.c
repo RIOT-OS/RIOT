@@ -42,11 +42,7 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 /**
  * @brief   Allocate memory for the UDP thread's stack
  */
-#if ENABLE_DEBUG
-static char _stack[GNRC_UDP_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
-#else
-static char _stack[GNRC_UDP_STACK_SIZE];
-#endif
+static char _stack[GNRC_UDP_STACK_SIZE + DEBUG_EXTRA_STACKSIZE];
 
 /**
  * @brief   Calculate the UDP checksum dependent on the network protocol
