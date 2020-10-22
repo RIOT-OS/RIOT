@@ -360,13 +360,6 @@ typedef gpio_t adc_conf_t;
 #define NWDT_TIME_UPPER_LIMIT          (1000U)
 /** @} */
 
-/**
- * @name Radio peripheral configuration
- * @{
- */
-#define RADIO_IRQ_PRIO      1
-/** @} */
-
 #ifdef __cplusplus
 }
 #endif
