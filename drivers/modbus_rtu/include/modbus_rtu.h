@@ -78,7 +78,7 @@ enum {
     MB_ER_ACKNOWLEDGE,
     MB_ER_SERVER_BUSY,
     MB_ER_MEMORY_PARITY_ERROR,
-    /* non standart */
+    /* non standard */
     MB_ER_TIMEOUT   = 250,
     MB_ER_CRC       = 251,
     MB_ER_INVAL_ID  = 252
@@ -139,7 +139,7 @@ typedef struct {
      */
     kernel_pid_t pid;
     /**
-     * @brief   ID device. 0 - master, otherwice slave.
+     * @brief   ID of the device, 0 is reserved for master.
      */
     uint8_t id;
     /**
@@ -185,11 +185,11 @@ int modbus_rtu_send_request(modbus_rtu_t *modbus,
  * @brief   Wait request from master.
  *
  * Wait request from master, blocking.
- * Request will be writeт to message.
- * Use only slave.
+ * Request will be written to message.
+ * Use as slave only.
  *
- * @param[in] modbus    pointer modbus
- * @param[in] message   pointer modbus message
+ * @param[in] modbus    pointer to modbus
+ * @param[in] message   pointer to modbus message
  *
  * @return              0 on success, otherwise error
  */
@@ -211,7 +211,7 @@ int modbus_rtu_send_response(modbus_rtu_t *modbus,
                              modbus_rtu_message_t *message);
 
 /**
- * @brief   Copy number bit from src to dst.
+ * @brief   Copy number of bits from src to dst.
  *
  * @param[in] dst            destination
  * @param[in] start_bit_dst  the first bit will be copied to
