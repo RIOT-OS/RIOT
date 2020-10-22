@@ -97,13 +97,18 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-
     printf("test_shell.\n");
 
     /* define buffer to be used by the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
 
     /* define own shell commands */
+    shell_run_once(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
+
+    puts("shell exited");
+
+    /* Restart the shell after the previous one exits, so that we can test
+     * Ctrl-D exit */
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     /* or use only system shell commands */
