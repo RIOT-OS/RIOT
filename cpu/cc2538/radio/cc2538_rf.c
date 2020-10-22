@@ -65,9 +65,11 @@ static const init_pair_t init_table[] = {
     {&RFCORE_XREG_FRMCTRL1,  0x00                     },
     {&RFCORE_XREG_SRCMATCH,  0x00                     },
     {&RFCORE_XREG_FIFOPCTRL, CC2538_RF_MAX_DATA_LEN   },
-    {&RFCORE_XREG_RFIRQM0,   FIFOP | RXPKTDONE        },
 #if IS_USED(MODULE_IEEE802154_RADIO_HAL)
-    {&RFCORE_XREG_RFIRQM1,   TXDONE | CSP_STOP        },
+    {&RFCORE_XREG_RFIRQM0,   FIFOP | RXPKTDONE | SFD  },
+    {&RFCORE_XREG_RFIRQM1,   TXDONE | CSP_STOP | TXACKDONE  },
+#else
+    {&RFCORE_XREG_RFIRQM0,   FIFOP | RXPKTDONE        },
 #endif
     {&RFCORE_XREG_RFERRM,    STROBE_ERR | TXUNDERF | TXOVERF | RXUNDERF | RXOVERF | NLOCK},
     {NULL, 0},
