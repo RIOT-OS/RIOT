@@ -24,7 +24,7 @@
 #include "mutex.h"
 #include "thread.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void cond_init(cond_t *cond)

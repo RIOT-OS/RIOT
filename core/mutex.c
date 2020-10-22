@@ -29,7 +29,7 @@
 #include "irq.h"
 #include "list.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int _mutex_lock(mutex_t *mutex, volatile uint8_t *blocking)
