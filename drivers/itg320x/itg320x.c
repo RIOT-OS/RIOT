@@ -28,17 +28,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if ENABLE_DEBUG
-
 #define DEBUG_DEV(f, d, ...) \
         DEBUG("[itg320x] %s i2c dev=%d addr=%02x: " f "\n", \
               __func__, d->params.dev, d->params.addr, ## __VA_ARGS__);
-
-#else /* ENABLE_DEBUG */
-
-#define DEBUG_DEV(f, d, ...)
-
-#endif /* ENABLE_DEBUG */
 
 #define ERROR_DEV(f, d, ...) \
      do { \
@@ -322,14 +314,14 @@ static int _reg_read(const itg320x_t *dev, uint8_t reg, uint8_t *data, uint16_t 
         return ITG320X_ERROR_I2C;
     }
 
-#if ENABLE_DEBUG
-    printf("[itg320x] %s i2c dev=%d addr=%02x: read %d bytes from reg 0x%02x: ",
-           __func__, dev->params.dev, dev->params.addr, len, reg);
-    for (int i = 0; i < len; i++) {
-         printf("%02x ", data[i]);
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        printf("[itg320x] %s i2c dev=%d addr=%02x: read %d bytes from reg 0x%02x: ",
+            __func__, dev->params.dev, dev->params.addr, len, reg);
+        for (unsigned i = 0; i < len; i++) {
+            printf("%02x ", data[i]);
+        }
+        printf("\n");
     }
-    printf("\n");
-#endif
 
     return ITG320X_OK;
 }
