@@ -85,7 +85,7 @@ void handle_trap(uint32_t mcause)
             case IRQ_M_SOFT:
                 /* Handle software interrupt - flag for context switch */
                 sched_context_switch_request = 1;
-                CLINT_REG(0) = 0;
+                CLINT_REG(CLINT_MSIP) = 0;
                 break;
 
 #ifdef MODULE_PERIPH_TIMER
