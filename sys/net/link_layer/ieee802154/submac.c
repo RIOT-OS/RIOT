@@ -358,13 +358,22 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
         return -ENETDOWN;
     }
 
-    int res = ieee802154_radio_config_phy(dev, &conf);
+    int res;
+    if ((res = ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_TRX_OFF)) < 0) {
+        return res;
+    }
+
+    res = ieee802154_radio_config_phy(dev, &conf);
 
     if (res >= 0) {
         submac->channel_num = channel_num;
         submac->channel_page = channel_page;
         submac->tx_pow = tx_pow;
     }
+    while (ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {}
+
+    ieee802154_radio_request_set_trx_state(dev, submac->state == IEEE802154_STATE_LISTEN ? IEEE802154_TRX_STATE_RX_ON : IEEE802154_TRX_STATE_TRX_OFF);
+    while (ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {}
 
     return res;
 }
