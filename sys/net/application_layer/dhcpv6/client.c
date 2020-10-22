@@ -332,40 +332,43 @@ static inline dhcpv6_opt_t *_opt_next(dhcpv6_opt_t *opt)
 
 static bool _check_status_opt(dhcpv6_opt_status_t *status)
 {
-    /* DHCPV6_STATUS_SUCCESS is 0, so we don't need to fix byte order */
-#if ENABLE_DEBUG
-    if ((status != NULL) && (status->code.u16 != DHCPV6_STATUS_SUCCESS)) {
-        size_t msg_len = byteorder_ntohs(status->len);
-        char msg[msg_len - 1];
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if ((status != NULL) && (status->code.u16 != DHCPV6_STATUS_SUCCESS)) {
+            size_t msg_len = byteorder_ntohs(status->len);
+            char msg[msg_len - 1];
 
-        strncpy(msg, status->msg, msg_len - 2);
-        DEBUG("DHCPv6 client: server returned error (%u) \"%s\"\n",
-              byteorder_ntohs(status->code), msg);
+            strncpy(msg, status->msg, msg_len - 2);
+            DEBUG("DHCPv6 client: server returned error (%u) \"%s\"\n",
+                byteorder_ntohs(status->code), msg);
+        }
     }
-#endif
+
+    /* DHCPV6_STATUS_SUCCESS is 0, so we don't need to fix byte order */
     return (status == NULL) || (status->code.u16 == DHCPV6_STATUS_SUCCESS);
 }
 
 static bool _check_cid_opt(dhcpv6_opt_duid_t *cid)
 {
-#if ENABLE_DEBUG
-    if ((byteorder_ntohs(cid->len) != duid_len) ||
-        (memcmp(cid->duid, duid, duid_len) != 0)) {
-        DEBUG("DHCPv6 client: message is not for me\n");
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if ((byteorder_ntohs(cid->len) != duid_len) ||
+            (memcmp(cid->duid, duid, duid_len) != 0)) {
+            DEBUG("DHCPv6 client: message is not for me\n");
+        }
     }
-#endif
+
     return ((byteorder_ntohs(cid->len) == duid_len) &&
             (memcmp(cid->duid, duid, duid_len) == 0));
 }
 
 static bool _check_sid_opt(dhcpv6_opt_duid_t *sid)
 {
-#if ENABLE_DEBUG
-    if ((byteorder_ntohs(sid->len) != server.duid_len) ||
-        (memcmp(sid->duid, server.duid.u8, server.duid_len) != 0)) {
-        DEBUG("DHCPv6 client: message is not from my server\n");
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if ((byteorder_ntohs(sid->len) != server.duid_len) ||
+            (memcmp(sid->duid, server.duid.u8, server.duid_len) != 0)) {
+            DEBUG("DHCPv6 client: message is not from my server\n");
+        }
     }
-#endif
+
     return ((byteorder_ntohs(sid->len) == server.duid_len) &&
             (memcmp(sid->duid, server.duid.u8, server.duid_len) == 0));
 }

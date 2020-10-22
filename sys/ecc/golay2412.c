@@ -45,14 +45,8 @@
 #include "bitarithm.h"
 #include "ecc/golay2412.h"
 
-#define ENABLE_DEBUG        0
+#define ENABLE_DEBUG 0
 #include "debug.h"
-
-#if ENABLE_DEBUG
-#define DEBUG_FEC_GOLAY2412 (1)
-#else
-#define DEBUG_FEC_GOLAY2412 (0)
-#endif
 
 /* generator matrix transposed [24 x 12] */
 static const uint32_t golay2412_Gt[24] = {
@@ -75,7 +69,6 @@ static const uint32_t golay2412_H[12] = {
     0x00008d1d, 0x00004a3b, 0x00002477, 0x00001ffe
 };
 
-#if DEBUG_FEC_GOLAY2412
 /* print string of bits to standard output */
 static inline void liquid_print_bitstring(uint32_t _x,
                                           uint32_t _n)
@@ -86,7 +79,6 @@ static inline void liquid_print_bitstring(uint32_t _x,
         printf("%" PRIu32, (_x >> (_n - i - 1)) & 1);
     }
 }
-#endif
 
 #ifndef NDEBUG
 static uint32_t block_get_enc_msg_len(uint32_t _dec_msg_len,
@@ -107,16 +99,15 @@ static uint32_t block_get_enc_msg_len(uint32_t _dec_msg_len,
     /* compute total number of bytes out: ceil(num_bits_out/8) */
     uint32_t num_bytes_out = num_bits_out / 8 + ((num_bits_out % 8) ? 1 : 0);
 
-#if DEBUG_FEC_GOLAY2412
-    printf("block_get_enc_msg_len(%" PRIu32 ",%" PRIu32 ",%" PRIu32 ")\n", _dec_msg_len, _m, _k);
-    printf("    dec msg len :   %" PRIu32 " bytes\n", _dec_msg_len);
-    printf("    m           :   %" PRIu32 " bits\n", _m);
-    printf("    k           :   %" PRIu32 " bits\n", _k);
-    printf("    num bits in :   %" PRIu32 " bits\n", num_bits_in);
-    printf("    num blocks  :   %" PRIu32 "\n", num_blocks);
-    printf("    num bits out:   %" PRIu32 " bits\n", num_bits_out);
-    printf("    enc msg len :   %" PRIu32 " bytes\n", num_bytes_out);
-#endif
+    DEBUG("block_get_enc_msg_len(%" PRIu32 ",%" PRIu32 ",%" PRIu32 ")\n",
+          _dec_msg_len, _m, _k);
+    DEBUG("    dec msg len :   %" PRIu32 " bytes\n", _dec_msg_len);
+    DEBUG("    m           :   %" PRIu32 " bits\n", _m);
+    DEBUG("    k           :   %" PRIu32 " bits\n", _k);
+    DEBUG("    num bits in :   %" PRIu32 " bits\n", num_bits_in);
+    DEBUG("    num blocks  :   %" PRIu32 "\n", num_blocks);
+    DEBUG("    num bits out:   %" PRIu32 " bits\n", num_bits_out);
+    DEBUG("    enc msg len :   %" PRIu32 " bytes\n", num_bytes_out);
 
     return num_bytes_out;
 }
@@ -187,84 +178,75 @@ static uint32_t golay2412_decode_symbol(uint32_t _sym_enc,
 
     /* compute syndrome vector, s = r*H^T = ( H*r^T )^T */
     s = golay2412_matrix_mul(_sym_enc, _B, 12);
-#if DEBUG_FEC_GOLAY2412
-    printf("s (syndrome vector): "); liquid_print_bitstring(s, 12); printf("\n");
-#endif
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        printf("s (syndrome vector): ");
+        liquid_print_bitstring(s, 12);
+        printf("\n");
+    }
 
     /* compute weight of s (12 bits) */
     uint8_t ws = bitarithm_bits_set_u32(s & 0x00000fff);
-#if DEBUG_FEC_GOLAY2412
-    printf("w(s) = %u\n", ws);
-#endif
+    DEBUG("w(s) = %u\n", ws);
 
     /* step 2: */
     e_hat = 0;
     if (ws <= 3) {
-#if DEBUG_FEC_GOLAY2412
-        printf("    w(s) <= 3: estimating error vector as [s, 0(12)]\n");
-#endif
+        DEBUG("    w(s) <= 3: estimating error vector as [s, 0(12)]\n");
         /* set e_hat = [s 0(12)] */
         e_hat = (s << 12) & 0xfff000;
     }
     else {
         /* step 3: search for p[i] s.t. w(s+p[i]) <= 2 */
-#if DEBUG_FEC_GOLAY2412
-        printf("    searching for w(s + p_i) <= 2...\n");
-#endif
+        DEBUG("    searching for w(s + p_i) <= 2...\n");
         int8_t s_index = golay2412_parity_search(s, _A);
 
         if (s_index >= 0) {
             /* vector found! */
-#if DEBUG_FEC_GOLAY2412
-            printf("    w(s + p[%2i]) <= 2: estimating error vector as [s+p[%2i],"
-                   "u[%2i]]\n", s_index, s_index, s_index);
-#endif
+            DEBUG("    w(s + p[%2i]) <= 2: estimating error vector as "
+                  "[s+p[%2i],u[%2i]]\n", s_index, s_index, s_index);
+
             /* NOTE : uj = 1 << (12-j-1) */
             e_hat = ((s ^ _A[s_index]) << 12) | (1 << (11 - s_index));
         }
         else {
             /* step 4: compute s*P */
             uint32_t sP = golay2412_matrix_mul(s, _A, 12);
-#if DEBUG_FEC_GOLAY2412
-            printf("s*P: "); liquid_print_bitstring(sP, 12); printf("\n");
-#endif
+
+            if (IS_ACTIVE(ENABLE_DEBUG)) {
+                printf("s*P: ");
+                liquid_print_bitstring(sP, 12);
+                printf("\n");
+            }
 
             /* compute weight of sP (12 bits) */
             uint8_t wsP = bitarithm_bits_set_u32(sP & 0x00000fff);
-#if DEBUG_FEC_GOLAY2412
-            printf("w(s*P) = %u\n", wsP);
-#endif
+            DEBUG("w(s*P) = %u\n", wsP);
 
             if (wsP == 2 || wsP == 3) {
                 /* step 5: set e = [0, s*P] */
-#if DEBUG_FEC_GOLAY2412
-                printf("    w(s*P) in [2,3]: estimating error vector as [0(12), s*P]\n");
-#endif
+                DEBUG("    w(s*P) in [2,3]: estimating error vector as "
+                      "[0(12), s*P]\n");
                 e_hat = sP;
             }
             else {
                 /* step 6: search for p[i] s.t. w(s*P + p[i]) == 2... */
+                DEBUG("    searching for w(s*P + p_i) == 2...\n");
 
-#if DEBUG_FEC_GOLAY2412
-                printf("    searching for w(s*P + p_i) == 2...\n");
-#endif
                 int8_t sP_index = golay2412_parity_search(sP, _A);
 
                 if (sP_index >= 0) {
                     /* vector found! */
-#if DEBUG_FEC_GOLAY2412
-                    printf("    w(s*P + p[%2i]) == 2: estimating error vector as [u[%2i],"
-                           "s*P+p[%2i]]\n", sP_index, sP_index, sP_index);
-#endif
+                    DEBUG("    w(s*P + p[%2i]) == 2: estimating error vector "
+                          "as [u[%2i],s*P+p[%2i]]\n",
+                          sP_index, sP_index, sP_index);
+
                     /* NOTE : uj = 1 << (12-j-1)
                      *      [      uj << 1 2    ] [    sP + p[j]    ] */
                     e_hat = (1L << (23 - sP_index)) | (sP ^ _A[sP_index]);
                 }
                 else {
                     /* step 7: decoding error */
-#if DEBUG_FEC_GOLAY2412
-                    printf("  **** decoding error\n");
-#endif
+                    DEBUG("  **** decoding error\n");
                 }
             }
         }
@@ -272,14 +254,15 @@ static uint32_t golay2412_decode_symbol(uint32_t _sym_enc,
 
     /* step 8: compute estimated transmitted message: v_hat = r + e_hat */
     v_hat = _sym_enc ^ e_hat;
-#if DEBUG_FEC_GOLAY2412
-    printf("r (received vector):            ");
-    liquid_print_bitstring(_sym_enc, 24); printf("\n");
-    printf("e-hat (estimated error vector): ");
-    liquid_print_bitstring(e_hat, 24);    printf("\n");
-    printf("v-hat (estimated tx vector):    ");
-    liquid_print_bitstring(v_hat, 24);    printf("\n");
-#endif
+
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        printf("r (received vector):            ");
+        liquid_print_bitstring(_sym_enc, 24); printf("\n");
+        printf("e-hat (estimated error vector): ");
+        liquid_print_bitstring(e_hat, 24);    printf("\n");
+        printf("v-hat (estimated tx vector):    ");
+        liquid_print_bitstring(v_hat, 24);    printf("\n");
+    }
 
     /* compute estimated original message: (last 12 bits of encoded message) */
     m_hat = v_hat & 0x0fff;

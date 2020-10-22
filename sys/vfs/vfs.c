@@ -31,7 +31,8 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-#if ENABLE_DEBUG
+
+#if IS_ACTIVE(ENABLE_DEBUG)
 /* Since some of these functions are called by printf, we can't really call
  * printf from our functions or we end up in an infinite recursion. */
 #include <unistd.h> /* for STDOUT_FILENO */

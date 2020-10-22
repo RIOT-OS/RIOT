@@ -89,13 +89,13 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
     int ret = -EHOSTUNREACH;
     bool is_all_zeros_addr = true;
 
-#if ENABLE_DEBUG
-    DEBUG("[fib_find_entry] dst =");
-    for (size_t i = 0; i < dst_size; i++) {
-        DEBUG(" %02x", dst[i]);
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        DEBUG("[fib_find_entry] dst =");
+        for (size_t i = 0; i < dst_size; i++) {
+            DEBUG(" %02x", dst[i]);
+        }
+        DEBUG("\n");
     }
-    DEBUG("\n");
-#endif
 
     for (size_t i = 0; i < dst_size; ++i) {
         if (dst[i] != 0) {
@@ -175,15 +175,15 @@ static int fib_find_entry(fib_table_t *table, uint8_t *dst, size_t dst_size,
         }
     }
 
-#if ENABLE_DEBUG
-    if (count > 0) {
-        DEBUG("[fib_find_entry] found prefix on interface %d:", entry_arr[0]->iface_id);
-        for (size_t i = 0; i < entry_arr[0]->global->address_size; i++) {
-            DEBUG(" %02x", entry_arr[0]->global->address[i]);
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if (count > 0) {
+            DEBUG("[fib_find_entry] found prefix on interface %d:", entry_arr[0]->iface_id);
+            for (size_t i = 0; i < entry_arr[0]->global->address_size; i++) {
+                DEBUG(" %02x", entry_arr[0]->global->address[i]);
+            }
+            DEBUG("\n");
         }
-        DEBUG("\n");
     }
-#endif
 
     *entry_arr_size = count;
     return ret;
