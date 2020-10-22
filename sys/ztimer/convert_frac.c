@@ -30,7 +30,7 @@
 #include "ztimer/convert.h"
 #include "ztimer/convert_frac.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**

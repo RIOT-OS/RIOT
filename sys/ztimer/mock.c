@@ -25,7 +25,7 @@
 #include <inttypes.h>
 #include "ztimer/mock.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* Functions for controlling the mock clock below */

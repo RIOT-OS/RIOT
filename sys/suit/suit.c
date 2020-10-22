@@ -31,7 +31,7 @@
 #include "suit/policy.h"
 #include "suit.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int suit_parse(suit_manifest_t *manifest, const uint8_t *buf,

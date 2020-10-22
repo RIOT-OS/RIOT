@@ -21,7 +21,7 @@
 #include "frac.h"
 #include "bitarithm.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 uint32_t gcd32(uint32_t u, uint32_t v)

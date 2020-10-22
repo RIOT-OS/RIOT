@@ -21,7 +21,7 @@
 
 #include "net/gnrc/icmpv6/error.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* all error messages are basically the same size and format */

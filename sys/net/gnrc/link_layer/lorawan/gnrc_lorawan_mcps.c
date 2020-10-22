@@ -26,7 +26,7 @@
 
 #include "random.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG      0
 #include "debug.h"
 
 #define _16_UPPER_BITMASK 0xFFFF0000

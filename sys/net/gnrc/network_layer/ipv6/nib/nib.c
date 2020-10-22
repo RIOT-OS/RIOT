@@ -40,8 +40,9 @@
 #include "_nib-6lr.h"
 #include "_nib-slaac.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
+
 #if ENABLE_DEBUG
 #include "evtimer.h"
 #endif

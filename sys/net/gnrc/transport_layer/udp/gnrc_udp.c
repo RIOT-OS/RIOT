@@ -31,8 +31,7 @@
 #include "net/gnrc/icmpv6/error.h"
 #include "net/inet_csum.h"
 
-
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**

@@ -22,7 +22,7 @@
 
 #include "color.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void color_rgb2hsv(color_rgb_t *rgb, color_hsv_t *hsv)

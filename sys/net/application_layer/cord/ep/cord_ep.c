@@ -34,7 +34,7 @@
 #include "net/cord/ep_standalone.h"
 #endif
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define FLAG_SUCCESS        (0x0001)

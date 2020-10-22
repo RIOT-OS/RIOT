@@ -24,7 +24,7 @@
 #include "periph/rtc.h"
 #include "ztimer/periph_rtc.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* this algorithm and the one from _timestamp_to_gmt_civil() have been adapted from

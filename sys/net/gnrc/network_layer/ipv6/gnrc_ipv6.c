@@ -37,12 +37,15 @@
 #include "net/gnrc/ipv6/ext/frag.h"
 #endif
 
+#ifdef MODULE_FIB
+#include "net/fib.h"
+#include "net/fib/table.h"
+#endif
+
 #include "net/gnrc/ipv6.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
-
-#define _MAX_L2_ADDR_LEN    (8U)
 
 #if ENABLE_DEBUG
 static char _stack[GNRC_IPV6_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
@@ -50,9 +53,9 @@ static char _stack[GNRC_IPV6_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
 static char _stack[GNRC_IPV6_STACK_SIZE];
 #endif
 
+#define _MAX_L2_ADDR_LEN    (8U)
+
 #ifdef MODULE_FIB
-#include "net/fib.h"
-#include "net/fib/table.h"
 /**
  * @brief buffer to store the entries in the IPv6 forwarding table
  */

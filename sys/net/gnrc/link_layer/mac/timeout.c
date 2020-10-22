@@ -24,7 +24,7 @@
 #include "net/gnrc.h"
 #include "net/gnrc/mac/timeout.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void gnrc_mac_init_timeouts(gnrc_mac_timeout_t *mac_timeout,

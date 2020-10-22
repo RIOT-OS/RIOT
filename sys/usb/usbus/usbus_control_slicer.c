@@ -23,7 +23,7 @@
 #include "usb/usbus.h"
 #include "usb/usbus/control.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int usbus_control_slicer_nextslice(usbus_t *usbus)

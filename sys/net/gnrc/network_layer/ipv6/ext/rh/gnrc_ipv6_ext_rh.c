@@ -28,7 +28,7 @@
 
 #include "net/gnrc/ipv6/ext/rh.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* unchecked precondition: hdr is gnrc_pktsnip_t::data of the

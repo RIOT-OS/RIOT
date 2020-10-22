@@ -36,7 +36,7 @@
 #error "[skald] error: unable to find any netdev-ble capable radio"
 #endif
 
-#define ENABLE_DEBUG            (0)
+#define ENABLE_DEBUG            0
 #include "debug.h"
 
 #define JITTER_MIN              (0U)            /* 0ms */

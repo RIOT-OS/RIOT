@@ -27,7 +27,7 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netapi.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int _gnrc_netapi_get_set(kernel_pid_t pid, netopt_t opt, uint16_t context,

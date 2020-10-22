@@ -23,7 +23,7 @@
 #include "assert.h"
 #include "net/l2filter.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static inline bool match(const l2filter_t *filter,

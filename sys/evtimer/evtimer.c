@@ -27,7 +27,7 @@
 
 #include "evtimer.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void _add_event_to_list(evtimer_t *evtimer, evtimer_event_t *event)

@@ -22,7 +22,7 @@
 #include <malloc.h>
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 typedef struct __pthread_tls_datum {

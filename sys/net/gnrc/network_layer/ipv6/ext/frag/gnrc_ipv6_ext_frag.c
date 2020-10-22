@@ -31,7 +31,7 @@
 
 #include "net/gnrc/ipv6/ext/frag.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static gnrc_ipv6_ext_frag_send_t _snd_bufs[CONFIG_GNRC_IPV6_EXT_FRAG_SEND_SIZE];

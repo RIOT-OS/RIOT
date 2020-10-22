@@ -26,7 +26,7 @@
 #include "uuid.h"
 #include "luid.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define SUIT_DEVID_BYTES 32

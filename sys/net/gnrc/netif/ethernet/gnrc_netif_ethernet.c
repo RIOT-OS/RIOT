@@ -25,7 +25,7 @@
 #include "net/ipv6/hdr.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #if defined(MODULE_OD) && ENABLE_DEBUG

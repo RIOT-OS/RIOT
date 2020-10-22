@@ -24,7 +24,7 @@
 #include "periph/pm.h"
 #include "pm_layered.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef PM_NUM_MODES

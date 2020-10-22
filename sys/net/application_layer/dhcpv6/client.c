@@ -26,7 +26,7 @@
 #include "xtimer.h"
 #include "xtimer/implementation.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #include "_dhcpv6.h"
