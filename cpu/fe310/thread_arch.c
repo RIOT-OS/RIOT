@@ -180,8 +180,10 @@ void thread_yield_higher(void)
     /* Use SW intr to schedule context switch */
     CLINT_REG(CLINT_MSIP) = 1;
 
-    /* Latency of SW intr can be 4-7 cycles; wait for the SW intr */
-    __asm__ volatile ("wfi");
+    /* Latency of SW intr can be a few cycles; wait for the SW intr.
+     * We cannot use WFI here as the SW intr may be delivered before we
+     * reach the WFI instruction, thereby causing a thread deadlock. */
+    while (CLINT_REG(CLINT_MSIP) == 1) {};
 }
 
 /**
