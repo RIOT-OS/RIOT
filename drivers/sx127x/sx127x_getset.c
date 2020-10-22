@@ -34,7 +34,7 @@
 #include "sx127x_registers.h"
 #include "sx127x_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 uint8_t sx127x_get_state(const sx127x_t *dev)

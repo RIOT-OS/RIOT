@@ -24,7 +24,7 @@
 #include "ltc4150.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void pulse_cb(void *_dev)

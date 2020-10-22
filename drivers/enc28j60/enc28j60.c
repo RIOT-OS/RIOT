@@ -31,7 +31,7 @@
 #include "enc28j60.h"
 #include "enc28j60_regs.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
 #define SPI_BUS         (dev->p.spi)

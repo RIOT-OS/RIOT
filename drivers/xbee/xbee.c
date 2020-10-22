@@ -33,55 +33,55 @@
 #include "net/gnrc.h"
 #endif
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG            0
 #include "debug.h"
 
 /**
  * @brief   Internal driver event type when RX is finished
  */
-#define ISR_EVENT_RX_DONE           (0x0001)
+#define ISR_EVENT_RX_DONE       (0x0001)
 
 /**
  * @brief   Delay when entering command mode, must be > 1s
  */
-#define ENTER_CMD_MODE_DELAY        (1100UL * US_PER_MS)
+#define ENTER_CMD_MODE_DELAY    (1100UL * US_PER_MS)
 /**
  * @brief   Delay when resetting the device, 10ms
  */
-#define RESET_DELAY                 (10UL * US_PER_MS)
+#define RESET_DELAY             (10UL * US_PER_MS)
 
 /**
  * @brief   Timeout for receiving AT command response
  */
-#define RESP_TIMEOUT_USEC           (US_PER_SEC)
+#define RESP_TIMEOUT_USEC       (US_PER_SEC)
 
 /**
  * @brief   Start delimiter in API frame mode
  */
-#define API_START_DELIMITER         (0x7e)
+#define API_START_DELIMITER     (0x7e)
 
 /**
  * @brief   Command IDs when communicating in API frame mode
  * @{
  */
-#define API_ID_MODEM_STATUS         (0x8a)  /**< modem status frame */
-#define API_ID_AT                   (0x08)  /**< AT command request frame */
-#define API_ID_AT_QUEUE             (0x09)  /**< queued AT command frame */
-#define API_ID_AT_RESP              (0x88)  /**< AT command response frame */
-#define API_ID_TX_LONG_ADDR         (0x00)  /**< TX frame (long address) */
-#define API_ID_TX_SHORT_ADDR        (0x01)  /**< TX frame (short address) */
-#define API_ID_TX_RESP              (0x89)  /**< TX response frame */
-#define API_ID_RX_LONG_ADDR         (0x80)  /**< RX frame (long address) */
-#define API_ID_RX_SHORT_ADDR        (0x81)  /**< RX frame (short address) */
+#define API_ID_MODEM_STATUS     (0x8a)  /**< modem status frame */
+#define API_ID_AT               (0x08)  /**< AT command request frame */
+#define API_ID_AT_QUEUE         (0x09)  /**< queued AT command frame */
+#define API_ID_AT_RESP          (0x88)  /**< AT command response frame */
+#define API_ID_TX_LONG_ADDR     (0x00)  /**< TX frame (long address) */
+#define API_ID_TX_SHORT_ADDR    (0x01)  /**< TX frame (short address) */
+#define API_ID_TX_RESP          (0x89)  /**< TX response frame */
+#define API_ID_RX_LONG_ADDR     (0x80)  /**< RX frame (long address) */
+#define API_ID_RX_SHORT_ADDR    (0x81)  /**< RX frame (short address) */
 /** @} */
 
 /**
  * @brief   Internal option flags (to be expanded if needed)
  * @{
  */
-#define OPT_DIS_AUTO_ACK            (0x01)  /**< disable sending of auto ACKs */
-#define OPT_BCAST_ADDR              (0x02)  /**< address broadcast */
-#define OPT_BCAST_PAN               (0x04)  /**< PAN broadcast */
+#define OPT_DIS_AUTO_ACK        (0x01)  /**< disable sending of auto ACKs */
+#define OPT_BCAST_ADDR          (0x02)  /**< address broadcast */
+#define OPT_BCAST_PAN           (0x04)  /**< PAN broadcast */
 /** @} */
 
 /**

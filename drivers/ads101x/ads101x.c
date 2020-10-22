@@ -28,7 +28,7 @@
 #include "ads101x_params.h"
 #include "ads101x_regs.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef ADS101X_READ_DELAY

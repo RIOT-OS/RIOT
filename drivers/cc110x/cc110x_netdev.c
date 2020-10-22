@@ -33,7 +33,7 @@
 #include "cc110x.h"
 #include "cc110x_internal.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static int cc110x_init(netdev_t *netdev);

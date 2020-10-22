@@ -25,7 +25,7 @@
 #include "pcd8544.h"
 #include "pcd8544_internal.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define ASCII_MIN           0x20    /**< start of ASCII table */

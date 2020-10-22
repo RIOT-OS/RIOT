@@ -34,7 +34,7 @@
 #include "sx127x_internal.h"
 #include "sx127x_params.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 

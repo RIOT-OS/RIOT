@@ -29,7 +29,7 @@
 #include "scd30.h"
 #include "scd30_internal.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define SCD30_I2C           (dev->params.i2c_dev)

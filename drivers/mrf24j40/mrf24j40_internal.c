@@ -26,7 +26,7 @@
 #include "mrf24j40_registers.h"
 #include "kernel_defines.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define SPIDEV          (dev->params.spi)

@@ -26,7 +26,7 @@
 #include "ili9341.h"
 #include "ili9341_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void _ili9341_spi_acquire(const ili9341_t *dev)

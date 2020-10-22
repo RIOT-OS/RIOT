@@ -24,7 +24,7 @@
 #include "kw2xrf_intern.h"
 #include "overwrites.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void kw2xrf_disable_interrupts(kw2xrf_t *dev)

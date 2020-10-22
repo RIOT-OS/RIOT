@@ -28,7 +28,7 @@
 #include "periph/i2c.h"
 #include "periph/spi.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG                0
 #include "debug.h"
 
 #define PN532_I2C_ADDRESS           (0x24)

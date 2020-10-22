@@ -23,7 +23,7 @@
 #include "atwinc15x0_internal.h"
 #include "bus_wrapper/include/nm_bus_wrapper.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define NM_BUS_MAX_TRX_SZ   256

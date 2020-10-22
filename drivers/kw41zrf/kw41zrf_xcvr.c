@@ -52,7 +52,7 @@
 #include "vendor/XCVR/MKW41Z4/fsl_xcvr.h"
 #include "vendor/XCVR/MKW41Z4/ifr_radio.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* The implementations for these functions are taken from the vendor-provided

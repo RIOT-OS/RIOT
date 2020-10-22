@@ -26,7 +26,7 @@
 
 #include "net/netdev/ieee802154.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void netdev_ieee802154_reset(netdev_ieee802154_t *dev)

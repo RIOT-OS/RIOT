@@ -27,7 +27,7 @@
 #include "ina3221_params.h"
 #include "ina3221_regs.h"
 #include "ina3221.h"
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 typedef struct {

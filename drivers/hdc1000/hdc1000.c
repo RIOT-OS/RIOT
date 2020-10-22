@@ -28,7 +28,7 @@
 #include "periph/i2c.h"
 #include "hdc1000.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static int16_t temp_cached, hum_cached;

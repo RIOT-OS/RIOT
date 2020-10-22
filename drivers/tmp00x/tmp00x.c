@@ -37,8 +37,7 @@
 #include "kernel_defines.h"
 #include "xtimer.h"
 
-
-#define ENABLE_DEBUG                (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int tmp00x_init(tmp00x_t *dev, const tmp00x_params_t *params)

@@ -28,7 +28,7 @@
 #include "bmx055.h"
 #include "bmx055_internal.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
 #define BUS             (dev->p.i2c)

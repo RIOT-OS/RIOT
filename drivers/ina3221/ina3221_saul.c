@@ -22,10 +22,11 @@
 #include "phydat.h"
 #include "saul.h"
 #include "ina3221.h"
-#define ENABLE_DEBUG    (0)
+
+#define ENABLE_DEBUG            0
 #include "debug.h"
 
-#define SAUL_INA3221_NO_VALUE (0)
+#define SAUL_INA3221_NO_VALUE   (0)
 
 static int read_bus_voltage(const void *dev, phydat_t *res)
 {

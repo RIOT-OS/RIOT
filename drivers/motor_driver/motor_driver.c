@@ -26,7 +26,7 @@
 #include <log.h>
 #include <motor_driver.h>
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include <debug.h>
 
 int motor_driver_init(motor_driver_t motor_driver)

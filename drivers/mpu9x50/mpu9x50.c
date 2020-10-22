@@ -27,7 +27,7 @@
 #include "xtimer.h"
 #include "byteorder.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define REG_RESET           (0x00)

@@ -26,7 +26,7 @@
 #include "ph_oem_params.h"
 #include "ph_oem_regs.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define DEV_I2C (dev->params.i2c)

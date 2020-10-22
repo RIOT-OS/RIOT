@@ -34,7 +34,7 @@
 #include "mrf24j40_internal.h"
 #include "mrf24j40_registers.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void _irq_handler(void *arg)

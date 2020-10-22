@@ -27,7 +27,7 @@
 #include "periph/gpio.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void ds18_low(const ds18_t *dev)

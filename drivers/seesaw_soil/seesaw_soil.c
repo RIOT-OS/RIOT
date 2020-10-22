@@ -26,7 +26,7 @@
 #include "periph/i2c.h"
 #include "seesaw_soil.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static int _seesaw_read_regs(const seesaw_soil_t *dev, uint16_t reg_addr, void* data, size_t len) {

@@ -28,7 +28,7 @@
 #include "adxl345_regs.h"
 #include "adxl345_params.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG                0
 #include "debug.h"
 
 #define ADXL345_BUS                 (dev->params.i2c)

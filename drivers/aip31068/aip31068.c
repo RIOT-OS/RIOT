@@ -23,7 +23,7 @@
 #include "aip31068_regs.h"
 #include "aip31068_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**

@@ -31,7 +31,7 @@
 #include "mma8x5x.h"
 #include "mma8x5x_regs.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define BUS                 (dev->params.i2c)

@@ -35,7 +35,7 @@
 #include "cc2420_internal.h"
 #include "cc2420_registers.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static int _send(netdev_t *netdev, const iolist_t *iolist);

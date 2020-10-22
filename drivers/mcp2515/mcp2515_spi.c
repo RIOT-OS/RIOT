@@ -28,7 +28,7 @@
 #include "xtimer.h"
 #include "irq.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int mcp2515_spi_init(const candev_mcp2515_t *dev)

@@ -27,7 +27,7 @@
 #include "mrf24j40_netdev.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void mrf24j40_setup(mrf24j40_t *dev, const mrf24j40_params_t *params, uint8_t index)

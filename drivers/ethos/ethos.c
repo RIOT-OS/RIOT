@@ -43,7 +43,7 @@
 extern isrpipe_t stdio_uart_isrpipe;
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void _get_mac_addr(netdev_t *dev, uint8_t* buf);

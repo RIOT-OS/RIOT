@@ -31,7 +31,7 @@
 #include "thread.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int dfplayer_init(dfplayer_t *dev, const dfplayer_params_t *params)

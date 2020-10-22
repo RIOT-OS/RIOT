@@ -17,7 +17,7 @@
 #include "periph/uart.h"
 #include "event/thread.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef AT_PRINT_INCOMING

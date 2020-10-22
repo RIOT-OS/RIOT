@@ -31,7 +31,7 @@
 #include "srf08.h"
 #include "srf08_params.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define SRF08_DEV_I2C       (dev->params.i2c)

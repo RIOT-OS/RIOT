@@ -22,7 +22,7 @@
 #include "tps6274x.h"
 #include "periph/gpio.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int tps6274x_init(tps6274x_t *dev, const tps6274x_params_t *params)

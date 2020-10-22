@@ -32,7 +32,7 @@
 #include "w5100.h"
 #include "w5100_regs.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define SPI_CONF            SPI_MODE_0
