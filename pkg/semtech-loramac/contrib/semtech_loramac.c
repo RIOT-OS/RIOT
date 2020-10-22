@@ -47,7 +47,7 @@
 #include "periph/eeprom.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define SEMTECH_LORAMAC_MSG_QUEUE                   (4U)

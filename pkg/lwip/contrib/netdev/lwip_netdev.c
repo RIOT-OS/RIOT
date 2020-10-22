@@ -37,7 +37,7 @@
 #include "utlist.h"
 #include "thread.h"
 
-#define ENABLE_DEBUG                (0)
+#define ENABLE_DEBUG                0
 #include "debug.h"
 
 #define LWIP_NETDEV_NAME            "lwip_netdev_mux"

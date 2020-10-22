@@ -31,7 +31,7 @@
 #include "host/ble_hs.h"
 #include "nimble/nimble_port.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
 #if defined(MODULE_NIMBLE_AUTOCONN_IPSP)

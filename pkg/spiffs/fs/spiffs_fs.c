@@ -28,7 +28,7 @@
 
 #include "kernel_defines.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include <debug.h>
 
 static int spiffs_err_to_errno(s32_t err);

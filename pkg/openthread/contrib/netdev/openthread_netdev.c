@@ -30,7 +30,7 @@
 #include "ot.h"
 #include "event.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static otInstance *sInstance;   /**< global OpenThread instance */

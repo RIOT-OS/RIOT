@@ -26,7 +26,7 @@
 
 #include "LoRaMac.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void semtech_loramac_set_deveui(semtech_loramac_t *mac, const uint8_t *eui)

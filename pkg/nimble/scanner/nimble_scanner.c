@@ -26,7 +26,7 @@
 
 #include "host/ble_gap.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static nimble_scanner_cb _disc_cb = NULL;

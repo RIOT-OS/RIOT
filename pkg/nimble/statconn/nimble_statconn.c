@@ -27,7 +27,7 @@
 
 #include "host/ble_hs.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
 #define UNUSED          (0x00)

@@ -26,7 +26,7 @@
 
 #include "nimble_scanlist.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static nimble_scanlist_entry_t _mem[NIMBLE_SCANLIST_SIZE];
