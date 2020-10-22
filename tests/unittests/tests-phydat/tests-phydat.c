@@ -27,7 +27,7 @@
 
 #include "phydat.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* Default is smaller implementation */

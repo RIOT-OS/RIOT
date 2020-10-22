@@ -12,7 +12,7 @@
 
 #include "div.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static const uint32_t u32_test_values[] = {

@@ -20,7 +20,7 @@
 #include "embUnit.h"
 #include "yxml.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static char _yxml_buf[1024];

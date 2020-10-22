@@ -17,7 +17,7 @@
 #include <stddef.h>
 #include "periph/rtt.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static uint32_t counter, alarm;
