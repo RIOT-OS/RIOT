@@ -40,7 +40,7 @@
 #include "esp_now_params.h"
 #include "esp_now_netdev.h"
 
-#define ENABLE_DEBUG             (0)
+#define ENABLE_DEBUG             0
 #include "debug.h"
 
 #define ESP_NOW_UNICAST          (1)

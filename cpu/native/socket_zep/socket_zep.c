@@ -32,7 +32,7 @@
 
 #include "socket_zep.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG            0
 #include "debug.h"
 
 #define _UNIX_NTP_ERA_OFFSET    (2208988800U)

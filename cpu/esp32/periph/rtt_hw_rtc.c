@@ -33,7 +33,7 @@
 #include "syscalls.h"
 #include "timex.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define RTC_CLK_CAL_FRACT       19  /* fractional bits of calibration value */

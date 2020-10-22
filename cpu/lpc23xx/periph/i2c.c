@@ -33,7 +33,7 @@
 #include "thread.h"
 #include "mutex.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #if I2C_NUMOF > 0

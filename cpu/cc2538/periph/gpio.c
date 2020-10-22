@@ -28,7 +28,7 @@
 #include "bitarithm.h"
 #include "periph/gpio.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define MODE_NOTSUP         (0xff)

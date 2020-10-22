@@ -23,7 +23,7 @@
 #include <ctype.h>
 #include "clk_conf.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #if ENABLE_DEBUG
 #define DEBUG(...) fprintf(stderr, __VA_ARGS__)
 #else

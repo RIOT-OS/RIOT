@@ -19,7 +19,7 @@
 #include "xtimer.h"
 #include "diskio.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* --- MCI configurations --- */

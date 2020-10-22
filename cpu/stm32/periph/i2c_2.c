@@ -48,7 +48,7 @@
 #include "periph_conf.h"
 
 /* Some DEBUG statements may cause delays that alter i2c functionality */
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define TICK_TIMEOUT        (0xFFFF)

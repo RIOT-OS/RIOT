@@ -22,7 +22,7 @@
  * WARNING! enable debugging will have timing side effects and can lead
  * to timer underflows, system crashes or system dead locks in worst case.
  */
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #include "periph/timer.h"

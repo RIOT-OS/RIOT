@@ -33,7 +33,7 @@
 #include "net/netdev/eth.h"
 #include "periph/gpio.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #if IS_USED(MODULE_STM32_ETH_LINK_UP)

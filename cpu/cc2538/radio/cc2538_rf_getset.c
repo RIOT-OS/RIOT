@@ -23,7 +23,7 @@
 
 #include "cc2538_rf.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* static const __flash uint8_t? */

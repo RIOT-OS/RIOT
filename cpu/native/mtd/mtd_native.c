@@ -24,7 +24,7 @@
 
 #include "native_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static int _init(mtd_dev_t *dev)

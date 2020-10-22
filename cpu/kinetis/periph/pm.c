@@ -23,7 +23,7 @@
 
 #include "periph/pm.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* Set to 1 to use the LEDx macros to show which sleep mode is entered */

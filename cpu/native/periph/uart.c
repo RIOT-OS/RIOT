@@ -31,7 +31,7 @@
 #include "native_internal.h"
 #include "async_read.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**

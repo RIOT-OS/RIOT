@@ -37,7 +37,7 @@
  * is able to interfere with USB functionality and you might see different
  * errors than debug disabled
  */
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #if defined(STM32_USB_OTG_FS_ENABLED) && defined(STM32_USB_OTG_HS_ENABLED)

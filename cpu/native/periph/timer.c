@@ -48,7 +48,7 @@
 #include "native_internal.h"
 #include "periph/timer.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define NATIVE_TIMER_SPEED 1000000

@@ -25,7 +25,7 @@
 #include "periph_conf.h"
 #include "mutex.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* The SAMD5x/SAME5x family has two ADCs: ADC0 and ADC1.

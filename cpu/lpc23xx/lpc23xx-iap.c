@@ -26,7 +26,7 @@
 #include "iap.h"
 #include "lpc23xx.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* pointer to reserved flash rom section for configuration data */

@@ -24,7 +24,7 @@
 #include "cpu.h"
 #include "periph/eeprom.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 size_t eeprom_read(uint32_t pos, void *data, size_t len)

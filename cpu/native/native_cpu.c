@@ -59,7 +59,7 @@ extern netdev_tap_t netdev_tap;
 
 #include "native_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 ucontext_t end_context;

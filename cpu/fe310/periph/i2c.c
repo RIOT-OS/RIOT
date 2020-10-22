@@ -33,7 +33,7 @@
 #include "vendor/platform.h"
 #include "vendor/prci_driver.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define I2C_BUSY_TIMEOUT    (0xffff)

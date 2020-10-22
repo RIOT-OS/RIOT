@@ -29,8 +29,13 @@
 
 #include "vendor/spi.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
+
+#define SPI_CLK_NUMOF       ARRAY_SIZE(_spi_clks)
+
+/* DIV_UP is division which rounds up instead of down */
+#define SPI_DIV_UP(a, b)    (((a) + ((b) - 1)) / (b))
 
 static const uint32_t _spi_clks[] = {
     100000,
@@ -40,12 +45,7 @@ static const uint32_t _spi_clks[] = {
     10000000,
 };
 
-#define SPI_CLK_NUMOF       ARRAY_SIZE(_spi_clks)
-
 static uint32_t _spi_clks_config[SPI_CLK_NUMOF] = { 0 };
-
-/* DIV_UP is division which rounds up instead of down */
-#define SPI_DIV_UP(a,b) (((a) + ((b) - 1)) / (b))
 
 /**
  * @brief   Allocation device locks

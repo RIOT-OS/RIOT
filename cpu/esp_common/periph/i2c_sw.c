@@ -26,7 +26,7 @@
    described in [wikipedia](https://en.wikipedia.org/wiki/I%C2%B2C#Example_of_bit-banging_the_I%C2%B2C_master_protocol).
 */
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #include <assert.h>

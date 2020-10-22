@@ -33,7 +33,7 @@
 #include "gpiodev_linux.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void pm_set_lowest(void)

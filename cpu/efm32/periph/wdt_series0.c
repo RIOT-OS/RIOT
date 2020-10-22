@@ -31,7 +31,7 @@
 
 #include "timex.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static WDOG_PeriodSel_TypeDef _get_prescaler(uint32_t max_time)

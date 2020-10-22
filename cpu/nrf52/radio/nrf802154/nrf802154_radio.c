@@ -29,7 +29,7 @@
 #include "nrf802154.h"
 #include "net/ieee802154/radio.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define ED_RSSISCALE        (4U)    /**< RSSI scale for internal HW value */

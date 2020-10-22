@@ -30,7 +30,7 @@
 #include "periph/timer.h"
 #include "periph_conf.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define LOAD_VALUE_16_BIT       (UINT16_MAX)
