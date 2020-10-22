@@ -30,7 +30,7 @@
 #define CLOCK_HSE               MHZ(16)
 
 #include "periph_cpu.h"
-#include "f2f4f7/cfg_clock_default_180.h"
+#include "clk_conf.h"
 
 #ifdef __cplusplus
 extern "C" {

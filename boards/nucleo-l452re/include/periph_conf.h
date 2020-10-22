@@ -31,7 +31,7 @@
 #endif
 
 #include "periph_cpu.h"
-#include "l4/cfg_clock_default.h"
+#include "clk_conf.h"
 #include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
