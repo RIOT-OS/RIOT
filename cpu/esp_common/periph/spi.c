@@ -488,15 +488,15 @@ void IRAM_ATTR spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         return;
     }
 
-    #if ENABLE_DEBUG
-    if (out) {
-        DEBUG("out = ");
-        for (size_t i = 0; i < len; i++) {
-            DEBUG("%02x ", ((const uint8_t *)out)[i]);
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if (out) {
+            DEBUG("out = ");
+            for (size_t i = 0; i < len; i++) {
+                DEBUG("%02x ", ((const uint8_t *)out)[i]);
+            }
+            DEBUG("\n");
         }
-        DEBUG("\n");
     }
-    #endif
 
     if (cs != SPI_CS_UNDEF) {
         gpio_clear(cs);
@@ -524,13 +524,13 @@ void IRAM_ATTR spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
         gpio_set (cs);
     }
 
-    #if ENABLE_DEBUG
-    if (in) {
-        DEBUG("in = ");
-        for (size_t i = 0; i < len; i++) {
-            DEBUG("%02x ", ((const uint8_t *)in)[i]);
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        if (in) {
+            DEBUG("in = ");
+            for (size_t i = 0; i < len; i++) {
+                DEBUG("%02x ", ((const uint8_t *)in)[i]);
+            }
+            DEBUG("\n");
         }
-        DEBUG("\n");
     }
-    #endif
 }

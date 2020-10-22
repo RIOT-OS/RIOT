@@ -167,30 +167,30 @@ NORETURN void IRAM call_start_cpu0 (void)
                 rtc_clk_apb_freq_get(), rtc_clk_xtal_freq_get()*MHZ,
                 rtc_clk_slow_freq_get_hz());
 
-    #if ENABLE_DEBUG
-    ets_printf("reset reason: %d\n", reset_reason);
-    ets_printf("_stack      %p\n", sp);
-    ets_printf("_bss_start  %p\n", &_bss_start);
-    ets_printf("_bss_end    %p\n", &_bss_end);
-    #ifndef MODULE_ESP_IDF_HEAP
-    ets_printf("_heap_start %p\n", &_sheap);
-    ets_printf("_heap_end   %p\n", &_eheap);
-    ets_printf("_heap_free  %u\n", get_free_heap_size());
-    #endif /* MODULE_ESP_IDF_HEAP */
-    #endif /* ENABLE_DEBUG */
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        ets_printf("reset reason: %d\n", reset_reason);
+        ets_printf("_stack      %p\n", sp);
+        ets_printf("_bss_start  %p\n", &_bss_start);
+        ets_printf("_bss_end    %p\n", &_bss_end);
+        if (!IS_ACTIVE(MODULE_ESP_IDF_HEAP)) {
+            ets_printf("_heap_start %p\n", &_sheap);
+            ets_printf("_heap_end   %p\n", &_eheap);
+            ets_printf("_heap_free  %u\n", get_free_heap_size());
+        }
+    }
 
     LOG_STARTUP("PRO cpu is up (single core mode, only PRO cpu is used)\n");
 
     /* disable APP cpu */
     DPORT_CLEAR_PERI_REG_MASK(DPORT_APPCPU_CTRL_B_REG, DPORT_APPCPU_CLKGATE_EN);
 
-    #ifdef MODULE_ESP_IDF_HEAP
-    /* init heap */
-    heap_caps_init();
-    #if ENABLE_DEBUG
-    ets_printf("Heap free: %u byte\n", get_free_heap_size());
-    #endif /* ENABLE_DEBUG */
-    #endif /* MODULE_ESP_IDF_HEAP */
+    if (IS_ACTIVE(MODULE_ESP_IDF_HEAP)) {
+        /* init heap */
+        heap_caps_init();
+        if (IS_ACTIVE(ENABLE_DEBUG)) {
+            ets_printf("Heap free: %u byte\n", get_free_heap_size());
+        }
+    }
 
     /* init SPI RAM if enabled */
     #if CONFIG_SPIRAM_SUPPORT && CONFIG_SPIRAM_BOOT_INIT

@@ -24,7 +24,7 @@
 #include "esp_heap_trace.h"
 #include "priv/esp_heap_caps_priv.h"
 
-#if ENABLE_DEBUG
+#if IS_ACTIVE(ENABLE_DEBUG)
 #define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
 #endif
 

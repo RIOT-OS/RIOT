@@ -44,9 +44,6 @@
 #include "native_internal.h"
 
 #define ENABLE_DEBUG 0
-#if ENABLE_DEBUG
-#define LOCAL_DEBUG (1)
-#endif
 #include "debug.h"
 
 ssize_t (*real_read)(int fd, void *buf, size_t count);
@@ -109,16 +106,18 @@ int (*real_clock_gettime)(clockid_t clk_id, struct timespec *tp);
 void _native_syscall_enter(void)
 {
     _native_in_syscall++;
-#if LOCAL_DEBUG
-    real_write(STDERR_FILENO, "> _native_in_syscall\n", 21);
-#endif
+
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        real_write(STDERR_FILENO, "> _native_in_syscall\n", 21);
+    }
 }
 
 void _native_syscall_leave(void)
 {
-#if LOCAL_DEBUG
-    real_write(STDERR_FILENO, "< _native_in_syscall\n", 21);
-#endif
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        real_write(STDERR_FILENO, "< _native_in_syscall\n", 21);
+    }
+
     _native_in_syscall--;
     if (
             (_native_sigpend > 0)

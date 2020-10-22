@@ -316,13 +316,14 @@ unsigned int IRAM timer_read(tim_t dev)
 {
     CHECK_PARAM_RET (dev < HW_TIMER_NUMOF, -1);
 
-    #if ENABLE_DEBUG
-    uint32_t count_lo = timer_get_counter_lo(dev);
-    DEBUG("%s %u\n", __func__, count_lo);
-    return count_lo;
-    #else
-    return timer_get_counter_lo(dev);
-    #endif
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        uint32_t count_lo = timer_get_counter_lo(dev);
+        DEBUG("%s %u\n", __func__, count_lo);
+        return count_lo;
+    }
+    else {
+        return timer_get_counter_lo(dev);
+    }
 }
 
 void IRAM timer_start(tim_t dev)
