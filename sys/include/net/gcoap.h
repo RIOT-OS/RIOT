@@ -459,10 +459,11 @@ extern "C" {
  * @{
  */
 #define GCOAP_MEMO_UNUSED       (0)     /**< This memo is unused */
-#define GCOAP_MEMO_WAIT         (1)     /**< Request sent; awaiting response */
-#define GCOAP_MEMO_RESP         (2)     /**< Got response */
-#define GCOAP_MEMO_TIMEOUT      (3)     /**< Timeout waiting for response */
-#define GCOAP_MEMO_ERR          (4)     /**< Error processing response packet */
+#define GCOAP_MEMO_RETRANSMIT   (1)     /**< Request sent, retransmitting until response arrives */
+#define GCOAP_MEMO_WAIT         (2)     /**< Request sent; awaiting response */
+#define GCOAP_MEMO_RESP         (3)     /**< Got response */
+#define GCOAP_MEMO_TIMEOUT      (4)     /**< Timeout waiting for response */
+#define GCOAP_MEMO_ERR          (5)     /**< Error processing response packet */
 /** @} */
 
 /**

@@ -41,6 +41,9 @@
 #define GCOAP_RESOURCE_WRONG_METHOD -1
 #define GCOAP_RESOURCE_NO_PATH -2
 
+/* Sentinel value indicating that no immediate response is required */
+#define NO_IMMEDIATE_REPLY (-1)
+
 /* End of the range to pick a random timeout */
 #define TIMEOUT_RANGE_END (CONFIG_COAP_ACK_TIMEOUT * CONFIG_COAP_RANDOM_FACTOR_1000 / 1000)
 
@@ -48,11 +51,12 @@
 static void *_event_loop(void *arg);
 static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg);
 static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
+static void _cease_retransmission(gcoap_request_memo_t *memo);
 static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                                                          sock_udp_ep_t *remote);
 static void _expire_request(gcoap_request_memo_t *memo);
 static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *pdu,
-                           const sock_udp_ep_t *remote);
+                           const sock_udp_ep_t *remote, bool by_mid);
 static int _find_resource(coap_pkt_t *pdu, const coap_resource_t **resource_ptr,
                                             gcoap_listener_t **listener_ptr);
 static int _find_observer(sock_udp_ep_t **observer, sock_udp_ep_t *remote);
@@ -133,6 +137,15 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
     coap_pkt_t pdu;
     sock_udp_ep_t remote;
     gcoap_request_memo_t *memo = NULL;
+    /* Code paths that necessitate a response on the message layer can set a
+     * response type here (COAP_TYPE_RST or COAP_TYPE_ACK). If set, at the end
+     * of the function there will be
+     *   * that value will be put in the code field,
+     *   * token length cleared,
+     *   * code set to EMPTY, and
+     *   * the message is returned with the rest of its header intact.
+     */
+    int8_t messagelayer_emptyresponse_type = NO_IMMEDIATE_REPLY;
 
     (void)arg;
     if (type & SOCK_ASYNC_MSG_RECV) {
@@ -157,18 +170,18 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
             if (coap_get_code_raw(&pdu) == COAP_CODE_EMPTY) {
                 /* ping request */
                 if (coap_get_type(&pdu) == COAP_TYPE_CON) {
-                    coap_hdr_set_type(pdu.hdr, COAP_TYPE_RST);
-
-                    ssize_t bytes = sock_udp_send(sock, _listen_buf,
-                                                  sizeof(coap_hdr_t), &remote);
-                    if (bytes <= 0) {
-                        DEBUG("gcoap: ping response failed: %d\n", (int)bytes);
+                    messagelayer_emptyresponse_type = COAP_TYPE_RST;
+                    DEBUG("gcoap: Answering empty CON request with RST\n");
+                } else if (coap_get_type(&pdu) == COAP_TYPE_ACK) {
+                    _find_req_memo(&memo, &pdu, &remote, true);
+                    if ((memo != NULL) && (memo->send_limit != GCOAP_SEND_LIMIT_NON)) {
+                        DEBUG("gcoap: empty ACK processed, stopping retransmissions\n");
+                        _cease_retransmission(memo);
+                    } else {
+                        DEBUG("gcoap: empty ACK matches no known CON, ignoring\n");
                     }
-                } else if (coap_get_type(&pdu) == COAP_TYPE_NON) {
-                    DEBUG("gcoap: empty NON msg\n");
-                }
-                else {
-                    goto empty_as_response;
+                } else {
+                    DEBUG("gcoap: Ignoring empty non-CON request\n");
                 }
             }
             /* normal request */
@@ -189,17 +202,17 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
             }
             break;
 
-empty_as_response:
-            DEBUG("gcoap: empty ack/reset not handled yet\n");
-            return;
-
         /* incoming response */
         case COAP_CLASS_SUCCESS:
         case COAP_CLASS_CLIENT_FAILURE:
         case COAP_CLASS_SERVER_FAILURE:
-            _find_req_memo(&memo, &pdu, &remote);
+            _find_req_memo(&memo, &pdu, &remote, false);
             if (memo) {
                 switch (coap_get_type(&pdu)) {
+                case COAP_TYPE_CON:
+                    messagelayer_emptyresponse_type = COAP_TYPE_ACK;
+                    DEBUG("gcoap: Answering CON response with ACK\n");
+                    /* fall through */
                 case COAP_TYPE_NON:
                 case COAP_TYPE_ACK:
                     if (memo->resp_evt_tmout.queue) {
@@ -215,9 +228,6 @@ empty_as_response:
                     }
                     memo->state = GCOAP_MEMO_UNUSED;
                     break;
-                case COAP_TYPE_CON:
-                    DEBUG("gcoap: separate CON response not handled yet\n");
-                    break;
                 default:
                     DEBUG("gcoap: illegal response type: %u\n", coap_get_type(&pdu));
                     break;
@@ -229,6 +239,23 @@ empty_as_response:
             break;
         default:
             DEBUG("gcoap: illegal code class: %u\n", coap_get_code_class(&pdu));
+        }
+    }
+
+    if (messagelayer_emptyresponse_type != NO_IMMEDIATE_REPLY) {
+        coap_hdr_set_type(pdu.hdr, (uint8_t)messagelayer_emptyresponse_type);
+        coap_hdr_set_code(pdu.hdr, COAP_CODE_EMPTY);
+        /* Set the token length to 0, preserving the CoAP version as it was and
+         * the empty message type that was just set.
+         *
+         * FIXME: Introduce an internal function to set or truncate the token
+         * */
+        pdu.hdr->ver_t_tkl &= 0xf0;
+
+        ssize_t bytes = sock_udp_send(sock, _listen_buf,
+                                      sizeof(coap_hdr_t), &remote);
+        if (bytes <= 0) {
+            DEBUG("gcoap: empty response failed: %d\n", (int)bytes);
         }
     }
 }
@@ -256,6 +283,12 @@ static void _on_resp_timeout(void *arg) {
 #endif
         event_timeout_set(&memo->resp_evt_tmout, timeout);
 
+        if (memo->state == GCOAP_MEMO_WAIT) {
+            /* See _cease_retransmission: Still going through the timeouts and
+             * rescheduling, but not actually sending any more */
+            return;
+        }
+
         ssize_t bytes = sock_udp_send(&_sock, memo->msg.data.pdu_buf,
                                       memo->msg.data.pdu_len, &memo->remote_ep);
         if (bytes <= 0) {
@@ -263,6 +296,32 @@ static void _on_resp_timeout(void *arg) {
             _expire_request(memo);
         }
     }
+}
+
+/* Change the retransmission of the memo such that no requests are sent any more.
+ *
+ * This is used in response to an empty ACK.
+ *
+ * The current implementation does not touch the timers, but merely sets the
+ * memo's state to GCOAP_MEMO_WAIT. This approach needs less complex code at
+ * the cost of the remaining `send_limit` timers firing and some memory not
+ * being freed until the actual response arrives.
+ *
+ * An alternative implementation would stop the timeouts, and either free the
+ * whole memo if it has no response handler, or calculate the remaining timeout
+ * from `send_limit` to set a final timeout then. In that case, it might also
+ * free the gcoap_resend_t data and move it back into hdr_buf (along with a
+ * change in the discriminator for that). (That's not an option with the
+ * current design because the discriminator is the send_limit field, which is
+ * still used to count down).
+ *
+ * @param[inout]   memo   The memo indicating the pending request
+ *
+ * @pre The @p memo is GCOAP_MEMO_RETRANSMIT or GCOAP_MEMO_WAIT, and its
+ *      send_limit is not GCOAP_SEND_LIMIT_NON.
+ */
+static void _cease_retransmission(gcoap_request_memo_t *memo) {
+    memo->state = GCOAP_MEMO_WAIT;
 }
 
 /*
@@ -440,9 +499,10 @@ static int _find_resource(coap_pkt_t *pdu, const coap_resource_t **resource_ptr,
  * memo_ptr[out] -- Registered request memo, or NULL if not found
  * src_pdu[in] -- PDU for token to match
  * remote[in] -- Remote endpoint to match
+ * by_mid[in] -- true if matches are to be done based on Message ID, otherwise they are done by token
  */
 static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
-                           const sock_udp_ep_t *remote)
+                           const sock_udp_ep_t *remote, bool by_mid)
 {
     *memo_ptr = NULL;
     /* no need to initialize struct; we only care about buffer contents below */
@@ -463,7 +523,13 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
             memo_pdu->hdr = (coap_hdr_t *) memo->msg.data.pdu_buf;
         }
 
-        if (coap_get_token_len(memo_pdu) == cmplen) {
+        if (by_mid) {
+            if ((src_pdu->hdr->id == memo_pdu->hdr->id)
+                    && sock_udp_ep_equal(&memo->remote_ep, remote)) {
+                *memo_ptr = memo;
+                break;
+            }
+        } else if (coap_get_token_len(memo_pdu) == cmplen) {
             memo_pdu->token = coap_hdr_data_ptr(memo_pdu->hdr);
             if ((memcmp(src_pdu->token, memo_pdu->token, cmplen) == 0)
                     && sock_udp_ep_equal(&memo->remote_ep, remote)) {
@@ -478,7 +544,7 @@ static void _find_req_memo(gcoap_request_memo_t **memo_ptr, coap_pkt_t *src_pdu,
 static void _expire_request(gcoap_request_memo_t *memo)
 {
     DEBUG("coap: received timeout message\n");
-    if (memo->state == GCOAP_MEMO_WAIT) {
+    if ((memo->state == GCOAP_MEMO_RETRANSMIT) || (memo->state == GCOAP_MEMO_WAIT)) {
         memo->state = GCOAP_MEMO_TIMEOUT;
         /* Pass response to handler */
         if (memo->resp_handler) {
@@ -733,6 +799,7 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
 #if CONFIG_COAP_RANDOM_FACTOR_1000 > 1000
                 timeout = random_uint32_range(timeout, TIMEOUT_RANGE_END * US_PER_SEC);
 #endif
+                memo->state = GCOAP_MEMO_RETRANSMIT;
             }
             else {
                 memo->state = GCOAP_MEMO_UNUSED;
