@@ -13,6 +13,7 @@ config BOARD_CC2538DK
     select CPU_MODEL_CC2538NF53
     select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
+    select HAS_PERIPH_RTT
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
