@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include <errno.h>
+#include <inttypes.h>
 
 #include "kernel_defines.h"
 
@@ -34,11 +35,6 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#if ENABLE_DEBUG
-/* For PRIu16 etc. */
-#include <inttypes.h>
-#endif
 
 /**
  * This is a can_id element
