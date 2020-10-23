@@ -21,6 +21,15 @@
 - QDEC: Emulated according to PWM
 - SPI: Runtime configurable - `/dev/spidev*` are supported (Linux host only)
 
+# Required packages
+
+The `native` version of RIOT will produce a 32 bit binary.
+On Debian/Ubuntu you can install the required libraries with
+
+```
+sudo apt install gcc-multilib
+```
+
 # Building native with debug flags
 @deprecated `make all-debug` is deprecated; `make all` now builds with debugs
             flags by default. The target will be removed after the 2020.10
