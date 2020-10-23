@@ -703,11 +703,9 @@ _nib_abr_entry_t *_nib_abr_add(const ipv6_addr_t *addr)
         DEBUG("  using %p\n", (void *)abr);
         memcpy(&abr->addr, addr, sizeof(abr->addr));
     }
-#if ENABLE_DEBUG
     else {
         DEBUG("  NIB full\n");
     }
-#endif  /* ENABLE_DEBUG */
     return abr;
 }
 
