@@ -74,7 +74,7 @@ void soft_spi_init_pins(soft_spi_t bus)
 int soft_spi_init_cs(soft_spi_t bus, soft_spi_cs_t cs)
 {
     DEBUG("Soft SPI init CS\n");
-    if (bus >= SPI_NUMOF)
+    if (bus >= SOFT_SPI_NUMOF)
     {
         DEBUG("Soft SPI bus not valid\n");
         return SOFT_SPI_NODEV;
