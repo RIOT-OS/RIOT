@@ -441,7 +441,9 @@ struct ieee802154_radio_ops {
      * @brief Read a frame from the internal framebuffer
      *
      * This function reads the received frame from the internal framebuffer.
-     * It should try to copy the received frame into @p buf
+     * It should try to copy the received PSDU frame into @p buf. The FCS
+     * field will **not** be copied and its size **not** be taken into account
+     * for the return value.
      *
      * @post It's not safe to call this function again before setting the
      *       transceiver state to @ref IEEE802154_TRX_STATE_RX_ON (thus flushing
