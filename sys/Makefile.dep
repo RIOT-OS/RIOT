@@ -623,6 +623,12 @@ ifneq (,$(filter l2filter_%,$(USEMODULE)))
   USEMODULE += l2filter
 endif
 
+ifneq (,$(filter gcoap_fileserver,$(USEMODULE)))
+  USEMODULE += gcoap
+  USEMODULE += checksum
+  USEMODULE += vfs
+endif
+
 ifneq (,$(filter gcoap_forward_proxy,$(USEMODULE)))
   USEMODULE += gcoap
   USEMODULE += uri_parser
