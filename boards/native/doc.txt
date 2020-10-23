@@ -20,6 +20,7 @@
 - PWM: Dummy PWM
 - QDEC: Emulated according to PWM
 - SPI: Runtime configurable - `/dev/spidev*` are supported (Linux host only)
+- GPIO: Runtime configurable - `/dev/gpiochip*` are supported (Linux host only)
 
 # Required packages
 
