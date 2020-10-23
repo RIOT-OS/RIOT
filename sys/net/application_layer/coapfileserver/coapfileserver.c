@@ -282,6 +282,10 @@ static ssize_t coapfileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf, s
             entry_name += 1;
         }
         size_t entry_len = strlen(entry_name);
+        if (entry_len <= 2 && memcmp(entry_name, "..", entry_len) == 0) {
+            /* Up pointers don't work the same way in URI semantics */
+            continue;
+        }
         /* maybe ",", "<>", and the length */
         ssize_t need_bytes = (payload_cursor == 0 ? 0 : 1) + 2 + entry_len;
         if (payload_cursor + need_bytes > pdu->payload_len) {
