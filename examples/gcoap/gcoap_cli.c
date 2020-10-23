@@ -373,7 +373,8 @@ int gcoap_cli_cmd(int argc, char **argv)
 
     if (((argc == apos + 2) && (code_pos == 0)) ||    /* ping */
         ((argc == apos + 3) && (code_pos == 1)) ||    /* get */
-        ((argc == apos + 4) && (code_pos > 1))) {     /* post or put */
+        ((argc == apos + 3 ||
+          argc == apos + 4) && (code_pos > 1))) {     /* post or put */
 
         char *uri = NULL;
         int uri_len = 0;
