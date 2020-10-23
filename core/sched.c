@@ -20,6 +20,7 @@
  */
 
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "sched.h"
 #include "clist.h"
@@ -34,11 +35,6 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#if ENABLE_DEBUG
-/* For PRIu16 etc. */
-#include <inttypes.h>
-#endif
 
 #ifdef PICOLIBC_TLS
 #include <picotls.h>
