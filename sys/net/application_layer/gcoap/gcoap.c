@@ -644,6 +644,18 @@ void gcoap_register_listener(gcoap_listener_t *listener)
     _coap_state.listeners = listener;
 }
 
+void gcoap_register_listeners(gcoap_listener_t *listener)
+{
+    gcoap_listener_t *temp = listener->next;
+    while (listener) {
+        gcoap_register_listener(listener);
+        listener = temp;
+        if(temp) {
+            temp = temp->next;
+        }
+    }
+}
+
 int gcoap_req_init(coap_pkt_t *pdu, uint8_t *buf, size_t len,
                    unsigned code, const char *path)
 {
