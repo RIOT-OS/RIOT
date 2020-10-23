@@ -8,7 +8,7 @@
 [![IRC][irc-badge]][irc-link]
 [![Matrix][matrix-badge]][matrix-link]
 
-                          ZZZZZZ
+<!--                      ZZZZZZ
                         ZZZZZZZZZZZZ
                       ZZZZZZZZZZZZZZZZ
                      ZZZZZZZ     ZZZZZZ
@@ -32,7 +32,7 @@
       ZZZZZZ     ZZZZZZ          ZZZZZ      777     7777777777       777
        ZZZZZZZZZZZZZZZ            ZZZZ      777      77777777        777
          ZZZZZZZZZZZ               Z
-            ZZZZZ
+            ZZZZZ                                                            -->
 
 The friendly Operating System for IoT!
 
