@@ -275,9 +275,15 @@ static ssize_t coapfileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf, s
     vfs_dirent_t entry;
     ssize_t payload_cursor = 0;
     while (vfs_readdir(&dir, &entry) > 0) {
-        size_t entry_len = strlen((char*)&entry.d_name);
-        /* maybe ",", "<>", and the length without leading slash */
-        ssize_t need_bytes = (payload_cursor == 0 ? 0 : 1) + 2 + entry_len - 1;
+        char *entry_name = (char*)entry.d_name;
+        /* Ignore leading slashes presented by some file systems; see
+         * https://github.com/RIOT-OS/RIOT/issues/14635 */
+        while (entry_name[0] == '/') {
+            entry_name += 1;
+        }
+        size_t entry_len = strlen(entry_name);
+        /* maybe ",", "<>", and the length */
+        ssize_t need_bytes = (payload_cursor == 0 ? 0 : 1) + 2 + entry_len;
         if (payload_cursor + need_bytes > pdu->payload_len) {
             /* Without blockwise, this is the best approximation we can do */
             DEBUG("coapfileserver: Directory listing truncated\n");
@@ -287,8 +293,8 @@ static ssize_t coapfileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf, s
             pdu->payload[payload_cursor++] = ',';
         }
         pdu->payload[payload_cursor++] = '<';
-        memcpy(&pdu->payload[payload_cursor], &entry.d_name[1], entry_len - 1);
-        payload_cursor += entry_len - 1;
+        memcpy(&pdu->payload[payload_cursor], entry_name, entry_len);
+        payload_cursor += entry_len;
         pdu->payload[payload_cursor++] = '>';
     }
     vfs_closedir(&dir);
