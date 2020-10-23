@@ -28,17 +28,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if ENABLE_DEBUG
-
 #define DEBUG_DEV(f, d, ...) \
         DEBUG("[apds99xx] %s i2c dev=%d addr=%02x: " f "\n", \
               __func__, d->params.dev, APDS99XX_I2C_ADDRESS, ## __VA_ARGS__);
-
-#else /* ENABLE_DEBUG */
-
-#define DEBUG_DEV(f, d, ...)
-
-#endif /* ENABLE_DEBUG */
 
 #define ERROR_DEV(f, d, ...) \
         LOG_ERROR("[apds99xx] %s i2c dev=%d addr=%02x: " f "\n", \

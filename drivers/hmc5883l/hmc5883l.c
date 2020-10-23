@@ -27,17 +27,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if ENABLE_DEBUG
-
 #define DEBUG_DEV(f, d, ...) \
         DEBUG("[hmc5883l] %s i2c dev=%d addr=%02x: " f "\n", \
               __func__, d->dev, HMC5883L_I2C_ADDRESS, ## __VA_ARGS__);
-
-#else /* ENABLE_DEBUG */
-
-#define DEBUG_DEV(f, d, ...)
-
-#endif /* ENABLE_DEBUG */
 
 #define ERROR_DEV(f, d, ...) \
         LOG_ERROR("[hmc5883l] %s i2c dev=%d addr=%02x: " f "\n", \
