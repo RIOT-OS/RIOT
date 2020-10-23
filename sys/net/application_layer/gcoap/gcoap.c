@@ -702,6 +702,10 @@ kernel_pid_t gcoap_init(void)
 
 void gcoap_register_listener(gcoap_listener_t *listener)
 {
+    /* That item will be overridden, ensure that the user expecting different
+     * behavior will notice this. */
+    assert(listener->next == NULL);
+
     if (!listener->link_encoder) {
         listener->link_encoder = gcoap_encode_link;
     }
