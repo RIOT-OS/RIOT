@@ -27,7 +27,7 @@
 
 #include "can/candev.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* reset delay should be at least 2 microseconds */

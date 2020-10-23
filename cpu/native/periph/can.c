@@ -39,7 +39,7 @@
 #include "async_read.h"
 #include "sched.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static int _init(candev_t *candev);

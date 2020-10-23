@@ -30,7 +30,7 @@
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/pkt.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define _ALIGNMENT_MASK    (sizeof(_unused_t) - 1)

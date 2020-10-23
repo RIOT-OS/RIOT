@@ -29,7 +29,7 @@
 #include "kernel_types.h"
 #include "clist.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 #if ENABLE_DEBUG
 /* Since some of these functions are called by printf, we can't really call

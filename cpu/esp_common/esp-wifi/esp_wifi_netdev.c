@@ -46,9 +46,6 @@
 #include "esp_wifi_params.h"
 #include "esp_wifi_netdev.h"
 
-#define ENABLE_DEBUG_HEXDUMP    (0)
-#define ENABLE_DEBUG            (0)
-#include "debug.h"
 #include "log.h"
 
 #define ESP_WIFI_DEBUG(f, ...) \
@@ -92,6 +89,10 @@
 #include "lwip/pbuf.h"
 
 #endif /* MCU_ESP8266 */
+
+#define ENABLE_DEBUG_HEXDUMP    0
+#define ENABLE_DEBUG            0
+#include "debug.h"
 
 /**
  * There is only one ESP WiFi device. We define it as static device variable

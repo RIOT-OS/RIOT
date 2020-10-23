@@ -18,7 +18,7 @@
  * @}
  */
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #include "sdk/sdk.h"

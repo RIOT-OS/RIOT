@@ -27,7 +27,7 @@
 #include "lsm6dsl.h"
 #include "lsm6dsl_internal.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))

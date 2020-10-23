@@ -33,7 +33,7 @@
 #include "periph/spi.h"
 #include "pm_layered.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 /**

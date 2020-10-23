@@ -35,8 +35,8 @@
 #include "od.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG        (0)
-#define ENABLE_DEBUG_DUMP   (0)
+#define ENABLE_DEBUG        0
+#define ENABLE_DEBUG_DUMP   0
 #include "debug.h"
 
 #define ATWINC15X0_MAC_STR          "%02x:%02x:%02x:%02x:%02x:%02x"

@@ -27,7 +27,7 @@
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_STATS */
 #include "net/gnrc/sixlowpan/frag/vrb.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static gnrc_sixlowpan_frag_vrb_t _vrb[CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE];

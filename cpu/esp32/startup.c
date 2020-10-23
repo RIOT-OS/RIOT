@@ -18,8 +18,6 @@
  * @}
  */
 
-#define ENABLE_DEBUG  (0)
-#include "debug.h"
 #include "esp_common.h"
 
 #include <stdlib.h>
@@ -67,6 +65,9 @@
 #ifdef MODULE_STDIO_UART
 #include "stdio_uart.h"
 #endif
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 #define MHZ 1000000UL
 #define STRINGIFY(s) STRINGIFY2(s)

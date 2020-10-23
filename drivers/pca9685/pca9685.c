@@ -26,10 +26,8 @@
 #include "log.h"
 #include "xtimer.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
-
-#if ENABLE_DEBUG
 
 #define ASSERT_PARAM(cond) \
     do { \
@@ -44,12 +42,6 @@
         DEBUG("[pca9685] %s i2c dev=%d addr=%02x: " f "\n", \
               __func__, d->params.i2c_dev, dev->params.i2c_addr, ## __VA_ARGS__)
 
-#else /* ENABLE_DEBUG */
-
-#define ASSERT_PARAM(cond) assert(cond)
-#define DEBUG_DEV(f, d, ...)
-
-#endif /* ENABLE_DEBUG */
 #define ERROR_DEV(f, d, ...) \
         LOG_ERROR("[pca9685] %s i2c dev=%d addr=%02x: " f "\n", \
                   __func__, d->params.i2c_dev, dev->params.i2c_addr, ## __VA_ARGS__)

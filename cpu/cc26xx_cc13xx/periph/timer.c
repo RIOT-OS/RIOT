@@ -31,7 +31,7 @@
 
 #include "cc26xx_cc13xx_power.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define LOAD_VALUE              (0xffff)

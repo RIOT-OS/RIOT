@@ -30,7 +30,7 @@
 #include "net/gnrc/netif/ieee802154.h"
 #include "net/netdev/ieee802154.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int _gnrc_lwmac_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)

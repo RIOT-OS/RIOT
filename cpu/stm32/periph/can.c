@@ -33,7 +33,7 @@
 #include "sched.h"
 #include "mutex.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define CAN_MAX_WAIT_CHANGE (10000U)

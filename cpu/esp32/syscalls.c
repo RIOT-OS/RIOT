@@ -40,7 +40,7 @@
 #include "esp_heap_caps.h"
 #endif
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define MHZ 1000000UL

@@ -27,7 +27,7 @@
 #include "ot.h"
 #include "event.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define OPENTHREAD_SPINEL_FRAME_MARKER      (0x7e)

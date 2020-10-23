@@ -25,7 +25,7 @@
 #include "net/loramac.h"
 #include "net/gnrc/netreg.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static uint8_t _nwkskey[LORAMAC_NWKSKEY_LEN] = LORAMAC_NWK_SKEY_DEFAULT;

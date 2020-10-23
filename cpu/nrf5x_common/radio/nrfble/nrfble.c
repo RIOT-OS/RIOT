@@ -29,7 +29,7 @@
 #include "nrfble.h"
 #include "net/netdev/ble.h"
 
-#define ENABLE_DEBUG            (0)
+#define ENABLE_DEBUG            0
 #include "debug.h"
 
 /* driver specific device configuration */

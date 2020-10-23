@@ -27,15 +27,15 @@
 #include "cpu_conf.h"
 #include "irq.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
-#define SPIDEV                  (dev->params.spi)
-#define SPICLK                  (dev->params.spi_clk)
-#define CSPIN                   (dev->params.cs_pin)
-#define SPIMODE                 (SPI_MODE_0)
+#define SPIDEV              (dev->params.spi)
+#define SPICLK              (dev->params.spi_clk)
+#define CSPIN               (dev->params.cs_pin)
+#define SPIMODE             (SPI_MODE_0)
 
-#define KW2XRF_IBUF_LENGTH      (9)
+#define KW2XRF_IBUF_LENGTH  (9)
 
 static uint8_t ibuf[KW2XRF_IBUF_LENGTH];
 

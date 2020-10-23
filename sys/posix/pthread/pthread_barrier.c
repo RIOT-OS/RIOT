@@ -20,7 +20,7 @@
 #include "sched.h"
 #include "pthread.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int pthread_barrier_init(pthread_barrier_t *barrier,

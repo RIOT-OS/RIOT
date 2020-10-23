@@ -35,20 +35,19 @@
 #include "dht.h"
 #include "dht_params.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG            0
 #include "debug.h"
 
 /* Every pulse send by the DHT longer than 40µs is interpreted as 1 */
-#define PULSE_WIDTH_THRESHOLD       (40U)
+#define PULSE_WIDTH_THRESHOLD   (40U)
 /* If an expected pulse is not detected within 1000µs, something is wrong */
-#define TIMEOUT                     (1000U)
+#define TIMEOUT                 (1000U)
 /* The DHT sensor cannot measure more than once a second */
-#define DATA_HOLD_TIME              (US_PER_SEC)
+#define DATA_HOLD_TIME          (US_PER_SEC)
 /* The start signal by pulling data low for at least 18ms and then up for
  * 20-40µs*/
-#define START_LOW_TIME              (20U * US_PER_MS)
-#define START_HIGH_TIME             (40U)
-
+#define START_LOW_TIME          (20U * US_PER_MS)
+#define START_HIGH_TIME         (40U)
 
 static inline void _reset(dht_t *dev)
 {

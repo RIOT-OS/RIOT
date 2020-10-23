@@ -26,7 +26,7 @@
 #include "net/loramac.h"
 #include "net/gnrc/lorawan/region.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* This factor is used for converting "real" seconds into microcontroller

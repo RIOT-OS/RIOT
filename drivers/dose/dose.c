@@ -28,7 +28,7 @@
 #include "net/eui_provider.h"
 #include "net/netdev/eth.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static uint16_t crc16_update(uint16_t crc, uint8_t octet);

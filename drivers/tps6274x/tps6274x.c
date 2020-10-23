@@ -22,7 +22,7 @@
 #include "tps6274x.h"
 #include "periph/gpio.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int tps6274x_init(tps6274x_t *dev, const tps6274x_params_t *params)
@@ -63,12 +63,10 @@ uint16_t tps6274x_switch_voltage(tps6274x_t *dev, uint16_t voltage)
             /* mark pins that could and had to be set */
             vsel_set |= vsel & (1 << i);
         }
-#if ENABLE_DEBUG
         else {
-            printf("[tps6274x] Pin vsel%u is not connected but is required for \
-                selected voltage level\n", i + 1);
+            DEBUG("[tps6274x] Pin vsel%u is not connected but is required for "
+                  "selected voltage level\n", i + 1);
         }
-#endif
     }
     return ((uint16_t)vsel_set) * 100 + 1800;
 }
@@ -78,9 +76,8 @@ void tps6274x_load_ctrl(tps6274x_t *dev, int status)
     if (gpio_is_valid(dev->params.ctrl_pin)) {
         gpio_write(dev->params.ctrl_pin, status);
     }
-#if ENABLE_DEBUG
     else {
-        printf("[TPS6274x] CTRL Pin not defined, no load activation possible\n");
+        DEBUG("[tps6274x] CTRL Pin not defined, no load activation "
+              "possible\n");
     }
-#endif
 }

@@ -19,7 +19,7 @@
  * @}
  */
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 
 #include <assert.h>
 #include <debug.h>

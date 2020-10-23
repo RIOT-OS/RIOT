@@ -22,7 +22,7 @@
 #include "vendor/hw_nvic.h"
 #include "periph/pm.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void pm_set(unsigned mode)

@@ -29,12 +29,12 @@
 
 #include "periph/pm.h"
 
-#define ENABLE_DEBUG (0)
-#include "debug.h"
-
 #ifdef MODULE_AUTO_INIT
 #include <auto_init.h>
 #endif
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 #ifndef CONFIG_BOOT_MSG_STRING
 #define CONFIG_BOOT_MSG_STRING "main(): This is RIOT! (Version: " RIOT_VERSION ")"

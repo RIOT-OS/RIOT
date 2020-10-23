@@ -34,7 +34,7 @@
 #include "vendor/platform.h"
 #include "vendor/plic_driver.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* Convert RTT freq to pre-scaler value */

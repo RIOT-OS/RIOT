@@ -22,7 +22,7 @@
 #include "socket_zep_params.h"
 #include "net/gnrc/netif/ieee802154.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**

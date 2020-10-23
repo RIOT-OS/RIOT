@@ -27,7 +27,7 @@
 #include "mtd_mapper.h"
 #include "mutex.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void _unlock(mtd_mapper_region_t *region)

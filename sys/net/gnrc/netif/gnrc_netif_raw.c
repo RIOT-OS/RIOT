@@ -17,7 +17,7 @@
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/netif/raw.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
 #define IP_VERSION_MASK (0xf0U)

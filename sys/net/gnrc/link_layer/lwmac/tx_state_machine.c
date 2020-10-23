@@ -30,9 +30,6 @@
 #include "include/tx_state_machine.h"
 #include "include/lwmac_internal.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 #ifndef LOG_LEVEL
 /**
  * @brief Default log level define
@@ -40,6 +37,9 @@
 #define LOG_LEVEL LOG_WARNING
 #endif
 #include "log.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 /**
  * @brief   Flag to track if send packet success

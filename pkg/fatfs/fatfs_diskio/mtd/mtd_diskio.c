@@ -24,7 +24,7 @@
 #include "fatfs/ffconf.h"
 #include "mtd.h"
 #include "fatfs/integer.h"
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #if FATFS_FFCONF_OPT_FS_NORTC == 0

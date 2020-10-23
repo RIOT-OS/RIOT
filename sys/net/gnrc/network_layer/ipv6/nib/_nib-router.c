@@ -29,7 +29,7 @@
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C */
 #include "_nib-router.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ROUTER)

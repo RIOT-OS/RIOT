@@ -22,7 +22,7 @@
 
 #include "nimble_netif_conn.h"
 
-#define ENABLE_DEBUG            (0)
+#define ENABLE_DEBUG            0
 #include "debug.h"
 
 #define CONN_CNT                (NIMBLE_NETIF_MAX_CONN)

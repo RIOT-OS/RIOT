@@ -45,7 +45,7 @@
 #include "bitarithm.h"
 #include "ecc/golay2412.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #if ENABLE_DEBUG

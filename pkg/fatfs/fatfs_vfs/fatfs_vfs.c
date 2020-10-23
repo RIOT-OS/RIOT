@@ -30,7 +30,7 @@
 #include "kernel_defines.h" /* needed for BUILD_BUG_ON */
 #include "time.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include <debug.h>
 
 static int fatfs_err_to_errno(int32_t err);

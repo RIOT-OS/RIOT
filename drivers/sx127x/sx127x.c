@@ -41,7 +41,7 @@
 #include "sx127x_registers.h"
 #include "sx127x_netdev.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* The reset signal must be applied for at least 100 µs to trigger the manual

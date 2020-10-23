@@ -18,9 +18,6 @@
  * @}
  */
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 #include <stdint.h>
 #include <stdio.h>
 
@@ -31,6 +28,9 @@
 #include "esp/common_macros.h"
 #include "esp/xtensa_ops.h"
 #include "xtensa/xtensa_context.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 /**
  * @brief Set on entry into and reset on exit from an ISR

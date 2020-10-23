@@ -30,7 +30,7 @@
 #include "mma7660.h"
 #include "mma7660_reg.h"
 
-#define ENABLE_DEBUG     (0)
+#define ENABLE_DEBUG     0
 #include "debug.h"
 
 #define I2C_SPEED        I2C_SPEED_FAST

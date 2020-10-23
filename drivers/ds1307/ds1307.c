@@ -21,7 +21,7 @@
 #include "ds1307.h"
 #include "ds1307_internal.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static int _nvram_read(struct nvram *dev, uint8_t *dst, uint32_t src,

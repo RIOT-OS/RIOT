@@ -33,7 +33,7 @@
 #include "at86rf2xx_internal.h"
 #include "at86rf2xx_netdev.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 

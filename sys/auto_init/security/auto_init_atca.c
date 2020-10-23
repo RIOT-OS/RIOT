@@ -20,7 +20,7 @@
 #include "atca.h"
 #include "atca_params.h"
 
-#define ENABLE_DEBUG                (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define ATCA_NUMOF (ARRAY_SIZE(atca_params))

@@ -26,7 +26,7 @@
 #include "esp_heap_caps.h"
 #endif
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifdef MODULE_ESP_IDF_HEAP

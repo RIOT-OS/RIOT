@@ -22,7 +22,7 @@
 #include "ot.h"
 #include "openthread/tasklet.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void _ev_tasklets_handler(event_t *event)

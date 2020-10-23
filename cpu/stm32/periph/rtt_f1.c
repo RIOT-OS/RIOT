@@ -23,7 +23,7 @@
 #include "periph/rtt.h"
 #include "periph_conf.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define RTT_PRESCALER        ((RTT_CLOCK_FREQUENCY / RTT_FREQUENCY) - 1 )

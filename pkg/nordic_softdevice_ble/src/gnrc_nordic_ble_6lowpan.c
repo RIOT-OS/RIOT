@@ -55,14 +55,14 @@
 
 #include "ble-mac.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
 
 #if defined(MODULE_OD) && ENABLE_DEBUG
 #include "od.h"
 #endif
 
-#define BLE_PRIO                    (GNRC_NETIF_PRIO)
+#define BLE_PRIO        (GNRC_NETIF_PRIO)
 
 /* XXX: netdev required by gnrc_netif, but not implemented fully for
  * nordic_softdevice_ble for legacy reasons */

@@ -21,14 +21,14 @@
 #include "net/gnrc/ipv6/ext/rh.h"
 #include "net/gnrc/rpl/srh.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG                0
 #include "debug.h"
-
-static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 #define GNRC_RPL_SRH_PADDING(X)     ((X & 0xF0) >> 4)
 #define GNRC_RPL_SRH_COMPRE(X)      (X & 0x0F)
 #define GNRC_RPL_SRH_COMPRI(X)      ((X & 0xF0) >> 4)
+
+static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 /* checks if multiple addresses within the source routing header exist on my
  * interfaces */

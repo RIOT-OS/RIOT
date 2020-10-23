@@ -23,7 +23,7 @@
 #include "cc110x.h"
 #include "cc110x_internal.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)

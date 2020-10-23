@@ -23,8 +23,6 @@
 
 #include "vcnl40x0_params.h"
 
-#define ENABLE_DEBUG (0)
-
 /**
  * @brief   Define the number of configured sensors
  */

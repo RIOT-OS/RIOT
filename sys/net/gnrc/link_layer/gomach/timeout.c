@@ -24,7 +24,7 @@
 #include "net/gnrc/gomach/timeout.h"
 #include "net/gnrc/gomach/types.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* Return index >= 0 if found, -ENONENT if not found. */

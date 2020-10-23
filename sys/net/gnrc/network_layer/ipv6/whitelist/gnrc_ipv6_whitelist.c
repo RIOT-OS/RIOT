@@ -18,7 +18,7 @@
 
 #include "net/gnrc/ipv6/whitelist.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 ipv6_addr_t gnrc_ipv6_whitelist[CONFIG_GNRC_IPV6_WHITELIST_SIZE];

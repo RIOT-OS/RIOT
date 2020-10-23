@@ -23,7 +23,7 @@
 #include "bh1900nux.h"
 #include "byteorder.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int bh1900nux_init(bh1900nux_t *dev, const bh1900nux_params_t *params)

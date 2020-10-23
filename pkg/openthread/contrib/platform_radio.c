@@ -30,7 +30,7 @@
 #include "openthread/platform/radio.h"
 #include "ot.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define RADIO_IEEE802154_FCS_LEN    (2U)

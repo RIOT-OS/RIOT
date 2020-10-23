@@ -20,7 +20,7 @@
 #include "pca9633.h"
 #include "pca9633_regs.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /**

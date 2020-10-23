@@ -23,7 +23,7 @@
 #include "at86rf215_internal.h"
 #include "periph/spi.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* we can still go +3 dBm higher by increasing PA current */

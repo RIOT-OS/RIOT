@@ -28,7 +28,7 @@
 #include "net/cord/config.h"
 #include "net/cord/ep_standalone.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 /* stack configuration */

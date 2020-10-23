@@ -34,9 +34,6 @@
 #include "net/gnrc/netif/ieee802154.h"
 #include "net/netdev/ieee802154.h"
 
-#define ENABLE_DEBUG    (0)
-#include "debug.h"
-
 #ifndef LOG_LEVEL
 /**
  * @brief Default log level define
@@ -45,6 +42,9 @@
 #endif
 
 #include "log.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 int _gnrc_gomach_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 {

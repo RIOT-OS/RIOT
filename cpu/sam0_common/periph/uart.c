@@ -29,7 +29,7 @@
 #include "periph/uart.h"
 #include "periph/gpio.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #if defined (CPU_COMMON_SAML1X) || defined (CPU_COMMON_SAMD5X)

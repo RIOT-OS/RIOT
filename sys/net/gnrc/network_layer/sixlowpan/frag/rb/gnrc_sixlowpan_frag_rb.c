@@ -36,7 +36,7 @@
 
 #include "net/gnrc/sixlowpan/frag/rb.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* estimated fragment payload size to determinate RBUF_INT_SIZE, default to

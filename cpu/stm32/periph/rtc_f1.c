@@ -20,7 +20,7 @@
 #include "cpu.h"
 #include "periph/rtc.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define EXTI_IMR_BIT        (EXTI_IMR_MR17)
@@ -29,8 +29,8 @@
 #define EXTI_PR_BIT         (EXTI_PR_PR17)
 
 static struct {
-    rtc_alarm_cb_t cb;          /**< callback called from RTC interrupt */
-    void *arg;                  /**< argument passed to the callback */
+    rtc_alarm_cb_t cb;      /**< callback called from RTC interrupt */
+    void *arg;              /**< argument passed to the callback */
 } isr_ctx;
 
 static void _rtc_enter_config_mode(void)

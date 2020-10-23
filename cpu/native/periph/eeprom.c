@@ -30,7 +30,7 @@
 #include "periph/eeprom.h"
 #include "eeprom_native.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 char eeprom_file[EEPROM_FILEPATH_MAX_LEN];

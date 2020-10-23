@@ -28,7 +28,7 @@
 
 #include "timex.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* For PRIu8 etc. */
@@ -50,11 +50,9 @@ gnrc_pktsnip_t *gnrc_ndp_nbr_sol_build(const ipv6_addr_t *tgt,
         nbr_sol->tgt.u64[0].u64 = tgt->u64[0].u64;
         nbr_sol->tgt.u64[1].u64 = tgt->u64[1].u64;
     }
-#if ENABLE_DEBUG
     else {
         DEBUG("ndp: NS not created due to no space in packet buffer\n");
     }
-#endif
     return pkt;
 }
 
@@ -73,11 +71,9 @@ gnrc_pktsnip_t *gnrc_ndp_nbr_adv_build(const ipv6_addr_t *tgt, uint8_t flags,
         nbr_adv->tgt.u64[0].u64 = tgt->u64[0].u64;
         nbr_adv->tgt.u64[1].u64 = tgt->u64[1].u64;
     }
-#if ENABLE_DEBUG
     else {
         DEBUG("ndp: NA not created due to no space in packet buffer\n");
     }
-#endif
     return pkt;
 }
 
@@ -91,11 +87,9 @@ gnrc_pktsnip_t *gnrc_ndp_rtr_sol_build(gnrc_pktsnip_t *options)
         ndp_rtr_sol_t *rtr_sol = pkt->data;
         rtr_sol->resv.u32 = 0;
     }
-#if ENABLE_DEBUG
     else {
         DEBUG("ndp: RS not created due to no space in packet buffer\n");
     }
-#endif
     return pkt;
 }
 
@@ -116,11 +110,9 @@ gnrc_pktsnip_t *gnrc_ndp_rtr_adv_build(uint8_t cur_hl, uint8_t flags,
         rtr_adv->reach_time = byteorder_htonl(reach_time);
         rtr_adv->retrans_timer = byteorder_htonl(retrans_timer);
     }
-#if ENABLE_DEBUG
     else {
         DEBUG("ndp: RA not created due to no space in packet buffer\n");
     }
-#endif
     return pkt;
 }
 
@@ -141,11 +133,9 @@ gnrc_pktsnip_t *gnrc_ndp_opt_build(uint8_t type, size_t size,
         opt->type = type;
         opt->len = (uint8_t)(pkt->size / 8);
     }
-#if ENABLE_DEBUG
     else {
         DEBUG("ndp: option not created due to no space in packet buffer\n");
     }
-#endif
     return pkt;
 }
 

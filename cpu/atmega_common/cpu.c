@@ -33,7 +33,7 @@
 #include "periph/init.h"
 #include "panic.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef MCUSR

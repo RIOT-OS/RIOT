@@ -31,7 +31,7 @@
 #include "periph_conf.h"
 #include "periph/uart.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef KINETIS_HAVE_LPUART

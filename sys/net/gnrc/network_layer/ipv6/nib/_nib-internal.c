@@ -30,7 +30,7 @@
 #include "_nib-internal.h"
 #include "_nib-router.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 /* pointers for default router selection */
@@ -111,11 +111,9 @@ _nib_onl_entry_t *_nib_onl_alloc(const ipv6_addr_t *addr, unsigned iface)
     if (node != NULL) {
         _override_node(addr, iface, node);
     }
-#if ENABLE_DEBUG
     else {
         DEBUG("  NIB full\n");
     }
-#endif  /* ENABLE_DEBUG */
     return node;
 }
 

@@ -28,7 +28,7 @@
 #include "stmpe811_constants.h"
 #include "stmpe811_params.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define STMPE811_DEV_I2C    (dev->params.i2c)

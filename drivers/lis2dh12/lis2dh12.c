@@ -22,7 +22,7 @@
 #include "lis2dh12.h"
 #include "lis2dh12_internal.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 /* the following block contains the SPI mode specific adaption */

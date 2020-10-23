@@ -23,7 +23,7 @@
 #include "vcnl40x0_params.h"
 #include "periph/i2c.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 #define DEV_I2C             (dev->params.i2c_dev)

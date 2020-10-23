@@ -34,7 +34,7 @@
 #include "periph/spi.h"
 #endif
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 unsigned int bme680_devs_numof = 0;

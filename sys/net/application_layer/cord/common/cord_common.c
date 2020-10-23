@@ -24,7 +24,7 @@
 #include "net/gcoap.h"
 #include "net/cord/common.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 

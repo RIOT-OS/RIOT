@@ -33,7 +33,7 @@
 #include "net/netdev/ieee802154.h"
 #include "nrf802154.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG        0
 #include "debug.h"
 
 static const netdev_driver_t nrf802154_netdev_driver;

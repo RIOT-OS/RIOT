@@ -100,7 +100,7 @@
 #include "irq.h"
 #include "cpu.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 extern uint32_t _estack;

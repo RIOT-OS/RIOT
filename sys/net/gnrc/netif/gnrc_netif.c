@@ -44,7 +44,7 @@
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/internal.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);

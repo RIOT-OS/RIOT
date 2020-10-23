@@ -25,7 +25,8 @@
 #include "log.h"
 #include "msg.h"
 #include "net/gnrc/netif/conf.h"    /* <- GNRC_NETIF_MSG_QUEUE_SIZE */
-#define ENABLE_DEBUG    (0)
+
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef CC110X_EXTRA_STACKSIZE

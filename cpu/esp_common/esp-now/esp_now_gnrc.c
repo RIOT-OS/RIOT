@@ -30,7 +30,7 @@
 #include "esp_now_gnrc.h"
 #include "net/gnrc/netif.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)

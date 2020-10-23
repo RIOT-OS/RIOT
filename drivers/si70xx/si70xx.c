@@ -24,7 +24,7 @@
 #include "si70xx_internals.h"
 #include "si70xx.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define SI70XX_I2C     (dev->params.i2c_dev)

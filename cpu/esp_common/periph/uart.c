@@ -21,9 +21,6 @@
 
 #include <assert.h>
 
-#define ENABLE_DEBUG (0)
-#include "debug.h"
-
 #include "esp_common.h"
 #include "cpu.h"
 #include "irq_arch.h"
@@ -39,6 +36,9 @@
 #include "esp/common_macros.h"
 #include "rom/ets_sys.h"
 #include "xtensa/xtensa_api.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
 
 #ifdef MCU_ESP32
 

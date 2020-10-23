@@ -26,7 +26,7 @@
 #include "can/pkt.h"
 #include "mutex.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define HANDLE_UNUSED 0

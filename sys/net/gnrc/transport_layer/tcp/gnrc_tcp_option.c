@@ -19,7 +19,7 @@
 #include "include/gnrc_tcp_common.h"
 #include "include/gnrc_tcp_option.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int _gnrc_tcp_option_parse(gnrc_tcp_tcb_t *tcb, tcp_hdr_t *hdr)

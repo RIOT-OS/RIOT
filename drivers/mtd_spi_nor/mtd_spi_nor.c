@@ -34,15 +34,11 @@
 #include "byteorder.h"
 #include "mtd_spi_nor.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    0
 #include "debug.h"
-#define ENABLE_TRACE    (0)
 
-#if ENABLE_TRACE
-#define TRACE(...) DEBUG(__VA_ARGS__)
-#else
-#define TRACE(...)
-#endif
+#define ENABLE_TRACE    0
+#define TRACE(...)      DEBUG(__VA_ARGS__)
 
 /* after power up, on an invalid JEDEC ID, wait and read N times */
 #ifndef MTD_POWER_UP_WAIT_FOR_ID

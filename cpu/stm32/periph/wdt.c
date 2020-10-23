@@ -22,6 +22,7 @@
 
 #include <stdlib.h>
 #include <assert.h>
+#include <inttypes.h>
 
 #include "cpu.h"
 #include "timex.h"
@@ -29,7 +30,7 @@
 #include "periph_cpu.h"
 #include "periph/wdt.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifdef __cplusplus
@@ -46,13 +47,11 @@ extern "C" {
 #define IWDG_UNLOCK               ((uint16_t)0x5555)
 #define IWDG_LOCK                 ((uint16_t)0x0000)
 
-#if ENABLE_DEBUG
-/* wdt_time (us) = LSI(us) x 4 x 2^PRE x RELOAD */
 static inline uint32_t _wdt_time(uint8_t pre, uint16_t rel)
 {
+    /* wdt_time (us) = LSI(us) x 4 x 2^PRE x RELOAD */
     return (uint32_t)(((uint64_t) US_PER_SEC * 4 * (1 << pre) * rel ) / CLOCK_LSI);
 }
-#endif
 
 static inline void _iwdt_unlock(void)
 {
@@ -133,9 +132,7 @@ void wdt_setup_reboot(uint32_t min_time, uint32_t max_time)
     _set_prescaler(pre);
     _set_reload(rel);
 
-#if ENABLE_DEBUG
-    DEBUG("[wdt]: reset time %lu [us]\n", _wdt_time(pre, rel));
-#endif
+    DEBUG("[wdt]: reset time %" PRIu32 " [us]\n", _wdt_time(pre, rel));
 
     /* Refresh wdt counter */
     wdt_kick();

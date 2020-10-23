@@ -28,7 +28,7 @@
 #include <string.h>
 #include <errno.h>
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static void _init(usbus_t *usbus, usbus_handler_t *handler);

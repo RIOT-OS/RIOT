@@ -20,7 +20,7 @@
 
 #include "at30tse75x.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define AT30TSE75X_BUS_FREE_TIME_TICKS (xtimer_ticks_from_usec(AT30TSE75X_BUS_FREE_TIME_US))

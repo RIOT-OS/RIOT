@@ -27,7 +27,7 @@
 #include "shtc1.h"
 #include "shtc1_regs.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int8_t shtc1_init(shtc1_t *const dev, const shtc1_params_t *params)

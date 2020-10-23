@@ -60,7 +60,7 @@
 #include "iot_defines.h"
 #include "ble-core.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #define IS_SRVC_CHANGED_CHARACT_PRESENT 1

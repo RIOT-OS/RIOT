@@ -31,7 +31,7 @@
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/icmpv6/echo.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static inline uint16_t _calc_csum(gnrc_pktsnip_t *hdr,

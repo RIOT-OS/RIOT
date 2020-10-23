@@ -27,7 +27,7 @@
 #include "cpu.h"
 #include "periph/hwrng.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static cc2538_soc_adc_t *soc_adc = (cc2538_soc_adc_t *)SOC_ADC_BASE;

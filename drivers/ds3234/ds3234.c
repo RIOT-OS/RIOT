@@ -24,7 +24,7 @@
 #include "ds3234.h"
 #include "ds3234_regs.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG            0
 #include "debug.h"
 
 /* SPI command byte parameters */

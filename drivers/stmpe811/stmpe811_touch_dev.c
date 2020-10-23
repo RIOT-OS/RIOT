@@ -27,7 +27,7 @@
 #include "stmpe811.h"
 #include "stmpe811_touch_dev.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 uint16_t _stmpe811_height(const touch_dev_t *touch_dev)

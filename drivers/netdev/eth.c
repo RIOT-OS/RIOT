@@ -26,7 +26,7 @@
 #include "net/eui64.h"
 #include "net/ethernet.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 int netdev_eth_get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)

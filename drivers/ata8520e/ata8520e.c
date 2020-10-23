@@ -33,7 +33,7 @@
 #include "ata8520e_internals.h"
 #include "ata8520e.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 /* Warning: to correctly display the debug messages in callbacks,
    add CFLAGS+=-DTHREAD_STACKSIZE_IDLE=THREAD_STACKSIZE_DEFAULT to the build
    command.

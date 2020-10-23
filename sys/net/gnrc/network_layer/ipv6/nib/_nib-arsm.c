@@ -28,7 +28,7 @@
 #include "_nib-router.h"
 #include "_nib-6lr.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
@@ -133,11 +133,9 @@ void _handle_sl2ao(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             }
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD && CONFIG_GNRC_IPV6_NIB_6LR */
         }
-#if ENABLE_DEBUG
         else {
             DEBUG("nib: Neighbor cache full\n");
         }
-#endif  /* ENABLE_DEBUG */
     }
     /* not else to include NCE created in nce == NULL branch */
     if ((nce != NULL) && (nce->mode & _NC)) {
@@ -322,7 +320,6 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
                         nbr->ns_sent++;
                     }
                 }
-#if ENABLE_DEBUG
                 else {
                     DEBUG("multicast to %s's solicited nodes (skipping since there is already "
                           "a multicast NS within %ums)\n",
@@ -330,7 +327,6 @@ void _probe_nbr(_nib_onl_entry_t *nbr, bool reset)
                                            sizeof(addr_str)),
                           (unsigned)netif->ipv6.retrans_time);
                 }
-#endif  /* ENABLE_DEBUG */
                 gnrc_netif_release(netif);
             }
             break;
