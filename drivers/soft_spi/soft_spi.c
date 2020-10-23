@@ -74,14 +74,12 @@ void soft_spi_init_pins(soft_spi_t bus)
 int soft_spi_init_cs(soft_spi_t bus, soft_spi_cs_t cs)
 {
     DEBUG("Soft SPI init CS\n");
-    if (bus >= SOFT_SPI_NUMOF)
-    {
+    if (bus >= SOFT_SPI_NUMOF) {
         DEBUG("Soft SPI bus not valid\n");
         return SOFT_SPI_NODEV;
     }
 
-    if ((cs == GPIO_UNDEF) || (cs == SOFT_SPI_CS_UNDEF))
-    {
+    if ((cs == GPIO_UNDEF) || (cs == SOFT_SPI_CS_UNDEF)) {
         DEBUG("Soft SPI chip select line not valid\n");
         return SOFT_SPI_NOCS;
     }
@@ -92,7 +90,8 @@ int soft_spi_init_cs(soft_spi_t bus, soft_spi_cs_t cs)
     return SOFT_SPI_OK;
 }
 
-int soft_spi_acquire(soft_spi_t bus, soft_spi_cs_t cs, soft_spi_mode_t mode, soft_spi_clk_t clk)
+int soft_spi_acquire(soft_spi_t bus, soft_spi_cs_t cs, soft_spi_mode_t mode,
+                     soft_spi_clk_t clk)
 {
     (void)cs;
     assert(bus < SOFT_SPI_NUMOF);
@@ -101,19 +100,16 @@ int soft_spi_acquire(soft_spi_t bus, soft_spi_cs_t cs, soft_spi_mode_t mode, sof
     mutex_lock(&locks[bus]);
 
     if ((mode != SOFT_SPI_MODE_0) && (mode != SOFT_SPI_MODE_1) &&
-        (mode != SOFT_SPI_MODE_2) && (mode != SOFT_SPI_MODE_3))
-    {
+        (mode != SOFT_SPI_MODE_2) && (mode != SOFT_SPI_MODE_3)) {
         return SOFT_SPI_NOMODE;
     }
     if ((clk != SOFT_SPI_CLK_100KHZ) && (clk != SOFT_SPI_CLK_400KHZ) &&
-        (clk != SOFT_SPI_CLK_DEFAULT))
-    {
+        (clk != SOFT_SPI_CLK_DEFAULT)) {
         return SOFT_SPI_NOCLK;
     }
     soft_spi_config[bus].soft_spi_mode = mode;
     soft_spi_config[bus].soft_spi_clk = clk;
-    switch (mode)
-    {
+    switch (mode) {
     case SOFT_SPI_MODE_0:
     case SOFT_SPI_MODE_1:
         /* CPOL=0 :clk idle state pin level is low*/
@@ -137,17 +133,16 @@ void soft_spi_release(soft_spi_t bus)
 static uint8_t _transfer_one_byte(soft_spi_t bus, uint8_t out)
 {
     int8_t bit = 0, i = 0;
+
     if (SOFT_SPI_MODE_1 == soft_spi_config[bus].soft_spi_mode ||
-        SOFT_SPI_MODE_3 == soft_spi_config[bus].soft_spi_mode)
-    {
+        SOFT_SPI_MODE_3 == soft_spi_config[bus].soft_spi_mode) {
         /* CPHA = 1 :Even edge valid*/
         gpio_toggle(soft_spi_config[bus].clk_pin);
     }
 
     bit = (out & (1 << 7)) >> 7;
     gpio_write(soft_spi_config[bus].mosi_pin, bit);
-    for (i = 6; i >= 0; i--)
-    {
+    for (i = 6; i >= 0; i--) {
         xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
         gpio_toggle(soft_spi_config[bus].clk_pin);
         xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
@@ -159,8 +154,7 @@ static uint8_t _transfer_one_byte(soft_spi_t bus, uint8_t out)
     gpio_toggle(soft_spi_config[bus].clk_pin);
 
     if (SOFT_SPI_MODE_0 == soft_spi_config[bus].soft_spi_mode ||
-        SOFT_SPI_MODE_2 == soft_spi_config[bus].soft_spi_mode)
-    {
+        SOFT_SPI_MODE_2 == soft_spi_config[bus].soft_spi_mode) {
         /* CPHASE = 1 */
         xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
         gpio_toggle(soft_spi_config[bus].clk_pin);
@@ -173,9 +167,9 @@ static uint8_t _readin_one_byte(soft_spi_t bus)
 {
     int8_t i = 0, tmp = 0;
     int bit;
+
     if (SOFT_SPI_MODE_1 == soft_spi_config[bus].soft_spi_mode ||
-        SOFT_SPI_MODE_3 == soft_spi_config[bus].soft_spi_mode)
-    {
+        SOFT_SPI_MODE_3 == soft_spi_config[bus].soft_spi_mode) {
         /* CPHA = 1*/
         gpio_toggle(soft_spi_config[bus].clk_pin);
         xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
@@ -184,8 +178,7 @@ static uint8_t _readin_one_byte(soft_spi_t bus)
     xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
     bit = gpio_read(soft_spi_config[bus].miso_pin);
     tmp |= (!!bit << 7);
-    for (i = 6; i >= 0; i--)
-    {
+    for (i = 6; i >= 0; i--) {
         xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
         gpio_toggle(soft_spi_config[bus].clk_pin);
         xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
@@ -195,8 +188,7 @@ static uint8_t _readin_one_byte(soft_spi_t bus)
     }
 
     if (SOFT_SPI_MODE_0 == soft_spi_config[bus].soft_spi_mode ||
-        SOFT_SPI_MODE_2 == soft_spi_config[bus].soft_spi_mode)
-    {
+        SOFT_SPI_MODE_2 == soft_spi_config[bus].soft_spi_mode) {
         xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
         gpio_toggle(soft_spi_config[bus].clk_pin);
     }
@@ -204,7 +196,8 @@ static uint8_t _readin_one_byte(soft_spi_t bus)
     return tmp;
 }
 
-uint8_t soft_spi_transfer_byte(soft_spi_t bus, soft_spi_cs_t cs, bool cont, uint8_t out)
+uint8_t soft_spi_transfer_byte(soft_spi_t bus, soft_spi_cs_t cs, bool cont,
+                               uint8_t out)
 {
     DEBUG("Soft SPI soft_spi_transfer_bytes\n");
     assert(bus < SOFT_SPI_NUMOF);
@@ -212,17 +205,14 @@ uint8_t soft_spi_transfer_byte(soft_spi_t bus, soft_spi_cs_t cs, bool cont, uint
     uint8_t retval = 0;
 
     /* activate the given chip select line */
-    if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF))
-    {
+    if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF)) {
         gpio_clear((gpio_t)cs);
     }
 
     retval = _transfer_one_byte(bus, out);
 
-    if (!cont)
-    {
-        if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF))
-        {
+    if (!cont) {
+        if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF)) {
             gpio_set((gpio_t)cs);
         }
     }
@@ -238,14 +228,12 @@ uint8_t soft_spi_read_byte(soft_spi_t bus, soft_spi_cs_t cs, bool cont)
     uint8_t retval = 0;
 
     /* activate the given chip select line */
-    if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF))
-    {
+    if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF)) {
         gpio_clear((gpio_t)cs);
     }
 
     retval = _readin_one_byte(bus);
-    if (!cont)
-    {
+    if (!cont) {
         gpio_set((gpio_t)cs);
     }
 
@@ -261,27 +249,21 @@ void soft_spi_transfer_bytes(soft_spi_t bus, soft_spi_cs_t cs, bool cont,
     const uint8_t *outbuf = out;
     uint8_t *inbuf = in;
 
-    if (!inbuf)
-    {
-        for (size_t i = 0; i < len - 1; i++)
-        {
+    if (!inbuf) {
+        for (size_t i = 0; i < len - 1; i++) {
             soft_spi_transfer_byte(bus, cs, true, outbuf[i]);
         }
         soft_spi_transfer_byte(bus, cs, cont, outbuf[len - 1]);
     }
-    else if (!outbuf)
-    {
-        for (size_t i = 0; i < len - 1; i++)
-        {
+    else if (!outbuf) {
+        for (size_t i = 0; i < len - 1; i++) {
             inbuf[i] = soft_spi_read_byte(bus, cs, true);
         }
 
         inbuf[len - 1] = soft_spi_read_byte(bus, cs, cont);
     }
-    else
-    {
-        for (size_t i = 0; i < len - 1; i++)
-        {
+    else {
+        for (size_t i = 0; i < len - 1; i++) {
             soft_spi_transfer_byte(bus, cs, true, outbuf[i]);
             inbuf[i] = soft_spi_read_byte(bus, cs, true);
         }
