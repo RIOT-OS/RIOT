@@ -332,8 +332,20 @@ static int stat_etag(char *filename, union stattag *stattag)
 
     memset(stattag, 0, sizeof(union stattag));
     err = vfs_stat(filename, &stattag->stat);
-    if (err < 0)
+    if (err < 0) {
+        /* Some file systems, like  only implement fstat. FIXME: run on file
+         * handles all the time and only use fstat. (Not trivial because it
+         * needs going through all filesystems to check whether there isn't one
+         * that only does stat and not fstat) */
+        int fd = vfs_open(filename, O_RDONLY, 0);
+        if (fd < 0) {
+            return fd;
+        }
+        err = vfs_fstat(fd, &stattag->stat);
+        vfs_close(fd);
+
         return err;
+    }
 
     /* Normalizing fields whose value can change without affecting the ETag */
     stattag->stat.st_nlink = 0;
