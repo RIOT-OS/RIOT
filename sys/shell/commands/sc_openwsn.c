@@ -541,6 +541,7 @@ static int _queue_cmd(int argc, char **argv)
     return -1;
 }
 
+#if SCHEDULER_DEBUG_ENABLE
 static int _scheduler_cmd(char *arg)
 {
     (void)arg;
@@ -551,6 +552,7 @@ static int _scheduler_cmd(char *arg)
 
     return 0;
 }
+#endif
 
 static void _print_usage(void)
 {
@@ -559,7 +561,9 @@ static void _print_usage(void)
     puts("\topenwsn queue: Openqueue management commands");
     puts("\topenwsn cell: cell management commands");
     puts("\topenwsn 6top: 6top request commands");
+#if SCHEDULER_DEBUG_ENABLE
     puts("\topenwsn sched: show openos scheduler information");
+#endif
 }
 
 int _openwsn_handler(int argc, char **argv)
@@ -585,9 +589,11 @@ int _openwsn_handler(int argc, char **argv)
         return _cell_cmd(argc - 1, &argv[1]);
     }
 
+#if SCHEDULER_DEBUG_ENABLE
     if (!strcmp(argv[1], "sched")) {
         return _scheduler_cmd(NULL);
     }
+#endif
 
     if (!strcmp(argv[1], "6top")) {
         if (!ieee154e_isSynch()) {

@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-USEMODULE += gnrc_sock_ip
+USEMODULE += sock_ip
 USEMODULE += gnrc_ipv6
 USEMODULE += ps
 

@@ -1,3 +1,18 @@
+PSEUDOMODULES += openwsn_serial \
+                 openwsn_debugpins \
+                 openwsn_6lo_frag \
+                 openwsn_icmpv6_echo \
+                 openwsn_iee802154e_security \
+                 openwsn_leds \
+                 openwsn_scheduler \
+                 openwsn_sctimer \
+                 openwsn_sctimer_rtt \
+                 openwsn_sctimer_ztimer \
+                 openwsn_radio \
+                 #
+
+DIRS += $(RIOTBASE)/pkg/openwsn/contrib
+
 INCLUDES += -I$(PKGDIRBASE)/openwsn \
             -I$(PKGDIRBASE)/openwsn/kernel \
             -I$(PKGDIRBASE)/openwsn/inc \
@@ -17,19 +32,14 @@ INCLUDES += -I$(PKGDIRBASE)/openwsn \
             -I$(PKGDIRBASE)/openwsn/openweb/opencoap \
             -I$(RIOTBASE)/pkg/openwsn/include \
 
-DIRS += $(RIOTBASE)/pkg/openwsn/contrib
+ifneq (,$(filter openwsn_openos,$(USEMODULE)))
+  INCLUDES += -I$(PKGDIRBASE)/openwsn/kernel/openos
+endif
 
-PSEUDOMODULES += openwsn_serial \
-                 openwsn_debugpins \
-                 openwsn_6lo_frag \
-                 openwsn_icmpv6_echo \
-                 openwsn_iee802154e_security \
-                 openwsn_leds \
-                 openwsn_sctimer \
-                 openwsn_sctimer_rtt \
-                 openwsn_sctimer_ztimer \
-                 openwsn_radio \
-                 #
+ifneq (,$(filter openwsn_riotos,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBASE)/pkg/openwsn/scheduler
+  DIRS += $(RIOTBASE)/pkg/openwsn/scheduler
+endif
 
 # Set OpenWSN configurations flags, see $(PKG_SOURCE_DIR)/openwsn-fw/inc/config.h
 

@@ -1,5 +1,6 @@
 CPU_CORE = cortex-m0plus
 
 FEATURES_PROVIDED += puf_sram
+FEATURES_PROVIDED += periph_gpio_fast_read
 
 -include $(RIOTCPU)/sam0_common/Makefile.features

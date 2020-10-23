@@ -169,5 +169,3 @@ eval-gprof:
 
 eval-cachegrind:
 	$(CGANNOTATE) $(shell ls -rt cachegrind.out* | tail -1)
-
-UNDEF += $(BINDIR)/cpu/startup.o

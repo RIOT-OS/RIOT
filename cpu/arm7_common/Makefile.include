@@ -1,5 +1,6 @@
 # Target architecture for the build. Use arm-none-eabi if you are unsure.
-TARGET_ARCH ?= arm-none-eabi
+TARGET_ARCH_ARM7 ?= arm-none-eabi
+TARGET_ARCH ?= $(TARGET_ARCH_ARM7)
 
 INCLUDES += -I$(RIOTBASE)/cpu/arm7_common/include/
 
@@ -17,5 +18,3 @@ ASFLAGS     += $(CFLAGS_CPU) $(CFLAGS_DBG)
 LINKFLAGS   += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU).ld
 LINKFLAGS   += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
 LINKFLAGS   += -Wl,--gc-sections
-
-UNDEF += $(BINDIR)/cpu/startup.o

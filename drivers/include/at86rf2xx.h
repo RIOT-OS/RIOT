@@ -120,7 +120,7 @@ extern "C" {
 #   define MIN_RX_SENSITIVITY              (-101)
 #endif
 
-#if defined(DOXYGEN) || defined(MODULE_AT86RF232) || defined(MODULE_AT86RF233)
+#if defined(DOXYGEN) || defined(MODULE_AT86RF232) || defined(MODULE_AT86RF233) || defined(MODULE_AT86RFR2)
 /**
  * @brief   Frame retry counter reporting
  *
@@ -284,7 +284,7 @@ typedef struct {
                                              return to @ref at86rf2xx_t::idle_state */
 #if AT86RF2XX_HAVE_RETRIES
     /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
-    uint8_t tx_retries;                 /**< Number of NOACK retransmissions */
+    int8_t tx_retries;                  /**< Number of NOACK retransmissions */
 #endif
     /** @} */
 } at86rf2xx_t;
@@ -621,7 +621,7 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, const uint8_t *data,
  *
  * @param[in] dev           device to trigger
  */
-void at86rf2xx_tx_exec(const at86rf2xx_t *dev);
+void at86rf2xx_tx_exec(at86rf2xx_t *dev);
 
 /**
  * @brief   Perform one manual channel clear assessment (CCA)

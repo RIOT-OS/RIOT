@@ -36,9 +36,6 @@ OPTIONAL_CFLAGS_BLACKLIST += -gz
 
 ASFLAGS += --longcalls --text-section-literals
 
-# thin archives trigger a reboot loop - see #12258, #12035, #12346
-ARFLAGS = rcs
-
 CFLAGS_DBG ?= -ggdb -g3
 
 # override default CFLAGS_OPT in case module esp_gdb is enabled
@@ -80,7 +77,7 @@ CFLAGS += $(if $(findstring qio,$(FLASH_MODE)),-DFLASH_MODE_QIO=1)
 CFLAGS += $(if $(findstring dio,$(FLASH_MODE)),-DFLASH_MODE_DIO=1)
 CFLAGS += $(if $(findstring dout,$(FLASH_MODE)),-DFLASH_MODE_DOUT=1)
 
-BASELIBS += -lhal -lg -lc
+ARCHIVES += -lhal -lg -lc
 
 LINKFLAGS += $(CFLAGS_OPT) $(CFLAGS_DBG)
 LINKFLAGS += -L$(ESP_SDK_DIR)/components/$(CPU)

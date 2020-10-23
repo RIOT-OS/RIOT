@@ -1,5 +1,6 @@
 # Target architecture for the build. Use msp430-elf if you are unsure.
-TARGET_ARCH ?= msp430-elf
+TARGET_ARCH_MSP430 ?= msp430-elf
+TARGET_ARCH ?= $(TARGET_ARCH_MSP430)
 
 MSP430_SUPPORT_FILES ?= $(RIOTCPU)/msp430_common/vendor/msp430-gcc-support-files
 

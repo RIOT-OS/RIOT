@@ -87,6 +87,9 @@ extern "C" {
 #define AT86RF2XX_REG__TRX_RPC                                  (&TRX_RPC)
 #define AT86RF2XX_REG__ANT_DIV                                  (&ANT_DIV)
 #define AT86RF2XX_REG__IRQ_MASK                                 (&IRQ_MASK)
+#ifdef IRQ_MASK1
+#define AT86RF2XX_REG__IRQ_MASK1                                (&IRQ_MASK1)
+#endif
 #define AT86RF2XX_REG__IRQ_STATUS                               (&IRQ_STATUS)
 #define AT86RF2XX_REG__IRQ_STATUS1                              (&IRQ_STATUS1)
 #define AT86RF2XX_REG__VREG_CTRL                                (&VREG_CTRL)

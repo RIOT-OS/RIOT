@@ -1,7 +1,7 @@
-From 9854468048be9f3119ff76ec4545ba7bfb99f107 Mon Sep 17 00:00:00 2001
+From 219e01c2b9fb779e3682a24d361a8a9b672b551a Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Sun, 29 Mar 2020 12:11:53 +0200
-Subject: [PATCH 04/10] kernel/openos/scheduler: use thread flags, restore
+Subject: [PATCH 4/9] kernel/openos/scheduler: use thread flags, restore
  irq_state
 
 Use thread_flags_wait_any to pause the scheduler. Set flag in
@@ -14,7 +14,7 @@ squash! kernel/openos/scheduler: use thread flags
  2 files changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/kernel/openos/scheduler.c b/kernel/openos/scheduler.c
-index 1dad545e..28bfe5c2 100644
+index f52f35d4..41be092f 100644
 --- a/kernel/openos/scheduler.c
 +++ b/kernel/openos/scheduler.c
 @@ -10,6 +10,11 @@
@@ -29,7 +29,7 @@ index 1dad545e..28bfe5c2 100644
  //=========================== variables =======================================
  
  scheduler_vars_t scheduler_vars;
-@@ -31,8 +36,11 @@ void scheduler_init(void) {
+@@ -36,8 +41,11 @@ void scheduler_init(void) {
      SCHEDULER_ENABLE_INTERRUPT();
  }
  
@@ -42,7 +42,7 @@ index 1dad545e..28bfe5c2 100644
      while (1) {
          while(scheduler_vars.task_list!=NULL) {
           // there is still at least one task in the linked-list of tasks
-@@ -59,6 +67,7 @@ void scheduler_start(void) {
+@@ -66,6 +74,7 @@ void scheduler_start(void) {
        }
        debugpins_task_clr();
        board_sleep();
@@ -50,20 +50,20 @@ index 1dad545e..28bfe5c2 100644
        debugpins_task_set();                      // IAR should halt here if nothing to do
     }
  }
-@@ -105,6 +114,8 @@ void scheduler_push_task(task_cbt cb, task_prio_t prio) {
-     }
+@@ -114,6 +123,8 @@ void scheduler_push_task(task_cbt cb, task_prio_t prio) {
+ #endif
  
      ENABLE_INTERRUPTS();
 +   thread_t *thread = (thread_t*) thread_get(openwsn_get_pid());
 +   thread_flags_set(thread, OPENWSN_SCHEDULER_FLAG);
  }
  
- //=========================== private =========================================
+ 
 diff --git a/kernel/scheduler.h b/kernel/scheduler.h
-index bc49817e..f3f64570 100644
+index dd035a22..51b6d9cb 100644
 --- a/kernel/scheduler.h
 +++ b/kernel/scheduler.h
-@@ -64,7 +64,7 @@ typedef struct {
+@@ -47,7 +47,7 @@ typedef void (*task_cbt)(void);
  //=========================== prototypes ======================================
  
  void scheduler_init(void);
@@ -71,7 +71,7 @@ index bc49817e..f3f64570 100644
 +void scheduler_start(unsigned state);
  void scheduler_push_task(task_cbt task_cb, task_prio_t prio);
  
- /**
+ #if SCHEDULER_DEBUG_ENABLE
 -- 
-2.27.0
+2.28.0
 

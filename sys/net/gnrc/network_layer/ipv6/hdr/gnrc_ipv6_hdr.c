@@ -26,7 +26,7 @@ static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 
 /* For independent testing */
-#ifdef MODULE_GNRC_IPV6
+#ifdef MODULE_GNRC_NETTYPE_IPV6
 #define HDR_NETTYPE (GNRC_NETTYPE_IPV6)
 #else
 #define HDR_NETTYPE (GNRC_NETTYPE_UNDEF)

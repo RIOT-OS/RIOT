@@ -3,8 +3,5 @@
 # as easy as adding the header file only.
 EFM32_HEADER = $(wildcard $(RIOTCPU)/efm32/families/efr32mg12p/include/vendor/$(CPU_MODEL).h)
 
-# vectors.o is provided by 'cpu_$(CPU_FAM)' module and not by 'cpu'
-VECTORS_O = $(BINDIR)/cpu_efr32mg12p/vectors.o
-
 # include vendor device headers
 INCLUDES += -I$(RIOTCPU)/efm32/families/efr32mg12p/include/vendor

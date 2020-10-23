@@ -110,6 +110,10 @@ typedef enum {
      * It's assumed that @ref IEEE802154_CAP_FRAME_RETRANS is present.
      */
     IEEE802154_CAP_FRAME_RETRANS_INFO,
+    /**
+     * @brief the device retains all register values when off.
+     */
+    IEEE802154_CAP_REG_RETENTION,
 } ieee802154_rf_caps_t;
 
 /**
@@ -484,6 +488,18 @@ struct ieee802154_radio_ops {
      * @pre call to @ref ieee802154_radio_ops::request_on was successful.
      *
      * @post the transceiver state is @ref IEEE802154_TRX_STATE_TRX_OFF
+     * During boot or in case the radio doesn't support @ref
+     * IEEE802154_CAP_REG_RETENTION when @ref off was called, the
+     * Physical Information Base will be undefined. Thus, take into
+     * consideration that the following functions should be called right after
+     * the radio is turned on again:
+     * - @ref set_cca_threshold
+     * - @ref set_cca_mode
+     * - @ref config_phy
+     * - @ref set_csma_params
+     * - @ref set_rx_mode
+     * - @ref set_hw_addr_filter
+     * - @ref set_frame_retrans (if available)
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      *
@@ -620,15 +636,12 @@ struct ieee802154_radio_ops {
      * @return -EINVAL if the configuration is not valid for the device.
      * @return negative errno on error
      */
-    int (*config_phy)(ieee802154_dev_t *dev, ieee802154_phy_conf_t *conf);
+    int (*config_phy)(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf);
 
     /**
      * @brief Set IEEE802.15.4 addresses in hardware address filter
      *
      * @pre the device is on
-     *
-     * @note this function pointer can be NULL if the device doesn't support
-     *       hardware address filtering.
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] short_addr the IEEE802.15.4 short address. If NULL, the short
@@ -679,7 +692,7 @@ struct ieee802154_radio_ops {
      * @return -EINVAL if the settings are not supported.
      * @return negative errno on error
      */
-    int (*set_csma_params)(ieee802154_dev_t *dev, ieee802154_csma_be_t *bd,
+    int (*set_csma_params)(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd,
                            int8_t retries);
 
     /**
@@ -802,7 +815,7 @@ static inline int ieee802154_radio_set_cca_mode(ieee802154_dev_t *dev,
  * @return result of @ref ieee802154_radio_ops::config_phy
  */
 static inline int ieee802154_radio_config_phy(ieee802154_dev_t *dev,
-                                              ieee802154_phy_conf_t *conf)
+                                              const ieee802154_phy_conf_t *conf)
 {
     return dev->driver->config_phy(dev, conf);
 }
@@ -876,7 +889,7 @@ static inline int ieee802154_radio_set_frame_retrans(ieee802154_dev_t *dev,
  * @return result of @ref ieee802154_radio_ops::set_csma_params
  */
 static inline int ieee802154_radio_set_csma_params(ieee802154_dev_t *dev,
-                                                   ieee802154_csma_be_t *bd,
+                                                   const ieee802154_csma_be_t *bd,
                                                    int8_t retries)
 {
     return dev->driver->set_csma_params(dev, bd, retries);
