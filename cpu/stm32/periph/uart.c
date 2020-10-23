@@ -34,7 +34,8 @@
 #include "periph/gpio.h"
 #include "pm_layered.h"
 
-#if defined(CPU_LINE_STM32L4R5xx) || defined(CPU_FAM_STM32G0)
+#if defined(CPU_LINE_STM32L4R5xx) || defined(CPU_FAM_STM32G0) || \
+    defined(CPU_FAM_STM32L5)
 #define ISR_REG     ISR
 #define ISR_TXE     USART_ISR_TXE_TXFNF
 #define ISR_RXNE    USART_ISR_RXNE_RXFNE
@@ -60,9 +61,9 @@
 #define RDR_REG     DR
 #endif
 
-#if defined(CPU_LINE_STM32L4R5xx) || defined(CPU_FAM_STM32G0)
+#if defined(CPU_LINE_STM32L4R5xx) || defined(CPU_FAM_STM32G0) || \
+    defined(CPU_FAM_STM32L5)
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE_RXFNEIE)
-#define USART_ISR_RXNE      (USART_ISR_RXNE_RXFNE)
 #else
 #define RXENABLE            (USART_CR1_RE | USART_CR1_RXNEIE)
 #endif
@@ -96,7 +97,8 @@ static inline USART_TypeDef *dev(uart_t uart)
 
 static inline void uart_init_usart(uart_t uart, uint32_t baudrate);
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4)
+    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
+    defined(CPU_FAM_STM32L5)
 #ifdef MODULE_PERIPH_LPUART
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate);
 #endif
@@ -189,7 +191,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev(uart)->CR3 = 0;
 
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4)
+    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
+    defined(CPU_FAM_STM32L5)
     switch (uart_config[uart].type) {
         case STM32_USART:
             uart_init_usart(uart, baudrate);
@@ -301,7 +304,13 @@ static inline void uart_init_usart(uart_t uart, uint32_t baudrate)
 }
 
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L4) || \
-    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4)
+    defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
+    defined(CPU_FAM_STM32L5)
+#ifdef CPU_FAM_STM32L5
+#define RCC_CCIPR_LPUART1SEL_0  RCC_CCIPR1_LPUART1SEL_0
+#define RCC_CCIPR_LPUART1SEL_1  RCC_CCIPR1_LPUART1SEL_1
+#define CCIPR                   CCIPR1
+#endif
 #ifdef MODULE_PERIPH_LPUART
 static inline void uart_init_lpuart(uart_t uart, uint32_t baudrate)
 {

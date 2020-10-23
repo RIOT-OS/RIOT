@@ -1,0 +1,30 @@
+# Copyright (c) 2020 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config BOARD
+    default "nucleo-l552ze-q" if BOARD_NUCLEO_L552ZE_Q
+
+config BOARD_NUCLEO_L552ZE_Q
+    bool
+    default y
+    select BOARD_COMMON_NUCLEO144
+    select CPU_MODEL_STM32L552ZE
+
+    # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_LPUART
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_UART
+
+    # Put other features for this board (in alphabetical order)
+    select HAS_RIOTBOOT
+
+    # Clock configuration
+    select BOARD_HAS_LSE
+
+source "$(RIOTBOARD)/common/nucleo144/Kconfig"

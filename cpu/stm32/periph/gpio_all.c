@@ -45,7 +45,8 @@ static gpio_isr_ctx_t isr_ctx[EXTI_NUMOF];
 #endif /* MODULE_PERIPH_GPIO_IRQ */
 
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
+    defined(CPU_FAM_STM32L5)
 #define EXTI_REG_RTSR       (EXTI->RTSR1)
 #define EXTI_REG_FTSR       (EXTI->FTSR1)
 #define EXTI_REG_PR         (EXTI->PR1)
@@ -92,7 +93,7 @@ static inline void port_init_clock(GPIO_TypeDef *port, gpio_t pin)
 #elif defined (CPU_FAM_STM32L0) || defined(CPU_FAM_STM32G0)
     periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
 #elif defined (CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-      defined (CPU_FAM_STM32G4)
+      defined (CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5)
     periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
 #ifdef PWR_CR2_IOSV
     if (port == GPIOG) {
@@ -158,7 +159,7 @@ void gpio_init_analog(gpio_t pin)
 #elif defined (CPU_FAM_STM32L0) || defined(CPU_FAM_STM32G0)
     periph_clk_en(IOP, (RCC_IOPENR_GPIOAEN << _port_num(pin)));
 #elif defined (CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-      defined (CPU_FAM_STM32G4)
+      defined (CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5)
     periph_clk_en(AHB2, (RCC_AHB2ENR_GPIOAEN << _port_num(pin)));
 #else
     periph_clk_en(AHB1, (RCC_AHB1ENR_GPIOAEN << _port_num(pin)));
@@ -236,7 +237,9 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     gpio_init(pin, mode);
 
     /* enable global pin interrupt */
-#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
+#if defined(CPU_FAM_STM32L5)
+    NVIC_EnableIRQ(EXTI0_IRQn + pin_num);
+#elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32G0)
     if (pin_num < 2) {
         NVIC_EnableIRQ(EXTI0_1_IRQn);
@@ -264,7 +267,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     EXTI_REG_FTSR &= ~(1 << pin_num);
     EXTI_REG_FTSR |=  ((flank >> 1) << pin_num);
 
-#if defined(CPU_FAM_STM32G0)
+#if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5)
     /* enable specific pin as exti sources */
     EXTI->EXTICR[pin_num >> 2] &= ~(0xf << ((pin_num & 0x03) * 8));
     EXTI->EXTICR[pin_num >> 2] |= (port_num << ((pin_num & 0x03) * 8));
@@ -286,7 +289,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
 
 void isr_exti(void)
 {
-#if defined(CPU_FAM_STM32G0)
+#if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5)
     /* only generate interrupts against lines which have their IMR set */
     uint32_t pending_rising_isr = (EXTI->RPR1 & EXTI_REG_IMR);
     uint32_t pending_falling_isr = (EXTI->FPR1 & EXTI_REG_IMR);

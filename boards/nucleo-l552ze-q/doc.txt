@@ -1,0 +1,26 @@
+/**
+@defgroup    boards_nucleo-l552ze-q STM32 Nucleo-L552ZE-Q
+@ingroup     boards_common_nucleo144
+@brief       Support for the STM32 Nucleo-L552ZE-Q
+
+## Flashing the device
+
+The ST Nucleo-L552ZE-Q board includes an on-board ST-LINK V2.1 programmer. The
+easiest way to program the board is to use OpenOCD. Once you have installed
+OpenOCD (look [here](https://github.com/RIOT-OS/RIOT/wiki/OpenOCD) for
+installation instructions), you can flash the board simply by typing
+
+```
+make BOARD=nucleo-l552ze-q flash
+```
+and debug via GDB by simply typing
+```
+make BOARD=nucleo-l552ze-q debug
+```
+
+## Supported Toolchains
+
+For using the ST Nucleo-L552ZE-Q board we recommend the usage of the
+[GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded)
+toolchain.
+ */

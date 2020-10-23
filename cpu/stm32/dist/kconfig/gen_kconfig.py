@@ -112,9 +112,12 @@ def generate_kconfig(kconfig, context, overwrite, verbose):
     template = env.get_template(template_file)
     render = template.render(**context)
 
-    kconfig_file = os.path.join(
-        STM32_KCONFIG_DIR, context["fam"], "Kconfig.{}".format(kconfig)
-    )
+    kconfig_dir = os.path.join(STM32_KCONFIG_DIR, context["fam"])
+    kconfig_file = os.path.join(kconfig_dir, "Kconfig.{}".format(kconfig))
+
+    # Create family Kconfig dir if it doesn't exist yet
+    if not os.path.exists(kconfig_dir):
+        os.makedirs(kconfig_dir)
 
     if (not os.path.exists(kconfig_file) or
             (os.path.exists(kconfig_file) and

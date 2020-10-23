@@ -46,7 +46,8 @@
 #elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 /* Enable ultra low-power and clear wakeup flags */
 #define PM_STOP_CONFIG  (PWR_CR_LPSDSR | PWR_CR_ULP | PWR_CR_CWUF)
-#elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4)
+#elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4) || \
+      defined(CPU_FAM_STM32L5)
 #define PM_STOP_CONFIG  (PWR_CR1_LPMS_STOP1)
 #elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G0)
 #define PM_STOP_CONFIG  (PWR_CR1_LPMS_0)
@@ -66,7 +67,8 @@
  */
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 #define PM_STANDBY_CONFIG   (PWR_CR_PDDS | PWR_CR_CWUF | PWR_CR_CSBF | PWR_CR_ULP)
-#elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4)
+#elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4) || \
+      defined(CPU_FAM_STM32L5)
 #define PM_STANDBY_CONFIG   (PWR_CR1_LPMS_STANDBY)
 #elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G0)
 #define PM_STANDBY_CONFIG   (PWR_CR1_LPMS_0 | PWR_CR1_LPMS_1)
@@ -78,7 +80,8 @@
 #endif
 
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
+    defined(CPU_FAM_STM32L5)
 #define PWR_CR_REG     PWR->CR1
 #define PWR_WUP_REG    PWR->CR3
 /* Allow overridable SRAM2 retention mode using CFLAGS */
@@ -104,14 +107,15 @@ void pm_set(unsigned mode)
             PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
             PWR_CR_REG |= PM_STANDBY_CONFIG;
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4)
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5)
 #if STM32L4_SRAM2_RETENTION
             PWR->CR3 |= PWR_CR3_RRS;
 #else
             PWR->CR3 &= ~PWR_CR3_RRS;
 #endif
 #endif
-#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4)
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4) || \
+    defined(CPU_FAM_STM32L5)
             /* Clear flags */
             PWR->SCR |= PWR_SCR_CSBF;
 #endif

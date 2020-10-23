@@ -31,7 +31,7 @@ extern "C" {
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L4) || \
     defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5)
 
 /**
  * @brief   Timing register settings
@@ -41,7 +41,8 @@ extern "C" {
 static const i2c_timing_param_t timing_params[] = {
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F7) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0)
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
+    defined(CPU_FAM_STM32L5)
     [ I2C_SPEED_NORMAL ]    = {
         .presc  = 0xB,
         .scll   = 0x13,     /* t_SCLL   = 5.0us  */
@@ -112,7 +113,7 @@ static const i2c_timing_param_t timing_params[] = {
 
 #endif /* CPU_FAM_STM32F0 || CPU_FAM_STM32F3 || CPU_FAM_STM32F7 ||
           CPU_FAM_STM32L0 || CPU_FAM_STM32L4 || CPU_FAM_STM32WB ||
-          CPU_FAM_STM32G4 || CPU_FAM_STM32G0 */
+          CPU_FAM_STM32G4 || CPU_FAM_STM32G0 || CPU_FAM_STM32L5 */
 
 #ifdef __cplusplus
 }
