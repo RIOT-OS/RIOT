@@ -179,6 +179,9 @@ endif
 ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
   FILTER += xtimer
 endif
+ifneq (,$(filter coapfileserver,$(USEMODULE)))
+    DIRS += net/application_layer/coapfileserver
+endif
 
 DIRS += $(dir $(wildcard $(addsuffix /Makefile, $(filter-out $(FILTER), $(USEMODULE)))))
 

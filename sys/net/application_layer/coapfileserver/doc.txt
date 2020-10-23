@@ -1,0 +1,56 @@
+/*
+ * Copyright (C) 2020 chrysn
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    net_coapfileserver CoAP file server
+ * @ingroup     net
+ * @brief       Library for serving files from the VFS to CoAP clients
+ *
+ * # About
+ * 
+ * This maps files in the local file system onto a resources in CoAP. In that,
+ * is is what is called a static web server in the unconstrained web.
+ *
+ * As usual, GET operations are used to read files<!-- WRITESUPPORT, and PUT writes to files.
+ * In the current implementation, PUTs are expressed as random-access, meaning
+ * that files are not updated atomically -->.
+ *
+ * Directories are expressed to URIs with trailing slashes<!-- WRITESUPPORT, and are always
+ * created implicitly when files are PUT under them; they can be DELETEd when
+ * empty -->.
+ *
+ *
+ * # Usage
+ *
+ * * ``USEMODULE += coapfileserver``
+ *
+ * * Have a @ref coapfileserver_entry populated with the path you want to serve,
+ *   and the number of path components to strip from incoming requests:
+ *
+ *   ```
+ *   static const struct coapfileserver_entry files_sd = {
+ *       "/sd",
+ *       2
+ *   };
+ *   ```
+ *
+ * * Enter a @ref coapfileserver_handler handler into your CoAP server's
+ *   resource list like this:
+ *
+ *   ```
+ *   static const coap_resource_t _resources[] = {
+ *       ...,
+ *       { "/files/sd", COAP_GET | COAP_MATCH_SUBTREE, coapfileserver_handler, files_sd },
+ *       ...
+ *   }
+ *   ```
+ *
+ *   The allowed methods dictate whether it's read-only (``COAP_GET``) or (in the
+ *   future<!-- WRITESUPPORT -->) read-write (``1COAP_GET | COAP_PUT | COAP_DELETE``).
+ *
+ */
