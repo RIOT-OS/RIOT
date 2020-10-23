@@ -266,7 +266,7 @@ enum {
 #define CONFIG_CC2538_RF_OBS_2      rssi_valid
 #endif
 
-/* Default configration for cc2538dk or similar */
+/* Default configuration for cc2538dk or similar */
 #ifndef CONFIG_CC2538_RF_OBS_SIG_0_PCX
 #define CONFIG_CC2538_RF_OBS_SIG_0_PCX  0   /* PC0 = LED_1 (red) */
 #endif
