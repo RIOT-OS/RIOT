@@ -19,6 +19,14 @@ export VALGRIND ?= valgrind
 export CGANNOTATE ?= cg_annotate
 export GPROF ?= gprof
 
+# newer Ubuntu versions require cross compilation for i686
+ifeq (gnu,$(TOOLCHAIN))
+ifeq (0,$(shell i686-linux-gnu-gcc --version > /dev/null; echo $$?))
+  TARGET_ARCH_NATIVE = i686-linux-gnu
+  TARGET_ARCH ?= $(TARGET_ARCH_NATIVE)
+endif
+endif
+
 # basic cflags:
 CFLAGS += -Wall -Wextra -pedantic $(CFLAGS_DBG)
 CFLAGS_DBG ?= -g3
