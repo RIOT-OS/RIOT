@@ -5,8 +5,8 @@
 # directory for more details.
 #
 
-menu "STM32 G0 clock configuration"
-    depends on CPU_FAM_G0
+menu "STM32 clock configuration"
+    depends on CPU_FAM_G0 || CPU_FAM_G4
 
 choice
 bool "Clock source selection"
@@ -26,20 +26,55 @@ endchoice
 
 config CLOCK_PLL_M
     int "M: PLLIN division factor" if USE_CLOCK_PLL
-    default 1
-    range 1 8
+    default 1 if CPU_FAM_G0
+    default 4 if CPU_FAM_G4
+    default 6 if CPU_FAM_G4 && BOARD_HAS_HSE
+    range 1 8 if CPU_FAM_G0
+    range 1 16 if CPU_FAM_G4
 
 config CLOCK_PLL_N
     int "N: PLLIN multiply factor" if USE_CLOCK_PLL
-    default 20
-    range 8 86
+    default 20 if CPU_FAM_G0
+    default 40 if CPU_FAM_G4
+    range 8 86 if CPU_FAM_G0
+    range 8 127 if CPU_FAM_G4
 
+if CPU_FAM_G0
 config CLOCK_PLL_R
     int "Q: VCO division factor" if USE_CLOCK_PLL
     default 6 if BOARD_HAS_HSE
     default 5
     range 2 8
+endif
 
+if CPU_FAM_G4
+choice
+bool "R: Main PLL division factor for PLL 'R' clock (system clock)" if USE_CLOCK_PLL
+default PLL_R_DIV_2
+
+config PLL_R_DIV_2
+    bool "Divide by 2"
+
+config PLL_R_DIV_4
+    bool "Divide by 4"
+
+config PLL_R_DIV_6
+    bool "Divide by 6"
+
+config PLL_R_DIV_8
+    bool "Divide by 8"
+
+endchoice
+
+config CLOCK_PLL_R
+    int
+    default 2 if PLL_R_DIV_2
+    default 4 if PLL_R_DIV_4
+    default 6 if PLL_R_DIV_6
+    default 8 if PLL_R_DIV_8
+endif
+
+if CPU_FAM_G0
 choice
 bool "HSISYS division factor" if USE_CLOCK_HSI
 default CLOCK_HSISYS_DIV_1
@@ -72,7 +107,7 @@ endchoice
 
 config CLOCK_HSISYS_DIV
     int
-    default 1
+    default 1 if CLOCK_HSISYS_DIV_1
     default 2 if CLOCK_HSISYS_DIV_2
     default 4 if CLOCK_HSISYS_DIV_4
     default 8 if CLOCK_HSISYS_DIV_8
@@ -80,9 +115,10 @@ config CLOCK_HSISYS_DIV
     default 32 if CLOCK_HSISYS_DIV_32
     default 64 if CLOCK_HSISYS_DIV_64
     default 128 if CLOCK_HSISYS_DIV_128
+endif
 
 choice
-bool "APB prescaler (division factor of HCLK to produce PCLK)"
+bool "APB1 prescaler (division factor of HCLK to produce PCLK1)"
 default CLOCK_APB1_DIV_1
 
 config CLOCK_APB1_DIV_1
@@ -110,6 +146,33 @@ config CLOCK_APB1_DIV
     default 8 if CLOCK_APB1_DIV_8
     default 16 if CLOCK_APB1_DIV_16
 
-endmenu
+choice
+bool "APB2 prescaler (division factor of HCLK to produce PCLK2)"  if CPU_FAM_G4
+default CLOCK_APB2_DIV_1
 
-source "$(RIOTBOARD)/common/stm32/Kconfig"
+config CLOCK_APB2_DIV_1
+    bool "Divide HCLK by 1"
+
+config CLOCK_APB2_DIV_2
+    bool "Divide HCLK by 2"
+
+config CLOCK_APB2_DIV_4
+    bool "Divide HCLK by 4"
+
+config CLOCK_APB2_DIV_8
+    bool "Divide HCLK by 8"
+
+config CLOCK_APB2_DIV_16
+    bool "Divide HCLK by 16"
+
+endchoice
+
+config CLOCK_APB2_DIV
+    int
+    default 1 if CLOCK_APB2_DIV_1
+    default 2 if CLOCK_APB2_DIV_2
+    default 4 if CLOCK_APB2_DIV_4
+    default 8 if CLOCK_APB2_DIV_8
+    default 16 if CLOCK_APB2_DIV_16
+
+endmenu

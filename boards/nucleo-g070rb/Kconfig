@@ -26,5 +26,4 @@ config BOARD_NUCLEO_G070RB
     # Clock configuration
     select BOARD_HAS_LSE
 
-source "$(RIOTBOARD)/common/stm32/Kconfig.g0"
 source "$(RIOTBOARD)/common/nucleo64/Kconfig"

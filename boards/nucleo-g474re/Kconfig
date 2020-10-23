@@ -30,5 +30,4 @@ config BOARD_NUCLEO_G474RE
     select BOARD_HAS_HSE
     select BOARD_HAS_LSE
 
-source "$(RIOTBOARD)/common/stm32/Kconfig.g4"
 source "$(RIOTBOARD)/common/nucleo64/Kconfig"
