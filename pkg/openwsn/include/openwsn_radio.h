@@ -55,25 +55,30 @@ extern "C" {
 #endif
 
 #include "net/netdev.h"
+#include "net/ieee802154/radio.h"
 #include "radio.h"
 
 /**
  * @brief   Initialize OpenWSN radio
  *
- * @param[in]   netdev     pointer to a netdev interface
+ * @param[in]   radio_dev     pointer to a dev interface
  *
  * @return  PID of OpenWSN thread
  * @return  -1 on initialization error
  */
-int openwsn_radio_init(netdev_t *netdev);
+int openwsn_radio_init(void *radio_dev);
 
 /**
  * @brief OpenWSN radio variables structure
  */
 typedef struct {
+#if IS_ACTIVE(MODULE_OPENWSN_RADIO_NETDEV)
+    netdev_t *dev;                    /**< netdev device */
+#else
+    ieee802154_dev_t  *dev;           /**< radio hal */
+#endif
     radio_capture_cbt startFrame_cb;  /**< start of frame capture callback */
     radio_capture_cbt endFrame_cb;    /**< end of frame capture callback */
-    netdev_t *dev;                    /**< netdev device */
 } openwsn_radio_t;
 
 #ifdef __cplusplus

@@ -87,6 +87,30 @@
 /** @} */
 
 /**
+ * @name    OpenWSN leds configuration
+ * @{
+ */
+#define OPENWSN_LEDPIN_ERROR    LED0_PIN
+#define OPENWSN_LEDPIN_SYNC     LED1_PIN
+#define OPENWSN_LEDPIN_RADIO    LED3_PIN
+#define OPENWSN_LEDPIN_DEBUG    LED2_PIN
+/** @} */
+
+/**
+ * @name    OpenWSN debugpins configuration
+ *
+ * @note This configuration mimics the one done in OpenWSN-fw for the
+ *       same platform
+ * @{
+ */
+#define OPENWSN_DEBUGPIN_FRAME  GPIO_PIN(0, 7) /* A7 */
+#define OPENWSN_DEBUGPIN_ISR    GPIO_PIN(2, 3) /* C3 */
+#define OPENWSN_DEBUGPIN_SLOT   GPIO_PIN(1, 3) /* B3 */
+#define OPENWSN_DEBUGPIN_FSM    GPIO_PIN(1, 2) /* B2 */
+#define OPENWSN_DEBUGPIN_TASK   GPIO_PIN(1, 1) /* B1 */
+#define OPENWSN_DEBUGPIN_RADIO  GPIO_PIN(1, 0) /* B0 */
+
+/**
  * @name    AT86RF215 configuration
  * @{
  */

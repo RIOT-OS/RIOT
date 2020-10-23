@@ -16,8 +16,6 @@ ifneq (,$(filter openwsn_openstack,$(USEMODULE)))
 
   DEFAULT_MODULE += auto_init_openwsn
 
-  USEMODULE += luid
-  USEMODULE += netdev_default
 endif
 
 ifneq (,$(filter openwsn_scheduler,$(USEMODULE)))
@@ -48,6 +46,23 @@ endif
 ifneq (,$(filter openwsn_crypto,$(USEMODULE)))
   USEMODULE += crypto_3des
   USEMODULE += cipher_modes
+endif
+
+ifneq (,$(filter openwsn_radio,$(USEMODULE)))
+  USEMODULE += netdev_default
+  USEMODULE += luid
+  ifneq (,$(filter cc2538_rf nrf802154,$(USEMODULE)))
+    USEMODULE += openwsn_radio_hal
+  endif
+  ifneq (,$(filter at86rf2xx,$(USEMODULE)))
+    USEMODULE += openwsn_radio_netdev
+  endif
+endif
+
+ifneq (,$(filter openwsn_radio_hal,$(USEMODULE)))
+  USEMODULE += ieee802154_radio_hal
+  # Used here only for dependency resolution
+  DISABLE_MODULE += auto_init_gnrc_netif
 endif
 
 ifneq (,$(filter openwsn_sctimer,$(USEMODULE)))

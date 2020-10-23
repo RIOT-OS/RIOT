@@ -61,14 +61,14 @@ void scheduler_start(unsigned state)
     /* wait for events */
     event_t *event;
     while ((event = event_wait_multi(_queues, TASKPRIO_MAX))) {
-        debugpins_task_clr();
+        debugpins_task_set();
         event->handler(event);
         /* remove from task list */
         memarray_free(&_scheduler_vars.memarray, event);
 #if SCHEDULER_DEBUG_ENABLE
         scheduler_dbg.numTasksCur--;
 #endif
-        debugpins_task_set();
+        debugpins_task_clr();
     }
 }
 

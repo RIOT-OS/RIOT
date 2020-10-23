@@ -43,6 +43,19 @@ extern "C" {
 #define CPU_HAS_BITBAND                 (1)
 /** @} */
 
+/**
+ * @name    OpenWSN timing constants
+ *
+ * @{
+ */
+/* Taken from openwsn-fw */
+#define PORT_maxTxDataPrepare   (460/PORT_US_PER_TICK)
+#define PORT_maxRxAckPrepare    (300/PORT_US_PER_TICK)
+#define PORT_maxRxDataPrepare   (300/PORT_US_PER_TICK)
+#define PORT_maxTxAckPrepare    (460/PORT_US_PER_TICK)
+#define PORT_delayTx            (400/PORT_US_PER_TICK)
+/** @} */
+
 #ifdef __cplusplus
 } /* end extern "C" */
 #endif

@@ -1,3 +1,8 @@
+# ATM openwsn does not support the at86rf215 radio
+ifneq (,$(filter openwsn,$(USEPKG)))
+  USEMODULE += cc2538_rf
+endif
+
 ifneq (,$(filter netdev_default,$(USEMODULE)))
   ifeq (,$(filter cc2538_rf,$(USEMODULE)))
     USEMODULE += at86rf215
