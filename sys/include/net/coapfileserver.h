@@ -18,8 +18,8 @@
  * @}
  */
 
-#ifndef COAPFILESERVER_H
-#define COAPFILESERVER_H
+#ifndef NET_COAPFILESERVER_H
+#define NET_COAPFILESERVER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,6 +66,6 @@ ssize_t coapfileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *
 }
 #endif
 
-#endif
+#endif /* NET_COAPFILESERVER_H */
 
 /** @} */
