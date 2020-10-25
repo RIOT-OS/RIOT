@@ -64,24 +64,24 @@
 #define JEDEC_BANK(n)   ((n) << 8)
 
 typedef enum {
-    SPI_NOR_JEDEC_ATMEL     = 0x1F | JEDEC_BANK(1),
+    SPI_NOR_JEDEC_ATMEL = 0x1F | JEDEC_BANK(1),
 } jedec_manuf_t;
 /** @} */
 
+static inline spi_t _get_spi(const mtd_spi_nor_t *dev)
+{
+    return dev->params->spi;
+}
+
 static void mtd_spi_acquire(const mtd_spi_nor_t *dev)
 {
-    spi_acquire(dev->params->spi, dev->params->cs,
+    spi_acquire(_get_spi(dev), dev->params->cs,
                 dev->params->mode, dev->params->clk);
 }
 
 static void mtd_spi_release(const mtd_spi_nor_t *dev)
 {
-    spi_release(dev->params->spi);
-}
-
-static bool mtd_spi_manuf_match(const mtd_jedec_id_t *id, jedec_manuf_t manuf)
-{
-    return manuf == ((id->bank << 8) | id->manuf);
+    spi_release(_get_spi(dev));
 }
 
 /**
@@ -111,12 +111,12 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
     }
 
     /* Send opcode followed by address */
-    spi_transfer_byte(dev->params->spi, dev->params->cs, true, opcode);
-    spi_transfer_bytes(dev->params->spi, dev->params->cs, true,
+    spi_transfer_byte(_get_spi(dev), dev->params->cs, true, opcode);
+    spi_transfer_bytes(_get_spi(dev), dev->params->cs, true,
                        (char *)addr_buf, NULL, dev->params->addr_width);
 
     /* Read data */
-    spi_transfer_bytes(dev->params->spi, dev->params->cs, false,
+    spi_transfer_bytes(_get_spi(dev), dev->params->cs, false,
                        NULL, dest, count);
 }
 
@@ -147,16 +147,16 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
     }
 
     /* Send opcode followed by address */
-    spi_transfer_byte(dev->params->spi, dev->params->cs, true, opcode);
+    spi_transfer_byte(_get_spi(dev), dev->params->cs, true, opcode);
 
     /* only keep CS asserted when there is data that follows */
     bool cont = (count > 0);
-    spi_transfer_bytes(dev->params->spi, dev->params->cs, cont,
+    spi_transfer_bytes(_get_spi(dev), dev->params->cs, cont,
                        (char *)addr_buf, NULL, dev->params->addr_width);
 
     /* Write data */
     if (cont) {
-        spi_transfer_bytes(dev->params->spi, dev->params->cs,
+        spi_transfer_bytes(_get_spi(dev), dev->params->cs,
                            false, (void *)src, NULL, count);
     }
 }
@@ -175,7 +175,7 @@ static void mtd_spi_cmd_read(const mtd_spi_nor_t *dev, uint8_t opcode, void *des
     TRACE("mtd_spi_cmd_read: %p, %02x, %p, %" PRIu32 "\n",
           (void *)dev, (unsigned int)opcode, dest, count);
 
-    spi_transfer_regs(dev->params->spi, dev->params->cs, opcode, NULL, dest, count);
+    spi_transfer_regs(_get_spi(dev), dev->params->cs, opcode, NULL, dest, count);
 }
 
 /**
@@ -192,7 +192,7 @@ static void __attribute__((unused)) mtd_spi_cmd_write(const mtd_spi_nor_t *dev, 
     TRACE("mtd_spi_cmd_write: %p, %02x, %p, %" PRIu32 "\n",
           (void *)dev, (unsigned int)opcode, src, count);
 
-    spi_transfer_regs(dev->params->spi, dev->params->cs, opcode,
+    spi_transfer_regs(_get_spi(dev), dev->params->cs, opcode,
                       (void *)src, NULL, count);
 }
 
@@ -208,7 +208,12 @@ static void mtd_spi_cmd(const mtd_spi_nor_t *dev, uint8_t opcode)
     TRACE("mtd_spi_cmd: %p, %02x\n",
           (void *)dev, (unsigned int)opcode);
 
-    spi_transfer_byte(dev->params->spi, dev->params->cs, false, opcode);
+    spi_transfer_byte(_get_spi(dev), dev->params->cs, false, opcode);
+}
+
+static bool mtd_spi_manuf_match(const mtd_jedec_id_t *id, jedec_manuf_t manuf)
+{
+    return manuf == ((id->bank << 8) | id->manuf);
 }
 
 /**
@@ -381,7 +386,7 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
 
     DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %lx, opcodes: %p\n",
-          (unsigned long)dev->params->spi, (unsigned long)dev->params->cs, (void *)dev->params->opcode);
+          (unsigned long)_get_spi(dev), (unsigned long)dev->params->cs, (void *)dev->params->opcode);
 
     if (dev->params->addr_width == 0) {
         return -EINVAL;
@@ -389,7 +394,7 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
 
     /* CS */
     DEBUG("mtd_spi_nor_init: CS init\n");
-    spi_init_cs(dev->params->spi, dev->params->cs);
+    spi_init_cs(_get_spi(dev), dev->params->cs);
 
     /* power up the MTD device*/
     DEBUG("mtd_spi_nor_init: power up MTD device");
