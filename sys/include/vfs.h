@@ -969,6 +969,20 @@ const vfs_mount_t *vfs_iterate_mounts(const vfs_mount_t *cur);
  */
 const vfs_file_t *vfs_file_get(int fd);
 
+/** @brief  Implementation of `stat` using `fstat`
+ *
+ * This helper can be used by file system drivers that do not have any more
+ * efficient implementation of `fs_op::stat` than opening the file and running
+ * `f_op::fstat` on it.
+ *
+ * It can be set as `fs_op::stat` by a file system driver, provided it
+ * implements `f_op::open` and `f_op::fstat` and `f_op::close`, and its `open`
+ * accepts `NULL` in the `abs_path` position.
+ */
+int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp,
+        const char *restrict path,
+        struct stat *restrict buf);
+
 #ifdef __cplusplus
 }
 #endif
