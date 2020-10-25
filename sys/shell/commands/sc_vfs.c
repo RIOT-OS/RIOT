@@ -49,6 +49,7 @@ static void _vfs_usage(char **argv)
     printf("%s mv <src> <dest>\n", argv[0]);
     printf("%s rm <file>\n", argv[0]);
     printf("%s df [path]\n", argv[0]);
+    printf("%s stat <path>\n", argv[0]);
     puts("r: Read [bytes] bytes at [offset] in file <path>");
     puts("w: Write (<a>: append, <o> overwrite) <ascii> or <hex> string <data> in file <path>");
     puts("ls: list files in <path>");
@@ -56,6 +57,7 @@ static void _vfs_usage(char **argv)
     puts("cp: Copy <src> file to <dest>");
     puts("rm: Unlink (delete) <file>");
     puts("df: show file system space utilization stats");
+    puts("stat: show file metadata");
 }
 
 /* Macro used by _errno_string to expand errno labels to string and print it */
@@ -491,6 +493,29 @@ static int _rm_handler(int argc, char **argv)
     return 0;
 }
 
+static int _stat_handler(int argc, char **argv)
+{
+    if (argc != 2) {
+        _vfs_usage(argv);
+        return 1;
+    }
+
+    struct stat buf;
+    int res = vfs_stat(argv[1], &buf);
+    if (res < 0) {
+        char errbuf[16];
+        _errno_string(res, (char *)errbuf, sizeof(errbuf));
+        printf("stat ERR: %s\n", errbuf);
+        return 2;
+    }
+    /* Losely modeled after Linux stat output */
+    printf("File: %s\n", argv[1]);
+    printf("Size: %ld\n", buf.st_size);
+    printf("Type: %s\n", S_ISREG(buf.st_mode) ? "file" : S_ISDIR(buf.st_mode) ? "directory" : "other");
+    printf("Access: %o\n", buf.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO));
+    return 0;
+}
+
 int _ls_handler(int argc, char **argv)
 {
     if (argc < 2) {
@@ -576,6 +601,9 @@ int _vfs_handler(int argc, char **argv)
     }
     else if (strcmp(argv[1], "df") == 0) {
         return _df_handler(argc - 1, &argv[1]);
+    }
+    else if (strcmp(argv[1], "stat") == 0) {
+        return _stat_handler(argc - 1, &argv[1]);
     }
     else {
         printf("vfs: unsupported sub-command \"%s\"\n", argv[1]);
