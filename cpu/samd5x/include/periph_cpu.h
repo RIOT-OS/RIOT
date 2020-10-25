@@ -107,6 +107,11 @@ typedef enum {
 #define DAC_NUMOF           (2)
 
 /**
+ * @brief   The MCU has one QSPI interface.
+ */
+#define QSPI_NUMOF          (1)
+
+/**
  * @name    Real time counter configuration
  * @{
  */
