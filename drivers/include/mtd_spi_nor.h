@@ -49,7 +49,7 @@ typedef struct {
     uint8_t page_program;    /**< Page program */
     uint8_t sector_erase;    /**< Block erase 4 KiB */
     uint8_t block_erase_32k; /**< 32KiB block erase */
-    uint8_t block_erase;     /**< Block erase (usually 64 KiB) */
+    uint8_t block_erase_64k; /**< Block erase (usually 64 KiB) */
     uint8_t chip_erase;      /**< Chip erase */
     uint8_t sleep;           /**< Deep power down */
     uint8_t wake;            /**< Release from deep power down */
@@ -85,10 +85,16 @@ typedef struct __attribute__((packed)) {
  * @brief   Flag to set when the device support 4KiB sector erase (sector_erase opcode)
  */
 #define SPI_NOR_F_SECT_4K   (1)
+
 /**
  * @brief   Flag to set when the device support 32KiB block erase (block_erase_32k opcode)
  */
 #define SPI_NOR_F_SECT_32K  (2)
+
+/**
+ * @brief   Flag to set when the device support 64KiB block erase (block_erase_32k opcode)
+ */
+#define SPI_NOR_F_SECT_64K  (4)
 
 /**
  * @brief Compile-time parameters for a serial flash device
@@ -96,9 +102,9 @@ typedef struct __attribute__((packed)) {
 typedef struct {
     const mtd_spi_nor_opcode_t *opcode; /**< Opcode table for the device */
     uint32_t wait_chip_erase;   /**< Full chip erase wait time in µs */
-    uint32_t wait_sector_erase; /**< Sector erase wait time in µs */
+    uint32_t wait_64k_erase;    /**< 64KB page erase wait time in µs */
     uint32_t wait_32k_erase;    /**< 32KB page erase wait time in µs */
-    uint32_t wait_4k_erase;     /**< 4KB page erase wait time in µs */
+    uint32_t wait_sector_erase; /**< 4KB sector erase wait time in µs */
     uint32_t wait_chip_wake_up; /**< Chip wake up time in µs */
     spi_clk_t clk;           /**< SPI clock */
     uint16_t flag;           /**< Config flags */
