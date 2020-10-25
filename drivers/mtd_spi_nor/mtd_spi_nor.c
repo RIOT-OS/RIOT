@@ -70,26 +70,63 @@ typedef enum {
 } jedec_manuf_t;
 /** @} */
 
+static inline bool _is_qspi(const mtd_spi_nor_t *dev)
+{
+    if (!IS_ACTIVE(MODULE_MTD_SPI_NOR_QSPI)) {
+        return false;
+    }
+
+    return dev->params->flag & SPI_NOR_F_QSPI;
+}
+
+static inline bool _is_spi(const mtd_spi_nor_t *dev)
+{
+    if (!IS_ACTIVE(MODULE_MTD_SPI_NOR_SPI)) {
+        return false;
+    }
+
+    if (IS_ACTIVE(MODULE_MTD_SPI_NOR_QSPI)) {
+        return (dev->params->flag & SPI_NOR_F_QSPI) == 0;
+    }
+
+    return true;
+}
+
 static inline spi_t _get_spi(const mtd_spi_nor_t *dev)
 {
-    return dev->params->spi;
+    return dev->params->spi.spi;
 }
 
-static void mtd_spi_acquire(const mtd_spi_nor_t *dev)
+static inline qspi_t _get_qspi(const mtd_spi_nor_t *dev)
 {
-    spi_acquire(_get_spi(dev), dev->params->cs,
-                dev->params->mode, dev->params->clk);
-}
-
-static void mtd_spi_release(const mtd_spi_nor_t *dev)
-{
-    spi_release(_get_spi(dev));
+    return dev->params->spi.qspi;
 }
 
 static inline uint8_t* _be_addr(const mtd_spi_nor_t *dev, uint32_t *addr)
 {
     *addr = htonl(*addr);
     return &((uint8_t*)addr)[4 - dev->params->addr_width];
+}
+
+static void mtd_spi_acquire(const mtd_spi_nor_t *dev)
+{
+    if (_is_qspi(dev)) {
+        qspi_acquire(_get_qspi(dev));
+    } else if (_is_spi(dev))
+    {
+        spi_acquire(_get_spi(dev), dev->params->cs,
+                    dev->params->mode, dev->params->clk);
+    }
+}
+
+static void mtd_spi_release(const mtd_spi_nor_t *dev)
+{
+    if (_is_qspi(dev)) {
+        qspi_release(_get_qspi(dev));
+    } else if (_is_spi(dev))
+    {
+        spi_release(_get_spi(dev));
+    }
 }
 
 /**
@@ -107,6 +144,13 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
 {
     TRACE("mtd_spi_cmd_addr_read: %p, %02x, (%06"PRIx32"), %p, %" PRIu32 "\n",
           (void *)dev, (unsigned int)opcode, addr, dest, count);
+
+    if (_is_qspi(dev)) {
+        qspi_read(_get_qspi(dev), addr, dest, count);
+        return;
+    } else if (!_is_spi(dev)) {
+        return;
+    }
 
     uint8_t *addr_buf = _be_addr(dev, &addr);
 
@@ -143,6 +187,17 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
 {
     TRACE("mtd_spi_cmd_addr_write: %p, %02x, (%06"PRIx32"), %p, %" PRIu32 "\n",
           (void *)dev, (unsigned int)opcode, addr, src, count);
+
+    if (_is_qspi(dev)) {
+        if (opcode == SFLASH_CMD_QUAD_PAGE_PROGRAM) {
+            qspi_write(_get_qspi(dev), addr, src, count);
+        } else {
+            qspi_erase(_get_qspi(dev), opcode, addr);
+        }
+        return;
+    } else if (!_is_spi(dev)) {
+        return;
+    }
 
     uint8_t *addr_buf = _be_addr(dev, &addr);
 
@@ -183,7 +238,11 @@ static void mtd_spi_cmd_read(const mtd_spi_nor_t *dev, uint8_t opcode, void *des
     TRACE("mtd_spi_cmd_read: %p, %02x, %p, %" PRIu32 "\n",
           (void *)dev, (unsigned int)opcode, dest, count);
 
-    spi_transfer_regs(_get_spi(dev), dev->params->cs, opcode, NULL, dest, count);
+    if (_is_qspi(dev)) {
+        qspi_cmd_read(_get_qspi(dev), opcode, dest, count);
+    } else if (_is_spi(dev)) {
+        spi_transfer_regs(_get_spi(dev), dev->params->cs, opcode, NULL, dest, count);
+    }
 }
 
 /**
@@ -200,8 +259,12 @@ static void __attribute__((unused)) mtd_spi_cmd_write(const mtd_spi_nor_t *dev, 
     TRACE("mtd_spi_cmd_write: %p, %02x, %p, %" PRIu32 "\n",
           (void *)dev, (unsigned int)opcode, src, count);
 
-    spi_transfer_regs(_get_spi(dev), dev->params->cs, opcode,
-                      (void *)src, NULL, count);
+    if (_is_qspi(dev)) {
+        qspi_cmd_write(_get_qspi(dev), opcode, src, count);
+    } else if (_is_spi(dev)) {
+        spi_transfer_regs(_get_spi(dev), dev->params->cs, opcode,
+                          (void *)src, NULL, count);
+    }
 }
 
 /**
@@ -216,7 +279,11 @@ static void mtd_spi_cmd(const mtd_spi_nor_t *dev, uint8_t opcode)
     TRACE("mtd_spi_cmd: %p, %02x\n",
           (void *)dev, (unsigned int)opcode);
 
-    spi_transfer_byte(_get_spi(dev), dev->params->cs, false, opcode);
+    if (_is_qspi(dev)) {
+        qspi_cmd_write(_get_qspi(dev), opcode, NULL, 0);
+    } else if (_is_spi(dev)) {
+        spi_transfer_byte(_get_spi(dev), dev->params->cs, false, opcode);
+    }
 }
 
 static bool mtd_spi_manuf_match(const mtd_jedec_id_t *id, jedec_manuf_t manuf)
@@ -363,6 +430,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
     mtd_spi_acquire(dev);
     switch (power) {
         case MTD_POWER_UP:
+
             mtd_spi_cmd(dev, dev->params->opcode->wake);
 #if defined(MODULE_XTIMER)
             /* No sense in trying multiple times if no xtimer to wait between
@@ -378,6 +446,12 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
                 return -EIO;
             }
 #endif
+            /* configure QSPI */
+            if (_is_qspi(dev)) {
+                qspi_configure(_get_qspi(dev), dev->params->mode,
+                               dev->params->addr_width, dev->params->clk);
+            }
+
             break;
         case MTD_POWER_DOWN:
             mtd_spi_cmd(dev, dev->params->opcode->sleep);
@@ -401,8 +475,16 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     }
 
     /* CS */
-    DEBUG("mtd_spi_nor_init: CS init\n");
-    spi_init_cs(_get_spi(dev), dev->params->cs);
+    if (_is_spi(dev)) {
+        DEBUG("mtd_spi_nor_init: CS init\n");
+        spi_init_cs(_get_spi(dev), dev->params->cs);
+    }
+
+    /* configure QSPI */
+    if (_is_qspi(dev)) {
+        qspi_configure(_get_qspi(dev), dev->params->mode,
+                       dev->params->addr_width, dev->params->clk);
+    }
 
     /* power up the MTD device*/
     DEBUG("mtd_spi_nor_init: power up MTD device");

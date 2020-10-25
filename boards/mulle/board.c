@@ -36,7 +36,7 @@
 static nvram_t mulle_nvram_dev;
 nvram_t *mulle_nvram = &mulle_nvram_dev;
 static nvram_spi_params_t nvram_spi_params = {
-        .spi = MULLE_NVRAM_SPI_DEV,
+        .spi.spi = MULLE_NVRAM_SPI_DEV,
         .clk = MULLE_NVRAM_SPI_CLK,
         .cs = MULLE_NVRAM_SPI_CS,
         .address_count = MULLE_NVRAM_SPI_ADDRESS_COUNT,
@@ -54,7 +54,7 @@ static const mtd_spi_nor_params_t mulle_nor_params = {
     .wait_sector_erase = 10LU * US_PER_MS,
     .wait_32k_erase = 20LU * US_PER_MS,
     .wait_chip_wake_up = 1LU * US_PER_MS,
-    .spi = MULLE_NOR_SPI_DEV,
+    .spi.spi = MULLE_NOR_SPI_DEV,
     .cs = MULLE_NOR_SPI_CS,
     .addr_width = 3,
     .mode = SPI_MODE_3,

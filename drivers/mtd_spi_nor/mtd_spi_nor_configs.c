@@ -42,6 +42,22 @@ const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default = {
     .wake            = 0xab,
 };
 
+const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_qspi = {
+    .rdid            = 0x9f,
+    .wren            = 0x06,
+    .rdsr            = 0x05,
+    .wrsr            = 0x01,
+    .read            = SFLASH_CMD_QUAD_READ,
+    .read_fast       = 0x0b,
+    .page_program    = SFLASH_CMD_QUAD_PAGE_PROGRAM,
+    .sector_erase    = 0x20,
+    .block_erase_32k = 0x52,
+    .block_erase_64k = 0xd8,
+    .chip_erase      = 0xc7,
+    .sleep           = 0xb9,
+    .wake            = 0xab,
+};
+
 const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default_4bytes = {
     .rdid            = 0x9f,
     .wren            = 0x06,
