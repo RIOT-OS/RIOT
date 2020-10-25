@@ -24,6 +24,18 @@
 #include "mcg.h"
 #endif
 
+#ifdef LMEM
+static void cpu_cache_init(void)
+{
+    LMEM->PCCCR = LMEM_PCCCR_INVW0_MASK | LMEM_PCCCR_INVW1_MASK | LMEM_PCCCR_GO_MASK |
+                  LMEM_PCCCR_ENCACHE_MASK | LMEM_PCCCR_ENWRBUF_MASK;
+    while (LMEM->PCCCR & LMEM_PCCCR_GO_MASK) {}
+    LMEM->PSCCR = LMEM_PSCCR_INVW0_MASK | LMEM_PSCCR_INVW1_MASK | LMEM_PSCCR_GO_MASK |
+                  LMEM_PSCCR_ENCACHE_MASK | LMEM_PSCCR_ENWRBUF_MASK;
+    while (LMEM->PSCCR & LMEM_PSCCR_GO_MASK) {}
+}
+#endif
+
 /**
  * @brief Initialize the CPU, set IRQ priorities
  */
@@ -31,6 +43,9 @@ void cpu_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();
+#ifdef LMEM
+    cpu_cache_init();
+#endif
 #ifdef SMC
     /* Clear LLS protection */
     /* Clear VLPS, VLPW, VLPR protection */

@@ -200,6 +200,11 @@ void i2c_init(i2c_t dev)
             I2C2_CLKEN();
             break;
 #endif
+#ifdef I2C3
+        case (uintptr_t)I2C3:
+            I2C3_CLKEN();
+            break;
+#endif
         default:
             if (ENABLE_INIT_DEBUG) {
                 DEBUG("i2c_init: Unknown I2C device %p\n", (void *)i2c);

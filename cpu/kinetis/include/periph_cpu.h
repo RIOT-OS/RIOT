@@ -661,6 +661,28 @@ typedef struct {
      * @see CPU reference manual, SIM_CLKDIV1
      */
     uint32_t clkdiv1;
+#ifdef SIM_CLKDIV3_PLLFLLDIV
+    /**
+     * @brief   Clock divider (register 3) bitfield setting
+     *
+     * The value will be written to the SIM_CLKDIV3 hardware register without
+     * any transformation. Use the SIM_CLCKDIV3_PLLFLLx() macros to ensure the
+     * proper bit shift for the chosen divider settings.
+     *
+     * @see CPY reference manual, SIM_CLKDIV3
+     */
+    uint32_t clkdiv3;
+#endif
+#ifdef SIM_SOPT2_PLLFLLSEL
+    /**
+     * @brief   Clock source select for the high frequency peripheral clock.
+     *
+     * The value will be written to the SIM_SOPT2 hardware register without
+     * any transformation. Use the SIM_SOPT2_PLLFLLSEL() macro to ensure the
+     * proper bit shift for the chosen clock source setting.
+     */
+    uint32_t periph_pllfllsel;
+#endif
     /**
      * @brief   RTC oscillator Capacitor Load Configuration bits
      *

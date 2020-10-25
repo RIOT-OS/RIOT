@@ -312,7 +312,9 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
 #ifdef MCG
     [MCG_IRQn        ] = isr_mcg,             /* MCG Interrupt */
 #endif
-#ifdef LPTMR0
+#if defined(LPTMR0) && defined(LPTMR1)
+    [LPTMR0_LPTMR1_IRQn] = isr_lptmr0_lptmr1, /* LPTimer shared interrupt */
+#elif defined(LPTMR0)
     [LPTMR0_IRQn     ] = isr_lptmr0,          /* LPTimer interrupt */
 #endif
 #ifdef PORTA

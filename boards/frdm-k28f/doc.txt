@@ -1,0 +1,5 @@
+/**
+@defgroup    boards_frdm-k28f NXP FRDM-K28F Board
+@ingroup     boards
+@brief       Support for the NXP FRDM-K28F
+ */

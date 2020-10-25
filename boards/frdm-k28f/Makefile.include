@@ -1,0 +1,16 @@
+# No need to start the bootloader when programming over SWD
+FRDM_K28F_DISABLE_BOOTLOADER ?= 1
+
+ifeq (1,$(FRDM_K28F_DISABLE_BOOTLOADER))
+  # Disable the watch dog during flashing to prevent a reset after the write
+  # Enable protected write to FCF (required for setting FOPT byte).
+  OPENOCD_PRE_FLASH_CMDS += "-c kinetis fcf_source protection"
+  # TODO: variable
+  OPENOCD_PRE_FLASH_CMDS += "-c kinetis fopt 0x3f"
+  CFLAGS += -DKINETIS_FOPT=0x3f
+endif
+OPENOCD_PRE_FLASH_CMDS += "-c kinetis disable_wdog"
+
+
+# Include default FRDM board config
+include $(RIOTBOARD)/common/frdm/Makefile.include
