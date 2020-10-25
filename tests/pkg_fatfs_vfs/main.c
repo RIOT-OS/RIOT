@@ -318,6 +318,8 @@ static void test_fstat(void)
             vfs_write(fd, test_txt, sizeof(test_txt)) == sizeof(test_txt));
     print_test_result("test_stat__close", vfs_close(fd) == 0);
 
+    print_test_result("test_stat__direct", vfs_stat(FULL_FNAME1, &stat_buf) == 0);
+
     fd = vfs_open(FULL_FNAME1, O_RDONLY, 0);
     print_test_result("test_stat__open", fd >= 0);
     print_test_result("test_stat__stat", vfs_fstat(fd, &stat_buf) == 0);
