@@ -537,6 +537,28 @@ static inline void sam0_cortexm_sleep(int deep)
 }
 
 /**
+ * @brief   Enable CPU cache
+ */
+static inline void samd0_cache_enable(void)
+{
+#ifdef CMCC
+    CMCC->CTRL.bit.CEN = 1;
+#endif
+}
+
+/**
+ * @brief   Disable and clear CPU cache
+ */
+static inline void samd0_cache_disable(void)
+{
+#ifdef CMCC
+    CMCC->CTRL.bit.CEN = 0;
+    while (CMCC->SR.bit.CSTS) {}
+    CMCC->MAINT0.bit.INVALL = 1;
+#endif
+}
+
+/**
  * @brief   Disable alternate function (PMUX setting) for a PORT pin
  *
  * @param[in] pin   Pin to reset the multiplexing for
