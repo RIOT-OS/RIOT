@@ -18,7 +18,7 @@
 #include <fcntl.h>
 #include <error.h>
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
 /** Maximum length of an expressible path, including the trailing 0 character. */
@@ -257,10 +257,6 @@ static ssize_t coapfileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf, s
 {
     /**
      * ToDo:
-     *
-     * * Produce actual link format (considering the 'origin' part, ie. always
-     *   giving full paths including path-so-far from the request PDU), or
-     *   serve CoRAL right away
      *
      * * Blockwise
      *
