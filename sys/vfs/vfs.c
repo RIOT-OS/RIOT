@@ -1000,4 +1000,23 @@ static inline int _fd_is_valid(int fd)
     return 0;
 }
 
+int vfs_sysop_stat_from_fstat(vfs_mount_t *mountp, const char *restrict path, struct stat *restrict buf)
+{
+    const vfs_file_ops_t * f_op = mountp->fs->f_op;
+    vfs_file_t opened = {
+        .mp = mountp,
+        /* As per definition of the `vfsfile_ops::open` field */
+        .f_op = f_op,
+        .private_data = { .ptr = NULL },
+        .pos = 0,
+    };
+    int err = f_op->open(&opened, path, 0, 0, NULL);
+    if (err < 0) {
+        return err;
+    }
+    err = f_op->fstat(&opened, buf);
+    f_op->close(&opened);
+    return err;
+}
+
 /** @} */

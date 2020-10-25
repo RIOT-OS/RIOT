@@ -445,6 +445,7 @@ static const vfs_file_system_ops_t fatfs_fs_ops = {
     .unlink = _unlink,
     .mkdir = _mkdir,
     .rmdir = _rmdir,
+    .stat = vfs_sysop_stat_from_fstat,
 };
 
 static const vfs_file_ops_t fatfs_file_ops = {
