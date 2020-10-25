@@ -61,6 +61,12 @@ static ssize_t coapfileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf, s
 /** Create a CoAP response for a given errno (eg. EACCESS -> 4.03 Forbidden
  * etc., defaulting to 5.03 Internal Server Error) */
 static size_t coapfileserver_errno_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, int err);
+/** Return true if path/name is a directory.
+ *
+ * Currently assembling the values in a buffer, this could be done without a
+ * buffer if an openat / vfs_openat was present.
+ * */
+static bool entry_is_dir(char *path, char *name);
 
 ssize_t coapfileserver_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx) {
     struct coapfileserver_entry *entry = (struct coapfileserver_entry *)ctx;
@@ -258,7 +264,6 @@ static ssize_t coapfileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf, s
      *
      * * Blockwise
      *
-     * * Directories don't have their trailing slashes yet
      */
     vfs_DIR dir;
 
@@ -286,8 +291,9 @@ static ssize_t coapfileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf, s
             /* Up pointers don't work the same way in URI semantics */
             continue;
         }
+        bool is_dir = entry_is_dir(request->namebuf, entry_name);
         /* maybe ",", "<>", and the length */
-        ssize_t need_bytes = (payload_cursor == 0 ? 0 : 1) + 2 + entry_len;
+        ssize_t need_bytes = (payload_cursor == 0 ? 0 : 1) + 2 + entry_len + (is_dir ? 1 : 0);
         if (payload_cursor + need_bytes > pdu->payload_len) {
             /* Without blockwise, this is the best approximation we can do */
             DEBUG("coapfileserver: Directory listing truncated\n");
@@ -299,6 +305,9 @@ static ssize_t coapfileserver_directory_handler(coap_pkt_t *pdu, uint8_t *buf, s
         pdu->payload[payload_cursor++] = '<';
         memcpy(&pdu->payload[payload_cursor], entry_name, entry_len);
         payload_cursor += entry_len;
+        if (is_dir) {
+            pdu->payload[payload_cursor++] = '/';
+        }
         pdu->payload[payload_cursor++] = '>';
     }
     vfs_closedir(&dir);
@@ -359,4 +368,38 @@ static int stat_etag(char *filename, union stattag *stattag)
     }
 
     return 0;
+}
+
+static bool entry_is_dir(char *path, char *name)
+{
+    /* FIXME have an openat or fstatat
+     *
+     * or just build the long name outside because it's printed later, or use
+     * it from the printed buffer? */
+    char buf[COAPFILESERVER_PATH_MAX];
+    /* snprintf may be expensive, but without a strlcpy it's a pain to do
+     * manually */
+    int printed = snprintf(buf, sizeof(buf), "%s/%s", path, name);
+    if (printed <= 0) {
+        /* Returning true on error as a slash in a file name is more likely to
+         * cause suspicion than the lack of one at a directory */
+        return true;
+    }
+
+    struct stat stat;
+    memset(&stat, 0, sizeof(stat));
+    int err = vfs_stat(buf, &stat);
+    if (err != 0) {
+        int fd = vfs_open(buf, O_RDONLY, 0);
+        if (fd < 0) {
+            return true;
+        }
+        err = vfs_fstat(fd, &stat);
+        vfs_close(fd);
+
+        if (err != 0) {
+            return true;
+        }
+    }
+    return (stat.st_mode & S_IFMT) == S_IFDIR;
 }
