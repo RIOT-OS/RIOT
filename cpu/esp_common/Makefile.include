@@ -14,6 +14,7 @@ PSEUDOMODULES += esp_log_startup
 PSEUDOMODULES += esp_qemu
 PSEUDOMODULES += esp_spiffs
 PSEUDOMODULES += esp_wifi_any
+PSEUDOMODULES += esp_wifi_ap
 
 # Common includes
 

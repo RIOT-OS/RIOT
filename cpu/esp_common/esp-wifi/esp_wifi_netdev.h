@@ -56,10 +56,14 @@ typedef struct
     uint8_t tx_buf[ETHERNET_MAX_LEN];  /**< transmit buffer */
 
     uint8_t event_recv;                /**< number of frame received events */
+#ifdef MODULE_ESP_WIFI_AP
+    uint8_t sta_connected;             /**< number of connected stations */
+#else /* MODULE_ESP_WIFI_AP */
     uint8_t event_conn;                /**< number of pending connect events */
     uint8_t event_disc;                /**< number of pending disc events */
 
     bool connected;                    /**< indicates whether connected to AP */
+#endif /* MODULE_ESP_WIFI_AP */
 
     mutex_t dev_lock;                  /**< device is already in use */
 
