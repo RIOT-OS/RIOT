@@ -84,6 +84,12 @@ static void mtd_spi_release(const mtd_spi_nor_t *dev)
     spi_release(_get_spi(dev));
 }
 
+static inline uint8_t* _be_addr(const mtd_spi_nor_t *dev, uint32_t *addr)
+{
+    *addr = htonl(*addr);
+    return &((uint8_t*)addr)[4 - dev->params->addr_width];
+}
+
 /**
  * @internal
  * @brief Send command opcode followed by address, followed by a read to buffer
@@ -95,13 +101,13 @@ static void mtd_spi_release(const mtd_spi_nor_t *dev)
  * @param[in]  count  number of bytes to read after the address has been sent
  */
 static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
-                                  be_uint32_t addr, void *dest, uint32_t count)
+                                  uint32_t addr, void *dest, uint32_t count)
 {
-    TRACE("mtd_spi_cmd_addr_read: %p, %02x, (%02x %02x %02x %02x), %p, %" PRIu32 "\n",
-          (void *)dev, (unsigned int)opcode, addr.u8[0], addr.u8[1], addr.u8[2],
-          addr.u8[3], dest, count);
+    TRACE("mtd_spi_cmd_addr_read: %p, %02x, (%06"PRIx32"), %p, %" PRIu32 "\n",
+          (void *)dev, (unsigned int)opcode, addr, dest, count);
 
-    uint8_t *addr_buf = &addr.u8[4 - dev->params->addr_width];
+    uint8_t *addr_buf = _be_addr(dev, &addr);
+
     if (ENABLE_TRACE) {
         TRACE("mtd_spi_cmd_addr_read: addr:");
         for (unsigned int i = 0; i < dev->params->addr_width; ++i) {
@@ -131,13 +137,13 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
  * @param[in]  count  number of bytes to write after the opcode has been sent
  */
 static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
-                                   be_uint32_t addr, const void *src, uint32_t count)
+                                   uint32_t addr, const void *src, uint32_t count)
 {
-    TRACE("mtd_spi_cmd_addr_write: %p, %02x, (%02x %02x %02x %02x), %p, %" PRIu32 "\n",
-          (void *)dev, (unsigned int)opcode, addr.u8[0], addr.u8[1], addr.u8[2],
-          addr.u8[3], src, count);
+    TRACE("mtd_spi_cmd_addr_write: %p, %02x, (%06"PRIx32"), %p, %" PRIu32 "\n",
+          (void *)dev, (unsigned int)opcode, addr, src, count);
 
-    uint8_t *addr_buf = &addr.u8[4 - dev->params->addr_width];
+    uint8_t *addr_buf = _be_addr(dev, &addr);
+
     if (ENABLE_TRACE) {
         TRACE("mtd_spi_cmd_addr_write: addr:");
         for (unsigned int i = 0; i < dev->params->addr_width; ++i) {
@@ -488,10 +494,8 @@ static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t 
         return 0;
     }
 
-    be_uint32_t addr_be = byteorder_htonl(addr);
-
     mtd_spi_acquire(dev);
-    mtd_spi_cmd_addr_read(dev, dev->params->opcode->read, addr_be, dest, size);
+    mtd_spi_cmd_addr_read(dev, dev->params->opcode->read, addr, dest, size);
     mtd_spi_release(dev);
 
     return 0;
@@ -520,15 +524,13 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
         return -EOVERFLOW;
     }
 
-    be_uint32_t addr_be = byteorder_htonl(addr);
-
     mtd_spi_acquire(dev);
 
     /* write enable */
     mtd_spi_cmd(dev, dev->params->opcode->wren);
 
     /* Page program */
-    mtd_spi_cmd_addr_write(dev, dev->params->opcode->page_program, addr_be, src, size);
+    mtd_spi_cmd_addr_write(dev, dev->params->opcode->page_program, addr, src, size);
 
     /* waiting for the command to complete before returning */
     wait_for_write_complete(dev, 0);
@@ -549,7 +551,7 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
     uint32_t remaining = mtd->page_size - offset;
     size = MIN(remaining, size);
 
-    be_uint32_t addr_be = byteorder_htonl(page * mtd->page_size + offset);
+    uint32_t addr = page * mtd->page_size + offset;
 
     mtd_spi_acquire(dev);
 
@@ -557,7 +559,7 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
     mtd_spi_cmd(dev, dev->params->opcode->wren);
 
     /* Page program */
-    mtd_spi_cmd_addr_write(dev, dev->params->opcode->page_program, addr_be, src, size);
+    mtd_spi_cmd_addr_write(dev, dev->params->opcode->page_program, addr, src, size);
 
     /* waiting for the command to complete before returning */
     wait_for_write_complete(dev, 0);
@@ -594,7 +596,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
     mtd_spi_acquire(dev);
     while (size) {
         uint32_t us;
-        be_uint32_t addr_be = byteorder_htonl(addr);
+
         /* write enable */
         mtd_spi_cmd(dev, dev->params->opcode->wren);
 
@@ -606,7 +608,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         else if ((dev->params->flag & SPI_NOR_F_SECT_32K) && (size >= MTD_32K) &&
                  ((addr & MTD_32K_ADDR_MASK) == 0)) {
             /* 32 KiB blocks can be erased with block erase command */
-            mtd_spi_cmd_addr_write(dev, dev->params->opcode->block_erase_32k, addr_be, NULL, 0);
+            mtd_spi_cmd_addr_write(dev, dev->params->opcode->block_erase_32k, addr, NULL, 0);
             addr += MTD_32K;
             size -= MTD_32K;
             us = dev->params->wait_32k_erase;
@@ -614,13 +616,13 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         else if ((dev->params->flag & SPI_NOR_F_SECT_4K) && (size >= MTD_4K) &&
                  ((addr & MTD_4K_ADDR_MASK) == 0)) {
             /* 4 KiB sectors can be erased with sector erase command */
-            mtd_spi_cmd_addr_write(dev, dev->params->opcode->sector_erase, addr_be, NULL, 0);
+            mtd_spi_cmd_addr_write(dev, dev->params->opcode->sector_erase, addr, NULL, 0);
             addr += MTD_4K;
             size -= MTD_4K;
             us = dev->params->wait_4k_erase;
         }
         else {
-            mtd_spi_cmd_addr_write(dev, dev->params->opcode->block_erase, addr_be, NULL, 0);
+            mtd_spi_cmd_addr_write(dev, dev->params->opcode->block_erase, addr, NULL, 0);
             addr += sector_size;
             size -= sector_size;
             us = dev->params->wait_sector_erase;
