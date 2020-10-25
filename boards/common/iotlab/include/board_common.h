@@ -62,23 +62,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name    OpenWSN timing constants
- *
- * @{
- */
-/* Measured 440us + ~10% */
-#define PORT_maxTxDataPrepare   (500/PORT_US_PER_TICK)
-/* Measured 200us + ~10% */
-#define PORT_maxRxAckPrepare    (300/PORT_US_PER_TICK)
-/* Measured 300us + ~10% */
-#define PORT_maxRxDataPrepare   (350/PORT_US_PER_TICK)
-/* Measured 316us + ~10% */
-#define PORT_maxTxAckPrepare    (350/PORT_US_PER_TICK)
-/* Measured 360us with openwsn_sctimer_rtt */
-#define PORT_delayTx            (360/PORT_US_PER_TICK)
-/** @} */
-
-/**
  * @name    Define the interface to the AT86RF231 radio
  *
  * {spi bus, spi speed, cs pin, int pin, reset pin, sleep pin}

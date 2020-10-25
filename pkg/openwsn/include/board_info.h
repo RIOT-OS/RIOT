@@ -31,6 +31,12 @@
 #include "periph_conf.h"
 #include "timex.h"
 
+#if defined __has_include
+#  if __has_include ("openwsn_defs.h")
+#    include "openwsn_defs.h"
+#  endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
