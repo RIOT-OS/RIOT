@@ -512,7 +512,10 @@ static int _stat_handler(int argc, char **argv)
     printf("File: %s\n", argv[1]);
     printf("Size: %ld\n", buf.st_size);
     printf("Type: %s\n", S_ISREG(buf.st_mode) ? "file" : S_ISDIR(buf.st_mode) ? "directory" : "other");
-    printf("Access: %o\n", buf.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO));
+    /* There is no formatter for mode_t like there is PRIu32. Casting to
+     * unsiged contains the regular (lowest 9) bits, and works both on
+     * platforms with unsiged and long unsigned modes. */
+    printf("Access: %o\n", (unsigned)(buf.st_mode & (S_IRWXU | S_IRWXG | S_IRWXO)));
     return 0;
 }
 
