@@ -10,11 +10,14 @@ endif
 # and check FEATURES_USED instead.
 FEATURES_OPTIONAL += periph_ics
 FEATURES_OPTIONAL += periph_mcg
+FEATURES_OPTIONAL += periph_mcg_lite
 
 ifneq (,$(filter periph_ics,$(FEATURES_USED)))
   USEMODULE += periph_ics
 else ifneq (,$(filter periph_mcg,$(FEATURES_USED)))
   USEMODULE += periph_mcg
+else ifneq (,$(filter periph_mcg_lite,$(FEATURES_USED)))
+  USEMODULE += periph_mcg_lite
 endif
 
 USEMODULE += periph_wdog

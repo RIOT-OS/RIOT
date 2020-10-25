@@ -24,6 +24,11 @@ config CPU_FAM_K
     select HAS_PERIPH_FLASHPAGE_RAW
     select HAS_PERIPH_MCG
 
+config CPU_FAM_L
+    bool
+    select CPU_COMMON_KINETIS
+    select HAS_PERIPH_MCG_LITE
+
 config CPU_FAM_W
     bool
     select CPU_COMMON_KINETIS
@@ -43,6 +48,26 @@ config CPU_MODEL_MK22FN512VLH12
     select CPU_CORE_CORTEX_M4
     select CPU_FAM_K
     select HAS_PERIPH_HWRNG
+
+config CPU_MODEL_MKL43Z256VLH4
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_FAM_L
+
+config CPU_MODEL_MKL43Z256VMP4
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_FAM_L
+
+config CPU_MODEL_MKL43Z128VLH4
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_FAM_L
+
+config CPU_MODEL_MKL43Z128VMP4
+    bool
+    select CPU_CORE_CORTEX_M0PLUS
+    select CPU_FAM_L
 
 config CPU_MODEL_MK60DN512VLL10
     bool
@@ -101,6 +126,11 @@ config HAS_PERIPH_MCG
     help
         Indicates that the cpu uses the Kinetis Multipurpose Clock Generator.
 
+config HAS_PERIPH_MCG_LITE
+    bool
+    help
+        Indicates that the cpu uses the lite version of the Kinetis Multipurpose Clock Generator.
+
 config HAS_PERIPH_ICS
     bool
     help
@@ -111,6 +141,7 @@ config HAS_PERIPH_ICS
 config CPU_FAM
     default "ea" if CPU_FAM_EA
     default "k" if CPU_FAM_K
+    default "l" if CPU_FAM_L
     default "w" if CPU_FAM_W
 
 config CPU_MODEL
@@ -123,6 +154,10 @@ config CPU_MODEL
     default "mkw22d512vha5"   if CPU_MODEL_MKW22D512VHA5
     default "mkw41z256vht4"   if CPU_MODEL_MKW41Z256VHT4
     default "mkw41z512vht4"   if CPU_MODEL_MKW41Z512VHT4
+    default "mkl43z256vlh4"   if CPU_MODEL_MKL43Z256VLH4
+    default "mkl43z256vmp4"   if CPU_MODEL_MKL43Z256VMP4
+    default "mkl43z128vlh4"   if CPU_MODEL_MKL43Z128VLH4
+    default "mkl43z128vmp4"   if CPU_MODEL_MKL43Z128VMP4
     default "s9keaz128aclh" if CPU_MODEL_S9KEAZ128ACLH
 
 config CPU

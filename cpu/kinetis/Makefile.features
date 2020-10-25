@@ -3,6 +3,8 @@ FEATURES_PROVIDED += periph_pm
 
 # TRNG driver is not implemented for mkw41z models
 _KINETIS_CPU_MODELS_WITHOUT_HWRNG += mkw41z256vht4 mkw41z512vht4
+# TRNG driver is not implemented for kl43z models
+_KINETIS_CPU_MODELS_WITHOUT_HWRNG += mkl43z%
 # No HWRNG in mk20d7 devices
 _KINETIS_CPU_MODELS_WITHOUT_HWRNG += mk20dx256vlh7
 
@@ -24,6 +26,8 @@ endif
 
 ifeq (ea,$(CPU_FAM))
   FEATURES_PROVIDED += periph_ics
+else ifeq (l,$(CPU_FAM))
+  FEATURES_PROVIDED += periph_mcg_lite
 else
   FEATURES_PROVIDED += periph_mcg
 endif
