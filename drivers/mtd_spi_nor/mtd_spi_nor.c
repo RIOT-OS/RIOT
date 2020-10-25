@@ -67,12 +67,6 @@ typedef enum {
 } jedec_manuf_t;
 /** @} */
 
-static int mtd_spi_nor_init(mtd_dev_t *mtd);
-static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t size);
-static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t size);
-static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size);
-static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power);
-
 static void mtd_spi_acquire(const mtd_spi_nor_t *dev)
 {
     spi_acquire(dev->params->spi, dev->params->cs,
@@ -115,16 +109,14 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
         TRACE("\n");
     }
 
-    do {
-        /* Send opcode followed by address */
-        spi_transfer_byte(dev->params->spi, dev->params->cs, true, opcode);
-        spi_transfer_bytes(dev->params->spi, dev->params->cs, true,
-                           (char *)addr_buf, NULL, dev->params->addr_width);
+    /* Send opcode followed by address */
+    spi_transfer_byte(dev->params->spi, dev->params->cs, true, opcode);
+    spi_transfer_bytes(dev->params->spi, dev->params->cs, true,
+                       (char *)addr_buf, NULL, dev->params->addr_width);
 
-        /* Read data */
-        spi_transfer_bytes(dev->params->spi, dev->params->cs, false,
-                           NULL, dest, count);
-    } while (0);
+    /* Read data */
+    spi_transfer_bytes(dev->params->spi, dev->params->cs, false,
+                       NULL, dest, count);
 }
 
 /**
@@ -153,18 +145,19 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
         TRACE("\n");
     }
 
-    do {
-        /* Send opcode followed by address */
-        spi_transfer_byte(dev->params->spi, dev->params->cs, true, opcode);
-        bool cont = (count > 0); /* only keep CS asserted when there is data that follows */
-        spi_transfer_bytes(dev->params->spi, dev->params->cs, cont,
-                           (char *)addr_buf, NULL, dev->params->addr_width);
-        /* Write data */
-        if (cont) {
-            spi_transfer_bytes(dev->params->spi, dev->params->cs,
-                               false, (void *)src, NULL, count);
-        }
-    } while (0);
+    /* Send opcode followed by address */
+    spi_transfer_byte(dev->params->spi, dev->params->cs, true, opcode);
+
+    /* only keep CS asserted when there is data that follows */
+    bool cont = (count > 0);
+    spi_transfer_bytes(dev->params->spi, dev->params->cs, cont,
+                       (char *)addr_buf, NULL, dev->params->addr_width);
+
+    /* Write data */
+    if (cont) {
+        spi_transfer_bytes(dev->params->spi, dev->params->cs,
+                           false, (void *)src, NULL, count);
+    }
 }
 
 /**
@@ -360,6 +353,38 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
     DEBUG("\n");
 }
 
+static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
+{
+    mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
+
+    mtd_spi_acquire(dev);
+    switch (power) {
+        case MTD_POWER_UP:
+            mtd_spi_cmd(dev, dev->params->opcode->wake);
+#if defined(MODULE_XTIMER)
+            /* No sense in trying multiple times if no xtimer to wait between
+               reads */
+            uint8_t retries = 0;
+            int res = 0;
+            do {
+                xtimer_usleep(dev->params->wait_chip_wake_up);
+                res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
+                retries++;
+            } while (res < 0 || retries < MTD_POWER_UP_WAIT_FOR_ID);
+            if (res < 0) {
+                return -EIO;
+            }
+#endif
+            break;
+        case MTD_POWER_DOWN:
+            mtd_spi_cmd(dev, dev->params->opcode->sleep);
+            break;
+    }
+    mtd_spi_release(dev);
+
+    return 0;
+}
+
 static int mtd_spi_nor_init(mtd_dev_t *mtd)
 {
     DEBUG("mtd_spi_nor_init: %p\n", (void *)mtd);
@@ -420,12 +445,14 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     uint8_t shift = 0;
     uint32_t page_size = mtd->page_size;
     uint32_t mask = 0;
+
     if ((page_size & (page_size - 1)) == 0) {
         while ((page_size >> shift) > 1) {
             ++shift;
         }
         mask = (UINT32_MAX << shift);
     }
+
     dev->page_addr_mask = mask;
     dev->page_addr_shift = shift;
     DEBUG("mtd_spi_nor_init: page_addr_mask = 0x%08" PRIx32 ", page_addr_shift = %u\n",
@@ -455,6 +482,7 @@ static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t 
           (void *)mtd, dest, addr, size);
     const mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
     uint32_t chipsize = mtd->page_size * mtd->pages_per_sector * mtd->sector_count;
+
     if (addr > chipsize) {
         return -EOVERFLOW;
     }
@@ -464,6 +492,7 @@ static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t 
     if (size == 0) {
         return 0;
     }
+
     be_uint32_t addr_be = byteorder_htonl(addr);
 
     mtd_spi_acquire(dev);
@@ -495,9 +524,11 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
     if (addr + size > total_size) {
         return -EOVERFLOW;
     }
+
     be_uint32_t addr_be = byteorder_htonl(addr);
 
     mtd_spi_acquire(dev);
+
     /* write enable */
     mtd_spi_cmd(dev, dev->params->opcode->wren);
 
@@ -508,6 +539,7 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
     wait_for_write_complete(dev, 0);
 
     mtd_spi_release(dev);
+
     return 0;
 }
 
@@ -601,38 +633,6 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 
         /* waiting for the command to complete before continuing */
         wait_for_write_complete(dev, us);
-    }
-    mtd_spi_release(dev);
-
-    return 0;
-}
-
-static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
-{
-    mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
-
-    mtd_spi_acquire(dev);
-    switch (power) {
-        case MTD_POWER_UP:
-            mtd_spi_cmd(dev, dev->params->opcode->wake);
-#if defined(MODULE_XTIMER)
-            /* No sense in trying multiple times if no xtimer to wait between
-               reads */
-            uint8_t retries = 0;
-            int res = 0;
-            do {
-                xtimer_usleep(dev->params->wait_chip_wake_up);
-                res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
-                retries++;
-            } while (res < 0 || retries < MTD_POWER_UP_WAIT_FOR_ID);
-            if (res < 0) {
-                return -EIO;
-            }
-#endif
-            break;
-        case MTD_POWER_DOWN:
-            mtd_spi_cmd(dev, dev->params->opcode->sleep);
-            break;
     }
     mtd_spi_release(dev);
 
