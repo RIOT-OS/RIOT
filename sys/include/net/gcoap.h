@@ -690,6 +690,16 @@ kernel_pid_t gcoap_init(void);
 /**
  * @brief   Starts listening for resource paths
  *
+ * @pre @p listener is a valid pointer to a single listener (that is,
+ *      `listener->next == NULL`)
+ *
+ * @note If you are tempted to register a pre-linked chain of listeners,
+ *       consider placing all their resources in the resources array of a
+ *       single listener instead. In the few cases where this does not work
+ *       (that is, when the resources need a different `link_encoder` or other
+ *       fields of the listener struct), they can just be registered
+ *       individually.
+ *
  * @param[in] listener  Listener containing the resources.
  */
 void gcoap_register_listener(gcoap_listener_t *listener);
