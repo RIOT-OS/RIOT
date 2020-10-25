@@ -22,6 +22,7 @@
  */
 
 #include <stdint.h>
+#include <string.h>
 #include <errno.h>
 
 #include "mtd.h"
@@ -229,59 +230,48 @@ static inline uint8_t parity8(uint8_t x)
  */
 static int mtd_spi_read_jedec_id(const mtd_spi_nor_t *dev, mtd_jedec_id_t *out)
 {
-    /* not using above read functions because of variable length rdid response */
-    int status = 0;
-    mtd_jedec_id_t jedec;
+    uint8_t buffer[JEDEC_BANK_MAX + sizeof(mtd_jedec_id_t) - 1];
 
     DEBUG("mtd_spi_read_jedec_id: rdid=0x%02x\n",
           (unsigned int)dev->params->opcode->rdid);
 
     /* Send opcode */
-    spi_transfer_byte(dev->params->spi, dev->params->cs, true, dev->params->opcode->rdid);
+    mtd_spi_cmd_read(dev, dev->params->opcode->rdid, buffer, sizeof(buffer));
 
-    /* Read manufacturer ID */
-    jedec.bank = 1;
-    while (status == 0) {
-        jedec.manuf = spi_transfer_byte(dev->params->spi,
-                                        dev->params->cs, true, 0);
-        if (jedec.manuf == JEDEC_NEXT_BANK) {
-            /* next bank, see JEP106 */
-            DEBUG("mtd_spi_read_jedec_id: manuf bank incr\n");
-            ++jedec.bank;
-            continue;
-        }
-        if (parity8(jedec.manuf) == 0) {
-            /* saw even parity, we expected odd parity => parity error */
-            DEBUG("mtd_spi_read_jedec_id: Parity error (0x%02x)\n", (unsigned int)jedec.manuf);
-            status = -2;
-            break;
-        }
-        if (jedec.manuf == 0xFF || jedec.manuf == 0x00) {
-            DEBUG_PUTS("mtd_spi_read_jedec_id: failed to read manufacturer ID");
-            status = -3;
-            break;
-        }
-        else {
-            /* all OK! */
-            break;
+    /* Manufacturer IDs are organized in 'banks'.
+     * If we read the 'next bank' instead of manufacturer ID, skip
+     * the byte and increment the bank counter.
+     */
+    uint8_t bank = 0;
+    while (buffer[bank] == JEDEC_NEXT_BANK) {
+        if (++bank == JEDEC_BANK_MAX) {
+            DEBUG_PUTS("mtd_spi_read_jedec_id: bank out of bounds\n")
+            return -1;
         }
     }
-    DEBUG("mtd_spi_read_jedec_id: bank=%u manuf=0x%02x\n", (unsigned int)jedec.bank,
-          (unsigned int)jedec.manuf);
 
-    /* Read device ID */
-    if (status == 0) {
-        spi_transfer_bytes(dev->params->spi, dev->params->cs, false, NULL,
-                           (char *)&jedec.device[0], sizeof(jedec.device));
+    if (parity8(buffer[bank]) == 0) {
+        /* saw even parity, we expected odd parity => parity error */
+        DEBUG("mtd_spi_read_jedec_id: Parity error (0x%02x)\n", buffer[bank]);
+        return -2;
     }
+
+    if (buffer[bank] == 0xFF || buffer[bank] == 0x00) {
+        DEBUG_PUTS("mtd_spi_read_jedec_id: failed to read manufacturer ID");
+        return -3;
+    }
+
+    /* Copy manufacturer ID */
+    out->bank = bank + 1;
+    memcpy((uint8_t*)out + 1, &buffer[bank], 3);
+
+    DEBUG("mtd_spi_read_jedec_id: bank=%u manuf=0x%02x\n", (unsigned int)out->bank,
+          (unsigned int)out->manuf);
+
     DEBUG("mtd_spi_read_jedec_id: device=0x%02x, 0x%02x\n",
-          (unsigned int)jedec.device[0], (unsigned int)jedec.device[1]);
+          (unsigned int)out->device[0], (unsigned int)out->device[1]);
 
-    if (status == 0) {
-        *out = jedec;
-    }
-
-    return status;
+    return 0;
 }
 
 /**
