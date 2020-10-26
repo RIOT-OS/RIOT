@@ -28,9 +28,24 @@
  * @def DEVELHELP
  * @brief   This global macro activates functionality to help developers.
  *
- *          Additional code parts such as (extensive) debug output and sanity
- *          checks using assertions. To activate it set environment variable
- *          `DEVELHELP=1`, or disable explicitly with `DEVELHELP=0`.
+ * To activate it set environment variable `DEVELHELP=1`, or disable explicitly
+ * with `DEVELHELP=0`.
+ *
+ * The following list of what `DEVELHELP=1` enables is not comprehensive, but
+ * should give a rough impression of what to expect:
+ *
+ * * Many runtime checks are enabled (stack overflow protection, warnings when
+ *   sending messages to invalid PIDs, …), some of which just log errors to
+ *   stdout, some even halt the system.
+ * * Some structures contain additional information, e.g. threads store their
+ *   names and stack sizes.
+ * * Some error paths that are active even at `DEVELHELP=0` perform more
+ *   complex tasks to give useful output.
+ * * The @ref assert() function is only evaluated with `DEVELHELP=1` (or when
+ *   `FORCE_ASSERTS=1`). Otherwise, the build system sets `NDEBUG` and thus
+ *   skips assertions entirely.
+ * * On a panic, the system halts (or enters the bootloader) instead of
+ *   restarting.
  */
 #if DOXYGEN
 #   define DEVELHELP
