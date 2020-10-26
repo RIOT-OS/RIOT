@@ -122,6 +122,24 @@
  * (now() - B) + T[1]). Thus even though the list is keeping relative offsets,
  * the time keeping is done by keeping track of the absolute times.
  *
+ * Currently, a sorted singly linked list is used for storing the timers.
+ * This choice has some implications:
+ *
+ * - only one pointer needed per timer object (for "next" element)
+ * - simple implementation
+ * - acceptable runtime for expected number of active timers (<50)
+ * - constant get_min() (important for timer triggering)
+ * - O(n) insertion / removal of timer objects
+ *
+ * By making the list doubly-linked, removal of timer objects could be easily
+ * made a constant operation, at the price of another pointer per timer object
+ * (for "previous" element).
+ *
+ * If deemed necessary, the linked list can be exchanged our augmented with
+ * another data structure providing better algorithmic guarantees. It remains
+ * to be shown whether the increased complexity would lead to better
+ * performance for any reasonable amount of active timers.
+ *
  *
  * ## Clock extension
  *
