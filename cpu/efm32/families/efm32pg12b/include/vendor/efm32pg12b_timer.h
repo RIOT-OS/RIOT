@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief EFM32PG12B_TIMER register and bit field definitions
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -586,13 +585,13 @@ typedef struct {
 #define _TIMER_LOCK_TIMERLOCKKEY_SHIFT             0                                        /**< Shift value for TIMER_TIMERLOCKKEY */
 #define _TIMER_LOCK_TIMERLOCKKEY_MASK              0xFFFFUL                                 /**< Bit mask for TIMER_TIMERLOCKKEY */
 #define _TIMER_LOCK_TIMERLOCKKEY_DEFAULT           0x00000000UL                             /**< Mode DEFAULT for TIMER_LOCK */
-#define _TIMER_LOCK_TIMERLOCKKEY_LOCK              0x00000000UL                             /**< Mode LOCK for TIMER_LOCK */
 #define _TIMER_LOCK_TIMERLOCKKEY_UNLOCKED          0x00000000UL                             /**< Mode UNLOCKED for TIMER_LOCK */
+#define _TIMER_LOCK_TIMERLOCKKEY_LOCK              0x00000000UL                             /**< Mode LOCK for TIMER_LOCK */
 #define _TIMER_LOCK_TIMERLOCKKEY_LOCKED            0x00000001UL                             /**< Mode LOCKED for TIMER_LOCK */
 #define _TIMER_LOCK_TIMERLOCKKEY_UNLOCK            0x0000CE80UL                             /**< Mode UNLOCK for TIMER_LOCK */
 #define TIMER_LOCK_TIMERLOCKKEY_DEFAULT            (_TIMER_LOCK_TIMERLOCKKEY_DEFAULT << 0)  /**< Shifted mode DEFAULT for TIMER_LOCK */
-#define TIMER_LOCK_TIMERLOCKKEY_LOCK               (_TIMER_LOCK_TIMERLOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for TIMER_LOCK */
 #define TIMER_LOCK_TIMERLOCKKEY_UNLOCKED           (_TIMER_LOCK_TIMERLOCKKEY_UNLOCKED << 0) /**< Shifted mode UNLOCKED for TIMER_LOCK */
+#define TIMER_LOCK_TIMERLOCKKEY_LOCK               (_TIMER_LOCK_TIMERLOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for TIMER_LOCK */
 #define TIMER_LOCK_TIMERLOCKKEY_LOCKED             (_TIMER_LOCK_TIMERLOCKKEY_LOCKED << 0)   /**< Shifted mode LOCKED for TIMER_LOCK */
 #define TIMER_LOCK_TIMERLOCKKEY_UNLOCK             (_TIMER_LOCK_TIMERLOCKKEY_UNLOCK << 0)   /**< Shifted mode UNLOCK for TIMER_LOCK */
 
@@ -1573,13 +1572,13 @@ typedef struct {
 #define _TIMER_DTLOCK_LOCKKEY_SHIFT                0                                     /**< Shift value for TIMER_LOCKKEY */
 #define _TIMER_DTLOCK_LOCKKEY_MASK                 0xFFFFUL                              /**< Bit mask for TIMER_LOCKKEY */
 #define _TIMER_DTLOCK_LOCKKEY_DEFAULT              0x00000000UL                          /**< Mode DEFAULT for TIMER_DTLOCK */
-#define _TIMER_DTLOCK_LOCKKEY_LOCK                 0x00000000UL                          /**< Mode LOCK for TIMER_DTLOCK */
 #define _TIMER_DTLOCK_LOCKKEY_UNLOCKED             0x00000000UL                          /**< Mode UNLOCKED for TIMER_DTLOCK */
+#define _TIMER_DTLOCK_LOCKKEY_LOCK                 0x00000000UL                          /**< Mode LOCK for TIMER_DTLOCK */
 #define _TIMER_DTLOCK_LOCKKEY_LOCKED               0x00000001UL                          /**< Mode LOCKED for TIMER_DTLOCK */
 #define _TIMER_DTLOCK_LOCKKEY_UNLOCK               0x0000CE80UL                          /**< Mode UNLOCK for TIMER_DTLOCK */
 #define TIMER_DTLOCK_LOCKKEY_DEFAULT               (_TIMER_DTLOCK_LOCKKEY_DEFAULT << 0)  /**< Shifted mode DEFAULT for TIMER_DTLOCK */
-#define TIMER_DTLOCK_LOCKKEY_LOCK                  (_TIMER_DTLOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for TIMER_DTLOCK */
 #define TIMER_DTLOCK_LOCKKEY_UNLOCKED              (_TIMER_DTLOCK_LOCKKEY_UNLOCKED << 0) /**< Shifted mode UNLOCKED for TIMER_DTLOCK */
+#define TIMER_DTLOCK_LOCKKEY_LOCK                  (_TIMER_DTLOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for TIMER_DTLOCK */
 #define TIMER_DTLOCK_LOCKKEY_LOCKED                (_TIMER_DTLOCK_LOCKKEY_LOCKED << 0)   /**< Shifted mode LOCKED for TIMER_DTLOCK */
 #define TIMER_DTLOCK_LOCKKEY_UNLOCK                (_TIMER_DTLOCK_LOCKKEY_UNLOCK << 0)   /**< Shifted mode UNLOCK for TIMER_DTLOCK */
 

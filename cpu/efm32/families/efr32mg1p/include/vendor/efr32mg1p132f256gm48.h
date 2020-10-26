@@ -2,10 +2,9 @@
  * @file
  * @brief CMSIS Cortex-M Peripheral Access Layer Header File
  *        for EFR32MG1P132F256GM48
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -149,42 +148,42 @@ typedef enum IRQn{
 #define PART_NUMBER               "EFR32MG1P132F256GM48" /**< Part Number */
 
 /** Memory Base addresses and limits */
-#define FLASH_MEM_BASE            (0x00000000UL) /**< FLASH base address  */
-#define FLASH_MEM_SIZE            (0x10000000UL) /**< FLASH available address space  */
-#define FLASH_MEM_END             (0x0FFFFFFFUL) /**< FLASH end address  */
-#define FLASH_MEM_BITS            (0x0000001CUL) /**< FLASH used bits  */
-#define RAM_CODE_MEM_BASE         (0x10000000UL) /**< RAM_CODE base address  */
-#define RAM_CODE_MEM_SIZE         (0x7C00UL)     /**< RAM_CODE available address space  */
-#define RAM_CODE_MEM_END          (0x10007BFFUL) /**< RAM_CODE end address  */
-#define RAM_CODE_MEM_BITS         (0x0000000FUL) /**< RAM_CODE used bits  */
-#define PER_BITCLR_MEM_BASE       (0x44000000UL) /**< PER_BITCLR base address  */
-#define PER_BITCLR_MEM_SIZE       (0xE8000UL)    /**< PER_BITCLR available address space  */
-#define PER_BITCLR_MEM_END        (0x440E7FFFUL) /**< PER_BITCLR end address  */
-#define PER_BITCLR_MEM_BITS       (0x00000014UL) /**< PER_BITCLR used bits  */
-#define CRYPTO_BITSET_MEM_BASE    (0x460F0000UL) /**< CRYPTO_BITSET base address  */
-#define CRYPTO_BITSET_MEM_SIZE    (0x400UL)      /**< CRYPTO_BITSET available address space  */
-#define CRYPTO_BITSET_MEM_END     (0x460F03FFUL) /**< CRYPTO_BITSET end address  */
-#define CRYPTO_BITSET_MEM_BITS    (0x0000000AUL) /**< CRYPTO_BITSET used bits  */
 #define CRYPTO_MEM_BASE           (0x400F0000UL) /**< CRYPTO base address  */
 #define CRYPTO_MEM_SIZE           (0x400UL)      /**< CRYPTO available address space  */
 #define CRYPTO_MEM_END            (0x400F03FFUL) /**< CRYPTO end address  */
 #define CRYPTO_MEM_BITS           (0x0000000AUL) /**< CRYPTO used bits  */
-#define CRYPTO_BITCLR_MEM_BASE    (0x440F0000UL) /**< CRYPTO_BITCLR base address  */
-#define CRYPTO_BITCLR_MEM_SIZE    (0x400UL)      /**< CRYPTO_BITCLR available address space  */
-#define CRYPTO_BITCLR_MEM_END     (0x440F03FFUL) /**< CRYPTO_BITCLR end address  */
-#define CRYPTO_BITCLR_MEM_BITS    (0x0000000AUL) /**< CRYPTO_BITCLR used bits  */
-#define PER_BITSET_MEM_BASE       (0x46000000UL) /**< PER_BITSET base address  */
-#define PER_BITSET_MEM_SIZE       (0xE8000UL)    /**< PER_BITSET available address space  */
-#define PER_BITSET_MEM_END        (0x460E7FFFUL) /**< PER_BITSET end address  */
-#define PER_BITSET_MEM_BITS       (0x00000014UL) /**< PER_BITSET used bits  */
-#define PER_MEM_BASE              (0x40000000UL) /**< PER base address  */
-#define PER_MEM_SIZE              (0xE8000UL)    /**< PER available address space  */
-#define PER_MEM_END               (0x400E7FFFUL) /**< PER end address  */
-#define PER_MEM_BITS              (0x00000014UL) /**< PER used bits  */
 #define RAM_MEM_BASE              (0x20000000UL) /**< RAM base address  */
 #define RAM_MEM_SIZE              (0x7C00UL)     /**< RAM available address space  */
 #define RAM_MEM_END               (0x20007BFFUL) /**< RAM end address  */
 #define RAM_MEM_BITS              (0x0000000FUL) /**< RAM used bits  */
+#define PER_BITSET_MEM_BASE       (0x46000000UL) /**< PER_BITSET base address  */
+#define PER_BITSET_MEM_SIZE       (0xE8000UL)    /**< PER_BITSET available address space  */
+#define PER_BITSET_MEM_END        (0x460E7FFFUL) /**< PER_BITSET end address  */
+#define PER_BITSET_MEM_BITS       (0x00000014UL) /**< PER_BITSET used bits  */
+#define CRYPTO_BITSET_MEM_BASE    (0x460F0000UL) /**< CRYPTO_BITSET base address  */
+#define CRYPTO_BITSET_MEM_SIZE    (0x400UL)      /**< CRYPTO_BITSET available address space  */
+#define CRYPTO_BITSET_MEM_END     (0x460F03FFUL) /**< CRYPTO_BITSET end address  */
+#define CRYPTO_BITSET_MEM_BITS    (0x0000000AUL) /**< CRYPTO_BITSET used bits  */
+#define PER_MEM_BASE              (0x40000000UL) /**< PER base address  */
+#define PER_MEM_SIZE              (0xE8000UL)    /**< PER available address space  */
+#define PER_MEM_END               (0x400E7FFFUL) /**< PER end address  */
+#define PER_MEM_BITS              (0x00000014UL) /**< PER used bits  */
+#define CRYPTO_BITCLR_MEM_BASE    (0x440F0000UL) /**< CRYPTO_BITCLR base address  */
+#define CRYPTO_BITCLR_MEM_SIZE    (0x400UL)      /**< CRYPTO_BITCLR available address space  */
+#define CRYPTO_BITCLR_MEM_END     (0x440F03FFUL) /**< CRYPTO_BITCLR end address  */
+#define CRYPTO_BITCLR_MEM_BITS    (0x0000000AUL) /**< CRYPTO_BITCLR used bits  */
+#define RAM_CODE_MEM_BASE         (0x10000000UL) /**< RAM_CODE base address  */
+#define RAM_CODE_MEM_SIZE         (0x7C00UL)     /**< RAM_CODE available address space  */
+#define RAM_CODE_MEM_END          (0x10007BFFUL) /**< RAM_CODE end address  */
+#define RAM_CODE_MEM_BITS         (0x0000000FUL) /**< RAM_CODE used bits  */
+#define FLASH_MEM_BASE            (0x00000000UL) /**< FLASH base address  */
+#define FLASH_MEM_SIZE            (0x10000000UL) /**< FLASH available address space  */
+#define FLASH_MEM_END             (0x0FFFFFFFUL) /**< FLASH end address  */
+#define FLASH_MEM_BITS            (0x0000001CUL) /**< FLASH used bits  */
+#define PER_BITCLR_MEM_BASE       (0x44000000UL) /**< PER_BITCLR base address  */
+#define PER_BITCLR_MEM_SIZE       (0xE8000UL)    /**< PER_BITCLR available address space  */
+#define PER_BITCLR_MEM_END        (0x440E7FFFUL) /**< PER_BITCLR end address  */
+#define PER_BITCLR_MEM_BITS       (0x00000014UL) /**< PER_BITCLR used bits  */
 
 /** Bit banding area */
 #define BITBAND_PER_BASE          (0x42000000UL) /**< Peripheral Address Space bit-band area */

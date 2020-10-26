@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief CMSIS Cortex-M3/M4 System Layer for EFM32 devices.
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -117,13 +116,6 @@ uint32_t SystemHfrcoFreq = EFM32_HFRCO_STARTUP_FREQ;
  **************************   GLOBAL FUNCTIONS   *******************************
  ******************************************************************************/
 
-#if defined(__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
-#if defined(__ICCARM__)    /* IAR requires the __vector_table symbol */
-#define __Vectors    __vector_table
-#endif
-extern uint32_t __Vectors;
-#endif
-
 /***************************************************************************//**
  * @brief
  *   Get the current core clock frequency.
@@ -215,6 +207,12 @@ uint32_t SystemHFClockGet(void)
 #endif
       break;
 
+#if defined(CMU_HFCLKSTATUS_SELECTED_HFRCODIV2)
+    case CMU_HFCLKSTATUS_SELECTED_HFRCODIV2:
+      ret = SystemHfrcoFreq / 2;
+      break;
+#endif
+
     default: /* CMU_HFCLKSTATUS_SELECTED_HFRCO */
       ret = SystemHfrcoFreq;
       break;
@@ -302,6 +300,19 @@ void SystemInit(void)
 
 #if defined(UNALIGNED_SUPPORT_DISABLE)
   SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
+#endif
+
+#if defined(_SILICON_LABS_32B_SERIES_1_CONFIG_1)
+  /****************************
+   * Fix for errata DCDC_E206
+   * Enable bypass switch as errata workaround. The bypass current limit will be
+   * disabled again in CHIP_Init() to avoid added current consumption. */
+
+  EMU->DCDCCLIMCTRL |= 1U << _EMU_DCDCCLIMCTRL_BYPLIMEN_SHIFT;
+  EMU->DCDCCTRL = (EMU->DCDCCTRL & ~_EMU_DCDCCTRL_DCDCMODE_MASK)
+                  | EMU_DCDCCTRL_DCDCMODE_BYPASS;
+  *(volatile uint32_t *)(0x400E3074) &= ~(0x1UL << 0);
+  *(volatile uint32_t *)(0x400E3060) &= ~(0x1UL << 28);
 #endif
 }
 

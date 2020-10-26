@@ -2,10 +2,9 @@
  * @file
  * @brief CMSIS Cortex-M Peripheral Access Layer Header File
  *        for EFR32MG12P332F1024GL125
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -167,58 +166,18 @@ typedef enum IRQn{
 #define PART_NUMBER                "EFR32MG12P332F1024GL125" /**< Part Number */
 
 /** Memory Base addresses and limits */
-#define RAM0_CODE_MEM_BASE         (0x10000000UL)          /**< RAM0_CODE base address  */
-#define RAM0_CODE_MEM_SIZE         (0x20000UL)             /**< RAM0_CODE available address space  */
-#define RAM0_CODE_MEM_END          (0x1001FFFFUL)          /**< RAM0_CODE end address  */
-#define RAM0_CODE_MEM_BITS         (0x00000011UL)          /**< RAM0_CODE used bits  */
-#define RAM2_MEM_BASE              (0x20040000UL)          /**< RAM2 base address  */
-#define RAM2_MEM_SIZE              (0x800UL)               /**< RAM2 available address space  */
-#define RAM2_MEM_END               (0x200407FFUL)          /**< RAM2 end address  */
-#define RAM2_MEM_BITS              (0x0000000BUL)          /**< RAM2 used bits  */
-#define RAM1_MEM_BASE              (0x20020000UL)          /**< RAM1 base address  */
-#define RAM1_MEM_SIZE              (0x20000UL)             /**< RAM1 available address space  */
-#define RAM1_MEM_END               (0x2003FFFFUL)          /**< RAM1 end address  */
-#define RAM1_MEM_BITS              (0x00000011UL)          /**< RAM1 used bits  */
 #define CRYPTO1_BITCLR_MEM_BASE    (0x440F0400UL)          /**< CRYPTO1_BITCLR base address  */
 #define CRYPTO1_BITCLR_MEM_SIZE    (0x400UL)               /**< CRYPTO1_BITCLR available address space  */
 #define CRYPTO1_BITCLR_MEM_END     (0x440F07FFUL)          /**< CRYPTO1_BITCLR end address  */
 #define CRYPTO1_BITCLR_MEM_BITS    (0x0000000AUL)          /**< CRYPTO1_BITCLR used bits  */
-#define PER_MEM_BASE               (0x40000000UL)          /**< PER base address  */
-#define PER_MEM_SIZE               (0xF0000UL)             /**< PER available address space  */
-#define PER_MEM_END                (0x400EFFFFUL)          /**< PER end address  */
-#define PER_MEM_BITS               (0x00000014UL)          /**< PER used bits  */
-#define RAM1_CODE_MEM_BASE         (0x10020000UL)          /**< RAM1_CODE base address  */
-#define RAM1_CODE_MEM_SIZE         (0x20000UL)             /**< RAM1_CODE available address space  */
-#define RAM1_CODE_MEM_END          (0x1003FFFFUL)          /**< RAM1_CODE end address  */
-#define RAM1_CODE_MEM_BITS         (0x00000011UL)          /**< RAM1_CODE used bits  */
-#define CRYPTO1_MEM_BASE           (0x400F0400UL)          /**< CRYPTO1 base address  */
-#define CRYPTO1_MEM_SIZE           (0x400UL)               /**< CRYPTO1 available address space  */
-#define CRYPTO1_MEM_END            (0x400F07FFUL)          /**< CRYPTO1 end address  */
-#define CRYPTO1_MEM_BITS           (0x0000000AUL)          /**< CRYPTO1 used bits  */
-#define FLASH_MEM_BASE             (0x00000000UL)          /**< FLASH base address  */
-#define FLASH_MEM_SIZE             (0x10000000UL)          /**< FLASH available address space  */
-#define FLASH_MEM_END              (0x0FFFFFFFUL)          /**< FLASH end address  */
-#define FLASH_MEM_BITS             (0x0000001CUL)          /**< FLASH used bits  */
-#define CRYPTO0_MEM_BASE           (0x400F0000UL)          /**< CRYPTO0 base address  */
-#define CRYPTO0_MEM_SIZE           (0x400UL)               /**< CRYPTO0 available address space  */
-#define CRYPTO0_MEM_END            (0x400F03FFUL)          /**< CRYPTO0 end address  */
-#define CRYPTO0_MEM_BITS           (0x0000000AUL)          /**< CRYPTO0 used bits  */
-#define CRYPTO_MEM_BASE            CRYPTO0_MEM_BASE        /**< Alias for CRYPTO0_MEM_BASE */
-#define CRYPTO_MEM_SIZE            CRYPTO0_MEM_SIZE        /**< Alias for CRYPTO0_MEM_SIZE */
-#define CRYPTO_MEM_END             CRYPTO0_MEM_END         /**< Alias for CRYPTO0_MEM_END  */
-#define CRYPTO_MEM_BITS            CRYPTO0_MEM_BITS        /**< Alias for CRYPTO0_MEM_BITS */
-#define PER_BITCLR_MEM_BASE        (0x44000000UL)          /**< PER_BITCLR base address  */
-#define PER_BITCLR_MEM_SIZE        (0xF0000UL)             /**< PER_BITCLR available address space  */
-#define PER_BITCLR_MEM_END         (0x440EFFFFUL)          /**< PER_BITCLR end address  */
-#define PER_BITCLR_MEM_BITS        (0x00000014UL)          /**< PER_BITCLR used bits  */
-#define CRYPTO0_BITSET_MEM_BASE    (0x460F0000UL)          /**< CRYPTO0_BITSET base address  */
-#define CRYPTO0_BITSET_MEM_SIZE    (0x400UL)               /**< CRYPTO0_BITSET available address space  */
-#define CRYPTO0_BITSET_MEM_END     (0x460F03FFUL)          /**< CRYPTO0_BITSET end address  */
-#define CRYPTO0_BITSET_MEM_BITS    (0x0000000AUL)          /**< CRYPTO0_BITSET used bits  */
-#define CRYPTO_BITSET_MEM_BASE     CRYPTO0_BITSET_MEM_BASE /**< Alias for CRYPTO0_BITSET_MEM_BASE */
-#define CRYPTO_BITSET_MEM_SIZE     CRYPTO0_BITSET_MEM_SIZE /**< Alias for CRYPTO0_BITSET_MEM_SIZE */
-#define CRYPTO_BITSET_MEM_END      CRYPTO0_BITSET_MEM_END  /**< Alias for CRYPTO0_BITSET_MEM_END  */
-#define CRYPTO_BITSET_MEM_BITS     CRYPTO0_BITSET_MEM_BITS /**< Alias for CRYPTO0_BITSET_MEM_BITS */
+#define RAM1_MEM_BASE              (0x20020000UL)          /**< RAM1 base address  */
+#define RAM1_MEM_SIZE              (0x20000UL)             /**< RAM1 available address space  */
+#define RAM1_MEM_END               (0x2003FFFFUL)          /**< RAM1 end address  */
+#define RAM1_MEM_BITS              (0x00000011UL)          /**< RAM1 used bits  */
+#define RAM2_MEM_BASE              (0x20040000UL)          /**< RAM2 base address  */
+#define RAM2_MEM_SIZE              (0x800UL)               /**< RAM2 available address space  */
+#define RAM2_MEM_END               (0x200407FFUL)          /**< RAM2 end address  */
+#define RAM2_MEM_BITS              (0x0000000BUL)          /**< RAM2 used bits  */
 #define CRYPTO0_BITCLR_MEM_BASE    (0x440F0000UL)          /**< CRYPTO0_BITCLR base address  */
 #define CRYPTO0_BITCLR_MEM_SIZE    (0x400UL)               /**< CRYPTO0_BITCLR available address space  */
 #define CRYPTO0_BITCLR_MEM_END     (0x440F03FFUL)          /**< CRYPTO0_BITCLR end address  */
@@ -227,22 +186,62 @@ typedef enum IRQn{
 #define CRYPTO_BITCLR_MEM_SIZE     CRYPTO0_BITCLR_MEM_SIZE /**< Alias for CRYPTO0_BITCLR_MEM_SIZE */
 #define CRYPTO_BITCLR_MEM_END      CRYPTO0_BITCLR_MEM_END  /**< Alias for CRYPTO0_BITCLR_MEM_END  */
 #define CRYPTO_BITCLR_MEM_BITS     CRYPTO0_BITCLR_MEM_BITS /**< Alias for CRYPTO0_BITCLR_MEM_BITS */
-#define PER_BITSET_MEM_BASE        (0x46000000UL)          /**< PER_BITSET base address  */
-#define PER_BITSET_MEM_SIZE        (0xF0000UL)             /**< PER_BITSET available address space  */
-#define PER_BITSET_MEM_END         (0x460EFFFFUL)          /**< PER_BITSET end address  */
-#define PER_BITSET_MEM_BITS        (0x00000014UL)          /**< PER_BITSET used bits  */
+#define CRYPTO1_MEM_BASE           (0x400F0400UL)          /**< CRYPTO1 base address  */
+#define CRYPTO1_MEM_SIZE           (0x400UL)               /**< CRYPTO1 available address space  */
+#define CRYPTO1_MEM_END            (0x400F07FFUL)          /**< CRYPTO1 end address  */
+#define CRYPTO1_MEM_BITS           (0x0000000AUL)          /**< CRYPTO1 used bits  */
+#define CRYPTO0_BITSET_MEM_BASE    (0x460F0000UL)          /**< CRYPTO0_BITSET base address  */
+#define CRYPTO0_BITSET_MEM_SIZE    (0x400UL)               /**< CRYPTO0_BITSET available address space  */
+#define CRYPTO0_BITSET_MEM_END     (0x460F03FFUL)          /**< CRYPTO0_BITSET end address  */
+#define CRYPTO0_BITSET_MEM_BITS    (0x0000000AUL)          /**< CRYPTO0_BITSET used bits  */
+#define CRYPTO_BITSET_MEM_BASE     CRYPTO0_BITSET_MEM_BASE /**< Alias for CRYPTO0_BITSET_MEM_BASE */
+#define CRYPTO_BITSET_MEM_SIZE     CRYPTO0_BITSET_MEM_SIZE /**< Alias for CRYPTO0_BITSET_MEM_SIZE */
+#define CRYPTO_BITSET_MEM_END      CRYPTO0_BITSET_MEM_END  /**< Alias for CRYPTO0_BITSET_MEM_END  */
+#define CRYPTO_BITSET_MEM_BITS     CRYPTO0_BITSET_MEM_BITS /**< Alias for CRYPTO0_BITSET_MEM_BITS */
+#define RAM1_CODE_MEM_BASE         (0x10020000UL)          /**< RAM1_CODE base address  */
+#define RAM1_CODE_MEM_SIZE         (0x20000UL)             /**< RAM1_CODE available address space  */
+#define RAM1_CODE_MEM_END          (0x1003FFFFUL)          /**< RAM1_CODE end address  */
+#define RAM1_CODE_MEM_BITS         (0x00000011UL)          /**< RAM1_CODE used bits  */
+#define RAM0_CODE_MEM_BASE         (0x10000000UL)          /**< RAM0_CODE base address  */
+#define RAM0_CODE_MEM_SIZE         (0x20000UL)             /**< RAM0_CODE available address space  */
+#define RAM0_CODE_MEM_END          (0x1001FFFFUL)          /**< RAM0_CODE end address  */
+#define RAM0_CODE_MEM_BITS         (0x00000011UL)          /**< RAM0_CODE used bits  */
+#define FLASH_MEM_BASE             (0x00000000UL)          /**< FLASH base address  */
+#define FLASH_MEM_SIZE             (0x10000000UL)          /**< FLASH available address space  */
+#define FLASH_MEM_END              (0x0FFFFFFFUL)          /**< FLASH end address  */
+#define FLASH_MEM_BITS             (0x0000001CUL)          /**< FLASH used bits  */
 #define CRYPTO1_BITSET_MEM_BASE    (0x460F0400UL)          /**< CRYPTO1_BITSET base address  */
 #define CRYPTO1_BITSET_MEM_SIZE    (0x400UL)               /**< CRYPTO1_BITSET available address space  */
 #define CRYPTO1_BITSET_MEM_END     (0x460F07FFUL)          /**< CRYPTO1_BITSET end address  */
 #define CRYPTO1_BITSET_MEM_BITS    (0x0000000AUL)          /**< CRYPTO1_BITSET used bits  */
-#define RAM2_CODE_MEM_BASE         (0x10040000UL)          /**< RAM2_CODE base address  */
-#define RAM2_CODE_MEM_SIZE         (0x800UL)               /**< RAM2_CODE available address space  */
-#define RAM2_CODE_MEM_END          (0x100407FFUL)          /**< RAM2_CODE end address  */
-#define RAM2_CODE_MEM_BITS         (0x0000000BUL)          /**< RAM2_CODE used bits  */
 #define RAM_MEM_BASE               (0x20000000UL)          /**< RAM base address  */
 #define RAM_MEM_SIZE               (0x20000UL)             /**< RAM available address space  */
 #define RAM_MEM_END                (0x2001FFFFUL)          /**< RAM end address  */
 #define RAM_MEM_BITS               (0x00000011UL)          /**< RAM used bits  */
+#define CRYPTO0_MEM_BASE           (0x400F0000UL)          /**< CRYPTO0 base address  */
+#define CRYPTO0_MEM_SIZE           (0x400UL)               /**< CRYPTO0 available address space  */
+#define CRYPTO0_MEM_END            (0x400F03FFUL)          /**< CRYPTO0 end address  */
+#define CRYPTO0_MEM_BITS           (0x0000000AUL)          /**< CRYPTO0 used bits  */
+#define CRYPTO_MEM_BASE            CRYPTO0_MEM_BASE        /**< Alias for CRYPTO0_MEM_BASE */
+#define CRYPTO_MEM_SIZE            CRYPTO0_MEM_SIZE        /**< Alias for CRYPTO0_MEM_SIZE */
+#define CRYPTO_MEM_END             CRYPTO0_MEM_END         /**< Alias for CRYPTO0_MEM_END  */
+#define CRYPTO_MEM_BITS            CRYPTO0_MEM_BITS        /**< Alias for CRYPTO0_MEM_BITS */
+#define PER_BITSET_MEM_BASE        (0x46000000UL)          /**< PER_BITSET base address  */
+#define PER_BITSET_MEM_SIZE        (0xF0000UL)             /**< PER_BITSET available address space  */
+#define PER_BITSET_MEM_END         (0x460EFFFFUL)          /**< PER_BITSET end address  */
+#define PER_BITSET_MEM_BITS        (0x00000014UL)          /**< PER_BITSET used bits  */
+#define PER_MEM_BASE               (0x40000000UL)          /**< PER base address  */
+#define PER_MEM_SIZE               (0xF0000UL)             /**< PER available address space  */
+#define PER_MEM_END                (0x400EFFFFUL)          /**< PER end address  */
+#define PER_MEM_BITS               (0x00000014UL)          /**< PER used bits  */
+#define RAM2_CODE_MEM_BASE         (0x10040000UL)          /**< RAM2_CODE base address  */
+#define RAM2_CODE_MEM_SIZE         (0x800UL)               /**< RAM2_CODE available address space  */
+#define RAM2_CODE_MEM_END          (0x100407FFUL)          /**< RAM2_CODE end address  */
+#define RAM2_CODE_MEM_BITS         (0x0000000BUL)          /**< RAM2_CODE used bits  */
+#define PER_BITCLR_MEM_BASE        (0x44000000UL)          /**< PER_BITCLR base address  */
+#define PER_BITCLR_MEM_SIZE        (0xF0000UL)             /**< PER_BITCLR available address space  */
+#define PER_BITCLR_MEM_END         (0x440EFFFFUL)          /**< PER_BITCLR end address  */
+#define PER_BITCLR_MEM_BITS        (0x00000014UL)          /**< PER_BITCLR used bits  */
 
 /** Bit banding area */
 #define BITBAND_PER_BASE           (0x42000000UL) /**< Peripheral Address Space bit-band area */
@@ -1027,13 +1026,13 @@ typedef enum IRQn{
 #define _WTIMER_LOCK_TIMERLOCKKEY_SHIFT             0                                         /**< Shift value for TIMER_TIMERLOCKKEY */
 #define _WTIMER_LOCK_TIMERLOCKKEY_MASK              0xFFFFUL                                  /**< Bit mask for TIMER_TIMERLOCKKEY */
 #define _WTIMER_LOCK_TIMERLOCKKEY_DEFAULT           0x00000000UL                              /**< Mode DEFAULT for WTIMER_LOCK */
-#define _WTIMER_LOCK_TIMERLOCKKEY_LOCK              0x00000000UL                              /**< Mode LOCK for WTIMER_LOCK */
 #define _WTIMER_LOCK_TIMERLOCKKEY_UNLOCKED          0x00000000UL                              /**< Mode UNLOCKED for WTIMER_LOCK */
+#define _WTIMER_LOCK_TIMERLOCKKEY_LOCK              0x00000000UL                              /**< Mode LOCK for WTIMER_LOCK */
 #define _WTIMER_LOCK_TIMERLOCKKEY_LOCKED            0x00000001UL                              /**< Mode LOCKED for WTIMER_LOCK */
 #define _WTIMER_LOCK_TIMERLOCKKEY_UNLOCK            0x0000CE80UL                              /**< Mode UNLOCK for WTIMER_LOCK */
 #define WTIMER_LOCK_TIMERLOCKKEY_DEFAULT            (_WTIMER_LOCK_TIMERLOCKKEY_DEFAULT << 0)  /**< Shifted mode DEFAULT for WTIMER_LOCK */
-#define WTIMER_LOCK_TIMERLOCKKEY_LOCK               (_WTIMER_LOCK_TIMERLOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for WTIMER_LOCK */
 #define WTIMER_LOCK_TIMERLOCKKEY_UNLOCKED           (_WTIMER_LOCK_TIMERLOCKKEY_UNLOCKED << 0) /**< Shifted mode UNLOCKED for WTIMER_LOCK */
+#define WTIMER_LOCK_TIMERLOCKKEY_LOCK               (_WTIMER_LOCK_TIMERLOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for WTIMER_LOCK */
 #define WTIMER_LOCK_TIMERLOCKKEY_LOCKED             (_WTIMER_LOCK_TIMERLOCKKEY_LOCKED << 0)   /**< Shifted mode LOCKED for WTIMER_LOCK */
 #define WTIMER_LOCK_TIMERLOCKKEY_UNLOCK             (_WTIMER_LOCK_TIMERLOCKKEY_UNLOCK << 0)   /**< Shifted mode UNLOCK for WTIMER_LOCK */
 
@@ -2014,13 +2013,13 @@ typedef enum IRQn{
 #define _WTIMER_DTLOCK_LOCKKEY_SHIFT                0                                      /**< Shift value for TIMER_LOCKKEY */
 #define _WTIMER_DTLOCK_LOCKKEY_MASK                 0xFFFFUL                               /**< Bit mask for TIMER_LOCKKEY */
 #define _WTIMER_DTLOCK_LOCKKEY_DEFAULT              0x00000000UL                           /**< Mode DEFAULT for WTIMER_DTLOCK */
-#define _WTIMER_DTLOCK_LOCKKEY_LOCK                 0x00000000UL                           /**< Mode LOCK for WTIMER_DTLOCK */
 #define _WTIMER_DTLOCK_LOCKKEY_UNLOCKED             0x00000000UL                           /**< Mode UNLOCKED for WTIMER_DTLOCK */
+#define _WTIMER_DTLOCK_LOCKKEY_LOCK                 0x00000000UL                           /**< Mode LOCK for WTIMER_DTLOCK */
 #define _WTIMER_DTLOCK_LOCKKEY_LOCKED               0x00000001UL                           /**< Mode LOCKED for WTIMER_DTLOCK */
 #define _WTIMER_DTLOCK_LOCKKEY_UNLOCK               0x0000CE80UL                           /**< Mode UNLOCK for WTIMER_DTLOCK */
 #define WTIMER_DTLOCK_LOCKKEY_DEFAULT               (_WTIMER_DTLOCK_LOCKKEY_DEFAULT << 0)  /**< Shifted mode DEFAULT for WTIMER_DTLOCK */
-#define WTIMER_DTLOCK_LOCKKEY_LOCK                  (_WTIMER_DTLOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for WTIMER_DTLOCK */
 #define WTIMER_DTLOCK_LOCKKEY_UNLOCKED              (_WTIMER_DTLOCK_LOCKKEY_UNLOCKED << 0) /**< Shifted mode UNLOCKED for WTIMER_DTLOCK */
+#define WTIMER_DTLOCK_LOCKKEY_LOCK                  (_WTIMER_DTLOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for WTIMER_DTLOCK */
 #define WTIMER_DTLOCK_LOCKKEY_LOCKED                (_WTIMER_DTLOCK_LOCKKEY_LOCKED << 0)   /**< Shifted mode LOCKED for WTIMER_DTLOCK */
 #define WTIMER_DTLOCK_LOCKKEY_UNLOCK                (_WTIMER_DTLOCK_LOCKKEY_UNLOCK << 0)   /**< Shifted mode UNLOCK for WTIMER_DTLOCK */
 

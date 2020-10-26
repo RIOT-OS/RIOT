@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief EFM32PG1B_RTCC register and bit field definitions
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -531,13 +530,13 @@ typedef struct {
 #define _RTCC_LOCK_LOCKKEY_SHIFT            0                                  /**< Shift value for RTCC_LOCKKEY */
 #define _RTCC_LOCK_LOCKKEY_MASK             0xFFFFUL                           /**< Bit mask for RTCC_LOCKKEY */
 #define _RTCC_LOCK_LOCKKEY_DEFAULT          0x00000000UL                       /**< Mode DEFAULT for RTCC_LOCK */
-#define _RTCC_LOCK_LOCKKEY_LOCK             0x00000000UL                       /**< Mode LOCK for RTCC_LOCK */
 #define _RTCC_LOCK_LOCKKEY_UNLOCKED         0x00000000UL                       /**< Mode UNLOCKED for RTCC_LOCK */
+#define _RTCC_LOCK_LOCKKEY_LOCK             0x00000000UL                       /**< Mode LOCK for RTCC_LOCK */
 #define _RTCC_LOCK_LOCKKEY_LOCKED           0x00000001UL                       /**< Mode LOCKED for RTCC_LOCK */
 #define _RTCC_LOCK_LOCKKEY_UNLOCK           0x0000AEE8UL                       /**< Mode UNLOCK for RTCC_LOCK */
 #define RTCC_LOCK_LOCKKEY_DEFAULT           (_RTCC_LOCK_LOCKKEY_DEFAULT << 0)  /**< Shifted mode DEFAULT for RTCC_LOCK */
-#define RTCC_LOCK_LOCKKEY_LOCK              (_RTCC_LOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for RTCC_LOCK */
 #define RTCC_LOCK_LOCKKEY_UNLOCKED          (_RTCC_LOCK_LOCKKEY_UNLOCKED << 0) /**< Shifted mode UNLOCKED for RTCC_LOCK */
+#define RTCC_LOCK_LOCKKEY_LOCK              (_RTCC_LOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for RTCC_LOCK */
 #define RTCC_LOCK_LOCKKEY_LOCKED            (_RTCC_LOCK_LOCKKEY_LOCKED << 0)   /**< Shifted mode LOCKED for RTCC_LOCK */
 #define RTCC_LOCK_LOCKKEY_UNLOCK            (_RTCC_LOCK_LOCKKEY_UNLOCK << 0)   /**< Shifted mode UNLOCK for RTCC_LOCK */
 
