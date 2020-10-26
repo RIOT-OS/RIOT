@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include "vectors_cortexm.h"
+#include "cpu.h"
 
 /* define a local dummy handler as it needs to be in the same compilation unit
  * as the alias definition */
@@ -66,8 +67,12 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_rtc,                /*  3 Real-Time Counter */
     isr_eic,                /*  4 External Interrupt Controller */
     isr_nvmctrl,            /*  5 Non-Volatile Memory Controller */
+#ifdef REV_DMAC
     isr_dmac,               /*  6 Direct Memory Access Controller */
+#endif
+#ifdef REV_USB
     isr_usb,                /*  7 Universal Serial Bus */
+#endif
     isr_evsys,              /*  8 Event System Interface */
     isr_sercom0,            /*  9 Serial Communication Interface 0 */
     isr_sercom1,            /* 10 Serial Communication Interface 1 */
@@ -87,5 +92,7 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_ac,                 /* 24 Analog Comparators */
     isr_dac,                /* 25 Digital Analog Converter */
     isr_ptc,                /* 26 Peripheral Touch Controller */
+#ifdef REV_I2S
     isr_i2c                 /* 27 Inter-IC Sound Interface */
+#endif
 };
