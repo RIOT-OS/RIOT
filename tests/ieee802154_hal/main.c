@@ -482,6 +482,7 @@ int config_phy(int argc, char **argv)
         puts("Wrong channel configuration (11 <= channel <= 26).");
         return 1;
     }
+    _set_trx_state(IEEE802154_TRX_STATE_TRX_OFF, false);
     ieee802154_dev_t *dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
     ieee802154_phy_conf_t conf = {.channel=channel, .page=0, .pow=tx_pow};
     if (ieee802154_radio_config_phy(dev, &conf) < 0) {
@@ -490,6 +491,8 @@ int config_phy(int argc, char **argv)
     else {
         puts("Success!");
     }
+
+    _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
 
     return 0;
 }

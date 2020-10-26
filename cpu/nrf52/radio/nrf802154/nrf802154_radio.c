@@ -616,10 +616,7 @@ static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
         return -EINVAL;
     }
 
-    _disable();
-
-    /* This will take in worst case 21 us */
-    while (NRF_RADIO->STATE != RADIO_STATE_STATE_Disabled) {};
+    assert(NRF_RADIO->STATE == RADIO_STATE_STATE_Disabled);
 
     /* The value of this register represents the frequency offset (in MHz) from
      * 2400 MHz.  Channel 11 (first 2.4 GHz band channel) starts at 2405 MHz
@@ -631,13 +628,6 @@ static int _config_phy(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf)
     DEBUG("[nrf802154] setting channel to %i\n", conf->channel);
     DEBUG("[nrf802154] setting TX power to %i\n", conf->pow);
     _set_txpower(pow);
-
-    if (_state == STATE_RX) {
-        NRF_RADIO->TASKS_RXEN = 1;
-
-        /* This takes in worst case 40 us */
-        while (NRF_RADIO->STATE == RADIO_STATE_STATE_RxRu) {}
-    }
 
     return 0;
 }

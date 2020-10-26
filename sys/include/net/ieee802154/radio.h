@@ -636,13 +636,14 @@ struct ieee802154_radio_ops {
      * function should return -EINVAL
      *
      * @pre the device is on
+     * @pre the transceiver state is @ref IEEE802154_TRX_STATE_TRX_OFF
      *
      * @param[in] dev IEEE802.15.4 device descriptor
      * @param[in] conf the PHY configuration
      *
-     * @return 0 on success
-     * @return -EINVAL if the configuration is not valid for the device.
-     * @return negative errno on error
+     * @return 0        on success
+     * @return -EINVAL  if the configuration is not valid for the device.
+     * @return <0       error, return value is negative errno indicating the cause.
      */
     int (*config_phy)(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf);
 
@@ -815,6 +816,8 @@ static inline int ieee802154_radio_set_cca_mode(ieee802154_dev_t *dev,
 
 /**
  * @brief Shortcut to @ref ieee802154_radio_ops::config_phy
+ *
+ * @pre the transceiver state is @ref IEEE802154_TRX_STATE_TRX_OFF
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  * @param[in] conf the PHY configuration
