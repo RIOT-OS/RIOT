@@ -11,23 +11,25 @@
  *
  * @{
  * @file
- * @brief xtimer posix wrapper
+ * @brief  posix sleep/usleep implementation wrapped around @ref ztimer
  * @author Kaspar Schleiser <kaspar@schleiser.de>
  * @}
  */
 
 #include <unistd.h>
 
-#include "xtimer.h"
+#include "kernel_defines.h"
+#include "timex.h"
+#include "ztimer.h"
 
 unsigned int sleep(unsigned int seconds)
 {
-    xtimer_usleep64(seconds * US_PER_SEC);
+    ztimer_sleep(ZTIMER_MSEC, seconds * MS_PER_SEC);
     return 0;
 }
 
 int usleep(useconds_t usec)
 {
-    xtimer_usleep64(usec);
+    ztimer_sleep(ZTIMER_USEC, usec);
     return 0;
 }
