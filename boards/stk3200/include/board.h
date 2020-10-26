@@ -32,11 +32,13 @@ extern "C" {
 /**
  * @name    Xtimer configuration
  *
- * The timer runs at 250 KHz to increase accuracy.
+ * The timer runs at 250 kHz.
  * @{
  */
+#define XTIMER_DEV          (TIMER_DEV(0))
 #define XTIMER_HZ           (250000UL)
 #define XTIMER_WIDTH        (16)
+#define XTIMER_CHAN         (0)
 /** @} */
 
 /**

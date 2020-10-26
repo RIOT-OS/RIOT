@@ -31,6 +31,9 @@ extern "C" {
 
 /**
  * @name    Xtimer configuration
+ *
+ * The timer runs at 1000 kHz to increase accuracy, or at 32.768 kHz if
+ * LETIMER is used.
  * @{
  */
 #if IS_ACTIVE(CONFIG_EFM32_XTIMER_USE_LETIMER)
@@ -42,7 +45,7 @@ extern "C" {
 #define XTIMER_HZ           (1000000UL)
 #define XTIMER_WIDTH        (32)
 #endif
-#define XTIMER_CHAN (0)
+#define XTIMER_CHAN         (0)
 /** @} */
 
 /**
