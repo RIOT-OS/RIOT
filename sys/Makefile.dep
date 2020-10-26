@@ -817,6 +817,10 @@ ifneq (,$(filter luid,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_cpuid
 endif
 
+ifneq (,$(filter nanocoap_sock,$(USEMODULE)))
+  USEMODULE += sock_udp
+endif
+
 ifneq (,$(filter nanocoap_%,$(USEMODULE)))
   USEMODULE += nanocoap
 endif
