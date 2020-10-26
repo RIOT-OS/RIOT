@@ -313,6 +313,34 @@ static uint32_t mtd_spi_nor_get_size(const mtd_jedec_id_t *id)
     return 1 << id->device[1];
 }
 
+static inline void wait_for_write_enable_cleared(const mtd_spi_nor_t *dev)
+{
+    do {
+        uint8_t status;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
+
+        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting !WEL\n", (unsigned int)status);
+        if ((status & STATUS_WEL) == 0) {
+            break;
+        }
+        thread_yield();
+    } while (1);
+}
+
+static inline void wait_for_write_enable_set(const mtd_spi_nor_t *dev)
+{
+    do {
+        uint8_t status;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
+
+        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting WEL\n", (unsigned int)status);
+        if (status & STATUS_WEL) {
+            break;
+        }
+        thread_yield();
+    } while (1);
+}
+
 static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us)
 {
     unsigned i = 0, j = 0;
@@ -324,8 +352,8 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
         uint8_t status;
         mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
 
-        TRACE("mtd_spi_nor: wait device status = 0x%02x\n", (unsigned int)status);
-        if ((status & 1) == 0) { /* TODO magic number */
+        TRACE("mtd_spi_nor: wait device status = 0x%02x, waiting !WIP\n", (unsigned int)status);
+        if ((status & STATUS_WIP) == 0) {
             break;
         }
         i++;
@@ -475,6 +503,7 @@ static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t 
 
 static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t size)
 {
+    int ret = 0;
     uint32_t total_size = mtd->page_size * mtd->pages_per_sector * mtd->sector_count;
 
     DEBUG("mtd_spi_nor_write: %p, %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
@@ -501,14 +530,31 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
     /* write enable */
     mtd_spi_cmd(dev, dev->params->opcode->wren);
 
+    /* Wait for WEL to be set */
+    wait_for_write_enable_set(dev);
+
     /* Page program */
     mtd_spi_cmd_addr_write(dev, dev->params->opcode->page_program, addr_be, src, size);
 
     /* waiting for the command to complete before returning */
     wait_for_write_complete(dev, 0);
 
+    /* Wait for WEL to be cleared */
+    wait_for_write_enable_cleared(dev);
+
+    if (IS_ACTIVE(CONFIG_MTD_SPI_NOR_RDSCUR)) {
+        /* Read security register */
+        uint8_t rdscur;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
+        if (rdscur & SECURITY_PFAIL) {
+            DEBUG("mtd_spi_nor_write: ERR: page program failed!\n");
+            ret = -EIO;
+        }
+    }
+
     mtd_spi_release(dev);
-    return 0;
+
+    return ret;
 }
 
 static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t offset,
@@ -521,6 +567,7 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
 
     uint32_t remaining = mtd->page_size - offset;
     size = MIN(remaining, size);
+    int ret = size;
 
     be_uint32_t addr_be = byteorder_htonl(page * mtd->page_size + offset);
 
@@ -529,19 +576,36 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
     /* write enable */
     mtd_spi_cmd(dev, dev->params->opcode->wren);
 
+    /* Wait for WEL to be set */
+    wait_for_write_enable_set(dev);
+
     /* Page program */
     mtd_spi_cmd_addr_write(dev, dev->params->opcode->page_program, addr_be, src, size);
 
     /* waiting for the command to complete before returning */
     wait_for_write_complete(dev, 0);
 
+    /* Wait for WEL to be cleared */
+    wait_for_write_enable_cleared(dev);
+
+    if (IS_ACTIVE(CONFIG_MTD_SPI_NOR_RDSCUR)) {
+        /* Read security register */
+        uint8_t rdscur;
+        mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
+        if (rdscur & SECURITY_PFAIL) {
+            DEBUG("mtd_spi_nor_write: ERR: page program failed!\n");
+            ret = -EIO;
+        }
+    }
+
     mtd_spi_release(dev);
 
-    return size;
+    return ret;
 }
 
 static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 {
+    int ret = 0;
     DEBUG("mtd_spi_nor_erase: %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
           (void *)mtd, addr, size);
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
@@ -570,6 +634,9 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         be_uint32_t addr_be = byteorder_htonl(addr);
         /* write enable */
         mtd_spi_cmd(dev, dev->params->opcode->wren);
+
+        /* Wait for WEL to be set */
+        wait_for_write_enable_set(dev);
 
         if (size == total_size) {
             mtd_spi_cmd(dev, dev->params->opcode->chip_erase);
@@ -601,10 +668,23 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 
         /* waiting for the command to complete before continuing */
         wait_for_write_complete(dev, us);
+
+        /* Wait for WEL to be cleared */
+        wait_for_write_enable_cleared(dev);
+
+        if (IS_ACTIVE(CONFIG_MTD_SPI_NOR_RDSCUR)) {
+            /* Read security register */
+            uint8_t rdscur;
+            mtd_spi_cmd_read(dev, dev->params->opcode->rdscur, &rdscur, sizeof(rdscur));
+            if (rdscur & SECURITY_EFAIL) {
+                DEBUG("mtd_spi_nor_erase: ERR: erase failed!\n");
+                ret = -EIO;
+            }
+        }
     }
     mtd_spi_release(dev);
 
-    return 0;
+    return ret;
 }
 
 static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
