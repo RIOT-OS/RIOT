@@ -33,7 +33,6 @@ static const mtd_spi_nor_params_t _serpente_nor_params = {
     .wait_chip_erase = 15LU * US_PER_SEC,
     .wait_32k_erase = 250LU * US_PER_MS,
     .wait_sector_erase = 50LU * US_PER_MS,
-    .wait_4k_erase = 150LU * US_PER_MS,
     .wait_chip_wake_up = 1LU * US_PER_MS,
     .clk = SERPENTE_NOR_SPI_CLK,
     .flag = SERPENTE_NOR_FLAGS,
