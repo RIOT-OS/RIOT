@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <stdio.h>
 
+#include "bitfield.h"
 #include "common.h"
 #include "embUnit.h"
 #include "embUnit/embUnit.h"
@@ -41,6 +42,7 @@
 
 #define ETHERNET_STACKSIZE          (THREAD_STACKSIZE_MAIN)
 #define IEEE802154_STACKSIZE        (THREAD_STACKSIZE_MAIN)
+#define ETHERNET_GROUPS_MAX 8U
 
 static gnrc_netif_t ethernet_netif;
 static gnrc_netif_t ieee802154_netif;
@@ -49,6 +51,9 @@ static char ethernet_netif_stack[ETHERNET_STACKSIZE];
 static char ieee802154_netif_stack[ETHERNET_STACKSIZE];
 static char netifs_stack[DEFAULT_DEVS_NUMOF][THREAD_STACKSIZE_DEFAULT];
 static bool init_called = false;
+
+static uint8_t ethernet_groups[ETHERNET_GROUPS_MAX][ETHERNET_ADDR_LEN];
+static BITFIELD(ethernet_groups_set, ETHERNET_GROUPS_MAX);
 
 static inline void _test_init(gnrc_netif_t *netif);
 static inline int _mock_netif_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
@@ -62,6 +67,11 @@ static int _set_netdev_address_long(netdev_t *dev, const void *value,
 static int _get_netdev_src_len(netdev_t *dev, void *value, size_t max_len);
 static int _set_netdev_src_len(netdev_t *dev, const void *value,
                                size_t value_len);
+static int _get_netdev_l2_group(netdev_t *dev, void *value, size_t max_len);
+static int _set_netdev_l2_group(netdev_t *dev, const void *value,
+                                size_t value_len);
+static int _set_netdev_l2_group_leave(netdev_t *dev, const void *value,
+                                      size_t value_len);
 
 static const gnrc_netif_ops_t default_ops = {
     .init = _test_init,
@@ -76,6 +86,8 @@ static void _set_up(void)
 {
     msg_t msg;
 
+    /* reset ethernet groups */
+    memset(ethernet_groups_set, 0, sizeof(ethernet_groups_set));
     memset(ethernet_netif.ipv6.addrs_flags, 0,
            sizeof(ethernet_netif.ipv6.addrs_flags));
     memset(ethernet_netif.ipv6.addrs, 0,
@@ -915,6 +927,55 @@ static void test_netapi_get__ADDRESS_LONG(void)
                 &value, sizeof(value)));
 }
 
+static void test_netapi_set_get__L2_GROUP(void)
+{
+    static const uint8_t exp_group1[] = { 0x33, 0x33, 0x00, 0x00, 0x00, 0x01 };
+    static const uint8_t exp_group2[] = { 0x33, 0x33, 0x00, 0x00, 0x00, 0x02 };
+    uint8_t value[2][ETHERNET_ADDR_LEN];
+
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_group1),
+            gnrc_netapi_set(ethernet_netif.pid,
+                NETOPT_L2_GROUP, 0,
+                &exp_group1, sizeof(exp_group1)));
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_group2),
+            gnrc_netapi_set(ethernet_netif.pid,
+                NETOPT_L2_GROUP, 0,
+                &exp_group2, sizeof(exp_group2)));
+    TEST_ASSERT_EQUAL_INT(sizeof(value),
+            gnrc_netapi_get(ethernet_netif.pid,
+                NETOPT_L2_GROUP, 0,
+                &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(exp_group1, value[0], sizeof(exp_group1)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(exp_group2, value[1], sizeof(exp_group2)));
+    TEST_ASSERT_EQUAL_INT(-ENOTSUP,
+            gnrc_netapi_get(ieee802154_netif.pid,
+                NETOPT_L2_GROUP, 0,
+                &value, sizeof(value)));
+}
+
+static void test_netapi_set__L2_GROUP_LEAVE(void)
+{
+    static const uint8_t exp_group1[] = { 0x33, 0x33, 0x00, 0x00, 0x00, 0x01 };
+    static const uint8_t exp_group2[] = { 0x33, 0x33, 0x00, 0x00, 0x00, 0x02 };
+    uint8_t value[2][ETHERNET_ADDR_LEN];
+
+    test_netapi_set_get__L2_GROUP();
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_group1),
+            gnrc_netapi_set(ethernet_netif.pid,
+                NETOPT_L2_GROUP_LEAVE, 0,
+                &exp_group1, sizeof(exp_group1)));
+    /* exp_group1 was removed */
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_group2),
+            gnrc_netapi_get(ethernet_netif.pid,
+                NETOPT_L2_GROUP, 0,
+                &value, sizeof(value)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(exp_group2, value[0], sizeof(exp_group2)));
+    TEST_ASSERT_EQUAL_INT(-ENOTSUP,
+            gnrc_netapi_get(ieee802154_netif.pid,
+                NETOPT_L2_GROUP_LEAVE, 0,
+                &value, sizeof(value)));
+}
+
 static void test_netapi_set__HOP_LIMIT(void)
 {
     uint8_t value = 89;
@@ -965,6 +1026,30 @@ static void test_netapi_set__IPV6_GROUP(void)
     TEST_ASSERT(0 <= gnrc_netif_ipv6_group_idx(&netifs[0], &value));
 }
 
+static void test_netapi_set__IPV6_GROUP__ethernet(void)
+{
+    ipv6_addr_t value = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+    uint8_t exp_ethernet[ETHERNET_ADDR_LEN];
+    uint8_t l2_value[1][ETHERNET_ADDR_LEN];
+
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
+                          gnrc_netif_ipv6_group_to_l2_group(&ethernet_netif,
+                                                            &value,
+                                                            exp_ethernet));
+    TEST_ASSERT(0 > gnrc_netif_ipv6_group_idx(&ethernet_netif, &value));
+    TEST_ASSERT_EQUAL_INT(sizeof(value),
+            gnrc_netapi_set(ethernet_netif.pid,
+                NETOPT_IPV6_GROUP, 0,
+                &value, sizeof(value)));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_group_idx(&ethernet_netif, &value));
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
+            gnrc_netapi_get(ethernet_netif.pid,
+                NETOPT_L2_GROUP, 0,
+                &l2_value, sizeof(l2_value)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(exp_ethernet, l2_value[0],
+                                    sizeof(exp_ethernet)));
+}
+
 static void test_netapi_set__IPV6_GROUP_LEAVE(void)
 {
     ipv6_addr_t value = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
@@ -976,6 +1061,87 @@ static void test_netapi_set__IPV6_GROUP_LEAVE(void)
                 NETOPT_IPV6_GROUP_LEAVE, 0,
                 &value, sizeof(value)));
     TEST_ASSERT(0 > gnrc_netif_ipv6_group_idx(&netifs[0], &value));
+}
+
+static void test_netapi_set__IPV6_GROUP_LEAVE__ethernet(void)
+{
+    ipv6_addr_t value = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+    uint8_t l2_value[1][ETHERNET_ADDR_LEN];
+
+    /* no L2 group assigned */
+    TEST_ASSERT_EQUAL_INT(0,
+            gnrc_netapi_get(ethernet_netif.pid,
+                NETOPT_L2_GROUP, 0,
+                &l2_value, sizeof(l2_value)));
+    /* join a group */
+    test_netapi_set__IPV6_GROUP__ethernet();
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_group_idx(&ethernet_netif, &value));
+    TEST_ASSERT_EQUAL_INT(sizeof(value),
+            gnrc_netapi_set(ethernet_netif.pid,
+                NETOPT_IPV6_GROUP_LEAVE, 0,
+                &value, sizeof(value)));
+    TEST_ASSERT(0 > gnrc_netif_ipv6_group_idx(&ethernet_netif, &value));
+    /* no L2 group assigned */
+    TEST_ASSERT_EQUAL_INT(0,
+            gnrc_netapi_get(ethernet_netif.pid,
+                NETOPT_L2_GROUP, 0,
+                &l2_value, sizeof(l2_value)));
+}
+
+static void test_netapi_set__IPV6_GROUP_LEAVE__ethernet_two_same(void)
+{
+    ipv6_addr_t value1 = IPV6_ADDR_ALL_NODES_LINK_LOCAL;
+    ipv6_addr_t value2 = IPV6_ADDR_ALL_NODES_IF_LOCAL;
+    uint8_t exp_ethernet[ETHERNET_ADDR_LEN];
+    uint8_t l2_value[2][ETHERNET_ADDR_LEN];
+
+    /* no L2 group assigned */
+    TEST_ASSERT_EQUAL_INT(0,
+            gnrc_netapi_get(ethernet_netif.pid,
+                NETOPT_L2_GROUP, 0,
+                &l2_value, sizeof(l2_value)));
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
+                          gnrc_netif_ipv6_group_to_l2_group(&ethernet_netif,
+                                                            &value1,
+                                                            exp_ethernet));
+    /* join a group */
+    test_netapi_set__IPV6_GROUP__ethernet();
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_group_idx(&ethernet_netif, &value1));
+    /* join another IPv6 group with same suffix */
+    TEST_ASSERT_EQUAL_INT(sizeof(value2),
+            gnrc_netapi_set(ethernet_netif.pid,
+                NETOPT_IPV6_GROUP, 0,
+                &value2, sizeof(value2)));
+    TEST_ASSERT(0 <= gnrc_netif_ipv6_group_idx(&ethernet_netif, &value2));
+    /* only one link layer group joined due to the same suffix */
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
+            gnrc_netapi_get(ethernet_netif.pid,
+                NETOPT_L2_GROUP, 0,
+                &l2_value, sizeof(l2_value)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(exp_ethernet, l2_value[0],
+                                    sizeof(exp_ethernet)));
+    TEST_ASSERT_EQUAL_INT(sizeof(value1),
+            gnrc_netapi_set(ethernet_netif.pid,
+                NETOPT_IPV6_GROUP_LEAVE, 0,
+                &value1, sizeof(value1)));
+    TEST_ASSERT(0 > gnrc_netif_ipv6_group_idx(&ethernet_netif, &value1));
+    /* still in link layer group due to other IPv6 group */
+    TEST_ASSERT_EQUAL_INT(sizeof(exp_ethernet),
+            gnrc_netapi_get(ethernet_netif.pid,
+                NETOPT_L2_GROUP, 0,
+                &l2_value, sizeof(l2_value)));
+    TEST_ASSERT_EQUAL_INT(0, memcmp(exp_ethernet, l2_value[0],
+                                    sizeof(exp_ethernet)));
+    TEST_ASSERT_EQUAL_INT(sizeof(value2),
+            gnrc_netapi_set(ethernet_netif.pid,
+                NETOPT_IPV6_GROUP_LEAVE, 0,
+                &value2, sizeof(value2)));
+    TEST_ASSERT(0 > gnrc_netif_ipv6_group_idx(&ethernet_netif, &value2));
+    /* no L2 group assigned */
+    TEST_ASSERT_EQUAL_INT(0,
+            gnrc_netapi_get(ethernet_netif.pid,
+                NETOPT_L2_GROUP, 0,
+                &l2_value, sizeof(l2_value)));
 }
 
 static void test_netapi_set__MAX_PACKET_SIZE(void)
@@ -1574,11 +1740,16 @@ static Test *embunit_tests_gnrc_netif(void)
             new_TestFixture(test_netapi_get__6LO_IPHC),
             new_TestFixture(test_netapi_get__ADDRESS),
             new_TestFixture(test_netapi_get__ADDRESS_LONG),
+            new_TestFixture(test_netapi_set_get__L2_GROUP),
+            new_TestFixture(test_netapi_set__L2_GROUP_LEAVE),
             new_TestFixture(test_netapi_set__HOP_LIMIT),
             new_TestFixture(test_netapi_set__IPV6_ADDR),
             new_TestFixture(test_netapi_set__IPV6_ADDR_REMOVE),
             new_TestFixture(test_netapi_set__IPV6_GROUP),
+            new_TestFixture(test_netapi_set__IPV6_GROUP__ethernet),
             new_TestFixture(test_netapi_set__IPV6_GROUP_LEAVE),
+            new_TestFixture(test_netapi_set__IPV6_GROUP_LEAVE__ethernet),
+            new_TestFixture(test_netapi_set__IPV6_GROUP_LEAVE__ethernet_two_same),
             new_TestFixture(test_netapi_set__MAX_PACKET_SIZE),
             new_TestFixture(test_netapi_set__6LO_IPHC),
             new_TestFixture(test_netapi_set__ADDRESS),
@@ -1603,6 +1774,12 @@ int main(void)
             _get_netdev_address);
     netdev_test_set_set_cb((netdev_test_t *)ethernet_dev, NETOPT_ADDRESS,
             _set_netdev_address);
+    netdev_test_set_get_cb((netdev_test_t *)ethernet_dev, NETOPT_L2_GROUP,
+            _get_netdev_l2_group);
+    netdev_test_set_set_cb((netdev_test_t *)ethernet_dev, NETOPT_L2_GROUP,
+            _set_netdev_l2_group);
+    netdev_test_set_set_cb((netdev_test_t *)ethernet_dev, NETOPT_L2_GROUP_LEAVE,
+            _set_netdev_l2_group_leave);
     netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev, NETOPT_ADDRESS,
             _get_netdev_address);
     netdev_test_set_set_cb((netdev_test_t *)ieee802154_dev, NETOPT_ADDRESS,
@@ -1735,6 +1912,71 @@ static int _set_netdev_src_len(netdev_t *dev, const void *value,
         expect(value_len == sizeof(uint16_t));
         ieee802154_l2addr_len = *((uint16_t *)value);
         return sizeof(uint16_t);
+    }
+    return -ENOTSUP;
+}
+
+static int _get_netdev_l2_group(netdev_t *dev, void *value, size_t max_len)
+{
+    (void)max_len;
+
+    if (dev == ethernet_dev) {
+        expect(max_len >= ETHERNET_ADDR_LEN);
+        int res = 0;
+
+        for (unsigned i = 0; res < (int)max_len && i < ETHERNET_GROUPS_MAX; i++) {
+            if (bf_isset(ethernet_groups_set, i)) {
+                memcpy(((uint8_t *)value) + res, ethernet_groups[i],
+                       ETHERNET_ADDR_LEN);
+                res += ETHERNET_ADDR_LEN;
+            }
+        }
+        return res;
+    }
+    return -ENOTSUP;
+}
+
+static int _set_netdev_l2_group(netdev_t *dev, const void *value,
+                                size_t value_len)
+{
+    if (dev == ethernet_dev) {
+        int idx = -ENOMEM;
+
+        expect(value_len >= ETHERNET_ADDR_LEN);
+        for (unsigned i = 0; i < ETHERNET_GROUPS_MAX; i++) {
+            if (bf_isset(ethernet_groups_set, i)) {
+                if (memcmp(value, ethernet_groups[i],
+                           sizeof(ethernet_groups[i])) == 0) {
+                    return ETHERNET_ADDR_LEN;
+                }
+            }
+            else if (idx < 0) {
+                idx = i;
+            }
+        }
+        if (idx >= 0) {
+            memcpy(ethernet_groups[idx], value, sizeof(ethernet_groups[idx]));
+            bf_set(ethernet_groups_set, idx);
+            return ETHERNET_ADDR_LEN;
+        }
+        return idx;
+    }
+    return -ENOTSUP;
+}
+
+static int _set_netdev_l2_group_leave(netdev_t *dev, const void *value,
+        size_t value_len)
+{
+    if (dev == ethernet_dev) {
+        expect(value_len >= ETHERNET_ADDR_LEN);
+        for (unsigned i = 0; i < ETHERNET_GROUPS_MAX; i++) {
+            if (bf_isset(ethernet_groups_set, i) &&
+                (memcmp(value, ethernet_groups[i],
+                        sizeof(ethernet_groups[i])) == 0)) {
+                bf_unset(ethernet_groups_set, i);
+            }
+        }
+        return ETHERNET_ADDR_LEN;
     }
     return -ENOTSUP;
 }
