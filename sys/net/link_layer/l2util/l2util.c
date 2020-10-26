@@ -243,7 +243,7 @@ int l2util_ipv6_group_to_l2_group(int dev_type,
                                   uint8_t *l2_group)
 {
     switch (dev_type) {
-#if defined(MODULE_NETDEV_ETH) || defined(MODULE_ESP_NOW)
+#if IS_USED(MODULE_NETDEV_ETH)
         case NETDEV_TYPE_ETHERNET:
             /* see https://tools.ietf.org/html/rfc2464#section-7 */
             l2_group[0] = 0x33;
