@@ -4,6 +4,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
 # setup JLink for flashing
 JLINK_DEVICE = EFR32MG1PxxxF256
+JLINK_PRE_FLASH = r
 include $(RIOTMAKE)/tools/jlink.inc.mk
 
 # setup serial terminal
