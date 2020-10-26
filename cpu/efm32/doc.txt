@@ -111,3 +111,9 @@
  * @ingroup         cpu_efm32
  * @brief           Silicon Labs's EFR32MG12P MCUs family implementation
  */
+
+/**
+ * @defgroup        cpu_ezr32wg Silicon Labs EZR32WG family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EZR32WG MCUs family implementation
+ */
