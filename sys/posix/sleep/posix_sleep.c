@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup sys_xtimer
+ * @ingroup posix
  *
  * @{
  * @file

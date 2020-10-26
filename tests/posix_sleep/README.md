@@ -1,4 +1,4 @@
-# posix_time test application
+# posix_sleep test application
 
 This test tests POSIX' `sleep()` and `usleep()`.
 The test script also checks the sanity of the timings by comparing the overall

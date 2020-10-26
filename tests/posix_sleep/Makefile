@@ -1,5 +1,5 @@
 include ../Makefile.tests_common
 
-USEMODULE += posix_time
+USEMODULE += posix_sleep
 
 include $(RIOTBASE)/Makefile.include

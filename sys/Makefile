@@ -140,8 +140,8 @@ endif
 ifneq (,$(filter posix_sockets,$(USEMODULE)))
   DIRS += posix/sockets
 endif
-ifneq (,$(filter posix_time,$(USEMODULE)))
-  DIRS += posix/time
+ifneq (,$(filter posix_sleep,$(USEMODULE)))
+  DIRS += posix/sleep
 endif
 ifneq (,$(filter pthread,$(USEMODULE)))
   DIRS += posix/pthread
