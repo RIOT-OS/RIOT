@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief EFM32GG_LESENSE register and bit field definitions
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -1731,27 +1730,27 @@ typedef struct {
 #define _LESENSE_ST_TCONFA_PRSACT_MASK                 0x7000UL                                      /**< Bit mask for LESENSE_PRSACT */
 #define _LESENSE_ST_TCONFA_PRSACT_DEFAULT              0x00000000UL                                  /**< Mode DEFAULT for LESENSE_ST_TCONFA */
 #define _LESENSE_ST_TCONFA_PRSACT_NONE                 0x00000000UL                                  /**< Mode NONE for LESENSE_ST_TCONFA */
-#define _LESENSE_ST_TCONFA_PRSACT_UP                   0x00000001UL                                  /**< Mode UP for LESENSE_ST_TCONFA */
 #define _LESENSE_ST_TCONFA_PRSACT_PRS0                 0x00000001UL                                  /**< Mode PRS0 for LESENSE_ST_TCONFA */
-#define _LESENSE_ST_TCONFA_PRSACT_PRS1                 0x00000002UL                                  /**< Mode PRS1 for LESENSE_ST_TCONFA */
+#define _LESENSE_ST_TCONFA_PRSACT_UP                   0x00000001UL                                  /**< Mode UP for LESENSE_ST_TCONFA */
 #define _LESENSE_ST_TCONFA_PRSACT_DOWN                 0x00000002UL                                  /**< Mode DOWN for LESENSE_ST_TCONFA */
+#define _LESENSE_ST_TCONFA_PRSACT_PRS1                 0x00000002UL                                  /**< Mode PRS1 for LESENSE_ST_TCONFA */
 #define _LESENSE_ST_TCONFA_PRSACT_PRS01                0x00000003UL                                  /**< Mode PRS01 for LESENSE_ST_TCONFA */
 #define _LESENSE_ST_TCONFA_PRSACT_PRS2                 0x00000004UL                                  /**< Mode PRS2 for LESENSE_ST_TCONFA */
-#define _LESENSE_ST_TCONFA_PRSACT_PRS02                0x00000005UL                                  /**< Mode PRS02 for LESENSE_ST_TCONFA */
 #define _LESENSE_ST_TCONFA_PRSACT_UPANDPRS2            0x00000005UL                                  /**< Mode UPANDPRS2 for LESENSE_ST_TCONFA */
+#define _LESENSE_ST_TCONFA_PRSACT_PRS02                0x00000005UL                                  /**< Mode PRS02 for LESENSE_ST_TCONFA */
 #define _LESENSE_ST_TCONFA_PRSACT_PRS12                0x00000006UL                                  /**< Mode PRS12 for LESENSE_ST_TCONFA */
 #define _LESENSE_ST_TCONFA_PRSACT_DOWNANDPRS2          0x00000006UL                                  /**< Mode DOWNANDPRS2 for LESENSE_ST_TCONFA */
 #define _LESENSE_ST_TCONFA_PRSACT_PRS012               0x00000007UL                                  /**< Mode PRS012 for LESENSE_ST_TCONFA */
 #define LESENSE_ST_TCONFA_PRSACT_DEFAULT               (_LESENSE_ST_TCONFA_PRSACT_DEFAULT << 12)     /**< Shifted mode DEFAULT for LESENSE_ST_TCONFA */
 #define LESENSE_ST_TCONFA_PRSACT_NONE                  (_LESENSE_ST_TCONFA_PRSACT_NONE << 12)        /**< Shifted mode NONE for LESENSE_ST_TCONFA */
-#define LESENSE_ST_TCONFA_PRSACT_UP                    (_LESENSE_ST_TCONFA_PRSACT_UP << 12)          /**< Shifted mode UP for LESENSE_ST_TCONFA */
 #define LESENSE_ST_TCONFA_PRSACT_PRS0                  (_LESENSE_ST_TCONFA_PRSACT_PRS0 << 12)        /**< Shifted mode PRS0 for LESENSE_ST_TCONFA */
-#define LESENSE_ST_TCONFA_PRSACT_PRS1                  (_LESENSE_ST_TCONFA_PRSACT_PRS1 << 12)        /**< Shifted mode PRS1 for LESENSE_ST_TCONFA */
+#define LESENSE_ST_TCONFA_PRSACT_UP                    (_LESENSE_ST_TCONFA_PRSACT_UP << 12)          /**< Shifted mode UP for LESENSE_ST_TCONFA */
 #define LESENSE_ST_TCONFA_PRSACT_DOWN                  (_LESENSE_ST_TCONFA_PRSACT_DOWN << 12)        /**< Shifted mode DOWN for LESENSE_ST_TCONFA */
+#define LESENSE_ST_TCONFA_PRSACT_PRS1                  (_LESENSE_ST_TCONFA_PRSACT_PRS1 << 12)        /**< Shifted mode PRS1 for LESENSE_ST_TCONFA */
 #define LESENSE_ST_TCONFA_PRSACT_PRS01                 (_LESENSE_ST_TCONFA_PRSACT_PRS01 << 12)       /**< Shifted mode PRS01 for LESENSE_ST_TCONFA */
 #define LESENSE_ST_TCONFA_PRSACT_PRS2                  (_LESENSE_ST_TCONFA_PRSACT_PRS2 << 12)        /**< Shifted mode PRS2 for LESENSE_ST_TCONFA */
-#define LESENSE_ST_TCONFA_PRSACT_PRS02                 (_LESENSE_ST_TCONFA_PRSACT_PRS02 << 12)       /**< Shifted mode PRS02 for LESENSE_ST_TCONFA */
 #define LESENSE_ST_TCONFA_PRSACT_UPANDPRS2             (_LESENSE_ST_TCONFA_PRSACT_UPANDPRS2 << 12)   /**< Shifted mode UPANDPRS2 for LESENSE_ST_TCONFA */
+#define LESENSE_ST_TCONFA_PRSACT_PRS02                 (_LESENSE_ST_TCONFA_PRSACT_PRS02 << 12)       /**< Shifted mode PRS02 for LESENSE_ST_TCONFA */
 #define LESENSE_ST_TCONFA_PRSACT_PRS12                 (_LESENSE_ST_TCONFA_PRSACT_PRS12 << 12)       /**< Shifted mode PRS12 for LESENSE_ST_TCONFA */
 #define LESENSE_ST_TCONFA_PRSACT_DOWNANDPRS2           (_LESENSE_ST_TCONFA_PRSACT_DOWNANDPRS2 << 12) /**< Shifted mode DOWNANDPRS2 for LESENSE_ST_TCONFA */
 #define LESENSE_ST_TCONFA_PRSACT_PRS012                (_LESENSE_ST_TCONFA_PRSACT_PRS012 << 12)      /**< Shifted mode PRS012 for LESENSE_ST_TCONFA */
@@ -1785,27 +1784,27 @@ typedef struct {
 #define _LESENSE_ST_TCONFB_PRSACT_MASK                 0x7000UL                                      /**< Bit mask for LESENSE_PRSACT */
 #define _LESENSE_ST_TCONFB_PRSACT_DEFAULT              0x00000000UL                                  /**< Mode DEFAULT for LESENSE_ST_TCONFB */
 #define _LESENSE_ST_TCONFB_PRSACT_NONE                 0x00000000UL                                  /**< Mode NONE for LESENSE_ST_TCONFB */
-#define _LESENSE_ST_TCONFB_PRSACT_UP                   0x00000001UL                                  /**< Mode UP for LESENSE_ST_TCONFB */
 #define _LESENSE_ST_TCONFB_PRSACT_PRS0                 0x00000001UL                                  /**< Mode PRS0 for LESENSE_ST_TCONFB */
-#define _LESENSE_ST_TCONFB_PRSACT_PRS1                 0x00000002UL                                  /**< Mode PRS1 for LESENSE_ST_TCONFB */
+#define _LESENSE_ST_TCONFB_PRSACT_UP                   0x00000001UL                                  /**< Mode UP for LESENSE_ST_TCONFB */
 #define _LESENSE_ST_TCONFB_PRSACT_DOWN                 0x00000002UL                                  /**< Mode DOWN for LESENSE_ST_TCONFB */
+#define _LESENSE_ST_TCONFB_PRSACT_PRS1                 0x00000002UL                                  /**< Mode PRS1 for LESENSE_ST_TCONFB */
 #define _LESENSE_ST_TCONFB_PRSACT_PRS01                0x00000003UL                                  /**< Mode PRS01 for LESENSE_ST_TCONFB */
 #define _LESENSE_ST_TCONFB_PRSACT_PRS2                 0x00000004UL                                  /**< Mode PRS2 for LESENSE_ST_TCONFB */
-#define _LESENSE_ST_TCONFB_PRSACT_PRS02                0x00000005UL                                  /**< Mode PRS02 for LESENSE_ST_TCONFB */
 #define _LESENSE_ST_TCONFB_PRSACT_UPANDPRS2            0x00000005UL                                  /**< Mode UPANDPRS2 for LESENSE_ST_TCONFB */
+#define _LESENSE_ST_TCONFB_PRSACT_PRS02                0x00000005UL                                  /**< Mode PRS02 for LESENSE_ST_TCONFB */
 #define _LESENSE_ST_TCONFB_PRSACT_PRS12                0x00000006UL                                  /**< Mode PRS12 for LESENSE_ST_TCONFB */
 #define _LESENSE_ST_TCONFB_PRSACT_DOWNANDPRS2          0x00000006UL                                  /**< Mode DOWNANDPRS2 for LESENSE_ST_TCONFB */
 #define _LESENSE_ST_TCONFB_PRSACT_PRS012               0x00000007UL                                  /**< Mode PRS012 for LESENSE_ST_TCONFB */
 #define LESENSE_ST_TCONFB_PRSACT_DEFAULT               (_LESENSE_ST_TCONFB_PRSACT_DEFAULT << 12)     /**< Shifted mode DEFAULT for LESENSE_ST_TCONFB */
 #define LESENSE_ST_TCONFB_PRSACT_NONE                  (_LESENSE_ST_TCONFB_PRSACT_NONE << 12)        /**< Shifted mode NONE for LESENSE_ST_TCONFB */
-#define LESENSE_ST_TCONFB_PRSACT_UP                    (_LESENSE_ST_TCONFB_PRSACT_UP << 12)          /**< Shifted mode UP for LESENSE_ST_TCONFB */
 #define LESENSE_ST_TCONFB_PRSACT_PRS0                  (_LESENSE_ST_TCONFB_PRSACT_PRS0 << 12)        /**< Shifted mode PRS0 for LESENSE_ST_TCONFB */
-#define LESENSE_ST_TCONFB_PRSACT_PRS1                  (_LESENSE_ST_TCONFB_PRSACT_PRS1 << 12)        /**< Shifted mode PRS1 for LESENSE_ST_TCONFB */
+#define LESENSE_ST_TCONFB_PRSACT_UP                    (_LESENSE_ST_TCONFB_PRSACT_UP << 12)          /**< Shifted mode UP for LESENSE_ST_TCONFB */
 #define LESENSE_ST_TCONFB_PRSACT_DOWN                  (_LESENSE_ST_TCONFB_PRSACT_DOWN << 12)        /**< Shifted mode DOWN for LESENSE_ST_TCONFB */
+#define LESENSE_ST_TCONFB_PRSACT_PRS1                  (_LESENSE_ST_TCONFB_PRSACT_PRS1 << 12)        /**< Shifted mode PRS1 for LESENSE_ST_TCONFB */
 #define LESENSE_ST_TCONFB_PRSACT_PRS01                 (_LESENSE_ST_TCONFB_PRSACT_PRS01 << 12)       /**< Shifted mode PRS01 for LESENSE_ST_TCONFB */
 #define LESENSE_ST_TCONFB_PRSACT_PRS2                  (_LESENSE_ST_TCONFB_PRSACT_PRS2 << 12)        /**< Shifted mode PRS2 for LESENSE_ST_TCONFB */
-#define LESENSE_ST_TCONFB_PRSACT_PRS02                 (_LESENSE_ST_TCONFB_PRSACT_PRS02 << 12)       /**< Shifted mode PRS02 for LESENSE_ST_TCONFB */
 #define LESENSE_ST_TCONFB_PRSACT_UPANDPRS2             (_LESENSE_ST_TCONFB_PRSACT_UPANDPRS2 << 12)   /**< Shifted mode UPANDPRS2 for LESENSE_ST_TCONFB */
+#define LESENSE_ST_TCONFB_PRSACT_PRS02                 (_LESENSE_ST_TCONFB_PRSACT_PRS02 << 12)       /**< Shifted mode PRS02 for LESENSE_ST_TCONFB */
 #define LESENSE_ST_TCONFB_PRSACT_PRS12                 (_LESENSE_ST_TCONFB_PRSACT_PRS12 << 12)       /**< Shifted mode PRS12 for LESENSE_ST_TCONFB */
 #define LESENSE_ST_TCONFB_PRSACT_DOWNANDPRS2           (_LESENSE_ST_TCONFB_PRSACT_DOWNANDPRS2 << 12) /**< Shifted mode DOWNANDPRS2 for LESENSE_ST_TCONFB */
 #define LESENSE_ST_TCONFB_PRSACT_PRS012                (_LESENSE_ST_TCONFB_PRSACT_PRS012 << 12)      /**< Shifted mode PRS012 for LESENSE_ST_TCONFB */

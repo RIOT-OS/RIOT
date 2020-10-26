@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief CMSIS Cortex-M3 System Layer for EFM32GG devices.
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -105,13 +104,6 @@ uint32_t SystemCoreClock = 14000000UL;
 /*******************************************************************************
  **************************   GLOBAL FUNCTIONS   *******************************
  ******************************************************************************/
-
-#if defined(__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
-#if defined(__ICCARM__)    /* IAR requires the __vector_table symbol */
-#define __Vectors    __vector_table
-#endif
-extern uint32_t __Vectors;
-#endif
 
 /***************************************************************************//**
  * @brief

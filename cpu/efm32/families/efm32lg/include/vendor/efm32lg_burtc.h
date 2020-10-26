@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief EFM32LG_BURTC register and bit field definitions
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -264,13 +263,13 @@ typedef struct {
 #define _BURTC_LOCK_LOCKKEY_SHIFT             0                                   /**< Shift value for BURTC_LOCKKEY */
 #define _BURTC_LOCK_LOCKKEY_MASK              0xFFFFUL                            /**< Bit mask for BURTC_LOCKKEY */
 #define _BURTC_LOCK_LOCKKEY_DEFAULT           0x00000000UL                        /**< Mode DEFAULT for BURTC_LOCK */
-#define _BURTC_LOCK_LOCKKEY_LOCK              0x00000000UL                        /**< Mode LOCK for BURTC_LOCK */
 #define _BURTC_LOCK_LOCKKEY_UNLOCKED          0x00000000UL                        /**< Mode UNLOCKED for BURTC_LOCK */
+#define _BURTC_LOCK_LOCKKEY_LOCK              0x00000000UL                        /**< Mode LOCK for BURTC_LOCK */
 #define _BURTC_LOCK_LOCKKEY_LOCKED            0x00000001UL                        /**< Mode LOCKED for BURTC_LOCK */
 #define _BURTC_LOCK_LOCKKEY_UNLOCK            0x0000AEE8UL                        /**< Mode UNLOCK for BURTC_LOCK */
 #define BURTC_LOCK_LOCKKEY_DEFAULT            (_BURTC_LOCK_LOCKKEY_DEFAULT << 0)  /**< Shifted mode DEFAULT for BURTC_LOCK */
-#define BURTC_LOCK_LOCKKEY_LOCK               (_BURTC_LOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for BURTC_LOCK */
 #define BURTC_LOCK_LOCKKEY_UNLOCKED           (_BURTC_LOCK_LOCKKEY_UNLOCKED << 0) /**< Shifted mode UNLOCKED for BURTC_LOCK */
+#define BURTC_LOCK_LOCKKEY_LOCK               (_BURTC_LOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for BURTC_LOCK */
 #define BURTC_LOCK_LOCKKEY_LOCKED             (_BURTC_LOCK_LOCKKEY_LOCKED << 0)   /**< Shifted mode LOCKED for BURTC_LOCK */
 #define BURTC_LOCK_LOCKKEY_UNLOCK             (_BURTC_LOCK_LOCKKEY_UNLOCK << 0)   /**< Shifted mode UNLOCK for BURTC_LOCK */
 

@@ -1,34 +1,32 @@
-/**************************************************************************//**
- * @file efm32zg_adc.h
+/***************************************************************************//**
+ * @file
  * @brief EFM32ZG_ADC register and bit field definitions
- * @version 5.4.0
- ******************************************************************************
+ *******************************************************************************
  * # License
- * <b>Copyright 2017 Silicon Laboratories, Inc. www.silabs.com</b>
- ******************************************************************************
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
+ *******************************************************************************
+ *
+ * SPDX-License-Identifier: Zlib
+ *
+ * The licensor of this software is Silicon Laboratories Inc.
+ *
+ * This software is provided 'as-is', without any express or implied
+ * warranty. In no event will the authors be held liable for any damages
+ * arising from the use of this software.
  *
  * Permission is granted to anyone to use this software for any purpose,
  * including commercial applications, and to alter it and redistribute it
  * freely, subject to the following restrictions:
  *
  * 1. The origin of this software must not be misrepresented; you must not
- *    claim that you wrote the original software.@n
+ *    claim that you wrote the original software. If you use this software
+ *    in a product, an acknowledgment in the product documentation would be
+ *    appreciated but is not required.
  * 2. Altered source versions must be plainly marked as such, and must not be
- *    misrepresented as being the original software.@n
+ *    misrepresented as being the original software.
  * 3. This notice may not be removed or altered from any source distribution.
  *
- * DISCLAIMER OF WARRANTY/LIMITATION OF REMEDIES: Silicon Laboratories, Inc.
- * has no obligation to support this Software. Silicon Laboratories, Inc. is
- * providing the Software "AS IS", with no express or implied warranties of any
- * kind, including, but not limited to, any implied warranties of
- * merchantability or fitness for any particular purpose or warranties against
- * infringement of any proprietary rights of a third party.
- *
- * Silicon Laboratories, Inc. will not be liable for any consequential,
- * incidental, or special damages, or any other relief, or for any claim by
- * any third party, arising from your use of this Software.
- *
- *****************************************************************************/
+ ******************************************************************************/
 
 #ifdef __cplusplus
 extern "C" {
@@ -41,39 +39,39 @@ extern "C" {
 #pragma clang system_header  /* Treat file as system include file. */
 #endif
 
-/**************************************************************************//**
-* @addtogroup Parts
-* @{
-******************************************************************************/
-/**************************************************************************//**
+/***************************************************************************//**
+ * @addtogroup Parts
+ * @{
+ ******************************************************************************/
+/***************************************************************************//**
  * @defgroup EFM32ZG_ADC
  * @{
  * @brief EFM32ZG_ADC Register Declaration
- *****************************************************************************/
+ ******************************************************************************/
 typedef struct {
-  __IOM uint32_t CTRL;         /**< Control Register  */
-  __IOM uint32_t CMD;          /**< Command Register  */
-  __IM uint32_t  STATUS;       /**< Status Register  */
-  __IOM uint32_t SINGLECTRL;   /**< Single Sample Control Register  */
-  __IOM uint32_t SCANCTRL;     /**< Scan Control Register  */
-  __IOM uint32_t IEN;          /**< Interrupt Enable Register  */
-  __IM uint32_t  IF;           /**< Interrupt Flag Register  */
-  __IOM uint32_t IFS;          /**< Interrupt Flag Set Register  */
-  __IOM uint32_t IFC;          /**< Interrupt Flag Clear Register  */
-  __IM uint32_t  SINGLEDATA;   /**< Single Conversion Result Data  */
-  __IM uint32_t  SCANDATA;     /**< Scan Conversion Result Data  */
-  __IM uint32_t  SINGLEDATAP;  /**< Single Conversion Result Data Peek Register  */
-  __IM uint32_t  SCANDATAP;    /**< Scan Sequence Result Data Peek Register  */
-  __IOM uint32_t CAL;          /**< Calibration Register  */
+  __IOM uint32_t CTRL;          /**< Control Register  */
+  __IOM uint32_t CMD;           /**< Command Register  */
+  __IM uint32_t  STATUS;        /**< Status Register  */
+  __IOM uint32_t SINGLECTRL;    /**< Single Sample Control Register  */
+  __IOM uint32_t SCANCTRL;      /**< Scan Control Register  */
+  __IOM uint32_t IEN;           /**< Interrupt Enable Register  */
+  __IM uint32_t  IF;            /**< Interrupt Flag Register  */
+  __IOM uint32_t IFS;           /**< Interrupt Flag Set Register  */
+  __IOM uint32_t IFC;           /**< Interrupt Flag Clear Register  */
+  __IM uint32_t  SINGLEDATA;    /**< Single Conversion Result Data  */
+  __IM uint32_t  SCANDATA;      /**< Scan Conversion Result Data  */
+  __IM uint32_t  SINGLEDATAP;   /**< Single Conversion Result Data Peek Register  */
+  __IM uint32_t  SCANDATAP;     /**< Scan Sequence Result Data Peek Register  */
+  __IOM uint32_t CAL;           /**< Calibration Register  */
 
-  uint32_t       RESERVED0[1]; /**< Reserved for future use **/
-  __IOM uint32_t BIASPROG;     /**< Bias Programming Register  */
-} ADC_TypeDef;                 /** ADC Register Declaration *//** @} */
+  uint32_t       RESERVED0[1U]; /**< Reserved for future use **/
+  __IOM uint32_t BIASPROG;      /**< Bias Programming Register  */
+} ADC_TypeDef;                  /** ADC Register Declaration *//** @} */
 
-/**************************************************************************//**
+/***************************************************************************//**
  * @defgroup EFM32ZG_ADC_BitFields
  * @{
- *****************************************************************************/
+ ******************************************************************************/
 
 /* Bit fields for ADC CTRL */
 #define _ADC_CTRL_RESETVALUE                    0x001F0000UL                                /**< Default value for ADC_CTRL */
@@ -273,16 +271,16 @@ typedef struct {
 #define _ADC_SINGLECTRL_INPUTSEL_SHIFT          8                                        /**< Shift value for ADC_INPUTSEL */
 #define _ADC_SINGLECTRL_INPUTSEL_MASK           0xF00UL                                  /**< Bit mask for ADC_INPUTSEL */
 #define _ADC_SINGLECTRL_INPUTSEL_DEFAULT        0x00000000UL                             /**< Mode DEFAULT for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_INPUTSEL_CH0            0x00000000UL                             /**< Mode CH0 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH0CH1         0x00000000UL                             /**< Mode CH0CH1 for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_INPUTSEL_CH1            0x00000001UL                             /**< Mode CH1 for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_INPUTSEL_CH0            0x00000000UL                             /**< Mode CH0 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH2CH3         0x00000001UL                             /**< Mode CH2CH3 for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_INPUTSEL_CH2            0x00000002UL                             /**< Mode CH2 for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_INPUTSEL_CH1            0x00000001UL                             /**< Mode CH1 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH4CH5         0x00000002UL                             /**< Mode CH4CH5 for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_INPUTSEL_CH2            0x00000002UL                             /**< Mode CH2 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH6CH7         0x00000003UL                             /**< Mode CH6CH7 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH3            0x00000003UL                             /**< Mode CH3 for ADC_SINGLECTRL */
-#define _ADC_SINGLECTRL_INPUTSEL_CH4            0x00000004UL                             /**< Mode CH4 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_DIFF0          0x00000004UL                             /**< Mode DIFF0 for ADC_SINGLECTRL */
+#define _ADC_SINGLECTRL_INPUTSEL_CH4            0x00000004UL                             /**< Mode CH4 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH5            0x00000005UL                             /**< Mode CH5 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH6            0x00000006UL                             /**< Mode CH6 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_CH7            0x00000007UL                             /**< Mode CH7 for ADC_SINGLECTRL */
@@ -294,16 +292,16 @@ typedef struct {
 #define _ADC_SINGLECTRL_INPUTSEL_DAC0OUT0       0x0000000DUL                             /**< Mode DAC0OUT0 for ADC_SINGLECTRL */
 #define _ADC_SINGLECTRL_INPUTSEL_DAC0OUT1       0x0000000EUL                             /**< Mode DAC0OUT1 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_DEFAULT         (_ADC_SINGLECTRL_INPUTSEL_DEFAULT << 8)  /**< Shifted mode DEFAULT for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_INPUTSEL_CH0             (_ADC_SINGLECTRL_INPUTSEL_CH0 << 8)      /**< Shifted mode CH0 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH0CH1          (_ADC_SINGLECTRL_INPUTSEL_CH0CH1 << 8)   /**< Shifted mode CH0CH1 for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_INPUTSEL_CH1             (_ADC_SINGLECTRL_INPUTSEL_CH1 << 8)      /**< Shifted mode CH1 for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_INPUTSEL_CH0             (_ADC_SINGLECTRL_INPUTSEL_CH0 << 8)      /**< Shifted mode CH0 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH2CH3          (_ADC_SINGLECTRL_INPUTSEL_CH2CH3 << 8)   /**< Shifted mode CH2CH3 for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_INPUTSEL_CH2             (_ADC_SINGLECTRL_INPUTSEL_CH2 << 8)      /**< Shifted mode CH2 for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_INPUTSEL_CH1             (_ADC_SINGLECTRL_INPUTSEL_CH1 << 8)      /**< Shifted mode CH1 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH4CH5          (_ADC_SINGLECTRL_INPUTSEL_CH4CH5 << 8)   /**< Shifted mode CH4CH5 for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_INPUTSEL_CH2             (_ADC_SINGLECTRL_INPUTSEL_CH2 << 8)      /**< Shifted mode CH2 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH6CH7          (_ADC_SINGLECTRL_INPUTSEL_CH6CH7 << 8)   /**< Shifted mode CH6CH7 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH3             (_ADC_SINGLECTRL_INPUTSEL_CH3 << 8)      /**< Shifted mode CH3 for ADC_SINGLECTRL */
-#define ADC_SINGLECTRL_INPUTSEL_CH4             (_ADC_SINGLECTRL_INPUTSEL_CH4 << 8)      /**< Shifted mode CH4 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_DIFF0           (_ADC_SINGLECTRL_INPUTSEL_DIFF0 << 8)    /**< Shifted mode DIFF0 for ADC_SINGLECTRL */
+#define ADC_SINGLECTRL_INPUTSEL_CH4             (_ADC_SINGLECTRL_INPUTSEL_CH4 << 8)      /**< Shifted mode CH4 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH5             (_ADC_SINGLECTRL_INPUTSEL_CH5 << 8)      /**< Shifted mode CH5 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH6             (_ADC_SINGLECTRL_INPUTSEL_CH6 << 8)      /**< Shifted mode CH6 for ADC_SINGLECTRL */
 #define ADC_SINGLECTRL_INPUTSEL_CH7             (_ADC_SINGLECTRL_INPUTSEL_CH7 << 8)      /**< Shifted mode CH7 for ADC_SINGLECTRL */
@@ -409,12 +407,12 @@ typedef struct {
 #define _ADC_SCANCTRL_INPUTMASK_SHIFT           8                                      /**< Shift value for ADC_INPUTMASK */
 #define _ADC_SCANCTRL_INPUTMASK_MASK            0xFF00UL                               /**< Bit mask for ADC_INPUTMASK */
 #define _ADC_SCANCTRL_INPUTMASK_DEFAULT         0x00000000UL                           /**< Mode DEFAULT for ADC_SCANCTRL */
-#define _ADC_SCANCTRL_INPUTMASK_CH0             0x00000001UL                           /**< Mode CH0 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH0CH1          0x00000001UL                           /**< Mode CH0CH1 for ADC_SCANCTRL */
-#define _ADC_SCANCTRL_INPUTMASK_CH1             0x00000002UL                           /**< Mode CH1 for ADC_SCANCTRL */
+#define _ADC_SCANCTRL_INPUTMASK_CH0             0x00000001UL                           /**< Mode CH0 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH2CH3          0x00000002UL                           /**< Mode CH2CH3 for ADC_SCANCTRL */
-#define _ADC_SCANCTRL_INPUTMASK_CH2             0x00000004UL                           /**< Mode CH2 for ADC_SCANCTRL */
+#define _ADC_SCANCTRL_INPUTMASK_CH1             0x00000002UL                           /**< Mode CH1 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH4CH5          0x00000004UL                           /**< Mode CH4CH5 for ADC_SCANCTRL */
+#define _ADC_SCANCTRL_INPUTMASK_CH2             0x00000004UL                           /**< Mode CH2 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH6CH7          0x00000008UL                           /**< Mode CH6CH7 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH3             0x00000008UL                           /**< Mode CH3 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH4             0x00000010UL                           /**< Mode CH4 for ADC_SCANCTRL */
@@ -422,12 +420,12 @@ typedef struct {
 #define _ADC_SCANCTRL_INPUTMASK_CH6             0x00000040UL                           /**< Mode CH6 for ADC_SCANCTRL */
 #define _ADC_SCANCTRL_INPUTMASK_CH7             0x00000080UL                           /**< Mode CH7 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_DEFAULT          (_ADC_SCANCTRL_INPUTMASK_DEFAULT << 8) /**< Shifted mode DEFAULT for ADC_SCANCTRL */
-#define ADC_SCANCTRL_INPUTMASK_CH0              (_ADC_SCANCTRL_INPUTMASK_CH0 << 8)     /**< Shifted mode CH0 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_CH0CH1           (_ADC_SCANCTRL_INPUTMASK_CH0CH1 << 8)  /**< Shifted mode CH0CH1 for ADC_SCANCTRL */
-#define ADC_SCANCTRL_INPUTMASK_CH1              (_ADC_SCANCTRL_INPUTMASK_CH1 << 8)     /**< Shifted mode CH1 for ADC_SCANCTRL */
+#define ADC_SCANCTRL_INPUTMASK_CH0              (_ADC_SCANCTRL_INPUTMASK_CH0 << 8)     /**< Shifted mode CH0 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_CH2CH3           (_ADC_SCANCTRL_INPUTMASK_CH2CH3 << 8)  /**< Shifted mode CH2CH3 for ADC_SCANCTRL */
-#define ADC_SCANCTRL_INPUTMASK_CH2              (_ADC_SCANCTRL_INPUTMASK_CH2 << 8)     /**< Shifted mode CH2 for ADC_SCANCTRL */
+#define ADC_SCANCTRL_INPUTMASK_CH1              (_ADC_SCANCTRL_INPUTMASK_CH1 << 8)     /**< Shifted mode CH1 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_CH4CH5           (_ADC_SCANCTRL_INPUTMASK_CH4CH5 << 8)  /**< Shifted mode CH4CH5 for ADC_SCANCTRL */
+#define ADC_SCANCTRL_INPUTMASK_CH2              (_ADC_SCANCTRL_INPUTMASK_CH2 << 8)     /**< Shifted mode CH2 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_CH6CH7           (_ADC_SCANCTRL_INPUTMASK_CH6CH7 << 8)  /**< Shifted mode CH6CH7 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_CH3              (_ADC_SCANCTRL_INPUTMASK_CH3 << 8)     /**< Shifted mode CH3 for ADC_SCANCTRL */
 #define ADC_SCANCTRL_INPUTMASK_CH4              (_ADC_SCANCTRL_INPUTMASK_CH4 << 8)     /**< Shifted mode CH4 for ADC_SCANCTRL */

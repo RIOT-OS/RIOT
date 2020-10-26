@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief CMSIS Cortex-M3/M4 System Layer for EFM32 devices.
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -48,11 +47,28 @@ extern "C" {
  ******************************************************************************/
 
 /*******************************************************************************
+ ******************************   TYPEDEFS   ***********************************
+ ******************************************************************************/
+
+/* Interrupt vectortable entry */
+typedef union {
+  void (*pFunc)(void);
+  void *topOfStack;
+} tVectorEntry;
+
+/*******************************************************************************
  **************************   GLOBAL VARIABLES   *******************************
  ******************************************************************************/
 
-extern uint32_t SystemCoreClock;        /**< System Clock Frequency (Core Clock) */
-extern uint32_t SystemHfrcoFreq;        /**< System HFRCO frequency */
+extern uint32_t SystemCoreClock;    /**< System Clock Frequency (Core Clock) */
+extern uint32_t SystemHfrcoFreq;    /**< System HFRCO frequency */
+
+#if defined(__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
+#if defined(__ICCARM__)    /* IAR requires the __vector_table symbol */
+#define __Vectors    __vector_table
+#endif
+extern const tVectorEntry __Vectors[];
+#endif
 
 /*******************************************************************************
  *****************************   PROTOTYPES   **********************************

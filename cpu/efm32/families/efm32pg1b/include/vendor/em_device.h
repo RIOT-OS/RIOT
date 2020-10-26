@@ -11,10 +11,9 @@
  *          Add "#include "em_device.h" to your source files
  * @endverbatim
  *
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib

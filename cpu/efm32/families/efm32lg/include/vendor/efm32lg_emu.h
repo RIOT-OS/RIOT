@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief EFM32LG_EMU register and bit field definitions
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -107,13 +106,13 @@ typedef struct {
 #define _EMU_LOCK_LOCKKEY_SHIFT             0                                 /**< Shift value for EMU_LOCKKEY */
 #define _EMU_LOCK_LOCKKEY_MASK              0xFFFFUL                          /**< Bit mask for EMU_LOCKKEY */
 #define _EMU_LOCK_LOCKKEY_DEFAULT           0x00000000UL                      /**< Mode DEFAULT for EMU_LOCK */
-#define _EMU_LOCK_LOCKKEY_LOCK              0x00000000UL                      /**< Mode LOCK for EMU_LOCK */
 #define _EMU_LOCK_LOCKKEY_UNLOCKED          0x00000000UL                      /**< Mode UNLOCKED for EMU_LOCK */
+#define _EMU_LOCK_LOCKKEY_LOCK              0x00000000UL                      /**< Mode LOCK for EMU_LOCK */
 #define _EMU_LOCK_LOCKKEY_LOCKED            0x00000001UL                      /**< Mode LOCKED for EMU_LOCK */
 #define _EMU_LOCK_LOCKKEY_UNLOCK            0x0000ADE8UL                      /**< Mode UNLOCK for EMU_LOCK */
 #define EMU_LOCK_LOCKKEY_DEFAULT            (_EMU_LOCK_LOCKKEY_DEFAULT << 0)  /**< Shifted mode DEFAULT for EMU_LOCK */
-#define EMU_LOCK_LOCKKEY_LOCK               (_EMU_LOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for EMU_LOCK */
 #define EMU_LOCK_LOCKKEY_UNLOCKED           (_EMU_LOCK_LOCKKEY_UNLOCKED << 0) /**< Shifted mode UNLOCKED for EMU_LOCK */
+#define EMU_LOCK_LOCKKEY_LOCK               (_EMU_LOCK_LOCKKEY_LOCK << 0)     /**< Shifted mode LOCK for EMU_LOCK */
 #define EMU_LOCK_LOCKKEY_LOCKED             (_EMU_LOCK_LOCKKEY_LOCKED << 0)   /**< Shifted mode LOCKED for EMU_LOCK */
 #define EMU_LOCK_LOCKKEY_UNLOCK             (_EMU_LOCK_LOCKKEY_UNLOCK << 0)   /**< Shifted mode UNLOCK for EMU_LOCK */
 

@@ -1,10 +1,9 @@
 /***************************************************************************//**
  * @file
  * @brief CMSIS Cortex-M3/M4 System Layer for EFR32 devices.
- * @version 5.8.3
  *******************************************************************************
  * # License
- * <b>Copyright 2019 Silicon Laboratories Inc. www.silabs.com</b>
+ * <b>Copyright 2020 Silicon Laboratories Inc. www.silabs.com</b>
  *******************************************************************************
  *
  * SPDX-License-Identifier: Zlib
@@ -117,13 +116,6 @@ uint32_t SystemHfrcoFreq = EFR32_HFRCO_STARTUP_FREQ;
  **************************   GLOBAL FUNCTIONS   *******************************
  ******************************************************************************/
 
-#if defined(__VTOR_PRESENT) && (__VTOR_PRESENT == 1U)
-#if defined(__ICCARM__)    /* IAR requires the __vector_table symbol */
-#define __Vectors    __vector_table
-#endif
-extern uint32_t __Vectors;
-#endif
-
 /***************************************************************************//**
  * @brief
  *   Get the current core clock frequency.
@@ -213,6 +205,10 @@ uint32_t SystemHFClockGet(void)
       /* be caused by a misconfiguration though. */
       ret = 0U;
 #endif
+      break;
+
+    case CMU_HFCLKSTATUS_SELECTED_HFRCODIV2:
+      ret = SystemHfrcoFreq / 2;
       break;
 
     default: /* CMU_HFCLKSTATUS_SELECTED_HFRCO */
