@@ -193,15 +193,6 @@ static const uart_conf_t uart_config[] = {
         .irq = USART0_RX_IRQn
     },
     {
-        .dev = USART1,
-        .rx_pin = GPIO_PIN(PC, 7),
-        .tx_pin = GPIO_PIN(PC, 6),
-        .loc = USART_ROUTELOC0_RXLOC_LOC11 |
-               USART_ROUTELOC0_TXLOC_LOC11,
-        .cmu = cmuClock_USART1,
-        .irq = USART1_RX_IRQn
-    },
-    {
         .dev = LEUART0,
         .rx_pin = GPIO_PIN(PD, 11),
         .tx_pin = GPIO_PIN(PD, 10),
@@ -214,8 +205,7 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 #define UART_0_ISR_RX       isr_usart0_rx
-#define UART_1_ISR_RX       isr_usart1_rx
-#define UART_2_ISR_RX       isr_leuart0
+#define UART_1_ISR_RX       isr_leuart0
 /** @} */
 
 #ifdef __cplusplus
