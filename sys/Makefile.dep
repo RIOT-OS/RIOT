@@ -569,6 +569,7 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
   endif
   ifneq (,$(filter openwsn_%,$(USEMODULE)))
     USEMODULE += netif
+    USEMODULE += ipv6_addr
   endif
 endif
 
