@@ -9,7 +9,8 @@ ifneq (,$(filter arduino,$(USEMODULE)))
   SKETCH_MODULE ?= arduino_sketches
   USEMODULE += $(SKETCH_MODULE)
   USEMODULE += fmt
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))
