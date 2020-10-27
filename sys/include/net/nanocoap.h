@@ -297,7 +297,7 @@ static inline unsigned coap_get_code_class(coap_pkt_t *pkt)
  *
  * @returns     message code detail
  */
-static inline unsigned coap_get_code_detail(coap_pkt_t *pkt)
+static inline unsigned coap_get_code_detail(const coap_pkt_t *pkt)
 {
     return pkt->hdr->code & 0x1f;
 }

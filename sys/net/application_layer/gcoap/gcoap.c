@@ -455,8 +455,8 @@ static int _request_matcher_default(gcoap_listener_t *listener,
         return GCOAP_RESOURCE_NO_PATH;
     }
 
-    coap_method_flags_t method_flag = coap_method2flag(coap_get_code_detail(
-                                                           (coap_pkt_t *)pdu));
+    coap_method_flags_t method_flag = coap_method2flag(
+        coap_get_code_detail(pdu));
 
     for (size_t i = 0; i < listener->resources_len; i++) {
         *resource = &listener->resources[i];
