@@ -68,8 +68,7 @@ def publish(server_dir, server_url, app_ver, keys='default', latest_name=None):
 
 def wait_for_update(child):
     return child.expect([r"Fetching firmware \|[█ ]+\|\s+\d+\%",
-                         "riotboot_flashwrite: riotboot flashing "
-                         "completed successfully"],
+                         "Finalizing payload store"],
                         timeout=UPDATING_TIMEOUT)
 
 
