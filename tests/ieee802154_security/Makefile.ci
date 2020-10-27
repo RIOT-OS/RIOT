@@ -13,6 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l031k6 \
     nucleo-l053r8 \
     nucleo-l552ze-q \
+    samd10-xmini \
     stk3200 \
     stm32f030f4-demo \
     stm32f0discovery \

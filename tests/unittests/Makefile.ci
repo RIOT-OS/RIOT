@@ -81,6 +81,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     opencm904 \
     openlabs-kw41z-mini-256kib \
     pba-d-01-kw2x \
+    samd10-xmini \
     samd21-xpro \
     saml10-xpro \
     saml11-xpro \

@@ -4,4 +4,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega328p \
     nucleo-l011k4 \
+    samd10-xmini \
     #

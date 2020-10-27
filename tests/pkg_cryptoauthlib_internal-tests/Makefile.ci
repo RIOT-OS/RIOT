@@ -1,11 +1,4 @@
 BOARD_INSUFFICIENT_MEMORY := \
-    sam10-xpro \
-    saml11-xpro \
-    blackpill \
-    bluepill \
-    i-nucleo-lrwan1 \
-    nucleo-f302r8 \
-    nucleo-l031k6 \
     arduino-duemilanove \
     arduino-leonardo \
     arduino-mega2560 \
@@ -15,10 +8,19 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega256rfr2-xpro \
     atmega328p \
     avr-rss2 \
+    blackpill \
+    bluepill \
     derfmega128 \
     derfmega256 \
+    i-nucleo-lrwan1 \
     mega-xplained \
     microduino-corerf \
+    nucleo-f302r8 \
     nucleo-l011k4 \
+    nucleo-l031k6 \
+    sam10-xpro \
+    samd10-xmini \
     saml10-xpro \
-    waspmote-pro
+    saml11-xpro \
+    waspmote-pro \
+    #

@@ -10,6 +10,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     mega-xplained \
     microduino-corerf \
     nucleo-l011k4 \
+    samd10-xmini \
     stk3200 \
     stm32f030f4-demo \
     waspmote-pro \

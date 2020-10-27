@@ -19,6 +19,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-f334r8 \
     nucleo-l0% \
     phynode-kw41z \
+    samd10-xmini \
     samd21-xpro \
     saml10-xpro \
     saml11-xpro \
