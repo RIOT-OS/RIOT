@@ -35,16 +35,6 @@ extern "C" {
 #endif
 
 /**
- * @name   Default parameters for native argument parsing
- * @{
- */
-#define SOCKET_ZEP_PORT_DEFAULT         "17754" /**< default port */
-#define SOCKET_ZEP_LOCAL_ADDR_DEFAULT   "::"    /**< default local address */
-/**
- * @}
- */
-
-/**
  * @brief   socket_zep configurations
  */
 extern socket_zep_params_t socket_zep_params[SOCKET_ZEP_MAX];

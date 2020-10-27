@@ -314,8 +314,8 @@ void usage_exit(int status)
 #endif
 #if defined(MODULE_SOCKET_ZEP) && (SOCKET_ZEP_MAX > 0)
 "    -z [<laddr>:<lport>,]<raddr>:<rport> --zep=[<laddr>:<lport>,]<raddr>:<rport>\n"
-"        provide a ZEP interface with local address and port (<laddr>, <lport>)\n"
-"        and remote address and port (default local: [::]:17754).\n"
+"        provide a ZEP interface with (optional) local address and port (<laddr>, <lport>).\n"
+"        The ZEP interface connects to the remote address and may listen on a local address.\n"
 "        Required to be provided SOCKET_ZEP_MAX times\n"
 #endif
     );
@@ -396,8 +396,8 @@ static void _zep_params_setup(char *zep_str, int zep)
     }
     second_ep = strtok_r(NULL, ",", &save_ptr);
     if (second_ep == NULL) {
-        socket_zep_params[zep].local_addr = SOCKET_ZEP_LOCAL_ADDR_DEFAULT;
-        socket_zep_params[zep].local_port = SOCKET_ZEP_PORT_DEFAULT;
+        socket_zep_params[zep].local_addr = NULL;
+        socket_zep_params[zep].local_port = NULL;
         _parse_ep_str(first_ep, &socket_zep_params[zep].remote_addr,
                       &socket_zep_params[zep].remote_port);
     }
