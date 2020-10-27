@@ -49,6 +49,8 @@
 #define MTD_POWER_UP_WAIT_FOR_ID    (0x0F)
 #endif
 
+#define MTD_64K             (65536ul)
+#define MTD_64K_ADDR_MASK   (0xFFFF)
 #define MTD_32K             (32768ul)
 #define MTD_32K_ADDR_MASK   (0x7FFF)
 #define MTD_4K              (4096ul)
@@ -580,6 +582,14 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
             size -= total_size;
             us = dev->params->wait_chip_erase;
         }
+        else if ((dev->params->flag & SPI_NOR_F_SECT_64K) && (size >= MTD_64K) &&
+                 ((addr & MTD_64K_ADDR_MASK) == 0)) {
+            /* 64 KiB blocks can be erased with block erase command */
+            mtd_spi_cmd_addr_write(dev, dev->params->opcode->block_erase_64k, addr_be, NULL, 0);
+            addr += MTD_64K;
+            size -= MTD_64K;
+            us = dev->params->wait_64k_erase;
+        }
         else if ((dev->params->flag & SPI_NOR_F_SECT_32K) && (size >= MTD_32K) &&
                  ((addr & MTD_32K_ADDR_MASK) == 0)) {
             /* 32 KiB blocks can be erased with block erase command */
@@ -594,13 +604,14 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
             mtd_spi_cmd_addr_write(dev, dev->params->opcode->sector_erase, addr_be, NULL, 0);
             addr += MTD_4K;
             size -= MTD_4K;
-            us = dev->params->wait_4k_erase;
+            us = dev->params->wait_sector_erase;
         }
         else {
-            mtd_spi_cmd_addr_write(dev, dev->params->opcode->block_erase, addr_be, NULL, 0);
-            addr += sector_size;
-            size -= sector_size;
-            us = dev->params->wait_sector_erase;
+            /* no suitable erase block found */
+            assert(0);
+
+            mtd_spi_release(dev);
+            return -EINVAL;
         }
 
         /* waiting for the command to complete before continuing */
