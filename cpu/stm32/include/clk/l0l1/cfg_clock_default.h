@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_common_stm32
+ * @ingroup     cpu_stm32
  * @{
  *
  * @file
@@ -16,8 +16,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef L0L1_CFG_CLOCK_DEFAULT_H
-#define L0L1_CFG_CLOCK_DEFAULT_H
+#ifndef CLK_L0L1_CFG_CLOCK_DEFAULT_H
+#define CLK_L0L1_CFG_CLOCK_DEFAULT_H
 
 #include "periph_cpu.h"
 
@@ -156,5 +156,5 @@ extern "C" {
 }
 #endif
 
-#endif /* L0L1_CFG_CLOCK_DEFAULT_H */
+#endif /* CLK_L0L1_CFG_CLOCK_DEFAULT_H */
 /** @} */

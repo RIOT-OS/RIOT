@@ -8,7 +8,7 @@
  */
 
 /**
- * @ingroup     boards_common_stm32
+ * @ingroup     cpu_stm32
  * @{
  *
  * @file
@@ -18,10 +18,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef L4_CFG_CLOCK_DEFAULT_H
-#define L4_CFG_CLOCK_DEFAULT_H
-
-#include "periph_cpu.h"
+#ifndef CLK_L4L5WB_CFG_CLOCK_DEFAULT_H
+#define CLK_L4L5WB_CFG_CLOCK_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -169,9 +167,22 @@ extern "C" {
  */
 #define CLOCK_CORECLOCK                 \
         ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_M) * CONFIG_CLOCK_PLL_N) / CONFIG_CLOCK_PLL_R
-#ifndef CLOCK_CORECLOCK_MAX
+
+/* Set max allowed sysclk */
+#if defined(CPU_FAM_STM32WB)
+#define CLOCK_CORECLOCK_MAX             MHZ(64)
+#elif defined(CPU_FAM_STM32L5)
+#define CLOCK_CORECLOCK_MAX             MHZ(110)
+#elif defined(CPU_LINE_STM32L4A6xx) || defined(CPU_LINE_STM32L4P5xx) || \
+      defined(CPU_LINE_STM32L4Q5xx) || defined(CPU_LINE_STM32L4R5xx) || \
+      defined(CPU_LINE_STM32L4R7xx) || defined(CPU_LINE_STM32L4R9xx) || \
+      defined(CPU_LINE_STM32L4S5xx) || defined(CPU_LINE_STM32L4S7xx) || \
+      defined(CPU_LINE_STM32L4S9xx)
+#define CLOCK_CORECLOCK_MAX             MHZ(120)
+#else /* all the other L4 */
 #define CLOCK_CORECLOCK_MAX             MHZ(80)
 #endif
+
 #if CLOCK_CORECLOCK > CLOCK_CORECLOCK_MAX
 #if CLOCK_CORECLOCK_MAX == MHZ(64)
 #error "SYSCLK cannot exceed 64MHz"
@@ -202,5 +213,5 @@ extern "C" {
 }
 #endif
 
-#endif /* L4_CFG_CLOCK_DEFAULT_H */
+#endif /* CLK_L4L5WB_CFG_CLOCK_DEFAULT_H */
 /** @} */

@@ -20,9 +20,7 @@
 #define PERIPH_CONF_H
 
 /* Add specific clock configuration (HSE, LSE) for this board here */
-#define CLOCK_CORECLOCK_MAX             MHZ(110)
-
-/* Reach 108MHz by by default setting custom PLL_N factor */
+/* Reach 108MHz by default by setting custom PLL_N factor */
 #ifndef CONFIG_CLOCK_PLL_N
 #define CONFIG_CLOCK_PLL_N              27
 #endif
@@ -33,7 +31,7 @@
 #endif
 
 #include "periph_cpu.h"
-#include "l4/cfg_clock_default.h"
+#include "clk_conf.h"
 #include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim5.h"

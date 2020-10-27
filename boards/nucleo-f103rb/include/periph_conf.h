@@ -30,7 +30,7 @@
 #endif
 
 #include "periph_cpu.h"
-#include "f1f3/cfg_clock_default.h"
+#include "clk_conf.h"
 
 #ifdef __cplusplus
 extern "C" {

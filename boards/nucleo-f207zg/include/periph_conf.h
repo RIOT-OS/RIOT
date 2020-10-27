@@ -32,7 +32,7 @@
 #endif
 
 #include "periph_cpu.h"
-#include "f2f4f7/cfg_clock_default_120.h"
+#include "clk_conf.h"
 #include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_usb_otg_fs.h"
 #include "mii.h"

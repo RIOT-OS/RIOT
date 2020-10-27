@@ -84,4 +84,7 @@ $(STM32IRQS_INCLUDE_FILE): $(STM32FAM_INCLUDE_FILE)
 	$(Q)$(RIOTBASE)/cpu/stm32/dist/irqs/gen_irqs.py $(CPU_FAM)
 endif
 
+# Include clock configuration directory
+INCLUDES += -I$(RIOTCPU)/stm32/include/clk
+
 include $(RIOTMAKE)/arch/cortexm.inc.mk

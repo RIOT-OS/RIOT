@@ -20,11 +20,7 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-#include "periph_cpu.h"
-
 /* Add specific clock configuration (HSE, LSE) for this board here */
-#define CLOCK_CORECLOCK_MAX             MHZ(64)
-
 #ifndef CONFIG_BOARD_HAS_LSE
 #define CONFIG_BOARD_HAS_LSE            1
 #endif
@@ -39,8 +35,8 @@
 #define CLOCK_EXTAHB_DIV    RCC_EXTCFGR_C2HPRE_3
 #define CLOCK_EXTAHB        (CLOCK_CORECLOCK / 2)
 
-#include "l4/cfg_clock_default.h"
-
+#include "periph_cpu.h"
+#include "clk_conf.h"
 #include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"

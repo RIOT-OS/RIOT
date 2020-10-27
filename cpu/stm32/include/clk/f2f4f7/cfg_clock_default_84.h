@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup     boards_common_stm32
+ * @ingroup     cpu_stm32
  * @{
  *
  * @file
@@ -20,8 +20,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef F2F4F7_CFG_CLOCK_DEFAULT_84_H
-#define F2F4F7_CFG_CLOCK_DEFAULT_84_H
+#ifndef CLK_F2F4F7_CFG_CLOCK_DEFAULT_84_H
+#define CLK_F2F4F7_CFG_CLOCK_DEFAULT_84_H
 
 #include "f2f4f7/cfg_clock_common.h"
 
@@ -77,5 +77,5 @@ extern "C" {
 #error "SYSCLK cannot exceed 84MHz"
 #endif
 
-#endif /* F2F4F7_CFG_CLOCK_DEFAULT_84_H */
+#endif /* CLK_F2F4F7_CFG_CLOCK_DEFAULT_84_H */
 /** @} */
