@@ -22,6 +22,7 @@ extern "C" {
 #include <string.h>
 #include <stdio.h>
 
+#include "fmt.h"
 #include "irq.h"
 }
 
@@ -148,7 +149,7 @@ size_t SerialPort::print(float val)
 size_t SerialPort::print(float val, int format)
 {
     char buf[64];
-    size_t len = sprintf(buf, "%.*f", format, (double)val);
+    size_t len = fmt_float(buf, val, format);
     write(buf, len);
     return len;
 }
