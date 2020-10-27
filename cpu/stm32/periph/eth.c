@@ -518,6 +518,13 @@ static int stm32_eth_recv(netdev_t *netdev, void *buf, size_t max_len,
         rx_curr = rx_curr->desc_next;
     }
 
+    if ((size + ETHERNET_FCS_LEN - 1) % ETH_RX_BUFFER_SIZE < ETHERNET_FCS_LEN) {
+        /* one additional rx descriptor was needed only for the FCS, hand that
+         * back to the DMA as well */
+        rx_curr->status = RX_DESC_STAT_OWN;
+        rx_curr = rx_curr->desc_next;
+    }
+
     handle_lost_rx_irqs();
     return size;
 }
