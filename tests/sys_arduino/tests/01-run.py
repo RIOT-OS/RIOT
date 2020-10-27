@@ -64,6 +64,11 @@ def testfunc(child):
     child.expect_exact("println(unsigned long, DEC): 1234567890")
     child.expect_exact("print(unsigned long, HEX): 499602d2")
     child.expect_exact("println(unsigned long, HEX): 499602d2")
+    child.expect_exact("print(float): 3.14")
+    child.expect_exact("print(float): 3")
+    child.expect_exact("print(float): 3.1")
+    child.expect_exact("print(float): 3.14")
+    child.expect_exact("print(float): 3.141")
 
 
 if __name__ == "__main__":
