@@ -36,6 +36,7 @@ static void _tx_end(ieee802154_submac_t *submac, int status,
 
     ieee802154_radio_request_set_trx_state(dev, submac->state == IEEE802154_STATE_LISTEN ? IEEE802154_TRX_STATE_RX_ON : IEEE802154_TRX_STATE_TRX_OFF);
 
+    submac->wait_for_ack = false;
     submac->tx = false;
     while (ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {}
     submac->cb->tx_done(submac, status, info);
@@ -160,7 +161,6 @@ void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac)
             ieee802154_tx_info_t tx_info;
             tx_info.retrans = submac->retrans;
             bool fp = (ack[0] & IEEE802154_FCF_FRAME_PEND);
-            submac->wait_for_ack = false;
             ieee802154_radio_set_rx_mode(submac->dev,
                                          IEEE802154_RX_AACK_ENABLED);
             _tx_end(submac, fp ? TX_STATUS_FRAME_PENDING : TX_STATUS_SUCCESS,
@@ -228,7 +228,6 @@ static void _handle_tx_no_ack(ieee802154_submac_t *submac)
 
     if (ieee802154_radio_has_frame_retrans(dev)) {
         ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_RX_ON);
-        submac->wait_for_ack = false;
         _tx_end(submac, TX_STATUS_NO_ACK, NULL);
     }
     else {
