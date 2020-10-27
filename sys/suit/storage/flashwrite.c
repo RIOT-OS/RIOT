@@ -174,7 +174,7 @@ static bool _flashwrite_match_offset(const suit_storage_t *storage,
     (void)storage;
 
     int target_slot = riotboot_slot_other();
-    uintptr_t slot_start = (intptr_t)riotboot_slot_get_hdr(target_slot);
+    uintptr_t slot_start = (uintptr_t)riotboot_slot_offset(target_slot);
 
     return (slot_start == (uintptr_t)offset);
 }
