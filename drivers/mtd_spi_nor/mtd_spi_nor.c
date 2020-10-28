@@ -286,6 +286,16 @@ static void mtd_spi_cmd(const mtd_spi_nor_t *dev, uint8_t opcode)
     }
 }
 
+static void _write_enable(const mtd_spi_nor_t *dev)
+{
+    /* QSPI handles write enable internally */
+    if (_is_qspi(dev)) {
+        return;
+    }
+
+    mtd_spi_cmd(dev, dev->params->opcode->wren);
+}
+
 static bool mtd_spi_manuf_match(const mtd_jedec_id_t *id, jedec_manuf_t manuf)
 {
     return manuf == ((id->bank << 8) | id->manuf);
@@ -448,8 +458,12 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
 #endif
             /* configure QSPI */
             if (_is_qspi(dev)) {
+
+                uint32_t flags = QSPI_FLAG_4BIT
+                               | (dev->params->addr_width == 4 ? QSPI_FLAG_ADDR_32BIT : 0);
+
                 qspi_configure(_get_qspi(dev), dev->params->mode,
-                               dev->params->addr_width, dev->params->clk);
+                               flags, dev->params->clk);
             }
 
             break;
@@ -478,12 +492,6 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     if (_is_spi(dev)) {
         DEBUG("mtd_spi_nor_init: CS init\n");
         spi_init_cs(_get_spi(dev), dev->params->cs);
-    }
-
-    /* configure QSPI */
-    if (_is_qspi(dev)) {
-        qspi_configure(_get_qspi(dev), dev->params->mode,
-                       dev->params->addr_width, dev->params->clk);
     }
 
     /* power up the MTD device*/
@@ -611,7 +619,7 @@ static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uin
     mtd_spi_acquire(dev);
 
     /* write enable */
-    mtd_spi_cmd(dev, dev->params->opcode->wren);
+    _write_enable(dev);
 
     /* Page program */
     mtd_spi_cmd_addr_write(dev, dev->params->opcode->page_program, addr, src, size);
@@ -640,7 +648,7 @@ static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page
     mtd_spi_acquire(dev);
 
     /* write enable */
-    mtd_spi_cmd(dev, dev->params->opcode->wren);
+    _write_enable(dev);
 
     /* Page program */
     mtd_spi_cmd_addr_write(dev, dev->params->opcode->page_program, addr, src, size);
@@ -682,7 +690,7 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         uint32_t us;
 
         /* write enable */
-        mtd_spi_cmd(dev, dev->params->opcode->wren);
+        _write_enable(dev);
 
         if (size == total_size) {
             mtd_spi_cmd(dev, dev->params->opcode->chip_erase);
