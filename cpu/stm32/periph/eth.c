@@ -111,6 +111,52 @@ netdev_t *_netdev;
 static uint8_t _link_state = LINK_STATE_DOWN;
 #endif /* IS_USED(MODULE_STM32_ETH_LINK_UP) */
 
+static void _debug_tx_descriptor_info(unsigned line)
+{
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        DEBUG("[stm32_eth:%u] TX descriptors:\n", line);
+        for (unsigned i = 0; i < ETH_TX_DESCRIPTOR_COUNT; i++) {
+            uint32_t status = tx_desc[i].status;
+            DEBUG("    %s %u: OWN=%c, ES=%c, UF=%c, EC=%c, NC=%c, FS=%c, "
+                  "LS=%c\n",
+                  (tx_curr == tx_desc + i) ? "-->" : "   ",
+                  i,
+                  (status & TX_DESC_STAT_OWN) ? '1' : '0',
+                  (status & TX_DESC_STAT_ES) ? '1' : '0',
+                  (status & TX_DESC_STAT_UF) ? '1' : '0',
+                  (status & TX_DESC_STAT_EC) ? '1' : '0',
+                  (status & TX_DESC_STAT_NC) ? '1' : '0',
+                  (status & TX_DESC_STAT_FS) ? '1' : '0',
+                  (status & TX_DESC_STAT_LS) ? '1' : '0');
+        }
+    }
+}
+
+static inline uint32_t _len_from_rx_desc_status(uint32_t status)
+{
+    /* bits 16-29 contain the frame length including 4 B frame check sequence */
+    return (status >> 16) & 0x3fff;
+}
+
+static void _debug_rx_descriptor_info(unsigned line)
+{
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        DEBUG("[stm32_eth:%u] RX descriptors:\n", line);
+        for (unsigned i = 0; i < ETH_RX_DESCRIPTOR_COUNT; i++) {
+            uint32_t status = rx_desc[i].status;
+            DEBUG("    %s %u: OWN=%c, FS=%c, LS=%c, ES=%c, DE=%c, FL=%lu\n",
+                  (rx_curr == rx_desc + i) ? "-->" : "   ",
+                  i,
+                  (status & RX_DESC_STAT_OWN) ? '1' : '0',
+                  (status & RX_DESC_STAT_FS) ? '1' : '0',
+                  (status & RX_DESC_STAT_LS) ? '1' : '0',
+                  (status & RX_DESC_STAT_ES) ? '1' : '0',
+                  (status & RX_DESC_STAT_DE) ? '1' : '0',
+                  _len_from_rx_desc_status(status));
+        }
+    }
+}
+
 /**
  * @brief   Read or write a MII register
  *
@@ -480,16 +526,9 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
 
     /* Error check */
     unsigned i = 0;
+    _debug_tx_descriptor_info(__LINE__);
     while (1) {
         uint32_t status = tx_desc[i].status;
-        DEBUG("TX desc %u status: ES=%c, UF=%c, EC=%c, NC=%c, FS=%c, LS=%c\n",
-              i,
-              (status & TX_DESC_STAT_ES) ? '1' : '0',
-              (status & TX_DESC_STAT_UF) ? '1' : '0',
-              (status & TX_DESC_STAT_EC) ? '1' : '0',
-              (status & TX_DESC_STAT_NC) ? '1' : '0',
-              (status & TX_DESC_STAT_FS) ? '1' : '0',
-              (status & TX_DESC_STAT_LS) ? '1' : '0');
         /* The Error Summary (ES) bit is set, if any error during TX occurred */
         if (status & TX_DESC_STAT_ES) {
             /* TODO: Report better event to reflect error */
@@ -507,6 +546,7 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
 
 static int get_rx_frame_size(void)
 {
+    _debug_rx_descriptor_info(__LINE__);
     edma_desc_t *i = rx_curr;
     uint32_t status;
     while (1) {
@@ -515,13 +555,6 @@ static int get_rx_frame_size(void)
             DEBUG("[stm32_eth] RX not completed (spurious interrupt?)\n");
             return -EAGAIN;
         }
-        DEBUG("[stm32_eth] get_rx_frame_size(): "
-              "FS=%c, LS=%c, ES=%c, DE=%c, FL=%lu\n",
-              (status & RX_DESC_STAT_FS) ? '1' : '0',
-              (status & RX_DESC_STAT_LS) ? '1' : '0',
-              (status & RX_DESC_STAT_ES) ? '1' : '0',
-              (status & RX_DESC_STAT_DE) ? '1' : '0',
-              ((status >> 16) & 0x3fff) - ETHERNET_FCS_LEN);
         if (status & RX_DESC_STAT_DE) {
             DEBUG("[stm32_eth] Overflow during RX\n");
             return -EOVERFLOW;
@@ -536,8 +569,7 @@ static int get_rx_frame_size(void)
         i = i->desc_next;
     }
 
-    /* bits 16-29 contain the frame length including 4 B frame check sequence */
-    return ((status >> 16) & 0x3fff) - ETHERNET_FCS_LEN;
+    return _len_from_rx_desc_status(status) - ETHERNET_FCS_LEN;
 }
 
 static void drop_frame_and_update_rx_curr(void)
@@ -620,6 +652,14 @@ static int stm32_eth_recv(netdev_t *netdev, void *buf, size_t max_len,
         rx_curr = rx_curr->desc_next;
     }
 
+    if ((size + ETHERNET_FCS_LEN - 1) % ETH_RX_BUFFER_SIZE < ETHERNET_FCS_LEN) {
+        /* one additional rx descriptor was needed only for the FCS, hand that
+         * back to the DMA as well */
+        rx_curr->status = RX_DESC_STAT_OWN;
+        rx_curr = rx_curr->desc_next;
+    }
+
+    _debug_rx_descriptor_info(__LINE__);
     handle_lost_rx_irqs();
     return size;
 }
