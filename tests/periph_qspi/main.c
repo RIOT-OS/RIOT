@@ -101,10 +101,10 @@ static int cmd_erase(int argc, char **argv)
     addr = atoi(argv[2]);
     mode = atoi(argv[3]);
 
-    const spi_flash_cmd_t cmds[] = {
-        SFLASH_CMD_ERASE_SECTOR,
-        SFLASH_CMD_ERASE_BLOCK,
-        SFLASH_CMD_ERASE_CHIP,
+    const qspi_erase_size_t cmds[] = {
+        QSPI_ERASE_4K,
+        QSPI_ERASE_64K,
+        QSPI_ERASE_CHIP,
     };
 
     if (mode > ARRAY_SIZE(cmds)) {
@@ -113,8 +113,7 @@ static int cmd_erase(int argc, char **argv)
     }
 
     qspi_acquire(dev);
-    qspi_cmd_write(dev, SFLASH_CMD_WRITE_ENABLE, NULL, 0);
-    qspi_erase(dev, cmds[mode], addr);
+    qspi_erase(dev, addr, cmds[mode]);
     qspi_release(dev);
 
     return 0;
@@ -138,7 +137,6 @@ static int cmd_write(int argc, char **argv)
     len  = strlen(argv[3]);
 
     qspi_acquire(dev);
-    qspi_cmd_write(dev, SFLASH_CMD_WRITE_ENABLE, NULL, 0);
     qspi_write(dev, addr, argv[3], len);
     qspi_release(dev);
 
@@ -204,13 +202,16 @@ static int cmd_cfg(int argc, char **argv)
     unsigned addr_len = atoi(argv[2]);
     unsigned freq_mhz = atoi(argv[3]);
 
+    uint32_t flags = QSPI_FLAG_4BIT
+                   | (addr_len == 4 ? QSPI_FLAG_ADDR_32BIT : 0);
+
     if (argc > 3) {
         mode = _qspi_mode(atoi(argv[4]));
     }
 
     printf("QSPI%s: %u-bit, %u MHz\n", argv[1], 8 * addr_len, freq_mhz);
 
-    qspi_configure(dev, mode, addr_len, MHZ(freq_mhz));
+    qspi_configure(dev, mode, flags,  MHZ(freq_mhz));
 
     return 0;
 }
