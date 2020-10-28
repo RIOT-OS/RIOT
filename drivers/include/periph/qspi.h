@@ -106,6 +106,34 @@ typedef enum {
 #endif
 
 /**
+ * @brief   Standard QSPI erase block sizes
+ */
+#ifndef HAVE_QSPI_ERASE_SIZE_T
+typedef enum {
+    QSPI_ERASE_4K   = SFLASH_CMD_ERASE_SECTOR,
+    QSPI_ERASE_64K  = SFLASH_CMD_ERASE_BLOCK,
+    QSPI_ERASE_CHIP = SFLASH_CMD_ERASE_CHIP,
+} qspi_erase_size_t;
+#endif
+
+/**
+ * @brief   Configuration Options for QSPI
+ * @{
+ */
+#define QSPI_FLAG_1BIT          (0x0)   /**< single data line           */
+#define QSPI_FLAG_2BIT          (0x1)   /**< two parallel data lines    */
+#define QSPI_FLAG_4BIT          (0x2)   /**< four parallel data lines   */
+#define QSPI_FLAG_8BIT          (0x3)   /**< eight parallel data lines  */
+
+#define QSPI_FLAG_BIT_MASK      (0x3)   /**< mask to get data lines from flags */
+#define QSPI_FLAG_BIT(flags)    ((flags) & QSPI_FLAG_BIT_MASK)
+
+#define QSPI_FLAG_DDR           (0x4)   /**< use Double Data Rate mode  */
+
+#define QSPI_FLAG_ADDR_32BIT    (0x8)   /**< use 32 bit addressing      */
+/** @} */
+
+/**
  * @brief   Basic initialization of the given QSPI bus
  *
  * @note    This function MUST not be called more than once per bus!
@@ -119,11 +147,10 @@ void qspi_init(qspi_t bus);
  *
  * @param[in] bus       QSPI device to configure
  * @param[in] mode      QSPI mode @see qspi_mode_t
- * @param[in] addrlen   Addressing mode (bytes)
- *                      3 for 24 bit addressing, 4 for 32 bit
+ * @param[in] flags     QSPI Configuration Options
  * @param[in] clk_hz    QSPI frequency in Hz
  */
-void qspi_configure(qspi_t bus, qspi_mode_t mode, uint8_t addrlen, uint32_t clk_hz);
+void qspi_configure(qspi_t bus, qspi_mode_t mode, uint32_t flags, uint32_t clk_hz);
 
 /**
  * @brief   Start a new QSPI transaction
@@ -168,15 +195,6 @@ void qspi_cmd_read(qspi_t bus, uint8_t command, void *response, size_t len);
 void qspi_cmd_write(qspi_t bus, uint8_t command, const void *data, size_t len);
 
 /**
- * @brief   Erase external memory by address
- *
- * @param[in] bus       QSPI device
- * @param[in] command   The JEDEC command ID (sector erase, block erase)
- * @param[in] address   The address of the block that will be reased
- */
-void qspi_erase(qspi_t bus, uint8_t command, uint32_t address);
-
-/**
  * @brief   Read data from external memory.
  *          Typically it is implemented by quad read command (`0x6B`).
  *
@@ -198,6 +216,15 @@ void qspi_read(qspi_t bus, uint32_t addr, void *data, size_t len);
  * @param[in] len       Nmber of byte to write
  */
 void qspi_write(qspi_t bus, uint32_t addr, const void *data, size_t len);
+
+/**
+ * @brief   Erase external memory by address
+ *
+ * @param[in] bus       QSPI device
+ * @param[in] address   The address of the block that will be reased
+ * @param[in] size      The erase block size to use
+ */
+void qspi_erase(qspi_t bus, uint32_t address, qspi_erase_size_t size);
 
 #ifdef __cplusplus
 }
