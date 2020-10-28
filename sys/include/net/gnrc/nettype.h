@@ -49,15 +49,6 @@ extern "C" {
  */
 typedef enum {
     /**
-     * @brief   Not so much protocol but data type that is passed to network
-     *          devices using the netdev interface
-     *
-     * @deprecated  Unused since https://github.com/RIOT-OS/RIOT/pull/11193.
-     *              Will be removed after 2020.10 release.
-     *
-     */
-    GNRC_NETTYPE_IOVEC = -2,
-    /**
      * @brief   Protocol is as defined in @ref gnrc_netif_hdr_t. Not usable with
      *          @ref net_gnrc_netreg
      */
