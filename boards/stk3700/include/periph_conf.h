@@ -195,8 +195,7 @@ static const spi_dev_t spi_config[] = {
 /**
  * @name    Timer configuration
  *
- * The implementation can use one low-energy timer
- * or two regular timers in cascade mode.
+ * The implementation uses two timers in cascade mode.
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -223,13 +222,12 @@ static const timer_conf_t timer_config[] = {
         },
         .irq = LETIMER0_IRQn,
         .channel_numof = 2
-    },
+    }
 };
 
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 #define TIMER_0_ISR         isr_timer1
 #define TIMER_1_ISR         isr_letimer0
-
-#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
