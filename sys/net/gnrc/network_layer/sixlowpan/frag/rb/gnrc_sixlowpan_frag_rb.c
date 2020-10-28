@@ -468,15 +468,15 @@ static int _rbuf_get(const void *src, size_t src_len,
         /* if oldest is not empty, res must not be NULL (because otherwise
          * oldest could have been picked as res) */
         assert(!gnrc_sixlowpan_frag_rb_entry_empty(oldest));
-        if (GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE ||
+        if (!IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE) ||
             ((now_usec - oldest->super.arrival) >
             CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US)) {
             DEBUG("6lo rfrag: reassembly buffer full, remove oldest entry\n");
             gnrc_pktbuf_release(oldest->pkt);
             gnrc_sixlowpan_frag_rb_remove(oldest);
             res = oldest;
-#if GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE && \
-    defined(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
+#if !IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE) && \
+    IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_STATS)
             gnrc_sixlowpan_frag_stats_get()->rbuf_full++;
 #endif
         }

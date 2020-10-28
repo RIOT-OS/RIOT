@@ -103,29 +103,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Aggressively override reassembly buffer when full
- *
- * @note    Only applicable with
- *          [gnrc_sixlowpan_frag_rb](@ref net_gnrc_sixlowpan_frag_rb) module
- *
- * When set to a non-zero value this will cause the reassembly buffer to
- * override the oldest entry no matter what. When set to zero only the oldest
- * entry that is older than @ref CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_TIMEOUT_US will be
- * overwritten (they will still timeout normally if reassembly buffer is not
- * full).
- *
- * @deprecated Use inverse @ref CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE instead.
- *             Will be removed after 2020.10 release.
- */
-#ifndef GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE
-#if IS_ACTIVE(CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE)
-#define GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE    (0)
-#else /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE */
-#define GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE    (1)
-#endif /* CONFIG_GNRC_SIXLOWPAN_FRAG_RBUF_DO_NOT_OVERRIDE */
-#endif /* GNRC_SIXLOWPAN_FRAG_RBUF_AGGRESSIVE_OVERRIDE */
-
-/**
  * @brief   Deletion timer for reassembly buffer entries in microseconds
  *
  * @note    Only applicable with
