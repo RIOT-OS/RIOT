@@ -135,9 +135,9 @@ void qspi_read(qspi_t bus, uint32_t addr, void *data, size_t len)
     samd0_cache_enable();
 }
 
-void qspi_erase(qspi_t bus, uint8_t command, uint32_t address)
+void qspi_erase(qspi_t bus, uint32_t address, qspi_erase_size_t size)
 {
-    (void)bus;
+    qspi_cmd_write(bus, SFLASH_CMD_WRITE_ENABLE, NULL, 0);
 
     uint32_t iframe = QSPI_INSTRFRAME_WIDTH_SINGLE_BIT_SPI
                     | _qspi_addrlen
@@ -145,12 +145,12 @@ void qspi_erase(qspi_t bus, uint8_t command, uint32_t address)
                     | QSPI_INSTRFRAME_INSTREN | QSPI_INSTRFRAME_ADDREN;
 
     QSPI->INSTRADDR.reg = address;
-    _run_instruction(command, iframe, address, NULL, 0);
+    _run_instruction(size, iframe, address, NULL, 0);
 }
 
 void qspi_write(qspi_t bus, uint32_t addr, const void *data, size_t len)
 {
-    (void)bus;
+    qspi_cmd_write(bus, SFLASH_CMD_WRITE_ENABLE, NULL, 0);
 
     uint32_t iframe = QSPI_INSTRFRAME_WIDTH_QUAD_OUTPUT
                     | _qspi_addrlen
@@ -206,12 +206,13 @@ void qspi_init(qspi_t bus)
                     | QSPI_CTRLB_DATALEN_8BITS | QSPI_CTRLB_CSMODE_LASTXFER;
 }
 
-void qspi_configure(qspi_t bus, qspi_mode_t mode, uint8_t addrlen, uint32_t clk_hz)
+void qspi_configure(qspi_t bus, qspi_mode_t mode, uint32_t flags, uint32_t clk_hz)
 {
     (void)bus;
 
-    assert(addrlen == 3 || addrlen == 4);
     assert(clk_hz <= CLOCK_CORECLOCK);
+    /* TODO: support other modes */
+    assert(QSPI_FLAG_BIT(flags) == QSPI_FLAG_4BIT);
 
     qspi_acquire(bus);
 
@@ -222,14 +223,12 @@ void qspi_configure(qspi_t bus, qspi_mode_t mode, uint8_t addrlen, uint32_t clk_
     /* set addr len needs write enable                 */
     qspi_cmd_write(bus, SFLASH_CMD_WRITE_ENABLE, NULL, 0);
 
-    if (addrlen == 3) {
-        qspi_cmd_write(bus, SFLASH_CMD_3_BYTE_ADDR, NULL, 0);
-        _qspi_addrlen = QSPI_INSTRFRAME_ADDRLEN_24BITS;
-    }
-
-    if (addrlen == 4) {
+    if (flags & QSPI_FLAG_ADDR_32BIT) {
         qspi_cmd_write(bus, SFLASH_CMD_4_BYTE_ADDR, NULL, 0);
         _qspi_addrlen = QSPI_INSTRFRAME_ADDRLEN_32BITS;
+    } else {
+        qspi_cmd_write(bus, SFLASH_CMD_3_BYTE_ADDR, NULL, 0);
+        _qspi_addrlen = QSPI_INSTRFRAME_ADDRLEN_24BITS;
     }
 
     qspi_release(bus);
