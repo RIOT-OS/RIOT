@@ -37,7 +37,7 @@ extern "C" {
  * @{
  */
 #if IS_ACTIVE(CONFIG_EFM32_XTIMER_USE_LETIMER)
-#define XTIMER_DEV          (TIMER_DEV(1))
+#define XTIMER_DEV          (TIMER_DEV(2))
 #define XTIMER_HZ           (32768UL)
 #define XTIMER_WIDTH        (16)
 #else
