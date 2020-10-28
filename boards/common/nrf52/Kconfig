@@ -8,4 +8,4 @@ config BOARD_COMMON_NRF52
     bool
     select HAS_PERIPH_RTT
     select HAS_PERIPH_TIMER
-    select HAS_RIOTBOOT if !USEPKG_NORDIC_SOFTDEVICE_BLE
+    select HAS_RIOTBOOT

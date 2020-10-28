@@ -19,19 +19,6 @@ PROGRAMMER ?= jlink
 ifeq (jlink,$(PROGRAMMER))
   # setup JLink for flashing
   JLINK_DEVICE = nrf52
-
-  # special options when using SoftDevice
-  ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
-    JLINK_PRE_FLASH = loadfile $(BINDIR)/softdevice.hex
-    FLASH_ADDR = 0x1f000
-    LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
-    # murdock: softdevice.hex file is used for flashing
-    # It must be taken into account for the test input hash and
-    # be sent to the separated testing boards
-    TEST_EXTRA_FILES += $(BINDIR)/softdevice.hex
-    # Files in TEST_EXTRA_FILES need to have an explicit target
-    $(BINDIR)/softdevice.hex: | $(ELFFILE)
-  endif
   include $(RIOTMAKE)/tools/jlink.inc.mk
 else ifeq (openocd,$(PROGRAMMER))
   ifneq (,$(filter $(BOARD),ruuvitag thingy52))
@@ -41,26 +28,6 @@ else ifeq (openocd,$(PROGRAMMER))
   # setup OpenOCD for flashing. Version 0.10 of OpenOCD doesn't contain support
   # for nrf52dk and nrf52840dk boards. To use OpenOCD with these a version
   # build from source (master > 2018, August the 13rd) is required.
-  ifneq (,$(filter nordic_softdevice_ble,$(USEPKG)))
-    LINKER_SCRIPT ?= $(RIOTCPU)/$(CPU)/ldscripts/$(CPU_MODEL)_sd.ld
-
-    OPENOCD_PRE_FLASH_CMDS += -c 'flash write_image erase "$(BINDIR)/softdevice.hex"'
-    OPENOCD_PRE_VERIFY_CMDS += -c 'verify_image "$(BINDIR)/softdevice.hex"'
-
-    # Cannot use the 'ELFFILE' here
-    # The segments are 0x10000 aligned so padding bytes are copied and verified
-    #
-    # Using 'LINKFLAGS += -Wl,--nmagic' prevents it but would require
-    # dedicated testing/review
-    FLASHFILE ?= $(HEXFILE)
-
-    # murdock: softdevice.hex file is used for flashing
-    # It must be taken into account for the test input hash and
-    # be sent to the separated testing boards
-    TEST_EXTRA_FILES += $(BINDIR)/softdevice.hex
-    # Files in TEST_EXTRA_FILES need to have an explicit target
-    $(BINDIR)/softdevice.hex: | $(ELFFILE)
-  endif
   DEBUG_ADAPTER ?= jlink
   OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
   include $(RIOTMAKE)/tools/openocd.inc.mk
