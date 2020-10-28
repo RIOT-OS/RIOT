@@ -112,19 +112,6 @@ extern "C" {
 #define FLASHPAGE_RAW_ALIGNMENT    (4U)
 /** @} */
 
-/**
- * @brief   SoftDevice settings
- * @{
- */
-#ifdef SOFTDEVICE_PRESENT
-#ifndef DONT_OVERRIDE_NVIC
-#include "nrf_soc.h"
-#undef NVIC_SetPriority
-#define NVIC_SetPriority    sd_nvic_SetPriority
-#endif /* DONT_OVERRIDE_NVIC */
-#endif /* SOFTDEVICE_PRESENT */
-/** @} */
-
 #ifdef CPU_MODEL_NRF52840XXAA
 /**
  * @name    OpenWSN timing constants
