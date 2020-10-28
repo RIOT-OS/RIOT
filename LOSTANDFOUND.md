@@ -216,6 +216,14 @@ Reason for removal:
 - Ported version even older (last update Feb 2016)
 - Updating to more recent version would be more effort than its worth
 
+### GNRC_NETTYPE_IOVEC [4f243c52eabefe709d78560ce7f1d502d737a999]
+Author(s):
+- Martine S. Lenders <m.lenders@fu-berlin.de>
+- Hauke Petersen <devel@haukepetersen.de>
+
+Reason for removal:
+- Unused since [9fb2f541baca469e34fa01b004d6f19385700ce9]
+
 
 [cdc252ab7bd4161cc046bf93a3e55995704b24d4]: https://github.com/RIOT-OS/RIOT/commit/cdc252ab7bd4161cc046bf93a3e55995704b24d4
 [ed3887ac5c1e95308c2827bce3cdca8b0f146c22]: https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22
@@ -238,3 +246,5 @@ Reason for removal:
 [f2760c033c5f332be076b25aa212aca4007c3d65]: https://github.com/RIOT-OS/RIOT/commit/f2760c033c5f332be076b25aa212aca4007c3d65
 [e63cd54f3b1e002a7895bb7c46af889b341c1a15]: https://github.com/RIOT-OS/RIOT/commit/e63cd54f3b1e002a7895bb7c46af889b341c1a15
 [4f243c52eabefe709d78560ce7f1d502d737a999]: https://github.com/RIOT-OS/RIOT/commit/4f243c52eabefe709d78560ce7f1d502d737a999
+[3cac6e0979468ba56659291fd1cd11096611589d]: https://github.com/RIOT-OS/RIOT/commit/3cac6e0979468ba56659291fd1cd11096611589d
+[9fb2f541baca469e34fa01b004d6f19385700ce9]: https://github.com/RIOT-OS/RIOT/commit/9fb2f541baca469e34fa01b004d6f19385700ce9
