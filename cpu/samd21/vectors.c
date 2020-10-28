@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include "vectors_cortexm.h"
+#include "cpu.h"
 
 /* define a local dummy handler as it needs to be in the same compilation unit
  * as the alias definition */
@@ -47,6 +48,7 @@ WEAK_DEFAULT void isr_sercom5(void);
 WEAK_DEFAULT void isr_tcc0(void);
 WEAK_DEFAULT void isr_tcc1(void);
 WEAK_DEFAULT void isr_tcc2(void);
+WEAK_DEFAULT void isr_tcc3(void);
 WEAK_DEFAULT void isr_tc3(void);
 WEAK_DEFAULT void isr_tc4(void);
 WEAK_DEFAULT void isr_tc5(void);
@@ -54,9 +56,10 @@ WEAK_DEFAULT void isr_tc6(void);
 WEAK_DEFAULT void isr_tc7(void);
 WEAK_DEFAULT void isr_adc(void);
 WEAK_DEFAULT void isr_ac(void);
+WEAK_DEFAULT void isr_ac1(void);
 WEAK_DEFAULT void isr_dac(void);
 WEAK_DEFAULT void isr_ptc(void);
-WEAK_DEFAULT void isr_i2c(void);
+WEAK_DEFAULT void isr_i2s(void);
 
 /* CPU specific interrupt vector table */
 ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
@@ -66,8 +69,12 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_rtc,                /*  3 Real-Time Counter */
     isr_eic,                /*  4 External Interrupt Controller */
     isr_nvmctrl,            /*  5 Non-Volatile Memory Controller */
+#ifdef REV_DMAC
     isr_dmac,               /*  6 Direct Memory Access Controller */
+#endif
+#ifdef REV_USB
     isr_usb,                /*  7 Universal Serial Bus */
+#endif
     isr_evsys,              /*  8 Event System Interface */
     isr_sercom0,            /*  9 Serial Communication Interface 0 */
     isr_sercom1,            /* 10 Serial Communication Interface 1 */
@@ -87,5 +94,13 @@ ISR_VECTOR(1) const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_ac,                 /* 24 Analog Comparators */
     isr_dac,                /* 25 Digital Analog Converter */
     isr_ptc,                /* 26 Peripheral Touch Controller */
-    isr_i2c                 /* 27 Inter-IC Sound Interface */
+#ifdef REV_I2S
+    isr_i2s,                /* 27 Inter-IC Sound Interface */
+#endif
+#if CPU_IRQ_NUMOF > 27
+    isr_ac1,                /* 28 Analog Comparators 1 */
+#endif
+#if CPU_IRQ_NUMOF > 28
+    isr_tcc3,               /* 29 Timer Counter Control 3 */
+#endif
 };
