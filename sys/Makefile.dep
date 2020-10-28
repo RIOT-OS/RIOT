@@ -67,6 +67,10 @@ ifneq (,$(filter base64url,$(USEMODULE)))
   USEMODULE += base64
 endif
 
+ifneq (,$(filter netif,$(USEMODULE)))
+  USEMODULE += fmt
+endif
+
 ifneq (,$(filter auto_init_gnrc_netif,$(USEMODULE)))
   USEMODULE += gnrc_netif_init_devs
 endif
