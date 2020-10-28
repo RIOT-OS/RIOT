@@ -159,7 +159,6 @@ static const pwm_conf_t pwm_config[] = {
  * @name    RTT configuration
  * @{
  */
-
 #define RTT_MAX_VALUE       (0xFFFFFF)
 #define RTT_FREQUENCY       (1U)
 /** @} */

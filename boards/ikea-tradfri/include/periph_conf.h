@@ -52,7 +52,6 @@ extern "C" {
  * @name    RTT configuration
  * @{
  */
-
 #define RTT_MAX_VALUE       (0xFFFFFFFF)
 #define RTT_FREQUENCY       (1U)
 /** @} */
