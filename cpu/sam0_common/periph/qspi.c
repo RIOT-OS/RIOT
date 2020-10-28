@@ -214,8 +214,6 @@ void qspi_configure(qspi_t bus, qspi_mode_t mode, uint32_t flags, uint32_t clk_h
     /* TODO: support other modes */
     assert(QSPI_FLAG_BIT(flags) == QSPI_FLAG_4BIT);
 
-    qspi_acquire(bus);
-
     QSPI->BAUD.reg = QSPI_BAUD_BAUD((CLOCK_CORECLOCK + clk_hz - 1) / clk_hz)
                    | mode;
 
@@ -230,6 +228,4 @@ void qspi_configure(qspi_t bus, qspi_mode_t mode, uint32_t flags, uint32_t clk_h
         qspi_cmd_write(bus, SFLASH_CMD_3_BYTE_ADDR, NULL, 0);
         _qspi_addrlen = QSPI_INSTRFRAME_ADDRLEN_24BITS;
     }
-
-    qspi_release(bus);
 }
