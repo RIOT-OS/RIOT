@@ -84,6 +84,11 @@ static void _lock(void)
 #else
     PAC1->WPSET.reg = PAC1_WPROT_DEFAULT_VAL;
 #endif
+
+    /* cached flash contents may have changed - invalidate cache */
+#ifdef CMCC
+    CMCC->MAINT0.bit.INVALL = 1;
+#endif
 }
 
 static void _cmd_clear_page_buffer(void)
