@@ -207,23 +207,6 @@ gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt);
 gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *snip);
 
 /**
- * @brief   Replace a snip from a packet and the packet buffer by another snip.
- *
- * @deprecated  Function is not used by anyone (not even tested, see
- *              https://github.com/RIOT-OS/RIOT/issues/5089). Will be removed
- *              after 2020.10 release.
- *
- * @param[in] pkt   A packet
- * @param[in] old   snip currently in the packet
- * @param[in] add   snip which will replace old
- *
- * @return  The new reference to @p pkt
- */
-gnrc_pktsnip_t *gnrc_pktbuf_replace_snip(gnrc_pktsnip_t *pkt,
-                                         gnrc_pktsnip_t *old,
-                                         gnrc_pktsnip_t *add);
-
-/**
  * @brief   Reverses snip order of a packet in a write-protected manner.
  *
  * This can be used to change the send/receive order of a packet (see

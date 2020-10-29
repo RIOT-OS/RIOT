@@ -235,6 +235,16 @@ Author(s):
 Reason for removal:
 - Outdated, unmaintained and no longer working
 
+### gnrc_pktbuf_replace_snip() [72821a502f073006643cb4ef7815fc8c42563ce6]
+
+Author(s):
+- Joakim Nohlgård <joakim.nohlgard@eistec.se>
+- Martine S. Lenders <m.lenders@fu-berlin.de>
+
+Reason for removal:
+- Unused, untested and no longer needed
+
+
 [cdc252ab7bd4161cc046bf93a3e55995704b24d4]: https://github.com/RIOT-OS/RIOT/commit/cdc252ab7bd4161cc046bf93a3e55995704b24d4
 [ed3887ac5c1e95308c2827bce3cdca8b0f146c22]: https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22
 [0e2a62078850e1ecc74db2db4d639cf2d8fb96d3]: https://github.com/RIOT-OS/RIOT/commit/0e2a62078850e1ecc74db2db4d639cf2d8fb96d3
@@ -259,3 +269,4 @@ Reason for removal:
 [3cac6e0979468ba56659291fd1cd11096611589d]: https://github.com/RIOT-OS/RIOT/commit/3cac6e0979468ba56659291fd1cd11096611589d
 [9fb2f541baca469e34fa01b004d6f19385700ce9]: https://github.com/RIOT-OS/RIOT/commit/9fb2f541baca469e34fa01b004d6f19385700ce9
 [35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34]: https://github.com/RIOT-OS/RIOT/commit/35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34
+[72821a502f073006643cb4ef7815fc8c42563ce6]: https://github.com/RIOT-OS/RIOT/commit/72821a502f073006643cb4ef7815fc8c42563ce6

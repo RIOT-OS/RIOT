@@ -25,31 +25,6 @@ gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt,
     return pkt;
 }
 
-gnrc_pktsnip_t *gnrc_pktbuf_replace_snip(gnrc_pktsnip_t *pkt,
-                                         gnrc_pktsnip_t *old,
-                                         gnrc_pktsnip_t *add)
-{
-    /* If add is a list we need to preserve its tail */
-    if (add->next != NULL) {
-        gnrc_pktsnip_t *tail = add->next;
-        /* find the last snip in tail */
-        gnrc_pktsnip_t *back = gnrc_pkt_prev_snip(tail, NULL);
-        /* Replace old */
-        LL_REPLACE_ELEM(pkt, old, add);
-        /* and wire in the tail between */
-        back->next = add->next;
-        add->next = tail;
-    }
-    else {
-        /* add is a single element, has no tail, simply replace */
-        LL_REPLACE_ELEM(pkt, old, add);
-    }
-    old->next = NULL;
-    gnrc_pktbuf_release(old);
-
-    return pkt;
-}
-
 gnrc_pktsnip_t *gnrc_pktbuf_reverse_snips(gnrc_pktsnip_t *pkt)
 {
     gnrc_pktsnip_t *reversed = NULL, *ptr = pkt;
