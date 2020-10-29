@@ -309,13 +309,16 @@ void usage_exit(int status)
 "        times (up to UART_NUMOF)\n"
 #ifdef MODULE_PERIPH_GPIO_LINUX
 "    -g <gpio>, --gpio=<gpio>\n"
-"        specify gpiochip device for GPIO access. This argument can be used multiple times.\n"
+"        specify gpiochip device for GPIO access.\n"
+"        This argument can be used multiple times.\n"
 "        Example: --gpio=/dev/gpiochip0 uses gpiochip0 for port 0\n"
 #endif
 #if defined(MODULE_SOCKET_ZEP) && (SOCKET_ZEP_MAX > 0)
 "    -z [<laddr>:<lport>,]<raddr>:<rport> --zep=[<laddr>:<lport>,]<raddr>:<rport>\n"
-"        provide a ZEP interface with (optional) local address and port (<laddr>, <lport>).\n"
-"        The ZEP interface connects to the remote address and may listen on a local address.\n"
+"        provide a ZEP interface with an (optional) local address and port\n"
+"        (<laddr>:<lport>) and a remote address and port (<raddr>:<rport>).\n"
+"        The ZEP interface connects to the remote address and may listen\n"
+"        on a local address.\n"
 "        Required to be provided SOCKET_ZEP_MAX times\n"
 #endif
     );
