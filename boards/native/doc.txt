@@ -31,11 +31,4 @@ On Debian/Ubuntu you can install the required libraries with
 sudo apt install gcc-multilib
 ```
 
-# Building native with debug flags
-@deprecated `make all-debug` is deprecated; `make all` now builds with debugs
-            flags by default. The target will be removed after the 2020.10
-            release.
-
-To build with debug flags for `native` use `make all-debug` instead of
-`make all`
  */
