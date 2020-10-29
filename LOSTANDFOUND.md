@@ -224,6 +224,16 @@ Author(s):
 Reason for removal:
 - Unused since [9fb2f541baca469e34fa01b004d6f19385700ce9]
 
+### pkg/nordic_softdevice_ble [35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34]
+
+Author(s):
+- Hauke Petersen <hauke.petersen@fu-berlin.de>
+- Kaspar Schleiser <kaspar@schleiser.de>
+- Martine Lenders <m.lenders@fu-berlin.de>
+- Wojciech Bober <wojciech.bober@nordicsemi.no>
+
+Reason for removal:
+- Outdated, unmaintained and no longer working
 
 [cdc252ab7bd4161cc046bf93a3e55995704b24d4]: https://github.com/RIOT-OS/RIOT/commit/cdc252ab7bd4161cc046bf93a3e55995704b24d4
 [ed3887ac5c1e95308c2827bce3cdca8b0f146c22]: https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22
@@ -248,3 +258,4 @@ Reason for removal:
 [4f243c52eabefe709d78560ce7f1d502d737a999]: https://github.com/RIOT-OS/RIOT/commit/4f243c52eabefe709d78560ce7f1d502d737a999
 [3cac6e0979468ba56659291fd1cd11096611589d]: https://github.com/RIOT-OS/RIOT/commit/3cac6e0979468ba56659291fd1cd11096611589d
 [9fb2f541baca469e34fa01b004d6f19385700ce9]: https://github.com/RIOT-OS/RIOT/commit/9fb2f541baca469e34fa01b004d6f19385700ce9
+[35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34]: https://github.com/RIOT-OS/RIOT/commit/35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34
