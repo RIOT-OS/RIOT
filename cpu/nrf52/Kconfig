@@ -42,7 +42,6 @@ config CPU_MODEL_NRF52832XXAA
     bool
     select CPU_FAM_NRF52
     select CPU_CORE_CORTEX_M4F
-    select HAS_BLE_NORDIC_SOFTDEVICE
 
 config CPU_MODEL_NRF52833XXAA
     bool

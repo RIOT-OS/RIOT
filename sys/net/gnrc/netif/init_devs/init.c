@@ -139,11 +139,6 @@ void gnrc_netif_init_devs(void)
         auto_init_socket_zep();
     }
 
-    if (IS_USED(MODULE_NORDIC_SOFTDEVICE_BLE)) {
-        extern void gnrc_nordic_ble_6lowpan_init(void);
-        gnrc_nordic_ble_6lowpan_init();
-    }
-
     if (IS_USED(MODULE_NRFMIN)) {
         extern void gnrc_nrfmin_init(void);
         gnrc_nrfmin_init();

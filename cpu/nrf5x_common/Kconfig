@@ -42,10 +42,4 @@ config HAS_RADIO_NRFMIN
         Indicates that a radio compatible with the nRF minimal radio driver is
         present.
 
-config HAS_BLE_NORDIC_SOFTDEVICE
-    bool
-    help
-        Indicates that Nordic SoftDevice support in RIOT has been verified on the
-        current platform.
-
 source "$(RIOTCPU)/cortexm_common/Kconfig"

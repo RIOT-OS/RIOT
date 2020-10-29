@@ -24,9 +24,7 @@
 
 #include "cpu.h"
 #include "periph/hwrng.h"
-#ifndef MODULE_NORDIC_SOFTDEVICE_BLE
 #include "assert.h"
-#endif
 
 void hwrng_init(void)
 {
@@ -34,11 +32,6 @@ void hwrng_init(void)
     NRF_RNG->CONFIG = 1;
 }
 
-/*
- * The hardware peripheral is used by the SoftDevice. When the SoftDevice is
- * enabled, it shall only be accessed through the SoftDevice API
- */
-#ifndef MODULE_NORDIC_SOFTDEVICE_BLE
 void hwrng_read(void *buf, unsigned int num)
 {
     unsigned int count = 0;
@@ -71,24 +64,3 @@ void hwrng_read(void *buf, unsigned int num)
     NRF_RNG->POWER = 0;
 #endif
 }
-
-#else
-
-void hwrng_read(void *buf, unsigned int num)
-{
-    uint32_t ret;
-    uint8_t avail;
-
-    assert(num <= 0xff);
-
-    /* this is not the most efficient, but this way we can assure that there are
-     * enough bytes of random data available */
-    do {
-        sd_rand_application_bytes_available_get(&avail);
-    } while (avail < (uint8_t)num);
-
-    ret = sd_rand_application_vector_get((uint8_t *)buf, (uint8_t)num);
-    assert(ret == NRF_SUCCESS);
-    (void)ret;
-}
-#endif /* MODULE_NORDIC_SOFTDEVICE_BLE */

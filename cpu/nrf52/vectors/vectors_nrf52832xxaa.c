@@ -53,21 +53,7 @@ WEAK_DEFAULT void isr_wdt(void);
 WEAK_DEFAULT void isr_rtc1(void);
 WEAK_DEFAULT void isr_qdec(void);
 WEAK_DEFAULT void isr_lpcomp(void);
-
-#ifndef SOFTDEVICE_PRESENT
 WEAK_DEFAULT void isr_swi0(void);
-#else
-/* For unknown reasons, setting PendSV pending within
- * the softdevice ISRs leads to a crash. This workaround
- * uses swi0 as trampoline.
- */
-extern void thread_yield_higher(void);
-void isr_swi0(void)
-{
-    thread_yield_higher();
-}
-#endif
-
 WEAK_DEFAULT void isr_swi1(void);
 WEAK_DEFAULT void isr_swi2(void);
 WEAK_DEFAULT void isr_swi3(void);
@@ -84,10 +70,6 @@ WEAK_DEFAULT void isr_spi2(void);
 WEAK_DEFAULT void isr_rtc2(void);
 WEAK_DEFAULT void isr_i2s(void);
 WEAK_DEFAULT void isr_fpu(void);
-
-#ifdef SOFTDEVICE_PRESENT
-extern void SWI2_EGU2_IRQHandler(void);
-#endif
 
 /* CPU specific interrupt vector table */
 ISR_VECTOR(1)
@@ -114,11 +96,7 @@ const isr_t vector_cpu[CPU_IRQ_NUMOF] = {
     isr_lpcomp,            /* lpcomp */
     isr_swi0,              /* swi0 */
     isr_swi1,              /* swi1 */
-#ifdef SOFTDEVICE_PRESENT
-    SWI2_EGU2_IRQHandler,  /* softdevice swi handler */
-#else
     isr_swi2,              /* swi2 */
-#endif
     isr_swi3,              /* swi3 */
     isr_swi4,              /* swi4 */
     isr_swi5,              /* swi5 */
