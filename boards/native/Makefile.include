@@ -137,9 +137,6 @@ endif
 
 all: # do not override first target
 
-all-debug: all
-	@$(COLOR_ECHO) '$(COLOR_RED)`all-debug` is deprecated, just use `all`$(COLOR_RESET)'
-
 all-gprof: all
 
 all-asan: all
