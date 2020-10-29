@@ -133,6 +133,25 @@ static char *_consume_authority(uri_parser_result_t *result, char *uri,
         if (ipv6_end >= authority_end) {
             return NULL;
         }
+
+        char *zoneid_start = _strchrb(result->host, ipv6_end, '%');
+        if (zoneid_start) {
+            /* skip % */
+            result->zoneid = zoneid_start + 1;
+            result->zoneid_len = ipv6_end - result->zoneid;
+
+            /* zoneid cannot be empty */
+            if (result->zoneid_len == 0) {
+                return NULL;
+            }
+        }
+
+        /* remove '[', ']', and '%' zoneid from ipv6addr */
+        result->ipv6addr = result->host + 1;
+        result->ipv6addr_len = ipv6_end - result->ipv6addr;
+        if (result->zoneid) {
+            result->ipv6addr_len -= result->zoneid_len + 1;
+        }
     }
 
     /* consume port, if available */
@@ -145,6 +164,7 @@ static char *_consume_authority(uri_parser_result_t *result, char *uri,
         (result->userinfo || result->port)) {
         return NULL;
     }
+
     /* this includes the '/' */
     return authority_end;
 }

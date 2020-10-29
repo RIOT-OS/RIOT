@@ -39,18 +39,45 @@ extern "C" {
  * @brief container that holds all results
  */
 typedef struct {
-    char *scheme;                 /**< scheme */
-    char *userinfo;               /**< userinfo */
-    char *host;                   /**< host */
-    char *port;                   /**< port */
-    char *path;                   /**< path */
-    char *query;                  /**< query */
-    uint16_t scheme_len;          /**< length of @p scheme */
-    uint16_t userinfo_len;        /**< length of @p userinfo */
-    uint16_t host_len;            /**< length of @p host */
-    uint16_t port_len;            /**< length of @p port */
-    uint16_t path_len;            /**< length of @p path */
-    uint16_t query_len;           /**< length of @p query */
+    char *scheme;                   /**< scheme */
+    char *userinfo;                 /**< userinfo */
+
+    /**
+     * @brief host part
+     *
+     * @note for IPv6 addresses, @ref host also includes the brackets
+     * '[' and ']' as well as the zoneid (with leading '%'), if
+     * present.
+     */
+    char *host;
+
+    /**
+     * @brief Pointer to the start of the address, if @ref host is an
+     * IPv6 address and NULL otherwise
+     *
+     * @note @ref ipv6addr does not include the brackets '[' and ']'
+     * and the zoneid part.
+     */
+    char *ipv6addr;
+
+    /**
+     * @brief zoneid if @ref host is IPv6 address, NULL otherwise
+     *
+     * @see https://tools.ietf.org/html/rfc6874
+     */
+    char *zoneid;
+
+    char *port;                     /**< port */
+    char *path;                     /**< path */
+    char *query;                    /**< query */
+    uint16_t scheme_len;            /**< length of @ref scheme */
+    uint16_t userinfo_len;          /**< length of @ref userinfo */
+    uint16_t host_len;              /**< length of @ref host */
+    uint16_t ipv6addr_len;          /**< length of @ref ipv6addr */
+    uint16_t zoneid_len;            /**< length of @ref zoneid */
+    uint16_t port_len;              /**< length of @ref port */
+    uint16_t path_len;              /**< length of @ref path */
+    uint16_t query_len;             /**< length of @ref query */
 } uri_parser_result_t;
 
 /**
