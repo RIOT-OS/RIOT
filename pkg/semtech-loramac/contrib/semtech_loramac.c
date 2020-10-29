@@ -539,13 +539,15 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
 
         case NETDEV_EVENT_RX_COMPLETE:
         {
-            size_t len;
+            int len;
             uint8_t radio_payload[SX127X_RX_BUFFER_SIZE];
             len = dev->driver->recv(dev, NULL, 0, 0);
-            dev->driver->recv(dev, radio_payload, len, &packet_info);
-            semtech_loramac_radio_events.RxDone(radio_payload,
-                                                len, packet_info.rssi,
-                                                packet_info.snr);
+            if (len > 0) {
+                dev->driver->recv(dev, radio_payload, len, &packet_info);
+                semtech_loramac_radio_events.RxDone(radio_payload,
+                                                    len, packet_info.rssi,
+                                                    packet_info.snr);
+            } /* len could be -EBADMSG, in which case a CRC error message will be received shortly */
             break;
         }
         case NETDEV_EVENT_RX_TIMEOUT:
