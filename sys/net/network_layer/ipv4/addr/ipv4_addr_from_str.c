@@ -13,6 +13,7 @@
  */
 
 #include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "net/ipv4/addr.h"
@@ -20,12 +21,15 @@
 #define DEC     "0123456789"
 
 /* based on inet_pton4() by Paul Vixie */
-ipv4_addr_t *ipv4_addr_from_str(ipv4_addr_t *result, const char *addr)
+ipv4_addr_t *ipv4_addr_from_buf(ipv4_addr_t *result, const char *addr,
+                                size_t addr_len)
 {
-    uint8_t saw_digit, octets, ch;
+    uint8_t saw_digit, octets;
     uint8_t tmp[sizeof(ipv4_addr_t)], *tp;
+    const char *start = addr;
 
-    if ((result == NULL) || (addr == NULL)) {
+    if ((result == NULL) || (addr == NULL) || (addr_len == 0) ||
+        (addr_len > IPV4_ADDR_MAX_STR_LEN)) {
         return NULL;
     }
 
@@ -33,7 +37,8 @@ ipv4_addr_t *ipv4_addr_from_str(ipv4_addr_t *result, const char *addr)
     octets = 0;
     *(tp = tmp) = 0;
 
-    while ((ch = *addr++) != '\0') {
+    while ((size_t)(addr - start) < addr_len) {
+        uint8_t ch = *addr++;
         const char *pch;
 
         if ((pch = strchr(DEC, ch)) != NULL) {
@@ -72,6 +77,15 @@ ipv4_addr_t *ipv4_addr_from_str(ipv4_addr_t *result, const char *addr)
 
     memcpy(result, tmp, sizeof(ipv4_addr_t));
     return result;
+}
+
+ipv4_addr_t *ipv4_addr_from_str(ipv4_addr_t *result, const char *addr)
+{
+    if ((result == NULL) || (addr == NULL)) {
+        return NULL;
+    }
+
+    return ipv4_addr_from_buf(result, addr, strlen(addr));
 }
 
 
