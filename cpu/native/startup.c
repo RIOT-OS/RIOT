@@ -309,13 +309,16 @@ void usage_exit(int status)
 "        times (up to UART_NUMOF)\n"
 #ifdef MODULE_PERIPH_GPIO_LINUX
 "    -g <gpio>, --gpio=<gpio>\n"
-"        specify gpiochip device for GPIO access. This argument can be used multiple times.\n"
+"        specify gpiochip device for GPIO access.\n"
+"        This argument can be used multiple times.\n"
 "        Example: --gpio=/dev/gpiochip0 uses gpiochip0 for port 0\n"
 #endif
 #if defined(MODULE_SOCKET_ZEP) && (SOCKET_ZEP_MAX > 0)
 "    -z [<laddr>:<lport>,]<raddr>:<rport> --zep=[<laddr>:<lport>,]<raddr>:<rport>\n"
-"        provide a ZEP interface with local address and port (<laddr>, <lport>)\n"
-"        and remote address and port (default local: [::]:17754).\n"
+"        provide a ZEP interface with an (optional) local address and port\n"
+"        (<laddr>:<lport>) and a remote address and port (<raddr>:<rport>).\n"
+"        The ZEP interface connects to the remote address and may listen\n"
+"        on a local address.\n"
 "        Required to be provided SOCKET_ZEP_MAX times\n"
 #endif
     );
@@ -396,8 +399,8 @@ static void _zep_params_setup(char *zep_str, int zep)
     }
     second_ep = strtok_r(NULL, ",", &save_ptr);
     if (second_ep == NULL) {
-        socket_zep_params[zep].local_addr = SOCKET_ZEP_LOCAL_ADDR_DEFAULT;
-        socket_zep_params[zep].local_port = SOCKET_ZEP_PORT_DEFAULT;
+        socket_zep_params[zep].local_addr = NULL;
+        socket_zep_params[zep].local_port = NULL;
         _parse_ep_str(first_ep, &socket_zep_params[zep].remote_addr,
                       &socket_zep_params[zep].remote_port);
     }
