@@ -21,9 +21,10 @@
 #include "unittests-constants.h"
 #include "tests-uri_parser.h"
 
-#define VEC(u, f, s, us, h, po, pa, q, e)                                   \
+#define VEC(u, f, s, us, h, v6a, z, po, pa, q, e)                           \
     { .uri = u, .full_uri = f, .scheme = s, .userinfo = us, .host = h,      \
-      .port = po, .path = pa, .query = q, .expected = e}
+      .ipv6addr = v6a, .zoneid = z, .port = po, .path = pa,                 \
+      .query = q, .expected = e}
 
 #define VEC_CHECK(comp, i, vec_msg)                                         \
     do {                                                                    \
@@ -55,7 +56,9 @@ typedef struct {
     bool full_uri;
     char scheme[8];
     char userinfo[16];
-    char host[16];
+    char host[24];
+    char ipv6addr[16];
+    char zoneid[8];
     char port[32];
     char path[48];
     char query[32];
@@ -67,9 +70,9 @@ typedef struct {
       scheme, userinfo, host, port,
       path, query, expected return value)
 */
-static const validate_t validate_uris[27] = {
+static const validate_t validate_uris[] = {
         /* uri to parse */
-    VEC("coap://RIOT:test@[2001:db8::1]:5683/.well-known/core?v=1",
+    VEC("coap://RIOT:test@[fe80:db8::1%tap0]:5683/.well-known/core?v=1",
         /* is URI */
         true,
         /* parsed scheme */
@@ -77,7 +80,11 @@ static const validate_t validate_uris[27] = {
         /* parsed userinfo */
         "RIOT:test",
         /* parsed host */
-        "[2001:db8::1]",
+        "[fe80:db8::1%tap0]",
+        /* parsed host without zoneid */
+        "fe80:db8::1",
+        /* parsed zoneid */
+        "tap0",
         /* parsed port */
         "5683",
         /* parsed path */
@@ -86,8 +93,32 @@ static const validate_t validate_uris[27] = {
         "v=1",
         /* expected return value */
         0),
+    VEC("coap://RIOT:test@[fe80:db8::1%]:5683/.well-known/core?v=1",
+        true,
+        "coap",
+        "RIOT:test",
+        "[fe80:db8::1%]",
+        "fe80:db8::1",
+        "",
+        "5683",
+        "/.well-known/core",
+        "v=1",
+        -1),
+    VEC("coap://[fe80::1]/foo%20bar",
+        true,
+        "coap",
+        "",
+        "[fe80::1]",
+        "fe80::1",
+        "",
+        "",
+        "/foo%20bar",
+        "",
+        0),
     VEC("/.well-known/core?v=1",
         false,
+        "",
+        "",
         "",
         "",
         "",
@@ -100,6 +131,8 @@ static const validate_t validate_uris[27] = {
         "coap",
         "R",
         "[2001:db8::1]",
+        "2001:db8::1",
+        "",
         "5own",
         "/v=1",
         "",
@@ -109,6 +142,8 @@ static const validate_t validate_uris[27] = {
         "coap",
         "R",
         "[2001:db8::1]",
+        "2001:db8::1",
+        "",
         "5own",
         "/:v=1",
         "",
@@ -118,6 +153,8 @@ static const validate_t validate_uris[27] = {
         "cap",
         "R",
         "[2001:db8::1]",
+        "2001:db8::1",
+        "",
         "5own",
         "/",
         "v=1",
@@ -127,12 +164,16 @@ static const validate_t validate_uris[27] = {
         "oap",
         "",
         "Y2001:db8::1]",
+        "",
+        "",
         "5own",
         "/av=1",
         "",
         0),
     VEC("//Rb[ʰ00J:d/5v=0",
         false,
+        "",
+        "",
         "",
         "",
         "",
@@ -148,10 +189,14 @@ static const validate_t validate_uris[27] = {
         "",
         "",
         "",
+        "",
+        "",
         -1),
     VEC("coap:///R@[2008::1]:5own//R@[2008::1]:5own/?v=1",
         true,
         "coap",
+        "",
+        "",
         "",
         "",
         "",
@@ -164,11 +209,15 @@ static const validate_t validate_uris[27] = {
         "",
         "R",
         "",
+        "",
+        "",
         "/RZ[2001[8:01[8::1]:5o:1]:5oTMv=1",
         "",
         0),
     VEC("coap://R@////////////////7///v=1",
         true,
+        "",
+        "",
         "",
         "",
         "",
@@ -182,12 +231,16 @@ static const validate_t validate_uris[27] = {
         "",
         "",
         "",
+        "",
+        "",
         "coa[:////[2001:db5ow:5own/Ov=1",
         "",
         0),
     VEC("tel:+1-816-555-1212",
         true,
         "tel",
+        "",
+        "",
         "",
         "",
         "",
@@ -200,11 +253,15 @@ static const validate_t validate_uris[27] = {
         "",
         "",
         "",
+        "",
+        "",
         "+15105550101,+15105550102",
         "body=hello%20there",
         0),
     VEC("a",
         false,
+        "",
+        "",
         "",
         "",
         "",
@@ -218,6 +275,8 @@ static const validate_t validate_uris[27] = {
         "",
         "",
         "",
+        "",
+        "",
         "test@example.com",
         "",
         0),
@@ -226,6 +285,8 @@ static const validate_t validate_uris[27] = {
         "ftp",
         "",
         "ftp.is.co.za",
+        "",
+        "",
         "",
         "/rfc/rfc1808.txt",
         "",
@@ -236,6 +297,8 @@ static const validate_t validate_uris[27] = {
         "",
         "www.ietf.org",
         "",
+        "",
+        "",
         "/rfc/rfc2396.txt",
         "",
         0),
@@ -244,6 +307,8 @@ static const validate_t validate_uris[27] = {
         "ldap",
         "",
         "[2001:db8::7]",
+        "2001:db8::7",
+        "",
         "",
         "/c=GB",
         "objectClass?one",
@@ -251,6 +316,8 @@ static const validate_t validate_uris[27] = {
     VEC("mailto:John.Doe@example.com",
         true,
         "mailto",
+        "",
+        "",
         "",
         "",
         "",
@@ -263,12 +330,16 @@ static const validate_t validate_uris[27] = {
         "",
         "",
         "",
+        "",
+        "",
         "comp.infosystems.www.servers.unix",
         "",
         0),
     VEC("tel:+1-816-555-1212",
         true,
         "tel",
+        "",
+        "",
         "",
         "",
         "",
@@ -280,6 +351,8 @@ static const validate_t validate_uris[27] = {
         "telnet",
         "",
         "192.0.2.16",
+        "",
+        "",
         "80",
         "/",
         "",
@@ -287,6 +360,8 @@ static const validate_t validate_uris[27] = {
     VEC("urn:oasis:names:specification:docbook:dtd:xml:4.1.2",
         true,
         "urn",
+        "",
+        "",
         "",
         "",
         "",
@@ -301,9 +376,13 @@ static const validate_t validate_uris[27] = {
         "",
         "",
         "",
+        "",
+        "",
         -1),
     VEC("/",
         false,
+        "",
+        "",
         "",
         "",
         "",
@@ -313,6 +392,8 @@ static const validate_t validate_uris[27] = {
         0),
     VEC("./this:that",
         false,
+        "",
+        "",
         "",
         "",
         "",
@@ -336,6 +417,8 @@ static void test_uri_parser__validate(void)
             VEC_CHECK(scheme, i, _failure_msg);
             VEC_CHECK(userinfo, i, _failure_msg);
             VEC_CHECK(host, i, _failure_msg);
+            VEC_CHECK(ipv6addr, i, _failure_msg);
+            VEC_CHECK(zoneid, i, _failure_msg);
             VEC_CHECK(port, i, _failure_msg);
             VEC_CHECK(path, i, _failure_msg);
             VEC_CHECK(query, i, _failure_msg);
@@ -358,6 +441,8 @@ static void test_uri_parser__unterminated_string(void)
     VEC_CHECK(scheme, 0, _failure_msg);
     VEC_CHECK(userinfo, 0, _failure_msg);
     VEC_CHECK(host, 0, _failure_msg);
+    VEC_CHECK(ipv6addr, 0, _failure_msg);
+    VEC_CHECK(zoneid, 0, _failure_msg);
     VEC_CHECK(port, 0, _failure_msg);
     VEC_CHECK(path, 0, _failure_msg);
     VEC_CHECK(query, 0, _failure_msg);
