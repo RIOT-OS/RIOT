@@ -348,8 +348,7 @@ static int32_t _SDP3x_read_pressure(const sdp3x_t *dev)
  *      2 byte Scale Factor differential pressure
  *      1 byte CRC
  *
- *      @param addr   Address byte 1 = 0x21, 2 = 0x22, 3 = 0x23,
- *                    else = Last address
+ *      @param dev    sdp3x device
  *      @param data   Data will be stored here
  *
  *      @return       0 if data could be read, 1 if CRC-Error
@@ -387,9 +386,9 @@ static int8_t _SDP3x_read_data(const sdp3x_t *dev, int16_t *data)
 
 /**
  *      intern method to convert sensor value to pascal
- *      @param  dev      device
- *      @param  value    raw sensor value
- *      @return pressure value in centiPa
+ *      @param  value                 raw sensor value
+ *      @param  dp_scale_factor scale factor for sensor
+ *      @return pressure              value in centiPa
  */
 static int32_t _SDP3x_convert_to_pascal(int16_t value, int16_t dp_scale_factor)
 {
@@ -399,7 +398,6 @@ static int32_t _SDP3x_convert_to_pascal(int16_t value, int16_t dp_scale_factor)
 
 /**
  *      intern method to convert sensor value to celsius
- *      @param  dev     device
  *      @param  value   raw sensor value
  *      @return temperature in centi°C
  */
@@ -445,7 +443,6 @@ static void _sdp3x_irq_callback(void *arg)
  *      Function to check if the product number set
  *      is the one we get from the sensor
  *      @param  data  data read from the sensor
- *      @param  dev   sdp3x device
  *      @return true  if values from sensor were correct
  */
 static bool _check_product_number(uint8_t *readData)
