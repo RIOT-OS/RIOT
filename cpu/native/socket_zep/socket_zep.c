@@ -40,6 +40,9 @@
  * (https://pubs.opengroup.org/onlinepubs/9699919799.2016edition/basedefs/time.h.html) */
 #define TV_USEC_PER_SEC         (1000000L)
 
+/* dummy packet to register with ZEP dispatcher */
+#define SOCKET_ZEP_V2_TYPE_HELLO   (255)
+
 static size_t _zep_hdr_fill_v2_data(socket_zep_t *dev, zep_v2_data_hdr_t *hdr,
                                     size_t payload_len)
 {
@@ -390,6 +393,21 @@ static int _connect_remote(socket_zep_t *dev, const socket_zep_params_t *params)
     return res;
 }
 
+static void _send_zep_hello(socket_zep_t *dev)
+{
+    if (IS_USED(MODULE_SOCKET_ZEP_HELLO)) {
+        /* dummy packet */
+        zep_v2_data_hdr_t hdr = {
+            .hdr.preamble = "EX",
+            .hdr.version  = 2,
+            .type = SOCKET_ZEP_V2_TYPE_HELLO,
+            .resv = "HELLO",
+        };
+
+        real_write(dev->sock_fd, &hdr, sizeof(hdr));
+    }
+}
+
 void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params)
 {
     int res;
@@ -408,7 +426,10 @@ void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params)
         dev->sock_fd = res;
     }
 
-    _connect_remote(dev, params);
+    if (_connect_remote(dev, params) == 0) {
+        /* send dummy data to connect to dispatcher */
+        _send_zep_hello(dev);
+    }
 
     /* generate hardware address from local address */
     uint8_t ss_array[sizeof(struct sockaddr_storage)] = { 0 };
