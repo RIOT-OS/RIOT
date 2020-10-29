@@ -693,12 +693,36 @@ static inline int gnrc_netif_ndp_addr_len_from_l2ao(gnrc_netif_t *netif,
     assert(netif->flags & GNRC_NETIF_FLAGS_HAS_L2ADDR);
     return l2util_ndp_addr_len_from_l2ao(netif->device_type, opt);
 }
+
+/**
+ * @brief   Converts an IPv6 multicast address to a multicast address
+ *          of the respective link layer.
+ *
+ * @pre There is enough allocated space in @p l2_group for an address for a
+ *      device of type @p dev_type (e.g. 6 bytes for an ethernet address).
+ *
+ * @param[in] dev_type      The network interface @p l2_addr should be generated
+ *                          for.
+ * @param[in] ipv6_group    An IPv6 multicast address.
+ * @param[out] l2_group     A link layer multicast address
+ *
+ * @return  Length of @p l2_group in bytes
+ * @return  `-ENOTSUP` if link layer does not support multicast.
+ */
+static inline int gnrc_netif_ipv6_group_to_l2_group(gnrc_netif_t *netif,
+                                                    const ipv6_addr_t *ipv6_group,
+                                                    uint8_t *l2_group)
+{
+    return l2util_ipv6_group_to_l2_group(netif->device_type, ipv6_group,
+                                         l2_group);
+}
 #else   /* IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN) */
 #define gnrc_netif_ipv6_init_mtu(netif)                             (void)netif
 #define gnrc_netif_ipv6_iid_from_addr(netif, addr, addr_len, iid)   (-ENOTSUP)
 #define gnrc_netif_ipv6_iid_to_addr(netif, iid, addr)               (-ENOTSUP)
 #define gnrc_netif_ndp_addr_len_from_l2ao(netif, opt)               (-ENOTSUP)
 #define gnrc_netif_ipv6_get_iid(netif, iid)                         (-ENOTSUP)
+#define gnrc_netif_ipv6_group_to_l2_group(netif, ipv6_group, l2_group)  (-ENOTSUP)
 #endif  /* IS_USED(MODULE_GNRC_NETIF_IPV6) || defined(DOXYGEN) */
 /** @} */
 

@@ -238,5 +238,27 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
     return -ENOTSUP;
 }
 
+int l2util_ipv6_group_to_l2_group(int dev_type,
+                                  const ipv6_addr_t *ipv6_group,
+                                  uint8_t *l2_group)
+{
+    switch (dev_type) {
+#if IS_USED(MODULE_NETDEV_ETH)
+        case NETDEV_TYPE_ETHERNET:
+            /* see https://tools.ietf.org/html/rfc2464#section-7 */
+            l2_group[0] = 0x33;
+            l2_group[1] = 0x33;
+            l2_group[2] = ipv6_group->u8[12];
+            l2_group[3] = ipv6_group->u8[13];
+            l2_group[4] = ipv6_group->u8[14];
+            l2_group[5] = ipv6_group->u8[15];
+            return sizeof(eui48_t);
+#endif
+        default:
+            (void)ipv6_group;
+            (void)l2_group;
+            return -ENOTSUP;
+    }
+}
 
 /** @} */

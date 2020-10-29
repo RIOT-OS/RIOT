@@ -717,12 +717,44 @@ gnrc_netif_t *gnrc_netif_get_by_prefix(const ipv6_addr_t *prefix)
     return best_netif;
 }
 
+static int _netif_ops_set_helper(gnrc_netif_t *netif, netopt_t opt,
+                                 void *data, uint16_t data_len)
+{
+    gnrc_netapi_opt_t netapi_opt = {
+        .opt = opt,
+        .data = data,
+        .data_len = data_len,
+    };
+    return netif->ops->set(netif, &netapi_opt);
+}
+
 int gnrc_netif_ipv6_group_join_internal(gnrc_netif_t *netif,
                                         const ipv6_addr_t *addr)
 {
+    uint8_t l2_group_data[GNRC_NETIF_L2ADDR_MAXLEN];
     unsigned idx = UINT_MAX;
+    int l2_group_len;
 
+    /* can be called out of lock */
+    l2_group_len = gnrc_netif_ipv6_group_to_l2_group(netif, addr,
+                                                     l2_group_data);
     gnrc_netif_acquire(netif);
+    if (l2_group_len > 0) {
+        int res = _netif_ops_set_helper(netif, NETOPT_L2_GROUP,
+                                        l2_group_data, (uint16_t)l2_group_len);
+        /* link layer does not support multicast, but we can still use
+         * broadcast */
+        if ((res != -ENOTSUP) && (res < 0)) {
+            gnrc_netif_release(netif);
+            return res;
+        }
+    }
+    /* link layer does not support multicast, but we can still use
+     * broadcast */
+    else if (l2_group_len != -ENOTSUP) {
+        gnrc_netif_release(netif);
+        return l2_group_len;
+    }
     for (unsigned i = 0; i < GNRC_NETIF_IPV6_GROUPS_NUMOF; i++) {
         if (ipv6_addr_equal(&netif->ipv6.groups[i], addr)) {
             gnrc_netif_release(netif);
@@ -748,11 +780,56 @@ int gnrc_netif_ipv6_group_join_internal(gnrc_netif_t *netif,
 void gnrc_netif_ipv6_group_leave_internal(gnrc_netif_t *netif,
                                           const ipv6_addr_t *addr)
 {
-    int idx;
+    uint8_t l2_group_data[GNRC_NETIF_L2ADDR_MAXLEN];
+    int idx = -1, l2_group_len;
+    /* IPv6 addresses that correspond to the same L2 address */
+    unsigned l2_groups = 0;
 
     assert((netif != NULL) && (addr != NULL));
+    /* can be called out of lock */
+    l2_group_len = gnrc_netif_ipv6_group_to_l2_group(netif, addr,
+                                                     l2_group_data);
+    /* link layer does not support multicast, but might still have used
+     * broadcast */
+    if ((l2_group_len < 0) && (l2_group_len != -ENOTSUP)) {
+        return;
+    }
     gnrc_netif_acquire(netif);
-    idx = _group_idx(netif, addr);
+    for (unsigned i = 0; i < GNRC_NETIF_IPV6_GROUPS_NUMOF; i++) {
+        if (l2_group_len > 0) {
+            uint8_t tmp[GNRC_NETIF_L2ADDR_MAXLEN];
+            if (!ipv6_addr_is_unspecified(&netif->ipv6.groups[i]) &&
+                (gnrc_netif_ipv6_group_to_l2_group(netif,
+                                                   &netif->ipv6.groups[i],
+                                                   tmp) == l2_group_len)) {
+                if (memcmp(tmp, l2_group_data, l2_group_len) == 0) {
+                    l2_groups++;
+                }
+            }
+        }
+        if (ipv6_addr_equal(&netif->ipv6.groups[i], addr)) {
+            idx = i;
+        }
+    }
+    if (idx < 0) {
+        gnrc_netif_release(netif);
+        return;
+    }
+    /* we need to have found at least one corresponding group for the IPv6
+     * group we want to leave when link layer supports multicast */
+    assert((l2_group_len == -ENOTSUP) || (l2_groups > 0));
+    /* we only found exactly IPv6 multicast address that corresponds to
+     * `l2_group_data`, so we can remove it, if there would be more, we need
+     * to stay in the group */
+    if (l2_groups == 1) {
+        int res = _netif_ops_set_helper(netif, NETOPT_L2_GROUP_LEAVE,
+                                        l2_group_data, (uint16_t)l2_group_len);
+        /* link layer does not support multicast, but might still have used
+         * broadcast */
+        if ((res != -ENOTSUP) && (res < 0)) {
+            DEBUG("gnrc_netif: error leaving link layer group\n");
+        }
+    }
     if (idx >= 0) {
         ipv6_addr_set_unspecified(&netif->ipv6.groups[idx]);
         /* TODO:

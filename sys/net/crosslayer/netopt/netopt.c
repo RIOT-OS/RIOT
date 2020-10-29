@@ -122,6 +122,8 @@ static const char *_netopt_strmap[] = {
     [NETOPT_NUM_GATEWAYS]          = "NETOPT_NUM_GATEWAYS",
     [NETOPT_LINK_CHECK]            = "NETOPT_LINK_CHECK",
     [NETOPT_RSSI]                  = "NETOPT_RSSI",
+    [NETOPT_L2_GROUP]              = "NETOPT_L2_GROUP",
+    [NETOPT_L2_GROUP_LEAVE]        = "NETOPT_L2_GROUP_LEAVE",
     [NETOPT_NUMOF]                 = "NETOPT_NUMOF",
 };
 

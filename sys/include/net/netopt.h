@@ -748,6 +748,21 @@ typedef enum {
     NETOPT_RSSI,
 
     /**
+     * @brief   (array of byte array) get link layer multicast groups as array
+     *          of byte arrays (length of each byte array corresponds to the
+     *          length of @ref NETOPT_ADDRESS) or join a link layer multicast
+     *          group as byte array on an interface
+     *
+     * When getting the option you can pass an array of byte arrays of any
+     * length greater than 0 to the getter. The array will be filled up to to
+     * its maximum and the remaining addresses on the interface will be ignored
+     */
+    NETOPT_L2_GROUP,
+    /**
+     * @brief   (array of byte arrays) Leave an link layer multicast group
+     */
+    NETOPT_L2_GROUP_LEAVE,
+    /**
      * @brief   maximum number of options defined here.
      *
      * @note    Interfaces are not meant to respond to this option
