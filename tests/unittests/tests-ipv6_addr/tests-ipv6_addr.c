@@ -1056,6 +1056,30 @@ static void test_ipv6_addr_split_prefix__with_prefix(void)
     TEST_ASSERT_EQUAL_INT(strcmp("fd00:dead:beef::1", a), 0);
 }
 
+static void test_ipv6_addr_from_buf__success(void)
+{
+    ipv6_addr_t a = { {
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 255, 255, 255, 255
+        }
+    };
+    ipv6_addr_t result;
+
+#ifdef MODULE_IPV4_ADDR
+    TEST_ASSERT_NOT_NULL(ipv6_addr_from_buf(&result, "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255%tap0", 45));
+#else
+    TEST_ASSERT_NOT_NULL(ipv6_addr_from_buf(&result, "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff%tap0", 39));
+#endif
+    TEST_ASSERT(ipv6_addr_equal(&a, &result));
+}
+
+static void test_ipv6_addr_from_buf__too_long_len(void)
+{
+    ipv6_addr_t result;
+
+    TEST_ASSERT_NULL(ipv6_addr_from_buf(&result, "::1", IPV6_ADDR_MAX_STR_LEN + 1));
+}
+
 Test *tests_ipv6_addr_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -1148,6 +1172,8 @@ Test *tests_ipv6_addr_tests(void)
         new_TestFixture(test_ipv6_addr_split_iface__with_iface),
         new_TestFixture(test_ipv6_addr_split_prefix__no_prefix),
         new_TestFixture(test_ipv6_addr_split_prefix__with_prefix),
+        new_TestFixture(test_ipv6_addr_from_buf__success),
+        new_TestFixture(test_ipv6_addr_from_buf__too_long_len),
     };
 
     EMB_UNIT_TESTCALLER(ipv6_addr_tests, NULL, NULL, fixtures);
