@@ -8,3 +8,5 @@
 config BOARD_COMMON_NUCLEO144
     bool
     select HAS_ARDUINO
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"
