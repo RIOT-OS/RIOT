@@ -153,7 +153,12 @@ gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr
     return (res < 0) ? NULL : &rbuf[res];
 }
 
-
+gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_get_by_datagram(
+    const gnrc_netif_hdr_t *netif_hdr,
+    uint16_t tag)
+{
+    return _rbuf_get_by_tag(netif_hdr, tag);
+}
 
 bool gnrc_sixlowpan_frag_rb_exists(const gnrc_netif_hdr_t *netif_hdr,
                                    uint16_t tag)
