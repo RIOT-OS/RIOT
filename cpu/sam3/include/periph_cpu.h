@@ -66,9 +66,14 @@ typedef uint32_t gpio_t;
 #define TIMER_MAX_VAL       (0xffffffff)
 
 /**
- * @brief   We use 3 channels for each defined timer
+ * @brief   We use one channel for each defined timer
+ *
+ * While the peripheral provides three channels, the current interrupt
+ * flag handling leads to a race condition where calling timer_clear() on one
+ * channel can disable a pending flag for other channels.
+ * Until resolved, limit the peripheral to only one channel.
  */
-#define TIMER_CHANNEL_NUMOF (3)
+#define TIMER_CHANNEL_NUMOF (1)
 
 /**
  * @brief   The RTT width is fixed to 32-bit
