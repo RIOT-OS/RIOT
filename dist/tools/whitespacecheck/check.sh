@@ -6,13 +6,13 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
-IGNORE=`awk '{ printf ":!%s ", $0 }' $(dirname "$0")/ignore_list.txt`
+IGNORE=$(awk '{ printf ":!%s ", $0 }' "$(dirname "$0")/ignore_list.txt")
 
 # If no branch but an option is given, unset BRANCH.
 # Otherwise, consume this parameter.
 BRANCH="${1}"
 if echo "${BRANCH}" | grep -q '^-'; then
-    if [ $(git rev-parse --abbrev-ref HEAD) != "master" ]; then
+    if [ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]; then
         BRANCH="master"
     else
         BRANCH=""
@@ -30,15 +30,18 @@ if [ -z "${BRANCH}" ]; then
 fi
 
 git -c core.whitespace="tab-in-indent,tabwidth=4" \
-    diff --check $(git merge-base ${BRANCH} HEAD) -- *.[ch] ${IGNORE}
+    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- *.[ch] ${IGNORE}
 
 RESULT=$?
 
 # Git regards any trailing white space except `\n` as an error so `\r` is
 # checked here, too
 git -c core.whitespace="trailing-space" \
-    diff --check $(git merge-base ${BRANCH} HEAD) -- . ${IGNORE}
-if [ $? -ne 0 ] || [ $RESULT -ne 0 ]
+    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- . ${IGNORE}
+
+TRAILING_RESULT=$?
+
+if [ ${TRAILING_RESULT} -ne 0 ] || [ ${RESULT} -ne 0 ]
 then
     echo "ERROR: This change introduces new whitespace errors"
     exit 1
