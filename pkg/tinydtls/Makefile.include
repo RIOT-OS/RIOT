@@ -39,11 +39,6 @@ ifeq (,$(CONFIG_KCONFIG_PKG_TINYDTLS))
   endif
 endif
 
-ifneq (,$(filter -DDTLS_DEBUG,$(CFLAGS)))
-  # For backwards compability. This can be removed after release 2020.10
-  $(warning Warning! DTLS_DEBUG is deprecated use CONFIG_DTLS_DEBUG)
-  CFLAGS += -DCONFIG_DTLS_DEBUG
-endif
 ifneq (,$(or $(CONFIG_DTLS_DEBUG),$(filter -DCONFIG_DTLS_DEBUG,$(CFLAGS))))
   CFLAGS += -DTINYDTLS_LOG_LVL=6
 else
@@ -58,20 +53,10 @@ endif
 # Translate 'CONFIG_' options to package specific flags. This checks if the
 # option is being set via Kconfig or CFLAGS
 
-ifneq (,$(filter -DDTLS_PSK,$(CFLAGS)))
-  # For backwards compability. This can be removed after release 2020.10
-  $(warning Warning! DTLS_PSK is deprecated use CONFIG_DTLS_PSK)
-  CFLAGS += -DCONFIG_DTLS_PSK
-endif
 ifneq (,$(or $(CONFIG_DTLS_PSK),$(filter -DCONFIG_DTLS_PSK,$(CFLAGS))))
     CFLAGS += -DDTLS_PSK
 endif
 
-ifneq (,$(filter -DDTLS_ECC,$(CFLAGS)))
-  # For backwards compability. This can be removed after release 2020.10
-  $(warning Warning! DTLS_ECC is deprecated use CONFIG_DTLS_ECC)
-  CFLAGS += -DCONFIG_DTLS_ECC
-endif
 ifneq (,$(or $(CONFIG_DTLS_ECC),$(filter -DCONFIG_DTLS_ECC,$(CFLAGS))))
     CFLAGS += -DDTLS_ECC
 endif
