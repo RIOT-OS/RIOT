@@ -54,7 +54,7 @@ typedef struct {
  * @param[in]   max_val maximum value this timer supports
  */
 void ztimer_periph_timer_init(ztimer_periph_timer_t *clock, tim_t dev,
-                              unsigned long freq, uint32_t max_val);
+                              uint32_t freq, uint32_t max_val);
 
 #ifdef __cplusplus
 }

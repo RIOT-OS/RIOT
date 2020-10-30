@@ -74,8 +74,7 @@ static const ztimer_ops_t _ztimer_periph_timer_ops = {
 };
 
 void ztimer_periph_timer_init(ztimer_periph_timer_t *clock, tim_t dev,
-                              unsigned long freq,
-                              uint32_t max_val)
+                              uint32_t freq, uint32_t max_val)
 {
     clock->dev = dev;
     clock->super.ops = &_ztimer_periph_timer_ops;
