@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <inttypes.h>
+
 /* WARNING! enable debugging will have timing side effects and can lead
  * to timer underflows, system crashes or system dead locks in worst case. */
 #define ENABLE_DEBUG 0
@@ -113,9 +115,10 @@ void IRAM hw_timer_handler(void* arg)
     irq_isr_exit();
 }
 
-int timer_init (tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init (tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
-    DEBUG("%s dev=%u freq=%lu cb=%p arg=%p\n", __func__, dev, freq, cb, arg);
+    DEBUG("%s dev=%u freq=%" PRIu32 " cb=%p arg=%p\n",
+          __func__, dev, freq, cb, arg);
 
     CHECK_PARAM_RET (dev  <  HW_TIMER_NUMOF, -1);
     CHECK_PARAM_RET (freq == XTIMER_HZ_BASE, -1);
@@ -378,7 +381,7 @@ void IRAM os_timer_handler (void* arg)
     irq_isr_exit ();
 }
 
-int timer_init (tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init (tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
     DEBUG("%s dev=%u freq=%lu cb=%p arg=%p\n", __func__, dev, freq, cb, arg);
 

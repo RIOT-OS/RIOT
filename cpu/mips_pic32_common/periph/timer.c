@@ -120,7 +120,7 @@ int gettimeofday(struct timeval *__restrict __p, void *__restrict __tz)
     return 0;
 }
 
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
     assert(dev == 0);
 

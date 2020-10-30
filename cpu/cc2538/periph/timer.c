@@ -183,7 +183,7 @@ static inline cc2538_gptimer_t *dev(tim_t tim)
  * @brief Setup the given timer
  *
  */
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 {
     DEBUG("%s(%u, %lu, %p, %p)\n", __FUNCTION__, tim, freq, cb, arg);
 

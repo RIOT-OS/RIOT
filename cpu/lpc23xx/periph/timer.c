@@ -127,7 +127,7 @@ static inline void pwr_clk_and_isr(tim_t tim, uint32_t scale)
     }
 }
 
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 {
     /* get the timers base register */
     lpc23xx_timer_t *dev = get_dev(tim);

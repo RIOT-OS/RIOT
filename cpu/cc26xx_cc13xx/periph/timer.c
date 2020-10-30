@@ -98,7 +98,7 @@ static inline gpt_reg_t *dev(tim_t tim)
     return ((gpt_reg_t *)(GPT0_BASE | (((uint32_t)tim) << 12)));
 }
 
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 {
     DEBUG("timer_init(%u, %lu)\n", tim, freq);
     /* make sure given timer is valid */
