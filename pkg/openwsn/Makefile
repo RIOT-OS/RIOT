@@ -45,14 +45,13 @@ OPENWSN_PATH_openapps       = openapps
 OPENWSN_PATH_openweb        = openweb
 OPENWSN_PATH_drivers        = drivers/common
 OPENWSN_PATH_crypto         = drivers/common/crypto
-OPENWSN_PATH_openos         = kernel/openos
 OPENWSN_PATH_cjoin          = openapps/cjoin
-OPENWSN_PATH_opencoap       = openweb/opencoap
+OPENWSN_PATH_coap           = openweb/opencoap
 OPENWSN_PATH_mac_low        = openstack/02a-MAClow
 OPENWSN_PATH_mac_high       = openstack/02b-MAChigh
 OPENWSN_PATH_iphc           = openstack/03a-IPHC
 OPENWSN_PATH_ipv6           = openstack/03b-IPv6
-OPENWSN_PATH_transport      = openstack/04-TRAN
+OPENWSN_PATH_udp            = openstack/04-TRAN
 OPENWSN_PATH_crosslayers    = openstack/cross-layers
 
 all: $(OPENWSN_MODULES)

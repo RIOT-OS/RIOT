@@ -45,34 +45,8 @@ ifneq (,$(filter openwsn_riotos,$(USEMODULE)))
 endif
 
 # Set OpenWSN configurations flags, see $(PKG_SOURCE_DIR)/openwsn-fw/inc/config.h
-
 ifneq (,$(filter openwsn_cjoin,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_CJOIN_C
-  CFLAGS += -DBOARD_CRYPTOENGINE_ENABLED
-endif
-
-ifneq (,$(filter openwsn_transport,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_UDP_C
-endif
-
-ifneq (,$(filter openwsn_opencoap,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_COAP_C
-endif
-
-ifneq (,$(filter openwsn_6lo_frag,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_6LO_FRAGMENTATION_C
-endif
-
-ifneq (,$(filter openwsn_icmpv6_echo,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_ICMPV6ECHO_C
-endif
-
-ifneq (,$(filter openwsn_iee802154e_security,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_IEEE802154E_SECURITY_C
-endif
-
-ifneq (,$(filter openwsn_adaptive_msf,$(USEMODULE)))
-  CFLAGS += -DOPENWSN_ADAPTIVE_MSF
+  CFLAGS += -DBOARD_CRYPTOENGINE_ENABLED=1
 endif
 
 ifneq (,$(filter openwsn_sock%,$(USEMODULE)))
