@@ -125,7 +125,8 @@ static int _parse_dns_reply(uint8_t *buf, size_t len, void* addr_out, int family
             return tmp;
         }
         bufpos += tmp;
-        if ((bufpos + RR_TYPE_LENGTH + RR_CLASS_LENGTH + RR_TTL_LENGTH) >= buflim) {
+        if ((bufpos + RR_TYPE_LENGTH + RR_CLASS_LENGTH +
+             RR_TTL_LENGTH + sizeof(uint16_t)) >= buflim) {
             return -EBADMSG;
         }
         uint16_t _type = ntohs(_get_short(bufpos));
