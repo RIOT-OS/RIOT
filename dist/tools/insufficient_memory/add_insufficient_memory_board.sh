@@ -7,6 +7,8 @@
 # directory for more details.
 #
 
+MAKE_ARGS="-j4"
+
 if [ -z $1 ]; then
     echo "usage: $0 <board>"
     exit 1
@@ -30,21 +32,27 @@ else
     CRESET=
 fi
 
+if [ "$1" == "--no-docker" ]; then
+    LOCAL_MAKE_ARGS=${MAKE_ARGS}
+    shift 1
+else
+    # Use a standardized build within Docker and with minimal output
+    export DOCKER_MAKE_ARGS=${MAKE_ARGS}
+    export BUILD_IN_DOCKER=1
+fi
+
+export RIOT_CI_BUILD=1
+
 BOARD=$1
 RIOTBASE=$(dirname $0)/../../..
 APPLICATIONS+=examples/*/Makefile
 APPLICATIONS+=" "
 APPLICATIONS+=tests/*/Makefile
 
-# Use a standardized build within Docker and with minimal output
-export BUILD_IN_DOCKER=1
-export DOCKER_MAKE_ARGS="-j4"
-export RIOT_CI_BUILD=1
-
 for app in ${APPLICATIONS}; do
     application=$(dirname ${app})
     printf "${CNORMAL}%-40s${CRESET}" ${application}
-    output=$(make BOARD=${BOARD} -C ${RIOTBASE}/${application} 2>&1)
+    output=$(make BOARD=${BOARD} ${LOCAL_MAKE_ARGS} -C ${RIOTBASE}/${application} 2>&1)
     if [ $? != 0 ]; then
         if echo ${output} | grep -e overflowed -e "not within region" > /dev/null; then
             printf "${CBIG}%s${CRESET}\n" "too big"
