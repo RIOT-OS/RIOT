@@ -87,7 +87,7 @@ static inline bool is_oneshot(tim_t tim, int chan)
 
 #endif /* MODULE_PERIPH_TIMER_PERIODIC */
 
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 {
     /* check if device is valid */
     if (tim >= TIMER_NUMOF) {

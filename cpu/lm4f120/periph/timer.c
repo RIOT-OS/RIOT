@@ -63,7 +63,7 @@ static inline uint32_t _llvalue_to_scaled_value(uint64_t corrected,
     return scaledv;
 }
 
-int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t tim, uint32_t freq, timer_cb_t cb, void *arg)
 {
     if (tim >= TIMER_NUMOF){
         return -1;

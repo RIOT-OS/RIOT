@@ -127,7 +127,7 @@ typedef struct {
  * @return                  0 on success
  * @return                  -1 if speed not applicable or unknown device given
  */
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg);
+int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg);
 
 /**
  * @brief Set a given timer channel for the given timer device

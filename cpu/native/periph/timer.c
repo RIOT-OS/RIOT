@@ -81,7 +81,7 @@ void native_isr_timer(void)
     _callback(_cb_arg, 0);
 }
 
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
     (void)freq;
     DEBUG("%s\n", __func__);

@@ -39,7 +39,7 @@
  */
 static timer_isr_ctx_t config[TIMER_NUMOF];
 
-int timer_init(tim_t dev, unsigned long freq, timer_cb_t cb, void *arg)
+int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 {
     if (dev == 0) {
         /* save callback */
