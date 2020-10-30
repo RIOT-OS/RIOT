@@ -153,6 +153,66 @@ For instructions on how to configure via `CFLAGS` check the
 @ref config "identified compile-time configurations". To learn how to use
 Kconfig in RIOT, please refer to the @ref kconfig-users-guide.
 
+Use Docker to build RIOT                           {#docker}
+========================
+[Docker](https://www.docker.com/) is a platform that allows packaging software into containers that can easily be run on any Linux that has Docker installed.
+
+You can download a RIOT Docker container from the Docker Hub and then use that to build your project making use of all toolchains that we've preinstalled in the container.
+
+Setup                                              {#docker-setup}
+-----
+
+### Installing docker
+
+To use the RIOT docker build image, the Docker application needs to be installed on your system.
+To install Docker, depending on your operating system, use `sudo apt-get install docker` or a variant.
+
+The user on your computer requires permission to access and use docker. There are two ways to manage this:
+- Your OS distribution may create a group called `docker`. If so, then adding yourself to that group (and logging out and in again) should grant you permission.
+- Execute docker with sudo. This is in fact the most secure and recommended setup (see [here](https://docs.docker.com/install/linux/linux-postinstall/), [here](https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface), [here](https://www.projectatomic.io/blog/2015/08/why-we-dont-let-non-root-users-run-docker-in-centos-fedora-or-rhel/) and [here](https://fosterelli.co/privilege-escalation-via-docker.html)). No extra setup steps are needed. `make` should be instructed to use `sudo` by setting `DOCKER="sudo docker"` in the command line.
+
+Finally, download the pre-built RIOT Docker container:
+
+```console
+# docker pull riot/riotbuild
+```
+
+This will take a while. If it finishes correctly, you can then use the toolchains contained in the Docker container:
+(**from the riot root**):
+
+```console
+$ docker run --rm -i -t -u $UID -v $(pwd):/data/riotbuild riot/riotbuild ./dist/tools/compile_test/compile_test.py
+```
+
+# Usage
+
+The RIOT build system provides support for using the Docker container to build RIOT projects, so you do not need to type the long docker command line every time:
+
+(**from the directory you would normally run make, e.g. examples/default**)
+
+```console
+$ make BUILD_IN_DOCKER=1
+```
+
+If your user does not have permissions to access the Docker daemon:
+
+```console
+$ make BUILD_IN_DOCKER=1 DOCKER="sudo docker"
+```
+
+to always use Docker for building, set `BUILD_IN_DOCKER=1` (and if necessary `DOCKER="sudo docker"`) in the environment:
+
+```console
+$ export BUILD_IN_DOCKER=1
+```
+
+running make without specifying `BUILD_IN_DOCKER=1` will still use Docker (because of the environment variable)
+
+Troubleshooting                                    {#docker-troubleshooting}
+---------------
+
+On some Ubuntu versions a make with `BUILD_IN_DOCKER=1` can't resolve the host name of for example github.com. To fix this add the file `/etc/docker/daemon.json` with the address of your DNS Server.
+
 Using the native port with networking
 =====================================
 
