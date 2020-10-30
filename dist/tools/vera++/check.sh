@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Copyright 2018 Jose Ignacio Alamos <jose.alamos@haw-hamburg.de>
 #
