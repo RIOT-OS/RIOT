@@ -817,6 +817,10 @@ ifneq (,$(filter luid,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_cpuid
 endif
 
+ifneq (,$(filter nanocoap_sock,$(USEMODULE)))
+  USEMODULE += sock_udp
+endif
+
 ifneq (,$(filter nanocoap_%,$(USEMODULE)))
   USEMODULE += nanocoap
 endif
@@ -922,8 +926,11 @@ endif
 ifneq (,$(filter suit,$(USEMODULE)))
   USEPKG += nanocbor
   USEPKG += libcose
-  USEMODULE += libcose_crypt_c25519
   USEMODULE += uuid
+
+  ifeq (,$(filter libcose_crypt_%,$(USEMODULE)))
+    USEMODULE += libcose_crypt_c25519
+  endif
 
   # tests/suit_manifest has some mock implementations,
   # only add the non-mock dependencies if not building that test.
