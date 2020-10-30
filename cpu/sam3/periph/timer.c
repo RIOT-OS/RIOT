@@ -128,6 +128,14 @@ int timer_set_absolute(tim_t tim, int channel, unsigned int value)
         return -1;
     }
     (&dev(tim)->TC_CHANNEL[0].TC_RA)[channel] = value;
+
+    /* read TC status register to clear any possibly pending
+     * ISR flag (that has not been served yet).
+     * timer_clear() disables the interrupt, but does not clear the flags.
+     * if we don't clear them here, re-enabling the interrupt below
+     * can trigger for the previously disabled timer. */
+    (void)dev(tim)->TC_CHANNEL[0].TC_SR;
+
     dev(tim)->TC_CHANNEL[0].TC_IER = (TC_IER_CPAS << channel);
 
     return 0;
