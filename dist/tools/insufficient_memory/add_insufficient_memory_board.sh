@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Copyright (C) 2019 Benjamin Valentin <benjamin.valentin@ml-pa.com>
 #

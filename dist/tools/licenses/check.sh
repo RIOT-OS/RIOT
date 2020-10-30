@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Copyright 2017 Kaspar Schleiser <kaspar@schleiser.de>
 # Copyright 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>

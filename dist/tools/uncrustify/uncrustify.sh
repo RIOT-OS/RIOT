@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 RIOTBASE=$(git rev-parse --show-toplevel)
 CURDIR=$(cd "$(dirname "$0")" && pwd)
 UNCRUSTIFY_CFG="$RIOTBASE"/uncrustify-riot.cfg
