@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 DLCACHE_DIR=${DLCACHE_DIR:-~/.dlcache}
 

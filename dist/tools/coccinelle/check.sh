@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copyright 2017 Kaspar Schleiser <kaspar@schleiser.de>
 #
