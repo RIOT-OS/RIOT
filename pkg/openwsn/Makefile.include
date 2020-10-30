@@ -35,10 +35,6 @@ INCLUDES += -I$(PKGDIRBASE)/openwsn \
             -I$(PKGDIRBASE)/openwsn/openweb/opencoap \
             -I$(RIOTBASE)/pkg/openwsn/include \
 
-ifneq (,$(filter openwsn_openos,$(USEMODULE)))
-  INCLUDES += -I$(PKGDIRBASE)/openwsn/kernel/openos
-endif
-
 ifneq (,$(filter openwsn_riotos,$(USEMODULE)))
   INCLUDES += -I$(RIOTBASE)/pkg/openwsn/scheduler
   DIRS += $(RIOTBASE)/pkg/openwsn/scheduler
