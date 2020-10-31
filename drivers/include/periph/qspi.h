@@ -145,6 +145,8 @@ void qspi_init(qspi_t bus);
 /**
  * @brief   Configure the QSPI peripheral settings
  *
+ * @pre     The @p bus has been acquired with @ref qspi_acquire
+ *
  * @param[in] bus       QSPI device to configure
  * @param[in] mode      QSPI mode @see qspi_mode_t
  * @param[in] flags     QSPI Configuration Options
@@ -167,6 +169,8 @@ void qspi_acquire(qspi_t bus);
 /**
  * @brief   Finish an ongoing QSPI transaction by releasing the given QSPI bus
  *
+ * @pre     The @p bus has been acquired with @ref qspi_acquire
+ *
  * After release, the given SPI bus should be fully powered down until acquired
  * again.
  *
@@ -176,6 +180,8 @@ void qspi_release(qspi_t bus);
 
 /**
  * @brief   Execute a command with response data e.g Read Status, Read JEDEC
+ *
+ * @pre     The @p bus has been acquired with @ref qspi_acquire
  *
  * @param[in]   bus      QSPI device
  * @param[in]   command  The JEDEC command ID
@@ -190,6 +196,8 @@ ssize_t qspi_cmd_read(qspi_t bus, uint8_t command, void *response, size_t len);
 /**
  * @brief   Execute a command with data e.g Write Status, Write Enable
  *
+ * @pre     The @p bus has been acquired with @ref qspi_acquire
+ *
  * @param[in]   bus      QSPI device
  * @param[in]   command  The JEDEC command ID
  * @param[in]   data     Command parameter data, may be NULL
@@ -203,6 +211,8 @@ ssize_t qspi_cmd_write(qspi_t bus, uint8_t command, const void *data, size_t len
 /**
  * @brief   Read data from external memory.
  *          Typically it is implemented by quad read command (`0x6B`).
+ *
+ * @pre     The @p bus has been acquired with @ref qspi_acquire
  *
  * @param[in]   bus      QSPI device
  * @param[in]   address  Address to read from
@@ -220,6 +230,11 @@ ssize_t qspi_read(qspi_t bus, uint32_t addr, void *data, size_t len);
  *          Can only write 1 -> 0, so target region should erased first.
  *          Typically it uses quad write command (`0x32`).
  *
+ *          The QSPI driver will take care of setting the Write Enable
+ *          on the external flash.
+ *
+ * @pre     The @p bus has been acquired with @ref qspi_acquire
+ *
  * @param[in]   bus       QSPI device
  * @param[in]   address   Address to write to
  * @param[in]   data      Buffer to write
@@ -232,6 +247,11 @@ ssize_t qspi_write(qspi_t bus, uint32_t addr, const void *data, size_t len);
 
 /**
  * @brief   Erase external memory by address
+ *
+ *          The QSPI driver will take care of setting the Write Enable
+ *          on the external flash.
+ *
+ * @pre     The @p bus has been acquired with @ref qspi_acquire
  *
  * @param[in]   bus       QSPI device
  * @param[in]   address   The address of the block that will be erased
