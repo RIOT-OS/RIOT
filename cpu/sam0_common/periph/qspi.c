@@ -87,7 +87,7 @@ static void _run_instruction(uint8_t command, uint32_t iframe, uint32_t addr,
     QSPI->INTFLAG.reg = QSPI_INTFLAG_INSTREND;
 }
 
-void qspi_cmd_read(qspi_t bus, uint8_t command, void *response, size_t len)
+ssize_t qspi_cmd_read(qspi_t bus, uint8_t command, void *response, size_t len)
 {
     (void)bus;
 
@@ -100,9 +100,11 @@ void qspi_cmd_read(qspi_t bus, uint8_t command, void *response, size_t len)
     samd0_cache_disable();
     _run_instruction(command, iframe, 0, response, len);
     samd0_cache_enable();
+
+    return len;
 }
 
-void qspi_cmd_write(qspi_t bus, uint8_t command, const void *data, size_t len)
+ssize_t qspi_cmd_write(qspi_t bus, uint8_t command, const void *data, size_t len)
 {
     (void)bus;
 
@@ -115,9 +117,11 @@ void qspi_cmd_write(qspi_t bus, uint8_t command, const void *data, size_t len)
     samd0_cache_disable();
     _run_instruction(command, iframe, 0, (void *)data, len);
     samd0_cache_enable();
+
+    return len;
 }
 
-void qspi_read(qspi_t bus, uint32_t addr, void *data, size_t len)
+ssize_t qspi_read(qspi_t bus, uint32_t addr, void *data, size_t len)
 {
     (void)bus;
 
@@ -133,6 +137,8 @@ void qspi_read(qspi_t bus, uint32_t addr, void *data, size_t len)
     samd0_cache_disable();
     _run_instruction(SFLASH_CMD_QUAD_READ, iframe, addr, data, len);
     samd0_cache_enable();
+
+    return len;
 }
 
 void qspi_erase(qspi_t bus, uint32_t address, qspi_erase_size_t size)
@@ -148,7 +154,7 @@ void qspi_erase(qspi_t bus, uint32_t address, qspi_erase_size_t size)
     _run_instruction(size, iframe, address, NULL, 0);
 }
 
-void qspi_write(qspi_t bus, uint32_t addr, const void *data, size_t len)
+ssize_t qspi_write(qspi_t bus, uint32_t addr, const void *data, size_t len)
 {
     qspi_cmd_write(bus, SFLASH_CMD_WRITE_ENABLE, NULL, 0);
 
@@ -161,6 +167,8 @@ void qspi_write(qspi_t bus, uint32_t addr, const void *data, size_t len)
     samd0_cache_disable();
     _run_instruction(SFLASH_CMD_QUAD_PAGE_PROGRAM, iframe, addr, (void *)data, len);
     samd0_cache_enable();
+
+    return len;
 }
 
 void qspi_acquire(qspi_t bus)
