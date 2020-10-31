@@ -540,9 +540,9 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
         case NETDEV_EVENT_RX_COMPLETE:
         {
             int len;
-            uint8_t radio_payload[SX127X_RX_BUFFER_SIZE];
             len = dev->driver->recv(dev, NULL, 0, 0);
             if (len > 0) {
+                uint8_t radio_payload[SX127X_RX_BUFFER_SIZE];
                 dev->driver->recv(dev, radio_payload, len, &packet_info);
                 semtech_loramac_radio_events.RxDone(radio_payload,
                                                     len, packet_info.rssi,
