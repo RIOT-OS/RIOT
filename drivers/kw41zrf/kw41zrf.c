@@ -21,7 +21,6 @@
 
 #include "log.h"
 #include "msg.h"
-#include "luid.h"
 #include "net/gnrc.h"
 #include "net/ieee802154.h"
 
@@ -39,23 +38,24 @@
 static void kw41zrf_set_address(kw41zrf_t *dev)
 {
     DEBUG("[kw41zrf] Set MAC address\n");
-    eui64_t addr_long;
-    network_uint16_t addr_short;
-
-    /* get unique IDs to use as hardware addresses */
-    luid_get_eui64(&addr_long);
-    luid_get_short(&addr_short);
 
     /* set short and long address */
-    kw41zrf_set_addr_long(dev, &addr_long);
-    kw41zrf_set_addr_short(dev, &addr_short);
+    kw41zrf_set_addr_long(dev, (eui64_t *)&dev->netdev.long_addr);
+    kw41zrf_set_addr_short(dev, (network_uint16_t *)&dev->netdev.short_addr);
 }
 
-void kw41zrf_setup(kw41zrf_t *dev)
+void kw41zrf_setup(kw41zrf_t *dev, uint8_t index)
 {
     netdev_t *netdev = (netdev_t *)dev;
 
     netdev->driver = &kw41zrf_driver;
+
+    /* register with netdev */
+    netdev_register(netdev, NETDEV_KW41ZRF, index);
+
+    /* get unique IDs to use as hardware addresses */
+    netdev_ieee802154_setup(&dev->netdev);
+
     /* initialize device descriptor */
     dev->idle_seq = XCVSEQ_RECEIVE;
     dev->pm_blocked = 0;

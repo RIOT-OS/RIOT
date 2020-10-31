@@ -135,8 +135,10 @@ typedef struct {
  * @brief   Setup an KW41ZRF based device state
  *
  * @param[out] dev          device descriptor
+ * @param[in]  index        index of @p params in a global parameter struct array.
+ *                          If initialized manually, pass a unique identifier instead.
  */
-void kw41zrf_setup(kw41zrf_t *dev);
+void kw41zrf_setup(kw41zrf_t *dev, uint8_t index);
 
 /**
  * @brief   Initialize the given KW41ZRF device
