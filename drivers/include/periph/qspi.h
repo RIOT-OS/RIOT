@@ -170,59 +170,72 @@ void qspi_acquire(qspi_t bus);
  * After release, the given SPI bus should be fully powered down until acquired
  * again.
  *
- * @param[in] bus       QSPI device to release
+ * @param[in]   bus     QSPI device to release
  */
 void qspi_release(qspi_t bus);
 
 /**
  * @brief   Execute a command with response data e.g Read Status, Read JEDEC
  *
- * @param[in]  bus      QSPI device
- * @param[in]  command  The JEDEC command ID
- * @param[out] response Command response data, may be NULL
- * @param[in]  len      Size of the command response buffer
+ * @param[in]   bus      QSPI device
+ * @param[in]   command  The JEDEC command ID
+ * @param[out]  response Buffer for command response
+ * @param[in]   len      Size of the command response buffer
+ *
+ * @return      length of the response
+ *              negative error
  */
-void qspi_cmd_read(qspi_t bus, uint8_t command, void *response, size_t len);
+ssize_t qspi_cmd_read(qspi_t bus, uint8_t command, void *response, size_t len);
 
 /**
  * @brief   Execute a command with data e.g Write Status, Write Enable
  *
- * @param[in] bus       QSPI device
- * @param[in] command   The JEDEC command ID
- * @param[in] data      Command parameter data, may be NULL
- * @param[in] len       Size of the command response buffer
+ * @param[in]   bus      QSPI device
+ * @param[in]   command  The JEDEC command ID
+ * @param[in]   data     Command parameter data, may be NULL
+ * @param[in]   len      Size of the command response buffer
+ *
+ * @return      number of bytes written
+ *              negative error
  */
-void qspi_cmd_write(qspi_t bus, uint8_t command, const void *data, size_t len);
+ssize_t qspi_cmd_write(qspi_t bus, uint8_t command, const void *data, size_t len);
 
 /**
  * @brief   Read data from external memory.
  *          Typically it is implemented by quad read command (`0x6B`).
  *
- * @param[in]  bus      QSPI device
- * @param[in]  address  Address to read from
- * @param[out] data     Buffer to store the data
- * @param[in]  len      Nmber of byte to read
+ * @param[in]   bus      QSPI device
+ * @param[in]   address  Address to read from
+ * @param[out]  data     Buffer to store the data
+ * @param[in]   len      Number of byte to read
+ *
+ * @return      length of bytes read, may be smaller than @p len if the
+ *              driver has a maximal transfer size.
+ *              negative error
  */
-void qspi_read(qspi_t bus, uint32_t addr, void *data, size_t len);
+ssize_t qspi_read(qspi_t bus, uint32_t addr, void *data, size_t len);
 
 /**
  * @brief   Write data to external memory.
  *          Can only write 1 -> 0, so target region should erased first.
  *          Typically it uses quad write command (`0x32`).
  *
- * @param[in] bus       QSPI device
- * @param[in] address   Address to write to
- * @param[in] data      Buffer to write
- * @param[in] len       Nmber of byte to write
+ * @param[in]   bus       QSPI device
+ * @param[in]   address   Address to write to
+ * @param[in]   data      Buffer to write
+ * @param[in]   len       Number of byte to write
+ *
+ * @return      number of bytes written, may be smaller than @p len
+ *              negative error
  */
-void qspi_write(qspi_t bus, uint32_t addr, const void *data, size_t len);
+ssize_t qspi_write(qspi_t bus, uint32_t addr, const void *data, size_t len);
 
 /**
  * @brief   Erase external memory by address
  *
- * @param[in] bus       QSPI device
- * @param[in] address   The address of the block that will be reased
- * @param[in] size      The erase block size to use
+ * @param[in]   bus       QSPI device
+ * @param[in]   address   The address of the block that will be erased
+ * @param[in]   size      The erase block size to use
  */
 void qspi_erase(qspi_t bus, uint32_t address, qspi_erase_size_t size);
 
