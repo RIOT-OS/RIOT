@@ -46,6 +46,9 @@
 #define MTD_POWER_UP_WAIT_FOR_ID    (0x0F)
 #endif
 
+#define SFLASH_CMD_4_BYTE_ADDR (0xB7)   /**< enable 32 bit addressing */
+#define SFLASH_CMD_3_BYTE_ADDR (0xE9)   /**< enable 24 bit addressing */
+
 #define MTD_64K             (65536ul)
 #define MTD_64K_ADDR_MASK   (0xFFFF)
 #define MTD_32K             (32768ul)
@@ -378,6 +381,11 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
                 return -EIO;
             }
 #endif
+            /* enable 32 bit address mode */
+            if (dev->params->addr_width == 4) {
+                mtd_spi_cmd(dev, SFLASH_CMD_4_BYTE_ADDR);
+            }
+
             break;
         case MTD_POWER_DOWN:
             mtd_spi_cmd(dev, dev->params->opcode->sleep);
