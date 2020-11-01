@@ -20,6 +20,38 @@
 
 #include "board.h"
 #include "periph/gpio.h"
+#include "mtd_spi_nor.h"
+#include "timex.h"
+
+#ifdef MODULE_MTD
+/* N25Q256A */
+static const mtd_spi_nor_params_t _same54_nor_params = {
+    .opcode = &mtd_spi_nor_opcode_default,
+    .wait_chip_erase = 240 * US_PER_SEC,
+    .wait_64k_erase = 700 * US_PER_MS,
+    .wait_sector_erase = 250 * US_PER_MS,
+    .wait_chip_wake_up = 1 * US_PER_MS,
+    .clk  = MHZ(54),
+    .flag = SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_64K,
+    .spi  = SPI_DEV(2),
+    .mode = SPI_MODE_0,
+    .cs   = SAM0_QSPI_PIN_CS,
+    .wp   = SAM0_QSPI_PIN_DATA_2,
+    .hold = SAM0_QSPI_PIN_DATA_3,
+    .addr_width = 4,
+};
+
+static mtd_spi_nor_t same54_nor_dev = {
+    .base = {
+        .driver = &mtd_spi_nor_driver,
+        .page_size = 256,
+        .pages_per_sector = 16,
+    },
+    .params = &_same54_nor_params,
+};
+
+mtd_dev_t *mtd0 = (mtd_dev_t *)&same54_nor_dev;
+#endif /* MODULE_MTD */
 
 void board_init(void)
 {
