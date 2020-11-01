@@ -245,6 +245,11 @@ config HAS_PERIPH_SPI
     help
         Indicates that an SPI peripheral is present.
 
+config HAS_PERIPH_SPI_ON_QSPI
+    bool
+    help
+        Indicates that the QSPI peripheral can be used in SPI mode.
+
 config HAS_PERIPH_SPI_RECONFIGURE
     bool
     help
