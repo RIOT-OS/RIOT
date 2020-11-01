@@ -319,6 +319,7 @@ SetupAfterColdResetWakeupFromShutDownCfg3( uint32_t ccfg_ModeConfReg )
                    ((( fcfg1OscConf & FCFG1_OSC_CONF_HPOSC_DIV3_BYPASS_M         ) >> FCFG1_OSC_CONF_HPOSC_DIV3_BYPASS_S         ) << ADI_2_REFSYS_HPOSCCTL0_DIV3_BYPASS_S         )   );
             break;
         }
+        /* fall-through */
         // Not a HPOSC chip - fall through to default
     default :
         // XOSC source is a 24 MHz crystal (default)
@@ -362,6 +363,7 @@ SetupAfterColdResetWakeupFromShutDownCfg3( uint32_t ccfg_ModeConfReg )
                               IOC_STD_INPUT | IOC_HYST_ENABLE );   // Route external clock to AON IOC w/hysteresis
                                                                    // Set XOSC_LF in bypass mode to allow external 32 kHz clock
         HWREG( AUX_DDI0_OSC_BASE + DDI_O_SET + DDI_0_OSC_O_CTL0 ) = DDI_0_OSC_CTL0_XOSC_LF_DIG_BYPASS;
+        /* fall-through */
         // Fall through to set XOSC_LF as SCLK_LF source
     case 2 : // XOSC_LF -> SLCK_LF (32768 Hz)
         OSCClockSourceSet( OSC_SRC_CLK_LF, OSC_XOSC_LF );

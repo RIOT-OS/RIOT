@@ -57,6 +57,7 @@
 #include "chipinfo.h"
 #include "setup.h"
 #include "setup_rom.h"
+#include "cpu.h"
 
 //*****************************************************************************
 //
@@ -120,7 +121,7 @@ SetupTrimDevice(void)
     ThisLibraryIsFor_CC26x0_HwRev22AndLater_HaltIfViolated();
 
     // Enable standby in flash bank
-    HWREGBITW( FLASH_BASE + FLASH_O_CFG, FLASH_CFG_DIS_STANDBY_BITN ) = 0;
+    HWREGBITW( FLASH_BASEADDR + FLASH_O_CFG, FLASH_CFG_DIS_STANDBY_BITN ) = 0;
 
     // Clock must always be enabled for the semaphore module (due to ADI/DDI HW workaround)
     HWREG( AUX_WUC_BASE + AUX_WUC_O_MODCLKEN1 ) = AUX_WUC_MODCLKEN1_SMPH;
@@ -192,7 +193,7 @@ SetupTrimDevice(void)
 
     // Configure optimal wait time for flash FSM in cases where flash pump
     // wakes up from sleep
-    HWREG(FLASH_BASE + FLASH_O_FPAC1) = (HWREG(FLASH_BASE + FLASH_O_FPAC1) &
+    HWREG(FLASH_BASEADDR + FLASH_O_FPAC1) = (HWREG(FLASH_BASEADDR + FLASH_O_FPAC1) &
                                          ~FLASH_FPAC1_PSLEEPTDIS_M) |
                                         (0x139<<FLASH_FPAC1_PSLEEPTDIS_S);
 
@@ -337,7 +338,7 @@ TrimAfterColdResetWakeupFromShutDown(uint32_t ui32Fcfg1Revision)
     HWREG( AUX_WUC_BASE + AUX_WUC_O_MODCLKEN0 ) = AUX_WUC_MODCLKEN0_AUX_DDI0_OSC;
 
     // Disable EFUSE clock
-    HWREGBITW( FLASH_BASE + FLASH_O_CFG, FLASH_CFG_DIS_EFUSECLK_BITN ) = 1;
+    HWREGBITW( FLASH_BASEADDR + FLASH_O_CFG, FLASH_CFG_DIS_EFUSECLK_BITN ) = 1;
 }
 
 

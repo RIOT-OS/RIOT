@@ -68,6 +68,7 @@ extern "C"
 #include "../inc/hw_aon_rtc.h"
 #include "interrupt.h"
 #include "debug.h"
+#include "../../include/cc26x0_prcm.h"
 
 //*****************************************************************************
 //

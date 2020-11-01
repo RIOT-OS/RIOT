@@ -458,7 +458,7 @@ IOCPinTypeGpioOutput(uint32_t ui32IOId)
 //
 //*****************************************************************************
 void
-IOCPinTypeUart(uint32_t ui32Base, uint32_t ui32Rx, uint32_t ui32Tx,
+IOCPinTypeUart(__attribute__ ((unused)) uint32_t ui32Base, uint32_t ui32Rx, uint32_t ui32Tx,
                uint32_t ui32Cts, uint32_t ui32Rts)
 {
     // Check the arguments.
@@ -609,7 +609,7 @@ IOCPinTypeSsiSlave(uint32_t ui32Base, uint32_t ui32Rx,
 //
 //*****************************************************************************
 void
-IOCPinTypeI2c(uint32_t ui32Base, uint32_t ui32Data, uint32_t ui32Clk)
+IOCPinTypeI2c(__attribute__ ((unused)) uint32_t ui32Base, uint32_t ui32Data, uint32_t ui32Clk)
 {
     uint32_t ui32IOConfig;
 

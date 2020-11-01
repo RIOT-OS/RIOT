@@ -43,6 +43,7 @@
 #include "aon_rtc.h"
 #include "osc.h"
 #include "setup_rom.h"
+#include "cpu.h"
 
 //*****************************************************************************
 //

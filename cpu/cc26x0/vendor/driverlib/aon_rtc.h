@@ -65,6 +65,7 @@ extern "C"
 #include "../inc/hw_memmap.h"
 #include "../inc/hw_aon_rtc.h"
 #include "debug.h"
+#include "../../include/cc26x0_prcm.h"
 
 //*****************************************************************************
 //
