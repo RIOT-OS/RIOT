@@ -80,6 +80,31 @@ static inline bool _use_dma(spi_t bus)
 #endif
 }
 
+static inline void _init_dma(spi_t bus, volatile void *reg_rx, volatile void *reg_tx)
+{
+    if (!_use_dma(bus)) {
+        return;
+    }
+
+#ifdef MODULE_PERIPH_DMA
+    _dma_state[bus].rx_dma = dma_acquire_channel();
+    _dma_state[bus].tx_dma = dma_acquire_channel();
+
+    dma_setup(_dma_state[bus].tx_dma,
+              spi_config[bus].tx_trigger, 0, false);
+    dma_setup(_dma_state[bus].rx_dma,
+              spi_config[bus].rx_trigger, 1, true);
+
+    dma_prepare(_dma_state[bus].rx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
+                reg_rx, NULL, 1, 0);
+    dma_prepare(_dma_state[bus].tx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
+                NULL, reg_tx, 0, 0);
+#else
+    (void)reg_rx;
+    (void)reg_tx;
+#endif
+}
+
 void spi_init(spi_t bus)
 {
     /* make sure given bus is good */
@@ -99,27 +124,16 @@ void spi_init(spi_t bus)
     while ((dev(bus)->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST) ||
            (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_SWRST)) {}
 
-    /* configure base clock: using GLK GEN 0 */
+    /* configure base clock */
     sercom_set_gen(dev(bus), spi_config[bus].gclk_src);
 
     /* enable receiver and configure character size to 8-bit
      * no synchronization needed, as SERCOM device is not enabled */
     dev(bus)->CTRLB.reg = (SERCOM_SPI_CTRLB_CHSIZE(0) | SERCOM_SPI_CTRLB_RXEN);
 
-#ifdef MODULE_PERIPH_DMA
-    if (_use_dma(bus)) {
-        _dma_state[bus].rx_dma = dma_acquire_channel();
-        _dma_state[bus].tx_dma = dma_acquire_channel();
-        dma_setup(_dma_state[bus].tx_dma,
-                  spi_config[bus].tx_trigger, 0, false);
-        dma_setup(_dma_state[bus].rx_dma,
-                  spi_config[bus].rx_trigger, 1, true);
-        dma_prepare(_dma_state[bus].rx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
-                    (void*)&dev(bus)->DATA.reg, NULL, 1, 0);
-        dma_prepare(_dma_state[bus].tx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
-                    NULL, (void*)&dev(bus)->DATA.reg, 0, 0);
-    }
-#endif
+    /* set up DMA channels */
+    _init_dma(bus, &dev(bus)->DATA.reg, &dev(bus)->DATA.reg);
+
     /* put device back to sleep */
     poweroff(bus);
 
@@ -164,9 +178,9 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
      * efficiency reason we do that here, so we can do all in one single write
      * to the CTRLA register */
     const uint32_t ctrla = SERCOM_SPI_CTRLA_MODE(0x3)       /* 0x3 -> master */
-                           | SERCOM_SPI_CTRLA_DOPO(spi_config[bus].mosi_pad)
-                           | SERCOM_SPI_CTRLA_DIPO(spi_config[bus].miso_pad)
-                           | (mode << SERCOM_SPI_CTRLA_CPHA_Pos);
+                         | SERCOM_SPI_CTRLA_DOPO(spi_config[bus].mosi_pad)
+                         | SERCOM_SPI_CTRLA_DIPO(spi_config[bus].miso_pad)
+                         | (mode << SERCOM_SPI_CTRLA_CPHA_Pos);
 
     /* get exclusive access to the device */
     mutex_lock(&locks[bus]);
@@ -218,11 +232,18 @@ static void _blocking_transfer(spi_t bus, const void *out, void *in, size_t len)
     const uint8_t *out_buf = out;
     uint8_t *in_buf = in;
 
-    for (int i = 0; i < (int)len; i++) {
+    for (size_t i = 0; i < len; i++) {
         uint8_t tmp = (out_buf) ? out_buf[i] : 0;
+
+        /* transmit byte on MOSI */
         dev(bus)->DATA.reg = tmp;
-        while (!(dev(bus)->INTFLAG.reg & SERCOM_SPI_INTFLAG_RXC)) {}
-        tmp = (uint8_t)dev(bus)->DATA.reg;
+
+        /* wait until byte has been sampled on MISO */
+        while (dev(bus)->INTFLAG.bit.RXC == 0) {}
+
+        /* consume the byte */
+        tmp = dev(bus)->DATA.reg;
+
         if (in_buf) {
             in_buf[i] = tmp;
         }
@@ -273,6 +294,7 @@ static void _dma_transfer_regs(spi_t bus, uint8_t reg, const uint8_t *out,
 
     _dma_execute(bus);
 }
+
 void spi_transfer_regs(spi_t bus, spi_cs_t cs,
                        uint8_t reg, const void *out, void *in, size_t len)
 {
@@ -312,6 +334,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     if (cs != SPI_CS_UNDEF) {
         gpio_clear((gpio_t)cs);
     }
+
     if (_use_dma(bus)) {
 #ifdef MODULE_PERIPH_DMA
         /* The DMA promises not to modify the const out data */
