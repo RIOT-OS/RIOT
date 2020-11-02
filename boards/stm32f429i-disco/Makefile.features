@@ -1,1 +1,3 @@
+FEATURES_PROVIDED += highlevel_stdio
+
 include $(RIOTBOARD)/stm32f429i-disc1/Makefile.features

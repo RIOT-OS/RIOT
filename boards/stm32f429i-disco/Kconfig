@@ -22,4 +22,5 @@ config BOARD_STM32F429I_DISCO
     select HAS_PERIPH_USBDEV
 
     # Put other features for this board (in alphabetical order)
+    select HAS_HIGHLEVEL_STDIO
     select HAS_RIOTBOOT
