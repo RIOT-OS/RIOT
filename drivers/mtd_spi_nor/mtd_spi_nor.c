@@ -359,6 +359,26 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
     DEBUG("\n");
 }
 
+static void _init_pins(mtd_spi_nor_t *dev)
+{
+    DEBUG("mtd_spi_nor_init: init pins\n");
+
+    /* CS */
+    spi_init_cs(_get_spi(dev), dev->params->cs);
+
+    /* Write Protect - not used by the driver */
+    if (gpio_is_valid(dev->params->wp)) {
+        gpio_init(dev->params->wp, GPIO_OUT);
+        gpio_set(dev->params->wp);
+    }
+
+    /* Hold - not used by the driver */
+    if (gpio_is_valid(dev->params->hold)) {
+        gpio_init(dev->params->hold, GPIO_OUT);
+        gpio_set(dev->params->hold);
+    }
+}
+
 static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
 {
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
@@ -408,9 +428,8 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
         return -EINVAL;
     }
 
-    /* CS */
-    DEBUG("mtd_spi_nor_init: CS init\n");
-    spi_init_cs(_get_spi(dev), dev->params->cs);
+    /* CS, WP, Hold */
+    _init_pins(dev);
 
     /* power up the MTD device*/
     DEBUG("mtd_spi_nor_init: power up MTD device");
