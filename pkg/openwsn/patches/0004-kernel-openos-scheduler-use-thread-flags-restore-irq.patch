@@ -1,7 +1,7 @@
-From 5630298719fb089c36250ad8bb7b4a5fe803a795 Mon Sep 17 00:00:00 2001
+From cce174546a58a0d0dc170bc641f89ab86f38547c Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Sun, 29 Mar 2020 12:11:53 +0200
-Subject: [PATCH 04/10] kernel/openos/scheduler: use thread flags, restore
+Subject: [PATCH 04/11] kernel/openos/scheduler: use thread flags, restore
  irq_state
 
 Use thread_flags_wait_any to pause the scheduler. Set flag in

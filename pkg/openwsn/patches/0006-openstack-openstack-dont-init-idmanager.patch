@@ -1,7 +1,7 @@
-From 3a6c00dcf2ae76ce47e0d6c70bbc3a60f8b6e930 Mon Sep 17 00:00:00 2001
+From 0aac1d530e20b0773775e40fa81694f20fcaa443 Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Fri, 15 May 2020 13:45:02 +0200
-Subject: [PATCH 06/10] openstack/openstack: dont init idmanager
+Subject: [PATCH 06/11] openstack/openstack: dont init idmanager
 
 Dont initiate idmanager in OpenWSN but in RIOT to allow overriding
 default short address.

@@ -1,7 +1,7 @@
-From 6c87c5ab22a266951db6e23f2aafa1f57cf01f8e Mon Sep 17 00:00:00 2001
+From cce2ccd31b931d1b739e05e124af709e56359a59 Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Fri, 27 Mar 2020 10:18:16 +0100
-Subject: [PATCH 07/10] openstack/openapps: add debugging
+Subject: [PATCH 07/11] openstack/openapps: add debugging
 
 Debugging info that can be also be obtained through ifconfig in
 tests/openwsn.
