@@ -46,6 +46,9 @@
 #define MTD_POWER_UP_WAIT_FOR_ID    (0x0F)
 #endif
 
+#define SFLASH_CMD_4_BYTE_ADDR (0xB7)   /**< enable 32 bit addressing */
+#define SFLASH_CMD_3_BYTE_ADDR (0xE9)   /**< enable 24 bit addressing */
+
 #define MTD_64K             (65536ul)
 #define MTD_64K_ADDR_MASK   (0xFFFF)
 #define MTD_32K             (32768ul)
@@ -356,6 +359,26 @@ static inline void wait_for_write_complete(const mtd_spi_nor_t *dev, uint32_t us
     DEBUG("\n");
 }
 
+static void _init_pins(mtd_spi_nor_t *dev)
+{
+    DEBUG("mtd_spi_nor_init: init pins\n");
+
+    /* CS */
+    spi_init_cs(_get_spi(dev), dev->params->cs);
+
+    /* Write Protect - not used by the driver */
+    if (gpio_is_valid(dev->params->wp)) {
+        gpio_init(dev->params->wp, GPIO_OUT);
+        gpio_set(dev->params->wp);
+    }
+
+    /* Hold - not used by the driver */
+    if (gpio_is_valid(dev->params->hold)) {
+        gpio_init(dev->params->hold, GPIO_OUT);
+        gpio_set(dev->params->hold);
+    }
+}
+
 static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
 {
     mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
@@ -378,6 +401,11 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
                 return -EIO;
             }
 #endif
+            /* enable 32 bit address mode */
+            if (dev->params->addr_width == 4) {
+                mtd_spi_cmd(dev, SFLASH_CMD_4_BYTE_ADDR);
+            }
+
             break;
         case MTD_POWER_DOWN:
             mtd_spi_cmd(dev, dev->params->opcode->sleep);
@@ -396,13 +424,12 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %lx, opcodes: %p\n",
           (unsigned long)_get_spi(dev), (unsigned long)dev->params->cs, (void *)dev->params->opcode);
 
-    if (dev->params->addr_width == 0) {
-        return -EINVAL;
-    }
+    /* verify configuration */
+    assert(dev->params->addr_width > 0);
+    assert(dev->params->addr_width <= 4);
 
-    /* CS */
-    DEBUG("mtd_spi_nor_init: CS init\n");
-    spi_init_cs(_get_spi(dev), dev->params->cs);
+    /* CS, WP, Hold */
+    _init_pins(dev);
 
     /* power up the MTD device*/
     DEBUG("mtd_spi_nor_init: power up MTD device");

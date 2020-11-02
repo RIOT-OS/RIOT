@@ -38,6 +38,8 @@ static const mtd_spi_nor_params_t _weact_nor_params = {
     .spi = WEACT_411CE_NOR_SPI_DEV,
     .mode = WEACT_411CE_NOR_SPI_MODE,
     .cs = WEACT_411CE_NOR_SPI_CS,
+    .wp = GPIO_UNDEF,
+    .hold = GPIO_UNDEF,
     .addr_width = 3,
 };
 

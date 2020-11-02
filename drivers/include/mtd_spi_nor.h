@@ -111,6 +111,8 @@ typedef struct {
     spi_t spi;               /**< SPI bus the device is connected to */
     spi_mode_t mode;         /**< SPI mode */
     gpio_t cs;               /**< CS pin GPIO handle */
+    gpio_t wp;               /**< Write Protect pin GPIO handle */
+    gpio_t hold;             /**< HOLD pin GPIO handle */
     uint8_t addr_width;      /**< Number of bytes in addresses, usually 3 for small devices */
 } mtd_spi_nor_params_t;
 
