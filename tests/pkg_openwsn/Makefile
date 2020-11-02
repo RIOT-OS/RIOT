@@ -35,6 +35,7 @@ BOARD_WHITELIST = \
 USEPKG += openwsn
 USEMODULE += openwsn_openstack
 USEMODULE += sock_udp
+USEMODULE += sock_async
 
 # Optional OpenWSN Modules
 ## Enable Constrained Join Protocol (CoJP)
