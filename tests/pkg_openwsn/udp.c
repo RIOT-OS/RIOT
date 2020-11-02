@@ -20,6 +20,7 @@
  * @}
  */
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -75,14 +76,12 @@ void udp_cli_init(void)
     local.port = WKP_UDP_ECHO;
 
     if (sock_udp_create(&_sock_udp, &local, NULL, 0) < 0) {
-        puts("Could not create socket\n");
+        puts("Could not create socket");
         return;
     }
 
     sock_udp_set_cb(&_sock_udp, _sock_udp_handler, NULL);
 }
-
-#include "errno.h"
 
 static int udp_send(char *addr_str, char *port_str, char *data,
                     unsigned int num, unsigned int delay)
