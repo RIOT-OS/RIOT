@@ -10,3 +10,5 @@ FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_usbdev
+
+FEATURES_PROVIDED += highlevel_stdio
