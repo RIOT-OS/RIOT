@@ -424,9 +424,9 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %lx, opcodes: %p\n",
           (unsigned long)_get_spi(dev), (unsigned long)dev->params->cs, (void *)dev->params->opcode);
 
-    if (dev->params->addr_width == 0) {
-        return -EINVAL;
-    }
+    /* verify configuration */
+    assert(dev->params->addr_width > 0);
+    assert(dev->params->addr_width <= 4);
 
     /* CS, WP, Hold */
     _init_pins(dev);
