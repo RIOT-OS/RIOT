@@ -36,6 +36,8 @@ static const mtd_spi_nor_params_t _ikea_tradfri_nor_params = {
     .spi = IKEA_TRADFRI_NOR_SPI_DEV,
     .mode = IKEA_TRADFRI_NOR_SPI_MODE,
     .cs = IKEA_TRADFRI_NOR_SPI_CS,
+    .wp = GPIO_UNDEF,
+    .hold = GPIO_UNDEF,
     .addr_width = 3,
 };
 
