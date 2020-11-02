@@ -104,7 +104,8 @@ void uhcp_handle_push(uhcp_push_t *req, uint8_t *src, uint16_t port, uhcp_iface_
 
     inet_ntop(AF_INET6, prefix, prefix_str, INET6_ADDRSTRLEN);
 
-    LOG_INFO("uhcp: push from %s:%u prefix=%s/%u\n", addr_str, (unsigned)port, prefix_str, req->prefix_len);
+    LOG_INFO("uhcp: push from %s:%u prefix=%s/%u\n", addr_str, (unsigned)port,
+             prefix_str, req->prefix_len);
     uhcp_handle_prefix(prefix, req->prefix_len, 0xFFFF, src, iface);
 }
 #endif
