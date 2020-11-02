@@ -31,6 +31,9 @@
 #ifdef MODULE_PERIPH_INIT_SPI
 #include "periph/spi.h"
 #endif
+#ifdef MODULE_PERIPH_INIT_QSPI
+#include "periph/qspi.h"
+#endif
 #ifdef MODULE_PERIPH_INIT_RTC
 #include "periph/rtc.h"
 #endif
@@ -62,6 +65,13 @@ void periph_init(void)
 #ifdef MODULE_PERIPH_INIT_SPI
     for (unsigned i = 0; i < SPI_NUMOF; i++) {
         spi_init(SPI_DEV(i));
+    }
+#endif
+
+    /* initialize configured QSPI devices */
+#ifdef MODULE_PERIPH_INIT_QSPI
+    for (unsigned i = 0; i < QSPI_NUMOF; i++) {
+        qspi_init(QSPI_DEV(i));
     }
 #endif
 

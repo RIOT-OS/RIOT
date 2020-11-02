@@ -18,6 +18,7 @@ config BOARD_SAME54_XPRO
     select HAS_PERIPH_RTT
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI
+    select HAS_PERIPH_QSPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV

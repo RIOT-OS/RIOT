@@ -28,6 +28,7 @@
 
 #include "periph_conf.h"
 #include "periph/spi.h"
+#include "periph/qspi.h"
 #include "periph/gpio.h"
 #include "mtd.h"
 
@@ -97,6 +98,11 @@ typedef struct __attribute__((packed)) {
 #define SPI_NOR_F_SECT_64K  (4)
 
 /**
+ * @brief   Flag to set when the device is connected via QSPI
+ */
+#define SPI_NOR_F_QSPI      (8)
+
+/**
  * @brief Compile-time parameters for a serial flash device
  */
 typedef struct {
@@ -108,7 +114,10 @@ typedef struct {
     uint32_t wait_chip_wake_up; /**< Chip wake up time in µs */
     spi_clk_t clk;           /**< SPI clock */
     uint16_t flag;           /**< Config flags */
-    spi_t spi;               /**< SPI bus the device is connected to */
+    union {
+        spi_t spi;           /**< SPI bus the device is connected to */
+        qspi_t qspi;         /**< QSPI bus the device is connected to */
+    } spi;                   /**< SPI/QSPI bus to use */
     spi_mode_t mode;         /**< SPI mode */
     gpio_t cs;               /**< CS pin GPIO handle */
     uint8_t addr_width;      /**< Number of bytes in addresses, usually 3 for small devices */
@@ -172,6 +181,13 @@ extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default;
  * Commands for 4-byte addresses chips (above 128Mb)
  */
 extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_default_4bytes;
+
+/**
+ * @brief   Default QSPI command opcodes
+ *
+ * Uses Quad Read for read & Quad Write for write
+ */
+extern const mtd_spi_nor_opcode_t mtd_spi_nor_opcode_qspi;
 
 #ifdef __cplusplus
 }

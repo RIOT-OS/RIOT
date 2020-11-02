@@ -1,1 +1,12 @@
-FEATURES_REQUIRED += periph_spi
+ifneq (,$(filter mtd_spi_nor_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+endif
+
+ifneq (,$(filter mtd_spi_nor_qspi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_qspi
+endif
+
+# default to mtd_spi_nor_spi
+ifeq (,$(filter mtd_spi_nor_%,$(USEMODULE)))
+  USEMODULE += mtd_spi_nor_spi
+endif

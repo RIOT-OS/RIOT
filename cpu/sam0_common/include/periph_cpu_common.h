@@ -377,6 +377,19 @@ typedef enum {
 #define spi_pin_clk(dev)  spi_config[dev].clk_pin
 /** @} */
 
+/**
+ * @brief   Override QSPI modes
+ * @{
+ */
+#define HAVE_QSPI_MODE_T
+typedef enum {
+    QSPI_MODE_0 = 0x0,      /**< CPOL=0, CPHA=0 */
+    QSPI_MODE_1 = 0x2,      /**< CPOL=0, CPHA=1 */
+    QSPI_MODE_2 = 0x1,      /**< CPOL=1, CPHA=0 */
+    QSPI_MODE_3 = 0x3       /**< CPOL=1, CPHA=1 */
+} qspi_mode_t;
+/** @} */
+
 #endif /* ndef DOXYGEN */
 
 /**
@@ -533,6 +546,28 @@ static inline void sam0_cortexm_sleep(int deep)
 
 #ifdef MODULE_PERIPH_GPIO
     gpio_pm_cb_leave(deep);
+#endif
+}
+
+/**
+ * @brief   Enable CPU cache
+ */
+static inline void samd0_cache_enable(void)
+{
+#ifdef CMCC
+    CMCC->CTRL.bit.CEN = 1;
+#endif
+}
+
+/**
+ * @brief   Disable and clear CPU cache
+ */
+static inline void samd0_cache_disable(void)
+{
+#ifdef CMCC
+    CMCC->CTRL.bit.CEN = 0;
+    while (CMCC->SR.bit.CSTS) {}
+    CMCC->MAINT0.bit.INVALL = 1;
 #endif
 }
 
