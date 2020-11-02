@@ -3,9 +3,7 @@ ifneq (,$(filter openwsn_openstack,$(USEMODULE)))
   USEMODULE += openwsn_ipv6
   USEMODULE += openwsn_mac_low
   USEMODULE += openwsn_mac_high
-  USEMODULE += openwsn_udp
   USEMODULE += openwsn_crosslayers
-
   USEMODULE += openwsn_drivers
   USEMODULE += openwsn_sctimer
   USEMODULE += openwsn_radio
@@ -32,6 +30,8 @@ ifneq (,$(filter openwsn_ipv6,$(USEMODULE)))
 endif
 
 ifneq (,$(filter openwsn_cjoin,$(USEMODULE)))
+  USEMODULE += sock_async
+  # The implementation of sock_udp used by openwsn_coap is asynchronous
   USEMODULE += openwsn_coap
   USEMODULE += openwsn_crypto
 endif
@@ -97,6 +97,7 @@ ifneq (,$(filter openwsn_debugpins,$(USEMODULE)))
 endif
 
 ifneq (,$(filter sock_udp,$(USEMODULE)))
+  USEMODULE += openwsn_udp
   USEMODULE += openwsn_sock_udp
 endif
 
