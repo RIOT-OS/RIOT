@@ -106,7 +106,7 @@ int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 #endif
 
     for (size_t i = 0; i < size; i += sector_size) {
-        flashpage_write(flashpage_page((void *)dst_addr), NULL);
+        flashpage_write(flashpage_page((void *)(dst_addr + i)), NULL);
     }
 
     return 0;
