@@ -59,6 +59,9 @@ else
   LINKFLAGS += -ldl
 endif
 
+# XFA (cross file array) support
+LINKFLAGS += -T$(RIOTBASE)/cpu/native/ldscripts/xfa.ld
+
 # clean up unused functions
 CFLAGS += -ffunction-sections -fdata-sections
 ifeq ($(OS),Darwin)
