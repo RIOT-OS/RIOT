@@ -126,7 +126,22 @@ extern "C" {
  *
  * 802.15.4g, Table 70 (p. 43)
  */
-#define IEEE802154G_ATURNAROUNDTIME_US (1 * US_PER_MS)
+#define IEEE802154G_ATURNAROUNDTIME_US          (1 * US_PER_MS)
+
+/**
+ * IEEE Std 802.15.4-2020
+ * Table 11-1—PHY constants: The value is 12 for all other PHYs.
+ */
+#define IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS   (12)
+
+/**
+ * IEEE Std 802.15.4-2020
+ * Table 11-1—PHY constants: For all other PHYs¹, the duration of
+ * 8 symbol periods.
+ *
+ * [1] all but MR-O-QPSK
+ */
+#define IEEE802154_CCA_DURATION_IN_SYMBOLS      (8)
 
 /**
  * @brief   802.15.4 PHY modes

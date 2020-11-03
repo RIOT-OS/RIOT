@@ -44,12 +44,6 @@ extern "C" {
 #define AT86RF215_EDT_DEFAULT           (-84) /* dBm */
 
 /**
- * This is used to calculate the csma backoff based on the bitrate.
- */
-/** 20 symbols is the std period length */
-#define AT86RF215_BACKOFF_PERIOD_IN_SYMBOLS (20U)
-
-/**
  * Default Parameters for 802.15.4 retransmissions & CSMA
  * @{
  */
@@ -140,6 +134,171 @@ void at86rf215_filter_ack(at86rf215_t *dev, bool on);
 void at86rf215_get_random(at86rf215_t *dev, void *data, size_t len);
 
 /**
+ * @ingroup  drivers_at86rf215
+ * @defgroup drivers_at86rf215_fsk  AT86RF215 MR-FSK PHY
+ * @{
+ */
+
+/**
+ * @brief   Symbol Rates for register values, in 10kHz
+ */
+extern const uint8_t _at86rf215_fsk_srate_10kHz[];
+
+/**
+ * @brief   Channel Spacing for register values, in 25kHz
+ */
+extern const uint8_t _at86rf215_fsk_channel_spacing_25kHz[];
+
+/**
+ * @brief   Configure the radio to make use of FSK modulation
+ *
+ * @param[in] dev       device to configure
+ * @param[in] srate     symbol rate, possible values: FSK_SRATE_50K … FSK_SRATE_400K
+ * @param[in] mod_idx   modulation index, multiplied by 64 (½ -> 32; 1 -> 64)
+ * @param[in] mod_order modulation order, may be FSK_MORD_2SFK or FSK_MORD_4SFK
+ * @param[in] fec       forward error correction, may be @ref IEEE802154_FEC_NONE,
+ *                      @ref IEEE802154_FEC_NRNSC or @ref IEEE802154_FEC_RSC
+ *
+ * @return              0 on success, error otherwise
+ */
+int at86rf215_configure_FSK(at86rf215_t *dev, uint8_t srate, uint8_t mod_idx, uint8_t mod_order, uint8_t fec);
+
+/**
+ * @brief   Configure the symbol rate of the FSK modulation
+ *
+ * @param[in] dev       device to configure
+ * @param[in] srate     symbol rate, possible values: FSK_SRATE_50K … FSK_SRATE_400K
+ */
+int at86rf215_FSK_set_srate(at86rf215_t *dev, uint8_t srate);
+
+/**
+ * @brief   Get the symbol rate of the FSK modulation
+ *
+ * @param[in] dev   device to read from
+ *
+ * @return          symbol rate, possible values: FSK_SRATE_50K … FSK_SRATE_400K
+ */
+uint8_t at86rf215_FSK_get_srate(at86rf215_t *dev);
+
+/**
+ * @brief   Configure the modulation index of the FSK modulation
+ *          The modulation index is a fractional value, it is represented as
+ *          fractions of 64.
+ *          Not all possible fractional values are configurable by the hardware.
+ *          If the fractional can not be mapped to the hardware, the nearest matching
+ *          one is chosen.
+ *
+ * @param[in] dev       device to configure
+ * @param[in] mod_idx   modulation index, multiplied by 64 (½ -> 32; 1 -> 64)
+ *
+ * @return              0 on success, failure otherwise
+ */
+int at86rf215_FSK_set_mod_idx(at86rf215_t *dev, uint8_t mod_idx);
+
+/**
+ * @brief   Get the current modulation index of the FSK modulation
+ *          The modulation index is a fractional value, it is represented as
+ *          fractions of 64.
+ *
+ * @param[in] dev       device to read from
+ *
+ * @return              the current modulation index, multiplied by 64
+ */
+uint8_t at86rf215_FSK_get_mod_idx(at86rf215_t *dev);
+
+/**
+ * @brief   Configure the Forward Error Correction (coding) scheme for FSK modulation.
+ *          Supported values are:
+ *              - no error correction
+ *              - non-recursive and non-systematic code (NRNSC)
+ *              - recursive and systematic code (RSC)
+ *
+ * @param[in] dev       device to configure
+ * @param[in] mode      forward error correction, may be @ref IEEE802154_FEC_NONE,
+ *                      @ref IEEE802154_FEC_NRNSC or @ref IEEE802154_FEC_RSC
+ *
+ * @return              0 on success, failure otherwise
+ */
+int at86rf215_FSK_set_fec(at86rf215_t *dev, uint8_t mode);
+
+/**
+ * @brief   Get the Forward Error Correction (coding) scheme for FSK modulation.
+ *          Supported values are:
+ *              - no error correction
+ *              - non-recursive and non-systematic code (NRNSC)
+ *              - recursive and systematic code (RSC)
+ *
+ * @param[in] dev       device to read from
+ *
+ * @return              current coding scheme, may be @ref IEEE802154_FEC_NONE,
+ *                      @ref IEEE802154_FEC_NRNSC or @ref IEEE802154_FEC_RSC
+ */
+uint8_t at86rf215_FSK_get_fec(at86rf215_t *dev);
+
+/**
+ * @brief   Configure the channel spacing for the FSK modulation
+ *
+ * @param[in] dev       device to configure
+ * @param[in] ch_space  channel spacing, possible values: FSK_CHANNEL_SPACING_200K … _400K
+ *
+ * @return              0 on success, failure otherwise
+ */
+int at86rf215_FSK_set_channel_spacing(at86rf215_t *dev, uint8_t ch_space);
+
+/**
+ * @brief   Get the configured channel spacing
+ *
+ * @param[in] dev   device to read from
+ *
+ * @return          channel spacing in kHz
+ */
+uint16_t at86rf215_get_channel_spacing(at86rf215_t *dev);
+
+/**
+ * @brief   Configure the FSK modulation order.
+ *          You can choose between 2-level and 4-level FSK
+ *
+ * @param[in] dev       device to configure
+ * @param[in] mod_order modulation order, may be FSK_MORD_2SFK or FSK_MORD_4SFK
+ *
+ * @return              0 on success, failure otherwise
+ */
+int at86rf215_FSK_set_mod_order(at86rf215_t *dev, uint8_t mod_order);
+
+/**
+ * @brief   Get the current FSK modulation order.
+ *          You can choose between 2-level and 4-level FSK
+ *
+ * @param[in] dev       device to read from
+ *
+ * @return              modulation order, may be FSK_MORD_2SFK or FSK_MORD_4SFK
+ */
+uint8_t at86rf215_FSK_get_mod_order(at86rf215_t *dev);
+
+/**
+ * @brief   The FSK premable length needs to be switched between RX and TX
+ *          This function takes care of putting FSK into RX mode.
+ *
+ * @param[in] dev       device that is entering RX mode
+ */
+void at86rf215_FSK_prepare_rx(at86rf215_t *dev);
+
+/**
+ * @brief   The FSK premable length needs to be switched between RX and TX
+ *          This function takes care of putting FSK into TX mode.
+ *
+ * @param[in] dev       device that is entering TX mode
+ */
+void at86rf215_FSK_prepare_tx(at86rf215_t *dev);
+/** @} */
+
+/**
+ * @ingroup  drivers_at86rf215
+ * @defgroup drivers_at86rf215_ofdm AT86RF215 MR-OFDM PHY
+ * @{
+ */
+
+/**
  * @brief   Configure the radio to make use of OFDM modulation.
  *          There are 4 OFDM options, each with a different number of active tones.
  *          The device supports BPSK, QPSK and 16-QAM modulation and coding schemes (MCS)
@@ -189,6 +348,8 @@ int at86rf215_OFDM_set_option(at86rf215_t *dev, uint8_t option);
  * @return              the current OFDM option
  */
 uint8_t at86rf215_OFDM_get_option(at86rf215_t *dev);
+
+/** @} */
 
 /**
  * @ingroup     drivers_at86rf215

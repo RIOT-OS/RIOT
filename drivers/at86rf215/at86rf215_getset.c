@@ -212,6 +212,13 @@ void at86rf215_enable_rpc(at86rf215_t *dev)
 
     /* no Reduced Power mode available for OFDM */
 
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+    if (dev->fsk_pl) {
+        /* MR-FSK */
+        at86rf215_reg_or(dev, dev->BBC->RG_FSKRPC, FSKRPC_EN_MASK);
+        return;
+    }
+#endif
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
     {
         /* MR-O-QPSK */
@@ -228,6 +235,13 @@ void at86rf215_disable_rpc(at86rf215_t *dev)
 
     /* no Reduced Power mode available for OFDM */
 
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+    if (dev->fsk_pl) {
+        /* MR-FSK */
+        at86rf215_reg_and(dev, dev->BBC->RG_FSKRPC, ~FSKRPC_EN_MASK);
+        return;
+    }
+#endif
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
     {
         /* MR-O-QPSK */

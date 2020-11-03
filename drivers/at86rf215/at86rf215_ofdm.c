@@ -268,12 +268,18 @@ int at86rf215_configure_OFDM(at86rf215_t *dev, uint8_t option, uint8_t scheme)
 
     at86rf215_reg_write(dev, dev->BBC->RG_OFDMPHRTX, scheme);
 
-    dev->csma_backoff_period = AT86RF215_BACKOFF_PERIOD_IN_SYMBOLS *
-                               OFDM_SYMBOL_TIME_US;
+    dev->csma_backoff_period = IEEE802154G_ATURNAROUNDTIME_US
+                             + IEEE802154_CCA_DURATION_IN_SYMBOLS
+                             * OFDM_SYMBOL_TIME_US;
     DEBUG("[%s] CSMA BACKOFF: %" PRIu32 " µs\n", "OFDM",
           dev->csma_backoff_period);
 
     _set_ack_timeout(dev, option, scheme);
+
+    /* disable FSK preamble switching */
+#ifdef MODULE_NETDEV_IEEE802154_MR_FSK
+    dev->fsk_pl = 0;
+#endif
 
     at86rf215_enable_radio(dev, BB_MROFDM);
 

@@ -14,6 +14,7 @@ DEFAULT_MODULE += netdev_ieee802154_multimode
 DEFAULT_MODULE += netdev_ieee802154_oqpsk
 DEFAULT_MODULE += netdev_ieee802154_mr_oqpsk
 DEFAULT_MODULE += netdev_ieee802154_mr_ofdm
+DEFAULT_MODULE += netdev_ieee802154_mr_fsk
 
 FEATURES_REQUIRED += periph_gpio
 FEATURES_REQUIRED += periph_gpio_irq

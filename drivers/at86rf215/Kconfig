@@ -72,6 +72,11 @@ config AT86RF215_DEFAULT_MR_OFDM
     help
         MR-O-OFDM according to IEEE 802.15.4g
 
+config AT86RF215_DEFAULT_MR_FSK
+    bool "MR-FSK"
+    help
+        MR-FSK according to IEEE 802.15.4g
+
 endchoice
 
 menu "O-QPSK (802.15.4) configuration"
@@ -145,6 +150,54 @@ config AT86RF215_DEFAULT_MR_OFDM_MCS
         4: QPSK, rate 3⁄4
         5: 16-QAM, rate 1⁄2
         6: 16-QAM, rate 3⁄4
+
+endmenu
+
+menu "MR-FSK (802.15.4g) configuration"
+    depends on AT86RF215_DEFAULT_MR_FSK
+
+config AT86RF215_DEFAULT_MR_FSK_SRATE
+    int "Default MR-FSK Symbol Rate"
+    range 0 5
+    default 3
+    help
+        Default Symbol Rate of the MR-FSK PHY
+
+        0:  50 kHz
+        1: 100 kHZ
+        2: 150 kHZ
+        3: 200 kHZ
+        4: 300 kHZ
+        5: 400 kHZ
+
+config AT86RF215_DEFAULT_MR_FSK_MOD_IDX
+    int "Default MR-FSK Modulation Index"
+    range 0 128
+    default 64
+    help
+        Default Modulation Index of the MR-FSK PHY as a fraction of 64.
+        (32/64 = 0.5; 64/64 = 1 …)
+
+config AT86RF215_DEFAULT_MR_FSK_MORD
+    int "Default MR-FSK Modulation Order"
+    range 0 1
+    default 1
+    help
+        Default FSK Modulation Order
+
+        0: 2-FSK
+        1: 4-FSk
+
+config AT86RF215_DEFAULT_MR_FSK_FEC
+    int "Default MR-FSK Forward Error Correction Scheme"
+    range 0 2
+    default 0
+    help
+        Default Settings for Forward Error Correction
+
+        0: No Forward Error Correction
+        1: Non-recursive and non-systematic code
+        2: Recursive and systematic code
 
 endmenu
 
