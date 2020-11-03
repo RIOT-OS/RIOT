@@ -47,6 +47,7 @@ void *thread1(void *arg)
 
     /* check if the message came from the right bus */
     assert(msg_is_from_bus(arg, &msg));
+    assert(msg_bus_get_sender_pid(&msg) == p_main);
 
     printf("T1 recv: %s (type=%d)\n",
           (char*) msg.content.ptr, msg_bus_get_type(&msg));
@@ -70,6 +71,7 @@ void *thread2(void *arg)
 
     /* check if the message came from the right bus */
     assert(msg_is_from_bus(arg, &msg));
+    assert(msg_bus_get_sender_pid(&msg) == p_main);
 
     printf("T2 recv: %s (type=%d)\n",
           (char*) msg.content.ptr, msg_bus_get_type(&msg));
@@ -93,6 +95,7 @@ void *thread3(void *arg)
 
     /* check if the message came from the right bus */
     assert(msg_is_from_bus(arg, &msg));
+    assert(msg_bus_get_sender_pid(&msg) == p_main);
 
     printf("T3 recv: %s (type=%d)\n",
           (char*) msg.content.ptr, msg_bus_get_type(&msg));
