@@ -63,7 +63,7 @@ INCLUDES += -I$(STM32CMSIS_INCLUDE_DIR)
 # the time to ensure it's correctly updated when versions in the packages are
 # updated.
 $(STM32FAM_INCLUDE_FILE): FORCE
-	$(Q)make -C $(RIOTCPU)/stm32/include/vendor
+	$(Q)+$(MAKE) -C $(RIOTCPU)/stm32/include/vendor
 
 # The vectors source file requires the family headers to be fetched before since
 # it's generated from the CMSIS content
