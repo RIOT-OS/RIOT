@@ -100,7 +100,7 @@ to get familiar with the different clocks.
 | HFXO   | No       | 38.4 MHz   |                                    |
 | LFRCO  | Yes      | 32.768 kHz |                                    |
 | LFXO   | No       | 32.768 kHz |                                    |
-| ULFRCO | No       | 1.000 kHz  | Not very reliable as a time source |
+| ULFRCO | No       | 1 kHz      | Not very reliable as a time source |
 
 The sources can be used to clock following branches:
 

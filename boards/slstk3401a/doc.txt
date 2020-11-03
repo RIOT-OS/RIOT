@@ -14,27 +14,28 @@ actively measure the power consumption of your hardware and code, in real-time.
 ## Hardware
 
 ### MCU
-| MCU           | EFM32PG1B200F256GM48                                                                             |
-|---------------|--------------------------------------------------------------------------------------------------|
-| Family        | ARM Cortex-M4F                                                                                   |
-| Vendor        | Silicon Labs                                                                                     |
-| Vendor Family | EFM32 Pearl Gecko 1B                                                                             |
-| RAM           | 32.0KB                                                                                           |
-| Flash         | 256.0KB                                                                                          |
-| EEPROM        | no                                                                                               |
-| Frequency     | up to 40 MHz                                                                                     |
-| FPU           | yes                                                                                              |
-| MPU           | yes                                                                                              |
-| DMA           | 8 channels                                                                                       |
-| Timers        | 2x 16-bit, 1x 16-bit (low power)                                                                 |
-| ADCs          | 12-bit ADC                                                                                       |
-| UARTs         | 2x USART, 1x LEUART                                                                              |
-| SPIs          | 2x USART                                                                                         |
-| I2Cs          | 2x                                                                                               |
-| Vcc           | 1.85V - 3.8V                                                                                     |
-| Datasheet     | [Datasheet](https://www.silabs.com/Support%20Documents/TechnicalDocs/EFM32PG1-DataSheet.pdf)     |
-| Manual        | [Manual](https://www.silabs.com/Support%20Documents/TechnicalDocs/EFM32PG1-ReferenceManual.pdf)  |
-| Board Manual  | [Board Manual](https://www.silabs.com/documents/public/user-guides/ug154-stk3401-user-guide.pdf) |
+| MCU             | EFM32PG1B200F256GM48                                                                             |
+|-----------------|--------------------------------------------------------------------------------------------------|
+| Family          | ARM Cortex-M4F                                                                                   |
+| Vendor          | Silicon Labs                                                                                     |
+| Vendor Family   | EFM32 Pearl Gecko 1B                                                                             |
+| RAM             | 32.0 KiB                                                                                         |
+| Flash           | 256.0 KiB                                                                                        |
+| EEPROM          | no                                                                                               |
+| Frequency       | up to 40 MHz                                                                                     |
+| FPU             | yes                                                                                              |
+| MPU             | yes                                                                                              |
+| DMA             | 8 channels                                                                                       |
+| Timers          | 2x 16-bit + 1x 16-bit (low power)                                                                |
+| ADCs            | 12-bit ADC                                                                                       |
+| UARTs           | 2x USART, 1x LEUART                                                                              |
+| SPIs            | 2x USART                                                                                         |
+| I2Cs            | 1x                                                                                               |
+| Vcc             | 1.85 V - 3.8 V                                                                                   |
+| Datasheet       | [Datasheet](https://www.silabs.com/documents/public/data-sheets/efm32pg1-datasheet.pdf)          |
+| Manual          | [Manual](https://www.silabs.com/documents/public/reference-manuals/efm32pg1-rm.pdf)              |
+| Board Manual    | [Board Manual](https://www.silabs.com/documents/public/user-guides/ug154-stk3401-user-guide.pdf) |
+| Board Schematic | Can be downloaded using Silicon Labs' Simplicity Studio                                          |
 
 ### Pinout
 This is the pinout of the expansion header on the right side of the board.
@@ -67,9 +68,9 @@ PIN 1 is the bottom-left contact when the header faces  you horizontally.
 | RTC        | &mdash; | RTCC            |                                | 1 Hz interval. Either RTC or RTT (see below)             |
 | SPI        | 0       | USART1          | MOSI: PC6, MISO: PC7, CLK: PC8 |                                                          |
 | Timer      | 0       | TIMER0 + TIMER1 |                                | TIMER0 is used as prescaler (must be adjecent)           |
+|            | 1       | LETIMER0        |                                |                                                          |
 | UART       | 0       | USART0          | RX: PA1, TX: PA0               | Default STDIO output                                     |
-|            | 1       | USART1          | RX: PC6, TX: PC7               |                                                          |
-|            | 2       | LEUART0         | RX: PD11, TX: PD10             | Baud rate limited (see below)                            |
+|            | 1       | LEUART0         | RX: PD11, TX: PD10             | Baud rate limited (see below)                            |
 
 ### User interface
 | Peripheral | Mapped to | Pin | Comments   |
@@ -138,8 +139,7 @@ symbols (`-gdwarf-2` for GCC).
 
 ### Clock selection
 There are several clock sources that are available for the different
-peripherals. You are advised to read [AN0004.1]
-(https://www.silabs.com/documents/public/application-notes/an0004.1-efm32-cmu.pdf)
+peripherals. You are advised to read [AN0004.0](https://www.silabs.com/documents/public/application-notes/an0004.0-efm32-cmu.pdf)
 to get familiar with the different clocks.
 
 | Source | Internal | Speed      | Comments                           |
@@ -148,7 +148,7 @@ to get familiar with the different clocks.
 | HFXO   | No       | 40 MHz     |                                    |
 | LFRCO  | Yes      | 32.768 kHz |                                    |
 | LFXO   | No       | 32.768 kHz |                                    |
-| ULFRCO | No       | 1.000 kHz  | Not very reliable as a time source |
+| ULFRCO | No       | 1 kHz      | Not very reliable as a time source |
 
 The sources can be used to clock following branches:
 
@@ -193,11 +193,11 @@ Therefore, only one of both peripherals can be enabled at the same time.
 Configured at 1 Hz interval, the RTCC will overflow each 136 years.
 
 ### Hardware crypto
-This MCU is equipped with a hardware accelerated crypto peripheral that can
+This MCU is equipped with a hardware-accelerated crypto peripheral that can
 speed up AES128, AES256, SHA1, SHA256 and several other cryptographic
 computations.
 
-A peripheral driver interface for RIOT-OS is proposed, but not yet implemented.
+A peripheral driver interface is proposed, but not yet implemented.
 
 ### Usage of EMLIB
 This port makes uses of EMLIB by Silicon Labs to abstract peripheral registers.
@@ -253,8 +253,8 @@ make emulate
 ```
 
 ## Supported Toolchains
-For using the Silicon Labs SLSTK3401A starter kit we strongly recommend the
-usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
+For using the Silicon Labs SLSTK3401A starter kit we strongly recommend
+the usage of the [GNU Tools for ARM Embedded Processors](https://developer.arm.com/open-source/gnu-toolchain/gnu-rm)
 toolchain.
 
 ## License information
