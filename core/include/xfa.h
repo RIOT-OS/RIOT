@@ -44,7 +44,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  * @internal
  */
-#define _XFA_CONST(name, prio) __attribute__((used, section(".roxfa." #name "." #prio))) const
+#define _XFA_CONST(name, prio) __attribute__((used, section(".roxfa." #name "." #prio)))
 
 /**
  * @brief Define a read-only cross-file array
