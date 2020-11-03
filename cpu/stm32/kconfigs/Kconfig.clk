@@ -6,7 +6,7 @@
 #
 
 menu "STM32 clock configuration"
-    depends on CPU_FAM_G0 || CPU_FAM_G4
+    depends on CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L0 || CPU_FAM_L1
 
 choice
 bool "Clock source selection"
@@ -14,6 +14,10 @@ default USE_CLOCK_PLL
 
 config USE_CLOCK_PLL
     bool "PLL"
+
+config USE_CLOCK_MSI
+    bool "Use direct multi-speed frequency internal oscillator (MSI)"
+    depends on CPU_FAM_L0 || CPU_FAM_L1
 
 config USE_CLOCK_HSE
     bool "Direct High frequency external oscillator (HSE)"
@@ -24,6 +28,7 @@ config USE_CLOCK_HSI
 
 endchoice
 
+if CPU_FAM_G0 || CPU_FAM_G4
 config CLOCK_PLL_M
     int "M: PLLIN division factor" if USE_CLOCK_PLL
     default 1 if CPU_FAM_G0
@@ -45,7 +50,7 @@ config CLOCK_PLL_R
     default 6 if BOARD_HAS_HSE
     default 5
     range 2 8
-endif
+endif  # CPU_FAM_G0
 
 if CPU_FAM_G4
 choice
@@ -72,7 +77,7 @@ config CLOCK_PLL_R
     default 4 if PLL_R_DIV_4
     default 6 if PLL_R_DIV_6
     default 8 if PLL_R_DIV_8
-endif
+endif  # CPU_FAM_G4
 
 if CPU_FAM_G0
 choice
@@ -115,7 +120,99 @@ config CLOCK_HSISYS_DIV
     default 32 if CLOCK_HSISYS_DIV_32
     default 64 if CLOCK_HSISYS_DIV_64
     default 128 if CLOCK_HSISYS_DIV_128
-endif
+endif  # CPU_FAM_G0
+
+endif  # CPU_FAM_G0 || CPU_FAM_G4
+
+if CPU_FAM_L0 || CPU_FAM_L1
+config CLOCK_PLL_DIV
+    int "Main PLL division factor" if USE_CLOCK_PLL
+    default 2
+    range 2 4
+
+choice
+bool "Main PLL multiply factor" if USE_CLOCK_PLL
+default PLL_MUL_4
+
+config PLL_MUL_3
+    bool "Multiply by 3"
+
+config PLL_MUL_4
+    bool "Multiply by 4"
+
+config PLL_MUL_6
+    bool "Multiply by 6"
+
+config PLL_MUL_8
+    bool "Multiply by 8"
+
+config PLL_MUL_12
+    bool "Multiply by 12"
+
+config PLL_MUL_16
+    bool "Multiply by 16"
+
+config PLL_MUL_24
+    bool "Multiply by 24"
+
+config PLL_MUL_32
+    bool "Multiply by 32"
+
+config PLL_MUL_48
+    bool "Multiply by 48"
+
+endchoice
+
+config CLOCK_PLL_MUL
+    int
+    default 3 if PLL_MUL_3
+    default 4 if PLL_MUL_4
+    default 6 if PLL_MUL_6
+    default 8 if PLL_MUL_8
+    default 12 if PLL_MUL_12
+    default 16 if PLL_MUL_16
+    default 24 if PLL_MUL_24
+    default 32 if PLL_MUL_32
+    default 48 if PLL_MUL_48
+
+choice
+bool "Desired MSI clock frequency" if USE_CLOCK_MSI
+default CLOCK_MSI_4MHZ
+
+config CLOCK_MSI_65KHZ
+    bool "65.536kHz"
+
+config CLOCK_MSI_130KHZ
+    bool "131.072kHz"
+
+config CLOCK_MSI_260KHZ
+    bool "262.144kHz"
+
+config CLOCK_MSI_520KHZ
+    bool "524.288kHz"
+
+config CLOCK_MSI_1MHZ
+    bool "1.048MHz"
+
+config CLOCK_MSI_2MHZ
+    bool "2.097MHz"
+
+config CLOCK_MSI_4MHZ
+    bool "4.194MHz"
+
+endchoice
+
+config CLOCK_MSI
+    int
+    default 65536 if CLOCK_MSI_65KHZ
+    default 131072 if CLOCK_MSI_130KHZ
+    default 262144 if CLOCK_MSI_260KHZ
+    default 524288 if CLOCK_MSI_520KHZ
+    default 1048000 if CLOCK_MSI_1MHZ
+    default 2097000 if CLOCK_MSI_2MHZ
+    default 4194000 if CLOCK_MSI_4MHZ
+
+endif  # CPU_FAM_L0 || CPU_FAM_L1
 
 choice
 bool "APB1 prescaler (division factor of HCLK to produce PCLK1)"
@@ -147,7 +244,8 @@ config CLOCK_APB1_DIV
     default 16 if CLOCK_APB1_DIV_16
 
 choice
-bool "APB2 prescaler (division factor of HCLK to produce PCLK2)"  if CPU_FAM_G4
+bool "APB2 prescaler (division factor of HCLK to produce PCLK2)"
+depends on CPU_FAM_G4 || CPU_FAM_L0 || CPU_FAM_L1
 default CLOCK_APB2_DIV_1
 
 config CLOCK_APB2_DIV_1

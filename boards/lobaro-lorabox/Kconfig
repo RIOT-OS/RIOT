@@ -20,3 +20,8 @@ config BOARD_LOBARO_LORABOX
     select HAS_PERIPH_SPI_GPIO_MODE
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+
+    # Clock configuration
+    select BOARD_HAS_LSE
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

@@ -28,3 +28,8 @@ config BOARD_LSN50
     # The 0.10.0 openocd version in Ubuntu Bionic doesn't work. The change was
     # introduced after Jun 8, 2017 - v0.10.0-1-20170607-2132-dev.
     select HAS_RIOTBOOT
+
+    # Clock configuration
+    select BOARD_HAS_LSE
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

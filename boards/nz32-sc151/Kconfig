@@ -23,3 +23,5 @@ config BOARD_NZ32_SC151
     select HAS_PERIPH_SPI_GPIO_MODE
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"
