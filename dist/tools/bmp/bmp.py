@@ -219,7 +219,12 @@ def debug_mode(port):
 
 def connect_to_target(port):
     # open GDB in machine interface mode
-    gdbmi = GdbController(gdb_path=args.gdb_path, gdb_args=["--nx", "--quiet", "--interpreter=mi2", args.file])
+    try:
+        # try old API first
+        gdbmi = GdbController(gdb_path=args.gdb_path, gdb_args=["--nx", "--quiet", "--interpreter=mi2", args.file])
+    except TypeError:
+        # and then new API
+        gdbmi = GdbController(command=[args.gdb_path, "--nx", "--quiet", "--interpreter=mi2", args.file])
     assert gdb_write_and_wait_for_result(gdbmi, '-target-select extended-remote %s' % port, 'connecting',
                                          expected_result='connected')
     # set options
