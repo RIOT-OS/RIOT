@@ -60,6 +60,7 @@ enum {
     SAM0_GCLK_1MHZ,                     /**< 1 MHz clock for xTimer */
     SAM0_GCLK_32KHZ,                    /**< 32 kHz clock           */
     SAM0_GCLK_1KHZ,                     /**< 1 kHz clock            */
+    SAM0_GCLK_DISABLED = 0xF,           /**< disabled GCLK          */
 };
 /** @} */
 
