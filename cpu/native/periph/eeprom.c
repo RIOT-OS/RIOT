@@ -48,7 +48,7 @@ static inline void eeprom_native_write(void)
     DEBUG("Writing data to EEPROM file %s:\n", eeprom_file);
     fwrite(_eeprom_buf, 1, ARRAY_SIZE(_eeprom_buf), fp);
 
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         for (size_t i = 0; i < ARRAY_SIZE(_eeprom_buf); i++) {
             DEBUG("0x%02X ", _eeprom_buf[i]);
             if ((i + 1) % 16 == 0) {
@@ -69,7 +69,7 @@ void eeprom_native_read(void)
 
     DEBUG("Reading data from EEPROM file %s:\n", eeprom_file);
     fread(_eeprom_buf, 1, ARRAY_SIZE(_eeprom_buf), fp);
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         for (size_t i = 0; i < ARRAY_SIZE(_eeprom_buf); i++) {
             DEBUG("0x%02X ", _eeprom_buf[i]);
             if ((i + 1) % 16 == 0) {

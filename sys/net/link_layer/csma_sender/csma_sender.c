@@ -21,6 +21,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdbool.h>
+#include <inttypes.h>
 
 #include "xtimer.h"
 #include "random.h"
@@ -31,11 +32,6 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#if ENABLE_DEBUG
-/* For PRIu16 etc. */
-#include <inttypes.h>
-#endif
 
 const csma_sender_conf_t CSMA_SENDER_CONF_DEFAULT = {
     CONFIG_CSMA_SENDER_MIN_BE_DEFAULT,

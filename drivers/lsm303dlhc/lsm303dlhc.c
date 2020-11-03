@@ -82,7 +82,7 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, const lsm303dlhc_params_t *params)
     i2c_release(DEV_I2C);
     /* configure mag data ready pin */
     gpio_init(DEV_MAG_PIN, GPIO_IN);
-    if (ENABLE_DEBUG && res == 0) {
+    if (IS_ACTIVE(ENABLE_DEBUG) && res == 0) {
         DEBUG("[OK]\n");
     }
     else {

@@ -47,13 +47,9 @@
 #define ENABLE_DEBUG        0
 #include "debug.h"
 
-#if ENABLE_DEBUG
-static char _stack[GNRC_IPV6_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
-#else
-static char _stack[GNRC_IPV6_STACK_SIZE];
-#endif
-
 #define _MAX_L2_ADDR_LEN    (8U)
+
+static char _stack[GNRC_IPV6_STACK_SIZE + DEBUG_EXTRA_STACKSIZE];
 
 #ifdef MODULE_FIB
 /**

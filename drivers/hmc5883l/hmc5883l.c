@@ -27,17 +27,9 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if ENABLE_DEBUG
-
 #define DEBUG_DEV(f, d, ...) \
         DEBUG("[hmc5883l] %s i2c dev=%d addr=%02x: " f "\n", \
               __func__, d->dev, HMC5883L_I2C_ADDRESS, ## __VA_ARGS__);
-
-#else /* ENABLE_DEBUG */
-
-#define DEBUG_DEV(f, d, ...)
-
-#endif /* ENABLE_DEBUG */
 
 #define ERROR_DEV(f, d, ...) \
         LOG_ERROR("[hmc5883l] %s i2c dev=%d addr=%02x: " f "\n", \
@@ -251,7 +243,7 @@ static int _reg_read(const hmc5883l_t *dev, uint8_t reg, uint8_t *data, uint16_t
     i2c_release(dev->dev);
 
     if (res == 0) {
-        if (ENABLE_DEBUG) {
+        if (IS_ACTIVE(ENABLE_DEBUG)) {
             printf("[hmc5883l] %s i2c dev=%d addr=%02x: read following bytes: ",
                    __func__, dev->dev, HMC5883L_I2C_ADDRESS);
             for (unsigned i = 0; i < len; i++) {
@@ -276,7 +268,7 @@ static int _reg_write(const hmc5883l_t *dev, uint8_t reg, uint8_t data)
 
     DEBUG_DEV("write register 0x%02x", dev, reg);
 
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         printf("[hmc5883l] %s i2c dev=%d addr=%02x: write following bytes: ",
                __func__, dev->dev, HMC5883L_I2C_ADDRESS);
         printf("%02x ", data);

@@ -923,16 +923,16 @@ static int _forward_frag(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *frag_hdr,
     DEBUG("to (%s, %u)\n",
           gnrc_netif_addr_to_str(vrbe->super.dst, vrbe->super.dst_len,
                                  addr_str), vrbe->out_tag);
-#if ENABLE_DEBUG && defined(MODULE_OD)
-    DEBUG("Original fragmentation header:\n");
-    od_hex_dump(frag_hdr->data, frag_hdr->size, OD_WIDTH_DEFAULT);
-    DEBUG("IPHC headers + payload:\n");
-    frag_hdr = pkt;
-    while (frag_hdr) {
+    if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_OD)) {
+        DEBUG("Original fragmentation header:\n");
         od_hex_dump(frag_hdr->data, frag_hdr->size, OD_WIDTH_DEFAULT);
-        frag_hdr = frag_hdr->next;
+        DEBUG("IPHC headers + payload:\n");
+        frag_hdr = pkt;
+        while (frag_hdr) {
+            od_hex_dump(frag_hdr->data, frag_hdr->size, OD_WIDTH_DEFAULT);
+            frag_hdr = frag_hdr->next;
+        }
     }
-#endif
     gnrc_pktbuf_release(pkt);
     (void)frag_hdr;
     (void)page;

@@ -312,13 +312,13 @@ static int _isotp_rcv_ff(struct isotp *isotp, struct can_frame *frame, int ae)
         ((uint8_t *)isotp->rx.snip->data)[isotp->rx.idx++] = frame->data[i];
     }
 
-#if ENABLE_DEBUG
-    DEBUG("_isotp_rcv_ff: rx.buf=");
-    for (unsigned i = 0; i < isotp->rx.idx; i++) {
-        DEBUG("%02hhx", ((uint8_t *)isotp->rx.snip->data)[i]);
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        DEBUG("_isotp_rcv_ff: rx.buf=");
+        for (unsigned i = 0; i < isotp->rx.idx; i++) {
+            DEBUG("%02hhx", ((uint8_t *)isotp->rx.snip->data)[i]);
+        }
+        DEBUG("\n");
     }
-    DEBUG("\n");
-#endif
 
     isotp->rx.sn = 1;
 
@@ -360,13 +360,13 @@ static int _isotp_rcv_cf(struct isotp *isotp, struct can_frame *frame, int ae)
         }
     }
 
-#if ENABLE_DEBUG
-    DEBUG("_isotp_rcv_cf: rx.buf=");
-    for (unsigned i = 0; i < isotp->rx.idx; i++) {
-        DEBUG("%02hhx", ((uint8_t *)isotp->rx.snip->data)[i]);
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        DEBUG("_isotp_rcv_cf: rx.buf=");
+        for (unsigned i = 0; i < isotp->rx.idx; i++) {
+            DEBUG("%02hhx", ((uint8_t *)isotp->rx.snip->data)[i]);
+        }
+        DEBUG("\n");
     }
-    DEBUG("\n");
-#endif
 
     if (isotp->rx.idx >= isotp->rx.snip->size) {
         isotp->rx.state = ISOTP_IDLE;
@@ -392,13 +392,13 @@ static int _isotp_rcv(struct isotp *isotp, struct can_frame *frame)
     int ae = (isotp->opt.flags & CAN_ISOTP_EXTEND_ADDR) ? 1 : 0;
     uint8_t n_pci_type;
 
-#if ENABLE_DEBUG
-    DEBUG("_isotp_rcv: id=%" PRIx32 " data=", frame->can_id);
-    for (int i = 0; i < frame->can_dlc; i++) {
-      DEBUG("%02hhx", frame->data[i]);
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        DEBUG("_isotp_rcv: id=%" PRIx32 " data=", frame->can_id);
+        for (int i = 0; i < frame->can_dlc; i++) {
+            DEBUG("%02hhx", frame->data[i]);
+        }
+        DEBUG("\n");
     }
-    DEBUG("\n");
-#endif
 
     if (ae && frame->data[0] != isotp->opt.rx_ext_address) {
         return 1;
@@ -448,13 +448,13 @@ static int _isotp_send_fc(struct isotp *isotp, int ae, uint8_t status)
 
     isotp->rx.bs = 0;
 
-#if ENABLE_DEBUG
-    DEBUG("_isotp_send_fc: id=%" PRIx32 " data=", fc.can_id);
-    for (int i = 0; i < fc.can_dlc; i++) {
-      DEBUG("%02hhx", fc.data[i]);
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        DEBUG("_isotp_send_fc: id=%" PRIx32 " data=", fc.can_id);
+        for (int i = 0; i < fc.can_dlc; i++) {
+            DEBUG("%02hhx", fc.data[i]);
+        }
+        DEBUG("\n");
     }
-    DEBUG("\n");
-#endif
 
     xtimer_set(&isotp->rx_timer, CAN_ISOTP_TIMEOUT_N_Ar);
     isotp->rx.tx_handle = raw_can_send(isotp->entry.ifnum, &fc, isotp_pid);

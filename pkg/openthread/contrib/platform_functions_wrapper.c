@@ -110,17 +110,13 @@ uint8_t ot_call_command(char* command, void *arg, void* answer)
 
 void output_bytes(const char* name, const uint8_t *aBytes, uint8_t aLength)
 {
-#if ENABLE_DEBUG
-    DEBUG("%s: ", name);
-    for (int i = 0; i < aLength; i++) {
-        DEBUG("%02x", aBytes[i]);
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        DEBUG("%s: ", name);
+        for (int i = 0; i < aLength; i++) {
+            DEBUG("%02x", aBytes[i]);
+        }
+        DEBUG("\n");
     }
-    DEBUG("\n");
-#else
-    (void)name;
-    (void)aBytes;
-    (void)aLength;
-#endif
 }
 
 OT_COMMAND ot_channel(otInstance* ot_instance, void* arg, void* answer) {

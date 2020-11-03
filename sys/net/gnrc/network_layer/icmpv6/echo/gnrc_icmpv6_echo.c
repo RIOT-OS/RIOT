@@ -12,6 +12,8 @@
  * @file
  */
 
+#include <inttypes.h>
+
 #include "net/gnrc.h"
 
 #include "od.h"
@@ -22,11 +24,6 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#if ENABLE_DEBUG
-/* For PRIu16 etc. */
-#include <inttypes.h>
-#endif
 
 gnrc_pktsnip_t *gnrc_icmpv6_echo_build(uint8_t type, uint16_t id, uint16_t seq,
                                        uint8_t *data, size_t data_len)

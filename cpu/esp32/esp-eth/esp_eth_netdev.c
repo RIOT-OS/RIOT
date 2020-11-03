@@ -203,10 +203,10 @@ static int _esp_eth_send(netdev_t *netdev, const iolist_t *iolist)
         }
     }
 
-    #if ENABLE_DEBUG
-    printf ("%s: send %d byte\n", __func__, dev->tx_len);
-    /* esp_hexdump (dev->tx_buf, dev->tx_len, 'b', 16); */
-    #endif
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        printf ("%s: send %d byte\n", __func__, dev->tx_len);
+        /* esp_hexdump (dev->tx_buf, dev->tx_len, 'b', 16); */
+    }
 
     int ret = 0;
 
@@ -253,9 +253,9 @@ static int _esp_eth_recv(netdev_t *netdev, void *buf, size_t len, void *info)
         return -ENOBUFS;
     }
 
-    #if ENABLE_DEBUG
-    /* esp_hexdump (dev->rx_buf, dev->rx_len, 'b', 16); */
-    #endif
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        esp_hexdump (dev->rx_buf, dev->rx_len, 'b', 16);
+    }
 
     /* copy received date and reset the receive length */
     memcpy(buf, dev->rx_buf, dev->rx_len);

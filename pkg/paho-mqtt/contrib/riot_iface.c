@@ -88,8 +88,7 @@ static int mqtt_read(struct Network *n, unsigned char *buf, int len,
         }
     } while (rc < len && xtimer_now64().ticks64 < send_tick && rc >= 0);
 
-#ifdef ENABLE_DEBUG
-    if (IS_USED(MODULE_LWIP) && rc > 0) {
+    if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_LWIP) && rc > 0) {
         DEBUG("MQTT buf asked for %d, available to read %d\n",
                 rc, tsrb_avail(&tsrb_lwip_tcp));
         for (int i = 0; i < rc; i++) {
@@ -97,7 +96,6 @@ static int mqtt_read(struct Network *n, unsigned char *buf, int len,
         }
         DEBUG("\n");
     }
-#endif
 
     return rc;
 }

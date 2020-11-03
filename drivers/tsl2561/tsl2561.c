@@ -75,13 +75,14 @@ int tsl2561_init(tsl2561_t *dev, const tsl2561_params_t *params)
                   TSL2561_COMMAND_MODE | TSL2561_REGISTER_TIMING,
                   DEV_INTEGRATION | DEV_GAIN, 0);
 
-#if ENABLE_DEBUG
-    uint8_t timing;
-    i2c_read_reg(DEV_I2C, DEV_ADDR,
-                 TSL2561_COMMAND_MODE | TSL2561_REGISTER_TIMING, &timing, 0);
-    DEBUG("[Info] Timing ? %d (expected: %d)\n",
-          timing, DEV_INTEGRATION | DEV_GAIN);
-#endif
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        uint8_t timing;
+        i2c_read_reg(DEV_I2C, DEV_ADDR,
+                     TSL2561_COMMAND_MODE | TSL2561_REGISTER_TIMING,
+                     &timing, 0);
+        DEBUG("[Info] Timing ? %d (expected: %d)\n",
+              timing, DEV_INTEGRATION | DEV_GAIN);
+    }
 
     _disable(dev);
     i2c_release(DEV_I2C);
@@ -187,12 +188,13 @@ static void _enable(const tsl2561_t *dev)
     i2c_write_reg(DEV_I2C, DEV_ADDR,
                   TSL2561_COMMAND_MODE | TSL2561_REGISTER_CONTROL,
                   TSL2561_CONTROL_POWERON, 0);
-#if ENABLE_DEBUG
-    uint8_t en;
-    i2c_read_reg(DEV_I2C, DEV_ADDR,
-                 TSL2561_COMMAND_MODE | TSL2561_REGISTER_CONTROL, &en, 0);
-    DEBUG("[Info] Enabled ? %s\n", en == 3 ? "true" : "false");
-#endif
+
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        uint8_t en;
+        i2c_read_reg(DEV_I2C, DEV_ADDR,
+                     TSL2561_COMMAND_MODE | TSL2561_REGISTER_CONTROL, &en, 0);
+        DEBUG("[Info] Enabled ? %s\n", en == 3 ? "true" : "false");
+    }
 }
 
 
@@ -203,12 +205,12 @@ static void _disable(const tsl2561_t *dev)
                   TSL2561_COMMAND_MODE | TSL2561_REGISTER_CONTROL,
                   TSL2561_CONTROL_POWEROFF, 0);
 
-#if ENABLE_DEBUG
-    uint8_t dis;
-    i2c_read_reg(DEV_I2C, DEV_ADDR,
-                 TSL2561_COMMAND_MODE | TSL2561_REGISTER_CONTROL, &dis, 0);
-    DEBUG("[Info] Disabled ? %s\n", dis == 0 ? "true": "false");
-#endif
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        uint8_t dis;
+        i2c_read_reg(DEV_I2C, DEV_ADDR,
+                     TSL2561_COMMAND_MODE | TSL2561_REGISTER_CONTROL, &dis, 0);
+        DEBUG("[Info] Disabled ? %s\n", dis == 0 ? "true": "false");
+    }
 }
 
 static void _read_data(const tsl2561_t *dev, uint16_t *full, uint16_t *ir)

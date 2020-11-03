@@ -15,6 +15,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "net/gnrc/icmpv6.h"
 #include "net/gnrc/ipv6.h"
@@ -30,9 +31,6 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-/* For PRIu8 etc. */
-#include <inttypes.h>
 
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 

@@ -50,9 +50,7 @@ static int _init(int argc, char **argv)
 
     if (sdcard_spi_init(card, &sdcard_spi_params[0]) != 0) {
         puts("[FAILED]");
-        #if ENABLE_DEBUG != 1
-        puts("enable debugging in sdcard_spi.c for further information!");
-        #endif
+        puts("enable debugging in sdcard_spi.c for more information!");
         return -2;
     }
     puts("[OK]");

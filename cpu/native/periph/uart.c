@@ -164,7 +164,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     DEBUG("writing to serial port ");
 
-    if (ENABLE_DEBUG) {
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
         for (size_t i = 0; i < len; i++) {
             DEBUG("%02x ", (unsigned char) data[i]);
         }

@@ -322,13 +322,14 @@ static int _read_data(sht3x_dev_t* dev, uint8_t *data, uint8_t len)
     i2c_release(dev->i2c_dev);
 
     if (res == 0) {
-#if ENABLE_DEBUG
-        printf("[sht3x] %s bus=%d addr=%02x: read following bytes: ",
-               __func__, dev->i2c_dev, dev->i2c_addr);
-        for (int i=0; i < len; i++)
-            printf("%02x ", data[i]);
-        printf("\n");
-#endif /* ENABLE_DEBUG */
+        if (IS_ACTIVE(ENABLE_DEBUG)) {
+            printf("[sht3x] %s bus=%d addr=%02x: read following bytes: ",
+                   __func__, dev->i2c_dev, dev->i2c_addr);
+            for (int i=0; i < len; i++) {
+                printf("%02x ", data[i]);
+            }
+            printf("\n");
+        }
     }
     else {
         DEBUG_DEV("could not read %d bytes from sensor, reason %d",

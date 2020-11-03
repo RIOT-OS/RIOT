@@ -72,7 +72,7 @@ void priority_queue_add(priority_queue_t *root, priority_queue_node_t *new_obj)
     new_obj->next = NULL;
 }
 
-#if ENABLE_DEBUG
+#if IS_ACTIVE(ENABLE_DEBUG)
 void priority_queue_print(priority_queue_t *root)
 {
     printf("queue:\n");

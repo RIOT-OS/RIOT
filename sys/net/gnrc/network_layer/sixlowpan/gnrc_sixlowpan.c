@@ -32,12 +32,7 @@
 
 static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 
-#if ENABLE_DEBUG
-static char _stack[GNRC_SIXLOWPAN_STACK_SIZE + THREAD_EXTRA_STACKSIZE_PRINTF];
-#else
-static char _stack[GNRC_SIXLOWPAN_STACK_SIZE];
-#endif
-
+static char _stack[GNRC_SIXLOWPAN_STACK_SIZE + DEBUG_EXTRA_STACKSIZE];
 
 /* handles GNRC_NETAPI_MSG_TYPE_RCV commands */
 static void _receive(gnrc_pktsnip_t *pkt);

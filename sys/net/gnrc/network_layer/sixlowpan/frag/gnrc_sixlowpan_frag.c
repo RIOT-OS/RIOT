@@ -16,6 +16,9 @@
  * @author  Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
  */
 
+#include <assert.h>
+#include <inttypes.h>
+
 #include "kernel_types.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netapi.h"
@@ -29,14 +32,6 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#if ENABLE_DEBUG
-/* For PRIu16 etc. */
-
-#include <assert.h>
-#include <inttypes.h>
-#endif
-
 
 static inline uint16_t _floor8(uint16_t length)
 {

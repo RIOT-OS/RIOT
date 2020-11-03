@@ -30,7 +30,7 @@
 #define ENABLE_DEBUG                    0
 #include "debug.h"
 
-#if ENABLE_DEBUG
+#if IS_ACTIVE(ENABLE_DEBUG)
 static char addr_str[IPV6_ADDR_MAX_STR_LEN];
 #endif
 

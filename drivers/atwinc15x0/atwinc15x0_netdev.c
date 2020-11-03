@@ -103,9 +103,10 @@ static void _atwinc15x0_eth_cb(uint8_t type, void *msg, void *ctrl_buf)
 
     DEBUG("%s type=%u msg=%p len=%d remaining=%d\n", __func__,
           type, msg, ctrl->u16DataSize, ctrl->u16RemainigDataSize);
-#if MODULE_OD && ENABLE_DEBUG_DUMP
-    od_hex_dump(msg, ctrl->u16DataSize, 16);
-#endif
+
+    if (IS_ACTIVE(ENABLE_DEBUG) && IS_USED(MODULE_OD)) {
+        od_hex_dump(msg, ctrl->u16DataSize, 16);
+    }
 
     /* the buffer shouldn't be used here */
     assert(atwinc15x0->rx_buf == NULL);
@@ -258,12 +259,13 @@ static int _atwinc15x0_send(netdev_t *netdev, const iolist_t *iolist)
         }
     }
 
-#if ENABLE_DEBUG
-    DEBUG("%s send %d byte", __func__, tx_len);
-#if MODULE_OD && ENABLE_DEBUG_DUMP
-    od_hex_dump(dev->tx_buf, dev->tx_len, OD_WIDTH_DEFAULT);
-#endif /* MODULE_OD && ENABLE_DEBUG_HEXDUMP */
-#endif
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        DEBUG("%s send %d byte", __func__, tx_len);
+        if (IS_ACTIVE(ENABLE_DEBUG_DUMP) && IS_USED(MODULE_OD)) {
+            od_hex_dump(atwinc15x0_eth_buf, tx_len, OD_WIDTH_DEFAULT);
+        }
+    }
+
     irq_restore(state);
 
     /* send the the packet */
@@ -320,14 +322,15 @@ static int _atwinc15x0_recv(netdev_t *netdev, void *buf, size_t len, void *info)
     dev->rx_len = 0;
     dev->rx_buf = NULL;
 
-#if ENABLE_DEBUG
-    ethernet_hdr_t *hdr = (ethernet_hdr_t *)buf;
-    DEBUG("%s received %u byte from addr " ATWINC15X0_MAC_STR "\n",
-          __func__, rx_size, ATWINC15X0_MAC_STR_ARG(hdr->src));
-#if MODULE_OD && ENABLE_DEBUG_DUMP
-    od_hex_dump(buf, rx_size, OD_WIDTH_DEFAULT);
-#endif /* MODULE_OD && ENABLE_DEBUG_HEXDUMP */
-#endif /* ENABLE_DEBUG */
+    if (IS_ACTIVE(ENABLE_DEBUG)) {
+        ethernet_hdr_t *hdr = (ethernet_hdr_t *)buf;
+        DEBUG("%s received %u byte from addr " ATWINC15X0_MAC_STR "\n",
+            __func__, rx_size, ATWINC15X0_MAC_STR_ARG(hdr->src));
+
+        if (IS_ACTIVE(ENABLE_DEBUG_DUMP) && IS_USED(MODULE_OD)) {
+            od_hex_dump(buf, rx_size, OD_WIDTH_DEFAULT);
+        }
+    }
 
     irq_restore(state);
 
