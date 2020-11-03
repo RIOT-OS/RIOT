@@ -139,21 +139,34 @@ static const spi_dev_t spi_config[] = {
  */
 static const timer_conf_t timer_config[] = {
     {
-        {
+        .prescaler = {
             .dev = TIMER0,
             .cmu = cmuClock_TIMER0
         },
-        {
+        .timer = {
             .dev = TIMER1,
             .cmu = cmuClock_TIMER1
         },
         .irq = TIMER1_IRQn,
-        .channel_numof = 3
+        .channel_numof = 4
+    },
+    {
+        .prescaler = {
+            .dev = NULL,
+            .cmu = cmuClock_LETIMER0
+        },
+        .timer = {
+            .dev = LETIMER0,
+            .cmu = cmuClock_LETIMER0
+        },
+        .irq = LETIMER0_IRQn,
+        .channel_numof = 2
     }
 };
 
 #define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 #define TIMER_0_ISR         isr_timer1
+#define TIMER_1_ISR         isr_letimer0
 /** @} */
 
 /**
