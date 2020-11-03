@@ -17,6 +17,8 @@
 #ifndef PCA9633_REGS_H
 #define PCA9633_REGS_H
 
+#include "bitarithm.h"
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -98,47 +100,47 @@ extern "C"
  *        0 = disabled
  *        1 = enabled
  */
-#define PCA9633_BIT_AI2     7
+#define PCA9633_BIT_AI2     BIT7
 
 /**
  * @brief Bit for Auto-Increment bit1
  */
-#define PCA9633_BIT_AI1     6
+#define PCA9633_BIT_AI1     BIT6
 
 /**
  * @brief Bit for Auto-Increment bit0
  */
-#define PCA9633_BIT_AI0     5
+#define PCA9633_BIT_AI0     BIT5
 
 /**
  * @brief 0 = Normal mode
  *        1 = Low power mode. Oscillator off
  */
-#define PCA9633_BIT_SLEEP   4
+#define PCA9633_BIT_SLEEP   BIT4
 
 /**
  * @brief 0 = PCA9633 does not respond to I2C-bus subaddress 1
  *        1 = PCA9633 responds to I2C-bus subaddress 1
  */
-#define PCA9633_BIT_SUB1    3
+#define PCA9633_BIT_SUB1    BIT3
 
 /**
  * @brief 0 = PCA9633 does not respond to I2C-bus subaddress 2
  *        1 = PCA9633 responds to I2C-bus subaddress 2
  */
-#define PCA9633_BIT_SUB2    2
+#define PCA9633_BIT_SUB2    BIT2
 
 /**
  * @brief 0 = PCA9633 does not respond to I2C-bus subaddress 3
  *        1 = PCA9633 responds to I2C-bus subaddress 3
  */
-#define PCA9633_BIT_SUB3    1
+#define PCA9633_BIT_SUB3    BIT1
 
 /**
  * @brief 0 = PCA9633 does not respond to LED All Call I2C-bus address
  *        1 = PCA9633 responds to LED All Call I2C-bus address
  */
-#define PCA9633_BIT_ALLCALL 0
+#define PCA9633_BIT_ALLCALL BIT0
 
 
 
@@ -147,30 +149,25 @@ extern "C"
 /**
  * @brief Bit for group control; 0=dimming, 1=blinking
  */
-#define PCA9633_BIT_DMBLNK  5
+#define PCA9633_BIT_DMBLNK      BIT5
 
 /**
  * @brief 0 = Output logic state not inverted. Value to use when no external driver used
  *        1 = Output logic state inverted. Value to use when external driver used
  */
-#define PCA9633_BIT_INVRT   4
+#define PCA9633_BIT_INVRT       BIT4
 
 /**
  * @brief 0 = Outputs change on STOP command
  *        1 = Outputs change on ACK
  */
-#define PCA9633_BIT_OCH     3
+#define PCA9633_BIT_OCH         BIT3
 
 /**
  * @brief 0 = The 4 LED outputs are configured with an open-drain structure
  *        1 = The 4 LED outputs are configured with a totem pole structure
  */
-#define PCA9633_BIT_OUTDRV  2
-
-/**
- * @brief See PCA9633_BIT_OUTNE0
- */
-#define PCA9633_BIT_OUTNE1  1
+#define PCA9633_BIT_OUTDRV      BIT2
 
 /**
  * @brief 00 = When OE = 1 (output drivers not enabled), LEDn = 0.
@@ -180,31 +177,31 @@ extern "C"
  *        10 When OE = 1 (output drivers not enabled), LEDn = high-impedance.
  *        11 reserved
  */
-#define PCA9633_BIT_OUTNE0  0
+#define PCA9633_BITMASK_OUTNE   0x03
 
 
 
 /* Bits in REG_LEDOUT (page 14, table 13) */
 
 /**
- * @brief Lower of two bits for LDR3
+ * @brief Bitmask for LDR3
  */
-#define PCA9633_BIT_LDR3    6
+#define PCA9633_BITMASK_LDR3    0xC0
 
 /**
- * @brief Lower of two bits for LDR2
+ * @brief Bitmask for LDR2
  */
-#define PCA9633_BIT_LDR2    4
+#define PCA9633_BITMASK_LDR2    0x30
 
 /**
- * @brief Lower of two bits for LDR1
+ * @brief Bitmask for LDR1
  */
-#define PCA9633_BIT_LDR1    2
+#define PCA9633_BITMASK_LDR1    0x0C
 
 /**
- * @brief Lower of two bits for LDR0
+ * @brief Bitmask for LDR0
  */
-#define PCA9633_BIT_LDR0    0
+#define PCA9633_BITMASK_LDR0    0x03
 
 #ifdef __cplusplus
 }

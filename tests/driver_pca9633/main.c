@@ -399,25 +399,25 @@ int run_demo(int argc, char **argv)
     puts("4. changing ldr state");
     pca9633_set_grp_pwm(&pca9633_dev, 255);
     pca9633_set_rgb(&pca9633_dev, 255, 255, 255);
-    pca9633_set_ldr_state(&pca9633_dev, PCA9633_LDR_STATE_OFF, PCA9633_BIT_LDR1);
+    pca9633_set_ldr_state(&pca9633_dev, PCA9633_LDR_STATE_OFF, PCA9633_PWM_CHANNEL_1);
     // color should be magenta
     xtimer_usleep(500 * US_PER_MS);
 
     pca9633_set_grp_pwm(&pca9633_dev, 0);
     pca9633_set_rgb(&pca9633_dev, 0, 0, 0);
-    pca9633_set_ldr_state(&pca9633_dev, PCA9633_LDR_STATE_ON, PCA9633_BIT_LDR1);
+    pca9633_set_ldr_state(&pca9633_dev, PCA9633_LDR_STATE_ON, PCA9633_PWM_CHANNEL_1);
     // color should be green
     xtimer_usleep(500 * US_PER_MS);
 
     pca9633_set_grp_pwm(&pca9633_dev, 255);
     pca9633_set_rgb(&pca9633_dev, 255, 128, 0);
-    pca9633_set_ldr_state(&pca9633_dev,PCA9633_LDR_STATE_IND, PCA9633_BIT_LDR1);
+    pca9633_set_ldr_state(&pca9633_dev,PCA9633_LDR_STATE_IND, PCA9633_PWM_CHANNEL_1);
     // color should be orange
     xtimer_usleep(500 * US_PER_MS);
 
     pca9633_set_grp_pwm(&pca9633_dev, 0);
     pca9633_set_rgb(&pca9633_dev, 255, 255, 255);
-    pca9633_set_ldr_state(&pca9633_dev, PCA9633_LDR_STATE_IND_GRP, PCA9633_BIT_LDR1);
+    pca9633_set_ldr_state(&pca9633_dev, PCA9633_LDR_STATE_IND_GRP, PCA9633_PWM_CHANNEL_1);
     // should be no color at all
     xtimer_usleep(500 * US_PER_MS);
 
