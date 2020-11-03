@@ -357,11 +357,6 @@ endif
 # Add standard include directories
 INCLUDES += -I$(RIOTBASE)/core/include -I$(RIOTBASE)/drivers/include -I$(RIOTBASE)/sys/include
 
-# Augmentation ldscript for cross file arrays (XFA)
-# this argument must come before any other -T options on the command line,
-# otherwise we get an error message ".text not found for insert"
-LINKFLAGS += -Txfa.ld
-
 # process provided features
 include $(RIOTBASE)/Makefile.features
 
