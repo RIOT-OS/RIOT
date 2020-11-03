@@ -311,7 +311,7 @@ void gnrc_lorawan_calculate_join_mic(const uint8_t *buf, size_t len,
  * @param[in] dev_addr the Device Address
  * @param[in] fcnt frame counter
  * @param[in] dir direction of the packet (0 is uplink, 1 is downlink)
- * @param[in] frame pointer to the PSDU frame (witout MIC)
+ * @param[in] frame pointer to the PSDU frame (without MIC)
  * @param[in] nwkskey pointer to the Network Session Key
  * @param[out] out calculated MIC
  */

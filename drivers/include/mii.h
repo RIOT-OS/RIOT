@@ -64,7 +64,7 @@ extern "C" {
 #define MII_BMCR_POWER_DOWN BIT11   /**< Set to power down PHY */
 #define MII_BMCR_ISOLATE    BIT10   /**< Set to electrically isolate PHY from
                                          MII (PHY becomes inoperational) */
-#define MII_BMCR_AN_RESTART BIT9    /**< Set to restart auto-negotation */
+#define MII_BMCR_AN_RESTART BIT9    /**< Set to restart auto-negotiation */
 #define MII_BMCR_FULL_DPLX  BIT8    /**< Set for full duplex */
 #define MII_BMCR_HALF_DPLX  (0)     /**< Set for half duplex */
 #define MII_BMCR_COLL_TEST  BIT7    /**< Set to enable collision signal test */
