@@ -5,8 +5,8 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect("n=   0 t=\ +\d+ v=0x00000000\r\n")
-    child.expect("n=   1 t=\+\ +\d+ v=0x00000001\r\n")
+    child.expect(r"n=   0 t=\ +\d+ v=0x00000000\r\n")
+    child.expect(r"n=   1 t=\+\ +\d+ v=0x00000001\r\n")
 
 
 if __name__ == "__main__":
