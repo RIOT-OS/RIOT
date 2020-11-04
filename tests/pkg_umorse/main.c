@@ -23,7 +23,7 @@
 #include "led.h"
 #include "periph_conf.h"
 #include "xtimer.h"
-#define UMORSE_MSLEEP(m)    xtimer_usleep(m * US_PER_MS)
+#define UMORSE_MSLEEP(m)    xtimer_msleep(m)
 
 #include "umorse.h"
 #include "print.h"
