@@ -135,7 +135,7 @@ int aip31068_init(aip31068_t *dev, const aip31068_params_t *params)
      * HD44780 hidden behind it so to be sure that it works for all kinds of
      * HD44780 we follow the initialization sequence of the HD44780, even though
      * it might be unnecessary for others. */
-    xtimer_usleep(50 * US_PER_MS);
+    xtimer_msleep(50);
 
     int rc = 0;
 
@@ -146,7 +146,7 @@ int aip31068_init(aip31068_t *dev, const aip31068_params_t *params)
     }
 
     /* wait after the first try */
-    xtimer_usleep(5 * US_PER_MS);
+    xtimer_msleep(5);
 
     /* second try */
     rc = _command(dev, AIP31068_CMD_FUNCTION_SET | _function_set);
