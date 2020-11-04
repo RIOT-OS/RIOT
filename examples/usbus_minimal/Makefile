@@ -22,7 +22,4 @@ USB_PID ?= $(USB_PID_TESTING)
 # Change this to 0 show compiler invocation lines by default:
 QUIET ?= 1
 
-# Do not run Kconfig by default
-SHOULD_RUN_KCONFIG ?=
-
 include $(RIOTBASE)/Makefile.include
