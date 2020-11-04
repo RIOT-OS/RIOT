@@ -198,25 +198,10 @@ static int mtd_sdcard_read(mtd_dev_t *dev, void *buff, uint32_t addr,
     return -EOVERFLOW;
 }
 
-static int mtd_sdcard_write(mtd_dev_t *dev, const void *buff, uint32_t addr,
-                            uint32_t size)
-{
-    int res =  mtd_sdcard_write_page(dev, buff, addr / SD_HC_BLOCK_SIZE,
-                                     addr % SD_HC_BLOCK_SIZE, size);
-    if (res < 0) {
-        return res;
-    }
-    if (res == (int)size) {
-        return 0;
-    }
-    return -EOVERFLOW;
-}
-
 const mtd_desc_t mtd_sdcard_driver = {
     .init = mtd_sdcard_init,
     .read = mtd_sdcard_read,
     .read_page = mtd_sdcard_read_page,
-    .write = mtd_sdcard_write,
     .write_page = mtd_sdcard_write_page,
     .erase_sector = mtd_sdcard_erase_sector,
     .power = mtd_sdcard_power,
