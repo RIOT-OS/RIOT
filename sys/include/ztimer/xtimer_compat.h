@@ -68,10 +68,35 @@ static inline uint64_t xtimer_now_usec64(void)
     return ztimer_now(ZTIMER_USEC);
 }
 
+static inline void _ztimer_sleep_scale(ztimer_clock_t *clock, uint32_t time, uint32_t scale)
+{
+    const uint32_t max_sleep = UINT32_MAX / scale;
+
+    while (time > max_sleep) {
+        ztimer_sleep(clock, max_sleep * scale);
+        time -= max_sleep;
+    }
+
+    ztimer_sleep(clock, time * scale);
+}
+
 static inline void xtimer_sleep(uint32_t seconds)
 {
     /* TODO: use ZTIMER_SEC */
-    ztimer_sleep(ZTIMER_USEC, seconds * 1000000LU);
+    if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
+        _ztimer_sleep_scale(ZTIMER_MSEC, seconds, 1000);
+    } else {
+        _ztimer_sleep_scale(ZTIMER_USEC, seconds, 1000000);
+    }
+}
+
+static inline void xtimer_msleep(uint32_t milliseconds)
+{
+    if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
+        ztimer_sleep(ZTIMER_MSEC, milliseconds);
+    } else {
+        _ztimer_sleep_scale(ZTIMER_USEC, seconds, 1000);
+    }
 }
 
 static inline void xtimer_usleep(uint32_t microseconds)
