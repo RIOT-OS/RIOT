@@ -61,26 +61,26 @@ int mhz19_get_ppm(mhz19_t *dev, int16_t *ppm)
     DEBUG("%s: Waiting for high level to end\n", __func__);
     while (gpio_read(dev->pin) && timeout) {
         timeout--;
-        xtimer_usleep(US_PER_MS);
+        xtimer_msleep(1);
     }
 
     DEBUG("%s: Waiting for initial rising edge\n", __func__);
     while (!gpio_read(dev->pin) && timeout) {
         timeout--;
-        xtimer_usleep(US_PER_MS);
+        xtimer_msleep(1);
     }
 
     start = xtimer_now_usec() / US_PER_MS;
     DEBUG("%s: Waiting for falling edge\n", __func__);
     while (gpio_read(dev->pin) && timeout) {
         timeout--;
-        xtimer_usleep(US_PER_MS);
+        xtimer_msleep(1);
     }
     middle = xtimer_now_usec() / US_PER_MS;
     DEBUG("%s: Waiting for rising edge\n", __func__);
     while (!gpio_read(dev->pin) && timeout) {
         timeout--;
-        xtimer_usleep(US_PER_MS);
+        xtimer_msleep(1);
     }
 
     /* If we waited too long for flanks, something went wrong */

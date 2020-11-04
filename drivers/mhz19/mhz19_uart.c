@@ -137,7 +137,7 @@ static void mhz19_cmd(mhz19_t *dev, const uint8_t *in)
     uart_write(dev->params->uart, in, MHZ19_BUF_SIZE + 1);
 
     /* Add some delay after executing command */
-    xtimer_usleep(MHZ19_TIMEOUT_CMD * US_PER_MS);
+    xtimer_msleep(MHZ19_TIMEOUT_CMD);
 
     /* Unlock concurrency guard mutex */
     mutex_unlock(&dev->mutex);
