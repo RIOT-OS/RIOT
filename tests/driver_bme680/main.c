@@ -76,7 +76,7 @@ int main(void)
             /* get the duration for the measurement */
             int duration = bme680_get_duration(&dev[i]);
             /* wait for the duration */
-            xtimer_usleep(duration * US_PER_MS);
+            xtimer_msleep(duration);
             /* read the data */
             int res = bme680_get_data(&dev[i], &data);
 
