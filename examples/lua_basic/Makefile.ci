@@ -33,6 +33,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     opencm904 \
     saml10-xpro \
     saml11-xpro \
+    slstk3400a \
     spark-core \
     stk3200 \
     stm32f030f4-demo \
