@@ -113,17 +113,17 @@ int main(void)
 
     thread_create(_stack, sizeof(_stack), PRIO, 0, _cnt_thread, NULL, "cnt");
     /* first, wait 155ms -> should lead to 3 timeout wakeups */
-    xtimer_usleep(155U * US_PER_MS);
+    xtimer_msleep(155U);
     /* post event 3 times -> should lead to 3 event wakeups */
     for (unsigned i = 0; i < 3; i++) {
         event_post(&_evtq, &_evt);
-        xtimer_usleep(5U * US_PER_MS);
+        xtimer_msleep(5U);
     }
     /* wait for 35ms and post another event -> +1 event wakeup */
-    xtimer_usleep(35U * US_PER_MS);
+    xtimer_msleep(35U);
     event_post(&_evtq, &_evt);
     /* finally, wait 60ms and collect results -> +1 timeout wakeup */
-    xtimer_usleep(60U * US_PER_MS);
+    xtimer_msleep(60U);
 
     unsigned events = atomic_load(&_wakeup_evt);
     unsigned timeouts = atomic_load(&_wakeup_timeout);
