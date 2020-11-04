@@ -231,7 +231,7 @@ int rn2xx3_sys_sleep(rn2xx3_t *dev)
 
     /* Wait a little to check if the device could go to sleep. No answer means
        it worked. */
-    xtimer_usleep(US_PER_MS);
+    xtimer_msleep(1);
 
     DEBUG("[rn2xx3] RESP: %s\n", dev->resp_buf);
     if (rn2xx3_process_response(dev) == RN2XX3_ERR_INVALID_PARAM) {
