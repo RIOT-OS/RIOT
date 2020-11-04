@@ -387,11 +387,11 @@ int run_demo(int argc, char **argv)
     aip31068_clear(&aip31068_dev);
     aip31068_set_text_insertion_mode(&aip31068_dev, LEFT_TO_RIGHT);
     aip31068_print(&aip31068_dev, "scroll right");
-    xtimer_usleep(500 * US_PER_MS);
+    xtimer_msleep(500);
 
     for (int i = 0; i < 4; i++) {
         aip31068_scroll_display_right(&aip31068_dev);
-        xtimer_usleep(500 * US_PER_MS);
+        xtimer_msleep(500);
     }
 
     /* 2.b scroll left with text insertion following RIGHT_TO_LEFT */
@@ -399,11 +399,11 @@ int run_demo(int argc, char **argv)
     aip31068_set_text_insertion_mode(&aip31068_dev, RIGHT_TO_LEFT);
     aip31068_set_cursor_position(&aip31068_dev, 0, COL_COUNT - 1);
     aip31068_print(&aip31068_dev, "tfel llorcs");
-    xtimer_usleep(500 * US_PER_MS);
+    xtimer_msleep(500);
 
     for (int i = 0; i < 5; i++) {
         aip31068_scroll_display_left(&aip31068_dev);
-        xtimer_usleep(500 * US_PER_MS);
+        xtimer_msleep(500);
     }
     aip31068_set_text_insertion_mode(&aip31068_dev, LEFT_TO_RIGHT);
 
@@ -433,7 +433,7 @@ int run_demo(int argc, char **argv)
     char long_line[] = "This is a very long line";
     for (int i = 0; i < (int) strlen(long_line); i++) {
         aip31068_print_char(&aip31068_dev, long_line[i]);
-        xtimer_usleep(250 * US_PER_MS);
+        xtimer_msleep(250);
     }
     aip31068_set_auto_scroll_enabled(&aip31068_dev, false);
     xtimer_sleep(2);
@@ -458,11 +458,11 @@ int run_demo(int argc, char **argv)
         }
 
         aip31068_set_cursor_position(&aip31068_dev, 0, i);
-        xtimer_usleep(500 * US_PER_MS);
+        xtimer_msleep(500);
     }
     xtimer_sleep(1);
     aip31068_return_home(&aip31068_dev);
-    xtimer_usleep(500 * US_PER_MS);
+    xtimer_msleep(500);
     aip31068_set_cursor_blinking_enabled(&aip31068_dev, false);
 
     /* 7. show and move cursor */
@@ -471,18 +471,18 @@ int run_demo(int argc, char **argv)
     xtimer_sleep(1);
     for (int i = 0; i <= 9; i++) {
         aip31068_print_char(&aip31068_dev, '0' + i);
-        xtimer_usleep(250 * US_PER_MS);
+        xtimer_msleep(250);
     }
 
     aip31068_return_home(&aip31068_dev);
-    xtimer_usleep(100 * US_PER_MS);
+    xtimer_msleep(100);
     for (int i = 0; i < 50; i++) {
         aip31068_move_cursor_right(&aip31068_dev);
-        xtimer_usleep(100 * US_PER_MS);
+        xtimer_msleep(100);
     }
     for (int i = 50; i > 0 ; i--) {
         aip31068_move_cursor_left(&aip31068_dev);
-        xtimer_usleep(100 * US_PER_MS);
+        xtimer_msleep(100);
     }
 
     aip31068_set_cursor_visible(&aip31068_dev, false);
@@ -501,7 +501,7 @@ int run_demo(int argc, char **argv)
                 aip31068_print(&aip31068_dev, "B");
             }
 
-            xtimer_usleep(100 * US_PER_MS);
+            xtimer_msleep(100);
         }
 
         aip31068_clear(&aip31068_dev);
@@ -515,7 +515,7 @@ int run_demo(int argc, char **argv)
                 aip31068_print(&aip31068_dev, "Y");
             }
 
-            xtimer_usleep(100 * US_PER_MS);
+            xtimer_msleep(100);
         }
     }
 
@@ -536,7 +536,7 @@ int run_demo(int argc, char **argv)
         aip31068_print(&aip31068_dev, string_rep);
 
         _set_progress(&aip31068_dev, j);
-        xtimer_usleep(100 * US_PER_MS);
+        xtimer_msleep(100);
     }
     _set_progress_bar_enabled(&aip31068_dev, false);
     aip31068_clear(&aip31068_dev);
