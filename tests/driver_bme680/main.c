@@ -55,6 +55,7 @@ int main(void)
         printf("Initialize BME680 sensor %u ... ", i);
         if (bme680_init(&dev[i], &bme680_params[i]) != BME680_OK) {
             puts("failed");
+            return -1;
         }
         else {
             puts("OK");

@@ -16,13 +16,12 @@ def testfunc(child):
     if i == 1:
         print('FAILED')
         return
-    child.expect('\[bme680\]: dev=0, ')
-    child.expect(r'T = \d+.\d+ degC, ')
-    child.expect(r'P = \d+ Pa, ')
-    child.expect(r'H = \d+.\d+ \%, ')
-    child.expect(r'G = \d+ ohms')
+    child.expect(r'\[bme680\]: dev=0, '
+                 r'T = \d+.\d+ degC, '
+                 r'P = \d+ Pa, '
+                 r'H = \d+.\d+ \%, '
+                 r'G = \d+ ohms\r\n')
     print('SUCCESS')
-    return
 
 
 if __name__ == "__main__":
