@@ -321,7 +321,7 @@ static int _send(dfplayer_t *dev, uint8_t cmd, uint8_t p1, uint8_t p2,
         }
 
         /* wait to work around HW bug */
-        xtimer_usleep(DFPLAYER_SEND_DELAY_MS * US_PER_MS);
+        xtimer_msleep(DFPLAYER_SEND_DELAY_MS);
 
         if (!retval) {
             break;
