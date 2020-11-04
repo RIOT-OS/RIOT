@@ -46,7 +46,7 @@ int main(void)
 
         progress_bar_update(&progress_bar);
 
-        xtimer_usleep(50 * US_PER_MS);
+        xtimer_msleep(50);
     }
 
     puts("\nDone!");
@@ -64,7 +64,7 @@ int main(void)
         }
 
         progress_bar_update_multi(progress_bar_list, PROGRESS_BAR_LIST_NUMOF);
-        xtimer_usleep(50 * US_PER_MS);
+        xtimer_msleep(50);
     }
 
     puts("Done!");
