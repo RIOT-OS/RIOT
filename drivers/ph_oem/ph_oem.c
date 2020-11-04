@@ -270,7 +270,7 @@ static int _new_reading_available(const ph_oem_t *dev)
             i2c_release(DEV_I2C);
             return PH_OEM_READ_ERR;
         }
-        xtimer_usleep(20 * US_PER_MS);
+        xtimer_msleep(20);
     } while (new_reading_available == 0);
 
     /* need to manually reset register back to 0x00 */
