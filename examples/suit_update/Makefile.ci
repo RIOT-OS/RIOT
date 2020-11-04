@@ -25,7 +25,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l412kb \
     saml10-xpro \
     saml11-xpro \
-    slskt3400a \
+    slstk3400a \
     stk3200 \
     stm32f0discovery \
     telosb \

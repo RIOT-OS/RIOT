@@ -28,6 +28,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     samr30-xpro \
     samr34-xpro \
     sensebox_samd21 \
+    slstk3400a \
     sodaq-% \
     stk3200 \
     stm32f030f4-demo \

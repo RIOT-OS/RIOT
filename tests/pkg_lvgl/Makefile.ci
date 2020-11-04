@@ -14,6 +14,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     saml10-xpro \
     saml11-xpro \
     spark-core \
+    slstk3400a \
     stk3200 \
     stm32f030f4-demo \
     stm32f0discovery \
