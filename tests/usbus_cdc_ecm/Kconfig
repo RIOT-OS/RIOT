@@ -1,5 +1,0 @@
-config USB_VID
-    default 0x$(DEFAULT_VID) if KCONFIG_USB
-
-config USB_PID
-    default 0x$(DEFAULT_PID) if KCONFIG_USB
