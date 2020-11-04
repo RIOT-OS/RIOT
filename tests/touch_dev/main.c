@@ -73,7 +73,7 @@ int main(void)
             printf("X: %i, Y:%i\n", touches[0].x, touches[0].y);
         }
 
-        xtimer_usleep(10 * US_PER_MS);
+        xtimer_msleep(10);
     }
 
     return 0;
