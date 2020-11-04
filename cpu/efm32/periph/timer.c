@@ -336,3 +336,17 @@ void TIMER_1_ISR(void)
     _timer_isr(1);
 }
 #endif /* TIMER_1_ISR */
+
+#ifdef TIMER_2_ISR
+void TIMER_2_ISR(void)
+{
+    _timer_isr(2);
+}
+#endif /* TIMER_2_ISR */
+
+#ifdef TIMER_3_ISR
+void TIMER_3_ISR(void)
+{
+    _timer_isr(3);
+}
+#endif /* TIMER_3_ISR */
