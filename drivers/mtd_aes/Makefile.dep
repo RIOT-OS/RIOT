@@ -1,0 +1,2 @@
+USEMODULE += crypto_aes
+USEMODULE += cipher_modes
