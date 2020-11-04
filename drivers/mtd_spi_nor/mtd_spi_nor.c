@@ -621,45 +621,6 @@ static int mtd_spi_nor_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t 
     return 0;
 }
 
-static int mtd_spi_nor_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t size)
-{
-    uint32_t total_size = mtd->page_size * mtd->pages_per_sector * mtd->sector_count;
-
-    DEBUG("mtd_spi_nor_write: %p, %p, 0x%" PRIx32 ", 0x%" PRIx32 "\n",
-          (void *)mtd, src, addr, size);
-    if (size == 0) {
-        return 0;
-    }
-    const mtd_spi_nor_t *dev = (mtd_spi_nor_t *)mtd;
-    if (size > mtd->page_size) {
-        DEBUG("mtd_spi_nor_write: ERR: page program >1 page (%" PRIu32 ")!\n", mtd->page_size);
-        return -EOVERFLOW;
-    }
-    if (dev->page_addr_mask &&
-        ((addr & dev->page_addr_mask) != ((addr + size - 1) & dev->page_addr_mask))) {
-        DEBUG("mtd_spi_nor_write: ERR: page program spans page boundary!\n");
-        return -EOVERFLOW;
-    }
-    if (addr + size > total_size) {
-        return -EOVERFLOW;
-    }
-
-    mtd_spi_acquire(dev);
-
-    /* write enable */
-    mtd_spi_cmd(dev, dev->params->opcode->wren);
-
-    /* Page program */
-    mtd_spi_cmd_addr_write(dev, dev->params->opcode->page_program, addr, src, size);
-
-    /* waiting for the command to complete before returning */
-    wait_for_write_complete(dev, 0);
-
-    mtd_spi_release(dev);
-
-    return 0;
-}
-
 static int mtd_spi_nor_write_page(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t offset,
                                   uint32_t size)
 {
@@ -768,7 +729,6 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
 const mtd_desc_t mtd_spi_nor_driver = {
     .init = mtd_spi_nor_init,
     .read = mtd_spi_nor_read,
-    .write = mtd_spi_nor_write,
     .write_page = mtd_spi_nor_write_page,
     .erase = mtd_spi_nor_erase,
     .power = mtd_spi_nor_power,
