@@ -49,6 +49,36 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    ADC configuration
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    {
+        .dev = ADC0,
+        .cmu = cmuClock_ADC0,
+    }
+};
+
+static const adc_chan_conf_t adc_channel_config[] = {
+    {
+        .dev = 0,
+        .input = adcPosSelTEMP,
+        .reference = adcRef1V25,
+        .acq_time = adcAcqTime8
+    },
+    {
+        .dev = 0,
+        .input = adcPosSelAVDD,
+        .reference = adcRef5V,
+        .acq_time = adcAcqTime8
+    }
+};
+
+#define ADC_DEV_NUMOF       ARRAY_SIZE(adc_config)
+#define ADC_NUMOF           ARRAY_SIZE(adc_channel_config)
+/** @} */
+
+/**
  * @name    RTT configuration
  * @{
  */
