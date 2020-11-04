@@ -738,6 +738,10 @@ ifneq (,$(filter random,$(USEMODULE)))
   USEMODULE += luid
 endif
 
+ifneq (,$(filter hashes,$(USEMODULE)))
+  USEMODULE += crypto
+endif
+
 ifneq (,$(filter asymcute,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += sock_util
