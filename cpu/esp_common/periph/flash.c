@@ -83,7 +83,6 @@ extern uint32_t spi_flash_get_id(void);
 /* forward declaration of mtd functions */
 static int _flash_init(mtd_dev_t *dev);
 static int _flash_read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size);
-static int _flash_write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size);
 static int _flash_write_page(mtd_dev_t *dev, const void *buff, uint32_t page,
                               uint32_t offset, uint32_t size);
 static int _flash_erase(mtd_dev_t *dev, uint32_t addr, uint32_t size);
@@ -130,7 +129,6 @@ void spi_flash_drive_init(void)
 
     _flash_driver.init  = &_flash_init;
     _flash_driver.read  = &_flash_read;
-    _flash_driver.write = &_flash_write;
     _flash_driver.write_page = &_flash_write_page;
     _flash_driver.erase = &_flash_erase;
     _flash_driver.power = &_flash_power;
@@ -307,24 +305,6 @@ static int _flash_read(mtd_dev_t *dev, void *buff, uint32_t addr, uint32_t size)
     CHECK_PARAM_RET(_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
 
     return (spi_flash_read(_flash_beg + addr, buff, size) == ESP_OK) ? 0 : -EIO;
-}
-
-static int _flash_write(mtd_dev_t *dev, const void *buff, uint32_t addr, uint32_t size)
-{
-    DEBUG("%s dev=%p addr=%08"PRIx32" size=%"PRIu32" buf=%p\n",
-          __func__, dev, addr, size, buff);
-
-    CHECK_PARAM_RET(dev == &_flash_dev, -ENODEV);
-    CHECK_PARAM_RET(buff != NULL, -ENOTSUP);
-
-    /* size must be within the flash address space */
-    CHECK_PARAM_RET(_flash_beg + addr + size <= _flash_end, -EOVERFLOW);
-
-    /* addr + size must be within a page */
-    CHECK_PARAM_RET(size <= _flashchip->page_size, -EOVERFLOW);
-    CHECK_PARAM_RET((addr % _flashchip->page_size) + size <= _flashchip->page_size, -EOVERFLOW);
-
-    return (spi_flash_write(_flash_beg + addr, buff, size) == ESP_OK) ? 0 : -EIO;
 }
 
 static int _flash_write_page(mtd_dev_t *dev, const void *buff, uint32_t page,  uint32_t offset,
