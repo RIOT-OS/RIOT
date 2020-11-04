@@ -40,5 +40,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f0discovery \
     stm32l0538-disco \
     stm32mindev \
+    stm32mp157c-dk2 \
     yunjia-nrf51822 \
     #
