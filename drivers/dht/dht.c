@@ -118,7 +118,7 @@ int dht_init(dht_t *dev, const dht_params_t *params)
 
     _reset(dev);
 
-    xtimer_usleep(2000 * US_PER_MS);
+    xtimer_msleep(2000);
 
     DEBUG("dht_init: success\n");
     return DHT_OK;
