@@ -29,6 +29,8 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
+
 #include "riotboot/hdr.h"
 
 /**
