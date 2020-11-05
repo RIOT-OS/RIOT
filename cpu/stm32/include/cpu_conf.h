@@ -79,7 +79,10 @@ extern "C" {
  * @{
  */
 #define CPU_DEFAULT_IRQ_PRIO            (1U)
+/* STM32MP1 family has no flah */
+#if !defined(CPU_FAM_STM32MP1)
 #define CPU_FLASH_BASE                  FLASH_BASE
+#endif
 
 /* CPU_IRQ_NUMOF cannot be determined automatically from cmsis header */
 #if defined(CPU_LINE_STM32F030x4)
