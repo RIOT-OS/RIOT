@@ -55,6 +55,20 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    Configuration for Feather M0 LoRa and the SX1276 module
+ * @{
+ **/
+#define SX127X_PARAM_SPI                SPI_DEV(0)
+#define SX127X_PARAM_SPI_NSS            GPIO_PIN(PA, 6)
+#define SX127X_PARAM_RESET              GPIO_PIN(PA, 8)
+#define SX127X_PARAM_DIO0               GPIO_PIN(PA, 9)
+#define SX127X_PARAM_DIO1               GPIO_UNDEF
+#define SX127X_PARAM_DIO2               GPIO_UNDEF
+#define SX127X_PARAM_DIO3               GPIO_UNDEF
+#define SX127X_PARAM_PASELECT           (SX127X_PA_BOOST)
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
  */
 void board_init(void);
