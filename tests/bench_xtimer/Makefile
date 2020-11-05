@@ -25,6 +25,7 @@ LOW_MEMORY_BOARDS += \
   e104-bt5010a-tb \
   derfmega128 \
   feather-m0 \
+  feather-m0-lora \
   feather-m0-wifi \
   hifive1 \
   hifive1b \
