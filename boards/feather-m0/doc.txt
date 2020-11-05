@@ -65,6 +65,20 @@ and define the required WiFi parameters, for example:
 For detailed information about the parameters, see section
 @ref drivers_atwinc15x0.
 
+### Using with LoRa module
+
+To enable the LoRa module available on the
+[Feather M0 LoRa](https://learn.adafruit.com/adafruit-feather-m0-radio-with-lora-radio-module)
+variant of the board automatically for LoRa applications,
+use `feather-m0-lora` as board:
+
+```
+make BOARD=feather-m0-lora -C examples/gnrc_lorawan
+```
+
+For detailed information about the parameters, see section
+@ref drivers_sx127x.
+
 ### Accessing STDIO via UART
 
 STDIO of RIOT is directly available over the USB port.

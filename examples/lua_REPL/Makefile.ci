@@ -20,6 +20,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     esp8266-olimex-mod \
     esp8266-sparkfun-thing \
     feather-m0 \
+    feather-m0-lora \
     feather-m0-wifi \
     firefly \
     frdm-kl43z \
