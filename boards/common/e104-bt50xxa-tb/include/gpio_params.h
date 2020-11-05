@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_e104-bt5010a-tb
+ * @ingroup     boards_common_e104-bt50xxa-tb
  * @{
  *
  * @file

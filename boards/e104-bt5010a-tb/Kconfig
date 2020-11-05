@@ -10,10 +10,7 @@ config BOARD
 config BOARD_E104_BT5010A_TB
     bool
     default y
-    select BOARD_COMMON_NRF52
+    select BOARD_COMMON_E104_BT50XXA_TB
     select CPU_MODEL_NRF52810XXAA
-    select HAS_PERIPH_I2C
-    select HAS_PERIPH_SPI
-    select HAS_PERIPH_UART
 
-source "$(RIOTBOARD)/common/nrf52/Kconfig"
+source "$(RIOTBOARD)/common/e104-bt50xxa-tb/Kconfig"

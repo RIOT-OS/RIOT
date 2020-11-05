@@ -1,4 +1,1 @@
-# external programmer required
-DEBUG_ADAPTER ?= jlink
-
-include $(RIOTBOARD)/common/nrf52/Makefile.include
+include $(RIOTBOARD)/common/e104-bt50xxa-tb/Makefile.include

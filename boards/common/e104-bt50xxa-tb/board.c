@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_e104-bt5010a-tb
+ * @ingroup     boards_common_e104-bt50xxa-tb
  * @{
  *
  * @file
- * @brief       Board initialization for the E104-BT5010A Test Board
+ * @brief       Board initialization for the E104-BT50xxA Test Board
  *
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  *
