@@ -108,7 +108,7 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static char _msg_stack[GCOAP_STACK_SIZE];
 static event_queue_t _queue;
 static uint8_t _listen_buf[CONFIG_GCOAP_PDU_BUF_SIZE];
-static sock_udp_t _sock;
+static sock_udp_t _sock_udp;
 
 /* Event loop for gcoap _pid thread. */
 static void *_event_loop(void *arg)
@@ -121,14 +121,14 @@ static void *_event_loop(void *arg)
     local.netif  = SOCK_ADDR_ANY_NETIF;
     local.port   = CONFIG_GCOAP_PORT;
 
-    int res = sock_udp_create(&_sock, &local, NULL, 0);
+    int res = sock_udp_create(&_sock_udp, &local, NULL, 0);
     if (res < 0) {
         DEBUG("gcoap: cannot create sock: %d\n", res);
         return 0;
     }
 
     event_queue_init(&_queue);
-    sock_udp_event_init(&_sock, &_queue, _on_sock_evt, NULL);
+    sock_udp_event_init(&_sock_udp, &_queue, _on_sock_evt, NULL);
     event_loop(&_queue);
 
     return 0;
@@ -299,7 +299,7 @@ static void _on_resp_timeout(void *arg) {
             return;
         }
 
-        ssize_t bytes = sock_udp_send(&_sock, memo->msg.data.pdu_buf,
+        ssize_t bytes = sock_udp_send(&_sock_udp, memo->msg.data.pdu_buf,
                                       memo->msg.data.pdu_len, &memo->remote_ep);
         if (bytes <= 0) {
             DEBUG("gcoap: sock resend failed: %d\n", (int)bytes);
@@ -900,7 +900,7 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
         }
     }
 
-    ssize_t res = sock_udp_send(&_sock, buf, len, remote);
+    ssize_t res = sock_udp_send(&_sock_udp, buf, len, remote);
     if (res <= 0) {
         if (memo != NULL) {
             if (msg_type == COAP_TYPE_CON) {
@@ -978,7 +978,7 @@ size_t gcoap_obs_send(const uint8_t *buf, size_t len,
     _find_obs_memo_resource(&memo, resource);
 
     if (memo) {
-        ssize_t bytes = sock_udp_send(&_sock, buf, len, memo->observer);
+        ssize_t bytes = sock_udp_send(&_sock_udp, buf, len, memo->observer);
         return (size_t)((bytes > 0) ? bytes : 0);
     }
     else {
