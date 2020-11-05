@@ -14,7 +14,6 @@ config CPU_STM32
     select HAS_PERIPH_TIMER_PERIODIC
     select HAS_PERIPH_UART_MODECFG
     select HAS_PERIPH_UART_NONBLOCKING
-    select HAS_PERIPH_WDT
 
 # Common CPU symbol
 config CPU
