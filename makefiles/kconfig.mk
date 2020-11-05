@@ -85,8 +85,11 @@ $(GENERATED_DIR): $(if $(MAKE_RESTARTS),,$(CLEAN))
 # build.
 SHOULD_RUN_KCONFIG ?= $(or $(wildcard $(APPDIR)/*.config), \
                            $(wildcard $(APPDIR)/Kconfig), \
-                           $(if $(CLEAN),,$(wildcard $(KCONFIG_OUT_CONFIG))), \
-                           $(filter menuconfig, $(MAKECMDGOALS)))
+                           $(if $(CLEAN),,$(wildcard $(KCONFIG_OUT_CONFIG))))
+
+ifneq (,$(filter menuconfig, $(MAKECMDGOALS)))
+  SHOULD_RUN_KCONFIG := 1
+endif
 
 # When testing Kconfig we should always run it
 ifeq (1,$(TEST_KCONFIG))
