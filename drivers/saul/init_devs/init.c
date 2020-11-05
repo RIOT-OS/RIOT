@@ -99,6 +99,10 @@ void saul_init_devs(void)
         extern void auto_init_fxos8700(void);
         auto_init_fxos8700();
     }
+    if (IS_USED(MODULE_GP2Y10XX)) {
+        extern void auto_init_gp2y10xx(void);
+        auto_init_gp2y10xx();
+    }
     if (IS_USED(MODULE_GROVE_LEDBAR)) {
         extern void auto_init_grove_ledbar(void);
         auto_init_grove_ledbar();
