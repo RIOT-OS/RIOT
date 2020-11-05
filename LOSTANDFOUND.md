@@ -270,3 +270,11 @@ Reason for removal:
 [9fb2f541baca469e34fa01b004d6f19385700ce9]: https://github.com/RIOT-OS/RIOT/commit/9fb2f541baca469e34fa01b004d6f19385700ce9
 [35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34]: https://github.com/RIOT-OS/RIOT/commit/35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34
 [72821a502f073006643cb4ef7815fc8c42563ce6]: https://github.com/RIOT-OS/RIOT/commit/72821a502f073006643cb4ef7815fc8c42563ce6
+
+### sys/irq_handler [a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2]
+Author(s):
+- Gunar Schorcht <gunar@schorcht.net>
+
+Reason for removal:
+- Provides some feature as `sys/event_thread`
+- Has been deprecated directly in the first release it was provided
