@@ -43,6 +43,34 @@ extern "C" {
 #define CPU_HAS_BITBAND                 (1)
 /** @} */
 
+
+/**
+ * @brief   Flash page configuration
+ * @{
+ */
+#define FLASHPAGE_SIZE          (2048U)
+/* Last page holds the Customer Configuration Area (CCA), this holds
+   the Bootloader Backdoor Configuration, Application Entry Point,
+   flashpage lock bits. For safety disable writing to that page by
+   default */
+#ifndef FLASHPAGE_CC2538_USE_CCA_PAGE
+#define FLASHPAGE_CC2538_USE_CCA_PAGE   (0)
+#endif
+#if FLASHPAGE_CC2538_USE_CCA_PAGE
+#define FLASHPAGE_NUMOF         ((CC2538_FLASHSIZE / FLASHPAGE_SIZE))
+#else
+#define FLASHPAGE_NUMOF         ((CC2538_FLASHSIZE / FLASHPAGE_SIZE) -1)
+#endif
+#define FLASH_ERASE_STATE       (0x1)
+
+/* The minimum block size which can be written is 4B. However, the erase
+ * block is always FLASHPAGE_SIZE.
+ */
+#define FLASHPAGE_RAW_BLOCKSIZE    (4U)
+/* Writing should be always 4 bytes aligned */
+#define FLASHPAGE_RAW_ALIGNMENT    (4U)
+/** @} */
+
 /**
  * @name    OpenWSN timing constants
  *

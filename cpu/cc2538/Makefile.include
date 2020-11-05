@@ -1,1 +1,26 @@
+
+# Set ROM and RAM lengths according to CPU model
+ifneq (,$(filter cc2538nf11,$(CPU_MODEL)))
+  ROM_LEN ?= 128K
+  RAM_LEN ?= 16K
+endif
+ifneq (,$(filter cc2538nf23,$(CPU_MODEL)))
+  ROM_LEN ?= 256K
+  RAM_LEN ?= 32K
+endif
+ifneq (,$(filter cc2538nf53 cc2538sf53,$(CPU_MODEL)))
+  ROM_LEN ?= 512K
+  RAM_LEN ?= 32K
+endif
+
+ROM_START_ADDR ?= 0x00200000
+RAM_START_ADDR ?= 0x20000000
+
+KB := 1024
+ROM_LEN_K := $(shell echo $(ROM_LEN) | sed 's/K//')
+FLASHSIZE := $(shell echo $$(( $(ROM_LEN_K) * $(KB) )) )
+
+# Set CFLAGS
+CFLAGS += -DCC2538_FLASHSIZE=$(FLASHSIZE)U
+
 include $(RIOTMAKE)/arch/cortexm.inc.mk
