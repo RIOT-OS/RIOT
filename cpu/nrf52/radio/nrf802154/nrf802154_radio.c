@@ -38,8 +38,8 @@
 /* Set timer period to 16 us (IEEE 802.15.4 symbol time) */
 #define TIMER_FREQ          (62500UL)
 
-#define TX_POWER_MIN        (-40)   /* in dBm */
-#define TX_POWER_MAX        (8)     /* in dBm */
+#define TX_POWER_MIN        (-40)                               /* in dBm */
+#define TX_POWER_MAX        ((int)RADIO_TXPOWER_TXPOWER_Max)    /* in dBm */
 
 /**
  * @brief Default nrf802154 radio shortcuts
@@ -308,8 +308,8 @@ static int set_cca_threshold(ieee802154_dev_t *dev, int8_t threshold)
 static void _set_txpower(int16_t txpower)
 {
     DEBUG("[nrf802154]: Setting TX power to %i\n", txpower);
-    if (txpower > 8) {
-        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Pos8dBm;
+    if (txpower > (int)RADIO_TXPOWER_TXPOWER_Max) {
+        NRF_RADIO->TXPOWER = RADIO_TXPOWER_TXPOWER_Max;
     }
     else if (txpower > 1) {
         NRF_RADIO->TXPOWER = (uint32_t)txpower;
