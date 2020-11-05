@@ -83,7 +83,7 @@ int main(void)
                 temperature / 100, temperature % 100);
 
         /* sleep between measurements */
-        xtimer_usleep(1000 * US_PER_MS);
+        xtimer_msleep(1000);
     }
 
     return 0;

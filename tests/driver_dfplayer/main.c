@@ -90,7 +90,7 @@ static void playback_done_handler(event_t *_data)
             break;
     }
     print_str(".mp3: Playback completed\n");
-    xtimer_usleep(DFPLAYER_TIMEOUT_MS * US_PER_MS);
+    xtimer_msleep(DFPLAYER_TIMEOUT_MS);
     dfplayer_next(dev);
 }
 

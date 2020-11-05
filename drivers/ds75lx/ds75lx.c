@@ -126,7 +126,7 @@ int ds75lx_wakeup(const ds75lx_t *dev)
 
     if (ret == DS75LX_OK) {
         /* Wait max conversion time (depends on resolution) */
-        xtimer_usleep((DS75LX_MAX_CONVERSION_TIME << dev->params.resolution) * US_PER_MS);
+        xtimer_msleep((DS75LX_MAX_CONVERSION_TIME << dev->params.resolution));
     }
 
     return ret;

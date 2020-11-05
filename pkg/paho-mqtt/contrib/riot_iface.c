@@ -215,7 +215,7 @@ void *mqtt_riot_run(void *arg)
         }
         MutexUnlock(&client->mutex);
         /* let other threads do their work */
-        xtimer_usleep(MQTT_YIELD_POLLING_MS * US_PER_MS);
+        xtimer_msleep(MQTT_YIELD_POLLING_MS);
     }
     return NULL;
 }

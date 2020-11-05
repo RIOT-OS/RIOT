@@ -78,7 +78,7 @@ void nm_bsp_reset(void)
 
 void nm_bsp_sleep(uint32 u32TimeMsec)
 {
-    xtimer_usleep(u32TimeMsec * US_PER_MS);
+    xtimer_msleep(u32TimeMsec);
 }
 
 void nm_bsp_register_isr(tpfNmBspIsr pfIsr)

@@ -45,8 +45,7 @@
 #define INTPIN               (dev->params.int_pin)
 #define RESETPIN             (dev->params.reset_pin)
 #define POWERPIN             (dev->params.power_pin)
-#define SPI_CS_DELAY         (US_PER_MS)
-#define DELAY_10_MS          (10 * US_PER_MS) /* 10 ms */
+#define SPI_CS_DELAY_MS      (1)
 #define TX_TIMEOUT           (8U)             /* 8 s */
 #define TX_RX_TIMEOUT        (50U)            /* 50 s */
 
@@ -167,9 +166,9 @@ static void _spi_transfer_byte(const ata8520e_t *dev, bool cont, uint8_t out)
     /* Manually triggering CS because of a required delay, see datasheet,
        section 2.1.1, page 10 */
     gpio_clear((gpio_t)CSPIN);
-    xtimer_usleep(SPI_CS_DELAY);
+    xtimer_msleep(SPI_CS_DELAY_MS);
     spi_transfer_byte(SPIDEV, SPI_CS_UNDEF, cont, out);
-    xtimer_usleep(SPI_CS_DELAY);
+    xtimer_msleep(SPI_CS_DELAY_MS);
     gpio_set((gpio_t)CSPIN);
 }
 
@@ -179,9 +178,9 @@ static void _spi_transfer_bytes(const ata8520e_t *dev, bool cont,
     /* Manually triggering CS because of a required delay, see datasheet,
        section 2.1.1, page 10 */
     gpio_clear((gpio_t)CSPIN);
-    xtimer_usleep(SPI_CS_DELAY);
+    xtimer_msleep(SPI_CS_DELAY_MS);
     spi_transfer_bytes(SPIDEV, SPI_CS_UNDEF, cont, out, in, len);
-    xtimer_usleep(SPI_CS_DELAY);
+    xtimer_msleep(SPI_CS_DELAY_MS);
     gpio_set((gpio_t)CSPIN);
 }
 
@@ -220,9 +219,9 @@ static void _status(const ata8520e_t *dev)
 static void _reset(const ata8520e_t *dev)
 {
     gpio_set(RESETPIN);
-    xtimer_usleep(DELAY_10_MS);
+    xtimer_msleep(10);
     gpio_clear(RESETPIN);
-    xtimer_usleep(DELAY_10_MS);
+    xtimer_msleep(10);
     gpio_set(RESETPIN);
 }
 
@@ -270,7 +269,7 @@ int ata8520e_init(ata8520e_t *dev, const ata8520e_params_t *params)
         return -ATA8520E_ERR_SPI;
     }
 
-    xtimer_usleep(100 * US_PER_MS); /* 100 ms */
+    xtimer_msleep(100);
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
         char sigfox_id[SIGFOX_ID_LENGTH + 1];
@@ -392,7 +391,7 @@ static bool _wait_event(ata8520e_t *dev, uint8_t timeout)
 static void _prepare_send_frame(ata8520e_t *dev, uint8_t *msg, uint8_t msg_len)
 {
     _poweron(dev);
-    xtimer_usleep(5 * US_PER_MS);
+    xtimer_msleep(5);
     _status(dev);
 
     /* Verify message length */
@@ -487,7 +486,7 @@ int ata8520e_send_bit(ata8520e_t *dev, bool bit)
 {
     DEBUG("[ata8520e] Sending bit '%d'\n", bit);
     _poweron(dev);
-    xtimer_usleep(5 * US_PER_MS);
+    xtimer_msleep(5);
     _status(dev);
 
     dev->internal_state = ATA8520E_STATE_TX;

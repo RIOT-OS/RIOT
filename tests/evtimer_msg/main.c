@@ -111,7 +111,7 @@ int main(void)
            NEVENTS);
 
     /* The last offset is the largest, wait for it and a tiny bit more */
-    xtimer_usleep((offsets[3] + 10) * US_PER_MS);
+    xtimer_msleep((offsets[3] + 10));
     puts("By now all msgs should have been received");
     puts("If yes, the tests were successful");
 }
