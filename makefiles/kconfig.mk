@@ -144,7 +144,8 @@ $(KCONFIG_OUT_CONFIG): $(GENERATED_DEPENDENCIES_DEP) $(GENCONFIG) $(MERGE_SOURCE
 	$(Q) $(GENCONFIG) \
 	  --config-out=$(KCONFIG_OUT_CONFIG) \
 	  --file-list $(KCONFIG_OUT_DEP) \
-	  --kconfig-filename $(KCONFIG) \
+	  --kconfig-filename $(KCONFIG) $(if $(Q),,--debug )\
+	  $(if $(filter 1,$(KCONFIG_IGNORE_CONFIG_ERRORS)), --ignore-config-errors) \
 	  --config-sources $(MERGE_SOURCES) && \
 	  touch $(KCONFIG_OUT_CONFIG)
 
@@ -159,7 +160,8 @@ $(KCONFIG_GENERATED_AUTOCONF_HEADER_C): $(KCONFIG_OUT_CONFIG) $(GENERATED_DIR_DE
 	$(Q) $(GENCONFIG) \
 	  --header-path $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) \
 	  --sync-deps $(KCONFIG_SYNC_DIR) \
-	  --kconfig-filename $(KCONFIG) \
+	  --kconfig-filename $(KCONFIG) $(if $(Q),,--debug ) \
+	   $(if $(filter 1,$(KCONFIG_IGNORE_CONFIG_ERRORS)), --ignore-config-errors) \
 	  --config-sources $(KCONFIG_OUT_CONFIG) && \
 	  touch $(KCONFIG_GENERATED_AUTOCONF_HEADER_C)
 

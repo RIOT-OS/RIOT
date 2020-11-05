@@ -1,0 +1,29 @@
+config APPLICATION
+    bool
+    default y
+    depends on MODULE_FOO
+
+config MODULE_FOO
+    bool "The Foo"
+
+config MODULE_BAR
+    bool "The Bar"
+    depends on MODULE_BAZ
+
+config MODULE_BAZ
+    bool "The Baz"
+
+choice
+    bool "Options"
+
+config OPT_1
+    bool "1"
+
+config OPT_2
+    bool "2"
+    depends on MODULE_BAZ
+
+config OPT_3
+    bool "3"
+
+endchoice
