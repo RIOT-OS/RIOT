@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 Freie Universität Berlin
+ * Copyright (C) 2015-2020 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -97,16 +97,9 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
- * @brief   RTC configuration
- */
-#define RTC_NUMOF           (1U)
-
-/**
  * @name    RTT configuration
  * @{
  */
-#define RTT_NUMOF           (1U)
-
 #define RTT_MAX_VALUE       (0xFFFFFF)
 #define RTT_FREQUENCY       (1U)
 /** @} */
@@ -147,7 +140,7 @@ static const timer_conf_t timer_config[] = {
             .cmu = cmuClock_TIMER1
         },
         .irq = TIMER1_IRQn,
-        .channel_numof = 3,
+        .channel_numof = 3
     }
 };
 

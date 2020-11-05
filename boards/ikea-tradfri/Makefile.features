@@ -3,6 +3,7 @@ CPU_FAM = efr32mg1p
 CPU_MODEL = efr32mg1p132f256gm32
 
 # Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_spi

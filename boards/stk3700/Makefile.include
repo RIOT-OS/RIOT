@@ -5,5 +5,8 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 
+# setup JLink for flashing
+JLINK_PRE_FLASH = r
+
 # include board common
 include $(RIOTBOARD)/common/silabs/Makefile.include

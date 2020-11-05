@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 Freie Universität Berlin
+ * Copyright (C) 2015-2020 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -141,8 +141,7 @@ static const spi_dev_t spi_config[] = {
 /**
  * @name    Timer configuration
  *
- * The implementation can use one low-energy timer
- * or two regular timers in cascade mode.
+ * The implementation uses two timers in cascade mode.
  * @{
  */
 static const timer_conf_t timer_config[] = {
@@ -156,7 +155,7 @@ static const timer_conf_t timer_config[] = {
             .cmu = cmuClock_TIMER1
         },
         .irq = TIMER1_IRQn,
-        .channel_numof = 3
+        .channel_numof = 4
     },
     {
         .prescaler = {
@@ -169,13 +168,12 @@ static const timer_conf_t timer_config[] = {
         },
         .irq = LETIMER0_IRQn,
         .channel_numof = 2
-    },
+    }
 };
 
+#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 #define TIMER_0_ISR         isr_timer1
 #define TIMER_1_ISR         isr_letimer0
-
-#define TIMER_NUMOF         ARRAY_SIZE(timer_config)
 /** @} */
 
 /**
@@ -193,15 +191,6 @@ static const uart_conf_t uart_config[] = {
         .irq = USART0_RX_IRQn
     },
     {
-        .dev = USART1,
-        .rx_pin = GPIO_PIN(PC, 6),
-        .tx_pin = GPIO_PIN(PC, 7),
-        .loc = USART_ROUTELOC0_RXLOC_LOC11 |
-               USART_ROUTELOC0_TXLOC_LOC11,
-        .cmu = cmuClock_USART1,
-        .irq = USART1_RX_IRQn
-    },
-    {
         .dev = LEUART0,
         .rx_pin = GPIO_PIN(PD, 11),
         .tx_pin = GPIO_PIN(PD, 10),
@@ -214,8 +203,7 @@ static const uart_conf_t uart_config[] = {
 
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 #define UART_0_ISR_RX       isr_usart0_rx
-#define UART_1_ISR_RX       isr_usart1_rx
-#define UART_2_ISR_RX       isr_leuart0
+#define UART_1_ISR_RX       isr_leuart0
 /** @} */
 
 #ifdef __cplusplus

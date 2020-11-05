@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Bas Stottelaar <basstottelaar@gmail.com>
+ * Copyright (C) 2017-2020 Bas Stottelaar <basstottelaar@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -49,10 +49,39 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    ADC configuration
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    {
+        .dev = ADC0,
+        .cmu = cmuClock_ADC0,
+    }
+};
+
+static const adc_chan_conf_t adc_channel_config[] = {
+    {
+        .dev = 0,
+        .input = adcPosSelTEMP,
+        .reference = adcRef1V25,
+        .acq_time = adcAcqTime8
+    },
+    {
+        .dev = 0,
+        .input = adcPosSelAVDD,
+        .reference = adcRef5V,
+        .acq_time = adcAcqTime8
+    }
+};
+
+#define ADC_DEV_NUMOF       ARRAY_SIZE(adc_config)
+#define ADC_NUMOF           ARRAY_SIZE(adc_channel_config)
+/** @} */
+
+/**
  * @name    RTT configuration
  * @{
  */
-
 #define RTT_MAX_VALUE       (0xFFFFFFFF)
 #define RTT_FREQUENCY       (1U)
 /** @} */
@@ -96,7 +125,7 @@ static const timer_conf_t timer_config[] = {
             .cmu = cmuClock_TIMER1
         },
         .irq = TIMER1_IRQn,
-        .channel_numof = 3
+        .channel_numof = 4
     },
     {
         .prescaler = {
@@ -109,7 +138,7 @@ static const timer_conf_t timer_config[] = {
         },
         .irq = LETIMER0_IRQn,
         .channel_numof = 2
-    },
+    }
 };
 
 #define TIMER_0_ISR         isr_timer1
