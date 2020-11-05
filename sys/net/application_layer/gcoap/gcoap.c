@@ -45,6 +45,8 @@
 /* Internal functions */
 static void *_event_loop(void *arg);
 static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg);
+static void _process_coap_pdu(sock_udp_t *sock, sock_udp_ep_t *remote,
+                              uint8_t *buf, size_t len);
 static ssize_t _well_known_core_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
 static void _cease_retransmission(gcoap_request_memo_t *memo);
 static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
@@ -106,7 +108,7 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static char _msg_stack[GCOAP_STACK_SIZE];
 static event_queue_t _queue;
 static uint8_t _listen_buf[CONFIG_GCOAP_PDU_BUF_SIZE];
-static sock_udp_t _sock;
+static sock_udp_t _sock_udp;
 
 /* Event loop for gcoap _pid thread. */
 static void *_event_loop(void *arg)
@@ -119,24 +121,41 @@ static void *_event_loop(void *arg)
     local.netif  = SOCK_ADDR_ANY_NETIF;
     local.port   = CONFIG_GCOAP_PORT;
 
-    int res = sock_udp_create(&_sock, &local, NULL, 0);
+    int res = sock_udp_create(&_sock_udp, &local, NULL, 0);
     if (res < 0) {
         DEBUG("gcoap: cannot create sock: %d\n", res);
         return 0;
     }
 
     event_queue_init(&_queue);
-    sock_udp_event_init(&_sock, &_queue, _on_sock_evt, NULL);
+    sock_udp_event_init(&_sock_udp, &_queue, _on_sock_evt, NULL);
     event_loop(&_queue);
 
     return 0;
 }
 
-/* Handles sock events from the event queue. */
+/* Handles UDP socket events from the event queue. */
 static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
 {
-    coap_pkt_t pdu;
+    (void)arg;
     sock_udp_ep_t remote;
+
+    if (type & SOCK_ASYNC_MSG_RECV) {
+        ssize_t res = sock_udp_recv(sock, _listen_buf, sizeof(_listen_buf),
+                                    0, &remote);
+        if (res <= 0) {
+            DEBUG("gcoap: udp recv failure: %d\n", (int)res);
+            return;
+        }
+        _process_coap_pdu(sock, &remote, _listen_buf, res);
+    }
+}
+
+/* Processes and evaluates the coap pdu */
+static void _process_coap_pdu(sock_udp_t *sock, sock_udp_ep_t *remote,
+                              uint8_t *buf, size_t len)
+{
+    coap_pkt_t pdu;
     gcoap_request_memo_t *memo = NULL;
     /* Code paths that necessitate a response on the message layer can set a
      * response type here (COAP_TYPE_RST or COAP_TYPE_ACK). If set, at the end
@@ -148,99 +167,89 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
      */
     int8_t messagelayer_emptyresponse_type = NO_IMMEDIATE_REPLY;
 
-    (void)arg;
-    if (type & SOCK_ASYNC_MSG_RECV) {
-        ssize_t res = sock_udp_recv(sock, _listen_buf, sizeof(_listen_buf),
-                                    0, &remote);
-        if (res <= 0) {
-            DEBUG("gcoap: udp recv failure: %d\n", (int)res);
-            return;
-        }
+    ssize_t res = coap_parse(&pdu, buf, len);
+    if (res < 0) {
+        DEBUG("gcoap: parse failure: %d\n", (int)res);
+        /* If a response, can't clear memo, but it will timeout later. */
+        return;
+    }
 
-        res = coap_parse(&pdu, _listen_buf, res);
-        if (res < 0) {
-            DEBUG("gcoap: parse failure: %d\n", (int)res);
-            /* If a response, can't clear memo, but it will timeout later. */
-            return;
-        }
-
-        /* validate class and type for incoming */
-        switch (coap_get_code_class(&pdu)) {
-        /* incoming request or empty */
-        case COAP_CLASS_REQ:
-            if (coap_get_code_raw(&pdu) == COAP_CODE_EMPTY) {
-                /* ping request */
-                if (coap_get_type(&pdu) == COAP_TYPE_CON) {
-                    messagelayer_emptyresponse_type = COAP_TYPE_RST;
-                    DEBUG("gcoap: Answering empty CON request with RST\n");
-                } else if (coap_get_type(&pdu) == COAP_TYPE_ACK) {
-                    _find_req_memo(&memo, &pdu, &remote, true);
-                    if ((memo != NULL) && (memo->send_limit != GCOAP_SEND_LIMIT_NON)) {
-                        DEBUG("gcoap: empty ACK processed, stopping retransmissions\n");
-                        _cease_retransmission(memo);
-                    } else {
-                        DEBUG("gcoap: empty ACK matches no known CON, ignoring\n");
-                    }
+    /* validate class and type for incoming */
+    switch (coap_get_code_class(&pdu)) {
+    /* incoming request or empty */
+    case COAP_CLASS_REQ:
+        if (coap_get_code_raw(&pdu) == COAP_CODE_EMPTY) {
+            /* ping request */
+            if (coap_get_type(&pdu) == COAP_TYPE_CON) {
+                messagelayer_emptyresponse_type = COAP_TYPE_RST;
+                DEBUG("gcoap: Answering empty CON request with RST\n");
+            } else if (coap_get_type(&pdu) == COAP_TYPE_ACK) {
+                _find_req_memo(&memo, &pdu, remote, true);
+                if ((memo != NULL) && (memo->send_limit != GCOAP_SEND_LIMIT_NON)) {
+                    DEBUG("gcoap: empty ACK processed, stopping retransmissions\n");
+                    _cease_retransmission(memo);
                 } else {
-                    DEBUG("gcoap: Ignoring empty non-CON request\n");
+                    DEBUG("gcoap: empty ACK matches no known CON, ignoring\n");
                 }
+            } else {
+                DEBUG("gcoap: Ignoring empty non-CON request\n");
             }
-            /* normal request */
-            else if (coap_get_type(&pdu) == COAP_TYPE_NON
-                    || coap_get_type(&pdu) == COAP_TYPE_CON) {
-                size_t pdu_len = _handle_req(&pdu, _listen_buf, sizeof(_listen_buf),
-                                             &remote);
-                if (pdu_len > 0) {
-                    ssize_t bytes = sock_udp_send(sock, _listen_buf, pdu_len,
-                                                  &remote);
-                    if (bytes <= 0) {
-                        DEBUG("gcoap: send response failed: %d\n", (int)bytes);
-                    }
-                }
-            }
-            else {
-                DEBUG("gcoap: illegal request type: %u\n", coap_get_type(&pdu));
-            }
-            break;
-
-        /* incoming response */
-        case COAP_CLASS_SUCCESS:
-        case COAP_CLASS_CLIENT_FAILURE:
-        case COAP_CLASS_SERVER_FAILURE:
-            _find_req_memo(&memo, &pdu, &remote, false);
-            if (memo) {
-                switch (coap_get_type(&pdu)) {
-                case COAP_TYPE_CON:
-                    messagelayer_emptyresponse_type = COAP_TYPE_ACK;
-                    DEBUG("gcoap: Answering CON response with ACK\n");
-                    /* fall through */
-                case COAP_TYPE_NON:
-                case COAP_TYPE_ACK:
-                    if (memo->resp_evt_tmout.queue) {
-                        event_timeout_clear(&memo->resp_evt_tmout);
-                    }
-                    memo->state = GCOAP_MEMO_RESP;
-                    if (memo->resp_handler) {
-                        memo->resp_handler(memo, &pdu, &remote);
-                    }
-
-                    if (memo->send_limit >= 0) {        /* if confirmable */
-                        *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
-                    }
-                    memo->state = GCOAP_MEMO_UNUSED;
-                    break;
-                default:
-                    DEBUG("gcoap: illegal response type: %u\n", coap_get_type(&pdu));
-                    break;
-                }
-            }
-            else {
-                DEBUG("gcoap: msg not found for ID: %u\n", coap_get_id(&pdu));
-            }
-            break;
-        default:
-            DEBUG("gcoap: illegal code class: %u\n", coap_get_code_class(&pdu));
         }
+        /* normal request */
+        else if (coap_get_type(&pdu) == COAP_TYPE_NON
+                || coap_get_type(&pdu) == COAP_TYPE_CON) {
+            size_t pdu_len = _handle_req(&pdu, _listen_buf, sizeof(_listen_buf),
+                                            remote);
+            if (pdu_len > 0) {
+                ssize_t bytes = sock_udp_send(sock, _listen_buf, pdu_len,
+                                                remote);
+                if (bytes <= 0) {
+                    DEBUG("gcoap: send response failed: %d\n", (int)bytes);
+                }
+            }
+        }
+        else {
+            DEBUG("gcoap: illegal request type: %u\n", coap_get_type(&pdu));
+        }
+        break;
+
+    /* incoming response */
+    case COAP_CLASS_SUCCESS:
+    case COAP_CLASS_CLIENT_FAILURE:
+    case COAP_CLASS_SERVER_FAILURE:
+        _find_req_memo(&memo, &pdu, remote, false);
+        if (memo) {
+            switch (coap_get_type(&pdu)) {
+            case COAP_TYPE_CON:
+                messagelayer_emptyresponse_type = COAP_TYPE_ACK;
+                DEBUG("gcoap: Answering CON response with ACK\n");
+                /* fall through */
+            case COAP_TYPE_NON:
+            case COAP_TYPE_ACK:
+                if (memo->resp_evt_tmout.queue) {
+                    event_timeout_clear(&memo->resp_evt_tmout);
+                }
+                memo->state = GCOAP_MEMO_RESP;
+                if (memo->resp_handler) {
+                    memo->resp_handler(memo, &pdu, remote);
+                }
+
+                if (memo->send_limit >= 0) {        /* if confirmable */
+                    *memo->msg.data.pdu_buf = 0;    /* clear resend PDU buffer */
+                }
+                memo->state = GCOAP_MEMO_UNUSED;
+                break;
+            default:
+                DEBUG("gcoap: illegal response type: %u\n", coap_get_type(&pdu));
+                break;
+            }
+        }
+        else {
+            DEBUG("gcoap: msg not found for ID: %u\n", coap_get_id(&pdu));
+        }
+        break;
+    default:
+        DEBUG("gcoap: illegal code class: %u\n", coap_get_code_class(&pdu));
     }
 
     if (messagelayer_emptyresponse_type != NO_IMMEDIATE_REPLY) {
@@ -253,8 +262,8 @@ static void _on_sock_evt(sock_udp_t *sock, sock_async_flags_t type, void *arg)
          * */
         pdu.hdr->ver_t_tkl &= 0xf0;
 
-        ssize_t bytes = sock_udp_send(sock, _listen_buf,
-                                      sizeof(coap_hdr_t), &remote);
+        ssize_t bytes = sock_udp_send(sock, buf,
+                                      sizeof(coap_hdr_t), remote);
         if (bytes <= 0) {
             DEBUG("gcoap: empty response failed: %d\n", (int)bytes);
         }
@@ -290,7 +299,7 @@ static void _on_resp_timeout(void *arg) {
             return;
         }
 
-        ssize_t bytes = sock_udp_send(&_sock, memo->msg.data.pdu_buf,
+        ssize_t bytes = sock_udp_send(&_sock_udp, memo->msg.data.pdu_buf,
                                       memo->msg.data.pdu_len, &memo->remote_ep);
         if (bytes <= 0) {
             DEBUG("gcoap: sock resend failed: %d\n", (int)bytes);
@@ -891,7 +900,7 @@ size_t gcoap_req_send(const uint8_t *buf, size_t len,
         }
     }
 
-    ssize_t res = sock_udp_send(&_sock, buf, len, remote);
+    ssize_t res = sock_udp_send(&_sock_udp, buf, len, remote);
     if (res <= 0) {
         if (memo != NULL) {
             if (msg_type == COAP_TYPE_CON) {
@@ -969,7 +978,7 @@ size_t gcoap_obs_send(const uint8_t *buf, size_t len,
     _find_obs_memo_resource(&memo, resource);
 
     if (memo) {
-        ssize_t bytes = sock_udp_send(&_sock, buf, len, memo->observer);
+        ssize_t bytes = sock_udp_send(&_sock_udp, buf, len, memo->observer);
         return (size_t)((bytes > 0) ? bytes : 0);
     }
     else {
