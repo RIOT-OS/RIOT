@@ -24,7 +24,7 @@ EXPECTED_HELP = (
 
 EXPECTED_PS = (
     '\tpid | state    Q | pri',
-    '\t  \d | running  Q |   7'
+    r'\t  \d | running  Q |   7'
 )
 
 RIOT_TERMINAL = os.environ.get('RIOT_TERMINAL')
@@ -74,7 +74,7 @@ CMDS = (
     ('echo escaped\\ space', '"echo""escaped space"'),
     ('echo escape within \'\\s\\i\\n\\g\\l\\e\\q\\u\\o\\t\\e\'', '"echo""escape""within""singlequote"'),
     ('echo escape within "\\d\\o\\u\\b\\l\\e\\q\\u\\o\\t\\e"', '"echo""escape""within""doublequote"'),
-    ("""echo "t\e st" "\\"" '\\'' a\ b""", '"echo""te st"""""\'""a b"'),
+    ("""echo "t\e st" "\\"" '\\'' a\ b""", '"echo""te st"""""\'""a b"'),  # noqa: W605
 
     # test correct quoting
     ('echo "hello"world', '"echo""helloworld"'),
