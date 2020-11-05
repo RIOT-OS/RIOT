@@ -2,10 +2,10 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_nrf_temperature
 endif
 
-ifneq (,$(findstring nrf52832, $(CPU_MODEL)))
-  # include common nrf52832 dependencies
-  include $(RIOTBOARD)/common/nrf52/nrf52832/Makefile.dep
-else ifneq (,$(findstring nrf52840, $(CPU_MODEL)))
-  # include common nrf52840 dependencies
-  include $(RIOTBOARD)/common/nrf52/nrf52840/Makefile.dep
+ifneq (,$(filter nrf52811xxaa nrf52820xxaa rf52833xxaa nrf52840xxaa,$(CPU_MODEL)))
+  # include dependencies for 802.15.4 radio
+  include $(RIOTBOARD)/common/nrf52/Makefile.nrf802154.dep
+else
+  # include dependencies for BLE
+  include $(RIOTBOARD)/common/nrf52/Makefile.nimble.dep
 endif
