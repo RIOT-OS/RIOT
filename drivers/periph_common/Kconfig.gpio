@@ -22,6 +22,13 @@ config MODULE_PERIPH_GPIO_IRQ
     depends on HAS_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_COMMON
 
+config MODULE_PERIPH_GPIO_FAST_READ
+    bool "GPIO fast read"
+    depends on HAS_PERIPH_GPIO_FAST_READ
+    help
+        This trades an increase in power consumption for a decrease in GPIO pin
+        read latency.
+
 # TODO: this module is actually just an artifact from the way periph_init_%
 # modules are handled in Makefile. We need to define it to keep the list the
 # same for now. We should be able to remove it later on.
@@ -30,5 +37,10 @@ config MODULE_PERIPH_INIT_GPIO_IRQ
     bool "Auto initialize GPIO interrupt peripheral"
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_GPIO_IRQ
+
+config MODULE_PERIPH_INIT_GPIO_FAST_READ
+    bool "Auto initialize GPIO fast read"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_GPIO_FAST_READ
 
 endif # MODULE_PERIPH_GPIO
