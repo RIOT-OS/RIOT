@@ -561,8 +561,12 @@ ifneq (,$(filter posix_semaphore,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
-ifneq (,$(filter posix_time,$(USEMODULE)))
-  USEMODULE += xtimer
+ifneq (,$(filter posix_sleep,$(USEMODULE)))
+  USEMODULE += ztimer_msec
+  ifneq (,$(filter periph_rtt,$(USEMODULE)))
+    USEMODULE += ztimer_periph_rtt
+  endif
+  USEMODULE += ztimer_usec
   USEMODULE += posix_headers
 endif
 
