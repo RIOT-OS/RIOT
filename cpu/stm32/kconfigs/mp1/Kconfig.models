@@ -1,0 +1,14 @@
+# Copyright (C) 2020 Savoir-faire Linux
+#
+# This file is subject to the terms and conditions of the GNU Lesser General
+# Public License v2.1. See the file LICENSE in the top level directory for more
+# details.
+
+# CPU models
+config CPU_MODEL_STM32MP157CAC
+    bool
+    select CPU_LINE_STM32MP157CXX
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32mp157cac" if CPU_MODEL_STM32MP157CAC
