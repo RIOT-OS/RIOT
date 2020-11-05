@@ -1,0 +1,3 @@
+USEMODULE += boards_common_e104_bt50xxa_tb
+
+include $(RIOTBOARD)/common/e104-bt50xxa-tb/Makefile.dep
