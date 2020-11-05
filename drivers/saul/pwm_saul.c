@@ -27,8 +27,13 @@
 /**
  * Find factor and shiftback such that for each value entry in the phydat, the
  * resulting PWM duty cycle would be (value * factor) >> shiftback.
+ *
+ * This also makes the maximum legal input value for that input (which allows
+ * clipping the input to a value that doesn't wrap during that multiplication,
+ * or just to err out). If future versions of this take the scale into account,
+ * they will adjust the maximum accordingly.
  */
-static int extract_scaling(const phydat_t *state, int *factor, int *shiftback)
+static int extract_scaling(const phydat_t *state, int *factor, int *shiftback, int *max)
 {
     if (state->scale != 0) {
         return -ECANCELED;
@@ -43,14 +48,17 @@ static int extract_scaling(const phydat_t *state, int *factor, int *shiftback)
     case UNIT_NONE:
         *factor = 1;
         *shiftback = 0;
+        *max = saul_pwm_resolution;
         break;
     case UNIT_BOOL:
         *factor = saul_pwm_resolution;
         *shiftback = 0;
+        *max = 1;
         break;
     case UNIT_PERCENT:
         *factor = ((int)saul_pwm_resolution << shift100) / 100;
         *shiftback = shift100;
+        *max = 100;
         break;
     default:
         return -ECANCELED;
@@ -70,11 +78,15 @@ static int write_dimmer(const void *dev, phydat_t *state)
 {
     const saul_pwm_dimmer_params_t *p = dev;
 
-    int factor, shiftback;
+    int factor, shiftback, max;
 
-    int err = extract_scaling(state, &factor, &shiftback);
+    int err = extract_scaling(state, &factor, &shiftback, &max);
     if (err < 0) {
         return err;
+    }
+
+    if (state->val[0] < 0 || state->val[0] > max) {
+        return -ECANCELED;
     }
 
     setchan(&p->channel, (state->val[0] * factor) >> shiftback);
@@ -91,11 +103,17 @@ static int write_rgb(const void *dev, phydat_t *state)
 {
     const saul_pwm_rgb_params_t *p = dev;
 
-    int factor, shiftback;
+    int factor, shiftback, max;
 
-    int err = extract_scaling(state, &factor, &shiftback);
+    int err = extract_scaling(state, &factor, &shiftback, &max);
     if (err < 0) {
         return err;
+    }
+
+    for (int i = 0; i < 3; ++i) {
+        if (state->val[i] < 0 || state->val[i] > max) {
+            return -ECANCELED;
+        }
     }
 
     for (int i = 0; i < 3; ++i) {
