@@ -24,7 +24,6 @@
 #define IRQ_ARCH_H
 
 #include "irq.h"
-#include "cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,6 +37,7 @@ extern "C" {
 
 
 extern volatile int __irq_is_in;
+#define _GENERAL_INTERRUPT_ENABLE   (0x0008)
 
 __attribute__((always_inline)) static inline unsigned int irq_disable(void)
 {
@@ -48,7 +48,7 @@ __attribute__((always_inline)) static inline unsigned int irq_disable(void)
         "nop"                               "\n\t"
         "and %[gie], %[state]"              "\n\t"
         : [state]   "=r"(state)
-        : [gie]     "i"(GIE)
+        : [gie]     "i"(_GENERAL_INTERRUPT_ENABLE)
         : "memory"
     );
 
@@ -65,7 +65,7 @@ __attribute__((always_inline)) static inline unsigned int irq_enable(void)
         "nop"                               "\n\t"
         "and %[gie], %[state]"              "\n\t"
         : [state]   "=r"(state)
-        : [gie]     "i"(GIE)
+        : [gie]     "i"(_GENERAL_INTERRUPT_ENABLE)
         : "memory"
     );
 
