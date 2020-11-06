@@ -147,6 +147,14 @@ void ieee802154_submac_ack_timeout_fired(ieee802154_submac_t *submac)
     }
 }
 
+void ieee802154_submac_crc_error_cb(ieee802154_submac_t *submac)
+{
+    ieee802154_dev_t *dev = submac->dev;
+    /* switch back to RX_ON state */
+    ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_RX_ON);
+    while (ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {}
+}
+
 /* All callbacks run in the same context */
 void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac)
 {
