@@ -16,6 +16,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     cc2650-launchpad \
     cc2650stk \
     derfmega128 \
+    e104-bt5010a-tb \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \
