@@ -2,4 +2,6 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
+# use nrfmin as default GNRC netdev as nimble is too large for the board
+include $(RIOTBOARD)/common/nrf52/Makefile.nrfmin.dep
 include $(RIOTBOARD)/common/nrf52/Makefile.dep
