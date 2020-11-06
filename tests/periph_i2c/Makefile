@@ -7,4 +7,7 @@ FEATURES_OPTIONAL = periph_i2c_reconfigure
 USEMODULE += shell
 USEMODULE += xtimer
 
+# avoid running Kconfig by default
+SHOULD_RUN_KCONFIG ?=
+
 include $(RIOTBASE)/Makefile.include

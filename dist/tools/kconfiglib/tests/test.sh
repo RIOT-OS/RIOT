@@ -18,6 +18,8 @@ KCONFIGLIB_DIR="$(readlink -f "$(dirname "$0")/..")"
 TESTS_DIR=${KCONFIGLIB_DIR}/tests
 GENCONFIG=${KCONFIGLIB_DIR}/genconfig.py
 
+export TEST_KCONFIG=1
+
 KCONFIG_FILE="${TESTS_DIR}/Kconfig.test"
 CONFIG_FOO_Y="${TESTS_DIR}/foo_y.config"
 CONFIG_BAR_Y="${TESTS_DIR}/bar_y.config"

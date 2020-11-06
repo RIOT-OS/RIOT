@@ -7,4 +7,7 @@ FEATURES_OPTIONAL += periph_flashpage_rwee
 
 USEMODULE += shell
 
+# avoid running Kconfig by default
+SHOULD_RUN_KCONFIG ?=
+
 include $(RIOTBASE)/Makefile.include
