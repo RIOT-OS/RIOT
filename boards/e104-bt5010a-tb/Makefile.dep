@@ -1,3 +1,5 @@
 USEMODULE += boards_common_e104_bt50xxa_tb
 
+# use nrfmin for GNRC as nimble is too large for the board
+include $(RIOTBOARD)/common/nrf52/Makefile.nrfmin.dep
 include $(RIOTBOARD)/common/e104-bt50xxa-tb/Makefile.dep
