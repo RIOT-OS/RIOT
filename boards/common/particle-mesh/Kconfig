@@ -13,5 +13,6 @@ config BOARD_COMMON_PARTICLE_MESH
     select HAS_PERIPH_SPI
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
+    select HAS_HIGHLEVEL_STDIO
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

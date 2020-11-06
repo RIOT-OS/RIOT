@@ -6,5 +6,8 @@ ifeq (1,$(PARTICLE_MONOFIRMWARE))
   USEMODULE += usb_board_reset
 endif
 
+# default to stdio over CDC ACM
+include $(RIOTBOARD)/common/makefiles/stdio_cdc_acm.dep.mk
+
 # include common nrf52 dependencies
 include $(RIOTBOARD)/common/nrf52/Makefile.dep
