@@ -13,6 +13,7 @@ import tempfile
 import time
 
 from testrunner import run
+from testrunner import utils
 
 # Default test over loopback interface
 COAP_HOST = "[fd00:dead:beef::1]"
@@ -113,10 +114,7 @@ def ping6(client):
 
 
 def get_reachable_addr(child):
-    # Wait for suit_coap thread to start
-    child.expect_exact("suit_coap: started.")
-    child.expect_exact("Starting the shell")
-    # give some time for the network interface to be configured
+    # Give some time for the network interface to be configured
     time.sleep(1)
     # Get address
     client_addr = get_ipv6_addr(child)
@@ -126,11 +124,23 @@ def get_reachable_addr(child):
 
 
 def app_version(child):
+    utils.test_utils_interactive_sync_shell(child, 5, 1)
     # get version of currently running image
     # "Image Version: 0x00000000"
+    child.sendline('riotboot-hdr')
     child.expect(r"Image Version: (?P<app_ver>0x[0-9a-fA-F:]+)\r\n")
     app_ver = int(child.match.group("app_ver"), 16)
     return app_ver
+
+
+def running_slot(child):
+    utils.test_utils_interactive_sync_shell(child, 5, 1)
+    # get version of currently running image
+    # "Image Version: 0x00000000"
+    child.sendline('current-slot')
+    child.expect(r"Running from slot (\d+)\r\n")
+    slot = int(child.match.group(1))
+    return slot
 
 
 def _test_invalid_version(child, client, app_ver):
@@ -165,9 +175,11 @@ def _test_successful_update(child, client, app_ver):
         while wait_for_update(child) == 0:
             pass
 
+        # Wait for reboot
+        child.expect_exact("suit_coap: rebooting...")
         # Verify running slot
-        child.expect(r"running from slot (\d+)\r\n")
-        assert target_slot == int(child.match.group(1)), "BOOTED FROM SAME SLOT"
+        current_slot = running_slot(child)
+        assert target_slot == current_slot, "BOOTED FROM SAME SLOT"
         # Verify client is reachable and get address
         client = get_reachable_addr(child)
 

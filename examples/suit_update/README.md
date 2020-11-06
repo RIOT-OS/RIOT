@@ -465,22 +465,24 @@ displayed during this step:
 Once the new image is written, a final validation is performed and, in case of
 success, the application reboots on the new slot:
 
+    Finalizing payload store
     Verifying image digest
-    riotboot: verifying digest at 0x1fffbd15 (img at: 0x1000 size: 77448)
+    Starting digest verification against image
+    Install correct payload
     Verifying image digest
-    riotboot: verifying digest at 0x1fffbd15 (img at: 0x1000 size: 77448)
-    suit_parse() success
-    SUIT policy check OK.
-    suit_coap: finalizing image flash
-    riotboot_flashwrite: riotboot flashing completed successfully
+    Starting digest verification against image
+    Install correct payload
     Image magic_number: 0x544f4952
-    Image Version: 0x5e71f662
-    Image start address: 0x00001100
-    Header chksum: 0x745a0376
+    Image Version: 0x5fa52bcc
+    Image start address: 0x00201400
+    Header chksum: 0x53bb3d33
+    suit_coap: rebooting...
 
-    main(): This is RIOT! (Version: 2020.04)
+    main(): This is RIOT! (Version: <version xx>))
     RIOT SUIT update example application
-    running from slot 1
+    Running from slot 1
+    ...
+
 
 The slot number should have changed from after the application reboots.
 You can do the publish-notify sequence several times to verify this.
