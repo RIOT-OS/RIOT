@@ -35,6 +35,38 @@ To flash the board with OpenOCD, use the `PROGRAMMER` variable:
     PROGRAMMER=openocd make BOARD=<board name> -C examples/hello-world flash
 ```
 
+#### Alternative flashing procedure: Particle bootloader and DFU-Util
+
+As an alternative to using the Particle Mesh debugger,
+the USB DFU mode bootloader shipped with Particle Mesh devices can be used.
+That mode can be entered by keeping the SETUP/MODE button pressed after power-up or reset
+until the RGB LED **blinks yellow fast**.
+
+In this mode, the bootloader and Soft Device are kept in place,
+reducing the available flash memory to 784kB,
+but in turn, devices can easily be switched back to using Particle software.
+
+In order to use this mode, set `PARTICLE_MONOFIRMWARE=1` wherever you set the `BOARD`.
+This will trigger the use of the appropriate linker script,
+and switch in [`dfu-util`](http://dfu-util.sourceforge.net/) as the default programmer,
+which needs to be installed.
+<!-- Using PARTICLE_MONOFIRMWARE=1 images with an external programmer is untested but might just work once checksums are static. -->
+
+On Linux hosts, devices for the DFU mode are frequently only accessible to root,
+causing error messages like
+
+    dfu-util: Cannot open DFU device 2b04:d00e
+    dfu-util: No DFU capable USB device available
+
+To make Particle devices writable for all users,
+follow [Particle's instructions](https://docs.particle.io/support/particle-tools-faq/installing-dfu-util/)
+on setting up dfu-util.
+
+The Particle bootloader checks the firmware's checksum at startup time.
+As these checks would be frustrated by flash writes inside RIOT (typically using the @ref drivers_periph_flashpage),
+the CFLAG @ref PARTICLE_MONOFIRMWARE_CHECKSUMLIMIT "-DPARTICLE_MONOFIRMWARE_CHECKSUMLIMIT" can be set.
+Then, the checksum is only calculated over the memory region that contains the interrupt vector and the bootloader manifest.
+
 ### Reset the board
 
 The on-board reset button doesn't work, so to trigger a reset of the board, use

@@ -1,1 +1,2 @@
+CFLAGS += "-DPARTICLE_PLATFORM_ID=14"
 include $(RIOTBOARD)/common/particle-mesh/Makefile.include
