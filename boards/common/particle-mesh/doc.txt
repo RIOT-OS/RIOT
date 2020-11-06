@@ -75,12 +75,14 @@ the `reset` target with `make`:
     make BOARD=<board name> -C examples/hello-world reset
 ```
 
-### Accessing STDIO via UART
+### STDIO configuration
 
-The STDIO is not accessible via the USB port.
+By default, the board uses USB to expose a serial terminal.
+Other stdio options can be enabled as modules to replace that.
 
-To access the STDIO of RIOT, a FTDI to USB converter needs to be plugged to
-the RX/TX pins on the board.
+When the `stdio_uart` module is used,
+it defaults to using UART0,
+which is configured for the board's RX/TX pin pair.
 
 ### nRF antenna selection
 
