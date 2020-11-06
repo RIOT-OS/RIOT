@@ -31,6 +31,7 @@
 /* map CMSIS defines not present in stm32wb55xx.h */
 #if defined(CPU_FAM_STM32WB)
 #define RCC_PLLCFGR_PLLSRC_HSE      (RCC_PLLCFGR_PLLSRC_0 | RCC_PLLCFGR_PLLSRC_1)
+#define RCC_PLLCFGR_PLLSRC_HSI      (RCC_PLLCFGR_PLLSRC_1)
 #define RCC_PLLCFGR_PLLSRC_MSI      (RCC_PLLCFGR_PLLSRC_0)
 #define RCC_CFGR_SW_MSI             (0x00000000U)
 #define RCC_CFGR_SW_HSI             (RCC_CFGR_SW_0)
