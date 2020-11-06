@@ -24,6 +24,7 @@
 #include "cpu.h"
 #include "stmclk.h"
 #include "periph_conf.h"
+#include "periph/gpio.h"
 
 /* PLL configuration */
 #if defined(CPU_FAM_STM32F1)
@@ -95,11 +96,141 @@
 #endif
 #endif
 
+/* Configure MCO */
+#ifndef CONFIG_CLOCK_ENABLE_MCO
+#define CONFIG_CLOCK_ENABLE_MCO     0   /* Don't enable MCO by default */
+#endif
+
+/* Configure the MCO clock source: options are PLLCLK / 2 (default), HSE, HSI or SYSCLK*/
+#ifndef CONFIG_CLOCK_MCO_USE_PLLCLK
+#if IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSE) || IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSI) || \
+    IS_ACTIVE(CONFIG_CLOCK_MCO_USE_SYSCLK)
+#define CONFIG_CLOCK_MCO_USE_PLLCLK 0
+#else
+#define CONFIG_CLOCK_MCO_USE_PLLCLK 1   /* Use PLLCLK / 2 by default */
+#endif
+#endif /* CONFIG_CLOCK_MCO_USE_PLLCLK */
+
+#ifndef CONFIG_CLOCK_MCO_USE_HSE
+#define CONFIG_CLOCK_MCO_USE_HSE    0
+#endif /* CONFIG_CLOCK_MCO_USE_HSE */
+
+#ifndef CONFIG_CLOCK_MCO_USE_HSI
+#define CONFIG_CLOCK_MCO_USE_HSI    0
+#endif /* CONFIG_CLOCK_MCO_USE_HSI */
+
+#ifndef CONFIG_CLOCK_MCO_USE_SYSCLK
+#define CONFIG_CLOCK_MCO_USE_SYSCLK 0
+#endif /* CONFIG_CLOCK_MCO_USE_SYSCLK */
+
+#if IS_ACTIVE(CONFIG_CLOCK_MCO_USE_PLLCLK) && \
+    (IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSE) || IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSI) || \
+     IS_ACTIVE(CONFIG_CLOCK_MCO_USE_SYSCLK))
+#error "Cannot use PLLCLK as MCO clock source with other clocks"
+#endif
+
+#if IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSE) && \
+    (IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSI) || IS_ACTIVE(CONFIG_CLOCK_MCO_USE_PLLCLK) || \
+     IS_ACTIVE(CONFIG_CLOCK_MCO_USE_SYSCLK))
+#error "Cannot use HSE as MCO clock source with other clocks"
+#endif
+
+#if IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSI) && \
+    (IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSE) || IS_ACTIVE(CONFIG_CLOCK_MCO_USE_PLLCLK) || \
+     IS_ACTIVE(CONFIG_CLOCK_MCO_USE_SYSCLK))
+#error "Cannot use HSI as MCO clock source with other clocks"
+#endif
+
+#if IS_ACTIVE(CONFIG_CLOCK_MCO_USE_SYSCLK) && \
+    (IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSE) || IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSI) || \
+     IS_ACTIVE(CONFIG_CLOCK_MCO_USE_PLLCLK))
+#error "Cannot use SYSCLK as MCO clock source with other clocks"
+#endif
+
+/* Define MCO selection bitfields for F3, for compatibility reasons */
+#if defined(CPU_FAM_STM32F3)
+#define RCC_CFGR_MCOSEL_SYSCLK                  RCC_CFGR_MCO_SYSCLK
+#define RCC_CFGR_MCOSEL_HSI                     RCC_CFGR_MCO_HSI
+#define RCC_CFGR_MCOSEL_HSE                     RCC_CFGR_MCO_HSE
+#define RCC_CFGR_MCOSEL_PLL_DIV2                RCC_CFGR_MCO_PLL
+#endif
+
+#if IS_ACTIVE(CONFIG_CLOCK_MCO_USE_SYSCLK)
+#define CLOCK_MCO_SRC                           (RCC_CFGR_MCOSEL_SYSCLK)
+#elif IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSI)
+#define CLOCK_MCO_SRC                           (RCC_CFGR_MCOSEL_HSI)
+#elif IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSE)
+#define CLOCK_MCO_SRC                           (RCC_CFGR_MCOSEL_HSE)
+#elif IS_ACTIVE(CONFIG_CLOCK_MCO_USE_PLLCLK)
+#define CLOCK_MCO_SRC                           (RCC_CFGR_MCOSEL_PLL_DIV2)
+#else
+#error "Invalid MCO clock source selection"
+#endif
+
+/* Configure the MCO prescaler: valid values are 1, 2, 4, 8, 16, 32, 64, 128 */
+#ifndef CONFIG_CLOCK_MCO_PRE
+#define CONFIG_CLOCK_MCO_PRE                    (1)
+#endif
+
+/* MCO prescaler is only available on some STM32F0 and some STM32F3 lines */
+#if defined(CPU_LINE_STM32F030x6) || defined(CPU_LINE_STM32F030xC) || \
+    defined(CPU_LINE_STM32F031x6) || defined(CPU_LINE_STM32F038xx) || \
+    defined(CPU_LINE_STM32F042x6) || defined(CPU_LINE_STM32F048xx) || \
+    defined(CPU_LINE_STM32F070x6) || defined(CPU_LINE_STM32F070xB) || \
+    defined(CPU_LINE_STM32F071xB) || defined(CPU_LINE_STM32F072xB) || \
+    defined(CPU_LINE_STM32F078xx) || defined(CPU_LINE_STM32F091xC) || \
+    defined(CPU_LINE_STM32F098xx) || \
+    defined(CPU_LINE_STM32F301x8) || defined(CPU_LINE_STM32F302x8) || \
+    defined(CPU_LINE_STM32F302xE) || defined(CPU_LINE_STM32F303x8) || \
+    defined(CPU_LINE_STM32F303xE) || defined(CPU_LINE_STM32F318xx) || \
+    defined(CPU_LINE_STM32F328xx) || defined(CPU_LINE_STM32F334x8) || \
+    defined(CPU_LINE_STM32F398xx)
+#if CONFIG_CLOCK_MCO_PRE == 1
+#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_DIV1)
+#elif CONFIG_CLOCK_MCO_PRE == 2
+#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_DIV2)
+#elif CONFIG_CLOCK_MCO_PRE == 4
+#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_DIV4)
+#elif CONFIG_CLOCK_MCO_PRE == 8
+#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_DIV8)
+#elif CONFIG_CLOCK_MCO_PRE == 16
+#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_DIV16)
+#elif CONFIG_CLOCK_MCO_PRE == 32
+#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_DIV32)
+#elif CONFIG_CLOCK_MCO_PRE == 64
+#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_DIV64)
+#elif CONFIG_CLOCK_MCO_PRE == 128
+#define CLOCK_MCO_PRE                           (RCC_CFGR_MCOPRE_DIV128)
+#else
+#error "Invalid MCO prescaler"
+#endif
+#else /* CPU_FAM_STM32F1 and other F0/F3 lines */
+#if CONFIG_CLOCK_MCO_PRE != 1
+#error "MCO prescaler is not configurable on this CPU"
+#endif
+#define CLOCK_MCO_PRE                           (0)
+#endif
+
+/* MCO prescaler is only available on STM32F0 and STM32F3 */
+#if defined(CPU_FAM_STM32F1) && (CONFIG_CLOCK_MCO_PRE != 1)
+#error "MCO prescaler is not available on STM32F1 (only value 1 is allowed)."
+#endif
+
+/* Make sure MCO output clock is less than 50MHz, can only be possible when
+   using SYSCLK driven by PLL */
+#if IS_ACTIVE(CONFIG_CLOCK_MCO_USE_SYSCLK) && IS_ACTIVE(CONFIG_USE_CLOCK_PLL) && \
+    ((CLOCK_CORECLOCK / CONFIG_CLOCK_MCO_PRE) > MHZ(50))
+#error "Cannot use a SYSCLK > 50MHz to output to MCO"
+#endif
+
+
 /* Check whether PLL is required */
 /* Check whether PLL must be enabled:
   - When PLLCLK is used as SYSCLK
+  - When MCO is enabled with PLLCLK as input clock
 */
-#if IS_ACTIVE(CONFIG_USE_CLOCK_PLL)
+#if IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || \
+    (IS_ACTIVE(CONFIG_CLOCK_ENABLE_MCO) && IS_ACTIVE(CONFIG_CLOCK_MCO_USE_PLLCLK))
 #define CLOCK_ENABLE_PLL            1
 #else
 #define CLOCK_ENABLE_PLL            0
@@ -109,9 +240,11 @@
   - When HSE is used as SYSCLK
   - When PLL is used as SYSCLK and the board provides HSE (since HSE will be
     used as PLL input clock)
+  - When MCO is enabled with HSE as input clock
 */
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || \
-    (IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && IS_ACTIVE(CONFIG_USE_CLOCK_PLL))
+    (IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) || \
+    (IS_ACTIVE(CONFIG_CLOCK_ENABLE_MCO) && IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSE))
 #define CLOCK_ENABLE_HSE            1
 #else
 #define CLOCK_ENABLE_HSE            0
@@ -121,9 +254,11 @@
   - When HSI is used as SYSCLK
   - When PLL is used as SYSCLK and the board doesn't provide HSE (since HSI will be
     used as PLL input clock)
+  - When MCO is enabled with HSI as input clock
 */
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSI) || \
-    (!IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && IS_ACTIVE(CONFIG_USE_CLOCK_PLL))
+    (!IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && IS_ACTIVE(CONFIG_USE_CLOCK_PLL)) || \
+    (IS_ACTIVE(CONFIG_CLOCK_ENABLE_MCO) && IS_ACTIVE(CONFIG_CLOCK_MCO_USE_HSI))
 #define CLOCK_ENABLE_HSI            1
 #else
 #define CLOCK_ENABLE_HSI            0
@@ -160,6 +295,19 @@ void stmclk_init_sysclk(void)
 
     /* disable all active clocks except HSI -> resets the clk configuration */
     RCC->CR = (RCC_CR_HSION | RCC_CR_HSITRIM_4);
+
+    /* Enable and configure MCO if required */
+    if (IS_ACTIVE(CONFIG_CLOCK_ENABLE_MCO)) {
+        RCC->CFGR |= (CLOCK_MCO_SRC | CLOCK_MCO_PRE);
+
+        /* Configure MCO pin (PA8/AF0) */
+        gpio_init(GPIO_PIN(PORT_A, 8), GPIO_OUT);
+#if defined(CPU_FAM_STM32F1)
+        gpio_init_af(GPIO_PIN(PORT_A, 8), GPIO_AF_OUT_PP);
+#else
+        gpio_init_af(GPIO_PIN(PORT_A, 8), GPIO_AF0);
+#endif
+    }
 
     /* Enable HSE if it's used */
     if (IS_ACTIVE(CLOCK_ENABLE_HSE)) {
