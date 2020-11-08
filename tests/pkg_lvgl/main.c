@@ -90,8 +90,6 @@ static void sysmon_task(lv_task_t *param)
 
 void sysmon_create(void)
 {
-    refr_task = lv_task_create(sysmon_task, REFR_TIME, LV_TASK_PRIO_LOW, NULL);
-
     lv_coord_t hres = lv_disp_get_hor_res(NULL);
     lv_coord_t vres = lv_disp_get_ver_res(NULL);
 
@@ -123,6 +121,7 @@ void sysmon_create(void)
     lv_label_set_recolor(info_label, true);
 
     /* Refresh the chart and label manually at first */
+    refr_task = lv_task_create(sysmon_task, REFR_TIME, LV_TASK_PRIO_LOW, NULL);
     sysmon_task(NULL);
 }
 
