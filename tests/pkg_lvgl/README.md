@@ -3,7 +3,7 @@ LittlevGL sample application
 
 This application shows a basic usage of LittlevGL with RIOT. It's simply an
 adaption of one of the upstream examples: the
-[sysmon example](https://github.com/littlevgl/lv_examples/tree/master/lv_apps/sysmon).
+[sysmon example](https://github.com/lvgl/lv_apps/tree/master/src/lv_sysmon).
 
 ### Flashing the application
 
