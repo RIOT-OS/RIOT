@@ -59,7 +59,7 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
     if (CONFIG_RIOTBOOT_FLASHWRITE_RAW && offset) {
         /* Erase the first page only if the offset (!=0) specifies that there is
          * a checksum or other mechanism at the start of the page. */
-        flashpage_write(state->flashpage, NULL);
+        flashpage_erase(state->flashpage);
     }
 
     return 0;
@@ -78,9 +78,9 @@ int riotboot_flashwrite_flush(riotboot_flashwrite_t *state)
         /* Get the offset of the remaining chunk */
         size_t flashpage_pos = state->offset - flashwrite_buffer_pos;
         /* Write remaining chunk */
-        flashpage_write_raw(slot_start + flashpage_pos,
-                            state->flashpage_buf,
-                            RIOTBOOT_FLASHPAGE_BUFFER_SIZE);
+        flashpage_write(slot_start + flashpage_pos,
+                        state->flashpage_buf,
+                        RIOTBOOT_FLASHPAGE_BUFFER_SIZE);
     }
     else {
         if (flashpage_write_and_verify(state->flashpage, state->flashpage_buf) != FLASHPAGE_OK) {
@@ -106,7 +106,7 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
         if (CONFIG_RIOTBOOT_FLASHWRITE_RAW && flashpage_pos == 0) {
             /* Erase the next page */
             state->flashpage++;
-            flashpage_write(state->flashpage, NULL);
+            flashpage_erase(state->flashpage);
         }
         if (CONFIG_RIOTBOOT_FLASHWRITE_RAW &&
                 flashwrite_buffer_pos == 0) {
@@ -131,7 +131,7 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
                        state->flashpage_buf, RIOTBOOT_FLASHPAGE_BUFFER_SIZE);
             }
             else {
-                flashpage_write_raw((uint8_t*)addr + flashpage_pos,
+                flashpage_write((uint8_t*)addr + flashpage_pos,
                                     state->flashpage_buf,
                                     RIOTBOOT_FLASHPAGE_BUFFER_SIZE);
             }
@@ -161,7 +161,7 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
 
 #if CONFIG_RIOTBOOT_FLASHWRITE_RAW
     memcpy(state->firstblock_buf, bytes, len);
-    flashpage_write_raw(slot_start, state->firstblock_buf, RIOTBOOT_FLASHPAGE_BUFFER_SIZE);
+    flashpage_write(slot_start, state->firstblock_buf, RIOTBOOT_FLASHPAGE_BUFFER_SIZE);
 #else
     uint8_t *firstpage;
 

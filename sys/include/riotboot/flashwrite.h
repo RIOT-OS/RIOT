@@ -41,9 +41,9 @@
  * 2. write image starting at second block
  * 3. write first block
  *
- * When using periph_flashpage_raw with this module, the need to buffer a full
+ * When using raw mode is used with this module, the need to buffer a full
  * flashpage page is removed, instead it must buffer two times the
- * FLASHPAGE_RAW_BLOCKSIZE. One is used to buffer the current write block,
+ * FLASHPAGE_WRITE_BLOCK_SIZE. One is used to buffer the current write block,
  * the other buffers the first chunk (offset zero, page zero). This first
  * chunk is written when finalizing the flash operation. The minimal size for
  * RIOTBOOT_FLASHPAGE_BUFFER_SIZE is 4, at least the riotboot magic number must
@@ -70,7 +70,7 @@ extern "C" {
  * @brief Enable/disable raw writes to flash
  */
 #ifndef CONFIG_RIOTBOOT_FLASHWRITE_RAW
-#define CONFIG_RIOTBOOT_FLASHWRITE_RAW  IS_ACTIVE(MODULE_PERIPH_FLASHPAGE_RAW)
+#define CONFIG_RIOTBOOT_FLASHWRITE_RAW  1
 #endif
 
 /**
@@ -78,10 +78,10 @@ extern "C" {
  */
 #if CONFIG_RIOTBOOT_FLASHWRITE_RAW
 
-#if (FLASHPAGE_RAW_BLOCKSIZE < 4)
+#if (FLASHPAGE_WRITE_BLOCK_SIZE < 4)
 #define RIOTBOOT_FLASHPAGE_BUFFER_SIZE 4
 #else
-#define RIOTBOOT_FLASHPAGE_BUFFER_SIZE FLASHPAGE_RAW_BLOCKSIZE
+#define RIOTBOOT_FLASHPAGE_BUFFER_SIZE FLASHPAGE_WRITE_BLOCK_SIZE
 #endif
 
 #else /* CONFIG_RIOTBOOT_FLASHWRITE_RAW */
@@ -94,13 +94,14 @@ extern "C" {
  * @brief Extra attributes required for the firmware intermediate buffer
  */
 #define RIOTBOOT_FLASHPAGE_BUFFER_ATTRS \
-    __attribute__((aligned(FLASHPAGE_RAW_ALIGNMENT)))
+    __attribute__((aligned(FLASHPAGE_WRITE_BLOCK_ALIGNMENT)))
 
 /**
  * @brief   firmware update state structure
  *
  * @note    @ref FLASHPAGE_SIZE can be very large on some platforms, don't place
- *          this struct on the stack or increase the thread stack size accordingly.
+ *          this struct on the stack or increase the thread stack size
+ *          accordingly.
  */
 typedef struct {
     int target_slot;                        /**< update targets this slot     */
