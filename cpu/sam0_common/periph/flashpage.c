@@ -284,28 +284,13 @@ static void _write_row(uint8_t *dst, const void *_data, size_t len, size_t chunk
     }
 }
 
-void flashpage_write(int page, const void *data)
+void flashpage_erase(unsigned page)
 {
     assert((unsigned)page < FLASHPAGE_NUMOF);
-
     _erase_page(flashpage_addr(page), _cmd_erase_row);
-
-    if (data == NULL) {
-        return;
-    }
-
-    /* One RIOT page is FLASHPAGE_PAGES_PER_ROW SAM0 flash pages (a row) as
-     * defined in the file cpu/sam0_common/include/cpu_conf.h, therefore we
-     * have to split the write into FLASHPAGE_PAGES_PER_ROW raw calls
-     * underneath, each writing a physical page in chunks of 4 bytes (see
-     * flashpage_write_raw)
-     * The erasing is done once as a full row is always erased.
-     */
-    _write_row(flashpage_addr(page), data, FLASHPAGE_SIZE, NVMCTRL_PAGE_SIZE,
-               _cmd_write_page);
 }
 
-void flashpage_write_raw(void *target_addr, const void *data, size_t len)
+void flashpage_write(void *target_addr, const void *data, size_t len)
 {
     /* ensure the length doesn't exceed the actual flash size */
     assert(((unsigned)target_addr + len) <=
@@ -368,7 +353,7 @@ static void _cmd_write_page_rwwee(void)
 #endif
 }
 
-void flashpage_rwwee_write_raw(void *target_addr, const void *data, size_t len)
+void flashpage_rwwee_write(void *target_addr, const void *data, size_t len)
 {
     assert(((unsigned)target_addr + len) <=
            (CPU_FLASH_RWWEE_BASE + (FLASHPAGE_SIZE * FLASHPAGE_RWWEE_NUMOF)));
@@ -376,7 +361,7 @@ void flashpage_rwwee_write_raw(void *target_addr, const void *data, size_t len)
     _write_row(target_addr, data, len, NVMCTRL_PAGE_SIZE, _cmd_write_page_rwwee);
 }
 
-void flashpage_rwwee_write(int page, const void *data)
+void flashpage_rwwee_write_page(unsigned page, const void *data)
 {
     assert((unsigned)page < FLASHPAGE_RWWEE_NUMOF);
 
