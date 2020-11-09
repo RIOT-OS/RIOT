@@ -116,20 +116,20 @@ extern "C" {
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5)
-#define FLASHPAGE_RAW_BLOCKSIZE         (8U)
+#define FLASHPAGE_WRITE_BLOCK_SIZE      (8U)
 #elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
-#define FLASHPAGE_RAW_BLOCKSIZE         (4U)
+#define FLASHPAGE_WRITE_BLOCK_SIZE      (4U)
 #else
-#define FLASHPAGE_RAW_BLOCKSIZE         (2U)
+#define FLASHPAGE_WRITE_BLOCK_SIZE      (2U)
 #endif
 
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5)
-#define FLASHPAGE_RAW_ALIGNMENT         (8U)
+#define FLASHPAGE_WRITE_BLOCK_ALIGNMENT       (8U)
 #else
 /* Writing should be always 4 bytes aligned */
-#define FLASHPAGE_RAW_ALIGNMENT         (4U)
+#define FLASHPAGE_WRITE_BLOCK_ALIGNMENT       (4U)
 #endif
 /** @} */
 
