@@ -42,7 +42,7 @@ static int _read(mtd_dev_t *dev, void *buf, uint32_t addr, uint32_t size)
 
     (void)dev;
 
-    if (addr % FLASHPAGE_RAW_ALIGNMENT) {
+    if (addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) {
         return -EINVAL;
     }
 
@@ -61,13 +61,13 @@ static int _write(mtd_dev_t *dev, const void *buf, uint32_t addr, uint32_t size)
 {
     (void)dev;
 
-    if (addr % FLASHPAGE_RAW_ALIGNMENT) {
+    if (addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) {
         return -EINVAL;
     }
-    if ((uintptr_t)buf % FLASHPAGE_RAW_ALIGNMENT) {
+    if ((uintptr_t)buf % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) {
         return -EINVAL;
     }
-    if (size % FLASHPAGE_RAW_BLOCKSIZE) {
+    if (size % FLASHPAGE_WRITE_BLOCK_SIZE) {
         return -EOVERFLOW;
     }
     if (addr + size > MTD_FLASHPAGE_END_ADDR) {
@@ -80,7 +80,7 @@ static int _write(mtd_dev_t *dev, const void *buf, uint32_t addr, uint32_t size)
     uint32_t dst_addr = addr;
 #endif
 
-    flashpage_write_raw((void *)dst_addr, buf, size);
+    flashpage_write((void *)dst_addr, buf, size);
 
     return 0;
 }
@@ -106,7 +106,7 @@ int _erase(mtd_dev_t *dev, uint32_t addr, uint32_t size)
 #endif
 
     for (size_t i = 0; i < size; i += sector_size) {
-        flashpage_write(flashpage_page((void *)(dst_addr + i)), NULL);
+        flashpage_erase(flashpage_page((void *)(dst_addr + i)));
     }
 
     return 0;

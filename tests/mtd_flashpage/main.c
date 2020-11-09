@@ -122,7 +122,8 @@ static void test_mtd_write_erase(void)
 
 static void test_mtd_write_read(void)
 {
-    const char buf[] __attribute__ ((aligned (FLASHPAGE_RAW_ALIGNMENT))) = "ABCDEFGHIJKLMNO";
+    const char buf[] __attribute__ ((aligned (FLASHPAGE_WRITE_BLOCK_ALIGNMENT)))
+            = "ABCDEFGHIJKLMNO";
 
     /* stm32l0x and stm32l1x erase its flash with 0's */
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)

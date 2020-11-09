@@ -1,2 +1,2 @@
 FEATURES_REQUIRED += periph_flashpage
-FEATURES_REQUIRED += periph_flashpage_raw
+FEATURES_REQUIRED += periph_flashpage_pagewise
