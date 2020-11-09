@@ -8,6 +8,6 @@
 config APPLICATION
     bool
     default y
-    imply MODULE_PERIPH_FLASHPAGE_RAW
+    imply MODULE_PERIPH_FLASHPAGE_PAGEWISE
     imply MODULE_PERIPH_FLASHPAGE_RWEE
     depends on TEST_KCONFIG
