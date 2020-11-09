@@ -44,7 +44,6 @@
 #define TFLAGS_TIMEOUT      (0x0002)
 #define TFLAGS_ANY          (TFLAGS_RESP | TFLAGS_TIMEOUT)
 
-
 static const char *cli_id;
 static sock_udp_t sock;
 static sock_udp_ep_t gateway;
