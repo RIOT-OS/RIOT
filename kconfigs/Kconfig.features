@@ -124,10 +124,10 @@ config HAS_PERIPH_FLASHPAGE
     help
         Indicates that a Flashpage peripheral is present.
 
-config HAS_PERIPH_FLASHPAGE_RAW
+config HAS_PERIPH_FLASHPAGE_PAGEWISE
     bool
     help
-        Indicates that the Flashpage peripheral supports raw writing.
+        Indicates that the Flashpage peripheral supports pagewise writing.
 
 config HAS_PERIPH_FLASHPAGE_RWEE
     bool

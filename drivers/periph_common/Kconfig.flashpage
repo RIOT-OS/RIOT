@@ -19,15 +19,15 @@ config MODULE_PERIPH_INIT_FLASHPAGE
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_FLASHPAGE
 
-config MODULE_PERIPH_FLASHPAGE_RAW
-    bool "Raw writing support"
-    depends on HAS_PERIPH_FLASHPAGE_RAW
+config MODULE_PERIPH_FLASHPAGE_PAGEWISE
+    bool "Pagewise writing support"
+    depends on HAS_PERIPH_FLASHPAGE_PAGEWISE
     depends on MODULE_PERIPH_FLASHPAGE
 
-config MODULE_PERIPH_INIT_FLASHPAGE_RAW
-    bool "Auto initialize Flashpage raw"
+config MODULE_PERIPH_INIT_FLASHPAGE_PAGEWISE
+    bool "Auto initialize Flashpage pagewise"
     default y if MODULE_PERIPH_INIT
-    depends on MODULE_PERIPH_FLASHPAGE_RAW
+    depends on MODULE_PERIPH_FLASHPAGE_PAGEWISE
 
 config MODULE_PERIPH_FLASHPAGE_RWEE
     bool "Read while Write support"
