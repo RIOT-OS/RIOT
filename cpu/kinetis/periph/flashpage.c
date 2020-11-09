@@ -132,12 +132,12 @@ static int _check_errors(void)
 static int _verify_erased(uint32_t address, size_t len)
 {
     /* Ensures verifies are aligned */
-    assert(!(address % FLASHPAGE_RAW_SECTION_ALIGNMENT));
+    assert(!(address % FLASHPAGE_BLOCK_SECTION_ALIGNMENT));
 
-    /* We verify FLASHPAGE_RAW_SECTION_ALIGNMENT Bytes at a time, we
-       round up before adjusting to FLASHPAGE_RAW_SECTION_ALIGNMENT */
-    uint32_t num = (len + (FLASHPAGE_RAW_SECTION_ALIGNMENT - 1)) /
-                   FLASHPAGE_RAW_SECTION_ALIGNMENT;
+    /* We verify FLASHPAGE_BLOCK_SECTION_ALIGNMENT Bytes at a time, we
+       round up before adjusting to FLASHPAGE_BLOCK_SECTION_ALIGNMENT */
+    uint32_t num = (len + (FLASHPAGE_BLOCK_SECTION_ALIGNMENT - 1)) /
+                   FLASHPAGE_BLOCK_SECTION_ALIGNMENT;
 
     /* Setup command and run */
     FCCOBx[0] = BYTES_JOIN_TO_WORD_1_3(FTFx_VERIFY_SECTION, address);
@@ -150,7 +150,7 @@ static int _verify_erased(uint32_t address, size_t len)
 static int _sector_erase(uint32_t address)
 {
     /* Ensures erases are aligned */
-    assert(!(address % FLASHPAGE_RAW_SECTION_ALIGNMENT));
+    assert(!(address % FLASHPAGE_BLOCK_SECTION_ALIGNMENT));
 
     /* Setup command and run */
     FCCOBx[0] = BYTES_JOIN_TO_WORD_1_3(FTFx_ERASE_SECTOR, address);
@@ -163,7 +163,7 @@ static int _flash_write(uint32_t address, uint32_t *data)
 {
     /* Setup command and run */
     FCCOBx[1] = *data++;
-    if (FLASHPAGE_RAW_BLOCKSIZE == 8U) {
+    if (FLASHPAGE_WRITE_BLOCK_SIZE == 8U) {
         FCCOBx[2] = *data;
         FCCOBx[0] = BYTES_JOIN_TO_WORD_1_3(FTFx_PROGRAM_PHRASE, address);
     }
@@ -175,21 +175,29 @@ static int _flash_write(uint32_t address, uint32_t *data)
     return _check_errors();
 }
 
-void flashpage_write_raw(void *target_addr, const void *data, size_t len)
+void flashpage_erase(unsigned page)
 {
-    /* Assert multiples of FLASHPAGE_RAW_BLOCKSIZE are written and no less of
+    assert(page < (int)FLASHPAGE_NUMOF);
+
+    /* ERASE sector */
+    _sector_erase((uint32_t)flashpage_addr(page));
+}
+
+void flashpage_write(void *target_addr, const void *data, size_t len)
+{
+    /* Assert multiples of FLASHPAGE_WRITE_BLOCK_SIZE are written and no less of
        that length. */
-    assert(!(len % FLASHPAGE_RAW_BLOCKSIZE));
+    assert(!(len % FLASHPAGE_WRITE_BLOCK_SIZE));
 
     /* Ensure writes are aligned */
-    assert(!(((unsigned)target_addr % FLASHPAGE_RAW_ALIGNMENT) ||
-             ((unsigned)data % FLASHPAGE_RAW_ALIGNMENT)));
+    assert(!(((unsigned)target_addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) ||
+             ((unsigned)data % FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
 
     /* Ensure the length doesn't exceed the actual flash size */
     assert(((unsigned)target_addr + len) <
            (CPU_FLASH_BASE + (FLASHPAGE_SIZE * FLASHPAGE_NUMOF)) + 1);
 
-#ifdef FLASHPAGE_RAW_PHRASE
+#ifdef FLASHPAGE_BLOCK_PHRASE
     const uint64_t *data_addr = data;
     uint64_t *dst = target_addr;
 #else
@@ -203,24 +211,9 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
         return;
     }
 
-    /* Write to flash FLASHPAGE_RAW_BLOCKSIZE bytes at a time */
-    for (size_t i = 0; i < (len / FLASHPAGE_RAW_BLOCKSIZE); i++) {
+    /* Write to flash FLASHPAGE_WRITE_BLOCK_SIZE bytes at a time */
+    for (size_t i = 0; i < (len / FLASHPAGE_WRITE_BLOCK_SIZE); i++) {
         _flash_write((uint32_t) dst++, (uint32_t *) data_addr++);
     }
 
-}
-
-void flashpage_write(int page, const void *data)
-{
-    assert(page < (int)FLASHPAGE_NUMOF);
-
-    uint32_t *page_addr = flashpage_addr(page);
-
-    /* ERASE sector */
-    _sector_erase((uint32_t)page_addr);
-
-    /* WRITE sector */
-    if (data != NULL) {
-        flashpage_write_raw(page_addr, data, FLASHPAGE_SIZE);
-    }
 }

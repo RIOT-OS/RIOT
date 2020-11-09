@@ -21,7 +21,7 @@ include $(LAST_MAKEFILEDIR)/kinetis-info.mk
 
 ifneq (,$(filter k w,$(CPU_FAM)))
   FEATURES_PROVIDED += periph_flashpage
-  FEATURES_PROVIDED += periph_flashpage_raw
+  FEATURES_PROVIDED += periph_flashpage_pagewise
 endif
 
 ifeq (ea,$(CPU_FAM))
