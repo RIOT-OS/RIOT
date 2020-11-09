@@ -248,16 +248,7 @@ void flashpage_write(int page, const void *data)
     assert(page < (int)(FLASH->SFR & FLASH_SFR_SFSA));
 #endif
 
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
-    /* STM32L0/L1 only supports word sizes */
-    uint32_t *page_addr = flashpage_addr(page);
-#elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4) || \
-      defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5)
-    uint64_t *page_addr = flashpage_addr(page);
-#else
-    /* Default is to support half-word sizes */
-    uint16_t *page_addr = flashpage_addr(page);
-#endif
+    void *page_addr = flashpage_addr(page);
 
     /* ERASE sequence */
     _erase_page(page_addr);
