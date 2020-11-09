@@ -139,7 +139,15 @@ extern "C" {
       (IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CLOCK_HSE == MHZ(16)))
 #define CONFIG_CLOCK_PLL_N              (32)
 #else
+#if defined(CPU_LINE_STM32L4A6xx) || defined(CPU_LINE_STM32L4P5xx) || \
+    defined(CPU_LINE_STM32L4Q5xx) || defined(CPU_LINE_STM32L4R5xx) || \
+    defined(CPU_LINE_STM32L4R7xx) || defined(CPU_LINE_STM32L4R9xx) || \
+    defined(CPU_LINE_STM32L4S5xx) || defined(CPU_LINE_STM32L4S7xx) || \
+    defined(CPU_LINE_STM32L4S9xx)
+#define CONFIG_CLOCK_PLL_N              (30)
+#else
 #define CONFIG_CLOCK_PLL_N              (20)
+#endif
 #endif
 #endif
 #ifndef CONFIG_CLOCK_PLL_Q
