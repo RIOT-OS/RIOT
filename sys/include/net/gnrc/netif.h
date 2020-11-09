@@ -91,9 +91,9 @@ typedef enum {
  */
 typedef enum {
     /**
-     * @brief   Address becomes valid
+     * @brief   Link-Local Address becomes valid
      *
-     * The event is generated when an address on the interface becomes valid.
+     * The event is generated when a link-local address on the interface becomes valid.
      * The message payload contains a pointer to the respective
      * @ref ipv6_addr_t struct.
      *
@@ -101,7 +101,19 @@ typedef enum {
      * the event and processing it, the pointer will point to the new address
      * which might *not* be valid.
      */
-    GNRC_IPV6_EVENT_ADDR_VALID,
+    GNRC_IPV6_EVENT_LOCAL_ADDR_VALID,
+    /**
+     * @brief   Global Address becomes valid
+     *
+     * The event is generated when a global address on the interface becomes valid.
+     * The message payload contains a pointer to the respective
+     * @ref ipv6_addr_t struct.
+     *
+     * @note If the address on the interface changed between sending
+     * the event and processing it, the pointer will point to the new address
+     * which might *not* be valid.
+     */
+    GNRC_IPV6_EVENT_GLOBAL_ADDR_VALID,
 } gnrc_ipv6_event_t;
 
 /**

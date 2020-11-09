@@ -79,7 +79,7 @@ void _auto_configure_addr(gnrc_netif_t *netif, const ipv6_addr_t *pfx,
          *    locked here) */
         netif->ipv6.addrs_flags[idx] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
         netif->ipv6.addrs_flags[idx] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
-        gnrc_netif_ipv6_bus_post(netif, GNRC_IPV6_EVENT_ADDR_VALID, &netif->ipv6.addrs[idx]);
+        gnrc_netif_ipv6_bus_post(netif, GNRC_IPV6_EVENT_LOCAL_ADDR_VALID, &netif->ipv6.addrs[idx]);
     }
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
@@ -213,7 +213,11 @@ void _handle_valid_addr(const ipv6_addr_t *addr)
     if (idx >= 0) {
         netif->ipv6.addrs_flags[idx] &= ~GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_MASK;
         netif->ipv6.addrs_flags[idx] |= GNRC_NETIF_IPV6_ADDRS_FLAGS_STATE_VALID;
-        gnrc_netif_ipv6_bus_post(netif, GNRC_IPV6_EVENT_ADDR_VALID, &netif->ipv6.addrs[idx]);
+
+        gnrc_ipv6_event_t event = ipv6_addr_is_link_local(addr)
+                                ? GNRC_IPV6_EVENT_LOCAL_ADDR_VALID
+                                : GNRC_IPV6_EVENT_GLOBAL_ADDR_VALID;
+        gnrc_netif_ipv6_bus_post(netif, event, &netif->ipv6.addrs[idx]);
     }
     if (netif != NULL) {
         /* was acquired in `_get_netif_state()` */
