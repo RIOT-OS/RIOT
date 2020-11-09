@@ -26,15 +26,27 @@
 
 #include "em_msc.h"
 
-void flashpage_write_raw(void *target_addr, const void *data, size_t len)
+void flashpage_erase(unsigned page)
 {
-    /* assert multiples of FLASHPAGE_RAW_BLOCKSIZE are written and no less of
+    assert(page < (int)FLASHPAGE_NUMOF);
+
+    uint32_t *page_addr = (uint32_t *)flashpage_addr(page);
+
+    /* erase given page */
+    MSC_Init();
+    MSC_ErasePage(page_addr);
+    MSC_Deinit();
+}
+
+void flashpage_write(void *target_addr, const void *data, size_t len)
+{
+    /* assert multiples of FLASHPAGE_WRITE_BLOCK_SIZE are written and no less of
        that length. */
-    assert(!(len % FLASHPAGE_RAW_BLOCKSIZE));
+    assert(!(len % FLASHPAGE_WRITE_BLOCK_SIZE));
 
     /* ensure writes are aligned */
-    assert(!(((unsigned)target_addr % FLASHPAGE_RAW_ALIGNMENT) ||
-            ((unsigned)data % FLASHPAGE_RAW_ALIGNMENT)));
+    assert(!(((unsigned)target_addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) ||
+            ((unsigned)data % FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
 
     /* ensure the length doesn't exceed the actual flash size */
     assert(((unsigned)target_addr + len) <
@@ -46,21 +58,4 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     MSC_Init();
     MSC_WriteWord(page_addr, data_addr, len);
     MSC_Deinit();
-}
-
-void flashpage_write(int page, const void *data)
-{
-    assert(page < (int)FLASHPAGE_NUMOF);
-
-    uint32_t *page_addr = (uint32_t *)flashpage_addr(page);
-
-    /* erase given page */
-    MSC_Init();
-    MSC_ErasePage(page_addr);
-    MSC_Deinit();
-
-    /* write data to page */
-    if (data != NULL) {
-        flashpage_write_raw(page_addr, data, FLASHPAGE_SIZE);
-    }
 }
