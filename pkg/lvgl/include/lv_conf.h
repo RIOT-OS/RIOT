@@ -116,6 +116,10 @@ typedef int16_t lv_coord_t;
 #define LV_MEM_CUSTOM_FREE    free         /*Wrapper to free*/
 #endif     /*LV_MEM_CUSTOM*/
 
+/* Use the standard memcpy and memset instead of LVGL's own functions.
+ * The standard functions might or might not be faster depending on their implementation. */
+#define LV_MEMCPY_MEMSET_STD    0
+
 /* Garbage Collector settings
  * Used if lvgl is binded to higher level language and the memory is managed by that language */
 #define LV_ENABLE_GC 0
@@ -148,6 +152,12 @@ typedef int16_t lv_coord_t;
 /* Repeated trigger period in long press [ms]
  * Time between `LV_EVENT_LONG_PRESSED_REPEAT */
 #define LV_INDEV_DEF_LONG_PRESS_REP_TIME  100
+
+/* Gesture threshold in pixels */
+#define LV_INDEV_DEF_GESTURE_LIMIT        50
+
+/* Gesture min velocity at release before swipe (pixels)*/
+#define LV_INDEV_DEF_GESTURE_MIN_VELOCITY 3
 
 /*==================
  * Feature usage
@@ -256,6 +266,9 @@ typedef void * lv_img_decoder_user_data_t;
 /* Define a custom attribute to `lv_disp_flush_ready` function */
 #define LV_ATTRIBUTE_FLUSH_READY
 
+/* Required alignment size for buffers */
+#define LV_ATTRIBUTE_MEM_ALIGN_SIZE
+
 /* With size optimization (-Os) the compiler might not align data to
  * 4 or 8 byte boundary. This alignment will be explicitly applied where needed.
  * E.g. __attribute__((aligned(4))) */
@@ -338,6 +351,9 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 
 /*Checks is the memory is successfully allocated or no. (Quite fast)*/
 #define LV_USE_ASSERT_MEM       1
+
+/*Check the integrity of `lv_mem` after critical operations. (Slow)*/
+#define LV_USE_ASSERT_MEM_INTEGRITY       0
 
 /* Check the strings.
  * Search for NULL, very long strings, invalid characters, and unnatural repetitions. (Slow)
@@ -443,7 +459,10 @@ typedef void * lv_font_user_data_t;
 /* A fast and impressive theme.
  * Flags:
  * LV_THEME_MATERIAL_FLAG_LIGHT: light theme
- * LV_THEME_MATERIAL_FLAG_DARK: dark theme*/
+ * LV_THEME_MATERIAL_FLAG_DARK: dark theme
+ * LV_THEME_MATERIAL_FLAG_NO_TRANSITION: disable transitions (state change animations)
+ * LV_THEME_MATERIAL_FLAG_NO_FOCUS: disable indication of focused state)
+ * */
  #define LV_USE_THEME_MATERIAL    1
 
 /* Mono-color theme for monochrome displays.
@@ -479,7 +498,7 @@ typedef void * lv_font_user_data_t;
 
 /* If a word is at least this long, will break wherever "prettiest"
  * To disable, set to a value <= 0 */
-#define LV_TXT_LINE_BREAK_LONG_LEN          12
+#define LV_TXT_LINE_BREAK_LONG_LEN          0
 
 /* Minimum number of characters in a long word to put on a line before a break.
  * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
@@ -505,12 +524,19 @@ typedef void * lv_font_user_data_t;
 #define LV_BIDI_BASE_DIR_DEF  LV_BIDI_DIR_AUTO
 #endif
 
+/* Enable Arabic/Persian processing
+ * In these languages characters should be replaced with
+ * an other form based on their position in the text */
+#define LV_USE_ARABIC_PERSIAN_CHARS 0
+
 /*Change the built in (v)snprintf functions*/
 #define LV_SPRINTF_CUSTOM   0
 #if LV_SPRINTF_CUSTOM
 #define LV_SPRINTF_INCLUDE <stdio.h>
 #define lv_snprintf     snprintf
 #define lv_vsnprintf    vsnprintf
+#else   /*!LV_SPRINTF_CUSTOM*/
+#define LV_SPRINTF_DISABLE_FLOAT 1
 #endif  /*LV_SPRINTF_CUSTOM*/
 
 /*===================
@@ -701,6 +727,7 @@ typedef void * lv_obj_user_data_t;
 #define LV_USE_TABLE    1
 #if LV_USE_TABLE
 #  define LV_TABLE_COL_MAX    12
+#  define LV_TABLE_CELL_STYLE_CNT 4
 #endif
 
 /*Tab (dependencies: lv_page, lv_btnm)*/
