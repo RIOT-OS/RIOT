@@ -145,6 +145,8 @@ extern "C" {
     defined(CPU_LINE_STM32L4S5xx) || defined(CPU_LINE_STM32L4S7xx) || \
     defined(CPU_LINE_STM32L4S9xx)
 #define CONFIG_CLOCK_PLL_N              (30)
+#elif defined(CPU_FAM_STM32L5)
+#define CONFIG_CLOCK_PLL_N              (27)
 #else
 #define CONFIG_CLOCK_PLL_N              (20)
 #endif
