@@ -50,9 +50,9 @@ extern "C" {
 /* The minimum block size which can be written is 1B. However, the erase
  * block is always FLASHPAGE_SIZE.
  */
-#define FLASHPAGE_RAW_BLOCKSIZE    (1U)
+#define FLASHPAGE_WRITE_BLOCK_SIZE      (1U)
 /* Writing should be always 2 byte aligned */
-#define FLASHPAGE_RAW_ALIGNMENT    (2U)
+#define FLASHPAGE_WRITE_BLOCK_ALIGNMENT (2U)
 /** @} */
 
 /**

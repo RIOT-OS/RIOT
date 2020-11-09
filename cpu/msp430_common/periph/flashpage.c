@@ -55,15 +55,25 @@ static inline void _erase(uint16_t *page_addr)
     _lock(state);
 }
 
-void flashpage_write_raw(void *target_addr, const void *data, size_t len)
+void flashpage_erase(unsigned page)
 {
-    /* assert multiples of FLASHPAGE_RAW_BLOCKSIZE are written and no less of
+    assert((unsigned) page < FLASHPAGE_NUMOF);
+
+    uint16_t *page_addr = (uint16_t *)flashpage_addr(page);
+
+    /* erase page */
+    _erase(page_addr);
+}
+
+void flashpage_write(void *target_addr, const void *data, size_t len)
+{
+    /* assert multiples of FLASHPAGE_WRITE_BLOCK_SIZE are written and no less of
        that length. */
-    assert(!(len % FLASHPAGE_RAW_BLOCKSIZE));
+    assert(!(len % FLASHPAGE_WRITE_BLOCK_SIZE));
 
     /* ensure writes are aligned */
-    assert(!(((unsigned)target_addr % FLASHPAGE_RAW_ALIGNMENT) ||
-            ((unsigned)data % FLASHPAGE_RAW_ALIGNMENT)));
+    assert(!(((unsigned)target_addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) ||
+            ((unsigned)data % FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
 
     /* ensure the length doesn't exceed the actual flash size */
     assert(((unsigned)target_addr + len) <
@@ -86,19 +96,4 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
 
     /* lock flash and re-enable interrupts */
     _lock(state);
-}
-
-void flashpage_write(int page, const void *data)
-{
-    assert((unsigned) page < FLASHPAGE_NUMOF);
-
-    uint16_t *page_addr = (uint16_t *)flashpage_addr(page);
-
-    /* erase page */
-    _erase(page_addr);
-
-    /* write page */
-    if (data != NULL) {
-        flashpage_write_raw(page_addr, data, FLASHPAGE_SIZE);
-    }
 }
