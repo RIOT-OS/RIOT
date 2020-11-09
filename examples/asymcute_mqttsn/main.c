@@ -257,7 +257,7 @@ static int _cmd_connect(int argc, char **argv)
         return 1;
     }
     if (ep.port == 0) {
-        ep.port = MQTTSN_DEFAULT_PORT;
+        ep.port = CONFIG_ASYMCUTE_DEFAULT_PORT;
     }
 
     /* get request context */

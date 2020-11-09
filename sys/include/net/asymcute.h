@@ -64,6 +64,13 @@ extern "C" {
  * @{
  */
 /**
+ * @brief   Default UDP port to listen on
+ */
+#ifndef CONFIG_ASYMCUTE_DEFAULT_PORT
+#define CONFIG_ASYMCUTE_DEFAULT_PORT    (1883U)
+#endif
+
+/**
  * @brief   Default buffer size for Asymcute client (as exponent of 2^n)
  *
  * As the buffer size ALWAYS needs to be power of two, this option represents
