@@ -60,11 +60,18 @@ extern "C" {
 
 /**
  * @defgroup net_asymcute_conf Asymcute (MQTT-SN Client) compile configurations
- * @ingroup config
+ * @ingroup net_mqtt_conf
+ * @brief   Compile-time configuration options for Asymcute, an asynchronous
+ *          MQTT-SN implementation based on the OASIS MQTT-SN protocol. It
+ *          provides a flexible interface that allows users to issue any number
+ *          of concurrent requests to one or more different gateways
+ *          simultaneously.
  * @{
  */
 /**
- * @brief   Default UDP port to listen on
+ * @brief   Default UDP port to listen on. Usage can be found in
+ *          examples/asymcute_mqttsn. Application code is expected to use this
+ *          macro to assign the default port.
  */
 #ifndef CONFIG_ASYMCUTE_DEFAULT_PORT
 #define CONFIG_ASYMCUTE_DEFAULT_PORT    (1883U)
@@ -73,8 +80,8 @@ extern "C" {
 /**
  * @brief   Default buffer size for Asymcute client (as exponent of 2^n)
  *
- * As the buffer size ALWAYS needs to be power of two, this option represents
- * the exponent of 2^n, which will be used as the size of the buffer.
+ * @deprecated Use @ref CONFIG_ASYMCUTE_BUFSIZE instead. Will be removed after
+ * 2021.04 release.
  */
 #ifndef CONFIG_ASYMCUTE_BUFSIZE_EXP
 #define CONFIG_ASYMCUTE_BUFSIZE_EXP     (7U)
@@ -93,18 +100,18 @@ extern "C" {
  * @note    Must be less than (256 - 8) AND less than ( @ref CONFIG_ASYMCUTE_BUFSIZE - 8).
  */
 #ifndef CONFIG_ASYMCUTE_TOPIC_MAXLEN
-#define CONFIG_ASYMCUTE_TOPIC_MAXLEN       (32U)
+#define CONFIG_ASYMCUTE_TOPIC_MAXLEN    (32U)
 #endif
 
 /**
  * @brief   Keep alive interval [in s] communicated to the gateway
  *
- * keep alive interval in seconds which is communicated to the gateway in the
+ * Keep alive interval in seconds which is communicated to the gateway in the
  * CONNECT message. For more information, see MQTT-SN Spec v1.2, section 5.4.4.
  * For default values,see section 7.2 -> TWAIT: > 5 min.
  */
 #ifndef CONFIG_ASYMCUTE_KEEPALIVE
-#define CONFIG_ASYMCUTE_KEEPALIVE          (360)
+#define CONFIG_ASYMCUTE_KEEPALIVE       (360)
 #endif
 
 /**
@@ -116,7 +123,7 @@ extern "C" {
  * @note    Must be less than @ref CONFIG_ASYMCUTE_KEEPALIVE
  */
 #ifndef CONFIG_ASYMCUTE_KEEPALIVE_PING
-#define CONFIG_ASYMCUTE_KEEPALIVE_PING     ((CONFIG_ASYMCUTE_KEEPALIVE / 4) * 3)
+#define CONFIG_ASYMCUTE_KEEPALIVE_PING  ((CONFIG_ASYMCUTE_KEEPALIVE / 4) * 3)
 #endif
 
 /**
@@ -130,7 +137,7 @@ extern "C" {
  * section 6.13. For default values, see section 7.2 -> Tretry: 10 to 15 sec.
  */
 #ifndef CONFIG_ASYMCUTE_T_RETRY
-#define CONFIG_ASYMCUTE_T_RETRY            (10U)
+#define CONFIG_ASYMCUTE_T_RETRY         (10U)
 #endif
 
 /**
@@ -143,7 +150,7 @@ extern "C" {
  * For default values, see section 7.2 -> Nretry: 3-5.
  */
 #ifndef CONFIG_ASYMCUTE_N_RETRY
-#define CONFIG_ASYMCUTE_N_RETRY            (3U)
+#define CONFIG_ASYMCUTE_N_RETRY         (3U)
 #endif
 /** @} */
 
@@ -151,14 +158,14 @@ extern "C" {
 /**
  * @brief   Default priority for Asymcute's handler thread
  */
-#define ASYMCUTE_HANDLER_PRIO       (THREAD_PRIORITY_MAIN - 2)
+#define ASYMCUTE_HANDLER_PRIO           (THREAD_PRIORITY_MAIN - 2)
 #endif
 
 #ifndef ASYMCUTE_HANDLER_STACKSIZE
 /**
  * @brief   Default stack size for Asymcute's handler thread
  */
-#define ASYMCUTE_HANDLER_STACKSIZE  (THREAD_STACKSIZE_DEFAULT)
+#define ASYMCUTE_HANDLER_STACKSIZE      (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 #ifndef ASYMCUTE_LISTENER_PRIO
@@ -167,14 +174,14 @@ extern "C" {
  *
  * @note    Must be of higher priority than @ref ASYMCUTE_HANDLER_PRIO
  */
-#define ASYMCUTE_LISTENER_PRIO      (THREAD_PRIORITY_MAIN - 3)
+#define ASYMCUTE_LISTENER_PRIO          (THREAD_PRIORITY_MAIN - 3)
 #endif
 
 #ifndef ASYMCUTE_LISTENER_STACKSIZE
 /**
  * @brief   Default stack size for an Asymcute listener thread
  */
-#define ASYMCUTE_LISTENER_STACKSIZE (THREAD_STACKSIZE_DEFAULT)
+#define ASYMCUTE_LISTENER_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
 #endif
 
 /**
