@@ -43,7 +43,6 @@ extern "C" {
 #define CPU_HAS_BITBAND                 (1)
 /** @} */
 
-
 /**
  * @brief   Flash page configuration
  * @{
@@ -69,19 +68,6 @@ extern "C" {
 #define FLASHPAGE_RAW_BLOCKSIZE    (4U)
 /* Writing should be always 4 bytes aligned */
 #define FLASHPAGE_RAW_ALIGNMENT    (4U)
-/** @} */
-
-/**
- * @name    OpenWSN timing constants
- *
- * @{
- */
-/* Taken from openwsn-fw */
-#define PORT_maxTxDataPrepare   (460/PORT_US_PER_TICK)
-#define PORT_maxRxAckPrepare    (300/PORT_US_PER_TICK)
-#define PORT_maxRxDataPrepare   (300/PORT_US_PER_TICK)
-#define PORT_maxTxAckPrepare    (460/PORT_US_PER_TICK)
-#define PORT_delayTx            (400/PORT_US_PER_TICK)
 /** @} */
 
 #ifdef __cplusplus

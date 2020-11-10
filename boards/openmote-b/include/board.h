@@ -88,6 +88,9 @@
 
 /**
  * @name    OpenWSN leds configuration
+ *
+ * @note This configuration mimics the one done in OpenWSN-fw for the
+ *       same platform
  * @{
  */
 #define OPENWSN_LEDPIN_ERROR    LED0_PIN
