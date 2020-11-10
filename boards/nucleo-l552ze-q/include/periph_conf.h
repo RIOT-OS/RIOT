@@ -20,12 +20,6 @@
 #define PERIPH_CONF_H
 
 /* Add specific clock configuration (HSE, LSE) for this board here */
-/* Reach 108MHz by default by setting custom PLL_N factor */
-#ifndef CONFIG_CLOCK_PLL_N
-#define CONFIG_CLOCK_PLL_N              27
-#endif
-
-/* Add specific clock configuration (HSE, LSE) for this board here */
 #ifndef CONFIG_BOARD_HAS_LSE
 #define CONFIG_BOARD_HAS_LSE            1
 #endif

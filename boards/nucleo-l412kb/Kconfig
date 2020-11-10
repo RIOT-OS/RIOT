@@ -28,4 +28,7 @@ config BOARD_NUCLEO_L412KB
     # https://github.com/RIOT-OS/RIOT/pull/12144#issuecomment-527090161
     select HAS_RIOTBOOT
 
+    # Clock configuration
+    select BOARD_HAS_LSE
+
 source "$(RIOTBOARD)/common/nucleo32/Kconfig"

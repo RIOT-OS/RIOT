@@ -24,10 +24,6 @@
 #define CONFIG_BOARD_HAS_LSE            1
 #endif
 
-#ifndef CONFIG_CLOCK_PLL_N
-#define CONFIG_CLOCK_PLL_N              (30)
-#endif
-
 #include "periph_cpu.h"
 #include "clk_conf.h"
 #include "cfg_i2c1_pb8_pb9.h"
