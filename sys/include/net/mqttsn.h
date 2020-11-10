@@ -27,14 +27,6 @@
 extern "C" {
 #endif
 
-
-#ifndef MQTTSN_DEFAULT_PORT
-/**
- * @brief   Default UDP port for MQTT-SN servers
- */
-#define MQTTSN_DEFAULT_PORT     (1883U)
-#endif
-
 /**
  * @name    The client ID must contain 1-23 characters
  *
