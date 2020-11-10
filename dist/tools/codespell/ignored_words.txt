@@ -104,3 +104,9 @@ dedup
 
 # circularly (used in "circularly linked list" in clist.h) => circular
 circularly
+
+# Chang (common name) => Change
+Chang
+
+# chang (common name) => change
+chang
