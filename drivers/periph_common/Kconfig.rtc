@@ -1,0 +1,19 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_PERIPH_RTC
+    bool "RTC peripheral driver"
+    depends on HAS_PERIPH_RTC
+    select MODULE_PERIPH_COMMON
+
+config MODULE_PERIPH_INIT_RTC
+    bool "Auto initialize RTC peripheral"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_RTC
+
+# Include CPU specific configurations
+osource "$(RIOTCPU)/$(CPU)/periph/Kconfig.rtc"
