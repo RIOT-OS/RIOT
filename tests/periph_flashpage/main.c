@@ -23,6 +23,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "od.h"
 #include "shell.h"
 #include "periph/flashpage.h"
 
@@ -112,6 +113,11 @@ static int cmd_info(int argc, char **argv)
 #ifdef FLASHPAGE_RWWEE_NUMOF
     printf("RWWEE Flash start addr:\t0x%08x\n", (int)CPU_FLASH_RWWEE_BASE);
     printf("RWWEE Number of pages:\t%i\n", (int)FLASHPAGE_RWWEE_NUMOF);
+#endif
+
+#ifdef NVMCTRL_USER
+    printf("AUX page size:\t%i\n", FLASH_USER_PAGE_AUX_SIZE + sizeof(nvm_user_page_t));
+    printf("    user area:\t%i\n", FLASH_USER_PAGE_AUX_SIZE);
 #endif
 
     return 0;
@@ -535,6 +541,67 @@ static int cmd_test_last_rwwee_raw(int argc, char **argv)
 
 #endif
 
+#ifdef NVMCTRL_USER
+static int cmd_dump_config(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+#ifdef FLASH_USER_PAGE_SIZE
+    od_hex_dump((void*)NVMCTRL_USER, FLASH_USER_PAGE_SIZE, 0);
+#else
+    od_hex_dump((void*)NVMCTRL_USER, AUX_PAGE_SIZE * AUX_NB_OF_PAGES, 0);
+#endif
+
+    return 0;
+}
+
+static int cmd_test_config(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+
+    const uint16_t single_data = 0x1234;
+    const uint8_t test_data[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
+    uint32_t dst = FLASH_USER_PAGE_AUX_SIZE - (sizeof(test_data) + 2);
+
+    puts("[START]");
+
+    sam0_flashpage_aux_reset(NULL);
+
+    /* check if the AUX page has been cleared */
+    for (uint32_t i = 0; i < FLASH_USER_PAGE_AUX_SIZE; ++i) {
+        if (*(uint8_t*)sam0_flashpage_aux_get(i) != 0xFF) {
+            printf("user page not cleared at offset 0x%"PRIx32"\n", i);
+            return -1;
+        }
+    }
+
+    /* write test data */
+    sam0_flashpage_aux_write_raw(dst, test_data, sizeof(test_data));
+
+    /* write single half-word */
+    sam0_flashpage_aux_write_raw(dst + sizeof(test_data), &single_data, sizeof(single_data));
+
+    /* check if half-word was written correctly */
+    uint16_t data_in = *(uint16_t*)sam0_flashpage_aux_get(dst + sizeof(test_data));
+    if (data_in != single_data) {
+        printf("%x != %x, offset = 0x%"PRIx32"\n", single_data, data_in, dst + sizeof(test_data));
+        return -1;
+    }
+
+    /* check if test data was written correctly */
+    if (memcmp(sam0_flashpage_aux_get(dst), test_data, sizeof(test_data))) {
+        printf("write test_data failed, offset = 0x%"PRIx32"\n", dst);
+        return -1;
+    }
+
+    puts("[SUCCESS]");
+
+    return 0;
+}
+#endif /* NVMCTRL_USER */
+
 static const shell_command_t shell_commands[] = {
     { "info", "Show information about pages", cmd_info },
     { "dump", "Dump the selected page to STDOUT", cmd_dump },
@@ -559,6 +626,10 @@ static const shell_command_t shell_commands[] = {
 #ifdef MODULE_PERIPH_FLASHPAGE_RAW
     { "test_last_rwwee_raw", "Write and verify raw short write on last RWWEE page available", cmd_test_last_rwwee_raw },
 #endif
+#endif
+#ifdef NVMCTRL_USER
+    { "dump_config_page", "Dump the content of the MCU configuration page", cmd_dump_config },
+    { "test_config_page", "Test writing config page. (!DANGER ZONE!)", cmd_test_config },
 #endif
     { NULL, NULL, NULL }
 };
