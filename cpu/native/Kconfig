@@ -77,3 +77,10 @@ config CPU_MODEL
 
 config CPU
     default "native" if CPU_MODEL_NATIVE
+
+menu "Native modules"
+    depends on CPU_ARCH_NATIVE
+
+rsource "backtrace/Kconfig"
+
+endmenu # Native modules
