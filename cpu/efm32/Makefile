@@ -25,5 +25,8 @@ endif
 ifneq (,$(filter cpu_efr32mg12p,$(USEMODULE)))
   DIRS += families/efr32mg12p
 endif
+ifneq (,$(filter cpu_ezr32wg,$(USEMODULE)))
+  DIRS += families/ezr32wg
+endif
 
 include $(RIOTBASE)/Makefile.base
