@@ -16,6 +16,22 @@
  * @file
  * @brief       Messaging Bus API for inter process message broadcast.
  *
+ *              Threads can subscribe to messages on one or multiple buses.
+ *              If a message is posted on one bus, all threads that are
+ *              subscribed to that message type will receive the message.
+ *
+ *              On one bus only 32 different message types are possible.
+ *              Do not use the `type` and `sender_pid` fields of a message
+ *              directly if it may have been received over a message bus.
+ *              Instead, use the @ref msg_bus_get_type and
+ *              @ref msg_bus_get_sender_pid functions.
+ *
+ *              If you want to check if a message was sent directly (not
+ *              over a bus, you can use the @ref msg_is_from_bus function.
+ *
+ *              @note Make sure to unsubscribe from all previously subscribed
+ *              buses before terminating a thread.
+ *
  * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
@@ -205,10 +221,10 @@ static inline void msg_bus_unsubscribe(msg_bus_entry_t *entry, uint8_t type)
  * This function sends a message to all threads listening on the bus which are
  * listening for messages with the message type of @p m.
  *
- * It behaves identical to @see msg_bus_post, but sends a pre-defined message.
+ * It behaves identical to @ref msg_bus_post, but sends a pre-defined message.
  *
- * @note The message is expected to have the event ID encoded in the lower 5 bits
- *       and the bus ID encoded in the upper 11 bits of the message type.
+ * @note The message is expected to have the event ID encoded in the lower
+ *       5 bits and the bus ID encoded in the upper 11 bits of the message type.
  *
  * @param[in] m             The message to post the bus
  * @param[in] bus           The message bus to post the message on
