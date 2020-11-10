@@ -573,6 +573,7 @@ static void _session_to_ep(const session_t *session, sock_udp_ep_t *ep)
 {
     ep->port = session->port;
     ep->netif = session->ifindex;
+    ep->family = AF_INET6;
     memcpy(&ep->addr.ipv6, &session->addr, sizeof(ipv6_addr_t));
 }
 
