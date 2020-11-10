@@ -45,6 +45,7 @@
  */
 static char raw_buf[64] ALIGNMENT_ATTR;
 
+#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 /**
  * @brief   Allocate space for 1 flash page in RAM
  *
@@ -54,6 +55,7 @@ static char raw_buf[64] ALIGNMENT_ATTR;
  *          requires 64 bit alignment.
  */
 static uint8_t page_mem[FLASHPAGE_SIZE] ALIGNMENT_ATTR;
+#endif
 
 static int getpage(const char *str)
 {
@@ -65,6 +67,7 @@ static int getpage(const char *str)
     return page;
 }
 
+#ifdef FLASHPAGE_SIZE
 static void dumpchar(uint8_t mem)
 {
     if (mem >= ' ' && mem <= '~') {
@@ -97,6 +100,7 @@ static void dump_local(void)
     puts("Local page buffer:");
     memdump(page_mem, FLASHPAGE_SIZE);
 }
+#endif
 
 static int cmd_info(int argc, char **argv)
 {
@@ -104,7 +108,11 @@ static int cmd_info(int argc, char **argv)
     (void)argv;
 
     printf("Flash start addr:\t0x%08x\n", (int)CPU_FLASH_BASE);
+#ifdef FLASHPAGE_SIZE
     printf("Page size:\t\t%i\n", (int)FLASHPAGE_SIZE);
+#else
+    puts("Page size:\t\tvariable");
+#endif
     printf("Number of pages:\t%i\n", (int)FLASHPAGE_NUMOF);
 
 #ifdef FLASHPAGE_RWWEE_NUMOF
@@ -120,6 +128,7 @@ static int cmd_info(int argc, char **argv)
     return 0;
 }
 
+#ifdef FLASHPAGE_SIZE
 static int cmd_dump(int argc, char **argv)
 {
     int page;
@@ -137,7 +146,7 @@ static int cmd_dump(int argc, char **argv)
     addr = flashpage_addr(page);
 
     printf("Flash page %i at address %p\n", page, addr);
-    memdump(addr, FLASHPAGE_SIZE);
+    memdump(addr, flashpage_size(page));
 
     return 0;
 }
@@ -172,6 +181,7 @@ static int cmd_read(int argc, char **argv)
 
     return 0;
 }
+#endif
 
 #ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static int cmd_write(int argc, char **argv)
@@ -258,6 +268,7 @@ static int cmd_erase(int argc, char **argv)
     return 0;
 }
 
+#ifdef FLASHPAGE_SIZE
 static int cmd_edit(int argc, char **argv)
 {
     int offset;
@@ -283,6 +294,7 @@ static int cmd_edit(int argc, char **argv)
 
     return 0;
 }
+#endif
 
 #ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static int cmd_test(int argc, char **argv)
@@ -614,16 +626,16 @@ static int cmd_test_config(int argc, char **argv)
 
 static const shell_command_t shell_commands[] = {
     { "info", "Show information about pages", cmd_info },
+#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
     { "dump", "Dump the selected page to STDOUT", cmd_dump },
     { "dump_local", "Dump the local page buffer to STDOUT", cmd_dump_local },
     { "read", "Copy the given page to the local page buffer and dump to STDOUT", cmd_read },
-#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
     { "write", "Write the local page buffer to the given page", cmd_write },
 #endif
     { "write_raw", "Write (ASCII, max 64B) data to the given address", cmd_write_raw },
     { "erase", "Erase the given page buffer", cmd_erase },
-    { "edit", "Write bytes to the local page buffer", cmd_edit },
 #ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
+    { "edit", "Write bytes to the local page buffer", cmd_edit },
     { "test", "Write and verify test pattern", cmd_test },
     { "test_last_pagewise", "Write and verify test pattern on last page available", cmd_test_last },
 #endif
