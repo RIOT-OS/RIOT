@@ -27,7 +27,6 @@
 
 #include "em_adc.h"
 #include "em_cmu.h"
-#include "em_device.h"
 #include "em_gpio.h"
 #include "em_timer.h"
 #include "em_usart.h"
