@@ -597,7 +597,7 @@ void *_listener(void *arg)
 
     while (1) {
         sock_udp_ep_t remote;
-        int n = sock_udp_recv(&con->sock, con->rxbuf, ASYMCUTE_BUFSIZE,
+        int n = sock_udp_recv(&con->sock, con->rxbuf, CONFIG_ASYMCUTE_BUFSIZE,
                               SOCK_NO_TIMEOUT, &remote);
         if (n > 0) {
             _on_data(con, (size_t)n, &remote);
@@ -860,7 +860,7 @@ int asymcute_publish(asymcute_con_t *con, asymcute_req_t *req,
         return ASYMCUTE_NOTSUP;
     }
     /* check for message size */
-    if ((data_len + 9) > ASYMCUTE_BUFSIZE) {
+    if ((data_len + 9) > CONFIG_ASYMCUTE_BUFSIZE) {
         return ASYMCUTE_OVERFLOW;
     }
     /* make sure topic is registered */

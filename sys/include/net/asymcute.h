@@ -81,9 +81,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default buffer size used for receive and request buffers
+ */
+#ifndef CONFIG_ASYMCUTE_BUFSIZE
+#define CONFIG_ASYMCUTE_BUFSIZE         (128U)
+#endif
+
+/**
  * @brief   Maximum topic length
  *
- * @note    Must be less than (256 - 8) AND less than ( @ref ASYMCUTE_BUFSIZE - 8).
+ * @note    Must be less than (256 - 8) AND less than ( @ref CONFIG_ASYMCUTE_BUFSIZE - 8).
  */
 #ifndef CONFIG_ASYMCUTE_TOPIC_MAXLEN
 #define CONFIG_ASYMCUTE_TOPIC_MAXLEN       (32U)
@@ -139,13 +146,6 @@ extern "C" {
 #define CONFIG_ASYMCUTE_N_RETRY            (3U)
 #endif
 /** @} */
-
-#ifndef ASYMCUTE_BUFSIZE
-/**
- * @brief   Default buffer size used for receive and request buffers
- */
-#define ASYMCUTE_BUFSIZE            (1 << CONFIG_ASYMCUTE_BUFSIZE_EXP)
-#endif
 
 #ifndef ASYMCUTE_HANDLER_PRIO
 /**
@@ -275,7 +275,7 @@ struct asymcute_req {
     void *arg;                      /**< internally used additional state */
     event_callback_t to_evt;        /**< timeout event */
     event_timeout_t to_timer;       /**< timeout timer */
-    uint8_t data[ASYMCUTE_BUFSIZE]; /**< buffer holding the request's data */
+    uint8_t data[CONFIG_ASYMCUTE_BUFSIZE]; /**< buffer holding the request's data */
     size_t data_len;                /**< length of the request packet in byte */
     uint16_t msg_id;                /**< used message id for this request */
     uint8_t retry_cnt;              /**< retransmission counter */
@@ -297,7 +297,7 @@ struct asymcute_con {
                                          *   connection */
     uint8_t keepalive_retry_cnt;        /**< keep alive transmission counter */
     uint8_t state;                      /**< connection state */
-    uint8_t rxbuf[ASYMCUTE_BUFSIZE];    /**< connection specific receive buf */
+    uint8_t rxbuf[CONFIG_ASYMCUTE_BUFSIZE];    /**< connection specific receive buf */
     char cli_id[MQTTSN_CLI_ID_MAXLEN + 1];  /**< buffer to store client ID */
 };
 
