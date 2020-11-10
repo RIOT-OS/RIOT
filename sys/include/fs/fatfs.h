@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-#include "fatfs/ff.h"
+#include "fatfs/source/ff.h"
 #include "vfs.h"
 
 #ifndef FATFS_YEAR_OFFSET

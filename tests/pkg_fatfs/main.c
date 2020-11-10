@@ -23,7 +23,6 @@
 #endif
 #include "mtd.h"
 #include "fatfs_diskio_mtd.h"
-#include "fatfs/ff.h"
 #include "shell.h"
 #include <string.h>
 #include <stdlib.h>
