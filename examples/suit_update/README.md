@@ -3,7 +3,7 @@
 This example shows how to integrate SUIT-compliant firmware updates into a
 RIOT application. It implements basic support of the SUIT architecture using
 the manifest format specified in
-[draft-moran-suit-manifest-04](https://datatracker.ietf.org/doc/draft-moran-suit-manifest/04/).
+[draft-ietf-suit-manifest-09](https://tools.ietf.org/id/draft-ietf-suit-manifest-09.txt).
 
 **WARNING**: This code should not be considered production ready for the time being.
              It has not seen much exposure or security auditing.
