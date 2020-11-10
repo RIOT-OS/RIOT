@@ -1,5 +1,3 @@
-CPU = efm32
-
 # The radio board connected to the slwstk6000b mainboard
 BOARD_MODULE = $(word 2, $(subst -, ,$(BOARD)))
 
