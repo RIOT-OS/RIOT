@@ -84,3 +84,5 @@ menu "Native modules"
 rsource "backtrace/Kconfig"
 
 endmenu # Native modules
+
+rsource "periph/Kconfig"
