@@ -318,22 +318,22 @@ static int _ls(int argc, char **argv)
 static int _mkfs(int argc, char **argv)
 {
     int vol_idx;
-    BYTE opt;
+    MKFS_PARM opt = {0};
 
     if (argc == 3) {
         vol_idx = atoi(argv[1]);
 
         if (strcmp(argv[2], "fat") == 0) {
-            opt = FM_FAT;
+            opt.fmt = FM_FAT;
         }
         else if (strcmp(argv[2], "fat32") == 0) {
-            opt = FM_FAT32;
+            opt.fmt = FM_FAT32;
         }
         else if (strcmp(argv[2], "exfat") == 0) {
-            opt = FM_EXFAT;
+            opt.fmt = FM_EXFAT;
         }
         else {
-            opt = FM_ANY;
+            opt.fmt = FM_ANY;
         }
     }
     else {
@@ -352,8 +352,7 @@ static int _mkfs(int argc, char **argv)
 
     puts("formatting media...");
 
-    /* au = 0: use default allocation unit size depending on volume size */
-    FRESULT mkfs_resu = f_mkfs(volume_str, opt, 0,  work, sizeof(work));
+    FRESULT mkfs_resu = f_mkfs(volume_str, &opt, work, sizeof(work));
 
     if (mkfs_resu == FR_OK) {
         puts("[OK]");
