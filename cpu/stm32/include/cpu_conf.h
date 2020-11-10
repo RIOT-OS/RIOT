@@ -116,7 +116,73 @@ extern "C" {
 #define FLASHPAGE_SIZE                  (128U)
 #endif
 
+#ifdef FLASHPAGE_SIZE
 #define FLASHPAGE_NUMOF                 (STM32_FLASHSIZE / FLASHPAGE_SIZE)
+#endif
+
+#if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
+    defined(CPU_FAM_STM32F7)
+#define PERIPH_FLASHPAGE_CUSTOM_PAGESIZES
+
+/**
+ * @brief stm32 dual bank configuration
+ *
+ * By default, the stm32f4 series with 1MB flash enable the DB1M flag to split
+ * the 1MB flash into two banks, 2MB devices are always split in two banks.
+ * On both the stm32f4 and the stm32f7 this can be modified with user
+ * programmable flags. Detecting the settings at runtime is not supported
+ *
+ * @note This must match the setting on the MCU. by default it is assumed that
+ * the user has not changed this setting manually.
+ */
+#if (defined(FLASH_OPTCR_DB1M) && (STM32_FLASHSIZE >= (1024 * 1024)))
+#define FLASHPAGE_DUAL_BANK             1
+#else
+#define FLASHPAGE_DUAL_BANK             0
+#endif
+
+/* stm32f7 uses single bank with 32KB to 256KB sectors on a number of devices */
+#if defined(CPU_FAM_STM32F7)
+#if defined(CPU_LINE_STM32F745xx) || \
+    defined(CPU_LINE_STM32F746xx) || \
+    defined(CPU_LINE_STM32F750xx) || \
+    defined(CPU_LINE_STM32F756xx) || \
+    defined(CPU_LINE_STM32F765xx) || \
+    defined(CPU_LINE_STM32F767xx) || \
+    defined(CPU_LINE_STM32F769xx) || \
+    defined(CPU_LINE_STM32F777xx) || \
+    defined(CPU_LINE_STM32F779xx)
+#define FLASHPAGE_MIN_SECTOR_SIZE       (32 * 1024)
+#elif defined(CPU_LINE_STM32F722xx) || \
+      defined(CPU_LINE_STM32F723xx) || \
+      defined(CPU_LINE_STM32F730xx) || \
+      defined(CPU_LINE_STM32F732xx) || \
+      defined(CPU_LINE_STM32F733xx)
+#define FLASHPAGE_MIN_SECTOR_SIZE       (16 * 1024)
+#else
+/* Intentionally error on an unknown line to prevent flashpage errors */
+#error Unknown STM32F7 Line, unable to determine FLASHPAGE_MIN_SECTOR_SIZE
+#endif
+
+#else /* CPU_FAM_STM32F7 */
+#define FLASHPAGE_MIN_SECTOR_SIZE       (16 * 1024)
+#endif
+
+#if FLASHPAGE_DUAL_BANK
+/* Number of "large" sectors + 4 for the small sectors that together equal a
+ * single large sector. Times two to account for the two banks */
+#define FLASHPAGE_NUMOF                 ((STM32_FLASHSIZE / \
+                                         (8 * FLASHPAGE_MIN_SECTOR_SIZE)) + 8)
+#else
+/* Number of "large" sectors + 4 for the small sectors that together equal a
+ * single large sector, eg: 1 MB = 7 * 128 KB sectors + 1 64 KB and 4 16 KB
+ * sectors */
+#define FLASHPAGE_NUMOF                 ((STM32_FLASHSIZE / \
+                                         (8 * FLASHPAGE_MIN_SECTOR_SIZE)) + 4)
+#endif
+
+#endif
+
 
 /* The minimum block size which can be written depends on the family.
  * However, the erase block is always FLASHPAGE_SIZE.
@@ -124,13 +190,15 @@ extern "C" {
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5)
-#define FLASHPAGE_WRITE_BLOCK_SIZE      (8U)
+#define FLASHPAGE_WRITE_BLOCK_SIZE            (8U)
 typedef uint64_t stm32_flashpage_block_t;
-#elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
-#define FLASHPAGE_WRITE_BLOCK_SIZE      (4U)
+#elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
+      defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
+      defined(CPU_FAM_STM32F7)
+#define FLASHPAGE_WRITE_BLOCK_SIZE            (4U)
 typedef uint32_t stm32_flashpage_block_t;
 #else
-#define FLASHPAGE_WRITE_BLOCK_SIZE      (2U)
+#define FLASHPAGE_WRITE_BLOCK_SIZE            (2U)
 typedef uint16_t stm32_flashpage_block_t;
 #endif
 

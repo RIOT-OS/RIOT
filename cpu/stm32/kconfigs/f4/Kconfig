@@ -11,6 +11,7 @@ config CPU_FAM_F4
     select CPU_CORE_CORTEX_M4F
     select HAS_CPU_STM32F4
     select HAS_CORTEXM_MPU
+    select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_WDT
     select HAS_BOOTLOADER_STM32
 
