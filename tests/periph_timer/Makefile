@@ -21,6 +21,7 @@ BOARDS_TIMER_32kHz := \
     slstk3401a \
     slstk3402a \
     sltb001a \
+    slwstk6220a \
     stk3600 \
     stk3700 \
     #
