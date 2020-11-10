@@ -78,12 +78,22 @@ extern "C" {
 
 #define CLOCK_HSI                       MHZ(8)
 
-/* The following parameters configure a 48MHz system clock with HSI (or default HSE) as input clock */
+/* The following parameters configure a 48MHz system clock with HSI (or default HSE) as input clock
+On stm32f031x6 and stm32f042x6 lines, there's no HSE and PREDIV is hard-wired to 2,
+so to reach 48MHz set PLL_PREDIV to 2 and PLL_MUL to 12 so core clock = (HSI8 / 2) * 12 = 48MHz */
 #ifndef CONFIG_CLOCK_PLL_PREDIV
+#if defined(CPU_LINE_STM32F031x6) || defined(CPU_LINE_STM32F042x6)
+#define CONFIG_CLOCK_PLL_PREDIV         (2)
+#else
 #define CONFIG_CLOCK_PLL_PREDIV         (1)
 #endif
+#endif
 #ifndef CONFIG_CLOCK_PLL_MUL
+#if defined(CPU_LINE_STM32F031x6) || defined(CPU_LINE_STM32F042x6)
+#define CONFIG_CLOCK_PLL_MUL            (12)
+#else
 #define CONFIG_CLOCK_PLL_MUL            (6)
+#endif
 #endif
 
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
