@@ -148,7 +148,7 @@ static const timer_conf_t timer_config[] = {
             .cmu = cmuClock_TIMER1
         },
         .irq = TIMER1_IRQn,
-        .channel_numof = 4
+        .channel_numof = 3
     },
     {
         .prescaler = {
