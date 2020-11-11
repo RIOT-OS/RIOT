@@ -5,3 +5,6 @@ include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.features
 # Various other features (if any)
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_usbdev
+
+# Various other features (if any)
+FEATURES_PROVIDED += emulator_renode

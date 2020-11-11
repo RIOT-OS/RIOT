@@ -1,0 +1,25 @@
+nvic: IRQControllers.NVIC @ sysbus 0xE000E000
+    -> cpu@0
+
+cpu: CPU.CortexM @ sysbus
+    cpuType: "cortex-m4"
+    nvic: nvic
+
+uart0: UART.NRF52840_UART @ sysbus 0x40002000
+    -> nvic@2
+
+rtc0: Timers.NRF52840_RTC @ sysbus 0x4000B000
+    -> nvic@11
+
+flash: Memory.MappedMemory @ sysbus 0x0
+    size: 0x20000000
+
+sram: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x20000000
+
+ram: Memory.MappedMemory @ sysbus 0x60000000
+    size: 0x40000000
+
+sysbus:
+    init:
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/NRF52840.svd.gz

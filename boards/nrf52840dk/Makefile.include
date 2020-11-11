@@ -1,1 +1,4 @@
+# setup emulator
+include $(RIOTMAKE)/tools/renode.inc.mk
+
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include

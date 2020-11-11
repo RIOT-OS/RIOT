@@ -1,0 +1,16 @@
+:name: NRF52840
+:description: This script runs the NRF52840DK and flashs a given image
+
+using sysbus
+
+mach create
+machine LoadPlatformDescription @$RENODE_CPU_BIN_REPL
+
+emulation CreateServerSocketTerminal 3456 "term" False
+connector Connect sysbus.uart0 term
+
+macro reset
+"""
+    sysbus LoadELF $image_file
+"""
+runMacro $reset
