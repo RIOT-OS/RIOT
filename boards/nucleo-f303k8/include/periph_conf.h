@@ -19,15 +19,6 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
-/* Adjust PLL factors:
-  - On nucleo-f303k8, there's no HSE and PREDIV is hard-wired to 2
-  - to reach the maximum possible system clock (64MHz) set PLL_MUL to 16
-    so system clock = (HSI8 / 2) * 16 = 64MHz */
-#define CONFIG_CLOCK_PLL_PREDIV     (2)
-#ifndef CONFIG_CLOCK_PLL_MUL
-#define CONFIG_CLOCK_PLL_MUL        (16)
-#endif
-
 #include "periph_cpu.h"
 #include "clk_conf.h"
 #include "cfg_timer_tim2.h"
