@@ -45,6 +45,7 @@ rsource "tmp00x/Kconfig"
 endmenu # Sensor Device Drivers
 
 menu "Storage Device Drivers"
+rsource "at24cxxx/Kconfig"
 rsource "mtd/Kconfig"
 rsource "mtd_sdcard/Kconfig"
 endmenu # Storage Device Drivers
