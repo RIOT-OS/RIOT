@@ -22,6 +22,7 @@ endmenu # Peripherals drivers
 
 menu "Sensor Device Drivers"
 rsource "ad7746/Kconfig"
+rsource "adcxx1c/Kconfig"
 rsource "ads101x/Kconfig"
 rsource "bmx055/Kconfig"
 rsource "fxos8700/Kconfig"
