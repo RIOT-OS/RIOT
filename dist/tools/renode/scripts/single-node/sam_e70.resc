@@ -1,0 +1,20 @@
+using sysbus
+$name?="SAM E70"
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/sam_e70.repl
+
+cpu PerformanceInMips 125
+
+$bin?=@https://dl.antmicro.com/projects/renode/sam-e70_xplained--zephyr-shell.elf-s_903664-0c15fd8ddb4f34090e708c8b4135c95dd4ee0c32
+
+showAnalyzer sysbus.usart1
+
+# we silence the MPU warnings in nvic
+logLevel 3 nvic
+
+macro reset
+"""
+    sysbus LoadELF $bin
+"""
+
+runMacro $reset

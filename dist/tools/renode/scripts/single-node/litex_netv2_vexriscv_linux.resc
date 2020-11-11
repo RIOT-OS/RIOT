@@ -1,0 +1,31 @@
+:name: LiteX VexRiscv on NeTV2
+:description: This script runs Linux with framebuffer support on LiteX/VexRiscv
+
+$name?="LiteX"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/litex_netv2_vexriscv_linux.repl
+
+$kernel?=@https://dl.antmicro.com/projects/renode/litex_netv2_vexriscv--linux_kernel.bin-s_4553716-63780a978bf5768b81854e3febd58cabb47be4f0
+$rootfs?=@https://dl.antmicro.com/projects/renode/litex_netv2_vexriscv--buildroot_rootfs.cpio-s_4061696-befa7810480d9d85fd7d6a7e6c5f2514eb5de4ab
+$dtb?=@https://dl.antmicro.com/projects/renode/litex_netv2_vexriscv--linux.dtb-s_2068-2b68e9266b67dac4bafae70027a19fa487278bbe
+$emulator?=@https://dl.antmicro.com/projects/renode/litex_netv2_vexriscv--emulator.bin-s_10248-8039372fef62d8e4e4cb57e20561e37674fcc4ea
+
+showAnalyzer sysbus.uart
+showAnalyzer sysbus.litex_video
+
+macro reset
+"""
+    sysbus LoadBinary $kernel 0xc0000000
+    sysbus LoadBinary $rootfs 0xc0800000
+    sysbus LoadFdt $dtb 0xc1000000
+    sysbus LoadBinary $emulator 0x20000000
+
+    cpu PC 0x20000000
+"""
+
+runMacro $reset
+
+
+

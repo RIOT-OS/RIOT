@@ -1,0 +1,22 @@
+:name: PicoSoC Example
+:description: This script runs PicoSoC test firmware
+
+$name?="picosoc"
+
+using sysbus
+
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/picosoc.repl
+
+$bin?=@https://dl.antmicro.com/projects/renode/icebreaker_fw.elf-s_14080-c09a99cd3716d6428af7700e19af66d7935ea438
+
+showAnalyzer sysbus.uart
+
+macro reset
+"""
+    cpu SetRegisterUnsafe 2 0x1000
+    sysbus LoadELF $bin
+"""
+
+runMacro $reset
+

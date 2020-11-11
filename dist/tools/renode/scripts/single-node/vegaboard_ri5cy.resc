@@ -1,0 +1,51 @@
+$name?="Vegaboard-RI5CY"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/ri5cy.repl
+
+$bin?=@https://dl.antmicro.com/projects/renode/vegaboard--zephyr_shell.elf-s_1000428-46ce2752ebea346c8d232ab4e4f8d489999488af
+
+showAnalyzer lpuart0
+
+sysbus LoadELF $bin
+
+sysbus Tag <0x4004f000 0x1e4> "INTMUX0: Interrupt Multiplexer 0"
+sysbus Tag <0x4002b000 0x204> "PCC0: Peripheral Clock Controller 0"
+sysbus Tag <0x41027000 0x204> "PCC1: Peripheral Clock Controller 1"
+
+# Clock Status Register
+machine PyDevFromString """
+if request.isInit:
+    ctr = 0
+else:
+    if ctr > 0:
+        request.value = 0x3000001
+    else:
+        request.value = 0x2000000
+    ctr += 1
+""" 0x4002c010 0x4 True
+
+# Slow IRC Control Status Register
+sysbus Tag <0x4002c200 4> "SIRCCSR" 0xFFFFFFFF
+
+# Fast IRC Control Status Register
+sysbus Tag <0x4002c300 4> "FIRCCSR" 0xFFFFFFFF
+
+# Low Power FLL Control Status Register
+sysbus Tag <0x4002c500 4> "LPFFLCSR" 0xFFFFFFFF
+
+# Slow IRC Configuration Register: configured as high range clock (8 MHz)
+sysbus Tag <0x4002c208 4> "SIRCFFG" 0x1
+
+# INTMUX0 Channel0 IRQ Source Register
+# the value is hardcoded to the one corresponding to lptmr0
+sysbus Tag <0x4004f004 4> "intmux0_channel0_source" 0xdc
+
+# EVENT0: Clear Interrupt Pending Register
+# this is silenced because CPU writes 1 to this register
+# in order to clear interrupt in INTMUX0; since we don't
+# have this peripheral yet, it would generate a lot of
+# warnings in log; this should be removed once INTMUX
+# peripheral is merged
+sysbus SilenceRange <0xe004100c 4>

@@ -1,0 +1,21 @@
+:name: Murax SoC with VexRiscv
+
+$name?="Murax"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/murax_vexriscv.repl
+
+showAnalyzer sysbus.uart
+
+macro reset
+"""
+    sysbus LoadELF @https://dl.antmicro.com/projects/renode/murax--demo.elf-s_26952-7635fc30d0a3ed10c5b7cba622131b02d103f629
+    sysbus.cpu MTVEC 0x80000020
+"""
+
+runMacro $reset
+
+# this is a hack to allow handling interrupts at all; this should be after #13326
+cpu SetMachineIrqMask 0xffffffff
+

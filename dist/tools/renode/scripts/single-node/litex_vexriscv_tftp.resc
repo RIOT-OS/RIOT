@@ -1,0 +1,28 @@
+:name: Built-in TFTP server demo
+:description: This script runs Micropython on LiteX/VexRiscv booted from the the internal TFTP  server hosted by Renode
+
+$name?="litex-vexriscv"
+$bios?=@https://dl.antmicro.com/projects/renode/bios.bin-s_27076-9b28166a445deb24d5d3547871ae0de8365ba4d0
+$micropython?=@https://dl.antmicro.com/projects/renode/litex_vexriscv-micropython.bin-s_218608-db594ec6a9a75d77d2475afd714b6c28fb6e6498
+
+using sysbus
+mach create $name
+
+machine LoadPlatformDescription @platforms/cpus/litex_vexriscv_tftp.repl
+
+emulation CreateSwitch "switch"
+connector Connect ethmac switch
+emulation CreateNetworkServer "server" "192.168.100.100"
+connector Connect server switch
+
+server StartTFTP 6069
+server.tftp ServeFile $micropython "boot.bin"
+
+showAnalyzer uart
+
+macro reset
+"""
+    sysbus LoadBinary $bios 0x0
+    cpu PC 0x0
+"""
+runMacro $reset

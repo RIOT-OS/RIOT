@@ -1,0 +1,22 @@
+:name: LiteX Microwatt
+:description: This script runs LiteX BIOS on Microwatt CPU.
+
+$name?="LiteX+Microwatt"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/litex_microwatt.repl
+
+$bios?=@https://dl.antmicro.com/projects/renode/litex_microwatt--bios.bin-s_31172-0833ddddcf3d4aff1adcac22ac536c9c15f7c269
+
+showAnalyzer sysbus.uart
+
+macro reset
+"""
+    sysbus LoadBinary $bios 0x0
+    sysbus.cpu PC 0x0
+"""
+
+runMacro $reset
+
+

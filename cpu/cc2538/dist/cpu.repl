@@ -1,0 +1,76 @@
+uDma: DMA.UDMA @ sysbus 0x400FF000
+    -> nvic@46
+
+uart0: UART.PL011 @ sysbus 0x4000C000
+    -> nvic@5
+    size: 0x1000
+
+watchdog: Timers.CC2538Watchdog @ sysbus 0x400D5000
+    periodInMs: 500
+
+sleepTimer: Timers.CC2538SleepTimer @ sysbus 0x400D5040
+
+uart1: UART.PL011 @ sysbus 0x4000D000
+    -> nvic@6
+
+ram: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x40000
+
+gpioA: GPIOPort.CC2538_GPIO @ sysbus 0x400D9000
+    -> nvic@0
+
+gpioB: GPIOPort.CC2538_GPIO @ sysbus 0x400DA000
+    -> nvic@1
+
+gpioC: GPIOPort.CC2538_GPIO @ sysbus 0x400DB000
+    -> nvic@2
+
+gpioD: GPIOPort.CC2538_GPIO @ sysbus 0x400DC000
+    -> nvic@3
+
+rom: Memory.MappedMemory @ sysbus 0x0
+    size: 0x20000
+
+flash: Memory.MappedMemory @ sysbus 0x200000
+    size: 0x100000
+
+nvic: IRQControllers.NVIC @ sysbus 0xE000E000
+    systickFrequency: 1000000
+    IRQ -> cpu@0
+
+cpu: CPU.CortexM @ sysbus
+    nvic: nvic
+    cpuType: "cortex-m3"
+    PerformanceInMips: 24
+
+radio: Wireless.CC2538RF @ sysbus 0x40088000
+    IRQ -> nvic@141 | nvic@26
+
+bitband: Miscellaneous.BitBanding @ sysbus <0x22000000, +0x200000>
+    peripheralBase: 0x20000000
+
+crypto: Miscellaneous.CC2538_Cryptoprocessor @ sysbus 0x4008B000
+    -> nvic@143
+
+flashCtrl: MTD.CC2538FlashController @ sysbus 0x400D3000
+    flash: flash
+
+ssi0: SPI.CC2538_SSI @ sysbus 0x40008000
+    -> nvic@7
+
+ssi1: SPI.CC2538_SSI @ sysbus 0x40009000
+    -> nvic@34
+
+sysbus:
+    init:
+        Tag <0x400D2000, 0x400D2FFF> "SYS_CTRL_CLOCK_CTRL" 1
+        Tag <0x40088664, 0x40088667> "RFCORE_XREG_RSSISTAT" 1
+        Tag <0x400D2004, 0x400D2007> "CLOCK_STATUS" 0x10004B0
+        Tag <0x400D7000, 0x400D70FF> "ADC"
+        Tag <0x40030000, 0x40030FFF> "GPTIMER0"
+        Tag <0x40031000, 0x40031FFF> "GPTIMER1"
+        Tag <0x40032000, 0x40032FFF> "GPTIMER2"
+        Tag <0x40033000, 0x40033FFF> "GPTIMER3"
+        Tag <0x400D5000, 0x400D50FF> "STIMER_WTDG"
+
+

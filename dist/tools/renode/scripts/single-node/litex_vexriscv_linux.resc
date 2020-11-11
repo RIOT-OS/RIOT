@@ -1,0 +1,33 @@
+using sysbus
+
+mach create
+machine LoadPlatformDescription @platforms/cpus/litex_vexriscv_linux.repl
+
+sysbus SilenceRange <0xf0004000 0x100> # SDRAM
+sysbus SilenceRange <0xf0009000 0x100> # ETH PHY
+
+showAnalyzer uart
+
+$kernel?=@https://dl.antmicro.com/projects/renode/litex_vexriscv--linux_kernel.bin-s_2726132-bf6ce8df309ad53deb081351129eb135a4ad508d
+$rootfs?=@https://dl.antmicro.com/projects/renode/litex_vexriscv--buildroot_rootfs.cpio-s_4055552-6743d738694cfdb8eea3d4632f92bf88de330025
+$dtb?=@https://dl.antmicro.com/projects/renode/litex_vexriscv--linux.dtb-s_1866-ee6b16235a4503283f676c42a16cd1b1ddb54a83
+$emulator?=@https://dl.antmicro.com/projects/renode/litex_vexriscv--emulator.bin-s_9028-796a4227b806997c6629462fdf0dcae73de06929
+
+macro reset
+"""
+    ### Linux kernel
+    sysbus LoadBinary $kernel 0xc0000000
+
+    ### rootfs
+    sysbus LoadBinary $rootfs 0xc0800000
+
+    ### dts
+    sysbus LoadFdt $dtb 0xc1000000
+
+    ### VexRiscv BIOS aka emulator
+    sysbus LoadBinary $emulator 0x20000000
+
+    cpu PC 0x20000000
+"""
+
+runMacro $reset

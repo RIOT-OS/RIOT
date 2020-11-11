@@ -1,0 +1,25 @@
+:name: PolarFire SoC
+:description: This is a sample script prepared to create a PolarFire SoC platform
+
+$bin?=@https://dl.antmicro.com/projects/renode/pse-freertos-lwip.elf-s_1413416-f348e11b20bd1a8cb24c39e888cf6430e4ee4035
+
+using sysbus
+mach create
+
+machine LoadPlatformDescription @platforms/cpus/polarfire-soc.repl
+
+showAnalyzer mmuart0
+
+macro reset
+"""
+   sysbus LoadELF $bin
+"""
+runMacro $reset
+
+## Alternatively, to start GDB and load from SoftConsole:
+# machine StartGdbServer 3333 true
+## Remember! After the connection is done and the binary is loaded, you have to issue:
+# u54_1 PC `e51 PC`
+## for every core you need to use as GDB initializes only the e51 core.
+## If you don't want the core to run, issue:
+# u54_4 IsHalted true

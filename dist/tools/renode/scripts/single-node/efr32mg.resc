@@ -1,0 +1,42 @@
+:name: EFR32MG
+:description: This script runs Zephyr on EFR32MG.
+
+$name?="EFR32-MG"
+using sysbus
+mach create $name
+
+machine LoadPlatformDescription @platforms/cpus/silabs/efr32/efr32mg12.repl
+
+$bin?=@https://dl.antmicro.com/projects/renode/zephyr.elf-s_408460-78d9cb6ba6a067f86d437cf4f9ef2672bec39c15
+sysbus Tag <0x40080000 0x400> "RADIO"
+
+# osc hack - push the initialization forward
+machine PyDevFromFile @scripts/pydev/flipflop.py 0x400E4090 4 true "CMU_STATUS"
+
+set SET
+"""
+if request.isWrite:
+    d = sysbus.ReadDoubleWord(request.offset + 0x40000000)
+    sysbus.WriteDoubleWord(request.offset + 0x40000000, d | request.value)
+"""
+
+machine PyDevFromString $SET 0x46000000 0x1000000 false "PERIPHERAL_SET"
+
+set CLEAR
+"""
+if request.isWrite:
+    d = sysbus.ReadDoubleWord(request.offset + 0x40000000)
+    sysbus.WriteDoubleWord(request.offset + 0x40000000, d & ~request.value)
+"""
+
+machine PyDevFromString $CLEAR 0x44000000 0x1000000 false "PERIPHERAL_CLEAR"
+
+showAnalyzer usart0
+
+macro reset
+"""
+    sysbus LoadELF $bin
+    deviceInformation Unique `next_value`
+"""
+
+runMacro $reset

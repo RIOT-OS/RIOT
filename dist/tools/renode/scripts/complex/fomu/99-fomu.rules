@@ -1,0 +1,5 @@
+# Fomu
+# Copy this file to /etc/udev/rules.d in order to enable access to Fomu device by non-root users
+
+SUBSYSTEM=="usb", ATTR{idVendor}=="1209", ATTR{idProduct}=="5bf0", MODE="0666"
+SUBSYSTEM=="usb", ATTRS{idVendor}=="1209", ATTRS{idProduct}=="5bf0", MODE="0666"

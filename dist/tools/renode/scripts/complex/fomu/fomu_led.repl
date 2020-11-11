@@ -1,0 +1,2 @@
+led: EtherBoneBridge @ sysbus <0xe0006800, +0x100>
+    port: 1234

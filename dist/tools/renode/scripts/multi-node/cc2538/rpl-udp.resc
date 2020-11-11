@@ -1,0 +1,42 @@
+:name: cc2538 range medium 3 nodes
+
+######################################################################
+#
+# Sample script creating 1 server node and 2 client nodes using a
+# range-based medium function - transmission is possible if nodes are
+# in range. Nodes are positioned in a 3D space (x,y,z),
+# at a distance of 10 (units) from each other.
+#
+######################################################################
+
+emulation CreateWirelessMedium "wireless"
+
+# The radio is using a range-based medium (with the `Range` set to `11`)
+# If not set, the default SimpleMediumFunction will be used (where range is not relevant)
+wireless SetRangeWirelessFunction 11
+
+######################### UDP SERVER - begin #########################
+$bin=@https://dl.antmicro.com/projects/renode/udp-server.elf-s_173732-a2aefb896d521a8fdc2a052cac1933c68cc39bf5
+$name="server"
+i @scripts/single-node/cc2538.resc
+connector Connect radio wireless
+wireless SetPosition radio 0 0 0
+mach clear
+########################## UDP SERVER - end ##########################
+
+######################### UDP CLIENT - begin #########################
+$bin=@https://dl.antmicro.com/projects/renode/udp-client.elf-s_173840-9eed7fe31993d055b98410b886044e8205a95644
+$name="client-1"
+i @scripts/single-node/cc2538.resc
+connector Connect radio wireless
+wireless SetPosition radio 10 0 0
+mach clear
+########################## UDP CLIENT - end ##########################
+
+######################### UDP CLIENT - begin #########################
+$name="client-2"
+i @scripts/single-node/cc2538.resc
+connector Connect radio wireless
+wireless SetPosition radio 0 10 0
+mach clear
+########################## UDP CLIENT - end ##########################

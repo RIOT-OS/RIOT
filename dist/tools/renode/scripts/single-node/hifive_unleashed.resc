@@ -1,0 +1,24 @@
+$name?="hifive-unleashed"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/sifive-fu540.repl
+
+showAnalyzer uart0
+
+$bin?=@https://dl.antmicro.com/projects/renode/hifive-unleashed--bbl.elf-s_17219640-c7e1b920bf81be4062f467d9ecf689dbf7f29c7a
+$fdt?=@https://dl.antmicro.com/projects/renode/hifive-unleashed--devicetree.dtb-s_10532-70cd4fc9f3b4df929eba6e6f22d02e6ce4c17bd1
+$vmlinux?=@https://dl.antmicro.com/projects/renode/hifive-unleashed--vmlinux.elf-s_80421976-46788813c50dc7eb1a1a33c1730ca633616f75f5
+
+macro reset
+"""
+    sysbus LoadELF $bin
+    sysbus LoadFdt $fdt 0x81000000 "earlyconsole mem=256M@0x80000000"
+
+    # Load the Linux kernel symbols, as they are not included in the BBL
+    sysbus LoadSymbolsFrom $vmlinux
+
+    # Device tree address is passed as an argument to the BBL
+    e51 SetRegisterUnsafe 11 0x81000000
+"""
+runMacro $reset

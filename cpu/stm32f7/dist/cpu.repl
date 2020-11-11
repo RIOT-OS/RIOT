@@ -1,0 +1,126 @@
+fsmcBank1: Memory.MappedMemory @ sysbus 0xC0000000
+    size: 0x10000000
+
+sram: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x60000
+
+flash: Memory.MappedMemory @ sysbus 0x08000000
+    size: 0x200000
+
+usart1: UART.STM32F7_USART @ sysbus 0x40011000
+    -> nvic@37
+
+can1: CAN.STMCAN @ sysbus <0x40006400, +0x400>
+    [0-3] -> nvic@[19-22]
+
+nvic: IRQControllers.NVIC @ sysbus 0xE000E000
+    systickFrequency: 72000000
+    IRQ -> cpu@0
+
+cpu: CPU.CortexM @ sysbus
+    cpuType: "cortex-m7"
+    nvic: nvic
+
+exti: IRQControllers.EXTI @ sysbus 0x40013C00
+    [0-6] -> nvic@[6-10, 23, 40]
+
+gpioPortA: GPIOPort.STM32F4GPIOPort @ sysbus <0x40020000, +0x400>
+    modeResetValue: 0xA8000000
+    pullUpPullDownResetValue: 0x64000000
+    [0-15] -> exti@[0-15]
+
+gpioPortB: GPIOPort.STM32F4GPIOPort @ sysbus <0x40020400, +0x400>
+    modeResetValue: 0x00000280
+    outputSpeedResetValue: 0x000000C0
+    pullUpPullDownResetValue: 0x00000100
+    [0-15] -> exti@[0-15]
+
+gpioPortC: GPIOPort.STM32F4GPIOPort @ sysbus <0x40020800, +0x400>
+    [0-15] -> exti@[0-15]
+
+gpioPortD: GPIOPort.STM32F4GPIOPort @ sysbus <0x40020C00, +0x400>
+    [0-15] -> exti@[0-15]
+
+gpioPortE: GPIOPort.STM32F4GPIOPort @ sysbus <0x40021000, +0x400>
+    [0-15] -> exti@[0-15]
+
+gpioPortF: GPIOPort.STM32F4GPIOPort @ sysbus <0x40021400, +0x400>
+    [0-15] -> exti@[0-15]
+
+gpioPortG: GPIOPort.STM32F4GPIOPort @ sysbus <0x40021800, +0x400>
+    [0-15] -> exti@[0-15]
+
+gpioPortH: GPIOPort.STM32F4GPIOPort @ sysbus <0x40021C00, +0x400>
+    [0-15] -> exti@[0-15]
+
+gpioPortI: GPIOPort.STM32F4GPIOPort @ sysbus <0x40022000, +0x400>
+    [0-15] -> exti@[0-15]
+
+gpioPortJ: GPIOPort.STM32F4GPIOPort @ sysbus <0x40022400, +0x400>
+    [0-15] -> exti@[0-15]
+
+gpioPortK: GPIOPort.STM32F4GPIOPort @ sysbus <0x40022800, +0x400>
+    [0-15] -> exti@[0-15]
+
+ethernet: Network.SynopsysEthernetMAC @ sysbus 0x40028000
+    -> nvic@61
+
+rom: Memory.MappedMemory @ sysbus 0x1FFF0000
+    size: 0x10000
+
+spi1: SPI.STM32SPI @ sysbus 0x40013000
+
+spi2: SPI.STM32SPI @ sysbus 0x40003800
+
+spi3: SPI.STM32SPI @ sysbus 0x40003C00
+
+dma1: DMA.STM32DMA @ sysbus 0x40026000
+    [0-7] -> nvic@[11-17,47]
+
+dma2: DMA.STM32DMA @ sysbus 0x40026400
+    [0-7] -> nvic@[56-60,68-70]
+
+ltdc: Video.STM32LTDC @ sysbus 0x40016800
+    -> nvic@88
+
+dma2d: DMA.STM32DMA2D @ sysbus 0x4002B000
+    -> nvic@90
+
+i2c1: I2C.STM32F7_I2C @ sysbus 0x40005400
+    EventInterrupt -> nvic@31
+    ErrorInterrupt -> nvic@32
+
+i2c2: I2C.STM32F7_I2C @ sysbus 0x40005800
+    EventInterrupt -> nvic@33
+    ErrorInterrupt -> nvic@34
+
+i2c3: I2C.STM32F7_I2C @ sysbus 0x40005C00
+    EventInterrupt -> nvic@72
+    ErrorInterrupt -> nvic@73
+
+i2c4: I2C.STM32F7_I2C @ sysbus 0x40006000
+    EventInterrupt -> nvic@95
+    ErrorInterrupt -> nvic@96
+
+syscfg: Miscellaneous.STM32_SYSCFG @ sysbus 0x40013800
+    [0-15] -> exti@[0-15]
+
+rcc: Python.PythonPeripheral @ sysbus 0x40023800
+    size: 0x400
+    initable: true
+    filename: "$RIOTBASE/dist/tools/renode/scripts/pydev/flipflop.py"
+
+pwrCsr1: Python.PythonPeripheral @ sysbus 0x40007004
+    size: 0x4
+    initable: true
+    filename: "$RIOTBASE/dist/tools/renode/scripts/pydev/flipflop.py"
+
+sdMmcSta: Python.PythonPeripheral @ sysbus 0x40012C34
+    size: 0x4
+    initable: true
+    filename: "$RIOTBASE/dist/tools/renode/scripts/pydev/flipflop.py"
+
+sysbus:
+    init:
+        ApplySVD @https://dl.antmicro.com/projects/renode/svd/STM32F7x6.svd.gz
+

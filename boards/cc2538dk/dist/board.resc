@@ -1,8 +1,9 @@
 mach create
 using sysbus
-machine LoadPlatformDescription @platforms/cpus/cc2538.repl
+machine LoadPlatformDescription @$RENODE_BOARD_BIN_REPL
+machine SetClockSource cpu
 
-machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x400D2004 0x4 True "sysctrl"
+machine PyDevFromFile @$RIOTBASE/scripts/pydev/rolling-bit.py 0x400D2004 0x4 True "sysctrl"
 
 # show the UART output
 showAnalyzer uart0

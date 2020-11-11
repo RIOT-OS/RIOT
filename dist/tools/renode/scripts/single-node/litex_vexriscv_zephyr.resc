@@ -1,0 +1,21 @@
+#
+# This script runs Zephyr OS on LiteX+VexRiscv in Renode
+#
+# Note that it uses a custom LiteX configuration.
+# For details, please refer to the repl file.
+#
+using sysbus
+
+mach create
+machine LoadPlatformDescription @platforms/cpus/litex_vexriscv_zephyr.repl
+
+showAnalyzer uart
+
+$zephyr?=@https://dl.antmicro.com/projects/renode/litex_vexriscv--zephyr-shell.elf-s_850340-baf59564d97de15457a3a626aa61c44c1cea66bc
+
+macro reset
+"""
+    sysbus LoadELF $zephyr
+"""
+
+runMacro $reset

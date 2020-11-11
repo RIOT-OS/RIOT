@@ -1,0 +1,22 @@
+mach create
+using sysbus
+machine LoadPlatformDescription @platforms/cpus/efr32mg.repl
+machine SetClockSource cpu
+
+# osc hack - push the initialization forward
+machine PyDevFromFile @scripts/pydev/flipflop.py 0x400E4090 4 true "CMU_STATUS"
+
+# show the UART output
+showAnalyzer usart0
+
+# generate a unique device id
+$unique_id = `next_value 1`
+
+macro reset
+"""
+    sysbus LoadELF $image_file
+    deviceInformation Unique $unique_id
+"""
+
+runMacro $reset
+start

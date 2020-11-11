@@ -1,0 +1,20 @@
+:name: STM32F746
+:description: This script runs Dartino on STM32F7 Discovery.
+
+using sysbus
+$name?="STM32F746"
+mach create $name
+
+machine LoadPlatformDescription @platforms/boards/stm32f7_discovery-bb.repl
+
+showAnalyzer usart1
+showAnalyzer ltdc
+
+$bin ?= @https://dl.antmicro.com/projects/renode/dartino-lines.elf-s_486816-cd8876ab9de60af779f4429dfe16c79bf831b84d
+
+macro reset
+"""
+    sysbus LoadELF $bin
+"""
+
+runMacro $reset

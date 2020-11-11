@@ -1,0 +1,21 @@
+:name: LiteX VexRiscv on Arty board
+:description: This script runs LiteX Build Environment firmware on VexRiscv CPU on Arty board.
+
+$name?="arty_litex_vexriscv"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/boards/arty_litex_vexriscv.repl
+
+$bin?=@https://dl.antmicro.com/projects/renode/arty_litex_vexriscv--firmware.elf-s_438376-e20651f6e9625812f6588ce2b79c978f2c4d7eab
+
+showAnalyzer sysbus.uart
+
+macro reset
+"""
+    sysbus LoadELF $bin
+"""
+
+runMacro $reset
+
+

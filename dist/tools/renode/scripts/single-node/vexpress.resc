@@ -1,0 +1,42 @@
+:name: Versatile Express
+:description: This script runs Linux on Versatile Express.
+#
+# DEMO SCRIPT
+#
+# platform: vexpress busybox linux
+#
+
+using sysbus
+$name?="VersatileExpress"
+mach create $name
+machine LoadPlatformDescription @platforms/boards/vexpress.repl
+
+sysbus Redirect 0xC0000000 0x80000000 0x20000000
+
+$bin?=@https://dl.antmicro.com/projects/renode/vexpress--vmlinux-vexpress--c2e36631a7ac4fced04258b63e5d80d25e0a18cc
+$rootfs?=@https://dl.antmicro.com/projects/renode/cortex-a9--rootfs-minimal.cpio--abd8ed48b3dd3b0fec98f5ffb50fdd881fde40af
+### create externals ###
+
+showAnalyzer sysbus.uart0
+
+macro reset
+"""
+    ### set registers ###
+
+    cpu SetRegisterUnsafe 0 0x0
+    cpu SetRegisterUnsafe 1 0x8E0      # board id
+    cpu SetRegisterUnsafe 2 0x80000100 # atags
+
+    ### load binaries ###
+
+    sysbus LoadELF $bin
+
+    sysbus ZeroRange 0x80800000 0x800000
+    sysbus LoadBinary $rootfs 0x80800000
+
+    sysbus LoadAtags "console=ttyAMA0,115200 root=/dev/ram initrd=0x80800000,8M mem=512M vmalloc=256M earlyprintk" 0x20000000 0x80000100
+
+    cpu PC 0x80008000
+"""
+
+runMacro $reset

@@ -1,0 +1,33 @@
+:name: FIREFLY
+:description: This script runs Hello World example from Contiki-NG on Zolertia Firefly.
+
+$name?="Zolertia"
+using sysbus
+mach create $name
+
+machine LoadPlatformDescription @platforms/boards/zolertia-firefly.repl
+
+machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x400D2004 0x4 True "sysctrl"
+
+showAnalyzer uart0
+
+$id = `next_value 1`
+
+macro reset
+"""
+    #set node address. 0x00 0x12 0x4B is TI OUI
+    sysbus WriteDoubleWord 0x00280028 $id
+    sysbus WriteDoubleWord 0x0028002C 0x00
+    sysbus WriteDoubleWord 0x00280030 0xAB
+    sysbus WriteDoubleWord 0x00280034 0x89
+    sysbus WriteDoubleWord 0x00280038 0x00
+    sysbus WriteDoubleWord 0x0028003C 0x4B
+    sysbus WriteDoubleWord 0x00280040 0x12
+    sysbus WriteDoubleWord 0x00280044 0x00
+
+    sysbus LoadBinary @https://dl.antmicro.com/projects/renode/cc2538_rom_dump.bin-s_524288-0c196cdc21b5397f82e0ff42b206d1cc4b6d7522 0x0
+    sysbus LoadELF @https://dl.antmicro.com/projects/renode/contiki-ng-zolertia-hello-world.elf-s_174148-6c609e4e8ac5ff30a36ac6d9c11f3a8536aac59b
+
+"""
+
+runMacro $reset

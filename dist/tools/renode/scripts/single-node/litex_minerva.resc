@@ -1,0 +1,22 @@
+:name: LiteX Minerva
+:description: This script runs LiteX BIOS on Minerva CPU.
+
+$name?="LiteX+Minerva"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/litex_minerva.repl
+
+$bios?=@https://dl.antmicro.com/projects/renode/litex_minerva--bios.bin-s_23548-4b53f9bd9af1804c893bd088ac179916bf3efa2c
+
+showAnalyzer sysbus.uart
+
+macro reset
+"""
+    sysbus LoadBinary $bios 0x0
+    sysbus.cpu PC 0x0
+"""
+
+runMacro $reset
+
+

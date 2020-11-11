@@ -1,0 +1,11 @@
+using sysbus
+
+mach create
+machine LoadPlatformDescription @platforms/cpus/litex_vexriscv.repl
+machine LoadPlatformDescription $ORIGIN/fomu_led.repl
+
+sysbus LoadELF @https://dl.antmicro.com/projects/renode/litex_vexriscv-fomu--zephyr-led-controller.elf-s_855804-5f73a38fb44db5298e613826926bd16843edd89b
+sysbus LogPeripheralAccess led True
+
+showAnalyzer uart
+

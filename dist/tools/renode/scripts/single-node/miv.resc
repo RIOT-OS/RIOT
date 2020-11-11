@@ -1,0 +1,18 @@
+:name: Mi-V
+:description: This script runs Zephyr RTOS shell sample on a Mi-V RISC-V board.
+
+$name?="Mi-V"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/boards/miv-board.repl
+
+$bin?=@https://dl.antmicro.com/projects/renode/shell-demo-miv.elf-s_803248-ea4ddb074325b2cc1aae56800d099c7cf56e592a
+
+showAnalyzer uart
+
+macro reset
+"""
+    sysbus LoadELF $bin
+"""
+runMacro $reset

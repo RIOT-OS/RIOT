@@ -1,0 +1,20 @@
+:name: Micropython @ LiteX VexRiscv
+:description: This script runs Micropython on LiteX+VexRiscv platform (without LiteX BIOS bootloader)
+
+$name?="LiteX+VexRiscv"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/litex_vexriscv_micropython.repl
+
+$bin?=@https://dl.antmicro.com/projects/renode/litex_vexriscv--micropython.elf-s_2713384-e2d6be24b6a0de3d1bcf3161e38191b0e4489010
+
+showAnalyzer sysbus.uart
+
+macro reset
+"""
+    sysbus LoadELF $bin
+"""
+
+runMacro $reset
+

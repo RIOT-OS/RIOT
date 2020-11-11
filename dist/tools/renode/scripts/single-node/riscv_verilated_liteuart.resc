@@ -1,0 +1,23 @@
+:name: RISC-V platform with a verilated UART
+:description: This script runs Zephyr using a verilated UART.
+
+$name?="LiteUART"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/verilated/litex_vexriscv_verilated_liteuart.repl
+
+$bin?=@https://dl.antmicro.com/projects/renode/zephyr--verilated_liteuart--shell.elf-s_864780-63c7e83fb01451ac6683434997f6f03c6a8f9079
+$uart?=@https://dl.antmicro.com/projects/renode/verilator--liteuart-s_300416-5a1efad127e6ec04892a32c53853cf94c1228061
+
+showAnalyzer uart
+
+uart SimulationFilePath $uart
+
+macro reset
+"""
+    sysbus LoadELF $bin
+"""
+
+runMacro $reset
+

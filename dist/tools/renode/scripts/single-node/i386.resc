@@ -1,0 +1,12 @@
+:name: I386
+:description: This script runs U-Boot on a bare x86 platform.
+
+$name?="i386"
+mach create $name
+
+$bin?=@https://dl.antmicro.com/projects/renode/u-boot-x86-minimal-s_925199-6543506df8e9f59fb57adb2e378838e8f028f40f
+machine LoadPlatformDescription @platforms/cpus/i386.repl
+
+sysbus LoadELF $bin
+sysbus.cpu PC 0xFFFFF800
+showAnalyzer sysbus.uart

@@ -1,0 +1,20 @@
+using sysbus
+$name?="Microwatt"
+
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/microwatt.repl
+
+$bin?=@https://dl.antmicro.com/projects/renode/microwatt--micropython.elf-s_2282296-072a8aac5d4d9897425f72ec2ca8ca123e6d624f
+
+showAnalyzer uart
+
+macro reset
+"""
+    sysbus LoadELF $bin
+
+    # Microwatt should always boot from 0 but the ELF files tend to set the
+    # entry point differently. Adjust this to match your use case.
+    cpu PC 0
+"""
+
+runMacro $reset

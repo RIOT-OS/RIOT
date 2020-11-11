@@ -1,0 +1,40 @@
+mach create
+using sysbus
+machine LoadPlatformDescription @platforms/boards/stm32f4_discovery-kit.repl
+
+machine SetClockSource sysbus.cpu
+cpu PerformanceInMips 125
+
+# oscillator setup to toggle status bit based on requested clock.
+set RCC_CFGR
+"""
+if request.isWrite:
+    value = (request.value & ~(0x0C)) | ((request.value & 0x03) << 0x02)
+elif request.isRead:
+    request.value = value
+"""
+
+machine PyDevFromString $RCC_CFGR 0x40023808 0x4 false "RCC_CFGR"
+
+# show the UART output
+showAnalyzer uart2
+
+# generate a unique device id
+python "import _random"
+python "rand = _random.Random()"
+
+$id1 = `python "print rand.getrandbits(32)"`
+$id2 = `python "print rand.getrandbits(32)"`
+$id3 = `python "print rand.getrandbits(32)"`
+
+macro reset
+"""
+    sysbus LoadELF $image_file
+
+    sysbus WriteDoubleWord 0x1FFF7A10 $id1
+    sysbus WriteDoubleWord 0x1FFF7A14 $id2
+    sysbus WriteDoubleWord 0x1FFF7A18 $id3
+"""
+
+runMacro $reset
+start

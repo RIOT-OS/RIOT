@@ -1,0 +1,16 @@
+using sysbus
+
+mach create
+machine LoadPlatformDescription @platforms/cpus/litex_vexriscv_smp.repl
+
+sysbus LoadBinary @https://dl.antmicro.com/projects/renode/litex_vexriscv_smp--opensbi.bin-s_45360-dcfe5f7b149bd1e0232609d87fb698f95f5e33c4 0x40F00000
+sysbus LoadBinary @https://dl.antmicro.com/projects/renode/litex_vexriscv_smp--linux_kernel.bin-s_3009892-d77e1e2a896ab0767452ee9b1186e117b606ba39 0x40000000
+sysbus LoadBinary @https://dl.antmicro.com/projects/renode/litex_vexriscv_smp--device_tree.dtb-s_1703-ebe07ee2f4e15760ae9b13483a51d241cab20002 0x40EF0000
+sysbus LoadBinary @https://dl.antmicro.com/projects/renode/litex_vexriscv_smp--rootfs.cpio-s_4570112-7a6a6388e09170db38795a006dd75f91d556eecf 0x41000000
+
+cpu_0 PC 0x40F00000
+cpu_1 PC 0x40F00000
+cpu_2 PC 0x40F00000
+cpu_3 PC 0x40F00000
+
+showAnalyzer uart

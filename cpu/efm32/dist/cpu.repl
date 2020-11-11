@@ -1,0 +1,66 @@
+i2c0: I2C.EFR32_I2CController @ sysbus <0x4000c000, +0x400>
+    -> nvic@16
+
+usart0: UART.EFR32_USART @ sysbus <0x40010000, +0x400>
+    ReceiveIRQ -> nvic@11
+    TransmitIRQ -> nvic@12
+usart1: UART.EFR32_USART @ sysbus <0x40010400, +0x400>
+    ReceiveIRQ -> nvic@19
+    TransmitIRQ -> nvic@20
+
+leUart0: UART.LEUART @ sysbus <0x4004a000, +0x400>
+    -> nvic@21
+
+gpioPort: GPIOPort.EFR32_GPIOPort @ sysbus 0x4000a000
+    EvenIRQ -> nvic@9
+    OddIRQ -> nvic@17
+
+bitband_peripherals: Miscellaneous.BitBanding @ sysbus <0x42000000, +0x2000000>
+    peripheralBase: 0x40000000
+
+bitband_sram: Miscellaneous.BitBanding @ sysbus <0x22000000, +0x2000000>
+    peripheralBase: 0x20000000
+
+sram: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x00008000
+
+flash: Memory.MappedMemory @ sysbus 0x00000000
+    size: 0x00040000
+
+nvic: IRQControllers.NVIC @ sysbus 0xE000E000
+    IRQ -> cpu@0
+
+cpu: CPU.CortexM @ sysbus
+    nvic: nvic
+    cpuType: "cortex-m4f"
+
+deviceInformation: Miscellaneous.SiLabs.EFR32DeviceInformation @ sysbus 0x0fe081b0
+    deviceFamily: DeviceFamily.EFR32MG1P
+    deviceNumber: 1
+    flashDevice: flash
+    sramDevice: sram
+
+gpcrc: Miscellaneous.SiLabs.EFR32_GPCRC @ sysbus 0x4001c000
+
+timer0: Timers.EFR32_Timer @ sysbus 0x40018000
+    frequency: 0x1000000 //bogus
+    width: TimerWidth.Bit16
+    -> nvic@10
+
+timer1: Timers.EFR32_Timer @ sysbus 0x40018400
+    frequency: 0x1000000 //bogus
+    width: TimerWidth.Bit16
+    -> nvic@18
+
+sysbus:
+    init:
+        Tag <0x400e0000,0x400e07ff> "MSC"
+        Tag <0x400e3000,0x400e33ff> "EMU"
+        Tag <0x400e5000,0x400e53ff> "RMU"
+        Tag <0x400e4000,0x400e43ff> "CMU"
+        Tag <0x400e6000,0x400e63ff> "PRS"
+        Tag <0x400e2000,0x400e2fff> "LDMA"
+        Tag <0x400e1000,0x400e13ff> "FPUEH"
+        Tag <0x40046000,0x400463ff> "LETIMER0"
+        Tag <0x4001e000,0x4001e3ff> "CRYOTIMER"
+        Tag <0x4004e000,0x4004e3ff> "PCNT0"

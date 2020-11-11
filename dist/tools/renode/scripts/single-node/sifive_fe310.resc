@@ -1,0 +1,19 @@
+:name: SiFive-FE310
+:description: This script runs Zephyr RTOS shell sample on SiFive-FE310 platform.
+
+$name?="SiFive-FE310"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/sifive-fe310.repl
+
+$bin?=@https://dl.antmicro.com/projects/renode/zephyr-fe310-shell.elf-s_323068-cf87169150ecdb30ad5a14c87ae209c53dd3eca2
+
+showAnalyzer uart0
+sysbus LoadELF $bin
+
+sysbus Tag <0x10008000 4> "PRCI_HFROSCCFG" 0xFFFFFFFF
+sysbus Tag <0x10008008 4> "PRCI_PLLCFG" 0xFFFFFFFF
+
+cpu PC `sysbus GetSymbolAddress "vinit"`
+cpu PerformanceInMips 320

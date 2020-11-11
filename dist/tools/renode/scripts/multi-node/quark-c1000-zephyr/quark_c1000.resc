@@ -1,0 +1,47 @@
+# The following lines are not interpreted.
+:name: Quark C1000
+:description: This script runs Zephyr shell example on Quark C1000 (32-bit x86).
+
+# The `using` command allows the user to omit a prefix when referring to a peripheral.
+# E.g. `using sysbus` allows to refer to the CPU device with `cpu` instead of `sysbus.cpu`.
+using sysbus
+
+# The ?= notation indicates a default value if the variable is not set.
+$name?="Quark-C1000"
+
+# Create a new machine and set the Monitor's context accordingly.
+mach create $name
+
+# Load the hardware description from the REPL file.
+machine LoadPlatformDescription @platforms/boards/quark_c1000-cc2520.repl
+
+# This is a sample shell binary:
+$bin ?= @https://dl.antmicro.com/projects/renode/zephyr_shell.elf-s_398140-ed6b1a68e94b1cb8ac3cc7d80fb4d36e36a22766
+# This is a default bootloader:
+$boot ?= @https://dl.antmicro.com/projects/renode/quark_se_rom.bin-s_8192-b688c8b9380014d7deb2bd42dc218fc5ee8d1abf
+
+# Open a window for the `sysbus.uartB` device - which, in this case, is a default UART for user interaction.
+showAnalyzer uartB
+
+# The following series of commands is executed everytime the machine is reset.
+macro reset
+"""
+    # Set the WAIT_FOR_JTAG GPIO pin. The bootloader stalls if it's set to low.
+    gpio OnGPIO 15 true
+
+    # Load the bootloader. The address has to be specified as the binary files do not contain
+    # any addressing information.
+    sysbus LoadBinary $boot 0xffffe000
+
+    # The ELF files already contain information on where to load each part. They also provide symbols, which
+    # can be used for execution tracing.
+    sysbus LoadELF $bin
+
+    # By default, the initial PC is set to the ELF entry point. Since the bootloader has to be started before the target application,
+    # the PC needs to be set manually to the correct value.
+    sysbus.cpu PC 0xfffffff0
+"""
+
+# Run this macro once to load the binaries.
+runMacro $reset
+

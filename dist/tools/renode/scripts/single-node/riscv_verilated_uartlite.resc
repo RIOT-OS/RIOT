@@ -1,0 +1,24 @@
+:name: RISC-V platform with a verilated UART
+:description: This script runs Zephyr printing out on a verilated UART.
+
+$name?="UARTLite"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/cpus/verilated/riscv_verilated_uartlite.repl
+
+$bin?=@https://dl.antmicro.com/projects/renode/uartlite--custom_uart_demo--zephyr.elf-s_184340-129eb92404f437a466cd8700f6743b1c5b0da912
+$uart?=@https://dl.antmicro.com/projects/renode/verilator--uartlite_trace_off-s_252704-c703fe4dec057a9cbc391a0a750fe9f5777d8a74
+
+showAnalyzer uart
+
+uart SimulationFilePath $uart
+
+macro reset
+"""
+    sysbus LoadELF $bin
+    # set pc to the beginning of ROM where `vinit` is defined that sets `mtvec` and jumps directly to `__start`
+    sysbus.cpu PC `sysbus GetSymbolAddress "vinit"`
+"""
+runMacro $reset
+

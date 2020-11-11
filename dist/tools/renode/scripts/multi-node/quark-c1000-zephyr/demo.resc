@@ -1,0 +1,64 @@
+:name: Quark C1000 with CC2520 - 2 nodes
+
+######################################################################
+#
+# Sample script creating 1 server node and 1 client node using a
+# range-based radio medium function - transmission is possible if
+# the nodes are in range of each other. The nodes are positioned in 3D space (x,y,z),
+# at a distance of 10 units on the x-axis.
+#
+# Differences in SyncUnit values for machines represent differences
+# in their relative speed. This prevents the machines from
+# synchronizing in full.
+#
+######################################################################
+
+# Create a new wireless transmission medium. This command adds the `wireless` object to the emulation.
+emulation CreateWirelessMedium "wireless"
+
+# The radio is using a range-based medium (with the `Range` set to `11`).
+# If not set, the default SimpleMediumFunction will be used (where range is not relevant).
+wireless SetRangeWirelessFunction 11
+
+######################### UDP SERVER - begin #########################
+# This creates a server node, connects it to the wireless medium and sets the node's position.
+#
+# The `$bin` variable contains the path to the server ELF file. The `$name` variable will indicate
+# the name of the created machine. Both variables are used in quark_c1000.resc.
+$bin=@https://dl.antmicro.com/projects/renode/zephyr-echo-server.elf-s_1003060-56eb87aafc8c00f73ebe154dafee627a3a4f23f6
+$name="server"
+
+# Load the script for a single generic node:
+i @scripts/multi-node/quark-c1000-zephyr/quark_c1000.resc
+
+# Each radio device has to be connected to a wireless medium. Two devices can communicate
+# if they are connected to the same medium.
+# In this situation the radio is accessible via an SPI bus.
+connector Connect spi1.radio wireless
+
+# Each radio in a machine can have its position set independently.
+wireless SetPosition spi1.radio 0 0 0
+
+########################## UDP SERVER - end ##########################
+
+# The Monitor works in the context of the current machine. It allows the user to access the machine's peripherals
+# and to set variables local to this machine. The selection must be cleared before creating a new machine
+# so that the $bin and $name variables are global and accessible from the new context.
+mach clear
+
+######################### UDP CLIENT - begin #########################
+# This creates a client node.
+
+$bin=@https://dl.antmicro.com/projects/renode/zephyr-echo-client.elf-s_1016316-bfb6584d9d63950e8106c6820efccdaf0b7738a5
+$name="client"
+
+i @scripts/multi-node/quark-c1000-zephyr/quark_c1000.resc
+connector Connect spi1.radio wireless
+
+# The node is placed 10 units from the server. With the maximum range set to 11, all packets will be delivered.
+wireless SetPosition spi1.radio 10 0 0
+
+########################## UDP CLIENT - end ##########################
+
+# This clears the Monitor's context. To select a machine, use the `mach set` command (try `help mach`).
+mach clear

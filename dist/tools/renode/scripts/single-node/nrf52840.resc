@@ -1,0 +1,17 @@
+:name: NRF52840
+:description: This script runs Zephyr Shell demo on NRF52840.
+
+using sysbus
+
+mach create
+machine LoadPlatformDescription @platforms/cpus/nrf52840.repl
+
+$bin?=@https://dl.antmicro.com/projects/renode/nrf52840--zephyr_shell_fs.elf-s_1397004-c605df83d35b8f89e4b76f4f8f72a7e1b9801256
+
+showAnalyzer uart0
+
+macro reset
+"""
+    sysbus LoadELF $bin
+"""
+runMacro $reset

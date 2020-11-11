@@ -1,0 +1,28 @@
+# NOTE: set the `$output_file` variable before including this script
+
+$zephyr_application=@https://dl.antmicro.com/projects/renode/litex_i2s--zephyr-echo_sample.elf-s_1172756-db2f7eb8c6c8f396651b2f2d517cee13d79a9a69
+$simulation_duration?="3.2"
+$input_file?=@https://dl.antmicro.com/projects/renode/sine440_with_beep_aligned.pcm_s24le_44100_stereo.raw-s_793344-b37432aad6a22f36cb5c1e239c9bce4adbcd15fb
+
+using sysbus
+
+mach create
+machine LoadPlatformDescription @platforms/cpus/litex_zephyr_vexriscv_i2s.repl
+
+showAnalyzer sysbus.uart
+
+macro reset
+"""
+    sysbus LoadELF $zephyr_application
+
+    i2s_tx Output $output_file
+    i2s_rx LoadPCM $input_file
+
+    emulation RunFor $simulation_duration
+
+    echo "The output file:"
+    echo $output_file
+    echo "The emulation is now paused"
+"""
+
+runMacro $reset

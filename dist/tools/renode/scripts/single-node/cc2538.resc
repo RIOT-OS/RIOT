@@ -1,0 +1,35 @@
+:name: CC2538
+:description: This script runs Contiki-NG hello-world example on CC2538.
+
+$name?="CC2538"
+$bin?=@https://dl.antmicro.com/projects/renode/cc2538-contiki_hello_world.elf-s_242120-08fc83d11f790ccc1aa46abfdfc9c2e1a94baed2
+
+mach create $name
+using sysbus
+machine LoadPlatformDescription @platforms/cpus/cc2538.repl
+
+machine PyDevFromFile @scripts/pydev/rolling-bit.py 0x400D2004 0x4 True "sysctrl"
+
+$id = `next_value 1`
+
+macro reset
+"""
+    #set node address. 0x00 0x12 0x4B is TI OUI
+    sysbus WriteDoubleWord 0x00280028 $id
+    sysbus WriteDoubleWord 0x0028002C 0x00
+    sysbus WriteDoubleWord 0x00280030 0xAB
+    sysbus WriteDoubleWord 0x00280034 0x89
+    sysbus WriteDoubleWord 0x00280038 0x00
+    sysbus WriteDoubleWord 0x0028003C 0x4B
+    sysbus WriteDoubleWord 0x00280040 0x12
+    sysbus WriteDoubleWord 0x00280044 0x00
+
+    sysbus LoadBinary @https://dl.antmicro.com/projects/renode/cc2538_rom_dump.bin-s_524288-0c196cdc21b5397f82e0ff42b206d1cc4b6d7522 0x0
+    sysbus LoadELF $bin
+
+    cpu VectorTableOffset `sysbus GetSymbolAddress "vectors"`
+"""
+
+runMacro $reset
+
+showAnalyzer sysbus.uart0
