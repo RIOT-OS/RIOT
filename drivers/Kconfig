@@ -8,6 +8,7 @@ menu "Drivers"
 
 menu "Actuator Device Drivers"
 rsource "aip31068/Kconfig"
+rsource "apa102/Kconfig"
 rsource "motor_driver/Kconfig"
 endmenu # Actuator Device Drivers
 
