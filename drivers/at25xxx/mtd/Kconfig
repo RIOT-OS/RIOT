@@ -1,0 +1,12 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_MTD_AT25XXX
+    bool "MTD implementation for AT25XXX"
+    depends on MODULE_AT25XXX
+    depends on MODULE_MTD
+    depends on TEST_KCONFIG

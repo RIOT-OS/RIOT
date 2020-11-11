@@ -47,6 +47,7 @@ endmenu # Sensor Device Drivers
 
 menu "Storage Device Drivers"
 rsource "at24cxxx/Kconfig"
+rsource "at25xxx/Kconfig"
 rsource "mtd/Kconfig"
 rsource "mtd_sdcard/Kconfig"
 endmenu # Storage Device Drivers
