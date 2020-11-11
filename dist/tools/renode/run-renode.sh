@@ -80,7 +80,7 @@ write_board_repl() {
 }
 
 write_board_config() {
-    echo "\$image_file = '${IMAGE_FILE}'" > "${RENODE_BOARD_BIN_CONFIG}"
+    echo "\$image_file?=@${IMAGE_FILE}" > "${RENODE_BOARD_BIN_CONFIG}"
     content=$(cat "$RENODE_BOARD_CONFIG" | sed -e 's@$RIOTBASE@'"$RIOTBASE"'@g')
     content=$(echo "$content" | sed -e 's@$RENODE_BOARD_BIN_REPL@'"$RENODE_BOARD_BIN_REPL"'@g')
     content=$(echo "$content" | sed -e 's@$RENODE_CPU_BIN_REPL@'"$RENODE_CPU_BIN_REPL"'@g')
