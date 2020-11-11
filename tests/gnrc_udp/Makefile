@@ -16,12 +16,12 @@ USEMODULE += ps
 USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
 
+include $(RIOTBASE)/Makefile.include
+
 # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
 ifndef CONFIG_GNRC_PKTBUF_SIZE
   CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=8192
 endif
-
-include $(RIOTBASE)/Makefile.include
 
 # Set a custom channel if needed
 include $(RIOTMAKE)/default-radio-settings.inc.mk

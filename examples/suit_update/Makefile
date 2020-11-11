@@ -7,12 +7,6 @@ BOARD ?= samr21-xpro
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-# lower pktbuf size to something sufficient for this application
-# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
-ifndef CONFIG_GNRC_PKTBUF_SIZE
-  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=2000
-endif
-
 #
 # Networking
 #
@@ -100,6 +94,12 @@ TESTRUNNER_RESET_AFTER_TERM ?= 1
 TEST_ON_CI_BLACKLIST = all
 
 include $(RIOTBASE)/Makefile.include
+
+# lower pktbuf size to something sufficient for this application
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=2000
+endif
 
 .PHONY: host-tools
 

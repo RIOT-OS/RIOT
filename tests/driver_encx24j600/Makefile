@@ -8,12 +8,6 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += ps
 
-# lower pktbuf size
-# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
-ifndef CONFIG_GNRC_PKTBUF_SIZE
-  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=2048
-endif
-
 # set board specific peripheral configurations
 ifneq (,$(filter nucleo-f334r8,$(BOARD)))
 # these settings are probably valid for PoEll-i on most nucelo boards, but
@@ -36,3 +30,9 @@ CFLAGS += -DENCX24J600_INT=$(ENC_INT)
 CFLAGS += -I$(CURDIR)
 
 include $(RIOTBASE)/Makefile.include
+
+# lower pktbuf size
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_GNRC_PKTBUF_SIZE
+  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=2048
+endif

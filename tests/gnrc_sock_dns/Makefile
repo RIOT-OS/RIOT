@@ -28,16 +28,6 @@ USEMODULE += posix_inet
 
 LOW_MEMORY_BOARDS := nucleo-f334r8 msb-430 msb-430h
 
-ifeq ($(BOARD),$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
-# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
-ifndef CONFIG_GNRC_PKTBUF_SIZE
-  CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
-endif
-    CFLAGS += -DCONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF=2 \
-              -DGNRC_NETIF_IPV6_GROUPS_NUMOF=2 -DCONFIG_GNRC_IPV6_NIB_NUMOF=1 \
-              -DCONFIG_GNRC_IPV6_NIB_OFFL_NUMOF=1
-endif
-
 # The test requires some setup and to be run as root
 # So it cannot currently be run
 TEST_ON_CI_BLACKLIST += all
@@ -48,3 +38,13 @@ ethos:
 	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTTOOLS)/ethos
 
 include $(RIOTBASE)/Makefile.include
+
+ifeq ($(BOARD),$(filter $(BOARD),$(LOW_MEMORY_BOARDS)))
+# Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
+  ifndef CONFIG_GNRC_PKTBUF_SIZE
+    CFLAGS += -DCONFIG_GNRC_PKTBUF_SIZE=512
+  endif
+    CFLAGS += -DCONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF=2 \
+              -DGNRC_NETIF_IPV6_GROUPS_NUMOF=2 -DCONFIG_GNRC_IPV6_NIB_NUMOF=1 \
+              -DCONFIG_GNRC_IPV6_NIB_OFFL_NUMOF=1
+endif
