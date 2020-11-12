@@ -1521,6 +1521,9 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
         }
         else {
             LOG_ERROR("gnrc_netif: can't queue packet for sending\n");
+            /* If we got here, it means the device was busy and the pkt queue
+             * was full. The packet should be dropped here anyway */
+            gnrc_pktbuf_release_error(pkt, ENOMEM);
         }
         return;
     }
