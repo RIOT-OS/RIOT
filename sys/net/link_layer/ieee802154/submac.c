@@ -170,6 +170,15 @@ void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac)
     else {
         submac->cb->rx_done(submac);
 
+        /* Only set the radio to the SubMAC default state only if the upper
+         * layer didn't try to send more data. Otherwise there's risk of not
+         * being compliant with the Radio HAL API (e.g the radio might try
+         * to set a different state in the middle of a transmission).
+         */
+        if (submac->tx) {
+            return;
+        }
+
         /* The Radio HAL will be in "FB Lock" state. We need to do a state
          * transition here in order to release it */
         ieee802154_trx_state_t next_state = submac->state == IEEE802154_STATE_LISTEN ? IEEE802154_TRX_STATE_RX_ON : IEEE802154_TRX_STATE_TRX_OFF;
@@ -179,7 +188,6 @@ void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac)
          * not busy
          */
         while (ieee802154_radio_request_set_trx_state(submac->dev, next_state) == -EBUSY);
-
         while (ieee802154_radio_confirm_set_trx_state(submac->dev) == -EAGAIN) {}
     }
 }
