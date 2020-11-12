@@ -113,6 +113,11 @@ void auto_init(void)
         extern void openwsn_bootstrap(void);
         openwsn_bootstrap();
     }
+    if (IS_USED(MODULE_AUTO_INIT_UWB_CORE)) {
+        LOG_DEBUG("Bootstrapping uwb core.\n");
+        extern void uwb_core_init(void);
+        uwb_core_init();
+    }
     if (IS_USED(MODULE_GCOAP) &&
         !IS_ACTIVE(CONFIG_GCOAP_NO_AUTO_INIT)) {
         LOG_DEBUG("Auto init gcoap.\n");

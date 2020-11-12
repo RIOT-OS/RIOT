@@ -1,0 +1,36 @@
+From ed15486f7890a3ffb0426c153cefb951d822e93e Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 14 Aug 2020 13:56:25 +0200
+Subject: [PATCH 3/5] uwb_dw1000/dw1000_hal: define even if DW1000_DEVICE_0 is
+ unset
+
+In RIOT multiple DW1000 devices will be speficied thorugh a link
+list so `hal_dw1000_inst` must be customly defined.
+
+The rest of the api should still be defined
+---
+ hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c b/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c
+index b85e32a..90ccd6c 100644
+--- a/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c
++++ b/hw/drivers/uwb/uwb_dw1000/src/dw1000_hal.c
+@@ -262,6 +262,8 @@ hal_dw1000_inst(uint8_t idx)
+     return 0;
+ }
+ 
++#endif
++
+ /**
+  * API to reset all the gpio pins.
+  *
+@@ -756,5 +758,3 @@ hal_dw1000_get_rst(struct _dw1000_dev_instance_t * inst)
+ {
+     return hal_gpio_read(inst->rst_pin);
+ }
+-
+-#endif
+-- 
+2.28.0
+

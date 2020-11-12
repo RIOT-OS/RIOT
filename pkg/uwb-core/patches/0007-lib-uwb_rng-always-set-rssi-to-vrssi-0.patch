@@ -1,0 +1,34 @@
+From f51123d3cfcd811090367a65d5bf029897aceb98 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Mon, 21 Sep 2020 13:42:56 +0200
+Subject: [PATCH 7/7] lib/uwb_rng: always set rssi to vrssi[0]
+
+---
+ lib/uwb_rng/src/uwb_rng.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/lib/uwb_rng/src/uwb_rng.c b/lib/uwb_rng/src/uwb_rng.c
+index ccc91c5..3218f61 100644
+--- a/lib/uwb_rng/src/uwb_rng.c
++++ b/lib/uwb_rng/src/uwb_rng.c
+@@ -981,12 +981,17 @@ complete_cb(struct uwb_dev * inst, struct uwb_mac_interface * cbs)
+     frame->local.rssi = uwb_calc_rssi(inst, inst->rxdiag);
+     frame->local.fppl = uwb_calc_fppl(inst, inst->rxdiag);
+ 
++
+     if (inst->capabilities.sts) {
+         frame->local.flags.has_sts = inst->config.rx.stsMode != DWT_STS_MODE_OFF;
+         frame->local.flags.has_valid_sts = !(inst->status.sts_ts_error || inst->status.sts_pream_error);
+         frame->local.vrssi[0] = frame->local.rssi;
+         frame->local.vrssi[1] = uwb_calc_seq_rssi(inst, inst->rxdiag, UWB_RXDIAG_STS);
+         frame->local.vrssi[2] = uwb_calc_seq_rssi(inst, inst->rxdiag, UWB_RXDIAG_STS2);
++    } else {
++        frame->local.vrssi[0] = frame->local.rssi;
++        frame->local.vrssi[1] = DPL_FLOAT32_NAN();
++        frame->local.vrssi[2] = DPL_FLOAT32_NAN();
+     }
+ 
+     /* Postprocess in thread context */
+-- 
+2.28.0
+

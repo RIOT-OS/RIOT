@@ -1,0 +1,36 @@
+USEMODULE += uwb-core_dpl
+USEMODULE += uwb-core_contrib
+
+DEFAULT_MODULE += auto_init_uwb-core
+
+USEMODULE += sema
+USEMODULE += event_callback
+USEMODULE += xtimer
+USEMODULE += fmt
+
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi
+
+ifneq (,$(filter uwb-core_twr_%,$(USEMODULE)))
+  USEMODULE += uwb-core_rng
+endif
+
+ifneq (,$(filter uwb-core_rng,$(USEMODULE)))
+  USEMODULE += uwb-core_rng_math
+  USEMODULE += uwb-core_dsp
+  USEMODULE += uwb-core_uwb_json
+endif
+
+ifneq (,$(filter uwb-core_uwbcfg,$(USEMODULE)))
+  USEMODULE += uwb-core_config
+endif
+
+# Some stdlib functions used by the pkg are not in avr-gcc
+FEATURES_BLACKLIST += arch_avr8
+# uwb-core has specific compilation sources when compiling kernel
+# libraries these introduce additional compilation issues that have not
+# been addressed in this port
+FEATURES_BLACKLIST += arch_native
+
+# LLVM ARM shows issues with missing definitions for stdatomic
+TOOLCHAINS_BLACKLIST += llvm

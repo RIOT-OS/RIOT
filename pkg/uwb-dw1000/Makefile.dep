@@ -1,0 +1,13 @@
+USEMODULE += uwb-dw1000_hal
+DEFAULT_MODULE += auto_init_uwb-dw1000
+
+USEMODULE += xtimer
+
+FEATURES_REQUIRED += periph_gpio_irq
+FEATURES_REQUIRED += periph_spi
+
+# Some of the pkg operation would overflow on 16bit
+FEATURES_REQUIRED += arch_32bit
+
+# LLVM ARM shows issues with missing definitions for stdatomic
+TOOLCHAINS_BLACKLIST += llvm
