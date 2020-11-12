@@ -93,7 +93,6 @@ static void run_test(const char *name, unsigned (*test)(unsigned))
 
     unsigned long iter_per_second = (4*PER_ITERATION) * count / TIMEOUT_S;
 
-    printf("+ %s: %lu iterations per second\r\n", name, iter_per_second);
     printf("{ \"%s\" : { \"iter/second\" : %lu", name, iter_per_second);
 #ifdef CLOCK_CORECLOCK
     printf(", \"ticks\" : %"PRIu32,
@@ -132,7 +131,6 @@ static void run_test_test_and_clear(void)
     unsigned long iter_per_second = 2 * count / TIMEOUT_S;
     static const char name[] = "bitarithm_test_and_clear";
 
-    printf("+ %s: %lu iterations per second\r\n", name,iter_per_second);
     printf("{ \"%s\" : { \"iter/second\" : %lu", name, iter_per_second);
 #ifdef CLOCK_CORECLOCK
     printf(", \"ticks\" : %"PRIu32,
