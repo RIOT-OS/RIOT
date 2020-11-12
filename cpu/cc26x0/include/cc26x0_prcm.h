@@ -50,9 +50,6 @@ typedef struct {
  * @brief   DDI_0_OSC register values
  * @{
  */
-#define DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL_RCOSC        0x0
-#define DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL_XOSC         0x1
-#define DDI_0_OSC_CTL0_SCLK_MF_SRC_SEL              0x2
 #define DDI_0_OSC_CTL0_SCLK_LF_SRC_SEL_mask         0x6
 #define DDI_0_OSC_CTL0_SCLK_LF_SRC_SEL_HF_RCOSC     0x0
 #define DDI_0_OSC_CTL0_SCLK_LF_SRC_SEL_HF_XOSC      0x4
@@ -67,13 +64,6 @@ typedef struct {
 #define DDI_0_OSC_CTL0_ACLK_TDC_SRC_SEL_RCOSC_HF    0x000 /* 48MHz */
 #define DDI_0_OSC_CTL0_ACLK_TDC_SRC_SEL_RCOSC_LF    0x080 /* 48MHz */
 #define DDI_0_OSC_CTL0_ACLK_TDC_SRC_SEL_XOSC_HF     0x100 /* 24MHz */
-#define DDI_0_OSC_CTL0_CLK_LOSS_EN                  0x200 /* enable clock loss detection */
-#define DDI_0_OSC_CTL0_XOSC_LF_DIG_BYPASS           0x400 /* bypass XOSC_LF and use digital input clock from AON foor xosx_lf (precuations in datasheet) */
-#define DDI_0_OSC_CTL0_XOSC_HF_POWER_MODE           0x800
-#define DDI_0_OSC_CTL0_RCOSC_LF_TRIMMED             0x1000
-#define DDI_0_OSC_CTL0_ALLOW_SCLK_HF_SWITCHING      0x10000
-#define DDI_0_OSC_CTL0_FORCE_KICKSTART_EN           0x400000
-#define DDI_0_OSC_CTL0_DOUBLER_RESET_DURATION       0x2000000
 #define DDI_0_OSC_CTL0_DOUBLER_START_DURATION_mask  0x6000000
 #define DDI_0_OSC_CTL0_BYPASS_RCOSC_LF_CLK_QUAL     0x10000000
 #define DDI_0_OSC_CTL0_BYPASS_XOSC_LF_CLK_QUAL      0x20000000
