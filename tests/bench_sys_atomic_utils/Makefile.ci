@@ -1,0 +1,3 @@
+BOARD_INSUFFICIENT_MEMORY := \
+    stm32f030f4-demo \
+    #
