@@ -18,6 +18,9 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill \
     bluepill-128kib \
     calliope-mini \
+    cc1312-launchpad \
+    cc1352-launchpad \
+    cc1352p-launchpad \
     cc2650-launchpad \
     cc2650stk \
     derfmega128 \
