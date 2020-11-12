@@ -768,6 +768,16 @@ typedef enum {
     NETOPT_RSSI,
 
     /**
+     * @brief (uint16_t) Set the battery monitor voltage (in mV).
+     *
+     * When set, a @ref SYS_BUS_POWER_EVENT_LOW_VOLTAGE event is generated
+     * on the SYS_BUS_POWER bus if the supply voltage falls below the set value.
+     *
+     * Set to 0 to disable battery monitoring.
+     */
+    NETOPT_BATMON,
+
+    /**
      * @brief   (array of byte array) get link layer multicast groups as array
      *          of byte arrays (length of each byte array corresponds to the
      *          length of @ref NETOPT_ADDRESS) or join a link layer multicast
