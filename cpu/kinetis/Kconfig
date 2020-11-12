@@ -21,7 +21,7 @@ config CPU_FAM_K
     bool
     select CPU_COMMON_KINETIS
     select HAS_PERIPH_FLASHPAGE
-    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
     select HAS_PERIPH_MCG
 
 config CPU_FAM_L
@@ -33,7 +33,7 @@ config CPU_FAM_W
     bool
     select CPU_COMMON_KINETIS
     select HAS_PERIPH_FLASHPAGE
-    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
     select HAS_PERIPH_MCG
 
 ## CPU Models

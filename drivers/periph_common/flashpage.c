@@ -28,18 +28,19 @@
 
 #include "periph/flashpage.h"
 
-void flashpage_read(int page, void *data)
+#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
+void flashpage_read(unsigned page, void *data)
 {
-    assert(page < (int)FLASHPAGE_NUMOF);
+    assert(page < FLASHPAGE_NUMOF);
 
 #if defined(CPU_FAM_STM32WB)
-    assert(page < (int)(FLASH->SFR & FLASH_SFR_SFSA));
+    assert(page < (FLASH->SFR & FLASH_SFR_SFSA));
 #endif
 
     memcpy(data, flashpage_addr(page), FLASHPAGE_SIZE);
 }
 
-int flashpage_verify(int page, const void *data)
+int flashpage_verify(unsigned page, const void *data)
 {
     assert(page < (int)FLASHPAGE_NUMOF);
 
@@ -55,23 +56,35 @@ int flashpage_verify(int page, const void *data)
     }
 }
 
-int flashpage_write_and_verify(int page, const void *data)
+int flashpage_write_and_verify(unsigned page, const void *data)
 {
-    flashpage_write(page, data);
+    flashpage_write_page(page, data);
     return flashpage_verify(page, data);
 }
 
+void flashpage_write_page(unsigned page, const void *data)
+{
+    assert((unsigned) page < FLASHPAGE_NUMOF);
+
+    flashpage_erase(page);
+
+    /* write page */
+    if (data != NULL) {
+        flashpage_write(flashpage_addr(page), data, FLASHPAGE_SIZE);
+    }
+}
+#endif /* MODULE_PERIPH_FLASHPAGE_PAGEWISE */
 
 #if defined(FLASHPAGE_RWWEE_NUMOF)
 
-void flashpage_rwwee_read(int page, void *data)
+void flashpage_rwwee_read(unsigned page, void *data)
 {
     assert(page < (int)FLASHPAGE_RWWEE_NUMOF);
 
     memcpy(data, flashpage_rwwee_addr(page), FLASHPAGE_SIZE);
 }
 
-int flashpage_rwwee_verify(int page, const void *data)
+int flashpage_rwwee_verify(unsigned page, const void *data)
 {
     assert(page < (int)FLASHPAGE_RWWEE_NUMOF);
 
@@ -83,9 +96,9 @@ int flashpage_rwwee_verify(int page, const void *data)
     }
 }
 
-int flashpage_rwwee_write_and_verify(int page, const void *data)
+int flashpage_rwwee_write_and_verify(unsigned page, const void *data)
 {
-    flashpage_rwwee_write(page, data);
+    flashpage_rwwee_write_page(page, data);
     return flashpage_rwwee_verify(page, data);
 }
 

@@ -163,15 +163,30 @@ static void _erase_page(void *page_addr)
 #endif
 }
 
-void flashpage_write_raw(void *target_addr, const void *data, size_t len)
+void flashpage_erase(unsigned page)
 {
-    /* assert multiples of FLASHPAGE_RAW_BLOCKSIZE are written and no less of
+    assert(page < (int)FLASHPAGE_NUMOF);
+
+    /* ensure there is no attempt to write to CPU2 protected area */
+#if defined(CPU_FAM_STM32WB)
+    assert(page < (int)(FLASH->SFR & FLASH_SFR_SFSA));
+#endif
+
+    void *page_addr = flashpage_addr(page);
+
+    /* ERASE sequence */
+    _erase_page(page_addr);
+}
+
+void flashpage_write(void *target_addr, const void *data, size_t len)
+{
+    /* assert multiples of FLASHPAGE_WRITE_BLOCK_SIZE are written and no less of
        that length. */
-    assert(!(len % FLASHPAGE_RAW_BLOCKSIZE));
+    assert(!(len % FLASHPAGE_WRITE_BLOCK_SIZE));
 
     /* ensure writes are aligned */
-    assert(!(((unsigned)target_addr % FLASHPAGE_RAW_ALIGNMENT) ||
-            ((unsigned)data % FLASHPAGE_RAW_ALIGNMENT)));
+    assert(!(((unsigned)target_addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) ||
+            ((unsigned)data % FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
 
     /* ensure the length doesn't exceed the actual flash size */
     assert(((unsigned)target_addr + len) <
@@ -237,24 +252,4 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
         stmclk_disable_hsi();
     }
 #endif
-}
-
-void flashpage_write(int page, const void *data)
-{
-    assert(page < (int)FLASHPAGE_NUMOF);
-
-    /* ensure there is no attempt to write to CPU2 protected area */
-#if defined(CPU_FAM_STM32WB)
-    assert(page < (int)(FLASH->SFR & FLASH_SFR_SFSA));
-#endif
-
-    void *page_addr = flashpage_addr(page);
-
-    /* ERASE sequence */
-    _erase_page(page_addr);
-
-    /* WRITE sequence */
-    if (data != NULL) {
-        flashpage_write_raw(page_addr, data, FLASHPAGE_SIZE);
-    }
 }

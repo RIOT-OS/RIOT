@@ -64,17 +64,17 @@ extern "C" {
 #define CPU_FLASH_BASE      (0)
 #endif
 /**
- * @def     FLASHPAGE_RAW_BLOCKSIZE
+ * @def     FLASHPAGE_WRITE_BLOCK_SIZE
  *
  * @brief   For raw writings to the flash, this constant must define the
  *          minimum write length allowed by the MCU.
  */
 #ifdef DOXYGEN
-#define FLASHPAGE_RAW_BLOCKSIZE
+#define FLASHPAGE_WRITE_BLOCK_SIZE
 #endif
 
 /**
- * @def     FLASHPAGE_RAW_ALIGNMENT
+ * @def     FLASHPAGE_WRITE_BLOCK_ALIGNMENT
  *
  * @brief   The buffers to be written to the flash MUST be aligned, as well as
  *          the address on which the buffer is written to the flash. This variable
@@ -82,7 +82,7 @@ extern "C" {
  *          requirements.
  */
 #ifdef DOXYGEN
-#define FLASHPAGE_RAW_ALIGNMENT
+#define FLASHPAGE_WRITE_BLOCK_ALIGNMENT
 #endif
 /**
  * @def FLASHPAGE_SIZE
@@ -114,7 +114,7 @@ enum {
  *
  * @return              starting memory address of the given page
  */
-static inline void *flashpage_addr(int page)
+static inline void *flashpage_addr(unsigned page)
 {
     return (void *)(CPU_FLASH_BASE + (page * FLASHPAGE_SIZE));
 }
@@ -130,10 +130,17 @@ static inline void *flashpage_addr(int page)
  *
  * @return              page containing the given address
  */
-static inline int flashpage_page(void *addr)
+static inline unsigned flashpage_page(void *addr)
 {
-    return (int)(((int)addr - CPU_FLASH_BASE) / FLASHPAGE_SIZE);
+    return (((intptr_t)addr - CPU_FLASH_BASE) / FLASHPAGE_SIZE);
 }
+
+/**
+ * @brief   Erase the given page
+ *
+ * @param[in] page      Page to erase
+ */
+void flashpage_erase(unsigned page);
 
 /**
  * @brief   Write the given page with the given data
@@ -142,7 +149,7 @@ static inline int flashpage_page(void *addr)
  * @param[in] data      data to write to the page, MUST be FLASHPAGE_SIZE
  *                      byte. Set to NULL for page erase only.
  */
-void flashpage_write(int page, const void *data);
+void flashpage_write_page(unsigned page, const void *data);
 
 /**
  * @brief   Write any number of data bytes to a given location in the
@@ -152,20 +159,20 @@ void flashpage_write(int page, const void *data);
  *          this function
  *
  * Both target address and data address must be aligned to
- * FLASHPAGE_RAW_ALIGN. @p len must be a multiple of FLASHPAGE_RAW_BLOCKSIZE.
+ * FLASHPAGE_BLOCK_ALIGN. @p len must be a multiple of FLASHPAGE_WRITE_BLOCK_SIZE.
  * This function doesn't erase any area in flash, thus be sure the targeted
  * memory area is erased before writing on it (using the flashpage_write function).
  *
  * @param[in] target_addr   address in flash to write to. MUST be aligned
- *                          to FLASHPAGE_RAW_ALIGNMENT.
+ *                          to FLASHPAGE_WRITE_BLOCK_ALIGNMENT.
  * @param[in] data          data to write to the address. MUST be aligned
- *                          to FLASHPAGE_RAW_ALIGNMENT.
+ *                          to FLASHPAGE_WRITE_BLOCK_ALIGNMENT.
  * @param[in] len           length of the data to be written. It MUST be
- *                          multiple of FLASHPAGE_RAW_BLOCKSIZE. Also,
+ *                          multiple of FLASHPAGE_WRITE_BLOCK_SIZE. Also,
  *                          ensure it doesn't exceed the actual flash
  *                          memory size.
  */
-void flashpage_write_raw(void *target_addr, const void *data, size_t len);
+void flashpage_write(void *target_addr, const void *data, size_t len);
 
 /**
  * @brief   Read the given page into the given memory location
@@ -174,7 +181,7 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len);
  * @param[out] data     memory to write the page to, MUST be FLASHPAGE_SIZE
  *                      byte
  */
-void flashpage_read(int page, void *data);
+void flashpage_read(unsigned page, void *data);
 
 /**
  * @brief   Verify the given page against the given data
@@ -186,7 +193,7 @@ void flashpage_read(int page, void *data);
  * @return              FLASHPAGE_OK if data in the page is identical to @p data
  * @return              FLASHPAGE_NOMATCH if data and page content diverge
  */
-int flashpage_verify(int page, const void *data);
+int flashpage_verify(unsigned page, const void *data);
 
 /**
  * @brief   Write the given page and verify the results
@@ -200,7 +207,7 @@ int flashpage_verify(int page, const void *data);
  * @return              FLASHPAGE_OK on success
  * @return              FLASHPAGE_NOMATCH if data and page content diverge
  */
-int flashpage_write_and_verify(int page, const void *data);
+int flashpage_write_and_verify(unsigned page, const void *data);
 
 /**
   *  @brief  Functions to support additional RWWEE flash section
@@ -227,7 +234,7 @@ int flashpage_write_and_verify(int page, const void *data);
  *
  * @return              starting memory address of the given RWWEE page
  */
-static inline void *flashpage_rwwee_addr(int page)
+static inline void *flashpage_rwwee_addr(unsigned page)
 {
     return (void *)(CPU_FLASH_RWWEE_BASE + (page * FLASHPAGE_SIZE));
 }
@@ -255,7 +262,7 @@ static inline int flashpage_rwwee_page(void *addr)
  * @param[in] data      data to write to the RWWEE page, MUST be FLASHPAGE_SIZE
  *                      byte. Set to NULL for RWWEE page erase only.
  */
-void flashpage_rwwee_write(int page, const void *data);
+void flashpage_rwwee_write_page(unsigned page, const void *data);
 
 /**
  * @brief   Write any number of data bytes to a given location in the
@@ -265,20 +272,20 @@ void flashpage_rwwee_write(int page, const void *data);
  *          this function
  *
  * Both target address and data address must be aligned to
- * FLASHPAGE_RAW_ALIGN. @p len must be a multiple of FLASHPAGE_RAW_BLOCKSIZE.
+ * FLASHPAGE_BLOCK_ALIGN. @p len must be a multiple of FLASHPAGE_WRITE_BLOCK_SIZE.
  * This function doesn't erase any area in flash, thus be sure the targeted
  * memory area is erased before writing on it (using the flashpage_write function).
  *
  * @param[in] target_addr   RWWEE address in flash to write to. MUST be aligned
- *                          to FLASHPAGE_RAW_ALIGNMENT.
+ *                          to FLASHPAGE_WRITE_BLOCK_ALIGNMENT.
  * @param[in] data          data to write to the address. MUST be aligned
- *                          to FLASHPAGE_RAW_ALIGNMENT.
+ *                          to FLASHPAGE_WRITE_BLOCK_ALIGNMENT.
  * @param[in] len           length of the data to be written. It MUST be
- *                          multiple of FLASHPAGE_RAW_BLOCKSIZE. Also,
+ *                          multiple of FLASHPAGE_WRITE_BLOCK_SIZE. Also,
  *                          ensure it doesn't exceed the actual RWWEE flash
  *                          memory size.
  */
-void flashpage_rwwee_write_raw(void *target_addr, const void *data, size_t len);
+void flashpage_rwwee_write(void *target_addr, const void *data, size_t len);
 
 /**
  * @brief   Read the given RWWEE page into the given memory location
@@ -287,7 +294,7 @@ void flashpage_rwwee_write_raw(void *target_addr, const void *data, size_t len);
  * @param[out] data     memory to write the RWWEE page to, MUST be FLASHPAGE_SIZE
  *                      byte
  */
-void flashpage_rwwee_read(int page, void *data);
+void flashpage_rwwee_read(unsigned page, void *data);
 
 /**
  * @brief   Verify the given RWWEE page against the given data
@@ -299,7 +306,7 @@ void flashpage_rwwee_read(int page, void *data);
  * @return              FLASHPAGE_OK if data in the RWWEE page is identical to @p data
  * @return              FLASHPAGE_NOMATCH if data and RWWEE page content diverge
  */
-int flashpage_rwwee_verify(int page, const void *data);
+int flashpage_rwwee_verify(unsigned page, const void *data);
 
 /**
  * @brief   Write the given RWWEE page and verify the results
@@ -314,7 +321,7 @@ int flashpage_rwwee_verify(int page, const void *data);
  * @return              FLASHPAGE_OK on success
  * @return              FLASHPAGE_NOMATCH if data and RWWEE page content diverge
  */
-int flashpage_rwwee_write_and_verify(int page, const void *data);
+int flashpage_rwwee_write_and_verify(unsigned page, const void *data);
 
 #endif /* FLASHPAGE_RWWEE_NUMOF */
 

@@ -111,9 +111,9 @@ as shown in the NVM Row Organization figure. */
 /* The minimum block size which can be written is 16B. However, the erase
  * block is always FLASHPAGE_SIZE (SAM0 row).
  */
-#define FLASHPAGE_RAW_BLOCKSIZE    (16)
+#define FLASHPAGE_WRITE_BLOCK_SIZE      (16)
 /* Writing should be always 4 byte aligned */
-#define FLASHPAGE_RAW_ALIGNMENT    (4)
+#define FLASHPAGE_WRITE_BLOCK_ALIGNMENT (4)
 /* Add RWWEE memory if supported by revision of the chip
  * On some chips it is called RWW EEPROM while on some DATAFLASH, try to
  * catch all without relying on the CPU model but on the named defines

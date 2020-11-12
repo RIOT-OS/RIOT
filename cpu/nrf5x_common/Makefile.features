@@ -1,7 +1,7 @@
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_flashpage
-FEATURES_PROVIDED += periph_flashpage_raw
+FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_temperature

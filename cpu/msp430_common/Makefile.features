@@ -4,5 +4,5 @@ CPU_CORE = msp430
 FEATURES_PROVIDED += arch_16bit
 FEATURES_PROVIDED += arch_msp430
 FEATURES_PROVIDED += periph_flashpage
-FEATURES_PROVIDED += periph_flashpage_raw
+FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_pm

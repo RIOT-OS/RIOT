@@ -61,16 +61,25 @@ static inline void _erase(uint32_t *page_addr)
     irq_restore(state);
 }
 
-__attribute__ ((section (".ramfunc")))
-void flashpage_write_raw(void *target_addr, const void *data, size_t len)
+void flashpage_erase(unsigned page)
 {
-    /* assert multiples of FLASHPAGE_RAW_BLOCKSIZE are written and no less of
+    assert((unsigned) page < FLASHPAGE_NUMOF);
+
+    uint32_t *page_addr = (uint32_t *)flashpage_addr(page);
+
+    _erase(page_addr);
+}
+
+__attribute__ ((section (".ramfunc")))
+void flashpage_write(void *target_addr, const void *data, size_t len)
+{
+    /* assert multiples of FLASHPAGE_WRITE_BLOCK_SIZE are written and no less of
        that length. */
-    assert(!(len % FLASHPAGE_RAW_BLOCKSIZE));
+    assert(!(len % FLASHPAGE_WRITE_BLOCK_SIZE));
 
     /* ensure writes are aligned */
-    assert(!(((unsigned)target_addr % FLASHPAGE_RAW_ALIGNMENT) ||
-            ((unsigned)data % FLASHPAGE_RAW_ALIGNMENT)));
+    assert(!(((unsigned)target_addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) ||
+            ((unsigned)data % FLASHPAGE_WRITE_BLOCK_ALIGNMENT)));
 
     /* ensure the length doesn't exceed the actual flash size */
     assert(((unsigned)target_addr + len) <=
@@ -90,26 +99,11 @@ void flashpage_write_raw(void *target_addr, const void *data, size_t len)
     /* starts the write-sequence state machine */
     DEBUG("[flashpage_raw] write: now writing the data\n");
     FLASH_CTRL_FCTL |= FLASH_CTRL_FCTL_WRITE;
-    for (unsigned i = 0; i < (len / FLASHPAGE_RAW_BLOCKSIZE); i++) {
+    for (unsigned i = 0; i < (len / FLASHPAGE_WRITE_BLOCK_SIZE); i++) {
         FLASH_CTRL_FWDATA = (uint32_t) *(data_addr++);
         /* wait for flash operation to complete */
         while (FLASH_CTRL_FCTL & FLASH_CTRL_FCTL_FULL) {}
     }
     /* re-enable interrupts */
     irq_restore(state);
-}
-
-void flashpage_write(int page, const void *data)
-{
-    assert((unsigned) page < FLASHPAGE_NUMOF);
-
-    uint32_t *page_addr = (uint32_t *)flashpage_addr(page);
-
-    /* erase page */
-    _erase(page_addr);
-
-    /* write page */
-    if (data != NULL) {
-        flashpage_write_raw(page_addr, data, FLASHPAGE_SIZE);
-    }
 }

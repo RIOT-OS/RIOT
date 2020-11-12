@@ -146,12 +146,12 @@
 /* The minimum block size which can be written is 8B (Phrase). However, the
  * erase block is always FLASHPAGE_SIZE.
  */
-#define FLASHPAGE_RAW_PHRASE              (8U)
-#define FLASHPAGE_RAW_BLOCKSIZE           FLASHPAGE_RAW_PHRASE
+#define FLASHPAGE_BLOCK_PHRASE              (8U)
+#define FLASHPAGE_WRITE_BLOCK_SIZE          FLASHPAGE_BLOCK_PHRASE
 /* Writing should be always 8 bytes aligned */
-#define FLASHPAGE_RAW_ALIGNMENT           FLASHPAGE_RAW_PHRASE
+#define FLASHPAGE_WRITE_BLOCK_ALIGNMENT     FLASHPAGE_BLOCK_PHRASE
 /* Section erase and programming must be 16 bytes aligned */
-#define FLASHPAGE_RAW_SECTION_ALIGNMENT   (16U)
+#define FLASHPAGE_BLOCK_SECTION_ALIGNMENT   (16U)
 /** @} */
 
 #ifdef __cplusplus

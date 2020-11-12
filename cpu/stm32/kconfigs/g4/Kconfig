@@ -12,7 +12,7 @@ config CPU_FAM_G4
     select HAS_CPU_STM32G4
     select HAS_CORTEXM_MPU
     select HAS_PERIPH_FLASHPAGE
-    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
     select HAS_PERIPH_HWRNG
 
 config CPU_FAM

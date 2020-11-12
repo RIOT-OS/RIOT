@@ -14,7 +14,7 @@ config CPU_FAM_F0
     select CPU_CORE_CORTEX_M0
     select HAS_CPU_STM32F0
     select HAS_PERIPH_FLASHPAGE
-    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
 
 config HAS_CPU_STM32F0
     bool
