@@ -7,6 +7,7 @@
  */
 
 /**
+ * @ingroup     tests
  * @{
  *
  * @file
@@ -20,7 +21,6 @@
 #include <string.h>
 
 #include "embUnit.h"
-#include "tests-atomic_utils.h"
 
 #include "atomic_utils.h"
 #include "random.h"
@@ -280,7 +280,11 @@ Test *tests_atomic_utils_tests(void)
     return (Test *)&atomic_utils_tests;
 }
 
-void tests_atomic_utils(void)
+int main(void)
 {
+    TESTS_START();
     TESTS_RUN(tests_atomic_utils_tests());
+    TESTS_END();
+
+    return 0;
 }
