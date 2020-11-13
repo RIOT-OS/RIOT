@@ -6,6 +6,7 @@
 #
 menu "Packages"
 
+rsource "driver_bme680/Kconfig"
 rsource "tinydtls/Kconfig"
 rsource "wakaama/Kconfig"
 

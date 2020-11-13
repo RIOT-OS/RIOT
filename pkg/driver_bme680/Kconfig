@@ -1,0 +1,15 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config PACKAGE_DRIVER_BME680
+    bool "BME680 sensor driver package"
+    select MODULE_DRIVER_BME680_CONTRIB
+
+config MODULE_DRIVER_BME680_CONTRIB
+    bool
+    help
+        RIOT integration code for the BME680 package.
