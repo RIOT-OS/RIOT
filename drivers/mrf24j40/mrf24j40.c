@@ -21,7 +21,6 @@
  */
 
 #include "byteorder.h"
-#include "net/gnrc.h"
 #include "mrf24j40_registers.h"
 #include "mrf24j40_internal.h"
 #include "mrf24j40_netdev.h"
