@@ -49,7 +49,9 @@ configurations. e.g:
   specific pin connections to a LCD screen, radio, etc.). Some boards might also
   define optimized `XTIMER_%` values (e.g. @ref XTIMER_BACKOFF).
 - `gpio_params.h`: if the board supports @ref drivers_saul "SAUL" then its
-  @ref saul_gpio_params_t is defined here.
+  @ref saul_gpio_params_t is defined here. (Analogously, a `adc_params.h` can
+  contain a @ref saul_adc_params_t, and `pwm_params.h` a @ref
+  saul_pwm_rgb_params_t and a @ref saul_pwm_dimmer_params_t).
 - other: other specific headers needed by one `BOARD`
 
 @note Header files do not need to be defined in `include/`, but if defined

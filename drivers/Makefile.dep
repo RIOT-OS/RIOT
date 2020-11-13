@@ -154,6 +154,10 @@ ifneq (,$(filter saul_gpio,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio
 endif
 
+ifneq (,$(filter saul_pwm,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_pwm
+endif
+
 ifneq (,$(filter saul,$(USEMODULE)))
   USEMODULE += phydat
 endif
