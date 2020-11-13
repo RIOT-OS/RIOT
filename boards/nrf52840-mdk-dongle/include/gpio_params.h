@@ -31,6 +31,7 @@ extern "C" {
  */
 static const  saul_gpio_params_t saul_gpio_params[] =
 {
+#ifndef MODULE_SAUL_PWM
     {
         .name  = "LED Red",
         .pin   = LED0_PIN,
@@ -49,6 +50,7 @@ static const  saul_gpio_params_t saul_gpio_params[] =
         .mode  = GPIO_OUT,
         .flags = (SAUL_GPIO_INVERTED | SAUL_GPIO_INIT_CLEAR),
     },
+#endif
     {
         .name  = "Reset",
         .pin   = BTN0_PIN,

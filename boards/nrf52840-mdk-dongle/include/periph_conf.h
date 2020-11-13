@@ -55,6 +55,20 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
+/**
+ * @name   PWM configuration
+ *
+ * For the nRF52840-mdk-dongle board, the PWM0 module is set to drive the RGB LED.
+ * Other PWM outputs are not configured.
+ *
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    { NRF_PWM0, { GPIO_PIN(0, 23), GPIO_PIN(0, 22), GPIO_PIN(0, 24) } }
+};
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
