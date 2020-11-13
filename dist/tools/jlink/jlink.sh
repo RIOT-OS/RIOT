@@ -159,7 +159,7 @@ test_version() {
     JLINK_MINIMUM_VERSION="6.74"
     # Adding '-nogui 1' will simply return 'Unknown command line option -nogui'
     # on older versions, JLINK_VERSION will still be parsed correctly.
-    JLINK_VERSION=$(echo q | "${JLINK}" -nogui 1 2> /dev/null | grep "^DLL version*" | grep -oP "\d+\.\d+")
+    JLINK_VERSION=$(echo q | "${JLINK}" -nogui 1 2> /dev/null | grep "^DLL version*" | grep -oE "[0-9]+\.[0-9]+")
 
     if [ $? -ne 0 ]; then
         echo "Error: J-Link appears not to be installed on your PATH"
