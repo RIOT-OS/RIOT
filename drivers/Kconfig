@@ -6,6 +6,8 @@
 
 menu "Drivers"
 
+rsource "saul/Kconfig"
+
 menu "Actuator Device Drivers"
 rsource "aip31068/Kconfig"
 rsource "apa102/Kconfig"
