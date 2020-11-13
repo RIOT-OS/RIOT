@@ -117,8 +117,8 @@
 #define ILI9341_PARAM_CS        LCD_CS
 #define ILI9341_PARAM_DCX       LCD_DC
 #define ILI9341_PARAM_RST       LCD_RST
-#define ILi9341_PARAM_RGB       1
-#define ILI9341_PARAM_INVERTED  1
+#define ILi9341_PARAM_RGB       0
+#define ILI9341_PARAM_INVERTED  0
 #endif
 /** @} */
 
