@@ -1,6 +1,5 @@
 USEMODULE += cc1xxx_common
 USEMODULE += luid
-USEMODULE += netif
 USEMODULE += xtimer
 FEATURES_REQUIRED += periph_gpio
 FEATURES_REQUIRED += periph_gpio_irq

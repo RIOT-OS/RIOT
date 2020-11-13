@@ -1,5 +1,4 @@
 USEMODULE += luid
-USEMODULE += netif
 USEMODULE += ieee802154
 USEMODULE += netdev_ieee802154
 USEMODULE += core_thread_flags
