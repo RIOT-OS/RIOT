@@ -378,6 +378,8 @@ ifeq (1,$(TEST_KCONFIG))
   $(info === [ATTENTION] Testing Kconfig dependency modelling ===)
   KCONFIG_MODULES := $(call lowercase,$(patsubst CONFIG_MODULE_%,%,$(filter CONFIG_MODULE_%,$(.VARIABLES))))
   USEMODULE := $(KCONFIG_MODULES)
+  KCONFIG_PACKAGES := $(call lowercase,$(patsubst CONFIG_PACKAGE_%,%,$(filter CONFIG_PACKAGE_%,$(.VARIABLES))))
+  USEPKG := $(KCONFIG_PACKAGES)
 else
   # check if required features are provided and update $(FEATURES_USED)
   include $(RIOTMAKE)/features_check.inc.mk
