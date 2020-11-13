@@ -55,9 +55,11 @@ $(call target-export-variables,$(VECTORS_O),CPU_LINE)
 # which are only used for STM32 system includes and not of interest for RIOT.
 CFLAGS += -D__SYSTEM_STM32$(call uppercase,$(CPU_FAM))XX_H
 
-STM32CMSIS_INCLUDE_DIR = $(RIOTCPU)/stm32/include/vendor/cmsis/$(CPU_FAM)/Include
-STM32FAM_INCLUDE_FILE = $(STM32CMSIS_INCLUDE_DIR)/stm32$(CPU_FAM)xx.h
-INCLUDES += -I$(STM32CMSIS_INCLUDE_DIR)
+ifeq (,$(filter STM32MP157Cxx,$(CPU_LINE)))
+  STM32CMSIS_INCLUDE_DIR = $(RIOTCPU)/stm32/include/vendor/cmsis/$(CPU_FAM)/Include
+  STM32FAM_INCLUDE_FILE = $(STM32CMSIS_INCLUDE_DIR)/stm32$(CPU_FAM)xx.h
+  INCLUDES += -I$(STM32CMSIS_INCLUDE_DIR)
+endif
 
 # Fetch all CMSIS headers using the package mechanism. This rule is called all
 # the time to ensure it's correctly updated when versions in the packages are
@@ -70,19 +72,19 @@ $(STM32FAM_INCLUDE_FILE): FORCE
 $(VECTORS_FILE): $(STM32FAM_INCLUDE_FILE)
 	$(Q)$(RIOTBASE)/cpu/stm32/dist/irqs/gen_vectors.py $(CPU_LINE)
 
-ifneq (STM32F030x4,$(CPU_LINE))
-  # IRQs of STM32F030x4 family are not available in the CMSIS package so they
-  # are hardcoded in RIOTs codebase.
+ifeq (,$(filter STM32MP157Cxx STM32F030x4,$(CPU_LINE)))
+  # IRQs of STM32F030x4 and STM32MP157Cxx lines are not available in the CMSIS
+  # package so they are hardcoded in RIOTs codebase.
   # For other lines, the IRQs are automatically generated once from the whole
   # list of CMSIS headers available in a given family
   STM32IRQS_INCLUDE_FILE = $(RIOTCPU)/stm32/include/irqs/$(CPU_FAM)/irqs.h
   BUILDDEPS += $(STM32IRQS_INCLUDE_FILE)
+endif
 
 # The IRQ header for a given family requires the family headers to be fetched
 # before since it's generated from all CMSIS content of that family
 $(STM32IRQS_INCLUDE_FILE): $(STM32FAM_INCLUDE_FILE)
 	$(Q)$(RIOTBASE)/cpu/stm32/dist/irqs/gen_irqs.py $(CPU_FAM)
-endif
 
 # Include clock configuration directory
 INCLUDES += -I$(RIOTCPU)/stm32/include/clk

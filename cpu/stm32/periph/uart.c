@@ -45,7 +45,7 @@
 #elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32L0) || \
       defined(CPU_FAM_STM32F3) || defined(CPU_FAM_STM32L4) || \
       defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32F7) || \
-      defined(CPU_FAM_STM32G4)
+      defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32MP1)
 #define ISR_REG     ISR
 #define ISR_TXE     USART_ISR_TXE
 #define ISR_RXNE    USART_ISR_RXNE
@@ -297,7 +297,24 @@ static inline void uart_init_usart(uart_t uart, uint32_t baudrate)
     uint32_t clk;
 
     /* calculate and apply baudrate */
+#ifdef CPU_FAM_STM32MP1
+    RCC->UART35CKSELR = uart_config[uart].clk_src;
+
+    switch (uart_config[uart].clk_src) {
+        case RCC_UART35CKSELR_UART35SRC_2:  /* HSI */
+            clk = CLOCK_HSI;
+            break;
+        case RCC_UART35CKSELR_UART35SRC_4:  /* HSE */
+            clk = CLOCK_HSE;
+            break;
+        default: /* return */
+            return;
+    }
+
+    clk /= baudrate;
+#else
     clk = periph_apb_clk(uart_config[uart].bus) / baudrate;
+#endif
     mantissa = (uint16_t)(clk / 16);
     fraction = (uint8_t)(clk - (mantissa * 16));
     dev(uart)->BRR = ((mantissa & 0x0fff) << 4) | (fraction & 0x0f);

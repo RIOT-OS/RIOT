@@ -1,13 +1,15 @@
 include $(RIOTCPU)/stm32/stm32_info.mk
 
-FEATURES_PROVIDED += bootloader_stm32
+ifneq (mp1,$(CPU_FAM))
+  FEATURES_PROVIDED += bootloader_stm32
+  FEATURES_PROVIDED += periph_wdt
+endif
 FEATURES_PROVIDED += cpu_stm32$(CPU_FAM)
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_timer_periodic
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_uart_nonblocking
-FEATURES_PROVIDED += periph_wdt
 
 ifneq (,$(filter $(CPU_FAM),f0 f1 f3 g0 g4 l0 l1 l4 l5 wb))
   FEATURES_PROVIDED += periph_flashpage
@@ -31,7 +33,7 @@ ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l0 l4 l5 wb))
   endif
 endif
 
-ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l1 l4))
+ifneq (,$(filter $(CPU_FAM),f2 f4 f7 g4 l1 l4 mp1))
   FEATURES_PROVIDED += cortexm_mpu
 endif
 

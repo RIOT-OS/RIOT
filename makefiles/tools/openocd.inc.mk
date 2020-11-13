@@ -16,9 +16,16 @@ endif
 
 OPENOCD_CONFIG ?= $(BOARDDIR)/dist/openocd.cfg
 
-# Export OPENOCD_CONFIG to required targets
 OPENOCD_TARGETS = debug% flash% reset
+
+# Export GDB_PORT_CORE_OFFSET to required targets
+$(call target-export-variables,$(OPENOCD_TARGETS),GDB_PORT_CORE_OFFSET)
+
+# Export OPENOCD_CONFIG to required targets
 $(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_CONFIG)
+
+# Export OPENOCD_CORE to required targets
+$(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_CORE)
 
 # Export OPENOCD_ADAPTER_INIT to required targets
 $(call target-export-variables,$(OPENOCD_TARGETS),OPENOCD_ADAPTER_INIT)

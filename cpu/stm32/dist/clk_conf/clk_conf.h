@@ -35,6 +35,7 @@ enum fam {
     STM32F3,
     STM32F4,
     STM32F7,
+    STM32MP1,
     FAM_MAX,
 };
 /** @} */
@@ -106,8 +107,15 @@ enum {
     STM32F777,
     STM32F779,
 
-    MODEL_MAX,
+    MODEL_F_MAX,
 };
+
+enum {
+    STM32MP157,
+
+    MODEL_MP_MAX,
+};
+
 /** @} */
 
 /**
@@ -167,6 +175,7 @@ typedef struct {
     unsigned max_coreclock; /**< Max coreclock */
     unsigned max_apb1;      /**< Max APB1 clock */
     unsigned max_apb2;      /**< Max APB2 clock */
+    unsigned max_apb3;      /**< Max APB3 clock */
 
     unsigned hsi; /**< HSI frequency */
 
@@ -200,7 +209,7 @@ typedef struct {
 #define STM32F0(x) [STM32F0##x] = x
 
 /** List of supported models */
-static const unsigned stm32_model[] = {
+static const unsigned stm32_f_model[] = {
     STM32F0(30),
     STM32F0(70),
     STM32F0(31),
@@ -264,6 +273,13 @@ static const unsigned stm32_model[] = {
     STM32F(779),
 };
 
+#define STM32MP(x) [STM32MP##x] = x
+
+/** List of supported models */
+static const unsigned stm32_model_mp[] = {
+    STM32MP(157),
+};
+
 /** STM32F2xx / STM32F401 PLL config */
 #define stm32f2_4_192_pll_cfg  { \
     .min_vco_input = 1000000U, \
@@ -304,10 +320,30 @@ static const unsigned stm32_model[] = {
     .inc_q = 1, \
 }
 
+/** STM32MP1 PLL config */
+#define stm32mp1_pll_cfg  { \
+    .min_vco_input = 4000000U, \
+    .max_vco_input = 16000000U, \
+    .min_vco_output = 400000000U, \
+    .max_vco_output = 800000000U, \
+    .min_n = 25, \
+    .max_n = 100, \
+    .inc_n = 1, \
+    .min_m = 2, \
+    .max_m = 63, \
+    .inc_m = 1, \
+    .min_p = 2, \
+    .max_p = 127, \
+    .inc_p = 1, \
+    .min_q = 2, \
+    .max_q = 127, \
+    .inc_q = 1, \
+}
+
 /**
  * @brief Clock config for supported cpu
  */
-static const clk_cfg_t stm32_clk_cfg[] = {
+static const clk_cfg_t stm32_f_clk_cfg[] = {
     [STM32F030 ... STM32F098] = {
         .family = STM32F0,
         .max_coreclock = 48000000U,
@@ -591,6 +627,28 @@ static const clk_cfg_t stm32_clk_cfg[] = {
         .has_pll_sai_m = false,
         .has_pll_i2s_alt_input = false,
         .has_alt_48MHz = ALT_48MHZ_SAI | ALT_48MHZ_P,
+        .need_48MHz = true,
+    },
+};
+
+    /**
+ * @brief Clock config for supported cpu
+ */
+static const clk_cfg_t stm32_mp_clk_cfg[] = {
+    [STM32MP157] = {
+        .family = STM32MP1,
+        .max_coreclock = 209000000U,
+        .max_apb1 = 104500000U,
+        .max_apb2 = 104500000U,
+        .max_apb3 = 104500000U,
+        .hsi = 64000000U,
+        .pll = stm32mp1_pll_cfg,
+        .has_pll_i2s = false,
+        .has_pll_sai = false,
+        .has_pll_i2s_m = false,
+        .has_pll_sai_m = false,
+        .has_pll_i2s_alt_input = false,
+        .has_alt_48MHz = 0,
         .need_48MHz = true,
     },
 };

@@ -54,6 +54,10 @@ def parse_cmsis(cpu_line):
         # STM32F030x4 is provided in the RIOT codebase in a different location
         cpu_line_cmsis = os.path.join(
             STM32_VENDOR_DIR, "{}.h".format(cpu_line.lower()))
+    elif cpu_line.startswith("STM32MP1"):
+        # STM32MP157Cxx is provided in the RIOT codebase in a different location
+        cpu_line_cmsis = os.path.join(
+            STM32_VENDOR_DIR, "{}_cm4.h".format(cpu_line.lower()))
     else:
         cpu_line_cmsis = STM32_CMSIS_FILE.format(
             cpu_fam.lower(), cpu_line.lower())
@@ -70,7 +74,7 @@ def parse_cmsis(cpu_line):
             # skip line that contains non unicode characters
             continue
         # start filling lines after interrupt Doxygen comment
-        if line.startswith("typedef enum"):
+        if "typedef enum" in line:
             use_line = True
 
         # use a regexp to get the available IRQs

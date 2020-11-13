@@ -14,6 +14,8 @@ config CPU_FAM_G4
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
     select HAS_PERIPH_HWRNG
+    select HAS_PERIPH_WDT
+    select HAS_BOOTLOADER_STM32
 
 config CPU_FAM
     default "g4" if CPU_FAM_G4

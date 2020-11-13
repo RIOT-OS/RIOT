@@ -53,7 +53,8 @@
 #define PM_STOP_CONFIG  (PWR_CR1_LPMS_0)
 #elif defined(CPU_FAM_STM32F7)
 #define PM_STOP_CONFIG  (PWR_CR1_LPDS | PWR_CR1_FPDS | PWR_CR1_LPUDS)
-#elif defined(CPU_FAM_STM32WB)
+#elif defined(CPU_FAM_STM32MP1)
+#define PM_STOP_CONFIG  (0)
 #else
 #define PM_STOP_CONFIG  (PWR_CR_LPDS | PWR_CR_FPDS)
 #endif
@@ -74,6 +75,8 @@
 #define PM_STANDBY_CONFIG   (PWR_CR1_LPMS_0 | PWR_CR1_LPMS_1)
 #elif defined(CPU_FAM_STM32F7)
 #define PM_STANDBY_CONFIG   (PWR_CR1_PDDS | PWR_CR1_CSBF)
+#elif defined(CPU_FAM_STM32MP1)
+#define PM_STANDBY_CONFIG   (0)
 #else
 #define PM_STANDBY_CONFIG   (PWR_CR_PDDS | PWR_CR_CWUF | PWR_CR_CSBF)
 #endif
@@ -92,6 +95,9 @@
 #elif defined(CPU_FAM_STM32F7)
 #define PWR_CR_REG     PWR->CR1
 #define PWR_WUP_REG    PWR->CSR2
+#elif defined(CPU_FAM_STM32MP1)
+#define PWR_CR_REG     PWR->CR1
+#define PWR_WUP_REG    PWR->MCUWKUPENR
 #else
 #define PWR_CR_REG     PWR->CR
 #define PWR_WUP_REG    PWR->CSR
@@ -102,7 +108,7 @@ void pm_set(unsigned mode)
     int deep;
 
     switch (mode) {
-#ifdef STM32_PM_STANDBY
+#if !defined(CPU_FAM_STM32MP1)
         case STM32_PM_STANDBY:
             PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
             PWR_CR_REG |= PM_STANDBY_CONFIG;
@@ -125,14 +131,12 @@ void pm_set(unsigned mode)
             deep = 1;
             break;
 #endif
-#ifdef STM32_PM_STOP
         case STM32_PM_STOP:
             PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
             PWR_CR_REG |= PM_STOP_CONFIG;
             /* Set SLEEPDEEP bit of system control block */
             deep = 1;
             break;
-#endif
         default:
             deep = 0;
             break;
@@ -142,7 +146,9 @@ void pm_set(unsigned mode)
 
     if (deep) {
         /* Re-init clock after STOP */
+#if !defined(CPU_FAM_STM32MP1) || IS_USED(MODULE_STM32MP1_ENG_MODE)
         stmclk_init_sysclk();
+#endif
     }
 }
 

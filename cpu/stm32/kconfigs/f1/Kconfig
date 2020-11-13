@@ -12,6 +12,9 @@ config CPU_FAM_F1
     select HAS_CPU_STM32F1
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_WDT
+    select HAS_BOOTLOADER_STM32
 
 config CPU_FAM
     default "f1" if CPU_FAM_F1

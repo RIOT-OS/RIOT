@@ -188,6 +188,10 @@ static void usage(char **argv)
 
 int main(int argc, char **argv)
 {
+    int char_offset = 0;
+    const unsigned int* stm32_model_p = stm32_f_model;
+    const clk_cfg_t* stm32_clk_cfg_p = stm32_f_clk_cfg;
+    int model_max = MODEL_F_MAX;
     if (argc < 2) {
         usage(argv);
         return 1;
@@ -199,23 +203,36 @@ int main(int argc, char **argv)
             || !isdigit(argv[1][8])
             || ((argv[1][5] != 'f') && (argv[1][5] != 'F')
                 /* && (argv[1][5] != 'l') && (argv[1][5] != 'L') */)) {
-        fprintf(stderr, "Invalid model : %s\n", argv[1]);
-        return 1;
+        if (strlen(argv[1]) < 10
+            || !isdigit(argv[1][7])
+            || !isdigit(argv[1][8])
+            || !isdigit(argv[1][9])
+            || ((argv[1][5] != 'm') && (argv[1][5] != 'M'))
+            || ((argv[1][6] != 'p') && (argv[1][5] != 'p'))
+            ) {
+            fprintf(stderr, "Invalid model : %s\n", argv[1]);
+            return 1;
+        }
+
+        char_offset = 1;
+        stm32_model_p = stm32_model_mp;
+        stm32_clk_cfg_p = stm32_mp_clk_cfg;
+        model_max = MODEL_MP_MAX;
     }
 
-    int model = atoi(argv[1] + 6);
+    int model = atoi(argv[1] + 6 + char_offset);
     int i;
-    for (i = 0; i < MODEL_MAX; i++) {
-        if (stm32_model[i] == model) {
+    for (i = 0; i < model_max; i++) {
+        if (stm32_model_p[i] == model) {
             break;
         }
     }
-    if (i == MODEL_MAX) {
+    if (i == model_max) {
         fprintf(stderr, "Unsupported CPU model %s\n", argv[1]);
         return 1;
     }
 
-    const clk_cfg_t *cfg = &stm32_clk_cfg[i];
+    const clk_cfg_t *cfg = &stm32_clk_cfg_p[i];
 
     /* print help for given cpu */
     if (argc < 5) {
@@ -399,6 +416,7 @@ int main(int argc, char **argv)
     /* APB prescalers */
     unsigned apb1_pre;
     unsigned apb2_pre;
+    unsigned apb3_pre;
 
     for (apb1_pre = 1; apb1_pre <= 16; apb1_pre <<= 1) {
         if (coreclock / apb1_pre <= cfg->max_apb1) {
@@ -408,6 +426,13 @@ int main(int argc, char **argv)
     if (cfg->family != STM32F0) {
         for (apb2_pre = 1; apb2_pre <= 16; apb2_pre <<= 1) {
             if (coreclock / apb2_pre <= cfg->max_apb2) {
+                break;
+            }
+        }
+    }
+    if (cfg->family == STM32MP1) {
+        for (apb3_pre = 1; apb3_pre <= 16; apb3_pre <<= 1) {
+            if (coreclock / apb3_pre <= cfg->max_apb3) {
                 break;
             }
         }
@@ -435,13 +460,31 @@ int main(int argc, char **argv)
            " * 1: external crystal available (always 32.768kHz) */\n"
            "#define CLOCK_LSE           (%uU)\n", is_lse);
     printf("/* peripheral clock setup */\n");
+
+    if (cfg->family != STM32MP1) {
     printf("#define CLOCK_AHB_DIV       RCC_CFGR_HPRE_DIV1\n"
            "#define CLOCK_AHB           (CLOCK_CORECLOCK / 1)\n");
+    }
     if (cfg->family == STM32F0) {
         printf("#define CLOCK_APB1_DIV      RCC_CFGR_PPRE_DIV%u      /* max %uMHz */\n"
                "#define CLOCK_APB1          (CLOCK_CORECLOCK / %u)\n",
                apb1_pre, cfg->max_apb1 / 1000000U, apb1_pre);
         printf("#define CLOCK_APB2          (CLOCK_APB1)\n");
+    }
+    else if (cfg->family == STM32MP1) {
+        /* TODO: Set to 1 by default, conf_clk is not able to handle this parameter */
+        printf("#define CLOCK_MCU_DIV       RCC_MCUDIVR_MCUDIV_1     /* max %uMHz */\n"
+               "#define CLOCK_MCU           (CLOCK_CORECLOCK / 1)\n",
+               cfg->max_coreclock / 1000000U);
+        printf("#define CLOCK_APB1_DIV      RCC_APB1DIVR_APB1DIV_%u     /* max %uMHz */\n"
+               "#define CLOCK_APB1          (CLOCK_CORECLOCK / %u)\n",
+               apb1_pre, cfg->max_apb1 / 1000000U, apb1_pre);
+        printf("#define CLOCK_APB2_DIV      RCC_APB2DIVR_APB2DIV_%u     /* max %uMHz */\n"
+               "#define CLOCK_APB2          (CLOCK_CORECLOCK / %u)\n",
+               apb2_pre, cfg->max_apb2 / 1000000U, apb2_pre);
+        printf("#define CLOCK_APB3_DIV      RCC_APB3DIVR_APB3DIV_%u     /* max %uMHz */\n"
+               "#define CLOCK_APB3          (CLOCK_CORECLOCK / %u)\n",
+               apb3_pre, cfg->max_apb3 / 1000000U, apb3_pre);
     }
     else {
         printf("#define CLOCK_APB1_DIV      RCC_CFGR_PPRE1_DIV%u     /* max %uMHz */\n"

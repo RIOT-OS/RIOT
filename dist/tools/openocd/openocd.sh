@@ -51,6 +51,15 @@
 #               DBG:            debugger client command, default: 'gdb -q'
 #               TUI:            if TUI!=null, the -tui option will be used
 #
+# debugr:       debug <elfile>
+#               debug given file on the target but flash it first directly
+#               in RAM.
+#
+# flashr:       flash <image_file>
+#               flash given file to the target but directly in RAM.
+#
+#               See 'flash' command above for options
+#
 # debug-server: starts OpenOCD as GDB server, but does not connect to
 #               to it with any frontend. This might be useful when using
 #               IDEs.
@@ -67,6 +76,8 @@
 
 # Default GDB port, set to 0 to disable, required != 0 for debug and debug-server targets
 : ${GDB_PORT:=3333}
+# Default GDB port core offset
+: ${GDB_PORT_CORE_OFFSET:=0}
 # Default telnet port, set to 0 to disable
 : ${TELNET_PORT:=4444}
 # Default TCL port, set to 0 to disable
@@ -86,7 +97,7 @@
 # Debugger client command, can be used to wrap GDB in a front-end
 : ${DBG:=${GDB}}
 # Default debugger flags,
-: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext :${GDB_PORT}\"}
+: ${DBG_DEFAULT_FLAGS:=-q -ex \"tar ext :$(( GDB_PORT + GDB_PORT_CORE_OFFSET ))\"}
 # Extra debugger flags, added by the user
 : ${DBG_EXTRA_FLAGS:=}
 # Debugger flags, will be passed to sh -c, remember to escape any quotation signs.
@@ -100,6 +111,8 @@
 : ${OPENOCD_DBG_EXTRA_CMD:=}
 # command used to reset the board
 : ${OPENOCD_CMD_RESET_RUN:="-c 'reset run'"}
+# Select core on multi-core processors.
+: ${OPENOCD_CORE:=}
 # This is an optional offset to the base address that can be used to flash an
 # image in a different location than it is linked at. This feature can be useful
 # when flashing images for firmware swapping/remapping boot loaders.
@@ -254,6 +267,52 @@ _flash_address() {
     _flash_list | awk "NR==${bank_num}"'{printf "0x%08x\n", $4}'
 }
 
+do_flashr() {
+    IMAGE_FILE=$1
+    test_config
+    test_imagefile
+    if [ -n "${PRE_FLASH_CHECK_SCRIPT}" ]; then
+        sh -c "${PRE_FLASH_CHECK_SCRIPT} '${IMAGE_FILE}'"
+        RETVAL=$?
+        if [ $RETVAL -ne 0 ]; then
+            echo "pre-flash checks failed, status=$RETVAL"
+            exit $RETVAL
+        fi
+    fi
+
+    # In case of binary file, IMAGE_OFFSET should include the flash base address
+    # This allows flashing normal binary files without env configuration
+    if _is_binfile "${IMAGE_FILE}" "${IMAGE_TYPE}"; then
+        # hardwritten to use the first bank
+        FLASH_ADDR=$(_flash_address 1)
+        echo "Binfile detected, adding ROM base address: ${FLASH_ADDR}"
+        IMAGE_TYPE=bin
+        IMAGE_OFFSET=$(printf "0x%08x\n" "$((${IMAGE_OFFSET} + ${FLASH_ADDR}))")
+    fi
+
+    if [ "${IMAGE_OFFSET}" != "0" ]; then
+        echo "Flashing with IMAGE_OFFSET: ${IMAGE_OFFSET}"
+    fi
+
+    # flash device
+    sh -c "${OPENOCD} \
+            ${OPENOCD_ADAPTER_INIT} \
+            -f '${OPENOCD_CONFIG}' \
+            ${OPENOCD_EXTRA_INIT} \
+            ${OPENOCD_EXTRA_RESET_INIT} \
+            -c 'tcl_port 0' \
+            -c 'telnet_port 0' \
+            -c 'gdb_port 0' \
+            -c 'init' \
+            -c 'targets ${OPENOCD_CORE}' \
+            -c 'reset' \
+            -c 'halt' \
+            -c 'load_image \"${IMAGE_FILE}\" ' \
+            -c 'resume ${START_ADDR}' \
+            -c 'shutdown'" &&
+    echo "'Done flashing"
+}
+
 #
 # now comes the actual actions
 #
@@ -332,7 +391,7 @@ do_debug() {
             -c 'gdb_port ${GDB_PORT}' \
             -c 'init' \
             ${OPENOCD_DBG_EXTRA_CMD} \
-            -c 'targets' \
+            -c 'targets ${OPENOCD_CORE}' \
             ${OPENOCD_DBG_START_CMD} \
             -l /dev/null & \
             echo \$! > $OCD_PIDFILE" &
@@ -390,6 +449,19 @@ case "${ACTION}" in
   flash)
     echo "### Flashing Target ###"
     do_flash "$@"
+    ;;
+  flashr)
+    START_ADDR=$(objdump -f $1 | sed '/^$/d' | tail -1 | grep -o "0x[0-9a-fA-F].*")
+    echo "### Flashing target RAM ###"
+        do_flashr "$@"
+    ;;
+  debugr)
+    START_ADDR=$(objdump -f $1 | sed '/^$/d' | tail -1 | grep -o "0x[0-9a-fA-F].*")
+    echo "Start address: $START_ADDR"
+    DBG_FLAGS="$DBG_FLAGS \
+        -ex 'load $1' \
+        "
+        do_debug "$@"
     ;;
   debug)
     echo "### Starting Debugging ###"
