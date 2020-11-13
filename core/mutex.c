@@ -20,8 +20,9 @@
  * @}
  */
 
-#include <stdio.h>
+#include <errno.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 #include "mutex.h"
 #include "thread.h"
@@ -32,42 +33,38 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-int _mutex_lock(mutex_t *mutex, volatile uint8_t *blocking)
+int mutex_lock(mutex_t *mutex)
 {
-    unsigned irqstate = irq_disable();
+    unsigned irq_state = irq_disable();
 
     DEBUG("PID[%" PRIkernel_pid "]: Mutex in use.\n", thread_getpid());
 
     if (mutex->queue.next == NULL) {
         /* mutex is unlocked. */
         mutex->queue.next = MUTEX_LOCKED;
-        DEBUG("PID[%" PRIkernel_pid "]: mutex_wait early out.\n",
+        DEBUG("PID[%" PRIkernel_pid "]: mutex_wait_and_lock early out.\n",
               thread_getpid());
-        irq_restore(irqstate);
-        return 1;
-    }
-    else if (*blocking) {
-        thread_t *me = thread_get_active();
-        DEBUG("PID[%" PRIkernel_pid "]: Adding node to mutex queue: prio: %"
-              PRIu32 "\n", thread_getpid(), (uint32_t)me->priority);
-        sched_set_status(me, STATUS_MUTEX_BLOCKED);
-        if (mutex->queue.next == MUTEX_LOCKED) {
-            mutex->queue.next = (list_node_t *)&me->rq_entry;
-            mutex->queue.next->next = NULL;
-        }
-        else {
-            thread_add_to_list(&mutex->queue, me);
-        }
-        irq_restore(irqstate);
-        thread_yield_higher();
-        /* We were woken up by scheduler. Waker removed us from queue.
-         * We have the mutex now. */
-        return 1;
-    }
-    else {
-        irq_restore(irqstate);
+        irq_restore(irq_state);
         return 0;
     }
+
+    thread_t *me = thread_get_active();
+    DEBUG("PID[%" PRIkernel_pid "]: Adding node to mutex queue: prio: %"
+          PRIu32 "\n", thread_getpid(), (uint32_t)me->priority);
+    sched_set_status(me, STATUS_MUTEX_BLOCKED);
+    if (mutex->queue.next == MUTEX_LOCKED) {
+        mutex->queue.next = (list_node_t *)&me->rq_entry;
+        mutex->queue.next->next = NULL;
+    }
+    else {
+        thread_add_to_list(&mutex->queue, me);
+    }
+
+
+    irq_restore(irq_state);
+    thread_yield_higher();
+    /* We were woken up by scheduler. Waker removed us from queue. */
+    return 0;
 }
 
 void mutex_unlock(mutex_t *mutex)
