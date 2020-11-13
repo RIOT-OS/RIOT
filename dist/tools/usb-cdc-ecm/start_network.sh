@@ -1,13 +1,13 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-USB_CDC_ECM_DIR="$(dirname $(readlink -f $0))"
+USB_CDC_ECM_DIR="$(dirname "$(readlink -f "$0")")"
 
 INTERFACE_CHECK_COUNTER=5  # 5 attempts to find usb interface
 
 find_interface() {
     INTERFACE=$(ls -A /sys/bus/usb/drivers/cdc_ether/*/net/ 2>/dev/null)
-    INTERFACE_CHECK=$(echo -n ${INTERFACE} | head -c1 | wc -c)
-    if [ ${INTERFACE_CHECK} -eq 0 -a ${INTERFACE_CHECK_COUNTER} != 0 ]; then
+    INTERFACE_CHECK=$(echo -n "${INTERFACE}" | head -c1 | wc -c)
+    if [ "${INTERFACE_CHECK}" -eq 0 ] && [ ${INTERFACE_CHECK_COUNTER} != 0 ]; then
         # We want to have multiple opportunities to find the USB interface
         # as sometimes it can take a few seconds for it to enumerate after
         # the device has been flashed.
@@ -21,7 +21,7 @@ find_interface() {
 echo "Waiting for network interface."
 find_interface
 
-if [ ${INTERFACE_CHECK} -eq 0 ]; then
+if [ "${INTERFACE_CHECK}" -eq 0 ]; then
     echo "Unable to find network interface"
     exit 1
 else
@@ -29,41 +29,41 @@ else
 fi
 
 setup_interface() {
-    sysctl -w net.ipv6.conf.${INTERFACE}.forwarding=1
-    sysctl -w net.ipv6.conf.${INTERFACE}.accept_ra=0
-    ip link set ${INTERFACE} up
-    ip a a fe80::1/64 dev ${INTERFACE}
+    sysctl -w net.ipv6.conf."${INTERFACE}".forwarding=1
+    sysctl -w net.ipv6.conf."${INTERFACE}".accept_ra=0
+    ip link set "${INTERFACE}" up
+    ip a a fe80::1/64 dev "${INTERFACE}"
     ip a a fd00:dead:beef::1/128 dev lo
-    ip route add ${PREFIX} via fe80::2 dev ${INTERFACE}
+    ip route add "${PREFIX}" via fe80::2 dev "${INTERFACE}"
 }
 
 cleanup_interface() {
-    ip a d fe80::1/64 dev ${INTERFACE}
+    ip a d fe80::1/64 dev "${INTERFACE}"
     ip a d fd00:dead:beef::1/128 dev lo
-    ip route del ${PREFIX} via fe80::2 dev ${INTERFACE}
+    ip route del "${PREFIX}" via fe80::2 dev "${INTERFACE}"
 }
 
 cleanup() {
     echo "Cleaning up..."
     cleanup_interface
     if [ -n "${UHCPD_PID}" ]; then
-        kill ${UHCPD_PID}
+        kill "${UHCPD_PID}"
     fi
     if [ -n "${DHCPD_PIDFILE}" ]; then
-        kill "$(cat ${DHCPD_PIDFILE})"
+        kill "$(cat "${DHCPD_PIDFILE}")"
         rm "${DHCPD_PIDFILE}"
     fi
     trap "" INT QUIT TERM EXIT
 }
 
 start_uhcpd() {
-    ${UHCPD} ${INTERFACE} ${PREFIX} > /dev/null &
+    ${UHCPD} "${INTERFACE}" "${PREFIX}" > /dev/null &
     UHCPD_PID=$!
 }
 
 start_dhcpd() {
     DHCPD_PIDFILE=$(mktemp)
-    ${DHCPD} -d -p ${DHCPD_PIDFILE} ${INTERFACE} ${PREFIX} 2> /dev/null
+    ${DHCPD} -d -p "${DHCPD_PIDFILE}" "${INTERFACE}" "${PREFIX}" 2> /dev/null
 }
 
 if [ "$1" = "-d" ] || [ "$1" = "--use-dhcpv6" ]; then
@@ -79,7 +79,7 @@ PREFIX=$1
     exit 1
 }
 
-if [ ! -z "$2" ]; then
+if [ -n "$2" ]; then
     PORT=$2
 fi
 
@@ -98,7 +98,7 @@ fi
 if [ -z "${PORT}" ]; then
     echo "Network enabled over CDC-ECM"
     echo "Press Return to stop"
-    read dummy
+    read -r
 else
-    ${USB_CDC_ECM_DIR}/../pyterm/pyterm -p "${PORT}"
+    "${USB_CDC_ECM_DIR}/../pyterm/pyterm" -p "${PORT}"
 fi
