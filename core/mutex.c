@@ -82,6 +82,39 @@ void mutex_lock(mutex_t *mutex)
     }
 }
 
+int mutex_lock_cancelable(mutex_cancel_t *mc)
+{
+    unsigned irq_state = irq_disable();
+
+    DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable()\n",
+          thread_getpid());
+
+    if (mc->cancelled) {
+        DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable cancelled "
+              "early.\n", thread_getpid());
+        irq_restore(irq_state);
+        return -ECANCELED;
+    }
+
+    mutex_t *mutex = mc->mutex;
+    if (mutex->queue.next == NULL) {
+        /* mutex is unlocked. */
+        mutex->queue.next = MUTEX_LOCKED;
+        DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable() early out.\n",
+              thread_getpid());
+        irq_restore(irq_state);
+        return 0;
+    }
+    else {
+        _block(mutex, irq_state);
+        if (mc->cancelled) {
+            DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable() "
+                  "cancelled.\n", thread_getpid());
+        }
+        return (mc->cancelled) ? -ECANCELED: 0;
+    }
+}
+
 void mutex_unlock(mutex_t *mutex)
 {
     unsigned irqstate = irq_disable();
@@ -147,4 +180,34 @@ void mutex_unlock_and_sleep(mutex_t *mutex)
     sched_set_status(thread_get_active(), STATUS_SLEEPING);
     irq_restore(irqstate);
     thread_yield_higher();
+}
+
+void mutex_cancel(mutex_cancel_t *mc)
+{
+    unsigned irq_state = irq_disable();
+    mc->cancelled = 1;
+
+    mutex_t *mutex = mc->mutex;
+    thread_t *thread = mc->thread;
+    if (thread_is_active(thread)) {
+        /* thread is still running or about to run, so it will check
+         * `mc-cancelled` in time */
+        irq_restore(irq_state);
+        return;
+    }
+
+    if ((mutex->queue.next != MUTEX_LOCKED)
+            && (mutex->queue.next != NULL)
+            && list_remove(&mutex->queue, (list_node_t *)&thread->rq_entry)) {
+        /* Thread was queued and removed from list, wake it up */
+        if (mutex->queue.next == NULL) {
+            mutex->queue.next = MUTEX_LOCKED;
+        }
+        sched_set_status(thread, STATUS_PENDING);
+        irq_restore(irq_state);
+        sched_switch(thread->priority);
+        return;
+    }
+
+    irq_restore(irq_state);
 }
