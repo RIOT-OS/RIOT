@@ -8,7 +8,6 @@ endif
 
 ifneq (,$(filter periph_can,$(FEATURES_USED)))
   ifeq ($(OS),Linux)
-    USEMODULE += can_linux
     CFLAGS += -DCAN_DLL_NUMOF=2
   endif
 endif

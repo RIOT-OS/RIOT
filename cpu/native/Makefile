@@ -26,9 +26,6 @@ ifneq (,$(filter mtd_native,$(USEMODULE)))
   DIRS += mtd
 endif
 
-ifneq (,$(filter can_linux,$(USEMODULE)))
-  DIRS += can
-endif
 ifneq (,$(filter backtrace,$(USEMODULE)))
   DIRS += backtrace
 endif

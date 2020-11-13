@@ -20,7 +20,8 @@
  */
 
 #if !defined(__linux__)
-#error "MODULE can_linux is only available on Linux"
+#error "Usage of periph_can on RIOT native requires libsocketcan. Currently \
+        this is only available on Linux"
 #else
 
 #include <string.h>

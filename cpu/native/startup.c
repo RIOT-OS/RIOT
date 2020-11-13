@@ -75,7 +75,7 @@ netdev_tap_params_t netdev_tap_params[NETDEV_TAP_MAX];
 #include "board.h"
 #include "mtd_native.h"
 #endif
-#ifdef MODULE_CAN_LINUX
+#ifdef MODULE_PERIPH_CAN
 #include "candev_linux.h"
 #endif
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
@@ -101,7 +101,7 @@ static const char short_opts[] = ":hi:s:deEoc:"
 #ifdef MODULE_MTD_NATIVE
     "m:"
 #endif
-#ifdef MODULE_CAN_LINUX
+#ifdef MODULE_PERIPH_CAN
     "n:"
 #endif
 #ifdef MODULE_SOCKET_ZEP
@@ -127,7 +127,7 @@ static const struct option long_opts[] = {
 #ifdef MODULE_MTD_NATIVE
     { "mtd", required_argument, NULL, 'm' },
 #endif
-#ifdef MODULE_CAN_LINUX
+#ifdef MODULE_PERIPH_CAN
     { "can", required_argument, NULL, 'n' },
 #endif
 #ifdef MODULE_SOCKET_ZEP
@@ -327,7 +327,7 @@ void usage_exit(int status)
 "    -m <mtd>, --mtd=<mtd>\n"
 "       specify the file name of mtd emulated device\n");
 #endif
-#if defined(MODULE_CAN_LINUX)
+#if defined(MODULE_PERIPH_CAN)
     real_printf(
 "    -n <ifnum>:<ifname>, --can <ifnum>:<ifname>\n"
 "        specify CAN interface <ifname> to use for CAN device #<ifnum>\n"
@@ -504,7 +504,7 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
                 ((mtd_native_dev_t *)mtd0)->fname = strndup(optarg, PATH_MAX - 1);
                 break;
 #endif
-#if defined(MODULE_CAN_LINUX)
+#if defined(MODULE_PERIPH_CAN)
             case 'n':{
                 int i;
                 i = atol(optarg);
