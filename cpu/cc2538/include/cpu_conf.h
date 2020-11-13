@@ -19,6 +19,7 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include "kernel_defines.h"
 #include "cpu_conf_common.h"
 #include "cc2538.h"
 #include "cc2538_gpio.h"
@@ -55,7 +56,7 @@ extern "C" {
 #ifndef FLASHPAGE_CC2538_USE_CCA_PAGE
 #define FLASHPAGE_CC2538_USE_CCA_PAGE   (0)
 #endif
-#if FLASHPAGE_CC2538_USE_CCA_PAGE
+#if (IS_ACTIVE(MODULE_RIOTBOOT) || FLASHPAGE_CC2538_USE_CCA_PAGE)
 #define FLASHPAGE_NUMOF         ((CC2538_FLASHSIZE / FLASHPAGE_SIZE))
 #else
 #define FLASHPAGE_NUMOF         ((CC2538_FLASHSIZE / FLASHPAGE_SIZE) -1)

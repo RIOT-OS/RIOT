@@ -8,6 +8,7 @@
 config CPU_FAM_CC2538
     bool
     select CPU_CORE_CORTEX_M3
+    select HAS_CORTEXM_MPU
     select HAS_CPU_CC2538
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_FLASHPAGE
@@ -17,7 +18,6 @@ config CPU_FAM_CC2538
     select HAS_PERIPH_HWRNG
     select HAS_PERIPH_UART_MODECFG
     select HAS_PERIPH_WDT
-    select HAS_CORTEXM_MPU
 
 ## CPU Models
 config CPU_MODEL_CC2538NF53
