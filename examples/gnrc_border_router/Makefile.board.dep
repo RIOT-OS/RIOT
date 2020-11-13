@@ -14,4 +14,5 @@ ifeq (,$(filter native,$(BOARD)))
   endif
 else
   USEMODULE += socket_zep
+  USEMODULE += socket_zep_hello
 endif

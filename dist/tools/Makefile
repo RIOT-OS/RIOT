@@ -1,4 +1,4 @@
-HOST_TOOLS=ethos uhcpd sliptty
+HOST_TOOLS=ethos uhcpd sliptty zep_dispatch
 
 .PHONY: all $(HOST_TOOLS)
 
