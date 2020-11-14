@@ -476,6 +476,10 @@ ifneq (,$(filter ieee802154_submac,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter l2util,$(USEMODULE)))
+  USEMODULE += fmt
+endif
+
 ifneq (,$(filter od,$(USEMODULE)))
   USEMODULE += fmt
 endif
