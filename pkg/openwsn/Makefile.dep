@@ -99,5 +99,9 @@ ifneq (,$(filter openwsn_debugpins,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio_irq
 endif
 
+ifneq (,$(filter shell_commands,$(USEMODULE)))
+  USEMODULE += l2util
+endif
+
 # This port currently requires setting ISR_STACKSIZE
 FEATURES_BLACKLIST += arch_esp32 arch_esp8266 arch_riscv arch_avr8
