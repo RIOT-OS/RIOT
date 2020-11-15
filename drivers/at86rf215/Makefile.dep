@@ -1,6 +1,6 @@
 DEFAULT_MODULE += auto_init_at86rf215
 
-ifeq (,$(filter at86rf215m,$(USEMODULE)))
+ifneq (,$(filter at86rf215m,$(USEMODULE)))
   USEMODULE += at86rf215_subghz
 endif
 
