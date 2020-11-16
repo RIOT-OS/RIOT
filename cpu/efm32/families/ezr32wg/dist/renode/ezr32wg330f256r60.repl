@@ -1,0 +1,112 @@
+
+i2c0: I2C.EFM32GGI2CController @ sysbus <0x4000a000, +0x400>
+    -> nvic@9
+i2c1: I2C.EFM32GGI2CController @ sysbus <0x4000a400, +0x400>
+    -> nvic@10
+
+timer0: Timers.Efm32Timer @ sysbus <0x40010000, +0x400>
+    -> nvic@2
+timer1: Timers.Efm32Timer @ sysbus <0x40010400, +0x400>
+    -> nvic@12
+timer2: Timers.Efm32Timer @ sysbus <0x40010800, +0x400>
+    -> nvic@13
+timer3: Timers.Efm32Timer @ sysbus <0x40010c00, +0x400>
+    -> nvic@14
+
+uart0: UART.EFM32_UART @ sysbus <0x4000e000, +0x400>
+    ReceiveIRQ -> nvic@20
+    TransmitIRQ -> nvic@21
+uart1: UART.EFM32_UART @ sysbus <0x4000e400, +0x400>
+    ReceiveIRQ -> nvic@22
+    TransmitIRQ -> nvic@23
+
+usart1: UART.EFM32_UART @ sysbus <0x4000c400, +0x400>
+    ReceiveIRQ -> nvic@15
+    TransmitIRQ -> nvic@16
+usart2: UART.EFM32_UART @ sysbus <0x4000c800, +0x400>
+    ReceiveIRQ -> nvic@18
+    TransmitIRQ -> nvic@19
+
+leUart0: UART.LEUART @ sysbus <0x40084000, +0x400>
+    -> nvic@24
+leUart1: UART.LEUART @ sysbus <0x40084400, +0x400>
+    -> nvic@25
+
+gpioPort: GPIOPort.EFMGPIOPort @ sysbus 0x40006000
+
+bitbandPeripherals: Miscellaneous.BitBanding @ sysbus <0x42000000, +0x2000000>
+    peripheralBase: 0x40000000
+
+bitbandSram: Miscellaneous.BitBanding @ sysbus <0x22000000, +0x2000000>
+    peripheralBase: 0x20000000
+
+sram: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x00008000
+
+flash: Memory.MappedMemory @ sysbus 0x00000000
+    size: 0x00040000
+
+nvic: IRQControllers.NVIC @ sysbus 0xE000E000
+    IRQ -> cpu@0
+
+cpu: CPU.CortexM @ sysbus
+    nvic: nvic
+    cpuType: "cortex-m4f"
+
+deviceInformation: Miscellaneous.SiLabs.EZR32DeviceInformation @ sysbus 0x0fe081a8
+    deviceFamily: DeviceFamily.EZR32WG
+    deviceNumber: 1
+    flashDevice: flash
+    sramDevice: sram
+
+sysbus:
+    init:
+        Tag <0x400c2000,0x400c3fff> "DMA"
+        Tag <0x400e0000,0x400e03ff> "AES"
+        Tag <0x400c4000,0x400c4fff> "USB"
+        Tag <0x400c0000,0x400c03ff> "MSC"
+        Tag <0x400c6000,0x400c63ff> "EMU"
+        Tag <0x400ca000,0x400ca3ff> "RMU"
+        Tag <0x400c8000,0x400c83ff> "CMU"
+        Tag <0x4008c000,0x4008c3ff> "LESENSE"
+        Tag <0x400c1c00,0x400c1fff> "FPUEH"
+        Tag <0x4000c000,0x4000c3ff> "USARTRF0"
+        Tag <0x4000c400,0x4000c7ff> "USART1"
+        Tag <0x4000c800,0x4000cbff> "USART2"
+        Tag <0x4000e000,0x4000e3ff> "UART0"
+        Tag <0x4000e400,0x4000e7ff> "UART1"
+        Tag <0x40010000,0x400103ff> "TIMER0"
+        Tag <0x40010400,0x400107ff> "TIMER1"
+        Tag <0x40010800,0x40010bff> "TIMER2"
+        Tag <0x40010c00,0x40010fff> "TIMER3"
+        Tag <0x40001000,0x400013ff> "ACMP0"
+        Tag <0x40001400,0x400017ff> "ACMP1"
+        Tag <0x40084000,0x400843ff> "LEUART0"
+        Tag <0x40084400,0x400847ff> "LEUART1"
+        Tag <0x40080000,0x400803ff> "RTC"
+        Tag <0x40082000,0x400823ff> "LETIMER0"
+        Tag <0x40086000,0x400863ff> "PCNT0"
+        Tag <0x40086400,0x400867ff> "PCNT1"
+        Tag <0x40086800,0x40086bff> "PCNT2"
+        Tag <0x4000a000,0x4000a3ff> "I2C0"
+        Tag <0x4000a400,0x4000a7ff> "I2C1"
+        Tag <0x40006000,0x40006fff> "GPIO"
+        Tag <0x40000000,0x400003ff> "VCMP"
+        Tag <0x400cc000,0x400cc3ff> "PRS"
+        Tag <0x40002000,0x400023ff> "ADC0"
+        Tag <0x40004000,0x400043ff> "DAC0"
+        Tag <0x40081000,0x400813ff> "BURTC"
+        Tag <0x40088000,0x400883ff> "WDOG"
+        Tag <0xe0041000,0xe0080fff> "ETM"
+        Tag <0x20000000,0x20007fff> "SRAM"
+        Tag <0x00000000,0x0003ffff> "FLASH"
+
+cmuStatusOscillator: Python.PythonPeripheral @ sysbus 0x400C802C
+    size: 0x4
+    initable: false
+    script: "request.value = 0xFFFFFFFF"
+
+vcmpStatus: Python.PythonPeripheral @ sysbus 0x40000008
+    size: 0x4
+    initable: false
+    script: "request.value = 0xFFFFFFFF"

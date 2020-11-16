@@ -1,0 +1,25 @@
+:name: STK3600
+:description: Silicon Labs STK3600 starter kit
+
+$name?="STK3600"
+
+using sysbus
+mach create $name
+
+machine LoadPlatformDescription $RIOTCPU/efm32/families/efm32lg/dist/renode/efm32lg990f256.repl
+machine LoadPlatformDescription $RIOTBOARD/stk3600/dist/renode/stk3600.repl
+
+# show the UART output
+showAnalyzer uart0
+
+# generate a unique device id
+$unique_id = `next_value 1`
+
+macro reset
+"""
+    sysbus LoadELF $ELFFILE
+    deviceInformation Unique $unique_id
+"""
+
+runMacro $reset
+start

@@ -1,0 +1,6 @@
+
+led0_pin: Miscellaneous.LED @ gpioPort 60
+led1_pin: Miscellaneous.LED @ gpioPort 59
+
+pb0_pin: Miscellaneous.Button @ gpioPort 62
+pb1_pin: Miscellaneous.Button @ gpioPort 63

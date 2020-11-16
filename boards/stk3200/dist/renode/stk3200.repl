@@ -1,0 +1,10 @@
+bc: Miscellaneous.LED @ gpioPort 9
+
+led0_pin: Miscellaneous.LED @ gpioPort 42
+led1_pin: Miscellaneous.LED @ gpioPort 43
+
+pb0_pin: Miscellaneous.Button @ gpioPort 40
+pb1_pin: Miscellaneous.Button @ gpioPort 41
+
+// TODO
+// ls013b7dh03: Video.LS013B7DH03 @ spi0

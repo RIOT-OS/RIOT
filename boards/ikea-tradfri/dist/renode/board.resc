@@ -1,0 +1,28 @@
+:name: IKEA TRÅDFRI
+:description: IKEA TRÅDFRI modules
+
+$name?="IKEA TRÅDFRI"
+
+using sysbus
+mach create $name
+
+machine LoadPlatformDescription $RIOTCPU/efm32/families/efr32mg1p/dist/renode/efr32mg1p132f256gm32.repl
+machine LoadPlatformDescription $RIOTBOARD/ikea-tradfri/dist/renode/ikea-tradfri.repl
+
+# osc hack - push the initialization forward
+machine PyDevFromFile @scripts/pydev/flipflop.py 0x400E4090 4 true "CMU_STATUS"
+
+# show the UART output
+showAnalyzer usart0
+
+# generate a unique device id
+$unique_id = `next_value 1`
+
+macro reset
+"""
+    sysbus LoadELF $ELFFILE
+    deviceInformation Unique $unique_id
+"""
+
+runMacro $reset
+start

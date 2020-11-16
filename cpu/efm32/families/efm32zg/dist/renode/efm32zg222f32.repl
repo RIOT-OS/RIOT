@@ -1,0 +1,77 @@
+
+i2c0: I2C.EFM32GGI2CController @ sysbus <0x4000a000, +0x400>
+    -> nvic@5
+
+timer0: Timers.Efm32Timer @ sysbus <0x40010000, +0x400>
+    -> nvic@2
+timer1: Timers.Efm32Timer @ sysbus <0x40010400, +0x400>
+    -> nvic@7
+
+usart1: UART.EFM32_UART @ sysbus <0x4000c400, +0x400>
+    ReceiveIRQ -> nvic@8
+    TransmitIRQ -> nvic@9
+
+leUart0: UART.LEUART @ sysbus <0x40084000, +0x400>
+    -> nvic@10
+
+gpioPort: GPIOPort.EFMGPIOPort @ sysbus 0x40006000
+
+bitbandPeripherals: Miscellaneous.BitBanding @ sysbus <0x42000000, +0x2000000>
+    peripheralBase: 0x40000000
+
+bitbandSram: Miscellaneous.BitBanding @ sysbus <0x22000000, +0x2000000>
+    peripheralBase: 0x20000000
+
+sram: Memory.MappedMemory @ sysbus 0x20000000
+    size: 0x00001000
+
+flash: Memory.MappedMemory @ sysbus 0x00000000
+    size: 0x00008000
+
+nvic: IRQControllers.NVIC @ sysbus 0xE000E000
+    IRQ -> cpu@0
+
+cpu: CPU.CortexM @ sysbus
+    nvic: nvic
+    cpuType: "cortex-m0+"
+
+deviceInformation: Miscellaneous.SiLabs.EFM32xGDeviceInformation @ sysbus 0x0fe081b0
+    deviceFamily: DeviceFamily.EFM32ZG
+    deviceNumber: 1
+    flashDevice: flash
+    sramDevice: sram
+
+sysbus:
+    init:
+        Tag <0x400e0000,0x400e03ff> "AES"
+        Tag <0x400c2000,0x400c3fff> "DMA"
+        Tag <0x400c0000,0x400c03ff> "MSC"
+        Tag <0x400c6000,0x400c63ff> "EMU"
+        Tag <0x400ca000,0x400ca3ff> "RMU"
+        Tag <0x400c8000,0x400c83ff> "CMU"
+        Tag <0x40010000,0x400103ff> "TIMER0"
+        Tag <0x40010400,0x400107ff> "TIMER1"
+        Tag <0x40001000,0x400013ff> "ACMP0"
+        Tag <0x4000c400,0x4000c7ff> "USART1"
+        Tag <0x400cc000,0x400cc3ff> "PRS"
+        Tag <0x40004000,0x400043ff> "IDAC0"
+        Tag <0x40006000,0x40006fff> "GPIO"
+        Tag <0x40000000,0x400003ff> "VCMP"
+        Tag <0x40002000,0x400023ff> "ADC0"
+        Tag <0x40084000,0x400843ff> "LEUART0"
+        Tag <0x40086000,0x400863ff> "PCNT0"
+        Tag <0x4000a000,0x4000a3ff> "I2C0"
+        Tag <0x40080000,0x400803ff> "RTC"
+        Tag <0x40088000,0x400883ff> "WDOG"
+        Tag <0x20000000,0x20000fff> "SRAM"
+        Tag <0x00000000,0x00007fff> "FLASH"
+
+cmuStatusOscillator: Python.PythonPeripheral @ sysbus 0x400C802C
+    size: 0x4
+    initable: false
+    script: "request.value = 0xFFFFFFFF"
+
+vcmpStatus: Python.PythonPeripheral @ sysbus 0x40000008
+    size: 0x4
+    initable: false
+    script: "request.value = 0xFFFFFFFF"

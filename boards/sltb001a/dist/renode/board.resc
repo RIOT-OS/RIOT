@@ -1,0 +1,28 @@
+:name: SLTB001A
+:description: Silicon Labs SLTB001A starter kit
+
+$name?="SLTB001A"
+
+using sysbus
+mach create $name
+
+machine LoadPlatformDescription $RIOTCPU/efm32/families/efr32mg1p/dist/renode/efr32mg1p132f256gm48.repl
+machine LoadPlatformDescription $RIOTBOARD/sltb001a/dist/renode/sltb001a.repl
+
+# osc hack - push the initialization forward
+machine PyDevFromFile @scripts/pydev/flipflop.py 0x400E4090 4 true "CMU_STATUS"
+
+# show the UART output
+showAnalyzer usart0
+
+# generate a unique device id
+$unique_id = `next_value 1`
+
+macro reset
+"""
+    sysbus LoadELF $ELFFILE
+    deviceInformation Unique $unique_id
+"""
+
+runMacro $reset
+start

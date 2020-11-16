@@ -9,5 +9,8 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 JLINK_DEVICE = EFR32MG1PxxxF256
 JLINK_PRE_FLASH = r
 
+# setup emulator
+include $(RIOTMAKE)/tools/renode.inc.mk
+
 # include board common
 include $(RIOTBOARD)/common/silabs/Makefile.include

@@ -1,0 +1,28 @@
+:name: SLSTK3402A
+:description: Silicon Labs SLSTK3402A starter kit
+
+$name?="SLSTK3402A"
+
+using sysbus
+mach create $name
+
+machine LoadPlatformDescription $RIOTCPU/efm32/families/efm32pg12b/dist/renode/efm32pg12b500f1024gl125.repl
+machine LoadPlatformDescription $RIOTBOARD/slstk3402a/dist/renode/slstk3402a.repl
+
+# osc hack - push the initialization forward
+machine PyDevFromFile @scripts/pydev/flipflop.py 0x400E4090 4 true "CMU_STATUS"
+
+# show the UART output
+showAnalyzer usart0
+
+# generate a unique device id
+$unique_id = `next_value 1`
+
+macro reset
+"""
+    sysbus LoadELF $ELFFILE
+    deviceInformation Unique $unique_id
+"""
+
+runMacro $reset
+start
