@@ -299,7 +299,7 @@ void flashpage_write(void *target_addr, const void *data, size_t len)
     _write_row(target_addr, data, len, NVMCTRL_PAGE_SIZE, _cmd_write_page);
 }
 
-void sam0_flashpage_aux_write_raw(uint32_t offset, const void *data, size_t len)
+void sam0_flashpage_aux_write(uint32_t offset, const void *data, size_t len)
 {
     uintptr_t dst = NVMCTRL_USER + sizeof(nvm_user_page_t) + offset;
 

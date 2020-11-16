@@ -1145,7 +1145,7 @@ void sam0_flashpage_aux_reset(const nvm_user_page_t *cfg);
  * @param   data    The data to write
  * @param   len     Size of the data
  */
-void sam0_flashpage_aux_write_raw(uint32_t offset, const void *data, size_t len);
+void sam0_flashpage_aux_write(uint32_t offset, const void *data, size_t len);
 
 /**
  * @brief   Get pointer to data in the user configuration area.
