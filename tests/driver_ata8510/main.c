@@ -50,17 +50,6 @@ int cmd_onoff(int argc, char **argv)
     return 0;
 }
 
-int cmd_signature(int argc, char **argv)
-{
-    (void)argc;
-    (void)argv;
-
-    uint8_t sig = ata8510_get_device_signature(&dev);
-    printf("Found signature 0x%02x\n", sig);
-
-    return 0;
-}
-
 int cmd_status(int argc, char **argv)
 {
     (void)argc;
@@ -216,7 +205,6 @@ int cmd_service_channel(int argc, char **argv)
 static const shell_command_t shell_commands[] = {
     { "on", "Turn on the radio", cmd_onoff },
     { "off", "Turn off the radio", cmd_onoff },
-    { "signature", "Get the device signature", cmd_signature },
     { "status", "Get the radio status", cmd_status },
     { "reset", "Reset the radio", cmd_reset },
     { "mode", "Get/set the radio mode", cmd_mode },

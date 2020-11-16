@@ -123,15 +123,6 @@ void ata8510_poweron(ata8510_t *dev);
 void ata8510_poweroff(ata8510_t *dev);
 
 /**
- * @brief Get the device signature
- *
- * @param[in] dev           Pointer to device descriptor
- *
- * @return ATA8510_PARTNUM  if the device is present
- */
-uint8_t ata8510_get_device_signature(ata8510_t *dev);
-
-/**
  * @brief Perform a complete reset of the device
  *
  * @param[in] dev           Pointer to device descriptor

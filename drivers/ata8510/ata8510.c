@@ -87,6 +87,20 @@ static void _send_command(ata8510_t *dev, const void *out,
     spi_release(SPIDEV);
 }
 
+static uint8_t _get_device_signature(ata8510_t *dev)
+{
+    const uint8_t command[6] = { ATA8510_CMD_GET_VERSION_FLASH, 0, 0, 0, 0, 0 };
+    uint8_t data[6] = { 0, 0, 0, 0, 0, 0 };
+
+    _send_command(dev, command, data, sizeof(command));
+
+    DEBUG("[ata8510] _get_device_signature: "
+          "%02x:%02x:%02x:%02x:%02x:%02x.\n",
+          data[0], data[1], data[2], data[3], data[4], data[5]
+          );
+    return data[2];
+}
+
 int ata8510_init(ata8510_t *dev, const ata8510_params_t *params)
 {
     int res;
@@ -118,7 +132,7 @@ int ata8510_init(ata8510_t *dev, const ata8510_params_t *params)
         return -ATA8510_ERR_SPI;
     }
 
-    uint8_t sig = ata8510_get_device_signature(dev);
+    uint8_t sig = _get_device_signature(dev);
     if (sig != ATA8510_PARTNUM) {
         DEBUG("[ata8510] ERROR: signature is not 0x%02x.\n", ATA8510_PARTNUM);
         return -ATA8510_ERR_SIGNATURE;
@@ -155,7 +169,7 @@ void ata8510_poweron(ata8510_t *dev)
 
 void ata8510_poweroff(ata8510_t *dev)
 {
-    uint8_t command[2] = { ATA8510_CMD_OFF_COMMAND, 0 };
+    const uint8_t command[2] = { ATA8510_CMD_OFF_COMMAND, 0 };
     uint8_t data[2] = { 0, 0 };
 
     ata8510_get_event_bytes(dev);
@@ -165,23 +179,9 @@ void ata8510_poweroff(ata8510_t *dev)
     DEBUG("[ata8510] poweroff\n");
 }
 
-uint8_t ata8510_get_device_signature(ata8510_t *dev)
-{
-    uint8_t command[6] = { ATA8510_CMD_GET_VERSION_FLASH, 0, 0, 0, 0, 0 };
-    uint8_t data[6] = { 0, 0, 0, 0, 0, 0 };
-
-    _send_command(dev, command, data, sizeof(command));
-
-    DEBUG("[ata8510] ata8510_get_device_signature: "
-          "%02x:%02x:%02x:%02x:%02x:%02x.\n",
-          data[0], data[1], data[2], data[3], data[4], data[5]
-          );
-    return data[2];
-}
-
 void ata8510_system_reset(ata8510_t *dev)
 {
-    uint8_t command[2] = { ATA8510_CMD_SYSTEM_RESET, 0 };
+    const uint8_t command[2] = { ATA8510_CMD_SYSTEM_RESET, 0 };
     uint8_t data[2] = { 0, 0 };
 
     _send_command(dev, command, data, sizeof(command));
@@ -191,7 +191,7 @@ void ata8510_system_reset(ata8510_t *dev)
 
 void ata8510_get_event_bytes(ata8510_t *dev)
 {
-    uint8_t command[4] = { ATA8510_CMD_GET_EVENT_BYTES, 0, 0, 0 };
+    const uint8_t command[4] = { ATA8510_CMD_GET_EVENT_BYTES, 0, 0, 0 };
 
     _send_command(dev, command, (uint8_t *)&dev->events, sizeof(command));
 
@@ -209,7 +209,7 @@ void ata8510_get_event_bytes(ata8510_t *dev)
 ata8510_system_mode_config_opm_t ata8510_set_mode(
     ata8510_t *dev, ata8510_system_mode_config_opm_t opm)
 {
-    uint8_t command[3] = { ATA8510_CMD_SET_SYSTEM_MODE, 0, 0 };
+    const uint8_t command[3] = { ATA8510_CMD_SET_SYSTEM_MODE, 0, 0 };
     uint8_t data[3] = { 0, 0, 0 };
     ata8510_system_mode_config_t *mode =
         (ata8510_system_mode_config_t *)&command[1];
@@ -249,7 +249,7 @@ ata8510_system_mode_config_opm_t ata8510_set_mode(
 
 static void _write_preamble(ata8510_t *dev)
 {
-    uint8_t command[11] =
+    const uint8_t command[11] =
     { ATA8510_CMD_WRITE_TX_PREAMBLE_FIFO, 9, 0x04, 0x70, 0x8E, 0x0A, 0x55, 0x55,
       0x10, 0x55, 0x56 };
     uint8_t data[11];
@@ -259,7 +259,7 @@ static void _write_preamble(ata8510_t *dev)
 
 static uint8_t _read_available_tx_fifo(ata8510_t *dev)
 {
-    uint8_t command[3] = { ATA8510_CMD_READ_FILL_LEVEL_TX_FIFO, 0x00, 0x00 };
+    const uint8_t command[3] = { ATA8510_CMD_READ_FILL_LEVEL_TX_FIFO, 0x00, 0x00 };
     uint8_t data[3];
 
     _send_command(dev, command, data, sizeof(command));
@@ -322,7 +322,7 @@ void ata8510_send_frame(ata8510_t *dev, uint8_t *payload, uint8_t payload_len)
 
 static uint8_t _read_fill_level_rx_fifo(ata8510_t *dev)
 {
-    uint8_t command[3] = { ATA8510_CMD_READ_FILL_LEVEL_RX_FIFO, 0x00, 0x00 };
+    const uint8_t command[3] = { ATA8510_CMD_READ_FILL_LEVEL_RX_FIFO, 0x00, 0x00 };
     uint8_t data[3];
 
     _send_command(dev, command, data, sizeof(command));
@@ -331,7 +331,7 @@ static uint8_t _read_fill_level_rx_fifo(ata8510_t *dev)
 
 static void _read_rx_fifo(ata8510_t *dev, uint8_t *buffer, uint8_t buffer_len)
 {
-    uint8_t command[ATA8510_DFIFO_RX_LENGTH +
+    const uint8_t command[ATA8510_DFIFO_RX_LENGTH +
                     3] = { ATA8510_CMD_READ_RX_FIFO, buffer_len };
     uint8_t data[ATA8510_DFIFO_RX_LENGTH + 3];
 
@@ -341,7 +341,7 @@ static void _read_rx_fifo(ata8510_t *dev, uint8_t *buffer, uint8_t buffer_len)
 
 static uint8_t _read_fill_level_rssi_fifo(ata8510_t *dev)
 {
-    uint8_t command[3] = { ATA8510_CMD_READ_FILL_LEVEL_RSSI_FIFO, 0x00, 0x00 };
+    const uint8_t command[3] = { ATA8510_CMD_READ_FILL_LEVEL_RSSI_FIFO, 0x00, 0x00 };
     uint8_t data[3];
 
     _send_command(dev, command, data, sizeof(command));
@@ -350,7 +350,7 @@ static uint8_t _read_fill_level_rssi_fifo(ata8510_t *dev)
 
 static void _read_rssi_fifo(ata8510_t *dev, uint8_t *buffer, uint8_t buffer_len)
 {
-    uint8_t command[ATA8510_SFIFO_LENGTH +
+    const uint8_t command[ATA8510_SFIFO_LENGTH +
                     3] = { ATA8510_CMD_READ_RSSI_FIFO, buffer_len };
     uint8_t data[ATA8510_SFIFO_LENGTH + 3];
 
@@ -477,7 +477,7 @@ static uint8_t _read_sram(ata8510_t *dev, uint16_t addr)
 {
     uint8_t addrh = (addr & 0xFF00) >> 8;
     uint8_t addrl = addr & 0x00FF;
-    uint8_t command[6] =
+    const uint8_t command[6] =
     { ATA8510_CMD_READ_SRAM_REGISTER, 1, addrh, addrl, 0, 0 };
     uint8_t data[6];
 
@@ -489,7 +489,7 @@ static uint8_t _read_eeprom(ata8510_t *dev, uint16_t addr)
 {
     uint8_t addrh = (addr & 0xFF00) >> 8;
     uint8_t addrl = addr & 0x00FF;
-    uint8_t command[5] = { ATA8510_CMD_READ_EEPROM, addrh, addrl, 0, 0 };
+    const uint8_t command[5] = { ATA8510_CMD_READ_EEPROM, addrh, addrl, 0, 0 };
     uint8_t data[5];
 
     _send_command(dev, command, data, sizeof(command));
@@ -511,7 +511,7 @@ static void _write_sram(ata8510_t *dev, uint16_t addr, uint8_t value)
 {
     uint8_t addrh = (addr & 0xFF00) >> 8;
     uint8_t addrl = addr & 0x00FF;
-    uint8_t command[5] =
+    const uint8_t command[5] =
     { ATA8510_CMD_WRITE_SRAM_REGISTER, 1, addrh, addrl, value };
     uint8_t data[5];
 
