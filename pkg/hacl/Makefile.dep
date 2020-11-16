@@ -2,3 +2,6 @@ USEMODULE+=random
 
 # HACL is only supported by 32 bit architectures
 FEATURES_REQUIRED += arch_32bit
+
+# upstream has moved and repo structure changed
+FEATURES_REQUIRED += working_upstream
