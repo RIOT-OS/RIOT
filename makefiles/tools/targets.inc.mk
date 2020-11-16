@@ -17,9 +17,9 @@ $(RIOTTOOLS)/pic32prog/pic32prog: $(RIOTTOOLS)/pic32prog/Makefile
 	$(MAKE) -C $(@D)
 	@echo "[INFO] $(@F) binary successfully built!"
 
-$(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py:
+$(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py: $(RIOTTOOLS)/cc2538-bsl/Makefile
 	@echo "[INFO] cc2538-bsl.py not found - fetching it from GitHub now"
-	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/cc2538-bsl
+	@CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/cc2538-bsl
 	@echo "[INFO] cc2538-bsl.py successfully fetched!"
 
 $(RIOTTOOLS)/edbg/edbg: $(RIOTTOOLS)/edbg/Makefile
