@@ -1,0 +1,4 @@
+using "$RIOTBASE/dist/tools/renode/repl/cpu/stm32f429.repl"
+using "$RIOTBASE/dist/tools/renode/repl/boards/stm32f4_discovery.repl"
+using "$RIOTBASE/dist/tools/renode/repl/boards/stm32f4_discovery-additional_gpios.repl"
+using "$RIOTBASE/dist/tools/renode/repl/boards/stm32f4_discovery-bb.repl"

@@ -6,11 +6,13 @@ using sysbus
 mach create
 machine LoadPlatformDescription @$RENODE_CPU_BIN_REPL
 
-emulation CreateServerSocketTerminal 3456 "term" False
-connector Connect sysbus.uart0 term
-
 macro reset
 """
     sysbus LoadELF $image_file
 """
 runMacro $reset
+
+emulation CreateServerSocketTerminal 3456 "term" False
+connector Connect sysbus.uart0 term
+
+start

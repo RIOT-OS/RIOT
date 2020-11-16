@@ -1,32 +1,23 @@
-mach create
-using sysbus
-machine LoadPlatformDescription @platforms/boards/stm32f4_discovery-kit.repl
+:name: STM32F4 Discovery
+:description: This script runs Contiki on STM32F4 Discovery.
 
-machine SetClockSource sysbus.cpu
+using sysbus
+$name?="STM32F4_Discovery"
+mach create $name
+machine LoadPlatformDescription @$RENODE_BOARD_BIN_REPL
+
 cpu PerformanceInMips 125
 
-# oscillator setup to toggle status bit based on requested clock.
-set RCC_CFGR
-"""
-if request.isWrite:
-    value = (request.value & ~(0x0C)) | ((request.value & 0x03) << 0x02)
-elif request.isRead:
-    request.value = value
-"""
+showAnalyzer sysbus.uart4
 
-machine PyDevFromString $RCC_CFGR 0x40023808 0x4 false "RCC_CFGR"
+### Set random board UNIQUE ID ###
 
-# show the UART output
-showAnalyzer uart2
-
-# generate a unique device id
 python "import _random"
 python "rand = _random.Random()"
 
 $id1 = `python "print rand.getrandbits(32)"`
 $id2 = `python "print rand.getrandbits(32)"`
 $id3 = `python "print rand.getrandbits(32)"`
-
 macro reset
 """
     sysbus LoadELF $image_file
@@ -37,4 +28,8 @@ macro reset
 """
 
 runMacro $reset
-start
+
+emulation CreateServerSocketTerminal 3456 "term"
+connector Connect sysbus.uart2 term
+
+machine StartGdbServer 3333 true

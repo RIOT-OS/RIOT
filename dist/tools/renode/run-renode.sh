@@ -51,6 +51,8 @@ fi
 # Default is to use $ELFFILE
 : ${IMAGE_FILE:=${ELFFILE}}
 
+echo $RENODE_CPU_BIN_REPL
+
 #
 # config test section.
 #
@@ -66,9 +68,11 @@ test_config() {
 # helper section.
 #
 write_cpu_repl() {
-    content=$(cat "$RENODE_CPU_REPL" | sed -e 's@$RIOTBASE@'"$RIOTBASE"'@g')
-    content=$(echo "$content" | sed -e 's@$RENODE_BOARD_BIN_REPL@'"$RENODE_BOARD_BIN_REPL"'@g')
-    echo "$content" > $RENODE_CPU_BIN_REPL
+    if [ -e $RENODE_CPU_REPL ]; then
+        content=$(cat "$RENODE_CPU_REPL" | sed -e 's@$RIOTBASE@'"$RIOTBASE"'@g')
+        content=$(echo "$content" | sed -e 's@$RENODE_BOARD_BIN_REPL@'"$RENODE_BOARD_BIN_REPL"'@g')
+        echo "$content" > $RENODE_CPU_BIN_REPL
+    fi
 }
 
 write_board_repl() {
