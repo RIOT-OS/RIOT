@@ -3,16 +3,24 @@
 #
 # Unified Renode script for RIOT
 #
-# This script is supposed to be called from RIOTs make system,
-# as it depends on certain environment variables.
+# This script is supposed to be called from RIOT's make system, as it depends
+# on certain environment variables.
+#
+# By default, it expects to find "dist/board.resc" in the board folder. This
+# file is the entry point for emulation.
 #
 # It will start the Renode emulator, providing it with several environment
 # variables:
-# $image_file          Full path to the image file (see $IMAGE_FILE below)
+# $BOARD               Selected board name
+# $CPU                 Selected CPU name
+# $ELFFILE             Full path to the image file
+# $RIOTBASE            Full path to RIOT-OS directory
+# $RIOTBOARD           Full path to board directory
+# $RIOTCPU             Full path to CPU directory
 #
 # Global environment variables used:
 # RENODE:              Renode command name, default: "renode"
-# RENODE_CONFIG:       Renode configuration file name,
+# RENODE_BOARD_CONFIG: Renode configuration file name,
 #                      default: "${BOARDSDIR}/${BOARD}/dist/board.resc"
 # RENODE_BIN_CONFIG:   Renode intermediate configuration file name,
 #                      default: "${BINDIR}/board.resc"
@@ -20,22 +28,19 @@
 # @author       Bas Stottelaar <basstottelaar@gmail.com>
 
 # Default path to Renode configuration file
-: ${RENODE_CONFIG:=${BOARDSDIR}/${BOARD}/dist/board.resc}
+: ${RENODE_BOARD_CONFIG:=${RIOTBOARD}/${BOARD}/dist/renode/board.resc}
 # Default path to Renode intermediate configuration file
-: ${RENODE_BIN_CONFIG:=${BINDIR}/board.resc}
+: ${RENODE_BIN_CONFIG:=${BINDIR}/renode.resc}
 # Default Renode command
 : ${RENODE:=renode}
-# Image file used for emulation
-# Default is to use $ELFFILE
-: ${IMAGE_FILE:=${ELFFILE}}
 
 #
 # config test section.
 #
 test_config() {
-    if [ ! -f "${RENODE_CONFIG}" ]; then
+    if [ ! -f "${RENODE_BOARD_CONFIG}" ]; then
         echo "Error: Unable to locate Renode board file"
-        echo "       (${RENODE_CONFIG})"
+        echo "       (${RENODE_BOARD_CONFIG})"
         exit 1
     fi
 }
@@ -44,8 +49,14 @@ test_config() {
 # helper section.
 #
 write_config() {
-    echo "\$image_file = '${IMAGE_FILE}'" > "${RENODE_BIN_CONFIG}"
-    echo "include @${RENODE_CONFIG}" >> "${RENODE_BIN_CONFIG}"
+    echo "# RIOT-OS variables for Renode emulation" > "${RENODE_BIN_CONFIG}"
+    echo "\$BOARD = '${BOARD}'" >> "${RENODE_BIN_CONFIG}"
+    echo "\$CPU = '${CPU}'" >> "${RENODE_BIN_CONFIG}"
+    echo "\$ELFFILE = @${ELFFILE}" >> "${RENODE_BIN_CONFIG}"
+    echo "\$RIOTBASE = @${RIOTBASE}" >> "${RENODE_BIN_CONFIG}"
+    echo "\$RIOTBOARD = @${RIOTBOARD}" >> "${RENODE_BIN_CONFIG}"
+    echo "\$RIOTCPU = @${RIOTCPU}" >> "${RENODE_BIN_CONFIG}"
+    echo "include @${RENODE_BOARD_CONFIG}" >> "${RENODE_BIN_CONFIG}"
 }
 
 #
