@@ -148,6 +148,15 @@ typedef enum {
      * @brief Multi-Rate Frequency Shift Keying PHY mode
      */
     IEEE802154_CAP_PHY_MR_FSK           = BIT17,
+    /**
+     * @brief the device supports source address match table.
+     *
+     * A Source Address Match table contains source addresses with pending
+     * data. When a coordinator device receives an IEEE 802.15.4 Data
+     * Request command from a child node, the Frame Pending bit of the ACK is
+     * set if the source address matches one from the table.
+     */
+    IEEE802154_CAP_SRC_ADDR_MATCH       = BIT18,
 } ieee802154_rf_caps_t;
 
 /**
@@ -287,6 +296,47 @@ typedef enum {
      */
     IEEE802154_RADIO_CONFIRM_CCA,
 } ieee802154_trx_ev_t;
+
+/**
+ * @brief Source Address Match commands.
+ */
+typedef enum {
+    /**
+     * @brief Enable or disable source address match.
+     *
+     * Enabling it sets the frame pending to all ACK frames in
+     * response to a Data Request command (if the radio doesn't
+     * support Source Address Matching) or to a specific address
+     * in the Source Address Matching table
+     */
+    IEEE802154_SRC_MATCH_EN,
+    /**
+     * @brief Add a short address to entry.
+     *
+     * This command should only be implemented if @ref IEEE802154_CAP_SRC_ADDR_MATCH
+     * is available.
+     */
+    IEEE802154_SRC_MATCH_SHORT_ADD,
+    /**
+     * @brief Clear short address from entry.
+     * This command should only be implemented if @ref IEEE802154_CAP_SRC_ADDR_MATCH
+     * is available.
+     */
+    IEEE802154_SRC_MATCH_SHORT_CLEAR,
+    /**
+     * @brief Add a extended address to entry.
+     * This command should only be implemented if @ref IEEE802154_CAP_SRC_ADDR_MATCH
+     * is available.
+     */
+    IEEE802154_SRC_MATCH_EXT_ADD,
+    /**
+     * @brief Clear extended address from entry.
+     *
+     * This command should only be implemented if @ref IEEE802154_CAP_SRC_ADDR_MATCH
+     * is available.
+     */
+    IEEE802154_SRC_MATCH_EXT_CLEAR,
+} ieee802154_src_match_t;
 
 /**
  * @brief CSMA-CA exponential backoff parameters.
@@ -568,6 +618,7 @@ struct ieee802154_radio_ops {
      * - @ref set_csma_params
      * - @ref set_rx_mode
      * - @ref set_hw_addr_filter
+     * - @ref config_src_addr_match
      * - @ref set_frame_retrans (if available)
      *
      * @param[in] dev IEEE802.15.4 device descriptor
@@ -765,6 +816,27 @@ struct ieee802154_radio_ops {
      * @return negative errno on error
      */
     int (*set_rx_mode)(ieee802154_dev_t *dev, ieee802154_rx_mode_t mode);
+
+    /**
+     * @brief Set the source address match configuration.
+     *
+     * This function configures the source address match filter in order to set
+     * the Frame Pending bit in ACK frames accordingly.
+     * In case the radio doesn't support @ref IEEE802154_CAP_SRC_ADDR_MATCH,
+     * this functions is used to activate the Frame Pending bit for all ACK
+     * frames (in order to be compliant with the IEEE 802.15.4 standard).
+     *
+     * @pre the device is on
+     *
+     * @param[in] dev IEEE802.15.4 device descriptor
+     * @param[in] cmd command for the source address match configuration
+     * @param[in] value value associated to @p cmd.
+     *
+     * @return 0 on success
+     * @return negative errno on error
+     */
+    int (*config_src_addr_match)(ieee802154_dev_t *dev, ieee802154_src_match_t cmd,
+                                 const void *value);
 };
 
 /**
@@ -879,6 +951,24 @@ static inline int ieee802154_radio_config_phy(ieee802154_dev_t *dev,
                                               const ieee802154_phy_conf_t *conf)
 {
     return dev->driver->config_phy(dev, conf);
+}
+
+/**
+ * @brief Shortcut to @ref ieee802154_radio_ops::config_src_addr_match
+ *
+ * @pre the device is on
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ * @param[in] cmd command for the source address match configuration
+ * @param[in] value value associated to @p cmd.
+ *
+ * @return  result of @ref ieee802154_radio_ops::config_src_addr_match
+ */
+static inline int ieee802154_radio_config_src_address_match(ieee802154_dev_t *dev,
+                                                            ieee802154_src_match_t cmd,
+                                                            const void *value)
+{
+    return dev->driver->config_src_addr_match(dev, cmd, value);
 }
 
 /**
