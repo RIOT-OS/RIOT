@@ -32,9 +32,11 @@
 #include "ata8510_internals.h"
 
 #define ENABLE_DEBUG (0)
-// Warning: to correctly display the debug messages in callbacks,
-// add CFLAGS+=-DTHREAD_STACKSIZE_IDLE=THREAD_STACKSIZE_DEFAULT to the build
-// command.
+/*
+ * Warning: to correctly display the debug messages in callbacks,
+ * add CFLAGS+=-DTHREAD_STACKSIZE_IDLE=THREAD_STACKSIZE_DEFAULT to the build
+ * command.
+ */
 #include "debug.h"
 
 #define SPIDEV               (dev->params.spi)
@@ -89,11 +91,11 @@ int ata8510_init(ata8510_t *dev, const ata8510_params_t *params)
 {
     int res;
 
-    // write config params to device descriptor
+    /* write config params to device descriptor */
     dev->params = *params;
     dev->receive_cb = NULL;
 
-    // Initialize pins
+    /* Initialize pins */
     if (gpio_init_int(INTPIN, GPIO_IN,
                       GPIO_FALLING, _irq_handler, dev) < 0) {
         DEBUG("[ata8510] ERROR: Interrupt pin not initialized\n");
@@ -110,7 +112,7 @@ int ata8510_init(ata8510_t *dev, const ata8510_params_t *params)
 
     ata8510_poweron(dev);
 
-    // Initialize SPI bus
+    /* Initialize SPI bus */
     if (spi_init_cs(dev->params.spi, CSPIN) < 0) {
         DEBUG("[ata8510] ERROR: SPI not initialized\n");
         return -ATA8510_ERR_SPI;
@@ -122,13 +124,13 @@ int ata8510_init(ata8510_t *dev, const ata8510_params_t *params)
         return -ATA8510_ERR_SIGNATURE;
     }
 
-    // Clear event line
+    /* Clear event line */
     ata8510_get_event_bytes(dev);
 
     dev->channel = ATA8510_CHANNEL_0;
     dev->service = ATA8510_SERVICE_0;
 
-    // _recv_thread will block on rx_lock until a frame arrives
+    /* _recv_thread will block on rx_lock until a frame arrives */
     mutex_lock(&(dev->rx_lock));
     res = thread_create(stack, sizeof(stack), THREAD_PRIORITY_MAIN - 1,
                         THREAD_CREATE_STACKTEST, _recv_thread, (void *)dev,
@@ -232,7 +234,7 @@ ata8510_system_mode_config_opm_t ata8510_set_mode(
             config->ser = dev->service;
             break;
         case ATA8510_MODE_RX_POLLING:
-            // service is used as startPollingIndex
+            /* service is used as startPollingIndex */
             config->ser = dev->service;
             break;
     }
@@ -310,7 +312,7 @@ void ata8510_send_frame(ata8510_t *dev, uint8_t *payload, uint8_t payload_len)
         ata8510_get_event_bytes(dev);
     }
 
-    // restore previous mode
+    /* restore previous mode */
     ata8510_get_event_bytes(dev);
     ata8510_set_mode(dev, ATA8510_MODE_IDLE);
     ata8510_set_mode(dev, mode);
@@ -365,7 +367,7 @@ static int _recv_frame(ata8510_t *dev, uint8_t *buffer, uint8_t buffer_len,
     uint8_t rssi_data[ATA8510_SFIFO_LENGTH];
 
     while (len > 0) {
-        // check RX FIFO
+        /* check RX FIFO */
         int fifo = _read_fill_level_rx_fifo(dev);
         if (fifo > 0) {
             n = (fifo <= len ? fifo : len);
@@ -374,7 +376,7 @@ static int _recv_frame(ata8510_t *dev, uint8_t *buffer, uint8_t buffer_len,
             ptr += n;
             len -= n;
         }
-        // check RSSI FIFO
+        /* check RSSI FIFO */
         fifo = _read_fill_level_rssi_fifo(dev);
         if (fifo > 0) {
             _read_rssi_fifo(dev, rssi_data, fifo);
@@ -387,7 +389,7 @@ static int _recv_frame(ata8510_t *dev, uint8_t *buffer, uint8_t buffer_len,
                 dev->rssi.len = sizeof(dev->rssi.data);
             }
         }
-        // if end of transfer, bail out
+        /* if end of transfer, bail out */
         if (dev->events.events.val.eota) {
             break;
         }
@@ -461,7 +463,7 @@ static void *_recv_thread(void *arg)
                         "packet discarded\n");
                     free(buffer);
                 }
-                // restore previous mode
+                /* restore previous mode */
                 ata8510_get_event_bytes(dev);
                 ata8510_set_mode(dev, ATA8510_MODE_IDLE);
                 ata8510_set_mode(dev, mode);

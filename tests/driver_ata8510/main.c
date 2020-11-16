@@ -35,7 +35,7 @@ static ata8510_t dev;
 #define ENABLE_DEBUG (0)
 #include "debug.h"
 
-// ----------------------------------------------------------------------------
+/* ---------------------------------------------------------------------------- */
 
 int cmd_onoff(int argc, char **argv)
 {
@@ -260,7 +260,7 @@ int main(void)
     }
     dev.receive_cb = recv;
 
-    // start the shell
+    /* start the shell */
     puts("Initialization OK, starting the shell now");
 
     char line_buf[255];
