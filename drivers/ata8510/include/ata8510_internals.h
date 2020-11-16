@@ -222,6 +222,12 @@ typedef struct {
 #define ATA8510_SRAM_PA_DAMPING     (0x02F4)
 /** @} */
 
+/**
+ * @brief delay to let the radio perform its initialization at poweron
+ * @{
+ */
+#define ATA8510_POWERON_DELAY 310
+
 #ifdef __cplusplus
 }
 #endif

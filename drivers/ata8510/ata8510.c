@@ -164,7 +164,7 @@ void ata8510_poweron(ata8510_t *dev)
     gpio_clear(RESETPIN);
     gpio_set(RESETPIN);
     gpio_clear(SLEEPPIN);
-    xtimer_usleep(310);
+    xtimer_usleep(ATA8510_POWERON_DELAY);
 }
 
 void ata8510_poweroff(ata8510_t *dev)
