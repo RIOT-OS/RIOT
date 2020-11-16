@@ -1,1 +1,1 @@
-USEMODULE += at24cxxx
+FEATURES_REQUIRED += periph_i2c
