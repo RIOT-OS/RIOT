@@ -5,8 +5,8 @@ TEST_ON_CI_WHITELIST += native
 USEPKG += libcose
 # By default we use hacl as crypto backend, uncomment to use a different
 # crypto backend.
-USEMODULE += libcose_crypt_hacl
-# USEMODULE += libcose_crypt_c25519
+# USEMODULE += libcose_crypt_hacl
+USEMODULE += libcose_crypt_c25519
 USEMODULE += memarray
 USEMODULE += embunit
 
