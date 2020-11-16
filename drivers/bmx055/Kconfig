@@ -1,9 +1,18 @@
 # Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
+config MODULE_BMX055
+    bool "BMX055 9-axis sensor"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+    default y if HAVE_BMX055 && MODULE_SAUL_DEFAULT
+
 menuconfig KCONFIG_USEMODULE_BMX055
     bool "Configure BMX055 driver"
     depends on USEMODULE_BMX055
@@ -40,3 +49,8 @@ config BMX055_GYRO_ADDR_DEFAULT
         Circuit (I²C)' in the datasheet.
 
 endif # KCONFIG_USEMODULE_BMX055
+
+config HAVE_BMX055
+    bool
+    help
+        Indicates that a BMX055 9-axis sensor is present.
