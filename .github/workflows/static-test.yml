@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - master
-    tags:
-      - '*'
   pull_request:
     branches:
       - '*'
@@ -20,12 +18,17 @@ jobs:
         # in master (default behavior in GH actions)
         # See https://github.com/actions/checkout#checkout-pull-request-head-commit-instead-of-merge-commit
         ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
     - name: Setup git
       run: |
-        git fetch origin master:master --no-tags
+        git fetch origin master:master_upstream --no-tags
         git config apply.whitespace nowarn
     - name: Fetch riot/riotbuild Docker image
       run: docker pull riot/riotbuild:latest
     - name: Run static-tests
       run: |
-        docker run --rm -v $(pwd):/data/riotbuild riot/riotbuild:latest make static-test
+        docker run --rm                     \
+          -e CI_BASE_BRANCH=master_upstream \
+          -v $(pwd):/data/riotbuild         \
+          riot/riotbuild:latest             \
+          make static-test
