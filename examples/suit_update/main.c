@@ -68,9 +68,10 @@ static void cb(void *arg)
 }
 #endif
 
-int main(void)
+static int cmd_print_riotboot_hdr(int argc, char **argv)
 {
-    puts("RIOT SUIT update example application");
+    (void)argc;
+    (void)argv;
 
     int current_slot = riotboot_slot_current();
     if (current_slot != -1) {
@@ -78,21 +79,48 @@ int main(void)
          * confuses the test script. As a workaround, just disable interrupts
          * for a while.
          */
-        irq_disable();
-        printf("running from slot %d\n", current_slot);
-        printf("slot start addr = %p\n", (void *)riotboot_slot_get_hdr(current_slot));
+        unsigned state = irq_disable();
         riotboot_slot_print_hdr(current_slot);
-        irq_enable();
+        irq_restore(state);
     }
     else {
         printf("[FAILED] You're not running riotboot\n");
     }
+    return 0;
+}
+
+static int cmd_print_current_slot(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    /* Sometimes, udhcp output messes up the following printfs.  That
+     * confuses the test script. As a workaround, just disable interrupts
+     * for a while.
+     */
+    unsigned state = irq_disable();
+    printf("Running from slot %d\n", riotboot_slot_current());
+    irq_restore(state);
+    return 0;
+}
+
+static const shell_command_t shell_commands[] = {
+    { "current-slot", "Print current slot number", cmd_print_current_slot },
+    { "riotboot-hdr", "Print current slot header", cmd_print_riotboot_hdr },
+    { NULL, NULL, NULL }
+};
+
+
+int main(void)
+{
+    puts("RIOT SUIT update example application");
 
 #if defined(MODULE_PERIPH_GPIO_IRQ) && defined(BTN0_PIN)
     /* initialize a button to manually trigger an update */
     gpio_init_int(BTN0_PIN, BTN0_MODE, GPIO_FALLING, cb, NULL);
 #endif
 
+    cmd_print_current_slot(0, NULL);
+    cmd_print_riotboot_hdr(0, NULL);
 
     /* start suit coap updater thread */
     suit_coap_run();
@@ -109,7 +137,7 @@ int main(void)
 
     puts("Starting the shell");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;
 }
