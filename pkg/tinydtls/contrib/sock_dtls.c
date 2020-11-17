@@ -488,6 +488,7 @@ static ssize_t _complete_handshake(sock_dtls_t *sock,
                                    const session_t *session)
 {
     memcpy(&remote->dtls_session, session, sizeof(remote->dtls_session));
+    _session_to_ep(&remote->dtls_session, &remote->ep);
 #ifdef SOCK_HAS_ASYNC
     if (sock->async_cb) {
         sock_async_flags_t flags = SOCK_ASYNC_CONN_RDY;
