@@ -572,10 +572,10 @@ static int cmd_test_config(int argc, char **argv)
     }
 
     /* write test data */
-    sam0_flashpage_aux_write_raw(dst, test_data, sizeof(test_data));
+    sam0_flashpage_aux_write(dst, test_data, sizeof(test_data));
 
     /* write single half-word */
-    sam0_flashpage_aux_write_raw(dst + sizeof(test_data), &single_data, sizeof(single_data));
+    sam0_flashpage_aux_write(dst + sizeof(test_data), &single_data, sizeof(single_data));
 
     /* check if half-word was written correctly */
     uint16_t data_in = *(uint16_t*)sam0_flashpage_aux_get(dst + sizeof(test_data));
