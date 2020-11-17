@@ -6,7 +6,7 @@
 #
 
 menu "STM32 clock configuration"
-    depends on CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L0 || CPU_FAM_L1 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
+    depends on CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_F0 || CPU_FAM_L0 || CPU_FAM_L1 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
 
 choice
 bool "Clock source selection"
@@ -47,11 +47,11 @@ endchoice
 
 endif  # CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
 
-if CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
 config CUSTOM_PLL_PARAMS
     bool "Configure PLL parameters"
     depends on USE_CLOCK_PLL
 
+if CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
 config CLOCK_PLL_M
     int "M: PLLIN division factor" if CUSTOM_PLL_PARAMS
     default 1 if CPU_FAM_G0
@@ -112,14 +112,28 @@ endif  # CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5
 
 endif  # CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
 
+if CPU_FAM_F0
+config CLOCK_PLL_PREDIV
+    int "PLLIN division factor" if CUSTOM_PLL_PARAMS && !CPU_LINE_STM32F031X6 && !CPU_LINE_STM32F042X6
+    default 2 if CPU_LINE_STM32F031X6 || CPU_LINE_STM32F042X6
+    default 1
+    range 1 16
+
+config CLOCK_PLL_MUL
+    int "PLLIN multiply factor" if CUSTOM_PLL_PARAMS
+    default 12 if CPU_LINE_STM32F031X6 || CPU_LINE_STM32F042X6
+    default 6
+    range 2 16
+endif
+
 if CPU_FAM_L0 || CPU_FAM_L1
 config CLOCK_PLL_DIV
-    int "Main PLL division factor" if USE_CLOCK_PLL
+    int "Main PLL division factor" if CUSTOM_PLL_PARAMS
     default 2
     range 2 4
 
 choice
-bool "Main PLL multiply factor" if USE_CLOCK_PLL
+bool "Main PLL multiply factor" if CUSTOM_PLL_PARAMS
 default PLL_MUL_4
 
 config PLL_MUL_3
