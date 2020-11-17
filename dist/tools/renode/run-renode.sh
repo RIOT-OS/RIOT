@@ -6,6 +6,8 @@
 # This script is supposed to be called from RIOT's make system, as it depends
 # on certain environment variables.
 #
+# The minimum supported version of Renode is V1.12.
+#
 # By default, it expects to find "dist/board.resc" in the board folder. This
 # file is the entry point for emulation.
 #
@@ -45,6 +47,26 @@ test_config() {
     fi
 }
 
+test_version() {
+    RENODE_MINIMUM_VERSION="1.12"
+
+    # Depends on https://github.com/renode/renode/issues/154
+    #RENODE_VERSION=$(${RENODE} --version > /dev/null)
+    RENODE_VERSION="1.12"
+
+    if [ $? -ne 0 ]; then
+        echo "Error: Renode appears not to be installed on your PATH"
+        exit 1
+    fi
+
+    "$RIOTTOOLS"/has_minimal_version/has_minimal_version.sh "$RENODE_VERSION" "$RENODE_MINIMUM_VERSION" 2> /dev/null
+
+    if [ $? -ne 0 ]; then
+        echo "Error: Renode V$RENODE_MINIMUM_VERSION is required, but V${RENODE_VERSION} is installed"
+        exit 1
+    fi
+}
+
 #
 # helper section.
 #
@@ -77,6 +99,7 @@ do_write() {
 
 do_start() {
     test_config
+    test_version
     write_config
     write_warning
     sh -c "${RENODE} '${RENODE_BIN_CONFIG}'"
