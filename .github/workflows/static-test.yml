@@ -1,0 +1,31 @@
+name: static-tests
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+
+jobs:
+  static-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        # Use the SHA of the PR branch as-is, not the PR branch merged
+        # in master (default behavior in GH actions)
+        # See https://github.com/actions/checkout#checkout-pull-request-head-commit-instead-of-merge-commit
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Setup git
+      run: |
+        git fetch origin master:master --no-tags
+        git config apply.whitespace nowarn
+    - name: Fetch riot/riotbuild Docker image
+      run: docker pull riot/riotbuild:latest
+    - name: Run static-tests
+      run: |
+        docker run --rm -v $(pwd):/data/riotbuild riot/riotbuild:latest make static-test
