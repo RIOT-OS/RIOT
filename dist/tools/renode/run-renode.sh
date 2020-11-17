@@ -59,6 +59,13 @@ write_config() {
     echo "include @${RENODE_BOARD_CONFIG}" >> "${RENODE_BIN_CONFIG}"
 }
 
+write_warning() {
+  echo "Note: The emulation experience depends on several factors, such as "
+  echo "the application, used peripherals and completeness of the "
+  echo "implementation of the target in Renode. Check the documentation of "
+  echo "Renode at https://renode.readthedocs.io/ for information."
+}
+
 #
 # now comes the actual actions
 #
@@ -71,6 +78,7 @@ do_write() {
 do_start() {
     test_config
     write_config
+    write_warning
     sh -c "${RENODE} '${RENODE_BIN_CONFIG}'"
 }
 
