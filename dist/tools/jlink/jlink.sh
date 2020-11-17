@@ -233,9 +233,9 @@ do_debug() {
 }
 
 do_debugserver() {
+    test_config
     test_version
     test_ports
-    test_config
     test_serial
     # start the J-Link GDB server
     sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
