@@ -239,7 +239,10 @@ char *thread_stack_init(thread_task_func_t task_func,
 void thread_stack_print(void)
 {
     int count = 0;
-    uint32_t *sp = (uint32_t *)thread_get_active()->sp;
+    /* The stack pointer will be aligned to word boundary by thread_create,
+     * which is 32 bit for all Cortex M MCUs. We can silence -Wcast-align here
+     */
+    uint32_t *sp = (uint32_t *)(uintptr_t)thread_get_active()->sp;
 
     printf("printing the current stack of thread %" PRIkernel_pid "\n",
            thread_getpid());
