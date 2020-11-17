@@ -12,7 +12,6 @@ ifneq (,$(filter periph_rtt,$(FEATURES_USED)))
   USEMODULE += ztimer_periph_rtt
 endif
 
-USEMODULE += netif
 USEMODULE += lora
 
 ifneq (,$(filter gnrc,$(USEMODULE)))
