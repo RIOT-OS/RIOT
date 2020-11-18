@@ -142,12 +142,12 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     uint8_t *top_of_stack;
     uint8_t *sp;
 
-    top_of_stack = (uint8_t*)((uint32_t)stack_start + stack_size - 1);
+    top_of_stack = (uint8_t*)((uintptr_t)stack_start + stack_size - 1);
 
     /* BEGIN - code from FreeRTOS port for Xtensa from Cadence */
 
     /* Create interrupt stack frame aligned to 16 byte boundary */
-    sp = (uint8_t*)(((uint32_t)(top_of_stack + 1) - XT_STK_FRMSZ - XT_CP_SIZE) & ~0xf);
+    sp = (uint8_t*)(((uintptr_t)(top_of_stack + 1) - XT_STK_FRMSZ - XT_CP_SIZE) & ~0xf);
 
     /* Clear whole stack with a known value to assist debugging */
     #if !defined(DEVELHELP) && !defined(SCHED_TEST_STACK)
@@ -160,7 +160,9 @@ char* thread_stack_init(thread_task_func_t task_func, void *arg, void *stack_sta
     /* ensure that stack is big enough */
     assert (sp > (uint8_t*)stack_start);
 
-    XtExcFrame* exc_frame = (XtExcFrame*)sp;
+    /* sp is aligned to 16 byte boundary, so cast is safe here. Use an
+     * intermediate cast to uintptr_t to silence -Wcast-align false positive */
+    XtExcFrame* exc_frame = (XtExcFrame*)(uintptr_t)sp;
 
     /* Explicitly initialize certain saved registers for call0 ABI */
     exc_frame->pc   = (uint32_t)task_func;         /* task entry point */
@@ -344,9 +346,11 @@ void thread_isr_stack_init(void)
     register uint32_t *sp __asm__ ("a1");
 #endif /* MCU_ESP32 */
 
-    /* assign each int of the stack the value of it's address */
-    uintptr_t *stackmax = (uintptr_t *)sp;
-    uintptr_t *stackp = (uintptr_t *)&port_IntStack;
+    /* assign each int of the stack the value of it's address. We can safely
+     * cast, as stack is aligned. Use an intermediate cast to uintptr_t to
+     * silence -Wcast-align false positive */
+    uintptr_t *stackmax = (uintptr_t *)(uintptr_t)sp;
+    uintptr_t *stackp = (uintptr_t *)(uintptr_t)&port_IntStack;
 
     while (stackp < stackmax) {
         *stackp = (uintptr_t) stackp;
