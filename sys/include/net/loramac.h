@@ -41,8 +41,8 @@ extern "C" {
  *
  *          8 bytes key, required for join procedure
  */
-#ifndef LORAMAC_DEV_EUI_DEFAULT
-#define LORAMAC_DEV_EUI_DEFAULT         "0000000000000000"
+#ifndef CONFIG_LORAMAC_DEV_EUI_DEFAULT
+#define CONFIG_LORAMAC_DEV_EUI_DEFAULT          "0000000000000000"
 #endif
 
 /**
