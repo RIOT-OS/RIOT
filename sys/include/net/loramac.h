@@ -42,8 +42,7 @@ extern "C" {
  *          8 bytes key, required for join procedure
  */
 #ifndef LORAMAC_DEV_EUI_DEFAULT
-#define LORAMAC_DEV_EUI_DEFAULT        { 0x00, 0x00, 0x00, 0x00, \
-                                         0x00, 0x00, 0x00, 0x00 }
+#define LORAMAC_DEV_EUI_DEFAULT         "0000000000000000"
 #endif
 
 /**
@@ -52,8 +51,7 @@ extern "C" {
  *          8 bytes key, required for join procedure
  */
 #ifndef LORAMAC_APP_EUI_DEFAULT
-#define LORAMAC_APP_EUI_DEFAULT        { 0x00, 0x00, 0x00, 0x00, \
-                                         0x00, 0x00, 0x00, 0x00 }
+#define LORAMAC_APP_EUI_DEFAULT         "0000000000000000"
 #endif
 
 /**
@@ -62,10 +60,7 @@ extern "C" {
  *          16 bytes key, required for join procedure
  */
 #ifndef LORAMAC_APP_KEY_DEFAULT
-#define LORAMAC_APP_KEY_DEFAULT        { 0x00, 0x00, 0x00, 0x00, \
-                                         0x00, 0x00, 0x00, 0x00, \
-                                         0x00, 0x00, 0x00, 0x00, \
-                                         0x00, 0x00, 0x00, 0x00 }
+#define LORAMAC_APP_KEY_DEFAULT         "00000000000000000000000000000000"
 #endif
 
 /**
@@ -74,10 +69,7 @@ extern "C" {
  *          16 bytes key, only required for ABP join procedure type
  */
 #ifndef LORAMAC_APP_SKEY_DEFAULT
-#define LORAMAC_APP_SKEY_DEFAULT       { 0x00, 0x00, 0x00, 0x00, \
-                                         0x00, 0x00, 0x00, 0x00, \
-                                         0x00, 0x00, 0x00, 0x00, \
-                                         0x00, 0x00, 0x00, 0x00 }
+#define LORAMAC_APP_SKEY_DEFAULT        "00000000000000000000000000000000"
 #endif
 
 /**
@@ -86,17 +78,14 @@ extern "C" {
  *          16 bytes key, only required for ABP join procedure type.
  */
 #ifndef LORAMAC_NWK_SKEY_DEFAULT
-#define LORAMAC_NWK_SKEY_DEFAULT       { 0x00, 0x00, 0x00, 0x00, \
-                                         0x00, 0x00, 0x00, 0x00, \
-                                         0x00, 0x00, 0x00, 0x00, \
-                                         0x00, 0x00, 0x00, 0x00 }
+#define LORAMAC_NWK_SKEY_DEFAULT        "00000000000000000000000000000000"
 #endif
 
 /**
  * @brief   Default device address
  */
 #ifndef LORAMAC_DEV_ADDR_DEFAULT
-#define LORAMAC_DEV_ADDR_DEFAULT       { 0x00, 0x00, 0x00, 0x00 }
+#define LORAMAC_DEV_ADDR_DEFAULT        "00000000"
 #endif
 /** @} */
 
