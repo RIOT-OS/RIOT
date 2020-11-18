@@ -115,15 +115,7 @@ config MODULE_PERIPH_INIT_QDEC
     default y if MODULE_PERIPH_INIT
     depends on MODULE_PERIPH_QDEC
 
-config MODULE_PERIPH_RTC
-    bool "RTC peripheral driver"
-    depends on HAS_PERIPH_RTC
-    select MODULE_PERIPH_COMMON
-
-config MODULE_PERIPH_INIT_RTC
-    bool "Auto initialize RTC peripheral"
-    default y if MODULE_PERIPH_INIT
-    depends on MODULE_PERIPH_RTC
+rsource "Kconfig.rtc"
 
 config MODULE_PERIPH_RTT
     bool "RTT peripheral driver"

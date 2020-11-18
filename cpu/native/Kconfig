@@ -19,6 +19,9 @@ config CPU_ARCH_NATIVE
     select HAS_PERIPH_PWM
     select HAS_SSP
 
+    # needed modules
+    select MODULE_PERIPH if TEST_KCONFIG
+
 config CPU_CORE_NATIVE
     bool
     select CPU_ARCH_NATIVE
@@ -74,3 +77,12 @@ config CPU_MODEL
 
 config CPU
     default "native" if CPU_MODEL_NATIVE
+
+menu "Native modules"
+    depends on CPU_ARCH_NATIVE
+
+rsource "backtrace/Kconfig"
+
+endmenu # Native modules
+
+rsource "periph/Kconfig"
