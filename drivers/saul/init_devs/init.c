@@ -95,6 +95,10 @@ void saul_init_devs(void)
         extern void auto_init_ds75lx(void);
         auto_init_ds75lx();
     }
+    if (IS_USED(MODULE_EFM32_CORETEMP)) {
+        extern void auto_init_efm32_coretemp(void);
+        auto_init_efm32_coretemp();
+    }
     if (IS_USED(MODULE_FXOS8700)) {
         extern void auto_init_fxos8700(void);
         auto_init_fxos8700();
