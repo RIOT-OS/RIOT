@@ -339,6 +339,16 @@ typedef enum {
 } ieee802154_src_match_t;
 
 /**
+ * @brief Address filter command
+ */
+typedef enum {
+    IEEE802154_AF_SHORT_ADDR, /**< Set short IEEE 802.15.4 address (network_uint16_t) */
+    IEEE802154_AF_EXT_ADDR,   /**< Set extended IEEE 802.15.4 address (eui64_t) */
+    IEEE802154_AF_PANID,      /**< Set PAN ID (uint16_t) */
+    IEEE802154_AF_PAN_COORD,  /**< Set device as PAN coordinator (bool) */
+} ieee802154_af_cmd_t;
+
+/**
  * @brief Frame Filter mode
  */
 typedef enum {
@@ -645,6 +655,7 @@ struct ieee802154_radio_ops {
      * - @ref set_cca_threshold
      * - @ref set_cca_mode
      * - @ref config_phy
+     * - @ref config_addr_filter
      * - @ref set_csma_params
      * - @ref set_rx_mode
      * - @ref set_hw_addr_filter
@@ -862,6 +873,23 @@ struct ieee802154_radio_ops {
     int (*set_frame_filter_mode)(ieee802154_dev_t *dev, ieee802154_filter_mode_t mode);
 
     /**
+     * @brief Configure the address filter.
+     *
+     * This functions is used for configuring the address filter parameters
+     * required by the IEEE 802.15.4 standard.
+     *
+     * @pre the device is on
+     *
+     * @param[in] dev IEEE802.15.4 device descriptor
+     * @param[in] cmd command for the address filter
+     * @param[in] value value for @p cmd.
+     *
+     * @return 0 on success
+     * @return negative errno on error
+     */
+    int (*config_addr_filter)(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, const void *value);
+
+    /**
      * @brief Set the source address match configuration.
      *
      * This function configures the source address match filter in order to set
@@ -1049,6 +1077,24 @@ static inline int ieee802154_radio_set_hw_addr_filter(ieee802154_dev_t *dev,
                                                       const uint16_t *pan_id)
 {
     return dev->driver->set_hw_addr_filter(dev, short_addr, ext_addr, pan_id);
+}
+
+/**
+ * @brief Shortcut to @ref ieee802154_radio_ops::config_addr_filter
+ *
+ * @pre the device is on
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ * @param[in] cmd command for the address filter
+ * @param[in] value value for @p cmd.
+ *
+ * @return result of @ref ieee802154_radio_ops::config_addr_filter
+ */
+static inline int ieee802154_radio_config_addr_filter(ieee802154_dev_t *dev,
+                                                  ieee802154_af_cmd_t cmd,
+                                                  const void* value)
+{
+    return dev->driver->config_addr_filter(dev, cmd, value);
 }
 
 /**
