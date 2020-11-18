@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2019 Mesotic SAS
- *               2020 Gunar Schorcht
+ * Copyright (C) 2020 OVGU Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -8,147 +7,74 @@
  */
 
 /**
- * @ingroup     drivers_bme680
+ * @ingroup     drivers_BME680
  * @{
- * @file
- * @brief       Bosch BME680 sensor driver implementation
  *
- * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
- * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @file
+ * @brief       Device driver implementation for the BME680
+ *
+ * @author      Jana Eisoldt <jana.eisoldt@ovgu.de>
+ *
  * @}
  */
 
-#include <assert.h>
-
 #include "bme680.h"
-#include "bme680_hal.h"
 #include "bme680_params.h"
-
-#include "log.h"
-
-#ifdef MODULE_BME680_I2C
+#include "bme680_internals.h"
 #include "periph/i2c.h"
-#endif
 
-#ifdef MODULE_BME680_SPI
-#include "periph/spi.h"
-#endif
-
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG 1
 #include "debug.h"
 
-unsigned int bme680_devs_numof = 0;
-
-bme680_t *bme680_devs[BME680_NUMOF] = { };
+#define DEV_ADDR    (dev->params.i2c_addr)
+#define DEV_I2C     (dev->params.i2c_dev)
 
 int bme680_init(bme680_t *dev, const bme680_params_t *params)
 {
-    int8_t ret;
+    assert(dev && params);
+    dev->params = *params;
+    
+    /*Acquire exclusive access */
+    i2c_acquire(DEV_I2C);
 
-    assert(bme680_devs_numof < BME680_NUMOF);
-    assert(dev);
+    uint8_t id = 0;
+    printf("aquired\n");
 
-    bme680_devs[bme680_devs_numof] = dev;
-    BME680_SENSOR(dev).dev_id = bme680_devs_numof++;
+    if (i2c_write_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_RESET, BME680_RESET, 0) < 0){
+        DEBUG("[bme680] error writing reset register\n");
+        /* Release I2C device */
+        i2c_release(DEV_I2C);
 
-    /* store interface parameters in the device for the HAL functions */
-    dev->intf = params->intf;
-
-    /* Select device interface and apply needed params */
-    if (params->ifsel == BME680_I2C_INTF) {
-#ifdef MODULE_BME680_I2C
-        BME680_SENSOR(dev).intf = BME680_I2C_INTF;
-        BME680_SENSOR(dev).read = bme680_i2c_read_hal;
-        BME680_SENSOR(dev).write = bme680_i2c_write_hal;
-#else
-        LOG_ERROR("[bme680]: module bme680_i2c not enabled\n");
-        return BME680_NO_DEV;
-#endif
-    }
-    else {
-#ifdef MODULE_BME680_SPI
-        BME680_SENSOR(dev).intf = BME680_SPI_INTF;
-        BME680_SENSOR(dev).read = bme680_spi_read_hal;
-        BME680_SENSOR(dev).write = bme680_spi_write_hal;
-        spi_init_cs(SPI_DEV(0), params->intf.spi.nss_pin);
-#else
-        LOG_ERROR("[bme680]: module bme680_spi not enabled\n");
-        return BME680_NO_DEV;
-#endif
+        return -BME680_ERR_I2C;
     }
 
-    BME680_SENSOR(dev).delay_ms = bme680_ms_sleep;
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_CHIP_ID, &id, 0) < 0){
+        DEBUG("[bme680] error reading chip id register\n");
+        /* Release I2C device */
+        i2c_release(DEV_I2C);
 
-    /* call internal bme680_init from Bosch Sensortech driver */
-    ret = bme680_init_internal(&BME680_SENSOR(dev));
-    if (ret != 0) {
-        DEBUG("[bme680]: Failed to get ID\n");
-        return ret;
+        return -BME680_ERR_I2C;
     }
 
-    /*  retrieve params and set them in bme680_t */
-    BME680_SENSOR(dev).tph_sett.os_temp = params->temp_os;
-    BME680_SENSOR(dev).tph_sett.os_hum = params->hum_os;
-    BME680_SENSOR(dev).tph_sett.os_pres = params->pres_os;
+    /* set oversampling mode do it in one write command */
+    i2c_write_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_CTRL_HUM, params->temp_oversampling, 0); 
+    i2c_write_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_CTRL_MEAS, params->temp_oversampling, 0); 
+    i2c_write_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_CTRL_MEAS, params->pres_oversampling, 0);
 
-    BME680_SENSOR(dev).tph_sett.filter = params->filter;
+    /* set gas sensor hot plate temperature set-point and heating duration */
+    i2c_write_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_CTRL_GAS, params->gas_heating_time, 0);
+    i2c_write_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_CTRL_GAS, params->gas_heating_temp, 0);
+    
+    i2c_write_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_CTRL_GAS, run_gas, 0);
 
-    /* Enable gas measurement if needed */
-    BME680_SENSOR(dev).gas_sett.run_gas = params->gas_measure;
-    /* Create a ramp heat waveform in 3 steps */
-    BME680_SENSOR(dev).gas_sett.heatr_temp = params->heater_temp;
-    BME680_SENSOR(dev).gas_sett.heatr_dur = params->heater_dur;
-
-    /* Select the intended power mode */
-    /* Must be set before writing the sensor configuration */
-    BME680_SENSOR(dev).power_mode = BME680_FORCED_MODE;
-
-    /* Set the desired sensor configuration */
-    ret = bme680_set_sensor_settings(params->settings, &BME680_SENSOR(dev));
-    if (ret != 0) {
-        DEBUG("[bme680]: failed to set settings\n");
-    }
-
-    return ret;
+    i2c_release(DEV_I2C);
+    return 0;
 }
 
-int bme680_force_measurement(bme680_t *dev)
+int16_t bme680_read_tphg(const bme680_t *dev)
 {
-    assert(dev);
-    BME680_SENSOR(dev).power_mode = BME680_FORCED_MODE;
-    return bme680_set_sensor_mode(&BME680_SENSOR(dev));
-}
-
-int bme680_get_duration(bme680_t* dev)
-{
-    assert(dev);
-
-    uint16_t duration;
-    bme680_get_profile_dur(&duration, &BME680_SENSOR(dev));
-    return duration;
-}
-
-int bme680_get_data(bme680_t* dev, bme680_field_data_t *data)
-{
-    assert(dev);
-
-    int8_t res;
-    if ((res = bme680_get_sensor_data(data, &BME680_SENSOR(dev))) == 0) {
-        return BME680_OK;
-    }
-
-    DEBUG("[bme680]: reading data failed with reason %d\n", res);
-
-    if (res == BME680_W_NO_NEW_DATA) {
-        return BME680_NO_NEW_DATA;
-    }
-    return res;
-}
-
-int bme680_set_ambient_temp(bme680_t* dev, int8_t temp)
-{
-    assert(dev);
-
-    BME680_SENSOR(dev).amb_temp = temp;
-    return bme680_set_sensor_settings(BME680_GAS_MEAS_SEL, &BME680_SENSOR(dev));
+    /* set forced mode */
+    if (dev)
+    i2c_write_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_CTRL_MEAS, BME680_FORCED_MODE, 0);
+    return 0;
 }
