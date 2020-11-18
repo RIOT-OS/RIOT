@@ -7,13 +7,22 @@
  */
 
 /**
- * @ingroup     tests
+ * @defgroup    sys_atomic_utils_volatile   Helpers for volatile accesses
+ * @ingroup     sys_atomic_utils
  * @{
  *
  * @file
  * @brief       Utility functions for non-atomic but volatile access
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
  *
+ * This functions intentionally have the same signature as the
+ * @ref sys_atomic_utils but don't guarantee atomic access and sequential
+ * consistency (or any other consistency). They basically only guarantee that
+ * no compiler optimization is applied to that operation and that the compiler
+ * will not reorder these operations in regard to each other or other `volatile`
+ * accesses.
+ *
+ * @warning     In most cases using this over @ref sys_atomic_utils is a bug!
  */
 
 #ifndef VOLATILE_UTILS_H
@@ -70,21 +79,21 @@ static inline uint64_t volatile_load_u64(const volatile uint64_t *var)
 static inline void volatile_store_u8(volatile uint8_t *dest, uint8_t val)
 {
     *dest = val;
+}
 /**
  * @brief   Store a 16 bit value completely unoptimized
  * @param   dest    Address to write the given value unoptimized to
  * @param   val     Value to write unoptimized
  */
-}
 static inline void volatile_store_u16(volatile uint16_t *dest, uint16_t val)
 {
     *dest = val;
+}
 /**
  * @brief   Store a 32 bit value completely unoptimized
  * @param   dest    Address to write the given value unoptimized to
  * @param   val     Value to write unoptimized
  */
-}
 static inline void volatile_store_u32(volatile uint32_t *dest, uint32_t val)
 {
     *dest = val;
