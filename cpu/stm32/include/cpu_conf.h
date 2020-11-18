@@ -21,6 +21,7 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+#include <stdint.h>
 #include "cpu_conf_common.h"
 
 #if defined(CPU_LINE_STM32F030x4)
@@ -124,10 +125,13 @@ extern "C" {
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
     defined(CPU_FAM_STM32L5)
 #define FLASHPAGE_WRITE_BLOCK_SIZE      (8U)
+typedef uint64_t stm32_flashpage_block_t;
 #elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 #define FLASHPAGE_WRITE_BLOCK_SIZE      (4U)
+typedef uint32_t stm32_flashpage_block_t;
 #else
 #define FLASHPAGE_WRITE_BLOCK_SIZE      (2U)
+typedef uint16_t stm32_flashpage_block_t;
 #endif
 
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
