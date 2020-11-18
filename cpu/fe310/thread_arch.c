@@ -91,10 +91,10 @@ char *thread_stack_init(thread_task_func_t task_func,
     *stk_top = STACK_MARKER;
 
     /* per ABI align stack pointer to 16 byte boundary. */
-    stk_top = (uint32_t *)(((uint32_t)stk_top) & ~((uint32_t)0xf));
+    stk_top = (uint32_t *)(((uintptr_t)stk_top) & ~((uintptr_t)0xf));
 
     /* reserve space for the stack frame. */
-    stk_top = (uint32_t *)((uint8_t *) stk_top - sizeof(*sf));
+    stk_top = (uint32_t *)((uintptr_t)stk_top - sizeof(*sf));
 
     /* populate the stack frame with default values for starting the thread. */
     sf = (struct context_switch_frame *) stk_top;
@@ -120,7 +120,10 @@ void thread_print_stack(void)
         return;
     }
 
-    uint32_t *sp = (uint32_t *)active_thread->sp;
+    /* thread_init aligns stack pointer to 16 byte boundary, the cast below
+     * is therefore safe. Use intermediate cast to uintptr_t to silence
+     * -Wcast-align */
+    uint32_t *sp = (uint32_t *)(uintptr_t)active_thread->sp;
 
     printf("printing the current stack of thread %" PRIkernel_pid "\n",
            thread_getpid());
