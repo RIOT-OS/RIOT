@@ -44,3 +44,6 @@ endif
 ifneq (,$(filter cortexm_mpu,$(FEATURES_USED)))
   USEMODULE += mpu_stack_guard
 endif
+
+# use efm32_coretemp if the feature is used
+USEMODULE += $(filter efm32_coretemp, $(FEATURES_USED))
