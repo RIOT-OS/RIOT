@@ -658,7 +658,6 @@ struct ieee802154_radio_ops {
      * - @ref config_addr_filter
      * - @ref set_csma_params
      * - @ref set_rx_mode
-     * - @ref set_hw_addr_filter
      * - @ref set_frame_filter_mode
      * - @ref config_src_addr_match
      * - @ref set_frame_retrans (if available)
@@ -790,26 +789,6 @@ struct ieee802154_radio_ops {
      * @return <0       error, return value is negative errno indicating the cause.
      */
     int (*config_phy)(ieee802154_dev_t *dev, const ieee802154_phy_conf_t *conf);
-
-    /**
-     * @brief Set IEEE802.15.4 addresses in hardware address filter
-     *
-     * @pre the device is on
-     *
-     * @param[in] dev IEEE802.15.4 device descriptor
-     * @param[in] short_addr the IEEE802.15.4 short address. If NULL, the short
-     *            address is not altered..
-     * @param[in] ext_addr the IEEE802.15.4 extended address (Network Byte Order).
-     *            If NULL, the extended address is not altered.
-     * @param[in] pan_id the IEEE802.15.4 PAN ID. If NULL, the PAN ID is not altered.
-     *
-     * @return 0 on success
-     * @return negative errno on error
-     */
-    int (*set_hw_addr_filter)(ieee802154_dev_t *dev,
-                              const network_uint16_t *short_addr,
-                              const eui64_t *ext_addr,
-                              const uint16_t *pan_id);
 
     /**
      * @brief Set number of frame retransmissions
@@ -1055,28 +1034,6 @@ static inline int ieee802154_radio_config_src_address_match(ieee802154_dev_t *de
 static inline int ieee802154_radio_off(ieee802154_dev_t *dev)
 {
     return dev->driver->off(dev);
-}
-
-/**
- * @brief Shortcut to @ref ieee802154_radio_ops::set_hw_addr_filter
- *
- * @pre the device is on
- *
- * @param[in] dev IEEE802.15.4 device descriptor
- * @param[in] short_addr the IEEE802.15.4 short address. If NULL, the short
- *            address is not altered..
- * @param[in] ext_addr the IEEE802.15.4 extended address (Network Byte Order).
- *            If NULL, the extended address is not altered.
- * @param[in] pan_id the IEEE802.15.4 PAN ID. If NULL, the PAN ID is not altered.
- *
- * @return result of @ref ieee802154_radio_ops::set_hw_addr_filter
- */
-static inline int ieee802154_radio_set_hw_addr_filter(ieee802154_dev_t *dev,
-                                                      const network_uint16_t *short_addr,
-                                                      const eui64_t *ext_addr,
-                                                      const uint16_t *pan_id)
-{
-    return dev->driver->set_hw_addr_filter(dev, short_addr, ext_addr, pan_id);
 }
 
 /**

@@ -71,9 +71,12 @@ void _idmanager_addr_override(void)
 
     /* Set all IEEE addresses */
     uint16_t panid = OPENWSN_PANID;
-    ieee802154_radio_set_hw_addr_filter(openwsn_radio.dev, &short_addr,
-                                        &eui64, &panid);
-
+    ieee802154_radio_config_addr_filter(openwsn_radio.dev, IEEE802154_AF_SHORT_ADDR,
+                                        &short_addr);
+    ieee802154_radio_config_addr_filter(openwsn_radio.dev, IEEE802154_AF_EXT_ADDR,
+                                        &eui64);
+    ieee802154_radio_config_addr_filter(openwsn_radio.dev, IEEE802154_AF_PANID,
+                                        &panid);
 }
 
 static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)

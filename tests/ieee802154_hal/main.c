@@ -246,7 +246,12 @@ static int _init(void)
 
     uint16_t panid = CONFIG_IEEE802154_DEFAULT_PANID;
     /* Set all IEEE addresses */
-    ieee802154_radio_set_hw_addr_filter(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), &short_addr, &ext_addr, &panid);
+    ieee802154_radio_config_addr_filter(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID),
+                                        IEEE802154_AF_SHORT_ADDR, &short_addr);
+    ieee802154_radio_config_addr_filter(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID),
+                                        IEEE802154_AF_EXT_ADDR, &ext_addr);
+    ieee802154_radio_config_addr_filter(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID),
+                                        IEEE802154_AF_PANID, &panid);
 
     /* Set PHY configuration */
     ieee802154_phy_conf_t conf = {.channel=CONFIG_IEEE802154_DEFAULT_CHANNEL, .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE, .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER};

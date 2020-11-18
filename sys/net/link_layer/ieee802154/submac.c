@@ -363,12 +363,10 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     /* If the radio is still not in TRX_OFF state, spin */
     while (ieee802154_radio_confirm_on(dev) == -EAGAIN) {}
 
-    /* Enable Auto ACK */
-    ieee802154_radio_set_rx_mode(dev, IEEE802154_RX_AACK_ENABLED);
-
     /* Configure address filter */
-    ieee802154_radio_set_hw_addr_filter(dev, &submac->short_addr,
-                                        &submac->ext_addr, &submac->panid);
+    ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_SHORT_ADDR, &submac->short_addr);
+    ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_EXT_ADDR, &submac->ext_addr);
+    ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_PANID, &submac->panid);
 
     /* Configure PHY settings (mode, channel, TX power) */
     ieee802154_phy_conf_t conf =
