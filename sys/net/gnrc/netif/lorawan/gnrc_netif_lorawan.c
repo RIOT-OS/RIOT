@@ -212,7 +212,7 @@ static void _init(gnrc_netif_t *netif)
     fmt_hex_bytes(_appskey, LORAMAC_APP_SKEY_DEFAULT);
     fmt_hex_bytes(_appkey, LORAMAC_APP_KEY_DEFAULT);
     fmt_hex_bytes(_deveui, CONFIG_LORAMAC_DEV_EUI_DEFAULT);
-    fmt_hex_bytes(_appeui, LORAMAC_APP_EUI_DEFAULT);
+    fmt_hex_bytes(_appeui, CONFIG_LORAMAC_APP_EUI_DEFAULT);
     fmt_hex_bytes(_devaddr, LORAMAC_DEV_ADDR_DEFAULT);
 
     /* Initialize default keys, address and EUIs */
