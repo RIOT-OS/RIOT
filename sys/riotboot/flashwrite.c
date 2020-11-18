@@ -151,7 +151,7 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
 }
 
 int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
-                               const uint8_t *bytes, size_t len)
+                                   const uint8_t *bytes, size_t len)
 {
     assert(len <= FLASHPAGE_SIZE);
 
@@ -179,7 +179,7 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
         LOG_INFO(LOG_PREFIX "riotboot flashing completed successfully\n");
     }
     else {
-        LOG_WARNING(LOG_PREFIX "re-flashing first block failed!\n");
+        LOG_ERROR(LOG_PREFIX "re-flashing first block failed!\n");
         return -1;
     }
 #endif /* !CONFIG_RIOTBOOT_FLASHWRITE_RAW */
