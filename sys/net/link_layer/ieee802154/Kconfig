@@ -82,6 +82,9 @@ if KCONFIG_USEMODULE_IEEE802154
     config IEEE802154_DEFAULT_CSMA_CA_MAX
         int "IEEE802.15.4 default CSMA-CA maximum backoff exponent"
         default 5
+    config IEEE802154_AUTO_ACK_DISABLE
+        bool "Disable Auto ACK support" if !USEPKG_OPENWSN
+        default y if USEPKG_OPENWSN
 
 menuconfig KCONFIG_USEMODULE_IEEE802154_SECURITY
     bool "Configure IEEE802.15.4 Security"
