@@ -20,6 +20,7 @@ endmenu # Actuator Device Drivers
 menu "Miscellaneous Device Drivers"
 rsource "at/Kconfig"
 rsource "at24mac/Kconfig"
+rsource "disp_dev/Kconfig"
 rsource "edbg_eui/Kconfig"
 rsource "hd44780/Kconfig"
 rsource "ili9341/Kconfig"
