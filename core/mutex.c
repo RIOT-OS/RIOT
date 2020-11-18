@@ -33,21 +33,20 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-int mutex_lock(mutex_t *mutex)
+/**
+ * @brief   Block waiting for a locked mutex
+ * @pre     IRQs are disabled
+ * @post    IRQs are restored to @p irq_state
+ * @post    The calling thread is no longer waiting for the mutex, either
+ *          because it got the mutex, or because the operation was cancelled
+ *          (only possible for @ref mutex_lock_cancelable)
+ *
+ * Most applications don't use @ref mutex_lock_cancelable. Inlining this
+ * function into both @ref mutex_lock and @ref mutex_lock_cancelable is,
+ * therefore, beneficial for the majority of applications.
+ */
+static inline __attribute__((always_inline)) void _block(mutex_t *mutex, unsigned irq_state)
 {
-    unsigned irq_state = irq_disable();
-
-    DEBUG("PID[%" PRIkernel_pid "] mutex_lock().\n", thread_getpid());
-
-    if (mutex->queue.next == NULL) {
-        /* mutex is unlocked. */
-        mutex->queue.next = MUTEX_LOCKED;
-        DEBUG("PID[%" PRIkernel_pid "] mutex_lock(): early out.\n",
-              thread_getpid());
-        irq_restore(irq_state);
-        return 0;
-    }
-
     thread_t *me = thread_get_active();
     DEBUG("PID[%" PRIkernel_pid "] mutex_lock() Adding node to mutex queue: "
           "prio: %" PRIu32 "\n", thread_getpid(), (uint32_t)me->priority);
@@ -60,11 +59,27 @@ int mutex_lock(mutex_t *mutex)
         thread_add_to_list(&mutex->queue, me);
     }
 
-
     irq_restore(irq_state);
     thread_yield_higher();
     /* We were woken up by scheduler. Waker removed us from queue. */
-    return 0;
+}
+
+void mutex_lock(mutex_t *mutex)
+{
+    unsigned irq_state = irq_disable();
+
+    DEBUG("PID[%" PRIkernel_pid "] mutex_lock().\n", thread_getpid());
+
+    if (mutex->queue.next == NULL) {
+        /* mutex is unlocked. */
+        mutex->queue.next = MUTEX_LOCKED;
+        DEBUG("PID[%" PRIkernel_pid "] mutex_lock(): early out.\n",
+              thread_getpid());
+        irq_restore(irq_state);
+    }
+    else {
+        _block(mutex, irq_state);
+    }
 }
 
 void mutex_unlock(mutex_t *mutex)
