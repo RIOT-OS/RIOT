@@ -187,15 +187,13 @@ static inline int mutex_trylock(mutex_t *mutex)
  *
  * @param[in,out]   mutex   Mutex object to lock.
  *
- * @retval  0               The mutex was locked by the caller
- *
  * @pre     @p mutex is not `NULL`
  * @pre     Mutex at @p mutex has been initialized
  * @pre     Must be called in thread context
  *
  * @post    The mutex @p is locked and held by the calling thread.
  */
-int mutex_lock(mutex_t *mutex);
+void mutex_lock(mutex_t *mutex);
 
 /**
  * @brief   Unlocks the mutex.
