@@ -33,6 +33,12 @@ config HAS_CPU_EFM32
     help
         Indicates that the CPU being used is an EFM32.
 
+## Definition of EFM32-specific drivers ##
+config HAS_EFM32_CORETEMP
+    bool
+    help
+        Indicates that the EFM32 coretemp driver is being used.
+
 ## Common CPU symbols
 config CPU
     default "efm32" if CPU_COMMON_EFM32
