@@ -140,8 +140,8 @@ int openwsn_radio_init(void *radio_dev)
     /* If the radio is still not in TRX_OFF state, spin */
     while (ieee802154_radio_confirm_on(dev) == -EAGAIN) {}
 
-    /* Enable basic mode, no AUTOACK. no CSMA */
-    ieee802154_radio_set_rx_mode(dev, IEEE802154_RX_AACK_DISABLED);
+    /* Enable basic mode (no AUTOACK. no CSMA-CA).
+     * Auto ACK is disabled via CONFIG_IEEE802154_AUTO_ACK_DISABLE. */
     /* MAC layer retransmissions are disabled by _set_csma_params() */
     ieee802154_radio_set_csma_params(dev, NULL, -1);
 
@@ -150,7 +150,7 @@ int openwsn_radio_init(void *radio_dev)
         where the destination-address mode is 0 (no destination address).
         per rfc8180 4.5.1 the destination address must be set, which means
         the destination-address mode can't be 0 */
-        ieee802154_radio_set_rx_mode(dev, IEEE802154_RX_PROMISC);
+        ieee802154_radio_set_frame_filter_mode(dev, IEEE802154_FILTER_PROMISC);
     }
 
     /* Configure PHY settings (channel, TX power) */

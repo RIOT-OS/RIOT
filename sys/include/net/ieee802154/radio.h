@@ -463,40 +463,6 @@ typedef enum {
 } ieee802154_cca_mode_t;
 
 /**
- * @brief RX mode configuration
- */
-typedef enum {
-    /**
-     * @brief Auto ACK is disabled
-     */
-    IEEE802154_RX_AACK_DISABLED,
-    /**
-     * @brief Auto ACK is enabled
-     */
-    IEEE802154_RX_AACK_ENABLED,
-    /**
-     * @brief Auto ACK is enabled and frame pending bit set in the next ACK frame
-     */
-    IEEE802154_RX_AACK_FRAME_PENDING,
-    /**
-     * @brief Radio is in promiscuous mode
-     */
-    IEEE802154_RX_PROMISC,
-    /**
-     * @brief Radio is ready to receive ACK frames
-     *
-     * This mode is optional. If a radio decides to implement it, the radio
-     * should allow ACK frames (and block ACK frames in all other RX modes).
-     * Note that this mode cannot guarantee that only ACK frames will be
-     * received.
-     *
-     * Expected to be implemented when either @ref IEEE802154_CAP_FRAME_RETRANS
-     * or @ref IEEE802154_CAP_IRQ_ACK_TIMEOUT is not there.
-     */
-    IEEE802154_RX_WAIT_FOR_ACK,
-} ieee802154_rx_mode_t;
-
-/**
  * @brief Holder of the PHY configuration
  */
 typedef struct {
@@ -657,7 +623,6 @@ struct ieee802154_radio_ops {
      * - @ref config_phy
      * - @ref config_addr_filter
      * - @ref set_csma_params
-     * - @ref set_rx_mode
      * - @ref set_frame_filter_mode
      * - @ref config_src_addr_match
      * - @ref set_frame_retrans (if available)
@@ -826,17 +791,6 @@ struct ieee802154_radio_ops {
      */
     int (*set_csma_params)(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd,
                            int8_t retries);
-
-    /**
-     * @brief Set the RX mode.
-     *
-     * @param[in] dev IEEE802.15.4 device descriptor
-     * @param[in] mode RX mode
-     *
-     * @return 0 on success
-     * @return negative errno on error
-     */
-    int (*set_rx_mode)(ieee802154_dev_t *dev, ieee802154_rx_mode_t mode);
 
     /**
      * @brief Set the frame filter moder.
@@ -1454,20 +1408,6 @@ static inline bool ieee802154_radio_has_phy_mr_fsk(ieee802154_dev_t *dev)
 static inline uint32_t ieee802154_radio_get_phy_modes(ieee802154_dev_t *dev)
 {
     return (dev->driver->caps & IEEE802154_RF_CAPS_PHY_MASK);
-}
-
-/**
- * @brief Shortcut to @ref ieee802154_radio_ops::set_rx_mode
- *
- * @param[in] dev IEEE802.15.4 device descriptor
- * @param[in] mode RX mode
- *
- * @return result of @ref ieee802154_radio_ops::set_rx_mode
- */
-static inline int ieee802154_radio_set_rx_mode(ieee802154_dev_t *dev,
-                                               ieee802154_rx_mode_t mode)
-{
-    return dev->driver->set_rx_mode(dev, mode);
 }
 
 /**
