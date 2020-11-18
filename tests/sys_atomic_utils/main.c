@@ -47,10 +47,10 @@ typedef enum {
     TEST_WIDTH_NUMOF
 } test_width_t;
 
-typedef void (*fetch_op_u8_t)(uint8_t *dest, uint8_t val);
-typedef void (*fetch_op_u16_t)(uint16_t *dest, uint16_t val);
-typedef void (*fetch_op_u32_t)(uint32_t *dest, uint32_t val);
-typedef void (*fetch_op_u64_t)(uint64_t *dest, uint64_t val);
+typedef void (*fetch_op_u8_t)(volatile uint8_t *dest, uint8_t val);
+typedef void (*fetch_op_u16_t)(volatile uint16_t *dest, uint16_t val);
+typedef void (*fetch_op_u32_t)(volatile uint32_t *dest, uint32_t val);
+typedef void (*fetch_op_u64_t)(volatile uint64_t *dest, uint64_t val);
 
 typedef struct {
     const char *name;
