@@ -22,6 +22,7 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#include "periph/adc.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
 
@@ -77,6 +78,15 @@ extern "C" {
 #define LED1_ON             gpio_set(LED1_PIN)
 #define LED1_OFF            gpio_clear(LED1_PIN)
 #define LED1_TOGGLE         gpio_toggle(LED1_PIN)
+/** @} */
+
+/**
+ * @name    Core temperature sensor configuration
+ *
+ * Connection to the on-chip temperature sensor.
+ * @{
+ */
+#define CORETEMP_ADC        ADC_LINE(0)
 /** @} */
 
 /**

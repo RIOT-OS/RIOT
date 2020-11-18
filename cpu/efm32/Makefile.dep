@@ -16,6 +16,10 @@ USEPKG += gecko_sdk
 # include layered power management
 USEMODULE += pm_layered
 
+ifneq (,$(filter efm32_coretemp,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_adc
+endif
+
 # CMSIS-DSP is needed for arm_math.h on Cortex-M0+ architectures
 ifeq ($(CPU_CORE),cortex-m0plus)
   USEPKG += cmsis-dsp

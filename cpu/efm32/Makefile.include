@@ -16,6 +16,9 @@ RIOTBOOT_LEN ?= 0x2000
 # the em_device.h header requires a global define with the cpu model
 CFLAGS += -D$(call uppercase_and_underscore,$(CPU_MODEL))
 
+# include EFM32 specific driver headers
+INCLUDES += -I$(RIOTCPU)/efm32/include/drivers
+
 # include cortexm_common
 LINKER_SCRIPT = cortexm.ld
 
