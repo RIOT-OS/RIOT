@@ -69,7 +69,7 @@ extern "C" {
  *          16 bytes key, only required for ABP join procedure type
  */
 #ifndef CONFIG_LORAMAC_APP_SKEY_DEFAULT
-#define CONFIG_LORAMAC_APP_SKEY_DEFAULT        "00000000000000000000000000000000"
+#define CONFIG_LORAMAC_APP_SKEY_DEFAULT         "00000000000000000000000000000000"
 #endif
 
 /**
@@ -77,8 +77,8 @@ extern "C" {
  *
  *          16 bytes key, only required for ABP join procedure type.
  */
-#ifndef LORAMAC_NWK_SKEY_DEFAULT
-#define LORAMAC_NWK_SKEY_DEFAULT        "00000000000000000000000000000000"
+#ifndef CONFIG_LORAMAC_NWK_SKEY_DEFAULT
+#define CONFIG_LORAMAC_NWK_SKEY_DEFAULT         "00000000000000000000000000000000"
 #endif
 
 /**
