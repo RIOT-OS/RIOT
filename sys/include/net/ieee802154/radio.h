@@ -339,6 +339,36 @@ typedef enum {
 } ieee802154_src_match_t;
 
 /**
+ * @brief Frame Filter mode
+ */
+typedef enum {
+    /**
+     * @brief accept all valid frames that match address filter configuration
+     */
+    IEEE802154_FILTER_ACCEPT,
+    /**
+     * @brief accept only ACK frames
+     *
+     * @note This mode should only be implemented if the transceiver doesn't
+     * handle ACK frame reception (when @ref IEEE802154_CAP_FRAME_RETRANS and
+     * @ref IEEE802154_CAP_IRQ_ACK_TIMEOUT are not present).
+     */
+    IEEE802154_FILTER_ACK_ONLY,
+    /**
+     * @brief accept all valid frames
+     *
+     * @note This mode is optional
+     */
+    IEEE802154_FILTER_PROMISC,
+    /**
+     * @brief accept all frames, regardless of FCS
+     *
+     * @note This mode is optional
+     */
+    IEEE802154_FILTER_SNIFFER,
+} ieee802154_filter_mode_t;
+
+/**
  * @brief CSMA-CA exponential backoff parameters.
  */
 typedef struct {
@@ -618,6 +648,7 @@ struct ieee802154_radio_ops {
      * - @ref set_csma_params
      * - @ref set_rx_mode
      * - @ref set_hw_addr_filter
+     * - @ref set_frame_filter_mode
      * - @ref config_src_addr_match
      * - @ref set_frame_retrans (if available)
      *
@@ -818,6 +849,19 @@ struct ieee802154_radio_ops {
     int (*set_rx_mode)(ieee802154_dev_t *dev, ieee802154_rx_mode_t mode);
 
     /**
+     * @brief Set the frame filter moder.
+     *
+     * @pre the device is on
+     *
+     * @param[in] dev IEEE802.15.4 device descriptor
+     * @param[in] mode address filter mode
+     *
+     * @return 0 on success
+     * @return negative errno on error
+     */
+    int (*set_frame_filter_mode)(ieee802154_dev_t *dev, ieee802154_filter_mode_t mode);
+
+    /**
      * @brief Set the source address match configuration.
      *
      * This function configures the source address match filter in order to set
@@ -1005,6 +1049,22 @@ static inline int ieee802154_radio_set_hw_addr_filter(ieee802154_dev_t *dev,
                                                       const uint16_t *pan_id)
 {
     return dev->driver->set_hw_addr_filter(dev, short_addr, ext_addr, pan_id);
+}
+
+/**
+ * @brief Shortcut to @ref ieee802154_radio_ops::set_frame_filter_mode
+ *
+ * @pre the device is on
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ * @param[in] mode frame filter mode
+ *
+ * @return result of @ref ieee802154_radio_ops::set_frame_filter_mode
+ */
+static inline int ieee802154_radio_set_frame_filter_mode(ieee802154_dev_t *dev,
+                                                    ieee802154_filter_mode_t mode)
+{
+    return dev->driver->set_frame_filter_mode(dev, mode);
 }
 
 /**
