@@ -80,14 +80,6 @@ static void _unlock_flash(void)
 
 static void _erase_page(void *page_addr)
 {
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
-    defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
-    defined(CPU_FAM_STM32L5)
-    uint32_t *dst = page_addr;
-#else
-    uint16_t *dst = page_addr;
-#endif
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F3)
     uint32_t hsi_state = (RCC->CR & RCC_CR_HSION);
@@ -107,16 +99,16 @@ static void _erase_page(void *page_addr)
     DEBUG("address to erase: %p\n", page_addr);
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
     DEBUG("[flashpage] erase: trigger the page erase\n");
-    *dst = (uint32_t)0;
+    *(uint32_t *)page_addr = 0;
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
       defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
       defined(CPU_FAM_STM32L5)
     DEBUG("[flashpage] erase: setting the page address\n");
     uint8_t pn;
 #if (FLASHPAGE_NUMOF <= MAX_PAGES_PER_BANK) || defined(CPU_FAM_STM32WB)
-    pn = (uint8_t)flashpage_page(dst);
+    pn = (uint8_t)flashpage_page(page_addr);
 #else
-    uint16_t page = flashpage_page(dst);
+    uint16_t page = flashpage_page(page_addr);
     if (page > MAX_PAGES_PER_BANK - 1) {
         CNTRL_REG |= FLASH_CR_BKER;
     }
@@ -130,7 +122,7 @@ static void _erase_page(void *page_addr)
     CNTRL_REG |= FLASH_CR_STRT;
 #else /* CPU_FAM_STM32F0 || CPU_FAM_STM32F1 || CPU_FAM_STM32F3 */
     DEBUG("[flashpage] erase: setting the page address\n");
-    FLASH->AR = (uint32_t)dst;
+    FLASH->AR = (uint32_t)page_addr;
     /* trigger the page erase and wait for it to be finished */
     DEBUG("[flashpage] erase: trigger the page erase\n");
     CNTRL_REG |= FLASH_CR_STRT;
