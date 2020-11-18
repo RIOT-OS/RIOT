@@ -59,8 +59,8 @@ extern "C" {
  *
  *          16 bytes key, required for join procedure
  */
-#ifndef LORAMAC_APP_KEY_DEFAULT
-#define LORAMAC_APP_KEY_DEFAULT         "00000000000000000000000000000000"
+#ifndef CONFIG_LORAMAC_APP_KEY_DEFAULT
+#define CONFIG_LORAMAC_APP_KEY_DEFAULT          "00000000000000000000000000000000"
 #endif
 
 /**
