@@ -43,4 +43,7 @@ config MODULE_STDIO_UART_RX
     help
         Reception when using UART-based STDIO needs to be enabled.
 
+config MODULE_PRINTF_FLOAT
+    bool "Float support in printf"
+
 endmenu # Standard Input/Output (STDIO)
