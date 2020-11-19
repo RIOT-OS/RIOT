@@ -25,6 +25,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "architecture.h"
 #include "board.h"
 #include "esp_common.h"
 #include "irq_arch.h"
@@ -134,10 +135,12 @@ void spi_flash_drive_init (void)
 
     /* read in partition table an determine the top of all partitions */
     uint32_t part_addr = ESP_PART_TABLE_ADDR;
-    uint8_t  part_buf[ESP_PART_ENTRY_SIZE];
+    uint8_t WORD_ALIGNED part_buf[ESP_PART_ENTRY_SIZE];
     bool     part_read = true;
     uint32_t part_top = 0;
-    esp_partition_info_t* part = (esp_partition_info_t*)part_buf;
+    /* Use intermediate cast to uintptr_t to silence false positive of
+     * -Wcast-align. We aligned part_buf to word size via attribute */
+    esp_partition_info_t* part = (esp_partition_info_t*)(uintptr_t)part_buf;
 
     while (part_read && part_addr < ESP_PART_TABLE_ADDR + ESP_PART_TABLE_SIZE) {
         spi_flash_read (part_addr, (void*)part_buf, ESP_PART_ENTRY_SIZE);
@@ -436,10 +439,12 @@ const esp_partition_t* esp_partition_find_first(esp_partition_type_t type,
                                                 const char* label)
 {
     uint32_t info_addr = ESP_PART_TABLE_ADDR;
-    uint8_t  info_buf[ESP_PART_ENTRY_SIZE];
-    bool     info_read = true;
+    uint8_t WORD_ALIGNED info_buf[ESP_PART_ENTRY_SIZE];
+    bool info_read = true;
 
-    esp_partition_info_t* info = (esp_partition_info_t*)info_buf;
+    /* use intermediate cast to uintptr_t to silence false positive of
+     * -Wcast-align. We used an attribute to align info_buf to word boundary */
+    esp_partition_info_t* info = (esp_partition_info_t*)(uintptr_t)info_buf;
     esp_partition_t* part;
 
     while (info_read && info_addr < ESP_PART_TABLE_ADDR + ESP_PART_TABLE_SIZE) {
