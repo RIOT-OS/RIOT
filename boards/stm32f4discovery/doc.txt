@@ -166,6 +166,15 @@ The board is now flashed with your RIOT binary
    - **PA2** is connected with **RX** on the UART converter
 2. done
 
+# Emulator
+
+To emulate this board you need an updated version of
+[renode](https://github.com/renode/renode) installed, at least version 1.11.
+
+```
+BOARD=stm32f4discovery make all emulate
+```
+
 ## Known Issues / Problems
 
 ### I2C
