@@ -84,8 +84,8 @@ extern "C" {
 /**
  * @brief   Default device address
  */
-#ifndef LORAMAC_DEV_ADDR_DEFAULT
-#define LORAMAC_DEV_ADDR_DEFAULT        "00000000"
+#ifndef CONFIG_LORAMAC_DEV_ADDR_DEFAULT
+#define CONFIG_LORAMAC_DEV_ADDR_DEFAULT         "00000000"
 #endif
 /** @} */
 
