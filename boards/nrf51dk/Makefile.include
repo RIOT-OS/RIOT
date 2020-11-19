@@ -8,8 +8,6 @@ PROGRAMMER ?= openocd
 # dap debug adapter is required for openocd
 ifeq (openocd,$(PROGRAMMER))
   DEBUG_ADAPTER = dap
-else ifeq (pyocd, $(PROGRAMMER)) # this boards is also supported by PyOCD
-  include $(RIOTMAKE)/tools/pyocd.inc.mk
 endif
 
 # include nrf51 boards common configuration

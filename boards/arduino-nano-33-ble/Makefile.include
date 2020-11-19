@@ -11,8 +11,6 @@ ifeq ($(PROGRAMMER),bossa)
   BOSSA_VERSION = nrf52
   BOSSA_ARDUINO_PREFLASH = yes
   PREFLASH_DELAY = 1
-
-  include $(RIOTMAKE)/tools/bossa.inc.mk
 endif
 
 TESTRUNNER_CONNECT_DELAY ?= 2

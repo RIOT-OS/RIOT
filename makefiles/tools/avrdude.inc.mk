@@ -19,22 +19,22 @@ DEBUGSERVER_FLAGS = "$(AVR_DEBUGDEVICE) $(DEBUGPROTO) :$(DEBUGSERVER_PORT)"
 DEBUGGER_FLAGS = "-x $(AVARICE_PATH)/gdb.conf $(ELFFILE)"
 DEBUGGER = "$(AVARICE_PATH)/debug.sh" $(DEBUGSERVER_FLAGS) $(AVARICE_PATH) $(DEBUGSERVER_PORT)
 
-PROGRAMMER_FLAGS = -p $(subst atmega,m,$(CPU))
+AVRDUDE_PROGRAMMER_FLAGS = -p $(subst atmega,m,$(CPU))
 
 # Set flasher port only for programmers that require it
-ifneq (,$(filter $(PROGRAMMER),arduino avr109 buspirate stk500v1 stk500v2 wiring))
+ifneq (,$(filter $(AVRDUDE_PROGRAMMER),arduino avr109 buspirate stk500v1 stk500v2 wiring))
   # make the flasher port configurable (e.g. with atmelice the port is usb)
   # defaults to terminal's serial port if not configured
-  PROGRAMMER_FLAGS += -P $(PROG_DEV)
+  AVRDUDE_PROGRAMMER_FLAGS += -P $(PROG_DEV)
 endif
-PROGRAMMER_FLAGS += $(FFLAGS_EXTRA)
+AVRDUDE_PROGRAMMER_FLAGS += $(FFLAGS_EXTRA)
 
 # don't force to flash HEXFILE, but set it as default
 FLASHFILE ?= $(HEXFILE)
-FFLAGS += -c $(PROGRAMMER) $(PROGRAMMER_FLAGS) -U flash:w:$(FLASHFILE)
+FFLAGS += -c $(AVRDUDE_PROGRAMMER) $(AVRDUDE_PROGRAMMER_FLAGS) -U flash:w:$(FLASHFILE)
 
-ifeq (,$(filter $(PROGRAMMER),arduino avr109 stk500v1 stk500v2 wiring))
+ifeq (,$(filter $(AVRDUDE_PROGRAMMER),arduino avr109 stk500v1 stk500v2 wiring))
   # Use avrdude to trigger a reset, if programming is not done via UART and a
   # bootloader.
-  RESET ?= $(FLASHER) -c $(PROGRAMMER) $(PROGRAMMER_FLAGS)
+  RESET ?= $(FLASHER) -c $(AVRDUDE_PROGRAMMER) $(AVRDUDE_PROGRAMMER_FLAGS)
 endif

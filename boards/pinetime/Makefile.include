@@ -5,7 +5,6 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 # define pyocd as programmer to program with stlink
 ifeq (pyocd,$(PROGRAMMER))
   FLASH_TARGET_TYPE ?= -t $(CPU)
-  include $(RIOTMAKE)/tools/pyocd.inc.mk
 endif
 
 # use shared Makefile.include

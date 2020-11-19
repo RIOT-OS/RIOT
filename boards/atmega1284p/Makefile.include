@@ -7,7 +7,7 @@ ATMEGA1284P_CLOCK   ?=
 # Allow overwriting programmer via env variables without affecting other boards
 PROGRAMMER_BOARD_ATMEGA1284P ?= atmelice
 # ICSP programmer to use for avrdude
-PROGRAMMER ?= $(PROGRAMMER_BOARD_ATMEGA1284P)
+AVRDUDE_PROGRAMMER ?= $(PROGRAMMER_BOARD_ATMEGA1284P)
 
 ifneq (,$(ATMEGA1284P_CLOCK))
   CFLAGS += -DCLOCK_CORECLOCK=$(ATMEGA1284P_CLOCK)

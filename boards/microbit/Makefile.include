@@ -7,8 +7,6 @@ PROGRAMMER ?= openocd
 
 ifeq (openocd,$(PROGRAMMER))
   DEBUG_ADAPTER = dap
-else ifeq (pyocd,$(PROGRAMMER))
-  include $(RIOTMAKE)/tools/pyocd.inc.mk
 endif
 
 # QEMU 4.0 added microbit system emulation.

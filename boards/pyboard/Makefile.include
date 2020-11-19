@@ -9,6 +9,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # this board is flashed using DFU
+PROGRAMMER ?= dfu-util
 DFU_USB_ID = 1d50:607f
 FFLAGS_OPTS = --reset
-include $(RIOTMAKE)/tools/dfu.inc.mk

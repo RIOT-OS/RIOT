@@ -8,7 +8,6 @@ include $(RIOTMAKE)/tools/serial.inc.mk
 ifeq ($(PROGRAMMER),jlink)
   # in case J-Link is attached to SWD pins, use a plain CPU memory model
   JLINK_DEVICE = atsamd21
-  include $(RIOTMAKE)/tools/jlink.inc.mk
 endif
 
 # Include all definitions for flashing with bossa over USB

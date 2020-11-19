@@ -8,6 +8,4 @@ ifeq ($(PROGRAMMER),bossa)
   # such bootloader.
   ROM_OFFSET ?= 0x2000
   BOSSA_ARDUINO_PREFLASH = yes
-
-  include $(RIOTMAKE)/tools/bossa.inc.mk
 endif

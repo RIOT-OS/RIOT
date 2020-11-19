@@ -16,4 +16,4 @@ DEBUG_ADAPTER ?= stlink
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
 # this board uses openocd
-include $(RIOTMAKE)/tools/openocd.inc.mk
+PROGRAMMER ?= openocd

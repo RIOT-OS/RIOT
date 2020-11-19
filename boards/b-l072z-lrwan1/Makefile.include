@@ -9,11 +9,9 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # this board has an on-board ST-link adapter
+PROGRAMMER ?= openocd
 DEBUG_ADAPTER ?= stlink
 
 # this board can become un-flashable after a hardfault,
 # use connect_assert_srst to always be able to flash or reset the board.
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
-
-# this board uses openocd
-include $(RIOTMAKE)/tools/openocd.inc.mk

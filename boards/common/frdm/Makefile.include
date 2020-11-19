@@ -2,6 +2,9 @@
 PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
+# Use OpenOCD by default
+PROGRAMMER ?= openocd
+
 # Use the shared OpenOCD configuration
 # Using dap or jlink depends on which firmware the OpenSDA debugger is running
 DEBUG_ADAPTER ?= dap
@@ -22,12 +25,9 @@ OPENOCD_CONFIG ?= $(RIOTBOARD)/common/frdm/dist/openocd-$(OPENOCD_KINETIS_FAMILY
 # Check the flash configuration field before flashing
 PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
 
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
 # The board can become un-flashable after some execution,
 # use connect_assert_srst to always be able to flash or reset the board.
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
-# this board uses openocd
-include $(RIOTMAKE)/tools/openocd.inc.mk
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
