@@ -1521,6 +1521,9 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
         }
         else {
             LOG_ERROR("gnrc_netif: can't queue packet for sending\n");
+            /* If we got here, it means the device was busy and the pkt queue
+             * was full. The packet should be dropped here anyway */
+            gnrc_pktbuf_release_error(pkt, ENOMEM);
         }
         return;
     }
@@ -1715,6 +1718,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                 break;
 #if IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ)
             case NETDEV_EVENT_TX_COMPLETE:
+            case NETDEV_EVENT_TX_COMPLETE_DATA_PENDING:
                 /* send packet previously queued within netif due to the lower
                  * layer being busy.
                  * Further packets will be sent on later TX_COMPLETE or
@@ -1729,6 +1733,7 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
 #endif  /* IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ) */
 #if IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ)
             case NETDEV_EVENT_TX_MEDIUM_BUSY:
+            case NETDEV_EVENT_TX_NOACK:
                 /* send packet previously queued within netif due to the lower
                  * layer being busy.
                  * Further packets will be sent on later TX_COMPLETE or
