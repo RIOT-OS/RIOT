@@ -402,6 +402,9 @@ ifneq (,$(filter emulate,$(MAKECMDGOALS)))
   -include $(RIOTMAKE)/tools/$(RIOT_EMULATOR).inc.mk
 endif
 
+# Include common programmer logic if available
+-include $(RIOTMAKE)/tools/$(PROGRAMMER).inc.mk
+
 # Assume GCC/GNU as supported toolchain if CPU's Makefile.include doesn't
 # provide this macro
 TOOLCHAINS_SUPPORTED ?= gnu
