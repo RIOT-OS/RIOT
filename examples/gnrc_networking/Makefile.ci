@@ -8,6 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p \
     blackpill \
     bluepill \
+    bluepill-stm32f030c8 \
     calliope-mini \
     derfmega128 \
     hifive1 \
