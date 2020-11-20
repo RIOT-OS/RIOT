@@ -84,4 +84,6 @@ int main(void)
     if (!failed) {
         puts("Test successful\n");
     }
+
+    return 0;
 }
