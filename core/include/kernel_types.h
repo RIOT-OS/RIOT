@@ -45,58 +45,5 @@ typedef signed ssize_t;
 #   endif
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
- * @def MAXTHREADS
- * @brief The maximum number of threads to be scheduled
- */
-#ifndef MAXTHREADS
-#define MAXTHREADS 32
-#endif
-
-/**
- * Canonical identifier for an invalid PID.
- */
-#define KERNEL_PID_UNDEF 0
-
-/**
- * The first valid PID (inclusive).
- */
-#define KERNEL_PID_FIRST (KERNEL_PID_UNDEF + 1)
-
-/**
- * The last valid PID (inclusive).
- */
-#define KERNEL_PID_LAST (KERNEL_PID_FIRST + MAXTHREADS - 1)
-
-/**
- * Macro for printing formatter
- */
-#define PRIkernel_pid PRIi16
-
-/**
- * Unique process identifier
- */
-typedef int16_t kernel_pid_t;
-
-/**
- * @brief   Determine if the given pid is valid
- *
- * @param[in]   pid     The pid to check
- *
- * @return      true if the pid is valid, false otherwise
- */
-static inline int pid_is_valid(kernel_pid_t pid)
-{
-    return ((KERNEL_PID_FIRST <= pid) && (pid <= KERNEL_PID_LAST));
-}
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif /* KERNEL_TYPES_H */
 /** @} */
