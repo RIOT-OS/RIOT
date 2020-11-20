@@ -159,6 +159,32 @@ static inline int mbox_try_get(mbox_t *mbox, msg_t *msg)
     return _mbox_get(mbox, msg, NON_BLOCKING);
 }
 
+/**
+ * @brief Get mbox queue size (capacity)
+ *
+ * @param[in] mbox  ptr to mailbox to operate on
+ *
+ * @return  size of mbox queue (or 0 if there's no queue)
+ */
+static inline size_t mbox_size(mbox_t *mbox)
+{
+    return mbox->cib.mask ? mbox->cib.mask + 1 : 0;
+}
+
+/**
+ * @brief Get messages available in mbox
+ *
+ * Returns the number of messages that can be retrieved without blocking.
+ *
+ * @param[in] mbox  ptr to mailbox to operate on
+ *
+ * @return  number of available messages
+ */
+static inline size_t mbox_avail(mbox_t *mbox)
+{
+    return cib_avail(&mbox->cib);
+}
+
 #ifdef __cplusplus
 }
 #endif
