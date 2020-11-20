@@ -12,7 +12,7 @@ else ifeq (pyocd,$(PROGRAMMER))
 endif
 
 # QEMU 4.0 added microbit system emulation.
-include $(RIOTMAKE)/tools/qemu.inc.mk
+RIOT_EMULATOR ?= qemu
 
 # include nrf51 boards common configuration
 include $(RIOTBOARD)/common/nrf51/Makefile.include
