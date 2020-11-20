@@ -210,7 +210,7 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
         }
         else
 #endif
-        if ((timeout == 0) && !cib_avail(&queue->base.conn->acceptmbox.mbox.cib)) {
+        if ((timeout == 0) && !mbox_avail(&queue->base.conn->acceptmbox.mbox)) {
             mutex_unlock(&queue->mutex);
             return -EAGAIN;
         }
@@ -245,7 +245,7 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
         }
     }
     else {
-        while (cib_avail(&queue->base.conn->acceptmbox.mbox.cib)) {
+        while (mbox_avail(&queue->base.conn->acceptmbox.mbox)) {
             /* close connections potentially accepted by lwIP */
             if (netconn_accept(queue->base.conn, &tmp) == ERR_OK) {
                 netconn_close(tmp);
@@ -259,7 +259,7 @@ int sock_tcp_accept(sock_tcp_queue_t *queue, sock_tcp_t **sock,
 #endif
 #if IS_ACTIVE(SOCK_HAS_ASYNC)
     if (queue->base.async_cb.gen &&
-        cib_avail(&queue->base.conn->acceptmbox.mbox.cib)) {
+        mbox_avail(&queue->base.conn->acceptmbox.mbox)) {
         queue->base.async_cb.gen(&queue->base, SOCK_ASYNC_CONN_RECV,
                                  queue->base.async_cb_arg);
     }
@@ -294,7 +294,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
     }
     else
 #endif
-    if ((timeout == 0) && !cib_avail(&sock->base.conn->recvmbox.mbox.cib)) {
+    if ((timeout == 0) && !mbox_avail(&sock->base.conn->recvmbox.mbox)) {
         mutex_unlock(&sock->mutex);
         return -EAGAIN;
     }
