@@ -17,11 +17,13 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "errno.h"
+#include "kernel_defines.h"
+
 #include "net/lora.h"
 #include "net/gnrc/lorawan.h"
-#include "errno.h"
 #include "net/gnrc/pktbuf.h"
-
 #include "net/lorawan/hdr.h"
 #include "net/loramac.h"
 #include "net/gnrc/lorawan/region.h"

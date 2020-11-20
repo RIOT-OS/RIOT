@@ -126,11 +126,34 @@ extern "C" {
 #endif
 
 /**
+ * @brief Toggle network type (public or private)
+ *
+ * Set "1" to enable private network, set "0" to enable public network.
+ * This configuration sets the sync word for LoRaWAN communication. This should
+ * be in concordance with the gateway configuration. Public networks use `0x34`
+ * while private networks use `0x12` as sync word.
+ */
+#ifdef DOXYGEN
+#define CONFIG_LORAMAC_DEFAULT_PRIVATE_NETWORK
+#endif
+
+/**
  * @brief   Default network type (public or private)
+ *
+ * This configuration sets the sync word for LoRaWAN communication. This should
+ * be in concordance with the gateway configuration. Public networks use `0x34`
+ * while private networks use `0x12` as sync word.
+ * @deprecated Use inverse @ref CONFIG_LORAMAC_DEFAULT_PRIVATE_NETWORK instead.
+ * Will be removed after 2021.04 release.
  */
 #ifndef LORAMAC_DEFAULT_PUBLIC_NETWORK
-#define LORAMAC_DEFAULT_PUBLIC_NETWORK         (true)
+#if IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_PRIVATE_NETWORK)
+#define LORAMAC_DEFAULT_PUBLIC_NETWORK          (false)
+#else
+#define LORAMAC_DEFAULT_PUBLIC_NETWORK          (true)
 #endif
+#endif
+
 /**
  * @brief   Default datarate
  */

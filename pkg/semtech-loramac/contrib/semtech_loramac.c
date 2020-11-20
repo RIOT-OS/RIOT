@@ -29,6 +29,7 @@
 
 #include "msg.h"
 #include "mutex.h"
+#include "kernel_defines.h"
 
 #include "net/netdev.h"
 #include "net/netdev/lora.h"
