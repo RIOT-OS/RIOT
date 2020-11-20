@@ -17,6 +17,8 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <inttypes.h>
+
 #include "assert.h"
 #include "frac.h"
 #include "bitarithm.h"
