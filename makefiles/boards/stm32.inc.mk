@@ -11,10 +11,6 @@ ifeq (bmp,$(PROGRAMMER))
   # the second is the BMP's UART interface
   PORT_LINUX ?= /dev/ttyACM1
   PORT_DARWIN ?= $(wordlist 2, 2, $(sort $(wildcard /dev/tty.usbmodem*)))
-else
-  # configure the serial terminal
-  PORT_LINUX ?= /dev/ttyACM0
-  PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 endif
 
 ifeq (openocd,$(PROGRAMMER))

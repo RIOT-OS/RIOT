@@ -1,10 +1,6 @@
 # export this module and its includes
 INCLUDES  += -I$(RIOTBOARD)/common/arduino-due/include
 
-# define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
-
 # setup flasher (using BOSSA)
 PROGRAMMER ?= bossa
 BOSSA_VERSION = 1.8
