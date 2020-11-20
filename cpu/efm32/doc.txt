@@ -101,6 +101,12 @@
  */
 
 /**
+ * @defgroup        cpu_efr32mg1b Silicon Labs EFR32MG1P family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EFR32MG1B MCUs family implementation
+ */
+
+/**
  * @defgroup        cpu_efr32mg1p Silicon Labs EFR32MG1P family
  * @ingroup         cpu_efm32
  * @brief           Silicon Labs's EFR32MG1P MCUs family implementation
