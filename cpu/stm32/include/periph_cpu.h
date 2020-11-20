@@ -821,7 +821,7 @@ typedef enum {
  * @brief stm32 USB OTG configuration
  */
 typedef struct {
-    uint8_t *periph;                /**< USB peripheral base address */
+    uintptr_t periph;               /**< USB peripheral base address */
     uint32_t rcc_mask;              /**< bit in clock enable register */
     stm32_usb_otg_fshs_phy_t phy;   /**< Built-in or ULPI phy */
     stm32_usb_otg_fshs_type_t type; /**< FS or HS type */
