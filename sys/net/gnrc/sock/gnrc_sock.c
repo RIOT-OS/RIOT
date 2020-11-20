@@ -107,7 +107,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     }
 #endif
 
-    if (reg->mbox.cib.mask != (GNRC_SOCK_MBOX_SIZE - 1)) {
+    if (mbox_size(&reg->mbox) != GNRC_SOCK_MBOX_SIZE) {
         return -EINVAL;
     }
 #ifdef MODULE_XTIMER
@@ -162,7 +162,7 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     *pkt_out = pkt; /* set out parameter */
 
 #if IS_ACTIVE(SOCK_HAS_ASYNC)
-    if (reg->async_cb.generic && cib_avail(&reg->mbox.cib)) {
+    if (reg->async_cb.generic && mbox_avail(&reg->mbox)) {
         reg->async_cb.generic(reg, SOCK_ASYNC_MSG_RECV, reg->async_cb_arg);
     }
 #endif
