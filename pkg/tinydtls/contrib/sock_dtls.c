@@ -461,7 +461,7 @@ static ssize_t _copy_buffer(sock_dtls_t *sock, sock_dtls_session_t *remote,
                            &remote->ep);
         if (sock->async_cb &&
             /* is there a message in the sock's mbox? */
-            cib_avail(&sock->mbox.cib)) {
+            mbox_avail(&sock->mbox)) {
             if (sock->buffer.data) {
                 sock->async_cb(sock, SOCK_ASYNC_MSG_RECV,
                                sock->async_cb_arg);
@@ -493,7 +493,7 @@ static ssize_t _complete_handshake(sock_dtls_t *sock,
     if (sock->async_cb) {
         sock_async_flags_t flags = SOCK_ASYNC_CONN_RDY;
 
-        if (cib_avail(&sock->mbox.cib)) {
+        if (mbox_avail(&sock->mbox)) {
             if (sock->buffer.data) {
                 flags |= SOCK_ASYNC_MSG_RECV;
             }
