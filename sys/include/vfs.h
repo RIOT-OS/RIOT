@@ -66,7 +66,7 @@
 #include <sys/types.h> /* for off_t etc. */
 #include <sys/statvfs.h> /* for struct statvfs */
 
-#include "kernel_types.h"
+#include "sched.h"
 #include "clist.h"
 
 #ifdef __cplusplus
