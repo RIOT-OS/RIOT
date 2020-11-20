@@ -622,6 +622,13 @@ ifneq (,$(filter riotboot_slot, $(USEMODULE)))
   USEMODULE += riotboot_hdr
 endif
 
+ifneq (,$(filter riotboot_serial, $(USEMODULE)))
+  FEATURES_REQUIRED += periph_flashpage
+  FEATURES_REQUIRED += periph_uart
+  USEMODULE += riotboot
+  USEMODULE += checksum
+endif
+
 ifneq (,$(filter riotboot_hdr, $(USEMODULE)))
   USEMODULE += checksum
   USEMODULE += riotboot
