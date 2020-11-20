@@ -81,6 +81,8 @@
 #define SCHED_H
 
 #include <stddef.h>
+#include <inttypes.h>
+
 #include "kernel_defines.h"
 #include "native_sched.h"
 #include "clist.h"
