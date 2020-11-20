@@ -6,7 +6,4 @@ PROGRAMMER_SERIAL ?= 06EB
 PORT_LINUX ?= $(word 2,$(shell $(RIOTTOOLS)/usb-serial/find-tty.sh '^$(PROGRAMMER_SERIAL)'))
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 
-# setup emulator
-include $(RIOTMAKE)/tools/renode.inc.mk
-
 include $(RIOTBOARD)/common/cc2538/Makefile.include
