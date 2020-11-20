@@ -26,6 +26,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     derfmega128 \
     derfmega256 \
     e104-bt5010a-tb \
+    e180-zg120b-tb \
     ek-lm4f120xl \
     esp8266-esp-12x \
     esp8266-olimex-mod \
