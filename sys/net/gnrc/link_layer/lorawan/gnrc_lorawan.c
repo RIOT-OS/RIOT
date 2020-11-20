@@ -45,7 +45,7 @@ static inline void gnrc_lorawan_mlme_reset(gnrc_lorawan_t *mac)
     mac->mlme.activation = MLME_ACTIVATION_NONE;
     mac->mlme.pending_mlme_opts = 0;
     mac->rx_delay = (LORAMAC_DEFAULT_RX1_DELAY / MS_PER_SEC);
-    mac->mlme.nid = LORAMAC_DEFAULT_NETID;
+    mac->mlme.nid = CONFIG_LORAMAC_DEFAULT_NETID;
 }
 
 static inline void gnrc_lorawan_mlme_backoff_init(gnrc_lorawan_t *mac)

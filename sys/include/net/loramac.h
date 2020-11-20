@@ -121,8 +121,8 @@ extern "C" {
 /**
  * @brief   Default NetID (only valid with ABP join procedure)
  */
-#ifndef LORAMAC_DEFAULT_NETID
-#define LORAMAC_DEFAULT_NETID                  (1U)
+#ifndef CONFIG_LORAMAC_DEFAULT_NETID
+#define CONFIG_LORAMAC_DEFAULT_NETID            (1U)
 #endif
 
 /**

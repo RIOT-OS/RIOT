@@ -450,7 +450,7 @@ static void _join_abp(semtech_loramac_t *mac)
 {
     DEBUG("[semtech-loramac] starting ABP join\n");
 
-    semtech_loramac_set_netid(mac, LORAMAC_DEFAULT_NETID);
+    semtech_loramac_set_netid(mac, CONFIG_LORAMAC_DEFAULT_NETID);
 
     mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
