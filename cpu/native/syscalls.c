@@ -130,7 +130,9 @@ void _native_syscall_leave(void)
        )
     {
         _native_in_isr = 1;
-        _native_cur_ctx = (ucontext_t *)thread_get_active()->sp;
+        /* Use intermediate cast to uintptr_t to silence -Wcast-align.
+         * stacks are manually word aligned in thread_static_init() */
+        _native_cur_ctx = (ucontext_t *)(uintptr_t)thread_get_active()->sp;
         native_isr_context.uc_stack.ss_sp = __isr_stack;
         native_isr_context.uc_stack.ss_size = SIGSTKSZ;
         native_isr_context.uc_stack.ss_flags = 0;
