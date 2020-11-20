@@ -5,9 +5,6 @@ INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
 # Configure programmer
 PROGRAMMER ?= stm32loader
 

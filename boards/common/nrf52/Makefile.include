@@ -12,9 +12,6 @@ else
   PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 endif
 
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
 PROGRAMMER ?= jlink
 ifeq (jlink,$(PROGRAMMER))
   # setup JLink for flashing

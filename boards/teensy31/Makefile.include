@@ -17,6 +17,3 @@ $(TEENSY_LOADER):
 	@echo "[INFO] teensy_loader binary not found - building it from source now"
 	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/teensy-loader-cli
 	@echo "[INFO] teensy_loader binary successfully build!"
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk

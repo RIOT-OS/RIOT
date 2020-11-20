@@ -1,6 +1,3 @@
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
 # include common nrf51 headers
 INCLUDES += -I$(RIOTBOARD)/common/nrf51/include
 

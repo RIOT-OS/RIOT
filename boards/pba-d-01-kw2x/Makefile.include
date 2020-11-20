@@ -15,9 +15,6 @@ ifneq (,$(SERIAL))
   PORT_LINUX := $(SERIAL_TTY)
 endif
 
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
 # this board uses openocd
 PROGRAMMER ?= openocd
 

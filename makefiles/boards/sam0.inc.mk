@@ -18,9 +18,6 @@ ifneq (,$(filter debug% flash% %term test,$(MAKECMDGOALS)))
   endif
 endif
 
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
 # Default for these boards is to use a CMSIS-DAP programmer
 DEBUG_ADAPTER ?= dap
 

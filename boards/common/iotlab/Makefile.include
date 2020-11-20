@@ -4,7 +4,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*B)))
 
 # setup serial terminal
 BAUD ?= 500000
-include $(RIOTMAKE)/tools/serial.inc.mk
 
 # Use openocd by default
 PROGRAMMER ?= openocd

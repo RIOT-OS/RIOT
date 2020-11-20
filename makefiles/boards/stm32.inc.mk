@@ -17,9 +17,6 @@ else
   PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 endif
 
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
 ifeq (openocd,$(PROGRAMMER))
   # STM32 boards can become un-flashable after a hardfault,
   # use connect_assert_srst to always be able to flash or reset the boards.
