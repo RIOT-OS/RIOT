@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #include "can/candev.h"
-#include "kernel_types.h"
+#include "sched.h"
 
 #ifdef MODULE_CAN_PM
 #include "xtimer.h"

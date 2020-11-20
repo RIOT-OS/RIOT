@@ -25,7 +25,7 @@
 #include "cib.h"
 #include "clist.h"
 #include "panic.h"
-#include "kernel_types.h"
+#include "sched.h"
 #include "list.h"
 #include "mbox.h"
 #include "msg.h"

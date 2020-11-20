@@ -22,7 +22,7 @@
 
 #include "dpl_types.h"
 
-#include "kernel_types.h"
+#include "sched.h"
 #include "thread.h"
 
 #ifdef __cplusplus
