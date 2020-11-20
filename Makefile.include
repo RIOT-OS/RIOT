@@ -404,6 +404,10 @@ ifneq (,$(filter emulate%,$(MAKECMDGOALS)))
   -include $(RIOTMAKE)/tools/$(RIOT_EMULATOR).inc.mk
 endif
 
+# Include common serial logic to define TERMPROG, TERMFLAGS variables based on
+# the content of RIOT_TERMINAL
+include $(RIOTMAKE)/tools/serial.inc.mk
+
 # Include common programmer logic if available
 -include $(RIOTMAKE)/tools/$(PROGRAMMER).inc.mk
 
