@@ -1,8 +1,12 @@
+# Use as default the most commonly used ports on Linux and OSX
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
 # set default port depending on operating system
 ifeq ($(OS),Linux)
-  PORT ?= $(call ensure_value,$(PORT_LINUX),No port set)
+  PORT ?= $(PORT_LINUX)
 else ifeq ($(OS),Darwin)
-  PORT ?= $(call ensure_value,$(PORT_DARWIN),No port set)
+  PORT ?= $(PORT_DARWIN)
 endif
 
 # Default PROG_DEV is the same as PORT
