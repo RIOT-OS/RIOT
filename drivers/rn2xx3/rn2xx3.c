@@ -249,7 +249,7 @@ int rn2xx3_sys_sleep(rn2xx3_t *dev)
 
 int rn2xx3_mac_init(rn2xx3_t *dev)
 {
-    rn2xx3_mac_set_dr(dev, LORAMAC_DEFAULT_DR);
+    rn2xx3_mac_set_dr(dev, CONFIG_LORAMAC_DEFAULT_DR);
     rn2xx3_mac_set_tx_power(dev, LORAMAC_DEFAULT_TX_POWER);
     rn2xx3_mac_set_tx_port(dev, LORAMAC_DEFAULT_TX_PORT);
     rn2xx3_mac_set_tx_mode(dev, LORAMAC_DEFAULT_TX_MODE);

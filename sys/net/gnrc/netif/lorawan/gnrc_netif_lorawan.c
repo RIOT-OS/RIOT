@@ -179,7 +179,7 @@ static void _reset(gnrc_netif_t *netif)
 {
     netif->lorawan.otaa = LORAMAC_DEFAULT_JOIN_PROCEDURE ==
                           LORAMAC_JOIN_OTAA ? NETOPT_ENABLE : NETOPT_DISABLE;
-    netif->lorawan.datarate = LORAMAC_DEFAULT_DR;
+    netif->lorawan.datarate = CONFIG_LORAMAC_DEFAULT_DR;
     netif->lorawan.demod_margin = 0;
     netif->lorawan.num_gateways = 0;
     netif->lorawan.port = LORAMAC_DEFAULT_TX_PORT;

@@ -44,7 +44,7 @@ CFLAGS += -DLORAMAC_DEFAULT_JOIN_PROCEDURE=LORAMAC_JOIN_OTAA
 # Uncomment to set the highest DR for the EU868 in order to maximize throughput.
 # If uncommented, the default value (DR0) is used.
 # Note this value is also used for the OTAA.
-#CFLAGS += -DLORAMAC_DEFAULT_DR=LORAMAC_DR_5
+#CFLAGS += -DCONFIG_LORAMAC_DEFAULT_DR=LORAMAC_DR_5
 
 # Set default messages to unconfirmable
 CFLAGS += -DLORAMAC_DEFAULT_TX_MODE=LORAMAC_TX_CNF
