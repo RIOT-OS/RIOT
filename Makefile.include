@@ -746,6 +746,10 @@ emulate:
 	$(call check_cmd,$(EMULATOR),Emulation program)
 	$(EMULATOR) $(EMULATOR_FLAGS)
 
+emulate-debug-server:
+	$(call check_cmd,$(EMULATOR),Emulation program)
+	$(EMULATOR) $(EMULATOR_DEBUG_FLAGS)
+
 reset:
 	$(call check_cmd,$(RESET),Reset program)
 	$(RESET) $(RESET_FLAGS)
