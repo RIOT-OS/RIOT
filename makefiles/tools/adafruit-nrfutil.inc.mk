@@ -1,6 +1,6 @@
 FLASHFILE = $(HEXFILE)
 FLASHDEPS += $(HEXFILE).zip
-FLASHER = adafruit-nrfutil
+FLASHER ?= adafruit-nrfutil
 FFLAGS = dfu serial --port=${PORT} --baudrate=${BAUD} --touch=1200 --package=$(HEXFILE).zip --singlebank
 
 %.hex.zip: %.hex

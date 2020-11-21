@@ -29,9 +29,9 @@ endif
 
 CCS_PATH ?= "CCS_PATH unconfigured"
 # configure the debug server
-DEBUGSERVER = $(CCS_PATH)/ccs/ccs_base/common/uscif/gdb_agent_console
-DEBUGSERVER_FLAGS = -p 3333 $(UNIFLASH_CONFIG_DAT)
+DEBUGSERVER ?= $(CCS_PATH)/ccs/ccs_base/common/uscif/gdb_agent_console
+DEBUGSERVER_FLAGS ?= -p 3333 $(UNIFLASH_CONFIG_DAT)
 
 # configure the debugging tool
-DEBUGGER = $(PREFIX)gdb
-DEBUGGER_FLAGS = -x $(UNIFLASH_CONFIG_GDB) $(ELFFILE)
+DEBUGGER ?= $(PREFIX)gdb
+DEBUGGER_FLAGS ?= -x $(UNIFLASH_CONFIG_GDB) $(ELFFILE)

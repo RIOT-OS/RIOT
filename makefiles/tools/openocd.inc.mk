@@ -1,6 +1,6 @@
 FLASHER ?= $(RIOTTOOLS)/openocd/openocd.sh
-DEBUGGER = $(RIOTTOOLS)/openocd/openocd.sh
-DEBUGSERVER = $(RIOTTOOLS)/openocd/openocd.sh
+DEBUGGER ?= $(RIOTTOOLS)/openocd/openocd.sh
+DEBUGSERVER ?= $(RIOTTOOLS)/openocd/openocd.sh
 RESET ?= $(RIOTTOOLS)/openocd/openocd.sh
 
 FLASHFILE ?= $(ELFFILE)

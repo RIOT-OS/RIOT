@@ -1,5 +1,5 @@
 FLASHER ?= $(RIOTTOOLS)/bmp/bmp.py
-DEBUGGER = $(RIOTTOOLS)/bmp/bmp.py
+DEBUGGER ?= $(RIOTTOOLS)/bmp/bmp.py
 RESET ?= $(RIOTTOOLS)/bmp/bmp.py
 
 FLASHFILE ?= $(ELFFILE)
