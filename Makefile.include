@@ -743,12 +743,12 @@ debug-server:
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
 
 emulate:
+ifeq (,$(filter debug%,$(MAKECMDGOALS)))
 	$(call check_cmd,$(EMULATOR),Emulation program)
 	$(EMULATOR) $(EMULATOR_FLAGS)
-
-emulate-debug-server:
-	$(call check_cmd,$(EMULATOR),Emulation program)
-	$(EMULATOR) $(EMULATOR_DEBUG_FLAGS)
+else
+	@:
+endif
 
 reset:
 	$(call check_cmd,$(RESET),Reset program)
