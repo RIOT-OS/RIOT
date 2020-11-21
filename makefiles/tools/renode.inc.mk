@@ -1,6 +1,7 @@
 RENODE ?= renode
 RENODE_IMAGE_FILE ?= $(ELFFILE)
 RENODE_BOARD_CONFIG ?= $(BOARDDIR)/dist/board.resc
+EMULATORDEPS += $(RENODE_BOARD_CONFIG)
 
 # Use renode interactive commands to specify the image file and board config
 RENODE_CONFIG_FLAGS += -e "set image_file '$(RENODE_IMAGE_FILE)'"
