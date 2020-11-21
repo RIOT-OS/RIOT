@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# This script wraps Renode emulator GDB server and a debugger
+# This script wraps an emulator GDB server (renode or qemu) and a debugger
 # client in a single command and takes 4 arguments: the board to emulate,
 # the application directory of the the current application, the elffile
 # containing the firmware to debug, the debugger port and custom debugger client
@@ -42,7 +42,7 @@ trap "cleanup ${EMULATOR_PIDFILE}" EXIT
 # don't trap on Ctrl+C, because GDB keeps running
 trap '' INT
 
-# start Renode GDB server
+# start emulator GDB server
 sh -c "\
     GDB_PORT=${GDB_PORT} \
     EMULATOR_PIDFILE=${EMULATOR_PIDFILE} \

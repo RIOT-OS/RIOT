@@ -28,4 +28,4 @@ DEBUGSERVER ?= $(EMULATOR)
 DEBUGSERVER_FLAGS ?= $(RENODE_DEBUG_FLAGS)
 
 DEBUGGER_FLAGS ?= $(BOARD) $(APPDIR) $(ELFFILE) $(GDB_PORT) "-ex \"monitor start\""
-DEBUGGER ?= $(RIOTTOOLS)/renode/renode-debug.sh
+DEBUGGER ?= $(RIOTTOOLS)/emulator/debug.sh
