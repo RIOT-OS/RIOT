@@ -9,18 +9,29 @@ EMULATORDEPS += $(RENODE_BOARD_CONFIG)
 # Use renode interactive commands to specify the image file and board config
 RENODE_CONFIG_FLAGS += -e "set image_file '$(RENODE_IMAGE_FILE)'"
 RENODE_CONFIG_FLAGS += -e "include @$(RENODE_BOARD_CONFIG)"
-
-# Set emulator variables
-EMULATOR_FLAGS ?= $(RENODE_CONFIG_FLAGS) -e start
-EMULATOR ?= $(RENODE)
-
-# Configure the debugger
-GDB_PORT ?= 3333
 EMULATOR_PIDFILE ?=
 ifneq (,$(EMULATOR_PIDFILE))
   $(info Using Renode pid file $(EMULATOR_PIDFILE))
   RENODE_CONFIG_FLAGS += --pid-file $(EMULATOR_PIDFILE)
 endif
+
+# Configure local serial port
+PORT = /tmp/riot_$(APPLICATION)_$(BOARD)_uart
+RENODE_CONFIG_FLAGS += -e "emulation CreateUartPtyTerminal \"term\" \"$(PORT)\" true"
+RENODE_CONFIG_FLAGS += -e "connector Connect sysbus.uart0 term"
+
+# Set emulator variables
+EMULATOR_FLAGS ?= $(RENODE_CONFIG_FLAGS) -e start
+EMULATOR ?= $(RENODE)
+
+# Configure the terminal
+RIOT_TERMPROG := $(TERMPROG)
+RIOT_TERMFLAGS := $(TERMFLAGS)
+TERMPROG := $(RIOTTOOLS)/emulator/term.sh
+TERMFLAGS := $(RIOT_EMULATOR) $(BOARD) $(APPDIR) $(RIOT_TERMPROG) '$(RIOT_TERMFLAGS)' $(PORT)
+
+# Configure the debugger
+GDB_PORT ?= 3333
 RENODE_DEBUG_FLAGS += $(RENODE_CONFIG_FLAGS)
 RENODE_DEBUG_FLAGS += -e "machine StartGdbServer $(GDB_PORT) true"
 

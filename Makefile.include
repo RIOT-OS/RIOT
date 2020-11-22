@@ -747,7 +747,7 @@ debug-server:
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
 
 emulate: all $(EMULATORDEPS)
-ifeq (,$(filter debug%,$(MAKECMDGOALS)))
+ifeq (,$(filter term cleanterm debug%,$(MAKECMDGOALS)))
 	$(call check_cmd,$(EMULATOR),Emulation program)
 	$(EMULATOR) $(EMULATOR_FLAGS)
 else
@@ -755,7 +755,7 @@ else
 endif
 
 emulate-only: $(EMULATORDEPS)
-ifeq (,$(filter debug%,$(MAKECMDGOALS)))
+ifeq (,$(filter term cleanterm debug%,$(MAKECMDGOALS)))
 	$(call check_cmd,$(EMULATOR),Emulation program)
 	$(EMULATOR) $(EMULATOR_FLAGS)
 else

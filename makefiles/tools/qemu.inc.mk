@@ -5,9 +5,16 @@ EMULATOR_MONITOR_FLAGS ?= telnet::$(EMULATOR_MONITOR_PORT),server,nowait
 FLASHFILE ?= $(ELFFILE)
 
 EMULATOR_FLAGS = -machine $(EMULATOR_MACHINE) -device loader,file=$(ELFFILE) \
-                 -serial stdio \
+                 -serial telnet::5555,server,nowait,nodelay \
                  -monitor $(EMULATOR_MONITOR_FLAGS) \
                  -nographic
+
+# Configure the qemu terminal access
+PORT = /tmp/riot_$(APPLICATION)_$(BOARD)_uart
+RIOT_TERMPROG := $(TERMPROG)
+RIOT_TERMFLAGS := $(TERMFLAGS)
+TERMPROG := $(RIOTTOOLS)/emulator/term.sh
+TERMFLAGS := $(RIOT_EMULATOR) $(BOARD) $(APPDIR) $(RIOT_TERMPROG) '$(RIOT_TERMFLAGS)' $(PORT)
 
 # Configure the debugger
 GDB_PORT ?= 3333
