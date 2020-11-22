@@ -24,6 +24,7 @@
 #include "board.h"
 #include "net/gnrc/netif/ieee802154.h"
 #include "net/gnrc.h"
+#include "include/init_devs.h"
 
 #include "kw2xrf.h"
 #include "kw2xrf_params.h"
@@ -32,7 +33,7 @@
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define KW2XRF_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+#define KW2XRF_MAC_STACKSIZE     (IEEE802154_STACKSIZE_DEFAULT)
 #ifndef KW2XRF_MAC_PRIO
 #define KW2XRF_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif

@@ -21,6 +21,7 @@
 #include "socket_zep.h"
 #include "socket_zep_params.h"
 #include "net/gnrc/netif/ieee802154.h"
+#include "include/init_devs.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -28,7 +29,7 @@
 /**
  * @brief   Define stack parameters for the MAC layer thread
  */
-#define SOCKET_ZEP_MAC_STACKSIZE    (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
+#define SOCKET_ZEP_MAC_STACKSIZE    (IEEE802154_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE)
 #ifndef SOCKET_ZEP_MAC_PRIO
 #define SOCKET_ZEP_MAC_PRIO         (GNRC_NETIF_PRIO)
 #endif

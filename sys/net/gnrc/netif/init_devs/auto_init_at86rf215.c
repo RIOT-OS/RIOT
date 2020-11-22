@@ -29,6 +29,7 @@
 #include "net/gnrc/gomach/gomach.h"
 #endif
 #include "net/gnrc.h"
+#include "include/init_devs.h"
 
 #include "at86rf215.h"
 #include "at86rf215_params.h"
@@ -37,7 +38,7 @@
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define AT86RF215_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+#define AT86RF215_MAC_STACKSIZE     (IEEE802154_STACKSIZE_DEFAULT)
 #ifndef AT86RF215_MAC_PRIO
 #define AT86RF215_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif
