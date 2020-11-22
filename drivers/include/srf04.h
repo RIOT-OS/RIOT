@@ -87,7 +87,7 @@ void srf04_trigger(const srf04_t *dev);
  * @return              SRF04_MEASURING if measurement is in progress
  * @return              SRF04_INVALID if no valid measurement is available
  */
-int srf04_read(const srf04_t* dev);
+int srf04_read(const srf04_t *dev);
 
 /**
  * @brief   Convenience function triggers a measurement and returns distance
@@ -100,7 +100,7 @@ int srf04_read(const srf04_t* dev);
  * @return              SRF04_MEASURING if measurement is in progress
  * @return              SRF04_INVALID if no valid measurement is available
  */
-int srf04_get_distance(const srf04_t* dev);
+int srf04_get_distance(const srf04_t *dev);
 
 #ifdef __cplusplus
 }
