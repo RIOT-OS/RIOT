@@ -83,11 +83,13 @@ int srf04_read(const srf04_t* dev)
 
 int srf04_get_distance(const srf04_t* dev)
 {
-    /* trigger new reading */
+    /* Trigger new reading */
     srf04_trigger(dev);
-    /* give the sensor the required time for sampling */
+
+    /* Give the sensor the required time for sampling */
     xtimer_usleep(SRF04_SAMPLE_PERIOD);
-    /* get the result */
+
+    /* Get the result */
     if (dev->distance >= SRF04_OK) {
         return ((dev->distance * 100) / SRF04_DISTANCE);
     }

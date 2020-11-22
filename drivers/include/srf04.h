@@ -54,7 +54,7 @@ typedef struct {
  */
 typedef struct {
     srf04_params_t p;   /**< GPIO Ports of device */
-    int distance;       /**< raw time of flight distance */
+    int32_t distance;   /**< raw time of flight distance */
     uint32_t time;      /**< timestamp of trigger or echo */
 } srf04_t;
 
