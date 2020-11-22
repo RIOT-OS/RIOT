@@ -95,7 +95,7 @@ static inline void xtimer_msleep(uint32_t milliseconds)
     if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
         ztimer_sleep(ZTIMER_MSEC, milliseconds);
     } else {
-        _ztimer_sleep_scale(ZTIMER_USEC, seconds, 1000);
+        _ztimer_sleep_scale(ZTIMER_USEC, milliseconds, 1000);
     }
 }
 
