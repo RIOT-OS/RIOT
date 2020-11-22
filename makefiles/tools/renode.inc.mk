@@ -15,6 +15,20 @@ ifneq (,$(EMULATOR_PIDFILE))
   RENODE_CONFIG_FLAGS += --pid-file $(EMULATOR_PIDFILE)
 endif
 
+# Renode logging configuration
+RENODE_SHOW_LOG ?= 0
+ifneq (1,$(RENODE_SHOW_LOG))
+  RENODE_CONFIG_FLAGS += --hide-log
+endif
+RENODE_LOG_LEVEL ?= 2  # Warning level
+RENODE_CONFIG_FLAGS += -e "logLevel $(RENODE_LOG_LEVEL)"
+
+# Renode GUI
+RENODE_SHOW_GUI ?= 0
+ifneq (1,$(RENODE_SHOW_GUI))
+  RENODE_CONFIG_FLAGS += --disable-xwt
+endif
+
 # Configure local serial port
 PORT = /tmp/riot_$(APPLICATION)_$(BOARD)_uart
 RENODE_CONFIG_FLAGS += -e "emulation CreateUartPtyTerminal \"term\" \"$(PORT)\" true"
