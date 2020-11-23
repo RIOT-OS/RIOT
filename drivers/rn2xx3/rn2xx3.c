@@ -253,7 +253,7 @@ int rn2xx3_mac_init(rn2xx3_t *dev)
     rn2xx3_mac_set_tx_power(dev, CONFIG_LORAMAC_DEFAULT_TX_POWER);
     rn2xx3_mac_set_tx_port(dev, CONFIG_LORAMAC_DEFAULT_TX_PORT);
     rn2xx3_mac_set_tx_mode(dev, CONFIG_LORAMAC_DEFAULT_TX_MODE);
-    rn2xx3_mac_set_adr(dev, LORAMAC_DEFAULT_ADR);
+    rn2xx3_mac_set_adr(dev, IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR));
     rn2xx3_mac_set_retx(dev, LORAMAC_DEFAULT_RETX);
     rn2xx3_mac_set_linkchk_interval(dev, LORAMAC_DEFAULT_LINKCHK);
     rn2xx3_mac_set_rx1_delay(dev, LORAMAC_DEFAULT_RX1_DELAY);
