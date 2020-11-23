@@ -306,7 +306,7 @@ int rn2xx3_mac_join_network(rn2xx3_t *dev, loramac_join_mode_t mode)
 
     ret = rn2xx3_wait_reply(dev,
                             CONFIG_LORAMAC_DEFAULT_JOIN_DELAY1 + \
-                            LORAMAC_DEFAULT_JOIN_DELAY2);
+                            CONFIG_LORAMAC_DEFAULT_JOIN_DELAY2);
 
     rn2xx3_set_internal_state(dev, RN2XX3_INT_STATE_IDLE);
 

@@ -370,8 +370,8 @@ extern "C" {
 /**
  * @brief   Default LoRaMAC join accept delay 2
  */
-#ifndef LORAMAC_DEFAULT_JOIN_DELAY2
-#define LORAMAC_DEFAULT_JOIN_DELAY2            (6U)
+#ifndef CONFIG_LORAMAC_DEFAULT_JOIN_DELAY2
+#define CONFIG_LORAMAC_DEFAULT_JOIN_DELAY2      (6U)
 #endif
 
 /**
