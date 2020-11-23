@@ -278,5 +278,9 @@ static inline uint8_t lorawan_hdr_get_frame_opts_len(lorawan_hdr_t *hdr)
     return (hdr->fctrl & LORAWAN_HDR_FOPTS_LEN_MASK) >> LORAWAN_HDR_FOPTS_LEN_POS;
 }
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* NET_LORAWAN_HDR_H */
 /** @} */
