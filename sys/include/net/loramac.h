@@ -412,8 +412,8 @@ extern "C" {
 /**
  * @brief   Default minimum RX symbols to detect a frame
  */
-#ifndef LORAMAC_DEFAULT_MIN_RX_SYMBOLS
-#define LORAMAC_DEFAULT_MIN_RX_SYMBOLS         (12)
+#ifndef CONFIG_LORAMAC_DEFAULT_MIN_RX_SYMBOLS
+#define CONFIG_LORAMAC_DEFAULT_MIN_RX_SYMBOLS   (12)
 #endif
 /** @} */
 
