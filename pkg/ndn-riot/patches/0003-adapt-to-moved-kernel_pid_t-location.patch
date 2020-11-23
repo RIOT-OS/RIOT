@@ -1,0 +1,39 @@
+From 51d973f2a0a04a716af8260c62fb5045356a30a5 Mon Sep 17 00:00:00 2001
+From: Kaspar Schleiser <kaspar@schleiser.de>
+Date: Mon, 23 Nov 2020 12:44:54 +0100
+Subject: [PATCH] adapt to moved kernel_pid_t location
+
+---
+ face-table.h | 2 +-
+ ndn.h        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/face-table.h b/face-table.h
+index 28b44a5c02..fb0c39b083 100644
+--- a/face-table.h
++++ b/face-table.h
+@@ -20,7 +20,7 @@
+ #ifndef NDN_FACE_TABLE_H_
+ #define NDN_FACE_TABLE_H_
+ 
+-#include <kernel_types.h>
++#include "sched.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+diff --git a/ndn.h b/ndn.h
+index d8d148c7f7..47d2032301 100644
+--- a/ndn.h
++++ b/ndn.h
+@@ -20,7 +20,7 @@
+ #ifndef NDN_H_
+ #define NDN_H_
+ 
+-#include <kernel_types.h>
++#include "sched.h"
+ 
+ #ifdef __cplusplus
+ extern "C" {
+-- 
+2.29.2
+
