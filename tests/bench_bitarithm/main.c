@@ -91,7 +91,14 @@ static void run_test(const char *name, unsigned (*test)(unsigned))
         ++count;
     } while (atomic_load(&done) == false);
 
-    printf("+ %s: %lu iterations per second\r\n", name, (4*PER_ITERATION) * count / TIMEOUT_S);
+    unsigned long iter_per_second = (4*PER_ITERATION) * count / TIMEOUT_S;
+
+    printf("{ \"%s\" : { \"iter/second\" : %lu", name, iter_per_second);
+#ifdef CLOCK_CORECLOCK
+    printf(", \"ticks\" : %"PRIu32,
+           (uint32_t)(CLOCK_CORECLOCK/iter_per_second));
+#endif
+    puts("}}");
 }
 
 static unsigned do_test_and_clear(unsigned state)
@@ -121,7 +128,15 @@ static void run_test_test_and_clear(void)
         ++count;
     } while (atomic_load(&done) == false);
 
-    printf("+ %s: %lu iterations per second\r\n", "bitarithm_test_and_clear", 2 * count / TIMEOUT_S);
+    unsigned long iter_per_second = 2 * count / TIMEOUT_S;
+    static const char name[] = "bitarithm_test_and_clear";
+
+    printf("{ \"%s\" : { \"iter/second\" : %lu", name, iter_per_second);
+#ifdef CLOCK_CORECLOCK
+    printf(", \"ticks\" : %"PRIu32,
+           (uint32_t)(CLOCK_CORECLOCK/iter_per_second));
+#endif
+    puts("}}");
 }
 
 #define run_test(test) run_test(#test, test)
