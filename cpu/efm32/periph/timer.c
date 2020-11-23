@@ -50,7 +50,7 @@ static timer_isr_ctx_t isr_ctx[TIMER_NUMOF];
 /**
  * @brief   Check whether device is a using a WTIMER device (32-bit)
  */
-static inline bool _is_wtimer(timer_t dev)
+static inline bool _is_wtimer(tim_t dev)
 {
 #if defined(WTIMER_COUNT) && WTIMER_COUNT > 0
     return ((uint32_t) timer_config[dev].timer.dev) >= WTIMER0_BASE;
@@ -63,7 +63,7 @@ static inline bool _is_wtimer(timer_t dev)
 /**
  * @brief   Check whether dev is using a LETIMER device
  */
-static inline bool _is_letimer(timer_t dev)
+static inline bool _is_letimer(tim_t dev)
 {
 #if defined(LETIMER_COUNT) && LETIMER_COUNT > 0
     return ((uint32_t) timer_config[dev].timer.dev) == LETIMER0_BASE;
