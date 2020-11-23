@@ -177,7 +177,7 @@ static void _driver_cb(netdev_t *dev, netdev_event_t event)
 
 static void _reset(gnrc_netif_t *netif)
 {
-    netif->lorawan.otaa = LORAMAC_DEFAULT_JOIN_PROCEDURE ==
+    netif->lorawan.otaa = CONFIG_LORAMAC_DEFAULT_JOIN_PROCEDURE ==
                           LORAMAC_JOIN_OTAA ? NETOPT_ENABLE : NETOPT_DISABLE;
     netif->lorawan.datarate = CONFIG_LORAMAC_DEFAULT_DR;
     netif->lorawan.demod_margin = 0;
