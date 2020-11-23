@@ -170,7 +170,7 @@ void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac)
 
     /* if the MAC is not activated, then this is a Join Request */
     rx_1 = mac->mlme.activation == MLME_ACTIVATION_NONE ?
-           LORAMAC_DEFAULT_JOIN_DELAY1 : mac->rx_delay;
+           CONFIG_LORAMAC_DEFAULT_JOIN_DELAY1 : mac->rx_delay;
 
     xtimer_set_msg(&mac->rx, rx_1 * _DRIFT_FACTOR, &mac->msg, thread_getpid());
 
