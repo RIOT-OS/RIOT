@@ -16,6 +16,8 @@
  */
 
 #include <errno.h>
+#include <limits.h>
+
 #include "irq.h"
 #include "assert.h"
 #include "sema.h"
