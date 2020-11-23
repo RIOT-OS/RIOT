@@ -282,14 +282,14 @@ extern "C" {
 /**
  * @brief   Default first RX window delay (in ms)
  */
-#ifndef LORAMAC_DEFAULT_RX1_DELAY
-#define LORAMAC_DEFAULT_RX1_DELAY              (1000U)
+#ifndef CONFIG_LORAMAC_DEFAULT_RX1_DELAY
+#define CONFIG_LORAMAC_DEFAULT_RX1_DELAY        (1000U)
 #endif
 
 /**
  * @brief   Default second RX window delay (in ms)
  */
-#define LORAMAC_DEFAULT_RX2_DELAY              (1000U + LORAMAC_DEFAULT_RX1_DELAY)
+#define LORAMAC_DEFAULT_RX2_DELAY              (1000U + CONFIG_LORAMAC_DEFAULT_RX1_DELAY)
 
 /**
  * @brief   Default second RX window datarate index

@@ -256,7 +256,7 @@ int rn2xx3_mac_init(rn2xx3_t *dev)
     rn2xx3_mac_set_adr(dev, IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR));
     rn2xx3_mac_set_retx(dev, CONFIG_LORAMAC_DEFAULT_RETX);
     rn2xx3_mac_set_linkchk_interval(dev, CONFIG_LORAMAC_DEFAULT_LINKCHK);
-    rn2xx3_mac_set_rx1_delay(dev, LORAMAC_DEFAULT_RX1_DELAY);
+    rn2xx3_mac_set_rx1_delay(dev, CONFIG_LORAMAC_DEFAULT_RX1_DELAY);
     rn2xx3_mac_set_ar(dev, IS_ACTIVE(CONFIG_RN2XX3_DEFAULT_AR));
     rn2xx3_mac_set_rx2_dr(dev, LORAMAC_DEFAULT_RX2_DR);
     rn2xx3_mac_set_rx2_freq(dev, LORAMAC_DEFAULT_RX2_FREQ);
