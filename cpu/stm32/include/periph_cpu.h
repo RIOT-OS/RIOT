@@ -21,6 +21,8 @@
 #ifndef PERIPH_CPU_H
 #define PERIPH_CPU_H
 
+#include <limits.h>
+
 #include "cpu.h"
 #include "macros/units.h"
 
