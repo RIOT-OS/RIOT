@@ -151,11 +151,9 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
 }
 
 int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
-                               const uint8_t *bytes, size_t len)
+                                   const uint8_t *bytes, size_t len)
 {
     assert(len <= FLASHPAGE_SIZE);
-
-    int res = -1;
 
     uint8_t *slot_start = (uint8_t *)riotboot_slot_get_hdr(state->target_slot);
 
@@ -179,11 +177,11 @@ int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
     int flashpage = flashpage_page((void *)slot_start);
     if (flashpage_write_and_verify(flashpage, firstpage) == FLASHPAGE_OK) {
         LOG_INFO(LOG_PREFIX "riotboot flashing completed successfully\n");
-        res = 0;
     }
     else {
-        LOG_WARNING(LOG_PREFIX "re-flashing first block failed!\n");
+        LOG_ERROR(LOG_PREFIX "re-flashing first block failed!\n");
+        return -1;
     }
 #endif /* !CONFIG_RIOTBOOT_FLASHWRITE_RAW */
-    return res;
+    return 0;
 }
