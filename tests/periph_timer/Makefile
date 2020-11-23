@@ -12,6 +12,7 @@ BOARDS_TIMER_250kHz := \
     #
 
 BOARDS_TIMER_32kHz := \
+    e180-zg120b-tb \
     hifive1 \
     hifive1b \
     ikea-tradfri \

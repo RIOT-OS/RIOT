@@ -15,6 +15,7 @@
 /boards/common/silabs/                      @basilfx
 /boards/common/slwstk6000b/                 @basilfx
 /boards/common/stm32/                       @aabadie @fjmolinas
+/boards/e180-zg120b-tb/                     @basilfx
 /boards/esp*/                               @gschorcht @yegorich
 /boards/hamilton/                           @Hyungsin
 /boards/ikea-tradfri/                       @basilfx

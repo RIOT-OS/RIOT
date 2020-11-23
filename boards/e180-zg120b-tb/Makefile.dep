@@ -1,0 +1,10 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += efm32_coretemp
+  USEMODULE += saul_gpio
+endif
+
+# add board common drivers
+USEMODULE += boards_common_silabs
+
+# include board common dependencies
+include $(RIOTBOARD)/common/silabs/Makefile.dep
