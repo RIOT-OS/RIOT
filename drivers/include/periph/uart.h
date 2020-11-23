@@ -91,6 +91,30 @@ typedef unsigned int uart_t;
 #endif
 
 /**
+ * @brief   Set to 1 if the CPU does not provide an implementation
+ *          for @ref uart_write
+ */
+#ifndef PERIPH_UART_NEEDS_WRITE
+#define PERIPH_UART_NEEDS_WRITE         (0)
+#endif
+
+/**
+ * @brief   Set to 1 if the CPU does not provide an implementation
+ *          for @ref uart_write_byte
+ */
+#ifndef PERIPH_UART_NEEDS_WRITE_BYTE
+#define PERIPH_UART_NEEDS_WRITE_BYTE    (1)
+#endif
+
+/**
+ * @brief   Set to 1 if the CPU does not provide an implementation
+ *          for @ref uart_write_string
+ */
+#ifndef PERIPH_UART_NEEDS_WRITE_STRING
+#define PERIPH_UART_NEEDS_WRITE_STRING  (1)
+#endif
+
+/**
  * @brief   Signature for receive interrupt callback
  *
  * @param[in] arg           context to the callback (optional)
@@ -270,6 +294,38 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
  *
  */
 void uart_write(uart_t uart, const uint8_t *data, size_t len);
+
+/**
+ * @brief   Write a single byte of data to the specified UART device
+ *
+ * This function is blocking, as it will only return after @p data
+ * has been send.
+ *
+ * @param[in] uart          UART device to use for transmission
+ * @param[in] data          byte to write
+ *
+ */
+#if PERIPH_UART_NEEDS_WRITE_BYTE
+static inline void uart_write_byte(uart_t uart, uint8_t data)
+{
+    uart_write(uart, &data, 1);
+}
+#else
+void uart_write_byte(uart_t uart, uint8_t data);
+#endif
+
+/**
+ * @brief   Write a NULL-terminated string to the specified UART device
+ *
+ * This function is blocking, as it will only return after all characters
+ * of the given string have been send. The way this data is send is up to the
+ * implementation: active waiting, interrupt driven, DMA, etc.
+ *
+ * @param[in] uart          UART device to use for transmission
+ * @param[in] s             string to send (NULL-terminated)
+ *
+ */
+void uart_write_string(uart_t uart, const char *s);
 
 /**
  * @brief   Power on the given UART device
