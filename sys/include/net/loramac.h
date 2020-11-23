@@ -377,8 +377,8 @@ extern "C" {
 /**
  * @brief   Default max FCNT gap
  */
-#ifndef LORAMAC_DEFAULT_MAX_FCNT_GAP
-#define LORAMAC_DEFAULT_MAX_FCNT_GAP           (16384U)
+#ifndef CONFIG_LORAMAC_DEFAULT_MAX_FCNT_GAP
+#define CONFIG_LORAMAC_DEFAULT_MAX_FCNT_GAP     (16384U)
 #endif
 
 /**
