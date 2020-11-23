@@ -239,8 +239,8 @@ extern "C" {
 /**
  * @brief   Default MAC TX port (from 1 to 223)
  */
-#ifndef LORAMAC_DEFAULT_TX_PORT
-#define LORAMAC_DEFAULT_TX_PORT                (2U)
+#ifndef CONFIG_LORAMAC_DEFAULT_TX_PORT
+#define CONFIG_LORAMAC_DEFAULT_TX_PORT          (2U)
 #endif
 
 /**

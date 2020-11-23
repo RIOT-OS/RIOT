@@ -398,7 +398,7 @@ int _loramac_handler(int argc, char **argv)
         }
 
         uint8_t cnf = LORAMAC_DEFAULT_TX_MODE;  /* Default: confirmable */
-        uint8_t port = LORAMAC_DEFAULT_TX_PORT; /* Default: 2 */
+        uint8_t port = CONFIG_LORAMAC_DEFAULT_TX_PORT; /* Default: 2 */
         /* handle optional parameters */
         if (argc > 3) {
             if (strcmp(argv[3], "cnf") == 0) {
