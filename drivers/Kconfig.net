@@ -6,6 +6,7 @@
 
 menu "Network Device Drivers"
 rsource "at86rf215/Kconfig"
+rsource "ata8520e/Kconfig"
 rsource "cc110x/Kconfig"
 rsource "dose/Kconfig"
 rsource "mrf24j40/Kconfig"

@@ -7,11 +7,14 @@
 menu "Drivers"
 
 menu "Actuator Device Drivers"
+rsource "aip31068/Kconfig"
+rsource "apa102/Kconfig"
 rsource "motor_driver/Kconfig"
 endmenu # Actuator Device Drivers
 
 menu "Miscellaneous Device Drivers"
 rsource "at/Kconfig"
+rsource "at24mac/Kconfig"
 endmenu # Miscellaneous Device Drivers
 
 rsource "Kconfig.net"
@@ -21,7 +24,13 @@ rsource "periph_common/Kconfig"
 endmenu # Peripherals drivers
 
 menu "Sensor Device Drivers"
+rsource "ad7746/Kconfig"
+rsource "adcxx1c/Kconfig"
 rsource "ads101x/Kconfig"
+rsource "adt7310/Kconfig"
+rsource "adxl345/Kconfig"
+rsource "apds99xx/Kconfig"
+rsource "at30tse75x/Kconfig"
 rsource "bmx055/Kconfig"
 rsource "fxos8700/Kconfig"
 rsource "gp2y10xx/Kconfig"
@@ -38,6 +47,9 @@ rsource "tmp00x/Kconfig"
 endmenu # Sensor Device Drivers
 
 menu "Storage Device Drivers"
+rsource "at24cxxx/Kconfig"
+rsource "at25xxx/Kconfig"
+rsource "mtd/Kconfig"
 rsource "mtd_sdcard/Kconfig"
 endmenu # Storage Device Drivers
 

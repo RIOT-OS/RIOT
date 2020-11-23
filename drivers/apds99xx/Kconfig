@@ -1,0 +1,59 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+choice
+    bool "APDS99XX proximity and ambient light sensor"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    optional
+    help
+        The driver can be used with following Broadcom sensors: APDS9900,
+        APDS9901, APDS9930, APDS9950, APDS9960. Select one model.
+
+        The base driver only supports a basic set of functions and has therefore
+        a small size. The procedure for retrieving new data is polling. Ambient
+        light and proximity sensing are supported.
+
+        The fully functional driver MODULE_APDS99XX_FULL supports all the
+        features supported by the base driver, as well as all other sensor
+        features, including interrupts and their configuration. Data-ready
+        interrupts can be used to retrieve data. In addition, threshold
+        interrupts can be used and configured.
+
+config MODULE_APDS9900
+    bool "APDS9900"
+    select MODULE_APDS99XX
+
+config MODULE_APDS9901
+    bool "APDS9901"
+    select MODULE_APDS99XX
+
+config MODULE_APDS9930
+    bool "APDS9930"
+    select MODULE_APDS99XX
+
+config MODULE_APDS9950
+    bool "APDS9950"
+    select MODULE_APDS99XX
+
+config MODULE_APDS9960
+    bool "APDS9960"
+    select MODULE_APDS99XX
+
+endchoice
+
+config MODULE_APDS99XX
+    bool
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+
+config MODULE_APDS99XX_FULL
+    bool "APDS99XX Full functionalities"
+    depends on MODULE_APDS99XX
+    depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_GPIO_IRQ

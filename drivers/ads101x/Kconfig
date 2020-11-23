@@ -4,6 +4,21 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
+config MODULE_ADS101X
+    bool "ADS101X Analog-to-Digital converter"
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_I2C
+    select MODULE_XTIMER
+    help
+        This driver works with the ads1013, ads1014, ads1015, ads1113, ads1114
+        and ads1115 models.
+
 menuconfig KCONFIG_USEMODULE_ADS101X
     bool "Configure ADS101X driver"
     depends on USEMODULE_ADS101X

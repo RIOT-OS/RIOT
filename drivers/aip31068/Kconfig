@@ -5,14 +5,12 @@
 # directory for more details.
 #
 
-menuconfig MODULE_ISRPIPE
-    bool "ISR Pipe"
-    select MODULE_TSRB
+config MODULE_AIP31068
+    bool "AIP31068 I2C LCD controller"
+    depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
-    help
-        ISR -> userspace pipe.
-
-config MODULE_ISRPIPE_READ_TIMEOUT
-    bool "ISR Pipe read with timeout"
-    depends on MODULE_ISRPIPE
     select MODULE_XTIMER
+    select MODULE_PERIPH_I2C
+# necessary to fix driver initialization on esp32
+# TODO: move this to ESP32
+    select MODULE_ESP_I2C_HW if CPU_ESP32

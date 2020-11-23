@@ -5,14 +5,10 @@
 # directory for more details.
 #
 
-menuconfig MODULE_ISRPIPE
-    bool "ISR Pipe"
-    select MODULE_TSRB
+config MODULE_ADT7310
+    bool "ADT7310 temperature sensor"
+    depends on HAS_PERIPH_SPI
     depends on TEST_KCONFIG
+    select MODULE_PERIPH_SPI
     help
-        ISR -> userspace pipe.
-
-config MODULE_ISRPIPE_READ_TIMEOUT
-    bool "ISR Pipe read with timeout"
-    depends on MODULE_ISRPIPE
-    select MODULE_XTIMER
+        Driver for the Analog Devices ADT7310 temperature sensor.

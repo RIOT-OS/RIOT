@@ -5,14 +5,11 @@
 # directory for more details.
 #
 
-menuconfig MODULE_ISRPIPE
-    bool "ISR Pipe"
-    select MODULE_TSRB
+config MODULE_AT30TSE75X
+    bool "AT30TSE75X temperature sensor"
+    depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
-    help
-        ISR -> userspace pipe.
-
-config MODULE_ISRPIPE_READ_TIMEOUT
-    bool "ISR Pipe read with timeout"
-    depends on MODULE_ISRPIPE
+    select MODULE_PERIPH_I2C
     select MODULE_XTIMER
+    help
+        AT30TSE75x temperature sensor with serial EEPROM.

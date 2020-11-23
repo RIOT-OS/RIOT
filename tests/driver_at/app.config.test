@@ -1,0 +1,20 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+# dependencies of AT driver
+CONFIG_MODULE_ISRPIPE=y
+CONFIG_MODULE_ISRPIPE_READ_TIMEOUT=y
+
+CONFIG_MODULE_AT=y
+
+# support URC processing
+CONFIG_MODULE_AT_URC=y
+
+# enable event thread to process URCs upon arrival
+CONFIG_MODULE_EVENT=y
+CONFIG_MODULE_EVENT_THREAD=y
+
+# support URC upon arrival
+CONFIG_MODULE_AT_URC_ISR=y
+
+# enable shell
+CONFIG_MODULE_SHELL=y

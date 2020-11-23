@@ -5,14 +5,10 @@
 # directory for more details.
 #
 
-menuconfig MODULE_ISRPIPE
-    bool "ISR Pipe"
-    select MODULE_TSRB
+config MODULE_AD7746
+    bool "AD7746 Capacitance-to-digital converter"
+    depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
     help
-        ISR -> userspace pipe.
-
-config MODULE_ISRPIPE_READ_TIMEOUT
-    bool "ISR Pipe read with timeout"
-    depends on MODULE_ISRPIPE
-    select MODULE_XTIMER
+        AD7746 Capacitance-to-digital converter with temperature sensor driver.

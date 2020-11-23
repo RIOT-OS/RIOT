@@ -1,0 +1,40 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+choice
+    bool "ADCXX1C Analog-to-Digital converter"
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    optional
+    help
+        This driver works with adc081c, adc101c and adc121c models. Select one.
+
+config MODULE_ADC081C
+    bool "ADC081C"
+    select MODULE_ADCXX1C
+
+config MODULE_ADC101C
+    bool "ADC101C"
+    select MODULE_ADCXX1C
+
+config MODULE_ADC121C
+    bool "ADC121C"
+    select MODULE_ADCXX1C
+
+endchoice
+
+config MODULE_ADCXX1C
+    bool
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_I2C
