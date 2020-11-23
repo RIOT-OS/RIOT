@@ -290,10 +290,6 @@ void uart_write_byte(uart_t uart, uint8_t data)
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    if (!gpio_is_valid(uart_config[uart].tx_pin)) {
-        return;
-    }
-
     for (const void* end = data + len; data != end; ++data) {
         _write_byte(uart, *data);
     }
