@@ -405,8 +405,8 @@ extern "C" {
 /**
  * @brief   Default maximum system overall timing error
  */
-#ifndef LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR
-#define LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR    (50)
+#ifndef CONFIG_LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR
+#define CONFIG_LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR  (50)
 #endif
 
 /**
