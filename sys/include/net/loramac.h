@@ -275,8 +275,8 @@ extern "C" {
  *
  *          0 means the link check process is disabled
  */
-#ifndef LORAMAC_DEFAULT_LINKCHK
-#define LORAMAC_DEFAULT_LINKCHK                (0U)
+#ifndef CONFIG_LORAMAC_DEFAULT_LINKCHK
+#define CONFIG_LORAMAC_DEFAULT_LINKCHK          (0U)
 #endif
 
 /**
