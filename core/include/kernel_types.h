@@ -45,5 +45,13 @@ typedef signed ssize_t;
 #   endif
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* KERNEL_TYPES_H */
 /** @} */
