@@ -182,6 +182,20 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg);
 
 #if defined(MODULE_PERIPH_UART_RECONFIGURE) || DOXYGEN
 /**
+ * @brief   Set the UART RX callback
+ *
+ * If no callback parameter is given (rx_cb := NULL), the UART will be
+ * initialized in TX only mode.
+ *
+ * @param[in] uart          UART device to configure
+ * @param[in] rx_cb         receive callback, executed in interrupt context once
+ *                          for every byte that is received (RX buffer filled),
+ *                          set to NULL for TX only mode
+ * @param[in] arg           optional context passed to the callback functions
+ */
+void uart_set_rx_cb(uart_t uart, uart_rx_cb_t rx_cb, void *arg);
+
+/**
  * @brief   Change the pins of the given UART back to plain GPIO functionality
  *
  * The pin mux of the RX and TX pins of the bus will be changed back to
