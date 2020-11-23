@@ -31,6 +31,9 @@ USEMODULE += netstats_l2
 USEMODULE += netstats_ipv6
 USEMODULE += netstats_rpl
 
+# Uncomment this to enable legacy support of netdev for IEEE 802.15.4 radios.
+# USEMODULE += netdev_ieee802154_legacy
+
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
