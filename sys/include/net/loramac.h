@@ -246,9 +246,15 @@ extern "C" {
 /**
  * @brief   Default MAC TX mode (confirmable or unconfirmable)
  */
- #ifndef LORAMAC_DEFAULT_TX_MODE
- #define LORAMAC_DEFAULT_TX_MODE               (LORAMAC_TX_CNF)
- #endif
+#if IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_TX_MODE_CNF)
+#define CONFIG_LORAMAC_DEFAULT_TX_MODE          (LORAMAC_TX_CNF)
+#elif IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_TX_MODE_UNCNF)
+#define CONFIG_LORAMAC_DEFAULT_TX_MODE          (LORAMAC_TX_UNCNF)
+#endif
+
+#ifndef CONFIG_LORAMAC_DEFAULT_TX_MODE
+#define CONFIG_LORAMAC_DEFAULT_TX_MODE          (LORAMAC_TX_CNF)
+#endif
 
 /**
  * @brief   Default adaptive datarate state

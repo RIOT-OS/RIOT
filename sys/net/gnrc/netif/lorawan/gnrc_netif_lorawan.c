@@ -183,7 +183,7 @@ static void _reset(gnrc_netif_t *netif)
     netif->lorawan.demod_margin = 0;
     netif->lorawan.num_gateways = 0;
     netif->lorawan.port = CONFIG_LORAMAC_DEFAULT_TX_PORT;
-    netif->lorawan.ack_req = LORAMAC_DEFAULT_TX_MODE == LORAMAC_TX_CNF;
+    netif->lorawan.ack_req = CONFIG_LORAMAC_DEFAULT_TX_MODE == LORAMAC_TX_CNF;
     netif->lorawan.flags = 0;
 }
 
