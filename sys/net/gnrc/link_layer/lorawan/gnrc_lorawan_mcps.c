@@ -415,7 +415,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     mac->mcps.waiting_for_ack = waiting_for_ack;
     mac->mcps.ack_requested = false;
 
-    mac->mcps.nb_trials = LORAMAC_DEFAULT_RETX;
+    mac->mcps.nb_trials = CONFIG_LORAMAC_DEFAULT_RETX;
 
     mac->mcps.msdu = pkt;
     mac->last_dr = mcps_request->data.dr;

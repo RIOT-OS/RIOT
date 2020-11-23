@@ -266,8 +266,8 @@ extern "C" {
 /**
  * @brief   Default uplink retransmission
  */
-#ifndef LORAMAC_DEFAULT_RETX
-#define LORAMAC_DEFAULT_RETX                   (5U)
+#ifndef CONFIG_LORAMAC_DEFAULT_RETX
+#define CONFIG_LORAMAC_DEFAULT_RETX             (5U)
 #endif
 
 /**
