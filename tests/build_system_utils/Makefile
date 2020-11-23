@@ -22,6 +22,7 @@ COMPILE_TESTS += test-memoized-variables
 COMPILE_TESTS += test-lowercase
 COMPILE_TESTS += test-uppercase
 COMPILE_TESTS += test-uppercase_and_underscore
+COMPILE_TESTS += test-version_is_greater
 
 # Tests will be run both in the host machine and in `docker`
 all: build-system-utils-tests
@@ -45,7 +46,12 @@ test-memoized-variables:
 
 test-lowercase:
 	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-lowercase)
+
 test-uppercase:
 	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-uppercase)
+
 test-uppercase_and_underscore:
 	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-uppercase_and_underscore)
+
+test-version_is_greater:
+	$(Q)$(call command_should_succeed,"$(MAKE)" -C $(MAKEFILES_UTILS) -f test-strings.mk test-version_is_greater)
