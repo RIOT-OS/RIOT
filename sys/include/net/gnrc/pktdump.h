@@ -22,7 +22,7 @@
 #ifndef NET_GNRC_PKTDUMP_H
 #define NET_GNRC_PKTDUMP_H
 
-#include "kernel_types.h"
+#include "sched.h"
 
 #ifdef __cplusplus
 extern "C" {

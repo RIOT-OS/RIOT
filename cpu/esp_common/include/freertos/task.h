@@ -13,6 +13,8 @@
 
 #ifndef DOXYGEN
 
+#include <limits.h> /* for INT_MAX */
+
 #include "thread.h"
 #include "freertos/FreeRTOS.h"
 

@@ -28,7 +28,7 @@
 extern "C" {
 #endif
 
-#include "kernel_types.h"
+#include "sched.h"
 #include "can/can.h"
 #include "can/common.h"
 #include "can/device.h"

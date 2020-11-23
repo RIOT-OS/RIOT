@@ -28,7 +28,7 @@
 #include "msg.h"
 #endif /* MODULE_CORE_MSG */
 #include "mutex.h"
-#include "kernel_types.h"
+#include "sched.h"
 
 #include "ztimer.h"
 

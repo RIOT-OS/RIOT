@@ -167,7 +167,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "kernel_types.h"
+
+#include "sched.h"
 
 #ifdef __cplusplus
 extern "C" {

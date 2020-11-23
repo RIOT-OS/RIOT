@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 #include "thread.h"
-#include "kernel_types.h"
+#include "sched.h"
 
 /* One stack for all threads. DON'T TRY THIS AT HOME!! */
 static char dummy_stack[THREAD_STACKSIZE_IDLE];

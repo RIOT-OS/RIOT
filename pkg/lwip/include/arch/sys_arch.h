@@ -25,7 +25,7 @@
 #include <stdint.h>
 
 #include "cib.h"
-#include "kernel_types.h"
+#include "sched.h"
 #include "mbox.h"
 #include "mutex.h"
 #include "random.h"

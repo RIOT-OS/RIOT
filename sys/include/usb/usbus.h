@@ -28,7 +28,7 @@
 
 #include "clist.h"
 #include "event.h"
-#include "kernel_types.h"
+#include "sched.h"
 #include "kernel_defines.h"
 #include "msg.h"
 #include "thread.h"

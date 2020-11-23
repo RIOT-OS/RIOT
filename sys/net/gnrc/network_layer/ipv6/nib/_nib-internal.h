@@ -27,7 +27,7 @@
 
 #include "bitfield.h"
 #include "evtimer_msg.h"
-#include "kernel_types.h"
+#include "sched.h"
 #include "mutex.h"
 #include "net/eui64.h"
 #include "net/ipv6/addr.h"

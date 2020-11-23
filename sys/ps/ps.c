@@ -21,7 +21,7 @@
 #include "thread.h"
 #include "sched.h"
 #include "thread.h"
-#include "kernel_types.h"
+#include "sched.h"
 
 #ifdef MODULE_SCHEDSTATISTICS
 #include "schedstatistics.h"
