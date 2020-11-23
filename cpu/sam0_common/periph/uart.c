@@ -188,21 +188,28 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     /* enable receiver and RX interrupt if configured */
-    if ((rx_cb) && (uart_config[uart].rx_pin != GPIO_UNDEF)) {
-        uart_ctx[uart].rx_cb = rx_cb;
-        uart_ctx[uart].arg = arg;
+    if (gpio_is_valid(uart_config[uart].rx_pin)) {
 #ifdef UART_HAS_TX_ISR
         /* enable RXNE ISR */
-        NVIC_EnableIRQ(SERCOM0_2_IRQn + (sercom_id(dev(uart)) * 4));
+        NVIC_EnableIRQ(SERCOM0_2_IRQn + sercom_id(dev(uart)) * 4);
 #else
         /* enable UART ISR */
         NVIC_EnableIRQ(SERCOM0_IRQn + sercom_id(dev(uart)));
 #endif /* UART_HAS_TX_ISR */
+
+        /* enable RX */
         dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_RXEN;
-        dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
+
         /* set wakeup receive from sleep if enabled */
         if (uart_config[uart].flags & UART_FLAG_WAKEUP) {
             dev(uart)->CTRLB.reg |= SERCOM_USART_CTRLB_SFDE;
+        }
+
+        uart_ctx[uart].rx_cb = rx_cb;
+        uart_ctx[uart].arg = arg;
+
+        if (rx_cb) {
+            dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
         }
     }
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
@@ -223,6 +230,19 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_ENABLE;
 
     return UART_OK;
+}
+
+void uart_set_rx_cb(uart_t uart, uart_rx_cb_t rx_cb, void *arg)
+{
+    /* disable interrupt while re-configuring callback */
+    dev(uart)->INTENCLR.reg = SERCOM_USART_INTENSET_RXC;
+
+    uart_ctx[uart].rx_cb = rx_cb;
+    uart_ctx[uart].arg = arg;
+
+    if (rx_cb) {
+        dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_RXC;
+    }
 }
 
 void uart_init_pins(uart_t uart)
