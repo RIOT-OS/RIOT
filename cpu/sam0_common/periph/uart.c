@@ -261,34 +261,43 @@ void uart_deinit_pins(uart_t uart)
 #endif
 }
 
+static inline void _write_byte(uart_t uart, uint8_t data)
+{
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    if (irq_is_in() || __get_PRIMASK()) {
+        /* if ring buffer is full free up a spot */
+        if (tsrb_full(&uart_tx_rb[uart])) {
+            while (!dev(uart)->INTFLAG.bit.DRE) {}
+            dev(uart)->DATA.reg = tsrb_get_one(&uart_tx_rb[uart]);
+        }
+        tsrb_add_one(&uart_tx_rb[uart], data);
+    }
+    else {
+        while (tsrb_add_one(&uart_tx_rb[uart], data) < 0) {}
+    }
+    dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
+#else
+    while (!dev(uart)->INTFLAG.bit.DRE) {}
+    dev(uart)->DATA.reg = data;
+#endif
+}
+
+void uart_write_byte(uart_t uart, uint8_t data)
+{
+    _write_byte(uart, data);
+    while (!dev(uart)->INTFLAG.bit.TXC) {}
+}
+
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    if (uart_config[uart].tx_pin == GPIO_UNDEF) {
+    if (!gpio_is_valid(uart_config[uart].tx_pin)) {
         return;
     }
 
-#ifdef MODULE_PERIPH_UART_NONBLOCKING
     for (const void* end = data + len; data != end; ++data) {
-        if (irq_is_in() || __get_PRIMASK()) {
-            /* if ring buffer is full free up a spot */
-            if (tsrb_full(&uart_tx_rb[uart])) {
-                while (!dev(uart)->INTFLAG.bit.DRE) {}
-                dev(uart)->DATA.reg = tsrb_get_one(&uart_tx_rb[uart]);
-            }
-            tsrb_add_one(&uart_tx_rb[uart], *data);
-        }
-        else {
-            while (tsrb_add_one(&uart_tx_rb[uart], *data) < 0) {}
-        }
-        dev(uart)->INTENSET.reg = SERCOM_USART_INTENSET_DRE;
-    }
-#else
-    for (const void* end = data + len; data != end; ++data) {
-        while (!dev(uart)->INTFLAG.bit.DRE) {}
-        dev(uart)->DATA.reg = *data;
+        _write_byte(uart, *data);
     }
     while (!dev(uart)->INTFLAG.bit.TXC) {}
-#endif
 }
 
 void uart_poweron(uart_t uart)
