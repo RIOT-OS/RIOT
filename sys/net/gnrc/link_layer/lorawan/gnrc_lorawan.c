@@ -190,7 +190,7 @@ void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac)
     switch (mac->state) {
         case LORAWAN_STATE_RX_1:
             DEBUG("gnrc_lorawan: RX1 timeout.\n");
-            _configure_rx_window(mac, LORAMAC_DEFAULT_RX2_FREQ,
+            _configure_rx_window(mac, CONFIG_LORAMAC_DEFAULT_RX2_FREQ,
                                  mac->dl_settings &
                                  GNRC_LORAWAN_DL_RX2_DR_MASK);
             mac->state = LORAWAN_STATE_RX_2;

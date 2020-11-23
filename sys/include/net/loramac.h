@@ -339,11 +339,11 @@ extern "C" {
 /**
  * @brief   Default second RX window frequency (in Hz)
  */
-#ifndef LORAMAC_DEFAULT_RX2_FREQ
+#ifndef CONFIG_LORAMAC_DEFAULT_RX2_FREQ
 #if IS_ACTIVE(CONFIG_LORAMAC_REGION_EU_868)
-#define LORAMAC_DEFAULT_RX2_FREQ               (869525000UL)
+#define CONFIG_LORAMAC_DEFAULT_RX2_FREQ         (869525000UL)
 #elif IS_ACTIVE(CONFIG_LORAMAC_REGION_IN_865)
-#define LORAMAC_DEFAULT_RX2_FREQ               (866550000UL)
+#define CONFIG_LORAMAC_DEFAULT_RX2_FREQ         (866550000UL)
 #endif
 #endif
 
