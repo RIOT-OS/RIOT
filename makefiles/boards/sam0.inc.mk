@@ -41,10 +41,3 @@ ifeq ($(PROGRAMMER),)
     PROGRAMMER ?= openocd
   endif
 endif
-
-ifeq ($(PROGRAMMER),edbg)
-  # use edbg for flashing. must be included before openocd
-  include $(RIOTMAKE)/tools/edbg.inc.mk
-  # use openocd for debugging
-  include $(RIOTMAKE)/tools/openocd.inc.mk
-endif

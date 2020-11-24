@@ -31,3 +31,7 @@ define edbg-flash-recipe
 endef
 
 flash-recipe = $(edbg-flash-recipe)
+
+# use openocd for debugging, must be included at the end so FLASHER/RESET
+# variables are already set for edbg.
+include $(RIOTMAKE)/tools/openocd.inc.mk
