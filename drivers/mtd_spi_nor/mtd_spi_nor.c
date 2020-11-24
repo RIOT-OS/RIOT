@@ -400,6 +400,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
 #endif
             /* enable 32 bit address mode */
             if (dev->params->addr_width == 4) {
+                mtd_spi_cmd(dev, dev->params->opcode->wren);
                 mtd_spi_cmd(dev, SFLASH_CMD_4_BYTE_ADDR);
             }
 
