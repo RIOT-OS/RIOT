@@ -183,6 +183,7 @@ static inline void mutex_init(mutex_t *mutex)
 static inline mutex_cancel_t mutex_cancel_init(mutex_t *mutex)
 {
     mutex_cancel_t result = { mutex, thread_get_active(), 0 };
+
     return result;
 }
 
@@ -202,10 +203,11 @@ static inline int mutex_trylock(mutex_t *mutex)
 {
     unsigned irq_state = irq_disable();
     int retval = 0;
+
     if (mutex->queue.next == NULL) {
         mutex->queue.next = MUTEX_LOCKED;
         retval = 1;
-    };
+    }
     irq_restore(irq_state);
     return retval;
 }
