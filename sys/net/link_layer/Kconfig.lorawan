@@ -1,0 +1,527 @@
+# Copyright (c) 2020 Freie Universitaet Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+config HAVE_LORAWAN
+    bool
+    help
+        Indicates that LoRaWAN support is present.
+
+menuconfig KCONFIG_USEMODULE_LORAWAN
+    bool "Configure LoRaWAN MAC"
+    depends on HAVE_LORAWAN
+    help
+        Configure LoRaWAN module using Kconfig. This may override configurations
+        in LoRa PHY.
+
+if KCONFIG_USEMODULE_LORAWAN
+
+choice
+    bool "Channel plan"
+    depends on USEMODULE_GNRC_LORAWAN || USEPKG_SEMTECH_LORAMAC
+    default LORAMAC_REGION_EU_868
+    help
+        Configure the LoRaWAN region.
+
+if USEPKG_SEMTECH_LORAMAC
+
+config LORAMAC_REGION_AS_923
+    bool "AS923"
+
+config LORAMAC_REGION_AU_915
+    bool "AU915-928"
+
+config LORAMAC_REGION_CN_470
+    bool "CN470-510"
+
+config LORAMAC_REGION_CN_779
+    bool "CN779-787"
+
+config LORAMAC_REGION_EU_433
+    bool "EU433"
+
+endif # USEPKG_SEMTECH_LORAMAC
+
+config LORAMAC_REGION_EU_868
+    bool "EU863-870"
+
+config LORAMAC_REGION_IN_865
+    bool "IN865-867"
+
+if USEPKG_SEMTECH_LORAMAC
+
+config LORAMAC_REGION_KR_920
+    bool "KR920-923"
+
+config LORAMAC_REGION_RU_864
+    bool "RU864-870"
+
+config LORAMAC_REGION_US_915
+    bool "US902-928"
+
+config LORAMAC_REGION_US_915_HYBRID
+    bool "US902-928(hybrid)"
+
+endif # USEPKG_SEMTECH_LORAMAC
+
+endchoice
+
+choice
+    bool "Join procedure"
+    depends on USEMODULE_GNRC_LORAWAN
+    default LORAMAC_DEFAULT_JOIN_PROCEDURE_OTAA
+    help
+        Configure the join procedure for end node activation. There are two
+        options, Over The Air Activation (OTAA) results in device sending
+        join request to the network whereas in the case of Activation By
+        Personalization (ABP) the user enters the activation keys manually. OTAA
+        is the preferred and most secure way to connect to a LoRaWAN network.
+        For quick testing ABP is preferred as the device can transmit right
+        away without waiting for the network to provision the keys.
+
+config LORAMAC_DEFAULT_JOIN_PROCEDURE_OTAA
+    bool "Over the air activation (OTAA)"
+
+config LORAMAC_DEFAULT_JOIN_PROCEDURE_ABP
+    bool "Activation by personalization (ABP)"
+
+endchoice
+
+if USEMODULE_GNRC_LORAWAN || USEPKG_SEMTECH_LORAMAC
+
+menu "OTAA credentials"
+
+config LORAMAC_DEV_EUI_DEFAULT
+    string "Device EUI"
+    default "0000000000000000"
+    help
+        Configure the default device EUI for join procedure.
+
+config LORAMAC_APP_EUI_DEFAULT
+    string "Application EUI"
+    default "0000000000000000"
+    help
+        Configure the default application EUI for join procedure.
+
+config LORAMAC_APP_KEY_DEFAULT
+    string "Application key"
+    default "00000000000000000000000000000000"
+    help
+        Configure the default application key for join procedure.
+
+endmenu # OTAA credentials
+
+endif # USEMODULE_GNRC_LORAWAN || USEPKG_SEMTECH_LORAMAC
+
+if USEMODULE_GNRC_LORAWAN
+
+menu "ABP credentials"
+
+config LORAMAC_DEV_ADDR_DEFAULT
+    string "Device address"
+    default "00000000"
+    help
+        Configure the default device address for ABP.
+
+config LORAMAC_NWK_SKEY_DEFAULT
+    string "Network session key"
+    default "00000000000000000000000000000000"
+    help
+        Configure the default network session key for ABP.
+
+config LORAMAC_APP_SKEY_DEFAULT
+    string "Application session key"
+    default "00000000000000000000000000000000"
+    help
+        Configure the default application session key for ABP.
+
+endmenu # ABP credentials
+
+endif # USEMODULE_GNRC_LORAWAN
+
+choice
+    bool "Device Class"
+    depends on USEMODULE_GNRC_LORAWAN || USEPKG_SEMTECH_LORAMAC
+    default LORAMAC_DEFAULT_DEVICE_CLASS_A
+    help
+        Configure the class of device. **IMP** GNRC LoRaWAN only supports
+        Class A. LoRaWAN supports three classes of operation for end nodes
+        namely Class A, B and C. All LoRaWAN devices are expected to implement
+        Class A, whereas Class B and Class C can be considered as extensions to
+        the specification of Class A devices. More information on device classes
+        be found in this link
+        < https://www.thethingsnetwork.org/docs/lorawan/classes.html >
+
+config LORAMAC_DEFAULT_DEVICE_CLASS_A
+    bool "Class A"
+    help
+        Class A devices support bi-directional communication between a device
+        and a gateway. Uplink messages (from the device to the server) can be
+        sent at any time (randomly). The device then opens two receive windows
+        at specified times (1s and 2s) after an uplink transmission. The receive
+        windows delays can be customised in Advanced options.
+
+config LORAMAC_DEFAULT_DEVICE_CLASS_B
+    bool "Class B"
+    depends on USEPKG_SEMTECH_LORAMAC
+    help
+        Class B devices extend Class A by adding scheduled receive windows for
+        downlink messages from the server. Using time-synchronized beacons
+        transmitted by the gateway, the devices periodically open receive
+        windows.
+
+config LORAMAC_DEFAULT_DEVICE_CLASS_C
+    bool "Class C"
+    depends on USEPKG_SEMTECH_LORAMAC
+    help
+        Class C devices extend Class A by keeping the receive windows open
+        unless they are transmitting. This allows for low-latency communication
+        but is many times more energy consuming than Class A devices.
+
+endchoice
+
+config LORAMAC_DEFAULT_PRIVATE_NETWORK
+    bool "Private Network"
+    depends on USEMODULE_GNRC_LORAWAN || USEPKG_SEMTECH_LORAMAC
+    help
+        Configure the default network type. Network is set to public by default.
+        Enable the option to set as network as private. This configuration sets
+        the sync word for LoRaWAN communication. This should be in concordance
+        with the gateway configuration. Public networks uses `0x34` while
+        private networks use `0x12` as sync word.
+
+choice
+    bool "Tx Data rate index"
+    default LORAMAC_DEFAULT_DR_0
+    help
+        Configure Data Rate (DR). Data rate combines two aspects, Bandwidth (BW)
+        and Spreading Factor(SF). BW depends on the region while SF contributes
+        to the dwell time in any given band which is limited by region. DR hence
+        signifies difference combination on BW and SF for different regions.
+        Refer LoRaWAN 1.0.3 Regional Parameters for more information.
+
+config LORAMAC_DEFAULT_DR_0
+    bool "DR0"
+
+config LORAMAC_DEFAULT_DR_1
+    bool "DR1"
+
+config LORAMAC_DEFAULT_DR_2
+    bool "DR2"
+
+config LORAMAC_DEFAULT_DR_3
+    bool "DR3"
+
+config LORAMAC_DEFAULT_DR_4
+    bool "DR4"
+
+config LORAMAC_DEFAULT_DR_5
+    bool "DR5"
+
+config LORAMAC_DEFAULT_DR_6
+    bool "DR6"
+
+config LORAMAC_DEFAULT_DR_7
+    bool "DR7"
+
+if LORAMAC_REGION_US_915
+
+config LORAMAC_DEFAULT_DR_8
+    bool "DR8"
+
+config LORAMAC_DEFAULT_DR_9
+    bool "DR9"
+
+config LORAMAC_DEFAULT_DR_10
+    bool "DR10"
+
+config LORAMAC_DEFAULT_DR_11
+    bool "DR11"
+
+config LORAMAC_DEFAULT_DR_12
+    bool "DR12"
+
+config LORAMAC_DEFAULT_DR_13
+    bool "DR13"
+
+config LORAMAC_DEFAULT_DR_14
+    bool "DR14"
+
+config LORAMAC_DEFAULT_DR_15
+    bool "DR15"
+
+endif # LORAMAC_REGION_US_915
+
+endchoice
+
+choice
+    bool "TX Power index"
+    depends on USEMODULE_RN2XX3
+    default LORAMAC_DEFAULT_TX_POWER_1
+    help
+        Configure the TX power index. TXPower index indicates power levels
+        relative to the max EIRP level of the end-device. Refer
+        LoRaWAN 1.0.3 Regional Parameters for more information.
+
+config LORAMAC_DEFAULT_TX_POWER_0
+    bool "TXPower 0"
+
+config LORAMAC_DEFAULT_TX_POWER_1
+    bool "TXPower 1"
+
+config LORAMAC_DEFAULT_TX_POWER_2
+    bool "TXPower 2"
+
+config LORAMAC_DEFAULT_TX_POWER_3
+    bool "TXPower 3"
+
+config LORAMAC_DEFAULT_TX_POWER_4
+    bool "TXPower 4"
+
+config LORAMAC_DEFAULT_TX_POWER_5
+    bool "TXPower 5"
+
+config LORAMAC_DEFAULT_TX_POWER_6
+    bool "TXPower 6"
+
+config LORAMAC_DEFAULT_TX_POWER_7
+    bool "TXPower 7"
+
+if LORAMAC_REGION_US_915
+
+config LORAMAC_DEFAULT_TX_POWER_8
+    bool "TXPower 8"
+
+config LORAMAC_DEFAULT_TX_POWER_9
+    bool "TXPower 9"
+
+config LORAMAC_DEFAULT_TX_POWER_10
+    bool "TXPower 10"
+
+config LORAMAC_DEFAULT_TX_POWER_11
+    bool "TXPower 11"
+
+config LORAMAC_DEFAULT_TX_POWER_12
+    bool "TXPower 12"
+
+config LORAMAC_DEFAULT_TX_POWER_13
+    bool "TXPower 13"
+
+config LORAMAC_DEFAULT_TX_POWER_14
+    bool "TXPower 14"
+
+config LORAMAC_DEFAULT_TX_POWER_15
+    bool "TXPower 15"
+
+endif # LORAMAC_REGION_US_915
+
+endchoice
+
+config LORAMAC_DEFAULT_TX_PORT
+    int "MAC TX port"
+    default 2
+    range 1 223
+    help
+        Configure the default MAC TX port. The TX port denotes the port field
+        `FPort` in the payload and is commonly used on the destination
+        side (Application Server) to distinguish different payload formats. For
+        example it can be used to identify different sensor types/values from
+        the same end-node and hence different payload formats can be assigned to
+        the different values based on value of port.
+
+choice
+    bool "MAC TX mode"
+    default LORAMAC_DEFAULT_TX_MODE_CNF
+    help
+        Configure the type of uplink packet (confirmed/unconfirmed). A confirmed
+        uplink will expect an acknowledgment from the network server; otherwise,
+        the message will be retransmitted by the number indicated by
+        CONFIG_LORAMAC_DEFAULT_RETX, whereas an unconfirmed message will not
+        expect any acknowledgment back from the network server.
+
+config LORAMAC_DEFAULT_TX_MODE_CNF
+    bool "Confirmable"
+
+config LORAMAC_DEFAULT_TX_MODE_UNCNF
+    bool "Unconfirmable"
+
+endchoice
+
+config LORAMAC_ADVANCED_OPTIONS
+    bool "Enable advanced options"
+
+config LORAMAC_DEFAULT_NETID
+    int "NET ID" if LORAMAC_ADVANCED_OPTIONS
+    default 1
+    help
+        Configure the default device NETID. NETID is used by networks for
+        assigning network-specific addresses to their end-devices
+        (i.e., DevAddr) so that uplink frames sent by those devices even when
+        they are roaming outside their home network can be forwarded to their
+        home network.
+
+config LORAMAC_DEFAULT_RETX
+    int "Uplink retransmissions" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEMODULE_GNRC_LORAWAN || USEMODULE_RN2XX3
+    range 0 255
+    default 5
+    help
+        Configure the maximum number of retransmissions to be used for a
+        confirmed uplink packet, if no downlink acknowledgment is received from
+        the network.
+
+config LORAMAC_DEFAULT_ADR
+    bool "Enable ADR" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEPKG_SEMTECH_LORAMAC || USEMODULE_RN2XX3
+    help
+        Enable or disable Adaptive Data Rate (ADR). If enabled the end node will
+        inform the network server about the status of ADR using the ADR field in
+        uplink data packet. The network server will then optimize the data rate
+        and the transmission power of the end node based on the information
+        collected from the network.
+
+config LORAMAC_DEFAULT_LINKCHK
+    int "Link check interval (in seconds)" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEMODULE_RN2XX3
+    range 0 65535
+    default 0
+    help
+        Configure the default link check interval (in seconds). 0 means the link
+        check process is disabled. The link check process is used by an
+        end-device to validate its connectivity with the network. The frame has
+        no payload. When a `LinkCheckReq` is received by the network server via
+        one or multiple gateways, it responds with a `LinkCheckAns` MAC command.
+
+config LORAMAC_DEFAULT_RX1_DELAY
+    int "RX1 window delay (in milliseconds)" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEMODULE_GNRC_LORAWAN || USEMODULE_RN2XX3
+    range 1000 5000
+    default 1000
+    help
+        Configure the RX1 window delay (in milliseconds). This configuration
+        specifies the delay to open the RX1 window after the end of
+        uplink modulation on the end-node.
+
+choice
+    bool "RX2 window datarate index" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEMODULE_GNRC_LORAWAN || USEMODULE_RN2XX3
+    default LORAMAC_DEFAULT_RX2_DR_0 if LORAMAC_REGION_EU_868
+    default LORAMAC_DEFAULT_RX2_DR_2 if LORAMAC_REGION_IN_865
+    help
+        Configure the RX2 window datarate. This may be changed only if the
+        network server can be configured with the same datarate.
+
+config LORAMAC_DEFAULT_RX2_DR_0
+    bool "DR0"
+
+config LORAMAC_DEFAULT_RX2_DR_1
+    bool "DR1"
+
+config LORAMAC_DEFAULT_RX2_DR_2
+    bool "DR2"
+
+config LORAMAC_DEFAULT_RX2_DR_3
+    bool "DR3"
+
+config LORAMAC_DEFAULT_RX2_DR_4
+    bool "DR4"
+
+config LORAMAC_DEFAULT_RX2_DR_5
+    bool "DR5"
+
+config LORAMAC_DEFAULT_RX2_DR_6
+    bool "DR6"
+
+config LORAMAC_DEFAULT_RX2_DR_7
+    bool "DR7"
+
+if LORAMAC_REGION_US_915
+
+config LORAMAC_DEFAULT_RX2_DR_8
+    bool "DR8"
+
+config LORAMAC_DEFAULT_RX2_DR_9
+    bool "DR9"
+
+config LORAMAC_DEFAULT_RX2_DR_10
+    bool "DR10"
+
+config LORAMAC_DEFAULT_RX2_DR_11
+    bool "DR11"
+
+config LORAMAC_DEFAULT_RX2_DR_12
+    bool "DR12"
+
+config LORAMAC_DEFAULT_RX2_DR_13
+    bool "DR13"
+
+config LORAMAC_DEFAULT_RX2_DR_14
+    bool "DR14"
+
+config LORAMAC_DEFAULT_RX2_DR_15
+    bool "DR15"
+
+endif # LORAMAC_REGION_US_915
+
+endchoice
+
+config LORAMAC_DEFAULT_RX2_FREQ
+    int "RX2 Frequency (in Hz)" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEMODULE_RN2XX3 || USEMODULE_GNRC_LORAWAN
+    default 866550000 if LORAMAC_REGION_IN_865
+    range 137000000 1020000000
+    default 869525000
+    help
+        Configure the frequency of RX2 receive window.
+
+config LORAMAC_DEFAULT_JOIN_DELAY1
+    int "Join accept delay 1 (in seconds)" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEMODULE_RN2XX3 || USEMODULE_GNRC_LORAWAN
+    default 5
+    help
+        Configure the maximum wait time in end node to receive the `join-accept`
+        message sent by the network in the first receive window. This is similar
+        to the operation of RX1 window.
+
+config LORAMAC_DEFAULT_JOIN_DELAY2
+    int "Join accept delay 2 (in seconds)" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEMODULE_RN2XX3
+    default 6
+    help
+        Configure the maximum wait time in end node to receive the `join-accept`
+        message sent by the network in the second receive window. This is
+        similar to the operation of RX2 window.
+
+config LORAMAC_DEFAULT_MAX_FCNT_GAP
+    int "Max frame counter deviation" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEMODULE_GNRC_LORAWAN
+    default 16384
+    help
+        Configure the maximum frame counter deviation which is the difference
+        between the frame counter values transmitted by the End Node and the
+        value stored in Network Server (NS).
+
+config LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR
+    int "Max system timing error (in milliseconds)" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEPKG_SEMTECH_LORAMAC
+    default 50
+    help
+        Configure the maximum sytem timing error. This configuration is used to
+        increase the RX window to account for timer drift. This may be decreased
+        if the system clock is accurate, for eg: if the system clock is from a
+        TCXO.
+
+config LORAMAC_DEFAULT_MIN_RX_SYMBOLS
+    int "Min RX symbols to detect frame" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEPKG_SEMTECH_LORAMAC
+    default 12
+    help
+        Configure the minimum RX symbols used to detect a frame. This
+        configuration is used to arrive at `T_RX_late` which is used in RX
+        window calculation. This may be increased to account for inaccuracies in
+        system timer. Refer SX1276_settings_for_LoRaWAN_v2p2.pdf
+        (AN1200.24) from Semtech for more information.
+
+endif # KCONFIG_USEMODULE_LORAWAN
