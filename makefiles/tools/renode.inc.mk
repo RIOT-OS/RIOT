@@ -1,2 +1,2 @@
-export EMULATOR ?= $(RIOTTOOLS)/renode/run-renode.sh
-export EMULATOR_FLAGS ?= start
+EMULATOR ?= $(RIOTTOOLS)/renode/run-renode.sh
+EMULATOR_FLAGS ?= start
