@@ -1,18 +1,31 @@
 # Target architecture for the build.
-TARGET_ARCH_RISCV ?= riscv-none-elf
 
-# If TARGET_ARCH wasn't set by user, also check if riscv64-unknown-elf
-# or riscv-none-embed is present.
-ifeq (riscv-none-elf,$(TARGET_ARCH_RISCV))
-  ifeq (,$(shell which $(TARGET_ARCH_RISCV)-gcc))
-    ifneq (,$(shell which riscv64-unknown-elf-gcc))
-      TARGET_ARCH_RISCV := riscv64-unknown-elf
-    else ifneq (,$(shell which riscv-none-embed-gcc))
-      $(info Falling back to legacy riscv-none-embed toolchain)
-      TARGET_ARCH_RISCV := riscv-none-embed
-    endif
-  endif
-endif
+# The correct triple for 32 bit embedded RISC-V targets is "riscv32-none-elf".
+# However, is unknown is used as sys (in place of none), it will also fall back
+# to none. Finally, if the GCC RISC-V cross compiler is compiled with full
+# multilib support, it can create both 32 bit and 64 bit binaries. Often this is
+# indicated with "riscv" being used instead of "riscv32/riscv64", but e.g.
+# Ubuntu uses "riscv64-unknown-elf" despite being able to produce both 32 and
+# 64 bit binaries. We'll test all possible combinations from the most correct
+# triple to the least correct triple all that might be able to produce our
+# binaries. Finally, "riscv-none-embed" is also tested for compatibility with
+# an previously popular legacy toolchain.
+
+_TRIPLES_TO_TEST := \
+    riscv32-none-elf \
+    riscv-none-elf \
+    riscv32-unknown-elf \
+    riscv-unknown-elf \
+    riscv64-none-elf \
+    riscv64-unknown-elf \
+    riscv-none-embed
+
+TARGET_ARCH_RISCV ?= \
+  $(strip \
+    $(subst -gcc,,\
+      $(notdir \
+        $(word 1,\
+          $(foreach triple,$(_TRIPLES_TO_TEST),$(shell which $(triple)-gcc))))))
 
 TARGET_ARCH ?= $(TARGET_ARCH_RISCV)
 
