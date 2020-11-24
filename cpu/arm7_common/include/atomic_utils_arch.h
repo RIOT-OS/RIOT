@@ -30,37 +30,37 @@ extern "C" {
 #ifndef __clang__
 
 #define HAS_ATOMIC_LOAD_U8
-static inline uint8_t atomic_load_u8(const uint8_t *var)
+static inline uint8_t atomic_load_u8(const volatile uint8_t *var)
 {
     return __atomic_load_1(var, __ATOMIC_SEQ_CST);
 }
 
 #define HAS_ATOMIC_LOAD_U16
-static inline uint16_t atomic_load_u16(const uint16_t *var)
+static inline uint16_t atomic_load_u16(const volatile uint16_t *var)
 {
     return __atomic_load_2(var, __ATOMIC_SEQ_CST);
 }
 
 #define HAS_ATOMIC_LOAD_U32
-static inline uint32_t atomic_load_u32(const uint32_t *var)
+static inline uint32_t atomic_load_u32(const volatile uint32_t *var)
 {
     return __atomic_load_4(var, __ATOMIC_SEQ_CST);
 }
 
 #define HAS_ATOMIC_STORE_U8
-static inline void atomic_store_u8(uint8_t *dest, uint8_t val)
+static inline void atomic_store_u8(volatile uint8_t *dest, uint8_t val)
 {
     __atomic_store_1(dest, val, __ATOMIC_SEQ_CST);
 }
 
 #define HAS_ATOMIC_STORE_U16
-static inline void atomic_store_u16(uint16_t *dest, uint16_t val)
+static inline void atomic_store_u16(volatile uint16_t *dest, uint16_t val)
 {
     __atomic_store_2(dest, val, __ATOMIC_SEQ_CST);
 }
 
 #define HAS_ATOMIC_STORE_U32
-static inline void atomic_store_u32(uint32_t *dest, uint32_t val)
+static inline void atomic_store_u32(volatile uint32_t *dest, uint32_t val)
 {
     __atomic_store_4(dest, val, __ATOMIC_SEQ_CST);
 }

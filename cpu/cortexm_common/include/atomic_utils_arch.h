@@ -31,37 +31,37 @@ extern "C" {
 #ifndef __clang__
 
 #define HAS_ATOMIC_LOAD_U8
-static inline uint8_t atomic_load_u8(const uint8_t *var)
+static inline uint8_t atomic_load_u8(const volatile uint8_t *var)
 {
     return __atomic_load_1(var, __ATOMIC_SEQ_CST);
 }
 
 #define HAS_ATOMIC_LOAD_U16
-static inline uint16_t atomic_load_u16(const uint16_t *var)
+static inline uint16_t atomic_load_u16(const volatile uint16_t *var)
 {
     return __atomic_load_2(var, __ATOMIC_SEQ_CST);
 }
 
 #define HAS_ATOMIC_LOAD_U32
-static inline uint32_t atomic_load_u32(const uint32_t *var)
+static inline uint32_t atomic_load_u32(const volatile uint32_t *var)
 {
     return __atomic_load_4(var, __ATOMIC_SEQ_CST);
 }
 
 #define HAS_ATOMIC_STORE_U8
-static inline void atomic_store_u8(uint8_t *dest, uint8_t val)
+static inline void atomic_store_u8(volatile uint8_t *dest, uint8_t val)
 {
     __atomic_store_1(dest, val, __ATOMIC_SEQ_CST);
 }
 
 #define HAS_ATOMIC_STORE_U16
-static inline void atomic_store_u16(uint16_t *dest, uint16_t val)
+static inline void atomic_store_u16(volatile uint16_t *dest, uint16_t val)
 {
     __atomic_store_2(dest, val, __ATOMIC_SEQ_CST);
 }
 
 #define HAS_ATOMIC_STORE_U32
-static inline void atomic_store_u32(uint32_t *dest, uint32_t val)
+static inline void atomic_store_u32(volatile uint32_t *dest, uint32_t val)
 {
     __atomic_store_4(dest, val, __ATOMIC_SEQ_CST);
 }
@@ -86,7 +86,7 @@ static inline void __attribute__((always_inline)) _bit_barrier_post(void)
     __asm__ volatile ("" : : : "memory");
 }
 
-static inline bool _is_addr_valid_for_bitbanding(void *_addr)
+static inline bool _is_addr_valid_for_bitbanding(volatile void *_addr)
 {
     /* SRAM bit-band region goes from 0x20000000 to 0x200fffff,
      * peripheral bit-band region goes from 0x40000000 to 0x400fffff */
@@ -102,25 +102,25 @@ static inline bool _is_addr_valid_for_bitbanding(void *_addr)
     return true;
 }
 
-static inline atomic_bit_u8_t atomic_bit_u8(uint8_t *dest, uint8_t bit)
+static inline atomic_bit_u8_t atomic_bit_u8(volatile uint8_t *dest, uint8_t bit)
 {
     assert(_is_addr_valid_for_bitbanding(dest));
     return bitband_addr(dest, bit);
 }
 
-static inline atomic_bit_u16_t atomic_bit_u16(uint16_t *dest, uint8_t bit)
+static inline atomic_bit_u16_t atomic_bit_u16(volatile uint16_t *dest, uint8_t bit)
 {
     assert(_is_addr_valid_for_bitbanding(dest));
     return bitband_addr(dest, bit);
 }
 
-static inline atomic_bit_u32_t atomic_bit_u32(uint32_t *dest, uint8_t bit)
+static inline atomic_bit_u32_t atomic_bit_u32(volatile uint32_t *dest, uint8_t bit)
 {
     assert(_is_addr_valid_for_bitbanding(dest));
     return bitband_addr(dest, bit);
 }
 
-static inline atomic_bit_u64_t atomic_bit_u64(uint64_t *dest, uint8_t bit)
+static inline atomic_bit_u64_t atomic_bit_u64(volatile uint64_t *dest, uint8_t bit)
 {
     assert(_is_addr_valid_for_bitbanding(dest));
     return bitband_addr(dest, bit);

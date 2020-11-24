@@ -23,40 +23,16 @@
 #include "embUnit.h"
 
 #include "atomic_utils.h"
+#include "volatile_utils.h"
 #include "random.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-typedef void (*fetch_op_u8_t)(uint8_t *dest, uint8_t val);
-typedef void (*fetch_op_u16_t)(uint16_t *dest, uint16_t val);
-typedef void (*fetch_op_u32_t)(uint32_t *dest, uint32_t val);
-typedef void (*fetch_op_u64_t)(uint64_t *dest, uint64_t val);
-
-static void fetch_add_u8(uint8_t *dest, uint8_t val){ *dest += val; }
-static void fetch_add_u16(uint16_t *dest, uint16_t val){ *dest += val; }
-static void fetch_add_u32(uint32_t *dest, uint32_t val){ *dest += val; }
-static void fetch_add_u64(uint64_t *dest, uint64_t val){ *dest += val; }
-
-static void fetch_sub_u8(uint8_t *dest, uint8_t val){ *dest -= val; }
-static void fetch_sub_u16(uint16_t *dest, uint16_t val){ *dest -= val; }
-static void fetch_sub_u32(uint32_t *dest, uint32_t val){ *dest -= val; }
-static void fetch_sub_u64(uint64_t *dest, uint64_t val){ *dest -= val; }
-
-static void fetch_or_u8(uint8_t *dest, uint8_t val){ *dest |= val; }
-static void fetch_or_u16(uint16_t *dest, uint16_t val){ *dest |= val; }
-static void fetch_or_u32(uint32_t *dest, uint32_t val){ *dest |= val; }
-static void fetch_or_u64(uint64_t *dest, uint64_t val){ *dest |= val; }
-
-static void fetch_xor_u8(uint8_t *dest, uint8_t val){ *dest ^= val; }
-static void fetch_xor_u16(uint16_t *dest, uint16_t val){ *dest ^= val; }
-static void fetch_xor_u32(uint32_t *dest, uint32_t val){ *dest ^= val; }
-static void fetch_xor_u64(uint64_t *dest, uint64_t val){ *dest ^= val; }
-
-static void fetch_and_u8(uint8_t *dest, uint8_t val){ *dest &= val; }
-static void fetch_and_u16(uint16_t *dest, uint16_t val){ *dest &= val; }
-static void fetch_and_u32(uint32_t *dest, uint32_t val){ *dest &= val; }
-static void fetch_and_u64(uint64_t *dest, uint64_t val){ *dest &= val; }
+typedef void (*fetch_op_u8_t)(volatile uint8_t *dest, uint8_t val);
+typedef void (*fetch_op_u16_t)(volatile uint16_t *dest, uint16_t val);
+typedef void (*fetch_op_u32_t)(volatile uint32_t *dest, uint32_t val);
+typedef void (*fetch_op_u64_t)(volatile uint64_t *dest, uint64_t val);
 
 static void test_load_store(void)
 {
@@ -91,16 +67,16 @@ static void test_fetch_op_u8(fetch_op_u8_t atomic_op, fetch_op_u8_t op)
 
 static void test_fetch_ops_u8(void)
 {
-    test_fetch_op_u8(atomic_fetch_add_u8, fetch_add_u8);
-    test_fetch_op_u8(atomic_fetch_sub_u8, fetch_sub_u8);
-    test_fetch_op_u8(atomic_fetch_or_u8, fetch_or_u8);
-    test_fetch_op_u8(atomic_fetch_xor_u8, fetch_xor_u8);
-    test_fetch_op_u8(atomic_fetch_and_u8, fetch_and_u8);
-    test_fetch_op_u8(semi_atomic_fetch_add_u8, fetch_add_u8);
-    test_fetch_op_u8(semi_atomic_fetch_sub_u8, fetch_sub_u8);
-    test_fetch_op_u8(semi_atomic_fetch_or_u8, fetch_or_u8);
-    test_fetch_op_u8(semi_atomic_fetch_xor_u8, fetch_xor_u8);
-    test_fetch_op_u8(semi_atomic_fetch_and_u8, fetch_and_u8);
+    test_fetch_op_u8(atomic_fetch_add_u8, volatile_fetch_add_u8);
+    test_fetch_op_u8(atomic_fetch_sub_u8, volatile_fetch_sub_u8);
+    test_fetch_op_u8(atomic_fetch_or_u8, volatile_fetch_or_u8);
+    test_fetch_op_u8(atomic_fetch_xor_u8, volatile_fetch_xor_u8);
+    test_fetch_op_u8(atomic_fetch_and_u8, volatile_fetch_and_u8);
+    test_fetch_op_u8(semi_atomic_fetch_add_u8, volatile_fetch_add_u8);
+    test_fetch_op_u8(semi_atomic_fetch_sub_u8, volatile_fetch_sub_u8);
+    test_fetch_op_u8(semi_atomic_fetch_or_u8, volatile_fetch_or_u8);
+    test_fetch_op_u8(semi_atomic_fetch_xor_u8, volatile_fetch_xor_u8);
+    test_fetch_op_u8(semi_atomic_fetch_and_u8, volatile_fetch_and_u8);
 }
 
 static void test_fetch_op_u16(fetch_op_u16_t atomic_op, fetch_op_u16_t op)
@@ -118,16 +94,16 @@ static void test_fetch_op_u16(fetch_op_u16_t atomic_op, fetch_op_u16_t op)
 
 static void test_fetch_ops_u16(void)
 {
-    test_fetch_op_u16(atomic_fetch_add_u16, fetch_add_u16);
-    test_fetch_op_u16(atomic_fetch_sub_u16, fetch_sub_u16);
-    test_fetch_op_u16(atomic_fetch_or_u16, fetch_or_u16);
-    test_fetch_op_u16(atomic_fetch_xor_u16, fetch_xor_u16);
-    test_fetch_op_u16(atomic_fetch_and_u16, fetch_and_u16);
-    test_fetch_op_u16(semi_atomic_fetch_add_u16, fetch_add_u16);
-    test_fetch_op_u16(semi_atomic_fetch_sub_u16, fetch_sub_u16);
-    test_fetch_op_u16(semi_atomic_fetch_or_u16, fetch_or_u16);
-    test_fetch_op_u16(semi_atomic_fetch_xor_u16, fetch_xor_u16);
-    test_fetch_op_u16(semi_atomic_fetch_and_u16, fetch_and_u16);
+    test_fetch_op_u16(atomic_fetch_add_u16, volatile_fetch_add_u16);
+    test_fetch_op_u16(atomic_fetch_sub_u16, volatile_fetch_sub_u16);
+    test_fetch_op_u16(atomic_fetch_or_u16, volatile_fetch_or_u16);
+    test_fetch_op_u16(atomic_fetch_xor_u16, volatile_fetch_xor_u16);
+    test_fetch_op_u16(atomic_fetch_and_u16, volatile_fetch_and_u16);
+    test_fetch_op_u16(semi_atomic_fetch_add_u16, volatile_fetch_add_u16);
+    test_fetch_op_u16(semi_atomic_fetch_sub_u16, volatile_fetch_sub_u16);
+    test_fetch_op_u16(semi_atomic_fetch_or_u16, volatile_fetch_or_u16);
+    test_fetch_op_u16(semi_atomic_fetch_xor_u16, volatile_fetch_xor_u16);
+    test_fetch_op_u16(semi_atomic_fetch_and_u16, volatile_fetch_and_u16);
 }
 
 static void test_fetch_op_u32(fetch_op_u32_t atomic_op, fetch_op_u32_t op)
@@ -145,16 +121,16 @@ static void test_fetch_op_u32(fetch_op_u32_t atomic_op, fetch_op_u32_t op)
 
 static void test_fetch_ops_u32(void)
 {
-    test_fetch_op_u32(atomic_fetch_add_u32, fetch_add_u32);
-    test_fetch_op_u32(atomic_fetch_sub_u32, fetch_sub_u32);
-    test_fetch_op_u32(atomic_fetch_or_u32, fetch_or_u32);
-    test_fetch_op_u32(atomic_fetch_xor_u32, fetch_xor_u32);
-    test_fetch_op_u32(atomic_fetch_and_u32, fetch_and_u32);
-    test_fetch_op_u32(semi_atomic_fetch_add_u32, fetch_add_u32);
-    test_fetch_op_u32(semi_atomic_fetch_sub_u32, fetch_sub_u32);
-    test_fetch_op_u32(semi_atomic_fetch_or_u32, fetch_or_u32);
-    test_fetch_op_u32(semi_atomic_fetch_xor_u32, fetch_xor_u32);
-    test_fetch_op_u32(semi_atomic_fetch_and_u32, fetch_and_u32);
+    test_fetch_op_u32(atomic_fetch_add_u32, volatile_fetch_add_u32);
+    test_fetch_op_u32(atomic_fetch_sub_u32, volatile_fetch_sub_u32);
+    test_fetch_op_u32(atomic_fetch_or_u32, volatile_fetch_or_u32);
+    test_fetch_op_u32(atomic_fetch_xor_u32, volatile_fetch_xor_u32);
+    test_fetch_op_u32(atomic_fetch_and_u32, volatile_fetch_and_u32);
+    test_fetch_op_u32(semi_atomic_fetch_add_u32, volatile_fetch_add_u32);
+    test_fetch_op_u32(semi_atomic_fetch_sub_u32, volatile_fetch_sub_u32);
+    test_fetch_op_u32(semi_atomic_fetch_or_u32, volatile_fetch_or_u32);
+    test_fetch_op_u32(semi_atomic_fetch_xor_u32, volatile_fetch_xor_u32);
+    test_fetch_op_u32(semi_atomic_fetch_and_u32, volatile_fetch_and_u32);
 }
 
 static void test_fetch_op_u64(fetch_op_u64_t atomic_op, fetch_op_u64_t op)
@@ -173,16 +149,16 @@ static void test_fetch_op_u64(fetch_op_u64_t atomic_op, fetch_op_u64_t op)
 
 static void test_fetch_ops_u64(void)
 {
-    test_fetch_op_u64(atomic_fetch_add_u64, fetch_add_u64);
-    test_fetch_op_u64(atomic_fetch_sub_u64, fetch_sub_u64);
-    test_fetch_op_u64(atomic_fetch_or_u64, fetch_or_u64);
-    test_fetch_op_u64(atomic_fetch_xor_u64, fetch_xor_u64);
-    test_fetch_op_u64(atomic_fetch_and_u64, fetch_and_u64);
-    test_fetch_op_u64(semi_atomic_fetch_add_u64, fetch_add_u64);
-    test_fetch_op_u64(semi_atomic_fetch_sub_u64, fetch_sub_u64);
-    test_fetch_op_u64(semi_atomic_fetch_or_u64, fetch_or_u64);
-    test_fetch_op_u64(semi_atomic_fetch_xor_u64, fetch_xor_u64);
-    test_fetch_op_u64(semi_atomic_fetch_and_u64, fetch_and_u64);
+    test_fetch_op_u64(atomic_fetch_add_u64, volatile_fetch_add_u64);
+    test_fetch_op_u64(atomic_fetch_sub_u64, volatile_fetch_sub_u64);
+    test_fetch_op_u64(atomic_fetch_or_u64, volatile_fetch_or_u64);
+    test_fetch_op_u64(atomic_fetch_xor_u64, volatile_fetch_xor_u64);
+    test_fetch_op_u64(atomic_fetch_and_u64, volatile_fetch_and_u64);
+    test_fetch_op_u64(semi_atomic_fetch_add_u64, volatile_fetch_add_u64);
+    test_fetch_op_u64(semi_atomic_fetch_sub_u64, volatile_fetch_sub_u64);
+    test_fetch_op_u64(semi_atomic_fetch_or_u64, volatile_fetch_or_u64);
+    test_fetch_op_u64(semi_atomic_fetch_xor_u64, volatile_fetch_xor_u64);
+    test_fetch_op_u64(semi_atomic_fetch_and_u64, volatile_fetch_and_u64);
 }
 
 static void test_atomic_set_bit(void)
