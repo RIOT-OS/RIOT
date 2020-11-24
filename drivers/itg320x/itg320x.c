@@ -96,11 +96,11 @@ int itg320x_init_int(const itg320x_t *dev, itg320x_drdy_int_cb_t cb, void *arg)
 
     if (dev->params.int_level == ITG320X_INT_HIGH) {
         /* for high active interrupt signal (default) */
-        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, cb, 0);
+        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_RISING, cb, arg);
     }
     else {
         /* for low active interrupt signal (default) */
-        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, cb, 0);
+        gpio_init_int(dev->params.int_pin, GPIO_IN, GPIO_FALLING, cb, arg);
     }
 
     /*
