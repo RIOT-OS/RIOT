@@ -12,11 +12,7 @@ else ifeq (pyocd,$(PROGRAMMER))
 endif
 
 # QEMU 4.0 added microbit system emulation.
-EMULATOR = qemu-system-arm
-EMULATOR_FLAGS = -M microbit -device loader,file=$(ELFFILE) \
-                 -serial stdio \
-                 -monitor telnet::45454,server,nowait \
-                 -nographic
+RIOT_EMULATOR ?= qemu
 
 # include nrf51 boards common configuration
 include $(RIOTBOARD)/common/nrf51/Makefile.include
