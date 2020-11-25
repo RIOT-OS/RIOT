@@ -1144,6 +1144,7 @@ HTML_EXTRA_FILES       = src/css/bootstrap.min.css \
                          src/js/doxy-jquery.js \
                          src/js/jquery.min.js \
                          src/js/jquery.powertip.min.js \
+                         src/js/jquery.scrollTo.min.js \
                          src/js/jquery.smartmenus.min.js \
                          src/js/jquery.smartmenus.bootstrap.min.js \
                          src/js/jquery-ui.min.js \
