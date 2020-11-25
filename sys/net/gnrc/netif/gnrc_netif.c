@@ -16,6 +16,7 @@
  */
 
 #include <assert.h>
+#include <limits.h>
 #include <string.h>
 #include <kernel_defines.h>
 
