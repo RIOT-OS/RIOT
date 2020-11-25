@@ -41,7 +41,7 @@ extern "C" {
 #ifndef BME680_PARAMS
 #define BME680_PARAMS                                                   \
 {                                                                       \
-                                .temp_oversampling = 1,                 \
+                                .temp_oversampling = 2,                 \
                                 .pres_oversampling = 16,                \
                                 .hum_oversampling = 1,                  \
                                 .gas_heating_time = 100,                \

@@ -46,6 +46,13 @@ typedef struct {
     /* add initialization params here */
 } bme680_params_t;
 
+typedef struct {
+    uint16_t temperature;
+    uint16_t humidity;
+    uint16_t pressure;
+    uint32_t t_fine;        //TODO should be stored somewhere else
+} bme680_data_t;
+
 /**
  * @brief   Device descriptor for the driver
  */
@@ -60,7 +67,12 @@ typedef struct {
 enum {
     BME680_OK = 0,                              /**< everything was fine */
     BME680_ERR_NODEV,                           /**< did not detect BMP180 */
-    BME680_ERR_I2C,                             /**< error when reading/writing I2C bus */
+    BME680_ERR_I2C_READ,                             /**< error when reading I2C bus */
+    BME680_ERR_I2C_WRITE,                             /**< error when writing I2C bus */
+    BME680_ERR_CALC_TEMP,                       /**< error when calculating temperature */
+    BME680_ERR_CALC_HUM,                       /**< error when calculating humidity */ 
+    BME680_ERR_CALC_PRESS,                       /**< error when calculating pressure */
+    BME680_ERR_CALC_GAS,                       /**< error when calculating gas */ 
     BME680_ERR_NOCAL,                           /**< error when reading calibration values */
 };
 
@@ -74,7 +86,7 @@ enum {
  */
 int bme680_init(bme680_t *dev, const bme680_params_t *params);
 
-int16_t bme680_read_tphg(const bme680_t *dev);
+uint16_t bme680_read(const bme680_t *dev, bme680_data_t *data);
 
 #ifdef __cplusplus
 }
