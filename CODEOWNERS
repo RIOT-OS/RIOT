@@ -71,6 +71,7 @@
 /drivers/at86rf215/                         @benpicco
 /drivers/at86rf2xx/                         @daniel-k @Hyungsin @jia200x @smlng @miri64
 /drivers/bh1900nux/                         @wosym
+/drivers/bq2429x/                           @jeandudey
 /drivers/cc110x/                            @maribu
 /drivers/cc1xxx_common/                     @maribu
 /drivers/ccs811/                            @gschorcht
@@ -132,6 +133,7 @@
 
 /tests/                                     @smlng @leandrolanzieri @aabadie @MichelRottleuthner @fjmolinas
 /tests/candev/                              @wosym
+/tests/driver_bq2429x/                      @jeandudey
 /tests/gnrc*                                @miri64
 /tests/lwip*                                @miri64
 /tests/slip/                                @miri64

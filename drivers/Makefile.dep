@@ -36,6 +36,10 @@ ifneq (,$(filter bm%280_spi,$(USEMODULE)))
   USEMODULE += bmx280
 endif
 
+ifneq (,$(filter bq2429x_int,$(USEMODULE)))
+  USEMODULE += bq2429x
+endif
+
 ifneq (,$(filter cc110%,$(USEMODULE)))
   USEMODULE += cc110x
 endif
