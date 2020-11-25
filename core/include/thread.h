@@ -599,6 +599,16 @@ static inline thread_status_t thread_get_status(const thread_t *thread) {
 }
 
 /**
+ * Returns if a thread is active (currently running or waiting to be scheduled)
+ *
+ * @param   thread   thread to work on
+ * @returns true if thread is active, false otherwise
+ */
+static inline bool thread_is_active(const thread_t *thread) {
+    return thread->status >= STATUS_ON_RUNQUEUE;
+}
+
+/**
  * Convert a thread state code to a human readable string.
  *
  * @param   state   thread state to convert
