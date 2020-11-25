@@ -22,7 +22,6 @@
 
 #include <stdio.h>
 
-#include "kernel_types.h"
 #include "thread.h"
 #include "pthread.h"
 #include "mutex.h"

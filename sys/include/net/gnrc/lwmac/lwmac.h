@@ -73,7 +73,6 @@
 #ifndef NET_GNRC_LWMAC_LWMAC_H
 #define NET_GNRC_LWMAC_LWMAC_H
 
-#include "kernel_types.h"
 #include "net/gnrc/netif.h"
 
 #ifdef __cplusplus

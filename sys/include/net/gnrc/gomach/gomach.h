@@ -41,7 +41,6 @@
 #define NET_GNRC_GOMACH_GOMACH_H
 
 #include "periph/rtt.h"
-#include "kernel_types.h"
 #include "net/gnrc/netif.h"
 
 #ifdef __cplusplus

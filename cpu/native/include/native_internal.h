@@ -50,8 +50,6 @@
 #include <sys/stat.h>
 #include <sys/uio.h>
 
-#include "kernel_types.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

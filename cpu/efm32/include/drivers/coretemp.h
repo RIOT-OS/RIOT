@@ -33,7 +33,6 @@
 #ifndef DRIVERS_CORETEMP_H
 #define DRIVERS_CORETEMP_H
 
-#include "kernel_types.h"
 
 #ifdef __cplusplus
 extern "C" {

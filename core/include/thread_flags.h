@@ -54,7 +54,6 @@
 #ifndef THREAD_FLAGS_H
 #define THREAD_FLAGS_H
 
-#include "kernel_types.h"
 #include "sched.h"  /* for thread_t typedef */
 
 #ifdef __cplusplus

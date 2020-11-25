@@ -22,7 +22,6 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include "kernel_types.h"
 #include "msg.h"
 #include "net/ethernet/hdr.h"
 #include "net/ipv6/addr.h"
