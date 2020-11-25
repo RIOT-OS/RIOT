@@ -87,7 +87,7 @@ void ps(void)
         thread_t *p = thread_get(i);
 
         if (p != NULL) {
-            thread_status_t state = p->status;                                     /* copy state */
+            thread_status_t state = thread_get_status(p);                          /* copy state */
             const char *sname = thread_state_to_string(state);                     /* get state name */
             const char *queued = &queued_name[(int)(state >= STATUS_ON_RUNQUEUE)]; /* get queued flag */
 #ifdef DEVELHELP
