@@ -589,6 +589,16 @@ static inline int thread_has_msg_queue(const volatile struct _thread *thread)
 }
 
 /**
+ * Get a thread's status
+ *
+ * @param   thread   thread to work on
+ * @returns status of thread
+ */
+static inline thread_status_t thread_get_status(const thread_t *thread) {
+    return thread->status;
+}
+
+/**
  * Convert a thread state code to a human readable string.
  *
  * @param   state   thread state to convert
