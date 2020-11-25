@@ -588,6 +588,14 @@ static inline int thread_has_msg_queue(const volatile struct _thread *thread)
 #endif
 }
 
+/**
+ * Convert a thread state code to a human readable string.
+ *
+ * @param   state   thread state to convert
+ * @returns ptr to string representation of thread state (or to "unknown")
+ */
+const char *thread_state_to_string(thread_status_t state);
+
 #ifdef __cplusplus
 }
 #endif
