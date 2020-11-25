@@ -19,7 +19,6 @@
 #include <assert.h>
 #include <inttypes.h>
 
-#include "kernel_types.h"
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netapi.h"
 #include "net/gnrc/netif/hdr.h"

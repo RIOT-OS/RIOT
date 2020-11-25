@@ -42,7 +42,6 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 
-#include "kernel_types.h"
 #include "net/af.h"
 #include "sys/bytes.h"
 

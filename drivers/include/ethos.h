@@ -23,7 +23,6 @@
 
 #include <stdbool.h>
 
-#include "kernel_types.h"
 #include "periph/uart.h"
 #include "net/netdev.h"
 #include "tsrb.h"

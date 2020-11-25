@@ -30,7 +30,6 @@
 #define SCHEDSTATISTICS_H
 
 #include <stdint.h>
-#include "kernel_types.h"
 
 #ifdef __cplusplus
  extern "C" {

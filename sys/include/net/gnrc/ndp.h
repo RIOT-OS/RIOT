@@ -22,7 +22,6 @@
 
 #include <stdint.h>
 
-#include "kernel_types.h"
 #include "net/gnrc/pkt.h"
 #include "net/gnrc/netif.h"
 #include "net/ipv6/addr.h"

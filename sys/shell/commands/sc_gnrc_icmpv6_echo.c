@@ -20,6 +20,7 @@
  */
 
 #ifdef MODULE_GNRC_ICMPV6
+#include <limits.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>

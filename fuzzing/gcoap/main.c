@@ -11,7 +11,6 @@
 
 #include "thread.h"
 #include "fuzzing.h"
-#include "kernel_types.h"
 
 #include "net/gcoap.h"
 #include "net/gnrc/udp.h"

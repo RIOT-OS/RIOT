@@ -24,8 +24,6 @@
 extern "C" {
 #endif
 
-#include "kernel_types.h"
-
 #include "can/can.h"
 #include "can/pkt.h"
 

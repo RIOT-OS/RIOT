@@ -22,7 +22,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "kernel_types.h"
 #include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/uart.h"

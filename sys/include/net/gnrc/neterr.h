@@ -23,7 +23,6 @@
 #include <errno.h>
 #include <stdint.h>
 
-#include "kernel_types.h"
 #include "msg.h"
 #include "net/gnrc/pkt.h"
 #include "thread.h"

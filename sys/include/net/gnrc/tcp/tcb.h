@@ -21,7 +21,6 @@
 #define NET_GNRC_TCP_TCB_H
 
 #include <stdint.h>
-#include "kernel_types.h"
 #include "ringbuffer.h"
 #include "mutex.h"
 #include "evtimer_msg.h"

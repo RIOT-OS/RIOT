@@ -22,6 +22,7 @@
 #define USB_H_USER_IS_RIOT_INTERNAL
 
 #include <stdio.h>
+#include <sys/types.h>
 
 #include "log.h"
 #include "isrpipe.h"
