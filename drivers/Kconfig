@@ -29,6 +29,7 @@ rsource "edbg_eui/Kconfig"
 rsource "hd44780/Kconfig"
 rsource "ili9341/Kconfig"
 rsource "io1_xplained/Kconfig"
+rsource "uart_half_duplex/Kconfig"
 endmenu # Miscellaneous Device Drivers
 
 rsource "Kconfig.net"
