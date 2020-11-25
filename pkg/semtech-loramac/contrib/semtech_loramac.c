@@ -204,8 +204,6 @@ static size_t _write_uint32(size_t pos, uint32_t value)
     return eeprom_write(pos, array, sizeof(uint32_t));
 }
 
-
-
 static inline void _set_join_state(semtech_loramac_t *mac, bool joined)
 {
     DEBUG("[semtech-loramac] set join state ? %d\n", joined);
