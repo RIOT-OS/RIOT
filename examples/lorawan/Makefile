@@ -24,8 +24,6 @@ USEMODULE += $(DRIVER)
 USEMODULE += fmt
 FEATURES_REQUIRED += periph_rtc
 
-CFLAGS += -DDEVEUI=\"$(DEVEUI)\" -DAPPEUI=\"$(APPEUI)\" -DAPPKEY=\"$(APPKEY)\"
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:
@@ -47,3 +45,15 @@ ifneq (,$(filter test,$(MAKECMDGOALS)))
 endif
 
 include $(RIOTBASE)/Makefile.include
+
+# OTAA compile time configuration keys
+ifeq (,$(CONFIG_LORAMAC_APP_KEY_DEFAULT)$(CONFIG_LORAMAC_APP_EUI_DEFAULT)$(CONFIG_LORAMAC_DEV_EUI_DEFAULT))
+CFLAGS += -DCONFIG_LORAMAC_APP_KEY_DEFAULT=\"$(APPKEY)\"
+CFLAGS += -DCONFIG_LORAMAC_APP_EUI_DEFAULT=\"$(APPEUI)\"
+CFLAGS += -DCONFIG_LORAMAC_DEV_EUI_DEFAULT=\"$(DEVEUI)\"
+endif
+
+# Set network as public
+ifndef CONFIG_LORAMAC_DEFAULT_PUBLIC_NETWORK
+  CFLAGS += -DCONFIG_LORAMAC_DEFAULT_PUBLIC_NETWORK=1
+endif
