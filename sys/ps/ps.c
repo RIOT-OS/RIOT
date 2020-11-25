@@ -37,7 +37,6 @@
  */
 void ps(void)
 {
-    const char queued_name[] = {'_', 'Q'};
 #ifdef DEVELHELP
     int overall_stacksz = 0, overall_used = 0;
 #endif
@@ -89,7 +88,7 @@ void ps(void)
         if (p != NULL) {
             thread_status_t state = thread_get_status(p);                          /* copy state */
             const char *sname = thread_state_to_string(state);                     /* get state name */
-            const char *queued = &queued_name[(int)(state >= STATUS_ON_RUNQUEUE)]; /* get queued flag */
+            const char *queued = thread_is_active(p) ? "Q" : "_";                  /* get queued flag */
 #ifdef DEVELHELP
             int stacksz = p->stack_size;                                           /* get stack size */
             overall_stacksz += stacksz;
