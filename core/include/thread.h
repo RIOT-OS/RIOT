@@ -588,6 +588,34 @@ static inline int thread_has_msg_queue(const volatile struct _thread *thread)
 #endif
 }
 
+/**
+ * Get a thread's status
+ *
+ * @param   thread   thread to work on
+ * @returns status of thread
+ */
+static inline thread_status_t thread_get_status(const thread_t *thread) {
+    return thread->status;
+}
+
+/**
+ * Returns if a thread is active (currently running or waiting to be scheduled)
+ *
+ * @param   thread   thread to work on
+ * @returns true if thread is active, false otherwise
+ */
+static inline bool thread_is_active(const thread_t *thread) {
+    return thread->status >= STATUS_ON_RUNQUEUE;
+}
+
+/**
+ * Convert a thread state code to a human readable string.
+ *
+ * @param   state   thread state to convert
+ * @returns ptr to string representation of thread state (or to "unknown")
+ */
+const char *thread_state_to_string(thread_status_t state);
+
 #ifdef __cplusplus
 }
 #endif
