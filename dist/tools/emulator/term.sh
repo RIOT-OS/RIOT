@@ -45,8 +45,9 @@ trap "cleanup terminal for ${EMULATOR} emulator" EXIT
 # start emulator in background
 sh -c "\
     EMULATOR_PIDFILE=${EMULATOR_PIDFILE} \
+    EMULATE=1 \
     BOARD=${BOARD} \
-    make -C ${APPDIR} emulate-only & \
+    make -C ${APPDIR} emulate & \
     echo \$! > ${EMULATOR_PIDFILE}" &
 
 # with qemu, start socat redirector in background

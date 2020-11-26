@@ -397,11 +397,13 @@ include $(BOARDDIR)/Makefile.include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
-# Include emulator code if available and if emulate target is used
-ifneq (,$(filter emulate%,$(MAKECMDGOALS)))
+# Include emulator code when required and if available
+ifeq (1,$(EMULATE))
   # Use renode as default emulator
   RIOT_EMULATOR ?= renode
   -include $(RIOTMAKE)/tools/$(RIOT_EMULATOR).inc.mk
+  TERMDEPS += $(EMULATORDEPS)
+  DEBUGDEPS += $(EMULATORDEPS)
 endif
 
 # Include common serial logic to define TERMPROG, TERMFLAGS variables based on
@@ -746,20 +748,10 @@ debug-server:
 	$(call check_cmd,$(DEBUGSERVER),Debug server program)
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
 
-emulate: all $(EMULATORDEPS)
-ifeq (,$(filter term cleanterm debug%,$(MAKECMDGOALS)))
+ifeq (1,$(EMULATE))
+emulate:
 	$(call check_cmd,$(EMULATOR),Emulation program)
 	$(EMULATOR) $(EMULATOR_FLAGS)
-else
-	@:
-endif
-
-emulate-only: $(EMULATORDEPS)
-ifeq (,$(filter term cleanterm debug%,$(MAKECMDGOALS)))
-	$(call check_cmd,$(EMULATOR),Emulation program)
-	$(EMULATOR) $(EMULATOR_FLAGS)
-else
-	@:
 endif
 
 reset:
