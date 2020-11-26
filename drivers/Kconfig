@@ -13,6 +13,7 @@ rsource "aip31068/Kconfig"
 rsource "apa102/Kconfig"
 rsource "grove_ledbar/Kconfig"
 rsource "motor_driver/Kconfig"
+rsource "my9221/Kconfig"
 endmenu # Actuator Device Drivers
 
 menu "Miscellaneous Device Drivers"
