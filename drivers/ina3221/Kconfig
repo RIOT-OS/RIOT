@@ -1,0 +1,22 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_INA3221
+    bool "INA3221 current/power monitor"
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_I2C
+
+config MODULE_INA3221_ALERTS
+    bool "Altert pins"
+    depends on HAS_PERIPH_GPIO_IRQ
+    depends on MODULE_INA3221
+    select MODULE_PERIPH_GPIO_IRQ
+    help
+        Say y to enable the usage of alert pins.
