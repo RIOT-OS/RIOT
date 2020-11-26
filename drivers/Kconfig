@@ -68,6 +68,7 @@ rsource "at24cxxx/Kconfig"
 rsource "at25xxx/Kconfig"
 rsource "mtd/Kconfig"
 rsource "mtd_sdcard/Kconfig"
+rsource "sdcard_spi/Kconfig"
 endmenu # Storage Device Drivers
 
 endmenu # Drivers
