@@ -1,6 +1,6 @@
 PKG_NAME=jsmn
 PKG_URL=https://github.com/zserge/jsmn
-PKG_VERSION=6784c826d9674915a4d89649c6288e6aecb4110d
+PKG_VERSION=053d3cd29200edb1bfd181d917d140c16c1f8834
 PKG_LICENSE=MIT
 
 include $(RIOTBASE)/pkg/pkg.mk
