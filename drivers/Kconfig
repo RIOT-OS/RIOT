@@ -11,6 +11,7 @@ rsource "saul/Kconfig"
 menu "Actuator Device Drivers"
 rsource "aip31068/Kconfig"
 rsource "apa102/Kconfig"
+rsource "grove_ledbar/Kconfig"
 rsource "motor_driver/Kconfig"
 endmenu # Actuator Device Drivers
 
