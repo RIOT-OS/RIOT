@@ -21,6 +21,7 @@
  */
 
 #include <stdio.h>
+#include <inttypes.h>
 
 #include "ztimer/convert.h"
 #include "ztimer/convert_shift.h"

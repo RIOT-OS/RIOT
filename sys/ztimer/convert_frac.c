@@ -23,6 +23,7 @@
  */
 
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "frac.h"
 #include "assert.h"

@@ -24,6 +24,7 @@
  */
 #include <assert.h>
 #include <stdint.h>
+#include <inttypes.h>
 
 #include "kernel_defines.h"
 #include "irq.h"
