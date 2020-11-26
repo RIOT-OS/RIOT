@@ -35,6 +35,7 @@ extern "C" {
  * @brief   Device initialization parameters
  */
 typedef struct {
+    uint8_t ambient_temp;
     uint16_t temp_oversampling;
     uint16_t pres_oversampling;
     uint16_t hum_oversampling;

@@ -49,6 +49,7 @@ extern "C" {
 #define BME680_REGISTER_CTRL_GAS_L  (0x71)
 
 #define BME680_REGISTER_MEAS_STATUS_0   (0x1D)
+#define BME60_REGISTER_GAS_R_LSB    (0x2B)
 
 #define BME680_PRESS_MSB            (0x1F) // Contains the MSB part [19:12] of the raw pressure measurement output data
 #define BME680_PRESS_LSB            (0x20) // Contains the LSB part [11:4] of the raw pressure measurement output data
