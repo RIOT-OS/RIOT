@@ -9,12 +9,13 @@ ifneq (,$(filter nimble,$(USEPKG)))
   CFLAGS += -DBOARD_NRF51_XTIMER_ALT
 endif
 
+# Use openocd by default
+PROGRAMMER ?= openocd
+
 ifeq ($(PROGRAMMER),openocd)
   # use common openocd configuration for nrf51
   OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf51/dist/openocd.cfg
-  include $(RIOTMAKE)/tools/openocd.inc.mk
 else ifeq ($(PROGRAMMER),jlink)
   # setup JLink for flashing
   JLINK_DEVICE = nrf51822
-  include $(RIOTMAKE)/tools/jlink.inc.mk
 endif

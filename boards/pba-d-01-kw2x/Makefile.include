@@ -18,6 +18,9 @@ endif
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 
+# this board uses openocd
+PROGRAMMER ?= openocd
+
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.
 # wdog-disable.bin is a precompiled binary which will disable the watchdog and
@@ -32,6 +35,3 @@ DEBUG_ADAPTER ?= dap
 # The board can become un-flashable after some firmware, use connect_assert_srst
 # to always be able to flash or reset the board.
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
-
-# this board uses openocd
-include $(RIOTMAKE)/tools/openocd.inc.mk

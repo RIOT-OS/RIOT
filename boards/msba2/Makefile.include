@@ -1,2 +1,1 @@
 include $(RIOTBOARD)/common/msba2/Makefile.include
-include $(RIOTMAKE)/tools/openocd.inc.mk

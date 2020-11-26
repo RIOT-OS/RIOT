@@ -15,8 +15,6 @@ ifeq ($(PROGRAMMER),adafruit-nrfutil)
     TERM_DELAY = 2
     TERMDEPS += term-delay
   endif
-
-  include $(RIOTMAKE)/tools/adafruit-nrfutil.inc.mk
 endif
 
 term-delay:

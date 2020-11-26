@@ -19,7 +19,6 @@ PROGRAMMER ?= jlink
 ifeq (jlink,$(PROGRAMMER))
   # setup JLink for flashing
   JLINK_DEVICE = nrf52
-  include $(RIOTMAKE)/tools/jlink.inc.mk
 else ifeq (openocd,$(PROGRAMMER))
   ifneq (,$(filter $(BOARD),ruuvitag thingy52))
     # openocd doesn't fully work with ruuvitag and thingy52
@@ -30,7 +29,4 @@ else ifeq (openocd,$(PROGRAMMER))
   # build from source (master > 2018, August the 13rd) is required.
   DEBUG_ADAPTER ?= jlink
   OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
-  include $(RIOTMAKE)/tools/openocd.inc.mk
-else ifeq (bmp,$(PROGRAMMER))
-  include $(RIOTMAKE)/tools/bmp.inc.mk
 endif

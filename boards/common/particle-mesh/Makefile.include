@@ -17,7 +17,6 @@ ifeq (1,$(PARTICLE_MONOFIRMWARE))
   # Setting DFU_ARGS won't work as the implied --reset causes errors.
   FFLAGS = -d 0x2B04:0xD00E -a 0 -s 0x30000:leave -D $(FLASHFILE)
   PROGRAMMER = dfu-util
-  include $(RIOTMAKE)/tools/dfu.inc.mk
   # If CDC-ACM is *not* enabled, any pre-flash resets will just not work -- but
   # then again nothing can be done in that case anyway, and the preflash
   # routines fall through without erring.
@@ -32,7 +31,6 @@ else
     # The board is not recognized automatically by pyocd, so the CPU target
     # option is passed explicitly
     FLASH_TARGET_TYPE ?= -t nrf52840
-    include $(RIOTMAKE)/tools/pyocd.inc.mk
   else ifeq (openocd,$(PROGRAMMER))
     DEBUG_ADAPTER ?= dap
   endif

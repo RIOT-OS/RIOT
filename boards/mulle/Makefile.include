@@ -3,18 +3,11 @@ ifdef MULLE_SERIAL
   CFLAGS += -DMULLE_SERIAL=$(MULLE_SERIAL)
 endif
 
+# this board uses openocd
+PROGRAMMER ?= openocd
+
 # Default debug adapter choice is to use the Mulle programmer board
 DEBUG_ADAPTER ?= mulle
-
-# Fall back to PROGRAMMER_SERIAL for backwards compatibility
-DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
-
-# Define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
 
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.
@@ -25,5 +18,12 @@ OPENOCD_PRE_VERIFY_CMDS += \
   -c 'resume 0x20000000'
 PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
 
-# this board uses openocd
-include $(RIOTMAKE)/tools/openocd.inc.mk
+# Fall back to PROGRAMMER_SERIAL for backwards compatibility
+DEBUG_ADAPTER_ID ?= $(PROGRAMMER_SERIAL)
+
+# Define the default port depending on the host OS
+PORT_LINUX ?= /dev/ttyUSB0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
+
+# setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk

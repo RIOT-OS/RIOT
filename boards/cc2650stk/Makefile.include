@@ -8,4 +8,4 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # configure the flash tool
-include $(RIOTMAKE)/tools/uniflash.inc.mk
+PROGRAMMER ?= uniflash

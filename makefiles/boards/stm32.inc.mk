@@ -28,18 +28,10 @@ ifeq (openocd,$(PROGRAMMER))
   # For STM32 boards the ST-link adapter is the default adapter, e.g. all
   # Nucleo boards have an on-board ST-link adapter
   DEBUG_ADAPTER ?= stlink
-
-  # RIOT uses openocd by default
-  include $(RIOTMAKE)/tools/openocd.inc.mk
-endif
-
-ifeq (bmp,$(PROGRAMMER))
-  include $(RIOTMAKE)/tools/bmp.inc.mk
 endif
 
 ifeq (jlink,$(PROGRAMMER))
   JLINK_DEVICE ?= $(CPU_MODEL)
-  include $(RIOTMAKE)/tools/jlink.inc.mk
 endif
 
 ifeq (dfu-util,$(PROGRAMMER))
@@ -51,7 +43,6 @@ ifeq (dfu-util,$(PROGRAMMER))
   ifeq (,$(DFU_USB_ID))
     $(error DFU_USB_ID is not set)
   endif
-  include $(RIOTMAKE)/tools/dfu.inc.mk
 endif
 
 ifeq (stm32flash,$(PROGRAMMER))

@@ -8,8 +8,8 @@ ifneq (,$(AVRDUDE_PORT))
   PROG_DEV ?= $(AVRDUDE_PORT)
 endif
 
-# PROGRAMMER defaults to the external flasher Bus Pirate ISP using avrdude.
-PROGRAMMER  ?= buspirate
+# Avrdude programmer defaults to the external flasher Bus Pirate ISP.
+AVRDUDE_PROGRAMMER  ?= buspirate
 # set serial port for avrdude with buspirate
 ifeq ($(OS),Linux)
   PROG_DEV ?= /dev/ttyUSB0

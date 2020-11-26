@@ -12,13 +12,11 @@ ifeq (openocd,$(PROGRAMMER))
   DEBUG_ADAPTER = jlink
   OPENOCD_TRANSPORT = jtag
   OPENOCD_PRE_FLASH_CMDS += "-c flash protect 0 1 last off"
-  include $(RIOTMAKE)/tools/openocd.inc.mk
 else ifeq (jlink,$(PROGRAMMER))
   # setup JLink for flashing
   JLINK_DEVICE = FE310
   JLINK_IF = JTAG
   FLASH_ADDR = 0x20010000
-  include $(RIOTMAKE)/tools/jlink.inc.mk
 else
   $(error Programmer '$(PROGRAMMER)' not supported for board '$(BOARD)')
 endif

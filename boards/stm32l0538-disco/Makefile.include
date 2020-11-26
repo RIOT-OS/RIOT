@@ -8,7 +8,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-DEBUG_ADAPTER ?= stlink
+# this board uses openocd with st-link
+PROGRAMMER ?= openocd
 
-# this board uses openocd
-include $(RIOTMAKE)/tools/openocd.inc.mk
+DEBUG_ADAPTER ?= stlink

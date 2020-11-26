@@ -12,5 +12,4 @@ ifeq ($(PROGRAMMER),pic32prog)
   # * The triangle `▶` goes into the port number 1 (a hole with a square around it)
   #   opposite side of the JP1 ICSP text.
   FLASHFILE ?= $(HEXFILE)
-  include $(RIOTMAKE)/tools/pic32prog.inc.mk
 endif
