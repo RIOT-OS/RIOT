@@ -1,0 +1,38 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_BME680
+    bool "BME680 Temperature/Humidity/Pressure/Gas sensor"
+    depends on TEST_KCONFIG
+    select PACKAGE_DRIVER_BME680
+    select MODULE_XTIMER if MODULE_SAUL
+
+if MODULE_BME680
+
+choice
+    bool "Device interface"
+    help
+        The device can be connected via different buses, select one.
+
+config MODULE_BME680_I2C
+    bool "I2C"
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+
+config MODULE_BME680_SPI
+    bool "SPI"
+    depends on HAS_PERIPH_SPI
+    depends on HAS_PERIPH_GPIO
+    select MODULE_PERIPH_SPI
+    select MODULE_PERIPH_GPIO
+
+endchoice
+
+config MODULE_BME680_FP
+    bool "Enable floating point"
+
+endif # MODULE_BME680

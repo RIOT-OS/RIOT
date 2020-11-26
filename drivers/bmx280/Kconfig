@@ -1,0 +1,48 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+choice
+    bool "BMx280 Temperature, pressure and humidity sensors"
+    optional
+    help
+        The driver supports both BME280 and BMP280 connected either via SPI or
+        I2C bus. Select one combination.
+
+config MODULE_BME280_I2C
+    bool "BME280 on I2C"
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+    select MODULE_BMX280
+
+config MODULE_BME280_SPI
+    bool "BME280 on SPI"
+    depends on HAS_PERIPH_SPI
+    depends on HAS_PERIPH_GPIO
+    select MODULE_PERIPH_SPI
+    select MODULE_PERIPH_GPIO
+    select MODULE_BMX280
+
+config MODULE_BMP280_I2C
+    bool "BMP280 on I2C"
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+    select MODULE_BMX280
+
+config MODULE_BMP280_SPI
+    bool "BMP280 on SPI"
+    depends on HAS_PERIPH_SPI
+    depends on HAS_PERIPH_GPIO
+    select MODULE_PERIPH_SPI
+    select MODULE_PERIPH_GPIO
+    select MODULE_BMX280
+
+endchoice
+
+config MODULE_BMX280
+    bool
+    depends on TEST_KCONFIG
+    select MODULE_XTIMER

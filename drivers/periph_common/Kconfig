@@ -129,6 +129,16 @@ config MODULE_PERIPH_INIT_RTT
 
 rsource "Kconfig.spi"
 
+config MODULE_PERIPH_TEMPERATURE
+    bool "Temperature peripheral driver"
+    depends on HAS_PERIPH_TEMPERATURE
+    select MODULE_PERIPH_COMMON
+
+config MODULE_PERIPH_INIT_TEMPERATURE
+    bool "Auto initialize temperature peripheral"
+    default y if MODULE_PERIPH_INIT
+    depends on MODULE_PERIPH_TEMPERATURE
+
 rsource "Kconfig.uart"
 
 config MODULE_PERIPH_USBDEV

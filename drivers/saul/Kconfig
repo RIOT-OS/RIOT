@@ -1,0 +1,59 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_SAUL
+    bool "[S]ensor [A]ctuator [U]ber [L]ayer"
+    depends on MODULE_PHYDAT
+    depends on TEST_KCONFIG
+    help
+        SAUL is a generic actuator/sensor interface in RIOT. Its purpose is to
+        enable unified interaction with a wide range of sensors and actuators
+        through a set of defined access functions and a common data structure.
+
+if MODULE_SAUL
+
+config MODULE_SAUL_DEFAULT
+    bool "Enable the default sensors and actuators of the platform"
+    depends on MODULE_SAUL_REG
+
+config MODULE_SAUL_ADC
+    bool "SAUL wrapper for direct access to analog pins"
+    depends on HAS_PERIPH_ADC
+    select MODULE_PERIPH_ADC
+    default y if HAVE_SAUL_ADC
+
+config MODULE_SAUL_GPIO
+    bool "SAUL wrapper for direct access to GPIO pins"
+    depends on HAS_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO
+    default y if HAVE_SAUL_GPIO
+
+config MODULE_SAUL_NRF_TEMPERATURE
+    bool "SAUL wrapper for direct access to the temperature peripheral"
+    depends on HAS_PERIPH_TEMPERATURE
+    select MODULE_PERIPH_TEMPERATURE
+
+config MODULE_AUTO_INIT_SAUL
+    bool "Auto initialize the SAUL sybsystem"
+    depends on MODULE_AUTO_INIT
+    select MODULE_SAUL_INIT_DEVS
+    default y
+
+config MODULE_SAUL_INIT_DEVS
+    bool
+
+endif # MODULE_SAUL
+
+config HAVE_SAUL_ADC
+    bool
+    help
+        Indicates that configuration for ADC access via SAUL is available.
+
+config HAVE_SAUL_GPIO
+    bool
+    help
+        Indicates that configuration for GPIO access via SAUL is available.
