@@ -20,6 +20,7 @@ menu "Miscellaneous Device Drivers"
 rsource "at/Kconfig"
 rsource "at24mac/Kconfig"
 rsource "hd44780/Kconfig"
+rsource "ili9341/Kconfig"
 endmenu # Miscellaneous Device Drivers
 
 rsource "Kconfig.net"
