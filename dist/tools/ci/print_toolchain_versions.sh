@@ -82,7 +82,7 @@ get_sys_shell() {
 }
 
 _get_make_shell() {
-    ${MAKE} -sf - 2>/dev/null <<MAKEFILE
+    ${MAKE} -sf - --no-print-directory 2>/dev/null <<MAKEFILE
 \$(info \$(realpath \$(SHELL)))
 MAKEFILE
 }
