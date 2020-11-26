@@ -23,6 +23,7 @@
 #include <string.h>
 
 #include "xtimer.h"
+#include "msg.h"
 #include "mutex.h"
 #include "rmutex.h"
 #include "thread.h"
