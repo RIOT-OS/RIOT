@@ -8,6 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mkrwan1300 \
     arduino-mkrzero \
     arduino-nano \
+    arduino-nano-33-iot \
     arduino-uno \
     arduino-zero \
     atmega256rfr2-xpro \

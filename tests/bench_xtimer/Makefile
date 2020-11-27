@@ -11,6 +11,7 @@ LOW_MEMORY_BOARDS += \
   arduino-mkrfox1200 \
   arduino-mkrwan1300 \
   arduino-mkrzero \
+  arduino-nano-33-iot \
   atmega1284p \
   b-l072z-lrwan1 \
   blackpill \
