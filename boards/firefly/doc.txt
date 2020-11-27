@@ -107,6 +107,16 @@ On Linux:
 - Firefly over CP2104: `ttyUSB0`
 - Firefly over USB driver (in CDC-ACM): `ttyACMn` (n=0, 1, ....)
 
+Emulator
+========
+
+To emulate this board you need an updated version of
+[renode](https://github.com/renode/renode) installed, at least version 1.9.
+
+```
+BOARD=firefly make all emulate
+```
+
 More Reading
 ============
 1. [Zolertia Firefly website][remote-site]
