@@ -1,0 +1,8 @@
+CPU = qn908x
+CPU_MODEL = qn9080xhn
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+
+# Include the common qn908x board features.
+include $(RIOTBOARD)/common/qn908x/Makefile.features
