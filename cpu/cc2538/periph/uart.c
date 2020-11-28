@@ -145,14 +145,12 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     /* Configure line control for 8-bit, no parity, 1 stop bit and enable  */
     u->cc2538_uart_lcrh.LCRH = (WLEN_8_BITS << 5) | FEN;
 
-    /* register callbacks */
+    /* register callbacks and enable UART irq */
     if (rx_cb) {
         uart_ctx[uart].rx_cb = rx_cb;
         uart_ctx[uart].arg = arg;
+        NVIC_EnableIRQ(UART_IRQ(uart_num));
     }
-
-    /* enable UART interrupt */
-    NVIC_EnableIRQ(UART_IRQ(uart_num));
 
     /* UART Enable */
     u->cc2538_uart_ctl.CTLbits.UARTEN = 1;
