@@ -289,7 +289,7 @@ static inline size_t _compose_ia_pd_opt(dhcpv6_opt_ia_pd_t *ia_pd,
     return len + sizeof(dhcpv6_opt_t);
 }
 
-static inline size_t _add_ia_pd_from_config(uint8_t *buf)
+static inline size_t _add_ia_pd_from_config(uint8_t *buf, size_t len_max)
 {
     size_t msg_len = 0;
 
@@ -301,6 +301,12 @@ static inline size_t _add_ia_pd_from_config(uint8_t *buf)
             msg_len += _compose_ia_pd_opt(ia_pd, ia_id, 0U);
         }
     }
+
+    if (msg_len > len_max) {
+        assert(0);
+        return 0;
+    }
+
     return msg_len;
 }
 
@@ -732,7 +738,7 @@ static void _solicit_servers(event_t *event)
                                         mud_url, sizeof(send_buf) - msg_len);
     }
 
-    msg_len += _add_ia_pd_from_config(&send_buf[msg_len]);
+    msg_len += _add_ia_pd_from_config(&send_buf[msg_len], sizeof(send_buf) - msg_len);
     DEBUG("DHCPv6 client: send SOLICIT\n");
     _flush_stale_replies(&sock);
     res = sock_udp_send(&sock, send_buf, msg_len, &remote);
@@ -840,7 +846,7 @@ static void _request_renew_rebind(uint8_t type)
     msg_len += _compose_elapsed_time_opt(time);
     msg_len += _compose_oro_opt((dhcpv6_opt_oro_t *)&send_buf[msg_len], oro_opts,
                                 ARRAY_SIZE(oro_opts));
-    msg_len += _add_ia_pd_from_config(&send_buf[msg_len]);
+    msg_len += _add_ia_pd_from_config(&send_buf[msg_len], sizeof(send_buf) - msg_len);
     _flush_stale_replies(&sock);
     while (sock_udp_send(&sock, send_buf, msg_len, &remote) <= 0) {}
     while (((res = sock_udp_recv(&sock, recv_buf, sizeof(recv_buf),
