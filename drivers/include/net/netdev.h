@@ -286,6 +286,7 @@ typedef enum {
     NETDEV_KW41ZRF,
     NETDEV_MRF24J40,
     NETDEV_NRF802154,
+    NETDEV_STM32_ETH,
     /* add more if needed */
 } netdev_type_t;
 /** @} */

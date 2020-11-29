@@ -24,7 +24,6 @@ ifneq (,$(filter stm32_eth,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eth
   USEMODULE += netdev_eth
   USEMODULE += iolist
-  USEMODULE += luid
   USEMODULE += xtimer
 endif
 

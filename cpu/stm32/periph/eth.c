@@ -26,10 +26,10 @@
 
 #include "bitarithm.h"
 #include "iolist.h"
-#include "luid.h"
 #include "mii.h"
 #include "mutex.h"
 #include "net/ethernet.h"
+#include "net/eui_provider.h"
 #include "net/netdev/eth.h"
 #include "periph/gpio.h"
 
@@ -407,8 +407,6 @@ static int stm32_eth_init(netdev_t *netdev)
     _link_status_timer.callback = _timer_cb;
     _link_status_timer.arg = netdev;
     xtimer_set(&_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_US);
-#else
-    (void)netdev;
 #endif
     /* enable APB2 clock */
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
@@ -459,14 +457,11 @@ static int stm32_eth_init(netdev_t *netdev)
                 | ETH_DMABMR_RDP_32Beat | ETH_DMABMR_PBL_32Beat
                 | ETH_DMABMR_EDE;
 
-    if (eth_config.addr[0] != 0) {
-        stm32_eth_set_addr(eth_config.addr);
-    }
-    else {
-        eui48_t hwaddr;
-        luid_get_eui48(&hwaddr);
-        stm32_eth_set_addr(hwaddr.uint8);
-    }
+    netdev_register(netdev, NETDEV_STM32_ETH, 0);
+
+    eui48_t hwaddr;
+    netdev_eui48_get(netdev, &hwaddr);
+    stm32_eth_set_addr(hwaddr.uint8);
 
     _init_buffer();
 
