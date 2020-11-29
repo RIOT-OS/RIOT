@@ -1049,7 +1049,6 @@ typedef enum {
  */
 typedef struct {
     eth_mode_t mode;            /**< Select configuration mode */
-    uint8_t addr[6];            /**< Ethernet MAC address */
     uint16_t speed;             /**< Speed selection */
     uint8_t dma;                /**< Locical CMA Descriptor used for TX */
     uint8_t dma_chan;           /**< DMA channel used for TX */

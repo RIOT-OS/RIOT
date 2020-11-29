@@ -248,7 +248,6 @@ static const adc_conf_t adc_config[] = {
  */
 static const eth_conf_t eth_config = {
     .mode = RMII,
-    .addr = { 0 },
     .speed = MII_BMCR_SPEED_100 | MII_BMCR_FULL_DPLX,
     .dma = 6,
     .dma_chan = 8,
