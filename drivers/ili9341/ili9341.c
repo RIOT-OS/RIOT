@@ -121,7 +121,7 @@ int ili9341_init(ili9341_t *dev, const ili9341_params_t *params)
     _write_cmd(dev, ILI9341_CMD_PWCTRL2, command_params, 1);
 
     /* VCOMCTL */
-    command_params[0] = _ili9341_calc_vmh(ILI9341_VCOMH);
+    command_params[0] = _ili9341_calc_vmh(CONFIG_ILI9341_VCOMH);
     command_params[1] = _ili9341_calc_vml(ILI9341_VCOML);
     _write_cmd(dev, ILI9341_CMD_VMCTRL1, command_params, 2);
 

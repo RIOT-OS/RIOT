@@ -63,8 +63,8 @@ extern "C" {
  *
  * Default VCOMH voltage of 4.25V
  */
-#ifndef ILI9341_VCOMH
-#define ILI9341_VCOMH   4250
+#ifndef CONFIG_ILI9341_VCOMH
+#define CONFIG_ILI9341_VCOMH            4250
 #endif
 
 /**
