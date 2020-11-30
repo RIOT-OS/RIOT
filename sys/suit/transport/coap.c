@@ -96,6 +96,8 @@ static inline void _print_download_progress(suit_manifest_t *manifest,
             puts("");
         }
     }
+#else
+    (void) image_size;
 #endif
 }
 #endif
