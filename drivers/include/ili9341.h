@@ -54,8 +54,8 @@ extern "C" {
  *
  * Default GVDD voltage of 4.8V
  */
-#ifndef ILI9341_GVDD
-#define ILI9341_GVDD    4800
+#ifndef CONFIG_ILI9341_GVDD
+#define CONFIG_ILI9341_GVDD             4800
 #endif
 
 /**

@@ -114,7 +114,7 @@ int ili9341_init(ili9341_t *dev, const ili9341_params_t *params)
     _write_cmd(dev, ILI9341_CMD_DISPOFF, NULL, 0);
 
     /* PWRCTL1/2 */
-    command_params[0] = _ili9341_calc_pwrctl1(ILI9341_GVDD);
+    command_params[0] = _ili9341_calc_pwrctl1(CONFIG_ILI9341_GVDD);
     _write_cmd(dev, ILI9341_CMD_PWCTRL1, command_params, 1);
 
     command_params[0] = 0x10; /* PWRCTL 0 0 0 */
