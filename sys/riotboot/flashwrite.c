@@ -24,10 +24,16 @@
 #include <string.h>
 
 #include "riotboot/flashwrite.h"
+#include "riotboot/slot.h"
 #include "od.h"
 
 #define LOG_PREFIX "riotboot_flashwrite: "
 #include "log.h"
+
+/**
+ * @brief Magic number used to invalidate a slot
+ */
+#define INVALIDATE_HDR                  0xAA
 
 static inline size_t min(size_t a, size_t b)
 {
@@ -148,6 +154,34 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
     }
 
     return 0;
+}
+
+int riotboot_flashwrite_invalidate(int slot)
+{
+    if (riotboot_slot_numof == 1) {
+        LOG_WARNING(LOG_PREFIX "abort, only one slot configured\n");
+        return -1;
+    }
+    if (riotboot_slot_validate(1 - slot) != 0) {
+        LOG_WARNING(LOG_PREFIX "abort, can not erase slot[%d], other slot[%d] is invalid\n",slot, 1 - slot);
+        return -2;
+    }
+
+    uint8_t data_flash[4];
+    memset(data_flash, INVALIDATE_HDR, sizeof(data_flash));
+
+    flashpage_write((void *)riotboot_slot_get_hdr(slot), data_flash, sizeof(data_flash));
+
+    return 0;
+}
+
+int riotboot_flashwrite_invalidate_latest(void)
+{
+    int _slot_to_revert;
+    _slot_to_revert = (riotboot_slot_get_hdr(riotboot_slot_other())->version
+                        > riotboot_slot_get_hdr(riotboot_slot_current())->version)
+                        ? riotboot_slot_other() : riotboot_slot_current();
+    return riotboot_flashwrite_invalidate(_slot_to_revert);
 }
 
 int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
