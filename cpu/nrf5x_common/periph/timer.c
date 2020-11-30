@@ -31,6 +31,7 @@ typedef struct {
     timer_cb_t cb;
     void *arg;
     uint8_t flags;
+    uint8_t is_periodic;
 } tim_ctx_t;
 
 /**
@@ -106,6 +107,29 @@ int timer_set_absolute(tim_t tim, int chan, unsigned int value)
     return 0;
 }
 
+int timer_set_periodic(tim_t tim, int chan, unsigned int value, uint8_t flags)
+{
+    /* see if channel is valid */
+    if (chan >= timer_config[tim].channels) {
+        return -1;
+    }
+
+    ctx[tim].flags |= (1 << chan);
+    ctx[tim].is_periodic |= (1 << chan);
+    dev(tim)->CC[chan] = value;
+    if (flags & TIM_FLAG_RESET_ON_MATCH) {
+        dev(tim)->SHORTS |= (1 << chan);
+    }
+    if (flags & TIM_FLAG_RESET_ON_SET) {
+        dev(tim)->TASKS_CLEAR = 1;
+    }
+    dev(tim)->INTENSET = (TIMER_INTENSET_COMPARE0_Msk << chan);
+
+    dev(tim)->TASKS_START = 1;
+
+    return 0;
+}
+
 int timer_clear(tim_t tim, int chan)
 {
     /* see if channel is valid */
@@ -114,7 +138,10 @@ int timer_clear(tim_t tim, int chan)
     }
 
     dev(tim)->INTENCLR = (TIMER_INTENSET_COMPARE0_Msk << chan);
+    /* Clear out the Compare->Clear flag of this channel */
+    dev(tim)->SHORTS &= ~(1 << chan);
     ctx[tim].flags &= ~(1 << chan);
+    ctx[tim].is_periodic &= ~(1 << chan);
 
     return 0;
 }
@@ -141,8 +168,10 @@ static inline void irq_handler(int num)
         if (dev(num)->EVENTS_COMPARE[i] == 1) {
             dev(num)->EVENTS_COMPARE[i] = 0;
             if (ctx[num].flags & (1 << i)) {
-                ctx[num].flags &= ~(1 << i);
-                dev(num)->INTENCLR = (TIMER_INTENSET_COMPARE0_Msk << i);
+                if ((ctx[num].is_periodic & (1 << i)) == 0) {
+                    ctx[num].flags &= ~(1 << i);
+                    dev(num)->INTENCLR = (TIMER_INTENSET_COMPARE0_Msk << i);
+                }
                 ctx[num].cb(ctx[num].arg, i);
             }
         }
