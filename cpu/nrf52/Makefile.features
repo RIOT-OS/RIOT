@@ -20,4 +20,6 @@ FEATURES_PROVIDED += ble_nimble_netif
 # all nrf52 have an MPU
 FEATURES_PROVIDED += cortexm_mpu
 
+FEATURES_PROVIDED += periph_i2c_reconfigure
+
 include $(RIOTCPU)/nrf5x_common/Makefile.features
