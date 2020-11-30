@@ -255,7 +255,12 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
     /* tell gnrc_ipv6 to send the above prepared fragment */
     msg.type = GNRC_IPV6_EXT_FRAG_SEND;
     msg.content.ptr = to_send;
-    msg_try_send(&msg, gnrc_ipv6_pid);
+    if (msg_try_send(&msg, gnrc_ipv6_pid) <= 0) {
+        DEBUG("ipv6_ext_frag: Unable to send fragment, canceling fragmentation\n");
+        gnrc_pktbuf_release(to_send);
+        _snd_buf_free(snd_buf);
+        return;
+    }
     if (last_fragment) {
         /* last fragment => we don't need the send buffer anymore.
          * But as we just sent it to gnrc_ipv6 we still need the packet
@@ -267,7 +272,10 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
          * later */
         msg.type = GNRC_IPV6_EXT_FRAG_CONTINUE;
         msg.content.ptr = snd_buf;
-        msg_try_send(&msg, gnrc_ipv6_pid);
+        if (msg_try_send(&msg, gnrc_ipv6_pid) <= 0) {
+            DEBUG("ipv6_ext_frag: Unable to continue fragmentation, canceling\n");
+            _snd_buf_free(snd_buf);
+        }
     }
 }
 
