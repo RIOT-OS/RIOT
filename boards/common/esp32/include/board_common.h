@@ -30,7 +30,9 @@
 
 #include "cpu.h"
 #include "periph_conf.h"
+#if MODULE_ARDUINO
 #include "arduino_pinmap.h"
+#endif
 
 #include "periph/gpio.h"
 #include "sdk_conf.h"

@@ -26,6 +26,7 @@ PSEUDOMODULES += esp_gdbstub
 PSEUDOMODULES += esp_hw_counter
 PSEUDOMODULES += esp_i2c_hw
 PSEUDOMODULES += esp_idf_newlib
+PSEUDOMODULES += esp_jtag
 PSEUDOMODULES += esp_rtc_timer_32k
 PSEUDOMODULES += esp_spi_ram
 PSEUDOMODULES += esp_wifi_enterprise
@@ -47,6 +48,10 @@ INCLUDES += -I$(RIOTCPU)/$(CPU)
 ifneq (,$(filter esp_eth,$(USEMODULE)))
   INCLUDES += -I$(RIOTCPU)/$(CPU)/vendor/esp-idf/include/ethernet
   INCLUDES += -I$(ESP32_SDK_DIR)/components/ethernet/include
+endif
+
+ifneq (,$(filter esp_jtag,$(USEMODULE)))
+  FEATURES_REQUIRED += esp_jtag
 endif
 
 CFLAGS += -DSDK_NOT_USED -DCONFIG_FREERTOS_UNICORE=1 -DESP_PLATFORM

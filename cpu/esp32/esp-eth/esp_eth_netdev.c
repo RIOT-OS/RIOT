@@ -56,6 +56,10 @@
 #include "eth_phy/phy_lan8720.h"
 #define EMAC_ETHERNET_PHY_CONFIG phy_lan8720_default_ethernet_config
 #endif
+#ifdef EMAC_PHY_IP101G
+#include "eth_phy/phy_ip101g.h"
+#define EMAC_ETHERNET_PHY_CONFIG phy_ip101g_default_ethernet_config
+#endif
 #ifdef EMAC_PHY_TLK110
 #include "eth_phy/phy_tlk110.h"
 #define EMAC_ETHERNET_PHY_CONFIG phy_tlk110_default_ethernet_config
