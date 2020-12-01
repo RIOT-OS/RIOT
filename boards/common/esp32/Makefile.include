@@ -2,7 +2,3 @@
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
-
-# reset tool configuration
-RESET ?= $(RIOTTOOLS)/esptool/espreset.py
-RESET_FLAGS ?= --port $(PROG_DEV)
