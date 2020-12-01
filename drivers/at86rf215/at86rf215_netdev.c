@@ -30,6 +30,8 @@
 #include "net/netdev/ieee802154.h"
 #include "net/gnrc/netif/internal.h"
 
+#include "sys/bus.h"
+
 #include "at86rf215.h"
 #include "at86rf215_netdev.h"
 #include "at86rf215_internal.h"
@@ -551,6 +553,22 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             res = sizeof(netopt_enable_t);
             break;
 
+#ifdef MODULE_AT86RF215_BATMON
+        case NETOPT_BATMON:
+            assert(len <= sizeof(uint16_t));
+            {
+                uint16_t mV = *(const uint16_t *)val;
+                if (mV) {
+                    res = at86rf215_enable_batmon(dev, mV);
+                    res = (res == 0) ? (int)sizeof(uint16_t) : res;
+                } else {
+                    at86rf215_disable_batmon(dev);
+                    res = sizeof(uint16_t);
+                }
+            }
+            break;
+#endif
+
         case NETOPT_RETRANS:
             assert(len <= sizeof(uint8_t));
             dev->retries_max =  *((const uint8_t *)val);
@@ -1051,6 +1069,14 @@ static void _isr(netdev_t *netdev)
             _clear_sibling_irq(dev);
         }
     }
+
+    /* Handle Low Battery IRQ */
+#if MODULE_AT86RF215_BATMON
+    if ((rf_irq_mask & RF_IRQ_BATLOW)) {
+        msg_bus_t *bus = sys_bus_get(SYS_BUS_POWER);
+        msg_bus_post(bus, SYS_BUS_POWER_EVENT_LOW_VOLTAGE, NULL);
+    }
+#endif
 
     /* exit early if the interrupt was not for this interface */
     if (!((bb_irq_mask & bb_irqs_enabled) ||

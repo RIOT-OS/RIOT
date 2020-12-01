@@ -58,6 +58,11 @@ void auto_init(void)
         extern void auto_init_event_thread(void);
         auto_init_event_thread();
     }
+    if (IS_USED(MODULE_SYS_BUS)) {
+        LOG_DEBUG("Auto init system buses.\n");
+        extern void auto_init_sys_bus(void);
+        auto_init_sys_bus();
+    }
     if (IS_USED(MODULE_MCI)) {
         LOG_DEBUG("Auto init mci.\n");
         extern void mci_initialize(void);
