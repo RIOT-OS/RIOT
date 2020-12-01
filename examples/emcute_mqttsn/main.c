@@ -31,7 +31,6 @@
 #ifndef EMCUTE_ID
 #define EMCUTE_ID           ("gertrud")
 #endif
-#define EMCUTE_PORT         (1883U)
 #define EMCUTE_PRIO         (THREAD_PRIORITY_MAIN - 1)
 
 #define NUMOFSUBS           (16U)
@@ -46,7 +45,7 @@ static char topics[NUMOFSUBS][TOPIC_MAXLEN];
 static void *emcute_thread(void *arg)
 {
     (void)arg;
-    emcute_run(EMCUTE_PORT, EMCUTE_ID);
+    emcute_run(CONFIG_EMCUTE_DEFAULT_PORT, EMCUTE_ID);
     return NULL;    /* should never be reached */
 }
 
@@ -74,7 +73,7 @@ static unsigned get_qos(const char *str)
 
 static int cmd_con(int argc, char **argv)
 {
-    sock_udp_ep_t gw = { .family = AF_INET6, .port = EMCUTE_PORT };
+    sock_udp_ep_t gw = { .family = AF_INET6, .port = CONFIG_EMCUTE_DEFAULT_PORT };
     char *topic = NULL;
     char *message = NULL;
     size_t len = 0;

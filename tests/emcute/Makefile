@@ -25,7 +25,6 @@ USEMODULE += shell
 USEMODULE += shell_commands
 USEMODULE += sock_util
 
-CFLAGS += -DEMCUTE_TOPIC_MAXLEN="249"   # 256 - 7
 CFLAGS += -DSTDIO_UART_RX_BUFSIZE="512" # Adapt to SHELL_BUFSIZE in app
 
 # The test requires some setup and to be run as root
@@ -38,3 +37,8 @@ ethos:
 	$(Q)env -u CC -u CFLAGS $(MAKE) -C $(RIOTTOOLS)/ethos
 
 include $(RIOTBASE)/Makefile.include
+
+# Set CONFIG_EMCUTE_TOPIC_MAXLEN via CFLAGS if not being set via Kconfig.
+ifndef CONFIG_EMCUTE_TOPIC_MAXLEN
+  CFLAGS += -DCONFIG_EMCUTE_TOPIC_MAXLEN=249   # 256 - 7
+endif

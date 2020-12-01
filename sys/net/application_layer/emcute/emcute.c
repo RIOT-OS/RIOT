@@ -44,13 +44,12 @@
 #define TFLAGS_TIMEOUT      (0x0002)
 #define TFLAGS_ANY          (TFLAGS_RESP | TFLAGS_TIMEOUT)
 
-
 static const char *cli_id;
 static sock_udp_t sock;
 static sock_udp_ep_t gateway;
 
-static uint8_t rbuf[EMCUTE_BUFSIZE];
-static uint8_t tbuf[EMCUTE_BUFSIZE];
+static uint8_t rbuf[CONFIG_EMCUTE_BUFSIZE];
+static uint8_t tbuf[CONFIG_EMCUTE_BUFSIZE];
 
 static emcute_sub_t *subs = NULL;
 
@@ -103,11 +102,11 @@ static int syncsend(uint8_t resp, size_t len, bool unlock)
      * remove was called */
     thread_flags_clear(TFLAGS_ANY);
 
-    for (unsigned retries = 0; retries <= EMCUTE_N_RETRY; retries++) {
+    for (unsigned retries = 0; retries <= CONFIG_EMCUTE_N_RETRY; retries++) {
         DEBUG("[emcute] syncsend: sending round %i\n", retries);
         sock_udp_send(&sock, tbuf, len, &gateway);
 
-        xtimer_set(&timer, (EMCUTE_T_RETRY * US_PER_SEC));
+        xtimer_set(&timer, (CONFIG_EMCUTE_T_RETRY * US_PER_SEC));
         thread_flags_t flags = thread_flags_wait_any(TFLAGS_ANY);
         if (flags & TFLAGS_RESP) {
             DEBUG("[emcute] syncsend: got response [%i]\n", result);
@@ -241,14 +240,14 @@ int emcute_con(sock_udp_ep_t *remote, bool clean, const char *will_topic,
     tbuf[1] = CONNECT;
     tbuf[2] = flags;
     tbuf[3] = PROTOCOL_VERSION;
-    byteorder_htobebufs(&tbuf[4], EMCUTE_KEEPALIVE);
+    byteorder_htobebufs(&tbuf[4], CONFIG_EMCUTE_KEEPALIVE);
     memcpy(&tbuf[6], cli_id, strlen(cli_id));
 
     /* configure 'state machine' and send the connection request */
     if (will_topic) {
         size_t topic_len = strlen(will_topic);
-        if ((topic_len > EMCUTE_TOPIC_MAXLEN) ||
-            ((will_msg_len + 4) > EMCUTE_BUFSIZE)) {
+        if ((topic_len > CONFIG_EMCUTE_TOPIC_MAXLEN) ||
+            ((will_msg_len + 4) > CONFIG_EMCUTE_BUFSIZE)) {
             gateway.port = 0;
             return EMCUTE_OVERFLOW;
         }
@@ -307,7 +306,7 @@ int emcute_reg(emcute_topic_t *topic)
     if (gateway.port == 0) {
         return EMCUTE_NOGW;
     }
-    if (strlen(topic->name) > EMCUTE_TOPIC_MAXLEN) {
+    if (strlen(topic->name) > CONFIG_EMCUTE_TOPIC_MAXLEN) {
         return EMCUTE_OVERFLOW;
     }
 
@@ -338,7 +337,7 @@ int emcute_pub(emcute_topic_t *topic, const void *data, size_t len,
     if (gateway.port == 0) {
         return EMCUTE_NOGW;
     }
-    if (len >= (EMCUTE_BUFSIZE - 9)) {
+    if (len >= (CONFIG_EMCUTE_BUFSIZE - 9)) {
         return EMCUTE_OVERFLOW;
     }
     if (flags & EMCUTE_QOS_2) {
@@ -375,7 +374,7 @@ int emcute_sub(emcute_sub_t *sub, unsigned flags)
     if (gateway.port == 0) {
         return EMCUTE_NOGW;
     }
-    if (strlen(sub->topic.name) > EMCUTE_TOPIC_MAXLEN) {
+    if (strlen(sub->topic.name) > CONFIG_EMCUTE_TOPIC_MAXLEN) {
         return EMCUTE_OVERFLOW;
     }
 
@@ -451,7 +450,7 @@ int emcute_willupd_topic(const char *topic, unsigned flags)
     if (gateway.port == 0) {
         return EMCUTE_NOGW;
     }
-    if (topic && (strlen(topic) > EMCUTE_TOPIC_MAXLEN)) {
+    if (topic && (strlen(topic) > CONFIG_EMCUTE_TOPIC_MAXLEN)) {
         return EMCUTE_OVERFLOW;
     }
 
@@ -477,7 +476,7 @@ int emcute_willupd_msg(const void *data, size_t len)
     if (gateway.port == 0) {
         return EMCUTE_NOGW;
     }
-    if (len > (EMCUTE_BUFSIZE - 4)) {
+    if (len > (CONFIG_EMCUTE_BUFSIZE - 4)) {
         return EMCUTE_OVERFLOW;
     }
 
@@ -509,7 +508,7 @@ void emcute_run(uint16_t port, const char *id)
     }
 
     uint32_t start = xtimer_now_usec();
-    uint32_t t_out = (EMCUTE_KEEPALIVE * US_PER_SEC);
+    uint32_t t_out = (CONFIG_EMCUTE_KEEPALIVE * US_PER_SEC);
 
     while (1) {
         ssize_t len = sock_udp_recv(&sock, rbuf, sizeof(rbuf), t_out, &remote);
@@ -556,13 +555,13 @@ void emcute_run(uint16_t port, const char *id)
         }
 
         uint32_t now = xtimer_now_usec();
-        if ((now - start) >= (EMCUTE_KEEPALIVE * US_PER_SEC)) {
+        if ((now - start) >= (CONFIG_EMCUTE_KEEPALIVE * US_PER_SEC)) {
             send_ping();
             start = now;
-            t_out = (EMCUTE_KEEPALIVE * US_PER_SEC);
+            t_out = (CONFIG_EMCUTE_KEEPALIVE * US_PER_SEC);
         }
         else {
-            t_out = (EMCUTE_KEEPALIVE * US_PER_SEC) - (now - start);
+            t_out = (CONFIG_EMCUTE_KEEPALIVE * US_PER_SEC) - (now - start);
         }
     }
 }

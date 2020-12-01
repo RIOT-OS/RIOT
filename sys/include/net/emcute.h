@@ -95,14 +95,23 @@
 extern "C" {
 #endif
 
-#ifndef EMCUTE_DEFAULT_PORT
 /**
- * @brief   Default UDP port to listen on (also used as SRC port)
+ * @defgroup net_emcute_conf EmCute (MQTT-SN Client) compile configurations
+ * @ingroup net_mqtt_conf
+ * @brief   Compile-time configuration options for emCute, an implementation
+ *          of the OASIS MQTT-SN protocol for RIOT. It is designed with a focus
+ *          on small memory footprint and usability
+ * @{
  */
-#define EMCUTE_DEFAULT_PORT     (1883U)
+/**
+ * @brief   Default UDP port to listen on (also used as SRC port). Usage can be
+ *          found in examples/emcute_mqttsn. Application code is expected to use
+ *          this macro to assign the default port.
+ */
+#ifndef CONFIG_EMCUTE_DEFAULT_PORT
+#define CONFIG_EMCUTE_DEFAULT_PORT          (1883U)
 #endif
 
-#ifndef EMCUTE_BUFSIZE
 /**
  * @brief   Buffer size used for emCute's transmit and receive buffers
  *
@@ -111,48 +120,57 @@ extern "C" {
  *
  * The overall buffer size used by emCute is this value time two (Rx + Tx).
  */
-#define EMCUTE_BUFSIZE          (512U)
+#ifndef CONFIG_EMCUTE_BUFSIZE
+#define CONFIG_EMCUTE_BUFSIZE               (512U)
 #endif
 
-#ifndef EMCUTE_TOPIC_MAXLEN
 /**
  * @brief   Maximum topic length
  *
- * @note    **Must** be less than (256 - 6) AND less than
- *          (@ref EMCUTE_BUFSIZE - 6).
+ * @note    **Must** be less than (256 - 6) AND less than ( @ref CONFIG_EMCUTE_BUFSIZE - 6 )
  */
-#define EMCUTE_TOPIC_MAXLEN     (196U)
+#ifndef CONFIG_EMCUTE_TOPIC_MAXLEN
+#define CONFIG_EMCUTE_TOPIC_MAXLEN          (196U)
 #endif
 
-#ifndef EMCUTE_KEEPALIVE
 /**
- * @brief   Keep-alive interval [in s]
+ * @brief   Keep-alive interval [in seconds] communicated to the gateway
  *
- * The node will communicate this interval to the gateway send a ping message
- * every time when this amount of time has passed.
- *
- * For the default value, see spec v1.2, section 7.2 -> T_WAIT: > 5 min
+ * Keep alive interval in seconds which is communicated to the gateway in the
+ * CONNECT message. For more information, see MQTT-SN Spec v1.2, section 5.4.4.
+ * For default values, see section 7.2 -> TWAIT: > 5 min.
  */
-#define EMCUTE_KEEPALIVE        (360)       /* -> 6 min*/
+#ifndef CONFIG_EMCUTE_KEEPALIVE
+#define CONFIG_EMCUTE_KEEPALIVE             (360)       /* -> 6 min*/
 #endif
 
-#ifndef EMCUTE_T_RETRY
 /**
  * @brief   Re-send interval [in seconds]
  *
- * For the default value, see spec v1.2, section 7.2 -> T_RETRY: 10 to 15 sec
+ * Interval used for timing the retry messages which are sent when the expected
+ * reply from GW is not received. The retry timer is started by the client when
+ * the message is sent and stopped when the expected reply from GW is received.
+ * If the timer times out and the expected GW’s reply is not received, the
+ * client retransmits the message. For more information, see MQTT-SN Spec v1.2,
+ * section 6.13. For default values, see section 7.2 -> Tretry: 10 to 15 sec.
  */
-#define EMCUTE_T_RETRY          (15U)       /* -> 15 sec */
+#ifndef CONFIG_EMCUTE_T_RETRY
+#define CONFIG_EMCUTE_T_RETRY               (15U)       /* -> 15 sec */
 #endif
 
-#ifndef EMCUTE_N_RETRY
 /**
- * @brief   Number of retries when sending packets
+ * @brief   Number of retransmissions until requests time out
  *
- * For the default value, see spec v1.2, section 7.2 -> N_RETRY: 3-5
+ * Maximum number of retransmissions in the event that the retry timer times
+ * out. After 'CONFIG_EMCUTE_N_RETRY' number of retransmissions, the client
+ * aborts the procedure and assumes that its MQTT-SN connection to the gateway
+ * is disconnected. For more information, see MQTT-SN Spec v1.2, section 6.13.
+ * For default values, see section 7.2 -> Nretry: 3-5.
  */
-#define EMCUTE_N_RETRY          (3U)
+#ifndef CONFIG_EMCUTE_N_RETRY
+#define CONFIG_EMCUTE_N_RETRY               (3U)
 #endif
+/** @} */
 
 /**
  * @brief   MQTT-SN flags
@@ -259,7 +277,7 @@ int emcute_discon(void);
  * @return  EMCUTE_OK on success
  * @return  EMCUTE_NOGW if not connected to a gateway
  * @return  EMCUTE_OVERFLOW if length of topic name exceeds
- *          @ref EMCUTE_TOPIC_MAXLEN
+ *          @ref CONFIG_EMCUTE_TOPIC_MAXLEN
  * @return  EMCUTE_TIMEOUT on connection timeout
  */
 int emcute_reg(emcute_topic_t *topic);
@@ -276,7 +294,7 @@ int emcute_reg(emcute_topic_t *topic);
  * @return  EMCUTE_OK on success
  * @return  EMCUTE_NOGW if not connected to a gateway
  * @return  EMCUTE_REJECT if publish message was rejected (QoS > 0 only)
- * @return  EMCUTE_OVERFLOW if length of data exceeds @ref EMCUTE_BUFSIZE
+ * @return  EMCUTE_OVERFLOW if length of data exceeds @ref CONFIG_EMCUTE_BUFSIZE
  * @return  EMCUTE_TIMEOUT on connection timeout (QoS > 0 only)
  * @return  EMCUTE_NOTSUP on unsupported flag values
  */
@@ -297,7 +315,7 @@ int emcute_pub(emcute_topic_t *topic, const void *buf, size_t len,
  * @return  EMCUTE_OK on success
  * @return  EMCUTE_NOGW if not connected to a gateway
  * @return  EMCUTE_OVERFLOW if length of topic name exceeds
- *          @ref EMCUTE_TOPIC_MAXLEN
+ *          @ref CONFIG_EMCUTE_TOPIC_MAXLEN
  * @return  EMCUTE_TIMEOUT on connection timeout
  */
 int emcute_sub(emcute_sub_t *sub, unsigned flags);
@@ -322,7 +340,7 @@ int emcute_unsub(emcute_sub_t *sub);
  * @return  EMCUTE_OK on success
  * @return  EMCUTE_NOGW if not connected to a gateway
  * @return  EMCUTE_OVERFLOW if length of topic name exceeds
- *          @ref EMCUTE_TOPIC_MAXLEN
+ *          @ref CONFIG_EMCUTE_TOPIC_MAXLEN
  * @return  EMCUTE_REJECT on rejection by the gateway
  * @return  EMCUTE_TIMEOUT on response timeout
  */
@@ -337,7 +355,7 @@ int emcute_willupd_topic(const char *topic, unsigned flags);
  * @return  EMCUTE_OK on success
  * @return  EMCUTE_NOGW if not connected to a gateway
  * @return  EMCUTE_OVERFLOW if length of the given message exceeds
- *          @ref EMCUTE_BUFSIZE
+ *          @ref CONFIG_EMCUTE_BUFSIZE
  * @return  EMCUTE_REJECT on rejection by the gateway
  * @return  EMCUTE_TIMEOUT on response timeout
  */

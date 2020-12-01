@@ -4,8 +4,6 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-rsource "asymcute/Kconfig"
-
 menu "CoAP"
 
 rsource "Kconfig.coap"
@@ -16,3 +14,10 @@ endmenu # CoAP
 
 rsource "cord/Kconfig"
 rsource "dhcpv6/Kconfig"
+
+menu "MQTT-SN"
+
+rsource "asymcute/Kconfig"
+rsource "emcute/Kconfig"
+
+endmenu # MQTT-SN

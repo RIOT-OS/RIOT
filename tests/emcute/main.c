@@ -39,11 +39,11 @@
 
 static char _emcute_stack[THREAD_STACKSIZE_DEFAULT];
 static char _shell_buffer[SHELL_BUFSIZE];
-static uint8_t _pub_buf[EMCUTE_BUFSIZE];
+static uint8_t _pub_buf[CONFIG_EMCUTE_BUFSIZE];
 
 static emcute_topic_t _topics[NUMOFTOPS];
 static emcute_sub_t _subscriptions[NUMOFTOPS];
-static char _topic_names[NUMOFTOPS][EMCUTE_TOPIC_MAXLEN + 1];
+static char _topic_names[NUMOFTOPS][CONFIG_EMCUTE_TOPIC_MAXLEN + 1];
 static char _addr_str[IPV6_ADDR_MAX_STR_LEN];
 
 static sock_udp_ep_t _gw = { .family = AF_INET6 };
@@ -72,7 +72,7 @@ static const shell_command_t _shell_commands[] = {
 static void *_emcute_thread(void *arg)
 {
     (void)arg;
-    emcute_run(MQTTSN_DEFAULT_PORT, EMCUTE_ID);
+    emcute_run(CONFIG_EMCUTE_DEFAULT_PORT, EMCUTE_ID);
     return NULL;    /* should never be reached */
 }
 
@@ -111,7 +111,7 @@ static int _con(int argc, char **argv)
         return 1;
     }
     if (_gw.port == 0) {
-        _gw.port = MQTTSN_DEFAULT_PORT;
+        _gw.port = CONFIG_EMCUTE_DEFAULT_PORT;
     }
     if (argc >= 4) {
         topic = argv[2];
@@ -155,7 +155,7 @@ static int _topic_name_find(const char *name)
         if ((_topic_names[i][0] == '\0') && (res < 0)) {
             res = i;
         }
-        else if (strncmp(name, _topic_names[i], EMCUTE_TOPIC_MAXLEN) == 0) {
+        else if (strncmp(name, _topic_names[i], CONFIG_EMCUTE_TOPIC_MAXLEN) == 0) {
             return i;
         }
     }
@@ -183,7 +183,7 @@ static int _reg(int argc, char **argv)
         was_set = true;
     }
     else {
-        strncpy(_topic_names[idx], argv[1], EMCUTE_TOPIC_MAXLEN);
+        strncpy(_topic_names[idx], argv[1], CONFIG_EMCUTE_TOPIC_MAXLEN);
     }
     t = &_topics[idx];
     t->name = _topic_names[idx];
@@ -251,7 +251,7 @@ static int _sub(int argc, char **argv)
         return 1;
     }
 
-    if (strlen(argv[1]) > EMCUTE_TOPIC_MAXLEN) {
+    if (strlen(argv[1]) > CONFIG_EMCUTE_TOPIC_MAXLEN) {
         puts("error: topic name exceeds maximum possible size");
         return 1;
     }
@@ -269,7 +269,7 @@ static int _sub(int argc, char **argv)
         was_set = true;
     }
     else {
-        strncpy(_topic_names[idx], argv[1], EMCUTE_TOPIC_MAXLEN);
+        strncpy(_topic_names[idx], argv[1], CONFIG_EMCUTE_TOPIC_MAXLEN);
     }
     _subscriptions[idx].topic.name = _topic_names[idx];
     if (emcute_sub(&_subscriptions[idx], flags) != EMCUTE_OK) {
