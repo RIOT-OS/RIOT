@@ -58,8 +58,8 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
 #define XFA_INIT_CONST(type, name) \
     _Pragma("GCC diagnostic push") \
     _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
-    _XFA_CONST(name, 0_) const type name [0] = {}; \
-    _XFA_CONST(name, 9_) const type name ## _end [0] = {}; \
+    _XFA_CONST(name, 0_) const volatile type name [0] = {}; \
+    _XFA_CONST(name, 9_) const volatile type name ## _end [0] = {}; \
     _Pragma("GCC diagnostic pop") \
     extern const unsigned __xfa_dummy
 
