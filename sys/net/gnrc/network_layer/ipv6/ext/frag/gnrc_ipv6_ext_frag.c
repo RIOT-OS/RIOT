@@ -14,6 +14,7 @@
  */
 
 #include <assert.h>
+#include <errno.h>
 #include <stdbool.h>
 
 #include "byteorder.h"
@@ -85,8 +86,9 @@ static gnrc_ipv6_ext_frag_send_t *_snd_buf_alloc(void);
  *          datagrams and fragments.
  *
  * @param[in] snd_buf   A fragmentation send buffer entry
+ * @param[in] error     Error number for the error causing the release
  */
-static void _snd_buf_free(gnrc_ipv6_ext_frag_send_t *snd_buf);
+static void _snd_buf_free(gnrc_ipv6_ext_frag_send_t *snd_buf, int error);
 
 /**
  * @brief   Removes a fragmentation send buffer without releasing the stored
@@ -175,7 +177,7 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
                     gnrc_pktbuf_release(ptr);
                 }
             }
-            _snd_buf_free(snd_buf);
+            _snd_buf_free(snd_buf, ENOSPC);
             return;
         }
         ptr = tmp;
@@ -212,7 +214,7 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
     if (ptr == NULL) {
         DEBUG("ipv6_ext_frag: unable to create fragmentation header\n");
         gnrc_pktbuf_release(to_send);
-        _snd_buf_free(snd_buf);
+        _snd_buf_free(snd_buf, ENOSPC);
         return;
     }
     remaining -= sizeof(ipv6_ext_frag_t);
@@ -237,7 +239,7 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
             if (ptr == NULL) {
                 DEBUG("ipv6_ext_frag: packet buffer full, canceling fragmentation\n");
                 gnrc_pktbuf_release(to_send);
-                _snd_buf_free(snd_buf);
+                _snd_buf_free(snd_buf, ENOSPC);
                 return;
             }
             assert(snd_buf->pkt->next == ptr);  /* we just created it with mark */
@@ -255,7 +257,12 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
     /* tell gnrc_ipv6 to send the above prepared fragment */
     msg.type = GNRC_IPV6_EXT_FRAG_SEND;
     msg.content.ptr = to_send;
-    msg_try_send(&msg, gnrc_ipv6_pid);
+    if (msg_try_send(&msg, gnrc_ipv6_pid) <= 0) {
+        DEBUG("ipv6_ext_frag: Unable to send fragment, canceling fragmentation\n");
+        gnrc_pktbuf_release(to_send);
+        _snd_buf_free(snd_buf, ENOMEM);
+        return;
+    }
     if (last_fragment) {
         /* last fragment => we don't need the send buffer anymore.
          * But as we just sent it to gnrc_ipv6 we still need the packet
@@ -267,7 +274,10 @@ void gnrc_ipv6_ext_frag_send(gnrc_ipv6_ext_frag_send_t *snd_buf)
          * later */
         msg.type = GNRC_IPV6_EXT_FRAG_CONTINUE;
         msg.content.ptr = snd_buf;
-        msg_try_send(&msg, gnrc_ipv6_pid);
+        if (msg_try_send(&msg, gnrc_ipv6_pid) <= 0) {
+            DEBUG("ipv6_ext_frag: Unable to continue fragmentation, canceling\n");
+            _snd_buf_free(snd_buf, ENOMEM);
+        }
     }
 }
 
@@ -291,13 +301,13 @@ static void _snd_buf_del(gnrc_ipv6_ext_frag_send_t *snd_buf)
     snd_buf->pkt = NULL;
 }
 
-static void _snd_buf_free(gnrc_ipv6_ext_frag_send_t *snd_buf)
+static void _snd_buf_free(gnrc_ipv6_ext_frag_send_t *snd_buf, int error)
 {
     if (snd_buf->per_frag) {
         gnrc_pktbuf_release(snd_buf->per_frag);
     }
     if (snd_buf->pkt) {
-        gnrc_pktbuf_release(snd_buf->pkt);
+        gnrc_pktbuf_release_error(snd_buf->pkt, error);
     }
     _snd_buf_del(snd_buf);
 }
