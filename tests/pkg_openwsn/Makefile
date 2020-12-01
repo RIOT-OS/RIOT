@@ -42,7 +42,7 @@ USEMODULE += sock_async
 ## Enable Constrained Join Protocol (CoJP)
 USEMODULE += openwsn_cjoin
 ## Enable 6lowpan fragmentation
-USEMODULE += openwsn_6lo_frag
+USEMODULE += openwsn_6lo_fragmentation
 ## Enable link layer security
 # USEMODULE += openwsn_iee802154e_security
 ## Enable MSF dynamic slot allocation
