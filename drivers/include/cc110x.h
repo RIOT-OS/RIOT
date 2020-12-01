@@ -558,11 +558,13 @@ typedef struct {
  *
  * @param   dev     Device descriptor to use
  * @param   params  Parameter of the device to setup
+ * @param   index   Index of @p params in a global parameter struct array.
+ *                  If initialized manually, pass a unique identifier instead.
  *
  * @retval  0       Device successfully set up
  * @retval  -EINVAL @p dev or @p params is `NULL`, or @p params is invalid
  */
-int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params);
+int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params, uint8_t index);
 
 /**
  * @brief Apply the given configuration and the given channel map and performs

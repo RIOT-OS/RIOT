@@ -73,7 +73,7 @@ void auto_init_cc110x(void)
     for (unsigned i = 0; i < CC110X_NUM; i++) {
         LOG_DEBUG("[auto_init_netif] initializing cc110x #%u\n", i);
 
-        cc110x_setup(&_cc110x_devs[i], &cc110x_params[i]);
+        cc110x_setup(&_cc110x_devs[i], &cc110x_params[i], i);
         gnrc_netif_cc1xxx_create(&_netif[i], stacks[i], CC110X_MAC_STACKSIZE, CC110X_MAC_PRIO,
                                  "cc110x", (netdev_t *)&_cc110x_devs[i]);
     }
