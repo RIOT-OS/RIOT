@@ -45,7 +45,7 @@ extern "C" {
  * @brief   Static length of the DUID
  */
 #define DHCPV6_CLIENT_DUID_LEN      (sizeof(dhcpv6_duid_l2_t) + 8U)
-#define DHCPV6_CLIENT_BUFLEN        (256)   /**< length for send and receive buffer */
+#define DHCPV6_CLIENT_BUFLEN        (256)   /**< default length for send and receive buffer */
 
 /**
  * @defgroup net_dhcpv6_conf DHCPv6 client compile configurations
@@ -58,6 +58,15 @@ extern "C" {
 #ifndef CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX
 #define CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX (1U)
 #endif
+
+/**
+ * @brief   MUD URL (must use the https:// scheme)
+ * For more info, see the [definitions](@ref net_dhcpv6_mud_url_option) below
+ */
+#ifndef CONFIG_DHCPV6_CLIENT_MUD_URL
+#define CONFIG_DHCPV6_CLIENT_MUD_URL "https://example.org"
+#endif
+
 /** @} */
 
 /**
@@ -165,6 +174,31 @@ void dhcpv6_client_conf_prefix(unsigned netif, const ipv6_addr_t *pfx,
 uint32_t dhcpv6_client_prefix_valid_until(unsigned netif,
                                           const ipv6_addr_t *pfx,
                                           unsigned pfx_len);
+/** @} */
+
+/**
+ * @name DHCPv6 Manufacturer Usage Description (MUD) URL option definitions
+ * @see [RFC 8520, section 10](https://tools.ietf.org/html/rfc8520#section-10)
+ * @anchor  net_dhcpv6_mud_url_option
+ * @{
+ */
+
+/**
+ * @brief   Length for the send buffer if a MUD URL is included in the DHCP client's packets
+ *
+ * @note    Only (re)defined by the `gnrc_dhcpv6_client_mud_url` pseudo-module.
+ */
+#if defined(MODULE_GNRC_DHCPV6_CLIENT_MUD_URL) || defined(DOXYGEN)
+#define DHCPV6_CLIENT_SEND_BUFLEN        (DHCPV6_CLIENT_BUFLEN + 256)
+#else
+#define DHCPV6_CLIENT_SEND_BUFLEN        (DHCPV6_CLIENT_BUFLEN)
+#endif
+
+/**
+ * @brief   Maximal length of a MUD URL
+ */
+#define MAX_MUD_URL_LENGTH (0xFF - sizeof(dhcpv6_opt_mud_url_t))
+
 /** @} */
 
 #ifdef __cplusplus
