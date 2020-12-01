@@ -554,7 +554,7 @@ static gnrc_pktsnip_t *_build_udp_packet(const ipv6_addr_t *dst,
         return NULL;
     }
     netif_hdr = hdr->data;
-    netif_hdr->if_pid = eth_netif->pid;
+    gnrc_netif_hdr_set_netif(netif_hdr, eth_netif);
     netif_hdr->flags |= GNRC_NETIF_HDR_FLAGS_MULTICAST;
     hdr->next = payload;
     return hdr;
