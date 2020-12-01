@@ -22,7 +22,7 @@ After initialization, every 2 seconds, the application:
 If your device is at a different I2C address than the default (0x77) you
 can build the test as follows:
 
-    export CFLAGS=-DBME280_PARAM_I2C_ADDR=0x76
+    export CFLAGS=-DBMX280_PARAM_I2C_ADDR=0x76
     BOARD=sodaq-autonomo make -C tests/driver_bmx280
 
 By default, the test application is built to use the bme280 module, to build it for
