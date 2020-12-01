@@ -16,6 +16,8 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#ifndef SETTINGS_H
+#define SETTINGS_H
 
 extern void init_settings(void);
 extern const char *file_setting(void);
@@ -28,3 +30,5 @@ extern void new_baud_setting(const char *new_baud);
 extern void new_crystal_setting(const char *new_xtal);
 
 extern char *baud_list[];
+
+#endif /* SETTINGS_H */

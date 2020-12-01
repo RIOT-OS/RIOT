@@ -16,5 +16,10 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#ifndef BOOT_23XX_H
+#define BOOT_23XX_H
+
 /* automatically generated from boot_23xx.armasm */
 extern const unsigned int boot_23xx[];
+
+#endif /* BOOT_23XX_H */

@@ -16,5 +16,10 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#ifndef UUENCODE_H
+#define UUENCODE_H
+
 extern void uuencode(char *str, const unsigned char *data, int num);
 extern int uudecode(const char *str, unsigned char *data, int max);
+
+#endif /* UUENCODE_H */

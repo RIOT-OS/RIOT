@@ -16,6 +16,11 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#ifndef GUI_H
+#define GUI_H
+
 extern void create_window(int *argc, char ***argv);
 extern void run_gui(void);
 extern void done_program(int still_in_bootloader);
+
+#endif /* GUI_H */

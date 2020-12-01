@@ -16,6 +16,9 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#ifndef CHIPINFO_H
+#define CHIPINFO_H
+
 extern char *lpc_return_strings[];
 
 /**
@@ -41,3 +44,5 @@ struct chip_info_struct {
 };
 
 extern struct chip_info_struct chip_info[];
+
+#endif /* CHIPINFO_H */
