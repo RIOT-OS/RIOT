@@ -398,7 +398,7 @@ INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
 # Include emulator code if available and if emulate target is used
-ifneq (,$(filter emulate,$(MAKECMDGOALS)))
+ifneq (,$(filter emulate%,$(MAKECMDGOALS)))
   # Use renode as default emulator
   RIOT_EMULATOR ?= renode
   -include $(RIOTMAKE)/tools/$(RIOT_EMULATOR).inc.mk
@@ -742,9 +742,21 @@ debug-server:
 	$(call check_cmd,$(DEBUGSERVER),Debug server program)
 	$(DEBUGSERVER) $(DEBUGSERVER_FLAGS)
 
-emulate:
+emulate: all $(EMULATORDEPS)
+ifeq (,$(filter debug%,$(MAKECMDGOALS)))
 	$(call check_cmd,$(EMULATOR),Emulation program)
 	$(EMULATOR) $(EMULATOR_FLAGS)
+else
+	@:
+endif
+
+emulate-only: $(EMULATORDEPS)
+ifeq (,$(filter debug%,$(MAKECMDGOALS)))
+	$(call check_cmd,$(EMULATOR),Emulation program)
+	$(EMULATOR) $(EMULATOR_FLAGS)
+else
+	@:
+endif
 
 reset:
 	$(call check_cmd,$(RESET),Reset program)

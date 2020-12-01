@@ -1,6 +1,6 @@
 FLASHER ?= $(RIOTBASE)/dist/tools/pyocd/pyocd.sh
-DEBUGGER = $(RIOTBASE)/dist/tools/pyocd/pyocd.sh
-DEBUGSERVER = $(RIOTBASE)/dist/tools/pyocd/pyocd.sh
+DEBUGGER ?= $(RIOTBASE)/dist/tools/pyocd/pyocd.sh
+DEBUGSERVER ?= $(RIOTBASE)/dist/tools/pyocd/pyocd.sh
 RESET ?= $(RIOTBASE)/dist/tools/pyocd/pyocd.sh
 
 FLASH_TARGET_TYPE ?=
