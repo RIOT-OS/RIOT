@@ -6,12 +6,12 @@
 #
 
 config BOARD
-    default "weact-f411ce" if BOARD_WEACT_F411CE
+    default "weact-f401ce" if BOARD_WEACT_F401CE
 
-config BOARD_WEACT_F411CE
+config BOARD_WEACT_F401CE
     bool
     default y
     select BOARD_COMMON_WEACT_F41XCX
-    select CPU_MODEL_STM32F411CE
+    select CPU_MODEL_STM32F401CE
 
 source "$(RIOTBOARD)/common/weact-f4x1cx/Kconfig"

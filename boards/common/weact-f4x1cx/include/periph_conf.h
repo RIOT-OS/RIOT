@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_weact-f411ce
+ * @ingroup     boards_common_weact-f4x1cx
  * @{
  *
  * @file
- * @brief       Peripheral MCU configuration for the WeAct-F411CE Board
+ * @brief       Peripheral MCU configuration for the WeAct-F4X1CX Board
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      José Ignacio Alamos <jialamos@uc.cl>
@@ -35,7 +35,6 @@
 /* The HSE provides a 25MHz clock */
 #define CLOCK_HSE               MHZ(25)
 
-#include "periph_cpu.h"
 #include "clk_conf.h"
 #include "cfg_i2c1_pb8_pb9.h"
 #include "cfg_timer_tim5.h"
@@ -170,7 +169,7 @@ static const spi_conf_t spi_config[] = {
  * @name   ADC configuration
  *
  * Note that we do not configure all ADC channels,
- * and not in the STM32F411 order.
+ * and not in the STM32F4x1 order.
  * Feel free to add more if needed.
  *
  * @{

@@ -7,9 +7,9 @@
  */
 
 /**
- * @ingroup     boards_weact-f411ce
+ * @ingroup     boards_common_weact-f4x1cx
  *
- * @brief       Support for the WeAct-F411CE Board
+ * @brief       Support for the WeAct-F4x1Cx Board
  * @{
  *
  * @file
@@ -29,20 +29,11 @@ extern "C" {
 #include "periph_cpu.h"
 
 /**
- * @name    Xtimer configuration
+ * @name    xtimer configuration
  * @{
  */
 #define XTIMER_BACKOFF              (8)
 #define XTIMER_OVERHEAD             (6)
-/** @} */
-
-/**
- * @brief Product & Vendor ID taken from example firmware
- *        that the board was shipped with.
- * @{
- */
-#define INTERNAL_PERIPHERAL_VID     (0x0483)
-#define INTERNAL_PERIPHERAL_PID     (0x5740)
 /** @} */
 
 /**
@@ -67,19 +58,19 @@ extern "C" {
 /** @} */
 
 /**
- * @name WeAct-F411CE NOR flash hardware configuration
+ * @name WeAct-F4X1CX NOR flash hardware configuration
  *
  *       The pad for the NOR Flash (U3) is not populated.
  *       You have to solder a serial flash yourself and adjust the parameters.
  * @{
  */
-#define WEACT_411CE_NOR_PAGE_SIZE          (256)
-#define WEACT_411CE_NOR_PAGES_PER_SECTOR   (16)
-#define WEACT_411CE_NOR_FLAGS              (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K)
-#define WEACT_411CE_NOR_SPI_DEV            SPI_DEV(0)
-#define WEACT_411CE_NOR_SPI_CLK            SPI_CLK_10MHZ
-#define WEACT_411CE_NOR_SPI_CS             GPIO_PIN(PORT_A, 4)
-#define WEACT_411CE_NOR_SPI_MODE           SPI_MODE_0
+#define WEACT_4X1CX_NOR_PAGE_SIZE          (256)
+#define WEACT_4X1CX_NOR_PAGES_PER_SECTOR   (16)
+#define WEACT_4X1CX_NOR_FLAGS              (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K)
+#define WEACT_4X1CX_NOR_SPI_DEV            SPI_DEV(0)
+#define WEACT_4X1CX_NOR_SPI_CLK            SPI_CLK_10MHZ
+#define WEACT_4X1CX_NOR_SPI_CS             GPIO_PIN(PORT_A, 4)
+#define WEACT_4X1CX_NOR_SPI_MODE           SPI_MODE_0
 /** @} */
 
 /**

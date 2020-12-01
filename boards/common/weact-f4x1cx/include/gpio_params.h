@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_weact-f411ce
+ * @ingroup     boards_common_weact-f4x1cx
  * @{
  *
  * @file
