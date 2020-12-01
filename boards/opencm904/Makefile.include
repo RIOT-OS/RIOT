@@ -8,13 +8,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # custom flasher to use with the bootloader
-FLASHER = $(RIOTBOARD)/opencm904/dist/robotis-loader.py
-DEBUGGER =
-DEBUGSERVER =
-
-FLASHFILE ?= $(BINFILE)
-FFLAGS = $(PROG_DEV) $(FLASHFILE)
-DEBUGGER_FLAGS =
+PROGRAMMER ?= robotis-loader
 
 # Skip the space needed by the embedded bootloader
 ROM_OFFSET ?= 0x3000
