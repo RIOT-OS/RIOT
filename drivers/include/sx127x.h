@@ -256,8 +256,10 @@ typedef void (sx127x_dio_irq_handler_t)(sx127x_t *dev);
  *
  * @param[in] dev                      Device descriptor
  * @param[in] params                   Parameters for device initialization
+ * @param[in] index                    Index of @p params in a global parameter struct array.
+ *                                     If initialized manually, pass a unique identifier instead.
  */
-void sx127x_setup(sx127x_t *dev, const sx127x_params_t *params);
+void sx127x_setup(sx127x_t *dev, const sx127x_params_t *params, uint8_t index);
 
 /**
  * @brief   Resets the SX127X
