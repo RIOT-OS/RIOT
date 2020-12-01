@@ -26,7 +26,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
+int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params, uint8_t index)
 {
     if (!dev || !params) {
         return -EINVAL;
@@ -40,6 +40,7 @@ int cc110x_setup(cc110x_t *dev, const cc110x_params_t *params)
     dev->params = *params;
     dev->netdev.driver = &cc110x_driver;
     dev->state = CC110X_STATE_OFF;
+    netdev_register(&dev->netdev, NETDEV_CC110X, index);
     return 0;
 }
 
