@@ -17,7 +17,10 @@ ifneq (,$(filter openwsn_openstack,$(USEMODULE)))
 endif
 
 ifneq (,$(filter openwsn_scheduler,$(USEMODULE)))
-  USEMODULE += openwsn_riotos
+  # allow to mock the scheduler as needed
+  ifeq (,$(filter openwsn_scheduler_mock,$(USEMODULE)))
+    USEMODULE += openwsn_riotos
+  endif
 endif
 
 ifneq (,$(filter openwsn_riotos,$(USEMODULE)))
