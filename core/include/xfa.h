@@ -52,6 +52,11 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  * This macro defines the symbols necessary to use XFA_START() and XFA_END().
  * It needs to be part of one single compilation unit.
  *
+ * The pragmas prevent these errors:
+ *
+ *     error: ISO C forbids empty initializer braces
+ *     error: ISO C forbids zero-size array ‘xfatest_const_end’
+ *
  * @param[in]   type    name of the cross-file array
  * @param[in]   name    name of the cross-file array
  */
@@ -68,6 +73,11 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  * This macro defines the symbols necessary to use XFA_START() and XFA_END().
  * It needs to be part of one single compilation unit.
+ *
+ * The pragmas prevent these errors:
+ *
+ *     error: ISO C forbids empty initializer braces
+ *     error: ISO C forbids zero-size array ‘xfatest_end’
  *
  * @param[in]   type    name of the cross-file array
  * @param[in]   name    name of the cross-file array
