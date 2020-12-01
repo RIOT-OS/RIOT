@@ -18,7 +18,8 @@ cd $RIOTBASE
 ROOT=$(git rev-parse --show-toplevel)
 EXIT_CODE=0
 
-FILES=$(FILEREGEX='\.h$' changed_files)
+EXCLUDE='^(dist/tools/)'
+FILES=$(FILEREGEX='\.h$' EXCLUDE=${EXCLUDE} changed_files)
 
 # check files
 for FILE in ${FILES}; do
