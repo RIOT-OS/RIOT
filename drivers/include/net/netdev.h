@@ -274,6 +274,10 @@ typedef void (*netdev_event_cb_t)(netdev_t *dev, netdev_event_t event);
 
 /**
  * @brief   Driver types for netdev.
+ *
+ * @warning New entries must be added at the bottom of the list
+ *          because the values need to remain constant to
+ *          generate stable L2 addresses.
  * @{
  */
 typedef enum {
@@ -287,6 +291,7 @@ typedef enum {
     NETDEV_MRF24J40,
     NETDEV_NRF802154,
     NETDEV_STM32_ETH,
+    NETDEV_CC110X,
     /* add more if needed */
 } netdev_type_t;
 /** @} */
