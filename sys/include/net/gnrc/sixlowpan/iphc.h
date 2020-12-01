@@ -52,6 +52,12 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *pkt, void *ctx, unsigned page);
  * @param[in] pkt   A 6LoWPAN frame with an uncompressed IPv6 header to send.
  *                  Will be translated to an 6LoWPAN IPHC frame.
  * @param[in] ctx   Context for the packet. May be NULL.
+ *                  If not NULL it is expected to be of type @ref
+ *                  gnrc_sixlowpan_frag_fb_t to provide initial information for
+ *                  possible fragmentation after compression (see
+ *                  net_gnrc_sixlowpan_frag_hint). This function might change
+ *                  the content of that. Depending on the compile configuration
+ *                  it might be ignored completely.
  * @param[in] page  Current 6Lo dispatch parsing page.
  *
  */

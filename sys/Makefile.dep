@@ -298,6 +298,13 @@ ifneq (,$(filter gnrc_sixlowpan_frag_fb,$(USEMODULE)))
   USEMODULE += core_msg
 endif
 
+ifneq (,$(filter gnrc_sixlowpan_frag_minfwd,$(USEMODULE)))
+  USEMODULE += gnrc_netif_pktq
+  USEMODULE += gnrc_sixlowpan_frag
+  USEMODULE += gnrc_sixlowpan_frag_hint
+  USEMODULE += gnrc_sixlowpan_frag_vrb
+endif
+
 ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
   USEMODULE += xtimer
 endif

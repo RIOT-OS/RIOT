@@ -26,6 +26,7 @@
 #include "net/gnrc/sixlowpan.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/sixlowpan/frag/rb.h"
+#include "net/gnrc/sixlowpan/frag/minfwd.h"
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_VRB
 #include "net/gnrc/sixlowpan/frag/vrb.h"
 #endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_VRB */
@@ -823,6 +824,7 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
                        payload_offset - sizeof(ipv6_hdr_t));
     }
     if ((rbuf == NULL) &&
+        /* (rbuf == NULL) => forwarding is not affected by this */
         (gnrc_pktbuf_realloc_data(ipv6, uncomp_hdr_len + payload_len) != 0)) {
         DEBUG("6lo iphc: no space left to copy payload\n");
         _recv_error_release(sixlo, ipv6, rbuf);
@@ -851,6 +853,12 @@ void gnrc_sixlowpan_iphc_recv(gnrc_pktsnip_t *sixlo, void *rbuf_ptr,
                 }
             }
             if ((ipv6 == NULL) || (res < 0)) {
+                /* TODO: There is a potential to fall-back to classic reassembly
+                 * when ipv6 != NULL. However, since `ipv6` was reversed in
+                 * `_encode_frag_for_forwarding`, that step needs to be reversed
+                 * or a version of the old ipv6 needs to be held in the buffer.
+                 * For now, just drop the packet all together in an error case
+                 */
                 gnrc_sixlowpan_frag_vrb_rm(vrbe);
             }
             gnrc_pktbuf_release(sixlo);
@@ -915,6 +923,11 @@ static int _forward_frag(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *frag_hdr,
     /* remove rewritten netif header (forwarding implementation must do this
      * anyway) */
     pkt = gnrc_pktbuf_remove_snip(pkt, pkt);
+    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD) &&
+        sixlowpan_frag_is(frag_hdr->data)) {
+        return gnrc_sixlowpan_frag_minfwd_forward(pkt, frag_hdr->data, vrbe,
+                                                  page);
+    }
     /* the following is just debug output for testing without any forwarding
      * scheme */
     DEBUG("6lo iphc: Do not know how to forward fragment from (%s, %u) ",
@@ -1609,9 +1622,20 @@ void gnrc_sixlowpan_iphc_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
     gnrc_pktsnip_t *tmp;
     /* datagram size before compression */
     size_t orig_datagram_size = gnrc_pkt_len(pkt->next);
+    ipv6_hdr_t *ipv6_hdr = pkt->next->data;
+    ipv6_addr_t dst;
 
-    (void)ctx;
+    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD)) {
+        dst = ipv6_hdr->dst;    /* copying original destination address */
+    }
+
     if ((tmp = _iphc_encode(pkt, pkt->data, netif))) {
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD) && (ctx != NULL) &&
+            (gnrc_sixlowpan_frag_minfwd_frag_iphc(tmp, orig_datagram_size, &dst,
+                                                  ctx) == 0)) {
+            DEBUG("6lo iphc minfwd: putting slack in first fragment\n");
+            return;
+        }
         gnrc_sixlowpan_multiplex_by_size(tmp, orig_datagram_size, netif, page);
     }
     else {

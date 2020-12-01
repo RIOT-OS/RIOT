@@ -288,12 +288,40 @@ static void _send(gnrc_pktsnip_t *pkt)
         return;
     }
 
-#ifdef MODULE_GNRC_SIXLOWPAN_IPHC
-    if (netif->flags & GNRC_NETIF_FLAGS_6LO_HC) {
-        gnrc_sixlowpan_iphc_send(pkt, NULL, 0);
+    if (IS_USED(MODULE_GNRC_SIXLOWPAN_IPHC) &&
+        netif->flags & GNRC_NETIF_FLAGS_6LO_HC) {
+        gnrc_sixlowpan_frag_fb_t *fbuf;
+
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_HINT) &&
+            IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_MINFWD)) {
+            /* prepare for sending with IPHC slack in first fragment */
+            fbuf = gnrc_sixlowpan_frag_fb_get();
+            if (fbuf != NULL) {
+                fbuf->pkt = pkt;
+                fbuf->datagram_size = datagram_size;
+                fbuf->tag = gnrc_sixlowpan_frag_fb_next_tag();
+                fbuf->offset = 0;
+                /* fbuf->hint only exists with the `gnrc_sixlowpan_frag_hint`
+                 * module, so despite already specifying that this `if` block
+                 * only works with `IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_HINT)`
+                 * above, we need to add a pre-processor `#if` here */
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_HINT)
+                fbuf->hint.fragsz = 0;
+#endif
+            }
+            else {
+                DEBUG("6lo: Not enough resources to fragment packet. "
+                      "Dropping packet\n");
+                gnrc_pktbuf_release(pkt);
+                return;
+            }
+        }
+        else {
+            fbuf = NULL;
+        }
+        gnrc_sixlowpan_iphc_send(pkt, fbuf, 0);
         return;
     }
-#endif
     if (!_add_uncompr_disp(pkt)) {
         /* adding uncompressed dispatch failed */
         DEBUG("6lo: no space left in packet buffer\n");
