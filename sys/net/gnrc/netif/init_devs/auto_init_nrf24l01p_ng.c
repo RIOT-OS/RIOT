@@ -72,7 +72,7 @@ void auto_init_nrf24l01p_ng(void)
     for (unsigned i = 0; i < NRF24L01P_NG_NUM; i++) {
         LOG_DEBUG("[auto_init_netif] initializing nrf24l01p #%u\n", i);
 
-        nrf24l01p_ng_setup(&_nrf24l01p_ng_devs[i], &nrf24l01p_ng_params[i]);
+        nrf24l01p_ng_setup(&_nrf24l01p_ng_devs[i], &nrf24l01p_ng_params[i], i);
         gnrc_netif_nrf24l01p_ng_create(&_netif[i], stacks[i],
                                        NRF24L01P_NG_MAC_STACKSIZE,
                                        NRF24L01P_NG_MAC_PRIO,

@@ -184,11 +184,14 @@ struct nrf24l01p_ng {
  *
  * @param[in] dev           NRF24L01+ device handle
  * @param[in] params        Parameters of the device to setup
+ * @param[in] index         Index of @p params in a global parameter struct array.
+ *                          If initialized manually, pass a unique identifier instead.
  *
  * @retval 0                Device successfully set up
  */
 int nrf24l01p_ng_setup(nrf24l01p_ng_t *dev,
-                       const nrf24l01p_ng_params_t *params);
+                       const nrf24l01p_ng_params_t *params,
+                       uint8_t index);
 
 /**
  * @brief   Enable or disable data pipe @p pipe

@@ -36,7 +36,8 @@
 #define NRF24L01P_NG_REG_RX_PW_PX(x)    (NRF24L01P_NG_REG_RX_PW_P0 + (x))
 
 int nrf24l01p_ng_setup(nrf24l01p_ng_t *dev,
-                       const nrf24l01p_ng_params_t *params)
+                       const nrf24l01p_ng_params_t *params,
+                       uint8_t index)
 {
     assert(dev);
     assert(params);
@@ -46,6 +47,7 @@ int nrf24l01p_ng_setup(nrf24l01p_ng_t *dev,
     dev->idle_state = NRF24L01P_NG_STATE_RX_MODE;
     dev->params = *params;
     dev->netdev.driver = &nrf24l01p_ng_driver;
+    netdev_register(&dev->netdev, NETDEV_NRF24L01P_NG, index);
     return 0;
 }
 
