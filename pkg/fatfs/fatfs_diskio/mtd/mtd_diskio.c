@@ -19,11 +19,9 @@
  * @}
  */
 
-#include "fatfs/diskio.h"       /**< FatFs lower layer API */
 #include "fatfs_diskio_mtd.h"
-#include "fatfs/ffconf.h"
+#include "ffconf.h"
 #include "mtd.h"
-#include "fatfs/integer.h"
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -91,7 +89,7 @@ DSTATUS disk_initialize(BYTE pdrv)
  */
 DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count)
 {
-    DEBUG("disk_read: %d, %lu, %d\n", pdrv, sector, count);
+    DEBUG("disk_read: %d, %lu, %d\n", pdrv, (long unsigned)sector, count);
     if ((pdrv >= FF_VOLUMES) || (fatfs_mtd_devs[pdrv]->driver == NULL)) {
         return RES_PARERR;
     }
@@ -122,7 +120,7 @@ DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count)
  */
 DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
 {
-    DEBUG("disk_write: %d, %lu, %d\n", pdrv, sector, count);
+    DEBUG("disk_write: %d, %lu, %d\n", pdrv, (long unsigned)sector, count);
     if ((pdrv >= FF_VOLUMES) || (fatfs_mtd_devs[pdrv]->driver == NULL)) {
         return RES_PARERR;
     }

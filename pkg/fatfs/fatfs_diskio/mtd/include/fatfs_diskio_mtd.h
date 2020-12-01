@@ -22,7 +22,8 @@
 extern "C" {
 #endif
 
-#include "fatfs/diskio.h" /* FatFs lower layer API */
+#include "fatfs/source/ff.h"
+#include "fatfs/source/diskio.h" /* FatFs lower layer API */
 
 #define RTC_YEAR_OFFSET   (1900)
 #define FATFS_YEAR_OFFSET (1980)
