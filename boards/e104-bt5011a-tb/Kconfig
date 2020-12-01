@@ -5,12 +5,12 @@
 # directory for more details.
 
 config BOARD
-    default "e104-bt5010a-tb" if BOARD_E104_BT5010A_TB
+    default "e104-bt5011a-tb" if BOARD_E104_BT5011A_TB
 
-config BOARD_E104_BT5010A_TB
+config BOARD_E104_BT5011A_TB
     bool
     default y
     select BOARD_COMMON_E104_BT50XXA_TB
-    select CPU_MODEL_NRF52810XXAA
+    select CPU_MODEL_NRF52811XXAA
 
 source "$(RIOTBOARD)/common/e104-bt50xxa-tb/Kconfig"

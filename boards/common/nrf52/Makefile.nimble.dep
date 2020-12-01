@@ -1,5 +1,5 @@
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
-  ifeq (,$(filter nrfmin,$(USEMODULE)))
+  ifeq (,$(filter nrfmin nrf802154,$(USEMODULE)))
     USEMODULE += nimble_netif
   endif
 endif

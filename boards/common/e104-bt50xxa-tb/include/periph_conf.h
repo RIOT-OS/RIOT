@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     boards_e104-bt5010a-tb
+ * @ingroup     boards_common_e104-bt50xxa-tb
  * @{
  *
  * @file
- * @brief       Peripheral configuration for the E104-BT5010A Test Board
+ * @brief       Peripheral configuration for the E104-BT50xxA Test Board
  *
  * @author      Benjamin Valentin <benpicco@googlemail.com>
  *
@@ -30,10 +30,10 @@ extern "C" {
 
 /**
  * @name    Clock configuration
- *          The E104-BT5010A module does not have any external oscillators
+ *          The E104-BT50xxA module does not have any external oscillators
  * @{
  */
-#define CLOCK_HFCLK         (0U)            /* internal RC oscillator */
+#define CLOCK_HFCLK         (1)             /* external crystal */
 #define CLOCK_LFCLK         (0)             /* internal RC oscillator */
 /** @} */
 

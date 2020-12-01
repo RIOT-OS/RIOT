@@ -6,6 +6,7 @@ PSEUDOMODULES += at_urc_isr_highest
 PSEUDOMODULES += at24c%
 PSEUDOMODULES += atomic_utils
 PSEUDOMODULES += base64url
+PSEUDOMODULES += board_software_reset
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
