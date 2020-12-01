@@ -16,11 +16,10 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-/**
- * @brief structure to hold boot partition
- */
+#ifndef UUENCODE_H
+#define UUENCODE_H
 
-typedef struct {
-    int size;           /**< size of partition */
-    const int *prog;    /**< partition data */
-} boot_t;
+extern void uuencode(char *str, const unsigned char *data, int num);
+extern int uudecode(const char *str, unsigned char *data, int max);
+
+#endif /* UUENCODE_H */

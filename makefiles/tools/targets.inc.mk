@@ -44,3 +44,8 @@ $(RIOTTOOLS)/flatc/flatc: $(RIOTTOOLS)/flatc/Makefile
 	@echo "[INFO] flatc binary not found - building it from source now"
 	$(MAKE) -C $(RIOTTOOLS)/flatc
 	@echo "[INFO] flatc binary successfully built!"
+
+$(RIOTTOOLS)/lpc2k_pgm/bin/lpc2k_pgm: $(RIOTTOOLS)/lpc2k_pgm/Makefile
+	@echo "[INFO] lpc2k_pgm binary not found - building it from source now"
+	@$(MAKE) -C $(RIOTTOOLS)/lpc2k_pgm
+	@echo "[INFO] lpc2k_pgm binary successfully built!"

@@ -1,26 +1,13 @@
-BOARDS_COMMON_MSBA2_DIR := $(patsubst %/,%,$(dir $(lastword $(MAKEFILE_LIST))))
-
-# Compile `lpc2k_pgm` when required
-# It is still compiling in `boards` as it was the case before introducing the
-# rule to autobuild
-MSBA2_TOOLS = $(BOARDS_COMMON_MSBA2_DIR)/tools
-LPC2K_PGM = $(MSBA2_TOOLS)/bin/lpc2k_pgm
-$(LPC2K_PGM): FORCE
-	env -i PATH=$(PATH) $(MAKE) -C $(MSBA2_TOOLS)
-FLASHDEPS += $(if $(findstring $(LPC2K_PGM),$(FLASHER)),$(LPC2K_PGM))
-
-FLASHER ?= $(LPC2K_PGM)
-
 # configure serial interface
 PORT_LINUX ?= /dev/ttyUSB0
 # This does not make a lot of sense, but it has the same value as the previous code
 PORT_DARWIN ?= /dev/tty.usbserial-ARM
+
+# Use lpc2k_pgm programmer
+PROGRAMMER ?= lpc2k_pgm
 
 # when using miniterm set RTS and DTR lines to 0, otherwise the board is reset
 MINITERMFLAGS += --rts 0 --dtr 0
 
 PYTERMFLAGS += -tg
 include $(RIOTMAKE)/tools/serial.inc.mk
-
-FLASHFILE ?= $(HEXFILE)
-FFLAGS = $(PROG_DEV) $(FLASHFILE)

@@ -16,5 +16,16 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-/* automatically generated from boot_2xxx.armasm */
-extern const unsigned int boot_2xxx[];
+#ifndef BOOT_H
+#define BOOT_H
+
+/**
+ * @brief structure to hold boot partition
+ */
+
+typedef struct {
+    int size;           /**< size of partition */
+    const int *prog;    /**< partition data */
+} boot_t;
+
+#endif /* BOOT_H */
