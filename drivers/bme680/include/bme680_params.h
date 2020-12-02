@@ -41,11 +41,11 @@ extern "C" {
 #ifndef BME680_PARAMS
 #define BME680_PARAMS                                                   \
 {                                                                       \
-                                .ambient_temp = 20,                     \
+                                .ambient_temp = 25,                     \
                                 .temp_oversampling = 2,                 \
                                 .pres_oversampling = 16,                \
                                 .hum_oversampling = 1,                  \
-                                .gas_heating_time = 100,                \
+                                .gas_heating_time = 200,                \
                                 .gas_heating_temp = 300,                \
                                 .i2c_dev    = BME680_PARAM_I2C_DEV,     \
                                 .i2c_addr   = BME680_PARAM_I2C_ADDR,    \

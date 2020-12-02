@@ -35,7 +35,7 @@ extern "C" {
  * @brief   Device initialization parameters
  */
 typedef struct {
-    uint8_t ambient_temp;
+    uint16_t ambient_temp;
     uint16_t temp_oversampling;
     uint16_t pres_oversampling;
     uint16_t hum_oversampling;
@@ -48,9 +48,9 @@ typedef struct {
 } bme680_params_t;
 
 typedef struct {
-    uint16_t temperature;
-    uint16_t humidity;
-    uint16_t pressure;
+    uint32_t temperature;
+    uint32_t humidity;
+    uint32_t pressure;
     uint32_t t_fine;        //TODO should be stored somewhere else
 } bme680_data_t;
 
@@ -88,6 +88,8 @@ enum {
 int bme680_init(bme680_t *dev, const bme680_params_t *params);
 
 uint16_t bme680_read(const bme680_t *dev, bme680_data_t *data);
+
+void disconnect(const bme680_t* dev);
 
 #ifdef __cplusplus
 }

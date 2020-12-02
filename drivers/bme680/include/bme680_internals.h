@@ -39,17 +39,21 @@ extern "C" {
  * @brief   registers
  * **/
 
+#define BME680_CHIP_ID              (0x61)
+
 #define BME680_REGISTER_CTRL_HUM    (0x72)
 #define BME680_REGISTER_CTRL_MEAS   (0x74)
 #define BME680_REGISTER_ID          (0x50)
 #define BME680_REGISTER_CTRL_GAS    (0x70)
-#define BME680_REGISTER_GAS_WAIT_0  (0x6D)
-#define BME680_REGISTER_RES_HEAT_0  (0x63)
+#define BME680_REGISTER_GAS_WAIT_0  (0x5A)
+#define BME680_REGISTER_RES_HEAT_0  (0x64)
 
 #define BME680_REGISTER_CTRL_GAS_L  (0x71)
 
+#define BME680_REGISTER_CONFIG      (0x75)
+
 #define BME680_REGISTER_MEAS_STATUS_0   (0x1D)
-#define BME60_REGISTER_GAS_R_LSB    (0x2B)
+#define BME680_REGISTER_GAS_R_LSB    (0x2B)
 
 #define BME680_PRESS_MSB            (0x1F) // Contains the MSB part [19:12] of the raw pressure measurement output data
 #define BME680_PRESS_LSB            (0x20) // Contains the LSB part [11:4] of the raw pressure measurement output data
