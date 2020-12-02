@@ -7,7 +7,9 @@ tests/driver_ad7746 tests/driver_adcxx1c tests/driver_ads101x tests/driver_adt10
 tests/driver_adt7310 tests/driver_adxl345 tests/driver_aip31068 tests/driver_apa102
 tests/driver_apds99xx tests/driver_apds99xx_full tests/driver_at tests/driver_at24cxxx
 tests/driver_at24mac tests/driver_at25xxx tests/driver_at30tse75x tests/driver_ata8520e
-tests/driver_b* tests/driver_ccs811 tests/driver_ccs811_full"}
+tests/driver_b* tests/driver_ccs811 tests/driver_ccs811_full
+tests/driver_g* tests/driver_h* tests/driver_i* tests/driver_j*
+tests/driver_my9221"}
 : ${TEST_KCONFIG_native:="examples/hello-world tests/periph_*"}
 
 export RIOT_CI_BUILD=1

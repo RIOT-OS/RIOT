@@ -5,6 +5,15 @@
 # directory for more details.
 #
 
+config MODULE_GP2Y10XX
+    bool "GP2Y10xx Optical Dust Sensor device driver"
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_ADC
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_ADC
+    select MODULE_XTIMER
+
 menuconfig KCONFIG_USEMODULE_GP2Y10XX
     bool "Configure GP2Y10xx driver"
     depends on USEMODULE_GP2Y10XX

@@ -4,6 +4,14 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
+config MODULE_HDC1000
+    bool "HDC1000 Humidity and Temperature Sensor"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+    select MODULE_XTIMER
+
 menuconfig KCONFIG_USEMODULE_HDC1000
     bool "Configure HDC1000 driver"
     depends on USEMODULE_HDC1000
