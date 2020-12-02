@@ -567,6 +567,19 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                                const gnrc_netapi_opt_t *opt);
 
 /**
+ * @brief Gets an interface by the netdev type (and index)
+ *
+ * @pre The netdev has been registered with @ref netdev_register
+ *
+ * @param[in]  type         driver type of the netdev, can be @ref NETDEV_ANY
+ * @param[in]  index        index of the netdev, can be @ref NETDEV_INDEX_ANY
+ *
+ * @return  The network interface that has a netdev of matching type and index
+ *          NULL if no matching interface could be found
+ */
+gnrc_netif_t *gnrc_netif_get_by_type(netdev_type_t type, uint8_t index);
+
+/**
  * @brief   Converts a hardware address to a human readable string.
  *
  * @note    Compatibility wrapper for @see l2util_addr_to_str

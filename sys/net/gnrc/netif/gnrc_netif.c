@@ -117,6 +117,31 @@ gnrc_netif_t *gnrc_netif_iter(const gnrc_netif_t *prev)
     return (gnrc_netif_t*) netif_iter((netif_t*) prev);
 }
 
+gnrc_netif_t *gnrc_netif_get_by_type(netdev_type_t type, uint8_t index)
+{
+    gnrc_netif_t *netif = NULL;
+    while ((netif = gnrc_netif_iter(netif))) {
+
+#ifdef MODULE_NETDEV_REGISTER
+        if (netif->dev->type != type && type != NETDEV_ANY) {
+            continue;
+        }
+
+        if (netif->dev->index != index && index != NETDEV_INDEX_ANY) {
+            continue;
+        }
+#else
+        (void)type;
+        (void)index;
+        assert(index == 0);
+#endif
+
+        return netif;
+    }
+
+    return NULL;
+}
+
 int gnrc_netif_get_from_netdev(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
 {
     int res = -ENOTSUP;

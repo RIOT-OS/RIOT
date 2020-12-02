@@ -20,13 +20,16 @@
 #include <stdio.h>
 
 #include "at86rf215.h"
+#include "at86rf215_internal.h"
 #include "thread.h"
 #include "shell.h"
 #include "shell_commands.h"
 #include "sys/bus.h"
 
 #include "net/gnrc/pktdump.h"
+#include "net/gnrc/netif.h"
 #include "net/gnrc.h"
+#include "od.h"
 
 static char batmon_stack[THREAD_STACKSIZE_MAIN];
 
@@ -74,8 +77,126 @@ static int cmd_enable_batmon(int argc, char **argv)
     return res;
 }
 
+static int cmd_set_trim(int argc, char **argv)
+{
+    if (argc < 2) {
+        printf("usage: %s <trim>\n", argv[0]);
+        return 1;
+    }
+
+    uint8_t trim = atoi(argv[1]);
+
+    if (trim > 0xF) {
+        puts("Trim value out of range");
+        return 1;
+    }
+
+    gnrc_netif_t *netif = gnrc_netif_get_by_type(NETDEV_AT86RF215, 0);
+
+    if (netif == NULL) {
+        puts("No at86rf215 radio found");
+        return 1;
+    }
+
+    at86rf215_t* dev = (at86rf215_t*)netif->dev;
+
+    printf("setting trim to %u fF\n", 300U * trim);
+    at86rf215_set_trim(dev, trim);
+
+    return 0;
+}
+
+static int cmd_set_clock_out(int argc, char **argv)
+{
+    const char *keys[] = {
+        [AT86RF215_CLKO_OFF]    = "off",
+        [AT86RF215_CLKO_26_MHz] = "26",
+        [AT86RF215_CLKO_32_MHz] = "32",
+        [AT86RF215_CLKO_16_MHz] = "16",
+        [AT86RF215_CLKO_8_MHz]  = "8",
+        [AT86RF215_CLKO_4_MHz]  = "4",
+        [AT86RF215_CLKO_2_MHz]  = "2",
+        [AT86RF215_CLKO_1_MHz]  = "1",
+    };
+
+    at86rf215_clko_freq_t freq = AT86RF215_CLKO_26_MHz;
+
+    if (argc > 1) {
+        unsigned tmp = 0xFF;
+        for (unsigned i = 0; i < ARRAY_SIZE(keys); ++i) {
+            if (strcmp(argv[1], keys[i]) == 0) {
+                tmp = i;
+                break;
+            }
+        }
+
+        if (tmp == 0xFF) {
+            printf("usage: %s [freq in MHz | off]\n", argv[0]);
+            printf("valid frequencies: off");
+            for (unsigned i = 1; i < ARRAY_SIZE(keys); ++i) {
+                printf(", %s MHz", keys[i]);
+            }
+            puts("");
+            return 1;
+        }
+
+        freq = tmp;
+    }
+
+
+    gnrc_netif_t *netif = gnrc_netif_get_by_type(NETDEV_AT86RF215, 0);
+
+    if (netif == NULL) {
+        puts("No at86rf215 radio found");
+        return 1;
+    }
+
+    at86rf215_t *dev = (at86rf215_t *)netif->dev;
+
+    printf("Clock output set to %s %s\n", keys[freq], freq ? "MHz" : "");
+    at86rf215_set_clock_output(dev, AT86RF215_CLKO_4mA, freq);
+
+    return 0;
+}
+
+static int cmd_get_random(int argc, char **argv)
+{
+    uint8_t values;
+    uint8_t buffer[256];
+
+    if (argc > 1) {
+        values = atoi(argv[1]);
+    }
+    else {
+        values = 16;
+    }
+
+    if (values == 0) {
+        printf("usage: %s [num]\n", argv[0]);
+        return 1;
+    }
+
+    gnrc_netif_t *netif = gnrc_netif_get_by_type(NETDEV_AT86RF215, 0);
+
+    if (netif == NULL) {
+        puts("No at86rf215 radio found");
+        return 1;
+    }
+
+    at86rf215_t *dev = (at86rf215_t *)netif->dev;
+
+    at86rf215_get_random(dev, buffer, values);
+
+    od_hex_dump(buffer, values, 0);
+
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "batmon", "Enable the battery monitor", cmd_enable_batmon },
+    { "set_trim", "at86rf215: Set the trim value of the crystal oscillator", cmd_set_trim },
+    { "set_clko", "at86rf215: Configure the Clock Output pin", cmd_set_clock_out },
+    { "get_random", "at86rf215: Get random values from the radio", cmd_get_random },
     { NULL, NULL, NULL }
 };
 

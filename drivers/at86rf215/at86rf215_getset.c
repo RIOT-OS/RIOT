@@ -89,6 +89,18 @@ uint8_t at86rf215_get_chan(const at86rf215_t *dev)
     return at86rf215_reg_read16(dev, dev->RF->RG_CNL);
 }
 
+void at86rf215_set_trim(at86rf215_t *dev, uint8_t trim)
+{
+    assert(trim <= 0xF);
+    at86rf215_reg_write(dev, RG_RF_XOC, trim | XOC_FS_MASK);
+}
+
+void at86rf215_set_clock_output(at86rf215_t *dev,
+                                at86rf215_clko_cur_t cur, at86rf215_clko_freq_t freq)
+{
+    at86rf215_reg_write(dev, RG_RF_CLKO, cur | freq);
+}
+
 void at86rf215_set_chan(at86rf215_t *dev, uint16_t channel)
 {
     at86rf215_await_state_end(dev, RF_STATE_TX);
