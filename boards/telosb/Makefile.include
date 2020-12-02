@@ -3,7 +3,6 @@ PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial-MXV*)))
 # setup serial terminal
 BAUD ?= 9600
-include $(RIOTMAKE)/tools/serial.inc.mk
 
 # flash tool configuration
 PROGRAMMER ?= goodfet

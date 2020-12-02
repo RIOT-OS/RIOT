@@ -1,6 +1,3 @@
-# set default port depending on operating system
-PORT_LINUX ?= /dev/ttyACM0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 # Use DEBUG_ADAPTER_ID to specify the programmer serial number to use:
 # DEBUG_ADAPTER_ID="ATML..."
 
@@ -17,9 +14,6 @@ ifneq (,$(filter debug% flash% %term test,$(MAKECMDGOALS)))
     DEBUG_ADAPTER_ID ?= $(SERIAL)
   endif
 endif
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
 
 # Default for these boards is to use a CMSIS-DAP programmer
 DEBUG_ADAPTER ?= dap

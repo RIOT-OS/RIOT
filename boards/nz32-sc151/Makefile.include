@@ -8,6 +8,3 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 # this board is flashed using DFU
 PROGRAMMER ?= dfu-util
 DFU_USB_ID = 0483:df11
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk

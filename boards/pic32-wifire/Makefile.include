@@ -1,5 +1,4 @@
 PORT_LINUX ?= /dev/ttyUSB0
-include $(RIOTMAKE)/tools/serial.inc.mk
 
 # use pic32prog by default to program this board
 PROGRAMMER ?= pic32prog

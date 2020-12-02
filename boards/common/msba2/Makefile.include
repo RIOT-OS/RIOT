@@ -10,4 +10,3 @@ PROGRAMMER ?= lpc2k_pgm
 MINITERMFLAGS += --rts 0 --dtr 0
 
 PYTERMFLAGS += -tg
-include $(RIOTMAKE)/tools/serial.inc.mk

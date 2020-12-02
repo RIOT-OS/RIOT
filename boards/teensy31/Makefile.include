@@ -10,13 +10,9 @@ ifeq ($(TEENSY_LOADER),$(FLASHER))
 endif
 
 # define the default port depending on the host OS
-PORT_LINUX ?= /dev/ttyACM0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial-*)))
 
 $(TEENSY_LOADER):
 	@echo "[INFO] teensy_loader binary not found - building it from source now"
 	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/teensy-loader-cli
 	@echo "[INFO] teensy_loader binary successfully build!"
-
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
