@@ -4,7 +4,7 @@ include ../Makefile.tests_common
 USEMODULE += ili9341
 USEMODULE += xtimer
 
-CFLAGS += -DILI9341_LE_MODE
+CFLAGS += -DCONFIG_ILI9341_LE_MODE
 
 include $(RIOTBASE)/Makefile.include
 

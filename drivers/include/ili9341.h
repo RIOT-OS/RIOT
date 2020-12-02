@@ -23,7 +23,7 @@
  * implemented here operates over SPI to communicate with the device.
  *
  * The device requires colors to be send in big endian RGB-565 format. The
- * @ref ILI9341_LE_MODE compile time option can switch this, but only use this
+ * @ref CONFIG_ILI9341_LE_MODE compile time option can switch this, but only use this
  * when strictly necessary. This option will slow down the driver as it
  * certainly can't use DMA anymore, every short has to be converted before
  * transfer.
@@ -82,8 +82,8 @@ extern "C" {
  * Compile time switch to change the driver to convert little endian
  * colors to big endian.
  */
-#ifndef ILI9341_LE_MODE
-#define ILI9341_LE_MODE     (0)
+#ifdef DOXYGEN
+#define CONFIG_ILI9341_LE_MODE
 #endif
 /** @} */
 
