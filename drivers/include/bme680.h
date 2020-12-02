@@ -47,6 +47,16 @@ typedef struct {
     /* add initialization params here */
 } bme680_params_t;
 
+/*typedef struct {
+        uint8_t par_g1, par_g3, res_heat_range = 0;
+    uint16_t par_g2 = 0;
+        uint16_t par_t1, par_t2 = 0;
+    uint8_t par_t3 = 0;
+        uint16_t par_h1, par_h2, hum_adc = 0;
+    uint8_t par_h3, par_h4, par_h5, par_h6, par_h7 = 0;
+    uint8_t par_h1_h2_lsb, par_h1_msb, par_h2_msb = 0;
+} bme680_config_t;*/
+
 typedef struct {
     uint32_t temperature;
     uint32_t humidity;
@@ -88,6 +98,8 @@ enum {
 int bme680_init(bme680_t *dev, const bme680_params_t *params);
 
 uint16_t bme680_read(const bme680_t *dev, bme680_data_t *data);
+
+uint16_t bme680_read_2(const bme680_t *dev, bme680_data_t *data);
 
 void disconnect(const bme680_t* dev);
 
