@@ -15,8 +15,6 @@
  * definition of constant arrays to be spread over multiple C compilation
  * units. These arrays are called "cross-file arrays" or short xfa.
  *
- *
- *
  * @file
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
@@ -44,7 +42,9 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  * @internal
  */
-#define _XFA_CONST(name, prio) __attribute__((used, section(".roxfa." #name "." #prio)))
+#define _XFA_CONST(name, \
+                   prio) __attribute__((used, \
+                                        section(".roxfa." #name "." #prio)))
 
 /**
  * @brief Define a read-only cross-file array
@@ -132,7 +132,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  * @param[in]   name    name of the xfa
  * @param[in]   prio    priority within the xfa
  */
-#define XFA(xfa_name, prio) _XFA(xfa_name, 5_ ##prio)
+#define XFA(xfa_name, prio) _XFA(xfa_name, 5_ ## prio)
 
 /**
  * @brief Define variable in read-only cross-file array
@@ -146,7 +146,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  * @param[in]   name    name of the xfa
  * @param[in]   prio    priority within the xfa
  */
-#define XFA_CONST(xfa_name, prio) _XFA_CONST(xfa_name, 5_ ##prio)
+#define XFA_CONST(xfa_name, prio) _XFA_CONST(xfa_name, 5_ ## prio)
 
 /**
  * @brief Add a pointer to cross-file array
@@ -159,13 +159,15 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  * @param[in]   entry       pointer variable to add to xfa
  */
 #define XFA_ADD_PTR(xfa_name, prio, name, entry) \
-    _XFA_CONST(xfa_name, 5_ ##prio) \
+    _XFA_CONST(xfa_name, 5_ ## prio) \
     const typeof(entry) xfa_name ## _ ## prio ## _ ## name = entry
 
 /**
  * @brief Calculate number of entries in cross-file array
  */
-#define XFA_LEN(type, name) (((const char*)name ## _end - (const char*)name) / sizeof(type))
+#define XFA_LEN(type, \
+                name) (((const char *)name ## _end - (const char *)name) / \
+                       sizeof(type))
 
 #ifdef __cplusplus
 extern "C" {
