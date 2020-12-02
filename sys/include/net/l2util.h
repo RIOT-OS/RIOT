@@ -153,6 +153,44 @@ int l2util_ipv6_group_to_l2_group(int dev_type,
                                   const ipv6_addr_t *ipv6_group,
                                   uint8_t *l2_group);
 
+/**
+ * @brief   Converts a hardware address to a human readable string.
+ *
+ * @details The format will be like `xx:xx:xx:xx` where `xx` are the bytes
+ *          of @p addr in hexadecimal representation.
+ *
+ * @pre `(out != NULL) && ((addr != NULL) || (addr_len == 0))`
+ * @pre @p out **MUST** have allocated at least 3 * @p addr_len bytes.
+ *
+ * @param[in] addr      A hardware address.
+ * @param[in] addr_len  Length of @p addr.
+ * @param[out] out      A string to store the output in. Must at least have
+ *                      3 * @p addr_len bytes allocated.
+ *
+ * @return  @p out.
+ */
+char *l2util_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
+
+/**
+ * @brief   Parses a string of colon-separated hexadecimals to a hardware
+ *          address.
+ *
+ * @details The input format must be like `xx:xx:xx:xx` where `xx` will be the
+ *          bytes of @p addr in hexadecimal representation.
+ *
+ * @pre `(out != NULL)`
+ * @pre @p out **MUST** have allocated at least
+ *      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes.
+ *
+ * @param[in] str       A string of colon-separated hexadecimals.
+ * @param[out] out      The resulting hardware address. Must at least have
+ *                      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes allocated.
+ *
+ * @return  Actual length of @p out on success.
+ * @return  0, on failure.
+ */
+size_t l2util_addr_from_str(const char *str, uint8_t *out);
+
 #ifdef __cplusplus
 }
 #endif

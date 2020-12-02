@@ -176,44 +176,6 @@ int netif_set_opt(netif_t *netif, netopt_t opt, uint16_t context,
  */
 int netif_register(netif_t *netif);
 
-/**
- * @brief   Converts a hardware address to a human readable string.
- *
- * @details The format will be like `xx:xx:xx:xx` where `xx` are the bytes
- *          of @p addr in hexadecimal representation.
- *
- * @pre `(out != NULL) && ((addr != NULL) || (addr_len == 0))`
- * @pre @p out **MUST** have allocated at least 3 * @p addr_len bytes.
- *
- * @param[in] addr      A hardware address.
- * @param[in] addr_len  Length of @p addr.
- * @param[out] out      A string to store the output in. Must at least have
- *                      3 * @p addr_len bytes allocated.
- *
- * @return  @p out.
- */
-char *netif_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
-
-/**
- * @brief   Parses a string of colon-separated hexadecimals to a hardware
- *          address.
- *
- * @details The input format must be like `xx:xx:xx:xx` where `xx` will be the
- *          bytes of @p addr in hexadecimal representation.
- *
- * @pre `(out != NULL)`
- * @pre @p out **MUST** have allocated at least
- *      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes.
- *
- * @param[in] str       A string of colon-separated hexadecimals.
- * @param[out] out      The resulting hardware address. Must at least have
- *                      @ref GNRC_NETIF_L2ADDR_MAXLEN bytes allocated.
- *
- * @return  Actual length of @p out on success.
- * @return  0, on failure.
- */
-size_t netif_addr_from_str(const char *str, uint8_t *out);
-
 #ifdef __cplusplus
 }
 #endif

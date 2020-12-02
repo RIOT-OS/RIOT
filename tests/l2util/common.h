@@ -7,7 +7,6 @@
  */
 
 /**
- * @defgroup    tests_gnrc_ipv6_nib Common header for GNRC's NIB tests
  * @ingroup     tests
  * @brief       Common definitions for GNRC's NIB tests
  * @{
@@ -18,7 +17,6 @@
  */
 #ifndef COMMON_H
 #define COMMON_H
-
 
 #include "net/gnrc/netif.h"
 
@@ -92,14 +90,6 @@ extern "C" {
                               LA1 ^ 0x2, LA2, LA3, LA4, LA5, LA6, LA7, LA8 }
 #define GLOBAL_PFX64        { GP1, GP2, GP3, GP4, GP5, GP6, GP7, GP8, \
                               LA1 ^ 0x82, LA2, LA3, LA4, LA5, LA6, LA7, LA8 }
-
-extern netdev_t *ethernet_dev;
-extern netdev_t *ieee802154_dev;
-extern netdev_t *devs[DEFAULT_DEVS_NUMOF];
-
-void _tests_init(void);
-void _test_trigger_recv(gnrc_netif_t *netif, const uint8_t *data,
-                        size_t data_len);
 
 #ifdef __cplusplus
 }

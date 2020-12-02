@@ -25,6 +25,7 @@
 #include "shell.h"
 #include "net/ieee802154.h"
 #include "net/ipv6/addr.h"
+#include "net/l2util.h"
 #include "net/netif.h"
 
 #include "openwsn.h"
@@ -107,17 +108,17 @@ int _openwsn_ifconfig(char *arg)
 
     addr = idmanager_getMyID(ADDR_16B);
     printf("\tHWaddr: %s  ",
-           netif_addr_to_str(addr->addr_16b, sizeof(addr->addr_16b),
+           l2util_addr_to_str(addr->addr_16b, sizeof(addr->addr_16b),
                              addr_str));
 
     addr = idmanager_getMyID(ADDR_PANID);
     printf("NID: %s\n\n",
-           netif_addr_to_str(addr->panid, sizeof(addr->panid),
+           l2util_addr_to_str(addr->panid, sizeof(addr->panid),
                              addr_str));
 
     addr = idmanager_getMyID(ADDR_64B);
     printf("\t\tLong HWaddr: %s\n",
-           netif_addr_to_str(addr->addr_64b, sizeof(addr->addr_64b),
+           l2util_addr_to_str(addr->addr_64b, sizeof(addr->addr_64b),
                              addr_str));
 
     if (IS_USED(MODULE_OPENWSN_IPV6)) {
@@ -155,7 +156,7 @@ int _openwsn_ifconfig(char *arg)
             else {
                 icmpv6rpl_getPreferredParentEui64(&neighbor);
                 printf("\t\tRPL parent: %s\n",
-                       netif_addr_to_str(neighbor.addr_64b,
+                       l2util_addr_to_str(neighbor.addr_64b,
                                          sizeof(neighbor.addr_64b),
                                          addr_str));
             }
@@ -164,7 +165,7 @@ int _openwsn_ifconfig(char *arg)
                 if (neighbors_isNeighborWithHigherDAGrank(i)) {
                     neighbors_getNeighborEui64(&neighbor, ADDR_64B, i);
                     printf("\t\t\t%s\n",
-                           netif_addr_to_str(neighbor.addr_64b,
+                           l2util_addr_to_str(neighbor.addr_64b,
                                              sizeof(neighbor.addr_64b),
                                              addr_str));
                 }
@@ -192,7 +193,7 @@ static int _neighbors_cmd(char *arg)
 
     for (int i = 0; i < MAXNUMNEIGHBORS; i++) {
         neighbors_getNeighborEui64(&neighbor, ADDR_64B, i);
-        netif_addr_to_str(neighbor.addr_64b, sizeof(neighbor.addr_64b),
+        l2util_addr_to_str(neighbor.addr_64b, sizeof(neighbor.addr_64b),
                           hwaddr_str);
         if (memcmp(hwaddr_str, "00:00:00:00:00:00:00:00",
                    IEEE802154_LONG_ADDRESS_LEN_STR_MAX)) {
@@ -224,7 +225,7 @@ static int _cell_list_cmd(char *arg)
         switch (schedule_vars.scheduleBuf[i].type) {
         case CELLTYPE_TX:
             printf("neigh: %s, slot: %03i, chan: %02i, type: TX\n",
-                   netif_addr_to_str(
+                   l2util_addr_to_str(
                        schedule_vars.scheduleBuf[i].neighbor.addr_64b,
                        IEEE802154_LONG_ADDRESS_LEN, hwaddr_str),
                    schedule_vars.scheduleBuf[i].slotOffset,
@@ -237,7 +238,7 @@ static int _cell_list_cmd(char *arg)
             break;
         case CELLTYPE_TXRX:
             printf("neigh: %s, slot: %03i, chan: %02i, type: RXTX\n",
-                   netif_addr_to_str(
+                   l2util_addr_to_str(
                        schedule_vars.scheduleBuf[i].neighbor.addr_64b,
                        IEEE802154_LONG_ADDRESS_LEN, hwaddr_str),
                    schedule_vars.scheduleBuf[i].slotOffset,
@@ -266,7 +267,7 @@ static int _cell_manage_cmd(int argc, char **argv)
 
     if (argc == 6) {
         addr.type = ADDR_64B;
-        size_t len = netif_addr_from_str(argv[5], addr.addr_64b);
+        size_t len = l2util_addr_from_str(argv[5], addr.addr_64b);
         if (len == 0) {
             puts("Error: invalid address");
             return -1;
@@ -358,7 +359,7 @@ static int _6top_manage_cmd(int argc, char **argv)
 
     if (argc == 5) {
         neigh.type = ADDR_64B;
-        size_t len = netif_addr_from_str(argv[4], neigh.addr_64b);
+        size_t len = l2util_addr_from_str(argv[4], neigh.addr_64b);
         if (len == 0) {
             puts("Error: invalid address");
             return -1;
@@ -445,7 +446,7 @@ static int _6top_cmd(int argc, char **argv)
 
         if (argc == 3) {
             neighbor.type = ADDR_64B;
-            size_t len = netif_addr_from_str(argv[2], neighbor.addr_64b);
+            size_t len = l2util_addr_from_str(argv[2], neighbor.addr_64b);
             if (len == 0) {
                 puts("Error: invalid address");
                 return -1;
