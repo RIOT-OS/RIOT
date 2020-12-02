@@ -61,6 +61,7 @@ typedef struct {
     uint32_t temperature;
     uint32_t humidity;
     uint32_t pressure;
+    uint32_t gas_resistance;
     uint32_t t_fine;        //TODO should be stored somewhere else
 } bme680_data_t;
 

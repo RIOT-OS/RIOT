@@ -101,9 +101,12 @@ extern "C" {
 #define BME680_REGISTER_RES_HEAT_RANGE    (0x02)
 #define BME680_REGISTER_RES_HEAT_VAL    (0x00)
 
-/*
- * @brief   register bits
-*/
+#define BME680_REGISTER_GAS_ADC_MSB     (0x2A)
+#define BME680_REGISTER_GAS_ADC_LSB     (0x2B)
+#define BME680_REGISTER_GAS_RANGE       (0x2B)
+#define BME680_REGISTER_RANGE_SWITCHING_ERROR   (0x04)
+
+
 
 /*
 * @brief    operation modes

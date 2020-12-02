@@ -38,7 +38,12 @@ static uint16_t _calc_temp(const bme680_t *dev, uint32_t* t_fine, uint32_t* res)
 //static uint16_t _calc_temp_old(const bme680_t *dev, uint32_t* t_fine, uint16_t* res);
 static uint16_t _calc_hum(const bme680_t *dev, const uint32_t *temp_comp, uint32_t* res);
 static uint16_t _calc_press(const bme680_t *dev, uint32_t* t_fine, uint32_t* res);
+static uint16_t _calc_gas(const bme680_t *dev, uint32_t* res);
 static void calc_heater_dur(uint16_t dur, uint8_t* res);
+
+#define CONST_ARRAY1_INT {2147483647, 2147483647, 2147483647, 2147483647, 2147483647, 2126008810, 2147483647, 2130303777, 2147483647, 2147483647, 2143188679, 2136746228, 2147483647, 2126008810, 2147483647, 2147483647}
+
+#define CONST_ARRAY2_INT {4096000000, 2048000000, 1024000000, 512000000, 255744255, 127110228, 64000000, 32258064, 16016016, 8000000, 4000000, 2000000, 1000000, 500000, 250000, 125000}
 
 int bme680_init(bme680_t *dev, const bme680_params_t *params)
 {
@@ -194,7 +199,12 @@ uint16_t bme680_read(const bme680_t *dev, bme680_data_t *data)
 uint16_t bme680_read_2(const bme680_t *dev, bme680_data_t *data)
 {
     assert(dev);
-    xtimer_msleep(100);
+    uint8_t status = 0;
+    do {
+        i2c_read_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_MEAS_STATUS_0, &status, 0);
+        xtimer_msleep(10);
+    } while (! (status & (1<<7)));
+    DEBUG("[bme680] completed waiting\n");
 
     if (!_calc_temp(dev, &data->t_fine, &data->temperature)){
         return -BME680_ERR_CALC_TEMP;
@@ -203,6 +213,30 @@ uint16_t bme680_read_2(const bme680_t *dev, bme680_data_t *data)
         return -BME680_ERR_CALC_HUM;
     }
     if (!_calc_press(dev, &data->t_fine, &data->pressure)){
+        return -BME680_ERR_CALC_PRESS;
+    }
+
+    uint8_t success = 0;
+    xtimer_msleep(10);
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_GAS_R_LSB, &success, 0) < 0){
+        DEBUG("[bme680] error reading BME60_REGISTER_GAS_R_LSB register\n");
+        // Release I2C device 
+        i2c_release(DEV_I2C);
+
+        return -BME680_ERR_I2C_READ;
+    }
+
+    if ((success & 0b00110000) != 0b00110000){
+        DEBUG("gas measurement not successful: %u\n", success);
+        // Release I2C device 
+        //i2c_release(DEV_I2C);
+
+        //return -BME680_ERR_I2C_WRITE;
+    }
+    else {
+        DEBUG("gas measurment successful\n");
+    }
+    if (!_calc_gas(dev, &data->gas_resistance)){
         return -BME680_ERR_CALC_PRESS;
     } 
 
@@ -269,15 +303,22 @@ static uint16_t _convert_res_heat(const bme680_t *dev, uint16_t* gas_heating_tem
         return -BME680_ERR_I2C_READ;
     }
 
-    uint8_t var1 = (((int32_t) (*ambient_temp) * par_g3) / 1000) * 256;
-    uint8_t var2 = (par_g1 + 784) * (((((par_g2 + 154009) * (*gas_heating_temp) * 5) / 100) + 3276800) / 10);
-    uint8_t var3 = var1 + (var2 >> 1);
-    uint8_t var4 = (var3 / (res_heat_range + 4));
-    uint8_t var5 = (131 * res_heat_val) + 65536;
-    uint8_t res_heat_x100 = (int32_t)(((var4 / var5) - 250) * 34);
-    uint8_t res_heat_x = (uint8_t)((res_heat_x100 + 50) / 100);
+	uint8_t heatr_res;
+	int32_t var1;
+	int32_t var2;
+	int32_t var3;
+	int32_t var4;
+	int32_t var5;
+	int32_t heatr_res_x100;
+    var1 = (((int32_t) (*ambient_temp) * par_g3) / 1000) * 256;
+	var2 = (par_g1 + 784) * (((((par_g2 + 154009) * (*gas_heating_temp) * 5) / 100) + 3276800) / 10);
+	var3 = var1 + (var2 / 2);
+	var4 = (var3 / ((res_heat_range) + 4));
+	var5 = (131 * res_heat_val) + 65536;
+	heatr_res_x100 = (int32_t) (((var4 / var5) - 250) * 34);
+	heatr_res = (uint8_t) ((heatr_res_x100 + 50) / 100);
 
-    *res = res_heat_x;
+    *res = heatr_res;
 
     if (res){
         printf(" ");
@@ -378,7 +419,6 @@ static uint16_t _calc_temp(const bme680_t *dev, uint32_t* t_fine, uint32_t* res)
     return 1;
 }
 
-
 static uint16_t _calc_hum(const bme680_t *dev, const uint32_t *temp_comp, uint32_t* res)
 {
     DEBUG("[bme680] start calc hum\n");
@@ -409,8 +449,6 @@ static uint16_t _calc_hum(const bme680_t *dev, const uint32_t *temp_comp, uint32
 
         return -BME680_ERR_I2C_READ;
     }
-
-    printf("par_h1_h2_lsb: %d\n", par_h1_h2_lsb);
 
     par_h1 = ((uint16_t) par_h1_msb << 4) | (par_h1_h2_lsb / 16);
 
@@ -473,36 +511,28 @@ static uint16_t _calc_hum(const bme680_t *dev, const uint32_t *temp_comp, uint32
         return -BME680_ERR_I2C_READ;
     }
 
-    int32_t var1;
-	int32_t var2;
-	int32_t var3;
-	int32_t var4;
-	int32_t var5;
-	int32_t var6;
-	int32_t calc_hum;
-
     hum_adc = (uint16_t) (((uint32_t) hum_adc_msb * 256) | (uint32_t) hum_adc_lsb);
 
-	var1 = (int32_t) (hum_adc - ((int32_t) ((int32_t) par_h1 * 16)))
+	uint32_t var1 = (int32_t) (hum_adc - ((int32_t) ((int32_t) par_h1 << 4)))
 		- ((((*temp_comp) * (int32_t) par_h3) / ((int32_t) 100)) >> 1);
-	var2 = ((int32_t) par_h2
+	uint32_t var2 = ((int32_t) par_h2
 		* ((((*temp_comp) * (int32_t) par_h4) / ((int32_t) 100))
 			+ ((((*temp_comp) * (((*temp_comp) * (int32_t) par_h5) / ((int32_t) 100))) >> 6)
 				/ ((int32_t) 100)) + (int32_t) (1 << 14))) >> 10;
-	var3 = var1 * var2;
-	var4 = (int32_t) par_h6 << 7;
+	uint32_t var3 = var1 * var2;
+	uint32_t var4 = (int32_t) par_h6 << 7;
 	var4 = ((var4) + (((*temp_comp) * (int32_t) par_h7) / ((int32_t) 100))) >> 4;
-	var5 = ((var3 >> 14) * (var3 >> 14)) >> 10;
-	var6 = (var4 * var5) >> 1;
-	calc_hum = (((var3 + var6) >> 10) * ((int32_t) 1000)) >> 12;
+	uint32_t var5 = ((var3 >> 14) * (var3 >> 14)) >> 10;
+	uint32_t var6 = (var4 * var5) >> 1;
+	uint32_t hum_comp = (((var3 + var6) >> 10) * ((int32_t) 1000)) >> 12;
 
-    DEBUG("[bme680] humidity compensated: %lu\n", calc_hum/1000);  
+    DEBUG("[bme680] humidity compensated: %lu\n", hum_comp/1000);  
 
     if (res){
         printf(" ");
     }
 
-    *res = calc_hum;
+    *res = hum_comp;
 
     return 1;  
 }
@@ -652,7 +682,12 @@ static uint16_t _calc_press(const bme680_t *dev, uint32_t* t_fine, uint32_t* res
 	var1 = ((32768 + var1) * (int32_t) par_p1) >> 15;
 	pressure_comp = 1048576 - press_adc;
 	pressure_comp = (int32_t)((pressure_comp - (var2 >> 12)) * ((uint32_t)3125));
-	pressure_comp = ((pressure_comp << 1) / var1);
+    if (pressure_comp >= (1 << 30)){
+        pressure_comp = ((pressure_comp / (uint32_t)var1) << 1);
+    }
+    else {
+	    pressure_comp = ((pressure_comp << 1) / var1);
+    }
 	var1 = ((int32_t) par_p9 * (int32_t)(((pressure_comp >> 3) *
 		(pressure_comp >> 3)) >> 13)) >> 12;
 	var2 = ((int32_t)(pressure_comp >> 2) *
@@ -673,12 +708,56 @@ static uint16_t _calc_press(const bme680_t *dev, uint32_t* t_fine, uint32_t* res
     return 1;    
 }
 
-/*static uint16_t _calc_gas(const bme680_t *dev, uint32_t* t_fine, uint16_t* res)
+static uint16_t _calc_gas(const bme680_t *dev, uint32_t* res)
 {
     uint16_t gas_adc = 0;
-    uint8_t gas_range, range_switching_error = 0;
+    uint8_t gas_range, range_switching_error, gas_adc_lsb, gas_adc_msb = 0;
+    uint32_t const_array1_int[] = CONST_ARRAY1_INT;
+    uint32_t const_array2_int[] = CONST_ARRAY2_INT;
+
+
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_GAS_ADC_MSB, &gas_adc_msb, 0) < 0){
+        DEBUG("[bme680] error reading BME680_REGISTER_PRESS_ADC register\n");
+         /* Release I2C device */
+        i2c_release(DEV_I2C);
+
+        return -BME680_ERR_I2C_READ;
+    } 
+    
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_GAS_ADC_LSB, &gas_adc_lsb, 0) < 0){
+        DEBUG("[bme680] error reading BME680_REGISTER_PRESS_ADC register\n");
+         /* Release I2C device */
+        i2c_release(DEV_I2C);
+
+        return -BME680_ERR_I2C_READ;
+    } 
+
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_GAS_RANGE, &gas_range, 0) < 0){
+        DEBUG("[bme680] error reading BME680_REGISTER_PRESS_ADC register\n");
+         /* Release I2C device */
+        i2c_release(DEV_I2C);
+
+        return -BME680_ERR_I2C_READ;
+    }
+
+    if (i2c_read_reg(DEV_I2C, DEV_ADDR, BME680_REGISTER_RANGE_SWITCHING_ERROR, &range_switching_error, 0) < 0){
+        DEBUG("[bme680] error reading BME680_REGISTER_PRESS_ADC register\n");
+         /* Release I2C device */
+        i2c_release(DEV_I2C);
+
+        return -BME680_ERR_I2C_READ;
+    } 
+
+    gas_range = gas_range & 0b00000111;
+
+    gas_adc = (gas_adc_msb << 2) |  ((gas_adc_lsb & 0b11000000) >> 6);
 
     int64_t var1 = (int64_t)(((1340 + (5 * (int64_t)range_switching_error)) * ((int64_t)const_array1_int[gas_range])) >> 16);
     int64_t var2 = (int64_t)(gas_adc << 15) - (int64_t)(1 << 24) + var1;
     int32_t gas_res = (int32_t)((((int64_t)(const_array2_int[gas_range] * (int64_t)var1) >> 9) + (var2 >> 1)) / var2);
-}*/
+
+    *res = gas_res;
+
+    DEBUG("calculated gas: %lu\n", gas_res);
+    return 1;
+}
