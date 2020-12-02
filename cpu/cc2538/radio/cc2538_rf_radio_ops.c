@@ -31,6 +31,7 @@
 #include "net/ieee802154/radio.h"
 
 static const ieee802154_radio_ops_t cc2538_rf_ops;
+static bool read_got_called = false;
 
 ieee802154_dev_t cc2538_rf_dev = {
     .driver = &cc2538_rf_ops,
@@ -207,6 +208,7 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
     }
 
 
+    read_got_called = true;
     return res;
 }
 
@@ -276,6 +278,8 @@ static int _confirm_set_trx_state(ieee802154_dev_t *dev)
     if (RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE == FSM_STATE_RX_CALIBRATION) {
         return -EAGAIN;
     }
+    confirm_counter++;
+    assert(request_counter == confirm_counter);
     return 0;
 }
 
@@ -303,9 +307,12 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
             RFCORE_XREG_RFIRQM0 |= RXPKTDONE;
             RFCORE_SFR_RFST = ISFLUSHRX;
             RFCORE_SFR_RFST = ISRXON;
+            read_got_called = false;
             break;
     }
 
+    assert(request_counter == confirm_counter);
+    request_counter++;
     return 0;
 }
 
