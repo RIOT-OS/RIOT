@@ -166,8 +166,7 @@ static int start_server(void)
     }
     _active = true;
 
-    sock_dtls_event_init(&_dtls_sock, &event_queue_medium, _dtls_handler,
-                         NULL);
+    sock_dtls_event_init(&_dtls_sock, EVENT_PRIO_MEDIUM, _dtls_handler, NULL);
     return 0;
 }
 
@@ -179,7 +178,7 @@ static int stop_server(void)
         return 1;
     }
 
-    event_post(&event_queue_medium, &_close.super);
+    event_post(EVENT_PRIO_MEDIUM, &_close.super);
     return 0;
 }
 
