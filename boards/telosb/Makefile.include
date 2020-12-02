@@ -6,6 +6,5 @@ BAUD ?= 9600
 include $(RIOTMAKE)/tools/serial.inc.mk
 
 # flash tool configuration
-FLASHER = $(RIOTTOOLS)/goodfet/goodfet.bsl
-FLASHFILE ?= $(HEXFILE)
-FFLAGS = --telosb -c $(PROG_DEV) -r -e -I -p $(FLASHFILE)
+PROGRAMMER ?= goodfet
+GOODFET_FLAGS ?= --telosb
