@@ -15,4 +15,4 @@ How to reproduce:
 ### Crashes if packets are not sent with a delay
 
 How to reproduce:
-  - Use spam function on radio nRF52840-DK e.g. "spam <long_addr> <len> <number of packets> 5"
+  - Use spam function on radio nRF52840-DK e.g. "spam <long_addr> <len> <number of packets> 0"
