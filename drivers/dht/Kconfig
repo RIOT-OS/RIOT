@@ -5,8 +5,9 @@
 # directory for more details.
 #
 
-config MODULE_EMBUNIT
-    bool "EmbUnit"
+config MODULE_DHT
+    bool "DHT Humidity and Temperature Sensors"
+    depends on HAS_PERIPH_GPIO
     depends on TEST_KCONFIG
-    help
-        RIOT Unittests based on the EmbUnit Framework.
+    select MODULE_PERIPH_GPIO
+    select MODULE_XTIMER

@@ -5,8 +5,8 @@
 # directory for more details.
 #
 
-config MODULE_EMBUNIT
-    bool "EmbUnit"
+config MODULE_DS1307
+    bool "DS1307 real-time clock"
+    depends on HAS_PERIPH_I2C
     depends on TEST_KCONFIG
-    help
-        RIOT Unittests based on the EmbUnit Framework.
+    select MODULE_PERIPH_I2C

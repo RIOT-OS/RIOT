@@ -1,0 +1,8 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+
+# needed for the Dynamixel bus implementation
+CONFIG_MODULE_UART_HALF_DUPLEX=y
+
+CONFIG_MODULE_DYNAMIXEL=y
+CONFIG_MODULE_SHELL=y

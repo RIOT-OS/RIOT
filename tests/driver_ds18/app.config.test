@@ -1,0 +1,8 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+CONFIG_MODULE_DS18=y
+CONFIG_MODULE_XTIMER=y
+CONFIG_MODULE_PRINTF_FLOAT=y
+
+# Use the module if you have an accurate sleep with xtimer (~3us)
+#CONFIG_MODULE_DS18_OPTIMIZED=y

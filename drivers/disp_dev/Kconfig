@@ -5,8 +5,6 @@
 # directory for more details.
 #
 
-config MODULE_EMBUNIT
-    bool "EmbUnit"
+config MODULE_DISP_DEV
+    bool "Display device generic API"
     depends on TEST_KCONFIG
-    help
-        RIOT Unittests based on the EmbUnit Framework.

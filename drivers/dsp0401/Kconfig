@@ -5,8 +5,11 @@
 # directory for more details.
 #
 
-config MODULE_EMBUNIT
-    bool "EmbUnit"
+config MODULE_DSP0401
+    bool "DSP0401 alphanumeric display"
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_PWM
     depends on TEST_KCONFIG
-    help
-        RIOT Unittests based on the EmbUnit Framework.
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_PWM
+    select MODULE_XTIMER

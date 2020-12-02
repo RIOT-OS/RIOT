@@ -5,8 +5,8 @@
 # directory for more details.
 #
 
-config MODULE_EMBUNIT
-    bool "EmbUnit"
+config MODULE_DS3234
+    bool "DS3234 Extremely Accurate SPI RTC"
+    depends on HAS_PERIPH_SPI
     depends on TEST_KCONFIG
-    help
-        RIOT Unittests based on the EmbUnit Framework.
+    select MODULE_PERIPH_SPI

@@ -5,8 +5,7 @@
 # directory for more details.
 #
 
-config MODULE_EMBUNIT
-    bool "EmbUnit"
+config MODULE_FEETECH
+    bool "Feetech's servomotors communication bus"
+    depends on MODULE_UART_HALF_DUPLEX
     depends on TEST_KCONFIG
-    help
-        RIOT Unittests based on the EmbUnit Framework.

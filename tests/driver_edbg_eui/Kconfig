@@ -5,8 +5,7 @@
 # directory for more details.
 #
 
-config MODULE_EMBUNIT
-    bool "EmbUnit"
-    depends on TEST_KCONFIG
-    help
-        RIOT Unittests based on the EmbUnit Framework.
+config APPLICATION
+    bool
+    default y
+    depends on BOARD_SAMR21_XPRO
