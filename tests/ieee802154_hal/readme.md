@@ -15,7 +15,7 @@ How to reproduce:
 ### Crashes if packets are not sent with a delay
 
 How to reproduce:
-  - Use spam function on radio nRF52840-DK e.g. "spam <long_addr> <len> <number of packets> 0"
+  - Use spam function on radio nRF52840-DK e.g. "spam <long_addr>, <len>, <number of packets>, 0"
   
 ## olertia
 
@@ -29,4 +29,4 @@ How to reproduce:
 
 How to reproduce:
   - Set nRF52840-DK to reply mode with "reply"
-  - Use spam function on radio olertia e.g. "spam <long_addr> <len> <number of packets> 0"
+  - Use spam function on radio olertia e.g. "spam <long_addr>, <len>, <number of packets>, 1"
