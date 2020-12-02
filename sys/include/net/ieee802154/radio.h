@@ -32,6 +32,9 @@ extern "C" {
 #include "byteorder.h"
 #include "net/eui64.h"
 
+extern uint16_t request_counter;
+extern uint16_t confirm_counter;
+
 /**
  * @brief Forward declaration of the radio ops structure.
  */
