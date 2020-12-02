@@ -52,7 +52,8 @@ extern "C" {
 /**
  * @brief ILI9341 gvdd level.
  *
- * Default GVDD voltage of 4.8V
+ * Default GVDD voltage of 4.8V. GVDD is reference level for the VCOM level and
+ * the grayscale voltage level. GVDD should be ≦ (AVDD - 0.5) V .
  */
 #ifndef CONFIG_ILI9341_GVDD
 #define CONFIG_ILI9341_GVDD             4800
@@ -61,7 +62,10 @@ extern "C" {
 /**
  * @brief ILI9341 VCOMH voltage level.
  *
- * Default VCOMH voltage of 4.25V
+ * Default VCOMH voltage of 4.25V. VCOMH represents the high level of VCOM AC
+ * voltage. VCOM levels needs to be adjusted to match the capacitance and
+ * performance specifications of the TFT panel to maximize contrast and minimize
+ * flickering.
  */
 #ifndef CONFIG_ILI9341_VCOMH
 #define CONFIG_ILI9341_VCOMH            4250
@@ -70,7 +74,10 @@ extern "C" {
 /**
  * @brief ILI9341 VCOML voltage level.
  *
- * Default VCOMH voltage of -2V
+ * Default VCOML voltage of -2V. VCOML represents the low level of VCOM AC
+ * voltage. VCOM levels needs to be adjusted to match the capacitance and
+ * performance specifications of the TFT panel to maximize contrast and minimize
+ * flickering
  */
 #ifndef CONFIG_ILI9341_VCOML
 #define CONFIG_ILI9341_VCOML            -2000
