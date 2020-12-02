@@ -40,11 +40,23 @@
 
 #define RADIO_DEFAULT_ID (0U)
 
+
+uint16_t confirm_counter = 0;
+uint16_t request_counter = 0;
+
 static inline void _set_trx_state(int state, bool verbose);
+static int send(uint8_t *dst, size_t dst_len, size_t len);
+
+
+static uint16_t received_acks;
+static uint16_t send_packets;
+static uint16_t received_packets;
 
 static uint8_t buffer[127];
 static xtimer_t timer_ack;
 static mutex_t lock;
+static bool send_reply;
+static bool enable_prints;
 
 static const char *str_states[3]= {"TRX_OFF", "RX", "TX"};
 static ieee802154_rx_mode_t current_rx_mode;
@@ -55,17 +67,35 @@ static uint8_t seq;
 static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
 {
     if (buffer[0] & IEEE802154_FCF_TYPE_ACK && ((seq-1) == buffer[2])) {
-        printf("Received valid ACK with sqn %i\n", buffer[2]);
+        if (enable_prints) {
+            printf("Received valid ACK with sqn %i\n", buffer[2]);
+        }
+        received_acks++;
     }
     else {
-        puts("Packet received:");
-        for (unsigned i=0;i<size;i++) {
-            printf("%02x ", buffer[i]);
+        if (enable_prints) {
+            puts("Packet received:");
+            for (unsigned i=0;i<size;i++) {
+                printf("%02x ", buffer[i]);
+            }
+        }
+        received_packets++;
+        if (send_reply) {
+            puts("");
+            uint8_t out[IEEE802154_LONG_ADDRESS_LEN];
+            unsigned j = 0;
+            for (unsigned i=20;i>12;i--) {
+                out[j] = buffer[i];
+                j++;
+            }
+            send(out, IEEE802154_LONG_ADDRESS_LEN, size - 21);
         }
     }
-    puts("");
-    printf("LQI: %i, RSSI: %i\n", (int) lqi, (int) rssi);
-    puts("");
+    if (enable_prints) {
+        puts("");
+        printf("LQI: %i, RSSI: %i\n", (int) lqi, (int) rssi);
+        puts("");
+    }
 }
 
 static int print_addr(int argc, char **argv)
@@ -160,7 +190,10 @@ static void _tx_finish_handler(event_t *event)
 
     switch (tx_info.status) {
         case TX_STATUS_SUCCESS:
-            puts("Transmission succeeded");
+            if (enable_prints) {
+                puts("Transmission succeeded");
+            }
+            send_packets++;
             break;
         case TX_STATUS_FRAME_PENDING:
             puts("Transmission succeeded and there's pending data");
@@ -260,7 +293,7 @@ static int send(uint8_t *dst, size_t dst_len,
         .iol_next = NULL,
     };
 
-    flags = IEEE802154_FCF_TYPE_DATA | IEEE802154_FCF_ACK_REQ;
+    flags = IEEE802154_FCF_TYPE_DATA ; //IEEE802154_FCF_ACK_REQ
 
     src_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
     dst_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
@@ -636,6 +669,112 @@ static int _caps_cmd(int argc, char **argv)
     return 0;
 }
 
+
+// uint8_t payload[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ornare lacinia mi elementum interdum ligula.";
+
+static int _spam(uint8_t *dst, size_t dst_len, size_t len, size_t num, size_t time)
+{
+    uint8_t flags;
+    uint8_t mhr[IEEE802154_MAX_HDR_LEN];
+    int mhr_len;
+
+    le_uint16_t src_pan, dst_pan;
+    iolist_t iol_data = {
+        .iol_base = payload,
+        .iol_len = len,
+        .iol_next = NULL,
+    };
+
+    flags = IEEE802154_FCF_TYPE_DATA;// | IEEE802154_FCF_ACK_REQ;
+
+    src_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
+    dst_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
+    uint8_t src_len = IEEE802154_LONG_ADDRESS_LEN;
+    void *src = &ext_addr;
+    received_acks = 0;
+    received_packets = 0;
+    send_packets = 0;
+    for(size_t i = 0; i < num; i++) {
+        /* fill MAC header, seq should be set by device */
+        if ((mhr_len = ieee802154_set_frame_hdr(mhr, src, src_len,
+                                            dst, dst_len,
+                                            src_pan, dst_pan,
+                                            flags, seq++)) < 0) {
+            puts("txtsnd: Error preperaring frame");
+            return 1;
+        }
+
+        iolist_t iol_hdr = {
+            .iol_next = &iol_data,
+            .iol_base = mhr,
+            .iol_len = mhr_len,
+        };
+        _send(&iol_hdr);
+        xtimer_msleep(time);
+    }
+    puts("-------Summary of the test-------");
+    printf("Send Packets: %d\n", send_packets);
+    printf("Acknowledged Packets: %d\n", received_acks);
+    printf("Percentage: %d\n", (received_acks * 100)/num);
+    printf("Received Packets: %d\n", received_packets);
+    puts("---------------------------------");
+    return 0;
+}
+
+int txtspam(int argc, char **argv)
+{
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+    size_t len;
+    size_t res;
+    size_t num;
+    size_t time;
+
+    if (argc != 5) {
+        puts("Usage: spam <long_addr> <len> <number of packets> <time in ms between packets>");
+        return 1;
+    }
+
+    res = _parse_addr(addr, sizeof(addr), argv[1]);
+    if (res == 0) {
+        puts("Usage: spam <long_addr> <len> <number of packets> <time in ms between packets>");
+        return 1;
+    };
+
+    len = atoi(argv[2]);
+    num = atoi(argv[3]);
+    time = atoi(argv[4]);
+    return _spam(addr, res, len, num, time);
+}
+
+int toggle_reply(int argc, char **argv) {
+    (void)argv[0];
+    (void)argc;
+    if (send_reply) {
+        send_reply = false;
+        puts("Packets are no longer mirrored");
+    } else {
+        send_reply = true;
+        puts("Packets are now mirrored");
+    }
+    printf("Request: %d\n", request_counter);
+    printf("Confirm: %d\n", confirm_counter);
+    return 0;
+}
+
+int toggle_enable_prints(int argc, char **argv) {
+    (void)argv[0];
+    (void)argc;
+    if (enable_prints) {
+        enable_prints = false;
+        puts("Printing is now disabled");
+    } else {
+        enable_prints = true;
+        puts("Printing is now enabled");
+    }
+    return 0;
+}
+
+
 static const shell_command_t shell_commands[] = {
     { "config_phy", "Set channel and TX power", config_phy},
     { "print_addr", "Print IEEE802.15.4 addresses", print_addr},
@@ -646,6 +785,9 @@ static const shell_command_t shell_commands[] = {
     { "rx_mode", "Enable/Disable AACK or set Frame Pending bit or set promiscuos mode", rx_mode_cmd },
     { "tx_mode", "Enable CSMA-CA, CCA or direct transmission", txmode_cmd },
     { "caps", "Get a list of caps supported by the device", _caps_cmd },
+    { "spam", "Sends many packets to the target", txtspam },
+    { "reply", "Every packet that arrives is mirrored", toggle_reply },
+    { "enable_prints", "Enable printing", toggle_enable_prints },
     { NULL, NULL, NULL }
 };
 
