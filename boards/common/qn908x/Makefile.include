@@ -1,0 +1,26 @@
+# Using dap or jlink depends on which firmware the OpenSDA debugger is running
+#DEBUG_ADAPTER ?= dap
+DEBUG_ADAPTER ?= jlink
+
+# Use the shared OpenOCD configuration
+OPENOCD_CONFIG ?= $(RIOTBOARD)/common/qn908x/dist/openocd.cfg
+
+# Disable the watchdog when flashing. OpenOCD runs a CRC program in RAM to
+# verify the image, which needs to have the WDT disabled but it is normally
+# enabled after a 'reset halt' command.
+OPENOCD_PRE_FLASH_CMDS += "-c qn908x disable_wdog"
+
+# Set default port depending on operating system
+PORT_LINUX ?= /dev/ttyACM0
+PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
+
+# OpenOCD is able to handle .elf files and is the preferred way.
+FLASHFILE ?= $(ELFFILE)
+
+# Setup serial terminal
+include $(RIOTMAKE)/tools/serial.inc.mk
+
+# This board uses OpenOCD. Note that support for QN908x in OpenOCD at the time
+# of writing has not been merged in the tree and is only available at
+# http://openocd.zylin.com/#/c/5584/ .
+include $(RIOTMAKE)/tools/openocd.inc.mk

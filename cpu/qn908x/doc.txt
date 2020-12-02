@@ -1,0 +1,68 @@
+/* NXP QN908x specific information for the `periph` drivers */
+/**
+
+@defgroup    cpu_qn908x NXP QN908x
+@ingroup     cpu
+@brief       NXP QN908x BLE-enabled Cortex-M4F MCU specific implementation
+
+The NXP QN908x family of chips such as the QN9080 feature a Cortex-M4F,
+Bluetooth Low Energy, USB 2.0 and in some SKUs like the QN9080SIP NFC as well.
+The CPU is designed to be ultra-low-power and high-performance, allowing
+applications with small battery capacity. It includes an optional DC-DC and LDO,
+low power sleep timers, I2C, SPI, ADC, SPIFI and several other peripherals.
+
+
+@defgroup    cpu_qn908x_cpuid NXP QN908x CPUID
+@ingroup     cpu_qn908x
+@brief       NXP QN908x CPUID driver
+
+No configuration is necessary. The CPUID value is based on the factory assigned
+default Bluetooth address in the read-only flash section which may not be the
+Bluetooth address used by the Bluetooth module if a different one was programmed
+there.
+
+
+@defgroup    cpu_qn908x_gpio NXP QN908x GPIO
+@ingroup     cpu_qn908x
+@brief       NXP QN908x GPIO driver
+
+The GPIO driver uses the @ref GPIO_PIN(port, pin) macro to declare pins.
+
+No configuration is necessary.
+
+
+@defgroup    cpu_qn908x_wdt NXP QN908x Watchdog timer (WDT)
+@ingroup     cpu_qn908x
+@brief       NXP QN908x Watchdog timer (WDT)
+
+The Watchdog timer in the NXP QN908x starts disabled on reset: the clock bit
+`CLK_WDT_EN` is enabled in the `CLK_EN` register on reset so the timer is
+running but the interrupt and reset functions are disabled. However, after the
+read-only bootloader ROM in the QN908x transfer the control flow to the user
+application (the RIOT kernel) the Watchdog is enabled with a timeout of 10
+seconds.
+
+If your board does not include the `periph_wdt` module, the Watchdog will be
+disabled at `cpu_init()` time and there's no configuration necessary. However,
+if your board or application does include it, the Watchdog will be left
+configured with the 10 second timeout set by the Bootloader and you need to
+call `wdt_setup_reboot()` or `wdt_setup_reboot_with_callback()` within the first
+10 seconds.
+
+The WDT block supports different clock sources which would be configured by the
+board since they depend on whether the optional crystals are populated in your
+board. Nevertheless, the millisecond values passed to `wdt_setup_reboot*` are
+internally converted to clock ticks using the clock configured at the time the
+function was called. `wdt_setup_reboot*()` can be called multiple times to
+change the WDT parameters or after changing the WDT clock source, but in any
+case `wdt_start()` must be called after it to start the WDT operation.
+
+Once the WDT triggers, it is not possible to avoid the device reboot and calling
+wdt_kick() from the WDT callback (if any) or after the callback was called will
+not have any effect. Note that, however, if the WDT callback returns before the
+configured CONFIG_WDT_WARNING_PERIOD the CPU will continue executing the code
+before the WDT interrupt occurred. If this is not desired, an infinite loop at
+the end of the WDT callback, after the safety operations have been performed is
+advisable.
+
+*/
