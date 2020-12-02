@@ -167,5 +167,13 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  */
 #define XFA_LEN(type, name) (((const char*)name ## _end - (const char*)name) / sizeof(type))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+/* making externc happy */
+#ifdef __cplusplus
+}
+#endif
+
 /** @} */
 #endif /* XFA_H */
