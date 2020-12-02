@@ -8,13 +8,12 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 # setup serial terminal
 include $(RIOTMAKE)/tools/serial.inc.mk
 
-FLASHER = $(RIOTTOOLS)/stm32loader/stm32loader.py
-FLASHFILE ?= $(BINFILE)
+# Configure programmer
+PROGRAMMER ?= stm32loader
 
-# -e: erase
 # -u: use sector by sector erase
 # -S: swap RTS and DTR
 # -l 0x1ff: amount of sectors to erase
-FFLAGS += -p $(PROG_DEV) -e -u -S -l 0x1ff -w $(FLASHFILE)
+STM32LOADER_FLAGS ?= -u -S -l 0x1ff
 
 PYTERMFLAGS +=  --set-rts 0
