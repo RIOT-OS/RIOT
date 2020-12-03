@@ -1,5 +1,5 @@
 include ../Makefile.tests_common
 
-USEMODULE += event_thread_highest event_thread_medium
+USEMODULE += event_thread
 
 include $(RIOTBASE)/Makefile.include

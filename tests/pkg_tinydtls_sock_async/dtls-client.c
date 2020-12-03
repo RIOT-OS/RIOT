@@ -171,7 +171,7 @@ static int client_send(char *addr_str, char *data)
     if (_sending) {
         puts("Already in the process of sending");
     }
-    event_timeout_init(&_timeouter, &event_queue_medium, &_timeout.super);
+    event_timeout_init(&_timeouter, EVENT_PRIO_MEDIUM, &_timeout.super);
     /* get interface */
     char* iface = ipv6_addr_split_iface(addr_str);
     if (iface) {
@@ -208,7 +208,7 @@ static int client_send(char *addr_str, char *data)
         return -1;
     }
 
-    sock_dtls_event_init(&_dtls_sock, &event_queue_medium, _dtls_handler,
+    sock_dtls_event_init(&_dtls_sock, EVENT_PRIO_MEDIUM, _dtls_handler,
                          data);
     res = credman_add(&credential);
     if (res < 0 && res != CREDMAN_EXIST) {

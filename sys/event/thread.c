@@ -21,21 +21,31 @@
  * @}
  */
 
+#include "architecture.h"
 #include "thread.h"
 #include "event.h"
 #include "event/thread.h"
 
-static void *_handler(void *event_queue)
+struct event_queue_and_size {
+    event_queue_t *q;
+    size_t q_numof;
+};
+
+static void *_handler_thread(void *tagged_ptr)
 {
-    event_queue_claim(event_queue);
-    event_loop(event_queue);
+    event_queue_t *qs = ptrtag_ptr(tagged_ptr);
+    /* number of queues is encoded in lower pointer bits */
+    size_t n = ptrtag_tag(tagged_ptr) + 1;
+    event_queues_claim(qs, n);
+    /* start event loop */
+    event_loop_multi(qs, n);
 
     /* should be never reached */
     return NULL;
 }
 
-void event_thread_init(event_queue_t *queue, char *stack, size_t stack_size,
-                       unsigned priority)
+void event_thread_init_multi(event_queue_t *queues, size_t queues_numof,
+                             char *stack, size_t stack_size, unsigned priority)
 {
     /* For the auto_init use case, this will be called before main gets
      * started.  main might already use the queues, so they need to be
@@ -43,9 +53,12 @@ void event_thread_init(event_queue_t *queue, char *stack, size_t stack_size,
      *
      * They will be claimed within the handler thread.
      */
-    event_queue_init_detached(queue);
+    event_queues_init_detached(queues, queues_numof);
 
-    thread_create(stack, stack_size, priority, 0, _handler, queue, "event");
+    void *tagged_ptr = ptrtag(queues, queues_numof - 1);
+
+    thread_create(stack, stack_size, priority, 0, _handler_thread, tagged_ptr,
+                  "event");
 }
 
 #ifndef EVENT_THREAD_STACKSIZE_DEFAULT
@@ -78,48 +91,43 @@ void event_thread_init(event_queue_t *queue, char *stack, size_t stack_size,
 #define EVENT_THREAD_LOWEST_PRIO   (THREAD_PRIORITY_IDLE - 1)
 #endif
 
-#ifdef MODULE_EVENT_THREAD_HIGHEST
-event_queue_t event_queue_highest;
-static char _evq_highest_stack[EVENT_THREAD_HIGHEST_STACKSIZE];
-#endif
+/* rely on compiler / linker to garbage collect unused stacks */
+static char WORD_ALIGNED _evq_highest_stack[EVENT_THREAD_HIGHEST_STACKSIZE];
+static char WORD_ALIGNED _evq_medium_stack[EVENT_THREAD_MEDIUM_STACKSIZE];
+static char WORD_ALIGNED _evq_lowest_stack[EVENT_THREAD_LOWEST_STACKSIZE];
 
-#ifdef MODULE_EVENT_THREAD_MEDIUM
-event_queue_t event_queue_medium;
-static char _evq_medium_stack[EVENT_THREAD_MEDIUM_STACKSIZE];
-#endif
-
-#ifdef MODULE_EVENT_THREAD_LOWEST
-event_queue_t event_queue_lowest;
-static char _evq_lowest_stack[EVENT_THREAD_LOWEST_STACKSIZE];
-#endif
-
-typedef struct {
-    event_queue_t *queue;
-    char *stack;
-    size_t stack_size;
-    unsigned priority;
-} event_threads_t;
-
-const event_threads_t _event_threads[] = {
-#ifdef MODULE_EVENT_THREAD_HIGHEST
-    { &event_queue_highest, _evq_highest_stack, sizeof(_evq_highest_stack),
-        EVENT_THREAD_HIGHEST_PRIO },
-#endif
-#ifdef MODULE_EVENT_THREAD_MEDIUM
-    { &event_queue_medium, _evq_medium_stack, sizeof(_evq_medium_stack),
-        EVENT_THREAD_MEDIUM_PRIO },
-#endif
-#ifdef MODULE_EVENT_THREAD_LOWEST
-    { &event_queue_lowest, _evq_lowest_stack, sizeof(_evq_lowest_stack),
-        EVENT_THREAD_LOWEST_PRIO },
-#endif
-};
+event_queue_t event_thread_queues[EVENT_QUEUE_PRIO_NUMOF];
 
 void auto_init_event_thread(void)
 {
-    for (unsigned i = 0; i < ARRAY_SIZE(_event_threads); i++) {
-        event_thread_init(_event_threads[i].queue,
-                _event_threads[i].stack, _event_threads[i].stack_size,
-                _event_threads[i].priority);
+    if (IS_USED(MODULE_EVENT_THREAD_HIGHEST)) {
+        /* In order to allow highest priority events to preempt all others,
+         * high priority events must be run in their own thread. This thread
+         * can preempt than preempt the other event thread(s). */
+        event_thread_init(EVENT_PRIO_HIGHEST,
+                          _evq_highest_stack, sizeof(_evq_highest_stack),
+                          EVENT_THREAD_HIGHEST_PRIO);
     }
+    if (IS_USED(MODULE_EVENT_THREAD_MEDIUM)) {
+        /* In order to allow medium priority events to preempt low priority
+         * events, we need to move the low priority events into their own
+         * thread. The always existing medium priority event thread can then
+         * preempt the lowest priority event thread. */
+        event_thread_init(EVENT_PRIO_LOWEST,
+                          _evq_lowest_stack, sizeof(_evq_lowest_stack),
+                          EVENT_THREAD_LOWEST_PRIO);
+    }
+
+    event_queue_t *qs = EVENT_PRIO_MEDIUM;
+    size_t qs_numof = 1;
+    if (!IS_USED(MODULE_EVENT_THREAD_HIGHEST)) {
+        qs = EVENT_PRIO_HIGHEST;
+        qs_numof = 2;
+    }
+    if (!IS_USED(MODULE_EVENT_THREAD_MEDIUM)) {
+        qs_numof++;
+    }
+    event_thread_init_multi(qs, qs_numof,
+                            _evq_medium_stack, sizeof(_evq_medium_stack),
+                            EVENT_THREAD_MEDIUM_PRIO);
 }

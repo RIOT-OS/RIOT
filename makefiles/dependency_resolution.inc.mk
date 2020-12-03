@@ -38,4 +38,12 @@ else
   # Sort and de-duplicate used modules and default modules for readability
   USEMODULE := $(sort $(USEMODULE))
   DEFAULT_MODULE := $(sort $(DEFAULT_MODULE))
+
+  # Warn about used deprecated modules
+  include $(RIOTMAKE)/deprecated_modules.inc.mk
+  DEPRECATED_MODULES_USED := $(sort $(filter $(DEPRECATED_MODULES),$(USEMODULE)))
+  ifneq (,$(DEPRECATED_MODULES_USED))
+    $(shell $(COLOR_ECHO) "$(COLOR_RED)Deprecated modules are in use:$(COLOR_RESET)"\
+                          "$(DEPRECATED_MODULES_USED)" 1>&2)
+  endif
 endif

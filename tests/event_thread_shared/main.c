@@ -43,6 +43,7 @@ static event_t event_medium = { .handler=_handler_medium };
 static void _handler_low(event_t *event) {
     (void)event;
     event_post(EVENT_PRIO_MEDIUM, &event_medium);
+    event_post(EVENT_PRIO_HIGHEST, &event_high);
     puts("low");
 }
 

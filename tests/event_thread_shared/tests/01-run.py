@@ -5,10 +5,11 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect_exact('main done\r\n')
+    child.expect_exact('low\r\n')
     child.expect_exact('high\r\n')
     child.expect_exact('medium\r\n')
-    child.expect_exact('low\r\n')
+    child.expect_exact('high\r\n')
+    child.expect_exact('main done\r\n')
 
 
 if __name__ == "__main__":
