@@ -306,7 +306,7 @@
  *
  * int main(void)
  * {
-  *    // Add credentials
+ *     // Add credentials
  *     // [...]
  *
  *     // initialize client
@@ -340,9 +340,16 @@
  *         return -1;
  *     }
  *
- *     if (sock_dtls_session_create(&dtls_sock, &remote, &session,
- *                                  SOCK_NO_TIMEOUT) < 0) {
- *         puts("Error creating session");
+ *     if (sock_dtls_session_init(&dtls_sock, &remote, &session) < 0) {
+ *         puts("Error initiating session");
+ *         sock_dtls_close(&dtls_sock);
+ *         sock_udp_close(&udp_sock);
+ *         return -1;
+ *     }
+ *
+ *     if (sock_dtls_recv(&dtls_sock, &session, rcv, sizeof(rcv),
+ *                        SOCK_NO_TIMEOUT) != -SOCK_DTLS_HANDSHAKE) {
+ *         puts("Error completing handshake");
  *         sock_dtls_close(&dtls_sock);
  *         sock_udp_close(&udp_sock);
  *         return -1;
@@ -394,24 +401,22 @@
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * After the UDP sock is created, we can proceed with creating the DTLS sock.
- * Before sending the packet, we must first create a session with the remote
- * endpoint using @ref sock_dtls_session_create(). We can set the timeout to `0`
- * if we want the function returns immediately after starting the handshake.
- * In that case, we will need to call @ref sock_dtls_recv() to receive and
- * process all the handshake packets. If the handshake is successful and the
- * session is created, we send packets to it using @ref sock_dtls_send().
- * As we already know the session exists, we can set the timeout to `0` and
- * listen to the reply with @ref sock_dtls_recv().
+ * Before sending the packet, we must first initiate a session handshake with
+ * the remote endpoint using @ref sock_dtls_session_init(). We will need to call
+ * @ref sock_dtls_recv() to receive and process all the handshake packets.
+ * If the handshake is successful and the session is created, we send packets
+ * to it using @ref sock_dtls_send(). As we already know the session exists,
+ * we can set the timeout to `0` and listen to the reply with @ref sock_dtls_recv().
  *
  * Alternatively, set the timeout to of @ref sock_dtls_send() to the duration we
  * want to wait for the handshake process. We can also set the timeout to
  * @ref SOCK_NO_TIMEOUT to block indefinitely until handshake is complete.
  * After handshake completes, the packet will be sent.
  *
- * @ref sock_dtls_create() and @ref sock_dtls_close() only manages the DTLS
- * layer. That means we still have to clean up the created UDP sock from before
- * by calling @ref sock_udp_close() on our UDP sock in case of error or we
- * reached the end of the application.
+ * @ref sock_dtls_init(), @ref sock_dtls_recv and @ref sock_dtls_close() only
+ * manages the DTLS layer. That means we still have to clean up the created
+ * UDP sock from before by calling @ref sock_udp_close() on our UDP sock
+ * in case of error or we reached the end of the application.
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * char rcv[128];
@@ -428,9 +433,16 @@
  *     return -1;
  * }
  *
- * if (sock_dtls_session_create(&dtls_sock, &remote, &session,
- *                              SOCK_NO_TIMEOUT) < 0) {
- *     puts("Error creating session");
+ * if (sock_dtls_session_init(&dtls_sock, &remote, &session) < 0) {
+ *     puts("Error initiating session");
+ *     sock_dtls_close(&dtls_sock);
+ *     sock_udp_close(&udp_sock);
+ *     return -1;
+ * }
+ *
+ * if (sock_dtls_recv(&dtls_sock, &session, rcv, sizeof(rcv),
+ *                    SOCK_NO_TIMEOUT) != -SOCK_DTLS_HANDSHAKE) {
+ *     puts("Error completing handshake");
  *     sock_dtls_close(&dtls_sock);
  *     sock_udp_close(&udp_sock);
  *     return -1;
