@@ -145,12 +145,12 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
     /* if set netifs should match the only one available in OpenWSN*/
     if ((local != NULL) &&
         (local->netif != SOCK_ADDR_ANY_NETIF) &&
-        (local->netif != openwsn_get_netif())) {
+        (local->netif != CONFIG_OPENWSN_NETIF_ID)) {
         return -EINVAL;
     }
     if ((remote != NULL) &&
         (remote->netif != SOCK_ADDR_ANY_NETIF) &&
-        (remote->netif != openwsn_get_netif())) {
+        (remote->netif != CONFIG_OPENWSN_NETIF_ID)) {
         return -EINVAL;
     }
 
@@ -243,9 +243,9 @@ ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
         /* if set netifs should match the only one available in OpenWSN*/
         if ((sock != NULL) &&
             (((sock->gen_sock.local.netif != SOCK_ADDR_ANY_NETIF) &&
-              (sock->gen_sock.local.netif != openwsn_get_netif())) ||
+              (sock->gen_sock.local.netif != CONFIG_OPENWSN_NETIF_ID)) ||
              ((remote->netif != SOCK_ADDR_ANY_NETIF) &&
-              (remote->netif != openwsn_get_netif())))) {
+              (remote->netif != CONFIG_OPENWSN_NETIF_ID)))) {
             return -EINVAL;
         }
         dst_addr.type = ADDR_128B;
@@ -442,7 +442,7 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
     /* copy source port and address to end point */
     ep.family = AF_INET6;
     ep.port = pkt->l4_sourcePortORicmpv6Type;
-    ep.netif = openwsn_get_netif();
+    ep.netif = CONFIG_OPENWSN_NETIF_ID;
     memcpy(&ep.addr, pkt->l3_sourceAdd.addr_128b, LENGTH_ADDR128b);
 
     if (remote != NULL) {
