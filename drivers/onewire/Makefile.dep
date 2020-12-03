@@ -1,0 +1,3 @@
+USEMODULE += xtimer
+USEMODULE += fmt
+FEATURES_REQUIRED += periph_gpio
