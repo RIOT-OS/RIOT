@@ -10,9 +10,8 @@ USEMODULE += vendor_fsl_clock
 # All peripherals use gpio_mux.h
 USEMODULE += periph_gpio_mux
 
-# This cpu modules doesn't support UART peripherals yet, so we need to include
-# stdio_null.
-# TODO: Remove stdio_null once periph_uart is implemented in this module.
-USEMODULE += stdio_null
+ifneq (,$(filter periph_uart,$(USEMODULE)))
+  USEMODULE += periph_flexcomm
+endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.dep

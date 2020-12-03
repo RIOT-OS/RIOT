@@ -31,6 +31,32 @@ The GPIO driver uses the @ref GPIO_PIN(port, pin) macro to declare pins.
 No configuration is necessary.
 
 
+@defgroup    cpu_qn908x_uart NXP QN908x UART
+@ingroup     cpu_qn908x
+@brief       NXP QN908x UART driver
+
+There are several FLEXCOMM interfaces in this chip, but only two of these
+support UART (FLEXCOMM0 and FLEXCOMM1). The default UART mode is 8n1 and can
+be changed with the uart_mode() function. If only RX or only TX is desired, the
+other pin can be set to GPIO_UNDEF.
+
+### UART configuration example (for periph_conf.h) ###
+
+    static const uart_conf_t uart_config[] = {
+        {
+            .dev          = USART0,
+            .rx_pin       = GPIO_PIN(PORT_A, 17), /* or 5 */
+            .tx_pin       = GPIO_PIN(PORT_A, 16), /* or 4 */
+        },
+        {
+            .dev          = USART1,
+            .rx_pin       = GPIO_PIN(PORT_A, 9), /* or 13 */
+            .tx_pin       = GPIO_PIN(PORT_A, 8), /* or 12 */
+        },
+    };
+    #define UART_NUMOF          ARRAY_SIZE(uart_config)
+
+
 @defgroup    cpu_qn908x_wdt NXP QN908x Watchdog timer (WDT)
 @ingroup     cpu_qn908x
 @brief       NXP QN908x Watchdog timer (WDT)
