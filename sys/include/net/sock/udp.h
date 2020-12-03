@@ -300,6 +300,51 @@ typedef struct sock_udp sock_udp_t;
 #endif
 
 /**
+ * @brief   Auxiliary data provided when receiving using an UDP sock object
+ */
+typedef struct {
+#if defined(MODULE_SOCK_AUX_LOCAL) || defined(DOXYGEN)
+    /**
+     * @brief   The local endpoint the datagram was received on
+     *
+     * @see SOCK_AUX_GET_LOCAL
+     */
+    sock_udp_ep_t local;
+#endif /* MODULE_SOCK_AUX_ENDPOINT */
+#if defined(MODULE_SOCK_AUX_TIMESTAMP) || defined(DOXYGEN)
+    /**
+     * @brief   System time the datagram was received
+     *
+     * @see SOCK_AUX_GET_TIMESTAMP
+     */
+    uint64_t timestamp;
+#endif /* MODULE_SOCK_AUX_TIMESTAP*/
+    sock_aux_flags_t flags; /**< Flags used request information */
+} sock_udp_aux_rx_t;
+
+/**
+ * @brief   Auxiliary data provided when sending using an UDP sock object
+ */
+typedef struct {
+#if defined(MODULE_SOCK_AUX_TIMESTAMP) || defined(DOXYGEN)
+    /**
+     * @brief   System time the datagram was send
+     *
+     * Add @ref SOCK_AUX_GET_TIMESTAMP to the bitmask in
+     * @ref sock_udp_aux_tx_t::flags to request a transmission timestamp. This
+     * bit will be cleared by @ref sock_udp_send_aux if and only if the
+     * timestamp was provided. The module `sock_aux_timestamp` needs to be
+     * selected to use this. The timestamp refers to the transmission of start
+     * of frame delimiter or preamble of the frame carrying the datagram and is
+     * given in nanoseconds since epoch, unless otherwise documented by the
+     * underlying implementation.
+     */
+    uint64_t timestamp;
+#endif /* MODULE_SOCK_AUX_TIMESTAP*/
+    sock_aux_flags_t flags; /**< Flags used request information */
+} sock_udp_aux_tx_t;
+
+/**
  * @brief   Creates a new UDP sock object
  *
  * @pre `(sock != NULL)`
@@ -393,6 +438,8 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep);
  *                      data is available).
  * @param[out] remote   Remote end point of the received data.
  *                      May be `NULL`, if it is not required by the application.
+ * @param[out] aux      Auxiliary data about the received datagram.
+ *                      May be `NULL`, if it is not required by the application.
  *
  * @note    Function blocks if no packet is currently waiting.
  *
@@ -409,8 +456,95 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep);
  *          the remote of @p sock.
  * @return  -ETIMEDOUT, if @p timeout expired.
  */
-ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
-                      uint32_t timeout, sock_udp_ep_t *remote);
+ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
+                          uint32_t timeout, sock_udp_ep_t *remote,
+                          sock_udp_aux_rx_t *aux);
+
+/**
+ * @brief   Receives a UDP message from a remote end point
+ *
+ * @pre `(sock != NULL) && (data != NULL) && (max_len > 0)`
+ *
+ * @param[in] sock      A UDP sock object.
+ * @param[out] data     Pointer where the received data should be stored.
+ * @param[in] max_len   Maximum space available at @p data.
+ * @param[in] timeout   Timeout for receive in microseconds.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be @ref SOCK_NO_TIMEOUT for no timeout (wait until
+ *                      data is available).
+ * @param[out] remote   Remote end point of the received data.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @note    Function blocks if no packet is currently waiting.
+ *
+ * @return  The number of bytes received on success.
+ * @return  0, if no received data is available, but everything is in order.
+ * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
+ * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
+ *          initialized (or closed while sock_udp_recv() blocks).
+ * @return  -ENOBUFS, if buffer space is not large enough to store received
+ *          data.
+ * @return  -ENOMEM, if no memory was available to receive @p data.
+ * @return  -EPROTO, if source address of received packet did not equal
+ *          the remote of @p sock.
+ * @return  -ETIMEDOUT, if @p timeout expired.
+ */
+static inline ssize_t sock_udp_recv(sock_udp_t *sock,
+                                    void *data, size_t max_len,
+                                    uint32_t timeout, sock_udp_ep_t *remote)
+{
+    return sock_udp_recv_aux(sock, data, max_len, timeout, remote, NULL);
+}
+
+/**
+ * @brief   Provides stack-internal buffer space containing a UDP message from
+ *          a remote end point
+ *
+ * @pre `(sock != NULL) && (data != NULL) && (buf_ctx != NULL)`
+ *
+ * @param[in] sock      A UDP sock object.
+ * @param[out] data     Pointer to a stack-internal buffer space containing the
+ *                      received data.
+ * @param[in,out] buf_ctx  Stack-internal buffer context. If it points to a
+ *                      `NULL` pointer, the stack returns a new buffer space
+ *                      for a new packet. If it does not point to a `NULL`
+ *                      pointer, an existing context is assumed to get a next
+ *                      segment in a buffer.
+ * @param[in] timeout   Timeout for receive in microseconds.
+ *                      If 0 and no data is available, the function returns
+ *                      immediately.
+ *                      May be @ref SOCK_NO_TIMEOUT for no timeout (wait until
+ *                      data is available).
+ * @param[out] remote   Remote end point of the received data.
+ *                      May be `NULL`, if it is not required by the application.
+ * @param[out] aux      Auxiliary data about the received datagram.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @experimental    This function is quite new, not implemented for all stacks
+ *                  yet, and may be subject to sudden API changes. Do not use in
+ *                  production if this is unacceptable.
+ *
+ * @note    Function blocks if no packet is currently waiting.
+ *
+ * @return  The number of bytes received on success. May not be the complete
+ *          payload. Continue calling with the returned `buf_ctx` to get more
+ *          buffers until result is 0 or an error.
+ * @return  0, if no received data is available, but everything is in order.
+ *          If @p buf_ctx was provided, it was released.
+ * @return  -EADDRNOTAVAIL, if local of @p sock is not given.
+ * @return  -EAGAIN, if @p timeout is `0` and no data is available.
+ * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
+ *          initialized (or closed while sock_udp_recv() blocks).
+ * @return  -ENOMEM, if no memory was available to receive @p data.
+ * @return  -EPROTO, if source address of received packet did not equal
+ *          the remote of @p sock.
+ * @return  -ETIMEDOUT, if @p timeout expired.
+ */
+ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
+                              uint32_t timeout, sock_udp_ep_t *remote,
+                              sock_udp_aux_rx_t *aux);
 
 /**
  * @brief   Provides stack-internal buffer space containing a UDP message from
@@ -454,8 +588,51 @@ ssize_t sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len,
  *          the remote of @p sock.
  * @return  -ETIMEDOUT, if @p timeout expired.
  */
-ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
-                          uint32_t timeout, sock_udp_ep_t *remote);
+static inline ssize_t sock_udp_recv_buf(sock_udp_t *sock,
+                                        void **data, void **buf_ctx,
+                                        uint32_t timeout,
+                                        sock_udp_ep_t *remote)
+{
+    return sock_udp_recv_buf_aux(sock, data, buf_ctx, timeout, remote, NULL);
+}
+
+/**
+ * @brief   Sends a UDP message to remote end point
+ *
+ * @pre `((sock != NULL || remote != NULL)) && (if (len != 0): (data != NULL))`
+ *
+ * @param[in] sock      A UDP sock object. May be `NULL`.
+ *                      A sensible local end point should be selected by the
+ *                      implementation in that case.
+ * @param[in] data      Pointer where the received data should be stored.
+ *                      May be `NULL` if `len == 0`.
+ * @param[in] len       Maximum space available at @p data.
+ * @param[in] remote    Remote end point for the sent data.
+ *                      May be `NULL`, if @p sock has a remote end point.
+ *                      sock_udp_ep_t::family may be AF_UNSPEC, if local
+ *                      end point of @p sock provides this information.
+ *                      sock_udp_ep_t::port may not be 0.
+ * @param[out] aux      Auxiliary data about the transmission.
+ *                      May be `NULL`, if it is not required by the application.
+ *
+ * @return  The number of bytes sent on success.
+ * @return  -EADDRINUSE, if `sock` has no local end-point or was `NULL` and the
+ *          pool of available ephemeral ports is depleted.
+ * @return  -EAFNOSUPPORT, if `remote != NULL` and sock_udp_ep_t::family of
+ *          @p remote is != AF_UNSPEC and not supported.
+ * @return  -EHOSTUNREACH, if @p remote or remote end point of @p sock is not
+ *          reachable.
+ * @return  -EINVAL, if sock_udp_ep_t::addr of @p remote is an invalid address.
+ * @return  -EINVAL, if sock_udp_ep_t::netif of @p remote is not a valid
+ *          interface or contradicts the given local interface (i.e.
+ *          neither the local end point of `sock` nor remote are assigned to
+ *          `SOCK_ADDR_ANY_NETIF` but are nevertheless different.
+ * @return  -EINVAL, if sock_udp_ep_t::port of @p remote is 0.
+ * @return  -ENOMEM, if no memory was available to send @p data.
+ * @return  -ENOTCONN, if `remote == NULL`, but @p sock has no remote end point.
+ */
+ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
+                          const sock_udp_ep_t *remote, sock_udp_aux_tx_t *aux);
 
 /**
  * @brief   Sends a UDP message to remote end point
@@ -490,8 +667,12 @@ ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,
  * @return  -ENOMEM, if no memory was available to send @p data.
  * @return  -ENOTCONN, if `remote == NULL`, but @p sock has no remote end point.
  */
-ssize_t sock_udp_send(sock_udp_t *sock, const void *data, size_t len,
-                      const sock_udp_ep_t *remote);
+static inline ssize_t sock_udp_send(sock_udp_t *sock,
+                                    const void *data, size_t len,
+                                    const sock_udp_ep_t *remote)
+{
+    return sock_udp_send_aux(sock, data, len, remote, NULL);
+}
 
 #include "sock_types.h"
 

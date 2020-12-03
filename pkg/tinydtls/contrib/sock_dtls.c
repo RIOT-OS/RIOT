@@ -351,9 +351,11 @@ void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote)
     dtls_close(sock->dtls_ctx, &remote->dtls_session);
 }
 
-ssize_t sock_dtls_send(sock_dtls_t *sock, sock_dtls_session_t *remote,
-                       const void *data, size_t len, uint32_t timeout)
+ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
+                           const void *data, size_t len, uint32_t timeout,
+                           sock_dtls_aux_tx_t *aux)
 {
+    (void)aux;
     int res;
 
     assert(sock);
@@ -509,9 +511,11 @@ static ssize_t _complete_handshake(sock_dtls_t *sock,
     return -SOCK_DTLS_HANDSHAKE;
 }
 
-ssize_t sock_dtls_recv(sock_dtls_t *sock, sock_dtls_session_t *remote,
-                       void *data, size_t max_len, uint32_t timeout)
+ssize_t sock_dtls_recv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
+                           void *data, size_t max_len, uint32_t timeout,
+                           sock_dtls_aux_rx_t *aux)
 {
+    (void)aux;
     assert(sock);
     assert(data);
     assert(remote);

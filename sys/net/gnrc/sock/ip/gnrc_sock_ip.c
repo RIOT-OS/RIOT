@@ -87,8 +87,9 @@ int sock_ip_get_remote(sock_ip_t *sock, sock_ip_ep_t *remote)
     return 0;
 }
 
-ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
-                     uint32_t timeout, sock_ip_ep_t *remote)
+ssize_t sock_ip_recv_aux(sock_ip_t *sock, void *data, size_t max_len,
+                         uint32_t timeout, sock_ip_ep_t *remote,
+                         sock_ip_aux_rx_t *aux)
 {
     void *pkt = NULL, *ctx = NULL;
     uint8_t *ptr = data;
@@ -96,7 +97,7 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
     bool nobufs = false;
 
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
-    while ((res = sock_ip_recv_buf(sock, &pkt, &ctx, timeout, remote)) > 0) {
+    while ((res = sock_ip_recv_buf_aux(sock, &pkt, &ctx, timeout, remote, aux)) > 0) {
         if (res > (ssize_t)max_len) {
             nobufs = true;
             continue;
@@ -108,9 +109,11 @@ ssize_t sock_ip_recv(sock_ip_t *sock, void *data, size_t max_len,
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }
 
-ssize_t sock_ip_recv_buf(sock_ip_t *sock, void **data, void **buf_ctx,
-                         uint32_t timeout, sock_ip_ep_t *remote)
+ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **buf_ctx,
+                             uint32_t timeout, sock_ip_ep_t *remote,
+                             sock_ip_aux_rx_t *aux)
 {
+    (void)aux;
     gnrc_pktsnip_t *pkt;
     sock_ip_ep_t tmp;
     int res;
@@ -149,9 +152,11 @@ ssize_t sock_ip_recv_buf(sock_ip_t *sock, void **data, void **buf_ctx,
     return res;
 }
 
-ssize_t sock_ip_send(sock_ip_t *sock, const void *data, size_t len,
-                     uint8_t proto, const sock_ip_ep_t *remote)
+ssize_t sock_ip_send_aux(sock_ip_t *sock, const void *data, size_t len,
+                         uint8_t proto, const sock_ip_ep_t *remote,
+                         sock_ip_aux_tx_t *aux)
 {
+    (void)aux;
     int res;
     gnrc_pktsnip_t *pkt;
     sock_ip_ep_t local;

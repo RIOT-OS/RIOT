@@ -245,6 +245,61 @@ struct _sock_tl_ep {
     uint16_t port;          /**< transport layer port (in host byte order) */
 };
 
+/**
+ * @brief   Flags used to request auxiliary data
+ */
+enum {
+    /**
+     * @brief   Flag to request the local address/endpoint
+     *
+     * @note    Select module `sock_aux_local` and a compatible network stack
+     *          to use this
+     *
+     * This is the address/endpoint the packet/datagram/segment was received on.
+     * This flag will be cleared if the network stack stored the local
+     * address/endpoint as requested, otherwise the bit remains set.
+     *
+     * Depending on the family of the socket, the timestamp will be stored in
+     * @ref sock_udp_aux_rx_t::local, @ref sock_ip_aux_rx_t::local, or in
+     * @ref sock_dtls_aux_rx_t::local.
+     */
+    SOCK_AUX_GET_LOCAL = (1LU << 0),
+    /**
+     * @brief   Flag to request the time stamp of transmission / reception
+     *
+     * @note    Select module `sock_aux_timestamp` and a compatible network
+     *          stack to use this
+     *
+     * Unless otherwise noted, the time stamp is the current system time in
+     * nanoseconds on which the start of frame delimiter or preamble was
+     * sent / received.
+     *
+     * Set this flag in the auxiliary data structure prior to the call of
+     * @ref sock_udp_recv_aux / @ref sock_udp_send_aux / @ref sock_ip_recv_aux
+     * / etc. to request the time stamp of reception / transmission. This flag
+     * will be cleared if the timestamp was stored, otherwise it remains set.
+     *
+     * Depending on the family of the socket, the timestamp will be stored in
+     * for reception in @ref sock_udp_aux_rx_t::timestamp,
+     * @ref sock_ip_aux_rx_t::timestamp, or @ref sock_dtls_aux_rx_t::timestamp.
+     * For transmission it will be stored in @ref sock_udp_aux_tx_t::timestamp,
+     * @ref sock_ip_aux_tx_t::timestamp, or @ref sock_dtls_aux_tx_t::timestamp.
+     */
+    SOCK_AUX_GET_TIMESTAMP = (1LU << 1),
+};
+
+/**
+ * @brief   Type holding the flags used to request specific auxiliary data
+ *
+ * This is a bitmask of `SOCK_AUX_GET_...`, e.g. if the mask contains
+ * @ref SOCK_AUX_GET_LOCAL, the local address/endpoint is requested
+ *
+ * @details The underlying type can be changed without further notice, if more
+ *          flags are needed. Thus, only the `typedef`ed type should be used
+ *          to store the flags.
+ */
+typedef uint8_t sock_aux_flags_t;
+
 #ifdef __cplusplus
 }
 #endif
