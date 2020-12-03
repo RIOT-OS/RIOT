@@ -3,14 +3,17 @@ CPU_MODEL = stm32f767zi
 
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_dma
+FEATURES_PROVIDED += periph_eth
 FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_ptp
+FEATURES_PROVIDED += periph_ptp_speed_adjustment
+FEATURES_PROVIDED += periph_ptp_timer
 FEATURES_PROVIDED += periph_rtc
 FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
 FEATURES_PROVIDED += periph_usbdev
-FEATURES_PROVIDED += periph_eth
 
 # Put other features for this board (in alphabetical order)
 FEATURES_PROVIDED += riotboot

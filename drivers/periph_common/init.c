@@ -46,6 +46,9 @@
 #ifdef MODULE_PERIPH_INIT_WDT
 #include "periph/wdt.h"
 #endif
+#ifdef MODULE_PERIPH_INIT_PTP
+#include "periph/ptp.h"
+#endif
 #endif /* MODULE_PERIPH_INIT */
 
 void periph_init(void)
@@ -90,6 +93,10 @@ void periph_init(void)
 
 #if defined(MODULE_PERIPH_INIT_WDT) && WDT_HAS_INIT
     wdt_init();
+#endif
+
+#if defined(MODULE_PERIPH_INIT_PTP)
+    ptp_init();
 #endif
 
 #endif /* MODULE_PERIPH_INIT */

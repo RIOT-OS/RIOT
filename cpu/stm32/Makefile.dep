@@ -32,4 +32,8 @@ ifneq (,$(filter periph_can,$(FEATURES_USED)))
   FEATURES_REQUIRED += periph_gpio_irq
 endif
 
+ifneq (,$(filter periph_eth periph_ptp,$(USEMODULE)))
+  USEMODULE += periph_eth_common
+endif
+
 include $(RIOTCPU)/cortexm_common/Makefile.dep
