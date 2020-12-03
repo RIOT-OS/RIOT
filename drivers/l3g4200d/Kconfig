@@ -1,9 +1,17 @@
 # Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
+config MODULE_L3G4200D
+    bool "L3G4200D gyroscope"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+
 menuconfig KCONFIG_USEMODULE_L3G4200D
     bool "Configure L3G4200D driver"
     depends on USEMODULE_L3G4200D
