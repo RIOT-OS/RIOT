@@ -2,4 +2,4 @@
 include $(RIOTBOARD)/common/nucleo32/Makefile.include
 
 # Reduce default thread stack size so that it fits in the only 2kB of RAM
-CFLAGS += -DTHREAD_STACKSIZE_DEFAULT=512
+CFLAGS += -DCPU_TINY_DEFAULT_STACK=1
