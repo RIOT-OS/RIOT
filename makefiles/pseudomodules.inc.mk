@@ -218,6 +218,12 @@ PSEUDOMODULES += sdp3x_irq
 PSEUDOMODULES += sx1272
 PSEUDOMODULES += sx1276
 
+# include variants of PCF857X drivers as pseudo modules
+PSEUDOMODULES += pcf857x_irq
+PSEUDOMODULES += pcf8574
+PSEUDOMODULES += pcf8574a
+PSEUDOMODULES += pcf8575
+
 # include variants of SHT1X drivers as pseudo modules
 PSEUDOMODULES += sht10
 PSEUDOMODULES += sht11

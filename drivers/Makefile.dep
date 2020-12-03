@@ -102,6 +102,10 @@ ifneq (,$(filter nrfmin,$(USEMODULE)))
   USEMODULE += netif
 endif
 
+ifneq (,$(filter pcf857%,$(USEMODULE)))
+  USEMODULE += pcf857x
+endif
+
 ifneq (,$(filter qmc5883l_%,$(USEMODULE)))
   USEMODULE += qmc5883l
 endif
