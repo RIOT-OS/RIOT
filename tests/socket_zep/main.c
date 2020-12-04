@@ -52,7 +52,7 @@ static void test_init(void)
 
     printf("Initializing socket ZEP with (local: [%s]:%s, remote: [%s]:%s)\n",
            p->local_addr, p->local_port, p->remote_addr, p->remote_port);
-    socket_zep_setup(&_dev, p);
+    socket_zep_setup(&_dev, p, 0);
     netdev->event_callback = _event_cb;
     expect(netdev->driver->init(netdev) >= 0);
     _print_info(netdev);

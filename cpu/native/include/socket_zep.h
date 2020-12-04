@@ -98,8 +98,10 @@ typedef struct {
  *
  * @param[in] dev       the preallocated socket_zep_t device handle to setup
  * @param[in] params    initialization parameters
+ * @param[in] index     index of @p params in a global parameter struct array.
+ *                      If initialized manually, pass a unique identifier instead.
  */
-void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params);
+void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params, uint8_t index);
 
 /**
  * @brief Cleanup socket resources

@@ -408,7 +408,7 @@ static void _send_zep_hello(socket_zep_t *dev)
     }
 }
 
-void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params)
+void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params, uint8_t index)
 {
     int res;
 
@@ -417,6 +417,8 @@ void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params)
 
     memset(dev, 0, sizeof(socket_zep_t));
     dev->netdev.netdev.driver = &socket_zep_driver;
+
+    netdev_register(&dev->netdev.netdev, NETDEV_SOCKET_ZEP, index);
 
     res = _bind_local(params);
 
