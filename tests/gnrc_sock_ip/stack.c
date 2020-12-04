@@ -41,9 +41,10 @@ void _prepare_send_checks(void)
 static gnrc_pktsnip_t *_build_ipv6_packet(const ipv6_addr_t *src,
                                           const ipv6_addr_t *dst, uint8_t nh,
                                           void *data, size_t data_len,
-                                          uint16_t netif)
+                                          uint16_t netif,
+                                          const inject_aux_t *aux)
 {
-    gnrc_pktsnip_t *netif_hdr, *ipv6, *payload;
+    gnrc_pktsnip_t *netif_hdr_snip, *ipv6, *payload;
     ipv6_hdr_t *ipv6_hdr;
 
     if ((netif > INT16_MAX) || (data_len > UINT16_MAX)) {
@@ -63,21 +64,25 @@ static gnrc_pktsnip_t *_build_ipv6_packet(const ipv6_addr_t *src,
     ipv6_hdr->nh = nh;
     ipv6_hdr->hl = 64;
     payload = gnrc_pkt_append(payload, ipv6);
-    netif_hdr = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
-    if (netif_hdr == NULL) {
+    netif_hdr_snip = gnrc_netif_hdr_build(NULL, 0, NULL, 0);
+    if (netif_hdr_snip == NULL) {
         return NULL;
     }
-    ((gnrc_netif_hdr_t *)netif_hdr->data)->if_pid = (kernel_pid_t)netif;
-    return gnrc_pkt_append(payload, netif_hdr);
+    gnrc_netif_hdr_t *netif_hdr = netif_hdr_snip->data;
+    netif_hdr->if_pid = (kernel_pid_t)netif;
+    if (aux) {
+        gnrc_netif_hdr_set_timestamp(netif_hdr, aux->timestamp);
+    }
+    return gnrc_pkt_append(payload, netif_hdr_snip);
 }
 
 
-bool _inject_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
-                    uint8_t proto, void *data, size_t data_len,
-                    uint16_t netif)
+bool _inject_packet_aux(const ipv6_addr_t *src, const ipv6_addr_t *dst,
+                        uint8_t proto, void *data, size_t data_len,
+                        uint16_t netif, const inject_aux_t *aux)
 {
     gnrc_pktsnip_t *pkt = _build_ipv6_packet(src, dst, proto, data, data_len,
-                                             netif);
+                                             netif, aux);
 
     if (pkt == NULL) {
         return false;

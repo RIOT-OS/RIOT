@@ -349,13 +349,16 @@ static void test_sock_ip_recv__aux(void)
     static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR_REMOTE };
     static const ipv6_addr_t dst_addr = { .u8 = _TEST_ADDR_LOCAL };
     static const sock_ip_ep_t local = { .family = AF_INET6 };
+    static const inject_aux_t inject_aux = { .timestamp = 42 };
     sock_ip_ep_t result;
-    sock_ip_aux_rx_t aux = { .flags = SOCK_AUX_GET_LOCAL };
+    sock_ip_aux_rx_t aux = {
+        .flags = SOCK_AUX_GET_LOCAL | SOCK_AUX_GET_TIMESTAMP
+    };
 
     expect(0 == sock_ip_create(&_sock, &local, NULL, _TEST_PROTO,
                                SOCK_FLAGS_REUSE_EP));
-    expect(_inject_packet(&src_addr, &dst_addr, _TEST_PROTO, "ABCD",
-                          sizeof("ABCD"), _TEST_NETIF));
+    expect(_inject_packet_aux(&src_addr, &dst_addr, _TEST_PROTO, "ABCD",
+                              sizeof("ABCD"), _TEST_NETIF, &inject_aux));
     expect(sizeof("ABCD") == sock_ip_recv_aux(&_sock, _test_buffer,
                                               sizeof(_test_buffer), 0, &result,
                                               &aux));
@@ -367,6 +370,12 @@ static void test_sock_ip_recv__aux(void)
     expect(memcmp(&aux.local.addr, &dst_addr, sizeof(dst_addr)) == 0);
 #else
     expect(aux.flags & SOCK_AUX_GET_LOCAL);
+#endif
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+    expect(!(aux.flags & SOCK_AUX_GET_TIMESTAMP));
+    expect(aux.timestamp == inject_aux.timestamp);
+#else
+    expect(aux.flags & SOCK_AUX_GET_TIMESTAMP);
 #endif
     expect(_check_net());
 }

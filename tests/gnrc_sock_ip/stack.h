@@ -40,6 +40,31 @@ void _net_init(void);
 void _prepare_send_checks(void);
 
 /**
+ * @brief   Structure containing auxiliary data to inject
+ */
+typedef struct {
+    uint64_t timestamp;     /**< Timestamp of reception */
+} inject_aux_t;
+
+/**
+ * @brief   Injects a received IPv6 packet into the stack
+ *
+ * @param[in] src       The source address of the IPv6 packet
+ * @param[in] dst       The destination address of the IPv6 packet
+ * @param[in] proto     The next header field of the IPv6 packet
+ * @param[in] data      The payload of the IPv6 packet
+ * @param[in] data_len  The payload length of the IPv6 packet
+ * @param[in] netif     The interface the packet came over
+ * @param[in] aux       Auxiliary data to inject
+ *
+ * @return  true, if packet was successfully injected
+ * @return  false, if an error occurred during injection
+ */
+bool _inject_packet_aux(const ipv6_addr_t *src, const ipv6_addr_t *dst,
+                        uint8_t proto, void *data, size_t data_len,
+                        uint16_t netif, const inject_aux_t *aux);
+
+/**
  * @brief   Injects a received IPv6 packet into the stack
  *
  * @param[in] src       The source address of the IPv6 packet
@@ -52,9 +77,13 @@ void _prepare_send_checks(void);
  * @return  true, if packet was successfully injected
  * @return  false, if an error occurred during injection
  */
-bool _inject_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
-                    uint8_t proto, void *data, size_t data_len,
-                    uint16_t netif);
+static inline bool _inject_packet(const ipv6_addr_t *src,
+                                  const ipv6_addr_t *dst,
+                                  uint8_t proto, void *data, size_t data_len,
+                                  uint16_t netif)
+{
+    return _inject_packet_aux(src, dst, proto, data, data_len, netif, NULL);
+}
 
 /**
  * @brief   Checks networking state (e.g. packet buffer state)
