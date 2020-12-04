@@ -128,11 +128,15 @@ extern "C" {
 #define LWIP_UDPLITE            0
 #endif /* MODULE_LWIP_UDPLITE */
 
-#if defined(MODULE_LWIP_SOCK)
+#if IS_USED(MODULE_LWIP_SOCK)
 #define LWIP_NETCONN            1
+#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+#define LWIP_NETBUF_RECVINFO    1
+#endif /* MODULE_SOCK_AUX_LOCAL */
 #else
 #define LWIP_NETCONN            0
-#endif
+#endif /* MODULE_LWIP_SOCK */
+
 
 #ifndef TCP_LISTEN_BACKLOG
 # if defined(MODULE_LWIP_SOCK_TCP)
