@@ -450,6 +450,15 @@ uint16_t usbus_add_string_descriptor(usbus_t *usbus, usbus_string_t *desc,
 uint16_t usbus_add_interface(usbus_t *usbus, usbus_interface_t *iface);
 
 /**
+ * @brief Add alternate settings to a given interface
+ *
+ * @param[in] iface   USB interface
+ * @param[in] alt     alternate settings interface to add
+ */
+void usbus_add_interface_alt(usbus_interface_t *iface,
+                                 usbus_interface_alt_t *alt);
+
+/**
  * @brief Find an endpoint from an interface based on the endpoint properties
  *
  * This iterates over the endpoints in an interface and will return the first
