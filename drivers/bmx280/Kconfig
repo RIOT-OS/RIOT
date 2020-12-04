@@ -8,6 +8,7 @@
 choice
     bool "BMx280 Temperature, pressure and humidity sensors"
     optional
+    depends on TEST_KCONFIG
     help
         The driver supports both BME280 and BMP280 connected either via SPI or
         I2C bus. Select one combination.
