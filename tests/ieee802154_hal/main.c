@@ -34,6 +34,8 @@
 
 #include "xtimer.h"
 
+#include "cond.h"
+
 #define SYMBOL_TIME (16U) /**< 16 us */
 
 #define ACK_TIMEOUT_TIME (40 * SYMBOL_TIME)
@@ -55,8 +57,11 @@ static uint16_t received_packets;
 static uint8_t buffer[127];
 static xtimer_t timer_ack;
 static mutex_t lock;
+static mutex_t got_message_mutex;
 static bool send_reply;
 static bool enable_prints;
+static cond_t got_message_cond;
+static bool got_message;
 
 static const char *str_states[3]= {"TRX_OFF", "RX", "TX"};
 static ieee802154_rx_mode_t current_rx_mode;
@@ -73,6 +78,12 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
         received_acks++;
     }
     else {
+        got_message = true;
+        //check if packet is for me (test)
+        //lock;
+        //post an event;
+        //unlock;
+        cond_signal(&got_message_cond);
         if (enable_prints) {
             puts("Packet received:");
             for (unsigned i=0;i<size;i++) {
@@ -501,16 +512,7 @@ static int rx_mode_cmd(int argc, char **argv)
     return 0;
 }
 
-int config_phy(int argc, char **argv)
-{
-    if (argc < 3) {
-        puts("Usage: config_phy <channel> <tx_pow>");
-        return 1;
-    }
-
-    uint8_t channel = atoi(argv[1]);
-    int8_t tx_pow = atoi(argv[2]);
-
+int _config_phy(uint8_t channel, int8_t tx_pow) {
     if (channel < 11 || channel > 26) {
         puts("Wrong channel configuration (11 <= channel <= 26).");
         return 1;
@@ -522,10 +524,25 @@ int config_phy(int argc, char **argv)
         puts("Channel or TX power settings not supported");
     }
     else {
-        puts("Success!");
+        printf("Success! Channel: %d was selected\n", channel);
     }
 
     _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
+
+    return 0;
+}
+
+int config_phy(int argc, char **argv)
+{
+    if (argc < 3) {
+        puts("Usage: config_phy <channel> <tx_pow>");
+        return 1;
+    }
+
+    uint8_t channel = atoi(argv[1]);
+    int8_t tx_pow = atoi(argv[2]);
+
+    _config_phy(channel, tx_pow);
 
     return 0;
 }
@@ -746,6 +763,47 @@ int txtspam(int argc, char **argv)
     return _spam(addr, res, len, num, time);
 }
 
+int test_channels(int argc, char **argv) {
+    if (argc != 3) {
+        puts("Usage: test_channels <long_addr>");
+        return 1;
+    }
+
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+    size_t res;
+    res = _parse_addr(addr, sizeof(addr), argv[1]);
+    if (res == 0) {
+        puts("Usage: test_channels <long_addr>");
+        return 1;
+    };
+
+    size_t sender = atoi(argv[2]);
+    if (sender) {
+        puts("Testing as sender");
+    } else {
+        puts("Testing as receiver");
+    }
+    for (uint8_t i = 11; i <= 26; i++) {
+        if (sender) {
+            xtimer_msleep(100);
+            _config_phy(i, 0);
+            send(addr,res, 5);
+        }
+        if (!sender) {
+            _config_phy(i, 0);
+            mutex_lock(&got_message_mutex);
+            while (!got_message) {
+                cond_wait(&got_message_cond, &got_message_mutex);
+            }
+            got_message = false;
+            mutex_unlock(&got_message_mutex);
+        }
+    }
+
+    puts("Test finished");
+    return 0;
+}
+
 int toggle_reply(int argc, char **argv) {
     (void)argv[0];
     (void)argc;
@@ -788,6 +846,7 @@ static const shell_command_t shell_commands[] = {
     { "spam", "Sends many packets to the target", txtspam },
     { "reply", "Every packet that arrives is mirrored", toggle_reply },
     { "enable_prints", "Enable printing", toggle_enable_prints },
+    { "test_channels", "It tries to transmit and receive on different channels", test_channels },
     { NULL, NULL, NULL }
 };
 
@@ -795,6 +854,8 @@ int main(void)
 {
     mutex_init(&lock);
     mutex_lock(&lock);
+    mutex_init(&got_message_mutex);
+    cond_init(&got_message_cond);
     _init();
 
     /* start the shell */
