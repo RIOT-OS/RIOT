@@ -433,30 +433,9 @@ void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params, uint
         _send_zep_hello(dev);
     }
 
-    /* generate hardware address from local address */
-    uint8_t ss_array[sizeof(struct sockaddr_storage)] = { 0 };
-    socklen_t ss_len = sizeof(struct sockaddr_storage);
+    /* setup hardware address */
+    netdev_ieee802154_setup(&dev->netdev);
 
-    if (getpeername(dev->sock_fd, (struct sockaddr *)&ss_array, &ss_len) < 0) {
-        err(EXIT_FAILURE, "ZEP: Unable to retrieve remote address");
-    }
-    assert(ss_len >= IEEE802154_LONG_ADDRESS_LEN);
-    if (getsockname(dev->sock_fd, (struct sockaddr *)&ss_array, &ss_len) < 0) {
-        err(EXIT_FAILURE, "ZEP: Unable to retrieve local address");
-    }
-    assert(ss_len >= IEEE802154_LONG_ADDRESS_LEN);
-
-    /* generate hardware address from socket address and port info */
-    dev->netdev.long_addr[1] = 'Z';     /* The "OUI" */
-    dev->netdev.long_addr[2] = 'E';
-    dev->netdev.long_addr[3] = 'P';
-    for (unsigned i = 0; i < ss_len; i++) { /* generate NIC from local source */
-        unsigned addr_idx = (i % (IEEE802154_LONG_ADDRESS_LEN / 2)) +
-                            (IEEE802154_LONG_ADDRESS_LEN / 2);
-        dev->netdev.long_addr[addr_idx] ^= ss_array[i];
-    }
-    dev->netdev.short_addr[0] = dev->netdev.long_addr[6];
-    dev->netdev.short_addr[1] = dev->netdev.long_addr[7];
     native_async_read_setup();
     native_async_read_add_handler(dev->sock_fd, dev, _socket_isr);
 }
