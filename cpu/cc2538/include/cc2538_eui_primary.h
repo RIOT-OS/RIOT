@@ -33,12 +33,14 @@ extern "C" {
  *
  * @param arg       unused
  * @param[out] addr The EUI-64
+ * @param index     unused
  *
  * @return  0
  */
-static inline int cc2538_get_eui64_primary(const void *arg, eui64_t *addr)
+static inline int cc2538_get_eui64_primary(const void *arg, eui64_t *addr, uint8_t index)
 {
     (void) arg;
+    (void) index;
 
     /*
      * The primary EUI-64 seems to be written to memory in a non-sequential

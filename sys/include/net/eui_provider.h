@@ -108,24 +108,26 @@ extern "C" {
  *
  * @param[in]   arg     Optional argument provided by eui48_conf_t
  * @param[out]  addr    Destination pointer for the EUI-48 address
+ * @param[in]   index   index of the netdev
  *
  * @return      0 on success, next provider in eui48_conf_t will be
  *              used otherwise.
  *              Will fall back to @see luid_get_eui48 eventually.
  */
-typedef int (*netdev_get_eui48_cb_t)(const void *arg, eui48_t *addr);
+typedef int (*netdev_get_eui48_cb_t)(const void *arg, eui48_t *addr, uint8_t index);
 
 /**
  * @brief   Function for providing a EUI-64 to a device
  *
  * @param[in]   arg     Optional argument provided by eui64_conf_t
  * @param[out]  addr    Destination pointer for the EUI-64 address
+ * @param[in]   index   index of the netdev
  *
  * @return      0 on success, next provider in eui64_conf_t will be
  *              used otherwise.
  *              Will fall back to @see luid_get_eui64 eventually.
  */
-typedef int (*netdev_get_eui64_cb_t)(const void *arg, eui64_t *addr);
+typedef int (*netdev_get_eui64_cb_t)(const void *arg, eui64_t *addr, uint8_t index);
 
 /**
  * @brief Structure to hold providers for EUI-48 addresses

@@ -48,8 +48,10 @@ extern "C" {
 /**
  * @brief    AT24Mac provides a EUI-48
  */
-static inline int _at24mac_get_eui48(const void *arg, eui48_t *addr)
+static inline int _at24mac_get_eui48(const void *arg, eui48_t *addr, uint8_t index)
 {
+    (void) index;
+
     return at24mac_get_eui48((uintptr_t)arg, addr);
 }
 

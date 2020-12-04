@@ -62,9 +62,10 @@ extern "C" {
 /**
  * @brief    EDBG provides a EUI-64, the same that is printed on the board
  */
-static inline int _edbg_get_eui64(const void *arg, eui64_t *addr)
+static inline int _edbg_get_eui64(const void *arg, eui64_t *addr, uint8_t index)
 {
     (void) arg;
+    (void) index;
 
     /* EDBG can take a while to respond on cold boot */
     unsigned tries = 10000;

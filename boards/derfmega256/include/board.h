@@ -37,9 +37,10 @@ extern "C" {
 /**
  * @brief    Constant in EEPROM provides a EUI-64, this is also printed on the board
  */
-static inline int _eeprom_mac_get_eui64(const void *arg, eui64_t *addr)
+static inline int _eeprom_mac_get_eui64(const void *arg, eui64_t *addr, uint8_t index)
 {
     (void) arg;
+    (void) index;
 
     if (eeprom_read(EEPROM_MAC_ADDR, addr, sizeof(eui64_t)) != sizeof(eui64_t)) {
         return -1;

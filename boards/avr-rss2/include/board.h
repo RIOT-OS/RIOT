@@ -41,8 +41,10 @@ extern "C" {
 /**
  * @brief    AT24Mac provides a EUI-64, this is also printed on the board
  */
-static inline int _at24mac_get_eui64(const void *arg, eui64_t *addr)
+static inline int _at24mac_get_eui64(const void *arg, eui64_t *addr, uint8_t index)
 {
+    (void) index;
+
     return at24mac_get_eui64((uintptr_t)arg, addr);
 }
 
