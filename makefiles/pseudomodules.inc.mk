@@ -43,6 +43,7 @@ PSEUDOMODULES += gnrc_netapi_callbacks
 PSEUDOMODULES += gnrc_netapi_mbox
 PSEUDOMODULES += gnrc_netif_bus
 PSEUDOMODULES += gnrc_netif_events
+PSEUDOMODULES += gnrc_netif_timestamp
 PSEUDOMODULES += gnrc_pktbuf_cmd
 PSEUDOMODULES += gnrc_netif_6lo
 PSEUDOMODULES += gnrc_netif_ipv6

@@ -90,7 +90,7 @@ void gnrc_sock_create(gnrc_sock_reg_t *reg, gnrc_nettype_t type, uint32_t demux_
 
 ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
                        uint32_t timeout, sock_ip_ep_t *remote,
-                       gnrc_sock_recv_aux_t aux)
+                       gnrc_sock_recv_aux_t *aux)
 {
     /* only used when some sock_aux_% module is used */
     (void)aux;
@@ -154,9 +154,9 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
     memcpy(&remote->addr, &ipv6_hdr->src, sizeof(ipv6_addr_t));
     remote->family = AF_INET6;
 #if IS_USED(MODULE_SOCK_AUX_LOCAL)
-    if (aux.local != NULL) {
-        memcpy(&aux.local->addr, &ipv6_hdr->dst, sizeof(ipv6_addr_t));
-        aux.local->family = AF_INET6;
+    if (aux->local != NULL) {
+        memcpy(&aux->local->addr, &ipv6_hdr->dst, sizeof(ipv6_addr_t));
+        aux->local->family = AF_INET6;
     }
 #endif /* MODULE_SOCK_AUX_LOCAL */
     netif = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_NETIF);
@@ -167,6 +167,13 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
         gnrc_netif_hdr_t *netif_hdr = netif->data;
         /* TODO: use API in #5511 */
         remote->netif = (uint16_t)netif_hdr->if_pid;
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+        if (aux->timestamp != NULL) {
+            if (gnrc_netif_hdr_get_timestamp(netif_hdr, aux->timestamp) == 0) {
+                aux->flags |= GNRC_SOCK_RECV_AUX_FLAG_TIMESTAMP;
+            }
+        }
+#endif /* MODULE_SOCK_AUX_TIMESTAMP */
     }
     *pkt_out = pkt; /* set out parameter */
 
