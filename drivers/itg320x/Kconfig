@@ -16,6 +16,7 @@ menuconfig MODULE_ITG320X
 
 config MODULE_ITG320X_INT
     bool "Interrupt mode"
+    depends on MODULE_ITG320X
     depends on HAS_PERIPH_GPIO_IRQ
     select MODULE_PERIPH_GPIO_IRQ
     help
