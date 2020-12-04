@@ -11,6 +11,36 @@ on:
 jobs:
   static-tests:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - commit-msg
+          - whitespacecheck
+          - doccheck
+          - externc
+          - cppcheck
+          - vera++
+          - pr_check
+          - coccinelle
+          - flake8
+          - headerguards
+          - buildsystem_sanity_check
+          - codespell
+          - uncrustify
+        include:
+          - test: commit-msg
+            params: master_upstream
+          - test: pr_check
+            params: master_upstream
+          - test: whitespacecheck
+            params: master_upstream
+          - env: modified and renamed files
+            test: licenses
+            diff-filter: MR
+          - env: added and copied files
+            test: licenses
+            diff-filter: AC
     steps:
     - uses: actions/checkout@v2
       with:
@@ -26,9 +56,12 @@ jobs:
     - name: Fetch riot/riotbuild Docker image
       run: docker pull riot/riotbuild:latest
     - name: Run static-tests
+      env:
+        DIFFFILTER: ${{ matrix.diff_filter }}
       run: |
         docker run --rm                     \
-          -e CI_BASE_BRANCH=master_upstream \
+          -e BASE_BRANCH=master_upstream    \
           -v $(pwd):/data/riotbuild         \
           riot/riotbuild:latest             \
-          make static-test
+          /data/riotbuild/dist/tools/${{ matrix.test }}/check.sh \
+              ${{ matrix.params }}
