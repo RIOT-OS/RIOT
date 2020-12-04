@@ -84,6 +84,9 @@ netdev_tap_params_t netdev_tap_params[NETDEV_TAP_MAX];
 #ifdef MODULE_PERIPH_GPIO_LINUX
 #include "gpiodev_linux.h"
 #endif
+#ifdef MODULE_NATIVE_CLI_EUI_PROVIDER
+#include "native_cli_eui_provider.h"
+#endif
 #ifdef MODULE_SOCKET_ZEP
 #include "socket_zep_params.h"
 
@@ -106,6 +109,9 @@ static const char short_opts[] = ":hi:s:deEoc:"
 #endif
 #ifdef MODULE_SOCKET_ZEP
     "z:"
+#endif
+#ifdef MODULE_NATIVE_CLI_EUI_PROVIDER
+    "U:"
 #endif
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
     "p:"
@@ -132,6 +138,9 @@ static const struct option long_opts[] = {
 #endif
 #ifdef MODULE_SOCKET_ZEP
     { "zep", required_argument, NULL, 'z' },
+#endif
+#ifdef MODULE_NATIVE_CLI_EUI_PROVIDER
+    { "eui64", required_argument, NULL, 'U' },
 #endif
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
     { "spi", required_argument, NULL, 'p' },
@@ -281,6 +290,9 @@ void usage_exit(int status)
         real_printf(" -z <laddr>:<lport>,<raddr>:<rport>");
     }
 #endif
+#ifdef MODULE_NATIVE_CLI_EUI_PROVIDER
+    real_printf(" [--eui64 <eui64> …]");
+#endif
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
     real_printf(" [-p <b>:<d>:<spidev>]");
 #endif
@@ -323,6 +335,11 @@ void usage_exit(int status)
 "        The ZEP interface connects to the remote address and may listen\n"
 "        on a local address.\n"
 "        Required to be provided SOCKET_ZEP_MAX times\n"
+#endif
+#ifdef MODULE_NATIVE_CLI_EUI_PROVIDER
+"    -U <eui64>, --eui64=<eui64>\n"
+"        provide a ZEP interface with EUI-64 (MAC address)\n"
+"        This argument can be provided multiple times\n"
 #endif
     );
 #ifdef MODULE_MTD_NATIVE
@@ -414,6 +431,7 @@ static void _zep_params_setup(char *zep_str, int zep)
                       &socket_zep_params[zep].remote_port);
     }
 }
+
 #endif
 
 /** @brief Initialization function pointer type */
@@ -529,6 +547,11 @@ __attribute__((constructor)) static void startup(int argc, char **argv, char **e
 #ifdef MODULE_SOCKET_ZEP
             case 'z':
                 _zep_params_setup(optarg, zeps++);
+                break;
+#endif
+#ifdef MODULE_NATIVE_CLI_EUI_PROVIDER
+            case 'U':
+                native_cli_add_eui64(optarg);
                 break;
 #endif
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
