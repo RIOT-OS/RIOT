@@ -294,6 +294,7 @@ typedef struct usbus_interface_alt {
                                              descriptor generators */
     usbus_endpoint_t *ep;               /**< List of associated endpoints for
                                              this alternative setting */
+    usbus_string_t *descr;              /**< Descriptor string */
 } usbus_interface_alt_t;
 
 /**
