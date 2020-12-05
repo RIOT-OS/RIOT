@@ -223,6 +223,9 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
               uart_stop_bits_t stop_bits)
 {
+    if ((data_bits & UART_INVALID_MODE) || (parity & UART_INVALID_MODE)) {
+        return UART_NOMODE;
+    }
     /* Setup mode and enable USART. The values of the uart_data_bits_t,
      * uart_parity_t and uart_stop_bits_t enums were selected to match the
      * fields in this registers so there's no need to do any conversion. */

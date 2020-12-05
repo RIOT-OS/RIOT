@@ -43,9 +43,15 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF          ARRAY_SIZE(uart_config)
 /** @} */
 
+/**
+ * @name   Timer configuration
+ * @{
+ */
+#define TIMER_NUMOF           4
+/** @} */
+
 /* put here the board peripherals definitions:
    - Available clocks
-   - Timers
    - PWMs
    - SPIs
    - I2C

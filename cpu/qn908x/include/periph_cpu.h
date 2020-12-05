@@ -81,9 +81,9 @@ typedef uint16_t gpio_t;
  * clocks installed on the board. Figure out a way to configure this limit based
  * on the clock used.
  */
-#define NWDT_TIME_LOWER_LIMIT (0)
+#define NWDT_TIME_LOWER_LIMIT (1U)
 #define NWDT_TIME_UPPER_LIMIT (268435U)
-#define WWDT_TIME_LOWER_LIMIT (0)
+#define WWDT_TIME_LOWER_LIMIT (1U)
 #define WWDT_TIME_UPPER_LIMIT (268435U)
 /** @} */
 
@@ -127,6 +127,7 @@ typedef enum {
     GPIO_HIGH       = 1,    /**< emit interrupt when the value is high */
     GPIO_RISING     = 2,    /**< emit interrupt on rising flank */
     GPIO_FALLING    = 3,    /**< emit interrupt on falling flank */
+    GPIO_BOTH       = 4,    /**< not supported -- rising and falling flanks */
 } gpio_flank_t;
 /** @} */
 #endif /* ndef DOXYGEN */
@@ -139,6 +140,14 @@ enum {
     PORT_B  = 1,            /**< port B */
     GPIO_PORTS_NUMOF        /**< overall number of available ports */
 };
+
+/**
+ * @brief   CPU specific timer Counter/Timers (CTIMER) configuration
+ * @{
+ */
+#define TIMER_CHANNELS      (4)
+#define TIMER_MAX_VALUE     (0xffffffff)
+/** @} */
 
 /**
  * @brief UART module configuration options
@@ -154,6 +163,13 @@ typedef struct {
 } uart_conf_t;
 
 /**
+ * @brief   Invalid UART mode mask
+ *
+ * Signals that the mode is invalid or not supported by the CPU.
+ */
+#define UART_INVALID_MODE   (0x80)
+
+/**
  * @brief   Definition of possible parity modes
  *
  * These are defined to match the values of the USART->CFG : PARITYSEL bit
@@ -161,9 +177,11 @@ typedef struct {
  * @{
  */
 typedef enum {
-    UART_PARITY_NONE    = 0,    /**< no parity */
-    UART_PARITY_EVEN    = 2,    /**< even parity */
-    UART_PARITY_ODD     = 3,    /**< odd parity */
+    UART_PARITY_NONE = 0,                         /**< no parity */
+    UART_PARITY_EVEN = 2,                         /**< even parity */
+    UART_PARITY_ODD = 3,                          /**< odd parity */
+    UART_PARITY_MARK = 0x10 | UART_INVALID_MODE,  /**< mark parity */
+    UART_PARITY_SPACE = 0x20 | UART_INVALID_MODE, /**< space parity */
 } uart_parity_t;
 #define HAVE_UART_PARITY_T
 /** @} */
@@ -175,8 +193,10 @@ typedef enum {
  * @{
  */
 typedef enum {
-    UART_DATA_BITS_7    = 0,    /**< 7 data bits */
-    UART_DATA_BITS_8    = 1,    /**< 8 data bits */
+    UART_DATA_BITS_5 = 0x10 | UART_INVALID_MODE, /**< 5 data bits */
+    UART_DATA_BITS_6 = 0x20 | UART_INVALID_MODE, /**< 6 data bits */
+    UART_DATA_BITS_7 = 0,                        /**< 7 data bits */
+    UART_DATA_BITS_8 = 1,                        /**< 8 data bits */
     /* Note: There's a UART_DATA_BITS_9 possible in this hardware. */
 } uart_data_bits_t;
 #define HAVE_UART_DATA_BITS_T
