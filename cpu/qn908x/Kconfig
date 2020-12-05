@@ -13,6 +13,7 @@ config CPU_FAM_QN908X
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_RTC
     select HAS_PERIPH_WDT
     select HAS_PERIPH_WDT_CB
 
