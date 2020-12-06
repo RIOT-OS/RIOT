@@ -117,6 +117,9 @@ typedef struct {
  */
 #define TOTAL_GPIO_PINS     (35)
 
+/* The IRQ number in the NVIC for each GPIO port. */
+static const uint32_t gpio_nvic_irqs[GPIO_PORTS_NUMOF] = GPIO_IRQS;
+
 static gpio_isr_cb_state_t gpio_isr_state[TOTAL_GPIO_PINS] = {};
 
 int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
@@ -162,6 +165,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
             /* Handled above */
             break;
     }
+    NVIC_EnableIRQ(gpio_nvic_irqs[GPIO_T_PORT(pin)]);
     gpio_irq_enable(pin);
     return 0;
 }
