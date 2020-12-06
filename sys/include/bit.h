@@ -7,11 +7,11 @@
  */
 
 /**
- * @ingroup     cpu_cortexm_common
+ * @ingroup     sys
  * @{
  *
  * @file
- * @brief       Bit access macros for Cortex-M based CPUs
+ * @brief       Bit access macros with bit-banding support for Cortex-M based CPUs
  *
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  */
@@ -32,7 +32,7 @@ extern "C" {
 
 #if DOXYGEN
 /** @brief Flag for telling if the CPU has hardware bit band support */
-#define CPU_HAS_BITBAND 1 || 0 (1 for Cortex-M3 and up, 0 for Cortex-M0)
+#define CPU_HAS_BITBAND 1 || 0 (1 if CPU implements bit-banding, 0 if not)
 #endif
 
 #if CPU_HAS_BITBAND || DOXYGEN
