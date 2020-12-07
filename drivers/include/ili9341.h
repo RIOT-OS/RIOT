@@ -23,7 +23,7 @@
  * implemented here operates over SPI to communicate with the device.
  *
  * The device requires colors to be send in big endian RGB-565 format. The
- * @ref ILI9341_LE_MODE compile time option can switch this, but only use this
+ * @ref CONFIG_ILI9341_LE_MODE compile time option can switch this, but only use this
  * when strictly necessary. This option will slow down the driver as it
  * certainly can't use DMA anymore, every short has to be converted before
  * transfer.
@@ -52,28 +52,35 @@ extern "C" {
 /**
  * @brief ILI9341 gvdd level.
  *
- * Default GVDD voltage of 4.8V
+ * Default GVDD voltage of 4.8V. GVDD is reference level for the VCOM level and
+ * the grayscale voltage level. GVDD should be ≦ (AVDD - 0.5) V .
  */
-#ifndef ILI9341_GVDD
-#define ILI9341_GVDD    4800
+#ifndef CONFIG_ILI9341_GVDD
+#define CONFIG_ILI9341_GVDD             4800
 #endif
 
 /**
  * @brief ILI9341 VCOMH voltage level.
  *
- * Default VCOMH voltage of 4.25V
+ * Default VCOMH voltage of 4.25V. VCOMH represents the high level of VCOM AC
+ * voltage. VCOM levels needs to be adjusted to match the capacitance and
+ * performance specifications of the TFT panel to maximize contrast and minimize
+ * flickering.
  */
-#ifndef ILI9341_VCOMH
-#define ILI9341_VCOMH   4250
+#ifndef CONFIG_ILI9341_VCOMH
+#define CONFIG_ILI9341_VCOMH            4250
 #endif
 
 /**
  * @brief ILI9341 VCOML voltage level.
  *
- * Default VCOMH voltage of -2V
+ * Default VCOML voltage of -2V. VCOML represents the low level of VCOM AC
+ * voltage. VCOM levels needs to be adjusted to match the capacitance and
+ * performance specifications of the TFT panel to maximize contrast and minimize
+ * flickering
  */
-#ifndef ILI9341_VCOML
-#define ILI9341_VCOML   -2000
+#ifndef CONFIG_ILI9341_VCOML
+#define CONFIG_ILI9341_VCOML            -2000
 #endif
 
 /**
@@ -82,8 +89,8 @@ extern "C" {
  * Compile time switch to change the driver to convert little endian
  * colors to big endian.
  */
-#ifndef ILI9341_LE_MODE
-#define ILI9341_LE_MODE     (0)
+#ifdef DOXYGEN
+#define CONFIG_ILI9341_LE_MODE
 #endif
 /** @} */
 
