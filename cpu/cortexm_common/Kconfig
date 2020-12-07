@@ -128,4 +128,20 @@ config MODULE_CORTEXM_FPU
     depends on HAS_CORTEXM_FPU
     depends on TEST_KCONFIG
 
+config MODULE_PERIPH_SYSTICK
+    bool "SysTick timer periph driver"
+    help
+        SysTick timer is present on every Cortex-M CPU.
+        It is a 24 bit, down-counting timer that runs at the same
+        frequency as the CPU.
+        This allows to use this timer as an (up-counting) timer in
+        RIOT.
+
+config MODULE_PERIPH_SYSTICK_PRESCALER
+    bool "SysTick timer prescaler"
+    depends on MODULE_PERIPH_SYSTICK
+    help
+        Allows to configure the SysTick backed timer to run at
+        'virtual' frequencies smaller than the CPU frequency.
+
 rsource "periph/Kconfig"
