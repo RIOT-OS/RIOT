@@ -203,13 +203,6 @@ extern "C" {
 #define LORAMAC_DEFAULT_RX2_DELAY              (1000U + LORAMAC_DEFAULT_RX1_DELAY)
 
 /**
- * @brief   Default automatic reply status
- */
-#ifndef LORAMAC_DEFAULT_AR
-#define LORAMAC_DEFAULT_AR                     (false)
-#endif
-
-/**
  * @brief   Default second RX window datarate index
  */
 #ifndef LORAMAC_DEFAULT_RX2_DR
