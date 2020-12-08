@@ -28,12 +28,6 @@
 #include "thread.h"
 #include "ztimer.h"
 
-typedef struct {
-    mutex_t *mutex;
-    thread_t *thread;
-    int timeout;
-} mutex_thread_t;
-
 static void _callback_unlock_mutex(void *arg)
 {
     mutex_t *mutex = (mutex_t *)arg;
