@@ -84,8 +84,15 @@ uint8_t _reg_addr_upstream(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
 #endif  /* CONFIG_GNRC_IPV6_NIB_MULTIHOP_DAD */
             if (aro->ltime.u16 != 0) {
                 _handle_sl2ao(netif, ipv6, icmpv6, sl2ao);
+
                 /* re-get NCE in case it was updated */
                 nce = _nib_onl_get(&ipv6->src, netif->pid);
+
+                /* NIB is full */
+                if (nce == NULL) {
+                    return SIXLOWPAN_ND_STATUS_NC_FULL;
+                }
+
                 /* and re-check EUI-64 in case nce was not an NC before */
                 if ((memcmp(&nce->eui64, &aro->eui64,
                             sizeof(aro->eui64)) != 0) &&
