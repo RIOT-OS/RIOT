@@ -221,7 +221,7 @@ size_t gnrc_lorawan_build_hdr(uint8_t mtype, le_uint32_t *dev_addr,
     lorawan_hdr_set_ack(lw_hdr, ack);
     lorawan_hdr_set_frame_opts_len(lw_hdr, fopts_length);
 
-    lw_hdr->fcnt = byteorder_btols(byteorder_htons(fcnt));
+    lw_hdr->fcnt = byteorder_htols(fcnt);
 
     buf->index += sizeof(lorawan_hdr_t);
 
@@ -248,7 +248,7 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
 
     lorawan_hdr_set_ack(lw_hdr, mac->mcps.ack_requested);
 
-    lw_hdr->fcnt = byteorder_btols(byteorder_htons(mac->mcps.fcnt));
+    lw_hdr->fcnt = byteorder_htols(mac->mcps.fcnt);
 
     buf.index += sizeof(lorawan_hdr_t);
 
