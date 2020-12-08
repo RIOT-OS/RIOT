@@ -43,7 +43,7 @@ int _gnrc_lwmac_transmit(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     size_t src_len, dst_len;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
     uint8_t flags = (uint8_t)(state->flags & NETDEV_IEEE802154_SEND_MASK);
-    le_uint16_t dev_pan = byteorder_btols(byteorder_htons(state->pan));
+    le_uint16_t dev_pan = byteorder_htols(state->pan);
 
     flags |= IEEE802154_FCF_TYPE_DATA;
     if (pkt == NULL) {
