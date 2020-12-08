@@ -20,4 +20,13 @@ config RN2XX3_DEFAULT_SLEEP
         Set the sleep duration (in ms).
         The value should be greater than RN2XX3_SLEEP_MIN (100 ms)
 
+config RN2XX3_DEFAULT_AR
+    bool "Enable automatic reply"
+    help
+        Enable/disable Automatic Reply (AR) for rn2xx3 module. By enabling the
+        automatic reply, the module will transmit a packet without a payload
+        immediately after a confirmed downlink is received, or when the
+        Frame Pending bit has been set by the server. Refer RN2483 LoRa™
+        Technology Module Command Reference User’s Guide for more information.
+
 endif # KCONFIG_USEMODULE_RN2XX3
