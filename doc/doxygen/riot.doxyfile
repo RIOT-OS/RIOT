@@ -772,6 +772,7 @@ INPUT                  = ../../doc.txt \
                          src/kconfig/kconfig.md \
                          src/using-cpp.md \
                          src/advanced-build-system-tricks.md \
+                         src/emulators.md \
                          src/changelog.md \
                          ../../LOSTANDFOUND.md
 
