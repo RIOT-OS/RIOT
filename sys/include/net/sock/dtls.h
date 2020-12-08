@@ -38,7 +38,7 @@
  *      @ref SOCK_DTLS_CLIENT
  *   3. Start handshake session to server @ref sock_dtls_session_init()
  *   4. Handle incoming handshake packets with @ref sock_dtls_recv()
- *   4. Send packet to server @ref sock_dtls_send()
+ *   5. Send packet to server @ref sock_dtls_send()
  *
  * ## Makefile Includes
  *
