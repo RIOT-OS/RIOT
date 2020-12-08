@@ -138,6 +138,14 @@ typedef struct {
 /** @} */
 
 /**
+ * @name    Define macros for sda and scl pin to be able to reinitialize them
+ * @{
+ */
+#define i2c_pin_sda(dev) i2c_config[dev].sda
+#define i2c_pin_scl(dev) i2c_config[dev].scl
+/** @} */
+
+/**
  * @name    The PWM unit on the nRF52 supports 4 channels per device
  */
 #define PWM_CHANNELS        (4U)
