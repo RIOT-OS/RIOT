@@ -163,3 +163,26 @@ void ztimer_set_wakeup(ztimer_clock_t *clock, ztimer_t *timer, uint32_t offset,
 
     ztimer_set(clock, timer, offset);
 }
+
+static void timeout_cb(void *arg) {
+    mutex_cancel(arg);
+}
+
+int ztimer_mutex_lock_timeout(ztimer_clock_t *clock, mutex_t *mutex,
+                              uint32_t timeout)
+{
+    if (mutex_trylock(mutex)) {
+        return 0;
+    }
+
+    mutex_cancel_t mc = mutex_cancel_init(mutex);
+    ztimer_t t = { .callback = timeout_cb, .arg = &mc };
+
+    ztimer_set(clock, &t, timeout);
+    if (mutex_lock_cancelable(&mc)) {
+        return -ECANCELED;
+    }
+
+    ztimer_remove(clock, &t);
+    return 0;
+}
