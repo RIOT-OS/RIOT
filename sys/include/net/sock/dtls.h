@@ -38,7 +38,7 @@
  *      @ref SOCK_DTLS_CLIENT
  *   3. Start handshake session to server @ref sock_dtls_session_init()
  *   4. Handle incoming handshake packets with @ref sock_dtls_recv()
- *   4. Send packet to server @ref sock_dtls_send()
+ *   5. Send packet to server @ref sock_dtls_send()
  *
  * ## Makefile Includes
  *
@@ -917,50 +917,6 @@ static inline ssize_t sock_dtls_send(sock_dtls_t *sock,
  * @param sock          DTLS sock to close
  */
 void sock_dtls_close(sock_dtls_t *sock);
-
-/**
- * @brief Creates a new DTLS session
- *
- *  Initiates a handshake with a DTLS server at @p ep and wait until it
- * completes or timed out.
- *
- * @deprecated Will not be available after the 2020.10 release.
- *             Please use @ref sock_dtls_session_init() and
- *             @ref sock_dtls_recv() instead.
- *
- * @param[in]  sock     DLTS sock to use
- * @param[in]  ep       Remote endpoint of the session
- * @param[out] remote   The created session, cannot be NULL
- * @param[in]  timeout  Timeout to wait for handshake to finish.
- *                      Returns immediately if 0.
- *                      May be SOCK_NO_TIMEOUT to wait indefinitely until
- *                      handshake complete.
- *
- * @return  0 on success
- * @return  -ENOMEM, if no memory to allocate for new peer
- * @return  -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.
- * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
- *          initialized (or closed while sock_udp_recv() blocks).
- */
-static inline int sock_dtls_session_create(sock_dtls_t *sock,
-                                           const sock_udp_ep_t *ep,
-                                           sock_dtls_session_t *remote,
-                                           unsigned timeout)
-{
-    int res;
-    uint8_t buf[DTLS_HANDSHAKE_BUFSIZE];
-
-    assert(sock);
-    assert(remote);
-
-    res = sock_dtls_session_init(sock, ep, remote);
-    if (res <= 0) {
-        return res;
-    }
-
-    res = sock_dtls_recv(sock, remote, buf, sizeof(buf), timeout);
-    return res == -SOCK_DTLS_HANDSHAKE ? 0 : res;
-}
 
 #include "sock_dtls_types.h"
 
