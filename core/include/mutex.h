@@ -298,7 +298,7 @@ void mutex_unlock_and_sleep(mutex_t *mutex);
  * Canonical use:
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
- * static void timeout_cb(void *_arg) {
+ * static void timeout_cb(void *arg) {
  *     mutex_cancel(arg);
  * }
  *
@@ -306,15 +306,13 @@ void mutex_unlock_and_sleep(mutex_t *mutex);
  *                               uint32_t timeout)
  * {
  *     mutex_cancel_t mc = mutex_cancel_init(mutex);
- *     ztimer_t t;
- *     t.callback = timeout_cb;
- *     t.arg = &mc;
+ *     ztimer_t t = { .callback = timeout_cb, .arg = &mc };
  *     ztimer_set(clock, &t, timeout);
- *     if (0 == mutex_lock_cancelable(mutex)) {
- *         ztimer_remove(clock, &t);
- *         return 0;
+ *     if (mutex_lock_cancelable(&mc)) {
+ *         return -ECANCELED;
  *     }
- *     return -ECANCELED;
+ *     ztimer_remove(clock, &t);
+ *     return 0;
  * }
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
