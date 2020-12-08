@@ -43,7 +43,7 @@
 /cpu/cc26x0/                                @hexluthor @smlng
 /cpu/cc26x2_cc13x2/                         @hexluthor @smlng
 /cpu/cc26xx_cc13xx/                         @hexluthor @smlng
-/cpu/cortexm_common/                        @haukepetersen @thomaseichinger @DipSwitch
+/cpu/cortexm_common/                        @kaspar030 @bergzand
 /cpu/efm32/                                 @basilfx
 /cpu/esp*/                                  @gschorcht
 /cpu/fe310/                                 @aabadie @kaspar030 @bergzand
