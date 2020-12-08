@@ -23,11 +23,6 @@
 #include "unittests-constants.h"
 #include "tests-ieee802154.h"
 
-static inline le_uint16_t byteorder_htols(uint16_t v)
-{
-    return byteorder_btols(byteorder_htons(v));
-}
-
 static void test_ieee802154_set_frame_hdr_flags0(void)
 {
     const le_uint16_t src_pan = byteorder_htols(0);
