@@ -28,7 +28,9 @@
  * index out of bounds" warning.  So until a solution for that is found, we
  * need to disable array bounds checks for files using XFAs.
  */
+#ifndef DOXYGEN
 _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
+#endif
 
 /**
  * @brief helper macro for other XFA_* macros
@@ -129,8 +131,8 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
  *
- * @param[in]   name    name of the xfa
- * @param[in]   prio    priority within the xfa
+ * @param[in]   xfa_name    name of the xfa
+ * @param[in]   prio        priority within the xfa
  */
 #define XFA(xfa_name, prio) _XFA(xfa_name, 5_ ## prio)
 
@@ -143,8 +145,8 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  *     XFA(driver_params, 0) driver_params_t _onboard = { .pin=42 };
  *
- * @param[in]   name    name of the xfa
- * @param[in]   prio    priority within the xfa
+ * @param[in]   xfa_name    name of the xfa
+ * @param[in]   prio        priority within the xfa
  */
 #define XFA_CONST(xfa_name, prio) _XFA_CONST(xfa_name, 5_ ## prio)
 
@@ -177,5 +179,5 @@ extern "C" {
 }
 #endif
 
-/** @} */
 #endif /* XFA_H */
+/** @} */
