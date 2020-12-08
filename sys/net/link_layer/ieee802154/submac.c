@@ -411,7 +411,7 @@ int ieee802154_set_state(ieee802154_submac_t *submac, ieee802154_submac_state_t 
         res = ieee802154_radio_off(dev);
     }
     else {
-        ieee802154_submac_state_t new_state =
+        ieee802154_trx_state_t new_state =
                     state == IEEE802154_STATE_IDLE
                     ? IEEE802154_TRX_STATE_TRX_OFF
                     : IEEE802154_TRX_STATE_RX_ON;
