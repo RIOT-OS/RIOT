@@ -293,8 +293,10 @@ def get_sym_applying_range(sym):
         (low, high, cond) = rng
         # get the first active one
         if kconfiglib.expr_value(cond):
-            return (low.str_value, high.str_value,
-                    "(if {})".format(cond.name) if not cond.is_constant else "")
+            cond_str = ""
+            if cond is not sym.kconfig.y:
+                cond_str = "if {}".format(kconfiglib.expr_str(cond))
+            return (low.str_value, high.str_value, cond_str)
     return None
 
 
