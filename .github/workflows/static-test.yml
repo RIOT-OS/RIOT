@@ -32,3 +32,10 @@ jobs:
           -v $(pwd):/data/riotbuild         \
           riot/riotbuild:latest             \
           make static-test
+    - name: Annotate static tests
+      uses: agyemanjp/ci-checks-action@2.0.1
+      checks: '[{
+          "name": "static-tests",
+          "fileName": ".static-test-report.json",
+          "prChangesOnly": false,
+        }]'
