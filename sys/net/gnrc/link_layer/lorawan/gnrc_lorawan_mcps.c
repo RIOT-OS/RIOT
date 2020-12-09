@@ -40,7 +40,7 @@ static int gnrc_lorawan_mic_is_valid(uint8_t *buf, size_t len, uint8_t *nwkskey)
 
     lorawan_hdr_t *lw_hdr = (lorawan_hdr_t *)buf;
 
-    uint32_t fcnt = byteorder_ntohs(byteorder_ltobs(lw_hdr->fcnt));
+    uint32_t fcnt = byteorder_ltohs(lw_hdr->fcnt);
     iolist_t iol =
     { .iol_base = buf, .iol_len = len - MIC_SIZE, .iol_next = NULL };
 
@@ -165,8 +165,8 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
             fopts = &_pkt.enc_payload;
         }
         gnrc_lorawan_encrypt_payload(&_pkt.enc_payload, &_pkt.hdr->addr,
-                                     byteorder_ntohs(byteorder_ltobs(
-                                                         _pkt.hdr->fcnt)), GNRC_LORAWAN_DIR_DOWNLINK,
+                                     byteorder_ltohs(_pkt.hdr->fcnt),
+                                     GNRC_LORAWAN_DIR_DOWNLINK,
                                      key);
     }
 

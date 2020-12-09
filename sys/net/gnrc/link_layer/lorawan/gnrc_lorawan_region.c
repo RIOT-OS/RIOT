@@ -121,7 +121,7 @@ void gnrc_lorawan_process_cflist(gnrc_lorawan_t *mac, uint8_t *cflist)
         le_uint32_t cl;
         cl.u32 = 0;
         memcpy(&cl, cflist, GNRC_LORAWAN_CFLIST_ENTRY_SIZE);
-        mac->channel[i] = byteorder_ntohl(byteorder_ltobl(cl)) * 100;
+        mac->channel[i] = byteorder_ltohl(cl) * 100;
         cflist += GNRC_LORAWAN_CFLIST_ENTRY_SIZE;
         DEBUG("gnrc_lorawan_region: Mac -> Channel %u %" PRIu32 " \n", i, mac->channel[i]);
     }
