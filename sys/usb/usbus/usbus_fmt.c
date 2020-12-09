@@ -205,6 +205,13 @@ static size_t _fmt_descriptors_iface_alts(usbus_t *usbus,
         len += sizeof(usb_descriptor_interface_t);
         usb_iface.alternate_setting = alts++;
         usb_iface.num_endpoints = _num_endpoints_alt(alt);
+        if (alt->descr) {
+            usb_iface.idx = alt->descr->idx;
+        } else {
+            /* If there is no string descriptor for a given alt interface
+               set the index to 0 to advertise it */
+            usb_iface.idx = 0;
+        }
         usbus_control_slicer_put_bytes(usbus, (uint8_t *)&usb_iface,
                                        sizeof(usb_descriptor_interface_t));
         len += _fmt_descriptors_post(usbus, alt->descr_gen);
