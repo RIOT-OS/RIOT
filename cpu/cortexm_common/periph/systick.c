@@ -60,7 +60,7 @@ void systick_callback(void)
 
 void systick_timer_init(unsigned long freq)
 {
-    if (IS_USED(MODULE_SYSTICK_PRESCALER)) {
+    if (IS_USED(MODULE_PERIPH_SYSTICK_PRESCALER)) {
         assert(freq <= CLOCK_CORECLOCK);
 
         prescaler = CLOCK_CORECLOCK / freq;
@@ -92,7 +92,7 @@ int systick_timer_set(unsigned int value)
     alarm_ext = val64 >> 24;
     alarm_val = val64 & SysTick_LOAD_RELOAD_Msk;
 
-    if (IS_USED(MODULE_SYSTICK_PRESCALER)) {
+    if (IS_USED(MODULE_PERIPH_SYSTICK_PRESCALER)) {
         now_offset += SysTick->LOAD - SysTick->VAL;
     } else {
         now += SysTick->LOAD - SysTick->VAL;
@@ -141,7 +141,7 @@ unsigned int systick_timer_read(void)
         load = SysTick->LOAD;
     } while (SysTick->VAL > val);
 
-    if (IS_USED(MODULE_SYSTICK_PRESCALER)) {
+    if (IS_USED(MODULE_PERIPH_SYSTICK_PRESCALER)) {
         uint32_t current_offset = load - val;
         return now + (current_offset + now_offset) / prescaler;
     } else {
@@ -162,7 +162,7 @@ void systick_timer_stop(void)
 void isr_systick(void)
 {
     /* update clock */
-    if (IS_USED(MODULE_SYSTICK_PRESCALER)) {
+    if (IS_USED(MODULE_PERIPH_SYSTICK_PRESCALER)) {
         now_offset += SysTick->LOAD;
 
         now += now_offset / prescaler;
