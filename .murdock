@@ -1,7 +1,12 @@
 #!/bin/sh
 
 : ${TEST_BOARDS_AVAILABLE:="esp32-wroom-32 samr21-xpro"}
-: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+
+# temporarily disabling llvm builds until https://github.com/RIOT-OS/RIOT/pull/15595
+# is in
+#: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
+: ${TEST_BOARDS_LLVM_COMPILE:=""}
+
 : ${TEST_KCONFIG_samr21_xpro:="examples/hello-world tests/periph_*
 tests/driver_ad7746 tests/driver_adcxx1c tests/driver_ads101x tests/driver_adt101x
 tests/driver_adt7310 tests/driver_adxl345 tests/driver_aip31068 tests/driver_apa102
