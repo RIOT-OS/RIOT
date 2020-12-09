@@ -1,5 +1,6 @@
 [dhcpy6d] 
     store_sqlite_volatile = /home/mlenders/Repositories/RIOT-OS/RIOT/volatile.sqlite
+	foobar
 
 [prefix_client]
 category = range
