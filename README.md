@@ -86,6 +86,13 @@ For specific toolchain installation, follow instructions in the
   version of the documentation is uploaded daily to
   [riot-os.org/api](https://riot-os.org/api).
 
+## FORUM
+Do you have a question, want to discuss a new feature, or just want to present
+your latest project using RIOT? Come over to our [forum] and post to your hearts
+content.
+
+[forum]: https://forum.riot-os.org
+
 ## CONTRIBUTE
 
 To contribute something to RIOT, please refer to our
