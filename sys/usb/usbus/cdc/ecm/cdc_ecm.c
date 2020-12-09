@@ -229,7 +229,7 @@ static void _init(usbus_t *usbus, usbus_handler_t *handler)
     usbus_add_interface(usbus, &cdcecm->iface_ctrl);
     usbus_add_interface(usbus, &cdcecm->iface_data);
 
-    cdcecm->iface_data.alts = &cdcecm->iface_data_alt;
+    usbus_add_interface_alt(&cdcecm->iface_data, &cdcecm->iface_data_alt);
 
     usbus_enable_endpoint(cdcecm->ep_out);
     usbus_enable_endpoint(cdcecm->ep_in);

@@ -121,6 +121,16 @@ uint16_t usbus_add_interface(usbus_t *usbus, usbus_interface_t *iface)
     return idx;
 }
 
+void usbus_add_interface_alt(usbus_interface_t *iface,
+                             usbus_interface_alt_t *alt)
+{
+    usbus_interface_alt_t **last = &iface->alts;
+    while (*last) {
+        last = &(*last)->next;
+    }
+    *last = alt;
+}
+
 void usbus_register_event_handler(usbus_t *usbus, usbus_handler_t *handler)
 {
     /* See note above for reasons against clist.h */
