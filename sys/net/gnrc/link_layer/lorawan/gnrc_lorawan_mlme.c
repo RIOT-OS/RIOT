@@ -131,7 +131,7 @@ void gnrc_lorawan_mlme_process_join(gnrc_lorawan_t *mac, uint8_t *data,
 
     le_nid.u32 = 0;
     memcpy(&le_nid, ja_hdr->net_id, 3);
-    mac->mlme.nid = byteorder_ntohl(byteorder_ltobl(le_nid));
+    mac->mlme.nid = byteorder_ltohl(le_nid);
     /* Copy devaddr */
     memcpy(&mac->dev_addr, ja_hdr->dev_addr, sizeof(mac->dev_addr));
 

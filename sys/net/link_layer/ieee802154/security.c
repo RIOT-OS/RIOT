@@ -157,7 +157,7 @@ static uint8_t _set_aux_hdr(const ieee802154_sec_context_t *ctx,
     ahr->scf = _scf(ctx->security_level, ctx->key_id_mode);
     /* If you look in the specification: Annex C,
        integers values are in little endian */
-    ahr->fc = byteorder_btoll(byteorder_htonl(ctx->frame_counter)).u32;
+    ahr->fc = byteorder_htoll(ctx->frame_counter).u32;
     size_t len = 5;
     switch (ctx->key_id_mode) {
         case IEEE802154_SCF_KEYMODE_IMPLICIT:
@@ -422,8 +422,7 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
     uint8_t aux_size = _get_aux_hdr_size(security_level, key_mode);
     uint8_t mac_size = _mac_size(security_level);
     /* remember that the frame counter was stored in little endian */
-    uint32_t frame_counter = byteorder_ntohl(
-                                byteorder_ltobl((le_uint32_t){aux->fc}));
+    uint32_t frame_counter = byteorder_ltohl((le_uint32_t){aux->fc});
 
     if (security_level == IEEE802154_SCF_SECLEVEL_NONE) {
         *payload = header + *header_size;
