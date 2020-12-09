@@ -113,6 +113,7 @@ rsource "at25xxx/Kconfig"
 rsource "mtd/Kconfig"
 rsource "mtd_flashpage/Kconfig"
 rsource "mtd_mapper/Kconfig"
+rsource "mtd_mci/Kconfig"
 rsource "mtd_sdcard/Kconfig"
 rsource "sdcard_spi/Kconfig"
 endmenu # Storage Device Drivers
