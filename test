@@ -1,0 +1,7 @@
+[dhcpy6d] 
+    store_sqlite_volatile = /home/mlenders/Repositories/RIOT-OS/RIOT/volatile.sqlite
+
+[prefix_client]
+category = range
+range = 1000-1fff
+pattern = 2001:db8:$range$::
