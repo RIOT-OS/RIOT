@@ -8,4 +8,4 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 # this board is flashed using DFU
 PROGRAMMER ?= dfu-util
 DFU_USB_ID = 1d50:607f
-FFLAGS_OPTS = --reset
+DFU_USE_DFUSE = 1
