@@ -84,16 +84,28 @@ extern "C" {
 #define CLOCK_HSI                       MHZ(8)
 
 /* The following parameters configure a 72MHz system clock with HSE (8MHz or
-   16MHz) and HSI (8MHz) as input clock */
+   16MHz) and HSI (8MHz) as input clock
+   On stm32f303x6, stm32f303x8, stm32f303xB, stm32f303xC, stm32f328x8 and
+   stm32f358xC lines, PREDIV is hard-wired to 2 (see RM0316 p.126 to p.128).
+   To reach the maximum possible system clock (64MHz) set PLL_PREDIV to 2 and
+   PLL_MUL to 16, so system clock = (HSI8 / 2) * 16 = 64MHz
+*/
 #ifndef CONFIG_CLOCK_PLL_PREDIV
-#if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(16))
+#if (IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE == MHZ(16))) || \
+    defined(CPU_LINE_STM32F303x6) || defined(CPU_LINE_STM32F303x8) || \
+    defined(CPU_LINE_STM32F303xB) || defined(CPU_LINE_STM32F303xC) || \
+    defined(CPU_LINE_STM32F328x8) || defined(CPU_LINE_STM32F358xC)
 #define CONFIG_CLOCK_PLL_PREDIV         (2)
 #else
 #define CONFIG_CLOCK_PLL_PREDIV         (1)
 #endif
 #endif
 #ifndef CONFIG_CLOCK_PLL_MUL
+#if defined(CPU_LINE_STM32F303x8)
+#define CONFIG_CLOCK_PLL_MUL            (16)
+#else
 #define CONFIG_CLOCK_PLL_MUL            (9)
+#endif
 #endif
 
 #if IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
