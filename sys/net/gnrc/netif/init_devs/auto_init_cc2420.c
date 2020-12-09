@@ -23,6 +23,7 @@
 #include "board.h"
 #include "net/gnrc/netif/ieee802154.h"
 #include "net/gnrc.h"
+#include "include/init_devs.h"
 
 #include "cc2420.h"
 #include "cc2420_params.h"
@@ -31,7 +32,7 @@
  * @brief   MAC layer stack parameters
  * @{
  */
-#define CC2420_MAC_STACKSIZE           (THREAD_STACKSIZE_MAIN)
+#define CC2420_MAC_STACKSIZE           (IEEE802154_STACKSIZE_DEFAULT)
 #ifndef CC2420_MAC_PRIO
 #define CC2420_MAC_PRIO                (GNRC_NETIF_PRIO)
 #endif

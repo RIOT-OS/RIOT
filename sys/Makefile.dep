@@ -50,6 +50,12 @@ ifneq (,$(filter sys_bus_%,$(USEMODULE)))
   USEMODULE += core_msg_bus
 endif
 
+ifneq (,$(filter ieee802154_security,$(USEMODULE)))
+  USEMODULE += crypto
+  USEMODULE += crypto_aes
+  USEMODULE += cipher_modes
+endif
+
 ifneq (,$(filter rtt_cmd,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
