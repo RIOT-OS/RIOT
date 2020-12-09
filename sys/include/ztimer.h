@@ -236,6 +236,7 @@
 
 #include "sched.h"
 #include "msg.h"
+#include "mutex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -506,6 +507,19 @@ void ztimer_set_wakeup(ztimer_clock_t *clock, ztimer_t *timer, uint32_t offset,
  */
 void ztimer_set_timeout_flag(ztimer_clock_t *clock, ztimer_t *timer,
                              uint32_t timeout);
+
+/**
+ * @brief   Try to lock the given mutex, but give up after @p timeout
+ *
+ * @param[in]       clock       ztimer clock to operate on
+ * @param[in,out]   mutex       Mutex object to lock
+ * @param[in]       timeout     timeout after which to give up
+ *
+ * @retval  0               Success, caller has the mutex
+ * @retval  -ECANCELED      Failed to obtain mutex within @p timeout
+ */
+int ztimer_mutex_lock_timeout(ztimer_clock_t *clock, mutex_t *mutex,
+                              uint32_t timeout);
 
 /**
  * @brief   Update ztimer clock head list offset

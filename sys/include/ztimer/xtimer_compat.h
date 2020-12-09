@@ -160,6 +160,16 @@ static inline void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset,
     ztimer_set_wakeup(ZTIMER_USEC, timer, offset, pid);
 }
 
+static inline int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us)
+{
+    assert(us <= UINT32_MAX);
+    if (ztimer_mutex_lock_timeout(ZTIMER_USEC, mutex, (uint32_t)us)) {
+        /* Impedance matching required: Convert -ECANCELED error code to -1: */
+        return -1;
+    }
+    return 0;
+}
+
 /*
    static inline void xtimer_set64(xtimer_t *timer, uint64_t offset_us);
    static inline void xtimer_tsleep32(xtimer_ticks32_t ticks);
@@ -183,7 +193,6 @@ static inline void xtimer_set_wakeup(xtimer_t *timer, uint32_t offset,
                                                 xtimer_ticks64_t b);
    static inline bool xtimer_less(xtimer_ticks32_t a, xtimer_ticks32_t b);
    static inline bool xtimer_less64(xtimer_ticks64_t a, xtimer_ticks64_t b);
-   int xtimer_mutex_lock_timeout(mutex_t *mutex, uint64_t us);
    void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout);
 
  #if defined(MODULE_CORE_MSG) || defined(DOXYGEN)
