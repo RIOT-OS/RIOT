@@ -23,9 +23,6 @@
 #include "cpu.h"
 #include "periph/gpio.h"
 
-#include "at24mac.h"
-#include "net/eui_provider.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,26 +33,6 @@ extern "C" {
  */
 #define AT24MAC_PARAM_I2C_DEV   I2C_DEV(0)
 #define AT24MAC_PARAM_TYPE      AT24MAC6XX
-/** @} */
-
-/**
- * @brief    AT24Mac provides a EUI-64, this is also printed on the board
- */
-static inline int _at24mac_get_eui64(const void *arg, eui64_t *addr, uint8_t index)
-{
-    (void) index;
-
-    return at24mac_get_eui64((uintptr_t)arg, addr);
-}
-
-/**
- * @name    EUI-64 sources on the board
- *          AT24Mac is present on the board
- * @{
- */
-#define EUI64_PROVIDER_FUNC   _at24mac_get_eui64
-#define EUI64_PROVIDER_TYPE   NETDEV_AT86RF2XX
-#define EUI64_PROVIDER_INDEX  0
 /** @} */
 
 /**
