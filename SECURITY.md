@@ -24,7 +24,7 @@ To access the "Trusted RIOT Users" notifications on the
 [RIOT forum](https://forum.riot-os.org) please send information
 on the RIOT based service or product as well as your
 [forum](https://forum.riot-os.org) username to the
-[security mailing list](security@riot-os.org).
+[security mailing list](mailto:security@riot-os.org).
 Early notification of security bugs will be available and should not be shared
 publicly.
 If done, it will result in access removal from the "Trusted RIOT Users"
