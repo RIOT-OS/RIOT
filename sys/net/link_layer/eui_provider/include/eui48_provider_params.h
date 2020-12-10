@@ -41,13 +41,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Optional function argument to `netdev_get_eui48_cb_t`
- */
-#ifndef EUI48_PROVIDER_ARG
-#define EUI48_PROVIDER_ARG    NULL
-#endif
-
-/**
  * @brief Driver type to match with EUI-48 provider
  */
 #ifndef EUI48_PROVIDER_TYPE
@@ -68,7 +61,6 @@ extern "C" {
 #ifndef EUI48_PROVIDER_PARAMS
 #define EUI48_PROVIDER_PARAMS     {                                \
                                  .provider = EUI48_PROVIDER_FUNC,  \
-                                 .arg      = EUI48_PROVIDER_ARG,   \
                                  .type     = EUI48_PROVIDER_TYPE,  \
                                  .index    = EUI48_PROVIDER_INDEX, \
                                 },

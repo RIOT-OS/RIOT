@@ -41,13 +41,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Optional function argument to `netdev_get_eui64_cb_t`
- */
-#ifndef EUI64_PROVIDER_ARG
-#define EUI64_PROVIDER_ARG    NULL
-#endif
-
-/**
  * @brief Driver type to match with EUI-64 provider
  */
 #ifndef EUI64_PROVIDER_TYPE
@@ -68,7 +61,6 @@ extern "C" {
 #ifndef EUI64_PROVIDER_PARAMS
 #define EUI64_PROVIDER_PARAMS     {                                \
                                  .provider = EUI64_PROVIDER_FUNC,  \
-                                 .arg      = EUI64_PROVIDER_ARG,   \
                                  .type     = EUI64_PROVIDER_TYPE,  \
                                  .index    = EUI64_PROVIDER_INDEX, \
                                 },

@@ -106,35 +106,32 @@ extern "C" {
 /**
  * @brief   Function for providing a EUI-48 to a device
  *
- * @param[in]   arg     Optional argument provided by eui48_conf_t
- * @param[out]  addr    Destination pointer for the EUI-48 address
  * @param[in]   index   index of the netdev
+ * @param[out]  addr    Destination pointer for the EUI-48 address
  *
  * @return      0 on success, next provider in eui48_conf_t will be
  *              used otherwise.
  *              Will fall back to @see luid_get_eui48 eventually.
  */
-typedef int (*netdev_get_eui48_cb_t)(const void *arg, eui48_t *addr, uint8_t index);
+typedef int (*netdev_get_eui48_cb_t)(uint8_t index, eui48_t *addr);
 
 /**
  * @brief   Function for providing a EUI-64 to a device
  *
- * @param[in]   arg     Optional argument provided by eui64_conf_t
- * @param[out]  addr    Destination pointer for the EUI-64 address
  * @param[in]   index   index of the netdev
+ * @param[out]  addr    Destination pointer for the EUI-64 address
  *
  * @return      0 on success, next provider in eui64_conf_t will be
  *              used otherwise.
  *              Will fall back to @see luid_get_eui64 eventually.
  */
-typedef int (*netdev_get_eui64_cb_t)(const void *arg, eui64_t *addr, uint8_t index);
+typedef int (*netdev_get_eui64_cb_t)(uint8_t index, eui64_t *addr);
 
 /**
  * @brief Structure to hold providers for EUI-48 addresses
  */
 typedef struct {
     netdev_get_eui48_cb_t provider; /**< function to provide an EUI-48                  */
-    const void *arg;                /**< argument to the provider function              */
     netdev_type_t type;             /**< device type to match or `NETDEV_ANY`           */
     uint8_t index;                  /**< device index to match or `NETDEV_INDEX_ANY`    */
 } eui48_conf_t;
@@ -144,7 +141,6 @@ typedef struct {
  */
 typedef struct {
     netdev_get_eui64_cb_t provider; /**< function to provide an EUI-64                  */
-    const void *arg;                /**< argument to the provider function              */
     netdev_type_t type;             /**< device type to match or `NETDEV_ANY`           */
     uint8_t index;                  /**< device index to match or `NETDEV_INDEX_ANY`    */
 } eui64_conf_t;
