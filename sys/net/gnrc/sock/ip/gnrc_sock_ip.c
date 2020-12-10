@@ -135,7 +135,12 @@ ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **buf_ctx,
         _aux.local = &aux->local;
     }
 #endif
-    res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp, _aux);
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_TIMESTAMP)) {
+        _aux.timestamp = &aux->timestamp;
+    }
+#endif
+    res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp, &_aux);
     if (res < 0) {
         return res;
     }
@@ -155,6 +160,16 @@ ssize_t sock_ip_recv_buf_aux(sock_ip_t *sock, void **data, void **buf_ctx,
 #if IS_USED(MODULE_SOCK_AUX_LOCAL)
     if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_LOCAL)) {
         aux->flags &= ~(SOCK_AUX_GET_LOCAL);
+    }
+#endif
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_TIMESTAMP)) {
+        /* check if network interface did provide a timestamp; this depends on
+         * hardware support. A timestamp of zero is used to indicate a missing
+         * timestamp */
+        if (aux->timestamp > 0) {
+            aux->flags &= ~SOCK_AUX_GET_TIMESTAMP;
+        }
     }
 #endif
     *data = pkt->data;

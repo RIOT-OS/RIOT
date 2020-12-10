@@ -185,6 +185,9 @@ endif
 
 ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
   USEMODULE += gnrc_sock
+  ifneq (,$(filter sock_aux_timestamp,$(USEMODULE)))
+    USEMODULE += gnrc_netif_timestamp
+  endif
 endif
 
 ifneq (,$(filter gnrc_sock_async,$(USEMODULE)))

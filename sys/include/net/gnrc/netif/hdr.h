@@ -88,6 +88,17 @@ extern "C" {
  *          @ref IEEE802154_FCF_FRAME_PEND
  */
 #define GNRC_NETIF_HDR_FLAGS_MORE_DATA  (0x10)
+
+/**
+ * @brief   Indicate presence of a valid timestamp
+ *
+ * @details If (and only if) module `gnrc_netif_timestamp` is used and the
+ *          network device supplied the timestamp of reception of a frame, this
+ *          timestamp is passed up the network stack through
+ *          @ref gnrc_netif_hdr_t::timestamp and this flag is set. This flag
+ *          can be used to check for presence of a valid timestamp.
+ */
+#define GNRC_NETIF_HDR_FLAGS_TIMESTAMP  (0x08)
 /**
  * @}
  */
@@ -105,6 +116,24 @@ typedef struct {
     uint8_t flags;              /**< flags as defined above */
     uint8_t lqi;                /**< lqi of received packet (optional) */
     int16_t rssi;               /**< rssi of received packet in dBm (optional) */
+#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP) || defined(DOXYGEN)
+    /**
+     * @brief   Timestamp of reception in nanoseconds since epoch
+     *
+     * @note    Only when @ref GNRC_NETIF_HDR_FLAGS_TIMESTAMP is set, this
+     *          field contains valid info.
+     *
+     * This field is only provided if module `gnrc_netif_timestamp` is used.
+     * Keep in mind that when the hardware does not provide timestamping, the
+     * network device driver could choose to provide this in software, which
+     * adds the delay and jitter of the ISR handling to the timestamp. Please
+     * keep also in mind that a hardware implementation might not be able to
+     * reliable timestamp every frame - e.g. a full-duplex wired interface might
+     * be unable to timestamp a received frame while timestamping an outgoing
+     * frame.
+     */
+    uint64_t timestamp;
+#endif /* MODULE_GNRC_NETIF_TIMESTAMP */
 } gnrc_netif_hdr_t;
 
 /**
@@ -199,6 +228,50 @@ static inline void gnrc_netif_hdr_set_dst_addr(gnrc_netif_hdr_t *hdr,
     }
 
     memcpy(((uint8_t *)(hdr + 1)) + hdr->src_l2addr_len, addr, addr_len);
+}
+
+/**
+ * @brief   Set the timestamp in the netif header
+ * @param[out]  hdr         Header to set the timestamp in
+ * @param[in]   timestamp   Timestamp to set (nanoseconds since epoch)
+ *
+ * @details If the module gnrc_netif_timestamp is not used, a call to this
+ *          function become a non-op (and will be fully optimized out by the
+ *          compiler)
+ */
+static inline void gnrc_netif_hdr_set_timestamp(gnrc_netif_hdr_t *hdr,
+                                                uint64_t timestamp)
+{
+    (void)hdr;
+    (void)timestamp;
+#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP)
+    hdr->timestamp = timestamp;
+    hdr->flags |= GNRC_NETIF_HDR_FLAGS_TIMESTAMP;
+#endif
+}
+
+/**
+ * @brief   Get the timestamp of the frame in nanoseconds since epoch
+ * @param[in]   hdr     Header to read the timestamp from
+ * @param[out]  dest    The timestamp will be stored here
+ * @retval      0       The timestamp was stored in @p dest
+ * @retval      -1      No timestamp available, @p dest is unchanged
+ *
+ * @details If the module gnrc_netif_timestamp is not used, this will always
+ *          return 0
+ */
+static inline int gnrc_netif_hdr_get_timestamp(const gnrc_netif_hdr_t *hdr,
+                                               uint64_t *dest)
+{
+    (void)hdr;
+    (void)dest;
+#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP)
+    if (hdr->flags & GNRC_NETIF_HDR_FLAGS_TIMESTAMP) {
+        *dest = hdr->timestamp;
+        return 0;
+    }
+#endif
+    return -1;
 }
 
 #if defined(MODULE_GNRC_IPV6) || defined(DOXYGEN)

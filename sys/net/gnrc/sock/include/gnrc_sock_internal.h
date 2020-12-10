@@ -70,17 +70,16 @@ typedef struct {
      */
     sock_ip_ep_t *local;
 #endif
-#if !IS_USED(MODULE_SOCK_AUX_LOCAL) || DOXYGEN
-    /**
-     * @brief   Workaround in case no `sock_aux_%` module is used
-     *
-     * Empty structures are only allowed with a GNU extension. For portability,
-     * this member is present if and only if this structure would be otherwise
-     * empty.
-     */
-    uint8_t this_struct_is_not_empty;
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP) || DOXYGEN
+    uint64_t *timestamp;    /**< timestamp PDU was received at in nanoseconds */
 #endif
+    /**
+     * @brief   Flags
+     */
+    uint8_t flags;
 } gnrc_sock_recv_aux_t;
+
+#define GNRC_SOCK_RECV_AUX_FLAG_TIMESTAMP   0x01    /**< Timestamp valid */
 
 /**
  * @brief   Internal helper functions for GNRC
@@ -143,7 +142,7 @@ void gnrc_sock_create(gnrc_sock_reg_t *reg, gnrc_nettype_t type, uint32_t demux_
  * @internal
  */
 ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt, uint32_t timeout,
-                       sock_ip_ep_t *remote, gnrc_sock_recv_aux_t aux);
+                       sock_ip_ep_t *remote, gnrc_sock_recv_aux_t *aux);
 
 /**
  * @brief   Send a packet internally

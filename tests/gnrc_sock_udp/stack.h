@@ -40,6 +40,13 @@ void _net_init(void);
 void _prepare_send_checks(void);
 
 /**
+ * @brief   Auxiliary data to inject
+ */
+typedef struct {
+    uint64_t timestamp; /**< Timestamp of reception */
+} inject_aux_t;
+
+/**
  * @brief   Injects a received UDP packet into the stack
  *
  * @param[in] src       The source address of the UDP packet
@@ -53,9 +60,33 @@ void _prepare_send_checks(void);
  * @return  true, if packet was successfully injected
  * @return  false, if an error occurred during injection
  */
-bool _inject_packet(const ipv6_addr_t *src, const ipv6_addr_t *dst,
-                    uint16_t src_port, uint16_t dst_port,
-                    void *data, size_t data_len, uint16_t netif);
+bool _inject_packet_aux(const ipv6_addr_t *src, const ipv6_addr_t *dst,
+                        uint16_t src_port, uint16_t dst_port,
+                        void *data, size_t data_len, uint16_t netif,
+                        const inject_aux_t *aux);
+
+/**
+ * @brief   Injects a received UDP packet into the stack
+ *
+ * @param[in] src       The source address of the UDP packet
+ * @param[in] dst       The destination address of the UDP packet
+ * @param[in] src_port  The source port of the UDP packet
+ * @param[in] dst_port  The destination port of the UDP packet
+ * @param[in] data      The payload of the UDP packet
+ * @param[in] data_len  The payload length of the UDP packet
+ * @param[in] netif     The interface the packet came over
+ *
+ * @return  true, if packet was successfully injected
+ * @return  false, if an error occurred during injection
+ */
+static inline bool _inject_packet(const ipv6_addr_t *src,
+                                  const ipv6_addr_t *dst,
+                                  uint16_t src_port, uint16_t dst_port,
+                                  void *data, size_t data_len, uint16_t netif)
+{
+    return _inject_packet_aux(src, dst, src_port, dst_port, data, data_len,
+                              netif, NULL);
+}
 
 /**
  * @brief   Checks networking state (e.g. packet buffer state)
