@@ -115,6 +115,7 @@ rsource "mtd_flashpage/Kconfig"
 rsource "mtd_mapper/Kconfig"
 rsource "mtd_mci/Kconfig"
 rsource "mtd_sdcard/Kconfig"
+rsource "mtd_spi_nor/Kconfig"
 rsource "sdcard_spi/Kconfig"
 endmenu # Storage Device Drivers
 
