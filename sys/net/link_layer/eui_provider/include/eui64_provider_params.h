@@ -17,7 +17,9 @@
 #ifndef EUI64_PROVIDER_PARAMS_H
 #define EUI64_PROVIDER_PARAMS_H
 
-#include "board.h"
+#if __has_include("eui_provider_params.h")
+#include "eui_provider_params.h"
+#endif
 #include "net/eui_provider.h"
 
 #ifdef __cplusplus
