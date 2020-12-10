@@ -7,6 +7,11 @@ USEMODULE += atmega_common
 # peripheral drivers are linked into the final binary
 USEMODULE += atmega_common_periph
 
+# The AVR-libc provides no thread safe malloc implementation and has no hooks
+# to inject. Use malloc_thread_safe to link calls to malloc to safe wrappers
+# instead.
+USEMODULE += malloc_thread_safe
+
 # the atmel port uses stdio_uart by default
 ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_uart
