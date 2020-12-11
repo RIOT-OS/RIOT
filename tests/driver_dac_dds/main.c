@@ -223,7 +223,7 @@ static int cmd_greeting(int argc, char **argv)
 
 static void _dac_init(void)
 {
-    printf("init DAC with %d bit, %u Hz\n", res_16b ? 16 : 8, sample_rate);
+    printf("init DAC DDS with %d bit, %u Hz\n", res_16b ? 16 : 8, sample_rate);
     dac_dds_init(DAC_DDS_CHAN, sample_rate,
                  res_16b ? DAC_FLAG_16BIT : DAC_FLAG_8BIT, NULL, NULL);
 }
