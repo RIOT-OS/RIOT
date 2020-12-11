@@ -310,7 +310,7 @@ void radio_getReceivedFrame(uint8_t *bufRead,
        OpenWSN includes IEEE802154_FCS_LEN in its length value */
     *lenRead = size + IEEE802154_FCS_LEN;
     /* get rssi, lqi & crc */
-    *rssi = rx_info.rssi;
+    *rssi = ieee802154_rssi_to_dbm(rx_info.rssi);
     *lqi = rx_info.lqi;
     /* only valid crc frames are currently accepted */
     *crc = 1;
