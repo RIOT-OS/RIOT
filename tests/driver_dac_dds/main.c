@@ -39,6 +39,10 @@
 #define DAC_DDS_CHAN    0
 #endif
 
+#ifndef DAC_DDS_DAC
+#define DAC_DDS_DAC    DAC_DDS_PARAM_DAC
+#endif
+
 #ifndef ENABLE_GREETING
 #define ENABLE_GREETING 1
 #endif
@@ -310,7 +314,7 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    dac_init(DAC_DDS_PARAM_DAC);
+    dac_init(DAC_DDS_DAC);
     _dac_init();
 
     /* start the shell */
