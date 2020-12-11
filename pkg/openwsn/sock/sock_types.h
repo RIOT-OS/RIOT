@@ -7,7 +7,10 @@
  */
 
 /**
- * @addtogroup pkg_openwsn_sock
+ * @defgroup pkg_openwsn_sock OpenWSN-specific implementation of the sock API
+ * @ingroup  pkg_openwsn
+ * @brief    Provides an implementation of the @ref net_sock by the
+ *           @ref pkg_openwsn
  * @{
  *
  * @file
