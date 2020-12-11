@@ -25,11 +25,15 @@
 #include <string.h>
 #include <errno.h>
 
+#include "macros/units.h"
 #include "mtd.h"
 #include "xtimer.h"
+#include "timex.h"
 #include "thread.h"
 #include "byteorder.h"
+#include "bitarithm.h"
 #include "mtd_spi_nor.h"
+#include "mtd_spi_nor/sfdp.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -88,7 +92,7 @@ static void mtd_spi_release(const mtd_spi_nor_t *dev)
 static inline uint8_t* _be_addr(const mtd_spi_nor_t *dev, uint32_t *addr)
 {
     *addr = htonl(*addr);
-    return &((uint8_t*)addr)[4 - dev->params->addr_width];
+    return &((uint8_t*)addr)[4 - dev->addr_width];
 }
 
 /**
@@ -111,7 +115,7 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
 
     if (IS_ACTIVE(ENABLE_TRACE)) {
         TRACE("mtd_spi_cmd_addr_read: addr:");
-        for (unsigned int i = 0; i < dev->params->addr_width; ++i) {
+        for (unsigned int i = 0; i < dev->addr_width; ++i) {
             TRACE(" %02x", addr_buf[i]);
         }
         TRACE("\n");
@@ -120,7 +124,7 @@ static void mtd_spi_cmd_addr_read(const mtd_spi_nor_t *dev, uint8_t opcode,
     /* Send opcode followed by address */
     spi_transfer_byte(_get_spi(dev), dev->params->cs, true, opcode);
     spi_transfer_bytes(_get_spi(dev), dev->params->cs, true,
-                       (char *)addr_buf, NULL, dev->params->addr_width);
+                       (char *)addr_buf, NULL, dev->addr_width);
 
     /* Read data */
     spi_transfer_bytes(_get_spi(dev), dev->params->cs, false,
@@ -147,7 +151,7 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
 
     if (IS_ACTIVE(ENABLE_TRACE)) {
         TRACE("mtd_spi_cmd_addr_write: addr:");
-        for (unsigned int i = 0; i < dev->params->addr_width; ++i) {
+        for (unsigned int i = 0; i < dev->addr_width; ++i) {
             TRACE(" %02x", addr_buf[i]);
         }
         TRACE("\n");
@@ -159,7 +163,7 @@ static void mtd_spi_cmd_addr_write(const mtd_spi_nor_t *dev, uint8_t opcode,
     /* only keep CS asserted when there is data that follows */
     bool cont = (count > 0);
     spi_transfer_bytes(_get_spi(dev), dev->params->cs, cont,
-                       (char *)addr_buf, NULL, dev->params->addr_width);
+                       (char *)addr_buf, NULL, dev->addr_width);
 
     /* Write data */
     if (cont) {
@@ -286,6 +290,212 @@ static int mtd_spi_read_jedec_id(const mtd_spi_nor_t *dev, mtd_jedec_id_t *out)
     return 0;
 }
 
+static void _read_sfdp_data(mtd_spi_nor_t *dev, uint32_t addr, void *data,
+                            size_t len)
+{
+    static const uint8_t opcode = 0x5a;
+    uint32_t s_addr = htonl(addr << 8); /* Shift to include the dummy byte */
+    /* Send opcode followed by address */
+    spi_transfer_byte(_get_spi(dev), dev->params->cs, true, opcode);
+    /* Includes dummy byte */
+    spi_transfer_bytes(_get_spi(dev), dev->params->cs, true,
+                       (char *)&s_addr, NULL, 4);
+
+    /* Read data */
+    spi_transfer_bytes(_get_spi(dev), dev->params->cs, false,
+                       NULL, data, len);
+}
+
+/* See the SFDP spec for these timing multipliers */
+static uint32_t _sfdp_sector_erase_timing(uint8_t erase)
+{
+    uint8_t count = (erase & 0x1F) + 1;
+    switch (erase & 0x60) {
+        case 0x00:
+            return count;
+        case 0x20:
+            return count * 16; /* Multiplied with 16 us */
+        case 0x40:
+            return count * 128; /* Multiplied with 128 us */
+        case 0x60:
+            return count * 1000; /* Multiplied with 1ms */
+    }
+    return 0;
+}
+
+static uint32_t _sfdp_chip_erase_timing(uint8_t erase)
+{
+    uint8_t count = (erase & 0x1F) + 1;
+    switch (erase & 0x60) {
+        case 0x00:
+            return count * 16 * US_PER_MS; /* Multiplied with 16 ms */
+        case 0x20:
+            return count * 256 * US_PER_MS; /* Multiplied with 256 ms */
+        case 0x40:
+            return count * 4 * US_PER_SEC; /* Multiplied with 4 seconds */
+        case 0x60:
+            return count * 64 * US_PER_SEC; /* Multiplied with 64 seconds */
+    }
+    return 0;
+}
+
+static uint32_t _sfdp_powerdown_delay_timing(uint8_t erase)
+{
+    uint8_t count = (erase & 0x1F) + 1;
+    switch (erase & 0x60) {
+        case 0x00:
+            /* Count as units of 128ns */
+            return (count * 128 + NS_PER_US) / NS_PER_US;
+        case 0x20:
+            return count; /* Multiplied with 1 us */
+        case 0x40:
+            return count * 8; /* Multiplied with 8 us */
+        case 0x60:
+            return count * 64; /* Multiplied with 64 us */
+    }
+    return 0;
+}
+
+static void _read_sfdp_access(mtd_spi_nor_t *dev,
+                              mtd_jedec_param_header_t *param)
+{
+    size_t offset = param->table_ptr;
+    uint32_t access = 0;
+    mtd_jedec_basic_spi_access_info_t access_info;
+
+    _read_sfdp_data(dev, offset + JEDEC_SFDP_BASIC_SPI_FLAGS, &access, sizeof(access));
+
+    if (access & JEDEC_SFDP_PARAM_SUP_ADDRESS_4_ONLY) {
+        dev->addr_width = 4;
+    }
+    else {
+        dev->addr_width = 3;
+    }
+
+    _read_sfdp_data(dev, offset + JEDEC_SFDP_BASIC_SPI_ERASE_12_INFO,
+                    &access_info, sizeof(access_info));
+
+    /* Supported Sector erase timings */
+    for (size_t i = 0; i < 4; i++) {
+        DEBUG("Erase type %u: %"PRIu32"B, inst: 0x%.2x, erase time: %"PRIu32"ms\n",
+              i + 1, 1LU << (access_info.erase[i].size), access_info.erase[i].instruction, _sfdp_sector_erase_timing(access_info.erase_time >> (4 + 7 * i)));
+        size_t size_exp = access_info.erase[i].size;
+
+        if (!size_exp) {
+            DEBUG("Empty erase time record, skipping\n");
+            continue;
+        }
+
+        size_t size = 1LU << size_exp;
+        uint32_t timing = _sfdp_sector_erase_timing(access_info.erase_time >> (4 + 7 * i));
+        switch (size) {
+            case KiB(4):
+                dev->wait_sector_erase = timing;
+                dev->flag |= SPI_NOR_F_SECT_4K;
+                break;
+            case KiB(32):
+                dev->wait_32k_erase = timing;
+                dev->flag |= SPI_NOR_F_SECT_32K;
+                break;
+            case KiB(64):
+                dev->wait_64k_erase = timing;
+                dev->flag |= SPI_NOR_F_SECT_64K;
+                break;
+        }
+    }
+
+    /* Chip erase timings */
+    dev->wait_chip_erase = _sfdp_chip_erase_timing(access_info.chip_erase_time);
+
+    /* Chip wake up timing */
+    mtd_jedec_basic_spi_powerdown_info_t powerdown_info = { 0 };
+    _read_sfdp_data(dev, offset + JEDEC_SFDP_BASIC_SPI_POWERDOWN_INFO,
+                    &powerdown_info, sizeof(powerdown_info));
+
+    dev->wait_chip_wake_up = _sfdp_powerdown_delay_timing(powerdown_info.delay);
+}
+
+static void _read_sfdp_size(mtd_spi_nor_t *dev,
+                             mtd_jedec_param_header_t *param)
+{
+    size_t offset = param->table_ptr;
+    uint32_t size = 0;
+
+    _read_sfdp_data(dev, offset + JEDEC_SFDP_BASIC_SPI_MEM_DENSITY, &size, sizeof(size));
+    /* For sizes greater than 4 gigabits */
+    if (size & BIT31) {
+        size = 1 << ((size & ~BIT31) - 3);
+    }
+
+    size = (size + 1) / 8; /* Another 0-based number */
+    mtd_dev_t *mtd = &dev->base;
+    mtd->sector_count = size / (mtd->pages_per_sector * mtd->page_size);
+
+    DEBUG("Full size: %"PRIu32", sector_count = %"PRIu32"\n", size, mtd->sector_count);
+}
+
+static void _read_sfdp_params(mtd_spi_nor_t *dev,
+                              mtd_jedec_param_header_t *param)
+{
+    /* Read the useful parameters from the basic SPI flash param table */
+
+    _read_sfdp_access(dev, param);
+
+    /* Size of the flash */
+    _read_sfdp_size(dev, param);
+
+    /* Erase timings */
+
+
+}
+
+static inline uint16_t _sfdp_id(mtd_jedec_param_header_t *header)
+{
+    return header->id_msb << 8 | header->id_lsb;
+}
+
+static int mtd_spi_nor_read_sfdp(mtd_spi_nor_t *dev)
+{
+    mtd_jedec_sfdp_header_t header;
+
+    _read_sfdp_data(dev, 0, &header, sizeof(header));
+
+    uint8_t num_headers = header.num_headers + 1; /* 0-based, so increment for actual number */
+
+    uint32_t signature = header.signature;
+
+    if (signature != 0x50444653) {
+        DEBUG("mtd_spi_sfdp: signature not found, no SFDP table\n");
+        return -1;
+    }
+
+    DEBUG("mtd_spi_sfdp: signature: %.8"PRIx32"\n", header.signature);
+    DEBUG("mtd_spi_sfdp: revision %u.%u, %u headers \n", header.major, header.minor, num_headers);
+
+
+    for (unsigned i = 0; i < num_headers; i++) {
+        mtd_jedec_param_header_t param;
+        /* includes dummy byte */
+        uint32_t addr = (8 * i + 8);
+
+        _read_sfdp_data(dev, addr, &param, sizeof(param));
+
+        uint16_t id = _sfdp_id(&param);
+
+        DEBUG("mtd_spi_sfdp: param ID: %.4x revision %u.%u, %u bytes length, offset %.6"PRIx32"\n",
+              id,
+              param.major, param.minor, 4*param.length, (uint32_t)param.table_ptr);
+
+        switch (id) {
+            case JEDEC_SFDP_PARAM_TABLE_BASIC_SPI:
+                _read_sfdp_params(dev, &param);
+                break;
+        }
+    }
+
+    return 0;
+}
+
 /**
  * @internal
  * @brief Get Flash capacity based on JEDEC ID
@@ -390,7 +600,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
             uint8_t retries = 0;
             int res = 0;
             do {
-                xtimer_usleep(dev->params->wait_chip_wake_up);
+                xtimer_usleep(dev->wait_chip_wake_up);
                 res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
                 retries++;
             } while (res < 0 || retries < MTD_POWER_UP_WAIT_FOR_ID);
@@ -399,7 +609,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
             }
 #endif
             /* enable 32 bit address mode */
-            if (dev->params->addr_width == 4) {
+            if (dev->addr_width == 4) {
                 mtd_spi_cmd(dev, SFLASH_CMD_4_BYTE_ADDR);
             }
 
@@ -421,10 +631,6 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     DEBUG("mtd_spi_nor_init: -> spi: %lx, cs: %lx, opcodes: %p\n",
           (unsigned long)_get_spi(dev), (unsigned long)dev->params->cs, (void *)dev->params->opcode);
 
-    /* verify configuration */
-    assert(dev->params->addr_width > 0);
-    assert(dev->params->addr_width <= 4);
-
     /* CS, WP, Hold */
     _init_pins(dev);
 
@@ -444,11 +650,18 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
     DEBUG("mtd_spi_nor_init: Found chip with ID: (%d, 0x%02x, 0x%02x, 0x%02x)\n",
           dev->jedec_id.bank, dev->jedec_id.manuf, dev->jedec_id.device[0], dev->jedec_id.device[1]);
 
-    /* derive density from JEDEC ID  */
+    if (!(dev->flag & SPI_NOR_F_NO_SFDP)) {
+        mtd_spi_nor_read_sfdp(dev);
+    }
+    /* Should be configured by sfdp if present, derive from JEDEC ID otherwise */
     if (mtd->sector_count == 0) {
         mtd->sector_count = mtd_spi_nor_get_size(&dev->jedec_id)
                           / (mtd->pages_per_sector * mtd->page_size);
     }
+
+    /* verify configuration */
+    assert(dev->addr_width > 0);
+    assert(dev->addr_width <= 4);
 
     DEBUG("mtd_spi_nor_init: %" PRIu32 " bytes "
           "(%" PRIu32 " sectors, %" PRIu32 " bytes/sector, "
@@ -458,7 +671,7 @@ static int mtd_spi_nor_init(mtd_dev_t *mtd)
           mtd->sector_count, mtd->pages_per_sector * mtd->page_size,
           mtd->pages_per_sector * mtd->sector_count,
           mtd->pages_per_sector, mtd->page_size);
-    DEBUG("mtd_spi_nor_init: Using %u byte addresses\n", dev->params->addr_width);
+    DEBUG("mtd_spi_nor_init: Using %u byte addresses\n", dev->addr_width);
 
     uint8_t status;
     mtd_spi_cmd_read(dev, dev->params->opcode->rdsr, &status, sizeof(status));
@@ -629,31 +842,31 @@ static int mtd_spi_nor_erase(mtd_dev_t *mtd, uint32_t addr, uint32_t size)
         if (size == total_size) {
             mtd_spi_cmd(dev, dev->params->opcode->chip_erase);
             size -= total_size;
-            us = dev->params->wait_chip_erase;
+            us = dev->wait_chip_erase;
         }
-        else if ((dev->params->flag & SPI_NOR_F_SECT_64K) && (size >= MTD_64K) &&
+        else if ((dev->flag & SPI_NOR_F_SECT_64K) && (size >= MTD_64K) &&
                  ((addr & MTD_64K_ADDR_MASK) == 0)) {
             /* 64 KiB blocks can be erased with block erase command */
             mtd_spi_cmd_addr_write(dev, dev->params->opcode->block_erase_64k, addr, NULL, 0);
             addr += MTD_64K;
             size -= MTD_64K;
-            us = dev->params->wait_64k_erase;
+            us = dev->wait_64k_erase;
         }
-        else if ((dev->params->flag & SPI_NOR_F_SECT_32K) && (size >= MTD_32K) &&
+        else if ((dev->flag & SPI_NOR_F_SECT_32K) && (size >= MTD_32K) &&
                  ((addr & MTD_32K_ADDR_MASK) == 0)) {
             /* 32 KiB blocks can be erased with block erase command */
             mtd_spi_cmd_addr_write(dev, dev->params->opcode->block_erase_32k, addr, NULL, 0);
             addr += MTD_32K;
             size -= MTD_32K;
-            us = dev->params->wait_32k_erase;
+            us = dev->wait_32k_erase;
         }
-        else if ((dev->params->flag & SPI_NOR_F_SECT_4K) && (size >= MTD_4K) &&
+        else if ((dev->flag & SPI_NOR_F_SECT_4K) && (size >= MTD_4K) &&
                  ((addr & MTD_4K_ADDR_MASK) == 0)) {
             /* 4 KiB sectors can be erased with sector erase command */
             mtd_spi_cmd_addr_write(dev, dev->params->opcode->sector_erase, addr, NULL, 0);
             addr += MTD_4K;
             size -= MTD_4K;
-            us = dev->params->wait_sector_erase;
+            us = dev->wait_sector_erase;
         }
         else {
             /* no suitable erase block found */

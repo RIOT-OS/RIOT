@@ -27,18 +27,12 @@
 #ifdef MODULE_MTD
 static const mtd_spi_nor_params_t _ikea_tradfri_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,
-    .wait_chip_erase = 2LU * US_PER_SEC,
-    .wait_32k_erase = 500LU *US_PER_MS,
-    .wait_sector_erase = 300LU * US_PER_MS,
-    .wait_chip_wake_up = 1LU * US_PER_MS,
     .clk = IKEA_TRADFRI_NOR_SPI_CLK,
-    .flag = IKEA_TRADFRI_NOR_FLAGS,
     .spi = IKEA_TRADFRI_NOR_SPI_DEV,
     .mode = IKEA_TRADFRI_NOR_SPI_MODE,
     .cs = IKEA_TRADFRI_NOR_SPI_CS,
     .wp = GPIO_UNDEF,
     .hold = GPIO_UNDEF,
-    .addr_width = 3,
 };
 
 static mtd_spi_nor_t ikea_tradfri_nor_dev = {

@@ -85,7 +85,6 @@ extern "C" {
 #define PINETIME_NOR_PAGE_SIZE          (256)
 #define PINETIME_NOR_PAGES_PER_SECTOR   (16)
 #define PINETIME_NOR_SECTOR_COUNT       (2048)
-#define PINETIME_NOR_FLAGS              (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K)
 #define PINETIME_NOR_SPI_DEV            SPI_DEV(0)
 #define PINETIME_NOR_SPI_CLK            SPI_CLK_10MHZ
 #define PINETIME_NOR_SPI_CS             GPIO_PIN(0, 5)

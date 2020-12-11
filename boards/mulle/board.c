@@ -50,12 +50,7 @@ static devfs_t mulle_nvram_devfs = {
 
 static const mtd_spi_nor_params_t mulle_nor_params = {
     .opcode = &mtd_spi_nor_opcode_default,
-    .wait_chip_erase = 16LU * US_PER_SEC,
-    .wait_sector_erase = 10LU * US_PER_MS,
-    .wait_32k_erase = 20LU * US_PER_MS,
-    .wait_chip_wake_up = 1LU * US_PER_MS,
     .spi = MULLE_NOR_SPI_DEV,
-    .addr_width = 3,
     .mode = SPI_MODE_3,
     .cs = MULLE_NOR_SPI_CS,
     .wp = GPIO_UNDEF,
@@ -71,6 +66,12 @@ static mtd_spi_nor_t mulle_nor_dev = {
         .sector_count = 32,
     },
     .params = &mulle_nor_params,
+    .wait_chip_erase = 16LU * US_PER_SEC,
+    .wait_sector_erase = 10LU * US_PER_MS,
+    .wait_32k_erase = 20LU * US_PER_MS,
+    .wait_chip_wake_up = 1LU * US_PER_MS,
+    .flag = SPI_NOR_F_NO_SFDP,
+    .addr_width = 3,
 };
 
 mtd_dev_t *mtd0 = (mtd_dev_t *)&mulle_nor_dev;

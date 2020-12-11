@@ -26,6 +26,7 @@
 
 #include <stdint.h>
 
+#include "bitarithm.h"
 #include "periph_conf.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
@@ -97,23 +98,22 @@ typedef struct __attribute__((packed)) {
 #define SPI_NOR_F_SECT_64K  (4)
 
 /**
+ * @brief   Flag to set when the MCU should not attempt autoconfiguration using
+ *          SFDP
+ */
+#define SPI_NOR_F_NO_SFDP   (0x8000)
+
+/**
  * @brief Compile-time parameters for a serial flash device
  */
 typedef struct {
     const mtd_spi_nor_opcode_t *opcode; /**< Opcode table for the device */
-    uint32_t wait_chip_erase;   /**< Full chip erase wait time in µs */
-    uint32_t wait_64k_erase;    /**< 64KB page erase wait time in µs */
-    uint32_t wait_32k_erase;    /**< 32KB page erase wait time in µs */
-    uint32_t wait_sector_erase; /**< 4KB sector erase wait time in µs */
-    uint32_t wait_chip_wake_up; /**< Chip wake up time in µs */
-    spi_clk_t clk;           /**< SPI clock */
-    uint16_t flag;           /**< Config flags */
     spi_t spi;               /**< SPI bus the device is connected to */
+    spi_clk_t clk;           /**< SPI clock */
     spi_mode_t mode;         /**< SPI mode */
     gpio_t cs;               /**< CS pin GPIO handle */
     gpio_t wp;               /**< Write Protect pin GPIO handle */
     gpio_t hold;             /**< HOLD pin GPIO handle */
-    uint8_t addr_width;      /**< Number of bytes in addresses, usually 3 for small devices */
 } mtd_spi_nor_params_t;
 
 /**
@@ -124,7 +124,17 @@ typedef struct {
 typedef struct {
     mtd_dev_t base;          /**< inherit from mtd_dev_t object */
     const mtd_spi_nor_params_t *params; /**< SPI NOR params */
+
+    uint32_t wait_chip_erase;   /**< Full chip erase wait time in µs */
+    uint32_t wait_64k_erase;    /**< 64KB page erase wait time in µs */
+    uint32_t wait_32k_erase;    /**< 32KB page erase wait time in µs */
+    uint32_t wait_sector_erase; /**< 4KB sector erase wait time in µs */
+    uint32_t wait_chip_wake_up; /**< Chip wake up time in µs */
+    uint16_t flag;           /**< Config flags */
+
     mtd_jedec_id_t jedec_id; /**< JEDEC ID of the chip */
+
+    uint8_t addr_width;      /**< Number of bytes in addresses, usually 3 for small devices */
 
     /**
      * @brief   bitmask to corresponding to the page address

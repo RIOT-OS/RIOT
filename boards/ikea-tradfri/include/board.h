@@ -88,7 +88,6 @@ extern "C" {
 #define IKEA_TRADFRI_NOR_PAGE_SIZE          (256)
 #define IKEA_TRADFRI_NOR_PAGES_PER_SECTOR   (16)
 #define IKEA_TRADFRI_NOR_SECTOR_COUNT       (64)
-#define IKEA_TRADFRI_NOR_FLAGS              (SPI_NOR_F_SECT_4K | SPI_NOR_F_SECT_32K)
 #define IKEA_TRADFRI_NOR_SPI_DEV            SPI_DEV(0)
 #define IKEA_TRADFRI_NOR_SPI_CLK            SPI_CLK_1MHZ
 #define IKEA_TRADFRI_NOR_SPI_CS             GPIO_PIN(PB, 11)
