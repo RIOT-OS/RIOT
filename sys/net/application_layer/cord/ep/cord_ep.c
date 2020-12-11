@@ -276,7 +276,11 @@ int cord_ep_register(const sock_udp_ep_t *remote, const char *regif)
     /* set some packet options and write query string */
     coap_hdr_set_type(pkt.hdr, COAP_TYPE_CON);
     coap_opt_add_uint(&pkt, COAP_OPT_CONTENT_FORMAT, COAP_FORMAT_LINK);
-    cord_common_add_qstring(&pkt);
+    res = cord_common_add_qstring(&pkt);
+    if (res < 0) {
+        retval = CORD_EP_ERR;
+        goto end;
+    }
 
     pkt_len = coap_opt_finish(&pkt, COAP_OPT_FINISH_PAYLOAD);
 
