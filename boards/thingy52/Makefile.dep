@@ -6,6 +6,10 @@ endif
 
 DEFAULT_MODULE += board_speaker
 
+ifneq (,$(filter periph_dac,$(FEATURES_USED)))
+  USEMODULE += pwm_dac
+endif
+
 # Use Segger's RTT unless another stdio_% is already used
 ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_rtt

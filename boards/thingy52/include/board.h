@@ -55,6 +55,21 @@ extern "C" {
 #define LPSXXX_PARAM_ADDR   (0x5c)
 /** @} */
 
+#ifdef MODULE_PWM_DAC
+/**
+ * @name    The emulated DAC channels
+ *
+ * The static value is actually the result of the @ref pwm_dac_init in
+ * board_init, and it is checked there whether the values are identical.
+ *
+ * @{
+ */
+#define DAC_NUMOF 1
+#undef DAC_LINE
+#define DAC_LINE(x) (0x600)
+/** @} */
+#endif /* MODULE_PWM_DAC */
+
 /**
  * @brief   Initialize board specific hardware
  */
