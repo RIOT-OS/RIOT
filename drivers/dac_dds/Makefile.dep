@@ -1,0 +1,2 @@
+FEATURES_REQUIRED += periph_dac
+FEATURES_REQUIRED += periph_timer_periodic
