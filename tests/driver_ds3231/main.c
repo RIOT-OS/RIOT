@@ -94,7 +94,12 @@ static int _cmd_get(int argc, char **argv)
     char dstr[ISOSTR_LEN];
 
     struct tm time;
-    ds3231_get_time(&_dev, &time);
+    int res;
+    res = ds3231_get_time(&_dev, &time);
+    if (res != 0) {
+        puts("error: unable to read time");
+        return 1;
+    }
 
     size_t pos = strftime(dstr, ISOSTR_LEN, "%Y-%m-%dT%H:%M:%S", &time);
     dstr[pos] = '\0';
@@ -122,7 +127,11 @@ static int _cmd_set(int argc, char **argv)
         return 1;
     }
 
-    ds3231_set_time(&_dev, &target_time);
+    res = ds3231_set_time(&_dev, &target_time);
+    if (res != 0) {
+        puts("error: unable to set time");
+        return 1;
+    }
 
     printf("success: time set to %s\n", argv[1]);
     return 0;
