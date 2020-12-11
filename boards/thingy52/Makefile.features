@@ -5,4 +5,6 @@ FEATURES_PROVIDED += periph_i2c
 FEATURES_PROVIDED += periph_pwm
 FEATURES_PROVIDED += periph_uart
 
+FEATURES_PROVIDED += board_speaker
+
 include $(RIOTBOARD)/common/nrf52/Makefile.features

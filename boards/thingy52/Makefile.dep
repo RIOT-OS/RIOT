@@ -4,6 +4,8 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += lps22hb
 endif
 
+DEFAULT_MODULE += board_speaker
+
 # Use Segger's RTT unless another stdio_% is already used
 ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
   USEMODULE += stdio_rtt

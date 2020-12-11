@@ -334,6 +334,12 @@ int main(void)
     dac_set(DAC_DDS_DAC, 1 << 15);
     _dac_init();
 
+#ifdef MODULE_BOARD_SPEAKER
+    /* It'll be always-on because the hello demo doesn't execute code when it's
+     * over */
+    board_speaker_on();
+#endif
+
     /* start the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);

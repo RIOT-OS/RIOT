@@ -21,9 +21,7 @@
 #include "cpu.h"
 #include "board.h"
 
-#if defined(MODULE_LPS22HB) || defined(MODULE_HTS221)
 #include "periph/gpio.h"
-#endif
 
 void board_init(void)
 {
@@ -36,4 +34,18 @@ void board_init(void)
 
     /* initialize the CPU */
     cpu_init();
+
+    /* Initialize speaker pin and keep it off initially */
+    gpio_init(SPK_PWR_CTRL_PIN, GPIO_OUT);
+    gpio_clear(SPK_PWR_CTRL_PIN);
+}
+
+void board_speaker_on(void)
+{
+    gpio_set(SPK_PWR_CTRL_PIN);
+}
+
+void board_speaker_off(void)
+{
+    gpio_clear(SPK_PWR_CTRL_PIN);
 }

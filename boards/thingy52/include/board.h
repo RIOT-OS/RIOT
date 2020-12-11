@@ -60,6 +60,22 @@ extern "C" {
  */
 void board_init(void);
 
+/**
+ * @brief   Enable the speaker
+ *
+ * Before this is called, it's a good time to run
+ * `dac_poweron(DAC_LINE(0));`.
+ */
+void board_speaker_on(void);
+
+/**
+ * @brief   Disable the speaker
+ *
+ * After this is called, it's a good time to run
+ * `dac_poweroff(DAC_LINE(0));`.
+ */
+void board_speaker_off(void);
+
 #ifdef __cplusplus
 }
 #endif
