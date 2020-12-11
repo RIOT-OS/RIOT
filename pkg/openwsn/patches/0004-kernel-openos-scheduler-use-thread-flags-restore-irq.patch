@@ -1,7 +1,7 @@
-From 219e01c2b9fb779e3682a24d361a8a9b672b551a Mon Sep 17 00:00:00 2001
+From cce174546a58a0d0dc170bc641f89ab86f38547c Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Sun, 29 Mar 2020 12:11:53 +0200
-Subject: [PATCH 4/9] kernel/openos/scheduler: use thread flags, restore
+Subject: [PATCH 04/11] kernel/openos/scheduler: use thread flags, restore
  irq_state
 
 Use thread_flags_wait_any to pause the scheduler. Set flag in
@@ -10,8 +10,8 @@ scheduler_push_task to trigger new task handling.
 squash! kernel/openos/scheduler: use thread flags
 ---
  kernel/openos/scheduler.c | 13 ++++++++++++-
- kernel/scheduler.h        |  2 +-
- 2 files changed, 13 insertions(+), 2 deletions(-)
+ kernel/scheduler.h        |  4 ++--
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/kernel/openos/scheduler.c b/kernel/openos/scheduler.c
 index f52f35d4..41be092f 100644
@@ -60,7 +60,7 @@ index f52f35d4..41be092f 100644
  
  
 diff --git a/kernel/scheduler.h b/kernel/scheduler.h
-index dd035a22..51b6d9cb 100644
+index e44f7956..51b6d9cb 100644
 --- a/kernel/scheduler.h
 +++ b/kernel/scheduler.h
 @@ -47,7 +47,7 @@ typedef void (*task_cbt)(void);
@@ -72,6 +72,15 @@ index dd035a22..51b6d9cb 100644
  void scheduler_push_task(task_cbt task_cb, task_prio_t prio);
  
  #if SCHEDULER_DEBUG_ENABLE
+@@ -55,7 +55,7 @@ uint8_t scheduler_debug_get_TasksCur(void);
+ uint8_t scheduler_debug_get_TasksMax(void);
+ #endif
+ 
+-#include "openos/scheduler_types.h"
++#include "scheduler_types.h"
+ 
+ /**
+ \}
 -- 
 2.28.0
 

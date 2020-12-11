@@ -43,7 +43,7 @@ void eui64_get(uint8_t *addressToWrite)
         _eui64_is_set = true;
     }
     memcpy(addressToWrite, _eui64.uint8, sizeof(_eui64.uint8));
-#else
+#elif MODULE_OPENWSN_RADIO_NETDEV
     eui64_t eui64;
 
     if (openwsn_radio.dev->driver->get(openwsn_radio.dev, NETOPT_ADDRESS_LONG,
@@ -54,5 +54,7 @@ void eui64_get(uint8_t *addressToWrite)
     else {
         luid_get_eui64((eui64_t *) addressToWrite);
     }
+#else
+    memset(addressToWrite, 0, sizeof(eui64_t));
 #endif
 }

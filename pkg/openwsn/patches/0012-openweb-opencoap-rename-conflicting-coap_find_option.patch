@@ -1,0 +1,134 @@
+From 61efa6bbbd5e93d8f8148b89ced95f0910e10d46 Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 4 Dec 2020 16:42:18 +0100
+Subject: [PATCH 12/13] openweb/opencoap: rename conflicting coap_find_option
+
+---
+ openweb/opencoap/coap.c   | 16 ++++++++--------
+ openweb/opencoap/coap.h   |  2 +-
+ openweb/opencoap/oscore.c |  6 +++---
+ 3 files changed, 12 insertions(+), 12 deletions(-)
+
+diff --git a/openweb/opencoap/coap.c b/openweb/opencoap/coap.c
+index 779c8c81..e743da52 100644
+--- a/openweb/opencoap/coap.c
++++ b/openweb/opencoap/coap.c
+@@ -191,7 +191,7 @@ void coap_receive(OpenQueueEntry_t *msg) {
+ 
+     // process handled options
+     //== Stateless Proxy option
+-    option_count = coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_STATELESSPROXY,
++    option_count = openwsn_coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_STATELESSPROXY,
+                                     &option_index);
+     if (option_count >= 1) {
+         statelessProxy = &coap_incomingOptions[option_index];
+@@ -205,7 +205,7 @@ void coap_receive(OpenQueueEntry_t *msg) {
+     }
+ 
+     //== Proxy Scheme option
+-    option_count = coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_PROXYSCHEME,
++    option_count = openwsn_coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_PROXYSCHEME,
+                                     &option_index);
+     if (option_count >= 1) {
+         proxyScheme = &coap_incomingOptions[option_index];
+@@ -220,7 +220,7 @@ void coap_receive(OpenQueueEntry_t *msg) {
+ 
+ 
+     //== Object Security Option
+-    option_count = coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_OSCORE,
++    option_count = openwsn_coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_OSCORE,
+                                     &option_index);
+     if (option_count >= 1) {
+         objectSecurity = &coap_incomingOptions[option_index];
+@@ -299,7 +299,7 @@ void coap_receive(OpenQueueEntry_t *msg) {
+         // iterate until matching resource found, or no match
+         while (found == FALSE && securityReturnCode == COAP_CODE_EMPTY) {
+ 
+-            option_count = coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_URIPATH,
++            option_count = openwsn_coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_URIPATH,
+                                             &option_index);
+             if (
+                     option_count == 2 &&
+@@ -924,7 +924,7 @@ owerror_t coap_options_encode(
+ }
+ 
+ 
+-uint8_t coap_find_option(coap_option_iht *array, uint8_t arrayLen, coap_option_t option, uint8_t *startIndex) {
++uint8_t openwsn_coap_find_option(coap_option_iht *array, uint8_t arrayLen, coap_option_t option, uint8_t *startIndex) {
+     uint8_t i;
+     uint8_t j;
+     bool found;
+@@ -1135,7 +1135,7 @@ void coap_handle_proxy_scheme(OpenQueueEntry_t *msg,
+     open_addr_t JRCaddress;
+ 
+     // verify that Proxy Scheme is set to coap
+-    option_count = coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_PROXYSCHEME, &option_index);
++    option_count = openwsn_coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_PROXYSCHEME, &option_index);
+     if (option_count >= 1) {
+         proxyScheme = &incomingOptions[option_index];
+     } else {
+@@ -1146,7 +1146,7 @@ void coap_handle_proxy_scheme(OpenQueueEntry_t *msg,
+     }
+ 
+     // verify that UriHost is set to "6tisch.arpa"
+-    option_count = coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_URIHOST, &option_index);
++    option_count = openwsn_coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_URIHOST, &option_index);
+     if (option_count >= 1) {
+         uriHost = &incomingOptions[option_index];
+     } else {
+@@ -1202,7 +1202,7 @@ void coap_handle_stateless_proxy(OpenQueueEntry_t *msg,
+     open_addr_t destIP;
+     open_addr_t link_local_prefix;
+ 
+-    option_count = coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_STATELESSPROXY, &option_index);
++    option_count = openwsn_coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_STATELESSPROXY, &option_index);
+     if (option_count >= 1) {
+         statelessProxy = &incomingOptions[option_index];
+     } else {
+diff --git a/openweb/opencoap/coap.h b/openweb/opencoap/coap.h
+index 8b9b89ac..cebbd780 100644
+--- a/openweb/opencoap/coap.h
++++ b/openweb/opencoap/coap.h
+@@ -258,7 +258,7 @@ uint8_t coap_options_parse(uint8_t *buffer,
+                            coap_option_iht *options,
+                            uint8_t *optionsLen);
+ 
+-uint8_t coap_find_option(coap_option_iht *array, uint8_t arrayLen, coap_option_t option, uint8_t *startIndex);
++uint8_t openwsn_coap_find_option(coap_option_iht *array, uint8_t arrayLen, coap_option_t option, uint8_t *startIndex);
+ 
+ /**
+ \}
+diff --git a/openweb/opencoap/oscore.c b/openweb/opencoap/oscore.c
+index bfc17133..a95f1877 100644
+--- a/openweb/opencoap/oscore.c
++++ b/openweb/opencoap/oscore.c
+@@ -11,7 +11,7 @@
+ 
+ #define EAAD_MAX_LEN            9 + OSCOAP_MAX_ID_LEN // assumes no Class I options
+ #define AAD_MAX_LEN            12 + EAAD_MAX_LEN
+-#define INFO_MAX_LEN           2 * OSCOAP_MAX_ID_LEN + 2 + 1 + 4 + 1 + 3 
++#define INFO_MAX_LEN           2 * OSCOAP_MAX_ID_LEN + 2 + 1 + 4 + 1 + 3
+ 
+ //=========================== variables =======================================
+ 
+@@ -175,7 +175,7 @@ owerror_t oscore_protect_message(
+     uint8_t option_index;
+ 
+     // find object security option in the list of passed options
+-    option_count = coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_OSCORE,
++    option_count = openwsn_coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_OSCORE,
+                                     &option_index);
+     if (option_count >= 1) {
+         objectSecurity = &incomingOptions[option_index];
+@@ -318,7 +318,7 @@ owerror_t oscore_unprotect_message(
+     uint8_t option_index;
+ 
+     // find object security option in the list of passed options
+-    option_count = coap_find_option(incomingOptions, *incomingOptionsLen, COAP_OPTION_NUM_OSCORE,
++    option_count = openwsn_coap_find_option(incomingOptions, *incomingOptionsLen, COAP_OPTION_NUM_OSCORE,
+                                     &option_index);
+     if (option_count >= 1) {
+         objectSecurity = &incomingOptions[option_index];
+-- 
+2.28.0
+

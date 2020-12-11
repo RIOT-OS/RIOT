@@ -1,0 +1,88 @@
+From f972dcfd8b8b8ec180bde87b12ab362c917e608f Mon Sep 17 00:00:00 2001
+From: Francisco Molina <femolina@uc.cl>
+Date: Fri, 30 Oct 2020 15:40:17 +0100
+Subject: [PATCH 10/11] inc/config.h: use kerneldefines
+
+---
+ inc/config.h | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
+
+diff --git a/inc/config.h b/inc/config.h
+index 8d2f0e74..fd215d28 100644
+--- a/inc/config.h
++++ b/inc/config.h
+@@ -1,6 +1,8 @@
+ #ifndef OPENWSN_CONFIG_H
+ #define OPENWSN_CONFIG_H
+ 
++#include "kernel_defines.h"
++
+ // =========================== Debugging ============================
+ 
+ /**
+@@ -197,7 +199,7 @@
+  *
+  */
+ #ifndef OPENWSN_CJOIN_C
+-#define OPENWSN_CJOIN_C (0)
++#define OPENWSN_CJOIN_C IS_USED(MODULE_OPENWSN_CJOIN)
+ #endif
+ 
+ // ======================= OpenWeb configuration =======================
+@@ -211,7 +213,7 @@
+  *
+  */
+ #ifndef OPENWSN_COAP_C
+-#define OPENWSN_COAP_C (0)
++#define OPENWSN_COAP_C IS_USED(MODULE_OPENWSN_COAP)
+ #endif
+ 
+ 
+@@ -224,7 +226,7 @@
+  *
+  */
+ #ifndef OPENWSN_UDP_C
+-#define OPENWSN_UDP_C (0)
++#define OPENWSN_UDP_C IS_USED(MODULE_OPENWSN_UDP)
+ #endif
+ 
+ /**
+@@ -239,7 +241,7 @@
+  *
+  */
+ #ifndef OPENWSN_6LO_FRAGMENTATION_C
+-#define OPENWSN_6LO_FRAGMENTATION_C (0)
++#define OPENWSN_6LO_FRAGMENTATION_C IS_USED(MODULE_OPENWSN_6LO_FRAGMENTATION)
+ #endif
+ 
+ #if OPENWSN_6LO_FRAGMENTATION_C
+@@ -257,7 +259,7 @@
+  * Enables the icmpv6 echo (ping) functionality
+  */
+ #ifndef OPENWSN_ICMPV6ECHO_C
+-#define OPENWSN_ICMPV6ECHO_C (0)
++#define OPENWSN_ICMPV6ECHO_C IS_USED(MODULE_OPENWSN_ICMPV6_ECHO)
+ #endif
+ 
+ 
+@@ -269,7 +271,7 @@
+  * Requires: OPENWSN_CJOIN_C, OPENWSN_COAP_C, OPENWSN_UDP_C
+  */
+ #ifndef OPENWSN_IEEE802154E_SECURITY_C
+-#define OPENWSN_IEEE802154E_SECURITY_C (0)
++#define OPENWSN_IEEE802154E_SECURITY_C IS_USED(OPENWSN_IEEE802154E_SECURITY)
+ #endif
+ 
+ 
+@@ -318,7 +320,7 @@
+  *  - MSF_LIM_NUMCELLSUSED_LOW: if cell usage is below this value, trigger 6P to remove a single cell to the selected parent
+  */
+ #ifndef ADAPTIVE_MSF
+-#define ADAPTIVE_MSF (0)
++#define ADAPTIVE_MSF IS_USED(MODULE_OPENWSN_ADAPTIVE_MSF)
+ #endif
+ 
+ #if ADAPTIVE_MSF
+-- 
+2.28.0
+
