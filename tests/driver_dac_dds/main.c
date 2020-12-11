@@ -315,6 +315,8 @@ static const shell_command_t shell_commands[] = {
 int main(void)
 {
     dac_init(DAC_DDS_DAC);
+    /* Initialize to the idle level of 16bit audio */
+    dac_set(DAC_DDS_DAC, 1 << 15);
     _dac_init();
 
     /* start the shell */
