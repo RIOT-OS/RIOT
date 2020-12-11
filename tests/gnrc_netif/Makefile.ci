@@ -47,6 +47,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l073rz \
     olimexino-stm32 \
     opencm904 \
+    samd10-xmini \
     saml10-xpro \
     saml11-xpro \
     spark-core \

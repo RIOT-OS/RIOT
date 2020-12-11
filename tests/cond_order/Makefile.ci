@@ -16,6 +16,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo32-f031 \
     nucleo32-f042 \
     nucleo32-l031 \
+    samd10-xmini \
     stk3200 \
     stm32f030f4-demo \
     stm32f0discovery \

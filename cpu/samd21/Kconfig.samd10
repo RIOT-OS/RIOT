@@ -1,0 +1,37 @@
+## CPU Models
+config CPU_MODEL_SAMD10C13A
+    bool
+    select CPU_FAM_SAMD10
+
+config CPU_MODEL_SAMD10C14A
+    bool
+    select CPU_FAM_SAMD10
+
+config CPU_MODEL_SAMD10D13AM
+    bool
+    select CPU_FAM_SAMD10
+
+config CPU_MODEL_SAMD10D13AS
+    bool
+    select CPU_FAM_SAMD10
+
+config CPU_MODEL_SAMD10D14AM
+    bool
+    select CPU_FAM_SAMD10
+
+config CPU_MODEL_SAMD10D14AS
+    bool
+    select CPU_FAM_SAMD10
+
+config CPU_MODEL_SAMD10D14AU
+    bool
+    select CPU_FAM_SAMD10
+
+config CPU_MODEL
+    default "samd10c13a" if CPU_MODEL_SAMD10C13A
+    default "samd10c14a" if CPU_MODEL_SAMD10C14A
+    default "samd10d13am" if CPU_MODEL_SAMD10D13AM
+    default "samd10d13as" if CPU_MODEL_SAMD10D13AS
+    default "samd10d14am" if CPU_MODEL_SAMD10D14AM
+    default "samd10d14as" if CPU_MODEL_SAMD10D14AS
+    default "samd10d14au" if CPU_MODEL_SAMD10D14AU
