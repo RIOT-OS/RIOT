@@ -226,8 +226,6 @@ static void _dac_init(void)
 
 static int cmd_init(int argc, char **argv)
 {
-    printf("argc: %d\n", argc);
-
     if (argc < 2) {
         printf("usage: %s <freq> <bit>\n", argv[0]);
         return 1;
