@@ -88,7 +88,10 @@ static int32_t isin(int32_t x)
     return c >= 0 ? y : -y;
 }
 
-/* simple function to fill buffer with samples */
+/* simple function to fill buffer with samples
+ *
+ * It is up to the caller to ensure that len is always at least period.
+ * */
 typedef void (*sample_gen_t)(uint8_t *dst, size_t len, uint16_t period);
 
 static void _fill_saw_samples_8(uint8_t *buf, size_t len, uint16_t period)
@@ -174,6 +177,11 @@ static void play_function(uint16_t period, uint32_t samples, sample_gen_t fun)
 {
     static uint8_t buf[DAC_BUF_SIZE];
     mutex_t lock = MUTEX_INIT_LOCKED;
+
+    if (period > DAC_BUF_SIZE) {
+        printf("Period duration exceeds sample buffer size.\n");
+        return;
+    }
 
     /* only work with whole wave periods */
     uint16_t len_aligned = DAC_BUF_SIZE - DAC_BUF_SIZE % period;
