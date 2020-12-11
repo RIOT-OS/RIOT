@@ -67,6 +67,22 @@ static const i2c_conf_t i2c_config[] = {
  */
 #define NRF5X_ENABLE_DCDC
 
+/**
+ * @name   PWM configuration
+ *
+ * The PWM0 module is configured with one channel to drive the speaker.
+ *
+ * The light well and color sendor RGB LEDs are not expressed yet for lack of
+ * an IO expander driver for this purpose.
+ *
+ * @{
+ */
+static const pwm_conf_t pwm_config[] = {
+    { NRF_PWM0, { GPIO_PIN(0, 27), GPIO_UNDEF, GPIO_UNDEF, GPIO_UNDEF } }
+};
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
