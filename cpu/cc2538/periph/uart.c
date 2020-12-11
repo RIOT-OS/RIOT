@@ -41,6 +41,7 @@
 #define BEMIS               (1 << 9)    /**< UART break error */
 #define FEMIS               (1 << 7)    /**< UART framing error */
 #define RTMIS               (1 << 6)    /**< UART RX time-out */
+#define TXMIS               (1 << 5)    /**< UART TX masked interrupt */
 #define RXMIS               (1 << 4)    /**< UART RX masked interrupt */
 
 #define UART_CTL_HSE_VALUE  (0)
@@ -68,6 +69,16 @@ enum {
  */
 static uart_isr_ctx_t uart_ctx[UART_NUMOF];
 
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+
+#include "tsrb.h"
+/**
+ * @brief   Allocate for tx ring buffers
+ */
+static tsrb_t uart_tx_rb[UART_NUMOF];
+static uint8_t uart_tx_rb_buf[UART_NUMOF][UART_TXBUF_SIZE];
+#endif
+
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
     assert(uart < UART_NUMOF);
@@ -79,6 +90,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
      * configuration.
      */
     unsigned int uart_num = ((uintptr_t)u - (uintptr_t)UART0_BASEADDR) / 0x1000;
+
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    /* set up the TX buffer */
+    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
+#endif
 
     /* Configure the Rx and Tx pins. If no callback function is defined,
      * the UART should be initialised in Tx only mode.
@@ -142,13 +158,16 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     u->IBRD = divisor >> DIVFRAC_NUM_BITS;
     u->FBRD = divisor & DIVFRAC_MASK;
 
-    /* Configure line control for 8-bit, no parity, 1 stop bit and enable  */
+    /* Configure line control for 8-bit, no parity, 1 stop bit and enable FIFO */
     u->cc2538_uart_lcrh.LCRH = (WLEN_8_BITS << 5) | FEN;
 
     /* register callbacks and enable UART irq */
     if (rx_cb) {
         uart_ctx[uart].rx_cb = rx_cb;
         uart_ctx[uart].arg = arg;
+    }
+
+    if (IS_USED(MODULE_PERIPH_UART_NONBLOCKING) || rx_cb) {
         NVIC_EnableIRQ(UART_IRQ(uart_num));
     }
 
@@ -187,20 +206,81 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 }
 #endif
 
+static inline void send_byte(uart_t uart, uint8_t byte)
+{
+    /* Block if the TX FIFO is full */
+    while (uart_config[uart].dev->cc2538_uart_fr.FRbits.TXFF) {}
+    uart_config[uart].dev->DR = byte;
+}
+
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     assert(uart < UART_NUMOF);
-
-    cc2538_uart_t *u = uart_config[uart].dev;
-
-    /* Block if the TX FIFO is full */
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
     for (size_t i = 0; i < len; i++) {
-        while (u->cc2538_uart_fr.FRbits.TXFF) {}
-        u->DR = data[i];
+        uart_config[uart].dev->cc2538_uart_im.IM |= TXMIS;
+        if (irq_is_in() || __get_PRIMASK()) {
+            /* if ring buffer is full free up a spot */
+            if (tsrb_full(&uart_tx_rb[uart])) {
+                send_byte(uart, tsrb_get_one(&uart_tx_rb[uart]));
+            }
+            /* if FIFO is full write to the buffer */
+            if (uart_config[uart].dev->cc2538_uart_fr.FRbits.TXFF) {
+                tsrb_add_one(&uart_tx_rb[uart], data[i]);
+            }
+            /* if tx FIFO is not full then add data to the FIFO */
+            else {
+                /* if there is already data in the tsrb buffer write that byte */
+                int byte = tsrb_get_one(&uart_tx_rb[uart]);
+                if (byte >= 0) {
+                    uart_config[uart].dev->DR = byte;
+                    tsrb_add_one(&uart_tx_rb[uart], data[i]);
+                }
+                /* If there is not data in the buffer directly write the
+                   current byte*/
+                else {
+                    uart_config[uart].dev->DR = data[i];
+                }
+            }
+        }
+        else {
+            /* The Tx FIFO will only triggered an interrupt when it gets
+               below TXIFLSEL. If there is no data in the FIFO the ISR
+               will never trigger, so always write directly to the FIFO
+               if its not full to make sure the process is always
+               bootstrapped */
+            /* If Tx FIFO is full then add to ring buffer */
+            if (uart_config[uart].dev->cc2538_uart_fr.FRbits.TXFF) {
+                while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {}
+            }
+            /* If tx FIFO is not full then add data to the FIFO */
+            else {
+                /* if there is already data in the tsrb buffer write that byte */
+                /* need to disable IRQs in case FIFO gets empty enough
+                   to trigger an ISR */
+                unsigned state = irq_disable();
+                int byte = tsrb_get_one(&uart_tx_rb[uart]);
+                if (byte >= 0) {
+                    uart_config[uart].dev->DR = byte;
+                    irq_restore(state);
+                    while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {}
+                }
+                /* If there is not data in the buffer directly write the
+                   current byte */
+                else {
+                    irq_restore(state);
+                    uart_config[uart].dev->DR = data[i];
+                }
+            }
+        }
     }
-
+#else
+    for (size_t i = 0; i < len; i++) {
+        send_byte(uart, data[i]);
+    }
     /* Wait for the TX FIFO to clear */
     while (!uart_config[uart].dev->cc2538_uart_fr.FRbits.TXFE) {}
+#endif
 }
 
 void uart_poweron(uart_t uart)
@@ -226,6 +306,24 @@ void uart_poweroff(uart_t uart)
     SYS_CTRL->cc2538_sys_ctrl_unnamed1.RCGCUART &= ~(1 << uart);
 }
 
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+static inline void irq_handler_tx(uart_t uart)
+{
+    /* fill up FIFO again */
+    while (!uart_config[uart].dev->cc2538_uart_fr.FRbits.TXFF) {
+        int byte = tsrb_get_one(&uart_tx_rb[uart]);
+        if (byte >= 0) {
+            uart_config[uart].dev->DR = byte;
+        }
+        else {
+            /* disable the interrupt if there are no more bytes to send */
+            uart_config[uart].dev->cc2538_uart_im.IM &= ~TXMIS;
+            break;
+        }
+    }
+}
+#endif
+
 static inline void irq_handler(uart_t uart)
 {
     assert(uart < UART_NUMOF);
@@ -239,6 +337,12 @@ static inline void irq_handler(uart_t uart)
     while (uart_config[uart].dev->cc2538_uart_fr.FRbits.RXFE == 0) {
         uart_ctx[uart].rx_cb(uart_ctx[uart].arg, uart_config[uart].dev->DR);
     }
+
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    if (mis & TXMIS) {
+        irq_handler_tx(uart);
+    }
+#endif
 
     if (mis & (OEMIS | BEMIS | FEMIS)) {
         /* Clear error status */

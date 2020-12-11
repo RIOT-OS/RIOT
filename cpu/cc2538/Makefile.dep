@@ -9,6 +9,10 @@ ifneq (,$(filter periph_rtc,$(USEMODULE)))
   USEMODULE += rtt_rtc
 endif
 
+ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
+  USEMODULE += tsrb
+endif
+
 USEMODULE += pm_layered
 
 include $(RIOTCPU)/cortexm_common/Makefile.dep
