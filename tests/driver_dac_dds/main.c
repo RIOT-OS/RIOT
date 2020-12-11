@@ -178,6 +178,9 @@ static void play_function(uint16_t period, uint32_t samples, sample_gen_t fun)
     /* only work with whole wave periods */
     uint16_t len_aligned = DAC_BUF_SIZE - DAC_BUF_SIZE % period;
 
+    /* One underrun indication is expected (for the first sample) */
+    int underruns = -1;
+
     /* 16 bit samples doubles data rate */
     if (res_16b) {
         samples *= 2;
@@ -193,10 +196,14 @@ static void play_function(uint16_t period, uint32_t samples, sample_gen_t fun)
         size_t len = min(samples, len_aligned);
         samples -= len;
 
-        dac_dds_play(DAC_DDS_CHAN, buf, len);
+        underruns += !dac_dds_play(DAC_DDS_CHAN, buf, len);
 
         /* wait for buffer flip */
         mutex_lock(&lock);
+    }
+
+    if (underruns != 0) {
+        printf("During playback, %d underruns occurred.\n", underruns);
     }
 }
 
