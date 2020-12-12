@@ -5,3 +5,8 @@ endif
 ifneq (,$(filter eui_provider,$(USEMODULE)))
   USEMODULE += at24mac
 endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi_on_qspi
+  USEMODULE += mtd_spi_nor
+endif

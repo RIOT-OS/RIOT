@@ -21,6 +21,7 @@
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Joakim Nohlgård <joakim.nohlgard@eistec.se>
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
+ * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  *
  * @}
  */
@@ -56,17 +57,79 @@ static DmacDescriptor DMA_DESCRIPTOR_ATTRS rx_desc[SPI_NUMOF];
  */
 static inline SercomSpi *dev(spi_t bus)
 {
-    return spi_config[bus].dev;
+    return (SercomSpi *)spi_config[bus].dev;
+}
+
+static inline bool _is_qspi(spi_t bus)
+{
+#ifdef MODULE_PERIPH_SPI_ON_QSPI
+    return (void*)spi_config[bus].dev == (void*)QSPI;
+#else
+    (void)bus;
+    return false;
+#endif
+}
+
+static inline void _qspi_clk(unsigned on)
+{
+#ifdef QSPI
+    /* enable/disable QSPI clock */
+    MCLK->APBCMASK.bit.QSPI_ = on;
+#else
+    (void)on;
+#endif
 }
 
 static inline void poweron(spi_t bus)
 {
-    sercom_clk_en(dev(bus));
+    if (_is_qspi(bus)) {
+        _qspi_clk(1);
+    } else {
+        sercom_clk_en(dev(bus));
+    }
 }
 
 static inline void poweroff(spi_t bus)
 {
-    sercom_clk_dis(dev(bus));
+    if (_is_qspi(bus)) {
+        _qspi_clk(0);
+    } else {
+        sercom_clk_dis(dev(bus));
+    }
+}
+
+static inline void _reset(SercomSpi *dev)
+{
+    dev->CTRLA.reg |= SERCOM_SPI_CTRLA_SWRST;
+    while (dev->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST) {}
+
+#ifdef SERCOM_SPI_STATUS_SYNCBUSY
+    while (dev->STATUS.bit.SYNCBUSY) {}
+#else
+    while (dev->SYNCBUSY.bit.SWRST) {}
+#endif
+}
+
+static inline void _disable(SercomSpi *dev)
+{
+    dev->CTRLA.reg = 0;
+
+#ifdef SERCOM_SPI_STATUS_SYNCBUSY
+    while (dev->STATUS.bit.SYNCBUSY) {}
+#else
+    while (dev->SYNCBUSY.reg) {}
+#endif
+}
+
+static inline void _enable(SercomSpi *dev)
+{
+    dev->CTRLA.bit.ENABLE = 1;
+
+#ifdef SERCOM_SPI_STATUS_SYNCBUSY
+    while (dev->STATUS.bit.SYNCBUSY) {}
+#else
+    while (dev->SYNCBUSY.reg) {}
+#endif
 }
 
 static inline bool _use_dma(spi_t bus)
@@ -79,6 +142,186 @@ static inline bool _use_dma(spi_t bus)
     return false;
 #endif
 }
+
+static inline void _init_dma(spi_t bus, const volatile void *reg_rx, volatile void *reg_tx)
+{
+    if (!_use_dma(bus)) {
+        return;
+    }
+
+#ifdef MODULE_PERIPH_DMA
+    _dma_state[bus].rx_dma = dma_acquire_channel();
+    _dma_state[bus].tx_dma = dma_acquire_channel();
+
+    dma_setup(_dma_state[bus].tx_dma,
+              spi_config[bus].tx_trigger, 0, false);
+    dma_setup(_dma_state[bus].rx_dma,
+              spi_config[bus].rx_trigger, 1, true);
+
+    dma_prepare(_dma_state[bus].rx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
+                (void*)reg_rx, NULL, 1, 0);
+    dma_prepare(_dma_state[bus].tx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
+                NULL, (void*)reg_tx, 0, 0);
+#else
+    (void)reg_rx;
+    (void)reg_tx;
+#endif
+}
+
+/**
+ * @brief   QSPI peripheral in SPI mode
+ * @{
+ */
+#ifdef QSPI
+static void _init_qspi(spi_t bus)
+{
+    /* reset the peripheral */
+    QSPI->CTRLA.bit.SWRST = 1;
+
+    QSPI->CTRLB.reg = QSPI_CTRLB_MODE_SPI
+                    | QSPI_CTRLB_CSMODE_LASTXFER
+                    | QSPI_CTRLB_DATALEN_8BITS;
+
+    /* set up DMA channels */
+    _init_dma(bus, &QSPI->RXDATA.reg, &QSPI->TXDATA.reg);
+}
+
+static void _qspi_acquire(spi_mode_t mode, spi_clk_t clk)
+{
+    /* datasheet says SCK = MCK / (BAUD + 1) */
+    /* but BAUD = 0 does not work, assume SCK = MCK / BAUD */
+    uint32_t baud = CLOCK_CORECLOCK > (2 * clk)
+                  ? (CLOCK_CORECLOCK + clk - 1) / clk
+                  : 1;
+
+    /* bit order is reversed from SERCOM SPI */
+    uint32_t _mode = (mode >> 1)
+                   | (mode << 1);
+    _mode &= 0x3;
+
+    QSPI->CTRLA.bit.ENABLE = 1;
+    QSPI->BAUD.reg = QSPI_BAUD_BAUD(baud) | _mode;
+}
+
+static inline void _qspi_release(void)
+{
+    QSPI->CTRLA.bit.ENABLE = 0;
+}
+
+static void _qspi_blocking_transfer(const void *out, void *in, size_t len)
+{
+    const uint8_t *out_buf = out;
+    uint8_t *in_buf = in;
+
+    for (size_t i = 0; i < len; i++) {
+        uint8_t tmp = out_buf ? out_buf[i] : 0;
+
+        /* transmit byte on MOSI */
+        QSPI->TXDATA.reg = tmp;
+
+        /* wait until byte has been sampled on MISO */
+        while (QSPI->INTFLAG.bit.RXC == 0) {}
+
+        /* consume the byte */
+        tmp = QSPI->RXDATA.reg;
+
+        if (in_buf) {
+            in_buf[i] = tmp;
+        }
+    }
+}
+#else /* !QSPI */
+void _init_qspi(spi_t bus);
+void _qspi_acquire(spi_mode_t mode, spi_clk_t clk);
+void _qspi_release(void);
+void _qspi_blocking_transfer(const void *out, void *in, size_t len);
+#endif
+/** @} */
+
+/**
+ * @brief   SERCOM peripheral in SPI mode
+ * @{
+ */
+static void _init_spi(spi_t bus, SercomSpi *dev)
+{
+    /* reset all device configuration */
+    _reset(dev);
+
+    /* configure base clock */
+    sercom_set_gen(dev, spi_config[bus].gclk_src);
+
+    /* enable receiver and configure character size to 8-bit
+     * no synchronization needed, as SERCOM device is not enabled */
+    dev->CTRLB.reg = SERCOM_SPI_CTRLB_CHSIZE(0) | SERCOM_SPI_CTRLB_RXEN;
+
+    /* set up DMA channels */
+    _init_dma(bus, &dev->DATA.reg, &dev->DATA.reg);
+}
+
+static void _spi_acquire(spi_t bus, spi_mode_t mode, spi_clk_t clk)
+{
+    /* configure bus clock, in synchronous mode its calculated from
+     * BAUD.reg = (f_ref / (2 * f_bus) - 1)
+     * with f_ref := CLOCK_CORECLOCK as defined by the board
+     * to mitigate the rounding error due to integer arithmetic, the
+     * equation is modified to
+     * BAUD.reg = ((f_ref + f_bus) / (2 * f_bus) - 1) */
+    const uint8_t baud = ((sam0_gclk_freq(spi_config[bus].gclk_src) + clk) / (2 * clk) - 1);
+
+    /* configure device to be master and set mode and pads,
+     *
+     * NOTE: we could configure the pads already during spi_init, but for
+     * efficiency reason we do that here, so we can do all in one single write
+     * to the CTRLA register */
+    const uint32_t ctrla = SERCOM_SPI_CTRLA_MODE(0x3)       /* 0x3 -> master */
+                         | SERCOM_SPI_CTRLA_DOPO(spi_config[bus].mosi_pad)
+                         | SERCOM_SPI_CTRLA_DIPO(spi_config[bus].miso_pad)
+                         | (mode << SERCOM_SPI_CTRLA_CPHA_Pos);
+
+    /* first configuration or reconfiguration after altered device usage */
+    if (dev(bus)->BAUD.reg != baud || dev(bus)->CTRLA.reg != ctrla) {
+        /* disable the device */
+        _disable(dev(bus));
+
+        dev(bus)->BAUD.reg = baud;
+        dev(bus)->CTRLA.reg = ctrla;
+        /* no synchronization needed here, the enable synchronization below
+         * acts as a write-synchronization for both registers */
+    }
+
+    /* finally enable the device */
+    _enable(dev(bus));
+}
+
+static inline void _spi_release(spi_t bus)
+{
+    /* disable the device */
+    _disable(dev(bus));
+}
+
+static void _spi_blocking_transfer(spi_t bus, const void *out, void *in, size_t len)
+{
+    const uint8_t *out_buf = out;
+    uint8_t *in_buf = in;
+
+    for (size_t i = 0; i < len; i++) {
+        uint8_t tmp = (out_buf) ? out_buf[i] : 0;
+
+        /* transmit byte on MOSI */
+        dev(bus)->DATA.reg = tmp;
+
+        /* wait until byte has been sampled on MISO */
+        while (dev(bus)->INTFLAG.bit.RXC == 0) {}
+
+        /* consume the byte */
+        tmp = dev(bus)->DATA.reg;
+
+        if (in_buf) {
+            in_buf[i] = tmp;
+        }
+    }
+}
+/** @} */
 
 void spi_init(spi_t bus)
 {
@@ -94,35 +337,14 @@ void spi_init(spi_t bus)
     /* wake up device */
     poweron(bus);
 
-    /* reset all device configuration */
-    dev(bus)->CTRLA.reg |= SERCOM_SPI_CTRLA_SWRST;
-    while ((dev(bus)->CTRLA.reg & SERCOM_SPI_CTRLA_SWRST) ||
-           (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_SWRST)) {}
-
-    /* configure base clock: using GLK GEN 0 */
-    sercom_set_gen(dev(bus), spi_config[bus].gclk_src);
-
-    /* enable receiver and configure character size to 8-bit
-     * no synchronization needed, as SERCOM device is not enabled */
-    dev(bus)->CTRLB.reg = (SERCOM_SPI_CTRLB_CHSIZE(0) | SERCOM_SPI_CTRLB_RXEN);
-
-#ifdef MODULE_PERIPH_DMA
-    if (_use_dma(bus)) {
-        _dma_state[bus].rx_dma = dma_acquire_channel();
-        _dma_state[bus].tx_dma = dma_acquire_channel();
-        dma_setup(_dma_state[bus].tx_dma,
-                  spi_config[bus].tx_trigger, 0, false);
-        dma_setup(_dma_state[bus].rx_dma,
-                  spi_config[bus].rx_trigger, 1, true);
-        dma_prepare(_dma_state[bus].rx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
-                    (void*)&dev(bus)->DATA.reg, NULL, 1, 0);
-        dma_prepare(_dma_state[bus].tx_dma, DMAC_BTCTRL_BEATSIZE_BYTE_Val,
-                    NULL, (void*)&dev(bus)->DATA.reg, 0, 0);
+    if (_is_qspi(bus)) {
+        _init_qspi(bus);
+    } else {
+        _init_spi(bus, dev(bus));
     }
-#endif
+
     /* put device back to sleep */
     poweroff(bus);
-
 }
 
 void spi_init_pins(spi_t bus)
@@ -150,45 +372,17 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
 
-    /* configure bus clock, in synchronous mode its calculated from
-     * BAUD.reg = (f_ref / (2 * f_bus) - 1)
-     * with f_ref := CLOCK_CORECLOCK as defined by the board
-     * to mitigate the rounding error due to integer arithmetic, the
-     * equation is modified to
-     * BAUD.reg = ((f_ref + f_bus) / (2 * f_bus) - 1) */
-    const uint8_t baud = ((sam0_gclk_freq(spi_config[bus].gclk_src) + clk) / (2 * clk) - 1);
-
-    /* configure device to be master and set mode and pads,
-     *
-     * NOTE: we could configure the pads already during spi_init, but for
-     * efficiency reason we do that here, so we can do all in one single write
-     * to the CTRLA register */
-    const uint32_t ctrla = SERCOM_SPI_CTRLA_MODE(0x3)       /* 0x3 -> master */
-                           | SERCOM_SPI_CTRLA_DOPO(spi_config[bus].mosi_pad)
-                           | SERCOM_SPI_CTRLA_DIPO(spi_config[bus].miso_pad)
-                           | (mode << SERCOM_SPI_CTRLA_CPHA_Pos);
-
     /* get exclusive access to the device */
     mutex_lock(&locks[bus]);
 
     /* power on the device */
     poweron(bus);
 
-    /* first configuration or reconfiguration after altered device usage */
-    if (dev(bus)->BAUD.reg != baud || dev(bus)->CTRLA.reg != ctrla) {
-        /* disable the device */
-        dev(bus)->CTRLA.reg &= ~(SERCOM_SPI_CTRLA_ENABLE);
-        while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
-
-        dev(bus)->BAUD.reg = baud;
-        dev(bus)->CTRLA.reg = ctrla;
-        /* no synchronization needed here, the enable synchronization below
-         * acts as a write-synchronization for both registers */
+    if (_is_qspi(bus)) {
+        _qspi_acquire(mode, clk);
+    } else {
+        _spi_acquire(bus, mode, clk);
     }
-
-    /* finally enable the device */
-    dev(bus)->CTRLA.reg |= SERCOM_SPI_CTRLA_ENABLE;
-    while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
 
     /* mux clk_pin to SPI peripheral */
     gpio_init_mux(spi_config[bus].clk_pin, spi_config[bus].clk_mux);
@@ -202,9 +396,11 @@ void spi_release(spi_t bus)
      * and lead to unexpected current draw by SPI salves. */
     gpio_disable_mux(spi_config[bus].clk_pin);
 
-    /* disable the device */
-    dev(bus)->CTRLA.reg &= ~(SERCOM_SPI_CTRLA_ENABLE);
-    while (dev(bus)->SYNCBUSY.reg & SERCOM_SPI_SYNCBUSY_ENABLE) {}
+    if (_is_qspi(bus)) {
+        _qspi_release();
+    } else {
+        _spi_release(bus);
+    }
 
     /* power off the device */
     poweroff(bus);
@@ -215,17 +411,10 @@ void spi_release(spi_t bus)
 
 static void _blocking_transfer(spi_t bus, const void *out, void *in, size_t len)
 {
-    const uint8_t *out_buf = out;
-    uint8_t *in_buf = in;
-
-    for (int i = 0; i < (int)len; i++) {
-        uint8_t tmp = (out_buf) ? out_buf[i] : 0;
-        dev(bus)->DATA.reg = tmp;
-        while (!(dev(bus)->INTFLAG.reg & SERCOM_SPI_INTFLAG_RXC)) {}
-        tmp = (uint8_t)dev(bus)->DATA.reg;
-        if (in_buf) {
-            in_buf[i] = tmp;
-        }
+    if (_is_qspi(bus)) {
+        _qspi_blocking_transfer(out, in, len);
+    } else {
+        _spi_blocking_transfer(bus, out, in, len);
     }
 }
 
@@ -273,6 +462,7 @@ static void _dma_transfer_regs(spi_t bus, uint8_t reg, const uint8_t *out,
 
     _dma_execute(bus);
 }
+
 void spi_transfer_regs(spi_t bus, spi_cs_t cs,
                        uint8_t reg, const void *out, void *in, size_t len)
 {
@@ -303,7 +493,6 @@ uint8_t spi_transfer_reg(spi_t bus, spi_cs_t cs, uint8_t reg, uint8_t out)
 
 #endif /* MODULE_PERIPH_DMA */
 
-
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
@@ -312,6 +501,7 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
     if (cs != SPI_CS_UNDEF) {
         gpio_clear((gpio_t)cs);
     }
+
     if (_use_dma(bus)) {
 #ifdef MODULE_PERIPH_DMA
         /* The DMA promises not to modify the const out data */

@@ -160,6 +160,18 @@ struct sam0_aux_cfg_mapping {
     /* config words 5,6,7 */
     uint32_t user_pages[3];                   /**< User pages                           */
 };
+
+/**
+ * @brief   QSPI pins are fixed
+ * @{
+ */
+#define SAM0_QSPI_PIN_CLK       GPIO_PIN(PB, 10)    /**< Clock        */
+#define SAM0_QSPI_PIN_CS        GPIO_PIN(PB, 11)    /**< Chip Select  */
+#define SAM0_QSPI_PIN_DATA_0    GPIO_PIN(PA,  8)    /**< D0 / MOSI    */
+#define SAM0_QSPI_PIN_DATA_1    GPIO_PIN(PA,  9)    /**< D1 / MISO    */
+#define SAM0_QSPI_PIN_DATA_2    GPIO_PIN(PA, 10)    /**< D2 / WP      */
+#define SAM0_QSPI_PIN_DATA_3    GPIO_PIN(PA, 11)    /**< D3 / HOLD    */
+#define SAM0_QSPI_MUX           GPIO_MUX_H          /**< QSPI mux     */
 /** @} */
 
 #ifdef __cplusplus

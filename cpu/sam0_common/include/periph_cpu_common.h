@@ -383,7 +383,7 @@ typedef enum {
  * @brief   SPI device configuration
  */
 typedef struct {
-    SercomSpi *dev;         /**< pointer to the used SPI device */
+    void *dev;              /**< pointer to the used SPI device */
     gpio_t miso_pin;        /**< used MISO pin */
     gpio_t mosi_pin;        /**< used MOSI pin */
     gpio_t clk_pin;         /**< used CLK pin */
