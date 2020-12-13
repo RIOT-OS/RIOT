@@ -73,15 +73,14 @@ typedef struct {
     gnrc_netif_t *netif;
     uint16_t id;
     uint8_t hoplimit;
-    uint8_t pattern;
 } _ping_data_t;
 
 static void _usage(char *cmdname);
 static int _configure(int argc, char **argv, _ping_data_t *data);
 static void _pinger(_ping_data_t *data);
-static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
+static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6, uint32_t now_us,
                          ipv6_addr_t *from, unsigned hoplimit, gnrc_netif_hdr_t *netif_hdr);
-static void _handle_reply(_ping_data_t *data, gnrc_pktsnip_t *pkt);
+static void _handle_reply(_ping_data_t *data, gnrc_pktsnip_t *pkt, uint32_t now_us);
 static int _finish(_ping_data_t *data);
 
 int _gnrc_icmpv6_ping(int argc, char **argv)
@@ -95,7 +94,6 @@ int _gnrc_icmpv6_ping(int argc, char **argv)
         .timeout = DEFAULT_TIMEOUT_USEC,
         .interval = DEFAULT_INTERVAL_USEC,
         .id = DEFAULT_ID,
-        .pattern = DEFAULT_ID,
     };
     int res;
 
@@ -110,7 +108,7 @@ int _gnrc_icmpv6_ping(int argc, char **argv)
         msg_receive(&msg);
         switch (msg.type) {
             case GNRC_NETAPI_MSG_TYPE_RCV: {
-                _handle_reply(&data, msg.content.ptr);
+                _handle_reply(&data, msg.content.ptr, xtimer_now_usec());
                 gnrc_pktbuf_release(msg.content.ptr);
                 break;
             }
@@ -238,6 +236,44 @@ static int _configure(int argc, char **argv, _ping_data_t *data)
     return res;
 }
 
+static void _fill_payload(uint8_t *buf, size_t len)
+{
+    uint8_t i = 0;
+
+    if (len >= sizeof(uint32_t)) {
+        uint32_t now = xtimer_now_usec();
+        memcpy(buf, &now, sizeof(now));
+        len -= sizeof(now);
+        buf += sizeof(now);
+    }
+
+    while (len--) {
+        *buf++ = i++;
+    }
+}
+
+static bool _check_payload(const void *buf, size_t len, uint32_t now,
+                           uint32_t *triptime, uint16_t *corrupt)
+{
+    uint8_t i = 0;
+    const uint8_t *data = buf;
+
+    if (len >= sizeof(uint32_t)) {
+        *triptime = now - unaligned_get_u32(buf);
+        len  -= sizeof(uint32_t);
+        data += sizeof(uint32_t);
+    }
+
+    while (len--) {
+        if (*data++ != i++) {
+            *corrupt = data - (uint8_t *)buf - 1;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 static void _pinger(_ping_data_t *data)
 {
     gnrc_pktsnip_t *pkt, *tmp;
@@ -277,7 +313,6 @@ static void _pinger(_ping_data_t *data)
         return;
     }
     databuf = (uint8_t *)(pkt->data) + sizeof(icmpv6_echo_t);
-    memset(databuf, data->pattern, data->datalen);
     tmp = gnrc_ipv6_hdr_build(pkt, NULL, &data->host);
     if (tmp == NULL) {
         puts("error: packet buffer full");
@@ -296,10 +331,10 @@ static void _pinger(_ping_data_t *data)
         gnrc_netif_hdr_set_netif(tmp->data, data->netif);
         pkt = gnrc_pkt_prepend(pkt, tmp);
     }
-    if (data->datalen >= sizeof(uint32_t)) {
-        uint32_t now = xtimer_now_usec();
-        memcpy(databuf, &now, sizeof(now));
-    }
+
+    /* add TX timestamp & test data */
+    _fill_payload(databuf, data->datalen);
+
     if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_IPV6,
                                    GNRC_NETREG_DEMUX_CTX_ALL,
                                    pkt)) {
@@ -311,7 +346,7 @@ error_exit:
     gnrc_pktbuf_release(pkt);
 }
 
-static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
+static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6, uint32_t now,
                          ipv6_addr_t *from, unsigned hoplimit,
                          gnrc_netif_hdr_t *netif_hdr)
 {
@@ -319,16 +354,17 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
 
     kernel_pid_t if_pid = netif_hdr ? netif_hdr->if_pid : KERNEL_PID_UNDEF;
     int16_t rssi = netif_hdr ? netif_hdr->rssi : GNRC_NETIF_HDR_NO_RSSI;
+    int16_t truncated;
 
-    /* discard if too short */
-    if (icmpv6->size < (data->datalen + sizeof(icmpv6_echo_t))) {
-        return;
-    }
+    /* check if payload size matches expectation */
+    truncated = (data->datalen + sizeof(icmpv6_echo_t)) - icmpv6->size;
+
     if (icmpv6_hdr->type == ICMPV6_ECHO_REP) {
         char from_str[IPV6_ADDR_MAX_STR_LEN];
         const char *dupmsg = " (DUP!)";
         uint32_t triptime = 0;
         uint16_t recv_seq;
+        uint16_t corrupted;
 
         /* not our ping */
         if (byteorder_ntohs(icmpv6_hdr->id) != data->id) {
@@ -340,8 +376,38 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
         }
         recv_seq = byteorder_ntohs(icmpv6_hdr->seq);
         ipv6_addr_to_str(&from_str[0], from, sizeof(from_str));
+
+        if (gnrc_netif_highlander() || (if_pid == KERNEL_PID_UNDEF) ||
+            !ipv6_addr_is_link_local(from)) {
+            printf("%u bytes from %s: icmp_seq=%u ttl=%u",
+                   (unsigned)icmpv6->size,
+                   from_str, recv_seq, hoplimit);
+        } else {
+            printf("%u bytes from %s%%%u: icmp_seq=%u ttl=%u",
+                   (unsigned)icmpv6->size,
+                   from_str, if_pid, recv_seq, hoplimit);
+
+        }
+        /* check if payload size matches */
+        if (truncated) {
+            printf(" truncated by %d byte", truncated);
+        }
+        /* check response for corruption */
+        else if (_check_payload(icmpv6_hdr + 1, data->datalen, now,
+                                &triptime, &corrupted)) {
+            printf(" corrupted at offset %u", corrupted);
+        }
+        if (rssi != GNRC_NETIF_HDR_NO_RSSI) {
+            printf(" rssi=%"PRId16" dBm", rssi);
+        }
         if (data->datalen >= sizeof(uint32_t)) {
-            triptime = xtimer_now_usec() - unaligned_get_u32(icmpv6_hdr + 1);
+            printf(" time=%lu.%03lu ms", (long unsigned)triptime / 1000,
+                   (long unsigned)triptime % 1000);
+        }
+
+        /* we can only calculate RTT (triptime) if payload was large enough for
+           a TX timestamp */
+        if (data->datalen >= sizeof(uint32_t)) {
             data->tsum += triptime;
             if (triptime < data->tmin) {
                 data->tmin = triptime;
@@ -358,29 +424,12 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
             data->num_recv++;
             dupmsg += 7;
         }
-        if (gnrc_netif_highlander() || (if_pid == KERNEL_PID_UNDEF) ||
-            !ipv6_addr_is_link_local(from)) {
-            printf("%u bytes from %s: icmp_seq=%u ttl=%u",
-                   (unsigned)icmpv6->size,
-                   from_str, recv_seq, hoplimit);
-        } else {
-            printf("%u bytes from %s%%%u: icmp_seq=%u ttl=%u",
-                   (unsigned)icmpv6->size,
-                   from_str, if_pid, recv_seq, hoplimit);
 
-        }
-        if (rssi != GNRC_NETIF_HDR_NO_RSSI) {
-            printf(" rssi=%"PRId16" dBm", rssi);
-        }
-        if (data->datalen >= sizeof(uint32_t)) {
-            printf(" time=%lu.%03lu ms", (long unsigned)triptime / 1000,
-                   (long unsigned)triptime % 1000);
-        }
         puts(dupmsg);
     }
 }
 
-static void _handle_reply(_ping_data_t *data, gnrc_pktsnip_t *pkt)
+static void _handle_reply(_ping_data_t *data, gnrc_pktsnip_t *pkt, uint32_t now)
 {
     gnrc_pktsnip_t *netif, *ipv6, *icmpv6;
     gnrc_netif_hdr_t *netif_hdr;
@@ -395,7 +444,7 @@ static void _handle_reply(_ping_data_t *data, gnrc_pktsnip_t *pkt)
     }
     ipv6_hdr = ipv6->data;
     netif_hdr = netif ? netif->data : NULL;
-    _print_reply(data, icmpv6, &ipv6_hdr->src, ipv6_hdr->hl, netif_hdr);
+    _print_reply(data, icmpv6, now, &ipv6_hdr->src, ipv6_hdr->hl, netif_hdr);
 #ifdef MODULE_GNRC_IPV6_NIB
     /* successful ping to neighbor (NIB handles case if ipv6->src is not a
      * neighbor) can be taken as upper-layer hint for reachability:
