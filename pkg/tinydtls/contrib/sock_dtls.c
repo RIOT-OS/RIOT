@@ -345,6 +345,15 @@ void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote)
     dtls_close(sock->dtls_ctx, &remote->dtls_session);
 }
 
+void sock_dtls_session_get_udp_ep(const sock_dtls_session_t *session,
+                                  sock_udp_ep_t *ep)
+{
+    assert(session);
+    assert(ep);
+
+    _session_to_ep(&session->dtls_session, ep);
+}
+
 ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
                            const void *data, size_t len, uint32_t timeout,
                            sock_dtls_aux_tx_t *aux)
