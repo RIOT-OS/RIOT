@@ -150,6 +150,51 @@ enum {
 /** @} */
 
 /**
+ * @brief   I2C bus speed values in kbit/s.
+ *
+ * @note    We support arbitrary speed values up to 400 kbit/s.
+ *
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW       = 10000u,   /**< low speed mode:          ~10 kbit/s */
+    I2C_SPEED_NORMAL    = 100000u,  /**< normal mode:            ~100 kbit/s */
+    I2C_SPEED_FAST      = 400000u,  /**< fast mode:              ~400 kbit/s */
+    I2C_SPEED_FAST_PLUS = 400000u,  /**< not supported, capped at 400 kbit/s */
+    I2C_SPEED_HIGH      = 400000u,  /**< not supported, capped at 400 kbit/s */
+} i2c_speed_t;
+/** @} */
+
+/**
+ * @brief   I2C configuration options
+ */
+typedef struct {
+    I2C_Type *dev;          /**< hardware device */
+    gpio_t pin_scl;         /**< SCL pin */
+    gpio_t pin_sda;         /**< SDA pin */
+    uint32_t speed;         /**< bus speed in bit/s */
+} i2c_conf_t;
+
+/**
+ * @name   Use shared I2C functions
+ * @{
+ */
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_WRITE_REGS
+/** @} */
+
+/**
+ * @name    Define macros for sda and scl pins.
+ * @{
+ */
+#define i2c_pin_sda(dev) i2c_config[dev].pin_sda
+#define i2c_pin_scl(dev) i2c_config[dev].pin_scl
+/** @} */
+
+/**
  * @brief UART module configuration options
  *
  * QN908x doesn't have any UART standalone blocks, but it has two FLEXCOMM

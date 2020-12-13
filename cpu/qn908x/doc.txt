@@ -31,6 +31,35 @@ The GPIO driver uses the @ref GPIO_PIN(port, pin) macro to declare pins.
 No configuration is necessary.
 
 
+@defgroup    cpu_qn908x_i2c NXP QN908x I2C
+@ingroup     cpu_qn908x
+@brief       NXP QN908x I2C driver
+
+There are several FLEXCOMM interfaces in this chip, but only two of these
+support I2C (FLEXCOMM1 and FLEXCOMM2) which are mapped as I2C0 and I2C1,
+respectively. A single FLEXCOMM interface can only be used for one of the I2C,
+UART or SPI interfaces, so for example USART1 and I2C0 can't be used at the
+same time since they are both the same FLEXCOMM1 interface.
+
+### I2C configuration example (for periph_conf.h) ###
+
+    static const i2c_conf_t i2c_config[] = {
+        {
+            .dev          = I2C0,
+            .pin_scl      = GPIO_PIN(PORT_A, 6),  // or A8, A12, A20
+            .pin_sda      = GPIO_PIN(PORT_A, 7),  // or A9, A13, A21
+            .speed        = I2C_SPEED_FAST,
+        },
+        {
+            .dev          = I2C1,
+            .pin_scl      = GPIO_PIN(PORT_A, 2),  // or A5, A23, A27
+            .pin_sda      = GPIO_PIN(PORT_A, 3),  // or A4, A22, A26
+            .speed        = I2C_SPEED_FAST,
+        },
+    };
+    #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
+
+
 @defgroup    cpu_qn908x_timer NXP QN908x Standard counter/timers (CTIMER)
 @ingroup     cpu_qn908x
 @brief       NXP QN908x timer driver
@@ -85,13 +114,13 @@ other pin can be set to GPIO_UNDEF.
     static const uart_conf_t uart_config[] = {
         {
             .dev          = USART0,
-            .rx_pin       = GPIO_PIN(PORT_A, 17), /* or 5 */
-            .tx_pin       = GPIO_PIN(PORT_A, 16), /* or 4 */
+            .rx_pin       = GPIO_PIN(PORT_A, 17),  // or A5
+            .tx_pin       = GPIO_PIN(PORT_A, 16),  // or A4
         },
         {
             .dev          = USART1,
-            .rx_pin       = GPIO_PIN(PORT_A, 9), /* or 13 */
-            .tx_pin       = GPIO_PIN(PORT_A, 8), /* or 12 */
+            .rx_pin       = GPIO_PIN(PORT_A, 9),  // or A13
+            .tx_pin       = GPIO_PIN(PORT_A, 8),  // or A12
         },
     };
     #define UART_NUMOF          ARRAY_SIZE(uart_config)
