@@ -12,4 +12,11 @@ USEMODULE += pm_layered
 # include sam0 common periph drivers
 USEMODULE += sam0_common_periph
 
+ifneq (,$(filter sam0_eth,$(USEMODULE)))
+  USEMODULE += netdev_eth
+  USEMODULE += netopt
+  USEMODULE += xtimer
+  USEMODULE += iolist
+  FEATURES_REQUIRED += periph_eth
+endif
 include $(RIOTCPU)/cortexm_common/Makefile.dep
