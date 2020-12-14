@@ -48,7 +48,8 @@ static const i2c_conf_t i2c_config[] = {
         .dev = NRF_TWIM0,
         .scl = 8,
         .sda = 7,
-        .speed = I2C_SPEED_NORMAL
+        /* All connected peripherals work with this */
+        .speed = I2C_SPEED_FAST
     },
     {
         /* EXT I2C bus */

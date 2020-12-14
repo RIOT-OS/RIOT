@@ -30,8 +30,6 @@
 #define ENABLE_DEBUG (1)
 #include "debug.h"
 
-#define I2C_CLK             I2C_SPEED_FAST
-
 #define CHECK(expr)         if (expr != SX150X_OK) { goto err; }
 
 /* define device module specific configuration */
@@ -48,7 +46,7 @@
 
 static int _reg_read(const sx150x_t *dev, uint8_t reg, uint8_t *val)
 {
-    if (i2c_read_reg(dev->bus, dev->addr, reg, val) != 1) {
+    if (i2c_read_reg(dev->bus, dev->addr, reg, val, 0) != 0) {
         return SX150X_BUSERR;
     }
     return SX150X_OK;
@@ -58,7 +56,7 @@ static int _reg_write(const sx150x_t *dev, uint8_t reg, uint8_t val)
 {
     // DEBUG("write reg 0x%02x, val 0x%02x\n", (int)reg, (int)val);
     DEBUG("a\n");
-    if (i2c_write_reg(dev->bus, dev->addr, reg, val) != 1) {
+    if (i2c_write_reg(dev->bus, dev->addr, reg, val, 0) != 0) {
         return SX150X_BUSERR;
     }
     return SX150X_OK;
@@ -66,7 +64,7 @@ static int _reg_write(const sx150x_t *dev, uint8_t reg, uint8_t val)
 
 static int _reg_write_u16(const sx150x_t *dev, uint8_t reg, uint16_t val)
 {
-    if (i2c_write_regs(dev->bus, dev->addr, reg, &val, 2) != 2) {
+    if (i2c_write_regs(dev->bus, dev->addr, reg, &val, 2, 0) != 0) {
         return SX150X_BUSERR;
     }
     return SX150X_OK;
@@ -114,15 +112,6 @@ int sx150x_init(sx150x_t *dev, const sx150x_params_t *params)
     memcpy(dev, params, sizeof(sx150x_params_t));
 
     DEBUG("[sx150x] init: initializing driver now\n");
-
-    /* initialize I2C bus */
-    if (i2c_init_master(dev->bus, I2C_CLK) != 0) {
-        DEBUG("[sx150x] init: error - unable to initialize I2C bus\n");
-        res = SX150X_NOBUS;
-        goto exit;
-    }
-
-    DEBUG("[sx150x] init master ok\n");
 
     /* try to get access to the bus */
     if (i2c_acquire(dev->bus) != 0) {
