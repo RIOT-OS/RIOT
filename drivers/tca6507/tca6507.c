@@ -377,7 +377,7 @@ int tca6507_dump_registers(const tca6507_t *dev)
 
   puts("tca6507 registers :");
   for (size_t i=0; i<sizeof(regs); i++) {
-    printf("\t%02lx: %02x\n", i, regs[i]);
+    printf("\t%02x: %02x\n", (unsigned)i, regs[i]);
   }
 
 finish:
