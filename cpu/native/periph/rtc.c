@@ -38,19 +38,32 @@
 
 static int _native_rtc_initialized = 0;
 static int _native_rtc_powered = 0;
+
 static struct tm _native_rtc_alarm;
 static rtc_alarm_cb_t _native_rtc_alarm_callback;
-static void *_native_rtc_alarm_argument;
 
-static xtimer_t _timer;
+static time_t _native_rtc_offset;
+
+static xtimer_t _native_rtc_timer;
+
+static void _native_rtc_cb(void *arg) {
+    if (_native_rtc_alarm_callback) {
+        _native_rtc_alarm_callback(arg);
+    }
+    _native_rtc_alarm_callback = NULL;
+}
 
 void rtc_init(void)
 {
     DEBUG("rtc_init\n");
 
+    xtimer_remove(&_native_rtc_timer);
+    _native_rtc_timer.callback = _native_rtc_cb;
+
     memset(&_native_rtc_alarm, 0, sizeof(_native_rtc_alarm));
     _native_rtc_alarm_callback = NULL;
-    _native_rtc_alarm_argument = NULL;
+
+    _native_rtc_offset = 0;
 
     _native_rtc_initialized = 1;
     printf("Native RTC initialized.\n");
@@ -81,15 +94,18 @@ void rtc_poweroff(void)
         warnx("rtc_poweroff: not powered on");
     }
 
+    if (_native_rtc_alarm_callback) {
+        xtimer_remove(&_native_rtc_timer);
+        memset(&_native_rtc_alarm, 0, sizeof(_native_rtc_alarm));
+        _native_rtc_alarm_callback = NULL;
+    }
+
     _native_rtc_powered = 0;
 }
 
-/* TODO: implement time setting using a delta */
 int rtc_set_time(struct tm *ttime)
 {
-    (void) ttime;
-
-    DEBUG("rtc_set_time()\n");
+    DEBUG_PUTS("rtc_set_time()");
 
     if (!_native_rtc_initialized) {
         warnx("rtc_set_time: not initialized");
@@ -100,9 +116,21 @@ int rtc_set_time(struct tm *ttime)
         return -1;
     }
 
-    warnx("rtc_set_time: not implemented");
+    time_t tnew = mktime(ttime);
+    if (tnew == -1) {
+        warnx("rtc_set_time: out of time_t range");
+        return -1;
+    }
+    _native_syscall_enter();
+    _native_rtc_offset = tnew - time(NULL);
+    _native_syscall_leave();
 
-    return -1;
+    if (_native_rtc_alarm_callback) {
+        rtc_set_alarm(&_native_rtc_alarm, _native_rtc_alarm_callback,
+                _native_rtc_timer.arg);
+    }
+
+    return 0;
 }
 
 int rtc_get_time(struct tm *ttime)
@@ -119,7 +147,7 @@ int rtc_get_time(struct tm *ttime)
     }
 
     _native_syscall_enter();
-    t = time(NULL);
+    t = time(NULL) + _native_rtc_offset;
 
     if (localtime_r(&t, ttime) == NULL) {
         err(EXIT_FAILURE, "rtc_get_time: localtime_r");
@@ -131,10 +159,6 @@ int rtc_get_time(struct tm *ttime)
 
 int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
-    (void) time;
-    (void) cb;
-    (void) arg;
-
     if (!_native_rtc_initialized) {
         warnx("rtc_set_alarm: not initialized");
         return -1;
@@ -147,19 +171,25 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     struct tm now;
     rtc_get_time(&now);
 
-    _native_rtc_alarm = *time;
+    time_t tdiff_secs = mktime(time) - mktime(&now);
 
-    _timer.callback = cb;
-    _timer.arg      = arg;
-    xtimer_set64(&_timer, (mktime(time) - mktime(&now)) * US_PER_SEC);
+    if (_native_rtc_alarm_callback) {
+        xtimer_remove(&_native_rtc_timer);
+    }
+
+    _native_rtc_alarm = *time;
+    _native_rtc_alarm_callback = cb;
+    _native_rtc_timer.arg = arg;
+
+    if (tdiff_secs >= 0) {
+        xtimer_set64(&_native_rtc_timer, tdiff_secs * US_PER_SEC);
+    }
 
     return 0;
 }
 
 int rtc_get_alarm(struct tm *time)
 {
-    (void) time;
-
     if (!_native_rtc_initialized) {
         warnx("rtc_get_alarm: not initialized");
         return -1;
@@ -185,6 +215,7 @@ void rtc_clear_alarm(void)
         warnx("rtc_clear_alarm: not powered on");
     }
 
-    xtimer_remove(&_timer);
+    xtimer_remove(&_native_rtc_timer);
     memset(&_native_rtc_alarm, 0, sizeof(_native_rtc_alarm));
+    _native_rtc_alarm_callback = NULL;
 }
