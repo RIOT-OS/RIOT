@@ -107,17 +107,6 @@ static int reg_clr(const sx150x_t *dev, uint8_t reg, uint8_t mask)
     return _reg_write(dev, reg, tmp);
 }
 
-/* Read-modify-write function to toggle a given mask in a register */
-static int reg_tgl(const sx150x_t *dev, uint8_t reg, uint8_t mask)
-{
-    uint8_t tmp;
-    if (_reg_read(dev, reg, &tmp) != SX150X_OK) {
-        return SX150X_BUSERR;
-    }
-    tmp ^= mask;
-    return _reg_write(dev, reg, tmp);
-}
-
 int sx150x_init(sx150x_t *dev, const sx150x_params_t *params)
 {
     assert(dev && params);
@@ -339,12 +328,9 @@ int sx150x_gpio_toggle(sx150x_t *dev, unsigned pin)
     assert(dev && (pin < PIN_NUMOF));
 
     i2c_acquire(dev->bus);
-    // FIXME this is incompatible with gpio_set/clear which are read-modify-write free through the data cache
-    CHECK(reg_tgl(dev, REG_DATA(pin), MASK(pin)));
+    dev->data ^= 1 << pin;
+    int res = _reg_write_u16(dev, REG_DATA(BOTH), dev->data);
+    i2c_release(dev->bus);
 
-    i2c_release(dev->bus);
-    return SX150X_OK;
-err:
-    i2c_release(dev->bus);
-    return SX150X_BUSERR;
+    return res;
 }
