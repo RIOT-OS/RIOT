@@ -255,6 +255,10 @@ void saul_init_devs(void)
         extern void auto_init_sds011(void);
         auto_init_sds011();
     }
+    if (IS_USED(MODULE_SI1133)) {
+        extern void auto_init_si1133(void);
+        auto_init_si1133();
+    }
     if (IS_USED(MODULE_SI114X)) {
         extern void auto_init_si114x(void);
         auto_init_si114x();
