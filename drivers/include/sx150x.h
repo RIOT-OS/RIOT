@@ -59,10 +59,19 @@ typedef struct {
 typedef struct {
     i2c_t bus;
     uint8_t addr;
+    /* Cached value of RegDataAB that enables gpio_set/clear without
+     * read-modify-write interactions */
     uint16_t data;
+    /* Set of pins in PWM mode. Kept for power tracking reasons -- when all are
+     * off, the PWM clock can be disable. Also used to not read-modify-write
+     * the LEDDRIVERENABLE register. */
+    uint16_t leddriverenable;
 } sx150x_t;
 
 int sx150x_init(sx150x_t *dev, const sx150x_params_t *params);
+
+int sx150x_pwm_init(sx150x_t *dev, unsigned pin);
+int sx150x_pwm_set(sx150x_t *dev, unsigned pin, uint8_t value);
 
 int sx150x_gpio_init(sx150x_t *dev, unsigned pin, gpio_mode_t mode);
 int sx150x_gpio_read(sx150x_t *dev, unsigned pin);

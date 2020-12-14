@@ -14,6 +14,7 @@
  * @brief       SX150X driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Christian Amsüss <chrysn@fsfe.org>
  */
 
 #include <string.h>
@@ -54,8 +55,6 @@ static int _reg_read(const sx150x_t *dev, uint8_t reg, uint8_t *val)
 
 static int _reg_write(const sx150x_t *dev, uint8_t reg, uint8_t val)
 {
-    // DEBUG("write reg 0x%02x, val 0x%02x\n", (int)reg, (int)val);
-    DEBUG("a\n");
     if (i2c_write_reg(dev->bus, dev->addr, reg, val, 0) != 0) {
         return SX150X_BUSERR;
     }
@@ -156,6 +155,11 @@ int sx150x_init(sx150x_t *dev, const sx150x_params_t *params)
         goto exit;
     }
 
+    /* Scale down PWM frequency; even the 120Hz don't appear flickery. */
+    res = _reg_write(dev, REG_MISC, REG_MISC_MINFREQ);
+    assert(res == SX150X_OK);
+
+
 #if ENABLE_DEBUG
     if (res == SX150X_OK) {
         DEBUG("[sx150x] init: initialization successful\n");
@@ -170,136 +174,133 @@ exit:
     return res;
 }
 
-// #include "xtimer.h"
-// static void sleep(void)
-// {
-//     xtimer_usleep(250 * 1000);
-// }
-/* REMOVE */
-// static void dump(const sx150x_t *dev)
-// {
-//     for (uint8_t reg = 0x0a; reg <= 0x11; reg++) {
-//         uint8_t tmp;
-//         _reg_read(dev, reg, &tmp);
-//         printf("Reg 0x%02x := 0x%02x\n", (int)reg, (int)tmp);
-//     }
-// }
-
-/** Debug output of a specific register */
-static void val(sx150x_t *dev, uint8_t reg, const char *out)
+/* Set the pin in the leddriverenable register, write it, and start the clock
+ * if not running according to the last leddriverenable state.
+ *
+ * The I2C bus must be acquired around this founction.
+ * */
+static int pwm_pin_on(sx150x_t *dev, unsigned pin)
 {
-    uint8_t tmp;
-    _reg_read(dev, reg, &tmp);
-    DEBUG("%s (0x%02x) is 0x%02x\n", out, (int)reg, (int)tmp);
+    int res;
+
+    if (dev->leddriverenable == 0) {
+        res = _reg_write(dev, REG_CLOCK, REG_CLOCK_INTERNALONLY);
+        if (res != SX150X_OK) {
+            return res;
+        }
+    }
+
+    dev->leddriverenable |= 1 << pin;
+
+    return _reg_write_u16(dev, REG_LEDDRIVERENABlE(BOTH), dev->leddriverenable);
+}
+
+/* Clear the pin in the leddriverenable register, write it if necessary, and
+ * stop the clock if no PWM pin is active any more
+ *
+ * The I2C bus must be acquired around this founction.
+ * */
+static int pwm_pin_off(sx150x_t *dev, unsigned pin)
+{
+    int res = SX150X_OK;
+    uint16_t mask = 1 << pin;
+    if ((dev->leddriverenable & mask) == 0) {
+        return res;
+    }
+
+    dev->leddriverenable &= ~mask;
+
+    res = _reg_write_u16(dev, REG_LEDDRIVERENABlE(BOTH), dev->leddriverenable);
+    if (res != SX150X_OK) {
+        return res;
+    }
+
+    if (dev->leddriverenable == 0) {
+        res = _reg_write(dev, REG_CLOCK, 0);
+    }
+    return res;
+}
+
+/* Summary for those who don't want to spend hours in the data sheet:
+ *
+ * * Logarithmic mode doesn't give any better resolution
+ * * PWM always assumes active-low LEDs (as polarity inversion only affects the
+ *   data register interpretation); especially log mode only makes sense that
+ *   way 'round
+ * * Only in ON state, full resolution is available; per the assumption of
+ *   active-low, IOnX is only relevant when the data=0; IOn=255 means
+ *   always-low, IOn=0 means always-high.
+ */
+int sx150x_pwm_init(sx150x_t *dev, unsigned pin)
+{
+    int res;
+    assert(dev && (pin < PIN_NUMOF));
+    i2c_acquire(dev->bus);
+
+    DEBUG("init pin %i for PWM\n", (int)pin);
+
+    res = _reg_write(dev, REG_INPUT_DISABLE(pin), MASK(pin));
+    if (res != SX150X_OK) {
+        goto err;
+    }
+
+    /* Given the registers expect pull-down and don't work when this is not
+     * set, it seems to be a suitable setting */
+    res = _reg_write(dev, REG_OPENDRAIN(pin), MASK(pin));
+    if (res != SX150X_OK) {
+        goto err;
+    }
+
+    /* Initialize to PWM value 0 in analogy to the PWM peripheral */
+    res = _reg_write(dev, reg_i_on(pin), 0);
+    if (res != SX150X_OK) {
+        goto err;
+    }
+
+    /* Only when pin is clear, the PWM's ON value is used */
+    dev->data &= ~(1 << pin);
+    res = _reg_write_u16(dev, REG_DATA(BOTH), dev->data);
+    if (res != SX150X_OK) {
+        goto err;
+    }
+
+    res = pwm_pin_on(dev, pin);
+    if (res != SX150X_OK) {
+        goto err;
+    }
+
+err:
+    i2c_release(dev->bus);
+    return res;
+}
+
+int sx150x_pwm_set(sx150x_t *dev, unsigned pin, uint8_t value)
+{
+    int res;
+    assert(dev && (pin < PIN_NUMOF));
+    i2c_acquire(dev->bus);
+
+    res = _reg_write(dev, reg_i_on(pin), value);
+
+    i2c_release(dev->bus);
+    return res;
 }
 
 int sx150x_gpio_init(sx150x_t *dev, unsigned pin, gpio_mode_t mode)
 {
     assert(dev && (pin < PIN_NUMOF));
 
-    (void)mode;
     i2c_acquire(dev->bus);
 
-    DEBUG("init pin %i\n", (int)pin);
+    /* Only currently supported mode */
+    assert(mode == GPIO_OUT);
 
-    val(dev, REG_INPUT_DISABLE(pin), "INPUT_DISABLE");
-    val(dev, REG_DIR(pin), "DIR");
-
-    // _reg_write(dev, REG_INPUT_DISABLE(pin), 0x53);
-
-    // _reg_read(dev, REG_INPUT_DISABLE(pin), &tmp);
-    // DEBUG("reg 0x%02x is 0x%02x\n", (int)REG_INPUT_DISABLE(pin), (int)tmp);
-
-    // DEBUG("[sx] gpio init: pin is %i (mask 0x%02x)\n", (int)pin, (int)MASK(pin));
-    // DEBUG("[sx] gpio init: INPUT DISABLE reg is 0x%02x\n", (int)REG_INPUT_DISABLE(pin));
+    pwm_pin_off(dev, pin);
 
     CHECK(reg_set(dev, REG_INPUT_DISABLE(pin), MASK(pin)));
     CHECK(reg_clr(dev, REG_DIR(pin), MASK(pin)));
 
-    val(dev, REG_INPUT_DISABLE(pin), "INPUT_DISABLE");
-    val(dev, REG_DIR(pin), "DIR");
 
-    // DEBUG("play with data reg\n");
-    // val(dev, REG_DATA(pin), "DATA");
-    // reg_set(dev, REG_DATA(pin), MASK(pin));
-    // val(dev, REG_DATA(pin), "DATA");
-    // reg_clr(dev, REG_DATA(pin), MASK(pin));
-    // val(dev, REG_DATA(pin), "DATA");
-
-
-//     val(dev, IND, "IND");
-//     _reg_write(dev, DIR, 0x1f);
-//     val(dev, DIR, "DIR");
-//     _reg_write(dev, OD, 0xe0);
-//     val(dev, OD, "OD ");
-
-//     for (int s = 5; s <= 7; s++) {
-//         for (int i = 0; i < 3; i++) {
-//             _reg_write(dev, DAT, ~(1 << s) & 0xe0);
-//             val(dev, DAT, "DAT");
-//             sleep();
-//             reg_set(dev, DAT, 0xe0);
-//             val(dev, DAT, "DAT");
-//             sleep();
-//         }
-//     }
-
-// #define IND2     0x01
-// #define DIR2     0x0f
-// #define OD2      0x0b
-// #define DAT2     0x11
-
-//     val(dev, IND2, "IND2");
-//     _reg_write(dev, DIR2, 0x1f);
-//     val(dev, DIR2, "DIR2");
-//     _reg_write(dev, OD2, 0xe0);
-//     val(dev, OD2, "OD2 ");
-
-//     for (int s = 5; s <= 7; s++) {
-//         for (int i = 0; i < 3; i++) {
-//             reg_clr(dev, DAT2, (1 << s));
-//             val(dev, DAT2, "DAT2");
-//             sleep();
-//             reg_set(dev, DAT2, 0xe0);
-//             val(dev, DAT2, "DAT2");
-//             sleep();
-//         }
-//     }
-
-
-    // _reg_write(dev, 0x0f, 0x1f);
-    // _reg_write(dev, 0x0b, 0xe0);
-
-
-    // for (int i = 0; i < 4; i++) {
-    //     reg_set(dev, 0x11, 0x20);
-    //     sleep();
-    //     reg_clr(dev, 0x11, 0x20);
-    //     sleep();
-    // }
-    // DEBUG("ON 0x80\n");
-    // dump(dev);
-    // sleep();
-    // _reg_write(dev, 0x11, 0x40);
-    // DEBUG("ON 0x40\n");
-    // dump(dev);
-    // sleep();
-    // _reg_write(dev, 0x11, 0x20);
-    // DEBUG("ON 0x20\n");
-    // dump(dev);
-    // sleep();
-    // _reg_write(dev, 0x11, 0xe0);
-    // DEBUG("ON 0xe\n");
-    // dump(dev);
-    // sleep();
-    // _reg_write(dev, 0x11, 0x00);
-    // DEBUG("ON 0x00\n");
-    // dump(dev);
-    // sleep();
-    // _reg_write(dev, 0x11, 0x00);
-
-
-// exit:
     DEBUG("[sx150x] gpio_init: done\n");
     i2c_release(dev->bus);
     return SX150X_OK;
@@ -313,31 +314,24 @@ int sx150x_gpio_set(sx150x_t *dev, unsigned pin)
 {
     assert(dev && (pin < PIN_NUMOF));
 
-    DEBUG("-> gpio set pin %i (mask 0x%02x)\n", (int)pin, (int)MASK(pin));
     i2c_acquire(dev->bus);
     dev->data |= (1 << pin);
-    _reg_write_u16(dev, REG_DATA(BOTH), dev->data);
+    int res = _reg_write_u16(dev, REG_DATA(BOTH), dev->data);
     i2c_release(dev->bus);
-    // DEBUG("--- RELEASED ---\n");
-    return SX150X_OK;
+
+    return res;
 }
 
 int sx150x_gpio_clear(sx150x_t *dev, unsigned pin)
 {
     assert(dev && (pin < PIN_NUMOF));
 
-    DEBUG("-> gpio clear pin %i (mask 0x%02x)\n", (int)pin, (int)MASK(pin));
     i2c_acquire(dev->bus);
     dev->data &= ~(1 << pin);
-    _reg_write_u16(dev, REG_DATA(BOTH), dev->data);
-
-    // dump(dev);
-    // int ret = reg_clr(dev, REG_DATA(pin), MASK(pin));
-    // dump(dev);
-
+    int res = _reg_write_u16(dev, REG_DATA(BOTH), dev->data);
     i2c_release(dev->bus);
-    // DEBUG("--- RELEASED ---\n");
-    return SX150X_OK;
+
+    return res;
 }
 
 int sx150x_gpio_toggle(sx150x_t *dev, unsigned pin)
@@ -345,6 +339,7 @@ int sx150x_gpio_toggle(sx150x_t *dev, unsigned pin)
     assert(dev && (pin < PIN_NUMOF));
 
     i2c_acquire(dev->bus);
+    // FIXME this is incompatible with gpio_set/clear which are read-modify-write free through the data cache
     CHECK(reg_tgl(dev, REG_DATA(pin), MASK(pin)));
 
     i2c_release(dev->bus);
@@ -353,14 +348,3 @@ err:
     i2c_release(dev->bus);
     return SX150X_BUSERR;
 }
-
-
-// int sx150x_write(sx150x_t *dev, unsigned pin, int value)
-// {
-//     if (value) {
-//         return sx150x_set(dev, pin);
-//     }
-//     else {
-//         return sx150x_clear(dev, pin);
-//     }
-// }
