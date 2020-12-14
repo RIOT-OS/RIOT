@@ -36,7 +36,7 @@ extern "C" {
  */
 static inline int _eeprom_mac_get_eui64(uint8_t index, eui64_t *addr)
 {
-    (void) index;
+    (void)index;
 
     if (eeprom_read(EEPROM_MAC_ADDR, addr, sizeof(eui64_t)) != sizeof(eui64_t)) {
         return -1;
