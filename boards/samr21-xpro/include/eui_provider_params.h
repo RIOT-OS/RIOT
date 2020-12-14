@@ -29,7 +29,7 @@ extern "C" {
  */
 static inline int _edbg_get_eui64(uint8_t index, eui64_t *addr)
 {
-    (void) index;
+    (void)index;
 
     /* EDBG can take a while to respond on cold boot */
     unsigned tries = 10000;
