@@ -1,0 +1,62 @@
+/*
+ * Copyright (C) 2020 Viktor Gal
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     tests
+ * @{
+ *
+ * @file
+ * @brief       Test application for the HDC2010 sensor driver
+ *
+ * @author      Viktor Gal <viktor.gal@maeth.com>
+ *
+ * @}
+ */
+
+#include <stdio.h>
+
+#include "fmt.h"
+#include "xtimer.h"
+#include "hdc2010.h"
+#include "hdc2010_params.h"
+
+#define SLEEP_USEC  (1000 * 1000U)
+
+int main(void)
+{
+    hdc2010_t dev;
+    int16_t temp, hum;
+    char tstr[8];
+    char hstr[8];
+
+    puts("HDC2010 Temperature and Humidity Sensor driver test application\n");
+    printf("Initializing HDC2010 sensor at I2C_DEV(%i)... ",
+            (int)hdc2010_params[0].i2c);
+    if (hdc2010_init(&dev, &hdc2010_params[0]) == HDC2010_OK) {
+        puts("[OK]\n");
+    }
+    else {
+        puts("[Failed]");
+        return 1;
+    }
+
+    while (1) {
+        size_t len;
+        hdc2010_read(&dev, &temp, &hum);
+
+        len = fmt_s16_dfp(tstr, temp, -2);
+        tstr[len] = '\0';
+        len = fmt_s16_dfp(hstr, hum, -2);
+        hstr[len] = '\0';
+        printf("Reading: T: %s °C  RH: %s %%\n", tstr, hstr);
+
+        xtimer_usleep(SLEEP_USEC);
+    }
+
+    return 0;
+}
