@@ -361,6 +361,28 @@ static const adc_conf_chan_t adc_channels[] = {
 #define DAC_VREF            DAC_CTRLB_REFSEL_VREFPU
 /** @} */
 
+/**
+ * @name Ethernet peripheral configuration
+ * @{
+ */
+static const sam0_common_gmac_config_t sam_gmac_config[] = {
+    {
+        .dev = GMAC,
+        .refclk = GPIO_PIN(PA, 14),
+        .txen = GPIO_PIN(PA, 17),
+        .txd0 = GPIO_PIN(PA, 18),
+        .txd1 = GPIO_PIN(PA, 19),
+        .crsdv = GPIO_PIN(PC, 20),
+        .rxd0 = GPIO_PIN(PA, 13),
+        .rxd1 = GPIO_PIN(PA, 12),
+        .rxer = GPIO_PIN(PA, 15),
+        .mdc = GPIO_PIN(PC, 11),
+        .mdio = GPIO_PIN(PC, 12),
+        .rst_pin = GPIO_PIN(PC, 21),
+        .int_pin = GPIO_PIN(PD, 12),
+    }
+};
+
 #ifdef __cplusplus
 }
 #endif

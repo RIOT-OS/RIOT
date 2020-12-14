@@ -141,6 +141,7 @@ typedef enum {
     GPIO_MUX_F = 0x5,       /**< select peripheral function F */
     GPIO_MUX_G = 0x6,       /**< select peripheral function G */
     GPIO_MUX_H = 0x7,       /**< select peripheral function H */
+    GPIO_MUX_L = 0xb,
 } gpio_mux_t;
 #endif
 
@@ -766,6 +767,48 @@ typedef struct {
     gpio_t pin;            /**< ADC channel pin */
     uint32_t muxpos;       /**< ADC channel pin multiplexer value */
 } adc_conf_chan_t;
+
+/**
+ * @name Ethernet peripheral parameters
+ * @{
+ */
+#ifndef ETH_RX_BUFFER_COUNT
+#define ETH_RX_BUFFER_COUNT (4)
+#endif
+
+#ifndef ETH_TX_BUFFER_COUNT
+#define ETH_TX_BUFFER_COUNT (4)
+#endif
+
+#ifndef ETH_RX_BUFFER_SIZE
+#define ETH_RX_BUFFER_SIZE (1536)
+#endif
+
+#ifndef ETH_TX_BUFFER_SIZE
+#define ETH_TX_BUFFER_SIZE (1536)
+#endif
+/** @} */
+
+/**
+ * @brief Ethernet parameters struct
+ */
+#if defined(GMAC_INST_NUM) || defined(DOXYGEN)
+typedef struct {
+    Gmac *dev;                /**< ptr to the device registers */
+    gpio_t refclk;            /**< REFCLK gpio */
+    gpio_t txen;              /**< TXEN gpio */
+    gpio_t txd0;              /**< TXD0 gpio */
+    gpio_t txd1;              /**< TXD1 gpio */
+    gpio_t crsdv;             /**< CRSDV gpio */
+    gpio_t rxd0;              /**< RXD0 gpio */
+    gpio_t rxd1;              /**< RXD1 gpio */
+    gpio_t rxer;              /**< RXER gpio */
+    gpio_t mdc;               /**< MII interface, clock gpio */
+    gpio_t mdio;              /**< MII interface, data gpio */
+    gpio_t rst_pin;           /**< PHY reset gpio */
+    gpio_t int_pin;           /**< PHY interrupt gpio */
+} sam0_common_gmac_config_t;
+#endif
 
 /**
  * @brief USB peripheral parameters
