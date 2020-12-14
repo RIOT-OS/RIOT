@@ -225,6 +225,32 @@ static inline int riotboot_flashwrite_finish(riotboot_flashwrite_t *state)
 }
 
 /**
+ * @brief   Invalidate a slot header (riotboot version)
+ *
+ * This function invalidates the target slot.
+ *
+ * @note    If this function is called with only one valid slot,
+ *          the invalidation will fail in order to keep one valid
+ *          image to run after reboot
+ *
+ * @param[in]   slot       Target slot to invalidate
+ *
+ * @returns     0 on success, <0 otherwise
+ */
+int riotboot_flashwrite_invalidate(int slot);
+
+/**
+ * @brief   Invalidate the latest firmware version (riotboot version)
+ *
+ * This function invalidates the slot having the most recent firmware revision
+ *
+ * @note    This function requires two valid images to succeed
+ *
+ * @returns     0 on success, <0 otherwise
+ */
+int riotboot_flashwrite_invalidate_latest(void);
+
+/**
  * @brief       Get a slot's size
  *
  * @param[in]   state   ptr to state struct
