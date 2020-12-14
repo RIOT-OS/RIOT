@@ -73,7 +73,7 @@ class GNRCICMPv6EchoParser(ShellInteractionParser):
 
     def parse(self, cmd_output):
         """
-        Parses output of GNRCIPv6NIB::nib_neigh_show()
+        Parses output of GNRCICMPv6Echo::ping6()
 
         >>> parser = GNRCICMPv6EchoParser()
         >>> res = parser.parse(
