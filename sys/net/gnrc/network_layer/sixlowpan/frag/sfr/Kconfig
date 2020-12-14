@@ -1,0 +1,101 @@
+# Copyright (c) 2020 Freie Universität Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR
+    bool "Configure GNRC 6LoWPAN Selective Fragment Recovery"
+    depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR
+    help
+        Configure GNRC 6LoWPAN Selective Fragement Recovery using Kconfig.
+
+if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR
+
+config GNRC_SIXLOWPAN_SFR_MIN_FRAG_SIZE
+    int "Default minimum value for fragment size (MinFragmentSize)"
+    default 96
+
+config GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE
+    int "Default maximum value for fragment size (MaxFragmentSize)"
+    default 112
+    help
+        It must be lower than the minimum MTU along the path. A large value
+        augments the chances of buffer bloat and transmission loss. The value
+        must be less than 512 if the unit is defined for the PHY layer is the
+        octet.
+
+config GNRC_SIXLOWPAN_SFR_OPT_FRAG_SIZE
+    int "Default value for fragment size that the sender should use to start with (OptFragmentSize)"
+    default 112
+    help
+        Must be inclusively between @ref GNRC_SIXLOWPAN_SFR_MIN_FRAG_SIZE and
+        @ref GNRC_SIXLOWPAN_SFR_MAX_FRAG_SIZE
+
+config GNRC_SIXLOWPAN_SFR_USE_ECN
+    bool "Indicates whether the sender should react to ECN (UseECN)"
+    default false
+    help
+        When the sender reacts to Explicit Congestion Notification (ECN) its
+        window size will vary between @ref
+        CONFIG_GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE and @ref
+        CONFIG_GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE.
+
+if GNRC_SIXLOWPAN_SFR_USE_ECN
+comment "Warning: Reaction of sender to ECN is not implemented yet"
+endif
+
+config GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE
+    int "Default minimum value of window size that the sender can use (MinWindowSize)"
+    default 1
+    range 1 32
+
+config GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE
+    int "Default maximum value of window size that the sender can use (MaxWindowSize)"
+    default 16
+    range 1 32
+
+config GNRC_SIXLOWPAN_SFR_OPT_WIN_SIZE
+    int "Default value of window size that the sender should start with (OptWindowSize)"
+    default 16
+    range 1 32
+    help
+        Must be inclusively between @ref GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE and
+        @ref GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE
+
+config GNRC_SIXLOWPAN_SFR_INTER_FRAME_GAP_US
+    int "Default minimum amount of time between transmissions in microseconds (InterFrameGap)"
+    default 100
+    help
+        All packets to a same destination, and in particular fragments, may be
+        subject to receive while transmitting and hidden terminal collisions
+        with the next or the previous transmission as the fragments progress
+        along a same path. The InterFrameGap protects the propagation of to one
+        transmission before the next one is triggered and creates a duty cycle
+        that controls the ratio of air and memory in intermediate nodes that a
+        particular datagram will use.
+
+config GNRC_SIXLOWPAN_SFR_MIN_ARQ_TIMEOUT_MS
+    int "Minimum RFRAG-ACK timeout in msec before a node takes a next action (MinARQTimeOut)"
+    default 350
+
+config GNRC_SIXLOWPAN_SFR_MAX_ARQ_TIMEOUT_MS
+    int "Maximum RFRAG-ACK timeout in msec before a node takes a next action (MaxARQTimeOut)"
+    default 700
+
+config GNRC_SIXLOWPAN_SFR_OPT_ARQ_TIMEOUT_MS
+    int "Default RFRAG-ACK timeout in msec before a node takes a next action (OptARQTimeOut)"
+    default 700
+    help
+        Must be inclusively between @ref GNRC_SIXLOWPAN_SFR_MIN_ARQ_TIMEOUT_MS
+        and @ref GNRC_SIXLOWPAN_SFR_MAX_ARQ_TIMEOUT_MS
+
+config GNRC_SIXLOWPAN_SFR_FRAG_RETRIES
+    int "The maximum number of retries for a particular fragment (MaxFragRetries)"
+    default 2
+
+config GNRC_SIXLOWPAN_SFR_DG_RETRIES
+    int "The maximum number of retries from scratch for a particular datagram (MaxDatagramRetries)"
+    default 0
+
+endif

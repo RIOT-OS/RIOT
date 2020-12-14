@@ -25,6 +25,9 @@
 
 #include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/pkt.h"
+#ifdef MODULE_GNRC_SIXLOWPAN_FRAG_SFR
+#include "net/sixlowpan/sfr.h"
+#endif  /* MODULE_GNRC_SIXLOWPAN_FRAG_SFR */
 
 #include "net/gnrc/sixlowpan/config.h"
 
@@ -96,6 +99,17 @@ typedef struct {
      * @brief   The reassembled packet in the packet buffer
      */
     gnrc_pktsnip_t *pkt;
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+    /**
+     * @brief   Bitmap for received fragments
+     *
+     * @note    Only available with module `gnrc_sixlowpan_frag_sfr` compiled
+     *          in.
+     */
+    BITFIELD(received, SIXLOWPAN_SFR_ACK_BITMAP_SIZE);
+    int8_t offset_diff;                         /**< offset change due to
+                                                 *   recompression */
+#endif /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
 } gnrc_sixlowpan_frag_rb_t;
 
 /**
@@ -119,6 +133,29 @@ gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr
                                                      size_t offset, unsigned page);
 
 /**
+ * @brief   Gets a reassembly buffer entry with a given link-layer address
+ *          pair and tag.
+ *
+ * @pre     `netif_hdr != NULL`
+ *
+ * @param[in] netif_hdr An interface header to provide the (source, destination)
+ *                      link-layer address pair. Must not be NULL.
+ * @param[in] tag       Tag to search for.
+ *
+ * @note    datagram_size is not a search parameter as the primary use case
+ *          for this function is [Selective Fragment Recovery]
+ *          (https://tools.ietf.org/html/rfc8931) where this information only
+ *          exists in the first fragment.
+ *
+ * @return  The reassembly buffer entry identified by the source and destination
+ *          address in the @p netif_hdr and @p tag, if any such entry exist.
+ * @return  NULL, if no entry with the given identifying tuple exist.
+ */
+gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_get_by_datagram(
+    const gnrc_netif_hdr_t *netif_hdr,
+    uint16_t tag);
+
+/**
  * @brief   Checks if a reassembly buffer entry with a given link-layer address
  *          pair and tag exists
  *
@@ -130,8 +167,8 @@ gnrc_sixlowpan_frag_rb_t *gnrc_sixlowpan_frag_rb_add(gnrc_netif_hdr_t *netif_hdr
  *
  * @note    datagram_size is not a search parameter as the primary use case
  *          for this function is [Selective Fragment Recovery]
- *          (https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-05)
- *          where this information only exists in the first fragment.
+ *          (https://tools.ietf.org/html/rfc8931) where this information only
+ *          exists in the first fragment.
  *
  * @return  true, if an entry with the given tuple exist.
  * @return  false, if no entry with the given tuple exist.
@@ -151,8 +188,8 @@ bool gnrc_sixlowpan_frag_rb_exists(const gnrc_netif_hdr_t *netif_hdr,
  *
  * @note    datagram_size is not a search parameter as the primary use case
  *          for this function is [Selective Fragment Recovery]
- *          (https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-05)
- *          where this information only exists in the first fragment.
+ *          (https://tools.ietf.org/html/rfc8931) where this information only
+ *          exists in the first fragment.
  */
 void gnrc_sixlowpan_frag_rb_rm_by_datagram(const gnrc_netif_hdr_t *netif_hdr,
                                            uint16_t tag);
@@ -250,6 +287,27 @@ static inline void gnrc_sixlowpan_frag_rb_remove(gnrc_sixlowpan_frag_rb_t *rbuf)
     return;
 }
 #endif
+
+#if defined(TEST_SUITES) || defined(DOXYGEN)
+/**
+ * @brief   Check if pool of fragment intervals is empty
+ *
+ * @see     @ref gnrc_sixlowpan_frag_rb_int_t
+ * @note    Returns only non-true values if @ref TEST_SUITES is defined.
+ *
+ * @return  true, if pool of fragment intervals is empty
+ * @return  false, if pool of fragment intervals is not empty
+ */
+bool gnrc_sixlowpan_frag_rb_ints_empty(void);
+#else   /* defined(TEST_SUITES) || defined(DOXYGEN) */
+/* always true without TEST_SUITES defined to optimize out when not testing,
+ * as checking the status of the fragment interval pool is unnecessary in
+ * production */
+static inline bool gnrc_sixlowpan_frag_rb_ints_empty(void)
+{
+    return true;
+}
+#endif  /* defined(TEST_SUITES) || defined(DOXYGEN) */
 
 #ifdef __cplusplus
 }

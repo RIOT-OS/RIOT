@@ -184,6 +184,29 @@ gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_get(
     return NULL;
 }
 
+gnrc_sixlowpan_frag_vrb_t *gnrc_sixlowpan_frag_vrb_reverse(
+        const gnrc_netif_t *netif, const uint8_t *src, size_t src_len,
+        unsigned tag)
+{
+    DEBUG("6lo vrb: trying to get entry for reverse label switching (%s, %u)\n",
+          gnrc_netif_addr_to_str(src, src_len, addr_str), tag);
+    for (unsigned i = 0; i < CONFIG_GNRC_SIXLOWPAN_FRAG_VRB_SIZE; i++) {
+        gnrc_sixlowpan_frag_vrb_t *vrbe = &_vrb[i];
+
+        if ((vrbe->out_tag == tag) && (vrbe->out_netif == netif) &&
+            (memcmp(vrbe->super.dst, src, src_len) == 0)) {
+            DEBUG("6lo vrb: got VRB entry from (%s, %u)\n",
+                  gnrc_netif_addr_to_str(vrbe->super.src,
+                                         vrbe->super.src_len,
+                                         addr_str), vrbe->super.tag);
+            return vrbe;
+        }
+    }
+    DEBUG("6lo vrb: no entry found\n");
+    return NULL;
+
+}
+
 void gnrc_sixlowpan_frag_vrb_gc(void)
 {
     uint32_t now_usec = xtimer_now_usec();

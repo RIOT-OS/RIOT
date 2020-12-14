@@ -32,6 +32,9 @@
 #if IS_USED(MODULE_GNRC_NETIF_PKTQ)
 #include "net/gnrc/netif/pktq.h"
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+#include "net/gnrc/sixlowpan/frag/sfr.h"
+#endif /* IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR) */
 #if IS_USED(MODULE_NETSTATS)
 #include "net/netstats.h"
 #endif /* IS_USED(MODULE_NETSTATS) */
@@ -1389,6 +1392,9 @@ void gnrc_netif_default_init(gnrc_netif_t *netif)
     _init_from_device(netif);
 #ifdef DEVELHELP
     _test_options(netif);
+#endif
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)
+    gnrc_sixlowpan_frag_sfr_init_iface(netif);
 #endif
     netif->cur_hl = CONFIG_GNRC_NETIF_DEFAULT_HL;
 #ifdef MODULE_GNRC_IPV6_NIB
