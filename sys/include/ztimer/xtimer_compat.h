@@ -19,9 +19,13 @@
 #ifndef ZTIMER_XTIMER_COMPAT_H
 #define ZTIMER_XTIMER_COMPAT_H
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 
+/* make sure to overwrite potentially conflicting XTIMER_WIDTH definition from
+ * board.h by eagerly including it */
+#include "board.h"
 #include "div.h"
 #include "timex.h"
 #ifdef MODULE_CORE_MSG
@@ -40,6 +44,13 @@ extern "C" {
  * so skip doxygen.
  */
 #ifndef DOXYGEN
+
+/* ztimer clocks with width lower than 32 bit get extended to 32 bit in software
+ * via ztimer_extend. So no matter what was defined elsewhere, we overwrite it
+ */
+#ifdef XTIMER_WIDTH
+#undef XTIMER_WIDTH
+#endif
 
 #define XTIMER_WIDTH    (32)
 #define XTIMER_MASK     (0)
@@ -185,6 +196,7 @@ static inline void xtimer_set_timeout_flag(xtimer_t *t, uint32_t timeout)
 
 static inline void xtimer_set_timeout_flag64(xtimer_t *t, uint64_t timeout)
 {
+    assert(timeout <= UINT32_MAX);
     xtimer_set_timeout_flag(t, timeout);
 }
 
