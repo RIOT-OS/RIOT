@@ -62,14 +62,29 @@ static int _reg_write(const sx150x_t *dev, uint8_t reg, uint8_t val)
     return SX150X_OK;
 }
 
+/** Write an up to 16 bit map value into a pair of (B, A) registers (or the
+ * direct register on the smaller SX1509s)
+ *
+ * @param[in] reg The first (B) register of the pair
+ * */
 static int _reg_write_u16(const sx150x_t *dev, uint8_t reg, uint16_t val)
 {
-    if (i2c_write_regs(dev->bus, dev->addr, reg, &val, 2, 0) != 0) {
+    uint8_t buf[] = {val >> 8, val & 0xff};
+    int ret;
+
+    if (PIN_NUMOF == 16) {
+        ret = i2c_write_regs(dev->bus, dev->addr, reg, buf, 2, 0);
+    } else {
+        ret = i2c_write_regs(dev->bus, dev->addr, reg, buf + 1, 1, 0);
+    }
+
+    if (ret != 0) {
         return SX150X_BUSERR;
     }
     return SX150X_OK;
 }
 
+/* Read-modify-write function to set a given mask in a register */
 static int reg_set(const sx150x_t *dev, uint8_t reg, uint8_t mask)
 {
     uint8_t tmp;
@@ -82,6 +97,7 @@ static int reg_set(const sx150x_t *dev, uint8_t reg, uint8_t mask)
     return _reg_write(dev, reg, tmp);
 }
 
+/* Read-modify-write function to clear a given mask in a register */
 static int reg_clr(const sx150x_t *dev, uint8_t reg, uint8_t mask)
 {
     uint8_t tmp;
@@ -92,6 +108,7 @@ static int reg_clr(const sx150x_t *dev, uint8_t reg, uint8_t mask)
     return _reg_write(dev, reg, tmp);
 }
 
+/* Read-modify-write function to toggle a given mask in a register */
 static int reg_tgl(const sx150x_t *dev, uint8_t reg, uint8_t mask)
 {
     uint8_t tmp;
@@ -168,6 +185,7 @@ exit:
 //     }
 // }
 
+/** Debug output of a specific register */
 static void val(sx150x_t *dev, uint8_t reg, const char *out)
 {
     uint8_t tmp;
@@ -298,7 +316,7 @@ int sx150x_gpio_set(sx150x_t *dev, unsigned pin)
     DEBUG("-> gpio set pin %i (mask 0x%02x)\n", (int)pin, (int)MASK(pin));
     i2c_acquire(dev->bus);
     dev->data |= (1 << pin);
-    _reg_write_u16(dev, REG_DATA(15), dev->data);
+    _reg_write_u16(dev, REG_DATA(BOTH), dev->data);
     i2c_release(dev->bus);
     // DEBUG("--- RELEASED ---\n");
     return SX150X_OK;
@@ -311,7 +329,7 @@ int sx150x_gpio_clear(sx150x_t *dev, unsigned pin)
     DEBUG("-> gpio clear pin %i (mask 0x%02x)\n", (int)pin, (int)MASK(pin));
     i2c_acquire(dev->bus);
     dev->data &= ~(1 << pin);
-    _reg_write_u16(dev, REG_DATA(15), dev->data);
+    _reg_write_u16(dev, REG_DATA(BOTH), dev->data);
 
     // dump(dev);
     // int ret = reg_clr(dev, REG_DATA(pin), MASK(pin));

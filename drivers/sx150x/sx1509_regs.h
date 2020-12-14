@@ -23,6 +23,8 @@
 extern "C" {
 #endif
 
+/* Value passed into REG_ macros that take a pin when used with the 16-bit write function */
+#define BOTH                    15
 #define OFFSET(pin)             ((pin > 7) ? 0 : 1)
 
 #define REG_INPUT_DISABLE(pin)  (0x00 + OFFSET(pin))
