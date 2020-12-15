@@ -3,6 +3,7 @@ FLASHER ?= $(DFU)
 FLASHFILE ?= $(BINFILE)
 
 DFU_ALT ?= 0
+DFU_USB_ID ?= ${USB_VID}:${USB_PID}
 ROM_OFFSET ?= 0
 
 _ROM_ADDR_WITH_OFFSET ?= $(shell printf "0x%x" $$(($(ROM_START_ADDR) + $(ROM_OFFSET))))
