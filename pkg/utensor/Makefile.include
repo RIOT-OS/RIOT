@@ -10,4 +10,5 @@ CXXEXFLAGS += -Wno-sign-compare
 ifeq (llvm,$(TOOLCHAIN))
   CXXEXFLAGS += -Wno-unused-variable
   CXXEXFLAGS += -Wno-shift-count-negative
+  CXXEXFLAGS += -Wno-implicit-int-float-conversion
 endif
