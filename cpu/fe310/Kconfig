@@ -64,3 +64,5 @@ config CPU_MODEL
 
 config CPU
     default "fe310" if CPU_FAM_FE310
+
+rsource "Kconfig.clk"
