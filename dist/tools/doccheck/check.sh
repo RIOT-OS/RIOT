@@ -22,17 +22,19 @@ fi
 
 DOXY_OUTPUT=$(make -C "${RIOTBASE}" doc 2>&1)
 DOXY_ERRCODE=$?
+RESULT=0
+
 
 if [ "${DOXY_ERRCODE}" -ne 0 ] ; then
     echo "'make doc' exited with non-zero code (${DOXY_ERRCODE})"
     echo "${DOXY_OUTPUT}"
-    exit 2
+    RESULT=2
 else
     ERRORS=$(echo "${DOXY_OUTPUT}" | grep '.*warning' | sed "s#${PWD}/\([^:]*\)#\1#g")
     if [ -n "${ERRORS}" ] ; then
         echo -e "${CERROR}ERROR: Doxygen generates the following warnings:${CRESET}"
         echo "${ERRORS}"
-        exit 2
+        RESULT=2
     fi
 fi
 
@@ -62,7 +64,7 @@ UNDEFINED_GROUPS=$( \
 if [ -n "${UNDEFINED_GROUPS}" ]
 then
     COUNT=$(echo "${UNDEFINED_GROUPS}" | wc -l)
-    echo -ne "${CERROR}ERROR${CRESET} "
+    echo -ne "\n\n${CERROR}ERROR${CRESET} "
     echo -e "There are ${CWARN}${COUNT}${CRESET} undefined Doxygen groups:"
     for group in ${UNDEFINED_GROUPS};
     do
@@ -70,7 +72,7 @@ then
         echo "${ALL_RAW_INGROUP}" | grep "\<${group}\>$" | sort -u |
                 awk -F: '{ print "\t" $1 }';
     done
-    exit 2
+    RESULT=2
 fi
 
 # Check for groups defined multiple times:
@@ -79,7 +81,7 @@ MULTIPLE_DEFINED_GROUPS=$(echo "${DEFINED_GROUPS}" | uniq -d)
 if [ -n "${MULTIPLE_DEFINED_GROUPS}" ]
 then
     COUNT=$(echo "${MULTIPLE_DEFINED_GROUPS}" | wc -l)
-    echo -ne "${CERROR}ERROR${CRESET} "
+    echo -ne "\n\n${CERROR}ERROR${CRESET} "
     echo -e "There are ${CWARN}${COUNT}${CRESET} Doxygen groups defined multiple times:"
     for group in ${MULTIPLE_DEFINED_GROUPS};
     do
@@ -89,5 +91,6 @@ then
             grep "\<${group}\>$" | sort -u |
             awk -F: '{ print "\t" $1 }';
     done
-    exit 2
+    RESULT=2
 fi
+exit ${RESULT}
