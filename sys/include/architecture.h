@@ -58,6 +58,9 @@ typedef uint<num>_t uword_t;
  *
  * @details Synonym to `int8_t`, `int16_t` or `int32_t` depending on
  *          architecture
+ *
+ * @note    This type is pronounce es-word-tea. When slaying dragons, this is
+ *          not the tool you're looking for.
  */
 typedef int<num>_t  sword_t;
 #elif (ARCHITECTURE_WORD_BITS == 8)
