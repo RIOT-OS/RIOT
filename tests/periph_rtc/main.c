@@ -92,8 +92,30 @@ int main(void)
     /* verify alarm */
     rtc_get_alarm(&time);
     print_time("   Alarm is set to ", &time);
+
+    /* clear alarm */
+    rtc_clear_alarm();
+    rtc_get_time(&time);
+    print_time("  Alarm cleared at ", &time);
+
+    /* verify alarm has been cleared */
+    xtimer_sleep(PERIOD);
+    rtc_get_time(&time);
+    if (mutex_trylock(&rtc_mtx)) {
+        print_time("   Error: Alarm at ", &time);
+    }
+    else {
+        print_time("       No alarm at ", &time);
+    }
+
+    /* set alarm */
+    rtc_get_time(&time);
+    inc_secs(&time, PERIOD);
+    rtc_set_alarm(&time, cb, &rtc_mtx);
+    print_time("  Setting alarm to ", &time);
     puts("");
 
+    /* loop over a few alarm cycles */
     while (1) {
         mutex_lock(&rtc_mtx);
         puts("Alarm!");
