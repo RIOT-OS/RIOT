@@ -109,12 +109,17 @@ static inline PortGroup *_port_iobus(gpio_t pin)
 
 static inline PortGroup *_port(gpio_t pin)
 {
-#ifdef PORT_IOBUS
+#ifdef MODULE_PERIPH_GPIO_FAST_READ
     /* Shift the PortGroup address back from the IOBUS region to the peripheral
      * region
      */
+#ifdef PORT_IOBUS_SEC
+    return (PortGroup *)((uintptr_t)_port_iobus(pin) -
+                         (uintptr_t)PORT_IOBUS_SEC + (uintptr_t)PORT_SEC);
+#else
     return (PortGroup *)((uintptr_t)_port_iobus(pin) -
                          (uintptr_t)PORT_IOBUS + (uintptr_t)PORT);
+#endif /* PORT_IOBUS_SEC */
 #else
     return _port_iobus(pin);
 #endif
