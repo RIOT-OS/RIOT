@@ -29,10 +29,10 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-typedef void (*fetch_op_u8_t)(volatile uint8_t *dest, uint8_t val);
-typedef void (*fetch_op_u16_t)(volatile uint16_t *dest, uint16_t val);
-typedef void (*fetch_op_u32_t)(volatile uint32_t *dest, uint32_t val);
-typedef void (*fetch_op_u64_t)(volatile uint64_t *dest, uint64_t val);
+typedef uint8_t (*fetch_op_u8_t)(volatile uint8_t *dest, uint8_t val);
+typedef uint16_t (*fetch_op_u16_t)(volatile uint16_t *dest, uint16_t val);
+typedef uint32_t (*fetch_op_u32_t)(volatile uint32_t *dest, uint32_t val);
+typedef uint64_t (*fetch_op_u64_t)(volatile uint64_t *dest, uint64_t val);
 
 static void test_load_store(void)
 {
@@ -58,9 +58,10 @@ static void test_fetch_op_u8(fetch_op_u8_t atomic_op, fetch_op_u8_t op)
     uint8_t i = 0;
     do {
         uint8_t state1 = 0x55, state2 = 0x55;
-        atomic_op(&state1, i);
-        op(&state2, i);
+        uint8_t res1 = atomic_op(&state1, i);
+        uint8_t res2 = op(&state2, i);
         TEST_ASSERT_EQUAL_INT(state1, state2);
+        TEST_ASSERT_EQUAL_INT(res1, res2);
         i++;
     } while (i);
 }
@@ -85,9 +86,10 @@ static void test_fetch_op_u16(fetch_op_u16_t atomic_op, fetch_op_u16_t op)
     do {
         uint16_t state1 = 0x5555, state2 = 0x5555;
         uint16_t num = random_uint32();
-        atomic_op(&state1, num);
-        op(&state2, num);
+        uint16_t res1 = atomic_op(&state1, num);
+        uint16_t res2 = op(&state2, num);
         TEST_ASSERT_EQUAL_INT(state1, state2);
+        TEST_ASSERT_EQUAL_INT(res1, res2);
         i++;
     } while (i);
 }
@@ -112,9 +114,10 @@ static void test_fetch_op_u32(fetch_op_u32_t atomic_op, fetch_op_u32_t op)
     do {
         uint32_t state1 = 0x55555555, state2 = 0x55555555;
         uint32_t num = random_uint32();
-        atomic_op(&state1, num);
-        op(&state2, num);
+        uint32_t res1 = atomic_op(&state1, num);
+        uint32_t res2 = op(&state2, num);
         TEST_ASSERT_EQUAL_INT(state1, state2);
+        TEST_ASSERT_EQUAL_INT(res1, res2);
         i++;
     } while (i);
 }
@@ -141,9 +144,10 @@ static void test_fetch_op_u64(fetch_op_u64_t atomic_op, fetch_op_u64_t op)
         state1 = state2 = 0x5555555555555555;
         uint64_t num;
         random_bytes((void *)&num, sizeof(num));
-        atomic_op(&state1, num);
-        op(&state2, num);
+        uint64_t res1 = atomic_op(&state1, num);
+        uint64_t res2 = op(&state2, num);
         TEST_ASSERT_EQUAL_INT(state1, state2);
+        TEST_ASSERT_EQUAL_INT(res1, res2);
         i++;
     } while (i);
 }
