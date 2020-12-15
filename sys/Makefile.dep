@@ -976,6 +976,12 @@ ifneq (,$(filter usbus_hid,$(USEMODULE)))
   USEMODULE += usbus
 endif
 
+ifneq (,$(filter usbus_dfu,$(USEMODULE)))
+  FEATURES_REQUIRED += riotboot
+  USEMODULE += usbus
+  USEMODULE += riotboot_slot
+endif
+
 ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += random

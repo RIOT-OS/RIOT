@@ -130,3 +130,8 @@ endif
 ifneq (,$(filter prng,$(USEMODULE)))
   include $(RIOTBASE)/sys/random/Makefile.include
 endif
+
+ifneq (,$(filter usbus_dfu,$(USEMODULE)))
+  CFLAGS += -DCPU_RAM_BASE=$(RAM_START_ADDR)
+  CFLAGS += -DCPU_RAM_SIZE=$(RAM_LEN)
+endif
