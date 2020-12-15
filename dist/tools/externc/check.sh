@@ -13,6 +13,9 @@ cd $RIOTBASE
 
 : "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
 . "${RIOTTOOLS}"/ci/changed_files.sh
+. "${RIOTTOOLS}"/ci/github_annotate.sh
+
+github_annotate_setup
 
 # prepare
 ROOT=$(git rev-parse --show-toplevel)
@@ -28,9 +31,24 @@ for FILE in ${FILES}; do
         | sed -e 's/  */ /g' \
         | grep -v -q '#ifdef __cplusplus extern "C" {'; \
     then
+        ANNOTATION="File does not have a C++ compatible header"
         EXIT_CODE=1
-        echo "file does not have a C++ compatible header: '${FILE}'"
+        echo "${ANNOTATION}: '${FILE}'"
+        ANNOTATION="${ANNOTATION}.\nPlease add:\n\n"
+        ANNOTATION="${ANNOTATION}"'```C\n'
+        ANNOTATION="${ANNOTATION}#ifdef __cplusplus\n"
+        ANNOTATION="${ANNOTATION}extern \"C\" {\n"
+        ANNOTATION="${ANNOTATION}#endif\n\n"
+        ANNOTATION="${ANNOTATION}/* your file content */\n\n"
+        ANNOTATION="${ANNOTATION}"'#ifdef __cplusplus\n'
+        ANNOTATION="${ANNOTATION}}\n"
+        ANNOTATION="${ANNOTATION}"'#endif\n'
+        ANNOTATION="${ANNOTATION}"'```\n\n'
+        ANNOTATION="${ANNOTATION}after your header \`#include\`s"
+        github_annotate_error "${FILE}" 0 "${ANNOTATION}"
     fi
 done
+
+github_annotate_teardown
 
 exit ${EXIT_CODE}
