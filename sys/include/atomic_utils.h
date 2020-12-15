@@ -276,29 +276,34 @@ static inline void atomic_store_u64(volatile uint64_t *dest, uint64_t val);
  * @brief   Atomically add a value onto a given value
  * @param[in,out]   dest    Add @p summand onto this value atomically in-place
  * @param[in]       summand Value to add onto @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_add_u8(volatile uint8_t *dest, uint8_t summand);
+static inline uint8_t atomic_fetch_add_u8(volatile uint8_t *dest,
+                                          uint8_t summand);
 /**
  * @brief   Atomically add a value onto a given value
  * @param[in,out]   dest    Add @p summand onto this value atomically in-place
  * @param[in]       summand Value to add onto @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_add_u16(volatile uint16_t *dest,
-                                        uint16_t summand);
+static inline uint16_t atomic_fetch_add_u16(volatile uint16_t *dest,
+                                            uint16_t summand);
 /**
  * @brief   Atomically add a value onto a given value
  * @param[in,out]   dest    Add @p summand onto this value atomically in-place
  * @param[in]       summand Value to add onto @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_add_u32(volatile uint32_t *dest,
-                                        uint32_t summand);
+static inline uint32_t atomic_fetch_add_u32(volatile uint32_t *dest,
+                                            uint32_t summand);
 /**
  * @brief   Atomically add a value onto a given value
  * @param[in,out]   dest    Add @p summand onto this value atomically in-place
  * @param[in]       summand Value to add onto @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_add_u64(volatile uint64_t *dest,
-                                        uint64_t summand);
+static inline uint64_t atomic_fetch_add_u64(volatile uint64_t *dest,
+                                            uint64_t summand);
 /** @} */
 
 /**
@@ -310,33 +315,37 @@ static inline void atomic_fetch_add_u64(volatile uint64_t *dest,
  * @param[in,out]   dest        Subtract @p subtrahend from this value
  *                              atomically in-place
  * @param[in]       subtrahend  Value to subtract from @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_sub_u8(volatile uint8_t *dest,
-                                       uint8_t subtrahend);
+static inline uint8_t atomic_fetch_sub_u8(volatile uint8_t *dest,
+                                          uint8_t subtrahend);
 /**
  * @brief   Atomically subtract a value from a given value
  * @param[in,out]   dest        Subtract @p subtrahend from this value
  *                              atomically in-place
  * @param[in]       subtrahend  Value to subtract from @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_sub_u16(volatile uint16_t *dest,
-                                        uint16_t subtrahend);
+static inline uint16_t atomic_fetch_sub_u16(volatile uint16_t *dest,
+                                            uint16_t subtrahend);
 /**
  * @brief   Atomically subtract a value from a given value
  * @param[in,out]   dest        Subtract @p subtrahend from this value
  *                              atomically in-place
  * @param[in]       subtrahend  Value to subtract from @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_sub_u32(volatile uint32_t *dest,
-                                        uint32_t subtrahend);
+static inline uint32_t atomic_fetch_sub_u32(volatile uint32_t *dest,
+                                            uint32_t subtrahend);
 /**
  * @brief   Atomically subtract a value from a given value
  * @param[in,out]   dest        Subtract @p subtrahend from this value
  *                              atomically in-place
  * @param[in]       subtrahend  Value to subtract from @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_sub_u64(volatile uint64_t *dest,
-                                        uint64_t subtrahend);
+static inline uint64_t atomic_fetch_sub_u64(volatile uint64_t *dest,
+                                            uint64_t subtrahend);
 /** @} */
 
 /**
@@ -348,29 +357,36 @@ static inline void atomic_fetch_sub_u64(volatile uint64_t *dest,
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest | val`
  * @param[in]       val         Value to bitwise or into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_or_u8(volatile uint8_t *dest, uint8_t val);
+static inline uint8_t atomic_fetch_or_u8(volatile uint8_t *dest, uint8_t val);
 /**
  * @brief   Atomic version of `*dest |= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest | val`
  * @param[in]       val         Value to bitwise or into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_or_u16(volatile uint16_t *dest, uint16_t val);
+static inline uint16_t atomic_fetch_or_u16(volatile uint16_t *dest,
+                                           uint16_t val);
 /**
  * @brief   Atomic version of `*dest |= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest | val`
  * @param[in]       val         Value to bitwise or into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_or_u32(volatile uint32_t *dest, uint32_t val);
+static inline uint32_t atomic_fetch_or_u32(volatile uint32_t *dest,
+                                           uint32_t val);
 /**
  * @brief   Atomic version of `*dest |= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest | val`
  * @param[in]       val         Value to bitwise or into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_or_u64(volatile uint64_t *dest, uint64_t val);
+static inline uint64_t atomic_fetch_or_u64(volatile uint64_t *dest,
+                                           uint64_t val);
 /** @} */
 
 /**
@@ -382,29 +398,36 @@ static inline void atomic_fetch_or_u64(volatile uint64_t *dest, uint64_t val);
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest ^ val`
  * @param[in]       val         Value to bitwise xor into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_xor_u8(volatile uint8_t *dest, uint8_t val);
+static inline uint8_t atomic_fetch_xor_u8(volatile uint8_t *dest, uint8_t val);
 /**
  * @brief   Atomic version of `*dest ^= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest ^ val`
  * @param[in]       val         Value to bitwise xor into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_xor_u16(volatile uint16_t *dest, uint16_t val);
+static inline uint16_t atomic_fetch_xor_u16(volatile uint16_t *dest,
+                                            uint16_t val);
 /**
  * @brief   Atomic version of `*dest ^= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest ^ val`
  * @param[in]       val         Value to bitwise xor into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_xor_u32(volatile uint32_t *dest, uint32_t val);
+static inline uint32_t atomic_fetch_xor_u32(volatile uint32_t *dest,
+                                            uint32_t val);
 /**
  * @brief   Atomic version of `*dest ^= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest ^ val`
  * @param[in]       val         Value to bitwise xor into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_xor_u64(volatile uint64_t *dest, uint64_t val);
+static inline uint64_t atomic_fetch_xor_u64(volatile uint64_t *dest,
+                                            uint64_t val);
 /** @} */
 
 /**
@@ -416,29 +439,36 @@ static inline void atomic_fetch_xor_u64(volatile uint64_t *dest, uint64_t val);
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest & val`
  * @param[in]       val         Value to bitwise and into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_and_u8(volatile uint8_t *dest, uint8_t val);
+static inline uint8_t atomic_fetch_and_u8(volatile uint8_t *dest, uint8_t val);
 /**
  * @brief   Atomic version of `*dest &= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest & val`
  * @param[in]       val         Value to bitwise and into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_and_u16(volatile uint16_t *dest, uint16_t val);
+static inline uint16_t atomic_fetch_and_u16(volatile uint16_t *dest,
+                                            uint16_t val);
 /**
  * @brief   Atomic version of `*dest &= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest & val`
  * @param[in]       val         Value to bitwise and into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_and_u32(volatile uint32_t *dest, uint32_t val);
+static inline uint32_t atomic_fetch_and_u32(volatile uint32_t *dest,
+                                            uint32_t val);
 /**
  * @brief   Atomic version of `*dest &= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest & val`
  * @param[in]       val         Value to bitwise and into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void atomic_fetch_and_u64(volatile uint64_t *dest, uint64_t val);
+static inline uint64_t atomic_fetch_and_u64(volatile uint64_t *dest,
+                                            uint64_t val);
 /** @} */
 
 /**
@@ -539,33 +569,37 @@ static inline void atomic_clear_bit_u64(atomic_bit_u64_t bit);
  * @param[in,out]   dest    Add @p summand onto this value semi-atomically
  *                          in-place
  * @param[in]       summand Value to add onto @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_add_u8(volatile uint8_t *dest,
-                                            uint8_t summand);
+static inline uint8_t semi_atomic_fetch_add_u8(volatile uint8_t *dest,
+                                               uint8_t summand);
 /**
  * @brief   Semi-atomically add a value onto a given value
  * @param[in,out]   dest    Add @p summand onto this value semi-atomically
  *                          in-place
  * @param[in]       summand Value to add onto @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_add_u16(volatile uint16_t *dest,
-                                             uint16_t summand);
+static inline uint16_t semi_atomic_fetch_add_u16(volatile uint16_t *dest,
+                                                 uint16_t summand);
 /**
  * @brief   Semi-atomically add a value onto a given value
  * @param[in,out]   dest    Add @p summand onto this value semi-atomically
  *                          in-place
  * @param[in]       summand Value to add onto @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_add_u32(volatile uint32_t *dest,
-                                             uint32_t summand);
+static inline uint32_t semi_atomic_fetch_add_u32(volatile uint32_t *dest,
+                                                 uint32_t summand);
 /**
  * @brief   Semi-atomically add a value onto a given value
  * @param[in,out]   dest    Add @p summand onto this value semi-atomically
  *                          in-place
  * @param[in]       summand Value to add onto @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_add_u64(volatile uint64_t *dest,
-                                             uint64_t summand);
+static inline uint64_t semi_atomic_fetch_add_u64(volatile uint64_t *dest,
+                                                 uint64_t summand);
 /** @} */
 
 /**
@@ -577,33 +611,37 @@ static inline void semi_atomic_fetch_add_u64(volatile uint64_t *dest,
  * @param[in,out]   dest        Subtract @p subtrahend from this value
  *                              semi-atomically in-place
  * @param[in]       subtrahend  Value to subtract from @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_sub_u8(volatile uint8_t *dest,
-                                            uint8_t subtrahend);
+static inline uint8_t semi_atomic_fetch_sub_u8(volatile uint8_t *dest,
+                                               uint8_t subtrahend);
 /**
  * @brief   Semi-atomically subtract a value from a given value
  * @param[in,out]   dest        Subtract @p subtrahend from this value
  *                              semi-atomically in-place
  * @param[in]       subtrahend  Value to subtract from @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_sub_u16(volatile uint16_t *dest,
-                                             uint16_t subtrahend);
+static inline uint16_t semi_atomic_fetch_sub_u16(volatile uint16_t *dest,
+                                                 uint16_t subtrahend);
 /**
  * @brief   Semi-atomically subtract a value from a given value
  * @param[in,out]   dest        Subtract @p subtrahend from this value
  *                              semi-atomically in-place
  * @param[in]       subtrahend  Value to subtract from @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_sub_u32(volatile uint32_t *dest,
-                                             uint32_t subtrahend);
+static inline uint32_t semi_atomic_fetch_sub_u32(volatile uint32_t *dest,
+                                                 uint32_t subtrahend);
 /**
  * @brief   Semi-atomically subtract a value from a given value
  * @param[in,out]   dest        Subtract @p subtrahend from this value
  *                              semi-atomically in-place
  * @param[in]       subtrahend  Value to subtract from @p dest
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_sub_u64(volatile uint64_t *dest,
-                                             uint64_t subtrahend);
+static inline uint64_t semi_atomic_fetch_sub_u64(volatile uint64_t *dest,
+                                                 uint64_t subtrahend);
 /** @} */
 
 /**
@@ -615,32 +653,36 @@ static inline void semi_atomic_fetch_sub_u64(volatile uint64_t *dest,
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest | val`
  * @param[in]       val         Value to bitwise or into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_or_u8(volatile uint8_t *dest, uint8_t val);
+static inline uint8_t semi_atomic_fetch_or_u8(volatile uint8_t *dest, uint8_t val);
 /**
  * @brief   Semi-atomic version of `*dest |= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest | val`
  * @param[in]       val         Value to bitwise or into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_or_u16(volatile uint16_t *dest,
-                                            uint16_t val);
+static inline uint16_t semi_atomic_fetch_or_u16(volatile uint16_t *dest,
+                                                uint16_t val);
 /**
  * @brief   Semi-atomic version of `*dest |= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest | val`
  * @param[in]       val         Value to bitwise or into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_or_u32(volatile uint32_t *dest,
-                                            uint32_t val);
+static inline uint32_t semi_atomic_fetch_or_u32(volatile uint32_t *dest,
+                                                uint32_t val);
 /**
  * @brief   Semi-atomic version of `*dest |= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest | val`
  * @param[in]       val         Value to bitwise or into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_or_u64(volatile uint64_t *dest,
-                                            uint64_t val);
+static inline uint64_t semi_atomic_fetch_or_u64(volatile uint64_t *dest,
+                                                uint64_t val);
 /** @} */
 
 /**
@@ -652,33 +694,37 @@ static inline void semi_atomic_fetch_or_u64(volatile uint64_t *dest,
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest ^ val`
  * @param[in]       val         Value to bitwise xor into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_xor_u8(volatile uint8_t *dest,
-                                            uint8_t val);
+static inline uint8_t semi_atomic_fetch_xor_u8(volatile uint8_t *dest,
+                                               uint8_t val);
 /**
  * @brief   Semi-atomic version of `*dest ^= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest ^ val`
  * @param[in]       val         Value to bitwise xor into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_xor_u16(volatile uint16_t *dest,
-                                             uint16_t val);
+static inline uint16_t semi_atomic_fetch_xor_u16(volatile uint16_t *dest,
+                                                 uint16_t val);
 /**
  * @brief   Semi-atomic version of `*dest ^= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest ^ val`
  * @param[in]       val         Value to bitwise xor into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_xor_u32(volatile uint32_t *dest,
-                                             uint32_t val);
+static inline uint32_t semi_atomic_fetch_xor_u32(volatile uint32_t *dest,
+                                                 uint32_t val);
 /**
  * @brief   Semi-atomic version of `*dest ^= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest ^ val`
  * @param[in]       val         Value to bitwise xor into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_xor_u64(volatile uint64_t *dest,
-                                             uint64_t val);
+static inline uint64_t semi_atomic_fetch_xor_u64(volatile uint64_t *dest,
+                                                 uint64_t val);
 /** @} */
 
 /**
@@ -690,33 +736,37 @@ static inline void semi_atomic_fetch_xor_u64(volatile uint64_t *dest,
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest & val`
  * @param[in]       val         Value to bitwise and into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_and_u8(volatile uint8_t *dest,
-                                            uint8_t val);
+static inline uint8_t semi_atomic_fetch_and_u8(volatile uint8_t *dest,
+                                               uint8_t val);
 /**
  * @brief   Semi-atomic version of `*dest &= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest & val`
  * @param[in]       val         Value to bitwise and into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_and_u16(volatile uint16_t *dest,
-                                             uint16_t val);
+static inline uint16_t semi_atomic_fetch_and_u16(volatile uint16_t *dest,
+                                                 uint16_t val);
 /**
  * @brief   Semi-atomic version of `*dest &= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest & val`
  * @param[in]       val         Value to bitwise and into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_and_u32(volatile uint32_t *dest,
-                                             uint32_t val);
+static inline uint32_t semi_atomic_fetch_and_u32(volatile uint32_t *dest,
+                                                 uint32_t val);
 /**
  * @brief   Semi-atomic version of `*dest &= val`
  * @param[in,out]   dest        Replace this value with the result of
  *                              `*dest & val`
  * @param[in]       val         Value to bitwise and into @p dest in-place
+ * @return  The value previously stored @p dest
  */
-static inline void semi_atomic_fetch_and_u64(volatile uint64_t *dest,
-                                             uint64_t val);
+static inline uint64_t semi_atomic_fetch_and_u64(volatile uint64_t *dest,
+                                                 uint64_t val);
 /** @} */
 
 /* Fallback implementations of atomic utility functions: */
@@ -799,12 +849,14 @@ ATOMIC_STORE_IMPL(u64, uint64_t)
  * @param   type    Variable type, e.g. `uint8_t`
  */
 #define ATOMIC_FETCH_OP_IMPL(opname, op, name, type)                           \
-    static inline void CONCAT4(atomic_fetch_, opname, _, name)                 \
+    static inline type CONCAT4(atomic_fetch_, opname, _, name)                 \
             (volatile type *dest, type val)                                    \
     {                                                                          \
         unsigned state = irq_disable();                                        \
-        *dest = *dest op val;                                                  \
+        const type result = *dest;                                             \
+        *dest = result op val;                                                 \
         irq_restore(state);                                                    \
+        return result;                                                         \
     }
 
 #ifndef HAS_ATOMIC_FETCH_ADD_U8
@@ -945,54 +997,62 @@ static inline void atomic_clear_bit_u64(atomic_bit_u64_t bit)
 
 /* FETCH_ADD */
 #if defined(HAS_ATOMIC_FETCH_ADD_U8) || !defined(HAS_ATOMIC_STORE_U8)
-static inline void semi_atomic_fetch_add_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t semi_atomic_fetch_add_u8(volatile uint8_t *dest,
+                                               uint8_t val)
 {
-    atomic_fetch_add_u8(dest, val);
+    return atomic_fetch_add_u8(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_add_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t semi_atomic_fetch_add_u8(volatile uint8_t *dest,
+                                               uint8_t val)
 {
-    atomic_store_u8(dest, *dest + val);
+    uint8_t result = atomic_load_u8(dest);
+    atomic_store_u8(dest, result + val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_ADD_U8 || !HAS_ATOMIC_STORE_U8 */
 
 #if defined(HAS_ATOMIC_FETCH_ADD_U16) || !defined(HAS_ATOMIC_STORE_U16)
-static inline void semi_atomic_fetch_add_u16(volatile uint16_t *dest,
-                                             uint16_t val)
+static inline uint16_t semi_atomic_fetch_add_u16(volatile uint16_t *dest,
+                                                 uint16_t val)
 {
-    atomic_fetch_add_u16(dest, val);
+    return atomic_fetch_add_u16(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_add_u16(volatile uint16_t *dest,
-                                             uint16_t val)
+static inline uint16_t semi_atomic_fetch_add_u16(volatile uint16_t *dest,
+                                                 uint16_t val)
 {
-    atomic_store_u16(dest, *dest + val);
+    uint16_t result = atomic_load_u16(dest);
+    atomic_store_u16(dest, result + val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_ADD_U16 || !HAS_ATOMIC_STORE_U16 */
 
 #if defined(HAS_ATOMIC_FETCH_ADD_U32) || !defined(HAS_ATOMIC_STORE_U32)
-static inline void semi_atomic_fetch_add_u32(volatile uint32_t *dest,
-                                             uint32_t val)
+static inline uint32_t semi_atomic_fetch_add_u32(volatile uint32_t *dest,
+                                                 uint32_t val)
 {
-    atomic_fetch_add_u32(dest, val);
+    return atomic_fetch_add_u32(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_add_u32(volatile uint32_t *dest,
-                                             uint32_t val)
+static inline uint32_t semi_atomic_fetch_add_u32(volatile uint32_t *dest,
+                                                 uint32_t val)
 {
-    atomic_store_u32(dest, *dest + val);
+    uint32_t result = atomic_load_u32(dest);
+    atomic_store_u32(dest, result + val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_ADD_U32 || !HAS_ATOMIC_STORE_U32 */
 
 #if defined(HAS_ATOMIC_FETCH_ADD_U64) || !defined(HAS_ATOMIC_STORE_U64)
-static inline void semi_atomic_fetch_add_u64(volatile uint64_t *dest,
-                                             uint64_t val)
+static inline uint64_t semi_atomic_fetch_add_u64(volatile uint64_t *dest,
+                                                 uint64_t val)
 {
-    atomic_fetch_add_u64(dest, val);
+    return atomic_fetch_add_u64(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_add_u64(volatile uint64_t *dest,
-                                             uint64_t val)
+static inline uint64_t semi_atomic_fetch_add_u64(volatile uint64_t *dest,
+                                                 uint64_t val)
 {
     atomic_store_u64(dest, *dest + val);
 }
@@ -1000,221 +1060,261 @@ static inline void semi_atomic_fetch_add_u64(volatile uint64_t *dest,
 
 /* FETCH_SUB */
 #if defined(HAS_ATOMIC_FETCH_SUB_U8) || !defined(HAS_ATOMIC_STORE_U8)
-static inline void semi_atomic_fetch_sub_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t semi_atomic_fetch_sub_u8(volatile uint8_t *dest,
+                                               uint8_t val)
 {
-    atomic_fetch_sub_u8(dest, val);
+    return atomic_fetch_sub_u8(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_sub_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t semi_atomic_fetch_sub_u8(volatile uint8_t *dest,
+                                               uint8_t val)
 {
-    atomic_store_u8(dest, *dest - val);
+    uint8_t result = atomic_load_u8(dest);
+    atomic_store_u8(dest, result - val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_SUB_U8 || !HAS_ATOMIC_STORE_U8 */
 
 #if defined(HAS_ATOMIC_FETCH_SUB_U16) || !defined(HAS_ATOMIC_STORE_U16)
-static inline void semi_atomic_fetch_sub_u16(volatile uint16_t *dest,
-                                             uint16_t val)
+static inline uint16_t semi_atomic_fetch_sub_u16(volatile uint16_t *dest,
+                                                 uint16_t val)
 {
-    atomic_fetch_sub_u16(dest, val);
+    return atomic_fetch_sub_u16(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_sub_u16(volatile uint16_t *dest,
-                                             uint16_t val)
+static inline uint16_t semi_atomic_fetch_sub_u16(volatile uint16_t *dest,
+                                                 uint16_t val)
 {
-    atomic_store_u16(dest, *dest - val);
+    uint16_t result = atomic_load_u16(dest);
+    atomic_store_u16(dest, result - val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_SUB_U16 || !HAS_ATOMIC_STORE_U16 */
 
 #if defined(HAS_ATOMIC_FETCH_SUB_U32) || !defined(HAS_ATOMIC_STORE_U32)
-static inline void semi_atomic_fetch_sub_u32(volatile uint32_t *dest,
-                                             uint32_t val)
+static inline uint32_t semi_atomic_fetch_sub_u32(volatile uint32_t *dest,
+                                                 uint32_t val)
 {
-    atomic_fetch_sub_u32(dest, val);
+    return atomic_fetch_sub_u32(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_sub_u32(volatile uint32_t *dest,
-                                             uint32_t val)
+static inline uint32_t semi_atomic_fetch_sub_u32(volatile uint32_t *dest,
+                                                 uint32_t val)
 {
-    atomic_store_u32(dest, *dest - val);
+    uint32_t result = atomic_load_u32(dest);
+    atomic_store_u32(dest, result - val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_SUB_U32 || !HAS_ATOMIC_STORE_U64 */
 
 #if defined(HAS_ATOMIC_FETCH_SUB_U64) || !defined(HAS_ATOMIC_STORE_U64)
-static inline void semi_atomic_fetch_sub_u64(volatile uint64_t *dest,
-                                             uint64_t val)
+static inline uint64_t semi_atomic_fetch_sub_u64(volatile uint64_t *dest,
+                                                 uint64_t val)
 {
-    atomic_fetch_sub_u64(dest, val);
+    return atomic_fetch_sub_u64(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_sub_u64(volatile uint64_t *dest,
-                                             uint64_t val)
+static inline uint64_t semi_atomic_fetch_sub_u64(volatile uint64_t *dest,
+                                                 uint64_t val)
 {
-    atomic_store_u64(dest, *dest - val);
+    uint64_t result = atomic_load_u64(dest);
+    atomic_store_u64(dest, result - val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_SUB_U64 || !HAS_ATOMIC_STORE_U64 */
 
 /* FETCH_OR */
 #if defined(HAS_ATOMIC_FETCH_OR_U8) || !defined(HAS_ATOMIC_STORE_U8)
-static inline void semi_atomic_fetch_or_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t semi_atomic_fetch_or_u8(volatile uint8_t *dest,
+                                              uint8_t val)
 {
-    atomic_fetch_or_u8(dest, val);
+    return atomic_fetch_or_u8(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_or_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t semi_atomic_fetch_or_u8(volatile uint8_t *dest,
+                                              uint8_t val)
 {
-    atomic_store_u8(dest, *dest | val);
+    uint8_t result = atomic_load_u8(dest);
+    atomic_store_u8(dest, result | val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_OR_U8 || !HAS_ATOMIC_STORE_U8 */
 
 #if defined(HAS_ATOMIC_FETCH_OR_U16) || !defined(HAS_ATOMIC_STORE_U16)
-static inline void semi_atomic_fetch_or_u16(volatile uint16_t *dest,
-                                            uint16_t val)
+static inline uint16_t semi_atomic_fetch_or_u16(volatile uint16_t *dest,
+                                                uint16_t val)
 {
-    atomic_fetch_or_u16(dest, val);
+    return atomic_fetch_or_u16(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_or_u16(volatile uint16_t *dest,
-                                            uint16_t val)
+static inline uint16_t semi_atomic_fetch_or_u16(volatile uint16_t *dest,
+                                                uint16_t val)
 {
-    atomic_store_u16(dest, *dest | val);
+    uint16_t result = atomic_load_u16(dest);
+    atomic_store_u16(dest, result | val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_OR_U16 || !HAS_ATOMIC_STORE_U16 */
 
 #if defined(HAS_ATOMIC_FETCH_OR_U32) || !defined(HAS_ATOMIC_STORE_U32)
-static inline void semi_atomic_fetch_or_u32(volatile uint32_t *dest,
-                                            uint32_t val)
+static inline uint32_t semi_atomic_fetch_or_u32(volatile uint32_t *dest,
+                                                uint32_t val)
 {
-    atomic_fetch_or_u32(dest, val);
+    return atomic_fetch_or_u32(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_or_u32(volatile uint32_t *dest,
-                                            uint32_t val)
+static inline uint32_t semi_atomic_fetch_or_u32(volatile uint32_t *dest,
+                                                uint32_t val)
 {
-    atomic_store_u32(dest, *dest | val);
+    uint32_t result = atomic_load_u32(dest);
+    atomic_store_u32(dest, result | val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_OR_U32 || !HAS_ATOMIC_STORE_U32 */
 
 #if defined(HAS_ATOMIC_FETCH_OR_U64) || !defined(HAS_ATOMIC_STORE_U64)
-static inline void semi_atomic_fetch_or_u64(volatile uint64_t *dest,
-                                            uint64_t val)
+static inline uint64_t semi_atomic_fetch_or_u64(volatile uint64_t *dest,
+                                                uint64_t val)
 {
-    atomic_fetch_or_u64(dest, val);
+    return atomic_fetch_or_u64(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_or_u64(volatile uint64_t *dest,
-                                            uint64_t val)
+static inline uint64_t semi_atomic_fetch_or_u64(volatile uint64_t *dest,
+                                                uint64_t val)
 {
-    atomic_store_u64(dest, *dest | val);
+    uint64_t result = atomic_load_u64(dest);
+    atomic_store_u64(dest, result | val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_OR_U64 || !HAS_ATOMIC_STORE_U64 */
 
 /* FETCH_XOR */
 #if defined(HAS_ATOMIC_FETCH_XOR_U8) || !defined(HAS_ATOMIC_STORE_U8)
-static inline void semi_atomic_fetch_xor_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t semi_atomic_fetch_xor_u8(volatile uint8_t *dest,
+                                               uint8_t val)
 {
-    atomic_fetch_xor_u8(dest, val);
+    return atomic_fetch_xor_u8(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_xor_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t semi_atomic_fetch_xor_u8(volatile uint8_t *dest,
+                                               uint8_t val)
 {
-    atomic_store_u8(dest, *dest ^ val);
+    uint8_t result = atomic_load_u8(dest);
+    atomic_store_u8(dest, result ^ val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_XOR_U8 || !HAS_ATOMIC_STORE_U8 */
 
 #if defined(HAS_ATOMIC_FETCH_XOR_U16) || !defined(HAS_ATOMIC_STORE_U16)
-static inline void semi_atomic_fetch_xor_u16(volatile uint16_t *dest,
-                                             uint16_t val)
+static inline uint16_t semi_atomic_fetch_xor_u16(volatile uint16_t *dest,
+                                                 uint16_t val)
 {
-    atomic_fetch_xor_u16(dest, val);
+    return atomic_fetch_xor_u16(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_xor_u16(volatile uint16_t *dest,
-                                             uint16_t val)
+static inline uint16_t semi_atomic_fetch_xor_u16(volatile uint16_t *dest,
+                                                 uint16_t val)
 {
-    atomic_store_u16(dest, *dest ^ val);
+    uint16_t result = atomic_load_u16(dest);
+    atomic_store_u16(dest, result ^ val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_XOR_U16 || !HAS_ATOMIC_STORE_U16 */
 
 #if defined(HAS_ATOMIC_FETCH_XOR_U32) || !defined(HAS_ATOMIC_STORE_U32)
-static inline void semi_atomic_fetch_xor_u32(volatile uint32_t *dest,
-                                             uint32_t val)
+static inline uint32_t semi_atomic_fetch_xor_u32(volatile uint32_t *dest,
+                                                 uint32_t val)
 {
-    atomic_fetch_xor_u32(dest, val);
+    return atomic_fetch_xor_u32(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_xor_u32(volatile uint32_t *dest,
-                                             uint32_t val)
+static inline uint32_t semi_atomic_fetch_xor_u32(volatile uint32_t *dest,
+                                                 uint32_t val)
 {
-    atomic_store_u32(dest, *dest ^ val);
+    uint32_t result = atomic_load_u32(dest);
+    atomic_store_u32(dest, result ^ val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_XOR_U32 || !HAS_ATOMIC_STORE_U32 */
 
 #if defined(HAS_ATOMIC_FETCH_XOR_U64) || !defined(HAS_ATOMIC_STORE_U64)
-static inline void semi_atomic_fetch_xor_u64(volatile uint64_t *dest,
-                                             uint64_t val)
+static inline uint64_t semi_atomic_fetch_xor_u64(volatile uint64_t *dest,
+                                                 uint64_t val)
 {
-    atomic_fetch_xor_u64(dest, val);
+    return atomic_fetch_xor_u64(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_xor_u64(volatile uint64_t *dest,
-                                             uint64_t val)
+static inline uint64_t semi_atomic_fetch_xor_u64(volatile uint64_t *dest,
+                                                 uint64_t val)
 {
-    atomic_store_u64(dest, *dest ^ val);
+    uint64_t result = atomic_load_u64(dest);
+    atomic_store_u64(dest, result ^ val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_XOR_U64 || !HAS_ATOMIC_STORE_U64 */
 
 /* FETCH_AND */
 #if defined(HAS_ATOMIC_FETCH_AND_U8) || !defined(HAS_ATOMIC_STORE_U8)
-static inline void semi_atomic_fetch_and_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t semi_atomic_fetch_and_u8(volatile uint8_t *dest,
+                                               uint8_t val)
 {
-    atomic_fetch_and_u8(dest, val);
+    return atomic_fetch_and_u8(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_and_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t semi_atomic_fetch_and_u8(volatile uint8_t *dest,
+                                               uint8_t val)
 {
-    atomic_store_u8(dest, *dest & val);
+    uint8_t result = atomic_load_u8(dest);
+    atomic_store_u8(dest, result & val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_AND_U8 || !HAS_ATOMIC_STORE_U8 */
 
 #if defined(HAS_ATOMIC_FETCH_AND_U16) || !defined(HAS_ATOMIC_STORE_U16)
-static inline void semi_atomic_fetch_and_u16(volatile uint16_t *dest,
-                                             uint16_t val)
+static inline uint16_t semi_atomic_fetch_and_u16(volatile uint16_t *dest,
+                                                 uint16_t val)
 {
-    atomic_fetch_and_u16(dest, val);
+    return atomic_fetch_and_u16(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_and_u16(volatile uint16_t *dest,
-                                             uint16_t val)
+static inline uint16_t semi_atomic_fetch_and_u16(volatile uint16_t *dest,
+                                                 uint16_t val)
 {
-    atomic_store_u16(dest, *dest & val);
+    uint16_t result = atomic_load_u16(dest);
+    atomic_store_u16(dest, result & val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_AND_U16 || !HAS_ATOMIC_STORE_U16 */
 
 #if defined(HAS_ATOMIC_FETCH_AND_U32) || !defined(HAS_ATOMIC_STORE_U32)
-static inline void semi_atomic_fetch_and_u32(volatile uint32_t *dest,
-                                             uint32_t val)
+static inline uint32_t semi_atomic_fetch_and_u32(volatile uint32_t *dest,
+                                                 uint32_t val)
 {
-    atomic_fetch_and_u32(dest, val);
+    return atomic_fetch_and_u32(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_and_u32(volatile uint32_t *dest,
-                                             uint32_t val)
+static inline uint32_t semi_atomic_fetch_and_u32(volatile uint32_t *dest,
+                                                 uint32_t val)
 {
-    atomic_store_u32(dest, *dest & val);
+    uint32_t result = atomic_load_u32(dest);
+    atomic_store_u32(dest, result & val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_AND_U32 || !HAS_ATOMIC_STORE_U32 */
 
 #if defined(HAS_ATOMIC_FETCH_AND_U64) || !defined(HAS_ATOMIC_STORE_U64)
-static inline void semi_atomic_fetch_and_u64(volatile uint64_t *dest,
-                                             uint64_t val)
+static inline uint64_t semi_atomic_fetch_and_u64(volatile uint64_t *dest,
+                                                 uint64_t val)
 {
-    atomic_fetch_and_u64(dest, val);
+    return atomic_fetch_and_u64(dest, val);
 }
 #else
-static inline void semi_atomic_fetch_and_u64(volatile uint64_t *dest,
-                                             uint64_t val)
+static inline uint64_t semi_atomic_fetch_and_u64(volatile uint64_t *dest,
+                                                 uint64_t val)
 {
-    atomic_store_u64(dest, *dest & val);
+    uint64_t result = atomic_load_u64(dest);
+    atomic_store_u64(dest, result & val);
+    return result;
 }
 #endif /* HAS_ATOMIC_FETCH_AND_U64 || !HAS_ATOMIC_STORE_U64 */
 

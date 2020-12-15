@@ -113,45 +113,55 @@ static inline void volatile_store_u64(volatile uint64_t *dest, uint64_t val)
  * @param   dest    Address of the value to add to
  * @param   val     Value to add
  */
-static inline void volatile_fetch_add_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t volatile_fetch_add_u8(volatile uint8_t *dest, uint8_t val)
 {
-    *dest += val;
+    uint8_t result = *dest;
+    *dest = result + val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest -= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_sub_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t volatile_fetch_sub_u8(volatile uint8_t *dest, uint8_t val)
 {
-    *dest -= val;
+    uint8_t result = *dest;
+    *dest = result - val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest |= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_or_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t volatile_fetch_or_u8(volatile uint8_t *dest, uint8_t val)
 {
-    *dest |= val;
+    uint8_t result = *dest;
+    *dest = result | val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest ^= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_xor_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t volatile_fetch_xor_u8(volatile uint8_t *dest, uint8_t val)
 {
-    *dest ^= val;
+    uint8_t result = *dest;
+    *dest = result ^ val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest &= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_and_u8(volatile uint8_t *dest, uint8_t val)
+static inline uint8_t volatile_fetch_and_u8(volatile uint8_t *dest, uint8_t val)
 {
-    *dest &= val;
+    uint8_t result = *dest;
+    *dest = result & val;
+    return result;
 }
 
 /**
@@ -159,45 +169,60 @@ static inline void volatile_fetch_and_u8(volatile uint8_t *dest, uint8_t val)
  * @param   dest    Address of the value to add to
  * @param   val     Value to add
  */
-static inline void volatile_fetch_add_u16(volatile uint16_t *dest, uint16_t val)
+static inline uint16_t volatile_fetch_add_u16(volatile uint16_t *dest,
+                                              uint16_t val)
 {
-    *dest += val;
+    uint16_t result = *dest;
+    *dest = result + val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest -= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_sub_u16(volatile uint16_t *dest, uint16_t val)
+static inline uint16_t volatile_fetch_sub_u16(volatile uint16_t *dest,
+                                              uint16_t val)
 {
-    *dest -= val;
+    uint16_t result = *dest;
+    *dest = result - val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest |= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_or_u16(volatile uint16_t *dest, uint16_t val)
+static inline uint16_t volatile_fetch_or_u16(volatile uint16_t *dest,
+                                             uint16_t val)
 {
-    *dest |= val;
+    uint16_t result = *dest;
+    *dest = result | val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest ^= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_xor_u16(volatile uint16_t *dest, uint16_t val)
+static inline uint16_t volatile_fetch_xor_u16(volatile uint16_t *dest,
+                                              uint16_t val)
 {
-    *dest ^= val;
+    uint16_t result = *dest;
+    *dest = result ^ val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest &= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_and_u16(volatile uint16_t *dest, uint16_t val)
+static inline uint16_t volatile_fetch_and_u16(volatile uint16_t *dest,
+                                              uint16_t val)
 {
-    *dest &= val;
+    uint16_t result = *dest;
+    *dest = result & val;
+    return result;
 }
 
 /**
@@ -205,45 +230,60 @@ static inline void volatile_fetch_and_u16(volatile uint16_t *dest, uint16_t val)
  * @param   dest    Address of the value to add to
  * @param   val     Value to add
  */
-static inline void volatile_fetch_add_u32(volatile uint32_t *dest, uint32_t val)
+static inline uint32_t volatile_fetch_add_u32(volatile uint32_t *dest,
+                                              uint32_t val)
 {
-    *dest += val;
+    uint32_t result = *dest;
+    *dest = result + val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest -= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_sub_u32(volatile uint32_t *dest, uint32_t val)
+static inline uint32_t volatile_fetch_sub_u32(volatile uint32_t *dest,
+                                              uint32_t val)
 {
-    *dest -= val;
+    uint32_t result = *dest;
+    *dest = result - val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest |= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_or_u32(volatile uint32_t *dest, uint32_t val)
+static inline uint32_t volatile_fetch_or_u32(volatile uint32_t *dest,
+                                             uint32_t val)
 {
-    *dest |= val;
+    uint32_t result = *dest;
+    *dest = result | val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest ^= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_xor_u32(volatile uint32_t *dest, uint32_t val)
+static inline uint32_t volatile_fetch_xor_u32(volatile uint32_t *dest,
+                                              uint32_t val)
 {
-    *dest ^= val;
+    uint32_t result = *dest;
+    *dest = result ^ val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest &= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_and_u32(volatile uint32_t *dest, uint32_t val)
+static inline uint32_t volatile_fetch_and_u32(volatile uint32_t *dest,
+                                              uint32_t val)
 {
-    *dest &= val;
+    uint32_t result = *dest;
+    *dest = result & val;
+    return result;
 }
 
 /**
@@ -251,45 +291,60 @@ static inline void volatile_fetch_and_u32(volatile uint32_t *dest, uint32_t val)
  * @param   dest    Address of the value to add to
  * @param   val     Value to add
  */
-static inline void volatile_fetch_add_u64(volatile uint64_t *dest, uint64_t val)
+static inline uint64_t volatile_fetch_add_u64(volatile uint64_t *dest,
+                                              uint64_t val)
 {
-    *dest += val;
+    uint64_t result = *dest;
+    *dest = result + val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest -= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_sub_u64(volatile uint64_t *dest, uint64_t val)
+static inline uint64_t volatile_fetch_sub_u64(volatile uint64_t *dest,
+                                              uint64_t val)
 {
-    *dest -= val;
+    uint64_t result = *dest;
+    *dest = result - val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest |= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_or_u64(volatile uint64_t *dest, uint64_t val)
+static inline uint64_t volatile_fetch_or_u64(volatile uint64_t *dest,
+                                             uint64_t val)
 {
-    *dest |= val;
+    uint64_t result = *dest;
+    *dest = result | val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest ^= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_xor_u64(volatile uint64_t *dest, uint64_t val)
+static inline uint64_t volatile_fetch_xor_u64(volatile uint64_t *dest,
+                                              uint64_t val)
 {
-    *dest ^= val;
+    uint64_t result = *dest;
+    *dest = result ^ val;
+    return result;
 }
 /**
  * @brief   Unoptimized version of `*dest &= val`
  * @param   dest    Address of the value to apply the operation on
  * @param   val     Second operand
  */
-static inline void volatile_fetch_and_u64(volatile uint64_t *dest, uint64_t val)
+static inline uint64_t volatile_fetch_and_u64(volatile uint64_t *dest,
+                                              uint64_t val)
 {
-    *dest &= val;
+    uint64_t result = *dest;
+    *dest = result & val;
+    return result;
 }
 
 #ifdef __cplusplus
