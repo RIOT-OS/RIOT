@@ -74,6 +74,9 @@ void ps(void)
 
 #ifdef MODULE_SCHEDSTATISTICS
     uint64_t rt_sum = 0;
+    if (!IS_ACTIVE(MODULE_CORE_IDLE_THREAD)) {
+        rt_sum = sched_pidlist[KERNEL_PID_UNDEF].runtime_ticks;
+    }
     for (kernel_pid_t i = KERNEL_PID_FIRST; i <= KERNEL_PID_LAST; i++) {
         thread_t *p = thread_get(i);
         if (p != NULL) {
