@@ -10,6 +10,8 @@
 # directory for more details.
 #
 
+. $(dirname "$0")/github_annotate.sh
+
 function print_result {
     local RED="\033[0;31m"
     local GREEN="\033[0;32m"
@@ -47,6 +49,7 @@ function run {
         (printf "%s\n" "$OUT" | while IFS= read -r line; do printf "\t%s\n" "$line"; done)
         echo ""
     fi
+    github_annotate_report_last_run
 }
 
 RESULT=0
