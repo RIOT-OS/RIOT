@@ -211,3 +211,9 @@ void mutex_cancel(mutex_cancel_t *mc)
 
     irq_restore(irq_state);
 }
+
+/* Helper for compatibility with C++ or other non-C languages */
+int mutex_trylock_ffi(mutex_t *mutex)
+{
+    return mutex_trylock(mutex);
+}
