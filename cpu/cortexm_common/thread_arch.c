@@ -372,31 +372,30 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     __asm__ volatile (
     /* PendSV handler entry point */
     /* save context by pushing unsaved registers to the stack */
-    /* {r0-r3,r12,LR,PC,xPSR,s0-s15,FPSCR} are saved automatically on exception entry */
+    /* {r0-r3,r12,LR,PC,PSR} are saved automatically on exception entry */
     ".thumb_func                      \n"
     ".syntax unified                  \n"
 
     /* skip context saving if sched_active_thread == NULL */
     "ldr    r1, =sched_active_thread  \n" /* r1 = &sched_active_thread  */
-    "ldr    r1, [r1]                  \n"
-    "mov    r12, r1                   \n" /* r12 = sched_active_thread   */
-    "push   {lr}                      \n" /* push exception return code */
+    "push   {r4,lr}                   \n" /* push r4 and exception return code */
+    "ldr    r4, [r1]                  \n" /* r4 = sched_active_thread */
 
     "cpsid  i                         \n" /* Disable IRQs during sched_run */
     "bl     sched_run                 \n" /* perform scheduling */
     "cpsie  i                         \n" /* Re-enable interrupts */
 
     /* Cortex-M0, Cortex-M0+ and Cortex-M23 */
-    "cmp    r0, r12                   \n" /* if r0 == previous_thread: */
+    "cmp    r0, r4                    \n" /* if r0 == previous_thread: */
     "bne    cont_schedule             \n" /*   jump over pop if r0 != 0 */
-    "pop    {pc}                      \n" /*   Pop exception return to PC */
+    "pop    {r4,pc}                   \n" /*   Pop exception return to PC */
 
     "cont_schedule:                   \n" /* Otherwise continue the ctx switch */
 
-    "pop    {r2}                      \n" /* Pop LR from the exception stack */
+    "pop    {r1,r2}                   \n" /* Pop LR from the exception stack */
+                                          /* r1 contains r4 from the thread */
     "mov    lr, r2                    \n" /* Store LR in lr */
-    "mov    r1,r12                    \n" /* r1 = sched_active_thread */
-    "cmp    r1, #0                    \n" /* Test if r1 == NULL */
+    "cmp    r4, #0                    \n" /* Test if sched_active_thread == NULL */
     "mov    r12, sp                   \n" /* remember the exception SP in r12 */
     "beq    restore_context           \n" /* goto restore_context if r1 == NULL */
 
@@ -406,7 +405,8 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     /* Calculate the expected stack offset beforehand so that we don't have to
      * store the old SP from here on, saves a register we don't have */
     "subs   r0, #36                   \n" /* Move saved SP with 9 words */
-    "str    r0, [r1]                  \n" /* And store */
+    "str    r0, [r4]                  \n" /* And store */
+    "mov    r4, r1                    \n" /* restore r4 content */
 
     /* we can not push high registers directly, so we move R11-R8 into
      * R4-R0, as these are already saved */
