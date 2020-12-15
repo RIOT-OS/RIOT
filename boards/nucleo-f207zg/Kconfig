@@ -28,8 +28,4 @@ config BOARD_NUCLEO_F207ZG
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
 
-    # Clock configuration
-    select BOARD_HAS_HSE
-    select BOARD_HAS_LSE
-
-source "$(RIOTBOARD)/common/nucleo64/Kconfig"
+source "$(RIOTBOARD)/common/nucleo144/Kconfig"

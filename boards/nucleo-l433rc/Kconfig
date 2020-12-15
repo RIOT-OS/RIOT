@@ -31,7 +31,4 @@ config BOARD_NUCLEO_L433RC
     # https://github.com/ntfreak/openocd/commit/a4d50544de07f13e3f9644d2b48e41ebdc91a7a3
     select HAS_RIOTBOOT
 
-    # Clock configuration
-    select BOARD_HAS_LSE
-
 source "$(RIOTBOARD)/common/nucleo64/Kconfig"
