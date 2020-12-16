@@ -27,46 +27,431 @@
 extern "C" {
 #endif
 
-/* clang provides no built-in atomic access to regular variables */
-#ifndef __clang__
-
 #define HAS_ATOMIC_LOAD_U8
 static inline uint8_t atomic_load_u8(const volatile uint8_t *var)
 {
-    return __atomic_load_1(var, __ATOMIC_SEQ_CST);
+    uint8_t result;
+    __asm__ volatile(
+        "ldrb   %[dest], [%[var]]"                                          "\n"
+        : [dest]        "=r"(result)
+        : [var]         "r"(var)
+        : "memory"
+    );
+    return result;
 }
 
 #define HAS_ATOMIC_LOAD_U16
 static inline uint16_t atomic_load_u16(const volatile uint16_t *var)
 {
-    return __atomic_load_2(var, __ATOMIC_SEQ_CST);
+    uint16_t result;
+    __asm__ volatile(
+        "ldrh   %[dest], [%[var]]"                                          "\n"
+        : [dest]        "=r"(result)
+        : [var]         "r"(var)
+        : "memory"
+    );
+    return result;
 }
 
 #define HAS_ATOMIC_LOAD_U32
 static inline uint32_t atomic_load_u32(const volatile uint32_t *var)
 {
-    return __atomic_load_4(var, __ATOMIC_SEQ_CST);
+    uint32_t result;
+    __asm__ volatile(
+        "ldr    %[dest], [%[var]]"                                          "\n"
+        : [dest]        "=r"(result)
+        : [var]         "r"(var)
+        : "memory"
+    );
+    return result;
 }
 
 #define HAS_ATOMIC_STORE_U8
 static inline void atomic_store_u8(volatile uint8_t *dest, uint8_t val)
 {
-    __atomic_store_1(dest, val, __ATOMIC_SEQ_CST);
+    __asm__ volatile(
+        "strb   %[val], [%[dest]]"                                          "\n"
+        : /* no outputs */
+        : [val]         "r"(val),
+          [dest]        "r"(dest)
+        : "memory"
+    );
 }
 
 #define HAS_ATOMIC_STORE_U16
 static inline void atomic_store_u16(volatile uint16_t *dest, uint16_t val)
 {
-    __atomic_store_2(dest, val, __ATOMIC_SEQ_CST);
+    __asm__ volatile(
+        "strh   %[val], [%[dest]]"                                          "\n"
+        : /* no outputs */
+        : [val]         "r"(val),
+          [dest]        "r"(dest)
+        : "memory"
+    );
 }
 
 #define HAS_ATOMIC_STORE_U32
 static inline void atomic_store_u32(volatile uint32_t *dest, uint32_t val)
 {
-    __atomic_store_4(dest, val, __ATOMIC_SEQ_CST);
+    __asm__ volatile(
+        "str    %[val], [%[dest]]"                                          "\n"
+        : /* no outputs */
+        : [val]         "r"(val),
+          [dest]        "r"(dest)
+        : "memory"
+    );
 }
 
-#endif /* __clang__ */
+#if !defined(CPU_CORE_CORTEX_M0) && !defined(CPU_CORE_CORTEX_M0PLUS)
+
+#define HAS_ATOMIC_FETCH_ADD_U8
+static inline uint8_t atomic_fetch_add_u8(volatile uint8_t *dest,
+                                          uint8_t val)
+{
+    uint8_t result;
+    /* fake output to let compiler do register allocation */
+    unsigned irq_state;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldrb   %[result], [%[dest]]"                                       "\n"
+        "add    %[val], %[result]"                                          "\n"
+        "strb   %[val], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [val]         "+r"(val)
+        : [dest]        "r"(dest)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_ADD_U16
+static inline uint16_t atomic_fetch_add_u16(volatile uint16_t *dest,
+                                            uint16_t val)
+{
+    uint16_t result;
+    /* fake output to let compiler do register allocation */
+    unsigned irq_state;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldrh   %[result], [%[dest]]"                                       "\n"
+        "add    %[val], %[result]"                                          "\n"
+        "strh   %[val], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [val]         "+r"(val)
+        : [dest]        "r"(dest)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_ADD_U32
+static inline uint32_t atomic_fetch_add_u32(volatile uint32_t *dest,
+                                            uint32_t val)
+{
+    uint32_t result;
+    /* fake output to let compiler do register allocation */
+    unsigned irq_state;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldr    %[result], [%[dest]]"                                       "\n"
+        "add    %[val], %[result]"                                          "\n"
+        "str    %[val], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [val]         "+r"(val)
+        : [dest]        "r"(dest)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_SUB_U8
+static inline uint8_t atomic_fetch_sub_u8(volatile uint8_t *dest,
+                                          uint8_t val)
+{
+    uint8_t result;
+    /* fake outputs to let compiler do register allocation */
+    unsigned irq_state, tmp;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldrb   %[result], [%[dest]]"                                       "\n"
+        "subs   %[tmp], %[result], %[val]"                                  "\n"
+        "strb   %[tmp], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [tmp]         "=&r"(tmp)
+        : [dest]        "r"(dest),
+          [val]         "r"(val)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_SUB_U16
+static inline uint16_t atomic_fetch_sub_u16(volatile uint16_t *dest,
+                                            uint16_t val)
+{
+    uint16_t result;
+    /* fake outputs to let compiler do register allocation */
+    unsigned irq_state, tmp;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldrh   %[result], [%[dest]]"                                       "\n"
+        "subs   %[tmp], %[result], %[val]"                                  "\n"
+        "strh   %[tmp], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [tmp]         "=&r"(tmp)
+        : [dest]        "r"(dest),
+          [val]         "r"(val)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_SUB_U32
+static inline uint32_t atomic_fetch_sub_u32(volatile uint32_t *dest,
+                                            uint32_t val)
+{
+    uint32_t result;
+    /* fake outputs to let compiler do register allocation */
+    unsigned irq_state, tmp;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldr    %[result], [%[dest]]"                                       "\n"
+        "subs   %[tmp], %[result], %[val]"                                  "\n"
+        "str    %[tmp], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [tmp]         "=&r"(tmp)
+        : [dest]        "r"(dest),
+          [val]         "r"(val)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_OR_U8
+static inline uint8_t atomic_fetch_or_u8(volatile uint8_t *dest,
+                                         uint8_t val)
+{
+    uint8_t result;
+    /* fake output to let compiler do register allocation */
+    unsigned irq_state;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldrb   %[result], [%[dest]]"                                       "\n"
+        "orrs   %[val], %[result]"                                          "\n"
+        "strb   %[val], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [val]         "+r"(val)
+        : [dest]        "r"(dest)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_OR_U16
+static inline uint16_t atomic_fetch_or_u16(volatile uint16_t *dest,
+                                           uint16_t val)
+{
+    uint16_t result;
+    /* fake output to let compiler do register allocation */
+    unsigned irq_state;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldrh   %[result], [%[dest]]"                                       "\n"
+        "orrs   %[val], %[result]"                                          "\n"
+        "strh   %[val], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [val]         "+r"(val)
+        : [dest]        "r"(dest)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_OR_U32
+static inline uint32_t atomic_fetch_or_u32(volatile uint32_t *dest,
+                                           uint32_t val)
+{
+    uint32_t result;
+    /* fake output to let compiler do register allocation */
+    unsigned irq_state;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldr    %[result], [%[dest]]"                                       "\n"
+        "orrs   %[val], %[result]"                                          "\n"
+        "str    %[val], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [val]         "+r"(val)
+        : [dest]        "r"(dest)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_XOR_U8
+static inline uint8_t atomic_fetch_xor_u8(volatile uint8_t *dest,
+                                          uint8_t val)
+{
+    uint8_t result;
+    /* fake output to let compiler do register allocation */
+    unsigned irq_state;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldrb   %[result], [%[dest]]"                                       "\n"
+        "eors   %[val], %[result]"                                          "\n"
+        "strb   %[val], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [val]         "+r"(val)
+        : [dest]        "r"(dest)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_XOR_U16
+static inline uint16_t atomic_fetch_xor_u16(volatile uint16_t *dest,
+                                            uint16_t val)
+{
+    uint16_t result;
+    /* fake output to let compiler do register allocation */
+    unsigned irq_state;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldrh   %[result], [%[dest]]"                                       "\n"
+        "eors   %[val], %[result]"                                          "\n"
+        "strh   %[val], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [val]         "+r"(val)
+        : [dest]        "r"(dest)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_XOR_U32
+static inline uint32_t atomic_fetch_xor_u32(volatile uint32_t *dest,
+                                            uint32_t val)
+{
+    uint32_t result;
+    /* fake output to let compiler do register allocation */
+    unsigned irq_state;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldr    %[result], [%[dest]]"                                       "\n"
+        "eors   %[val], %[result]"                                          "\n"
+        "str    %[val], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [val]         "+r"(val)
+        : [dest]        "r"(dest)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_AND_U8
+static inline uint8_t atomic_fetch_and_u8(volatile uint8_t *dest,
+                                          uint8_t val)
+{
+    uint8_t result;
+    /* fake output to let compiler do register allocation */
+    unsigned irq_state;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldrb   %[result], [%[dest]]"                                       "\n"
+        "ands   %[val], %[result]"                                          "\n"
+        "strb   %[val], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [val]         "+r"(val)
+        : [dest]        "r"(dest)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_AND_U16
+static inline uint16_t atomic_fetch_and_u16(volatile uint16_t *dest,
+                                            uint16_t val)
+{
+    uint16_t result;
+    /* fake output to let compiler do register allocation */
+    unsigned irq_state;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldrh   %[result], [%[dest]]"                                       "\n"
+        "ands   %[val], %[result]"                                          "\n"
+        "strh   %[val], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [val]         "+r"(val)
+        : [dest]        "r"(dest)
+        : "memory"
+    );
+    return result;
+}
+
+#define HAS_ATOMIC_FETCH_AND_U32
+static inline uint32_t atomic_fetch_and_u32(volatile uint32_t *dest,
+                                            uint32_t val)
+{
+    uint32_t result;
+    /* fake output to let compiler do register allocation */
+    unsigned irq_state;
+    __asm__ volatile(
+        "mrs    %[irq_state], PRIMASK"                                      "\n"
+        "cpsid  i"                                                          "\n"
+        "ldr    %[result], [%[dest]]"                                       "\n"
+        "ands   %[val], %[result]"                                          "\n"
+        "str    %[val], [%[dest]]"                                          "\n"
+        "msr    PRIMASK, %[irq_state]"                                      "\n"
+        : [result]      "=&r"(result),
+          [irq_state]   "=&r"(irq_state),
+          [val]         "+r"(val)
+        : [dest]        "r"(dest)
+        : "memory"
+    );
+    return result;
+}
+#endif /* !defined(CPU_CORE_CORTEX_M0) && !defined(CPU_CORE_CORTEX_M0PLUS) */
 
 #if CPU_HAS_BITBAND
 #define HAS_ATOMIC_BIT
