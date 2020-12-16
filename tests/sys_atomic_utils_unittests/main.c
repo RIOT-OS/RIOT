@@ -55,9 +55,9 @@ static void test_load_store(void)
 
 static void test_fetch_op_u8(fetch_op_u8_t atomic_op, fetch_op_u8_t op)
 {
-    uint8_t state1 = 0, state2 = 0;
     uint8_t i = 0;
     do {
+        uint8_t state1 = 0x55, state2 = 0x55;
         atomic_op(&state1, i);
         op(&state2, i);
         TEST_ASSERT_EQUAL_INT(state1, state2);
@@ -81,9 +81,9 @@ static void test_fetch_ops_u8(void)
 
 static void test_fetch_op_u16(fetch_op_u16_t atomic_op, fetch_op_u16_t op)
 {
-    uint16_t state1 = 0, state2 = 0;
     uint8_t i = 0;
     do {
+        uint16_t state1 = 0x5555, state2 = 0x5555;
         uint16_t num = random_uint32();
         atomic_op(&state1, num);
         op(&state2, num);
@@ -108,9 +108,9 @@ static void test_fetch_ops_u16(void)
 
 static void test_fetch_op_u32(fetch_op_u32_t atomic_op, fetch_op_u32_t op)
 {
-    uint32_t state1 = 0, state2 = 0;
     uint8_t i = 0;
     do {
+        uint32_t state1 = 0x55555555, state2 = 0x55555555;
         uint32_t num = random_uint32();
         atomic_op(&state1, num);
         op(&state2, num);
@@ -135,9 +135,10 @@ static void test_fetch_ops_u32(void)
 
 static void test_fetch_op_u64(fetch_op_u64_t atomic_op, fetch_op_u64_t op)
 {
-    uint64_t state1 = 0, state2 = 0;
     uint8_t i = 0;
     do {
+        uint64_t state1, state2;
+        state1 = state2 = 0x5555555555555555;
         uint64_t num;
         random_bytes((void *)&num, sizeof(num));
         atomic_op(&state1, num);
