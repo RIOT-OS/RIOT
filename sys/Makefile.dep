@@ -950,6 +950,8 @@ ifneq (,$(filter usbus,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_usbus
   USEMODULE += core_thread_flags
   USEMODULE += event
+  USEMODULE += luid
+  USEMODULE += fmt
   ifeq (,$(filter usbdev_mock,$(USEMODULE)))
     FEATURES_REQUIRED += periph_usbdev
   endif

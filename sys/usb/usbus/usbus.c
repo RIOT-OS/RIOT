@@ -21,6 +21,8 @@
 #include "kernel_defines.h"
 #include "bitarithm.h"
 #include "event.h"
+#include "fmt.h"
+#include "luid.h"
 #include "thread.h"
 #include "thread_flags.h"
 #include "periph/usbdev.h"
@@ -253,6 +255,18 @@ static void *_usbus_thread(void *args)
                                 CONFIG_USB_CONFIGURATION_STR);
     usbus_add_string_descriptor(usbus, &usbus->product, CONFIG_USB_PRODUCT_STR);
     usbus_add_string_descriptor(usbus, &usbus->manuf, CONFIG_USB_MANUF_STR);
+
+#ifdef CONFIG_USB_SERIAL_STR
+    usbus_add_string_descriptor(usbus, &usbus->serial, CONFIG_USB_SERIAL_STR);
+#else
+    static_assert(CONFIG_USB_SERIAL_BYTE_LENGTH <= UINT8_MAX/4,
+                  "USB serial byte length must be at most 63 due to protocol "
+                  "limitations");
+    uint8_t luid_buf[CONFIG_USB_SERIAL_BYTE_LENGTH];
+    luid_get(luid_buf, sizeof(luid_buf));
+    fmt_bytes_hex(usbus->serial_str, luid_buf, sizeof(luid_buf));
+    usbus_add_string_descriptor(usbus, &usbus->serial, usbus->serial_str);
+#endif
 
     usbus->state = USBUS_STATE_DISCONNECT;
 

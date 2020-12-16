@@ -288,6 +288,7 @@ size_t usbus_fmt_descriptor_dev(usbus_t *usbus)
     desc.product_id = CONFIG_USB_PID;
     desc.manufacturer_idx = usbus->manuf.idx;
     desc.product_idx = usbus->product.idx;
+    desc.serial_idx = usbus->serial.idx;
     /* USBUS supports only a single config at the moment */
     desc.num_configurations = 1;
     usbus_control_slicer_put_bytes(usbus, (uint8_t *)&desc,
