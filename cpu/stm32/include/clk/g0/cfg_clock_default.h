@@ -28,58 +28,13 @@ extern "C" {
 #endif
 
 /**
- * @name    Clock settings
+ * @name    G0 clock settings
  *
  * @{
  */
-/* Select the desired system clock source between PLL, HSE or HSI */
-#ifndef CONFIG_USE_CLOCK_PLL
-#if IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || IS_ACTIVE(CONFIG_USE_CLOCK_HSI)
-#define CONFIG_USE_CLOCK_PLL            0
-#else
-#define CONFIG_USE_CLOCK_PLL            1       /* Use PLL by default */
-#endif
-#endif /* CONFIG_USE_CLOCK_PLL */
-
-#ifndef CONFIG_USE_CLOCK_HSE
-#define CONFIG_USE_CLOCK_HSE            0
-#endif /* CONFIG_USE_CLOCK_HSE */
-
-#ifndef CONFIG_USE_CLOCK_HSI
-#define CONFIG_USE_CLOCK_HSI            0
-#endif /* CONFIG_USE_CLOCK_HSI */
-
-#if IS_ACTIVE(CONFIG_USE_CLOCK_PLL) && \
-    (IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || IS_ACTIVE(CONFIG_USE_CLOCK_HSI))
-#error "Cannot use PLL as clock source with other clock configurations"
-#endif
-
-#if IS_ACTIVE(CONFIG_USE_CLOCK_HSE) && \
-    (IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || IS_ACTIVE(CONFIG_USE_CLOCK_HSI))
-#error "Cannot use HSE as clock source with other clock configurations"
-#endif
-
-#if IS_ACTIVE(CONFIG_USE_CLOCK_HSI) && \
-    (IS_ACTIVE(CONFIG_USE_CLOCK_PLL) || IS_ACTIVE(CONFIG_USE_CLOCK_HSE))
-#error "Cannot use HSI as clock source with other clock configurations"
-#endif
-
-#ifndef CONFIG_BOARD_HAS_HSE
-#define CONFIG_BOARD_HAS_HSE            0
-#endif
-
-#ifndef CLOCK_HSE
-#define CLOCK_HSE                       MHZ(24)
-#endif
 #if IS_ACTIVE(CONFIG_BOARD_HAS_HSE) && (CLOCK_HSE < MHZ(4) || CLOCK_HSE > MHZ(48))
 #error "HSE clock frequency must be between 4MHz and 48MHz"
 #endif
-
-#ifndef CONFIG_BOARD_HAS_LSE
-#define CONFIG_BOARD_HAS_LSE            0
-#endif
-
-#define CLOCK_HSI                       MHZ(16)
 
 #ifndef CONFIG_CLOCK_HSISYS_DIV
 #define CONFIG_CLOCK_HSISYS_DIV         (1)

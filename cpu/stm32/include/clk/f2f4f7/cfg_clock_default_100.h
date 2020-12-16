@@ -23,8 +23,6 @@
 #ifndef CLK_F2F4F7_CFG_CLOCK_DEFAULT_100_H
 #define CLK_F2F4F7_CFG_CLOCK_DEFAULT_100_H
 
-#include "f2f4f7/cfg_clock_common.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -86,14 +84,12 @@ extern "C" {
 #endif
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
-
-#include "f2f4f7/cfg_clock_values.h"
-
 #if CLOCK_CORECLOCK > MHZ(100)
 #error "SYSCLK cannot exceed 100MHz"
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* CLK_F2F4F7_CFG_CLOCK_DEFAULT_100_H */

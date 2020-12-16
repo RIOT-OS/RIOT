@@ -23,8 +23,6 @@
 #ifndef CLK_F2F4F7_CFG_CLOCK_DEFAULT_216_H
 #define CLK_F2F4F7_CFG_CLOCK_DEFAULT_216_H
 
-#include "f2f4f7/cfg_clock_common.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -73,14 +71,12 @@ extern "C" {
 #endif
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
-
-#include "f2f4f7/cfg_clock_values.h"
-
 #if CLOCK_CORECLOCK > MHZ(216)
 #error "SYSCLK cannot exceed 216MHz"
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* CLK_F2F4F7_CFG_CLOCK_DEFAULT_216_H */
