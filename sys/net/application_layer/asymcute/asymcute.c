@@ -165,7 +165,12 @@ static void _compile_sub_unsub(asymcute_req_t *req, asymcute_con_t *con,
     req->data[pos] = type;
     req->data[pos + 1] = sub->topic->flags;
     byteorder_htobebufs(&req->data[pos + 2], req->msg_id);
-    memcpy(&req->data[pos + 4], sub->topic->name, topic_len);
+    if (sub->topic->flags & MQTTSN_TIT_MASK) {
+        memcpy(&req->data[pos + 4], &sub->topic->id, 2);
+    }
+    else {
+        memcpy(&req->data[pos + 4], sub->topic->name, topic_len);
+    }
     req->data_len = (pos + 4 + topic_len);
     req->arg = sub;
 }
@@ -474,19 +479,25 @@ static void _on_suback(asymcute_con_t *con, const uint8_t *data, size_t len)
     }
 
     unsigned ret = ASYMCUTE_REJECTED;
-    if (data[7] == MQTTSN_ACCEPTED) {
-        /* parse and apply assigned topic id */
-        asymcute_sub_t *sub = req->arg;
-        if (sub == NULL) {
-            return;
-        }
+    /* parse and apply assigned topic id */
+    asymcute_sub_t *sub = req->arg;
+    if (sub == NULL) {
+        return;
+    }
 
-        sub->topic->id = byteorder_bebuftohs(&data[3]);
+    if (data[7] == MQTTSN_ACCEPTED) {
+        /* do not assign a topic ID for short and predefined topics */
+        if (!(sub->topic->flags & MQTTSN_TIT_MASK)) {
+            sub->topic->id = byteorder_bebuftohs(&data[3]);
+        }
         sub->topic->con = con;
         /* insert subscription to connection context */
         sub->next = con->subscriptions;
         con->subscriptions = sub;
         ret = ASYMCUTE_SUBSCRIBED;
+    }
+    else {
+        sub->topic = NULL;
     }
 
     /* notify the user */
@@ -668,12 +679,12 @@ int asymcute_topic_init(asymcute_topic_t *topic, const char *topic_name,
 {
     assert(topic);
 
+
     size_t len = 0;
 
     if (asymcute_topic_is_reg(topic)) {
         return ASYMCUTE_REGERR;
     }
-
     if (topic_name == NULL) {
         if ((topic_id == 0) || (topic_id == UINT16_MAX)) {
             return ASYMCUTE_OVERFLOW;
@@ -692,8 +703,7 @@ int asymcute_topic_init(asymcute_topic_t *topic, const char *topic_name,
     if (topic_name == NULL) {
         topic->id = topic_id;
         topic->flags = MQTTSN_TIT_PREDEF;
-        memcpy(topic->name, &topic_id, 2);
-        topic->name[2] = '\0';
+        memcpy(topic->name, "..\0", 3);
     }
     else {
         strncpy(topic->name, topic_name, sizeof(topic->name));
@@ -823,6 +833,14 @@ int asymcute_register(asymcute_con_t *con, asymcute_req_t *req,
         goto end;
     }
 
+    /* if we have a short or predefined topic, there is no need to send a
+     * registration message. We assign the connection right away */
+    if (topic->flags & MQTTSN_TIT_MASK) {
+        topic->con = con;
+        mutex_unlock(&req->lock);
+        goto end;
+    }
+
     /* prepare topic */
     req->arg = topic;
     size_t topic_len = strlen(topic->name);
@@ -936,11 +954,14 @@ int asymcute_subscribe(asymcute_con_t *con, asymcute_req_t *req,
         ret = ASYMCUTE_GWERR;
         goto end;
     }
-    /* check if we are already subscribed to the given topic */
-    for (asymcute_sub_t *sub = con->subscriptions; sub; sub = sub->next) {
-        if (asymcute_topic_equal(topic, sub->topic)) {
-            ret = ASYMCUTE_SUBERR;
-            goto end;
+    /* check if we are already subscribed to the given topic, but only if the
+     * topic was already registered */
+    if (asymcute_topic_is_reg(topic)) {
+        for (asymcute_sub_t *sub = con->subscriptions; sub; sub = sub->next) {
+            if (asymcute_topic_equal(topic, sub->topic)) {
+                ret = ASYMCUTE_SUBERR;
+                goto end;
+            }
         }
     }
     /* make sure request context is clear to be used */
@@ -953,6 +974,7 @@ int asymcute_subscribe(asymcute_con_t *con, asymcute_req_t *req,
     sub->cb = callback;
     sub->arg = arg;
     sub->topic = topic;
+    topic->flags |= flags;
 
     /* send SUBSCRIBE message */
     _compile_sub_unsub(req, con, sub, MQTTSN_SUBSCRIBE);

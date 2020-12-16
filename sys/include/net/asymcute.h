@@ -395,6 +395,34 @@ static inline bool asymcute_topic_is_reg(const asymcute_topic_t *topic)
 }
 
 /**
+ * @brief   Check if a given topic is a short topic
+ *
+ * @param[in] topic     topic to check
+ *
+ * @return  true if topic is a short topic
+ * @return  false if topic is not short topic
+ */
+static inline bool asymcute_topic_is_short(const asymcute_topic_t *topic)
+{
+    assert(topic);
+    return ((topic->flags & MQTTSN_TIT_SHORT) != 0);
+}
+
+/**
+ * @brief   Check if a given topic is a pre-defined topic
+ *
+ * @param[in] topic     topic to check
+ *
+ * @return  true if topic is pre-defined
+ * @return  false if topic is not pre-defined
+ */
+static inline bool asymcute_topic_is_predef(const asymcute_topic_t *topic)
+{
+    assert(topic);
+    return ((topic->flags & MQTTSN_TIT_PREDEF) != 0);
+}
+
+/**
  * @brief   Check if a given topic is initialized
  *
  * @param[in] topic     topic to check
