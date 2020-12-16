@@ -879,8 +879,14 @@ int asymcute_publish(asymcute_con_t *con, asymcute_req_t *req,
         goto end;
     }
 
-    /* get message id */
-    req->msg_id = _msg_id_next(con);
+    /* set MsgId only for QoS 1 and 2, else it must be set to 0 */
+    if (((flags & MQTTSN_QOS_MASK) == MQTTSN_QOS_1) ||
+        ((flags & MQTTSN_QOS_MASK) == MQTTSN_QOS_2)) {
+        req->msg_id = _msg_id_next(con);
+    }
+    else {
+        req->msg_id = 0;
+    }
 
     /* assemble message */
     size_t pos = _len_set(req->data, data_len + 6);
