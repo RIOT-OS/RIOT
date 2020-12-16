@@ -48,10 +48,6 @@
 #define MAIN_QUEUE_SIZE     (8)
 static msg_t _main_msg_queue[MAIN_QUEUE_SIZE];
 
-#define LISTENER_PRIO       (THREAD_PRIORITY_MAIN - 1)
-
-static char listener_stack[ASYMCUTE_LISTENER_STACKSIZE];
-
 static asymcute_con_t _connection;
 static asymcute_req_t _reqs[REQ_CTX_NUMOF];
 static asymcute_sub_t _subscriptions[SUB_CTX_NUMOF];
@@ -264,8 +260,8 @@ static int _cmd_connect(int argc, char **argv)
         return 1;
     }
 
-    if (asymcute_connect(&_connection, req, &ep, argv[1], true, NULL)
-        != ASYMCUTE_OK) {
+    if (asymcute_connect(&_connection, req, &ep, argv[1],
+                         true, NULL, _on_con_evt) != ASYMCUTE_OK) {
         puts("error: failed to issue CONNECT request");
         return 1;
     }
@@ -554,10 +550,6 @@ int main(void)
     puts("Asymcute MQTT-SN example application\n");
     puts("Type 'help' to get started and have a look at the README.md for more"
          "information.");
-
-    /* setup the connection context */
-    asymcute_listener_run(&_connection, listener_stack, sizeof(listener_stack),
-                          LISTENER_PRIO, _on_con_evt);
 
     /* we need a message queue for the thread running the shell in order to
      * receive potentially fast incoming networking packets */
