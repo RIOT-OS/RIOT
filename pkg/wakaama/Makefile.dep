@@ -17,3 +17,6 @@ USEPKG += tlsf
 ifneq (,$(filter -DLWM2M_WITH_LOGS,$(CFLAGS)))
     USEMODULE += fmt
 endif
+
+# wakaama uses Sock UDP (implemented by some stack)
+USEMODULE += sock_udp
