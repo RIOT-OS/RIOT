@@ -33,7 +33,7 @@
 #define CLOCK_HSE               MHZ(25)
 
 #include "periph_cpu.h"
-#include "f2f4f7/cfg_clock_default_216.h"
+#include "clk_conf.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
 #include "cfg_usb_otg_fs.h"
