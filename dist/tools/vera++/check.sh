@@ -12,9 +12,7 @@ CURDIR=$(cd "$(dirname "$0")" && pwd)
 : "${WARNING:=1}"
 
 . "$RIOTBASE"/dist/tools/ci/changed_files.sh
-FILEREGEX='\.([CcHh]|[ch]pp)$'
-EXCLUDE='^(.+/vendor/)'
-FILES=$(FILEREGEX=${FILEREGEX} EXCLUDE=${EXCLUDE} changed_files)
+FILES=$(changed_files)
 
 if [ -z "${FILES}" ]; then
     exit 0
