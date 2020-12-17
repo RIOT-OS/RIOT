@@ -3,6 +3,14 @@
 @ingroup     boards
 @brief       Support for the nRF52840-Dongle
 
+### Quick start
+
+- Plug into a USB port.
+- `$ make BOARD=nrf52840dongle -C examples/saul flash term`
+  - See [Flash the board](#nrf52840dongle_flash) if anything goes wrong.
+- `> saul write 2 10 40 10`
+  - The LED glows in a soft turquise.
+
 ### General information
 
 The nRF52840-Dongle is a bare USB-stick shaped device that houses barely
@@ -21,7 +29,7 @@ reset button as well as 15 configurable external pins.
 - [nRF52840 web page](https://www.nordicsemi.com/?sc_itemid=%7BCDCCA013-FE4C-4655-B20C-1557AB6568C9%7D)
 - [documentation and hardware description](https://infocenter.nordicsemi.com/topic/ug_nrf52840_dongle/UG/nrf52840_Dongle/intro.html?cp=3_0_5)
 
-### Flash the board
+### <a name=nrf52840dongle_flash> Flash the board </a>
 
 The board is flashed using its on-board boot loader; the
 [nrfutil](https://github.com/NordicSemiconductor/pc-nrfutil) program needs to
