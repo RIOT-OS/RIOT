@@ -71,6 +71,14 @@ github_annotate_parse_log_default github_annotate_warning
 does the same as the last example snippet, but uses `github_annotate_warning`
 instead.
 
+If you do not need to provide a file with your error or warning, you can also
+use `github_annotate_error_no_file` or `github_annotate_warning_no_file`,
+respectively. Both take a just message as single parameter:
+
+```sh
+github_annotate_error_no_file "Something is wrong!"
+```
+
 After all errors or warnings are annotated, call `github_annotate_teardown` to
 finish annotations.
 
