@@ -29,6 +29,7 @@ jobs:
       run: |
         docker run --rm                     \
           -e CI_BASE_BRANCH=master_upstream \
+          -e GITHUB_RUN_ID=${GITHUB_RUN_ID} \
           -v $(pwd):/data/riotbuild         \
           riot/riotbuild:latest             \
           make static-test

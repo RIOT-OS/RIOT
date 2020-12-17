@@ -6,6 +6,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 
+. "$(dirname "$0")/../ci/github_annotate.sh"
+
 IGNORE=$(awk '{ printf ":!%s ", $0 }' "$(dirname "$0")/ignore_list.txt")
 
 # If no branch but an option is given, unset BRANCH.
@@ -23,6 +25,10 @@ else
     fi
 fi
 
+# sets
+# - LOG to tee output into for later parsing
+# - LOGFILE to parse GitHub annotations into
+github_annotate_setup
 
 # select files to check
 if [ -z "${BRANCH}" ]; then
@@ -30,16 +36,21 @@ if [ -z "${BRANCH}" ]; then
 fi
 
 git -c core.whitespace="tab-in-indent,tabwidth=4" \
-    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- *.[ch] ${IGNORE}
-
+    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- *.[ch] ${IGNORE} \
+            | ${LOG}
 RESULT=$?
 
 # Git regards any trailing white space except `\n` as an error so `\r` is
 # checked here, too
 git -c core.whitespace="trailing-space" \
-    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- . ${IGNORE}
+    diff --check "$(git merge-base "${BRANCH}" HEAD)" -- . ${IGNORE} \
+            | ${LOG}
 
 TRAILING_RESULT=$?
+
+github_annotate_parse_log_default
+
+github_annotate_teardown
 
 if [ ${TRAILING_RESULT} -ne 0 ] || [ ${RESULT} -ne 0 ]
 then
