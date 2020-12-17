@@ -6,6 +6,8 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+. "$(dirname "$0")/../ci/github_annotate.sh"
+github_annotate_setup
 
 FLAKE8_CMD="python3 -m flake8"
 
@@ -44,6 +46,18 @@ ${FLAKE8_CMD} --version &> /dev/null || {
 }
 
 ERRORS=$(${FLAKE8_CMD} --config="${RIOTTOOLS}"/flake8/flake8.cfg ${FILES})
+
+if github_annotate_is_on; then
+    echo "${ERRORS}" | grep "^.\+:[0-9]\+:" | while read line; do
+        FILENAME=$(echo "${line}" | cut -d: -f1)
+        LINENR=$(echo "${line}" | cut -d: -f2)
+        DETAILS=$(echo "${line}" | cut -d: -f4- |
+                  sed -e 's/^[ \t]*//' -e 's/[ \t]*$//')
+        github_annotate_error "${FILENAME}" "${LINENR}" "${DETAILS}"
+    done
+fi
+
+github_annotate_teardown
 
 if [ -n "${ERRORS}" ]
 then
