@@ -15,7 +15,7 @@
 declare -A DEPS
 
 DEPS["./dist/tools/licenses/check.sh"]="head pcregrep"
-DEPS["./dist/tools/doccheck/check.sh"]="doxygen tput snafu"
+DEPS["./dist/tools/doccheck/check.sh"]="doxygen tput"
 DEPS["./dist/tools/cppcheck/check.sh"]="cppcheck"
 DEPS["./dist/tools/vera++/check.sh"]="vera++"
 DEPS["./dist/tools/coccinelle/check.sh"]="spatch"
@@ -24,7 +24,7 @@ DEPS["./dist/tools/codespell/check.sh"]="codespell"
 DEPS["./dist/tools/uncrustify/uncrustify.sh"]="uncrustify"
 
 if ! command -v git 2>&1 1>/dev/null; then
-    echo -n "Required command 'git' for all static tests not found in PATH " >&2
+    echo -n "Required command 'git' for all static tests not found in PATH "
     print_warning
     set_result 1
     exit 1
@@ -61,7 +61,7 @@ set_result() {
 function run {
     for dep in ${DEPS["$1"]}; do
         if ! command -v ${dep} 2>&1 1>/dev/null; then
-            echo -n "Required command '${dep}' for '$*' not found in PATH " >&2
+            echo -n "Required command '${dep}' for '$*' not found in PATH "
             print_warning
             set_result 1
             return 1
