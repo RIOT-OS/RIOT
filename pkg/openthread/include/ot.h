@@ -147,13 +147,6 @@ void openthread_radio_init(netdev_t *dev, uint8_t *tb, uint8_t *rb);
 int openthread_netdev_init(char *stack, int stacksize, char priority, const char *name, netdev_t *netdev);
 
 /**
- * @brief   get PID of OpenThread thread.
- *
- * @return  PID of OpenThread thread
- */
-kernel_pid_t openthread_get_pid(void);
-
-/**
  * @brief   Init OpenThread random
  */
 void ot_random_init(void);
