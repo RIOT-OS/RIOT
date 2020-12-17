@@ -15,3 +15,6 @@ FEATURES_REQUIRED += periph_plic
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
+
+# Make calls to malloc and friends thread-safe
+USEMODULE += malloc_thread_safe
