@@ -101,6 +101,11 @@ class MQTTSNServer(Automaton):
 
     def _check_pkt_qos(self, pkt):
         qos_types = [mqttsn.PUBLISH, mqttsn.SUBSCRIBE]
+        # see MQTT-SN 1.2 spec 5.4.12
+        if (pkt.type == mqttsn.PUBLISH) and \
+           (pkt.qos not in [mqttsn.QOS_1, mqttsn.QOS_2]) and \
+           (pkt.mid != 0):
+            return False
         return (pkt.type not in qos_types) or (pkt.qos == self._qos_flags)
 
     def _get_tid(self, topic_name):
