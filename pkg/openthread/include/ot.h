@@ -73,6 +73,10 @@ typedef struct {
 
 /**
  * @brief   Struct containing an OpenThread job
+ *
+ * @deprecated   This structure is not needed anymore since it's possible to
+ *               run OpenThread code via @ref sys_event (see @ref openthread_get_evq).
+ *               Therefore it will be removed after the 2022.01 release.
  */
 typedef struct {
     event_t ev;                             /**< Event associated to the OpenThread job */
@@ -157,6 +161,10 @@ void ot_random_init(void);
 /**
  * @brief   Execute OpenThread command. Call this function only in OpenThread thread
  *
+ * @deprecated   This function is not needed anymore since it's possible to
+ *               run OpenThread code via @ref sys_event (see @ref openthread_get_evq).
+ *               Therefore it will be removed after the 2022.01 release.
+ *
  * @param[in]   ot_instance     OpenThread instance
  * @param[in]   command         OpenThread command name
  * @param[in]   arg             arg for the command
@@ -171,6 +179,10 @@ uint8_t ot_exec_command(otInstance *ot_instance, const char* command, void *arg,
  *
  * @note    An OpenThread command allows direct calls to OpenThread API (otXXX functions) without worrying about concurrency
  * issues. All API calls should be made in OT_JOB type functions.
+ *
+ * @deprecated   This function is not needed anymore since it's possible to
+ *               run OpenThread code via @ref sys_event (see @ref openthread_get_evq).
+ *               Therefore it will be removed after the 2022.01 release.
  *
  * @param[in]   command         name of the command to call
  * @param[in]   arg             arg for the command
