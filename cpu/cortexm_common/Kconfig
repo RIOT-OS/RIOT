@@ -9,6 +9,7 @@ config MODULE_CORTEXM_COMMON
     default y if CPU_CORE_CORTEX_M
     depends on TEST_KCONFIG
     select MODULE_PERIPH
+    select MODULE_MALLOC_THREAD_SAFE
     help
         Common code for Cortex-M cores.
 

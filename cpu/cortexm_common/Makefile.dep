@@ -32,3 +32,6 @@ endif
 ifeq (1, $(DEVELHELP))
   FEATURES_OPTIONAL += cortexm_mpu
 endif
+
+# Make calls to malloc and friends thread-safe
+USEMODULE += malloc_thread_safe
