@@ -73,9 +73,6 @@ static char ot_thread_stack[2 * THREAD_STACKSIZE_MAIN];
 
 void openthread_bootstrap(void)
 {
-    /* init random */
-    ot_random_init();
-
     /* setup netdev modules */
 #ifdef MODULE_AT86RF2XX
     at86rf2xx_setup(&at86rf2xx_dev, &at86rf2xx_params[0], 0);

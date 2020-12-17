@@ -1,0 +1,27 @@
+From 1586e89e4e8ec7b102cc1e5180ff13ab9bb6bb26 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benpicco@googlemail.com>
+Date: Thu, 17 Dec 2020 14:40:54 +0100
+Subject: [PATCH] xxx: define UINT16_MAX
+
+---
+ src/core/common/message.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/core/common/message.cpp b/src/core/common/message.cpp
+index 496aef7f1..a309831d7 100644
+--- a/src/core/common/message.cpp
++++ b/src/core/common/message.cpp
+@@ -40,6 +40,10 @@
+ #include "common/logging.hpp"
+ #include "net/ip6.hpp"
+ 
++#ifndef UINT16_MAX
++#define UINT16_MAX  0xFFFF
++#endif
++
+ namespace ot {
+ 
+ MessagePool::MessagePool(Instance &aInstance)
+-- 
+2.27.0
+
