@@ -18,10 +18,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        # Use the SHA of the PR branch as-is, not the PR branch merged
-        # in master (default behavior in GH actions)
-        # See https://github.com/actions/checkout#checkout-pull-request-head-commit-instead-of-merge-commit
-        ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: 0
     - name: Setup git
       run: |
