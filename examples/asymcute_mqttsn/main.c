@@ -260,9 +260,10 @@ static int _cmd_connect(int argc, char **argv)
         return 1;
     }
 
-    if (asymcute_connect(&_connection, req, &ep, argv[1],
-                         true, NULL, _on_con_evt) != ASYMCUTE_OK) {
-        puts("error: failed to issue CONNECT request");
+    int res = asymcute_connect(&_connection, req, &ep, argv[1],
+                               true, NULL, _on_con_evt);
+    if (res != ASYMCUTE_OK) {
+        printf("error: failed to issue CONNECT request (%i)\n", res);
         return 1;
     }
     return _ok(req);
@@ -279,8 +280,9 @@ static int _cmd_disconnect(int argc, char **argv)
         return 1;
     }
 
-    if (asymcute_disconnect(&_connection, req) != ASYMCUTE_OK) {
-        puts("error: failed to issue DISCONNECT request");
+    int res = asymcute_disconnect(&_connection, req);
+    if (res != ASYMCUTE_OK) {
+        printf("error: failed to issue DISCONNECT request (%i)\n", res);
         return 1;
     }
     return _ok(req);
@@ -322,8 +324,7 @@ static int _cmd_reg(int argc, char **argv)
 
     int res = asymcute_register(&_connection, req, t);
     if (res != ASYMCUTE_OK) {
-        printf("res: %i\n", res);
-        puts("error: unable to send REGISTER request\n");
+        printf("error: unable to send REGISTER request (%i)\n", res);
         return 1;
     }
     return _ok(req);
@@ -386,9 +387,9 @@ static int _cmd_pub(int argc, char **argv)
 
     /* publish data */
     size_t len = strlen(argv[2]);
-    if (asymcute_publish(&_connection, req, t, argv[2], len, flags) !=
-        ASYMCUTE_OK) {
-        puts("error: unable to send PUBLISH message");
+    int res = asymcute_publish(&_connection, req, t, argv[2], len, flags);
+    if (res != ASYMCUTE_OK) {
+        printf("error: unable to send PUBLISH message (%i)\n", res);
         return 1;
     }
     if (qos == 0) {
@@ -459,8 +460,9 @@ static int _cmd_sub(int argc, char **argv)
             puts("error: already subscribed to given topic");
         }
         else {
-            puts("error: unable to send SUBSCRIBE request");
+            printf("error: unable to send SUBSCRIBE request (%i)\n", res);
         }
+
         return 1;
     }
 
@@ -488,8 +490,9 @@ static int _cmd_unsub(int argc, char **argv)
     }
 
     /* issue unsubscribe request */
-    if (asymcute_unsubscribe(&_connection, req, sub) != ASYMCUTE_OK) {
-        puts("error: unable to send UNSUBSCRIBE request");
+    int res = asymcute_unsubscribe(&_connection, req, sub);
+    if (res != ASYMCUTE_OK) {
+        printf("error: unable to send UNSUBSCRIBE request (%i)\n", res);
         return 1;
     }
 
