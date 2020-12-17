@@ -13,6 +13,35 @@
  * @see         https://github.com/openthread/openthread
  *
  * Thread is a mesh oriented network stack running for IEEE802.15.4 networks.
+ *
+ * The RIOT port allows to directly call OpenThread API functions using
+ * @ref sys_event. For example:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
+ * #include "ot.h"
+ * #include "openthread/thread.h"
+ *
+ * static void _panid_handler(event_t *event);
+ * static event_t event_panid = {
+ *     .handler = _panid_handler
+ * };
+ *
+ * static void _panid_handler(event_t *event)
+ * {
+ *     (void) event;
+ *     uint16_t panid = otLinkGetPanId(openthread_get_instance());
+ *     do_something_with_panid(panid);
+ * }
+ *
+ * int main(void)
+ * {
+ *     event_post(openthread_get_evq(), &event_panid);
+ *     return 0;
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * @see https://openthread.io/releases/thread-reference-20180619
+ *
  * @{
  *
  * @file
