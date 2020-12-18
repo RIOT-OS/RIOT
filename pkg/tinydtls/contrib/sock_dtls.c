@@ -354,6 +354,15 @@ void sock_dtls_session_get_udp_ep(const sock_dtls_session_t *session,
     _session_to_ep(&session->dtls_session, ep);
 }
 
+void sock_dtls_session_set_udp_ep(sock_dtls_session_t *session,
+                                  const sock_udp_ep_t *ep)
+{
+    assert(session);
+    assert(ep);
+
+    _ep_to_session(ep, &session->dtls_session);
+}
+
 ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
                            const void *data, size_t len, uint32_t timeout,
                            sock_dtls_aux_tx_t *aux)
