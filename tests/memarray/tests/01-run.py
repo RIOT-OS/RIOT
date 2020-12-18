@@ -27,6 +27,20 @@ def testfunc(child):
             for i in range(max_number_blocks):
                 child.expect(r'Free \({}\) \d+ Bytes at 0x[a-z0-9]+,'
                              ' total [0-9]+\r\n'.format(i))
+
+    child.expect_exact("Extend and reduce tests")
+
+    child.expect_exact("Memarray available: {}".format(max_number_blocks))
+    child.expect_exact("Memarray available: {}".format(2 * max_number_blocks))
+    child.expect_exact("Memarray reduction: 0 available: {}"
+                       "".format(max_number_blocks))
+    child.expect_exact("Memarray reduction: -1 available: {}"
+                       "".format(max_number_blocks))
+    child.expect_exact("Memarray reduction: 0 available: 0")
+    child.expect_exact("Memarray available: {}".format(max_number_blocks - 1))
+    child.expect_exact("Memarray reduction: -1 available: {}"
+                       "".format(max_number_blocks - 1))
+
     child.expect_exact("Finishing")
 
 
