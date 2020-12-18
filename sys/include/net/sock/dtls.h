@@ -676,6 +676,20 @@ void sock_dtls_session_get_udp_ep(const sock_dtls_session_t *session,
                                   sock_udp_ep_t *ep);
 
 /**
+ * @brief Set the remote UDP endpoint from a session.
+ *
+ * @pre `(session != NULL) && (ep != NULL)`
+ *
+ * @param[in]   session   DTLS session
+ * @param[in]   ep        UDP endpoint
+ *
+ * @note Function should only be needed when doing a blocking handshake with
+ *       @ref sock_dtls_send() to set the remote UDP endpoint.
+ */
+void sock_dtls_session_set_udp_ep(sock_dtls_session_t *session,
+                                  const sock_udp_ep_t *ep);
+
+/**
  * @brief Receive handshake messages and application data from remote peer.
  *
  * @param[in]   sock    DTLS sock to use.
