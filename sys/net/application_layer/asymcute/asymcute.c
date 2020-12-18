@@ -167,7 +167,7 @@ static void _compile_sub_unsub(asymcute_req_t *req, asymcute_con_t *con,
     byteorder_htobebufs(&req->data[pos + 2], req->msg_id);
     memcpy(&req->data[pos + 4], sub->topic->name, topic_len);
     req->data_len = (pos + 4 + topic_len);
-    req->arg = (void *)sub;
+    req->arg = sub;
 }
 
 static void _req_resend(asymcute_req_t *req, asymcute_con_t *con)
@@ -184,7 +184,7 @@ static void _req_send(asymcute_req_t *req, asymcute_con_t *con,
     req->con = con;
     req->cb = cb;
     req->retry_cnt = CONFIG_ASYMCUTE_N_RETRY;
-    event_callback_init(&req->to_evt, _on_req_timeout, (void *)req);
+    event_callback_init(&req->to_evt, _on_req_timeout, req);
     event_timeout_init(&req->to_timer, &_queue, &req->to_evt.super);
     /* add request to the pending queue (if non-con request) */
     req->next = con->pending;
@@ -234,7 +234,7 @@ static void _disconnect(asymcute_con_t *con, uint8_t state)
 
 static void _on_req_timeout(void *arg)
 {
-    asymcute_req_t *req = (asymcute_req_t *)arg;
+    asymcute_req_t *req = arg;
 
     /* only process the timeout, if the request is still active */
     if (req->con == NULL) {
@@ -282,7 +282,7 @@ static unsigned _on_suback_timeout(asymcute_con_t *con, asymcute_req_t *req)
     (void)con;
 
     /* reset the subscription context */
-    asymcute_sub_t *sub = (asymcute_sub_t *)req->arg;
+    asymcute_sub_t *sub = req->arg;
     if (sub == NULL) {
         return ASYMCUTE_REJECTED;
     }
@@ -292,7 +292,7 @@ static unsigned _on_suback_timeout(asymcute_con_t *con, asymcute_req_t *req)
 
 static void _on_keepalive_evt(void *arg)
 {
-    asymcute_con_t *con = (asymcute_con_t *)arg;
+    asymcute_con_t *con = arg;
 
     mutex_lock(&con->lock);
 
@@ -393,7 +393,7 @@ static void _on_regack(asymcute_con_t *con, const uint8_t *data, size_t len)
     unsigned ret = ASYMCUTE_REJECTED;
     if (data[6] == MQTTSN_ACCEPTED) {
         /* finish the registration by applying the topic id */
-        asymcute_topic_t *topic = (asymcute_topic_t *)req->arg;
+        asymcute_topic_t *topic = req->arg;
         if (topic == NULL) {
             return;
         }
@@ -476,7 +476,7 @@ static void _on_suback(asymcute_con_t *con, const uint8_t *data, size_t len)
     unsigned ret = ASYMCUTE_REJECTED;
     if (data[7] == MQTTSN_ACCEPTED) {
         /* parse and apply assigned topic id */
-        asymcute_sub_t *sub = (asymcute_sub_t *)req->arg;
+        asymcute_sub_t *sub = req->arg;
         if (sub == NULL) {
             return;
         }
@@ -506,7 +506,7 @@ static void _on_unsuback(asymcute_con_t *con, const uint8_t *data, size_t len)
     }
 
     /* remove subscription from list */
-    asymcute_sub_t *sub = (asymcute_sub_t *)req->arg;
+    asymcute_sub_t *sub = req->arg;
     if (sub == NULL) {
         return;
     } else if (con->subscriptions == sub) {
@@ -586,7 +586,7 @@ static void _on_data(asymcute_con_t *con, size_t pkt_len, sock_udp_ep_t *remote)
 
 void *_listener(void *arg)
 {
-    asymcute_con_t *con = (asymcute_con_t *)arg;
+    asymcute_con_t *con = arg;
 
     /* create a socket for this listener, using an ephemeral port */
     sock_udp_ep_t local = SOCK_IPV6_EP_ANY;
@@ -824,7 +824,7 @@ int asymcute_register(asymcute_con_t *con, asymcute_req_t *req,
     }
 
     /* prepare topic */
-    req->arg = (void *)topic;
+    req->arg = topic;
     size_t topic_len = strlen(topic->name);
 
     /* prepare registration request */
