@@ -30,6 +30,7 @@
  * - Gateway discovery process not implemented
  * - Last will feature not implemented
  * - No support for QoS level 2
+ * - No support for QoS level -1
  * - No support for wildcard characters in topic names when subscribing
  * - Actual granted QoS level on subscription is ignored
  *
