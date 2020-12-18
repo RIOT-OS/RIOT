@@ -802,6 +802,7 @@ endif
 ifneq (,$(filter asymcute,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += sock_util
+  USEMODULE += sock_async_event
   USEMODULE += random
   USEMODULE += event_timeout
   USEMODULE += event_callback
