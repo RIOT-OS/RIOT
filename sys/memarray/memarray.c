@@ -21,13 +21,13 @@ void memarray_init(memarray_t *mem, void *data, size_t size, size_t num)
     DEBUG("memarray: Initialize memarray of %u times %u Bytes at %p\n",
           (unsigned)num, (unsigned)size, data);
 
-    mem->free_data = data;
+    mem->free_data = NULL;
     mem->size = size;
     mem->num = num;
 
-    for (size_t i = 0; i < (mem->num - 1); i++) {
-        void *next = ((char *)mem->free_data) + ((i + 1) * mem->size);
-        memcpy(((char *)mem->free_data) + (i * mem->size), &next, sizeof(void *));
+    for (uint8_t *element = data;
+         element < (uint8_t*)data + (num * size);
+         element += size) {
+        memarray_free(mem, element);
     }
-    memset(((char *)mem->free_data) + ((mem->num - 1) * (mem->size)), 0, sizeof(void *));
 }
