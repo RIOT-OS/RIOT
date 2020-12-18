@@ -21,7 +21,6 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "at24mac.h"
 #include "mtd.h"
 
 #ifdef __cplusplus
@@ -43,22 +42,6 @@ extern "C" {
  * @{
  */
 #define ATCA_PARAM_I2C           I2C_DEV(1)
-/** @} */
-
-/**
- * @brief    AT24Mac provides a EUI-48
- */
-static inline int _at24mac_get_eui48(const void *arg, eui48_t *addr)
-{
-    return at24mac_get_eui48((uintptr_t)arg, addr);
-}
-
-/**
- * @name    EUI-48 sources on the board
- *          AT24Mac is present on the board
- * @{
- */
-#define EUI48_PROVIDER_FUNC   _at24mac_get_eui48
 /** @} */
 
 /**
