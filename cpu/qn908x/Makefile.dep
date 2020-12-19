@@ -10,7 +10,7 @@ USEMODULE += vendor_fsl_clock
 # All peripherals use gpio_mux.h
 USEMODULE += periph_gpio_mux
 
-ifneq (,$(filter periph_uart,$(USEMODULE)))
+ifneq (,$(filter periph_uart periph_i2c,$(USEMODULE)))
   USEMODULE += periph_flexcomm
 endif
 

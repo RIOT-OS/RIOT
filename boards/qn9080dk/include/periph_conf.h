@@ -29,6 +29,21 @@ extern "C" {
 #endif
 
 /**
+ * @name I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev          = I2C1,
+        .pin_scl      = GPIO_PIN(PORT_A, 6),
+        .pin_sda      = GPIO_PIN(PORT_A, 7),
+        .speed        = I2C_SPEED_FAST,
+    },
+};
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
+/** @} */
+
+/**
  * @name   UART configuration
  * @{
  */
@@ -54,7 +69,6 @@ static const uart_conf_t uart_config[] = {
    - Available clocks
    - PWMs
    - SPIs
-   - I2C
    - ADC
    - RTC
    - RTT
