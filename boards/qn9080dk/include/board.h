@@ -57,6 +57,18 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    MMA8652FC 3-axis accelerometer bus configuration
+ *
+ * The MMA8652FC in the QN9080DK is only available when JP11 is shorted (the
+ * factory default).
+ * @{
+ */
+#define MMA8X5X_PARAM_I2C       I2C_DEV(0)
+#define MMA8X5X_PARAM_ADDR      0x1D
+#define MMA8X5X_PARAM_TYPE      (MMA8X5X_TYPE_MMA8652)
+/** @} */
+
+/**
  * @brief   Initialize board specific hardware
  */
 void board_init(void);
