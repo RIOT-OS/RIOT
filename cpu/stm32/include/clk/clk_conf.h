@@ -22,10 +22,9 @@
 #include "kernel_defines.h"
 #include "macros/units.h"
 
-#if defined(CPU_FAM_STM32F0)
-#include "f0/cfg_clock_default.h"
-#elif defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F3)
-#include "f1f3/cfg_clock_default.h"
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32F3)
+#include "f0f1f3/cfg_clock_default.h"
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
       defined(CPU_FAM_STM32F7)
 #include "f2f4f7/cfg_clock_default.h"
