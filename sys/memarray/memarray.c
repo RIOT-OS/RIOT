@@ -31,34 +31,3 @@ void memarray_init(memarray_t *mem, void *data, size_t size, size_t num)
     }
     memset(((char *)mem->free_data) + ((mem->num - 1) * (mem->size)), 0, sizeof(void *));
 }
-
-void *memarray_alloc(memarray_t *mem)
-{
-    assert(mem != NULL);
-
-    if (mem->free_data == NULL) {
-        return NULL;
-    }
-    void *free = mem->free_data;
-    mem->free_data = *((void **)mem->free_data);
-    DEBUG("memarray: Allocate %u Bytes at %p\n", (unsigned)mem->size, free);
-    return free;
-}
-
-void *memarray_calloc(memarray_t *mem)
-{
-    void *new = memarray_alloc(mem);
-    if (new) {
-        memset(new, 0, mem->size);
-    }
-    return new;
-}
-
-void memarray_free(memarray_t *mem, void *ptr)
-{
-    assert((mem != NULL) && (ptr != NULL));
-
-    memcpy(ptr, &mem->free_data, sizeof(void *));
-    mem->free_data = ptr;
-    DEBUG("memarray: Free %u Bytes at %p\n", (unsigned)mem->size, ptr);
-}
