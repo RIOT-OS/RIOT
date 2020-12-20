@@ -385,6 +385,92 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   Use some common SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
+#ifndef DOXYGEN
+/**
+ * @brief   Define a CPU specific SPI hardware chip select line macro
+ *
+ * GPIO numbers use the lower 5 bits and the bit 12. We define the CS numbers
+ * to have the bit 15 set.
+ */
+#define SPI_HWCS(x)         (1u << 15u | (x))
+
+/**
+ * @brief   Number of HW CS pins supported
+ */
+#define SPI_HWCS_NUMOF 4
+
+/**
+ * @brief   SPI mode select helper macro
+ *
+ * The polarity is determined by the bits CPOL and CPHA in the SPI CFG register.
+ */
+#define SPI_MODE_SEL(pol, pha)          (SPI_CFG_CPOL(pol) | SPI_CFG_CPHA(pha))
+
+/**
+ * @name   Override the SPI mode bitmask
+ *
+ * Override the SPI mode value so we can use it directly as a bitmask to CFG.
+ * @{
+ */
+#define HAVE_SPI_MODE_T
+typedef enum {
+    SPI_MODE_0  = SPI_MODE_SEL(0, 0),   /**< mode 0 */
+    SPI_MODE_1  = SPI_MODE_SEL(0, 1),   /**< mode 1 */
+    SPI_MODE_2  = SPI_MODE_SEL(1, 0),   /**< mode 2 */
+    SPI_MODE_3  = SPI_MODE_SEL(1, 1)    /**< mode 3 */
+} spi_mode_t;
+/** @} */
+
+/**
+ * @name   Override SPI speed values
+ *
+ * The speed is configured at run time based on the AHB clock speed using an
+ * arbitrary divider between /1 and /65536. The standard macro values just map
+ * to the frequency in Hz. The maximum possible speed is 32 MHz assuming a
+ * core clock and AHB bus clock of 32 MHz.
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef enum {
+    SPI_CLK_100KHZ  =   100000u,    /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ  =   400000u,    /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ    =  1000000u,    /**< drive the SPI bus with 1MHz */
+    SPI_CLK_5MHZ    =  5000000u,    /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ   = 10000000u     /**< drive the SPI bus with 10MHz */
+} spi_clk_t;
+/** @} */
+
+/**
+ * @brief   SPI pin getters
+ * @{
+ */
+#define spi_pin_mosi(bus) spi_config[bus].copi_pin
+#define spi_pin_miso(bus) spi_config[bus].cipo_pin
+#define spi_pin_clk(bus)  spi_config[bus].clk_pin
+/** @} */
+
+/**
+ * @brief   SPI module configuration options
+ */
+typedef struct {
+    SPI_Type *dev;                   /**< SPI device to use */
+    gpio_t cipo_pin;                 /**< Controller Input Peripheral Output */
+    gpio_t copi_pin;                 /**< Controller Output Peripheral Input */
+    gpio_t clk_pin;                  /**< CLK pin */
+    gpio_t cs_pin[SPI_HWCS_NUMOF];   /**< pins used for HW cs lines */
+} spi_conf_t;
+
+#endif /* ifndef DOXYGEN */
+
+/**
  * @brief UART module configuration options
  *
  * QN908x doesn't have any UART standalone blocks, but it has two FLEXCOMM
