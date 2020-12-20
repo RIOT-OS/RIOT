@@ -67,6 +67,28 @@ static const i2c_conf_t i2c_config[] = {
 /** @} */
 
 /**
+ * @name   SPI configuration
+ * @{
+ */
+static const spi_conf_t spi_config[] = {
+    {
+        .dev            = SPI0,  /* Flexcomm 2 */
+        .cipo_pin       = GPIO_PIN(PORT_A, 5),
+        .copi_pin       = GPIO_PIN(PORT_A, 4),
+        .clk_pin        = GPIO_PIN(PORT_A, 30),
+        .cs_pin         = {
+            GPIO_PIN(PORT_A, 3),  /* MX25R2035F CS# connected here. */
+            GPIO_UNDEF,
+            GPIO_UNDEF,
+            GPIO_UNDEF
+        },
+    },
+};
+
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
+/**
  * @name   UART configuration
  * @{
  */

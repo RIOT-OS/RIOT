@@ -5,6 +5,7 @@ CPU_MODEL = qn9080xhn
 FEATURES_PROVIDED += periph_adc
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_i2c
+FEATURES_PROVIDED += periph_spi
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart periph_uart_modecfg
 
