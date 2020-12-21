@@ -10,3 +10,6 @@ else
   # use the nano-specs of Newlib when available
   USEMODULE += newlib_nano
 endif
+
+# Make calls to malloc and friends thread-safe
+USEMODULE += malloc_thread_safe
