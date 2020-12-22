@@ -20,7 +20,7 @@
 
 #include <assert.h>
 #include <stdio.h>
-
+#include "fmt.h"
 #include "common.h"
 #include "errno.h"
 #include "event/thread.h"
@@ -54,7 +54,11 @@ static uint16_t received_acks;
 static uint16_t send_packets;
 static uint16_t received_packets;
 
+static uint8_t current_channel;
+
 static uint8_t buffer[127];
+static size_t size_last_packet;
+
 static xtimer_t timer_ack;
 static mutex_t lock;
 static mutex_t got_message_mutex;
@@ -85,6 +89,7 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
         //unlock;
         cond_signal(&got_message_cond);
         if (enable_prints) {
+            size_last_packet = size;
             puts("Packet received:");
             for (unsigned i=0;i<size;i++) {
                 printf("%02x ", buffer[i]);
@@ -330,6 +335,46 @@ static int send(uint8_t *dst, size_t dst_len,
     return 0;
 }
 
+static int send_with_channel(uint8_t *dst, size_t dst_len)
+{
+    uint8_t flags;
+    uint8_t mhr[IEEE802154_MAX_HDR_LEN];
+    int mhr_len;
+    uint8_t *channel_ptr = &current_channel;
+
+    le_uint16_t src_pan, dst_pan;
+    iolist_t iol_data = {
+        .iol_base = channel_ptr,
+        .iol_len = sizeof(*channel_ptr),
+        .iol_next = NULL,
+    };
+
+    flags = IEEE802154_FCF_TYPE_DATA ; //IEEE802154_FCF_ACK_REQ
+
+    src_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
+    dst_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
+    uint8_t src_len = IEEE802154_LONG_ADDRESS_LEN;
+    void *src = &ext_addr;
+
+    /* fill MAC header, seq should be set by device */
+    if ((mhr_len = ieee802154_set_frame_hdr(mhr, src, src_len,
+                                        dst, dst_len,
+                                        src_pan, dst_pan,
+                                        flags, seq++)) < 0) {
+        puts("txtsnd: Error preperaring frame");
+        return 1;
+    }
+
+    iolist_t iol_hdr = {
+        .iol_next = &iol_data,
+        .iol_base = mhr,
+        .iol_len = mhr_len,
+    };
+
+    _send(&iol_hdr);
+    return 0;
+}
+
 static inline int _dehex(char c, int default_)
 {
     if ('0' <= c && c <= '9') {
@@ -465,21 +510,19 @@ int _test_states(int argc, char **argv)
 int txtsnd(int argc, char **argv)
 {
     uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
-    size_t len;
     size_t res;
 
-    if (argc != 3) {
-        puts("Usage: txtsnd <long_addr> <len>");
+    if (argc != 2) {
+        puts("Usage: txtsnd <long_addr>");
         return 1;
     }
 
     res = _parse_addr(addr, sizeof(addr), argv[1]);
     if (res == 0) {
-        puts("Usage: txtsnd <long_addr> <len>");
+        puts("Usage: txtsnd <long_addr>");
         return 1;
     }
-    len = atoi(argv[2]);
-    return send(addr, res, len);
+    return send_with_channel(addr, res);
 }
 
 static int rx_mode_cmd(int argc, char **argv)
@@ -519,12 +562,14 @@ int _config_phy(uint8_t channel, int8_t tx_pow) {
     }
     _set_trx_state(IEEE802154_TRX_STATE_TRX_OFF, false);
     ieee802154_dev_t *dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
+    puts("");
     ieee802154_phy_conf_t conf = {.channel=channel, .page=0, .pow=tx_pow};
     if (ieee802154_radio_config_phy(dev, &conf) < 0) {
         puts("Channel or TX power settings not supported");
     }
     else {
         printf("Success! Channel: %d was selected\n", channel);
+        current_channel = channel;
     }
 
     _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
@@ -765,7 +810,7 @@ int txtspam(int argc, char **argv)
 
 int test_channels(int argc, char **argv) {
     if (argc != 3) {
-        puts("Usage: test_channels <long_addr>");
+        puts("Usage: test_channels <long_addr> <1 for Sender, 1 for Receiver>");
         return 1;
     }
 
@@ -773,7 +818,7 @@ int test_channels(int argc, char **argv) {
     size_t res;
     res = _parse_addr(addr, sizeof(addr), argv[1]);
     if (res == 0) {
-        puts("Usage: test_channels <long_addr>");
+        puts("Usage: test_channels <long_addr> <1 for Sender, 1 for Receiver>");
         return 1;
     };
 
@@ -832,6 +877,42 @@ int toggle_enable_prints(int argc, char **argv) {
     return 0;
 }
 
+int check_last_packet(int argc, char **argv) {
+    if (argc != 3) {
+        puts("Usage: check_last_packet <long_addr> <channel>");
+        return 1;
+    }
+    
+    uint8_t channel = atoi(argv[2]);
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+    uint8_t receive_addr[IEEE802154_LONG_ADDRESS_LEN];
+    _parse_addr(addr, sizeof(addr), argv[1]);
+    bool result =  true;
+    le_uint16_t src_pan;
+    ieee802154_get_src(buffer, receive_addr, &src_pan);
+    if (memcmp(addr, receive_addr, IEEE802154_LONG_ADDRESS_LEN) != 0) {
+        result = false;
+    }
+  /*  char string[IEEE802154_LONG_ADDRESS_LEN * 2 + 1];
+    memset(string, 0, sizeof(string));
+    fmt_bytes_hex (string, addr, 8);
+    printf("%s", string);
+    fmt_bytes_hex (string, receive_addr, 8);
+    printf("%s", string); */
+    if (channel != buffer[21]) {
+        puts("Fail channel match");
+        result = false;
+    }
+
+    if (result) {
+        puts("Success");
+    } else {
+        puts("No match");
+    }
+    puts("\n");
+    return 0;
+}
+
 
 static const shell_command_t shell_commands[] = {
     { "config_phy", "Set channel and TX power", config_phy},
@@ -847,6 +928,7 @@ static const shell_command_t shell_commands[] = {
     { "reply", "Every packet that arrives is mirrored", toggle_reply },
     { "enable_prints", "Enable printing", toggle_enable_prints },
     { "test_channels", "It tries to transmit and receive on different channels", test_channels },
+    { "check_last_packet", "Print last packet", check_last_packet },
     { NULL, NULL, NULL }
 };
 
@@ -857,10 +939,12 @@ int main(void)
     mutex_init(&got_message_mutex);
     cond_init(&got_message_cond);
     _init();
-
+    enable_prints = true;
+    current_channel = 26;
     /* start the shell */
     puts("Initialization successful - starting the shell now");
-
+    //xtimer_msleep(2000);
+    //puts(">");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 

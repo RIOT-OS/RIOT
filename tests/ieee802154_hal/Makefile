@@ -1,5 +1,6 @@
 include ../Makefile.tests_common
-
+TERMPROG := socat
+TERMFLAGS := - $(PORT),raw,echo=0,b115200
 BOARD_WHITELIST :=  \
 					adafruit-clue \
 					adafruit-itsybitsy-nrf52 \
