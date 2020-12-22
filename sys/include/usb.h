@@ -97,6 +97,32 @@ extern "C" {
 #endif
 
 /**
+ * @brief USB peripheral serial string
+ *
+ * Compile-time value to override the serial string with. An LUID-based hex
+ * string is generated when this value is not used.
+ *
+ * This string does not have to be a number, but it must be unique between
+ * devices with identical VID:PID combination.
+ */
+#ifdef DOXYGEN
+#define CONFIG_USB_SERIAL_STR           "RIOT-12345"
+#endif
+
+/**
+ * @brief USB peripheral serial string length
+ *
+ * Maximum value is 63. Sensible values are between 8 to 32 depending on the
+ * number of expected devices.
+ *
+ * The length here is in bytes. The generated hex string is twice as many chars
+ * in length due to conversion from bytes to hex chars.
+ */
+#if !defined(CONFIG_USB_SERIAL_STR) && !defined(CONFIG_USB_SERIAL_BYTE_LENGTH)
+#define CONFIG_USB_SERIAL_BYTE_LENGTH 8
+#endif
+
+/**
  * @brief USB peripheral device version
  *
  * This is the version number of this peripheral
