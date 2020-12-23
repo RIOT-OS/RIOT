@@ -203,9 +203,6 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
     kernel_pid_t iface = KERNEL_PID_UNDEF;
     gnrc_nettype_t type;
     size_t payload_len = gnrc_pkt_len(payload);
-#ifdef MODULE_GNRC_NETERR
-    unsigned status_subs = 0;
-#endif
 #if IS_USED(MODULE_GNRC_TX_SYNC)
     gnrc_tx_sync_t tx_sync;
 #endif
@@ -268,55 +265,16 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
         netif_hdr->if_pid = iface;
         pkt = gnrc_pkt_prepend(pkt, netif);
     }
-#ifdef MODULE_GNRC_NETERR
-    /* cppcheck-suppress uninitvar
-     * (reason: pkt is initialized in AF_INET6 case above, otherwise function
-     * will return early) */
-    for (gnrc_pktsnip_t *ptr = pkt; ptr != NULL; ptr = ptr->next) {
-        /* no error should occur since pkt was created here */
-        gnrc_neterr_reg(ptr);
-        status_subs++;
-    }
-#endif
     if (!gnrc_netapi_dispatch_send(type, GNRC_NETREG_DEMUX_CTX_ALL, pkt)) {
         /* this should not happen, but just in case */
         gnrc_pktbuf_release(pkt);
         return -EBADMSG;
     }
-
 #if IS_USED(MODULE_GNRC_TX_SYNC)
     gnrc_tx_sync(&tx_sync);
-#endif
-
-#ifdef MODULE_GNRC_NETERR
-    uint32_t last_status = GNRC_NETERR_SUCCESS;
-
-    while (status_subs--) {
-        msg_t err_report;
-        err_report.type = 0;
-
-        while (err_report.type != GNRC_NETERR_MSG_TYPE) {
-            msg_try_receive(&err_report);
-            if (err_report.type != GNRC_NETERR_MSG_TYPE) {
-                msg_try_send(&err_report, thread_getpid());
-            }
-        }
-        if (err_report.content.value != last_status) {
-            int res = (int)(-err_report.content.value);
-
-            for (unsigned i = 0; i < status_subs; i++) {
-                err_report.type = 0;
-                /* remove remaining status reports from queue */
-                while (err_report.type != GNRC_NETERR_MSG_TYPE) {
-                    msg_try_receive(&err_report);
-                    if (err_report.type != GNRC_NETERR_MSG_TYPE) {
-                        msg_try_send(&err_report, thread_getpid());
-                    }
-                }
-            }
-            return res;
-        }
-        last_status = err_report.content.value;
+    uint32_t error = gnrc_neterr_get(&tx_sync);
+    if (error) {
+        return -error;
     }
 #endif
     return payload_len;

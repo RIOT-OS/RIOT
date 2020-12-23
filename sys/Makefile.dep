@@ -111,6 +111,10 @@ ifneq (,$(filter gnrc_mac,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter gnrc_neterr,$(USEMODULE)))
+  USEMODULE += gnrc_tx_sync
+endif
+
 ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_nettype_gomach

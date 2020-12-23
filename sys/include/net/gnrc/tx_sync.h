@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2015 Martine Lenders <mlenders@inf.fu-berlin.de>
  * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
@@ -17,6 +18,7 @@
  * @brief   Definitions for TX sync.
  *
  * @author  Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author  Martine Lenders <mlenders@inf.fu-berlin.de>
  */
 #ifndef NET_GNRC_TX_SYNC_H
 #define NET_GNRC_TX_SYNC_H
@@ -36,6 +38,9 @@ extern "C" {
  * @brief   TX synchronization data */
 typedef struct {
     mutex_t signal;     /**< Mutex used for synchronization */
+#if IS_USED(MODULE_GNRC_NETERR) || defined(DOXYGEN)
+    uint32_t error;     /**< Feedback from lower layers: 0 for success, errno code otherwise */
+#endif
 } gnrc_tx_sync_t;
 
 /**
@@ -126,6 +131,40 @@ static inline void gnrc_tx_complete(gnrc_pktsnip_t *pkt)
 static inline void gnrc_tx_sync(gnrc_tx_sync_t *sync)
 {
     mutex_lock(&sync->signal);
+}
+
+/**
+ * @brief   Reports an error to all subscribers of errors to @p pkt.
+ *
+ * @param[in] pkt   Packet snip to report on.
+ * @param[in] err   The error code for the packet.
+ */
+static inline void gnrc_neterr_report(gnrc_pktsnip_t *pkt, uint32_t err)
+{
+    (void)err;
+#if IS_USED(MODULE_GNRC_NETERR)
+    assert(IS_USED(MODULE_GNRC_TX_SYNC) && (pkt->type == GNRC_NETTYPE_TX_SYNC));
+    gnrc_tx_sync_t *sync = pkt->data;
+    sync->error = err;
+#endif
+}
+
+/**
+ * @brief   Fetch the error/status code from a TX sync structure
+ * @param[in]   tx_sync     TX sync structure to get status/error from
+ * @return  Retrieved error code
+ *
+ * @details If module `gnrc_neterr` is not used, this will always return
+ *          @ref GNRC_NETERR_SUCCESS
+ */
+static inline uint32_t gnrc_neterr_get(gnrc_tx_sync_t *tx_sync)
+{
+    (void)tx_sync;
+#if IS_USED(MODULE_GNRC_NETERR)
+    return tx_sync->error;
+#else
+    return 0;
+#endif
 }
 
 #ifdef __cplusplus

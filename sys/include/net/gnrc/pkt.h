@@ -117,10 +117,6 @@ typedef struct gnrc_pktsnip {
      */
     unsigned int users;
     gnrc_nettype_t type;            /**< protocol of the packet snip */
-#ifdef MODULE_GNRC_NETERR
-    kernel_pid_t err_sub;           /**< subscriber to errors related to this
-                                     *   packet snip */
-#endif
 } gnrc_pktsnip_t;
 
 /**
