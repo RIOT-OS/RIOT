@@ -29,6 +29,29 @@ extern "C" {
 #endif
 
 /**
+ * @name ADC configuration
+ *
+ * Names "An" are as described in the "Analog In" header on the PCB. All "An"
+ * inputs are configured referenced to 1.8V.
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+    ADC_CHANNEL_ADC7_VINN | ADC_VINN_AVSS | ADC_VREF_GAIN_X15, /* A0 */
+    ADC_CHANNEL_ADC6_VINN | ADC_VINN_AVSS | ADC_VREF_GAIN_X15, /* A1 */
+    ADC_CHANNEL_ADC4_VINN | ADC_VINN_AVSS | ADC_VREF_GAIN_X15, /* A2 */
+    ADC_CHANNEL_ADC5_VINN | ADC_VINN_AVSS | ADC_VREF_GAIN_X15, /* A3 */
+    ADC_CHANNEL_ADC1_VINN | ADC_VINN_AVSS | ADC_VREF_GAIN_X15, /* A4 */
+    ADC_CHANNEL_ADC0_VINN | ADC_VINN_AVSS | ADC_VREF_GAIN_X15, /* A5 */
+    ADC_CHANNEL_ADC6_ADC7 | ADC_VREF_GAIN_X15,                 /* A1-A0 */
+    ADC_CHANNEL_ADC4_ADC5 | ADC_VREF_GAIN_X15,                 /* A2-A3 */
+    ADC_CHANNEL_ADC0_ADC1 | ADC_VREF_GAIN_X15,                 /* A5-A4 */
+    ADC_CHANNEL_TEMP,                                          /* temperature */
+    ADC_CHANNEL_VCC4_VINN | ADC_VINN_AVSS,                     /* Vcc/4 */
+};
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
+/** @} */
+
+/**
  * @name I2C configuration
  * @{
  */
