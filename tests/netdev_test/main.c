@@ -23,6 +23,7 @@
 #include "net/ethernet.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "net/gnrc/tx_sync.h"
 #include "net/netdev_test.h"
 #include "od.h"
 #include "thread.h"
@@ -89,10 +90,16 @@ static int test_send(void)
     ethernet_hdr_t *exp_mac = (ethernet_hdr_t *)_tmp;
     uint8_t *exp_payload = _tmp + sizeof(ethernet_hdr_t);
     gnrc_pktsnip_t *pkt, *hdr;
-    msg_t msg;
+    gnrc_tx_sync_t tx_sync;
+
+    pkt = gnrc_tx_sync_build(&tx_sync);
+    if (pkt == NULL) {
+        puts("Could not allocate tx_sync snip");
+        return 0;
+    }
 
     /* prepare packet for sending */
-    pkt = gnrc_pktbuf_add(NULL, _TEST_PAYLOAD1, sizeof(_TEST_PAYLOAD1) - 1,
+    pkt = gnrc_pktbuf_add(pkt , _TEST_PAYLOAD1, sizeof(_TEST_PAYLOAD1) - 1,
                           GNRC_NETTYPE_UNDEF);
     if (pkt == NULL) {
         puts("Could not allocate send payload");
@@ -111,18 +118,13 @@ static int test_send(void)
     exp_mac->type = byteorder_htons(ETHERTYPE_UNKNOWN);
     memcpy(exp_payload, _TEST_PAYLOAD1, sizeof(_TEST_PAYLOAD1) - 1);
     _tmp_len = sizeof(_TEST_PAYLOAD1) + sizeof(ethernet_hdr_t) - 1;
-    /* register for returned packet status */
-    if (gnrc_neterr_reg(pkt) != 0) {
-        puts("Can not register for error reporting");
-        return 0;
-    }
     /* send packet to MAC layer */
     gnrc_netif_send(gnrc_netif_get_by_pid(_mac_pid), pkt);
     /* wait for packet status and check */
-    msg_receive(&msg);
-    if ((msg.type != GNRC_NETERR_MSG_TYPE) ||
-        (msg.content.value != GNRC_NETERR_SUCCESS)) {
-        puts("Error sending packet");
+    gnrc_tx_sync(&tx_sync);
+    uint32_t err = gnrc_neterr_get(&tx_sync);
+    if (err) {
+        printf("Transmission failed with code %" PRIu32 "\n", err);
         return 0;
     }
     return 1;
