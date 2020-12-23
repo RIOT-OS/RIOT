@@ -449,6 +449,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     DEBUG("%s: multicast node add %s\n", __func__, res ? "success" : "error");
 #endif /* ESP_NOW_UNICAST */
 
+    netdev_register(&dev->netdev, NETDEV_ESP_NOW, 0);
     return dev;
 }
 
