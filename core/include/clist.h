@@ -139,7 +139,7 @@ static inline void clist_lpush(clist_node_t *list, clist_node_t *new_node)
         list->next->next = new_node;
     }
     else {
-        new_node->next = new_node;
+        new_node->next = NULL;
         list->next = new_node;
     }
 }
