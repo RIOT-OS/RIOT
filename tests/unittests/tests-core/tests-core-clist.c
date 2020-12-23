@@ -143,6 +143,17 @@ static void test_clist_lpop(void)
     TEST_ASSERT_NULL(clist_lpop(list));
 }
 
+static void test_clist_lpush_empty(void)
+{
+    list_node_t *list = &test_clist;
+
+    clist_lpush(list, &tests_clist_buf[2]);
+
+    TEST_ASSERT_NOT_NULL(list->next);
+    TEST_ASSERT(list->next == &tests_clist_buf[2]);
+    TEST_ASSERT(list->next->next == NULL);
+}
+
 static void test_clist_lpush(void)
 {
     list_node_t *list = &test_clist;
@@ -339,6 +350,7 @@ Test *tests_core_clist_tests(void)
         new_TestFixture(test_clist_lpop),
         new_TestFixture(test_clist_rpop),
         new_TestFixture(test_clist_lpush),
+        new_TestFixture(test_clist_lpush_empty),
         new_TestFixture(test_clist_remove_two),
         new_TestFixture(test_clist_add_three),
         new_TestFixture(test_clist_find),
