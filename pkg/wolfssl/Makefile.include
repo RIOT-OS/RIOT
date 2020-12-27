@@ -1,13 +1,12 @@
 CFLAGS += -DWOLFSSL_USER_SETTINGS=1
-CFLAGS += -DWOLFSSL_RIOT_OS=1
 
 INCLUDES += -I$(APPDIR)
 INCLUDES += -I$(PKGDIRBASE)/wolfssl
-INCLUDES += -I$(RIOTBASE)/pkg/wolfssl/sock_tls
 INCLUDES += -I$(RIOTBASE)/pkg/wolfssl/include
 
 ifneq (,$(filter sock_tls,$(USEMODULE)))
-  DIRS += $(RIOTBASE)/pkg/wolfssl/sock_tls
+  INCLUDES += -I$(RIOTBASE)/pkg/wolfssl/contrib/sock_tls
+  DIRS += $(RIOTBASE)/pkg/wolfssl/contrib/sock_tls
 endif
 
 # wolfcrypt implements different options using pseudomodules
