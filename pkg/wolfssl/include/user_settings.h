@@ -32,25 +32,29 @@ extern "C" {
 #define SP_WORD_SIZE 32
 #define WOLFSSL_SP
 
-
-
-/* GNRC support enabled if not
- * using sockets
- */
+/* Use custom I/O functions if not using POSIX socket */
 #ifndef MODULE_WOLFSSL_SOCKET
-#define WOLFSSL_GNRC
 #define WOLFSSL_USER_IO
 #else
 #include <sys/socket.h>
 #endif
 
-/* Select wolfcrypt only / +wolfssl
- * at compile time (via USEMODULE)
+/* Enable GNRC socket if not using sock dtls */
+#ifndef MODULE_SOCK_DTLS
+#define WOLFSSL_GNRC
+#endif
+
+/* Select wolfcrypt only if no other module is used
  */
 #ifndef MODULE_WOLFSSL_TLS
 #ifndef MODULE_WOLFSSL_TLS13
+#ifndef MODULE_SOCK_DTLS
 #define WOLFCRYPT_ONLY
-#else
+#endif
+#endif
+#endif
+
+#if !defined(MODULE_WOLFSSL_TLS) && !defined(MODULE_SOCK_DTLS)
 #define NO_OLD_TLS
 #define HAVE_TLS_EXTENSIONS
 #define HAVE_AES_DECRYPT
@@ -59,7 +63,6 @@ extern "C" {
 #define HAVE_AESCCM
 #define WOLFSSL_AES_COUNTER
 #define WOLFSSL_AES_DIRECT
-#endif
 #else
 #define HAVE_TLS_EXTENSIONS
 #endif
@@ -98,7 +101,7 @@ int strncasecmp(const char *s1, const char * s2, unsigned int sz);
 #endif
 
 #undef WOLFSSL_DTLS
-#ifdef MODULE_WOLFSSL_DTLS
+#if defined(MODULE_WOLFSSL_DTLS) || defined(MODULE_SOCK_DTLS)
 #define WOLFSSL_DTLS
 #endif
 

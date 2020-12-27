@@ -124,7 +124,7 @@ static int client_send(char *addr_str, char *data, size_t datalen)
     }
 
     res = sock_dtls_session_init(&dtls_sock, &remote, &session);
-    if (res <= 0) {
+    if (res < 0) {
         return res;
     }
 

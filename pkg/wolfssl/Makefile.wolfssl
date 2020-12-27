@@ -3,6 +3,8 @@ MODULE = wolfssl
 NO_AUTO_SRC = 1
 SUBMODULES += 1
 
+SRC += tls.c
+
 ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-unused-parameter
 endif

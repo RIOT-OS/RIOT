@@ -15,7 +15,8 @@ USEMODULE += auto_init_gnrc_netif
 USEMODULE += gnrc_ipv6_default
 
 # Specify DTLS implementation
-USEPKG += tinydtls
+# USEPKG += tinydtls
+USEPKG += wolfssl
 
 # Pull in sock APIs
 USEMODULE += sock_dtls
@@ -32,12 +33,16 @@ USEMODULE += shell_commands
 DTLS_PORT ?= 20220
 CFLAGS += -DDTLS_DEFAULT_PORT=$(DTLS_PORT)
 
+# TODO: use kconfig to configure enabled cipher
 # NOTE: If no cipher suite is selected, CONFIG_DTLS_PSK is used by default.
 # This section should be commented out if using Kconfig
-# This adds support for TLS_PSK_WITH_AES_128_CCM_8
-# CFLAGS += -DCONFIG_DTLS_PSK
+# This adds support for TLS_PSK_WITH_AES_128_CCM_8 when using tinydtls
+CFLAGS += -DCONFIG_DTLS_PSK
 # This adds support for TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8
 # CFLAGS += -DCONFIG_DTLS_ECC
+# use the following instead when using wolfssl
+USEMODULE += wolfssl_psk
+#USEMODULE += wolfcrypt_ecc
 
 # Uncomment to enable debug logs
 # CFLAGS += -DCONFIG_DTLS_DEBUG
