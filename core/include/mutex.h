@@ -59,7 +59,7 @@
  * 1. If the mutex was unlocked (value of `NULL`), its value is changed to
  *    `MUTEX_LOCKED` and the call to `mutex_lock()` returns right away without
  *    blocking.
- * 2. If the mutex as a vale of `MUTEX_LOCKED`, it will be changed to point to
+ * 2. If the mutex has a value of `MUTEX_LOCKED`, it will be changed to point to
  *    the `thread_t` of the running thread. The single item list is terminated
  *    be setting the `thread_t::rq_entry.next` of the running thread to `NULL`.
  *    The running thread blocks as described below.
