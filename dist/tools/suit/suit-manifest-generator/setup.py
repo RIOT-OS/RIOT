@@ -53,7 +53,7 @@ setuptools.setup (
         entry_points = entry_points,
             zip_safe = False,
     install_requires = [
-                'cbor>=1.0.0',
+                'cbor2>=5.0.0',
             'colorama>=0.4.0',
         'cryptography>=2.8',
         'pyhsslms>=1.0.0',
