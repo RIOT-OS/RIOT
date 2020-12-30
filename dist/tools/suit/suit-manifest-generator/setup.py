@@ -56,7 +56,6 @@ setuptools.setup (
                 'cbor2>=5.0.0',
             'colorama>=0.4.0',
         'cryptography>=2.8',
-        'pyhsslms>=1.0.0',
     ],
          classifiers = [
             "Programming Language :: Python :: 3",
