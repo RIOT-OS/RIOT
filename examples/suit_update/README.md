@@ -33,7 +33,7 @@ Table of contents:
 
 - Install python dependencies (only Python3.6 and later is supported):
 
-      $ pip3 install --user ed25519 pyasn1 cbor
+      $ pip3 install --user cbor2 cryptography
 
 - Install aiocoap from the source
 
