@@ -53,8 +53,8 @@ setuptools.setup (
         entry_points = entry_points,
             zip_safe = False,
     install_requires = [
-                'cbor2>=5.0.0',
-            'colorama>=0.4.0',
+        'cbor2>=5.0.0',
+        'colorama>=0.4.0',
         'cryptography>=2.8',
     ],
          classifiers = [
