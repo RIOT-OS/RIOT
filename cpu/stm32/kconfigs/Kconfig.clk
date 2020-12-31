@@ -373,4 +373,72 @@ config CLOCK_APB2_DIV
     default 8 if CLOCK_APB2_DIV_8
     default 16 if CLOCK_APB2_DIV_16
 
+if CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3
+config CLOCK_ENABLE_MCO
+    bool "Enable MCU Clock Output (MCO) on PA8"
+
+choice
+bool "MCO source"
+depends on CLOCK_ENABLE_MCO
+default CLOCK_MCO_USE_PLLCLK
+
+config CLOCK_MCO_USE_PLLCLK
+    bool "Use PLLCLK as MCO source"
+
+config CLOCK_MCO_USE_HSE
+    bool "Use HSE as MCO source"
+
+config CLOCK_MCO_USE_HSI
+    bool "Use HSI as MCO source"
+
+config CLOCK_MCO_USE_SYSCLK
+    bool "Use SYSCLK as MCO source"
+
+endchoice
+
+choice
+bool "MCO prescaler"
+depends on !CLOCK_HAS_NO_MCO_PRE && CLOCK_ENABLE_MCO
+default CLOCK_MCO_PRE_1
+
+config CLOCK_MCO_PRE_1
+    bool "Divide MCO by 1"
+
+config CLOCK_MCO_PRE_2
+    bool "Divide MCO by 2"
+
+config CLOCK_MCO_PRE_4
+    bool "Divide MCO by 4"
+
+config CLOCK_MCO_PRE_8
+    bool "Divide MCO by 8"
+
+config CLOCK_MCO_PRE_16
+    bool "Divide MCO by 16"
+
+config CLOCK_MCO_PRE_32
+    bool "Divide MCO by 32"
+
+config CLOCK_MCO_PRE_64
+    bool "Divide MCO by 64"
+
+config CLOCK_MCO_PRE_128
+    bool "Divide MCO by 128"
+
+endchoice
+
+config CLOCK_MCO_PRE
+    int
+    default 2 if CLOCK_MCO_PRE_2
+    default 4 if CLOCK_MCO_PRE_4
+    default 8 if CLOCK_MCO_PRE_8
+    default 16 if CLOCK_MCO_PRE_16
+    default 32 if CLOCK_MCO_PRE_32
+    default 64 if CLOCK_MCO_PRE_64
+    default 128 if CLOCK_MCO_PRE_128
+    default 1
+
+endif  # CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3
+
+
 endmenu
