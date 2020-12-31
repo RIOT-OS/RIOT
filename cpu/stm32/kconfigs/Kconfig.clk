@@ -373,7 +373,7 @@ config CLOCK_APB2_DIV
     default 8 if CLOCK_APB2_DIV_8
     default 16 if CLOCK_APB2_DIV_16
 
-if CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3 || CPU_FAM_G0 || CPU_FAM_G4
+if CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3 || CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L0 || CPU_FAM_L1
 config CLOCK_ENABLE_MCO
     bool "Enable MCU Clock Output (MCO) on PA8"
 
@@ -392,10 +392,13 @@ config CLOCK_MCO_USE_HSI
     bool "Use HSI as MCO source"
 
 config CLOCK_MCO_USE_LSE
-    bool "Use LSE as MCO source" if CPU_FAM_G0 || CPU_FAM_G4
+    bool "Use LSE as MCO source" if CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L0 || CPU_FAM_L1
 
 config CLOCK_MCO_USE_LSI
-    bool "Use LSI as MCO source" if CPU_FAM_G0 || CPU_FAM_G4
+    bool "Use LSI as MCO source" if CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L0 || CPU_FAM_L1
+
+config CLOCK_MCO_USE_MSI
+    bool "Use MSI as MCO source" if CPU_FAM_L0 || CPU_FAM_L1
 
 config CLOCK_MCO_USE_SYSCLK
     bool "Use SYSCLK as MCO source"
@@ -423,13 +426,13 @@ config CLOCK_MCO_PRE_16
     bool "Divide MCO by 16"
 
 config CLOCK_MCO_PRE_32
-    bool "Divide MCO by 32" if !CPU_FAM_G4
+    bool "Divide MCO by 32" if !CPU_FAM_G4 && !CPU_FAM_L0 && !CPU_FAM_L1
 
 config CLOCK_MCO_PRE_64
-    bool "Divide MCO by 64" if !CPU_FAM_G4
+    bool "Divide MCO by 64" if !CPU_FAM_G4 && !CPU_FAM_L0 && !CPU_FAM_L1
 
 config CLOCK_MCO_PRE_128
-    bool "Divide MCO by 128" if !CPU_FAM_G4
+    bool "Divide MCO by 128" if !CPU_FAM_G4 && !CPU_FAM_L0 && !CPU_FAM_L1
 
 endchoice
 
@@ -444,6 +447,6 @@ config CLOCK_MCO_PRE
     default 128 if CLOCK_MCO_PRE_128
     default 1
 
-endif  # CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3 || CPU_FAM_G0 || CPU_FAM_G4
+endif  # CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3 || CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L0 || CPU_FAM_L1
 
 endmenu
