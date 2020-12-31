@@ -57,8 +57,7 @@ typedef struct {
 } sx150x_params_t;
 
 typedef struct {
-    i2c_t bus;
-    uint8_t addr;
+    sx150x_params_t params;
     /* Cached value of RegDataAB that enables gpio_set/clear without
      * read-modify-write interactions */
     uint16_t data;

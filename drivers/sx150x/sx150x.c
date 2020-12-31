@@ -47,7 +47,7 @@
 
 static int _reg_read(const sx150x_t *dev, uint8_t reg, uint8_t *val)
 {
-    if (i2c_read_reg(dev->bus, dev->addr, reg, val, 0) != 0) {
+    if (i2c_read_reg(dev->params.bus, dev->params.addr, reg, val, 0) != 0) {
         return SX150X_BUSERR;
     }
     return SX150X_OK;
@@ -55,7 +55,7 @@ static int _reg_read(const sx150x_t *dev, uint8_t reg, uint8_t *val)
 
 static int _reg_write(const sx150x_t *dev, uint8_t reg, uint8_t val)
 {
-    if (i2c_write_reg(dev->bus, dev->addr, reg, val, 0) != 0) {
+    if (i2c_write_reg(dev->params.bus, dev->params.addr, reg, val, 0) != 0) {
         return SX150X_BUSERR;
     }
     return SX150X_OK;
@@ -72,9 +72,9 @@ static int _reg_write_u16(const sx150x_t *dev, uint8_t reg, uint16_t val)
     int ret;
 
     if (PIN_NUMOF == 16) {
-        ret = i2c_write_regs(dev->bus, dev->addr, reg, buf, 2, 0);
+        ret = i2c_write_regs(dev->params.bus, dev->params.addr, reg, buf, 2, 0);
     } else {
-        ret = i2c_write_regs(dev->bus, dev->addr, reg, buf + 1, 1, 0);
+        ret = i2c_write_regs(dev->params.bus, dev->params.addr, reg, buf + 1, 1, 0);
     }
 
     if (ret != 0) {
@@ -114,12 +114,12 @@ int sx150x_init(sx150x_t *dev, const sx150x_params_t *params)
     int res = SX150X_OK;
     uint8_t tmp;
 
-    memcpy(dev, params, sizeof(sx150x_params_t));
+    dev->params = *params;
 
     DEBUG("[sx150x] init: initializing driver now\n");
 
     /* try to get access to the bus */
-    if (i2c_acquire(dev->bus) != 0) {
+    if (i2c_acquire(dev->params.bus) != 0) {
         DEBUG("[sx150x] init: unable to acquire bus\n");
         res = SX150X_BUSERR;
         goto exit;
@@ -159,7 +159,7 @@ int sx150x_init(sx150x_t *dev, const sx150x_params_t *params)
 #endif
 
 exit:
-    i2c_release(dev->bus);
+    i2c_release(dev->params.bus);
     return res;
 }
 
@@ -224,7 +224,7 @@ int sx150x_pwm_init(sx150x_t *dev, unsigned pin)
 {
     int res;
     assert(dev && (pin < PIN_NUMOF));
-    i2c_acquire(dev->bus);
+    i2c_acquire(dev->params.bus);
 
     DEBUG("init pin %i for PWM\n", (int)pin);
 
@@ -259,7 +259,7 @@ int sx150x_pwm_init(sx150x_t *dev, unsigned pin)
     }
 
 err:
-    i2c_release(dev->bus);
+    i2c_release(dev->params.bus);
     return res;
 }
 
@@ -267,11 +267,11 @@ int sx150x_pwm_set(sx150x_t *dev, unsigned pin, uint8_t value)
 {
     int res;
     assert(dev && (pin < PIN_NUMOF));
-    i2c_acquire(dev->bus);
+    i2c_acquire(dev->params.bus);
 
     res = _reg_write(dev, reg_i_on(pin), value);
 
-    i2c_release(dev->bus);
+    i2c_release(dev->params.bus);
     return res;
 }
 
@@ -279,7 +279,7 @@ int sx150x_gpio_init(sx150x_t *dev, unsigned pin, gpio_mode_t mode)
 {
     assert(dev && (pin < PIN_NUMOF));
 
-    i2c_acquire(dev->bus);
+    i2c_acquire(dev->params.bus);
 
     /* Only currently supported mode */
     assert(mode == GPIO_OUT);
@@ -291,11 +291,11 @@ int sx150x_gpio_init(sx150x_t *dev, unsigned pin, gpio_mode_t mode)
 
 
     DEBUG("[sx150x] gpio_init: done\n");
-    i2c_release(dev->bus);
+    i2c_release(dev->params.bus);
     return SX150X_OK;
 
 err:
-    i2c_release(dev->bus);
+    i2c_release(dev->params.bus);
     return SX150X_BUSERR;
 }
 
@@ -303,10 +303,10 @@ int sx150x_gpio_set(sx150x_t *dev, unsigned pin)
 {
     assert(dev && (pin < PIN_NUMOF));
 
-    i2c_acquire(dev->bus);
+    i2c_acquire(dev->params.bus);
     dev->data |= (1 << pin);
     int res = _reg_write_u16(dev, REG_DATA(BOTH), dev->data);
-    i2c_release(dev->bus);
+    i2c_release(dev->params.bus);
 
     return res;
 }
@@ -315,10 +315,10 @@ int sx150x_gpio_clear(sx150x_t *dev, unsigned pin)
 {
     assert(dev && (pin < PIN_NUMOF));
 
-    i2c_acquire(dev->bus);
+    i2c_acquire(dev->params.bus);
     dev->data &= ~(1 << pin);
     int res = _reg_write_u16(dev, REG_DATA(BOTH), dev->data);
-    i2c_release(dev->bus);
+    i2c_release(dev->params.bus);
 
     return res;
 }
@@ -327,10 +327,10 @@ int sx150x_gpio_toggle(sx150x_t *dev, unsigned pin)
 {
     assert(dev && (pin < PIN_NUMOF));
 
-    i2c_acquire(dev->bus);
+    i2c_acquire(dev->params.bus);
     dev->data ^= 1 << pin;
     int res = _reg_write_u16(dev, REG_DATA(BOTH), dev->data);
-    i2c_release(dev->bus);
+    i2c_release(dev->params.bus);
 
     return res;
 }
