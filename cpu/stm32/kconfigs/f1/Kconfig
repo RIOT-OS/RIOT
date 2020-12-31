@@ -15,6 +15,7 @@ config CPU_FAM_F1
     select HAS_PERIPH_FLASHPAGE_RAW
     select HAS_PERIPH_WDT
     select HAS_BOOTLOADER_STM32
+    select CLOCK_HAS_NO_MCO_PRE
 
 config CPU_FAM
     default "f1" if CPU_FAM_F1

@@ -21,6 +21,7 @@ config CPU_LINE_STM32F302X8
 config CPU_LINE_STM32F302XC
     bool
     select CPU_FAM_F3
+    select CLOCK_HAS_NO_MCO_PRE
 
 config CPU_LINE_STM32F302XE
     bool
@@ -34,6 +35,7 @@ config CPU_LINE_STM32F303XC
     bool
     select CPU_FAM_F3
     select HAS_CORTEXM_MPU
+    select CLOCK_HAS_NO_MCO_PRE
 
 config CPU_LINE_STM32F303XE
     bool
@@ -55,14 +57,17 @@ config CPU_LINE_STM32F334X8
 config CPU_LINE_STM32F358XX
     bool
     select CPU_FAM_F3
+    select CLOCK_HAS_NO_MCO_PRE
 
 config CPU_LINE_STM32F373XC
     bool
     select CPU_FAM_F3
+    select CLOCK_HAS_NO_MCO_PRE
 
 config CPU_LINE_STM32F378XX
     bool
     select CPU_FAM_F3
+    select CLOCK_HAS_NO_MCO_PRE
 
 config CPU_LINE_STM32F398XX
     bool
