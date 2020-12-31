@@ -184,11 +184,19 @@ def _test_successful_update(child, client, app_ver):
         client = get_reachable_addr(child)
 
 
+def _test_suit_command_is_there(child):
+    child.sendline('suit')
+    child.expect_exact("Usage: suit <manifest url>")
+
+
 def testfunc(child):
     # Get current app_ver
     current_app_ver = app_version(child)
     # Verify client is reachable and get address
     client = get_reachable_addr(child)
+
+    # Verify the suit shell command is there
+    _test_suit_command_is_there(child)
 
     def run(func):
         if child.logfile == sys.stdout:
