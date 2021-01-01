@@ -1,12 +1,11 @@
 include ../Makefile.tests_common
 
-DRIVER ?= bme680_i2c
+BOARD ?= bluepill-128kib
+PORT = /dev/ttyUSB0
+
+DRIVER ?= bme680_ic2
 
 USEMODULE += $(DRIVER)
 USEMODULE += xtimer
-
-ifeq ($(ENABLE_FP),1)
-  USEMODULE += bme680_fp
-endif
 
 include $(RIOTBASE)/Makefile.include

@@ -16,6 +16,7 @@
  *
  * @author      Dylan Laduranty <dylan.laduranty@mesotic.com>
  * @author      Gunar Schorcht <gunar@schorcht.net>
+ * @author      Jana Eisoldt <jana.eisoldt@st.ovgu.de>
  * @}
  */
 
@@ -26,6 +27,8 @@
 #include "bme680_params.h"
 #include "mutex.h"
 #include "xtimer.h"
+#define ENABLE_DEBUG 1
+#include "debug.h"
 
 #define BME680_TEST_PERIOD_US   (5 * US_PER_SEC)
 
@@ -50,7 +53,7 @@ int main(void)
          * operating the gas sensor or by another temperature sensor. Function
          * bme680_set_ambient_temp can be used at any time to change it.
          */
-        BME680_SENSOR(&dev[i]).amb_temp = 25;
+        (&dev[i])->params.ambient_temp = 25;
 
         printf("Initialize BME680 sensor %u ... ", i);
         if (bme680_init(&dev[i], &bme680_params[i]) != BME680_OK) {
@@ -68,42 +71,25 @@ int main(void)
 
     while (1)
     {
-        struct bme680_field_data data;
+        bme680_data_t data;
 
         for (unsigned i = 0; i < BME680_NUMOF; i++) {
-            /* trigger one measuerment */
-            bme680_force_measurement(&dev[i]);
-            /* get the duration for the measurement */
-            int duration = bme680_get_duration(&dev[i]);
-            /* wait for the duration */
-            xtimer_msleep(duration);
-            /* read the data */
-            int res = bme680_get_data(&dev[i], &data);
 
-            if (res == 0 && dev[i].sensor.new_fields) {
-#ifndef MODULE_BME680_FP
+            int res = bme680_read(&dev[i], &data);
+
+            if (res == BME680_OK)
+                {
                 printf("[bme680]: dev=%u, "
-                       "T = %02d.%02d degC, "
+                       "T = %02lu.%02lu degC, "
                        "P = %" PRIu32 " Pa, H = %02" PRIu32 ".%03" PRIu32 " %%",
                        i, data.temperature / 100, data.temperature % 100,
                        data.pressure,
                        data.humidity / 1000, data.humidity % 1000);
                 /* Avoid using measurements from an unstable heating setup */
-                if (data.status & BME680_GASM_VALID_MSK) {
+                if (data.gas_status == 1) {
                     printf(", G = %" PRIu32 " ohms", data.gas_resistance);
                 }
-#else
-                printf("[bme680]: dev=%u T = %.2f degC, P = %.2f Pa, H %.3f %%",
-                       i, data.temperature, data.pressure, data.humidity);
-                /* Avoid using measurements from an unstable heating setup */
-                if (data.status & BME680_GASM_VALID_MSK) {
-                    printf(", G = %.0f ohms", data.gas_resistance);
-                }
-#endif
                 printf("\n");
-            }
-            else if (res == 0) {
-                printf("[bme680]: no new data\n");
             }
             else {
                 printf("[bme680]: read data failed with reason %d\n", res);
