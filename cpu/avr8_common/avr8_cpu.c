@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2017 RWTH Aachen, Josua Arndt
  *               2018 Matthew Blue
+ *               2021 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,7 +10,7 @@
  */
 
 /**
- * @ingroup     cpu_atmega_common
+ * @ingroup     cpu_avr8_common
  * @{
  *
  * @file
@@ -20,7 +21,8 @@
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @author      Matthew Blue <matthew.blue.neuro@gmail.com>
  * @author      Francisco Acosta <francisco.acosta@inria.fr>
-
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
+ *
  * @}
  */
 
@@ -58,7 +60,8 @@
 */
 uint8_t mcusr_mirror __attribute__((section(".noinit")));
 uint8_t soft_rst __attribute__((section(".noinit")));
-uint8_t atmega_state = 0;
+uint8_t avr8_state = 0;
+
 void get_mcusr(void) __attribute__((naked, section(".init0"), used));
 
 void get_mcusr(void)
@@ -78,14 +81,14 @@ void get_mcusr(void)
 
 void cpu_init(void)
 {
-    atmega_reset_cause();
+    avr8_reset_cause();
 
     wdt_reset();   /* should not be nececessary as done in bootloader */
     wdt_disable(); /* but when used without bootloader this is needed */
 
     /* Initialize stdio before periph_init() to allow use of DEBUG() there */
 #ifdef MODULE_AVR_LIBC_EXTRA
-    atmega_stdio_init();
+    avr8_stdio_init();
 #endif
     /* Initialize peripherals for which modules are included in the makefile.*/
     /* spi_init */

@@ -277,7 +277,7 @@ static inline void _isr(tim_t tim, int chan)
     DEBUG_TIMER_PORT |= (1 << DEBUG_TIMER_PIN);
 #endif
 
-    atmega_enter_isr();
+    avr8_enter_isr();
 
     if (is_oneshot(tim, chan)) {
         *ctx[tim].mask &= ~(1 << (chan + OCIE1A));
@@ -288,7 +288,7 @@ static inline void _isr(tim_t tim, int chan)
     DEBUG_TIMER_PORT &= ~(1 << DEBUG_TIMER_PIN);
 #endif
 
-    atmega_exit_isr();
+    avr8_exit_isr();
 }
 #endif
 

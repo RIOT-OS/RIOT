@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Kaspar Schleiser <kaspar@schleiser.de>
+ *               2021 Gerson Fernando Budke <nandojve@gmail.com>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -10,9 +11,10 @@
  * @{
  *
  * @file
- * @brief   Implements common atmega libc stdio initialization
+ * @brief   Implements common avr8 libc stdio initialization
  *
  * @author  Kaspar Schleiser <kaspar@schleiser.de>
+ * @author  Gerson Fernando Budke <nandojve@gmail.com>
  *
  * @}
  */
@@ -41,7 +43,7 @@ static int _uart_getchar(FILE *stream)
     return (int)c;
 }
 
-void atmega_stdio_init(void)
+void avr8_stdio_init(void)
 {
     stdio_init();
 

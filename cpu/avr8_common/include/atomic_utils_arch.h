@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
+ *               2021 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -7,13 +8,14 @@
  */
 
 /**
- * @ingroup     cpu_atmega_common
+ * @ingroup     cpu_avr8_common
  *
  * @{
  *
  * @file
  * @brief       Implementation of fast atomic utility functions
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  */
 
 #ifndef ATOMIC_UTILS_ARCH_H

@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
  *               2020 Otto-von-Guericke-Universität Magdeburg
+ *               2021 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,7 +10,7 @@
  */
 
 /**
- * @ingroup     cpu_atmega_common
+ * @ingroup     cpu_avr8_common
  * @{
  *
  * @file
@@ -19,6 +20,7 @@
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @author      Marian Buschsieweke <marian.buschsieweke@ovgu.de>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  */
 
@@ -28,7 +30,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdint.h>
-#include "irq.h"
 #include "cpu.h"
 
 #ifdef __cplusplus
@@ -98,8 +99,8 @@ __attribute__((always_inline)) static inline void irq_restore(unsigned int _stat
  */
 __attribute__((always_inline)) static inline int irq_is_in(void)
 {
-    uint8_t state = atmega_get_state();
-    return (state & ATMEGA_STATE_FLAG_ISR);
+    uint8_t state = avr8_get_state();
+    return (state & AVR8_STATE_FLAG_ISR);
 }
 
 #ifdef __cplusplus

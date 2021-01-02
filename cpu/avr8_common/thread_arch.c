@@ -2,6 +2,7 @@
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
  *               2017 Thomas Perrot <thomas.perrot@tupi.fr>
  *               2018 RWTH Aachen, Josua Arndt <jarndt@ias.rwth-aachen.de>
+ *               2021 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -9,7 +10,7 @@
  */
 
 /**
- * @ingroup     cpu_atmega_common
+ * @ingroup     cpu_avr8_common
  * @{
  *
  * @file
@@ -18,6 +19,7 @@
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Thomas Perrot <thomas.perrot@tupi.fr>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  *
  * @}
  */
@@ -30,13 +32,13 @@
 #include "cpu.h"
 #include "board.h"
 
-static void atmega_context_save(void);
-static void atmega_context_restore(void);
-static void atmega_enter_thread_mode(void);
+static void avr8_context_save(void);
+static void avr8_context_restore(void);
+static void avr8_enter_thread_mode(void);
 
 /**
  * @brief Since AVR doesn't support direct manipulation of the program counter we
- * model a stack like it would be left by atmega_context_save().
+ * model a stack like it would be left by avr8_context_save().
  * The resulting layout in memory is the following:
  * ---------------thread_t (not created by thread_stack_init) ----------
  * local variables (a temporary value and the stackpointer)
@@ -48,7 +50,7 @@ static void atmega_enter_thread_mode(void);
  * -----------------------------------------------------------------------
  * a 16 Bit pointer to task_func
  * this is placed exactly at the place where the program counter would be
- * stored normally and thus can be returned to when atmega_context_restore()
+ * stored normally and thus can be returned to when avr8_context_restore()
  * has been run
  * (Optional 17 bit (bit is set to zero) for devices with > 128kb FLASH)
  * -----------------------------------------------------------------------
@@ -61,7 +63,7 @@ static void atmega_enter_thread_mode(void);
  * r26 - r31
  * -----------------------------------------------------------------------
  *
- * After the invocation of atmega_context_restore() the pointer to task_func is
+ * After the invocation of avr8_context_restore() the pointer to task_func is
  * on top of the stack and can be returned to. This way we can actually place
  * it inside of the program counter of the MCU.
  * if task_func returns sched_task_exit gets popped into the PC
@@ -198,7 +200,7 @@ void thread_stack_print(void)
 void cpu_switch_context_exit(void)
 {
     sched_run();
-    atmega_enter_thread_mode();
+    avr8_enter_thread_mode();
 }
 
 #define STACK_POINTER  ((char *)AVR_STACK_POINTER_REG)
@@ -210,7 +212,7 @@ extern char *__brkval;
 /**
  * @brief Set the MCU into Thread-Mode and load the initial task from the stack and run it
  */
-void NORETURN atmega_enter_thread_mode(void)
+void NORETURN avr8_enter_thread_mode(void)
 {
     irq_enable();
 
@@ -226,7 +228,7 @@ void NORETURN atmega_enter_thread_mode(void)
         __brkval = __malloc_heap_start;
     }
 
-    atmega_context_restore();
+    avr8_context_restore();
     __asm__ volatile ("ret");
 
     UNREACHABLE();
@@ -235,9 +237,9 @@ void NORETURN atmega_enter_thread_mode(void)
 void thread_yield_higher(void)
 {
     if (irq_is_in() == 0) {
-        atmega_context_save();
+        avr8_context_save();
         sched_run();
-        atmega_context_restore();
+        avr8_context_restore();
         __asm__ volatile ("ret");
     }
     else {
@@ -245,20 +247,20 @@ void thread_yield_higher(void)
     }
 }
 
-void atmega_exit_isr(void)
+void avr8_exit_isr(void)
 {
-    atmega_state &= ~ATMEGA_STATE_FLAG_ISR;
-    /* Force access to atmega_state to take place */
+    avr8_state &= ~AVR8_STATE_FLAG_ISR;
+    /* Force access to avr8_state to take place */
     __asm__ volatile ("" : : : "memory");
     if (sched_context_switch_request) {
-        atmega_context_save();
+        avr8_context_save();
         sched_run();
-        atmega_context_restore();
+        avr8_context_restore();
         __asm__ volatile ("reti");
     }
 }
 
-__attribute__((always_inline)) static inline void atmega_context_save(void)
+__attribute__((always_inline)) static inline void avr8_context_save(void)
 {
     __asm__ volatile (
         "push __tmp_reg__                    \n\t"
@@ -313,7 +315,7 @@ __attribute__((always_inline)) static inline void atmega_context_save(void)
         "st   x+, __tmp_reg__                \n\t");
 }
 
-__attribute__((always_inline)) static inline void atmega_context_restore(void)
+__attribute__((always_inline)) static inline void avr8_context_restore(void)
 {
     __asm__ volatile (
         "lds  r26, sched_active_thread       \n\t"

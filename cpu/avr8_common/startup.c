@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014 Freie Universität Berlin, Hinnerk van Bruinehsen
+ *               2021 Gerson Fernando Budke
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -7,7 +8,7 @@
  */
 
 /**
- * @ingroup     cpu_atmega_common
+ * @ingroup     cpu_avr8_common
  * @{
  *
  * @file
@@ -16,6 +17,7 @@
  * @author      Hinnerk van Bruinehsen <h.v.bruinehsen@fu-berlin.de>
  * @author      Josua Arndt <jarndt@ias.rwth-aachen.de>
  * @author      Steffen Robertz <steffen.robertz@rwth-aachen.de>
+ * @author      Gerson Fernando Budke <nandojve@gmail.com>
  * @}
  */
 

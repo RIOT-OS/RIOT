@@ -37,7 +37,7 @@
 extern uint8_t mcusr_mirror;
 extern uint8_t soft_rst;
 
-void atmega_reset_cause(void)
+void avr8_reset_cause(void)
 {
     if (mcusr_mirror & (1 << PORF)) {
         DEBUG("Power-on reset.\n");
@@ -75,7 +75,7 @@ void atmega_reset_cause(void)
  */
 ISR(BADISR_vect)
 {
-    atmega_reset_cause();
+    avr8_reset_cause();
 
 #if defined (CPU_ATMEGA256RFR2)
     printf("IRQ_STATUS %#02x\nIRQ_STATUS1 %#02x\n",
@@ -97,8 +97,8 @@ ISR(BADISR_vect)
 #if defined(CPU_ATMEGA128RFA1) || defined (CPU_ATMEGA256RFR2)
 ISR(BAT_LOW_vect, ISR_BLOCK)
 {
-    atmega_enter_isr();
+    avr8_enter_isr();
     DEBUG("BAT_LOW\n");
-    atmega_exit_isr();
+    avr8_exit_isr();
 }
 #endif
