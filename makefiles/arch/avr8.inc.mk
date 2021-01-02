@@ -2,7 +2,14 @@
 TARGET_ARCH_AVR ?= avr
 TARGET_ARCH ?= $(TARGET_ARCH_AVR)
 
-CFLAGS_CPU   = -mmcu=$(CPU) $(CFLAGS_FPU)
+ifeq (atxmega,$(CPU))
+  ifeq (,$(CPU_MODEL))
+    $(error CPU_MODEL must have been defined by the board Makefile.features)
+  endif
+  CFLAGS_CPU ?= -mmcu=$(CPU_MODEL) $(CFLAGS_FPU)
+else
+  CFLAGS_CPU ?= -mmcu=$(CPU) $(CFLAGS_FPU)
+endif
 CFLAGS_LINK  = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
 CFLAGS_DBG  ?= -ggdb -g3
 CFLAGS_OPT  ?= -Os
