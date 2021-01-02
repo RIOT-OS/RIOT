@@ -174,6 +174,11 @@ static inline void __attribute__((always_inline)) cpu_print_last_instruction(voi
  */
 void atmega_stdio_init(void);
 
+/**
+ * @brief   Print reset cause
+ */
+void atmega_reset_cause(void);
+
 #ifdef __cplusplus
 }
 #endif

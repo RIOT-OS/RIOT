@@ -76,34 +76,9 @@ void get_mcusr(void)
 #endif
 }
 
-void _reset_cause(void)
-{
-    if (mcusr_mirror & (1 << PORF)) {
-        DEBUG("Power-on reset.\n");
-    }
-    if (mcusr_mirror & (1 << EXTRF)) {
-        DEBUG("External reset!\n");
-    }
-    if (mcusr_mirror & (1 << BORF)) {
-        DEBUG("Brownout reset!\n");
-    }
-    if (mcusr_mirror & (1 << WDRF)) {
-        if (soft_rst & 0xAA) {
-            DEBUG("Software reset!\n");
-        } else {
-            DEBUG("Watchdog reset!\n");
-        }
-    }
-#if !defined (CPU_ATMEGA328P)
-    if (mcusr_mirror & (1 << JTRF)) {
-        DEBUG("JTAG reset!\n");
-    }
-#endif
-}
-
 void cpu_init(void)
 {
-    _reset_cause();
+    atmega_reset_cause();
 
     wdt_reset();   /* should not be nececessary as done in bootloader */
     wdt_disable(); /* but when used without bootloader this is needed */
@@ -140,44 +115,3 @@ void heap_stats(void)
     printf("heap: %d (used %d, free %d) [bytes]\n",
            heap_size, heap_size - free, free);
 }
-
-/* This is a vector which is aliased to __vector_default,
- * the vector executed when an ISR fires with no accompanying
- * ISR handler. This may be used along with the ISR() macro to
- * create a catch-all for undefined but used ISRs for debugging
- * purposes.
- * SCIRQS – Symbol Counter Interrupt Status Register
- * BATMON – Battery Monitor Control and Status Register
- * IRQ_STATUS /1 – Transceiver Interrupt Status Register
- * EIFR – External Interrupt Flag Register
- * PCIFR – Pin Change Interrupt Flag Register
- */
-ISR(BADISR_vect)
-{
-    _reset_cause();
-
-#if defined (CPU_ATMEGA256RFR2)
-    printf("IRQ_STATUS %#02x\nIRQ_STATUS1 %#02x\n",
-            (unsigned int)IRQ_STATUS, (unsigned int)IRQ_STATUS1);
-
-    printf("SCIRQS %#02x\nBATMON %#02x\n", (unsigned int)SCIRQS, (unsigned int)BATMON);
-
-    printf("EIFR %#02x\nPCIFR %#02x\n", (unsigned int)EIFR, (unsigned int)PCIFR);
-#endif
-#ifdef LED_PANIC
-    /* Use LED light to signal ERROR. */
-    LED_PANIC;
-#endif
-
-    core_panic(PANIC_GENERAL_ERROR, PSTR("FATAL ERROR: BADISR_vect called, unprocessed Interrupt.\n"
-                  "STOP Execution.\n"));
-}
-
-#if defined(CPU_ATMEGA128RFA1) || defined (CPU_ATMEGA256RFR2)
-ISR(BAT_LOW_vect, ISR_BLOCK)
-{
-    atmega_enter_isr();
-    DEBUG("BAT_LOW\n");
-    atmega_exit_isr();
-}
-#endif
