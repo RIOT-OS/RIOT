@@ -8,6 +8,7 @@ BOARD_BLACKLIST :=  arduino-duemilanove \
                     arduino-uno \
                     atmega256rfr2-xpro \
                     atmega328p \
+                    atmega328p-xplained-mini \
                     derfmega128 \
                     derfmega256 \
                     f4vi1 \

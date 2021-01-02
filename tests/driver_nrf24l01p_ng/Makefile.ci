@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega1284p \
     atmega128rfa1 \
     atmega328p \
+    atmega328p-xplained-mini \
     bluepill-stm32f030c8 \
     derfmega128 \
     i-nucleo-lrwan1 \

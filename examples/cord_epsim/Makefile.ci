@@ -5,6 +5,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega328p \
+    atmega328p-xplained-mini \
     atxmega-a1u-xpro \
     bluepill-stm32f030c8 \
     hifive1 \

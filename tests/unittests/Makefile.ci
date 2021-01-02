@@ -13,6 +13,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-zero \
     atmega256rfr2-xpro \
     atmega328p \
+    atmega328p-xplained-mini \
     b-l072z-lrwan1 \
     blackpill \
     blackpill-128kib \

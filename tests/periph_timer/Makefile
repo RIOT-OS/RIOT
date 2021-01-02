@@ -13,6 +13,7 @@ BOARDS_TIMER_250kHz := \
     arduino-uno \
     atmega256rfr2-xpro \
     atmega328p \
+    atmega328p-xplained-mini \
     #
 
 BOARDS_TIMER_32kHz := \
