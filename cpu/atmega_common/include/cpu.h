@@ -35,6 +35,7 @@
 
 #include <avr/interrupt.h>
 #include "cpu_conf.h"
+#include "cpu_clock.h"
 #include "sched.h"
 #include "thread.h"
 
@@ -166,37 +167,6 @@ static inline void __attribute__((always_inline)) cpu_print_last_instruction(voi
                       : "=g" (lo));
     ptr = hi << 8 | lo;
     printf("Stack Pointer: 0x%04x\n", ptr);
-}
-
-/**
- * @brief   ATmega system clock prescaler settings
- *
- * Some CPUs may not support the highest prescaler settings
- */
-enum {
-    CPU_ATMEGA_CLK_SCALE_DIV1   = 0,
-    CPU_ATMEGA_CLK_SCALE_DIV2   = 1,
-    CPU_ATMEGA_CLK_SCALE_DIV4   = 2,
-    CPU_ATMEGA_CLK_SCALE_DIV8   = 3,
-    CPU_ATMEGA_CLK_SCALE_DIV16  = 4,
-    CPU_ATMEGA_CLK_SCALE_DIV32  = 5,
-    CPU_ATMEGA_CLK_SCALE_DIV64  = 6,
-    CPU_ATMEGA_CLK_SCALE_DIV128 = 7,
-    CPU_ATMEGA_CLK_SCALE_DIV256 = 8,
-    CPU_ATMEGA_CLK_SCALE_DIV512 = 9,
-};
-
-/**
- * @brief   Initializes system clock prescaler
- */
-static inline void atmega_set_prescaler(uint8_t clk_scale)
-{
-    /* Enable clock change */
-    /* Must be assignment to set all other bits to zero, see datasheet */
-    CLKPR = (1 << CLKPCE);
-
-    /* Write clock within 4 cycles */
-    CLKPR = clk_scale;
 }
 
 /**
