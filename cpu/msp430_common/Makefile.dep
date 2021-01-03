@@ -6,3 +6,6 @@ DEFAULT_MODULE += newlib
 ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += newlib_nano
 endif
+
+# Make calls to malloc and friends thread-safe
+USEMODULE += malloc_thread_safe
