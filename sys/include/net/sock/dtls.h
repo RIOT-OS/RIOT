@@ -907,6 +907,14 @@ ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
  * @note    When blocking, we will need an extra thread to call
  *          @ref sock_dtls_recv() function to handle the incoming handshake
  *          messages.
+ *          An example for a blocking handshake is:
+ *              1. Create an empty @ref sock_dtls_session_t object.
+ *              2. Set the UDP endpoint of the peer you want to connect to in the
+ *                 session object with @ref sock_dtls_session_set_udp_ep().
+ *              3. Call @ref sock_dtls_send() with a timeout greater than 0.
+ *                 The send function blocks until the handshake completes or the
+ *                 timeout expires. If the handshake was successful the data has
+ *                 been sent.
  *
  * @return The number of bytes sent on success
  * @return  -ENOTCONN, if `timeout == 0` and no existing session exists with
