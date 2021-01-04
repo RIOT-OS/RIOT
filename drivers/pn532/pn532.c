@@ -21,6 +21,7 @@
 #include <string.h>
 
 #include "assert.h"
+#include "kernel_defines.h"
 #include "xtimer.h"
 #include "mutex.h"
 #include "pn532.h"
@@ -121,7 +122,7 @@ int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode)
     gpio_set(dev->conf->reset);
     dev->mode = mode;
     if (mode == PN532_SPI) {
-#ifdef PN532_SUPPORT_SPI
+#if IS_USED(MODULE_PN532_SPI)
         /* we handle the CS line manually... */
         gpio_init(dev->conf->nss, GPIO_OUT);
         gpio_set(dev->conf->nss);
@@ -146,8 +147,8 @@ static uint8_t chksum(uint8_t *b, unsigned len)
     return c;
 }
 
-#ifdef PN532_SUPPORT_SPI
-static void reverse(char *buff, unsigned len)
+#if IS_USED(MODULE_PN532_SPI)
+static void reverse(uint8_t *buff, unsigned len)
 {
     while (len--) {
         buff[len] = (buff[len] & 0xF0) >> 4 | (buff[len] & 0x0F) << 4;
@@ -165,7 +166,7 @@ static int _write(const pn532_t *dev, uint8_t *buff, unsigned len)
     (void)len;
 
     switch (dev->mode) {
-#ifdef PN532_SUPPORT_I2C
+#if IS_USED(MODULE_PN532_I2C)
     case PN532_I2C:
         i2c_acquire(dev->conf->i2c);
         ret = i2c_write_bytes(dev->conf->i2c, PN532_I2C_ADDRESS, buff, len, 0);
@@ -175,7 +176,7 @@ static int _write(const pn532_t *dev, uint8_t *buff, unsigned len)
         i2c_release(dev->conf->i2c);
         break;
 #endif
-#ifdef PN532_SUPPORT_SPI
+#if IS_USED(MODULE_PN532_SPI)
     case PN532_SPI:
         spi_acquire(dev->conf->spi, SPI_CS_UNDEF, SPI_MODE, SPI_CLK);
         gpio_clear(dev->conf->nss);
@@ -204,7 +205,7 @@ static int _read(const pn532_t *dev, uint8_t *buff, unsigned len)
     (void)len;
 
     switch (dev->mode) {
-#ifdef PN532_SUPPORT_I2C
+#if IS_USED(MODULE_PN532_I2C)
     case PN532_I2C:
         i2c_acquire(dev->conf->i2c);
         /* len+1 for RDY after read is accepted */
@@ -215,7 +216,7 @@ static int _read(const pn532_t *dev, uint8_t *buff, unsigned len)
         i2c_release(dev->conf->i2c);
         break;
 #endif
-#ifdef PN532_SUPPORT_SPI
+#if IS_USED(MODULE_PN532_SPI)
     case PN532_SPI:
         spi_acquire(dev->conf->spi, SPI_CS_UNDEF, SPI_MODE, SPI_CLK);
         gpio_clear(dev->conf->nss);
