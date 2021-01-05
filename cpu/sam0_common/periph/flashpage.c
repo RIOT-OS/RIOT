@@ -31,6 +31,7 @@
 
 #include "cpu.h"
 #include "periph/flashpage.h"
+#include "unaligned.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -158,9 +159,13 @@ static void _cmd_write_page(void)
 
 /* We have to write whole words, but writing 0xFF is basically a no-op
  * so fill the unaligned bytes with 0xFF to get a whole extra word.
+ * To support writes of data with less than 4 bytes, an offset needs
+ * to be supplied.
  */
-static uint32_t unaligned_pad_start(const void *_data, uint8_t len)
+static uint32_t unaligned_pad_start(const void *_data, uint8_t len, uint8_t offset)
 {
+    assert((4 - offset) >= len);
+
     const uint8_t *data = _data;
     union {
         uint32_t u32;
@@ -169,13 +174,13 @@ static uint32_t unaligned_pad_start(const void *_data, uint8_t len)
 
     switch (len) {
         case 3:
-            buffer.u8[1] = *data++;
+            buffer.u8[offset + len - 3] = *data++;
             /* fall-through */
         case 2:
-            buffer.u8[2] = *data++;
+            buffer.u8[offset + len - 2] = *data++;
             /* fall-through */
         case 1:
-            buffer.u8[3] = *data++;
+            buffer.u8[offset + len - 1] = *data++;
     }
 
     return buffer.u32;
@@ -209,12 +214,14 @@ static uint32_t unaligned_pad_end(const void *_data, uint8_t len)
 static void _write_page(void* dst, const void *data, size_t len, void (*cmd_write)(void))
 {
     /* set bytes in the first, unaligned word */
-    uint8_t unaligned_start = (4 - ((uintptr_t)dst & 0x3)) & 0x3;
-    len -= unaligned_start;
+    uint8_t offset_unaligned_start = (uintptr_t)dst & 0x3;
+    /* use MIN to support short data sizes below 3 bytes */
+    uint8_t len_unaligned_start = MIN((4 - offset_unaligned_start) & 0x3, len);
+    len -= len_unaligned_start;
 
     /* set bytes in the last, unaligned word */
-    uint8_t unaligned_end = len & 0x3;
-    len -= unaligned_end;
+    uint8_t len_unaligned_end = len & 0x3;
+    len -= len_unaligned_end;
 
     /* word align destination address */
     uint32_t *dst32 = (void*)((uintptr_t)dst & ~0x3);
@@ -223,21 +230,26 @@ static void _write_page(void* dst, const void *data, size_t len, void (*cmd_writ
     _cmd_clear_page_buffer();
 
     /* write the first, unaligned bytes */
-    if (unaligned_start) {
-        *dst32++ = unaligned_pad_start(data, unaligned_start);
-        data = (uint8_t*)data + unaligned_start;
+    if (len_unaligned_start) {
+        *dst32++ = unaligned_pad_start(data, len_unaligned_start,
+                offset_unaligned_start);
+        data = (void *)((uintptr_t)data + len_unaligned_start);
     }
 
     /* copy whole words */
-    const uint32_t *data32 = data;
     while (len) {
-        *dst32++ = *data32++;
+        /* due to unknown input data alignment and the conditional
+         * shift applied above, data might not be aligned to a 4 byte
+         * boundary at this point
+         */
+        *dst32++ = unaligned_get_u32(data);
+        data = (void *)((uintptr_t)data + sizeof(uint32_t));
         len -= sizeof(uint32_t);
     }
 
     /* write the last, unaligned bytes */
-    if (unaligned_end) {
-        *dst32 = unaligned_pad_end(data32, unaligned_end);
+    if (len_unaligned_end) {
+        *dst32 = unaligned_pad_end(data, len_unaligned_end);
     }
 
     cmd_write();
