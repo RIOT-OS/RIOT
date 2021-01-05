@@ -225,7 +225,6 @@ Reason for removal:
 - Unused since [9fb2f541baca469e34fa01b004d6f19385700ce9]
 
 ### pkg/nordic_softdevice_ble [35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34]
-
 Author(s):
 - Hauke Petersen <hauke.petersen@fu-berlin.de>
 - Kaspar Schleiser <kaspar@schleiser.de>
@@ -236,7 +235,6 @@ Reason for removal:
 - Outdated, unmaintained and no longer working
 
 ### gnrc_pktbuf_replace_snip() [72821a502f073006643cb4ef7815fc8c42563ce6]
-
 Author(s):
 - Joakim Nohlgård <joakim.nohlgard@eistec.se>
 - Martine S. Lenders <m.lenders@fu-berlin.de>
@@ -244,6 +242,25 @@ Author(s):
 Reason for removal:
 - Unused, untested and no longer needed
 
+### sys/irq_handler [a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2]
+Author(s):
+- Gunar Schorcht <gunar@schorcht.net>
+
+Reason for removal:
+- Provides some feature as `sys/event_thread`
+- Has been deprecated directly in the first release it was provided
+
+### boards/slwstk6220a [cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9]
+Author(s):
+- Hauke Petersen <hauke.petersen@fu-berlin.de>
+- Bas Stottelaar <basstottelaar@gmail.com>
+
+Reason for removal:
+- The old implementation of the SLWSTK6220A based on `cpu/ezr32wg` did not use
+  the Gecko SDK, that other EFM32-based boards do use
+- The old implementation had limited peripherals supported
+- New implementation (with the same name) that is based on `cpu/efm32` was
+  added in commit [fe941ac9fe3f81c0f08ff3b8564cf439639abcda]
 
 [cdc252ab7bd4161cc046bf93a3e55995704b24d4]: https://github.com/RIOT-OS/RIOT/commit/cdc252ab7bd4161cc046bf93a3e55995704b24d4
 [ed3887ac5c1e95308c2827bce3cdca8b0f146c22]: https://github.com/RIOT-OS/RIOT/commit/ed3887ac5c1e95308c2827bce3cdca8b0f146c22
@@ -270,11 +287,6 @@ Reason for removal:
 [9fb2f541baca469e34fa01b004d6f19385700ce9]: https://github.com/RIOT-OS/RIOT/commit/9fb2f541baca469e34fa01b004d6f19385700ce9
 [35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34]: https://github.com/RIOT-OS/RIOT/commit/35b6ccedf31f10a5f8e4f97609ad5b10c28bdc34
 [72821a502f073006643cb4ef7815fc8c42563ce6]: https://github.com/RIOT-OS/RIOT/commit/72821a502f073006643cb4ef7815fc8c42563ce6
-
-### sys/irq_handler [a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2]
-Author(s):
-- Gunar Schorcht <gunar@schorcht.net>
-
-Reason for removal:
-- Provides some feature as `sys/event_thread`
-- Has been deprecated directly in the first release it was provided
+[a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2]: https://github.com/RIOT-OS/RIOT/commit/a2dd6f90e51ca9edef643ba72bd1fd18113cf0d2
+[cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9]: https://github.com/RIOT-OS/RIOT/commit/cab1ea66b49e3c72e2827c8686c09d84ae3ef9a9
+[fe941ac9fe3f81c0f08ff3b8564cf439639abcda]: https://github.com/RIOT-OS/RIOT/commit/fe941ac9fe3f81c0f08ff3b8564cf439639abcda
