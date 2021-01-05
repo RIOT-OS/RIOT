@@ -1,0 +1,19 @@
+:name: STM32F4 Discovery
+:description: This script runs the stm32f4_discovery on RIOT.
+
+using sysbus
+$name?="STM32F4_Discovery"
+mach create $name
+machine LoadPlatformDescription @platforms/boards/stm32f4_discovery-kit.repl
+
+cpu PerformanceInMips 125
+
+showAnalyzer sysbus.uart2
+
+
+macro reset
+"""
+    sysbus LoadELF $image_file
+"""
+
+runMacro $reset
