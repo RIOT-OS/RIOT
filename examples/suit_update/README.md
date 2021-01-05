@@ -69,7 +69,7 @@ Table of contents:
 ### Ble
 [prerequisites-ble]: #Ble
 
-Make sure you fullfil the "Prerequisites" and "Preparing Linux" section in [README.ipv6-over-ble.md](../../pkg/nimble/README.ipv6-over-ble.md).
+Make sure you fulfill the "Prerequisites" and "Preparing Linux" section in [README.ipv6-over-ble.md](../../pkg/nimble/README.ipv6-over-ble.md).
 
 ## Setup
 [setup]: #Setup
