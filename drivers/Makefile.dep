@@ -127,10 +127,6 @@ ifneq (,$(filter sht1%,$(USEMODULE)))
   USEMODULE += sht1x
 endif
 
-ifneq (,$(filter si1133,$(USEMODULE)))
-  USEMODULE += si1133
-endif
-
 ifneq (,$(filter si114%,$(USEMODULE)))
   USEMODULE += si114x
 endif
