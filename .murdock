@@ -16,7 +16,8 @@ tests/driver_b* tests/driver_ccs811 tests/driver_ccs811_full tests/driver_dcf77
 tests/driver_dfplayer tests/driver_dht tests/driver_ds18 tests/driver_ds75lx
 tests/driver_ds1307 tests/driver_ds3231 tests/driver_ds3234 tests/driver_dsp0401
 tests/driver_dynamixel tests/driver_edbg_eui tests/driver_f* tests/driver_g*
-tests/driver_h* tests/driver_i* tests/driver_j* tests/driver_my9221"}
+tests/driver_h* tests/driver_i* tests/driver_j* tests/driver_my9221
+tests/driver_o* tests/driver_p* tests/driver_q* tests/driver_r*"}
 : ${TEST_KCONFIG_native:="examples/hello-world tests/periph_*"}
 
 export RIOT_CI_BUILD=1

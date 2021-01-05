@@ -1,0 +1,8 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+
+# select if you want to build the SPI or the I2C version of the driver
+CONFIG_MODULE_PN532_I2C=y
+# CONFIG_MODULE_PN532_SPI=y
+
+CONFIG_MODULE_XTIMER=y
