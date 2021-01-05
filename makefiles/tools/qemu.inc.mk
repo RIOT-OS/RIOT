@@ -1,14 +1,17 @@
-EMULATOR ?= qemu-system-arm
-EMULATOR_MACHINE ?= $(BOARD)
-EMULATOR_MONITOR_PORT ?= 45454
-EMULATOR_MONITOR_FLAGS ?= telnet::$(EMULATOR_MONITOR_PORT),server,nowait
+QEMU ?= qemu-system-arm
+QEMU_MACHINE ?= $(BOARD)
+QEMU_MONITOR_PORT ?= 45454
+QEMU_MONITOR_FLAGS ?= telnet::$(QEMU_MONITOR_PORT),server,nowait
 FLASHFILE ?= $(ELFFILE)
 
 QEMU_SERIAL_TCP_PORT ?= 5555
-EMULATOR_FLAGS = -machine $(EMULATOR_MACHINE) -device loader,file=$(ELFFILE) \
-                 -serial telnet::$(QEMU_SERIAL_TCP_PORT),server,nowait,nodelay \
-                 -monitor $(EMULATOR_MONITOR_FLAGS) \
-                 -nographic
+
+# Configure emulator variables
+EMULATOR ?= $(QEMU)
+EMULATOR_FLAGS ?= -machine $(QEMU_MACHINE) -device loader,file=$(ELFFILE) \
+                  -serial telnet::$(QEMU_SERIAL_TCP_PORT),server,nowait,nodelay \
+                  -monitor $(QEMU_MONITOR_FLAGS) \
+                  -nographic
 
 # Configure the qemu terminal access
 EMULATOR_SERIAL_PORT ?= /tmp/riot_$(APPLICATION)_$(BOARD)_uart
