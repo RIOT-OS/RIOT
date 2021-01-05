@@ -4,6 +4,36 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
+if TEST_KCONFIG
+
+choice
+    bool "RN2XX3 LoRa module"
+    optional
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_UART
+
+config MODULE_RN2483
+    bool "RN2483"
+    select MODULE_RN2XX3
+
+config MODULE_RN2903
+    bool "RN2903"
+    select MODULE_RN2XX3
+
+endchoice
+
+config MODULE_RN2XX3
+    bool
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_UART
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_UART
+    select MODULE_FMT
+    select MODULE_XTIMER
+
+endif # TEST_KCONFIG
+
 menuconfig KCONFIG_USEMODULE_RN2XX3
     bool "Configure RN2XX3 driver"
     depends on USEMODULE_RN2XX3
