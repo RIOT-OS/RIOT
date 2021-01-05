@@ -1,0 +1,36 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if TEST_KCONFIG
+
+choice
+    bool "SHT10/SHT11/SHT15 Humidity and Temperature Sensor"
+    optional
+    depends on HAS_PERIPH_GPIO
+
+config MODULE_SHT10
+    bool "SHT10"
+    select MODULE_SHT1X
+
+config MODULE_SHT11
+    bool "SHT11"
+    select MODULE_SHT1X
+
+config MODULE_SHT15
+    bool "SHT15"
+    select MODULE_SHT1X
+
+endchoice
+
+config MODULE_SHT1X
+    bool
+    depends on HAS_PERIPH_GPIO
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_GPIO
+    select MODULE_XTIMER
+
+endif # TEST_KCONFIG
