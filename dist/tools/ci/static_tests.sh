@@ -12,6 +12,31 @@
 
 . $(dirname "$0")/github_annotate.sh
 
+declare -A DEPS
+
+DEPS["./dist/tools/licenses/check.sh"]="head pcregrep"
+DEPS["./dist/tools/doccheck/check.sh"]="doxygen tput"
+DEPS["./dist/tools/cppcheck/check.sh"]="cppcheck"
+DEPS["./dist/tools/vera++/check.sh"]="vera++"
+DEPS["./dist/tools/coccinelle/check.sh"]="spatch"
+DEPS["./dist/tools/flake8/check.sh"]="python3 flake8"
+DEPS["./dist/tools/codespell/check.sh"]="codespell"
+DEPS["./dist/tools/uncrustify/uncrustify.sh"]="uncrustify"
+
+if ! command -v git 2>&1 1>/dev/null; then
+    echo -n "Required command 'git' for all static tests not found in PATH "
+    print_warning
+    set_result 1
+    exit 1
+fi
+
+function print_warning {
+    local YELLOW="\033[0;33m"
+    local NO_COLOUR="\033[0m"
+
+    echo -e "${YELLOW}•${NO_COLOUR}"
+}
+
 function print_result {
     local RED="\033[0;31m"
     local GREEN="\033[0;32m"
@@ -34,6 +59,15 @@ set_result() {
 }
 
 function run {
+    for dep in ${DEPS["$1"]}; do
+        if ! command -v ${dep} 2>&1 1>/dev/null; then
+            echo -n "Required command '${dep}' for '$*' not found in PATH "
+            print_warning
+            set_result 1
+            return 1
+        fi
+    done
+
     echo -n "Running \"$*\" "
     OUT=$("$@" 2>&1)
     NEW_RESULT=$?
