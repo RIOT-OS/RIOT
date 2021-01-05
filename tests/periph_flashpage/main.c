@@ -26,6 +26,7 @@
 #include "od.h"
 #include "shell.h"
 #include "periph/flashpage.h"
+#include "unaligned.h"
 
 #define LINE_LEN            (16)
 
@@ -552,42 +553,57 @@ static int cmd_dump_config(int argc, char **argv)
 
 static int cmd_test_config(int argc, char **argv)
 {
+    /* This test is sam0 specific and also tests
+     * the unaligned writes for the sam0 flashpage
+     * driver implementation
+     */
+
     (void) argc;
     (void) argv;
 
     const uint16_t single_data = 0x1234;
     const uint8_t test_data[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
-    uint32_t dst = FLASH_USER_PAGE_AUX_SIZE - (sizeof(test_data) + 2);
+
+    assert(((int32_t)FLASH_USER_PAGE_AUX_SIZE - (int32_t)(sizeof(test_data) + 2 + 3)) > 0);
 
     puts("[START]");
 
-    sam0_flashpage_aux_reset(NULL);
+    for (uint32_t dst_offset = 0; dst_offset < 4; dst_offset++) {
+        /* destination base at 4 byte aligned address */
+        uint32_t dst = (uint32_t)(FLASH_USER_PAGE_AUX_SIZE
+                - (sizeof(test_data) + 2 + 3)) & ~((uint32_t)0x3);
+        /* add data destination offset */
+        dst += dst_offset;
 
-    /* check if the AUX page has been cleared */
-    for (uint32_t i = 0; i < FLASH_USER_PAGE_AUX_SIZE; ++i) {
-        if (*(uint8_t*)sam0_flashpage_aux_get(i) != 0xFF) {
-            printf("user page not cleared at offset 0x%"PRIx32"\n", i);
+        /* reset aux page */
+        sam0_flashpage_aux_reset(NULL);
+
+        /* check if the AUX page has been cleared */
+        for (uint32_t i = 0; i < FLASH_USER_PAGE_AUX_SIZE; ++i) {
+            if (*(uint8_t*)sam0_flashpage_aux_get(i) != 0xFF) {
+                printf("dst_offset=%"PRIu32": user page not cleared at offset 0x%"PRIx32"\n", dst_offset, i);
+                return -1;
+            }
+        }
+
+        /* write test data */
+        sam0_flashpage_aux_write(dst, test_data, sizeof(test_data));
+
+        /* write single half-word */
+        sam0_flashpage_aux_write(dst + sizeof(test_data), &single_data, sizeof(single_data));
+
+        /* check if half-word was written correctly */
+        uint16_t data_in = unaligned_get_u16(sam0_flashpage_aux_get(dst + sizeof(test_data)));
+        if (data_in != single_data) {
+            printf("dst_offset=%"PRIu32": %x != %x, offset = 0x%"PRIx32"\n", dst_offset, single_data, data_in, dst + sizeof(test_data));
             return -1;
         }
-    }
 
-    /* write test data */
-    sam0_flashpage_aux_write(dst, test_data, sizeof(test_data));
-
-    /* write single half-word */
-    sam0_flashpage_aux_write(dst + sizeof(test_data), &single_data, sizeof(single_data));
-
-    /* check if half-word was written correctly */
-    uint16_t data_in = *(uint16_t*)sam0_flashpage_aux_get(dst + sizeof(test_data));
-    if (data_in != single_data) {
-        printf("%x != %x, offset = 0x%"PRIx32"\n", single_data, data_in, dst + sizeof(test_data));
-        return -1;
-    }
-
-    /* check if test data was written correctly */
-    if (memcmp(sam0_flashpage_aux_get(dst), test_data, sizeof(test_data))) {
-        printf("write test_data failed, offset = 0x%"PRIx32"\n", dst);
-        return -1;
+        /* check if test data was written correctly */
+        if (memcmp(sam0_flashpage_aux_get(dst), test_data, sizeof(test_data))) {
+            printf("dst_offset=%"PRIu32": write test_data failed, offset = 0x%"PRIx32"\n", dst_offset, dst);
+            return -1;
+        }
     }
 
     puts("[SUCCESS]");
