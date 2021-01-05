@@ -15,6 +15,9 @@
  * definition of constant arrays to be spread over multiple C compilation
  * units. These arrays are called "cross-file arrays" or short xfa.
  *
+ * @experimental This API is considered experimental and will probably change
+ *               without notice!
+ *
  * @file
  * @author      Kaspar Schleiser <kaspar@schleiser.de>
  */
