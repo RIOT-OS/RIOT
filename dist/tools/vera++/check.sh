@@ -25,10 +25,5 @@ fi
 
 VERA_CMD="vera++ --root $CURDIR --exclusions $CURDIR/exclude $_QUIET"
 
-if [ $WARNING -ne 0 ]; then
-    echo "$FILES" | $VERA_CMD --profile riot \
-        --parameters $CURDIR/profiles/riot_params.txt -w | sed 's/^/warning: /g'
-fi
-
-echo "$FILES" | $VERA_CMD --profile riot_force \
-    --parameters $CURDIR/profiles/riot_force_params.txt -w
+echo "$FILES" | $VERA_CMD --profile riot \
+    --parameters $CURDIR/profiles/riot_params.txt -w
