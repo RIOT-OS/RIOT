@@ -49,6 +49,7 @@ menu "Peripherals drivers"
 rsource "periph_common/Kconfig"
 rsource "rtt_rtc/Kconfig"
 rsource "soft_spi/Kconfig"
+rsource "soft_uart/Kconfig"
 endmenu # Peripherals drivers
 
 menu "Sensor Device Drivers"
