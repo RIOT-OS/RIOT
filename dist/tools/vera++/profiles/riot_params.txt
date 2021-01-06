@@ -1,1 +1,3 @@
-max-line-length=80
+max-line-length=100
+max-line-length-warn=80
+max-consecutive-empty-lines=1

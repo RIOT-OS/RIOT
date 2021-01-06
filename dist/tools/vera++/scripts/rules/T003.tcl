@@ -1,23 +1,32 @@
 #!/usr/bin/tclsh
 # Some keywords should be followed by a single space
+# MOD: This script has been modified to ignore C++ keywords in C files.
 
-set keywords {
+set c_keywords {
     case
-    class
-    delete
     enum
-    explicit
     extern
     goto
-    new
     struct
     union
+}
+
+set cpp_keywords {
+    class
+    delete
+    explicit
+    new
     using
 }
 
-proc isKeyword {s} {
-    global keywords
-    return [expr [lsearch $keywords $s] != -1]
+proc isCKeyword {s} {
+    global c_keywords
+    return [expr [lsearch $c_keywords $s] != -1]
+}
+
+proc isCPPKeyword {s} {
+    global cpp_keywords
+    return [expr [lsearch $cpp_keywords $s] != -1]
 }
 
 set state "other"
@@ -38,7 +47,10 @@ foreach f [getSourceFileNames] {
             }
             set state "other"
         } else {
-            if [isKeyword $tokenName] {
+            # Check if it's a C++ file
+            regexp {\.[ch]pp} $f m
+            # C keywords are valid in C++ but not the other way around
+            if {[isCKeyword $tokenName] || ([info exists m] && [isCPPKeyword $tokenName])} {
                 set state "keyword"
                 set lineNumber [lindex $t 1]
                 set keywordValue [lindex $t 0]
