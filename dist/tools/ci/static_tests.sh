@@ -95,7 +95,11 @@ if [ -n "${CI_BASE_COMMIT}" ]; then
     git tag "${CI_BASE_BRANCH}" "${CI_BASE_COMMIT}"
 fi
 
-CI_BASE_BRANCH=${CI_BASE_BRANCH:-master}
+if [ -z "${GITHUB_RUN_ID}" ]; then
+    # only default to master when not running in a GitHub action
+    # (so GitHub can check release branches too)
+    CI_BASE_BRANCH=${CI_BASE_BRANCH:-master}
+fi
 
 export BASE_BRANCH="${CI_BASE_BRANCH}"
 
