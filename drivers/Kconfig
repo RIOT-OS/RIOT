@@ -25,6 +25,7 @@ rsource "disp_dev/Kconfig"
 rsource "dsp0401/Kconfig"
 rsource "hd44780/Kconfig"
 rsource "ili9341/Kconfig"
+rsource "touch_dev/Kconfig"
 endmenu # Display Device Drivers
 
 menu "Miscellaneous Device Drivers"
