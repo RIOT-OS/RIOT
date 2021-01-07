@@ -113,3 +113,6 @@ chang
 
 # filp (variable name for file pointer) => flip
 filp
+
+# Ether (Scapy class name and means Ethernet in some parts of the code) => Either
+ether
