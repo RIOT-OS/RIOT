@@ -31,7 +31,10 @@
 
 #include "test_utils/expect.h"
 
-#ifdef MODULE_ZTIMER_MSEC
+#ifdef MODULE_ZTIMER_SEC
+#define ZTIMER ZTIMER_SEC
+#define TICKS_PER_SEC 1
+#elif MODULE_ZTIMER_MSEC
 #define ZTIMER ZTIMER_MSEC
 #define TICKS_PER_SEC MS_PER_SEC
 #else
@@ -71,11 +74,14 @@ void *timer_thread(void *arg)
         msg_receive(&m);
         struct timer_msg *tmsg = m.content.ptr;
         uint32_t now = ztimer_now(ZTIMER);
-        printf("now=%lu:%lu -> every %lu.%lus: %s\n",
-               (now / TICKS_PER_SEC),
-               (now % TICKS_PER_SEC),
-               tmsg->interval / TICKS_PER_SEC,
-               tmsg->interval % TICKS_PER_SEC,
+        /* casts are needed to solve for sometimes TICKS_PER_SEC being UL
+         * result of / and % of uint32_t will always fit into uint32_t
+         */
+        printf("now=%"PRIu32":%"PRIu32" -> every %"PRIu32".%"PRIu32"s: %s\n",
+               (uint32_t)(now / TICKS_PER_SEC),
+               (uint32_t)(now % TICKS_PER_SEC),
+               (uint32_t)(tmsg->interval / TICKS_PER_SEC),
+               (uint32_t)(tmsg->interval % TICKS_PER_SEC),
                tmsg->text);
 
         tmsg->msg.type = 12345;
