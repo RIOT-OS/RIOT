@@ -1,0 +1,7 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+CONFIG_MODULE_SDP3X=y
+# enable interrupt support
+CONFIG_MODULE_SDP3X_IRQ=y
+
+CONFIG_MODULE_PRINTF_FLOAT=y
