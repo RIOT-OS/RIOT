@@ -25,10 +25,10 @@ def test(vectors, child):
         assert idx == 0
         return idx
 
-    def _safe_sendline(l):
-        assert len(l) < MAX_LINE
+    def _safe_sendline(line):
+        assert len(line) < MAX_LINE
         _safe_expect_exact('{ready}')
-        child.sendline(l)
+        child.sendline(line)
 
     for passwd, salt, iters, key in vectors:
         _safe_sendline(passwd)
