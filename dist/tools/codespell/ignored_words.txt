@@ -110,3 +110,6 @@ Chang
 
 # chang (common name) => change
 chang
+
+# filp (variable name for file pointer) => flip
+filp
