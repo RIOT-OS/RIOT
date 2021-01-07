@@ -212,14 +212,14 @@ void pca9685_pwm_poweron(pca9685_t *dev)
         /* clear the SLEEP bit */
         byte &= ~PCA9685_MODE1_SLEEP;
         EXEC(_write(dev, PCA9685_REG_MODE1, &byte, 1));
-        /* allow 500 us for oscilator to stabilize */
+        /* allow 500 us for oscillator to stabilize */
         xtimer_usleep(500);
         /* clear the RESTART bit to start all PWM channels*/
         EXEC(_update(dev, PCA9685_REG_MODE1, PCA9685_MODE1_RESTART, 1));
     }
     else {
         EXEC(_update(dev, PCA9685_REG_MODE1, PCA9685_MODE1_SLEEP, 0));
-        /* allow 500 us for oscilator to stabilize */
+        /* allow 500 us for oscillator to stabilize */
         xtimer_usleep(500);
         /* clear the RESTART bit to start all PWM channels*/
         EXEC(_update(dev, PCA9685_REG_MODE1, PCA9685_MODE1_RESTART, 1));
