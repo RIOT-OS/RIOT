@@ -36,6 +36,7 @@ rsource "ds3231/Kconfig"
 rsource "ds3234/Kconfig"
 rsource "edbg_eui/Kconfig"
 rsource "io1_xplained/Kconfig"
+rsource "tps6274x/Kconfig"
 rsource "uart_half_duplex/Kconfig"
 endmenu # Miscellaneous Device Drivers
 
