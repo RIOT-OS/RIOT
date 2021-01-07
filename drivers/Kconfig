@@ -107,6 +107,7 @@ rsource "qmc5883l/Kconfig"
 rsource "sps30/Kconfig"
 rsource "tcs37727/Kconfig"
 rsource "tmp00x/Kconfig"
+rsource "tsl2561/Kconfig"
 endmenu # Sensor Device Drivers
 
 menu "Storage Device Drivers"
