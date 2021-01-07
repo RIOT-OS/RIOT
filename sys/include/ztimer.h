@@ -596,6 +596,11 @@ extern ztimer_clock_t *const ZTIMER_USEC;
 extern ztimer_clock_t *const ZTIMER_MSEC;
 
 /**
+ * @brief   Default ztimer second clock
+ */
+extern ztimer_clock_t *const ZTIMER_SEC;
+
+/**
  * @brief   Base ztimer for the microsecond clock (ZTIMER_USEC)
  *
  * This ztimer will reference the counter device object at the end of the

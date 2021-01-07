@@ -66,6 +66,10 @@ ifneq (,$(filter ztimer_periph_timer,$(USEMODULE)))
   FEATURES_REQUIRED += periph_timer
 endif
 
+ifneq (,$(filter ztimer_periph_rtc,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtc
+endif
+
 ifneq (,$(filter ztimer_periph_rtt,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
