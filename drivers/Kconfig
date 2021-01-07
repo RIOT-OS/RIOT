@@ -108,6 +108,7 @@ rsource "sps30/Kconfig"
 rsource "tcs37727/Kconfig"
 rsource "tmp00x/Kconfig"
 rsource "tsl2561/Kconfig"
+rsource "tsl4531x/Kconfig"
 endmenu # Sensor Device Drivers
 
 menu "Storage Device Drivers"
