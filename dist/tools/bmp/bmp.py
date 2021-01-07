@@ -72,11 +72,11 @@ def detect_probes():
     return gdb_ports, uart_ports
 
 
-# search device with specific serial number <snr> in list <l>
-def search_serial(snr, l):
-    for p in l:
-        if snr in p.serial_number:
-            return p.device
+# search device with specific serial number <snr> in a list of ports <ports>
+def search_serial(snr, ports):
+    for port in ports:
+        if snr in port.serial_number:
+            return port.device
 
 
 # parse GDB output for targets
