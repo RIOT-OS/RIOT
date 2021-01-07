@@ -6,10 +6,11 @@
 #
 # Author: Juan Carrano <j.carrano@fu-berlin.de>
 
-import os
 import sys
 import base64
 from functools import partial
+
+from testrunner import run
 
 MAX_LINE = 128
 
@@ -40,6 +41,4 @@ def test(vectors, child):
 
 
 def main(vectors):
-    sys.path.append(os.path.join(os.environ['RIOTTOOLS'], 'testrunner'))
-    from testrunner import run
     sys.exit(run(partial(test, vectors)))
