@@ -24,7 +24,7 @@
  * @ref drivers_periph_hwrng and @ref sys_puf_sram. The concepts implemented here are heavily
  * influenced by NIST SP 800-90B. Entropy sources can be used to feed more advanced entropy
  * modules for cryptographic purposes, which typically accumulate multiple sources and safely
- * maintain internal sates. Alternatively, these sources can be used directly or with internal
+ * maintain internal states. Alternatively, these sources can be used directly or with internal
  * conditioning enabled for non-cryptographic tasks like seed generation of general purpose PRNGs,
  * in the absence of a hardware random number generator. The API, however, is not meant to face a user.
  *
