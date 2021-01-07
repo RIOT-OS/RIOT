@@ -447,18 +447,18 @@ void rtt_poweroff(void)
 #if RTT_BACKEND_SC
 ISR(SCNT_OVFL_vect)
 {
-    atmega_enter_isr();
+    avr8_enter_isr();
     /* Execute callback */
     if (rtt_state.overflow_cb != NULL) {
         rtt_state.overflow_cb(rtt_state.overflow_arg);
     }
 
-    atmega_exit_isr();
+    avr8_exit_isr();
 }
 #else
 ISR(TIMER2_OVF_vect)
 {
-    atmega_enter_isr();
+    avr8_enter_isr();
 
     ext_cnt++;
 
@@ -479,7 +479,7 @@ ISR(TIMER2_OVF_vect)
         }
     }
 
-    atmega_exit_isr();
+    avr8_exit_isr();
 }
 #endif
 
@@ -489,7 +489,7 @@ ISR(SCNT_CMP2_vect)
 ISR(TIMER2_COMPA_vect)
 #endif
 {
-    atmega_enter_isr();
+    avr8_enter_isr();
     /* Disable alarm interrupt */
 #if RTT_BACKEND_SC
     SCIRQM &= ~(1 << IRQMCP2);
@@ -505,5 +505,5 @@ ISR(TIMER2_COMPA_vect)
         cb(rtt_state.alarm_arg);
     }
 
-    atmega_exit_isr();
+    avr8_exit_isr();
 }

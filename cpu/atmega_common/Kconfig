@@ -4,15 +4,6 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
-config CPU_ARCH_AVR8
-    bool
-    select HAS_ARCH_8BIT
-    select HAS_ARCH_AVR8
-
-config CPU_CORE_AVR
-    bool
-    select CPU_ARCH_AVR8
-
 config CPU_COMMON_ATMEGA
     bool
     select CPU_CORE_AVR
@@ -34,21 +25,10 @@ config CPU_FAM_ATMEGA128
     select CPU_CORE_AVR
 
 ## Common CPU symbols
-config CPU_ARCH
-    default "avr8" if CPU_ARCH_AVR8
-
-config CPU_CORE
-    default "avr" if CPU_CORE_AVR
-
 config CPU_FAM
     default "atmega128" if CPU_FAM_ATMEGA128
 
 ## Declaration of specific features
-config HAS_ARCH_AVR8
-    bool
-    help
-        Indicates that the current architecture is Atmel AVR8.
-
 config HAS_ATMEGA_PCINT0
     bool
     help
@@ -72,3 +52,5 @@ config HAS_ATMEGA_PCINT3
 config ERROR_MODULES_CONFLICT
     default "On ATmega, the RTC and RTT use to the same hardware timer." if MODULE_PERIPH_RTC && MODULE_PERIPH_RTT
     depends on CPU_COMMON_ATMEGA
+
+source "$(RIOTCPU)/avr8_common/Kconfig"

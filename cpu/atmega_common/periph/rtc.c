@@ -34,7 +34,7 @@ static void *alarm_cb_arg;
 /* will be called every second */
 ISR(TIMER2_OVF_vect)
 {
-    atmega_enter_isr();
+    avr8_enter_isr();
 
     isr_flag = !isr_flag;
 
@@ -46,7 +46,7 @@ ISR(TIMER2_OVF_vect)
         alarm_cb(alarm_cb_arg);
     }
 
-    atmega_exit_isr();
+    avr8_exit_isr();
 }
 
 void rtc_init(void)
