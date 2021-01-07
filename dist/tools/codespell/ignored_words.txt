@@ -106,9 +106,6 @@ dedup
 circularly
 
 # Chang (common name) => Change
-Chang
-
-# chang (common name) => change
 chang
 
 # filp (variable name for file pointer) => flip
