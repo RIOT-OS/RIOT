@@ -38,6 +38,7 @@ rsource "edbg_eui/Kconfig"
 rsource "io1_xplained/Kconfig"
 rsource "tps6274x/Kconfig"
 rsource "uart_half_duplex/Kconfig"
+rsource "usbdev_mock/Kconfig"
 endmenu # Miscellaneous Device Drivers
 
 rsource "Kconfig.net"
