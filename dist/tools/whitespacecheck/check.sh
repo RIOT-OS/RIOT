@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copyright 2015 Oliver Hahm <oliver.hahm@inria.fr>
 #
@@ -38,7 +38,7 @@ fi
 git -c core.whitespace="tab-in-indent,tabwidth=4" \
     diff --check "$(git merge-base "${BRANCH}" HEAD)" -- *.[ch] ${IGNORE} \
             | ${LOG}
-RESULT=$?
+RESULT=${PIPESTATUS[0]}
 
 # Git regards any trailing white space except `\n` as an error so `\r` is
 # checked here, too
@@ -46,7 +46,7 @@ git -c core.whitespace="trailing-space" \
     diff --check "$(git merge-base "${BRANCH}" HEAD)" -- . ${IGNORE} \
             | ${LOG}
 
-TRAILING_RESULT=$?
+TRAILING_RESULT=${PIPESTATUS[0]}
 
 github_annotate_parse_log_default
 
