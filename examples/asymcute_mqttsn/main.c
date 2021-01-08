@@ -89,7 +89,7 @@ static uint16_t _parse_predef_id(const char *name)
 {
     uint16_t id = 0;
     if ((strlen(name) > 4) && (strncmp(name, "pre_", 4) == 0)) {
-        id = (uint16_t)atoi(&name[4]);
+        id = atoi(&name[4]);
     }
     return id;
 }
@@ -438,7 +438,7 @@ static int _cmd_sub(int argc, char **argv)
             puts("error: no free topic memory");
             return 1;
         }
-        if (_topic_init(t, argv[1]) == 0) {
+        if (_topic_init(t, argv[1]) == NULL) {
             puts("error: unable to initialize topic");
             return 1;
         }
