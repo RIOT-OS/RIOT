@@ -305,6 +305,17 @@ check_no_usemodules_in_makefile_include() {
         | error_with_message "Don't include USEMODULE in Makefile.include"
 }
 
+check_no_pkg_source_local() {
+    local patterns=()
+    local pathspec=()
+
+    patterns+=(-e 'PKG_SOURCE_LOCAL')
+
+    pathspec+=('pkg/*/Makefile')
+    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+        | error_with_message "Don't push PKG_SOURCE_LOCAL definitions upstream"
+}
+
 error_on_input() {
     ! grep ''
 }
@@ -323,6 +334,7 @@ all_checks() {
     check_files_in_boards_not_reference_board_var
     check_no_pseudomodules_in_makefile_dep
     check_no_usemodules_in_makefile_include
+    check_no_pkg_source_local
 }
 
 main() {

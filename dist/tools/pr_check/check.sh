@@ -57,10 +57,4 @@ if [ -n "$TRAVIS_PULL_REQUEST" -o -n "$CI_PULL_NR" ]; then
     fi
 fi
 
-if git grep -q PKG_SOURCE_LOCAL -- pkg/*/Makefile; then
-    echo -e "${CERROR}The following files contain a PKG_SOURCE_LOCAL definition:${CRESET}"
-    git grep -l PKG_SOURCE_LOCAL -- pkg/*/Makefile
-    EXIT_CODE=1
-fi
-
 exit ${EXIT_CODE}
