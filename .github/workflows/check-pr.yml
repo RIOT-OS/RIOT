@@ -32,8 +32,5 @@ jobs:
       run:
         git fetch origin '${{ github.base_ref }}:${{ github.base_ref }}'
     - name: Run checks
-      env:    # enforce deactivation of label check in pr_check
-        TRAVIS_PULL_REQUEST:
-        CI_PULL_NR:
       run: |
         ./dist/tools/${{ matrix.check }}/check.sh "${{ github.base_ref }}"

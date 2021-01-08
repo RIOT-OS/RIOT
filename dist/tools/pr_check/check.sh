@@ -11,7 +11,6 @@
 cd $RIOTBASE
 
 : "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
-. "${RIOTTOOLS}"/pr_check/check_labels.sh
 
 EXIT_CODE=0
 
@@ -43,18 +42,6 @@ if [ -n "${SQUASH_COMMITS}" ]; then
     echo -e "${CERROR}Pull request needs squashing:${CRESET}" 1>&2
     echo -e "${SQUASH_COMMITS}"
     EXIT_CODE=1
-fi
-
-if [ -n "$TRAVIS_PULL_REQUEST" -o -n "$CI_PULL_NR" ]; then
-    if check_gh_label "CI: needs squashing"; then
-        echo -e "${CERROR}Pull request needs squashing according to its labels set on GitHub${CRESET}"
-        EXIT_CODE=1
-    fi
-
-    if check_gh_label "State: waiting for other PR"; then
-        echo -e "${CERROR}Pull request is waiting for another pull request according to its labels set on GitHub${CRESET}"
-        EXIT_CODE=1
-    fi
 fi
 
 exit ${EXIT_CODE}
