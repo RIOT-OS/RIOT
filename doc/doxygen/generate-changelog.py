@@ -16,7 +16,8 @@ def generate_changelog(template_filename, changelog_filename, output_filename):
          open(changelog_filename) as changelog, \
          open(output_filename, "w") as output:
         changelog_lines = []
-        release_title = re.compile(r"((RIOT-\d{4}\.\d{2} - Release Notes)|(Release 2013\.08))")
+        release_title = re.compile(r"((RIOT-\d{4}\.\d{2}(\.\d+)? - "
+                                   r"Release Notes)|(Release 2013\.08))")
         notes_template = re.compile(r"\[Notes\]")
         title = 0
         prev_newline = False
@@ -35,7 +36,7 @@ def generate_changelog(template_filename, changelog_filename, output_filename):
                 prev_newline = True             # this introduces a newline, so count it
             elif release_title.match(line):
                 # if line contains a release title
-                release_match = re.search(r"(\d{4}\.\d{2})", line)
+                release_match = re.search(r"(\d{4}\.\d{2}(\.\d+)?)", line)
                 assert(release_match is not None)
                 # parse out release number
                 release = release_match.group(1)
