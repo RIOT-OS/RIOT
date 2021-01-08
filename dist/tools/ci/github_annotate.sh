@@ -33,12 +33,26 @@ _escape() {
         -e 's/%/%25/g' -e 's/\r/%0D/g' -e 's/\n/%0A/g'
 }
 
+_github_annotate() {
+    MESSAGE="$(_escape "${1}")"
+    LEVEL="${2:-error}"
+    OPTS="${3:-}"
+    echo "::${LEVEL} ${OPTS}::${DETAILS}" >> ${OUTFILE}
+}
+
 github_annotate_error() {
     if [ -n "${GITHUB_RUN_ID}" ]; then
         FILENAME="${1}"
         LINENUM="${2}"
-        DETAILS="$(_escape "${3}")"
-        echo "::error file=${FILENAME},line=${LINENUM}::${DETAILS}" >> ${OUTFILE}
+        DETAILS="${3}"
+        _github_annotate "${DETAILS}" error "file=${FILENAME},line=${LINENUM}"
+    fi
+}
+
+github_annotate_error_no_file() {
+    if [ -n "${GITHUB_RUN_ID}" ]; then
+        DETAILS="${1}"
+        _github_annotate "${DETAILS}" error
     fi
 }
 
@@ -47,7 +61,14 @@ github_annotate_warning() {
         FILENAME="${1}"
         LINENUM="${2}"
         DETAILS="$(_escape "${3}")"
-        echo "::warning file=${FILENAME},line=${LINENUM}::${DETAILS}" >> ${OUTFILE}
+        _github_annotate "${DETAILS}" warning "file=${FILENAME},line=${LINENUM}"
+    fi
+}
+
+github_annotate_warning_no_file() {
+    if [ -n "${GITHUB_RUN_ID}" ]; then
+        DETAILS="${1}"
+        _github_annotate "${DETAILS}" warning
     fi
 }
 
