@@ -103,7 +103,6 @@ fi
 
 export BASE_BRANCH="${CI_BASE_BRANCH}"
 
-run ./dist/tools/commit-msg/check.sh "${BASE_BRANCH}"
 run ./dist/tools/whitespacecheck/check.sh "${BASE_BRANCH}"
 DIFFFILTER="MR" ERROR_EXIT_CODE=0 run ./dist/tools/licenses/check.sh
 DIFFFILTER="AC" run ./dist/tools/licenses/check.sh
@@ -111,7 +110,6 @@ run ./dist/tools/doccheck/check.sh
 run ./dist/tools/externc/check.sh
 run ./dist/tools/cppcheck/check.sh
 run ./dist/tools/vera++/check.sh
-run ./dist/tools/pr_check/pr_check.sh "${BASE_BRANCH}"
 run ./dist/tools/coccinelle/check.sh
 run ./dist/tools/flake8/check.sh
 run ./dist/tools/headerguards/check.sh

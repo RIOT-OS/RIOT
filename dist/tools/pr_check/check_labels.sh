@@ -8,7 +8,7 @@
 #
 
 # The following script part has been moved here from:
-# ./dist/tools/pr_check/pr_check.sh
+# ./dist/tools/pr_check/check.sh
 
 GITHUB_API_HOST="https://api.github.com"
 GITHUB_REPO="RIOT-OS/RIOT"

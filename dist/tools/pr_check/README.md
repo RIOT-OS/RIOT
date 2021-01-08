@@ -6,7 +6,7 @@ another Pull Request.
 # Usage
 
 ```bash
-./pr_check.sh [<master branch>]
+./check.sh [<master branch>]
 ```
 
 The optional `<master branch>` parameter refers to the branch the pull request's
