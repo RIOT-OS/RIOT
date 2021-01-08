@@ -28,7 +28,7 @@
 #include "periph_conf.h"
 #include "periph_cpu.h"
 
-#define ENABLE_DEBUG (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 void stm32_eth_common_init(void)
