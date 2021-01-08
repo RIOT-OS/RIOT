@@ -7,5 +7,6 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l011k4 \
     olimexino-stm32 \
     samd10-xmini \
+    slstk3400a \
     stk3200 \
     #

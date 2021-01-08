@@ -78,6 +78,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     seeeduino_arch-pro \
     sensebox_samd21 \
     serpente \
+    slstk3400a \
     slstk3401a \
     sltb001a \
     slwstk6000b-slwrb4150a \

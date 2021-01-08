@@ -77,6 +77,12 @@
  */
 
 /**
+ * @defgroup        cpu_efm32hg Silicon Labs EFM32HG family
+ * @ingroup         cpu_efm32
+ * @brief           Silicon Labs's EFM32HG MCUs family implementation
+ */
+
+/**
  * @defgroup        cpu_efm32lg Silicon Labs EFM32LG family
  * @ingroup         cpu_efm32
  * @brief           Silicon Labs's EFM32LG MCUs family implementation
