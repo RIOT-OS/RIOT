@@ -24,7 +24,7 @@
  ******************************************************************************/
 
 #include "vendor/LPC17xx.h"
-#include "vendor_conf.h"
+#include "vendor/conf.h"
 
 /**
  * Initialize the system
