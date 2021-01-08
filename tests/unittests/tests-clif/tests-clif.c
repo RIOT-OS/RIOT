@@ -101,7 +101,7 @@ static void test_clif_encode_links(void)
     res = clif_encode_link(&links[0], NULL, 0);
     pos += res;
 
-    for (unsigned i = 1; i < sizeof(links) / sizeof(links[0]); i++) {
+    for (unsigned i = 1; i < ARRAY_SIZE(links); i++) {
         res = clif_add_link_separator(NULL, 0);
         if (res <= 0) {
             break;
@@ -122,7 +122,7 @@ static void test_clif_encode_links(void)
     res = clif_encode_link(&links[0], output, sizeof(output));
     pos += res;
 
-    for (unsigned i = 1; i < sizeof(links) / sizeof(links[0]); i++) {
+    for (unsigned i = 1; i < ARRAY_SIZE(links); i++) {
         res = clif_add_link_separator(&output[pos], sizeof(output) - pos);
         if (res <= 0) {
             break;
@@ -195,8 +195,8 @@ static void test_clif_decode_links(void)
         "http://www.example.com/sensors/t123", "/t", "/riot/board", "/riot/info"
     };
 
-    const unsigned exp_links_numof = sizeof(exp_targets) / sizeof(exp_targets[0]);
-    const unsigned exp_attrs_numof = sizeof(exp_attrs) / sizeof(exp_attrs[0]);
+    const unsigned exp_links_numof = ARRAY_SIZE(exp_targets);
+    const unsigned exp_attrs_numof = ARRAY_SIZE(exp_attrs);
     const size_t input_len = sizeof(input_string) - 1;
 
     clif_t out_link;
@@ -229,7 +229,7 @@ static void test_clif_decode_links(void)
     TEST_ASSERT(exp_links_numof == links_numof);
 
     /* now decode again but saving the attributes */
-    clif_attr_t out_attrs[sizeof(exp_attrs) / sizeof(exp_attrs[0])];
+    clif_attr_t out_attrs[ARRAY_SIZE(exp_attrs)];
     pos = input_string;
     unsigned attrs_numof = 0;
     do {
