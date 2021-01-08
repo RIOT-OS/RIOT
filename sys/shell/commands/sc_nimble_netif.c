@@ -441,7 +441,7 @@ int _nimble_netif_handler(int argc, char **argv)
         if (!fmt_is_number(argv[2])) {
             unsigned duration = DEFAULT_SCAN_DURATION;
             if (argc > 3) {
-                duration = (unsigned)atoi(argv[3]);
+                duration = atoi(argv[3]);
             }
             _cmd_connect_name(argv[2], duration * 1000);
             return 0;
