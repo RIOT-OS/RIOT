@@ -183,7 +183,7 @@ static uint16_t tx_upload(w5100_t *dev, uint16_t start, void *data, size_t len)
         size_t limit = ((S0_TX_BASE + S0_MEMSIZE) - start);
         wchunk(dev, start, data, limit);
         wchunk(dev, S0_TX_BASE, &((uint8_t *)data)[limit], len - limit);
-        return (S0_TX_BASE + limit);
+        return (S0_TX_BASE + len - limit);
     }
     else {
         wchunk(dev, start, data, len);
