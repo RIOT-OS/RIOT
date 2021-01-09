@@ -18,6 +18,7 @@
 
 #define USB_H_USER_IS_RIOT_INTERNAL
 
+#include "atomic_utils.h"
 #include "kernel_defines.h"
 #include "bitarithm.h"
 #include "event.h"
@@ -175,36 +176,26 @@ usbus_endpoint_t *usbus_add_endpoint(usbus_t *usbus, usbus_interface_t *iface,
     return ep;
 }
 
-static inline uint32_t _get_ep_bitflag(usbdev_ep_t *ep)
+static inline uint8_t _get_ep_bitnum(usbdev_ep_t *ep)
 {
     /* Endpoint activity bit flag, lower USBDEV_NUM_ENDPOINTS bits are
      * useb as OUT endpoint flags, upper bit are IN endpoints */
-    return 1 << ((ep->dir == USB_EP_DIR_IN ? USBDEV_NUM_ENDPOINTS
-                                           : 0x00) + ep->num);
+    return (ep->dir == USB_EP_DIR_IN ? USBDEV_NUM_ENDPOINTS
+                                     : 0x00) + ep->num;
 }
 
 static void _set_ep_event(usbus_t *usbus, usbdev_ep_t *ep)
 {
-    if (irq_is_in()) {
-        usbus->ep_events |= _get_ep_bitflag(ep);
-    }
-    else {
-        unsigned state = irq_disable();
-        usbus->ep_events |= _get_ep_bitflag(ep);
-        irq_restore(state);
-    }
+    atomic_bit_u32_t bitflag = atomic_bit_u32(&usbus->ep_events,
+                                              _get_ep_bitnum(ep));
+    atomic_set_bit_u32(bitflag);
 
     thread_flags_set(thread_get(usbus->pid), USBUS_THREAD_FLAG_USBDEV_EP);
 }
 
-static uint32_t _get_and_reset_ep_events(usbus_t *usbus)
+static inline uint32_t _get_and_reset_ep_events(usbus_t *usbus)
 {
-    unsigned state = irq_disable();
-    uint32_t res = usbus->ep_events;
-
-    usbus->ep_events = 0;
-    irq_restore(state);
-    return res;
+    return atomic_fetch_and_u32(&usbus->ep_events, 0);
 }
 
 static void _signal_handlers(usbus_t *usbus, uint16_t flag,
