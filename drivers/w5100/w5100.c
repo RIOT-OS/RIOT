@@ -73,6 +73,7 @@ static void wreg(w5100_t *dev, uint16_t reg, uint8_t data)
 static uint16_t raddr(w5100_t *dev, uint16_t addr_high, uint16_t addr_low)
 {
     uint16_t res = (rreg(dev, addr_high) << 8);
+
     res |= rreg(dev, addr_low);
     return res;
 }
@@ -143,7 +144,7 @@ static int init(netdev_t *netdev)
 
     /* reset the device */
     wreg(dev, REG_MODE, MODE_RESET);
-    while (rreg(dev, REG_MODE) & MODE_RESET) {};
+    while (rreg(dev, REG_MODE) & MODE_RESET) {}
 
     /* initialize the device, start with writing the MAC address */
     luid_get(hwaddr, ETHERNET_ADDR_LEN);
@@ -183,7 +184,7 @@ static uint16_t tx_upload(w5100_t *dev, uint16_t start, void *data, size_t len)
         size_t limit = ((S0_TX_BASE + S0_MEMSIZE) - start);
         wchunk(dev, start, data, limit);
         wchunk(dev, S0_TX_BASE, &((uint8_t *)data)[limit], len - limit);
-        return (S0_TX_BASE + limit);
+        return (S0_TX_BASE + len - limit);
     }
     else {
         wchunk(dev, start, data, len);
@@ -218,7 +219,7 @@ static int send(netdev_t *netdev, const iolist_t *iolist)
 
     /* trigger the sending process */
     wreg(dev, S0_CR, CR_SEND_MAC);
-    while (!(rreg(dev, S0_IR) & IR_SEND_OK)) {};
+    while (!(rreg(dev, S0_IR) & IR_SEND_OK)) {}
     wreg(dev, S0_IR, IR_SEND_OK);
 
     DEBUG("[w5100] send: transferred %i byte (at 0x%04x)\n", sum, (int)pos);
@@ -257,10 +258,11 @@ static int recv(netdev_t *netdev, void *buf, size_t max_len, void *info)
         /* find the size of the next packet in the RX buffer */
         uint16_t rp = raddr(dev, S0_RX_RD0, S0_RX_RD1);
         uint16_t psize = raddr(dev, (S0_RX_BASE + (rp & S0_MASK)),
-                                  (S0_RX_BASE + ((rp + 1) & S0_MASK)));
+                               (S0_RX_BASE + ((rp + 1) & S0_MASK)));
         len = psize - 2;
 
-        DEBUG("[w5100] recv: got packet of %i byte (at 0x%04x)\n", len, (int)rp);
+        DEBUG("[w5100] recv: got packet of %i byte (at 0x%04x)\n", len,
+              (int)rp);
 
         /* read the actual data into the given buffer if wanted */
         if (in_buf != NULL) {
@@ -321,16 +323,16 @@ static int get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
     int res = 0;
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            assert(max_len >= ETHERNET_ADDR_LEN);
-            spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
-            rchunk(dev, REG_SHAR0, value, ETHERNET_ADDR_LEN);
-            spi_release(dev->p.spi);
-            res = ETHERNET_ADDR_LEN;
-            break;
-        default:
-            res = netdev_eth_get(netdev, opt, value, max_len);
-            break;
+    case NETOPT_ADDRESS:
+        assert(max_len >= ETHERNET_ADDR_LEN);
+        spi_acquire(dev->p.spi, dev->p.cs, SPI_CONF, dev->p.clk);
+        rchunk(dev, REG_SHAR0, value, ETHERNET_ADDR_LEN);
+        spi_release(dev->p.spi);
+        res = ETHERNET_ADDR_LEN;
+        break;
+    default:
+        res = netdev_eth_get(netdev, opt, value, max_len);
+        break;
     }
 
     return res;
