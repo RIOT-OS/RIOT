@@ -21,6 +21,11 @@
 #define ESP_NOW_NETDEV_H
 
 #include "net/netdev.h"
+#include "mutex.h"
+#include "net/ethernet/hdr.h"
+#ifdef MODULE_GNRC
+#include "net/gnrc/nettype.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
