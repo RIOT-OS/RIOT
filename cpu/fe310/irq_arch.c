@@ -108,14 +108,28 @@ void handle_trap(uint32_t mcause)
         }
     }
     else {
+        switch (mcause) {
+        case CAUSE_USER_ECALL:    /* ECALL from user mode */
+        case CAUSE_MACHINE_ECALL: /* ECALL from machine mode */
+        {
+            /* TODO: get the ecall arguments */
+            sched_context_switch_request = 1;
+            /* Increment the return program counter past the ecall
+             * instruction */
+            uint32_t return_pc = read_csr(mepc);
+            write_csr(mepc, return_pc + 4);
+            break;
+        }
+        default:
 #ifdef DEVELHELP
-        printf("Unhandled trap:\n");
-        printf("  mcause: 0x%"PRIx32"\n", mcause);
-        printf("  mepc:   0x%"PRIx32"\n", read_csr(mepc));
-        printf("  mtval:  0x%"PRIx32"\n", read_csr(mtval));
+            printf("Unhandled trap:\n");
+            printf("  mcause: 0x%"PRIx32"\n", mcause);
+            printf("  mepc:   0x%"PRIx32"\n", read_csr(mepc));
+            printf("  mtval:  0x%"PRIx32"\n", read_csr(mtval));
 #endif
-        /* Unknown trap */
-        core_panic(PANIC_GENERAL_ERROR, "Unhandled trap");
+            /* Unknown trap */
+            core_panic(PANIC_GENERAL_ERROR, "Unhandled trap");
+        }
     }
     /* ISR done - no more changes to thread states */
     fe310_in_isr = 0;

@@ -178,13 +178,22 @@ void cpu_switch_context_exit(void)
     UNREACHABLE();
 }
 
+static inline void _ecall_dispatch(uint32_t num, void *ctx)
+{
+    /* function arguments are in a0 and a1 as per ABI */
+    __asm__ volatile (
+    "mv a0, %[num] \n"
+    "mv a1, %[ctx] \n"
+    "ECALL\n"
+    : /* No outputs */
+    : [num] "r" (num), [ctx] "r" (ctx)
+    : "memory"
+    );
+}
+
 void thread_yield_higher(void)
 {
-    /* Use SW intr to schedule context switch */
-    CLINT_REG(CLINT_MSIP) = 1;
-
-    /* Latency of SW intr can be 4-7 cycles; wait for the SW intr */
-    __asm__ volatile ("wfi");
+    _ecall_dispatch(0, NULL);
 }
 
 /**
