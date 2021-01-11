@@ -1074,4 +1074,12 @@ ifneq (,$(filter ecc_%,$(USEMODULE)))
   USEMODULE += ecc
 endif
 
+ifneq (,$(filter syslog, $(USEMODULE)))
+  FEATURES_REQUIRED += periph_rtc
+endif
+
+ifneq (,$(filter syslog_backend_file, $(USEMODULE)))
+  USEMODULE += vfs
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep

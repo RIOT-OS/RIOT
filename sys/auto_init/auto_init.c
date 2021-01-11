@@ -28,6 +28,10 @@
 
 void auto_init(void)
 {
+    if (IS_USED(MODULE_SYSLOG)) {
+        extern void syslog_init(void);
+        syslog_init();
+    }
     if (IS_USED(MODULE_AUTO_INIT_RANDOM)) {
         LOG_DEBUG("Auto init random.\n");
         extern void auto_init_random(void);

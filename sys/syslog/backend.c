@@ -1,0 +1,50 @@
+
+#include <string.h>
+
+#include "syslog.h"
+#include "backend.h"
+#include "stdio_base.h"
+#include "fmt.h"
+
+#define ENABLE_DEBUG    (0)
+#include "debug.h"
+
+#ifdef MODULE_SYSLOG_BACKEND_STDIO
+static bool _print = true;
+
+static void _stdio_send(struct syslog_msg *msg)
+{
+    if (!_print) {
+        return;
+    }
+    syslog_msg_get(msg);
+    stdio_write(msg->msg, msg->len);
+    if (msg->len && msg->msg[msg->len - 1] != '\n') {
+        stdio_write("\n", 1);
+    }
+    syslog_msg_put(msg);
+}
+
+void syslog_backend_stdio_print(bool print)
+{
+    _print = print;
+}
+
+static const syslog_backend_t stdio_be = {
+    .send = _stdio_send,
+};
+#endif /* MODULE_SYSLOG_BACKEND_STDIO */
+
+#ifdef MODULE_SYSLOG_BACKEND_FILE
+extern const syslog_backend_t file_be;
+#endif
+
+const syslog_backend_t *syslog_backends[] = {
+#ifdef MODULE_SYSLOG_BACKEND_STDIO
+    &stdio_be,
+#endif
+#ifdef MODULE_SYSLOG_BACKEND_FILE
+    &file_be,
+#endif
+};
+const size_t syslog_backends_numof = ARRAY_SIZE(syslog_backends);
