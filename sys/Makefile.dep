@@ -971,6 +971,11 @@ ifneq (,$(filter usbus_cdc_ecm,$(USEMODULE)))
   USEMODULE += luid
 endif
 
+ifneq (,$(filter usbus_hid,$(USEMODULE)))
+  USEMODULE += isrpipe_read_timeout
+  USEMODULE += usbus
+endif
+
 ifneq (,$(filter uuid,$(USEMODULE)))
   USEMODULE += hashes
   USEMODULE += random
