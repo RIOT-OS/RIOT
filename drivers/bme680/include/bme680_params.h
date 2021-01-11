@@ -61,7 +61,7 @@ extern "C" {
 {                                                                               \
                                 .ambient_temp = 25,                             \
                                 .temp_os = OVERSAMPLING_8,                      \
-                                .press_os = OVERSAMPLING_16,                    \
+                                .press_os = OVERSAMPLING_4,                    \
                                 .hum_os = OVERSAMPLING_2,                       \
                                 .meas_gas = true,                               \
                                 .gas_heating_time = 320,                        \
@@ -79,7 +79,7 @@ extern "C" {
                                 .hum_os = OVERSAMPLING_2,                       \
                                 .meas_gas = true,                               \
                                 .gas_heating_time = 320,                        \
-                                .gas_heating_temp = 100,                        \
+                                .gas_heating_temp = 150,                        \
                                 .filter = FILTER_COEFFICIENT_3,                 \
                                 .intf.spi.dev    = BME680_PARAM_SPI_DEV,        \
                                 .intf.spi.nss_pin   = BME680_PARAM_SPI_NSS_PIN, \

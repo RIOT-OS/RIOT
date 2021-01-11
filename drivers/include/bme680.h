@@ -76,31 +76,34 @@ typedef struct {
  */
 typedef struct {
     uint16_t par_t1;
-    uint16_t par_t2;
-    uint8_t par_t3;
+    int16_t par_t2;
+    int8_t par_t3;
     uint16_t par_h1;
     uint16_t par_h2;
-    uint8_t par_h3;
-    uint8_t par_h4;
-    uint8_t par_h5;
+    int8_t par_h3;
+    int8_t par_h4;
+    int8_t par_h5;
     uint8_t par_h6;
-    uint8_t par_h7;
+    int8_t par_h7; 
     uint16_t par_p1;
-    uint16_t par_p2;
-    uint8_t par_p3;
-    uint16_t par_p4;
-    uint16_t par_p5;
-    uint8_t par_p6;
-    uint8_t par_p7;
-    uint16_t par_p8;
-    uint16_t par_p9;
+    int16_t par_p2;
+    int8_t par_p3;
+    int16_t par_p4;
+    int16_t par_p5;
+    int8_t par_p6;
+    int8_t par_p7;
+    int16_t par_p8;
+    int16_t par_p9;
     uint8_t par_p10;
-    uint8_t par_g1;
-    uint16_t par_g2;
-    uint8_t par_g3;
-    uint8_t res_heat_range;
+    int8_t par_g1;
+    int16_t par_g2;
+    int8_t par_g3;
+    int8_t res_heat_range;
 } bme680_calib_t;
 
+/**
+ * @brief   Oversampling modes
+ */
 enum {
     OVERSAMPLING_1 = 0b001,
     OVERSAMPLING_2 = 0b010,
@@ -109,6 +112,9 @@ enum {
     OVERSAMPLING_16 = 0b101
 };
 
+/**
+ * @brief   Filter coefficients
+ */
 enum {
     FILTER_COEFFICIENT_0 = 0b000,
     FILTER_COEFFICIENT_1 = 0b001,
@@ -120,13 +126,16 @@ enum {
     FILTER_COEFFICIENT_127 = 0b111
 };
 
+/**
+ * @brief   Result data  
+ */
 typedef struct {
-    uint32_t temperature;
-    uint32_t humidity;
-    uint32_t pressure;
-    uint8_t gas_status;
-    uint32_t gas_resistance;
-    uint32_t t_fine;
+    uint32_t temperature;           /**< temperature in degree Celsius x 100 */
+    uint32_t humidity;              /**< humidity in %  */
+    uint32_t pressure;              /**< pressure in Pascal */
+    uint8_t gas_status;             /**< gas status indicating success (1) or error (0) */
+    uint32_t gas_resistance;        /**< gas resistance in Ohm */
+    uint32_t t_fine;                /**< temperature value used for pressure calculation */
 } bme680_data_t;
 
 /**
@@ -159,7 +168,6 @@ enum {
     BME680_ERR_CALC_HUM = -4,                   /**< error when calculating humidity */ 
     BME680_ERR_CALC_PRESS = -5,                 /**< error when calculating pressure */
     BME680_ERR_CALC_GAS = -6,                   /**< error when calculating gas */ 
-    BME680_ERR_HEAT_GAS = -7                    /**< error in heating the sensor to the required temperature */
 };
 
 /**
@@ -185,8 +193,7 @@ int bme680_init(bme680_t *dev, const bme680_params_t *params);
  * @return                  BME680_ERR_CALC_TEMP if temperature could not be calculated
  * @return                  BME680_ERR_CALC_HUM if humidity could not be calculated
  * @return                  BME680_ERR_CALC_PRESS if pressure could not be calculated
- * @return                  BME680_ERR_CALC_GAS if gas resistance could not be calculated
- * @return                  BME680_ERR_HEAT_GAS if heating temperature for gas sensor could not be reached          
+ * @return                  BME680_ERR_CALC_GAS if gas resistance could not be calculated         
  */
 uint16_t bme680_read(const bme680_t *dev, bme680_data_t *data);
 
