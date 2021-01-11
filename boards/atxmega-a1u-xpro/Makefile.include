@@ -1,0 +1,4 @@
+AVRDUDE_PROGRAMMER = xplainedpro_pdi
+DEBUGPROTO = -X
+
+include $(RIOTBOARD)/common/atxmega/Makefile.include
