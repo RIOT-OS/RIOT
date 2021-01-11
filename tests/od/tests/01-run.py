@@ -35,6 +35,10 @@ def testfunc(child):
     child.expect_exact("00000000  FF  2C  61  FF  2E  62  63  64  .,a..bcd")
     child.expect_exact("00000008  65  66  67  68  69  6A  6B  6C  efghijkl")
     child.expect_exact("00000010  6D  6E  6F  70  00              mnop.")
+    child.expect_exact("od_hex_dump_ext(long_str, sizeof(long_str), 8, 0x100)")
+    child.expect_exact("00000100  FF  2C  61  FF  2E  62  63  64  .,a..bcd")
+    child.expect_exact("00000108  65  66  67  68  69  6A  6B  6C  efghijkl")
+    child.expect_exact("00000110  6D  6E  6F  70  00              mnop.")
 
     print("All tests successful")
 
