@@ -3,6 +3,7 @@
 [![License][license-badge]][license-link]
 [![API docs][api-badge]][api-link]
 [![Wiki][wiki-badge]][wiki-link]
+[![Merge chance][merge-chance-badge]][merge-chance-link]
 [![Stack Overflow questions][stackoverflow-badge]][stackoverflow-link]
 [![Twitter][twitter-badge]][twitter-link]
 [![IRC][irc-badge]][irc-link]
@@ -128,6 +129,8 @@ https://www.riot-os.org
 [master-ci-link]: https://ci.riot-os.org/nightlies.html#master
 [matrix-badge]: https://img.shields.io/badge/chat-Matrix-brightgreen.svg
 [matrix-link]: https://matrix.to/#/#riot-os:matrix.org
+[merge-chance-badge]: https://img.shields.io/endpoint?url=https%3A%2F%2Fmerge-chance.info%2Fbadge%3Frepo%3DRIOT-OS/RIOT&color=informational
+[merge-chance-link]: https://merge-chance.info/target?repo=RIOT-OS/RIOT
 [release-badge]: https://img.shields.io/github/release/RIOT-OS/RIOT.svg
 [release-link]: https://github.com/RIOT-OS/RIOT/releases/latest
 [stackoverflow-badge]: https://img.shields.io/badge/stackoverflow-%5Briot--os%5D-yellow
