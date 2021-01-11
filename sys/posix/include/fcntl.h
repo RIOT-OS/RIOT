@@ -15,6 +15,9 @@
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/fcntl.h.html
  */
 
+#ifndef FCNTL_H
+#define FCNTL_H
+
 #ifndef DOXYGEN
 #if defined(CPU_NATIVE) || MODULE_NEWLIB || MODULE_PICOLIBC
 /* If building on native or newlib we need to use the system header instead */
@@ -22,8 +25,6 @@
 /* without the GCC pragma above #include_next will trigger a pedantic error */
 #include_next <fcntl.h>
 #else
-#ifndef FCNTL_H_
-#define FCNTL_H_
 
 #include <sys/types.h> /* for mode_t, off_t */
 
@@ -67,9 +68,9 @@ int  posix_fallocate(int, off_t, off_t);
 }
 #endif
 
-#endif /* FCNTL_H_ */
-
 #endif /* CPU_NATIVE */
 
 #endif /* DOXYGEN */
+
+#endif /* FCNTL_H */
 /** @} */
