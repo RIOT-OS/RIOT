@@ -9,7 +9,7 @@ LOGFILE=
 OUTFILE=github_annotate_outfile.log
 ECHO_ESC=echo
 
-if ps -p $$ | grep -q '\<bash\>'; then
+if [ -n "${BASH_VERSION}" ]; then
     # workaround when included in bash to escape newlines and carriage returns
     # properly in _escape
     ECHO_ESC='echo -e'
@@ -37,7 +37,7 @@ _github_annotate() {
     MESSAGE="$(_escape "${1}")"
     LEVEL="${2:-error}"
     OPTS="${3:-}"
-    echo "::${LEVEL} ${OPTS}::${DETAILS}" >> ${OUTFILE}
+    echo "::${LEVEL} ${OPTS}::${MESSAGE}" >> ${OUTFILE}
 }
 
 github_annotate_error() {
@@ -60,7 +60,7 @@ github_annotate_warning() {
     if [ -n "${GITHUB_RUN_ID}" ]; then
         FILENAME="${1}"
         LINENUM="${2}"
-        DETAILS="$(_escape "${3}")"
+        DETAILS="${3}"
         _github_annotate "${DETAILS}" warning "file=${FILENAME},line=${LINENUM}"
     fi
 }
