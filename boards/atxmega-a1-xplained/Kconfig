@@ -1,0 +1,20 @@
+# Copyright (c) 2020 HAW Hamburg
+# Copyright (c) 2021 Gerson Fernando Budle
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "atxmega-a1-xplained" if BOARD_ATXMEGA_A1_XPLAINED
+
+config BOARD_ATXMEGA_A1_XPLAINED
+    bool
+    default y
+    select CPU_MODEL_XMEGA128A1
+
+    select HAS_PERIPH_I2C
+    select HAS_PERIPH_SPI
+    select HAS_PERIPH_UART
+
+    select HAVE_SAUL_GPIO
