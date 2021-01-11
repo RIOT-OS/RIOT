@@ -61,8 +61,7 @@ void irq_init(void)
         plic_init();
     }
 
-    /* Enable SW and external interrupts */
-    set_csr(mie, MIP_MSIP);
+    /* Enable external interrupts */
     set_csr(mie, MIP_MEIP);
 
     /*  Set default state of mstatus */
@@ -82,12 +81,6 @@ void handle_trap(uint32_t mcause)
     if ((mcause & MCAUSE_INT) == MCAUSE_INT) {
         /* Cause is an interrupt - determine type */
         switch (mcause & MCAUSE_CAUSE) {
-            case IRQ_M_SOFT:
-                /* Handle software interrupt - flag for context switch */
-                sched_context_switch_request = 1;
-                CLINT_REG(0) = 0;
-                break;
-
 #ifdef MODULE_PERIPH_TIMER
             case IRQ_M_TIMER:
                 /* Handle timer interrupt */
