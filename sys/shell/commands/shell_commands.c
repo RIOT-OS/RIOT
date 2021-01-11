@@ -192,6 +192,10 @@ extern int _cryptoauth(int argc, char **argv);
 extern int _bootloader_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_SYSLOG
+extern int _syslog_handler(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
     {"version", "Prints current RIOT_VERSION", _version_handler},
@@ -324,6 +328,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_DFPLAYER
     {"dfplayer", "Control a DFPlayer Mini MP3 player", _sc_dfplayer},
+#endif
+#ifdef MODULE_SYSLOG
+    {"syslog", "syslog commands", _syslog_handler},
 #endif
     {NULL, NULL, NULL}
 };

@@ -122,4 +122,8 @@ ifneq (,$(filter cryptoauthlib,$(USEPKG)))
   SRC += sc_cryptoauthlib.c
 endif
 
+ifneq (,$(filter syslog,$(USEMODULE)))
+  SRC += sc_syslog.c
+endif
+
 include $(RIOTBASE)/Makefile.base
