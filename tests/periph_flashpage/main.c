@@ -542,9 +542,9 @@ static int cmd_dump_config(int argc, char **argv)
     (void) argv;
 
 #ifdef FLASH_USER_PAGE_SIZE
-    od_hex_dump((void*)NVMCTRL_USER, FLASH_USER_PAGE_SIZE, 0);
+    od_hex_dump_ext((void*)NVMCTRL_USER, FLASH_USER_PAGE_SIZE, 0, NVMCTRL_USER);
 #else
-    od_hex_dump((void*)NVMCTRL_USER, AUX_PAGE_SIZE * AUX_NB_OF_PAGES, 0);
+    od_hex_dump_ext((void*)NVMCTRL_USER, AUX_PAGE_SIZE * AUX_NB_OF_PAGES, 0, NVMCTRL_USER);
 #endif
 
     return 0;
