@@ -33,6 +33,24 @@ extern "C" {
 #if defined(MODULE_SOCK_DTLS) || defined(DOXYGEN)
 
 /**
+ * @brief Gets the asynchronous event session from sock object
+ *
+ * @pre `(sock != NULL) && (session != NULL)`
+ *
+ * @note Only available with @ref SOCK_HAS_ASYNC defined.
+ *       Should only be called within a DTLS event and session is only available
+ *       for the event types @ref SOCK_ASYNC_CONN_RDY and @ref SOCK_ASYNC_CONN_FIN.
+ *       For other event types use @ref sock_dtls_recv() to get the session.
+ *
+ * @param[in]  sock       The DTLS sock object of the current event.
+ * @param[out] session    Session object of the current event.
+ *
+ * @return true if the event session is available, false otherwise.
+ */
+bool sock_dtls_get_event_session(sock_dtls_t *sock,
+                                 sock_dtls_session_t *session);
+
+/**
  * @brief   Gets the asynchronous event context from sock object
  *
  * @pre `(sock != NULL)`
