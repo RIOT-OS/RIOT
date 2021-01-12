@@ -56,7 +56,7 @@ check_not_parsing_features() {
     # These two files contain sanity checks using FEATURES_ so are allowed
     pathspec+=(':!Makefile.include' ':!makefiles/info-global.inc.mk')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Modules should not check the content of FEATURES_PROVIDED/REQUIRED/OPTIONAL'
 }
 
@@ -72,7 +72,7 @@ check_providing_features_only_makefile_features() {
 
     pathspec+=(":!*Makefile.features")
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Features should only be provided in Makefile.features files'
 }
 
@@ -136,7 +136,7 @@ check_not_exporting_variables() {
         patterns+=(-e "export[[:blank:]]\+${variable}")
     done
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" \
         | error_with_message 'Variables must not be exported'
 
     # Some variables may still be exported in 'makefiles/vars.inc.mk' as the
@@ -152,7 +152,7 @@ check_not_exporting_variables() {
 
     # Only run if there are patterns, otherwise it matches everything
     if [ ${#patterns[@]} -ne 0 ]; then
-        git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+        git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
             | error_with_message 'Variables must only be exported in `makefiles/vars.inc.mk`'
     fi
 }
@@ -172,7 +172,7 @@ check_deprecated_vars_patterns() {
     # Ignore this file when matching as it self matches
     pathspec+=(":!${SCRIPT_PATH}")
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Deprecated variables or patterns'
 }
 
@@ -188,7 +188,7 @@ check_board_do_not_include_cpu_features_dep() {
 
     pathspec+=('boards/')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
             | error_with_message 'Makefiles files from cpu must not be included by the board anymore'
 }
 
@@ -204,7 +204,7 @@ check_cpu_cpu_model_defined_in_makefile_features() {
     pathspec+=(':!boards/**/Makefile.features')
     pathspec+=(':!cpu/**/Makefile.features')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
             | error_with_message 'CPU and CPU_MODEL definition must be done by board/BOARD/Makefile.features, board/common/**/Makefile.features or cpu/CPU/Makefile.features'
 }
 
@@ -217,7 +217,7 @@ check_not_setting_board_equal() {
 
     pathspec+=('**/Makefile')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Applications Makefile should use "BOARD ?="'
 }
 
@@ -231,7 +231,7 @@ check_board_insufficient_memory_not_in_makefile() {
 
     pathspec+=('**/Makefile')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Move BOARD_INSUFFICIENT_MEMORY to Makefile.ci'
 }
 
@@ -245,7 +245,7 @@ checks_tests_application_not_defined_in_makefile() {
     pathspec+=('tests/**/Makefile')
     pathspec+=(':!tests/external_board_native/Makefile')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message "Don't define APPLICATION in test Makefile"
 }
 
@@ -258,7 +258,7 @@ checks_develhelp_not_defined_via_cflags() {
 
     pathspec+=('**/Makefile')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message "Use DEVELHELP ?= 1 instead of using CFLAGS directly"
 }
 
@@ -274,7 +274,7 @@ check_files_in_boards_not_reference_board_var() {
     # boards/common/nrf52 uses a hack to resolve dependencies early
     pathspec+=(':!boards/common/nrf52/Makefile.include')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message 'Code in boards/ should not use $(BOARDS) to reference files since this breaks external BOARDS changing BOARDSDIR"'
 }
 
@@ -286,7 +286,7 @@ check_no_pseudomodules_in_makefile_dep() {
 
     pathspec+=('**/Makefile.dep')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message "Don't define PSEUDOMODULES in Makefile.dep"
 }
 
@@ -301,7 +301,7 @@ check_no_usemodules_in_makefile_include() {
     pathspec+=(':!tests/**/Makefile.include')
     pathspec+=(':!examples/**/Makefile.include')
 
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message "Don't include USEMODULE in Makefile.include"
 }
 
@@ -312,7 +312,7 @@ check_no_pkg_source_local() {
     patterns+=(-e 'PKG_SOURCE_LOCAL')
 
     pathspec+=('pkg/*/Makefile')
-    git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
+    git -C "${RIOTBASE}" grep -n "${patterns[@]}" -- "${pathspec[@]}" \
         | error_with_message "Don't push PKG_SOURCE_LOCAL definitions upstream"
 }
 
