@@ -286,6 +286,22 @@ enum {
      * @ref sock_ip_aux_tx_t::timestamp, or @ref sock_dtls_aux_tx_t::timestamp.
      */
     SOCK_AUX_GET_TIMESTAMP = (1LU << 1),
+    /**
+     * @brief   Flag to request the RSSI value of received frame
+     *
+     * @note    Select module `sock_aux_rssi` and a compatible network stack to
+     *          use this
+     *
+     * Set this flag in the auxiliary data structure prior to the call of
+     * @ref sock_udp_recv_aux / @ref sock_ip_recv_aux / etc. to request the
+     * RSSI value of a received frame. This flag will be cleared if the
+     * timestamp was stored, otherwise it remains set.
+     *
+     * Depending on the family of the socket, the RSSI value will be stored in
+     * @ref sock_udp_aux_rx_t::rssi, @ref sock_ip_aux_rx_t::rssi, or
+     * @ref sock_dtls_aux_rx_t::rssi.
+     */
+    SOCK_AUX_GET_RSSI = (1LU << 2),
 };
 
 /**
