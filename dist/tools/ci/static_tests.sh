@@ -22,6 +22,7 @@ DEPS["./dist/tools/coccinelle/check.sh"]="spatch"
 DEPS["./dist/tools/flake8/check.sh"]="python3 flake8"
 DEPS["./dist/tools/codespell/check.sh"]="codespell"
 DEPS["./dist/tools/uncrustify/uncrustify.sh"]="uncrustify"
+DEPS["./dist/tools/shellcheck/shellcheck.sh"]="shellcheck"
 
 if ! command -v git 2>&1 1>/dev/null; then
     echo -n "Required command 'git' for all static tests not found in PATH "
@@ -120,5 +121,6 @@ if [ -z "${GITHUB_RUN_ID}" ]; then
 else
     run ./dist/tools/uncrustify/uncrustify.sh
 fi
+ERROR_EXIT_CODE=0 run ./dist/tools/shellcheck/check.sh
 
 exit $RESULT

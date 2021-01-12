@@ -36,11 +36,17 @@ ${SHELLCHECK_CMD} --version &> /dev/null || {
 
 ERRORS=$("${SHELLCHECK_CMD}" --format=gcc ${FILES})
 
+EXIT_CODE=0
+
 if [ -n "${ERRORS}" ]
 then
     printf "%s There are issues in the following shell scripts %s\n" "${CERROR}" "${CRESET}"
     printf "%s\n" "${ERRORS}"
-    exit 1
-else
-    exit 0
+    if [ -z "${ERROR_EXIT_CODE}" ]; then
+        EXIT_CODE=1
+    else
+        EXIT_CODE="${ERROR_EXIT_CODE}"
+    fi
 fi
+
+exit "${EXIT_CODE}"
