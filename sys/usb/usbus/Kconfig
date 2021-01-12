@@ -43,5 +43,6 @@ config USBUS_EP0_SIZE_64
 endchoice
 
 rsource "cdc/Kconfig"
+rsource "dfu/Kconfig"
 
 endif # KCONFIG_USEMODULE_USBUS

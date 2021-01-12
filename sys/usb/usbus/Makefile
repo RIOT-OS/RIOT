@@ -7,6 +7,9 @@ endif
 ifneq (,$(filter usbus_cdc_acm,$(USEMODULE)))
     DIRS += cdc/acm
 endif
+ifneq (,$(filter usbus_dfu,$(USEMODULE)))
+    DIRS += dfu/
+endif
 ifneq (,$(filter usbus_hid,$(USEMODULE)))
     DIRS += hid
 endif
