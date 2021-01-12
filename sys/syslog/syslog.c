@@ -19,18 +19,18 @@
 
 #include "syslog.h"
 #include "backend.h"
+#include "formatter.h"
 #include "memarray.h"
-#include "fmt.h"
 #include "mutex.h"
 #include "periph/rtc.h"
 #include "log.h"
 #include "clist.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef SYSLOG_THREAD_PRIO
-#define SYSLOG_THREAD_PRIO          (THREAD_PRIORITY_MAIN - 1)
+#define SYSLOG_THREAD_PRIO          (THREAD_PRIORITY_MIN - 1)
 #endif
 #ifndef SYSLOG_THREAD_STACKSIZE
 #define SYSLOG_THREAD_STACKSIZE     THREAD_STACKSIZE_MEDIUM
@@ -199,7 +199,14 @@ void syslog(syslog_entry_t *entry, int priority, const char *format, ...)
 static void _set_time(struct syslog_msg *msg)
 {
 #if defined(MODULE_PERIPH_RTC)
-    rtc_get_time(&msg->time);
+    struct tm time;
+    rtc_get_time(&time);
+    msg->time.tm_hour = time.tm_hour;
+    msg->time.tm_min = time.tm_min;
+    msg->time.tm_sec = time.tm_sec;
+    msg->time.tm_year = time.tm_year;
+    msg->time.tm_mon = time.tm_mon;
+    msg->time.tm_mday = time.tm_mday;
     msg->time_set = true;
 #else
     msg->time_set = false;
@@ -223,141 +230,13 @@ static int _queue_msg(struct syslog_msg *msg)
     return -1;
 }
 
-/*
- * RFC5424 sepcifies a syslog message as:
- * SYSLOG-MSG      = HEADER SP STRUCTURED-DATA [SP MSG]
- *
- * HEADER          = PRI VERSION SP TIMESTAMP SP HOSTNAME
- *                   SP APP-NAME SP PROCID SP MSGID
- * PRI             = "<" PRIVAL ">"
- * PRIVAL          = 1*3DIGIT ; range 0 .. 191
- * VERSION         = NONZERO-DIGIT 0*2DIGIT
- * HOSTNAME        = NILVALUE / 1*255PRINTUSASCII
- *
- * APP-NAME        = NILVALUE / 1*48PRINTUSASCII
- * PROCID          = NILVALUE / 1*128PRINTUSASCII
- * MSGID           = NILVALUE / 1*32PRINTUSASCII
- *
- * TIMESTAMP       = NILVALUE / FULL-DATE "T" FULL-TIME
- * FULL-DATE       = DATE-FULLYEAR "-" DATE-MONTH "-" DATE-MDAY
- * DATE-FULLYEAR   = 4DIGIT
- * DATE-MONTH      = 2DIGIT  ; 01-12
- * DATE-MDAY       = 2DIGIT  ; 01-28, 01-29, 01-30, 01-31 based on
- *                           ; month/year
- * FULL-TIME       = PARTIAL-TIME TIME-OFFSET
- * PARTIAL-TIME    = TIME-HOUR ":" TIME-MINUTE ":" TIME-SECOND
- *                   [TIME-SECFRAC]
- * TIME-HOUR       = 2DIGIT  ; 00-23
- * TIME-MINUTE     = 2DIGIT  ; 00-59
- * TIME-SECOND     = 2DIGIT  ; 00-59
- * TIME-SECFRAC    = "." 1*6DIGIT
- * TIME-OFFSET     = "Z" / TIME-NUMOFFSET
- * TIME-NUMOFFSET  = ("+" / "-") TIME-HOUR ":" TIME-MINUTE
- *
- * STRUCTURED-DATA = NILVALUE / 1*SD-ELEMENT
- * SD-ELEMENT      = "[" SD-ID *(SP SD-PARAM) "]"
- * SD-PARAM        = PARAM-NAME "=" %d34 PARAM-VALUE %d34
- * SD-ID           = SD-NAME
- * PARAM-NAME      = SD-NAME
- * PARAM-VALUE     = UTF-8-STRING ; characters '"', '\' and
- *                                ; ']' MUST be escaped.
- * SD-NAME         = 1*32PRINTUSASCII
- *                   ; except '=', SP, ']', %d34 (")
- *
- * MSG             = MSG-ANY / MSG-UTF8
- * MSG-ANY         = *OCTET ; not starting with BOM
- * MSG-UTF8        = BOM UTF-8-STRING
- * BOM             = %xEF.BB.BF
- *
- * UTF-8-STRING    = *OCTET ; UTF-8 string as specified
- *                   ; in RFC 3629
- *
- * OCTET           = %d00-255
- * SP              = %d32
- * PRINTUSASCII    = %d33-126
- * NONZERO-DIGIT   = %d49-57
- * DIGIT           = %d48 / NONZERO-DIGIT
- * NILVALUE        = "-"
- *
- * In this implementation:
- *  - MSGID is not used (set to NILVALUE)
- *  - STRUCTURED-DATA is not used (set to NILVALUE)
- *  - Time is assumed UTC
- */
+#if IS_USED(MODULE_SYSLOG_FORMATTER_DEFAULT)
 #define TIME_FMT        "%d-%02d-%02dT%02d:%02d:%02dZ"
 #define TIME_PARAMS(t)  ((t).tm_year + 1900), ((t).tm_mon + 1), ((t).tm_mday), ((t).tm_hour), \
                         ((t).tm_min), ((t).tm_sec)
 
-static ssize_t _build_head(struct syslog_msg *msg, char *str, size_t len)
+ssize_t syslog_build_head(const struct syslog_msg *msg, const char *hostname, char *str, size_t len)
 {
-#if CONFIG_SYSLOG_USE_FMT
-    /* PRI VERSION SP TIMESTAMP SP is 30 char long */
-    assert(len > 30);
-    char *p = str;
-    /* <PRIVAL>VERSION */
-    p += fmt_char(p, '<');
-    p += fmt_s16_dec(p, msg->pri);
-    p += fmt_str(p, ">1 ");
-    if (msg->time_set) {
-        /* DATE-FULLYEAR "-" DATE-MONTH "-" DATE-MDAY */
-        p += fmt_s16_dec(p, msg->time.tm_year + 1900);
-        p += fmt_char(p, '-');
-        if (msg->time.tm_mon + 1 < 10) {
-            p += fmt_char(p, '0');
-        }
-        p += fmt_s16_dec(p, msg->time.tm_mon + 1);
-        p += fmt_char(p, '-');
-        if (msg->time.tm_mday < 10) {
-            p += fmt_char(p, '0');
-        }
-        p += fmt_s16_dec(p, msg->time.tm_mday);
-        /* T */
-        p += fmt_char(p, 'T');
-        /* TIME-HOUR ":" TIME-MINUTE ":" TIME-SECOND */
-        if (msg->time.tm_hour < 10) {
-            p += fmt_char(p, '0');
-        }
-        p += fmt_s16_dec(p, msg->time.tm_hour);
-        p += fmt_char(p, ':');
-        if (msg->time.tm_min < 10) {
-            p += fmt_char(p, '0');
-        }
-        p += fmt_s16_dec(p, msg->time.tm_min);
-        p += fmt_char(p, ':');
-        if (msg->time.tm_sec < 10) {
-            p += fmt_char(p, '0');
-        }
-        p += fmt_s16_dec(p, msg->time.tm_sec);
-        /* TIME-OFFSET (Z) */
-        p += fmt_char(p, 'Z');
-    }
-    else {
-        p += fmt_char(p, '-');
-    }
-    p += fmt_char(p, ' ');
-
-    size_t used = p - str;
-    /* keeping one spare for null char */
-    if (len > used + fmt_strlen(hostname) + fmt_strlen(msg->app_name) + 3) {
-        p += fmt_str(p, hostname);
-        p += fmt_char(p, ' ');
-        p += fmt_str(p, msg->app_name);
-        p += fmt_char(p, ' ');
-    }
-    used = p - str;
-    /* keeping one spare for null char */
-    if (len > used + fmt_u16_dec(NULL, msg->proc_id) + 6) {
-        p += fmt_u16_dec(p, msg->proc_id);
-        p += fmt_char(p, ' ');
-        p += fmt_char(p, '-');
-        p += fmt_char(p, ' ');
-        p += fmt_char(p, '-');
-        p += fmt_char(p, ' ');
-    }
-    *p = '\0';
-
-    return p - str;
-#else
     ssize_t ret;
     if (msg->time_set) {
         ret = snprintf(str, len, "<%d>%d " TIME_FMT " %s %s %" PRIkernel_pid " - - ",
@@ -372,8 +251,8 @@ static ssize_t _build_head(struct syslog_msg *msg, char *str, size_t len)
     }
 
     return ret;
-#endif
 }
+#endif
 
 static ssize_t _build_msg(char *str, size_t len, const char *fmt, va_list ap)
 {
@@ -408,7 +287,7 @@ void vsyslog(syslog_entry_t *entry, int priority, const char *format, va_list ap
 
     /* Eventually this should be done after the message is queued to avoid overloading
      * the caller with the string formatting */
-    ssize_t len = _build_head(msg, msg->msg, sizeof(msg->msg));
+    ssize_t len = syslog_build_head(msg, hostname, msg->msg, sizeof(msg->msg));
     if (len < 0) {
         goto exit_err;
     }
@@ -449,23 +328,12 @@ static void _dispatch_msg(struct syslog_msg *msg)
     syslog_msg_put(msg);
 }
 
-static void _init_backends(void)
-{
-    for (size_t i = 0; i < syslog_backends_numof; i++) {
-        if (syslog_backends[i]->init) {
-            syslog_backends[i]->init();
-        }
-    }
-}
-
 static void *_syslog_thread(void *arg)
 {
     (void)arg;
 
     msg_t queue[SYSLOG_MSG_QUEUE_SIZE];
     msg_init_queue(queue, ARRAY_SIZE(queue));
-
-    _init_backends();
 
     msg_t msg;
     while (1) {

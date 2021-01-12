@@ -1,4 +1,21 @@
 
+/*
+ * Copyright (C) 2021 Continental
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     sys_syslog
+ * @{
+ * @file
+ * @brief   Syslog implementation - backend
+ * @author  Vincent Dupont <vincent.dupont@continental-its.com>
+ * @}
+ */
+
 #include <string.h>
 
 #include "syslog.h"
@@ -6,7 +23,7 @@
 #include "stdio_base.h"
 #include "fmt.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifdef MODULE_SYSLOG_BACKEND_STDIO

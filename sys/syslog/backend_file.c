@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2021 Continental
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @ingroup     sys_syslog
+ * @{
+ * @file
+ * @brief   Syslog implementation - file backend
+ * @author  Vincent Dupont <vincent.dupont@continental-its.com>
+ * @}
+ */
 
 #include <fcntl.h>
 #include <errno.h>
@@ -8,7 +24,7 @@
 #include "vfs.h"
 #include "mutex.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifndef CONFIG_SYSLOG_FILE_ENTRY_NAME
@@ -98,11 +114,6 @@ static void _rotate(syslog_file_t *desc)
     mutex_unlock(&rotation_lock);
 }
 
-static int _init(void)
-{
-    return 0;
-}
-
 static void _send(struct syslog_msg *msg)
 {
     if (!_desc.nb_files) {
@@ -137,7 +148,6 @@ static void _send(struct syslog_msg *msg)
 }
 
 const syslog_backend_t file_be = {
-    .init = _init,
     .send = _send,
 };
 

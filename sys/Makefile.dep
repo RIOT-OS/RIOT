@@ -1075,7 +1075,7 @@ ifneq (,$(filter ecc_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter syslog, $(USEMODULE)))
-  FEATURES_REQUIRED += periph_rtc
+  FEATURES_OPTIONAL += periph_rtc
 endif
 
 ifneq (,$(filter syslog_backend_file, $(USEMODULE)))

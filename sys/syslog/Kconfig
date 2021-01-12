@@ -8,7 +8,6 @@ menuconfig KCONFIG_SYSLOG
     bool "Syslog"
     select MODULE_SYSLOG
     depends on TEST_KCONFIG
-    depends on HAS_PERIPH_RTC
     help
         Configure syslog via Kconfig
 
@@ -24,12 +23,22 @@ config SYSLOG_MAX_STRING_LEN
     int "Max length for a printed log message"
     default 256
 
-config SYSLOG_USE_FMT
-    bool "Use FMT instead of libc"
-    default n
-    select MODULE_FMT
+choice
+    bool "Formatter"
+    default DEFAULT
     help
-        Use fmt module instead of *printf for string formatting
+        Select the log message formatter
+
+config DEFAULT
+    bool "Default (libc-based)"
+    select MODULE_FORMATTER_DEFAULT
+
+config FMT
+    bool "fmt"
+    select MODULE_FORMATTER_FMT
+    select MODULE_FMT
+
+endchoice
 
 config SYSLOG_ALLOC_MEMARRAY
     bool "Use memarray"
