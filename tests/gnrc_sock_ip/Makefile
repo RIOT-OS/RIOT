@@ -7,7 +7,7 @@ ifeq (1, $(AUX_LOCAL))
   USEMODULE += sock_aux_local
 endif
 
-ifeq (1, $(AUX_LOCAL))
+ifeq (1, $(AUX_TIMESTAMP))
   USEMODULE += sock_aux_timestamp
 endif
 
