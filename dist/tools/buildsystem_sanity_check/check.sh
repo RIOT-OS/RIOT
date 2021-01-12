@@ -15,6 +15,9 @@
 
 : "${RIOTBASE:="$(cd "$(dirname "$0")/../../../" || exit; pwd)"}"
 
+: "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
+. "${RIOTTOOLS}"/ci/github_annotate.sh
+
 SCRIPT_PATH=dist/tools/buildsystem_sanity_check/check.sh
 
 
@@ -31,7 +34,22 @@ prepend() {
 }
 
 error_with_message() {
-    tab_indent | prepend "${1}:"
+    while read INPUT; do
+        if github_annotate_is_on; then
+            MESSAGE="${1}"
+            FILE=$(echo "${INPUT}" | cut -d: -f1)
+            LINE=$(echo "${INPUT}" | cut -d: -f2)
+            MATCH=$(echo "${INPUT}" | cut -d: -f3)
+            if [[ $var =~ ^[0-9]+$ ]] || [  -z "$MATCH" ]; then
+                # line is not provided in grep pattern
+                LINE=0
+            fi
+            github_annotate_error "$FILE" "$LINE" "$MESSAGE"
+        fi
+        # We need to generate non GitHub annotations for this script to fail.
+        # Also, the pure annotate output is not very helpful on its own ;-)
+        echo "${INPUT}" | tab_indent | prepend "${1}:"
+    done
 }
 
 
@@ -344,5 +362,8 @@ main() {
 
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    github_annotate_setup
     main
+    github_annotate_teardown
+    github_annotate_report_last_run
 fi
