@@ -65,6 +65,11 @@ _headercheck() {
                         if echo "$line" | \
                            grep -q "@@ -[0-9]\+\(,[0-9]\+\)\? +[0-9]\+\(,[0-9]\+\)\? @@"
                            then
+                           # treat hunk as new diff so it is at the corresponding line
+                           if [ -n "${DIFFLINE}" ]; then
+                               _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
+                               DIFF="--- $DIFFFILE\n+++ $DIFFFILE"
+                           fi
                            DIFFLINE="$(echo "$line" | sed 's/@@ -\([0-9]\+\).*$/\1/')"
                         fi
                         DIFF="$DIFF\n$line"
