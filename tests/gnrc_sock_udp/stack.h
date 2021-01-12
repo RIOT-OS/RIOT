@@ -44,6 +44,7 @@ void _prepare_send_checks(void);
  */
 typedef struct {
     uint64_t timestamp; /**< Timestamp of reception */
+    int16_t rssi;       /**< Fake RSSI value */
 } inject_aux_t;
 
 /**

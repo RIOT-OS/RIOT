@@ -429,10 +429,10 @@ static void test_sock_udp_recv__aux(void)
     static const ipv6_addr_t dst_addr = { .u8 = _TEST_ADDR_LOCAL };
     static const sock_udp_ep_t local = { .family = AF_INET6,
                                          .port = _TEST_PORT_LOCAL };
-    static const inject_aux_t inject_aux = { .timestamp = 1337 };
+    static const inject_aux_t inject_aux = { .timestamp = 1337, .rssi = -11 };
     sock_udp_ep_t result;
     sock_udp_aux_rx_t aux = {
-        .flags = SOCK_AUX_GET_LOCAL | SOCK_AUX_GET_TIMESTAMP
+        .flags = SOCK_AUX_GET_LOCAL | SOCK_AUX_GET_TIMESTAMP | SOCK_AUX_GET_RSSI
     };
 
     expect(0 == sock_udp_create(&_sock, &local, NULL, SOCK_FLAGS_REUSE_EP));
@@ -458,6 +458,12 @@ static void test_sock_udp_recv__aux(void)
     expect(inject_aux.timestamp == aux.timestamp);
 #else
     expect(aux.flags & SOCK_AUX_GET_TIMESTAMP);
+#endif
+#if IS_USED(MODULE_SOCK_AUX_RSSI)
+    expect(!(aux.flags & SOCK_AUX_GET_RSSI));
+    expect(inject_aux.rssi == aux.rssi);
+#else
+    expect(aux.flags & SOCK_AUX_GET_RSSI);
 #endif
     expect(_check_net());
 }
