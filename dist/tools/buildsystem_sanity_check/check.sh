@@ -57,7 +57,7 @@ check_not_parsing_features() {
     pathspec+=(':!Makefile.include' ':!makefiles/info-global.inc.mk')
 
     git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
-        | error_with_message 'Modules should not check the content of FEATURES_PROVIDED/_REQUIRED/OPTIONAL'
+        | error_with_message 'Modules should not check the content of FEATURES_PROVIDED/REQUIRED/OPTIONAL'
 }
 
 # Providing features for boards and CPUs should only be done in
