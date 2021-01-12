@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Copyright 2017 Kaspar Schleiser <kaspar@schleiser.de>
 # Copyright 2014 Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
@@ -13,6 +13,7 @@ cd $RIOTBASE
 
 : "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
 . "${RIOTTOOLS}"/ci/changed_files.sh
+. "${RIOTTOOLS}"/ci/github_annotate.sh
 
 # Don't show warnings about unusedStructMembers by default
 DEFAULT_SUPPRESSIONS="${1}"
@@ -50,7 +51,42 @@ if [ -z "${FILES}" ]; then
     exit
 fi
 
+# sets
+# - LOG to tee output into for later parsing
+# - LOGFILE to parse GitHub annotations into
+github_annotate_setup
+
 # TODO: switch back to 8 jobs when/if cppcheck issue is resolved
 cppcheck --std=c99 --enable=style --force --error-exitcode=2 --quiet -j 1 \
          --template "{file}:{line}: {severity} ({id}): {message}"         \
-         --inline-suppr ${DEFAULT_SUPPRESSIONS} ${CPPCHECK_OPTIONS} ${@} ${FILES}
+         --inline-suppr ${DEFAULT_SUPPRESSIONS} ${CPPCHECK_OPTIONS} ${@}  \
+         ${FILES} 2>&1 | ${LOG} 1>&2
+
+RESULT=${PIPESTATUS[0]}
+
+if github_annotate_is_on; then
+    grep "^.\+:[0-9]\+: [a-z]\+ (.*):" ${LOGFILE} | while read error_line; do
+        FILE=$(echo "${error_line}" | cut -d: -f1)
+        LINENUM=$(echo "${error_line}" | cut -d: -f2)
+        SEVERITY=$(echo "${error_line}" | cut -d: -f3)
+        ID=$(echo "${SEVERITY}" | sed 's/^.*(\(.*\))$/\1/g')
+        DETAILS=$(echo "${error_line}" | cut -d: -f4- |
+                  sed -e 's/^[ \t]*//' -e 's/[ \t]*$//')
+        DETAILS="${DETAILS}\n\n"
+        DETAILS="${DETAILS}If you are sure this is a false positive, you can "
+        DETAILS="${DETAILS}suppress this by adding the following comment above "
+        DETAILS="${DETAILS}this line:\n\n"
+        DETAILS="${DETAILS}    /* cppcheck-suppress ${ID}\n"
+        DETAILS="${DETAILS}     * (reason: <your reason why you think this is "
+        DETAILS="${DETAILS}a false positive>) */\n"
+
+        if echo "${SEVERITY}" | grep -q "\<error\>"; then
+            github_annotate_error "${FILE}" "${LINENUM}" "${DETAILS}"
+        else
+            github_annotate_warning "${FILE}" "${LINENUM}" "${DETAILS}"
+        fi
+    done
+fi
+
+github_annotate_teardown
+exit ${RESULT}
