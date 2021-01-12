@@ -31,7 +31,7 @@ prepend() {
 }
 
 error_with_message() {
-    tab_indent | prepend "${1}"
+    tab_indent | prepend "${1}:"
 }
 
 
@@ -137,7 +137,7 @@ check_not_exporting_variables() {
     done
 
     git -C "${RIOTBASE}" grep "${patterns[@]}" \
-        | error_with_message 'Variables must not be exported:'
+        | error_with_message 'Variables must not be exported'
 
     # Some variables may still be exported in 'makefiles/vars.inc.mk' as the
     # only place that should export common variables
@@ -153,7 +153,7 @@ check_not_exporting_variables() {
     # Only run if there are patterns, otherwise it matches everything
     if [ ${#patterns[@]} -ne 0 ]; then
         git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
-            | error_with_message 'Variables must only be exported in `makefiles/vars.inc.mk`:'
+            | error_with_message 'Variables must only be exported in `makefiles/vars.inc.mk`'
     fi
 }
 
@@ -173,7 +173,7 @@ check_deprecated_vars_patterns() {
     pathspec+=(":!${SCRIPT_PATH}")
 
     git -C "${RIOTBASE}" grep "${patterns[@]}" -- "${pathspec[@]}" \
-        | error_with_message 'Deprecated variables or patterns:'
+        | error_with_message 'Deprecated variables or patterns'
 }
 
 # Makefile files cpu must not be included by the board anymore
