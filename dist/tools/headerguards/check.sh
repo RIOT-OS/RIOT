@@ -23,8 +23,7 @@ filter() {
 }
 
 _headercheck() {
-    OUT="$(${RIOTTOOLS}/headerguards/headerguards.py ${FILES} | filter)"
-
+    OUT=$(${RIOTTOOLS}/headerguards/headerguards.py ${FILES} 2>&1 | filter)
     if [ -n "$OUT" ]; then
         EXIT_CODE=1
         echo "$OUT"
