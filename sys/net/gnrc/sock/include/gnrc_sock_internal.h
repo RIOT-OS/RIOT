@@ -73,6 +73,9 @@ typedef struct {
 #if IS_USED(MODULE_SOCK_AUX_TIMESTAMP) || DOXYGEN
     uint64_t *timestamp;    /**< timestamp PDU was received at in nanoseconds */
 #endif
+#if IS_USED(MODULE_SOCK_AUX_RSSI) || DOXYGEN
+    int16_t *rssi;          /**< RSSI value of received PDU */
+#endif
     /**
      * @brief   Flags
      */
@@ -80,6 +83,7 @@ typedef struct {
 } gnrc_sock_recv_aux_t;
 
 #define GNRC_SOCK_RECV_AUX_FLAG_TIMESTAMP   0x01    /**< Timestamp valid */
+#define GNRC_SOCK_RECV_AUX_FLAG_RSSI        0x02    /**< RSSI valid */
 
 /**
  * @brief   Internal helper functions for GNRC
