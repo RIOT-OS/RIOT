@@ -11,7 +11,7 @@ jobs:
     - uses: RIOT-OS/check-labels-action@v1.0.0
       with:
         access_token: ${{ secrets.GITHUB_TOKEN }}
-        unset_labels: 'CI: needs squashing,State: waiting for other PR'
+        unset_labels: 'CI: needs squashing,State: waiting for other PR,Process: blocked by feature freeze'
         cond_labels: '(Process: needs >1 ACK,review.approvals>1),(Area: RDM,review.approvals>2)'
   check-commits:
     runs-on: ubuntu-latest
