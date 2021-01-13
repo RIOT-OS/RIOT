@@ -94,6 +94,6 @@ Use it like this:
 
     $ cd examples/hello-world
     $ BOARD=microbit make clean all -j4
-    $ BOARD=microbit make emulate
+    $ EMULATE=1 BOARD=microbit make term
 
  */

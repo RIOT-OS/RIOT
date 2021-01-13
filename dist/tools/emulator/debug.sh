@@ -45,9 +45,10 @@ trap '' INT
 # start emulator GDB server
 sh -c "\
     GDB_PORT=${GDB_PORT} \
+    EMULATE=1 \
     EMULATOR_PIDFILE=${EMULATOR_PIDFILE} \
     BOARD=${BOARD} \
-    make -C ${APPDIR} emulate-only debug-server & \
+    make -C ${APPDIR} debug-server & \
     echo \$! > ${EMULATOR_PIDFILE}" &
 # Start the debugger and connect to the GDB server
 sh -c "${DBG} ${DBG_FLAGS} ${ELFFILE}"
