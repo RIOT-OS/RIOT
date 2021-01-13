@@ -7,13 +7,16 @@
 # directory for more details.
 #
 
+. "$(dirname "$0")/../ci/github_annotate.sh"
+
 : "${RIOTBASE:=$(cd $(dirname $0)/../../../; pwd)}"
 cd $RIOTBASE
 
 : "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
-. "${RIOTTOOLS}"/pr_check/check_labels.sh
 
 EXIT_CODE=0
+
+github_annotate_setup
 
 if tput colors &> /dev/null && [ $(tput colors) -ge 8 ]; then
     CERROR="\e[1;31m"
@@ -40,21 +43,24 @@ SQUASH_COMMITS="$(git log $(git merge-base HEAD "${RIOT_MASTER}")...HEAD --prett
                   keyword_filter)"
 
 if [ -n "${SQUASH_COMMITS}" ]; then
-    echo -e "${CERROR}Pull request needs squashing:${CRESET}" 1>&2
-    echo -e "${SQUASH_COMMITS}"
+    if github_annotate_is_on; then
+        echo "${SQUASH_COMMITS}" | while read commit; do
+            ANNOTATION="Commit needs to be squashed: \"${commit}\""
+            ANNOTATION="${ANNOTATION}\n\nPLEASE ONLY SQUASH WHEN ASKED BY A "
+            ANNOTATION="${ANNOTATION}MAINTAINER!"
+            ANNOTATION="${ANNOTATION}\nSee: "
+            ANNOTATION="${ANNOTATION}https://github.com/RIOT-OS/RIOT/blob/master/CONTRIBUTING.md#squash-commits-after-review"
+            github_annotate_error_no_file "${ANNOTATION}"
+        done
+    else
+        echo -e "${CERROR}Pull request needs squashing:${CRESET}" 1>&2
+        echo -e "${SQUASH_COMMITS}"
+    fi
     EXIT_CODE=1
 fi
 
-if [ -n "$TRAVIS_PULL_REQUEST" -o -n "$CI_PULL_NR" ]; then
-    if check_gh_label "CI: needs squashing"; then
-        echo -e "${CERROR}Pull request needs squashing according to its labels set on GitHub${CRESET}"
-        EXIT_CODE=1
-    fi
+github_annotate_teardown
 
-    if check_gh_label "State: waiting for other PR"; then
-        echo -e "${CERROR}Pull request is waiting for another pull request according to its labels set on GitHub${CRESET}"
-        EXIT_CODE=1
-    fi
-fi
+github_annotate_report_last_run
 
 exit ${EXIT_CODE}
