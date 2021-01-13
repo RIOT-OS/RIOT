@@ -20,6 +20,7 @@
 #include <string.h>
 #include <kernel_defines.h>
 
+#include "bitarithm.h"
 #include "bitfield.h"
 #include "event.h"
 #include "net/ethernet.h"
@@ -50,6 +51,10 @@
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+#define THREAD_FLAG_IRQ         BIT0
+#define THREAD_FLAG_RX_DONE     BIT1
+#define THREAD_FLAG_TX_DONE     BIT2
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);
 static void _check_netdev_capabilities(netdev_t *dev);
@@ -1408,28 +1413,32 @@ void gnrc_netif_default_init(gnrc_netif_t *netif)
 #endif
 }
 
-static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back);
+static gnrc_pktsnip_t * _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back);
 
-#if IS_USED(MODULE_GNRC_NETIF_EVENTS)
-/**
- * @brief   Call the ISR handler from an event
- *
- * @param[in]   evp     pointer to the event
- */
-static void _event_handler_isr(event_t *evp)
+static gnrc_pktsnip_t * _send_queued_pkt(gnrc_netif_t *netif)
 {
-    gnrc_netif_t *netif = container_of(evp, gnrc_netif_t, event_isr);
-    netif->dev->driver->isr(netif->dev);
-}
-#endif
-
-static inline void _event_post(gnrc_netif_t *netif)
-{
-#if IS_USED(MODULE_GNRC_NETIF_EVENTS)
-    event_post(&netif->evq, &netif->event_isr);
-#else
     (void)netif;
-#endif
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+    gnrc_pktsnip_t *pkt;
+
+    if ((pkt = gnrc_netif_pktq_get(netif)) != NULL) {
+        gnrc_pktsnip_t *result = _send(netif, pkt, true);
+        gnrc_netif_pktq_sched_get(netif);
+        return result;
+    }
+#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+    return NULL;
+}
+
+static void _pass_on_packet(gnrc_pktsnip_t *pkt)
+{
+    /* throw away packet if no one is interested */
+    if (!gnrc_netapi_dispatch_receive(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL,
+                                      pkt)) {
+        DEBUG("gnrc_netif: unable to forward packet of type %i\n", pkt->type);
+        gnrc_pktbuf_release(pkt);
+        return;
+    }
 }
 
 static void _process_receive_stats(gnrc_netif_t *netdev, gnrc_pktsnip_t *pkt)
@@ -1454,149 +1463,35 @@ static void _process_receive_stats(gnrc_netif_t *netdev, gnrc_pktsnip_t *pkt)
 }
 
 /**
- * @brief   Retrieve the netif event queue if enabled
+ * @brief   Handle failed transmission attempt
  *
- * @param[in]   netif   gnrc_netif instance to operate on
- *
- * @return              NULL if MODULE_GNRC_NETIF_EVENTS is not enabled
- * @return              gnrc_netif_t::evq if MODULE_GNRC_NETIF_EVENTS is enabled
+ * @param   netif       Interface which failed to transfer a frame
+ * @param   error_code  Return value of send() or send_confirm() indicating
+ *                      the failure cause
+ * @param   pkt         Frame that couldn't be send
+ * @param   push_back   Where to enqueue the frame (with module gnrc_netif_pktq)
  */
-static inline event_queue_t *_get_evq(gnrc_netif_t *netif)
+static void _tx_failed(gnrc_netif_t *netif, int error_code, gnrc_pktsnip_t *pkt,
+                       bool push_back)
 {
-#ifdef MODULE_GNRC_NETIF_EVENTS
-    return &netif->evq;
-#else
-    (void)netif;
-    return NULL;
-#endif
-}
-
-/**
- * @brief   Process any pending events and wait for IPC messages
- *
- * This function will block until an IPC message is received. Events posted to
- * the event queue will be processed while waiting for messages.
- *
- * @param[in]   netif   gnrc_netif instance to operate on
- * @param[out]  msg     pointer to message buffer to write the first received message
- *
- * @return >0 if msg contains a new message
- */
-static void _process_events_await_msg(gnrc_netif_t *netif, msg_t *msg)
-{
-    if (IS_USED(MODULE_GNRC_NETIF_EVENTS)) {
-        while (1) {
-            /* Using messages for external IPC, and events for internal events */
-
-            /* First drain the queues before blocking the thread */
-            /* Events will be handled before messages */
-            DEBUG("gnrc_netif: handling events\n");
-            event_t *evp;
-            /* We can not use event_loop() or event_wait() because then we would not
-             * wake up when a message arrives */
-            event_queue_t *evq = _get_evq(netif);
-            while ((evp = event_get(evq))) {
-                DEBUG("gnrc_netif: event %p\n", (void *)evp);
-                if (evp->handler) {
-                    evp->handler(evp);
-                }
-            }
-            /* non-blocking msg check */
-            int msg_waiting = msg_try_receive(msg);
-            if (msg_waiting > 0) {
-                return;
-            }
-            DEBUG("gnrc_netif: waiting for events\n");
-            /* Block the thread until something interesting happens */
-            thread_flags_wait_any(THREAD_FLAG_MSG_WAITING | THREAD_FLAG_EVENT);
-        }
-    }
-    else {
-        /* Only messages used for event handling */
-        DEBUG("gnrc_netif: waiting for incoming messages\n");
-        msg_receive(msg);
-    }
-}
-
-static void _send_queued_pkt(gnrc_netif_t *netif)
-{
-    (void)netif;
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
-    gnrc_pktsnip_t *pkt;
-
-    if ((pkt = gnrc_netif_pktq_get(netif)) != NULL) {
-        _send(netif, pkt, true);
-        gnrc_netif_pktq_sched_get(netif);
-    }
-#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
-}
-
-static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
-{
-    (void)push_back; /* only used with IS_USED(MODULE_GNRC_NETIF_PKTQ) */
-    int res;
-
-#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
-    /* send queued packets first to keep order */
-    if (!push_back && !gnrc_netif_pktq_empty(netif)) {
-        int put_res;
-
-        put_res = gnrc_netif_pktq_put(netif, pkt);
-        if (put_res == 0) {
-            DEBUG("gnrc_netif: (re-)queued pkt %p\n", (void *)pkt);
-            _send_queued_pkt(netif);
-            return;
-        }
-        else {
-            LOG_WARNING("gnrc_netif: can't queue packet for sending\n");
-            /* try to send anyway */
-        }
-    }
-    /* hold in case device was busy to not having to rewrite *all* the link
-     * layer implementations in case `gnrc_netif_pktq` is included */
-    gnrc_pktbuf_hold(pkt, 1);
-#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
-
-    /* Record send in neighbor statistics if destination is unicast */
+    /* arguments may be unused, depending on used pseudo modules */
+    (void)netif; (void)error_code; (void)pkt; (void)push_back;
+    DEBUG("gnrc_netif: error sending packet %p (code: %i)\n",
+          (void *)pkt, error_code);
     if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
-        gnrc_netif_hdr_t *netif_hdr = pkt->data;
-        if (netif_hdr->flags &
-            (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
-            DEBUG("l2 stats: Destination is multicast or unicast, NULL recorded\n");
-            netstats_nb_record(&netif->netif, NULL, 0);
+        int8_t retries = -1;
+        netstats_nb_result_t result;
+        if (error_code == -EBUSY) {
+            result = NETSTATS_NB_BUSY;
         } else {
-            DEBUG("l2 stats: recording transmission\n");
-            netstats_nb_record(&netif->netif,
-                               gnrc_netif_hdr_get_dst_addr(netif_hdr),
-                               netif_hdr->dst_l2addr_len);
+            result = NETSTATS_NB_NOACK;
+            netdev_t *dev = netif->dev;
+            dev->driver->get(dev, NETOPT_TX_RETRIES_NEEDED, &retries, sizeof(retries));
         }
+        netstats_nb_update_tx(&netif->netif, result, retries + 1);
     }
-
-    /* Split off the TX sync snip */
-    gnrc_pktsnip_t *tx_sync = IS_USED(MODULE_GNRC_TX_SYNC)
-                            ? gnrc_tx_sync_split(pkt) : NULL;
-    res = netif->ops->send(netif, pkt);
-    if (tx_sync != NULL) {
-        uint32_t err = (res < 0) ? -res : GNRC_NETERR_SUCCESS;
-        gnrc_pktbuf_release_error(tx_sync, err);
-    }
-
-    /* no frame was transmitted */
-    if (res < 0) {
-        DEBUG("gnrc_netif: error sending packet %p (code: %i)\n",
-              (void *)pkt, res);
-
-        if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
-            netstats_nb_update_tx(&netif->netif, NETSTATS_NB_BUSY, 0);
-        }
-    }
-#ifdef MODULE_NETSTATS_L2
-    else {
-        netif->stats.tx_bytes += res;
-    }
-#endif
 #if IS_USED(MODULE_GNRC_NETIF_PKTQ)
-    if (res == -EBUSY) {
+    if (error_code == -EBUSY) {
         int put_res;
 
         /* Lower layer was busy.
@@ -1616,19 +1511,199 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
             DEBUG("gnrc_netif: (re-)queued pkt %p\n", (void *)pkt);
             return; /* early return to not release */
         }
-        else {
-            LOG_ERROR("gnrc_netif: can't queue packet for sending\n");
-            /* If we got here, it means the device was busy and the pkt queue
-             * was full. The packet should be dropped here anyway */
-            gnrc_pktbuf_release_error(pkt, ENOMEM);
-        }
-        return;
-    }
-    else {
-        /* remove previously held packet */
-        gnrc_pktbuf_release(pkt);
+
+        LOG_ERROR("gnrc_netif: can't queue packet for sending\n");
+        /* If we got here, it means the device was busy and the pkt queue
+         * was full. The packet should be dropped here anyway */
+        error_code = -ENOMEM;
     }
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+    /* remove previously held packet */
+    gnrc_pktbuf_release_error(pkt, -error_code);
+#if IS_USED(MODULE_NETSTATS_L2)
+    /* we are the only ones supposed to touch this variable,
+     * so no acquire necessary */
+    netif->stats.tx_failed++;
+#endif /* IS_USED(MODULE_NETSTATS_L2) */
+}
+
+/**
+ * @brief   Handle successful transmission attempt
+ *
+ * @param   netif       Interface which failed to transfer a frame
+ * @param   bytes_send  Number of bytes send
+ *
+ * @return  Outgoing frame that was send from packet queue
+ * @retval  `NULL`      No frame is currently being send
+ */
+static gnrc_pktsnip_t * _tx_succeeded(gnrc_netif_t *netif, uint32_t bytes_send)
+{
+    /* arguments may be unused, depending on used pseudo modules */
+    (void)netif; (void)bytes_send;
+#if IS_USED(MODULE_NETSTATS_L2)
+    /* we are the only ones supposed to touch this variable,
+     * so no acquire necessary */
+    netif->stats.tx_success++;
+    netif->stats.tx_bytes += bytes_send;
+#endif /* IS_USED(MODULE_NETSTATS_L2) */
+    if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
+        int8_t retries = -1;
+        netdev_t *dev = netif->dev;
+        dev->driver->get(dev, NETOPT_TX_RETRIES_NEEDED, &retries, sizeof(retries));
+        netstats_nb_update_tx(&netif->netif, NETSTATS_NB_SUCCESS, retries + 1);
+    }
+    /* send packet previously queued within netif due to the lower
+     * layer being busy.
+     * Further packets will be sent on later TX_COMPLETE or
+     * TX_MEDIUM_BUSY */
+    return _send_queued_pkt(netif);
+}
+
+
+/**
+ * @brief   Process any pending events and wait for IPC messages
+ *
+ * This function will block until an IPC message is received. ISR events
+ * will still be processed.
+ *
+ * @param[in]   netif       gnrc_netif instance to operate on
+ * @param[in]   dev         netdev corresponding to @p netif
+ * @param[out]  msg         pointer to message buffer to write the first received
+ *                          message
+ * @param[in]   tx_pkt      frame that is currently being send, or `NULL` if no transmission is
+ *                          currently ongoing
+ *
+ * @return  Frame that is currently being send
+ * @retval  NULL            No frame is currently being send
+ */
+static gnrc_pktsnip_t * _process_events_await_msg(gnrc_netif_t *netif, netdev_t *dev, msg_t *msg,
+                                                  gnrc_pktsnip_t *tx_pkt)
+{
+    DEBUG("gnrc_netif: waiting for incoming events or messages\n");
+    const thread_flags_t flags_mask = THREAD_FLAG_IRQ | THREAD_FLAG_RX_DONE | THREAD_FLAG_TX_DONE
+                                    | THREAD_FLAG_MSG_WAITING;
+    while (msg_try_receive(msg) == -1) {
+        thread_flags_t flags = thread_flags_wait_any(flags_mask);
+        if (flags & THREAD_FLAG_IRQ) {
+            dev->driver->isr(dev);
+        }
+        if (flags & THREAD_FLAG_RX_DONE) {
+            gnrc_pktsnip_t *pkt = netif->ops->recv(netif);
+            /* send packet previously queued within netif due to the lower
+             * layer being busy.
+             * Further packets will be sent on later TX_COMPLETE */
+            if (!tx_pkt) {
+                tx_pkt = _send_queued_pkt(netif);
+            }
+            if (pkt) {
+                _process_receive_stats(netif, pkt);
+                _pass_on_packet(pkt);
+            }
+        }
+        if (flags & THREAD_FLAG_TX_DONE) {
+            if (!tx_pkt) {
+                DEBUG("gnrc_netif: got TX_DONE event while not sending\n");
+            }
+            else {
+                int retval;
+                while (-EAGAIN == (retval = dev->driver->confirm_send(dev, NULL)))
+                {
+                    /* Per API contract, this should never happen, but in
+                     * production code it might be better to busy wait here */
+                    assert(0);
+                }
+                if (retval < 0) {
+                    _tx_failed(netif, retval, tx_pkt, false);
+                    tx_pkt = NULL;
+                }
+                else {
+                    gnrc_pktsnip_t *to_release = tx_pkt;
+                    tx_pkt = _tx_succeeded(netif, retval);
+                    gnrc_pktbuf_release(to_release);
+                }
+            }
+        }
+    }
+
+    return tx_pkt;
+}
+
+/**
+ * @brief   Send a frame
+ *
+ * @param[in]   netif       interface to use for sending
+ * @param[in]   pkt         frame to send
+ * @param[in]   push_back   how to enqueue the packet when using gnrc_netif_pktq
+ *
+ * @return  @p pkt, if the frame is still in transit
+ * @retval  NULL            If sending @p pkt has completed and the buffer has been freed
+ */
+static gnrc_pktsnip_t * _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
+{
+    int res;
+
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+    /* send queued packets first to keep order */
+    if (!push_back && !gnrc_netif_pktq_empty(netif)) {
+        int put_res;
+
+        put_res = gnrc_netif_pktq_put(netif, pkt);
+        if (put_res == 0) {
+            DEBUG("gnrc_netif: (re-)queued pkt %p\n", (void *)pkt);
+            return _send_queued_pkt(netif);
+        }
+        else {
+            LOG_WARNING("gnrc_netif: can't queue packet for sending\n");
+            /* try to send anyway */
+        }
+    }
+    if (!netif->dev->driver->confirm_send) {
+        /* hold in case device was busy to not having to rewrite *all* the link
+         * layer implementations in case `gnrc_netif_pktq` is included */
+        gnrc_pktbuf_hold(pkt, 1);
+    }
+#endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+
+    /* Record send in neighbor statistics if destination is unicast */
+    if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
+        gnrc_netif_hdr_t *netif_hdr = pkt->data;
+        if (netif_hdr->flags &
+            (GNRC_NETIF_HDR_FLAGS_BROADCAST | GNRC_NETIF_HDR_FLAGS_MULTICAST)) {
+            DEBUG("l2 stats: Destination is multicast or unicast, NULL recorded\n");
+            netstats_nb_record(&netif->netif, NULL, 0);
+        } else {
+            DEBUG("l2 stats: recording transmission\n");
+            netstats_nb_record(&netif->netif,
+                               gnrc_netif_hdr_get_dst_addr(netif_hdr),
+                               netif_hdr->dst_l2addr_len);
+        }
+    }
+
+#if IS_USED(MODULE_GNRC_TX_SYNC)
+    /* Don't confuse netdevs with TX sync snip */
+    gnrc_pktsnip_t *tx_sync = gnrc_tx_sync_split(pkt);
+#endif
+    res = netif->ops->send(netif, pkt);
+
+    if (res < 0) {
+#if IS_USED(MODULE_GNRC_TX_SYNC)
+        gnrc_pkt_append(pkt, tx_sync);
+#endif
+        _tx_failed(netif, res, pkt, push_back);
+        return NULL;
+    }
+    if (!netif->dev->driver->confirm_send) {
+        /* success and legacy, blocking netdev API */
+#if IS_USED(MODULE_GNRC_TX_SYNC)
+        gnrc_pktbuf_release(tx_sync);
+#endif
+        return _tx_succeeded(netif, res);
+    }
+    /* modern API, outgoing frame needs still to be released upon TX completion */
+#if IS_USED(MODULE_GNRC_TX_SYNC)
+    gnrc_pkt_append(pkt, tx_sync);
+#endif
+    return pkt;
 }
 
 static void *_gnrc_netif_thread(void *args)
@@ -1645,12 +1720,6 @@ static void *_gnrc_netif_thread(void *args)
     gnrc_netif_acquire(netif);
     dev = netif->dev;
     netif->pid = thread_getpid();
-
-#if IS_USED(MODULE_GNRC_NETIF_EVENTS)
-    netif->event_isr.handler = _event_handler_isr,
-    /* set up the event queue */
-    event_queue_init(&netif->evq);
-#endif /* MODULE_GNRC_NETIF_EVENTS */
 
     /* setup the link-layer's message queue */
     msg_init_queue(msg_queue, GNRC_NETIF_MSG_QUEUE_SIZE);
@@ -1678,28 +1747,37 @@ static void *_gnrc_netif_thread(void *args)
     xtimer_ticks32_t last_wakeup = xtimer_now();
 #endif
 
+    gnrc_pktsnip_t *tx_pkt = NULL;
     while (1) {
         msg_t msg;
         /* msg will be filled by _process_events_await_msg.
          * The function will not return until a message has been received. */
-        _process_events_await_msg(netif, &msg);
+        tx_pkt = _process_events_await_msg(netif, dev, &msg, tx_pkt);
 
         /* dispatch netdev, MAC and gnrc_netapi messages */
         DEBUG("gnrc_netif: message %u\n", (unsigned)msg.type);
         switch (msg.type) {
 #if IS_USED(MODULE_GNRC_NETIF_PKTQ)
             case GNRC_NETIF_PKTQ_DEQUEUE_MSG:
-                DEBUG("gnrc_netif: send from packet send queue\n");
-                _send_queued_pkt(netif);
+                if (tx_pkt) {
+                    DEBUG("gnrc_netif: refusing to dequeue from pktq while TX is ongoing\n");
+                }
+                else {
+                    DEBUG("gnrc_netif: send from packet send queue\n");
+                    tx_pkt = _send_queued_pkt(netif);
+                }
                 break;
 #endif  /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
-            case NETDEV_MSG_TYPE_EVENT:
-                DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_EVENT received\n");
-                dev->driver->isr(dev);
-                break;
             case GNRC_NETAPI_MSG_TYPE_SND:
                 DEBUG("gnrc_netif: GNRC_NETDEV_MSG_TYPE_SND received\n");
-                _send(netif, msg.content.ptr, false);
+                if (tx_pkt) {
+                    DEBUG("gnrc_netif: transmission attempt during TX\n");
+                    /* if gnrc_netif_pktq is active, the outgoing frame will be queued up rather
+                     * than dropped */
+                    _tx_failed(netif, -EBUSY, msg.content.ptr, false);
+                } else {
+                    tx_pkt = _send(netif, msg.content.ptr, false);
+                }
 #if (CONFIG_GNRC_NETIF_MIN_WAIT_AFTER_SEND_US > 0U)
                 xtimer_periodic_wakeup(
                         &last_wakeup,
@@ -1757,100 +1835,31 @@ static void *_gnrc_netif_thread(void *args)
     return NULL;
 }
 
-static void _pass_on_packet(gnrc_pktsnip_t *pkt)
-{
-    /* throw away packet if no one is interested */
-    if (!gnrc_netapi_dispatch_receive(pkt->type, GNRC_NETREG_DEMUX_CTX_ALL,
-                                      pkt)) {
-        DEBUG("gnrc_netif: unable to forward packet of type %i\n", pkt->type);
-        gnrc_pktbuf_release(pkt);
-        return;
-    }
-}
-
 static void _event_cb(netdev_t *dev, netdev_event_t event)
 {
-    gnrc_netif_t *netif = (gnrc_netif_t *) dev->context;
+    gnrc_netif_t *netif = (gnrc_netif_t *)dev->context;
 
-    if (event == NETDEV_EVENT_ISR) {
-        if (IS_USED(MODULE_GNRC_NETIF_EVENTS)) {
-            _event_post(netif);
-        }
-        else {
-            msg_t msg = { .type = NETDEV_MSG_TYPE_EVENT,
-                          .content = { .ptr = netif } };
-
-            if (msg_send(&msg, netif->pid) <= 0) {
-                puts("gnrc_netif: possibly lost interrupt.");
-            }
-        }
-    }
-    else {
-        DEBUG("gnrc_netif: event triggered -> %i\n", event);
-        gnrc_pktsnip_t *pkt = NULL;
-        switch (event) {
-            case NETDEV_EVENT_RX_COMPLETE:
-                pkt = netif->ops->recv(netif);
-                /* send packet previously queued within netif due to the lower
-                 * layer being busy.
-                 * Further packets will be sent on later TX_COMPLETE */
-                _send_queued_pkt(netif);
-                if (pkt) {
-                    _process_receive_stats(netif, pkt);
-                    _pass_on_packet(pkt);
-                }
-                break;
-#if IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ)
-            case NETDEV_EVENT_TX_COMPLETE:
-            case NETDEV_EVENT_TX_COMPLETE_DATA_PENDING:
-                /* send packet previously queued within netif due to the lower
-                 * layer being busy.
-                 * Further packets will be sent on later TX_COMPLETE or
-                 * TX_MEDIUM_BUSY */
-                _send_queued_pkt(netif);
-#if IS_USED(MODULE_NETSTATS_L2)
-                /* we are the only ones supposed to touch this variable,
-                 * so no acquire necessary */
-                netif->stats.tx_success++;
-#endif  /* IS_USED(MODULE_NETSTATS_L2) */
-                if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
-                    int8_t retries = -1;
-                    dev->driver->get(dev, NETOPT_TX_RETRIES_NEEDED, &retries, sizeof(retries));
-                    netstats_nb_update_tx(&netif->netif, NETSTATS_NB_SUCCESS, retries + 1);
-                }
-                break;
-#endif  /* IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ) */
-#if IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ) || \
-    IS_USED(MODULE_NETSTATS_NEIGHBOR)
-            case NETDEV_EVENT_TX_MEDIUM_BUSY:
-            case NETDEV_EVENT_TX_NOACK:
-                /* update neighbor statistics */
-                if (IS_USED(MODULE_NETSTATS_NEIGHBOR)) {
-                    int8_t retries = -1;
-                    netstats_nb_result_t result;
-                    if (event == NETDEV_EVENT_TX_NOACK) {
-                        result = NETSTATS_NB_NOACK;
-                        dev->driver->get(dev, NETOPT_TX_RETRIES_NEEDED, &retries, sizeof(retries));
-                    } else {
-                        result = NETSTATS_NB_BUSY;
-                    }
-                    netstats_nb_update_tx(&netif->netif, result, retries + 1);
-                }
-                /* send packet previously queued within netif due to the lower
-                 * layer being busy.
-                 * Further packets will be sent on later TX_COMPLETE or
-                 * TX_MEDIUM_BUSY */
-                _send_queued_pkt(netif);
-#if IS_USED(MODULE_NETSTATS_L2)
-                /* we are the only ones supposed to touch this variable,
-                 * so no acquire necessary */
-                netif->stats.tx_failed++;
-#endif  /* IS_USED(MODULE_NETSTATS_L2) */
-                break;
-#endif  /* IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ) */
-            default:
-                DEBUG("gnrc_netif: warning: unhandled event %u.\n", event);
-        }
+    DEBUG("gnrc_netif: event triggered -> %i\n", event);
+    thread_t *thread = thread_get(netif->pid);
+    switch (event) {
+    case NETDEV_EVENT_ISR:
+        thread_flags_set(thread, THREAD_FLAG_IRQ);
+        break;
+    case NETDEV_EVENT_RX_COMPLETE:
+        thread_flags_set(thread, THREAD_FLAG_RX_DONE);
+        break;
+    case NETDEV_EVENT_TX_COMPLETE:
+        thread_flags_set(thread, THREAD_FLAG_TX_DONE);
+        break;
+    case NETDEV_EVENT_TX_COMPLETE_DATA_PENDING:
+    case NETDEV_EVENT_TX_MEDIUM_BUSY:
+    case NETDEV_EVENT_TX_NOACK:
+        /* legacy events */
+        DEBUG("gnrc_netif: legacy event %u received.\n", event);
+        thread_flags_set(thread, THREAD_FLAG_TX_DONE);
+        break;
+    default:
+        DEBUG("gnrc_netif: warning: unhandled event %u.\n", event);
     }
 }
 /** @} */
