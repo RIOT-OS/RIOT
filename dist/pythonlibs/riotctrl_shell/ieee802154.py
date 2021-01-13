@@ -173,3 +173,26 @@ class Txtsnd(ShellInteraction):
 
         if "Success" not in res:
             raise RuntimeError(res)
+    
+    def reply(self, timeout=None, async_=False):
+        cmd = "reply" \
+                .format()
+
+        try:
+            res = self.cmd(cmd, timeout=timeout, async_=async_)
+        except Exception as e:
+            print(str(e))
+            print("Exception")
+
+        if "Success" not in res:
+            raise RuntimeError(res)
+
+    def spam(self, long_addr, len, number_of_packets, time_betweeen_packets, timeout=None, async_=False):
+        cmd = "spam {long_addr} {len} {number_of_packets} {time_betweeen_packets}" \
+              .format(long_addr=long_addr, len=len, number_of_packets=number_of_packets, time_betweeen_packets=time_betweeen_packets)
+
+        try:
+            res = self.cmd(cmd, timeout=timeout, async_=async_)
+        except Exception as e:
+            print(str(e))
+            print("Exception")
