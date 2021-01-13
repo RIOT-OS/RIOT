@@ -17,6 +17,10 @@ else
 fi
 
 : "${RIOTBASE:=$(cd $(dirname $0)/../../../; pwd)}"
+
+REL_SCRIPT_DIR=$(realpath --relative-to=${RIOTBASE} $(cd $(dirname $0); pwd))
+REL_SCRIPT_PATH=${REL_SCRIPT_DIR}/$(basename "$0")
+
 cd $RIOTBASE
 
 : "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
@@ -47,16 +51,44 @@ if [ "${CODESPELL_INTERACTIVE}" = "1" ]; then
 fi
 
 # non-interactive mode
+. "${RIOTTOOLS}"/ci/github_annotate.sh
+
+github_annotate_setup
 
 # Filter-out all false positive raising "disabled due to" messages.
 ERRORS=$(${CODESPELL_CMD} ${CODESPELL_OPTS} ${FILES} | grep -ve "disabled due to")
 
+EXIT_CODE=0
+
 if [ -n "${ERRORS}" ]
 then
-    printf "%sThere are typos in the following files:%s\n\n" "${CERROR}" "${CRESET}"
-    printf "%s\n" "${ERRORS}"
-    printf "If those are false positives, add them to %s\n" "${RIOTTOOLS}/codespell/ignored_words.txt"
-    exit 1
-else
-    exit 0
+    IGNORED_WORDS="${REL_SCRIPT_DIR}/ignored_words.txt"
+    if github_annotate_is_on; then
+        echo "${ERRORS}" | sed -r "s/[[:cntrl:]]\[[0-9]{1,3}m//g" | \
+            while read error; do
+            FILENAME=$(echo "$error" | cut -d: -f1)
+            LINENUM=$(echo "$error" | cut -d: -f2)
+            ERROR=$(echo "$error" | cut -d: -f3- |
+                    sed -e 's/^[ \t]*//' -e 's/[ \t]*$//')
+            INTERACTIVE_CALL="CODESPELL_INTERACTIVE=1"
+            INTERACTIVE_CALL="${INTERACTIVE_CALL} BASE_BRANCH=${BASE_BRANCH}"
+            INTERACTIVE_CALL="${INTERACTIVE_CALL} ./${REL_SCRIPT_PATH}"
+
+            ANNOTATION="There is a typo: ${ERROR}\n"
+            ANNOTATION="${ANNOTATION}\nIf this is a false positive,"
+            ANNOTATION="${ANNOTATION} add it to ${IGNORED_WORDS}."
+            ANNOTATION="${ANNOTATION}\n\nYou can fix this interactively by"
+            ANNOTATION="${ANNOTATION} calling\n\n"
+            ANNOTATION="${ANNOTATION}     ${INTERACTIVE_CALL}"
+            github_annotate_error "${FILENAME}" "${LINENUM}" "${ANNOTATION}"
+        done
+    else
+        printf "%sThere are typos in the following files:%s\n\n" "${CERROR}" "${CRESET}"
+        printf "%s\n" "${ERRORS}"
+        printf "If those are false positives, add them to %s\n" "${IGNORED_WORDS}"
+    fi
+    EXIT_CODE=1
 fi
+
+github_annotate_teardown
+exit ${EXIT_CODE}
