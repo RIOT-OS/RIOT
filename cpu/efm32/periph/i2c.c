@@ -101,9 +101,9 @@ void i2c_init(i2c_t dev)
     CMU_ClockEnable(cmuClock_HFPER, true);
     CMU_ClockEnable(i2c_config[dev].cmu, true);
 
-    /* configure the pins */
-    gpio_init(i2c_config[dev].scl_pin, GPIO_OD);
-    gpio_init(i2c_config[dev].sda_pin, GPIO_OD);
+    /* configure the pins with pull-up to not drive the lines low */
+    gpio_init(i2c_config[dev].scl_pin, GPIO_OD_PU);
+    gpio_init(i2c_config[dev].sda_pin, GPIO_OD_PU);
 
     /* ensure slave is in a known state, which it may not be after a reset */
     for (int i = 0; i < 9; i++) {
