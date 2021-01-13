@@ -55,7 +55,7 @@ static uint32_t alarm_time;                 /**< The RTC timestamp of the (user)
 static rtc_alarm_cb_t alarm_cb;             /**< RTC alarm callback */
 static void *alarm_cb_arg;                  /**< RTC alarm callback argument */
 
-static void _rtt_alarm(void *arg);
+static void _rtt_cb(void *arg);
 
 /* convert RTT counter into RTC timestamp */
 static inline uint32_t _rtc_now(uint32_t now)
@@ -65,7 +65,18 @@ static inline uint32_t _rtc_now(uint32_t now)
 
 static inline void _set_alarm(uint32_t now, uint32_t next_alarm)
 {
-    rtt_set_alarm(now + next_alarm, _rtt_alarm, NULL);
+    if (IS_USED(MODULE_PERIPH_RTT_OVERFLOW)) {
+        rtt_set_alarm(now + next_alarm, alarm_cb, alarm_cb_arg);
+    } else {
+        rtt_set_alarm(now + next_alarm, _rtt_cb, NULL);
+    }
+}
+
+static inline bool _no_alarm(void)
+{
+    return (alarm_cb == NULL)     ||
+           (alarm_time < rtc_now) ||
+           (alarm_time - rtc_now > RTT_SECOND_MAX);
 }
 
 /* This calculates when the next alarm should happen.
@@ -78,9 +89,10 @@ static void _update_alarm(uint32_t now)
     last_alarm = TICKS(SECONDS(now));
 
     /* no alarm or alarm beyond this period */
-    if ((alarm_cb == NULL)     ||
-        (alarm_time < rtc_now) ||
-        (alarm_time - rtc_now > RTT_SECOND_MAX)) {
+    if (_no_alarm()) {
+        if (IS_USED(MODULE_PERIPH_RTT_OVERFLOW)) {
+            return;
+        }
         next_alarm = RTT_SECOND_MAX;
     } else {
         /* alarm triggers in this period */
@@ -89,15 +101,20 @@ static void _update_alarm(uint32_t now)
 
     /* alarm triggers NOW */
     if (next_alarm == 0) {
-        next_alarm = RTT_SECOND_MAX;
-        alarm_cb(alarm_cb_arg);
-    }
 
-    _set_alarm(now, TICKS(next_alarm));
+        /* next alarm should be an overflow again */
+        if (!IS_USED(MODULE_PERIPH_RTT_OVERFLOW)) {
+            _set_alarm(now, TICKS(RTT_SECOND_MAX));
+        }
+
+        alarm_cb(alarm_cb_arg);
+    } else {
+        _set_alarm(now, TICKS(next_alarm));
+    }
 }
 
-/* the RTT alarm callback */
-static void _rtt_alarm(void *arg)
+/* the RTT alarm/overflow callback */
+static void _rtt_cb(void *arg)
 {
     (void) arg;
 
@@ -114,7 +131,11 @@ void rtc_init(void)
         last_alarm = rtt_get_counter();
     }
 
-    _set_alarm(last_alarm, TICKS(RTT_SECOND_MAX));
+    if (IS_USED(MODULE_PERIPH_RTT_OVERFLOW)) {
+        rtt_set_overflow_cb(_rtt_cb, NULL);
+    } else {
+        _set_alarm(last_alarm, TICKS(RTT_SECOND_MAX));
+    }
 }
 
 int rtc_set_time(struct tm *time)
@@ -174,6 +195,10 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 
 void rtc_clear_alarm(void)
 {
+    if (IS_USED(MODULE_PERIPH_RTT_OVERFLOW)) {
+        rtt_clear_alarm();
+    }
+
     alarm_cb = NULL;
 }
 
