@@ -246,6 +246,7 @@ ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   USEMODULE += netif
   USEMODULE += l2util
   USEMODULE += fmt
+  USEMODULE += core_thread_flags
   ifneq (,$(filter netdev_ieee802154_submac,$(USEMODULE)))
     USEMODULE += gnrc_netif_pktq
   endif
@@ -262,11 +263,6 @@ endif
 
 ifneq (,$(filter gnrc_netif_bus,$(USEMODULE)))
   USEMODULE += core_msg_bus
-endif
-
-ifneq (,$(filter gnrc_netif_events,$(USEMODULE)))
-  USEMODULE += core_thread_flags
-  USEMODULE += event
 endif
 
 ifneq (,$(filter ieee802154 nrfmin esp_now cc110x gnrc_sixloenc,$(USEMODULE)))
