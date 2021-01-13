@@ -16,6 +16,7 @@ config CPU_FAM_ESP8266
     select HAS_CPU_ESP8266
     select HAS_PERIPH_RTC
     select HAS_PERIPH_RTT
+    select HAS_PERIPH_RTT_OVERFLOW
     select HAS_PERIPH_RTT_SET_COUNTER
 
 ## CPU Models

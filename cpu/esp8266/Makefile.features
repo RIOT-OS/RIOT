@@ -7,4 +7,5 @@ include $(RIOTCPU)/esp_common/Makefile.features
 FEATURES_PROVIDED += arch_esp8266
 FEATURES_PROVIDED += periph_rtt
 FEATURES_PROVIDED += periph_rtc
+FEATURES_PROVIDED += periph_rtt_overflow
 FEATURES_PROVIDED += periph_rtt_set_counter
