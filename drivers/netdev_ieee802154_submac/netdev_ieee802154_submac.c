@@ -196,7 +196,11 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     if (info) {
         netdev_ieee802154_rx_info_t *netdev_rx_info = info;
-        netdev_rx_info->rssi = rx_info.rssi;
+
+        /* The Radio HAL uses the IEEE 802.15.4 definition for RSSI.
+         * Netdev uses dBm. Therefore we need a translation here */
+        netdev_rx_info->rssi = ieee802154_rssi_to_dbm(rx_info.rssi);
+
         netdev_rx_info->lqi = rx_info.lqi;
     }
 
