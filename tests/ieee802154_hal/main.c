@@ -48,6 +48,7 @@ uint16_t request_counter = 0;
 
 static inline void _set_trx_state(int state, bool verbose);
 static int send(uint8_t *dst, size_t dst_len, size_t len);
+static int send_with_channel(uint8_t *dst, size_t dst_len);
 
 
 static uint16_t received_acks;
@@ -104,7 +105,8 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
                 out[j] = buffer[i];
                 j++;
             }
-            send(out, IEEE802154_LONG_ADDRESS_LEN, size - 21);
+            //send(out, IEEE802154_LONG_ADDRESS_LEN, size - 21);
+            send_with_channel(out, IEEE802154_LONG_ADDRESS_LEN);
         }
     }
     if (enable_prints) {
@@ -123,6 +125,7 @@ static int print_addr(int argc, char **argv)
         printf("%02x", *_p++);
     }
     printf("\n");
+    printf("%d", current_channel);
     return 0;
 }
 
@@ -854,10 +857,10 @@ int toggle_reply(int argc, char **argv) {
     (void)argc;
     if (send_reply) {
         send_reply = false;
-        puts("Packets are no longer mirrored");
+        puts("Success: Packets are no longer mirrored");
     } else {
         send_reply = true;
-        puts("Packets are now mirrored");
+        puts("Success: Packets are now mirrored");
     }
     printf("Request: %d\n", request_counter);
     printf("Confirm: %d\n", confirm_counter);
