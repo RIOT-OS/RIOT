@@ -624,6 +624,10 @@ ifneq (,$(filter sema,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter sema_inv,$(USEMODULE)))
+  USEMODULE += atomic_utils
+endif
+
 ifneq (,$(filter luid,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_cpuid
 endif
