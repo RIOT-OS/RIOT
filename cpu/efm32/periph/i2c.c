@@ -21,9 +21,9 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "byteorder.h"
 #include "cpu.h"
 #include "mutex.h"
-#include "byteorder.h"
 
 #include "periph_conf.h"
 #include "periph/i2c.h"
@@ -37,7 +37,9 @@
  *          transfers. Value based on kit driver (shipped with Simplicity
  *          Studio).
  */
-#define I2C_TIMEOUT (300000)
+#ifndef EFM32_I2C_TIMEOUT
+#define EFM32_I2C_TIMEOUT (300000)
+#endif
 
 /**
  * @brief   Holds the I2C transfer progress.
@@ -45,7 +47,7 @@
 static volatile I2C_TransferReturn_TypeDef i2c_progress[I2C_NUMOF];
 
 /**
- * @brief   Initialized bus locks (we have a maximum of three devices)
+ * @brief   Holds the I2C bus locks.
  */
 static mutex_t i2c_lock[I2C_NUMOF];
 
@@ -54,28 +56,21 @@ static mutex_t i2c_lock[I2C_NUMOF];
  */
 static int _transfer(i2c_t dev, I2C_TransferSeq_TypeDef *transfer)
 {
-    bool busy = true;
-    uint32_t timeout = I2C_TIMEOUT;
+    uint32_t counter = EFM32_I2C_TIMEOUT;
 
-    /* start the i2c transaction */
+    /* start transfer (using interrupts) and wait for it to complete or
+       timeout */
+    NVIC_ClearPendingIRQ(i2c_config[dev].irq);
+    NVIC_EnableIRQ(i2c_config[dev].irq);
+
     i2c_progress[dev] = I2C_TransferInit(i2c_config[dev].dev, transfer);
 
-    /* the transfer progresses via the interrupt handler */
-    while (busy) {
-        unsigned int cpsr = irq_disable();
+    while (i2c_progress[dev] == i2cTransferInProgress && counter--) {}
 
-        if (i2c_progress[dev] == i2cTransferInProgress && timeout--) {
-            cortexm_sleep_until_event();
-        }
-        else {
-            busy = false;
-        }
+    NVIC_DisableIRQ(i2c_config[dev].irq);
 
-        irq_restore(cpsr);
-    }
-
-    /* check for timeout */
-    if (!timeout) {
+    /* check for a timeout */
+    if (!counter) {
         return -ETIMEDOUT;
     }
 
@@ -133,10 +128,6 @@ void i2c_init(i2c_t dev)
     i2c_config[dev].dev->ROUTEPEN = I2C_ROUTEPEN_SDAPEN | I2C_ROUTEPEN_SCLPEN;
     i2c_config[dev].dev->ROUTELOC0 = i2c_config[dev].loc;
 #endif
-
-    /* enable interrupts */
-    NVIC_ClearPendingIRQ(i2c_config[dev].irq);
-    NVIC_EnableIRQ(i2c_config[dev].irq);
 
     /* enable peripheral */
     I2C_Enable(i2c_config[dev].dev, true);
