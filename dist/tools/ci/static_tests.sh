@@ -115,6 +115,10 @@ run ./dist/tools/flake8/check.sh
 run ./dist/tools/headerguards/check.sh
 run ./dist/tools/buildsystem_sanity_check/check.sh
 run ./dist/tools/codespell/check.sh
-run ./dist/tools/uncrustify/uncrustify.sh --check
+if [ -z "${GITHUB_RUN_ID}" ]; then
+    run ./dist/tools/uncrustify/uncrustify.sh --check
+else
+    run ./dist/tools/uncrustify/uncrustify.sh
+fi
 
 exit $RESULT
