@@ -26,8 +26,8 @@ RAM_START_ADDR := $(shell printf "0x%08x" $$(($(RAM_BASE_ADDR)-($(KINETIS_SRAM_L
 # Define ROM_LEN with a non arithmetic value as it must be
 # evaluated in `cortexm_common` without a shell context
 # The `K` is correctly handled by both the linker and `cortexm_common`.
-ROM_LEN = $(KINETIS_ROMSIZE)K
-RAM_LEN = $$(($(KINETIS_RAMSIZE) * 1024))
+ROM_LEN := $(KINETIS_ROMSIZE)K
+RAM_LEN := $(shell echo $$(($(KINETIS_RAMSIZE) * 1024)))
 
 CFLAGS += \
   -DKINETIS_CORE_$(KINETIS_CORE) \
