@@ -346,7 +346,7 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
     icmpv6_echo_t *icmpv6_hdr = icmpv6->data;
 
     kernel_pid_t if_pid = netif_hdr ? netif_hdr->if_pid : KERNEL_PID_UNDEF;
-    int16_t rssi = netif_hdr ? netif_hdr->rssi : 0;
+    int16_t rssi = netif_hdr ? netif_hdr->rssi : GNRC_NETIF_HDR_NO_RSSI;
 
     /* discard if too short */
     if (icmpv6->size < (data->datalen + sizeof(icmpv6_echo_t))) {
@@ -397,7 +397,7 @@ static void _print_reply(_ping_data_t *data, gnrc_pktsnip_t *icmpv6,
                    from_str, if_pid, recv_seq, hoplimit);
 
         }
-        if (rssi) {
+        if (rssi != GNRC_NETIF_HDR_NO_RSSI) {
             printf(" rssi=%"PRId16" dBm", rssi);
         }
         if (data->datalen >= sizeof(uint32_t)) {
