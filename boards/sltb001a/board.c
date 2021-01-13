@@ -22,6 +22,7 @@
 #include "board.h"
 #include "board_common.h"
 #include "periph/gpio.h"
+#include "xtimer.h"
 
 #ifdef MODULE_SILABS_PIC
 #include "pic.h"
@@ -35,8 +36,15 @@ void board_init(void)
 #ifndef RIOTBOOT
     /* perform common board initialization */
     board_common_init();
+#endif
+}
 
+void board_late_init(void)
+{
 #ifdef MODULE_SILABS_PIC
+    /* PIC requires xtimer for timing */
+    xtimer_init();
+
 #ifdef MODULE_CCS811
     /* enable the CCS811 air quality/gas sensor */
     pic_write(CCS811_PIC_ADDR, (1 << CCS811_PIC_EN_BIT) | (1 << CCS811_PIC_WAKE_BIT));
@@ -60,7 +68,6 @@ void board_init(void)
               (RGB_LED2_ENABLED << RGB_LED2_EN_BIT) |
               (RGB_LED3_ENABLED << RGB_LED3_EN_BIT) |
               (RGB_LED4_ENABLED << RGB_LED4_EN_BIT));
-#endif
 #endif
 #endif
 }

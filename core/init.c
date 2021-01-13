@@ -46,6 +46,9 @@ static void *main_trampoline(void *arg)
 {
     (void)arg;
 
+    extern void board_late_init(void);
+    board_late_init();
+
 #ifdef MODULE_AUTO_INIT
     auto_init();
 #endif
