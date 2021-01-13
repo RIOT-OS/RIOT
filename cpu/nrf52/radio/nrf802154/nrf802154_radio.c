@@ -230,11 +230,10 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
             radio_info->lqi = (uint8_t)(hwlqi > UINT8_MAX/ED_RSSISCALE
                                        ? UINT8_MAX
                                        : hwlqi * ED_RSSISCALE);
-            /* Calculate RSSI by subtracting the offset from the datasheet.
-             * Intentionally using a different calculation than the one from
-             * figure 122 of the v1.1 product specification. This appears to
-             * match real world performance better */
-            radio_info->rssi = _hwval_to_ieee802154_dbm(hwlqi) + IEEE802154_RADIO_RSSI_OFFSET;
+            /* We calculate RSSI from LQI, since it's already 8-bit
+               saturated (see page 321 of product spec v1.1) */
+            radio_info->rssi = _hwval_to_ieee802154_dbm(radio_info->lqi)
+                               + IEEE802154_RADIO_RSSI_OFFSET;
         }
         memcpy(buf, &rxbuf[1], pktlen);
     }

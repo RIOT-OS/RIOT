@@ -185,10 +185,15 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
 
             /* The number of dB above maximum sensitivity detected for the
              * received packet */
-            info->rssi = -CC2538_RSSI_OFFSET + rssi_val + IEEE802154_RADIO_RSSI_OFFSET;
+            /* Make sure there is no overflow even if no signal with such
+               low sensitivity should be detected */
+            const int hw_rssi_min = IEEE802154_RADIO_RSSI_OFFSET -
+                                    CC2538_RSSI_OFFSET;
+            int8_t hw_rssi = rssi_val > hw_rssi_min ?
+                (CC2538_RSSI_OFFSET + rssi_val) : IEEE802154_RADIO_RSSI_OFFSET;
+            info->rssi = hw_rssi - IEEE802154_RADIO_RSSI_OFFSET;
 
             corr_val = rfcore_read_byte() & CC2538_CORR_VAL_MASK;
-
             if (corr_val < CC2538_CORR_VAL_MIN) {
                 corr_val = CC2538_CORR_VAL_MIN;
             }
