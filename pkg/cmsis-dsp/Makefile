@@ -22,6 +22,8 @@ CMSIS_DSP_MODULES =                \
 
 .PHONY: cmsis-dsp_%
 
+CFLAGS += -Wno-cast-align
+
 all: $(CMSIS_DSP_MODULES)
 
 cmsis-dsp_%:
