@@ -30,18 +30,6 @@ extern "C" {
 #endif
 
 /**
- * @name USB DFU RAM information for riotboot
- * @{
- */
-#ifndef RIOTBOOT_DFU_ADDR
-#define RIOTBOOT_DFU_ADDR      (CPU_RAM_BASE + CPU_RAM_SIZE - 4)   /**< DFU default magic address */
-#endif
-#ifndef RIOTBOOT_MAGIC_NUMBER
-#define RIOTBOOT_MAGIC_NUMBER  RIOTBOOT_MAGIC                     /**< DFU default magic value */
-#endif
-/** @} */
-
-/**
  * @name USB DFU Default slots name
  * @{
  */

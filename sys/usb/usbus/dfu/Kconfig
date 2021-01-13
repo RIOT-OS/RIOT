@@ -23,13 +23,13 @@ config USB_DFU_DETACH_TIMEOUT_MS
         the host USB. Host USB should abort the pending operation if
         device doesn't detach after this timeout.
 
-config CUSTOM_RIOTBOOT_DFU_ADDR
+config CUSTOM_RIOTBOOT_MAGIC_ADDR
     bool "Use custom DFU magic address"
     help
         Say n to use the default address, which is the last in RAM.
 
-config RIOTBOOT_DFU_ADDR
+config RIOTBOOT_MAGIC_ADDR
     int "DFU magic address"
-    depends on CUSTOM_RIOTBOOT_DFU_ADDR
+    depends on CUSTOM_RIOTBOOT_MAGIC_ADDR
 
 endif # KCONFIG_USEMODULE_USBUS_DFU

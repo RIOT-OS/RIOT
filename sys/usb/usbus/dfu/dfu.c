@@ -23,6 +23,7 @@
 #include "usb/usbus.h"
 #include "usb/usbus/control.h"
 #include "usb/usbus/dfu.h"
+#include "riotboot/magic.h"
 #include "riotboot/usb_dfu.h"
 #ifdef MODULE_RIOTBOOT_USB_DFU
 #include "xtimer.h"
@@ -169,7 +170,7 @@ static void _dfu_class_control_req(usbus_t *usbus, usbus_dfu_device_t *dfu, usb_
             /* Detach USB bus */
             usbdev_set(usbus->dev, USBOPT_ATTACH, &disable, sizeof(usbopt_enable_t));
             /* Restart and jump into the bootloader */
-            uint32_t *reset_addr = (uint32_t *)RIOTBOOT_DFU_ADDR;
+            uint32_t *reset_addr = (uint32_t *)RIOTBOOT_MAGIC_ADDR;
             *reset_addr = RIOTBOOT_MAGIC_NUMBER;
             pm_reboot();
             break;
