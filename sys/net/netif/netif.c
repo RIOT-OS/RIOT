@@ -36,7 +36,7 @@ int netif_register(netif_t *netif)
     return 0;
 }
 
-netif_t *netif_iter(netif_t *last)
+netif_t *netif_iter(const netif_t *last)
 {
     if (last == NULL) {
         return (netif_t *)netif_list.next;
