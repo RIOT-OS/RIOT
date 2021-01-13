@@ -262,6 +262,11 @@ config HAS_PERIPH_RTT_SET_COUNTER
     help
         Indicates that the RTT peripheral implements rtt_set_counter().
 
+config HAS_PERIPH_RTT_OVERFLOW
+    bool
+    help
+        Indicates that the RTT provides an overflow callback.
+
 config HAS_PERIPH_SPI
     bool
     help

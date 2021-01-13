@@ -14,6 +14,7 @@ FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_rtt_set_counter
+FEATURES_PROVIDED += periph_rtt_overflow
 FEATURES_PROVIDED += periph_wdt
 
 FEATURES_CONFLICT += periph_rtc:periph_rtt
