@@ -93,6 +93,13 @@ static int _request_transmit(ieee802154_dev_t *dev)
 
     if (cc2538_csma_ca_retries < 0) {
         RFCORE_SFR_RFST = ISTXON;
+        /* The CPU Ctrl mask is used here to indicate whether the radio is being
+         * controlled by the CPU or the CSP Strobe Processor.
+         * We set this to 1 in order to indicate that the CSP is not used and
+         * thus, that the @ref ieee802154_radio_ops::confirm_transmit should
+         * return 0 immediately after the TXDONE event
+         */
+        RFCORE_XREG_CSPCTRL |= CC2538_CSP_MCU_CTRL_MASK;
     }
     else {
         cc2538_cca = false;
