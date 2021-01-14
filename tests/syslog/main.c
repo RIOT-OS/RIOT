@@ -23,7 +23,6 @@
 #include <string.h>
 
 #include "syslog.h"
-#include "msg.h"
 #include "shell.h"
 
 #if CONFIG_SYSLOG_HAS_OPEN
@@ -63,24 +62,12 @@ static int _log_handler(int argc, char **argv)
 }
 #endif /* CONFIG_SYSLOG_HAS_OPEN */
 
-static int _logd_handler(int argc, char **argv)
-{
-    if (argc != 3) {
-        printf("Usage: %s <level> <string>\n", argv[0]);
-        return 1;
-    }
-    syslog(syslog_default_entry, atoi(argv[1]), "%s", argv[2]);
-
-    return 0;
-}
-
 static const shell_command_t cmd[] = {
 #if CONFIG_SYSLOG_HAS_OPEN
     {"open", "open a syslog entry", _open_handler},
     {"log", "send a log to syslog", _log_handler},
     {"close", "close a syslog entry", _close_handler},
 #endif
-    {"logd", "send a log to syslog (default entry)", _logd_handler},
     {NULL, NULL, NULL}
 };
 
