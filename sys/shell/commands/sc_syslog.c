@@ -28,6 +28,7 @@ static void _syslog_usage(void)
 {
     puts("syslog list");
     puts("syslog hostname <name>");
+    puts("syslog setmask <mask>");
     puts("syslog logd <level> <string>");
 }
 
@@ -76,6 +77,17 @@ static int _logd_handler(int argc, char **argv)
     return 0;
 }
 
+static int _setmask_handler(int argc, char **argv)
+{
+    if (argc != 2) {
+        _syslog_usage();
+        return 1;
+    }
+    setlogmask(syslog_default_entry, atoi(argv[1]));
+
+    return 0;
+}
+
 int _syslog_handler(int argc, char **argv)
 {
     if (argc < 2) {
@@ -90,6 +102,9 @@ int _syslog_handler(int argc, char **argv)
     }
     else if (strcmp(argv[1], "logd") == 0) {
         return _logd_handler(argc - 1, argv + 1);
+    }
+    else if (strcmp(argv[1], "setmask") == 0) {
+        return _setmask_handler(argc - 1, argv + 1);
     }
     else {
         printf("syslog: unsupported sub-command: %s\n", argv[1]);
