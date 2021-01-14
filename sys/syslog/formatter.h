@@ -17,8 +17,8 @@
  * @author      Vincent Dupont <vincent.dupont@continental-its.com>
  */
 
-#ifndef SYSLOG_FORMATTER_H
-#define SYSLOG_FORMATTER_H
+#ifndef FORMATTER_H
+#define FORMATTER_H
 
 #include "backend.h"
 
@@ -33,7 +33,7 @@ extern "C" {
  * header.
  *
  * ```
- * RFC5424 sepcifies a syslog message as:
+ * RFC5424 specifies a syslog message as:
  * SYSLOG-MSG      = HEADER SP STRUCTURED-DATA [SP MSG]
  *
  * HEADER          = PRI VERSION SP TIMESTAMP SP HOSTNAME
@@ -108,4 +108,4 @@ ssize_t syslog_build_head(const struct syslog_msg *msg, const char *hostname, ch
 }
 #endif
 /** @} */
-#endif /* SYSLOG_FORMATTER_H */
+#endif /* FORMATTER_H */

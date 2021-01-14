@@ -17,8 +17,8 @@
  * @author      Vincent Dupont <vincent.dupont@continental-its.com>
  */
 
-#ifndef SYSLOG_BACKEND_H
-#define SYSLOG_BACKEND_H
+#ifndef BACKEND_H
+#define BACKEND_H
 
 #include <stdint.h>
 #include <stdatomic.h>
@@ -41,12 +41,12 @@ extern "C" {
  * @brief   Structure holding a datetime
  */
 typedef struct {
-  int	tm_sec;     /**< Seconds. [0-60] */
-  int	tm_min;     /**< Minutes. [0-60] */
-  int	tm_hour;    /**< Hours.   [0-23] */
-  int	tm_mday;    /**< Day.     [1-31] */
-  int	tm_mon;     /**< Month.   [0-11] */
-  int	tm_year;    /**< Year - 1900     */
+  int tm_sec;   /**< Seconds. [0-60] */
+  int tm_min;   /**< Minutes. [0-60] */
+  int tm_hour;  /**< Hours.   [0-23] */
+  int tm_mday;  /**< Day.     [1-31] */
+  int tm_mon;   /**< Month.   [0-11] */
+  int tm_year;  /**< Year - 1900     */
 } tm_t;
 
 typedef struct syslog_msg {
@@ -140,4 +140,4 @@ static inline uint8_t syslog_get_facility(uint8_t prival)
 }
 #endif
 /** @} */
-#endif /* SYSLOG_BACKEND_H */
+#endif /* BACKEND_H */

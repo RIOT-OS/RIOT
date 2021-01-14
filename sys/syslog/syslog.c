@@ -348,7 +348,7 @@ static void *_syslog_thread(void *arg)
             _dispatch_msg(msg.content.ptr);
             break;
         default:
-            DEBUG("syslog: unkown message received\n");
+            DEBUG("syslog: unknown message received\n");
             break;
         }
     }

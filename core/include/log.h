@@ -115,8 +115,8 @@ enum {
  * @brief Default log_write function, just maps to printf
  */
 #define log_write(level, ...) printf(__VA_ARGS__)
-#endif /* MODULE_LOG */
-#endif /* MODULE_SYSLOG */
+#endif  /* MODULE_LOG */
+#endif  /* MODULE_SYSLOG */
 
 #ifdef __cplusplus
 }
