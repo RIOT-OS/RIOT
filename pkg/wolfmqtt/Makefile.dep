@@ -1,0 +1,9 @@
+USEMODULE += wolfmqtt
+
+ifneq (,$(filter wolfmqtt_examples%,$(USEMODULE)))
+  USEMODULE += wolfmqtt_examples
+  USEMODULE += posix_netdb
+  USEMODULE += posix_sockets
+  USEMODULE += posix_select
+  USEMODULE += ztimer_sec
+endif
