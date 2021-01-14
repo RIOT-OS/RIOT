@@ -57,7 +57,8 @@ exec_uncrustify () {
                 if echo "$line" | grep -q '^--- .\+$'; then
                     _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
                     DIFF="$line"
-                    DIFFFILE=$(echo "$line" | sed 's/^--- \(.\+\)$/\1/g')
+                    DIFFFILE=$(echo "$line" |
+                        sed 's#^--- \([ab]/\)\?\(.\+\)$#\2#g')
                     DIFFLINE=""
                 # we are in a diff currently
                 elif [ -n "$DIFF" ]; then
