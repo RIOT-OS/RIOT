@@ -60,8 +60,7 @@ _headercheck() {
                         DIFFLINE=""
                     # we are in a diff currently
                     elif [ -n "$DIFF" ]; then
-                        # grep first line number of diff including offset to
-                        # comment _under_ diff
+                        # grep first line number of diff
                         if echo "$line" | \
                            grep -q "@@ -[0-9]\+\(,[0-9]\+\)\? +[0-9]\+\(,[0-9]\+\)\? @@"
                            then
