@@ -10,7 +10,7 @@
 # directory for more details.
 #
 
-. $(dirname "$0")/github_annotate.sh
+. "$(dirname "${0}")"/github_annotate.sh
 
 declare -A DEPS
 
@@ -22,8 +22,9 @@ DEPS["./dist/tools/coccinelle/check.sh"]="spatch"
 DEPS["./dist/tools/flake8/check.sh"]="python3 flake8"
 DEPS["./dist/tools/codespell/check.sh"]="codespell"
 DEPS["./dist/tools/uncrustify/uncrustify.sh"]="uncrustify"
+DEPS["./dist/tools/shellcheck/shellcheck.sh"]="shellcheck"
 
-if ! command -v git 2>&1 1>/dev/null; then
+if ! command -v git &>/dev/null; then
     echo -n "Required command 'git' for all static tests not found in PATH "
     print_warning
     set_result 1
@@ -60,7 +61,7 @@ set_result() {
 
 function run {
     for dep in ${DEPS["$1"]}; do
-        if ! command -v ${dep} 2>&1 1>/dev/null; then
+        if ! command -v ${dep} &>/dev/null; then
             echo -n "Required command '${dep}' for '$*' not found in PATH "
             print_warning
             set_result 1
@@ -120,5 +121,6 @@ if [ -z "${GITHUB_RUN_ID}" ]; then
 else
     run ./dist/tools/uncrustify/uncrustify.sh
 fi
+ERROR_EXIT_CODE=0 run ./dist/tools/shellcheck/check.sh
 
 exit $RESULT

@@ -21,6 +21,7 @@ fi
 
 : "${RIOTTOOLS:=${PWD}/dist/tools}"
 . "${RIOTTOOLS}"/ci/changed_files.sh
+. "${RIOTTOOLS}"/ci/github_annotate.sh
 
 FILES=$(FILEREGEX='(.*\.sh$)' changed_files)
 
@@ -34,13 +35,41 @@ ${SHELLCHECK_CMD} --version &> /dev/null || {
     exit 1
 }
 
-ERRORS=$("${SHELLCHECK_CMD}" --format=gcc ${FILES})
+github_annotate_setup
+
+# shellcheck disable=SC2086
+# FILES is supposed to be split, so don't quote it
+ERRORS="$("${SHELLCHECK_CMD}" --format=gcc ${FILES})"
+
+EXIT_CODE=0
 
 if [ -n "${ERRORS}" ]
 then
-    printf "%s There are issues in the following shell scripts %s\n" "${CERROR}" "${CRESET}"
-    printf "%s\n" "${ERRORS}"
-    exit 1
-else
-    exit 0
+    if github_annotate_is_on; then
+        echo "${ERRORS}" | while read -r error; do
+            FILENAME=$(echo "${error}" | cut -d: -f1)
+            LINENUM=$(echo "${error}" | cut -d: -f2)
+            SEVERITY=$(echo "${error}" | cut -d: -f4)
+            DETAILS=$(echo "${error}" | cut -d: -f5- |
+                      sed -e 's/^[ \t]*//' -e 's/[ \t]*$//')
+            if echo "${SEVERITY}" | grep -q 'error'; then
+                github_annotate_error "${FILENAME}" "${LINENUM}" "${DETAILS}"
+            else
+                github_annotate_warning "${FILENAME}" "${LINENUM}" "${DETAILS}"
+            fi
+        done
+    else
+        printf "%s There are issues in the following shell scripts %s\n" \
+            "${CERROR}" "${CRESET}"
+        printf "%s\n" "${ERRORS}"
+    fi
+    if [ -z "${ERROR_EXIT_CODE}" ]; then
+        EXIT_CODE=1
+    else
+        EXIT_CODE="${ERROR_EXIT_CODE}"
+    fi
 fi
+
+github_annotate_teardown
+
+exit "${EXIT_CODE}"
