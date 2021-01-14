@@ -1,0 +1,70 @@
+/**
+ * @defgroup pkg_wolfmqtt  WolfMQTT embedded MQTT library
+ * @ingroup  pkg
+ * @brief    Provides the WolfMQTT client and example applications
+ *
+ * # Introduction
+ *
+ * The wolfMQTT library is a client implementation of the MQTT written in C for
+ * embedded use. It supports SSL/TLS via the wolfSSL library. From this, it can
+ * provide the security that the MQTT protocol lacks. wolfMQTT was built from
+ * the ground up to be multi-platform, space conscience and extensible. It
+ * supports all Packet Types, all Quality of Service (QoS) levels 0-2 and
+ * supports SSL/TLS using the wolfSSL library. This implementation provides
+ * support for MQTT v5.0 and is based on MQTT v3.1.1. Additionally, there is
+ * also client support for MQTT-SN (Sensor Network).
+ *
+ * Feature of wolfMQTT library      supported by RIOT port at the moment
+ * Disconnect Callback              yes
+ * Error Strings                    yes
+ * MQTT-SN                          yes
+ * MQTT v5.0                        yes
+ * Property Callback                yes
+ * Examples                         yes (partly)
+ * Non-Blocking                     yes
+ * STDIN Capture                    yes
+ * TLS                              no
+ * Multi-thread                     yes
+ *
+ * # License
+ *
+ * wolfSSL’s software is available under two distinct licensing models:
+ * Open Source (GPLv2) or proprietary.
+ *
+ * Open Source
+ *
+ * wolfSSL (formerly CyaSSL) offers multiple products including, but not limited
+ * to:
+ *
+ * wolfSSL
+ * wolfCrypt
+ * wolfMQTT
+ * wolfSSH
+ *
+ * These software products are free software and may be modified to
+ * the needs of the user as long as the user adheres to version two of the GPL
+ * License. The GPLv2 license can be found on the gnu.org website
+ * (http://www.gnu.org/licenses/old-licenses/gpl-2.0.html).
+ *
+ *
+ * Commercial Licensing
+ *
+ * Businesses and enterprises who wish to incorporate wolfSSL products into
+ * proprietary appliances or other commercial software products for
+ * re-distribution must license commercial versions. Commercial licenses for
+ * wolfSSL, yaSSL, and wolfCrypt are available. Licenses are generally issued
+ * for one product and include unlimited royalty-free distribution. Custom
+ * licensing terms are also available.
+ *
+ * Commercial licenses are also available for wolfMQTT and wolfSSH.
+ * Please contact licensing@wolfssl.com with inquiries.
+ *
+ * @see https://github.com/wolfssl/wolfssl.git
+ *
+ *
+ * QUESTIONS / CONCERNS / FEEDBACK:
+ *
+ * For any questions, concerns, or other feedback please contact
+ * support@wolfssl.com anytime, we are always happy to help in any way we can!!
+ *
+ */

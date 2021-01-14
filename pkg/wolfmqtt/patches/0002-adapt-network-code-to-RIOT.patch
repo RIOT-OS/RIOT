@@ -1,0 +1,492 @@
+From 7a30c998761a4d8ad42ddac3aeed7352c1ff6674 Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Fri, 29 Jan 2021 02:19:42 +0100
+Subject: [PATCH] adapt network code to RIOT
+
+---
+ wolfmqtt/mqtt_types.h       |   2 +-
+ wolfmqtt_examples/mqttnet.c | 343 +++++++++++++++++++++++++++---------
+ 2 files changed, 262 insertions(+), 83 deletions(-)
+
+diff --git a/wolfmqtt/mqtt_types.h b/wolfmqtt/mqtt_types.h
+index 8d70c2b..d822aca 100644
+--- a/wolfmqtt/mqtt_types.h
++++ b/wolfmqtt/mqtt_types.h
+@@ -91,7 +91,7 @@
+         #include <dispatch/dispatch.h>
+         typedef dispatch_semaphore_t wm_Sem;
+ 
+-    #elif defined(__FreeBSD__) || defined(__linux__)
++    #elif defined(__FreeBSD__) || defined(__linux__) || defined(RIOT_OS)
+         /* Posix Style Semaphore */
+         #define WOLFMQTT_POSIX_SEMAPHORES
+         #include <semaphore.h>
+diff --git a/wolfmqtt_examples/mqttnet.c b/wolfmqtt_examples/mqttnet.c
+index f53a8ea..dbbbf93 100644
+--- a/wolfmqtt_examples/mqttnet.c
++++ b/wolfmqtt_examples/mqttnet.c
+@@ -96,6 +96,32 @@
+         #error wolfMQTT must be built with WOLFMQTT_NONBLOCK defined for Harmony
+     #endif
+ 
++/* RIOT OS */
++#elif defined(RIOT_OS)
++    #include "xtimer.h"
++
++    #include <arpa/inet.h>
++    #include <netinet/in.h>
++
++    #include <sys/select.h>
++    #include <sys/socket.h>
++    #include <sys/time.h>
++
++    #include "net/ipv4/addr.h"
++    #include "net/ipv6/addr.h"
++    #include "net/sock/dns.h"
++    #include "net/sock/ip.h"
++    #include "net/sock/tcp.h"
++    #include "net/sock/udp.h"
++
++    #if WOLFMQTT_USE_HOSTNAME
++        #include <netdb.h>
++    #endif
++
++    #include <unistd.h>
++    #include <errno.h>
++    #include <fcntl.h>
++
+ /* Linux */
+ #else
+     #include <sys/types.h>
+@@ -141,8 +167,15 @@
+ #ifndef SOCK_CLOSE
+     #define SOCK_CLOSE      close
+ #endif
+-#ifndef SOCK_ADDR_IN
+-    #define SOCK_ADDR_IN    struct sockaddr_in
++#ifdef MODULE_IPV4_ADDR
++    #ifndef SOCK_ADDR_IN
++        #define SOCK_ADDR_IN    struct sockaddr_in
++    #endif
++#endif
++#ifdef MODULE_IPV6_ADDR
++    #ifndef SOCK_ADDR_IN6
++        #define SOCK_ADDR_IN6   struct sockaddr_in6
++    #endif
+ #endif
+ #ifdef SOCK_ADDRINFO
+     #define SOCK_ADDRINFO   struct addrinfo
+@@ -166,7 +199,12 @@ typedef struct MulticastContext {
+ typedef struct _SocketContext {
+     SOCKET_T fd;
+     NB_Stat stat;
++#ifdef MODULE_IPV4_ADDR
+     SOCK_ADDR_IN addr;
++#endif
++#ifdef MODULE_IPV6_ADDR
++    SOCK_ADDR_IN6 addr6;
++#endif
+ #ifdef MICROCHIP_MPLAB_HARMONY
+     word32 bytes;
+ #endif
+@@ -560,8 +598,10 @@ static int NetConnect(void *context, const char* host, word16 port,
+     int type = SOCK_STREAM;
+     int rc = -1;
+     SOERROR_T so_error = 0;
+-    struct addrinfo *result = NULL;
+-    struct addrinfo hints;
++    #if WOLFMQTT_USE_HOSTNAME
++        struct addrinfo *result = NULL;
++        struct addrinfo hints;
++    #endif
+     MQTTCtx* mqttCtx = sock->mqttCtx;
+ 
+     /* Get address information for host and locate IPv4 */
+@@ -571,50 +611,92 @@ static int NetConnect(void *context, const char* host, word16 port,
+             PRINTF("NetConnect: Host %s, Port %u, Timeout %d ms, Use TLS %d",
+                 host, port, timeout_ms, mqttCtx->use_tls);
+ 
+-            XMEMSET(&hints, 0, sizeof(hints));
+-            hints.ai_family = AF_INET;
+-            hints.ai_socktype = SOCK_STREAM;
+-            hints.ai_protocol = IPPROTO_TCP;
++            #if WOLFMQTT_USE_HOSTNAME
++                XMEMSET(&hints, 0, sizeof(hints));
++                hints.ai_socktype = SOCK_STREAM;
++                hints.ai_protocol = IPPROTO_TCP;
+ 
+-            XMEMSET(&sock->addr, 0, sizeof(sock->addr));
+-            sock->addr.sin_family = AF_INET;
++                #ifdef MODULE_IPV6_ADDR
++                    hints.ai_family = AF_INET6;
++                #else
++                    hints.ai_family = AF_INET;
++                #endif
++            #endif
+ 
+-            rc = getaddrinfo(host, NULL, &hints, &result);
+-            if (rc == 0) {
+-                struct addrinfo* result_i = result;
++            #ifdef MODULE_IPV6_ADDR
++                XMEMSET(&sock->addr6, 0, sizeof(sock->addr6));
++            #endif
++            #ifdef MODULE_IPV4_ADDR
++                XMEMSET(&sock->addr, 0, sizeof(sock->addr));
++            #endif
+ 
+-                if (! result) {
+-                    rc = -1;
+-                    goto exit;
+-                }
++            #ifdef MODULE_IPV6_ADDR
++                sock->addr6.sin6_port = htons(port);
++                sock->addr6.sin6_family = AF_INET6;
++            #else
++                sock->addr.sin_port = htons(port);
++                sock->addr.sin_family = AF_INET;
++            #endif
+ 
+-                /* prefer ip4 addresses */
+-                while (result_i) {
+-                    if (result_i->ai_family == AF_INET)
+-                        break;
+-                    result_i = result_i->ai_next;
+-                }
++            #if WOLFMQTT_USE_HOSTNAME
++                rc = getaddrinfo(host, NULL, &hints, &result);
++                if (rc == 0) {
++                    struct addrinfo* result_i = result;
+ 
+-                if (result_i) {
+-                    sock->addr.sin_port = htons(port);
+-                    sock->addr.sin_family = AF_INET;
+-                    sock->addr.sin_addr =
+-                        ((SOCK_ADDR_IN*)(result_i->ai_addr))->sin_addr;
+-                }
+-                else {
+-                    rc = -1;
+-                }
++                    if (! result) {
++                        rc = -1;
++                        goto exit;
++                    }
+ 
+-                freeaddrinfo(result);
+-            }
+-            if (rc != 0)
+-                goto exit;
++                    while (result_i) {
++                        if (result_i->ai_family == hints.ai_family)
++                            break;
++                        result_i = result_i->ai_next;
++                    }
++
++                    if (result_i) {
++                        #ifdef MODULE_IPV6_ADDR
++                            sock->addr6.sin6_addr =
++                                ((SOCK_ADDR_IN6*)(result_i->ai_addr))->sin6_addr;
++                        #else
++                            sock->addr.sin_addr =
++                                ((SOCK_ADDR_IN*)(result_i->ai_addr))->sin_addr;
++                        #endif
++                    }
++                    else {
++                        rc = -1;
++                    }
++
++                    freeaddrinfo(result);
++                }
++                if (rc != 0)
++                    goto exit;
++            #else
++                #if MODULE_IPV6_ADDR
++                    if (inet_pton(AF_INET6, host, &sock->addr6.sin6_addr) != 1) {
++                        PRINTF("Error: unable to parse destination address '%s'\n", host);
++                        rc = -1;
++                        goto exit;
++                    }
++                #else
++                    if (inet_pton(AF_INET, host, &sock->addr.sin_addr) != 1) {
++                        PRINTF("Error: unable to parse destination address '%s'\n", host);
++                        rc = -1;
++                        goto exit;
++                    }
++                #endif
++            #endif /* WOLFMQTT_USE_HOSTNAME */
+ 
+             /* Default to error */
+             rc = -1;
+ 
+             /* Create socket */
+-            sock->fd = SOCK_OPEN(sock->addr.sin_family, type, 0);
++            #ifdef MODULE_IPV6_ADDR
++                sock->fd = SOCK_OPEN(sock->addr6.sin6_family, type, 0);
++            #else
++                sock->fd = SOCK_OPEN(sock->addr.sin_family, type, 0);
++            #endif
++
+             if (sock->fd == SOCKET_INVALID)
+                 goto exit;
+ 
+@@ -643,7 +725,11 @@ static int NetConnect(void *context, const char* host, word16 port,
+         #endif
+ 
+             /* Start connect */
+-            rc = SOCK_CONNECT(sock->fd, (struct sockaddr*)&sock->addr, sizeof(sock->addr));
++            #ifdef MODULE_IPV6_ADDR
++                rc = SOCK_CONNECT(sock->fd, (struct sockaddr*)&sock->addr6, sizeof(sock->addr6));
++            #else
++                rc = SOCK_CONNECT(sock->fd, (struct sockaddr*)&sock->addr, sizeof(sock->addr));
++            #endif
+             if (rc < 0) {
+                 /* Check for error */
+                 socklen_t len = sizeof(so_error);
+@@ -688,60 +774,103 @@ static int SN_NetConnect(void *context, const char* host, word16 port,
+ {
+     SocketContext *sock = (SocketContext*)context;
+     int type = SOCK_DGRAM;
+-    int rc;
++    int rc = 0;
+     SOERROR_T so_error = 0;
+-    struct addrinfo *result = NULL;
+-    struct addrinfo hints;
++    #if WOLFMQTT_USE_HOSTNAME
++        struct addrinfo *result = NULL;
++        struct addrinfo hints;
++    #endif
+     MQTTCtx* mqttCtx = sock->mqttCtx;
+ 
+     PRINTF("NetConnect: Host %s, Port %u, Timeout %d ms, Use TLS %d\n",
+         host, port, timeout_ms, mqttCtx->use_tls);
+ 
+-    /* Get address information for host and locate IPv4 */
+-    XMEMSET(&hints, 0, sizeof(struct addrinfo));
+-    hints.ai_family = AF_INET;
+-    hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
++    #if WOLFMQTT_USE_HOSTNAME
++        XMEMSET(&hints, 0, sizeof(hints));
++        hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
++        #ifdef MODULE_IPV6_ADDR
++            hints.ai_family = AF_INET6;
++        #else
++            hints.ai_family = AF_INET;
++        #endif
++    #endif
+ 
+-    XMEMSET(&sock->addr, 0, sizeof(sock->addr));
+-    sock->addr.sin_family = AF_INET;
++    #ifdef MODULE_IPV6_ADDR
++        XMEMSET(&sock->addr6, 0, sizeof(sock->addr6));
++    #endif
++    #ifdef MODULE_IPV4_ADDR
++        XMEMSET(&sock->addr, 0, sizeof(sock->addr));
++    #endif
+ 
+-    rc = getaddrinfo(host, NULL, &hints, &result);
+-    if (rc == 0) {
+-        struct addrinfo* result_i = result;
++    #ifdef MODULE_IPV6_ADDR
++        sock->addr6.sin6_port = htons(port);
++        sock->addr6.sin6_family = AF_INET6;
++    #else
++        sock->addr.sin_port = htons(port);
++        sock->addr.sin_family = AF_INET;
++    #endif
+ 
+-        if (! result) {
+-            rc = -1;
+-            goto exit;
+-        }
++    #if WOLFMQTT_USE_HOSTNAME
++        rc = getaddrinfo(host, NULL, &hints, &result);
++        if (rc == 0) {
++            struct addrinfo* result_i = result;
+ 
+-        /* prefer ip4 addresses */
+-        while (result_i) {
+-            if (result_i->ai_family == AF_INET)
+-                break;
+-            result_i = result_i->ai_next;
+-        }
++            if (! result) {
++                rc = -1;
++                goto exit;
++            }
+ 
+-        if (result_i) {
+-            sock->addr.sin_port = htons(port);
+-            sock->addr.sin_family = AF_INET;
+-            sock->addr.sin_addr =
+-                ((SOCK_ADDR_IN*)(result_i->ai_addr))->sin_addr;
+-        }
+-        else {
+-            rc = -1;
++            while (result_i) {
++                if (result_i->ai_family == hints.ai_family)
++                    break;
++                result_i = result_i->ai_next;
++            }
++
++            if (result_i) {
++                #ifdef MODULE_IPV6_ADDR
++                    sock->addr6.sin6_addr =
++                        ((SOCK_ADDR_IN6*)(result_i->ai_addr))->sin6_addr;
++                #else
++                    sock->addr.sin_addr =
++                        ((SOCK_ADDR_IN*)(result_i->ai_addr))->sin_addr;
++                #endif
++            }
++            else {
++                rc = -1;
++            }
++
++            freeaddrinfo(result);
+         }
++        if (rc != 0)
++            goto exit;
++    #else
++        #if MODULE_IPV6_ADDR
++            if (inet_pton(AF_INET6, host, &sock->addr6.sin6_addr) != 1) {
++                PRINTF("Error: unable to parse destination address '%s'\n", host);
++                rc = -1;
++                goto exit;
++            }
++        #else
++            if (inet_pton(AF_INET, host, &sock->addr.sin_addr) != 1) {
++                PRINTF("Error: unable to parse destination address '%s'\n", host);
++                rc = -1;
++                goto exit;
++            }
++        #endif
++    #endif /* WOLFMQTT_USE_HOSTNAME */
+ 
+-        freeaddrinfo(result);
+-    }
+-    if (rc != 0)
+-        goto exit;
++    /* Default to success */
++    rc = 0;
+ 
+-    if (rc == 0) {
+-        /* Create the socket */
++    /* Create socket */
++    #ifdef MODULE_IPV6_ADDR
++        sock->fd = SOCK_OPEN(sock->addr6.sin6_family, type, 0);
++    #else
+         sock->fd = SOCK_OPEN(sock->addr.sin_family, type, 0);
+-        if (sock->fd == SOCKET_INVALID) {
+-            rc = -1;
+-        }
++    #endif
++
++    if (sock->fd == SOCKET_INVALID) {
++        rc = -1;
+     }
+ 
+     if (rc == 0)
+@@ -759,7 +888,11 @@ static int SN_NetConnect(void *context, const char* host, word16 port,
+     #endif /* !WOLFMQTT_NO_TIMEOUT */
+ 
+         /* Start connect */
+-        rc = SOCK_CONNECT(sock->fd, (struct sockaddr*)&sock->addr, sizeof(sock->addr));
++        #ifdef MODULE_IPV6_ADDR
++            rc = SOCK_CONNECT(sock->fd, (struct sockaddr*)&sock->addr6, sizeof(sock->addr6));
++        #else
++            rc = SOCK_CONNECT(sock->fd, (struct sockaddr*)&sock->addr, sizeof(sock->addr));
++        #endif
+     }
+ 
+   exit:
+@@ -895,7 +1028,7 @@ static int NetRead_ex(void *context, byte* buf, int buf_len,
+                 }
+                 /* Check if rx or error */
+             #ifdef WOLFMQTT_ENABLE_STDIN_CAP
+-                else if ((!mqttCtx->test_mode && FD_ISSET(STDIN, &recvfds)) 
++                else if ((!mqttCtx->test_mode && FD_ISSET(STDIN, &recvfds))
+                 #ifdef WOLFMQTT_MULTITHREAD
+                     || FD_ISSET(sock->pfd[0], &recvfds)
+                 #endif
+@@ -903,9 +1036,11 @@ static int NetRead_ex(void *context, byte* buf, int buf_len,
+                     return MQTT_CODE_STDIN_WAKE;
+                 }
+             #endif
++
+                 if (FD_ISSET(sock->fd, &errfds)) {
+-                    rc = -1;
+-                    break;
++                    // Todo: find out reason why we can ignore this case
++                    //rc = -1;
++                    //break;
+                 }
+             }
+             else {
+@@ -1041,6 +1176,28 @@ int MqttClientNet_Init(MqttNet* net, MQTTCtx* mqttCtx)
+     }
+ #endif /* MICROCHIP_MPLAB_HARMONY */
+ 
++    /* wait until connection has been established */
++    xtimer_sleep(10);
++
++    #if WOLFMQTT_USE_HOSTNAME
++        /* setup dns server */
++        #ifdef MODULE_IPV6_ADDR
++            if (inet_pton(AF_INET6, WOLFMQTT_DNS_SERVER_IPV6, sock_dns_server.addr.ipv6) != 1) {
++                PRINTF("Error: unable to parse destination address '%s'\n", WOLFMQTT_DNS_SERVER_IPV6);
++                return -1;
++            }
++            sock_dns_server.family = AF_INET6;
++        #else
++            if (inet_pton(AF_INET, WOLFMQTT_DNS_SERVER_IPV4, sock_dns_server.addr.ipv4) != 1) {
++                PRINTF("Error: unable to parse destination address '%s'\n", WOLFMQTT_DNS_SERVER_IPV4);
++                return -1;
++            }
++            sock_dns_server.family = AF_INET;
++        #endif
++
++        sock_dns_server.port = SOCK_DNS_PORT;
++    #endif
++
+     if (net) {
+         SocketContext* sockCtx;
+ 
+@@ -1059,7 +1216,7 @@ int MqttClientNet_Init(MqttNet* net, MQTTCtx* mqttCtx)
+         sockCtx->fd = SOCKET_INVALID;
+         sockCtx->stat = SOCK_BEGIN;
+         sockCtx->mqttCtx = mqttCtx;
+-    
++
+     #if defined(WOLFMQTT_MULTITHREAD) && defined(WOLFMQTT_ENABLE_STDIN_CAP)
+         /* setup the pipe for waking select() */
+         if (pipe(sockCtx->pfd) != 0) {
+@@ -1075,6 +1232,28 @@ int MqttClientNet_Init(MqttNet* net, MQTTCtx* mqttCtx)
+ #ifdef WOLFMQTT_SN
+ int SN_ClientNet_Init(MqttNet* net, MQTTCtx* mqttCtx)
+ {
++    /* wait until connection has been established */
++    xtimer_sleep(10);
++
++    #if WOLFMQTT_USE_HOSTNAME
++        /* setup dns server */
++        #ifdef MODULE_IPV6_ADDR
++            if (inet_pton(AF_INET6, WOLFMQTT_DNS_SERVER_IPV6, sock_dns_server.addr.ipv6) != 1) {
++                PRINTF("Error: unable to parse destination address '%s'\n", WOLFMQTT_DNS_SERVER_IPV6);
++                return -1;
++            }
++            sock_dns_server.family = AF_INET6;
++        #else
++            if (inet_pton(AF_INET, WOLFMQTT_DNS_SERVER_IPV4, sock_dns_server.addr.ipv4) != 1) {
++                PRINTF("Error: unable to parse destination address '%s'\n", WOLFMQTT_DNS_SERVER_IPV4);
++                return -1;
++            }
++            sock_dns_server.family = AF_INET;
++        #endif
++
++        sock_dns_server.port = SOCK_DNS_PORT;
++    #endif
++
+     if (net) {
+         SocketContext* sockCtx;
+ 
+-- 
+2.25.1
+

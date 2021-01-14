@@ -1,0 +1,11 @@
+USEMODULE += wolfmqtt
+USEMODULE += wolfmqtt_examples
+
+USEMODULE += posix_inet
+USEMODULE += posix_netdb
+USEMODULE += posix_sockets
+USEMODULE += posix_select
+USEMODULE += posix_semaphore
+USEMODULE += pthread
+
+USEMODULE += xtimer
