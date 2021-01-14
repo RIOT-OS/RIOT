@@ -402,9 +402,12 @@ static void _send_zep_hello(socket_zep_t *dev)
             .hdr.version  = 2,
             .type = SOCKET_ZEP_V2_TYPE_HELLO,
             .resv = "HELLO",
+            .length = sizeof(dev->netdev.long_addr),
         };
 
-        real_write(dev->sock_fd, &hdr, sizeof(hdr));
+        /* append HW addr */
+        real_send(dev->sock_fd, &hdr, sizeof(hdr), MSG_MORE);
+        real_send(dev->sock_fd, dev->netdev.long_addr, sizeof(dev->netdev.long_addr), 0);
     }
 }
 
@@ -428,13 +431,16 @@ void socket_zep_setup(socket_zep_t *dev, const socket_zep_params_t *params, uint
         dev->sock_fd = res;
     }
 
-    if (_connect_remote(dev, params) == 0) {
-        /* send dummy data to connect to dispatcher */
-        _send_zep_hello(dev);
-    }
+    /* only send hello if we are connected to a remote */
+    bool send_hello = !_connect_remote(dev, params);
 
     /* setup hardware address */
     netdev_ieee802154_setup(&dev->netdev);
+
+    /* send dummy data to connect to dispatcher */
+    if (send_hello) {
+        _send_zep_hello(dev);
+    }
 
     native_async_read_setup();
     native_async_read_add_handler(dev->sock_fd, dev, _socket_isr);
