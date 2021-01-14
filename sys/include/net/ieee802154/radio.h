@@ -93,6 +93,10 @@ typedef enum {
      */
     IEEE802154_CAP_SUB_GHZ,
     /**
+     * @brief the device reports reception off frames with invalid CRC.
+     */
+    IEEE802154_CAP_IRQ_CRC_ERROR,
+    /**
      * @brief the device reports when the transmission is done
      */
     IEEE802154_CAP_IRQ_TX_DONE,
@@ -189,6 +193,18 @@ typedef enum {
      * This event is present if radio has @ref IEEE802154_CAP_IRQ_RX_START cap.
      */
     IEEE802154_RADIO_INDICATION_RX_START,
+
+    /**
+     * @brief the transceiver received a frame with an invalid crc.
+     *
+     * The transceiver might not stay in @ref IEEE802154_TRX_STATE_RX_ON
+     * after receiving an invalid CRC. Therefore the upper layer must
+     * set the transceiver state (@ref ieee802154_radio_ops::request_set_trx_state).
+     * e.g.: @ref IEEE802154_TRX_STATE_TRX_OFF or @ref IEEE802154_TRX_STATE_TX_ON
+     * to stop listening or @ref IEEE802154_TRX_STATE_RX_ON to keep
+     * listening.
+     */
+    IEEE802154_RADIO_INDICATION_CRC_ERROR,
 
     /**
      * @brief the transceiver sent out a valid SFD

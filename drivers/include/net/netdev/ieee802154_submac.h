@@ -38,8 +38,9 @@ extern "C" {
 #include "xtimer.h"
 
 #define NETDEV_SUBMAC_FLAGS_ACK_TIMEOUT (1 << 0)    /**< Flag for ACK Timeout event */
-#define NETDEV_SUBMAC_FLAGS_TX_DONE (1 << 1)        /**< Flag for TX Done event */
-#define NETDEV_SUBMAC_FLAGS_RX_DONE (1 << 2)        /**< Flag for RX Done event */
+#define NETDEV_SUBMAC_FLAGS_TX_DONE     (1 << 1)    /**< Flag for TX Done event */
+#define NETDEV_SUBMAC_FLAGS_RX_DONE     (1 << 2)    /**< Flag for RX Done event */
+#define NETDEV_SUBMAC_FLAGS_CRC_ERROR   (1 << 3)    /**< Flag for CRC ERROR event */
 
 /**
  * @brief IEEE 802.15.4 SubMAC netdev descriptor

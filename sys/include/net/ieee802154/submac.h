@@ -380,6 +380,13 @@ void ieee802154_submac_ack_timeout_fired(ieee802154_submac_t *submac);
 void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac);
 
 /**
+ * @brief Indicate the SubMAC that a frame with invalid CRC was received.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ */
+void ieee802154_submac_crc_error_cb(ieee802154_submac_t *submac);
+
+/**
  * @brief Indicate the SubMAC that the device finished the transmission procedure.
  *
  * @param[in] submac pointer to the SubMAC descriptor

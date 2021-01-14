@@ -178,6 +178,10 @@ static void _isr(netdev_t *netdev)
         if (flags & NETDEV_SUBMAC_FLAGS_RX_DONE) {
             ieee802154_submac_rx_done_cb(submac);
         }
+
+        if (flags & NETDEV_SUBMAC_FLAGS_CRC_ERROR) {
+            ieee802154_submac_crc_error_cb(submac);
+        }
     } while (netdev_submac->isr_flags != 0);
 }
 
@@ -268,6 +272,10 @@ static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
         break;
     case IEEE802154_RADIO_INDICATION_RX_DONE:
         netdev_submac->isr_flags |= NETDEV_SUBMAC_FLAGS_RX_DONE;
+        break;
+    case IEEE802154_RADIO_INDICATION_CRC_ERROR:
+        netdev_submac->isr_flags |= NETDEV_SUBMAC_FLAGS_CRC_ERROR;
+        break;
     default:
         break;
     }

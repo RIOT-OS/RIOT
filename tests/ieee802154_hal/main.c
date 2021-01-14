@@ -102,6 +102,21 @@ static xtimer_t timer_ack = {
     .callback = _timer_ack_handler,
 };
 
+void _crc_error_handler(event_t *event)
+{
+    (void) event;
+    puts("Packet with invalid CRC received");
+    ieee802154_dev_t* dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
+    /* switch back to RX_ON state */
+    ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_RX_ON);
+    while (ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {}
+}
+
+static event_t _crc_error_event = {
+    .handler = _crc_error_handler,
+};
+
+
 void _rx_done_handler(event_t *event)
 {
     (void) event;
@@ -138,6 +153,9 @@ static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
             break;
         case IEEE802154_RADIO_INDICATION_RX_DONE:
             event_post(EVENT_PRIO_HIGHEST, &_rx_done_event);
+            break;
+        case IEEE802154_RADIO_INDICATION_CRC_ERROR:
+            event_post(EVENT_PRIO_HIGHEST, &_crc_error_event);
             break;
         default:
            break;

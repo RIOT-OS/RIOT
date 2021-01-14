@@ -543,7 +543,7 @@ void isr_radio(void)
             }
             else {
                 DEBUG("[nrf802154] CRC fail.\n");
-                NRF_RADIO->TASKS_START = 1;
+                dev->cb(dev, IEEE802154_RADIO_INDICATION_CRC_ERROR);
             }
             break;
         case STATE_ACK:
@@ -644,6 +644,7 @@ static bool _get_cap(ieee802154_dev_t *dev, ieee802154_rf_caps_t cap)
     (void) dev;
     switch (cap) {
     case IEEE802154_CAP_24_GHZ:
+    case IEEE802154_CAP_IRQ_CRC_ERROR:
     case IEEE802154_CAP_IRQ_RX_START:
     case IEEE802154_CAP_IRQ_TX_START:
     case IEEE802154_CAP_IRQ_TX_DONE:

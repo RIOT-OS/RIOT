@@ -16,6 +16,7 @@
  * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
+#include <stdatomic.h>
 #include <sys/uio.h>
 
 #include "leds.h"
@@ -40,6 +41,8 @@ openwsn_radio_t openwsn_radio;
 
 /* stores the event capture time */
 static PORT_TIMER_WIDTH _txrx_event_capture_time = 0;
+/* set if frame with valid CRC is received, false otherwise */
+static atomic_bool _valid_crc = true;
 
 void _idmanager_addr_override(void)
 {
@@ -89,12 +92,21 @@ static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
         while (ieee802154_radio_confirm_set_trx_state(openwsn_radio.dev) == -EAGAIN) {}
         openwsn_radio.endFrame_cb(_txrx_event_capture_time);
         break;
+    case IEEE802154_RADIO_INDICATION_CRC_ERROR:
+        _valid_crc = false;
+        ieee802154_radio_request_set_trx_state(openwsn_radio.dev,
+                                               IEEE802154_TRX_STATE_TRX_OFF);
+        while (ieee802154_radio_confirm_set_trx_state(openwsn_radio.dev) == -EAGAIN) {}
+        openwsn_radio.endFrame_cb(_txrx_event_capture_time);
+        break;
     case IEEE802154_RADIO_INDICATION_RX_DONE:
+        _valid_crc = true;
+        ieee802154_radio_request_set_trx_state(openwsn_radio.dev,
+                                               IEEE802154_TRX_STATE_TRX_OFF);
+        while (ieee802154_radio_confirm_set_trx_state(openwsn_radio.dev) == -EAGAIN) {}
         openwsn_radio.endFrame_cb(_txrx_event_capture_time);
         break;
     case IEEE802154_RADIO_INDICATION_TX_START:
-        openwsn_radio.startFrame_cb(_txrx_event_capture_time);
-        break;
     case IEEE802154_RADIO_INDICATION_RX_START:
         openwsn_radio.startFrame_cb(_txrx_event_capture_time);
         break;
@@ -312,6 +324,5 @@ void radio_getReceivedFrame(uint8_t *bufRead,
     /* get rssi, lqi & crc */
     *rssi = ieee802154_rssi_to_dbm(rx_info.rssi);
     *lqi = rx_info.lqi;
-    /* only valid crc frames are currently accepted */
-    *crc = 1;
+    *crc = _valid_crc ? 1 : 0;
 }
