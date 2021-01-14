@@ -1,0 +1,27 @@
+From c49b5f964d411ce4764c356f35ff8d784420f319 Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Thu, 21 Jan 2021 20:32:55 +0100
+Subject: [PATCH 5/8] mqttclient: enable overriding of TEST_MESSAGE
+
+---
+ wolfmqtt_examples/mqttclient/mqttclient.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/wolfmqtt_examples/mqttclient/mqttclient.c b/wolfmqtt_examples/mqttclient/mqttclient.c
+index 9f50e22..71b1a77 100644
+--- a/wolfmqtt_examples/mqttclient/mqttclient.c
++++ b/wolfmqtt_examples/mqttclient/mqttclient.c
+@@ -37,7 +37,10 @@ static int mStopRead = 0;
+ /* Maximum size for network read/write callbacks. There is also a v5 define that
+    describes the max MQTT control packet size, DEFAULT_MAX_PKT_SZ. */
+ #define MAX_BUFFER_SIZE 1024
++
++#ifndef TEST_MESSAGE
+ #define TEST_MESSAGE    "test"
++#endif
+ 
+ #ifdef WOLFMQTT_PROPERTY_CB
+ #define MAX_CLIENT_ID_LEN 64
+-- 
+2.25.1
+
