@@ -39,6 +39,17 @@
 extern "C" {
 #endif
 
+
+#if !defined(CONFIG_LOG_LEVEL_RIOT) && !defined(CONFIG_LOG_LEVEL_RFC5424)
+/**
+ * @brief   Log level values setting
+ *
+ * Default to rfc5424, old RIOT-specific provided for compatibility
+ */
+#define CONFIG_LOG_LEVEL_RFC5424    1
+#define CONFIG_LOG_LEVEL_RIOT       0
+#endif
+
 /**
  * @brief defined log levels
  *
@@ -51,6 +62,7 @@ extern "C" {
  * The log function calls of filtered messages will be optimized out at compile
  * time, so a lower log level might result in smaller code size.
  */
+#if CONFIG_LOG_LEVEL_RFC5424 || DOXYGEN
 enum {
     LOG_NONE = -1,
     LOG_EMERG,      /**< Emergency log level, when system gets unusable */
@@ -67,6 +79,24 @@ enum {
                          too verbose for production use */
     LOG_ALL         /**< print everything */
 };
+#elif CONFIG_LOG_LEVEL_RIOT
+enum {
+    LOG_NONE,       /**< Lowest log level, will output nothing */
+    LOG_ERROR,      /**< Error log level, will print only critical,
+                         non-recoverable errors like hardware initialization
+                         failures */
+    LOG_WARNING,    /**< Warning log level, will print warning messages for
+                         temporary errors */
+    LOG_INFO,       /**< Informational log level, will print purely
+                         informational messages like successful system bootup,
+                         network link state, ...*/
+    LOG_DEBUG,      /**< Debug log level, printing developer stuff considered
+                         too verbose for production use */
+    LOG_ALL         /**< print everything */
+};
+#else
+#error "No log level configuration selected"
+#endif
 
 #ifndef LOG_LEVEL
 /**
