@@ -548,6 +548,11 @@ void isr_radio(void)
             break;
         case STATE_ACK:
             _state = STATE_IDLE;
+
+            /* We disable the radio to avoid unwanted emmissions (see ERRATA
+             * ID 204, "Switching between TX and RX causes unwanted emissions")
+             */
+            _disable();
             DEBUG("[nrf52840] TX ACK done.")
             _set_ifs_timer(false);
             break;
