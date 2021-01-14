@@ -280,15 +280,6 @@ static int _request_cca(ieee802154_dev_t *dev)
 }
 
 /**
- * @brief   Set CCA threshold value in internal represetion
- */
-static void _set_cca_thresh(uint8_t thresh)
-{
-    NRF_RADIO->CCACTRL &= ~RADIO_CCACTRL_CCAEDTHRES_Msk;
-    NRF_RADIO->CCACTRL |= thresh << RADIO_CCACTRL_CCAEDTHRES_Pos;
-}
-
-/**
  * @brief   Convert from dBm to the internal representation, when the
  *          radio operates as a IEEE802.15.4 transceiver.
  */
@@ -300,7 +291,15 @@ static inline uint8_t _dbm_to_ieee802154_hwval(int8_t dbm)
 static int set_cca_threshold(ieee802154_dev_t *dev, int8_t threshold)
 {
     (void) dev;
-    _set_cca_thresh(_dbm_to_ieee802154_hwval(threshold));
+
+    if (threshold < ED_RSSIOFFS) {
+        return -EINVAL;
+    }
+
+    uint8_t hw_val = _dbm_to_ieee802154_hwval(threshold);
+
+    NRF_RADIO->CCACTRL &= ~RADIO_CCACTRL_CCAEDTHRES_Msk;
+    NRF_RADIO->CCACTRL |= hw_val << RADIO_CCACTRL_CCAEDTHRES_Pos;
     return 0;
 }
 
