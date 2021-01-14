@@ -19,21 +19,30 @@ config SYSLOG_HOSTNAME
     help
         Syslog hostmame printed in the messages. Can also be set at runtime.
 
+config SYSLOG_SET_DEFAULT_IDENT
+    bool "Set default ident"
+
+config SYSLOG_DEFAULT_IDENT
+    string "Default ident"
+    depends on SYSLOG_SET_DEFAULT_IDENT
+    help
+        Syslog default entry ident string
+
 config SYSLOG_MAX_STRING_LEN
     int "Max length for a printed log message"
     default 256
 
 choice
     bool "Formatter"
-    default DEFAULT
+    default KCONFIG_SYSLOG_FORMATTER_DEFAULT
     help
         Select the log message formatter
 
-config DEFAULT
+config KCONFIG_SYSLOG_FORMATTER_DEFAULT
     bool "Default (libc-based)"
     select MODULE_FORMATTER_DEFAULT
 
-config FMT
+config KCONFIG_SYSLOG_FORMATTER_FMT
     bool "fmt"
     select MODULE_FORMATTER_FMT
     select MODULE_FMT

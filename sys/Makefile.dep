@@ -1082,4 +1082,8 @@ ifneq (,$(filter syslog_backend_file, $(USEMODULE)))
   USEMODULE += vfs
 endif
 
+ifneq (,$(filter syslog_formatter_fmt, $(USEMODULE)))
+  USEMODULE += fmt
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep

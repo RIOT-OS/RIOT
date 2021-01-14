@@ -40,6 +40,10 @@
 #define SYSLOG_MSG_QUEUE_SIZE       32
 #endif
 
+#if !CONFIG_SYSLOG_SET_DEFAULT_IDENT
+#define CONFIG_SYSLOG_DEFAULT_IDENT RIOT_APPLICATION
+#endif
+
 #ifndef CONFIG_SYSLOG_MEMARRAY
 #define CONFIG_SYSLOG_MEMARRAY      0
 #endif
@@ -437,12 +441,12 @@ void syslog_init(void)
                          _syslog_thread, NULL, "syslog");
 
 #if CONFIG_SYSLOG_HAS_OPEN
-    syslog_default_entry = openlog(RIOT_APPLICATION, 0, LOG_LOCAL0);
+    syslog_default_entry = openlog(CONFIG_SYSLOG_DEFAULT_IDENT, 0, LOG_KERN);
 #else
     syslog_default_entry = &_syslog_default_entry;
-    syslog_default_entry->ident = RIOT_APPLICATION;
+    syslog_default_entry->ident = CONFIG_SYSLOG_DEFAULT_IDENT;
     syslog_default_entry->option = 0;
-    syslog_default_entry->facility = LOG_LOCAL0;
+    syslog_default_entry->facility = LOG_KERN;
     syslog_default_entry->mask = LOG_LEVEL;
 #endif
 }
