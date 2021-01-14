@@ -1,0 +1,3 @@
+MODULE = wolfmqtt
+
+include $(RIOTBASE)/Makefile.base
