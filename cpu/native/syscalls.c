@@ -97,6 +97,7 @@ int (*real_fputc)(int c, FILE *stream);
 int (*real_fgetc)(FILE *stream);
 mode_t (*real_umask)(mode_t cmask);
 ssize_t (*real_writev)(int fildes, const struct iovec *iov, int iovcnt);
+ssize_t (*real_send)(int sockfd, const void *buf, size_t len, int flags);
 
 #ifdef __MACH__
 #else
@@ -484,6 +485,7 @@ void _native_init_syscalls(void)
     *(void **)(&real_clearerr) = dlsym(RTLD_NEXT, "clearerr");
     *(void **)(&real_umask) = dlsym(RTLD_NEXT, "umask");
     *(void **)(&real_writev) = dlsym(RTLD_NEXT, "writev");
+    *(void **)(&real_send) = dlsym(RTLD_NEXT, "send");
     *(void **)(&real_fclose) = dlsym(RTLD_NEXT, "fclose");
     *(void **)(&real_fseek) = dlsym(RTLD_NEXT, "fseek");
     *(void **)(&real_fputc) = dlsym(RTLD_NEXT, "fputc");
