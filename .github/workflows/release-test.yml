@@ -122,6 +122,10 @@ jobs:
           GITHUB_REPOSITORY=${GITHUB_REPOSITORY} \
           GITHUB_RUN_ID=${GITHUB_RUN_ID} \
           GITHUB_SERVER_URL=${GITHUB_SERVER_URL} \
+          LORAWAN_APP_KEY="${{ secrets.CI_TTN_APPKEY  }}" \
+          LORAWAN_NWK_SKEY="${{ secrets.CI_TTN_NWKSKEY_ABP  }}" \
+          LORAWAN_APP_SKEY="${{ secrets.CI_TTN_APPSKEY_ABP  }}" \
+          LORAWAN_DL_KEY="${{ secrets.CI_TTN_APPID_KEY  }}" \
           RIOTBASE=${RIOTBASE} \
           $(which tox) -- ${TOX_ARGS} -m "${{ matrix.pytest_mark }}"
     - name: junit2html and XML deploy
