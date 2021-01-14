@@ -7,3 +7,7 @@ ifneq (,$(filter wolfmqtt_examples%,$(USEMODULE)))
   USEMODULE += posix_select
   USEMODULE += ztimer_sec
 endif
+
+ifneq (,$(filter wolfmqtt_examples_mqttclient,$(USEMODULE)))
+  USEMODULE += sock_tcp
+endif
