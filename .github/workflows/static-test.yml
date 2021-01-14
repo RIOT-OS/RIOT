@@ -26,8 +26,8 @@ jobs:
           git fetch origin ${{ github.base_ref }}:${{ github.base_ref }} --no-tags
         fi
         git config apply.whitespace nowarn
-    - name: Fetch riot/riotbuild Docker image
-      run: docker pull riot/riotbuild:latest
+    - name: Fetch riot/static-test-tools Docker image
+      run: docker pull riot/static-test-tools:latest
     - name: Run static-tests
       run: |
         # Note: ${{ github.base_ref }} is empty when not in a PR
@@ -35,5 +35,5 @@ jobs:
           -e CI_BASE_BRANCH=${{ github.base_ref }}  \
           -e GITHUB_RUN_ID=${GITHUB_RUN_ID}         \
           -v $(pwd):/data/riotbuild                 \
-          riot/riotbuild:latest                     \
+          riot/static-test-tools:latest             \
           make static-test
