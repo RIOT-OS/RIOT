@@ -31,8 +31,12 @@ static gnrc_rpl_of_t *objective_functions[GNRC_RPL_IMPLEMENTED_OFS_NUMOF];
 void gnrc_rpl_of_manager_init(void)
 {
     /* insert new objective functions here */
-    objective_functions[0] = gnrc_rpl_get_of0();
-    objective_functions[1] = gnrc_rpl_get_of_mrhof();
+    if (IS_USED(MODULE_GNRC_RPL_OF0)) {
+        objective_functions[0] = gnrc_rpl_get_of0();
+    }
+    if (IS_USED(MODULE_GNRC_RPL_MRHOF)) {
+        objective_functions[1] = gnrc_rpl_get_of_mrhof();
+    }
 }
 
 /* find implemented OF via objective code point */
@@ -40,12 +44,16 @@ gnrc_rpl_of_t *gnrc_rpl_get_of_for_ocp(uint16_t ocp)
 {
     for (uint16_t i = 0; i < GNRC_RPL_IMPLEMENTED_OFS_NUMOF; i++) {
         if (objective_functions[i] == NULL) {
-            /* fallback if something goes wrong */
-            return gnrc_rpl_get_of0();
+            continue;
         }
         else if (ocp == objective_functions[i]->ocp) {
             return objective_functions[i];
         }
+    }
+
+    /* fallback if something goes wrong */
+    if (IS_USED(MODULE_GNRC_RPL_OF0)) {
+        return gnrc_rpl_get_of0();
     }
 
     return NULL;
