@@ -350,6 +350,17 @@ void ztimer_handler(ztimer_clock_t *clock);
 void ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, uint32_t val);
 
 /**
+ * @brief   Check if a timer is currently active
+ *
+ * @param[in]   clock       ztimer clock to operate on
+ * @param[in]   timer       timer to check
+ *
+ * @return  > 0 if timer is active
+ * @return 0 if timer is not active
+ */
+unsigned ztimer_is_set(const ztimer_clock_t *clock, const ztimer_t *timer);
+
+/**
  * @brief   Remove a timer from a clock
  *
  * This will place @p timer in the timer targets queue for @p clock.
