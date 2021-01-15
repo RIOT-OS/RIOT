@@ -1,5 +1,8 @@
 core/.*\.c
 core/include/.*\.h
+cpu/fe310/.*\.c
+cpu/fe310/include/.*\.h
+cpu/fe310/periph/.*\.c
 sys/ztimer/.*\.c
 sys/ztimer.h
 sys/include/ztimer/.*\.h
