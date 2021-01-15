@@ -52,14 +52,14 @@ static inline void _uart_isr(uart_t dev)
 void uart_isr(int num)
 {
     switch (num) {
-        case INT_UART0_BASE:
-            _uart_isr(0);
-            break;
-        case INT_UART1_BASE:
-            _uart_isr(1);
-            break;
-        default:
-            break;
+    case INT_UART0_BASE:
+        _uart_isr(0);
+        break;
+    case INT_UART1_BASE:
+        _uart_isr(1);
+        break;
+    default:
+        break;
     }
 }
 
@@ -136,8 +136,9 @@ void uart_write(uart_t dev, const uint8_t *data, size_t len)
 {
     for (size_t i = 0; i < len; i++) {
         /* Wait for FIFO to empty */
-        while ((_REG32(uart_config[dev].addr, UART_REG_TXFIFO) & UART_TXFIFO_FULL)
-               == (uint32_t)UART_TXFIFO_FULL) {};
+        while ((_REG32(uart_config[dev].addr,
+                       UART_REG_TXFIFO) & UART_TXFIFO_FULL)
+               == (uint32_t)UART_TXFIFO_FULL) {}
 
         /* Write a byte */
         _REG32(uart_config[dev].addr, UART_REG_TXFIFO) = data[i];
@@ -146,10 +147,10 @@ void uart_write(uart_t dev, const uint8_t *data, size_t len)
 
 void uart_poweron(uart_t dev)
 {
-    (void) dev;
+    (void)dev;
 }
 
 void uart_poweroff(uart_t dev)
 {
-    (void) dev;
+    (void)dev;
 }

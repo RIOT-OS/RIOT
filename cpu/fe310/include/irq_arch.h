@@ -43,12 +43,13 @@ static inline __attribute__((always_inline)) unsigned int irq_enable(void)
 {
     /* Enable all interrupts */
     unsigned state;
+
     __asm__ volatile (
         "csrrs %[dest], mstatus, %[mask]"
-        : [dest]    "=r"(state)
-        : [mask]    "i"(MSTATUS_MIE)
+        :[dest]    "=r" (state)
+        :[mask]    "i" (MSTATUS_MIE)
         : "memory"
-    );
+        );
     return state;
 }
 
@@ -59,12 +60,13 @@ static inline __attribute__((always_inline)) unsigned int irq_disable(void)
 {
 
     unsigned int state;
+
     __asm__ volatile (
         "csrrc %[dest], mstatus, %[mask]"
-        : [dest]    "=r"(state)
-        : [mask]    "i"(MSTATUS_MIE)
+        :[dest]    "=r" (state)
+        :[mask]    "i" (MSTATUS_MIE)
         : "memory"
-    );
+        );
 
     return state;
 }
@@ -72,15 +74,16 @@ static inline __attribute__((always_inline)) unsigned int irq_disable(void)
 /**
  * @brief Restore the state of the IRQ flags
  */
-static inline __attribute__((always_inline)) void irq_restore(unsigned int state)
+static inline __attribute__((always_inline)) void irq_restore(
+    unsigned int state)
 {
     /* Restore all interrupts to given state */
     __asm__ volatile (
         "csrw mstatus, %[state]"
         : /* no outputs */
-        : [state]   "r"(state)
+        :[state]   "r" (state)
         : "memory"
-    );
+        );
 }
 
 /**

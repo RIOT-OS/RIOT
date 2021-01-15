@@ -30,7 +30,8 @@ extern "C" {
  * @{
  */
 #ifndef CONFIG_USE_CLOCK_HFXOSC_PLL
-#if IS_ACTIVE(CONFIG_USE_CLOCK_HFXOSC) || IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC_PLL) || \
+#if IS_ACTIVE(CONFIG_USE_CLOCK_HFXOSC) || \
+    IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC_PLL) || \
     IS_ACTIVE(CONFIG_USE_CLOCK_HFROSC)
 #define CONFIG_USE_CLOCK_HFXOSC_PLL         0
 #else
@@ -51,22 +52,26 @@ extern "C" {
 #endif /* CONFIG_USE_CLOCK_HFROSC */
 
 #if CONFIG_USE_CLOCK_HFXOSC_PLL && \
-    (CONFIG_USE_CLOCK_HFROSC_PLL || CONFIG_USE_CLOCK_HFROSC || CONFIG_USE_CLOCK_HFXOSC)
+    (CONFIG_USE_CLOCK_HFROSC_PLL || CONFIG_USE_CLOCK_HFROSC || \
+     CONFIG_USE_CLOCK_HFXOSC)
 #error "Cannot use HFXOSC_PLL with other clock configurations"
 #endif
 
 #if CONFIG_USE_CLOCK_HFXOSC && \
-    (CONFIG_USE_CLOCK_HFROSC_PLL || CONFIG_USE_CLOCK_HFROSC || CONFIG_USE_CLOCK_HFXOSC_PLL)
+    (CONFIG_USE_CLOCK_HFROSC_PLL || CONFIG_USE_CLOCK_HFROSC || \
+     CONFIG_USE_CLOCK_HFXOSC_PLL)
 #error "Cannot use HFXOSC with other clock configurations"
 #endif
 
 #if CONFIG_USE_CLOCK_HFROSC_PLL && \
-    (CONFIG_USE_CLOCK_HFXOSC_PLL || CONFIG_USE_CLOCK_HFXOSC || CONFIG_USE_CLOCK_HFROSC)
+    (CONFIG_USE_CLOCK_HFXOSC_PLL || CONFIG_USE_CLOCK_HFXOSC || \
+     CONFIG_USE_CLOCK_HFROSC)
 #error "Cannot use HFROSC_PLL with other clock configurations"
 #endif
 
 #if CONFIG_USE_CLOCK_HFROSC && \
-    (CONFIG_USE_CLOCK_HFXOSC_PLL || CONFIG_USE_CLOCK_HFXOSC || CONFIG_USE_CLOCK_HFROSC_PLL)
+    (CONFIG_USE_CLOCK_HFXOSC_PLL || CONFIG_USE_CLOCK_HFXOSC || \
+     CONFIG_USE_CLOCK_HFROSC_PLL)
 #error "Cannot use HFROSC with other clock configurations"
 #endif
 
@@ -80,9 +85,12 @@ extern "C" {
 
 #if CONFIG_USE_CLOCK_HFXOSC_PLL
 #define CLOCK_PLL_INPUT_CLOCK               MHZ(16)
-#define CLOCK_PLL_REFR                      (CLOCK_PLL_INPUT_CLOCK / (CONFIG_CLOCK_PLL_R + 1))
-#define CLOCK_PLL_VCO                       (CLOCK_PLL_REFR * (2 * (CONFIG_CLOCK_PLL_F + 1)))
-#define CLOCK_PLL_OUT                       (CLOCK_PLL_VCO / (1 << CONFIG_CLOCK_PLL_Q))
+#define CLOCK_PLL_REFR                      (CLOCK_PLL_INPUT_CLOCK / \
+                                             (CONFIG_CLOCK_PLL_R + 1))
+#define CLOCK_PLL_VCO                       (CLOCK_PLL_REFR * \
+                                             (2 * (CONFIG_CLOCK_PLL_F + 1)))
+#define CLOCK_PLL_OUT                       (CLOCK_PLL_VCO / \
+                                             (1 << CONFIG_CLOCK_PLL_Q))
 #define CLOCK_CORECLOCK                     (CLOCK_PLL_OUT) /* 320000000Hz with the values used above */
 
 /* Check PLL settings */
@@ -90,10 +98,12 @@ extern "C" {
 #error "Only R=2 can be used when using HFXOSC"
 #endif
 #if (CLOCK_PLL_VCO < MHZ(384)) || (CLOCK_PLL_VCO > MHZ(768))
-#error "VCO frequency must be in the range [384MHz - 768MHz], check the CLOCK_PLL_F value"
+#error \
+    "VCO frequency must be in the range [384MHz - 768MHz], check the CLOCK_PLL_F value"
 #endif
 #if (CLOCK_PLL_OUT < MHZ(48)) || (CLOCK_PLL_OUT > MHZ(384))
-#error "PLL output frequency must be in the range [48MHz - 384MHz], check the CLOCK_PLL_Q value"
+#error \
+    "PLL output frequency must be in the range [48MHz - 384MHz], check the CLOCK_PLL_Q value"
 #endif
 
 #elif CONFIG_USE_CLOCK_HFXOSC
@@ -101,9 +111,9 @@ extern "C" {
 #endif
 
 /*
-  When using HFROSC input clock, the core clock cannot be computed from settings,
-  call cpu_freq() to get the configured CPU frequency.
-*/
+   When using HFROSC input clock, the core clock cannot be computed from settings,
+   call cpu_freq() to get the configured CPU frequency.
+ */
 #ifndef CONFIG_CLOCK_DESIRED_FREQUENCY
 #define CONFIG_CLOCK_DESIRED_FREQUENCY     MHZ(320)
 #endif

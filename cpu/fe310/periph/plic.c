@@ -51,7 +51,7 @@ static inline volatile uint32_t *_get_irq_reg(unsigned irq)
 
     return &PLIC_REG(PLIC_ENABLE_OFFSET +
                      (hart_id << PLIC_ENABLE_SHIFT_PER_TARGET)) +
-                     (irq >> 5); /* Intentionally outside the PLIC_REG macro */
+           (irq >> 5);           /* Intentionally outside the PLIC_REG macro */
 }
 
 void plic_enable_interrupt(unsigned irq)

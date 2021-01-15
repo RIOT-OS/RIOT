@@ -83,6 +83,7 @@ void flash_init(void)
      */
     uint32_t freq = cpu_freq();
     uint32_t sckdiv = (freq - 1) / (MAX_FLASH_FREQ * 2);
+
     if (sckdiv > SCKDIV_SAFE) {
         SPI0_REG(SPI_REG_SCKDIV) = sckdiv;
     }
