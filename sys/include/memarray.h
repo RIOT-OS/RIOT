@@ -20,7 +20,7 @@
 
 #include <assert.h>
 #include <stdint.h>
-#include <stdlib.h>
+#include <stddef.h>
 #include <string.h>
 
 #ifdef __cplusplus
@@ -109,6 +109,15 @@ static inline void memarray_free(memarray_t *mem, void *ptr)
     memcpy(ptr, &mem->free_data, sizeof(void *));
     mem->free_data = ptr;
 }
+
+/**
+ * @brief Returns the number of blocks available
+ *
+ * @param[in]   mem     memarray pool
+ *
+ * @returns             Number of elements available in the memarray pool
+ */
+size_t memarray_available(memarray_t *mem);
 
 #ifdef __cplusplus
 }

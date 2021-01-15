@@ -31,3 +31,14 @@ void memarray_init(memarray_t *mem, void *data, size_t size, size_t num)
         memarray_free(mem, element);
     }
 }
+
+size_t memarray_available(memarray_t *mem)
+{
+    size_t num = 0;
+    void **element = &mem->free_data;
+    while (*element) {
+        element = (void**)*element;
+        num++;
+    }
+    return num;
+}
