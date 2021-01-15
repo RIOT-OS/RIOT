@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2018 Tobias Heider <heidert@nm.ifi.lmu.de>
+ *               2020 Koen Zandberg <koen@bergzand.net>
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -13,6 +14,7 @@
  *
  * @brief       pseudo dynamic allocation in static memory arrays
  * @author      Tobias Heider <heidert@nm.ifi.lmu.de>
+ * @author      Koen Zandberg <koen@bergzand.net>
  */
 
 #ifndef MEMARRAY_H
@@ -33,8 +35,18 @@ extern "C" {
 typedef struct {
     void *free_data;    /**< memory pool data / head of the free list */
     size_t size;        /**< size of single list element */
-    size_t num;         /**< max number of elements in list */
 } memarray_t;
+
+/**
+ * @brief Memory pool element
+ *
+ * Internal memarray element struct to increase code readability
+ *
+ * @internal
+ */
+typedef struct memarray_element {
+    struct memarray_element *next;  /**< Pointer to the next element */
+} memarray_element_t;
 
 /**
  * @brief Initialize memarray pool with free list
@@ -47,7 +59,7 @@ typedef struct {
  * @param[in,out] mem    memarray pool to initialize
  * @param[in]     data   pointer to user-allocated data
  * @param[in]     size   size of a single element in data
- * @param[in]     num    number of elements in data
+ * @param[in]     num    number of elements in @p data
  */
 void memarray_init(memarray_t *mem, void *data, size_t size, size_t num);
 
@@ -109,6 +121,35 @@ static inline void memarray_free(memarray_t *mem, void *ptr)
     memcpy(ptr, &mem->free_data, sizeof(void *));
     mem->free_data = ptr;
 }
+
+/**
+ * @brief Extend the memarray with a new memory region
+ *
+ * This function extends the memarray pool with a new memory region. The region
+ * must be able to fit the supplied number of elements of the size used when
+ * initializing this memarray.
+ *
+ * @pre `mem != NULL`
+ * @pre `data != NULL`
+ * @pre `num != 0`
+ *
+ * @param[in,out] mem   memarray pool to extend
+ * @param[in]     data  pointer to user-allocated data
+ * @param[in]     num   number of elements in @p data
+ */
+void memarray_extend(memarray_t *mem, void *data, size_t num);
+
+/**
+ * @brief Reduce the memarray space, subtracting the memory pool
+ *
+ * It is up to the user to free all chunks in the reduced pool. The function
+ * will check if all elements in the pool are freed.
+ *
+ * @param[in,out] mem   memarray pool to reduce
+ * @param[in]     data  pointer to the user-allocated data to reduce
+ * @param[in]     num   number of elements to reduce the data pool with
+ */
+int memarray_reduce(memarray_t *mem, void *data, size_t num);
 
 /**
  * @brief Returns the number of blocks available
