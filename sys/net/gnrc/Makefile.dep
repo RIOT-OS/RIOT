@@ -101,7 +101,26 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     USEMODULE += xtimer
   endif
   USEMODULE += evtimer
-  USEMODULE += netstats_neighbor_etx
+
+  ifeq (,$(filter gnrc_rpl_mrhof%,$(USEMODULE)))
+    USEMODULE += gnrc_rpl_of0
+  endif
+endif
+
+ifneq (,$(filter gnrc_rpl_mrhof%,$(USEMODULE)))
+  USEMODULE += gnrc_rpl_mrhof
+
+  ifeq (,$(filter gnrc_rpl_mrhof_%,$(USEMODULE)))
+    USEMODULE += gnrc_rpl_mrhof_etx
+  endif
+
+  ifneq (,$(filter gnrc_rpl_mrhof_etx,$(USEMODULE)))
+    USEMODULE += netstats_neighbor_etx
+  endif
+
+  ifneq (,$(filter gnrc_rpl_mrhof_lqi,$(USEMODULE)))
+    USEMODULE += netstats_neighbor_lqi
+  endif
 endif
 
 ifneq (,$(filter gnrc_ipv6_auto_subnets_eui,$(USEMODULE)))

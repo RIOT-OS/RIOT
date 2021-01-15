@@ -253,7 +253,11 @@ extern "C" {
  * @brief   Default Objective Code Point (OF0)
  */
 #ifndef CONFIG_GNRC_RPL_DEFAULT_OCP
+#ifdef MODULE_GNRC_RPL_MRHOF
+#define CONFIG_GNRC_RPL_DEFAULT_OCP (1)
+#else
 #define CONFIG_GNRC_RPL_DEFAULT_OCP (0)
+#endif
 #endif
 
 /**

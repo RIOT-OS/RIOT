@@ -197,6 +197,8 @@ PSEUDOMODULES += gnrc_nettype_udp
 ## @}
 
 
+PSEUDOMODULES += gnrc_rpl_mrhof%
+PSEUDOMODULES += gnrc_rpl_of0
 PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
 PSEUDOMODULES += gnrc_sixlowpan_default
