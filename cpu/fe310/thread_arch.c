@@ -73,9 +73,9 @@
  *
  */
 char *thread_stack_init(thread_task_func_t task_func,
-                             void *arg,
-                             void *stack_start,
-                             int stack_size)
+                        void *arg,
+                        void *stack_start,
+                        int stack_size)
 {
     struct context_switch_frame *sf;
     uint32_t *stk_top;
@@ -97,25 +97,26 @@ char *thread_stack_init(thread_task_func_t task_func,
     stk_top = (uint32_t *)((uintptr_t)stk_top - sizeof(*sf));
 
     /* populate the stack frame with default values for starting the thread. */
-    sf = (struct context_switch_frame *) stk_top;
+    sf = (struct context_switch_frame *)stk_top;
 
     /* Clear stack frame */
     memset(sf, 0, sizeof(*sf));
 
     /* set initial reg values */
-    sf->pc = (uint32_t) task_func;
-    sf->a0 = (uint32_t) arg;
+    sf->pc = (uint32_t)task_func;
+    sf->a0 = (uint32_t)arg;
 
     /* if the thread exits go to sched_task_exit() */
-    sf->ra = (uint32_t) sched_task_exit;
+    sf->ra = (uint32_t)sched_task_exit;
 
-    return (char *) stk_top;
+    return (char *)stk_top;
 }
 
 void thread_print_stack(void)
 {
     int count = 0;
     thread_t *active_thread = thread_get_active();
+
     if (!active_thread) {
         return;
     }
@@ -182,13 +183,13 @@ static inline void _ecall_dispatch(uint32_t num, void *ctx)
 {
     /* function arguments are in a0 and a1 as per ABI */
     __asm__ volatile (
-    "mv a0, %[num] \n"
-    "mv a1, %[ctx] \n"
-    "ECALL\n"
-    : /* No outputs */
-    : [num] "r" (num), [ctx] "r" (ctx)
-    : "memory"
-    );
+        "mv a0, %[num] \n"
+        "mv a1, %[ctx] \n"
+        "ECALL\n"
+        : /* No outputs */
+        : [num] "r" (num), [ctx] "r" (ctx)
+        : "memory"
+        );
 }
 
 void thread_yield_higher(void)
@@ -206,6 +207,7 @@ void heap_stats(void)
 
     long int heap_size = &_eheap - &_sheap;
     struct mallinfo minfo = mallinfo();
+
     printf("heap: %ld (used %u, free %ld) [bytes]\n",
            heap_size, minfo.uordblks, heap_size - minfo.uordblks);
 }

@@ -62,26 +62,26 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     /*  Configure the mode */
 
     switch (mode) {
-        case GPIO_IN:
-            _set_pin_reg(GPIO_INPUT_EN, pin);
-            _clr_pin_reg(GPIO_OUTPUT_EN, pin);
-            _clr_pin_reg(GPIO_PULLUP_EN, pin);
-            break;
+    case GPIO_IN:
+        _set_pin_reg(GPIO_INPUT_EN, pin);
+        _clr_pin_reg(GPIO_OUTPUT_EN, pin);
+        _clr_pin_reg(GPIO_PULLUP_EN, pin);
+        break;
 
-        case GPIO_IN_PU:
-            _clr_pin_reg(GPIO_OUTPUT_EN, pin);
-            _set_pin_reg(GPIO_INPUT_EN, pin);
-            _set_pin_reg(GPIO_PULLUP_EN, pin);
-            break;
+    case GPIO_IN_PU:
+        _clr_pin_reg(GPIO_OUTPUT_EN, pin);
+        _set_pin_reg(GPIO_INPUT_EN, pin);
+        _set_pin_reg(GPIO_PULLUP_EN, pin);
+        break;
 
-        case GPIO_OUT:
-            _set_pin_reg(GPIO_OUTPUT_EN, pin);
-            _clr_pin_reg(GPIO_INPUT_EN, pin);
-            _clr_pin_reg(GPIO_PULLUP_EN, pin);
-            break;
+    case GPIO_OUT:
+        _set_pin_reg(GPIO_OUTPUT_EN, pin);
+        _clr_pin_reg(GPIO_INPUT_EN, pin);
+        _clr_pin_reg(GPIO_PULLUP_EN, pin);
+        break;
 
-        default:
-            return -1;
+    default:
+        return -1;
     }
 
     /* Configure the pin muxing for the GPIO */
@@ -108,7 +108,8 @@ void gpio_clear(gpio_t pin)
 
 void gpio_toggle(gpio_t pin)
 {
-    __atomic_fetch_xor(&GPIO_REG(GPIO_OUTPUT_VAL), (1 << pin), __ATOMIC_RELAXED);
+    __atomic_fetch_xor(&GPIO_REG(GPIO_OUTPUT_VAL), (1 << pin),
+                       __ATOMIC_RELAXED);
 }
 
 void gpio_write(gpio_t pin, int value)
@@ -133,18 +134,18 @@ void gpio_isr(int num)
 
     /* Clear interrupt */
     switch (isr_flank[pin]) {
-        case GPIO_FALLING:
-            _set_pin_reg(GPIO_FALL_IP, pin);
-            break;
+    case GPIO_FALLING:
+        _set_pin_reg(GPIO_FALL_IP, pin);
+        break;
 
-        case GPIO_RISING:
-            _set_pin_reg(GPIO_RISE_IP, pin);
-            break;
+    case GPIO_RISING:
+        _set_pin_reg(GPIO_RISE_IP, pin);
+        break;
 
-        case GPIO_BOTH:
-            _set_pin_reg(GPIO_FALL_IP, pin);
-            _set_pin_reg(GPIO_RISE_IP, pin);
-            break;
+    case GPIO_BOTH:
+        _set_pin_reg(GPIO_FALL_IP, pin);
+        _set_pin_reg(GPIO_RISE_IP, pin);
+        break;
     }
 }
 
@@ -187,21 +188,21 @@ void gpio_irq_enable(gpio_t pin)
 
     /* Enable interrupt for pin */
     switch (isr_flank[pin]) {
-        case GPIO_FALLING:
-            _set_pin_reg(GPIO_FALL_IE, pin);
-            break;
+    case GPIO_FALLING:
+        _set_pin_reg(GPIO_FALL_IE, pin);
+        break;
 
-        case GPIO_RISING:
-            _set_pin_reg(GPIO_RISE_IE, pin);
-            break;
+    case GPIO_RISING:
+        _set_pin_reg(GPIO_RISE_IE, pin);
+        break;
 
-        case GPIO_BOTH:
-            _set_pin_reg(GPIO_FALL_IE, pin);
-            _set_pin_reg(GPIO_RISE_IE, pin);
-            break;
+    case GPIO_BOTH:
+        _set_pin_reg(GPIO_FALL_IE, pin);
+        _set_pin_reg(GPIO_RISE_IE, pin);
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 }
 
@@ -214,21 +215,21 @@ void gpio_irq_disable(gpio_t pin)
 
     /* Disable interrupt for pin */
     switch (isr_flank[pin]) {
-        case GPIO_FALLING:
-            _clr_pin_reg(GPIO_FALL_IE, pin);
-            break;
+    case GPIO_FALLING:
+        _clr_pin_reg(GPIO_FALL_IE, pin);
+        break;
 
-        case GPIO_RISING:
-            _clr_pin_reg(GPIO_RISE_IE, pin);
-            break;
+    case GPIO_RISING:
+        _clr_pin_reg(GPIO_RISE_IE, pin);
+        break;
 
-        case GPIO_BOTH:
-            _clr_pin_reg(GPIO_FALL_IE, pin);
-            _clr_pin_reg(GPIO_RISE_IE, pin);
-            break;
+    case GPIO_BOTH:
+        _clr_pin_reg(GPIO_FALL_IE, pin);
+        _clr_pin_reg(GPIO_RISE_IE, pin);
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 }
 #endif /* MODULE_PERIPH_GPIO_IRQ */

@@ -55,7 +55,8 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 
 
     /* reset timer counter */
-    volatile uint64_t *mtime = (uint64_t *) (CLINT_CTRL_ADDR + CLINT_MTIME);
+    volatile uint64_t *mtime = (uint64_t *)(CLINT_CTRL_ADDR + CLINT_MTIME);
+
     *mtime = 0;
 
     return 0;
@@ -63,13 +64,13 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
-    volatile uint64_t *mtime = (uint64_t *) (CLINT_CTRL_ADDR + CLINT_MTIME);
+    volatile uint64_t *mtime = (uint64_t *)(CLINT_CTRL_ADDR + CLINT_MTIME);
     volatile uint64_t *mtimecmp =
-        (uint64_t *) (CLINT_CTRL_ADDR + CLINT_MTIMECMP);
+        (uint64_t *)(CLINT_CTRL_ADDR + CLINT_MTIMECMP);
 
     /* Compute delta for timer */
     uint64_t now = *mtime;
-    uint64_t then = now + (uint64_t) timeout;
+    uint64_t then = now + (uint64_t)timeout;
 
     if (dev != 0 || channel != 0) {
         return -1;
@@ -89,13 +90,13 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
 
-    volatile uint64_t *mtime = (uint64_t *) (CLINT_CTRL_ADDR + CLINT_MTIME);
+    volatile uint64_t *mtime = (uint64_t *)(CLINT_CTRL_ADDR + CLINT_MTIME);
     volatile uint64_t *mtimecmp =
-        (uint64_t *) (CLINT_CTRL_ADDR + CLINT_MTIMECMP);
+        (uint64_t *)(CLINT_CTRL_ADDR + CLINT_MTIMECMP);
 
     /* Compute absolute for timer */
     uint64_t now = *mtime;
-    uint64_t then = (now & 0xFFFFFFFF00000000) + (uint64_t) value;
+    uint64_t then = (now & 0xFFFFFFFF00000000) + (uint64_t)value;
 
     if (dev != 0 || channel != 0) {
         return -1;
@@ -123,14 +124,14 @@ int timer_clear(tim_t dev, int channel)
 
 unsigned int timer_read(tim_t dev)
 {
-    uint32_t lo = *(volatile uint32_t *) (CLINT_CTRL_ADDR + CLINT_MTIME);
+    uint32_t lo = *(volatile uint32_t *)(CLINT_CTRL_ADDR + CLINT_MTIME);
 
     if (dev != 0) {
         return 0;
     }
 
     /* Read current timer value */
-    return (unsigned int) lo;
+    return (unsigned int)lo;
 }
 
 void timer_start(tim_t dev)
@@ -157,7 +158,7 @@ void timer_stop(tim_t dev)
 void timer_isr(void)
 {
     volatile uint64_t *mtimecmp =
-        (uint64_t *) (CLINT_CTRL_ADDR + CLINT_MTIMECMP);
+        (uint64_t *)(CLINT_CTRL_ADDR + CLINT_MTIMECMP);
 
     /* Clear intr */
     clear_csr(mie, MIP_MTIP);

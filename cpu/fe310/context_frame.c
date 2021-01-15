@@ -25,7 +25,8 @@
 
 
 #define CHECK_OFFSET(member)     \
-    _Static_assert(offsetof(struct context_switch_frame, member) == member ## _OFFSET, \
+    _Static_assert(offsetof(struct context_switch_frame, \
+                            member) == member ## _OFFSET, \
                    "context_switch_frame offset mismatch for offset member");
 
 static void check_context_switch_frame_alignment(void) __attribute__ ((unused));

@@ -144,8 +144,8 @@ typedef struct {
  */
 #define NWDT_TIME_LOWER_LIMIT           (1)
 /* Ensure the internal "count" variable stays within the uint32 bounds.
-  This variable corresponds to max_time * RTC_FREQ / MS_PER_SEC. On fe310,
-  RTC_FREQ is 32768Hz. The 15 right shift is equivalent to a division by RTC_FREQ.
+   This variable corresponds to max_time * RTC_FREQ / MS_PER_SEC. On fe310,
+   RTC_FREQ is 32768Hz. The 15 right shift is equivalent to a division by RTC_FREQ.
  */
 #define NWDT_TIME_UPPER_LIMIT           ((UINT32_MAX >> 15)  * MS_PER_SEC + 1)
 /** @} */
