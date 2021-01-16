@@ -98,6 +98,18 @@ void sema_create(sema_t *sema, unsigned int value);
 void sema_destroy(sema_t *sema);
 
 /**
+ * @brief   Get a semaphore's current value
+ *
+ * @param[in]  sema       A semaphore.
+ *
+ * @return  the current value of the semaphore
+ */
+static inline unsigned sema_get_value(const sema_t *sema)
+{
+    return sema->value;
+}
+
+/**
  * @brief Wait for a semaphore, blocking or non-blocking.
  *
  * @details For commit purposes you should probably use sema_wait(),
