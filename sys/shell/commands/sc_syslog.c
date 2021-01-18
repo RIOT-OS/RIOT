@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "kernel_defines.h"
 #include "syslog.h"
 
 static void _syslog_usage(void)
@@ -30,6 +31,18 @@ static void _syslog_usage(void)
     puts("syslog hostname <name>");
     puts("syslog setmask <mask>");
     puts("syslog logd <level> <string>");
+    if (IS_USED(MODULE_SYSLOG_BACKEND_FILE)) {
+        puts("syslog file suspend");
+        puts("syslog file resume");
+        if (IS_ACTIVE(CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND)) {
+            puts("syslog file stop");
+            puts("syslog file start");
+        }
+    }
+    if (IS_USED(MODULE_SYSLOG_BACKEND_STDIO)) {
+        puts("syslog stdio enable");
+        puts("syslog stdio disable");
+    }
 }
 
 static int _list_handler(int argc, char **argv)
@@ -88,6 +101,61 @@ static int _setmask_handler(int argc, char **argv)
     return 0;
 }
 
+#if MODULE_SYSLOG_BACKEND_FILE
+static int _file_handler(int argc, char **argv)
+{
+    if (argc < 2) {
+        _syslog_usage();
+        return 1;
+    }
+    if (strcmp(argv[1], "suspend") == 0) {
+        syslog_backend_file_suspend_rotation();
+    }
+    else if (strcmp(argv[1], "resume") == 0) {
+        syslog_backend_file_resume_rotation();
+    }
+    else if (IS_ACTIVE(CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND) &&
+             strcmp(argv[1], "start") == 0) {
+        syslog_backend_file_start();
+    }
+    else if (IS_ACTIVE(CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND) &&
+             strcmp(argv[1], "stop") == 0) {
+        syslog_backend_file_stop();
+    }
+    else {
+        printf("syslog file: unsupported sub-command: %s\n", argv[1]);
+        _syslog_usage();
+        return 1;
+    }
+
+    return 0;
+}
+#endif
+
+#if MODULE_SYSLOG_BACKEND_STDIO
+static int _stdio_handler(int argc, char **argv)
+{
+    if (argc < 2) {
+        _syslog_usage();
+        return 1;
+    }
+
+    if (strcmp(argv[1], "enable") == 0) {
+        syslog_backend_stdio_print(1);
+    }
+    else if (strcmp(argv[1], "disable") == 0) {
+        syslog_backend_stdio_print(0);
+    }
+    else {
+        printf("syslog stdio: unsupported sub-command: %s\n", argv[1]);
+        _syslog_usage();
+        return 1;
+    }
+
+    return 0;
+}
+#endif
+
 int _syslog_handler(int argc, char **argv)
 {
     if (argc < 2) {
@@ -106,6 +174,16 @@ int _syslog_handler(int argc, char **argv)
     else if (strcmp(argv[1], "setmask") == 0) {
         return _setmask_handler(argc - 1, argv + 1);
     }
+#if MODULE_SYSLOG_BACKEND_FILE
+    else if (strcmp(argv[1], "file") == 0) {
+        return _file_handler(argc - 1, argv + 1);
+    }
+#endif
+#if MODULE_SYSLOG_BACKEND_STDIO
+    else if (strcmp(argv[1], "stdio") == 0) {
+        return _stdio_handler(argc - 1, argv + 1);
+    }
+#endif
     else {
         printf("syslog: unsupported sub-command: %s\n", argv[1]);
         _syslog_usage();
