@@ -283,15 +283,10 @@ void *thread_isr_stack_start(void)
 
 void NORETURN cpu_switch_context_exit(void)
 {
-    /* enable IRQs to make sure the SVC interrupt is reachable */
+    /* enable IRQs to make sure the PENDSV interrupt is reachable */
     irq_enable();
-    /* trigger the SVC interrupt */
-    __asm__ volatile (
-        "svc    #1                            \n"
-        : /* no outputs */
-        : /* no inputs */
-        : /* no clobbers */
-    );
+
+    thread_yield_higher();
 
     UNREACHABLE();
 }
