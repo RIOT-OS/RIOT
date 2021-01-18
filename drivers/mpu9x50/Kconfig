@@ -1,0 +1,33 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if TEST_KCONFIG
+
+choice
+    bool "MPU-9X50 accelerometer/magnetometer/gyroscope"
+    optional
+    depends on HAS_PERIPH_I2C
+    help
+        This driver supports both MPU9150 and MPU9250. Choose one model.
+
+config MODULE_MPU9150
+    bool "MPU-9150"
+    select MODULE_MPU9X50
+
+config MODULE_MPU9250
+    bool "MPU-9250"
+    select MODULE_MPU9X50
+
+endchoice
+
+config MODULE_MPU9X50
+    bool
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+    select MODULE_XTIMER
+
+endif # TEST_KCONFIG

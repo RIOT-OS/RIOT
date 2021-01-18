@@ -1,9 +1,17 @@
 # Copyright (c) 2020 Freie Universitaet Berlin
+#               2020 HAW Hamburg
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
+config MODULE_MTD_SDCARD
+    bool "MTD interface for SPI SD-Card"
+    depends on MODULE_SDCARD_SPI
+    depends on TEST_KCONFIG
+    select MODULE_MTD
+
 menuconfig KCONFIG_USEMODULE_MTD_SDCARD
     bool "Configure MTD_SDCARD driver"
     depends on USEMODULE_MTD_SDCARD

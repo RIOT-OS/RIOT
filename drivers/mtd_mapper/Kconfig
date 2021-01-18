@@ -1,0 +1,18 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_MTD_MAPPER
+    bool "MTD address mapper"
+    depends on TEST_KCONFIG
+    select MODULE_MTD
+    help
+        Driver for address remap for flash devices.
+
+        This MTD module allows for remapping multiple different regions on a single
+        MTD device and present them as separate MTD devices. This is similar to
+        partitions on a hard drive, although this system only allows hardcoded
+        partitions and lacks a partition table.
