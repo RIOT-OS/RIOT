@@ -72,11 +72,6 @@ ifneq (,$(filter ltc4150_%,$(USEMODULE)))
   USEMODULE += ltc4150
 endif
 
-ifneq (,$(filter mcp2515,$(USEMODULE)))
-  USEMODULE += xtimer
-  FEATURES_REQUIRED += periph_gpio periph_spi periph_gpio_irq
-endif
-
 ifneq (,$(filter mhz19_%,$(USEMODULE)))
   USEMODULE += mhz19
 endif
