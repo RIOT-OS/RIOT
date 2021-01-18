@@ -104,6 +104,16 @@ DOCKER_MAKE_ARGS ?=
 # https://github.com/docker/for-mac/issues/2396
 ETC_LOCALTIME = $(realpath /etc/localtime)
 
+# Fetch the number of jobs from the MAKEFLAGS
+# With $MAKE_VERSION < 4.2, the amount of parallelism is not available in
+# $MAKEFLAGS, only that parallelism is requested. So only -j, even if
+# something like -j3 is specified. This can be unexpected and dangerous
+# in older make so don't enable parallelism if $MAKE_VERSION < 4.2
+MAKE_JOBS_NEEDS = 4.1.999
+MAKE_VERSION_OK = $(call memoized,MAKE_VERSION_OK,$(call \
+    version_is_greater,$(MAKE_VERSION),$(MAKE_JOBS_NEEDS)))
+DOCKER_MAKE_JOBS = $(if $(MAKE_VERSION_OK),$(filter -j%,$(MAKEFLAGS)),)
+DOCKER_MAKE_ARGS += $(DOCKER_MAKE_JOBS)
 
 # # # # # # # # # # # # # # # #
 # Directory mapping functions #
