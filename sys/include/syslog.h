@@ -247,6 +247,13 @@ void syslog_backend_stdio_print(bool print);
 
 /* File */
 
+#ifndef CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND
+/**
+ * @brief   Enable suspend/resume file rotation
+ */
+#define CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND  1
+#endif
+
 /**
  * @brief   Start file backend
  *
@@ -255,6 +262,11 @@ void syslog_backend_stdio_print(bool print);
  * and counting the current number of files.
  */
 int syslog_backend_file_start(void);
+
+/**
+ * @brief   Stop file backend
+ */
+void syslog_backend_file_stop(void);
 
 /**
  * @brief   Suspend log rotation

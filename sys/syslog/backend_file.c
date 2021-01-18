@@ -43,10 +43,6 @@
 #define CONFIG_SYSLOG_BACKEND_NB_FILES      (32)
 #endif
 
-#ifndef CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND
-#define CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND  1
-#endif
-
 #define PATH_STRING(str) (sizeof(str) == 2 && str[0] == '/' ? "" : str)
 
 typedef struct {
@@ -88,10 +84,8 @@ static bool _needs_rotation(syslog_file_t *desc)
 
 static void _rotate(syslog_file_t *desc)
 {
-    mutex_lock(&desc->lock);
 #if CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND
     if (desc->suspend_rotation) {
-        mutex_unlock(&desc->lock);
         return;
     }
 #endif
@@ -118,7 +112,6 @@ static void _rotate(syslog_file_t *desc)
     }
     desc->nb_files++;
     desc->cur_size = 0;
-    mutex_unlock(&desc->lock);
 }
 
 static void _send(struct syslog_msg *msg)
@@ -153,6 +146,7 @@ static void _send(struct syslog_msg *msg)
         DEBUG("syslog_file: rotating\n");
         _rotate(&_desc);
     }
+
 unlock_and_exit:
     mutex_unlock(&_desc.lock);
 }
