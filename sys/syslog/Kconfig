@@ -113,6 +113,12 @@ config SYSLOG_BACKEND_NB_FILES
     help
         Maximum number of log files that are kept
 
+config SYSLOG_BACKEND_FILE_HAS_SUSPEND
+    bool "Enable suspend/resume"
+    default y
+    help
+        Build suspend/resume functions in to temporarly suspend file rotation
+
 endif # KCONFIG_SYSLOG_BACKEND_FILE
 
 endif # KCONFIG_SYSLOG

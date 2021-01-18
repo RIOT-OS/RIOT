@@ -43,6 +43,10 @@
 #define CONFIG_SYSLOG_BACKEND_NB_FILES      (32)
 #endif
 
+#ifndef CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND
+#define CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND  1
+#endif
+
 #define PATH_STRING(str) (sizeof(str) == 2 && str[0] == '/' ? "" : str)
 
 typedef struct {
@@ -56,6 +60,10 @@ typedef struct {
     const syslog_file_params_t *params;
     size_t cur_size;
     unsigned nb_files;
+#if CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND
+    unsigned suspend_rotation;
+#endif
+    mutex_t lock;
 } syslog_file_t;
 
 static const syslog_file_params_t params = {
@@ -69,9 +77,6 @@ static syslog_file_t _desc = {
     .params = &params,
 };
 
-static mutex_t rotation_lock = MUTEX_INIT;
-static unsigned suspend_rotation;
-
 static bool _needs_rotation(syslog_file_t *desc)
 {
     if (desc->cur_size >= desc->params->rotation_size) {
@@ -83,11 +88,13 @@ static bool _needs_rotation(syslog_file_t *desc)
 
 static void _rotate(syslog_file_t *desc)
 {
-    mutex_lock(&rotation_lock);
-    if (suspend_rotation) {
-        mutex_unlock(&rotation_lock);
+    mutex_lock(&desc->lock);
+#if CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND
+    if (desc->suspend_rotation) {
+        mutex_unlock(&desc->lock);
         return;
     }
+#endif
     if (desc->nb_files >= desc->params->max_nb_files) {
         /* remove oldest file */
         char name[VFS_NAME_MAX + 1];
@@ -111,24 +118,25 @@ static void _rotate(syslog_file_t *desc)
     }
     desc->nb_files++;
     desc->cur_size = 0;
-    mutex_unlock(&rotation_lock);
+    mutex_unlock(&desc->lock);
 }
 
 static void _send(struct syslog_msg *msg)
 {
+    mutex_lock(&_desc.lock);
     if (!_desc.nb_files) {
-        return;
+        goto unlock_and_exit;
     }
     char name[VFS_NAME_MAX + 1];
     int ret = snprintf(name, sizeof(name), "%s/%s.0", PATH_STRING(_desc.params->path),
                     _desc.params->prefix);
     if (ret > VFS_NAME_MAX) {
-        return;
+        goto unlock_and_exit;
     }
     int fd = vfs_open(name, O_RDWR | O_CREAT | O_APPEND, 0);
     if (fd < 0) {
         DEBUG("syslog_backend_file: unable to open file %s\n", name);
-        return;
+        goto unlock_and_exit;
     }
 
     syslog_msg_get(msg);
@@ -145,6 +153,8 @@ static void _send(struct syslog_msg *msg)
         DEBUG("syslog_file: rotating\n");
         _rotate(&_desc);
     }
+unlock_and_exit:
+    mutex_unlock(&_desc.lock);
 }
 
 const syslog_backend_t file_be = {
@@ -153,6 +163,8 @@ const syslog_backend_t file_be = {
 
 int syslog_backend_file_start(void)
 {
+    mutex_lock(&_desc.lock);
+
     DEBUG("syslog_backend_file_start: path=%s, prefix=%s\n", _desc.params->path, _desc.params->prefix);
     vfs_DIR dir;
     int ret = vfs_opendir(&dir, _desc.params->path);
@@ -163,7 +175,7 @@ int syslog_backend_file_start(void)
         }
         if (ret) {
             DEBUG("syslog_backend_file_start: unable to open %s\n", _desc.params->path);
-            return ret;
+            goto unlock_and_exit;
         }
     }
 
@@ -200,22 +212,56 @@ int syslog_backend_file_start(void)
         /* if no file exists yet, update nb_files to 1 so logging can start */
         _desc.nb_files++;
     }
+    else {
+        char name[VFS_NAME_MAX + 1];
+        ret = snprintf(name, sizeof(name), "%s/%s.0", PATH_STRING(_desc.params->path),
+                        _desc.params->prefix);
+        if (ret > VFS_NAME_MAX) {
+            ret = -1;
+            goto unlock_and_exit;
+        }
+        int fd = vfs_open(name, O_RDWR | O_CREAT | O_APPEND, 0);
+        if (fd < 0) {
+            DEBUG("syslog_backend_file_start: unable to open file %s\n", name);
+            ret = fd;
+            goto unlock_and_exit;
+        }
+        ret = vfs_lseek(fd, 0, SEEK_END);
+        if (ret > 0) {
+            _desc.cur_size = ret;
+        }
+        ret = vfs_close(fd);
+    }
 
+    DEBUG("syslog_backend_file_start: nb_files=%u, cur_size=%u\n",
+          _desc.nb_files, (unsigned)_desc.cur_size);
+
+unlock_and_exit:
+    mutex_unlock(&_desc.lock);
     return ret;
 }
 
+void syslog_backend_file_stop(void)
+{
+    mutex_lock(&_desc.lock);
+    _desc.nb_files = 0;
+    mutex_unlock(&_desc.lock);
+}
+
+#if CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND
 void syslog_backend_file_suspend_rotation(void)
 {
-    mutex_lock(&rotation_lock);
-    suspend_rotation++;
-    mutex_unlock(&rotation_lock);
+    mutex_lock(&_desc.lock);
+    _desc.suspend_rotation++;
+    mutex_unlock(&_desc.lock);
 }
 
 void syslog_backend_file_resume_rotation(void)
 {
-    assert(suspend_rotation);
+    assert(_desc.suspend_rotation);
 
-    mutex_lock(&rotation_lock);
-    suspend_rotation--;
-    mutex_unlock(&rotation_lock);
+    mutex_lock(&_desc.lock);
+    _desc.suspend_rotation--;
+    mutex_unlock(&_desc.lock);
 }
+#endif /* CONFIG_SYSLOG_BACKEND_FILE_HAS_SUSPEND */
