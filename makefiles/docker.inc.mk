@@ -109,9 +109,9 @@ ETC_LOCALTIME = $(realpath /etc/localtime)
 # $MAKEFLAGS, only that parallelism is requested. So only -j, even if
 # something like -j3 is specified. This can be unexpected and dangerous
 # in older make so don't enable parallelism if $MAKE_VERSION < 4.2
-MAKE_JOBS_NEEDS = 4.1.999
+MAKE_JOBS_NEEDS = 4.2.0
 MAKE_VERSION_OK = $(call memoized,MAKE_VERSION_OK,$(call \
-    version_is_greater,$(MAKE_VERSION),$(MAKE_JOBS_NEEDS)))
+    version_is_greater_or_equal,$(MAKE_VERSION),$(MAKE_JOBS_NEEDS)))
 DOCKER_MAKE_JOBS = $(if $(MAKE_VERSION_OK),$(filter -j%,$(MAKEFLAGS)),)
 DOCKER_MAKE_ARGS += $(DOCKER_MAKE_JOBS)
 
