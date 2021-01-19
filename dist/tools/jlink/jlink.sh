@@ -219,6 +219,7 @@ do_debug() {
     # start the J-Link GDB server
     sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
                            -nogui \
+                           -silent \
                            -device '${JLINK_DEVICE}' \
                            -speed '${JLINK_SPEED}' \
                            -if '${JLINK_IF}' \
