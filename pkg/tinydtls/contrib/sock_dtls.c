@@ -87,6 +87,8 @@ static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
     sock->buffer.session = session;
 #ifdef SOCK_HAS_ASYNC
     if (sock->async_cb != NULL) {
+        /* reset retrievable event session */
+        memset(&sock->async_cb_session, 0, sizeof(sock->async_cb_session));
         sock->async_cb(sock, SOCK_ASYNC_MSG_RECV, sock->async_cb_arg);
     }
 #endif
@@ -138,6 +140,7 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
         switch (code) {
             case DTLS_ALERT_CLOSE_NOTIFY:
                 /* peer closed their session */
+                memcpy(&sock->async_cb_session, session, sizeof(session_t));
                 sock->async_cb(sock, SOCK_ASYNC_CONN_FIN, sock->async_cb_arg);
                 break;
             case DTLS_EVENT_CONNECTED:
@@ -279,6 +282,7 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
 #ifdef SOCK_HAS_ASYNC
     sock->async_cb = NULL;
     sock->buf_ctx = NULL;
+    memset(&sock->async_cb_session, 0, sizeof(sock->async_cb_session));
 #endif /* SOCK_HAS_ASYNC */
     sock->role = role;
     sock->tag = tag;
@@ -516,6 +520,7 @@ static ssize_t _complete_handshake(sock_dtls_t *sock,
                 flags |= SOCK_ASYNC_CONN_RECV;
             }
         }
+        memcpy(&sock->async_cb_session, session, sizeof(session_t));
         sock->async_cb(sock, flags, sock->async_cb_arg);
     }
 #else
@@ -608,6 +613,19 @@ static inline uint32_t _update_timeout(uint32_t start, uint32_t timeout)
 }
 
 #ifdef SOCK_HAS_ASYNC
+bool sock_dtls_get_event_session(sock_dtls_t *sock,
+                                 sock_dtls_session_t *session)
+{
+    assert(sock);
+    assert(session);
+    if (sock->async_cb_session.size > 0) {
+        memcpy(&session->dtls_session, &sock->async_cb_session,
+               sizeof(sock->async_cb_session));
+        return true;
+    }
+    return false;
+}
+
 void _udp_cb(sock_udp_t *udp_sock, sock_async_flags_t flags, void *ctx)
 {
     sock_dtls_t *sock = ctx;
