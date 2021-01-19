@@ -81,3 +81,23 @@ int main(void)
 
     return 0;
 }
+
+#if CONFIG_SYSLOG_BACKEND_EXTRA
+#include "syslog_backend.h"
+#include "stdio_base.h"
+
+static void _send(struct syslog_msg *msg)
+{
+    syslog_msg_get(msg);
+    stdio_write("!! ", 3);
+    stdio_write(msg->msg, msg->len);
+    if (msg->len && msg->msg[msg->len - 1] != '\n') {
+        stdio_write("\n", 1);
+    }
+    syslog_msg_put(msg);
+}
+
+const syslog_backend_t extra_backend = {
+    .send = _send,
+};
+#endif
