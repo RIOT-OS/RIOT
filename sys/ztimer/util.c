@@ -158,7 +158,8 @@ void ztimer_set_wakeup(ztimer_clock_t *clock, ztimer_t *timer, uint32_t offset,
     ztimer_set(clock, timer, offset);
 }
 
-static void timeout_cb(void *arg) {
+static void timeout_cb(void *arg)
+{
     mutex_cancel(arg);
 }
 

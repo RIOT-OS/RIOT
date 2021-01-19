@@ -87,7 +87,8 @@ static inline uint64_t xtimer_now_usec64(void)
     return ztimer_now(ZTIMER_USEC);
 }
 
-static inline void _ztimer_sleep_scale(ztimer_clock_t *clock, uint32_t time, uint32_t scale)
+static inline void _ztimer_sleep_scale(ztimer_clock_t *clock, uint32_t time,
+                                       uint32_t scale)
 {
     const uint32_t max_sleep = UINT32_MAX / scale;
 
@@ -104,7 +105,8 @@ static inline void xtimer_sleep(uint32_t seconds)
     /* TODO: use ZTIMER_SEC */
     if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
         _ztimer_sleep_scale(ZTIMER_MSEC, seconds, 1000);
-    } else {
+    }
+    else {
         _ztimer_sleep_scale(ZTIMER_USEC, seconds, 1000000);
     }
 }
@@ -113,7 +115,8 @@ static inline void xtimer_msleep(uint32_t milliseconds)
 {
     if (IS_ACTIVE(MODULE_ZTIMER_MSEC)) {
         ztimer_sleep(ZTIMER_MSEC, milliseconds);
-    } else {
+    }
+    else {
         _ztimer_sleep_scale(ZTIMER_USEC, milliseconds, 1000);
     }
 }
@@ -204,6 +207,7 @@ static inline void xtimer_spin(xtimer_ticks32_t ticks)
 {
     assert(ticks < US_PER_MS);
     ztimer_now_t start = ztimer_now(ZTIMER_USEC);
+
     while (ztimer_now(ZTIMER_USEC) - start < ticks) {
         /* busy waiting */
     }
