@@ -18,11 +18,11 @@
 #include "formatter.h"
 #include "fmt.h"
 
-ssize_t syslog_build_head(const struct syslog_msg *msg, const char *hostname, char *str, size_t len)
+ssize_t syslog_build_head(struct syslog_msg *msg, const char *hostname)
 {
     /* PRI VERSION SP TIMESTAMP SP is 30 char long */
-    assert(len > 30);
-    char *p = str;
+    assert(msg->size > 30);
+    char *p = msg->msg;
     /* <PRIVAL>VERSION */
     p += fmt_char(p, '<');
     p += fmt_s16_dec(p, msg->pri);
@@ -65,17 +65,17 @@ ssize_t syslog_build_head(const struct syslog_msg *msg, const char *hostname, ch
     }
     p += fmt_char(p, ' ');
 
-    size_t used = p - str;
+    size_t used = p - msg->msg;
     /* keeping one spare for null char */
-    if (len > used + fmt_strlen(hostname) + fmt_strlen(msg->app_name) + 3) {
+    if (msg->size > used + fmt_strlen(hostname) + fmt_strlen(msg->app_name) + 3) {
         p += fmt_str(p, hostname);
         p += fmt_char(p, ' ');
         p += fmt_str(p, msg->app_name);
         p += fmt_char(p, ' ');
     }
-    used = p - str;
+    used = p - msg->msg;
     /* keeping one spare for null char */
-    if (len > used + fmt_u16_dec(NULL, msg->proc_id) + 6) {
+    if (msg->size > used + fmt_u16_dec(NULL, msg->proc_id) + 6) {
         p += fmt_u16_dec(p, msg->proc_id);
         p += fmt_char(p, ' ');
         p += fmt_char(p, '-');
@@ -85,5 +85,6 @@ ssize_t syslog_build_head(const struct syslog_msg *msg, const char *hostname, ch
     }
     *p = '\0';
 
-    return p - str;
+    msg->len = p - msg->msg;
+    return msg->len;
 }

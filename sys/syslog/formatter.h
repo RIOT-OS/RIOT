@@ -20,11 +20,18 @@
 #ifndef FORMATTER_H
 #define FORMATTER_H
 
+#include <stdarg.h>
+
 #include "syslog_backend.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+
+#define TIME_FMT        "%d-%02d-%02dT%02d:%02d:%02dZ"
+#define TIME_PARAMS(t)  ((t).tm_year + 1900), ((t).tm_mon + 1), ((t).tm_mday), ((t).tm_hour), \
+                        ((t).tm_min), ((t).tm_sec)
 
 /**
  * @brief   Build syslog string message header
@@ -94,15 +101,47 @@ extern "C" {
  *  - STRUCTURED-DATA is not used (set to NILVALUE)
  *  - Time is assumed UTC
  *
- * @param[in]   msg         syslog message to format
- * @param[in]   hostname    hostname
- * @param[out]  str         output string
- * @param[in]   len         size in bytes of @p str
+ * @param[in,out]   msg         syslog message to format
+ * @param[in]       hostname    hostname
  *
- * @return number of characters written in @p str (excluding null-terminating character) on success
+ * @return number of characters written in @p msg->msg (excluding null-terminating character) on success
  * @return < 0 on error
  */
-ssize_t syslog_build_head(const struct syslog_msg *msg, const char *hostname, char *str, size_t len);
+ssize_t syslog_build_head(struct syslog_msg *msg, const char *hostname);
+
+/**
+ * @brief   Build syslog string message
+ *
+ * @param[in,out]   msg         syslog message to format
+ * @param[in]       fmt         format string (printf-like)
+ * @param[in]       ap          parameter list
+ *
+ * @return number of bytes added to @p msg->msg on success
+ * @return < 0 on error
+ */
+ssize_t syslog_build_msg(struct syslog_msg *msg, const char *fmt, va_list ap);
+
+/**
+ * @brief   Build syslog string message footer
+ *
+ * @param[in,out]   msg         syslog message to format
+ *
+ * @return number of bytes added to @p msg->msg on success
+ * @return < 0 on error
+ */
+ssize_t syslog_build_foot(struct syslog_msg *msg);
+
+#if IS_USED(MODULE_SYSLOG_FORMATTER_DEFAULT) || IS_USED(MODULE_SYSLOG_FORMATTER_FMT) || DOXYGEN
+/**
+ * @brief   Enable usage of default message formatter (vsprintf-based)
+ */
+#define SYSLOG_FORMATTER_NEEDS_DEFAULT_MSG  1
+
+/**
+ * @brief   Enable usage of default footer formatter (empty footer)
+ */
+#define SYSLOG_FORMATTER_NEEDS_DEFAULT_FOOT 1
+#endif
 
 #ifdef __cplusplus
 }

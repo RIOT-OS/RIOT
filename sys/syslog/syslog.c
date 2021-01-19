@@ -106,13 +106,16 @@ static struct syslog_msg *_alloc_msg(void)
     mutex_lock(&lock);
     struct syslog_msg *msg = memarray_alloc(&mem_msgs);
     mutex_unlock(&lock);
-
+    if (msg) {
+        memset(msg, 0, sizeof(*msg));
+        msg->size = sizeof(msg->msg);
+    }
     return msg;
 }
 
 static void _free_msg(struct syslog_msg *msg)
 {
-    if (msg ==  NULL) {
+    if (msg == NULL) {
         return;
     }
     mutex_lock(&lock);
@@ -143,7 +146,11 @@ static void _free_entry(syslog_entry_t *entry)
 #else
 static struct syslog_msg *_alloc_msg(void)
 {
-    return malloc(sizeof(struct syslog_msg));
+    syslog_msg_t *msg = calloc(1, sizeof(struct syslog_msg));
+    if (msg) {
+        msg->size = sizeof(msg->msg);
+    }
+    return msg;
 }
 
 static void _free_msg(struct syslog_msg *msg)
@@ -235,37 +242,51 @@ static int _queue_msg(struct syslog_msg *msg)
 }
 
 #if IS_USED(MODULE_SYSLOG_FORMATTER_DEFAULT)
-#define TIME_FMT        "%d-%02d-%02dT%02d:%02d:%02dZ"
-#define TIME_PARAMS(t)  ((t).tm_year + 1900), ((t).tm_mon + 1), ((t).tm_mday), ((t).tm_hour), \
-                        ((t).tm_min), ((t).tm_sec)
-
-ssize_t syslog_build_head(const struct syslog_msg *msg, const char *hostname, char *str, size_t len)
+ssize_t syslog_build_head(struct syslog_msg *msg, const char *hostname)
 {
     ssize_t ret;
     if (msg->time_set) {
-        ret = snprintf(str, len, "<%d>%d " TIME_FMT " %s %s %" PRIkernel_pid " - - ",
+        ret = snprintf(msg->msg, msg->size, "<%d>%d " TIME_FMT " %s %s %" PRIkernel_pid " - - ",
                        msg->pri, 1, TIME_PARAMS(msg->time), hostname, msg->app_name, msg->proc_id);
     }
     else {
-        ret = snprintf(str, len, "<%d>%d - %s %s %d - - ",
+        ret = snprintf(msg->msg, msg->size, "<%d>%d - %s %s %d - - ",
                        msg->pri, 1, hostname, msg->app_name, msg->proc_id);
     }
-    if (ret > 0 && ret >= (ssize_t)len) {
-        ret = len - 1;
+    if (ret < 0) {
+        return ret;
     }
-
+    if (ret >= (ssize_t)msg->size) {
+        ret = msg->size - 1;
+    }
+    msg->len = ret;
     return ret;
 }
 #endif
 
-static ssize_t _build_msg(char *str, size_t len, const char *fmt, va_list ap)
+#if IS_ACTIVE(SYSLOG_FORMATTER_NEEDS_DEFAULT_MSG)
+ssize_t syslog_build_msg(struct syslog_msg *msg, const char *fmt, va_list ap)
 {
-    ssize_t ret = vsnprintf(str, len, fmt, ap);
-    if (ret > 0 && ret >= (ssize_t)len) {
-        ret = len - 1;
+    size_t rem = msg->size - msg->len;
+    ssize_t ret = vsnprintf(msg->msg + msg->len, rem, fmt, ap);
+    if (ret < 0) {
+        return ret;
     }
+    if ((size_t)ret >= rem) {
+        ret = rem - 1;
+    }
+    msg->len += ret;
     return ret;
 }
+#endif
+
+#if IS_ACTIVE(SYSLOG_FORMATTER_NEEDS_DEFAULT_FOOT)
+ssize_t syslog_build_foot(struct syslog_msg *msg)
+{
+    (void)msg;
+    return 0;
+}
+#endif
 
 void vsyslog(syslog_entry_t *entry, int priority, const char *format, va_list ap)
 {
@@ -279,7 +300,7 @@ void vsyslog(syslog_entry_t *entry, int priority, const char *format, va_list ap
 
     struct syslog_msg *msg = _alloc_msg();
     if (!msg) {
-        printf("syslog: unable to alloc msg\n");
+        DEBUG("syslog: unable to alloc msg\n");
         return;
     }
 
@@ -291,16 +312,18 @@ void vsyslog(syslog_entry_t *entry, int priority, const char *format, va_list ap
 
     /* Eventually this should be done after the message is queued to avoid overloading
      * the caller with the string formatting */
-    ssize_t len = syslog_build_head(msg, hostname, msg->msg, sizeof(msg->msg));
+    ssize_t len = syslog_build_head(msg, hostname);
     if (len < 0) {
         goto exit_err;
     }
-    msg->len = len;
-    len = _build_msg(msg->msg + len, sizeof(msg->msg) - len, format, ap);
+    len = syslog_build_msg(msg, format, ap);
     if (len < 0) {
         goto exit_err;
     }
-    msg->len += len;
+    len = syslog_build_foot(msg);
+    if (len < 0) {
+        goto exit_err;
+    }
 
     if (_queue_msg(msg) < 0) {
         goto exit_err;

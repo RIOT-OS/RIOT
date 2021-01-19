@@ -60,6 +60,9 @@ typedef struct {
   int tm_year;  /**< Year - 1900     */
 } tm_t;
 
+/**
+ * @brief   A syslog msg
+ */
 typedef struct syslog_msg {
     /* metadata */
     kernel_pid_t proc_id;   /**< Message proc_id (thread PID) */
@@ -69,6 +72,7 @@ typedef struct syslog_msg {
     const char *app_name;   /**< Message application name */
     /* msg */
     char msg[CONFIG_SYSLOG_MAX_STRING_LEN]; /**< Formatted message */
+    size_t size;                            /**< Size of @p msg */
     size_t len;                             /**< Number of characters in @p msg, excluding null-termination */
     /* internal */
     atomic_int cnt;         /**< Internal reference counter */
