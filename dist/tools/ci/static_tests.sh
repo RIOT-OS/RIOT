@@ -69,7 +69,11 @@ function run {
         fi
     done
 
-    echo -n "Running \"$*\" "
+    if [ -n "${GITHUB_RUN_ID}" ]; then
+        echo -n "::group::$1 "
+    else
+        echo -n "Running \"$*\" "
+    fi
     OUT=$("$@" 2>&1)
     NEW_RESULT=$?
 
@@ -84,7 +88,10 @@ function run {
         (printf "%s\n" "$OUT" | while IFS= read -r line; do printf "\t%s\n" "$line"; done)
         echo ""
     fi
-    github_annotate_report_last_run
+    if [ -n "${GITHUB_RUN_ID}" ]; then
+        github_annotate_report_last_run
+        echo "::endgroup::"
+    fi
 }
 
 RESULT=0
