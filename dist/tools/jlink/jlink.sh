@@ -156,21 +156,23 @@ test_term() {
 }
 
 test_version() {
-    JLINK_MINIMUM_VERSION="6.74"
-    # Adding '-nogui 1' will simply return 'Unknown command line option -nogui'
-    # on older versions, JLINK_VERSION will still be parsed correctly.
-    JLINK_VERSION=$(echo q | "${JLINK}" "${JLINK_SERIAL}" -nogui 1 2> /dev/null | grep "^DLL version*" | grep -oE "[0-9]+\.[0-9]+")
+    if [ -z "${JLINK_SKIP_VERSION}" ]; then
+        JLINK_MINIMUM_VERSION="6.74"
+        # Adding '-nogui 1' will simply return 'Unknown command line option -nogui'
+        # on older versions, JLINK_VERSION will still be parsed correctly.
+        JLINK_VERSION=$(echo q | "${JLINK}" "${JLINK_SERIAL}" -nogui 1 2> /dev/null | grep "^DLL version*" | grep -oE "[0-9]+\.[0-9]+")
 
-    if [ $? -ne 0 ]; then
-        echo "Error: J-Link appears not to be installed on your PATH"
-        exit 1
-    fi
+        if [ $? -ne 0 ]; then
+            echo "Error: J-Link appears not to be installed on your PATH"
+            exit 1
+        fi
 
-    "$RIOTTOOLS"/has_minimal_version/has_minimal_version.sh "$JLINK_VERSION" "$JLINK_MINIMUM_VERSION" 2> /dev/null
+        "$RIOTTOOLS"/has_minimal_version/has_minimal_version.sh "$JLINK_VERSION" "$JLINK_MINIMUM_VERSION" 2> /dev/null
 
-    if [ $? -ne 0 ]; then
-        echo "Error: J-Link V$JLINK_MINIMUM_VERSION is required, but V${JLINK_VERSION} is installed"
-        exit 1
+        if [ $? -ne 0 ]; then
+            echo "Error: J-Link V$JLINK_MINIMUM_VERSION is required, but V${JLINK_VERSION} is installed"
+            exit 1
+        fi
     fi
 }
 
