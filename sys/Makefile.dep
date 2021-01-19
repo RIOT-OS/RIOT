@@ -916,9 +916,13 @@ endif
 
 ifneq (,$(filter skald,$(USEMODULE)))
   FEATURES_REQUIRED += radio_nrfble
+  FEATURES_OPTIONAL += periph_rtt
   USEMODULE += nrfble
-  USEMODULE += xtimer
   USEMODULE += random
+  USEMODULE += ztimer_msec
+   ifneq (,$(filter periph_rtt,$(USEMODULE)))
+    USEMODULE += ztimer_periph_rtt
+  endif
 endif
 
 ifneq (,$(filter bluetil_addr,$(USEMODULE)))

@@ -46,7 +46,7 @@
 
 #include <stdint.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "net/ble.h"
 #include "net/netdev/ble.h"
 
@@ -62,8 +62,8 @@ extern "C" {
 /**
  * @brief   Advertising interval in microseconds
  */
-#ifndef CONFIG_SKALD_INTERVAL
-#define CONFIG_SKALD_INTERVAL          (1 * US_PER_SEC)
+#ifndef CONFIG_SKALD_INTERVAL_MS
+#define CONFIG_SKALD_INTERVAL_MS        (1000U)
 #endif
 
 /**
@@ -143,8 +143,8 @@ typedef struct {
  */
 typedef struct {
     netdev_ble_pkt_t pkt;   /**< packet holding the advertisement (GAP) data */
-    xtimer_t timer;         /**< timer for scheduling advertising events */
-    uint32_t last;          /**< last timer trigger (for offset compensation) */
+    ztimer_t timer;         /**< timer for scheduling advertising events */
+    ztimer_now_t last;      /**< last timer trigger (for offset compensation) */
     uint8_t cur_chan;       /**< keep track of advertising channels */
 } skald_ctx_t;
 
