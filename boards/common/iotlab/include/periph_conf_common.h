@@ -135,7 +135,7 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 #ifndef RTT_FREQUENCY
-#define RTT_FREQUENCY       (1)             /* in Hz */
+#define RTT_FREQUENCY       (RTT_MAX_FREQUENCY)     /* in Hz */
 #endif
 /** @} */
 
