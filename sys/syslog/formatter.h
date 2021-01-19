@@ -21,6 +21,7 @@
 #define FORMATTER_H
 
 #include <stdarg.h>
+#include <sys/types.h>
 
 #include "syslog_backend.h"
 
@@ -28,8 +29,18 @@
 extern "C" {
 #endif
 
-
+/**
+ * @brief   rfc5424-compatible time string format
+ *
+ * This should be used with @p TIME_PARAMS()
+ */
 #define TIME_FMT        "%d-%02d-%02dT%02d:%02d:%02dZ"
+
+/**
+ * @brief   @p TIME_FMT params
+ *
+ * @param   t   a @p tm_t structure
+ */
 #define TIME_PARAMS(t)  ((t).tm_year + 1900), ((t).tm_mon + 1), ((t).tm_mday), ((t).tm_hour), \
                         ((t).tm_min), ((t).tm_sec)
 
