@@ -29,11 +29,6 @@ extern "C"
 {
 #endif
 
-/**
- * @brief Tell bit.h that we provide CPU specific bit manipulation functions
- */
-#define BITBAND_FUNCTIONS_PROVIDED 1
-
 #define BME_AND_MASK        (1 << 26) /**< AND decoration bitmask */
 #define BME_OR_MASK         (1 << 27) /**< OR decoration bitmask */
 #define BME_XOR_MASK        (3 << 26) /**< XOR decoration bitmask */

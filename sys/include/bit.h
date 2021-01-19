@@ -26,10 +26,6 @@
 extern "C" {
 #endif
 
-/* Define BITBAND_FUNCTIONS_PROVIDED 1 if the CPU provides its own
- * implementations for bit manipulation */
-#if !BITBAND_FUNCTIONS_PROVIDED
-
 #if DOXYGEN
 /** @brief Flag for telling if the CPU has hardware bit band support */
 #define CPU_HAS_BITBAND 1 || 0 (1 if CPU implements bit-banding, 0 if not)
@@ -212,8 +208,6 @@ static inline void bit_clear8(volatile uint8_t *ptr, uint8_t bit)
 }
 
 #endif /* CPU_HAS_BITBAND */
-
-#endif /* !BITBAND_FUNCTIONS_PROVIDED */
 
 #ifdef __cplusplus
 }
