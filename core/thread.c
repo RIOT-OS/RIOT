@@ -102,6 +102,7 @@ void thread_sleep(void)
     }
 
     unsigned state = irq_disable();
+
     sched_set_status(thread_get_active(), STATUS_SLEEPING);
     irq_restore(state);
     thread_yield_higher();
@@ -183,6 +184,7 @@ uintptr_t thread_measure_stack_free(const char *stack)
     }
 
     uintptr_t space_free = (uintptr_t)stackp - (uintptr_t)stack;
+
     return space_free;
 }
 #endif
@@ -199,7 +201,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
     int total_stacksize = stacksize;
 #endif
 #ifndef CONFIG_THREAD_NAMES
-    (void) name;
+    (void)name;
 #endif
 
     /* align the stack on a 16/32bit boundary */
@@ -342,7 +344,7 @@ const char *thread_state_to_string(thread_status_t state)
     const char *name = state_names[state] ? state_names[state] : NULL;
 
     assert(name != NULL); /* if compiling with assertions, this is an error that
-                            indicates that the table above is incomplete */
+                             indicates that the table above is incomplete */
 
     return (name != NULL) ? name : STATE_NAME_UNKNOWN;
 }

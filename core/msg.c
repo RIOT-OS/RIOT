@@ -52,6 +52,7 @@ static int queue_msg(thread_t *target, const msg_t *m)
 
     DEBUG("queue_msg(): queuing message\n");
     msg_t *dest = &target->msg_array[n];
+
     *dest = *m;
 #if MODULE_CORE_THREAD_FLAGS
     target->flags |= THREAD_FLAG_MSG_WAITING;
@@ -242,7 +243,7 @@ int msg_send_bus(msg_t *m, msg_bus_t *bus)
     int count = 0;
 
     m->sender_pid = (in_irq ? KERNEL_PID_ISR : thread_getpid())
-                  | MSB_BUS_PID_FLAG;
+                    | MSB_BUS_PID_FLAG;
 
     unsigned state = irq_disable();
 
@@ -272,6 +273,7 @@ int msg_send_receive(msg_t *m, msg_t *reply, kernel_pid_t target_pid)
     assert(thread_getpid() != target_pid);
     unsigned state = irq_disable();
     thread_t *me = thread_get_active();
+
     sched_set_status(me, STATUS_REPLY_BLOCKED);
     me->wait_data = reply;
 
@@ -302,9 +304,11 @@ int msg_reply(msg_t *m, msg_t *reply)
           thread_getpid());
     /* copy msg to target */
     msg_t *target_message = (msg_t *)target->wait_data;
+
     *target_message = *reply;
     sched_set_status(target, STATUS_PENDING);
     uint16_t target_prio = target->priority;
+
     irq_restore(state);
     sched_switch(target_prio);
 
@@ -323,6 +327,7 @@ int msg_reply_int(msg_t *m, msg_t *reply)
     }
 
     msg_t *target_message = (msg_t *)target->wait_data;
+
     *target_message = *reply;
     sched_set_status(target, STATUS_PENDING);
     sched_context_switch_request = 1;
@@ -394,7 +399,7 @@ static int _msg_receive(msg_t *m, int block)
     }
     else {
         DEBUG("_msg_receive: %" PRIkernel_pid ": _msg_receive(): Waking up "
-             "waiting thread.\n", thread_getpid());
+              "waiting thread.\n", thread_getpid());
 
         thread_t *sender =
             container_of((clist_node_t *)next, thread_t, rq_entry);

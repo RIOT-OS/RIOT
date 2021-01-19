@@ -101,7 +101,8 @@ static inline uint16_t msg_bus_get_type(const msg_t *msg)
 {
     if (msg->sender_pid & MSB_BUS_PID_FLAG) {
         return msg->type & 0x1F;
-    } else {
+    }
+    else {
         return msg->type;
     }
 }

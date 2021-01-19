@@ -45,9 +45,11 @@
  * function into both @ref mutex_lock and @ref mutex_lock_cancelable is,
  * therefore, beneficial for the majority of applications.
  */
-static inline __attribute__((always_inline)) void _block(mutex_t *mutex, unsigned irq_state)
+static inline __attribute__((always_inline)) void _block(mutex_t *mutex,
+                                                         unsigned irq_state)
 {
     thread_t *me = thread_get_active();
+
     DEBUG("PID[%" PRIkernel_pid "] mutex_lock() Adding node to mutex queue: "
           "prio: %" PRIu32 "\n", thread_getpid(), (uint32_t)me->priority);
     sched_set_status(me, STATUS_MUTEX_BLOCKED);
@@ -97,6 +99,7 @@ int mutex_lock_cancelable(mutex_cancel_t *mc)
     }
 
     mutex_t *mutex = mc->mutex;
+
     if (mutex->queue.next == NULL) {
         /* mutex is unlocked. */
         mutex->queue.next = MUTEX_LOCKED;
@@ -111,7 +114,7 @@ int mutex_lock_cancelable(mutex_cancel_t *mc)
             DEBUG("PID[%" PRIkernel_pid "] mutex_lock_cancelable() "
                   "cancelled.\n", thread_getpid());
         }
-        return (mc->cancelled) ? -ECANCELED: 0;
+        return (mc->cancelled) ? -ECANCELED : 0;
     }
 }
 
@@ -148,6 +151,7 @@ void mutex_unlock(mutex_t *mutex)
     }
 
     uint16_t process_priority = process->priority;
+
     irq_restore(irqstate);
     sched_switch(process_priority);
 }
@@ -185,10 +189,12 @@ void mutex_unlock_and_sleep(mutex_t *mutex)
 void mutex_cancel(mutex_cancel_t *mc)
 {
     unsigned irq_state = irq_disable();
+
     mc->cancelled = 1;
 
     mutex_t *mutex = mc->mutex;
     thread_t *thread = mc->thread;
+
     if (thread_is_active(thread)) {
         /* thread is still running or about to run, so it will check
          * `mc-cancelled` in time */
@@ -197,8 +203,8 @@ void mutex_cancel(mutex_cancel_t *mc)
     }
 
     if ((mutex->queue.next != MUTEX_LOCKED)
-            && (mutex->queue.next != NULL)
-            && list_remove(&mutex->queue, (list_node_t *)&thread->rq_entry)) {
+        && (mutex->queue.next != NULL)
+        && list_remove(&mutex->queue, (list_node_t *)&thread->rq_entry)) {
         /* Thread was queued and removed from list, wake it up */
         if (mutex->queue.next == NULL) {
             mutex->queue.next = MUTEX_LOCKED;
