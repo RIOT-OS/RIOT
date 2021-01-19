@@ -12,10 +12,7 @@ from testrunner import run
 
 def testfunc(child):
     child.expect_exact('Testing Si1133 in blocking mode:')
-    i = child.expect([r'.*Result: OK\s', r'.*Result: FAILED (\d+)\s'])
-    if i == 1:
-        print('FAILED')
-        return
+    child.expect_exact('Result: OK')
     print('SUCCESS')
 
 
