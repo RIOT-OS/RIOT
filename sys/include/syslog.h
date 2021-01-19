@@ -187,7 +187,7 @@ void syslog_init(void);
 /**
  * @brief   Set syslog hostname
  *
- * @paran[in]   name    hostname to use, the buffer needs to remain allocated
+ * @param[in]   name    hostname to use, the buffer needs to remain allocated
  */
 void syslog_set_hostname(const char *name);
 
