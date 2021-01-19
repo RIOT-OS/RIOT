@@ -159,7 +159,7 @@ test_version() {
     JLINK_MINIMUM_VERSION="6.74"
     # Adding '-nogui 1' will simply return 'Unknown command line option -nogui'
     # on older versions, JLINK_VERSION will still be parsed correctly.
-    JLINK_VERSION=$(echo q | "${JLINK}" -nogui 1 2> /dev/null | grep "^DLL version*" | grep -oE "[0-9]+\.[0-9]+")
+    JLINK_VERSION=$(echo q | "${JLINK}" "${JLINK_SERIAL}" -nogui 1 2> /dev/null | grep "^DLL version*" | grep -oE "[0-9]+\.[0-9]+")
 
     if [ $? -ne 0 ]; then
         echo "Error: J-Link appears not to be installed on your PATH"
@@ -180,8 +180,8 @@ test_version() {
 do_flash() {
     BINFILE=$1
     test_config
-    test_version
     test_serial
+    test_version
     test_binfile
     # clear any existing contents in burn file
     /bin/echo -n "" > ${BINDIR}/burn.seg
@@ -210,8 +210,8 @@ do_flash() {
 do_debug() {
     ELFFILE=$1
     test_config
-    test_version
     test_serial
+    test_version
     test_elffile
     test_ports
     test_tui
@@ -234,9 +234,9 @@ do_debug() {
 
 do_debugserver() {
     test_config
+    test_serial
     test_version
     test_ports
-    test_serial
     # start the J-Link GDB server
     sh -c "${JLINK_SERVER} ${JLINK_SERIAL_SERVER} \
                            -nogui \
@@ -249,8 +249,8 @@ do_debugserver() {
 
 do_reset() {
     test_config
-    test_version
     test_serial
+    test_version
     # reset the board
     sh -c "${JLINK} ${JLINK_SERIAL} \
                     -nogui 1 \
@@ -264,8 +264,8 @@ do_reset() {
 
 do_term() {
     test_config
-    test_version
     test_serial
+    test_version
     test_term
 
     # temporary file that save the J-Link Commander pid
