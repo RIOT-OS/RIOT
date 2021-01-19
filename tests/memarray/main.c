@@ -32,11 +32,11 @@
 #endif
 
 #ifndef NUMBER_OF_TESTS
-#define NUMBER_OF_TESTS      (12)
+#define NUMBER_OF_TESTS      (1)
 #endif
 
 #ifndef NUMBER_OF_LOOPS
-#define NUMBER_OF_LOOPS      (2)
+#define NUMBER_OF_LOOPS      (1)
 #endif
 
 
@@ -50,6 +50,7 @@ struct block_t {
 };
 
 struct block_t block_storage_data[MAX_NUMBER_BLOCKS];
+struct block_t block_storage_data_extend[MAX_NUMBER_BLOCKS];
 memarray_t block_storage;
 
 int total = 0;
@@ -140,6 +141,48 @@ int main(void)
 
         count++;
     }
+
+    puts("Extend and reduce tests");
+
+    printf("Memarray available: %u\n",
+           (unsigned)memarray_available(&block_storage));
+
+    /* Extend with second block */
+    memarray_extend(&block_storage, block_storage_data_extend,
+                    MAX_NUMBER_BLOCKS);
+    printf("Memarray available: %u\n",
+           (unsigned)memarray_available(&block_storage));
+
+    /* remove the original block */
+    int res = memarray_reduce(&block_storage, block_storage_data,
+                              MAX_NUMBER_BLOCKS);
+    printf("Memarray reduction: %d available: %u\n",
+           res, (unsigned)memarray_available(&block_storage));
+
+    /* try to remove original block a second time */
+    res = memarray_reduce(&block_storage, block_storage_data,
+                          MAX_NUMBER_BLOCKS);
+    printf("Memarray reduction: %d available: %u\n",
+           res, (unsigned)memarray_available(&block_storage));
+
+    /* remove the extension block */
+    res = memarray_reduce(&block_storage, block_storage_data_extend,
+                          MAX_NUMBER_BLOCKS);
+    printf("Memarray reduction: %d available: %u\n",
+           res, (unsigned)memarray_available(&block_storage));
+
+    /* extend again with the original block */
+    memarray_extend(&block_storage, block_storage_data, MAX_NUMBER_BLOCKS);
+
+    /* remove one element */
+    memarray_alloc(&block_storage);
+    printf("Memarray available: %u\n",
+           (unsigned)memarray_available(&block_storage));
+
+    /* try to reduce with a missing element */
+    res = memarray_reduce(&block_storage, block_storage_data, MAX_NUMBER_BLOCKS);
+    printf("Memarray reduction: %d available: %u\n",
+           res, (unsigned)memarray_available(&block_storage));
 
     printf("Finishing\n");
     _ps_handler(0, NULL);
