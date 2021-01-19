@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
 DISABLE_MODULE += auto_init_at86rf2xx
+BOARD_BLACKLIST := native
 
 # define the driver to be used for selected boards
 ifneq (,$(filter samr21-xpro,$(BOARD)))
