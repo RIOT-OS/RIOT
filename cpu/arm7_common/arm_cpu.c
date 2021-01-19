@@ -36,16 +36,6 @@ __attribute__((used, section(".svc_stack"), aligned(4))) uint8_t svc_stack[ISR_S
 #error "ISR_STACKSIZE must be a multiple of 4"
 #endif
 
-void thread_yield_higher(void)
-{
-    if (irq_is_in()) {
-        sched_context_switch_request = 1;
-    }
-    else {
-        __asm__("svc 0\n");
-    }
-}
-
 /*----------------------------------------------------------------------------
  * Processor specific routine - here for ARM7
  * sizeof(void*) = sizeof(int)
