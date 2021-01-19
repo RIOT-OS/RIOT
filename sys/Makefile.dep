@@ -1063,7 +1063,11 @@ ifneq (,$(filter ztimer% %ztimer,$(USEMODULE)))
 endif
 
 ifneq (,$(filter evtimer,$(USEMODULE)))
-  USEMODULE += xtimer
+  ifneq (,$(filter evtimer_on_ztimer,$(USEMODULE)))
+    USEMODULE += ztimer_msec
+  else
+    USEMODULE += xtimer
+  endif
 endif
 
 # handle xtimer's deps. Needs to be done *after* ztimer
