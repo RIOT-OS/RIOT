@@ -79,7 +79,6 @@ int main() {
     thread t1(waits);
     thread t2(waits);
     thread t3(waits);
-    thread t4(waits);
     thread([&m, &cv] {
              unique_lock<mutex> lk(m);
              cv.notify_all();
@@ -87,7 +86,6 @@ int main() {
     t1.join();
     t2.join();
     t3.join();
-    t4.join();
   }
   puts("Done\n");
 
