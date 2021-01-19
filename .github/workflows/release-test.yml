@@ -100,6 +100,7 @@ jobs:
         fi
         docker pull riot/riotbuild:$DOCKER_VERSION
     - name: Create TAP interfaces
+      if: ${{ matrix.pytest_mark == 'not iotlab_creds' }}
       run: |
         sudo RIOT/dist/tools/tapsetup/tapsetup -c 11
     - name: Run release tests
