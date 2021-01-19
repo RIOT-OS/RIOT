@@ -11,11 +11,7 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect('Initialize BME680 sensor 0 ... ')
-    i = child.expect(['[OK]', '[failed]'])
-    if i == 1:
-        print('FAILED')
-        return
+    child.expect_exact('Initialize BME680 sensor 0 ... OK')
     child.expect(r'\[bme680\]: dev=0, '
                  r'T = \d+.\d+ degC, '
                  r'P = \d+ Pa, '
