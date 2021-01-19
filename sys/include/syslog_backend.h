@@ -17,8 +17,8 @@
  * @author      Vincent Dupont <vincent.dupont@continental-its.com>
  */
 
-#ifndef BACKEND_H
-#define BACKEND_H
+#ifndef SYSLOG_BACKEND_H
+#define SYSLOG_BACKEND_H
 
 #include <stdint.h>
 #include <stdatomic.h>
@@ -28,6 +28,17 @@
 
 #ifdef __cplusplus
 extern "C" {
+#endif
+
+#ifndef CONFIG_SYSLOG_BACKEND_EXTRA
+/**
+ * @brief   Config flag to use user-provided extra backend(s)
+ *
+ * If @p CONFIG_SYSLOG_BACKEND_EXTRA is used, one must provide @p syslog_backend_extra.h
+ * and @p SYSLOG_BACKEND_EXTRA, which is a list of @p syslog_backend_t that will be
+ * added to @p syslog_backends[]
+ */
+#define CONFIG_SYSLOG_BACKEND_EXTRA     0
 #endif
 
 #ifndef CONFIG_SYSLOG_MAX_STRING_LEN
@@ -140,4 +151,4 @@ static inline uint8_t syslog_get_facility(uint8_t prival)
 }
 #endif
 /** @} */
-#endif /* BACKEND_H */
+#endif /* SYSLOG_BACKEND_H */

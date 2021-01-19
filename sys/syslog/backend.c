@@ -18,12 +18,24 @@
 #include <string.h>
 
 #include "syslog.h"
-#include "backend.h"
+#include "syslog_backend.h"
 #include "stdio_base.h"
 #include "fmt.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+#if CONFIG_SYSLOG_BACKEND_EXTRA
+#include "syslog_backend_extra.h"
+#else
+/**
+ * @brief   External user-defined backend(s) driver(s)
+ *
+ * This must be defined in @p syslog_backend_extra.h if @p CONFIG_SYSLOG_BACKEND_EXTRA
+ * is set.
+ */
+#define SYSLOG_BACKEND_EXTRA
+#endif
 
 #ifdef MODULE_SYSLOG_BACKEND_STDIO
 static bool _print = true;
@@ -62,5 +74,6 @@ const syslog_backend_t *syslog_backends[] = {
 #ifdef MODULE_SYSLOG_BACKEND_FILE
     &file_be,
 #endif
+    SYSLOG_BACKEND_EXTRA
 };
 const size_t syslog_backends_numof = ARRAY_SIZE(syslog_backends);

@@ -20,7 +20,7 @@
 #ifndef FORMATTER_H
 #define FORMATTER_H
 
-#include "backend.h"
+#include "syslog_backend.h"
 
 #ifdef __cplusplus
 extern "C" {

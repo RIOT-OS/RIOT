@@ -20,7 +20,7 @@
 #include <string.h>
 
 #include "syslog.h"
-#include "backend.h"
+#include "syslog_backend.h"
 #include "vfs.h"
 #include "mutex.h"
 

@@ -74,6 +74,14 @@ config SYSLOG_HAS_OPEN
     help
         Implements openlog and closelog. If disabled, all logs will use the same entry.
 
+config SYSLOG_BACKEND_EXTRA
+    bool "Use external user-provided backend(s)"
+    default n
+    help
+        User-defined external backend(s) are provided. syslog_backend_extra.h must be provided
+        by the user and SYSLOG_BACKEND_EXTRA must be defined and contains the syslog_backend_t
+        driver(s) name that will be included to the backend array.
+
 config MODULE_SYSLOG_BACKEND_STDIO
     bool "STDIO backend"
     default y

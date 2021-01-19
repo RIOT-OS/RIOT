@@ -18,7 +18,7 @@
 #include <assert.h>
 
 #include "syslog.h"
-#include "backend.h"
+#include "syslog_backend.h"
 #include "formatter.h"
 #include "memarray.h"
 #include "mutex.h"
