@@ -31,9 +31,9 @@ _annotate_diff() {
     if [ -n "$1" -a -n "$2" -a -n "$3" ]; then
         MSG="Coccinelle proposes the following patch:\n\n$3"
         if [ $COCCINELLE_WARNONLY -eq 0 ]; then
-            github_annotate_error "$1" "$2" "${MSG}"
+            IFS="${OLD_IFS}" github_annotate_error "$1" "$2" "${MSG}"
         else
-            github_annotate_warning "$1" "$2" "${MSG}"
+            IFS="${OLD_IFS}" github_annotate_warning "$1" "$2" "${MSG}"
         fi
     fi
 }
@@ -59,7 +59,9 @@ coccinelle_checkone() {
                 echo "$OUT" | {
                     # see https://stackoverflow.com/a/30064493/11921757 for why we
                     # use a sub shell here
-                    while read line; do
+                    OLD_IFS="${IFS}"    # store old separator to later restore it
+                    IFS=''  # keep leading and trailing spaces
+                    while read -r line; do
                         # parse beginning of new diff
                         if echo "$line" | grep -q '^--- .\+$'; then
                             _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
@@ -84,7 +86,7 @@ coccinelle_checkone() {
                                fi
                                DIFFLINE="$(echo "$line" | sed 's/@@ -\([0-9]\+\).*$/\1/')"
                             fi
-                            DIFF="$DIFF\n$line"
+                            DIFF="$DIFF\n${line//\\/\\\\}"
                         fi
                     done
                     _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
