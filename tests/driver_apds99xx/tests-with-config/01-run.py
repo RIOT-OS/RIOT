@@ -11,11 +11,9 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect('Initializing APDS99XX sensor')
-    i = child.expect(['[OK]', '[Failed]'])
-    if i == 1:
-        print('FAILED')
-        return
+    child.expect_exact('Initializing APDS99XX sensor')
+    child.expect_exact('[OK]')
+    child.expect(r'proximity = \d+ \[cnts\]')
     child.expect(r'ambient = \d+ \[cnts\]')
     child.expect([r'red = \d+ \[cnts\], green = \d+ \[cnts\], blue = \d+ \[cnts\]',
                   r'illuminance = %d [lux]'])
