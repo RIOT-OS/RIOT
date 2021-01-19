@@ -33,3 +33,16 @@ _is_greater = $(if $(filter $1,$(firstword $(sort $1 $2))),,1)
 #   Return 1 if $1 is greater than $2, nothing otherwise
 version_is_greater = $(call _is_greater,$(call _padded_version,$1),\
                         $(call _padded_version,$2))
+
+# Checks if version $1 is equal to version $2
+#   $1,$2: version to check, '.' separated version 'major.minor.patch'
+#   Return 1 if $1 equal to $2, nothing otherwise
+_is_equal = $(if $(and $(findstring $(1),$(2)),$(findstring $(2),$(1))),1,)
+
+# Checks if version $1 is greater or equal than version $2
+#   $1: version to check, '.' separated version 'major.minor.patch'
+#   $2: minimum version, '.' separated version 'major.minor.patch'
+#   Return 1 if $1 is greater or equal than $2, nothing otherwise
+version_is_greater_or_equal = $(or \
+    $(call _is_greater,$(call _padded_version,$1),$(call _padded_version,$2)),\
+    $(call _is_equal,$(call _padded_version,$1),$(call _padded_version,$2)))
