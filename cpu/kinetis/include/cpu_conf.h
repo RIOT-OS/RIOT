@@ -49,7 +49,9 @@ extern "C"
  * @{
  */
 #ifdef BITBAND_REG32
-#define CPU_HAS_BITBAND 1
+#define CPU_HAS_BITBAND         1
+/* SRAM_L is mapped before the bit-banding region, only SRAM_U can be used for bit-banding */
+#define CPU_HAS_SRAM_BITBAND    0
 #endif
 /** @} */
 
