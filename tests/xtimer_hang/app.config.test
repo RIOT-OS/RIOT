@@ -2,5 +2,3 @@
 # application configuration. This is only needed during migration.
 CONFIG_MODULE_XTIMER=y
 CONFIG_MODULE_CORE_MSG=n
-
-CONFIG_MODULE_TEST_UTILS_INTERACTIVE_SYNC=y

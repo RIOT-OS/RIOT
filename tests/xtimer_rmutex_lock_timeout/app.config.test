@@ -2,5 +2,3 @@
 # application configuration. This is only needed during migration.
 CONFIG_MODULE_XTIMER=y
 CONFIG_MODULE_SHELL=y
-
-CONFIG_MODULE_TEST_UTILS_INTERACTIVE_SYNC=y

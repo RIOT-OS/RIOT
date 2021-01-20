@@ -1,4 +1,3 @@
 # this file enables modules defined in Kconfig. Do not use this file for
 # application configuration. This is only needed during migration.
 CONFIG_MODULE_HD44780=y
-CONFIG_MODULE_TEST_UTILS_INTERACTIVE_SYNC=y
