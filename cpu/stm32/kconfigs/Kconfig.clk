@@ -11,7 +11,7 @@ config CLOCK_HAS_NO_MCO_PRE
         Indicates that the CPU has no MCO prescaler
 
 menu "STM32 clock configuration"
-    depends on !CPU_FAM_F2 && !CPU_FAM_F4 && !CPU_FAM_F7
+    depends on CPU_STM32
 
 choice
 bool "Clock source selection"
@@ -56,9 +56,10 @@ config CUSTOM_PLL_PARAMS
     bool "Configure PLL parameters"
     depends on USE_CLOCK_PLL
 
-if CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
+if CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7 || CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
 config CLOCK_PLL_M
     int "M: PLLIN division factor" if CUSTOM_PLL_PARAMS
+    default 4 if CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7
     default 1 if CPU_FAM_G0
     default 6 if CPU_FAM_G4 && BOARD_HAS_HSE
     default 4 if CPU_FAM_G4
@@ -70,14 +71,67 @@ config CLOCK_PLL_M
 
 config CLOCK_PLL_N
     int "N: PLLIN multiply factor" if CUSTOM_PLL_PARAMS
+    default 120 if BOARD_HAS_HSE && CPU_FAM_F2
+    default 60 if CPU_FAM_F2
+    default 168 if CPU_FAM_F4 && CLOCK_MAX_84MHZ && BOARD_HAS_HSE
+    default 84 if CPU_FAM_F4 && CLOCK_MAX_84MHZ
+    default 96 if CPU_FAM_F4 && CLOCK_MAX_100MHZ && BOARD_HAS_HSE && (MODULE_PERIPH_USBDEV || USEMODULE_PERIPH_USBDEV)
+    default 48 if CPU_FAM_F4 && CLOCK_MAX_100MHZ && (MODULE_PERIPH_USBDEV || USEMODULE_PERIPH_USBDEV)
+    default 100 if CPU_FAM_F4 && CLOCK_MAX_100MHZ && BOARD_HAS_HSE
+    default 50 if CPU_FAM_F4 && CLOCK_MAX_100MHZ
+    default 168 if CPU_FAM_F4 && CLOCK_MAX_180MHZ && BOARD_HAS_HSE && (MODULE_PERIPH_USBDEV || USEMODULE_PERIPH_USBDEV)
+    default 84 if CPU_FAM_F4 && CLOCK_MAX_180MHZ && (MODULE_PERIPH_USBDEV || USEMODULE_PERIPH_USBDEV)
+    default 180 if CPU_FAM_F4 && CLOCK_MAX_180MHZ && BOARD_HAS_HSE
+    default 90 if CPU_FAM_F4 && CLOCK_MAX_180MHZ
+    default 216 if CPU_FAM_F7 && BOARD_HAS_HSE
+    default 108 if CPU_FAM_F7
     default 16 if CPU_FAM_WB
     default 30 if CPU_LINE_STM32L4A6XX || CPU_LINE_STM32L4P5XX || CPU_LINE_STM32L4Q5XX || CPU_LINE_STM32L4R5XX || CPU_LINE_STM32L4R7XX || CPU_LINE_STM32L4R9XX || CPU_LINE_STM32L4S5XX || CPU_LINE_STM32L4S7XX || CPU_LINE_STM32L4S9XX
     default 27 if CPU_FAM_L5
     default 20 if CPU_FAM_G0 || CPU_FAM_L4
     default 85 if CPU_FAM_G4
     range 8 86 if CPU_FAM_G0 || CPU_FAM_L4 || CPU_FAM_L5
+    range 50 432 if CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7
     range 8 127 if CPU_FAM_G4
     range 6 127 if CPU_FAM_WB
+
+if CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7
+choice
+bool "Main PLL division factor (PLLP) for main system clock" if CUSTOM_PLL_PARAMS
+default PLL_P_DIV_4 if CPU_FAM_F4 && CLOCK_MAX_84MHZ
+default PLL_P_DIV_2
+
+config PLL_P_DIV_2
+    bool "Divide by 2"
+
+config PLL_P_DIV_4
+    bool "Divide by 4"
+
+config PLL_P_DIV_6
+    bool "Divide by 6"
+
+config PLL_P_DIV_8
+    bool "Divide by 8"
+
+endchoice
+
+config CLOCK_PLL_P
+    int
+    default 2 if PLL_P_DIV_2
+    default 4 if PLL_P_DIV_4
+    default 6 if PLL_P_DIV_6
+    default 8 if PLL_P_DIV_8
+
+config CLOCK_PLL_Q
+    int "Main PLL division factor (PLLQ) for USB OTG FS, and SDIO clocks" if CUSTOM_PLL_PARAMS
+    default 5 if CPU_FAM_F2
+    default 7 if CPU_FAM_F4 && CLOCK_MAX_84MHZ
+    default 4 if CPU_FAM_F4 && CLOCK_MAX_100MHZ
+    default 7 if CPU_FAM_F4 && CLOCK_MAX_180MHZ && (MODULE_PERIPH_USBDEV || USEMODULE_PERIPH_USBDEV)
+    default 9 if CPU_FAM_F7
+    default 8
+    range 2 15
+endif  # CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7
 
 if CPU_FAM_G0 || CPU_FAM_WB
 config CLOCK_PLL_R
@@ -115,7 +169,7 @@ config CLOCK_PLL_R
     default 8 if PLL_R_DIV_8
 endif  # CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5
 
-endif  # CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
+endif  # CPU_FAM_F2 || CPU_FAM_F4 || CPU_FAM_F7 || CPU_FAM_G0 || CPU_FAM_G4 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
 
 if CPU_FAM_F0 || CPU_FAM_F1 || CPU_FAM_F3
 config CLOCK_PLL_PREDIV
@@ -313,8 +367,8 @@ endif  # CPU_FAM_L0 || CPU_FAM_L1 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
 
 choice
 bool "APB1 prescaler (division factor of HCLK to produce PCLK1)"
-default CLOCK_APB1_DIV_4 if CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
-default CLOCK_APB1_DIV_2 if CPU_FAM_F1 || CPU_FAM_F3
+default CLOCK_APB1_DIV_4 if CPU_FAM_F2 || (CPU_FAM_F4 && CLOCK_MAX_180MHZ) || CPU_FAM_F7 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
+default CLOCK_APB1_DIV_2 if CPU_FAM_F1 || CPU_FAM_F3 || CPU_FAM_F4
 default CLOCK_APB1_DIV_1
 
 config CLOCK_APB1_DIV_1
@@ -345,7 +399,7 @@ config CLOCK_APB1_DIV
 choice
 bool "APB2 prescaler (division factor of HCLK to produce PCLK2)"
 depends on !CPU_FAM_G0 && !CPU_FAM_F0
-default CLOCK_APB2_DIV_2 if CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
+default CLOCK_APB2_DIV_2 if CPU_FAM_F2 || (CPU_FAM_F4 && CLOCK_MAX_180MHZ) || CPU_FAM_F7 || CPU_FAM_L4 || CPU_FAM_L5 || CPU_FAM_WB
 default CLOCK_APB2_DIV_1
 
 config CLOCK_APB2_DIV_1

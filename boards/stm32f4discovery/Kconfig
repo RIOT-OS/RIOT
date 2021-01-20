@@ -28,6 +28,11 @@ config BOARD_STM32F4DISCOVERY
     # Various other features (if any)
     select HAS_ARDUINO
 
+    # Clock configuration
+    select BOARD_HAS_HSE
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"
+
 config ERROR_MODULES_CONFLICT
     default "On stm32f4discovery boards there are the same pins for the DAC and/or SPI_0." if MODULE_PERIPH_SPI && MODULE_PERIPH_DAC
     depends on BOARD_STM32F4DISCOVERY

@@ -25,4 +25,8 @@ config BOARD_NUCLEO_F446ZE
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
 
+    # Clock configuration
+    select BOARD_HAS_HSE
+    select BOARD_HAS_LSE
+
 source "$(RIOTBOARD)/common/nucleo144/Kconfig"

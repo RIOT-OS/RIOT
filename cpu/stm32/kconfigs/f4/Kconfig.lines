@@ -13,99 +13,122 @@
 config CPU_LINE_STM32F401XC
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_84MHZ
 
 config CPU_LINE_STM32F401XE
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_84MHZ
 
 config CPU_LINE_STM32F405XX
     bool
     select CPU_FAM_F4
     select HAS_PERIPH_HWRNG
+    select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F407XX
     bool
     select CPU_FAM_F4
     select HAS_PERIPH_HWRNG
+    select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F410CX
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_100MHZ
 
 config CPU_LINE_STM32F410RX
     bool
     select CPU_FAM_F4
     select HAS_PERIPH_HWRNG
+    select CLOCK_MAX_100MHZ
 
 config CPU_LINE_STM32F410TX
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_100MHZ
 
 config CPU_LINE_STM32F411XE
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_100MHZ
 
 config CPU_LINE_STM32F412CX
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_100MHZ
 
 config CPU_LINE_STM32F412RX
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_100MHZ
 
 config CPU_LINE_STM32F412VX
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_100MHZ
 
 config CPU_LINE_STM32F412ZX
     bool
     select CPU_FAM_F4
     select HAS_PERIPH_HWRNG
+    select CLOCK_MAX_100MHZ
 
 config CPU_LINE_STM32F413XX
     bool
     select CPU_FAM_F4
     select HAS_PERIPH_HWRNG
+    select CLOCK_MAX_100MHZ
 
 config CPU_LINE_STM32F415XX
     bool
     select CPU_FAM_F4
     select HAS_PERIPH_HWRNG
+    select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F417XX
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F423XX
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F427XX
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F429XX
     bool
     select CPU_FAM_F4
     select HAS_PERIPH_HWRNG
+    select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F437XX
     bool
     select CPU_FAM_F4
     select HAS_PERIPH_HWRNG
+    select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F439XX
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F446XX
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F469XX
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_180MHZ
 
 config CPU_LINE_STM32F479XX
     bool
     select CPU_FAM_F4
+    select CLOCK_MAX_180MHZ
