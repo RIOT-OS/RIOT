@@ -33,7 +33,8 @@
 #include "net/netdev/eth.h"
 #include "periph/gpio.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG            0
+#define ENABLE_DEBUG_VERBOSE    0
 #include "debug.h"
 
 #if IS_USED(MODULE_STM32_ETH_LINK_UP)
@@ -113,7 +114,7 @@ static uint8_t _link_state = LINK_STATE_DOWN;
 
 static void _debug_tx_descriptor_info(unsigned line)
 {
-    if (IS_ACTIVE(ENABLE_DEBUG)) {
+    if (IS_ACTIVE(ENABLE_DEBUG) && IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
         DEBUG("[stm32_eth:%u] TX descriptors:\n", line);
         for (unsigned i = 0; i < ETH_TX_DESCRIPTOR_COUNT; i++) {
             uint32_t status = tx_desc[i].status;
@@ -140,7 +141,7 @@ static inline uint32_t _len_from_rx_desc_status(uint32_t status)
 
 static void _debug_rx_descriptor_info(unsigned line)
 {
-    if (IS_ACTIVE(ENABLE_DEBUG)) {
+    if (IS_ACTIVE(ENABLE_DEBUG) && IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
         DEBUG("[stm32_eth:%u] RX descriptors:\n", line);
         for (unsigned i = 0; i < ETH_RX_DESCRIPTOR_COUNT; i++) {
             uint32_t status = rx_desc[i].status;
@@ -504,9 +505,13 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     /* start TX */
     ETH->DMATPDR = 0;
     /* await completion */
-    DEBUG("[stm32_eth] Started to send %u B via DMA\n", bytes_to_send);
+    if (IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
+        DEBUG("[stm32_eth] Started to send %u B via DMA\n", bytes_to_send);
+    }
     mutex_lock(&stm32_eth_tx_completed);
-    DEBUG("[stm32_eth] TX completed\n");
+    if (IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
+        DEBUG("[stm32_eth] TX completed\n");
+    }
 
     /* Error check */
     _debug_tx_descriptor_info(__LINE__);
