@@ -8,6 +8,7 @@
 : ${TEST_BOARDS_LLVM_COMPILE:=""}
 
 : ${TEST_KCONFIG_samr21_xpro:="examples/hello-world tests/periph_*
+tests/xtimer_* tests/ztimer_*
 tests/driver_ad7746 tests/driver_adcxx1c tests/driver_ads101x tests/driver_adt101x
 tests/driver_adt7310 tests/driver_adxl345 tests/driver_aip31068 tests/driver_apa102
 tests/driver_apds99xx tests/driver_apds99xx_full tests/driver_at tests/driver_at24cxxx
@@ -22,7 +23,8 @@ tests/driver_motor_driver tests/driver_mpl3115a2 tests/driver_mpu9x50
 tests/driver_mq3 tests/driver_my9221 tests/driver_nvram_spi tests/mtd_flashpage
 tests/mtd_mapper tests/driver_o* tests/driver_p* tests/driver_q*
 tests/driver_r*"}
-: ${TEST_KCONFIG_native:="examples/hello-world tests/periph_*"}
+: ${TEST_KCONFIG_native:="examples/hello-world tests/periph_*
+tests/xtimer_* tests/ztimer_*"}
 
 export RIOT_CI_BUILD=1
 export CC_NOCOLOR=1

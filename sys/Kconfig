@@ -16,6 +16,7 @@ rsource "embunit/Kconfig"
 rsource "entropy_source/Kconfig"
 rsource "event/Kconfig"
 rsource "fmt/Kconfig"
+rsource "frac/Kconfig"
 rsource "isrpipe/Kconfig"
 rsource "malloc_thread_safe/Kconfig"
 rsource "net/Kconfig"
@@ -31,6 +32,7 @@ rsource "test_utils/Kconfig"
 rsource "tsrb/Kconfig"
 rsource "usb/Kconfig"
 rsource "xtimer/Kconfig"
+rsource "ztimer/Kconfig"
 
 config MODULE_SYS
     bool
