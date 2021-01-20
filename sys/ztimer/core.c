@@ -58,6 +58,15 @@ static unsigned _is_set(const ztimer_clock_t *clock, const ztimer_t *t)
     }
 }
 
+unsigned ztimer_is_set(const ztimer_clock_t *clock, const ztimer_t *timer)
+{
+    unsigned state = irq_disable();
+    unsigned res = _is_set(clock, timer);
+
+    irq_restore(state);
+    return res;
+}
+
 void ztimer_remove(ztimer_clock_t *clock, ztimer_t *timer)
 {
     unsigned state = irq_disable();
