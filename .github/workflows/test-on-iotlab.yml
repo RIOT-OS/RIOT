@@ -76,10 +76,11 @@ jobs:
       DOCKER_ENVIRONMENT_CMDLINE: -e BUILD_FILES=\$$\(BINFILE\)
       COMPILE_AND_TEST_FOR_BOARD: ./dist/tools/compile_and_test_for_board/compile_and_test_for_board.py
       COMPILE_AND_TEST_ARGS: --with-test-only --jobs=2 --report-xml
-      # Exclude applications that require the riotboot feature and providing a test
-      # because flashing at a specific offset is not (yet) supported on IoT-LAB
-      # so they will always fail because of that limitation
-      APPLICATIONS_EXCLUDE: examples/suit_update tests/riotboot
+      # Exclude applications that cannot run on iotlab
+      # - tests/riotboot requires the riotboot feature and provides a test
+      #   but flashing at a specific offset is not (yet) supported on IoT-LAB
+      #   so it will always fail because of that limitation
+      APPLICATIONS_EXCLUDE: tests/riotboot
     steps:
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
