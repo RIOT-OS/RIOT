@@ -100,6 +100,7 @@ jobs:
         fi
         docker pull riot/riotbuild:$DOCKER_VERSION
     - name: Create TAP interfaces
+      if: ${{ matrix.pytest_mark == 'not iotlab_creds' }}
       run: |
         sudo RIOT/dist/tools/tapsetup/tapsetup -c 11
     - name: Run release tests
@@ -144,11 +145,12 @@ jobs:
         else
           VER=$(git -C $GITHUB_WORKSPACE/RIOT rev-parse --short HEAD)
         fi
+        MARK=$(echo "${{ matrix.pytest_mark }}" | tr '[ _]' '-')
+        REPORT_XML=$GITHUB_WORKSPACE/Release-Specs/test-report.xml
+        REPORT_NAME=test-reports/test-report-$MARK-$VER-$DATE
         mkdir test-reports/
-        junit2html $GITHUB_WORKSPACE/Release-Specs/test-report.xml \
-          test-reports/test-report-native-$VER-$DATE.html
-        cp $GITHUB_WORKSPACE/Release-Specs/test-report.xml \
-          test-reports/test-report-native-$VER-$DATE.xml
+        junit2html ${REPORT_XML} ${REPORT_NAME}.html
+        cp ${REPORT_XML} ${REPORT_NAME}.xml
     - uses: actions/upload-artifact@v2
       if: always()
       with:
