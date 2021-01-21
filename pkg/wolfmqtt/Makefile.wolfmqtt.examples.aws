@@ -1,0 +1,3 @@
+MODULE = wolfmqtt_examples_aws
+
+include $(RIOTBASE)/Makefile.base
