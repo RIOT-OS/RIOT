@@ -350,11 +350,15 @@ void spi_init(spi_t bus)
 void spi_init_pins(spi_t bus)
 {
     /* MISO must always have PD/PU, see #5968. This is a ~65uA difference */
-    gpio_init(spi_config[bus].miso_pin, GPIO_IN_PD);
+    if (gpio_is_valid(spi_config[bus].miso_pin)) {
+        gpio_init(spi_config[bus].miso_pin, GPIO_IN_PD);
+        gpio_init_mux(spi_config[bus].miso_pin, spi_config[bus].miso_mux);
+    }
+
     gpio_init(spi_config[bus].mosi_pin, GPIO_OUT);
-    gpio_init(spi_config[bus].clk_pin, GPIO_OUT);
-    gpio_init_mux(spi_config[bus].miso_pin, spi_config[bus].miso_mux);
     gpio_init_mux(spi_config[bus].mosi_pin, spi_config[bus].mosi_mux);
+
+    gpio_init(spi_config[bus].clk_pin, GPIO_OUT);
     /* clk_pin will be muxed during acquire / release */
 
     mutex_unlock(&locks[bus]);
@@ -364,7 +368,9 @@ void spi_deinit_pins(spi_t bus)
 {
     mutex_lock(&locks[bus]);
 
-    gpio_disable_mux(spi_config[bus].miso_pin);
+    if (gpio_is_valid(spi_config[bus].miso_pin)) {
+        gpio_disable_mux(spi_config[bus].miso_pin);
+    }
     gpio_disable_mux(spi_config[bus].mosi_pin);
 }
 
