@@ -21,6 +21,10 @@ ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))
   FEATURES_REQUIRED += periph_pwm
 endif
 
+ifneq (,$(filter congure_%,$(USEMODULE)))
+  USEMODULE += congure
+endif
+
 ifneq (,$(filter eepreg,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eeprom
 endif
