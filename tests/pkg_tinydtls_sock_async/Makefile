@@ -12,6 +12,7 @@ USEMODULE += gnrc_ipv6_default
 USEMODULE += sock_async_event
 USEMODULE += sock_dtls
 USEMODULE += sock_udp
+USEMODULE += sock_util
 USEMODULE += event_thread_medium
 USEMODULE += event_timeout
 
