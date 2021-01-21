@@ -8,5 +8,7 @@ cpu/riscv_common/include/.*\.h
 cpu/riscv_common/periph/.*\.c
 sys/riotboot/.*\.h
 sys/riotboot/.*\.c
+sys/congure.*\.c
+sys/include/congure.*\.h
 sys/ztimer/.*\.c
 sys/include/ztimer.*\.h
