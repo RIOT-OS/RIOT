@@ -305,7 +305,7 @@ netopt_state_t _get_state(at86rf2xx_t *dev)
 
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
-    at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
+    at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
 
     if (netdev == NULL) {
         return -ENODEV;
@@ -483,13 +483,12 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 {
-    at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
-    uint8_t old_state = at86rf2xx_get_status(dev);
-    int res = -ENOTSUP;
-
+    at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
     if (dev == NULL) {
         return -ENODEV;
     }
+    uint8_t old_state = at86rf2xx_get_status(dev);
+    int res = -ENOTSUP;
 
     /* temporarily wake up if sleeping and opt != NETOPT_STATE.
      * opt != NETOPT_STATE check prevents redundant wake-up.
