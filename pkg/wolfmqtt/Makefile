@@ -14,6 +14,7 @@ all: $(filter \
     wolfmqtt_examples_snclient \
     wolfmqtt_examples_nbclient \
     wolfmqtt_examples_multithread \
+    wolfmqtt_examples_aws \
     ,$(USEMODULE))
 
 wolfmqtt:
@@ -33,3 +34,6 @@ wolfmqtt_examples_nbclient:
 
 wolfmqtt_examples_multithread:
 	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/multithread -f $(CURDIR)/Makefile.$(PKG_NAME).examples.multithread
+
+wolfmqtt_examples_aws:
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/aws -f $(CURDIR)/Makefile.$(PKG_NAME).examples.aws

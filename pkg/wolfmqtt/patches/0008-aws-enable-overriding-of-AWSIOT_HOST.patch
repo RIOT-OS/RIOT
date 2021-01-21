@@ -1,0 +1,27 @@
+From b1daf9955d5c07c2232efb1a657230b2dbeb1133 Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Wed, 3 Mar 2021 21:21:21 +0100
+Subject: [PATCH] aws: enable overriding of AWSIOT_HOST
+
+---
+ wolfmqtt_examples/aws/awsiot.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/wolfmqtt_examples/aws/awsiot.c b/wolfmqtt_examples/aws/awsiot.c
+index 8e2f1bb..b532f27 100644
+--- a/wolfmqtt_examples/aws/awsiot.c
++++ b/wolfmqtt_examples/aws/awsiot.c
+@@ -70,7 +70,9 @@ static int mStopRead = 0;
+ #define APP_FIRMWARE_VERSION LIBWOLFMQTT_VERSION_STRING
+ 
+ #define MAX_BUFFER_SIZE         512    /* Maximum size for network read/write callbacks */
+-#define AWSIOT_HOST             "a2dujmi05ideo2.iot.us-west-2.amazonaws.com"
++#ifndef AWSIOT_HOST
++    #define AWSIOT_HOST             "a2dujmi05ideo2.iot.us-west-2.amazonaws.com"
++#endif
+ #define AWSIOT_DEVICE_ID        "demoDevice"
+ #define AWSIOT_QOS              MQTT_QOS_1
+ #define AWSIOT_KEEP_ALIVE_SEC   DEFAULT_KEEP_ALIVE_SEC
+-- 
+2.25.1
+
