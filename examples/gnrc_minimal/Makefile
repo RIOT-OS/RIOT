@@ -26,12 +26,6 @@ USEMODULE += gnrc_icmpv6_echo
 # Use minimal standard PRNG
 USEMODULE += prng_minstd
 
-# llvm compatibility requires yet to be released picolibc 1.4.7
-ifneq (llvm, $(TOOLCHAIN))
-  # Use picolibc when available
-  FEATURES_OPTIONAL += picolibc
-endif
-
 CFLAGS += -DLOG_LEVEL=LOG_NONE  # disable log output
 CFLAGS += -DCONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF=2 \
           -DGNRC_NETIF_IPV6_GROUPS_NUMOF=2 -DCONFIG_GNRC_IPV6_NIB_NUMOF=1 \
