@@ -6,6 +6,10 @@ ifeq ($(PROGRAMMER),bossa)
   # by default, we use BOSSA to flash this board and take into account the
   # preinstalled Arduino bootloader. ROM_OFFSET skips the space taken by
   # such bootloader.
-  ROM_OFFSET ?= 0x2000
+  ifeq ($(CPU),samd5x)
+    ROM_OFFSET ?= 0x4000
+  else
+    ROM_OFFSET ?= 0x2000
+  endif
   BOSSA_ARDUINO_PREFLASH = yes
 endif
