@@ -94,7 +94,7 @@ config CPU_LINE_STM32F417XX
 config CPU_LINE_STM32F423XX
     bool
     select CPU_FAM_F4
-    select CLOCK_MAX_180MHZ
+    select CLOCK_MAX_100MHZ
 
 config CPU_LINE_STM32F427XX
     bool
