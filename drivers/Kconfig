@@ -18,6 +18,7 @@ rsource "grove_ledbar/Kconfig"
 rsource "motor_driver/Kconfig"
 rsource "my9221/Kconfig"
 rsource "rgbled/Kconfig"
+rsource "ws281x/Kconfig"
 endmenu # Actuator Device Drivers
 
 menu "Display Device Drivers"
@@ -25,6 +26,7 @@ rsource "disp_dev/Kconfig"
 rsource "dsp0401/Kconfig"
 rsource "hd44780/Kconfig"
 rsource "ili9341/Kconfig"
+rsource "touch_dev/Kconfig"
 endmenu # Display Device Drivers
 
 menu "Miscellaneous Device Drivers"
@@ -35,7 +37,9 @@ rsource "ds3231/Kconfig"
 rsource "ds3234/Kconfig"
 rsource "edbg_eui/Kconfig"
 rsource "io1_xplained/Kconfig"
+rsource "tps6274x/Kconfig"
 rsource "uart_half_duplex/Kconfig"
+rsource "usbdev_mock/Kconfig"
 endmenu # Miscellaneous Device Drivers
 
 rsource "Kconfig.net"
@@ -105,6 +109,10 @@ rsource "qmc5883l/Kconfig"
 rsource "sps30/Kconfig"
 rsource "tcs37727/Kconfig"
 rsource "tmp00x/Kconfig"
+rsource "tsl2561/Kconfig"
+rsource "tsl4531x/Kconfig"
+rsource "vcnl40x0/Kconfig"
+rsource "veml6070/Kconfig"
 endmenu # Sensor Device Drivers
 
 menu "Storage Device Drivers"

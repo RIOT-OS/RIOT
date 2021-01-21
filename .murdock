@@ -22,9 +22,9 @@ tests/driver_mag3110 tests/driver_mhz19 tests/driver_mma7660
 tests/driver_motor_driver tests/driver_mpl3115a2 tests/driver_mpu9x50
 tests/driver_mq3 tests/driver_my9221 tests/driver_nvram_spi tests/mtd_flashpage
 tests/mtd_mapper tests/driver_o* tests/driver_p* tests/driver_q*
-tests/driver_r*"}
+tests/driver_r* tests/driver_t* tests/driver_u* tests/driver_v*"}
 : ${TEST_KCONFIG_native:="examples/hello-world tests/periph_*
-tests/xtimer_* tests/ztimer_*"}
+tests/xtimer_* tests/ztimer_* tests/driver_ws281x"}
 
 export RIOT_CI_BUILD=1
 export CC_NOCOLOR=1
