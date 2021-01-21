@@ -1,9 +1,18 @@
 # Copyright (c) 2020 Freie Universitaet Berlin
+#               2021 HAW Hamburg
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
+menuconfig MODULE_SLIPDEV
+    bool "SLIP over UART network device"
+    depends on HAS_PERIPH_UART
+    depends on TEST_KCONFIG
+    select MODULE_TSRB
+    select MODULE_PERIPH_UART
+
 menuconfig KCONFIG_USEMODULE_SLIPDEV
     bool "Configure SLIPDEV driver"
     depends on USEMODULE_SLIPDEV

@@ -1,12 +1,13 @@
-# Copyright (c) 2020 HAW Hamburg
+# Copyright (c) 2021 HAW Hamburg
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
 
-config MODULE_SAUL_REG
-    bool "Global sensor/actuator registry for SAUL devices"
-    default y
-    depends on MODULE_SAUL
+config MODULE_SOFT_SPI
+    bool "Software-implemented SPI"
+    depends on HAS_PERIPH_GPIO
     depends on TEST_KCONFIG
+    select MODULE_PERIPH_GPIO
+    select MODULE_XTIMER

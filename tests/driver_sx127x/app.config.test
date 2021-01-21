@@ -1,0 +1,9 @@
+# this file enables modules defined in Kconfig. Do not use this file for
+# application configuration. This is only needed during migration.
+
+CONFIG_MODULE_SX1276=y
+
+CONFIG_MODULE_OD=y
+CONFIG_MODULE_SHELL=y
+CONFIG_MODULE_SHELL_COMMANDS=y
+CONFIG_MODULE_PS=y
