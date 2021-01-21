@@ -41,18 +41,6 @@ extern "C" {
 #endif
 #endif /* CONFIG_USE_CLOCK_PLL */
 
-#ifndef CONFIG_USE_CLOCK_MSI
-#define CONFIG_USE_CLOCK_MSI            0
-#endif /* CONFIG_USE_CLOCK_MSI */
-
-#ifndef CONFIG_USE_CLOCK_HSE
-#define CONFIG_USE_CLOCK_HSE            0
-#endif /* CONFIG_USE_CLOCK_HSE */
-
-#ifndef CONFIG_USE_CLOCK_HSI
-#define CONFIG_USE_CLOCK_HSI            0
-#endif /* CONFIG_USE_CLOCK_HSI */
-
 #if IS_ACTIVE(CONFIG_USE_CLOCK_PLL) && \
     (IS_ACTIVE(CONFIG_USE_CLOCK_MSI) || IS_ACTIVE(CONFIG_USE_CLOCK_HSE) || \
      IS_ACTIVE(CONFIG_USE_CLOCK_HSI))
@@ -77,20 +65,12 @@ extern "C" {
 #error "Cannot use HSI as clock source with other clock configurations"
 #endif
 
-#ifndef CONFIG_BOARD_HAS_HSE
-#define CONFIG_BOARD_HAS_HSE            0
-#endif
-
 #ifndef CLOCK_HSE
 #if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 #define CLOCK_HSE                       MHZ(24)
 #else
 #define CLOCK_HSE                       MHZ(8)
 #endif
-#endif
-
-#ifndef CONFIG_BOARD_HAS_LSE
-#define CONFIG_BOARD_HAS_LSE            0
 #endif
 
 #define CLOCK_HSI                       MHZ(16)
