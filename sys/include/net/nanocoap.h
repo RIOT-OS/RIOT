@@ -1269,12 +1269,32 @@ static inline size_t coap_opt_put_block2_control(uint8_t *buf, uint16_t lastonum
  *                          or 0 if first option
  * @param[in]   optnum      option number to use
  * @param[in]   string      string to encode as option
+ * @param[in]   len         length of the string
  * @param[in]   separator   character used in @p string to separate parts
  *
  * @return      number of bytes written to @p buf
  */
-size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
-                           const char *string, char separator);
+size_t coap_opt_put_string_with_len(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
+                                    const char *string, size_t len, char separator);
+/**
+ * @brief   Encode the given string as multi-part option into buffer
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in]   lastonum    number of previous option (for delta calculation),
+ *                          or 0 if first option
+ * @param[in]   optnum      option number to use
+ * @param[in]   string      string to encode as option
+ * @param[in]   separator   character used in @p string to separate parts
+ *
+ * @return      number of bytes written to @p buf
+ */
+static inline size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum,
+                                         uint16_t optnum,
+                                         const char *string, char separator)
+{
+    return coap_opt_put_string_with_len(buf, lastonum, optnum,
+                                        string, strlen(string), separator);
+}
 
 /**
  * @brief   Convenience function for inserting LOCATION_PATH option into buffer

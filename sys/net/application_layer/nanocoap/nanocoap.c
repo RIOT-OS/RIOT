@@ -747,11 +747,9 @@ size_t coap_opt_put_block(uint8_t *buf, uint16_t lastonum, coap_block_slicer_t *
     return coap_opt_put_uint(buf, lastonum, option, _slicer2blkopt(slicer, more));
 }
 
-size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
-                           const char *string, char separator)
+size_t coap_opt_put_string_with_len(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
+                                    const char *string, size_t len, char separator)
 {
-    size_t len = strlen(string);
-
     if (len == 0) {
         return 0;
     }
