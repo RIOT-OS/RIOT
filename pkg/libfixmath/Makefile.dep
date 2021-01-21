@@ -6,3 +6,9 @@ ifneq (,$(filter libfixmath-unittests,$(USEMODULE)))
   # The round function is not provided by the msp430 toolchain
   FEATURES_BLACKLIST += arch_msp430
 endif
+
+ifneq (,$(filter gnu gcc,$(TOOLCHAIN)))
+  # On recent arm-none-eabi-gcc toolchains division testcases fail
+  # see https://github.com/RIOT-OS/RIOT/issues/14568
+  FEATURES_BLACKLIST += arch_arm
+endif
