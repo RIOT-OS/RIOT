@@ -1,0 +1,11 @@
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+ifneq (,$(filter mtd,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi_on_qspi
+  USEMODULE += mtd_spi_nor
+endif
+
+# setup the samd21 arduino bootloader related dependencies
+include $(RIOTBOARD)/common/samd21-arduino-bootloader/Makefile.dep
