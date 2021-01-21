@@ -11,7 +11,7 @@ config BOARD
 config BOARD_NUCLEO_F207ZG
     bool
     default y
-    select BOARD_COMMON_NUCLEO64
+    select BOARD_COMMON_NUCLEO144
     select CPU_MODEL_STM32F207ZG
 
     # Put defined MCU peripherals here (in alphabetical order)
@@ -28,8 +28,4 @@ config BOARD_NUCLEO_F207ZG
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
 
-    # Clock configuration
-    select BOARD_HAS_HSE
-    select BOARD_HAS_LSE
-
-source "$(RIOTBOARD)/common/nucleo64/Kconfig"
+source "$(RIOTBOARD)/common/nucleo144/Kconfig"
