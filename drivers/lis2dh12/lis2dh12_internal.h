@@ -19,7 +19,6 @@
 #ifndef LIS2DH12_INTERNAL_H
 #define LIS2DH12_INTERNAL_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -73,6 +72,7 @@ extern "C" {
  * @{
  */
 #define WHO_AM_I_VAL                (0x33)
+#define CTRL_REG0_DEFAULT           (0x10)
 /** @} */
 
 #ifdef __cplusplus
