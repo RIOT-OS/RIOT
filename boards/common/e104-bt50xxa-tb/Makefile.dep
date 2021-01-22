@@ -7,6 +7,4 @@ ifneq (,$(filter board_software_reset,$(USEMODULE)))
   FEATURES_REQUIRED += periph_gpio_irq
 endif
 
-DEFAULT_MODULE += board_software_reset
-
 include $(RIOTBOARD)/common/nrf52/Makefile.dep

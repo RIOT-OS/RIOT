@@ -1,0 +1,2 @@
+# Default modules for e104-bt50xxa-tb boards
+DEFAULT_MODULE += board_software_reset
