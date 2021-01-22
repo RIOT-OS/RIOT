@@ -319,10 +319,19 @@ ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
 
 void sock_udp_close(sock_udp_t *sock)
 {
+    assert(sock != NULL);
     if (_udp_socket_list == NULL) {
         return;
     }
     if (sock) {
+        /* drop messages in mbox if any */
+        msg_t msg;
+        while (mbox_try_get(&sock->mbox, &msg)) {
+            if (msg.type == _MSG_TYPE_RECV_PKT) {
+                openqueue_freePacketBuffer(
+                    (OpenQueueEntry_t*) msg.content.ptr);
+            }
+        }
         /* remove sock from list */
         mutex_lock(&_sock_list_lock);
         LL_DELETE(_udp_socket_list, sock);
