@@ -17,8 +17,15 @@ config CPU_FAM_F1
     select HAS_BOOTLOADER_STM32
     select CLOCK_HAS_NO_MCO_PRE
 
+if CPU_FAM_F1
+
 config CPU_FAM
-    default "f1" if CPU_FAM_F1
+    default "f1"
+
+config ERROR_MODULES_CONFLICT
+    default "On STM32F1, the RTC and RTT map to the same hardware peripheral." if MODULE_PERIPH_RTC && MODULE_PERIPH_RTT
+
+endif # CPU_FAM_F1
 
 config HAS_CPU_STM32F1
     bool
