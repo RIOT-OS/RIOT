@@ -13,7 +13,15 @@
  * @author  Martine Lenders <m.lenders@fu-berlin.de>
  */
 
+#include "mutex.h"
 #include "net/gnrc/pktbuf.h"
+
+#include "pktbuf_internal.h"
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
+mutex_t gnrc_pktbuf_mutex = MUTEX_INIT;
 
 gnrc_pktsnip_t *gnrc_pktbuf_remove_snip(gnrc_pktsnip_t *pkt,
                                         gnrc_pktsnip_t *snip)
@@ -74,6 +82,29 @@ int gnrc_pktbuf_merge(gnrc_pktsnip_t *pkt)
     gnrc_pktbuf_release(pkt->next);
     pkt->next = NULL;
     return res;
+}
+
+void gnrc_pktbuf_release_error(gnrc_pktsnip_t *pkt, uint32_t err)
+{
+    mutex_lock(&gnrc_pktbuf_mutex);
+    while (pkt) {
+        gnrc_pktsnip_t *tmp;
+        assert(gnrc_pktbuf_contains(pkt));
+        assert(pkt->users > 0);
+        tmp = pkt->next;
+        if (pkt->users == 1) {
+            pkt->users = 0; /* not necessary but to be on the safe side */
+            gnrc_pktbuf_free_internal(pkt->data, pkt->size);
+            gnrc_pktbuf_free_internal(pkt, sizeof(gnrc_pktsnip_t));
+        }
+        else {
+            pkt->users--;
+        }
+        DEBUG("pktbuf: report status code %" PRIu32 "\n", err);
+        gnrc_neterr_report(pkt, err);
+        pkt = tmp;
+    }
+    mutex_unlock(&gnrc_pktbuf_mutex);
 }
 
 /** @} */
