@@ -33,7 +33,8 @@
 #include "net/netdev/eth.h"
 #include "periph/gpio.h"
 
-#define ENABLE_DEBUG 0
+#define ENABLE_DEBUG            0
+#define ENABLE_DEBUG_VERBOSE    0
 #include "debug.h"
 
 #if IS_USED(MODULE_STM32_ETH_LINK_UP)
@@ -113,7 +114,7 @@ static uint8_t _link_state = LINK_STATE_DOWN;
 
 static void _debug_tx_descriptor_info(unsigned line)
 {
-    if (IS_ACTIVE(ENABLE_DEBUG)) {
+    if (IS_ACTIVE(ENABLE_DEBUG) && IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
         DEBUG("[stm32_eth:%u] TX descriptors:\n", line);
         for (unsigned i = 0; i < ETH_TX_DESCRIPTOR_COUNT; i++) {
             uint32_t status = tx_desc[i].status;
@@ -140,7 +141,7 @@ static inline uint32_t _len_from_rx_desc_status(uint32_t status)
 
 static void _debug_rx_descriptor_info(unsigned line)
 {
-    if (IS_ACTIVE(ENABLE_DEBUG)) {
+    if (IS_ACTIVE(ENABLE_DEBUG) && IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
         DEBUG("[stm32_eth:%u] RX descriptors:\n", line);
         for (unsigned i = 0; i < ETH_RX_DESCRIPTOR_COUNT; i++) {
             uint32_t status = rx_desc[i].status;
@@ -228,8 +229,7 @@ static void stm32_eth_set_addr(const uint8_t *addr)
     ETH->MACA0LR = (addr[3] << 24) | (addr[2] << 16) | (addr[1] << 8) | addr[0];
 }
 
-/** Initialization of the DMA descriptors to be used */
-static void _init_buffer(void)
+static void _init_dma_descriptors(void)
 {
     size_t i;
     for (i = 0; i < ETH_RX_DESCRIPTOR_COUNT; i++) {
@@ -252,6 +252,17 @@ static void _init_buffer(void)
 
     ETH->DMARDLAR = (uintptr_t)rx_curr;
     ETH->DMATDLAR = (uintptr_t)tx_curr;
+}
+
+static void _reset_eth_dma(void)
+{
+    /* disable DMA TX and RX */
+    ETH->DMAOMR &= ~(ETH_DMAOMR_ST | ETH_DMAOMR_SR);
+
+    _init_dma_descriptors();
+
+    /* enable DMA TX and RX */
+    ETH->DMAOMR |= ETH_DMAOMR_ST | ETH_DMAOMR_SR;
 }
 
 static int stm32_eth_set(netdev_t *dev, netopt_t opt,
@@ -445,8 +456,6 @@ static int stm32_eth_init(netdev_t *netdev)
     netdev_eui48_get(netdev, &hwaddr);
     stm32_eth_set_addr(hwaddr.uint8);
 
-    _init_buffer();
-
     ETH->DMAIER |= ETH_DMAIER_NISE | ETH_DMAIER_TIE | ETH_DMAIER_RIE;
 
     /* enable transmitter and receiver */
@@ -456,8 +465,7 @@ static int stm32_eth_init(netdev_t *netdev)
     /* wait for FIFO flushing to complete */
     while (ETH->DMAOMR & ETH_DMAOMR_FTF) { }
 
-    /* enable DMA TX and RX */
-    ETH->DMAOMR |= ETH_DMAOMR_ST | ETH_DMAOMR_SR;
+    _reset_eth_dma();
 
     _setup_phy();
 
@@ -476,9 +484,10 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     /* We cannot send more chunks than allocated descriptors */
     assert(iolist_count(iolist) <= ETH_TX_DESCRIPTOR_COUNT);
 
+    edma_desc_t *dma_iter = tx_curr;
     for (unsigned i = 0; iolist; iolist = iolist->iol_next, i++) {
-        tx_curr->control = iolist->iol_len;
-        tx_curr->buffer_addr = iolist->iol_base;
+        dma_iter->control = iolist->iol_len;
+        dma_iter->buffer_addr = iolist->iol_base;
         uint32_t status = TX_DESC_STAT_IC | TX_DESC_STAT_TCH | TX_DESC_STAT_CIC
                           | TX_DESC_STAT_OWN;
         if (!i) {
@@ -489,34 +498,56 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
             /* last chunk */
             status |= TX_DESC_STAT_LS;
         }
-        tx_curr->status = status;
-        tx_curr = tx_curr->desc_next;
+        dma_iter->status = status;
+        dma_iter = dma_iter->desc_next;
     }
 
     /* start TX */
     ETH->DMATPDR = 0;
     /* await completion */
-    DEBUG("[stm32_eth] Started to send %u B via DMA\n", bytes_to_send);
+    if (IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
+        DEBUG("[stm32_eth] Started to send %u B via DMA\n", bytes_to_send);
+    }
     mutex_lock(&stm32_eth_tx_completed);
-    DEBUG("[stm32_eth] TX completed\n");
+    if (IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
+        DEBUG("[stm32_eth] TX completed\n");
+    }
 
     /* Error check */
-    unsigned i = 0;
     _debug_tx_descriptor_info(__LINE__);
+    int error = 0;
     while (1) {
-        uint32_t status = tx_desc[i].status;
+        uint32_t status = tx_curr->status;
         /* The Error Summary (ES) bit is set, if any error during TX occurred */
         if (status & TX_DESC_STAT_ES) {
-            /* TODO: Report better event to reflect error */
-            netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-            return -1;
+            if (status & TX_DESC_STAT_EC) {
+                DEBUG("[stm32_eth] collision in half duplex mode\n");
+                error = -EBUSY;
+            }
+            else if (status & TX_DESC_STAT_NC) {
+                DEBUG("[stm32_eth] no carrier detected during TX\n");
+                error = -ENETDOWN;
+            }
+            else {
+                /* don't detect underflow error here, as we trigger TX only
+                 * after all descriptors have been handed over to the DMA.
+                 * Hence, the DMA should never run out of desciprtors during
+                 * TX. */
+                DEBUG("[stm32_eth] unhandled error during TX\n");
+                error = -EIO;
+            }
+            _reset_eth_dma();
         }
+        tx_curr = tx_curr->desc_next;
         if (status & TX_DESC_STAT_LS) {
             break;
         }
-        i++;
     }
+
     netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
+    if (error) {
+        return error;
+    }
     return (int)bytes_to_send;
 }
 
@@ -533,10 +564,12 @@ static int get_rx_frame_size(void)
         }
         if (status & RX_DESC_STAT_DE) {
             DEBUG("[stm32_eth] Overflow during RX\n");
+            _reset_eth_dma();
             return -EOVERFLOW;
         }
         if (status & RX_DESC_STAT_ES) {
             DEBUG("[stm32_eth] Error during RX\n");
+            _reset_eth_dma();
             return -EIO;
         }
         if (status & RX_DESC_STAT_LS) {
