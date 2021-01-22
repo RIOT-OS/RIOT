@@ -129,9 +129,23 @@
 #include "thread_flags.h"
 #endif
 
+#include "thread_arch.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief Macro definition to inline some of the platform specific
+ *        implementations
+ *
+ * Should be enabled when advantageous by CPU's in their thread_arch.h header
+ */
+#ifdef THREAD_API_INLINED
+#define THREAD_MAYBE_INLINE static inline __attribute__((always_inline))
+#else
+#define THREAD_MAYBE_INLINE
+#endif /* THREAD_API_INLINED */
 
 #if defined(DEVELHELP) && !defined(CONFIG_THREAD_NAMES)
 /**
@@ -431,7 +445,7 @@ void thread_yield(void);
  *
  * @see     thread_yield()
  */
-void thread_yield_higher(void);
+THREAD_MAYBE_INLINE void thread_yield_higher(void);
 
 /**
  * @brief   Puts the current thread into zombie state.
@@ -594,7 +608,8 @@ static inline int thread_has_msg_queue(const volatile struct _thread *thread)
  * @param   thread   thread to work on
  * @returns status of thread
  */
-static inline thread_status_t thread_get_status(const thread_t *thread) {
+static inline thread_status_t thread_get_status(const thread_t *thread)
+{
     return thread->status;
 }
 
@@ -604,7 +619,8 @@ static inline thread_status_t thread_get_status(const thread_t *thread) {
  * @param   thread   thread to work on
  * @returns true if thread is active, false otherwise
  */
-static inline bool thread_is_active(const thread_t *thread) {
+static inline bool thread_is_active(const thread_t *thread)
+{
     return thread->status >= STATUS_ON_RUNQUEUE;
 }
 

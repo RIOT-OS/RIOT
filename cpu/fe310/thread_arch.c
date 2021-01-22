@@ -179,24 +179,6 @@ void cpu_switch_context_exit(void)
     UNREACHABLE();
 }
 
-static inline void _ecall_dispatch(uint32_t num, void *ctx)
-{
-    /* function arguments are in a0 and a1 as per ABI */
-    __asm__ volatile (
-        "mv a0, %[num] \n"
-        "mv a1, %[ctx] \n"
-        "ECALL\n"
-        : /* No outputs */
-        : [num] "r" (num), [ctx] "r" (ctx)
-        : "memory"
-        );
-}
-
-void thread_yield_higher(void)
-{
-    _ecall_dispatch(0, NULL);
-}
-
 /**
  * @brief Print heap statistics
  */

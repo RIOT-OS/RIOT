@@ -291,16 +291,6 @@ void NORETURN cpu_switch_context_exit(void)
     UNREACHABLE();
 }
 
-void thread_yield_higher(void)
-{
-    /* trigger the PENDSV interrupt to run scheduler and schedule new thread if
-     * applicable */
-    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
-    /* flush the pipeline. Otherwise we risk that subsequent instructions are
-     * executed before the IRQ has actually triggered */
-    __ISB();
-}
-
 #if CPU_CORE_CORTEXM_FULL_THUMB
 void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     __asm__ volatile (
