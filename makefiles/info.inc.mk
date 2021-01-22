@@ -146,7 +146,7 @@ info-build-json:
 	@echo '"BOARDDIR": "$(BOARDDIR)",'
 	@echo '"RIOTCPU": "$(RIOTCPU)",'
 	@echo '"RIOTPKG": "$(RIOTPKG)",'
-	@echo '"EXTERNAL_BOARD_DIRS": $(call json_string_or_null $(EXTERNAL_BOARD_DIRS)),'
+	@echo '"EXTERNAL_BOARD_DIRS": $(call json_string_or_null,$(EXTERNAL_BOARD_DIRS)),'
 	@echo '"BINDIR": "$(BINDIR)",'
 	@echo '"ELFFILE": "$(ELFFILE)",'
 	@echo '"HEXFILE": "$(HEXFILE)",'
