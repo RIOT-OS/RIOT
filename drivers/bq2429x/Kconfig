@@ -1,0 +1,38 @@
+# Copyright (C) 2020 Locha Inc
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_BQ2429X
+    bool "BQ2429x single-cell USB charger"
+    depends on HAS_PERIPH_I2C
+    depends on HAS_PERIPH_GPIO
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_I2C
+    select MODULE_PERIPH_GPIO
+    default y if HAVE_BQ2429X
+    help
+        The driver can be used with Texas Instruments USB charger ICs: BQ24295,
+        BQ24296, BQ24297, BQ24298, BQ24292I, BQ24296M.
+
+config MODULE_BQ2429X_INT
+    bool "Interrupt handling"
+    depends on HAS_PERIPH_GPIO_IRQ
+    depends on MODULE_BQ2429X
+    select MODULE_PERIPH_GPIO_IRQ
+    default y if HAVE_BQ2429X_INT
+    help
+        Say y to include interrupt handling functionality.
+
+config HAVE_BQ2429X
+    bool
+    help
+        Indicates that a BQ2429x charger and power management IC is present.
+
+config HAVE_BQ2429X_INT
+    bool
+    help
+        Indicates that a BQ2429x charger and power management IC is present,
+        with interrupt functionality (the INT pin is connected).
