@@ -30,10 +30,6 @@ config HAS_BOOTLOADER_STM32
     help
         Indicates that the stm32 bootloader is being used.
 
-config ERROR_MODULES_CONFLICT
-    default "On STM32, the RTC and RTT map to the same hardware peripheral." if MODULE_PERIPH_RTC && MODULE_PERIPH_RTT
-    depends on CPU_STM32
-
 orsource "kconfigs/Kconfig.clk"
 orsource "kconfigs/*/Kconfig"
 orsource "kconfigs/*/Kconfig.lines"
