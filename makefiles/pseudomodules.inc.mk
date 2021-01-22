@@ -269,6 +269,12 @@ PSEUDOMODULES += lps25hb
 # add all pseudo random number generator variants as pseudomodules
 PSEUDOMODULES += prng_%
 
+# pseudo random number generator seed sources
+PSEUDOMODULES += random_seed_puf_sram
+PSEUDOMODULES += random_seed_hwrng
+PSEUDOMODULES += random_seed_luid
+PSEUDOMODULES += random_seed_fixed
+
 # STM32 periph pseudomodules
 PSEUDOMODULES += stm32_periph_%
 

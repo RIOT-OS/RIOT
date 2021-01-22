@@ -11,6 +11,43 @@
  * @defgroup    sys_random Random
  * @ingroup     sys
  * @brief       Pseudo Random Number Generator (PRNG)
+ *
+ * To use add `USEMODULE += random` to the application Makefile.
+ *
+ * ## Auto-initialization ##
+ *
+ * Auto-initialization of the random module is controlled by adding the module
+ * `auto_init_random` (as long as `auto_init` is also used). This module is
+ * enabled by default when `random` is included, to disable it one must
+ * explicitly add it to `DISABLE_MODULE` in the application Makefile. During
+ * auto-initialization `auto_init_random` is called, and the PRNG system
+ * is seeded.
+ *
+ * ## PRNG seed sources ##
+ *
+ * The random module allows different sources to be used for the seed during
+ * the auto-initialization (or if `auto_init_random` is used manually). This
+ * is controlled by selecting from the following modules:
+ *
+ * | Module | Description |
+ * | ------ | ----------- |
+ * | `random_seed_hwrng` | Uses the HWRNG peripheral. |
+ * | `random_seed_puf_sram` | Uses the SRAM based physically unclonable function. |
+ * | `random_seed_luid` | Uses the Locally Unique ID Generator module, which uses the CPUID peripheral if present. |
+ * | `random_seed_fixed` | Uses @ref RANDOM_SEED_DEFAULT as seed. |
+ *
+ ***WARNING:** `random_seed_luid` and `random_seed_fixed` are not recommended as
+ * they provide no real entropy.
+ *
+ * ### Default behaviour ###
+ *
+ * The default behaviour, when there is no selected source, is as follows:
+ *
+ * 1. If the @ref sys_puf_sram module is used `random_seed_puf_sram` is used.
+ * 2. If the platform has a HWRNG peripheral `random_seed_hwrng` is used.
+ * 3. If the platform has a CPUID peripheral `random_seed_luid` is used.
+ * 4. If none of the above applies `random_seed_fixed` is used.
+ *
  * @{
  *
  * @file

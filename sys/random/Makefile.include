@@ -13,3 +13,8 @@ ifneq (1,$(words $(filter-out prng_shaxprng,$(USED_PRNG_IMPLEMENTATIONS))))
   $(info Currently the following prng modules are used: $(USED_PRNG_IMPLEMENTATIONS))
   $(error Only one implementation of PRNG should be used.)
 endif
+
+# Check that one and only one seed source has been selected
+ifneq (1,$(words $(filter-out random_seed_%,$(USEMODULE))))
+  $(error One seed should be selected for the random subsystem. Check the documentation for options.)
+endif

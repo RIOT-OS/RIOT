@@ -43,6 +43,27 @@ ifneq (,$(filter random,$(USEMODULE)))
   ifeq (,$(filter prng_%,$(USEMODULE)))
     USEMODULE += prng_tinymt32
   endif
+
+  # select a default seed source for auto initialization if none is selected
+  ifeq (,$(filter random_seed_%,$(USEMODULE)))
+    # by default we select the fixed, if another is possible we disable it
+    DEFAULT_MODULE += random_seed_fixed
+
+    ifneq (,$(filter puf_sram,$(USEMODULE)))
+      USEMODULE += random_seed_puf_sram
+      DISABLE_MODULE += random_seed_fixed
+    else ifneq (,$(filter periph_hwrng,$(FEATURES_USED)))
+      USEMODULE += random_seed_hwrng
+      DISABLE_MODULE += random_seed_fixed
+    else ifneq (,$(filter periph_cpuid,$(FEATURES_USED)))
+      USEMODULE += random_seed_luid
+      DISABLE_MODULE += random_seed_fixed
+    else
+      FEATURES_OPTIONAL += periph_hwrng
+      FEATURES_OPTIONAL += periph_cpuid
+    endif
+
+  endif
 endif
 
 ifneq (,$(filter spiffs,$(USEMODULE)))

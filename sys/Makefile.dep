@@ -793,10 +793,18 @@ ifneq (,$(filter random,$(USEMODULE)))
     FEATURES_REQUIRED += periph_hwrng
   endif
 
-  ifeq (,$(filter puf_sram,$(USEMODULE)))
-    FEATURES_OPTIONAL += periph_hwrng
-  endif
+endif
 
+# random module seed sources
+ifneq (,$(filter random_seed_puf_sram,$(USEMODULE)))
+  USEMODULE += puf_sram
+endif
+
+ifneq (,$(filter random_seed_hwrng,$(USEMODULE)))
+  USEMODULE += periph_hwrng
+endif
+
+ifneq (,$(filter random_seed_luid,$(USEMODULE)))
   USEMODULE += luid
 endif
 
