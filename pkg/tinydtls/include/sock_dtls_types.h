@@ -52,6 +52,7 @@ struct sock_dtls {
      */
     sock_dtls_cb_t async_cb;
     void *async_cb_arg;                     /**< asynchronous callback arg */
+    session_t async_cb_session;             /**< asynchronous callback session */
 #if defined(SOCK_HAS_ASYNC_CTX) || defined(DOXYGEN)
     /**
      * @brief   Asynchronous event context
