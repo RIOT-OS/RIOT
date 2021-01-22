@@ -18,11 +18,6 @@ $(if $(RAM_LEN),,$(error RAM_LEN is not defined))
 LINKFLAGS += $(LINKFLAGPREFIX)--defsym=__TEXT_REGION_LENGTH__=$(ROM_LEN)$(if $(ROM_RESERVED),-$(ROM_RESERVED))
 LINKFLAGS += $(LINKFLAGPREFIX)--defsym=__DATA_REGION_LENGTH__=$(RAM_LEN)
 
-# Use newer linker script to have ROM/RAM configuration symbols in binutils<2.26
-LDSCRIPT_COMPAT = $(if $(shell $(TARGET_ARCH)-ld --verbose | grep __TEXT_REGION_LENGTH__),,\
-                    -T$(RIOTCPU)/$(CPU)/ldscripts_compat/avr_2.26.ld)
-LINKFLAGS += $(LDSCRIPT_COMPAT)
-
 ifeq ($(LTO),1)
   # avr-gcc <4.8.3 has a bug when using LTO which causes a warning to be printed always:
   # '_vector_25' appears to be a misspelled signal handler [enabled by default]
