@@ -65,70 +65,13 @@ extern "C" {
 #ifndef CONFIG_SKALD_INTERVAL_MS
 #define CONFIG_SKALD_INTERVAL_MS        (1000U)
 #endif
-
-/**
- * @brief   Configure advertising channel 37
- *
- * Set CONFIG_ADV_CH_37_DISABLE to disable channel 37
- */
-#ifdef DOXYGEN
-#define CONFIG_ADV_CH_37_DISABLE
-#endif
-
-/**
- * @brief   Configure advertising channel 38
- *
- * Set CONFIG_ADV_CH_38_DISABLE to disable channel 38
- */
-#ifdef DOXYGEN
-#define CONFIG_ADV_CH_38_DISABLE
-#endif
-
-/**
- * @brief   Configure advertising channel 39
- *
- * Set CONFIG_ADV_CH_39_DISABLE to disable channel 39
- */
-#ifdef DOXYGEN
-#define CONFIG_ADV_CH_39_DISABLE
-#endif
 /** @} */
-
-/**
- * @brief   Define advertising channel 37 if @ref CONFIG_ADV_CH_37_DISABLE is
- *          not set
- */
-#if !defined(CONFIG_ADV_CH_37_DISABLE) || defined(DOXYGEN)
-#define ADV_CH_37 37,
-#else
-#define ADV_CH_37
-#endif
-
-/**
- * @brief   Define advertising channel 38 if @ref CONFIG_ADV_CH_38_DISABLE is
- *          not set
- */
-#if !defined(CONFIG_ADV_CH_38_DISABLE) || defined(DOXYGEN)
-#define ADV_CH_38 38,
-#else
-#define ADV_CH_38
-#endif
-
-/**
- * @brief   Define advertising channel 39 if @ref CONFIG_ADV_CH_39_DISABLE is
- *          not set
- */
-#if !defined(CONFIG_ADV_CH_39_DISABLE) || defined(DOXYGEN)
-#define ADV_CH_39 39
-#else
-#define ADV_CH_39
-#endif
 
 /**
  * @brief   List of advertising channels
  */
 #ifndef SKALD_ADV_CHAN
-#define SKALD_ADV_CHAN { ADV_CH_37 ADV_CH_38 ADV_CH_39 }
+#define SKALD_ADV_CHAN                 { 37, 38, 39 }
 #endif
 
 /**
