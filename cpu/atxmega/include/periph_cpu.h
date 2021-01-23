@@ -301,6 +301,59 @@ typedef struct {
     cpu_int_lvl_t int_lvl;  /**< Serial Interrupt Level */
 } i2c_conf_t;
 
+/**
+ * @brief   Enable common SPI functions
+ * @{
+ */
+#define PERIPH_SPI_NEEDS_INIT_CS
+#define PERIPH_SPI_NEEDS_TRANSFER_BYTE
+#define PERIPH_SPI_NEEDS_TRANSFER_REG
+#define PERIPH_SPI_NEEDS_TRANSFER_REGS
+/** @} */
+
+/**
+ * @brief   Define global value for undefined SPI device
+ * @{
+ */
+#define SPI_UNDEF               (UCHAR_MAX)
+/** @} */
+
+/**
+ * @brief Define spi_t data type to save data
+ * @{
+ */
+#define HAVE_SPI_T
+typedef uint8_t spi_t;
+/** @} */
+
+/**
+ * @brief  SPI device configuration
+ * @{
+ */
+typedef struct {
+    SPI_t *dev;                     /**< pointer to the used SPI device */
+    pwr_reduction_t pwr;            /**< Power Management */
+    gpio_t sck_pin;                 /**< pin used for SCK */
+    gpio_t miso_pin;                /**< pin used for MISO */
+    gpio_t mosi_pin;                /**< pin used for MOSI */
+    gpio_t ss_pin;                  /**< pin used for SS line */
+} spi_conf_t;
+/** @} */
+
+/**
+ * @brief  Available SPI clock speeds
+ * @{
+ */
+#define HAVE_SPI_CLK_T
+typedef enum {
+    SPI_CLK_100KHZ = 100000U,       /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ = 400000U,       /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ   = 1000000U,      /**< drive the SPI bus with 1MHz */
+    SPI_CLK_5MHZ   = 5000000U,      /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ  = 10000000U,     /**< drive the SPI bus with 10MHz */
+} spi_clk_t;
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
