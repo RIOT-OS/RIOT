@@ -173,13 +173,13 @@ static int cmd_write(int argc, char **argv)
     return res;
 }
 
-static int cmd_write_page(int argc, char **argv)
+static int cmd_write_page_raw(int argc, char **argv)
 {
     mtd_dev_t *dev = _get_dev(argc, argv);
     uint32_t page, offset, len;
 
     if (argc < 5 || dev == NULL) {
-        printf("usage: %s <dev> <page> <offset> <len>\n", argv[0]);
+        printf("usage: %s <dev> <page> <offset> <data>\n", argv[0]);
         return -1;
     }
 
@@ -188,6 +188,29 @@ static int cmd_write_page(int argc, char **argv)
     len    = strlen(argv[4]);
 
     int res = mtd_write_page_raw(dev, argv[4], page, offset, len);
+
+    if (res) {
+        printf("error: %i\n", res);
+    }
+
+    return res;
+}
+
+static int cmd_write_page(int argc, char **argv)
+{
+    mtd_dev_t *dev = _get_dev(argc, argv);
+    uint32_t page, offset, len;
+
+    if (argc < 5 || dev == NULL) {
+        printf("usage: %s <dev> <page> <offset> <data>\n", argv[0]);
+        return -1;
+    }
+
+    page   = atoi(argv[2]);
+    offset = atoi(argv[3]);
+    len    = strlen(argv[4]);
+
+    int res = mtd_write_page(dev, argv[4], page, offset, len);
 
     if (res) {
         printf("error: %i\n", res);
@@ -409,7 +432,7 @@ static int cmd_test(int argc, char **argv)
     /* overwrite first test string, rely on MTD for read-modify-write */
     const char test_str_2[] = "Hello World!";
     offset = 5;
-    assert(mtd_write_page_hl(dev, test_str_2, page_0, offset, sizeof(test_str_2)) == 0);
+    assert(mtd_write_page(dev, test_str_2, page_0, offset, sizeof(test_str_2)) == 0);
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str_2)) == 0);
     assert(memcmp(test_str_2, buffer, sizeof(test_str_2)) == 0);
 
@@ -426,7 +449,12 @@ static const shell_command_t shell_commands[] = {
     { "read", "Read a region of memory on the MTD device", cmd_read },
     { "read_page", "Read a region of memory on the MTD device (pagewise addressing)", cmd_read_page },
     { "write", "Write a region of memory on the MTD device", cmd_write },
-    { "write_page", "Write a region of memory on the MTD device (pagewise addressing)", cmd_write_page },
+    { "write_page_raw",
+      "Write a region of memory on the MTD device (pagewise addressing)",
+      cmd_write_page_raw },
+    { "write_page",
+      "Write a region of memory on the MTD device (pagewise addressing, read-modify-write)",
+      cmd_write_page },
     { "erase", "Erase a region of memory on the MTD device", cmd_erase },
     { "erase_sector", "Erase a sector of memory on the MTD device", cmd_erase_sector },
     { "test", "Erase & write test data to the last two sectors", cmd_test },
