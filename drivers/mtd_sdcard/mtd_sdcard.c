@@ -158,4 +158,5 @@ const mtd_desc_t mtd_sdcard_driver = {
     .write_page = mtd_sdcard_write_page,
     .erase = mtd_sdcard_erase,
     .power = mtd_sdcard_power,
+    .flags = MTD_DRIVER_FLAG_DIRECT_WRITE,
 };

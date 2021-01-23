@@ -80,5 +80,6 @@ const mtd_desc_t mtd_at24cxxx_driver = {
     .write = _mtd_at24cxxx_write,
     .write_page = mtd_at24cxxx_write_page,
     .erase = _mtd_at24cxxx_erase,
-    .power = _mtd_at24cxxx_power
+    .power = _mtd_at24cxxx_power,
+    .flags = MTD_DRIVER_FLAG_DIRECT_WRITE,
 };

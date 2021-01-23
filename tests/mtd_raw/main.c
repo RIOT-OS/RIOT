@@ -406,6 +406,13 @@ static int cmd_test(int argc, char **argv)
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
     assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
 
+    /* overwrite first test string, rely on MTD for read-modify-write */
+    const char test_str_2[] = "Hello World!";
+    offset = 5;
+    assert(mtd_write_page_hl(dev, test_str_2, page_0, offset, sizeof(test_str_2)) == 0);
+    assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str_2)) == 0);
+    assert(memcmp(test_str_2, buffer, sizeof(test_str_2)) == 0);
+
     puts("[SUCCESS]");
 
     free(buffer);
