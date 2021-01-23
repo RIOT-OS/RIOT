@@ -33,12 +33,12 @@ static inline void _ecall_dispatch(uint32_t num, void *ctx)
 {
     /* function arguments are in a0 and a1 as per ABI */
     __asm__ volatile (
-        "mv a0, %[num] \n"
-        "mv a1, %[ctx] \n"
+        "add a0, x0, %[num] \n"
+        "add a1, x0, %[ctx] \n"
         "ECALL\n"
         : /* No outputs */
         : [num] "r" (num), [ctx] "r" (ctx)
-        : "memory"
+        : "memory", "a0", "a1"
         );
 }
 
