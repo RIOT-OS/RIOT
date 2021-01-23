@@ -291,7 +291,7 @@ static void _print_size(uint64_t size)
         unit = "byte";
     }
 
-    printf("total: %lu %s\n", len, unit);
+    printf("%lu %s", len, unit);
 }
 
 static void _print_info(mtd_dev_t *dev)
@@ -299,7 +299,9 @@ static void _print_info(mtd_dev_t *dev)
     printf("sectors: %"PRIu32"\n", dev->sector_count);
     printf("pages per sector: %"PRIu32"\n", dev->pages_per_sector);
     printf("page size: %"PRIu32"\n", dev->page_size);
+    printf("total: ");
     _print_size(_get_size(dev));
+    puts("");
 }
 
 static int cmd_info(int argc, char **argv)
@@ -479,7 +481,9 @@ int main(void)
             continue;
         }
 
-        printf("OK (%lu kiB)\n", (unsigned long)(_get_size(dev) / 1024));
+        printf("OK (");
+        _print_size(_get_size(dev));
+        puts(")");
         mtd_power(dev, MTD_POWER_UP);
     }
 
