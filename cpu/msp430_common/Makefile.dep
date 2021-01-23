@@ -1,8 +1,5 @@
 USEMODULE += msp430_common msp430_common_periph
 
-# msp430 uses newlib by default
-DEFAULT_MODULE += newlib
-
 ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += newlib_nano
 endif
