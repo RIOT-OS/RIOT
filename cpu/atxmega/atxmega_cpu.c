@@ -22,6 +22,7 @@
 
 #include "cpu.h"
 #include "cpu_clock.h"
+#include "cpu_pm.h"
 #include "panic.h"
 
 #define ENABLE_DEBUG 0
@@ -63,18 +64,7 @@ void avr8_reset_cause(void)
 
 void __attribute__((weak)) avr8_clk_init(void)
 {
-    volatile uint8_t *reg = (uint8_t *)&PR.PRGEN;
-    uint8_t i;
-
-    /* Turn off all peripheral clocks that can be turned off. */
-    for (i = 0; i <= 7; i++) {
-        reg[i] = 0xff;
-    }
-
-    /* Turn on all peripheral clocks that can be turned on. */
-    for (i = 0; i <= 7; i++) {
-        reg[i] = 0x00;
-    }
+    pm_periph_power_off();
 
     /* XMEGA A3U [DATASHEET] p.23 After reset, the device starts up running
      * from the 2MHz internal oscillator. The other clock sources, DFLLs
