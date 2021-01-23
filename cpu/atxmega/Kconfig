@@ -26,6 +26,7 @@ config CPU_COMMON_ATXMEGA
 config CPU_CORE_ATXMEGA_A1
     bool
     select CPU_COMMON_ATXMEGA
+    select HAS_ATXMEGA_EBI
 
 config CPU_CORE_ATXMEGA_A3
     bool
@@ -75,6 +76,11 @@ source "$(RIOTCPU)/atxmega/Kconfig.XMEGAE"
 ## Declaration of specific features
 config HAS_CPU_ATXMEGA
     bool
+
+config HAS_ATXMEGA_EBI
+    bool
+    help
+        Indicates that the External Bus Interface is present.
 
 config HAS_PERIPH_NVM
     bool

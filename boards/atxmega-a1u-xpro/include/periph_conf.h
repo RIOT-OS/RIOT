@@ -130,6 +130,18 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF         ARRAY_SIZE(spi_config)
 /** @} */
 
+/**
+ * @name EBI configuration
+ *
+ * For more information, see ebi_conf_t structure.
+ *
+ * @{
+ */
+static const ebi_conf_t ebi_config = {
+    0
+};
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
