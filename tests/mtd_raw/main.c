@@ -404,12 +404,12 @@ static int cmd_test(int argc, char **argv)
     assert(mtd_write_page_raw(dev, buffer, page_0, 0, page_size) == 0);
     assert(mtd_write_page_raw(dev, buffer, page_1, 0, page_size) == 0);
 
-    /* erase two sectors and check if they have been erase */
+    /* erase two sectors and check if they have been erased */
     assert(mtd_erase_sector(dev, sector, 2) == 0);
     assert(mtd_read_page(dev, buffer, page_0, 0, page_size) == 0);
-    assert(mem_is_all_set(buffer, 0xFF, page_size));
+    assert(mem_is_all_set(buffer, 0xFF, page_size) || mem_is_all_set(buffer, 0x00, page_size));
     assert(mtd_read_page(dev, buffer, page_1, 0, page_size) == 0);
-    assert(mem_is_all_set(buffer, 0xFF, page_size));
+    assert(mem_is_all_set(buffer, 0xFF, page_size) || mem_is_all_set(buffer, 0x00, page_size));
 
     /* write test data & read it back */
     const char test_str[] = "0123456789";
