@@ -222,6 +222,7 @@ enum {
     NETDEV_TYPE_CC110X,
     NETDEV_TYPE_LORA,
     NETDEV_TYPE_NRFMIN,
+    NETDEV_TYPE_NRF24L01P_NG,
     NETDEV_TYPE_SLIP,
     NETDEV_TYPE_ESP_NOW,
 };
@@ -315,6 +316,7 @@ typedef enum {
     NETDEV_SX127X,
     NETDEV_SAM0_ETH,
     NETDEV_ESP_NOW,
+    NETDEV_NRF24L01P_NG,
     /* add more if needed */
 } netdev_type_t;
 /** @} */
