@@ -13,7 +13,6 @@ config CPU_COMMON_SAMD5X
     select HAS_CORTEXM_MPU
     select HAS_CPU_SAMD5X
     select HAS_PERIPH_DMA
-    select HAS_PERIPH_ETH
     select HAS_PERIPH_GPIO_TAMPER_WAKE
     select HAS_PERIPH_HWRNG
     select HAS_PERIPH_SPI_ON_QSPI
