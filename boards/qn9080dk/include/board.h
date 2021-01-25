@@ -20,6 +20,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "mtd.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
 
@@ -66,6 +67,14 @@ extern "C" {
 #define MMA8X5X_PARAM_I2C       I2C_DEV(0)
 #define MMA8X5X_PARAM_ADDR      0x1D
 #define MMA8X5X_PARAM_TYPE      (MMA8X5X_TYPE_MMA8652)
+/** @} */
+
+/**
+ * @name MTD configuration
+ * @{
+ */
+extern mtd_dev_t *mtd0;
+#define MTD_0 mtd0
 /** @} */
 
 /**
