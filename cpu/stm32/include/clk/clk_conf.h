@@ -23,15 +23,24 @@
 #include "macros/units.h"
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
+    defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F3) || \
+    defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7) || \
+    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4) || \
+    defined(CPU_FAM_STM32MP1)
+#include "cfg_clock_common_fx_gx_mp1.h"
+#else /* CPU_FAM_STM32L0 || CPU_FAM_STM32L1 || CPU_FAM_STM32L4 ||
+       * CPU_FAM_STM32L5 || CPU_FAM_STM32WB */
+#include "cfg_clock_common_lx_wb.h"
+#endif
+
+#if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
     defined(CPU_FAM_STM32F3)
 #include "f0f1f3/cfg_clock_default.h"
 #elif defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
       defined(CPU_FAM_STM32F7)
 #include "f2f4f7/cfg_clock_default.h"
-#elif defined(CPU_FAM_STM32G0)
-#include "g0/cfg_clock_default.h"
-#elif defined(CPU_FAM_STM32G4)
-#include "g4/cfg_clock_default.h"
+#elif defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32G4)
+#include "g0g4/cfg_clock_default.h"
 #elif defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 #include "l0l1/cfg_clock_default.h"
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
