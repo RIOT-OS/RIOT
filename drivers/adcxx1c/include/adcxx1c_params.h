@@ -61,8 +61,8 @@ extern "C" {
 #endif
 
 /** @brief  Low limit for the alert */
-#ifndef ADCXX1C_PARAM_LOW_LIMIT
-#define ADCXX1C_PARAM_LOW_LIMIT  (0)
+#ifndef CONFIG_ADCXX1C_PARAM_LOW_LIMIT
+#define CONFIG_ADCXX1C_PARAM_LOW_LIMIT          (0)
 #endif
 
 /** @brief  High limit for the alert */
@@ -85,7 +85,7 @@ extern "C" {
                                   .bits       = ADCXX1C_PARAM_BITS,       \
                                   .cycle      = ADCXX1C_PARAM_CYCLE,      \
                                   .alert_pin  = ADCXX1C_PARAM_ALERT_PIN,  \
-                                  .low_limit  = ADCXX1C_PARAM_LOW_LIMIT,  \
+                                  .low_limit  = CONFIG_ADCXX1C_PARAM_LOW_LIMIT,  \
                                   .high_limit = ADCXX1C_PARAM_HIGH_LIMIT, \
                                   .hysteresis = ADCXX1C_PARAM_HYSTERESIS }
 #endif
