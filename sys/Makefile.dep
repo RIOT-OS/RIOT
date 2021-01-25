@@ -723,6 +723,7 @@ endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_saul
+  DEFAULT_MODULE += saul_init_devs
   USEMODULE += saul
   USEMODULE += saul_reg
 endif
