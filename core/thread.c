@@ -67,6 +67,22 @@ void thread_zombify(void)
     UNREACHABLE();
 }
 
+#if defined(MODULE_THREAD_CRASH)
+bool thread_has_crashed(thread_t *active_thread)
+{
+    if (active_thread->config & THREAD_CONFIG_KILL_ON_CRASH) {
+        irq_disable();
+        sched_set_status(active_thread, STATUS_CRASHED);
+        /* We're in a fault handler, so this will trigger after the fault
+         * handler returned */
+        thread_yield_higher();
+        irq_enable();
+        return true;
+    }
+    return false;
+}
+#endif /* MODULE_THREAD_CRASH */
+
 int thread_kill_zombie(kernel_pid_t pid)
 {
     DEBUG("thread_kill: Trying to kill PID %" PRIkernel_pid "...\n", pid);
@@ -224,6 +240,10 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
      * sure alignment is correct above.) */
     thread_t *thread = (thread_t *)(uintptr_t)(stack + stacksize);
 
+#if defined(MODULE_THREAD_CRASH)
+    thread->config = flags & THREAD_CONFIG_KILL_ON_CRASH;
+#endif
+
 #ifdef PICOLIBC_TLS
     stacksize -= _tls_size();
 
@@ -322,6 +342,7 @@ kernel_pid_t thread_create(char *stack, int stacksize, uint8_t priority,
 static const char *state_names[STATUS_NUMOF] = {
     [STATUS_STOPPED] = "stopped",
     [STATUS_ZOMBIE] = "zombie",
+    [STATUS_CRASHED] = "crashed",
     [STATUS_SLEEPING] = "sleeping",
     [STATUS_MUTEX_BLOCKED] = "bl mutex",
     [STATUS_RECEIVE_BLOCKED] = "bl rx",

@@ -148,6 +148,7 @@ typedef struct _thread thread_t;
  */
 typedef enum {
     STATUS_STOPPED,                 /**< has terminated                           */
+    STATUS_CRASHED,                 /**< thread has crashed with a fault          */
     STATUS_ZOMBIE,                  /**< has terminated & keeps thread's thread_t */
     STATUS_SLEEPING,                /**< sleeping                                 */
     STATUS_MUTEX_BLOCKED,           /**< waiting for a locked mutex               */
