@@ -352,7 +352,7 @@ static void test_sock_ip_recv__aux(void)
     static const inject_aux_t inject_aux = { .timestamp = 42 };
     sock_ip_ep_t result;
     sock_ip_aux_rx_t aux = {
-        .flags = SOCK_AUX_GET_LOCAL | SOCK_AUX_GET_TIMESTAMP
+        .flags = SOCK_AUX_GET_LOCAL | SOCK_AUX_GET_TIMESTAMP | SOCK_AUX_GET_RSSI
     };
 
     expect(0 == sock_ip_create(&_sock, &local, NULL, _TEST_PROTO,
@@ -376,6 +376,12 @@ static void test_sock_ip_recv__aux(void)
     expect(aux.timestamp == inject_aux.timestamp);
 #else
     expect(aux.flags & SOCK_AUX_GET_TIMESTAMP);
+#endif
+#if IS_USED(MODULE_SOCK_AUX_RSSI)
+    expect(!(aux.flags & SOCK_AUX_GET_RSSI));
+    expect(aux.rssi == inject_aux.rssi);
+#else
+    expect(aux.flags & SOCK_AUX_GET_RSSI);
 #endif
     expect(_check_net());
 }

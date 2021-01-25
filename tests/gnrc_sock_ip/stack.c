@@ -72,6 +72,7 @@ static gnrc_pktsnip_t *_build_ipv6_packet(const ipv6_addr_t *src,
     netif_hdr->if_pid = (kernel_pid_t)netif;
     if (aux) {
         gnrc_netif_hdr_set_timestamp(netif_hdr, aux->timestamp);
+        netif_hdr->rssi = aux->rssi;
     }
     return gnrc_pkt_append(payload, netif_hdr_snip);
 }

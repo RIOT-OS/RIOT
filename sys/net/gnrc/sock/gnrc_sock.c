@@ -174,6 +174,12 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
             }
         }
 #endif /* MODULE_SOCK_AUX_TIMESTAMP */
+#if IS_USED(MODULE_SOCK_AUX_RSSI)
+        if ((aux->rssi) && (netif_hdr->rssi != GNRC_NETIF_HDR_NO_RSSI)) {
+            aux->flags |= GNRC_SOCK_RECV_AUX_FLAG_RSSI;
+            *aux->rssi = netif_hdr->rssi;
+        }
+#endif /* MODULE_SOCK_AUX_RSSI */
     }
     *pkt_out = pkt; /* set out parameter */
 
