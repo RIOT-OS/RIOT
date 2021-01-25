@@ -47,6 +47,27 @@
 #endif
 
 /**
+ * @brief   CPU core supports full Thumb instruction set
+ */
+#if defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS) || \
+    defined(CPU_CORE_CORTEX_M23)
+#define CPU_CORE_CORTEXM_FULL_THUMB 0
+#else
+#define CPU_CORE_CORTEXM_FULL_THUMB 1
+#endif
+
+/**
+ * @brief   CPU core supports the full set of fault handlers
+ */
+#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
+    defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
+    defined(CPU_CORE_CORTEX_M7)
+#define VECTORS_CORTEXM_EXTENDED_FAULT_HANDLERS 1
+#else
+#define VECTORS_CORTEXM_EXTENDED_FAULT_HANDLERS 0
+#endif
+
+/**
  * @brief   Memory markers, defined in the linker script
  * @{
  */
@@ -259,9 +280,8 @@ __attribute__((naked)) void hard_fault_default(void)
         "bx      lr                         \n" /* exit the exception handler    */
         " regular_handler:                  \n"
 #endif
-#if defined(CPU_CORE_CORTEX_M0) || defined(CPU_CORE_CORTEX_M0PLUS) \
-    || defined(CPU_CORE_CORTEX_M23)
         "push {r4-r7}                       \n" /* save r4..r7 to the stack   */
+#if CPU_CORE_CORTEXM_FULL_THUMB
         "mov r3, r8                         \n" /*                            */
         "mov r4, r9                         \n" /*                            */
         "mov r5, r10                        \n" /*                            */
@@ -505,9 +525,7 @@ ISR_VECTOR(0) const cortexm_base_t cortex_vector_base = {
         #endif  /* CORTEXM_VECTOR_RESERVED_0X28 */
 
         /* additional vectors used by M3, M33, M4(F), and M7 */
-#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
-    defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
-    defined(CPU_CORE_CORTEX_M7)
+#if VECTORS_CORTEXM_EXTENDED_FAULT_HANDLERS
         /* [-12] memory manage exception */
         [ 3] = mem_manage_default,
         /* [-11] bus fault exception */
