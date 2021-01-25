@@ -280,18 +280,29 @@ __attribute__((naked)) void hard_fault_default(void)
         "bx      lr                         \n" /* exit the exception handler    */
         " regular_handler:                  \n"
 #endif
-        "push {r4-r7}                       \n" /* save r4..r7 to the stack   */
 #if CPU_CORE_CORTEXM_FULL_THUMB
+        "push {r4-r11,lr}                   \n" /* save r4..r11+lr to the stack */
+#else
+        "push {r4-r7,lr}                    \n" /* save r4..r7+lr to the stack */
         "mov r3, r8                         \n" /*                            */
         "mov r4, r9                         \n" /*                            */
         "mov r5, r10                        \n" /*                            */
         "mov r6, r11                        \n" /*                            */
         "push {r3-r6}                       \n" /* save r8..r11 to the stack  */
-#else
-        "push {r4-r11}                      \n" /* save r4..r11 to the stack  */
 #endif
         "mov r3, sp                         \n" /* r4_to_r11_stack parameter  */
         "bl hard_fault_handler              \n" /* hard_fault_handler(r0)     */
+#if CPU_CORE_CORTEXM_FULL_THUMB
+        "pop  {r4-r11,pc}                   \n" /* pop r4..r11 back from the stack
+                                                 * and return from the handler */
+#else
+        "pop  {r3-r6}                       \n" /* pop r8..r11 from the stack */
+        "mov  r11, r6                       \n" /* and move them to their registers */
+        "mov  r10, r5                       \n" /*                                  */
+        "mov  r9, r4                        \n" /*                                  */
+        "mov  r8, r3                        \n" /*                                  */
+        "pop  {r4-r7,pc}                    \n" /* Pop r4..r7 and return            */
+#endif
           :
           : [sram]   "r" ((uintptr_t)&_sram + HARDFAULT_HANDLER_REQUIRED_STACK_SPACE),
             [eram]   "r" (&_eram),
