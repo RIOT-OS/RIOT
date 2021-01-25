@@ -11,7 +11,11 @@ endif
 
 # Select the specific implementation for `periph_adc`
 ifneq (,$(filter periph_adc,$(USEMODULE)))
-  SRC += adc_$(CPU_FAM).c
+  ifneq (,$(filter $(CPU_FAM),f4 f7))
+    SRC += adc_f4_f7.c
+  else
+    SRC += adc_$(CPU_FAM).c
+  endif
 endif
 
 # Select the correct implementation for `periph_gpio`

@@ -15,6 +15,7 @@ config BOARD_NUCLEO_F767ZI
     select CPU_MODEL_STM32F767ZI
 
     # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_ADC
     select HAS_PERIPH_DMA
     select HAS_PERIPH_I2C
     select HAS_PERIPH_RTC
