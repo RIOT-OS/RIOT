@@ -206,11 +206,6 @@ void reset_handler_default(void)
     kernel_init();
 }
 
-void nmi_default(void)
-{
-    core_panic(PANIC_NMI_HANDLER, "NMI HANDLER");
-}
-
 #ifdef DEVELHELP
 
 /* The hard fault handler requires some stack space as a working area for local
@@ -337,6 +332,14 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
     uint32_t afsr  = SCB->AFSR;
 #endif
 
+    if (IS_ACTIVE(MODULE_FAULT_EXCEPTION_RECOVERY) && (exc_return & 0x08)) {
+        thread_t *active_thread = thread_get_active();
+        if ( IS_ACTIVE(MODULE_THREAD_CRASH) &&
+                thread_has_crashed(active_thread)) {
+            return;
+        }
+    }
+
     /* Initialize these variables even if they're never used uninitialized.
      * Fixes wrong compiler warning by gcc < 6.0. */
     uint32_t pc = 0;
@@ -459,48 +462,68 @@ __attribute__((used)) void hard_fault_handler(uint32_t* sp, uint32_t corrupted, 
     core_panic(PANIC_HARD_FAULT, "HARD FAULT HANDLER");
 }
 
-#else
-
-void hard_fault_default(void)
-{
-    core_panic(PANIC_HARD_FAULT, "HARD FAULT HANDLER");
-}
-
 #endif /* DEVELHELP */
 
-#if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
-    defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
-    defined(CPU_CORE_CORTEX_M7)
-void mem_manage_default(void)
+void __attribute__((naked)) fault_handler_default(void)
 {
-    core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER");
+    __asm__ volatile (
+            ".syntax unified                    \n"
+            "mov r0, lr                 \n" /* Move link register to first argument */
+            "push {lr}                  \n" /* Push link register to the stack */
+            "bl generic_fault_handler   \n" /* Call the generic fault handler */
+            "pop {pc}                   \n" /* Pop the link register to return from the handler */
+            :
+            :
+            :
+    );
 }
 
-void bus_fault_default(void)
+void __attribute__((used)) generic_fault_handler(uint32_t exc_return)
 {
-    core_panic(PANIC_BUS_FAULT, "BUS FAULT HANDLER");
-}
-
-void usage_fault_default(void)
-{
-    core_panic(PANIC_USAGE_FAULT, "USAGE FAULT HANDLER");
-}
-
-void debug_mon_default(void)
-{
-    core_panic(PANIC_DEBUG_MON, "DEBUG MON HANDLER");
-}
+    /* check if the fault was triggered by thread code.
+     * This checks if the return value of the handler returns to thread or
+     * handler mode */
+    if (IS_ACTIVE(MODULE_FAULT_EXCEPTION_RECOVERY) && (exc_return & 0x08)) {
+        thread_t *active_thread = thread_get_active();
+        if (IS_ACTIVE(MODULE_THREAD_CRASH) &&
+                thread_has_crashed(active_thread)) {
+            return;
+        }
+    }
+    unsigned fault_reason = __get_IPSR() & 0x1F;
+    switch (fault_reason) {
+         case 1:
+             core_panic(PANIC_NMI_HANDLER, "NMI HANDLER");
+             break;
+#if VECTORS_CORTEXM_EXTENDED_FAULT_HANDLERS
+         case 3:
+             core_panic(PANIC_MEM_MANAGE, "MEM MANAGE HANDLER");
+             break;
+         case 4:
+             core_panic(PANIC_BUS_FAULT, "BUS FAULT HANDLER");
+             break;
+         case 5:
+             core_panic(PANIC_USAGE_FAULT, "USAGE FAULT HANDLER");
+             break;
+         case 11:
+             core_panic(PANIC_DEBUG_MON, "DEBUG MON HANDLER");
+             break;
 #endif
+         default:
+             core_panic(PANIC_DUMMY_HANDLER, "DUMMY HANDLER");
+    }
+}
 
 void dummy_handler_default(void)
 {
     core_panic(PANIC_DUMMY_HANDLER, "DUMMY HANDLER");
 }
 
+
 /* Cortex-M common interrupt vectors */
-__attribute__((weak,alias("dummy_handler_default"))) void isr_svc(void);
-__attribute__((weak,alias("dummy_handler_default"))) void isr_pendsv(void);
-__attribute__((weak,alias("dummy_handler_default"))) void isr_systick(void);
+__attribute__((weak,alias("fault_handler_default"))) void isr_svc(void);
+__attribute__((weak,alias("fault_handler_default"))) void isr_pendsv(void);
+__attribute__((weak,alias("fault_handler_default"))) void isr_systick(void);
 
 /* define Cortex-M base interrupt vectors
  * IRQ entries -9 to -6 inclusive (offsets 0x1c to 0x2c of cortexm_base_t)
@@ -511,9 +534,13 @@ ISR_VECTOR(0) const cortexm_base_t cortex_vector_base = {
         /* entry point of the program */
         [ 0] = reset_handler_default,
         /* [-14] non maskable interrupt handler */
-        [ 1] = nmi_default,
+        [ 1] = fault_handler_default,
         /* [-13] hard fault exception */
+#ifdef DEVELHELP
         [ 2] = hard_fault_default,
+#else
+        [ 2] = fault_handler_default,
+#endif /* DEVELHELP */
         /* [-5] SW interrupt, in RIOT used for triggering context switches */
         [10] = isr_svc,
         /* [-2] pendSV interrupt, in RIOT use to do the actual context switch */
@@ -538,13 +565,13 @@ ISR_VECTOR(0) const cortexm_base_t cortex_vector_base = {
         /* additional vectors used by M3, M33, M4(F), and M7 */
 #if VECTORS_CORTEXM_EXTENDED_FAULT_HANDLERS
         /* [-12] memory manage exception */
-        [ 3] = mem_manage_default,
+        [ 3] = fault_handler_default,
         /* [-11] bus fault exception */
-        [ 4] = bus_fault_default,
+        [ 4] = fault_handler_default,
         /* [-10] usage fault exception */
-        [ 5] = usage_fault_default,
+        [ 5] = fault_handler_default,
         /* [-4] debug monitor exception */
-        [11] = debug_mon_default,
+        [11] = fault_handler_default,
 #endif
     }
 };
