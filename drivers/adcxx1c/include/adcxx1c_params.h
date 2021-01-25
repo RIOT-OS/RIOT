@@ -42,7 +42,7 @@ extern "C" {
 
 /** @brief  I2C address */
 #ifndef ADCXX1C_PARAM_ADDR
-#define ADCXX1C_PARAM_ADDR       (ADCXX1C_I2C_ADDRESS)
+#define ADCXX1C_PARAM_ADDR       (CONFIG_ADCXX1C_I2C_ADDRESS)
 #endif
 
 /** @brief  Resolution in bits */

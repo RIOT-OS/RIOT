@@ -36,8 +36,8 @@ extern "C" {
 /**
  * @brief  ADCxx1C default address (ADCxx1C021 address)
  */
-#ifndef ADCXX1C_I2C_ADDRESS
-#define ADCXX1C_I2C_ADDRESS  (0x54)
+#ifndef CONFIG_ADCXX1C_I2C_ADDRESS
+#define CONFIG_ADCXX1C_I2C_ADDRESS          (0x54)
 #endif
 
 /**
