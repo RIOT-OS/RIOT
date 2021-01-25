@@ -26,6 +26,7 @@ PSEUDOMODULES += ecc_%
 PSEUDOMODULES += event_%
 PSEUDOMODULES += evtimer_mbox
 PSEUDOMODULES += evtimer_on_ztimer
+PSEUDOMODULES += fault_exception_recovery
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gnrc_dhcpv6_%
 PSEUDOMODULES += gnrc_dhcpv6_client_mud_url

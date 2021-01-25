@@ -62,6 +62,12 @@ config HAS_ETHERNET
     help
         Indicates that Ethernet connectivity is present.
 
+config HAS_FAULT_EXCEPTION_RECOVERY
+    bool
+    help
+        Indicates that the platform can recover from hard faults and other
+        exceptions.
+
 config HAS_HIGHLEVEL_STDIO
     bool
     help
