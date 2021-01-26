@@ -11,6 +11,7 @@ config CPU_COMMON_SAML21
     select CPU_CORE_CORTEX_M0PLUS
     select HAS_BACKUP_RAM
     select HAS_CPU_SAML21
+    select HAS_PERIPH_DMA
     select HAS_PERIPH_GPIO_FAST_READ
 
 config CPU_FAM_SAML21

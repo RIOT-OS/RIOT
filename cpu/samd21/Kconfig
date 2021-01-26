@@ -15,14 +15,21 @@ config CPU_COMMON_SAMD21
 config CPU_FAM_SAMD10
     bool
     select CPU_COMMON_SAMD21
+    select HAS_PERIPH_DMA
+
+config CPU_FAM_SAMD20
+    bool
+    select CPU_COMMON_SAMD21
 
 config CPU_FAM_SAMD21
     bool
     select CPU_COMMON_SAMD21
+    select HAS_PERIPH_DMA
 
 config CPU_FAM_SAMR21
     bool
     select CPU_COMMON_SAMD21
+    select HAS_PERIPH_DMA
 
 ## Definition of specific features
 config HAS_CPU_SAMD21
@@ -33,6 +40,7 @@ config HAS_CPU_SAMD21
 ## Common CPU symbols
 config CPU_FAM
     default "samd10" if CPU_FAM_SAMD10
+    default "samd20" if CPU_FAM_SAMD20
     default "samd21" if CPU_FAM_SAMD21
     default "samr21" if CPU_FAM_SAMR21
 
@@ -40,6 +48,7 @@ config CPU
     default "samd21" if CPU_COMMON_SAMD21
 
 source "$(RIOTCPU)/samd21/Kconfig.samd10"
+source "$(RIOTCPU)/samd21/Kconfig.samd20"
 source "$(RIOTCPU)/samd21/Kconfig.samd21"
 source "$(RIOTCPU)/samd21/Kconfig.samr21"
 

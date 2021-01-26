@@ -8,7 +8,6 @@
 config CPU_COMMON_SAM0
     bool
     select HAS_PERIPH_CPUID
-    select HAS_PERIPH_DMA
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
     select HAS_PERIPH_FLASHPAGE_RWEE
