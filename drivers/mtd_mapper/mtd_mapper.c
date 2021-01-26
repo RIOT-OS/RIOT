@@ -112,9 +112,9 @@ static int _write_page(mtd_dev_t *mtd, const void *src, uint32_t page,
     mtd_mapper_region_t *region = container_of(mtd, mtd_mapper_region_t, mtd);
 
     _lock(region);
-    int res = mtd_write_page(region->parent->mtd, src,
-                             page + _page_offset(region),
-                             offset, count);
+    int res = mtd_write_page_raw(region->parent->mtd, src,
+                                 page + _page_offset(region),
+                                 offset, count);
     _unlock(region);
     return res;
 }

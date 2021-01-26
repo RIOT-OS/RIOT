@@ -187,7 +187,7 @@ static int cmd_write_page(int argc, char **argv)
     offset = atoi(argv[3]);
     len    = strlen(argv[4]);
 
-    int res = mtd_write_page(dev, argv[4], page, offset, len);
+    int res = mtd_write_page_raw(dev, argv[4], page, offset, len);
 
     if (res) {
         printf("error: %i\n", res);
@@ -376,8 +376,8 @@ static int cmd_test(int argc, char **argv)
 
     /* write dummy data to sectors */
     memset(buffer, 0x23, dev->page_size);
-    assert(mtd_write_page(dev, buffer, page_0, 0, page_size) == 0);
-    assert(mtd_write_page(dev, buffer, page_1, 0, page_size) == 0);
+    assert(mtd_write_page_raw(dev, buffer, page_0, 0, page_size) == 0);
+    assert(mtd_write_page_raw(dev, buffer, page_1, 0, page_size) == 0);
 
     /* erase two sectors and check if they have been erase */
     assert(mtd_erase_sector(dev, sector, 2) == 0);
@@ -389,20 +389,20 @@ static int cmd_test(int argc, char **argv)
     /* write test data & read it back */
     const char test_str[] = "0123456789";
     uint32_t offset = 5;
-    assert(mtd_write_page(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
+    assert(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
     assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
 
     /* write across page boundary */
     offset = page_size - sizeof(test_str) / 2;
-    assert(mtd_write_page(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
+    assert(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
     assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
 
     /* write across sector boundary */
     offset = page_size - sizeof(test_str) / 2
            + (dev->pages_per_sector - 1) * page_size;
-    assert(mtd_write_page(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
+    assert(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
     assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
 

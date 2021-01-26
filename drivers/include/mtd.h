@@ -285,8 +285,9 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
  * The MTD layer will take care of splitting up the transaction into multiple
  * writes if it is required by the underlying storage media.
  *
- * @p offset must be smaller than the page size
+ * This performs a raw write, no automatic read-modify-write cycle is performed.
  *
+ * @p offset must be smaller than the page size
  *
  * @param      mtd      the device to write to
  * @param[in]  src      the buffer to write
@@ -302,7 +303,8 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count);
  * @return -EIO if I/O error occurred
  * @return -EINVAL if parameters are invalid
  */
-int mtd_write_page(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t offset, uint32_t size);
+int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page,
+                       uint32_t offset, uint32_t size);
 
 /**
  * @brief   Erase sectors of a MTD device
