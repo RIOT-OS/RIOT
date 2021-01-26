@@ -115,10 +115,6 @@ void cpu_init(void)
 
     /* Initialize stdio */
     stdio_init();
-#ifndef _PICOLIBC__
-    /* Initialize newlib-nano library stubs */
-    nanostubs_init();
-#endif /* PICOLIBC */
 
     /* Initialize static peripheral */
     periph_init();
