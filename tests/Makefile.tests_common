@@ -1,6 +1,6 @@
 APPLICATION ?= tests_$(notdir $(patsubst %/,%,$(CURDIR)))
 
-ifneq (,$(wildcard $(CURDIR)/tests/.))
+ifneq (,$(wildcard $(CURDIR)/tests*/.))
   DEFAULT_MODULE += test_utils_interactive_sync
   # add interactive test configuration when testing Kconfig
   ifeq (1,$(TEST_KCONFIG))

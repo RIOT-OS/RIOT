@@ -11,17 +11,13 @@ from testrunner import run
 
 
 def testfunc(child):
-    child.expect('Initialize BME680 sensor 0 ... ')
-    i = child.expect(['[OK]', '[failed]'])
-    if i == 1:
-        print('FAILED')
-        return
-    child.expect(r'\[bme680\]: dev=0, '
-                 r'T = \d+.\d+ degC, '
-                 r'P = \d+ Pa, '
-                 r'H = \d+.\d+ \%, '
-                 r'G = \d+ ohms\r\n')
+    child.expect_exact('Initializing APDS99XX sensor')
+    child.expect_exact('[OK]')
+    child.expect(r'ambient = \d+ \[cnts\]')
+    child.expect([r'red = \d+ \[cnts\], green = \d+ \[cnts\], blue = \d+ \[cnts\]',
+                  r'illuminance = %d [lux]'])
     print('SUCCESS')
+    return
 
 
 if __name__ == "__main__":

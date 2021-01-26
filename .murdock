@@ -27,6 +27,8 @@ tests/driver_v*"}
 : ${TEST_KCONFIG_native:="examples/hello-world tests/periph_*
 tests/xtimer_* tests/ztimer_* tests/driver_ws281x"}
 
+: ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/driver_at86rf2xx_aes"}
+
 export RIOT_CI_BUILD=1
 export CC_NOCOLOR=1
 export STATIC_TESTS=0
@@ -382,7 +384,11 @@ run_test() {
     BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only termdeps -j2
 
     # now run the actual test
-    BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir test
+    if is_in_list "${appdir}" "${TEST_WITH_CONFIG_SUPPORTED}"; then
+        BOARD=${board} TOOLCHAIN=${toolchain} make -C${appdir} test-with-config
+    else
+        BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir test
+    fi
     RES=$?
 
     if [ $RES -eq 0 -a -n "$TEST_HASH" ]; then

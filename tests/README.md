@@ -117,3 +117,22 @@ The expected behavior is verified with the test in `tests/test_tools`.
 Tests cannot rely on having on all boards and terminal programs:
 * unbuffered input
 * allowing sending special characters like `ctrl+c/ctrl+d`
+
+
+Running tests that require a preliminary manual configuration
+-------------------------------------------------------------
+
+Some tests need active monitoring or manual setup steps but still have some
+automated scripts. The test automation scripts are defined in the
+`<test_application>/tests-with-config/` folder.
+For running them, follow the setup or analysis documentation and use the
+`test-with-config` target.
+
+Running tests that require root privileges
+------------------------------------------
+
+Some tests require root privileges to launch their automated script. In this
+case, the test automation scripts are defined in the
+`<test_application>/tests-as-root/` folder.
+For running them, follow the setup or analysis documentation and use the
+`test-as-root` target.
