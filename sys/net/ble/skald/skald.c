@@ -40,7 +40,7 @@
 #include "debug.h"
 
 #define JITTER_MIN              (0U)            /* 0ms */
-#define JITTER_MAX              (10000U)        /* 10ms */
+#define JITTER_MAX              (10U)           /* 10ms */
 
 #define ADV_CHAN_NUMOF          sizeof(_adv_chan)
 #define ADV_AA                  (0x8e89bed6)    /* access address */
@@ -63,18 +63,18 @@ static void _stop_radio(void)
 
 static void _sched_next(skald_ctx_t *ctx)
 {
-    ctx->last += CONFIG_SKALD_INTERVAL;
+    ctx->last += CONFIG_SKALD_INTERVAL_MS;
     /* schedule next advertising event, adding a random jitter between
      * 0ms and 10ms (see spec v5.0-vol6-b-4.4.2.2.1) */
     ctx->last += random_uint32_range(JITTER_MIN, JITTER_MAX);
     /* compensate the time passed since the timer triggered last by using the
      * current value of the timer */
-    xtimer_set(&ctx->timer, (ctx->last - xtimer_now_usec()));
+    ztimer_set(ZTIMER_MSEC, &ctx->timer, (ctx->last - ztimer_now(ZTIMER_MSEC)));
 }
 
 static void _on_adv_evt(void *arg)
 {
-    skald_ctx_t *ctx = (skald_ctx_t *)arg;
+    skald_ctx_t *ctx = arg;
 
     /* advertise on the next adv channel - or skip this event if the radio is
      * busy */
@@ -98,7 +98,7 @@ static void _on_radio_evt(netdev_t *netdev, netdev_event_t event)
     if (event == NETDEV_EVENT_TX_COMPLETE) {
         skald_ctx_t *ctx = _radio->context;
         _stop_radio();
-        xtimer_set(&ctx->timer, 150);
+        _on_adv_evt(ctx);
     }
 }
 
@@ -124,7 +124,7 @@ void skald_adv_start(skald_ctx_t *ctx)
     /* initialize advertising context */
     ctx->timer.callback = _on_adv_evt;
     ctx->timer.arg = ctx;
-    ctx->last = xtimer_now_usec();
+    ctx->last = ztimer_now(ZTIMER_MSEC);
     ctx->cur_chan = 0;
     ctx->pkt.flags = (BLE_ADV_NONCON_IND | BLE_LL_FLAG_TXADD);
 
@@ -136,7 +136,7 @@ void skald_adv_stop(skald_ctx_t *ctx)
 {
     assert(ctx);
 
-    xtimer_remove(&ctx->timer);
+    ztimer_remove(ZTIMER_MSEC, &ctx->timer);
     if (_radio->context == (void *)ctx) {
         _stop_radio();
     }

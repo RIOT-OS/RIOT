@@ -12,12 +12,12 @@ menuconfig KCONFIG_USEMODULE_SKALD
 
 if KCONFIG_USEMODULE_SKALD
 
-config SKALD_INTERVAL
+config SKALD_INTERVAL_MS
     int "Advertising interval in microseconds"
-    default 1000000
+    default 1000
     help
-        Configure advertising interval in microseconds. Default value is 1
-        second which is 1000000 microseconds.
+        Configure advertising interval in milliseconds. Default value is 1
+        second which is 1000 milliseconds.
 
 config ADV_CH_37_DISABLE
     bool "Disable advertising on channel 37"
