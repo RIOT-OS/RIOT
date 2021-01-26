@@ -1,367 +1,367 @@
-#! /usr/bin/env python3
-# -*- coding: utf-8 -*-
-# vim:fenc=utf-8
-#
-# Copyright © 2016 Martine Lenders <mail@martine-lenders.eu>
-#
-# Distributed under terms of the MIT license.
+#!/usr/bin/env python3
 
-from __future__ import print_function
+# Copyright (C) 2016 Martine Lenders <mail@martine-lenders.eu>
+# Copyright (C) 2020 Freie Universität Berlin
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+import itertools
+import logging
 import os
-import sys
 import random
-import subprocess
-import time
-import types
-import pexpect
+import re
 import socket
+import sys
+import time
+
+from riotctrl.ctrl import RIOTCtrl
+from riotctrl.shell import ShellInteraction, ShellInteractionParser
+
+from riotctrl_shell.sys import Reboot
 
 DEFAULT_TIMEOUT = 5
 
 MAKE = os.environ.get('MAKE', 'make')
 
 
-class Strategy(object):
-    def __init__(self, func=None):
-        if func is not None:
-            if sys.version_info < (3,):
-                self.__class__.execute = types.MethodType(func, self, self.__class__)
-            else:
-                self.__class__.execute = types.MethodType(func, self)
+def _inc_port(port1):
+    """
+    Increments the number in port1 by 1
 
-    def execute(self, *args, **kwargs):
-        raise NotImplementedError()
-
-
-class ApplicationStrategy(Strategy):
-    def __init__(self, app_dir=os.getcwd(), func=None):
-        super(ApplicationStrategy, self).__init__(func)
-        self.app_dir = app_dir
-
-
-class BoardStrategy(Strategy):
-    def __init__(self, board, func=None):
-        super(BoardStrategy, self).__init__(func)
-        self.board = board
-
-    def __run_make(self, application, make_targets, env=None):
-        env = os.environ.copy()
-        if env is not None:
-            env.update(env)
-        env.update(self.board.to_env())
-        cmd = (MAKE, "-C", application) + make_targets
-        print(' '.join(cmd))
-        print(subprocess.check_output(cmd, env=env))
-
-    def execute(self, application):
-        super(BoardStrategy, self).execute(application)
+    >>> _inc_port("/dev/ttyACM0")
+    '/dev/ttyACM1'
+    >>> _inc_port("tap0")
+    'tap1'
+    """
+    m = re.search(r"\D(\d+)$", port1)
+    if m is None:
+        raise ValueError("Unable auto-generate second device port. "
+                         "Please set PORT2 environment variable.")
+    port1_num = int(m.group(1))
+    port2_num = port1_num + 1
+    return re.sub(r"{}$".format(port1_num), str(port2_num), port1)
 
 
-class CleanStrategy(BoardStrategy):
-    def execute(self, application, env=None):
-        super(CleanStrategy, self).__run_make(application, ("-B", "clean"), env)
+def get_riot_ctrls():
+    board = os.environ["BOARD"]
+    port1 = os.environ["PORT"]
+    port2 = os.environ.get("PORT2", _inc_port(port1))
+    ctrl1 = RIOTCtrl(env={"BOARD": board, "PORT": port1})
+    ctrl2 = RIOTCtrl(env={"BOARD": board, "PORT": port2})
+    return ctrl1, ctrl2
 
 
-class BuildStrategy(BoardStrategy):
-    def execute(self, application, env=None):
-        super(BuildStrategy, self).__run_make(application, ("all",), env)
+def iter_groupby_n(n, iterable):
+     args = [iter(iterable)] * n
+     return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
 
 
-class FlashStrategy(BoardStrategy):
-    def execute(self, application, env=None):
-        super(FlashStrategy, self).__run_make(application, ("all",), env)
+class Shell(Reboot):
+    @staticmethod
+    def get_shells(ctrls):
+        return [Shell(ctrl) for ctrl in ctrls]
 
+    @ShellInteraction.check_term
+    def ifconfig(self, timeout=-1, async_=False):
+        return self.cmd("ifconfig", timeout, async_)
 
-class ResetStrategy(BoardStrategy):
-    def execute(self, application, env=None):
-        super(ResetStrategy, self).__run_make(application, ("reset",), env)
+    @ShellInteraction.check_term
+    def _server_start(self, prot, param, timeout=-1, async_=False):
+        res = self.cmd("{} server start {}".format(prot, param),
+                       timeout, async_)
+        if "Success:" not in res:
+            raise RuntimeError(res)
+        return res
 
+    @ShellInteraction.check_term
+    def _server_stop(self, prot, timeout=-1, async_=False):
+        res = self.cmd("{} server stop".format(prot),
+                       timeout, async_)
+        if "Success:" not in res:
+            raise RuntimeError(res)
+        return res
 
-class Board(object):
-    def __init__(self, name, port=None, serial=None, clean=None,
-                 build=None, flash=None,
-                 reset=None, term=None):
-        def _reset_native_execute(obj, application, env=None, *args, **kwargs):
-            pass
+    @ShellInteraction.check_term
+    def _send(self, prot, dst, data, num=None, delay=None,
+              timeout=-1, async_=False):
+        cmd = "{prot} send {dst} {data}".format(prot=prot, dst=dst,
+                                                data=data.hex())
+        if num is not None:
+            cmd += " {}".format(num)
+        if delay is not None:
+            cmd += " {}".format(int(delay) * 1000000)
+        res = self.cmd(cmd, timeout, async_)
+        if "Success:" not in res:
+            raise RuntimeError(res)
+        return res
 
-        if (name == "native") and (reset is None):
-            reset = _reset_native_execute
-
-        self.name = name
-        self.port = port
-        self.serial = serial
-        self.clean_strategy = CleanStrategy(self, clean)
-        self.build_strategy = BuildStrategy(self, build)
-        self.flash_strategy = FlashStrategy(self, flash)
-        self.reset_strategy = ResetStrategy(self, reset)
-
-    def __len__(self):
-        return 1
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        raise StopIteration()
-
-    def __repr__(self):
-        return ("<Board %s,port=%s,serial=%s>" %
-                (repr(self.name), repr(self.port), repr(self.serial)))
-
-    def to_env(self):
-        env = {}
-        if self.name:
-            env['BOARD'] = self.name
-        if self.port:
-            env['PORT'] = self.port
-        if self.serial:
-            env['SERIAL'] = self.serial
-        return env
-
-    def clean(self, application=os.getcwd(), env=None):
-        self.build_strategy.execute(application, env)
-
-    def build(self, application=os.getcwd(), env=None):
-        self.build_strategy.execute(application, env)
-
-    def flash(self, application=os.getcwd(), env=None):
-        self.flash_strategy.execute(application, env)
-
-    def reset(self, application=os.getcwd(), env=None):
-        self.reset_strategy.execute(application, env)
-
-
-class BoardGroup(object):
-    def __init__(self, boards):
-        self.boards = boards
-
-    def __len__(self):
-        return len(self.boards)
-
-    def __iter__(self):
-        return iter(self.boards)
-
-    def __repr__(self):
-        return str(self.boards)
-
-    def clean(self, application=os.getcwd(), env=None):
-        for board in self.boards:
-            board.clean(application, env)
-
-    def build(self, application=os.getcwd(), env=None):
-        for board in self.boards:
-            board.build(application, env)
-
-    def flash(self, application=os.getcwd(), env=None):
-        for board in self.boards:
-            board.flash(application, env)
-
-    def reset(self, application=os.getcwd(), env=None):
-        for board in self.boards:
-            board.reset(application, env)
-
-
-def default_test_case(board_group, application, env=None):
-    for board in board_group:
-        env = os.environ.copy()
-        if env is not None:
-            env.update(env)
-        env.update(board.to_env())
-        with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env,
-                            timeout=DEFAULT_TIMEOUT,
-                            logfile=sys.stdout) as spawn:
-            spawn.expect("TEST: SUCCESS")
-
-
-class TestStrategy(ApplicationStrategy):
-    def execute(self, board_groups, test_cases=[default_test_case],
-                timeout=DEFAULT_TIMEOUT, env=None):
-        for board_group in board_groups:
-            print("Testing for %s: " % board_group)
-            for test_case in test_cases:
-                board_group.reset()
-                test_case(board_group, self.app_dir, env=None)
-                sys.stdout.write('.')
-                sys.stdout.flush()
-                # wait a bit for tear down of test case
-                time.sleep(.2)
-            print()
-
-
-def get_ipv6_address(spawn):
-    spawn.sendline(u"ifconfig")
-    spawn.expect(r"[A-Za-z0-9]{2}_[0-9]+:  inet6 (fe80::[0-9a-f:]+)\s")
-    return spawn.match.group(1)
-
-
-def test_ipv6_send(board_group, application, env=None):
-    env_sender = os.environ.copy()
-    if env is not None:
-        env_sender.update(env)
-    env_sender.update(board_group.boards[0].to_env())
-    env_receiver = os.environ.copy()
-    if env is not None:
-        env_receiver.update(env)
-    env_receiver.update(board_group.boards[1].to_env())
-    with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_sender,
-                        timeout=DEFAULT_TIMEOUT) as sender, \
-        pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_receiver,
-                       timeout=DEFAULT_TIMEOUT) as receiver:
-        ipprot = random.randint(0x00, 0xff)
-        receiver_ip = get_ipv6_address(receiver)
-        receiver.sendline(u"ip server start %d" % ipprot)
-        # wait for neighbor discovery to be done
-        time.sleep(5)
-        sender.sendline(u"ip send %s %d 01:23:45:67:89:ab:cd:ef" % (receiver_ip, ipprot))
-        sender.expect_exact(u"Success: send 8 byte over IPv6 to %s (next header: %d)" %
-                            (receiver_ip, ipprot))
-        receiver.expect(u"00000000  01  23  45  67  89  AB  CD  EF")
-
-
-def test_udpv6_send(board_group, application, env=None):
-    env_sender = os.environ.copy()
-    if env is not None:
-        env_sender.update(env)
-    env_sender.update(board_group.boards[0].to_env())
-    env_receiver = os.environ.copy()
-    if env is not None:
-        env_receiver.update(env)
-    env_receiver.update(board_group.boards[1].to_env())
-    with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_sender,
-                        timeout=DEFAULT_TIMEOUT) as sender, \
-        pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_receiver,
-                       timeout=DEFAULT_TIMEOUT) as receiver:
-        port = random.randint(0x0000, 0xffff)
-        receiver_ip = get_ipv6_address(receiver)
-
-        receiver.sendline(u"udp server start %d" % port)
-        # wait for neighbor discovery to be done
-        time.sleep(5)
-        sender.sendline(u"udp send [%s]:%d ab:cd:ef" % (receiver_ip, port))
-        sender.expect_exact("Success: send 3 byte over UDP to [{}]:{}"
-                            .format(receiver_ip, port))
-        receiver.expect(u"00000000  AB  CD  EF")
-
-
-def test_tcpv6_send(board_group, application, env=None):
-    env_client = os.environ.copy()
-    if env is not None:
-        env_client.update(env)
-    env_client.update(board_group.boards[0].to_env())
-    env_server = os.environ.copy()
-    if env is not None:
-        env_server.update(env)
-    env_server.update(board_group.boards[1].to_env())
-    with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_client,
-                        timeout=DEFAULT_TIMEOUT) as client, \
-        pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_server,
-                       timeout=DEFAULT_TIMEOUT) as server:
-        port = random.randint(0x0000, 0xffff)
-        server_ip = get_ipv6_address(server)
-        client_ip = get_ipv6_address(client)
-
-        server.sendline(u"tcp server start %d" % port)
-        # wait for neighbor discovery to be done
-        time.sleep(5)
-        client.sendline(u"tcp connect [%s]:%d" % (server_ip, port))
-        server.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % client_ip)
-        client.sendline(u"tcp send affe:abe")
-        client.expect_exact(u"Success: send 4 byte over TCP to server")
-        server.expect(u"00000000  AF  FE  AB  E0")
-        client.sendline(u"tcp disconnect")
-        client.sendline(u"tcp send affe:abe")
-        client.expect_exact(u"could not send")
-
-
-def test_tcpv6_multiconnect(board_group, application, env=None):
-    if any(b.name != "native" for b in board_group.boards):
-        # run test only with native
-        print("SKIP_TEST INFO found non-native board")
-        return
-    env_client = os.environ.copy()
-    if env is not None:
-        env_client.update(env)
-    env_client.update(board_group.boards[0].to_env())
-    env_server = os.environ.copy()
-    if env is not None:
-        env_server.update(env)
-    env_server.update(board_group.boards[1].to_env())
-    with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_client,
-                        timeout=DEFAULT_TIMEOUT) as client, \
-        pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_server,
-                       timeout=DEFAULT_TIMEOUT) as server:
-        port = random.randint(0x0000, 0xffff)
-        server_ip = get_ipv6_address(server)
-        client_ip = get_ipv6_address(client)
-
+    @staticmethod
+    def _format_ipv6_addr(addr):
         try:
-            connect_addr = socket.getaddrinfo(
-                "%s%%tapbr0" % server_ip, port)[0][4]
-        except socket.gaierror as e:
-            print("SKIP_TEST INFO", e)
-            return
-        server.sendline(u"tcp server start %d" % port)
-        # wait for neighbor discovery to be done
-        time.sleep(5)
-        client.sendline(u"tcp connect [%s]:%d" % (server_ip, port))
-        server.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % client_ip)
-        with socket.socket(socket.AF_INET6) as sock:
-            sock.connect(connect_addr)
-            server.expect(u"Error on TCP accept \\[-[0-9]+\\]")
-        client.sendline(u"tcp disconnect")
-        server.expect(u"TCP connection to \\[%s\\]:[0-9]+ reset" % client_ip)
-        client.sendline(u"tcp connect [%s]:%d" % (server_ip, port))
-        server.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % client_ip)
-        client.sendline(u"tcp disconnect")
-        server.expect(u"TCP connection to \\[%s\\]:[0-9]+ reset" % client_ip)
-        with socket.socket(socket.AF_INET6) as sock:
-            sock.connect(connect_addr)
-            server.expect(u"TCP client \\[[0-9a-f:]+\\]:[0-9]+ connected")
-        server.expect(u"TCP connection to \\[[0-9a-f:]+\\]:[0-9]+ reset")
+            socket.inet_pton(socket.AF_INET6, addr)
+            return "[{}]".format(addr)
+        except socket.error:    # not an IPv6 address
+            return addr
+
+    def ip_server_start(self, proto, timeout=-1, async_=False):
+        return self._server_start("ip", proto, timeout, async_)
+
+    def ip_server_stop(self, timeout=-1, async_=False):
+        return self._server_stop("ip", timeout, async_)
+
+    def ip_send(self, dst_addr, proto, data, num=None, delay=None,
+                timeout=-1, async_=False):
+        return self._send("ip", "{} {}".format(dst_addr, proto), data,
+                          num, delay, timeout, async_)
+
+    def tcp_server_start(self, port, timeout=-1, async_=False):
+        return self._server_start("tcp", port, timeout, async_)
+
+    def tcp_server_stop(self, timeout=-1, async_=False):
+        return self._server_stop("tcp", timeout, async_)
+
+    def tcp_client_connect(self, dst_addr, dport, timeout=-1, async_=False):
+        dst_addr = self._format_ipv6_addr(dst_addr)
+        res = self.cmd("tcp connect {}:{}".format(dst_addr, dport),
+                       timeout, async_)
+        if "Error:" in res or "Client already connected" in res:
+            raise RuntimeError(res)
+        return res
+
+    def tcp_client_disconnect(self, timeout=-1, async_=False):
+        return self.cmd("tcp disconnect", timeout, async_)
+
+    def tcp_send(self, data, num=None, delay=None,
+                 timeout=-1, async_=False):
+        return self._send("tcp", "", data, num, delay, timeout, async_)
+
+    def udp_server_start(self, port, timeout=-1, async_=False):
+        return self._server_start("udp", port, timeout, async_)
+
+    def udp_server_stop(self, timeout=-1, async_=False):
+        return self._server_stop("udp", timeout, async_)
+
+    def udp_send(self, dst_addr, dport, data, num=None, delay=None,
+                 timeout=-1, async_=False):
+        dst_addr = self._format_ipv6_addr(dst_addr)
+        return self._send("udp", "{}:{}".format(dst_addr, dport), data,
+                          num, delay, timeout, async_)
+
+    @classmethod
+    def _pattern_from_ip(cls, ip=None):
+        if ip is None:
+            return r"(\[[0-9a-f:]+\]|[0-9\.]+)"
+        else:
+            return cls._format_ipv6_addr(ip) \
+                .replace(r"[", r"\[") \
+                .replace(r"]", r"\]")
+
+    def tcp_server_client_expect(self, client_ip=None):
+        self.riotctrl.term.expect(
+            r"TCP client (?P<client_addr>{}):(?P<client_port>\d+) "
+            r"connected".format(self._pattern_from_ip(client_ip))
+        )
+        res = self.riotctrl.term.match.groupdict()
+        res["client_addr"] = res["client_addr"].strip("[]")
+        res["client_port"] = int(res["client_port"])
+        return res
+
+    def tcp_server_connection_reset_expect(self, client_ip=None):
+        self.riotctrl.term.expect(
+            r"TCP connection to "
+            r"(?P<client_addr>{}):(?P<client_port>\d+) reset"
+            .format(self._pattern_from_ip(client_ip))
+        )
+        res = self.riotctrl.term.match.groupdict()
+        res["client_addr"] = res["client_addr"].strip("[]")
+        res["client_port"] = int(res["client_port"])
+        return res
+
+    def od_expect(self, data, width=16):
+        addr = 0
+        for byte_line in iter_groupby_n(width, data):
+            self.riotctrl.term.expect_exact(
+                "{:08X}  ".format(addr) +
+                "  ".join("{:02X}".format(byte) for byte in byte_line)
+            )
+            addr += width
 
 
-def test_triple_send(board_group, application, env=None):
-    env_sender = os.environ.copy()
-    if env is not None:
-        env_sender.update(env)
-    env_sender.update(board_group.boards[0].to_env())
-    env_receiver = os.environ.copy()
-    if env is not None:
-        env_receiver.update(env)
-    env_receiver.update(board_group.boards[1].to_env())
-    with pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_sender,
-                        timeout=DEFAULT_TIMEOUT) as sender, \
-        pexpect.spawnu(MAKE, ["-C", application, "term"], env=env_receiver,
-                       timeout=DEFAULT_TIMEOUT) as receiver:
-        udp_port = random.randint(0x0000, 0xffff)
-        tcp_port = random.randint(0x0000, 0xffff)
-        ipprot = random.randint(0x00, 0xff)
-        receiver_ip = get_ipv6_address(receiver)
-        sender_ip = get_ipv6_address(sender)
+class LwIPIfconfigParser(ShellInteractionParser):
+    def __init__(self):
+        self.iface_c = re.compile(r"(?P<name>.._\d\d):\s")
+        self.ipv6_c = re.compile(r"inet6\s+(?P<addr>[0-9a-f:]+)$")
+        self.ipv4_c = re.compile(r"inet\s+(?P<addr>[\d\.]+)$")
 
-        receiver.sendline(u"ip server start %d" % ipprot)
-        receiver.sendline(u"udp server start %d" % udp_port)
-        receiver.sendline(u"tcp server start %d" % tcp_port)
-        # wait for neighbor discovery to be done
-        time.sleep(5)
-        sender.sendline(u"udp send [%s]:%d 01:23" % (receiver_ip, udp_port))
-        sender.expect_exact(u"Success: send 2 byte over UDP to [%s]:%d" %
-                            (receiver_ip, udp_port))
-        receiver.expect(u"00000000  01  23")
+    def parse(self, cmd_output):
+        netifs = None
+        current = None
+        for line in cmd_output.splitlines():
+            m = self.iface_c.search(line)
+            if m is not None:
+                name = m.group("name")
+                if netifs is None:
+                    netifs = {}
+                current = netifs[name] = {}
+                line = line[m.end():]
+            if current is None:
+                continue
+            m = self.ipv6_c.search(line)
+            if m is not None:
+                if "ipv6_addrs" in current:
+                    current["ipv6_addrs"].append(m.group("addr"))
+                else:
+                    current["ipv6_addrs"] = [m.group("addr")]
+            m = self.ipv4_c.search(line)
+            if m is not None:
+                current["ipv4_addr"] = m.group("addr")
+        return netifs
 
-        sender.sendline(u"ip send %s %d 01:02:03:04" % (receiver_ip, ipprot))
-        sender.expect_exact(u"Success: send 4 byte over IPv6 to %s (next header: %d)" %
-                            (receiver_ip, ipprot))
-        receiver.expect(u"00000000  01  02  03  04")
-        sender.sendline(u"tcp connect [%s]:%d" % (receiver_ip, tcp_port))
-        receiver.expect(u"TCP client \\[%s\\]:[0-9]+ connected" % sender_ip)
-        sender.sendline(u"tcp send dead:beef")
-        sender.expect_exact(u"Success: send 4 byte over TCP to server")
-        receiver.expect(u"00000000  DE  AD  BE  EF")
+
+def get_ip_addr(node, ifconfig_parser):
+    res = ifconfig_parser.parse(node.ifconfig())
+    assert res
+    key = next(iter(res))
+    # prefer IPv6
+    if "ipv6_addrs" in res[key]:
+        assert len(res[key]["ipv6_addrs"]) > 0
+        return res[key]["ipv6_addrs"][0]
+    assert "ipv4_addr" in res[key]
+    assert res[key]["ipv4_addr"] != "0.0.0.0"
+    return res[key]["ipv4_addr"]
+
+
+def tear_down(nodes):
+    for node in nodes:
+        node.reboot()
+    time.sleep(node.riotctrl.TERM_STARTED_DELAY)
+
+
+def test_ip_send(nodes, ifconfig_parser):
+    sender = nodes[0]
+    receiver = nodes[1]
+
+    ipprot = random.randint(0x00, 0xff)
+    # data still needs to fit shell limit
+    data = os.urandom(random.randint(1, 20))
+    receiver_ip = get_ip_addr(receiver, ifconfig_parser)
+    receiver.ip_server_start(ipprot)
+    sender.ip_send(receiver_ip, ipprot, data)
+    receiver.od_expect(data)
+
+
+def test_udp_send(nodes, ifconfig_parser):
+    sender = nodes[0]
+    receiver = nodes[1]
+
+    port = random.randint(0x0000, 0xffff)
+    # data still needs to fit shell limit
+    data = os.urandom(random.randint(1, 20))
+    receiver_ip = get_ip_addr(receiver, ifconfig_parser)
+    receiver.udp_server_start(port)
+    sender.udp_send(receiver_ip, port, data)
+    receiver.od_expect(data)
+
+
+def test_tcp_send(nodes, ifconfig_parser):
+    server = nodes[0]
+    client = nodes[1]
+
+    port = random.randint(0x0000, 0xffff)
+    # data still needs to fit shell limit
+    data = os.urandom(random.randint(1, 20))
+    server_ip = get_ip_addr(server, ifconfig_parser)
+    client_ip = get_ip_addr(client, ifconfig_parser)
+
+    server.tcp_server_start(port)
+    client.tcp_client_connect(server_ip, port)
+    server.tcp_server_client_expect(client_ip)
+    client.tcp_send(data)
+    server.od_expect(data)
+    client.tcp_client_disconnect()
+    try:
+        client.tcp_send(data)
+        assert False
+    except RuntimeError:
+        pass
+
+
+def test_tcpv6_multiconnect(nodes, ifconfig_parser):
+    if any(n.riotctrl.board() != "native" for n in nodes):
+        # run test only with native
+        logging.info("SKIP_TEST: found non-native board")
+        return
+    server = nodes[0]
+    client = nodes[1]
+
+    port = random.randint(0x0000, 0xffff)
+    server_ip = get_ip_addr(server, ifconfig_parser)
+    client_ip = get_ip_addr(client, ifconfig_parser)
+
+    try:
+        connect_addr = socket.getaddrinfo(
+            "%s%%tapbr0" % server_ip, port)[0][4]
+    except socket.gaierror as e:
+        logging.info("SKIP_TEST: %s" % e)
+        return
+
+    server.tcp_server_start(port)
+    client.tcp_client_connect(server_ip, port)
+    server.tcp_server_client_expect(client_ip)
+    with socket.socket(socket.AF_INET6) as sock:
+        sock.connect(connect_addr)
+        server.riotctrl.term.expect(r"Error on TCP accept \[-[0-9]+\]")
+    client.tcp_client_disconnect()
+    server.tcp_server_connection_reset_expect(client_ip)
+    client.tcp_client_connect(server_ip, port)
+    server.tcp_server_client_expect(client_ip)
+    client.tcp_client_disconnect()
+    server.tcp_server_connection_reset_expect(client_ip)
+    with socket.socket(socket.AF_INET6) as sock:
+        sock.connect(connect_addr)
+        res = server.tcp_server_client_expect()
+    server.tcp_server_connection_reset_expect(res["client_addr"])
+
+
+def test_triple_send(nodes, ifconfig_parser):
+    sender = nodes[0]
+    receiver = nodes[1]
+
+    udp_port = random.randint(0x0000, 0xffff)
+    tcp_port = random.randint(0x0000, 0xffff)
+    ipprot = random.randint(0x00, 0xff)
+    receiver_ip = get_ip_addr(receiver, ifconfig_parser)
+    sender_ip = get_ip_addr(sender, ifconfig_parser)
+
+    receiver.ip_server_start(ipprot)
+    receiver.udp_server_start(udp_port)
+    receiver.tcp_server_start(tcp_port)
+    # data still needs to fit shell limit
+    data = os.urandom(random.randint(1, 20))
+    sender.udp_send(receiver_ip, udp_port, data)
+    receiver.od_expect(data)
+
+    data = os.urandom(random.randint(1, 20))
+    sender.ip_send(receiver_ip, ipprot, data)
+    receiver.od_expect(data)
+
+    data = os.urandom(random.randint(1, 20))
+    sender.tcp_client_connect(receiver_ip, tcp_port)
+    receiver.tcp_server_client_expect(sender_ip)
+    sender.tcp_send(data)
+    receiver.od_expect(data)
 
 
 if __name__ == "__main__":
-    TestStrategy().execute([BoardGroup((Board("native", "tap0"),
-                            Board("native", "tap1")))],
-                           [test_ipv6_send, test_udpv6_send, test_tcpv6_send,
-                            test_tcpv6_multiconnect, test_triple_send])
+    testfunctions = [value for key, value
+                     in sys.modules[__name__].__dict__.items()
+                     if key.startswith("test")]
+    nodes = Shell.get_shells(get_riot_ctrls())
+    ifconfig_parser = LwIPIfconfigParser()
+    with nodes[0].riotctrl.run_term(reset=True, logfile=sys.stdout), \
+         nodes[1].riotctrl.run_term(reset=True, logfile=sys.stdout):
+        for func in testfunctions:
+            func(nodes, ifconfig_parser)
+            tear_down(nodes)
