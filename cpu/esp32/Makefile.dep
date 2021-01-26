@@ -5,8 +5,11 @@ include $(RIOTCPU)/esp_common/Makefile.dep
 USEMODULE += esp_idf_driver
 USEMODULE += esp_idf_esp32
 USEMODULE += esp_idf_soc
-USEMODULE += newlib_nano
 USEMODULE += pm_layered
+
+ifneq (,$(filter newlib,$(USEMODULE)))
+  USEMODULE += newlib_nano
+endif
 
 ifneq (,$(filter esp_eth,$(USEMODULE)))
   USEMODULE += esp_freertos

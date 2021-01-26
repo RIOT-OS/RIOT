@@ -321,6 +321,11 @@ config HAS_PICOLIBC
     help
         Indicates that the picolibc C library is available for the platform.
 
+config HAS_NEWLIB
+    bool
+    help
+        Indicates that the newlib C library is available for the platform.
+
 config HAS_PUF_SRAM
     bool
     help

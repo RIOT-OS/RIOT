@@ -10,6 +10,7 @@ FEATURES_PROVIDED += esp_spiffs
 FEATURES_PROVIDED += esp_wifi_ap
 FEATURES_PROVIDED += esp_wifi
 FEATURES_PROVIDED += libstdcpp
+FEATURES_PROVIDED += newlib
 FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_hwrng
 FEATURES_PROVIDED += periph_pm

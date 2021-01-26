@@ -20,3 +20,7 @@ include $(RIOTCPU)/$(CPU)/Makefile.features
 
 # Provide CPU as a feature to allow listing all boards with a CPU
 FEATURES_PROVIDED += cpu_$(CPU)
+
+# Features that are conflicting for all architectures
+FEATURES_CONFLICT += picolibc:newlib
+FEATURES_CONFLICT_MSG += "Only one standard C library can be used"
