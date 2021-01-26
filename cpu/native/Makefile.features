@@ -26,6 +26,9 @@ ifeq ($(OS),Linux)
   FEATURES_PROVIDED += periph_can
 endif
 
+#nativ is x86-32 for now see boards/native/Makefile.include
+CPU_ARCH := x86-32
+
 # This configuration enables modules that are only available when using Kconfig
 # module modelling
 ifeq (1, $(TEST_KCONFIG))
