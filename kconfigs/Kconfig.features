@@ -220,6 +220,12 @@ config HAS_PERIPH_PTP_TIMER
     help
         Indicates that the PTP clock can be used as timer.
 
+config HAS_PERIPH_PTP_TXRX_TIMESTAMPS
+    bool
+    help
+        Indicates that the PTP clock can provide exact time stamps of the
+        reception and transmission of frames.
+
 config HAS_PERIPH_PWM
     bool
     help
