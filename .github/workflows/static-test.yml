@@ -24,6 +24,8 @@ jobs:
         # Note: ${{ github.base_ref }} is empty when not in a PR
         if [ -n "${{ github.base_ref }}" ]; then
           git fetch origin ${{ github.base_ref }}:${{ github.base_ref }} --no-tags
+        else
+          git config diff.renameLimit 16384
         fi
         git config apply.whitespace nowarn
     - name: Fetch riot/riotbuild Docker image
