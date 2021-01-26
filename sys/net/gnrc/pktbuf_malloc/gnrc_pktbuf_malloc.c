@@ -33,10 +33,10 @@
 #include "net/gnrc/nettype.h"
 #include "net/gnrc/pkt.h"
 
+#include "pktbuf_internal.h"
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-static mutex_t _mutex = MUTEX_INIT;
 
 #ifdef MODULE_FUZZING
 extern gnrc_pktsnip_t *gnrc_pktbuf_fuzzptr;
@@ -106,9 +106,9 @@ gnrc_pktsnip_t *gnrc_pktbuf_add(gnrc_pktsnip_t *next, const void *data, size_t s
               (unsigned)size, CONFIG_GNRC_PKTBUF_SIZE);
         return NULL;
     }
-    mutex_lock(&_mutex);
+    mutex_lock(&gnrc_pktbuf_mutex);
     pkt = _create_snip(next, data, size, type);
-    mutex_unlock(&_mutex);
+    mutex_unlock(&gnrc_pktbuf_mutex);
     return pkt;
 }
 
@@ -162,9 +162,9 @@ gnrc_pktsnip_t *gnrc_pktbuf_mark(gnrc_pktsnip_t *pkt, size_t size, gnrc_nettype_
 {
     gnrc_pktsnip_t *new;
 
-    mutex_lock(&_mutex);
+    mutex_lock(&gnrc_pktbuf_mutex);
     new = _mark(pkt, size, type);
-    mutex_unlock(&_mutex);
+    mutex_unlock(&gnrc_pktbuf_mutex);
     return new;
 }
 
@@ -200,53 +200,27 @@ int gnrc_pktbuf_realloc_data(gnrc_pktsnip_t *pkt, size_t size)
 {
     int res;
 
-    mutex_lock(&_mutex);
+    mutex_lock(&gnrc_pktbuf_mutex);
     res = _realloc_data(pkt, size);
-    mutex_unlock(&_mutex);
+    mutex_unlock(&gnrc_pktbuf_mutex);
     return res;
 }
 
 void gnrc_pktbuf_hold(gnrc_pktsnip_t *pkt, unsigned int num)
 {
-    mutex_lock(&_mutex);
+    mutex_lock(&gnrc_pktbuf_mutex);
     while (pkt) {
         pkt->users += num;
         pkt = pkt->next;
     }
-    mutex_unlock(&_mutex);
-}
-
-static void _release_error_locked(gnrc_pktsnip_t *pkt, uint32_t err)
-{
-    while (pkt) {
-        gnrc_pktsnip_t *tmp;
-        tmp = pkt->next;
-        if (pkt->users == 1) {
-            pkt->users = 0; /* not necessary but to be on the safe side */
-            _free(pkt->data);
-            _free(pkt);
-        }
-        else {
-            pkt->users--;
-        }
-        DEBUG("pktbuf: report status code %" PRIu32 "\n", err);
-        gnrc_neterr_report(pkt, err);
-        pkt = tmp;
-    }
-}
-
-void gnrc_pktbuf_release_error(gnrc_pktsnip_t *pkt, uint32_t err)
-{
-    mutex_lock(&_mutex);
-    _release_error_locked(pkt, err);
-    mutex_unlock(&_mutex);
+    mutex_unlock(&gnrc_pktbuf_mutex);
 }
 
 gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt)
 {
-    mutex_lock(&_mutex);
+    mutex_lock(&gnrc_pktbuf_mutex);
     if (pkt == NULL) {
-        mutex_unlock(&_mutex);
+        mutex_unlock(&gnrc_pktbuf_mutex);
         return NULL;
     }
     if (pkt->users > 1) {
@@ -255,10 +229,10 @@ gnrc_pktsnip_t *gnrc_pktbuf_start_write(gnrc_pktsnip_t *pkt)
         if (new != NULL) {
             pkt->users--;
         }
-        mutex_unlock(&_mutex);
+        mutex_unlock(&gnrc_pktbuf_mutex);
         return new;
     }
-    mutex_unlock(&_mutex);
+    mutex_unlock(&gnrc_pktbuf_mutex);
     return pkt;
 }
 
