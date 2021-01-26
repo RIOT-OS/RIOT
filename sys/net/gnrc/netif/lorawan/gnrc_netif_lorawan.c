@@ -14,6 +14,7 @@
  */
 
 #include <assert.h>
+#include "fmt.h"
 
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netif.h"
@@ -28,12 +29,12 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static uint8_t _nwkskey[LORAMAC_NWKSKEY_LEN] = LORAMAC_NWK_SKEY_DEFAULT;
-static uint8_t _appskey[LORAMAC_APPSKEY_LEN] = LORAMAC_APP_SKEY_DEFAULT;
-static uint8_t _appkey[LORAMAC_APPKEY_LEN] = LORAMAC_APP_KEY_DEFAULT;
-static uint8_t _deveui[LORAMAC_DEVEUI_LEN] = LORAMAC_DEV_EUI_DEFAULT;
-static uint8_t _appeui[LORAMAC_APPEUI_LEN] = LORAMAC_APP_EUI_DEFAULT;
-static uint8_t _devaddr[LORAMAC_DEVADDR_LEN] = LORAMAC_DEV_ADDR_DEFAULT;
+static uint8_t _nwkskey[LORAMAC_NWKSKEY_LEN];
+static uint8_t _appskey[LORAMAC_APPSKEY_LEN];
+static uint8_t _appkey[LORAMAC_APPKEY_LEN];
+static uint8_t _deveui[LORAMAC_DEVEUI_LEN];
+static uint8_t _appeui[LORAMAC_APPEUI_LEN];
+static uint8_t _devaddr[LORAMAC_DEVADDR_LEN];
 
 static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif);
@@ -176,13 +177,13 @@ static void _driver_cb(netdev_t *dev, netdev_event_t event)
 
 static void _reset(gnrc_netif_t *netif)
 {
-    netif->lorawan.otaa = LORAMAC_DEFAULT_JOIN_PROCEDURE ==
+    netif->lorawan.otaa = CONFIG_LORAMAC_DEFAULT_JOIN_PROCEDURE ==
                           LORAMAC_JOIN_OTAA ? NETOPT_ENABLE : NETOPT_DISABLE;
-    netif->lorawan.datarate = LORAMAC_DEFAULT_DR;
+    netif->lorawan.datarate = CONFIG_LORAMAC_DEFAULT_DR;
     netif->lorawan.demod_margin = 0;
     netif->lorawan.num_gateways = 0;
-    netif->lorawan.port = LORAMAC_DEFAULT_TX_PORT;
-    netif->lorawan.ack_req = LORAMAC_DEFAULT_TX_MODE == LORAMAC_TX_CNF;
+    netif->lorawan.port = CONFIG_LORAMAC_DEFAULT_TX_PORT;
+    netif->lorawan.ack_req = CONFIG_LORAMAC_DEFAULT_TX_MODE == LORAMAC_TX_CNF;
     netif->lorawan.flags = 0;
 }
 
@@ -205,6 +206,14 @@ static void _init(gnrc_netif_t *netif)
     gnrc_netif_default_init(netif);
     netif->dev->event_callback = _driver_cb;
     _reset(netif);
+
+    /* Convert default keys, address and EUIs to hex */
+    fmt_hex_bytes(_nwkskey, CONFIG_LORAMAC_NWK_SKEY_DEFAULT);
+    fmt_hex_bytes(_appskey, CONFIG_LORAMAC_APP_SKEY_DEFAULT);
+    fmt_hex_bytes(_appkey, CONFIG_LORAMAC_APP_KEY_DEFAULT);
+    fmt_hex_bytes(_deveui, CONFIG_LORAMAC_DEV_EUI_DEFAULT);
+    fmt_hex_bytes(_appeui, CONFIG_LORAMAC_APP_EUI_DEFAULT);
+    fmt_hex_bytes(_devaddr, CONFIG_LORAMAC_DEV_ADDR_DEFAULT);
 
     /* Initialize default keys, address and EUIs */
     memcpy(netif->lorawan.nwkskey, _nwkskey, sizeof(_nwkskey));

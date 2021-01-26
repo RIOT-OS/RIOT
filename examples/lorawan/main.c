@@ -104,9 +104,9 @@ int main(void)
     puts("=====================================");
 
     /* Convert identifiers and application key */
-    fmt_hex_bytes(deveui, DEVEUI);
-    fmt_hex_bytes(appeui, APPEUI);
-    fmt_hex_bytes(appkey, APPKEY);
+    fmt_hex_bytes(deveui, CONFIG_LORAMAC_DEV_EUI_DEFAULT);
+    fmt_hex_bytes(appeui, CONFIG_LORAMAC_APP_EUI_DEFAULT);
+    fmt_hex_bytes(appkey, CONFIG_LORAMAC_APP_KEY_DEFAULT);
 
     /* Initialize the loramac stack */
     semtech_loramac_init(&loramac);

@@ -34,6 +34,10 @@ config MODULE_RN2XX3
 
 endif # TEST_KCONFIG
 
+config USEMODULE_RN2XX3
+    bool
+    select HAVE_LORAWAN
+
 menuconfig KCONFIG_USEMODULE_RN2XX3
     bool "Configure RN2XX3 driver"
     depends on USEMODULE_RN2XX3

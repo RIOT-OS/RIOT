@@ -249,17 +249,17 @@ int rn2xx3_sys_sleep(rn2xx3_t *dev)
 
 int rn2xx3_mac_init(rn2xx3_t *dev)
 {
-    rn2xx3_mac_set_dr(dev, LORAMAC_DEFAULT_DR);
-    rn2xx3_mac_set_tx_power(dev, LORAMAC_DEFAULT_TX_POWER);
-    rn2xx3_mac_set_tx_port(dev, LORAMAC_DEFAULT_TX_PORT);
-    rn2xx3_mac_set_tx_mode(dev, LORAMAC_DEFAULT_TX_MODE);
-    rn2xx3_mac_set_adr(dev, LORAMAC_DEFAULT_ADR);
-    rn2xx3_mac_set_retx(dev, LORAMAC_DEFAULT_RETX);
-    rn2xx3_mac_set_linkchk_interval(dev, LORAMAC_DEFAULT_LINKCHK);
-    rn2xx3_mac_set_rx1_delay(dev, LORAMAC_DEFAULT_RX1_DELAY);
+    rn2xx3_mac_set_dr(dev, CONFIG_LORAMAC_DEFAULT_DR);
+    rn2xx3_mac_set_tx_power(dev, CONFIG_LORAMAC_DEFAULT_TX_POWER);
+    rn2xx3_mac_set_tx_port(dev, CONFIG_LORAMAC_DEFAULT_TX_PORT);
+    rn2xx3_mac_set_tx_mode(dev, CONFIG_LORAMAC_DEFAULT_TX_MODE);
+    rn2xx3_mac_set_adr(dev, IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR));
+    rn2xx3_mac_set_retx(dev, CONFIG_LORAMAC_DEFAULT_RETX);
+    rn2xx3_mac_set_linkchk_interval(dev, CONFIG_LORAMAC_DEFAULT_LINKCHK);
+    rn2xx3_mac_set_rx1_delay(dev, CONFIG_LORAMAC_DEFAULT_RX1_DELAY);
     rn2xx3_mac_set_ar(dev, IS_ACTIVE(CONFIG_RN2XX3_DEFAULT_AR));
-    rn2xx3_mac_set_rx2_dr(dev, LORAMAC_DEFAULT_RX2_DR);
-    rn2xx3_mac_set_rx2_freq(dev, LORAMAC_DEFAULT_RX2_FREQ);
+    rn2xx3_mac_set_rx2_dr(dev, CONFIG_LORAMAC_DEFAULT_RX2_DR);
+    rn2xx3_mac_set_rx2_freq(dev, CONFIG_LORAMAC_DEFAULT_RX2_FREQ);
 
     return RN2XX3_OK;
 }
@@ -305,8 +305,8 @@ int rn2xx3_mac_join_network(rn2xx3_t *dev, loramac_join_mode_t mode)
     rn2xx3_set_internal_state(dev, RN2XX3_INT_STATE_MAC_JOIN);
 
     ret = rn2xx3_wait_reply(dev,
-                            LORAMAC_DEFAULT_JOIN_DELAY1 + \
-                            LORAMAC_DEFAULT_JOIN_DELAY2);
+                            CONFIG_LORAMAC_DEFAULT_JOIN_DELAY1 + \
+                            CONFIG_LORAMAC_DEFAULT_JOIN_DELAY2);
 
     rn2xx3_set_internal_state(dev, RN2XX3_INT_STATE_IDLE);
 

@@ -29,6 +29,7 @@
 
 #include "msg.h"
 #include "mutex.h"
+#include "kernel_defines.h"
 
 #include "net/netdev.h"
 #include "net/netdev/lora.h"
@@ -203,8 +204,6 @@ static size_t _write_uint32(size_t pos, uint32_t value)
     return eeprom_write(pos, array, sizeof(uint32_t));
 }
 
-
-
 static inline void _set_join_state(semtech_loramac_t *mac, bool joined)
 {
     DEBUG("[semtech-loramac] set join state ? %d\n", joined);
@@ -375,15 +374,15 @@ void _init_loramac(semtech_loramac_t *mac,
 #endif
     mutex_unlock(&mac->lock);
 
-    semtech_loramac_set_dr(mac, LORAMAC_DEFAULT_DR);
-    semtech_loramac_set_adr(mac, LORAMAC_DEFAULT_ADR);
+    semtech_loramac_set_dr(mac, CONFIG_LORAMAC_DEFAULT_DR);
+    semtech_loramac_set_adr(mac, IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR));
     semtech_loramac_set_public_network(mac, LORAMAC_DEFAULT_PUBLIC_NETWORK);
-    semtech_loramac_set_class(mac, LORAMAC_DEFAULT_DEVICE_CLASS);
-    semtech_loramac_set_tx_port(mac, LORAMAC_DEFAULT_TX_PORT);
-    semtech_loramac_set_tx_mode(mac, LORAMAC_DEFAULT_TX_MODE);
+    semtech_loramac_set_class(mac, CONFIG_LORAMAC_DEFAULT_DEVICE_CLASS);
+    semtech_loramac_set_tx_port(mac, CONFIG_LORAMAC_DEFAULT_TX_PORT);
+    semtech_loramac_set_tx_mode(mac, CONFIG_LORAMAC_DEFAULT_TX_MODE);
     semtech_loramac_set_system_max_rx_error(mac,
-                                            LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR);
-    semtech_loramac_set_min_rx_symbols(mac, LORAMAC_DEFAULT_MIN_RX_SYMBOLS);
+                                            CONFIG_LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR);
+    semtech_loramac_set_min_rx_symbols(mac, CONFIG_LORAMAC_DEFAULT_MIN_RX_SYMBOLS);
 #ifdef MODULE_PERIPH_EEPROM
     _read_loramac_config(mac);
 #endif
@@ -450,7 +449,7 @@ static void _join_abp(semtech_loramac_t *mac)
 {
     DEBUG("[semtech-loramac] starting ABP join\n");
 
-    semtech_loramac_set_netid(mac, LORAMAC_DEFAULT_NETID);
+    semtech_loramac_set_netid(mac, CONFIG_LORAMAC_DEFAULT_NETID);
 
     mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;

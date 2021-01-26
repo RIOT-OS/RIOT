@@ -2,8 +2,31 @@ INCLUDES += -I$(RIOTBASE)/pkg/semtech-loramac/include
 
 DIRS += $(RIOTBASE)/pkg/semtech-loramac/contrib
 
-# Use EU868 as default region
-LORA_REGION ?= EU868
+# Translate 'CONFIG_' options to package specific flags. This checks if the
+# option is being set via Kconfig or CFLAGS
+ifneq (,$(or $(CONFIG_LORAMAC_REGION_AS_923),$(filter -DCONFIG_LORAMAC_REGION_AS_923,$(CFLAGS))))
+    LORA_REGION ?= AS923
+else ifneq (,$(or $(CONFIG_LORAMAC_REGION_AU_915),$(filter -DCONFIG_LORAMAC_REGION_AU_915,$(CFLAGS))))
+    LORA_REGION ?= AU915
+else ifneq (,$(or $(CONFIG_LORAMAC_REGION_CN_470),$(filter -DCONFIG_LORAMAC_REGION_CN_470,$(CFLAGS))))
+    LORA_REGION ?= CN470
+else ifneq (,$(or $(CONFIG_LORAMAC_REGION_CN_779),$(filter -DCONFIG_LORAMAC_REGION_CN_779,$(CFLAGS))))
+    LORA_REGION ?= CN779
+else ifneq (,$(or $(CONFIG_LORAMAC_REGION_EU_433),$(filter -DCONFIG_LORAMAC_REGION_EU_433,$(CFLAGS))))
+    LORA_REGION ?= EU433
+else ifneq (,$(or $(CONFIG_LORAMAC_REGION_KR_920),$(filter -DCONFIG_LORAMAC_REGION_KR_920,$(CFLAGS))))
+    LORA_REGION ?= KR920
+else ifneq (,$(or $(CONFIG_LORAMAC_REGION_IN_865),$(filter -DCONFIG_LORAMAC_REGION_IN_865,$(CFLAGS))))
+    LORA_REGION ?= IN865
+else ifneq (,$(or $(CONFIG_LORAMAC_REGION_US_915),$(filter -DCONFIG_LORAMAC_REGION_US_915,$(CFLAGS))))
+    LORA_REGION ?= US915
+else ifneq (,$(or $(CONFIG_LORAMAC_REGION_RU_864),$(filter -DCONFIG_LORAMAC_REGION_RU_864,$(CFLAGS))))
+    LORA_REGION ?= RU864
+else ifneq (,$(or $(CONFIG_LORAMAC_REGION_US_915_HYBRID),$(filter -DCONFIG_LORAMAC_REGION_US_915_HYBRID,$(CFLAGS))))
+    LORA_REGION ?= US915_HYBRID
+else
+    LORA_REGION ?= EU868
+endif
 
 CFLAGS += -DREGION_$(LORA_REGION)
 CFLAGS += -DLORAMAC_ACTIVE_REGION=LORAMAC_REGION_$(LORA_REGION)

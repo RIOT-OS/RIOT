@@ -17,11 +17,13 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+
+#include "errno.h"
+#include "kernel_defines.h"
+
 #include "net/lora.h"
 #include "net/gnrc/lorawan.h"
-#include "errno.h"
 #include "net/gnrc/pktbuf.h"
-
 #include "net/lorawan/hdr.h"
 #include "net/loramac.h"
 #include "net/gnrc/lorawan/region.h"
@@ -44,8 +46,8 @@ static inline void gnrc_lorawan_mlme_reset(gnrc_lorawan_t *mac)
 {
     mac->mlme.activation = MLME_ACTIVATION_NONE;
     mac->mlme.pending_mlme_opts = 0;
-    mac->rx_delay = (LORAMAC_DEFAULT_RX1_DELAY / MS_PER_SEC);
-    mac->mlme.nid = LORAMAC_DEFAULT_NETID;
+    mac->rx_delay = (CONFIG_LORAMAC_DEFAULT_RX1_DELAY / MS_PER_SEC);
+    mac->mlme.nid = CONFIG_LORAMAC_DEFAULT_NETID;
 }
 
 static inline void gnrc_lorawan_mlme_backoff_init(gnrc_lorawan_t *mac)
@@ -105,7 +107,7 @@ void gnrc_lorawan_reset(gnrc_lorawan_t *mac)
 
     dev->driver->set(dev, NETOPT_RX_TIMEOUT, &rx_timeout, sizeof(rx_timeout));
 
-    gnrc_lorawan_set_rx2_dr(mac, LORAMAC_DEFAULT_RX2_DR);
+    gnrc_lorawan_set_rx2_dr(mac, CONFIG_LORAMAC_DEFAULT_RX2_DR);
 
     mac->toa = 0;
     gnrc_lorawan_mcps_reset(mac);
@@ -168,7 +170,7 @@ void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac)
 
     /* if the MAC is not activated, then this is a Join Request */
     rx_1 = mac->mlme.activation == MLME_ACTIVATION_NONE ?
-           LORAMAC_DEFAULT_JOIN_DELAY1 : mac->rx_delay;
+           CONFIG_LORAMAC_DEFAULT_JOIN_DELAY1 : mac->rx_delay;
 
     xtimer_set_msg(&mac->rx, rx_1 * _DRIFT_FACTOR, &mac->msg, thread_getpid());
 
@@ -188,7 +190,7 @@ void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac)
     switch (mac->state) {
         case LORAWAN_STATE_RX_1:
             DEBUG("gnrc_lorawan: RX1 timeout.\n");
-            _configure_rx_window(mac, LORAMAC_DEFAULT_RX2_FREQ,
+            _configure_rx_window(mac, CONFIG_LORAMAC_DEFAULT_RX2_FREQ,
                                  mac->dl_settings &
                                  GNRC_LORAWAN_DL_RX2_DR_MASK);
             mac->state = LORAWAN_STATE_RX_2;

@@ -4,6 +4,10 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+config USEMODULE_GNRC_LORAWAN
+    bool
+    select HAVE_LORAWAN
+
 menuconfig KCONFIG_USEMODULE_GNRC_LORAWAN
     bool "Configure GNRC LoRaWAN"
     depends on USEMODULE_GNRC_LORAWAN
@@ -11,20 +15,6 @@ menuconfig KCONFIG_USEMODULE_GNRC_LORAWAN
         Configure GNRC LoRaWAN module using Kconfig.
 
 if KCONFIG_USEMODULE_GNRC_LORAWAN
-
-choice
-    bool "LoRaWAN region"
-    default LORAMAC_REGION_EU_868
-    help
-        Configure the LoRaWAN region.
-
-config LORAMAC_REGION_EU_868
-    bool "EU863-870"
-
-config LORAMAC_REGION_IN_865
-    bool "IN865-867"
-
-endchoice
 
 config GNRC_LORAWAN_TIMER_DRIFT
     int "Maximum timer drift"
