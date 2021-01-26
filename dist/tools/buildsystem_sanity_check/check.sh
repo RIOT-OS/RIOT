@@ -63,6 +63,7 @@ check_not_parsing_features() {
 
     patterns+=(-e 'if.*filter.*FEATURES_PROVIDED')
     patterns+=(-e 'if.*filter.*FEATURES_REQUIRED')
+    patterns+=(-e 'if.*filter.*FEATURES_REQUIRED_ANY')
     patterns+=(-e 'if.*filter.*FEATURES_OPTIONAL')
     patterns+=(-e 'if.*filter.*FEATURES_OPTIONAL_ANY')
 
