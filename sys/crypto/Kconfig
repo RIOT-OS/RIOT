@@ -1,0 +1,47 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "Crypto"
+
+config MODULE_CRYPTO
+    bool "Common cryptographic functionalities"
+    depends on TEST_KCONFIG
+
+choice
+    bool "Crypto block ciphers API implementation"
+    optional
+    depends on TEST_KCONFIG
+    help
+        The common Crypto block ciphers API has multiple implementations. Choose
+        one of the following.
+
+config MODULE_CRYPTO_AES
+    bool "AES"
+    select MODULE_CRYPTO
+
+config MODULE_CRYPTO_3DES
+    bool "3DES (deprecated)"
+    select MODULE_CRYPTO
+
+endchoice
+
+menu "Crypto AES options"
+depends on MODULE_CRYPTO_AES
+
+config MODULE_CRYPTO_AES_PRECALCULATED
+    bool "Pre-calculate T tables"
+
+config MODULE_CRYPTO_AES_UNROLL
+    bool "Unroll loop in AES"
+    help
+        This unrolls a loop in AES, but it uses more flash.
+
+endmenu # Crypto AES options
+
+rsource "modes/Kconfig"
+
+endmenu # Crypto
