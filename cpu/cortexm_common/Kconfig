@@ -47,6 +47,7 @@ config CPU_CORE_CORTEX_M
     select HAS_CPU_CHECK_ADDRESS
     select HAS_SSP
     select HAS_CORTEXM_SVC
+    select HAS_PERIPH_SYSTICK
 
 ## Common CPU symbols
 config CPU_CORE
@@ -127,5 +128,31 @@ config MODULE_CORTEXM_FPU
     default y
     depends on HAS_CORTEXM_FPU
     depends on TEST_KCONFIG
+
+config HAS_PERIPH_SYSTICK
+    bool
+    help
+        Indicates that the SysTick timer peripheral is implemented.
+
+if TEST_KCONFIG
+
+config MODULE_PERIPH_SYSTICK
+    bool "SysTick timer periph driver"
+    depends on HAS_PERIPH_SYSTICK
+    help
+        SysTick timer is present on every Cortex-M CPU.
+        It is a 24 bit, down-counting timer that runs at the same
+        frequency as the CPU.
+        This allows to use this timer as an (up-counting) timer in
+        RIOT.
+
+config MODULE_PERIPH_SYSTICK_PRESCALER
+    bool "SysTick timer prescaler"
+    depends on MODULE_PERIPH_SYSTICK
+    help
+        Allows to configure the SysTick backed timer to run at
+        'virtual' frequencies smaller than the CPU frequency.
+
+endif
 
 rsource "periph/Kconfig"
