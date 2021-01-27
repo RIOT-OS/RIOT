@@ -14,6 +14,7 @@ config BOARD_B_L072Z_LRWAN1
     select CPU_MODEL_STM32L072CZ
 
     # Put defined MCU peripherals here (in alphabetical order)
+    select HAS_PERIPH_ADC    
     select HAS_PERIPH_DMA
     select HAS_PERIPH_I2C
     select HAS_PERIPH_RTC
