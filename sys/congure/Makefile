@@ -1,3 +1,6 @@
+ifneq (,$(filter congure_abe,$(USEMODULE)))
+  DIRS += abe
+endif
 ifneq (,$(filter congure_quic,$(USEMODULE)))
   DIRS += quic
 endif

@@ -37,6 +37,10 @@ ifneq (,$(filter congure_%,$(USEMODULE)))
   USEMODULE += congure
 endif
 
+ifneq (,$(filter congure_abe,$(USEMODULE)))
+  USEMODULE += congure_reno_methods
+endif
+
 ifneq (,$(filter congure_quic,$(USEMODULE)))
   USEMODULE += ztimer_msec
 endif
