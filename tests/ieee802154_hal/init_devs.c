@@ -26,6 +26,10 @@
 #include "cc2538_rf.h"
 #endif
 
+#ifdef MODULE_CC26X2_CC13X2_RF
+#include "cc26x2_cc13x2_rf.h"
+#endif
+
 #ifdef MODULE_NRF802154
 #include "nrf802154.h"
 #endif
@@ -34,11 +38,16 @@
 extern ieee802154_dev_t cc2538_rf_dev;
 #endif
 
+#ifdef MODULE_CC26X2_CC13X2_RF
+extern ieee802154_dev_t cc26x2_cc13x2_rf_hal_dev;
+#endif
+
 #ifdef MODULE_NRF802154
 extern ieee802154_dev_t nrf802154_hal_dev;
 #endif
 
 #define RADIOS_NUMOF IS_USED(MODULE_CC2538_RF) + \
+                     IS_USED(MODULE_CC26X2_CC13X2_RF) + \
                      IS_USED(MODULE_NRF802154)
 
 #if RADIOS_NUMOF == 0
@@ -53,6 +62,10 @@ static void _register_radios(void)
 
 #ifdef MODULE_CC2538_RF
     _radios[i++] = &cc2538_rf_dev;
+#endif
+
+#ifdef MODULE_CC26X2_CC13X2_RF
+    _radios[i++] = &cc26x2_cc13x2_rf_hal_dev;
 #endif
 
 #ifdef MODULE_NRF802154
@@ -71,6 +84,10 @@ void ieee802154_hal_test_init_devs(void)
      * `auto_init`) */
 #ifdef MODULE_CC2538_RF
     cc2538_init();
+#endif
+
+#ifdef MODULE_CC26X2_CC13X2_RF
+    cc26x2_cc13x2_rf_init();
 #endif
 
 #ifdef MODULE_NRF802154
