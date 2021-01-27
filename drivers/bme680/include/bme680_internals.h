@@ -14,7 +14,7 @@
  *
  * @file
  * @brief       Internal addresses, registers, constants for the BME680 sensor.
- * 
+ *
  * @author      Jana Eisoldt <jana.eisoldt@ovgu.de>
  */
 
@@ -48,68 +48,86 @@ extern "C" {
  * @brief    default chip id
  */
 #define BME680_CHIP_ID                      (0x61)
+
 /**
  * @brief   registers
  */
-
-#define BME680_REGISTER_RESET               (0xE0)
-#define BME680_REGISTER_CHIP_ID             (0xD0)
-
-#define BME680_REGISTER_CTRL_HUM            (0x72)
-#define BME680_REGISTER_CTRL_MEAS           (0x74)
-#define BME680_REGISTER_CTRL_GAS            (0x70)
-#define BME680_REGISTER_GAS_WAIT_0          (0x64)
-#define BME680_REGISTER_RES_HEAT_0          (0x5A)
-#define BME680_REGISTER_CTRL_GAS_1          (0x71)
-#define BME680_REGISTER_CONFIG              (0x75)
-
+#define BME680_REGISTER_CALIB_3             (0x00)
+#define BME680_REGISTER_ADC                 (0x1F)
+#define BME680_REGISTER_ADC_GAS             (0x2A)
 #define BME680_REGISTER_MEAS_STATUS_0       (0x1D)
-
-#define BME680_REGISTER_PAR_T1              (0xE9)
-#define BME680_REGISTER_PAR_T2              (0x8A)
-#define BME680_REGISTER_PAR_T3              (0x8C)
-#define BME680_REGISTER_TEMP_ADC_XLSB       (0x24)
-#define BME680_REGISTER_TEMP_ADC_LSB        (0x23)
-#define BME680_REGISTER_TEMP_ADC_MSB        (0x22)
-
-#define BME680_REGISTER_PAR_H1_H2_LSB       (0xE2)
-#define BME680_REGISTER_PAR_H1_MSB          (0xE3)
-#define BME680_REGISTER_PAR_H2_MSB          (0xE1)
-#define BME680_REGISTER_PAR_H3              (0xE4)
-#define BME680_REGISTER_PAR_H4              (0xE5)
-#define BME680_REGISTER_PAR_H5              (0xE6)
-#define BME680_REGISTER_PAR_H6              (0xE7)
-#define BME680_REGISTER_PAR_H7              (0xE8)
-#define BME680_REGISTER_HUM_ADC_LSB         (0x26)
-#define BME680_REGISTER_HUM_ADC_MSB         (0x25)
-
-#define BME680_REGISTER_PAR_P1              (0x8E)
-#define BME680_REGISTER_PAR_P2              (0x90)
-#define BME680_REGISTER_PAR_P3              (0x92)
-#define BME680_REGISTER_PAR_P4              (0x94)
-#define BME680_REGISTER_PAR_P5              (0x96)
-#define BME680_REGISTER_PAR_P6              (0x99)
-#define BME680_REGISTER_PAR_P7              (0x98)
-#define BME680_REGISTER_PAR_P8              (0x9C)
-#define BME680_REGISTER_PAR_P9              (0x9E)
-#define BME680_REGISTER_PAR_P10             (0xA0)
-#define BME680_REGISTER_PRESS_ADC_XLSB      (0x21)
-#define BME680_REGISTER_PRESS_ADC_LSB       (0x20)
-#define BME680_REGISTER_PRESS_ADC_MSB       (0x1F)
-
-#define BME680_REGISTER_PAR_G1              (0xED)
-#define BME680_REGISTER_PAR_G2              (0xEB)
-#define BME680_REGISTER_PAR_G3              (0xEE)
-#define BME680_REGISTER_RES_HEAT_RANGE      (0x02)
-#define BME680_REGISTER_RES_HEAT_VAL        (0x00)
-#define BME680_REGISTER_GAS_R_LSB           (0x2B)
-
+#define BME680_REGISTER_RES_HEAT_0          (0x5A)
+#define BME680_REGISTER_GAS_WAIT_0          (0x64)
+#define BME680_REGISTER_CTRL_GAS            (0x70)
+#define BME680_REGISTER_CTRL_GAS_1          (0x71)
+#define BME680_REGISTER_CTRL_HUM            (0x72)
 #define BME680_REGISTER_SPI_MEM_PAGE        (0x73)
+#define BME680_REGISTER_CTRL_MEAS           (0x74)
+#define BME680_REGISTER_CONFIG              (0x75)
+#define BME680_REGISTER_CHIP_ID             (0xD0)
+#define BME680_REGISTER_CALIB_2             (0x8A)
+#define BME680_REGISTER_RESET               (0xE0)
+#define BME680_REGISTER_CALIB_1             (0xE1)
 
-#define BME680_REGISTER_GAS_ADC_MSB         (0x2A)
-#define BME680_REGISTER_GAS_ADC_LSB         (0x2B)
-#define BME680_REGISTER_GAS_RANGE           (0x2B)
-#define BME680_REGISTER_RANGE_SW_ERR        (0x04)
+/**
+ * @brief   structs for reading out register values
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t h2_msb;
+    uint8_t h1_h2_lsb;
+    uint8_t h1_msb;
+    int8_t par_h3;
+    int8_t par_h4;
+    int8_t par_h5;
+    uint8_t par_h6;
+    int8_t par_h7;
+    uint16_t par_t1;
+    int16_t par_g2;
+    int8_t par_g1;
+    int8_t par_g3;
+} bme680_calib_chunk1_t;
+
+typedef struct __attribute__((packed)) {
+    int16_t par_t2;
+    int8_t par_t3;
+    uint8_t padding1;
+    uint16_t par_p1;
+    int16_t par_p2;
+    int8_t par_p3;
+    int8_t padding2;
+    int16_t par_p4;
+    int16_t par_p5;
+    int8_t par_p7;
+    int8_t par_p6;
+    uint8_t padding3[2];
+    int16_t par_p8;
+    int16_t par_p9;
+    uint8_t par_p10;
+} bme680_calib_chunk2_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t res_heat_val;
+    uint8_t padding1;
+    uint8_t res_heat_range;
+    uint8_t padding2;
+    uint8_t range_sw_error;
+} bme680_calib_chunk3_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t press_adc_msb;
+    uint8_t press_adc_lsb;
+    uint8_t press_adc_xlsb;
+    uint8_t temp_adc_msb;
+    uint8_t temp_adc_lsb;
+    uint8_t temp_adc_xlsb;
+    uint8_t hum_adc_msb;
+    uint8_t hum_adc_lsb;
+} bme680_adc_readout_t;
+
+typedef struct __attribute__((packed)) {
+    uint8_t gas_adc_msb;
+    uint8_t gas_adc_lsb;
+} bme680_adc_readout_gas_t;
 
 /*
 * @brief    data status
@@ -140,6 +158,7 @@ extern "C" {
 #define BME680_FILTER_SETTINGS_MASK         (0xE3)
 #define BME680_GAS_SETTINGS_MASK            (0xE0)
 #define BME680_H1_H2_MASK                   (0x0F)
+#define BME680_SPI_MEM_PAGE_MASK            (0x10)
 
 /*
 * @brief    commands and operation modes

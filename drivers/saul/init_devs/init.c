@@ -63,9 +63,13 @@ void saul_init_devs(void)
         extern void auto_init_apds99xx(void);
         auto_init_apds99xx();
     }
-    if (IS_USED(MODULE_BME680)) {
-        extern void auto_init_bme680(void);
-        auto_init_bme680();
+    if (IS_USED(MODULE_BME680_I2C)) {
+        extern void auto_init_bme680_i2c(void);
+        auto_init_bme680_i2c();
+    }
+    if (IS_USED(MODULE_BME680_SPI)) {
+        extern void auto_init_bme680_spi(void);
+        auto_init_bme680_spi();
     }
     if (IS_USED(MODULE_BMP180)) {
         extern void auto_init_bmp180(void);

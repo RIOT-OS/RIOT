@@ -1,6 +1,6 @@
 include ../Makefile.tests_common
 
-DRIVER ?= bme680_ic2
+DRIVER ?= bme680_spi
 
 USEMODULE += $(DRIVER)
 USEMODULE += xtimer
