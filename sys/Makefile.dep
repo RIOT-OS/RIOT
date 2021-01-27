@@ -732,6 +732,10 @@ ifneq (,$(filter phydat,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter pm_layered,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_pm
+endif
+
 ifneq (,$(filter evtimer_mbox,$(USEMODULE)))
   USEMODULE += evtimer
   USEMODULE += core_mbox
