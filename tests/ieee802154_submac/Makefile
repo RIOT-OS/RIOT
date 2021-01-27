@@ -5,6 +5,9 @@ BOARD_WHITELIST :=  \
 					adafruit-itsybitsy-nrf52 \
 					arduino-nano-33-ble \
 					cc2538dk \
+					cc1312-launchpad \
+					cc1352-launchpad \
+					cc1352p-launchpad \
 					feather-nrf52840 \
 					nrf52840dk \
 					nrf52840dongle \
