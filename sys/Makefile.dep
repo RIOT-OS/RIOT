@@ -1019,6 +1019,7 @@ ifneq (,$(filter riotboot_usb_dfu, $(USEMODULE)))
   USEMODULE += usbus_dfu
   USEMODULE += riotboot_flashwrite
   FEATURES_REQUIRED += no_idle_thread
+  FEATURES_REQUIRED += periph_pm
 endif
 
 ifneq (,$(filter irq_handler,$(USEMODULE)))
