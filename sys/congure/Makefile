@@ -1,3 +1,6 @@
+ifneq (,$(filter congure_abe,$(USEMODULE)))
+  DIRS += abe
+endif
 ifneq (,$(filter congure_mock,$(USEMODULE)))
   DIRS += mock
 endif
