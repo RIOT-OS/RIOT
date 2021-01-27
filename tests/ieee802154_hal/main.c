@@ -265,6 +265,9 @@ static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
         case IEEE802154_DEV_TYPE_KW2XRF:
             printf("kw2xrf");
             break;
+        case IEEE802154_DEV_TYPE_CC26X2_CC13X2_RF:
+            printf("cc26x2_cc13x2_rf");
+            break;
     }
 
     puts(".");
@@ -320,7 +323,12 @@ static int _init(void)
     expect(res >= 0);
 
     /* ieee802154_radio_set_cca_mode*/
+    /* cc26x2_cc13x2_rf supports only IEEE802154_CCA_MODE_CARRIER_SENSING */
+#ifdef MODULE_CC26X2_CC13X2_RF
+    res = ieee802154_radio_set_cca_mode(&_radio[0], IEEE802154_CCA_MODE_CARRIER_SENSING);
+#else
     res = ieee802154_radio_set_cca_mode(&_radio[0], IEEE802154_CCA_MODE_ED_THRESHOLD);
+#endif
     expect(res >= 0);
     res = ieee802154_radio_set_cca_threshold(&_radio[0], CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
     expect(res >= 0);

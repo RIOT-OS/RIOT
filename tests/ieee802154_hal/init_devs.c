@@ -28,6 +28,10 @@
 #include "cc2538_rf.h"
 #endif
 
+#ifdef MODULE_CC26X2_CC13X2_RF
+#include "cc26x2_cc13x2_rf.h"
+#endif
+
 #ifdef MODULE_NRF802154
 #include "nrf802154.h"
 #endif
@@ -58,6 +62,13 @@ void ieee802154_hal_test_init_devs(ieee802154_dev_cb_t cb, void *opaque)
     if ((radio = cb(IEEE802154_DEV_TYPE_CC2538_RF, opaque)) ){
         cc2538_rf_hal_setup(radio);
         cc2538_init();
+    }
+#endif
+
+#ifdef MODULE_CC26X2_CC13X2_RF
+    if ((radio = cb(IEEE802154_DEV_TYPE_CC26X2_CC13X2_RF, opaque)) ){
+        cc26x2_cc13x2_rf_hal_setup(radio);
+        cc26x2_cc13x2_rf_init();
     }
 #endif
 
