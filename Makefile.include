@@ -387,6 +387,9 @@ else
   # handle removal of default modules
   USEMODULE += $(filter-out $(DISABLE_MODULE), $(DEFAULT_MODULE))
 
+  # avoid recursive expansion
+  USEMODULE := $(sort $(USEMODULE))
+
   # process dependencies
   include $(RIOTMAKE)/dependency_resolution.inc.mk
 endif
