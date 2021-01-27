@@ -86,8 +86,11 @@ endif
 # always select gpio (until explicit dependencies are sorted out)
 FEATURES_OPTIONAL += periph_gpio
 
-# always select power management if available
-FEATURES_OPTIONAL += periph_pm
+# always select power management unless building the bootloader
+# pm is not needed by the bootloader and omitting it saves some ROM
+ifneq (1, $(RIOTBOOT_BUILD))
+  FEATURES_OPTIONAL += periph_pm
+endif
 
 # always select provided architecture features
 FEATURES_REQUIRED += $(filter arch_%,$(FEATURES_PROVIDED))
