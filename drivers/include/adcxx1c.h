@@ -35,6 +35,10 @@ extern "C" {
 
 /**
  * @brief  ADCxx1C default address (ADCxx1C021 address)
+ *
+ * ADCXX1C allows for up to 9 devices on a single bus. The value depends on the
+ * state of ADR1 and ADR0 Pins. For more information refer section `I2C Slave
+ * (Hardware) Address` in datasheet.
  */
 #ifndef CONFIG_ADCXX1C_I2C_ADDRESS
 #define CONFIG_ADCXX1C_I2C_ADDRESS          (0x54)
