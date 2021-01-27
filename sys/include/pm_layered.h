@@ -62,14 +62,22 @@ typedef union {
  *
  * @param[in]   mode      power mode to block
  */
+#ifdef MODULE_PM_LAYERED
 void pm_block(unsigned mode);
+#else
+static inline void pm_block(unsigned mode) { (void)mode; }
+#endif
 
 /**
  * @brief   Unblock a power mode
  *
  * @param[in]   mode      power mode to unblock
  */
+#ifdef MODULE_PM_LAYERED
 void pm_unblock(unsigned mode);
+#else
+static inline void pm_unblock(unsigned mode) { (void)mode; }
+#endif
 
 /**
  * @brief   Switches the MCU to a new power mode

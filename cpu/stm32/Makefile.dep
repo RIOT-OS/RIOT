@@ -1,5 +1,4 @@
 # All stm32 families provide pm support
-USEMODULE += pm_layered
 
 # include stm32 common periph drivers, clock configurations and vectors
 USEMODULE += periph stm32_clk stm32_vectors
