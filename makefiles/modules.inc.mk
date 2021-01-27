@@ -8,6 +8,19 @@ ED = $(addprefix MODULE_,$(_ALLMODULES))
 # EXTDEFINES will be put in CFLAGS_WITH_MACROS
 EXTDEFINES = $(addprefix -D,$(call uppercase_and_underscore,$(ED)))
 
+# Check that there are no duplicates in the module registry
+_REG := $(strip $(call uniq,$(MODULE_REGISTRY)))
+ifneq ($(_REG),$(MODULE_REGISTRY))
+  $(warning MODULE_REGISTRY: $(MODULE_REGISTRY))
+  $(error Duplicated modules found in the module registry)
+endif
+
+# Check that all used modules and packages are registered in the build system
+UNKNOWN_MODULES := $(filter-out $(MODULE_REGISTRY),$(_ALLMODULES))
+ifneq (,$(UNKNOWN_MODULES))
+  $(error The following modules are not registered in the build system: $(UNKNOWN_MODULES))
+endif
+
 # filter "pseudomodules" from "real modules", but not "no_pseudomodules"
 REALMODULES += $(filter-out $(PSEUDOMODULES), $(_ALLMODULES))
 REALMODULES += $(filter $(NO_PSEUDOMODULES), $(_ALLMODULES))
