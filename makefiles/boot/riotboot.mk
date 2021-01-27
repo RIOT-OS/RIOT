@@ -76,7 +76,7 @@ riotboot: $(SLOT_RIOT_BINS)
 
 # riotboot bootloader compile target
 riotboot/flash-bootloader: riotboot/bootloader/flash
-riotboot/bootloader/%:
+riotboot/bootloader/%: $(BUILDDEPS)
 	$(Q)/usr/bin/env -i \
 		QUIET=$(QUIET) PATH="$(PATH)"\
 		EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" BOARD=$(BOARD)\
