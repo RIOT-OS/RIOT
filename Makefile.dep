@@ -1,5 +1,6 @@
 # include board specific application dependencies
 -include $(APPDIR)/Makefile.board.dep
+-include $(APPDIR)/Makefile.$(TOOLCHAIN).dep
 
 # include board dependencies
 -include $(BOARDDIR)/Makefile.dep
