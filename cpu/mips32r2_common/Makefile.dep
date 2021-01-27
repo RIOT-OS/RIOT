@@ -1,7 +1,7 @@
 USEMODULE += mips32r2_common
 USEMODULE += mips32r2_common_periph
-USEMODULE += newlib
 
+FEATURES_REQUIRED += newlib
 # mips32 needs periph_timer for its gettimeofday() implementation
 FEATURES_REQUIRED += periph_timer
 

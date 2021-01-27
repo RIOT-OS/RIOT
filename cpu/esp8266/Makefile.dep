@@ -9,7 +9,6 @@ USEMODULE += esp_idf_util
 USEMODULE += esp_idf_wpa_supplicant_crypto
 USEMODULE += esp_sdk
 USEMODULE += mtd
-USEMODULE += newlib
 USEMODULE += periph_common
 USEMODULE += ps
 

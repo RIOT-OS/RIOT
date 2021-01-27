@@ -9,6 +9,7 @@ config CPU_ARCH_MIPS32R2
     bool
     select HAS_ARCH_32BIT
     select HAS_ARCH_MIPS32R2
+    select HAS_NEWLIB
     select HAS_CPP
     select HAS_LIBSTDCPP
     select HAS_PERIPH_PM

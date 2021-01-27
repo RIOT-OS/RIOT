@@ -1,12 +1,8 @@
 # use common ARM7 periph code
 USEMODULE += arm7_common_periph
 
-ifneq (,$(filter picolibc,$(FEATURES_USED)))
-  # Use Picolibc when explicitly selected
-  USEMODULE += picolibc
-else
-  # all cortex MCU's use newlib as libc
-  USEMODULE += newlib
+FEATURES_REQUIRED_ANY += newlib|picolibc
+ifneq (,$(filter newlib,$(USEMODULE)))
   # use the nano-specs of Newlib when available
   USEMODULE += newlib_nano
 endif

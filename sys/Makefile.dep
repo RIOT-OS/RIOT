@@ -530,11 +530,11 @@ ifneq (,$(filter od_string,$(USEMODULE)))
 endif
 
 ifneq (,$(filter newlib_gnu_source,$(USEMODULE)))
-  USEMODULE += newlib
+  FEATURES_REQUIRED += newlib
 endif
 
 ifneq (,$(filter newlib_nano,$(USEMODULE)))
-  USEMODULE += newlib
+  FEATURES_REQUIRED += newlib
 endif
 
 ifneq (,$(filter newlib,$(USEMODULE)))

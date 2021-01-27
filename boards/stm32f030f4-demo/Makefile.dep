@@ -1,3 +1,2 @@
 # Use Picolibc to reduce ROM usage
 FEATURES_REQUIRED += picolibc
-USEMODULE += picolibc

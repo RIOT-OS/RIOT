@@ -4,17 +4,8 @@ USEMODULE += cortexm_common
 # include common periph code
 USEMODULE += cortexm_common_periph
 
-# Ensure newlib is not added if picolibc is already in FEATURES_USED or USEMODULE.
-# nucleo-l011k4 doesn't use features to forces picolibc but directly set it in
-# USEMODULE. This is because during the first pass of the dependency resolution,
-# with the feature mechanism, the picolib feature is not present in FEATURES_USED
-# at this staged and as a result newlib modules are wrongly added.
-ifneq (,$(filter picolibc,$(FEATURES_USED) $(USEMODULE)))
-  # Use Picolibc when explicitly selected
-  USEMODULE += picolibc
-else
-  # all cortex MCU's use newlib as libc
-  USEMODULE += newlib
+FEATURES_REQUIRED_ANY += newlib|picolibc
+ifneq (,$(filter newlib,$(USEMODULE)))
   # use the nano-specs of Newlib when available
   USEMODULE += newlib_nano
 endif
