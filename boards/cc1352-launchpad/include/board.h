@@ -42,7 +42,7 @@ extern "C" {
  * @name    On-board button configuration
  * @{
  */
-#define BTN0_PIN            GPIO_PIN(0, 13)
+#define BTN0_PIN            GPIO_PIN(0, 15)
 #define BTN0_MODE           GPIO_IN_PU
 
 #define BTN1_PIN            GPIO_PIN(0, 14)
