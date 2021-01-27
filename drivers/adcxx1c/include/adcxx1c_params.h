@@ -23,6 +23,7 @@
 #include "board.h"
 #include "saul_reg.h"
 #include "adcxx1c.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,8 +52,27 @@ extern "C" {
 #endif
 
 /** @brief  Conversion interval */
-#ifndef ADCXX1C_PARAM_CYCLE
-#define ADCXX1C_PARAM_CYCLE      (ADCXX1C_CYCLE_DISABLED)
+
+#if IS_ACTIVE(CONFIG_ADCXX1C_PARAM_CYCLE_DISABLE)
+#define CONFIG_ADCXX1C_PARAM_CYCLE                  (ADCXX1C_CYCLE_DISABLED)
+#elif IS_ACTIVE(CONFIG_ADCXX1C_PARAM_CYCLE_32)
+#define CONFIG_ADCXX1C_PARAM_CYCLE                  (ADCXX1C_CYCLE_32)
+#elif IS_ACTIVE(CONFIG_ADCXX1C_PARAM_CYCLE_64)
+#define CONFIG_ADCXX1C_PARAM_CYCLE                  (ADCXX1C_CYCLE_64)
+#elif IS_ACTIVE(CONFIG_ADCXX1C_PARAM_CYCLE_128)
+#define CONFIG_ADCXX1C_PARAM_CYCLE                  (ADCXX1C_CYCLE_128)
+#elif IS_ACTIVE(CONFIG_ADCXX1C_PARAM_CYCLE_256)
+#define CONFIG_ADCXX1C_PARAM_CYCLE                  (ADCXX1C_CYCLE_256)
+#elif IS_ACTIVE(CONFIG_ADCXX1C_PARAM_CYCLE_512)
+#define CONFIG_ADCXX1C_PARAM_CYCLE                  (ADCXX1C_CYCLE_512)
+#elif IS_ACTIVE(CONFIG_ADCXX1C_PARAM_CYCLE_1024)
+#define CONFIG_ADCXX1C_PARAM_CYCLE                  (ADCXX1C_CYCLE_1024)
+#elif IS_ACTIVE(CONFIG_ADCXX1C_PARAM_CYCLE_2048)
+#define CONFIG_ADCXX1C_PARAM_CYCLE                  (ADCXX1C_CYCLE_2048)
+#endif
+
+#ifndef CONFIG_ADCXX1C_PARAM_CYCLE
+#define CONFIG_ADCXX1C_PARAM_CYCLE                  (ADCXX1C_CYCLE_DISABLED)
 #endif
 
 /** @brief  Alert gpio pin */
@@ -83,7 +103,7 @@ extern "C" {
 #define ADCXX1C_PARAMS          { .i2c        = ADCXX1C_PARAM_I2C,        \
                                   .addr       = ADCXX1C_PARAM_ADDR,       \
                                   .bits       = ADCXX1C_PARAM_BITS,       \
-                                  .cycle      = ADCXX1C_PARAM_CYCLE,      \
+                                  .cycle      = CONFIG_ADCXX1C_PARAM_CYCLE,      \
                                   .alert_pin  = ADCXX1C_PARAM_ALERT_PIN,  \
                                   .low_limit  = CONFIG_ADCXX1C_PARAM_LOW_LIMIT,  \
                                   .high_limit = CONFIG_ADCXX1C_PARAM_HIGH_LIMIT, \
