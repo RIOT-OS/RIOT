@@ -296,6 +296,19 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
     return 0;
 }
 
+int16_t sock_dtls_session_get_epoch(sock_dtls_t *sock, sock_dtls_session_t *session)
+{
+    assert(sock);
+    assert(session);
+
+    dtls_peer_t *peer = dtls_get_peer(sock->dtls_ctx, &session->dtls_session);
+    if (!peer) {
+        return -ENOTCONN;
+    }
+    dtls_security_parameters_t *security = dtls_security_params(peer);
+    return security->epoch;
+}
+
 sock_udp_t *sock_dtls_get_udp_sock(sock_dtls_t *sock)
 {
     assert(sock);
