@@ -1,6 +1,10 @@
 DEVELHELP = 0
 include ../Makefile.tests_common
 
+# for some reason pyterm sends ANSI characters when used with graphical
+# terminal emulators. Socat doesn't seem to do it.
+RIOT_TERMINAL ?= socat
+
 USEMODULE += shell
 
 # Disable shell echo and prompt to not have them in the way for testing
