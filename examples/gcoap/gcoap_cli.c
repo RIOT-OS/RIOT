@@ -30,6 +30,28 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#if IS_USED(MODULE_GCOAP_DTLS)
+#include "net/credman.h"
+#include "net/dsm.h"
+#include "tinydtls_keys.h"
+
+/* Example credential tag for credman. Tag together with the credential type needs to be unique. */
+#define GCOAP_DTLS_CREDENTIAL_TAG 10
+
+static const uint8_t psk_id_0[] = PSK_DEFAULT_IDENTITY;
+static const uint8_t psk_key_0[] = PSK_DEFAULT_KEY;
+static const credman_credential_t credential = {
+    .type = CREDMAN_TYPE_PSK,
+    .tag = GCOAP_DTLS_CREDENTIAL_TAG,
+    .params = {
+        .psk = {
+            .key = { .s = psk_key_0, .len = sizeof(psk_key_0) - 1, },
+            .id = { .s = psk_id_0, .len = sizeof(psk_id_0) - 1, },
+        }
+    },
+};
+#endif
+
 static bool _proxied = false;
 static sock_udp_ep_t _proxy_remote;
 static char proxy_uri[64];
@@ -316,7 +338,16 @@ int gcoap_cli_cmd(int argc, char **argv)
     if (strcmp(argv[1], "info") == 0) {
         uint8_t open_reqs = gcoap_op_state();
 
-        printf("CoAP server is listening on port %u\n", CONFIG_GCOAP_PORT);
+        if (IS_USED(MODULE_GCOAP_DTLS)) {
+            printf("CoAP server is listening on port %u\n", CONFIG_GCOAPS_PORT);
+        } else {
+            printf("CoAP server is listening on port %u\n", CONFIG_GCOAP_PORT);
+        }
+#if IS_USED(MODULE_GCOAP_DTLS)
+        printf("Connection secured with DTLS\n");
+        printf("Free DTLS session slots: %d/%d\n", dsm_get_num_available_slots(),
+                dsm_get_num_maximum_slots());
+#endif
         printf(" CLI requests sent: %u\n", req_count);
         printf("CoAP open requests: %u\n", open_reqs);
         printf("Configured Proxy: ");
@@ -466,5 +497,19 @@ int gcoap_cli_cmd(int argc, char **argv)
 
 void gcoap_cli_init(void)
 {
+#if IS_USED(MODULE_GCOAP_DTLS)
+    int res = credman_add(&credential);
+    if (res < 0 && res != CREDMAN_EXIST) {
+        /* ignore duplicate credentials */
+        printf("gcoap: cannot add credential to system: %d\n", res);
+        return;
+    }
+    sock_dtls_t *gcoap_sock_dtls = gcoap_get_sock_dtls();
+    res = sock_dtls_add_credential(gcoap_sock_dtls, GCOAP_DTLS_CREDENTIAL_TAG);
+    if (res < 0) {
+        printf("gcoap: cannot add credential to DTLS sock: %d\n", res);
+    }
+#endif
+
     gcoap_register_listener(&_listener);
 }
