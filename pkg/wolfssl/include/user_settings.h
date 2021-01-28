@@ -315,8 +315,11 @@ int strncasecmp(const char *s1, const char * s2, unsigned int sz);
 
 /* The following defines should prevent declaration of name-colliding "Aes"
  * structure on SAML21, SAME54 platform code
+ *
+ * TODO: avoid pulling in all vendor files through cpu_conf.h
  */
 #define _SAML21_AES_COMPONENT_
+#define _SAMD51_AES_COMPONENT_
 #define _SAME54_AES_COMPONENT_
 #define _SAMR34_AES_COMPONENT_
 
