@@ -9,3 +9,10 @@ It can be flashed normally with:
 ```
 make flash -C tests/driver/bq2429x BOARD=...
 ```
+
+To test the driver, ensure a BQ2429x device is correctly plugged and configured
+and run:
+
+```
+make BOARD=<your board> -C tests/driver/bq2429x flash test-with-config
+```
