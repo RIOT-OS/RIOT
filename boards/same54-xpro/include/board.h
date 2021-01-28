@@ -34,6 +34,7 @@ extern "C" {
 #define AT24MAC_PARAM_I2C_DEV   I2C_DEV(1)
 #define AT24MAC_PARAM_I2C_ADDR  (0x5E)
 #define AT24MAC_PARAM_TYPE      AT24MAC4XX
+#define AT24CXXX_PARAM_I2C      I2C_DEV(1)
 #define AT24CXXX_PARAM_ADDR     (0x56)
 /** @} */
 
@@ -71,8 +72,10 @@ extern "C" {
  * @name MTD configuration
  * @{
  */
-extern mtd_dev_t *mtd0;
-#define MTD_0 mtd0
+extern mtd_dev_t *mtd0, *mtd1;
+#define MTD_0       mtd0
+#define MTD_1       mtd1
+#define MTD_NUMOF   2
 /** @} */
 
 /**

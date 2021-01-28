@@ -143,4 +143,5 @@ const mtd_desc_t mtd_mci_driver = {
     .write_page     = mtd_mci_write_page,
     .erase_sector   = mtd_mci_erase_sector,
     .power          = mtd_mci_power,
+    .flags          = MTD_DRIVER_FLAG_DIRECT_WRITE,
 };

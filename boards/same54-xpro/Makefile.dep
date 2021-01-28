@@ -9,6 +9,7 @@ endif
 ifneq (,$(filter mtd,$(USEMODULE)))
   FEATURES_REQUIRED += periph_spi_on_qspi
   USEMODULE += mtd_spi_nor
+  USEMODULE += mtd_at24cxxx at24mac
 endif
 
 # enables sam0_eth as default network device

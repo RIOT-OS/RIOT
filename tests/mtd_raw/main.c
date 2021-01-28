@@ -173,13 +173,36 @@ static int cmd_write(int argc, char **argv)
     return res;
 }
 
+static int cmd_write_page_raw(int argc, char **argv)
+{
+    mtd_dev_t *dev = _get_dev(argc, argv);
+    uint32_t page, offset, len;
+
+    if (argc < 5 || dev == NULL) {
+        printf("usage: %s <dev> <page> <offset> <data>\n", argv[0]);
+        return -1;
+    }
+
+    page   = atoi(argv[2]);
+    offset = atoi(argv[3]);
+    len    = strlen(argv[4]);
+
+    int res = mtd_write_page_raw(dev, argv[4], page, offset, len);
+
+    if (res) {
+        printf("error: %i\n", res);
+    }
+
+    return res;
+}
+
 static int cmd_write_page(int argc, char **argv)
 {
     mtd_dev_t *dev = _get_dev(argc, argv);
     uint32_t page, offset, len;
 
     if (argc < 5 || dev == NULL) {
-        printf("usage: %s <dev> <page> <offset> <len>\n", argv[0]);
+        printf("usage: %s <dev> <page> <offset> <data>\n", argv[0]);
         return -1;
     }
 
@@ -268,7 +291,7 @@ static void _print_size(uint64_t size)
         unit = "byte";
     }
 
-    printf("total: %lu %s\n", len, unit);
+    printf("%lu %s", len, unit);
 }
 
 static void _print_info(mtd_dev_t *dev)
@@ -276,7 +299,9 @@ static void _print_info(mtd_dev_t *dev)
     printf("sectors: %"PRIu32"\n", dev->sector_count);
     printf("pages per sector: %"PRIu32"\n", dev->pages_per_sector);
     printf("page size: %"PRIu32"\n", dev->page_size);
+    printf("total: ");
     _print_size(_get_size(dev));
+    puts("");
 }
 
 static int cmd_info(int argc, char **argv)
@@ -376,35 +401,42 @@ static int cmd_test(int argc, char **argv)
 
     /* write dummy data to sectors */
     memset(buffer, 0x23, dev->page_size);
-    assert(mtd_write_page(dev, buffer, page_0, 0, page_size) == 0);
-    assert(mtd_write_page(dev, buffer, page_1, 0, page_size) == 0);
+    assert(mtd_write_page_raw(dev, buffer, page_0, 0, page_size) == 0);
+    assert(mtd_write_page_raw(dev, buffer, page_1, 0, page_size) == 0);
 
-    /* erase two sectors and check if they have been erase */
+    /* erase two sectors and check if they have been erased */
     assert(mtd_erase_sector(dev, sector, 2) == 0);
     assert(mtd_read_page(dev, buffer, page_0, 0, page_size) == 0);
-    assert(mem_is_all_set(buffer, 0xFF, page_size));
+    assert(mem_is_all_set(buffer, 0xFF, page_size) || mem_is_all_set(buffer, 0x00, page_size));
     assert(mtd_read_page(dev, buffer, page_1, 0, page_size) == 0);
-    assert(mem_is_all_set(buffer, 0xFF, page_size));
+    assert(mem_is_all_set(buffer, 0xFF, page_size) || mem_is_all_set(buffer, 0x00, page_size));
 
     /* write test data & read it back */
     const char test_str[] = "0123456789";
     uint32_t offset = 5;
-    assert(mtd_write_page(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
+    assert(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
     assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
 
     /* write across page boundary */
     offset = page_size - sizeof(test_str) / 2;
-    assert(mtd_write_page(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
+    assert(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
     assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
 
     /* write across sector boundary */
     offset = page_size - sizeof(test_str) / 2
            + (dev->pages_per_sector - 1) * page_size;
-    assert(mtd_write_page(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
+    assert(mtd_write_page_raw(dev, test_str, page_0, offset, sizeof(test_str)) == 0);
     assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str)) == 0);
     assert(memcmp(test_str, buffer, sizeof(test_str)) == 0);
+
+    /* overwrite first test string, rely on MTD for read-modify-write */
+    const char test_str_2[] = "Hello World!";
+    offset = 5;
+    assert(mtd_write_page(dev, test_str_2, page_0, offset, sizeof(test_str_2)) == 0);
+    assert(mtd_read_page(dev, buffer, page_0, offset, sizeof(test_str_2)) == 0);
+    assert(memcmp(test_str_2, buffer, sizeof(test_str_2)) == 0);
 
     puts("[SUCCESS]");
 
@@ -419,7 +451,12 @@ static const shell_command_t shell_commands[] = {
     { "read", "Read a region of memory on the MTD device", cmd_read },
     { "read_page", "Read a region of memory on the MTD device (pagewise addressing)", cmd_read_page },
     { "write", "Write a region of memory on the MTD device", cmd_write },
-    { "write_page", "Write a region of memory on the MTD device (pagewise addressing)", cmd_write_page },
+    { "write_page_raw",
+      "Write a region of memory on the MTD device (pagewise addressing)",
+      cmd_write_page_raw },
+    { "write_page",
+      "Write a region of memory on the MTD device (pagewise addressing, read-modify-write)",
+      cmd_write_page },
     { "erase", "Erase a region of memory on the MTD device", cmd_erase },
     { "erase_sector", "Erase a sector of memory on the MTD device", cmd_erase_sector },
     { "test", "Erase & write test data to the last two sectors", cmd_test },
@@ -444,7 +481,9 @@ int main(void)
             continue;
         }
 
-        printf("OK (%lu kiB)\n", (unsigned long)(_get_size(dev) / 1024));
+        printf("OK (");
+        _print_size(_get_size(dev));
+        puts(")");
         mtd_power(dev, MTD_POWER_UP);
     }
 
