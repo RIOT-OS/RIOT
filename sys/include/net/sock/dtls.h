@@ -665,6 +665,19 @@ int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
 void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote);
 
 /**
+ * @brief   Get the current epoch of a session.
+ *
+ * @pre `(sock != NULL) && (ep != NULL)`
+ *
+ * @param[in]  sock     @ref sock_dtls_t, which the session is created on
+ * @param[in]  session  @ref sock_dtls_session_t, from which the epoch is to be
+ *                      extracted
+ *
+ * @return  The epoch on success
+ * @return  -ENOTCONN, if the session is not established
+ */
+int16_t sock_dtls_session_get_epoch(sock_dtls_t *sock, sock_dtls_session_t *session);
+/**
  * @brief Get the remote UDP endpoint from a session.
  *
  * @pre `(session != NULL) && (ep != NULL)`
