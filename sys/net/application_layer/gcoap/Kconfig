@@ -13,6 +13,42 @@ menuconfig KCONFIG_USEMODULE_GCOAP
 
 if KCONFIG_USEMODULE_GCOAP
 
+menu "DTLS options"
+config GCOAP_DTLS_CREDENTIAL_TAG
+    int "Credential tag"
+    default 5
+    range 0 65535
+    help
+        DTLS credential tag to determine, which credential to use for
+        authentication.
+
+config GCOAP_DTLS_HANDSHAKE_TIMEOUT_USEC
+    int "DTLS handshake timeout in microseconds"
+    default 4000000
+    help
+        Time, expressed in microseconds, that the DTLS send function waits for
+        a handshake process and the send process itself to complete.
+
+config GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS
+    int "Minimum number of available sessions"
+    default 1
+    help
+        Number of sessions that should be kept free. If the count of free
+        sessions falls below this threshold, oldest used sessions will be closed
+        after a timeout time.
+
+config GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_USEC
+    int "DTLS session slot automatic free up timeout in microseconds"
+    default 3000000
+    help
+        Time, expressed in microseconds. When the last session slot is occupied
+        this time indicates when a session will be freed up automatically.
+
+        Prevents that the server can be blocked by lack of available session
+        slots and not properly closed sessions.
+
+endmenu # DTLS options
+
 config GCOAP_PDU_BUF_SIZE
     int "Request or response buffer size"
     default 128
@@ -90,6 +126,13 @@ config GCOAP_PORT
     default 5683
     help
         Server port, the default is the one specified in RFC 7252.
+
+config GCOAPS_PORT
+    int "Secured server port"
+    default 5684
+    help
+        Server port for secured connections, the default is the one specified in
+        RFC 7252.
 
 config GCOAP_REQ_WAITING_MAX
     int "Maximum awaiting requests"

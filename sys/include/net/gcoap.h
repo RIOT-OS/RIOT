@@ -38,6 +38,7 @@
  * - Observe Server Operation
  * - Block Operation
  * - Proxy Operation
+ * - DTLS for transport security
  * - Implementation Notes
  * - Implementation Status
  *
@@ -338,6 +339,22 @@
  *
  * Not implemented yet.
  *
+ * ## DTLS as transport security ##
+ *
+ * Gcoap allows to use DTLS for transport security by using the @ref net_sock_dtls
+ * "DTLS sock API". Using the module gcoap_dtls enables the support. Gcoap
+ * listens for requests on CONFIG_GCOAPS_PORT, 5684 by default when DTLS is enabled.
+ *
+ * Credentials have to been configured before use. See @ref net_credman "Credman"
+ * and @ref net_sock_dtls_creds "DTLS sock credentials API" for credential managing.
+ * Access to the DTLS socket is provided by gcoap_get_sock_dtls().
+ *
+ * Gcoap includes a DTLS session management component that stores active sessions.
+ * By default, it tries to have CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS
+ * session slots available to keep the server responsive. If not enough sessions
+ * are available the server destroys the session that has not been used for the
+ * longest time after CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_USEC.
+ *
  * ## Implementation Notes ##
  *
  * ### Waiting for a response ###
@@ -384,6 +401,9 @@
 #include "event/timeout.h"
 #include "net/ipv6/addr.h"
 #include "net/sock/udp.h"
+#if IS_USED(MODULE_GCOAP_DTLS)
+#include "net/sock/dtls.h"
+#endif
 #include "net/nanocoap.h"
 #include "xtimer.h"
 
@@ -402,6 +422,36 @@ extern "C" {
  */
 #ifndef CONFIG_GCOAP_PORT
 #define CONFIG_GCOAP_PORT              (5683)
+#endif
+/**
+ * @brief   Secure Server port; use RFC 7252 default if not defined
+ */
+#ifndef CONFIG_GCOAPS_PORT
+#define CONFIG_GCOAPS_PORT             (5684)
+#endif
+
+/**
+ * @brief   Timeout for the DTLS handshake process. Set to 0 for infinite time
+ */
+#ifndef CONFIG_GCOAP_DTLS_HANDSHAKE_TIMEOUT_USEC
+#define CONFIG_GCOAP_DTLS_HANDSHAKE_TIMEOUT_USEC    (3 * US_PER_SEC)
+#endif
+
+/**
+ * @brief   Number of minimum available sessions. If the count of available
+ *          sessions falls below this threshold, the oldest used session will be
+ *          closed after a timeout time. Set to 0 to deactivate this feature.
+ */
+#ifndef CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS
+#define CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS  (1)
+#endif
+
+/**
+ * @brief   Timeout for freeing up a session when minimum number of available
+ *          sessions is not given.
+ */
+#ifndef CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_USEC
+#define CONFIG_GCOAP_DTLS_MINIMUM_AVAILABLE_SESSIONS_TIMEOUT_USEC  (15 * US_PER_SEC)
 #endif
 
 /**
@@ -565,11 +615,19 @@ extern "C" {
 
 /**
  * @brief Stack size for module thread
+ * @{
  */
 #ifndef GCOAP_STACK_SIZE
-#define GCOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE \
-                          + sizeof(coap_pkt_t))
+#if IS_USED(MODULE_GCOAP_DTLS)
+#define GCOAP_DTLS_EXTRA_STACKSIZE  (THREAD_STACKSIZE_DEFAULT)
+#else
+#define GCOAP_DTLS_EXTRA_STACKSIZE  (0)
 #endif
+
+#define GCOAP_STACK_SIZE (THREAD_STACKSIZE_DEFAULT + DEBUG_EXTRA_STACKSIZE \
+                          + sizeof(coap_pkt_t) + GCOAP_DTLS_EXTRA_STACKSIZE)
+#endif
+/** @} */
 
 /**
  * @ingroup net_gcoap_conf
@@ -586,6 +644,7 @@ extern "C" {
  */
 #define COAP_LINK_FLAG_INIT_RESLIST  (1)  /**< initialize as for first resource
                                            *   in a list */
+
 /** @} */
 
 /**
@@ -720,6 +779,33 @@ typedef struct {
 } gcoap_observe_memo_t;
 
 /**
+ * @brief   Coap socket types
+ */
+typedef enum {
+    COAP_SOCKET_TYPE_UNDEF = 0,
+    COAP_SOCKET_TYPE_UDP,
+    COAP_SOCKET_TYPE_DTLS
+} coap_socket_type_t;
+
+/**
+ * @brief   Coap socket to handle multiple transport types
+ */
+typedef struct {
+    coap_socket_type_t type;                /**< Type of stored socket */
+    union {
+        sock_udp_t *udp;
+#if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
+        sock_dtls_t *dtls;
+#endif
+    } socket;                               /**< Stored socket */
+#if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
+    sock_dtls_session_t ctx_dtls_session;   /**< Session object for the stored socket.
+                                                 Used for exchanging a session between
+                                                 functions. */
+#endif
+} coap_socket_t;
+
+/**
  * @brief   Initializes the gcoap thread and device
  *
  * Must call once before first use.
@@ -798,6 +884,7 @@ static inline ssize_t gcoap_request(coap_pkt_t *pdu, uint8_t *buf, size_t len,
  * @param[in] context       User defined context passed to the response handler
  *
  * @return  length of the packet
+ * @return -ENOTCONN, if DTLS was used and session establishment failed
  * @return  0 if cannot send
  */
 ssize_t gcoap_req_send(const uint8_t *buf, size_t len,
@@ -916,6 +1003,17 @@ int gcoap_get_resource_list(void *buf, size_t maxlen, uint8_t cf);
  */
 ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
                           size_t maxlen, coap_link_encoder_ctx_t *context);
+
+#if IS_USED(MODULE_GCOAP_DTLS) || defined(DOXYGEN)
+/**
+ * @brief   Get the underlying DTLS socket of gcoap.
+ *
+ * Useful for managing credentials of gcoap.
+ *
+ * @return  pointer to the @ref sock_dtls_t object
+ */
+sock_dtls_t *gcoap_get_sock_dtls(void);
+#endif
 
 #ifdef __cplusplus
 }
