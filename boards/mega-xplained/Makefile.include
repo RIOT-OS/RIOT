@@ -1,6 +1,6 @@
 # Found by checking fuse settings (2048 words so 4KB)
 # https://www.microchip.com/DevelopmentTools/ProductDetails/atmega1284p-xpld
-BOOTLOADER_SIZE ?= 4K
+ATMEGA_BOOTLOADER_SIZE ?= 4K
 
 # For backward compatibility
 ifneq (,$(AVRDUDE_PORT))
