@@ -79,6 +79,7 @@ IOTLAB_ARCHI_nrf52840-mdk   = nrf52840mdk:multi
 IOTLAB_ARCHI_pba-d-01-kw2x  = phynode:kw2xrf
 IOTLAB_ARCHI_samr21-xpro    = samr21:at86rf233
 IOTLAB_ARCHI_samr30-xpro    = samr30:at86rf212b
+IOTLAB_ARCHI_zigduino       = zigduino:atmega128rfa1
 IOTLAB_ARCHI := $(IOTLAB_ARCHI_$(BOARD))
 
 # There are several deprecated and incompatible features used here that were
@@ -93,7 +94,7 @@ else
   _NODES_DEPLOYED = $(shell iotlab-experiment --jmespath='"0"' --format='" ".join' get $(_IOTLAB_EXP_ID) --deployment)
   _NODES_LIST_OPTION = --nodes
   _NODES_FLASH_OPTION = --flash
-  ifneq (firefly,$(BOARD))
+  ifeq (,$(filter firefly zigduino,$(BOARD)))
     # All boards in IoT-LAB except firefly can be flashed using $(BINFILE).
     # On IoT-LAB, firefly only accepts $(ELFFILE) and WSN320 boards on accept $(HEXFILE).
     # Using $(BINFILE) speeds up the firmware upload since the file is much
