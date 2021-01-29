@@ -26,6 +26,7 @@
 
 #include "mutex.h"
 #include "net/gnrc/pktbuf.h"
+#include "net/netdev.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +35,8 @@ extern "C" {
 /**
  * @brief   TX synchronization data */
 typedef struct {
-    mutex_t signal;     /**< Mutex used for synchronization */
+    mutex_t signal;             /**< Mutex used for synchronization */
+    netdev_tx_info_t tx_info;   /**< auxiliary data about transmission */
 } gnrc_tx_sync_t;
 
 /**
