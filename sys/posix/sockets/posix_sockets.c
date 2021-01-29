@@ -405,11 +405,11 @@ static void _sock_set_cb(socket_t *socket)
         case SOCK_STREAM:
             /* is a TCP client socket */
             if (socket->queue_array == NULL) {
-                sock_tcp_set_cb(&socket->sock.tcp.sock, callback.tcp, socket);
+                sock_tcp_set_cb(&socket->sock->tcp.sock, callback.tcp, socket);
             }
             /* is a TCP listening socket */
             else {
-                sock_tcp_queue_set_cb(&socket->sock.tcp.queue,
+                sock_tcp_queue_set_cb(&socket->sock->tcp.queue,
                                       callback.tcp_queue, socket);
             }
             break;
