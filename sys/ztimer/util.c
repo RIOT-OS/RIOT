@@ -25,6 +25,7 @@
 
 #include "irq.h"
 #include "mutex.h"
+#include "rmutex.h"
 #include "thread.h"
 #include "ztimer.h"
 
@@ -179,4 +180,19 @@ int ztimer_mutex_lock_timeout(ztimer_clock_t *clock, mutex_t *mutex,
 
     ztimer_remove(clock, &t);
     return 0;
+}
+
+int ztimer_rmutex_lock_timeout(ztimer_clock_t *clock, rmutex_t *rmutex,
+                               uint32_t timeout)
+{
+    if (rmutex_trylock(rmutex)) {
+        return 0;
+    }
+    if (ztimer_mutex_lock_timeout(clock, &rmutex->mutex, timeout) == 0) {
+        atomic_store_explicit(&rmutex->owner,
+                              thread_getpid(), memory_order_relaxed);
+        rmutex->refcount++;
+        return 0;
+    }
+    return -ECANCELED;
 }
