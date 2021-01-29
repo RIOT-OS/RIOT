@@ -11,3 +11,7 @@ endif
 ifneq (,$(filter wolfmqtt_examples_mqttclient,$(USEMODULE)))
   USEMODULE += sock_tcp
 endif
+
+ifneq (,$(filter wolfmqtt_examples_snclient,$(USEMODULE)))
+  USEMODULE += sock_udp
+endif

@@ -1,0 +1,5 @@
+MODULE = wolfmqtt_examples_snclient
+
+SRC := $(filter-out sn-client_qos-1.c sn-multithread.c,$(wildcard *.c))
+
+include $(RIOTBASE)/Makefile.base
