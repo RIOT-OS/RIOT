@@ -4,4 +4,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     microduino-corerf \
     stm32f030f4-demo \
     waspmote-pro \
+    zigduino \
     #

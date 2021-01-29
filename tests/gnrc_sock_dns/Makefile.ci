@@ -32,4 +32,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     thingy52 \
     waspmote-pro \
     z1 \
+    zigduino \
     #

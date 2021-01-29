@@ -61,4 +61,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     weio \
     yunjia-nrf51822 \
     z1 \
+    zigduino \
     #

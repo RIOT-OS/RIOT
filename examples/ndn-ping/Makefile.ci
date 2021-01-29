@@ -29,4 +29,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     waspmote-pro \
     weio \
     z1 \
+    zigduino \
     #

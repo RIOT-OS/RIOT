@@ -28,4 +28,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32l0538-disco \
     telosb \
     waspmote-pro \
+    zigduino \
     #
