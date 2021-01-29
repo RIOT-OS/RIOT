@@ -7,7 +7,12 @@ include $(RIOTBASE)/pkg/pkg.mk
 
 CFLAGS += -Wno-unused-parameter
 
-all: $(filter wolfmqtt wolfmqtt_examples wolfmqtt_examples_mqttclient,$(USEMODULE))
+all: $(filter \
+    wolfmqtt \
+    wolfmqtt_examples \
+    wolfmqtt_examples_mqttclient \
+    wolfmqtt_examples_snclient \
+    ,$(USEMODULE))
 
 wolfmqtt:
 	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(CURDIR)/Makefile.$(PKG_NAME)
@@ -17,3 +22,6 @@ wolfmqtt_examples:
 
 wolfmqtt_examples_mqttclient:
 	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/mqttclient -f $(CURDIR)/Makefile.$(PKG_NAME).examples.mqttclient
+
+wolfmqtt_examples_snclient:
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/sn-client -f $(CURDIR)/Makefile.$(PKG_NAME).examples.snclient

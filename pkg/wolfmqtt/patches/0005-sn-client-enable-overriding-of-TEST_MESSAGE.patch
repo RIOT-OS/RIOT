@@ -1,0 +1,46 @@
+From 9544a5912ec87d1d1909a9e2aac24a878088c0ef Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Wed, 27 Jan 2021 19:04:04 +0100
+Subject: [PATCH] sn-client: enable overriding of TEST_MESSAGE
+
+---
+ wolfmqtt_examples/sn-client/sn-client.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/wolfmqtt_examples/sn-client/sn-client.c b/wolfmqtt_examples/sn-client/sn-client.c
+index 8dffc14..3076d3a 100644
+--- a/wolfmqtt_examples/sn-client/sn-client.c
++++ b/wolfmqtt_examples/sn-client/sn-client.c
+@@ -36,9 +36,15 @@ static int mStopRead = 0;
+ 
+ /* Configuration */
+ /* Maximum size for network read/write callbacks. */
+-#define MAX_BUFFER_SIZE 1024
+-#define TEST_MESSAGE    "test"
+-#define SHORT_TOPIC_NAME "s1"
++#define MAX_BUFFER_SIZE     1024
++
++#ifndef SHORT_TOPIC_NAME
++#define SHORT_TOPIC_NAME    "s1"
++#endif
++
++#ifndef TEST_MESSAGE
++#define TEST_MESSAGE        "test"
++#endif
+ 
+ static int sn_message_cb(MqttClient *client, MqttMessage *msg,
+     byte msg_new, byte msg_done)
+@@ -460,8 +466,8 @@ int main(int argc, char** argv)
+     mqttCtx.app_name = "sn-client";
+ 
+     /* Settings for MQTT-SN gateway */
+-    mqttCtx.host = "localhost";
+-    mqttCtx.port = 10000;
++    mqttCtx.host = DEFAULT_MQTT_HOST;
++    mqttCtx.port = DEFAULT_MQTT_PORT;
+ 
+     /* parse arguments */
+     rc = mqtt_parse_args(&mqttCtx, argc, argv);
+-- 
+2.25.1
+
