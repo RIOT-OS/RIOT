@@ -192,6 +192,7 @@ ssize_t sock_ip_send_aux(sock_ip_t *sock, const void *data, size_t len,
     gnrc_pktsnip_t *pkt;
     sock_ip_ep_t local;
     sock_ip_ep_t rem;
+    gnrc_sock_send_aux_t _aux = { .flags = 0 };
 
     assert((sock != NULL) || (remote != NULL));
     assert((len == 0) || (data != NULL)); /* (len != 0) => (data != NULL) */
@@ -258,7 +259,13 @@ ssize_t sock_ip_send_aux(sock_ip_t *sock, const void *data, size_t len,
     if (pkt == NULL) {
         return -ENOMEM;
     }
-    res = gnrc_sock_send(pkt, &local, &rem, proto);
+
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+    if (aux && (aux->flags & SOCK_AUX_GET_TIMESTAMP)) {
+        _aux.timestamp = &aux->timestamp;
+    }
+#endif
+    res = gnrc_sock_send(pkt, &local, &rem, proto, &_aux);
     if (res <= 0) {
         return res;
     }
@@ -268,6 +275,12 @@ ssize_t sock_ip_send_aux(sock_ip_t *sock, const void *data, size_t len,
                               sock->reg.async_cb_arg);
     }
 #endif  /* SOCK_HAS_ASYNC */
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
+    if (aux && (aux->flags & SOCK_AUX_GET_TIMESTAMP)
+        && (_aux.flags & GNRC_SOCK_SEND_AUX_FLAG_TIMESTAMP)) {
+        aux->flags &= ~SOCK_AUX_GET_TIMESTAMP;
+    }
+#endif
     return res;
 }
 
