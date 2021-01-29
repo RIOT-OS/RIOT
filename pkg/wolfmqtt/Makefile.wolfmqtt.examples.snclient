@@ -1,0 +1,3 @@
+MODULE = wolfmqtt_examples_snclient
+
+include $(RIOTBASE)/Makefile.base
