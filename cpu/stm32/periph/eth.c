@@ -28,7 +28,6 @@
 #include "iolist.h"
 #include "macros/utils.h"
 #include "mii.h"
-#include "mutex.h"
 #include "net/ethernet.h"
 #include "net/eui_provider.h"
 #include "net/netdev/eth.h"
@@ -568,6 +567,10 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
         if (!i) {
             /* fist chunk */
             status |= TX_DESC_STAT_FS;
+            if (IS_USED(MODULE_PERIPH_PTP) && IS_USED(MODULE_NETDEV_TX_INFO_TIMESTAMP)) {
+                /* enable time stamping for this frame */
+                status |= TX_DESC_STAT_TTSE;
+            }
         }
         if (!iolist->iol_next) {
             /* last chunk */
@@ -590,8 +593,9 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
     return 0;
 }
 
-static int stm32_eth_confirm_send(netdev_t *netdev, void *info)
+static int stm32_eth_confirm_send(netdev_t *netdev, void *_info)
 {
+    netdev_tx_info_t *info = _info;
     (void)info;
     (void)netdev;
     if (IS_USED(MODULE_STM32_ETH_TRACING)) {
@@ -626,11 +630,22 @@ static int stm32_eth_confirm_send(netdev_t *netdev, void *info)
             }
             _reset_eth_dma();
         }
-        tx_curr = tx_curr->desc_next;
         tx_bytes += tx_curr->control;
         if (status & TX_DESC_STAT_LS) {
+#ifdef MODULE_NETDEV_TX_INFO_TIMESTAMP
+            if (IS_USED(MODULE_PERIPH_PTP)) {
+                /* time stamp was requested, but check if it actually was captured via TTSS bit */
+                if (status & TX_DESC_STAT_TTSS) {
+                    info->timestamp = tx_curr->ts_low;
+                    info->timestamp += (uint64_t)tx_curr->ts_high * NS_PER_SEC;
+                    info->flags |= NETDEV_TX_INFO_FLAG_TIMESTAMP;
+                }
+            }
+#endif
+            tx_curr = tx_curr->desc_next;
             break;
         }
+        tx_curr = tx_curr->desc_next;
     }
 
     _debug_tx_descriptor_info(__LINE__);
