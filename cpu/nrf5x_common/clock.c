@@ -18,6 +18,9 @@
  */
 
 #include "cpu.h"
+#include "irq.h"
+#include "assert.h"
+#include "nrf_clock.h"
 #include "periph_conf.h"
 
 /* make sure both clocks are configured */
@@ -27,6 +30,8 @@
 #ifndef CLOCK_LFCLK
 #error "Clock init: CLOCK_LFCLK is not defined by your board!"
 #endif
+
+static unsigned _hfxo_requests = 0;
 
 void clock_init_hf(void)
 {
@@ -39,12 +44,36 @@ void clock_init_hf(void)
 #endif
 #endif
 
-#if CLOCK_HFCLK
-    /* start the HF clock */
-    NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
-    NRF_CLOCK->TASKS_HFCLKSTART = 1;
-    while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) {}
+    /* allow to always enable the HFXO as non-default option */
+#if CLOCK_HFXO_ONBOOT
+    clock_hfxo_request();
 #endif
+}
+
+void clock_hfxo_request(void)
+{
+    unsigned state = irq_disable();
+    ++_hfxo_requests;
+    if (_hfxo_requests == 1) {
+        NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
+        NRF_CLOCK->TASKS_HFCLKSTART = 1;
+        while (NRF_CLOCK->EVENTS_HFCLKSTARTED == 0) {}
+    }
+    irq_restore(state);
+}
+
+void clock_hfxo_release(void)
+{
+    /* if this function is called while the counter is zero the state in a
+     * driver requesting the HFXO is broken! */
+    assert(_hfxo_requests);
+
+    unsigned state = irq_disable();
+    --_hfxo_requests;
+    if (_hfxo_requests == 0) {
+        NRF_CLOCK->TASKS_HFCLKSTOP = 1;
+    }
+    irq_restore(state);
 }
 
 void clock_start_lf(void)

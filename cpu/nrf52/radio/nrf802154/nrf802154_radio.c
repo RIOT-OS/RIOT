@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "luid.h"
+#include "nrf_clock.h"
 
 #include "net/ieee802154.h"
 #include "periph/timer.h"
@@ -100,6 +101,22 @@ static const ieee802154_radio_ops_t nrf802154_ops;
 ieee802154_dev_t nrf802154_hal_dev = {
     .driver = &nrf802154_ops,
 };
+
+static void _power_on(void)
+{
+    if (NRF_RADIO->POWER == 0) {
+        clock_hfxo_request();
+        NRF_RADIO->POWER = 1;
+    }
+}
+
+static void _power_off(void)
+{
+    if (NRF_RADIO->POWER == 1) {
+        NRF_RADIO->POWER = 0;
+        clock_hfxo_release();
+    }
+}
 
 static bool _l2filter(uint8_t *mhr)
 {
@@ -445,7 +462,8 @@ int nrf802154_init(void)
     (void)result;
     timer_stop(NRF802154_TIMER);
 
-    /* power off peripheral */
+    /* power off peripheral (but do not release the HFXO as we never requested
+     * it so far) */
     NRF_RADIO->POWER = 0;
 
     return 0;
@@ -574,7 +592,7 @@ static int _request_on(ieee802154_dev_t *dev)
     (void) dev;
     _state = STATE_IDLE;
     DEBUG("[nrf802154]: Request to turn on\n");
-    NRF_RADIO->POWER = 1;
+    _power_on();
     /* make sure the radio is disabled/stopped */
     _disable();
     /* we configure it to run in IEEE802.15.4 mode */
@@ -639,7 +657,7 @@ static int _off(ieee802154_dev_t *dev)
 {
     (void) dev;
     DEBUG("[nrf802154] Turning off the radio\n");
-    NRF_RADIO->POWER = 0;
+    _power_off();
     return 0;
 }
 
