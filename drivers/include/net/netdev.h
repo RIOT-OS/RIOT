@@ -282,6 +282,32 @@ struct netdev_radio_rx_info {
 };
 
 /**
+ * @name    Flags indicating which fields in @ref netdev_tx_info_t
+ *          are present
+ * @{
+ */
+#define NETDEV_TX_INFO_FLAG_TIMESTAMP       (1U << 0)
+/** @} */
+
+/**
+ * @brief   Structure to pass on auxiliary data about a transmission
+ */
+typedef struct {
+#if IS_USED(MODULE_NETDEV_TX_INFO_TIMESTAMP) || DOXYGEN
+    /**
+     * @brief   The time stamp of transmission in nanoseconds since epoch
+     *
+     * If possible, this should precisely record the time when the start of
+     * frame delimiter or the first bit after the preamble is transmitted
+     *
+     * @note    Only available when module `netdev_tx_info_timestamp` is used
+     */
+    uint64_t timestamp;
+#endif
+    uint8_t flags;      /**< Flags indicating populated entries */
+} netdev_tx_info_t;
+
+/**
  * @brief   Forward declaration for netdev struct
  */
 typedef struct netdev netdev_t;
