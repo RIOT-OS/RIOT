@@ -147,7 +147,9 @@ ifneq (,$(filter ieee802154_radio_hal,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+  # enable default network devices on the platform
   USEMODULE += netdev_default
+  USEMODULE += netdev
   USEMODULE += gnrc_netif
 endif
 

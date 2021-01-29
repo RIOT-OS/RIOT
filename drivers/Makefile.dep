@@ -197,7 +197,7 @@ ifneq (,$(filter periph_timer_periodic,$(USEMODULE)))
   FEATURES_REQUIRED += periph_timer
 endif
 
-ifneq (,$(filter netdev_%,$(USEMODULE)))
+ifneq (,$(filter-out netdev_default, $(filter netdev_%,$(USEMODULE))))
   USEMODULE += netdev
   # Don't register netdevs if there is only a single one of them
   ifeq (,$(filter gnrc_netif_single,$(USEMODULE)))
