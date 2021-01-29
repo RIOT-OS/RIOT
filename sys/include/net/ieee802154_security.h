@@ -33,9 +33,6 @@
 extern "C" {
 #endif
 
-#if IS_USED(MODULE_IEEE802154_RADIO_HAL)
-#include "net/ieee802154/radio.h"
-#else
 /**
  * @brief   Forward declaration of an IEEE802.15.4 abstract security device
  */
@@ -97,7 +94,6 @@ struct ieee802154_sec_dev {
      */
     void *ctx;
 };
-#endif
 
 #if !defined(IEEE802154_DEFAULT_KEY) || defined(DOXYGEN)
 /**

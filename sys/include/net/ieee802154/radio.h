@@ -733,64 +733,6 @@ struct ieee802154_radio_ops {
 };
 
 /**
- * @brief Forward declaration of the radio cipher ops structure
- */
-typedef struct ieee802154_radio_cipher_ops ieee802154_radio_cipher_ops_t;
-
-/**
- * @brief Forward declaration of the IEEE802.15.4 security device descriptor
- */
-typedef struct ieee802154_sec_dev ieee802154_sec_dev_t;
-
-/**
- * @brief IEEE802.15.4 security device descriptor
- */
-struct ieee802154_sec_dev {
-    /**
-     * @brief Pointer to the operations of the device
-     */
-    const struct ieee802154_radio_cipher_ops *cipher_ops;
-    /**
-     * @brief pointer to the context of the device
-     */
-    void *ctx;
-};
-
-struct ieee802154_radio_cipher_ops {
-    /**
-     * @brief   Function to set the encryption key for the
-     *          next cipher operation
-     *
-     * @param[in]       dev         Security device descriptor
-     * @param[in]       key         Key to be used for the next cipher operation
-     * @param[in]       key_size    key size in bytes
-     */
-    void (*set_key)(ieee802154_sec_dev_t *dev,
-                    const uint8_t *key, uint8_t key_size);
-    /**
-     * @brief   Function to perform ECB encryption
-     *
-     * @param[in]       dev         Security device descriptor
-     * @param[out]      cipher      Output cipher blocks
-     * @param[in]       plain       Input plain blocks
-     * @param[in]       nblocks     Number of blocks
-     */
-    void (*ecb)(const ieee802154_sec_dev_t *dev, uint8_t *cipher,
-                const uint8_t *plain, uint8_t nblocks);
-    /**
-     * @brief   Function to compute CBC-MAC
-     *
-     * @param[in]       dev         Security device descriptor
-     * @param[in]       cipher      Output cipher blocks
-     * @param[in, out]  iv          in: IV; out: computed MIC
-     * @param[in]       plain       Input plain blocks
-     * @param[in]       nblocks     Number of blocks
-     */
-    void (*cbc)(const ieee802154_sec_dev_t *dev, uint8_t *cipher,
-                uint8_t *iv, const uint8_t *plain, uint8_t nblocks);
-};
-
-/**
  * @brief Shortcut to @ref ieee802154_radio_ops::write
  *
  * @param[in] dev IEEE802.15.4 device descriptor
@@ -1227,48 +1169,6 @@ static inline int ieee802154_radio_set_rx_mode(ieee802154_dev_t *dev,
                                                ieee802154_rx_mode_t mode)
 {
     return dev->driver->set_rx_mode(dev, mode);
-}
-
-/**
- * @brief Shortcut to ieee802154_sec_dev_t::ieee802154_radio_cipher_ops_t::set_key
- *
- * @param[in] dev IEEE802.15.4 security device descriptor
- * @param[in] key Encryption key
- * @param[in] key_size Size of the key in bytes
- */
-static inline void ieee802154_radio_cipher_set_key(ieee802154_sec_dev_t *dev,
-                                                   const uint8_t *key, uint8_t key_size)
-{
-    dev->cipher_ops->set_key(dev->ctx, key, key_size);
-}
-
-/**
- * @brief Shortcut to ieee802154_sec_dev_t::ieee802154_radio_cipher_ops_t::ecb
- *
- * @param[in] dev IEEE802.15.4 security device descriptor
- * @param[out] cipher Output cipher blocks
- * @param[in] plain Input plain blocks
- * @param[in] nblocks Number of blocks
- */
-static inline void ieee802154_radio_cipher_ecb(const ieee802154_sec_dev_t *dev, uint8_t *cipher,
-                                               const uint8_t *plain, uint8_t nblocks)
-{
-    dev->cipher_ops->ecb(dev->ctx, cipher, plain, nblocks);
-}
-
-/**
- * @brief Shortcut to ieee802154_sec_dev_t::ieee802154_radio_cipher_ops_t::cbc
- *
- * @param[in] dev IEEE802.15.4 security device descriptor
- * @param[out] cipher Output cipher blocks
- * @param[in] iv Initial vector to be XOR´ed to the first plain block
- * @param[in] plain Input plain blocks
- * @param[in] nblocks Number of blocks
- */
-static inline void ieee802154_radio_cipher_cbc(const ieee802154_sec_dev_t *dev, uint8_t *cipher,
-                                               uint8_t *iv, const uint8_t *plain, uint8_t nblocks)
-{
-    dev->cipher_ops->cbc(dev->ctx, cipher, iv, plain, nblocks);
 }
 
 #ifdef __cplusplus
