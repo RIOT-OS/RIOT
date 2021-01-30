@@ -142,6 +142,196 @@ enum {
 };
 
 /**
+ * @name    ADC CPU configuration
+ * @{
+ */
+#if DOXYGEN
+/**
+ * @brief Define if ADC external capacitor is connected to PA06 pin.
+ *
+ * The ADC block can use an external capacitor to better stabilize the reference
+ * voltage. This capacitor is optional, but if it is present on the board this
+ * macro should be defined by the board to make the ADC block use it.
+ */
+#define BOARD_HAS_ADC_PA06_CAP
+#endif
+
+#ifndef DOXYGEN
+/**
+ * @name   ADC resolution values
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT = 6u,         /**< ADC resolution: 6 bit + sign */
+    ADC_RES_8BIT = 8u,         /**< ADC resolution: 8 bit + sign */
+    ADC_RES_10BIT = 10u,       /**< ADC resolution: 10 bit + sign */
+    ADC_RES_12BIT = 12u,       /**< ADC resolution: 12 bit + sign */
+    ADC_RES_14BIT = 14u,       /**< ADC resolution: 14 bit + sign */
+    ADC_RES_16BIT = 16u,       /**< ADC resolution: 16 bit + sign */
+    /* Extra modes supported by this CPU. */
+    ADC_RES_MAX = 22u,         /**< Full ADC resolution: 22 bit + sign */
+    ADC_RES_UV = 23u,          /**< ADC resolution: signed int in uV */
+} adc_res_t;
+/** @} */
+#endif /* ifndef DOXYGEN */
+
+/**
+ * @brief   ADC oversample clock configuration
+ *
+ * The ADC runs at a given ADC clock frequency which is derived from either the
+ * high frequency clock (16 or 32 MHz) or the low frequency one (32 or
+ * 32.768 KHz). Running the ADC from the 32 KHz source can be useful in low
+ * power applications where the high speed clock is not running.
+ *
+ * The ADC sample rate for adc_sample() will be about 128 times slower than the
+ * ADC clock, due to the decimation filter, meaning that the maximum sampling
+ * rate is 31.25 KHz.
+ */
+typedef enum {
+    ADC_CLOCK_4M,     /**< 4 MHz from the high speed clock. */
+    ADC_CLOCK_2M,     /**< 2 MHz from the high speed clock. */
+    ADC_CLOCK_1M,     /**< 1 MHz from the high speed clock. */
+    ADC_CLOCK_500K,   /**< 500 KHz from the high speed clock. */
+    ADC_CLOCK_250K,   /**< 250 KHz from the high speed clock. */
+    ADC_CLOCK_125K,   /**< 125 KHz from the high speed clock. */
+    ADC_CLOCK_62K5,   /**< 62.5 KHz from the high speed clock. */
+    ADC_CLOCK_31K25,  /**< 31.25 KHz from the high speed clock. */
+    ADC_CLOCK_32K,    /**< 32 KHz or 32.768 KHz from the low speed clock. */
+} qn908x_adc_clock_t;
+
+#ifdef DOXYGEN
+/** @brief Selected ADC oversample clock.
+ *
+ * Define to one of the qn908x_adc_clock_t values.
+ */
+#define QN908X_ADC_CLOCK
+/** @} */
+#endif /* ifdef DOXYGEN */
+
+
+/**
+ * @brief   ADC channel pair configuration
+ *
+ * The following are the possible combinations of + and - inputs to the ADC
+ * sigma delta. Some of these combinations reference the "Vinn" signal which can
+ * be independently selected, see @ref qn908x_adc_vinn_t for details.
+ *
+ * The first signal is connected to the positive side while the second one is
+ * connected to the negative side. For example, ADC_CHANNEL_ADC0_ADC1 will read
+ * a positive value if ADC0 voltage is higher than ADC1.
+ *
+ * The @ref ADC_CHANNEL_TEMP uses the internal temperature signal and
+ * @ref ADC_CHANNEL_VCC4_VINN connects the + side to Vcc/4, which is useful to
+ * measure the battery level when Vcc is directly connected to a battery.
+ */
+typedef enum {
+    ADC_CHANNEL_ADC0_ADC1 =  0u << 9u,   /**< Sample ADC0 / ADC1 */
+    ADC_CHANNEL_ADC2_ADC3 =  1u << 9u,   /**< Sample ADC2 / ADC3 */
+    ADC_CHANNEL_ADC4_ADC5 =  2u << 9u,   /**< Sample ADC4 / ADC5 */
+    ADC_CHANNEL_ADC6_ADC7 =  3u << 9u,   /**< Sample ADC6 / ADC7 */
+    ADC_CHANNEL_ADC0_VINN =  4u << 9u,   /**< Sample ADC0 / Vinn */
+    ADC_CHANNEL_ADC1_VINN =  5u << 9u,   /**< Sample ADC1 / Vinn */
+    ADC_CHANNEL_ADC2_VINN =  6u << 9u,   /**< Sample ADC2 / Vinn */
+    ADC_CHANNEL_ADC3_VINN =  7u << 9u,   /**< Sample ADC3 / Vinn */
+    ADC_CHANNEL_ADC4_VINN =  8u << 9u,   /**< Sample ADC4 / Vinn */
+    ADC_CHANNEL_ADC5_VINN =  9u << 9u,   /**< Sample ADC5 / Vinn */
+    ADC_CHANNEL_ADC6_VINN = 10u << 9u,   /**< Sample ADC6 / Vinn */
+    ADC_CHANNEL_ADC7_VINN = 11u << 9u,   /**< Sample ADC7 / Vinn */
+    ADC_CHANNEL_TEMP      = 13u << 9u,   /**< Sample internal temperature */
+    ADC_CHANNEL_VCC4_VINN = 14u << 9u,   /**< Sample 1/4 Vcc / Vinn */
+    ADC_CHANNEL_VINN_VINN = 15u << 9u,   /**< Sample Vinn / Vinn */
+    ADC_CHANNEL_VINN_VSS  = 20u << 9u,   /**< Sample Vinn / Vss */
+} qn908x_adc_channel_t;
+
+/**
+ * @brief   ADC Vref configuration
+ *
+ * This value affects the reference voltage used by the ADC as the full range.
+ * It is also used in some cases to generate the Vinn signal are is only relevant for the channels that reference Vinn when it was
+ * set by @ref qn908x_adc_vinn_t to use Vref. The actual values match the field
+ * VREF_SEL in ADC CTRL register.
+ */
+typedef enum {
+    ADC_VREF_1V2  = 0x0000u, /**< Vref := internal 1.2V. */
+    ADC_VREF_VREF = 0x4000u, /**< Vref := external ADC_VREFI pin */
+    ADC_VREF_VEXT = 0x8000u, /**< Vref := external ADC_VREFI with the driver */
+    ADC_VREF_VCC  = 0xC000u, /**< Vref := Vcc */
+} qn908x_adc_vref_t;
+
+/**
+ * @brief   ADC Vref x1.5 multiplier flag
+ *
+ * Note, this is the same value as ADC_CFG_VREF_GAIN_MASK. When enabled the
+ * Vref voltage will be multiplied by 1.5x.
+ */
+#define ADC_VREF_GAIN_X15 (0x100u)
+
+/**
+ * @brief   ADC PGA Enabled flag
+ *
+ * Flag to enable the Programmable Gain Amplifier (PGA) with a gain of 1x. This
+ * is only useful if the source signal doesn't have any driving capability since
+ * the gain is set to 1x. The hardware supports other gain combinations but
+ * those are not supported by the driver.
+ *
+ * Note: this value is defined as the inverse of ADC_CFG_PGA_BP_MASK which is
+ * defined if the PGA is bypassed.
+ */
+#define ADC_PGA_ENABLE (0x08u)
+
+/**
+ * @brief   ADC Vinn configuration
+ *
+ * This value is only relevant for the channels that reference Vinn. The value
+ * is the same as the PGA_VINN in ADC CFG register with a logic xor 0x30u to
+ * make the default AVSS (analog Vss pad).
+ */
+typedef enum {
+    ADC_VINN_VREF     = 0x30u, /**< Use Vinn := Vref */
+    ADC_VINN_VREF_3_4 = 0x20u, /**< Use Vinn := 3/4 * Vref */
+    ADC_VINN_VREF_2   = 0x10u, /**< Use Vinn := 1/2 * Vref */
+    ADC_VINN_AVSS     = 0x00u, /**< Use Vinn := Vss */
+} qn908x_adc_vinn_t;
+
+/**
+ * @brief   ADC SD Gain configuration
+ *
+ * This multiplies the sampled value (difference between +/- signals) by the
+ * given value.
+ *
+ * Note: these values logic xor 0x40 match the values for ADC_CFG_ADC_GAIN
+ * field. This is selected so that omitting this flag in the config field
+ * defaults to x1.0 gain but it can still be converted to the ADC_GAIN field
+ * with a simple logic xor.
+ */
+typedef enum {
+    ADC_GAIN_X05 = 0x40u, /**< Use gain := 0.5 */
+    ADC_GAIN_X1  = 0x00u, /**< Use gain := 1 */
+    ADC_GAIN_X15 = 0xC0u, /**< Use gain := 1.5 */
+    ADC_GAIN_X20 = 0x80u, /**< Use gain := 2 */
+} qn908x_adc_gain_t;
+
+/**
+ * @brief   CPU specific ADC configuration
+ *
+ * ADC Channel, Vinn, Vref and gain configuration.
+ *
+ * This value should be set to the logic or between the following values:
+ *  * bit 3: the optional flag @ref ADC_PGA_ENABLE,
+ *  * bits 4-5: a @ref qn908x_adc_vinn_t value defining Vinn if needed,
+ *  * bits 6-7: a @ref qn908x_adc_gain_t optional gain value,
+ *  * bit 8: the optional flag @ref ADC_VREF_GAIN_X15,
+ *  * bits 9-13: the selected @ref qn908x_adc_channel_t, and
+ *  * bits 14-15: the @ref qn908x_adc_vref_t value defining Vref.
+ *
+ * The same channels with different settings can be configured as different ADC
+ * lines in the board, just using different adc_conf_t entries.
+ */
+typedef uint16_t adc_conf_t;
+/** @} */
+
+/**
  * @brief   CPU specific timer Counter/Timers (CTIMER) configuration
  * @{
  */
