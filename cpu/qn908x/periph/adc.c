@@ -159,15 +159,15 @@ int adc_init(adc_t line)
                     ADC_CTRL_CH_IDX_EN(0) |
                     ADC_CTRL_DATA_FORMAT(1) | /* DATA is sign extended. */
                     ADC_CTRL_SIG_INV_EN(0) |
-#ifdef CONFIG_BOARD_HAS_ADC_PA06_CAP
+#ifdef BOARD_HAS_ADC_PA06_CAP
                     ADC_CTRL_VREFO_EN(1) |
-#endif /* CONFIG_BOARD_HAS_ADC_PA06_CAP */
+#endif /* BOARD_HAS_ADC_PA06_CAP */
                     ADC_CTRL_TRIGGER(35 /* software trigger */);
 
-#ifdef CONFIG_BOARD_HAS_ADC_PA06_CAP
+#ifdef BOARD_HAS_ADC_PA06_CAP
         /* Use PA06 as the ADC_EX_CAP signal. */
         gpio_init_mux(GPIO_PIN(PORT_A, 6), 1);
-#endif /* CONFIG_BOARD_HAS_ADC_PA06_CAP */
+#endif /* BOARD_HAS_ADC_PA06_CAP */
 
         /* Always use CFG[0] to sample all channels. */
         ADC->CH_CFG = 0u;
