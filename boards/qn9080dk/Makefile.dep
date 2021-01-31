@@ -2,3 +2,8 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
   USEMODULE += mma8x5x
 endif
+
+# For MX25R2035F on SPI_DEV(0).
+ifneq (,$(filter mtd,$(USEMODULE)))
+  USEMODULE += mtd_spi_nor
+endif
