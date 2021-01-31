@@ -44,8 +44,7 @@ config CPU_MODEL_MK20DX256VLH7
 
 config CPU_MODEL_MK22FN512VLH12
     bool
-# This is actually M4F; TODO: Add floating point support
-    select CPU_CORE_CORTEX_M4
+    select CPU_CORE_CORTEX_M4F
     select CPU_FAM_K
     select HAS_PERIPH_HWRNG
 
@@ -77,8 +76,7 @@ config CPU_MODEL_MK60DN512VLL10
 
 config CPU_MODEL_MK64FN1M0VLL12
     bool
-# This is actually M4F; TODO: Add floating point support
-    select CPU_CORE_CORTEX_M4
+    select CPU_CORE_CORTEX_M4F
     select CPU_FAM_K
     select HAS_PERIPH_HWRNG
 
