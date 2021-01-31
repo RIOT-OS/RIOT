@@ -47,22 +47,25 @@ The same54-xpro is available from various hardware vendors for ~70USD (as of
 
 ## Implementation Status
 
-| Device | ID        | Supported | Comments  |
-|:------------- |:------------- |:------------- |:------------- |
-| MCU        | same54    | partly    | |
-| Low-level driver | GPIO    | yes       | |
-|        | ADC       | no    | |
-|        | PWM       | no    | |
-|        | UART      | yes       | |
-|        | I2C       | yes       | |
-|        | SPI       | yes       |  |
-|        | USB       | no        | |
-|        | RTT       | yes       | |
-|        | RTC       | yes       |  |
-|        | RNG       | yes       |  |
-|        | Timer     | yes           | |
-|        | Ethernet  | no           | |
-
+| Device           | ID        | Supported | Comments  |
+|:---------------- |:--------- |:--------- |:--------- |
+| MCU              | same54    | partly    |           |
+| Low-level driver | GPIO      | yes       |           |
+|                  | ADC       | yes       |           |
+|                  | CAN       | no        |           |
+|                  | DAC       | yes       |           |
+|                  | QSPI      | no        | see #15300|
+|                  | SD/MMC    | no        |           |
+|                  | PWM       | yes       |           |
+|                  | UART      | yes       |           |
+|                  | I2C       | yes       |           |
+|                  | SPI       | yes       |           |
+|                  | USB       | yes       |           |
+|                  | RTT       | yes       |           |
+|                  | RTC       | yes       |           |
+|                  | RNG       | yes       |           |
+|                  | Timer     | yes       |           |
+|                  | Ethernet  | yes       |           |
 
 
 ## Flashing the device
