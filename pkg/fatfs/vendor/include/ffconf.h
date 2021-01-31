@@ -2,7 +2,7 @@
 /  FatFs - Configuration file
 /---------------------------------------------------------------------------*/
 
-#define FFCONF_DEF	86606	/* Revision ID */
+#define FFCONF_DEF	80196	/* Revision ID */
 
 /*---------------------------------------------------------------------------/
 / Function Configurations
