@@ -340,22 +340,16 @@ int spi_init_with_gpio_mode(spi_t bus, spi_gpio_mode_t mode);
  * is active when this function is called, this function will block until the
  * other transaction is complete (spi_relase was called).
  *
- * @note    This function expects the @p bus and the @p cs parameters to be
- *          valid (they are checked in spi_init and spi_init_cs before)
- *
  * @param[in]   bus     SPI device to access
  * @param[in]   cs      chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
  * @param[in]   mode    mode to use for the new transaction
  * @param[in]   clk     bus clock speed to use for the transaction
  *
- * @retval  0           success
- * @retval  -EINVAL     Invalid mode in @p mode
- * @retval  -EINVAL     Invalid clock in @p clock
- * @retval  -ENOTSUP    Unsupported but valid mode in @p mode
- * @retval  -ENOTSUP    Unsupported but valid clock in @p clock
+ * @pre     All parameters are valid and supported, otherwise an assertion blows
+ *          up (if assertions are enabled).
  */
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk);
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk);
 
 /**
  * @brief   Finish an ongoing SPI transaction by releasing the given SPI bus
