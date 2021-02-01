@@ -21,9 +21,10 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
 
@@ -59,9 +60,10 @@ void spi_init_pins(spi_t bus)
     SPI_MISOSEL = spi_config[bus].miso;
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void) cs;
+    (void)cs;
+    assert((unsigned)bus < SPI_NUMOF);
 
     mutex_lock(&locks[bus]);
     /* power on the bus (NRF51 only) */
@@ -71,8 +73,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     dev(bus)->FREQUENCY = clk;
     /* enable the bus */
     dev(bus)->ENABLE = 1;
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

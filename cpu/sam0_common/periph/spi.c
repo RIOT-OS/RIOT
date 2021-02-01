@@ -26,9 +26,10 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
-#include "assert.h"
 #include "periph/spi.h"
 #include "pm_layered.h"
 
@@ -374,9 +375,10 @@ void spi_deinit_pins(spi_t bus)
     gpio_disable_mux(spi_config[bus].mosi_pin);
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
+    assert((unsigned)bus < SPI_NUMOF);
 
     /* get exclusive access to the device */
     mutex_lock(&locks[bus]);
@@ -392,8 +394,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* mux clk_pin to SPI peripheral */
     gpio_init_mux(spi_config[bus].clk_pin, spi_config[bus].clk_mux);
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

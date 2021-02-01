@@ -87,7 +87,7 @@ void spi_init_pins(spi_t bus)
     gpio_init(spi_config[bus].mosi_pin, GPIO_OUT);
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
     (void)clk;
@@ -106,8 +106,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     (void)dev(bus)->STATUS;
     (void)dev(bus)->DATA;
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

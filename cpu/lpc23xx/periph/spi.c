@@ -95,19 +95,16 @@ void spi_init_pins(spi_t bus)
     *(&PINSEL0 + cfg->pinsel_clk) |= cfg->pinsel_msk_clk;
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void) cs;
+    (void)cs; (void)mode;
+    assert((unsigned)bus < SPI_NUMOF);
+    assert(mode == SPI_MODE_0);
 
     uint32_t pclksel;
     uint32_t cpsr;
 
     lpc23xx_spi_t *dev = get_dev(bus);
-
-    /* only support for mode 0 at the moment */
-    if (mode != SPI_MODE_0) {
-        return SPI_NOMODE;
-    }
 
     /* lock bus */
     mutex_lock(&lock[bus]);
@@ -141,8 +138,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     while (dev->SR & SSPSR_RNE) {       /* while RNE (Receive FIFO Not Empty)...*/
         dev->DR;                        /* read data*/
     }
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

@@ -20,6 +20,7 @@
 
 #ifdef MODULE_PERIPH_SPIDEV_LINUX
 
+#include <assert.h>
 #include <fcntl.h>
 #include <string.h>
 #include <sys/ioctl.h>
@@ -145,12 +146,10 @@ void spidev_linux_teardown(void)
     }
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     DEBUG("spi_acquire(%u, %u, 0x%02x, %d)\n", bus, cs, mode, clk);
-    if (bus >= SPI_NUMOF) {
-        return SPI_NODEV;
-    }
+    assert((unsigned)bus < SPI_NUMOF);
 
     mutex_lock(&(device_state[bus].lock));
 
@@ -166,8 +165,7 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
         unsigned csid = CS_TO_CSID(cs);
         if (device_state[bus].fd[csid] < 0) {
             DEBUG("spi_acquire: No fd for %u:%u\n", bus, csid);
-            mutex_unlock(&(device_state[bus].lock));
-            return SPI_NOCS;
+            assert(0);
         }
         fd = device_state[bus].fd[csid];
         DEBUG("spi_acquire: Using %u:%u with HWCS (-> fd 0x%x)\n", bus, csid, fd);
@@ -175,25 +173,23 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     else if (IS_GPIO_CS(cs) || cs == SPI_CS_UNDEF) {
         fd = spidev_get_first_fd(&(device_state[bus]));
         if (fd < 0) {
-            mutex_unlock(&(device_state[bus].lock));
-            return SPI_NOCS;
+            DEBUG("spi_acquire: Invalid CS parameter\n");
+            assert(0);
         }
         DEBUG("spi_acquire: Using SPI_CS_UNDEF (-> fd 0x%x)\n", fd);
     }
     else {
         DEBUG("spi_acquire: Invalid CS parameter\n");
-        mutex_unlock(&(device_state[bus].lock));
-        return SPI_NOCS;
+        assert(0);
     }
 
     int res = spi_set_params(fd, use_hwcs, mode, clk);
     if (res < 0) {
         DEBUG("spi_acquire: set_params failed\n");
-        mutex_unlock(&(device_state[bus].lock));
+        assert(0);
     }
 
     DEBUG("spi_acquire: bus %u acquired\n", bus);
-    return SPI_OK;
 }
 
 void spi_init(spi_t bus)

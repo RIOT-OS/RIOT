@@ -26,6 +26,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "bitarithm.h"
 #include "cpu.h"
 #include "mutex.h"
@@ -219,8 +221,9 @@ int spi_init_with_gpio_mode(spi_t bus, spi_gpio_mode_t mode)
 }
 #endif
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
+    assert((unsigned)bus < SPI_NUMOF);
 
     /* lock bus */
     mutex_lock(&locks[bus]);
@@ -279,8 +282,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     if (cr2_extra_settings) {
         dev(bus)->CR2 = (SPI_CR2_SETTINGS | cr2_extra_settings);
     }
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)
