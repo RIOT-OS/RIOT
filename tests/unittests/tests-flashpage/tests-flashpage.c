@@ -27,6 +27,9 @@
 #define FLASHPAGE_NUMOF     128
 #endif
 
+/* fake uniform flashpage sizes for devices that don't have it */
+#undef PERIPH_FLASHPAGE_CUSTOM_PAGESIZES
+
 #include "periph/flashpage.h"
 
 static void test_flashbase_addr(void)
