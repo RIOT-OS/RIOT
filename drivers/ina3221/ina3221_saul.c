@@ -31,7 +31,7 @@
 static int read_bus_voltage(const void *dev, phydat_t *res)
 {
     ina3221_t *_dev = (ina3221_t *)dev;
-    ina3221_enable_ch_t ench = 0;
+    uint16_t ench = 0;
     int16_t voltage[INA3221_NUM_CH] = { 0 };
     int num_ch = _ina3221_get_enable_channel(_dev, &ench);
 
@@ -54,7 +54,7 @@ static int read_bus_voltage(const void *dev, phydat_t *res)
 static int read_current(const void *dev, phydat_t *res)
 {
     ina3221_t *_dev = (ina3221_t *)dev;
-    ina3221_enable_ch_t ench = 0;
+    uint16_t ench = 0;
     int32_t shunt_uv[INA3221_NUM_CH] = { 0 };
     int32_t current[INA3221_NUM_CH] = { 0 };
     int num_ch = _ina3221_get_enable_channel(_dev, &ench);
@@ -81,7 +81,7 @@ static int read_current(const void *dev, phydat_t *res)
 static int read_power(const void *dev, phydat_t *res)
 {
     ina3221_t *_dev = (ina3221_t *)dev;
-    ina3221_enable_ch_t ench = 0;
+    uint16_t ench = 0;
     int32_t shunt_uv[INA3221_NUM_CH] = { 0 };
     int32_t current_ua[INA3221_NUM_CH] = { 0 };
     int16_t bus_mv[INA3221_NUM_CH] = { 0 };
@@ -112,7 +112,7 @@ static int read_power(const void *dev, phydat_t *res)
 static int read_shunt_voltage_sum(const void *dev, phydat_t *res)
 {
     ina3221_t *_dev = (ina3221_t *)dev;
-    ina3221_enable_ch_t ench = 0;
+    uint16_t ench = 0;
     int32_t shunt_voltage_sum = SAUL_INA3221_NO_VALUE;
     int num_ch = _ina3221_get_enable_channel(_dev, &ench);
 
@@ -130,7 +130,7 @@ static int read_shunt_voltage_sum(const void *dev, phydat_t *res)
 static int configure_channel(const void *dev, phydat_t *data)
 {
     ina3221_t *_dev = (ina3221_t *)dev;
-    ina3221_enable_ch_t ench =
+    uint16_t ench =
         ((data->val[0] & INA3221_CH1) ? INA3221_ENABLE_CH1 : 0) |
         ((data->val[0] & INA3221_CH2) ? INA3221_ENABLE_CH2 : 0) |
         ((data->val[0] & INA3221_CH3) ? INA3221_ENABLE_CH3 : 0);
@@ -144,7 +144,7 @@ static int configure_channel(const void *dev, phydat_t *data)
 static int configure_channel_sum(const void *dev, phydat_t *data)
 {
     ina3221_t *_dev = (ina3221_t *)dev;
-    ina3221_enable_sum_ch_t esch =
+    uint16_t esch =
         ((data->val[0] & INA3221_CH1) ? INA3221_ENABLE_SUM_CH1 : 0) |
         ((data->val[0] & INA3221_CH2) ? INA3221_ENABLE_SUM_CH2 : 0) |
         ((data->val[0] & INA3221_CH3) ? INA3221_ENABLE_SUM_CH3 : 0);
