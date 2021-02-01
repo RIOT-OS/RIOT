@@ -171,7 +171,7 @@ struct congure_snd_driver {
      *
      * @param[in]   c           The CongURE state object.
      * @param[in]   msgs        A collection of messages for which the ACK
-     *                          timed out. The list may be changed by the
+     *                          timed out. The list must not be changed by the
      *                          method.
      */
     void (*report_msgs_timeout)(congure_snd_t *c, congure_snd_msg_t *msgs);
@@ -190,7 +190,8 @@ struct congure_snd_driver {
      *
      * @param[in]   c           The CongURE state object.
      * @param[in]   msgs        A collection of messages that are known to
-     *                          be lost. The list may be changed by the method.
+     *                          be lost. The list must not be be changed by the
+     *                          method.
      */
     void (*report_msgs_lost)(congure_snd_t *c, congure_snd_msg_t *msgs);
 

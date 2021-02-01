@@ -8,6 +8,8 @@ if !TEST_KCONFIG
 menu "CongURE congestion control abstraction"
     depends on USEMODULE_CONGURE
 
+rsource "test/Kconfig"
+
 endmenu # CongURE congestion control abstraction
 endif # !TEST_KCONFIG
 
@@ -17,6 +19,8 @@ menuconfig MODULE_CONGURE
     depends on TEST_KCONFIG
 
 if MODULE_CONGURE
+
+rsource "test/Kconfig"
 
 endif   # MODULE_CONGURE
 endif   # TEST_KCONFIG

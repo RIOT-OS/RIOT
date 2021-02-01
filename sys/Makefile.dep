@@ -25,6 +25,10 @@ ifneq (,$(filter congure_%,$(USEMODULE)))
   USEMODULE += congure
 endif
 
+ifneq (,$(filter congure_test,$(USEMODULE)))
+  USEMODULE += fmt
+endif
+
 ifneq (,$(filter eepreg,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eeprom
 endif
