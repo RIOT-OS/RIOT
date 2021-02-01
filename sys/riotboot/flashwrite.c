@@ -49,9 +49,15 @@ size_t riotboot_flashwrite_slotsize(
 int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
                              size_t offset)
 {
+#ifdef FLASHPAGE_SIZE
     assert(offset <= FLASHPAGE_SIZE);
     /* the flashpage size must be a multiple of the riotboot flashpage buffer */
     static_assert(!(FLASHPAGE_SIZE % RIOTBOOT_FLASHPAGE_BUFFER_SIZE));
+#else
+    /* The flashpage buffer must be a multiple of the write block size */
+    static_assert(!(RIOTBOOT_FLASHPAGE_BUFFER_SIZE % FLASHPAGE_WRITE_BLOCK_SIZE));
+#endif
+
 
     LOG_INFO(LOG_PREFIX "initializing update to target slot %i\n",
              target_slot);
@@ -103,15 +109,20 @@ int riotboot_flashwrite_putbytes(riotboot_flashwrite_t *state,
     LOG_DEBUG(LOG_PREFIX "processing bytes %u-%u\n", state->offset, state->offset + len - 1);
 
     while (len) {
-        size_t flashpage_pos = state->offset % FLASHPAGE_SIZE;
+        /* Position within the page, calculated from state->offset by
+         * subtracting the start offset of the current page */
+        size_t flashpage_pos = state->offset -
+            (flashpage_addr(state->flashpage) - (void*)riotboot_slot_get_hdr(state->target_slot));
         size_t flashwrite_buffer_pos = state->offset % RIOTBOOT_FLASHPAGE_BUFFER_SIZE;
         size_t flashpage_avail = RIOTBOOT_FLASHPAGE_BUFFER_SIZE - flashwrite_buffer_pos;
 
         size_t to_copy = min(flashpage_avail, len);
 
-        if (CONFIG_RIOTBOOT_FLASHWRITE_RAW && flashpage_pos == 0) {
+        if (CONFIG_RIOTBOOT_FLASHWRITE_RAW &&
+                flashpage_pos == flashpage_size(state->flashpage)) {
             /* Erase the next page */
             state->flashpage++;
+            flashpage_pos = 0;
             flashpage_erase(state->flashpage);
         }
         if (CONFIG_RIOTBOOT_FLASHWRITE_RAW &&

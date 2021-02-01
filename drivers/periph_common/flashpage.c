@@ -37,7 +37,7 @@ void flashpage_read(unsigned page, void *data)
     assert(page < (FLASH->SFR & FLASH_SFR_SFSA));
 #endif
 
-    memcpy(data, flashpage_addr(page), FLASHPAGE_SIZE);
+    memcpy(data, flashpage_addr(page), flashpage_size(page));
 }
 
 int flashpage_verify(unsigned page, const void *data)
@@ -48,7 +48,7 @@ int flashpage_verify(unsigned page, const void *data)
     assert(page < (int)(FLASH->SFR & FLASH_SFR_SFSA));
 #endif
 
-    if (memcmp(flashpage_addr(page), data, FLASHPAGE_SIZE) == 0) {
+    if (memcmp(flashpage_addr(page), data, flashpage_size(page)) == 0) {
         return FLASHPAGE_OK;
     }
     else {
