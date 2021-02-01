@@ -29,20 +29,15 @@ extern "C" {
 #endif
 
 /**
- * @brief   Acquire the SPI interface of the transceiver and configure it
- *
- * @retval  SPI_OK      Success
- * @retval  SPI_NOMODE  SPI mode 0 not supported by MCU
- * @retval  SPI_NOCLK   SPI clock given in @ref cc110x_params_t is not supported
+ * @brief   Acquire the SPI interface of the transceiver
  *
  * @pre     When first acquiring the device either after boot or after having put
  *          the device to sleep mode, use @ref cc110x_power_on_and_acquire
  *          instead. Subsequently, this function should be used (it is faster).
  */
-static inline int cc110x_acquire(cc110x_t *dev)
+static inline void cc110x_acquire(cc110x_t *dev)
 {
-    return spi_acquire(dev->params.spi, dev->params.cs, SPI_MODE_0,
-                       dev->params.spi_clk);
+    spi_acquire(dev->params.spi, dev->params.cs, SPI_MODE_0, dev->params.spi_clk);
 }
 
 /**

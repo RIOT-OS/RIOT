@@ -58,7 +58,8 @@ static int _init_bus(const lis2dh12_t *dev)
 
 static int _acquire(const lis2dh12_t *dev)
 {
-    return spi_acquire(BUS, BUS_CS, BUS_MODE, BUS_CLK);
+    spi_acquire(BUS, BUS_CS, BUS_MODE, BUS_CLK);
+    return BUS_OK;
 }
 
 static void _release(const lis2dh12_t *dev)

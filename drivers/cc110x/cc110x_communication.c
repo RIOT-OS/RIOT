@@ -39,9 +39,7 @@ int cc110x_power_on_and_acquire(cc110x_t *dev)
     gpio_set(cs);
     spi_init_cs(dev->params.spi, dev->params.cs);
 
-    if (cc110x_acquire(dev) != SPI_OK) {
-        return -EIO;
-    }
+    cc110x_acquire(dev);
 
     while (cc110x_state_from_status(cc110x_status(dev)) != CC110X_STATE_IDLE) {
         cc110x_cmd(dev, CC110X_STROBE_IDLE);

@@ -354,11 +354,7 @@ static int cc110x_recv(netdev_t *netdev, void *buf, size_t len, void *info)
     /* Call to cc110x_enter_rx_mode() will clear dev->buf.len, so back up it first */
     int size = dev->buf.len;
 
-    if (cc110x_acquire(dev) != SPI_OK) {
-        DEBUG("[cc110x] netdev_driver_t::recv(): cc110x_acquire() "
-              "failed\n");
-        return -EIO;
-    }
+    cc110x_acquire(dev);
 
     /* Copy RX info on last frame (if requested) */
     if (info != NULL) {
@@ -396,10 +392,7 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
     /* assert that cc110x_send was called with valid parameters */
     assert(netdev && iolist && (iolist->iol_len == sizeof(cc1xxx_l2hdr_t)));
 
-    if (cc110x_acquire(dev) != SPI_OK) {
-        DEBUG("[cc110x] netdev_driver_t::send(): cc110x_acquire() failed\n");
-        return -1;
-    }
+    cc110x_acquire(dev);
 
     switch (dev->state) {
     case CC110X_STATE_FSTXON:
@@ -503,9 +496,7 @@ static int cc110x_send(netdev_t *netdev, const iolist_t *iolist)
  */
 static int cc110x_get_promiscuous_mode(cc110x_t *dev, netopt_enable_t *dest)
 {
-    if (cc110x_acquire(dev) != SPI_OK) {
-        return -EIO;
-    }
+    cc110x_acquire(dev);
 
     uint8_t pktctrl1;
     cc110x_read(dev, CC110X_REG_PKTCTRL1, &pktctrl1);
@@ -598,9 +589,7 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
  */
 static int cc110x_set_addr(cc110x_t *dev, uint8_t addr)
 {
-    if (cc110x_acquire(dev) != SPI_OK) {
-        return -EIO;
-    }
+    cc110x_acquire(dev);
 
     dev->addr = addr;
     cc110x_write(dev, CC110X_REG_ADDR, addr);
@@ -618,9 +607,7 @@ static int cc110x_set_addr(cc110x_t *dev, uint8_t addr)
  */
 static int cc110x_set_promiscuous_mode(cc110x_t *dev, netopt_enable_t enable)
 {
-    if (cc110x_acquire(dev) != SPI_OK) {
-        return -EIO;
-    }
+    cc110x_acquire(dev);
 
     uint8_t pktctrl1 = CC110X_PKTCTRL1_VALUE;
     if (enable == NETOPT_ENABLE) {
