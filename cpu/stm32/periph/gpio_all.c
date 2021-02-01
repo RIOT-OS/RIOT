@@ -36,6 +36,7 @@
  * @brief   The STM32F0 family has 16 external interrupt lines
  */
 #define EXTI_NUMOF          (16U)
+#define EXTI_MASK           (0xFFFF)
 
 /**
  * @brief   Allocate memory for one callback and argument per EXTI channel
@@ -338,8 +339,8 @@ void isr_exti(void)
 #if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
     defined(CPU_FAM_STM32MP1)
     /* only generate interrupts against lines which have their IMR set */
-    uint32_t pending_rising_isr = (EXTI->RPR1 & EXTI_REG_IMR);
-    uint32_t pending_falling_isr = (EXTI->FPR1 & EXTI_REG_IMR);
+    uint32_t pending_rising_isr = (EXTI->RPR1 & EXTI_REG_IMR & EXTI_MASK);
+    uint32_t pending_falling_isr = (EXTI->FPR1 & EXTI_REG_IMR & EXTI_MASK);
 
     /* clear by writing a 1 */
     EXTI->RPR1 = pending_rising_isr;
@@ -348,7 +349,7 @@ void isr_exti(void)
     uint32_t pending_isr = pending_rising_isr | pending_falling_isr;
 #else
     /* only generate interrupts against lines which have their IMR set */
-    uint32_t pending_isr = (EXTI_REG_PR & EXTI_REG_IMR);
+    uint32_t pending_isr = (EXTI_REG_PR & EXTI_REG_IMR & EXTI_MASK);
 
     /* clear by writing a 1 */
     EXTI_REG_PR = pending_isr;
