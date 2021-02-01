@@ -72,9 +72,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "periph_cpu.h"
-#include "periph_conf.h"
+#include "macros/units.h"
 #include "periph/gpio.h"
+#include "periph_conf.h"
+#include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -172,16 +173,16 @@ typedef enum {
  * The actual speed of the bus can vary to some extend, as the combination of
  * CPU clock and available prescaler values on certain platforms may not make
  * the exact values possible.
+ *
+ * @deprecated  Use numeric values instead
  */
-#ifndef HAVE_SPI_CLK_T
-typedef enum {
-    SPI_CLK_100KHZ = 0,     /**< drive the SPI bus with 100KHz */
-    SPI_CLK_400KHZ,         /**< drive the SPI bus with 400KHz */
-    SPI_CLK_1MHZ,           /**< drive the SPI bus with 1MHz */
-    SPI_CLK_5MHZ,           /**< drive the SPI bus with 5MHz */
-    SPI_CLK_10MHZ           /**< drive the SPI bus with 10MHz */
-} spi_clk_t;
-#endif
+enum {
+    SPI_CLK_100KHZ  = KHZ(100), /**< drive the SPI bus with 100KHz */
+    SPI_CLK_400KHZ  = KHZ(400), /**< drive the SPI bus with 400KHz */
+    SPI_CLK_1MHZ    = MHZ(1),   /**< drive the SPI bus with 1MHz */
+    SPI_CLK_5MHZ    = MHZ(5),   /**< drive the SPI bus with 5MHz */
+    SPI_CLK_10MHZ   = MHZ(10),  /**< drive the SPI bus with 10MHz */
+};
 
 /**
  * @brief   Basic initialization of the given SPI bus
@@ -338,18 +339,33 @@ int spi_init_with_gpio_mode(spi_t bus, spi_gpio_mode_t mode);
  * Starting a new SPI transaction will get exclusive access to the SPI bus
  * and configure it according to the given values. If another SPI transaction
  * is active when this function is called, this function will block until the
- * other transaction is complete (spi_relase was called).
+ * other transaction is complete (@ref spi_release was called).
  *
  * @param[in]   bus     SPI device to access
  * @param[in]   cs      chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
  * @param[in]   mode    mode to use for the new transaction
- * @param[in]   clk     bus clock speed to use for the transaction
+ * @param[in]   clk     maximum bus clock to use in Hz
+ *
+ * @return  The actually used clock frequency in Hz
  *
  * @pre     All parameters are valid and supported, otherwise an assertion blows
  *          up (if assertions are enabled).
+ *
+ * @post    The SPI devices is configured to run with the given SPI mode at the
+ *          highest supported SPI clock that is less than or equal to @p clk_hz.
+ *          Exclusive access to the SPI bus is guaranteed until @ref spi_release
+ *          is called.
+ *
+ * @note    Implementations will accept arbitrary high values for @p clk_hz and
+ *          just fall back to a supported speed. A frequency below the lowest
+ *          frequency supported will however cause an `assert()`ion to blow.
+ *          An implementation supporting all enum values for @p mode will not
+ *          verify this, as users of this function are expected to not just
+ *          cast random numbers to `spi_mode_t` but use the dedicated enum
+ *          values.
  */
-void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk);
+uint32_t spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, uint32_t clk_hz);
 
 /**
  * @brief   Finish an ongoing SPI transaction by releasing the given SPI bus
