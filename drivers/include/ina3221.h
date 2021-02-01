@@ -9,6 +9,7 @@
 /**
  * @defgroup    drivers_ina3221 INA3221 current/power monitor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver for Texas Instruments INA3221
  *              three-channel ,high-side current and bus voltage
  *              monitor
