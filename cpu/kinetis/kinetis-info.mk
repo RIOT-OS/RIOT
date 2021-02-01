@@ -37,8 +37,7 @@ else ifeq ($(KINETIS_CORE), D)
   CPU_CORE = cortex-m4
 else ifeq ($(KINETIS_CORE), F)
   # Cortex-M4F or Cortex-M7
-  # TODO: Add floating point support
-  CPU_CORE = cortex-m4
+  CPU_CORE = cortex-m4f
 endif
 
 # For the rest of the build system we expose the series as family
