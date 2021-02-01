@@ -130,6 +130,7 @@ extern "C" {
 #if defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
     defined(CPU_FAM_STM32F7)
 #define PERIPH_FLASHPAGE_CUSTOM_PAGESIZES
+#define PERIPH_FLASHPAGE_NEEDS_FLASHPAGE_ADDR
 
 /**
  * @brief stm32 dual bank configuration

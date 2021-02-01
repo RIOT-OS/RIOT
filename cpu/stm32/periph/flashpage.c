@@ -328,16 +328,6 @@ size_t flashpage_size(unsigned page)
     }
 }
 
-void *flashpage_addr(unsigned page)
-{
-    uintptr_t addr = CPU_FLASH_BASE;
-    while (page) {
-        addr += flashpage_size(--page);
-    }
-
-    return (void*)addr;
-}
-
 unsigned flashpage_page(void *addr)
 {
     /* Calculates the flashpage number based on the address for the
