@@ -10,18 +10,19 @@ include $(RIOTCPU)/stm32/stm32_riotboot.mk
 include $(RIOTCPU)/stm32/stm32_mem_lengths.mk
 KB := 1024
 ROM_LEN_K := $(shell echo $(ROM_LEN) | sed 's/K//')
+RAM_LEN_K := $(shell echo $(RAM_LEN) | sed 's/K//')
 
 ifeq (stm32wb55rg,$(CPU_MODEL))
   # adjust RAM_LEN and ROM_LEN according to CPU2 RAM_LEN and ROM_LEN
-  RAM_LEN_K := $(shell echo $(RAM_LEN) | sed 's/K//')
   CPU2_RAM_LEN_K := $(shell echo $(CPU2_RAM_LEN) | sed 's/K//')
-  RAM_LEN := $(shell echo $$(( ($(RAM_LEN_K) - $(CPU2_RAM_LEN_K) ) ))K)
+  RAM_LEN := $(shell echo $$(( ($(RAM_LEN_K) - $(CPU2_RAM_LEN_K) ) * $(KB) )))
 
   CPU2_ROM_LEN_K := $(shell echo $(CPU2_ROM_LEN) | sed 's/K//')
   FLASHSIZE := $(shell echo $$(( ($(ROM_LEN_K) - $(CPU2_ROM_LEN_K) )* $(KB) )) )
   ROM_LEN := $(shell echo $$(( ($(ROM_LEN_K) - $(CPU2_ROM_LEN_K) ) ))K)
 else
   FLASHSIZE := $(shell echo $$(( $(ROM_LEN_K) * $(KB) )) )
+  RAM_LEN := $(shell echo $$(( $(RAM_LEN_K) * $(KB) )) )
 endif
 
 # Get CPU_LINE_ variable
@@ -37,7 +38,8 @@ info-stm32:
 	@$(COLOR_ECHO) "\tLine: $(CPU_LINE)"
 	@$(COLOR_ECHO) "\tPin count:\t$(STM32_PINS)"
 	@$(COLOR_ECHO) "\tROM size:\t$(ROM_LEN) ($(FLASHSIZE) Bytes)"
-	@$(COLOR_ECHO) "\tRAM size:\t$(RAM_LEN)"
+	@$(COLOR_ECHO) "\tRAM size:\t$(RAM_LEN_K)KiB"
+
 
 ifneq (,$(CCMRAM_LEN))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ccmram_length=$(CCMRAM_LEN)
