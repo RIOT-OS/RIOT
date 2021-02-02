@@ -62,7 +62,6 @@ ifneq (,$(filter openwsn_radio,$(USEMODULE)))
 endif
 
 ifneq (,$(filter openwsn_radio_hal,$(USEMODULE)))
-  USEMODULE += ieee802154_radio_hal
   # Used here only for dependency resolution
   DISABLE_MODULE += auto_init_gnrc_netif
 endif
