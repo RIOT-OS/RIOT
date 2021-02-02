@@ -6,10 +6,11 @@ SRC = \
     cc2538_rf_internal.c \
     #
 
-ifneq (,$(filter ieee802154_radio_hal,$(USEMODULE)))
-  SRC += cc2538_rf_radio_ops.c
-else
+# use netdev implementation when legacy is explicitly enabled
+ifneq (,$(filter cc2538_rf_netdev_legacy,$(USEMODULE)))
   SRC += cc2538_rf_netdev.c
+else
+  SRC += cc2538_rf_radio_ops.c
 endif
 
 include $(RIOTBASE)/Makefile.base
