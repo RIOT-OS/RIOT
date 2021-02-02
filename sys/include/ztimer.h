@@ -237,6 +237,7 @@
 #include "sched.h"
 #include "msg.h"
 #include "mutex.h"
+#include "rmutex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -531,6 +532,19 @@ void ztimer_set_timeout_flag(ztimer_clock_t *clock, ztimer_t *timer,
  */
 int ztimer_mutex_lock_timeout(ztimer_clock_t *clock, mutex_t *mutex,
                               uint32_t timeout);
+
+/**
+ * @brief   Try to lock the given rmutex, but give up after @p timeout
+ *
+ * @param[in]       clock       ztimer clock to operate on
+ * @param[in,out]   rmutex      rmutex object to lock
+ * @param[in]       timeout     timeout after which to give up
+ *
+ * @retval  0               Success, caller has the rmutex
+ * @retval  -ECANCELED      Failed to obtain rmutex within @p timeout
+ */
+int ztimer_rmutex_lock_timeout(ztimer_clock_t *clock, rmutex_t *rmutex,
+                               uint32_t timeout);
 
 /**
  * @brief   Update ztimer clock head list offset
