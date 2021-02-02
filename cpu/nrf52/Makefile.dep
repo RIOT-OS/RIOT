@@ -4,8 +4,9 @@ ifneq (,$(filter nrf802154,$(USEMODULE)))
   FEATURES_REQUIRED += periph_timer
   FEATURES_REQUIRED += radio_nrf802154
   USEMODULE += luid
-  USEMODULE += netdev_ieee802154
-  ifeq (,$(filter netdev_ieee802154_legacy,$(USEMODULE)))
+  ifneq (,$(filter nrf802154_netdev_legacy,$(USEMODULE)))
+    USEMODULE += netdev_ieee802154
+  else ifneq (,$(filter netdev,$(USEMODULE)))
     USEMODULE += netdev_ieee802154_submac
   endif
 endif
