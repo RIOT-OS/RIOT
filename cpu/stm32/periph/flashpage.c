@@ -164,10 +164,11 @@ static void _erase_page(void *page_addr)
     }
 #endif
 
-#ifdef FLASH_CR_PNB
-    /* reset PER bit (if the register settings exist) */
     DEBUG("[flashpage] erase: resetting the page erase bit\n");
-    CNTRL_REG &= ~(FLASH_CR_PER | FLASH_CR_PNB);
+    CNTRL_REG &= ~(FLASH_CR_PER);
+#ifdef FLASH_CR_PNB
+    /* reset PNB bit (if the register settings exist) */
+    CNTRL_REG &= ~(FLASH_CR_PNB);
 #endif
 
     /* lock the flash module again */
