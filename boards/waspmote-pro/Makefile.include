@@ -2,6 +2,5 @@
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 BAUD        ?= 9600
 WASPMOTE_PRO_BOOTLOADER ?= stk500v1
-BOOTLOADER  ?= $(WASPMOTE_PRO_BOOTLOADER)
 
 include $(RIOTBOARD)/common/atmega/Makefile.include

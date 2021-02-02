@@ -2,6 +2,5 @@
 BAUD        ?= 9600
 
 ARDUINO_MEGA2560_BOOTLOADER ?= stk500v2
-BOOTLOADER ?= $(ARDUINO_MEGA2560_BOOTLOADER)
 
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

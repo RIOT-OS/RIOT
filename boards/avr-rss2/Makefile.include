@@ -4,7 +4,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 # refine serial port information for pyterm
 BAUD        ?= 115200
 AVR_RSS2_BOOTLOADER ?= stk500v2
-BOOTLOADER  ?= $(AVR_RSS2_BOOTLOADER)
-BOOTLOADER_SIZE ?= 4K # Unlike the Arduino Mega2560, the bootloader size is 4K
+ATMEGA_BOOTLOADER_SIZE ?= 4K # Unlike the Arduino Mega2560, the bootloader size is 4K
 
 include $(RIOTBOARD)/common/atmega/Makefile.include

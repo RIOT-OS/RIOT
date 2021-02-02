@@ -5,6 +5,6 @@ PORT_LINUX  ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 # refine serial port information for pyterm
 BAUD        ?= 115200
-BOOTLOADER  ?= derfmega
+DERFMEGA128_BOOTLOADER  ?= derfmega
 
 include $(RIOTBOARD)/common/atmega/Makefile.include

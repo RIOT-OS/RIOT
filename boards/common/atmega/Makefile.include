@@ -3,51 +3,54 @@ INCLUDES += -I$(RIOTBOARD)/common/atmega/include
 # Use avrdude programmer
 PROGRAMMER ?= avrdude
 
+# Use atmega board specific bootloader by default
+ATMEGA_BOOTLOADER ?= $($(call uppercase_and_underscore,$(BOARD))_BOOTLOADER)
+
 # If avrdude specific programmer is not set, set it based on the bootloader used
 ifeq (,$(AVRDUDE_PROGRAMMER))
-  ifeq (atmegaboot,$(BOOTLOADER))
+  ifeq (atmegaboot,$(ATMEGA_BOOTLOADER))
     AVRDUDE_PROGRAMMER = arduino
-    BOOTLOADER_SIZE ?= 2048
-    BOOTLOADER_BAUD ?= 57600
+    ATMEGA_BOOTLOADER_SIZE ?= 2048
+    ATMEGA_BOOTLOADER_BAUD ?= 57600
   endif
 
-  ifeq (optiboot,$(BOOTLOADER))
+  ifeq (optiboot,$(ATMEGA_BOOTLOADER))
     AVRDUDE_PROGRAMMER = arduino
     ifneq (,$(filter $(CPU), atmega128rfa1 atmega256rfr2 atmega1281 atmega1284p atmega2560))
       # The minimum bootloader size on these CPUs is 1 KiB (so 512 Byte are wasted)
-      BOOTLOADER_SIZE ?= 1024
+      ATMEGA_BOOTLOADER_SIZE ?= 1024
     else
-      BOOTLOADER_SIZE ?= 512
+      ATMEGA_BOOTLOADER_SIZE ?= 512
     endif
   endif
 
-  ifeq (stk500v1,$(BOOTLOADER))
+  ifeq (stk500v1,$(ATMEGA_BOOTLOADER))
     AVRDUDE_PROGRAMMER = stk500v1
-    BOOTLOADER_SIZE ?= 8K
+    ATMEGA_BOOTLOADER_SIZE ?= 8K
   endif
 
-  ifeq (stk500v2,$(BOOTLOADER))
+  ifeq (stk500v2,$(ATMEGA_BOOTLOADER))
     AVRDUDE_PROGRAMMER = stk500v2
-    BOOTLOADER_SIZE ?= 8K
+    ATMEGA_BOOTLOADER_SIZE ?= 8K
     # Disable auto erase; erasing the flash is done implicitly by the bootloader
     # and explicit erase is not supported
     FFLAGS_EXTRA += -D
   endif
 
-  ifeq (avr109,$(BOOTLOADER))
+  ifeq (avr109,$(ATMEGA_BOOTLOADER))
     AVRDUDE_PROGRAMMER = avr109
-    BOOTLOADER_SIZE ?= 4K
+    ATMEGA_BOOTLOADER_SIZE ?= 4K
   endif
 
-  ifeq (derfmega,$(BOOTLOADER))
+  ifeq (derfmega,$(ATMEGA_BOOTLOADER))
     AVRDUDE_PROGRAMMER = wiring
-    BOOTLOADER_SIZE ?= 4K
+    ATMEGA_BOOTLOADER_SIZE ?= 4K
   endif
 
-  ifneq (,$(BOOTLOADER_BAUD))
-    FFLAGS_EXTRA += -b $(BOOTLOADER_BAUD)
+  ifneq (,$(ATMEGA_BOOTLOADER_BAUD))
+    FFLAGS_EXTRA += -b $(ATMEGA_BOOTLOADER_BAUD)
   endif
 endif
 
-BOOTLOADER_SIZE ?= 0
-ROM_RESERVED ?= $(BOOTLOADER_SIZE)
+ATMEGA_BOOTLOADER_SIZE ?= 0
+ROM_RESERVED ?= $(ATMEGA_BOOTLOADER_SIZE)
