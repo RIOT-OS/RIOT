@@ -214,23 +214,16 @@ int cmd_init(int argc, char **argv)
         puts("error: unable to initialize the given chip select line");
         return 1;
     }
-    tmp = spi_acquire(spiconf.dev, spiconf.cs, spiconf.mode, spiconf.clk);
-    if (tmp == SPI_NOMODE) {
-        puts("error: given SPI mode is not supported");
-        return 1;
+    if (IS_ACTIVE(NDEBUG)) {
+        puts("cannot test configuration without assert()ions enabled");
     }
-    else if (tmp == SPI_NOCLK) {
-        puts("error: targeted clock speed is not supported");
-        return 1;
+    else {
+        printf("Trying to initialize SPI_DEV(%i): mode: %i, clk: %i, cs_port: %i, cs_pin: %i\n",
+               dev, mode, clk, port, pin);
+        puts("Note: Failed assertion (crash) means configuration not supported");
+        spi_acquire(spiconf.dev, spiconf.cs, spiconf.mode, spiconf.clk);
+        spi_release(spiconf.dev);
     }
-    else if (tmp != SPI_OK) {
-        puts("error: unable to acquire bus with given parameters");
-        return 1;
-    }
-    spi_release(spiconf.dev);
-
-    printf("SPI_DEV(%i) initialized: mode: %i, clk: %i, cs_port: %i, cs_pin: %i\n",
-           dev, mode, clk, port, pin);
 
     return 0;
 }
@@ -250,11 +243,7 @@ int cmd_transfer(int argc, char **argv)
     }
 
     /* get bus access */
-    if (spi_acquire(spiconf.dev, spiconf.cs,
-                    spiconf.mode, spiconf.clk) != SPI_OK) {
-        puts("error: unable to acquire the SPI bus");
-        return 1;
-    }
+    spi_acquire(spiconf.dev, spiconf.cs, spiconf.mode, spiconf.clk);
 
     /* transfer data */
     len = strlen(argv[1]);
@@ -293,11 +282,7 @@ int cmd_bench(int argc, char **argv)
     memset(bench_wbuf, BENCH_PAYLOAD, BENCH_LARGE);
 
     /* get access to the bus */
-    if (spi_acquire(spiconf.dev, spiconf.cs,
-                    spiconf.mode, spiconf.clk) != SPI_OK) {
-        puts("error: unable to acquire the SPI bus");
-        return 1;
-    }
+    spi_acquire(spiconf.dev, spiconf.cs, spiconf.mode, spiconf.clk);
 
     puts("### Running some benchmarks, all values in [us] ###");
     puts("### Test\t\t\t\tTransfer time\tuser time\n");
@@ -517,10 +502,7 @@ int cmd_bench(int argc, char **argv)
     start = xtimer_now_usec();
     for (int i = 0; i < BENCH_REDOS; i++) {
         spi_release(spiconf.dev);
-        if (spi_acquire(spiconf.dev, spiconf.cs, spiconf.mode, spiconf.clk) != SPI_OK) {
-            puts("ERROR - spi_acquire() failed.");
-            break;
-        }
+        spi_acquire(spiconf.dev, spiconf.cs, spiconf.mode, spiconf.clk);
     }
     stop = xtimer_now_usec();
     sched_stop = _sched_ticks();
