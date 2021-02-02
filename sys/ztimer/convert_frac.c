@@ -93,7 +93,12 @@ void ztimer_convert_frac_init(ztimer_convert_frac_t *self,
           (void *)self, (void *)lower, freq_self, freq_lower);
 
     *self = (ztimer_convert_frac_t) {
-        .super.super = { .ops = &ztimer_convert_frac_ops, },
+        .super.super = {
+            .ops = &ztimer_convert_frac_ops,
+#ifdef MODULE_PM_LAYERED
+            .required_pm_mode = ZTIMER_CLOCK_NO_REQUIRED_PM_MODE,
+#endif
+        },
         .super.lower = lower,
         .super.lower_entry =
         { .callback = (void (*)(void *))ztimer_handler, .arg = &self->super, },
