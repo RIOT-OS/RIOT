@@ -160,10 +160,15 @@ void ztimer_init(void)
                              ZTIMER_MSEC_CONVERT_LOWER,
                              FREQ_1KHZ, ZTIMER_MSEC_CONVERT_LOWER_FREQ);
 #  endif
-#  ifdef CONFIG_ZTIMER_MSEC_ADJUST
-    LOG_DEBUG("ztimer_init(): ZTIMER_MSEC setting adjust value to %i\n",
+#  ifdef CONFIG_ZTIMER_MSEC_ADJUST_SET
+    LOG_DEBUG("ztimer_init(): ZTIMER_MSEC setting adjust_set value to %i\n",
               CONFIG_ZTIMER_MSEC_ADJUST);
-    ZTIMER_MSEC->adjust = CONFIG_ZTIMER_MSEC_ADJUST;
+    ZTIMER_MSEC->adjust_set = CONFIG_ZTIMER_MSEC_ADJUST;
+#  endif
+#  ifdef CONFIG_ZTIMER_MSEC_ADJUST_SLEEP
+    LOG_DEBUG("ztimer_init(): ZTIMER_MSEC setting adjust_sleep value to %i\n",
+              CONFIG_ZTIMER_USEC_ADJUST_SLEEP );
+    ZTIMER_MSEC->adjust_sleep = CONFIG_ZTIMER_MSEC_ADJUST_SLEEP;
 #  endif
 #endif
 }
