@@ -1,6 +1,6 @@
-From a80c84666ee68876c583af3e130025f2136455cf Mon Sep 17 00:00:00 2001
+From 8b62c5ed1cc74007497baf3a93920bf9ebabf068 Mon Sep 17 00:00:00 2001
 From: Benjamin Valentin <benpicco@googlemail.com>
-Date: Tue, 10 Nov 2020 18:39:58 +0100
+Date: Sun, 31 Jan 2021 20:00:38 +0100
 Subject: [PATCH 2/2] remove diskio.c
 
 ---
@@ -10,12 +10,12 @@ Subject: [PATCH 2/2] remove diskio.c
 
 diff --git a/source/diskio.c b/source/diskio.c
 deleted file mode 100644
-index fffa767..0000000
+index 81aaf59..0000000
 --- a/source/diskio.c
 +++ /dev/null
 @@ -1,229 +0,0 @@
 -/*-----------------------------------------------------------------------*/
--/* Low level disk I/O module skeleton for FatFs     (C)ChaN, 2019        */
+-/* Low level disk I/O module SKELETON for FatFs     (C)ChaN, 2019        */
 -/*-----------------------------------------------------------------------*/
 -/* If a working storage control module is available, it should be        */
 -/* attached to the FatFs via a glue function rather than modifying it.   */
@@ -244,5 +244,5 @@ index fffa767..0000000
 -}
 -
 -- 
-2.25.1
+2.27.0
 
