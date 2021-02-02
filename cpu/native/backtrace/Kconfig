@@ -7,5 +7,5 @@
 
 config MODULE_BACKTRACE
     bool "Stack backtrace"
-    depends on CPU_ARCH_NATIVE
+    depends on CPU_NATIVE
     depends on TEST_KCONFIG
