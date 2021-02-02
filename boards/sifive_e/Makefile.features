@@ -1,0 +1,6 @@
+CPU = fe310
+CPU_MODEL = fe310_g000
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_timer
+FEATURES_PROVIDED += periph_uart

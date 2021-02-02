@@ -45,7 +45,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     }
 
     /* Built in timer for FE310 is 32KHz */
-    if (freq != RTC_FREQ) {
+    if (freq != CLOCK_TIMERCLOCK) {
         return -1;
     }
 

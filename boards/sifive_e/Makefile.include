@@ -1,0 +1,10 @@
+FLASHER = true
+FLASHFILE ?= $(ELFFILE)
+EMULATOR = qemu-system-riscv32
+EMULATOR_FLAGS = -machine sifive_e -kernel $(ELFFILE) \
+                 -serial stdio \
+                 -monitor telnet::45454,server,nowait \
+                 -nographic
+
+TERMPROG ?= $(EMULATOR)
+TERMFLAGS ?= $(EMULATOR_FLAGS)

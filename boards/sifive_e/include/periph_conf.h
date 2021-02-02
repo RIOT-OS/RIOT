@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2017 Ken Rabold
- *               2019 Inria
+ * Copyright (C) 2020 Koen Zandberg <koen@bergzand.net>
  *
  * This file is subject to the terms and conditions of the GNU Lesser General
  * Public License v2.1. See the file LICENSE in the top level directory for more
@@ -8,31 +7,46 @@
  */
 
 /**
- * @ingroup     boards_hifive1
+ * @ingroup     boards_sifive_e
  * @{
  *
  * @file
- * @brief       Peripheral specific definitions for the HiFive1 RISC-V board
+ * @brief       Peripheral specific definitions for the Qemu sifive_e RISC-V
+ *              board
  *
- * @author      Ken Rabold
+ * @author      Koen Zandberg <koen@bergzand.net>
  */
 
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "macros/units.h"
 #include "periph_cpu.h"
-#include "clk_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
+ * @name    Core Clock configuration
+ *
+ * Contains the absolute minimum to make the clock code happy. Intentionally
+ * doesn't define CLOCK_CORECLOCK. Qemu doesn't pretend to run at a specific
+ * clock frequency.
+ * @{
+ */
+#define CONFIG_USE_CLOCK_HFXOSC_PLL         (0)
+#define CONFIG_USE_CLOCK_HFXOSC             (0)
+#define CONFIG_CLOCK_HFROSC_DIV             (1)
+#define CONFIG_CLOCK_HFROSC_TRIM            (6)
+/** @} */
+
+/**
  * @name    Timer configuration
  *
  * @{
  */
-#define CLOCK_TIMERCLOCK            (RTC_FREQ)
+#define CLOCK_TIMERCLOCK            (MHZ(10))
 #define TIMER_NUMOF                 (1)
 /** @} */
 
@@ -58,30 +72,6 @@ static const uart_conf_t uart_config[] = {
 #define UART_NUMOF                  ARRAY_SIZE(uart_config)
 /** @} */
 
-/**
- * @name    SPI device configuration
- *
- * @{
- */
-static const spi_conf_t spi_config[] = {
-    {
-        .addr       = SPI1_CTRL_ADDR,
-        .mosi       = GPIO_PIN(0, 3), /* D11 */
-        .miso       = GPIO_PIN(0, 4), /* D12 */
-        .sclk       = GPIO_PIN(0, 5), /* D13 */
-    },
-};
-
-#define SPI_NUMOF                  ARRAY_SIZE(spi_config)
-/** @} */
-
-/**
- * @name    PWM configuration
- *
- * @{
- */
-#define PWM_NUMOF                   (3)
-/** @} */
 
 #ifdef __cplusplus
 }
@@ -89,3 +79,4 @@ static const spi_conf_t spi_config[] = {
 
 #endif /* PERIPH_CONF_H */
 /** @} */
+
