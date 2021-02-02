@@ -40,6 +40,12 @@ typedef struct ieee802154_sec_dev ieee802154_sec_dev_t;
 
 /**
  * @brief   Struct of security operations
+ *
+ * @note    A device can indicate that the fallback implementations should be
+ *          used by setting the corresponding member to `NULL`, or pointing to
+ *          @ref ieee802154_radio_cipher_ops, which does the same. Note that
+ *          @ref ieee802154_radio_cipher_ops is the default security operations
+ *          driver assigned when @ref ieee802154_sec_init is called.
  */
 typedef struct ieee802154_radio_cipher_ops {
     /**
@@ -402,7 +408,7 @@ int ieee802154_sec_encrypt_frame(ieee802154_sec_context_t *ctx,
  *
  * @param[in]       ctx                     IEEE 802.15.4 security context
  * @param[in]       frame_size              Size of received frame
- * @param[in]       header                  Poinzter to header, which is also the frame
+ * @param[in]       header                  Pointer to header, which is also the frame
  * @param[in, out]  header_size             in: Header size; out: Size of header and auxiliary header
  * @param[out]      payload                 Will point to the beginning of the payload
  * @param[out]      payload_size            Pointer to store the payload size
@@ -423,57 +429,7 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
                                  const uint8_t *src_address);
 
 /**
- * @brief   Set the encryption key to be used for the next cipher operation
- *
- * This function should be the default callback operation to set the encryption key,
- * if a radio does not provide special hardware security features.
- *
- * @param[in] dev       Security device
- * @param[in] key       Key to be use for the next cipher operation
- * @param[in] key_size  Key size
- */
-void ieee802154_sec_set_key(ieee802154_sec_dev_t *dev,
-                            const uint8_t *key, uint8_t key_size);
-
-/**
- * @brief   Perform ECB block cipher for IEEE802154 security layer
- *
- * This function should be the default callback operation to perform ECB,
- * if a radio does not provide special hardware security features.
- *
- * @param[in] dev       Security device
- * @param[out] cipher   Output cipher blocks
- * @param[in] plain     Input plain blocks
- * @param[in] nblocks   Number of blocks
- */
-void ieee802154_sec_ecb(const ieee802154_sec_dev_t *dev,
-                        uint8_t *cipher,
-                        const uint8_t *plain,
-                        uint8_t nblocks);
-
-/**
- * @brief   Perform CBC block cipher for IEEE802154 security layer
- *          MIC computation
- *
- * This function should be the default callback operation to perform CBC,
- * if a radio does not provide special hardware security features.
- *
- * @param[in] dev       Security device
- * @param[out] cipher   Output cipher blocks
- * @param[in] iv        Initial vector
- * @param[in] plain     Input plain blocks
- * @param[in] nblocks   Number of blocks
- */
-void ieee802154_sec_cbc(const ieee802154_sec_dev_t *dev,
-                        uint8_t *cipher,
-                        uint8_t *iv,
-                        const uint8_t *plain,
-                        uint8_t nblocks);
-
-/**
- * @brief Implements @ref ieee802154_sec_set_key,
- *                   @ref ieee802154_sec_ecb,
- *                   @ref ieee802154_sec_cbc
+ * @brief Default descriptor that will fallback to default implementations
  */
 extern const ieee802154_radio_cipher_ops_t ieee802154_radio_cipher_ops;
 

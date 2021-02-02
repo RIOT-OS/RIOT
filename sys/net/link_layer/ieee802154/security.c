@@ -24,15 +24,50 @@
 #include "net/ieee802154_security.h"
 
 const ieee802154_radio_cipher_ops_t ieee802154_radio_cipher_ops = {
-    .set_key = ieee802154_sec_set_key,
-    .ecb = ieee802154_sec_ecb,
-    .cbc = ieee802154_sec_cbc
+    .set_key = NULL,
+    .ecb = NULL,
+    .cbc = NULL
 };
 
 static inline uint16_t _min(uint16_t a, uint16_t b)
 {
     return a < b ? a : b;
 }
+
+/**
+ * @brief   Perform an ECB block cipher for IEEE 802.15.4 security layer.
+ *
+ * This is the fallback implementation for the case where the security device
+ * does not provide an specific implementation.
+ *
+ * @param[in]  dev       Security device
+ * @param[out] cipher    Output cipher blocks
+ * @param[in]  plain     Input plain blocks
+ * @param[in]  nblocks   Number of blocks
+ */
+static void _sec_ecb(const ieee802154_sec_dev_t *dev,
+                     uint8_t *cipher,
+                     const uint8_t *plain,
+                     uint8_t nblocks);
+
+/**
+ * @brief   Perform a CBC block cipher for IEEE 802.15.4 security layer MIC
+ *          computation.
+ *
+ * This is the fallback implementation for the case where the security device
+ * does not provide an specific implementation.
+ *
+ * @param[in]  dev      Security device
+ * @param[out] cipher   Output cipher blocks
+ * @param[in]  iv       Initial vector
+ * @param[in]  plain    Input plain blocks
+ * @param[in]  nblocks  Number of blocks
+ */
+static void _sec_cbc(const ieee802154_sec_dev_t *dev,
+                     uint8_t *cipher,
+                     uint8_t *iv,
+                     const uint8_t *plain,
+                     uint8_t nblocks);
 
 /**
  * @brief Flag field of CCM input block
@@ -254,7 +289,12 @@ static uint8_t _ecb(ieee802154_sec_context_t *ctx,
                     const uint8_t *Ai, uint16_t size)
 {
     uint16_t s = _min(IEEE802154_SEC_BLOCK_SIZE, size);
-    ctx->dev.cipher_ops->ecb(&ctx->dev, tmp2, Ai, 1);
+    if (ctx->dev.cipher_ops->ecb) {
+        ctx->dev.cipher_ops->ecb(&ctx->dev, tmp2, Ai, 1);
+    }
+    else {
+        _sec_ecb(&ctx->dev, tmp2, Ai, 1);
+    }
     memcpy(tmp1, data, s);
     memset(tmp1 + s, 0, IEEE802154_SEC_BLOCK_SIZE - s);
     _memxor(tmp1, tmp2, IEEE802154_SEC_BLOCK_SIZE);
@@ -272,13 +312,20 @@ static uint8_t _cbc_next(ieee802154_sec_context_t *ctx,
     uint16_t s = _min(IEEE802154_SEC_BLOCK_SIZE, size);
     memcpy(tmp, next, s);
     memset(tmp + s, 0, IEEE802154_SEC_BLOCK_SIZE - s);
-    ctx->dev.cipher_ops->cbc(&ctx->dev, last, last, tmp, 1);
+    if (ctx->dev.cipher_ops->cbc){
+        ctx->dev.cipher_ops->cbc(&ctx->dev, last, last, tmp, 1);
+    }
+    else {
+        _sec_cbc(&ctx->dev, last, last, tmp, 1);
+    }
     return s;
 }
 
 static void _set_key(ieee802154_sec_context_t *ctx, const uint8_t *key)
 {
-    ctx->dev.cipher_ops->set_key(&ctx->dev, key, IEEE802154_SEC_BLOCK_SIZE);
+    if (ctx->dev.cipher_ops->set_key) {
+        ctx->dev.cipher_ops->set_key(&ctx->dev, key, IEEE802154_SEC_BLOCK_SIZE);
+    }
     memcpy(ctx->cipher.context.context, key, IEEE802154_SEC_KEY_LENGTH);
 }
 
@@ -481,39 +528,24 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
     return IEEE802154_SEC_OK;
 }
 
-void ieee802154_sec_set_key(ieee802154_sec_dev_t *ctx,
-                            const uint8_t *key, uint8_t key_size)
+static void _sec_ecb(const ieee802154_sec_dev_t *dev,
+                     uint8_t *cipher,
+                     const uint8_t *plain,
+                     uint8_t nblocks)
 {
-    /* This is a dummy implementation of the set_key callback
-       in ieee802154_radio_cipher_ops_t.
-       The copying of the key is done in the static _set_key() function,
-       which wraps around the set_key callback and then copies.
-       For the software encryption / decryption, there is
-       nothing else to do, hence the NOP. For hardware support,
-       the key must be transferred to the transceiver. */
-    (void)ctx;
-    (void)key;
-    (void)key_size;
-}
-
-void ieee802154_sec_ecb(const ieee802154_sec_dev_t *ctx,
-                        uint8_t *cipher,
-                        const uint8_t *plain,
-                        uint8_t nblocks)
-{
-    cipher_encrypt_ecb(&((ieee802154_sec_context_t *)ctx->ctx)->cipher,
+    cipher_encrypt_ecb(&((ieee802154_sec_context_t *)dev->ctx)->cipher,
                        plain,
                        nblocks * IEEE802154_SEC_BLOCK_SIZE,
                        cipher);
 }
 
-void ieee802154_sec_cbc(const ieee802154_sec_dev_t *ctx,
-                        uint8_t *cipher,
-                        uint8_t *iv,
-                        const uint8_t *plain,
-                        uint8_t nblocks)
+static void _sec_cbc(const ieee802154_sec_dev_t *dev,
+                     uint8_t *cipher,
+                     uint8_t *iv,
+                     const uint8_t *plain,
+                     uint8_t nblocks)
 {
-    cipher_encrypt_cbc(&((ieee802154_sec_context_t *)ctx->ctx)->cipher,
+    cipher_encrypt_cbc(&((ieee802154_sec_context_t *)dev->ctx)->cipher,
                        iv,
                        plain,
                        nblocks * IEEE802154_SEC_BLOCK_SIZE,
