@@ -78,13 +78,7 @@ void SPIClass::beginTransaction(SPISettings settings)
 {
     rmutex_lock(&mut);
     /* Call spi_acquire first to prevent data races */
-    int retval = spi_acquire(spi_dev, SPI_CS_UNDEF,
-                             settings.mode, settings.clock);
-    /* No support for exceptions (at least on AVR), resort to assert() */
-    assert(retval == SPI_OK);
-    if (retval != SPI_OK) {
-        return;
-    }
+    spi_acquire(spi_dev, SPI_CS_UNDEF, settings.mode, settings.clock);
     is_transaction = true;
 }
 
@@ -100,13 +94,7 @@ void SPIClass::transfer(void *buf, size_t count)
     rmutex_lock(&mut);
 
     if (!is_transaction) {
-        int retval = spi_acquire(spi_dev, SPI_CS_UNDEF,
-                                 settings.mode, settings.clock);
-        /* No support for exceptions (at least on AVR), resort to assert() */
-        assert(retval == SPI_OK);
-        if (retval != SPI_OK) {
-            return;
-        }
+        spi_acquire(spi_dev, SPI_CS_UNDEF, settings.mode, settings.clock);
     }
     spi_transfer_bytes(spi_dev, SPI_CS_UNDEF, false, buf, buf, count);
     if (!is_transaction) {
