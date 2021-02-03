@@ -30,7 +30,14 @@ extern "C" {
 #endif
 
 /**
+ * @defgroup sys_shell_config Shell compile time configurations
+ * @ingroup config
+ * @{
+ */
+/**
  * @brief Shutdown RIOT on shell exit
+ *
+ * @note On native platform this option defaults to 1.
  */
 #ifndef CONFIG_SHELL_SHUTDOWN_ON_EXIT
 /* Some systems (e.g Ubuntu 20.04) close stdin on CTRL-D / EOF
@@ -38,10 +45,46 @@ extern "C" {
  * Instead terminate RIOT, which is also the behavior a user would
  * expect from a CLI application.
  */
-#  ifdef CPU_NATIVE
+#  if defined(CPU_NATIVE) && !IS_ACTIVE(KCONFIG_MODULE_SHELL)
 #    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 1
+#  else
+#    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 0
 #  endif
 #endif
+
+/**
+ * @brief Set to 1 to disable shell's echo
+ */
+#ifndef CONFIG_SHELL_NO_ECHO
+#define CONFIG_SHELL_NO_ECHO 0
+#endif
+
+/**
+ * @brief Set to 1 to disable shell's prompt
+ */
+#ifndef CONFIG_SHELL_NO_PROMPT
+#define CONFIG_SHELL_NO_PROMPT 0
+#endif
+
+/**
+ * @brief Set to 1 to disable shell's echo
+ * @deprecated This has been replaced by @ref CONFIG_SHELL_NO_ECHO and will be
+ *             removed after release 2021.07.
+ */
+#ifndef SHELL_NO_ECHO
+#define SHELL_NO_ECHO CONFIG_SHELL_NO_ECHO
+#endif
+
+/**
+ * @brief Set to 1 to disable shell's prompt
+ * @deprecated This has been replaced by @ref CONFIG_SHELL_NO_PROMPT and will be
+ *             removed after release 2021.07.
+ */
+#ifndef SHELL_NO_PROMPT
+#define SHELL_NO_PROMPT CONFIG_SHELL_NO_PROMPT
+#endif
+
+/** @} */
 
 /**
  * @brief Default shell buffer size (maximum line length shell can handle)
