@@ -354,7 +354,8 @@ int listen(int socket, int backlog);
  * @param[in] length        Specifies the length in bytes of the buffer pointed
  *                          to by the buffer argument.
  * @param[in] flags         Specifies the type of message reception. Support
- *                          for values other than 0 is not implemented yet.
+ *                          for values other than 0 is not implemented yet, but
+ *                          when using lwIP, the MSG_PEEK flag is available.
  * @param[out] address      A null pointer, or points to a sockaddr structure
  *                          in which the sending address is to be stored. The
  *                          length and format of the address depend on the
@@ -391,7 +392,8 @@ ssize_t recvfrom(int socket, void *__restrict buffer, size_t length, int flags,
  * @param[in] length    Specifies the length in bytes of the buffer pointed to
  *                      by the buffer argument.
  * @param[in] flags     Specifies the type of message reception. Support for
- *                      values other than 0 is not implemented yet.
+ *                      values other than 0 is not implemented yet, but when
+ *                      using lwIP, the MSG_PEEK flag is available.
  *
  * @return  Upon successful completion, recv() shall return the length of the
  *          message in bytes. If no messages are available to be received and
