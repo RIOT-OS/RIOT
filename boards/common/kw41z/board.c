@@ -21,7 +21,26 @@
 #include "board.h"
 #include "periph/gpio.h"
 
-void led_init(void);
+static void led_init(void)
+{
+    /* initialize and turn off LEDs */
+#ifdef LED0_PIN
+    gpio_init(LED0_PIN, GPIO_OUT);
+    LED0_OFF;
+#endif
+#ifdef LED1_PIN
+    gpio_init(LED1_PIN, GPIO_OUT);
+    LED1_OFF;
+#endif
+#ifdef LED2_PIN
+    gpio_init(LED2_PIN, GPIO_OUT);
+    LED2_OFF;
+#endif
+#ifdef LED3_PIN
+    gpio_init(LED3_PIN, GPIO_OUT);
+    LED3_OFF;
+#endif
+}
 
 void board_init(void)
 {
