@@ -142,7 +142,7 @@ static int _send_pkt(nimble_netif_conn_t *conn, gnrc_pktsnip_t *pkt)
 
     if ((res != 0) && (res != BLE_HS_ESTALLED)) {
         os_mbuf_free_chain(sdu);
-        return -ENOBUFS;
+        return -ECANCELED;
     }
 
     return num_bytes;
