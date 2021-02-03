@@ -13,9 +13,6 @@ endif
 # include Gecko SDK package
 USEPKG += gecko_sdk
 
-# include layered power management
-USEMODULE += pm_layered
-
 ifneq (,$(filter efm32_coretemp,$(USEMODULE)))
   FEATURES_REQUIRED += periph_adc
 endif

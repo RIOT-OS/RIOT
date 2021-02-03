@@ -21,6 +21,5 @@ else ifneq (,$(filter periph_mcg_lite,$(FEATURES_USED)))
 endif
 
 USEMODULE += periph_wdog
-USEMODULE += pm_layered
 
 include $(RIOTCPU)/cortexm_common/Makefile.dep

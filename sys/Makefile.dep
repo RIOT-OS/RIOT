@@ -732,6 +732,10 @@ ifneq (,$(filter phydat,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter pm_layered,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_pm
+endif
+
 ifneq (,$(filter evtimer_mbox,$(USEMODULE)))
   USEMODULE += evtimer
   USEMODULE += core_mbox
@@ -1015,6 +1019,7 @@ ifneq (,$(filter riotboot_usb_dfu, $(USEMODULE)))
   USEMODULE += usbus_dfu
   USEMODULE += riotboot_flashwrite
   FEATURES_REQUIRED += no_idle_thread
+  FEATURES_REQUIRED += periph_pm
 endif
 
 ifneq (,$(filter irq_handler,$(USEMODULE)))

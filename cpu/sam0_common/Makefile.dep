@@ -6,9 +6,6 @@ ifneq (,$(filter periph_rtc periph_rtt,$(USEMODULE)))
   USEMODULE += periph_rtc_rtt
 endif
 
-# All SAM0 based CPUs provide PM
-USEMODULE += pm_layered
-
 # include sam0 common periph drivers
 USEMODULE += sam0_common_periph
 
