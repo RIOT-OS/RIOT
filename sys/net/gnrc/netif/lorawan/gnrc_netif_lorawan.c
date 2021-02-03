@@ -414,6 +414,14 @@ static int _get(gnrc_netif_t *netif, gnrc_netapi_opt_t *opt)
             memcpy(opt->data, &tmp, sizeof(uint32_t));
             res = sizeof(uint32_t);
             break;
+        case NETOPT_LORAWAN_ADR:
+            mlme_request.type = MLME_GET;
+            mlme_request.mib.type = MIB_ADR;
+            gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request,
+                                      &mlme_confirm);
+            *((bool *)opt->data) = mlme_confirm.mib.adr;
+            res = sizeof(bool);
+            break;
         default:
             res = netif->dev->driver->get(netif->dev, opt->opt, opt->data,
                                           opt->data_len);
@@ -430,6 +438,14 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 
     gnrc_netif_acquire(netif);
     switch (opt->opt) {
+        case NETOPT_LORAWAN_ADR:
+            assert(opt->data_len == sizeof(bool));
+            mlme_request.type = MLME_SET;
+            mlme_request.mib.type = MIB_ADR;
+            mlme_request.mib.adr = *((bool *)opt->data);
+            gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request,
+                                      &mlme_confirm);
+            break;
         case NETOPT_LORAWAN_DR:
             assert(opt->data_len == sizeof(uint8_t));
             if (!gnrc_lorawan_validate_dr(*((uint8_t *)opt->data))) {
