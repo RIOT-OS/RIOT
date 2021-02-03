@@ -48,10 +48,14 @@
 #include "thread_flags.h"
 #endif
 
+#include "ringbuffer.h"
+
 /* enough to create sockets both with socket() and accept() */
 #define _ACTUAL_SOCKET_POOL_SIZE   (SOCKET_POOL_SIZE + \
                                     (SOCKET_POOL_SIZE * SOCKET_TCP_QUEUE_SIZE))
 #define SOCKET_BLKSIZE             (512)
+
+#define PEEK_BUF_SIZE              (32)
 
 /**
  * @brief   Unitfied connection type.
@@ -82,6 +86,7 @@ typedef struct {
     int type;
     int protocol;
     bool bound;
+    ringbuffer_t peek_rb;
 #ifdef POSIX_SETSOCKOPT
     uint32_t recv_timeout;
 #endif
@@ -319,6 +324,9 @@ static int socket_close(vfs_file_t *filp)
             bf_unset(_sock_pool_used, idx);
         }
     }
+
+    free(s->peek_rb.buf);
+
     mutex_unlock(&_socket_pool_mutex);
     s->sock = NULL;
     s->domain = AF_UNSPEC;
@@ -479,6 +487,16 @@ int socket(int domain, int type, int protocol)
             errno = EAFNOSUPPORT;
             res = -1;
     }
+
+    char *buf_ptr = malloc(PEEK_BUF_SIZE * sizeof(char));
+    if(buf_ptr == NULL) {
+        errno = ENOMEM;
+        res = -1;
+    }
+    else {
+        ringbuffer_init(&(s->peek_rb), buf_ptr, PEEK_BUF_SIZE);
+    }
+
     mutex_unlock(&_socket_pool_mutex);
     return res;
 }
@@ -926,7 +944,6 @@ static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
     int res = 0;
     struct _sock_tl_ep ep = { .port = 0 };
 
-    (void)flags;
     if (s == NULL) {
         return -ENOTSOCK;
     }
@@ -940,6 +957,32 @@ static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
         if ((res = _bind_connect(s, NULL, 0)) < 0) {
             return res;
         }
+    }
+#ifdef MODULE_SOCK_UDP
+    bool peek_mode = (flags & MSG_PEEK) != 0;
+#else
+    (void) flags;
+#endif
+
+    size_t to_read = length;
+    uint8_t *buf_index = buffer;
+
+    while (to_read != 0 && !ringbuffer_empty(&(s->peek_rb))) {
+        *buf_index++ = ringbuffer_get_one(&(s->peek_rb));
+        to_read--;
+    }
+
+    if (to_read == 0) {
+        /* read all bytes from peek buffer */
+        return length;
+    }
+    else {
+        /* only a part of the bytes was read from peek buffer, need to get
+         * the rest via socket calls
+         */
+        res = length - to_read;
+        buffer = buf_index;
+        length = to_read;
     }
 
 #ifdef POSIX_SETSOCKOPT
@@ -963,8 +1006,11 @@ static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
 #endif
 #ifdef MODULE_SOCK_UDP
         case SOCK_DGRAM:
-            res = sock_udp_recv(&s->sock->udp, buffer, length, recv_timeout,
+            res += sock_udp_recv(&s->sock->udp, buffer, length, recv_timeout,
                                 &ep);
+            if (peek_mode) {
+                ringbuffer_add(&(s->peek_rb), buffer, length);
+            }
             break;
 #endif
         default:
