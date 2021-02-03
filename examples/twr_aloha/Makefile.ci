@@ -1,4 +1,5 @@
 BOARD_INSUFFICIENT_MEMORY := \
+    bluepill-stm32f030c8 \
     i-nucleo-lrwan1 \
     nucleo-f031k6 \
     nucleo-f042k6 \

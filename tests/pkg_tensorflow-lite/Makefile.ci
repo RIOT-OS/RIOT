@@ -4,6 +4,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     b-l072z-lrwan1 \
     blackpill \
     bluepill \
+    bluepill-stm32f030c8 \
     calliope-mini \
     feather-m0 \
     frdm-kw41z \

@@ -2,6 +2,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
     blackpill \
     bluepill \
+    bluepill-stm32f030c8 \
     calliope-mini \
     hifive1 \
     hifive1b \

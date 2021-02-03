@@ -5,6 +5,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega328p \
+    bluepill-stm32f030c8 \
     i-nucleo-lrwan1 \
     nucleo-f030r8 \
     nucleo-f031k6 \
