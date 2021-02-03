@@ -522,8 +522,8 @@ extern "C" {
  *
  * @note This feature is not yet supported.
  */
-#ifndef LORAMAC_DEFAULT_ADR_ACK_DELAY
-#define LORAMAC_DEFAULT_ADR_ACK_DELAY           (32U)
+#ifndef CONFIG_LORAMAC_DEFAULT_ADR_ACK_DELAY
+#define CONFIG_LORAMAC_DEFAULT_ADR_ACK_DELAY    (32)
 #endif
 
 /**

@@ -71,11 +71,14 @@ ifndef CONFIG_KCONFIG_USEMODULE_LORAWAN
   # Note this value is also used for the OTAA.
   # CFLAGS += -DCONFIG_LORAMAC_DEFAULT_DR_5
 
-  # # Set default messages to unconfirmable
+  # Set default messages to unconfirmable
   CFLAGS += -DCONFIG_LORAMAC_DEFAULT_TX_MODE_UNCNF
 
   # Set region
   CFLAGS += -DCONFIG_LORAMAC_REGION_EU_868
+
+  # Enable ADR
+  # CFLAGS += -DCONFIG_LORAMAC_DEFAULT_ADR
 endif
 
 # We can reduce the size of the packet buffer for LoRaWAN, since there's no IP
