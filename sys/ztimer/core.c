@@ -169,8 +169,10 @@ ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock)
     assert(clock->max_value);
     unsigned state = irq_disable();
     uint32_t lower_now = clock->ops->now(clock);
+
     DEBUG(
-        "ztimer_now() checkpoint=%" PRIu32 " lower_last=%" PRIu32 " lower_now=%" PRIu32 " diff=%" PRIu32 "\n",
+        "ztimer_now() checkpoint=%" PRIu32 " lower_last=%" PRIu32
+        " lower_now=%" PRIu32 " diff=%" PRIu32 "\n",
         (uint32_t)clock->checkpoint, clock->lower_last, lower_now,
         _add_modulo(lower_now, clock->lower_last, clock->max_value));
     clock->checkpoint += _add_modulo(lower_now, clock->lower_last,
@@ -178,6 +180,7 @@ ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock)
     clock->lower_last = lower_now;
     DEBUG("ztimer_now() returning %" PRIu32 "\n", (uint32_t)clock->checkpoint);
     ztimer_now_t now = clock->checkpoint;
+
     irq_restore(state);
     return now;
 }
