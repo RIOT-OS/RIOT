@@ -319,6 +319,7 @@ static int socket_close(vfs_file_t *filp)
             bf_unset(_sock_pool_used, idx);
         }
     }
+
     mutex_unlock(&_socket_pool_mutex);
     s->sock = NULL;
     s->domain = AF_UNSPEC;
@@ -478,6 +479,7 @@ int socket(int domain, int type, int protocol)
             errno = EAFNOSUPPORT;
             res = -1;
     }
+
     mutex_unlock(&_socket_pool_mutex);
     return res;
 }
@@ -924,21 +926,22 @@ static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
     int res = 0;
     struct _sock_tl_ep ep = { .port = 0 };
 
-    (void)flags;
     if (s == NULL) {
         return -ENOTSOCK;
     }
     if (s->sock == NULL) {  /* socket is not connected */
-#ifdef MODULE_SOCK_TCP
+    #ifdef MODULE_SOCK_TCP
         if (s->type == SOCK_STREAM) {
             return -ENOTCONN;
         }
-#endif
+    #endif
         /* bind implicitly */
         if ((res = _bind_connect(s, NULL, 0)) < 0) {
             return res;
         }
     }
+
+    bool peek_mode = (flags & MSG_PEEK) != 0;
 
 #ifdef POSIX_SETSOCKOPT
     const uint32_t recv_timeout = s->recv_timeout;
@@ -947,41 +950,75 @@ static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
 #endif
 
     switch (s->type) {
-#ifdef MODULE_SOCK_IP
+    #ifdef MODULE_SOCK_IP
         case SOCK_RAW:
-            res = sock_ip_recv(&s->sock->raw, buffer, length, recv_timeout,
-                               (sock_ip_ep_t *)&ep);
+            if (peek_mode) {
+            #ifdef MODULE_LWIP
+                res = sock_ip_peek(&s->sock->raw, buffer, length, recv_timeout,
+                                   (sock_ip_ep_t *)&ep);
+            #else
+                /* peek is only available when using lwIP at the moment */
+                return -ENOTSUP;
+            #endif
+            }
+            else {
+                res = sock_ip_recv(&s->sock->raw, buffer, length, recv_timeout,
+                                   (sock_ip_ep_t *)&ep);
+            }
             break;
-#endif
-#ifdef MODULE_SOCK_TCP
+    #endif
+    #ifdef MODULE_SOCK_TCP
         case SOCK_STREAM:
-            res = sock_tcp_read(&s->sock->tcp.sock, buffer, length,
-                                recv_timeout);
+            if (peek_mode) {
+            #ifdef MODULE_LWIP
+                res = sock_tcp_peek(&s->sock->tcp.sock, buffer, length,
+                                    recv_timeout);
+            #else
+                /* peek is only available when using lwIP at the moment */
+                return -ENOTSUP;
+            #endif
+            }
+            else {
+                res = sock_tcp_read(&s->sock->tcp.sock, buffer, length,
+                                    recv_timeout);
+            }
             break;
-#endif
-#ifdef MODULE_SOCK_UDP
+    #endif
+    #ifdef MODULE_SOCK_UDP
         case SOCK_DGRAM:
-            res = sock_udp_recv(&s->sock->udp, buffer, length, recv_timeout,
-                                &ep);
+            if (peek_mode) {
+            #ifdef MODULE_LWIP
+                res = sock_udp_peek(&s->sock->udp, buffer, length, recv_timeout,
+                                    &ep);
+            #else
+                /* peek is only available when using lwIP at the moment */
+                return -ENOTSUP;
+            #endif
+            }
+            else {
+                res = sock_udp_recv(&s->sock->udp, buffer, length, recv_timeout,
+                                    &ep);
+            }
             break;
-#endif
+    #endif
         default:
-#if !defined(MODULE_SOCK_IP) && !defined(MODULE_SOCK_TCP) && !defined(MODULE_SOCK_UDP)
+    #if !defined(MODULE_SOCK_IP) && !defined(MODULE_SOCK_TCP) && !defined(MODULE_SOCK_UDP)
             (void) recv_timeout;
-#endif
+    #endif
             res = -EOPNOTSUPP;
             break;
     }
+
     if ((res >= 0) && (address != NULL) && (address_len != NULL)) {
-#ifdef MODULE_SOCK_ASYNC
+    #ifdef MODULE_SOCK_ASYNC
         atomic_fetch_sub(&s->available, 1);
-#endif
+    #endif
         switch (s->type) {
-#ifdef MODULE_SOCK_TCP
+        #ifdef MODULE_SOCK_TCP
             case SOCK_STREAM:
                 res = _getpeername(s, address, address_len);
                 break;
-#endif
+        #endif
             default: {
                 struct sockaddr_storage sa;
                 socklen_t sa_len;
@@ -993,6 +1030,7 @@ static ssize_t socket_recvfrom(socket_t *s, void *restrict buffer,
             }
         }
     }
+
     return res;
 }
 
