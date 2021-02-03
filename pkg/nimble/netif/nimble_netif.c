@@ -660,3 +660,18 @@ int nimble_netif_update(int handle,
 
     return NIMBLE_NETIF_OK;
 }
+
+int nimble_netif_used_chanmap(int handle, uint8_t map[5])
+{
+    nimble_netif_conn_t *conn = nimble_netif_conn_get(handle);
+    if (conn == NULL) {
+        return NIMBLE_NETIF_NOTCONN;
+    }
+
+    int res = ble_hs_hci_read_chan_map(conn->gaphandle, map);
+    if (res != 0) {
+        return NIMBLE_NETIF_DEVERR;
+    }
+
+    return NIMBLE_NETIF_OK;
+}
