@@ -91,6 +91,9 @@ static uint32_t _get_nth_channel(gnrc_lorawan_t *mac, size_t n)
 
 void gnrc_lorawan_channels_init(gnrc_lorawan_t *mac)
 {
+    /* We set the channel mask for the default channels and populate from the list */
+    mac->channel_mask = UINT16_MAX >> (16 - GNRC_LORAWAN_DEFAULT_CHANNELS_NUMOF);
+
     for (unsigned i = 0; i < GNRC_LORAWAN_DEFAULT_CHANNELS_NUMOF; i++) {
         mac->channel[i] = gnrc_lorawan_default_channels[i];
         DEBUG("gnrc_lorawan_region: Mac -> Channel %u %" PRIu32 " \n", i, mac->channel[i]);
@@ -122,6 +125,7 @@ void gnrc_lorawan_process_cflist(gnrc_lorawan_t *mac, uint8_t *cflist)
         cl.u32 = 0;
         memcpy(&cl, cflist, GNRC_LORAWAN_CFLIST_ENTRY_SIZE);
         mac->channel[i] = byteorder_ltohl(cl) * 100;
+        mac->channel_mask |= 1 << i;
         cflist += GNRC_LORAWAN_CFLIST_ENTRY_SIZE;
         DEBUG("gnrc_lorawan_region: Mac -> Channel %u %" PRIu32 " \n", i, mac->channel[i]);
     }
