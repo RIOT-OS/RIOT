@@ -25,6 +25,7 @@
 #include "net/lorawan/hdr.h"
 
 #include "random.h"
+#include "kernel_defines.h"
 
 #define ENABLE_DEBUG      0
 #include "debug.h"
@@ -251,6 +252,8 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
     lw_hdr->addr = mac->dev_addr;
     lw_hdr->fctrl = 0;
 
+    lorawan_hdr_set_adr(lw_hdr, IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR));
+
     lorawan_hdr_set_ack(lw_hdr, mac->mcps.ack_requested);
 
     lw_hdr->fcnt = byteorder_htols(mac->mcps.fcnt);
@@ -423,13 +426,26 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     gnrc_lorawan_build_uplink(mac, pkt, waiting_for_ack,
                               mcps_request->data.port);
 
+    if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS) {
+        mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS;
+    }
+
     mac->mcps.waiting_for_ack = waiting_for_ack;
+
     mac->mcps.ack_requested = false;
 
     mac->mcps.nb_trials = waiting_for_ack ? CONFIG_LORAMAC_DEFAULT_RETX : mac->mcps.redundancy;
 
     mac->mcps.msdu = pkt;
-    mac->last_dr = mcps_request->data.dr;
+
+    DEBUG("LAST DR%d \n",mac->last_dr); //to be removed
+
+    if(!IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR)){
+        mac->last_dr = mcps_request->data.dr;
+    }
+
+    DEBUG("After MCPS REQ LAST DR%d \n",mac->last_dr);  //to be removed
+
     _transmit_pkt(mac);
     mcps_confirm->status = GNRC_LORAWAN_REQ_STATUS_DEFERRED;
 out:

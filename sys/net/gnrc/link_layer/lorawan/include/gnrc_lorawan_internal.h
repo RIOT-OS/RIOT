@@ -69,11 +69,15 @@ extern "C" {
 #define GNRC_LORAWAN_BACKOFF_BUDGET_3   (8700000LL)     /**< budget of time on air every 24 hours */
 
 #define GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ  (1 << 0) /**< Internal Link Check request flag */
+#define GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS    (1 << 1)
 
 #define GNRC_LORAWAN_CID_SIZE (1U)                      /**< size of Command ID in FOps */
 #define GNRC_LORAWAN_CID_LINK_CHECK_ANS (0x02)          /**< Link Check CID */
+#define GNRC_LORAWAN_CID_LINK_ADR_REQ   (0x03)
+#define GNRC_LORAWAN_CID_LINK_ADR_ANS   (0x03)
 
 #define GNRC_LORAWAN_FOPT_LINK_CHECK_ANS_SIZE (3U)      /**< size of Link check answer */
+#define GNRC_LORAWAN_FOPT_LINK_ADR_REQ_SIZE   (5U)      /**< size of Link ADR Request (LinkADRReq) */
 
 #define GNRC_LORAWAN_JOIN_DELAY_U32_MASK (0x1FFFFF)     /**< mask for detecting overflow in frame counter */
 
@@ -113,7 +117,7 @@ extern "C" {
 typedef struct {
     uint8_t *data;  /**< pointer to the beginning of the buffer holding data */
     uint8_t size;   /**< size of the buffer */
-    uint8_t index;  /**< current inxed in the buffer */
+    uint8_t index;  /**< current index in the buffer */
 } lorawan_buffer_t;
 
 /**
@@ -133,6 +137,15 @@ typedef struct {
     uint8_t margin;         /**< demodulation margin (in dB) */
     uint8_t num_gateways;   /**< number of gateways */
 } mlme_link_req_confirm_t;
+
+/**
+ * @brief MLME Link ADR request data sent by NS
+ */
+typedef struct {
+    uint8_t dr_txpwr;       /**< DataRate_TXPower (in dB) */
+    uint16_t chmsk;         /**< Channel Mask*/
+    uint8_t redncy;         /**< Redundancy bit */
+} mlme_link_adr_req_t;
 
 /**
  * @brief MCPS data
@@ -235,7 +248,7 @@ void gnrc_lorawan_generate_session_keys(const uint8_t *app_nonce,
                                         uint8_t *appskey);
 
 /**
- * @brief Set datarate for the next transmission
+ * @brief Set SF and BW for the next transmission
  *
  * @param[in] mac pointer to the MAC descriptor
  * @param[in] datarate desired datarate

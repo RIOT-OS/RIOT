@@ -102,6 +102,7 @@ void gnrc_lorawan_reset(gnrc_lorawan_t *mac)
 
     dev->driver->set(dev, NETOPT_RX_TIMEOUT, &rx_timeout, sizeof(rx_timeout));
 
+    mac->last_dr = CONFIG_LORAMAC_DEFAULT_DR;
     gnrc_lorawan_set_rx2_dr(mac, CONFIG_LORAMAC_DEFAULT_RX2_DR);
 
     mac->toa = 0;
