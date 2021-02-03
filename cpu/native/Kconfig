@@ -24,7 +24,7 @@ config CPU_NATIVE
 
 config CPU_CORE_NATIVE
     bool
-    select CPU_ARCH_X86_32
+    select CPU_NATIVE
 
 config CPU_FAM_NATIVE
     bool
