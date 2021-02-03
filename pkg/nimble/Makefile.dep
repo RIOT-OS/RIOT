@@ -59,6 +59,7 @@ ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nimble_statconn,$(USEMODULE)))
+  USEMODULE += random
   USEMODULE += nimble_netif
   USEMODULE += nimble_addr
 endif

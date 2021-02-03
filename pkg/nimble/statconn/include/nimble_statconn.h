@@ -80,10 +80,22 @@ extern "C" {
 #endif
 
 /**
- * @brief   Connection interval used when opening a new connection [in ms]
+ * @brief   Minimum connection interval used when opening a new connection. The
+ *          actual used connection interval will be a random value ranging from
+ *          @ref NIMBLE_STATCONN_CONN_ITVL_MIN_MS to
+ *          @ref NIMBLE_STATCONN_CONN_ITVL_MAX_MS. Set both variables to the same
+ *          value to use a fixed connection interval. [in ms]
  */
-#ifndef NIMBLE_STATCONN_CONN_ITVL_MS
-#define NIMBLE_STATCONN_CONN_ITVL_MS        (75U)
+#ifndef NIMBLE_STATCONN_CONN_ITVL_MIN_MS
+#define NIMBLE_STATCONN_CONN_ITVL_MIN_MS    (75U)
+#endif
+
+/**
+ * @brief   Maximum connection interval to use. See
+ *          @ref NIMBLE_STATCONN_CONN_ITVL_MIN_MS for more information. [in ms]
+ */
+#ifndef NIMBLE_STATCONN_CONN_ITVL_MAX_MS
+#define NIMBLE_STATCONN_CONN_ITVL_MAX_MS    (75U)
 #endif
 
 /**
