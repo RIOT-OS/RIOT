@@ -167,6 +167,11 @@ void avr8_exit_isr(void);
 void cpu_init(void);
 
 /**
+ * @brief Initialization of the CPU clock
+ */
+void avr8_clk_init(void);
+
+/**
  * @brief   Print the last instruction's address
  */
 static inline void __attribute__((always_inline)) cpu_print_last_instruction(void)
