@@ -67,6 +67,9 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             }
             *((uint8_t*) value) = netdev_submac->retrans;
             return 1;
+        case NETOPT_IEEE802154_PHY:
+            *((uint8_t*) value) = ieee802154_get_phy_mode(submac);
+            return 1;
         default:
             break;
     }
