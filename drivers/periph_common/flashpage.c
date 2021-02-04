@@ -22,6 +22,8 @@
 #include "cpu.h"
 #include "assert.h"
 
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
 /* guard this file, must be done before including periph/flashpage.h
  * TODO: remove as soon as periph drivers can be build selectively */
 #if defined(FLASHPAGE_NUMOF) && defined(FLASHPAGE_SIZE)
@@ -103,5 +105,80 @@ int flashpage_rwwee_write_and_verify(unsigned page, const void *data)
 }
 
 #endif
+
+/* We have to write whole words, but writing 0xFF is basically a no-op
+ * so fill the unaligned bytes with 0xFF to get a whole extra word.
+ * To support writes of data with less than 4 bytes, an offset needs
+ * to be supplied.
+ */
+static void unaligned_pad_start(const void *dst, uint8_t *buffer,
+                                const void *data, uint8_t len, uint8_t offset)
+{
+    if (IS_ACTIVE(FLASHPAGE_NO_BLIND_WRITES)) {
+        memcpy(buffer, dst, FLASHPAGE_WRITE_BLOCK_SIZE);
+    } else {
+        memset(buffer, FLASHPAGE_ERASE_STATE, FLASHPAGE_WRITE_BLOCK_SIZE);
+    }
+    memcpy(buffer + offset, data, len);
+}
+
+/* We have to write whole words, but writing 0xFF is basically a no-op
+ * so fill the unaligned bytes with 0xFF to get a whole extra word.
+ */
+static void unaligned_pad_end(const void *dst, uint8_t *buffer,
+                              const void *data, uint8_t len)
+{
+    if (IS_ACTIVE(FLASHPAGE_NO_BLIND_WRITES)) {
+        memcpy(buffer, dst, FLASHPAGE_WRITE_BLOCK_SIZE);
+    } else {
+        memset(buffer, FLASHPAGE_ERASE_STATE, FLASHPAGE_WRITE_BLOCK_SIZE);
+    }
+    memcpy(buffer, data, len);
+}
+
+void flashpage_write_unaligned(void *_dst, const void *_data, size_t len)
+{
+    uint8_t *dst = _dst;
+    const uint8_t *data = _data;
+
+    const uint8_t mask = FLASHPAGE_WRITE_BLOCK_ALIGNMENT - 1;
+    uint8_t padding[FLASHPAGE_WRITE_BLOCK_SIZE];
+
+    /* set bytes in the first, unaligned word */
+    uint8_t offset_unaligned_start = (uintptr_t)dst & mask;
+
+    /* word align destination address */
+    dst = (void*)((uintptr_t)dst & ~mask);
+
+    if (offset_unaligned_start) {
+        /* use MIN to support short data sizes below the block size */
+        uint8_t len_unaligned_start = (FLASHPAGE_WRITE_BLOCK_SIZE - offset_unaligned_start)
+                                    & (FLASHPAGE_WRITE_BLOCK_SIZE - 1);
+        len_unaligned_start = MIN(len_unaligned_start, len);
+        len -= len_unaligned_start;
+
+        /* write the first, unaligned bytes */
+        unaligned_pad_start(dst, padding, data, len_unaligned_start, offset_unaligned_start);
+        flashpage_write(dst, padding, sizeof(padding));
+
+        data += len_unaligned_start;
+        dst += FLASHPAGE_WRITE_BLOCK_SIZE;
+    }
+
+    /* set bytes in the last, unaligned word */
+    uint8_t len_unaligned_end = len & mask;
+    len -= len_unaligned_end;
+
+    /* write aligned chunks */
+    if (len) {
+        flashpage_write(dst, data, len);
+    }
+
+    /* write the last, unaligned bytes */
+    if (len_unaligned_end) {
+        unaligned_pad_end(dst + len, padding, data + len, len_unaligned_end);
+        flashpage_write(dst + len, padding, sizeof(padding));
+    }
+}
 
 #endif
