@@ -32,6 +32,7 @@
 
 #include "cpu.h"
 #include "board.h"
+#include "irq.h"
 #include "periph/init.h"
 #include "panic.h"
 
@@ -95,6 +96,8 @@ void cpu_init(void)
     /* rtc_init */
     /* hwrng_init */
     periph_init();
+
+    irq_enable();
 }
 
 struct __freelist {
