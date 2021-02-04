@@ -22,6 +22,10 @@ include $(RIOTBASE)/drivers/Makefile.dep
 # pull dependencies from packages
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.dep)
 
+ifneq (,$(filter thread_crash,$(USEMODULE)))
+  FEATURES_REQUIRED += fault_exception_recovery
+endif
+
 ifneq (,$(filter mpu_stack_guard,$(USEMODULE)))
   FEATURES_REQUIRED += cortexm_mpu
 endif
