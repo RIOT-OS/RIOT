@@ -38,10 +38,9 @@ static const coap_resource_t _resources[] = {
 };
 
 static gcoap_listener_t _listener = {
-    &_resources[0],
-    sizeof(_resources) / sizeof(_resources[0]),
-    NULL,
-    NULL
+    .resources = &_resources[0],
+    .resources_len = sizeof(_resources) / sizeof(_resources[0]),
+    .next = NULL,
 };
 
 static ssize_t _chat_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
@@ -109,9 +108,17 @@ int coap_post(char *addr, char *msgbuf, size_t msglen)
     gcoap_req_init(&pdu, buf, CONFIG_GCOAP_PDU_BUF_SIZE,
                    COAP_POST, COAP_CHAT_PATH);
 
-    memcpy(pdu.payload, msgbuf, msglen);
+    coap_opt_add_format(&pdu, COAP_FORMAT_TEXT);
+    len = coap_opt_finish(&pdu, COAP_OPT_FINISH_PAYLOAD);
 
-    len = gcoap_finish(&pdu, msglen, COAP_FORMAT_TEXT);
+    if (pdu.payload_len >= msglen) {
+        memcpy(pdu.payload, msgbuf, msglen);
+        len += msglen;
+    }
+    else {
+        DEBUG("[CoAP] coap_post: ERROR. The message buffer is too small for the message\n");
+        return -1;
+    }
 
     DEBUG("[CoAP] coap_post: sending msg ID %u, %u bytes\n",
           coap_get_id(&pdu), (unsigned) len);
