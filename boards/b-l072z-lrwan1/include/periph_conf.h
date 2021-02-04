@@ -158,11 +158,19 @@ static const spi_conf_t spi_config[] = {
  */
 static const adc_conf_t adc_config[] = {
     {GPIO_PIN(PORT_A, 0), 0},
+<<<<<<< HEAD
     {GPIO_PIN(PORT_A, 0), 0},
     {GPIO_PIN(PORT_A, 4), 4},
     {GPIO_PIN(PORT_A, 4), 4},
     {GPIO_PIN(PORT_B, 9), 1},
     {GPIO_PIN(PORT_B, 8), 8},
+=======
+    {GPIO_PIN(PORT_A, 1), 1},
+    {GPIO_PIN(PORT_A, 4), 4},
+    {GPIO_PIN(PORT_B, 0), 0},
+    {GPIO_PIN(PORT_C, 1), 1},
+    {GPIO_PIN(PORT_C, 0), 0},
+>>>>>>> abf148135e285138c4ec02e5f7262243a62bd7f1
 };
 
 #define ADC_NUMOF           ARRAY_SIZE(adc_config)
