@@ -12,11 +12,11 @@ menuconfig MODULE_SHELL
 
 rsource "commands/Kconfig"
 
-menuconfig KCONFIG_MODULE_SHELL
+menuconfig KCONFIG_USEMODULE_SHELL
     bool "Configure the Shell interpreter"
     depends on USEMODULE_SHELL
 
-if KCONFIG_MODULE_SHELL
+if KCONFIG_USEMODULE_SHELL
 
 config SHELL_SHUTDOWN_ON_EXIT
     bool "Shutdown RIOT on shell exit"
@@ -33,4 +33,4 @@ config SHELL_NO_ECHO
 config SHELL_NO_PROMPT
     bool "Disable prompt"
 
-endif # KCONFIG_MODULE_SHELL
+endif # KCONFIG_USEMODULE_SHELL
