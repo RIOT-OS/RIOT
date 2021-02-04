@@ -49,7 +49,7 @@ static inline suit_storage_ram_region_t *_get_active_region(
 static bool _get_region_by_string(const char *location, uint32_t *val)
 {
     /* Matching on .ram.### */
-    static const char prefix[] = ".ram.";
+    static const char prefix[] = CONFIG_SUIT_STORAGE_RAM_LOCATION_PREFIX;
     static const size_t prefix_len = sizeof(prefix) - 1;
 
     /* Check for prefix */
@@ -221,7 +221,7 @@ static const suit_storage_driver_t suit_storage_ram_driver = {
     .set_active_location = _ram_set_active_location,
     .get_seq_no = _ram_get_seq_no,
     .set_seq_no = _ram_set_seq_no,
-    .separator = '.',
+    .separator = CONFIG_SUIT_STORAGE_RAM_LOCATION_SEPARATOR,
 };
 
 suit_storage_ram_t suit_storage_ram = {
