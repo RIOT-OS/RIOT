@@ -12,8 +12,6 @@ TIMEOUT_MS ?= 3000
 # Suppress test execution to avoid CI errors
 TEST_ON_CI_BLACKLIST += all
 
-CFLAGS += -DCONFIG_SHELL_NO_ECHO
-
 ifeq (native,$(BOARD))
   TERMFLAGS ?= $(TAP)
 else
@@ -53,4 +51,9 @@ endif
 # via Kconfig
 ifndef CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION_MS
   CFLAGS += -DCONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION_MS=$(TIMEOUT_MS)
+endif
+
+# Set the shell echo configuration via CFLAGS if not being controlled via Kconfig
+ifndef CONFIG_KCONFIG_USEMODULE_SHELL
+  CFLAGS += -DCONFIG_SHELL_NO_ECHO
 endif

@@ -45,7 +45,7 @@ extern "C" {
  * Instead terminate RIOT, which is also the behavior a user would
  * expect from a CLI application.
  */
-#  if defined(CPU_NATIVE) && !IS_ACTIVE(KCONFIG_MODULE_SHELL)
+#  if defined(CPU_NATIVE) && !IS_ACTIVE(KCONFIG_USEMODULE_SHELL)
 #    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 1
 #  else
 #    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 0

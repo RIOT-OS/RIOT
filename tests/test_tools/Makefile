@@ -3,9 +3,6 @@ include ../Makefile.tests_common
 
 USEMODULE += shell
 
-# Disable shell echo and prompt to not have them in the way for testing
-CFLAGS += -DCONFIG_SHELL_NO_ECHO=1 -DCONFIG_SHELL_NO_PROMPT=1
-
 # No need for test_utils_interactive_sync in this test since the test
 # synchronizes by itself through `shellping` command.
 DISABLE_MODULE += test_utils_interactive_sync
@@ -14,3 +11,9 @@ DISABLE_MODULE += test_utils_interactive_sync
 USEMODULE += dummy_thread
 
 include $(RIOTBASE)/Makefile.include
+
+# Set the shell echo configuration via CFLAGS if not being controlled via Kconfig
+# Disable shell echo and prompt to not have them in the way for testing
+ifndef CONFIG_KCONFIG_USEMODULE_SHELL
+  CFLAGS += -DCONFIG_SHELL_NO_ECHO -DCONFIG_SHELL_NO_PROMPT
+endif
