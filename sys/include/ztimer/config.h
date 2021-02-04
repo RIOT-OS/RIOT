@@ -104,17 +104,36 @@ extern "C" {
 #endif  /* MODULE_ZTIMER_PERIPH_RTT */
 
 /**
- * @brief   The minimum pm mode required for ZTIMER_USEC to run.
+ * @brief   The minimum pm mode required for ZTIMER_TIMER to run.
  */
-#ifndef CONFIG_ZTIMER_USEC_REQUIRED_PM_MODE
-#define CONFIG_ZTIMER_USEC_REQUIRED_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
+#ifndef CONFIG_ZTIMER_TIMER_BLOCK_PM_MODE
+#  ifdef CONFIG_ZTIMER_USEC_REQUIRED_PM_MODE
+#    define CONFIG_ZTIMER_TIMER_BLOCK_PM_MODE CONFIG_ZTIMER_USEC_REQUIRED_PM_MODE
+#  else
+#    define CONFIG_ZTIMER_TIMER_BLOCK_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
+#  endif
 #endif
 
 /**
- * @brief   The minimum pm mode required for ZTIMER_MSEC to run
+ * @brief   The minimum pm mode required for ZTIMER_RTT to run
  */
-#ifndef CONFIG_ZTIMER_MSEC_REQUIRED_PM_MODE
-#define CONFIG_ZTIMER_MSEC_REQUIRED_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
+#ifndef CONFIG_ZTIMER_RTT_BLOCK_PM_MODE
+#  ifdef CONFIG_ZTIMER_MSEC_REQUIRED_PM_MODE
+#    define CONFIG_ZTIMER_RTT_BLOCK_PM_MODE CONFIG_ZTIMER_MSEC_REQUIRED_PM_MODE
+#  else
+#    define CONFIG_ZTIMER_RTT_BLOCK_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
+#  endif
+#endif
+
+/**
+ * @brief   The minimum pm mode required for ZTIMER_RTC to run
+ */
+#ifndef CONFIG_ZTIMER_RTC_BLOCK_PM_MODE
+#  ifdef CONFIG_ZTIMER_SEC_REQUIRED_PM_MODE
+#    define CONFIG_ZTIMER_RTC_BLOCK_PM_MODE CONFIG_ZTIMER_SEC_REQUIRED_PM_MODE
+#  else
+#    define CONFIG_ZTIMER_RTC_BLOCK_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
+#  endif
 #endif
 
 #ifdef __cplusplus
