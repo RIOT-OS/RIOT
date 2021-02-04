@@ -11,3 +11,26 @@ menuconfig MODULE_SHELL
     depends on TEST_KCONFIG
 
 rsource "commands/Kconfig"
+
+menuconfig KCONFIG_MODULE_SHELL
+    bool "Configure the Shell interpreter"
+    depends on USEMODULE_SHELL
+
+if KCONFIG_MODULE_SHELL
+
+config SHELL_SHUTDOWN_ON_EXIT
+    bool "Shutdown RIOT on shell exit"
+    default y if CPU_NATIVE
+    help
+        Some systems (e.g Ubuntu 20.04) close stdin on CTRL-D / EOF
+        That means we can't just re-start the shell.
+        Instead terminate RIOT, which is also the behavior a user would expect
+        from a CLI application.
+
+config SHELL_NO_ECHO
+    bool "Disable echo"
+
+config SHELL_NO_PROMPT
+    bool "Disable prompt"
+
+endif # KCONFIG_MODULE_SHELL

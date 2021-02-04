@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <errno.h>
 
+#include "kernel_defines.h"
 #include "shell.h"
 #include "shell_commands.h"
 
@@ -48,18 +49,6 @@
 #else
     #define flush_if_needed()
 #endif /* MODULE_NEWLIB || MODULE_PICOLIBC */
-
-#ifndef SHELL_NO_ECHO
-    #define ECHO_ON 1
-#else
-    #define ECHO_ON 0
-#endif /* SHELL_NO_ECHO */
-
-#ifndef SHELL_NO_PROMPT
-    #define PROMPT_ON 1
-#else
-    #define PROMPT_ON 0
-#endif /* SHELL_NO_PROMPT */
 
 #ifdef MODULE_SHELL_COMMANDS
     #define _builtin_cmds _shell_command_list
@@ -343,7 +332,7 @@ __attribute__((weak)) void shell_post_command_hook(int ret, int argc,
 
 static inline void print_prompt(void)
 {
-    if (PROMPT_ON) {
+    if (!IS_ACTIVE(CONFIG_SHELL_NO_PROMPT) && !IS_ACTIVE(SHELL_NO_PROMPT)) {
         putchar('>');
         putchar(' ');
     }
@@ -353,14 +342,14 @@ static inline void print_prompt(void)
 
 static inline void echo_char(char c)
 {
-    if (ECHO_ON) {
+    if (!IS_ACTIVE(CONFIG_SHELL_NO_ECHO) && !IS_ACTIVE(SHELL_NO_ECHO)) {
         putchar(c);
     }
 }
 
 static inline void white_tape(void)
 {
-    if (ECHO_ON) {
+    if (!IS_ACTIVE(CONFIG_SHELL_NO_ECHO) && !IS_ACTIVE(SHELL_NO_ECHO)) {
         putchar('\b');
         putchar(' ');
         putchar('\b');
@@ -369,7 +358,7 @@ static inline void white_tape(void)
 
 static inline void new_line(void)
 {
-    if (ECHO_ON) {
+    if (!IS_ACTIVE(CONFIG_SHELL_NO_ECHO) && !IS_ACTIVE(SHELL_NO_ECHO)) {
         putchar('\r');
         putchar('\n');
     }

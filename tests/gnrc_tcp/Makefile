@@ -12,7 +12,7 @@ TIMEOUT_MS ?= 3000
 # Suppress test execution to avoid CI errors
 TEST_ON_CI_BLACKLIST += all
 
-CFLAGS += -DSHELL_NO_ECHO
+CFLAGS += -DCONFIG_SHELL_NO_ECHO
 
 ifeq (native,$(BOARD))
   TERMFLAGS ?= $(TAP)
