@@ -76,7 +76,7 @@ ztimer_clock_t *const ZTIMER_USEC = &_ztimer_convert_frac_usec.super.super;
 #  endif
 #endif
 
-/* use RTT for ZTIMER_MSEC, if used. Use RTT also for ZTIMER_USEC,
+/* use RTT for ZTIMER_MSEC, if used. Use RTT also for ZTIMER_SEC,
    unless module ztimer_periph_rtc is explicitly used by application */
 #if MODULE_ZTIMER_PERIPH_RTT && (MODULE_ZTIMER_MSEC || (MODULE_ZTIMER_SEC && !MODULE_ZTIMER_PERIPH_RTC))
 static ztimer_periph_rtt_t _ztimer_periph_timer_rtt_msec_sec;
@@ -88,7 +88,7 @@ static ztimer_periph_rtt_t _ztimer_periph_timer_rtt_msec_sec;
 ztimer_clock_t *const ZTIMER_MSEC_BASE = &_ztimer_periph_timer_rtt_msec_sec;
 #    if RTT_FREQUENCY != FREQ_1KHZ
 static ztimer_convert_frac_t _ztimer_convert_frac_msec;
-ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_convert_frac_msec_sec.super.super;
+ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_convert_frac_msec.super.super;
 #  define ZTIMER_MSEC_CONVERT_LOWER_FREQ    RTT_FREQUENCY
 #  define ZTIMER_MSEC_CONVERT_LOWER         (&_ztimer_periph_timer_rtt_msec_sec)
 #    else
@@ -112,7 +112,7 @@ ztimer_clock_t *const ZTIMER_SEC = &_ztimer_periph_timer_rtc_sec;
 #  elif MODULE_ZTIMER_PERIPH_RTT
 static ztimer_convert_frac_t _ztimer_convert_frac_sec;
 ztimer_clock_t *const ZTIMER_SEC = &_ztimer_convert_frac_sec.super.super;
-ztimer_clock_t *const ZTIMER_SEC_BASE = &_ztimer_periph_timer_msec_sec.super;
+ztimer_clock_t *const ZTIMER_SEC_BASE = &_ztimer_periph_timer_rtt_msec_sec;
 #    define ZTIMER_SEC_CONVERT_LOWER        (&_ztimer_periph_timer_rtt_msec_sec)
 #    define ZTIMER_SEC_CONVERT_LOWER_FREQ   RTT_FREQUENCY
 #  elif MODULE_ZTIMER_USEC
@@ -205,6 +205,11 @@ void ztimer_init(void)
     ztimer_convert_frac_init(&_ztimer_convert_frac_sec,
                              ZTIMER_SEC_CONVERT_LOWER,
                              FREQ_1HZ, ZTIMER_SEC_CONVERT_LOWER_FREQ);
+#  endif
+#  ifdef MODULE_PM_LAYERED
+    LOG_DEBUG("ztimer_init(): ZTIMER_SEC setting required_pm_mode to %i\n",
+              CONFIG_ZTIMER_SEC_REQUIRED_PM_MODE);
+    ZTIMER_SEC->required_pm_mode = CONFIG_ZTIMER_SEC_REQUIRED_PM_MODE;
 #  endif
 #endif
 }

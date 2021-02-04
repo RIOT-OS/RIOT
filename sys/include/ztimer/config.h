@@ -117,6 +117,13 @@ extern "C" {
 #define CONFIG_ZTIMER_MSEC_REQUIRED_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
 #endif
 
+/**
+ * @brief   The minimum pm mode required for ZTIMER_SEC to run
+ */
+#ifndef CONFIG_ZTIMER_SEC_REQUIRED_PM_MODE
+#define CONFIG_ZTIMER_SEC_REQUIRED_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
+#endif
+
 #ifdef __cplusplus
 }
 #endif
