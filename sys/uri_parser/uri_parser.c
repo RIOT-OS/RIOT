@@ -171,12 +171,6 @@ static char *_consume_authority(uri_parser_result_t *result, char *uri,
         return NULL;
     }
 
-    /* do not allow empty host if userinfo or port are set */
-    if ((result->host_len == 0) &&
-        (result->userinfo || result->port)) {
-        return NULL;
-    }
-
     /* this includes the '/' */
     return authority_end;
 }
