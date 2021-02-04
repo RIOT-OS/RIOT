@@ -55,7 +55,7 @@ static char *_consume_scheme(uri_parser_result_t *result, char *uri,
     result->scheme_len = p - uri;
 
     /* check if authority part exists '://' */
-    if ((p[1] != '\0') && (p[2] != '\0') && (p[1] == '/') && (p[2] == '/')) {
+    if (((uri_end - p) > 2) && (p[1] == '/') && (p[2] == '/')) {
         *has_authority = true;
         /* skip '://' */
         return p + 3;
