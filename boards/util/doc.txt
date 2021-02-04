@@ -1,0 +1,18 @@
+/**
+@defgroup    boards_util Dummy board
+@ingroup     boards
+@brief       Support for using the RIOT build system to build native utilities
+
+# Overview
+
+While the @ref boards_native is aimed at simulating hardware and using as
+much of RIOT as possible, the `util` dummy board does the opposite.
+
+It attempts to use as little RIOT code as possible to build a native application,
+just leveraging the RIOT build system to build utilities that make use
+of RIOT libaries or packages.
+
+There is no attempt made to simulate any hardware.
+All libraries of the host operating system are available.
+
+ */
