@@ -75,9 +75,11 @@ void _consume_userinfo(uri_parser_result_t *result, char *uri,
     if (userinfo_end) {
         result->userinfo = uri;
         result->userinfo_len = userinfo_end - uri;
-        /* shift host part beyond userinfo and '@' */
-        result->host += result->userinfo_len + 1;
-        result->host_len -= result->userinfo_len + 1;
+        if ((result->userinfo_len + 1) < result->host_len) {
+            /* shift host part beyond userinfo and '@' */
+            result->host += result->userinfo_len + 1;
+            result->host_len -= result->userinfo_len + 1;
+        }
     }
 }
 
