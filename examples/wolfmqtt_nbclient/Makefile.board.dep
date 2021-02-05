@@ -1,0 +1,9 @@
+# Put board specific dependencies here
+
+ifneq (,$(filter arch_esp,$(FEATURES_USED)))
+  USEMODULE += esp_wifi
+else ifeq ($(BOARD),nucleo-f207zg)
+  USEMODULE += stm32_eth_auto
+else ifeq ($(BOARD),native)
+  USEMODULE += netdev_default
+endif

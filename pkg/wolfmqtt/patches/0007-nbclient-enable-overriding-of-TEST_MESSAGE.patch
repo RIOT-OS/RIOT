@@ -1,0 +1,27 @@
+From 828bba0b85843fc288aa21e67ef64e980d18a97a Mon Sep 17 00:00:00 2001
+From: Hendrik van Essen <hendrik.ve@fu-berlin.de>
+Date: Fri, 5 Feb 2021 17:13:38 +0100
+Subject: [PATCH 7/8] nbclient: enable overriding of TEST_MESSAGE
+
+---
+ wolfmqtt_examples/nbclient/nbclient.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/wolfmqtt_examples/nbclient/nbclient.c b/wolfmqtt_examples/nbclient/nbclient.c
+index b3fff62..d9f2875 100644
+--- a/wolfmqtt_examples/nbclient/nbclient.c
++++ b/wolfmqtt_examples/nbclient/nbclient.c
+@@ -38,7 +38,10 @@ static int mStopRead = 0;
+ 
+ /* Maximum size for network read/write callbacks. */
+ #define MAX_BUFFER_SIZE 1024
++
++#ifndef TEST_MESSAGE
+ #define TEST_MESSAGE    "test"
++#endif
+ 
+ #ifdef WOLFMQTT_DISCONNECT_CB
+ /* callback indicates a network error occurred */
+-- 
+2.25.1
+
