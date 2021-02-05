@@ -1,0 +1,35 @@
+From 97efad915e3757b16d154cdfefa24cc68a3a4031 Mon Sep 17 00:00:00 2001
+From: HendrikVE <hendrik1995@msn.com>
+Date: Fri, 5 Feb 2021 17:14:00 +0100
+Subject: [PATCH 08/11] nbclient: wait for established connection
+
+---
+ wolfmqtt_examples/nbclient/nbclient.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/wolfmqtt_examples/nbclient/nbclient.c b/wolfmqtt_examples/nbclient/nbclient.c
+index d9f2875..5048208 100644
+--- a/wolfmqtt_examples/nbclient/nbclient.c
++++ b/wolfmqtt_examples/nbclient/nbclient.c
+@@ -24,7 +24,7 @@
+     #include <config.h>
+ #endif
+ 
+-
++#include "xtimer.h"
+ #include "wolfmqtt/mqtt_client.h"
+ 
+ #ifdef WOLFMQTT_NONBLOCK
+@@ -496,6 +496,9 @@ exit:
+ 
+     int main(int argc, char** argv)
+     {
++        /* wait until connection has been established */
++        xtimer_sleep(10);
++
+         int rc;
+ #ifdef WOLFMQTT_NONBLOCK
+         MQTTCtx mqttCtx;
+-- 
+2.25.1
+

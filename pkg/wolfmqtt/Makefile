@@ -12,6 +12,7 @@ all: $(filter \
     wolfmqtt_examples \
     wolfmqtt_examples_mqttclient \
     wolfmqtt_examples_snclient \
+    wolfmqtt_examples_nbclient \
     ,$(USEMODULE))
 
 wolfmqtt:
@@ -25,3 +26,6 @@ wolfmqtt_examples_mqttclient:
 
 wolfmqtt_examples_snclient:
 	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/sn-client -f $(CURDIR)/Makefile.$(PKG_NAME).examples.snclient
+
+wolfmqtt_examples_nbclient:
+	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfmqtt_examples/nbclient -f $(CURDIR)/Makefile.$(PKG_NAME).examples.nbclient

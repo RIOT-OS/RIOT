@@ -1,0 +1,3 @@
+MODULE = wolfmqtt_examples_nbclient
+
+include $(RIOTBASE)/Makefile.base
