@@ -78,21 +78,23 @@ ztimer_clock_t *const ZTIMER_USEC = &_ztimer_convert_frac_usec.super.super;
 
 /* use RTT for ZTIMER_MSEC, if used. Use RTT also for ZTIMER_SEC,
    unless module ztimer_periph_rtc is explicitly used by application */
-#if MODULE_ZTIMER_PERIPH_RTT && (MODULE_ZTIMER_MSEC || (MODULE_ZTIMER_SEC && !MODULE_ZTIMER_PERIPH_RTC))
-static ztimer_periph_rtt_t _ztimer_periph_timer_rtt_msec_sec;
-#  define ZTIMER_RTT_INIT (&_ztimer_periph_timer_rtt_msec_sec)
+#if MODULE_ZTIMER_PERIPH_RTT && (MODULE_ZTIMER_MSEC || \
+                                 (MODULE_ZTIMER_SEC && \
+                                  !MODULE_ZTIMER_PERIPH_RTC))
+static ztimer_periph_rtt_t _ztimer_periph_timer_rtt;
+#  define ZTIMER_RTT (&_ztimer_periph_timer_rtt)
 #endif
 
 #if MODULE_ZTIMER_MSEC
 #  if MODULE_ZTIMER_PERIPH_RTT
-ztimer_clock_t *const ZTIMER_MSEC_BASE = &_ztimer_periph_timer_rtt_msec_sec;
+ztimer_clock_t *const ZTIMER_MSEC_BASE = &_ztimer_periph_timer_rtt;
 #    if RTT_FREQUENCY != FREQ_1KHZ
 static ztimer_convert_frac_t _ztimer_convert_frac_msec;
 ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_convert_frac_msec.super.super;
+#  define ZTIMER_MSEC_CONVERT_LOWER         (&_ztimer_periph_timer_rtt)
 #  define ZTIMER_MSEC_CONVERT_LOWER_FREQ    RTT_FREQUENCY
-#  define ZTIMER_MSEC_CONVERT_LOWER         (&_ztimer_periph_timer_rtt_msec_sec)
 #    else
-ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_periph_timer_rtt_msec_sec;
+ztimer_clock_t *const ZTIMER_MSEC = &_ztimer_periph_timer_rtt;
 #    endif
 #  elif MODULE_ZTIMER_USEC
 static ztimer_convert_frac_t _ztimer_convert_frac_msec;
@@ -112,8 +114,8 @@ ztimer_clock_t *const ZTIMER_SEC = &_ztimer_periph_timer_rtc_sec;
 #  elif MODULE_ZTIMER_PERIPH_RTT
 static ztimer_convert_frac_t _ztimer_convert_frac_sec;
 ztimer_clock_t *const ZTIMER_SEC = &_ztimer_convert_frac_sec.super.super;
-ztimer_clock_t *const ZTIMER_SEC_BASE = &_ztimer_periph_timer_rtt_msec_sec;
-#    define ZTIMER_SEC_CONVERT_LOWER        (&_ztimer_periph_timer_rtt_msec_sec)
+ztimer_clock_t *const ZTIMER_SEC_BASE = &_ztimer_periph_timer_rtt;
+#    define ZTIMER_SEC_CONVERT_LOWER        (&_ztimer_periph_timer_rtt)
 #    define ZTIMER_SEC_CONVERT_LOWER_FREQ   RTT_FREQUENCY
 #  elif MODULE_ZTIMER_USEC
 static ztimer_convert_frac_t _ztimer_convert_frac_sec;
@@ -170,9 +172,9 @@ void ztimer_init(void)
 #  endif
 #endif
 
-#ifdef ZTIMER_RTT_INIT
+#ifdef ZTIMER_RTT
     LOG_DEBUG("ztimer_init(): initializing rtt\n");
-    ztimer_periph_rtt_init(ZTIMER_RTT_INIT);
+    ztimer_periph_rtt_init(ZTIMER_RTT);
 #endif
 
 #if MODULE_ZTIMER_MSEC
@@ -200,7 +202,7 @@ void ztimer_init(void)
     LOG_DEBUG("ztimer_init(): initializing rtc\n");
     ztimer_periph_rtc_init(&_ztimer_periph_timer_rtc_sec);
 #  else
-    LOG_DEBUG("ztimer_init(): ZTIMER_SEC convert_frac from %lu to 1000\n",
+    LOG_DEBUG("ztimer_init(): ZTIMER_SEC convert_frac from %lu to 1\n",
               (long unsigned)ZTIMER_SEC_CONVERT_LOWER_FREQ);
     ztimer_convert_frac_init(&_ztimer_convert_frac_sec,
                              ZTIMER_SEC_CONVERT_LOWER,
