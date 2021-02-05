@@ -1,0 +1,3 @@
+MODULE = wolfmqtt_examples_multithread
+
+include $(RIOTBASE)/Makefile.base
