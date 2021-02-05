@@ -14,6 +14,8 @@ config CPU_ARCH_NATIVE
     select HAS_LIBSTDCPP
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_EEPROM
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
     select HAS_PERIPH_HWRNG
     select HAS_PERIPH_PM
     select HAS_PERIPH_PWM
