@@ -401,6 +401,17 @@ static const validate_t validate_uris[] = {
         "./this:that",
         "",
         0),
+    VEC("pP://",
+        true,
+        "pP",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        0),
 };
 
 static char _failure_msg[VEC_MSG_LEN];
