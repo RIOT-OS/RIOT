@@ -1,0 +1,34 @@
+From 333f879aa8b99790a4f47121ea81e62b79e334a2 Mon Sep 17 00:00:00 2001
+From: HendrikVE <hendrik1995@msn.com>
+Date: Sat, 6 Feb 2021 00:02:20 +0100
+Subject: [PATCH 10/11] multithread: wait for established connection
+
+---
+ wolfmqtt_examples/multithread/multithread.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/wolfmqtt_examples/multithread/multithread.c b/wolfmqtt_examples/multithread/multithread.c
+index 02ee48c..74373bb 100755
+--- a/wolfmqtt_examples/multithread/multithread.c
++++ b/wolfmqtt_examples/multithread/multithread.c
+@@ -24,6 +24,7 @@
+     #include <config.h>
+ #endif
+ 
++#include "xtimer.h"
+ #include "wolfmqtt/mqtt_client.h"
+ 
+ #include "multithread.h"
+@@ -618,6 +619,9 @@ int multithread_test(MQTTCtx *mqttCtx)
+ 
+ int main(int argc, char** argv)
+ {
++    /* wait until connection has been established */
++    xtimer_sleep(10);
++
+     int rc;
+ #ifdef WOLFMQTT_MULTITHREAD
+     /* init defaults */
+-- 
+2.25.1
+
