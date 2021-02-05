@@ -13,6 +13,8 @@
  * @author  José Ignacio Alamos <jose.alamos@haw-hamburg.de>
  */
 #include "kernel_defines.h"
+#include "bitarithm.h"
+#include "random.h"
 #include "net/gnrc/lorawan/region.h"
 
 #define ENABLE_DEBUG 0
@@ -62,33 +64,6 @@ uint8_t gnrc_lorawan_rx1_get_dr_offset(uint8_t dr_up, uint8_t dr_offset)
 }
 #endif
 
-static size_t _get_num_used_channels(gnrc_lorawan_t *mac)
-{
-    size_t count = 0;
-
-    for (unsigned i = 0; i < GNRC_LORAWAN_MAX_CHANNELS; i++) {
-        if (mac->channel[i]) {
-            count++;
-        }
-    }
-    return count;
-}
-
-static uint32_t _get_nth_channel(gnrc_lorawan_t *mac, size_t n)
-{
-    int i = 0;
-    uint32_t channel = 0;
-
-    while (n) {
-        if (mac->channel[i]) {
-            n--;
-            channel = mac->channel[i];
-            i++;
-        }
-    }
-    return channel;
-}
-
 void gnrc_lorawan_channels_init(gnrc_lorawan_t *mac)
 {
     /* We set the channel mask for the default channels and populate from the list */
@@ -107,14 +82,15 @@ void gnrc_lorawan_channels_init(gnrc_lorawan_t *mac)
 
 uint32_t gnrc_lorawan_pick_channel(gnrc_lorawan_t *mac)
 {
-    netdev_t *netdev = gnrc_lorawan_get_netdev(mac);
-    uint32_t random_number;
+    uint8_t index = 0;
 
-    netdev->driver->get(netdev, NETOPT_RANDOM, &random_number,
-                        sizeof(random_number));
+    uint8_t random_number = random_uint32_range(0, bitarithm_bits_set(mac->channel_mask));
+    unsigned state = mac->channel_mask;
 
-    return _get_nth_channel(mac,
-                            1 + (random_number % _get_num_used_channels(mac)));
+    for (int i = 0; i < random_number; i++) {
+        state = bitarithm_test_and_clear(state, &index);
+    }
+    return mac->channel[index];
 }
 
 void gnrc_lorawan_process_cflist(gnrc_lorawan_t *mac, uint8_t *cflist)
