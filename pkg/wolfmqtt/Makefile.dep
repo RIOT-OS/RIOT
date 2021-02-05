@@ -12,6 +12,12 @@ ifneq (,$(filter wolfmqtt_examples_mqttclient,$(USEMODULE)))
   USEMODULE += sock_tcp
 endif
 
+ifneq (,$(filter wolfmqtt_examples_multithread,$(USEMODULE)))
+  USEMODULE += sock_tcp
+  USEMODULE += posix_semaphore
+  USEMODULE += pthread
+endif
+
 ifneq (,$(filter wolfmqtt_examples_nbclient,$(USEMODULE)))
   USEMODULE += sock_tcp
 endif
