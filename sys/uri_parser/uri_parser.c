@@ -75,9 +75,16 @@ void _consume_userinfo(uri_parser_result_t *result, char *uri,
     if (userinfo_end) {
         result->userinfo = uri;
         result->userinfo_len = userinfo_end - uri;
-        /* shift host part beyond userinfo and '@' */
-        result->host += result->userinfo_len + 1;
-        result->host_len -= result->userinfo_len + 1;
+
+        /* shift host part beyond userinfo and '@', but only if possible */
+        unsigned offset = result->userinfo_len + 1;
+        if ((result->host + offset) > authority_end) {
+            result->host_len = 0;
+            return;
+        }
+
+        result->host_len -= offset;
+        result->host += offset;
     }
 }
 
@@ -125,6 +132,11 @@ static char *_consume_authority(uri_parser_result_t *result, char *uri,
     /* consume userinfo, if available */
     _consume_userinfo(result, uri, authority_end);
 
+    /* host is empty */
+    if (result->host_len == 0) {
+        return authority_end;
+    }
+
     char *ipv6_end = NULL;
     /* validate IPv6 form */
     if (result->host[0] == '[') {
@@ -156,12 +168,6 @@ static char *_consume_authority(uri_parser_result_t *result, char *uri,
 
     /* consume port, if available */
     if (!_consume_port(result, ipv6_end, authority_end)) {
-        return NULL;
-    }
-
-    /* do not allow empty host if userinfo or port are set */
-    if ((result->host_len == 0) &&
-        (result->userinfo || result->port)) {
         return NULL;
     }
 
@@ -218,6 +224,11 @@ static int _parse_absolute(uri_parser_result_t *result, char *uri,
         return -1;
     }
 
+    if (uri >= uri_end) {
+        /* nothing more to consume */
+        return 0;
+    }
+
     if (has_authority) {
         uri = _consume_authority(result, uri, uri_end);
         if (uri == NULL) {
@@ -225,8 +236,12 @@ static int _parse_absolute(uri_parser_result_t *result, char *uri,
         }
     }
 
-    /* parsing the path, starting with '/' */
-    return _parse_relative(result, uri, uri_end);
+    /* is there more to parse after authority? */
+    if (uri < uri_end) {
+        /* parsing the path, starting with '/' */
+        return _parse_relative(result, uri, uri_end);
+    }
+    return 0;
 }
 
 bool uri_parser_is_absolute(const char *uri, size_t uri_len)
