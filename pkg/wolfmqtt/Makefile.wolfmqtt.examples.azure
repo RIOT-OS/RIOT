@@ -1,0 +1,3 @@
+MODULE = wolfmqtt_examples_azure
+
+include $(RIOTBASE)/Makefile.base
