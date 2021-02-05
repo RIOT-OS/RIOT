@@ -22,7 +22,6 @@
 #include "msg.h"
 
 #include "net/gcoap.h"
-#include "kernel_types.h"
 #include "shell.h"
 
 #define BUFLEN          (64U)
