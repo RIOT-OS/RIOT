@@ -6,12 +6,15 @@
 # directory for more details.
 #
 
-config CPU_COMMON_ATXMEGA
+config HAS_CPU_CORE_ATXMEGA
     bool
     select CPU_ARCH_AVR8
-    select CPU_CORE_AVR
     select HAS_CPU_ATXMEGA
     select HAS_CPP
+
+config CPU_COMMON_ATXMEGA
+    bool
+    select HAS_CPU_CORE_ATXMEGA
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
