@@ -224,6 +224,11 @@ static int _parse_absolute(uri_parser_result_t *result, char *uri,
         return -1;
     }
 
+    if (uri >= uri_end) {
+        /* nothing more to consume */
+        return 0;
+    }
+
     if (has_authority) {
         uri = _consume_authority(result, uri, uri_end);
         if (uri == NULL) {
