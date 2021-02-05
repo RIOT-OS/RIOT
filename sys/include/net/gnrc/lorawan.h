@@ -284,6 +284,18 @@ void gnrc_lorawan_mlme_confirm(gnrc_lorawan_t *mac, mlme_confirm_t *confirm);
  */
 netdev_t *gnrc_lorawan_get_netdev(gnrc_lorawan_t *mac);
 
+/**
+ * @brief Set the channel mask in order to enable or disable LoRaWAN channels
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] channel_mask the channel mask. LSB maps to channel 0
+ *
+ * @return 0 on success
+ * @return -EINVAL if @p channel_mask is zero or if the channel mask tries to
+ *         enable an undefined channel
+ */
+int gnrc_lorawan_phy_set_channel_mask(gnrc_lorawan_t *mac, uint16_t channel_mask);
+
 #ifdef __cplusplus
 }
 #endif

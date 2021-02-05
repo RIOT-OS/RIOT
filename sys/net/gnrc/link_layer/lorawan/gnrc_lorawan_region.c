@@ -64,6 +64,22 @@ uint8_t gnrc_lorawan_rx1_get_dr_offset(uint8_t dr_up, uint8_t dr_offset)
 }
 #endif
 
+int gnrc_lorawan_phy_set_channel_mask(gnrc_lorawan_t *mac, uint16_t channel_mask)
+{
+    if (!channel_mask) {
+        return -EINVAL;
+    }
+
+    for (int n = channel_mask, i = 0; n; n = n >> 1, i++) {
+        if ((n & 0x1) && !mac->channel[i]) {
+           return -EINVAL;
+        }
+    }
+
+    mac->channel_mask = channel_mask;
+    return 0;
+}
+
 void gnrc_lorawan_channels_init(gnrc_lorawan_t *mac)
 {
     /* We set the channel mask for the default channels and populate from the list */
