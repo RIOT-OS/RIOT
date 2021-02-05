@@ -37,6 +37,7 @@ lwm2m_object_t *lwm2m_get_object_device(void);
 lwm2m_object_t *lwm2m_client_get_security_object(
                         lwm2m_client_data_t *client_data)
 {
+    (void)client_data;
     lwm2m_object_t *ret;
     char *server_uri = CONFIG_LWM2M_SERVER_URI;
     int server_id = CONFIG_LWM2M_SERVER_ID;
@@ -47,7 +48,6 @@ lwm2m_object_t *lwm2m_client_get_security_object(
     ret = get_security_object(server_id, server_uri, psk_id, psk_buffer,
                               psk_len, IS_ACTIVE(CONFIG_LWM2M_BOOTSTRAP));
 
-    client_data->obj_security = ret;
     return ret;
 }
 

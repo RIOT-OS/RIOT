@@ -127,12 +127,19 @@ static netif_t *_get_interface(char *host);
 void *lwm2m_connect_server(uint16_t sec_obj_inst_id, void *user_data)
 {
     lwm2m_client_data_t *client_data = (lwm2m_client_data_t *)user_data;
-    lwm2m_list_t *instance;
     lwm2m_client_connection_t *new_conn = NULL;
 
+    /* get the security object list */
+    lwm2m_object_t *security_objects = (lwm2m_object_t *)LWM2M_LIST_FIND(
+                                                            client_data->lwm2m_ctx->objectList,
+                                                            LWM2M_SECURITY_OBJECT_ID);
+    if (!security_objects) {
+        DEBUG("[lwm2m_connect_server] Could not find sec object\n");
+        return NULL;
+    }
+
     /* get the security object instance */
-    instance = LWM2M_LIST_FIND(client_data->obj_security->instanceList,
-                               sec_obj_inst_id);
+    lwm2m_list_t *instance = LWM2M_LIST_FIND(security_objects, sec_obj_inst_id);
     if (instance == NULL) {
         DEBUG("[lwm2m_connect_server] Could not find sec object instance\n");
         return NULL;
@@ -343,8 +350,18 @@ static lwm2m_client_connection_t *_connection_create(int instance_id,
 
     memset(uri_buf, 0, sizeof(uri_buf));
     DEBUG("Creating connection\n");
-    /* get the server URI from the requested instance */
-    uri = _get_uri_from_security_obj(client_data->obj_security, instance_id,
+
+    /* get the list of security objects */
+    lwm2m_object_t *security_objects = (lwm2m_object_t *)LWM2M_LIST_FIND(
+                                                            client_data->lwm2m_ctx->objectList,
+                                                            LWM2M_SECURITY_OBJECT_ID);
+    if (!security_objects) {
+        DEBUG("[_connection_create] Could not find any security object\n");
+        return NULL;
+    }
+
+    /* get the URI from the security object instance */
+    uri = _get_uri_from_security_obj(security_objects, instance_id,
                                      uri_buf, sizeof(uri_buf) - 1);
 
     host = _parse_schema(uri, &default_port, instance_id);
