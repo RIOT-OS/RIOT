@@ -35,6 +35,7 @@
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc/netreg.h"
 #include "net/loramac.h"
+#include "net/gnrc/tx_sync.h"
 
 #define LORAWAN_QUEUE_SIZE (4U)
 
@@ -48,6 +49,7 @@ int tx_cmd(int argc, char **argv)
     gnrc_pktsnip_t *pkt;
     uint8_t port = CONFIG_LORAMAC_DEFAULT_TX_PORT; /* Default: 2 */
     int interface;
+    gnrc_tx_sync_t tx_sync;
 
     if (argc < 3) {
         _usage();
@@ -65,23 +67,17 @@ int tx_cmd(int argc, char **argv)
         }
     }
 
-    pkt = gnrc_pktbuf_add(NULL, argv[2], strlen(argv[2]), GNRC_NETTYPE_UNDEF);
-
-    /* register for returned packet status */
-    if (gnrc_neterr_reg(pkt) != 0) {
-        puts("Can not register for error reporting");
-        return 0;
-    }
+    pkt = gnrc_tx_sync_build(&tx_sync);
+    pkt = gnrc_pktbuf_add(pkt, argv[2], strlen(argv[2]), GNRC_NETTYPE_UNDEF);
 
     gnrc_netapi_set(interface, NETOPT_LORAWAN_TX_PORT, 0, &port, sizeof(port));
     gnrc_netif_send(gnrc_netif_get_by_pid(interface), pkt);
 
     /* wait for packet status and check */
-    msg_t msg;
-    msg_receive(&msg);
-    if ((msg.type != GNRC_NETERR_MSG_TYPE) ||
-        (msg.content.value != GNRC_NETERR_SUCCESS)) {
-        printf("Error sending packet: (status: %d\n)", (int) msg.content.value);
+    gnrc_tx_sync(&tx_sync);
+    uint32_t err = gnrc_neterr_get(&tx_sync);
+    if (err != GNRC_NETERR_SUCCESS) {
+        printf("Error sending packet: (status: %" PRIu32 "\n)", err);
     }
     else {
         puts("Successfully sent packet");

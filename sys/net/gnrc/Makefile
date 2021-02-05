@@ -136,5 +136,8 @@ endif
 ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
   DIRS += transport_layer/tcp
 endif
+ifneq (,$(filter gnrc_tx_sync,$(USEMODULE)))
+  DIRS += tx_sync
+endif
 
 include $(RIOTBASE)/Makefile.base

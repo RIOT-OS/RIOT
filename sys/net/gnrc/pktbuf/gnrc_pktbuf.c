@@ -15,6 +15,7 @@
 
 #include "mutex.h"
 #include "net/gnrc/pktbuf.h"
+#include "net/gnrc/tx_sync.h"
 
 #include "pktbuf_internal.h"
 
@@ -94,14 +95,20 @@ void gnrc_pktbuf_release_error(gnrc_pktsnip_t *pkt, uint32_t err)
         tmp = pkt->next;
         if (pkt->users == 1) {
             pkt->users = 0; /* not necessary but to be on the safe side */
-            gnrc_pktbuf_free_internal(pkt->data, pkt->size);
+            if (!IS_USED(MODULE_GNRC_TX_SYNC)
+                || (pkt->type != GNRC_NETTYPE_TX_SYNC)) {
+                gnrc_pktbuf_free_internal(pkt->data, pkt->size);
+            }
+            else {
+                DEBUG("pktbuf: report status code %" PRIu32 "\n", err);
+                gnrc_neterr_report(pkt, err);
+                gnrc_tx_complete(pkt);
+            }
             gnrc_pktbuf_free_internal(pkt, sizeof(gnrc_pktsnip_t));
         }
         else {
             pkt->users--;
         }
-        DEBUG("pktbuf: report status code %" PRIu32 "\n", err);
-        gnrc_neterr_report(pkt, err);
         pkt = tmp;
     }
     mutex_unlock(&gnrc_pktbuf_mutex);

@@ -47,6 +47,7 @@
 
 #include "net/gnrc/netif.h"
 #include "net/gnrc/netif/internal.h"
+#include "net/gnrc/tx_sync.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -1534,7 +1535,13 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
      * layer implementations in case `gnrc_netif_pktq` is included */
     gnrc_pktbuf_hold(pkt, 1);
 #endif /* IS_USED(MODULE_GNRC_NETIF_PKTQ) */
+    gnrc_pktsnip_t *tx_sync = IS_USED(MODULE_GNRC_TX_SYNC)
+                            ? gnrc_tx_sync_split(pkt) : NULL;
     res = netif->ops->send(netif, pkt);
+    if (tx_sync != NULL) {
+        uint32_t err = (res < 0) ? -res : GNRC_NETERR_SUCCESS;
+        gnrc_pktbuf_release_error(tx_sync, err);
+    }
 #if IS_USED(MODULE_GNRC_NETIF_PKTQ)
     if (res == -EBUSY) {
         int put_res;
