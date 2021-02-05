@@ -1,0 +1,28 @@
+From 0ee68890355c4ebd15323511c46ff109ad106d49 Mon Sep 17 00:00:00 2001
+From: Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
+Date: Fri, 5 Feb 2021 16:17:20 +0100
+Subject: [PATCH] core/registration: cast to time_t
+
+---
+ core/registration.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/core/registration.c b/core/registration.c
+index 03fa851..aed3607 100644
+--- a/core/registration.c
++++ b/core/registration.c
+@@ -1313,9 +1313,9 @@ void registration_step(lwm2m_context_t * contextP,
+             time_t interval;
+ 
+             nextUpdate = targetP->lifetime;
+-            if (COAP_MAX_TRANSMIT_WAIT < nextUpdate)
++            if ((time_t)COAP_MAX_TRANSMIT_WAIT < nextUpdate)
+             {
+-                nextUpdate -= COAP_MAX_TRANSMIT_WAIT;
++                nextUpdate -= (time_t)COAP_MAX_TRANSMIT_WAIT;
+             }
+             else
+             {
+-- 
+2.30.0
+
