@@ -18,6 +18,7 @@ BOARD_WHITELIST := \
                     remote-reva \
                     remote-revb \
                     omote \
+                    openmote-b \
                     openmote-cc2538 \
                     nrf52840dk \
                     nrf52840-mdk \
