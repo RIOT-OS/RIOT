@@ -85,6 +85,8 @@ static uint32_t transaction_start;
 static uint32_t transaction_id;
 static uint8_t duid_len = sizeof(dhcpv6_duid_l2_t);
 
+static const char mud_url[] = CONFIG_DHCPV6_CLIENT_MUD_URL;
+
 static void _post_solicit_servers(void *args);
 static void _solicit_servers(event_t *event);
 static void _request(event_t *event);
@@ -127,6 +129,10 @@ static void *_thread(void *args)
 void dhcpv6_client_init(event_queue_t *eq, uint16_t netif)
 {
     assert(eq->waiter != NULL);
+    if (IS_USED(MODULE_GNRC_DHCPV6_CLIENT_MUD_URL)) {
+        assert(strlen(mud_url) <= MAX_MUD_URL_LENGTH);
+        assert(strncmp(mud_url, "https://", 8) == 0);
+    }
     event_queue = eq;
     local.netif = netif;
     remote.netif = netif;
@@ -248,18 +254,21 @@ static inline size_t _compose_elapsed_time_opt(dhcpv6_opt_elapsed_time_t *time)
 }
 
 static inline size_t _compose_mud_url_opt(dhcpv6_opt_mud_url_t *mud_url_opt,
-                                          const char *mud_url, size_t len_max)
+                                          size_t len_max)
 {
+    if (!IS_USED(MODULE_GNRC_DHCPV6_CLIENT_MUD_URL)) {
+        return 0;
+    }
     uint16_t len = strlen(mud_url);
 
     if (len > len_max) {
-        assert(0);
+        assert(len <= len_max);
         return 0;
     }
 
     mud_url_opt->type = byteorder_htons(DHCPV6_OPT_MUD_URL);
     mud_url_opt->len = byteorder_htons(len);
-    strncpy(mud_url_opt->mudString, mud_url, len_max);
+    memcpy(mud_url_opt->mud_string, mud_url, len);
     return len + sizeof(dhcpv6_opt_mud_url_t);
 }
 
@@ -729,15 +738,6 @@ static void _solicit_servers(event_t *event)
     msg_len += _compose_elapsed_time_opt(time);
     msg_len += _compose_oro_opt((dhcpv6_opt_oro_t *)&send_buf[msg_len], oro_opts,
                                 ARRAY_SIZE(oro_opts));
-
-    if (IS_USED(MODULE_GNRC_DHCPV6_CLIENT_MUD_URL)) {
-        const char mud_url[] = CONFIG_DHCPV6_CLIENT_MUD_URL;
-        assert(strlen(mud_url) <= MAX_MUD_URL_LENGTH);
-        assert(strncmp(mud_url, "https://", 8) == 0);
-        msg_len += _compose_mud_url_opt((dhcpv6_opt_mud_url_t *)&send_buf[msg_len],
-                                        mud_url, sizeof(send_buf) - msg_len);
-    }
-
     msg_len += _add_ia_pd_from_config(&send_buf[msg_len], sizeof(send_buf) - msg_len);
     DEBUG("DHCPv6 client: send SOLICIT\n");
     _flush_stale_replies(&sock);
@@ -841,6 +841,8 @@ static void _request_renew_rebind(uint8_t type)
     if (type != DHCPV6_REBIND) {
         msg_len += _compose_sid_opt((dhcpv6_opt_duid_t *)&send_buf[msg_len]);
     }
+    msg_len += _compose_mud_url_opt((dhcpv6_opt_mud_url_t *)&send_buf[msg_len],
+                                    sizeof(send_buf) - msg_len);
     transaction_start = _now_cs();
     time = (dhcpv6_opt_elapsed_time_t *)&send_buf[msg_len];
     msg_len += _compose_elapsed_time_opt(time);
