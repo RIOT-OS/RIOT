@@ -1,0 +1,6 @@
+# for this board we support flashing via openocd
+PROGRAMMER ?= openocd
+DEBUG_ADAPTER = dap
+
+# include nrf52 boards common configuration
+include $(RIOTBOARD)/common/nrf52/Makefile.include
