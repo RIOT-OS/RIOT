@@ -285,12 +285,23 @@ static void test_clif_get_attr_missing_value(void)
     TEST_ASSERT_EQUAL_INT(strlen(input), r);
 }
 
+static void test_clif_get_attr_empty(void)
+{
+    clif_attr_t attr;
+
+    /* clif_get_attr used to access data even if input was empty.
+     * See: https://github.com/RIOT-OS/RIOT/pull/15947 */
+    int r = clif_get_attr(NULL, 0, &attr);
+    TEST_ASSERT_EQUAL_INT(CLIF_NOT_FOUND, r);
+}
+
 Test *tests_clif_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_clif_encode_links),
         new_TestFixture(test_clif_decode_links),
         new_TestFixture(test_clif_get_attr_missing_value),
+        new_TestFixture(test_clif_get_attr_empty)
     };
 
     EMB_UNIT_TESTCALLER(clif_tests, NULL, NULL, fixtures);
