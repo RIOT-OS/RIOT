@@ -535,7 +535,7 @@ extern "C" {
 #define LORAMAC_PORT_MIN                        (1U)
 
 /**
- * @brief   Maximmu port value
+ * @brief   Maximum port value
  */
 #define LORAMAC_PORT_MAX                        (223U)
 
