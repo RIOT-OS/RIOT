@@ -153,6 +153,7 @@ typedef struct {
     int nb_trials;                      /**< holds the remaining number of retransmissions */
     int ack_requested;                  /**< whether the network server requested an ACK */
     int waiting_for_ack;                /**< true if the MAC layer is waiting for an ACK */
+    uint8_t redundancy;                 /**< unconfirmed uplink redundancy */
     char mhdr_mic[MHDR_MIC_BUF_SIZE];   /**< internal retransmissions buffer */
 } gnrc_lorawan_mcps_t;
 
@@ -393,11 +394,11 @@ void gnrc_lorawan_mlme_no_rx(gnrc_lorawan_t *mac);
 void gnrc_lorawan_event_no_rx(gnrc_lorawan_t *mac);
 
 /**
- * @brief Mac callback for ACK timeout event
+ * @brief Mac callback for retransmission timeout event
  *
  * @param[in] mac pointer to the MAC descriptor
  */
-void gnrc_lorawan_event_ack_timeout(gnrc_lorawan_t *mac);
+void gnrc_lorawan_event_retrans_timeout(gnrc_lorawan_t *mac);
 
 /**
  * @brief Get the maximum MAC payload (M value) for a given datarate.
