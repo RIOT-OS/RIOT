@@ -320,6 +320,18 @@ void gnrc_lorawan_set_timer(gnrc_lorawan_t *mac, uint32_t us);
  */
 void gnrc_lorawan_remove_timer(gnrc_lorawan_t *mac);
 
+/**
+ * @brief Set unconfirmed uplink redundancy
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] redundancy number of unconfirmed uplink retransmissions
+ */
+static inline void gnrc_lorawan_set_uncnf_redundancy(gnrc_lorawan_t *mac,
+                                                     uint8_t redundancy)
+{
+    mac->mcps.redundancy = redundancy;
+}
+
 #ifdef __cplusplus
 }
 #endif
