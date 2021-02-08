@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup         cpu_cc26x0
+ * @ingroup         cpu_cc26x0_cc13x0
  * @{
  *
  * @file

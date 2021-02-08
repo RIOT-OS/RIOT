@@ -6,15 +6,15 @@
  * details.
  */
 /**
- * @ingroup         cpu_cc26x0_definitions
+ * @ingroup         cpu_cc26x0_cc13x0_definitions
  * @{
  *
  * @file
- * @brief           CC26x0 AUX register definitions
+ * @brief           CC26x0/CC13x0 AUX register definitions
  */
 
-#ifndef CC26X0_AUX_H
-#define CC26X0_AUX_H
+#ifndef CC26X0_CC13X0_AUX_H
+#define CC26X0_CC13X0_AUX_H
 
 #include <stdbool.h>
 
@@ -253,6 +253,5 @@ typedef struct {
 } /* end extern "C" */
 #endif
 
-#endif /* CC26X0_AUX_H */
-
+#endif /* CC26X0_CC13X0_AUX_H */
 /** @}*/

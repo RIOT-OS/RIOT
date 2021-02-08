@@ -64,7 +64,7 @@ extern "C"
 #include "../inc/hw_types.h"
 #include "../inc/hw_memmap.h"
 #include "../inc/hw_fcfg1.h"
-#include "../../include/cc26x0_prcm.h"
+#include "../../include/cc26x0_cc13x0_prcm.h"
 
 //*****************************************************************************
 //
