@@ -24,6 +24,7 @@
 #define NET_GNRC_LORAWAN_H
 
 #include "gnrc_lorawan_internal.h"
+#include "assert.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -319,6 +320,21 @@ void gnrc_lorawan_set_timer(gnrc_lorawan_t *mac, uint32_t us);
  * @param[in] mac pointer to the MAC descriptor
  */
 void gnrc_lorawan_remove_timer(gnrc_lorawan_t *mac);
+
+/**
+ * @brief Set unconfirmed uplink redundancy
+ *
+ * @pre   @p redundancy <= 14
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param[in] redundancy number of unconfirmed uplink retransmissions
+ */
+static inline void gnrc_lorawan_set_uncnf_redundancy(gnrc_lorawan_t *mac,
+                                                     uint8_t redundancy)
+{
+    assert(redundancy <= (0xF - 1));
+    mac->mcps.redundancy = redundancy;
+}
 
 #ifdef __cplusplus
 }
