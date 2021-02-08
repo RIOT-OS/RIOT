@@ -278,7 +278,10 @@ ssize_t clif_get_attr(const char *input, size_t input_len, clif_attr_t *attr)
             attr->key_len = pos - attr->key;
             /* check if the value is quoted and prepare pointer for value scan */
             pos++;
-            if (*pos == '"') {
+            if (pos == end) {
+                break;
+            }
+            else if (*pos == '"') {
                 quoted = true;
                 pos++;
             }
