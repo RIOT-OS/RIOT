@@ -285,6 +285,21 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default redundancy for unconfirmed uplink
+ *
+ * This corresponds to the number of unconfirmed uplink retransmissions when
+ * using ADR. This configuration does not affect confirmed uplinks.  By
+ * default, uplinks are sent without retransmissions (this means, the device
+ * sends only one uplink packet)
+ *
+ * @note This value MUST NOT be greater than 14, since the LinkADRCommand it's
+ *       already limited by a 4 bit value (therefore, 15 uplink transmissions)
+ */
+#ifndef CONFIG_LORAMAC_DEFAULT_REDUNDANCY
+#define CONFIG_LORAMAC_DEFAULT_REDUNDANCY       (0U)
+#endif
+
+/**
  * @brief   Enable/disable adaptive datarate state
  *
  * If enabled the end node will inform the network server about the status of
