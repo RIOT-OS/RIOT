@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_cc26x0
+ * @ingroup     cpu_cc26x0_cc13x0
  * @{
  *
  * @file
@@ -21,7 +21,9 @@
 #include "periph_conf.h"
 #include "periph/init.h"
 #include "stdio_base.h"
+#if IS_USED(MODULE_CC26X0_DRIVERLIB)
 #include "vendor/driverlib/setup.h"
+#endif
 
 #ifndef HF_CLOCK_SOURCE
 #define HF_CLOCK_SOURCE DDI_0_OSC_CTL0_SCLK_HF_SRC_SEL_RCOSC /* set 48MHz RCOSC */
@@ -38,8 +40,10 @@ void cpu_init(void)
     /* initialize the Cortex-M core */
     cortexm_init();
 
+#if IS_USED(MODULE_CC26X0_DRIVERLIB)
     /* Final trim of device */
     SetupTrimDevice();
+#endif
 
     /* initialize stdio prior to periph_init() to allow use of DEBUG() there */
     stdio_init();
