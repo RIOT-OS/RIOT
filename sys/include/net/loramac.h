@@ -549,6 +549,11 @@ extern "C" {
  */
 #define LORAMAC_NETWORK_ID_LEN                  (3U)
 
+/**
+ * @brief Maximum unconfirmed uplink redundancy
+ */
+#define LORAMAC_REDUNDANCY_MAX                  (14U)
+
 /** @} */
 
 /**
