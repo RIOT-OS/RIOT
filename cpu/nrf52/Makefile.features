@@ -6,7 +6,7 @@ endif
 CPU_FAM  = nrf52
 
 # The 802.15.4 radio is not available on all SoCs
-ifneq (,$(filter nrf52811xxaa nrf52820xxaa rf52833xxaa nrf52840xxaa,$(CPU_MODEL)))
+ifneq (,$(filter nrf52811xxaa nrf52820xxaa nrf52833xxaa nrf52840xxaa,$(CPU_MODEL)))
   FEATURES_PROVIDED += radio_nrf802154
 endif
 
