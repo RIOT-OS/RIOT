@@ -1,7 +1,26 @@
-// See LICENSE for license details.
+/*
+ * Copyright (C) 2020, Koen Zandberg <koen@bergzand.net>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
 
-#ifndef RISCV_CSR_ENCODING_H
-#define RISCV_CSR_ENCODING_H
+/**
+ * @defgroup    cpu_riscv_common_vendor
+ * @ingroup     cpu_riscv_common
+ * @brief       RISC-V CSR definitions
+ * @{
+ *
+ * @file
+ * @brief       Basic definitions for the RISC-V CSRs. Upstream usually calls
+ *              this file `encoding.h`
+ *
+ * @author      Koen Zandberg <koen@bergzand.net>
+ */
+
+#ifndef RISCV_CSR_H
+#define RISCV_CSR_H
 
 #define MSTATUS_UIE         0x00000001
 #define MSTATUS_SIE         0x00000002
@@ -1311,3 +1330,4 @@ DECLARE_CAUSE("supervisor_ecall", CAUSE_SUPERVISOR_ECALL)
 DECLARE_CAUSE("hypervisor_ecall", CAUSE_HYPERVISOR_ECALL)
 DECLARE_CAUSE("machine_ecall", CAUSE_MACHINE_ECALL)
 #endif
+

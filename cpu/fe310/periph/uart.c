@@ -26,9 +26,8 @@
 #include "cpu.h"
 #include "periph/uart.h"
 #include "plic.h"
-#include "vendor/encoding.h"
+#include "vendor/riscv_csr.h"
 #include "vendor/platform.h"
-#include "vendor/plic_driver.h"
 #include "vendor/prci_driver.h"
 
 /**

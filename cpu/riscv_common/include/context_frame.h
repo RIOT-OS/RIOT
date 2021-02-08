@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     cpu_fe310
+ * @ingroup     cpu_riscv_common
  * @{
  *
  * @file

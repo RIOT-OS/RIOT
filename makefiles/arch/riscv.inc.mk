@@ -35,7 +35,7 @@ CFLAGS_LINK  = -nostartfiles -ffunction-sections -fdata-sections
 CFLAGS_DBG  ?= -g3
 CFLAGS_OPT  ?= -Os
 
-LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
+LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/riscv_common/ldscripts
 LINKER_SCRIPT ?= $(CPU_MODEL).ld
 LINKFLAGS += -T$(LINKER_SCRIPT)
 

@@ -21,6 +21,8 @@
 #ifndef PERIPH_CONF_H
 #define PERIPH_CONF_H
 
+#include "kernel_defines.h"
+#include "macros/units.h"
 #include "periph_cpu.h"
 #include "clk_conf.h"
 

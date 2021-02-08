@@ -5,31 +5,15 @@
 # directory for more details.
 #
 
-config CPU_ARCH_RISCV
-    bool
-    select HAS_ARCH_RISCV
-    select HAS_NEWLIB
-    select HAS_PICOLIBC if '$(RIOT_CI_BUILD)' != '1'
-    select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
-
-config CPU_CORE_RV32M
-    bool
-    select CPU_ARCH_RISCV
-    select HAS_ARCH_32BIT
-
 config CPU_FAM_FE310
     bool
-    select CPU_CORE_RV32M
+    select CPU_CORE_RV32I
     select HAS_CPU_FE310
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
-    select HAS_PERIPH_PLIC
     select HAS_PERIPH_PM
     select HAS_PERIPH_WDT
-    select HAS_CPP
-    select HAS_LIBSTDCPP
-    select HAS_SSP
 
 config CPU_MODEL_FE310_G000
     bool
@@ -40,22 +24,10 @@ config CPU_MODEL_FE310_G002
     select CPU_FAM_FE310
 
 ## Definition of specific features
-config HAS_ARCH_RISCV
-    bool
-    help
-        Indicates that the current CPU has a RISC-V.
-
-## Definition of specific features
 config HAS_CPU_FE310
     bool
     help
         Indicates that a 'fe310' cpu is being used.
-
-config CPU_ARCH
-    default "risc-v" if CPU_ARCH_RISCV
-
-config CPU_CORE
-    default "rv32m" if CPU_CORE_RV32M
 
 config CPU_FAM
     default "fe310" if CPU_FAM_FE310
@@ -68,3 +40,5 @@ config CPU
     default "fe310" if CPU_FAM_FE310
 
 rsource "Kconfig.clk"
+
+source "$(RIOTCPU)/riscv_common/Kconfig"

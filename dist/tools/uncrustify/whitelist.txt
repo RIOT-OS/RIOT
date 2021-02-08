@@ -3,5 +3,8 @@ core/include/.*\.h
 cpu/fe310/.*\.c
 cpu/fe310/include/.*\.h
 cpu/fe310/periph/.*\.c
+cpu/riscv_common/.*\.c
+cpu/riscv_common/include/.*\.h
+cpu/riscv_common/periph/.*\.c
 sys/ztimer/.*\.c
 sys/include/ztimer.*\.h

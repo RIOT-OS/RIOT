@@ -8,11 +8,11 @@
  */
 
 /**
- * @addtogroup      cpu_fe310
+ * @addtogroup      cpu_riscv_common
  * @{
  *
  * @file
- * @brief           Linker variables for SiFive FE310
+ * @brief           Linker variables for the RISC-V CPU
  *
  * @author          Koen Zandberg <koen@bergzand.net>
  *

@@ -7,11 +7,21 @@
  */
 
 /**
- * @ingroup     cpu_fe310
+ * @ingroup     cpu_riscv_common
  * @{
  *
  * @file        timer.c
- * @brief       Low-level timer implementation
+ * @brief       Low-level timer implementation based on the CLINT
+ *
+ * RISCV implementations using this peripheral must define the `CLINT_BASE_ADDR`
+ * in order to use the clint as timer.
+ *
+ * This implementation assumes the following registers at their offsets:
+ *
+ *  - mtimecmp: 0x4000
+ *  - mtime:    0xBFF8
+ *
+ * The MTIP flag in the mie csr is used to enable and disable the interrupt
  *
  * @author      Ken Rabold
  * @}
@@ -21,11 +31,15 @@
 #include <unistd.h>
 
 #include "cpu.h"
+#include "cpu_conf.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
 #include "periph/timer.h"
-#include "vendor/encoding.h"
-#include "vendor/platform.h"
+#include "vendor/riscv_csr.h"
+
+#ifndef CLINT_BASE_ADDR
+#error CLINT_BASE_ADDR must be defined to use the CLINT as timer
+#endif
 
 /**
  * @brief   Save reference to the timer callback
@@ -44,7 +58,6 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
         return -1;
     }
 
-    /* Built in timer for FE310 is 32KHz */
     if (freq != RTC_FREQ) {
         return -1;
     }
@@ -55,7 +68,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 
 
     /* reset timer counter */
-    volatile uint64_t *mtime = (uint64_t *)(CLINT_CTRL_ADDR + CLINT_MTIME);
+    volatile uint64_t *mtime = (uint64_t *)(CLINT_BASE_ADDR + CLINT_MTIME);
 
     *mtime = 0;
 
@@ -64,9 +77,9 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
 
 int timer_set(tim_t dev, int channel, unsigned int timeout)
 {
-    volatile uint64_t *mtime = (uint64_t *)(CLINT_CTRL_ADDR + CLINT_MTIME);
+    volatile uint64_t *mtime = (uint64_t *)(CLINT_BASE_ADDR + CLINT_MTIME);
     volatile uint64_t *mtimecmp =
-        (uint64_t *)(CLINT_CTRL_ADDR + CLINT_MTIMECMP);
+        (uint64_t *)(CLINT_BASE_ADDR + CLINT_MTIMECMP);
 
     /* Compute delta for timer */
     uint64_t now = *mtime;
@@ -90,9 +103,9 @@ int timer_set(tim_t dev, int channel, unsigned int timeout)
 int timer_set_absolute(tim_t dev, int channel, unsigned int value)
 {
 
-    volatile uint64_t *mtime = (uint64_t *)(CLINT_CTRL_ADDR + CLINT_MTIME);
+    volatile uint64_t *mtime = (uint64_t *)(CLINT_BASE_ADDR + CLINT_MTIME);
     volatile uint64_t *mtimecmp =
-        (uint64_t *)(CLINT_CTRL_ADDR + CLINT_MTIMECMP);
+        (uint64_t *)(CLINT_BASE_ADDR + CLINT_MTIMECMP);
 
     /* Compute absolute for timer */
     uint64_t now = *mtime;
@@ -124,7 +137,7 @@ int timer_clear(tim_t dev, int channel)
 
 unsigned int timer_read(tim_t dev)
 {
-    uint32_t lo = *(volatile uint32_t *)(CLINT_CTRL_ADDR + CLINT_MTIME);
+    uint32_t lo = *(volatile uint32_t *)(CLINT_BASE_ADDR + CLINT_MTIME);
 
     if (dev != 0) {
         return 0;
@@ -158,7 +171,7 @@ void timer_stop(tim_t dev)
 void timer_isr(void)
 {
     volatile uint64_t *mtimecmp =
-        (uint64_t *)(CLINT_CTRL_ADDR + CLINT_MTIMECMP);
+        (uint64_t *)(CLINT_BASE_ADDR + CLINT_MTIMECMP);
 
     /* Clear intr */
     clear_csr(mie, MIP_MTIP);

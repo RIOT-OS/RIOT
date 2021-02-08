@@ -26,7 +26,7 @@
 static uint32_t _cpu_frequency = 0;
 #endif
 
-void clock_init(void)
+void fe310_clock_init(void)
 {
     /* Ensure that we aren't running off the PLL before we mess with it. */
     if (PRCI_REG(PRCI_PLLCFG) & PLL_SEL(1)) {

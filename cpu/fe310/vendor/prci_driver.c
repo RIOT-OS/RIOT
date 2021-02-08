@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "vendor/encoding.h"
+#include "vendor/riscv_csr.h"
 #include "vendor/platform.h"
 #include "vendor/prci_driver.h"
 
@@ -36,31 +36,31 @@ uint32_t PRCI_measure_mcycle_freq(uint32_t mtime_ticks, uint32_t mtime_freq)
   do {
     start_mtime = CLINT_REG(CLINT_MTIME);
   } while (start_mtime == tmp);
-  
+
   uint64_t start_mcycle;
   rdmcycle(&start_mcycle);
-  
+
   while (CLINT_REG(CLINT_MTIME) < end_mtime) ;
-  
+
   uint64_t end_mcycle;
   rdmcycle(&end_mcycle);
   uint32_t difference = (uint32_t) (end_mcycle - start_mcycle);
 
   uint64_t freq = ((uint64_t) difference * mtime_freq) / mtime_ticks;
   return (uint32_t) freq & 0xFFFFFFFF;
-  
+
 }
- 
+
 
 void PRCI_use_hfrosc(int div, int trim)
 {
   // Make sure the HFROSC is running at its default setting
   // It is OK to change this even if we are running off of it.
-  
+
   PRCI_REG(PRCI_HFROSCCFG) = (ROSC_DIV(div) | ROSC_TRIM(trim) | ROSC_EN(1));
 
   while ((PRCI_REG(PRCI_HFROSCCFG) & ROSC_RDY(1)) == 0);
-  
+
   PRCI_REG(PRCI_PLLCFG) &= ~PLL_SEL(1);
 }
 
@@ -73,12 +73,12 @@ void PRCI_use_pll(int refsel, int bypass,
     // Make sure the HFROSC is running at its default setting
     PRCI_use_hfrosc(4, 16);
   }
-  
+
   // Set PLL Source to be HFXOSC if desired.
   uint32_t config_value = 0;
 
   config_value |= PLL_REFSEL(refsel);
-  
+
   if (bypass) {
     // Bypass
     config_value |= PLL_BYPASS(1);
@@ -89,14 +89,14 @@ void PRCI_use_pll(int refsel, int bypass,
     // Set our Final output divide to divide-by-1:
     PRCI_REG(PRCI_PLLDIV) = (PLL_FINAL_DIV_BY_1(1) | PLL_FINAL_DIV(0));
   } else {
-  
+
     // To overclock, use the hfrosc
     if (hfrosctrim >= 0 && hfroscdiv >= 0) {
       PRCI_use_hfrosc(hfroscdiv, hfrosctrim);
     }
-    
+
     // Set DIV Settings for PLL
-    
+
     // (Legal values of f_REF are 6-48MHz)
 
     // Set DIVR to divide-by-2 to get 8MHz frequency
@@ -134,7 +134,7 @@ void PRCI_use_pll(int refsel, int bypass,
     // So wait 4 ticks of RTC.
     uint32_t now = CLINT_REG(CLINT_MTIME);
     while (CLINT_REG(CLINT_MTIME) - now < 4) ;
-    
+
     // Now it is safe to check for PLL Lock
     while ((PRCI_REG(PRCI_PLLCFG) & PLL_LOCK(1)) == 0);
 
@@ -148,7 +148,7 @@ void PRCI_use_pll(int refsel, int bypass,
   if (refsel) {
     PRCI_REG(PRCI_HFROSCCFG) &= ~ROSC_EN(1);
   }
-  
+
 }
 
 void PRCI_use_default_clocks(void)
@@ -162,7 +162,7 @@ void PRCI_use_default_clocks(void)
 
 void PRCI_use_hfxosc(uint32_t finaldiv)
 {
-  
+
   PRCI_use_pll(1, // Use HFXTAL
 	       1, // Bypass = 1
 	       0, // PLL settings don't matter
@@ -216,20 +216,20 @@ uint32_t PRCI_set_hfrosctrim_for_f_cpu(uint32_t f_cpu, PRCI_freq_target target )
   uint32_t desired_hfrosc_freq = (f_cpu/ 16);
 
   PRCI_use_hfrosc(hfroscdiv, hfrosctrim);
-  
+
   // Ignore the first run (for icache reasons)
   uint32_t cpu_freq = PRCI_measure_mcycle_freq(3000, RTC_FREQ);
 
   cpu_freq = PRCI_measure_mcycle_freq(3000, RTC_FREQ);
   uint32_t prev_freq = cpu_freq;
-  
+
   while ((cpu_freq < desired_hfrosc_freq) && (hfrosctrim < 0x1F)){
     prev_trim = hfrosctrim;
     prev_freq = cpu_freq;
     hfrosctrim ++;
     PRCI_use_hfrosc(hfroscdiv, hfrosctrim);
     cpu_freq = PRCI_measure_mcycle_freq(3000, RTC_FREQ);
-  } 
+  }
 
   // We couldn't go low enough
   if (prev_freq > desired_hfrosc_freq){
@@ -237,7 +237,7 @@ uint32_t PRCI_set_hfrosctrim_for_f_cpu(uint32_t f_cpu, PRCI_freq_target target )
     cpu_freq = PRCI_measure_mcycle_freq(1000, RTC_FREQ);
     return cpu_freq;
   }
-  
+
   // We couldn't go high enough
   if (cpu_freq < desired_hfrosc_freq){
     PRCI_use_pll(0, 0, 1, 31, 1, 1, hfroscdiv, prev_trim);

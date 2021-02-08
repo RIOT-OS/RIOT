@@ -9,7 +9,7 @@
  */
 
 /**
- * @ingroup         cpu_fe310
+ * @ingroup         cpu_riscv_common
  * @{
  *
  * @file
@@ -24,17 +24,15 @@
 #define IRQ_ARCH_H
 
 #include <stdint.h>
-#include "irq.h"
-#include "cpu_conf.h"
-#include "cpu.h"
 
-#include "vendor/encoding.h"
+#include "irq.h"
+#include "vendor/riscv_csr.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern volatile int fe310_in_isr;
+extern volatile int riscv_in_isr;
 
 /**
  * @brief Enable all maskable interrupts
@@ -91,7 +89,7 @@ static inline __attribute__((always_inline)) void irq_restore(
  */
 static inline __attribute__((always_inline)) int irq_is_in(void)
 {
-    return fe310_in_isr;
+    return riscv_in_isr;
 }
 
 #ifdef __cplusplus
