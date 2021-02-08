@@ -46,7 +46,7 @@ extern "C" {
  *
  * The port definition is used (and zeroed) to suppress compiler warnings
  */
-#ifdef CPU_MODEL_NRF52840XXAA
+#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
 #define GPIO_PIN(x,y)       ((x << 5) | y)
 #else
 #define GPIO_PIN(x,y)       ((x & 0) | y)

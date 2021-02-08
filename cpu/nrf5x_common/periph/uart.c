@@ -85,7 +85,7 @@ static inline NRF_UARTE_Type *dev(uart_t uart)
  */
 static uart_isr_ctx_t isr_ctx;
 
-#endif  /* CPU_MODEL_NRF52840XXAA || CPU_MODEL_NRF52811XXAA */
+#endif  /* !CPU_MODEL_NRF52832XXAA && !CPU_FAM_NRF51 */
 
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
@@ -415,7 +415,7 @@ static inline void irq_handler(uart_t uart)
     cortexm_isr_end();
 }
 
-#endif /* CPU_MODEL_NRF52840XXAA || CPU_MODEL_NRF5211XXAA */
+#endif  /* !CPU_MODEL_NRF52832XXAA && !CPU_FAM_NRF51 */
 
 #ifdef UART_0_ISR
 void UART_0_ISR(void)
