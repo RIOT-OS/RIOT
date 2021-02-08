@@ -98,12 +98,13 @@
 #define LWIP_NETIF_NUMOF        ARRAY_SIZE(socket_zep_params)
 #endif
 
-#ifdef MODULE_ESP_ETH      /* is mutual exclusive with above ifdef */
+/* is mutual exclusive with above ifdef */
+#if IS_USED(MODULE_ESP_ETH) && IS_USED(MODULE_ESP_WIFI)
+#define LWIP_NETIF_NUMOF        (2)
+#define ESP_WIFI_INDEX          (1)
+#elif IS_USED(MODULE_ESP_ETH) || IS_USED(MODULE_ESP_WIFI)
 #define LWIP_NETIF_NUMOF        (1)
-#endif
-
-#ifdef MODULE_ESP_WIFI     /* is mutual exclusive with above ifdef */
-#define LWIP_NETIF_NUMOF        (1)
+#define ESP_WIFI_INDEX          (0)
 #endif
 
 #ifdef MODULE_STM32_ETH
@@ -234,20 +235,23 @@ void lwip_bootstrap(void)
             return;
         }
     }
-#elif defined(MODULE_ESP_ETH)
+#elif (IS_USED(MODULE_ESP_ETH) || IS_USED(MODULE_ESP_WIFI))
+#if IS_USED(MODULE_ESP_ETH)
     esp_eth_setup(&_esp_eth_dev);
     if (_netif_add(&netif[0], &_esp_eth_dev, lwip_netdev_init,
                    tcpip_input) == NULL) {
         DEBUG("Could not add esp_eth device\n");
         return;
     }
-#elif defined(MODULE_ESP_WIFI)
+#endif
+#if IS_USED(MODULE_ESP_WIFI)
     esp_wifi_setup(&_esp_wifi_dev);
-    if (_netif_add(&netif[0], &_esp_wifi_dev, lwip_netdev_init,
+    if (_netif_add(&netif[ESP_WIFI_INDEX], &_esp_wifi_dev, lwip_netdev_init,
                    tcpip_input) == NULL) {
         DEBUG("Could not add esp_wifi device\n");
         return;
     }
+#endif
 #elif defined(MODULE_STM32_ETH)
     stm32_eth_netdev_setup(&stm32_eth);
     if (_netif_add(&netif[0], &stm32_eth, lwip_netdev_init,
