@@ -93,6 +93,10 @@ ifneq (,$(filter openwsn,$(USEPKG)))
   SRC += sc_openwsn.c
 endif
 
+ifneq (,$(filter lwip_netif,$(USEMODULE)))
+  SRC += sc_lwip_netif.c
+endif
+
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   SRC += sc_rtc.c
 endif

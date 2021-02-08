@@ -137,6 +137,9 @@ extern "C" {
 #define LWIP_NETCONN            0
 #endif /* MODULE_LWIP_SOCK */
 
+#ifdef MODULE_SHELL_COMMANDS
+#define LWIP_DEBUG              1
+#endif
 
 #ifndef TCP_LISTEN_BACKLOG
 # if defined(MODULE_LWIP_SOCK_TCP)
