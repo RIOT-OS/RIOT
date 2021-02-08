@@ -21,6 +21,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill-stm32f030c8 \
     calliope-mini \
     cc1312-launchpad \
+    cc1350-launchpad \
     cc1352-launchpad \
     cc1352p-launchpad \
     cc2650-launchpad \
@@ -46,13 +47,13 @@ BOARD_INSUFFICIENT_MEMORY := \
     lobaro-lorabox \
     lsn50 \
     maple-mini \
-    mega-xplained \
     mcb2388 \
+    mega-xplained \
     microbit \
     microduino-corerf \
-    msba2 \
     msb-430 \
     msb-430h \
+    msba2 \
     nrf51dk \
     nrf51dongle \
     nrf6310 \
