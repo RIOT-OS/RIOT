@@ -49,6 +49,11 @@ extern "C" {
  */
 typedef enum {
     /**
+     * @brief   TX synchronization data for passing up error data or
+     *          auxiliary data
+     */
+    GNRC_NETTYPE_TX_SYNC = -3,
+    /**
      * @brief   Protocol is as defined in @ref gnrc_netif_hdr_t. Not usable with
      *          @ref net_gnrc_netreg
      */
