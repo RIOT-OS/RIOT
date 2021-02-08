@@ -7,7 +7,7 @@
  */
 
 /**
- * @addtogroup      cpu_cc26x0
+ * @addtogroup      cpu_cc26x0_cc13x0
  * @{
  *
  * @file
@@ -31,9 +31,9 @@
 
 #include "cpu_conf_cc26xx_cc13xx.h"
 
-#include "cc26x0_aux.h"
-#include "cc26x0_fcfg.h"
-#include "cc26x0_prcm.h"
+#include "cc26x0_cc13x0_aux.h"
+#include "cc26x0_cc13x0_fcfg.h"
+#include "cc26x0_cc13x0_prcm.h"
 
 /**
  * @brief   Bit-Band configuration
