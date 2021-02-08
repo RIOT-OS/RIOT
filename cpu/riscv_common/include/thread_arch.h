@@ -21,6 +21,8 @@
 #ifndef THREAD_ARCH_H
 #define THREAD_ARCH_H
 
+#include "irq.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -44,7 +46,12 @@ static inline void _ecall_dispatch(uint32_t num, void *ctx)
 
 static inline __attribute__((always_inline)) void thread_yield_higher(void)
 {
-    _ecall_dispatch(0, NULL);
+    if (irq_is_in()) {
+        sched_context_switch_request = 1;
+    }
+    else {
+        _ecall_dispatch(0, NULL);
+    }
 }
 
 #endif /* DOXYGEN */
