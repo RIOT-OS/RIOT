@@ -17,7 +17,8 @@ microphone, an accelerometer and a magnetometer.
 
 ##  Flashing and Debugging
 
-The board can be flashed using OpenOCD. Debugger is also available with OpenOCD.
+The board can be flashed using OpenOCD and PyOCD. Debugger is also available
+with both programmers.
 
 ```
 BOARD=microbit make flash
