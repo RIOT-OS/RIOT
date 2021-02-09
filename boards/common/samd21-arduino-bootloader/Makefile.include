@@ -12,4 +12,5 @@ ifeq ($(PROGRAMMER),bossa)
     ROM_OFFSET ?= 0x2000
   endif
   BOSSA_ARDUINO_PREFLASH = yes
+  PREFLASH_DELAY ?= 2
 endif
