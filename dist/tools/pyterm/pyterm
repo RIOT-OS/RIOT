@@ -688,13 +688,17 @@ class SerCmd(cmd.Cmd):
         output = ""
         crreceived = False
         nlreceived = False
+        c_already_read = False
         while (1):
-            try:
-                c = self._read_char()
-            # try to re-open it with a timeout of 1s otherwise
-            except (serial.SerialException, ValueError):
-                self._handle_serial_exception()
-                continue
+            # one of the if branches might have read c already
+            if not c_already_read:
+                try:
+                    c = self._read_char()
+                # try to re-open it with a timeout of 1s otherwise
+                except (serial.SerialException, ValueError):
+                    self._handle_serial_exception()
+                    continue
+            c_already_read = False
             if c == '\r':
                 if (self.newline == "LFCR" and nlreceived) or (self.newline == "CR"):
                     self.handle_line(output)
@@ -706,6 +710,21 @@ class SerCmd(cmd.Cmd):
             elif c == self.serprompt and output == "":
                 sys.stdout.write('%c ' % self.serprompt)
                 sys.stdout.flush()
+                # self.serprompt was read, but a space (that we also printed
+                # above) may follow. As such, read the next character, but keep
+                # it for the next iteration in case it is not a space.
+                # If we don't do this, the space from the prompt will be
+                # prepended to the next output, causing the next prompt on empty
+                # output potentially to be ignored, since `output` will be " "
+                try:
+                    c = self._read_char()
+                # try to re-open it with a timeout of 1s otherwise
+                except (serial.SerialException, ValueError):
+                    self._handle_serial_exception()
+                    continue
+                if c != ' ':            # not a space?
+                    # then use `c` in the next iteration
+                    c_already_read = True
             else:
                 output += c
 
