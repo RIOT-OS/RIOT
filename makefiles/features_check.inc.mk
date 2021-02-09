@@ -32,10 +32,9 @@ FEATURES_USABLE := $(filter-out $(FEATURES_BLACKLIST),$(FEATURES_PROVIDED))
 FEATURES_REQUIRED_ONE_OUT_OF := $(foreach item,\
                                   $(FEATURES_REQUIRED_ANY),\
                                   $(word 1,\
-                                    $(filter $(subst |, ,$(item)),\
-                                              $(FEATURES_USED_SO_FAR) \
-                                              $(FEATURES_USABLE)) \
-                                              $(item)))
+                                    $(filter $(FEATURES_USED_SO_FAR) $(FEATURES_USABLE),\
+                                             $(subst |, ,$(item)))\
+                                    $(item)))
 
 # Features that are required by the application but not provided by the BSP
 # Having features missing may case the build to fail.
