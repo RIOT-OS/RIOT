@@ -24,4 +24,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     saml10-xpro \
     saml11-xpro \
     waspmote-pro \
+    zigduino \
     #

@@ -29,4 +29,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     wsn430-v1_3b \
     wsn430-v1_4 \
     z1 \
+    zigduino \
     #

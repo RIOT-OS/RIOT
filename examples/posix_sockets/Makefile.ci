@@ -38,4 +38,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     waspmote-pro \
     yunjia-nrf51822 \
     z1 \
+    zigduino \
     #

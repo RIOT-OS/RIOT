@@ -46,13 +46,13 @@ BOARD_INSUFFICIENT_MEMORY := \
     lobaro-lorabox \
     lsn50 \
     maple-mini \
-    mega-xplained \
     mcb2388 \
+    mega-xplained \
     microbit \
     microduino-corerf \
-    msba2 \
     msb-430 \
     msb-430h \
+    msba2 \
     nrf51dk \
     nrf51dongle \
     nrf6310 \
@@ -117,4 +117,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     yarm \
     yunjia-nrf51822 \
     z1 \
+    zigduino \
     #
