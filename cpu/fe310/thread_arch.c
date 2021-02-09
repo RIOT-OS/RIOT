@@ -193,7 +193,12 @@ static inline void _ecall_dispatch(uint32_t num, void *ctx)
 
 void thread_yield_higher(void)
 {
-    _ecall_dispatch(0, NULL);
+    if (irq_is_in()) {
+        sched_context_switch_request = 1;
+    }
+    else {
+        _ecall_dispatch(0, NULL);
+    }
 }
 
 /**
