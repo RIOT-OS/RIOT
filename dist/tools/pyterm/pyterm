@@ -662,6 +662,26 @@ class SerCmd(cmd.Cmd):
         if self.set_dtr == 1 or self.set_dtr == 0:
             self.ser.setDTR(self.set_dtr)
 
+    def _read_char(self):
+        # check if serial port can be accessed.
+        sr = codecs.getreader("UTF-8")(self.ser,
+                                       errors='replace')
+        return sr.read(1)
+
+    def _handle_serial_exception(self):
+        self.logger.warning("Serial port disconnected, waiting to "
+                            "get reconnected...")
+        self.ser.close()
+        time.sleep(1)
+        if os.path.exists(self.port):
+            self.logger.warning("Try to reconnect to %s again..."
+                                % (self.port))
+            try:
+                self.serial_connect()
+                self.logger.info("Reconnected to serial port %s" % self.port)
+            except serial.SerialException:
+                pass
+
     def reader(self):
         """Serial or TCP reader.
         """
@@ -669,25 +689,11 @@ class SerCmd(cmd.Cmd):
         crreceived = False
         nlreceived = False
         while (1):
-            # check if serial port can be accessed.
             try:
-                sr = codecs.getreader("UTF-8")(self.ser,
-                                               errors='replace')
-                c = sr.read(1)
+                c = self._read_char()
             # try to re-open it with a timeout of 1s otherwise
             except (serial.SerialException, ValueError):
-                self.logger.warning("Serial port disconnected, waiting to "
-                                    "get reconnected...")
-                self.ser.close()
-                time.sleep(1)
-                if os.path.exists(self.port):
-                    self.logger.warning("Try to reconnect to %s again..."
-                                        % (self.port))
-                    try:
-                        self.serial_connect()
-                        self.logger.info("Reconnected to serial port %s" % self.port)
-                    except serial.SerialException:
-                        pass
+                self._handle_serial_exception()
                 continue
             if c == '\r':
                 if (self.newline == "LFCR" and nlreceived) or (self.newline == "CR"):
