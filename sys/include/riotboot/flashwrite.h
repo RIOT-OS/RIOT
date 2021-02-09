@@ -206,7 +206,7 @@ int riotboot_flashwrite_flush(riotboot_flashwrite_t *state);
  * @returns     0 on success, <0 otherwise
  */
 int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
-                               const uint8_t *bytes, size_t len);
+                                   const uint8_t *bytes, size_t len);
 
 /**
  * @brief   Finish a firmware update (riotboot version)

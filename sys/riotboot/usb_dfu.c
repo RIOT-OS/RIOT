@@ -30,8 +30,10 @@ static usbus_dfu_device_t dfu;
 static char _stack[USBUS_STACKSIZE];
 static usbus_t usbus;
 
-void riotboot_usb_dfu_init(unsigned forced) {
+void riotboot_usb_dfu_init(unsigned forced)
+{
     uint32_t *reset_addr = (uint32_t *)RIOTBOOT_DFU_ADDR;
+
     if (forced == 1 || *reset_addr == RIOTBOOT_MAGIC_NUMBER) {
         *reset_addr = 0;
         usbus_init(&usbus, usbdev_get_ctx(0));
