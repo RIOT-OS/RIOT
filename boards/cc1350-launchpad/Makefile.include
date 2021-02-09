@@ -1,0 +1,4 @@
+XDEBUGGER = XDS110
+
+# configure the flash tool
+PROGRAMMER ?= uniflash

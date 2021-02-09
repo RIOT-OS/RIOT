@@ -1,0 +1,51 @@
+/**
+@defgroup        boards_cc1350_launchpad TI CC1350 LaunchPad XL
+@ingroup         boards
+@brief           Texas Instruments SimpleLink(TM) CC1350 Wireless MCU LaunchPad(TM) Kit
+
+## Overview
+
+The [LAUNCHXL-CC1350](https://www.ti.com/tool/LAUNCHXL-CC1350) is a Texas
+Instrument's development kit for the CC1350 SoC MCU which combines a Cortex-M3
+microcontroller alonside a dedicated Cortex-M0 to control a dual-band radio.
+
+## Hardware
+
+![LAUNCHXL-CC1350](https://www.ti.com/diagrams/launchxl-cc1350_launchxl-cc1350.jpg)
+
+| MCU               | CC1312R1              |
+|:----------------- |:--------------------- |
+| Family            | ARM Cortex-M3         |
+| Vendor            | Texas Instruments     |
+| RAM               | 20KiB                 |
+| Flash             | 128KiB                |
+| Frequency         | 48MHz                 |
+| FPU               | no                    |
+| Timers            | 4                     |
+| ADCs              | 1x 12-bit (channels)  |
+| UARTs             | 2                     |
+| SPIs              | 2                     |
+| I2Cs              | 1                     |
+| Vcc               | 1.8V - 3.8V           |
+| Datasheet         | [Datasheet](https://www.ti.com/lit/ds/swrs183b/swrs183b.pdf) |
+| Reference Manual  | [Reference Manual](https://www.ti.com/lit/ug/swcu117i/swcu117i.pdf) |
+
+## Board pinout
+
+The [CC1350 Quick Start Guide](https://www.ti.com/lit/ug/swru478b/swru478b.pdf)
+provides the default pinout for the board.
+
+## Flashing and Debugging
+
+The LAUNCHXL-CC1350 comes with an XDS110 on-board debug probe that provides,
+programming, flashing and debuggigng capabilities.
+
+It can be either flashed either using Uniflash or OpenOCD, by setting
+`PROGRAMMER=uniflash` (default) or `PROGRAMMER=openocd` respectively.
+
+For example, to use OpenOCD:
+
+```
+make -C examples/hello-world flash PROGRAMMER=openocd
+```
+*/
