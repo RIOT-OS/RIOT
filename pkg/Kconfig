@@ -10,5 +10,6 @@ rsource "driver_bme680/Kconfig"
 rsource "semtech-loramac/Kconfig"
 rsource "tinydtls/Kconfig"
 rsource "wakaama/Kconfig"
+rsource "umorse/Kconfig"
 
 endmenu # Packages
