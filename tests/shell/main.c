@@ -87,11 +87,19 @@ static int print_shell_bufsize(int argc, char **argv)
     return 0;
 }
 
+static int print_empty(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "bufsize", "Get the shell's buffer size", print_shell_bufsize },
     { "start_test", "starts a test", print_teststart },
     { "end_test", "ends a test", print_testend },
     { "echo", "prints the input command", print_echo },
+    { "empty", "print nothing on command", print_empty },
     { NULL, NULL, NULL }
 };
 
