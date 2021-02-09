@@ -1,4 +1,4 @@
-FLASHER = $(RIOTTOOLS)/jlink/jlink.sh
+FLASHER ?= $(RIOTTOOLS)/jlink/jlink.sh
 DEBUGGER ?= $(RIOTTOOLS)/jlink/jlink.sh
 DEBUGSERVER ?= $(RIOTTOOLS)/jlink/jlink.sh
 RESET ?= $(RIOTTOOLS)/jlink/jlink.sh
