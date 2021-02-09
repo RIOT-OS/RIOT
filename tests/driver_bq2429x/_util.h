@@ -186,9 +186,9 @@ static inline const char *_util_chrg_stat_to_str(bq2429x_chrg_stat_t stat)
     return "";
 }
 
-static inline const char *_util_chrg_fault_to_str(bq2429x_chrg_stat_t stat)
+static inline const char *_util_chrg_fault_to_str(bq2429x_chrg_fault_t fault)
 {
-    switch (stat) {
+    switch (fault) {
         case BQ2429x_CHRG_FAULT_NORMAL:
             return "Normal";
         case BQ2429x_CHRG_FAULT_INPUT:
