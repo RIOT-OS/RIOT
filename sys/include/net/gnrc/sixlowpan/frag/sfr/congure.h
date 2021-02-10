@@ -16,6 +16,7 @@
  * (SFR). The flavor of congestion control can be selected using the following sub-modules:
  *
  * - @ref net_gnrc_sixlowpan_frag_sfr_congure_sfr (the default)
+ * - @ref net_gnrc_sixlowpan_frag_sfr_congure_quic
  * @{
  *
  * @file
