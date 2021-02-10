@@ -765,7 +765,6 @@ INPUT                  = ../../doc.txt \
                          src/creating-modules.md \
                          src/creating-an-application.md \
                          src/porting-boards.md \
-                         src/porting-cpus.md \
                          src/driver-guide.md \
                          src/getting-started.md \
                          ../../tests/README.md \
@@ -2331,7 +2330,7 @@ DOT_PATH               =
 # command).
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOTFILE_DIRS           =
+DOTFILE_DIRS           = dot/
 
 # The MSCFILE_DIRS tag can be used to specify one or more directories that
 # contain msc files that are included in the documentation (see the \mscfile
