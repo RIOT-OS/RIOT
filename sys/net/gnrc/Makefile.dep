@@ -240,6 +240,14 @@ ifneq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure_%,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_sfr_congure
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_sfr
+endif
+
 ifneq (,$(filter gnrc_sixlowpan_frag_sfr_ecn_%,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_frag_sfr_ecn
 endif

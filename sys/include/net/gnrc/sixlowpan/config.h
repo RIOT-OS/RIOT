@@ -209,7 +209,13 @@ extern "C" {
  * size will vary between @ref CONFIG_GNRC_SIXLOWPAN_SFR_MIN_WIN_SIZE and @ref
  * CONFIG_GNRC_SIXLOWPAN_SFR_MAX_WIN_SIZE.
  */
+#ifdef CONFIG_GNRC_SIXLOWPAN_SFR_USE_ECN
+#if IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR_CONGURE)
+#define CONFIG_GNRC_SIXLOWPAN_SFR_USE_ECN           1U
+#else
 #define CONFIG_GNRC_SIXLOWPAN_SFR_USE_ECN           0U
+#endif
+#endif
 
 /**
  * @brief   Default minimum value of window size that the sender can use
