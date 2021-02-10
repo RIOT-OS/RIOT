@@ -294,16 +294,20 @@ typedef struct {
 typedef struct {
     /**
      * @brief   Set a new timer target
+     * @param   clock       ztimer clock to set the new target
+     * @param   val         Relative target (e.g. fire at value `now() + val`)
      */
     void (*set)(ztimer_clock_t *clock, uint32_t val);
 
     /**
      * @brief   Get the current count of the timer
+     * @param   clock       ztimer clock to get the current time from
      */
     uint32_t (*now)(ztimer_clock_t *clock);
 
     /**
      * @brief   Cancel any set target
+     * @param   clock       ztimer clock to cancel a pending alarm, if any
      */
     void (*cancel)(ztimer_clock_t *clock);
 } ztimer_ops_t;
