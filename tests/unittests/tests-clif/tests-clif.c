@@ -274,11 +274,23 @@ static void test_clif_decode_links(void)
     TEST_ASSERT_EQUAL_INT(exp_attrs_numof, attrs_numof);
 }
 
+static void test_clif_get_attr_missing_value(void)
+{
+    clif_attr_t attr;
+    char *input = ";ct=";
+
+    /* Used to result in a spatial memory safety violation.
+     * See: https://github.com/RIOT-OS/RIOT/pull/15945 */
+    int r = clif_get_attr(input, strlen(input), &attr);
+    TEST_ASSERT_EQUAL_INT(strlen(input), r);
+}
+
 Test *tests_clif_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_clif_encode_links),
-        new_TestFixture(test_clif_decode_links)
+        new_TestFixture(test_clif_decode_links),
+        new_TestFixture(test_clif_get_attr_missing_value),
     };
 
     EMB_UNIT_TESTCALLER(clif_tests, NULL, NULL, fixtures);
