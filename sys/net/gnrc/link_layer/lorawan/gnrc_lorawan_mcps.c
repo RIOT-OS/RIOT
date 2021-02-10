@@ -155,6 +155,12 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
         return;
     }
 
+    /* Check if downlink was received after an uplink that had `ADRACKReq` bit set */
+    if (mac->mcps.adr_ack_cnt >= LORAMAC_DEFAULT_ADR_ACK_LIMIT) {
+        DEBUG("gnrc_lorawan_mcps: ADR_ACK_CNT reset after downlink\n");
+        mac->mcps.adr_ack_cnt = 0;
+    }
+
     iolist_t *fopts = NULL;
 
     if (_pkt.fopts.iol_base) {
@@ -253,6 +259,14 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
     lw_hdr->fctrl = 0;
 
     lorawan_hdr_set_adr(lw_hdr, IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR));
+
+    /* Set `ADRACKReq` bit and ADR_ACK_CNT */
+    if ((mac->last_dr != 0) && IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR)) {
+        mac->mcps.adr_ack_cnt++;
+        lorawan_hdr_set_adr_ack_req(lw_hdr,
+                                    mac->mcps.adr_ack_cnt >= LORAMAC_DEFAULT_ADR_ACK_LIMIT ?
+                                    true : false);
+    }
 
     lorawan_hdr_set_ack(lw_hdr, mac->mcps.ack_requested);
 
@@ -378,6 +392,16 @@ void gnrc_lorawan_event_no_rx(gnrc_lorawan_t *mac)
         return;
     }
 
+    if ((mac->mcps.adr_ack_cnt  > (LORAMAC_DEFAULT_ADR_ACK_LIMIT +
+         LORAMAC_DEFAULT_ADR_ACK_DELAY)) && (mac->last_dr != 0)) {
+        DEBUG("gnrc_lorawan_mcps: ADRACKReq: Decrement DR\n");
+        mac->last_dr--;
+
+        if (!mac->last_dr) {
+            mac->mcps.adr_ack_cnt = 0;
+        }
+    }
+
     _handle_retransmissions(mac);
 }
 
@@ -428,6 +452,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
 
     if (mac->mlme.pending_mlme_opts & GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS) {
         mac->mlme.pending_mlme_opts &= ~GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS;
+        mac->mcps.adr_ack_cnt = 1;
     }
 
     mac->mcps.waiting_for_ack = waiting_for_ack;

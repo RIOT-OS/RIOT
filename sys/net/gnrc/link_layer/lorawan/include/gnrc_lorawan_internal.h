@@ -162,6 +162,7 @@ typedef struct {
 typedef struct {
     uint32_t fcnt;                      /**< uplink framecounter */
     uint32_t fcnt_down;                 /**< downlink frame counter */
+    uint16_t adr_ack_cnt;               /**< `ADR_ACK_CNT` */
     iolist_t *msdu;                     /**< current MSDU */
     int nb_trials;                      /**< holds the remaining number of retransmissions */
     int ack_requested;                  /**< whether the network server requested an ACK */
