@@ -1,15 +1,19 @@
 # Check if all required FEATURES are provided
 
+# Features that are provided and not blacklisted
+FEATURES_USABLE := $(filter-out $(FEATURES_BLACKLIST),$(FEATURES_PROVIDED))
+
+# Features that may be used, if provided.
 FEATURES_OPTIONAL_ONLY := $(sort $(filter-out $(FEATURES_REQUIRED),$(FEATURES_OPTIONAL)))
-FEATURES_OPTIONAL_USED := $(sort $(filter $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
-# Optional features that will not be used because they are not provided
-FEATURES_OPTIONAL_MISSING := $(sort $(filter-out $(FEATURES_PROVIDED),$(FEATURES_OPTIONAL_ONLY)))
+
+# Optional features that end up being used
+FEATURES_OPTIONAL_USED := $(sort $(filter $(FEATURES_USABLE),$(FEATURES_OPTIONAL_ONLY)))
+
+# Optional features that will not be used because they are not provided or blacklisted
+FEATURES_OPTIONAL_MISSING := $(sort $(filter-out $(FEATURES_USABLE),$(FEATURES_OPTIONAL_ONLY)))
 
 # Features that are used without taking "one out of" dependencies into account
 FEATURES_USED_SO_FAR := $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
-
-# Features that are provided and not blacklisted
-FEATURES_USABLE := $(filter-out $(FEATURES_BLACKLIST),$(FEATURES_PROVIDED))
 
 # Additionally required features due to the "one out of" dependencies
 # Algorithm:
