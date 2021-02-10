@@ -217,6 +217,27 @@ static void test_sock_udp_create__full(void)
     expect(_TEST_PORT_REMOTE == ep.port);
 }
 
+static void test_sock_udp_close__clean_queue(void)
+{
+    static const ipv6_addr_t src_addr = { .u8 = _TEST_ADDR_REMOTE };
+    static const ipv6_addr_t dst_addr = { .u8 = _TEST_ADDR_LOCAL };
+    static const sock_udp_ep_t local = { .family = AF_INET6,
+                                            .port = _TEST_PORT_LOCAL };
+    static const sock_udp_ep_t remote = { .addr = { .ipv6 = _TEST_ADDR_REMOTE },
+                                            .family = AF_INET6,
+                                            .port = _TEST_PORT_REMOTE };
+    static uint8_t test_data[] = "ABCD";
+
+    expect(0 == sock_udp_create(&_sock, &local, &remote, SOCK_FLAGS_REUSE_EP));
+    /* inject a packet destined to _sock */
+    expect(_inject_packet(&src_addr, &dst_addr, _TEST_PORT_REMOTE,
+                            _TEST_PORT_LOCAL, test_data, sizeof(test_data),
+                            _TEST_NETIF));
+    /* _sock is closed before reading the packet, closing should drop it */
+    sock_udp_close(&_sock);
+    expect(_check_net());
+}
+
 static void test_sock_udp_recv__EADDRNOTAVAIL(void)
 {
     expect(0 == sock_udp_create(&_sock, NULL, NULL, SOCK_FLAGS_REUSE_EP));
@@ -755,6 +776,7 @@ int main(void)
     CALL(test_sock_udp_create__only_remote());
     CALL(test_sock_udp_create__full());
     /* sock_udp_close() is tested in tear_down() */
+    CALL(test_sock_udp_close__clean_queue());
     /* sock_udp_get_local() is tested in sock_udp_create() tests */
     /* sock_udp_get_remote() is tested in sock_udp_create() tests */
     CALL(test_sock_udp_recv__EADDRNOTAVAIL());

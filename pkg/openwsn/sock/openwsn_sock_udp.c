@@ -25,6 +25,7 @@
 #ifdef MODULE_ZTIMER_USEC
 #include "ztimer.h"
 #endif
+#include "mutex.h"
 #include "utlist.h"
 #include "log.h"
 
@@ -43,7 +44,10 @@
 #define _TIMEOUT_MSG_TYPE  (0x8474)
 #endif /* MODULE_ZTIMER_USEC */
 
+/* sock linked list */
 static sock_udp_t *_udp_socket_list;
+/* linked list lock */
+static mutex_t _sock_list_lock;
 
 #ifdef MODULE_ZTIMER_USEC
 static void _timeout_cb(void *arg)
@@ -127,6 +131,7 @@ static uint16_t _get_dyn_port(void)
 void sock_udp_init(void)
 {
     _udp_socket_list = NULL;
+    mutex_init(&_sock_list_lock);
 }
 
 int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
@@ -199,7 +204,9 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
         sock->async_cb = NULL;
 #endif
         /* update socket list */
+        mutex_lock(&_sock_list_lock);
         LL_PREPEND(_udp_socket_list, sock);
+        mutex_unlock(&_sock_list_lock);
     }
 
     /* set flags */
@@ -312,11 +319,23 @@ ssize_t sock_udp_send_aux(sock_udp_t *sock, const void *data, size_t len,
 
 void sock_udp_close(sock_udp_t *sock)
 {
+    assert(sock != NULL);
     if (_udp_socket_list == NULL) {
         return;
     }
     if (sock) {
+        /* drop messages in mbox if any */
+        msg_t msg;
+        while (mbox_try_get(&sock->mbox, &msg)) {
+            if (msg.type == _MSG_TYPE_RECV_PKT) {
+                openqueue_freePacketBuffer(
+                    (OpenQueueEntry_t*) msg.content.ptr);
+            }
+        }
+        /* remove sock from list */
+        mutex_lock(&_sock_list_lock);
         LL_DELETE(_udp_socket_list, sock);
+        mutex_unlock(&_sock_list_lock);
         sock->next = NULL;
     }
 }
@@ -495,7 +514,10 @@ void sock_receive_internal(void)
         LOG_ERROR("%s: not pkt in queue\n", __FUNCTION__);
         return;
     }
+
+    mutex_lock(&_sock_list_lock);
     current = _udp_socket_list;
+
     while (current != NULL) {
         if (current->gen_sock.local.port == pkt->l4_destination_port &&
             idmanager_isMyAddress(&pkt->l3_destinationAdd)) {
@@ -508,6 +530,8 @@ void sock_receive_internal(void)
                     "openwsn_sock: dropped message to %p (was full)\n",
                     (void *)&current->mbox);
             }
+            /* unlock mutex before callback execution */
+            mutex_unlock(&_sock_list_lock);
 #ifdef SOCK_HAS_ASYNC
             if (current->async_cb != NULL) {
                 current->async_cb(current, SOCK_ASYNC_MSG_RECV, NULL);
@@ -520,6 +544,8 @@ void sock_receive_internal(void)
     }
 
     if (current == NULL) {
+        /* unlock mutex if no associated sock was found */
+        mutex_unlock(&_sock_list_lock);
         openqueue_freePacketBuffer(pkt);
         LOG_ERROR("%s: no associated socket found\n", __FUNCTION__);
     }
@@ -540,16 +566,23 @@ void sock_senddone_internal(OpenQueueEntry_t *msg, owerror_t error)
         return;
     }
 
+    mutex_lock(&_sock_list_lock);
     current = _udp_socket_list;
-
     while (current != NULL) {
         if (current->gen_sock.local.port == pkt->l4_sourcePortORicmpv6Type &&
             current->async_cb != NULL) {
+            /* unlock mutex before callback execution */
+            mutex_unlock(&_sock_list_lock);
             current->async_cb(current, SOCK_ASYNC_MSG_SENT, &error);
             break;
         }
 
         current = current->next;
+    }
+
+    if (current == NULL) {
+        /* unlock mutex if no associated sock was found */
+        mutex_unlock(&_sock_list_lock);
     }
 #else /* SOCK_HAS_ASYNC */
     (void)error;
