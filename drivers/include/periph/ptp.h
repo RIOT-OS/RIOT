@@ -216,18 +216,18 @@ void ptp_init(void);
  *
  * 1. A call with @p correction set to `0` restores the nominal clock speed.
  * 2. A call with a positive value for @p correction speeds the clock up
- *    by `correction / (1 << 16)` (so up to ~50% for `INT16_MAX`).
+ *    by `correction / (1 << 32)` (so up to ~50% for `INT32_MAX`).
  * 3. A call with a negative value for @p correction slows the clock down by
- *    `-correction / (1 << 16)` (so up to 50% for `INT16_MIN`).
+ *    `-correction / (1 << 32)` (so up to 50% for `INT32_MIN`).
  *
- * This allows the clock speed to be adjusted in steps ± 0.00153% in relation
+ * This allows the clock speed to be adjusted in steps ± 2.3284E-08 % in relation
  * to its nominal clock speed, thus, allowing to counter systematic clock drift.
  * In addition, this is intended to "smoothly" synchronize the clock over time
  * to avoid jumps in the system time. (Especially calling @ref ptp_clock_adjust
  * with negative values might be something to avoid, when applications are not
  * prepared with clocks going backwards.)
  */
-void ptp_clock_adjust_speed(int16_t correction);
+void ptp_clock_adjust_speed(int32_t correction);
 
 /**
  * @brief   Adjust the PTP clock as given

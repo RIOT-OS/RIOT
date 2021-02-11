@@ -53,11 +53,11 @@ static void speed_adj_cb(void *arg, int chan)
     mutex_unlock(&sync_mutex);
 }
 
-static int test_speed_adjustment(const int16_t speed)
+static int test_speed_adjustment(const int32_t speed)
 {
 
     uint32_t expected_ns = TEST_TIME_US * 1000;
-    expected_ns += ((int64_t)expected_ns * speed) >> 16;
+    expected_ns += ((int64_t)expected_ns * speed) >> 32;
     const uint32_t expected_ns_lower = expected_ns *  9999ULL / 10000ULL;
     const uint32_t expected_ns_upper = expected_ns * 10001ULL / 10000ULL;
 
@@ -67,7 +67,7 @@ static int test_speed_adjustment(const int16_t speed)
     print_str(" (~");
     {
         int64_t tmp = speed * 100000ULL;
-        tmp = (tmp + UINT16_MAX / 2) / UINT16_MAX;
+        tmp /= UINT32_MAX;
         tmp += 100000ULL;
         char output[16];
         print(output, fmt_s32_dfp(output, (int32_t)tmp, -3));
@@ -220,8 +220,9 @@ static int test_clock_adjustment(int32_t offset)
 
 int main(void)
 {
-    static const int16_t speeds[] = {
-        0, INT16_MAX, INT16_MIN, 1337, -1337, 42, -42, 665, -665
+    static const int32_t speeds[] = {
+        /* 0%, +50%, -50%, +1%, -1%, +0.1%, -0.1%, +42/(2^32), -42/(2^32) */
+        0, INT32_MAX, INT32_MIN, 42949673, -42949673, 4294967, -4294967, 42, -42
     };
     static const int32_t offsets[] = {
         0, -1337, +1337, INT32_MAX

@@ -114,11 +114,11 @@ void ptp_init(void)
           ptptsar, ptpssir);
 }
 
-void ptp_clock_adjust_speed(int16_t correction)
+void ptp_clock_adjust_speed(int32_t correction)
 {
     uint64_t offset = ptptsar;
     offset *= correction;
-    offset >>= 16;
+    offset >>= 32;
     uint32_t adjusted_ptptsar = ptptsar + (uint32_t)offset;
     /* Value to add onto the 32 bit accumulator register (which causes the
      * value in ETH->PTPSSIR to be added onto the subsection register on
