@@ -60,7 +60,11 @@ extern "C" {
 /**
  * @brief   The nRF52 family of CPUs provides a fixed number of 9 ADC lines
  */
+#ifdef SAADC_CH_PSELP_PSELP_VDDHDIV5
+#define ADC_NUMOF           (10U)
+#else
 #define ADC_NUMOF           (9U)
+#endif
 
 /**
  * @brief   SPI temporary buffer size for storing const data in RAM before
@@ -83,6 +87,9 @@ enum {
     NRF52_AIN6 = 6,         /**< Analog Input 6 */
     NRF52_AIN7 = 7,         /**< Analog Input 7 */
     NRF52_VDD  = 8,         /**< VDD, not useful if VDD is reference... */
+#ifdef SAADC_CH_PSELP_PSELP_VDDHDIV5
+    NRF52_VDDHDIV5 = 9,     /**< VDDH divided by 5 */
+#endif
 };
 
 #ifndef DOXYGEN
