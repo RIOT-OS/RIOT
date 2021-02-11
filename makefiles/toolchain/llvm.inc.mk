@@ -51,15 +51,16 @@ gcc_include_dirs = $(realpath \
 )
 
 ifneq (,$(TARGET_ARCH))
+  TARGET_ARCH_LLVM ?= $(TARGET_ARCH)
   ifeq (,$(CFLAGS_CPU))
     $(error CFLAGS_CPU must have been defined to use `llvm`.)
   endif
 
   # Tell clang to cross compile
-  CFLAGS     += -target $(TARGET_ARCH)
-  CXXFLAGS   += -target $(TARGET_ARCH)
+  CFLAGS     += -target $(TARGET_ARCH_LLVM)
+  CXXFLAGS   += -target $(TARGET_ARCH_LLVM)
   # We currently don't use LLVM for linking (see comment above).
-  # LINKFLAGS  += -target $(TARGET_ARCH)
+  # LINKFLAGS  += -target $(TARGET_ARCH_LLVM)
 
   # Clang on Linux uses GCC's C and C++ headers and libstdc++ (installed with GCC)
 
