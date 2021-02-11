@@ -1,5 +1,6 @@
 # Set default programmer as jlink
 PROGRAMMER ?= jlink
+PROGRAMMERS_SUPPORTED += jlink openocd
 
 ifeq (openocd,$(PROGRAMMER))
   OPENOCD_DEBUG_ADAPTER = jlink
@@ -10,8 +11,6 @@ else ifeq (jlink,$(PROGRAMMER))
   JLINK_DEVICE = FE310
   JLINK_IF = JTAG
   FLASH_ADDR = 0x20010000
-else
-  $(error Programmer '$(PROGRAMMER)' not supported for board '$(BOARD)')
 endif
 
 TESTRUNNER_RESET_DELAY = 1
