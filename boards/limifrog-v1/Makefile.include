@@ -9,3 +9,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 PROGRAMMER ?= openocd
 OPENOCD_DEBUG_ADAPTER ?= stlink
 STLINK_VERSION ?= 2
+
+# openocd programmer is supported
+PROGRAMMERS_SUPPORTED += openocd

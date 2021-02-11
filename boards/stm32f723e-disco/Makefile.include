@@ -6,3 +6,6 @@ PROGRAMMER ?= openocd
 
 # this board has an on-board ST-link adapter
 OPENOCD_DEBUG_ADAPTER ?= stlink
+
+# openocd programmer is supported
+PROGRAMMERS_SUPPORTED += openocd

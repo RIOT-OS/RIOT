@@ -5,6 +5,9 @@ INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 PROGRAMMER ?= openocd
 OPENOCD_DEBUG_ADAPTER ?= stlink
 
+# Add openocd as supported programmer
+PROGRAMMERS_SUPPORTED += openocd
+
 # this board can become un-flashable after a hardfault,
 # use connect_assert_srst to always be able to flash or reset the board.
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
