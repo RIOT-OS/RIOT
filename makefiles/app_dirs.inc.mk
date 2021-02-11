@@ -3,6 +3,20 @@
 # fallback so empty RIOTBASE won't lead to "/examples/"
 RIOTBASE ?= .
 
+# Define the list of examples subdirectories that container application directories
+EXAMPLES_APPLICATIONS_SUBDIRS :=  \
+    ble                       \
+    coap                      \
+    cord                      \
+    dtls                      \
+    gnrc                      \
+    icn                       \
+    lora                      \
+    mqtt                      \
+    posix                     \
+    #
+EXAMPLES_APPLICATIONS_SUBDIRS := $(addprefix examples/,$(EXAMPLES_APPLICATIONS_SUBDIRS))
+
 # Define the list of tests sudirectories that contain application directories
 TEST_APPLICATIONS_SUBDIRS :=  \
     arch                      \
@@ -26,6 +40,7 @@ APPLICATION_DIRS :=                   \
     bootloaders                       \
     examples                          \
     tests                             \
+    $(EXAMPLES_APPLICATIONS_SUBDIRS)  \
     $(TEST_APPLICATIONS_SUBDIRS)      \
     #
 
