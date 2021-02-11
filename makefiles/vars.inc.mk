@@ -105,6 +105,8 @@ export HEXFILE               # The 'intel hex' stripped result of the compilatio
 # DEBUGSERVER_FLAGS          # The parameters to supply to DEBUGSERVER.
 # RESET                      # The command to call on "make reset", this command resets/reboots the target.
 # RESET_FLAGS                # The parameters to supply to RESET.
+# PROGRAMMER                 # The programmer to use when flashing, resetting or debugging
+# PROGRAMMERS_SUPPORTED      # The list of programmers supported by a board
 
 export DLCACHE               # directory used to cache http downloads
 export DOWNLOAD_TO_FILE      # Use `$(DOWNLOAD_TO_FILE) $(DESTINATION) $(URL)` to download `$(URL)` to `$(DESTINATION)`.
