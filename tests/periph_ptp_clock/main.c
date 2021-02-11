@@ -46,16 +46,6 @@
 static mutex_t sync_mutex = MUTEX_INIT_LOCKED;
 static atomic_uint_least64_t timestamp;
 
-static inline void print_s64_dec(int64_t _num)
-{
-    uint64_t num = _num;
-    if (_num < 0) {
-        print_str("-");
-        num = -_num;
-    }
-    print_u64_dec(num);
-}
-
 static void speed_adj_cb(void *arg, int chan)
 {
     (void)arg;
