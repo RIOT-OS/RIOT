@@ -24,3 +24,6 @@ OPENOCD_PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
 # The board can become un-flashable after some execution,
 # use connect_assert_srst to always be able to flash or reset the board.
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
+
+# openocd programmer is supported with FRDM boards
+PROGRAMMERS_SUPPORTED += openocd
