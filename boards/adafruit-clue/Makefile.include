@@ -2,6 +2,7 @@
 PROGRAMMER ?= adafruit-nrfutil
 
 include $(RIOTBOARD)/common/nrf52/Makefile.include
+PROGRAMMERS_SUPPORTED += adafruit-nrfutil
 
 ifeq ($(PROGRAMMER),adafruit-nrfutil)
   # The preinstalled bootloader must also be taken into account so

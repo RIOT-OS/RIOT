@@ -23,3 +23,6 @@ ifneq (,$(filter $(BOARD),ruuvitag thingy52))
     $(error Cannot use OpenOCD with $(BOARD) board)
   endif
 endif
+
+# set list of supported programmers
+PROGRAMMERS_SUPPORTED += bmp openocd

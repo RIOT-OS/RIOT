@@ -8,4 +8,7 @@ PROGRAMMER ?= pyocd
 PYOCD_FLASH_TARGET_TYPE ?= -t nrf52840
 OPENOCD_DEBUG_ADAPTER = dap
 
+# This board can also be flashed with pyocd
+PROGRAMMERS_SUPPORTED += pyocd
+
 include $(RIOTBOARD)/common/nrf52/Makefile.include

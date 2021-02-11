@@ -22,6 +22,8 @@ ifeq (nrfutil,$(PROGRAMMER))
   include $(RIOTMAKE)/tools/usb_board_reset.mk
 endif
 
+PROGRAMMERS_SUPPORTED += nrfutil
+
 %.hex.zip: %.hex
 	$(call check_cmd,$(FLASHER),Flash program and preparation tool)
 	$(FLASHER) pkg generate --hw-version 52 --sd-req 0x00 --application-version 1 --application $< $@
