@@ -1,5 +1,5 @@
 
-FEATURES_REQUIRED_ANY += picolibc|newlib
+FEATURES_REQUIRED_ANY += newlib|picolibc
 ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += newlib_nano
   USEMODULE += newlib_syscalls_default
