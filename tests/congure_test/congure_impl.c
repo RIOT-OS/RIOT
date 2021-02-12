@@ -22,7 +22,7 @@ int congure_test_snd_setup(congure_test_snd_t *c, unsigned id)
     if (id > 0) {
         return -1;
     }
-    congure_mock_snd_setup(c);
+    congure_mock_snd_setup(c, NULL);
     return 0;
 }
 
