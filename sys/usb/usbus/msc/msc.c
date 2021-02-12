@@ -69,37 +69,40 @@ static const usbus_handler_driver_t msc_driver = {
 };
 
 static void _write_xfer(usbus_msc_device_t *msc) {
-/* Check if we have a block to read and transfer */
-    if (msc->block_nb) {
-        size_t len;
-        /* Retrieve incoming data */
-        usbdev_ep_get(msc->ep_out->ep, USBOPT_EP_AVAILABLE, &len, sizeof(size_t));
-        if (len > 0) {
-            /* Prepare page buffer */
-            memcpy(&msc->buffer[msc->block_offset], msc->ep_out->ep->buf, len);
-        }
-        usbdev_ep_ready(msc->ep_out->ep, 0);
-        /* Update offset for page buffer */
-        msc->block_offset += len;
-        /* Decrement whole len */
-        msc->cmd.len -= len;
+    /* Check if we have a block to read and transfer */
+    if (!msc->block_nb) {
+        return;
+    }
 
-        /* buffer is full, write it and point to new block if any */
-        if (msc->block_offset >= (MTD_MSC->page_size * msc->pages_per_vpage)) {
-            mtd_write_page(MTD_MSC, msc->buffer, msc->block * msc->pages_per_vpage,
-                           0, MTD_MSC->page_size * msc->pages_per_vpage);
-            msc->block_offset = 0;
-            msc->block++;
-            msc->block_nb--;
-        }
-        if (msc->cmd.len == 0) {
-            /* All blocks have been transferred, send CSW to host */
-            if (msc->state == DATA_TRANSFER) {
-                msc->state = GEN_CSW;
-            }
+    size_t len;
+    /* Retrieve incoming data */
+    usbdev_ep_get(msc->ep_out->ep, USBOPT_EP_AVAILABLE, &len, sizeof(size_t));
+    if (len > 0) {
+        /* Prepare page buffer */
+        memcpy(&msc->buffer[msc->block_offset], msc->ep_out->ep->buf, len);
+    }
+    usbdev_ep_ready(msc->ep_out->ep, 0);
+    /* Update offset for page buffer */
+    msc->block_offset += len;
+    /* Decrement whole len */
+    msc->cmd.len -= len;
+
+    /* buffer is full, write it and point to new block if any */
+    if (msc->block_offset >= (MTD_MSC->page_size * msc->pages_per_vpage)) {
+        mtd_write_page(MTD_MSC, msc->buffer, msc->block * msc->pages_per_vpage,
+                       0, MTD_MSC->page_size * msc->pages_per_vpage);
+        msc->block_offset = 0;
+        msc->block++;
+        msc->block_nb--;
+    }
+    if (msc->cmd.len == 0) {
+        /* All blocks have been transferred, send CSW to host */
+        if (msc->state == DATA_TRANSFER) {
+            msc->state = GEN_CSW;
         }
     }
 }
+
 static void _xfer_data( usbus_msc_device_t *msc)
 {
     /* Check if we have a block to read and transfer */
