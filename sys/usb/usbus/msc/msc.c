@@ -29,7 +29,10 @@
 #include "debug.h"
 
 #include "mtd.h"
-extern mtd_dev_t *mtd0;
+
+#ifndef MTD_MSC
+#define MTD_MSC MTD_0
+#endif
 
 /* Internal buffer to handle size difference between MTD layer and USB
    endpoint size as some MTD implementation (like mtd_sdcard) doesn't allow
@@ -82,9 +85,9 @@ static void _write_xfer(usbus_msc_device_t *msc) {
         msc->cmd.len -= len;
 
         /* buffer is full, write it and point to new block if any */
-        if (msc->block_offset >= (mtd0->page_size * msc->pages_per_vpage)) {
-            mtd_write_page(mtd0, msc->buffer, msc->block * msc->pages_per_vpage,
-                           0, mtd0->page_size * msc->pages_per_vpage);
+        if (msc->block_offset >= (MTD_MSC->page_size * msc->pages_per_vpage)) {
+            mtd_write_page(MTD_MSC, msc->buffer, msc->block * msc->pages_per_vpage,
+                           0, MTD_MSC->page_size * msc->pages_per_vpage);
             msc->block_offset = 0;
             msc->block++;
             msc->block_nb--;
@@ -103,8 +106,8 @@ static void _xfer_data( usbus_msc_device_t *msc)
     if (msc->block_nb) {
         /* read buffer from mtd device */
         if (msc->block_offset == 0) {
-            mtd_read_page(mtd0, msc->buffer, msc->block * msc->pages_per_vpage,
-                          0, mtd0->page_size * msc->pages_per_vpage);
+            mtd_read_page(MTD_MSC, msc->buffer, msc->block * msc->pages_per_vpage,
+                          0, MTD_MSC->page_size * msc->pages_per_vpage);
         }
         /* Prepare endpoint buffer */
         memcpy(msc->ep_in->ep->buf, &msc->buffer[msc->block_offset], 64);
@@ -115,7 +118,7 @@ static void _xfer_data( usbus_msc_device_t *msc)
         /* Decrement whole len */
         msc->cmd.len -= 64;
         /* whole buffer is empty, point to new block if any */
-        if (msc->block_offset >= (mtd0->page_size * msc->pages_per_vpage)) {
+        if (msc->block_offset >= (MTD_MSC->page_size * msc->pages_per_vpage)) {
             msc->block_offset = 0;
             msc->block++;
             msc->block_nb--;
@@ -144,7 +147,7 @@ int usbus_msc_init(usbus_t *usbus, usbus_msc_device_t *handler)
     handler->handler_ctrl.driver = &msc_driver;
     usbus_register_event_handler(usbus, (usbus_handler_t*)handler);
     printf("[MSC]: MTD init...");
-    if (mtd_init(mtd0) != 0) {
+    if (mtd_init(MTD_MSC) != 0) {
         puts("[FAILED]");
         return -1;
     }
