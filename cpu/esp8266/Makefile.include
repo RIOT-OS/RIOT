@@ -23,10 +23,6 @@ BOOTLOADER_POS = 0x0000
 include $(RIOTCPU)/esp_common/Makefile.include
 
 # regular Makefile
-
-TARGET_ARCH_ESP8266 ?= xtensa-esp8266-elf
-TARGET_ARCH ?= $(TARGET_ARCH_ESP8266)
-
 PSEUDOMODULES += esp_sw_timer
 
 INCLUDES += -I$(RIOTCPU)/$(CPU)
@@ -68,3 +64,5 @@ LINKFLAGS += -Tesp8266.peripherals.ld
 
 LINKFLAGS += -Wl,-wrap=pp_attach
 LINKFLAGS += -Wl,-wrap=pm_attach
+
+include $(RIOTMAKE)/arch/esp8266.inc.mk

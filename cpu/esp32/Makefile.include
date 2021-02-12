@@ -18,9 +18,6 @@ include $(RIOTCPU)/esp_common/Makefile.include
 
 # regular Makefile
 
-TARGET_ARCH_ESP32 ?= xtensa-esp32-elf
-TARGET_ARCH ?= $(TARGET_ARCH_ESP32)
-
 PSEUDOMODULES += esp_eth_hw
 PSEUDOMODULES += esp_gdbstub
 PSEUDOMODULES += esp_hw_counter
@@ -85,3 +82,5 @@ ifneq (,$(filter esp_qemu,$(USEMODULE)))
   FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin &&
   FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
 endif
+
+include $(RIOTMAKE)/arch/esp32.inc.mk

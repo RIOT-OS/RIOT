@@ -1,0 +1,2 @@
+TARGET_ARCH_ESP32 ?= xtensa-esp32-elf
+TARGET_ARCH ?= $(TARGET_ARCH_ESP32)
