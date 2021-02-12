@@ -26,20 +26,6 @@
  * @name Interrupt vector definition
  * @{
  */
-
-/* This is needed to homogenize the symbolic IRQ names across different versions
- * of the vendor headers. These must be defined before any vendor headers are
- * included */
-#define FTFA_IRQn FTF_IRQn
-#define FTFA_Collision_IRQn Read_Collision_IRQn
-#define FTFE_IRQn FTF_IRQn
-#define FTFE_Collision_IRQn Read_Collision_IRQn
-#define FTFL_IRQn FTF_IRQn
-#define FTFL_Collision_IRQn Read_Collision_IRQn
-#define PMC_IRQn LVD_LVW_IRQn
-#define Watchdog_IRQn WDOG_EWM_IRQn
-#define LVD_LVW_DCDC_IRQn LVD_LVW_IRQn
-
 #include "vectors_kinetis.h"
 
 /* CPU specific interrupt vector table */
