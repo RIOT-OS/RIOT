@@ -282,4 +282,10 @@ static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size
     return pkt;
 }
 
+void gnrc_pktbuf_free_internal(void *data, size_t size)
+{
+    (void)size;
+    _free(data);
+}
+
 /** @} */

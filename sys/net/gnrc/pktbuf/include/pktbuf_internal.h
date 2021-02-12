@@ -71,7 +71,6 @@ static inline bool gnrc_pktbuf_contains(void *ptr)
 #endif
 }
 
-#if IS_USED(MODULE_GNRC_PKTBUF_STATIC) || DOXYGEN
 /**
  * @brief   Release an internal buffer
  *
@@ -82,13 +81,6 @@ static inline bool gnrc_pktbuf_contains(void *ptr)
  * @param   size    size of @p data in bytes
  */
 void gnrc_pktbuf_free_internal(void *data, size_t size);
-#else
-static inline void gnrc_pktbuf_free_internal(void *data, size_t size)
-{
-    (void)size;
-    free(data);
-}
-#endif
 
 /* for testing */
 #ifdef TEST_SUITES
