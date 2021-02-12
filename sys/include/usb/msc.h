@@ -42,7 +42,7 @@ extern "C" {
 #define USB_MSC_SUBCLASS_MMC5         0x02 /**< MMC5 allocated by USB-IF */
 #define USB_MSC_SUBCLASS_UFI          0x04 /**< Interface Floppy Disk Drives */
 #define USB_MSC_SUBCLASS_SCSI_TCS     0x06 /**< SCSI transparent command set */
-#define USB_MSC_SUBCLASS_LSDFS        0x07 /**< Early negotiation acces */
+#define USB_MSC_SUBCLASS_LSDFS        0x07 /**< Early negotiation access */
 #define USB_MSC_SUBCLASS_IEEE1667     0x08 /**< IEEE1677 allocated by USB-IF */
 #define USB_MSC_SUBCLASS_VENDOR       0xFF /**< Vendor Specific */
 /** @} */

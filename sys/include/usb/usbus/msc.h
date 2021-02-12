@@ -56,7 +56,7 @@ typedef struct usbus_msc_device {
     usbus_endpoint_t *ep_out;       /**< Data endpoint out */
     usbus_descr_gen_t msc_descr;    /**< MSC descriptor generator */
     usbus_t *usbus;                 /**< Pointer to the USBUS context */
-    cbw_info_t cmd;                 /**< Command Block Wrapper informations */
+    cbw_info_t cmd;                 /**< Command Block Wrapper information */
     event_t rx_event;               /**< Transmit ready event */
     usbus_msc_state_t state;        /**< Internal state machine for msc */
     uint8_t *buffer;                /**< Pointer to the current data transfer buffer */

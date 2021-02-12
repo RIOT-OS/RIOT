@@ -120,7 +120,7 @@ typedef struct __attribute__((packed)) {
     uint8_t flags;          /**< Miscellaneous flags */
     uint32_t blk_addr;      /**< Block address */
     uint8_t group_number;   /**< Group number */
-    uint16_t xfer_len;      /**< Transfer lenght in bytes */
+    uint16_t xfer_len;      /**< Transfer length in bytes */
 } msc_cbw_rw10_pkt_t;
 
 /**
@@ -138,8 +138,8 @@ typedef struct __attribute__((packed)) {
     uint8_t version;            /**< Byte 2 SCSI Version */
     uint8_t response_format:4;  /**< Byte 3 [B3..B0] Response Data Format */
     uint8_t reserved3:4;        /**< Byte 3 [B7..B4] Reserved */
-    uint8_t length;             /**< Byte 4 Additionnal Length (n-4) */
-    uint8_t flags[3];           /**< Byte 7..5 Miscellanous flags UNUSED BY USBUS ONLY */
+    uint8_t length;             /**< Byte 4 Additional Length (n-4) */
+    uint8_t flags[3];           /**< Byte 7..5 Miscellaneous flags UNUSED BY USBUS ONLY */
     uint8_t vendor_id[8];       /**< Byte 15..8 Vendor Identification */
     uint8_t product_id[16];     /**< Byte 31..16 Product Identification */
     uint8_t product_rev[4];     /**< Byte 35..32 Product Revision */
@@ -211,7 +211,7 @@ void scsi_process_cmd(usbus_t *usbus, usbus_handler_t *handler, usbdev_ep_t *ep,
  * @brief Generate Command Status Wrapper and send it to the host
  *
  * @param   handler   MSC device struct
- * @param   cmd       struct containing needed informations to generate CBW response
+ * @param   cmd       struct containing needed information to generate CBW response
  */
 void scsi_gen_csw(usbus_handler_t *handler, cbw_info_t cmd);
 
