@@ -44,14 +44,14 @@ APPLICATION_DIRS :=                   \
     $(TEST_APPLICATIONS_SUBDIRS)      \
     #
 
-APPLICATION_DIRS := $(addprefix $(RIOTBASE)/,$(APPLICATION_DIRS))
-APPLICATION_DIRS := $(addsuffix /*/Makefile,$(APPLICATION_DIRS))
-
 # 1. use wildcard to find Makefiles
 # 2. use patsubst to drop trailing "/"
 # 3. use patsubst to drop possible leading "./"
 # 4. sort
-APPLICATION_DIRS := $(sort $(patsubst ./%,%,$(patsubst %/,%,$(dir $(wildcard $(APPLICATION_DIRS))))))
+APPLICATION_DIRS := $(addprefix $(RIOTBASE)/,$(APPLICATION_DIRS))
+APPLICATION_DIRS_RELATIVE := $(dir $(wildcard $(addsuffix /*/Makefile,$(APPLICATION_DIRS))))
+APPLICATION_DIRS_ABSOLUTE := $(abspath $(APPLICATION_DIRS_RELATIVE))
+APPLICATION_DIRS := $(sort $(patsubst ./%,%,$(patsubst %/,%,$(APPLICATION_DIRS_RELATIVE))))
 
 info-applications:
 	@for dir in $(APPLICATION_DIRS); do echo $$dir; done

@@ -202,6 +202,14 @@ include $(RIOTMAKE)/boards.inc.mk
 # Debug targets for build system migration
 include $(RIOTMAKE)/dependencies_debug.inc.mk
 
+# List all available applications
+include $(RIOTMAKE)/app_dirs.inc.mk
+
+ifeq (,$(filter $(APPDIR),$(APPLICATION_DIRS_ABSOLUTE)))
+  $(error Application parent directory is not listed in the list of examples \
+          or tests subdirectories. Please update 'makefiles/app_dirs.inc.mk')
+endif
+
 # Use TOOLCHAIN environment variable to select the toolchain to use.
 # If native, TOOLCHAIN for OSX is llvm
 ifeq ($(BOARD),native)
