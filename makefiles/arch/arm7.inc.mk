@@ -1,0 +1,18 @@
+# Target architecture for the build. Use arm-none-eabi if you are unsure.
+TARGET_ARCH_ARM7 ?= arm-none-eabi
+TARGET_ARCH ?= $(TARGET_ARCH_ARM7)
+
+# currently only arm7tdmi-s is supported by RIOT, but allow overriding MCPU
+# if someone wants to add support for other ARM7 CPUs
+MCPU ?= arm7tdmi-s
+
+CFLAGS_CPU  = -mcpu=$(MCPU)
+CFLAGS_LINK = -ffunction-sections -fdata-sections -fno-builtin -fshort-enums
+CFLAGS_DBG  ?= -ggdb -g3
+CFLAGS_OPT  ?= -Os
+
+CFLAGS      += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT)
+ASFLAGS     += $(CFLAGS_CPU) $(CFLAGS_DBG)
+LINKFLAGS   += -T$(RIOTCPU)/$(CPU)/ldscripts/$(CPU).ld
+LINKFLAGS   += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) -static -lgcc -nostartfiles
+LINKFLAGS   += -Wl,--gc-sections
