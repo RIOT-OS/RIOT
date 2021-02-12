@@ -3,7 +3,7 @@
 # fallback so empty RIOTBASE won't lead to "/examples/"
 RIOTBASE ?= .
 
-# Define the list of examples subdirectories that container application directories
+# Define the list of examples subdirectories that contain application directories
 EXAMPLES_APPLICATIONS_SUBDIRS :=  \
     ble                       \
     coap                      \
