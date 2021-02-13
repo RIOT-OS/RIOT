@@ -1,5 +1,0 @@
-# configure the flash tool
-PROGRAMMER ?= uniflash
-
-OPENOCD_CONFIG ?= $(RIOTBOARD)/common/cc26x2_cc13x2/dist/openocd.cfg
-UNIFLASH_CONFIG ?= $(RIOTBOARD)/common/cc26x2_cc13x2/dist
