@@ -661,22 +661,6 @@ static int _off(ieee802154_dev_t *dev)
     return 0;
 }
 
-static bool _get_cap(ieee802154_dev_t *dev, ieee802154_rf_caps_t cap)
-{
-    (void) dev;
-    switch (cap) {
-    case IEEE802154_CAP_24_GHZ:
-    case IEEE802154_CAP_IRQ_CRC_ERROR:
-    case IEEE802154_CAP_IRQ_RX_START:
-    case IEEE802154_CAP_IRQ_TX_START:
-    case IEEE802154_CAP_IRQ_TX_DONE:
-    case IEEE802154_CAP_IRQ_CCA_DONE:
-        return true;
-    default:
-        return false;
-    }
-}
-
 int _len(ieee802154_dev_t *dev)
 {
     (void) dev;
@@ -793,6 +777,13 @@ void nrf802154_setup(nrf802154_t *dev)
 }
 
 static const ieee802154_radio_ops_t nrf802154_ops = {
+    .caps =  IEEE802154_CAP_24_GHZ
+          | IEEE802154_CAP_IRQ_CRC_ERROR
+          | IEEE802154_CAP_IRQ_RX_START
+          | IEEE802154_CAP_IRQ_TX_START
+          | IEEE802154_CAP_IRQ_TX_DONE
+          | IEEE802154_CAP_IRQ_CCA_DONE,
+
     .write = _write,
     .read = _read,
     .request_transmit = _request_transmit,
@@ -805,7 +796,6 @@ static const ieee802154_radio_ops_t nrf802154_ops = {
     .confirm_set_trx_state = _confirm_set_trx_state,
     .request_cca = _request_cca,
     .confirm_cca = _confirm_cca,
-    .get_cap = _get_cap,
     .set_cca_threshold = set_cca_threshold,
     .set_cca_mode = _set_cca_mode,
     .config_phy = _config_phy,

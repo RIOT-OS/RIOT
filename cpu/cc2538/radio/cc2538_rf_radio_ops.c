@@ -400,23 +400,6 @@ static int _off(ieee802154_dev_t *dev)
     return -ENOTSUP;
 }
 
-static bool _get_cap(ieee802154_dev_t *dev, ieee802154_rf_caps_t cap)
-{
-    (void) dev;
-    switch (cap) {
-        case IEEE802154_CAP_24_GHZ:
-        case IEEE802154_CAP_AUTO_CSMA:
-        case IEEE802154_CAP_IRQ_CRC_ERROR:
-        case IEEE802154_CAP_IRQ_TX_DONE:
-        case IEEE802154_CAP_IRQ_CCA_DONE:
-        case IEEE802154_CAP_IRQ_RX_START:
-        case IEEE802154_CAP_IRQ_TX_START:
-            return true;
-        default:
-            return false;
-    }
-}
-
 static int _set_hw_addr_filter(ieee802154_dev_t *dev, const network_uint16_t *short_addr,
                                const eui64_t *ext_addr, const uint16_t *pan_id)
 {
@@ -536,6 +519,14 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
 }
 
 static const ieee802154_radio_ops_t cc2538_rf_ops = {
+    .caps = IEEE802154_CAP_24_GHZ
+          | IEEE802154_CAP_AUTO_CSMA
+          | IEEE802154_CAP_IRQ_CRC_ERROR
+          | IEEE802154_CAP_IRQ_TX_DONE
+          | IEEE802154_CAP_IRQ_CCA_DONE
+          | IEEE802154_CAP_IRQ_RX_START
+          | IEEE802154_CAP_IRQ_TX_START,
+
     .write = _write,
     .read = _read,
     .request_transmit = _request_transmit,
@@ -548,7 +539,6 @@ static const ieee802154_radio_ops_t cc2538_rf_ops = {
     .confirm_set_trx_state = _confirm_set_trx_state,
     .request_cca = _request_cca,
     .confirm_cca = _confirm_cca,
-    .get_cap = _get_cap,
     .set_cca_threshold = _set_cca_threshold,
     .set_cca_mode = _set_cca_mode,
     .config_phy = _config_phy,
