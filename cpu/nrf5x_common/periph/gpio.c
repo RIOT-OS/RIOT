@@ -86,7 +86,7 @@ static inline NRF_GPIO_Type *port(gpio_t pin)
  */
 static inline int pin_num(gpio_t pin)
 {
-#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
+#if GPIO_COUNT > 1
     return (pin & PIN_MASK);
 #else
     return (int)pin;
@@ -184,7 +184,7 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     /* configure the GPIOTE channel: set even mode, pin and active flank */
     NRF_GPIOTE->CONFIG[_pin_index] = (GPIOTE_CONFIG_MODE_Event |
                              (pin_num(pin) << GPIOTE_CONFIG_PSEL_Pos) |
-#if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
+#if GPIO_COUNT > 1
                              ((pin & PORT_BIT) << 8) |
 #endif
                              (flank << GPIOTE_CONFIG_POLARITY_Pos));
