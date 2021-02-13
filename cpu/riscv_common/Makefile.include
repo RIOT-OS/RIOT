@@ -1,6 +1,8 @@
 CFLAGS += -Wno-pedantic
 INCLUDES += -I$(RIOTCPU)/riscv_common/include
 
+TOOLCHAINS_SUPPORTED = gnu llvm
+
 # All variables must be defined in the CPU configuration when using the common
 # `ldscripts/riscv.ld`
 ifneq (,$(ROM_START_ADDR)$(RAM_START_ADDR)$(ROM_LEN)$(RAM_LEN))
