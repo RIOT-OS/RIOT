@@ -46,7 +46,7 @@ static inline void nrfx_dcdc_init(void)
     /* on CPUs that support high voltage power supply via VDDH and thus use a
      * two stage regulator, we also enable the DC/DC converter for the first
      * state. */
-#ifdef POWER_MAINREGSTATUS_MAINREGSTATUS_High
+#ifdef POWER_DCDCEN0_DCDCEN_Msk
     if (NRF_POWER->MAINREGSTATUS == POWER_MAINREGSTATUS_MAINREGSTATUS_High) {
         NRF_POWER->DCDCEN0 = 1;
     }
