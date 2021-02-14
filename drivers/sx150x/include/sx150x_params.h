@@ -19,6 +19,9 @@
 #ifndef SX150X_PARAMS_H
 #define SX150X_PARAMS_H
 
+#include "board.h"
+#include "sx150x.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,18 +38,27 @@ extern "C" {
 #endif
 
 #ifndef SX150X_PARAMS
-#define SX150X_PARAMS                { .bus  = SX150X_PARAM_I2C_DEV,  \
-                                       .addr = SX150X_PARAM_I2C_ADDR, }
+#define SX150X_PARAMS                {{ .bus  = SX150X_PARAM_I2C_DEV,  \
+                                       .addr = SX150X_PARAM_I2C_ADDR, }}
 #endif
-/**@}*/
 
 /**
- * @brief   Configure SX150x
+ * References to the SX150x device (or devices, matching @ref SX150X_PARAMS in
+ * count) that are to be auto-initialized
  */
-static const sx150x_params_t sx150x_params[] =
-{
-    SX150X_PARAMS
-};
+#ifndef SX150X_DEVS
+#define SX150X_DEVS                  { &board_io_expander }
+#endif
+
+/**
+ *
+ */
+#ifndef SX150X_RGBS
+#define SX150X_RGBS                  { { &board_io_expander, { 7, 5, 6 } }, \
+                                       { &board_io_expander, { 13, 14, 15 } } }
+#endif
+
+/**@}*/
 
 #ifdef __cplusplus
 }

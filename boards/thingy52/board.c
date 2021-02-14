@@ -23,7 +23,7 @@
 // #include "sx150x.h"
 // #include "sx150x_params.h"
 
-// sx150x_t thingy52_sx;
+sx150x_t board_io_expander;
 
 #if defined(MODULE_LPS22HB) || defined(MODULE_HTS221)
 #include "periph/gpio.h"

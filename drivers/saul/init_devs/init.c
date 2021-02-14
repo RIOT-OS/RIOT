@@ -275,6 +275,10 @@ void saul_init_devs(void)
         extern void auto_init_sps30(void);
         auto_init_sps30();
     }
+    if (IS_USED(MODULE_SX150X)) {
+        extern void auto_init_sx150x(void);
+        auto_init_sx150x();
+    }
     if (IS_USED(MODULE_TCS37727)) {
         extern void auto_init_tcs37727(void);
         auto_init_tcs37727();

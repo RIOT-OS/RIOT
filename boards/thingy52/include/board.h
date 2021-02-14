@@ -20,6 +20,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "sx150x.h"
 
 #ifdef __cplusplus
 extern "C" {
