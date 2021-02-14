@@ -1,3 +1,6 @@
+# i don't have jlink so i go uart
+USEMODULE += stdio_uart
+
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += lis2dh12
   USEMODULE += hts221
