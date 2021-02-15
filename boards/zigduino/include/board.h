@@ -51,11 +51,6 @@ extern "C" {
 #define PIR_MOTION_MODE     GPIO_IN_PU
 /** @} */
 
-/**
- * @brief Initialize board specific hardware, including clock, LEDs and stdio
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

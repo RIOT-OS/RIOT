@@ -190,11 +190,6 @@ extern mtd_dev_t *mtd0;
 /** @} */
 #endif /* MODULE_MTD_SDCARD || DOXYGEN */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

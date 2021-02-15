@@ -68,11 +68,6 @@ extern "C" {
 #define BTN4_MODE           GPIO_IN_PD          /**< Up button mode     */
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

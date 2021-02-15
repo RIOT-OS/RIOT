@@ -93,11 +93,6 @@ enum {
 /** @} */
 
 /**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
-/**
  * @brief   Set antenna switch
  */
 void board_antenna_config(uint8_t antenna);

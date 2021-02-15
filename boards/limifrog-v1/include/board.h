@@ -57,11 +57,6 @@ extern "C" {
 #define LIS3MDL_PARAM_ADDR       (0x28)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

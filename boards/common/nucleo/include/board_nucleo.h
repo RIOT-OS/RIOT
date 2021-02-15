@@ -60,11 +60,6 @@ extern "C" {
  */
 void board_common_nucleo_init(void);
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

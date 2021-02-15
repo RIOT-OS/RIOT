@@ -104,11 +104,6 @@ extern "C" {
 #define ADPS9960_PARAM_PIN_INT  GPIO_PIN(0, 23)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

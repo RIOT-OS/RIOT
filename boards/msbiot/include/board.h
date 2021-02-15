@@ -78,11 +78,6 @@ extern "C" {
 #define BUTTON1_PIN         GPIO_PIN(PORT_A, 0)     /**< Pin of right button */
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

@@ -98,11 +98,6 @@ extern "C" {
 #define LED2_TOGGLE         (GPIOC->ODR ^=  LED2_MASK)
 /** @} */
 
-/**
- * @brief   Initialize board specific hardware, including clock, LEDs and std-IO
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif

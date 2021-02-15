@@ -120,11 +120,6 @@ extern "C" {
 #define SI70XX_PARAM_I2C_DEV    SI7021_I2C
 /** @} */
 
-/**
- * @brief   Initialize the board (GPIO, sensors, clocks).
- */
-void board_init(void);
-
 #ifdef __cplusplus
 }
 #endif
