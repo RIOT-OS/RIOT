@@ -21,6 +21,8 @@ def test_riotctrl():
         version = ctrl.term.match.group(1)
         shell = ShellInteraction(ctrl)
         parser = RapidJSONShellInteractionParser()
+        res = shell.cmd('empty')
+        assert not res.strip()
         res = shell.cmd('version')
         assert res.strip() == version
         count = 0

@@ -7,9 +7,20 @@
 
 #include "shell.h"
 
+static int _empty(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+    return 0;
+}
+
+static shell_commands_t _shell_commands[] {
+    { "empty", "A command with empty output", _empty },
+};
+
 int main(void)
 {
     char line_buf[SHELL_DEFAULT_BUFSIZE];
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
+    shell_run(_shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
     return 0;
 }
