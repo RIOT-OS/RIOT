@@ -9,4 +9,6 @@ FEATURES_PROVIDED += periph_usbdev
 
 # Various other features (if any)
 
+FEATURES_PROVIDED += highlevel_stdio
+
 include $(RIOTBOARD)/common/nrf52/Makefile.features
