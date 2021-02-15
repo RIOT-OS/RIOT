@@ -29,7 +29,7 @@ $(PKG_BUILD_DIR)/lib/librelic_s.a: $(PKG_BUILD_DIR)/Makefile
 
 # Pass 'COMP' with a target specific export to not have issues with the shell
 # escaping evaluation.
-COMP = $(filter-out -Werror -Werror=old-style-definition -Werror=strict-prototypes -std=gnu99,$(CFLAGS))
+COMP = $(filter-out -Werror -Werror=old-style-definition -Werror=strict-prototypes -std=gnu11,$(CFLAGS))
 $(PKG_BUILD_DIR)/Makefile: export COMP ?=
 $(PKG_BUILD_DIR)/Makefile: $(PKG_PREPARED) $(TOOLCHAIN_FILE) | ..cmake_version_supported
 	cmake -B$(PKG_BUILD_DIR) -H$(PKG_SOURCE_DIR) \
