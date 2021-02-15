@@ -48,6 +48,7 @@ config CPU_CORE_CORTEX_M
     select HAS_SSP
     select HAS_CORTEXM_SVC
     select HAS_NEWLIB
+    select HAS_DBGPIN
 
 ## Common CPU symbols
 config CPU_CORE
