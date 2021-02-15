@@ -60,7 +60,9 @@ somewhere else then they must be added to the include path. In
 
 Board initialization functions are defined in `board.c`. This file must at
 least define a `board_init()` function that is called at startup. This
-function initializes the `CPU` by calling`cpu_init()` among others.
+function initializes the `CPU` by calling`cpu_init()` among others. It is run
+before the scheduler is started, so it must not block (e.g. by performing I2C
+operations).
 
 ```c
 void board_init(void)
