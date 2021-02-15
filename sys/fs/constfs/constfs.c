@@ -18,8 +18,6 @@
  * @}
  */
 
-/* Required for strnlen in string.h, when building with -std=c99 */
-#define _DEFAULT_SOURCE 1
 #include <stddef.h>
 #include <string.h>
 #include <unistd.h>
