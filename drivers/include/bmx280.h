@@ -195,7 +195,6 @@ typedef struct {
     /* Config Register */
     bmx280_t_sb_t t_sb;                 /**< standby */
     bmx280_filter_t filter;             /**< filter coefficient */
-    uint8_t spi3w_en;                   /**< Enables 3-wire SPI interface */
 
     /* ctrl_meas */
     bmx280_mode_t run_mode;             /**< ctrl_meas mode */
