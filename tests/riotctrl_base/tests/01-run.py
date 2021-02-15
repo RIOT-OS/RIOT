@@ -34,5 +34,6 @@ def test_riotctrl():
             parser.parse(line)
         assert count > 0
 
+
 if __name__ == "__main__":
     test_riotctrl()
