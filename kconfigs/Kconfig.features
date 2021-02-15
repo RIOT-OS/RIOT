@@ -52,6 +52,12 @@ config HAS_CPU_CHECK_ADDRESS
     help
         Indicates that address validity check is supported.
 
+config HAS_DBGPIN
+    bool
+    help
+        Indicates that a platform provides the neccessary initialization hooks
+        for the dbgpin module.
+
 config HAS_EMULATOR_RENODE
     bool
     help
