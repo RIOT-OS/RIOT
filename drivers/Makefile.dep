@@ -163,6 +163,11 @@ ifneq (,$(filter ws281x_%,$(USEMODULE)))
   USEMODULE += ws281x
 endif
 
+ifneq (,$(filter sx1507 sx1508 sx1509,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += sx150x
+endif
+
 ifneq (,$(filter saul_adc,$(USEMODULE)))
   FEATURES_REQUIRED += periph_adc
 endif

@@ -20,6 +20,10 @@
 
 #include "cpu.h"
 #include "board.h"
+// #include "sx150x.h"
+// #include "sx150x_params.h"
+
+sx150x_t board_io_expander;
 
 #if defined(MODULE_LPS22HB) || defined(MODULE_HTS221)
 #include "periph/gpio.h"
@@ -29,7 +33,7 @@ void board_init(void)
 {
     /* LP22HB and HTS221 can only be powered with VREG when VDD_PWR_CTRL_PIN
        is set. */
-#if defined(MODULE_LPS22HB) || defined(MODULE_HTS221)
+#if defined(MODULE_LPS22HB) || defined(MODULE_HTS221) || 1
     gpio_init(VDD_PWR_CTRL_PIN, GPIO_OUT);
     gpio_set(VDD_PWR_CTRL_PIN);
 #endif

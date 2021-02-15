@@ -1,8 +1,14 @@
+# i don't have jlink so i go uart
+USEMODULE += stdio_uart
+
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += lis2dh12
   USEMODULE += hts221
   USEMODULE += lps22hb
 endif
+
+# Always include the I/O expander
+USEMODULE += sx1509
 
 # Use Segger's RTT unless another stdio_% is already used
 ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))

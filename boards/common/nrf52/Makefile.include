@@ -13,10 +13,10 @@ ifeq (jlink,$(PROGRAMMER))
   # setup JLink for flashing
   JLINK_DEVICE = nrf52
 else ifeq (openocd,$(PROGRAMMER))
-  ifneq (,$(filter $(BOARD),ruuvitag thingy52))
-    # openocd doesn't fully work with ruuvitag and thingy52
-    $(error Cannot use OpenOCD with $(BOARD) board)
-  endif
+#   ifneq (,$(filter $(BOARD),ruuvitag thingy52))
+#     # openocd doesn't fully work with ruuvitag and thingy52
+#     $(error Cannot use OpenOCD with $(BOARD) board)
+#   endif
   # setup OpenOCD for flashing. Version 0.10 of OpenOCD doesn't contain support
   # for nrf52dk and nrf52840dk boards. To use OpenOCD with these a version
   # build from source (master > 2018, August the 13rd) is required.
