@@ -27,6 +27,22 @@
 #include "riotboot/slot.h"
 #include "riotboot/usb_dfu.h"
 
+#include "bootloader_selection.h"
+
+#ifdef BTN_BOOTLOADER_PIN
+#include "periph/gpio.h"
+#endif
+
+static bool _bootloader_alternative_mode(void)
+{
+#ifdef BTN_BOOTLOADER_PIN
+    gpio_init(BTN_BOOTLOADER_PIN, BTN_BOOTLOADER_MODE);
+    return (bool)gpio_read(BTN_BOOTLOADER_PIN) != BTN_BOOTLOADER_INVERTED;
+#else
+    return false;
+#endif
+}
+
 void kernel_init(void)
 {
     uint32_t version = 0;
@@ -50,7 +66,7 @@ void kernel_init(void)
     /* Flash the unused slot if magic word is set */
     riotboot_usb_dfu_init(0);
 
-    if (slot != -1) {
+    if (slot != -1 && !_bootloader_alternative_mode()) {
         riotboot_slot_jump(slot);
     }
 
