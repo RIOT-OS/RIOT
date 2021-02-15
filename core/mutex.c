@@ -49,7 +49,9 @@ static inline __attribute__((always_inline)) void _block(mutex_t *mutex,
                                                          unsigned irq_state)
 {
     thread_t *me = thread_get_active();
-
+    /* Fail visibly even if a blocking action is called from somewhere where
+     * it's subtly not allowed, eg. board_init */
+    assert(me != NULL);
     DEBUG("PID[%" PRIkernel_pid "] mutex_lock() Adding node to mutex queue: "
           "prio: %" PRIu32 "\n", thread_getpid(), (uint32_t)me->priority);
     sched_set_status(me, STATUS_MUTEX_BLOCKED);
