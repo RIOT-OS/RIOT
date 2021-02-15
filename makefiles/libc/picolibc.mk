@@ -6,6 +6,9 @@ ifneq (,$(filter picolibc,$(USEMODULE)))
         CFLAGS += -fshort-wchar
         LINKFLAGS += -Wl,--no-wchar-size-warning
     endif
+  else
+    $(warning picolib was selected to be build but no picolib.spec could be found)
+    $(error   check your installation or build configuration.)
   endif
 endif
 
