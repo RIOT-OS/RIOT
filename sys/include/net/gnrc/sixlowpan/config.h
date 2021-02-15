@@ -383,6 +383,17 @@ extern "C" {
 #ifndef CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
 #define CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN        2U
 #endif
+
+/**
+ * @brief   Deactivate automatic handling of ARQ timer
+ *
+ * This requires an external source (e.g. a test application) to call
+ * @ref gnrc_sixlowpan_frag_sfr_arq_timeout() for
+ * @ref net_gnrc_sixlowpan_frag_sfr to still work properly.
+ */
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_MOCK_ARQ_TIMER
+#define CONFIG_GNRC_SIXLOWPAN_SFR_MOCK_ARQ_TIMER        0U
+#endif
 /** @} */
 
 /**
