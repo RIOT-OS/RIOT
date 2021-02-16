@@ -25,8 +25,8 @@ tests/mtd_mapper tests/driver_o* tests/driver_p* tests/driver_q*
 tests/driver_r* tests/driver_s* tests/driver_t* tests/driver_u*
 tests/driver_v*"}
 : ${TEST_KCONFIG_native:="examples/hello-world tests/periph_* tests/sys_crypto
-tests/test_tools tests/prng_* tests/xtimer_* tests/ztimer_* tests/driver_ws281x
-tests/posix_sleep"}
+tests/prng_* tests/xtimer_* tests/ztimer_* tests/driver_ws281x
+tests/posix_sleep tests/pkg_umorse"}
 
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/driver_at86rf2xx_aes"}
 
