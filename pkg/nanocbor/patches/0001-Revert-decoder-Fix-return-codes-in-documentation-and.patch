@@ -1,0 +1,92 @@
+From 78648e735260f179767e0767b4dbc33a9db48d06 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benpicco@googlemail.com>
+Date: Tue, 23 Feb 2021 11:22:31 +0100
+Subject: [PATCH] Revert "decoder: Fix return codes in documentation and code"
+
+This reverts commit 349a340491ce67d8fc7d230e33befbf08d2a1690.
+---
+ include/nanocbor/nanocbor.h |  6 +++---
+ src/decoder.c               | 14 ++++++--------
+ 2 files changed, 9 insertions(+), 11 deletions(-)
+
+diff --git a/include/nanocbor/nanocbor.h b/include/nanocbor/nanocbor.h
+index af994a8..bd5adc3 100644
+--- a/include/nanocbor/nanocbor.h
++++ b/include/nanocbor/nanocbor.h
+@@ -188,7 +188,7 @@ void nanocbor_decoder_init(nanocbor_value_t *value,
+  * @param[in]   value   decoder value context
+  *
+  * @return              major type
+- * @return              NANOCBOR_ERR_END if the buffer is exhausted
++ * @return              NANOCBOR_ERR_OVERFLOW if the buffer is exhausted
+  */
+ int nanocbor_get_type(const nanocbor_value_t *value);
+ 
+@@ -304,7 +304,7 @@ int nanocbor_get_int32(nanocbor_value_t *cvalue, int32_t *value);
+  * @param[out]  buf     pointer to the byte string
+  * @param[out]  len     length of the byte string
+  *
+- * @return              NANOCBOR_OK on success
++ * @return              number of bytes read
+  * @return              negative on error
+  */
+ int nanocbor_get_bstr(nanocbor_value_t *cvalue, const uint8_t **buf, size_t *len);
+@@ -319,7 +319,7 @@ int nanocbor_get_bstr(nanocbor_value_t *cvalue, const uint8_t **buf, size_t *len
+  * @param[out]  buf     pointer to the text string
+  * @param[out]  len     length of the text string
+  *
+- * @return              NANOCBOR_OK on success
++ * @return              number of bytes read
+  * @return              negative on error
+  */
+ int nanocbor_get_tstr(nanocbor_value_t *cvalue, const uint8_t **buf, size_t *len);
+diff --git a/src/decoder.c b/src/decoder.c
+index 6b69405..bffd481 100644
+--- a/src/decoder.c
++++ b/src/decoder.c
+@@ -64,7 +64,7 @@ static int _value_match_exact(nanocbor_value_t *cvalue, uint8_t val)
+     }
+     else if (*cvalue->cur == val) {
+         _advance(cvalue, 1U);
+-        res = NANOCBOR_OK;
++        res = 1; /* simple CBOR value is 1 byte */
+     }
+     return res;
+ }
+@@ -243,7 +243,6 @@ static int _get_str(nanocbor_value_t *cvalue, const uint8_t **buf, size_t *len,
+     if (res >= 0) {
+         *buf = (cvalue->cur) + res;
+         _advance(cvalue, (unsigned int)((size_t)res + *len));
+-        res = NANOCBOR_OK;
+     }
+     return res;
+ }
+@@ -280,7 +279,7 @@ static int _enter_container(nanocbor_value_t *it, nanocbor_value_t *container,
+     container->end = it->end;
+     container->remaining = 0;
+ 
+-    if (_value_match_exact(it, (uint8_t)(((unsigned)type << NANOCBOR_TYPE_OFFSET) | NANOCBOR_SIZE_INDEFINITE)) == NANOCBOR_OK) {
++    if (_value_match_exact(it, (uint8_t)(((unsigned)type << NANOCBOR_TYPE_OFFSET) | NANOCBOR_SIZE_INDEFINITE)) == 1) {
+         container->flags = NANOCBOR_DECODER_FLAG_INDEFINITE |
+                            NANOCBOR_DECODER_FLAG_CONTAINER;
+         container->cur = it->cur;
+@@ -289,12 +288,11 @@ static int _enter_container(nanocbor_value_t *it, nanocbor_value_t *container,
+ 
+     int res = _get_uint64(it, &container->remaining,
+                           NANOCBOR_SIZE_WORD, type);
+-    if (res < 0) {
+-        return res;
++    if (res > 0) {
++        container->flags = NANOCBOR_DECODER_FLAG_CONTAINER;
++        container->cur = it->cur + res;
+     }
+-    container->flags = NANOCBOR_DECODER_FLAG_CONTAINER;
+-    container->cur = it->cur + res;
+-    return NANOCBOR_OK;
++    return res;
+ }
+ 
+ int nanocbor_enter_array(nanocbor_value_t *it, nanocbor_value_t *array)
+-- 
+2.27.0
+
