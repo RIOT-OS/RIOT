@@ -21,7 +21,6 @@
 
 #include <string.h>
 #include "net/netif.h"
-#include "xtimer.h"
 #include "timex.h"
 
 #ifdef __cplusplus
