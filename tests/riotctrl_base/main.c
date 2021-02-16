@@ -16,6 +16,7 @@ static int _empty(int argc, char **argv)
 
 static const shell_command_t _shell_commands[] = {
     { "empty", "A command with empty output", _empty },
+    { NULL, NULL, NULL },
 };
 
 int main(void)
