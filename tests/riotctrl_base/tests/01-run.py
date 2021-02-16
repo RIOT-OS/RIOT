@@ -15,8 +15,10 @@ from riotctrl.shell.json import RapidJSONShellInteractionParser
 
 def test_riotctrl():
     ctrl = RIOTCtrl()
-    with ctrl.run_term(reset=True):
+    ctrl.start_term()
+    try:
         ctrl.term.logfile = sys.stdout
+        ctrl.reset()
         ctrl.term.expect(r'This is RIOT! \(Version: (.+)\)\r\n')
         version = ctrl.term.match.group(1)
         shell = ShellInteraction(ctrl)
@@ -33,6 +35,8 @@ def test_riotctrl():
             # just check if parsable
             parser.parse(line)
         assert count > 0
+    finally:
+        ctrl.stop_term()
 
 
 if __name__ == "__main__":
