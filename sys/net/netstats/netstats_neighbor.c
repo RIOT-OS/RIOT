@@ -22,6 +22,7 @@
 #include "net/l2util.h"
 #include "net/netdev.h"
 #include "net/netstats/neighbor.h"
+#include "xtimer.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
