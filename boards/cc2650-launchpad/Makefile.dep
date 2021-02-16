@@ -1,3 +1,4 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
+  USEMODULE += saul_cc26xx_cc13xx_batmon
 endif
