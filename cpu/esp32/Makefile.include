@@ -82,5 +82,3 @@ ifneq (,$(filter esp_qemu,$(USEMODULE)))
   FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin &&
   FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
 endif
-
-include $(RIOTMAKE)/arch/esp32.inc.mk

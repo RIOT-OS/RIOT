@@ -9,6 +9,14 @@ config CPU_ARCH_XTENSA
     select HAS_ARCH_32BIT
     select HAS_ARCH_ESP
 
+config CPU_ARCH_XTENSA_LX106
+    bool
+    select CPU_ARCH_XTENSA
+
+config CPU_ARCH_XTENSA_LX6
+    bool
+    select CPU_ARCH_XTENSA
+
 config CPU_COMMON_ESP
     bool
     select HAS_CPP
@@ -58,4 +66,5 @@ config HAS_ARCH_ESP
 
 ## Common CPU symbols
 config CPU_ARCH
-    default "xtensa" if CPU_ARCH_XTENSA
+    default "xtensa-lx106" if CPU_ARCH_XTENSA_LX106
+    default "xtensa-lx6" if CPU_ARCH_XTENSA_LX6
