@@ -30,14 +30,6 @@ extern "C" {
 #endif
 
 /**
- * @brief       A deprecated alias for @ref NETOPT_MAX_PDU_SIZE
- *
- * @deprecated  Please use @ref NETOPT_MAX_PDU_SIZE instead of
- *              `NETOPT_MAX_PACKET_SIZE`
- */
-#define NETOPT_MAX_PACKET_SIZE NETOPT_MAX_PDU_SIZE
-
-/**
  * @brief   Global list of configuration options available throughout the
  *          network stack, e.g. by netdev and netapi
  *
