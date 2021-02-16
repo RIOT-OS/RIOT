@@ -7,17 +7,22 @@
  */
 
 /**
+ * @ingroup     tests
  * @{
  *
  * @file
+ * @brief       Unittests for the ``flashpage`` periph driver
+ *
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ *
  */
 
 #include <errno.h>
 #include <stdint.h>
 
 #include "cpu.h"
+#include "embUnit.h"
 #include "embUnit/embUnit.h"
-#include "tests-flashpage.h"
 
 /* need to define these values before including the header */
 #ifndef FLASHPAGE_SIZE
@@ -31,6 +36,10 @@
 #undef PERIPH_FLASHPAGE_CUSTOM_PAGESIZES
 
 #include "periph/flashpage.h"
+
+#if (defined(BOARD_NATIVE) && !IS_USED(MODULE_PERIPH_FLASHPAGE))
+char _native_flash[FLASHPAGE_SIZE * FLASHPAGE_NUMOF];
+#endif
 
 static void test_flashbase_addr(void)
 {
@@ -72,8 +81,11 @@ Test *tests_flashpage_tests(void)
     return (Test *)&flashbase_tests;
 }
 
-void tests_flashpage(void)
+int main(void)
 {
+    TESTS_START();
     TESTS_RUN(tests_flashpage_tests());
+    TESTS_END();
+    return 0;
 }
 /** @} */
