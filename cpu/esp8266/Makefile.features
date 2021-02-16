@@ -1,5 +1,5 @@
-CPU_ARCH = xtensa-lx106
-CPU_FAM = esp8266
+CPU_ARCH := xtensa-lx106
+CPU_FAM := esp8266
 
 
 # MCU defined features that are provided independent on board definitions

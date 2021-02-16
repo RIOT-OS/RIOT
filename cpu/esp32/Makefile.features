@@ -1,5 +1,5 @@
-CPU_ARCH = xtensa-lx6
-CPU_FAM = esp32
+CPU_ARCH := xtensa-lx6
+CPU_FAM := esp32
 
 # MCU defined features that are provided independent on board definitions
 
