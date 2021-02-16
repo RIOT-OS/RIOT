@@ -79,7 +79,7 @@
 //#define AON_RTC_BASE            0x40092000 // AON_RTC
 #define AON_EVENT_BASE          0x40093000 // AON_EVENT
 //#define AON_IOC_BASE            0x40094000 // AON_IOC
-#define AON_BATMON_BASE         0x40095000 // AON_BATMON
+//#define AON_BATMON_BASE         0x40095000 // AON_BATMON
 #define AUX_AIODIO0_BASE        0x400C1000 // AUX_AIODIO
 #define AUX_AIODIO1_BASE        0x400C2000 // AUX_AIODIO
 #define AUX_TDC_BASE            0x400C4000 // AUX_TDC

@@ -11,10 +11,11 @@ supported by RIOT: @ref cpu_cc26x0_cc13x0, @ref cpu_cc26x2_cc13x2
 ## <a name="cc26xx_cc13xx_toc"> Table of Contents </a> &nbsp;[[TOC]](#cc26xx_cc13xx_toc)
 
 1. [Overview](#cc26xx_cc13xx_overview)
-2. [Flashing the CCFG](#cc26xx_cc13xx_ccfg)
-3. [Debugging](#cc26xx_cc13xx_debugging)
+3. [Battery Monitor](#cc26xx_cc13xx_batmon)
+4. [Flashing the CCFG](#cc26xx_cc13xx_ccfg)
+5. [Debugging](#cc26xx_cc13xx_debugging)
     1. [Using OpenOCD](#cc26xx_cc13xx_openocd)
-    1. [Using Uniflash](#cc26xx_cc13xx_uniflash)
+    2. [Using Uniflash](#cc26xx_cc13xx_uniflash)
 
 # <a name="cc26xx_cc13xx_overview"> Overview </a> &nbsp;[[TOC]](#cc26xx_cc13xx_toc)
 
@@ -33,6 +34,32 @@ and improvements on various peripherals.
 
 @note The actual flash size is the flash size minus 88 bytes, these 88 bytes are
 reserved for the CCFG, see also [Flashing the CCFG](#cc26xx_cc13xx_ccfg).
+
+# <a name="cc26xx_cc13xx_batmon"> Battery Monitor </a> &nbsp;[[TOC]](#cc26xx_cc13xx_toc)
+
+This CPU family provides the Always-On Battery Monitor peripheral which
+takes measurements of voltage and temperature of the MCU.
+
+The API is provided through SAUL and can be enabled using `saul_default` on
+LaunchPad boards or by adding `saul_cc26xx_cc13xx_batmon` as a dependency.
+This module has SAUL auto initialization capabilities.
+
+After initialization two SAUL sensors will be available:
+
+- `CC26XX_CC13XX_BAT_V` which provides the battery voltage in milli-volts.
+- `CC26XX_CC13XX_BAT_T` which provides the battery/CPU voltage in degrees Celsius.
+
+## Temperature measurement confidence
+
+The measurements of the devices are innaccurate and varies by chip. Texas
+Instruments provides a table with upper and lower bounds that provide 99%
+confidence for the measured temperatures. Values are provided in degrees Celsius.
+
+ Ambient Temperature | -40 | -30 | -20 | -10 | 0  | 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100 | 110 | 120
+:--------------------|:----|:----|:----|:----|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:----|:----|:----
+ Upper               | -28 | -20 | -12 | -3  | 7  | 17 | 26 | 36 | 46 | 56 | 65 | 75 | 85 | 95 | 105 | 115 | 125
+ Lower               | -45 | -36 | -26 | -16 | -5 | 4  | 14 | 24 | 35 | 45 | 54 | 65 | 75 | 85 | 94  | 104 | 113
+
 
 # <a name="cc26xx_cc13xx_ccfg"> Flashing the CCFG </a> &nbsp;[[TOC]](#cc26xx_cc13xx_toc)
 
