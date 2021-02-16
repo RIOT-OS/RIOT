@@ -860,6 +860,62 @@ ISR(TRX24_TX_START_vect){
 #endif
 
 /**
+ * @brief  Transceiver PLL Lock
+ *
+ *  Is triggered when PLL locked successfully.
+ *
+ * Manual p. 40
+ */
+ISR(TRX24_PLL_LOCK_vect, ISR_BLOCK)
+{
+    avr8_enter_isr();
+
+    DEBUG("TRX24_PLL_LOCK\n");
+    ((at86rf2xx_t *)at86rfmega_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__PLL_LOCK;
+
+    avr8_exit_isr();
+}
+
+/**
+ * @brief  Transceiver PLL Unlock
+ *
+ *  Is triggered when PLL unlocked unexpectedly.
+ *
+ * Manual p. 89
+ */
+ISR(TRX24_PLL_UNLOCK_vect, ISR_BLOCK)
+{
+    avr8_enter_isr();
+
+    DEBUG("TRX24_PLL_UNLOCK\n");
+    ((at86rf2xx_t *)at86rfmega_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__PLL_UNLOCK;
+
+    avr8_exit_isr();
+}
+
+/**
+ * @brief ISR for transceiver's receive start interrupt
+ *
+ *  Is triggered when valid PHR is detected.
+ *  Save IRQ status and inform upper layer of data reception.
+ *
+ * Flow Diagram Manual p. 52 / 63
+ */
+ISR(TRX24_RX_START_vect, ISR_BLOCK)
+{
+    avr8_enter_isr();
+
+    uint8_t status = *AT86RF2XX_REG__TRX_STATE & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS;
+    DEBUG("TRX24_RX_START 0x%x\n", status);
+
+    ((at86rf2xx_t *)at86rfmega_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__RX_START;
+    /* Call upper layer to process valid PHR */
+    netdev_trigger_event_isr(at86rfmega_dev);
+
+    avr8_exit_isr();
+}
+
+/**
  * @brief ISR for transceiver's receive end interrupt
  *
  *  Is triggered when valid data is received. FCS check passed.
@@ -877,6 +933,23 @@ ISR(TRX24_RX_END_vect, ISR_BLOCK)
     ((at86rf2xx_t *)at86rfmega_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__RX_END;
     /* Call upper layer to process received data */
     netdev_trigger_event_isr(at86rfmega_dev);
+
+    avr8_exit_isr();
+}
+
+/**
+ * @brief  Transceiver CCAED Measurement finished
+ *
+ *  Is triggered when CCA or ED measurement completed.
+ *
+ * Manual p. 74 and p. 76
+ */
+ISR(TRX24_CCA_ED_DONE_vect, ISR_BLOCK)
+{
+    avr8_enter_isr();
+
+    DEBUG("TRX24_CCA_ED_DONE\n");
+    ((at86rf2xx_t *)at86rfmega_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__CCA_ED_DONE;
 
     avr8_exit_isr();
 }
@@ -922,6 +995,27 @@ ISR(TRX24_TX_END_vect, ISR_BLOCK)
         /* Call upper layer to process if data was send successful */
         netdev_trigger_event_isr(at86rfmega_dev);
     }
+
+    avr8_exit_isr();
+}
+
+/**
+ * @brief ISR for transceiver's wakeup finished interrupt
+ *
+ *  Is triggered when transceiver module reset is finished.
+ *  Save IRQ status and inform upper layer the transceiver is operational.
+ *
+ * Manual p. 40
+ */
+ISR(TRX24_AWAKE_vect, ISR_BLOCK)
+{
+    avr8_enter_isr();
+
+    DEBUG("TRX24_AWAKE\n");
+
+    ((at86rf2xx_t *)at86rfmega_dev)->irq_status |= AT86RF2XX_IRQ_STATUS_MASK__AWAKE;
+    /* Call upper layer to process transceiver wakeup finished */
+    netdev_trigger_event_isr(at86rfmega_dev);
 
     avr8_exit_isr();
 }
