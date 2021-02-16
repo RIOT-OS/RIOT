@@ -39,6 +39,10 @@ void saul_init_devs(void)
         extern void auto_init_saul_pwm(void);
         auto_init_saul_pwm();
     }
+    if (IS_USED(MODULE_SAUL_CC26XX_CC13XX_BATMON)) {
+        extern void auto_init_cc26xx_cc13xx_batmon(void);
+        auto_init_cc26xx_cc13xx_batmon();
+    }
     if (IS_USED(MODULE_SAUL_NRF_TEMPERATURE)) {
         extern void auto_init_nrf_temperature(void);
         auto_init_nrf_temperature();
