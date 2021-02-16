@@ -8,5 +8,9 @@ else ifeq (openocd,$(PROGRAMMER))
   DEBUG_ADAPTER = dap
 endif
 
+ifneq (,$(filter microbit,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBOARD)/common/microbit/include
+endif
+
 # include nrf52 boards common configuration
 include $(RIOTBOARD)/common/nrf52/Makefile.include
