@@ -59,7 +59,7 @@ static int _get_netdev_proto(netdev_t *netdev, void *value, size_t max_len)
     return sizeof(gnrc_nettype_t);
 }
 
-int _get_max_packet_size(netdev_t *dev, void *value, size_t max_len)
+int _get_max_pdu_size(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
     assert(max_len == sizeof(uint16_t));
@@ -104,8 +104,8 @@ void _tests_init(void)
                            _get_device_type);
     netdev_test_set_get_cb(&_mock_netdev, NETOPT_PROTO,
                            _get_netdev_proto);
-    netdev_test_set_get_cb(&_mock_netdev, NETOPT_MAX_PACKET_SIZE,
-                           _get_max_packet_size);
+    netdev_test_set_get_cb(&_mock_netdev, NETOPT_MAX_PDU_SIZE,
+                           _get_max_pdu_size);
     netdev_test_set_get_cb(&_mock_netdev, NETOPT_SRC_LEN,
                            _get_src_len);
     netdev_test_set_get_cb(&_mock_netdev, NETOPT_ADDRESS_LONG,
