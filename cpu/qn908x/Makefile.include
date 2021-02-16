@@ -35,5 +35,3 @@ CFLAGS += \
 # include path here.
 PSEUDOMODULES += vendor_%
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include/vendor
-
-include $(RIOTMAKE)/arch/cortexm.inc.mk

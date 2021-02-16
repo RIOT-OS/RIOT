@@ -22,5 +22,3 @@ ifneq (,$(ITIM_START_ADDR))
 endif
 
 LINKER_SCRIPT ?= riscv.ld
-
-include $(RIOTMAKE)/arch/riscv.inc.mk

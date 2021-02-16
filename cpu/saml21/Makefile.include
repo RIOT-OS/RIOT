@@ -19,4 +19,3 @@ ifneq (,$(filter saml21j18b saml21j18a samr30g18a samr34j18b,$(CPU_MODEL)))
 endif
 
 include $(RIOTCPU)/sam0_common/Makefile.include
-include $(RIOTMAKE)/arch/cortexm.inc.mk

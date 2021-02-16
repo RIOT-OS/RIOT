@@ -1,3 +1,5 @@
+CPU_ARCH := native
+
 ifeq (FreeBSD,$(OS))
   DISABLE_LIBSTDCPP ?= 1
 endif

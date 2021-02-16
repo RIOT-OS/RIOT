@@ -42,5 +42,3 @@ LINKER_SCRIPT ?= cc2538.ld
 ifneq (,$(filter riotboot,$(FEATURES_USED)))
   CFLAGS += -DUPDATE_CCA=0
 endif
-
-include $(RIOTMAKE)/arch/cortexm.inc.mk

@@ -36,5 +36,3 @@ CFLAGS += \
   -DKINETIS_SUBFAMILY=$(KINETIS_SUBFAMILY) \
   -DKINETIS_ROMSIZE=$(KINETIS_ROMSIZE) \
   #
-
-include $(RIOTMAKE)/arch/cortexm.inc.mk
