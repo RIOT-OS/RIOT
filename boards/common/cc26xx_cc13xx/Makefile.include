@@ -1,5 +1,8 @@
 # configure the flash tool
 PROGRAMMER ?= uniflash
 
+# uniflash and openocd programmers are supported
+PROGRAMMERS_SUPPORTED += openocd uniflash
+
 OPENOCD_CONFIG ?= $(RIOTBOARD)/common/cc26xx_cc13xx/dist/openocd.cfg
 UNIFLASH_CONFIG ?= $(RIOTBOARD)/common/cc26xx_cc13xx/dist
