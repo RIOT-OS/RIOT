@@ -116,8 +116,7 @@ extern "C" {
 #define FLASHPAGE_SIZE                  (128U)
 #endif
 
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1) || \
-    defined(CPU_FAM_STM32L4)
+#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
 #define FLASHPAGE_ERASE_STATE           (0x00U)
 #endif
 
@@ -187,7 +186,6 @@ extern "C" {
 #endif
 
 #endif
-
 
 /* The minimum block size which can be written depends on the family.
  * However, the erase block is always FLASHPAGE_SIZE.
