@@ -20,7 +20,7 @@ if KCONFIG_USEMODULE_SHELL
 
 config SHELL_SHUTDOWN_ON_EXIT
     bool "Shutdown RIOT on shell exit"
-    default y if CPU_NATIVE
+    default y if HAS_CPU_NATIVE
     help
         Some systems (e.g Ubuntu 20.04) close stdin on CTRL-D / EOF
         That means we can't just re-start the shell.
