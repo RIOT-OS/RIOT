@@ -2,94 +2,75 @@
 @defgroup        boards_cc1352p_launchpad TI CC1352P LaunchPad
 @ingroup         boards
 @brief           Texas Instruments SimpleLink(TM) CC1352P Wireless MCU LaunchPad(TM) Kit
-*/
 
-## Overview
+## <a name="cc1352p_launchpad_toc"> Table of Contents </a> &nbsp;[[TOC]](#cc1352p_launchpad_toc)
+
+1. [Overview](#cc1352p_launchpad_overview)
+2. [Hardware](#cc1352p_launchpad_hardware)
+3. [Board pinout](#cc1352p_launcpad_pinout)
+4. [Flashing the Device](#cc1352p_launchpad_flashing)
+
+## <a name="cc1352p_launchpad_overview"> Overview </a> &nbsp;[[TOC]](#cc1352p_launchpad_toc)
 
 The [LAUNCHXL-CC1352P](http://www.ti.com/tool/LAUNCHXL-CC1352P) is a Texas
 Instrument's development kit for the CC1352P SoC which combines dual-band wireless MCU
 with integrated power amplifier.
 
-## Hardware
+## <a name="cc1352p_launchpad_hardware"> Hardware </a> &nbsp;[[TOC]](#cc1352p_launchpad_toc)
 
 ![LAUNCHPAD-CC1352P](http://www.ti.com/diagrams/launchxl-cc1352p_launchxl-cc1352p_mcu041a_cc1352p1.jpg)
+
+| MCU               | CC1352R1              |
+|:----------------- |:--------------------- |
+| Family            | ARM Cortex-M4F        |
+| Vendor            | Texas Instruments     |
+| RAM               | 80KiB                 |
+| Flash             | 352KiB                |
+| Frequency         | 48MHz                 |
+| FPU               | yes                   |
+| Timers            | 4                     |
+| ADCs              | 1x 12-bit (channels)  |
+| UARTs             | 2                     |
+| SPIs              | 2                     |
+| I2Cs              | 1                     |
+| Vcc               | 1.8V - 3.8V           |
+| Datasheet         | [Datasheet](http://www.ti.com/lit/ds/symlink/cc1352p.pdf) (pdf file) |
+| Reference Manual  | [Reference Manual](http://www.ti.com/lit/ug/swcu185d/swcu185d.pdf) |
 
 The board comes in two variants with different RF matching network on the 20 dBm PA output port:
 
 - LAUNCHXL-CC1352P1: 868/915 MHz up to 20 dBm, 2.4 GHz up to 5 dBm
 - LAUNCHXL-CC1352P-2: 868/915 MHz up to 14 dBm, 2.4 GHz up to 20 dBm.
 
-For a more detailed information, please check out the [CC1352P datasheet](http://www.ti.com/lit/ds/swrs192c/swrs192c.pdf) or the [quick start guide](http://www.ti.com/lit/ug/swau108a/swau108a.pdf)
+## <a name="cc1352p_launchpad_pinout"> Board pinout </a> &nbsp;[[TOC]](#cc1352p_launchpad_toc)
 
-## Flashing and Debugging
+The [LAUNCHXL-CC1352P1 Quick Start Guide](https://www.ti.com/lit/ug/swau108a/swau108a.pdf)
+provides the default pinout for the board.
 
-The LAUNCHXL-CC1352P comes with an XDS110 on-board debug probe that provides
-programming, flashing and debugging capabilities.
+## <a name="cc1352p_launchpad_flashing"> Flashing the Device </a> &nbsp;[[TOC]](#cc1352p_launchpad_toc)
 
-### TI Code Composer Studio _CCS_
-
-The TI's [Code Composer Studio _CCS_](http://www.ti.com/tool/CCSTUDIO) is an Integrated Development Environment which provides the necessary tools to use the debug features of the XDS110.
-
-### Uniflash
-
-[Uniflash](http://www.ti.com/tool/UNIFLASH) is a standalone flash tool for TI MCUs, Sitara Processors & SimpleLink devices.
-
-#### Setting up the environment
-
-In order to make use of the programming and debugging capabilities of the XDS110 some environment variable needs to be set:
+Flashing RIOT is quite straight forward. The board comes with an XDS110 on-board
+debug probe that provides programming, flashing and debugging capabilities
+through the USB Micro-USB connector. Once either TI Uniflash or OpenOCD are
+installed just connect the board using the Micro-USB port to your computer and
+type:
 
 ```
-export CCS_PATH=<path to ti install folder>/ti/ccs930
-export UNIFLASH_PATH<path to ti install folder>/ti/uniflash_5.2.0
+make flash BOARD=cc1352p-launchpad
 ```
 
-That assumes you have CCS 9.3.0 (for the path name) and Uniflash 5.2.0, adjust
-accordingly.
-
-After that you can flash using the RIOT `make flash` command on your application
-or to debug you first start the debug server:
-
-```
-make debug-server
-```
-
-And then on another terminal you can run:
-
-```
-make debug
-```
-
-It will open GDB and connect to the debug server automatically.
-
-### Using OpenOCD
-
-To use OpenOCD with the XDS110 you need to use the an special version of
-OpenOCD made by TI (upstream version is not _yet_ compatible). You can
-clone and compile it from source:
-
-```
-# Clone into the openocd-ti folder
-git clone https://git.ti.com/cgit/sdo-emu/openocd openocd-ti
-
-# Change directory to the openocd source code
-cd openocd-ti/openocd
-
-# Configure, build, install
-./configure
-make
-sudo make install
-```
-
-#### Setting up the environment
-
-Now that we have the TI version of OpenOCD we need to export the `PROGRAMMER`
-environment variable, this is to enable OpenOCD instead of Uniflash.
+To use OpenOCD instead of uniflash we need to set the `PROGRAMMER` environment
+variable, this is to enable OpenOCD instead of Uniflash.
 
 ```
 export PROGRAMMER=openocd
 ```
 
-Now we can just do `make debug-server` and then `make debug`, this all using
-OpenOCD.
+Now we can just do `make flash` and `make debug`, this all using OpenOCD.
+
+For detailed information about CC1312 MCUs as well as configuring, compiling
+RIOT and installation of flashing tools for CC1312 boards,
+see \ref cc26xx_cc13xx_riot.
+
 
 */
