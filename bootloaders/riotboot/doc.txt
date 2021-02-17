@@ -107,7 +107,7 @@ flash` if the `riotboot` feature is used.
 
 ## Testing riotboot
 
-See [tests/riotboot/README.md](https://github.com/RIOT-OS/RIOT/blob/master/tests/riotboot/README.md).
+See <a href="https://github.com/RIOT-OS/RIOT/blob/master/tests/riotboot/README.md">tests/riotboot/README.md</a>.
 
 # Quick riotboot porting guide
 
