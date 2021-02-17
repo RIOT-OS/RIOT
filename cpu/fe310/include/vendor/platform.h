@@ -3,10 +3,6 @@
 #ifndef _SIFIVE_PLATFORM_H
 #define _SIFIVE_PLATFORM_H
 
-// Some things missing from the official encoding.h
-#define MCAUSE_INT         0x80000000
-#define MCAUSE_CAUSE       0x7FFFFFFF
-
 
 
 #include "vendor/aon.h"
