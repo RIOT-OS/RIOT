@@ -31,6 +31,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     samd10-xmini \
     saml10-xpro \
     saml11-xpro \
+    seeedstudio-gd32 \
     slstk3400a \
     spark-core \
     stk3200 \
