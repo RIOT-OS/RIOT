@@ -5,7 +5,10 @@
  * General Public License v2.1. See the file LICENSE in the top level
  * directory for more details.
  */
-    .section .init
+#include "vendor/riscv_csr.h"
+
+.section .init
+
     .globl _start
     .type _start,@function
 
@@ -14,6 +17,15 @@ _start:
     .cfi_undefined ra
 .option push
 .option norelax
+    csrc CSR_MSTATUS, MSTATUS_MIE
+    la a0, _start
+    li a1, ROM_START_ADDR
+    bleu a1, a0, _start_real
+    la a0, _start_real
+    add a0, a0, a1
+    jr a0
+
+_start_real:
     la gp, __global_pointer$
 .option pop
     la sp, _sp
