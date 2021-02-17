@@ -232,7 +232,10 @@ nrf24l01p_ng_ard_t nrf24l01p_ng_valtoe_ard(uint16_t retr_delay)
     if (retr_delay >= 4000) {
         return NRF24L01P_NG_ARD_4000US;
     }
-    return (nrf24l01p_ng_ard_t)(retr_delay / 250);
+    if (retr_delay < 250) {
+        return NRF24L01P_NG_ARD_250US;
+    }
+    return (nrf24l01p_ng_ard_t)((retr_delay / 250) - 1);
 }
 
 /**

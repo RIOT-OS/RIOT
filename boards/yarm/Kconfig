@@ -11,6 +11,7 @@ config BOARD_YARM
     bool
     default y
     select CPU_MODEL_SAML21J18B
+    select HAS_HIGHLEVEL_STDIO
     select HAS_PERIPH_ADC
     select HAS_PERIPH_I2C
     select HAS_PERIPH_RTC
