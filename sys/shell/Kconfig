@@ -5,6 +5,19 @@
 # directory for more details.
 #
 
+if !TEST_KCONFIG
+
+menuconfig KCONFIG_USEMODULE_SHELL
+    bool "Configure the Shell interpreter"
+    depends on USEMODULE_SHELL
+
+if KCONFIG_USEMODULE_SHELL
+rsource "Kconfig.config"
+endif # KCONFIG_USEMODULE_SHELL
+
+endif # !TEST_KCONFIG
+
+if TEST_KCONFIG
 menuconfig MODULE_SHELL
     bool "Shell interpreter"
     select MODULE_STDIN
@@ -12,25 +25,8 @@ menuconfig MODULE_SHELL
 
 rsource "commands/Kconfig"
 
-menuconfig KCONFIG_USEMODULE_SHELL
-    bool "Configure the Shell interpreter"
-    depends on USEMODULE_SHELL
+if MODULE_SHELL
+rsource "Kconfig.config"
+endif
 
-if KCONFIG_USEMODULE_SHELL
-
-config SHELL_SHUTDOWN_ON_EXIT
-    bool "Shutdown RIOT on shell exit"
-    default y if HAS_CPU_NATIVE
-    help
-        Some systems (e.g Ubuntu 20.04) close stdin on CTRL-D / EOF
-        That means we can't just re-start the shell.
-        Instead terminate RIOT, which is also the behavior a user would expect
-        from a CLI application.
-
-config SHELL_NO_ECHO
-    bool "Disable echo"
-
-config SHELL_NO_PROMPT
-    bool "Disable prompt"
-
-endif # KCONFIG_USEMODULE_SHELL
+endif # TEST_KCONFIG
