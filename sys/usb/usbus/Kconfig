@@ -44,5 +44,6 @@ endchoice
 
 rsource "cdc/Kconfig"
 rsource "dfu/Kconfig"
+rsource "msc/Kconfig"
 
 endif # KCONFIG_USEMODULE_USBUS

@@ -1,0 +1,33 @@
+# Copyright (c) 2021 Mesotic SAS
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_USEMODULE_USBUS_MSC
+    bool "Configure USBUS MSC"
+    depends on USEMODULE_USBUS_MSC
+    help
+        Configure the USBUS MSC module via Kconfig.
+
+if KCONFIG_USEMODULE_USBUS_MSC
+
+USBUS_MSC_BUFFER_SIZE
+
+config USBUS_MSC_BUFFER_SIZE
+    int "Buffer size for storing a flash page"
+    default 512
+
+config USBUS_MSC_VENDOR_ID
+    string "MSC Vendor ID"
+    default "RIOT-OS"
+
+config USBUS_MSC_PRODUCT_ID
+    string "MSC Product ID"
+    default "RIOT_MSC_DISK"
+
+config USBUS_MSC_PRODUCT_REV
+    string "MSC Product Revision"
+    default "1.0"
+
+endif # KCONFIG_USEMODULE_USBUS_MSC
