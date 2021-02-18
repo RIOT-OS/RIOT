@@ -12,7 +12,7 @@ ifeq (uf2conv,$(PROGRAMMER))
   ROM_OFFSET = 0x1000
   ROM_LEN    = 0xf3000
 
-  FFLAGS_OPTS = -f 0xADA52840
+  UF2CONV_FLAGS = -f 0xADA52840
   include $(RIOTMAKE)/tools/usb_board_reset.mk
 endif
 
