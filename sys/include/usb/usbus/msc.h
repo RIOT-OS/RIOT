@@ -30,10 +30,6 @@
 extern "C" {
 #endif
 
-#ifndef USBUS_MSC_BLOCK_NUM
-#define USBUS_MSC_BLOCK_NUM 1
-#endif /* USBUS_MSC_BLOCK_NUM */
-
 #ifndef USBUS_MSC_BUFFER_SIZE
 #define USBUS_MSC_BUFFER_SIZE 512
 #endif /* USBUS_MSC_BUFFER_SIZE */
