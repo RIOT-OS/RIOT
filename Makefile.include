@@ -416,6 +416,10 @@ TOOLCHAINS_SUPPORTED ?= gnu
 # Import all toolchain settings
 include $(RIOTMAKE)/toolchain/$(TOOLCHAIN).inc.mk
 
+# Append ldscript path after importing CPU and board makefiles to allow
+# overriding the core ldscripts
+LINKFLAGS += -L$(RIOTBASE)/core/ldscripts
+
 # Tell ccache to pass the original file to the compiler, instead of passing the
 # preprocessed code. Without this setting, the compilation will fail with
 # -Wimplicit-fallthrough warnings even when the fall through case is properly

@@ -158,6 +158,7 @@ SECTIONS
     _data_start = ABSOLUTE(.);
     *(.data)
     *(.data.*)
+    KEEP (*(SORT(.xfa.*)))
     *(.gnu.linkonce.d.*)
     *(.data1)
     *(.sdata)
@@ -243,6 +244,7 @@ SECTIONS
     _rodata_start = ABSOLUTE(.);
     *(.rodata)
     *(.rodata.*)
+    KEEP (*(SORT(.roxfa.*)))
     *(.irom1.text) /* catch stray ICACHE_RODATA_ATTR */
     *(.gnu.linkonce.r.*)
     *(.rodata1)

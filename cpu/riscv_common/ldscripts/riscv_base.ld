@@ -61,6 +61,7 @@ SECTIONS
     *(.rdata)
     *(.rodata .rodata.*)
     *(.gnu.linkonce.r.*)
+    KEEP (*(SORT(.roxfa.*)))
   } >flash AT>flash :flash
 
   . = ALIGN(4);
@@ -182,6 +183,7 @@ SECTIONS
     *(.srodata.cst4)
     *(.srodata.cst2)
     *(.srodata .srodata.*)
+    KEEP (*(SORT(.xfa.*)))
   } >ram AT>flash :ram_init
 
   . = ALIGN(4);

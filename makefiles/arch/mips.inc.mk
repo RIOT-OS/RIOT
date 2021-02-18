@@ -64,6 +64,9 @@ LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT)
 LINKFLAGS += -Wl,--gc-sections
 
+# XFA support
+LINKFLAGS += -T$(RIOTCPU)/mips_pic32_common/ldscripts/xfa.ld
+
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-truncation
 OPTIONAL_CFLAGS_BLACKLIST += -gz
