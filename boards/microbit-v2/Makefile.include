@@ -3,7 +3,7 @@ PROGRAMMER ?= openocd
 ifeq (pyocd,$(PROGRAMMER))
   # The board is not recognized automatically by pyocd, so the CPU target
   # option is passed explicitly
-  FLASH_TARGET_TYPE ?= -t $(CPU)
+  PYOCD_FLASH_TARGET_TYPE ?= -t $(CPU)
 else ifeq (openocd,$(PROGRAMMER))
   OPENOCD_DEBUG_ADAPTER = dap
 endif

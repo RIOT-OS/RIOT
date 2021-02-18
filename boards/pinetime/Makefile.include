@@ -3,7 +3,7 @@ RIOT_TERMINAL ?= jlink
 
 # define pyocd as programmer to program with stlink
 ifeq (pyocd,$(PROGRAMMER))
-  FLASH_TARGET_TYPE ?= -t $(CPU)
+  PYOCD_FLASH_TARGET_TYPE ?= -t $(CPU)
 endif
 
 # use shared Makefile.include

@@ -12,7 +12,7 @@
 #
 #               options:
 #               <hex_file>:   Filename of the hex file that will be flashed
-#               FLASH_TARGET_TYPE: CPU target type (nrf52, nrf51, etc)
+#               PYOCD_FLASH_TARGET_TYPE: CPU target type (nrf52, nrf51, etc)
 #
 # debug:        debug <elfile>
 #               starts pyocd-gdbserver as GDB server in the background and
@@ -71,7 +71,7 @@
 : ${DBG_FLAGS:=${DBG_DEFAULT_FLAGS} ${DBG_EXTRA_FLAGS}}
 # CPU Target type.
 # Use `-t` followed by value. Example: -t nrf51
-: ${FLASH_TARGET_TYPE:=}
+: ${PYOCD_FLASH_TARGET_TYPE:=}
 # This is an optional offset to the base address that can be used to flash an
 # image in a different location than it is linked at. This feature can be useful
 # when flashing images for firmware swapping/remapping boot loaders.
@@ -126,7 +126,7 @@ do_flash() {
     fi
 
     # flash device
-    sh -c "${PYOCD_FLASH} ${FLASH_TARGET_TYPE} ${PYOCD_ADAPTER_INIT} -a ${IMAGE_OFFSET} \"${HEX_FILE}\"" &&
+    sh -c "${PYOCD_FLASH} ${PYOCD_FLASH_TARGET_TYPE} ${PYOCD_ADAPTER_INIT} -a ${IMAGE_OFFSET} \"${HEX_FILE}\"" &&
     echo 'Done flashing'
 }
 
@@ -148,7 +148,7 @@ do_debug() {
     trap '' INT
     # start PyOCD as GDB server
     ${SETSID} sh -c "${PYOCD_GDBSERVER} \
-            ${FLASH_TARGET_TYPE} \
+            ${PYOCD_FLASH_TARGET_TYPE} \
             ${PYOCD_ADAPTER_INIT} \
             -p ${GDB_PORT} \
             -T ${TELNET_PORT} & \
@@ -166,7 +166,7 @@ do_debug() {
 do_debugserver() {
     # start PyOCD as GDB server
     sh -c "${PYOCD_GDBSERVER} \
-            ${FLASH_TARGET_TYPE} \
+            ${PYOCD_FLASH_TARGET_TYPE} \
             ${PYOCD_ADAPTER_INIT} \
             -p ${GDB_PORT} \
             -T ${TELNET_PORT}"
@@ -174,7 +174,7 @@ do_debugserver() {
 
 do_reset() {
     # start PyOCD and invoke board reset
-    sh -c "${PYOCD_CMD} cmd -c reset ${FLASH_TARGET_TYPE} ${PYOCD_ADAPTER_INIT}"
+    sh -c "${PYOCD_CMD} cmd -c reset ${PYOCD_FLASH_TARGET_TYPE} ${PYOCD_ADAPTER_INIT}"
 }
 
 #
