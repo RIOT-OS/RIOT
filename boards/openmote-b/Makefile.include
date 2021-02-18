@@ -6,7 +6,7 @@ PROGRAMMER ?= cc2538-bsl
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
   FLASHFILE ?= $(HEXFILE)
-  FFLAGS_OPTS ?= --bootloader-invert-lines
+  CC2538_BSL_FLAGS_OPTS ?= --bootloader-invert-lines
 endif
 
 include $(RIOTBOARD)/common/cc2538/Makefile.include
