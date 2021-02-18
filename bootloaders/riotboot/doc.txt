@@ -1,3 +1,7 @@
+/**
+@defgroup    bootloader_riotboot riotboot
+@ingroup     bootloaders
+
 # Overview
 This folder contains a simple bootloader called "riotboot".
 A header with metadata of length `RIOTBOOT_HDR_LEN` precedes
@@ -48,7 +52,7 @@ no image will be booted and the bootloader will enter `while(1);` endless loop.
 # Requirements
 Try to compile and run tests/riotboot:
 
-$ BOARD=<board> make -C tests/riotboot flash test
+    $ BOARD=<board> make -C tests/riotboot flash test
 
 If the test succeeds, your board is supported. Else you can try to port
 riotboot to your board (see the below porting guide).
@@ -103,7 +107,7 @@ flash` if the `riotboot` feature is used.
 
 ## Testing riotboot
 
-See [tests/riotboot/README.md](https://github.com/RIOT-OS/RIOT/blob/master/tests/riotboot/README.md).
+See <a href="https://github.com/RIOT-OS/RIOT/blob/master/tests/riotboot/README.md">tests/riotboot/README.md</a>.
 
 # Quick riotboot porting guide
 
@@ -151,3 +155,5 @@ offset and a defined firmware size. To get an idea look at
 Additional remarks:
 
 - If your are in Big-Endian, you may need to further adapt some part of the code.
+
+*/

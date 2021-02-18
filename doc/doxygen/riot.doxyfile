@@ -757,6 +757,7 @@ INPUT                  = ../../doc.txt \
                          ../../core \
                          ../../cpu \
                          ../../boards \
+                         ../../bootloaders \
                          ../../drivers \
                          ../../pkg \
                          ../../sys \
