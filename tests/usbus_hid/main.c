@@ -26,7 +26,7 @@
 
 /*
    this descriptor is used, because the basic usb_hid interface was developed in
-   conjunction with FIDO2. Descriptor is taken from CTAP2 specification
+   conjunction with FIDO2. Descriptor is taken from CTAP specification
    (version 20190130) section 8.1.8.2
  */
 static const uint8_t report_desc_ctap[] = {

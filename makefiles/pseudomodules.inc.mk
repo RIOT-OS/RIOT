@@ -37,6 +37,7 @@ PSEUDOMODULES += evtimer_mbox
 PSEUDOMODULES += evtimer_on_ztimer
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gcoap_dtls
+PSEUDOMODULES += fido2_tests
 PSEUDOMODULES += gnrc_dhcpv6_%
 PSEUDOMODULES += gnrc_ipv6_default
 PSEUDOMODULES += gnrc_ipv6_ext_frag_stats
