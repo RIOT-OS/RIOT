@@ -113,13 +113,14 @@ static void _xfer_data( usbus_msc_device_t *msc)
                           0, MTD_MSC->page_size * msc->pages_per_vpage);
         }
         /* Prepare endpoint buffer */
-        memcpy(msc->ep_in->ep->buf, &msc->buffer[msc->block_offset], 64);
+        memcpy(msc->ep_in->ep->buf, &msc->buffer[msc->block_offset],
+               msc->ep_in->ep->len);
         /* Data prepared, signal ready to usbus */
-        usbdev_ep_ready(msc->ep_in->ep, 64);
+        usbdev_ep_ready(msc->ep_in->ep, msc->ep_in->ep->len);
         /* Update offset for page buffer */
-        msc->block_offset += 64;
+        msc->block_offset += msc->ep_in->ep->len;
         /* Decrement whole len */
-        msc->cmd.len -= 64;
+        msc->cmd.len -= msc->ep_in->ep->len;
         /* whole buffer is empty, point to new block if any */
         if (msc->block_offset >= (MTD_MSC->page_size * msc->pages_per_vpage)) {
             msc->block_offset = 0;
