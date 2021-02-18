@@ -1,7 +1,7 @@
 MODULE = board
 
 ifneq (,$(filter microbit,$(USEMODULE)))
-  DIRS += microbit
+  DIRS += $(RIOTBOARD)/common/microbit
 endif
 
 include $(RIOTBASE)/Makefile.base

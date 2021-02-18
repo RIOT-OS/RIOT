@@ -11,5 +11,9 @@ endif
 # QEMU 4.0 added microbit system emulation.
 RIOT_EMULATOR ?= qemu
 
+ifneq (,$(filter microbit,$(USEMODULE)))
+  INCLUDES += -I$(RIOTBOARD)/common/microbit/include
+endif
+
 # include nrf51 boards common configuration
 include $(RIOTBOARD)/common/nrf51/Makefile.include
