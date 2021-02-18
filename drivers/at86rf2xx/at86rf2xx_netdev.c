@@ -667,7 +667,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
 #endif /* MODULE_NETDEV_IEEE802154_OQPSK */
 
-#if IS_USED(MODULE_AT86RF2XX_COMMON_AES_SPI) && \
+#if IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
     IS_USED(MODULE_IEEE802154_SECURITY)
         case NETOPT_ENCRYPTION_KEY:
             assert(len >= IEEE802154_SEC_KEY_LENGTH);
