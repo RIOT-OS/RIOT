@@ -47,11 +47,13 @@ int riotboot_flashwrite_init_raw(riotboot_flashwrite_t *state, int target_slot,
 #ifdef FLASHPAGE_SIZE
     assert(offset <= FLASHPAGE_SIZE);
     /* the flashpage size must be a multiple of the riotboot flashpage buffer */
-    static_assert(!(FLASHPAGE_SIZE % RIOTBOOT_FLASHPAGE_BUFFER_SIZE));
+    static_assert(!(FLASHPAGE_SIZE % RIOTBOOT_FLASHPAGE_BUFFER_SIZE),
+                  "Flashpage size must be a multiple of riotboot flashpage buffer.");
 #else
     /* The flashpage buffer must be a multiple of the write block size */
     static_assert(!(RIOTBOOT_FLASHPAGE_BUFFER_SIZE %
-                    FLASHPAGE_WRITE_BLOCK_SIZE));
+                    FLASHPAGE_WRITE_BLOCK_SIZE),
+                  "Flashpage buffer must be a multiple of write block size.");
 #endif
 
 
