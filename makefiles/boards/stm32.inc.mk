@@ -13,19 +13,15 @@ ifeq (bmp,$(PROGRAMMER))
   PORT_DARWIN ?= $(wordlist 2, 2, $(sort $(wildcard /dev/tty.usbmodem*)))
 endif
 
-ifeq (openocd,$(PROGRAMMER))
-  # STM32 boards can become un-flashable after a hardfault,
-  # use connect_assert_srst to always be able to flash or reset the boards.
-  OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
+# STM32 boards can become un-flashable after a hardfault,
+# use connect_assert_srst to always be able to flash or reset the boards.
+OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
-  # For STM32 boards the ST-link adapter is the default adapter, e.g. all
-  # Nucleo boards have an on-board ST-link adapter
-  OPENOCD_DEBUG_ADAPTER ?= stlink
-endif
+# For STM32 boards the ST-link adapter is the default adapter, e.g. all
+# Nucleo boards have an on-board ST-link adapter
+OPENOCD_DEBUG_ADAPTER ?= stlink
 
-ifeq (jlink,$(PROGRAMMER))
-  JLINK_DEVICE ?= $(CPU_MODEL)
-endif
+JLINK_DEVICE ?= $(CPU_MODEL)
 
 ifeq (dfu-util,$(PROGRAMMER))
   # optionally, use dfu-util to flash via usb

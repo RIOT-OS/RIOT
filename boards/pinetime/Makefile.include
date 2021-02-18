@@ -2,9 +2,7 @@
 RIOT_TERMINAL ?= jlink
 
 # define pyocd as programmer to program with stlink
-ifeq (pyocd,$(PROGRAMMER))
-  PYOCD_FLASH_TARGET_TYPE ?= -t $(CPU)
-endif
+PYOCD_FLASH_TARGET_TYPE ?= -t $(CPU)
 
 # use shared Makefile.include
 include $(RIOTBOARD)/common/nrf52/Makefile.include

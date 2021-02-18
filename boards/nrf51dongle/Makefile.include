@@ -5,9 +5,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 PROGRAMMER ?= jlink
 
 # set required jlink debug adapter for openocd if it's used
-ifeq (openocd,$(PROGRAMMER))
-  OPENOCD_DEBUG_ADAPTER = jlink
-endif
+OPENOCD_DEBUG_ADAPTER = jlink
 
 # include nrf51 boards common configuration
 include $(RIOTBOARD)/common/nrf51/Makefile.include
