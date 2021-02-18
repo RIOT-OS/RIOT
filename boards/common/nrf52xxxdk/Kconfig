@@ -11,5 +11,6 @@ config BOARD_COMMON_NRF52XXXDK
     select HAS_PERIPH_PWM
     select HAS_PERIPH_SPI
     select HAS_PERIPH_UART
+    select HAS_VDD_LC_FILTER_REG1
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

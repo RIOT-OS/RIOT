@@ -16,5 +16,7 @@ config BOARD_NRF52840DONGLE
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
     select HAS_HIGHLEVEL_STDIO
+    select HAS_VDD_LC_FILTER_REG0
+    select HAS_VDD_LC_FILTER_REG1
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"
