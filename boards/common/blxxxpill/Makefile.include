@@ -15,7 +15,7 @@ ifeq (dfu-util,$(PROGRAMMER))
     # Flashing may be easier if using a software USB reset.
     # Future updates may provide USB support for stm32f1 which benefits
     # from this software reset.
-    FFLAGS_OPTS += --reset
+    DFU_UTIL_FLAGS_OPTS += --reset
   endif
 endif
 
