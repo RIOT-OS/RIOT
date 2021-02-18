@@ -19,12 +19,8 @@ DISABLE_MODULE += auto_init auto_init_%
 
 # avoid using stdio
 USEMODULE += stdio_null
-
-# Include riotboot flash partition functionality
-USEMODULE += riotboot_slot
-
 # Add RIOTBOOT USB DFU integration
-USEMODULE=riotboot_usb_dfu
+USEMODULE += riotboot_usb_dfu
 
 # Use xtimer for scheduled reboot
 USEMODULE += xtimer
