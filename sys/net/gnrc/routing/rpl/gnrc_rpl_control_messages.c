@@ -113,12 +113,14 @@ static inline bool gnrc_rpl_validation_DAO(gnrc_rpl_dao_t *dao, uint16_t len)
 {
     uint16_t expected_len = sizeof(*dao) + sizeof(icmpv6_hdr_t);
 
-    if ((dao->k_d_flags & GNRC_RPL_DAO_D_BIT)) {
-        expected_len += sizeof(ipv6_addr_t);
-    }
-
     if (expected_len <= len) {
-        return true;
+        if ((dao->k_d_flags & GNRC_RPL_DAO_D_BIT)) {
+            expected_len += sizeof(ipv6_addr_t);
+        }
+
+        if (expected_len <= len) {
+            return true;
+        }
     }
 
     DEBUG("RPL: wrong DAO len: %d, expected: %d\n", len, expected_len);
@@ -147,12 +149,14 @@ static inline bool gnrc_rpl_validation_DAO_ACK(gnrc_rpl_dao_ack_t *dao_ack,
         return false;
     }
 
-    if ((dao_ack->d_reserved & GNRC_RPL_DAO_ACK_D_BIT)) {
-        expected_len += sizeof(ipv6_addr_t);
-    }
+    if (expected_len <= len) {
+        if ((dao_ack->d_reserved & GNRC_RPL_DAO_ACK_D_BIT)) {
+            expected_len += sizeof(ipv6_addr_t);
+        }
 
-    if (expected_len == len) {
-        return true;
+        if (expected_len == len) {
+            return true;
+        }
     }
 
     DEBUG("RPL: wrong DAO-ACK len: %d, expected: %d\n", len, expected_len);
