@@ -80,7 +80,8 @@ riotboot/bootloader/%: $(BUILDDEPS)
 	$(Q)/usr/bin/env -i \
 		QUIET=$(QUIET) PATH="$(PATH)"\
 		EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" BOARD=$(BOARD)\
-		DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID)\
+		DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID) \
+		PROGRAMMER=$(PROGRAMMER) \
 			$(MAKE) --no-print-directory -C $(RIOTBOOT_DIR) $*
 
 # Generate a binary file from the bootloader which fills all the
