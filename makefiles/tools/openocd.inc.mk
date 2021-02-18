@@ -50,7 +50,7 @@ ifneq (,$(OPENOCD_PRE_FLASH_CMDS))
   $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),OPENOCD_PRE_FLASH_CMDS)
 endif
 
-ifneq (,$(PRE_FLASH_CHECK_SCRIPT))
-  # Export PRE_FLASH_CHECK_SCRIPT only to the flash/flash-only targets
-  $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),PRE_FLASH_CHECK_SCRIPT)
+ifneq (,$(OPENOCD_PRE_FLASH_CHECK_SCRIPT))
+  # Export OPENOCD_PRE_FLASH_CHECK_SCRIPT only to the flash/flash-only targets
+  $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),OPENOCD_PRE_FLASH_CHECK_SCRIPT)
 endif
