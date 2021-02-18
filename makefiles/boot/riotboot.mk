@@ -81,7 +81,7 @@ riotboot/bootloader/%: $(BUILDDEPS)
 		QUIET=$(QUIET) PATH="$(PATH)"\
 		EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" BOARD=$(BOARD)\
 		DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID) \
-		PROGRAMMER=$(PROGRAMMER) \
+		PROGRAMMER=$(PROGRAMMER) PROGRAMMER_QUIET=$(PROGRAMMER_QUIET) \
 			$(MAKE) --no-print-directory -C $(RIOTBOOT_DIR) $*
 
 # Generate a binary file from the bootloader which fills all the
