@@ -1,0 +1,22 @@
+/*
+ * Copyright (C) 2021 Nils Ollrogge
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup    fido2 FIDO2 - Fast Identity Online 2
+ * @ingroup     sys
+ *
+ * FIDO2 is an authentication standard that seeks to solve the password problem
+ * by enabling passwordless authentication. Instead of using passwords to
+ * authenticate to web services, FIDO2 enables users to use common devices
+ * (authenticators) to create cryptographic credentials
+ * which are then used for authentication.
+ *
+ * FIDO2 consists of the W3C Web Authentication specification (WebAuthn)
+ * and the Client to Authenticator Protocol (CTAP).
+ *
+ */

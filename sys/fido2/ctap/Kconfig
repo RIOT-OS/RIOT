@@ -1,0 +1,34 @@
+# Copyright (C) 2021 Nils Ollrogge
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+menuconfig MODULE_FIDO2_CTAP
+    bool "FIDO2 CTAP"
+    depends on TEST_KCONFIG
+    help
+        Configure a FIDO2 CTAP authenticator via KConfig.
+
+if MODULE_FIDO2_CTAP
+
+config FIDO2_CTAP_DEVICE_AAGUID
+    string "AAGUID of the CTAP2 authenticator"
+    default "9c295865fa2c36b705a42320af9c8f16"
+    help
+        AAGUID needs to be 128 bits long.
+
+config FIDO2_CTAP_DISABLE_UP
+    bool "Disable user presence tests"
+    default n
+    help
+        When set, the authenticator will not ask for permission before creating
+        a new credential pair or authenticating.
+
+config FIDO2_CTAP_DISABLE_LED
+    bool "Disable LED animations"
+    default n
+    help
+        When set, the authenticator will not use LED's .
+
+endif # KCONFIG_FIDO2_CTAP

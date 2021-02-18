@@ -718,4 +718,35 @@ ifneq (,$(filter dbgpin,$(USEMODULE)))
   FEATURES_REQUIRED += dbgpin
 endif
 
+ifneq (,$(filter fido2_ctap_%,$(USEMODULE)))
+  USEMODULE += fido2_ctap_transport
+  USEMODULE += fido2_ctap
+  ifneq (,$(filter fido2_ctap_hid,$(USEMODULE)))
+      ifneq (native, $(BOARD))
+        USEMODULE += usbus_hid
+        DISABLE_MODULE += auto_init_usbus
+    endif
+  endif
+endif
+
+ifneq (,$(filter fido2_ctap,$(USEMODULE)))
+  ifneq (native, $(BOARD))
+    FEATURES_REQUIRED += periph_flashpage
+    FEATURES_REQUIRED += periph_gpio_irq
+    USEMODULE += periph_flashpage_pagewise
+  endif
+
+  USEMODULE += xtimer
+
+  USEPKG += tinycbor
+  INCLUDE += $(RIOTPKG)/tinycbor
+
+  USEPKG += micro-ecc
+
+  USEMODULE += cipher_modes
+  USEMODULE += crypto_aes_256
+  USEMODULE += hashes
+  USEMODULE += fido2
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
