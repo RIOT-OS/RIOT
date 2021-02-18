@@ -4,9 +4,9 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 
 PROGRAMMER ?= cc2538-bsl
 
+CC2538_BSL_FLAGS_OPTS ?= --bootloader-invert-lines
 ifeq ($(PROGRAMMER),cc2538-bsl)
   FLASHFILE ?= $(HEXFILE)
-  CC2538_BSL_FLAGS_OPTS ?= --bootloader-invert-lines
 endif
 
 include $(RIOTBOARD)/common/cc2538/Makefile.include
