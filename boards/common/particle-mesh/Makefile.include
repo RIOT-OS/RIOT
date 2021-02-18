@@ -28,7 +28,7 @@ else
     # option is passed explicitly
     FLASH_TARGET_TYPE ?= -t nrf52840
   else ifeq (openocd,$(PROGRAMMER))
-    DEBUG_ADAPTER ?= dap
+    OPENOCD_DEBUG_ADAPTER ?= dap
   endif
 endif
 

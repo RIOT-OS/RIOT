@@ -3,7 +3,7 @@ PROGRAMMER ?= openocd
 
 # dap debug adapter is required for openocd
 ifeq (openocd,$(PROGRAMMER))
-  DEBUG_ADAPTER = dap
+  OPENOCD_DEBUG_ADAPTER = dap
 endif
 
 # Enable direct write to FCF (required for setting FOPT byte).

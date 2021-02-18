@@ -20,6 +20,6 @@ else ifeq (openocd,$(PROGRAMMER))
   # setup OpenOCD for flashing. Version 0.10 of OpenOCD doesn't contain support
   # for nrf52dk and nrf52840dk boards. To use OpenOCD with these a version
   # build from source (master > 2018, August the 13rd) is required.
-  DEBUG_ADAPTER ?= jlink
+  OPENOCD_DEBUG_ADAPTER ?= jlink
   OPENOCD_CONFIG = $(RIOTBOARD)/common/nrf52/dist/openocd.cfg
 endif

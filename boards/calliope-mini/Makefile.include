@@ -2,7 +2,7 @@
 PROGRAMMER ?= openocd
 
 ifeq (openocd,$(PROGRAMMER))
-  DEBUG_ADAPTER = dap
+  OPENOCD_DEBUG_ADAPTER = dap
 else ifeq (pyocd,$(PROGRAMMER))
   # PyOCD doesn't recognize automatically the board ID, so target type has to
   # be passed explicitly

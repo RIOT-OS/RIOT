@@ -16,15 +16,15 @@ ifneq (,$(filter debug% flash% %term test,$(MAKECMDGOALS)))
 endif
 
 # Default for these boards is to use a CMSIS-DAP programmer
-DEBUG_ADAPTER ?= dap
+OPENOCD_DEBUG_ADAPTER ?= dap
 
 # If no programmer is set, select a default programmer
 ifeq ($(PROGRAMMER),)
   # EDBG can only be used with a compatible Atmel programmer
-  ifeq ($(DEBUG_ADAPTER),dap)
+  ifeq ($(OPENOCD_DEBUG_ADAPTER),dap)
     # set this to either openocd, jlink or edbg
     PROGRAMMER ?= edbg
-  else ifeq ($(DEBUG_ADAPTER),jlink)
+  else ifeq ($(OPENOCD_DEBUG_ADAPTER),jlink)
     # only use JLinkExe if it's installed
     ifneq (,$(shell which JLinkExe))
       PROGRAMMER ?= jlink

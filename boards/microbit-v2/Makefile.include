@@ -5,7 +5,7 @@ ifeq (pyocd,$(PROGRAMMER))
   # option is passed explicitly
   FLASH_TARGET_TYPE ?= -t $(CPU)
 else ifeq (openocd,$(PROGRAMMER))
-  DEBUG_ADAPTER = dap
+  OPENOCD_DEBUG_ADAPTER = dap
 endif
 
 ifneq (,$(filter microbit,$(USEMODULE)))

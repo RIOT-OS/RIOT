@@ -23,7 +23,7 @@ OPENOCD_PRE_VERIFY_CMDS += \
   -c 'resume 0x20000000'
 PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
 
-DEBUG_ADAPTER ?= dap
+OPENOCD_DEBUG_ADAPTER ?= dap
 
 # The board can become un-flashable after some firmware, use connect_assert_srst
 # to always be able to flash or reset the board.

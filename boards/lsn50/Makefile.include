@@ -7,4 +7,4 @@ PROGRAMMER ?= openocd
 # use connect_assert_srst to always be able to flash or reset the boards.
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 # By default, flash this board using an ST-link adapter
-DEBUG_ADAPTER ?= stlink
+OPENOCD_DEBUG_ADAPTER ?= stlink

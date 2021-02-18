@@ -28,7 +28,7 @@ To flash the board with OpenOCD, use the `PROGRAMMER` variable:
 It is also possible to use the SWD interface of a ST-LINK/V2 in-circuit
 debugger/programmer with OpenOCD to flash a nrf52 board:
 ```
-    PROGRAMMER=openocd DEBUG_ADAPTER=stlink make BOARD=<nrf52 board> -C examples/hello-world flash
+    PROGRAMMER=openocd OPENOCD_DEBUG_ADAPTER=stlink make BOARD=<nrf52 board> -C examples/hello-world flash
 ```
 
 */

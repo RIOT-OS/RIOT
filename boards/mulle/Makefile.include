@@ -7,7 +7,7 @@ endif
 PROGRAMMER ?= openocd
 
 # Default debug adapter choice is to use the Mulle programmer board
-DEBUG_ADAPTER ?= mulle
+OPENOCD_DEBUG_ADAPTER ?= mulle
 
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.

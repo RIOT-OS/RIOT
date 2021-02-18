@@ -1,5 +1,5 @@
 # FLASHER will be lpc2k_pgm still
-DEBUG_ADAPTER ?= dap
+OPENOCD_DEBUG_ADAPTER ?= dap
 JLINK_DEVICE := LPC2388
 OPENOCD_TRANSPORT := jtag
 

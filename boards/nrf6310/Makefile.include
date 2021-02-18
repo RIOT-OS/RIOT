@@ -7,7 +7,7 @@ PROGRAMMER ?= jlink
 
 # set required debug adapter for openocd if it's used
 ifeq (openocd,$(PROGRAMMER))
-  DEBUG_ADAPTER = jlink
+  OPENOCD_DEBUG_ADAPTER = jlink
 endif
 
 # include nrf51 boards common configuration

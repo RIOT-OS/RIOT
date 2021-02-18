@@ -6,7 +6,7 @@ PROGRAMMER ?= openocd
 
 # dap debug adapter is required for openocd
 ifeq (openocd,$(PROGRAMMER))
-  DEBUG_ADAPTER = dap
+  OPENOCD_DEBUG_ADAPTER = dap
 endif
 
 # include nrf51 boards common configuration

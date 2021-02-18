@@ -5,7 +5,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 # this board uses openocd with an HEXFILE
 PROGRAMMER ?= openocd
 FLASHFILE ?= $(HEXFILE)
-DEBUG_ADAPTER ?= dap
+OPENOCD_DEBUG_ADAPTER ?= dap
 
 # generate image checksum from hex file
 PRE_FLASH_CHECK_SCRIPT = lpc_checksum --format hex

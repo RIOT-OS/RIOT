@@ -9,8 +9,8 @@ DEBUGGER_FLAGS ?= debug $(ELFFILE)
 DEBUGSERVER_FLAGS ?= debug-server
 RESET_FLAGS ?= reset
 
-ifneq (,$(DEBUG_ADAPTER))
-  include $(RIOTMAKE)/tools/openocd-adapters/$(DEBUG_ADAPTER).inc.mk
+ifneq (,$(OPENOCD_DEBUG_ADAPTER))
+  include $(RIOTMAKE)/tools/openocd-adapters/$(OPENOCD_DEBUG_ADAPTER).inc.mk
   OPENOCD_ADAPTER_INIT += -c 'transport select $(OPENOCD_TRANSPORT)'
 endif
 

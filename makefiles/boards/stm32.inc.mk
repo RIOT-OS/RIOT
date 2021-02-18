@@ -20,7 +20,7 @@ ifeq (openocd,$(PROGRAMMER))
 
   # For STM32 boards the ST-link adapter is the default adapter, e.g. all
   # Nucleo boards have an on-board ST-link adapter
-  DEBUG_ADAPTER ?= stlink
+  OPENOCD_DEBUG_ADAPTER ?= stlink
 endif
 
 ifeq (jlink,$(PROGRAMMER))

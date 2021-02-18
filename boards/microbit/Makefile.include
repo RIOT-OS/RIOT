@@ -5,7 +5,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 PROGRAMMER ?= openocd
 
 ifeq (openocd,$(PROGRAMMER))
-  DEBUG_ADAPTER = dap
+  OPENOCD_DEBUG_ADAPTER = dap
 endif
 
 # QEMU 4.0 added microbit system emulation.
