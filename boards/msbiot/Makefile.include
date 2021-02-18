@@ -4,8 +4,9 @@ INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 PROGRAMMER ?= openocd
 
 OPENOCD_DEBUG_ADAPTER ?= stlink
+STLINK_VERSION ?= 2
+
 ifeq (openocd,$(PROGRAMMER))
-  STLINK_VERSION ?= 2
   PORT_LINUX ?= /dev/ttyUSB0
 endif
 

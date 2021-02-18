@@ -17,10 +17,9 @@ ifeq (dfu-util,$(PROGRAMMER))
     # from this software reset.
     FFLAGS_OPTS += --reset
   endif
-
-else ifeq (openocd,$(PROGRAMMER))
-  STLINK_VERSION ?= 2
 endif
+
+STLINK_VERSION ?= 2
 
 # Setup of programmer and serial is shared between STM32 based boards
 include $(RIOTMAKE)/boards/stm32.inc.mk
