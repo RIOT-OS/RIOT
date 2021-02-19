@@ -38,6 +38,8 @@
 #include "sched.h"
 #include "test_utils/expect.h"
 
+#include "pktbuf_static.h"
+
 #include "net/gnrc/ndp.h"
 
 #define TEST_CUR_HL             (194U)
@@ -81,9 +83,8 @@ static void set_up(void)
 static void fill_pktbuf(void)
 {
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, NULL,
-                                          /* 24 = sizeof(gnrc_pktsnip_t) +
-                                           * potential alignment */
-                                          CONFIG_GNRC_PKTBUF_SIZE - 24U,
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          _align(sizeof(gnrc_pktsnip_t)),
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(pkt);
     TEST_ASSERT(gnrc_pktbuf_is_sane());
@@ -496,9 +497,10 @@ static void test_nbr_sol_send__src_NOT_NULL(void)
 static void test_nbr_sol_send__pktbuf_full1(void)
 {
     /* don't be able to fit any more data into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding */
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - 24,
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          _align(sizeof(gnrc_pktsnip_t)),
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(tmp);
     gnrc_ndp_nbr_sol_send(&test_tgt, test_netif, &test_src, &test_dst, NULL);
@@ -510,10 +512,11 @@ static void test_nbr_sol_send__pktbuf_full1(void)
 static void test_nbr_sol_send__pktbuf_full2(void)
 {
     /* just be able to fit the SLLAO into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding
      * - 16 == size of SLLAO for IEEE 802.15.4 */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - (2 * 24) - 16,
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          (2 * _align(sizeof(gnrc_pktsnip_t))) - 16,
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(tmp);
     gnrc_ndp_nbr_sol_send(&test_tgt, test_netif, &test_src, &test_dst, NULL);
@@ -525,10 +528,11 @@ static void test_nbr_sol_send__pktbuf_full2(void)
 static void test_nbr_sol_send__pktbuf_full3(void)
 {
     /* just be able to fit the SLLAO and NS into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding
      * - 16 == size of SLLAO for IEEE 802.15.4 */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - (3 * 24) - 16 -
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          (3 * _align(sizeof(gnrc_pktsnip_t))) - 16 -
                                           sizeof(ndp_nbr_sol_t),
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(tmp);
@@ -541,10 +545,11 @@ static void test_nbr_sol_send__pktbuf_full3(void)
 static void test_nbr_sol_send__pktbuf_full4(void)
 {
     /* just be able to fit the SLLAO, NS, and IPv6 header into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding
      * - 16 == size of SLLAO for IEEE 802.15.4 */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - (4 * 24) - 16 -
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          (4 * _align(sizeof(gnrc_pktsnip_t))) - 16 -
                                           sizeof(ndp_nbr_sol_t) -
                                           sizeof(ipv6_hdr_t),
                                           GNRC_NETTYPE_UNDEF);
@@ -707,9 +712,10 @@ static void test_nbr_adv_send__src_tgt_specified_dst_supply_tl2a_ext_opts(void)
 static void test_nbr_adv_send__pktbuf_full1(void)
 {
     /* don't be able to fit any more data into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding */
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - 24,
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          _align(sizeof(gnrc_pktsnip_t)),
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(tmp);
     gnrc_ndp_nbr_adv_send(&test_src, test_netif, &test_dst, true, NULL);
@@ -721,10 +727,11 @@ static void test_nbr_adv_send__pktbuf_full1(void)
 static void test_nbr_adv_send__pktbuf_full2(void)
 {
     /* just be able to fit the TLLAO into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding
      * - 16 == size of TLLAO for IEEE 802.15.4 */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - (2 * 24) - 16,
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          (2 * _align(sizeof(gnrc_pktsnip_t))) - 16,
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(tmp);
     gnrc_ndp_nbr_adv_send(&test_src, test_netif, &test_dst, true, NULL);
@@ -736,10 +743,11 @@ static void test_nbr_adv_send__pktbuf_full2(void)
 static void test_nbr_adv_send__pktbuf_full3(void)
 {
     /* just be able to fit the TLLAO and NA into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding
      * - 16 == size of TLLAO for IEEE 802.15.4 */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - (3 * 24) - 16 -
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          (3 * _align(sizeof(gnrc_pktsnip_t))) - 16 -
                                           sizeof(ndp_nbr_adv_t),
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(tmp);
@@ -752,10 +760,11 @@ static void test_nbr_adv_send__pktbuf_full3(void)
 static void test_nbr_adv_send__pktbuf_full4(void)
 {
     /* just be able to fit the TLLAO, NA, and IPv6 header into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding
      * - 16 == size of TLLAO for IEEE 802.15.4 */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - (4 * 24) - 16 -
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          (4 * _align(sizeof(gnrc_pktsnip_t))) - 16 -
                                           sizeof(ndp_nbr_adv_t) -
                                           sizeof(ipv6_hdr_t),
                                           GNRC_NETTYPE_UNDEF);
@@ -830,9 +839,10 @@ static void test_rtr_sol_send__dst_global(void)
 static void test_rtr_sol_send__pktbuf_full1(void)
 {
     /* don't be able to fit any more data into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding */
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - 24,
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          _align(sizeof(gnrc_pktsnip_t)),
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(tmp);
     gnrc_ndp_rtr_sol_send(test_netif, &test_dst);
@@ -844,10 +854,11 @@ static void test_rtr_sol_send__pktbuf_full1(void)
 static void test_rtr_sol_send__pktbuf_full2(void)
 {
     /* just be able to fit the SLLAO into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding
      * - 16 == size of SLLAO for IEEE 802.15.4 */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - (2 * 24) - 16,
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          (2 * _align(sizeof(gnrc_pktsnip_t))) - 16,
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(tmp);
     gnrc_ndp_rtr_sol_send(test_netif, &test_dst);
@@ -859,10 +870,11 @@ static void test_rtr_sol_send__pktbuf_full2(void)
 static void test_rtr_sol_send__pktbuf_full3(void)
 {
     /* just be able to fit the SLLAO and RS into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding
      * - 16 == size of SLLAO for IEEE 802.15.4 */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - (3 * 24) - 16 -
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          (3 * _align(sizeof(gnrc_pktsnip_t))) - 16 -
                                           sizeof(ndp_rtr_sol_t),
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(tmp);
@@ -875,10 +887,11 @@ static void test_rtr_sol_send__pktbuf_full3(void)
 static void test_rtr_sol_send__pktbuf_full4(void)
 {
     /* just be able to fit the SLLAO, RS, and IPv6 header into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding
      * - 16 == size of SLLAO for IEEE 802.15.4 */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - (4 * 24) - 16 -
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          (4 * _align(sizeof(gnrc_pktsnip_t))) - 16 -
                                           sizeof(ndp_rtr_sol_t) -
                                           sizeof(ipv6_hdr_t),
                                           GNRC_NETTYPE_UNDEF);
@@ -1029,9 +1042,10 @@ static void test_rtr_adv_send__src_dst_fin_ext_opts(void)
 static void test_rtr_adv_send__pktbuf_full1(void)
 {
     /* don't be able to fit any more data into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding */
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - 24,
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          _align(sizeof(gnrc_pktsnip_t)),
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(tmp);
     gnrc_ndp_rtr_adv_send(test_netif, &test_src, &test_dst, false, NULL);
@@ -1043,10 +1057,11 @@ static void test_rtr_adv_send__pktbuf_full1(void)
 static void test_rtr_adv_send__pktbuf_full2(void)
 {
     /* just be able to fit the SLLAO into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding
      * - 16 == size of SLLAO for IEEE 802.15.4 */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - (2 * 24) - 16,
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          (2 * _align(sizeof(gnrc_pktsnip_t))) - 16,
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(tmp);
     gnrc_ndp_rtr_adv_send(test_netif, &test_src, &test_dst, false, NULL);
@@ -1058,10 +1073,11 @@ static void test_rtr_adv_send__pktbuf_full2(void)
 static void test_rtr_adv_send__pktbuf_full3(void)
 {
     /* just be able to fit the SLLAO and RA into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding
      * - 16 == size of SLLAO for IEEE 802.15.4 */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - (3 * 24) - 16 -
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          (3 * _align(sizeof(gnrc_pktsnip_t))) - 16 -
                                           sizeof(ndp_rtr_adv_t),
                                           GNRC_NETTYPE_UNDEF);
     TEST_ASSERT_NOT_NULL(tmp);
@@ -1074,10 +1090,11 @@ static void test_rtr_adv_send__pktbuf_full3(void)
 static void test_rtr_adv_send__pktbuf_full4(void)
 {
     /* just be able to fit the SLLAO, RA, and IPv6 header into packet buffer
-     * - 24 == sizeof(gnrc_pktsnip_t) + pktbuf internal padding
+     * - sizeof(gnrc_pktsnip_t) + pktbuf internal padding
      * - 16 == size of SLLAO for IEEE 802.15.4 */
     gnrc_pktsnip_t *tmp = gnrc_pktbuf_add(NULL, NULL,
-                                          CONFIG_GNRC_PKTBUF_SIZE - (4 * 24) - 16 -
+                                          CONFIG_GNRC_PKTBUF_SIZE -
+                                          (4 * _align(sizeof(gnrc_pktsnip_t))) - 16 -
                                           sizeof(ndp_rtr_adv_t) -
                                           sizeof(ipv6_hdr_t),
                                           GNRC_NETTYPE_UNDEF);
