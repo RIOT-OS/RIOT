@@ -46,6 +46,4 @@ void board_init(void)
     RF24_SWITCH_AT86RF215_ON;
 #endif
 
-    /* initialize the CPU */
-    cpu_init();
 }

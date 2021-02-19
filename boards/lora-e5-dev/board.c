@@ -28,8 +28,6 @@
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
     /* initialization of on-board LEDs */
 #ifdef AUTO_INIT_LED0
     gpio_init(LED0_PIN, GPIO_OUT);

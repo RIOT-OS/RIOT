@@ -89,6 +89,4 @@ void board_init(void)
 
     board_nrfantenna_select(BOARD_NRFANTENNA_DEFAULT);
 
-    /* initialize the CPU */
-    cpu_init();
 }

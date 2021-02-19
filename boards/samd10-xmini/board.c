@@ -36,6 +36,4 @@ void board_init(void)
     gpio_init(GPIO_PIN(PA, 24), GPIO_IN_PU);
     gpio_init(GPIO_PIN(PA, 25), GPIO_IN_PU);
 
-    /* initialize the CPU */
-    cpu_init();
 }

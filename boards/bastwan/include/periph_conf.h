@@ -91,7 +91,6 @@ static const uart_conf_t uart_config[] = {
  */
 /* SERCOM5 does not support DMA at the moment. See Datasheet samr34, Figure 4-2 */
 static const spi_conf_t spi_config[] = {
-
     {
         .dev = &(SERCOM5->SPI),
         .miso_pin = GPIO_PIN(PA, 23),

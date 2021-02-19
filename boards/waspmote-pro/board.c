@@ -58,6 +58,5 @@ void board_init(void)
 #endif
 #endif
 
-    cpu_init();
     led_init();
 }

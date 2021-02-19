@@ -44,9 +44,6 @@ static void led_init(void)
 
 void board_init(void)
 {
-    /* initialize the CPU core */
-    cpu_init();
-
     /* initialize LEDs, skip for riotboot */
     if (!IS_ACTIVE(RIOTBOOT)) {
         led_init();
