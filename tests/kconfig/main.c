@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include "app.h"
 #include "kernel_defines.h"
+#include "external_module_1.h"
+#include "external_module_2.h"
 
 int main(void)
 {
@@ -30,5 +32,9 @@ int main(void)
     if (IS_ACTIVE(CONFIG_APP_MSG_2)) {
         puts("MSG_2 is active");
     }
+
+    puts(CONFIG_EXTERNAL_MODULE_1_MESSAGE);
+    puts(CONFIG_EXTERNAL_MODULE_2_MESSAGE);
+
     return 0;
 }
