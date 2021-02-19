@@ -11,6 +11,8 @@ USEMODULE += netdev_test
 CFLAGS += -DGNRC_NETTYPE_NDP=GNRC_NETTYPE_TEST
 CFLAGS += -DTEST_SUITES
 
+INCLUDES += -I$(RIOTBASE)/sys/net/gnrc/pktbuf_static/include
+
 include $(RIOTBASE)/Makefile.include
 
 # Set GNRC_PKTBUF_SIZE via CFLAGS if not being set via Kconfig.
