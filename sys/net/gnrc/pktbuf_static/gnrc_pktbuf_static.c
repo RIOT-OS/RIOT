@@ -31,16 +31,10 @@
 #include "net/gnrc/pkt.h"
 
 #include "pktbuf_internal.h"
+#include "pktbuf_static.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-#define _ALIGNMENT_MASK    (sizeof(_unused_t) - 1)
-
-typedef struct _unused {
-    struct _unused *next;
-    unsigned int size;
-} _unused_t;
 
 /* The static buffer needs to be aligned to word size, so that its start
  * address can be casted to `_unused_t *` safely. Just allocating an array of
@@ -58,12 +52,6 @@ static uint16_t max_byte_count = 0;
 static gnrc_pktsnip_t *_create_snip(gnrc_pktsnip_t *next, const void *data, size_t size,
                                     gnrc_nettype_t type);
 static void *_pktbuf_alloc(size_t size);
-
-/* fits size to byte alignment */
-static inline size_t _align(size_t size)
-{
-    return (size + _ALIGNMENT_MASK) & ~(_ALIGNMENT_MASK);
-}
 
 static inline void _set_pktsnip(gnrc_pktsnip_t *pkt, gnrc_pktsnip_t *next,
                                 void *data, size_t size, gnrc_nettype_t type)

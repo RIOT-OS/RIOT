@@ -21,6 +21,10 @@ ifneq (,$(filter gnrc_pktbuf,$(USEMODULE)))
   include $(RIOTBASE)/sys/net/gnrc/pktbuf/Makefile.include
 endif
 
+ifneq (,$(filter gnrc_pktbuf_static,$(USEMODULE)))
+  include $(RIOTBASE)/sys/net/gnrc/pktbuf_static/Makefile.include
+endif
+
 ifneq (,$(filter malloc_thread_safe,$(USEMODULE)))
   include $(RIOTBASE)/sys/malloc_thread_safe/Makefile.include
 endif
