@@ -43,9 +43,9 @@ void board_nrfantenna_select(enum board_nrfantenna_selection choice)
     }
 }
 
-void board_init(void)
-{
 #ifdef PARTICLE_MONOFIRMWARE
+void post_startup(void)
+{
     /* For comparison with MicroPython's hook into this bootloader, they'd set
      * SCB->VTOR here. That is necessary because while the particle bootloader
      * largely mimics the ARM bootup by requiring a VTOR at the start of the
@@ -68,8 +68,11 @@ void board_init(void)
      * */
     NVIC_DisableIRQ(0);
     NVIC_DisableIRQ(6);
+}
 #endif
 
+void board_init(void)
+{
     /* initialize the boards LEDs */
     gpio_init(LED0_PIN, GPIO_OUT);
     gpio_set(LED0_PIN);
