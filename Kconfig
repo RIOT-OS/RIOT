@@ -33,6 +33,10 @@ rsource "drivers/Kconfig"
 rsource "sys/Kconfig"
 rsource "pkg/Kconfig"
 
+menu "External Modules"
+osource "$(KCONFIG_EXTERNAL_CONFIGS)"
+endmenu # External Modules
+
 comment "RIOT is in a migration phase."
 comment "Some configuration options may not be here. Use CFLAGS instead."
 
