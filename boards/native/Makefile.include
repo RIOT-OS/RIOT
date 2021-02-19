@@ -10,7 +10,7 @@ else
 endif
 
 RESET ?= $(RIOTBOARD)/native/dist/reset.sh
-FLASHER = true
+FLASHER ?=
 FLASHFILE ?= $(ELFFILE)
 
 TERMPROG ?= $(FLASHFILE)
