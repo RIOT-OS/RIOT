@@ -20,6 +20,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <strings.h>
 
 #include "common.h"
 #include "errno.h"
@@ -488,13 +489,43 @@ static int rx_mode_cmd(int argc, char **argv)
 
 int config_phy(int argc, char **argv)
 {
-    if (argc < 3) {
-        puts("Usage: config_phy <channel> <tx_pow>");
+    if (argc < 4) {
+        puts("Usage: config_phy <phy_mode> <channel> <tx_pow>");
         return 1;
     }
 
-    uint8_t channel = atoi(argv[1]);
-    int8_t tx_pow = atoi(argv[2]);
+    ieee802154_phy_mode_t phy_mode;
+    if (strcasecmp(argv[1], "BPSK")) {
+        phy_mode = IEEE802154_PHY_BPSK;
+    }
+    else if (strcasecmp(argv[1], "ASK")) {
+        phy_mode = IEEE802154_PHY_ASK;
+    }
+    else if (strcasecmp(argv[1], "O-QPSK")) {
+        phy_mode = IEEE802154_PHY_OQPSK;
+    }
+    else if (strcasecmp(argv[1], "MR-O-QPSK")) {
+        phy_mode = IEEE802154_PHY_MR_OQPSK;
+    }
+    else if (strcasecmp(argv[1], "MR-OFDM")) {
+        phy_mode = IEEE802154_PHY_MR_OFDM;
+    }
+    else if (strcasecmp(argv[1], "MR-FSK")) {
+        phy_mode = IEEE802154_PHY_MR_FSK;
+    }
+    else {
+        puts("Wrong PHY mode specified. Must be one of:");
+        puts("  * BPSK");
+        puts("  * ASK");
+        puts("  * O-QPSK");
+        puts("  * MR-O-QPSK");
+        puts("  * MR-OFDM");
+        puts("  * MR-FSK");
+        return 1;
+    }
+
+    uint8_t channel = atoi(argv[2]);
+    int8_t tx_pow = atoi(argv[3]);
 
     if (channel < 11 || channel > 26) {
         puts("Wrong channel configuration (11 <= channel <= 26).");
@@ -502,7 +533,7 @@ int config_phy(int argc, char **argv)
     }
     _set_trx_state(IEEE802154_TRX_STATE_TRX_OFF, false);
     ieee802154_dev_t *dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
-    ieee802154_phy_conf_t conf = {.channel=channel, .page=0, .pow=tx_pow};
+    ieee802154_phy_conf_t conf = {.phy_mode=phy_mode, .channel=channel, .page=0, .pow=tx_pow};
     if (ieee802154_radio_config_phy(dev, &conf) < 0) {
         puts("Channel or TX power settings not supported");
     }
@@ -602,6 +633,12 @@ static int _caps_cmd(int argc, char **argv)
     bool has_irq_ack_timeout = false;
     bool has_irq_cca_done = false;
     bool has_frame_retrans_info = false;
+    bool has_phy_bpsk = false;
+    bool has_phy_ask = false;
+    bool has_phy_oqpsk = false;
+    bool has_phy_mr_oqpsk = false;
+    bool has_phy_mr_ofdm = false;
+    bool has_phy_mr_fsk = false;
 
     if (ieee802154_radio_has_frame_retrans(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
        has_frame_retrans = true;
@@ -639,6 +676,30 @@ static int _caps_cmd(int argc, char **argv)
         has_frame_retrans_info = true;
     }
 
+    if (ieee802154_radio_has_phy_bpsk(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
+        has_phy_bpsk = true;
+    }
+
+    if (ieee802154_radio_has_phy_ask(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
+        has_phy_ask = true;
+    }
+
+    if (ieee802154_radio_has_phy_oqpsk(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
+        has_phy_oqpsk = true;
+    }
+
+    if (ieee802154_radio_has_phy_mr_oqpsk(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
+        has_phy_mr_oqpsk = true;
+    }
+
+    if (ieee802154_radio_has_phy_mr_ofdm(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
+        has_phy_mr_ofdm = true;
+    }
+
+    if (ieee802154_radio_has_phy_mr_fsk(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
+        has_phy_mr_fsk = true;
+    }
+
     puts("               CAPS              ");
     puts("=================================");
     printf("- Frame Retransmissions:        %s\n", has_frame_retrans ? "y" : "n");
@@ -650,6 +711,13 @@ static int _caps_cmd(int argc, char **argv)
     printf("    * ACK Timeout indication:   %s\n", has_irq_ack_timeout ? "y" : "n");
     printf("- RX_START indication:          %s\n", has_irq_rx_start ? "y" : "n");
     printf("- CCA Done indication:          %s\n", has_irq_cca_done ? "y" : "n");
+    printf("- PHY modes:                      \n");
+    printf("-   * BPSK:                     %s\n", has_phy_bpsk ? "y" : "n");
+    printf("-   * ASK:                      %s\n", has_phy_ask ? "y" : "n");
+    printf("-   * O-QPSK:                   %s\n", has_phy_oqpsk ? "y" : "n");
+    printf("-   * MR-O-QPSK:                %s\n", has_phy_mr_oqpsk ? "y" : "n");
+    printf("-   * MR-OFDM:                  %s\n", has_phy_mr_ofdm ? "y" : "n");
+    printf("-   * MR-FSK:                   %s\n", has_phy_mr_fsk? "y" : "n");
 
     return 0;
 }
