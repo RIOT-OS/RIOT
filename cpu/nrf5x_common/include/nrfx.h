@@ -32,25 +32,29 @@ extern "C" {
 /**
  * @brief Enable the internal DC/DC power converter for the NRF5x MCU.
  *
- * The internal DC/DC converter is more efficient compared to the LDO regulator.
- * The downside of the DC/DC converter is that it requires an external inductor
- * to be present on the board. Enabling the DC/DC converter is guarded with
- * NRF5X_ENABLE_DCDC, this macro must be defined if the DC/DC converter is to be
- * enabled.
+ * In most cases, the internal DC/DC converter is more efficient compared to the
+ * LDO regulator. The downside of the DC/DC converter is that it requires an
+ * external LC filter to be present on the board. Per default, the DC/DC
+ * converter is enabled if an LC filter is present (VDD_LC_FILTER_REGx feature).
+ *
+ * Independent of the presence of the LC filter, the DC/DC converter(s) can be
+ * disabled by blacklisting the VDD_LC_FILTER_REGx feature, e.g. build using
+ * `FEATURES_BLACKLIST=VDD_LC_FILTER_REG1 make all`.
  */
 static inline void nrfx_dcdc_init(void)
 {
-#ifdef NRF5X_ENABLE_DCDC
-    NRF_POWER->DCDCEN = 1;
+    if (IS_ACTIVE(MODULE_VDD_LC_FILTER_REG1)) {
+        NRF_POWER->DCDCEN = 1;
+    }
 
-    /* on CPUs that support high voltage power supply via VDDH and thus use a
-     * two stage regulator, we also enable the DC/DC converter for the first
-     * state. */
 #ifdef POWER_DCDCEN0_DCDCEN_Msk
-    if (NRF_POWER->MAINREGSTATUS == POWER_MAINREGSTATUS_MAINREGSTATUS_High) {
+    /* on CPUs that support high voltage power supply via VDDH and thus use a
+     * two stage regulator, we also try to enable the DC/DC converter for the
+     * first stage */
+    if (IS_ACTIVE(MODULE_VDD_LC_FILTER_REG0) &&
+        (NRF_POWER->MAINREGSTATUS == POWER_MAINREGSTATUS_MAINREGSTATUS_High)) {
         NRF_POWER->DCDCEN0 = 1;
     }
-#endif
 #endif
 }
 

@@ -43,4 +43,16 @@ config HAS_RADIO_NRFMIN
         Indicates that a radio compatible with the nRF minimal radio driver is
         present.
 
+config HAS_VDD_LC_FILTER_REG0
+    bool
+    help
+        Indicates that a board is equipped with an external LC filter circuit
+        attached to the CPUs voltage regulator stage 0.
+
+config HAS_VDD_LC_FILTER_REG1
+    bool
+    help
+        Indicates that a board is equipped with an external LC filter circuit
+        attached to the CPUs voltage regulator stage 1.
+
 source "$(RIOTCPU)/cortexm_common/Kconfig"

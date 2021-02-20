@@ -30,11 +30,6 @@ extern "C" {
 #endif
 
 /**
- * @brief Enable the internal DC/DC converter
- */
-#define NRF5X_ENABLE_DCDC
-
-/**
  * @name    UART configuration
  * @{
  */

@@ -57,3 +57,6 @@ endif
 
 # use efm32_coretemp if the feature is used
 USEMODULE += $(filter efm32_coretemp, $(FEATURES_USED))
+
+# if LC filter(s) is attached to the CPUs voltage regulator, use it
+USEMODULE += $(filter vdd_lc_filter_%,$(FEATURES_USED))

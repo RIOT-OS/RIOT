@@ -68,11 +68,6 @@ static const spi_conf_t spi_config[] = {
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
-/**
- * @brief Enable the internal DC/DC converter
- */
-#define NRF5X_ENABLE_DCDC
-
 #ifdef __cplusplus
 }
 #endif
