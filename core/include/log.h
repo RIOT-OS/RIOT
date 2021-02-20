@@ -16,6 +16,9 @@
  * This header offers a bunch of "LOG_*" functions that, with the default
  * implementation, just use printf, but honour a verbosity level.
  *
+ * An implementation close to RFC 5424 is provided with the syslog module.
+ * It can be used by adding `USEMODULE += syslog` in the Makefile.
+ *
  * If desired, it is possible to implement a log module which then will be used
  * instead the default printf-based implementation.  In order to do so, the log
  * module has to
@@ -36,6 +39,17 @@
 extern "C" {
 #endif
 
+
+#if !defined(CONFIG_LOG_LEVEL_RIOT) && !defined(CONFIG_LOG_LEVEL_RFC5424)
+/**
+ * @brief   Log level values setting
+ *
+ * Default to rfc5424, old RIOT-specific provided for compatibility
+ */
+#define CONFIG_LOG_LEVEL_RFC5424    1
+#define CONFIG_LOG_LEVEL_RIOT       0
+#endif
+
 /**
  * @brief defined log levels
  *
@@ -48,6 +62,24 @@ extern "C" {
  * The log function calls of filtered messages will be optimized out at compile
  * time, so a lower log level might result in smaller code size.
  */
+#if CONFIG_LOG_LEVEL_RFC5424 || DOXYGEN
+enum {
+    LOG_NONE = -1,
+    LOG_EMERG,      /**< Emergency log level, when system gets unusable */
+    LOG_ALERT,      /**< Emergency log level, action must be taken immediately */
+    LOG_CRIT,       /**< Emergency log level, for emergency errors which are not recoverable */
+    LOG_ERROR,      /**< Error log level, will print only critical, possibly recoverable */
+    LOG_WARNING,    /**< Warning log level, will print warning messages for
+                         temporary errors */
+    LOG_NOTICE,     /**< Notice log level, normal, but significant, conditions */
+    LOG_INFO,       /**< Informational log level, will print purely
+                         informational messages like successful system bootup,
+                         network link state, ...*/
+    LOG_DEBUG,      /**< Debug log level, printing developer stuff considered
+                         too verbose for production use */
+    LOG_ALL         /**< print everything */
+};
+#elif CONFIG_LOG_LEVEL_RIOT
 enum {
     LOG_NONE,       /**< Lowest log level, will output nothing */
     LOG_ERROR,      /**< Error log level, will print only critical,
@@ -62,6 +94,9 @@ enum {
                          too verbose for production use */
     LOG_ALL         /**< print everything */
 };
+#else
+#error "No log level configuration selected"
+#endif
 
 #ifndef LOG_LEVEL
 /**
@@ -70,6 +105,9 @@ enum {
 #define LOG_LEVEL LOG_INFO
 #endif
 
+#if defined(MODULE_SYSLOG)
+#include "syslog.h"
+#else
 /**
  * @brief Log message if level <= LOG_LEVEL
  */
@@ -88,8 +126,12 @@ enum {
  * @name Logging convenience defines
  * @{
  */
+#define LOG_EMERG(...) LOG(LOG_EMERG, __VA_ARGS__)
+#define LOG_ALERT(...) LOG(LOG_ALERT, __VA_ARGS__)
+#define LOG_CRIT(...) LOG(LOG_CRIT, __VA_ARGS__)
 #define LOG_ERROR(...) LOG(LOG_ERROR, __VA_ARGS__)
 #define LOG_WARNING(...) LOG(LOG_WARNING, __VA_ARGS__)
+#define LOG_NOTICE(...) LOG(LOG_NOTICE, __VA_ARGS__)
 #define LOG_INFO(...) LOG(LOG_INFO, __VA_ARGS__)
 #define LOG_DEBUG(...) LOG(LOG_DEBUG, __VA_ARGS__)
 /** @} */
@@ -103,7 +145,8 @@ enum {
  * @brief Default log_write function, just maps to printf
  */
 #define log_write(level, ...) printf(__VA_ARGS__)
-#endif
+#endif  /* MODULE_LOG */
+#endif  /* MODULE_SYSLOG */
 
 #ifdef __cplusplus
 }

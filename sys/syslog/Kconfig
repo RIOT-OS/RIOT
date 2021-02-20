@@ -1,0 +1,132 @@
+# Copyright (c) 2021 Continental
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig KCONFIG_SYSLOG
+    bool "Syslog"
+    select MODULE_SYSLOG
+    depends on TEST_KCONFIG
+    help
+        Configure syslog via Kconfig
+
+if KCONFIG_SYSLOG
+
+config SYSLOG_HOSTNAME
+    string "Hostname"
+    default "-"
+    help
+        Syslog hostmame printed in the messages. Can also be set at runtime.
+
+config SYSLOG_SET_DEFAULT_IDENT
+    bool "Set default ident"
+
+config SYSLOG_DEFAULT_IDENT
+    string "Default ident"
+    depends on SYSLOG_SET_DEFAULT_IDENT
+    help
+        Syslog default entry ident string
+
+config SYSLOG_MAX_STRING_LEN
+    int "Max length for a printed log message"
+    default 256
+
+choice
+    bool "Formatter"
+    default KCONFIG_SYSLOG_FORMATTER_DEFAULT
+    help
+        Select the log message formatter
+
+config KCONFIG_SYSLOG_FORMATTER_DEFAULT
+    bool "Default (libc-based)"
+    select MODULE_FORMATTER_DEFAULT
+
+config KCONFIG_SYSLOG_FORMATTER_FMT
+    bool "fmt"
+    select MODULE_FORMATTER_FMT
+    select MODULE_FMT
+
+endchoice
+
+config SYSLOG_ALLOC_MEMARRAY
+    bool "Use memarray"
+    default n
+    select MODULE_MEMARRAY
+    help
+        Use memarray instead of malloc for memory allocation
+
+if SYSLOG_ALLOC_MEMARRAY
+
+config SYSLOG_MAX_ENTRIES
+    int "Max number of entries allocated with memarray"
+    default 8
+
+config SYSLOG_MAX_MSGS
+    int "Max number of messages allocated with memarray"
+    default 64
+
+endif # SYSLOG_ALLOC_MEMARRAY
+
+config SYSLOG_HAS_OPEN
+    bool "Implements openlog/closelog"
+    default n
+    help
+        Implements openlog and closelog. If disabled, all logs will use the same entry.
+
+config SYSLOG_BACKEND_EXTRA
+    bool "Use external user-provided backend(s)"
+    default n
+    help
+        User-defined external backend(s) are provided. syslog_backend_extra.h must be provided
+        by the user and SYSLOG_BACKEND_EXTRA must be defined and contains the syslog_backend_t
+        driver(s) name that will be included to the backend array.
+
+config MODULE_SYSLOG_BACKEND_STDIO
+    bool "STDIO backend"
+    default y
+    help
+        Print log messages on stdio
+
+menuconfig KCONFIG_SYSLOG_BACKEND_FILE
+    bool "File backend"
+    select MODULE_SYSLOG_BACKEND_FILE
+    select MODULE_VFS
+    help
+        Configure syslog file backend via Kconfig
+
+if KCONFIG_SYSLOG_BACKEND_FILE
+
+config SYSLOG_BACKEND_FILE_PATH
+    string "Directory path where logs are stored"
+    default "/log/sys"
+    help
+        Directory where logs will be stored. It should not contain a trailing '/'
+
+config SYSLOG_FILE_ENTRY_NAME
+    string "Log filename prefix"
+    default "log"
+    help
+        Prefix of log files name, if "log", files will be log.0, log.1...
+
+config SYSLOG_BACKEND_ROT_SIZE
+    int "Rotation size"
+    default 262144
+    help
+        Max size of a file before a file rotation is triggered
+
+config SYSLOG_BACKEND_NB_FILES
+    int "Max number of log files"
+    default 32
+    help
+        Maximum number of log files that are kept
+
+config SYSLOG_BACKEND_FILE_HAS_SUSPEND
+    bool "Enable suspend/resume"
+    default y
+    help
+        Build suspend/resume functions in to temporarly suspend file rotation
+
+endif # KCONFIG_SYSLOG_BACKEND_FILE
+
+endif # KCONFIG_SYSLOG

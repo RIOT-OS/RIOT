@@ -39,6 +39,9 @@ ASFLAGS += --longcalls --text-section-literals
 
 CFLAGS_DBG ?= -ggdb -g3
 
+# Extended rfc5424-compatible log levels are not supported
+CFLAGS += -DCONFIG_LOG_LEVEL_RIOT=1
+
 # override default CFLAGS_OPT in case module esp_gdb is enabled
 ifneq (,$(filter esp_gdb,$(USEMODULE)))
   CFLAGS_OPT ?= -Og
