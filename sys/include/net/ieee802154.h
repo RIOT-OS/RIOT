@@ -163,7 +163,7 @@ extern "C" {
 /**
  * @brief   802.15.4 PHY modes
  */
-enum {
+typedef enum {
     IEEE802154_PHY_DISABLED,        /**< PHY disabled, no mode selected */
     IEEE802154_PHY_BPSK,            /**< Binary Phase Shift Keying */
     IEEE802154_PHY_ASK,             /**< Amplitude-Shift Keying */
@@ -171,7 +171,7 @@ enum {
     IEEE802154_PHY_MR_OQPSK,        /**< Multi-Rate Offset Quadrature Phase-Shift Keying */
     IEEE802154_PHY_MR_OFDM,         /**< Multi-Rate Orthogonal Frequency-Division Multiplexing */
     IEEE802154_PHY_MR_FSK           /**< Multi-Rate Frequency Shift Keying */
-};
+} ieee802154_phy_mode_t;
 
 /**
  * @brief   802.15.4 forward error correction schemes
