@@ -228,7 +228,7 @@ void lwip_bootstrap(void)
     }
 #elif defined(MODULE_SOCKET_ZEP)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
-        socket_zep_setup(&socket_zep_devs[i], &socket_zep_params[i]);
+        socket_zep_setup(&socket_zep_devs[i], &socket_zep_params[i], i);
         if (netif_add(&netif[i], &socket_zep_devs[i], lwip_netdev_init,
                       tcpip_6lowpan_input) == NULL) {
             DEBUG("Could not add socket_zep device\n");
