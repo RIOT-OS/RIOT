@@ -475,7 +475,7 @@ class RIOTApplication():
         if output is not None:
             if self.testcase:
                 self.testcase.stdout += output + '\n'
-            return output
+            return
 
         # Run setup-tasks, output is only kept in case of error
         for taskname, taskargs in setuptasks.items():
@@ -494,7 +494,6 @@ class RIOTApplication():
             if self.testcase:
                 self.testcase.stdout += output + '\n'
             self._write_resultfile(name, 'success', output)
-            return output
         except subprocess.CalledProcessError as err:
             self._make_handle_error(name, err)
 
