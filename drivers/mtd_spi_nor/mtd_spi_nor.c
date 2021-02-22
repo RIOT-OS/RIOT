@@ -393,7 +393,7 @@ static int mtd_spi_nor_power(mtd_dev_t *mtd, enum mtd_power_state power)
                 xtimer_usleep(dev->params->wait_chip_wake_up);
                 res = mtd_spi_read_jedec_id(dev, &dev->jedec_id);
                 retries++;
-            } while (res < 0 || retries < MTD_POWER_UP_WAIT_FOR_ID);
+            } while (res < 0 && retries < MTD_POWER_UP_WAIT_FOR_ID);
             if (res < 0) {
                 return -EIO;
             }
