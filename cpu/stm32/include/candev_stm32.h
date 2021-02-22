@@ -100,6 +100,7 @@ typedef struct {
 #ifndef CPU_FAM_STM32F1
     gpio_af_t af;               /**< Alternate pin function to use */
 #endif
+    bool en_deep_sleep_wake_up; /**< Enable deep-sleep wake-up interrupt */
 #if CANDEV_STM32_CHAN_NUMOF > 1 || defined(DOXYGEN)
     CAN_TypeDef *can_master;    /**< Master CAN device */
     uint32_t master_rcc_mask;   /**< Master device RCC mask */

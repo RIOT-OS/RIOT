@@ -65,6 +65,7 @@ static const can_conf_t candev_conf[] = {
         .rx1_irqn = CAN1_RX1_IRQn,
         .sce_irqn = CAN1_SCE_IRQn,
 #endif
+        .en_deep_sleep_wake_up = true,
         .ttcm = 0,
         .abom = 1,
         .awum = 1,
@@ -85,6 +86,7 @@ static const can_conf_t candev_conf[] = {
 #ifndef CPU_FAM_STM32F1
         .af = GPIO_AF9,
 #endif
+        .en_deep_sleep_wake_up = true,
         .tx_irqn = CAN2_TX_IRQn,
         .rx0_irqn = CAN2_RX0_IRQn,
         .rx1_irqn = CAN2_RX1_IRQn,
@@ -108,6 +110,7 @@ static const can_conf_t candev_conf[] = {
         .rx_pin = GPIO_PIN(PORT_B, 3),
         .tx_pin = GPIO_PIN(PORT_B, 4),
         .af = GPIO_AF11,
+        .en_deep_sleep_wake_up = true,
         .tx_irqn = CAN3_TX_IRQn,
         .rx0_irqn = CAN3_RX0_IRQn,
         .rx1_irqn = CAN3_RX1_IRQn,
