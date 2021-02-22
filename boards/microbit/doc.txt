@@ -69,7 +69,7 @@ default anytime ([as described here](https://www.mbed.com/en/development/hardwar
 Once you have flashed the JLink firmware, you can flash the board like this:
 
 ```
-BOARD=microbit FLASHTOOL=jlink make flash
+BOARD=microbit PROGRAMMER=jlink make flash
 ```
 
 With the JLink firmware, you can now also do in-circuit debugging etc.
