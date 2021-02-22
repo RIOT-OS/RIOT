@@ -24,6 +24,7 @@
 #include "cfg_clock_32_1.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_default.h"
+#include "cfg_spi_default.h"
 
 #ifdef __cplusplus
 extern "C" {
