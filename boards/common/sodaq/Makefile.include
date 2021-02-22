@@ -2,4 +2,4 @@
 INCLUDES += -I$(RIOTBOARD)/common/sodaq/include
 
 # Include all definitions for flashing with bossa over USB
-include $(RIOTBOARD)/common/samd21-arduino-bootloader/Makefile.include
+include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.include

@@ -7,4 +7,4 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
 endif
 
 # setup the samd21 arduino bootloader related dependencies
-include $(RIOTBOARD)/common/samd21-arduino-bootloader/Makefile.dep
+include $(RIOTBOARD)/common/samdx1-arduino-bootloader/Makefile.dep
