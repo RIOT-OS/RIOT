@@ -219,7 +219,7 @@ typedef struct __attribute__((packed)) {
     uint8_t length;         /**< Size of this descriptor */
     uint8_t type;           /**< Descriptor type (@ref USB_TYPE_DESCRIPTOR_CDC) */
     uint8_t subtype;        /**< Descriptor subtype (@ref USB_CDC_DESCR_SUBTYPE_ACM) */
-    uint8_t capabalities;   /**< Bitmap indicating the capabilities */
+    uint8_t capabilities;   /**< Bitmap indicating the capabilities */
 } usb_desc_acm_t;
 
 /**
@@ -254,7 +254,7 @@ typedef struct __attribute__((packed)) {
     uint8_t length;     /**< Size of this descriptor */
     uint8_t type;       /**< Descriptor type (@ref USB_TYPE_DESCRIPTOR_CDC) */
     uint8_t subtype;    /**< Descriptor subtype (@ref USB_CDC_DESCR_SUBTYPE_CALL_MGMT) */
-    uint8_t capabalities; /**< Supported capabilities */
+    uint8_t capabilities; /**< Supported capabilities */
     uint8_t data_if;      /**< Interface number used for the call management */
 } usb_desc_call_mngt_t;
 
