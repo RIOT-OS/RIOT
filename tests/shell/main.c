@@ -103,6 +103,30 @@ static const shell_command_t shell_commands[] = {
     { NULL, NULL, NULL }
 };
 
+static int _xfa_test1(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+    printf("[XFA TEST 1 OK]\n");
+
+    return 0;
+}
+
+static int _xfa_test2(int argc, char **argv)
+{
+    (void) argc;
+    (void) argv;
+    printf("[XFA TEST 2 OK]\n");
+
+    return 0;
+}
+
+/* Add above commands to the shell commands XFA using helper macro.
+ * Intentionally reversed order to test linker script based alphanumeric
+ * ordering. */
+SHELL_COMMAND(xfa_test2, "xfa test command 2",_xfa_test2);
+SHELL_COMMAND(xfa_test1, "xfa test command 1",_xfa_test1);
+
 int main(void)
 {
     printf("test_shell.\n");
