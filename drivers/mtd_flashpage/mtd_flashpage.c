@@ -24,6 +24,7 @@
 #include <assert.h>
 
 #include "architecture.h"
+#include "cpu.h"
 #include "cpu_conf.h"
 #include "mtd_flashpage.h"
 #include "periph/flashpage.h"
@@ -53,6 +54,11 @@ static int _write(mtd_dev_t *dev, const void *buf, uint32_t addr, uint32_t size)
 {
     (void)dev;
 
+#ifndef CPU_HAS_UNALIGNED_ACCESS
+    if ((uintptr_t)buf % sizeof(uword_t)) {
+        return -EINVAL;
+    }
+#endif
     if (addr % FLASHPAGE_WRITE_BLOCK_ALIGNMENT) {
         return -EINVAL;
     }
