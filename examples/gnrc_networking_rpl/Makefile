@@ -7,13 +7,6 @@ BOARD ?= native
 # This has to be the absolute path to the RIOT base directory:
 RIOTBASE ?= $(CURDIR)/../..
 
-# we need to define the interface on which RPL will run
-ifeq (native,$(BOARD))
-  CFLAGS += -DCONFIG_GNRC_RPL_DEFAULT_NETIF=7
-else
-  CFLAGS += -DCONFIG_GNRC_RPL_DEFAULT_NETIF=6
-endif
-
 # foren6 sniffer listens on channel 11
 CFLAGS += -DCONFIG_IEEE802154_DEFAULT_CHANNEL=11
 
@@ -88,6 +81,18 @@ endif
 QUIET ?= 1
 
 include $(RIOTBASE)/Makefile.include
+
+# we need to define the interface on which RPL will run
+GNRC_RPL_DEFAULT_NETIF ?= 5
+
+ifneq (,$(filter gnrc_sixlowpan, $(USEMODULE)))
+  GNRC_RPL_DEFAULT_NETIF := ($(GNRC_RPL_DEFAULT_NETIF) + 1)
+endif
+ifneq (,$(filter core_idle_thread, $(USEMODULE)))
+  GNRC_RPL_DEFAULT_NETIF := ($(GNRC_RPL_DEFAULT_NETIF) + 1)
+endif
+
+CFLAGS += -DCONFIG_GNRC_RPL_DEFAULT_NETIF="$(GNRC_RPL_DEFAULT_NETIF)"
 
 # Set a custom channel if needed
 include $(RIOTMAKE)/default-radio-settings.inc.mk
