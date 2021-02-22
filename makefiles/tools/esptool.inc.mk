@@ -40,6 +40,10 @@ ifneq (,$(filter esp_qemu,$(USEMODULE)))
   FFLAGS += head -c $$((0x10000)) |
   FFLAGS += cat - $(FLASHFILE).bin tmp.bin |
   FFLAGS += head -c $(FLASH_SIZE)MB > $(BINDIR)/$(CPU)flash.bin && rm tmp.bin;
+  ifeq (esp32,$(CPU_FAM))
+    FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin &&
+    FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
+  endif
 else
   PROGRAMMER_SPEED ?= 460800
   FLASHER = $(ESPTOOL)
