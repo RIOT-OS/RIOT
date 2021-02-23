@@ -44,6 +44,12 @@ static int _read(mtd_dev_t *dev, void *buf, uint32_t addr, uint32_t size)
 
     (void)dev;
 
+#ifndef CPU_HAS_UNALIGNED_ACCESS
+    if (addr % sizeof(uword_t)) {
+        return -EINVAL;
+    }
+#endif
+
     uword_t dst_addr = addr;
     memcpy(buf, (void *)dst_addr, size);
 
