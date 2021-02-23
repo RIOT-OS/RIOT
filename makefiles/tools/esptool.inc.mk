@@ -12,38 +12,14 @@ ESPTOOL ?= $(RIOTTOOLS)/esptool/esptool.py
 # The ELFFILE is the base one used for flashing
 FLASHFILE ?= $(ELFFILE)
 
-# configure preflasher to convert .elf to .bin before flashing
-PREFLASHER = $(ESPTOOL)
-PREFFLAGS  = --chip $(FLASH_CHIP) elf2image
-PREFFLAGS += --flash_mode $(FLASH_MODE) --flash_size $(FLASH_SIZE)MB
-PREFFLAGS += --flash_freq $(FLASH_FREQ) $(FLASH_OPTS)
-PREFFLAGS += -o $(FLASHFILE).bin $(FLASHFILE);
-PREFFLAGS += printf "\n" > $(BINDIR)/partitions.csv;
-PREFFLAGS += printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $(BINDIR)/partitions.csv;
-PREFFLAGS += printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $(BINDIR)/partitions.csv;
-PREFFLAGS += printf "factory, app, factory, 0x10000, " >> $(BINDIR)/partitions.csv;
-PREFFLAGS += ls -l $(FLASHFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partitions.csv;
-
-PREFFLAGS += python3 $(RIOTTOOLS)/esptool/gen_esp32part.py
-PREFFLAGS += --verify $(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
-FLASHDEPS += preflash
+# Convert .elf to .bin before flashing
+FLASHDEPS += esp-image-convert
 
 # flasher configuration
 ifneq (,$(filter esp_qemu,$(USEMODULE)))
-  FLASHER = dd
-  FFLAGS += if=/dev/zero bs=1M count=$(FLASH_SIZE) |
-  FFLAGS += tr "\\000" "\\377" > tmp.bin && cat tmp.bin |
-  FFLAGS += head -c $$(($(BOOTLOADER_POS))) |
-  FFLAGS += cat - $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN) tmp.bin |
-  FFLAGS += head -c $$((0x8000)) |
-  FFLAGS += cat - $(BINDIR)/partitions.bin tmp.bin |
-  FFLAGS += head -c $$((0x10000)) |
-  FFLAGS += cat - $(FLASHFILE).bin tmp.bin |
-  FFLAGS += head -c $(FLASH_SIZE)MB > $(BINDIR)/$(CPU)flash.bin && rm tmp.bin;
-  ifeq (esp32,$(CPU_FAM))
-    FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin &&
-    FFLAGS += cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
-  endif
+  FLASHER =
+  FFLAGS =
+  FLASHDEPS += esp-qemu
 else
   PROGRAMMER_SPEED ?= 460800
   FLASHER = $(ESPTOOL)
@@ -53,6 +29,35 @@ else
   FFLAGS += $(BOOTLOADER_POS) $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN)
   FFLAGS += 0x8000 $(BINDIR)/partitions.bin
   FFLAGS += 0x10000 $(FLASHFILE).bin
+endif
+
+.PHONY: esp-image-convert esp-qemu
+# prepare image to flash: convert .elf to .bin
+esp-image-convert:
+	$(Q)$(ESPTOOL) --chip $(FLASH_CHIP) elf2image --flash_mode $(FLASH_MODE) \
+		--flash_size $(FLASH_SIZE)MB --flash_freq $(FLASH_FREQ) $(FLASH_OPTS) \
+		-o $(FLASHFILE).bin $(FLASHFILE)
+	$(Q)printf "\n" > $(BINDIR)/partitions.csv
+	$(Q)printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $(BINDIR)/partitions.csv
+	$(Q)printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $(BINDIR)/partitions.csv
+	$(Q)printf "factory, app, factory, 0x10000, " >> $(BINDIR)/partitions.csv
+	$(Q)ls -l $(FLASHFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partitions.csv
+	$(Q)python3 $(RIOTTOOLS)/esptool/gen_esp32part.py --verify \
+		$(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
+
+esp-qemu:
+	$(Q)dd if=/dev/zero bs=1M count=$(FLASH_SIZE) | \
+	  tr "\\000" "\\377" > tmp.bin && cat tmp.bin | \
+		head -c $$(($(BOOTLOADER_POS))) | \
+		cat - $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN) tmp.bin | \
+		head -c $$((0x8000)) | \
+		cat - $(BINDIR)/partitions.bin tmp.bin | \
+		head -c $$((0x10000)) | \
+		cat - $(FLASHFILE).bin tmp.bin | \
+		head -c $(FLASH_SIZE)MB > $(BINDIR)/$(CPU)flash.bin && rm tmp.bin
+ifeq (esp32,$(CPU_FAM))
+	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin
+	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
 endif
 
 # reset tool configuration
