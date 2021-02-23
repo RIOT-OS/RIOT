@@ -158,6 +158,12 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  *
  * Pointers will end up sorted by prio.
  *
+ * @note This implementation uses the __typeof__() C extension.
+ *       It is available both in GCC and LLVM, and both don't complain with
+ *       plain "-std=c11". If deemed necessary, use of __typeof__ can be removed
+ *       and the type can be added as parameter, at the cost of much less
+ *       convenience.
+ *
  * @param[in]   xfa_name    name of the xfa
  * @param[in]   prio        priority within the xfa
  * @param[in]   name        symbol name
@@ -165,7 +171,7 @@ _Pragma("GCC diagnostic ignored \"-Warray-bounds\"")
  */
 #define XFA_ADD_PTR(xfa_name, prio, name, entry) \
     _XFA_CONST(xfa_name, 5_ ## prio) \
-    const typeof(entry) xfa_name ## _ ## prio ## _ ## name = entry
+    const __typeof__(entry) xfa_name ## _ ## prio ## _ ## name = entry
 
 /**
  * @brief Calculate number of entries in cross-file array
