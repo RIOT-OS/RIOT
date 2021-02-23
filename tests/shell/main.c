@@ -52,8 +52,8 @@ void shell_post_command_hook(int ret, int argc, char **argv)
 
 static int print_teststart(int argc, char **argv)
 {
-    (void) argc;
-    (void) argv;
+    (void)argc;
+    (void)argv;
     printf("[TEST_START]\n");
 
     return 0;
@@ -61,8 +61,8 @@ static int print_teststart(int argc, char **argv)
 
 static int print_testend(int argc, char **argv)
 {
-    (void) argc;
-    (void) argv;
+    (void)argc;
+    (void)argv;
     printf("[TEST_END]\n");
 
     return 0;
@@ -80,8 +80,8 @@ static int print_echo(int argc, char **argv)
 
 static int print_shell_bufsize(int argc, char **argv)
 {
-    (void) argc;
-    (void) argv;
+    (void)argc;
+    (void)argv;
     printf("%d\n", SHELL_DEFAULT_BUFSIZE);
 
     return 0;
@@ -89,8 +89,8 @@ static int print_shell_bufsize(int argc, char **argv)
 
 static int print_empty(int argc, char **argv)
 {
-    (void) argc;
-    (void) argv;
+    (void)argc;
+    (void)argv;
     return 0;
 }
 
@@ -105,8 +105,8 @@ static const shell_command_t shell_commands[] = {
 
 static int _xfa_test1(int argc, char **argv)
 {
-    (void) argc;
-    (void) argv;
+    (void)argc;
+    (void)argv;
     printf("[XFA TEST 1 OK]\n");
 
     return 0;
@@ -114,8 +114,8 @@ static int _xfa_test1(int argc, char **argv)
 
 static int _xfa_test2(int argc, char **argv)
 {
-    (void) argc;
-    (void) argv;
+    (void)argc;
+    (void)argv;
     printf("[XFA TEST 2 OK]\n");
 
     return 0;
@@ -124,8 +124,8 @@ static int _xfa_test2(int argc, char **argv)
 /* Add above commands to the shell commands XFA using helper macro.
  * Intentionally reversed order to test linker script based alphanumeric
  * ordering. */
-SHELL_COMMAND(xfa_test2, "xfa test command 2",_xfa_test2);
-SHELL_COMMAND(xfa_test1, "xfa test command 1",_xfa_test1);
+SHELL_COMMAND(xfa_test2, "xfa test command 2", _xfa_test2);
+SHELL_COMMAND(xfa_test1, "xfa test command 1", _xfa_test1);
 
 int main(void)
 {
@@ -144,9 +144,7 @@ int main(void)
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     /* or use only system shell commands */
-    /*
-    shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE);
-    */
+    /* shell_run(NULL, line_buf, SHELL_DEFAULT_BUFSIZE); */
 
     return 0;
 }
