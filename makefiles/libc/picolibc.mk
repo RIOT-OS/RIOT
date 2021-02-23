@@ -6,6 +6,11 @@ ifneq (,$(filter picolibc,$(USEMODULE)))
         CFLAGS += -fshort-wchar
         LINKFLAGS += -Wl,--no-wchar-size-warning
     endif
+  else
+    $(warning picolibc was selected to be build but no picolibc.spec could be found)
+    $(warning you might want to install "picolibc" for "$(TARGET_ARCH)")
+    $(warning or add "FEATURES_BLACKLIST += picolibc" to Makefile)
+    $(error   check your installation or build configuration.)
   endif
 endif
 
