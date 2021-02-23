@@ -9,6 +9,13 @@ ROM_OFFSET ?= 0
 _ROM_ADDR_WITH_OFFSET ?= $(shell printf "0x%x" $$(($(ROM_START_ADDR) + $(ROM_OFFSET))))
 FLASH_ADDR ?= $(if $(ROM_OFFSET),$(_ROM_ADDR_WITH_OFFSET),$(ROM_START_ADDR))
 DFU_USE_DFUSE ?= 0
+
+# Warn about deprecated variables
+ifneq (,$(FFLAGS_OPTS))
+  $(warning Warning! FFLAGS_OPTS is deprecated use DFU_UTIL_FLAGS_OPTS)
+  DFU_UTIL_FLAGS_OPTS ?= $(FFLAGS_OPTS)
+endif
+
 # Optional flasher flags
 DFU_UTIL_FLAGS_OPTS ?=
 
