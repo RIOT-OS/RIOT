@@ -2,12 +2,6 @@
 # https://www.microchip.com/DevelopmentTools/ProductDetails/atmega1284p-xpld
 ATMEGA_BOOTLOADER_SIZE ?= 4K
 
-# For backward compatibility
-ifneq (,$(AVRDUDE_PORT))
-  $(warning Warning! AVRDUDE_PORT is deprecated use PROG_DEV)
-  PROG_DEV ?= $(AVRDUDE_PORT)
-endif
-
 # Avrdude programmer defaults to the external flasher Bus Pirate ISP.
 AVRDUDE_PROGRAMMER  ?= buspirate
 # set serial port for avrdude with buspirate
