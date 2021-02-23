@@ -1,9 +1,3 @@
-# For backward compatibility
-ifneq (,$(AVRDUDE_PORT))
-  $(warning Warning! AVRDUDE_PORT is deprecated use PROG_DEV)
-  PROG_DEV ?= $(AVRDUDE_PORT)
-endif
-
 PORT_LINUX      ?= /dev/ttyUSB0
 PROG_DEV        ?= /dev/ttyACM0
 PORT_DARWIN     ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
