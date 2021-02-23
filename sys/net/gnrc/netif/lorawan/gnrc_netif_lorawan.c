@@ -18,6 +18,7 @@
 
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/netif.h"
+#include "net/gnrc/netif/hdr.h"
 #include "net/gnrc/netif/lorawan.h"
 #include "net/gnrc/netif/internal.h"
 #include "net/gnrc/lorawan.h"
@@ -90,19 +91,47 @@ static inline void _set_be_addr(gnrc_lorawan_t *mac, uint8_t *be_addr)
 
 void gnrc_lorawan_mcps_indication(gnrc_lorawan_t *mac, mcps_indication_t *ind)
 {
-    (void)mac;
+    gnrc_netif_t *netif = container_of(mac, gnrc_netif_t, lorawan.mac);
+    gnrc_nettype_t nettype = IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR)
+                     ? GNRC_NETTYPE_UNDEF
+                     : GNRC_NETTYPE_LORAWAN;
+    uint32_t demux = IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR)
+                     ? GNRC_NETREG_DEMUX_CTX_ALL
+                     : ind->data.port;
+
+    assert(ind->data.port >= LORAMAC_PORT_MIN && ind->data.port <= LORAMAC_PORT_MAX);
+
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, ind->data.pkt->iol_base,
                                           ind->data.pkt->iol_len,
-                                          GNRC_NETTYPE_LORAWAN);
+                                          nettype);
     if (!pkt) {
         DEBUG("gnrc_lorawan: mcps_indication: couldn't allocate pktbuf\n");
         return;
     }
 
-    if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_LORAWAN, ind->data.port,
-                                      pkt)) {
-        gnrc_pktbuf_release(pkt);
+    if (IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR)) {
+        gnrc_pktsnip_t *netif_snip = gnrc_netif_hdr_build(NULL, 0,
+                                                          &ind->data.port,
+                                                          sizeof(ind->data.port));
+        if (netif_snip == NULL) {
+            DEBUG("gnrc_lorawan_netif: no space left in packet buffer\n");
+            goto release;
+        }
+
+        gnrc_netif_hdr_t *hdr = netif_snip->data;
+        gnrc_netif_hdr_set_netif(hdr, netif);
+        pkt = gnrc_pkt_append(pkt, netif_snip);
     }
+
+    if (!gnrc_netapi_dispatch_receive(nettype, demux, pkt)) {
+        DEBUG("gnrc_lorawan_netif: unable to forward packet\n")
+        goto release;
+    }
+
+    return;
+
+release:
+    gnrc_pktbuf_release(pkt);
 }
 
 void gnrc_lorawan_mlme_indication(gnrc_lorawan_t *mac, mlme_indication_t *ind)
@@ -251,23 +280,51 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
     mlme_request_t mlme_request;
     mlme_confirm_t mlme_confirm;
 
+    gnrc_pktsnip_t *head;
+    uint8_t port;
+    int res = -EINVAL;
+
+    if (IS_ACTIVE(CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR)) {
+        gnrc_netif_hdr_t *netif_hdr;
+        const uint8_t *dst;
+        netif_hdr = payload->data;
+        dst = gnrc_netif_hdr_get_dst_addr(netif_hdr);
+
+        assert(payload->type == GNRC_NETTYPE_NETIF);
+        head = payload->next;
+        port = dst[0];
+
+        if (netif_hdr->dst_l2addr_len != sizeof(port)) {
+            goto end;
+        }
+    }
+    else {
+        head = payload;
+        port = netif->lorawan.port;
+    }
+
     if (netif->lorawan.flags & GNRC_NETIF_LORAWAN_FLAGS_LINK_CHECK) {
         mlme_request.type = MLME_LINK_CHECK;
         gnrc_lorawan_mlme_request(&netif->lorawan.mac, &mlme_request,
                                   &mlme_confirm);
     }
+
     mcps_request_t req =
     { .type = netif->lorawan.ack_req ? MCPS_CONFIRMED : MCPS_UNCONFIRMED,
       .data =
-      { .pkt = (iolist_t *)payload, .port = netif->lorawan.port,
+      { .pkt = (iolist_t *)head, .port = port,
           .dr = netif->lorawan.datarate } };
     mcps_confirm_t conf;
 
     gnrc_lorawan_mcps_request(&netif->lorawan.mac, &req, &conf);
-    if (conf.status < 0) {
-        gnrc_pktbuf_release_error(payload, conf.status);
+    res = conf.status;
+
+end:
+    if (res < 0) {
+        gnrc_pktbuf_release_error(payload, res);
     }
-    return conf.status;
+
+    return res;
 }
 
 static void _msg_handler(gnrc_netif_t *netif, msg_t *msg)

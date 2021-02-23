@@ -30,6 +30,21 @@ extern "C" {
 #define GNRC_NETIF_LORAWAN_FLAGS_LINK_CHECK                (0x1U)
 
 /**
+ * @brief Encode LoRaWAN port in GNRC netif header.
+ *
+ * When set, GNRC netif will interpret the destination address of the
+ * GNRC netif header as the LoRaWAN port. For downlinks, a GNRC netif header
+ * with the received port in destination field will be included in the
+ * first snip.
+ *
+ * @deprecated From Release 2021.10 all GNRC LoRaWAN packets will include
+ * the GNRC Netif header. Therefore this parameter will be removed
+ */
+#if defined(DOXYGEN)
+#define CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR
+#endif
+
+/**
  * @brief   GNRC LoRaWAN interface descriptor
  */
 typedef struct {
