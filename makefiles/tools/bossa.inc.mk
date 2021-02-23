@@ -1,6 +1,13 @@
 BOSSA_VERSION ?= 1.9
 FLASHFILE ?= $(BINFILE)
 FLASHER ?= $(RIOTTOOLS)/bossa-$(BOSSA_VERSION)/bossac
+
+# Warn about deprecated variables
+ifneq (,$(FFLAGS_OPTS))
+  $(warning Warning! FFLAGS_OPTS is deprecated use BOSSA_FLAGS_OPTS)
+  BOSSA_FLAGS_OPTS ?= $(FFLAGS_OPTS)
+endif
+
 BOSSA_FLAGS_OPTS ?=
 
 # Only use ROM_OFFSET with Bossa version 1.9
