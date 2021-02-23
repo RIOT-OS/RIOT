@@ -43,11 +43,6 @@ KCONFIG_OUT_CONFIG = $(GENERATED_DIR)/out.config
 # whenever a change occurs on one of the previously used Kconfig files.
 KCONFIG_OUT_DEP = $(KCONFIG_OUT_CONFIG).d
 
-# Include configuration symbols if available. This allows to check for Kconfig
-# symbols in makefiles. Make tries to 'remake' all included files (see
-# https://www.gnu.org/software/make/manual/html_node/Remaking-Makefiles.html).
--include $(KCONFIG_OUT_CONFIG)
-
 # Add configurations to merge, in ascendent priority (i.e. a file overrides the
 # previous ones).
 #
@@ -100,6 +95,11 @@ endif
 export SHOULD_RUN_KCONFIG
 
 ifneq (,$(SHOULD_RUN_KCONFIG))
+
+# Include configuration symbols if available. This allows to check for Kconfig
+# symbols in makefiles. Make tries to 'remake' all included files (see
+# https://www.gnu.org/software/make/manual/html_node/Remaking-Makefiles.html).
+-include $(KCONFIG_OUT_CONFIG)
 
 # Add configuration header to build dependencies
 BUILDDEPS += $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) $(FIXDEP)
