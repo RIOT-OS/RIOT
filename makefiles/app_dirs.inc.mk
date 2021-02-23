@@ -11,7 +11,7 @@ EXAMPLES_APPLICATIONS_SUBDIRS :=  \
     dtls                      \
     gnrc                      \
     icn                       \
-    lora                      \
+    lorawan                   \
     mqtt                      \
     posix                     \
     #
