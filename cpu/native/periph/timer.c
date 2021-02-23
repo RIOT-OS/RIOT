@@ -66,7 +66,7 @@ static struct itimerval itv;
 static unsigned long ts2ticks(struct timespec *tp)
 {
     /* TODO: check for overflow */
-    return(((unsigned long)tp->tv_sec * NATIVE_TIMER_SPEED) + (tp->tv_nsec / 1000));
+    return (((unsigned long)tp->tv_sec * NATIVE_TIMER_SPEED) + (tp->tv_nsec / 1000));
 }
 
 /**
