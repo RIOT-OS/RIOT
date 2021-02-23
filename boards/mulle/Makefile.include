@@ -5,6 +5,7 @@ endif
 
 # this board uses openocd
 PROGRAMMER ?= openocd
+PROGRAMMERS_SUPPORTED += openocd
 
 # Default debug adapter choice is to use the Mulle programmer board
 OPENOCD_DEBUG_ADAPTER ?= mulle

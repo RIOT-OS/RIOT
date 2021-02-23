@@ -13,6 +13,7 @@ endif
 
 # this board uses openocd
 PROGRAMMER ?= openocd
+PROGRAMMERS_SUPPORTED += openocd
 
 # We need special handling of the watchdog if we want to speed up the flash
 # verification by using the MCU to compute the image checksum after flashing.

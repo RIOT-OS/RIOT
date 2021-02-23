@@ -2,6 +2,7 @@
 # of writing has not been merged in the tree and is only available at
 # http://openocd.zylin.com/#/c/5584/ .
 PROGRAMMER ?= openocd
+PROGRAMMERS_SUPPORTED += openocd
 
 # Using dap or jlink depends on which firmware the OpenSDA debugger is running
 #OPENOCD_DEBUG_ADAPTER ?= dap
