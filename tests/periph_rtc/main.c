@@ -172,8 +172,15 @@ int main(void)
         /* capture time before printf */
         uint32_t now_usecs = xtimer_now_usec();
         if (++cnt < REPEAT) {
-            struct tm time;
+            struct tm alarm = time;
             rtc_get_time(&time);
+
+            if (alarm.tm_sec != time.tm_sec) {
+                puts("alarm time mismatch");
+                print_time("expected: ", &alarm);
+                print_time("now:      ", &time);
+            }
+
             time.tm_sec += PERIOD;
             rtc_set_alarm(&time, cb, &rtc_mtx);
         }
