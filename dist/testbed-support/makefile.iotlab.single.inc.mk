@@ -172,17 +172,14 @@ info-iotlab-node:
 
 # Configure FLASHER, RESET, TERMPROG depending on BOARD and if on frontend
 
-# Command to check if 'stdin' is 0. Cannot use 'cmp - <(echo 0)' without bash shell
-_STDIN_EQ_0 = grep 0
-
 ifneq (iotlab-a8-m3,$(BOARD))
 
   # M3 nodes
   FLASHER     = iotlab-node
   RESET       = iotlab-node
-  _NODE_FMT   = --jmespath='keys(@)[0]' --format='int'
-  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) $(_NODES_FLASH_OPTION) $(FLASHFILE) | $(_STDIN_EQ_0)
-  RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) --reset | $(_STDIN_EQ_0)
+  _NODE_FMT   = --jmespath='keys(@)[0]' --format='lambda ret: exit(int(ret))'
+  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) $(_NODES_FLASH_OPTION) $(FLASHFILE)
+  RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) --reset
 
   ifeq (,$(_IOTLAB_ON_FRONTEND))
     TERMPROG  = ssh
@@ -198,8 +195,8 @@ else
   FLASHER     = iotlab-ssh
   RESET       = iotlab-ssh
   _NODE_FMT   = --jmespath='keys(values(@)[0])[0]' --fmt='int'
-  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) flash-m3 $(_IOTLAB_NODELIST) $(FLASHFILE) | $(_STDIN_EQ_0)
-  RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) reset-m3 $(_IOTLAB_NODELIST) | $(_STDIN_EQ_0)
+  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) flash-m3 $(_IOTLAB_NODELIST) $(FLASHFILE)
+  RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) reset-m3 $(_IOTLAB_NODELIST)
 
   TERMPROG  = ssh
   ifeq (,$(_IOTLAB_ON_FRONTEND))
