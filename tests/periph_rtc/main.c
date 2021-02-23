@@ -122,7 +122,7 @@ int main(void)
 
         if (++cnt < REPEAT) {
             struct tm time;
-            rtc_get_alarm(&time);
+            rtc_get_time(&time);
             inc_secs(&time, PERIOD);
             rtc_set_alarm(&time, cb, &rtc_mtx);
         }
