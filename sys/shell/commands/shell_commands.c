@@ -108,6 +108,10 @@ extern int _openwsn_ifconfig(int argc, char **argv);
 extern int _openwsn_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_LWIP_NETIF
+extern int _lwip_netif_config(int argc, char **argv);
+#endif
+
 #ifdef MODULE_FIB
 extern int _fib_route_handler(int argc, char **argv);
 #endif
@@ -261,6 +265,9 @@ const shell_command_t _shell_command_list[] = {
 #ifdef MODULE_OPENWSN
     {"ifconfig", "Shows assigned IPv6 addresses", _openwsn_ifconfig},
     {"openwsn", "OpenWSN commands", _openwsn_handler},
+#endif
+#ifdef MODULE_LWIP_NETIF
+    {"ifconfig", "List network interfaces", _lwip_netif_config},
 #endif
 #ifdef MODULE_FIB
     {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
