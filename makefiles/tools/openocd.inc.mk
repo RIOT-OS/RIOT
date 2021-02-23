@@ -9,6 +9,17 @@ DEBUGGER_FLAGS ?= debug $(ELFFILE)
 DEBUGSERVER_FLAGS ?= debug-server
 RESET_FLAGS ?= reset
 
+# Warn about deprecated variables
+ifneq (,$(DEBUG_ADAPTER))
+  $(warning Warning! DEBUG_ADAPTER is deprecated use OPENOCD_DEBUG_ADAPTER)
+  OPENOCD_DEBUG_ADAPTER ?= $(DEBUG_ADAPTER)
+endif
+
+ifneq (,$(PRE_FLASH_CHECK_SCRIPT))
+  $(warning Warning! PRE_FLASH_CHECK_SCRIPT is deprecated use OPENOCD_PRE_FLASH_CHECK_SCRIPT)
+  OPENOCD_PRE_FLASH_CHECK_SCRIPT ?= $(PRE_FLASH_CHECK_SCRIPT)
+endif
+
 ifneq (,$(OPENOCD_DEBUG_ADAPTER))
   include $(RIOTMAKE)/tools/openocd-adapters/$(OPENOCD_DEBUG_ADAPTER).inc.mk
   OPENOCD_ADAPTER_INIT += -c 'transport select $(OPENOCD_TRANSPORT)'
