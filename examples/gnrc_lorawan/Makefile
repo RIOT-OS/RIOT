@@ -1,24 +1,37 @@
 # name of your application
 APPLICATION = gnrc_lorawan
 
-USEMODULE += shell
-USEMODULE += shell_commands
-USEMODULE += gnrc_netdev_default
-USEMODULE += auto_init_gnrc_netif
-USEMODULE += gnrc_lorawan
-USEMODULE += gnrc_pktdump
-USEMODULE += gnrc_neterr
+# Turn on developer helpers
+DEVELHELP ?= 1
 
 BOARD ?= b-l072z-lrwan1
 RIOTBASE ?= ../../
 
-# Turn on developer helpers
-DEVELHELP ?= 1
+# Include board's default network devices and auto-initialization of GNRC
+# interfaces
+USEMODULE += gnrc_netdev_default
+USEMODULE += auto_init_gnrc_netif
 
-# use SX1276 by default
-DRIVER ?= sx1276
+# Add support for GNRC LoRaWAN
+USEMODULE += gnrc_lorawan
 
-USEMODULE += $(DRIVER)
+# Use GNRC pktdump to print downlink messages
+USEMODULE += gnrc_pktdump
+
+# Include the shell and shell commands.
+USEMODULE += shell
+USEMODULE += shell_commands
+
+# Use GNRC Txtsnd to transmit LoRaWAN from the shell
+USEMODULE += gnrc_txtsnd
+
+# Uncomment as needed if a board doesn't include a LoRa radio by default
+# USEMODULE += sx1272
+# USEMODULE += sx1276
+
+# As there is an 'app.config' we want to explicitly disable Kconfig by setting
+# the variable to empty
+SHOULD_RUN_KCONFIG ?=
 
 include $(RIOTBASE)/Makefile.include
 
@@ -32,6 +45,14 @@ include $(RIOTBASE)/Makefile.include
 
 # Check if being configured via Kconfig
 ifndef CONFIG_KCONFIG_USEMODULE_LORAWAN
+
+  # Tell GNRC to encode LoRaWAN port in the GNRC netif header.
+  # This allows us to use `gnrc_txtsnd` to send data from the shell using the
+  # `txtsnd` command.
+  #
+  # Note: From Release 22.01 all GNRC LoRaWAN packets will include the netif
+  # header. Therefore this flag will be removed after that
+  CFLAGS += -DCONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR
 
   CFLAGS += -DCONFIG_LORAMAC_APP_KEY_DEFAULT=\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"
   CFLAGS += -DCONFIG_LORAMAC_APP_EUI_DEFAULT=\"BBBBBBBBBBBBBBBB\"
