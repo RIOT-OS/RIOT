@@ -59,6 +59,7 @@
 #include "xtensa/core-macros.h"
 #include "xtensa/xtensa_api.h"
 
+#include "board_generic.h"
 #include "periph_cpu.h"
 #include "tools.h"
 

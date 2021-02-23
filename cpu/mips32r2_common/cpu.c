@@ -25,6 +25,7 @@
 #include "cpu.h"
 #include "board.h"
 
+#include "board_generic.h"
 
 void mips_start(void);
 

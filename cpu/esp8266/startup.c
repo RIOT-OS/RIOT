@@ -40,6 +40,8 @@
 #include "rom_functions.h"
 #include "sdk/sdk.h"
 
+#include "board_generic.h"
+
 #if MODULE_ESP_GDBSTUB
 #include "gdbstub.h"
 #endif
