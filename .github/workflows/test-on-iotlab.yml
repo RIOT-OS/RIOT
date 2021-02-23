@@ -82,6 +82,10 @@ jobs:
       #   but flashing at a specific offset is not (yet) supported on IoT-LAB
       #   so it will always fail because of that limitation
       APPLICATIONS_EXCLUDE: tests/periph_timer_short_relative_set tests/riotboot
+      # Increase tolerance error with `tests/periph_timer_periodic` because
+      # of timing issues with the test script when running in the github
+      # actions environment
+      TEST_PERIPH_TIMER_PERIODIC_PRECISION: 0.30
     steps:
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
