@@ -140,5 +140,3 @@ splx_(int sr)
     asmv("bis %0, r2" : : "r"(sr));
     asmv("nop");
 }
-
-extern void board_init(void);

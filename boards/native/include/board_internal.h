@@ -13,9 +13,10 @@
 extern "C" {
 #endif
 
+#include "board_generic.h"
+
 extern int _native_null_out_file;
 extern int _native_null_in_pipe[2];
-void board_init(void);
 
 #ifdef __cplusplus
 }

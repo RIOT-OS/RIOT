@@ -25,6 +25,8 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
+#include "board_generic.h"
+
 /* For Catchall-Loop */
 #include "board.h"
 #ifdef MODULE_PUF_SRAM
@@ -34,7 +36,6 @@
 /**
  * @brief functions for initializing the board, std-lib and kernel
  */
-extern void board_init(void);
 extern void kernel_init(void);
 extern void __libc_init_array(void);
 
