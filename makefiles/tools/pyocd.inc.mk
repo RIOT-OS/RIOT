@@ -3,6 +3,12 @@ DEBUGGER ?= $(RIOTBASE)/dist/tools/pyocd/pyocd.sh
 DEBUGSERVER ?= $(RIOTBASE)/dist/tools/pyocd/pyocd.sh
 RESET ?= $(RIOTBASE)/dist/tools/pyocd/pyocd.sh
 
+# Warn about deprecated variables
+ifneq (,$(FLASH_TARGET_TYPE))
+  $(warning Warning! FLASH_TARGET_TYPE is deprecated use PYOCD_FLASH_TARGET_TYPE)
+  PYOCD_FLASH_TARGET_TYPE ?= $(FLASH_TARGET_TYPE)
+endif
+
 PYOCD_FLASH_TARGET_TYPE ?=
 FLASHFILE ?= $(HEXFILE)
 FFLAGS ?= flash $(FLASHFILE)
