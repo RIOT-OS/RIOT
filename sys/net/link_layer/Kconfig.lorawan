@@ -409,7 +409,6 @@ config LORAMAC_DEFAULT_RETX
 
 config LORAMAC_DEFAULT_ADR
     bool "Enable ADR" if LORAMAC_ADVANCED_OPTIONS
-    depends on USEPKG_SEMTECH_LORAMAC || USEMODULE_RN2XX3
     help
         Enable or disable Adaptive Data Rate (ADR). If enabled the end node will
         inform the network server about the status of ADR using the ADR field in
@@ -571,4 +570,20 @@ config LORAMAC_DEFAULT_REDUNDANCY
          By default, uplinks are sent without retransmissions
          (this means, the device sends only one uplink packet)
 
-endmenu # LoRaWAN MAC
+config LORAMAC_DEFAULT_ADR_ACK_LIMIT
+    int "ACK limit (ADR)" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEMODULE_GNRC_LORAWAN
+    default 64
+    help
+        Defines the ADR ACK counter limit (`ADR_ACK_CNT`).
+
+config LORAMAC_DEFAULT_ADR_ACK_DELAY
+    int "ACK delay (ADR)" if LORAMAC_ADVANCED_OPTIONS
+    depends on USEMODULE_GNRC_LORAWAN
+    default 32
+    help
+        Configure the window ,in terms of number of uplink frames, within which
+        Network Server is expected to send a downlink after `ADRACKReq` bit has
+        been set by the node.
+
+endif # KCONFIG_USEMODULE_LORAWAN

@@ -504,17 +504,14 @@ extern "C" {
 #ifndef CONFIG_LORAMAC_DEFAULT_MIN_RX_SYMBOLS
 #define CONFIG_LORAMAC_DEFAULT_MIN_RX_SYMBOLS   (12)
 #endif
-/**
- * @}
- */
 
 /**
  * @brief   Default adaptive datarate ACK limit (in s)
  *
  * @note This feature is not yet supported.
  */
-#ifndef LORAMAC_DEFAULT_ADR_ACK_LIMIT
-#define LORAMAC_DEFAULT_ADR_ACK_LIMIT           (64U)
+#ifndef CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT
+#define CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT    (64U)
 #endif
 
 /**
@@ -525,6 +522,8 @@ extern "C" {
 #ifndef CONFIG_LORAMAC_DEFAULT_ADR_ACK_DELAY
 #define CONFIG_LORAMAC_DEFAULT_ADR_ACK_DELAY    (32)
 #endif
+
+/** @} */
 
 /**
  * @brief   Default adaptive datarate timeout
