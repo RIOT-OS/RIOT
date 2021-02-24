@@ -96,3 +96,6 @@ endif
 
 # All ESP are flashed using esptool
 PROGRAMMER ?= esptool
+
+# Add esptool in the list supported programmers
+PROGRAMMERS_SUPPORTED += esptool

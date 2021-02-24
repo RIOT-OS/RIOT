@@ -4,6 +4,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
 # this board uses openocd with a custom reset command
 PROGRAMMER ?= openocd
+PROGRAMMERS_SUPPORTED += openocd
 OPENOCD_CMD_RESET_RUN =-c _reset
 
 # use our own openocd script to flash since HiFive1 has reset problems.

@@ -5,3 +5,5 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 # setup flash tool
 PROGRAMMER ?= goodfet
 GOODFET_FLAGS ?= --z1
+
+PROGRAMMERS_SUPPORTED += goodfet

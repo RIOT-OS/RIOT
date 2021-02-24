@@ -3,6 +3,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
 # for this board we support flashing via openocd or pyocd
 PROGRAMMER ?= openocd
+PROGRAMMERS_SUPPORTED += pyocd
 
 OPENOCD_DEBUG_ADAPTER = dap
 

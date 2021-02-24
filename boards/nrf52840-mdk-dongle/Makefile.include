@@ -16,4 +16,6 @@ ifeq (uf2conv,$(PROGRAMMER))
   include $(RIOTMAKE)/tools/usb_board_reset.mk
 endif
 
+PROGRAMMERS_SUPPORTED += uf2conv
+
 include $(RIOTBOARD)/common/nrf52/Makefile.include

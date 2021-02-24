@@ -7,3 +7,6 @@ endif
 
 # use shared Makefile.include
 include $(RIOTBOARD)/common/nrf52xxxdk/Makefile.include
+
+# openocd doesn't fully work with this board
+PROGRAMMERS_SUPPORTED := $(filter-out openocd,$(PROGRAMMERS_SUPPORTED))

@@ -3,6 +3,9 @@ INCLUDES += -I$(RIOTBOARD)/common/atmega/include
 # Use avrdude programmer
 PROGRAMMER ?= avrdude
 
+# Add avrdude as supported programmer
+PROGRAMMERS_SUPPORTED += avrdude
+
 # Use atmega board specific bootloader by default
 ATMEGA_BOOTLOADER ?= $($(call uppercase_and_underscore,$(BOARD))_BOOTLOADER)
 

@@ -1,6 +1,9 @@
 # define the default flash-tool
 PROGRAMMER ?= cc2538-bsl
 
+# cc2538-bsl programmer is supported
+PROGRAMMERS_SUPPORTED += cc2538-bsl
+
 ifeq ($(PROGRAMMER),cc2538-bsl)
   PROG_BAUD ?= 460800
 else ifeq ($(PROGRAMMER),jlink)

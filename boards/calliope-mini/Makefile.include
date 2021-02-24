@@ -1,6 +1,9 @@
 # for this board we support flashing via openocd or pyocd
 PROGRAMMER ?= openocd
 
+# This board can be flashed with pyocd
+PROGRAMMERS_SUPPORTED += pyocd
+
 OPENOCD_DEBUG_ADAPTER = dap
 # PyOCD doesn't recognize automatically the board ID, so target type has to
 # be passed explicitly

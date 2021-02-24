@@ -1,6 +1,7 @@
 # by default, we use BOSSA to flash this board to take into account the
 # pre-flashed Arduino bootloader
 PROGRAMMER ?= bossa
+PROGRAMMERS_SUPPORTED += bossa
 
 # setup the flash tool used
 ifeq ($(PROGRAMMER),jlink)

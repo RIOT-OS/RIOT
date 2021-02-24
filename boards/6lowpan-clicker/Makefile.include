@@ -1,6 +1,6 @@
 # use pic32prog by default to program this board
 PROGRAMMER ?= pic32prog
-
+PROGRAMMERS_SUPPORTED += pic32prog
 ifeq ($(PROGRAMMER),pic32prog)
   # pic32prog
   #

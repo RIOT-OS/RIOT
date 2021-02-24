@@ -5,6 +5,8 @@ CFLAGS += -DBOARD_NRFANTENNA_DEFAULT=BOARD_NRFANTENNA_$(BOARD_NRFANTENNA_DEFAULT
 # add the common header files to the include path
 INCLUDES += -I$(RIOTBOARD)/common/particle-mesh/include
 
+PROGRAMMERS_SUPPORTED += dfu-util pyocd
+
 ifeq (1,$(PARTICLE_MONOFIRMWARE))
   CFLAGS += -DPARTICLE_MONOFIRMWARE
   ROM_OFFSET = 0x30000
@@ -17,6 +19,9 @@ ifeq (1,$(PARTICLE_MONOFIRMWARE))
   # then again nothing can be done in that case anyway, and the preflash
   # routines fall through without erring.
   include $(RIOTMAKE)/tools/usb_board_reset.mk
+
+  # Only dfu-util is supported in this case
+  PROGRAMMERS_SUPPORTED = dfu-util
 else
   # This board uses a DAP-Link programmer
   # Flashing support is provided through pyocd (default) and openocd.

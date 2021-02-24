@@ -2,6 +2,10 @@
 # Bossa is the default programmer
 PROGRAMMER ?= bossa
 
+# Add bossa as supported programmers. Boards that support more programmers
+# should declare them in their own Makefile.include
+PROGRAMMERS_SUPPORTED += bossa
+
 ifeq ($(PROGRAMMER),bossa)
   # by default, we use BOSSA to flash this board and take into account the
   # preinstalled Arduino bootloader. ROM_OFFSET skips the space taken by

@@ -4,6 +4,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
 # this board uses openocd with an HEXFILE
 PROGRAMMER ?= openocd
+PROGRAMMERS_SUPPORTED += openocd
 FLASHFILE ?= $(HEXFILE)
 OPENOCD_DEBUG_ADAPTER ?= dap
 

@@ -7,3 +7,5 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 # setup flash tool
 PROGRAMMER ?= mspdebug
 MSPDEBUG_PROGRAMMER ?= olimex
+
+PROGRAMMERS_SUPPORTED += mspdebug

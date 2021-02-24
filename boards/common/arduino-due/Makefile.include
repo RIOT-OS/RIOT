@@ -3,5 +3,6 @@ INCLUDES  += -I$(RIOTBOARD)/common/arduino-due/include
 
 # setup flasher (using BOSSA)
 PROGRAMMER ?= bossa
+PROGRAMMERS_SUPPORTED += bossa
 BOSSA_VERSION = 1.8
 BOSSA_ARDUINO_PREFLASH = yes

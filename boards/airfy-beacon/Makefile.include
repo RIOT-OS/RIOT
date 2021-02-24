@@ -6,7 +6,5 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 OPENOCD_DEBUG_ADAPTER ?= stlink
 STLINK_VERSION ?= 2
 
-PROGRAMMER = openocd
-
 # include nrf51 boards common configuration
 include $(RIOTBOARD)/common/nrf51/Makefile.include

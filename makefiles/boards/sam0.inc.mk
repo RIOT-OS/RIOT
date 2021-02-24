@@ -18,6 +18,9 @@ endif
 # Default for these boards is to use a CMSIS-DAP programmer
 OPENOCD_DEBUG_ADAPTER ?= dap
 
+# Increase the list of supported programmers
+PROGRAMMERS_SUPPORTED += openocd edbg
+
 # If no programmer is set, select a default programmer
 ifeq ($(PROGRAMMER),)
   # EDBG can only be used with a compatible Atmel programmer

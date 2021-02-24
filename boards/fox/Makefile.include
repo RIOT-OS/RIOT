@@ -7,3 +7,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*)))
 
 # this board uses openocd
 PROGRAMMER ?= openocd
+
+# openocd programmer is supported
+PROGRAMMERS_SUPPORTED += openocd

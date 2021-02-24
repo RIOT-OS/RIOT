@@ -83,3 +83,6 @@ SLOT0_LEN ?= $(shell printf "0x%x" $$((($(ROM_LEN:%K=%*1024)-$(RIOTBOOT_LEN)) / 
 SLOT1_LEN ?= $(SLOT0_LEN)
 SLOT0_LEN := $(SLOT0_LEN)
 SLOT1_LEN := $(SLOT1_LEN)
+
+# JLink is able to flash any ARM CPUs
+PROGRAMMERS_SUPPORTED += jlink

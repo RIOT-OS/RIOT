@@ -5,6 +5,9 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbserial*B)))
 # setup serial terminal
 BAUD ?= 500000
 
+# openocd programmer is supported
+PROGRAMMERS_SUPPORTED += openocd
+
 # Use openocd by default
 PROGRAMMER ?= openocd
 

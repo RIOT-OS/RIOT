@@ -410,6 +410,17 @@ endif
 # Include common programmer logic if available
 -include $(RIOTMAKE)/tools/$(PROGRAMMER).inc.mk
 
+# Check if programmer is supported by the board, only if PROGRAMMERS_SUPPORTED
+# is set and if programmer is not iotlab
+ifneq (iotlab,$(PROGRAMMER))
+  ifneq (,$(PROGRAMMERS_SUPPORTED))
+    ifeq (,$(filter $(PROGRAMMER),$(PROGRAMMERS_SUPPORTED)))
+      $(info '$(PROGRAMMER)' programmer is not supported by this board. \
+              Supported programmers: '$(PROGRAMMERS_SUPPORTED)')
+    endif
+  endif
+endif
+
 # Assume GCC/GNU as supported toolchain if CPU's Makefile.include doesn't
 # provide this macro
 TOOLCHAINS_SUPPORTED ?= gnu

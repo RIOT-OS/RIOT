@@ -1,2 +1,4 @@
 # this board uses openocd
 PROGRAMMER ?= openocd
+
+PROGRAMMERS_SUPPORTED += openocd
