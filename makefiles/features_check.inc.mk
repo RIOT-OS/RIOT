@@ -1,7 +1,23 @@
 # Check if all required FEATURES are provided
 
-# Features that are provided and not blacklisted
-FEATURES_USABLE := $(filter-out $(FEATURES_BLACKLIST),$(FEATURES_PROVIDED))
+# Features that are used without taking "one out of" dependencies into account
+FEATURES_USED_SO_FAR := $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
+
+# Get features which inclusion would cause a conflict
+# Parameter 1: Features currently used
+# Parameter 2: A set of features that would conflict (separated by spaces)
+# Algorithm: If interaction of the two lists is empty, return an empty set. Otherwise return
+#            the set of conflicting features without the feature in it that is already used
+_features_would_conflict = $(if $(filter $1,$2),$(filter-out $1,$2))
+# Adding any of the following features would result in a feature conflict with the already used
+# features:
+FEATURES_WOULD_CONFLICT := $(foreach conflict,$(FEATURES_CONFLICT),\
+                             $(call _features_would_conflict,\
+                               $(FEATURES_USED_SO_FAR),$(subst :, ,$(conflict))))
+
+# Features that are provided, not blacklisted, and do not conflict with any used feature
+FEATURES_USABLE := $(filter-out $(FEATURES_BLACKLIST) $(FEATURES_WOULD_CONFLICT),\
+                     $(FEATURES_PROVIDED))
 
 # Features that may be used, if provided.
 FEATURES_OPTIONAL_ONLY := $(sort $(filter-out $(FEATURES_REQUIRED),$(FEATURES_OPTIONAL)))
@@ -12,7 +28,7 @@ FEATURES_OPTIONAL_USED := $(sort $(filter $(FEATURES_USABLE),$(FEATURES_OPTIONAL
 # Optional features that will not be used because they are not provided or blacklisted
 FEATURES_OPTIONAL_MISSING := $(sort $(filter-out $(FEATURES_USABLE),$(FEATURES_OPTIONAL_ONLY)))
 
-# Features that are used without taking "one out of" dependencies into account
+# Update to account for change in FEATURES_OPTIONAL_USED
 FEATURES_USED_SO_FAR := $(sort $(FEATURES_REQUIRED) $(FEATURES_OPTIONAL_USED))
 
 # Additionally required features due to the "one out of" dependencies
