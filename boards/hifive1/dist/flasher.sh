@@ -24,7 +24,7 @@
 #
 #               options:
 #               <image_file>:   Filename of the file that will be flashed
-#               PRE_FLASH_CHECK_SCRIPT: a command to run before flashing to
+#               OPENOCD_PRE_FLASH_CHECK_SCRIPT: a command to run before flashing to
 #               verify the integrity of the image to be flashed. <image_file> is
 #               passed as a command line argument to this command.
 #
@@ -84,8 +84,8 @@ do_flash() {
     IMAGE_FILE=$1
     test_config
     test_imagefile
-    if [ -n "${PRE_FLASH_CHECK_SCRIPT}" ]; then
-        sh -c "${PRE_FLASH_CHECK_SCRIPT} '${IMAGE_FILE}'"
+    if [ -n "${OPENOCD_PRE_FLASH_CHECK_SCRIPT}" ]; then
+        sh -c "${OPENOCD_PRE_FLASH_CHECK_SCRIPT} '${IMAGE_FILE}'"
         RETVAL=$?
         if [ $RETVAL -ne 0 ]; then
             echo "pre-flash checks failed, status=$RETVAL"

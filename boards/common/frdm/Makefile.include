@@ -3,8 +3,8 @@ PROGRAMMER ?= openocd
 
 # Use the shared OpenOCD configuration
 # Using dap or jlink depends on which firmware the OpenSDA debugger is running
-DEBUG_ADAPTER ?= dap
-#DEBUG_ADAPTER ?= jlink
+OPENOCD_DEBUG_ADAPTER ?= dap
+#OPENOCD_DEBUG_ADAPTER ?= jlink
 
 # Configuration for OpenOCD v0.10.0 and newer
 # For KW41Z, an OpenOCD version built from source is required. The support for
@@ -19,7 +19,7 @@ endif
 OPENOCD_CONFIG ?= $(RIOTBOARD)/common/frdm/dist/openocd-$(OPENOCD_KINETIS_FAMILY).cfg
 
 # Check the flash configuration field before flashing
-PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
+OPENOCD_PRE_FLASH_CHECK_SCRIPT = $(RIOTCPU)/$(CPU)/dist/check-fcfield.sh
 
 # The board can become un-flashable after some execution,
 # use connect_assert_srst to always be able to flash or reset the board.

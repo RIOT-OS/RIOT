@@ -2,7 +2,7 @@
 INCLUDES += -I$(RIOTBOARD)/common/kw41z/include
 
 # This board comes with OpenSDA configured for JLink compatibility
-DEBUG_ADAPTER ?= jlink
+OPENOCD_DEBUG_ADAPTER ?= jlink
 
 # Include default FRDM board config
 include $(RIOTBOARD)/common/frdm/Makefile.include

@@ -7,5 +7,5 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 
 # this board uses openocd with st-link
 PROGRAMMER ?= openocd
-DEBUG_ADAPTER ?= stlink
+OPENOCD_DEBUG_ADAPTER ?= stlink
 STLINK_VERSION ?= 2

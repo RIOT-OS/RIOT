@@ -4,8 +4,8 @@
 PROGRAMMER ?= openocd
 
 # Using dap or jlink depends on which firmware the OpenSDA debugger is running
-#DEBUG_ADAPTER ?= dap
-DEBUG_ADAPTER ?= jlink
+#OPENOCD_DEBUG_ADAPTER ?= dap
+OPENOCD_DEBUG_ADAPTER ?= jlink
 
 # Use the shared OpenOCD configuration
 OPENOCD_CONFIG ?= $(RIOTBOARD)/common/qn908x/dist/openocd.cfg

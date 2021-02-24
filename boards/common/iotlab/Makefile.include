@@ -11,7 +11,7 @@ PROGRAMMER ?= openocd
 # Using connect_assert_srst removes errors on flash from invalid state
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST ?= 1
 
-DEBUG_ADAPTER ?= iotlab
+OPENOCD_DEBUG_ADAPTER ?= iotlab
 
 OPENOCD_CONFIG ?= $(RIOTBOARD)/common/iotlab/dist/openocd.cfg
 

@@ -2,7 +2,7 @@
 INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 
 # this board has an on-board ST-link adapter
-DEBUG_ADAPTER = stlink-dap
+OPENOCD_DEBUG_ADAPTER = stlink-dap
 OPENOCD_CORE = stm32mp15x.cm4
 GDB_PORT_CORE_OFFSET = 1
 

@@ -3,7 +3,7 @@ INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 
 # this board uses openocd with st-link
 PROGRAMMER ?= openocd
-DEBUG_ADAPTER ?= stlink
+OPENOCD_DEBUG_ADAPTER ?= stlink
 
 # This board can become un-flashable after a hardfault,
 # use connect_assert_srst to always be able to flash or reset the board.

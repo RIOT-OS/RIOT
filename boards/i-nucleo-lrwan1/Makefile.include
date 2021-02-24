@@ -2,7 +2,7 @@
 INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 
 # to flash this board, use an ST-link adapter
-DEBUG_ADAPTER ?= stlink
+OPENOCD_DEBUG_ADAPTER ?= stlink
 
 # this board can become un-flashable after a hardfault,
 # use connect_assert_srst to always be able to flash or reset the boards.

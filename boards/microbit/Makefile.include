@@ -4,9 +4,7 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 # for this board we support flashing via openocd or pyocd
 PROGRAMMER ?= openocd
 
-ifeq (openocd,$(PROGRAMMER))
-  DEBUG_ADAPTER = dap
-endif
+OPENOCD_DEBUG_ADAPTER = dap
 
 # QEMU 4.0 added microbit system emulation.
 RIOT_EMULATOR ?= qemu

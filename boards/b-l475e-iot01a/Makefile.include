@@ -3,7 +3,7 @@ INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 
 # this board has an on-board ST-link adapter
 PROGRAMMER ?= openocd
-DEBUG_ADAPTER ?= stlink
+OPENOCD_DEBUG_ADAPTER ?= stlink
 
 # The board can become un-flashable after some execution,
 # use connect_assert_srst to always be able to flash or reset the board.
