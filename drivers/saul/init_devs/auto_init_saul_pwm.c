@@ -24,6 +24,7 @@
  * @}
  */
 
+#include <inttypes.h>
 #include "log.h"
 #include "saul_reg.h"
 #include "saul/periph.h"
@@ -83,7 +84,7 @@ static int configure(pwm_t dev)
 {
     LOG_DEBUG("[auto_init_saul] initializing PWM %u for LED operation,", dev);
     uint32_t freq = pwm_init(dev, PWM_LEFT, SAUL_PWM_FREQ, saul_pwm_resolution);
-    LOG_DEBUG(" actual frequency %lu,\n", freq);
+    LOG_DEBUG(" actual frequency %" PRIu32 ",\n", freq);
     return freq != 0 ? 0 : -ENOTSUP;
 }
 
