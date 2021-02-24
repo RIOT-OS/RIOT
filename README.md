@@ -75,6 +75,47 @@ but not limited to:
 * Sigfox
 * LoRaWAN
 
+## GETTING RIOT
+
+The most convenient way to get RIOT is to clone it via Git
+
+```console
+$ git clone https://github.com/RIOT-OS/RIOT
+```
+
+this will ensure that you get all the newest features and bug fixes with the
+caveat of an ever changing work environment.
+
+If you prefer things more stable, RIOT provides a quarter annual release cycle.
+The source code for the releases resulting from that cycle you can download [via
+Github][releases] as ZIP file or tarball. You can also checkout a release using
+
+```console
+$ git checkout <YYYY.MM>
+```
+
+in Git, where `<YYYY.MM>` is the release name.
+
+Note, that RIOT follows a rolling release cycle, meaning, that only for the most
+current release support and bug fixes are provided. For major bug fixes, we may
+provide a point release `YYYY.MM.N` which results in a new ZIP file or tarball
+over at the [release page][releases]. However, minor bug fixes are only pushed
+to the release branch `YYYY.MM-branch`. You can fetch that via Git using
+
+```console
+$ git clone -b `<YYYY.MM-branch>` https://github.com/RIOT-OS/RIOT
+```
+
+or
+
+```console
+$ git pull origin <YYYY.MM-branch>:<YYYY.MM-branch>
+$ git checkout <YYYY.MM-branch>
+```
+
+if you have RIOT already cloned.
+
+[releases]: https://github.com/RIOT-OS/RIOT/releases
 
 ## GETTING STARTED
 * You want to start the RIOT? Just follow our
