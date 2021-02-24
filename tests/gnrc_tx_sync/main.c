@@ -42,32 +42,47 @@ static msg_t main_msg_queue[MAIN_QUEUE_SIZE];
 static atomic_int sends_completed = ATOMIC_VAR_INIT(0);
 static gnrc_netif_t netif;
 static netdev_test_t netdev_test;
-static netdev_t *netdev =
-#if IS_USED(MODULE_NETDEV_IEEE802154)
-    &netdev_test.netdev.netdev;
-#else
-    &netdev_test.netdev;
-#endif
+static netdev_t *netdev = &netdev_test.netdev.netdev;
 
-static bool carries_test_message(const iolist_t *iolist)
+/* With 6LoWPAN, This test message needs exactly two fragments to be transmitted
+ * due to the maximum L2 PDU of 96 bytes */
+static const char test_msg[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTU"
+                               "VWXYZ0123456789.,:;!?@#$%^&*()[]{}-_=+/<>`~\'\""
+                               "\\";
+static unsigned pld_pos = 0;
+
+static bool carries_test_message(const iolist_t *iol)
 {
-    /* This is dark magic, don't do this at home.
-     * We rely on two things here:
-     * 1.)  As we're testing gnrc_tx_sync, we can be sure that the used network stack is GNRC.
-     *      Hence, iolist actually is of type gnrc_pktsnip_t * and we can just cast it back
-     * 2.)  There are only two types of messages being send in this test: ICMPv6 messages and
-     *      our UDP test message (or fragments of it).
+    /* Dark magic: We just assume that the test message will be placed at the
+     * end of one single iolist chunk and that fragments (if applicable) are
+     * send in order. We also assume that no more than four bytes in a row will
+     * never match the test message payload by chance.
      *
-     * Detecting (unfragmented) ICMPv6 messages is trivial, so we just do this. All other frames
-     * must be carrying our test message.
+     * Note that this intentionally ignores retransmissions, which can occur in
+     * the SFR case.
      */
-    for (const gnrc_pktsnip_t *iter = (const gnrc_pktsnip_t *)iolist; iter; iter = iter->next) {
-        if (iter->type == GNRC_NETTYPE_ICMPV6) {
-            return false;
-        }
-    }
 
-    return true;
+    while (iol) {
+        if ((iol->iol_base != NULL) && (iol->iol_len > 0)) {
+            const char *pos = iol->iol_base;
+            const char *end = pos + iol->iol_len;
+            while (pos < end) {
+                if (*pos == test_msg[pld_pos]) {
+                    size_t len = (size_t)end - (size_t)pos;
+                    if ((len > 4) &&
+                            (pld_pos + len <= sizeof(test_msg)) &&
+                            !memcmp(pos, &test_msg[pld_pos], len)) {
+                        /* data matches next chunk of test message */
+                        pld_pos += len;
+                        return true;
+                    }
+                }
+                pos++;
+            }
+        }
+        iol = iol->iol_next;
+    }
+    return false;
 }
 
 static int netdev_send(netdev_t *dev, const iolist_t *iolist)
@@ -100,8 +115,8 @@ static int netdev_get_max_pdu_size(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
     const uint16_t pdu_size_ethernet = 1500;
-    const uint16_t pdu_size_6lo = 32;
-    expect(max_len == sizeof(uint16_t));
+    const uint16_t pdu_size_6lo = 96;
+    assert(max_len == sizeof(uint16_t));
     if (IS_USED(MODULE_NETDEV_IEEE802154)) {
         memcpy(value, &pdu_size_6lo, sizeof(pdu_size_6lo));
     }
@@ -180,7 +195,9 @@ int main(void)
     );
 
     if (IS_USED(MODULE_NETDEV_IEEE802154)) {
-        puts("IEEE 802.15.4 mode (TEST_6LO=1), sending 2 6LoWPAN fragments");
+        printf("IEEE 802.15.4 mode (TEST_6LO=1, TEST_FRAG_SFR=%u), "
+               "sending 2 6LoWPAN fragments",
+               (unsigned)IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR));
     }
     else {
         puts("Ethernet mode (TEST_6LO=0), sending 1 IPv6 packet");
@@ -204,9 +221,6 @@ int main(void)
     ipv6_addr_set_all_nodes_multicast((ipv6_addr_t *)&remote.addr.ipv6,
                                       IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
     expect(sock_udp_create(&sock, &local, NULL, 0) == 0);
-    /* With 6LoWPAN, This test message needs exactly two fragments to be transmitted due
-     * to the maximum L2 PDU of 32 bytes */
-    static const char test_msg[33] = { 'T', 'e', 's', 't' };
     /* with gnrc_tx_sync, we expect sock_udp_send() to block until transmission is done */
     expect(sock_udp_send(&sock, test_msg, sizeof(test_msg), &remote) > 0);
     /* the virtual netdev device increments sends_completed for each frame carrying the test
@@ -214,8 +228,11 @@ int main(void)
      * the test has failed. */
     int sends = atomic_load(&sends_completed);
     int sends_expected = (IS_USED(MODULE_NETDEV_IEEE802154)) ? 2 : 1;
-    printf("transmissions expected = %d, transmissions completed = %d\n", sends_expected, sends);
+    printf("transmissions expected = %d, transmissions completed = %d\n",
+           sends_expected, sends);
+    printf("sent %u out of %u bytes\n", pld_pos, (unsigned)sizeof(test_msg));
     expect(sends == sends_expected);
+    expect(pld_pos == sizeof(test_msg));
 
     puts("TEST PASSED");
 
