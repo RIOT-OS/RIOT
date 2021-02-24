@@ -11,6 +11,3 @@ else ifeq ($(PROGRAMMER),bossa)
   # ROM_OFFSET skips the space taken by the pre-flashed Arduino bootloader.
   ROM_OFFSET ?= 0x2000
 endif
-
-# setup the boards dependencies
-include $(RIOTBOARD)/sensebox_samd21/Makefile.dep
