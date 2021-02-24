@@ -32,7 +32,7 @@ check () {
 _annotate_diff() {
     if [ -n "$1" -a -n "$2" -a -n "$3" ]; then
         MSG="Uncrustify proposes the following patch:\n\n$3"
-        github_annotate_error "$1" "$2" "${MSG}"
+        IFS="${OLD_IFS}" github_annotate_error "$1" "$2" "${MSG}"
     fi
 }
 
@@ -52,7 +52,9 @@ exec_uncrustify () {
         git diff HEAD | {
             # see https://stackoverflow.com/a/30064493/11921757 for why we
             # use a sub shell here
-            while read line; do
+            OLD_IFS="$IFS"      # store old separator to later restore it
+            IFS=''  # keep leading and trailing spaces
+            while read -r line; do
                 # parse beginning of new diff
                 if echo "$line" | grep -q '^--- .\+$'; then
                     _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
@@ -74,7 +76,7 @@ exec_uncrustify () {
                        fi
                        DIFFLINE="$(echo "$line" | sed 's/@@ -\([0-9]\+\).*$/\1/')"
                     fi
-                    DIFF="$DIFF\n$line"
+                    DIFF="$DIFF\n${line//\\/\\\\}"
                 fi
             done
             _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
