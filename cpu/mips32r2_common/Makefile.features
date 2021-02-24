@@ -1,4 +1,4 @@
-CPU_ARCH = mips32r2
+CPU_ARCH := mips32r2
 
 FEATURES_PROVIDED += arch_32bit
 FEATURES_PROVIDED += arch_mips32r2

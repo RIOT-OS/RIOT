@@ -1,7 +1,6 @@
 export ROMABLE = 1
 
 include $(RIOTCPU)/mips_pic32_common/Makefile.include
-include $(RIOTMAKE)/arch/mips.inc.mk
 
 # define build specific options
 CFLAGS += -march=m5101 -mmicromips -DSKIP_COPY_TO_RAM

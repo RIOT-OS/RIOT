@@ -1,5 +1,3 @@
-CPU_ARCH = xtensa
-
 # MCU defined features that are provided independent on board definitions
 
 FEATURES_PROVIDED += arch_32bit

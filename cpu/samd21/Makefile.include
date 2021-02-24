@@ -25,4 +25,3 @@ endif
 CFLAGS += -DCPU_COMMON_SAMD21
 
 include $(RIOTCPU)/sam0_common/Makefile.include
-include $(RIOTMAKE)/arch/cortexm.inc.mk

@@ -394,6 +394,9 @@ include $(BOARDDIR)/Makefile.include
 INCLUDES += -I$(RIOTCPU)/$(CPU)/include
 include $(RIOTCPU)/$(CPU)/Makefile.include
 
+# include architecture specific settings, if any
+-include $(RIOTMAKE)/arch/$(CPU_ARCH).inc.mk
+
 # Include common serial logic to define TERMPROG, TERMFLAGS variables based on
 # the content of RIOT_TERMINAL
 include $(RIOTMAKE)/tools/serial.inc.mk

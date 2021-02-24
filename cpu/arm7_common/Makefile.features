@@ -1,5 +1,5 @@
-CPU_ARCH = armv4t
-CPU_CORE = arm7tdmi_s
+CPU_ARCH := armv4t
+CPU_CORE := arm7tdmi_s
 
 FEATURES_PROVIDED += arch_32bit
 FEATURES_PROVIDED += arch_arm

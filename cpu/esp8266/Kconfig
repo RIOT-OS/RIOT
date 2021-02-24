@@ -6,7 +6,7 @@
 
 config CPU_CORE_XTENSA_L106
     bool
-    select CPU_ARCH_XTENSA
+    select CPU_ARCH_XTENSA_LX106
 
 config CPU_FAM_ESP8266
     bool

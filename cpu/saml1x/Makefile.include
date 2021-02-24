@@ -8,4 +8,3 @@ endif
 CFLAGS += -DCPU_COMMON_SAML1X
 
 include $(RIOTCPU)/sam0_common/Makefile.include
-include $(RIOTMAKE)/arch/cortexm.inc.mk
