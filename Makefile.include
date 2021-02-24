@@ -513,7 +513,7 @@ include $(RIOTMAKE)/modules.inc.mk
 
 
 .PHONY: all link clean flash flash-only termdeps term doc debug debug-server reset objdump help info-modules
-.PHONY: print-size elffile binfile hexfile flashfile
+.PHONY: print-size elffile binfile hexfile flashfile cosy
 .PHONY: ..in-docker-container
 
 # Targets that depend on FORCE will always be rebuilt. Contrary to a .PHONY
@@ -539,6 +539,7 @@ endif
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
 HEXFILE ?= $(ELFFILE:.elf=.hex)
 BINFILE ?= $(ELFFILE:.elf=.bin)
+MAPFILE ?= $(ELFFILE:.elf=.map)
 
 ifneq (,$(filter suit, $(USEMODULE)))
   include $(RIOTMAKE)/suit.base.inc.mk
@@ -715,6 +716,11 @@ flash-only: $(FLASHDEPS)
 
 preflash: $(BUILD_BEFORE_FLASH)
 	$(PREFLASHER_PREFIX)$(PREFLASHER) $(PREFFLAGS)
+
+# graphical memory usage analyzer
+COSY_TOOL ?= $(PKGDIRBASE)/cosy/cosy.py
+cosy: $(ELFFILE) $(COSY_TOOL)
+	$(COSY_TOOL) --riot-base $(RIOTBASE) $(APPDIR) $(BOARD) $(ELFFILE) $(MAPFILE)
 
 ifneq (,$(TERMLOG)$(TERMTEE))
   TERMTEE ?= | tee -a $(TERMLOG)

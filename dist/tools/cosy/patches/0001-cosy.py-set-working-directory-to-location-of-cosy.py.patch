@@ -1,0 +1,46 @@
+From 77f489ec59d30c89e41bb94e2094b8bbaeeec4fb Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benpicco@googlemail.com>
+Date: Tue, 23 Feb 2021 23:57:53 +0100
+Subject: [PATCH 1/2] cosy.py: set working directory to location of cosy.py
+
+When calling `cosy.py` from outside it's directory, one gets
+
+     File "/home/benpicco/dev/cosy/cosy.py", line 364, in <module>
+        with open("root/symbols.json", 'w') as f:
+    IOError: [Errno 2] No such file or directory: 'root/symbols.json'
+
+as all paths used inide the script are relative.
+
+Fix this by changing the working directory to the location of `cosy.py`
+---
+ cosy.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/cosy.py b/cosy.py
+index f48f163..7000125 100755
+--- a/cosy.py
++++ b/cosy.py
+@@ -17,7 +17,7 @@
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ import sys
+-from os import path
++from os import path, chdir
+ import argparse
+ import re
+ import subprocess
+@@ -303,6 +303,11 @@ def check_completeness(symbols):
+ 
+ 
+ if __name__ == "__main__":
++
++    # change to directory of cosy.py
++    dname = path.dirname(path.abspath(__file__))
++    chdir(dname)
++
+     # Define some command line args
+     p = argparse.ArgumentParser()
+     p.add_argument("appdir", default="../RIOT/examples/hello-world", nargs="?", help="Full path to application dir")
+-- 
+2.27.0
+

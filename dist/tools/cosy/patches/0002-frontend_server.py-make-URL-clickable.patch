@@ -1,0 +1,23 @@
+From 71050a3460d918f21d1a0550b3388ca4474b5f9a Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benpicco@googlemail.com>
+Date: Wed, 24 Feb 2021 00:14:36 +0100
+Subject: [PATCH 2/2] frontend_server.py: make URL clickable
+
+---
+ frontend_server.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/frontend_server.py b/frontend_server.py
+index c06ea2b..a03362f 100644
+--- a/frontend_server.py
++++ b/frontend_server.py
+@@ -36,5 +36,5 @@ def run( root, port, index ):
+     HTTPHandler.index = index
+     HTTPHandler.root = root
+     httpd = HTTPServer(('', port), HTTPHandler)
+-    print("Started frontend server, connect you browser to localhost:" + str(port))
++    print("Started frontend server, connect you browser to http://localhost:" + str(port))
+     httpd.serve_forever()
+-- 
+2.27.0
+
