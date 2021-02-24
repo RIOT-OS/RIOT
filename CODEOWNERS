@@ -60,6 +60,8 @@
 /cpu/saml21/                                @dylad
 /cpu/stm32*/                                @aabadie @fjmolinas @DipSwitch @vincent-d
 /cpu/*/periph/                              @MrKevinWeiss
+/cpu/stm32/periph/eth*                      @maribu
+/cpu/stm32/periph/ptp.c                     @maribu
 
 /doc/                                       @aabadie @jia200x
 
@@ -91,6 +93,7 @@
 /drivers/xbee/                              @haukepetersen @miri64
 /drivers/include/periph/                    @MrKevinWeiss
 /drivers/periph_common/                     @MrKevinWeiss
+/drivers/include/periph/ptp.h               @maribu
 
 /pkg/cryptoauthlib/                         @Einhornhool @PeterKietzmann
 /pkg/lua/                                   @jcarrano
@@ -111,6 +114,7 @@
 /sys/fmt/                                   @kaspar030
 /sys/net/application_layer/gcoap/           @haukepetersen @kb2ma
 /sys/net/application_layer/nanocoap/        @kaspar030 @haukepetersen @kb2ma
+/sys/include/net/sock*                      @maribu
 /sys/net/netif/                             @miri64 @jia200x
 /sys/net/gnrc/network_layer/                @miri64
 /sys/net/gnrc/transport_layer/tcp/          @brummer-simon @miri64
