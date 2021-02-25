@@ -59,7 +59,6 @@
 /cpu/saml1x/                                @dylad
 /cpu/saml21/                                @dylad
 /cpu/stm32*/                                @aabadie @fjmolinas @DipSwitch @vincent-d
-/cpu/*/periph/                              @MrKevinWeiss
 /cpu/stm32/periph/eth*                      @maribu
 /cpu/stm32/periph/ptp.c                     @maribu
 
@@ -144,7 +143,6 @@
 /tests/unittests                            @miri64
 /tests/*/tests/*.py                         @miri64
 /tests/cpu_efm32_features/                  @basilfx
-/tests/periph*/                             @MrKevinWeiss
 
 # KConfig maintainers will be notified about all KConfig changes
 Kconfig                                     @leandrolanzieri @jia200x @cgundogan
