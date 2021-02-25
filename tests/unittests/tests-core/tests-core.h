@@ -58,13 +58,6 @@ Test *tests_core_cib_tests(void);
 Test *tests_core_clist_tests(void);
 
 /**
- * @brief   Generates tests for lifo.h
- *
- * @return  embUnit tests if successful, NULL if not.
- */
-Test *tests_core_lifo_tests(void);
-
-/**
  * @brief   Generates tests for list.h
  *
  * @return  embUnit tests if successful, NULL if not.
