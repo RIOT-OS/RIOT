@@ -37,6 +37,9 @@ ifeq ($(TOOLCHAIN),llvm)
   TARGET_ARCH_LLVM := riscv32-none-elf
 else
   CFLAGS_CPU += -mcmodel=medlow -msmall-data-limit=8
+  ifneq (,$(shell $(TARGET_ARCH)-gcc --help=target | grep '\-malign-data='))
+    CFLAGS_CPU += -malign-data=natural
+  endif
 endif
 CFLAGS_LINK  = -ffunction-sections -fdata-sections
 CFLAGS_DBG  ?= -g3
