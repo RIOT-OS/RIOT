@@ -29,8 +29,15 @@ export KCONFIG_GENERATED_DEPENDENCIES = $(GENERATED_DIR)/Kconfig.dep
 # This file will contain external module configurations
 export KCONFIG_EXTERNAL_CONFIGS = $(GENERATED_DIR)/Kconfig.external_modules
 
-# This file will contain application default configurations
-KCONFIG_APP_CONFIG = $(APPDIR)/app.config
+# Add configurations that only work when running the Kconfig test so far,
+# because they activate modules.
+ifeq (1,$(TEST_KCONFIG))
+  # This file will contain application default configurations
+  KCONFIG_APP_CONFIG = $(APPDIR)/app.config.test
+else
+  # This file will contain application default configurations
+  KCONFIG_APP_CONFIG = $(APPDIR)/app.config
+endif
 
 # Default and user overwritten configurations
 KCONFIG_USER_CONFIG = $(APPDIR)/user.config
@@ -54,13 +61,6 @@ KCONFIG_OUT_DEP = $(KCONFIG_OUT_CONFIG).d
 # and share them among boards or cpus.
 # This file will contain application default configurations used for Kconfig Test
 MERGE_SOURCES += $(KCONFIG_ADD_CONFIG)
-
-# Add configurations that only work when running the Kconfig test so far,
-# because they activate modules.
-ifeq (1,$(TEST_KCONFIG))
-  MERGE_SOURCES += $(wildcard $(APPDIR)/app.config.test)
-endif
-
 MERGE_SOURCES += $(wildcard $(KCONFIG_APP_CONFIG))
 MERGE_SOURCES += $(wildcard $(KCONFIG_USER_CONFIG))
 
