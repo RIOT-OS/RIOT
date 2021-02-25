@@ -17,5 +17,9 @@ ifneq (,$(filter nrf52832xxaa,$(CPU_MODEL)))
   endif
 endif
 
+ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
+  USEMODULE += tsrb
+endif
+
 include $(RIOTCPU)/nrf5x_common/Makefile.dep
 include $(RIOTCPU)/cortexm_common/Makefile.dep

@@ -218,6 +218,13 @@ typedef struct {
 #endif
 
 /**
+ * @brief   Size of the UART TX buffer for non-blocking mode.
+ */
+#ifndef UART_TXBUF_SIZE
+#define UART_TXBUF_SIZE    (64)
+#endif
+
+/**
  * @brief  SPI configuration values
  */
 typedef struct {
