@@ -397,7 +397,8 @@ typedef enum {
     NETOPT_CCA_MODE,
 
     /**
-     * @brief   (@ref netstats_t*) get statistics about sent and received packets and data of the device or protocol
+     * @brief   (@ref netstats_t*) get statistics about sent and received packets and data of the
+     *          device or protocol
      *
      * Expects a pointer to a @ref netstats_t struct that will be pointed to
      * the corresponding @ref netstats_t of the module.
@@ -417,7 +418,8 @@ typedef enum {
     NETOPT_ENCRYPTION_KEY,
 
     /**
-     * @brief   (@ref netopt_rf_testmode_t) Test mode for the radio, e.g. for CE or FCC certification
+     * @brief   (@ref netopt_rf_testmode_t) Test mode for the radio, e.g. for CE or FCC
+     *          certification
      *
      * Get/set the test mode as type @ref netopt_rf_testmode_t or as uint8_t if
      * the radio supports other vendor specific test modes.
