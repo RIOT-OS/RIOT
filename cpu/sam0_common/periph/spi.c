@@ -356,9 +356,11 @@ void spi_init_pins(spi_t bus)
     }
 
     gpio_init(spi_config[bus].mosi_pin, GPIO_OUT);
-    gpio_init(spi_config[bus].clk_pin, GPIO_OUT);
+    gpio_init_mux(spi_config[bus].mosi_pin, spi_config[bus].mosi_mux);
 
-    /* mosi_pin, clk_pin will be muxed during acquire / release */
+    gpio_init(spi_config[bus].clk_pin, GPIO_OUT);
+    /* clk_pin will be muxed during acquire / release */
+
     mutex_unlock(&locks[bus]);
 }
 
@@ -369,6 +371,7 @@ void spi_deinit_pins(spi_t bus)
     if (gpio_is_valid(spi_config[bus].miso_pin)) {
         gpio_disable_mux(spi_config[bus].miso_pin);
     }
+    gpio_disable_mux(spi_config[bus].mosi_pin);
 }
 
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
@@ -388,7 +391,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     }
 
     /* mux clk_pin to SPI peripheral */
-    gpio_init_mux(spi_config[bus].mosi_pin, spi_config[bus].mosi_mux);
     gpio_init_mux(spi_config[bus].clk_pin, spi_config[bus].clk_mux);
 
     return SPI_OK;
@@ -396,11 +398,9 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
 void spi_release(spi_t bus)
 {
-    /* Demux clk_pin and mosi_pin back to GPIO_OUT function.
-     * Otherwise it will get HIGH-Z and lead to unexpected current draw by SPI salves.
-     */
+    /* Demux clk_pin back to GPIO_OUT function. Otherwise it will get HIGH-Z
+     * and lead to unexpected current draw by SPI salves. */
     gpio_disable_mux(spi_config[bus].clk_pin);
-    gpio_disable_mux(spi_config[bus].mosi_pin);
 
     if (_is_qspi(bus)) {
         _qspi_release();
