@@ -55,6 +55,7 @@ LOW_MEMORY_BOARDS += \
   opencm904 \
   saml10-xpro \
   saml11-xpro \
+  sensebox_samd21 \
   serpente \
   sodaq-autonomo \
   sodaq-explorer \
