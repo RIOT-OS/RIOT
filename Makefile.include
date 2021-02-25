@@ -709,10 +709,13 @@ distclean:
 	-@for i in $(USEPKG) ; do "$(MAKE)" -C $(RIOTPKG)/$$i distclean ; done
 	-@rm -rf $(BINDIRBASE)
 
+# Include PROGRAMMER_FLASH/PROGRAMMER_RESET variables
+include $(RIOTMAKE)/tools/programmer.inc.mk
+
 # Define flash-recipe with a default value
 define default-flash-recipe
   $(call check_cmd,$(FLASHER),Flash program)
-  $(FLASHER) $(FFLAGS)
+  $(PROGRAMMER_FLASH)
 endef
 flash-recipe ?= $(default-flash-recipe)
 
@@ -774,7 +777,7 @@ endif
 
 reset:
 	$(call check_cmd,$(RESET),Reset program)
-	$(RESET) $(RESET_FLAGS)
+	$(PROGRAMMER_RESET)
 
 # tests related targets and variables
 include $(RIOTMAKE)/tests/tests.inc.mk
