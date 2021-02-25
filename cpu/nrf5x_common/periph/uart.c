@@ -273,7 +273,7 @@ void uart_poweron(uart_t uart)
     assert(uart < UART_NUMOF);
 
     if (isr_ctx[uart].rx_cb) {
-        NRF_UART0->TASKS_STARTRX = 1;
+        dev(uart)->TASKS_STARTRX = 1;
     }
 }
 
