@@ -10,7 +10,9 @@
 
 # include external modules dependencies
 # processed before RIOT ones to be evaluated before the 'default' rules.
--include $(EXTERNAL_MODULE_DIRS:%=%/Makefile.dep)
+-include $(foreach d,$(EXTERNAL_MODULE_DIRS), \
+			$(if $(filter $(shell sed -E 's/MODULE\s*=\s*(.*)/\1/' $(d)/Makefile), $(USEMODULE)), $(d)/Makefile.dep,\
+				$(if $(filter $(notdir $(d)), $(USEMODULE)), $(d)/Makefile.dep)))
 
 # pull dependencies from sys and drivers
 include $(RIOTBASE)/sys/Makefile.dep
