@@ -21,9 +21,11 @@
 
 #include "embUnit.h"
 
-
-/* Define MTD_0 in board.h to use the board mtd if any */
-#ifdef MTD_0
+/* Define MTD_0 in board.h to use the board mtd if any and if
+ * CONFIG_USE_HARDWARE_MTD is defined (add CFLAGS=-DCONFIG_USE_HARDWARE_MTD to
+ * the command line to enable it */
+#if defined(MTD_0) && IS_ACTIVE(CONFIG_USE_HARDWARE_MTD)
+#define USE_MTD_0
 #define _dev (MTD_0)
 #else
 /* Test mock object implementing a simple RAM-based mtd */
@@ -436,7 +438,7 @@ static void tests_spiffs_partition(void)
 
 Test *tests_spiffs(void)
 {
-#ifndef MTD_0
+#ifndef USE_MTD_0
     memset(dummy_memory, 0xff, sizeof(dummy_memory));
 #endif
     EMB_UNIT_TESTFIXTURES(fixtures) {
