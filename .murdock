@@ -290,6 +290,7 @@ compile() {
                 kconfig_test_hash=0
                 echo "An error occurred while compiling using Kconfig";
             fi
+            break
         fi
     done
 
@@ -302,7 +303,7 @@ compile() {
 
     if [ ${should_check_kconfig_hash} != 0 ]; then
         if [ ${kconfig_test_hash} != ${test_hash} ]; then
-            echo "Hashes of binaries with and without Kconfig mismatch for ${app}";
+            echo "Hashes of binaries with and without Kconfig mismatch for ${appdir}";
             echo "Please check that all used modules are modelled in Kconfig and enabled";
             RES=1
         fi
