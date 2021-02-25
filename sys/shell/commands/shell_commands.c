@@ -16,15 +16,14 @@
  * @author      Oliver Hahm <oliver.hahm@inria.fr>
  * @author      Zakaria Kasmi <zkasmi@inf.fu-berlin.de>
  * @author      Ludwig Knüpfer <ludwig.knuepfer@fu-berlin.de>
+ * @author      Kaspar Schleiser <kaspar@schleiser.de>
  *
  * @}
  */
 
 #include <stdlib.h>
-#include "shell_commands.h"
-#ifdef MODULE_CONGURE_TEST
-#include "congure/test.h"
-#endif
+
+#include "shell.h"
 
 extern int _reboot_handler(int argc, char **argv);
 extern int _version_handler(int argc, char **argv);
@@ -203,163 +202,166 @@ extern int _cryptoauth(int argc, char **argv);
 extern int _bootloader_handler(int argc, char **argv);
 #endif
 
-const shell_command_t _shell_command_list[] = {
-    {"reboot", "Reboot the node", _reboot_handler},
-    {"version", "Prints current RIOT_VERSION", _version_handler},
+SHELL_COMMAND(reboot, "Reboot the node", _reboot_handler);
+SHELL_COMMAND(version, "Prints current RIOT_VERSION", _version_handler);
 #ifdef MODULE_USB_BOARD_RESET
-    {"bootloader", "Reboot to bootloader", _bootloader_handler},
+SHELL_COMMAND(bootloader, "Reboot to bootloader", _bootloader_handler);
 #endif
 #ifdef MODULE_CONFIG
-    {"id", "Gets or sets the node's id.", _id_handler},
+SHELL_COMMAND(id, "Gets or sets the node's id.", _id_handler);
 #endif
 #ifdef MODULE_HEAP_CMD
-    {"heap", "Prints heap statistics.", _heap_handler},
+SHELL_COMMAND(heap, "Prints heap statistics.", _heap_handler);
 #endif
 #ifdef MODULE_PERIPH_PM
-    { "pm", "interact with layered PM subsystem", _pm_handler },
+SHELL_COMMAND(pm, "interact with layered PM subsystem", _pm_handler);
 #endif
 #ifdef MODULE_PS
-    {"ps", "Prints information about running threads.", _ps_handler},
+SHELL_COMMAND(ps, "Prints information about running threads.", _ps_handler);
 #endif
 #ifdef MODULE_SHT1X
-    {"temp", "Prints measured temperature.", _get_temperature_handler},
-    {"hum", "Prints measured humidity.", _get_humidity_handler},
-    {"weather", "Prints measured humidity and temperature.", _get_weather_handler},
-    {"sht-config", "Get/set SHT10/11/15 sensor configuration.", _sht_config_handler},
+SHELL_COMMAND(temp, "Prints measured temperature.", _get_temperature_handler);
+SHELL_COMMAND(hum, "Prints measured humidity.", _get_humidity_handler);
+SHELL_COMMAND(weather, "Prints measured humidity and temperature.", _get_weather_handler);
+SHELL_COMMAND(sht_config, "Get/set SHT10/11/15 sensor configuration.", _sht_config_handler);
 #endif
 #ifdef MODULE_AT30TSE75X
-    {"at30tse75x", "Test AT30TSE75X temperature sensor", _at30tse75x_handler},
+SHELL_COMMAND(at30tse75x, "Test AT30TSE75X temperature sensor", _at30tse75x_handler);
 #endif
 #ifdef MODULE_MCI
-    {DISK_READ_SECTOR_CMD, "Reads the specified sector of inserted memory card", _read_sector},
-    {DISK_READ_BYTES_CMD, "Reads the specified bytes from inserted memory card", _read_bytes},
-    {DISK_GET_SECTOR_SIZE, "Get the sector size of inserted memory card", _get_sectorsize},
-    {DISK_GET_SECTOR_COUNT, "Get the sector count of inserted memory card", _get_sectorcount},
-    {DISK_GET_BLOCK_SIZE, "Get the block size of inserted memory card", _get_blocksize},
+SHELL_COMMAND(dread_sec, "Reads the specified sector of inserted memory card", _read_sector);
+SHELL_COMMAND(dread, "Reads the specified bytes from inserted memory card", _read_bytes);
+SHELL_COMMAND(dget_ssize, "Get the sector size of inserted memory card", _get_sectorsize);
+SHELL_COMMAND(dget_scount, "Get the sector count of inserted memory card", _get_sectorcount);
+SHELL_COMMAND(dget_bsize, "Get the block size of inserted memory card", _get_blocksize);
 #endif
 #ifdef MODULE_GNRC_ICMPV6_ECHO
 #ifdef MODULE_XTIMER
-    { "ping6", "Ping via ICMPv6", _gnrc_icmpv6_ping },
-    { "ping", "Alias for ping6", _gnrc_icmpv6_ping },
+SHELL_COMMAND(ping6, "Ping via ICMPv6", _gnrc_icmpv6_ping);
+SHELL_COMMAND(ping, "Alias for ping6", _gnrc_icmpv6_ping);
 #endif
 #endif
 #ifdef MODULE_RANDOM
-    { "random_init", "initializes the PRNG", _random_init },
-    { "random_get", "returns 32 bit of pseudo randomness", _random_get },
+SHELL_COMMAND(random_init, "initializes the PRNG", _random_init);
+SHELL_COMMAND(random_get, "returns 32 bit of pseudo randomness", _random_get);
 #endif
 #ifdef MODULE_PERIPH_RTC
-    {"rtc", "control RTC peripheral interface",  _rtc_handler},
+SHELL_COMMAND(rtc, "control RTC peripheral interface",  _rtc_handler);
 #endif
 #ifdef MODULE_RTT_CMD
-    {"rtt", "control RTC peripheral interface",  _rtt_handler},
+SHELL_COMMAND(rtt, "control RTC peripheral interface",  _rtt_handler);
 #endif
 #ifdef MODULE_GNRC_IPV6_NIB
-    {"nib", "Configure neighbor information base", _gnrc_ipv6_nib},
+SHELL_COMMAND(nib, "Configure neighbor information base", _gnrc_ipv6_nib);
 #endif
 #ifdef MODULE_NETSTATS_NEIGHBOR
-    {"neigh", "Show neighbor statistics", _netstats_nb},
+SHELL_COMMAND(neigh, "Show neighbor statistics", _netstats_nb);
 #endif
 #ifdef MODULE_GNRC_NETIF
-    {"ifconfig", "Configure network interfaces", _gnrc_netif_config},
+SHELL_COMMAND(ifconfig, "Configure network interfaces", _gnrc_netif_config);
 #ifdef MODULE_GNRC_TXTSND
-    {"txtsnd", "Sends a custom string as is over the link layer", _gnrc_netif_send },
+SHELL_COMMAND(txtsnd, "Sends a custom string as is over the link layer", _gnrc_netif_send);
 #endif
 #endif
 #ifdef MODULE_OPENWSN
-    {"ifconfig", "Shows assigned IPv6 addresses", _openwsn_ifconfig},
-    {"openwsn", "OpenWSN commands", _openwsn_handler},
+SHELL_COMMAND(ifconfig, "Shows assigned IPv6 addresses", _openwsn_ifconfig);
+SHELL_COMMAND(openwsn, "OpenWSN commands", _openwsn_handler);
 #endif
 #ifdef MODULE_LWIP_NETIF
-    {"ifconfig", "List network interfaces", _lwip_netif_config},
+SHELL_COMMAND(ifconfig, "List network interfaces", _lwip_netif_config);
 #endif
 #ifdef MODULE_FIB
-    {"fibroute", "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler},
+SHELL_COMMAND(fibroute, "Manipulate the FIB (info: 'fibroute [add|del]')", _fib_route_handler);
 #endif
 #ifdef MODULE_GNRC_IPV6_EXT_FRAG_STATS
-    {"ip6_frag", "IPv6 fragmentation statistics", _gnrc_ipv6_frag_stats },
+SHELL_COMMAND(ip6_frag, "IPv6 fragmentation statistics", _gnrc_ipv6_frag_stats);
 #endif
 #ifdef MODULE_GNRC_IPV6_WHITELIST
-    {"whitelist", "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist },
+SHELL_COMMAND(whitelist, "whitelists an address for receival ('whitelist [add|del|help]')", _whitelist);
 #endif
 #ifdef MODULE_GNRC_IPV6_BLACKLIST
-    {"blacklist", "blacklists an address for receival ('blacklist [add|del|help]')", _blacklist },
+SHELL_COMMAND(blacklist, "blacklists an address for receival ('blacklist [add|del|help]')", _blacklist);
 #endif
 #ifdef MODULE_GNRC_PKTBUF_CMD
-    {"pktbuf", "prints internal stats of the packet buffer", _gnrc_pktbuf_cmd },
+SHELL_COMMAND(pktbuf, "prints internal stats of the packet buffer", _gnrc_pktbuf_cmd);
 #endif
 #ifdef MODULE_GNRC_RPL
-    {"rpl", "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl },
+SHELL_COMMAND(rpl, "rpl configuration tool ('rpl help' for more information)", _gnrc_rpl);
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_CTX
-    {"6ctx", "6LoWPAN context configuration tool", _gnrc_6ctx },
+SHELL_COMMAND(6ctx, "6LoWPAN context configuration tool", _gnrc_6ctx);
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
-    {"6lo_frag", "6LoWPAN fragment statistics", _gnrc_6lo_frag_stats },
+SHELL_COMMAND(6lo_frag, "6LoWPAN fragment statistics", _gnrc_6lo_frag_stats);
 #endif
 #ifdef MODULE_SAUL_REG
-    {"saul", "interact with sensors and actuators using SAUL", _saul },
+SHELL_COMMAND(saul, "interact with sensors and actuators using SAUL", _saul);
 #endif
 #ifdef MODULE_CCN_LITE_UTILS
-    { "ccnl_open", "opens an interface or socket", _ccnl_open },
-    { "ccnl_int", "sends an interest", _ccnl_interest },
-    { "ccnl_cs", "shows CS or creates content and populates it", _ccnl_content },
-    { "ccnl_fib", "shows or modifies the CCN-Lite FIB", _ccnl_fib },
+SHELL_COMMAND(ccnl_open, "opens an interface or socket", _ccnl_open);
+SHELL_COMMAND(ccnl_int, "sends an interest", _ccnl_interest);
+SHELL_COMMAND(ccnl_cs, "shows CS or creates content and populates it", _ccnl_content);
+SHELL_COMMAND(ccnl_fib, "shows or modifies the CCN-Lite FIB", _ccnl_fib);
 #endif
 #ifdef MODULE_SNTP
-    { "ntpdate", "synchronizes with a remote time server", _ntpdate },
+SHELL_COMMAND(ntpdate, "synchronizes with a remote time server", _ntpdate);
 #endif
 #ifdef MODULE_VFS
-    {"vfs", "virtual file system operations", _vfs_handler},
-    {"ls", "list files", _ls_handler},
+SHELL_COMMAND(vfs, "virtual file system operations", _vfs_handler);
+SHELL_COMMAND(ls, "list files", _ls_handler);
 #endif
 #ifdef MODULE_CONN_CAN
-    {"can", "CAN commands", _can_handler},
+SHELL_COMMAND(can, "CAN commands", _can_handler);
 #endif
 #ifdef MODULE_CORD_EP
-    {"cord_ep", "Resource directory endpoint commands", _cord_ep_handler },
+SHELL_COMMAND(cord_ep, "Resource directory endpoint commands", _cord_ep_handler);
 #endif
 #ifdef MODULE_APP_METADATA
-    {"app_metadata", "Returns application metadata", _app_metadata_handler },
+SHELL_COMMAND(app_metadata, "Returns application metadata", _app_metadata_handler);
 #endif
 #ifdef MODULE_I2C_SCAN
-    { "i2c_scan", "Performs an I2C bus scan", _i2c_scan },
+SHELL_COMMAND(i2c_scan, "Performs an I2C bus scan", _i2c_scan);
 #endif
 #ifdef MODULE_SEMTECH_LORAMAC
-    {"loramac", "Control Semtech loramac stack", _loramac_handler},
+SHELL_COMMAND(loramac, "Control Semtech loramac stack", _loramac_handler);
 #endif
 #ifdef MODULE_NIMBLE_NETIF
-    { "ble", "Manage BLE connections for NimBLE", _nimble_netif_handler },
+SHELL_COMMAND(ble, "Manage BLE connections for NimBLE", _nimble_netif_handler);
 #endif
 #ifdef MODULE_NIMBLE_STATCONN
-    { "statconn", "NimBLE netif statconn", _nimble_statconn_handler},
+SHELL_COMMAND(statconn, "NimBLE netif statconn", _nimble_statconn_handler);
 #endif
 #ifdef MODULE_SUIT_TRANSPORT_COAP
-    { "suit", "Trigger a SUIT firmware update", _suit_handler },
+SHELL_COMMAND(suit, "Trigger a SUIT firmware update", _suit_handler);
 #endif
 #ifdef MODULE_CRYPTOAUTHLIB
-    { "cryptoauth", "Commands for Microchip CryptoAuth devices", _cryptoauth },
+SHELL_COMMAND(cryptoauth, "Commands for Microchip CryptoAuth devices", _cryptoauth);
 #endif
 #ifdef MODULE_DFPLAYER
-    {"dfplayer", "Control a DFPlayer Mini MP3 player", _sc_dfplayer},
+SHELL_COMMAND(dfplayer, "Control a DFPlayer Mini MP3 player", _sc_dfplayer);
 #endif
+
 #ifdef MODULE_CONGURE_TEST
-    { "cong_clear", "Clears CongURE state object", congure_test_clear_state },
-    { "cong_setup", "Calls the setup function for the CongURE state object",
-      congure_test_call_setup },
-    { "cong_init", "Calls init method of the CongURE state object",
-      congure_test_call_init },
-    { "cong_imi", "Calls inter_message_interval method of the CongURE state object",
-      congure_test_call_inter_msg_interval },
-    { "cong_add_msg",
-      "Adds a message to the list of messages to be reported with "
-      "report_msgs_lost or report_msgs_timeout",
-      congure_test_add_msg },
-    { "cong_msgs_reset",
-      "Resets the list of messages to be reported with report_msgs_lost or "
-      "report_msgs_timeout",
-      congure_test_msgs_reset },
-    { "cong_report", "Calls a report_* method of the CongURE state object",
-      congure_test_call_report },
+#include "congure/test.h"
+SHELL_COMMAND(cong_clear, "Clears CongURE state object",
+              congure_test_clear_state);
+SHELL_COMMAND(cong_setup,
+              "Calls the setup function for the CongURE state object",
+              congure_test_call_setup);
+SHELL_COMMAND(cong_init, "Calls init method of the CongURE state object",
+              congure_test_call_init);
+SHELL_COMMAND(cong_imi,
+              "Calls inter_message_interval method of the CongURE state object",
+              congure_test_call_inter_msg_interval);
+SHELL_COMMAND(cong_add_msg,
+              "Adds a message to the list of messages to be reported with "
+              "report_msgs_lost or report_msgs_timeout",
+              congure_test_add_msg);
+SHELL_COMMAND(cong_msgs_reset,
+              "Resets the list of messages to be reported with report_msgs_lost or "
+              "report_msgs_timeout",
+              congure_test_msgs_reset);
+SHELL_COMMAND(cong_report,
+              "Calls a report_* method of the CongURE state object",
+              congure_test_call_report);
 #endif
-    {NULL, NULL, NULL}
-};
