@@ -292,15 +292,15 @@ void gnrc_sixlowpan_frag_send(gnrc_pktsnip_t *pkt, void *ctx, unsigned page)
         goto error;
     }
     fbuf->offset += res;
-    if (IS_USED(MODULE_GNRC_TX_SYNC) && tx_sync) {
-        /* re-attach tx_sync to allow releasing it at end
-         * of transmission, or transmission failure */
-        gnrc_pkt_append((pkt) ? pkt : fbuf->pkt, tx_sync);
-    }
     if (!gnrc_sixlowpan_frag_fb_send(fbuf)) {
         DEBUG("6lo frag: message queue full, can't issue next fragment "
               "sending\n");
         goto error;
+    }
+    if (IS_USED(MODULE_GNRC_TX_SYNC) && tx_sync) {
+        /* re-attach tx_sync to allow releasing it at end
+         * of transmission, or transmission failure */
+        gnrc_pkt_append((pkt) ? pkt : fbuf->pkt, tx_sync);
     }
     thread_yield();
     return;
