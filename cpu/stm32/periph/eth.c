@@ -142,7 +142,7 @@ static void _debug_rx_descriptor_info(unsigned line)
         DEBUG("[stm32_eth:%u] RX descriptors:\n", line);
         for (unsigned i = 0; i < ETH_RX_DESCRIPTOR_COUNT; i++) {
             uint32_t status = rx_desc[i].status;
-            DEBUG("    %s %u: OWN=%c, FS=%c, LS=%c, ES=%c, DE=%c, FL=%lu\n",
+            DEBUG("    %s %u: OWN=%c, FS=%c, LS=%c, ES=%c, DE=%c, FL=%" PRIu32 "\n",
                   (rx_curr == rx_desc + i) ? "-->" : "   ",
                   i,
                   (status & RX_DESC_STAT_OWN) ? '1' : '0',
