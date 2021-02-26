@@ -478,18 +478,21 @@ extern "C" {
 #endif
 
 /**
- * @brief   Default adaptive datarate ACK limit (in s)
+ * @brief   Default adaptive datarate ACK limit
  *
- * @note This feature is not yet supported.
+ * `ADRACKReq` bit (FOpts) is set to 1 once `ADR_ACK_CNT` reach
+ *  @ref CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT
  */
 #ifndef CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT
 #define CONFIG_LORAMAC_DEFAULT_ADR_ACK_LIMIT    (64U)
 #endif
 
 /**
- * @brief   Default adaptive datarate ACK delay (in s)
+ * @brief   Default adaptive datarate ACK delay
  *
- * @note This feature is not yet supported.
+ * ACK delay is the window ,in terms of number of uplink frames, within which
+ * Network Server is expected to send a downlink after `ADRACKReq` bit has
+ * been set by the node.
  */
 #ifndef CONFIG_LORAMAC_DEFAULT_ADR_ACK_DELAY
 #define CONFIG_LORAMAC_DEFAULT_ADR_ACK_DELAY    (32U)
