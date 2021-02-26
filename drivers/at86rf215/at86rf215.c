@@ -93,6 +93,9 @@ void at86rf215_reset_and_cfg(at86rf215_t *dev)
     /* default to requesting ACKs, just like at86rf2xx */
     const netopt_enable_t enable = NETOPT_ENABLE;
     netdev_ieee802154_set(&dev->netdev, NETOPT_ACK_REQ, &enable, sizeof(enable));
+
+    /* enable RX start IRQs */
+    at86rf215_reg_or(dev, dev->BBC->RG_IRQM, BB_IRQ_RXAM);
 }
 
 void at86rf215_reset(at86rf215_t *dev)
