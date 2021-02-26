@@ -346,23 +346,10 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         case NETOPT_RX_START_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->flags & AT86RF2XX_OPT_TELL_RX_START);
-            return sizeof(netopt_enable_t);
-
         case NETOPT_RX_END_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->flags & AT86RF2XX_OPT_TELL_RX_END);
-            return sizeof(netopt_enable_t);
-
         case NETOPT_TX_START_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->flags & AT86RF2XX_OPT_TELL_TX_START);
-            return sizeof(netopt_enable_t);
-
         case NETOPT_TX_END_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->flags & AT86RF2XX_OPT_TELL_TX_END);
+            *((netopt_enable_t *)val) = NETOPT_ENABLE;
             return sizeof(netopt_enable_t);
 
         case NETOPT_CSMA:
@@ -601,30 +588,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             }
             break;
 
-        case NETOPT_RX_START_IRQ:
-            at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_START,
-                                 ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_RX_END_IRQ:
-            at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_RX_END,
-                                 ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_TX_START_IRQ:
-            at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_TX_START,
-                                 ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_TX_END_IRQ:
-            at86rf2xx_set_option(dev, AT86RF2XX_OPT_TELL_TX_END,
-                                 ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
         case NETOPT_CSMA:
             if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
                 at86rf2xx_set_option(dev, AT86RF2XX_OPT_CSMA,
@@ -716,7 +679,7 @@ static void _isr_send_complete(at86rf2xx_t *dev, uint8_t trac_status)
 
     DEBUG("[at86rf2xx] EVT - TX_END\n");
 
-    if (netdev->event_callback && (dev->flags & AT86RF2XX_OPT_TELL_TX_END)) {
+    if (netdev->event_callback) {
         switch (trac_status) {
 #ifdef MODULE_OPENTHREAD
             case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
@@ -751,7 +714,10 @@ static void _isr_send_complete(at86rf2xx_t *dev, uint8_t trac_status)
 
 static inline void _isr_recv_complete(netdev_t *netdev)
 {
-    at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
+    at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
+    if (!netdev->event_callback) {
+        return;
+    }
     if (IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
         uint8_t phy_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__PHY_RSSI);
         bool crc_ok = phy_status & AT86RF2XX_PHY_RSSI_MASK__RX_CRC_VALID;
@@ -803,9 +769,6 @@ static void _isr(netdev_t *netdev)
         if ((state == AT86RF2XX_PHY_STATE_RX)
             || (state == AT86RF2XX_PHY_STATE_RX_BUSY)) {
             DEBUG("[at86rf2xx] EVT - RX_END\n");
-            if (!(dev->flags & AT86RF2XX_OPT_TELL_RX_END)) {
-                return;
-            }
 
             _isr_recv_complete(netdev);
 
