@@ -12,6 +12,44 @@ menuconfig KCONFIG_USEMODULE_IEEE802154
 
 if KCONFIG_USEMODULE_IEEE802154
 
+    choice
+        bool "IEEE802.15.4 default PHY mode"
+        default IEEE802154_DEFAULT_PHY_OQPSK
+        help
+            IEEE802.15.4 default mode
+
+        config IEEE802154_DEFAULT_PHY_BPSK
+            bool "BPSK"
+            help
+                Binary Phase Shift Keying
+
+        config IEEE802154_DEFAULT_PHY_ASK
+            bool "ASK"
+            help
+                Amplitude-Shift Keying
+
+        config IEEE802154_DEFAULT_PHY_OQPSK
+            bool "O-QPSK"
+            help
+                Offset Quadrature Phase-Shift Keying
+
+        config IEEE802154_DEFAULT_PHY_MR_OQPSK
+            bool "MR-O-QPSK"
+            help
+                Multi-Rate Offset Quadrature Phase-Shift Keying
+
+        config IEEE802154_DEFAULT_PHY_MR_OFDM
+            bool "MR-OFDM"
+            help
+                Multi-Rate Orthogonal Frequency-Division Multiplexing
+
+        config IEEE802154_DEFAULT_PHY_MR_FSK
+            bool "MR-FSK"
+            help
+                Multi-Rate Frequency Shift Keying
+
+    endchoice # IEEE802.15.4 default PHY mode
+
     config IEEE802154_DEFAULT_SUBGHZ_CHANNEL
         int "IEEE802.15.4 default sub-GHZ channel"
         default 5

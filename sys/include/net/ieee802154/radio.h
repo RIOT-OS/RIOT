@@ -32,6 +32,7 @@ extern "C" {
 #include "bitarithm.h"
 #include "byteorder.h"
 #include "net/eui64.h"
+#include "net/ieee802154.h"
 
 /**
  * @brief Forward declaration of the radio ops structure.
@@ -123,7 +124,42 @@ typedef enum {
      * @brief the device retains all register values when off.
      */
     IEEE802154_CAP_REG_RETENTION        = BIT11,
+    /**
+     * @brief Binary Phase Shift Keying PHY mode
+     */
+    IEEE802154_CAP_PHY_BPSK             = BIT12,
+    /**
+     * @brief Amplitude-Shift Keying PHY mode
+     */
+    IEEE802154_CAP_PHY_ASK              = BIT13,
+    /**
+     * @brief Offset Quadrature Phase-Shift Keying
+     */
+    IEEE802154_CAP_PHY_OQPSK            = BIT14,
+    /**
+     * @brief Multi-Rate Offset Quadrature Phase-Shift Keying PHY mode
+     */
+    IEEE802154_CAP_PHY_MR_OQPSK         = BIT15,
+    /**
+     * @brief Multi-Rate Orthogonal Frequency-Division Multiplexing PHY mode
+     */
+    IEEE802154_CAP_PHY_MR_OFDM          = BIT16,
+    /**
+     * @brief Multi-Rate Frequency Shift Keying PHY mode
+     */
+    IEEE802154_CAP_PHY_MR_FSK           = BIT17,
 } ieee802154_rf_caps_t;
+
+/**
+ * @brief Bit-mask for PHY modes capabilities.
+ */
+#define IEEE802154_RF_CAPS_PHY_MASK \
+    (IEEE802154_CAP_PHY_BPSK        \
+    | IEEE802154_CAP_PHY_ASK        \
+    | IEEE802154_CAP_PHY_OQPSK      \
+    | IEEE802154_CAP_PHY_MR_OQPSK   \
+    | IEEE802154_CAP_PHY_MR_OFDM    \
+    | IEEE802154_CAP_PHY_MR_FSK)    \
 
 /**
  * @brief Transmission status
@@ -374,9 +410,10 @@ typedef enum {
  * @brief Holder of the PHY configuration
  */
 typedef struct {
-    uint16_t channel;   /**< IEEE802.15.4 channel number */
-    uint8_t page;       /**< IEEE802.15.4 channel page */
-    int8_t pow;         /**< TX power in dBm */
+    ieee802154_phy_mode_t phy_mode; /**< IEEE802.15.4 PHY mode */
+    uint16_t channel;               /**< IEEE802.15.4 channel number */
+    uint8_t page;                   /**< IEEE802.15.4 channel page */
+    int8_t pow;                     /**< TX power in dBm */
 } ieee802154_phy_conf_t;
 
 /**
@@ -389,7 +426,7 @@ struct ieee802154_radio_ops {
      * This field contains bitflags of supported capabilities
      * (@ref ieee802154_rf_caps_t) by the device.
      */
-    const uint16_t caps;
+    const uint32_t caps;
 
     /**
      * @brief Write a frame into the framebuffer.
@@ -1156,6 +1193,117 @@ static inline bool ieee802154_radio_has_frame_retrans_info(
 }
 
 /**
+ * @brief Check if the device supports the BPSK PHY mode.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_PHY_BPSK.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_phy_bpsk(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_PHY_BPSK);
+}
+
+/**
+ * @brief Check if the device supports the ASK PHY mode.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_PHY_ASK.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_phy_ask(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_PHY_ASK);
+}
+
+/**
+ * @brief Check if the device supports the O-QPSK PHY mode.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_PHY_OQPSK.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_phy_oqpsk(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_PHY_OQPSK);
+}
+
+/**
+ * @brief Check if the device supports the MR-O-QPSK PHY mode.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_PHY_MR_OQPSK.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_phy_mr_oqpsk(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_PHY_MR_OQPSK);
+}
+
+/**
+ * @brief Check if the device supports the MR-OFDM PHY mode.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_PHY_MR_OFDM.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_phy_mr_ofdm(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_PHY_MR_OFDM);
+}
+
+/**
+ * @brief Check if the device supports the MR-FSK PHY mode.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_PHY_MR_FSK.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_phy_mr_fsk(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_PHY_MR_FSK);
+}
+
+/**
+ * @brief Get supported PHY modes of the device.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and returns only
+ * the bits from  @ref IEEE802154_RF_CAPS_PHY_MASK.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return PHY modes bit mask.
+ */
+static inline uint32_t ieee802154_radio_get_phy_modes(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_RF_CAPS_PHY_MASK);
+}
+
+/**
  * @brief Shortcut to @ref ieee802154_radio_ops::set_rx_mode
  *
  * @param[in] dev IEEE802.15.4 device descriptor
@@ -1167,6 +1315,75 @@ static inline int ieee802154_radio_set_rx_mode(ieee802154_dev_t *dev,
                                                ieee802154_rx_mode_t mode)
 {
     return dev->driver->set_rx_mode(dev, mode);
+}
+
+/**
+ * @brief Convert a @ref ieee802154_phy_mode_t to a @ref ieee802154_rf_caps_t
+ * value.
+ *
+ * @param[in] phy_mode PHY mode
+ *
+ * @return Equivalent capability given the PHY mode.
+ * @return 0 on invalid values
+ * @return 0 when @ref IEEE802154_PHY_DISABLED is given as the parameter.
+ */
+static inline uint32_t ieee802154_phy_mode_to_cap(
+    ieee802154_phy_mode_t phy_mode)
+{
+    switch (phy_mode) {
+        case IEEE802154_PHY_BPSK:
+            return IEEE802154_CAP_PHY_BPSK;
+        case IEEE802154_PHY_ASK:
+            return IEEE802154_CAP_PHY_ASK;
+        case IEEE802154_PHY_OQPSK:
+            return IEEE802154_CAP_PHY_OQPSK;
+        case IEEE802154_PHY_MR_OQPSK:
+            return IEEE802154_CAP_PHY_MR_OQPSK;
+        case IEEE802154_PHY_MR_OFDM:
+            return IEEE802154_CAP_PHY_MR_OFDM;
+        case IEEE802154_PHY_MR_FSK:
+            return IEEE802154_CAP_PHY_MR_FSK;
+
+        case IEEE802154_PHY_DISABLED:
+        default:
+            break;
+    }
+
+    return 0;
+}
+
+/**
+ * @brief Convert a @ref ieee802154_rf_caps_t to a @ref ieee802154_phy_mode_t
+ * value.
+ *
+ * @note The @p parameter must be one of the PHY capabilities.
+ *
+ * @param[in] cap The IEEE 802.15.4 capability.
+ *
+ * @return Equivalent phy mode given the capability.
+ * @return 0 on invalid values
+ */
+static inline ieee802154_phy_mode_t ieee802154_cap_to_phy_mode(uint32_t cap)
+{
+    switch (cap) {
+        case IEEE802154_CAP_PHY_BPSK:
+            return IEEE802154_PHY_BPSK;
+        case IEEE802154_CAP_PHY_ASK:
+            return IEEE802154_PHY_ASK;
+        case IEEE802154_CAP_PHY_OQPSK:
+            return IEEE802154_PHY_OQPSK;
+        case IEEE802154_CAP_PHY_MR_OQPSK:
+            return IEEE802154_PHY_MR_OQPSK;
+        case IEEE802154_PHY_MR_OFDM:
+            return IEEE802154_PHY_MR_OFDM;
+        case IEEE802154_CAP_PHY_MR_FSK:
+            return IEEE802154_PHY_MR_FSK;
+
+        default:
+            break;
+    }
+
+    return IEEE802154_PHY_DISABLED;
 }
 
 #ifdef __cplusplus

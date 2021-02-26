@@ -26,6 +26,7 @@
 
 #include "byteorder.h"
 #include "net/eui64.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -163,7 +164,7 @@ extern "C" {
 /**
  * @brief   802.15.4 PHY modes
  */
-enum {
+typedef enum {
     IEEE802154_PHY_DISABLED,        /**< PHY disabled, no mode selected */
     IEEE802154_PHY_BPSK,            /**< Binary Phase Shift Keying */
     IEEE802154_PHY_ASK,             /**< Amplitude-Shift Keying */
@@ -171,7 +172,7 @@ enum {
     IEEE802154_PHY_MR_OQPSK,        /**< Multi-Rate Offset Quadrature Phase-Shift Keying */
     IEEE802154_PHY_MR_OFDM,         /**< Multi-Rate Orthogonal Frequency-Division Multiplexing */
     IEEE802154_PHY_MR_FSK           /**< Multi-Rate Frequency Shift Keying */
-};
+} ieee802154_phy_mode_t;
 
 /**
  * @brief   802.15.4 forward error correction schemes
@@ -207,6 +208,28 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
  * @ingroup  config
  * @{
  */
+/**
+ * @brief IEEE802.15.4 default PHY mode
+ * @{
+ */
+#if IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_BPSK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_BPSK
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_ASK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_ASK
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_OQPSK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_OQPSK
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_MR_OQPSK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_MR_OQPSK
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_MR_OFDM)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_MR_OFDM
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_MR_FSK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_MR_FSK
+#endif
+
+#ifndef CONFIG_IEEE802154_DEFAULT_PHY_MODE
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_OQPSK
+#endif
+/** @} */
 /**
  * @brief IEEE802.15.4 default sub-GHZ channel
  */

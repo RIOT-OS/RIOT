@@ -337,6 +337,29 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
         submac->channel_page = CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE;
     }
 
+    /* Get supported PHY modes */
+    int supported_phy_modes = ieee802154_radio_get_phy_modes(dev);
+    assert(supported_phy_modes != 0);
+
+    uint32_t default_phy_cap = ieee802154_phy_mode_to_cap(CONFIG_IEEE802154_DEFAULT_PHY_MODE);
+
+    /* Check if configuration provides valid PHY */
+    if (CONFIG_IEEE802154_DEFAULT_PHY_MODE != IEEE802154_PHY_DISABLED &&
+        (supported_phy_modes & default_phy_cap)) {
+        /* Check if default PHY is supported */
+        submac->phy_mode = CONFIG_IEEE802154_DEFAULT_PHY_MODE;
+    }
+    else {
+        /* Get first set bit, and use it as the default,
+         *
+         * by this order, the priority is defined on the ieee802154_rf_caps_t
+         * definition, first IEEE 802.15.4-2006 PHY modes, then
+         * IEEE 802.15.4g-2012 PHY modes. */
+        unsigned bit = bitarithm_lsb(supported_phy_modes);
+
+        submac->phy_mode = ieee802154_cap_to_phy_mode(1 << bit);
+    }
+
     /* If the radio is still not in TRX_OFF state, spin */
     while (ieee802154_radio_confirm_on(dev) == -EAGAIN) {}
 
@@ -347,9 +370,10 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_radio_set_hw_addr_filter(dev, &submac->short_addr,
                                         &submac->ext_addr, &submac->panid);
 
-    /* Configure PHY settings (channel, TX power) */
+    /* Configure PHY settings (mode, channel, TX power) */
     ieee802154_phy_conf_t conf =
-    { .channel = CONFIG_IEEE802154_DEFAULT_CHANNEL,
+    { .phy_mode = submac->phy_mode,
+      .channel = CONFIG_IEEE802154_DEFAULT_CHANNEL,
       .page = CONFIG_IEEE802154_DEFAULT_CHANNEL,
       .pow = CONFIG_IEEE802154_DEFAULT_TXPOWER };
 
@@ -367,7 +391,10 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
 {
     ieee802154_dev_t *dev = submac->dev;
     const ieee802154_phy_conf_t conf =
-    { .channel = channel_num, .page = channel_page, .pow = tx_pow };
+    { .phy_mode = submac->phy_mode,
+      .channel = channel_num,
+      .page = channel_page,
+      .pow = tx_pow };
 
     if (submac->state == IEEE802154_STATE_OFF) {
         return -ENETDOWN;
