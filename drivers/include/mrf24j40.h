@@ -96,14 +96,6 @@ extern "C" {
 #define MRF24J40_OPT_PROMISCUOUS        (0x0200)    /**< promiscuous mode
                                                      *   active */
 #define MRF24J40_OPT_PRELOADING         (0x0400)    /**< preloading enabled */
-#define MRF24J40_OPT_TELL_TX_START      (0x0800)    /**< notify MAC layer on TX
-                                                     *   start */
-#define MRF24J40_OPT_TELL_TX_END        (0x1000)    /**< notify MAC layer on TX
-                                                     *   finished */
-#define MRF24J40_OPT_TELL_RX_START      (0x2000)    /**< notify MAC layer on RX
-                                                     *   start */
-#define MRF24J40_OPT_TELL_RX_END        (0x4000)    /**< notify MAC layer on RX
-                                                     *   finished */
 /** @} */
 
 

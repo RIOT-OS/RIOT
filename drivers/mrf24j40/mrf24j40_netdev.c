@@ -231,26 +231,10 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         case NETOPT_RX_START_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_START);
-            res = sizeof(netopt_enable_t);
-            break;
-
         case NETOPT_RX_END_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_TELL_RX_END);
-            res = sizeof(netopt_enable_t);
-            break;
-
         case NETOPT_TX_START_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_TELL_TX_START);
-            res = sizeof(netopt_enable_t);
-            break;
-
         case NETOPT_TX_END_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->netdev.flags & MRF24J40_OPT_TELL_TX_END);
+            *((netopt_enable_t *)val) = NETOPT_ENABLE;
             res = sizeof(netopt_enable_t);
             break;
 
@@ -486,30 +470,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             res = sizeof(netopt_enable_t);
             break;
 
-        case NETOPT_RX_START_IRQ:
-            mrf24j40_set_option(dev, MRF24J40_OPT_TELL_RX_START,
-                                ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_RX_END_IRQ:
-            mrf24j40_set_option(dev, MRF24J40_OPT_TELL_RX_END,
-                                ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_TX_START_IRQ:
-            mrf24j40_set_option(dev, MRF24J40_OPT_TELL_TX_START,
-                                ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_TX_END_IRQ:
-            mrf24j40_set_option(dev, MRF24J40_OPT_TELL_TX_END,
-                                ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
         case NETOPT_CSMA:
             mrf24j40_set_option(dev, MRF24J40_OPT_CSMA,
                                 ((const bool *)val)[0]);
@@ -570,7 +530,7 @@ static void _isr(netdev_t *netdev)
         dev->pending &= ~(MRF24J40_TASK_TX_READY);
         DEBUG("[mrf24j40] EVT - TX_END\n");
 #ifdef MODULE_NETSTATS_L2
-        if (netdev->event_callback && (dev->netdev.flags & MRF24J40_OPT_TELL_TX_END)) {
+        if (netdev->event_callback) {
             uint8_t txstat = mrf24j40_reg_read_short(dev, MRF24J40_REG_TXSTAT);
             dev->tx_retries = (txstat >> MRF24J40_TXSTAT_MAX_FRAME_RETRIES_SHIFT);
             /* transmission failed */
@@ -595,9 +555,7 @@ static void _isr(netdev_t *netdev)
     /* Receive interrupt occurred */
     if (dev->pending & MRF24J40_TASK_RX_READY) {
         DEBUG("[mrf24j40] EVT - RX_END\n");
-        if ((dev->netdev.flags & MRF24J40_OPT_TELL_RX_END)) {
-            netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
-        }
+        netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
         dev->pending &= ~(MRF24J40_TASK_RX_READY);
     }
     DEBUG("[mrf24j40] END IRQ\n");
