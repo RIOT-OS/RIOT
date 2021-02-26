@@ -22,6 +22,9 @@
 
 #include <stdlib.h>
 #include "shell_commands.h"
+#ifdef MODULE_CONGURE_TEST
+#include "congure/test.h"
+#endif
 
 extern int _reboot_handler(int argc, char **argv);
 extern int _version_handler(int argc, char **argv);
@@ -338,6 +341,17 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_DFPLAYER
     {"dfplayer", "Control a DFPlayer Mini MP3 player", _sc_dfplayer},
+#endif
+#ifdef MODULE_CONGURE_TEST
+    { "cong_clear", "Clears CongURE state object", congure_test_clear_state },
+    { "cong_setup", "Calls the setup function for the CongURE state object",
+      congure_test_call_setup },
+    { "cong_init", "Calls init method of the CongURE state object",
+      congure_test_call_init },
+    { "cong_imi", "Calls inter_message_interval method of the CongURE state object",
+      congure_test_call_inter_msg_interval },
+    { "cong_report", "Calls a report_* method of the CongURE state object",
+      congure_test_call_report },
 #endif
     {NULL, NULL, NULL}
 };
