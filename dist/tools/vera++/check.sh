@@ -16,7 +16,7 @@ CURDIR=$(cd "$(dirname "$0")" && pwd)
 # tests/pkg_utensor/models/deep_mlp_weight.hpp is an auto-generated file
 # with lots of commas so T009 takes very long. Since it is auto-generated, just
 # exclude it.
-EXCLUDE='^(.+/vendor/|dist/tools/coccinelle/include|dist/tools/fixdep/fixdep.c|dist/tools/lpc2k_pgm/src|tests/pkg_utensor/models)'
+EXCLUDE='^(.+/vendor/|dist/tools/coccinelle/include|dist/tools/fixdep/fixdep.c|dist/tools/lpc2k_pgm/src|tests/pkg_utensor/external_modules/models)'
 FILES=$(changed_files)
 
 if [ -z "${FILES}" ]; then
