@@ -23,6 +23,8 @@
 #ifndef LIFO_H
 #define LIFO_H
 
+#include "log.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,7 +37,10 @@ extern "C" {
  * @return  1, if empty
  * @return  0, otherwise.
  */
-int lifo_empty(int *array);
+static inline int lifo_empty(int *array)
+{
+    return array[0] == -1;
+}
 
 /**
  * @brief               Initialize a lifo array.
@@ -45,7 +50,13 @@ int lifo_empty(int *array);
  * @param[in,out] array An array of size *n* + 1. Must not be `NULL`.
  * @param[in] n         Maximum integer value the lifo is able to store.
  */
-void lifo_init(int *array, int n);
+static inline void lifo_init(int *array, int n)
+{
+    LOG_DEBUG("lifo_init(%i)\n", n);
+    for (int i = 0; i <= n; i++) {
+        array[i] = -1;
+    }
+}
 
 /**
  * @brief               Insert an element into the lifo
@@ -58,7 +69,24 @@ void lifo_init(int *array, int n);
  *                      the array - 1, must not be stored already.
  *
  */
-void lifo_insert(int *array, int i);
+static inline void lifo_insert(int *array, int i)
+{
+    LOG_DEBUG("lifo_insert(%i)\n", i);
+
+    int index = i + 1;
+
+#ifdef DEVELHELP
+    if ((array[index] != -1) && (array[0] != -1)) {
+        LOG_WARNING(
+            "lifo_insert: overwriting array[%i] == %i with %i\n\n\n"
+            "\t\tThe lifo is broken now.\n\n\n", index,
+            array[index], array[0]);
+    }
+#endif
+
+    array[index] = array[0];
+    array[0] = i;
+}
 
 /**
  * @brief           Extract the least recently inserted element from the lifo.
@@ -70,7 +98,24 @@ void lifo_insert(int *array, int i);
  * @return          -1, if the lifo is empty.
  * @return          the least recently inserted element, otherwise.
  */
-int lifo_get(int *array);
+static inline int lifo_get(int *array)
+{
+    DEBUG("lifo_get\n");
+    int head = array[0];
+
+    if (head != -1) {
+        array[0] = array[head + 1];
+    }
+
+#ifdef DEVELHELP
+    /* make sure a double insert does not result in an infinite
+     * resource of values */
+    array[head + 1] = -1;
+#endif
+
+    DEBUG("lifo_get: returning %i\n", head);
+    return head;
+}
 
 #ifdef __cplusplus
 }
