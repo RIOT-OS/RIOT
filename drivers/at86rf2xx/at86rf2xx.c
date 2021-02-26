@@ -24,8 +24,7 @@
  * @}
  */
 
-
-#include "luid.h"
+#include "kernel_defines.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #if IS_USED(IEEE802154_SECURITY)
