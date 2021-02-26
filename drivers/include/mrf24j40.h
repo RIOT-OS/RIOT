@@ -104,8 +104,6 @@ extern "C" {
                                                      *   start */
 #define MRF24J40_OPT_TELL_RX_END        (0x4000)    /**< notify MAC layer on RX
                                                      *   finished */
-#define MRF24J40_OPT_REQ_AUTO_ACK       (0x8000)    /**< notify MAC layer on RX
-                                                     *   finished */
 /** @} */
 
 
