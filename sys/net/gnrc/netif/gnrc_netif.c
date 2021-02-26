@@ -52,7 +52,7 @@
 #include "debug.h"
 
 static void _update_l2addr_from_dev(gnrc_netif_t *netif);
-static void _configure_netdev(netdev_t *dev);
+static void _check_netdev_capabilities(netdev_t *dev);
 static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 
@@ -411,11 +411,6 @@ int gnrc_netif_set_from_netdev(gnrc_netif_t *netif,
                     break;
                 case NETOPT_IEEE802154_PHY:
                     gnrc_netif_ipv6_init_mtu(netif);
-                    break;
-                case NETOPT_STATE:
-                    if (*((netopt_state_t *)opt->data) == NETOPT_STATE_RESET) {
-                        _configure_netdev(netif->dev);
-                    }
                     break;
                 default:
                     break;
@@ -1261,18 +1256,20 @@ static void _init_from_device(gnrc_netif_t *netif)
     _update_l2addr_from_dev(netif);
 }
 
-static void _configure_netdev(netdev_t *dev)
+static void _check_netdev_capabilities(netdev_t *dev)
 {
-    /* Enable RX- and TX-complete interrupts */
-    static const netopt_enable_t enable = NETOPT_ENABLE;
-    int res = dev->driver->set(dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
-    if (res < 0) {
-        DEBUG("gnrc_netif: enable NETOPT_RX_END_IRQ failed: %d\n", res);
-    }
-    if (IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ)) {
-        res = dev->driver->set(dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
-        if (res < 0) {
-            DEBUG("gnrc_netif: enable NETOPT_TX_END_IRQ failed: %d\n", res);
+    /* Check whether RX- and TX-complete interrupts are supported by the driver */
+    if (IS_ACTIVE(DEVELHELP)) {
+        netopt_enable_t enable = NETOPT_ENABLE;
+        int res = dev->driver->get(dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
+        if ((res != sizeof(enable)) || (enable != NETOPT_ENABLE)) {
+            LOG_WARNING("NETOPT_RX_END_IRQ not implemented by driver\n");
+        }
+        if (IS_USED(MODULE_NETSTATS_L2) || IS_USED(MODULE_GNRC_NETIF_PKTQ)) {
+            res = dev->driver->get(dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
+            if ((res != sizeof(enable)) || (enable != NETOPT_ENABLE)) {
+                LOG_WARNING("NETOPT_TX_END_IRQ not implemented by driver\n");
+            }
         }
     }
 }
@@ -1667,7 +1664,7 @@ static void *_gnrc_netif_thread(void *args)
         return NULL;
     }
     netif_register(&netif->netif);
-    _configure_netdev(dev);
+    _check_netdev_capabilities(dev);
     netif->ops->init(netif);
 #if DEVELHELP
     assert(options_tested);
