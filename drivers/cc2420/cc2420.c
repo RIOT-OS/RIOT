@@ -145,7 +145,7 @@ size_t cc2420_tx_prepare(cc2420_t *dev, const iolist_t *iolist)
 void cc2420_tx_exec(cc2420_t *dev)
 {
     /* trigger the transmission */
-    if (dev->options & CC2420_OPT_TELL_TX_START) {
+    if (dev->netdev.netdev.event_callback) {
         dev->netdev.netdev.event_callback(&dev->netdev.netdev,
                                           NETDEV_EVENT_TX_STARTED);
     }
