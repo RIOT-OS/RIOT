@@ -13,6 +13,9 @@
  * @file
  * @brief   LIFO buffer API, read long description carefully
  * @author  Heiko Will <hwill@inf.fu-berlin.de>
+ * @deprecated Is no longer used in RIOT.
+ *             Has very tight constrains making new use unlikely.
+ *             Will be removed after release 2021.04.
  *
  * @details This LIFO implementation very efficiently handles integer values.
  *          The caveat is that it **can only handle values between 0 and its own
@@ -100,7 +103,7 @@ static inline void lifo_insert(int *array, int i)
  */
 static inline int lifo_get(int *array)
 {
-    DEBUG("lifo_get\n");
+    LOG_DEBUG("lifo_get\n");
     int head = array[0];
 
     if (head != -1) {
@@ -113,7 +116,7 @@ static inline int lifo_get(int *array)
     array[head + 1] = -1;
 #endif
 
-    DEBUG("lifo_get: returning %i\n", head);
+    LOG_DEBUG("lifo_get: returning %i\n", head);
     return head;
 }
 
