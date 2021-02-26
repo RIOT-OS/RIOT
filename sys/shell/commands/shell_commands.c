@@ -350,6 +350,14 @@ const shell_command_t _shell_command_list[] = {
       congure_test_call_init },
     { "cong_imi", "Calls inter_message_interval method of the CongURE state object",
       congure_test_call_inter_msg_interval },
+    { "cong_add_msg",
+      "Adds a message to the list of messages to be reported with "
+      "report_msgs_lost or report_msgs_timeout",
+      congure_test_add_msg },
+    { "cong_msgs_reset",
+      "Resets the list of messages to be reported with report_msgs_lost or "
+      "report_msgs_timeout",
+      congure_test_msgs_reset },
     { "cong_report", "Calls a report_* method of the CongURE state object",
       congure_test_call_report },
 #endif
