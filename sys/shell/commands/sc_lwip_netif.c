@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Shell command for printing lwIP network interface status
+ * @brief       Shell command for interacting with lwIP network interfaces
  *
  * @author      Erik Ekman <eekman@google.com>
  *
@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include "lwip/netif.h"
+#include "lwip/netifapi.h"
 #include "net/netdev.h"
 #include "net/netopt.h"
 
@@ -81,6 +82,8 @@ static void _netif_list(struct netif *netif) {
 static void _usage(const char *cmd) {
     printf("usage: %s [iface]\n", cmd);
     puts("      List all or a specific network interface");
+    printf("usage: %s <iface> {up|down}\n", cmd);
+    puts("      Enable or disable an interface (independent of link)");
 }
 
 int _lwip_netif_config(int argc, char **argv)
@@ -104,17 +107,26 @@ int _lwip_netif_config(int argc, char **argv)
     } else if (strcmp(argv[1], "help") == 0) {
         _usage(argv[0]);
         return 0;
-    } else if (argc == 2) {
+    } else {
         LOCK_TCPIP_CORE();
         struct netif *netif = netif_find(argv[1]);
         UNLOCK_TCPIP_CORE();
-        if (netif) {
-            _netif_list(netif);
-            return 0;
-        } else {
+        if (!netif) {
             printf("Interface '%s' not found.\n", argv[1]);
             _usage(argv[0]);
             return 1;
+        }
+        if (argc == 2) {
+            _netif_list(netif);
+            return 0;
+        } else if (argc == 3) {
+            if (strcmp(argv[2], "up") == 0) {
+                netifapi_netif_set_up(netif);
+                return 0;
+            } else if (strcmp(argv[2], "down") == 0) {
+                netifapi_netif_set_down(netif);
+                return 0;
+            }
         }
     }
     _usage(argv[0]);
