@@ -78,6 +78,11 @@ static void _netif_list(struct netif *netif) {
 #endif
 }
 
+static void _usage(const char *cmd) {
+    printf("usage: %s [iface]\n", cmd);
+    puts("      List all or a specific network interface");
+}
+
 int _lwip_netif_config(int argc, char **argv)
 {
     if (argc < 2) {
@@ -96,7 +101,22 @@ int _lwip_netif_config(int argc, char **argv)
             }
         }
         return 0;
+    } else if (strcmp(argv[1], "help") == 0) {
+        _usage(argv[0]);
+        return 0;
+    } else if (argc == 2) {
+        LOCK_TCPIP_CORE();
+        struct netif *netif = netif_find(argv[1]);
+        UNLOCK_TCPIP_CORE();
+        if (netif) {
+            _netif_list(netif);
+            return 0;
+        } else {
+            printf("Interface '%s' not found.\n", argv[1]);
+            _usage(argv[0]);
+            return 1;
+        }
     }
-    printf("%s takes no arguments.\n", argv[0]);
+    _usage(argv[0]);
     return 1;
 }
