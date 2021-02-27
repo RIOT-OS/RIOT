@@ -245,7 +245,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     size_t src_len, dst_len;
     uint8_t mhr_len;
 #if IS_USED(MODULE_IEEE802154_SECURITY)
-    uint8_t mhr[IEEE802154_MAX_HDR_LEN + IEEE802154_MAX_AUX_HDR_LEN];
+    uint8_t mhr[IEEE802154_MAX_HDR_LEN + IEEE802154_SEC_MAX_AUX_HDR_LEN];
 #else
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
 #endif
@@ -336,7 +336,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
         iolist_header.iol_next = (iolist_t *)pkt->next;
 
-        uint8_t mic[IEEE802154_MAC_SIZE];
+        uint8_t mic[IEEE802154_SEC_MAX_MAC_SIZE];
         uint8_t mic_size = 0;
 
         if (flags & NETDEV_IEEE802154_SECURITY_EN) {

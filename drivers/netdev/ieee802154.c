@@ -178,7 +178,7 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
             *((uint16_t *)value) = (_get_ieee802154_pdu(dev)
                                     - IEEE802154_MAX_HDR_LEN)
 #if IS_USED(MODULE_IEEE802154_SECURITY)
-                                    -IEEE802154_MAX_AUX_HDR_LEN
+                                    -IEEE802154_SEC_MAX_AUX_HDR_LEN
 #endif /* IS_USED(MODULE_IEEE802154_SECURITY) */
                                     - IEEE802154_FCS_LEN;
             res = sizeof(uint16_t);
