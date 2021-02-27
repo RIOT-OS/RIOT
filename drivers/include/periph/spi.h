@@ -66,10 +66,11 @@
 #ifndef PERIPH_SPI_H
 #define PERIPH_SPI_H
 
+#include <errno.h>
+#include <limits.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <limits.h>
 
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -127,14 +128,17 @@ typedef gpio_t spi_cs_t;
 #endif
 
 /**
- * @brief   Status codes used by the SPI driver interface
+ * @brief       Status codes used by the SPI driver interface
+ *
+ * @deprecated  Use negative errno codes instead. The enum is still provided
+ *              for backwards compatibility
  */
 enum {
-    SPI_OK          =  0,   /**< everything went as planned */
-    SPI_NODEV       = -1,   /**< invalid SPI bus specified */
-    SPI_NOCS        = -2,   /**< invalid chip select line specified */
-    SPI_NOMODE      = -3,   /**< selected mode is not supported */
-    SPI_NOCLK       = -4    /**< selected clock value is not supported */
+    SPI_OK          =  0,       /**< everything went as planned */
+    SPI_NODEV       = -ENXIO,   /**< invalid SPI bus specified */
+    SPI_NOCS        = -EINVAL,  /**< invalid chip select line specified */
+    SPI_NOMODE      = -EINVAL,  /**< selected mode is not supported */
+    SPI_NOCLK       = -EINVAL   /**< selected clock value is not supported */
 };
 
 /**
@@ -215,7 +219,7 @@ void spi_init(spi_t bus);
  *
  * The pins used are configured in the board's periph_conf.h.
  *
- * @param[in] bus       SPI device the pins are configure for
+ * @param[in]   bus     SPI device the pins are configure for
  */
 void spi_init_pins(spi_t bus);
 
@@ -231,12 +235,12 @@ void spi_init_pins(spi_t bus);
  * hardware chip select line `x` or the GPIO_PIN(x,y) macro for using any
  * GPIO pin for manual chip select.
  *
- * @param[in] bus       SPI device that is used with the given CS line
- * @param[in] cs        chip select pin to initialize
+ * @param[in]   bus     SPI device that is used with the given CS line
+ * @param[in]   cs      chip select pin to initialize
  *
- * @return              SPI_OK on success
- * @return              SPI_NODEV on invalid device
- * @return              SPI_NOCS on invalid CS pin/line
+ * @retval  0           success
+ * @retval  -ENXIO      invalid device
+ * @retval  -EINVAL     invalid CS pin/line
  */
 int spi_init_cs(spi_t bus, spi_cs_t cs);
 
@@ -260,7 +264,7 @@ int spi_init_cs(spi_t bus, spi_cs_t cs);
  * @note Until this is implemented on all platforms, this requires the
  *       periph_spi_reconfigure feature to be used.
  *
- * @param[in] dev       the device to de-initialize
+ * @param[in]   dev     the device to de-initialize
  */
 void spi_deinit_pins(spi_t dev);
 
@@ -319,11 +323,11 @@ typedef struct {
 /**
  * @brief   Initialize MOSI/MISO/SCLK pins with adapted GPIO modes
  *
- * @param[in] bus       SPI device that is used with the given CS line
- * @param[in] mode      a struct containing the 3 modes to use on each pin
+ * @param[in]   bus     SPI device that is used with the given CS line
+ * @param[in]   mode    a struct containing the 3 modes to use on each pin
  *
- * @return              0 on success
- * @return              <0 on error
+ * @retval  0           success
+ * @retval  <0          error
  */
 int spi_init_with_gpio_mode(spi_t bus, spi_gpio_mode_t mode);
 #endif
@@ -339,15 +343,17 @@ int spi_init_with_gpio_mode(spi_t bus, spi_gpio_mode_t mode);
  * @note    This function expects the @p bus and the @p cs parameters to be
  *          valid (they are checked in spi_init and spi_init_cs before)
  *
- * @param[in] bus       SPI device to access
- * @param[in] cs        chip select pin/line to use, set to SPI_CS_UNDEF if chip
+ * @param[in]   bus     SPI device to access
+ * @param[in]   cs      chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
- * @param[in] mode      mode to use for the new transaction
- * @param[in] clk       bus clock speed to use for the transaction
+ * @param[in]   mode    mode to use for the new transaction
+ * @param[in]   clk     bus clock speed to use for the transaction
  *
- * @return              SPI_OK on success
- * @return              SPI_NOMODE if given mode is not supported
- * @return              SPI_NOCLK if given clock speed is not supported
+ * @retval  0           success
+ * @return  -EINVAL     Invalid mode in @p mode
+ * @return  -EINVAL     Invalid clock in @p clock
+ * @return  -ENOTSUP    Unsupported but valid mode in @p mode
+ * @return  -ENOTSUP    Unsupported but valid clock in @p clock
  */
 int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk);
 
@@ -357,18 +363,18 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk);
  * After release, the given SPI bus should be fully powered down until acquired
  * again.
  *
- * @param[in] bus       SPI device to release
+ * @param[in]   bus     SPI device to release
  */
 void spi_release(spi_t bus);
 
 /**
  * @brief Transfer one byte on the given SPI bus
  *
- * @param[in] bus       SPI device to use
- * @param[in] cs        chip select pin/line to use, set to SPI_CS_UNDEF if chip
+ * @param[in]   bus     SPI device to use
+ * @param[in]   cs      chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
- * @param[in] cont      if true, keep device selected after transfer
- * @param[in] out       byte to send out
+ * @param[in]   cont    if true, keep device selected after transfer
+ * @param[in]   out     byte to send out
  *
  * @return              the received byte
  */
@@ -377,13 +383,13 @@ uint8_t spi_transfer_byte(spi_t bus, spi_cs_t cs, bool cont, uint8_t out);
 /**
  * @brief   Transfer a number bytes using the given SPI bus
  *
- * @param[in]  bus      SPI device to use
- * @param[in]  cs       chip select pin/line to use, set to SPI_CS_UNDEF if chip
+ * @param[in]   bus     SPI device to use
+ * @param[in]   cs      chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
- * @param[in]  cont     if true, keep device selected after transfer
- * @param[in]  out      buffer to send data from, set NULL if only receiving
- * @param[out] in       buffer to read into, set NULL if only sending
- * @param[in]  len      number of bytes to transfer
+ * @param[in]   cont    if true, keep device selected after transfer
+ * @param[in]   out     buffer to send data from, set NULL if only receiving
+ * @param[out]  in      buffer to read into, set NULL if only sending
+ * @param[in]   len     number of bytes to transfer
  */
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len);
@@ -394,11 +400,11 @@ void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
  * This function is a shortcut function for easier handling of SPI devices that
  * implement a register based access scheme.
  *
- * @param[in] bus       SPI device to use
- * @param[in]  cs       chip select pin/line to use, set to SPI_CS_UNDEF if chip
+ * @param[in]   bus     SPI device to use
+ * @param[in]   cs      chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
- * @param[in] reg       register address to transfer data to/from
- * @param[in] out       byte to send
+ * @param[in]   reg     register address to transfer data to/from
+ * @param[in]   out     byte to send
  *
  * @return              value that was read from the given register address
  */
@@ -410,13 +416,13 @@ uint8_t spi_transfer_reg(spi_t bus, spi_cs_t cs, uint8_t reg, uint8_t out);
  * This function is a shortcut function for easier handling of SPI devices that
  * implement a register based access scheme.
  *
- * @param[in]  bus      SPI device to use
- * @param[in]  cs       chip select pin/line to use, set to SPI_CS_UNDEF if chip
+ * @param[in]   bus     SPI device to use
+ * @param[in]   cs      chip select pin/line to use, set to SPI_CS_UNDEF if chip
  *                      select should not be handled by the SPI driver
- * @param[in]  reg      register address to transfer data to/from
- * @param[in]  out      buffer to send data from, set NULL if only receiving
- * @param[out] in       buffer to read into, set NULL if only sending
- * @param[in]  len      number of bytes to transfer
+ * @param[in]   reg     register address to transfer data to/from
+ * @param[in]   out     buffer to send data from, set NULL if only receiving
+ * @param[out]  in      buffer to read into, set NULL if only sending
+ * @param[in]   len     number of bytes to transfer
  */
 void spi_transfer_regs(spi_t bus, spi_cs_t cs, uint8_t reg,
                        const void *out, void *in, size_t len);
