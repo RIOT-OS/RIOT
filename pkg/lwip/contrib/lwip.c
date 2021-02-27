@@ -61,6 +61,10 @@
 #include "esp-wifi/esp_wifi_netdev.h"
 #endif
 
+#ifdef MODULE_SAM0_ETH
+#include "sam0_eth_netdev.h"
+#endif
+
 #ifdef MODULE_STM32_ETH
 #include "stm32_eth.h"
 #endif
@@ -107,6 +111,10 @@
 #define ESP_WIFI_INDEX          (0)
 #endif
 
+#ifdef MODULE_SAM0_ETH
+#define LWIP_NETIF_NUMOF        (1)
+#endif
+
 #ifdef MODULE_STM32_ETH
 #define LWIP_NETIF_NUMOF        (1)
 #endif
@@ -151,6 +159,11 @@ extern void esp_eth_setup (esp_eth_netdev_t* dev);
 #ifdef MODULE_ESP_WIFI
 extern esp_wifi_netdev_t _esp_wifi_dev;
 extern void esp_wifi_setup(esp_wifi_netdev_t *dev);
+#endif
+
+#ifdef MODULE_SAM0_ETH
+static netdev_t sam0_eth;
+extern void sam0_eth_setup(netdev_t *netdev);
 #endif
 
 #ifdef MODULE_STM32_ETH
@@ -252,6 +265,13 @@ void lwip_bootstrap(void)
         return;
     }
 #endif
+#elif defined(MODULE_SAM0_ETH)
+    sam0_eth_setup(&sam0_eth);
+    if (_netif_add(&netif[0], &sam0_eth, lwip_netdev_init,
+                   tcpip_input) == NULL) {
+        DEBUG("Could not add sam0_eth device\n");
+        return;
+    }
 #elif defined(MODULE_STM32_ETH)
     stm32_eth_netdev_setup(&stm32_eth);
     if (_netif_add(&netif[0], &stm32_eth, lwip_netdev_init,
