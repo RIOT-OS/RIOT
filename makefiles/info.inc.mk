@@ -5,6 +5,7 @@
         info-debug-variable-% info-toolchains-supported \
         check-toolchain-supported \
         info-programmers-supported \
+        Makefile.ci \
         #
 
 info-objsize:
