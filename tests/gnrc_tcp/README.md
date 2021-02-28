@@ -41,6 +41,6 @@ or by executing the following commands:
 Usage
 ==========
     make BOARD=<BOARD_NAME> all flash
-    sudo make BOARD=<BOARD_NAME> test
+    sudo make BOARD=<BOARD_NAME> test-as-root
 
 'sudo' is required due to ethos and raw socket usage.
