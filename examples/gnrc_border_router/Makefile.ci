@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega1284p \
     atmega328p \
+    atxmega-a1u-xpro \
     b-l072z-lrwan1 \
     blackpill \
     blackpill-128kib \
