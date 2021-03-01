@@ -91,6 +91,22 @@ extern "C" {
 #endif
 /** @} */
 
+/**
+ * @brief   Extra query parameters added during registration
+ *
+ * Must be suitable for constructing a static array out of them.
+ *
+ * Example:
+ *
+ * ```
+ * CFLAGS += '-DCONFIG_CORD_EXTRAARGS="proxy=on","et=tag:riot-os.org,2020:board"'
+ * ```
+ */
+#ifdef DOXYGEN
+#define CONFIG_CORD_EXTRAARGS
+#endif
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
