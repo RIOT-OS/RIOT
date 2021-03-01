@@ -54,9 +54,9 @@ static void _netif_list(struct netif *netif) {
             printf(":");
         }
     }
-    printf(" Link: %s State: %s %s\n",
-        netif_is_link_up(netif) ? "up" : "down",
-        netif_is_up(netif) ? "up" : "down",
+    printf("  Link: %s  State: %s  %s\n",
+        netif_is_link_up(netif) ? "up  " : "down",
+        netif_is_up(netif) ? "up  " : "down",
         netif == netif_default ? "Default route" : "");
     printf("        Link type: %s\n",
         (dev->driver->get(dev, NETOPT_IS_WIRED, &i, sizeof(i)) > 0) ?
