@@ -93,6 +93,10 @@ void gnrc_lorawan_mcps_indication(gnrc_lorawan_t *mac, mcps_indication_t *ind)
     gnrc_pktsnip_t *pkt = gnrc_pktbuf_add(NULL, ind->data.pkt->iol_base,
                                           ind->data.pkt->iol_len,
                                           GNRC_NETTYPE_LORAWAN);
+    if (!pkt) {
+        DEBUG("gnrc_lorawan: mcps_indication: couldn't allocate pktbuf\n");
+        return;
+    }
 
     if (!gnrc_netapi_dispatch_receive(GNRC_NETTYPE_LORAWAN, ind->data.port,
                                       pkt)) {
