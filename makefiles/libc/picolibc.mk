@@ -7,12 +7,18 @@ ifneq (,$(filter picolibc,$(USEMODULE)))
         LINKFLAGS += -Wl,--no-wchar-size-warning
     endif
   else
-    $(warning picolibc was selected to be build but no picolibc.spec could be found)
-    $(warning you might want to install "picolibc" for "$(TARGET_ARCH)")
-    $(warning or add "FEATURES_BLACKLIST += picolibc" to Makefile)
-    $(error   check your installation or build configuration.)
+    BUILDDEPS += _missing-picolibc
   endif
 endif
+
+.PHONY: _missing-picolibc
+
+_missing-picolibc:
+	@$(Q)echo "picolibc was selected to be build but no picolibc.spec could be found"
+	@$(Q)echo "you might want to install "picolibc" for "$(TARGET_ARCH)""
+	@$(Q)echo "or add "FEATURES_BLACKLIST += picolibc" to Makefile)"
+	@$(COLOR_ECHO) "$(COLOR_RED)check your installation or build configuration."
+	@$(Q)exit 1
 
 ifeq (1,$(USE_PICOLIBC))
   LINKFLAGS += -specs=picolibc.specs
