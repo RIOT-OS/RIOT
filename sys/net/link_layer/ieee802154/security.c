@@ -178,7 +178,7 @@ static inline bool _req_encryption(uint8_t sec_level)
 static inline void _memxor(void *dst, const void* src, size_t size)
 {
     while (size--) {
-        ((uint8_t *)dst)[size] ^= ((uint8_t *)src)[size];
+        ((uint8_t *)dst)[size] ^= ((const uint8_t *)src)[size];
     }
 }
 
