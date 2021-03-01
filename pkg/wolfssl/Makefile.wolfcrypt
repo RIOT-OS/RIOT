@@ -1,6 +1,7 @@
 MODULE = wolfcrypt
 
 CFLAGS += -Wno-unused
+CFLAGS += -Wno-pedantic
 
 ifeq (llvm,$(TOOLCHAIN))
   CFLAGS += -Wno-unused-parameter
