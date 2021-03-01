@@ -79,5 +79,15 @@ int cord_common_add_qstring(coap_pkt_t *pkt)
     }
 #endif
 
+#ifdef CONFIG_CORD_EXTRAARGS
+    static const char *extra[] = { CONFIG_CORD_EXTRAARGS };
+    for (unsigned i = 0; i < ARRAY_SIZE(extra); ++i) {
+        res = coap_opt_add_uri_query(pkt, extra[i], NULL);
+        if (res < 0) {
+            return res;
+        }
+    }
+#endif
+
     return 0;
 }
