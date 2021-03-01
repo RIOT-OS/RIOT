@@ -32,8 +32,8 @@ CFLAGS += -DRD_ADDR=$(RD_ADDR)
 
 include $(RIOTBASE)/Makefile.include
 
-# For debugging and demonstration purposes, we limit the lifetime to the minimal
-# allowed value of 60s (see draft-ietf-core-resource-directory-11, Table 2)
+# For debugging and demonstration purposes, we limit the lifetime to just one
+# minute
 RD_LT ?= 60
 
 # Set CONFIG_CORD_LT only if not being set via Kconfig
