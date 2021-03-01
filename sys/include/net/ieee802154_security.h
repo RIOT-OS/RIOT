@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 Otto-von-Gericke-Universität Magdeburg
+ * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -34,7 +34,7 @@ extern "C" {
 #endif
 
 /**
- * @brief   Forward declaration of an IEEE802.15.4 abstract security device
+ * @brief   Forward declaration of an IEEE 802.15.4 abstract security device
  */
 typedef struct ieee802154_sec_dev ieee802154_sec_dev_t;
 
@@ -88,7 +88,7 @@ typedef struct ieee802154_radio_cipher_ops {
 } ieee802154_radio_cipher_ops_t;
 
 /**
- * @brief IEEE802.15.4 security device descriptor
+ * @brief IEEE 802.15.4 security device descriptor
  */
 struct ieee802154_sec_dev {
     /**
@@ -206,7 +206,7 @@ typedef enum {
  * |                |             |                  | short source address               |
  * |                |             |                  | of the originator of the frame.    |
  * +----------------+-------------+------------------+------------------------------------+
- * | HX_INDEX       | 8 bytes     | 1 byte           | The key can be determined          |
+ * | HW_INDEX       | 8 bytes     | 1 byte           | The key can be determined          |
  * |                |             |                  | from the key index and             |
  * |                |             |                  | the long address of the originator |
  * |                |             |                  | of the frame.                      |
@@ -217,7 +217,7 @@ typedef enum {
     IEEE802154_SCF_KEYMODE_INDEX                = 0x01, /**< Key is determined from key index */
     IEEE802154_SCF_KEYMODE_SHORT_INDEX          = 0x02, /**< Key is determined from 4 byte key source and key index */
     IEEE802154_SCF_KEYMODE_HW_INDEX             = 0x03  /**< Key is determined from 8 byte key source and key index */
-} ieee802154_scr_keymode_t;
+} ieee802154_scf_keymode_t;
 
 /**
  * @brief   IEEE 802.15.4 security error codes
@@ -376,7 +376,7 @@ typedef struct __attribute__((packed)) {
 /**
  * @brief   Initialize IEEE 802.15.4 security context with default values
  *
- * @param[out]      ctx                     security context
+ * @param[out]      ctx                     IEEE 802.15.4 security context
  */
 void ieee802154_sec_init(ieee802154_sec_context_t *ctx);
 

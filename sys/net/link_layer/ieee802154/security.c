@@ -221,9 +221,9 @@ static uint8_t _set_aux_hdr(const ieee802154_sec_context_t *ctx,
  * @brief   Construct the first block A0 for CTR
  */
 static inline void _init_ctr_A0(ieee802154_ccm_block_t *A0,
-                               uint32_t frame_counter,
-                               uint8_t security_level,
-                               const uint8_t *src_address)
+                                uint32_t frame_counter,
+                                uint8_t security_level,
+                                const uint8_t *src_address)
 {
     A0->flags = _ccm_flag(0, 2);
     A0->nonce.frame_counter = htonl(frame_counter);
@@ -244,11 +244,11 @@ static inline void _advance_ctr_Ai(ieee802154_ccm_block_t *Ai)
  * @brief   Construct the first block B0 for CBC-MAC
  */
 static inline void _init_cbc_B0(ieee802154_ccm_block_t *B0,
-                               uint32_t frame_counter,
-                               uint8_t security_level,
-                               uint16_t m_len,
-                               uint8_t mic_size,
-                               const uint8_t *src_address)
+                                uint32_t frame_counter,
+                                uint8_t security_level,
+                                uint16_t m_len,
+                                uint8_t mic_size,
+                                const uint8_t *src_address)
 {
     B0->flags = _ccm_flag(mic_size, 2);
     B0->nonce.frame_counter = htonl(frame_counter),

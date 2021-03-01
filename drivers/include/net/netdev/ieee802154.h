@@ -119,7 +119,7 @@ typedef struct {
     uint8_t page;                           /**< channel page */
     uint16_t flags;                         /**< flags as defined above */
     int16_t txpower;                        /**< tx power in dBm */
-#if IS_USED(MODULE_IEEE802154_SECURITY) || defined (Doxygen)
+#if IS_USED(MODULE_IEEE802154_SECURITY) || defined(DOXYGEN)
     ieee802154_sec_context_t sec_ctx;       /**< security context */
 #endif
     /** @} */
