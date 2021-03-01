@@ -26,11 +26,13 @@ config MODULE_ZTIMER_PERIPH_RTT
     bool "RTT peripheral"
     depends on HAS_PERIPH_RTT
     select MODULE_PERIPH_RTT
+    default y if !MODULE_ZTIMER_PERIPH_TIMER
 
 config MODULE_ZTIMER_PERIPH_TIMER
     bool "Timer peripheral"
     depends on HAS_PERIPH_TIMER
     select MODULE_PERIPH_TIMER
+    default y
 
 endmenu # Backends
 
