@@ -208,7 +208,7 @@ static uint8_t _set_aux_hdr(const ieee802154_sec_context_t *ctx,
             break;
         case IEEE802154_SCF_KEYMODE_HW_INDEX:
             memcpy(ahr->key_id, ctx->key_source, 8);
-            memcpy(ahr->key_id + 4, &ctx->key_index, 1);
+            memcpy(ahr->key_id + 8, &ctx->key_index, 1);
             len += 9;
             break;
         default:
