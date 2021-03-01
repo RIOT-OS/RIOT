@@ -34,6 +34,15 @@ static inline uint16_t _min(uint16_t a, uint16_t b)
     return a < b ? a : b;
 }
 
+static void _set_key(ieee802154_sec_context_t *ctx,
+                     const uint8_t *key)
+{
+    if (ctx->dev.cipher_ops->set_key) {
+        ctx->dev.cipher_ops->set_key(&ctx->dev, key, IEEE802154_SEC_BLOCK_SIZE);
+    }
+    memcpy(ctx->cipher.context.context, key, IEEE802154_SEC_KEY_LENGTH);
+}
+
 /**
  * @brief   Perform an ECB block cipher for IEEE 802.15.4 security layer.
  *
@@ -48,7 +57,13 @@ static inline uint16_t _min(uint16_t a, uint16_t b)
 static void _sec_ecb(const ieee802154_sec_dev_t *dev,
                      uint8_t *cipher,
                      const uint8_t *plain,
-                     uint8_t nblocks);
+                     uint8_t nblocks)
+{
+    cipher_encrypt_ecb(&((ieee802154_sec_context_t *)dev->ctx)->cipher,
+                       plain,
+                       nblocks * IEEE802154_SEC_BLOCK_SIZE,
+                       cipher);
+}
 
 /**
  * @brief   Perform a CBC block cipher for IEEE 802.15.4 security layer MIC
@@ -67,7 +82,14 @@ static void _sec_cbc(const ieee802154_sec_dev_t *dev,
                      uint8_t *cipher,
                      uint8_t *iv,
                      const uint8_t *plain,
-                     uint8_t nblocks);
+                     uint8_t nblocks)
+{
+    cipher_encrypt_cbc(&((ieee802154_sec_context_t *)dev->ctx)->cipher,
+                       iv,
+                       plain,
+                       nblocks * IEEE802154_SEC_BLOCK_SIZE,
+                       cipher);
+}
 
 /**
  * @brief Flag field of CCM input block
@@ -321,14 +343,6 @@ static uint8_t _cbc_next(ieee802154_sec_context_t *ctx,
     return s;
 }
 
-static void _set_key(ieee802154_sec_context_t *ctx, const uint8_t *key)
-{
-    if (ctx->dev.cipher_ops->set_key) {
-        ctx->dev.cipher_ops->set_key(&ctx->dev, key, IEEE802154_SEC_BLOCK_SIZE);
-    }
-    memcpy(ctx->cipher.context.context, key, IEEE802154_SEC_KEY_LENGTH);
-}
-
 static void _comp_mic(ieee802154_sec_context_t *ctx,
                       uint8_t mic[IEEE802154_MAC_SIZE],
                       ieee802154_ccm_block_t *B0,
@@ -526,28 +540,4 @@ int ieee802154_sec_decrypt_frame(ieee802154_sec_context_t *ctx,
     }
     *header_size += aux_size;
     return IEEE802154_SEC_OK;
-}
-
-static void _sec_ecb(const ieee802154_sec_dev_t *dev,
-                     uint8_t *cipher,
-                     const uint8_t *plain,
-                     uint8_t nblocks)
-{
-    cipher_encrypt_ecb(&((ieee802154_sec_context_t *)dev->ctx)->cipher,
-                       plain,
-                       nblocks * IEEE802154_SEC_BLOCK_SIZE,
-                       cipher);
-}
-
-static void _sec_cbc(const ieee802154_sec_dev_t *dev,
-                     uint8_t *cipher,
-                     uint8_t *iv,
-                     const uint8_t *plain,
-                     uint8_t nblocks)
-{
-    cipher_encrypt_cbc(&((ieee802154_sec_context_t *)dev->ctx)->cipher,
-                       iv,
-                       plain,
-                       nblocks * IEEE802154_SEC_BLOCK_SIZE,
-                       cipher);
 }
