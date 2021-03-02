@@ -5,10 +5,21 @@ ifeq (0,$(PROGRAMMER_QUIET))
   PROGRAMMER_VERBOSE_OPT ?= --verbose
 endif
 
+# When multiple debuggers are connected then pyocd shows an interactive
+# UI to select the user interface to flash, with the python wrapper this
+# is lost and will also cause the wrapper to hang waiting for user input.
+# As long as a similar functionality is not provided by the wrapper
+# then disable it for pyocd.
+PROGRAMMER_WRAPPER_BLACKLIST ?= pyocd
+
 # Don't use the programmer wrapper for the CI (where speed and verbose output
 # are important)
 ifneq (1,$(RIOT_CI_BUILD))
-  USE_PROGRAMMER_WRAPPER_SCRIPT ?= 1
+  ifneq (,$(filter $(PROGRAMMER),$(PROGRAMMER_WRAPPER_BLACKLIST)))
+    USE_PROGRAMMER_WRAPPER_SCRIPT ?= 0
+  else
+    USE_PROGRAMMER_WRAPPER_SCRIPT ?= 1
+  endif
 else
   USE_PROGRAMMER_WRAPPER_SCRIPT ?= 0
 endif
