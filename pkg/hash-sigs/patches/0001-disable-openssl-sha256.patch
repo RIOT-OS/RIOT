@@ -1,0 +1,34 @@
+From c9a4401a2c3d6b97d59364370dc2b95a501cacbd Mon Sep 17 00:00:00 2001
+From: Koen Zandberg <koen@bergzand.net>
+Date: Tue, 2 Mar 2021 10:30:38 +0100
+Subject: [PATCH] disable openssl sha256
+
+---
+ sha256.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sha256.h b/sha256.h
+index 152419a..f7c7a00 100644
+--- a/sha256.h
++++ b/sha256.h
+@@ -1,7 +1,7 @@
+ #if !defined(SHA256_H_)
+ #define SHA256_H_
+ 
+-#define USE_OPENSSL 1   /* We use the OpenSSL implementation for SHA-256 */
++#define USE_OPENSSL 0   /* We use the OpenSSL implementation for SHA-256 */
+                         /* (which is quite a bit faster than our portable */
+                         /* C version) */
+ 
+@@ -26,7 +26,7 @@ typedef struct {
+ void SHA256_Init(SHA256_CTX *);  /* context */
+ 
+ void SHA256_Update(SHA256_CTX *, /* context */
+-                  const void *, /* input block */ 
++                  const void *, /* input block */
+                   unsigned int);/* length of input block */
+ 
+ void SHA256_Final(unsigned char *,
+-- 
+2.26.2
+

@@ -1,0 +1,19 @@
+/*
+ * Copyright (C) 2022 Inria
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup   pkg_hash-sigs Hash-based signatures
+ * @ingroup    pkg
+ * @brief      Cisco Hash-based signature scheme
+ * @see        https://github.com/future-proof-iot/hash-sigs
+ *
+ * This is a port of the Cisco Hash sigs package for RIOT. It implements RFC
+ * 8554 HSS-LMS signatures.
+ *
+ * The future-proof-iot fork patched out the malloc/free calls in original code.
+ */

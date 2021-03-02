@@ -1,0 +1,2 @@
+# hash-sigs is only supported by 32bit architectures
+FEATURES_REQUIRED += arch_32bit

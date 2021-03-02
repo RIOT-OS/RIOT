@@ -1,0 +1,36 @@
+MODULE := hash-sigs
+
+CFLAGS += -Wno-sign-compare
+CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-char-subscripts
+
+SRC += endian.c
+SRC += hash.c
+SRC += fips202.c
+SRC += hss.c
+SRC += hss_aux.c
+SRC += hss_alloc.c
+SRC += hss_common.c
+SRC += hss_compute.c
+SRC += hss_derive.c
+SRC += hss_generate.c
+SRC += hss_keygen.c
+SRC += hss_param.c
+SRC += hss_reserve.c
+SRC += hss_sign.c
+SRC += hss_sign_inc.c
+SRC += hss_thread_single.c
+SRC += hss_verify.c
+SRC += hss_verify_inc.c
+SRC += hss_zeroize.c
+SRC += lm_common.c
+SRC += lm_ots_common.c
+SRC += lm_ots_sign.c
+SRC += lm_ots_verify.c
+SRC += lm_verify.c
+SRC += sha256.c
+SRC += signatures.c
+
+
+include $(RIOTBASE)/Makefile.base
+
