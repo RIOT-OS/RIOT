@@ -44,9 +44,9 @@ def _check_help(child):
     child.sendline('help')
     child.expect_exact('Command              Description')
     child.expect_exact('---------------------------------------')
-    child.expect_exact('reboot               Reboot the node')
     child.expect_exact('ps                   Prints information about '
                        'running threads.')
+    child.expect_exact('reboot               Reboot the node')
 
 
 def _check_ps(child):
