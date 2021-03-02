@@ -17,9 +17,9 @@ EXPECTED_HELP = (
     'start_test           starts a test',
     'end_test             ends a test',
     'echo                 prints the input command',
-    'reboot               Reboot the node',
-    'ps                   Prints information about running threads.',
     'app_metadata         Returns application metadata',
+    'ps                   Prints information about running threads.',
+    'reboot               Reboot the node',
     'xfa_test1            xfa test command 1',
     'xfa_test2            xfa test command 2'
 )
