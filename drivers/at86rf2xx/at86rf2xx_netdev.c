@@ -47,6 +47,7 @@
 #include "debug.h"
 
 static int _send(netdev_t *netdev, const iolist_t *iolist);
+static int _confirm_send(netdev_t *netdev, void *info);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *netdev);
 static void _isr(netdev_t *netdev);
@@ -55,6 +56,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len);
 
 const netdev_driver_t at86rf2xx_driver = {
     .send = _send,
+    .confirm_send = _confirm_send,
     .recv = _recv,
     .init = _init,
     .isr = _isr,
@@ -117,6 +119,10 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
     size_t len = 0;
 
+    if (at86rf2xx_is_busy(dev)) {
+        return -EBUSY;
+    }
+
     at86rf2xx_tx_prepare(dev);
 
     /* load packet data into FIFO */
@@ -139,6 +145,37 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     /* return the number of bytes that were actually loaded into the frame
      * buffer/send out */
     return (int)len;
+}
+
+static int _confirm_send(netdev_t *netdev, void *info)
+{
+    (void)info;
+    at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
+    int ret;
+
+    /* ISR sets this */
+    switch (dev->status) {
+        case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
+        case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
+            ret = dev->tx_frame_len;
+            break;
+        case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
+            ret = -EBUSY;
+            break;
+        case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
+            ret = -ECOMM;
+            break;
+        case AT86RF2XX_TRX_STATE__TRAC_INVALID:
+            /* Even though the reset value for register bits TRAC_STATUS
+               is zero, the RX_AACK and TX_ARET procedures set the register
+               bits to TRAC_STATUS = 7 (INVALID) when they are started. */
+            ret = -EAGAIN;
+            break;
+        default:
+            DEBUG("[at86rf2xx] unknown status %u\n", dev->status);
+            ret = 0;
+    }
+    return ret;
 }
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
@@ -663,25 +700,26 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     return res;
 }
 
-static void _isr_send_complete(at86rf2xx_t *dev, uint8_t trac_status)
+static void _isr_send_complete(at86rf2xx_t *dev)
 {
     netdev_t *netdev = &dev->netdev.netdev;
     if (IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
+        dev->status = AT86RF2XX_TRX_STATE__TRAC_SUCCESS;
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
         return;
     }
-/* Only radios with the XAH_CTRL_2 register support frame retry reporting */
+    /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
 #if AT86RF2XX_HAVE_RETRIES && defined(AT86RF2XX_REG__XAH_CTRL_2)
-    dev->tx_retries = (at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2)
-                       & AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK) >>
-                      AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
+    dev->tx_retries = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2);
+    dev->tx_retries &= AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK;
+    dev->tx_retries >>= AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
 #endif
 
     DEBUG("[at86rf2xx] EVT - TX_END\n");
 
     if (netdev->event_callback) {
-        switch (trac_status) {
-#ifdef MODULE_OPENTHREAD
+#if IS_USED(MODULE_OPENTHREAD)
+        switch(dev->status) {
             case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
                 netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
                 DEBUG("[at86rf2xx] TX SUCCESS\n");
@@ -690,26 +728,23 @@ static void _isr_send_complete(at86rf2xx_t *dev, uint8_t trac_status)
                 netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE_DATA_PENDING);
                 DEBUG("[at86rf2xx] TX SUCCESS DATA PENDING\n");
                 break;
+            case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
+                netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
+                DEBUG("[at86rf2xx] TX NO_ACK\n");
+                break;
+            case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
+                netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
+                DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
+                break;
+            default:
+                DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",
+                        trac_status >> 5);
+        }
 #else
-                    case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
-                    case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
-                        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-                        DEBUG("[at86rf2xx] TX SUCCESS\n");
-                        break;
+        /* let _confirm_send() evaluate the transmission status */
+        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
 #endif
-                    case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
-                        netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
-                        DEBUG("[at86rf2xx] TX NO_ACK\n");
-                        break;
-                    case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
-                        netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
-                        DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
-                        break;
-                    default:
-                        DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",
-                              trac_status >> 5);
-                }
-            }
+    }
 }
 
 static inline void _isr_recv_complete(netdev_t *netdev)
@@ -739,7 +774,6 @@ static void _isr(netdev_t *netdev)
     at86rf2xx_t *dev = (at86rf2xx_t *) netdev;
     uint8_t irq_mask;
     uint8_t state;
-    uint8_t trac_status;
 
     /* If transceiver is sleeping register access is impossible and frames are
      * lost anyway, so return immediately.
@@ -757,31 +791,30 @@ static void _isr(netdev_t *netdev)
     irq_mask = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_STATUS);
 #endif
 
-    trac_status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE)
-                  & AT86RF2XX_TRX_STATE_MASK__TRAC;
-
     if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__RX_START) {
-        netdev->event_callback(netdev, NETDEV_EVENT_RX_STARTED);
+        if (netdev->event_callback) {
+            netdev->event_callback(netdev, NETDEV_EVENT_RX_STARTED);
+        }
         DEBUG("[at86rf2xx] EVT - RX_START\n");
     }
 
     if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__TRX_END) {
+        if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
+            dev->status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE)
+                          & AT86RF2XX_TRX_STATE_MASK__TRAC;
+        }
         if ((state == AT86RF2XX_PHY_STATE_RX)
             || (state == AT86RF2XX_PHY_STATE_RX_BUSY)) {
             DEBUG("[at86rf2xx] EVT - RX_END\n");
-
             _isr_recv_complete(netdev);
-
         }
         else if (state == AT86RF2XX_PHY_STATE_TX) {
-            /* check for more pending TX calls and return to idle state if
-             * there are none */
-            assert(dev->pending_tx != 0);
             /* Radio is idle, any TX transaction is done */
+            assert(dev->pending_tx != 0);
             dev->pending_tx = 0;
             at86rf2xx_set_state(dev, dev->idle_state);
             DEBUG("[at86rf2xx] return to idle state 0x%x\n", dev->idle_state);
-            _isr_send_complete(dev, trac_status);
+            _isr_send_complete(dev);
         }
         /* Only the case when an interrupt was received and the radio is busy
          * with a next PDU transmission when _isr is called.
@@ -794,7 +827,7 @@ static void _isr(netdev_t *netdev)
         else if (state == AT86RF2XX_PHY_STATE_TX_BUSY) {
             if (dev->pending_tx > 1) {
                 dev->pending_tx--;
-                _isr_send_complete(dev, trac_status);
+                _isr_send_complete(dev);
             }
         }
     }

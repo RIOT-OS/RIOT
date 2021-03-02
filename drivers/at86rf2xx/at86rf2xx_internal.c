@@ -116,6 +116,16 @@ uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
             & AT86RF2XX_TRX_STATUS_MASK__TRX_STATUS);
 }
 
+bool at86rf2xx_is_busy(const at86rf2xx_t *dev)
+{
+    uint8_t s;
+    while ((s = at86rf2xx_get_status(dev)) == AT86RF2XX_STATE_IN_PROGRESS) {}
+    return s == AT86RF2XX_STATE_BUSY_RX         ||
+           s == AT86RF2XX_STATE_BUSY_TX         ||
+           s == AT86RF2XX_STATE_BUSY_RX_AACK    ||
+           s == AT86RF2XX_STATE_BUSY_TX_ARET;
+}
+
 void at86rf2xx_assert_awake(at86rf2xx_t *dev)
 {
     if (at86rf2xx_get_status(dev) == AT86RF2XX_STATE_SLEEP) {

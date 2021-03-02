@@ -24,6 +24,7 @@
 #ifndef AT86RF2XX_INTERNAL_H
 #define AT86RF2XX_INTERNAL_H
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "at86rf2xx.h"
@@ -202,6 +203,15 @@ void at86rf2xx_fb_stop(const at86rf2xx_t *dev);
  * @return              internal status of the given device
  */
 uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev);
+
+/**
+ * @brief   Check whether the transceiver is currently in a busy state
+ *
+ * @param[in] dev       device to check for being busy
+ *
+ * @return              true if device is busy, else false
+ */
+bool at86rf2xx_is_busy(const at86rf2xx_t *dev);
 
 /**
  * @brief   Make sure that device is not sleeping
