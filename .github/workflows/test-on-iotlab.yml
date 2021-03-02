@@ -94,7 +94,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install iotlabcli pexpect junit-xml
+          pip install iotlabcli pexpect riotctrl[rapidjson] junit-xml
       - name: Configure credentials
         run: echo '${{ secrets.IOTLABRC }}' > ~/.iotlabrc
       - name: Setup SSH agent
