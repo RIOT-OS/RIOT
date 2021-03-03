@@ -151,6 +151,9 @@ int strncasecmp(const char *s1, const char * s2, unsigned int sz);
 #define NO_ASN
 #endif
 
+/* date check does not work on RIOT */
+#define NO_ASN_TIME
+
 #ifndef MODULE_WOLFCRYPT_HMAC
 #define NO_HMAC
 #endif
