@@ -33,6 +33,10 @@ class Programmer:
 
     def spin(self, process):
         """Print a spinning icon while programmer process is running."""
+        print(
+            "For full programmer output add PROGRAMMER_QUIET=0 or "
+            "QUIET=0 to the make command line."
+        )
         while process.poll() is None:
             for index in range(len(SPIN)):
                 sys.stdout.write(
@@ -59,11 +63,6 @@ class Programmer:
         # subprocess failed
         if process.returncode != 0:
             print(process.stdout.read().decode())
-        else:
-            print(
-                "(for full programmer output add PROGRAMMER_QUIET=0 or "
-                "QUIET=0 to the make command line)"
-            )
 
     def run(self):
         """Run the programmer in a background process."""
