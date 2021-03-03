@@ -6,6 +6,7 @@ FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_hwrng
+FEATURES_PROVIDED += periph_rtt_set_counter
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_uart_nonblocking
 FEATURES_PROVIDED += periph_wdt
