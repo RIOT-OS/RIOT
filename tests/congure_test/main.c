@@ -240,6 +240,9 @@ static void _print_report_msgs_lost_state(void)
 
 static void _print_report_msg_acked_state(void)
 {
+    clist_node_t msgs = {
+        .next = &_congure_state.report_msg_acked_args.msg->super,
+    };
     print_str("\"report_msg_acked\":{");
 
     print_str("\"calls\":");
@@ -252,13 +255,12 @@ static void _print_report_msg_acked_state(void)
     print_u32_hex((intptr_t)_congure_state.report_msg_acked_args.c);
     print_str("\",");
 
-    assert((_congure_state.report_msg_acked_args.msg == NULL) ||
-           (_congure_state.report_msg_acked_args.msg->super.next == NULL));
+    /* Check sanity of `congure_test` internal message list: `cong_msg_add`
+     * should have been only called at most once by the test script */
+    assert(clist_count(&msgs) < 2);
     print_str("\"msg\":");
     if (_congure_state.report_msg_acked_args.msg) {
-        _print_congure_snd_msg(
-            (clist_node_t *)_congure_state.report_msg_acked_args.msg, NULL
-        );
+        _print_congure_snd_msg(msgs.next, NULL);
     }
     else {
         print_str("null,");

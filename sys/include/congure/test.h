@@ -188,6 +188,57 @@ int congure_test_call_init(int argc, char **argv);
 int congure_test_call_inter_msg_interval(int argc, char **argv);
 
 /**
+ * @brief   Adds a message from the message pool to the list for
+ *          `cong_report msgs_lost` and `cong_report msgs_timeout`.
+ *
+ * @param[in] argc  Number of @p argv. Needs to be at least 4
+ * @param[in] argv  Three arguments are expected. Each call of the command
+ *                  represents an element of the `msgs` list parameter of
+ *                  congure_snd_driver_t::report_msgs_lost() and
+ *                  congure_snd_msg_t::report_msgs_timeout():
+ *                    - `argv[1]` (`msg_send_time`) is expected to be an
+ *                      integer for the `send_time` member of
+ *                      @ref congure_snd_msg_t,
+ *                    - `argv[2]` (`msg_size`) is expected to be an integer
+ *                      for the `size` member of @ref congure_snd_msg_t, and
+ *                    - `argv[3]` (`msg_resends`) is expected to be a an integer
+ *                      integer for the `resends` member of
+ *                      @ref congure_snd_msg_t.
+ *
+ * This function will generate the following JSON objects in STDOUT:
+ * - @code {"success":null} @endcode
+ *   On success
+ * - @code {"error":"At least 3 arguments `msg_send_time`, `msg_size`,
+ *   `msg_resends` expected"} @endcode
+ *   When `argc < 4`.
+ * - @code {"error":"`<arg_name>` expected to be integer"} @endcode
+ *   When `argv[i] = "<arg_name>"` is expected to be an integer but is not
+ *   parseable
+ * - @code {"error":"List element pool depleted"} @endcode
+ *   When called moret than > @ref CONFIG_CONGURE_TEST_LOST_MSG_POOL_SIZE) times
+ *   without calling `cong_msgs_reset` in between.
+ *
+ * @retval  0 on success.
+ * @retval  1 on error.
+ */
+int congure_test_add_msg(int argc, char **argv);
+
+/**
+ * @brief   Resets the the message pool and messages list for
+ *          `cong_report msgs_lost` and `cong_report msgs_timeout`.
+ *
+ * @param[in] argc  Number of @p argv. Needs to be at least 1.
+ * @param[in] argv  Command line arguments. No extra arguments are required
+ *                  except for the command name in `argv[0]`.
+ *
+ * Always generates the following JSON object in STDOUT:
+ * @code {"success": null} @endcode
+ *
+ * @return  Always 0.
+ */
+int congure_test_msgs_reset(int argc, char **argv);
+
+/**
  * @brief   Calls one of the `report_*()` methods for CongURE state object.
  *
  * @see congure_snd_driver_t::report_msg_sent()
@@ -197,7 +248,7 @@ int congure_test_call_inter_msg_interval(int argc, char **argv);
  * @see congure_snd_driver_t::report_msg_acked()
  * @see congure_snd_driver_t::report_ecn_ce()
  *
- * @param[in] argc  Number of @p argv. Needs to be at least 3.
+ * @param[in] argc  Number of @p argv. Needs to be at least 2.
  * @param[in] argv  Command line arguments. `argv[0]` needs to be the command
  *                  name and `argv[1]` needs to one of the following
  *                  sub-commands that may require at least one extra arguments:
@@ -207,66 +258,34 @@ int congure_test_call_inter_msg_interval(int argc, char **argv);
  *                  - `msg_sent`: `argv[2]` is expected to be an integer for the
  *                    `msg_size` parameter of
  *                    congure_snd_driver_t::report_msg_discarded()
- *                  - `msg_timeout`: `argv` is expected to have a number of
- *                    parameters divisible by 3 after `argv[1]` (i.e.
- *                    `(argc - 2) % 3 == 0` must hold). Each group of 3
- *                    `argv[2+i]`, `argv[3+i]`, argv[4+i] (with `i` being the
- *                    offset of the group) represents an element in the `msgs`
- *                    list parameter of
- *                    congure_snd_driver_t::report_msg_timeout():
- *                    - `argv[2+i]` (`msg_send_time`) is expected to be an
- *                      integer for the `send_time` member of
- *                      @ref congure_snd_msg_t,
- *                    - `argv[3+i]` (`msg_size`) is expected to be a an integer
- *                      for the `size` member of @ref congure_snd_msg_t, and
- *                    - `argv[4+i]` (`msg_resends`) is expected to be an integer
- *                      integer for the `resends` member of
- *                      @ref congure_snd_msg_t.
- *                  - `msg_lost`: `argv` is expected to have a number of
- *                    parameters divisible by 3 after `argv[1]` (i.e.
- *                    `(argc - 2) % 3 == 0` must hold. Each group of 3
- *                    `argv[2+i]`, `argv[3+i]`, argv[4+i] (with `i` being the
- *                    offset of the group) represents an element in the `msgs`
- *                    list parameter of
- *                    congure_snd_driver_t::report_msg_lost():
- *                    - `argv[2+i]` (`msg_send_time`) is expected to be an
- *                      integer for the `send_time` member of
- *                      @ref congure_snd_msg_t,
- *                    - `argv[3+i]` (`msg_size`) is expected to be an integer
- *                      for the `size` member of @ref congure_snd_msg_t, and
- *                    - `argv[4+i]` (`msg_resends`) is expected to be a an integer
- *                      integer for the `resends` member of
- *                      @ref congure_snd_msg_t.
- *                  - `msg_acked`: `argc` must be 11. The first three arguments
- *                    after `argv[1]` represent members of the `msg` parameter
- *                    of congure_snd_driver_t::report_msg_acked():
- *                    - `argv[2]` (`msg_send_time`) is expected to be an
- *                      integer for the `send_time` member of
- *                      @ref congure_snd_msg_t,
- *                    - `argv[3]` (`msg_size`) is expected to be an integer
- *                      for the `size` member of @ref congure_snd_msg_t, and
- *                    - `argv[4]` (`msg_resends`) is expected to be an integer
- *                      for the `resends` member of @ref congure_snd_msg_t.
- *
- *                    The `next` member of @ref congure_snd_msg_t will be
- *                    initialized with `NULL`.
- *
- *                    The remaining 6 arguments represent members of the `ack`
- *                    parameter of congure_snd_driver_t::report_msg_acked():
- *                    - `argv[5]` (`ack_recv_time`) is expected to be a an
+ *                  - `msg_timeout`: no arguments are expected, but
+ *                     @ref congure_test_add_msg() should be called a number of
+ *                     times beforehand to add messages that are to be reported
+ *                     timed out. The list of messages is reset after the call.
+ *                  - `msg_lost`: no arguments are expected, but
+ *                     @ref congure_test_add_msg() should be called a number of
+ *                     times beforehand to add messages that are to be reported
+ *                     lost. The list of messages is reset after the call.
+ *                  - `msg_acked`: @ref congure_test_add_msg() must have been
+ *                    called to add a message for the `msg` parameter of
+ *                    congure_snd_driver_t::report_msg_acked().
+ *                    `argc` must be 8. The 6 arguments after the sub-command
+ *                    represent members of the `ack` parameter of
+ *                    congure_snd_driver_t::report_msg_acked():
+ *                    - `argv[2]` (`ack_recv_time`) is expected to be a an
  *                      integer for the `recv_time` member of
  *                      @ref congure_snd_ack_t,
- *                    - `argv[6]` (`ack_id`) is expected to be a an integer
+ *                    - `argv[3]` (`ack_id`) is expected to be a an integer
  *                      for the `ack_id` member of @ref congure_snd_ack_t, and
- *                    - `argv[7]` (`ack_size`) is expected to be a an integer
+ *                    - `argv[4]` (`ack_size`) is expected to be a an integer
  *                      integer for the `size` member of @ref congure_snd_ack_t.
- *                    - `argv[8]` (`ack_clean`) is expected to be a an integer
+ *                    - `argv[5]` (`ack_clean`) is expected to be a an integer
  *                      for the `clean` member of @ref congure_snd_ack_t. If
- *                      `argv[8]` is `"0"`, `clean` will be set to `false` and to
+ *                      `argv[5]` is `"0"`, `clean` will be set to `false` and to
  *                      `true` otherwise.
- *                    - `argv[9]` (`ack_wnd`) is expected to be a 16-bit integer
+ *                    - `argv[6]` (`ack_wnd`) is expected to be a 16-bit integer
  *                      for the `wnd` member of @ref congure_snd_ack_t.
- *                    - `argv[10]` (`ack_delay`) is expected to be a 16-bit
+ *                    - `argv[7]` (`ack_delay`) is expected to be a 16-bit
  *                      integer for the `delay` member of
  *                      @ref congure_snd_ack_t.
  *                  - `ecn_ce`: `argv[2]` is expected to be an integer for the
@@ -296,15 +315,9 @@ int congure_test_call_inter_msg_interval(int argc, char **argv);
  *   arguments beyond the sub-command (i.e. `argc` needs at least to be
  *   `<arg_num> + 2`), with the names of the arguments expected provided in
  *   `<arg_list>` as a comma-seperated list of <tt>`<arg_name>`</tt>.
- * - @code {"error":"Number of arguments must be divisible by 3"} @endcode
- *   When `argv[1] == "msg_timeout"` or `argv[1] == "msg_lost"` but
- *   the length of the argument list after `argv[1]` is not divisible by 3 (i.e.
- *   `(argc - 2) % 3 != 0`).
- * - @code {"error":"List element pool depleted"} @endcode
- *   When `argv[1] == "msg_timeout"` or `argv[1] == "msg_lost"` and
- *   `(argc - 2) / 3` >= @ref CONFIG_CONGURE_TEST_LOST_MSG_POOL_SIZE).
- *
- * Provides no output on success.
+ * - @code {"error":"Message not initialized"} @endcode
+ *   When `argv[0]` in `{msg_acked, msgs_lost, msgs_timout}` was not called,
+ *   but no messages where added using @ref congure_test_add_msg().
  *
  * @retval  0 on success.
  * @retval  1 on error.

@@ -18,9 +18,14 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "clist.h"
 #include "fmt.h"
 
 #include "congure/test.h"
+
+static congure_snd_msg_t _msgs_pool[CONFIG_CONGURE_TEST_LOST_MSG_POOL_SIZE];
+static unsigned _msgs_pool_idx;
+static clist_node_t _msgs;
 
 static bool _scn_u32_dec_with_zero(const char *str, size_t n, uint32_t *res)
 {
@@ -35,10 +40,8 @@ static bool _scn_u32_dec_with_zero(const char *str, size_t n, uint32_t *res)
 
 int congure_test_clear_state(int argc, char **argv)
 {
-    (void)argc;
-    (void)argv;
     memset(congure_test_get_state(), 0, sizeof(congure_test_snd_t));
-    print_str("{\"success\":null}\n");
+    congure_test_msgs_reset(argc, argv);
     return 0;
 }
 
@@ -126,6 +129,56 @@ int congure_test_call_inter_msg_interval(int argc, char **argv)
     return 0;
 }
 
+int congure_test_add_msg(int argc, char **argv)
+{
+    uint32_t tmp;
+
+    if (argc < 4) {
+        print_str("{\"error\":\"At least 3 arguments `msg_send_time`, "
+                  "`msg_size`, `msg_resends` expected\"}\n");
+        return 1;
+    }
+    if (_msgs_pool_idx >= ARRAY_SIZE(_msgs_pool)) {
+        print_str("{\"error\":\"List element pool depleted\"}\n");
+        return 1;
+    }
+    _msgs_pool[_msgs_pool_idx].super.next = NULL;
+
+    if (!_scn_u32_dec_with_zero(argv[1], strlen(argv[1]), &tmp)) {
+        print_str("{\"error\":\"`msg_send_time` expected to be "
+                  "integer\"}\n");
+        return 1;
+    }
+    _msgs_pool[_msgs_pool_idx].send_time = tmp;
+
+    if (!_scn_u32_dec_with_zero(argv[2], strlen(argv[2]), &tmp)) {
+        print_str("{\"error\":\"`msg_size` expected to be integer\"}\n");
+        return 1;
+    }
+    _msgs_pool[_msgs_pool_idx].size = tmp;
+
+    if (!_scn_u32_dec_with_zero(argv[3], strlen(argv[3]), &tmp)) {
+        print_str("{\"error\":\"`msg_resends` expected to be "
+                  "integer\"}\n");
+        return 1;
+    }
+    _msgs_pool[_msgs_pool_idx].resends = tmp;
+
+    clist_rpush(&_msgs, &_msgs_pool[_msgs_pool_idx++].super);
+    print_str("{\"success\":null}\n");
+    return 0;
+}
+
+int congure_test_msgs_reset(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    _msgs.next = NULL;
+    _msgs_pool_idx = 0;
+    print_str("{\"success\":null}\n");
+    return 0;
+}
+
 static int _call_report_msg_sent(int argc, char **argv)
 {
     congure_test_snd_t *c = congure_test_get_state();
@@ -163,56 +216,15 @@ static int _call_report_msg_discarded(int argc, char **argv)
 }
 
 static int _call_report_msgs_timeout_lost(void (*method)(congure_snd_t *,
-                                                         congure_snd_msg_t *),
-                                          int argc, char **argv)
+                                                         congure_snd_msg_t *))
 {
-    static congure_snd_msg_t list_pool[CONFIG_CONGURE_TEST_LOST_MSG_POOL_SIZE];
-    clist_node_t msgs = { .next = NULL };
     congure_test_snd_t *c = congure_test_get_state();
 
-    if (argc < 4) {
-        print_str("{\"error\":\"At least 3 arguments `msg_send_time`, "
-                  "`msg_size`, `msg_resends` expected\"}\n");
+    if (_msgs.next == NULL) {
+        print_str("{\"error\":\"Message not initialized\"}\n");
         return 1;
     }
-    if ((argc - 1) % 3) {
-        print_str("{\"error\":\"Number of arguments must be divisible "
-                  "by 3\"}\n");
-        return 1;
-    }
-    if ((unsigned)((argc - 1) / 3) >= ARRAY_SIZE(list_pool)) {
-        print_str("{\"error\":\"List element pool depleted\"}");
-        return 1;
-    }
-    for (int i = 1; i < argc; i += 3) {
-        uint32_t tmp;
-        unsigned pool_idx = ((i - 1) / 3);
-
-        list_pool[pool_idx].super.next = NULL;
-
-        if (!_scn_u32_dec_with_zero(argv[i], strlen(argv[i]), &tmp)) {
-            print_str("{\"error\":\"`msg_send_time` expected to be "
-                      "integer\"}\n");
-            return 1;
-        }
-        list_pool[pool_idx].send_time = tmp;
-
-        if (!_scn_u32_dec_with_zero(argv[i + 1], strlen(argv[i + 1]), &tmp)) {
-            print_str("{\"error\":\"`msg_size` expected to be integer\"}\n");
-            return 1;
-        }
-        list_pool[pool_idx].size = tmp;
-
-        if (!_scn_u32_dec_with_zero(argv[i + 2], strlen(argv[i + 2]), &tmp)) {
-            print_str("{\"error\":\"`msg_resends` expected to be "
-                      "integer\"}\n");
-            return 1;
-        }
-        list_pool[pool_idx].resends = tmp;
-
-        clist_rpush(&msgs, &list_pool[pool_idx].super);
-    }
-    method(&c->super, (congure_snd_msg_t *)msgs.next);
+    method(&c->super, (congure_snd_msg_t *)_msgs.next);
     print_str("{\"success\":null}\n");
     return 0;
 }
@@ -221,76 +233,61 @@ static int _call_report_msgs_timeout(int argc, char **argv)
 {
     congure_test_snd_t *c = congure_test_get_state();
 
-    return _call_report_msgs_timeout_lost(c->super.driver->report_msgs_timeout,
-                                          argc, argv);
+    (void)argc;
+    (void)argv;
+    return _call_report_msgs_timeout_lost(c->super.driver->report_msgs_timeout);
 }
 
 static int _call_report_msgs_lost(int argc, char **argv)
 {
     congure_test_snd_t *c = congure_test_get_state();
 
-    return _call_report_msgs_timeout_lost(c->super.driver->report_msgs_lost,
-                                          argc, argv);
+    (void)argc;
+    (void)argv;
+    return _call_report_msgs_timeout_lost(c->super.driver->report_msgs_lost);
 }
 
 static int _call_report_msg_acked(int argc, char **argv)
 {
-    static congure_snd_msg_t msg = { .size = 0 };
     static congure_snd_ack_t ack = { .size = 0 };
     congure_test_snd_t *c = congure_test_get_state();
     uint32_t tmp;
 
-    if (argc < 10) {
-        print_str("{\"error\":\"At least 9 arguments `msg_send_time`, "
-                  "`msg_size`, `msg_resends`, `ack_recv_time`, `ack_id`, "
-                  "`ack_size`, `ack_clean`, `ack_wnd`, `ack_delay` "
+    if (_msgs.next == NULL) {
+        print_str("{\"error\":\"Message not initialized\"}\n");
+        return 1;
+    }
+    if (argc < 7) {
+        print_str("{\"error\":\"At least 6 arguments `ack_recv_time`, "
+                  "`ack_id`, `ack_size`, `ack_clean`, `ack_wnd`, `ack_delay` "
                   "expected\"}\n");
         return 1;
     }
     if (!_scn_u32_dec_with_zero(argv[1], strlen(argv[1]), &tmp)) {
-        print_str("{\"error\":\"`msg_send_time` expected to be "
-                  "integer\"}\n");
-        return 1;
-    }
-    msg.send_time = tmp;
-
-    if (!_scn_u32_dec_with_zero(argv[2], strlen(argv[2]), &tmp)) {
-        print_str("{\"error\":\"`msg_size` expected to be integer\"}\n");
-        return 1;
-    }
-    msg.size = tmp;
-
-    if (!_scn_u32_dec_with_zero(argv[3], strlen(argv[3]), &tmp)) {
-        print_str("{\"error\":\"`msg_resends` expected to be integer\"}\n");
-        return 1;
-    }
-    msg.resends = tmp;
-
-    if (!_scn_u32_dec_with_zero(argv[4], strlen(argv[4]), &tmp)) {
         print_str("{\"error\":\"`ack_recv_time` expected to be integer\"}\n");
         return 1;
     }
     ack.recv_time = tmp;
 
-    if (!_scn_u32_dec_with_zero(argv[5], strlen(argv[5]), &tmp)) {
+    if (!_scn_u32_dec_with_zero(argv[2], strlen(argv[2]), &tmp)) {
         print_str("{\"error\":\"`ack_id` expected to be integer\"}\n");
         return 1;
     }
     ack.id = tmp;
 
-    if (!_scn_u32_dec_with_zero(argv[6], strlen(argv[6]), &tmp)) {
+    if (!_scn_u32_dec_with_zero(argv[3], strlen(argv[3]), &tmp)) {
         print_str("{\"error\":\"`ack_size` expected to be integer\"}\n");
         return 1;
     }
     ack.size = tmp;
 
-    if (!_scn_u32_dec_with_zero(argv[7], strlen(argv[7]), &tmp)) {
+    if (!_scn_u32_dec_with_zero(argv[4], strlen(argv[4]), &tmp)) {
         print_str("{\"error\":\"`ack_clean` expected to be integer\"}\n");
         return 1;
     }
     ack.clean = (bool)tmp;
 
-    if (!_scn_u32_dec_with_zero(argv[8], strlen(argv[8]), &tmp)) {
+    if (!_scn_u32_dec_with_zero(argv[5], strlen(argv[5]), &tmp)) {
         print_str("{\"error\":\"`ack_wnd` expected to be integer\"}\n");
         return 1;
     }
@@ -300,7 +297,7 @@ static int _call_report_msg_acked(int argc, char **argv)
     }
     ack.wnd = (uint16_t)tmp;
 
-    if (!_scn_u32_dec_with_zero(argv[9], strlen(argv[9]), &tmp)) {
+    if (!_scn_u32_dec_with_zero(argv[6], strlen(argv[6]), &tmp)) {
         print_str("{\"error\":\"`ack_delay` expected to be integer\"}\n");
         return 1;
     }
@@ -310,7 +307,8 @@ static int _call_report_msg_acked(int argc, char **argv)
     }
     ack.delay = (uint16_t)tmp;
 
-    c->super.driver->report_msg_acked(&c->super, &msg, &ack);
+    c->super.driver->report_msg_acked(&c->super,
+                                      (congure_snd_msg_t *)_msgs.next, &ack);
     print_str("{\"success\":null}\n");
     return 0;
 }
