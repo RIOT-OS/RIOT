@@ -15,6 +15,10 @@ class MockSpawn():
         self.before = None
         self.echo = False
 
+    def read_nonblocking(self, size=1, timeout=-1):
+        # do nothing, only used to flush pexpect output
+        pass
+
     def sendline(self, line, *args, **kwargs):
         self.last_command = line
         if self.ctrl.output is None:
