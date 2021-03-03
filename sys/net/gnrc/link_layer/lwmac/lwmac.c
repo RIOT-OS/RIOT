@@ -78,7 +78,7 @@ static const gnrc_netif_ops_t lwmac_ops = {
 };
 
 int gnrc_netif_lwmac_create(gnrc_netif_t *netif, char *stack, int stacksize,
-                            char priority, char *name, netdev_t *dev)
+                            char priority, const char *name, netdev_t *dev)
 {
     return gnrc_netif_create(netif, stack, stacksize, priority, name, dev,
                              &lwmac_ops);
