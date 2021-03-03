@@ -1,0 +1,32 @@
+From 7936623b1211613c17eefe273801de75ee836402 Mon Sep 17 00:00:00 2001
+From: HendrikVE <hendrik1995@msn.com>
+Date: Sat, 6 Feb 2021 00:35:04 +0100
+Subject: [PATCH 11/11] fix linking error
+
+The example 'multithread' can't be linked because the function 'pipe'
+was declared, but never defined.
+---
+ wolfmqtt_examples/mqttnet.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/wolfmqtt_examples/mqttnet.c b/wolfmqtt_examples/mqttnet.c
+index 391066f..0cba332 100644
+--- a/wolfmqtt_examples/mqttnet.c
++++ b/wolfmqtt_examples/mqttnet.c
+@@ -543,6 +543,13 @@ static int NetDisconnect(void *context)
+ /* -------------------------------------------------------------------------- */
+ #else
+ 
++int pipe(SOCKET_T *sock)
++{
++    // empty implementation to fix linking error
++    return 0;
++}
++
++
+ #ifndef WOLFMQTT_NO_TIMEOUT
+ static void setup_timeout(struct timeval* tv, int timeout_ms)
+ {
+-- 
+2.25.1
+

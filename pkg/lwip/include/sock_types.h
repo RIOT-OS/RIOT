@@ -24,6 +24,8 @@
 #include "net/sock/async/types.h"
 #endif
 
+#include "ringbuffer.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -127,6 +129,7 @@ struct sock_tcp_queue {
  */
 struct sock_udp {
     lwip_sock_base_t base;          /**< parent class */
+    ringbuffer_t recv_rb;
 };
 
 #ifdef __cplusplus

@@ -84,11 +84,20 @@ int select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *errorfds,
         errno = EINVAL;
         return -1;
     }
+
     for (int i = 0; i < nfds; i++) {
+
         if ((readfds != NULL) && FD_ISSET(i, readfds)) {
             if (!posix_socket_is(i)) {
-                errno = EBADF;
-                return -1;
+                /* errno = EBADF; */
+                /* return -1; */
+                /* Todo: I get two fd here. The socket wanted is 3 in my case,
+                 *       but there is also a fd for 0. posix_socket_is(0) would
+                 *       return false and return -1, before checking fd 3 which
+                 *       can be used. Therefore continue for now so we can reach
+                 *       the correct fd.
+                 */
+                continue;
             }
             if (posix_socket_avail(i) > 0) {
                 FD_SET(i, &ret_readfds);

@@ -1,0 +1,34 @@
+From 8fc2cf31c28c830edfc269817201a5887cf6a727 Mon Sep 17 00:00:00 2001
+From: HendrikVE <hendrik1995@msn.com>
+Date: Fri, 29 Jan 2021 17:20:16 +0100
+Subject: [PATCH 06/11] sn-client: wait for established connection
+
+---
+ wolfmqtt_examples/sn-client/sn-client.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/wolfmqtt_examples/sn-client/sn-client.c b/wolfmqtt_examples/sn-client/sn-client.c
+index 3076d3a..6af2e93 100644
+--- a/wolfmqtt_examples/sn-client/sn-client.c
++++ b/wolfmqtt_examples/sn-client/sn-client.c
+@@ -24,6 +24,7 @@
+     #include <config.h>
+ #endif
+ 
++#include "xtimer.h"
+ #include "wolfmqtt/mqtt_client.h"
+ 
+ #include "sn-client.h"
+@@ -457,6 +458,9 @@ exit:
+ 
+ int main(int argc, char** argv)
+ {
++    /* wait until connection has been established */
++    xtimer_sleep(10);
++
+     int rc;
+ #ifdef WOLFMQTT_SN
+     MQTTCtx mqttCtx;
+-- 
+2.25.1
+

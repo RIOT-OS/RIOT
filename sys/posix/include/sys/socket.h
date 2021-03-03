@@ -116,6 +116,20 @@ extern "C" {
 #define SO_TYPE         (15)    /**< Socket type. */
 /** @} */
 
+/**
+ * @name    Flag names
+ * @brief   Flag parameter for recvfrom(), recvmsg(), sendmsg(), or sendto()
+ * @{
+ */
+#define MSG_CTRUNC      (0x01)    /**< Control data truncated. */
+#define MSG_DONTROUTE   (0x02)    /**< Send without using routing tables. */
+#define MSG_EOR         (0x04)    /**< Terminates a record (if supported by the protocol). */
+#define MSG_OOB         (0x08)    /**< Out-of-band data. */
+#define MSG_PEEK        (0x10)    /**< Leave received data in queue. */
+#define MSG_TRUNC       (0x20)    /**< Normal data truncated. */
+#define MSG_WAITALL     (0x40)    /**< Attempt to fill the read buffer. */
+/** @} */
+
 typedef unsigned short sa_family_t;   /**< address family type */
 
 /**
@@ -134,7 +148,6 @@ struct sockaddr_storage {
     sa_family_t ss_family;                  /**< Address family */
     uint8_t ss_data[SOCKADDR_MAX_DATA_LEN]; /**< Socket address */
 };
-
 
 /**
  * @brief   Accept a new connection on a socket
@@ -332,7 +345,8 @@ int listen(int socket, int backlog);
  * @param[in] length        Specifies the length in bytes of the buffer pointed
  *                          to by the buffer argument.
  * @param[in] flags         Specifies the type of message reception. Support
- *                          for values other than 0 is not implemented yet.
+ *                          for values other than 0 or MSG_PEEK is not
+ *                          implemented yet.
  * @param[out] address      A null pointer, or points to a sockaddr structure
  *                          in which the sending address is to be stored. The
  *                          length and format of the address depend on the
@@ -369,7 +383,7 @@ ssize_t recvfrom(int socket, void *__restrict buffer, size_t length, int flags,
  * @param[in] length    Specifies the length in bytes of the buffer pointed to
  *                      by the buffer argument.
  * @param[in] flags     Specifies the type of message reception. Support for
- *                      values other than 0 is not implemented yet.
+ *                      values other than 0 or MSG_PEEK is not implemented yet.
  *
  * @return  Upon successful completion, recv() shall return the length of the
  *          message in bytes. If no messages are available to be received and

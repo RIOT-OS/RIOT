@@ -27,6 +27,10 @@
 #include "lwip/sys.h"
 #include "lwip/udp.h"
 
+#include "ringbuffer.h"
+
+#define RECV_BUF_SIZE 32
+
 int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
                     const sock_udp_ep_t *remote, uint16_t flags)
 {
@@ -43,6 +47,15 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local,
 #if IS_ACTIVE(SOCK_HAS_ASYNC)
         netconn_set_callback_arg(sock->base.conn, &sock->base);
 #endif
+
+        char *buf_ptr = malloc(RECV_BUF_SIZE * sizeof(char));
+        if(buf_ptr == NULL) {
+            errno = ENOMEM;
+            res = -1;
+        }
+        else {
+            ringbuffer_init(&(sock->recv_rb), buf_ptr, RECV_BUF_SIZE);
+        }
     }
     return res;
 }
@@ -53,6 +66,8 @@ void sock_udp_close(sock_udp_t *sock)
     if (sock->base.conn != NULL) {
         netconn_delete(sock->base.conn);
         sock->base.conn = NULL;
+
+        free(sock->recv_rb.buf);
     }
 }
 
@@ -80,19 +95,50 @@ ssize_t sock_udp_recv_aux(sock_udp_t *sock, void *data, size_t max_len,
     ssize_t res, ret = 0;
     bool nobufs = false;
 
+    size_t to_read = max_len;
+    uint8_t *buf_index = ptr;
+
+    while (to_read != 0 && !ringbuffer_empty(&(sock->recv_rb))) {
+        *buf_index++ = ringbuffer_get_one(&(sock->recv_rb));
+        to_read--;
+    }
+
+    if (to_read == 0) {
+        /* read all bytes from ringbuffer */
+        return max_len;
+    }
+    else {
+        /* only a part of the bytes was read from peek buffer, need to get
+         * the rest via socket calls
+         */
+        ptr += max_len - to_read;
+        max_len = to_read;
+    }
+
     assert((sock != NULL) && (data != NULL) && (max_len > 0));
     while ((res = sock_udp_recv_buf_aux(sock, &pkt, &ctx, timeout,
                                         remote, aux)) > 0) {
         struct netbuf *buf = ctx;
+
         if (buf->p->tot_len > (ssize_t)max_len) {
-            nobufs = true;
+
+            size_t leftover_count = res - max_len;
+            ringbuffer_add(&(sock->recv_rb), (((char*) pkt) + max_len), leftover_count);
+
+            memcpy(ptr, pkt, max_len);
+            ptr += max_len;
+            ret += max_len;
+
+            //nobufs = true;
             /* progress context to last element */
-            while (netbuf_next(ctx) == 0) {}
-            continue;
+            // while (netbuf_next(ctx) == 0) {}
+            // continue;
         }
-        memcpy(ptr, pkt, res);
-        ptr += res;
-        ret += res;
+        else {
+            memcpy(ptr, pkt, res);
+            ptr += res;
+            ret += res;
+        }
     }
     return (nobufs) ? -ENOBUFS : ((res < 0) ? res : ret);
 }

@@ -1,0 +1,273 @@
+From b6723403ea3715e9861b3ce6f8d709be648975e8 Mon Sep 17 00:00:00 2001
+From: HendrikVE <hendrik1995@msn.com>
+Date: Fri, 29 Jan 2021 02:19:42 +0100
+Subject: [PATCH 02/11] adapt network code to RIOT
+
+---
+ wolfmqtt/mqtt_types.h       |   2 +-
+ wolfmqtt_examples/mqttnet.c | 158 +++++++++++++++++-------------------
+ 2 files changed, 74 insertions(+), 86 deletions(-)
+
+diff --git a/wolfmqtt/mqtt_types.h b/wolfmqtt/mqtt_types.h
+index 8d70c2b..d822aca 100644
+--- a/wolfmqtt/mqtt_types.h
++++ b/wolfmqtt/mqtt_types.h
+@@ -91,7 +91,7 @@
+         #include <dispatch/dispatch.h>
+         typedef dispatch_semaphore_t wm_Sem;
+ 
+-    #elif defined(__FreeBSD__) || defined(__linux__)
++    #elif defined(__FreeBSD__) || defined(__linux__) || defined(RIOT_OS)
+         /* Posix Style Semaphore */
+         #define WOLFMQTT_POSIX_SEMAPHORES
+         #include <semaphore.h>
+diff --git a/wolfmqtt_examples/mqttnet.c b/wolfmqtt_examples/mqttnet.c
+index f53a8ea..391066f 100644
+--- a/wolfmqtt_examples/mqttnet.c
++++ b/wolfmqtt_examples/mqttnet.c
+@@ -96,6 +96,25 @@
+         #error wolfMQTT must be built with WOLFMQTT_NONBLOCK defined for Harmony
+     #endif
+ 
++/* RIOT OS */
++#elif defined(RIOT_OS)
++    #include <arpa/inet.h>
++    #include <netinet/in.h>
++
++    #include <sys/select.h>
++    #include <sys/socket.h>
++    #include <sys/time.h>
++
++    #include "net/ipv4/addr.h"
++    #include "net/ipv6/addr.h"
++    #include "net/sock/ip.h"
++    #include "net/sock/udp.h"
++    #include "net/sock/tcp.h"
++
++    #include <unistd.h>
++    #include <errno.h>
++    #include <fcntl.h>
++
+ /* Linux */
+ #else
+     #include <sys/types.h>
+@@ -142,13 +161,17 @@
+     #define SOCK_CLOSE      close
+ #endif
+ #ifndef SOCK_ADDR_IN
+-    #define SOCK_ADDR_IN    struct sockaddr_in
++    #ifdef MODULE_IPV4_ADDR
++        #define SOCK_ADDR_IN    struct sockaddr_in
++    #endif
++    #ifdef MODULE_IPV6_ADDR
++        #define SOCK_ADDR_IN    struct sockaddr_in6
++    #endif
+ #endif
+ #ifdef SOCK_ADDRINFO
+     #define SOCK_ADDRINFO   struct addrinfo
+ #endif
+ 
+-
+ /* Local context for Net callbacks */
+ typedef enum {
+     SOCK_BEGIN = 0,
+@@ -558,10 +581,8 @@ static int NetConnect(void *context, const char* host, word16 port,
+ {
+     SocketContext *sock = (SocketContext*)context;
+     int type = SOCK_STREAM;
+-    int rc = -1;
++    int rc = 0;
+     SOERROR_T so_error = 0;
+-    struct addrinfo *result = NULL;
+-    struct addrinfo hints;
+     MQTTCtx* mqttCtx = sock->mqttCtx;
+ 
+     /* Get address information for host and locate IPv4 */
+@@ -571,50 +592,33 @@ static int NetConnect(void *context, const char* host, word16 port,
+             PRINTF("NetConnect: Host %s, Port %u, Timeout %d ms, Use TLS %d",
+                 host, port, timeout_ms, mqttCtx->use_tls);
+ 
+-            XMEMSET(&hints, 0, sizeof(hints));
+-            hints.ai_family = AF_INET;
+-            hints.ai_socktype = SOCK_STREAM;
+-            hints.ai_protocol = IPPROTO_TCP;
+-
+             XMEMSET(&sock->addr, 0, sizeof(sock->addr));
+-            sock->addr.sin_family = AF_INET;
+ 
+-            rc = getaddrinfo(host, NULL, &hints, &result);
+-            if (rc == 0) {
+-                struct addrinfo* result_i = result;
++            #if defined(MODULE_IPV4_ADDR)
++                sock->addr.sin_family = AF_INET;
++                sock->addr.sin_port = htons(port);
+ 
+-                if (! result) {
+-                    rc = -1;
++                if (inet_pton(AF_INET, host, &sock->addr.sin_addr) != 1) {
++                    PRINTF("Error: unable to parse destination address\n");
+                     goto exit;
+                 }
++            #elif defined(MODULE_IPV6_ADDR)
++                sock->addr.sin6_family = AF_INET6;
++                sock->addr.sin6_port = htons(port);
+ 
+-                /* prefer ip4 addresses */
+-                while (result_i) {
+-                    if (result_i->ai_family == AF_INET)
+-                        break;
+-                    result_i = result_i->ai_next;
+-                }
+-
+-                if (result_i) {
+-                    sock->addr.sin_port = htons(port);
+-                    sock->addr.sin_family = AF_INET;
+-                    sock->addr.sin_addr =
+-                        ((SOCK_ADDR_IN*)(result_i->ai_addr))->sin_addr;
+-                }
+-                else {
+-                    rc = -1;
++                if (inet_pton(AF_INET6, host, &sock->addr.sin6_addr) != 1) {
++                    PRINTF("Error: unable to parse destination address\n");
++                    goto exit;
+                 }
+-
+-                freeaddrinfo(result);
+-            }
+-            if (rc != 0)
+-                goto exit;
+-
+-            /* Default to error */
+-            rc = -1;
++            #endif
+ 
+             /* Create socket */
+-            sock->fd = SOCK_OPEN(sock->addr.sin_family, type, 0);
++            #if defined(MODULE_IPV4_ADDR)
++                sock->fd = SOCK_OPEN(sock->addr.sin_family, type, 0);
++            #elif defined(MODULE_IPV6_ADDR)
++                sock->fd = SOCK_OPEN(sock->addr.sin6_family, type, 0);
++            #endif
++
+             if (sock->fd == SOCKET_INVALID)
+                 goto exit;
+ 
+@@ -688,60 +692,42 @@ static int SN_NetConnect(void *context, const char* host, word16 port,
+ {
+     SocketContext *sock = (SocketContext*)context;
+     int type = SOCK_DGRAM;
+-    int rc;
++    int rc = 0;
+     SOERROR_T so_error = 0;
+-    struct addrinfo *result = NULL;
+-    struct addrinfo hints;
+     MQTTCtx* mqttCtx = sock->mqttCtx;
+ 
+     PRINTF("NetConnect: Host %s, Port %u, Timeout %d ms, Use TLS %d\n",
+         host, port, timeout_ms, mqttCtx->use_tls);
+ 
+-    /* Get address information for host and locate IPv4 */
+-    XMEMSET(&hints, 0, sizeof(struct addrinfo));
+-    hints.ai_family = AF_INET;
+-    hints.ai_socktype = SOCK_DGRAM; /* Datagram socket */
+-
+     XMEMSET(&sock->addr, 0, sizeof(sock->addr));
+-    sock->addr.sin_family = AF_INET;
+-
+-    rc = getaddrinfo(host, NULL, &hints, &result);
+-    if (rc == 0) {
+-        struct addrinfo* result_i = result;
+-
+-        if (! result) {
+-            rc = -1;
+-            goto exit;
+-        }
+-
+-        /* prefer ip4 addresses */
+-        while (result_i) {
+-            if (result_i->ai_family == AF_INET)
+-                break;
+-            result_i = result_i->ai_next;
+-        }
+ 
+-        if (result_i) {
+-            sock->addr.sin_port = htons(port);
+-            sock->addr.sin_family = AF_INET;
+-            sock->addr.sin_addr =
+-                ((SOCK_ADDR_IN*)(result_i->ai_addr))->sin_addr;
+-        }
+-        else {
+-            rc = -1;
+-        }
++#if defined(MODULE_IPV4_ADDR)
++    sock->addr.sin_family = AF_INET;
++    sock->addr.sin_port = htons(port);
+ 
+-        freeaddrinfo(result);
++    if (inet_pton(AF_INET, host, &sock->addr.sin_addr) != 1) {
++        PRINTF("Error: unable to parse destination address\n");
++        goto exit;
+     }
+-    if (rc != 0)
++#elif defined(MODULE_IPV6_ADDR)
++    sock->addr.sin6_family = AF_INET6;
++    sock->addr.sin6_port = htons(port);
++
++    if (inet_pton(AF_INET6, host, &sock->addr.sin6_addr) != 1) {
++        PRINTF("Error: unable to parse destination address\n");
+         goto exit;
++    }
++#endif
+ 
+-    if (rc == 0) {
+-        /* Create the socket */
++    /* Create socket */
++    #if defined(MODULE_IPV4_ADDR)
+         sock->fd = SOCK_OPEN(sock->addr.sin_family, type, 0);
+-        if (sock->fd == SOCKET_INVALID) {
+-            rc = -1;
+-        }
++    #elif defined(MODULE_IPV6_ADDR)
++        sock->fd = SOCK_OPEN(sock->addr.sin6_family, type, 0);
++    #endif
++
++    if (sock->fd == SOCKET_INVALID) {
++        rc = -1;
+     }
+ 
+     if (rc == 0)
+@@ -895,7 +881,7 @@ static int NetRead_ex(void *context, byte* buf, int buf_len,
+                 }
+                 /* Check if rx or error */
+             #ifdef WOLFMQTT_ENABLE_STDIN_CAP
+-                else if ((!mqttCtx->test_mode && FD_ISSET(STDIN, &recvfds)) 
++                else if ((!mqttCtx->test_mode && FD_ISSET(STDIN, &recvfds))
+                 #ifdef WOLFMQTT_MULTITHREAD
+                     || FD_ISSET(sock->pfd[0], &recvfds)
+                 #endif
+@@ -903,9 +889,11 @@ static int NetRead_ex(void *context, byte* buf, int buf_len,
+                     return MQTT_CODE_STDIN_WAKE;
+                 }
+             #endif
++
+                 if (FD_ISSET(sock->fd, &errfds)) {
+-                    rc = -1;
+-                    break;
++                    // Todo: find out reason why we can ignore this case
++                    //rc = -1;
++                    //break;
+                 }
+             }
+             else {
+@@ -1059,7 +1047,7 @@ int MqttClientNet_Init(MqttNet* net, MQTTCtx* mqttCtx)
+         sockCtx->fd = SOCKET_INVALID;
+         sockCtx->stat = SOCK_BEGIN;
+         sockCtx->mqttCtx = mqttCtx;
+-    
++
+     #if defined(WOLFMQTT_MULTITHREAD) && defined(WOLFMQTT_ENABLE_STDIN_CAP)
+         /* setup the pipe for waking select() */
+         if (pipe(sockCtx->pfd) != 0) {
+-- 
+2.25.1
+

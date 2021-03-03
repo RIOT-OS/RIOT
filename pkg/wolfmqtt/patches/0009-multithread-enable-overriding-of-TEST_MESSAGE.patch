@@ -1,0 +1,28 @@
+From 8fab7e8dea6ac5bc9469d7cea0cce5df6d92f1b4 Mon Sep 17 00:00:00 2001
+From: HendrikVE <hendrik1995@msn.com>
+Date: Sat, 6 Feb 2021 00:01:55 +0100
+Subject: [PATCH 09/11] multithread: enable overriding of TEST_MESSAGE
+
+---
+ wolfmqtt_examples/multithread/multithread.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/wolfmqtt_examples/multithread/multithread.c b/wolfmqtt_examples/multithread/multithread.c
+index df84df4..02ee48c 100755
+--- a/wolfmqtt_examples/multithread/multithread.c
++++ b/wolfmqtt_examples/multithread/multithread.c
+@@ -38,7 +38,11 @@
+ /* Maximum size for network read/write callbacks. There is also a v5 define that
+    describes the max MQTT control packet size, DEFAULT_MAX_PKT_SZ. */
+ #define MAX_BUFFER_SIZE 1024
++
++#ifndef TEST_MESSAGE
+ #define TEST_MESSAGE    "test00"
++#endif
++
+ /* Number of publish tasks. Each will send a unique message to the broker. */
+ #define NUM_PUB_TASKS   10
+ 
+-- 
+2.25.1
+
