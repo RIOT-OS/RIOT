@@ -81,13 +81,13 @@ static inline void _set_mac_addr(netdev_t *netdev, const uint8_t *src)
     memcpy(dev->addr, src, ETHERNET_ADDR_LEN);
 }
 
-static inline int _get_promiscous(netdev_t *netdev)
+static inline int _get_promiscuous(netdev_t *netdev)
 {
     netdev_tap_t *dev = (netdev_tap_t*)netdev;
     return dev->promiscuous;
 }
 
-static inline int _set_promiscous(netdev_t *netdev, int value)
+static inline int _set_promiscuous(netdev_t *netdev, int value)
 {
     netdev_tap_t *dev = (netdev_tap_t*)netdev;
     dev->promiscuous = value;
@@ -121,7 +121,7 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
             }
             break;
         case NETOPT_PROMISCUOUSMODE:
-            *((bool*)value) = (bool)_get_promiscous(dev);
+            *((bool*)value) = (bool)_get_promiscuous(dev);
             res = sizeof(bool);
             break;
         default:
@@ -144,7 +144,7 @@ static int _set(netdev_t *dev, netopt_t opt, const void *value, size_t value_len
             res = ETHERNET_ADDR_LEN;
             break;
         case NETOPT_PROMISCUOUSMODE:
-            _set_promiscous(dev, ((const bool *)value)[0]);
+            _set_promiscuous(dev, ((const bool *)value)[0]);
             res = sizeof(netopt_enable_t);
             break;
         default:
