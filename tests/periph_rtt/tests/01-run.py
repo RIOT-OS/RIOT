@@ -25,8 +25,8 @@ def testfunc(child):
     child.expect(r'RTT now: \d+')
     child.expect(r'Setting initial alarm to now \+ {} s \(\d+\)'
                  .format(period))
-    child.expect_exact('Done setting up the RTT, wait for many Hellos')
     start = time.time()
+    child.expect_exact('Done setting up the RTT, wait for many Hellos')
     for _ in range(MAX_HELLOS):
         child.expect_exact('Hello\r\n', timeout=period + 1)
 
