@@ -73,6 +73,7 @@ ifneq (,$(filter trace,$(USEMODULE)))
 endif
 
 ifneq (,$(filter shell_commands,$(USEMODULE)))
+  include $(RIOTBASE)/sys/shell/commands/Makefile.dep
   ifneq (,$(filter dfplayer,$(USEMODULE)))
     USEMODULE += auto_init_multimedia
     USEMODULE += fmt
