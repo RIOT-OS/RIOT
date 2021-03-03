@@ -18,9 +18,13 @@ extern "C" {
 #define NO_DEV_RANDOM
 #define NO_FILESYSTEM
 #define NO_WOLFSSL_MEMORY
-#define NO_MAIN_DRIVER
 #define NO_SIG_WRAPPER
 #define NO_OLD_RNGNAME
+
+/* we need the main driver for applications from the wolfmqtt pkg */
+#ifndef MODULE_WOLFMQTT
+#define NO_MAIN_DRIVER
+#endif
 
 /* Uncomment the next two lines to enable wolfSSL debug */
 // #define DEBUG_WOLFSSL
