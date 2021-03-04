@@ -216,6 +216,8 @@ char phydat_prefix_from_scale(int8_t scale);
  * Inserts the @p values in the given @p dat so that all @p dim values in
  * @p values fit inside the limits of the data type,
  * [@ref PHYDAT_MIN, @ref PHYDAT_MAX], and updates the stored scale factor.
+ * The @ref phydat_t::scale member in @p dat is used as the the original scale
+ * of the @p values.
  * The value is rounded to the nearest integer if possible, otherwise away from
  * zero. E.g. `0.5` and `0.6` are rounded to `1`, `0.4` and `-0.4` are rounded
  * to `0`, `-0.5` and `-0.6` are rounded to `-1`.
@@ -231,8 +233,8 @@ char phydat_prefix_from_scale(int8_t scale);
  *       @ref phydat_t. Statistically, this precision loss happens in 0.00153%
  *       of the calls. This optimization saves a bit more than 20 bytes.
  *
- * @pre  The @ref phydat_t::scale member in @p dat was initialized by the
-         caller prior to calling this function.
+ * @pre  The @ref phydat_t::scale member in @p dat is initialized to the scale
+ *       of the @p values by the caller prior to calling this function.
  *
  * @param[in, out]  dat         the value will be written into this data array
  * @param[in]       values      value(s) to rescale
