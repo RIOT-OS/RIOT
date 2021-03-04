@@ -30,10 +30,6 @@ int main(void)
     xtimer_init();
 #endif
 
-#ifdef OUTPUT
-    TextUIRunner_setOutputter(OUTPUTTER);
-#endif
-
     TESTS_START();
 #ifndef NO_TEST_SUITES
     UNCURRY(RUN_TEST_SUITES, TEST_SUITES)
