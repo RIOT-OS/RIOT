@@ -53,7 +53,7 @@ void ColorOutputter_printStatistics(OutputterRef self, TestResultRef result)
     else {
         printf("\n" BGGREEN SBOLD "OK" SDEFAULT " (%d tests)", result->runCount);
     }
-    printf(LINEFILL BGDEFAULT "\n");
+    printf(LINEFILL BGDEFAULT "\n" ANSI_RESET);
 }
 
 static const OutputterImplement ColorOutputterImplement = {
