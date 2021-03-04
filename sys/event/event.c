@@ -75,7 +75,7 @@ event_t *event_get(event_queue_t *queue)
 event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
 {
     assert(queues && n_queues);
-    event_t *result;
+    event_t *result = NULL;
 
     do {
         unsigned state = irq_disable();
