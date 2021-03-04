@@ -2,6 +2,7 @@
 # application configuration. This is only needed during migration.
 CONFIG_MODULE_FMT=y
 CONFIG_MODULE_XTIMER=y
+CONFIG_MODULE_SHELL=y
 CONFIG_MODULE_LIS2DH12=y
 CONFIG_MODULE_LIS2DH12_SPI=y
 

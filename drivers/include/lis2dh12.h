@@ -39,6 +39,7 @@
 #include <stdint.h>
 
 #include "saul.h"
+#include "lis2dh12_registers.h"
 
 #include "periph/gpio.h"
 #ifdef MODULE_LIS2DH12_SPI
@@ -71,18 +72,30 @@ typedef enum {
 /**
  * @brief   Available sampling rates
  *
- * @note    The device does also support some additional rates for specific low-
- *          power modes, but those are as of now not supported by this driver
  */
 typedef enum {
-    LIS2DH12_RATE_1HZ   = 0x17,     /**< sample with 1Hz */
-    LIS2DH12_RATE_10HZ  = 0x27,     /**< sample with 10Hz */
-    LIS2DH12_RATE_25HZ  = 0x37,     /**< sample with 25Hz */
-    LIS2DH12_RATE_50HZ  = 0x47,     /**< sample with 50Hz */
-    LIS2DH12_RATE_100HZ = 0x57,     /**< sample with 100Hz */
-    LIS2DH12_RATE_200HZ = 0x67,     /**< sample with 200Hz */
-    LIS2DH12_RATE_400HZ = 0x77,     /**< sample with 400Hz */
+    LIS2DH12_RATE_1HZ   = 0x1,      /**< sample with 1Hz @ all power modes */
+    LIS2DH12_RATE_10HZ  = 0x2,      /**< sample with 10Hz @ all power modes */
+    LIS2DH12_RATE_25HZ  = 0x3,      /**< sample with 25Hz @ all power modes */
+    LIS2DH12_RATE_50HZ  = 0x4,      /**< sample with 50Hz @ all power modes */
+    LIS2DH12_RATE_100HZ = 0x5,      /**< sample with 100Hz @ all power modes */
+    LIS2DH12_RATE_200HZ = 0x6,      /**< sample with 200Hz @ all power modes */
+    LIS2DH12_RATE_400HZ = 0x7,      /**< sample with 400Hz @ all power modes */
+    LIS2DH12_RATE_1620HZ = 0x8,     /**< sample with 1620HZ @ Low Power*/
+    LIS2DH12_RATE_VERYHIGH = 0x9,   /**< sample with 1344Hz @ High resolution or \
+                                        5376Hz @ Low Power*/
 } lis2dh12_rate_t;
+
+/**
+ * @brief   Available power modes
+ *
+ */
+typedef enum {
+    LIS2DH12_POWER_DOWN   = 0,  /**< power down the device */
+    LIS2DH12_POWER_LOW    = 1,  /**< low power mode */
+    LIS2DH12_POWER_NORMAL = 2,  /**< normal mode */
+    LIS2DH12_POWER_HIGH   = 3,  /**< high resolution */
+} lis2dh12_powermode_t;
 
 /**
  * @brief   LIS2DH12 configuration parameters
@@ -101,14 +114,63 @@ typedef struct {
 #endif
     lis2dh12_scale_t scale;         /**< sampling sensitivity used */
     lis2dh12_rate_t rate;           /**< sampling rate used */
+    lis2dh12_powermode_t powermode; /**< power mode used*/
 } lis2dh12_params_t;
+
+/**
+ * @brief   LIS2DH12 high pass modes
+ */
+typedef enum {
+    LIS2DH12_HP_MODE_NORMAL    = 0x0, /**< normal mode, reset by reading REG_REFERENCE */
+    LIS2DH12_HP_MODE_REFERENCE = 0x1, /**< uses the reference signal for filtering */
+    LIS2DH12_HP_MODE_AUTORESET = 0x3, /**< automatically resets on interrupt generation */
+} lis2dh12_hp_mode_t;
+
+/**
+ * @brief   LIS2DH12 high pass cutoff frequency
+ */
+typedef enum {
+    LIS2DH12_HP_FREQ_DIV50  = 0, /**< cutoff freq is ODR divided by 50 */
+    LIS2DH12_HP_FREQ_DIV100 = 1, /**< cutoff freq is ODR divided by 100 */
+    LIS2DH12_HP_FREQ_DIV200 = 2, /**< cutoff freq is ODR divided by 200 */
+    LIS2DH12_HP_FREQ_DIV400 = 3, /**< cutoff freq is ODR divided by 400 */
+} lis2dh12_hp_freq_t;
+
+/**
+ * @brief   LIS2DH12 high pass config values
+ */
+typedef struct {
+    lis2dh12_hp_mode_t Highpass_mode; /**< set the High pass mode */
+    lis2dh12_hp_freq_t Highpass_freq; /**< set the High pass cutoff frequency \
+                                            related to device rate */
+    bool CLICK_enable;    /**< enables filter for click data */
+    bool INT1_enable;     /**< enables filter for AOI on interrupt 1 */
+    bool INT2_enable;     /**< enables filter for AOI on interrupt 2 */
+    bool DATA_OUT_enable; /**< enables filter for data output */
+} lis2dh12_highpass_t;
+
+/**
+ * @brief   LIS2DH12 click config values
+ */
+typedef struct {
+    bool enable_DOUBLE;     /**< otherwise single click for given axis are enabled */
+    bool enable_X_CLICK;    /**< enable double pr single click for X axes */
+    bool enable_Y_CLICK;    /**< enable double pr single click for Y axes */
+    bool enable_Z_CLICK;    /**< enable double pr single click for Z axes */
+    bool noINT_latency;     /**< if "0" interrupt stays high for TIME_latency setting \
+                                if "1" interrupt stays high until CLICK_SRC is read */
+    uint8_t CLICK_thold:7;  /**< set click threshold */
+    uint8_t TIME_limit:7;   /**< set number of ODR cycles for time limit over threshold value */
+    uint8_t TIME_latency;   /**< set number of ODR cycles for latency after a click */
+    uint8_t TIME_window;    /**< set number of ODR cycles for window between clicks */
+} lis2dh12_click_t;
 
 /**
  * @brief   LIS2DH12 device descriptor
  */
 typedef struct {
     const lis2dh12_params_t *p;     /**< device configuration */
-    uint16_t comp;                  /**< scale compensation factor */
+    uint8_t comp;                   /**< scale compensation factor */
 } lis2dh12_t;
 
 /**
@@ -118,7 +180,8 @@ enum {
     LIS2DH12_OK    =  0,            /**< everything was fine */
     LIS2DH12_NOBUS = -1,            /**< bus interface error */
     LIS2DH12_NODEV = -2,            /**< unable to talk to device */
-    LIS2DH12_NOINT = -3,            /**< wrong interrupt line (has to be LIS2DH12_INT1 or LIS2DH12_INT2) */
+    LIS2DH12_NOINT = -3,            /**< wrong interrupt line (has to be LIS2DH12_INT1
+                                        or LIS2DH12_INT2) */
     LIS2DH12_NODATA= -4,            /**< no data available */
 };
 
@@ -126,44 +189,9 @@ enum {
 /*
  * @brief Interrupt lines
  */
-enum{
+enum {
     LIS2DH12_INT1 = 1,              /**< first interrupt line */
     LIS2DH12_INT2 = 2,              /**< second interrupt line */
-};
-
-/**
- * @brief   Interrupt config register values
- */
-enum {
-    LIS2DH12_INT_CFG_XLIE = 0x01,   /**< enable X low evnt */
-    LIS2DH12_INT_CFG_XHIE = 0x02,   /**< enable X high event */
-    LIS2DH12_INT_CFG_YLIE = 0x04,   /**< enable Y low event */
-    LIS2DH12_INT_CFG_YHIE = 0x08,   /**< enable Y high event */
-    LIS2DH12_INT_CFG_ZLIE = 0x10,   /**< enable Z low event */
-    LIS2DH12_INT_CFG_ZHIE = 0x20,   /**< enable Z high event */
-    LIS2DH12_INT_CFG_6D   = 0x40,   /**< enable 6-direction detection */
-    LIS2DH12_INT_CFG_AOI  = 0x80,   /**< and/or combination interrupt events */
-};
-
-/**
- * @brief   Interrupt type values
- */
-enum {
-    /* for interrupt 1 (CTRL_REG3) */
-    LIS2DH12_INT_TYPE_I1_OVERRUN = 0x02, /**< FIFO overrun interrupt on INT1 */
-    LIS2DH12_INT_TYPE_I1_WTM     = 0x04, /**< FIFO watermark inter. on INT1 */
-    LIS2DH12_INT_TYPE_I1_ZYXDA   = 0x10, /**< ZYXDA interrupt on INT1 */
-    LIS2DH12_INT_TYPE_I1_IA2     = 0x20, /**< IA2 interrupt on INT1 */
-    LIS2DH12_INT_TYPE_I1_IA1     = 0x40, /**< IA1 interrupt on INT1 */
-    LIS2DH12_INT_TYPE_I1_CLICK   = 0x80, /**< click interrupt on INT1 */
-
-    /* for interrupt 2 (CTRL_REG6) */
-    LIS2DH12_INT_TYPE_INT_POLARITY = 0x02, /**< INT1 and INT2 pin polarity */
-    LIS2DH12_INT_TYPE_I2_ACT       = 0x08, /**< enable activity interrupt on INT2 */
-    LIS2DH12_INT_TYPE_I2_BOOT      = 0x10, /**< enable boot on INT2 */
-    LIS2DH12_INT_TYPE_I2_IA2       = 0x20, /**< IA2 on INT2 */
-    LIS2DH12_INT_TYPE_I2_IA1       = 0x40, /**< IA1 on INT2 */
-    LIS2DH12_INT_TYPE_I2_CLICK     = 0x80, /**< click interrupt on INT2 */
 };
 
 /**
@@ -171,36 +199,43 @@ enum {
  */
 typedef struct {
     uint8_t int_config;             /**< values for configuration */
-    uint8_t int_threshold:7;        /**< the threshold for triggering interrupt, threshold in range 0-127 */
-    uint8_t int_duration:7;         /**< time between two interrupts ODR section in CTRL_REG1, duration in range 0-127 */
+    uint8_t int_threshold:7;        /**< the threshold for triggering interrupt,
+                                        threshold in range 0-127 */
+    uint8_t int_duration:7;         /**< time between two interrupts ODR section in CTRL_REG1,
+                                        duration in range 0-127 */
     uint8_t int_type;               /**< values for type of interrupts */
     gpio_cb_t cb;                   /**< the callback to execute */
     void *arg;                      /**< the callback argument */
 } lis2dh12_int_params_t;
-
-/**
- * @brief   Status of INT_SRC register
- */
-#define LIS2DH12_INT_SRC_XL     (0x01)  /**< X low event has occurred */
-#define LIS2DH12_INT_SRC_XH     (0x02)  /**< X high event has occurred */
-#define LIS2DH12_INT_SRC_YL     (0x04)  /**< Y low event has occurred */
-#define LIS2DH12_INT_SRC_YH     (0x08)  /**< Y high event has occurred */
-#define LIS2DH12_INT_SRC_ZL     (0x10)  /**< Z low event has occurred */
-#define LIS2DH12_INT_SRC_ZH     (0x20)  /**< Z high event has occurred */
-#define LIS2DH12_INT_SRC_IA     (0x40)  /**< 1 if interrupt occurred */
 #endif /* MODULE_LIS2DH12_INT */
 
 /**
- * @brief   Status of INT_SRC register
+ * @brief   LIS2DH12 FIFO data struct
  */
-#define LIS2DH12_STATUS_XDA     (0x01)  /**< X-axis new data available */
-#define LIS2DH12_STATUS_YDA     (0x02)  /**< Y-axis new data available */
-#define LIS2DH12_STATUS_ZDA     (0x04)  /**< Z-axis new data available */
-#define LIS2DH12_STATUS_ZYXDA   (0x08)  /**< on X-, Y-, Z-axis new data available */
-#define LIS2DH12_STATUS_XOR     (0x10)  /**< X-axis data overrun */
-#define LIS2DH12_STATUS_YOR     (0x20)  /**< Y-axis data overrun */
-#define LIS2DH12_STATUS_ZOR     (0x40)  /**< Y-axis data overrun */
-#define LIS2DH12_STATUS_ZYXOR   (0x80)  /**< on X-, Y-, Z-axis data overrun */
+typedef struct {
+    int16_t X_AXIS;    /**< X raw data in FIFO */
+    int16_t Y_AXIS;    /**< Y raw data in FIFO */
+    int16_t Z_AXIS;    /**< Z raw data in FIFO */
+} lis2dh12_fifo_data_t;
+
+/**
+ * @brief   LIS2DH12 FIFO modes
+ */
+typedef enum {
+    LIS2DH12_FIFO_MODE_BYPASS = 0,      /**< default mode, FIFO is bypassed */
+    LIS2DH12_FIFO_MODE_FIFOMODE,        /**< normal FIFO mode, stops if FIFO is full */
+    LIS2DH12_FIFO_MODE_STREAM,          /**< Stream mode, oldest values get overwritten */
+    LIS2DH12_FIFO_MODE_STREAMtoFIFO,    /**< Stream mode and on interrupt jumps to FIFO mode */
+} lis2dh12_fifo_mode_t;
+
+/**
+ * @brief   LIS2DH12 FIFO config values
+ */
+typedef struct {
+    lis2dh12_fifo_mode_t FIFO_mode; /**< set FIFO mode */
+    uint8_t FIFO_watermark:5;       /**< set the FIFO watermark level */
+    bool FIFO_set_INT2;             /**< sets the FIFO interrupt to INT2, otherwise INT1 */
+} lis2dh12_fifo_t;
 
 /**
  * @brief   Export the SAUL interface for this driver
@@ -234,6 +269,52 @@ int lis2dh12_read_int_src(const lis2dh12_t *dev, uint8_t *data, uint8_t int_line
 #endif /* MODULE_LIS2DH12_INT */
 
 /**
+ * @brief   Set the FIFO configuration
+ *
+ * @param[in] dev       device descriptor
+ * @param[in] config    device FIFO configuration
+ *
+ * @return  LIS2DH12_OK on success
+ */
+int lis2dh12_set_fifo(const lis2dh12_t *dev, const lis2dh12_fifo_t *config);
+
+/**
+ * @brief   Restart the FIFO mode
+ *          this sets the FIFO mode in BYPASS mode and then back to previous mode
+ *          Note: The LIS module disables the FIFO after interrupt automatically,
+ *          it is recommended to set the FIFO in BYPASS mode and then back to old
+ *          FIFO mode to enable the FIFO again.
+ *
+ * @param[in] dev       device descriptor
+ *
+ * @return  LIS2DH12_OK on success
+ */
+int lis2dh12_restart_fifo(const lis2dh12_t *dev);
+
+/**
+ * @brief   Read the FIFO source register
+ *
+ * @param[in] dev       device descriptor
+ * @param[out] data     LIS2DH12_FIFO_SRC_REG_t content, allocate one byte
+ *
+ * @return  LIS2DH12_OK on success
+ */
+int lis2dh12_read_fifo_src(const lis2dh12_t *dev, LIS2DH12_FIFO_SRC_REG_t *data);
+
+/**
+ * @brief   This function will read a given number of data from FIFO
+ *          reads amount of data that is available in FIFO
+ *
+ * @param[in] dev           device descriptor
+ * @param[out] fifo_data    FIFO data, must have space for number of data
+ * @param[in] number        amount of FIFO data to be read
+ *
+ * @return  number of valid data read from FIFO
+ */
+uint8_t lis2dh12_read_fifo_data(const lis2dh12_t *dev, lis2dh12_fifo_data_t *fifo_data,
+                                uint8_t number);
+
+/**
  * @brief   Initialize the given LIS2DH12 sensor device
  *
  * @param[out] dev      device descriptor
@@ -257,7 +338,100 @@ int lis2dh12_init(lis2dh12_t *dev, const lis2dh12_params_t *params);
 int lis2dh12_read(const lis2dh12_t *dev, int16_t *data);
 
 /**
- * @brief   Power on the given device
+ * @brief   Clear the LIS2DH12 memory, clears all sampled data
+ *
+ * @param[in] dev       device descriptor
+ *
+ * @return  LIS2DH12_OK on success
+ */
+int lis2dh12_clear_data(const lis2dh12_t *dev);
+
+/**
+ * @brief   Change device scale value
+ *
+ * @param[in] dev       device descriptor
+ * @param[in] scale     change to given scale value
+ *
+ * @return  LIS2DH12_OK on success
+ */
+int lis2dh12_set_scale(lis2dh12_t *dev, lis2dh12_scale_t scale);
+
+/**
+ * @brief   Change device sampling rate
+ *
+ * @param[in] dev       device descriptor
+ * @param[in] rate      change to given sampling rate
+ *
+ * @return  LIS2DH12_OK on success
+ */
+int lis2dh12_set_datarate(const lis2dh12_t *dev, lis2dh12_rate_t rate);
+
+/**
+ * @brief   Change device power mode
+ *
+ * @param[in] dev           device descriptor
+ * @param[in] powermode     change to given power mode
+ *
+ * @return  LIS2DH12_OK on success
+ */
+int lis2dh12_set_powermode(const lis2dh12_t *dev, lis2dh12_powermode_t powermode);
+
+/**
+ * @brief   Configures the high pass filter
+ *
+ * @param[in] dev       device descriptor
+ * @param[in] config    device high pass configuration
+ *
+ * @return  LIS2DH12_OK on success
+ */
+int lis2dh12_set_highpass(const lis2dh12_t *dev, const lis2dh12_highpass_t *config);
+
+/**
+ * @brief   Set the reference value to control the high-pass reference.
+ *          In LIS2DH12_HP_MODE_REFERENCE the reference value is used to filter data
+ *          on all axis. Subtracts reference value from acceleration.
+ *          Note: LSB changes according to LIS2DH12_SCALE
+ *
+ * @param[in] dev           device descriptor
+ * @param[in] reference     reference value [8 Bit]
+ *
+ * @return  LIS2DH12_OK on success
+ */
+int lis2dh12_set_reference(const lis2dh12_t *dev, uint8_t reference);
+
+/**
+ * @brief   Read the reference value
+ *
+ * @param[in] dev       device descriptor
+ * @param[out] data     reference value read from device
+ *
+ * @return  LIS2DH12_OK on success
+ */
+int lis2dh12_read_reference(const lis2dh12_t *dev, uint8_t *data);
+
+/**
+ * @brief   Set click configuration
+ *
+ * @param[in] dev       device descriptor
+ * @param[in] config    device click configuration
+ *
+ * @return  LIS2DH12_OK on success
+ */
+int lis2dh12_set_click(const lis2dh12_t *dev, const lis2dh12_click_t *config);
+
+/**
+ * @brief   Read click source register
+ *
+ * @param[in] dev       device descriptor
+ * @param[out] data     LIS2DH12_CLICK_SRC_t content, allocate one byte
+ *
+ * @return  LIS2DH12_OK on success
+ */
+int lis2dh12_read_click_src(const lis2dh12_t *dev, LIS2DH12_CLICK_SRC_t *data);
+
+/**
+ * @brief   Power on the given device and resets power mode and sampling rate
+ *          to default values in the device descriptor parameters
  *
  * @param[in] dev       device descriptor
  *
