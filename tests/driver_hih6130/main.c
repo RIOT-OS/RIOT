@@ -65,10 +65,10 @@ int main(void)
         /* Split value into two integer parts for printing. */
         fractional = modff(hum, &integral);
         printf("humidity: %4d.%04u %%",
-            (int)integral, (unsigned int)abs(fractional * 10000.f));
+            (int)integral, (unsigned int)abs((int)(fractional * 10000.f)));
         fractional = modff(temp, &integral);
         printf("  temperature: %4d.%04u C\n",
-            (int)integral, (unsigned int)abs(fractional * 10000.f));
+            (int)integral, (unsigned int)abs((int)(fractional * 10000.f)));
     }
 
     return 0;
