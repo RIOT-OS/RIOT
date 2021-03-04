@@ -1,0 +1,22 @@
+ifneq (,$(filter edhoc-c_crypto_wolfssl,$(USEMODULE)))
+  USEPKG += wolfssl
+  USEMODULE += wolfcrypt
+  USEMODULE += wolfcrypt_aes
+  USEMODULE += wolfcrypt_ed25519
+  USEMODULE += wolfcrypt_curve25519
+  USEMODULE += wolfcrypt_hmac
+  USEMODULE += wolfcrypt_random
+  USEMODULE += wolfcrypt_sha256
+endif
+
+ifneq (,$(filter edhoc-c_crypto_tinycrypt,$(USEMODULE)))
+  USEPKG += tinycrypt
+  # Blacklist platforms using nimble, mynewt-nimble has an in-tree copy
+  # of tinycrypt that conflicts with the remote one
+  FEATURES_BLACKLIST += ble_nimble
+  USEPKG += c25519
+endif
+
+ifneq (,$(filter edhoc-c_cbor_nanocbor,$(USEMODULE)))
+  USEPKG += nanocbor
+endif
