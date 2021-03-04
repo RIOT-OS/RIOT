@@ -282,7 +282,25 @@ static void test_clif_get_attr_missing_value(void)
     /* Used to result in a spatial memory safety violation.
      * See: https://github.com/RIOT-OS/RIOT/pull/15945 */
     int r = clif_get_attr(input, strlen(input), &attr);
-    TEST_ASSERT_EQUAL_INT(strlen(input), r);
+    TEST_ASSERT_EQUAL_INT(CLIF_NOT_FOUND, r);
+}
+
+static void test_clif_get_attr_missing_quote(void)
+{
+    clif_attr_t attr;
+    char *input = ";rt=\"temp";
+
+    int r = clif_get_attr(input, strlen(input), &attr);
+    TEST_ASSERT_EQUAL_INT(CLIF_NOT_FOUND, r);
+}
+
+static void test_clif_get_empty_attr_value(void)
+{
+    clif_attr_t attr;
+    char *input = ";rt=\"\"";
+
+    int r = clif_get_attr(input, strlen(input), &attr);
+    TEST_ASSERT_EQUAL_INT(CLIF_NOT_FOUND, r);
 }
 
 static void test_clif_get_attr_empty(void)
@@ -301,6 +319,8 @@ Test *tests_clif_tests(void)
         new_TestFixture(test_clif_encode_links),
         new_TestFixture(test_clif_decode_links),
         new_TestFixture(test_clif_get_attr_missing_value),
+        new_TestFixture(test_clif_get_attr_missing_quote),
+        new_TestFixture(test_clif_get_empty_attr_value),
         new_TestFixture(test_clif_get_attr_empty)
     };
 
