@@ -222,6 +222,18 @@ int main(void)
 
     candev->driver->init(candev);
 
+#if defined(CAN_LOOPBACK_MODE)
+    puts("Switching to loopback mode");
+    /* set to loopback test mode */
+    canopt_state_t mode = CANOPT_STATE_LOOPBACK;
+    candev->driver->set(candev, CANOPT_STATE, &mode, sizeof(mode));
+
+    /* dont care, rev all msg id */
+    struct can_filter filter;
+    filter.can_mask = 0;
+    candev->driver->set_filter(candev, &filter);
+#endif
+
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 

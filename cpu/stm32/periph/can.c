@@ -805,6 +805,12 @@ static int _set(candev_t *candev, canopt_t opt, void *value, size_t value_len)
                         can->BTR |= CAN_BTR_SILM;
                         res += set_mode(can, mode);
                         break;
+                    case CANOPT_STATE_LOOPBACK:
+                        DEBUG("candev_stm32 %p: Loopback\n", (void *)dev);
+                        res = set_mode(can, MODE_INIT);
+                        can->BTR |= CAN_BTR_LBKM;
+                        res += set_mode(can, MODE_NORMAL);
+                        break;
                 }
             }
             break;
