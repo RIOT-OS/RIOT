@@ -65,6 +65,17 @@
 static uart_isr_ctx_t isr_ctx[UART_NUMOF];
 static uint8_t rx_buf[UART_NUMOF];
 
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+
+#include "tsrb.h"
+/**
+ * @brief   Allocate for tx ring buffers
+ */
+static uint8_t tx_buf[UART_NUMOF];
+static tsrb_t uart_tx_rb[UART_NUMOF];
+static uint8_t uart_tx_rb_buf[UART_NUMOF][UART_TXBUF_SIZE];
+#endif
+
 static inline NRF_UARTE_Type *dev(uart_t uart)
 {
     return uart_config[uart].dev;
@@ -210,6 +221,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     NRF_UART0->TASKS_STARTTX = 1;
 #endif
 
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    /* set up the TX buffer */
+    tsrb_init(&uart_tx_rb[uart], uart_tx_rb_buf[uart], UART_TXBUF_SIZE);
+#endif
+
     if (rx_cb) {
 #if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
         dev(uart)->RXD.MAXCNT = 1;
@@ -221,11 +237,11 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         NRF_UART0->INTENSET = UART_INTENSET_RXDRDY_Msk;
         NRF_UART0->TASKS_STARTRX = 1;
 #endif
-
-        /* enable global and receiving interrupt */
-        NVIC_EnableIRQ(UART_IRQN);
     }
 
+    if (rx_cb || IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
+        NVIC_EnableIRQ(UART_IRQN);
+    }
     return UART_OK;
 }
 
@@ -233,21 +249,59 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 #if !defined(CPU_MODEL_NRF52832XXAA) && !defined(CPU_FAM_NRF51)
 static void _write_buf(uart_t uart, const uint8_t *data, size_t len)
 {
-    /* reset endtx flag */
     dev(uart)->EVENTS_ENDTX = 0;
+    if (IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
+        dev(uart)->INTENSET = UARTE_INTENSET_ENDTX_Msk;
+    }
     /* set data to transfer to DMA TX pointer */
     dev(uart)->TXD.PTR = (uint32_t)data;
     dev(uart)->TXD.MAXCNT = len;
     /* start transmission */
     dev(uart)->TASKS_STARTTX = 1;
     /* wait for the end of transmission */
-    while (dev(uart)->EVENTS_ENDTX == 0) {}
+    if (!IS_USED(MODULE_PERIPH_UART_NONBLOCKING)) {
+        while (dev(uart)->EVENTS_ENDTX == 0) {}
+    }
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
     assert(uart < UART_NUMOF);
-
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    for (size_t i = 0; i < len; i++) {
+        /* in IRQ or interrupts disabled */
+        if (irq_is_in() || __get_PRIMASK()) {
+            if (tsrb_full(&uart_tx_rb[uart])) {
+                /* wait for end of ongoing transmission */
+                if (dev(uart)->EVENTS_TXSTARTED) {
+                    while (dev(uart)->EVENTS_ENDTX == 0) {}
+                    dev(uart)->EVENTS_TXSTARTED = 0;
+                }
+                /* free one spot in buffer */
+                tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
+                _write_buf(uart, &tx_buf[uart], 1);
+            }
+            tsrb_add_one(&uart_tx_rb[uart], data[i]);
+        }
+        else {
+            /* if no transmission is ongoing and ring buffer is full
+               free up a spot in the buffer by sending one byte */
+            if (!dev(uart)->EVENTS_TXSTARTED && tsrb_full(&uart_tx_rb[uart])) {
+                tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
+                _write_buf(uart, &tx_buf[uart], 1);
+            }
+            while (tsrb_add_one(&uart_tx_rb[uart], data[i]) < 0) {}
+        }
+    }
+    /* if no transmission is ongoing bootstrap the transmission process
+       by setting a single byte to be written */
+    if (!dev(uart)->EVENTS_TXSTARTED) {
+        if (!tsrb_empty(&uart_tx_rb[uart])) {
+            tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
+            _write_buf(uart, &tx_buf[uart], 1);
+        }
+    }
+#else
     /* EasyDMA can only transfer data from RAM (see ref. manual, sec. 6.34.1).
      * So if the given `data` buffer resides in ROM, we need to copy it to RAM
      * before being able to transfer it. To make sure the stack does not
@@ -266,6 +320,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
     else {
         _write_buf(uart, data, len);
     }
+#endif
 }
 
 void uart_poweron(uart_t uart)
@@ -273,7 +328,7 @@ void uart_poweron(uart_t uart)
     assert(uart < UART_NUMOF);
 
     if (isr_ctx[uart].rx_cb) {
-        NRF_UART0->TASKS_STARTRX = 1;
+        dev(uart)->TASKS_STARTRX = 1;
     }
 }
 
@@ -319,16 +374,28 @@ int uart_mode(uart_t uart, uart_data_bits_t data_bits, uart_parity_t parity,
 
 static inline void irq_handler(uart_t uart)
 {
-    if (dev(uart)->EVENTS_ENDRX == 1) {
+    if (dev(uart)->EVENTS_ENDRX) {
         dev(uart)->EVENTS_ENDRX = 0;
 
         /* make sure we actually received new data */
-        if (dev(uart)->RXD.AMOUNT == 0) {
-            return;
+        if (dev(uart)->RXD.AMOUNT != 0) {
+            /* Process received byte */
+            isr_ctx[uart].rx_cb(isr_ctx[uart].arg, rx_buf[uart]);
         }
-        /* Process received byte */
-        isr_ctx[uart].rx_cb(isr_ctx[uart].arg, rx_buf[uart]);
     }
+
+#ifdef MODULE_PERIPH_UART_NONBLOCKING
+    if (dev(uart)->EVENTS_ENDTX) {
+        /* reset flags and idsable ISR on EVENTS_ENDTX */
+        dev(uart)->EVENTS_ENDTX = 0;
+        dev(uart)->EVENTS_TXSTARTED = 0;
+        dev(uart)->INTENCLR = UARTE_INTENSET_ENDTX_Msk;
+        if (!tsrb_empty(&uart_tx_rb[uart])) {
+            tx_buf[uart] = tsrb_get_one(&uart_tx_rb[uart]);
+            _write_buf(uart, &tx_buf[uart], 1);
+        }
+    }
+#endif
 
     cortexm_isr_end();
 }
