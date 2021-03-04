@@ -42,6 +42,13 @@ typedef struct {
 } touch_t;
 
 /**
+ * @brief   Signature of touch event callback triggered from interrupt
+ *
+ * @param[in] arg       optional context for the callback
+ */
+typedef void (*touch_event_cb_t)(void *arg);
+
+/**
  * @brief   Generic type for a touch driver
  */
 typedef struct {
@@ -75,6 +82,15 @@ typedef struct {
      * @return              number of touch positions, 0 means no touch
      */
     uint8_t (*touches)(const touch_dev_t *dev, touch_t *touches, size_t len);
+
+    /**
+     * @brief   Set and configure the touch event callback
+     *
+     * @param[in] dev       Pointer to the touch device
+     * @param[in] cb        The callback function
+     * @param[in] arg       Context argument
+     */
+    void (*set_event_callback)(const touch_dev_t *dev, touch_event_cb_t cb, void *arg);
 } touch_dev_driver_t;
 
 /**
@@ -83,6 +99,40 @@ typedef struct {
 struct touch_dev {
     const touch_dev_driver_t *driver;    /**< Pointer to driver of the touch device */
 };
+
+/**
+ * @brief   Touch dev registry entry
+ */
+typedef struct touch_dev_reg {
+    struct touch_dev_reg *next;     /**< pointer to the next touch device in the list */
+    touch_dev_t *dev;               /**< pointer to the device descriptor */
+    uint8_t screen_id;              /**< id of the screen this touch device is attached to */
+} touch_dev_reg_t;
+
+/**
+ * @brief   Export the touch device registry as global variable
+ */
+extern touch_dev_reg_t *touch_dev_reg;
+
+/**
+ * @brief   Add pointer to a touch device item to the list of touch items
+ *
+ * @param[in] dev   Pointer to the touch device
+ *
+ * @return          0 on success
+ * @return         -ENODEV on invalid entry
+*/
+int touch_dev_reg_add(touch_dev_reg_t *dev);
+
+/**
+ * @brief   Find the touch device that is attached to a given screen
+ *
+ * @param[in] screen_id Identifier (number) of the screen
+ *
+ * @return              pointer to the touch device in the registry
+ * @return              NULL if there's no match
+*/
+touch_dev_reg_t *touch_dev_reg_find_screen(uint8_t screen_id);
 
 /**
  * @brief   Get the height of the touch device
@@ -115,6 +165,15 @@ uint16_t touch_dev_width(const touch_dev_t *dev);
  * @return              number of touch positions, 0 means no touch
  */
 uint8_t touch_dev_touches(const touch_dev_t *dev, touch_t *touches, size_t len);
+
+/**
+ * @brief   Set and configure the touch event callback
+ *
+ * @param[in] dev       Pointer to the touch device
+ * @param[in] cb        The callback function
+ * @param[in] arg       Context argument
+ */
+void touch_dev_set_touch_event_callback(const touch_dev_t *dev, touch_event_cb_t cb, void *arg);
 
 #ifdef __cplusplus
 }

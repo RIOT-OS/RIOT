@@ -21,8 +21,45 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <inttypes.h>
+#include <errno.h>
 
 #include "disp_dev.h"
+
+disp_dev_reg_t *disp_dev_reg = NULL;
+
+int disp_dev_reg_add(disp_dev_reg_t *dev)
+{
+    disp_dev_reg_t *tmp = disp_dev_reg;
+
+    if (dev == NULL) {
+        return -ENODEV;
+    }
+
+    /* prepare new entry */
+    dev->next = NULL;
+    /* add to registry */
+    if (disp_dev_reg == NULL) {
+        disp_dev_reg = dev;
+    }
+    else {
+        while (tmp->next != NULL) {
+            tmp = tmp->next;
+        }
+        tmp->next = dev;
+    }
+    return 0;
+}
+
+disp_dev_reg_t *disp_dev_reg_find_screen(uint8_t screen_id)
+{
+    disp_dev_reg_t *tmp = disp_dev_reg;
+
+    while (tmp && tmp->screen_id != screen_id) {
+        tmp = tmp->next;
+    }
+
+    return tmp;
+}
 
 void disp_dev_map(const disp_dev_t *dev,
                   uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,

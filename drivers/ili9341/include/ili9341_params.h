@@ -81,6 +81,21 @@ static const ili9341_params_t ili9341_params[] =
     ILI9341_PARAMS,
 };
 
+/**
+ * @brief   Default screen identifiers
+ */
+#ifndef ILI9341_PARAM_SCREEN_IDS
+#define ILI9341_PARAM_SCREEN_IDS    0
+#endif
+
+/**
+ * @brief   Configure screen identifiers
+ */
+static const uint8_t ili9341_screen_ids[] =
+{
+    ILI9341_PARAM_SCREEN_IDS,
+};
+
 #ifdef __cplusplus
 }
 #endif

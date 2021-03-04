@@ -24,16 +24,7 @@
 
 #include "lvgl/lvgl.h"
 #include "lvgl_riot.h"
-
-#include "screen_dev.h"
-
-#include "ili9341.h"
-#include "ili9341_params.h"
 #include "disp_dev.h"
-#include "ili9341_disp_dev.h"
-
-static ili9341_t s_disp_dev;
-static screen_dev_t s_screen;
 
 #define CPU_LABEL_COLOR     "FF0000"
 #define MEM_LABEL_COLOR     "0000FF"
@@ -127,18 +118,10 @@ void sysmon_create(void)
 
 int main(void)
 {
-    /* Configure the generic display driver interface */
-    s_screen.display = (disp_dev_t *)&s_disp_dev;
-    s_screen.display->driver = &ili9341_disp_dev_driver;
-
     /* Enable backlight */
     disp_dev_backlight_on();
 
-    /* Initialize the concrete display driver */
-    ili9341_init(&s_disp_dev, &ili9341_params[0]);
-
-    /* Initialize lvgl with the generic display and touch drivers */
-    lvgl_init(&s_screen);
+    lvgl_start();
 
     /* Create the system monitor widget */
     sysmon_create();

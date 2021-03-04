@@ -102,6 +102,40 @@ struct disp_dev {
 };
 
 /**
+ * @brief   Disp dev registry entry
+ */
+typedef struct disp_dev_reg {
+    struct disp_dev_reg *next;      /**< pointer to the next display device in the list */
+    disp_dev_t *dev;                /**< pointer to the device descriptor */
+    uint8_t screen_id;              /**< id of the screen this display is attached to */
+} disp_dev_reg_t;
+
+/**
+ * @brief   Export the display device registry as global variable
+ */
+extern disp_dev_reg_t *disp_dev_reg;
+
+/**
+ * @brief   Add pointer to a display device item to the list of display items
+ *
+ * @param[in] dev   Pointer to the display device
+ *
+ * @return          0 on success
+ * @return         -ENODEV on invalid entry
+*/
+int disp_dev_reg_add(disp_dev_reg_t *dev);
+
+/**
+ * @brief   Find the display device that is attached to a given screen
+ *
+ * @param[in] screen_id Identifier (number) of the screen
+ *
+ * @return              pointer to the display device in the registry
+ * @return              NULL if there's no match
+*/
+disp_dev_reg_t *disp_dev_reg_find_screen(uint8_t screen_id);
+
+/**
  * @brief   Map an area to display on the device
  *
  * @param[in] dev   Pointer to the display device

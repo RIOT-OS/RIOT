@@ -3,6 +3,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     bluepill \
     bluepill-stm32f030c8 \
     i-nucleo-lrwan1 \
+    nucleo-f030r8 \
     nucleo-f031k6 \
     nucleo-f042k6 \
     nucleo-f302r8 \
@@ -20,4 +21,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     stm32f030f4-demo \
     stm32f0discovery \
     stm32l0538-disco \
+    stm32mp157c-dk2 \
     #

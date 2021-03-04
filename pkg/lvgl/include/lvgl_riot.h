@@ -33,6 +33,11 @@ extern "C" {
 void lvgl_init(screen_dev_t *screen_dev);
 
 /**
+ * Start the lvgl task handler background thread
+*/
+void lvgl_start(void);
+
+/**
  * @brief   Wakeup lvgl when inactive
  *
  * This function unblocks the lvgl task handler thread and will indirectly

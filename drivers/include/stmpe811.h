@@ -64,7 +64,7 @@ typedef struct {
  *
  * @param[in] arg       optional context for the callback
  */
-typedef void (*touch_event_cb_t)(void *arg);
+typedef void (*stmpe811_event_cb_t)(void *arg);
 
 /**
  * @brief   Device initialization parameters
@@ -85,6 +85,8 @@ typedef struct {
     touch_dev_t *dev;                   /**< Pointer to the generic touch device */
 #endif
     stmpe811_params_t params;           /**< Device parameters */
+    stmpe811_event_cb_t cb;             /**< Configured IRQ event callback */
+    void *cb_arg;                       /**< Extra argument for the callback */
     uint16_t prev_x;                    /**< Previous X coordinate */
     uint16_t prev_y;                    /**< Previous Y coordinate */
 } stmpe811_t;
@@ -103,7 +105,7 @@ typedef struct {
  * @return                  -STMPE811_ERR_I2C on any I2C error
  */
 int stmpe811_init(stmpe811_t *dev, const stmpe811_params_t * params,
-                  touch_event_cb_t cb, void *arg);
+                  stmpe811_event_cb_t cb, void *arg);
 
 /**
  * @brief   Read the touch position

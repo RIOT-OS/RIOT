@@ -72,8 +72,18 @@ uint8_t _stmpe811_touches(const touch_dev_t *touch_dev, touch_t *touches, size_t
     return ret;
 }
 
+void _stmpe811_set_event_callback(const touch_dev_t *touch_dev, touch_event_cb_t cb, void *arg)
+{
+    stmpe811_t *dev = (stmpe811_t *)touch_dev;
+    assert(dev);
+
+    dev->cb = (stmpe811_event_cb_t)cb;
+    dev->cb_arg = arg;
+}
+
 const touch_dev_driver_t stmpe811_touch_dev_driver = {
     .height     = _stmpe811_height,
     .width      = _stmpe811_width,
     .touches    = _stmpe811_touches,
+    .set_event_callback = _stmpe811_set_event_callback,
 };
