@@ -8,7 +8,7 @@
 
 import os
 import sys
-from testrunner import run
+from testrunner import run, run_check_unittests
 
 
 def testfunc(child):
@@ -17,7 +17,7 @@ def testfunc(child):
     # 16 seconds on `samr21-xpro`
     # >50 seconds on `nrf51dk`
     timeout = 60 if board != 'native' else -1
-    child.expect(r"OK \(\d+ tests\)", timeout=timeout)
+    run_check_unittests(timeout=timeout)
 
 
 if __name__ == "__main__":
