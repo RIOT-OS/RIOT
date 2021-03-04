@@ -55,7 +55,6 @@
 #define FREQ_1KHZ       1000LU
 #define FREQ_1HZ        1LU
 
-
 /* Step 0: define available ztimer-periphery by activated modules */
 
 /* #if CONFIG_ZTIMER_USEC_TYPE_PERIPH_TIMER
@@ -79,16 +78,22 @@
 #  define ZTIMER_RTC_CLK  _ztimer_periph_timer_rtc
 #endif
 
-/* Step 1: prepare defines for ztimer initialization and
- *         check which ztimer-periphery is in use
+/* Step 1: select which periphery to use for the higher level ZTIMER_*SEC
+ *         selected periphery is marked for initialisation (INIT_ZTIMER_<periph>
+ *         prepare defines for ztimer initialization
  */
 
+/* ZTIMER_USEC allways uses the basic timer
+ * basic timer is available on all boards */
 #if MODULE_ZTIMER_USEC
 #  ifndef INIT_ZTIMER_TIMER
 #    define INIT_ZTIMER_TIMER 1
 #  endif
 #endif
 
+/* ZTIMER_MSEC prefers ZTIMER_RTT (ztrimer_periph_timer_rtt)
+ * if it is available and runs at a frequency > 1kHz
+ * if not it falls back to use the basic timer */
 #if MODULE_ZTIMER_MSEC
 #  if defined(ZTIMER_RTT) && RTT_FREQUENCY >= FREQ_1KHZ
 #    define ZTIMER_MSEC_RTT 1
@@ -107,6 +112,9 @@
 #  endif
 #endif
 
+/* ZTIMER_MSEC prefers ZTIMER_RTT (ztrimer_periph_timer_rtt) if it is available
+ * if not it prefers ZTIMER_RTC (ztrimer_periph_timer_rtc) if it is available
+ * if not it falls back to use the basic timer */
 #if MODULE_ZTIMER_SEC
 #  ifdef ZTIMER_RTT
 #    define ZTIMER_SEC_RTT
