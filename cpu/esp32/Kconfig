@@ -10,14 +10,15 @@ config CPU_CORE_XTENSA_LX6
 
 config CPU_FAM_ESP32
     bool
-    select CPU_CORE_XTENSA_LX6
     select CPU_COMMON_ESP
+    select CPU_CORE_XTENSA_LX6
     select HAS_ARCH_ESP32
     select HAS_CPU_ESP32
     select HAS_ESP_WIFI_ENTERPRISE
     select HAS_PERIPH_ADC_CTRL
     select HAS_PERIPH_RTC
     select HAS_PERIPH_RTT
+    select HAS_PERIPH_RTT_SET_COUNTER
 
 ## CPU Models
 config CPU_MODEL_ESP32_WROOM_32

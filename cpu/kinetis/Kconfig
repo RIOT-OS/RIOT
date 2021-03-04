@@ -8,9 +8,10 @@ config CPU_COMMON_KINETIS
     bool
     select HAS_CPU_KINETIS
     select HAS_PERIPH_CPUID
-    select HAS_PERIPH_PM
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_PM
+    select HAS_PERIPH_RTT_SET_COUNTER
 
 config CPU_FAM_EA
     bool

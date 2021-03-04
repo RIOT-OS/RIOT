@@ -251,6 +251,11 @@ config HAS_PERIPH_RTT
     help
         Indicates that an RTT peripheral is present.
 
+config HAS_PERIPH_RTT_SET_COUNTER
+    bool
+    help
+        Indicates that the RTT peripheral implements rtt_set_counter().
+
 config HAS_PERIPH_SPI
     bool
     help

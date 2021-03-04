@@ -122,6 +122,10 @@ config MODULE_PERIPH_RTT
     depends on HAS_PERIPH_RTT
     select MODULE_PERIPH_COMMON
 
+config MODULE_PERIPH_RTT_SET_COUNTER
+    bool "rtc_set_counter() implementation in the RTT peripheral driver"
+    depends on HAS_PERIPH_RTT_SET_COUNTER && MODULE_PERIPH_RTT
+
 config MODULE_PERIPH_INIT_RTT
     bool "Auto initialize RTT peripheral"
     default y if MODULE_PERIPH_INIT
