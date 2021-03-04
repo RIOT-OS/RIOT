@@ -127,6 +127,20 @@ enum {
 #endif
 
 /**
+ * @def FLASHPAGE_NO_BLIND_WRITES
+ *
+ * @brief   Usually flash bits can be flipped from their erased state
+ *          to the 'written' state, but not back.
+ *          This also means that writes of already written bits are
+ *          ignored.
+ *          Set this define if the on-board flash does not support those
+ *          semantics.
+ */
+#if defined(DOXYGEN)
+#define FLASHPAGE_NO_BLIND_WRITES
+#endif
+
+/**
  * @brief   Get the page size of the given page number
  *
  * @param[in] page      page number to get the size for
@@ -217,6 +231,25 @@ void flashpage_write_page(unsigned page, const void *data);
  *                          memory size.
  */
 void flashpage_write(void *target_addr, const void *data, size_t len);
+
+/**
+ * @brief   Write any number of data bytes to a given location in the
+ *          flash memory
+ *          If the target address or data are not aligned or smaller than
+ *          FLASHPAGE_WRITE_BLOCK_SIZE, this function will split the write
+ *          into multiple low-level writes to fulfil those requirements.
+ *
+ * @warning Make sure the targeted memory area is erased before calling
+ *          this function
+ *
+ * This function doesn't erase any area in flash, thus be sure the targeted
+ * memory area is erased before writing on it (using the flashpage_write function).
+ *
+ * @param[in] target_addr   address in flash to write to.
+ * @param[in] data          data to write to the address.
+ * @param[in] len           length of the data to be written.
+ */
+void flashpage_write_unaligned(void *target_addr, const void *data, size_t len);
 
 /**
  * @brief   Read the given page into the given memory location
