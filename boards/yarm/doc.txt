@@ -106,3 +106,4 @@ sudo service udev restart
 Recommended toolchain for SAML21 is [GNU Tools for ARM Embedded Processors](https://launchpad.net/gcc-arm-embedded).
 On Debian Buster, the default [gcc-arm-none-eabi](https://packages.debian.org/buster/gcc-arm-none-eabi)
 package works well.
+*/
