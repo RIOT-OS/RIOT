@@ -15,7 +15,7 @@
  * When included, this module enables congestion control for 6LoWPAN Selective Fragment Recovery
  * (SFR). The flavor of congestion control can be selected using the following sub-modules:
  *
- * - TBD
+ * - @ref net_gnrc_sixlowpan_frag_sfr_congure_sfr (the default)
  * @{
  *
  * @file
