@@ -83,7 +83,7 @@
  *         prepare defines for ztimer initialization
  */
 
-/* ZTIMER_USEC allways uses the basic timer
+/* ZTIMER_USEC always uses the basic timer
  * basic timer is available on all boards */
 #if MODULE_ZTIMER_USEC
 #  ifndef INIT_ZTIMER_TIMER
@@ -101,14 +101,14 @@
 #      define INIT_ZTIMER_RTT 1
 #    endif
 #    if RTT_FREQUENCY != FREQ_1KHZ
-#      define ZTIMER_MSEC_CONVERT_LOWER_FREQ    RTT_FREQUENCY
+#      define ZTIMER_MSEC_CONVERT_LOWER_FREQ RTT_FREQUENCY
 #    endif
 #  else
 #    define ZTIMER_MSEC_TIMER 1
 #    ifndef INIT_ZTIMER_TIMER
 #      define INIT_ZTIMER_TIMER 1
 #    endif
-#    define ZTIMER_MSEC_CONVERT_LOWER_FREQ    CONFIG_ZTIMER_USEC_BASE_FREQ
+#    define ZTIMER_MSEC_CONVERT_LOWER_FREQ CONFIG_ZTIMER_USEC_BASE_FREQ
 #  endif
 #endif
 
@@ -121,7 +121,7 @@
 #    ifndef INIT_ZTIMER_RTT
 #      define INIT_ZTIMER_RTT 1
 #    endif
-#    define ZTIMER_SEC_CONVERT_LOWER_FREQ    RTT_FREQUENCY
+#    define ZTIMER_SEC_CONVERT_LOWER_FREQ RTT_FREQUENCY
 #  else
 #    ifdef ZTIMER_RTC
 #      define ZTIMER_SEC_RTC
@@ -133,7 +133,7 @@
 #      ifndef INIT_ZTIMER_TIMER
 #        define INIT_ZTIMER_TIMER 1
 #      endif
-#      define ZTIMER_SEC_CONVERT_LOWER_FREQ       CONFIG_ZTIMER_USEC_BASE_FREQ
+#      define ZTIMER_SEC_CONVERT_LOWER_FREQ CONFIG_ZTIMER_USEC_BASE_FREQ
 #    endif
 #  endif
 #endif
