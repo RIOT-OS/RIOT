@@ -29,7 +29,7 @@
 #include "periph/gpio.h"
 
 /* map CMSIS defines not present in stm32wb55xx.h */
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
 #define RCC_PLLCFGR_PLLSRC_HSE      (RCC_PLLCFGR_PLLSRC_0 | RCC_PLLCFGR_PLLSRC_1)
 #define RCC_PLLCFGR_PLLSRC_HSI      (RCC_PLLCFGR_PLLSRC_1)
 #define RCC_PLLCFGR_PLLSRC_MSI      (RCC_PLLCFGR_PLLSRC_0)
@@ -67,7 +67,7 @@
 #endif
 #define PLL_N                       (CONFIG_CLOCK_PLL_N << RCC_PLLCFGR_PLLN_Pos)
 
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
 #if (CONFIG_CLOCK_PLL_R < 1 || CONFIG_CLOCK_PLL_R > 8)
 #error "PLL configuration: PLL R value is invalid"
 #else
@@ -87,7 +87,7 @@
 #endif
 #endif
 
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
 #if (CONFIG_CLOCK_PLL_Q < 1 || CONFIG_CLOCK_PLL_Q > 8)
 #error "PLL configuration: PLL Q value is invalid"
 #else
@@ -249,7 +249,7 @@
 #define CONFIG_CLOCK_MCO_PRE                    (1)
 #endif
 
-#ifdef CPU_FAM_STM32WB
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
 /* Define bitfields for MCO prescaler for compatibility with L4*/
 #define RCC_CFGR_MCOPRE_DIV1                    (0)
 #define RCC_CFGR_MCOPRE_DIV2                    (RCC_CFGR_MCOPRE_0)
@@ -273,7 +273,7 @@
 #endif
 
 /* Configure main and peripheral bus clock prescalers */
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
 #define CLOCK_AHB_DIV               (0)
 
 #if CONFIG_CLOCK_APB1_DIV == 1
@@ -339,7 +339,9 @@
 #define CLOCK48MHZ_USE_MSI          0
 #endif
 
-#if IS_ACTIVE(CLOCK48MHZ_USE_PLLQ)
+#if defined(CPU_FAM_STM32WL)
+#define CLOCK48MHZ_SELECT           (0)
+#elif IS_ACTIVE(CLOCK48MHZ_USE_PLLQ)
 #define CLOCK48MHZ_SELECT           (RCC_CCIPR_CLK48SEL_1)
 #elif IS_ACTIVE(CLOCK48MHZ_USE_MSI)
 #define CLOCK48MHZ_SELECT           (RCC_CCIPR_CLK48SEL_1 | RCC_CCIPR_CLK48SEL_0)
@@ -431,7 +433,7 @@
  * @name    Deduct the needed flash wait states from the core clock frequency
  * @{
  */
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
 #if (CLOCK_AHB <= 64000000)
 #define FLASH_WAITSTATES        ((CLOCK_AHB - 1) / 18000000U)
 #else

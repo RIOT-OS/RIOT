@@ -67,6 +67,9 @@
 #elif CPU_FAM_STM32WB
 #include "stm32wbxx.h"
 #include "irqs/wb/irqs.h"
+#elif CPU_FAM_STM32WL
+#include "stm32wlxx.h"
+#include "irqs/wl/irqs.h"
 #else
 #error Not supported CPU family
 #endif
