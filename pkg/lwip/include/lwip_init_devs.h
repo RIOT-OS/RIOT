@@ -36,6 +36,7 @@ void lwip_netif_init_devs(void);
  * @param state         pointer to the netdev for the interface
  *
  * The netif will be set up using the `lwip_netdev_init` helper.
+ * The first netif added will be marked as the default route.
  */
 struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state);
 

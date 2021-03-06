@@ -259,10 +259,6 @@ void lwip_bootstrap(void)
         return;
     }
 #endif
-    if (netif[0].state != NULL) {
-        /* state is set to a netdev_t in the netif_add_noaddr() calls above */
-        netif_set_default(&netif[0]);
-    }
 #endif
     /* also allow for external interface definition */
     tcpip_init(NULL, NULL);

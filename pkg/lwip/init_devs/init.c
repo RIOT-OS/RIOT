@@ -32,7 +32,12 @@ void lwip_netif_init_devs(void)
 
 struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state)
 {
-    return netif_add_noaddr(netif, state, lwip_netdev_init, tcpip_input);
+    struct netif *_if = netif_add_noaddr(netif, state, lwip_netdev_init,
+                                         tcpip_input);
+    if (_if && netif_default == NULL) {
+        netif_set_default(_if);
+    }
+    return _if;
 }
 
 /**@}*/
