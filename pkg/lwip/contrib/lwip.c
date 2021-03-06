@@ -164,7 +164,12 @@ extern void lwip_netif_init_devs(void);
 
 struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state)
 {
-    return netif_add_noaddr(netif, state, lwip_netdev_init, tcpip_input);
+    struct netif *_if = netif_add_noaddr(netif, state, lwip_netdev_init,
+                                         tcpip_input);
+    if (_if && netif_default == NULL) {
+        netif_set_default(_if);
+    }
+    return _if;
 }
 
 void lwip_bootstrap(void)
@@ -256,10 +261,6 @@ void lwip_bootstrap(void)
         return;
     }
 #endif
-    if (netif[0].state != NULL) {
-        /* state is set to a netdev_t in the netif_add_noaddr() calls above */
-        netif_set_default(&netif[0]);
-    }
 #endif
     /* also allow for external interface definition */
     tcpip_init(NULL, NULL);
