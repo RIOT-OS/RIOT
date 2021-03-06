@@ -42,7 +42,7 @@ extern "C" {
 #elif defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
 #define CANDEV_STM32_CHAN_NUMOF 2
 #elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
-      defined(CPU_FAM_STM32L4) || DOXYGEN
+      defined(CPU_FAM_STM32L4) || defined(CPU_LINE_STM32F722xx) || DOXYGEN
 /** Number of channels in the device (up to 3) */
 #define CANDEV_STM32_CHAN_NUMOF 1
 #else
@@ -136,7 +136,6 @@ typedef struct {
 #define CAN_STM32_TX_MAILBOXES 3
 /** The number of receive FIFO */
 #define CAN_STM32_RX_MAILBOXES 2
-
 
 #ifndef CAN_STM32_RX_MAIL_FIFO
 /** This is the maximum number of frame the driver can receive simultaneously */
