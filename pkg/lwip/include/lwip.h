@@ -19,6 +19,8 @@
 #ifndef LWIP_H
 #define LWIP_H
 
+#include "net/netdev.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,6 +32,10 @@ extern "C" {
  * stack and the stack's thread is started.
  */
 void lwip_bootstrap(void);
+
+struct netif;
+
+struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state);
 
 #ifdef __cplusplus
 }

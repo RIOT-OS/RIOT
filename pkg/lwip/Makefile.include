@@ -29,6 +29,9 @@ endif
 ifneq (,$(filter lwip_netdev,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib/netdev
 endif
+ifneq (,$(filter lwip_netif_init_devs,$(USEMODULE)))
+  DIRS += $(RIOTBASE)/pkg/lwip/init_devs
+endif
 ifneq (,$(filter lwip_sock,$(USEMODULE)))
   ifneq (,$(filter lwip_ipv6,$(USEMODULE)))
     CFLAGS += -DSOCK_HAS_IPV6

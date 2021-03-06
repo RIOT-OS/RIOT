@@ -21,11 +21,6 @@
 #include "lwip/netifapi.h"
 #include "netif/lowpan6.h"
 
-#ifdef MODULE_NETDEV_TAP
-#include "netdev_tap.h"
-#include "netdev_tap_params.h"
-#endif
-
 #ifdef MODULE_AT86RF2XX
 #include "at86rf2xx.h"
 #include "at86rf2xx_params.h"
@@ -76,11 +71,7 @@
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
-#ifdef MODULE_NETDEV_TAP
-#define LWIP_NETIF_NUMOF        (NETDEV_TAP_MAX)
-#endif
-
-#ifdef MODULE_AT86RF2XX     /* is mutual exclusive with above ifdef */
+#ifdef MODULE_AT86RF2XX
 #define LWIP_NETIF_NUMOF        ARRAY_SIZE(at86rf2xx_params)
 #endif
 
@@ -123,10 +114,6 @@
 
 #ifdef LWIP_NETIF_NUMOF
 static struct netif netif[LWIP_NETIF_NUMOF];
-#endif
-
-#ifdef MODULE_NETDEV_TAP
-static netdev_tap_t netdev_taps[LWIP_NETIF_NUMOF];
 #endif
 
 #ifdef MODULE_AT86RF2XX
@@ -173,20 +160,19 @@ extern void stm32_eth_netdev_setup(netdev_t *netdev);
 static nrf802154_t nrf802154_dev;
 #endif
 
+extern void lwip_netif_init_devs(void);
+
+struct netif *lwip_add_ethernet(struct netif *netif, netdev_t *state)
+{
+    return netif_add_noaddr(netif, state, lwip_netdev_init, tcpip_input);
+}
+
 void lwip_bootstrap(void)
 {
+    lwip_netif_init_devs();
     /* TODO: do for every eligible netdev */
 #ifdef LWIP_NETIF_NUMOF
-#ifdef MODULE_NETDEV_TAP
-    for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
-        netdev_tap_setup(&netdev_taps[i], &netdev_tap_params[i]);
-        if (netif_add_noaddr(&netif[i], &netdev_taps[i].netdev, lwip_netdev_init,
-                             tcpip_input) == NULL) {
-            DEBUG("Could not add netdev_tap device\n");
-            return;
-        }
-    }
-#elif defined(MODULE_MRF24J40)
+#ifdef MODULE_MRF24J40
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
         mrf24j40_setup(&mrf24j40_devs[i], &mrf24j40_params[i], i);
         if (netif_add_noaddr(&netif[i], &mrf24j40_devs[i].netdev.netdev, lwip_netdev_init,
