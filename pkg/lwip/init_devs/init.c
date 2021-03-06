@@ -29,6 +29,11 @@ void lwip_netif_init_devs(void)
         auto_init_esp_eth();
     }
 
+    if (IS_USED(MODULE_ESP_WIFI)) {
+        extern void auto_init_esp_wifi(void);
+        auto_init_esp_wifi();
+    }
+
     if (IS_USED(MODULE_NETDEV_TAP)) {
         extern void auto_init_netdev_tap(void);
         auto_init_netdev_tap();
