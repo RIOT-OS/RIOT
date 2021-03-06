@@ -63,6 +63,7 @@ ifneq (,$(filter lwip_%,$(USEMODULE)))
   USEMODULE += lwip_contrib
   USEMODULE += lwip_core
   USEMODULE += lwip_netif
+  USEMODULE += lwip_netif_init_devs
   USEMODULE += netdev
   ifeq (,$(filter lwip_ipv4 lwip_ipv6,$(USEMODULE)))
     USEMODULE += lwip_ipv4
