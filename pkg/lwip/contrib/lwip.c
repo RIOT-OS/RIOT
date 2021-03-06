@@ -47,10 +47,6 @@
 #include "socket_zep_params.h"
 #endif
 
-#ifdef MODULE_ESP_ETH
-#include "esp-eth/esp_eth_netdev.h"
-#endif
-
 #ifdef MODULE_ESP_WIFI
 #include "esp-wifi/esp_wifi_netdev.h"
 #endif
@@ -98,12 +94,8 @@
 #endif
 
 /* is mutual exclusive with above ifdef */
-#if IS_USED(MODULE_ESP_ETH) && IS_USED(MODULE_ESP_WIFI)
-#define LWIP_NETIF_NUMOF        (2)
-#define ESP_WIFI_INDEX          (1)
-#elif IS_USED(MODULE_ESP_ETH) || IS_USED(MODULE_ESP_WIFI)
+#if IS_USED(MODULE_ESP_WIFI)
 #define LWIP_NETIF_NUMOF        (1)
-#define ESP_WIFI_INDEX          (0)
 #endif
 
 #ifdef MODULE_SAM0_ETH
@@ -140,11 +132,6 @@ static mrf24j40_t mrf24j40_devs[LWIP_NETIF_NUMOF];
 
 #ifdef MODULE_SOCKET_ZEP
 static socket_zep_t socket_zep_devs[LWIP_NETIF_NUMOF];
-#endif
-
-#ifdef MODULE_ESP_ETH
-extern esp_eth_netdev_t _esp_eth_dev;
-extern void esp_eth_setup (esp_eth_netdev_t* dev);
 #endif
 
 #ifdef MODULE_ESP_WIFI
@@ -216,23 +203,13 @@ void lwip_bootstrap(void)
             return;
         }
     }
-#elif (IS_USED(MODULE_ESP_ETH) || IS_USED(MODULE_ESP_WIFI))
-#if IS_USED(MODULE_ESP_ETH)
-    esp_eth_setup(&_esp_eth_dev);
-    if (netif_add_noaddr(&netif[0], &_esp_eth_dev.netdev, lwip_netdev_init,
-                         tcpip_input) == NULL) {
-        DEBUG("Could not add esp_eth device\n");
-        return;
-    }
-#endif
-#if IS_USED(MODULE_ESP_WIFI)
+#elif IS_USED(MODULE_ESP_WIFI)
     esp_wifi_setup(&_esp_wifi_dev);
-    if (netif_add_noaddr(&netif[ESP_WIFI_INDEX], &_esp_wifi_dev.netdev, lwip_netdev_init,
+    if (netif_add_noaddr(&netif[0], &_esp_wifi_dev.netdev, lwip_netdev_init,
                          tcpip_input) == NULL) {
         DEBUG("Could not add esp_wifi device\n");
         return;
     }
-#endif
 #elif defined(MODULE_SAM0_ETH)
     sam0_eth_setup(&sam0_eth);
     if (netif_add_noaddr(&netif[0], &sam0_eth, lwip_netdev_init,
