@@ -405,8 +405,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             break;
 
         case NETOPT_IEEE802154_PHY:
-            assert(max_len >= sizeof(int8_t));
-            *((int8_t *)val) = at86rf215_get_phy_mode(dev);
+            assert(max_len >= sizeof(uint8_t));
+            *((uint8_t *)val) = at86rf215_get_phy_mode(dev);
             res = max_len;
             break;
 #ifdef MODULE_NETDEV_IEEE802154_MR_FSK
