@@ -330,12 +330,12 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             }
             break;
 
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
-
         case NETOPT_IEEE802154_PHY:
             assert(max_len >= sizeof(int8_t));
             *(uint8_t *)val = IEEE802154_PHY_OQPSK;
             return sizeof(uint8_t);
+
+#ifdef MODULE_NETDEV_IEEE802154_OQPSK
 
         case NETOPT_OQPSK_RATE:
             assert(max_len >= sizeof(int8_t));
