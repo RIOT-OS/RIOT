@@ -516,6 +516,11 @@ int kw41zrf_netdev_get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
             *((uint16_t *)value) = 0;
             return sizeof(uint16_t);
 
+        case NETOPT_IEEE802154_PHY:
+            assert(len >= sizeof(uint8_t));
+            *((uint8_t *)value) = IEEE802154_PHY_OQPSK;
+            return sizeof(uint8_t);
+
         default:
             break;
     }
