@@ -421,6 +421,9 @@ static int _get(netdev_t *dev, netopt_t opt, void *value, size_t max_len)
 #endif
 
     switch (opt) {
+        case NETOPT_IEEE802154_PHY:
+            *((uint8_t *)value) = IEEE802154_PHY_OQPSK;
+            return sizeof(uint8_t);
         case NETOPT_CHANNEL:
             assert(max_len >= sizeof(uint16_t));
             *((uint16_t *)value) = nrf802154_dev->chan;
