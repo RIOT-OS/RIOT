@@ -322,6 +322,13 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
                 !!(dev->netdev.flags & KW2XRF_OPT_AUTOCCA);
             return sizeof(netopt_enable_t);
 
+        case NETOPT_IEEE802154_PHY:
+            if (len < sizeof(uint8_t)) {
+                return -EOVERFLOW;
+            }
+            *((uint8_t *)value) = IEEE802154_PHY_OQPSK;
+            return sizeof(uint8_t);
+
         case NETOPT_CHANNEL:
             if (len < sizeof(uint16_t)) {
                 return -EOVERFLOW;
