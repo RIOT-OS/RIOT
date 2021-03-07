@@ -9,6 +9,7 @@
 
 /.murdock                                   @kaspar030
 
+/boards/common/atxmega/                     @nandojve
 /boards/common/esp*/                        @gschorcht
 /boards/common/nrf*/                        @aabadie @haukepetersen
 /boards/common/nucleo*/                     @aabadie
@@ -34,11 +35,14 @@
 /boards/stk3*00/                            @basilfx
 /boards/openmote*/                          @MrKevinWeiss
 /boards/cc1352p-launchpad                   @luisan00
+/boards/atxmega*/                           @nandojve
 
 /core/                                      @kaspar030
 
 /cpu/arm7_common/                           @kaspar030 @maribu
+/cpu/avr8_common/                           @kYc0o @roberthartung @maribu @nandojve
 /cpu/atmega*/                               @kYc0o @roberthartung @maribu
+/cpu/atxmega/                               @nandojve
 /cpu/cc2538/                                @hexluthor @smlng @fjmolinas
 /cpu/cc26x0/                                @hexluthor @smlng
 /cpu/cc26x2_cc13x2/                         @hexluthor @smlng
