@@ -1,11 +1,11 @@
 ifneq (,$(filter cortex-m23 cortex-m0%,$(CPU_CORE)))
   QDSA_IMPL ?= arm
 else
-ifneq (,$(filter atmega_common,$(USEMODULE)))
-  QDSA_IMPL ?= avr
-else
-  QDSA_IMPL ?= cref
-endif
+  ifneq (,$(filter arch_avr8,$(FEATURES_USED)))
+    QDSA_IMPL ?= avr
+  else
+    QDSA_IMPL ?= cref
+  endif
 endif
 
 export QDSA_IMPL
