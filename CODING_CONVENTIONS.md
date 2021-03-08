@@ -97,7 +97,7 @@
 
 ## Return values
 
-* Any function must return one of the following values:
+* Every function must return one of the following values or none (void):
     * logical value (zero or not zero)
     * an error code (given as a negative number or zero) or a positive status
       value
