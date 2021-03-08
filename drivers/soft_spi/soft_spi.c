@@ -79,7 +79,7 @@ void soft_spi_init_pins(soft_spi_t bus)
         gpio_clear(soft_spi_config[bus].mosi_pin);
     }
     if (gpio_is_valid(soft_spi_config[bus].miso_pin)) {
-        gpio_init(soft_spi_config[bus].mosi_pin, GPIO_IN);
+        gpio_init(soft_spi_config[bus].miso_pin, GPIO_IN);
     }
 }
 
@@ -137,7 +137,9 @@ void soft_spi_release(soft_spi_t bus)
 
 static inline uint8_t _transfer_one_byte(soft_spi_t bus, uint8_t out)
 {
-    int8_t bit = 0, i = 0;
+    int8_t bit = 0, i = 0, read_bit = 0;
+    uint8_t read_tmp = 0;
+
     if (SOFT_SPI_MODE_1 == soft_spi_config[bus].soft_spi_mode ||
         SOFT_SPI_MODE_3 == soft_spi_config[bus].soft_spi_mode) {
         /* CPHA = 1*/
@@ -149,6 +151,8 @@ static inline uint8_t _transfer_one_byte(soft_spi_t bus, uint8_t out)
     for (i = 6; i >= 0; i--) {
         xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
         gpio_toggle(soft_spi_config[bus].clk_pin);
+        read_bit = gpio_read(soft_spi_config[bus].miso_pin);
+        read_tmp |= (!!read_bit << (i + 1));
         xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
         gpio_toggle(soft_spi_config[bus].clk_pin);
         bit = (out & (1 << i)) >> i;
@@ -156,6 +160,8 @@ static inline uint8_t _transfer_one_byte(soft_spi_t bus, uint8_t out)
     }
     xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
     gpio_toggle(soft_spi_config[bus].clk_pin);
+    read_bit = gpio_read(soft_spi_config[bus].miso_pin);
+    read_tmp |= (!!read_bit << 0);
 
     if (SOFT_SPI_MODE_0 == soft_spi_config[bus].soft_spi_mode ||
         SOFT_SPI_MODE_2 == soft_spi_config[bus].soft_spi_mode) {
@@ -164,7 +170,42 @@ static inline uint8_t _transfer_one_byte(soft_spi_t bus, uint8_t out)
         gpio_toggle(soft_spi_config[bus].clk_pin);
     }
 
-    return out;
+    return read_tmp;
+}
+
+static uint8_t _readin_one_byte(soft_spi_t bus)
+{
+    int8_t i = 0, tmp = 0;
+    int bit;
+    if (SOFT_SPI_MODE_1 == soft_spi_config[bus].soft_spi_mode ||
+        SOFT_SPI_MODE_3 == soft_spi_config[bus].soft_spi_mode)
+    {
+        /* CPHA = 1*/
+        gpio_toggle(soft_spi_config[bus].clk_pin);
+        xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
+    }
+    gpio_toggle(soft_spi_config[bus].clk_pin);
+    xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
+    bit = gpio_read(soft_spi_config[bus].miso_pin);
+    tmp |= (!!bit << 7);
+    for (i = 6; i >= 0; i--)
+    {
+        xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
+        gpio_toggle(soft_spi_config[bus].clk_pin);
+        xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
+        gpio_toggle(soft_spi_config[bus].clk_pin);
+        bit = gpio_read(soft_spi_config[bus].miso_pin);
+        tmp |= (!!bit << i);
+    }
+
+    if (SOFT_SPI_MODE_0 == soft_spi_config[bus].soft_spi_mode ||
+        SOFT_SPI_MODE_2 == soft_spi_config[bus].soft_spi_mode)
+    {
+        xtimer_nanosleep(soft_spi_config[bus].soft_spi_clk);
+        gpio_toggle(soft_spi_config[bus].clk_pin);
+    }
+
+    return tmp;
 }
 
 uint8_t soft_spi_transfer_byte(soft_spi_t bus, soft_spi_cs_t cs, bool cont, uint8_t out)
@@ -190,23 +231,76 @@ uint8_t soft_spi_transfer_byte(soft_spi_t bus, soft_spi_cs_t cs, bool cont, uint
     return retval;
 }
 
-void soft_spi_transfer_bytes(soft_spi_t bus, soft_spi_cs_t cs, bool cont,
-                        const void *out, void *in, size_t len)
-{
-    DEBUG("Soft SPI soft_spi_transfer_bytes\n");
 
+uint8_t soft_spi_read_byte(soft_spi_t bus, soft_spi_cs_t cs, bool cont)
+{
+    DEBUG("Soft SPI soft_spi_readin_byte\n");
     assert(soft_spi_bus_is_valid(bus));
 
-    uint8_t tmp = 0;
+    uint8_t retval = 0;
 
-    for (size_t i = 0; i < len-1; i++) {
-        tmp = (NULL != out) ? ((uint8_t *)out)[i] : 0;
-        uint8_t retval = soft_spi_transfer_byte(bus, cs, true, tmp);
-        if (NULL != in) {
-            ((uint8_t *)in)[0] = retval;
+    /* activate the given chip select line */
+    if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF))
+    {
+        gpio_clear((gpio_t)cs);
+    }
+    retval = _readin_one_byte(bus);
+
+    if (!cont)
+    {
+        if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF))
+        {
+            gpio_set((gpio_t)cs);
         }
     }
 
-    tmp = (NULL != out) ? ((uint8_t *)out)[len-1] : 0;
-    soft_spi_transfer_byte(bus, cs, cont, tmp);
+    return retval;
+}
+
+void soft_spi_transfer_bytes(soft_spi_t bus, soft_spi_cs_t cs, bool cont,
+                             const void *out, void *in, size_t len)
+{
+    DEBUG("Soft SPI soft_spi_transfer_bytes\n");
+    assert(soft_spi_bus_is_valid(bus));
+    /* make sure at least one input or one output buffer is given */
+    assert(out || in);
+
+    const uint8_t *outbuf = out;
+    uint8_t *inbuf = in;
+
+    /* activate the given chip select line */
+    if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF))
+    {
+        gpio_clear((gpio_t)cs);
+    }
+
+    if (!inbuf)
+    {
+        for (size_t i = 0; i < len; i++)
+        {
+            _transfer_one_byte(bus, outbuf[i]);
+        }
+    }
+    else if (!outbuf)
+    {
+        for (size_t i = 0; i < len; i++)
+        {
+            inbuf[i] = _readin_one_byte(bus);
+        }
+    }
+    else
+    {
+        for (size_t i = 0; i < len; i++)
+        {
+            inbuf[i] = _transfer_one_byte(bus, outbuf[i]);
+        }
+    }
+
+    if (!cont)
+    {
+        if ((cs != GPIO_UNDEF) && (cs != SOFT_SPI_CS_UNDEF))
+        {
+            gpio_set((gpio_t)cs);
+        }
+    }
 }
