@@ -213,11 +213,13 @@ int riotboot_flashwrite_invalidate_latest(void)
 int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
                                    const uint8_t *bytes, size_t len)
 {
+#ifndef PERIPH_FLASHPAGE_CUSTOM_PAGESIZES
     assert(len <= FLASHPAGE_SIZE);
+#endif
 
     uint8_t *slot_start = (uint8_t *)riotboot_slot_get_hdr(state->target_slot);
 
-#if CONFIG_RIOTBOOT_FLASHWRITE_RAW
+#if IS_ACTIVE(CONFIG_RIOTBOOT_FLASHWRITE_RAW)
     memcpy(state->firstblock_buf, bytes, len);
     flashpage_write(slot_start, state->firstblock_buf,
                     RIOTBOOT_FLASHPAGE_BUFFER_SIZE);
