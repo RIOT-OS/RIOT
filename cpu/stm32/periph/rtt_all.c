@@ -185,6 +185,11 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
     irq_restore(is);
 }
 
+uint32_t rtt_get_alarm(void)
+{
+    return LPTIM1->CMP;
+}
+
 void rtt_clear_alarm(void)
 {
     to_cb = NULL;

@@ -75,9 +75,31 @@ int main(void)
     uint32_t now = rtt_get_counter();
     printf("RTT now: %" PRIu32 "\n", now);
 
+    if (IS_USED(MODULE_PERIPH_RTT_SET_COUNTER)) {
+        puts("Setting RTT timer to 1337");
+        rtt_set_counter(1337);
+        now = rtt_get_counter();
+        printf("RTT now: %" PRIu32 "\n", now);
+        if ((now < 1337) || (now > 1337 + (1 * RTT_FREQUENCY + 999) / 1000)) {
+            puts("ERROR: rtt_set_counter() failed (off by more than 1 ms)");
+            return 1;
+        }
+        else {
+            puts("rtt_set_counter() PASSED");
+        }
+    }
+
     last = (now + TICKS_TO_WAIT) & RTT_MAX_VALUE;
     printf("Setting initial alarm to now + 5 s (%" PRIu32 ")\n", last);
     rtt_set_alarm(last, cb, 0);
+
+    if (rtt_get_alarm() != last) {
+        puts("Error: rtt_get_alarm() not working");
+        return 1;
+    }
+    else {
+        puts("rtt_get_alarm() PASSED");
+    }
 
     puts("Done setting up the RTT, wait for many Hellos");
     return 0;

@@ -2,6 +2,7 @@ BOARD ?= samr21-xpro
 include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_rtt
+FEATURES_OPTIONAL += periph_rtt_set_counter
 
 DISABLE_MODULE += periph_init_rtt
 

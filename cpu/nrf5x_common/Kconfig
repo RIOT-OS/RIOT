@@ -6,18 +6,19 @@
 
 config CPU_COMMON_NRF5X
     bool
+    select HAS_BLE_NIMBLE
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_HWRNG
+    select HAS_PERIPH_RTT_SET_COUNTER
     select HAS_PERIPH_TEMPERATURE
     select HAS_PERIPH_TIMER_PERIODIC
     select HAS_PERIPH_UART_MODECFG
     select HAS_PERIPH_WDT
     select HAS_PERIPH_WDT_CB
-    select HAS_BLE_NIMBLE
     select HAS_RADIO_NRFBLE
     select HAS_RADIO_NRFMIN
 

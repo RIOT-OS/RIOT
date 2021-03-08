@@ -191,9 +191,11 @@ void rtt_clear_overflow_cb(void);
 uint32_t rtt_get_counter(void);
 
 /**
- * @brief Set the RTT counter to a specified value.
+ * @brief   Set the RTT counter to a specified value.
  *
  * @param[in] counter       The value to set the RTT to.
+ *
+ * @note    This function is only provided when the feature `periph_rtt_set_counter` is provided
  */
 void rtt_set_counter(uint32_t counter);
 
