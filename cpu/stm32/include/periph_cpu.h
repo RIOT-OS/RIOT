@@ -52,6 +52,8 @@
 #include "periph/l5/periph_cpu.h"
 #elif defined(CPU_FAM_STM32WB)
 #include "periph/wb/periph_cpu.h"
+#elif defined(CPU_FAM_STM32WL)
+#include "periph/wl/periph_cpu.h"
 #endif
 
 #ifdef __cplusplus
@@ -738,7 +740,7 @@ typedef enum {
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
-    defined(CPU_FAM_STM32L5)
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL)
     I2C_SPEED_FAST_PLUS,    /**< fast plus mode: ~1Mbit/s */
 #endif
 } i2c_speed_t;
@@ -774,7 +776,7 @@ typedef struct {
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
-    defined(CPU_FAM_STM32L5)
+    defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32WL)
 /**
  * @brief   Structure for I2C timing register settings
  *

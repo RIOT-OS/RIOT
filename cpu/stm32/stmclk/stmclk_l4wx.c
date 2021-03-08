@@ -330,18 +330,16 @@
 /* Configure 48MHz clock source */
 #define CLOCK_PLLQ                  ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_M) * CONFIG_CLOCK_PLL_N) / CONFIG_CLOCK_PLL_Q
 
-#if CLOCK_PLLQ == MHZ(48)
+#if CLOCK_PLLQ == MHZ(48) && !defined(CPU_FAM_STM32WL)
 #define CLOCK48MHZ_USE_PLLQ         1
-#elif CONFIG_CLOCK_MSI == MHZ(48)
+#elif CONFIG_CLOCK_MSI == MHZ(48) && !defined(CPU_FAM_STM32WL)
 #define CLOCK48MHZ_USE_MSI          1
 #else
 #define CLOCK48MHZ_USE_PLLQ         0
 #define CLOCK48MHZ_USE_MSI          0
 #endif
 
-#if defined(CPU_FAM_STM32WL)
-#define CLOCK48MHZ_SELECT           (0)
-#elif IS_ACTIVE(CLOCK48MHZ_USE_PLLQ)
+#if IS_ACTIVE(CLOCK48MHZ_USE_PLLQ)
 #define CLOCK48MHZ_SELECT           (RCC_CCIPR_CLK48SEL_1)
 #elif IS_ACTIVE(CLOCK48MHZ_USE_MSI)
 #define CLOCK48MHZ_SELECT           (RCC_CCIPR_CLK48SEL_1 | RCC_CCIPR_CLK48SEL_0)
@@ -433,12 +431,20 @@
  * @name    Deduct the needed flash wait states from the core clock frequency
  * @{
  */
-#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
+#if defined(CPU_FAM_STM32WL)
+#if (CLOCK_AHB <= 16000000)     /* VCORE range 2 */
+#define FLASH_WAITSTATES        ((CLOCK_AHB - 1) / 6000000U)
+#elif (CLOCK_AHB <= 48000000)   /* VCORE range 1 */
+#define FLASH_WAITSTATES        ((CLOCK_AHB - 1) / 18000000U)
+#else
+#define FLASH_WAITSTATES        FLASH_ACR_LATENCY_2
+#endif /* CPU_FAM_STM32WL */
+#elif defined(CPU_FAM_STM32WB)
 #if (CLOCK_AHB <= 64000000)
 #define FLASH_WAITSTATES        ((CLOCK_AHB - 1) / 18000000U)
 #else
 #define FLASH_WAITSTATES        FLASH_ACR_LATENCY_3WS
-#endif
+#endif /* CPU_FAM_STM32WB */
 #else
 #define FLASH_WAITSTATES        ((CLOCK_AHB - 1) / 16000000U)
 #endif
@@ -487,6 +493,11 @@ void stmclk_init_sysclk(void)
         - Use HSE as PLL input clock
     */
     if (IS_ACTIVE(CLOCK_ENABLE_HSE)) {
+
+    /* Use VDDTCXO regulator */
+#if defined(CPU_FAM_STM32WL)
+        RCC->CR |= (RCC_CR_HSEBYPPWR);
+#endif
         RCC->CR |= (RCC_CR_HSEON);
         while (!(RCC->CR & RCC_CR_HSERDY)) {}
     }

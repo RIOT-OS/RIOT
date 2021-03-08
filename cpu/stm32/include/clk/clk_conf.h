@@ -30,7 +30,7 @@
 #include "cfg_clock_common_fx_gx_mp1.h"
 #else /* CPU_FAM_STM32L0 || CPU_FAM_STM32L1 || CPU_FAM_STM32L4 ||
        * CPU_FAM_STM32L5 || CPU_FAM_STM32WB */
-#include "cfg_clock_common_lx_wb.h"
+#include "cfg_clock_common_lx_wx.h"
 #endif
 
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F1) || \
@@ -45,7 +45,7 @@
 #include "l0l1/cfg_clock_default.h"
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L5) || \
       defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
-#include "l4l5wb/cfg_clock_default.h"
+#include "l4l5wx/cfg_clock_default.h"
 #elif defined(CPU_FAM_STM32MP1)
 #include "mp1/cfg_clock_default.h"
 #else

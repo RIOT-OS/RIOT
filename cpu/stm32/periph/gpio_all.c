@@ -238,7 +238,8 @@ int gpio_init_int(gpio_t pin, gpio_mode_t mode, gpio_flank_t flank,
     isr_ctx[pin_num].arg = arg;
 
     /* enable clock of the SYSCFG module for EXTI configuration */
-#if !defined(CPU_FAM_STM32WB) && !defined(CPU_FAM_STM32MP1) && !defined(CPU_FAM_STM32WL)
+#if !defined(CPU_FAM_STM32WB) && !defined(CPU_FAM_STM32MP1) && \
+    !defined(CPU_FAM_STM32WL)
 #ifdef CPU_FAM_STM32F0
     periph_clk_en(APB2, RCC_APB2ENR_SYSCFGCOMPEN);
 #elif defined(CPU_FAM_STM32G0)

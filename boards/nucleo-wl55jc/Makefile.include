@@ -1,0 +1,2 @@
+# load the common Makefile.include for Nucleo boards
+include $(RIOTBOARD)/common/nucleo64/Makefile.include

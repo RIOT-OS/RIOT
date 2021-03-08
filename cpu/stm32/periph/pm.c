@@ -49,7 +49,8 @@
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4) || \
       defined(CPU_FAM_STM32L5)
 #define PM_STOP_CONFIG  (PWR_CR1_LPMS_STOP1)
-#elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32WL)
+#elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G0) || \
+      defined(CPU_FAM_STM32WL)
 #define PM_STOP_CONFIG  (PWR_CR1_LPMS_0)
 #elif defined(CPU_FAM_STM32F7)
 #define PM_STOP_CONFIG  (PWR_CR1_LPDS | PWR_CR1_FPDS | PWR_CR1_LPUDS)
@@ -71,7 +72,8 @@
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32G4) || \
       defined(CPU_FAM_STM32L5)
 #define PM_STANDBY_CONFIG   (PWR_CR1_LPMS_STANDBY)
-#elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32WL)
+#elif defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G0) || \
+      defined(CPU_FAM_STM32WL)
 #define PM_STANDBY_CONFIG   (PWR_CR1_LPMS_0 | PWR_CR1_LPMS_1)
 #elif defined(CPU_FAM_STM32F7)
 #define PM_STANDBY_CONFIG   (PWR_CR1_PDDS | PWR_CR1_CSBF)
@@ -113,7 +115,8 @@ void pm_set(unsigned mode)
             PWR_CR_REG &= ~(PM_STOP_CONFIG | PM_STANDBY_CONFIG);
             PWR_CR_REG |= PM_STANDBY_CONFIG;
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
-    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5)
+    defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
+    defined(CPU_FAM_STM32WL)
 #if STM32L4_SRAM2_RETENTION
             PWR->CR3 |= PWR_CR3_RRS;
 #else

@@ -13,22 +13,22 @@
  * @{
  *
  * @file
- * @brief       Base STM32Lx/WB clock configuration
+ * @brief       Base STM32Lx/Wx clock configuration
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  * @author      Vincent Dupont <vincent@otakeys.com>
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef CLK_CFG_CLOCK_COMMON_LX_WB_H
-#define CLK_CFG_CLOCK_COMMON_LX_WB_H
+#ifndef CLK_CFG_CLOCK_COMMON_LX_WX_H
+#define CLK_CFG_CLOCK_COMMON_LX_WX_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
- * @name    Clock system configuration (L0/L1/L4/L5/WB)
+ * @name    Clock system configuration (L0/L1/L4/L5/WB/WL)
  * @{
  */
 /* Select the desired system clock source between PLL, HSE or HSI */
@@ -87,5 +87,5 @@ extern "C" {
 }
 #endif
 
-#endif /* CLK_CFG_CLOCK_COMMON_LX_WB_H */
+#endif /* CLK_CFG_CLOCK_COMMON_LX_WX_H */
 /** @} */
