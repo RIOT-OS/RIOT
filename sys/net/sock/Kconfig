@@ -44,4 +44,8 @@ config DTLS_HANDSHAKE_BUFSIZE_EXP
         represents the exponent of 2^n, which will be used as the size of the
         buffer. The buffer is used to hold credentials during DTLS handshakes.
 
+config DTLS_PSK_ID_HINT_MAX_SIZE
+    int "Maximum size for a PSK Identity hint string"
+    default 32
+
 endif # KCONFIG_USEMODULE_SOCK_DTLS

@@ -182,8 +182,16 @@ static int _get_psk_info(struct dtls_context_t *ctx, const session_t *session,
     switch (type) {
     case DTLS_PSK_HINT:
         DEBUG("sock_dtls: psk hint request\n");
-        /* Ignored. See https://tools.ietf.org/html/rfc4279#section-5.2 */
-        return 0;
+        /* return a hint to the client if set */
+        c_len = strlen(sock->psk_hint);
+        if (c_len) {
+            c = sock->psk_hint;
+            break;
+        }
+        else {
+            DEBUG("sock_dtls: no hint provided\n");
+            return 0;
+        }
     case DTLS_PSK_IDENTITY:
         DEBUG("sock_dtls: psk id request\n");
         c = credential.params.psk.id.s;
@@ -279,6 +287,7 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
 
     sock->udp_sock = udp_sock;
     sock->buffer.data = NULL;
+    sock->psk_hint[0] = '\0';
 #ifdef SOCK_HAS_ASYNC
     sock->async_cb = NULL;
     sock->buf_ctx = NULL;
@@ -293,6 +302,17 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
     }
     mbox_init(&sock->mbox, sock->mbox_queue, SOCK_DTLS_MBOX_SIZE);
     dtls_set_handler(sock->dtls_ctx, &_dtls_handler);
+    return 0;
+}
+
+int sock_dtls_set_server_psk_id_hint(sock_dtls_t *sock, const char *hint)
+{
+    assert(sock);
+    if (strlen(hint) > CONFIG_DTLS_PSK_ID_HINT_MAX_SIZE) {
+        DEBUG("sock_dtls: could not set hint due to buffer size\n");
+        return -1;
+    }
+    strcpy(sock->psk_hint, hint);
     return 0;
 }
 
