@@ -61,9 +61,19 @@ void software_init_hook(void)
     exit(-1);
 }
 
+static void soc_init(void)
+{
+    /* initialize stdio*/
+    stdio_init();
+
+    /* trigger static peripheral initialization */
+    periph_init();
+}
 
 void mips_start(void)
 {
+    soc_init();
+
     board_init();
 
     /* kernel_init */
@@ -76,15 +86,6 @@ void panic_arch(void)
     assert(0);
     while (1) {
     }
-}
-
-void cpu_init(void)
-{
-    /* initialize stdio*/
-    stdio_init();
-
-    /* trigger static peripheral initialization */
-    periph_init();
 }
 
 #ifdef MODULE_NEWLIB_SYSCALLS_DEFAULT

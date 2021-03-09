@@ -264,7 +264,7 @@ application (the RIOT kernel) the Watchdog is enabled with a timeout of 10
 seconds.
 
 If your board does not include the `periph_wdt` module, the Watchdog will be
-disabled at `cpu_init()` time and there's no configuration necessary. However,
+disabled at `soc_init()` time and there's no configuration necessary. However,
 if your board or application does include it, the Watchdog will be left
 configured with the 10 second timeout set by the Bootloader and you need to
 call `wdt_setup_reboot()` or `wdt_setup_reboot_with_callback()` within the first

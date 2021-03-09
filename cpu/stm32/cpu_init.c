@@ -147,7 +147,7 @@ static void _gpio_init_ain(void)
 }
 #endif
 
-void cpu_init(void)
+void soc_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();

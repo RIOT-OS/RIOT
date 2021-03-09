@@ -25,8 +25,6 @@ void led_init(void);
 
 void board_init(void)
 {
-    /* initialize the CPU core */
-    cpu_init();
 
     /* initialize LEDs */
     led_init();

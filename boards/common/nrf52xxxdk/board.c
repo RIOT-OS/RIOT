@@ -27,6 +27,4 @@ void board_init(void)
     LED_PORT->DIRSET = (LED_MASK);
     LED_PORT->OUTSET = (LED_MASK);
 
-    /* initialize the CPU */
-    cpu_init();
 }

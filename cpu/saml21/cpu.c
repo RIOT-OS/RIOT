@@ -204,7 +204,7 @@ void cpu_pm_cb_leave(int deep)
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks
  */
-void cpu_init(void)
+void soc_init(void)
 {
     /* disable the watchdog timer */
     WDT->CTRLA.bit.ENABLE = 0;

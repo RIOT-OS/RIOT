@@ -194,7 +194,6 @@ void msp430_init_dco(void)
 
 void board_init(void)
 {
-    msp430_cpu_init();
     msb_ports_init();
 
     msp430_set_cpu_speed(CLOCK_CORECLOCK);

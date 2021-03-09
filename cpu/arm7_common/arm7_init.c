@@ -113,7 +113,7 @@ static inline void _init_data(void)
 
 void bootloader(void)
 {
-    extern void cpu_init(void);
+    extern void soc_init(void);
 
     /* initialize bss and data */
     _init_data();
@@ -125,7 +125,7 @@ void bootloader(void)
 #endif
 
     /* cpu specific setup of clocks, peripherals */
-    cpu_init();
+    soc_init();
 
 #if defined(MODULE_NEWLIB) || defined(MODULE_PICOLIBC)
     extern void __libc_init_array(void);

@@ -34,6 +34,7 @@
 #include "board.h"
 #include "periph/init.h"
 #include "panic.h"
+#include "irq.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -44,6 +45,10 @@
  * here doesn't hurt*/
 #define MCUSR MCUCSR
 #endif /* !MCUSR */
+
+#ifndef CPU_ATMEGA_CLK_SCALE_INIT
+#define CPU_ATMEGA_CLK_SCALE_INIT    CPU_ATMEGA_CLK_SCALE_DIV1
+#endif
 
 /*
 * Since atmega MCUs do not feature a software reset, the watchdog timer
@@ -79,8 +84,15 @@ void get_mcusr(void)
 #endif
 }
 
-void cpu_init(void)
+void soc_init(void)
 {
+    atmega_set_prescaler(CPU_ATMEGA_CLK_SCALE_INIT);
+
+#ifdef PRUSB
+    /* disable usb interrupt */
+    PRR1 |= 1<<PRUSB;
+#endif
+
     avr8_reset_cause();
 
     wdt_reset();   /* should not be nececessary as done in bootloader */
@@ -95,6 +107,8 @@ void cpu_init(void)
     /* rtc_init */
     /* hwrng_init */
     periph_init();
+
+    irq_enable();
 }
 
 struct __freelist {

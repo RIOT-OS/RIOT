@@ -29,6 +29,4 @@ void board_init(void)
     NRF_GPIO->DIRSET = (LED0_MASK | LED1_MASK | LED2_MASK);
     NRF_GPIO->OUTSET = (LED0_MASK | LED1_MASK | LED2_MASK);
 
-    /* initialize the CPU */
-    cpu_init();
 }

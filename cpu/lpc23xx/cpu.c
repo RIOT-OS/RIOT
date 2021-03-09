@@ -116,7 +116,7 @@ void arm_reset(void)
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks
  */
-void cpu_init(void)
+void soc_init(void)
 {
     extern void board_init(void);
 

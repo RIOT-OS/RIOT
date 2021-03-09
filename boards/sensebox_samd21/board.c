@@ -44,8 +44,6 @@ mtd_dev_t *mtd0 = (mtd_dev_t *)&sensebox_sd_dev;
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
 
     /* initialize the on-board red LED on pin PA27 */
     gpio_init(LED0_PIN, GPIO_OUT);

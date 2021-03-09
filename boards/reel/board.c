@@ -29,6 +29,4 @@ void board_init(void)
     NRF_P1->DIRSET = (LED_MASK_P1);
     NRF_P1->OUTSET = (LED_MASK_P1);
 
-    /* initialize the CPU */
-    cpu_init();
 }

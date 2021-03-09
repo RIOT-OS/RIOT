@@ -37,7 +37,7 @@ static bool ftpan_36(void);
 /**
  * @brief   Initialize the CPU, set IRQ priorities
  */
-void cpu_init(void)
+void soc_init(void)
 {
     /* Workaround for FTPAN-32
      * "DIF: Debug session automatically enables TracePort pins." */

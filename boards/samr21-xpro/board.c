@@ -47,6 +47,4 @@ void board_init(void)
     /* set default antenna switch configuration */
     board_antenna_config(RFCTL_ANTENNA_DEFAULT);
 
-    /* initialize the CPU */
-    cpu_init();
 }

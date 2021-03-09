@@ -25,8 +25,6 @@
 
 void board_init(void)
 {
-    /* initialize the CPU core */
-    cpu_init();
 
     /* initialize and turn off LEDs */
 #ifdef LED0_PIN

@@ -262,7 +262,7 @@ static void clk_init(void)
     }
 }
 
-void cpu_init(void)
+void soc_init(void)
 {
     /* disable the watchdog timer */
     WDT->CTRL.bit.ENABLE = 0;

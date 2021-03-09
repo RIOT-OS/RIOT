@@ -52,6 +52,4 @@ void board_init(void)
     LED_GREEN_OFF;
     gpio_init(LED_GREEN_PIN, GPIO_OUT);
 
-    /* initialize the CPU */
-    cpu_init();
 }

@@ -42,7 +42,7 @@ uint32_t SystemCoreClock = DEFAULT_SYSTEM_CLOCK;
 void SystemInit(void)
 {
     /* Do nothing here. The system initialization is done in board_init() and
-     * cpu_init() as needed. This function shouldn't be called anyway.
+     * soc_init() as needed. This function shouldn't be called anyway.
      */
 }
 

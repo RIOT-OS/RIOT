@@ -302,7 +302,7 @@ void cpu_pm_cb_leave(int deep)
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks
  */
-void cpu_init(void)
+void soc_init(void)
 {
     /* CPU starts with DFLL48 as clock source, so we must use the LDO */
     sam0_set_voltage_regulator(SAM0_VREG_LDO);

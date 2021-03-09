@@ -48,7 +48,7 @@
 /**
  * @brief Initialize the CPU, set IRQ priorities
  */
-void cpu_init(void)
+void soc_init(void)
 {
     /* disable the watchdog timer */
     WDT->WDT_MR |= WDT_MR_WDDIS;

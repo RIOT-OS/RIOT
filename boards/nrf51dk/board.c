@@ -39,6 +39,4 @@ void board_init(void)
     gpio_init(BTN2_PIN, BTN2_MODE);
     gpio_init(BTN3_PIN, BTN3_MODE);
 
-    /* initialize the CPU */
-    cpu_init();
 }

@@ -24,7 +24,7 @@
 /**
  * @brief Initialize the CPU, set IRQ priorities
  */
-void cpu_init(void)
+void soc_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();

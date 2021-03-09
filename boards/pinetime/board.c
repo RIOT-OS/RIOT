@@ -61,8 +61,6 @@ mtd_dev_t *mtd0 = (mtd_dev_t *)&pinetime_nor_dev;
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
 
     /* initialize pins */
     gpio_init(VCC33, GPIO_OUT);

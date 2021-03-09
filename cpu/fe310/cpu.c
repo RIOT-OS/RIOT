@@ -91,7 +91,7 @@ void flash_init(void)
 /**
  * @brief Initialize the CPU, set IRQ priorities, clocks, peripheral
  */
-void cpu_init(void)
+void soc_init(void)
 {
     /* Initialize clock */
     fe310_clock_init();

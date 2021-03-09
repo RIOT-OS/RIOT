@@ -32,7 +32,14 @@ extern "C" {
 /**
  * @brief   Initialization of the CPU
  */
-void cpu_init(void);
+void soc_init(void);
+
+/**
+ * @brief       Compatibility definition for out of tree boards.
+ *
+ * @deprecated  cpu_init() is called automatically now
+ */
+static inline void cpu_init(void) {}
 
 /**
  * @brief   Initialize rv32i specific core parts of the CPU

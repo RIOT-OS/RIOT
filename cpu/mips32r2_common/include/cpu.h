@@ -51,9 +51,11 @@ static inline void cpu_print_last_instruction(void)
 }
 
 /**
- * @brief Initialize the CPU, set IRQ priorities
+ * @brief       Compatibility definition for out of tree boards.
+ *
+ * @deprecated  cpu_init() is called automatically now
  */
-void cpu_init(void);
+static inline void cpu_init(void) {}
 
 /**
  * @brief   Trigger a conditional context scheduler run / context switch

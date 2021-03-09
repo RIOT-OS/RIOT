@@ -172,7 +172,10 @@ void reset_handler_default(void)
 
     post_startup();
 
-    /* initialize the board (which also initiates CPU initialization) */
+    /* initialize the CPU */
+    soc_init();
+
+    /* initialize the board */
     board_init();
 
 #if MODULE_NEWLIB || MODULE_PICOLIBC

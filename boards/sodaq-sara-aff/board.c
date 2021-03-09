@@ -49,6 +49,4 @@ void board_init(void)
     GPS_ENABLE_OFF;
     gpio_init(GPS_ENABLE_PIN, GPIO_OUT);
 
-    /* initialize the CPU */
-    cpu_init();
 }

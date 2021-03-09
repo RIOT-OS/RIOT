@@ -46,7 +46,8 @@ _start:
     call __libc_init_array
 
 
-    /* Initialize board and start kernel */
+    /* Initialize CPU, board and start kernel */
+    call soc_init
     call board_init
     call kernel_init
 

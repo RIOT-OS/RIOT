@@ -29,7 +29,7 @@ static void cpu_clock_init(void);
 /**
  * @brief Initialize the CPU
  */
-void cpu_init(void)
+void soc_init(void)
 {
     /* initialize the Cortex-M core */
     cortexm_init();

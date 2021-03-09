@@ -120,7 +120,14 @@ static inline void __attribute__((always_inline)) __exit_isr(void)
 /**
  * @brief   Initialize the cpu
  */
-void msp430_cpu_init(void);
+void msp430_soc_init(void);
+
+/**
+ * @brief       Compatibility definition for out of tree boards.
+ *
+ * @deprecated  cpu_init() is called automatically now
+ */
+static inline void msp430_cpu_init(void) {}
 
 /**
  * @brief   Print the last instruction's address

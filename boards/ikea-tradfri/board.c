@@ -56,8 +56,6 @@ mtd_dev_t *mtd0 = (mtd_dev_t *)&ikea_tradfri_nor_dev;
 
 void board_init(void)
 {
-    /* initialize the CPU */
-    cpu_init();
 
 #ifndef RIOTBOOT
     /* initialize the LEDs */

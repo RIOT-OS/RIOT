@@ -104,7 +104,7 @@ init_ports(void)
     P2IE = 0;
 }
 
-void msp430_cpu_init(void)
+void msp430_soc_init(void)
 {
     irq_disable();
     init_ports();

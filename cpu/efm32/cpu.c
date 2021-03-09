@@ -164,7 +164,7 @@ static void pm_init(void)
 
 #endif
 
-void cpu_init(void)
+void soc_init(void)
 {
 #ifndef RIOTBOOT
     /* apply errata that may be applicable (see em_chip.h) */
