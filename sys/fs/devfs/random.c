@@ -20,29 +20,6 @@
  */
 
 #include "vfs.h"
-
-#ifdef MODULE_DEVFS_HWRNG
-
-#include "periph/hwrng.h"
-
-static ssize_t hwrng_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes);
-
-const vfs_file_ops_t hwrng_vfs_ops = {
-    .read  = hwrng_vfs_read,
-};
-
-static ssize_t hwrng_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
-{
-    (void)filp;
-
-    hwrng_read(dest, nbytes);
-
-    return nbytes;
-}
-#endif /* MODULE_PERIPH_HWRNG */
-
-#ifdef MODULE_DEVFS_RANDOM
-
 #include "random.h"
 
 static ssize_t random_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes);
@@ -58,4 +35,3 @@ static ssize_t random_vfs_read(vfs_file_t *filp, void *dest, size_t nbytes)
 
     return nbytes;
 }
-#endif /* MODULE_RANDOM */
