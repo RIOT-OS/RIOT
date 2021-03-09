@@ -4,14 +4,9 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+menu "Network Layer"
 
-menu "Posix"
-    depends on TEST_KCONFIG
+rsource "ipv4/addr/Kconfig"
+rsource "ipv6/addr/Kconfig"
 
-config MODULE_POSIX_HEADERS
-    bool
-
-rsource "inet/Kconfig"
-rsource "sleep/Kconfig"
-
-endmenu # Posix
+endmenu # Network Layer

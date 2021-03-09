@@ -5,13 +5,6 @@
 # directory for more details.
 #
 
-menu "Posix"
-    depends on TEST_KCONFIG
-
-config MODULE_POSIX_HEADERS
-    bool
-
-rsource "inet/Kconfig"
-rsource "sleep/Kconfig"
-
-endmenu # Posix
+config MODULE_POSIX_INET
+    bool "POSIX Internet Support"
+    select MODULE_POSIX_HEADERS

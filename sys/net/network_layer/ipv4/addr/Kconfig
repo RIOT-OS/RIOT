@@ -5,13 +5,6 @@
 # directory for more details.
 #
 
-menu "Posix"
+config MODULE_IPV4_ADDR
+    bool "IPv4 address conversion"
     depends on TEST_KCONFIG
-
-config MODULE_POSIX_HEADERS
-    bool
-
-rsource "inet/Kconfig"
-rsource "sleep/Kconfig"
-
-endmenu # Posix
