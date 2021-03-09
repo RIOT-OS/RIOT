@@ -14,12 +14,17 @@
  */
 
 #include "kernel_defines.h"
+#include "congure/abe.h"
 #include "congure/reno.h"
 #include "net/gnrc/sixlowpan/config.h"
 
 #include "net/gnrc/sixlowpan/frag/sfr/congure.h"
 
+#if IS_USED(MODULE_CONGURE_ABE)
+typedef congure_abe_snd_t _sfr_congure_snd_t;
+#else
 typedef congure_reno_snd_t _sfr_congure_snd_t;
+#endif
 
 #define SFR_CONGURE_RENO_CONSTS { \
         .fr = _fr, \
@@ -36,14 +41,27 @@ static void _fr(congure_reno_snd_t *c);
 static bool _same_wnd_adv(congure_reno_snd_t *c, congure_snd_ack_t *ack);
 
 static _sfr_congure_snd_t _sfr_congures[CONFIG_GNRC_SIXLOWPAN_FRAG_FB_SIZE];
+#if IS_USED(MODULE_CONGURE_ABE)
+static const congure_abe_snd_consts_t _sfr_congure_abe_consts = {
+    .reno = SFR_CONGURE_RENO_CONSTS,
+    .abe_multiplier_numerator = CONFIG_CONGURE_ABE_MULTIPLIER_NUMERATOR_DEFAULT,
+    .abe_multiplier_denominator = CONFIG_CONGURE_ABE_MULTIPLIER_DENOMINATOR_DEFAULT,
+};
+#else
 static const congure_reno_snd_consts_t _sfr_congure_reno_consts = SFR_CONGURE_RENO_CONSTS;
+#endif
 
 congure_snd_t *gnrc_sixlowpan_frag_sfr_congure_snd_get(void)
 {
     for (unsigned i = 0; i < ARRAY_SIZE(_sfr_congures); i++) {
         if (_sfr_congures[i].super.driver == NULL) {
+#if IS_USED(MODULE_CONGURE_ABE)
+            congure_abe_snd_setup(&_sfr_congures[i],
+                                  &_sfr_congure_abe_consts);
+#else
             congure_reno_snd_setup(&_sfr_congures[i],
                                    &_sfr_congure_reno_consts);
+#endif
             return &_sfr_congures[i].super;
         }
     }
