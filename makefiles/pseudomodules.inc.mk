@@ -236,6 +236,11 @@ PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_stats
 ## @{
 ##
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure
+## @defgroup net_gnrc_sixlowpan_frag_sfr_congure_reno gnrc_sixlowpan_frag_sfr_congure_reno: TCP Reno
+## @brief  Congestion control for SFR using the [TCP Reno congestion control algorithm](@ref sys_congure_reno)
+## @{
+PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_reno
+## @}
 ## @defgroup net_gnrc_sixlowpan_frag_sfr_congure_quic gnrc_sixlowpan_frag_sfr_congure_quic: QUIC CC
 ## @brief  Congestion control for SFR using the [congestion control algorithm of QUIC](@ref sys_congure_quic)
 ## @{
