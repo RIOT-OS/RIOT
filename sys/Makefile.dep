@@ -79,6 +79,10 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter shell_lock,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter ssp,$(USEMODULE)))
   FEATURES_REQUIRED += ssp
 endif

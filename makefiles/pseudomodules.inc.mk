@@ -124,6 +124,7 @@ PSEUDOMODULES += scanf_float
 PSEUDOMODULES += sched_cb
 PSEUDOMODULES += semtech_loramac_rx
 PSEUDOMODULES += shell_hooks
+PSEUDOMODULES += shell_lock_auto_locking
 PSEUDOMODULES += slipdev_stdio
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_async
