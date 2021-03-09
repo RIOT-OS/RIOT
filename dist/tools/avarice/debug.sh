@@ -3,10 +3,10 @@
 # The setsid command is needed so that Ctrl+C in GDB doesn't kill avarice
 : ${SETSID:=setsid}
 
-if gdb-multiarch -v > /dev/null; then
-    GDB=gdb-multiarch
-elif avr-gdb -v > /dev/null; then
+if avr-gdb -v > /dev/null; then
     GDB=avr-gdb
+elif gdb-multiarch -v > /dev/null; then
+    GDB=gdb-multiarch
 else
     echo "Couldn't find multiarch GDB or AVR GDB. Check \$PATH."
     exit 1
