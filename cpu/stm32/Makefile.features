@@ -28,6 +28,7 @@ endif
 ifeq (f1,$(CPU_FAM))
   FEATURES_CONFLICT += periph_rtc:periph_rtt
   FEATURES_CONFLICT_MSG += "On the STM32F1, the RTC and RTT map to the same hardware peripheral."
+  FEATURES_PROVIDED += periph_rtt_set_counter
 endif
 
 # Not all F4 and L0 parts implement a RNG.

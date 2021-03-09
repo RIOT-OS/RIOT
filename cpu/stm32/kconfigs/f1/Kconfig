@@ -7,15 +7,16 @@
 
 config CPU_FAM_F1
     bool
-    select CPU_STM32
+    select CLOCK_HAS_NO_MCO_PRE
     select CPU_CORE_CORTEX_M3
+    select CPU_STM32
+    select HAS_BOOTLOADER_STM32
     select HAS_CPU_STM32F1
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
     select HAS_PERIPH_FLASHPAGE_RAW
+    select HAS_PERIPH_RTT_SET_COUNTER
     select HAS_PERIPH_WDT
-    select HAS_BOOTLOADER_STM32
-    select CLOCK_HAS_NO_MCO_PRE
 
 if CPU_FAM_F1
 

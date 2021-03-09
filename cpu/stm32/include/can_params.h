@@ -43,10 +43,12 @@ static const can_conf_t candev_conf[] = {
         .rcc_mask = RCC_APB1ENR1_CAN1EN,
 #else
         .rcc_mask = RCC_APB1ENR_CAN1EN,
+#if CANDEV_STM32_CHAN_NUMOF > 1
         .can_master = CAN1,
         .master_rcc_mask = RCC_APB1ENR_CAN1EN,
         .first_filter = 0,
         .nb_filters = 14,
+#endif
 #endif
 #if  defined(CPU_FAM_STM32F1)
         .rx_pin = GPIO_PIN(PORT_A, 11),
