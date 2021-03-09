@@ -98,4 +98,54 @@ config GNRC_SIXLOWPAN_SFR_DG_RETRIES
     int "The maximum number of retries from scratch for a particular datagram (MaxDatagramRetries)"
     default 0
 
+menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_NETIF
+    bool "Configure SFR ECN based on netif queue"
+    depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_NETIF
+
+if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_NETIF
+config GNRC_SIXLOWPAN_SFR_ECN_NETIF_NUM
+    int "The numerator for the factor for when to mark ECN on `netif` queue state"
+    default 1
+    help
+        When `gnrc_sixlowpan_frag_sfr_ecn_netif` is compiled in, nodes will set
+        the ECN bit of an RFRAG header when the input queue of the outgoing
+        `netif` is filled by
+        @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_NETIF_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_NETIF_DEN
+
+
+config GNRC_SIXLOWPAN_SFR_ECN_NETIF_DEN
+    int "The denominator for the factor for when to mark ECN on `netif` queue state"
+    default 2
+    help
+        When `gnrc_sixlowpan_frag_sfr_ecn_netif` is compiled in, nodes will set
+        the ECN bit of an RFRAG header when the input queue of the outgoing
+        `netif` is filled by
+        @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_NETIF_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_NETIF_DEN
+endif
+
+menuconfig KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_FQUEUE
+    bool "Configure SFR ECN based on SFR's frame queue"
+    depends on USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_FQUEUE
+
+if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_SFR_ECN_FQUEUE
+config GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM
+    int "The numerator for the factor for when to mark ECN on frame queue state"
+    default 1
+    help
+        When `gnrc_sixlowpan_frag_sfr_ecn_fqueue` is compiled in, nodes will set
+        the ECN bit of an RFRAG header when the input queue of the outgoing
+        `netif` is filled by
+        @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
+
+
+config GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
+    int "The denominator for the factor for when to mark ECN on frame queue state"
+    default 2
+    help
+        When `gnrc_sixlowpan_frag_sfr_ecn_fqueue` is compiled in, nodes will set
+        the ECN bit of an RFRAG header when the input queue of the outgoing
+        `netif` is filled by
+        @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
+endif
+
 endif
