@@ -60,6 +60,7 @@ PSEUDOMODULES += gnrc_sixlowpan_default
 PSEUDOMODULES += gnrc_sixlowpan_frag_hint
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_stats
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure
+PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_abe
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_reno
 PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_congure_sfr
 PSEUDOMODULES += gnrc_sixlowpan_iphc_nhc
