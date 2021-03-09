@@ -22,7 +22,7 @@ $ BOARD="<board>" make flash test
 It can also executed with pytest:
 
 ```console
-$ pytest tests/01-run.py
+$ PYTHONPATH=../../dist/pythonlibs BOARD="<board>" pytest tests/01-run.py
 ```
 
 Note that this only works from within the directory of the test, so if you are

@@ -15,6 +15,8 @@ from riotctrl.ctrl import RIOTCtrl
 from riotctrl.shell import ShellInteraction
 from riotctrl.shell.json import RapidJSONShellInteractionParser, rapidjson
 
+from riotctrl_shell.congure_test import CongureTest
+
 
 class TestCongUREBase(unittest.TestCase):
     DEBUG = False
@@ -475,6 +477,166 @@ class TestCongUREWithSetup(TestCongUREBase):
     def test_report_ecn_ce_success(self):
         time = 64352
         res = self.exec_cmd('cong_report ecn_ce {time}'.format(time=time))
+        self.assertIsNone(res['success'])
+        res = self.exec_cmd('state')
+        self.assertEqual(res['report_ecn_ce']['calls'], 1)
+        self.assertEqual(int(res['report_ecn_ce']['last_args']['c'],
+                             base=16),
+                         self.congure_state_ptr)
+        self.assertEqual(res['report_ecn_ce']['last_args']['time'],
+                         time)
+
+
+class TestCongUREWithCongureTestSI(TestCongUREBase):
+    @classmethod
+    def setUpClass(cls):
+        super(cls, cls).setUpClass()
+        cls.shell = CongureTest(cls.ctrl)
+
+    def call_method(self, method, *args, timeout=-1, async_=False, **kwargs):
+        res = getattr(self.shell, method)(*args,
+                                          timeout=timeout, async_=async_,
+                                          **kwargs)
+        self.logger.debug(repr(res))
+        if res.strip():
+            return self.json_parser.parse(res)
+        return None
+
+    def setUp(self):
+        super().setUp()
+        res = self.call_method('setup')
+        self.congure_state_ptr = int(res['success'], base=16)
+
+    def tearDown(self):
+        res = self.call_method('msgs_reset')
+        self.assertIn('success', res)
+
+    def test_init_success(self):
+        ctx = 0x12345
+        res = self.call_method('init', ctx=ctx)
+        self.assertIsNone(res['success'])
+        res = self.exec_cmd('state')
+        self.assertEqual(res['init']['calls'], 1)
+        self.assertEqual(int(res['init']['last_args']['c'], base=16),
+                         self.congure_state_ptr)
+        self.assertEqual(int(res['init']['last_args']['ctx'], base=16),
+                         ctx)
+
+    def test_inter_msg_interval_success(self):
+        msg_size = 521
+        res = self.call_method('inter_msg_interval', msg_size=msg_size)
+        assert res == {'success': -1}
+        res = self.exec_cmd('state')
+        self.assertEqual(res['inter_msg_interval']['calls'], 1)
+        self.assertEqual(int(res['inter_msg_interval']['last_args']['c'],
+                             base=16),
+                         self.congure_state_ptr)
+        self.assertEqual(res['inter_msg_interval']['last_args']['msg_size'],
+                         msg_size)
+
+    def test_report_unknown_command(self):
+        res = self.call_method('report', 'foobar')
+        self.assertEqual(res, {'error': 'Unknown command `foobar`'})
+
+    def test_report_msg_sent_success(self):
+        msg_size = 1234
+        res = self.call_method('report_msg_sent', msg_size=msg_size)
+        self.assertIsNone(res['success'])
+        res = self.exec_cmd('state')
+        self.assertEqual(res['report_msg_sent']['calls'], 1)
+        self.assertEqual(int(res['report_msg_sent']['last_args']['c'],
+                             base=16),
+                         self.congure_state_ptr)
+        self.assertEqual(res['report_msg_sent']['last_args']['msg_size'],
+                         msg_size)
+
+    def test_report_msg_discarded_success(self):
+        msg_size = 1234
+        res = self.call_method('report_msg_discarded', msg_size=msg_size)
+        self.assertIsNone(res['success'])
+        res = self.exec_cmd('state')
+        self.assertEqual(res['report_msg_discarded']['calls'], 1)
+        self.assertEqual(int(res['report_msg_discarded']['last_args']['c'],
+                             base=16),
+                         self.congure_state_ptr)
+        self.assertEqual(res['report_msg_discarded']['last_args']['msg_size'],
+                         msg_size)
+
+    def _report_msgs_timeout_lost_base_success(self, cmd):
+        msgs = [{'send_time': 76543, 'size': 1234, 'resends': 2},
+                {'send_time': 5432, 'size': 987, 'resends': 32}]
+        for msg in msgs:
+            res = self.call_method('add_msg', **msg)
+        res = self.call_method('report_{}_base'.format(cmd))
+        self.assertIsNone(res['success'])
+        res = self.exec_cmd('state')
+        self.assertEqual(res['report_{}'.format(cmd)]['calls'], 1)
+        self.assertEqual(int(res['report_{}'.format(cmd)]['last_args']['c'],
+                             base=16),
+                         self.congure_state_ptr)
+        self.assertEqual(res['report_{}'.format(cmd)]['last_args']['msgs'],
+                         msgs)
+
+    def _report_msgs_timeout_lost_success(self, cmd):
+        msgs = [{'send_time': 76543, 'size': 1234, 'resends': 2},
+                {'send_time': 5432, 'size': 987, 'resends': 32}]
+        res = self.call_method('report_{}'.format(cmd), msgs=msgs)
+        self.assertIsNone(res['success'])
+        res = self.exec_cmd('state')
+        self.assertEqual(res['report_{}'.format(cmd)]['calls'], 1)
+        self.assertEqual(int(res['report_{}'.format(cmd)]['last_args']['c'],
+                             base=16),
+                         self.congure_state_ptr)
+        self.assertEqual(res['report_{}'.format(cmd)]['last_args']['msgs'],
+                         msgs)
+
+    def test_report_msgs_timeout_base_success(self):
+        self._report_msgs_timeout_lost_base_success('msgs_timeout')
+
+    def test_report_msgs_lost_base_success(self):
+        self._report_msgs_timeout_lost_base_success('msgs_lost')
+
+    def test_report_msgs_timeout_success(self):
+        self._report_msgs_timeout_lost_success('msgs_timeout')
+
+    def test_report_msgs_lost_success(self):
+        self._report_msgs_timeout_lost_success('msgs_lost')
+
+    def test_report_msg_acked_base_success(self):
+        msg = {'send_time': 2862350241, 'size': 14679, 'resends': 0}
+        ack = {'recv_time': 2862350405, 'id': 1197554483, 'size': 14667,
+               'clean': 1, 'wnd': 17440, 'delay': 33325}
+        res = self.call_method('add_msg', **msg)
+        self.assertIn('success', res)
+        res = self.call_method(
+            'report_msg_acked_base',
+            **{'ack_{}'.format(k): v for k, v in ack.items()})
+        self.assertIsNone(res['success'])
+        res = self.exec_cmd('state')
+        self.assertEqual(res['report_msg_acked']['calls'], 1)
+        self.assertEqual(int(res['report_msg_acked']['last_args']['c'],
+                             base=16),
+                         self.congure_state_ptr)
+        self.assertEqual(res['report_msg_acked']['last_args']['msg'], msg)
+        self.assertEqual(res['report_msg_acked']['last_args']['ack'], ack)
+
+    def test_report_msg_acked_success(self):
+        msg = {'send_time': 2862350241, 'size': 14679, 'resends': 0}
+        ack = {'recv_time': 2862350405, 'id': 1197554483, 'size': 14667,
+               'clean': 1, 'wnd': 17440, 'delay': 33325}
+        res = self.call_method('report_msg_acked', msg=msg, ack=ack)
+        self.assertIsNone(res['success'])
+        res = self.exec_cmd('state')
+        self.assertEqual(res['report_msg_acked']['calls'], 1)
+        self.assertEqual(int(res['report_msg_acked']['last_args']['c'],
+                             base=16),
+                         self.congure_state_ptr)
+        self.assertEqual(res['report_msg_acked']['last_args']['msg'], msg)
+        self.assertEqual(res['report_msg_acked']['last_args']['ack'], ack)
+
+    def test_report_ecn_ce_success(self):
+        time = 64352
+        res = self.call_method('report_ecn_ce', time=time)
         self.assertIsNone(res['success'])
         res = self.exec_cmd('state')
         self.assertEqual(res['report_ecn_ce']['calls'], 1)
