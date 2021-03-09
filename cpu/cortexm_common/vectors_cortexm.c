@@ -37,6 +37,9 @@
 #ifdef MODULE_PUF_SRAM
 #include "puf_sram.h"
 #endif
+#ifdef MODULE_DBGPIN
+#include "dbgpin.h"
+#endif
 
 #ifndef SRAM_BASE
 #define SRAM_BASE 0
@@ -171,6 +174,10 @@ void reset_handler_default(void)
 #endif
 
     post_startup();
+
+#ifdef MODULE_DBGPIN
+    dbgpin_init();
+#endif
 
     /* initialize the board (which also initiates CPU initialization) */
     board_init();

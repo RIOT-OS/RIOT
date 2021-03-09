@@ -1126,4 +1126,9 @@ ifneq (,$(filter ecc_%,$(USEMODULE)))
   USEMODULE += ecc
 endif
 
+ifneq (,$(filter dbgpin,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += dbgpin
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep

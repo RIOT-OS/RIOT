@@ -30,6 +30,9 @@
 #ifdef MODULE_PUF_SRAM
 #include "puf_sram.h"
 #endif
+#ifdef MODULE_DBGPIN
+#include "dbgpin.h"
+#endif
 
 /**
  * @brief functions for initializing the board, std-lib and kernel
@@ -73,6 +76,11 @@ __attribute__((used)) void reset_handler(void)
 #ifdef MODULE_PUF_SRAM
     puf_sram_init((uint8_t *)RAMEND-SEED_RAM_LEN, SEED_RAM_LEN);
 #endif
+
+#ifdef MODULE_DBGPIN
+    dbgpin_init();
+#endif
+
     /* initialize the board and startup the kernel */
     board_init();
     /* startup the kernel */

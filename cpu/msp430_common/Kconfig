@@ -10,6 +10,7 @@ config CPU_ARCH_MSP430
     bool
     select HAS_ARCH_16BIT
     select HAS_ARCH_MSP430
+    select HAS_DBGPIN
     select HAS_PERIPH_FLASHPAGE
     select HAS_PERIPH_FLASHPAGE_PAGEWISE
     select HAS_NEWLIB

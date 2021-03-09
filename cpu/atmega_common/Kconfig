@@ -9,6 +9,7 @@ config CPU_COMMON_ATMEGA
     select CPU_CORE_AVR
     select HAS_ATMEGA_PCINT0
     select HAS_CPP
+    select HAS_DBGPIN
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_EEPROM
     select HAS_PERIPH_GPIO
