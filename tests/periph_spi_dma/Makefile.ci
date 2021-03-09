@@ -2,4 +2,5 @@
 # this test.
 include ../periph_spi/Makefile.ci
 BOARD_INSUFFICIENT_MEMORY += \
+    samd10-xmini \
     #

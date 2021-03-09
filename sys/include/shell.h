@@ -24,6 +24,7 @@
 #include "periph/pm.h"
 
 #include "kernel_defines.h"
+#include "xfa.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -195,6 +196,37 @@ static inline void shell_run(const shell_command_t *commands,
 {
     shell_run_forever(commands, line_buf, len);
 }
+
+/**
+ * @brief   Define shell command
+ *
+ * This macro is a helper for defining a shell command and adding it to the
+ * shell commands XFA (cross file array).
+ *
+ * Shell commands added using this macros will be sorted *after* builtins and
+ * commands passed via parameter to `shell_run_once()`. If a command with the
+ * same name exists in any of those, they will make a command added via this
+ * macro inaccassible.
+ *
+ * Commands added with this macro will be sorted alphanumerically by `name`.
+ *
+ * @experimental This should be considered experimental API, subject to change
+ *               without notice!
+ *
+ * Example:
+ *
+ * ```.c
+ * #include "shell.h"
+ * static int _my_command(int argc, char **argv) {
+ *   // ...
+ * }
+ * SHELL_COMMAND(my_command, "my command help text", _my_command);
+ * ```
+ */
+#define SHELL_COMMAND(name, help, func) \
+    XFA_USE_CONST(shell_command_t*, shell_commands_xfa); \
+    static const shell_command_t _xfa_ ## name ## _cmd = { #name, help, &func }; \
+    XFA_ADD_PTR(shell_commands_xfa, name, name, &_xfa_ ## name ## _cmd)
 
 #ifdef __cplusplus
 }
