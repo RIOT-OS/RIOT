@@ -20,10 +20,14 @@ USEMODULE += netstats_rpl
 ifeq (,$(CONGURE_IMPL))
   USEMODULE += gnrc_sixlowpan_frag_sfr_congure_sfr
 else
+ifeq (congure_reno,$(CONGURE_IMPL))
+  USEMODULE += gnrc_sixlowpan_frag_sfr_congure_reno
+else
 ifeq (congure_sfr,$(CONGURE_IMPL))
   USEMODULE += gnrc_sixlowpan_frag_sfr_congure_sfr
 else
   $(error "Unknown CongURE implementation `$(CONGURE_IMPL)`")
+endif
 endif
 endif
 
