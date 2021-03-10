@@ -288,6 +288,7 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
     sock->udp_sock = udp_sock;
     sock->buffer.data = NULL;
     sock->psk_hint[0] = '\0';
+    sock->client_psk_cb = NULL;
 #ifdef SOCK_HAS_ASYNC
     sock->async_cb = NULL;
     sock->buf_ctx = NULL;
@@ -365,6 +366,12 @@ size_t sock_dtls_get_credentials(sock_dtls_t *sock, const credman_tag_t **out)
 
     *out = sock->tags;
     return sock->tags_len;
+}
+
+void sock_dtls_set_client_psk_cb(sock_dtls_t *sock, sock_dtls_client_psk_cb_t cb)
+{
+    assert(sock);
+    sock->client_psk_cb = cb;
 }
 
 sock_udp_t *sock_dtls_get_udp_sock(sock_dtls_t *sock)

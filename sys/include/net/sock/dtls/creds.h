@@ -47,6 +47,23 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief Pre-Shared Key client callback. Called during handshake to determine session credential.
+ *
+ * @param[in] sock      DTLS sock object
+ * @param[in] ep        Remove UDP endpoint representing the session
+ * @param[in] tags      List of credential tags available for @p sock
+ * @param[in] tags_len  Number of credentials in @p tags
+ * @param[in] hint      Hint sent by the server. May be NULL
+ * @param[in] hint_len  Length of @p hint
+ *
+ * @return Tag of the credential to use when a suitable one is found
+ * @retval CREDMAN_TAG_EMPTY otherwise
+ */
+typedef credman_tag_t (*sock_dtls_client_psk_cb_t)(sock_dtls_t *sock, sock_udp_ep_t *ep,
+                                                   credman_tag_t tags[], unsigned tags_len,
+                                                   const char* hint, size_t hint_len);
+
+/**
  * @brief Sets the PSK Identity hint to be sent to clients during handshake.
  *
  * This hint is optional. It helps clients to decide which PSK Identity to use.
@@ -94,6 +111,15 @@ int sock_dtls_remove_credential(sock_dtls_t *sock, credman_tag_t tag);
  * @return Number of registered credentials
  */
 size_t sock_dtls_get_credentials(sock_dtls_t *sock, const credman_tag_t **out);
+
+/**
+ * @brief Sets the callback function for clients to specify a credential to use
+ *        for a given connection.
+ *
+ * @param[in] sock      The DTLS sock object to set the callback to.
+ * @param[in] cb        Callback to set.
+ */
+void sock_dtls_set_client_psk_cb(sock_dtls_t *sock, sock_dtls_client_psk_cb_t cb);
 
 #ifdef __cplusplus
 }
