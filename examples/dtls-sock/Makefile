@@ -24,6 +24,9 @@ USEPKG += tinydtls
 USEMODULE += sock_dtls
 USEMODULE += sock_udp
 
+# extra utilities for endpoint printing
+USEMODULE += sock_util
+
 # tinydtls needs crypto secure PRNG
 USEMODULE += prng_sha1prng
 
