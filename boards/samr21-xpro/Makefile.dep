@@ -9,3 +9,6 @@ endif
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
+
+# board only has a single network interface
+DEFAULT_MODULE += netdev_single
