@@ -36,6 +36,7 @@ extern "C" {
 static const timer_conf_t timer_config[] = {
     {
         .dev            = (void *)&TCC1,
+        .pwr            = PWR_RED_REG(PWR_PORT_C, PR_TC1_bm),
         .type           = TC_TYPE_1,
         .int_lvl        = { CPU_INT_LVL_LOW,
                             CPU_INT_LVL_OFF,
@@ -44,6 +45,7 @@ static const timer_conf_t timer_config[] = {
     },
     {
         .dev            = (void *)&TCC0,
+        .pwr            = PWR_RED_REG(PWR_PORT_C, PR_TC0_bm),
         .type           = TC_TYPE_0,
         .int_lvl        = { CPU_INT_LVL_LOW,
                             CPU_INT_LVL_LOW,
@@ -69,6 +71,7 @@ static const timer_conf_t timer_config[] = {
 static const uart_conf_t uart_config[] = {
     {   /* CDC-ACM */
         .dev            = &USARTE0,
+        .pwr            = PWR_RED_REG(PWR_PORT_E, PR_USART0_bm),
         .rx_pin         = GPIO_PIN(PORT_E, 2),
         .tx_pin         = GPIO_PIN(PORT_E, 3),
 #ifdef MODULE_PERIPH_UART_HW_FC
