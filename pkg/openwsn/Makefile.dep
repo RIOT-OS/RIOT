@@ -49,7 +49,9 @@ ifneq (,$(filter openwsn_crypto,$(USEMODULE)))
 endif
 
 ifneq (,$(filter openwsn_radio,$(USEMODULE)))
+  # enable default network devices on the platform
   USEMODULE += netdev_default
+  USEMODULE += netdev
   USEMODULE += luid
   ifneq (,$(filter cc2538_rf nrf802154,$(USEMODULE)))
     USEMODULE += openwsn_radio_hal
@@ -60,7 +62,6 @@ ifneq (,$(filter openwsn_radio,$(USEMODULE)))
 endif
 
 ifneq (,$(filter openwsn_radio_hal,$(USEMODULE)))
-  USEMODULE += ieee802154_radio_hal
   # Used here only for dependency resolution
   DISABLE_MODULE += auto_init_gnrc_netif
 endif

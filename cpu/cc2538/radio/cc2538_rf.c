@@ -136,7 +136,7 @@ void cc2538_init(void)
     RFCORE_XREG_FIFOPCTRL = CC2538_RF_MAX_DATA_LEN;
 
     /* Set default IRQ */
-    if (IS_USED(MODULE_IEEE802154_RADIO_HAL)) {
+    if (!IS_USED(MODULE_CC2538_RF_NETDEV_LEGACY)) {
         RFCORE_XREG_RFIRQM1 = TXDONE | CSP_STOP | TXACKDONE;
         RFCORE_XREG_RFIRQM0 = RXPKTDONE | FIFOP | SFD;
     } else {
@@ -212,7 +212,7 @@ bool cc2538_on(void)
 
 void cc2538_setup(cc2538_rf_t *dev)
 {
-#if IS_USED(MODULE_IEEE802154_RADIO_HAL)
+#if !IS_USED(MODULE_CC2538_RF_NETDEV_LEGACY)
     (void) dev;
 #if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
     extern ieee802154_dev_t cc2538_rf_dev;

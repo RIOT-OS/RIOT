@@ -105,6 +105,29 @@ endif
 the dependency block for your board *before* its dependencies pull in their own
 dependencies.
 
+#### Default configurations
+As explained in @ref default-configurations "Default Configurations", there are
+two pseudomodules that are used to indicate that certain drivers of devices
+present in the platform should be enabled. Each board (or CPU) has knowledge as
+to which drivers should be enabled in each case.
+
+The previous code snippet shows how a board which has a @ref drivers_sx127x
+device, pulls in its driver when the default network interfaces are required.
+
+When the pseudomodule `saul_default` is enabled, the board should pull in all
+the drivers of the devices it has which provide a @ref drivers_saul interface. This is
+usually done as following:
+
+```mk
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+  USEMODULE += apds9960
+  USEMODULE += bmp280_i2c
+  USEMODULE += lis3mdl
+  USEMODULE += sht3x
+endif
+```
+
 ### Makefile.features                                       {#makefile-features}
 
 This file defines all the features provided by the BOARD. These features

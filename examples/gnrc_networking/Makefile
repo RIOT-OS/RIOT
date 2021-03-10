@@ -37,9 +37,6 @@ USEMODULE += netstats_rpl
 # USEMODULE += sock_dns              # include DNS client
 # USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
 
-# Uncomment this to enable legacy support of netdev for IEEE 802.15.4 radios.
-# USEMODULE += netdev_ieee802154_legacy
-
 # Comment this out to disable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
 # development process:

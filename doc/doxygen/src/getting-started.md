@@ -153,6 +153,18 @@ For instructions on how to configure via `CFLAGS` check the
 @ref config "identified compile-time configurations". To learn how to use
 Kconfig in RIOT, please refer to the @ref kconfig-users-guide.
 
+Default configurations                                 {#default-configurations}
+----------------------
+When devices have a common access interface, having a default configuration to
+enable them across platforms, without having to explicitly specify which modules
+to include, comes in handy. For this, two pseudomodules are defined:
+
+- `saul_default`: will enable all the drivers of sensors and actuators that are
+present in the target platform.
+
+- `netdev_default`: will enable all the drivers of network devices
+present in the target platform.
+
 Use Docker to build RIOT                           {#docker}
 ========================
 [Docker](https://www.docker.com/) is a platform that allows packaging software into containers that can easily be run on any Linux that has Docker installed.
