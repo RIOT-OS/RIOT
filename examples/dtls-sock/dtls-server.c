@@ -107,13 +107,13 @@ void *dtls_server_wrapper(void *arg)
         return NULL;
     }
 
+    sock_dtls_session_t session = { 0 };
     while (active) {
         if ((msg_try_receive(&msg) == 1) &&
             (msg.type == DTLS_STOP_SERVER_MSG)){
             active = false;
         }
         else {
-            sock_dtls_session_t session = { 0 };
             res = sock_dtls_recv(&sock, &session, rcv, sizeof(rcv),
                                   10 * US_PER_SEC);
             if (res >= 0) {
@@ -129,9 +129,9 @@ void *dtls_server_wrapper(void *arg)
             }
         }
     }
+    puts("Terminating");
     sock_dtls_close(&sock);
     sock_udp_close(&udp_sock);
-    puts("Terminating");
     msg_reply(&msg, &msg);              /* Basic answer to the main thread */
     return NULL;
 }
