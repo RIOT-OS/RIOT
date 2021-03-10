@@ -293,8 +293,12 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
     sock->buf_ctx = NULL;
     memset(&sock->async_cb_session, 0, sizeof(sock->async_cb_session));
 #endif /* SOCK_HAS_ASYNC */
+
+    memset(sock->tags, CREDMAN_TAG_EMPTY, CONFIG_DTLS_CREDENTIALS_MAX * sizeof(credman_tag_t));
+    sock->tags_len = 1;
+    sock->tags[0] = tag;
+
     sock->role = role;
-    sock->tag = tag;
     sock->dtls_ctx = dtls_new_context(sock);
     if (!sock->dtls_ctx) {
         DEBUG("sock_dtls: error getting DTLS context\n");
@@ -314,6 +318,53 @@ int sock_dtls_set_server_psk_id_hint(sock_dtls_t *sock, const char *hint)
     }
     strcpy(sock->psk_hint, hint);
     return 0;
+}
+
+int sock_dtls_add_credential(sock_dtls_t *sock, credman_tag_t tag)
+{
+    assert(sock);
+    if (sock->tags_len < CONFIG_DTLS_CREDENTIALS_MAX) {
+        DEBUG("sock_dtls: credential added in position %d\n", sock->tags_len);
+        sock->tags[sock->tags_len] = tag;
+        sock->tags_len++;
+        return 0;
+    }
+    DEBUG("sock_dtls: could not add new credential\n");
+    return -1;
+}
+
+int sock_dtls_remove_credential(sock_dtls_t *sock, credman_tag_t tag)
+{
+    assert(sock);
+    int pos = -1;
+    for (unsigned i = 0; i < sock->tags_len; i++) {
+        if (sock->tags[i] == tag) {
+            pos = i;
+            DEBUG("sock_dtls: found credential to remove in position %i\n", pos);
+            break;
+        }
+    }
+
+    if (pos >= 0) {
+        sock->tags_len--;
+        for (; (unsigned)pos < sock->tags_len; pos++) {
+            sock->tags[pos] = sock->tags[pos + 1];
+        }
+        return 0;
+    }
+    else {
+        DEBUG("sock_dtls: could not find credential to remove\n");
+        return -1;
+    }
+}
+
+size_t sock_dtls_get_credentials(sock_dtls_t *sock, const credman_tag_t **out)
+{
+    assert(sock);
+    assert(out);
+
+    *out = sock->tags;
+    return sock->tags_len;
 }
 
 sock_udp_t *sock_dtls_get_udp_sock(sock_dtls_t *sock)

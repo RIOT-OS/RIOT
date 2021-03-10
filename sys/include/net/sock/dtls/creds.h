@@ -37,6 +37,13 @@ extern "C" {
 #ifndef CONFIG_DTLS_PSK_ID_HINT_MAX_SIZE
 #define CONFIG_DTLS_PSK_ID_HINT_MAX_SIZE    32
 #endif
+
+/**
+ * @brief   Default buffer size for TLS credential tags
+ */
+#ifndef CONFIG_DTLS_CREDENTIALS_MAX
+#define CONFIG_DTLS_CREDENTIALS_MAX     4
+#endif
 /** @} */
 
 /**
@@ -51,6 +58,42 @@ extern "C" {
  * @retval -1 on error
  */
 int sock_dtls_set_server_psk_id_hint(sock_dtls_t *sock, const char *hint);
+
+/**
+ * @brief Adds a credential tag to list of available credentials for @p sock.
+ *
+ * @pre sock != NULL
+ *
+ * @param[in] sock      DTLS sock object
+ * @param[in] tag       Tag of the credential to add
+ *
+ * @retval 0 on success
+ * @retval -1 otherwise
+ */
+int sock_dtls_add_credential(sock_dtls_t *sock, credman_tag_t tag);
+
+/**
+ * @brief Removes a credential tag of the list of available credentials for @p sock.
+ *
+ * @pre sock != NULL
+ *
+ * @param[in] sock      DTLS sock object
+ * @param[in] tag       Tag of the credential to remove
+ *
+ * @retval 0 on success
+ * @retval -1 otherwise
+ */
+int sock_dtls_remove_credential(sock_dtls_t *sock, credman_tag_t tag);
+
+/**
+ * @brief Returns an array of tags of the registered credentials in @p sock.
+ *
+ * @param[in]  sock      DTLS sock object
+ * @param[out] out       Pointer to place the reference to a read-only array of @ref credman_tag_t
+ *
+ * @return Number of registered credentials
+ */
+size_t sock_dtls_get_credentials(sock_dtls_t *sock, const credman_tag_t **out);
 
 #ifdef __cplusplus
 }

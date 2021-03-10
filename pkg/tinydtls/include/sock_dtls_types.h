@@ -75,9 +75,9 @@ struct sock_dtls {
         size_t datalen;                     /**< data length */
         session_t *session;                 /**< Session information */
     } buffer;
-    credman_tag_t tag;                      /**< Credential tag of a registered
-                                                (D)TLS credential */
     char psk_hint[CONFIG_DTLS_PSK_ID_HINT_MAX_SIZE]; /**< PSK Identity hint */
+    credman_tag_t tags[CONFIG_DTLS_CREDENTIALS_MAX]; /**< Tags of the available credentials */
+    unsigned tags_len;                      /**< Number of tags in the list 'tags' */
     dtls_peer_type role;                    /**< DTLS role of the socket */
 };
 
