@@ -289,6 +289,7 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
     sock->buffer.data = NULL;
     sock->psk_hint[0] = '\0';
     sock->client_psk_cb = NULL;
+    sock->rpk_cb = NULL;
 #ifdef SOCK_HAS_ASYNC
     sock->async_cb = NULL;
     sock->buf_ctx = NULL;
@@ -372,6 +373,12 @@ void sock_dtls_set_client_psk_cb(sock_dtls_t *sock, sock_dtls_client_psk_cb_t cb
 {
     assert(sock);
     sock->client_psk_cb = cb;
+}
+
+void sock_dtls_set_rpk_cb(sock_dtls_t *sock, sock_dtls_rpk_cb_t cb)
+{
+    assert(sock);
+    sock->rpk_cb = cb;
 }
 
 sock_udp_t *sock_dtls_get_udp_sock(sock_dtls_t *sock)

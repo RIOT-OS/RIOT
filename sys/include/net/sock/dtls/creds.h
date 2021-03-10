@@ -64,6 +64,20 @@ typedef credman_tag_t (*sock_dtls_client_psk_cb_t)(sock_dtls_t *sock, sock_udp_e
                                                    const char* hint, size_t hint_len);
 
 /**
+ * @brief Raw Public Key callback. Called during handshake to determine the session credential.
+ *
+ * @param[in] sock      DTLS sock object
+ * @param[in] ep        Remote UDP endpoint representing the session
+ * @param[in] tags      List of credential tags available for @p sock
+ * @param[in] tags_len  Number of credentials in @p tags
+ *
+ * @return Tag of the credential to use when a suitable one is found
+ * @retval CREDMAN_TAG_EMPTY otherwise
+ */
+typedef credman_tag_t (*sock_dtls_rpk_cb_t)(sock_dtls_t *sock, sock_udp_ep_t *ep,
+                                            credman_tag_t tags[], unsigned tags_len);
+
+/**
  * @brief Sets the PSK Identity hint to be sent to clients during handshake.
  *
  * This hint is optional. It helps clients to decide which PSK Identity to use.
@@ -120,6 +134,15 @@ size_t sock_dtls_get_credentials(sock_dtls_t *sock, const credman_tag_t **out);
  * @param[in] cb        Callback to set.
  */
 void sock_dtls_set_client_psk_cb(sock_dtls_t *sock, sock_dtls_client_psk_cb_t cb);
+
+/**
+ * @brief Sets the callback function to specify a credential to use for a given connection,
+ *        when using Raw Public Keys.
+ *
+ * @param[in] sock      The DTLS sock object to set the callback to.
+ * @param[in] cb        Callback to set.
+ */
+void sock_dtls_set_rpk_cb(sock_dtls_t *sock, sock_dtls_rpk_cb_t cb);
 
 #ifdef __cplusplus
 }

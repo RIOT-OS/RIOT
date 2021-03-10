@@ -80,6 +80,7 @@ struct sock_dtls {
     unsigned tags_len;                      /**< Number of tags in the list 'tags' */
     dtls_peer_type role;                    /**< DTLS role of the socket */
     sock_dtls_client_psk_cb_t client_psk_cb;/**< Callback to determine PSK credential for session */
+    sock_dtls_rpk_cb_t rpk_cb;              /**< Callback to determine RPK credential for session */
 };
 
 /**
