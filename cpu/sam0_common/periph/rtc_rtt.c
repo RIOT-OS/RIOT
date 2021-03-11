@@ -374,6 +374,16 @@ void rtc_tamper_enable(void)
     DEBUG("tamper enabled\n");
 }
 
+uint8_t rtc_get_tamper_event(void)
+{
+    uint32_t ret = RTC->MODE0.TAMPID.reg;
+
+    /* clear tamper event */
+    RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_TAMPER;
+    RTC->MODE0.TAMPID.reg  = ret;
+
+    return ret & RTC_TAMPID_TAMPID_Msk;
+}
 #endif /* RTC_NUM_OF_TAMPERS */
 
 void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
