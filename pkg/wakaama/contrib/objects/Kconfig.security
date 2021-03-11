@@ -1,0 +1,26 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "Security object"
+
+config LWM2M_OBJ_SECURITY_INSTANCES_MAX
+    int "Maximum number of instances of the Security object"
+    default 2
+
+config LWM2M_OBJ_SECURITY_PUB_KEY_ID_BUFSIZE
+    int "Buffer size of the public key or ID resource"
+    default 128
+
+config LWM2M_OBJ_SECURITY_SERVER_PUB_KEY_BUFSIZE
+    int "Buffer size of the server public key resource"
+    default 128
+
+config LWM2M_OBJ_SECURITY_SEC_KEY_BUFSIZE
+    int "Buffer size of the secret key resource"
+    default 64
+
+endmenu # Security object
