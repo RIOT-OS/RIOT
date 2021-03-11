@@ -100,7 +100,7 @@ static int netdev_get_max_pdu_size(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
     const uint16_t pdu_size_ethernet = 1500;
-    const uint16_t pdu_size_6lo = 32;
+    const uint16_t pdu_size_6lo = 96;
     assert(max_len == sizeof(uint16_t));
     if (IS_USED(MODULE_NETDEV_IEEE802154)) {
         memcpy(value, &pdu_size_6lo, sizeof(pdu_size_6lo));
@@ -181,6 +181,10 @@ int main(void)
 
     if (IS_USED(MODULE_NETDEV_IEEE802154)) {
         puts("IEEE 802.15.4 mode (TEST_6LO=1), sending 2 6LoWPAN fragments");
+        if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)) {
+            puts("Note: Selective Fragment Recovery is enabled. Due to retransmissions\n"
+                 "      of the last fragment, more than 2 transmissions might occur.");
+        }
     }
     else {
         puts("Ethernet mode (TEST_6LO=0), sending 1 IPv6 packet");
@@ -205,8 +209,8 @@ int main(void)
                                       IPV6_ADDR_MCAST_SCP_LINK_LOCAL);
     expect(sock_udp_create(&sock, &local, NULL, 0) == 0);
     /* With 6LoWPAN, This test message needs exactly two fragments to be transmitted due
-     * to the maximum L2 PDU of 32 bytes */
-    static const char test_msg[33] = { 'T', 'e', 's', 't' };
+     * to the maximum L2 PDU of 96 bytes */
+    static const char test_msg[97] = "Test";
     /* with gnrc_tx_sync, we expect sock_udp_send() to block until transmission is done */
     expect(sock_udp_send(&sock, test_msg, sizeof(test_msg), &remote) > 0);
     /* the virtual netdev device increments sends_completed for each frame carrying the test
@@ -215,7 +219,12 @@ int main(void)
     int sends = atomic_load(&sends_completed);
     int sends_expected = (IS_USED(MODULE_NETDEV_IEEE802154)) ? 2 : 1;
     printf("transmissions expected = %d, transmissions completed = %d\n", sends_expected, sends);
-    expect(sends == sends_expected);
+    if (IS_USED(MODULE_GNRC_SIXLOWPAN_FRAG_SFR)) {
+        expect(sends >= sends_expected);
+    }
+    else {
+        expect(sends == sends_expected);
+    }
 
     puts("TEST PASSED");
 

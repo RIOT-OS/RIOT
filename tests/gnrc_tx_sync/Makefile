@@ -1,10 +1,14 @@
 include ../Makefile.tests_common
 
 TEST_6LO ?= 1
+TEST_FRAG_SFR ?= 1
 
 ifeq (1,$(TEST_6LO))
   USEMODULE += gnrc_sixlowpan_default
   USEMODULE += netdev_ieee802154
+  ifeq (1,$(TEST_FRAG_SFR))
+    USEMODULE += gnrc_sixlowpan_frag_sfr
+  endif
 else
   USEMODULE += gnrc_ipv6_default
   USEMODULE += netdev_eth
