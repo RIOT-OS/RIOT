@@ -318,6 +318,7 @@ typedef enum {
     NETDEV_ESP_NOW,
     NETDEV_NRF24L01P_NG,
     NETDEV_SOCKET_ZEP,
+    NETDEV_SX126X,
     /* add more if needed */
 } netdev_type_t;
 /** @} */
