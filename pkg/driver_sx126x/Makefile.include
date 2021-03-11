@@ -1,0 +1,3 @@
+INCLUDES += -I$(PKGDIRBASE)/driver_sx126x/src
+
+DIRS += $(RIOTBASE)/pkg/driver_sx126x/contrib
