@@ -24,32 +24,12 @@
 #include "lwm2m_client_config.h"
 #include "lwm2m_client_objects.h"
 
-/* These functions are defined by the objects (object_security.c and
- * object_server.c are implemented by the Wakaama package. device.c can be
- * found in 'contrib/objects') */
-lwm2m_object_t *get_security_object(int server_id, const char *server_uri,
-                                    char *bs_psk_id, char *psk,
-                                    uint16_t psk_len, bool is_bootstrap);
+/* These functions are defined by the objects (object_server.c is implemented by
+ * the Wakaama package. security.c and device.c can be found in
+ * 'contrib/objects') */
 lwm2m_object_t *get_server_object(int server_id, const char *binding,
                                   int lifetime, bool storing);
 lwm2m_object_t *lwm2m_get_object_device(void);
-
-lwm2m_object_t *lwm2m_client_get_security_object(
-                        lwm2m_client_data_t *client_data)
-{
-    (void)client_data;
-    lwm2m_object_t *ret;
-    char *server_uri = CONFIG_LWM2M_SERVER_URI;
-    int server_id = CONFIG_LWM2M_SERVER_ID;
-    uint16_t psk_len = -1;
-    char *psk_buffer = NULL;
-    char *psk_id = NULL;
-
-    ret = get_security_object(server_id, server_uri, psk_id, psk_buffer,
-                              psk_len, IS_ACTIVE(CONFIG_LWM2M_BOOTSTRAP));
-
-    return ret;
-}
 
 lwm2m_object_t *lwm2m_client_get_server_object(
                         lwm2m_client_data_t *client_data)

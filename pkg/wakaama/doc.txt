@@ -1,7 +1,9 @@
 /**
- * @defgroup pkg_wakaama  Wakaama LwM2M implementation
+ * @defgroup pkg_wakaama  LwM2M - Lightweight Machine to Machine
  * @ingroup  pkg
  * @ingroup  net
- * @brief    Provides the Wakaama implementation of LwM2M
+ * @brief    LwM2M implementation based on the Wakaama package
  * @see      https://github.com/eclipse/wakaama
+ *
+ * For a list of the supported objects see @ref lwm2m_objects.
  */

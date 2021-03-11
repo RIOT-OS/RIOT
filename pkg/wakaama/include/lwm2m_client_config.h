@@ -73,23 +73,6 @@ extern "C" {
 #endif
 
 /**
- * @brief LwM2M server URI to register/bootstrap with
- *
- * @note The host part of the URI MUST be a valid IPv6 address. Host names can
- * not be resolved at this time.
- */
-#ifndef CONFIG_LWM2M_SERVER_URI
-#define CONFIG_LWM2M_SERVER_URI "coap://[fd00:dead:beef::1]"
-#endif
-
-/**
- * @brief Numeric ID of CONFIG_LWM2M_SERVER_URI
- */
-#ifndef CONFIG_LWM2M_SERVER_ID
-#define CONFIG_LWM2M_SERVER_ID 10
-#endif
-
-/**
  * @brief Alternate path to place LwM2M resources
  */
 #ifndef CONFIG_LWM2M_ALT_PATH
@@ -97,7 +80,7 @@ extern "C" {
 #endif
 
 /**
- * @brief Define to 1 to specify that @ref CONFIG_LWM2M_SERVER_URI is a bootstrap server
+ * @brief Define to 1 to add bootstrap server support
  *
  * To define just add it to your `CFLAGS` in your application's Makefile:
  *
@@ -232,6 +215,20 @@ extern "C" {
 #define CONFIG_LWM2M_DEVICE_BINDINGS "UQS"
 #else
 #define CONFIG_LWM2M_DEVICE_BINDINGS "U"
+#endif
+
+/**
+ * @brief Number to use as base for assigning tags to @ref net_credman credentials.
+ */
+#ifndef CONFIG_LWM2M_CREDMAN_TAG_BASE
+#define CONFIG_LWM2M_CREDMAN_TAG_BASE   (10U)
+#endif
+
+/**
+ * @brief Maximum length of an URI allowed.
+ */
+#ifndef CONFIG_LWM2M_URI_MAX_SIZE
+#define CONFIG_LWM2M_URI_MAX_SIZE       64
 #endif
 
 #ifdef __cplusplus

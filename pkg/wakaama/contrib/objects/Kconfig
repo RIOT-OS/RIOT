@@ -6,3 +6,4 @@
 #
 
 rsource "Kconfig.light_control"
+rsource "Kconfig.security"

@@ -8,8 +8,9 @@ USEMODULE += uri_parser
 # folder, by adding 'wakaama_objects_<objectName>' modules
 USEMODULE += wakaama_objects
 
-# include the 'device' object implementation (mandatory)
+# include mandatory objects
 USEMODULE += wakaama_objects_device
+USEMODULE += wakaama_objects_security
 
 USEMODULE += ztimer
 USEMODULE += ztimer_sec
