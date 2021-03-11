@@ -75,6 +75,16 @@ exec_uncrustify () {
                            DIFF="--- $DIFFFILE\n+++ $DIFFFILE"
                        fi
                        DIFFLINE="$(echo "$line" | sed 's/@@ -\([0-9]\+\).*$/\1/')"
+                       # Parse
+                       # @@ -<DIFFLINE>,<DIFFOFFSET> ...
+                       DIFFOFFSET="$(echo "$line" |
+                           sed 's/@@ -[0-9]\+\(,\([0-9]\+\)\)\?.*$/\2/')"
+                       if [ -n "$DIFFOFFSET" ]; then
+                           # if there is a DIFFOFFSET, add it to
+                           # DIFFLINE. DIFFLINE starts at 1, so we
+                           # need to subtract 1 to not overshoot.
+                           DIFFLINE=$(( DIFFLINE + DIFFOFFSET - 1 ))
+                       fi
                     fi
                     DIFF="$DIFF\n${line//\\/\\\\}"
                 fi
