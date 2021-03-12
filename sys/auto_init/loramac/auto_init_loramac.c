@@ -18,12 +18,19 @@
  */
 
 #include "log.h"
+#include "sx127x.h"
+#include "sx127x_netdev.h"
+#include "sx127x_params.h"
 #include "semtech_loramac.h"
 
 semtech_loramac_t loramac;
+static sx127x_t sx127x;
 
 void auto_init_loramac(void)
 {
+    sx127x_setup(&sx127x, &sx127x_params[0], 0);
+    loramac.netdev = (netdev_t *)&sx127x;
+    loramac.netdev->driver = &sx127x_driver;
     semtech_loramac_init(&loramac);
 }
 /** @} */
