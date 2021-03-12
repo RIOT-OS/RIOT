@@ -19,19 +19,20 @@
  * @}
  */
 
+#include <assert.h>
+
+#include "ztimer.h"
+
+#include "net/netopt.h"
 #include "net/lora.h"
 #include "net/netdev.h"
-
-#include "sx127x.h"
-#include "sx127x_internal.h"
-#include "sx127x_netdev.h"
 
 #include "radio/radio.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-extern sx127x_t sx127x;
+extern netdev_t *loramac_netdev_ptr;
 
 /*
  * Radio driver functions implementation wrappers, the netdev2 object
@@ -40,7 +41,8 @@ extern sx127x_t sx127x;
 void SX127XInit(RadioEvents_t *events)
 {
     (void) events;
-    if (sx127x_init(&sx127x) < 0) {
+    assert(loramac_netdev_ptr);
+    if (loramac_netdev_ptr->driver->init(loramac_netdev_ptr) < 0) {
         DEBUG("[semtech-loramac] radio: failed to initialize radio\n");
     }
 
@@ -49,30 +51,49 @@ void SX127XInit(RadioEvents_t *events)
 
 RadioState_t SX127XGetStatus(void)
 {
-    return (RadioState_t)sx127x_get_state(&sx127x);
+    netopt_state_t state;
+    loramac_netdev_ptr->driver->get(loramac_netdev_ptr, NETOPT_STATE, &state, sizeof(netopt_state_t));
+    switch (state) {
+    case NETOPT_STATE_RX:
+    case NETOPT_STATE_IDLE:
+        return RF_RX_RUNNING;
+    case NETOPT_STATE_TX:
+        return RF_TX_RUNNING;
+    default:
+        return RF_IDLE;
+    }
 }
 
 void SX127XSetModem(RadioModems_t modem)
 {
-    sx127x_set_modem(&sx127x, (uint8_t)modem);
+    (void)modem;
+    uint16_t modem_val = NETDEV_TYPE_LORA;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_DEVICE_TYPE, &modem_val, sizeof(uint16_t));
 }
 
 void SX127XSetChannel(uint32_t freq)
 {
-    sx127x_set_channel(&sx127x, freq);
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_CHANNEL_FREQUENCY, &freq, sizeof(uint32_t));
 }
 
 bool SX127XIsChannelFree(RadioModems_t modem, uint32_t freq,
                          int16_t rssiThresh, uint32_t maxCarrierSenseTime )
 {
-    (void) modem;
     (void) maxCarrierSenseTime;
-    return sx127x_is_channel_free(&sx127x, freq, rssiThresh);
+    Radio.SetChannel(freq);
+    netopt_state_t state = NETOPT_STATE_IDLE;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_STATE, &state, sizeof(netopt_state_t));
+    ztimer_sleep(ZTIMER_MSEC, 1); /* wait 1 millisecond */
+    int16_t rssi = Radio.Rssi(modem);
+    Radio.Sleep();
+    return (rssi <= rssiThresh);
 }
 
 uint32_t SX127XRandom(void)
 {
-    return sx127x_random(&sx127x);
+    uint32_t random;
+    loramac_netdev_ptr->driver->get(loramac_netdev_ptr, NETOPT_RANDOM, &random, sizeof(uint32_t));
+    return random;
 }
 
 void SX127XSetRxConfig(RadioModems_t modem, uint32_t bandwidth,
@@ -83,21 +104,28 @@ void SX127XSetRxConfig(RadioModems_t modem, uint32_t bandwidth,
                        bool crcOn, bool freqHopOn, uint8_t hopPeriod,
                        bool iqInverted, bool rxContinuous)
 {
-    (void) bandwidthAfc;
-    (void) fixLen;
-    sx127x_set_modem(&sx127x, modem);
-    sx127x_set_bandwidth(&sx127x, bandwidth);
-    sx127x_set_spreading_factor(&sx127x, spreading_factor);
-    sx127x_set_coding_rate(&sx127x, coding_rate);
-    sx127x_set_preamble_length(&sx127x, preambleLen);
-    sx127x_set_fixed_header_len_mode(&sx127x, false);
-    sx127x_set_payload_length(&sx127x, payloadLen);
-    sx127x_set_crc(&sx127x, crcOn);
-    sx127x_set_freq_hop(&sx127x, freqHopOn);
-    sx127x_set_hop_period(&sx127x, hopPeriod);
-    sx127x_set_iq_invert(&sx127x, iqInverted);
-    sx127x_set_symbol_timeout(&sx127x, symbTimeout);
-    sx127x_set_rx_single(&sx127x, !rxContinuous);
+    (void)bandwidthAfc;
+    (void)fixLen;
+    (void)modem;
+    uint16_t modem_val = NETDEV_TYPE_LORA;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_DEVICE_TYPE, &modem_val, sizeof(uint16_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_BANDWIDTH, &bandwidth, sizeof(uint8_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_CODING_RATE, &coding_rate, sizeof(uint8_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_SPREADING_FACTOR, &spreading_factor, sizeof(uint8_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_PREAMBLE_LENGTH, &preambleLen, sizeof(uint16_t));
+    netopt_enable_t fixed_header = NETOPT_DISABLE;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_FIXED_HEADER, &fixed_header, sizeof(netopt_enable_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_PDU_SIZE, &payloadLen, sizeof(uint8_t));
+    netopt_enable_t enable_crc = (crcOn) ? NETOPT_ENABLE : NETOPT_DISABLE;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_INTEGRITY_CHECK, &enable_crc, sizeof(netopt_enable_t));
+    netopt_enable_t enable_freq_hop = (freqHopOn) ? NETOPT_ENABLE : NETOPT_DISABLE;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_CHANNEL_HOP, &enable_freq_hop, sizeof(netopt_enable_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_CHANNEL_HOP_PERIOD, &hopPeriod, sizeof(uint8_t));
+    netopt_enable_t iq_inverted = (iqInverted) ? NETOPT_ENABLE : NETOPT_DISABLE;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_IQ_INVERT, &iq_inverted, sizeof(netopt_enable_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_RX_SYMBOL_TIMEOUT, &symbTimeout, sizeof(uint16_t));
+    netopt_enable_t single_rx = rxContinuous ? NETOPT_DISABLE : NETOPT_ENABLE;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_SINGLE_RECEIVE, &single_rx, sizeof(netopt_enable_t));
 }
 
 void SX127XSetTxConfig(RadioModems_t modem, int8_t power, uint32_t fdev,
@@ -106,92 +134,103 @@ void SX127XSetTxConfig(RadioModems_t modem, int8_t power, uint32_t fdev,
                        bool fixLen, bool crcOn, bool freqHopOn,
                        uint8_t hopPeriod, bool iqInverted, uint32_t timeout)
 {
-    (void) fdev;
-    (void) fixLen;
-    sx127x_set_modem(&sx127x, modem);
-    sx127x_set_freq_hop(&sx127x, freqHopOn);
-    sx127x_set_bandwidth(&sx127x, bandwidth);
-    sx127x_set_coding_rate(&sx127x, coding_rate);
-    sx127x_set_spreading_factor(&sx127x, spreading_factor);
-    sx127x_set_crc(&sx127x, crcOn);
-    sx127x_set_freq_hop(&sx127x, freqHopOn);
-    sx127x_set_hop_period(&sx127x, hopPeriod);
-    sx127x_set_fixed_header_len_mode(&sx127x, false);
-    sx127x_set_iq_invert(&sx127x, iqInverted);
-    sx127x_set_payload_length(&sx127x, 0);
-    sx127x_set_tx_power(&sx127x, power);
-    sx127x_set_preamble_length(&sx127x, preambleLen);
-    sx127x_set_rx_single(&sx127x, false);
-    sx127x_set_tx_timeout(&sx127x, timeout); /* base unit ms, LoRaMAC ms */
+    (void)fdev;
+    (void)fixLen;
+    (void)modem;
+    uint16_t modem_val = NETDEV_TYPE_LORA;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_DEVICE_TYPE, &modem_val, sizeof(uint16_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_BANDWIDTH, &bandwidth, sizeof(uint8_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_CODING_RATE, &coding_rate, sizeof(uint8_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_SPREADING_FACTOR, &spreading_factor, sizeof(uint8_t));
+    netopt_enable_t enable_crc = (crcOn) ? NETOPT_ENABLE : NETOPT_DISABLE;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_INTEGRITY_CHECK, &enable_crc, sizeof(netopt_enable_t));
+    netopt_enable_t enable_freq_hop = (freqHopOn) ? NETOPT_ENABLE : NETOPT_DISABLE;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_CHANNEL_HOP, &enable_freq_hop, sizeof(netopt_enable_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_CHANNEL_HOP_PERIOD, &hopPeriod, sizeof(uint8_t));
+    netopt_enable_t fixed_header = NETOPT_DISABLE;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_FIXED_HEADER, &fixed_header, sizeof(netopt_enable_t));
+    netopt_enable_t iq_inverted = (iqInverted) ? NETOPT_ENABLE : NETOPT_DISABLE;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_IQ_INVERT, &iq_inverted, sizeof(netopt_enable_t));
+    int16_t power_val = power;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_TX_POWER, &power_val, sizeof(int16_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_PREAMBLE_LENGTH, &preambleLen, sizeof(uint16_t));
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_TX_TIMEOUT, &timeout, sizeof(uint32_t)); /* base unit ms, LoRaMAC ms */
 }
 
 uint32_t SX127XTimeOnAir(RadioModems_t modem, uint8_t pktLen)
 {
     (void) modem;
-    return sx127x_get_time_on_air(&sx127x, pktLen);
+    (void) pktLen;
+    return 0;
 }
 
 void SX127XSend(uint8_t *buffer, uint8_t size)
 {
-    netdev_t *dev = (netdev_t *)&sx127x;
-    iolist_t iol = {
-        .iol_base = buffer,
-        .iol_len = size
-    };
-    dev->driver->send(dev, &iol);
+    iolist_t iol = { .iol_base = buffer, .iol_len = size };
+    loramac_netdev_ptr->driver->send(loramac_netdev_ptr, &iol);
 }
 
 void SX127XSleep(void)
 {
-    sx127x_set_sleep(&sx127x);
+    netopt_state_t state = NETOPT_STATE_SLEEP;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_STATE, &state, sizeof(netopt_state_t));
 }
 
 void SX127XStandby(void)
 {
-    sx127x_set_standby(&sx127x);
+    netopt_state_t state = NETOPT_STATE_STANDBY;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_STATE, &state, sizeof(netopt_state_t));
 }
 
 void SX127XRx(uint32_t timeout)
 {
-    sx127x_set_rx_timeout(&sx127x, timeout);
-    sx127x_set_rx(&sx127x);
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_RX_TIMEOUT, &timeout, sizeof(uint32_t));
+    netopt_state_t state = NETOPT_STATE_RX;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_STATE, &state, sizeof(netopt_state_t));
 }
 
 void SX127XStartCad(void)
 {
-    sx127x_start_cad(&sx127x);
 }
 
 int16_t SX127XRssi(RadioModems_t modem)
 {
-    sx127x_set_modem(&sx127x, (uint8_t)modem);
-    return sx127x_read_rssi(&sx127x);
+    (void)modem;
+    int8_t rssi;
+    loramac_netdev_ptr->driver->get(loramac_netdev_ptr, NETOPT_RSSI, &rssi, sizeof(int8_t));
+    return rssi;
 }
 
 void SX127XWrite(uint16_t addr, uint8_t data)
 {
-    sx127x_reg_write(&sx127x, addr, data);
+    (void)addr;
+    (void)data;
 }
 
 uint8_t SX127XRead(uint16_t addr)
 {
-    return sx127x_reg_read(&sx127x, addr);
+    (void)addr;
+    return 0;
 }
 
 void SX127XWriteBuffer(uint16_t addr, uint8_t *buffer, uint8_t size)
 {
-    sx127x_reg_write_burst(&sx127x, addr, buffer, size);
+    (void)addr;
+    (void)buffer;
+    (void)size;
 }
 
 void SX127XReadBuffer(uint16_t addr, uint8_t *buffer, uint8_t size)
 {
-    sx127x_reg_read_burst(&sx127x, addr, buffer, size);
+    (void)addr;
+    (void)buffer;
+    (void)size;
 }
 
 void SX127XSetMaxPayloadLength(RadioModems_t modem, uint8_t max)
 {
     (void) modem;
-    sx127x_set_max_payload_len(&sx127x, max);
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_MAX_PDU_SIZE, &max, sizeof(uint8_t));
 }
 
 bool SX127XCheckRfFrequency(uint32_t frequency)
@@ -211,14 +250,8 @@ void SX127XSetTxContinuousWave(uint32_t freq, int8_t power, uint16_t time)
 
 void SX127XSetPublicNetwork(bool enable)
 {
-    if (enable) {
-        /* Use public network syncword */
-        sx127x_set_syncword(&sx127x, LORA_SYNCWORD_PUBLIC);
-    }
-    else {
-        /* Use private network syncword */
-        sx127x_set_syncword(&sx127x, LORA_SYNCWORD_PRIVATE);
-    }
+    uint8_t syncword = (enable) ? LORA_SYNCWORD_PUBLIC : LORA_SYNCWORD_PRIVATE;
+    loramac_netdev_ptr->driver->set(loramac_netdev_ptr, NETOPT_SYNCWORD, &syncword, sizeof(uint8_t));
 }
 
 uint32_t SX127XGetWakeupTime(void)

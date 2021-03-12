@@ -35,10 +35,6 @@
 #include "net/netdev/lora.h"
 #include "net/loramac.h"
 
-#include "sx127x.h"
-#include "sx127x_params.h"
-#include "sx127x_netdev.h"
-
 #include "semtech_loramac.h"
 #include "LoRaMac.h"
 #include "LoRaMacTest.h"
@@ -51,17 +47,19 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#define LORAMAC_RX_BUFFER_SIZE                      (256U)
 #define SEMTECH_LORAMAC_MSG_QUEUE                   (4U)
 #define SEMTECH_LORAMAC_LORAMAC_STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
 static msg_t _semtech_loramac_msg_queue[SEMTECH_LORAMAC_MSG_QUEUE];
 static char _semtech_loramac_stack[SEMTECH_LORAMAC_LORAMAC_STACKSIZE];
 kernel_pid_t semtech_loramac_pid;
 
-sx127x_t sx127x;
 RadioEvents_t semtech_loramac_radio_events;
 LoRaMacPrimitives_t semtech_loramac_primitives;
 LoRaMacCallback_t semtech_loramac_callbacks;
 extern LoRaMacParams_t LoRaMacParams;
+
+netdev_t *loramac_netdev_ptr = 0;
 
 typedef struct {
     uint8_t *payload;
@@ -543,7 +541,7 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
             int len;
             len = dev->driver->recv(dev, NULL, 0, 0);
             if (len > 0) {
-                uint8_t radio_payload[SX127X_RX_BUFFER_SIZE];
+                uint8_t radio_payload[LORAMAC_RX_BUFFER_SIZE];
                 dev->driver->recv(dev, radio_payload, len, &packet_info);
                 semtech_loramac_radio_events.RxDone(radio_payload,
                                                     len, packet_info.rssi,
@@ -831,9 +829,8 @@ void *_semtech_loramac_event_loop(void *arg)
 
 int semtech_loramac_init(semtech_loramac_t *mac)
 {
-    sx127x_setup(&sx127x, &sx127x_params[0], 0);
-    sx127x.netdev.driver = &sx127x_driver;
-    sx127x.netdev.event_callback = _semtech_loramac_event_cb;
+    loramac_netdev_ptr = mac->netdev;
+    mac->netdev->event_callback = _semtech_loramac_event_cb;
 
     semtech_loramac_pid = thread_create(_semtech_loramac_stack,
                                         sizeof(_semtech_loramac_stack),
