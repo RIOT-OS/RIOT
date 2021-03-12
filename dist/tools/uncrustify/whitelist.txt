@@ -10,5 +10,9 @@ sys/riotboot/.*\.h
 sys/riotboot/.*\.c
 sys/congure.*\.c
 sys/include/congure.*\.h
+sys/test_utils/result_output/.*\c
+sys/test_utils/result_output/*/.*\c
+sys/test_utils/result_output/*/.*\h
+sys/test_utils/include/result_output.h
 sys/ztimer/.*\.c
 sys/include/ztimer.*\.h
