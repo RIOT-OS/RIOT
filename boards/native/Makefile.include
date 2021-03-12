@@ -21,7 +21,9 @@ export GPROF ?= gprof
 
 # basic cflags:
 CFLAGS += -Wall -Wextra -pedantic $(CFLAGS_DBG) $(CFLAGS_OPT)
+CFLAGS += -U_FORTIFY_SOURCE
 CFLAGS_DBG ?= -g3
+
 ifneq (,$(filter backtrace,$(USEMODULE)))
   $(warning module backtrace is used, do not omit frame pointers)
   CFLAGS_OPT ?= -Og -fno-omit-frame-pointer
