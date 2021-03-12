@@ -17,6 +17,6 @@ CFLAGS += -I$(PKG_SOURCE_DIR)/src
 CFLAGS += -Wno-pedantic
 
 all:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/driver/source -f $(RIOTBASE)/Makefile.base MODULE=driver_atwinc15x0
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/common/source -f $(RIOTBASE)/Makefile.base MODULE=driver_atwinc15x0_common
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/spi_flash/source -f $(RIOTBASE)/Makefile.base MODULE=driver_atwinc15x0_spi_flash
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/driver/source -f $(RIOTBASE)/Makefile.base MODULE=driver_atwinc15x0
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/common/source -f $(RIOTBASE)/Makefile.base MODULE=driver_atwinc15x0_common
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/spi_flash/source -f $(RIOTBASE)/Makefile.base MODULE=driver_atwinc15x0_spi_flash

@@ -57,4 +57,4 @@ OPENWSN_PATH_crosslayers    = openstack/cross-layers
 all: $(OPENWSN_MODULES)
 
 openwsn_%:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/$(OPENWSN_PATH_$*) -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/$(OPENWSN_PATH_$*) -f $(RIOTBASE)/Makefile.base MODULE=$@

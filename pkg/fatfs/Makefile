@@ -10,4 +10,4 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -Wno-overflow
 
 all:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/source -f $(RIOTBASE)/Makefile.base MODULE=fatfs
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/source -f $(RIOTBASE)/Makefile.base MODULE=fatfs

@@ -23,4 +23,4 @@ ifneq (,$(filter llvm,$(TOOLCHAIN)))
 endif
 
 all:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/hw/drivers/uwb/uwb_dw1000/src -f $(RIOTPKG)/uwb-dw1000/uwb-dw1000.mk MODULE=uwb-dw1000
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/hw/drivers/uwb/uwb_dw1000/src -f $(RIOTPKG)/uwb-dw1000/uwb-dw1000.mk MODULE=uwb-dw1000

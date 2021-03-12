@@ -17,4 +17,4 @@ ifneq ($(DEVELHELP),1)
 endif
 
 all:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base

@@ -32,65 +32,65 @@ all: $(SUBMODS)
 
 # blue code and RIOT port modules
 nimble_riot_contrib:
-	"$(MAKE)" -C $(TDIR)/contrib/
+	$(QQ)"$(MAKE)" -C $(TDIR)/contrib/
 
 nimble_porting_nimble:
-	"$(MAKE)" -C $(PDIR)/porting/nimble/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/porting/nimble/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_npl_riot:
-	"$(MAKE)" -C $(PDIR)/porting/npl/riot/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/porting/npl/riot/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 # host modules
 nimble_host:
-	"$(MAKE)" -C $(PDIR)/nimble/host/src/ -f $(TDIR)/nimble.host.mk
+	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/host/src/ -f $(TDIR)/nimble.host.mk
 
 nimble_host_util:
-	"$(MAKE)" -C $(PDIR)/nimble/host/util/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/host/util/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_host_store_ram:
-	"$(MAKE)" -C $(PDIR)/nimble/host/store/ram/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/host/store/ram/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_tinycrypt:
-	"$(MAKE)" -C $(PDIR)/ext/tinycrypt/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/ext/tinycrypt/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 # service implementations
 nimble_svc_gap:
-	"$(MAKE)" -C $(PDIR)/nimble/host/services/gap/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/host/services/gap/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_svc_gatt:
-	"$(MAKE)" -C $(PDIR)/nimble/host/services/gatt/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/host/services/gatt/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_svc_ipss:
-	"$(MAKE)" -C $(PDIR)/nimble/host/services/ipss/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/host/services/ipss/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 # controller specific modules
 nimble_transport_ram:
-	"$(MAKE)" -C $(PDIR)/nimble/transport/ram/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/transport/ram/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_controller:
-	"$(MAKE)" -C $(PDIR)/nimble/controller/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/controller/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 nimble_drivers_nrf5x:
-	"$(MAKE)" -C $(PDIR)/nimble/drivers/$(CPU_FAM)/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PDIR)/nimble/drivers/$(CPU_FAM)/src/ -f $(RIOTBASE)/Makefile.base MODULE=$@
 
 # additional, RIOT specific nimble modules
 nimble_addr:
-	"$(MAKE)" -C $(TDIR)/addr/
+	$(QQ)"$(MAKE)" -C $(TDIR)/addr/
 
 nimble_autoadv:
-	"$(MAKE)" -C $(TDIR)/autoadv
+	$(QQ)"$(MAKE)" -C $(TDIR)/autoadv
 
 nimble_autoconn:
-	"$(MAKE)" -C $(TDIR)/autoconn
+	$(QQ)"$(MAKE)" -C $(TDIR)/autoconn
 
 nimble_netif:
-	"$(MAKE)" -C $(TDIR)/netif/
+	$(QQ)"$(MAKE)" -C $(TDIR)/netif/
 
 nimble_scanlist:
-	"$(MAKE)" -C $(TDIR)/scanlist
+	$(QQ)"$(MAKE)" -C $(TDIR)/scanlist
 
 nimble_scanner:
-	"$(MAKE)" -C $(TDIR)/scanner
+	$(QQ)"$(MAKE)" -C $(TDIR)/scanner
 
 nimble_statconn:
-	"$(MAKE)" -C $(TDIR)/statconn
+	$(QQ)"$(MAKE)" -C $(TDIR)/statconn

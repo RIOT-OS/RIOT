@@ -39,10 +39,10 @@ $(TOOLCHAIN_FILE): git-download
 	$(RIOTTOOLS)/cmake/generate-xcompile-toolchain.sh > $(TOOLCHAIN_FILE)
 
 build_tests:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/test -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/jwt -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_jwt
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/tng -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_tng
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/atcacert -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_atcacert
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/test -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/jwt -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_jwt
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/tng -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_tng
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/test/atcacert -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_TEST_NAME)_atcacert
 
 git-download: | ..cmake_version_supported
 
