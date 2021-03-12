@@ -1084,6 +1084,10 @@ ifneq (,$(filter suit_%,$(USEMODULE)))
   USEMODULE += suit
 endif
 
+ifneq (,$(filter test_utils_result_output_%,$(USEMODULE)))
+  USEMODULE += test_utils_result_output
+endif
+
 # include ztimer dependencies
 ifneq (,$(filter ztimer% %ztimer,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer/Makefile.dep

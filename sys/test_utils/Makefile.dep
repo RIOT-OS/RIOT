@@ -1,3 +1,6 @@
 ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
   USEMODULE += stdin
 endif
+ifneq (,$(filter test_utils_result_output_%,$(USEMODULE)))
+  USEMODULE += fmt
+endif
