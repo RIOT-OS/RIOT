@@ -40,6 +40,10 @@
 #include "LoRaMacTest.h"
 #include "region/Region.h"
 
+#if IS_USED(MODULE_SX127X)
+#include "sx127x.h"
+#endif
+
 #ifdef MODULE_PERIPH_EEPROM
 #include "periph/eeprom.h"
 #endif
@@ -561,6 +565,7 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
             semtech_loramac_radio_events.RxError();
             break;
 
+#if IS_USED(MODULE_SX127X)
         case NETDEV_EVENT_FHSS_CHANGE_CHANNEL:
             DEBUG("[semtech-loramac] FHSS channel change\n");
             if(semtech_loramac_radio_events.FhssChangeChannel) {
@@ -576,6 +581,7 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
                             (sx127x_t *)dev)->_internal.is_last_cad_success);
             }
             break;
+#endif
 
         default:
             DEBUG("[semtech-loramac] unexpected netdev event received: %d\n",
