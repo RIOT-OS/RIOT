@@ -520,11 +520,13 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
             break;
 
         case NETDEV_EVENT_TX_COMPLETE:
-            sx127x_set_sleep((sx127x_t *)dev);
+        {
+            netopt_state_t sleep_state = NETOPT_STATE_SLEEP;
+            dev->driver->set(dev, NETOPT_STATE, &sleep_state, sizeof(netopt_state_t));
             semtech_loramac_radio_events.TxDone();
             DEBUG("[semtech-loramac] Transmission completed\n");
             break;
-
+        }
         case NETDEV_EVENT_TX_TIMEOUT:
             msg.type = MSG_TYPE_TX_TIMEOUT;
             if (msg_send(&msg, semtech_loramac_pid) <= 0) {
