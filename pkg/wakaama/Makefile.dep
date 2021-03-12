@@ -2,6 +2,7 @@ USEMODULE += wakaama_core wakaama_core_coap13 wakaama_client
 
 # include contrib code (platform adaption and client implementation)
 USEMODULE += wakaama_contrib
+USEMODULE += uri_parser
 
 # this allows us to include our own objects, implemented in the 'objects'
 # folder, by adding 'wakaama_objects_<objectName>' modules
