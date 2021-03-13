@@ -26,8 +26,12 @@
 #include "net/netopt.h"
 #include "net/lora.h"
 #include "net/netdev.h"
+#include "net/loramac.h"
 
+#include "LoRaMac.h"
 #include "radio/radio.h"
+
+#include "sx127x.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -160,8 +164,13 @@ void SX127XSetTxConfig(RadioModems_t modem, int8_t power, uint32_t fdev,
 uint32_t SX127XTimeOnAir(RadioModems_t modem, uint8_t pktLen)
 {
     (void) modem;
-    (void) pktLen;
-    return 0;
+    uint8_t cr;
+    loramac_netdev_ptr->driver->get(loramac_netdev_ptr, NETOPT_CODING_RATE, &cr, sizeof(uint8_t));
+    MibRequestConfirm_t mibReq;
+    mibReq.Type = MIB_CHANNELS_DATARATE;
+    LoRaMacMibGetRequestConfirm(&mibReq);
+    uint8_t dr = (uint8_t)mibReq.Param.ChannelsDatarate;
+    return lora_time_on_air(pktLen, dr, cr) >> 10;  /* divide by 1024: return value in ms */
 }
 
 void SX127XSend(uint8_t *buffer, uint8_t size)
