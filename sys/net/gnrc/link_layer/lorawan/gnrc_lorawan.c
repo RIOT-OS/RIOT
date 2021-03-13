@@ -207,43 +207,6 @@ void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac)
     _sleep_radio(mac);
 }
 
-/* This function uses a precomputed table to calculate time on air without
- * using floating point arithmetic */
-static uint32_t lora_time_on_air(size_t payload_size, uint8_t dr, uint8_t cr)
-{
-    assert(dr <= LORAMAC_DR_6);
-    uint8_t _K[6][4] = {    { 0, 1, 5, 5 },
-                            { 0, 1, 4, 5 },
-                            { 1, 5, 5, 5 },
-                            { 1, 4, 5, 4 },
-                            { 1, 3, 4, 4 },
-                            { 1, 2, 4, 3 } };
-
-    uint32_t t_sym = 1 << (15 - dr);
-    uint32_t t_preamble = (t_sym << 3) + (t_sym << 2) + (t_sym >> 2);
-
-    int index = (dr < LORAMAC_DR_6) ? dr : LORAMAC_DR_5;
-    uint8_t n0 = _K[index][0];
-    int nb_symbols;
-
-    uint8_t offset = _K[index][1];
-
-    if (payload_size < offset) {
-        nb_symbols = 8 + n0 * cr;
-    }
-    else {
-        uint8_t c1 = _K[index][2];
-        uint8_t c2 = _K[index][3];
-        uint8_t pos = (payload_size - offset) % (c1 + c2);
-        uint8_t cycle = (payload_size - offset) / (c1 + c2);
-        nb_symbols = 8 + (n0 + 2 * cycle + 1 + (pos > (c1 - 1))) * cr;
-    }
-
-    uint32_t t_payload = t_sym * nb_symbols;
-
-    return t_preamble + t_payload;
-}
-
 void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, iolist_t *psdu, uint8_t dr)
 {
     netdev_t *dev = gnrc_lorawan_get_netdev(mac);
@@ -260,7 +223,7 @@ void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, iolist_t *psdu, uint8_t dr)
 
     dev->driver->get(dev, NETOPT_CODING_RATE, &cr, sizeof(cr));
 
-    mac->toa = lora_time_on_air(iolist_size(psdu), dr, cr + 4);
+    mac->toa = lora_time_on_air(iolist_size(psdu), dr, cr);
 
     if (dev->driver->send(dev, psdu) == -ENOTSUP) {
         DEBUG("gnrc_lorawan: Cannot send: radio is still transmitting");

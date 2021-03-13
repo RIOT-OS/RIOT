@@ -22,6 +22,7 @@
 #ifndef NET_LORAMAC_H
 #define NET_LORAMAC_H
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -965,6 +966,54 @@ typedef enum {
     uint8_t dr_max;                    /**< Maximum datarate index */
     uint8_t dcycle;                    /**< Duty cycle to use on this channel (1 to 100) */
 } loramac_channel_t;
+
+/**
+ * @brief   Compute the time on air of a LoRa packet
+ *
+ * This function uses a precomputed table to calculate time on air without
+ * using floating point arithmetic
+ *
+ * @param[in] pkt_len                   Length of a packet in bytes
+ * @param[in] dr                        Datarate used to send the packet
+ * @param[in] cr                        Coding rate used to send the packet
+ * @return                              time on air in us
+ */
+static inline uint32_t lora_time_on_air(size_t pkt_len, uint8_t dr, uint8_t cr)
+{
+    assert(dr <= LORAMAC_DR_6);
+    const uint8_t _K[6][4] = {
+        { 0, 1, 5, 5 }, /* DR0 */
+        { 0, 1, 4, 5 }, /* DR1 */
+        { 1, 5, 5, 5 }, /* DR2 */
+        { 1, 4, 5, 4 }, /* DR3 */
+        { 1, 3, 4, 4 }, /* DR4 */
+        { 1, 2, 4, 3 }  /* DR5 */
+        };
+
+    uint32_t t_sym = 1 << (15 - dr);
+    uint32_t t_preamble = (t_sym << 3) + (t_sym << 2) + (t_sym >> 2);
+
+    uint8_t index = (dr < LORAMAC_DR_6) ? dr : LORAMAC_DR_5;
+    uint8_t n0 = _K[index][0];
+    uint32_t nb_symbols;
+
+    uint8_t offset = _K[index][1];
+
+    if (pkt_len < offset) {
+        nb_symbols = 8 + n0 * (cr + 4);
+    }
+    else {
+        uint8_t c1 = _K[index][2];
+        uint8_t c2 = _K[index][3];
+        uint8_t pos = (pkt_len - offset) % (c1 + c2);
+        uint8_t cycle = (pkt_len - offset) / (c1 + c2);
+        nb_symbols = 8 + (n0 + 2 * cycle + 1 + (pos > (c1 - 1))) * (cr + 4);
+    }
+
+    uint32_t t_payload = t_sym * nb_symbols;
+
+    return t_preamble + t_payload;
+}
 
 #ifdef __cplusplus
 }
