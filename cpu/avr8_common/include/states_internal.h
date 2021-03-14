@@ -84,18 +84,77 @@ extern uint8_t avr8_state_uart_sram;            /**< UART state variable. */
 /** @} */
 
 /**
- * @name    Global variable containing the current state of the MCU
- * @{
- *
- * @note    This variable is updated from IRQ context; access to it should
- *          be wrapped into @ref irq_disable and @ref irq_restore should be
- *          used.
+ * @brief   MCU ISR State
  *
  * Contents:
  *
- * | Label  | Description                                                   |
- * |:-------|:--------------------------------------------------------------|
- * | IRQ    | This variable is incremented when in IRQ context              |
+ * The `avr8_state_irq_count` is used to indicate that system is processing an
+ * ISR for AVR-8 devices.  It stores how deep system is processing a nested
+ * interrupt.  ATxmega have three selectable interrupt levels for any interrupt:
+ * low, medium and high and are controlled by PMIC. ATmega requires that users
+ * re-enable interrupts after executing the `_isr_handle` method to enable
+ * nested IRQs in low priority interrupts. ATxmega PMIC is not enough to
+ * determine the current state of MCU ISR in RIOT-OS because scheduler may
+ * perform a context switch inside any IRQ.
+ *
+ * If the system is running outside an interrupt, `avr8_state_irq_count` will
+ * have a 0 value.  When one or more interrupt vectors are activated,
+ * `avr8_state_irq_count` will be incremented and have a value greater than 0.
+ * These operations are performed by the pair @ref avr8_enter_isr and
+ * @ref avr8_exit_isr.
+ *
+ * An 3-level nested IRQ illustration can be visualized below:
+ *
+ *                             int-3
+ *                                ↯
+ *                                +----------+
+ *                                | high lvl |
+ *                   int-2        +----------+
+ *                      ↯         |          |
+ *                      +---------+          +---------+
+ *                      | mid lvl |          | mid lvl |
+ *         int-1        +---------+          +---------+
+ *            ↯         |                              |
+ *            +---------+                              +---------+
+ *            | low lvl |                              | low lvl |
+ *            +---------+                              +---------+ ↯ can switch
+ *            |                                                  | context here
+ * +----------+                                                  +----------+
+ * | thread A |                                                  | thread B |
+ * +----------+                                                  +----------+
+ *
+ * At @ref avr8_exit_isr scheduler may require a switch context.  That can be
+ * performed only when `avr8_state_irq_count` is equal to zero. This is
+ * necessary to avoid stack corruption and since system is processing interrupts
+ * since priority inheritance happened.
+ *
+ * The AVR-8 allow nested IRQ and MCUs cores perform with different behaviour, a
+ * custom IRQ management was developed.  The code is simple and must use the
+ * following skeleton:
+ *
+ * The `_isr_handle` method represents the body of an ISR routine.  This is the
+ * code that handles the IRQ itself.  It can be a shared function and don't
+ * need any special care.
+ *
+ * The IRQ method `_isr_handle` should have minimal parameters.  It is
+ * recommended up to 2 and convention is to use the first parameter as the
+ * instance and the second parameter usually represent the unit inside that
+ * instance.
+ *
+ * Example: UART uses 1 parameter and Timers, usually 2.
+ *
+ * static inline void _uart_isr_handler(instance)
+ * {
+ *     ...
+ * }
+ * AVR8_ISR(UART_0_RXC_ISR, _uart_isr_handler, 0);
+ *
+ * static inline void _tmr_isr_handler(instance, channel)
+ * {
+ *     ...
+ * }
+ * AVR8_ISR(TIMER_0_ISRA, _tmr_isr_handler, 0, 0);
+ * AVR8_ISR(TIMER_0_ISRB, _tmr_isr_handler, 0, 1);
  */
 #if (AVR8_STATE_IRQ_USE_SRAM)
 extern uint8_t avr8_state_irq_count_sram;               /**< IRQ state variable. */

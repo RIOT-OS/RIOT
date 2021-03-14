@@ -68,18 +68,6 @@ extern "C"
 /** @} */
 
 /**
- * @brief   Run this code on entering interrupt routines
- */
-static inline void avr8_enter_isr(void)
-{
-    /* This flag is only called from IRQ context, and nested IRQs are not
-     * supported as of now. The flag will be unset before the IRQ context is
-     * left, so no need to use memory barriers or atomics here
-     */
-    ++avr8_state_irq_count;
-}
-
-/**
  * @brief        Compute UART TX channel
  *
  * @param uart   The UART number
@@ -118,9 +106,114 @@ static inline int avr8_is_uart_tx_pending(void)
 }
 
 /**
+ * @brief Enter ISR routine
+ *
+ * It saves the register context for process an ISR.
+ */
+__attribute__((always_inline))
+static inline void avr8_isr_prolog(void)
+{
+    /* This flag is only called from IRQ context.  The value will be handled
+     * before ISR context is left by @ref avr8_isr_epilog.  ATxmega requires a
+     * cli() as first instruction inside an ISR to create a critical section
+     * around `avr8_state_irq_count`.
+     */
+    __asm__ volatile (
+#if defined(CPU_ATXMEGA)
+        "cli                               \n\t"
+#endif
+    /* Register pair r24/25 are used to update `avr8_state_irq_count` content.
+     * This registers are used to test conditions related to context switch in
+     * ISR at @ref avr8_isr_epilog.
+     */
+        "push   r24                        \n\t"
+        "push   r25                        \n\t"
+#if (AVR8_STATE_IRQ_USE_SRAM)
+        "lds    r24, %[state]              \n\t"
+        "subi   r24, 0xFF                  \n\t"
+        "sts    %[state], r24              \n\t"
+#else
+        "in     r24, %[state]              \n\t"
+        "subi   r24, 0xFF                  \n\t"
+        "out    %[state], r24              \n\t"
+#endif
+#if defined(CPU_ATXMEGA)
+        "sei                               \n\t"
+#endif
+        "push   __zero_reg__               \n\t"
+        "push   __tmp_reg__                \n\t"
+        "in     __tmp_reg__, __SREG__      \n\t"
+        "push   __tmp_reg__                \n\t"
+        "eor    __zero_reg__, __zero_reg__ \n\t"
+#if __AVR_HAVE_RAMPD__
+        "in     __tmp_reg__, __RAMPD__     \n\t"
+        "push   __tmp_reg__                \n\t"
+        "out    __RAMPD__, __zero_reg__    \n\t"
+#endif
+#if __AVR_HAVE_RAMPX__
+        "in     __tmp_reg__, __RAMPX__     \n\t"
+        "push   __tmp_reg__                \n\t"
+        "out    __RAMPX__, __zero_reg__    \n\t"
+#endif
+#if __AVR_HAVE_RAMPZ__
+        "in     __tmp_reg__, __RAMPZ__     \n\t"
+        "push   __tmp_reg__                \n\t"
+        "out    __RAMPZ__, __zero_reg__    \n\t"
+#endif
+        "push   r18                        \n\t"
+        "push   r19                        \n\t"
+        "push   r20                        \n\t"
+        "push   r21                        \n\t"
+        "push   r22                        \n\t"
+        "push   r23                        \n\t"
+        "push   r26                        \n\t"
+        "push   r27                        \n\t"
+        "push   r30                        \n\t"
+        "push   r31                        \n\t"
+        : /* no output */
+#if (AVR8_STATE_IRQ_USE_SRAM)
+        : [state] "" (avr8_state_irq_count)
+#else
+        : [state] "I" (_SFR_IO_ADDR(avr8_state_irq_count))
+#endif
+        : "memory"
+    );
+}
+
+/**
+ * @brief   Restore register context from ISR
+ */
+__attribute__((naked))
+void avr8_isr_epilog(void);
+
+/**
+ * @brief   Run this code on entering interrupt routines
+ *
+ * Notes:
+ * - This code must not be shared.
+ * - This code must not be a call or jmp.
+ */
+__attribute__((always_inline))
+static inline void avr8_enter_isr(void)
+{
+    avr8_isr_prolog();
+}
+
+/**
  * @brief Run this code on exiting interrupt routines
  */
-void avr8_exit_isr(void);
+__attribute__((always_inline))
+static inline void avr8_exit_isr(void)
+{
+    /* Let's not add more address in stack and save some code sharing
+     * avr8_isr_epilog.
+     */
+#if (FLASHEND <= 0x1FFF)
+    __asm__ volatile ("rjmp avr8_isr_epilog" : : : "memory");
+#else
+    __asm__ volatile ("jmp avr8_isr_epilog" : : : "memory");
+#endif
+}
 
 /**
  * @brief Initialization of the CPU clock
