@@ -57,38 +57,74 @@ extern "C"
 /** @} */
 
 /**
- * @name    Flags for the current state of the ATmega MCU
- * @{
+ * @brief   MCU ISR State
+ *
+ * Contents:
+ *
+ * The General Purpose I/O Register 1 (GPIOR1) is used to flag if system is
+ * processing an ISR for ATmega devices.  It stores how deep system is
+ * processing a nested interrupt.  ATxmega have three selectable interrupt
+ * levels for any interrupt: low, medium and high and are controlled by PMIC.
+ * ATmega requires that users re-enable interrupts after executing
+ * @ref avr8_enter_isr method to enable nested IRQs in low priority interrupts.
+ * ATxmega PMIC should be used to determine the current state of MCU ISR.
+ *
+ * If the system is running outside an interrupt, GPIOR1 will have always
+ * value 0, on any configuration.  When one or more interrupt vectors are
+ * activated, GPIOR1 will have a value greater than 0.  These operations are
+ * performed by the pair @ref avr8_enter_isr and @ref avr8_exit_isr.
+ *
+ * An 3-level nested IRQ illustration can be visualized below:
+ *
+ *                           int-3
+ *                              ↯
+ *                              +----------+
+ *                              | high lvl |
+ *                 int-2        +----------+
+ *                    ↯         |          |
+ *                    +---------+          +---------+
+ *                    | mid lvl |          | mid lvl |
+ *       int-1        +---------+          +---------+
+ *          ↯         |                              |
+ *          +---------+                              +---------+
+ *          | low lvl |                              | low lvl |
+ *          +---------+                              +---------+ ↯ can switch
+ *          |                                                  | context here
+ * +--------+                                                  +--------+
+ * | thread |                                                  | thread |
+ * +--------+                                                  +--------+
+ *
+ * At @ref avr8_exit_isr scheduler may require a switch context.  That can be
+ * performed in the following situation to avoid stack corruption:
+ *  - ATmega: when GPIOR1 is equal to 0
+ *  - ATxmega: when PMIC.STATUS indicate a low level IRQ
  */
-#define AVR8_STATE_FLAG_ISR           (0x80U) /**< In ISR */
-#define AVR8_STATE_FLAG_UART0_TX      (0x01U) /**< TX pending for UART 0 */
-#define AVR8_STATE_FLAG_UART1_TX      (0x02U) /**< TX pending for UART 1 */
-#define AVR8_STATE_FLAG_UART2_TX      (0x04U) /**< TX pending for UART 2 */
-#define AVR8_STATE_FLAG_UART3_TX      (0x08U) /**< TX pending for UART 3 */
-#define AVR8_STATE_FLAG_UART4_TX      (0x10U) /**< TX pending for UART 4 */
-#define AVR8_STATE_FLAG_UART5_TX      (0x20U) /**< TX pending for UART 5 */
-#define AVR8_STATE_FLAG_UART6_TX      (0x40U) /**< TX pending for UART 6 */
-#define AVR8_STATE_FLAG_UART_TX(x)    (0x01U << x) /**< TX pending for UART x */
-/** @} */
 
 /**
- * @brief   Global variable containing the current state of the MCU
+ * @brief   Flags TX pending for UART x
+ */
+#define AVR8_STATE_FLAG_UART_TX(x)    (0x01U << x)
+
+/**
+ * @brief   MCU UART TX pending state
  *
- * @note    This variable is updated from IRQ context; access to it should
- *          be wrapped into @ref irq_disable and @ref irq_restore or
- *          @ref avr8_get_state should be used.
+ * @note    The content must be changed using the pair
+ *          @ref avr8_uart_tx_set_pending and @ref avr8_uart_tx_clear_pending
+ *          methods.  The variable uses General Purpose IO Register 0 (GPIOR0)
+ *          which allows atomic operations and don't require a critical
+ *          section.
  *
  * Contents:
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *   7   6   5   4   3   2   1   0
  * +---+---+---+---+---+---+---+---+
- * |IRQ|TX6|TX5|TX4|TX3|TX2|TX1|TX0|
+ * |TX7|TX6|TX5|TX4|TX3|TX2|TX1|TX0|
  * +---+---+---+---+---+---+---+---+
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * | Label  | Description                                                   |
  * |:-------|:--------------------------------------------------------------|
- * | IRQ    | This bit is set when in IRQ context                           |
+ * | TX7    | This bit is set when on UART7 TX is pending                   |
  * | TX6    | This bit is set when on UART6 TX is pending                   |
  * | TX5    | This bit is set when on UART5 TX is pending                   |
  * | TX4    | This bit is set when on UART4 TX is pending                   |
@@ -97,45 +133,18 @@ extern "C"
  * | TX1    | This bit is set when on UART1 TX is pending                   |
  * | TX0    | This bit is set when on UART0 TX is pending                   |
  */
-extern uint8_t avr8_state;
-
-/**
- * @brief   Atomically read the state (@ref avr8_state)
- *
- * This function guarantees that the read is not optimized out, not reordered
- * and done atomically. This does not mean that by the time return value is
- * processed that it still reflects the value currently stored in
- * @ref avr8_state.
- *
- * Using ASM rather than C11 atomics has less overhead, as not every access to
- * the state has to be performed atomically: Those done from ISR will not be
- * interrupted (no support for nested interrupts) and barriers at the begin and
- * end of the ISRs make sure the access takes place before IRQ context is left.
- */
-static inline uint8_t avr8_get_state(void)
-{
-    uint8_t state;
-    __asm__ volatile(
-        "lds   %[state], avr8_state       \n\t"
-        : [state]   "=r" (state)
-        :
-        : "memory"
-
-    );
-
-    return state;
-}
 
 /**
  * @brief   Run this code on entering interrupt routines
  */
 static inline void avr8_enter_isr(void)
 {
-    /* This flag is only called from IRQ context, and nested IRQs are not
-     * supported as of now. The flag will be unset before the IRQ context is
-     * left, so no need to use memory barriers or atomics here
+    /* This flag is only called from IRQ context. The value will be handled
+     * before ISR context is left by @ref avr8_exit_isr.
      */
-    avr8_state |= AVR8_STATE_FLAG_ISR;
+#if !defined(CPU_ATXMEGA)
+    ++GPIOR1;
+#endif
 }
 
 /**
@@ -146,14 +155,33 @@ static inline void avr8_enter_isr(void)
  */
 static inline int avr8_is_uart_tx_pending(void)
 {
-    uint8_t state = avr8_get_state();
-    return (state & (AVR8_STATE_FLAG_UART0_TX
-                  |  AVR8_STATE_FLAG_UART1_TX
-                  |  AVR8_STATE_FLAG_UART2_TX
-                  |  AVR8_STATE_FLAG_UART3_TX
-                  |  AVR8_STATE_FLAG_UART4_TX
-                  |  AVR8_STATE_FLAG_UART5_TX
-                  |  AVR8_STATE_FLAG_UART6_TX));
+    return GPIOR0;
+}
+
+/**
+ * @brief        Set UART TX channel as pending
+ *
+ * General Purpose IO Register 0 (GPIOR0) allows RMW which eliminates critical
+ * section.
+ *
+ * @param uart   The UART number
+ */
+static inline void avr8_uart_tx_set_pending(unsigned uart)
+{
+    GPIOR0 |= AVR8_STATE_FLAG_UART_TX(uart);
+}
+
+/**
+ * @brief        Clear UART TX channel pending state
+ *
+ * General Purpose IO Register 0 (GPIOR0) allows RMW which eliminates critical
+ * section.
+ *
+ * @param uart   The UART number
+ */
+static inline void avr8_uart_tx_clear_pending(unsigned uart)
+{
+    GPIOR0 &= ~AVR8_STATE_FLAG_UART_TX(uart);
 }
 
 /**

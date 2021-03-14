@@ -70,7 +70,6 @@
 */
 uint8_t mcusr_mirror __attribute__((section(".noinit")));
 uint8_t soft_rst __attribute__((section(".noinit")));
-uint8_t avr8_state = 0;
 
 void get_mcusr(void) __attribute__((naked, section(".init0"), used));
 
@@ -116,6 +115,10 @@ void cpu_init(void)
               |  PMIC_MEDLVLEN_bm
               |  PMIC_LOLVLEN_bm;
 #endif
+
+    /* Set global resources initial state */
+    GPIOR0 = 0; /* MCU UART TX pending state */
+    GPIOR1 = 0; /* MCU ISR State */
 
     irq_enable();
 }

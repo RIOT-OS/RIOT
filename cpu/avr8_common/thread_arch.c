@@ -266,31 +266,40 @@ void NORETURN avr8_enter_thread_mode(void)
     UNREACHABLE();
 }
 
+__attribute__((always_inline)) static inline void avr8_context_switch(void)
+{
+    avr8_context_save();
+    sched_run();
+    avr8_context_restore();
+}
+
 void thread_yield_higher(void)
 {
     if (irq_is_in() == 0) {
-        avr8_context_save();
-        sched_run();
-        avr8_context_restore();
-        __asm__ volatile ("ret");
+        avr8_context_switch();
     }
     else {
         sched_context_switch_request = 1;
     }
 }
 
+__attribute__((always_inline)) static inline int avr8_nested_isr_allows_ctx_switch(void)
+{
+#if !defined(CPU_ATXMEGA)
+    return GPIOR1 == 0;
+#else
+    return PMIC.STATUS <= PMIC_LOLVLEX_bm;
+#endif
+}
+
 void avr8_exit_isr(void)
 {
-    avr8_state &= ~AVR8_STATE_FLAG_ISR;
-
-    /* Force access to avr8_state to take place */
-    __asm__ volatile ("" : : : "memory");
-
-    if (sched_context_switch_request) {
-        avr8_context_save();
-        sched_run();
-        avr8_context_restore();
-        __asm__ volatile ("reti");
+#if !defined(CPU_ATXMEGA)
+    --GPIOR1;
+#endif
+    if (avr8_nested_isr_allows_ctx_switch() && sched_context_switch_request) {
+        avr8_context_switch();
+        __asm__ volatile ("reti" : : : "memory");
     }
 }
 
