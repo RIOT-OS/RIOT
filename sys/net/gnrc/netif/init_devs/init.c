@@ -167,7 +167,7 @@ void gnrc_netif_init_devs(void)
         auto_init_nrf802154();
     }
 
-    if (IS_USED(MODULE_SX126X)) {
+    if (IS_USED(MODULE_SX126X) && !IS_USED(MODULE_SEMTECH_LORAMAC)) {
         extern void auto_init_sx126x(void);
         auto_init_sx126x();
     }
