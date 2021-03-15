@@ -57,20 +57,56 @@ extern "C" {
 #endif
 
 /**
+ * @name Memory access control bits
+ * @{
+ */
+#define LCD_MADCTL_MY           0x80    /**< Row address order */
+#define LCD_MADCTL_MX           0x40    /**< Column access order */
+#define LCD_MADCTL_MV           0x20    /**< Row column exchange */
+#define LCD_MADCTL_ML           0x10    /**< Vertical refresh order */
+#define LCD_MADCTL_BGR          0x08    /**< Color selector switch control */
+#define LCD_MADCTL_MH           0x04    /**< Horizontal refresh direction */
+/** @} */
+
+/**
+ * @name Display rotation modes
+ * @{
+ */
+#define LCD_MADCTL_VERT         LCD_MADCTL_MX       /**< Vertical mode */
+#define LCD_MADCTL_VERT_FLIP    LCD_MADCTL_MY       /**< Flipped vertical */
+#define LCD_MADCTL_HORZ         LCD_MADCTL_MV       /**< Horizontal mode */
+#define LCD_MADCTL_HORZ_FLIP    LCD_MADCTL_MV | \
+    LCD_MADCTL_MY | \
+    LCD_MADCTL_MX                                       /**< Horizontal flipped */
+/** @} */
+
+
+/**
+ * @brief   Display rotation mode
+ */
+typedef enum {
+    LCD_ROTATION_VERT       = LCD_MADCTL_VERT,      /**< Vertical mode */
+    LCD_ROTATION_VERT_FLIP  = LCD_MADCTL_VERT_FLIP, /**< Vertical flipped mode */
+    LCD_ROTATION_HORZ       = LCD_MADCTL_HORZ,      /**< Horizontal mode */
+    LCD_ROTATION_HORZ_FLIP  = LCD_MADCTL_HORZ_FLIP, /**< Horizontal flipped mode */
+} lcd_rotation_t;
+
+/**
  * @brief   Device initialization parameters
  */
 typedef  struct {
-    spi_t spi;          /**< SPI device that the display is connected to */
-    spi_clk_t spi_clk;  /**< SPI clock speed to use */
-    spi_mode_t spi_mode;/**< SPI mode */
-    gpio_t cs_pin;      /**< pin connected to the CHIP SELECT line */
-    gpio_t dcx_pin;     /**< pin connected to the DC line */
-    gpio_t rst_pin;     /**< pin connected to the reset line */
-    bool rgb;           /**< True when display is connected in RGB mode
-                          *  False when display is connected in BGR mode */
-    bool inverted;      /**< Display works in inverted color mode */
-    uint16_t lines;     /**< Number of lines, from 16 to 320 in 8 line steps */
-    uint16_t rgb_channels;  /**< Display rgb channels */
+    spi_t spi;                  /**< SPI device that the display is connected to */
+    spi_clk_t spi_clk;          /**< SPI clock speed to use */
+    spi_mode_t spi_mode;        /**< SPI mode */
+    gpio_t cs_pin;              /**< pin connected to the CHIP SELECT line */
+    gpio_t dcx_pin;             /**< pin connected to the DC line */
+    gpio_t rst_pin;             /**< pin connected to the reset line */
+    bool rgb;                   /**< True when display is connected in RGB mode
+                                 *  False when display is connected in BGR mode */
+    bool inverted;              /**< Display works in inverted color mode */
+    uint16_t lines;             /**< Number of lines, from 16 to 320 in 8 line steps */
+    uint16_t rgb_channels;      /**< Display rgb channels */
+    lcd_rotation_t rotation;    /**< Display rotation mode */
 } lcd_params_t;
 
 /**
@@ -145,7 +181,7 @@ int lcd_init(lcd_t *dev, const lcd_params_t *params);
  * @param[in]   color   single color to fill the area with
  */
 void lcd_fill(const lcd_t *dev, uint16_t x1, uint16_t x2,
-                  uint16_t y1, uint16_t y2, uint16_t color);
+              uint16_t y1, uint16_t y2, uint16_t color);
 
 /**
  * @brief   Fill a rectangular area with an array of pixels
@@ -164,7 +200,7 @@ void lcd_fill(const lcd_t *dev, uint16_t x1, uint16_t x2,
  * @param[in]   color   array of colors to fill the area with
  */
 void lcd_pixmap(const lcd_t *dev, uint16_t x1, uint16_t x2, uint16_t y1,
-                 uint16_t y2, const uint16_t *color);
+                uint16_t y2, const uint16_t *color);
 
 /**
  * @brief   Raw write command
@@ -175,7 +211,7 @@ void lcd_pixmap(const lcd_t *dev, uint16_t x1, uint16_t x2, uint16_t y1,
  * @param[in]   len     length of the command data
  */
 void lcd_write_cmd(const lcd_t *dev, uint8_t cmd, const uint8_t *data,
-                       size_t len);
+                   size_t len);
 
 /**
  * @brief   Raw read command

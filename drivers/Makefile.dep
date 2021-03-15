@@ -244,7 +244,3 @@ ifneq (,$(filter-out netdev_default, $(filter netdev_%,$(USEMODULE))))
     USEMODULE += netdev_register
   endif
 endif
-
-ifneq (,$(filter st7735,$(USEMODULE)))
-  USEMODULE += lcd
-endif

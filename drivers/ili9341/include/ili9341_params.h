@@ -54,15 +54,20 @@ extern "C" {
 #ifndef ILI9341_PARAM_INVERTED
 #define ILI9341_PARAM_INVERTED     0
 #endif
-
 #ifndef ILI9341_PARAM_NUM_LINES
-#define ILI9341_PARAM_NUM_LINES    320U
+#define ILI9341_PARAM_NUM_LINES         320U    /**< Number of lines */
+#endif
+#ifndef ILI9341_PARAM_RGB_CHANNELS
+#define ILI9341_PARAM_RGB_CHANNELS      240U    /**< Number of RGB channels (e.g. columns) */
 #endif
 
 #ifndef ILI9341_PARAM_ROTATION
-#define ILI9341_PARAM_ROTATION     ILI9341_ROTATION_HORZ_FLIP
+#define ILI9341_PARAM_ROTATION     LCD_ROTATION_HORZ_FLIP
 #endif
 
+/**
+ * @brief   Default params
+ */
 #ifndef ILI9341_PARAMS
 #define ILI9341_PARAMS              { .spi = ILI9341_PARAM_SPI, \
                                       .spi_clk = ILI9341_PARAM_SPI_CLK, \
@@ -74,14 +79,15 @@ extern "C" {
                                       .inverted = ILI9341_PARAM_INVERTED, \
                                       .lines = ILI9341_PARAM_NUM_LINES, \
                                       .rotation = ILI9341_PARAM_ROTATION, \
-                                    }
+                                      .rgb_channels = ILI9341_PARAM_RGB_CHANNELS, \
+}
 #endif
-/**@}*/
+/** @} */
 
 /**
  * @brief   Configure ILI9341
  */
-static const ili9341_params_t ili9341_params[] =
+static const lcd_params_t ili9341_params[] =
 {
     ILI9341_PARAMS,
 };
@@ -101,8 +107,19 @@ static const uint8_t ili9341_screen_ids[] =
     ILI9341_PARAM_SCREEN_IDS,
 };
 
+/**
+ * @brief   Define the number of configured displays
+ */
+#define ILI9341_NUMOF           ARRAY_SIZE(ili9341_params)
+/**
+ * @brief   Define the number screens this display driver is attached to
+ */
+#define ILI9341_SCREEN_NUMOF    ARRAY_SIZE(ili9341_screen_ids)
+
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* ILI9341_PARAMS_H */
+/** @} */

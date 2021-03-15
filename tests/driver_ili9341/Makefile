@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 BOARD ?= stm32f429i-disc1
 include ../Makefile.tests_common
 
@@ -21,3 +22,6 @@ ifndef CONFIG_KCONFIG_USEMODULE_ILI9341
     CFLAGS += -DCONFIG_NO_RIOT_IMAGE
   endif
 endif
+=======
+include Makefile.lcd
+>>>>>>> b7c02ac672 (drivers/ili9341: use common lcd dirver)
