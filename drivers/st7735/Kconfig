@@ -1,0 +1,53 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_ST7735
+    bool "ST7735 display driver"
+    depends on HAS_PERIPH_SPI
+    depends on HAS_PERIPH_GPIO
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_SPI
+    select MODULE_PERIPH_GPIO
+    select MODULE_LCD
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
+
+menuconfig KCONFIG_USEMODULE_ST7735
+    bool "Configure ST7735 driver"
+    depends on USEMODULE_ST7735
+    help
+        Configure the ST7735 display driver using Kconfig.
+
+if KCONFIG_USEMODULE_ST7735
+
+config ST7735_GVDD
+    int "GVDD voltage level (in millivolts)"
+    default 4800
+    range 3000 6000
+    help
+        Configure GVDD level, which is a reference level for the VCOM level and
+        the grayscale voltage level. GVDD should be ≦ (AVDD - 0.5) V .
+
+config ST7735_VCOMH
+    int "VCOMH voltage level (in millivolts)"
+    default 4250
+    range 2700 5875
+    help
+        Configure the high level of VCOM AC voltage. VCOM needs to be adjusted
+        to match the capacitance and performance specifications of the TFT panel
+        to maximize contrast and minimize flickering
+
+config ST7735_VCOML
+    int "VCOML voltage level (in millivolts)"
+    default -2000
+    range -2500 0
+    help
+        Configure the low level of VCOM AC voltage. VCOM needs to be adjusted to
+        match the capacitance and performance specifications of the TFT panel to
+        maximize contrast and minimize flickering
+
+endif # KCONFIG_USEMODULE_ST7735
