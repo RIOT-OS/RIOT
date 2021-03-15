@@ -173,6 +173,9 @@ endif
 ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
   DIRS += test_utils/interactive_sync
 endif
+ifneq (,$(filter test_utils_result_output,$(USEMODULE)))
+  DIRS += test_utils/result_output
+endif
 ifneq (,$(filter udp,$(USEMODULE)))
   DIRS += net/transport_layer/udp
 endif
