@@ -95,9 +95,10 @@ void spi_init_pins(spi_t bus)
     *(&PINSEL0 + cfg->pinsel_clk) |= cfg->pinsel_msk_clk;
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void) cs;
+    (void)cs;
+    assert((unsigned)bus < SPI_NUMOF);
 
     uint32_t pclksel;
     uint32_t cpsr;

@@ -280,10 +280,7 @@ void cc110x_isr(netdev_t *netdev)
      */
     netdev_event_t post_isr_event = NETDEV_NO_EVENT;
 
-    if (cc110x_acquire(dev) != SPI_OK) {
-        DEBUG("[cc110x] ISR: CRITICAL ERROR: Couldn't acquire device\n");
-        return;
-    }
+    cc110x_acquire(dev);
 
     /* Disable IRQs in a coarse manner, instead of doing so any time the
      * IOCFGx configuration registers are changed. (This should be less

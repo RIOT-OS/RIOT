@@ -67,9 +67,10 @@ void spi_init_pins(spi_t bus)
     ROM_GPIOPinTypeSSI(spi_confs[bus].gpio_port, spi_confs[bus].pins.mask);
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void) cs;
+    (void)cs;
+    assert((unsigned)bus < SPI_NUMOF);
     /* lock bus */
     mutex_lock(&locks[bus]);
     /* enable clock for SSI */
@@ -83,8 +84,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
                            8);
 
     ROM_SSIEnable(spi_confs[bus].ssi_base);
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

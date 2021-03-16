@@ -74,21 +74,11 @@ int kw2xrf_spi_init(kw2xrf_t *dev)
                   (unsigned)SPIDEV, res);
         return 1;
     }
-    /* verify SPI params */
-    res = spi_acquire(SPIDEV, CSPIN, SPIMODE, SPICLK);
-    if (res == SPI_NOMODE) {
-        LOG_ERROR("[kw2xrf_spi] given SPI mode is not supported");
-        return 1;
+    /* verify SPI params, if assertions are on */
+    if (!IS_ACTIVE(NDEBUG)) {
+        spi_acquire(SPIDEV, CSPIN, SPIMODE, SPICLK);
+        spi_release(SPIDEV);
     }
-    else if (res == SPI_NOCLK) {
-        LOG_ERROR("[kw2xrf_spi] targeted clock speed is not supported");
-        return 1;
-    }
-    else if (res != SPI_OK) {
-        LOG_ERROR("[kw2xrf_spi] unable to acquire bus with given parameters");
-        return 1;
-    }
-    spi_release(SPIDEV);
 
     DEBUG("[kw2xrf_spi] SPI_DEV(%u) initialized: mode: %u, clk: %u, cs_pin: %u\n",
           (unsigned)SPIDEV, (unsigned)SPIMODE, (unsigned)SPICLK, (unsigned)CSPIN);

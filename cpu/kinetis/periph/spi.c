@@ -26,6 +26,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
 #include "assert.h"
@@ -144,9 +146,10 @@ int spi_init_cs(spi_t bus, spi_cs_t cs)
     return SPI_OK;
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
-    (void) cs;
+    (void)cs;
+    assert((unsigned)bus < SPI_NUMOF);
     /* lock and power on the bus */
     mutex_lock(&locks[bus]);
     poweron(bus);
@@ -156,8 +159,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     /* configure clock and mode */
     dev(bus)->CTAR[0] = (mode | SPI_CTAR_FMSZ(7) | spi_clk_config[clk]);
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

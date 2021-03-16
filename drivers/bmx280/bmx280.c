@@ -49,11 +49,9 @@
 
 /* implementation for the driver's configured bus interface (I2C vs SPI) */
 #ifdef BMX280_USE_SPI /* using SPI mode */
-static inline int _acquire(const bmx280_t *dev)
+static inline void _acquire(const bmx280_t *dev)
 {
-    if (spi_acquire(BUS, CS, MODE, CLK) != SPI_OK) {
-        return BMX280_ERR_BUS;
-    }
+    spi_acquire(BUS, CS, MODE, CLK);
     return BMX280_OK;
 }
 

@@ -83,12 +83,11 @@ int nrf24l01p_init(nrf24l01p_t *dev, spi_t spi, gpio_t ce, gpio_t cs, gpio_t irq
     /* Init IRQ pin */
     gpio_init_int(dev->irq, GPIO_IN_PU, GPIO_FALLING, nrf24l01p_rx_cb, dev);
 
-    /* Test the SPI connection */
-    if (spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK) != SPI_OK) {
-        DEBUG("error: unable to acquire SPI bus with given params\n");
-        return -1;
+    /* Test the SPI connection, if assertions are on */
+    if (!IS_ACTIVE(NDEBUG)) {
+        spi_acquire(dev->spi, dev->cs, SPI_MODE, SPI_CLK);
+        spi_release(dev->spi);
     }
-    spi_release(dev->spi);
 
     xtimer_spin(DELAY_AFTER_FUNC_TICKS);
 

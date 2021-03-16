@@ -21,6 +21,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "vendor/hw_memmap.h"
 #include "vendor/hw_ssi.h"
 
@@ -93,10 +95,10 @@ void spi_init_pins(spi_t bus)
     gpio_init_mux(spi_config[bus].miso_pin, OVERRIDE_DISABLE, GPIO_MUX_NONE, rxd);
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     DEBUG("%s: bus=%u\n", __FUNCTION__, bus);
-    (void) cs;
+    (void)cs;
     /* lock the bus */
     mutex_lock(&locks[bus]);
     /* power on device */
@@ -132,6 +134,7 @@ static uint8_t _trx(cc2538_ssi_t *dev, uint8_t in)
 void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,
                         const void *out, void *in, size_t len)
 {
+    assert((unsigned)bus < SPI_NUMOF);
     DEBUG("%s: bus=%u, len=%u\n", __FUNCTION__, bus, (unsigned)len);
 
     const uint8_t *out_buf = out;

@@ -105,8 +105,6 @@ extern "C" {
  * @brief   Acquire the SPI bus of the transceiver
  *
  * @param[in] dev       NRF24L01+ device handle
- *
- * @return              @see spi_acquire
  */
 int nrf24l01p_ng_acquire(nrf24l01p_ng_t *dev);
 
@@ -114,8 +112,6 @@ int nrf24l01p_ng_acquire(nrf24l01p_ng_t *dev);
  * @brief   Release the SPI bus of the transceiver
  *
  * @param[in] dev       NRF24L01+ device handle
- *
- * @return               @see spi_release
  */
 void nrf24l01p_ng_release(nrf24l01p_ng_t *dev);
 

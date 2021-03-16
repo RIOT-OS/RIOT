@@ -31,17 +31,12 @@ extern "C" {
 /**
  * @brief   Acquire the SPI interface of the transceiver and configure it
  *
- * @retval  SPI_OK      Success
- * @retval  SPI_NOMODE  SPI mode 0 not supported by MCU
- * @retval  SPI_NOCLK   SPI clock given in @ref cc110x_params_t is not supported
- *
  * @pre     @ref cc110x_power_on has be called before calling this function.
  *          (Only needed *once* when the driver initializes.)
  */
-static inline int cc110x_acquire(cc110x_t *dev)
+static inline void cc110x_acquire(cc110x_t *dev)
 {
-    return spi_acquire(dev->params.spi, dev->params.cs, SPI_MODE_0,
-                       dev->params.spi_clk);
+    spi_acquire(dev->params.spi, dev->params.cs, SPI_MODE_0, dev->params.spi_clk);
 }
 
 /**
