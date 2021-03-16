@@ -394,6 +394,16 @@ uint8_t rtc_get_tamper_event(void)
 
     return ret & RTC_TAMPID_TAMPID_Msk;
 }
+
+uint8_t rtc_tamper_pin_mask(gpio_t pin)
+{
+    int idx = _rtc_pin(pin);
+    if (idx < 0) {
+        return 0;
+    }
+
+    return 1 << idx;
+}
 #endif /* RTC_NUM_OF_TAMPERS */
 
 void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)

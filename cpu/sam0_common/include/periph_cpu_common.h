@@ -1153,6 +1153,18 @@ void rtc_tamper_enable(void);
  *          pin index inside the @ref rtc_tamper_pins array.
  */
 uint8_t rtc_get_tamper_event(void);
+
+/**
+ * @brief   Get the tamper event mask for a certain pin.
+ *          Can be used together with @ref rtc_get_tamper_event to
+ *          check which RTC  pin caused the tamper event.
+ *
+ * @param pin   Pin to query
+ *
+ * @return  Bit mask with the bit corresponding to @p pin set
+ *          0 if @p pin is no RTC tamper pin
+ */
+uint8_t rtc_tamper_pin_mask(gpio_t pin);
 /** @} */
 
 /**
