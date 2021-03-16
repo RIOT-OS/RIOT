@@ -74,7 +74,6 @@ int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
 #endif
     rmutex_init(&netif->mutex);
     netif->ops = ops;
-    netif_register((netif_t*) netif);
     assert(netif->dev == NULL);
     netif->dev = netdev;
 
@@ -1665,14 +1664,9 @@ static void *_gnrc_netif_thread(void *args)
     res = dev->driver->init(dev);
     if (res < 0) {
         LOG_ERROR("gnrc_netif: netdev init failed: %d\n", res);
-        /* unregister this netif instance */
-        netif->ops = NULL;
-        netif->pid = KERNEL_PID_UNDEF;
-        netif->dev = NULL;
-        dev->event_callback = NULL;
-        dev->context = NULL;
         return NULL;
     }
+    netif_register(&netif->netif);
     _configure_netdev(dev);
     netif->ops->init(netif);
 #if DEVELHELP
