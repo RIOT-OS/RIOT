@@ -44,10 +44,10 @@ static void test_ieee802154_set_frame_hdr_flags0_non_beacon_non_ack(void)
     const le_uint16_t src_pan = byteorder_htols(0);
     const le_uint16_t dst_pan = byteorder_htols(0);
     const uint8_t flags = IEEE802154_FCF_TYPE_DATA;
-    uint8_t res;
+    uint8_t res[2];
 
     TEST_ASSERT_EQUAL_INT(0,
-                          ieee802154_set_frame_hdr(&res, NULL, 0,
+                          ieee802154_set_frame_hdr(res, NULL, 0,
                                                    NULL, 0,
                                                    src_pan, dst_pan,
                                                    flags, TEST_UINT8));
