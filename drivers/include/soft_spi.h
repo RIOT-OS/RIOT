@@ -125,7 +125,7 @@ typedef enum {
  * @brief Software SPI port descriptor
  */
 typedef struct {
-    gpio_t miso_pin;                /**< MOSI pin */
+    gpio_t miso_pin;                /**< MISO pin */
     gpio_t mosi_pin;                /**< MOSI pin */
     gpio_t clk_pin;                 /**< CLK pin */
     soft_spi_mode_t soft_spi_mode;  /**< data and clock polarity */
