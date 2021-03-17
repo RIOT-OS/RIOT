@@ -37,6 +37,10 @@
 extern "C" {
 #endif
 
+#ifndef SOFT_SPI_NUMOF
+#define SOFT_SPI_NUMOF 1    /**< Number of soft SPI interfaces */
+#endif
+
 /**
  * @defgroup drivers_softspi_config      Software SPI driver compile configuration
  * @ingroup config_drivers_soft_periph
