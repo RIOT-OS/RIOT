@@ -13,10 +13,25 @@
  *
  * This module provides a software implemented Serial Peripheral Interface bus.
  * It is intended to be used in situation where hardware spi is not available.
- * The signatures of the functions are similar to the functions declared in spi.h
- * The clock speed is approximated by using xtimer_usleep.
- * Currently only the use of MOSI in master mode is implemented. Therefore receiving
- * data from a slave is currently not possible.
+ * The signatures of the functions are identical to the functions declared in
+ * `spi.h`. The clock speed is approximated by using `xtimer_usleep()`.
+ *
+ * To use the software SPI as drop-in replacement for `periph_spi`, add the
+ * following to your application's Makefile:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * USEMODULE += soft_spi_as_periph_spi
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *
+ * This will hook up the functions defined here into the `periph_spi` interface,
+ * so that a call to e.g. `spi_acquire()` becomes an alias for
+ * `soft_spi_acquire()`. Hence, it is not possible to real `periph_spi` and
+ * `soft_spi_as_periph_spi` at the same time. Using `soft_spi_as_periph_spi`
+ * will therefore disable any other `periph_spi` implementation, when used.
+ *
+ * Without `soft_spi_as_periph_spi`, you can use both `soft_spi` and
+ * `periph_spi` at the same time.
+ *
  * @{
  *
  * @file

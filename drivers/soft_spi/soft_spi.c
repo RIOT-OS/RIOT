@@ -264,3 +264,20 @@ void soft_spi_transfer_regs(soft_spi_t bus, soft_spi_cs_t cs, uint8_t reg,
     soft_spi_transfer_bytes(bus, cs, true, &reg, NULL, 1);
     soft_spi_transfer_bytes(bus, cs, false, out, in, len);
 }
+
+#if MODULE_SOFT_SPI_AS_PERIPH_SPI
+void spi_init(spi_t bus) __attribute__((alias("soft_spi_init")));
+void spi_init_pins(spi_t bus) __attribute__((alias("soft_spi_init_pins")));
+int spi_init_cs(spi_t bus, spi_cs_t cs) __attribute__((alias("soft_spi_init_cs")));
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+    __attribute__((alias("soft_spi_acquire")));
+void spi_release(spi_t bus) __attribute__((alias("soft_spi_release")));
+uint8_t spi_transfer_byte(spi_t bus, spi_cs_t cs, bool cont, uint8_t out)
+    __attribute__((alias("soft_spi_transfer_byte")));
+void spi_transfer_bytes(spi_t bus, spi_cs_t cs, bool cont,const void *out, void *in, size_t len)
+    __attribute__((alias("soft_spi_transfer_bytes")));
+uint8_t spi_transfer_reg(spi_t bus, spi_cs_t cs, uint8_t reg, uint8_t out)
+    __attribute__((alias("soft_spi_transfer_reg")));
+void spi_transfer_regs(spi_t bus, spi_cs_t cs, uint8_t reg, const void *out, void *in, size_t len)
+    __attribute__((alias("soft_spi_transfer_regs")));
+#endif /* MODULE_SOFT_SPI_AS_PERIPH_SPI */

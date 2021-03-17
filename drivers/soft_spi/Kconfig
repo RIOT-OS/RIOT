@@ -11,3 +11,8 @@ config MODULE_SOFT_SPI
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
     select MODULE_XTIMER
+
+config MODULE_SOFT_SPI_AS_PERIPH_SPI
+    bool "Use the software-implemented SPI to provide the peripheral SPI API"
+    select MODULE_SOFT_SPI
+    select HAS_PERIPH_SPI
