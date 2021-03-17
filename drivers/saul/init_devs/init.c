@@ -223,6 +223,10 @@ void saul_init_devs(void)
         extern void auto_init_pir(void);
         auto_init_pir();
     }
+    if (IS_USED(MODULE_PMS5003)) {
+        extern void auto_init_pms5003(void);
+        auto_init_pms5003();
+    }
     if (IS_USED(MODULE_PULSE_COUNTER)) {
         extern void auto_init_pulse_counter(void);
         auto_init_pulse_counter();
