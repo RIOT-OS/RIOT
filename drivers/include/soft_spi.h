@@ -28,9 +28,10 @@
 #ifndef SOFT_SPI_H
 #define SOFT_SPI_H
 
+#include "board.h"
+#include "mutex.h"
 #include "periph/gpio.h"
 #include "periph/spi.h"
-#include "mutex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,35 +79,34 @@ typedef gpio_t soft_spi_cs_t;
  * @brief   Status codes used by the SPI driver interface
  */
 enum {
-    SOFT_SPI_OK          =  0,   /**< everything went as planned */
-    SOFT_SPI_NODEV       = -1,   /**< invalid SPI bus specified */
-    SOFT_SPI_NOCS        = -2,   /**< invalid chip select line specified */
-    SOFT_SPI_NOMODE      = -3,   /**< selected mode is not supported */
-    SOFT_SPI_NOCLK       = -4    /**< selected clock value is not supported */
+    SOFT_SPI_OK          = SPI_OK,      /**< everything went as planned */
+    SOFT_SPI_NODEV       = SPI_NODEV,   /**< invalid SPI bus specified */
+    SOFT_SPI_NOCS        = SPI_NOCS,    /**< invalid chip select line specified */
+    SOFT_SPI_NOMODE      = SPI_NOMODE,  /**< selected mode is not supported */
+    SOFT_SPI_NOCLK       = SPI_NOCLK    /**< selected clock value is not supported */
 };
 
 /**
  * @brief   Available SPI modes, defining the configuration of clock polarity
  *          and clock phase
  *
- * RIOT is using the mode numbers as commonly defined by most vendors
- * (https://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus#Mode_numbers):
- *
- * - MODE_0: CPOL=0, CPHA=0 - The first data bit is sampled by the receiver on
- *           the first SCK rising SCK edge (this mode is used most often).
- * - MODE_1: CPOL=0, CPHA=1 - The first data bit is sampled by the receiver on
- *           the second rising SCK edge.
- * - MODE_2: CPOL=1, CPHA=0 - The first data bit is sampled by the receiver on
- *           the first falling SCK edge.
- * - MODE_3: CPOL=1, CPHA=1 - The first data bit is sampled by the receiver on
- *           the second falling SCK edge.
+ * @deprecated  Directly use spi_mode_t instead
  */
-typedef enum {
-    SOFT_SPI_MODE_0 = 0,         /**< CPOL=0, CPHA=0 */
-    SOFT_SPI_MODE_1,             /**< CPOL=0, CPHA=1 */
-    SOFT_SPI_MODE_2,             /**< CPOL=1, CPHA=0 */
-    SOFT_SPI_MODE_3              /**< CPOL=1, CPHA=1 */
-} soft_spi_mode_t;
+typedef spi_mode_t soft_spi_mode_t;
+
+/**
+ * @name    Deprecated aliases
+ * @{
+ */
+#define SOFT_SPI_MODE_0 SPI_MODE_0 /**< Deprecated alias for SPI_MODE_0 */
+#define SOFT_SPI_MODE_1 SPI_MODE_1 /**< Deprecated alias for SPI_MODE_1 */
+#define SOFT_SPI_MODE_2 SPI_MODE_2 /**< Deprecated alias for SPI_MODE_2 */
+#define SOFT_SPI_MODE_3 SPI_MODE_3 /**< Deprecated alias for SPI_MODE_3 */
+
+#define SOFT_SPI_CLK_100KHZ SPI_CLK_100KHZ /**< Deprecated alias for SPI_CLK_100KHZ */
+#define SOFT_SPI_CLK_400KHZ SPI_CLK_400KHZ /**< Deprecated alias for SPI_CLK_400KHZ */
+#define SOFT_SPI_CLK_DEFAULT SPI_CLK_10MHZ /**< Deprecated alias for SPI_CLK_10MHZ */
+/** @} */
 
 /**
  * @brief   Available SPI clock speeds
@@ -114,12 +114,10 @@ typedef enum {
  * The actual speed of the bus varies between CPUs and depends on the speed
  * of the processing. The values of the enum entries represent the approximate
  * delay between two clock edges.
+ *
+ * @deprecated  Directly use spi_clk_t instead
  */
-typedef enum {
-    SOFT_SPI_CLK_100KHZ = 5,     /**< drive the SPI bus with less than 100kHz */
-    SOFT_SPI_CLK_1MHZ   = 1,     /**< drive the SPI bus with less than 1MHz */
-    SOFT_SPI_CLK_DEFAULT = 0,    /**< drive the SPI bus with maximum speed possible */
-} soft_spi_clk_t;
+typedef spi_clk_t soft_spi_clk_t;
 
 /**
  * @brief Software SPI port descriptor
@@ -128,8 +126,9 @@ typedef struct {
     gpio_t miso_pin;                /**< MOSI pin */
     gpio_t mosi_pin;                /**< MOSI pin */
     gpio_t clk_pin;                 /**< CLK pin */
-    soft_spi_mode_t soft_spi_mode;  /**< data and clock polarity */
-    soft_spi_clk_t soft_spi_clk;    /**< clock speed */
+    spi_mode_t soft_spi_mode;       /**< data and clock polarity */
+    uint16_t sleep_us;              /**< microseconds before toggling the clock
+                                     *   pin */
 } soft_spi_conf_t;
 
 /**
@@ -168,9 +167,9 @@ void soft_spi_init_pins(soft_spi_t bus);
  * @param[in] bus       SPI device that is used with the given CS line
  * @param[in] cs        chip select pin to initialize
  *
- * @return              SOFT_SPI_OK on success
- * @return              SOFT_SPI_NODEV on invalid device
- * @return              SOFT_SPI_NOCS on invalid CS pin/line
+ * @retval  0           success
+ * @retval  -ENXIO      invalid device
+ * @retval  -EINVAL     invalid CS pin/line
  */
 int soft_spi_init_cs(soft_spi_t bus, soft_spi_cs_t cs);
 
@@ -184,6 +183,9 @@ int soft_spi_init_cs(soft_spi_t bus, soft_spi_cs_t cs);
  *
  * @note    This function expects the @p bus and the @p cs parameters to be
  *          valid (they are checked in soft_spi_init and soft_spi_init_cs before)
+ * @warning For clock speeds higher than 400 kHz in @p clk, the SPI is driven as fast as the
+ *          implementation can manage. Don't expect the soft SPI to be able to compete with
+ *          peripheral SPI implementations in clock speed.
  *
  * @param[in]   bus     SPI device to access
  * @param[in]   cs      chip select pin/line to use
@@ -227,7 +229,7 @@ uint8_t soft_spi_transfer_byte(soft_spi_t bus, soft_spi_cs_t cs, bool cont, uint
  * @param[in]  len      number of bytes to transfer
  */
 void soft_spi_transfer_bytes(soft_spi_t bus, soft_spi_cs_t cs, bool cont,
-                        const void *out, void *in, size_t len);
+                             const void *out, void *in, size_t len);
 
 /**
  * @brief   Transfer one byte to/from a given register address
@@ -258,7 +260,7 @@ uint8_t soft_spi_transfer_reg(soft_spi_t bus, soft_spi_cs_t cs, uint8_t reg, uin
  * @param[in]  len      number of bytes to transfer
  */
 void soft_spi_transfer_regs(soft_spi_t bus, soft_spi_cs_t cs, uint8_t reg,
-                       const void *out, void *in, size_t len);
+                            const void *out, void *in, size_t len);
 
 #ifdef __cplusplus
 }
