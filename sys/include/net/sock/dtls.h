@@ -652,7 +652,9 @@ void sock_dtls_init(void);
  * @param[in] udp_sock  Existing UDP sock initialized with
  *                      @ref sock_udp_create() to be used underneath.
  * @param[in] tag       Credential tag of @p sock. The sock will only use
- *                      credentials with the same tag given here.
+ *                      credentials with the tags registered to it
+ *                      (see @ref sock_dtls_add_credential). Set to @ref CREDMAN_TAG_EMPTY to
+ *                      create a sock with an empty tag list.
  * @param[in] version   [DTLS version](@ref sock_dtls_prot_version) to use.
  * @param[in] role      [Role](@ref sock_dtls_role) of the endpoint.
  *

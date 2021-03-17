@@ -421,8 +421,14 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
 #endif /* SOCK_HAS_ASYNC */
 
     memset(sock->tags, CREDMAN_TAG_EMPTY, CONFIG_DTLS_CREDENTIALS_MAX * sizeof(credman_tag_t));
-    sock->tags_len = 1;
-    sock->tags[0] = tag;
+
+    if (tag != CREDMAN_TAG_EMPTY) {
+        sock->tags_len = 1;
+        sock->tags[0] = tag;
+    }
+    else {
+        sock->tags_len = 0;
+    }
 
     sock->role = role;
     sock->dtls_ctx = dtls_new_context(sock);
