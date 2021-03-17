@@ -240,3 +240,16 @@ void soft_spi_transfer_bytes(soft_spi_t bus, soft_spi_cs_t cs, bool cont,
         }
     }
 }
+
+uint8_t soft_spi_transfer_reg(soft_spi_t bus, soft_spi_cs_t cs, uint8_t reg, uint8_t out)
+{
+    soft_spi_transfer_bytes(bus, cs, true, &reg, NULL, 1);
+    return soft_spi_transfer_byte(bus, cs, false, out);
+}
+
+void soft_spi_transfer_regs(soft_spi_t bus, soft_spi_cs_t cs, uint8_t reg,
+        const void *out, void *in, size_t len)
+{
+    soft_spi_transfer_bytes(bus, cs, true, &reg, NULL, 1);
+    soft_spi_transfer_bytes(bus, cs, false, out, in, len);
+}
