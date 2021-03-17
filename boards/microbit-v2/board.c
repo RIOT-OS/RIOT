@@ -27,6 +27,6 @@ void board_init(void)
     cpu_init();
 
     /* initialize the on board buttons */
-    gpio_init(BTN0_PIN, GPIO_IN);
-    gpio_init(BTN1_PIN, GPIO_IN);
+    gpio_init(BTN0_PIN, BTN0_MODE);
+    gpio_init(BTN1_PIN, BTN1_MODE);
 }
