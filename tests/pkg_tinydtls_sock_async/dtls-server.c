@@ -59,6 +59,7 @@ static const credman_credential_t credential = {
 };
 #else /* #ifdef CONFIG_DTLS_PSK */
 static const uint8_t psk_key_0[] = PSK_DEFAULT_KEY;
+static const uint8_t psk_id_0[] = PSK_DEFAULT_IDENTITY;
 
 static const credman_credential_t credential = {
     .type = CREDMAN_TYPE_PSK,
@@ -66,6 +67,7 @@ static const credman_credential_t credential = {
     .params = {
         .psk = {
             .key = { .s = psk_key_0, .len = sizeof(psk_key_0) - 1, },
+            .id = { .s = psk_id_0, .len = sizeof(psk_id_0) - 1, },
         },
     },
 };
