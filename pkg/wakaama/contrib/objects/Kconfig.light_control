@@ -1,0 +1,22 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "Light Control object"
+
+config LWM2M_LIGHT_INSTANCES_MAX
+    int "Maximum number of Light Control object instances"
+    default 3
+
+config LWM2M_LIGHT_CONTROL_COLOR_MAX_SIZE
+    int "Maximum size of a Light Control color string"
+    default 16
+
+config LWM2M_LIGHT_CONTROL_APP_TYPE_MAX_SIZE
+    int "Maximum size of a Light Control application type string"
+    default 16
+
+endmenu # Light Control object
