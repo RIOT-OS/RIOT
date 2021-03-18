@@ -230,6 +230,7 @@ static void _reset(gnrc_netif_t *netif)
 {
     netif->lorawan.otaa = CONFIG_LORAMAC_DEFAULT_JOIN_PROCEDURE ==
                           LORAMAC_JOIN_OTAA ? NETOPT_ENABLE : NETOPT_DISABLE;
+    netif->lorawan.adr = IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR);
     netif->lorawan.datarate = CONFIG_LORAMAC_DEFAULT_DR;
     netif->lorawan.demod_margin = 0;
     netif->lorawan.num_gateways = 0;
@@ -336,7 +337,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
     { .type = netif->lorawan.ack_req ? MCPS_CONFIRMED : MCPS_UNCONFIRMED,
       .data =
       { .pkt = (iolist_t *)payload, .port = port,
-          .dr = netif->lorawan.datarate } };
+          .dr = netif->lorawan.datarate, .adr = netif->lorawan.adr  } };
     mcps_confirm_t conf;
 
     gnrc_lorawan_mcps_request(&netif->lorawan.mac, &req, &conf);
@@ -430,6 +431,10 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
 
     gnrc_netif_acquire(netif);
     switch (opt->opt) {
+        case NETOPT_LORAWAN_ADR:
+            assert(opt->data_len == sizeof(netopt_enable_t));
+            netif->lorawan.adr = *((netopt_enable_t *)opt->data);
+            break;
         case NETOPT_LORAWAN_DR:
             assert(opt->data_len == sizeof(uint8_t));
             if (!gnrc_lorawan_validate_dr(*((uint8_t *)opt->data))) {

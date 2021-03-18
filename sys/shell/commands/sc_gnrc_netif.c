@@ -79,6 +79,7 @@ static const struct {
     { "checksum", NETOPT_CHECKSUM },
     { "otaa", NETOPT_OTAA },
     { "link_check", NETOPT_LINK_CHECK },
+    { "adr", NETOPT_LORAWAN_ADR },
 };
 
 /* utility functions */
