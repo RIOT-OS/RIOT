@@ -170,7 +170,7 @@ int _parse_netif(sock_udp_ep_t *ep_out, char *netifstart)
 {
     char *netifend;
     size_t netiflen;
-    char netifbuf[NETIF_STR_LEN + 1];
+    char netifbuf[NETIF_STR_LEN + 1] = {0};
 
     for (netifend = netifstart; *netifend && *netifend != ']';
          netifend++);
