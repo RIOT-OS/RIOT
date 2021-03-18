@@ -32,6 +32,7 @@ SERVER_URI ?= '"coap://[fd00:dead:beef::1]"'
 
 # NOTE: Add the package for wakaama
 USEPKG += wakaama
+USEMODULE += wakaama_objects_light_control
 # Uncomment to enable Wakaama debug log
 #CFLAGS += -DCONFIG_LWM2M_WITH_LOGS=1
 

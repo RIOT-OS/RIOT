@@ -6,10 +6,10 @@ on the node with instances of the following objects:
 - [Security object](http://www.openmobilealliance.org/tech/profiles/LWM2M_Security-v1_0.xml)
 - [Server object](http://www.openmobilealliance.org/tech/profiles/LWM2M_Server-v1_0.xml)
 - [Device object](http://www.openmobilealliance.org/tech/profiles/LWM2M_Device-v1_0_3.xml)
+- [Light control object](https://raw.githubusercontent.com/OpenMobileAlliance/lwm2m-registry/prod/3311.xml)
 
 The application is based on the Eclipse Wakaama
-[example client](https://github.com/eclipse/wakaama/tree/master/examples/client)
-.
+[example client](https://github.com/eclipse/wakaama/tree/master/examples/client).
 
 ## Usage
 
@@ -18,10 +18,13 @@ To test the client a LwM2M server where to register is needed.
 [Eclipse Leshan](https://github.com/eclipse/leshan) demo is a good option for
 running one locally.
 
-To run the demo server:
+To run the demo server, download the jar file:
 ```shell
 wget https://hudson.eclipse.org/leshan/job/leshan/lastSuccessfulBuild/artifact/leshan-server-demo.jar
+```
 
+And run it:
+```shell
 java -jar ./leshan-server-demo.jar
 ```
 It will output the addresses where it is listening:
@@ -48,11 +51,15 @@ By default the bootstrap server option is disabled, it can be enabled by definin
 To run the bootstrap server, make sure that the ports it uses are different
 from the ones of previous server (default are 5683 for CoAP, 5684 for CoAPs,
 and 8080 for the webserver), and that it corresponds to the one set in
-`lwm2m.h` as `CONFIG_LWM2M_BSSERVER_PORT`:
-```shell
-# download demo
-wget https://hudson.eclipse.org/leshan/job/leshan/lastSuccessfulBuild/artifact/leshan-bsserver-demo.jar
+`lwm2m.h` as `CONFIG_LWM2M_BSSERVER_PORT`.
 
+Download the jar file:
+```shell
+wget https://hudson.eclipse.org/leshan/job/leshan/lastSuccessfulBuild/artifact/leshan-bsserver-demo.jar
+```
+
+And run it:
+```shell# download demo
 # set CoAP, CoAPs and webserver ports for bootstrap server
 BS_COAPPORT=5685
 BS_COAPSPORT=5686
@@ -111,3 +118,7 @@ BOARD=<board> make clean all flash term
 #### Shell commands
 - `lwm2m start`: Starts the LwM2M by configuring the module and registering to
   the server.
+- `lwm2m light <on|off> <dimmer> [color]`: Sets the light state to on or off,
+  with a given dimmer value and optional color.
+- `lwm2m mem`: (Only available if `DEVELHELP` is enabled in your Makefile) Prints the memory
+  usage of the LwM2M module.
