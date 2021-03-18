@@ -24,6 +24,7 @@
 #include "net/netdev.h"
 #include "net/lora.h"
 #include "net/loramac.h"
+#include "net/gnrc/lorawan/region.h"
 #include "net/gnrc/netreg.h"
 
 #define ENABLE_DEBUG 0
@@ -351,6 +352,11 @@ static int _set(gnrc_netif_t *netif, const gnrc_netapi_opt_t *opt)
     switch (opt->opt) {
         case NETOPT_LORAWAN_DR:
             assert(opt->data_len == sizeof(uint8_t));
+            if (!gnrc_lorawan_validate_dr(*((uint8_t *)opt->data))) {
+                DEBUG("gnrc_netif_lorawan: Invalid datarate\n");
+                res = -EINVAL;
+                break;
+            }
             netif->lorawan.datarate = *((uint8_t *)opt->data);
             break;
         case NETOPT_LORAWAN_TX_PORT:
