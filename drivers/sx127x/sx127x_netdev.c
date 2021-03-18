@@ -338,6 +338,11 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             *((netopt_enable_t*) val) = sx127x_get_iq_invert(dev) ? NETOPT_ENABLE : NETOPT_DISABLE;
             return sizeof(netopt_enable_t);
 
+        case NETOPT_RSSI:
+            assert(max_len >= sizeof(int8_t));
+            *((int8_t*) val) = sx127x_read_rssi(dev);
+            return sizeof(int8_t);
+
         default:
             break;
     }

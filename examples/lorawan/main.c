@@ -32,6 +32,10 @@
 #include "net/loramac.h"
 #include "semtech_loramac.h"
 
+#include "sx127x.h"
+#include "sx127x_netdev.h"
+#include "sx127x_params.h"
+
 /* Messages are sent every 20s to respect the duty cycle on each channel */
 #define PERIOD              (20U)
 
@@ -39,7 +43,8 @@
 static kernel_pid_t sender_pid;
 static char sender_stack[THREAD_STACKSIZE_MAIN / 2];
 
-semtech_loramac_t loramac;
+static semtech_loramac_t loramac;
+static sx127x_t sx127x;
 
 static const char *message = "This is RIOT!";
 
@@ -107,6 +112,11 @@ int main(void)
     fmt_hex_bytes(deveui, CONFIG_LORAMAC_DEV_EUI_DEFAULT);
     fmt_hex_bytes(appeui, CONFIG_LORAMAC_APP_EUI_DEFAULT);
     fmt_hex_bytes(appkey, CONFIG_LORAMAC_APP_KEY_DEFAULT);
+
+    /* Initialize the radio driver */
+    sx127x_setup(&sx127x, &sx127x_params[0], 0);
+    loramac.netdev = (netdev_t *)&sx127x;
+    loramac.netdev->driver = &sx127x_driver;
 
     /* Initialize the loramac stack */
     semtech_loramac_init(&loramac);
