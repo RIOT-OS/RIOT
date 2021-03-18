@@ -24,6 +24,8 @@
  * @}
  */
 
+#include <assert.h>
+
 #include "cpu.h"
 #include "mutex.h"
 #include "assert.h"
@@ -147,9 +149,10 @@ void spi_init_pins(spi_t bus)
     spi_twi_irq_register_spi(dev(bus), spi_isr_handler, (void *)bus);
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
+    assert((unsigned)bus < SPI_NUMOF);
 
     mutex_lock(&locks[bus]);
     /* configure bus */
@@ -157,8 +160,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
     dev(bus)->FREQUENCY = clk;
     /* enable the bus */
     dev(bus)->ENABLE = SPIM_ENABLE_ENABLE_Enabled;
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

@@ -104,10 +104,7 @@ static void print_state(cc110x_t *dev)
     uint8_t virtual_channel;
 
     /* Get all required data and release device */
-    if (cc110x_acquire(dev) != SPI_OK) {
-        puts("Failed to acquire CC1100/CC1101 transceiver");
-        return;
-    }
+    cc110x_acquire(dev);
 
     /* Reading out the RSSI changes it, as SPI communication seems to generate
      * some noise. Reading the RSSI out first yields up to 20 dBm lower

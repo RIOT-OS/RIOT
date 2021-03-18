@@ -67,9 +67,7 @@ int cc110x_recalibrate(cc110x_t *dev)
         /* Re-acquire SPI interface in order to check if calibration
          * succeeded
          */
-        if (cc110x_acquire(dev) != SPI_OK) {
-            return -EIO;
-        }
+        cc110x_acquire(dev);
     } while (cc110x_state_from_status(cc110x_status(dev)) != CC110X_STATE_IDLE);
 
     get_calibration_data(dev);
@@ -84,9 +82,7 @@ int cc110x_full_calibration(cc110x_t *dev)
         return -EINVAL;
     }
 
-    if (cc110x_acquire(dev) != SPI_OK) {
-        return -EIO;
-    }
+    cc110x_acquire(dev);
 
     switch (dev->state) {
         case CC110X_STATE_IDLE:

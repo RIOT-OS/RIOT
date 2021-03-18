@@ -185,16 +185,12 @@ int soft_spi_init_cs(soft_spi_t bus, soft_spi_cs_t cs);
  * @note    This function expects the @p bus and the @p cs parameters to be
  *          valid (they are checked in soft_spi_init and soft_spi_init_cs before)
  *
- * @param[in] bus       SPI device to access
- * @param[in] cs        chip select pin/line to use
- * @param[in] mode      mode to use for the new transaction
- * @param[in] clk       bus clock speed to use for the transaction
- *
- * @return              SOFT_SPI_OK on success
- * @return              SOFT_SPI_NOMODE if given mode is not supported
- * @return              SOFT_SPI_NOCLK if given clock speed is not supported
+ * @param[in]   bus     SPI device to access
+ * @param[in]   cs      chip select pin/line to use
+ * @param[in]   mode    mode to use for the new transaction
+ * @param[in]   clk     bus clock speed to use for the transaction
  */
-int soft_spi_acquire(soft_spi_t bus, soft_spi_cs_t cs, soft_spi_mode_t mode, soft_spi_clk_t clk);
+void soft_spi_acquire(soft_spi_t bus, soft_spi_cs_t cs, soft_spi_mode_t mode, soft_spi_clk_t clk);
 
 /**
  * @brief   Finish an ongoing SPI transaction by releasing the given SPI bus

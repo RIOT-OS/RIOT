@@ -56,9 +56,10 @@ void spi_init_pins(spi_t bus)
     gpio_init(spi_config[bus].miso_pin, GPIO_IN_PD);
 }
 
-int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
+void spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 {
     (void)cs;
+    assert((unsigned)bus < SPI_NUMOF);
 
     mutex_lock(&spi_lock[bus]);
 
@@ -68,8 +69,8 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
 
     USART_InitSync_TypeDef init = USART_INITSYNC_DEFAULT;
 
-    init.baudrate = (uint32_t) clk;
-    init.clockMode = (USART_ClockMode_TypeDef) mode;
+    init.baudrate = (uint32_t)clk;
+    init.clockMode = (USART_ClockMode_TypeDef)mode;
     init.msbf = true;
 
     USART_InitSync(spi_config[bus].dev, &init);
@@ -86,8 +87,6 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
                                      USART_ROUTEPEN_TXPEN |
                                      USART_ROUTEPEN_CLKPEN);
 #endif
-
-    return SPI_OK;
 }
 
 void spi_release(spi_t bus)

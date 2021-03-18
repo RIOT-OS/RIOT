@@ -48,9 +48,9 @@
 #define AT225XXXX_SET_BUF_SIZE      (64)
 #endif
 
-static inline int getbus(const at25xxx_t *dev)
+static inline void getbus(const at25xxx_t *dev)
 {
-    return spi_acquire(dev->params.spi, dev->params.cs_pin, SPI_MODE_0, dev->params.spi_clk);
+    spi_acquire(dev->params.spi, dev->params.cs_pin, SPI_MODE_0, dev->params.spi_clk);
 }
 
 static inline uint32_t _pos(uint8_t cmd, uint32_t pos)
@@ -254,10 +254,11 @@ int at25xxx_init(at25xxx_t *dev, const at25xxx_params_t *params)
         gpio_set(dev->params.hold_pin);
     }
 
-    /* check if the SPI configuration is valid */
-    if (getbus(dev) != SPI_OK) {
-        return -1;
+    if (!IS_ACTIVE(NDEBUG)) {
+        /* if assertions are on, trigger an assert on incorrect SPI settings
+         * right on initialization to ease debugging */
+        getbus(dev);
+        spi_release(dev->params.spi);
     }
-    spi_release(dev->params.spi);
     return 0;
 }
