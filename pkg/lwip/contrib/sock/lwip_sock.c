@@ -23,6 +23,7 @@
 
 #include "lwip/err.h"
 #include "lwip/ip.h"
+#include "lwip/netif.h"
 #include "lwip/tcp.h"
 #include "lwip/netif.h"
 #include "lwip/opt.h"
@@ -97,10 +98,12 @@ static bool _ep_isany(const struct _sock_tl_ep *ep)
 
 static const ip_addr_t *_netif_to_bind_addr(int family, uint16_t netif_num)
 {
+    struct netif *netif;
     if (netif_num > UINT8_MAX) {
         return NULL;
     }
-    for (struct netif *netif = netif_list; netif != NULL; netif = netif->next) {
+    /* cppcheck-suppress uninitvar ; assigned by macro */
+    NETIF_FOREACH(netif) {
         if (netif->num == (netif_num - 1)) {
             switch (family) {
 #if LWIP_IPV4
@@ -122,9 +125,11 @@ static const ip_addr_t *_netif_to_bind_addr(int family, uint16_t netif_num)
 
 static bool _addr_on_netif(int family, int netif_num, const ip_addr_t *addr)
 {
+    struct netif *netif;
     assert(addr != NULL);
     assert((netif_num >= 0) && (netif_num <= UINT8_MAX));
-    for (struct netif *netif = netif_list; netif != NULL; netif = netif->next) {
+    /* cppcheck-suppress uninitvar ; assigned by macro */
+    NETIF_FOREACH(netif) {
         if (netif->num == (netif_num - 1)) {
             switch (family) {
 #if LWIP_IPV4
@@ -439,7 +444,9 @@ uint16_t lwip_sock_bind_addr_to_netif(const ip_addr_t *bind_addr)
     assert(bind_addr != NULL);
 
     if (!ip_addr_isany(bind_addr)) {
-        for (struct netif *netif = netif_list; netif != NULL; netif = netif->next) {
+        struct netif *netif;
+        /* cppcheck-suppress uninitvar ; assigned by macro */
+        NETIF_FOREACH(netif) {
             if (IP_IS_V6(bind_addr)) {  /* XXX crappy API yields crappy code */
 #if LWIP_IPV6
                 if (netif_get_ip6_addr_match(netif, ip_2_ip6(bind_addr)) >= 0) {
