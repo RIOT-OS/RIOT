@@ -126,4 +126,6 @@ config LWM2M_TLSF_BUFFER
     int "Allocation buffer size"
     default 5120
 
+rsource "contrib/objects/Kconfig"
+
 endif # KCONFIG_USEPKG_WAKAAMA
