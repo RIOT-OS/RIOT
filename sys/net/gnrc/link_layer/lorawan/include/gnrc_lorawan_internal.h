@@ -69,12 +69,12 @@ extern "C" {
 #define GNRC_LORAWAN_BACKOFF_BUDGET_3   (8700000LL)     /**< budget of time on air every 24 hours */
 
 #define GNRC_LORAWAN_MLME_OPTS_LINK_CHECK_REQ  (1 << 0) /**< Internal Link Check request flag */
-#define GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS    (1 << 1)
+#define GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS    (1 << 1) /**< Internal Link ADR Answer flag */
 
 #define GNRC_LORAWAN_CID_SIZE (1U)                      /**< size of Command ID in FOps */
 #define GNRC_LORAWAN_CID_LINK_CHECK_ANS (0x02)          /**< Link Check CID */
-#define GNRC_LORAWAN_CID_LINK_ADR_REQ   (0x03)
-#define GNRC_LORAWAN_CID_LINK_ADR_ANS   (0x03)
+#define GNRC_LORAWAN_CID_LINK_ADR_REQ   (0x03)          /**< Link ADR Request CID */
+#define GNRC_LORAWAN_CID_LINK_ADR_ANS   (0x03)          /**< Link ADR Answer CID */
 
 #define GNRC_LORAWAN_FOPT_LINK_CHECK_ANS_SIZE (3U)      /**< size of Link check answer */
 #define GNRC_LORAWAN_FOPT_LINK_ADR_REQ_SIZE   (5U)      /**< size of Link ADR Request (LinkADRReq) */
@@ -163,7 +163,7 @@ typedef struct {
 typedef struct {
     uint32_t fcnt;                      /**< uplink framecounter */
     uint32_t fcnt_down;                 /**< downlink frame counter */
-    uint16_t adr_ack_cnt;               /**< `ADR_ACK_CNT` */
+    uint16_t adr_ack_cnt;               /**< ADR ACK counter */
     iolist_t *msdu;                     /**< current MSDU */
     int nb_trials;                      /**< holds the remaining number of retransmissions */
     int ack_requested;                  /**< whether the network server requested an ACK */
@@ -250,7 +250,7 @@ void gnrc_lorawan_generate_session_keys(const uint8_t *app_nonce,
                                         uint8_t *appskey);
 
 /**
- * @brief Set SF and BW for the next transmission
+ * @brief Set PHY parameters from DR for the next transmission
  *
  * @param[in] mac pointer to the MAC descriptor
  * @param[in] datarate desired datarate
