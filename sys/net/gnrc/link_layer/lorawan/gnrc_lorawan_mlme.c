@@ -144,6 +144,7 @@ void gnrc_lorawan_mlme_process_join(gnrc_lorawan_t *mac, uint8_t *data,
         gnrc_lorawan_process_cflist(mac, out + sizeof(lorawan_join_accept_t) - 1);
     }
 
+    DEBUG("gnrc_lorawan: Channel mask is %04x\n", mac->channel_mask);
     mac->mlme.activation = MLME_ACTIVATION_OTAA;
     status = GNRC_LORAWAN_REQ_STATUS_SUCCESS;
 
