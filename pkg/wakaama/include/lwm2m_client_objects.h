@@ -45,6 +45,7 @@ extern "C" {
  *        net/lwm2m.h
  *
  * @param[in, out] client_data Pointer to a LwM2M client data descriptor
+ * @param[in]      server_id   Server ID (SID) to assign to the new instance
  *
  * @return Pointer to the created object
  * @return NULL otherwise

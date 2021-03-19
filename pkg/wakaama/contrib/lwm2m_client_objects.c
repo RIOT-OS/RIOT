@@ -31,12 +31,11 @@ lwm2m_object_t *get_server_object(int server_id, const char *binding,
                                   int lifetime, bool storing);
 lwm2m_object_t *lwm2m_get_object_device(void);
 
-lwm2m_object_t *lwm2m_client_get_server_object(
-                        lwm2m_client_data_t *client_data)
+lwm2m_object_t *lwm2m_client_get_server_object(lwm2m_client_data_t *client_data,
+                                               int server_id)
 {
     (void)client_data;
     lwm2m_object_t *ret;
-    int server_id = CONFIG_LWM2M_SERVER_ID;
     int lifetime = CONFIG_LWM2M_DEVICE_TTL;
 
     ret = get_server_object(server_id, CONFIG_LWM2M_DEVICE_BINDINGS, lifetime,
