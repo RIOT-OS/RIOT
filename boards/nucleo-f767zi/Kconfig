@@ -29,6 +29,7 @@ config BOARD_NUCLEO_F767ZI
     select HAS_PERIPH_PTP_SPEED_ADJUSTMENT
     select HAS_PERIPH_PTP_TIMER
     select HAS_PERIPH_PTP_TXRX_TIMESTAMPS
+    select HAS_PERIPH_CAN
 
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
