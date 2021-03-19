@@ -310,7 +310,7 @@ static void _mlme_link_adr_req(gnrc_lorawan_t *mac, uint8_t *p)
     mlme_link_adr_req_t mlme_link_adr_req;
 
     mlme_link_adr_req.dr_txpwr = p[1];
-    mlme_link_adr_req.chmsk = (p[3] << 8 ) | (p[2] & 0xff);
+    mlme_link_adr_req.chmsk = (p[3] << 8 ) | p[2];
     mlme_link_adr_req.redncy = p[4];
 
     DEBUG("gnrc_lorawan_mlme: LinkADRReq DataRate_TXPower : DR%u TX%u\n",
