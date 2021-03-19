@@ -38,7 +38,6 @@
 #include "kernel_defines.h"
 #include "xfa.h"
 #include "shell.h"
-#include "shell_commands.h"
 
 /* define shell command cross file array */
 XFA_INIT_CONST(shell_command_t*, shell_commands_xfa);
@@ -53,12 +52,6 @@ XFA_INIT_CONST(shell_command_t*, shell_commands_xfa);
 #else
     #define flush_if_needed()
 #endif /* MODULE_NEWLIB || MODULE_PICOLIBC */
-
-#ifdef MODULE_SHELL_COMMANDS
-    #define _builtin_cmds _shell_command_list
-#else
-    #define _builtin_cmds NULL
-#endif
 
 #define SQUOTE '\''
 #define DQUOTE '"'
@@ -117,10 +110,6 @@ static shell_command_handler_t find_handler(
         handler = search_commands(command_list, command);
     }
 
-    if (handler == NULL && _builtin_cmds != NULL) {
-        handler = search_commands(_builtin_cmds, command);
-    }
-
     if (handler == NULL) {
         handler = search_commands_xfa(command);
     }
@@ -150,10 +139,6 @@ static void print_help(const shell_command_t *command_list)
          "\n---------------------------------------");
     if (command_list != NULL) {
         print_commands(command_list);
-    }
-
-    if (_builtin_cmds != NULL) {
-        print_commands(_builtin_cmds);
     }
 
     print_commands_xfa();
