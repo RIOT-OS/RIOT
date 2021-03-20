@@ -3,6 +3,7 @@ include $(RIOTCPU)/avr8_common/Makefile.features
 # common feature are defined in avr8_common/Makefile.features
 # Only add Additional features
 
+FEATURES_PROVIDED += cpu_core_atmega
 FEATURES_PROVIDED += atmega_pcint0
 FEATURES_PROVIDED += dbgpin
 FEATURES_PROVIDED += periph_cpuid

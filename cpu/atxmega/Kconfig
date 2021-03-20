@@ -1,0 +1,85 @@
+# Copyright (c) 2020 HAW Hamburg
+# Copyright (c) 2021 Gerson Fernando Budke
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config HAS_CPU_CORE_ATXMEGA
+    bool
+    select CPU_ARCH_AVR8
+    select HAS_CPU_ATXMEGA
+    select HAS_CPP
+
+config CPU_COMMON_ATXMEGA
+    bool
+    select HAS_CPU_CORE_ATXMEGA
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_NVM
+    select HAS_PERIPH_PM
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_TIMER_PERIODIC
+    select HAS_PERIPH_UART
+
+config CPU_CORE_ATXMEGA_A1
+    bool
+    select CPU_COMMON_ATXMEGA
+
+config CPU_CORE_ATXMEGA_A3
+    bool
+    select CPU_COMMON_ATXMEGA
+
+config CPU_CORE_ATXMEGA_A4
+    bool
+    select CPU_COMMON_ATXMEGA
+
+config CPU_CORE_ATXMEGA_B1
+    bool
+    select CPU_COMMON_ATXMEGA
+
+config CPU_CORE_ATXMEGA_B3
+    bool
+    select CPU_COMMON_ATXMEGA
+
+config CPU_CORE_ATXMEGA_C3
+    bool
+    select CPU_COMMON_ATXMEGA
+
+config CPU_CORE_ATXMEGA_C4
+    bool
+    select CPU_COMMON_ATXMEGA
+
+config CPU_CORE_ATXMEGA_D3
+    bool
+    select CPU_COMMON_ATXMEGA
+
+config CPU_CORE_ATXMEGA_D4
+    bool
+    select CPU_COMMON_ATXMEGA
+
+config CPU_CORE_ATXMEGA_E5
+    bool
+    select CPU_COMMON_ATXMEGA
+
+config CPU
+    default "atxmega" if CPU_COMMON_ATXMEGA
+
+source "$(RIOTCPU)/atxmega/Kconfig.XMEGAA"
+source "$(RIOTCPU)/atxmega/Kconfig.XMEGAB"
+source "$(RIOTCPU)/atxmega/Kconfig.XMEGAC"
+source "$(RIOTCPU)/atxmega/Kconfig.XMEGAD"
+source "$(RIOTCPU)/atxmega/Kconfig.XMEGAE"
+
+## Declaration of specific features
+config HAS_CPU_ATXMEGA
+    bool
+
+config HAS_PERIPH_NVM
+    bool
+    help
+        Indicates that the Non Volatile Memory controller is present.
+
+source "$(RIOTCPU)/avr8_common/Kconfig"

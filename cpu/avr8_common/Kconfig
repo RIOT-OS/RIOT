@@ -5,14 +5,11 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
 config CPU_ARCH_AVR8
     bool
     select HAS_ARCH_8BIT
     select HAS_ARCH_AVR8
-
-config CPU_CORE_AVR
-    bool
-    select CPU_ARCH_AVR8
 
 ## Common CPU symbols
 config CPU_ARCH

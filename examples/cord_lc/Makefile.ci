@@ -6,6 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega1284p \
     atmega328p \
+    atxmega-a1u-xpro \
     bluepill-stm32f030c8 \
     chronos \
     derfmega128 \

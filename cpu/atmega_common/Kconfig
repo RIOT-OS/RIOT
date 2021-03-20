@@ -4,11 +4,16 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
+config HAS_CPU_CORE_ATMEGA
+    bool
+    select CPU_ARCH_AVR8
+    select HAS_CPP
+
 config CPU_COMMON_ATMEGA
     bool
-    select CPU_CORE_AVR
+    select HAS_CPU_CORE_ATMEGA
     select HAS_ATMEGA_PCINT0
-    select HAS_CPP
     select HAS_DBGPIN
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_EEPROM

@@ -20,7 +20,6 @@
 
 #include "board.h"
 #include "cpu.h"
-#include "irq.h"
 #include "periph/gpio.h"
 
 #ifndef CPU_ATMEGA_CLK_SCALE_INIT
@@ -42,5 +41,4 @@ void __attribute__((weak)) board_init(void)
 #ifdef LED0_ON
     led_init();
 #endif
-    irq_enable();
 }

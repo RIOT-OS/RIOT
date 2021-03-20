@@ -1,7 +1,7 @@
-FEATURES_REQUIRED_ANY += arch_avr8|arch_esp32|arch_native
+FEATURES_REQUIRED_ANY += cpu_core_atmega|arch_esp32|arch_native
 
 ifeq (,$(filter ws281x_%,$(USEMODULE)))
-  ifneq (,$(filter arch_avr8,$(FEATURES_USED)))
+  ifneq (,$(filter cpu_core_atmega,$(FEATURES_USED)))
     USEMODULE += ws281x_atmega
   endif
   ifneq (,$(filter arch_native,$(FEATURES_USED)))
@@ -13,7 +13,7 @@ ifeq (,$(filter ws281x_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter ws281x_atmega,$(USEMODULE)))
-  FEATURES_REQUIRED += arch_avr8
+  FEATURES_REQUIRED += cpu_core_atmega
 endif
 
 USEMODULE += xtimer

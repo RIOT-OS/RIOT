@@ -2,6 +2,10 @@ include ../Makefile.tests_common
 
 FEATURES_REQUIRED = periph_timer
 
+BOARDS_TIMER_500kHz := \
+    atxmega-a1u-xpro \
+    #
+
 BOARDS_TIMER_250kHz := \
     arduino-duemilanove \
     arduino-leonardo \
@@ -39,7 +43,9 @@ BOARDS_TIMER_CLOCK_CORECLOCK := \
   waspmote-pro \
   #
 
-ifneq (,$(filter $(BOARDS_TIMER_250kHz),$(BOARD)))
+ifneq (,$(filter $(BOARDS_TIMER_500kHz),$(BOARD)))
+  TIMER_SPEED ?= 500000
+else ifneq (,$(filter $(BOARDS_TIMER_250kHz),$(BOARD)))
   TIMER_SPEED ?= 250000
 else ifneq (,$(filter $(BOARDS_TIMER_32kHz),$(BOARD)))
   TIMER_SPEED ?= 32768

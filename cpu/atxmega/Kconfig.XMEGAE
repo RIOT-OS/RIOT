@@ -1,0 +1,17 @@
+## CPU Models
+config CPU_MODEL_XMEGA8E5
+    bool
+    select CPU_CORE_ATXMEGA_E5
+
+config CPU_MODEL_XMEGA16E5
+    bool
+    select CPU_CORE_ATXMEGA_E5
+
+config CPU_MODEL_XMEGA32E5
+    bool
+    select CPU_CORE_ATXMEGA_E5
+
+config CPU_MODEL
+    default "atxmega8e5"     if CPU_MODEL_XMEGA8E5
+    default "atxmega16e5"    if CPU_MODEL_XMEGA16E5
+    default "atxmega32e5"    if CPU_MODEL_XMEGA32E5

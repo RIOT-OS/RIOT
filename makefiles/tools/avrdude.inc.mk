@@ -12,14 +12,18 @@ ifneq (,$(filter $(CPU),atmega328p))
   # Use debugWIRE as protocol for debugging (ATmega328P does not support JTAG)
   DEBUGPROTO := -w
 else
-  # Use JTAG as protocol for debugging
-  DEBUGPROTO := -j $(AVR_DEBUGINTERFACE)
+  # Use JTAG as protocol for debugging as default
+  DEBUGPROTO ?= -j $(AVR_DEBUGINTERFACE)
 endif
 DEBUGSERVER_FLAGS ?= "$(AVR_DEBUGDEVICE) $(DEBUGPROTO) :$(DEBUGSERVER_PORT)"
 DEBUGGER_FLAGS ?= "-x $(AVARICE_PATH)/gdb.conf $(ELFFILE)"
 DEBUGGER = "$(AVARICE_PATH)/debug.sh" $(DEBUGSERVER_FLAGS) $(AVARICE_PATH) $(DEBUGSERVER_PORT)
 
-AVRDUDE_PROGRAMMER_FLAGS = -p $(subst atmega,m,$(CPU))
+ifeq (atxmega,$(CPU))
+  AVRDUDE_PROGRAMMER_FLAGS ?= -p $(subst atxmega,x,$(CPU_MODEL))
+else
+  AVRDUDE_PROGRAMMER_FLAGS = -p $(subst atmega,m,$(CPU))
+endif
 
 # Set flasher port only for programmers that require it
 ifneq (,$(filter $(AVRDUDE_PROGRAMMER),arduino avr109 buspirate stk500v1 stk500v2 wiring))

@@ -1,0 +1,24 @@
+# Copyright (c) 2020 HAW Hamburg
+# Copyright (c) 2021 Gerson Fernando Budle
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+
+config BOARD
+    default "atxmega-a1u-xpro" if BOARD_ATXMEGA_A1U_XPRO
+
+config BOARD_ATXMEGA_A1U_XPRO
+    bool
+    default y
+    select CPU_MODEL_XMEGA128A1U
+    select HAS_PERIPH_CPUID
+    select HAS_PERIPH_GPIO
+    select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_NVM
+    select HAS_PERIPH_PM
+    select HAS_PERIPH_TIMER
+    select HAS_PERIPH_TIMER_PERIODIC
+    select HAS_PERIPH_UART
+
+    select HAVE_SAUL_GPIO
