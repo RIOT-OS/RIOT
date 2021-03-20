@@ -1,0 +1,70 @@
+/**
+@defgroup    bootloader_riotboot_dfu riotboot DFU
+@ingroup     bootloaders
+
+# Overview
+
+`riotboot_dfu` is a variation on @ref bootloader_riotboot that adds USB device firmware upgrade (DFU).
+In addition to the (otherwise small) slot selection,
+it uses a board's USB interface to allow firmware upgrades from inside the bootloader.
+
+At startup, the DFU mode is entered when either
+
+- none of the slots contains a valid firmware image, or
+
+- the first button was pressed when the board started (configurable at board level using @ref BTN_BOOTLOADER_PIN), or
+
+- the last running firmware asked the bootloader to go to DFU mode by using a magic number (see @ref RIOTBOOT_DFU_ADDR).
+
+# Prerequisites
+
+- The board must have functional USB support, easily tested using the `examples/usbus_minimal/` example.
+
+- The board must have functional riotboot support, see @ref bootloader_riotboot.
+
+# Flashing riotboot_dfu
+
+The `riotboot_dfu` bootloader can be flashed using a regular programmer like any other application:
+
+```
+$ make -C bootloaders/riotboot_dfu BOARD=particle-xenon all flash
+```
+
+Depending on your setup, you may need to select the right `PROGRAMMER` (and its details) in addition to your board.
+
+# DFU mode
+
+A device in riotboot DFU mode can be recognized in the USB device list by its VID/PID pair 1209:7d02:
+
+```
+$ lsusb
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 001 Device 005: ID 138a:003f [...]
+Bus 001 Device 004: ID 8087:0a2b [...]
+Bus 001 Device 045: ID 1209:7d02 Generic USB device
+Bus 001 Device 001: ID 1d6b:0002 [...]
+```
+
+When running in DFU mode, the bootloader allows writing to either of the two firmware slots.
+
+When the device is attached and in DFU mode (or the current firmware uses the `usbus_dfu` module),
+new firmware can be flashed to slot 0 using:
+
+```
+$ FEATURES_REQUIRED+=riotboot USEMODULE+=usbus_dfu make -C examples/saul BOARD=particle-xenon PROGRAMMER=dfu-util all riotboot/flash-slot0
+```
+
+Note that when building and flashing a different slot (eg. `flash-slot1`),
+the DFU utility has to be explicitly prompted to upload it the other slot
+by adding a `DFU_ALT=1` argument.
+
+# Entering DFU mode
+
+When RIOT applications are built with `USEMODULE+=usbus_dfu`,
+they implement what is called "runtime mode" in DFU.
+
+In runtime mode, it is visible to dfu-util that they are upgradable.
+On firmware upgrades, the build system can send a command via USB to enter DFU mode.
+This can also be done manually using `dfu-util -e`.
+
+*/
