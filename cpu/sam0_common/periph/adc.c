@@ -58,7 +58,10 @@ static inline void _wait_syncbusy(Adc *dev)
      * The ADC SYNCBUSY.SWTRIG gets stuck to '1' after wake-up from Standby Sleep mode.
      * SAMD5x/SAME5x errata: DS80000748 (page 10)
      */
-    while (dev->SYNCBUSY.reg & ~ADC_SYNCBUSY_SWTRIG) {}
+    do {
+        /* XXX: Why do we need to wait before accessing SYNCBUSY after hibernate? */
+        for (volatile unsigned int i = 0; i < 50; i++) {}
+    } while (dev->SYNCBUSY.reg & ~ADC_SYNCBUSY_SWTRIG);
 #endif
 }
 
