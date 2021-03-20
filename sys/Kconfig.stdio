@@ -10,7 +10,7 @@ menu "Standard Input/Output (STDIO)"
 
 choice
     bool "STDIO implementation"
-    default MODULE_STDIO_NATIVE if CPU_ARCH_NATIVE
+    default MODULE_STDIO_NATIVE if CPU_NATIVE
     default MODULE_STDIO_UART
 
 # TODO: Add MODULE_STDIO_CDC_ACM, MODULE_STDIO_RTT, and MODULE_STDIO_ETHOS
@@ -32,7 +32,7 @@ config MODULE_STDIO_UART
 
 config MODULE_STDIO_NATIVE
     bool "Native"
-    depends on CPU_ARCH_NATIVE
+    depends on CPU_NATIVE
 
 endchoice
 

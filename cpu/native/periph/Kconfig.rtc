@@ -6,5 +6,5 @@
 #
 
 config MODULE_PERIPH_RTC
-    select MODULE_XTIMER if CPU_ARCH_NATIVE
+    select MODULE_XTIMER if CPU_NATIVE
     depends on HAS_PERIPH_RTC

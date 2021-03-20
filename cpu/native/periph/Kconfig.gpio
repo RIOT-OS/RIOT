@@ -8,7 +8,7 @@
 choice NATIVE_GPIO_IMPLEMENTATION
     bool "Native GPIO peripheral implementation"
     depends on MODULE_PERIPH_GPIO
-    depends on CPU_ARCH_NATIVE
+    depends on CPU_NATIVE
     depends on TEST_KCONFIG
     default MODULE_PERIPH_GPIO_LINUX if NATIVE_OS_LINUX
 
