@@ -27,6 +27,10 @@
  * actuators/sensor via auto_init and the access to all available devices via
  * one unified shell command.
  *
+ * SAUL drivers may rely on being called from a thread, and often block for
+ * short amounts of time to obtain a value. Conversely, requests through the
+ * @ref sys_saul_reg must not be issued from an interrupt context.
+ *
  * @todo        So far, the interface only supports simple read and set
  *              operations. It probably needs to be extended to handling events,
  *              thresholds, and so on.
