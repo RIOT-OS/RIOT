@@ -89,7 +89,7 @@ int main(void)
         msg_receive(&msg);
 
         /* read the data */
-        if (ccs811_read_iaq(&sensor, &tvoc, &eco2, 0, 0) != CCS811_OK) {
+        if (ccs811_read_iaq(&sensor, &tvoc, &eco2, 0, 0) == CCS811_OK) {
             /* print values */
             printf("TVOC [ppb]: %d\neCO2 [ppm]: %d\n", tvoc, eco2);
             puts("+-------------------------------------+");

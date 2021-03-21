@@ -58,7 +58,7 @@ int main(void)
         }
 
         /* read the data and print them on success */
-        if (ccs811_read_iaq(&sensor, &tvoc, &eco2, 0, 0) != CCS811_OK) {
+        if (ccs811_read_iaq(&sensor, &tvoc, &eco2, 0, 0) == CCS811_OK) {
             printf("TVOC [ppb]: %d\neCO2 [ppm]: %d\n", tvoc, eco2);
             puts("+-------------------------------------+");
         }
