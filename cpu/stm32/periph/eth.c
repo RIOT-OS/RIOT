@@ -93,9 +93,6 @@ static xtimer_t _link_status_timer;
 
 #define MIN(a, b) (((a) <= (b)) ? (a) : (b))
 
-/* Synchronization between IRQ and thread context */
-mutex_t stm32_eth_tx_completed = MUTEX_INIT_LOCKED;
-
 /* Descriptors */
 static edma_desc_t rx_desc[ETH_RX_DESCRIPTOR_COUNT];
 static edma_desc_t tx_desc[ETH_TX_DESCRIPTOR_COUNT];
@@ -494,6 +491,10 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
         if (!i) {
             /* fist chunk */
             status |= TX_DESC_STAT_FS;
+            if (IS_USED(MODULE_PERIPH_PTP) && IS_USED(MODULE_NETDEV_TX_INFO_TIMESTAMP)) {
+                /* enable time stamping for this frame */
+                status |= TX_DESC_STAT_TTSE;
+            }
         }
         if (!iolist->iol_next) {
             /* last chunk */
@@ -505,17 +506,22 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
 
     /* start TX */
     ETH->DMATPDR = 0;
-    /* await completion */
     if (IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
         DEBUG("[stm32_eth] Started to send %u B via DMA\n", bytes_to_send);
     }
-    mutex_lock(&stm32_eth_tx_completed);
-    if (IS_ACTIVE(ENABLE_DEBUG_VERBOSE)) {
-        DEBUG("[stm32_eth] TX completed\n");
-    }
+
+    return 0;
+}
+
+
+static int stm32_eth_confirm_send(netdev_t *netdev, void *_info)
+{
+    netdev_tx_info_t *info = _info;
+    DEBUG("[stm32_eth] TX completed\n");
 
     /* Error check */
     _debug_tx_descriptor_info(__LINE__);
+    int tx_bytes = 0;
     int error = 0;
     while (1) {
         uint32_t status = tx_curr->status;
@@ -539,17 +545,27 @@ static int stm32_eth_send(netdev_t *netdev, const struct iolist *iolist)
             }
             _reset_eth_dma();
         }
-        tx_curr = tx_curr->desc_next;
+        tx_bytes += tx_curr->control;
         if (status & TX_DESC_STAT_LS) {
+            if (IS_USED(MODULE_PERIPH_PTP) && IS_USED(MODULE_NETDEV_TX_INFO_TIMESTAMP)) {
+                /* time stamp was requested, but check if it actually was captured via TTSS bit */
+                if (status & TX_DESC_STAT_TTSS) {
+                    info->timestamp = tx_curr->ts_low;
+                    info->timestamp += (uint64_t)tx_curr->ts_high * NS_PER_SEC;
+                    info->flags |= NETDEV_TX_INFO_FLAG_TIMESTAMP;
+                }
+            }
+            tx_curr = tx_curr->desc_next;
             break;
         }
+        tx_curr = tx_curr->desc_next;
     }
 
     netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
     if (error) {
         return error;
     }
-    return (int)bytes_to_send;
+    return tx_bytes;
 }
 
 static int get_rx_frame_size(void)
@@ -716,6 +732,7 @@ static void stm32_eth_isr(netdev_t *netdev)
 
 static const netdev_driver_t netdev_driver_stm32f4eth = {
     .send = stm32_eth_send,
+    .confirm_send = stm32_eth_confirm_send,
     .recv = stm32_eth_recv,
     .init = stm32_eth_init,
     .isr = stm32_eth_isr,
