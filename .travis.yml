@@ -4,7 +4,6 @@ language: minimal
 
 before_install:
   - sudo apt-get install coreutils cppcheck pcregrep python3 python3-pip uncrustify
-  - sudo pip3 install flake8
 
 notifications:
   email:
@@ -15,5 +14,4 @@ notifications:
 
 script:
   - ./RIOT/dist/tools/whitespacecheck/check.sh
-  - find . -path ./RIOT -prune -o -name *.py -exec python3 -m flake8 --config=./RIOT/dist/tools/flake8/flake8.cfg {} +
   - find . -path ./RIOT -prune -o \( -name *.c -o -name *.h \) -exec cppcheck --std=c99 --enable=style --force --error-exitcode=2 --quiet -j 1 {} +
