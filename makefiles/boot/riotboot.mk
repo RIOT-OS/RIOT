@@ -28,7 +28,7 @@ SLOT_RIOT_BINS = $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 # This results in the equivalent to "make flash-only" for
 # "make riotboot/flash-slot[01]".
 ifneq (1, $(RIOTBOOT_SKIP_COMPILE))
-$(BINDIR_APP)-%.elf: $(BASELIBS)
+$(BINDIR_APP)-%.elf: $(BASELIBS) $(ARCHIVES)
 	$(Q)$(_LINK) -o $@
 endif
 
