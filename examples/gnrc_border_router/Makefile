@@ -43,7 +43,7 @@ USEMODULE += ps
 #USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
 
 # When using a WiFi uplink we should use DHCPv6
-ifneq (,$(filter wifi ethernet,$(UPLINK)))
+ifneq (,$(filter cdc-ecm wifi ethernet,$(UPLINK)))
   USE_DHCPV6 ?= 1
 else
   USE_DHCPV6 ?= 0
