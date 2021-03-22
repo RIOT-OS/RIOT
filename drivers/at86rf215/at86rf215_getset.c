@@ -269,14 +269,6 @@ void at86rf215_set_option(at86rf215_t *dev, uint16_t option, bool state)
                          : (dev->flags & ~option);
 
     switch (option) {
-        case AT86RF215_OPT_TELL_RX_START:
-            if (state) {
-                at86rf215_reg_or(dev, dev->BBC->RG_IRQM, BB_IRQ_RXAM);
-            } else {
-                at86rf215_reg_and(dev, dev->BBC->RG_IRQM, ~BB_IRQ_RXAM);
-            }
-
-            break;
         case AT86RF215_OPT_PROMISCUOUS:
             if (state) {
                 at86rf215_reg_or(dev, dev->BBC->RG_AFC0, AFC0_PM_MASK);

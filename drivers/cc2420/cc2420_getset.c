@@ -199,14 +199,6 @@ int cc2420_set_option(cc2420_t *dev, uint16_t option, bool state)
                 DEBUG("cc2420: set_opt: CC2420_OPT_PRELOADING\n");
                 break;
 
-            case CC2420_OPT_TELL_TX_START:
-            case CC2420_OPT_TELL_TX_END:
-            case CC2420_OPT_TELL_RX_START:
-            case CC2420_OPT_TELL_RX_END:
-                DEBUG("cc2420: set_opt: TX/RX START/END\n");
-                /* TODO */
-                break;
-
             default:
                 return -ENOTSUP;
         }
@@ -240,14 +232,6 @@ int cc2420_set_option(cc2420_t *dev, uint16_t option, bool state)
 
             case CC2420_OPT_PRELOADING:
                 DEBUG("cc2420: clr_opt: CC2420_OPT_PRELOADING\n");
-                break;
-
-            case CC2420_OPT_TELL_TX_START:
-            case CC2420_OPT_TELL_TX_END:
-            case CC2420_OPT_TELL_RX_START:
-            case CC2420_OPT_TELL_RX_END:
-                DEBUG("cc2420: clr_opt: TX/RX START/END\n");
-                /* TODO */
                 break;
 
             default:

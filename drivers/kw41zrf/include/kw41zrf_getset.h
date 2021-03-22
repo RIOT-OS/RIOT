@@ -33,10 +33,6 @@ extern "C" {
 #define KW41ZRF_OPT_CSMA            (0x01u) /**< use CSMA/CA algorithm for sending */
 #define KW41ZRF_OPT_PROMISCUOUS     (0x02u) /**< promiscuous mode active */
 #define KW41ZRF_OPT_PRELOADING      (0x04u) /**< preloading enabled */
-#define KW41ZRF_OPT_TELL_TX_START   (0x08u) /**< notify MAC layer on TX start */
-#define KW41ZRF_OPT_TELL_TX_END     (0x10u) /**< notify MAC layer on TX finished */
-#define KW41ZRF_OPT_TELL_RX_START   (0x20u) /**< notify MAC layer on RX start */
-#define KW41ZRF_OPT_TELL_RX_END     (0x40u) /**< notify MAC layer on RX finished */
 #define KW41ZRF_OPT_AUTOACK         (0x80u) /**< automatic sending of ACKs */
 #define KW41ZRF_OPT_ACK_PENDING     (0x81u) /**< set pending bit on auto ACKs */
 /** @} */

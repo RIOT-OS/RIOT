@@ -169,6 +169,7 @@ static void at86rf2xx_enable_smart_idle(at86rf2xx_t *dev)
 
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
+    uint8_t tmp;
     netdev_ieee802154_reset(&dev->netdev);
 
     /* Reset state machine to ensure a known state */
@@ -204,7 +205,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 
 #if !defined(MODULE_AT86RFA1) && !defined(MODULE_AT86RFR2)
     /* don't populate masked interrupt flags to IRQ_STATUS register */
-    uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_1);
+    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_CTRL_1);
     tmp &= ~(AT86RF2XX_TRX_CTRL_1_MASK__IRQ_MASK_MODE);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_CTRL_1, tmp);
 #endif
@@ -242,6 +243,11 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
     dev->idle_state = AT86RF2XX_PHY_STATE_RX;
     /* go into RX state */
     at86rf2xx_set_state(dev, AT86RF2XX_PHY_STATE_RX);
+
+    /* Enable RX start IRQ */
+    tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
+    tmp |= AT86RF2XX_IRQ_STATUS_MASK__RX_START;
+    at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
 
     DEBUG("at86rf2xx_reset(): reset complete.\n");
 }
@@ -292,8 +298,7 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev)
     /* trigger sending of pre-loaded frame */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
                         AT86RF2XX_TRX_STATE__TX_START);
-    if (netdev->event_callback &&
-        (dev->flags & AT86RF2XX_OPT_TELL_TX_START)) {
+    if (netdev->event_callback) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
     }
 }

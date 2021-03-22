@@ -96,6 +96,9 @@ int kw41zrf_init(kw41zrf_t *dev, kw41zrf_cb_t cb)
     /* Allow radio interrupts */
     kw41zrf_unmask_irqs();
 
+    DEBUG("[kw41zrf] enabling RX start IRQs\n");
+    bit_clear32(&ZLL->PHY_CTRL, ZLL_PHY_CTRL_RX_WMRK_MSK_SHIFT);
+
     DEBUG("[kw41zrf] init finished\n");
 
     return 0;

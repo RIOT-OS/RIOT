@@ -298,23 +298,10 @@ int _get(netdev_t *netdev, netopt_t opt, void *value, size_t len)
             return sizeof(netopt_enable_t);
 
         case NETOPT_RX_START_IRQ:
-            *((netopt_enable_t *)value) =
-                !!(dev->netdev.flags & KW2XRF_OPT_TELL_RX_START);
-            return sizeof(netopt_enable_t);
-
         case NETOPT_RX_END_IRQ:
-            *((netopt_enable_t *)value) =
-                !!(dev->netdev.flags & KW2XRF_OPT_TELL_RX_END);
-            return sizeof(netopt_enable_t);
-
         case NETOPT_TX_START_IRQ:
-            *((netopt_enable_t *)value) =
-                !!(dev->netdev.flags & KW2XRF_OPT_TELL_TX_START);
-            return sizeof(netopt_enable_t);
-
         case NETOPT_TX_END_IRQ:
-            *((netopt_enable_t *)value) =
-                !!(dev->netdev.flags & KW2XRF_OPT_TELL_TX_END);
+            *((netopt_enable_t *)value) = NETOPT_ENABLE;
             return sizeof(netopt_enable_t);
 
         case NETOPT_AUTOCCA:
@@ -479,30 +466,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value, size_t len)
         case NETOPT_PROMISCUOUSMODE:
             kw2xrf_set_option(dev, KW2XRF_OPT_PROMISCUOUS,
                               ((bool *)value)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_RX_START_IRQ:
-            kw2xrf_set_option(dev, KW2XRF_OPT_TELL_RX_START,
-                                 ((bool *)value)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_RX_END_IRQ:
-            kw2xrf_set_option(dev, KW2XRF_OPT_TELL_RX_END,
-                                 ((bool *)value)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_TX_START_IRQ:
-            kw2xrf_set_option(dev, KW2XRF_OPT_TELL_TX_START,
-                                 ((bool *)value)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_TX_END_IRQ:
-            kw2xrf_set_option(dev, KW2XRF_OPT_TELL_TX_END,
-                                 ((bool *)value)[0]);
             res = sizeof(netopt_enable_t);
             break;
 

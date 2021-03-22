@@ -249,37 +249,43 @@ typedef enum {
      */
     NETOPT_RAWMODE,
     /**
-     * @brief   (@ref netopt_enable_t) trigger interrupt at reception start
+     * @brief   (@ref netopt_enable_t) Used to check if the driver generates NETDEV_EVENT_RX_STARTED
+     *          events
      *
      * It is mostly triggered after the preamble is correctly received
      *
-     * @note not all transceivers may support this interrupt
+     * @warning This value is read-only and cannot be configured at run-time
      */
     NETOPT_RX_START_IRQ,
 
     /**
-     * @brief   (@ref netopt_enable_t) trigger interrupt after frame reception
+     * @brief   (@ref netopt_enable_t) Used to check if the driver generates
+     *          NETDEV_EVENT_RX_COMPLETE events
      *
      * This interrupt is triggered after a complete frame is received.
      *
-     * @note in case a transceiver does not support this interrupt, the event
-     *       may be triggered by the driver
+     * @note    In case a transceiver does not support this interrupt, the event
+     *          may be triggered by the driver
+     * @warning This value is read-only and cannot be configured at run-time
      */
     NETOPT_RX_END_IRQ,
 
     /**
-     * @brief   (@ref netopt_enable_t) trigger interrupt at transmission start
+     * @brief   (@ref netopt_enable_t) Used to check if the driver generates NETDEV_EVENT_TX_STARTED
+     *          events
      *
      * This interrupt is triggered when the transceiver starts to send out the
      * frame.
      *
-     * @note in case a transceiver does not support this interrupt, the event
-     *       may be triggered by the driver
+     * @note    In case a transceiver does not support this interrupt, the event
+     *          may be triggered by the driver
+     * @warning This value is read-only and cannot be configured at run-time
      */
     NETOPT_TX_START_IRQ,
 
     /**
-     * @brief   (@ref netopt_enable_t) trigger interrupt after frame transmission
+     * @brief   (@ref netopt_enable_t) Used to check if the driver generates
+     *          NETDEV_EVENT_TX_COMPLETE events
      *
      * This interrupt is triggered when the full frame has been transmitted.
      *

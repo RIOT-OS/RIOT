@@ -303,10 +303,6 @@ typedef enum {
  * @name    Internal device option flags
  * @{
  */
-#define AT86RF215_OPT_TELL_TX_START  (0x0001)       /**< notify MAC layer on TX start */
-#define AT86RF215_OPT_TELL_TX_END    (0x0002)       /**< notify MAC layer on TX finished */
-#define AT86RF215_OPT_TELL_RX_START  (0x0004)       /**< notify MAC layer on RX start */
-#define AT86RF215_OPT_TELL_RX_END    (0x0008)       /**< notify MAC layer on RX finished */
 #define AT86RF215_OPT_CSMA           (0x0010)       /**< CSMA active */
 #define AT86RF215_OPT_PROMISCUOUS    (0x0020)       /**< promiscuous mode active */
 #define AT86RF215_OPT_PRELOADING     (0x0040)       /**< preloading enabled */
