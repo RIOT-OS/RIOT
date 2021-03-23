@@ -5,4 +5,5 @@
 # directory for more details.
 #
 
+rsource "Kconfig.device"
 rsource "Kconfig.security"
