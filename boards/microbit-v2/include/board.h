@@ -74,21 +74,6 @@ extern "C" {
 #define LSM303AGR_PARAM_MAG_ADDR    0x1E
 /** @} */
 
-#ifdef MODULE_PWM_DAC
-/**
- * @name    The emulated DAC channels
- *
- * The static value is actually the result of the @ref pwm_dac_init in
- * board_init, and it is checked there whether the values are identical.
- *
- * @{
- */
-#define DAC_NUMOF 1
-#undef DAC_LINE
-#define DAC_LINE(x) (0x600)
-/** @} */
-#endif /* MODULE_PWM_DAC */
-
 #ifdef __cplusplus
 }
 #endif

@@ -24,10 +24,9 @@
  * need for any additional allocation. In that, it relies on pwm_t itself using
  * no more than its lower 16 bits.
  *
- * Boards that use this should provide a DAC_NUMOF macro, and redefine the
- * DAC_LINE macro in their `periph_conf.h` header that, for each n wher 0 <= n
- * < DAC_NUMOF, produces the statically configured setup -- or define invalid
- * macros there to flag anything that'd try to use them.
+ * Boards that use this should modify the input to @ref PWM_DAC_PARAMS or
+ * provide a full value; the @ref DAC_LINE macro can then be used up to @ref
+ * DAC_NUMOF.
  *
  * @author      Christian Amsüss <chrysn@fsfe.org>
  * @}
@@ -43,8 +42,35 @@
 extern "C" {
 #endif
 
+typedef struct {
+    /** @brief PWM device to be used */
+    pwm_t dev;
+    /** @brief Frequency to run PWM with
+     *
+     * This needs to be chose high enough that the low pass filter attached
+     * does not let the configured frequency pass.
+     */
+    uint32_t freq;
+    /** @brief PWM mode to be used
+     *
+     * The previce mode usually does not matter; what matters is that it is
+     * supported by the hardware.
+     * */
+    pwm_mode_t mode;
+    /** @brief PWM resolution to be used
+     *
+     * Indicates the number of bits utilized in the PWM device. While higher
+     * numbers are preferable for dynamic resolution, picking a lower number
+     * may be necessary to allow for a sufficiently high frequency on the PWM
+     * device.
+     */
+    uint8_t resbits;
+} pwm_dac_params_t;
+
 /**
  * @brief   Set up a PWM device as a DAC
+ *
+ * This is typically done in the course of auto-initialization.
  *
  * In this step, the frequency and resolution of the PWM are set; when later a
  * DAC value is configured, it is expressed as a duty cycle.
@@ -58,23 +84,19 @@ extern "C" {
  * -- if its zero initializing value causes trouble, follow up on
  *  <https://github.com/RIOT-OS/RIOT/issues/15121>.
  *
- * If the underlying PWM has channels, the returned dac_t represents its
- * channel 0; other channels can be set independently by adding their channel
- * index to the returned value.
+ * Note that of the full PWM device, only channel 0 gets used; the other
+ * channels can not be used as not only would they need a cloned device entry,
+ * they'd also necessitate more complicated coordination of power management as
+ * turning any single one of them off wouldn't allow turning off the complete
+ * PWM driver.
  *
- * @param[in] dev PWM device to be used
- * @param[in] mode PWM mode to be used
- * @param[in] freq Frequency to run PWM with. This needs to be chose high
- *     enough that the low pass filter attached does not let the configured
- *     frequency pass.
- * @param[in] res PWM resolution to be used. Must be a power of 2. Picking a
- *     low number here may be necessary to allow for a sufficiently high
- *     frequency.
+ * @param   line    DAC peripheral line to initialize
  *
- * @return A dac_t usable for dac_set, or DAC_UNDEF if PWM initialization failed
+ * @retval  0       Success
+ * @retval  -EINVAL The parameters were not valid for the underlying PWM device
  *
  */
-dac_t pwm_dac_init(pwm_t dev, pwm_mode_t mode, uint32_t freq, uint16_t res);
+int pwm_dac_init(dac_t line);
 
 #ifdef __cplusplus
 }
