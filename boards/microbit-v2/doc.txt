@@ -15,6 +15,12 @@ as well as a Nordic proprietary radio mode.
 Additionally the boards features 2 buttons, a 5x5 LED matrix, a speaker, a
 microphone, an accelerometer and a magnetometer.
 
+## Links
+
+- [Website](https://www.microbit.co.uk/)
+- [Schematics](https://github.com/microbit-foundation/microbit-v2-hardware/blob/main/V2/MicroBit_V2.0.0_S_schematic.PDF)
+- [Pinout list, detailed descriptions and data sheets](https://tech.microbit.org/hardware/schematic/)
+
 ##  Flashing and Debugging
 
 The board can be flashed using OpenOCD and PyOCD. Debugger is also available
