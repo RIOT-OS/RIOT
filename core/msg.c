@@ -107,7 +107,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
     DEBUG("msg_send() %s:%i: Sending from %" PRIkernel_pid " to %" PRIkernel_pid
           ". block=%i src->state=%i target->state=%i\n", RIOT_FILE_RELATIVE,
           __LINE__, thread_getpid(), target_pid,
-          block, me->status, target->status);
+          block, (int)me->status, (int)target->status);
 
     if (target->status != STATUS_RECEIVE_BLOCKED) {
         DEBUG(
