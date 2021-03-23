@@ -21,6 +21,7 @@
 #include "kernel_defines.h"
 
 #include "lwm2m_client.h"
+#include "objects/device.h"
 #include "lwm2m_client_config.h"
 #include "lwm2m_client_objects.h"
 
@@ -29,7 +30,6 @@
  * 'contrib/objects') */
 lwm2m_object_t *get_server_object(int server_id, const char *binding,
                                   int lifetime, bool storing);
-lwm2m_object_t *lwm2m_get_object_device(void);
 
 lwm2m_object_t *lwm2m_client_get_server_object(lwm2m_client_data_t *client_data,
                                                int server_id)
@@ -41,11 +41,4 @@ lwm2m_object_t *lwm2m_client_get_server_object(lwm2m_client_data_t *client_data,
     ret = get_server_object(server_id, CONFIG_LWM2M_DEVICE_BINDINGS, lifetime,
                             false);
     return ret;
-}
-
-lwm2m_object_t *lwm2m_client_get_device_object(
-                        lwm2m_client_data_t *client_data)
-{
-    (void)client_data;
-    return lwm2m_get_object_device();
 }
