@@ -127,7 +127,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
 
         if (!block) {
             DEBUG("msg_send: %" PRIkernel_pid ": Receiver not waiting, "
-                  "block=%u\n", me->pid, block);
+                  "block=%d\n", me->pid, block);
             irq_restore(state);
             return 0;
         }
