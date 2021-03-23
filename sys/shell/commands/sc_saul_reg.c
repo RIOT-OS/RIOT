@@ -26,6 +26,14 @@
 
 #include "saul_reg.h"
 
+static const char *_devname(saul_reg_t *dev) {
+    if (dev->name == NULL) {
+        return "(no name)";
+    } else {
+        return dev->name;
+    }
+}
+
 /* this function does not check, if the given device is valid */
 static void probe(int num, saul_reg_t *dev)
 {
@@ -38,7 +46,7 @@ static void probe(int num, saul_reg_t *dev)
         return;
     }
     /* print results */
-    printf("Reading from #%i (%s|%s)\n", num, dev->name,
+    printf("Reading from #%i (%s|%s)\n", num, _devname(dev),
            saul_class_to_str(dev->driver->type));
     phydat_dump(&res, dim);
 }
@@ -68,7 +76,7 @@ static void list(void)
     }
     while (dev) {
         printf("#%i\t%s\t%s\n",
-               i++, saul_class_to_str(dev->driver->type), dev->name);
+               i++, saul_class_to_str(dev->driver->type), _devname(dev));
         dev = dev->next;
     }
 }
@@ -120,7 +128,7 @@ static void write(int argc, char **argv)
         data.val[i] = atoi(argv[i + 3]);
     }
     /* print values before writing */
-    printf("Writing to device #%i - %s\n", num, dev->name);
+    printf("Writing to device #%i - %s\n", num, _devname(dev));
     phydat_dump(&data, dim);
     /* write values to device */
     dim = saul_reg_write(dev, &data);
