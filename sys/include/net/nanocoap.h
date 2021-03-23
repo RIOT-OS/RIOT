@@ -1269,12 +1269,32 @@ static inline size_t coap_opt_put_block2_control(uint8_t *buf, uint16_t lastonum
  *                          or 0 if first option
  * @param[in]   optnum      option number to use
  * @param[in]   string      string to encode as option
+ * @param[in]   len         length of the string
  * @param[in]   separator   character used in @p string to separate parts
  *
  * @return      number of bytes written to @p buf
  */
-size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
-                           const char *string, char separator);
+size_t coap_opt_put_string_with_len(uint8_t *buf, uint16_t lastonum, uint16_t optnum,
+                                    const char *string, size_t len, char separator);
+/**
+ * @brief   Encode the given string as multi-part option into buffer
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in]   lastonum    number of previous option (for delta calculation),
+ *                          or 0 if first option
+ * @param[in]   optnum      option number to use
+ * @param[in]   string      string to encode as option
+ * @param[in]   separator   character used in @p string to separate parts
+ *
+ * @return      number of bytes written to @p buf
+ */
+static inline size_t coap_opt_put_string(uint8_t *buf, uint16_t lastonum,
+                                         uint16_t optnum,
+                                         const char *string, char separator)
+{
+    return coap_opt_put_string_with_len(buf, lastonum, optnum,
+                                        string, strlen(string), separator);
+}
 
 /**
  * @brief   Convenience function for inserting LOCATION_PATH option into buffer
@@ -1343,6 +1363,25 @@ static inline size_t coap_opt_put_uri_query(uint8_t *buf, uint16_t lastonum,
 {
     return coap_opt_put_string(buf, lastonum, COAP_OPT_URI_QUERY, uri, '&');
 }
+
+/**
+ * @brief   Convenience function for inserting URI_PATH and URI_QUERY into buffer
+ *          This function will automatically split path and query parameters.
+ *
+ * @param[out]  buf         buffer to write to
+ * @param[in,out] lastonum  number of previous option (for delta calculation),
+ *                          or 0 if first option
+ * @param[in]   uri         ptr into a source URI, to the first character after
+ *                          the authority component
+ *
+ * @returns     amount of bytes written to @p buf
+ *
+ * This function may produce two different options (Uri-Path and Uri-Query).
+ * Users that need to insert Content-Format, Max-Age or the currently
+ * unassigned option 13 need to split their URI themselves and call the
+ * respective helper functions.
+ */
+size_t coap_opt_put_uri_pathquery(uint8_t *buf, uint16_t *lastonum, const char *uri);
 
 /**
  * @brief   Convenience function for inserting PROXY_URI option into buffer

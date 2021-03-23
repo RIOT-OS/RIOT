@@ -399,6 +399,7 @@ struct usbus {
     usbus_string_t manuf;                           /**< Manufacturer string                   */
     usbus_string_t product;                         /**< Product string                        */
     usbus_string_t config;                          /**< Configuration string                  */
+    usbus_string_t serial;                          /**< serial string                  */
     usbus_endpoint_t ep_out[USBDEV_NUM_ENDPOINTS];  /**< USBUS OUT endpoints                   */
     usbus_endpoint_t ep_in[USBDEV_NUM_ENDPOINTS];   /**< USBUS IN endpoints                    */
     event_queue_t queue;                            /**< Event queue                           */
@@ -415,6 +416,12 @@ struct usbus {
     usbus_state_t state;                            /**< Current state                         */
     usbus_state_t pstate;                           /**< state to recover to from suspend      */
     uint8_t addr;                                   /**< Address of the USB peripheral         */
+#ifndef CONFIG_USB_SERIAL_STR
+    /**
+     * @brief Hex representation of the device serial number
+     */
+    char serial_str[2 * CONFIG_USB_SERIAL_BYTE_LENGTH + 1];
+#endif
 };
 
 /**

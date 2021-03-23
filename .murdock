@@ -8,6 +8,7 @@
 : ${TEST_BOARDS_LLVM_COMPILE:=""}
 
 : ${TEST_KCONFIG_samr21_xpro:="examples/hello-world tests/periph_*
+tests/test_tools tests/congure_* tests/xtimer_* tests/ztimer_*
 tests/driver_ad7746 tests/driver_adcxx1c tests/driver_ads101x tests/driver_adt101x
 tests/driver_adt7310 tests/driver_adxl345 tests/driver_aip31068 tests/driver_apa102
 tests/driver_apds99xx tests/driver_apds99xx_full tests/driver_at tests/driver_at24cxxx
@@ -16,8 +17,19 @@ tests/driver_b* tests/driver_ccs811 tests/driver_ccs811_full tests/driver_dcf77
 tests/driver_dfplayer tests/driver_dht tests/driver_ds18 tests/driver_ds75lx
 tests/driver_ds1307 tests/driver_ds3231 tests/driver_ds3234 tests/driver_dsp0401
 tests/driver_dynamixel tests/driver_edbg_eui tests/driver_f* tests/driver_g*
-tests/driver_h* tests/driver_i* tests/driver_j* tests/driver_my9221"}
-: ${TEST_KCONFIG_native:="examples/hello-world tests/periph_*"}
+tests/driver_h* tests/driver_i* tests/driver_j* tests/driver_l*
+tests/driver_mag3110 tests/driver_mhz19 tests/driver_mma7660
+tests/driver_motor_driver tests/driver_mpl3115a2 tests/driver_mpu9x50
+tests/driver_mq3 tests/driver_my9221 tests/driver_nvram_spi tests/mtd_flashpage
+tests/mtd_mapper tests/driver_o* tests/driver_p* tests/driver_q*
+tests/driver_r* tests/driver_s* tests/driver_t* tests/driver_u*
+tests/driver_v*"}
+: ${TEST_KCONFIG_native:="examples/hello-world tests/periph_* tests/sys_crypto
+tests/test_tools tests/congure_* tests/prng_* tests/xtimer_* tests/ztimer_*
+tests/driver_ws281x tests/posix_sleep tests/pkg_umorse tests/cb_mux* tests/eepreg
+tests/shell tests/struct_tm_utility"}
+
+: ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/driver_at86rf2xx_aes"}
 
 export RIOT_CI_BUILD=1
 export CC_NOCOLOR=1
@@ -278,6 +290,7 @@ compile() {
                 kconfig_test_hash=0
                 echo "An error occurred while compiling using Kconfig";
             fi
+            break
         fi
     done
 
@@ -290,7 +303,7 @@ compile() {
 
     if [ ${should_check_kconfig_hash} != 0 ]; then
         if [ ${kconfig_test_hash} != ${test_hash} ]; then
-            echo "Hashes of binaries with and without Kconfig mismatch for ${app}";
+            echo "Hashes of binaries with and without Kconfig mismatch for ${appdir}";
             echo "Please check that all used modules are modelled in Kconfig and enabled";
             RES=1
         fi
@@ -374,7 +387,11 @@ run_test() {
     BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir flash-only termdeps -j2
 
     # now run the actual test
-    BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir test
+    if is_in_list "${appdir}" "${TEST_WITH_CONFIG_SUPPORTED}"; then
+        BOARD=${board} TOOLCHAIN=${toolchain} make -C${appdir} test-with-config
+    else
+        BOARD=$board TOOLCHAIN=${toolchain} make -C$appdir test
+    fi
     RES=$?
 
     if [ $RES -eq 0 -a -n "$TEST_HASH" ]; then

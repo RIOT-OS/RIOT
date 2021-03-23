@@ -2,6 +2,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
     blackpill \
     bluepill \
+    bluepill-stm32f030c8 \
     hifive1 \
     hifive1b \
     i-nucleo-lrwan1 \
@@ -15,8 +16,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l011k4 \
     nucleo-l031k6 \
     nucleo-l053r8 \
+    samd10-xmini \
     saml10-xpro \
     saml11-xpro \
+    slstk3400a \
     stk3200 \
     stm32f030f4-demo \
     stm32f0discovery \

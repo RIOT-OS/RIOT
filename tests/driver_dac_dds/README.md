@@ -14,11 +14,11 @@ Typical usage:
 
 # Audio source and license
 
-hello.raw is an audio rendition of ESpeak saying "hello world". It was obtained
-from <https://commons.wikimedia.org/wiki/File:Hello_world_said_by_eSpeakNG.ogg>
-where it is annotated to be licensed under CC-BY-SA 4.0 international.
+hello.raw is an audio rendition of GeoTrinity saying "Ahoy!". It was obtained
+from <https://en.wikipedia.org/wiki/File:GT_Ahoi_Deutsch_GT.ogg>
+where it is annotated to be licensed under CC-BY-SA 3.0 international.
 
 It was converted and trimmed using:
 
-    $ fmpeg -i Hello_world_said_by_eSpeakNG.ogg -ar 8000 -f u8 -c:a pcm_u8 hello.raw
+    $ ffmpeg -i GT_Ahoi_Deutsch_GT.ogg -ac 1 -ar 8000 -f u8 -c:a pcm_u8 hello.raw
     $ python3 -c "s = open('hello.raw', 'rb').read(); s = s.strip(b'\x80') + b'\x80'; open('hello.raw', 'wb').write(s)"

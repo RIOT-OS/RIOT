@@ -18,10 +18,11 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "kernel_defines.h"
 #include "shell_commands.h"
 #include "shell.h"
 
-#if !defined(SHELL_NO_ECHO) || !defined(SHELL_NO_PROMPT)
+#if !IS_ACTIVE(CONFIG_SHELL_NO_ECHO) || !IS_ACTIVE(CONFIG_SHELL_NO_PROMPT)
 #error This test assumes no shell echo or shell prompt
 #endif
 

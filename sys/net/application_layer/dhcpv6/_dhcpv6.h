@@ -220,8 +220,8 @@ typedef struct __attribute__((packed)) {
  */
 typedef struct __attribute__((packed)) {
     network_uint16_t type;  /**< @ref DHCPV6_OPT_MUD_URL */
-    network_uint16_t len;   /**< length of the MUDstring in octets. */
-    char mudString[];       /**< MUD URL using the "https" scheme */
+    network_uint16_t len;   /**< length of the mud_string in octets. */
+    char mud_string[];       /**< MUD URL using the "https" scheme */
 } dhcpv6_opt_mud_url_t;
 
 #ifdef __cplusplus

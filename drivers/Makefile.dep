@@ -36,6 +36,10 @@ ifneq (,$(filter bm%280_spi,$(USEMODULE)))
   USEMODULE += bmx280
 endif
 
+ifneq (,$(filter bq2429x_int,$(USEMODULE)))
+  USEMODULE += bq2429x
+endif
+
 ifneq (,$(filter cc110%,$(USEMODULE)))
   USEMODULE += cc110x
 endif
@@ -72,11 +76,6 @@ ifneq (,$(filter ltc4150_%,$(USEMODULE)))
   USEMODULE += ltc4150
 endif
 
-ifneq (,$(filter mcp2515,$(USEMODULE)))
-  USEMODULE += xtimer
-  FEATURES_REQUIRED += periph_gpio periph_spi periph_gpio_irq
-endif
-
 ifneq (,$(filter mhz19_%,$(USEMODULE)))
   USEMODULE += mhz19
 endif
@@ -102,8 +101,22 @@ ifneq (,$(filter nrfmin,$(USEMODULE)))
   USEMODULE += netif
 endif
 
+ifneq (,$(filter nrf24l01p_ng_%,$(USEMODULE)))
+  USEMODULE += nrf24l01p_ng
+endif
+
 ifneq (,$(filter periph_ptp_timer periph_ptp_speed_adjustment,$(FEATURES_USED)))
   FEATURES_REQUIRED += periph_ptp
+endif
+
+ifneq (,$(filter pn532_i2c,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_i2c
+  USEMODULE += pn532
+endif
+
+ifneq (,$(filter pn532_spi,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_spi
+  USEMODULE += pn532
 endif
 
 ifneq (,$(filter qmc5883l_%,$(USEMODULE)))
@@ -184,7 +197,7 @@ ifneq (,$(filter periph_timer_periodic,$(USEMODULE)))
   FEATURES_REQUIRED += periph_timer
 endif
 
-ifneq (,$(filter netdev_%,$(USEMODULE)))
+ifneq (,$(filter-out netdev_default, $(filter netdev_%,$(USEMODULE))))
   USEMODULE += netdev
   # Don't register netdevs if there is only a single one of them
   ifeq (,$(filter gnrc_netif_single,$(USEMODULE)))

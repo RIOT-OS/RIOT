@@ -88,12 +88,8 @@ static void test_mtd_write_erase(void)
 {
     const char buf[] = "ABCDEFGHIJKLMNO";
 
-    /* stm32l0x and stm32l1x erase its flash with 0's */
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
-    uint8_t buf_empty[] = {0, 0, 0};
-#else
-    uint8_t buf_empty[] = {0xff, 0xff, 0xff};
-#endif
+    uint8_t buf_empty[3];
+    memset(buf_empty, FLASHPAGE_ERASE_STATE, sizeof(buf_empty));
     char buf_read[sizeof(buf) + sizeof(buf_empty)];
     memset(buf_read, 0, sizeof(buf_read));
 
@@ -107,11 +103,7 @@ static void test_mtd_write_erase(void)
     TEST_ASSERT_EQUAL_INT(0, ret);
 
     uint8_t expected[sizeof(buf_read)];
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
-    memset(expected, 0, sizeof(expected));
-#else
-    memset(expected, 0xff, sizeof(expected));
-#endif
+    memset(expected, FLASHPAGE_ERASE_STATE, sizeof(expected));
     ret = mtd_read(dev, buf_read, TEST_ADDRESS1, sizeof(buf_read));
     TEST_ASSERT_EQUAL_INT(0, ret);
     TEST_ASSERT_EQUAL_INT(0, memcmp(expected, buf_read, sizeof(buf_read)));
@@ -125,12 +117,8 @@ static void test_mtd_write_read(void)
     const char buf[] __attribute__ ((aligned (FLASHPAGE_WRITE_BLOCK_ALIGNMENT)))
             = "ABCDEFGHIJKLMNO";
 
-    /* stm32l0x and stm32l1x erase its flash with 0's */
-#if defined(CPU_FAM_STM32L0) || defined(CPU_FAM_STM32L1)
-    uint8_t buf_empty[] = {0, 0, 0};
-#else
-    uint8_t buf_empty[] = {0xff, 0xff, 0xff};
-#endif
+    uint8_t buf_empty[3];
+    memset(buf_empty, FLASHPAGE_ERASE_STATE, sizeof(buf_empty));
     char buf_read[sizeof(buf) + sizeof(buf_empty)];
     memset(buf_read, 0, sizeof(buf_read));
 

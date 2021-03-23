@@ -1,0 +1,25 @@
+From 51cf02a0ee4d6dd441edbc5e20f58eb1ee4c28f4 Mon Sep 17 00:00:00 2001
+From: Benjamin Valentin <benpicco@googlemail.com>
+Date: Thu, 17 Dec 2020 14:33:22 +0100
+Subject: [PATCH] [RIOT] use <assert.h>
+
+---
+ src/core/common/debug.hpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/core/common/debug.hpp b/src/core/common/debug.hpp
+index 3ab0eb21b..6e48f7d0d 100644
+--- a/src/core/common/debug.hpp
++++ b/src/core/common/debug.hpp
+@@ -40,7 +40,7 @@
+ #include <stdio.h>
+ #include "utils/wrap_string.h"
+ 
+-#if defined(OPENTHREAD_TARGET_DARWIN) || defined(OPENTHREAD_TARGET_LINUX)
++#if defined(OPENTHREAD_TARGET_DARWIN) || defined(OPENTHREAD_TARGET_LINUX) || defined(OPENTHREAD_TARGET_RIOT)
+ 
+ #include <assert.h>
+ 
+-- 
+2.27.0
+

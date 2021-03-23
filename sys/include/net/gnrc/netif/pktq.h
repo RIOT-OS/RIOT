@@ -47,6 +47,13 @@ extern "C" {
 int gnrc_netif_pktq_put(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt);
 
 /**
+ * @brief   Returns the overall usage of the packet queue resources
+ *
+ * @return  Number of gnrc_pktqueue_t entries currently in use.
+ */
+unsigned gnrc_netif_pktq_usage(void);
+
+/**
  * @brief   Gets a packet from the packet send queue of a network interface
  *
  * @pre `netif != NULL`

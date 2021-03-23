@@ -18,8 +18,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     blackpill-128kib \
     bluepill \
     bluepill-128kib \
+    bluepill-stm32f030c8 \
     calliope-mini \
     cc1312-launchpad \
+    cc1350-launchpad \
     cc1352-launchpad \
     cc1352p-launchpad \
     cc2650-launchpad \
@@ -45,13 +47,13 @@ BOARD_INSUFFICIENT_MEMORY := \
     lobaro-lorabox \
     lsn50 \
     maple-mini \
-    mega-xplained \
     mcb2388 \
+    mega-xplained \
     microbit \
     microduino-corerf \
-    msba2 \
     msb-430 \
     msb-430h \
+    msba2 \
     nrf51dk \
     nrf51dongle \
     nrf6310 \
@@ -81,6 +83,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     opencm904 \
     openlabs-kw41z-mini-256kib \
     pba-d-01-kw2x \
+    samd10-xmini \
+    samd20-xpro \
     samd21-xpro \
     saml10-xpro \
     saml11-xpro \
@@ -89,6 +93,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     samr30-xpro \
     samr34-xpro \
     sensebox_samd21 \
+    slstk3400a \
     slstk3401a \
     sltb001a \
     slwstk6000b-slwrb4150a \
@@ -113,4 +118,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     yarm \
     yunjia-nrf51822 \
     z1 \
+    zigduino \
     #

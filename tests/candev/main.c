@@ -48,6 +48,11 @@ static candev_mcp2515_t mcp2515_dev;
 /* add includes for other candev drivers here */
 #endif
 
+/* Default is not using loopback test mode */
+#ifndef CONFIG_USE_LOOPBACK_MODE
+#define CONFIG_USE_LOOPBACK_MODE        0
+#endif
+
 #define RX_RINGBUFFER_SIZE 128      /* Needs to be a power of 2! */
 static isrpipe_t rxbuf;
 static uint8_t rx_ringbuf[RX_RINGBUFFER_SIZE];
@@ -221,6 +226,18 @@ int main(void)
     candev->isr_arg = NULL;
 
     candev->driver->init(candev);
+
+if (IS_ACTIVE(CONFIG_USE_LOOPBACK_MODE)) {
+    puts("Switching to loopback mode");
+    /* set to loopback test mode */
+    canopt_state_t mode = CANOPT_STATE_LOOPBACK;
+    candev->driver->set(candev, CANOPT_STATE, &mode, sizeof(mode));
+
+    /* do not care, receive all message id */
+    struct can_filter filter;
+    filter.can_mask = 0;
+    candev->driver->set_filter(candev, &filter);
+}
 
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);

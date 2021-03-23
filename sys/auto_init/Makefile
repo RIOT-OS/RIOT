@@ -26,4 +26,8 @@ ifneq (,$(filter auto_init_security,$(USEMODULE)))
   DIRS += security
 endif
 
+ifneq (,$(filter auto_init_screen,$(USEMODULE)))
+  DIRS += screen
+endif
+
 include $(RIOTBASE)/Makefile.base

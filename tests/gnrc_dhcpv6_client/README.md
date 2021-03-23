@@ -21,7 +21,7 @@ If you use any platform other than `native`, you need to use `ethos`, otherwise
 `netdev_tap` is chosen.
 
 An instance of Kea that configured via [kea-dhcp6.conf](kea-dhcp6.conf) is
-started in parallel to `make term`/`make test`.
+started in parallel to `make term`/`make test-as-root`.
 
 Read the [Kea documentation] on the configuration file for more information.
 
@@ -31,7 +31,7 @@ If you created your interface and without the script, please reconfigure Kea by
 search & replacing "`tapbr0`" in the configuration file.
 
 ```sh
-BOARD=samr21-xpro make flash test
+BOARD=samr21-xpro make flash test-as-root
 ```
 
 [Kea]: http://kea.isc.org

@@ -1,0 +1,45 @@
+## CPU Models
+# XMEGA - C3
+config CPU_MODEL_XMEGA32C3
+    bool
+    select CPU_CORE_ATXMEGA_C3
+
+config CPU_MODEL_XMEGA64C3
+    bool
+    select CPU_CORE_ATXMEGA_C3
+
+config CPU_MODEL_XMEGC128C3
+    bool
+    select CPU_CORE_ATXMEGA_C3
+
+config CPU_MODEL_XMEGC192C3
+    bool
+    select CPU_CORE_ATXMEGA_C3
+
+config CPU_MODEL_XMEGA256C3
+    bool
+    select CPU_CORE_ATXMEGA_C3
+
+config CPU_MODEL_XMEGA384C3
+    bool
+    select CPU_CORE_ATXMEGA_C3
+
+# XMEGA - C4
+config CPU_MODEL_XMEGA16C4
+    bool
+    select CPU_CORE_ATXMEGA_C4
+
+config CPU_MODEL_XMEGA32C4
+    bool
+    select CPU_CORE_ATXMEGA_C4
+
+config CPU_MODEL
+    default "atxmega32c3"    if CPU_MODEL_XMEGA32C3
+    default "atxmega64c3"    if CPU_MODEL_XMEGA64C3
+    default "atxmega128c3"   if CPU_MODEL_XMEGC128C3
+    default "atxmega192c3"   if CPU_MODEL_XMEGC192C3
+    default "atxmega256c3"   if CPU_MODEL_XMEGA256C3
+    default "atxmega384c3"   if CPU_MODEL_XMEGA384C3
+
+    default "atxmega16c4"    if CPU_MODEL_XMEGA16C4
+    default "atxmega32c4"    if CPU_MODEL_XMEGA32C4

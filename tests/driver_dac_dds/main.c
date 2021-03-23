@@ -51,7 +51,9 @@
 #define min(a, b) ((a) > (b) ? (b) : (a))
 #endif
 
+#ifndef DAC_BUF_SIZE
 #define DAC_BUF_SIZE    (2048)
+#endif
 
 static bool res_16b = 0;
 static unsigned sample_rate = 8000;

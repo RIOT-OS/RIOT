@@ -18,7 +18,6 @@
  * @}
  */
 
-
 #include "thread_flags.h"
 #include "irq.h"
 #include "thread.h"
@@ -26,7 +25,8 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static inline int __attribute__((always_inline)) _thread_flags_wake(thread_t *thread)
+static inline int __attribute__((always_inline)) _thread_flags_wake(
+    thread_t *thread)
 {
     unsigned wakeup;
     thread_flags_t mask = (uint16_t)(unsigned)thread->wait_data;
@@ -118,6 +118,7 @@ thread_flags_t thread_flags_wait_one(thread_flags_t mask)
     _thread_flags_wait_any(mask);
     thread_t *me = thread_get_active();
     thread_flags_t tmp = me->flags & mask;
+
     /* clear all but least significant bit */
     tmp &= (~tmp + 1);
     return _thread_flags_clear_atomic(me, tmp);
@@ -146,6 +147,7 @@ void thread_flags_set(thread_t *thread, thread_flags_t mask)
     DEBUG("thread_flags_set(): setting 0x%08x for pid %" PRIkernel_pid "\n",
           mask, thread->pid);
     unsigned state = irq_disable();
+
     thread->flags |= mask;
     if (_thread_flags_wake(thread)) {
         irq_restore(state);

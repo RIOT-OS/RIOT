@@ -181,8 +181,6 @@ int register_interrupt(int sig, _native_callback_t handler);
  */
 int unregister_interrupt(int sig);
 
-//#include <sys/param.h>
-
 #ifdef __cplusplus
 }
 #endif

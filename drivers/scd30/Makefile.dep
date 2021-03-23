@@ -1,5 +1,3 @@
-ifneq (,$(filter scd30,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_i2c
-  USEMODULE += checksum
-  USEMODULE += xtimer
-endif
+FEATURES_REQUIRED += periph_i2c
+USEMODULE += checksum
+USEMODULE += xtimer

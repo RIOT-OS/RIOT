@@ -11,6 +11,7 @@ config CPU_ARCH_ARMV4T
     select HAS_ARCH_ARM
     select HAS_CPP
     select HAS_LIBSTDCPP
+    select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
 
 config CPU_CORE_ARM7TDMI_S
     bool
@@ -23,6 +24,7 @@ config CPU_CORE_ARM7TDMI_S
 ## Declaration of specific features
 config HAS_ARCH_ARM7
     bool
+    select HAS_NEWLIB
     select HAS_PICOLIBC
     help
         Indicates that the core is part of the ARM7 group of cores.

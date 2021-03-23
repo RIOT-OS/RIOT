@@ -599,8 +599,7 @@ static const shell_command_t shell_commands[] = {
 
 int main(void)
 {
-    puts("Manual SPI peripheral driver test");
-    puts("Refer to the README.md file for more information.\n");
+    puts("Manual SPI peripheral driver test (see README.md)");
 
     printf("There are %i SPI devices configured for your platform.\n",
            (int)SPI_NUMOF);

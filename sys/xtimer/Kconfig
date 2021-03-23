@@ -7,9 +7,12 @@
 
 menuconfig MODULE_XTIMER
     bool "xtimer"
-    select MODULE_PERIPH_TIMER if HAS_PERIPH_TIMER && !MODULE_XTIMER_ON_ZTIMER
-    depends on HAS_PERIPH_TIMER && !MODULE_XTIMER_ON_ZTIMER || MODULE_XTIMER_ON_ZTIMER
+    depends on HAS_PERIPH_TIMER || MODULE_XTIMER_ON_ZTIMER || MODULE_ZTIMER_XTIMER_COMPAT
     depends on TEST_KCONFIG
+
+    # use timer peripheral unless ztimer compatibility module is used
+    select MODULE_PERIPH_TIMER if HAS_PERIPH_TIMER && !MODULE_XTIMER_ON_ZTIMER && !MODULE_ZTIMER_XTIMER_COMPAT
+
     select MODULE_DIV if !MODULE_ZTIMER_XTIMER_COMPAT
     help
         Include xtimer module. xtimer requires a low-level timer implementation
@@ -18,6 +21,5 @@ menuconfig MODULE_XTIMER
 
 config MODULE_AUTO_INIT_XTIMER
     bool "Auto-init xtimer"
-    default y if MODULE_AUTO_INIT
-    depends on !MODULE_ZTIMER_XTIMER_COMPAT
+    default y if MODULE_AUTO_INIT && !MODULE_ZTIMER_XTIMER_COMPAT
     depends on MODULE_XTIMER

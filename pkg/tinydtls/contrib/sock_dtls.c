@@ -87,6 +87,8 @@ static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
     sock->buffer.session = session;
 #ifdef SOCK_HAS_ASYNC
     if (sock->async_cb != NULL) {
+        /* reset retrievable event session */
+        memset(&sock->async_cb_session, 0, sizeof(sock->async_cb_session));
         sock->async_cb(sock, SOCK_ASYNC_MSG_RECV, sock->async_cb_arg);
     }
 #endif
@@ -138,6 +140,7 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
         switch (code) {
             case DTLS_ALERT_CLOSE_NOTIFY:
                 /* peer closed their session */
+                memcpy(&sock->async_cb_session, session, sizeof(session_t));
                 sock->async_cb(sock, SOCK_ASYNC_CONN_FIN, sock->async_cb_arg);
                 break;
             case DTLS_EVENT_CONNECTED:
@@ -162,14 +165,10 @@ static int _get_psk_info(struct dtls_context_t *ctx, const session_t *session,
     (void)ctx;
     (void)desc;
     (void)desc_len;
+    (void)session;
     int ret;
-    sock_dtls_session_t _session;
-    sock_udp_ep_t ep;
-    sock_dtls_t *sock = (sock_dtls_t *)dtls_get_app_data(ctx);
 
-    _session_to_ep(session, &ep);
-    memcpy(&_session.ep, &ep, sizeof(sock_udp_ep_t));
-    memcpy(&_session.dtls_session, session, sizeof(session_t));
+    sock_dtls_t *sock = dtls_get_app_data(ctx);
 
     credman_credential_t credential;
     ret = credman_get(&credential, sock->tag, CREDMAN_TYPE_PSK);
@@ -283,6 +282,7 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
 #ifdef SOCK_HAS_ASYNC
     sock->async_cb = NULL;
     sock->buf_ctx = NULL;
+    memset(&sock->async_cb_session, 0, sizeof(sock->async_cb_session));
 #endif /* SOCK_HAS_ASYNC */
     sock->role = role;
     sock->tag = tag;
@@ -327,8 +327,6 @@ int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
     }
 
     /* prepare the remote party to connect to */
-    memcpy(&remote->ep, ep, sizeof(sock_udp_ep_t));
-    memcpy(&remote->dtls_session.addr, &ep->addr.ipv6, sizeof(ipv6_addr_t));
     _ep_to_session(ep, &remote->dtls_session);
 
     /* start the handshake */
@@ -349,6 +347,24 @@ int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
 void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote)
 {
     dtls_close(sock->dtls_ctx, &remote->dtls_session);
+}
+
+void sock_dtls_session_get_udp_ep(const sock_dtls_session_t *session,
+                                  sock_udp_ep_t *ep)
+{
+    assert(session);
+    assert(ep);
+
+    _session_to_ep(&session->dtls_session, ep);
+}
+
+void sock_dtls_session_set_udp_ep(sock_dtls_session_t *session,
+                                  const sock_udp_ep_t *ep)
+{
+    assert(session);
+    assert(ep);
+
+    _ep_to_session(ep, &session->dtls_session);
 }
 
 ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
@@ -442,7 +458,6 @@ static inline void _copy_session(sock_dtls_t *sock, sock_dtls_session_t *remote)
 {
     memcpy(&remote->dtls_session, sock->buffer.session,
            sizeof(remote->dtls_session));
-    _session_to_ep(&remote->dtls_session, &remote->ep);
 }
 
 static ssize_t _copy_buffer(sock_dtls_t *sock, sock_dtls_session_t *remote,
@@ -456,11 +471,14 @@ static ssize_t _copy_buffer(sock_dtls_t *sock, sock_dtls_session_t *remote,
         return -ENOBUFS;
     }
 #if SOCK_HAS_ASYNC
+    sock_udp_ep_t ep;
+    _session_to_ep(&remote->dtls_session, &ep);
+
     if (sock->buf_ctx != NULL) {
         memcpy(data, buf, sock->buffer.datalen);
         _copy_session(sock, remote);
         _check_more_chunks(sock->udp_sock, (void **)&buf, &sock->buf_ctx,
-                           &remote->ep);
+                           &ep);
         if (sock->async_cb &&
             /* is there a message in the sock's mbox? */
             mbox_avail(&sock->mbox)) {
@@ -490,7 +508,6 @@ static ssize_t _complete_handshake(sock_dtls_t *sock,
                                    const session_t *session)
 {
     memcpy(&remote->dtls_session, session, sizeof(remote->dtls_session));
-    _session_to_ep(&remote->dtls_session, &remote->ep);
 #ifdef SOCK_HAS_ASYNC
     if (sock->async_cb) {
         sock_async_flags_t flags = SOCK_ASYNC_CONN_RDY;
@@ -503,6 +520,7 @@ static ssize_t _complete_handshake(sock_dtls_t *sock,
                 flags |= SOCK_ASYNC_CONN_RECV;
             }
         }
+        memcpy(&sock->async_cb_session, session, sizeof(session_t));
         sock->async_cb(sock, flags, sock->async_cb_arg);
     }
 #else
@@ -518,6 +536,8 @@ ssize_t sock_dtls_recv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
     assert(sock);
     assert(data);
     assert(remote);
+
+    sock_udp_ep_t ep;
 
     /* loop breaks when timeout or application data read */
     while (1) {
@@ -538,13 +558,13 @@ ssize_t sock_dtls_recv_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
                       "sock_dtls_aux_rx_t became incompatible with "
                       "sock_udp_aux_rx_t");
         res = sock_udp_recv_aux(sock->udp_sock, data, max_len, timeout,
-                                &remote->ep, (sock_udp_aux_rx_t *)aux);
+                                &ep, (sock_udp_aux_rx_t *)aux);
         if (res <= 0) {
             DEBUG("sock_dtls: error receiving UDP packet: %d\n", (int)res);
             return res;
         }
 
-        _ep_to_session(&remote->ep, &remote->dtls_session);
+        _ep_to_session(&ep, &remote->dtls_session);
         res = dtls_handle_message(sock->dtls_ctx, &remote->dtls_session,
                                   (uint8_t *)data, res);
 
@@ -593,17 +613,31 @@ static inline uint32_t _update_timeout(uint32_t start, uint32_t timeout)
 }
 
 #ifdef SOCK_HAS_ASYNC
+bool sock_dtls_get_event_session(sock_dtls_t *sock,
+                                 sock_dtls_session_t *session)
+{
+    assert(sock);
+    assert(session);
+    if (sock->async_cb_session.size > 0) {
+        memcpy(&session->dtls_session, &sock->async_cb_session,
+               sizeof(sock->async_cb_session));
+        return true;
+    }
+    return false;
+}
+
 void _udp_cb(sock_udp_t *udp_sock, sock_async_flags_t flags, void *ctx)
 {
     sock_dtls_t *sock = ctx;
 
     if (flags & SOCK_ASYNC_MSG_RECV) {
-        sock_dtls_session_t remote;
+        session_t remote;
+        sock_udp_ep_t remote_ep;
         void *data = NULL;
         void *data_ctx = NULL;
 
         ssize_t res = sock_udp_recv_buf(udp_sock, &data, &data_ctx, 0,
-                                        &remote.ep);
+                                        &remote_ep);
         if (res <= 0) {
             DEBUG("sock_dtls: error receiving UDP packet: %d\n", (int)res);
             return;
@@ -612,15 +646,15 @@ void _udp_cb(sock_udp_t *udp_sock, sock_async_flags_t flags, void *ctx)
         /* prevent overriding already set `buf_ctx` */
         if (sock->buf_ctx != NULL) {
             DEBUG("sock_dtls: unable to store buffer asynchronously\n");
-            _check_more_chunks(udp_sock, &data, &data_ctx, &remote.ep);
+            _check_more_chunks(udp_sock, &data, &data_ctx, &remote_ep);
             return;
         }
-        _ep_to_session(&remote.ep, &remote.dtls_session);
+        _ep_to_session(&remote_ep, &remote);
         sock->buf_ctx = data_ctx;
-        res = dtls_handle_message(sock->dtls_ctx, &remote.dtls_session,
+        res = dtls_handle_message(sock->dtls_ctx, &remote,
                                   data, res);
         if (sock->buffer.data == NULL) {
-            _check_more_chunks(udp_sock, &data, &data_ctx, &remote.ep);
+            _check_more_chunks(udp_sock, &data, &data_ctx, &remote_ep);
             sock->buf_ctx = NULL;
         }
     }

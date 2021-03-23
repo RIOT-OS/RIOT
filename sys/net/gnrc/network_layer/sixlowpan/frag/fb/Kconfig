@@ -14,6 +14,7 @@ if KCONFIG_USEMODULE_GNRC_SIXLOWPAN_FRAG_FB
 
 config GNRC_SIXLOWPAN_FRAG_FB_SIZE
     int "Number of datagrams that can be fragmented simultaneously"
+    default 4 if MODULE_GNRC_SIXLOWPAN_FRAG_SFR
     default 1
     help
         This determines the number of @ref gnrc_sixlowpan_frag_fb_t instances

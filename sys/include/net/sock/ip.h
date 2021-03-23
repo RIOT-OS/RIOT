@@ -316,7 +316,15 @@ typedef struct {
      * @see SOCK_AUX_GET_TIMESTAMP
      */
     uint64_t timestamp;
-#endif /* MODULE_SOCK_AUX_TIMESTAP*/
+#endif /* MODULE_SOCK_AUX_TIMESTAP */
+#if defined(MODULE_SOCK_AUX_RSSI) || defined(DOXYGEN)
+    /**
+     * @brief   RSSI value of the received frame
+     *
+     * @see SOCK_AUX_GET_RSSI
+     */
+    int16_t rssi;
+#endif /* MODULE_SOCK_AUX_RSSI */
     sock_aux_flags_t flags; /**< Flags used request information */
 } sock_ip_aux_rx_t;
 

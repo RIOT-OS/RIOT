@@ -26,6 +26,7 @@
 #include "od.h"
 #include "shell.h"
 #include "periph/flashpage.h"
+#include "unaligned.h"
 
 #define LINE_LEN            (16)
 
@@ -44,6 +45,7 @@
  */
 static char raw_buf[64] ALIGNMENT_ATTR;
 
+#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 /**
  * @brief   Allocate space for 1 flash page in RAM
  *
@@ -53,6 +55,7 @@ static char raw_buf[64] ALIGNMENT_ATTR;
  *          requires 64 bit alignment.
  */
 static uint8_t page_mem[FLASHPAGE_SIZE] ALIGNMENT_ATTR;
+#endif
 
 static int getpage(const char *str)
 {
@@ -64,6 +67,7 @@ static int getpage(const char *str)
     return page;
 }
 
+#ifdef FLASHPAGE_SIZE
 static void dumpchar(uint8_t mem)
 {
     if (mem >= ' ' && mem <= '~') {
@@ -96,6 +100,7 @@ static void dump_local(void)
     puts("Local page buffer:");
     memdump(page_mem, FLASHPAGE_SIZE);
 }
+#endif
 
 static int cmd_info(int argc, char **argv)
 {
@@ -103,7 +108,11 @@ static int cmd_info(int argc, char **argv)
     (void)argv;
 
     printf("Flash start addr:\t0x%08x\n", (int)CPU_FLASH_BASE);
+#ifdef FLASHPAGE_SIZE
     printf("Page size:\t\t%i\n", (int)FLASHPAGE_SIZE);
+#else
+    puts("Page size:\t\tvariable");
+#endif
     printf("Number of pages:\t%i\n", (int)FLASHPAGE_NUMOF);
 
 #ifdef FLASHPAGE_RWWEE_NUMOF
@@ -119,6 +128,7 @@ static int cmd_info(int argc, char **argv)
     return 0;
 }
 
+#ifdef FLASHPAGE_SIZE
 static int cmd_dump(int argc, char **argv)
 {
     int page;
@@ -136,7 +146,7 @@ static int cmd_dump(int argc, char **argv)
     addr = flashpage_addr(page);
 
     printf("Flash page %i at address %p\n", page, addr);
-    memdump(addr, FLASHPAGE_SIZE);
+    memdump(addr, flashpage_size(page));
 
     return 0;
 }
@@ -171,6 +181,7 @@ static int cmd_read(int argc, char **argv)
 
     return 0;
 }
+#endif
 
 #ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static int cmd_write(int argc, char **argv)
@@ -257,6 +268,7 @@ static int cmd_erase(int argc, char **argv)
     return 0;
 }
 
+#ifdef FLASHPAGE_SIZE
 static int cmd_edit(int argc, char **argv)
 {
     int offset;
@@ -282,6 +294,7 @@ static int cmd_edit(int argc, char **argv)
 
     return 0;
 }
+#endif
 
 #ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 static int cmd_test(int argc, char **argv)
@@ -542,9 +555,9 @@ static int cmd_dump_config(int argc, char **argv)
     (void) argv;
 
 #ifdef FLASH_USER_PAGE_SIZE
-    od_hex_dump((void*)NVMCTRL_USER, FLASH_USER_PAGE_SIZE, 0);
+    od_hex_dump_ext((void*)NVMCTRL_USER, FLASH_USER_PAGE_SIZE, 0, NVMCTRL_USER);
 #else
-    od_hex_dump((void*)NVMCTRL_USER, AUX_PAGE_SIZE * AUX_NB_OF_PAGES, 0);
+    od_hex_dump_ext((void*)NVMCTRL_USER, AUX_PAGE_SIZE * AUX_NB_OF_PAGES, 0, NVMCTRL_USER);
 #endif
 
     return 0;
@@ -552,42 +565,57 @@ static int cmd_dump_config(int argc, char **argv)
 
 static int cmd_test_config(int argc, char **argv)
 {
+    /* This test is sam0 specific and also tests
+     * the unaligned writes for the sam0 flashpage
+     * driver implementation
+     */
+
     (void) argc;
     (void) argv;
 
     const uint16_t single_data = 0x1234;
     const uint8_t test_data[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE };
-    uint32_t dst = FLASH_USER_PAGE_AUX_SIZE - (sizeof(test_data) + 2);
+
+    assert(((int32_t)FLASH_USER_PAGE_AUX_SIZE - (int32_t)(sizeof(test_data) + 2 + 3)) > 0);
 
     puts("[START]");
 
-    sam0_flashpage_aux_reset(NULL);
+    for (uint32_t dst_offset = 0; dst_offset < 4; dst_offset++) {
+        /* destination base at 4 byte aligned address */
+        uint32_t dst = (uint32_t)(FLASH_USER_PAGE_AUX_SIZE
+                - (sizeof(test_data) + 2 + 3)) & ~((uint32_t)0x3);
+        /* add data destination offset */
+        dst += dst_offset;
 
-    /* check if the AUX page has been cleared */
-    for (uint32_t i = 0; i < FLASH_USER_PAGE_AUX_SIZE; ++i) {
-        if (*(uint8_t*)sam0_flashpage_aux_get(i) != 0xFF) {
-            printf("user page not cleared at offset 0x%"PRIx32"\n", i);
+        /* reset aux page */
+        sam0_flashpage_aux_reset(NULL);
+
+        /* check if the AUX page has been cleared */
+        for (uint32_t i = 0; i < FLASH_USER_PAGE_AUX_SIZE; ++i) {
+            if (*(uint8_t*)sam0_flashpage_aux_get(i) != 0xFF) {
+                printf("dst_offset=%"PRIu32": user page not cleared at offset 0x%"PRIx32"\n", dst_offset, i);
+                return -1;
+            }
+        }
+
+        /* write test data */
+        sam0_flashpage_aux_write(dst, test_data, sizeof(test_data));
+
+        /* write single half-word */
+        sam0_flashpage_aux_write(dst + sizeof(test_data), &single_data, sizeof(single_data));
+
+        /* check if half-word was written correctly */
+        uint16_t data_in = unaligned_get_u16(sam0_flashpage_aux_get(dst + sizeof(test_data)));
+        if (data_in != single_data) {
+            printf("dst_offset=%"PRIu32": %x != %x, offset = 0x%"PRIx32"\n", dst_offset, single_data, data_in, dst + sizeof(test_data));
             return -1;
         }
-    }
 
-    /* write test data */
-    sam0_flashpage_aux_write(dst, test_data, sizeof(test_data));
-
-    /* write single half-word */
-    sam0_flashpage_aux_write(dst + sizeof(test_data), &single_data, sizeof(single_data));
-
-    /* check if half-word was written correctly */
-    uint16_t data_in = *(uint16_t*)sam0_flashpage_aux_get(dst + sizeof(test_data));
-    if (data_in != single_data) {
-        printf("%x != %x, offset = 0x%"PRIx32"\n", single_data, data_in, dst + sizeof(test_data));
-        return -1;
-    }
-
-    /* check if test data was written correctly */
-    if (memcmp(sam0_flashpage_aux_get(dst), test_data, sizeof(test_data))) {
-        printf("write test_data failed, offset = 0x%"PRIx32"\n", dst);
-        return -1;
+        /* check if test data was written correctly */
+        if (memcmp(sam0_flashpage_aux_get(dst), test_data, sizeof(test_data))) {
+            printf("dst_offset=%"PRIu32": write test_data failed, offset = 0x%"PRIx32"\n", dst_offset, dst);
+            return -1;
+        }
     }
 
     puts("[SUCCESS]");
@@ -598,16 +626,16 @@ static int cmd_test_config(int argc, char **argv)
 
 static const shell_command_t shell_commands[] = {
     { "info", "Show information about pages", cmd_info },
+#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
     { "dump", "Dump the selected page to STDOUT", cmd_dump },
     { "dump_local", "Dump the local page buffer to STDOUT", cmd_dump_local },
     { "read", "Copy the given page to the local page buffer and dump to STDOUT", cmd_read },
-#ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
     { "write", "Write the local page buffer to the given page", cmd_write },
 #endif
     { "write_raw", "Write (ASCII, max 64B) data to the given address", cmd_write_raw },
     { "erase", "Erase the given page buffer", cmd_erase },
-    { "edit", "Write bytes to the local page buffer", cmd_edit },
 #ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
+    { "edit", "Write bytes to the local page buffer", cmd_edit },
     { "test", "Write and verify test pattern", cmd_test },
     { "test_last_pagewise", "Write and verify test pattern on last page available", cmd_test_last },
 #endif

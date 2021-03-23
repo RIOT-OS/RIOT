@@ -1,0 +1,5 @@
+FEATURES_REQUIRED += periph_i2c
+FEATURES_REQUIRED += periph_gpio
+ifneq (,$(filter $(USEMODULE),bq2429x_int))
+  FEATURES_REQUIRED += periph_gpio_irq
+endif

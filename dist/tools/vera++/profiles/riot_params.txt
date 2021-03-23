@@ -1,1 +1,2 @@
-max-line-length=80
+max-line-length=100
+max-consecutive-empty-lines=1

@@ -40,11 +40,6 @@ extern "C" {
 #define UART_PIN_TX         GPIO_PIN(0,20)
 /** @} */
 
-/**
- * @brief Enable the internal DC/DC converter
- */
-#define NRF5X_ENABLE_DCDC
-
 #ifdef __cplusplus
 }
 #endif

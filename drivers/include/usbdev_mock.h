@@ -7,7 +7,7 @@
  */
 /**
  * @defgroup    drivers_usbdev_mock USBdev mockup device
- * @ingroup     drivers
+ * @ingroup     drivers_misc
  * @brief       USBdev mockup device for testing
  * @{
  *

@@ -9,6 +9,7 @@
 /**
  * @defgroup    drivers_ina3221 INA3221 current/power monitor
  * @ingroup     drivers_sensors
+ * @ingroup     drivers_saul
  * @brief       Device driver for Texas Instruments INA3221
  *              three-channel ,high-side current and bus voltage
  *              monitor
@@ -516,7 +517,7 @@ int _ina3221_set_config(ina3221_t *dev, uint16_t cfg);
  * @brief Wrapper around @see _ina3221_set_config
  *
  * @param[in, out]  dev Device handle
- * @param[in]       chs Channel enable flags
+ * @param[in]       chs Channel enable flags @see ina3221_enable_ch_t
  * @param[in]       ns Number of samples
  * @param[in]       ctbadc Conversion time for bus voltage ADC
  * @param[in]       ctsadc Conversion time for shunt voltage ADC
@@ -525,7 +526,7 @@ int _ina3221_set_config(ina3221_t *dev, uint16_t cfg);
  * @return      @see _ina3221_set_config
  */
 static inline int ina3221_set_config(ina3221_t *dev,
-                                     ina3221_enable_ch_t chs,
+                                     uint16_t chs,
                                      ina3221_num_samples_t ns,
                                      ina3221_conv_time_bus_adc_t ctbadc,
                                      ina3221_conv_time_shunt_adc_t ctsadc,
@@ -548,7 +549,7 @@ int _ina3221_get_config(const ina3221_t *dev, uint16_t *cfg);
  * @brief   Wrapper around @see _ina3221_get_config
  *
  * @param[in]      dev Device handle
- * @param[out]     chs Pointer to enabled channels variable
+ * @param[out]     chs Pointer to enabled channels variable @see ina3221_enable_ch_t
  * @param[out]     ns Pointer to number of samples variable
  * @param[out]     ctbadc Pointer to conversion time bus adc variable
  * @param[out]     ctsadc Pointer to conversion time shunt adc variable
@@ -557,7 +558,7 @@ int _ina3221_get_config(const ina3221_t *dev, uint16_t *cfg);
  * @return      @see _ina3221_get_config
  */
 static inline int ina3221_get_config(const ina3221_t *dev,
-                                     ina3221_enable_ch_t *chs,
+                                     uint16_t *chs,
                                      ina3221_num_samples_t *ns,
                                      ina3221_conv_time_bus_adc_t *ctbadc,
                                      ina3221_conv_time_shunt_adc_t *ctsadc,
@@ -567,10 +568,10 @@ static inline int ina3221_get_config(const ina3221_t *dev,
     int ret = _ina3221_get_config(dev, &cfg);
 
     *chs = cfg & INA3221_ENABLE_CH_MASK;
-    *ns = cfg & INA3221_NUM_SAMPLES_MASK;
-    *ctbadc = cfg & INA3221_CONV_TIME_BADC_MASK;
-    *ctsadc = cfg & INA3221_CONV_TIME_SADC_MASK;
-    *mode = cfg & INA3221_MODE_MASK;
+    *ns = (ina3221_num_samples_t)(cfg & INA3221_NUM_SAMPLES_MASK);
+    *ctbadc = (ina3221_conv_time_bus_adc_t)(cfg & INA3221_CONV_TIME_BADC_MASK);
+    *ctsadc = (ina3221_conv_time_shunt_adc_t)(cfg & INA3221_CONV_TIME_SADC_MASK);
+    *mode = (ina3221_mode_t)(cfg & INA3221_MODE_MASK);
     return ret;
 }
 
@@ -578,14 +579,14 @@ static inline int ina3221_get_config(const ina3221_t *dev,
  * @brief Enable channels
  *
  * @param[in,out]   dev Device handle
- * @param[in]       ech Channel enable flags
+ * @param[in]       ech Channel enable flags @see ina3221_enable_ch_t
  *
  * @return      INA3221_OK, on success
  * @return      -INA3221_I2C_ERROR, if I2C bus acquirement failed
  * @return      @see i2c_read_regs
  * @return      @see i2c_write_regs
  */
-int _ina3221_set_enable_channel(ina3221_t *dev, ina3221_enable_ch_t ech);
+int _ina3221_set_enable_channel(ina3221_t *dev, uint16_t ech);
 
 /**
  * @brief   Wrapper around @see _ina3221_set_enable_channel
@@ -612,11 +613,11 @@ static inline int ina3221_set_channel_state(ina3221_t *dev,
  * @brief Read which channels are currently enabled
  *
  * @param[in]       dev Device handle
- * @param[out]      ech Pointer to enabled channels output variable
+ * @param[out]      ech Pointer to enabled channels output variable @see ina3221_enable_ch_t
  *
  * @return      Number of enabled channels
  */
-int _ina3221_get_enable_channel(const ina3221_t *dev, ina3221_enable_ch_t *ech);
+int _ina3221_get_enable_channel(const ina3221_t *dev, uint16_t *ech);
 
 /**
  * @brief   Wrapper around _ina3221_get_enable_channel
@@ -633,7 +634,7 @@ static inline int ina3221_get_channel_state(const ina3221_t *dev,
                                             ina3221_channel_state_t *ch2,
                                             ina3221_channel_state_t *ch3)
 {
-    ina3221_enable_ch_t ech = 0;
+    uint16_t ech = 0;
     int ret = _ina3221_get_enable_channel(dev, &ech);
 
     *ch1 = (ech & INA3221_ENABLE_CH1) ? INA3221_CH_ENABLE : INA3221_CH_DISABLE;
@@ -742,7 +743,7 @@ int ina3221_get_mode(const ina3221_t *dev, ina3221_mode_t *mode);
  * @brief Enable channels for shunt voltage sum calculation
  *
  * @param[in]       dev Device handle
- * @param[in]       esch Enable channel shunt voltage sum flags in host byte order
+ * @param[in]       esch Enable channel shunt voltage sum flags in host byte order @see ina3221_enable_sum_ch_t
  *
  * @return      INA3221_OK, on success
  * @return      -INA3221_I2C_ERROR, if I2C bus acquirement failed
@@ -750,7 +751,7 @@ int ina3221_get_mode(const ina3221_t *dev, ina3221_mode_t *mode);
  * @return      @see i2c_write_regs
  */
 int _ina3221_set_enable_sum_channel(const ina3221_t *dev,
-                                    ina3221_enable_sum_ch_t esch);
+                                    uint16_t esch);
 
 /**
  * @brief   Wrapper around @see _ina3221_set_enable_sum_channel
@@ -777,14 +778,14 @@ static inline int ina3221_set_enable_sum_channel(const ina3221_t *dev,
  * @brief Read enabled channels for shunt voltage sum calculation
  *
  * @param[in]       dev Device handle
- * @param[out]      esch Pointer to enabled channels for shunt voltage sum calculation output variable
+ * @param[out]      esch Pointer to enabled channels for shunt voltage sum calculation output variable @see ina3221_enable_sum_ch_t
  *
  * @return      Number of enabled channels for shunt voltage sum calculation, on success
  * @return      -INA3221_I2C_ERROR, if I2C bus acquirement failed
  * @return      @see i2c_read_regs
  */
 int _ina3221_get_enable_sum_channel(const ina3221_t *dev,
-                                    ina3221_enable_sum_ch_t *esch);
+                                    uint16_t *esch);
 
 /**
  * @brief   Wrapper for @see _ina3221_get_enable_sum_channel
@@ -801,7 +802,7 @@ static inline int ina3221_get_enable_sum_channel(const ina3221_t *dev,
                                                  ina3221_channel_state_t *ch2,
                                                  ina3221_channel_state_t *ch3)
 {
-    ina3221_enable_sum_ch_t esch = 0;
+    uint16_t esch = 0;
     int ret = _ina3221_get_enable_sum_channel(dev, &esch);
 
     *ch1 =

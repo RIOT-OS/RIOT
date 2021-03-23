@@ -55,7 +55,7 @@ int cord_epsim_register(const sock_udp_ep_t *rd_ep)
 
     /* build the initial CON packet */
     if (gcoap_req_init(&pkt, buf, sizeof(buf), COAP_METHOD_POST,
-                             "/.well-known/core") < 0) {
+                             "/.well-known/rd") < 0) {
         return CORD_EPSIM_ERROR;
     }
     /* make packet confirmable */

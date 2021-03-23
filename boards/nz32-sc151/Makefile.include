@@ -9,3 +9,6 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
 PROGRAMMER ?= dfu-util
 DFU_USB_ID = 0483:df11
 DFU_USE_DFUSE = 1
+
+# dfu-util programmer is supported
+PROGRAMMERS_SUPPORTED += dfu-util

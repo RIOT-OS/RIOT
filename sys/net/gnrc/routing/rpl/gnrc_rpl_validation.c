@@ -33,12 +33,17 @@ bool gnrc_rpl_validation_options(int msg_type, gnrc_rpl_instance_t *inst,
     uint16_t expected_len = 0;
 
     while(expected_len < len) {
-        switch(opt->type) {
-            case (GNRC_RPL_OPT_PAD1):
-                expected_len += 1;
-                opt = (gnrc_rpl_opt_t *) (((uint8_t *) opt) + 1);
-                continue;
+        if (opt->type == GNRC_RPL_OPT_PAD1) {
+            expected_len += 1;
+            opt = (gnrc_rpl_opt_t *) (((uint8_t *) opt) + 1);
+            continue;
+        }
 
+        if ((expected_len + sizeof(gnrc_rpl_opt_t)) > len) {
+            break;
+        }
+
+        switch(opt->type) {
             case (GNRC_RPL_OPT_DODAG_CONF):
                 if (msg_type != GNRC_RPL_ICMPV6_CODE_DIO) {
                     DEBUG("RPL: DODAG CONF DIO option not expected\n");
@@ -101,6 +106,11 @@ bool gnrc_rpl_validation_options(int msg_type, gnrc_rpl_instance_t *inst,
 
         }
         expected_len += opt->length + sizeof(gnrc_rpl_opt_t);
+
+        if (expected_len >= len) {
+          break;
+        }
+
         opt = (gnrc_rpl_opt_t *) (((uint8_t *) (opt + 1)) + opt->length);
     }
 

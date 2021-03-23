@@ -84,12 +84,17 @@ static event_t _netdev_ev = { .handler = _netdev_isr_handler };
 void recv(netdev_t *dev)
 {
     uint8_t src[IEEE802154_LONG_ADDRESS_LEN], dst[IEEE802154_LONG_ADDRESS_LEN];
-    size_t mhr_len, data_len, src_len, dst_len;
+    int data_len;
+    size_t mhr_len, src_len, dst_len;
     netdev_ieee802154_rx_info_t rx_info;
     le_uint16_t src_pan, dst_pan;
 
     putchar('\n');
     data_len = dev->driver->recv(dev, buffer, sizeof(buffer), &rx_info);
+    if (data_len < 0) {
+        puts("Couldn't read frame");
+        return;
+    }
     mhr_len = ieee802154_get_frame_hdr_len(buffer);
     if (mhr_len == 0) {
         puts("Unexpected MHR for incoming packet");
@@ -153,7 +158,7 @@ void recv(netdev_t *dev)
     printf("Seq.: %u\n", (unsigned)ieee802154_get_seq(buffer));
     od_hex_dump(buffer + mhr_len, data_len - mhr_len, 0);
     printf("txt: ");
-    for (size_t i = mhr_len; i < data_len; i++) {
+    for (int i = mhr_len; i < data_len; i++) {
         if ((buffer[i] > 0x1F) && (buffer[i] < 0x80)) {
             putchar((char)buffer[i]);
         }

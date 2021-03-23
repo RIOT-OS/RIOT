@@ -10,7 +10,5 @@ FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart periph_uart_modecfg
 
 # Put other features for this board (in alphabetical order)
-FEATURES_PROVIDED += riotboot
 FEATURES_PROVIDED += efm32_coretemp
-
-include $(RIOTBOARD)/common/silabs/Makefile.features
+FEATURES_PROVIDED += riotboot

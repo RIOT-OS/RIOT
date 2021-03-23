@@ -5,6 +5,11 @@
 # directory for more details.
 #
 
-config MODULE_SHELL_COMMANDS
+menuconfig MODULE_SHELL_COMMANDS
     bool "Basic shell commands"
     depends on MODULE_SHELL
+
+config MODULE_I2C_SCAN
+    bool "I2c scanner"
+    depends on MODULE_SHELL
+    depends on MODULE_PERIPH_I2C

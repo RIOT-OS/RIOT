@@ -20,6 +20,7 @@ LOW_MEMORY_BOARDS += \
   bluepill-128kib \
   calliope-mini \
   cc1312-launchpad \
+  cc1350-launchpad \
   cc1352-launchpad \
   cc2650-launchpad \
   cc2650stk \
@@ -54,6 +55,7 @@ LOW_MEMORY_BOARDS += \
   opencm904 \
   saml10-xpro \
   saml11-xpro \
+  sensebox_samd21 \
   serpente \
   sodaq-autonomo \
   sodaq-explorer \

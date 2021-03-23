@@ -17,7 +17,6 @@
  * @}
  */
 #include "cpucycle.h"
-#include "vendor/encoding.h"
 
 
 uint64_t get_cycle_count(void)
@@ -30,5 +29,5 @@ uint64_t get_cycle_count(void)
                           "csrr %2, mcycleh\n\t"        \
                           "bne  %0, %2, 1b\n\t"         \
                           : "=r" (hi), "=r" (lo), "=r" (hi2));
-    return lo | ((uint64_t) hi << 32);
+    return lo | ((uint64_t)hi << 32);
 }

@@ -151,9 +151,3 @@ void pm_set(unsigned mode)
 #endif
     }
 }
-
-void pm_off(void)
-{
-    irq_disable();
-    pm_set(0);
-}

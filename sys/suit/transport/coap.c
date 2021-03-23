@@ -198,14 +198,15 @@ static int _fetch_block(coap_pkt_t *pkt, uint8_t *buf, sock_udp_t *sock,
                         const char *path, coap_blksize_t blksize, size_t num)
 {
     uint8_t *pktpos = buf;
+    uint16_t lastonum = 0;
 
     pkt->hdr = (coap_hdr_t *)buf;
 
     pktpos += coap_build_hdr(pkt->hdr, COAP_TYPE_CON, NULL, 0, COAP_METHOD_GET,
                              num);
-    pktpos += coap_opt_put_uri_path(pktpos, 0, path);
+    pktpos += coap_opt_put_uri_pathquery(pktpos, &lastonum, path);
     pktpos +=
-        coap_opt_put_uint(pktpos, COAP_OPT_URI_PATH, COAP_OPT_BLOCK2,
+        coap_opt_put_uint(pktpos, lastonum, COAP_OPT_BLOCK2,
                           (num << 4) | blksize);
 
     pkt->payload = pktpos;

@@ -46,7 +46,7 @@ available for RIOT. Refer to the project page for instructions on how to
 build an flash the bootloader. Don't forgot to also update the fuse settings
 to set the bootloader size to 256 words (512 bytes).
 
-Compile and flash with `make BOARD=arduino-nano BOOTLOADER=optiboot flash` or
+Compile and flash with `make BOARD=arduino-nano ATMEGA_BOOTLOADER=optiboot flash` or
 use `export ARDUINO_NANO_BOOTLOADER=optiboot` in order to not have to specify
 the bootloader during compilation and flashing.
 

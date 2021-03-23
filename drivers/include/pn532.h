@@ -25,14 +25,15 @@
 extern "C" {
 #endif
 
+#include "kernel_defines.h"
 #include "mutex.h"
 #include "periph/i2c.h"
 #include "periph/spi.h"
 #include "periph/gpio.h"
 #include <stdint.h>
 
-#if !defined(PN532_SUPPORT_I2C) && !defined(PN532_SUPPORT_SPI)
-#error Please define PN532_SUPPORT_I2C and/or PN532_SUPPORT_SPI to enable \
+#if !IS_USED(MODULE_PN532_I2C) && !IS_USED(MODULE_PN532_SPI)
+#error Please use either pn532_i2c and/or pn532_spi module to enable \
     the functionality on this device
 #endif
 
@@ -41,16 +42,16 @@ extern "C" {
  */
 typedef struct {
     union {
-#if defined(PN532_SUPPORT_I2C) || DOXYGEN
+#if IS_USED(MODULE_PN532_I2C) || DOXYGEN
         i2c_t i2c;              /**< I2C device */
 #endif
-#if defined(PN532_SUPPORT_SPI) || DOXYGEN
+#if IS_USED(MODULE_PN532_SPI) || DOXYGEN
         spi_t spi;              /**< SPI device */
 #endif
     };
     gpio_t reset;               /**< Reset pin */
     gpio_t irq;                 /**< Interrupt pin */
-#if defined(PN532_SUPPORT_SPI) || DOXYGEN
+#if IS_USED(MODULE_PN532_SPI) || DOXYGEN
     gpio_t nss;                 /**< Chip Select pin (only SPI) */
 #endif
 } pn532_params_t;
@@ -185,11 +186,12 @@ void pn532_reset(const pn532_t *dev);
 int pn532_init(pn532_t *dev, const pn532_params_t *params, pn532_mode_t mode);
 
 
-#if defined(PN532_SUPPORT_I2C) || DOXYGEN
+#if IS_USED(MODULE_PN532_I2C) || DOXYGEN
 /**
  * @brief   Initialization of PN532 using i2c
  *
  * @see pn532_init for parameter and return value details
+ * @note Use `pn532_i2c` module to use this function.
  */
 static inline int pn532_init_i2c(pn532_t *dev, const pn532_params_t *params)
 {
@@ -197,11 +199,12 @@ static inline int pn532_init_i2c(pn532_t *dev, const pn532_params_t *params)
 }
 #endif
 
-#if defined(PN532_SUPPORT_SPI) || DOXYGEN
+#if IS_USED(MODULE_PN532_SPI) || DOXYGEN
 /**
  * @brief   Initialization of PN532 using spi
  *
  * @see pn532_init for parameter and return value details
+ * @note Use `pn532_spi` module to use this function.
  */
 static inline int pn532_init_spi(pn532_t *dev, const pn532_params_t *params)
 {

@@ -5,6 +5,7 @@ DRIVER ?= lis2dh12_spi
 
 USEMODULE += fmt
 USEMODULE += xtimer
+USEMODULE += shell
 USEMODULE += $(DRIVER)
 
 # for using lis2dh12 with interrupt function

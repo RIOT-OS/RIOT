@@ -21,6 +21,14 @@ ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))
   FEATURES_REQUIRED += periph_pwm
 endif
 
+ifneq (,$(filter congure_%,$(USEMODULE)))
+  USEMODULE += congure
+endif
+
+ifneq (,$(filter congure_test,$(USEMODULE)))
+  USEMODULE += fmt
+endif
+
 ifneq (,$(filter eepreg,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eeprom
 endif
@@ -134,12 +142,10 @@ ifneq (,$(filter sntp,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
-ifneq (,$(filter ieee802154_radio_hal,$(USEMODULE)))
-  USEMODULE += ieee802154
-endif
-
 ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+  # enable default network devices on the platform
   USEMODULE += netdev_default
+  USEMODULE += netdev
   USEMODULE += gnrc_netif
 endif
 
@@ -149,7 +155,8 @@ ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
 endif
 
 ifneq (,$(filter netdev_ieee802154_submac,$(USEMODULE)))
-  USEMODULE += ieee802154_radio_hal
+  USEMODULE += netdev_ieee802154
+  USEMODULE += ieee802154
   USEMODULE += ieee802154_submac
 endif
 
@@ -280,20 +287,26 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_nib_6ln
   USEMODULE += gnrc_sixlowpan
-  USEMODULE += gnrc_sixlowpan_frag
+  ifeq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_frag
+  endif
   USEMODULE += gnrc_sixlowpan_iphc
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_router_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_nib_6lr
-  USEMODULE += gnrc_sixlowpan_frag
+  ifeq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_frag
+  endif
   USEMODULE += gnrc_sixlowpan_iphc
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_border_router_default,$(USEMODULE)))
   USEMODULE += gnrc_ipv6_nib_6lbr
   USEMODULE += gnrc_ipv6_router_default
-  USEMODULE += gnrc_sixlowpan_frag
+  ifeq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_frag
+  endif
   USEMODULE += gnrc_sixlowpan_iphc
 endif
 
@@ -316,6 +329,23 @@ endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
   USEMODULE += xtimer
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_frag_fb
+  USEMODULE += gnrc_sixlowpan_frag_vrb
+  USEMODULE += gnrc_sixlowpan_frag_rb
+  USEMODULE += evtimer
+  USEMODULE += xtimer
+  ifneq (,$(filter gnrc_tx_sync,$(USEMODULE)))
+    # TODO: Implement gnrc_tx_sync for gnrc_sixlowpand_frag_sfr
+    $(error module gnrc_tx_sync conflicts with gnrc_sixlowpand_frag_sfr)
+  endif
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_stats,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_sfr
 endif
 
 ifneq (,$(filter gnrc_sixlowpan_frag_vrb,$(USEMODULE)))
@@ -511,11 +541,11 @@ ifneq (,$(filter od_string,$(USEMODULE)))
 endif
 
 ifneq (,$(filter newlib_gnu_source,$(USEMODULE)))
-  USEMODULE += newlib
+  FEATURES_REQUIRED += newlib
 endif
 
 ifneq (,$(filter newlib_nano,$(USEMODULE)))
-  USEMODULE += newlib
+  FEATURES_REQUIRED += newlib
 endif
 
 ifneq (,$(filter newlib,$(USEMODULE)))
@@ -605,6 +635,10 @@ ifneq (,$(filter sema,$(USEMODULE)))
   USEMODULE += xtimer
 endif
 
+ifneq (,$(filter sema_inv,$(USEMODULE)))
+  USEMODULE += atomic_utils
+endif
+
 ifneq (,$(filter luid,$(USEMODULE)))
   FEATURES_OPTIONAL += periph_cpuid
 endif
@@ -677,6 +711,11 @@ ifneq (,$(filter netstats_%, $(USEMODULE)))
   USEMODULE += netstats
 endif
 
+ifneq (,$(filter netstats_neighbor_%, $(USEMODULE)))
+  USEMODULE += netstats_neighbor
+  USEMODULE += xtimer
+endif
+
 ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
   USEMODULE += gnrc_netif
   USEMODULE += gnrc_nettype_lwmac
@@ -700,12 +739,17 @@ endif
 
 ifneq (,$(filter saul_default,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_saul
+  DEFAULT_MODULE += saul_init_devs
   USEMODULE += saul
   USEMODULE += saul_reg
 endif
 
 ifneq (,$(filter phydat,$(USEMODULE)))
   USEMODULE += fmt
+endif
+
+ifneq (,$(filter pm_layered,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_pm
 endif
 
 ifneq (,$(filter evtimer_mbox,$(USEMODULE)))
@@ -783,6 +827,7 @@ endif
 ifneq (,$(filter asymcute,$(USEMODULE)))
   USEMODULE += sock_udp
   USEMODULE += sock_util
+  USEMODULE += sock_async_event
   USEMODULE += random
   USEMODULE += event_timeout
   USEMODULE += event_callback
@@ -891,9 +936,13 @@ endif
 
 ifneq (,$(filter skald,$(USEMODULE)))
   FEATURES_REQUIRED += radio_nrfble
+  FEATURES_OPTIONAL += periph_rtt
   USEMODULE += nrfble
-  USEMODULE += xtimer
   USEMODULE += random
+  USEMODULE += ztimer_msec
+   ifneq (,$(filter periph_rtt,$(USEMODULE)))
+    USEMODULE += ztimer_periph_rtt
+  endif
 endif
 
 ifneq (,$(filter bluetil_addr,$(USEMODULE)))
@@ -931,6 +980,8 @@ ifneq (,$(filter usbus,$(USEMODULE)))
   DEFAULT_MODULE += auto_init_usbus
   USEMODULE += core_thread_flags
   USEMODULE += event
+  USEMODULE += luid
+  USEMODULE += fmt
   ifeq (,$(filter usbdev_mock,$(USEMODULE)))
     FEATURES_REQUIRED += periph_usbdev
   endif
@@ -947,6 +998,17 @@ ifneq (,$(filter usbus_cdc_ecm,$(USEMODULE)))
   USEMODULE += usbus
   USEMODULE += netdev_eth
   USEMODULE += luid
+endif
+
+ifneq (,$(filter usbus_hid,$(USEMODULE)))
+  USEMODULE += isrpipe_read_timeout
+  USEMODULE += usbus
+endif
+
+ifneq (,$(filter usbus_dfu,$(USEMODULE)))
+  FEATURES_REQUIRED += riotboot
+  USEMODULE += usbus
+  USEMODULE += riotboot_slot
 endif
 
 ifneq (,$(filter uuid,$(USEMODULE)))
@@ -967,6 +1029,13 @@ endif
 ifneq (,$(filter riotboot_hdr, $(USEMODULE)))
   USEMODULE += checksum
   USEMODULE += riotboot
+endif
+
+ifneq (,$(filter riotboot_usb_dfu, $(USEMODULE)))
+  USEMODULE += usbus_dfu
+  USEMODULE += riotboot_flashwrite
+  FEATURES_REQUIRED += no_idle_thread
+  FEATURES_REQUIRED += periph_pm
 endif
 
 ifneq (,$(filter irq_handler,$(USEMODULE)))
@@ -1014,13 +1083,21 @@ ifneq (,$(filter suit_%,$(USEMODULE)))
   USEMODULE += suit
 endif
 
+ifneq (,$(filter test_utils_result_output_%,$(USEMODULE)))
+  USEMODULE += test_utils_result_output
+endif
+
 # include ztimer dependencies
 ifneq (,$(filter ztimer% %ztimer,$(USEMODULE)))
   include $(RIOTBASE)/sys/ztimer/Makefile.dep
 endif
 
 ifneq (,$(filter evtimer,$(USEMODULE)))
-  USEMODULE += xtimer
+  ifneq (,$(filter evtimer_on_ztimer,$(USEMODULE)))
+    USEMODULE += ztimer_msec
+  else
+    USEMODULE += xtimer
+  endif
 endif
 
 # handle xtimer's deps. Needs to be done *after* ztimer
@@ -1050,6 +1127,11 @@ endif
 
 ifneq (,$(filter ecc_%,$(USEMODULE)))
   USEMODULE += ecc
+endif
+
+ifneq (,$(filter dbgpin,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += dbgpin
 endif
 
 include $(RIOTBASE)/sys/test_utils/Makefile.dep

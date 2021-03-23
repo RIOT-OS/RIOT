@@ -63,22 +63,19 @@ extern "C" {
 
 /**
  * @brief   Dispatch mask for 6LoWPAN selective fragment recovery
- * @see [draft-ietf-6lo-fragment-recovery-05,
- *      section 5](https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-05#section-5)
+ * @see [RFC 8931, section 5](https://tools.ietf.org/html/rfc8931#section-5)
  */
 #define SIXLOWPAN_SFR_DISP_MASK         (0xfe)
 
 /**
  * @brief   Dispatch for 6LoWPAN recoverable fragment
- * @see [draft-ietf-6lo-fragment-recovery-05, section
- *      5.1](https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-05#section-5.1)
+ * @see [RFC 8931, section 5.1](https://tools.ietf.org/html/rfc8931#section-5.1)
  */
 #define SIXLOWPAN_SFR_RFRAG_DISP        (0xe8)
 
 /**
  * @brief   Dispatch for 6LoWPAN recoverable fragment acknowledgment
- * @see [draft-ietf-6lo-fragment-recovery-05, section
- *      5.2](https://tools.ietf.org/html/draft-ietf-6lo-fragment-recovery-05#section-5.2)
+ * @see [RFC 8931, section 5.2](https://tools.ietf.org/html/rfc8931#section-5.2)
  */
 #define SIXLOWPAN_SFR_ACK_DISP          (0xea)
 

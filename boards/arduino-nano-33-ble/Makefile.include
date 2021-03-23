@@ -13,6 +13,8 @@ ifeq ($(PROGRAMMER),bossa)
   PREFLASH_DELAY = 1
 endif
 
+PROGRAMMERS_SUPPORTED += bossa
+
 TESTRUNNER_CONNECT_DELAY ?= 2
 $(call target-export-variables,test,TESTRUNNER_CONNECT_DELAY)
 

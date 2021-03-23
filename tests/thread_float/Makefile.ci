@@ -17,6 +17,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     opencm9-04 \
     pca10000 \
     pca10005 \
+    samd10-xmini \
     spark-core \
     stk3200 \
     stm32f030f4-demo \

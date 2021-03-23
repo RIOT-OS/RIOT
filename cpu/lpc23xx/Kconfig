@@ -41,4 +41,5 @@ config CPU_MODEL
 config CPU
     default "lpc23xx" if CPU_FAM_LPC23XX
 
+rsource "mci/Kconfig"
 source "$(RIOTCPU)/arm7_common/Kconfig"

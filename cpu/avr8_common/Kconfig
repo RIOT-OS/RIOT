@@ -1,0 +1,25 @@
+# Copyright (c) 2020 HAW Hamburg
+#               2021 Gerson Fernando Budke
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_ARCH_AVR8
+    bool
+    select HAS_ARCH_8BIT
+    select HAS_ARCH_AVR8
+
+## Common CPU symbols
+config CPU_ARCH
+    default "avr8" if CPU_ARCH_AVR8
+
+config CPU_CORE
+    default "avr" if CPU_CORE_AVR
+
+## Declaration of specific features
+config HAS_ARCH_AVR8
+    bool
+    help
+        Indicates that the current architecture is Atmel AVR8.

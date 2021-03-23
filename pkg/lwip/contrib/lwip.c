@@ -61,6 +61,10 @@
 #include "esp-wifi/esp_wifi_netdev.h"
 #endif
 
+#ifdef MODULE_SAM0_ETH
+#include "sam0_eth_netdev.h"
+#endif
+
 #ifdef MODULE_STM32_ETH
 #include "stm32_eth.h"
 #endif
@@ -98,11 +102,16 @@
 #define LWIP_NETIF_NUMOF        ARRAY_SIZE(socket_zep_params)
 #endif
 
-#ifdef MODULE_ESP_ETH      /* is mutual exclusive with above ifdef */
+/* is mutual exclusive with above ifdef */
+#if IS_USED(MODULE_ESP_ETH) && IS_USED(MODULE_ESP_WIFI)
+#define LWIP_NETIF_NUMOF        (2)
+#define ESP_WIFI_INDEX          (1)
+#elif IS_USED(MODULE_ESP_ETH) || IS_USED(MODULE_ESP_WIFI)
 #define LWIP_NETIF_NUMOF        (1)
+#define ESP_WIFI_INDEX          (0)
 #endif
 
-#ifdef MODULE_ESP_WIFI     /* is mutual exclusive with above ifdef */
+#ifdef MODULE_SAM0_ETH
 #define LWIP_NETIF_NUMOF        (1)
 #endif
 
@@ -150,6 +159,11 @@ extern void esp_eth_setup (esp_eth_netdev_t* dev);
 #ifdef MODULE_ESP_WIFI
 extern esp_wifi_netdev_t _esp_wifi_dev;
 extern void esp_wifi_setup(esp_wifi_netdev_t *dev);
+#endif
+
+#ifdef MODULE_SAM0_ETH
+static netdev_t sam0_eth;
+extern void sam0_eth_setup(netdev_t *netdev);
 #endif
 
 #ifdef MODULE_STM32_ETH
@@ -227,25 +241,35 @@ void lwip_bootstrap(void)
     }
 #elif defined(MODULE_SOCKET_ZEP)
     for (unsigned i = 0; i < LWIP_NETIF_NUMOF; i++) {
-        socket_zep_setup(&socket_zep_devs[i], &socket_zep_params[i]);
+        socket_zep_setup(&socket_zep_devs[i], &socket_zep_params[i], i);
         if (netif_add(&netif[i], &socket_zep_devs[i], lwip_netdev_init,
                       tcpip_6lowpan_input) == NULL) {
             DEBUG("Could not add socket_zep device\n");
             return;
         }
     }
-#elif defined(MODULE_ESP_ETH)
+#elif (IS_USED(MODULE_ESP_ETH) || IS_USED(MODULE_ESP_WIFI))
+#if IS_USED(MODULE_ESP_ETH)
     esp_eth_setup(&_esp_eth_dev);
     if (_netif_add(&netif[0], &_esp_eth_dev, lwip_netdev_init,
                    tcpip_input) == NULL) {
         DEBUG("Could not add esp_eth device\n");
         return;
     }
-#elif defined(MODULE_ESP_WIFI)
+#endif
+#if IS_USED(MODULE_ESP_WIFI)
     esp_wifi_setup(&_esp_wifi_dev);
-    if (_netif_add(&netif[0], &_esp_wifi_dev, lwip_netdev_init,
+    if (_netif_add(&netif[ESP_WIFI_INDEX], &_esp_wifi_dev, lwip_netdev_init,
                    tcpip_input) == NULL) {
         DEBUG("Could not add esp_wifi device\n");
+        return;
+    }
+#endif
+#elif defined(MODULE_SAM0_ETH)
+    sam0_eth_setup(&sam0_eth);
+    if (_netif_add(&netif[0], &sam0_eth, lwip_netdev_init,
+                   tcpip_input) == NULL) {
+        DEBUG("Could not add sam0_eth device\n");
         return;
     }
 #elif defined(MODULE_STM32_ETH)

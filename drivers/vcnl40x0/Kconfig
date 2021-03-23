@@ -1,0 +1,34 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if TEST_KCONFIG
+
+choice
+    bool "VCNL4010/VCNL4020/VCNL4040 Proximity and Ambient Light sensors"
+    optional
+    depends on HAS_PERIPH_I2C
+
+config MODULE_VCNL4010
+    bool "VCNL4010"
+    select MODULE_VCNL40X0
+
+config MODULE_VCNL4020
+    bool "VCNL4020"
+    select MODULE_VCNL40X0
+
+config MODULE_VCNL4040
+    bool "VCNL4040"
+    select MODULE_VCNL40X0
+
+endchoice
+
+config MODULE_VCNL40X0
+    bool
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+
+endif # TEST_KCONFIG

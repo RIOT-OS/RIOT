@@ -107,8 +107,14 @@ endif
 ifneq (,$(filter netopt,$(USEMODULE)))
   DIRS += net/crosslayer/netopt
 endif
+ifneq (,$(filter netstats_neighbor,$(USEMODULE)))
+  DIRS += net/netstats
+endif
 ifneq (,$(filter sema,$(USEMODULE)))
   DIRS += sema
+endif
+ifneq (,$(filter sema_inv,$(USEMODULE)))
+  DIRS += sema_inv
 endif
 ifneq (,$(filter sixlowpan,$(USEMODULE)))
   DIRS += net/network_layer/sixlowpan
@@ -166,6 +172,9 @@ ifneq (,$(filter tcp,$(USEMODULE)))
 endif
 ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
   DIRS += test_utils/interactive_sync
+endif
+ifneq (,$(filter test_utils_result_output,$(USEMODULE)))
+  DIRS += test_utils/result_output
 endif
 ifneq (,$(filter udp,$(USEMODULE)))
   DIRS += net/transport_layer/udp

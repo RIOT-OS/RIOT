@@ -1,4 +1,0 @@
-USEMODULE += cc26xx_cc13xx
-USEMODULE += cc26x0_driverlib
-
-include ${RIOTCPU}/cc26xx_cc13xx/Makefile.dep

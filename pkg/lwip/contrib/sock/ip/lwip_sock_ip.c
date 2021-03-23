@@ -25,6 +25,7 @@
 #include "lwip/api.h"
 #include "lwip/ip4.h"
 #include "lwip/ip6.h"
+#include "lwip/netif.h"
 #include "lwip/opt.h"
 #include "lwip/sys.h"
 #include "lwip/sock_internal.h"
@@ -79,7 +80,9 @@ static uint16_t _ip4_addr_to_netif(const ip4_addr_p_t *addr)
     assert(addr != NULL);
 
     if (!ip4_addr_isany(addr)) {
-        for (struct netif *netif = netif_list; netif != NULL; netif = netif->next) {
+        struct netif *netif;
+        /* cppcheck-suppress uninitvar ; assigned by macro */
+        NETIF_FOREACH(netif) {
             if (netif_ip4_addr(netif)->addr == addr->addr) {
                 return (int)netif->num + 1;
             }
@@ -97,7 +100,9 @@ static uint16_t _ip6_addr_to_netif(const ip6_addr_p_t *_addr)
     assert(_addr != NULL);
     ip6_addr_copy_from_packed(addr, *_addr);
     if (!ip6_addr_isany_val(addr)) {
-        for (struct netif *netif = netif_list; netif != NULL; netif = netif->next) {
+        struct netif *netif;
+        /* cppcheck-suppress uninitvar ; assigned by macro */
+        NETIF_FOREACH(netif) {
             if (netif_get_ip6_addr_match(netif, &addr) >= 0) {
                 return (int)netif->num + 1;
             }

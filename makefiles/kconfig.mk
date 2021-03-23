@@ -26,8 +26,18 @@ export KCONFIG_AUTOHEADER_HEADER
 # This file will contain the calculated dependencies formated in Kconfig
 export KCONFIG_GENERATED_DEPENDENCIES = $(GENERATED_DIR)/Kconfig.dep
 
-# This file will contain application default configurations
-KCONFIG_APP_CONFIG = $(APPDIR)/app.config
+# This file will contain external module configurations
+export KCONFIG_EXTERNAL_CONFIGS = $(GENERATED_DIR)/Kconfig.external_modules
+
+# Add configurations that only work when running the Kconfig test so far,
+# because they activate modules.
+ifeq (1,$(TEST_KCONFIG))
+  # This file will contain application default configurations
+  KCONFIG_APP_CONFIG = $(APPDIR)/app.config.test
+else
+  # This file will contain application default configurations
+  KCONFIG_APP_CONFIG = $(APPDIR)/app.config
+endif
 
 # Default and user overwritten configurations
 KCONFIG_USER_CONFIG = $(APPDIR)/user.config
@@ -43,11 +53,6 @@ KCONFIG_OUT_CONFIG = $(GENERATED_DIR)/out.config
 # whenever a change occurs on one of the previously used Kconfig files.
 KCONFIG_OUT_DEP = $(KCONFIG_OUT_CONFIG).d
 
-# Include configuration symbols if available. This allows to check for Kconfig
-# symbols in makefiles. Make tries to 'remake' all included files (see
-# https://www.gnu.org/software/make/manual/html_node/Remaking-Makefiles.html).
--include $(KCONFIG_OUT_CONFIG)
-
 # Add configurations to merge, in ascendent priority (i.e. a file overrides the
 # previous ones).
 #
@@ -56,13 +61,6 @@ KCONFIG_OUT_DEP = $(KCONFIG_OUT_CONFIG).d
 # and share them among boards or cpus.
 # This file will contain application default configurations used for Kconfig Test
 MERGE_SOURCES += $(KCONFIG_ADD_CONFIG)
-
-# Add configurations that only work when running the Kconfig test so far,
-# because they activate modules.
-ifeq (1,$(TEST_KCONFIG))
-  MERGE_SOURCES += $(wildcard $(APPDIR)/app.config.test)
-endif
-
 MERGE_SOURCES += $(wildcard $(KCONFIG_APP_CONFIG))
 MERGE_SOURCES += $(wildcard $(KCONFIG_USER_CONFIG))
 
@@ -100,6 +98,11 @@ endif
 export SHOULD_RUN_KCONFIG
 
 ifneq (,$(SHOULD_RUN_KCONFIG))
+
+# Include configuration symbols if available. This allows to check for Kconfig
+# symbols in makefiles. Make tries to 'remake' all included files (see
+# https://www.gnu.org/software/make/manual/html_node/Remaking-Makefiles.html).
+-include $(KCONFIG_OUT_CONFIG)
 
 # Add configuration header to build dependencies
 BUILDDEPS += $(KCONFIG_GENERATED_AUTOCONF_HEADER_C) $(FIXDEP)
@@ -140,6 +143,23 @@ $(KCONFIG_GENERATED_DEPENDENCIES): FORCE | $(GENERATED_DIR)
 	      printf "config %s\n\tbool\n\tdefault y\n", toupper($$0)}' \
 	  | $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@
 
+# All directories in EXTERNAL_MODULES_DIR which have a Kconfig file
+EXTERNAL_MODULE_KCONFIGS ?= $(sort $(foreach dir,$(EXTERNAL_MODULE_DIRS),\
+                              $(wildcard $(dir)/Kconfig)))
+# Build a Kconfig file that source all external modules configuration
+# files. Every EXTERNAL_MODULE_DIRS with a Kconfig file is written to
+# KCONFIG_EXTERNAL_CONFIGS as 'osource dir/Kconfig'
+$(KCONFIG_EXTERNAL_CONFIGS): FORCE | $(GENERATED_DIR)
+	$(Q)\
+	if [ -n "$(EXTERNAL_MODULE_KCONFIGS)" ] ; then  \
+		printf "%s\n" $(EXTERNAL_MODULE_KCONFIGS) \
+		| awk '{ printf "osource \"%s\"\n", $$0 }' \
+		| $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@ ; \
+	else \
+		printf "# no external modules" \
+		| $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@ ; \
+	fi
+
 # When the 'clean' target is called, the files inside GENERATED_DIR should be
 # regenerated. For that, we conditionally change GENERATED_DIR from an 'order
 # only' requisite to a normal one.
@@ -156,6 +176,7 @@ GENERATED_DIR_DEP := $(if $(CLEAN),,|) $(GENERATED_DIR)
 # Generates a .config file by merging multiple sources specified in
 # MERGE_SOURCES. This will also generate KCONFIG_OUT_DEP with the list of used
 # Kconfig files.
+$(KCONFIG_OUT_CONFIG): $(KCONFIG_EXTERNAL_CONFIGS)
 $(KCONFIG_OUT_CONFIG): $(GENERATED_DEPENDENCIES_DEP) $(GENCONFIG) $(MERGE_SOURCES) $(GENERATED_DIR_DEP)
 	$(Q) $(GENCONFIG) \
 	  --config-out=$(KCONFIG_OUT_CONFIG) \

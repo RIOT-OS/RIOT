@@ -58,6 +58,9 @@ typedef uint<num>_t uword_t;
  *
  * @details Synonym to `int8_t`, `int16_t` or `int32_t` depending on
  *          architecture
+ *
+ * @note    This type is pronounce es-word-tea. When slaying dragons, this is
+ *          not the tool you're looking for.
  */
 typedef int<num>_t  sword_t;
 #elif (ARCHITECTURE_WORD_BITS == 8)
@@ -86,6 +89,26 @@ typedef int32_t     sword_t;
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  */
 #define WORD_ALIGNED __attribute__((aligned(ARCHITECTURE_WORD_BYTES)))
+
+/**
+ * @brief   Smallest number an uword_t can hold
+ */
+#define UWORD_MIN                   0
+
+/**
+ * @brief   Highest number an uword_t can hold
+ */
+#define UWORD_MAX                   ((1ULL << ARCHITECTURE_WORD_BITS) - 1)
+
+/**
+ * @brief   Smallest number an sword_t can hold
+ */
+#define SWORD_MIN                   (-(1LL << (ARCHITECTURE_WORD_BITS - 1)))
+
+/**
+ * @brief   Highest number an sword_t can hold
+ */
+#define SWORD_MAX                   ((1LL << (ARCHITECTURE_WORD_BITS - 1)) - 1)
 
 #ifdef __cplusplus
 }

@@ -20,7 +20,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
-#include "vendor_conf.h"
+#include "vendor/conf.h"
 
 #ifdef __cplusplus
 extern "C" {

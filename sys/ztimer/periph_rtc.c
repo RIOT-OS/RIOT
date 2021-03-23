@@ -50,6 +50,7 @@ void _timestamp_to_gmt_civil(struct tm *_tm, uint32_t epoch)
     epoch /= 86400;
     uint32_t h = s / 3600;
     uint32_t m = s / 60 % 60;
+
     s = s % 60;
     uint32_t x = (epoch * 4 + 102032) / 146097 + 15;
     uint32_t b = epoch + 2442113 + x - (x / 4);
@@ -82,6 +83,7 @@ static uint32_t _ztimer_periph_rtc_now(ztimer_clock_t *clock)
     (void)clock;
 
     struct tm time;
+
     rtc_get_time(&time);
 
     return _gmt_civil_to_timestamp(time.tm_year + 1900, time.tm_mon,

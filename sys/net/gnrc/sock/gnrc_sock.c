@@ -23,6 +23,7 @@
 #include "net/gnrc/ipv6.h"
 #include "net/gnrc/ipv6/hdr.h"
 #include "net/gnrc/netreg.h"
+#include "net/gnrc/tx_sync.h"
 #include "net/udp.h"
 #include "utlist.h"
 #include "xtimer.h"
@@ -174,6 +175,12 @@ ssize_t gnrc_sock_recv(gnrc_sock_reg_t *reg, gnrc_pktsnip_t **pkt_out,
             }
         }
 #endif /* MODULE_SOCK_AUX_TIMESTAMP */
+#if IS_USED(MODULE_SOCK_AUX_RSSI)
+        if ((aux->rssi) && (netif_hdr->rssi != GNRC_NETIF_HDR_NO_RSSI)) {
+            aux->flags |= GNRC_SOCK_RECV_AUX_FLAG_RSSI;
+            *aux->rssi = netif_hdr->rssi;
+        }
+#endif /* MODULE_SOCK_AUX_RSSI */
     }
     *pkt_out = pkt; /* set out parameter */
 
@@ -199,11 +206,22 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
 #ifdef MODULE_GNRC_NETERR
     unsigned status_subs = 0;
 #endif
+#if IS_USED(MODULE_GNRC_TX_SYNC)
+    gnrc_tx_sync_t tx_sync;
+#endif
 
     if (local->family != remote->family) {
         gnrc_pktbuf_release(payload);
         return -EAFNOSUPPORT;
     }
+
+#if IS_USED(MODULE_GNRC_TX_SYNC)
+    if (gnrc_tx_sync_append(payload, &tx_sync)) {
+        gnrc_pktbuf_release(payload);
+        return -ENOMEM;
+    }
+#endif
+
     switch (local->family) {
 #ifdef SOCK_HAS_IPV6
         case AF_INET6: {
@@ -265,6 +283,11 @@ ssize_t gnrc_sock_send(gnrc_pktsnip_t *payload, sock_ip_ep_t *local,
         gnrc_pktbuf_release(pkt);
         return -EBADMSG;
     }
+
+#if IS_USED(MODULE_GNRC_TX_SYNC)
+    gnrc_tx_sync(&tx_sync);
+#endif
+
 #ifdef MODULE_GNRC_NETERR
     uint32_t last_status = GNRC_NETERR_SUCCESS;
 

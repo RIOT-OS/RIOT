@@ -37,13 +37,12 @@ extern "C" {
 
 #include "can/candev.h"
 
-#if defined(CPU_LINE_STM32F413xx) || defined(CPU_LINE_STM32F423xx)
-#define CANDEV_STM32_CHAN_NUMOF 3
-#elif defined(CPU_FAM_STM32F1) || defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4)
-#define CANDEV_STM32_CHAN_NUMOF 2
-#elif defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F3) || \
-      defined(CPU_FAM_STM32L4) || DOXYGEN
 /** Number of channels in the device (up to 3) */
+#if defined(CAN3)
+#define CANDEV_STM32_CHAN_NUMOF 3
+#elif defined(CAN2)
+#define CANDEV_STM32_CHAN_NUMOF 2
+#elif defined(CAN1) || defined(CAN) || DOXYGEN
 #define CANDEV_STM32_CHAN_NUMOF 1
 #else
 #error "CAN STM32: CPU not supported"
@@ -100,6 +99,7 @@ typedef struct {
 #ifndef CPU_FAM_STM32F1
     gpio_af_t af;               /**< Alternate pin function to use */
 #endif
+    bool en_deep_sleep_wake_up; /**< Enable deep-sleep wake-up interrupt */
 #if CANDEV_STM32_CHAN_NUMOF > 1 || defined(DOXYGEN)
     CAN_TypeDef *can_master;    /**< Master CAN device */
     uint32_t master_rcc_mask;   /**< Master device RCC mask */
@@ -135,7 +135,6 @@ typedef struct {
 #define CAN_STM32_TX_MAILBOXES 3
 /** The number of receive FIFO */
 #define CAN_STM32_RX_MAILBOXES 2
-
 
 #ifndef CAN_STM32_RX_MAIL_FIFO
 /** This is the maximum number of frame the driver can receive simultaneously */

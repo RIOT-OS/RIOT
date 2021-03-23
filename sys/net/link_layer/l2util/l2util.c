@@ -53,6 +53,26 @@ static void _create_eui64_from_short(const uint8_t *addr, size_t addr_len,
 }
 #endif /* defined(MODULE_CC110X) || defined(MODULE_NRFMIN) */
 
+#if defined(MODULE_NRF24L01P_NG)
+/* create EUI64 from (Enhanced) ShockBurst l2-addr
+   with 3 Byte to 5 Byte length */
+static void _create_eui64_from_shockburst(const uint8_t *addr, size_t addr_len,
+                                          eui64_t *eui64)
+{
+    memset(eui64->uint8, 0, sizeof(eui64->uint8));
+    eui64->uint8[3] = 0xff;
+    eui64->uint8[4] = 0xfe;
+    eui64->uint8[0] = ((uint8_t)addr_len) << 5; /* encode length */
+    if (addr_len > 3) {
+        memcpy(&eui64->uint8[1 + (5 - addr_len)],
+               addr, addr_len - 3);
+        addr += (addr_len - 3);
+        addr_len -= (addr_len - 3);
+    }
+    memcpy(&eui64->uint8[5 + (3 - addr_len)], addr, addr_len);
+}
+#endif /* defined(MODULE_NRF24L01P_NG) */
+
 int l2util_eui64_from_addr(int dev_type, const uint8_t *addr, size_t addr_len,
                            eui64_t *eui64)
 {
@@ -93,6 +113,16 @@ int l2util_eui64_from_addr(int dev_type, const uint8_t *addr, size_t addr_len,
                 return -EINVAL;
             }
 #endif  /* defined(MODULE_CC110X) || defined(MODULE_NRFMIN) */
+#if defined (MODULE_NRF24L01P_NG)
+        case NETDEV_TYPE_NRF24L01P_NG:
+            if (addr_len <= 5 && addr_len >= 3) {
+                _create_eui64_from_shockburst(addr, addr_len, eui64);
+                return addr_len;
+            }
+            else {
+                return -EINVAL;
+            }
+#endif /* defined (MODULE_NRF24L01P_NG) */
         default:
             (void)addr;
             (void)addr_len;
@@ -190,6 +220,16 @@ int l2util_ipv6_iid_to_addr(int dev_type, const eui64_t *iid, uint8_t *addr)
             addr[0] = iid->uint8[7];
             return sizeof(uint8_t);
 #endif  /* MODULE_CC110X */
+#if defined(MODULE_NRF24L01P_NG)
+        case NETDEV_TYPE_NRF24L01P_NG:
+            memset(addr, 0, sizeof(eui64_t));
+            uint8_t addr_len = iid->uint8[0] >> 5;
+            if (addr_len > 3) {
+                memcpy(addr, &iid->uint8[1 + (5 - addr_len)], addr_len - 3);
+            }
+            memcpy(&addr[addr_len - 3], &iid->uint8[5], 3);
+            return addr_len;
+#endif /* defined(MODULE_NRF24L01P_NG) */
         default:
             (void)iid;
             (void)addr;
@@ -243,6 +283,11 @@ int l2util_ndp_addr_len_from_l2ao(int dev_type,
                     return -EINVAL;
             }
 #endif  /* defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_XBEE) */
+#if defined(MODULE_NRF24L01P_NG)
+        case NETDEV_TYPE_NRF24L01P_NG:
+            (void)opt;
+            return 5; /* maximum length */
+#endif /* defined(MODULE_NRF24L01P_NG) */
         default:
             (void)opt;
 #ifdef DEVELHELP

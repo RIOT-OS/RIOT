@@ -1,0 +1,18 @@
+# Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_MALLOC_THREAD_SAFE
+    bool
+    depends on TEST_KCONFIG
+    help
+        This module provides wrappers for malloc(), calloc(), realloc(), and
+        free() which guarantee mutually exclusive access to heap data
+        structures. This linker is also instructed to redirect all calls to
+        the corresponding wrappers. As a result, all allocations become thread
+        safe without touching the application code or the c library. This module
+        is intended to be pulled in automatically if needed. Hence, applications
+        never should manually use it.

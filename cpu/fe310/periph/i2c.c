@@ -42,7 +42,8 @@ static const uint16_t _fe310_i2c_speed[2] = { 100U, 400U };
 static inline int _wait_busy(i2c_t dev, uint32_t max_timeout_counter);
 static inline int _start(i2c_t dev, uint16_t address);
 static inline int _read(i2c_t dev, uint8_t *data, int length, uint8_t stop);
-static inline int _write(i2c_t dev, const uint8_t *data, int length, uint8_t stop);
+static inline int _write(i2c_t dev, const uint8_t *data, int length,
+                         uint8_t stop);
 
 /**
  * @brief   Initialized bus locks
@@ -57,16 +58,22 @@ void i2c_init(i2c_t dev)
     mutex_init(&locks[dev]);
 
     /* Select IOF0 */
-    GPIO_REG(GPIO_IOF_SEL) &= ~((1 << i2c_config[dev].scl) | (1 << i2c_config[dev].sda));
+    GPIO_REG(GPIO_IOF_SEL) &=
+        ~((1 << i2c_config[dev].scl) | (1 << i2c_config[dev].sda));
     /* Enable IOF */
-    GPIO_REG(GPIO_IOF_EN) |= ((1 << i2c_config[dev].scl) | (1 << i2c_config[dev].sda));
+    GPIO_REG(GPIO_IOF_EN) |=
+        ((1 << i2c_config[dev].scl) | (1 << i2c_config[dev].sda));
 
-    _REG32(i2c_config[dev].addr, I2C_CONTROL) &= ~(I2C_CONTROL_IE | I2C_CONTROL_EN);
+    _REG32(i2c_config[dev].addr,
+           I2C_CONTROL) &= ~(I2C_CONTROL_IE | I2C_CONTROL_EN);
 
     /* Compute prescale: presc = (CORE_CLOCK / (5 * I2C_SPEED)) - 1 */
-    uint16_t presc = ((uint16_t)(cpu_freq() / 1000) / (5 * _fe310_i2c_speed[i2c_config[dev].speed])) - 1;
+    uint16_t presc =
+        ((uint16_t)(cpu_freq() / 1000) /
+         (5 * _fe310_i2c_speed[i2c_config[dev].speed])) - 1;
 
-    DEBUG("[i2c] init: computed prescale: %i (0x%02X|0x%02X)\n", presc, (presc >> 8), (presc & 0xFF));
+    DEBUG("[i2c] init: computed prescale: %i (0x%02X|0x%02X)\n", presc,
+          (presc >> 8), (presc & 0xFF));
 
     _REG32(i2c_config[dev].addr, I2C_PRESCALE_LO) = (presc & 0xFF);
     _REG32(i2c_config[dev].addr, I2C_PRESCALE_HI) = (presc >> 8);
@@ -106,7 +113,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
         return -EOPNOTSUPP;
     }
 
-        /* Check for wrong arguments given */
+    /* Check for wrong arguments given */
     if (data == NULL || length == 0) {
         return -EINVAL;
     }
@@ -114,6 +121,7 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
     DEBUG("[i2c] read bytes\n");
 
     int ret = 0;
+
     if (!(flags & I2C_NOSTART)) {
         ret = _start(dev, ((address << 1) | I2C_READ));
         if (ret < 0) {
@@ -134,7 +142,8 @@ int i2c_read_bytes(i2c_t dev, uint16_t address, void *data, size_t length,
     return length;
 }
 
-int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data, size_t length,
+int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data,
+                    size_t length,
                     uint8_t flags)
 {
     assert(dev < I2C_NUMOF);
@@ -172,13 +181,15 @@ int i2c_write_bytes(i2c_t dev, uint16_t address, const void *data, size_t length
 static inline int _wait_busy(i2c_t dev, uint32_t max_timeout_counter)
 {
     uint32_t timeout_counter = 0;
+
     DEBUG("[i2c] wait for transfer\n");
     while (_REG32(i2c_config[dev].addr, I2C_STATUS) & I2C_STATUS_TIP) {
         if (++timeout_counter >= max_timeout_counter) {
             DEBUG("[i2c] transfer timeout\n");
             return -ETIMEDOUT;
         }
-        else if ((_REG32(i2c_config[dev].addr, I2C_STATUS) & I2C_STATUS_ALOST) == I2C_STATUS_ALOST) {
+        else if ((_REG32(i2c_config[dev].addr,
+                         I2C_STATUS) & I2C_STATUS_ALOST) == I2C_STATUS_ALOST) {
             /* Arbitration lost */
             DEBUG("[i2c] error: Arbitration lost\n");
             return -EAGAIN;
@@ -200,6 +211,7 @@ static inline int _start(i2c_t dev, uint16_t address)
 
     /* Ensure all bytes has been read */
     int ret = _wait_busy(dev, I2C_BUSY_TIMEOUT);
+
     if (ret < 0) {
         return ret;
     }
@@ -246,7 +258,8 @@ static inline int _read(i2c_t dev, uint8_t *data, int length, uint8_t stop)
     return 0;
 }
 
-static inline int _write(i2c_t dev, const uint8_t *data, int length, uint8_t stop)
+static inline int _write(i2c_t dev, const uint8_t *data, int length,
+                         uint8_t stop)
 {
     uint8_t count = 0;
 

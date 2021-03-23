@@ -100,6 +100,17 @@ extern mtd_dev_t *mtd0;
 #define MTD_0 mtd0
 /** @} */
 
+/**
+ * @name Touch screen configuration
+ * @{
+ */
+#define CST816S_PARAM_I2C_DEV        I2C_DEV(0)
+#define CST816S_PARAM_I2C_ADDR       (0x15)
+#define CST816S_PARAM_IRQ            GPIO_PIN(0, 28)
+#define CST816S_PARAM_IRQ_FLANK      GPIO_FALLING
+#define CST816S_PARAM_RESET          GPIO_PIN(0, 10)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

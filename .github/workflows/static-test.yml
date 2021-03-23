@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+    tags:
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9]-RC[0-9]*'
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9]'
+      - '[0-9][0-9][0-9][0-9].[0-9][0-9].*'
   pull_request:
     branches:
       - '*'
@@ -14,21 +18,24 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        # Use the SHA of the PR branch as-is, not the PR branch merged
-        # in master (default behavior in GH actions)
-        # See https://github.com/actions/checkout#checkout-pull-request-head-commit-instead-of-merge-commit
-        ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: 0
     - name: Setup git
       run: |
-        git fetch origin master:master_upstream --no-tags
+        # Note: ${{ github.base_ref }} is empty when not in a PR
+        if [ -n "${{ github.base_ref }}" ]; then
+          git fetch origin ${{ github.base_ref }}:${{ github.base_ref }} --no-tags
+        else
+          git config diff.renameLimit 16384
+        fi
         git config apply.whitespace nowarn
-    - name: Fetch riot/riotbuild Docker image
-      run: docker pull riot/riotbuild:latest
+    - name: Fetch riot/static-test-tools Docker image
+      run: docker pull riot/static-test-tools:latest
     - name: Run static-tests
       run: |
-        docker run --rm                     \
-          -e CI_BASE_BRANCH=master_upstream \
-          -v $(pwd):/data/riotbuild         \
-          riot/riotbuild:latest             \
+        # Note: ${{ github.base_ref }} is empty when not in a PR
+        docker run --rm                             \
+          -e CI_BASE_BRANCH=${{ github.base_ref }}  \
+          -e GITHUB_RUN_ID=${GITHUB_RUN_ID}         \
+          -v $(pwd):/data/riotbuild                 \
+          riot/static-test-tools:latest             \
           make static-test

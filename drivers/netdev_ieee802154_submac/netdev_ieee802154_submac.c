@@ -67,6 +67,9 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             }
             *((uint8_t*) value) = netdev_submac->retrans;
             return 1;
+        case NETOPT_IEEE802154_PHY:
+            *((uint8_t*) value) = ieee802154_get_phy_mode(submac);
+            return 1;
         default:
             break;
     }
@@ -178,6 +181,10 @@ static void _isr(netdev_t *netdev)
         if (flags & NETDEV_SUBMAC_FLAGS_RX_DONE) {
             ieee802154_submac_rx_done_cb(submac);
         }
+
+        if (flags & NETDEV_SUBMAC_FLAGS_CRC_ERROR) {
+            ieee802154_submac_crc_error_cb(submac);
+        }
     } while (netdev_submac->isr_flags != 0);
 }
 
@@ -196,7 +203,11 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     if (info) {
         netdev_ieee802154_rx_info_t *netdev_rx_info = info;
-        netdev_rx_info->rssi = rx_info.rssi;
+
+        /* The Radio HAL uses the IEEE 802.15.4 definition for RSSI.
+         * Netdev uses dBm. Therefore we need a translation here */
+        netdev_rx_info->rssi = ieee802154_rssi_to_dbm(rx_info.rssi);
+
         netdev_rx_info->lqi = rx_info.lqi;
     }
 
@@ -264,6 +275,10 @@ static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
         break;
     case IEEE802154_RADIO_INDICATION_RX_DONE:
         netdev_submac->isr_flags |= NETDEV_SUBMAC_FLAGS_RX_DONE;
+        break;
+    case IEEE802154_RADIO_INDICATION_CRC_ERROR:
+        netdev_submac->isr_flags |= NETDEV_SUBMAC_FLAGS_CRC_ERROR;
+        break;
     default:
         break;
     }

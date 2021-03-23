@@ -13,6 +13,7 @@ config BOARD_SAME54_XPRO
     select CPU_MODEL_SAME54P20A
     select HAS_PERIPH_DAC
     select HAS_PERIPH_ADC
+    select HAS_PERIPH_ETH
     select HAS_PERIPH_I2C
     select HAS_PERIPH_RTC
     select HAS_PERIPH_RTT

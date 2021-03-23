@@ -1,5 +1,5 @@
 PKG_NAME     := libfixmath
-PKG_VERSION  := 7f9c966b5c473770dc93940e3e6e5323f3c1ad69
+PKG_VERSION  := 24488b16cc0359daada0682a9bd3a11a801d0a01
 PKG_URL      := https://github.com/PetteriAimonen/libfixmath
 PKG_LICENSE  := MIT
 

@@ -8,11 +8,13 @@ PSEUDOMODULES += atomic_utils
 PSEUDOMODULES += base64url
 PSEUDOMODULES += board_software_reset
 PSEUDOMODULES += board_speaker
+PSEUDOMODULES += bq2429x_int
 PSEUDOMODULES += can_mbox
 PSEUDOMODULES += can_pm
 PSEUDOMODULES += can_raw
 PSEUDOMODULES += ccn-lite-utils
 PSEUDOMODULES += cc2538_rf_obs_sig
+PSEUDOMODULES += cc2538_rf_netdev_legacy
 PSEUDOMODULES += conn_can_isotp_multi
 PSEUDOMODULES += cord_ep_standalone
 PSEUDOMODULES += core_%
@@ -20,6 +22,7 @@ PSEUDOMODULES += cortexm_fpu
 PSEUDOMODULES += cortexm_svc
 PSEUDOMODULES += cpu_check_address
 PSEUDOMODULES += crypto_%	# crypto_aes or crypto_3des
+PSEUDOMODULES += dbgpin
 PSEUDOMODULES += devfs_%
 PSEUDOMODULES += dhcpv6_%
 PSEUDOMODULES += ecc_%
@@ -57,6 +60,7 @@ PSEUDOMODULES += gnrc_sixloenc
 PSEUDOMODULES += gnrc_sixlowpan_border_router_default
 PSEUDOMODULES += gnrc_sixlowpan_default
 PSEUDOMODULES += gnrc_sixlowpan_frag_hint
+PSEUDOMODULES += gnrc_sixlowpan_frag_sfr_stats
 PSEUDOMODULES += gnrc_sixlowpan_iphc_nhc
 PSEUDOMODULES += gnrc_sixlowpan_nd_border_router
 PSEUDOMODULES += gnrc_sixlowpan_router_default
@@ -65,7 +69,6 @@ PSEUDOMODULES += gnrc_sock_check_reuse
 PSEUDOMODULES += gnrc_txtsnd
 PSEUDOMODULES += heap_cmd
 PSEUDOMODULES += i2c_scan
-PSEUDOMODULES += ieee802154_radio_hal
 PSEUDOMODULES += ieee802154_security
 PSEUDOMODULES += ieee802154_submac
 PSEUDOMODULES += ina3221_alerts
@@ -80,6 +83,7 @@ PSEUDOMODULES += log_color
 PSEUDOMODULES += lora
 PSEUDOMODULES += mpu_stack_guard
 PSEUDOMODULES += mpu_noexec_ram
+PSEUDOMODULES += mtd_write_page
 PSEUDOMODULES += nanocoap_%
 PSEUDOMODULES += netdev_default
 PSEUDOMODULES += netdev_ieee802154_%
@@ -89,6 +93,11 @@ PSEUDOMODULES += netdev_layer
 PSEUDOMODULES += netdev_register
 PSEUDOMODULES += netstats
 PSEUDOMODULES += netstats_l2
+PSEUDOMODULES += netstats_neighbor_etx
+PSEUDOMODULES += netstats_neighbor_count
+PSEUDOMODULES += netstats_neighbor_rssi
+PSEUDOMODULES += netstats_neighbor_lqi
+PSEUDOMODULES += netstats_neighbor_tx_time
 PSEUDOMODULES += netstats_ipv6
 PSEUDOMODULES += netstats_rpl
 PSEUDOMODULES += nimble
@@ -96,6 +105,8 @@ PSEUDOMODULES += nimble_autoconn_%
 PSEUDOMODULES += newlib
 PSEUDOMODULES += newlib_gnu_source
 PSEUDOMODULES += newlib_nano
+PSEUDOMODULES += nrf24l01p_ng_diagnostics
+PSEUDOMODULES += nrf802154_netdev_legacy
 PSEUDOMODULES += openthread
 PSEUDOMODULES += picolibc
 PSEUDOMODULES += picolibc_stdout_buffered
@@ -120,6 +131,7 @@ PSEUDOMODULES += slipdev_stdio
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_async
 PSEUDOMODULES += sock_aux_local
+PSEUDOMODULES += sock_aux_rssi
 PSEUDOMODULES += sock_aux_timestamp
 PSEUDOMODULES += sock_dtls
 PSEUDOMODULES += sock_ip
@@ -138,6 +150,7 @@ PSEUDOMODULES += stm32mp1_eng_mode
 PSEUDOMODULES += suit_transport_%
 PSEUDOMODULES += suit_storage_%
 PSEUDOMODULES += sys_bus_%
+PSEUDOMODULES += vdd_lc_filter_%
 PSEUDOMODULES += wakaama_objects_%
 PSEUDOMODULES += wifi_enterprise
 PSEUDOMODULES += xtimer_on_ztimer
@@ -147,7 +160,6 @@ PSEUDOMODULES += ztimer%
 # ztimer's main module is called "ztimer_core"
 NO_PSEUDOMODULES += ztimer_core
 NO_PSEUDOMODULES += netdev_ieee802154_submac
-NO_PSEUDOMODULES += netdev_ieee802154_legacy
 
 # print ascii representation in function od_hex_dump()
 PSEUDOMODULES += od_string
@@ -215,6 +227,10 @@ PSEUDOMODULES += ina220
 
 # include variants of mrf24j40 drivers as pseudo modules
 PSEUDOMODULES += mrf24j40m%
+
+# include variants of the pn532 drivers as pseudo modules
+PSEUDOMODULES += pn532_i2c
+PSEUDOMODULES += pn532_spi
 
 # include variants of sdp3x drivers as pseudo modules
 PSEUDOMODULES += sdp3x_irq
@@ -292,5 +308,6 @@ NO_PSEUDOMODULES += auto_init_loramac
 NO_PSEUDOMODULES += auto_init_multimedia
 NO_PSEUDOMODULES += auto_init_security
 NO_PSEUDOMODULES += auto_init_usbus
+NO_PSEUDOMODULES += auto_init_screen
 
 # Packages may also add modules to PSEUDOMODULES in their `Makefile.include`.

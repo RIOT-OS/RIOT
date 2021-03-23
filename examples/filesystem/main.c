@@ -287,7 +287,7 @@ static int _tee(int argc, char **argv)
     }
     fclose(f);
 #else
-    int fd = open(argv[1], O_RDWR | O_CREAT);
+    int fd = open(argv[1], O_RDWR | O_CREAT, 00777);
     if (fd < 0) {
         printf("error while trying to create %s\n", argv[1]);
         return 1;

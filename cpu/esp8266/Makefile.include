@@ -61,9 +61,10 @@ endif
 
 ARCHIVES += -lgcc -lwpa -lcore -lnet80211 -lphy -lpp -lstdc++
 
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp8266.rom.ld
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp8266.riot-os.ld
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp8266.peripherals.ld
+LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld
+LINKFLAGS += -Tesp8266.rom.ld
+LINKFLAGS += -Tesp8266.riot-os.ld
+LINKFLAGS += -Tesp8266.peripherals.ld
 
 LINKFLAGS += -Wl,-wrap=pp_attach
 LINKFLAGS += -Wl,-wrap=pm_attach

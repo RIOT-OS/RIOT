@@ -15,8 +15,8 @@
  * allows RIOT nodes to lookup resources, endpoints and groups with resource
  * directories.
  * It implements the standard lookup functionality as defined in
- * draft-ietf-core-resource-directory-23.
- * @see https://tools.ietf.org/html/draft-ietf-core-resource-directory-23
+ * draft-ietf-core-resource-directory-27.
+ * @see https://tools.ietf.org/html/draft-ietf-core-resource-directory-27
  *
  * ## Lookup modes
  *

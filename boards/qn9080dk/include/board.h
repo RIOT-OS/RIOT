@@ -20,6 +20,7 @@
 #define BOARD_H
 
 #include "cpu.h"
+#include "mtd.h"
 #include "periph_conf.h"
 #include "periph_cpu.h"
 
@@ -54,6 +55,26 @@ extern "C" {
 #define BTN1_MODE        GPIO_IN_PU
 #define BTN2_PIN         GPIO_PIN(PORT_A, 19)
 #define BTN2_MODE        GPIO_IN_PU
+/** @} */
+
+/**
+ * @name    MMA8652FC 3-axis accelerometer bus configuration
+ *
+ * The MMA8652FC in the QN9080DK is only available when JP11 is shorted (the
+ * factory default).
+ * @{
+ */
+#define MMA8X5X_PARAM_I2C       I2C_DEV(0)
+#define MMA8X5X_PARAM_ADDR      0x1D
+#define MMA8X5X_PARAM_TYPE      (MMA8X5X_TYPE_MMA8652)
+/** @} */
+
+/**
+ * @name MTD configuration
+ * @{
+ */
+extern mtd_dev_t *mtd0;
+#define MTD_0 mtd0
 /** @} */
 
 /**

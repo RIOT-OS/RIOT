@@ -90,7 +90,7 @@ int saul_reg_add(saul_reg_t *dev);
 int saul_reg_rm(saul_reg_t *dev);
 
 /**
- * @brief   Find a device by it's position in the registry
+ * @brief   Find a device by its position in the registry
  *
  * @param[in] pos       position to look up
  *
@@ -100,9 +100,9 @@ int saul_reg_rm(saul_reg_t *dev);
 saul_reg_t *saul_reg_find_nth(int pos);
 
 /**
- * @brief   Find the first device of the given type in the registry
+ * @brief   Find the first device by its type in the registry
  *
- * @param[in] type      device type to look for
+ * @param[in] type      the device type to look for
  *
  * @return      pointer to the first device matching the given type
  * @return      NULL if no device of that type could be found
@@ -110,7 +110,7 @@ saul_reg_t *saul_reg_find_nth(int pos);
 saul_reg_t *saul_reg_find_type(uint8_t type);
 
 /**
- * @brief   Find a device by its name
+ * @brief   Find the first device by its name in the registry
  *
  * @param[in] name      the name to look for
  *
@@ -118,6 +118,17 @@ saul_reg_t *saul_reg_find_type(uint8_t type);
  * @return      NULL if no device with that name could be found
  */
 saul_reg_t *saul_reg_find_name(const char *name);
+
+/**
+ * @brief   Find the first device by its type and name in the registry
+ *
+ * @param[in] type      the device type to look for
+ * @param[in] name      the name to look for
+ *
+ * @return      pointer to the first device matching the given type and name
+ * @return      NULL if no device with that type and name could be found
+ */
+saul_reg_t *saul_reg_find_type_and_name(uint8_t type, const char *name);
 
 /**
  * @brief   Read data from the given device

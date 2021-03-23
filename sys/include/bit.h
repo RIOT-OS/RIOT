@@ -31,11 +31,31 @@ extern "C" {
 #if !BITBAND_FUNCTIONS_PROVIDED
 
 #if DOXYGEN
-/** @brief Flag for telling if the CPU has hardware bit band support */
+/**
+ * @brief   Flag to check if the CPU has hardware bit band support
+ */
 #define CPU_HAS_BITBAND 1 || 0 (1 if CPU implements bit-banding, 0 if not)
+/**
+ * @brief   Flag to check if bit-banding is supported for all of SRAM
+ *
+ * @details Bit-banding in SRAM is only supported (if available at all) for a
+ *          1 MiB region in the address space. If not all of SRAM is mapped
+ *          there, it is safest to not use bit-banding at all. Luckily, only
+ *          few vendors decided to implement partially broken bit-banding.
+ *
+ * @retval  1   All of SRAM is bit-banding capable
+ * @retval  0   (At least one part) SRAM is not bit-banding capable
+ */
+#define CPU_HAS_SRAM_BITBAND 1 || 0
 #endif
 
 #if CPU_HAS_BITBAND || DOXYGEN
+/* Most CPUs with bitband have all of SRAM mapped in the bit-banding region.
+ * The few oddballs have to define it to zero in cpu_conf.h */
+#ifndef CPU_HAS_SRAM_BITBAND
+#define CPU_HAS_SRAM_BITBAND    1
+#endif
+
 /* Some MCUs provide a bitband address space for atomically accessing
  * single bits of peripheral registers, and sometimes for RAM as well */
 /**

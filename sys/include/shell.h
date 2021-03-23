@@ -24,13 +24,21 @@
 #include "periph/pm.h"
 
 #include "kernel_defines.h"
+#include "xfa.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /**
+ * @defgroup sys_shell_config Shell compile time configurations
+ * @ingroup config
+ * @{
+ */
+/**
  * @brief Shutdown RIOT on shell exit
+ *
+ * @note On native platform this option defaults to 1.
  */
 #ifndef CONFIG_SHELL_SHUTDOWN_ON_EXIT
 /* Some systems (e.g Ubuntu 20.04) close stdin on CTRL-D / EOF
@@ -38,10 +46,46 @@ extern "C" {
  * Instead terminate RIOT, which is also the behavior a user would
  * expect from a CLI application.
  */
-#  ifdef CPU_NATIVE
+#  if defined(CPU_NATIVE) && !IS_ACTIVE(KCONFIG_USEMODULE_SHELL)
 #    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 1
+#  else
+#    define CONFIG_SHELL_SHUTDOWN_ON_EXIT 0
 #  endif
 #endif
+
+/**
+ * @brief Set to 1 to disable shell's echo
+ */
+#ifndef CONFIG_SHELL_NO_ECHO
+#define CONFIG_SHELL_NO_ECHO 0
+#endif
+
+/**
+ * @brief Set to 1 to disable shell's prompt
+ */
+#ifndef CONFIG_SHELL_NO_PROMPT
+#define CONFIG_SHELL_NO_PROMPT 0
+#endif
+
+/**
+ * @brief Set to 1 to disable shell's echo
+ * @deprecated This has been replaced by @ref CONFIG_SHELL_NO_ECHO and will be
+ *             removed after release 2021.07.
+ */
+#ifndef SHELL_NO_ECHO
+#define SHELL_NO_ECHO CONFIG_SHELL_NO_ECHO
+#endif
+
+/**
+ * @brief Set to 1 to disable shell's prompt
+ * @deprecated This has been replaced by @ref CONFIG_SHELL_NO_PROMPT and will be
+ *             removed after release 2021.07.
+ */
+#ifndef SHELL_NO_PROMPT
+#define SHELL_NO_PROMPT CONFIG_SHELL_NO_PROMPT
+#endif
+
+/** @} */
 
 /**
  * @brief Default shell buffer size (maximum line length shell can handle)
@@ -152,6 +196,37 @@ static inline void shell_run(const shell_command_t *commands,
 {
     shell_run_forever(commands, line_buf, len);
 }
+
+/**
+ * @brief   Define shell command
+ *
+ * This macro is a helper for defining a shell command and adding it to the
+ * shell commands XFA (cross file array).
+ *
+ * Shell commands added using this macros will be sorted *after* builtins and
+ * commands passed via parameter to `shell_run_once()`. If a command with the
+ * same name exists in any of those, they will make a command added via this
+ * macro inaccassible.
+ *
+ * Commands added with this macro will be sorted alphanumerically by `name`.
+ *
+ * @experimental This should be considered experimental API, subject to change
+ *               without notice!
+ *
+ * Example:
+ *
+ * ```.c
+ * #include "shell.h"
+ * static int _my_command(int argc, char **argv) {
+ *   // ...
+ * }
+ * SHELL_COMMAND(my_command, "my command help text", _my_command);
+ * ```
+ */
+#define SHELL_COMMAND(name, help, func) \
+    XFA_USE_CONST(shell_command_t*, shell_commands_xfa); \
+    static const shell_command_t _xfa_ ## name ## _cmd = { #name, help, &func }; \
+    XFA_ADD_PTR(shell_commands_xfa, name, name, &_xfa_ ## name ## _cmd)
 
 #ifdef __cplusplus
 }

@@ -67,6 +67,21 @@ static const stmpe811_params_t stmpe811_params[] =
     STMPE811_PARAMS
 };
 
+/**
+ * @brief   Default screen identifiers
+ */
+#ifndef STMPE811_PARAM_SCREEN_IDS
+#define STMPE811_PARAM_SCREEN_IDS       0
+#endif
+
+/**
+ * @brief   Configure screen identifiers
+ */
+static const uint8_t stmpe811_screen_ids[] =
+{
+    STMPE811_PARAM_SCREEN_IDS,
+};
+
 #ifdef __cplusplus
 }
 #endif

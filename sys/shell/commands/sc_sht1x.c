@@ -175,7 +175,7 @@ int _sht_config_handler(int argc, char **argv)
     int dev_num = 0;
 
     if ((argc == 2) && (strcmp("--help", argv[1]) == 0)) {
-        printf("Usage: \"%s [PARMS]\n"
+        printf("Usage: \"%s [PARAMS]\n"
                "\n"
                "Supported parameters:\n"
                "  -d <NUM>\n"

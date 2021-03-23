@@ -7,8 +7,8 @@ SLOT1_LEN ?= $(SLOT0_LEN)
 # support SWD and UART via Pi GPIO header
 PORT_LINUX ?= /dev/serial0
 # TODO change to bcm2835gpio after it's merged as it's faster
-# DEBUG_ADAPTER ?= bcm2835gpio
-DEBUG_ADAPTER ?= sysfs_gpio
+# OPENOCD_DEBUG_ADAPTER ?= bcm2835gpio
+OPENOCD_DEBUG_ADAPTER ?= sysfs_gpio
 SRST_PIN ?= 16
 SWCLK_PIN ?= 20
 SWDIO_PIN ?= 21

@@ -79,7 +79,7 @@ static void _init_progress_bar(aip31068_t* dev, uint8_t row);
  * @param[in] dev       Device descriptor of the AIP31068
  * @param[in] enabled   Enable or disable
  */
-void _set_progress_bar_enabled(aip31068_t *dev, bool enabled);
+static void _set_progress_bar_enabled(aip31068_t *dev, bool enabled);
 
 /**
  * @brief Set the row for displaying the progress bar.
@@ -88,7 +88,7 @@ void _set_progress_bar_enabled(aip31068_t *dev, bool enabled);
  *
  * @param[in] row   Row where the progress bar is displayed
  */
-void _set_progress_bar_row(uint8_t row);
+static void _set_progress_bar_row(uint8_t row);
 
 /**
  * @brief Set the progress of the progress bar and draw the update.
@@ -99,9 +99,9 @@ void _set_progress_bar_row(uint8_t row);
  * @param[in] dev       Device descriptor of the AIP31068
  * @param[in] progress  Progress in percentage (0 to 100)
  */
-void _set_progress(aip31068_t *dev, uint8_t progress);
+static void _set_progress(aip31068_t *dev, uint8_t progress);
 
-int turn_on(int argc, char **argv)
+static int _turn_on(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -110,7 +110,7 @@ int turn_on(int argc, char **argv)
     return 0;
 }
 
-int turn_off(int argc, char **argv)
+static int _turn_off(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -119,7 +119,7 @@ int turn_off(int argc, char **argv)
     return 0;
 }
 
-int clear(int argc, char **argv)
+static int _clear(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -128,7 +128,7 @@ int clear(int argc, char **argv)
     return 0;
 }
 
-int home(int argc, char **argv)
+static int _home(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -137,7 +137,7 @@ int home(int argc, char **argv)
     return 0;
 }
 
-int autoscroll(int argc, char **argv)
+static int _autoscroll(int argc, char **argv)
 {
     if (argc != 2) {
         puts("usage: autoscroll <0 or 1>");
@@ -151,7 +151,7 @@ int autoscroll(int argc, char **argv)
     return 0;
 }
 
-int cursor_blinking(int argc, char **argv)
+static int _cursor_blinking(int argc, char **argv)
 {
     if (argc != 2) {
         puts("usage: cursor_blinking <0 or 1>");
@@ -165,7 +165,7 @@ int cursor_blinking(int argc, char **argv)
     return 0;
 }
 
-int cursor_visible(int argc, char **argv)
+static int _cursor_visible(int argc, char **argv)
 {
     if (argc != 2) {
         puts("usage: cursor_visible <0 or 1>");
@@ -179,7 +179,7 @@ int cursor_visible(int argc, char **argv)
     return 0;
 }
 
-int cursor_position(int argc, char **argv)
+static int _cursor_position(int argc, char **argv)
 {
     if (argc != 3) {
         puts("usage: cursor_position <row (e.g. 0 for first row)> <column (e.g. 0 for first column)>");
@@ -195,7 +195,7 @@ int cursor_position(int argc, char **argv)
     return 0;
 }
 
-int text_insertion(int argc, char **argv)
+static int _text_insertion(int argc, char **argv)
 {
     if (argc != 2) {
         puts("usage: text_insertion <mode (0-1)>");
@@ -225,7 +225,7 @@ int text_insertion(int argc, char **argv)
     return 0;
 }
 
-int cursor_left(int argc, char **argv)
+static int _cursor_left(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -235,7 +235,7 @@ int cursor_left(int argc, char **argv)
     return 0;
 }
 
-int cursor_right(int argc, char **argv)
+static int _cursor_right(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -245,7 +245,7 @@ int cursor_right(int argc, char **argv)
     return 0;
 }
 
-int scroll_left(int argc, char **argv)
+static int _scroll_left(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -254,7 +254,7 @@ int scroll_left(int argc, char **argv)
     return 0;
 }
 
-int scroll_right(int argc, char **argv)
+static int _scroll_right(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -263,7 +263,7 @@ int scroll_right(int argc, char **argv)
     return 0;
 }
 
-int create_custom_symbol(int argc, char **argv)
+static int _create_custom_symbol(int argc, char **argv)
 {
     if (argc != 10) {
         puts("usage: create_custom_symbol <symbol (0-7)> <row 0 (0-31)> ... <row 7 (0-31)>");
@@ -295,7 +295,7 @@ int create_custom_symbol(int argc, char **argv)
     return 0;
 }
 
-int print_custom_symbol(int argc, char **argv)
+static int _print_custom_symbol(int argc, char **argv)
 {
     if (argc != 2) {
         puts("usage: print_custom_symbol <symbol (0-7)>");
@@ -315,7 +315,7 @@ int print_custom_symbol(int argc, char **argv)
     return 0;
 }
 
-int print(int argc, char **argv)
+static int _print(int argc, char **argv)
 {
     if (argc != 2) {
         puts("usage: print <text>");
@@ -328,7 +328,7 @@ int print(int argc, char **argv)
     return 0;
 }
 
-int progressbar(int argc, char **argv)
+static int _progressbar(int argc, char **argv)
 {
     if (argc != 2) {
         puts("usage: progressbar <0 or 1>");
@@ -342,7 +342,7 @@ int progressbar(int argc, char **argv)
     return 0;
 }
 
-int progressbar_row(int argc, char **argv)
+static int _progressbar_row(int argc, char **argv)
 {
     if (argc != 2) {
         puts("usage: progressbar_row <row (e.g. 0 for first row)>");
@@ -356,7 +356,7 @@ int progressbar_row(int argc, char **argv)
     return 0;
 }
 
-int progress(int argc, char **argv)
+static int _progress(int argc, char **argv)
 {
     if (argc != 2) {
         puts("usage: progress <progress (0-100)>");
@@ -370,7 +370,7 @@ int progress(int argc, char **argv)
     return 0;
 }
 
-int run_demo(int argc, char **argv)
+static int _run_demo(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -546,7 +546,7 @@ int run_demo(int argc, char **argv)
     return 0;
 }
 
-void _set_progress_bar_enabled(aip31068_t *dev, bool enabled)
+static void _set_progress_bar_enabled(aip31068_t *dev, bool enabled)
 {
     _progress_bar_enabled = enabled;
 
@@ -555,12 +555,12 @@ void _set_progress_bar_enabled(aip31068_t *dev, bool enabled)
     }
 }
 
-void _set_progress_bar_row(uint8_t row)
+static void _set_progress_bar_row(uint8_t row)
 {
     _progress_bar_row = row;
 }
 
-void _set_progress(aip31068_t *dev, uint8_t progress)
+static void _set_progress(aip31068_t *dev, uint8_t progress)
 {
     if (!_progress_bar_enabled) {
         return;
@@ -640,26 +640,26 @@ static void _init_progress_bar(aip31068_t* dev, uint8_t row)
 }
 
 static const shell_command_t shell_commands[] = {
-    { "turn_on", "Turn on LCD.", turn_on },
-    { "turn_off", "Turn off LCD.", turn_off },
-    { "clear", "Clear display content.", clear },
-    { "home", "Return cursor to home position (0, 0).", home },
-    { "autoscroll", "Enable or disable autoscroll.", autoscroll },
-    { "cursor_blinking", "Enable or disable cursor blinking.", cursor_blinking },
-    { "cursor_visible", "Show or hide the cursor.", cursor_visible },
-    { "cursor_position", "Set cursor position.", cursor_position },
-    { "text_insertion", "Set text insertion mode.", text_insertion },
-    { "cursor_left", "Move cursor one to the left.", cursor_left },
-    { "cursor_right", "Move cursor one to the right.", cursor_right },
-    { "scroll_left", "Scroll display content one to the left.", scroll_left },
-    { "scroll_right", "Scroll display content one to the right.", scroll_right },
-    { "create_custom_symbol", "Create a custom symbol.", create_custom_symbol },
-    { "print_custom_symbol", "Print a custom symbol.", print_custom_symbol },
-    { "print", "Print a string.", print },
-    { "progressbar", "Enable/ disable progressbar feature.", progressbar },
-    { "progressbar_row", "Set row for progressbar.", progressbar_row },
-    { "progress", "Set progress for progressbar.", progress },
-    { "run_demo", "Demonstration of all functions.", run_demo },
+    { "turn_on", "Turn on LCD.", _turn_on },
+    { "turn_off", "Turn off LCD.", _turn_off },
+    { "clear", "Clear display content.", _clear },
+    { "home", "Return cursor to home position (0, 0).", _home },
+    { "autoscroll", "Enable or disable autoscroll.", _autoscroll },
+    { "cursor_blinking", "Enable or disable cursor blinking.", _cursor_blinking },
+    { "cursor_visible", "Show or hide the cursor.", _cursor_visible },
+    { "cursor_position", "Set cursor position.", _cursor_position },
+    { "text_insertion", "Set text insertion mode.", _text_insertion },
+    { "cursor_left", "Move cursor one to the left.", _cursor_left },
+    { "cursor_right", "Move cursor one to the right.", _cursor_right },
+    { "scroll_left", "Scroll display content one to the left.", _scroll_left },
+    { "scroll_right", "Scroll display content one to the right.", _scroll_right },
+    { "create_custom_symbol", "Create a custom symbol.", _create_custom_symbol },
+    { "print_custom_symbol", "Print a custom symbol.", _print_custom_symbol },
+    { "print", "Print a string.", _print },
+    { "progressbar", "Enable/ disable progressbar feature.", _progressbar },
+    { "progressbar_row", "Set row for progressbar.", _progressbar_row },
+    { "progress", "Set progress for progressbar.", _progress },
+    { "run_demo", "Demonstration of all functions.", _run_demo },
     { NULL, NULL, NULL }
 };
 

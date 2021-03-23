@@ -4,6 +4,11 @@
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
+config MODULE_LORA
+    bool "LoRa PHY support"
+    depends on TEST_KCONFIG
+
 menuconfig KCONFIG_USEMODULE_LORA
     bool "Configure LoRa PHY"
     depends on USEMODULE_LORA

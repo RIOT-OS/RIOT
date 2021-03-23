@@ -22,6 +22,8 @@
 #include <errno.h>
 #include <limits.h>
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "bitarithm.h"
 #include "mtd.h"
@@ -32,12 +34,22 @@ int mtd_init(mtd_dev_t *mtd)
         return -ENODEV;
     }
 
+    int res = -ENOTSUP;
+
     if (mtd->driver->init) {
-        return mtd->driver->init(mtd);
+        res = mtd->driver->init(mtd);
     }
-    else {
-        return -ENOTSUP;
+
+#ifdef MODULE_MTD_WRITE_PAGE
+    if ((mtd->driver->flags & MTD_DRIVER_FLAG_DIRECT_WRITE) == 0) {
+        mtd->work_area = malloc(mtd->pages_per_sector * mtd->page_size);
+        if (mtd->work_area == NULL) {
+            res = -ENOMEM;
+        }
     }
+#endif
+
+    return res;
 }
 
 int mtd_read(mtd_dev_t *mtd, void *dest, uint32_t addr, uint32_t count)
@@ -122,11 +134,49 @@ int mtd_write(mtd_dev_t *mtd, const void *src, uint32_t addr, uint32_t count)
     const uint32_t page_shift = bitarithm_msb(mtd->page_size);
     const uint32_t page_mask = mtd->page_size - 1;
 
-    return mtd_write_page(mtd, src, addr >> page_shift, addr & page_mask, count);
+    return mtd_write_page_raw(mtd, src, addr >> page_shift, addr & page_mask, count);
 }
 
-int mtd_write_page(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t offset,
-                   uint32_t count)
+#ifdef MODULE_MTD_WRITE_PAGE
+int mtd_write_page(mtd_dev_t *mtd, const void *data, uint32_t page,
+                   uint32_t offset, uint32_t len)
+{
+    if (!mtd || !mtd->driver) {
+        return -ENODEV;
+    }
+
+    if (mtd->work_area == NULL) {
+        return mtd_write_page_raw(mtd, data, page, offset, len);
+    }
+
+    int res;
+    uint8_t *work = mtd->work_area;
+    const uint32_t sector = page / mtd->pages_per_sector;
+    const uint32_t sector_page = sector * mtd->pages_per_sector;
+    const uint32_t sector_size = mtd->pages_per_sector * mtd->page_size;
+
+    /* copy sector to RAM */
+    res = mtd_read_page(mtd, work, sector_page, 0, sector_size);
+    if (res < 0) {
+        return res;
+    }
+
+    /* erase sector */
+    res = mtd_erase_sector(mtd, sector, 1);
+    if (res < 0) {
+        return res;
+    }
+
+    /* modify sector in RAM */
+    memcpy(work + (page - sector_page) * mtd->page_size + offset, data, len);
+
+    /* write back modified sector copy */
+    return mtd_write_page_raw(mtd, work, sector_page, 0, sector_size);
+}
+#endif
+
+int mtd_write_page_raw(mtd_dev_t *mtd, const void *src, uint32_t page, uint32_t offset,
+                       uint32_t count)
 {
     if (!mtd || !mtd->driver) {
         return -ENODEV;

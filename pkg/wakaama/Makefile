@@ -5,6 +5,12 @@ PKG_LICENSE=EDL-1.0,EPL-1.0
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+# some variable seem uninitialized to gcc with -Og but are not
+# https://gcc.gnu.org/bugzilla/buglist.cgi?quicksearch=may%20be%20used%20uninitialized
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=42145
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90710#c1
+CFLAGS += -Wno-maybe-uninitialized
+
 all:
 	"$(MAKE)" -C $(PKG_SOURCE_DIR)/core -f $(RIOTBASE)/Makefile.base MODULE=wakaama_core
 	"$(MAKE)" -C $(PKG_SOURCE_DIR)/core/er-coap-13 -f $(RIOTBASE)/Makefile.base MODULE=wakaama_core_coap13

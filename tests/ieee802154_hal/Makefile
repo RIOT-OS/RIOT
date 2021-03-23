@@ -27,7 +27,6 @@ USEMODULE += ps
 USEMODULE += event_thread_highest
 USEMODULE += event_callback
 USEMODULE += xtimer
-USEMODULE += ieee802154_radio_hal
 USEMODULE += netdev_default
 
 CFLAGS += -DEVENT_THREAD_HIGHEST_STACKSIZE=1024

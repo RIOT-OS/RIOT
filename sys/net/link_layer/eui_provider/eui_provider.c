@@ -35,7 +35,7 @@ void netdev_eui48_get(netdev_t *netdev, eui48_t *addr)
 #else
         (void) netdev;
 #endif
-        if (eui48_conf[i].provider(eui48_conf[i].arg, addr) == 0) {
+        if (eui48_conf[i].provider(i, addr) == 0) {
             return;
         }
     }
@@ -60,7 +60,7 @@ void netdev_eui64_get(netdev_t *netdev, eui64_t *addr)
 #else
         (void) netdev;
 #endif
-        if (eui64_conf[i].provider(eui64_conf[i].arg, addr) == 0) {
+        if (eui64_conf[i].provider(i, addr) == 0) {
             return;
         }
     }

@@ -65,6 +65,7 @@ SECTIONS
         KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
         KEEP (*(SORT(.dtors.*)))
         KEEP (*crtend.o(.dtors))
+        KEEP (*(SORT(.roxfa.*)))
 
         . = ALIGN(4);
         _efixed = .;            /* End of text section */
@@ -163,6 +164,7 @@ SECTIONS
         *(.ramfunc .ramfunc.*);
         *(.data .data.*);
         KEEP (*(.openocd .openocd.*))
+        KEEP (*(SORT(.xfa.*)))
         . = ALIGN(4);
         _erelocate = .;
     } > ram AT> rom

@@ -1,26 +1,27 @@
 INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 INCLUDES += -I$(RIOTBOARD)/common/blxxxpill/include
 
+# DFU programmer specific variables
+# For older versions of the DFU bootloader, set DFU_USB_ID to 1d50:6017
+DFU_USB_ID ?= 1eaf:0003
+DFU_ALT ?= 2
+DFU_USE_DFUSE = 1
+# If using STM32duino bootloader, this change is necessary.
+# Bootloader available at
+# github.com/rogerclarkmelbourne/STM32duino-bootloader/tree/master/binaries
+ifeq (stm32duino,$(BOOTLOADER))
+  # Flashing may be easier if using a software USB reset.
+  # Future updates may provide USB support for stm32f1 which benefits
+  # from this software reset.
+  DFU_UTIL_FLAGS_OPTS += --reset
+endif
+
 ifeq (dfu-util,$(PROGRAMMER))
-  # For older versions of the DFU bootloader, set DFU_USB_ID to 1d50:6017
-  DFU_USB_ID ?= 1eaf:0003
-  DFU_ALT ?= 2
-  DFU_USE_DFUSE = 1
   # Leave some space at the beginning of the flash for the bootloader
   ROM_OFFSET ?= 0x2000
-  # If using STM32duino bootloader, this change is necessary.
-  # Bootloader available at
-  # github.com/rogerclarkmelbourne/STM32duino-bootloader/tree/master/binaries
-  ifeq (stm32duino,$(BOOTLOADER))
-    # Flashing may be easier if using a software USB reset.
-    # Future updates may provide USB support for stm32f1 which benefits
-    # from this software reset.
-    FFLAGS_OPTS += --reset
-  endif
-
-else ifeq (openocd,$(PROGRAMMER))
-  STLINK_VERSION ?= 2
 endif
+
+STLINK_VERSION ?= 2
 
 # Setup of programmer and serial is shared between STM32 based boards
 include $(RIOTMAKE)/boards/stm32.inc.mk

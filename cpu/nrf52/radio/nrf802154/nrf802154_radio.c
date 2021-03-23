@@ -23,6 +23,7 @@
 
 #include "cpu.h"
 #include "luid.h"
+#include "nrf_clock.h"
 
 #include "net/ieee802154.h"
 #include "periph/timer.h"
@@ -100,6 +101,22 @@ static const ieee802154_radio_ops_t nrf802154_ops;
 ieee802154_dev_t nrf802154_hal_dev = {
     .driver = &nrf802154_ops,
 };
+
+static void _power_on(void)
+{
+    if (NRF_RADIO->POWER == 0) {
+        clock_hfxo_request();
+        NRF_RADIO->POWER = 1;
+    }
+}
+
+static void _power_off(void)
+{
+    if (NRF_RADIO->POWER == 1) {
+        NRF_RADIO->POWER = 0;
+        clock_hfxo_release();
+    }
+}
 
 static bool _l2filter(uint8_t *mhr)
 {
@@ -230,11 +247,10 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
             radio_info->lqi = (uint8_t)(hwlqi > UINT8_MAX/ED_RSSISCALE
                                        ? UINT8_MAX
                                        : hwlqi * ED_RSSISCALE);
-            /* Calculate RSSI by subtracting the offset from the datasheet.
-             * Intentionally using a different calculation than the one from
-             * figure 122 of the v1.1 product specification. This appears to
-             * match real world performance better */
-            radio_info->rssi = _hwval_to_ieee802154_dbm(hwlqi) + IEEE802154_RADIO_RSSI_OFFSET;
+            /* We calculate RSSI from LQI, since it's already 8-bit
+               saturated (see page 321 of product spec v1.1) */
+            radio_info->rssi = _hwval_to_ieee802154_dbm(radio_info->lqi)
+                               + IEEE802154_RADIO_RSSI_OFFSET;
         }
         memcpy(buf, &rxbuf[1], pktlen);
     }
@@ -281,15 +297,6 @@ static int _request_cca(ieee802154_dev_t *dev)
 }
 
 /**
- * @brief   Set CCA threshold value in internal represetion
- */
-static void _set_cca_thresh(uint8_t thresh)
-{
-    NRF_RADIO->CCACTRL &= ~RADIO_CCACTRL_CCAEDTHRES_Msk;
-    NRF_RADIO->CCACTRL |= thresh << RADIO_CCACTRL_CCAEDTHRES_Pos;
-}
-
-/**
  * @brief   Convert from dBm to the internal representation, when the
  *          radio operates as a IEEE802.15.4 transceiver.
  */
@@ -301,7 +308,15 @@ static inline uint8_t _dbm_to_ieee802154_hwval(int8_t dbm)
 static int set_cca_threshold(ieee802154_dev_t *dev, int8_t threshold)
 {
     (void) dev;
-    _set_cca_thresh(_dbm_to_ieee802154_hwval(threshold));
+
+    if (threshold < ED_RSSIOFFS) {
+        return -EINVAL;
+    }
+
+    uint8_t hw_val = _dbm_to_ieee802154_hwval(threshold);
+
+    NRF_RADIO->CCACTRL &= ~RADIO_CCACTRL_CCAEDTHRES_Msk;
+    NRF_RADIO->CCACTRL |= hw_val << RADIO_CCACTRL_CCAEDTHRES_Pos;
     return 0;
 }
 
@@ -447,7 +462,8 @@ int nrf802154_init(void)
     (void)result;
     timer_stop(NRF802154_TIMER);
 
-    /* power off peripheral */
+    /* power off peripheral (but do not release the HFXO as we never requested
+     * it so far) */
     NRF_RADIO->POWER = 0;
 
     return 0;
@@ -544,11 +560,16 @@ void isr_radio(void)
             }
             else {
                 DEBUG("[nrf802154] CRC fail.\n");
-                NRF_RADIO->TASKS_START = 1;
+                dev->cb(dev, IEEE802154_RADIO_INDICATION_CRC_ERROR);
             }
             break;
         case STATE_ACK:
             _state = STATE_IDLE;
+
+            /* We disable the radio to avoid unwanted emmissions (see ERRATA
+             * ID 204, "Switching between TX and RX causes unwanted emissions")
+             */
+            _disable();
             DEBUG("[nrf52840] TX ACK done.")
             _set_ifs_timer(false);
             break;
@@ -571,7 +592,7 @@ static int _request_on(ieee802154_dev_t *dev)
     (void) dev;
     _state = STATE_IDLE;
     DEBUG("[nrf802154]: Request to turn on\n");
-    NRF_RADIO->POWER = 1;
+    _power_on();
     /* make sure the radio is disabled/stopped */
     _disable();
     /* we configure it to run in IEEE802.15.4 mode */
@@ -636,23 +657,8 @@ static int _off(ieee802154_dev_t *dev)
 {
     (void) dev;
     DEBUG("[nrf802154] Turning off the radio\n");
-    NRF_RADIO->POWER = 0;
+    _power_off();
     return 0;
-}
-
-static bool _get_cap(ieee802154_dev_t *dev, ieee802154_rf_caps_t cap)
-{
-    (void) dev;
-    switch (cap) {
-    case IEEE802154_CAP_24_GHZ:
-    case IEEE802154_CAP_IRQ_RX_START:
-    case IEEE802154_CAP_IRQ_TX_START:
-    case IEEE802154_CAP_IRQ_TX_DONE:
-    case IEEE802154_CAP_IRQ_CCA_DONE:
-        return true;
-    default:
-        return false;
-    }
 }
 
 int _len(ieee802154_dev_t *dev)
@@ -771,6 +777,14 @@ void nrf802154_setup(nrf802154_t *dev)
 }
 
 static const ieee802154_radio_ops_t nrf802154_ops = {
+    .caps =  IEEE802154_CAP_24_GHZ
+          | IEEE802154_CAP_IRQ_CRC_ERROR
+          | IEEE802154_CAP_IRQ_RX_START
+          | IEEE802154_CAP_IRQ_TX_START
+          | IEEE802154_CAP_IRQ_TX_DONE
+          | IEEE802154_CAP_IRQ_CCA_DONE
+          | IEEE802154_CAP_PHY_OQPSK,
+
     .write = _write,
     .read = _read,
     .request_transmit = _request_transmit,
@@ -783,7 +797,6 @@ static const ieee802154_radio_ops_t nrf802154_ops = {
     .confirm_set_trx_state = _confirm_set_trx_state,
     .request_cca = _request_cca,
     .confirm_cca = _confirm_cca,
-    .get_cap = _get_cap,
     .set_cca_threshold = set_cca_threshold,
     .set_cca_mode = _set_cca_mode,
     .config_phy = _config_phy,

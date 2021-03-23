@@ -46,7 +46,7 @@ endif
 
 ifneq (,$(filter stdio_semihosting,$(USEMODULE)))
   USEMODULE += xtimer
-  FEATURES_REQUIRED += cpu_core_cortexm
+  FEATURES_REQUIRED_ANY += cpu_core_cortexm|arch_riscv
 endif
 
 # enable stdout buffering for modules that benefit from sending out buffers in larger chunks

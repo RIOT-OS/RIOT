@@ -23,3 +23,9 @@ config BOARD_STM32F429I_DISC1
 
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
+
+    # Clock configuration
+    select BOARD_HAS_HSE
+    select BOARD_HAS_LSE
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

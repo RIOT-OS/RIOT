@@ -52,6 +52,7 @@ struct sock_dtls {
      */
     sock_dtls_cb_t async_cb;
     void *async_cb_arg;                     /**< asynchronous callback arg */
+    session_t async_cb_session;             /**< asynchronous callback session */
 #if defined(SOCK_HAS_ASYNC_CTX) || defined(DOXYGEN)
     /**
      * @brief   Asynchronous event context
@@ -82,8 +83,6 @@ struct sock_dtls {
  * @brief Information about remote client connected to the server
  */
 struct sock_dtls_session {
-    sock_udp_ep_t   ep;              /**< Remote endpoint the session
-                                         is connected to */
     session_t       dtls_session;    /**< TinyDTLS session */
 };
 

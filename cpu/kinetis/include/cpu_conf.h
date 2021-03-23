@@ -19,6 +19,19 @@
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
+/* This is needed to homogenize the symbolic IRQ names across different versions
+ * of the vendor headers. These must be defined before any vendor headers are
+ * included */
+#define FTFA_IRQn FTF_IRQn
+#define FTFA_Collision_IRQn Read_Collision_IRQn
+#define FTFE_IRQn FTF_IRQn
+#define FTFE_Collision_IRQn Read_Collision_IRQn
+#define FTFL_IRQn FTF_IRQn
+#define FTFL_Collision_IRQn Read_Collision_IRQn
+#define PMC_IRQn LVD_LVW_IRQn
+#define Watchdog_IRQn WDOG_EWM_IRQn
+#define LVD_LVW_DCDC_IRQn LVD_LVW_IRQn
+
 /* Dispatch to a separate file per family */
 #if defined(KINETIS_SERIES_K)
 #include "cpu_conf_kinetis_k.h"
@@ -49,7 +62,9 @@ extern "C"
  * @{
  */
 #ifdef BITBAND_REG32
-#define CPU_HAS_BITBAND 1
+#define CPU_HAS_BITBAND         1
+/* SRAM_L is mapped before the bit-banding region, only SRAM_U can be used for bit-banding */
+#define CPU_HAS_SRAM_BITBAND    0
 #endif
 /** @} */
 

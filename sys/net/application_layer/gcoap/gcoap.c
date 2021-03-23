@@ -1067,27 +1067,4 @@ ssize_t gcoap_encode_link(const coap_resource_t *resource, char *buf,
     return exp_size;
 }
 
-int gcoap_add_qstring(coap_pkt_t *pdu, const char *key, const char *val)
-{
-    char qs[CONFIG_NANOCOAP_QS_MAX];
-    size_t len = strlen(key);
-    size_t val_len = (val) ? (strlen(val) + 1) : 0;
-
-    /* test if the query string fits, account for the zero termination */
-    if ((len + val_len + 1) >= CONFIG_NANOCOAP_QS_MAX) {
-        return -1;
-    }
-
-    memcpy(&qs[0], key, len);
-    if (val) {
-        qs[len] = '=';
-        /* the `=` character was already counted in `val_len`, so subtract it here */
-        memcpy(&qs[len + 1], val, (val_len - 1));
-        len += val_len;
-    }
-    qs[len] = '\0';
-
-    return coap_opt_add_string(pdu, COAP_OPT_URI_QUERY, qs, '&');
-}
-
 /** @} */

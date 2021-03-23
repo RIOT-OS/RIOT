@@ -1,12 +1,18 @@
 CPU_FAM := $(shell echo $(CPU_MODEL) | cut -c -6)
 
 FEATURES_PROVIDED += periph_cpuid
-FEATURES_PROVIDED += periph_dma
+
+CPU_MODELS_WITHOUT_DMA = samd20%
+ifeq (,$(filter $(CPU_MODELS_WITHOUT_DMA),$(CPU_MODEL)))
+  FEATURES_PROVIDED += periph_dma
+endif
+
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_flashpage_rwee
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_i2c_reconfigure
+FEATURES_PROVIDED += periph_rtt_set_counter
 FEATURES_PROVIDED += periph_spi_reconfigure
 FEATURES_PROVIDED += periph_timer_periodic # implements timer_set_periodic()
 FEATURES_PROVIDED += periph_uart_modecfg

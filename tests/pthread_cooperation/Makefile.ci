@@ -18,4 +18,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l011k4 \
     stm32l0538-disco \
     waspmote-pro \
+    zigduino \
     #

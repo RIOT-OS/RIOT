@@ -21,23 +21,27 @@ config CPU_MODEL_NRF52805XXAA
     bool
     select CPU_CORE_CORTEX_M4
     select CPU_FAM_NRF52
+    select HAS_PERIPH_UART_NONBLOCKING
 
 config CPU_MODEL_NRF52810XXAA
     bool
     select CPU_CORE_CORTEX_M4
     select CPU_FAM_NRF52
+    select HAS_PERIPH_UART_NONBLOCKING
 
 config CPU_MODEL_NRF52811XXAA
     bool
     select CPU_CORE_CORTEX_M4
     select CPU_FAM_NRF52
     select HAS_RADIO_NRF802154
+    select HAS_PERIPH_UART_NONBLOCKING
 
 config CPU_MODEL_NRF52820XXAA
     bool
     select CPU_CORE_CORTEX_M4
     select CPU_FAM_NRF52
     select HAS_RADIO_NRF802154
+    select HAS_PERIPH_UART_NONBLOCKING
 
 config CPU_MODEL_NRF52832XXAA
     bool
@@ -49,12 +53,14 @@ config CPU_MODEL_NRF52833XXAA
     select CPU_CORE_CORTEX_M4F
     select CPU_FAM_NRF52
     select HAS_RADIO_NRF802154
+    select HAS_PERIPH_UART_NONBLOCKING
 
 config CPU_MODEL_NRF52840XXAA
     bool
     select CPU_CORE_CORTEX_M4F
     select CPU_FAM_NRF52
     select HAS_RADIO_NRF802154
+    select HAS_PERIPH_UART_NONBLOCKING
 
 ## CPU common symbols
 config CPU_FAM

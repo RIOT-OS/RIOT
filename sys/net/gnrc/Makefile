@@ -106,6 +106,9 @@ endif
 ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/frag/rb
 endif
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
+  DIRS += network_layer/sixlowpan/frag/sfr
+endif
 ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
   DIRS += network_layer/sixlowpan/frag/stats
 endif
@@ -132,6 +135,9 @@ ifneq (,$(filter gnrc_udp,$(USEMODULE)))
 endif
 ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
   DIRS += transport_layer/tcp
+endif
+ifneq (,$(filter gnrc_tx_sync,$(USEMODULE)))
+  DIRS += tx_sync
 endif
 
 include $(RIOTBASE)/Makefile.base

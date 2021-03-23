@@ -10,5 +10,8 @@ import sys
 from testrunner import run_check_unittests
 
 
+TIMEOUT = 180  # takes more than 2 minutes to complete on nrf52840dk
+
+
 if __name__ == "__main__":
-    sys.exit(run_check_unittests())
+    sys.exit(run_check_unittests(timeout=TIMEOUT))

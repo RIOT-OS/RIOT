@@ -22,6 +22,11 @@ $(RIOTTOOLS)/cc2538-bsl/cc2538-bsl.py: $(RIOTTOOLS)/cc2538-bsl/Makefile
 	@CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/cc2538-bsl
 	@echo "[INFO] cc2538-bsl.py successfully fetched!"
 
+$(PKGDIRBASE)/cosy/cosy.py: $(RIOTTOOLS)/cosy/Makefile
+	@echo "[INFO] cosy.py not found - fetching it from GitHub now"
+	@CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/cosy
+	@echo "[INFO] cosy.py successfully fetched!"
+
 $(RIOTTOOLS)/edbg/edbg: $(RIOTTOOLS)/edbg/Makefile
 	@echo "[INFO] edbg binary not found - building it from source now"
 	CC= CFLAGS= $(MAKE) -C $(RIOTTOOLS)/edbg

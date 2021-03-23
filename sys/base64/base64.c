@@ -90,6 +90,7 @@ static int base64_encode_base(const void *data_in, size_t data_in_size,
                               void *base64_out, size_t *base64_out_size,
                               bool urlsafe)
 {
+    const uint8_t padding = urlsafe ? 0 : '=';
     const uint8_t *in = data_in;
     const uint8_t *end = in + data_in_size;
     uint8_t *out = base64_out;
@@ -131,14 +132,24 @@ static int base64_encode_base(const void *data_in, size_t data_in_size,
         encode_three_bytes(out, in[0], 0, 0, urlsafe);
         /* Replace last two bytes with "=" to signal corresponding input bytes
          * didn't exist */
-        out[2] = out[3] = '=';
+        out[2] = out[3] = padding;
+
+        /* padding is not required for urlsafe application */
+        if (urlsafe) {
+            *base64_out_size -= 2;
+        }
         return BASE64_SUCCESS;
     }
 
     /* Final case: 2 bytes remain for encoding, use zero as third input */
     encode_three_bytes(out, in[0], in[1], 0, urlsafe);
     /* Replace last output with "=" to signal corresponding input byte didn't exit */
-    out[3] = '=';
+    out[3] = padding;
+
+    /* padding is not required for urlsafe application */
+    if (urlsafe) {
+        *base64_out_size -= 1;
+    }
 
     return BASE64_SUCCESS;
 }

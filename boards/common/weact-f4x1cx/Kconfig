@@ -17,3 +17,9 @@ config BOARD_COMMON_WEACT_F41XCX
     select HAS_PERIPH_UART
     select HAS_PERIPH_USBDEV
     select HAS_HIGHLEVEL_STDIO
+
+    # Clock configuration
+    select BOARD_HAS_HSE
+    select BOARD_HAS_LSE
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

@@ -53,7 +53,7 @@ uint32_t gnrc_lorawan_fcnt_stol(uint32_t fcnt_down, uint16_t s_fcnt)
 {
     uint32_t u32_fcnt = (fcnt_down & _16_UPPER_BITMASK) | s_fcnt;
 
-    if (fcnt_down + LORAMAC_DEFAULT_MAX_FCNT_GAP >= _16_LOWER_BITMASK
+    if (fcnt_down + CONFIG_LORAMAC_DEFAULT_MAX_FCNT_GAP >= _16_LOWER_BITMASK
         && s_fcnt < (fcnt_down & _16_LOWER_BITMASK)) {
         u32_fcnt += _16_LOWER_BITMASK;
     }
@@ -95,7 +95,7 @@ int gnrc_lorawan_parse_dl(gnrc_lorawan_t *mac, uint8_t *buf, size_t len,
         gnrc_lorawan_fcnt_stol(mac->mcps.fcnt_down, _hdr->fcnt.u16);
 
     if (mac->mcps.fcnt_down > _fcnt || mac->mcps.fcnt_down +
-        LORAMAC_DEFAULT_MAX_FCNT_GAP < _fcnt) {
+        CONFIG_LORAMAC_DEFAULT_MAX_FCNT_GAP < _fcnt) {
         DEBUG("gnrc_lorawan: wrong frame counter\n");
         return -1;
     }
@@ -415,7 +415,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     mac->mcps.waiting_for_ack = waiting_for_ack;
     mac->mcps.ack_requested = false;
 
-    mac->mcps.nb_trials = LORAMAC_DEFAULT_RETX;
+    mac->mcps.nb_trials = CONFIG_LORAMAC_DEFAULT_RETX;
 
     mac->mcps.msdu = pkt;
     mac->last_dr = mcps_request->data.dr;

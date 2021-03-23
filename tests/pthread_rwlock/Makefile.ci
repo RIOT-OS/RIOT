@@ -4,6 +4,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega328p \
+    bluepill-stm32f030c8 \
     i-nucleo-lrwan1 \
     msb-430 \
     msb-430h \
@@ -15,6 +16,8 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l011k4 \
     nucleo-l031k6 \
     nucleo-l053r8 \
+    samd10-xmini \
+    slstk3400a \
     stk3200 \
     stm32f030f4-demo \
     stm32f0discovery \

@@ -6,6 +6,8 @@ PORT_DARWIN ?= /dev/tty.usbserial-ARM
 # Use lpc2k_pgm programmer
 PROGRAMMER ?= lpc2k_pgm
 
+PROGRAMMERS_SUPPORTED += lpc2k_pgm
+
 # when using miniterm set RTS and DTR lines to 0, otherwise the board is reset
 MINITERMFLAGS += --rts 0 --dtr 0
 

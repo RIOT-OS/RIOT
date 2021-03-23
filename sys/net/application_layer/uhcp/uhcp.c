@@ -98,8 +98,9 @@ void uhcp_handle_push(uhcp_push_t *req, uint8_t *src, uint16_t port, uhcp_iface_
     char prefix_str[INET6_ADDRSTRLEN];
     inet_ntop(AF_INET6, src, addr_str, INET6_ADDRSTRLEN);
     uint8_t prefix[IN6ADDRSZ] = { 0 };
-    if (req->prefix_len == 0) {
-        LOG_ERROR("uhcp_handle_push(): prefix length 0\n");
+    /* prefix_len can't be 0 or greater then IN6ADDRSZ * 8 (== 128) */
+    if ((req->prefix_len == 0) || (req->prefix_len > (IN6ADDRSZ << 3))) {
+        LOG_ERROR("uhcp_handle_push(): invalid prefix length\n");
         return;
     }
     size_t prefix_bytes = (req->prefix_len + 7)>>3;

@@ -9,8 +9,19 @@ DEBUGGER_FLAGS ?= debug $(ELFFILE)
 DEBUGSERVER_FLAGS ?= debug-server
 RESET_FLAGS ?= reset
 
+# Warn about deprecated variables
 ifneq (,$(DEBUG_ADAPTER))
-  include $(RIOTMAKE)/tools/openocd-adapters/$(DEBUG_ADAPTER).inc.mk
+  $(warning Warning! DEBUG_ADAPTER is deprecated use OPENOCD_DEBUG_ADAPTER)
+  OPENOCD_DEBUG_ADAPTER ?= $(DEBUG_ADAPTER)
+endif
+
+ifneq (,$(PRE_FLASH_CHECK_SCRIPT))
+  $(warning Warning! PRE_FLASH_CHECK_SCRIPT is deprecated use OPENOCD_PRE_FLASH_CHECK_SCRIPT)
+  OPENOCD_PRE_FLASH_CHECK_SCRIPT ?= $(PRE_FLASH_CHECK_SCRIPT)
+endif
+
+ifneq (,$(OPENOCD_DEBUG_ADAPTER))
+  include $(RIOTMAKE)/tools/openocd-adapters/$(OPENOCD_DEBUG_ADAPTER).inc.mk
   OPENOCD_ADAPTER_INIT += -c 'transport select $(OPENOCD_TRANSPORT)'
 endif
 
@@ -50,7 +61,7 @@ ifneq (,$(OPENOCD_PRE_FLASH_CMDS))
   $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),OPENOCD_PRE_FLASH_CMDS)
 endif
 
-ifneq (,$(PRE_FLASH_CHECK_SCRIPT))
-  # Export PRE_FLASH_CHECK_SCRIPT only to the flash/flash-only targets
-  $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),PRE_FLASH_CHECK_SCRIPT)
+ifneq (,$(OPENOCD_PRE_FLASH_CHECK_SCRIPT))
+  # Export OPENOCD_PRE_FLASH_CHECK_SCRIPT only to the flash/flash-only targets
+  $(call target-export-variables,$(OPENOCD_FLASH_TARGETS),OPENOCD_PRE_FLASH_CHECK_SCRIPT)
 endif

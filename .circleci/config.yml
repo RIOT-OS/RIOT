@@ -8,7 +8,7 @@ version: 2
 jobs:
   doc-build:
     docker:
-      - image: riot/riotbuild
+      - image: riot/static-test-tools
     steps:
       - checkout
       - run: make doc

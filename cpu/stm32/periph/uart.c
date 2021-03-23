@@ -215,6 +215,15 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
      * sent. */
     uart_init_pins(uart, rx_cb);
 
+#ifdef MODULE_PERIPH_UART_HW_FC
+    if (uart_config[uart].cts_pin != GPIO_UNDEF) {
+        dev(uart)->CR3 |= USART_CR3_CTSE;
+    }
+    if (uart_config[uart].rts_pin != GPIO_UNDEF) {
+        dev(uart)->CR3 |= USART_CR3_RTSE;
+    }
+#endif
+
     /* enable RX interrupt if applicable */
     if (rx_cb) {
         NVIC_EnableIRQ(uart_config[uart].irqn);
@@ -226,15 +235,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 
 #ifdef MODULE_PERIPH_UART_NONBLOCKING
     NVIC_EnableIRQ(uart_config[uart].irqn);
-#endif
-
-#ifdef MODULE_PERIPH_UART_HW_FC
-    if (uart_config[uart].cts_pin != GPIO_UNDEF) {
-        dev(uart)->CR3 |= USART_CR3_CTSE;
-    }
-    if (uart_config[uart].rts_pin != GPIO_UNDEF) {
-        dev(uart)->CR3 |= USART_CR3_RTSE;
-    }
 #endif
 
     return UART_OK;

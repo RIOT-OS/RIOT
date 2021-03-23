@@ -163,8 +163,6 @@ static gnrc_pktsnip_t *gnrc_nrfmin_recv(gnrc_netif_t *dev)
     if (nrfmin->dst_addr == NRFMIN_ADDR_BCAST) {
         netif->flags |= GNRC_NETIF_HDR_FLAGS_BROADCAST;
     }
-    netif->lqi = 0;
-    netif->rssi = 0;
     gnrc_netif_hdr_set_netif(netif, dev);
     pkt_snip->type = nrfmin->proto;
 

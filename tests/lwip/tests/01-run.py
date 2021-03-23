@@ -15,6 +15,7 @@ import time
 import types
 import pexpect
 import socket
+import ipaddress
 
 DEFAULT_TIMEOUT = 5
 
@@ -190,8 +191,9 @@ class TestStrategy(ApplicationStrategy):
 
 def get_ipv6_address(spawn):
     spawn.sendline(u"ifconfig")
-    spawn.expect(r"[A-Za-z0-9]{2}_[0-9]+:  inet6 (fe80::[0-9a-f:]+)\s")
-    return spawn.match.group(1)
+    spawn.expect(r" inet6 addr: (fe80:[0-9a-f:]+)\s")
+    # pack v6 address to minimal form (lwIP returns fe80:0:0:..)
+    return str(ipaddress.ip_address(spawn.match.group(1)))
 
 
 def test_ipv6_send(board_group, application, env=None):

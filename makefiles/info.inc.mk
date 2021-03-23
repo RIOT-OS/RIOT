@@ -3,7 +3,9 @@
         info-features-provided info-features-required \
         info-features-used \
         info-debug-variable-% info-toolchains-supported \
-        check-toolchain-supported
+        check-toolchain-supported \
+        info-programmers-supported \
+        #
 
 info-objsize:
 	@case "$(SORTROW)" in \
@@ -146,7 +148,7 @@ info-build-json:
 	@echo '"BOARDDIR": "$(BOARDDIR)",'
 	@echo '"RIOTCPU": "$(RIOTCPU)",'
 	@echo '"RIOTPKG": "$(RIOTPKG)",'
-	@echo '"EXTERNAL_BOARD_DIRS": $(call json_string_or_null $(EXTERNAL_BOARD_DIRS)),'
+	@echo '"EXTERNAL_BOARD_DIRS": $(call json_string_or_null,$(EXTERNAL_BOARD_DIRS)),'
 	@echo '"BINDIR": "$(BINDIR)",'
 	@echo '"ELFFILE": "$(ELFFILE)",'
 	@echo '"HEXFILE": "$(HEXFILE)",'
@@ -224,3 +226,6 @@ info-toolchains-supported:
 
 check-toolchain-supported:
 	@exit $(if $(filter $(TOOLCHAIN),$(filter-out $(TOOLCHAINS_BLACKLIST),$(TOOLCHAINS_SUPPORTED))),0,1)
+
+info-programmers-supported:
+	@echo $(sort $(PROGRAMMERS_SUPPORTED))

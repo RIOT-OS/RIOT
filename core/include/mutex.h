@@ -59,7 +59,7 @@
  * 1. If the mutex was unlocked (value of `NULL`), its value is changed to
  *    `MUTEX_LOCKED` and the call to `mutex_lock()` returns right away without
  *    blocking.
- * 2. If the mutex as a vale of `MUTEX_LOCKED`, it will be changed to point to
+ * 2. If the mutex has a value of `MUTEX_LOCKED`, it will be changed to point to
  *    the `thread_t` of the running thread. The single item list is terminated
  *    be setting the `thread_t::rq_entry.next` of the running thread to `NULL`.
  *    The running thread blocks as described below.
@@ -105,10 +105,13 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "irq.h"
 #include "kernel_defines.h"
 #include "list.h"
 #include "thread.h"
+
+#ifndef __cplusplus
+#include "irq.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -190,6 +193,25 @@ static inline mutex_cancel_t mutex_cancel_init(mutex_t *mutex)
 /**
  * @brief   Tries to get a mutex, non-blocking.
  *
+ * @internal
+ * @note    This function is intended for use by languages incompatible
+ *          with C (such as C++). Code in C should use @ref mutex_trylock
+ *          instead
+ *
+ * @param[in,out]   mutex   Mutex object to lock.
+ *
+ * @retval  1               if mutex was unlocked, now it is locked.
+ * @retval  0               if the mutex was locked.
+ *
+ * @pre     @p mutex is not `NULL`
+ * @pre     Mutex at @p mutex has been initialized
+ * @pre     Must be called in thread context
+ */
+int mutex_trylock_ffi(mutex_t *mutex);
+
+/**
+ * @brief   Tries to get a mutex, non-blocking.
+ *
  * @param[in,out]   mutex   Mutex object to lock.
  *
  * @retval  1               if mutex was unlocked, now it is locked.
@@ -201,6 +223,9 @@ static inline mutex_cancel_t mutex_cancel_init(mutex_t *mutex)
  */
 static inline int mutex_trylock(mutex_t *mutex)
 {
+#ifdef __cplusplus
+    return mutex_trylock_ffi(mutex);
+#else
     unsigned irq_state = irq_disable();
     int retval = 0;
 
@@ -210,6 +235,7 @@ static inline int mutex_trylock(mutex_t *mutex)
     }
     irq_restore(irq_state);
     return retval;
+#endif
 }
 
 /**

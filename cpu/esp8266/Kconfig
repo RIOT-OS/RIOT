@@ -10,12 +10,13 @@ config CPU_CORE_XTENSA_L106
 
 config CPU_FAM_ESP8266
     bool
-    select CPU_CORE_XTENSA_L106
     select CPU_COMMON_ESP
+    select CPU_CORE_XTENSA_L106
     select HAS_ARCH_ESP8266
     select HAS_CPU_ESP8266
-    select HAS_PERIPH_RTT
     select HAS_PERIPH_RTC
+    select HAS_PERIPH_RTT
+    select HAS_PERIPH_RTT_SET_COUNTER
 
 ## CPU Models
 config CPU_MODEL_ESP8266EX

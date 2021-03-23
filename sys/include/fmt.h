@@ -476,6 +476,15 @@ void print_u64_hex(uint64_t val);
 void print_u64_dec(uint64_t val);
 
 /**
+ * @brief Print int64 value as decimal to stdout
+ *
+ * @note This uses fmt_s64_dec(), which uses ~400b of code.
+ *
+ * @param[in]   val  Value to print
+ */
+void print_s64_dec(uint64_t val);
+
+/**
  * @brief Print float value
  *
  * @note See fmt_float for code size warning!

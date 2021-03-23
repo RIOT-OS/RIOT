@@ -229,6 +229,11 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
         _aux.timestamp = &aux->timestamp;
     }
 #endif
+#if IS_USED(MODULE_SOCK_AUX_RSSI)
+    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_RSSI)) {
+        _aux.rssi = &aux->rssi;
+    }
+#endif
     res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp, &_aux);
     if (res < 0) {
         return res;
@@ -258,13 +263,13 @@ ssize_t sock_udp_recv_buf_aux(sock_udp_t *sock, void **data, void **buf_ctx,
     }
 #endif
 #if IS_USED(MODULE_SOCK_AUX_TIMESTAMP)
-    if ((aux != NULL) && (aux->flags & SOCK_AUX_GET_TIMESTAMP)) {
-        /* check if network interface did provide a timestamp; this depends on
-         * hardware support. A timestamp of zero is used to indicate a missing
-         * timestamp */
-        if (_aux.flags & GNRC_SOCK_RECV_AUX_FLAG_TIMESTAMP) {
-            aux->flags &= ~SOCK_AUX_GET_TIMESTAMP;
-        }
+    if ((aux != NULL) && (_aux.flags & GNRC_SOCK_RECV_AUX_FLAG_TIMESTAMP)) {
+        aux->flags &= ~SOCK_AUX_GET_TIMESTAMP;
+    }
+#endif
+#if IS_USED(MODULE_SOCK_AUX_RSSI)
+    if ((aux != NULL) && (_aux.flags & GNRC_SOCK_RECV_AUX_FLAG_RSSI)) {
+        aux->flags &= ~SOCK_AUX_GET_RSSI;
     }
 #endif
     *data = pkt->data;

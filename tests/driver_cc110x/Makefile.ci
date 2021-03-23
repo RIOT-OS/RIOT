@@ -8,6 +8,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p \
     blackpill \
     bluepill \
+    bluepill-stm32f030c8 \
     derfmega128 \
     hifive1 \
     hifive1b \
@@ -26,8 +27,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l011k4 \
     nucleo-l031k6 \
     nucleo-l053r8 \
+    samd10-xmini \
     saml10-xpro \
     saml11-xpro \
+    slstk3400a \
     stk3200 \
     stm32f030f4-demo \
     stm32f0discovery \
@@ -37,4 +40,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     wsn430-v1_3b \
     wsn430-v1_4 \
     z1 \
+    zigduino \
     #

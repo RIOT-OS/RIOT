@@ -70,6 +70,11 @@ int main(void)
 
     ztimer_periodic_start(&t);
 
+    if (!ztimer_is_set(ZTIMER_MSEC, &t.timer)) {
+        print_str("Test failed\n");
+        return 1;
+    }
+
     /* wait for periodic to trigger N times */
     mutex_lock(&_mutex);
 

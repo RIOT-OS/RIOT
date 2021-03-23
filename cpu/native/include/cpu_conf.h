@@ -60,6 +60,32 @@ extern "C" {
 #   define CONFIG_GNRC_PKTBUF_SIZE     (2048)
 #endif
 
+/**
+ * @brief   Native Flash emulation
+ *          Use unusual parameters to trigger edge cases
+ * @{
+ */
+#ifndef FLASHPAGE_SIZE
+#define FLASHPAGE_SIZE                      (512)
+#endif
+#ifndef FLASHPAGE_NUMOF
+#define FLASHPAGE_NUMOF                     (32)
+#endif
+#ifndef FLASHPAGE_WRITE_BLOCK_ALIGNMENT
+#define FLASHPAGE_WRITE_BLOCK_ALIGNMENT     (8)
+#endif
+#ifndef FLASHPAGE_WRITE_BLOCK_SIZE
+#define FLASHPAGE_WRITE_BLOCK_SIZE          (16)
+#endif
+#ifndef FLASHPAGE_ERASE_STATE
+#define FLASHPAGE_ERASE_STATE               (0x0)
+#endif
+
+extern char _native_flash[FLASHPAGE_SIZE * FLASHPAGE_NUMOF];
+
+#define CPU_FLASH_BASE ((uintptr_t)_native_flash)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

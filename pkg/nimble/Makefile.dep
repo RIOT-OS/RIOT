@@ -48,6 +48,7 @@ ifneq (,$(filter nimble_autoconn_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
+  USEMODULE += random
   USEMODULE += nimble_netif
   USEMODULE += nimble_scanner
   USEMODULE += bluetil_ad

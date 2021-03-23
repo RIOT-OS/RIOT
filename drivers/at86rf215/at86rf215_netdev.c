@@ -287,23 +287,10 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             return sizeof(netopt_enable_t);
 
         case NETOPT_RX_START_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->flags & AT86RF215_OPT_TELL_RX_START);
-            return sizeof(netopt_enable_t);
-
         case NETOPT_RX_END_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->flags & AT86RF215_OPT_TELL_RX_END);
-            return sizeof(netopt_enable_t);
-
         case NETOPT_TX_START_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->flags & AT86RF215_OPT_TELL_TX_START);
-            return sizeof(netopt_enable_t);
-
         case NETOPT_TX_END_IRQ:
-            *((netopt_enable_t *)val) =
-                !!(dev->flags & AT86RF215_OPT_TELL_TX_END);
+            *((netopt_enable_t *)val) = NETOPT_ENABLE;
             return sizeof(netopt_enable_t);
 
         case NETOPT_CSMA:
@@ -587,30 +574,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             res = sizeof(netopt_enable_t);
             break;
 
-        case NETOPT_RX_START_IRQ:
-            at86rf215_set_option(dev, AT86RF215_OPT_TELL_RX_START,
-                                 ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_RX_END_IRQ:
-            at86rf215_set_option(dev, AT86RF215_OPT_TELL_RX_END,
-                                 ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_TX_START_IRQ:
-            at86rf215_set_option(dev, AT86RF215_OPT_TELL_TX_START,
-                                 ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
-        case NETOPT_TX_END_IRQ:
-            at86rf215_set_option(dev, AT86RF215_OPT_TELL_TX_END,
-                                 ((const bool *)val)[0]);
-            res = sizeof(netopt_enable_t);
-            break;
-
         case NETOPT_CSMA:
             at86rf215_set_option(dev, AT86RF215_OPT_CSMA,
                                  ((const bool *)val)[0]);
@@ -869,7 +832,7 @@ static void _tx_end(at86rf215_t *dev, netdev_event_t event)
 
     at86rf215_tx_done(dev);
 
-    if (dev->flags & AT86RF215_OPT_TELL_TX_END) {
+    if (netdev->event_callback) {
         netdev->event_callback(netdev, event);
     }
 
@@ -1028,9 +991,7 @@ static void _isr(netdev_t *netdev)
     uint8_t bb_irqs_enabled = BB_IRQ_RXFE | BB_IRQ_TXFE;
 
     /* not using IRQMM because we want to know about AGCH */
-    if (dev->flags & AT86RF215_OPT_TELL_RX_START) {
-        bb_irqs_enabled |= BB_IRQ_RXAM;
-    }
+    bb_irqs_enabled |= BB_IRQ_RXAM;
 
     rf_irq_mask = at86rf215_reg_read(dev, dev->RF->RG_IRQS);
     bb_irq_mask = at86rf215_reg_read(dev, dev->BBC->RG_IRQS);
@@ -1140,8 +1101,7 @@ static void _isr(netdev_t *netdev)
             at86rf215_rf_cmd(dev, CMD_RF_TX);
 
             /* This also tells the upper layer about retransmissions - should it be like that? */
-            if (netdev->event_callback &&
-                (dev->flags & AT86RF215_OPT_TELL_TX_START)) {
+            if (netdev->event_callback) {
                 netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
             }
         }
@@ -1177,8 +1137,7 @@ static void _isr(netdev_t *netdev)
             break;
         }
 
-        if ((bb_irq_mask & BB_IRQ_RXAM) &&
-            (dev->flags & AT86RF215_OPT_TELL_RX_END)) {
+        if ((bb_irq_mask & BB_IRQ_RXAM) && netdev->event_callback) {
             /* will be executed in the same thread */
             netdev->event_callback(netdev, NETDEV_EVENT_RX_STARTED);
         }
@@ -1191,7 +1150,7 @@ static void _isr(netdev_t *netdev)
 
         bb_irq_mask &= ~BB_IRQ_RXFE;
 
-        if (dev->flags & AT86RF215_OPT_TELL_RX_END) {
+        if (netdev->event_callback) {
             /* will be executed in the same thread */
             netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
         }

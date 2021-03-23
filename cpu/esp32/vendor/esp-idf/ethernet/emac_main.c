@@ -164,7 +164,7 @@ static void emac_set_rx_base_reg(void)
 */
 static void emac_reset_dma_chain(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     emac_config.cnt_tx = 0;
     emac_config.cur_tx = 0;
     emac_config.dirty_tx = 0;
@@ -176,7 +176,7 @@ static void emac_reset_dma_chain(void)
 
 static void emac_init_dma_chain(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     int i;
     uint32_t dma_phy;
     struct dma_extended_desc *p = NULL;
@@ -274,7 +274,7 @@ esp_err_t esp_eth_smi_wait_value(uint32_t reg_num, uint16_t value, uint16_t valu
 
 static void emac_set_user_config_data(eth_config_t *config )
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     emac_config.phy_addr = config->phy_addr;
     emac_config.mac_mode = config->mac_mode;
     emac_config.clock_mode = config->clock_mode;
@@ -299,19 +299,19 @@ static void emac_set_user_config_data(eth_config_t *config )
 
 static void emac_enable_intr(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     REG_WRITE(EMAC_DMAIN_EN_REG, EMAC_INTR_ENABLE_BIT);
 }
 
 static void emac_disable_intr(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     REG_WRITE(EMAC_DMAIN_EN_REG, 0);
 }
 
 static esp_err_t emac_verify_args(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     esp_err_t ret = ESP_OK;
 
     if (emac_config.phy_addr > PHY31) {
@@ -379,7 +379,7 @@ static esp_err_t emac_verify_args(void)
 
 static void emac_process_tx(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     uint32_t cur_tx_desc = emac_read_tx_cur_reg();
 
     if (emac_config.emac_status == EMAC_RUNTIME_STOP) {
@@ -404,7 +404,7 @@ static void emac_process_tx(void)
 
 void esp_eth_free_rx_buf(void *buf)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     xSemaphoreTakeRecursive( emac_rx_xMutex, ( TickType_t ) portMAX_DELAY );
 
     emac_clean_rx_desc(&(emac_config.dma_erx[emac_config.cur_rx]), (uint32_t) buf);
@@ -429,7 +429,7 @@ void esp_eth_free_rx_buf(void *buf)
 
 static uint32_t IRAM_ATTR emac_get_rxbuf_count_in_intr(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     uint32_t cnt = 0;
     uint32_t cur_rx_desc = emac_read_rx_cur_reg();
     struct dma_extended_desc *cur_desc = (struct dma_extended_desc *)cur_rx_desc;
@@ -444,7 +444,7 @@ static uint32_t IRAM_ATTR emac_get_rxbuf_count_in_intr(void)
 #if CONFIG_EMAC_L2_TO_L3_RX_BUF_MODE
 static void emac_process_rx(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     if (emac_config.emac_status == EMAC_RUNTIME_STOP) {
         return;
     }
@@ -467,7 +467,7 @@ static void emac_process_rx(void)
 
 static void emac_process_rx_unavail(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     if (emac_config.emac_status == EMAC_RUNTIME_STOP) {
         return;
     }
@@ -495,7 +495,7 @@ static void emac_process_rx_unavail(void)
 #else
 static void emac_process_rx_unavail(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     if (emac_config.emac_status == EMAC_RUNTIME_STOP) {
         return;
     }
@@ -527,7 +527,7 @@ static void emac_process_rx_unavail(void)
 
 static void emac_process_rx(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     if (emac_config.emac_status == EMAC_RUNTIME_STOP) {
         return;
     }
@@ -599,32 +599,32 @@ static void IRAM_ATTR emac_process_intr(void *arg)
                 emac_send_pause_frame_enable();
             }
         }
-        DEBUG("%s SIG_EMAC_RX_DONE", __func__);
+        DEBUG("%s SIG_EMAC_RX_DONE\n", __func__);
         emac_post(SIG_EMAC_RX_DONE, 0);
     }
 
     if (event & EMAC_RECV_BUF_UNAVAIL) {
         emac_disable_rx_unavail_intr();
-        DEBUG("%s SIG_EMAC_RX_UNAVAIL", __func__);
+        DEBUG("%s SIG_EMAC_RX_UNAVAIL\n", __func__);
         emac_post(SIG_EMAC_RX_UNAVAIL, 0);
     }
 
     if (event & EMAC_TRANS_INT) {
-        DEBUG("%s SIG_EMAC_TX_DONE", __func__);
+        DEBUG("%s SIG_EMAC_TX_DONE\n", __func__);
         emac_post(SIG_EMAC_TX_DONE, 0);
     }
 }
 
 static void emac_set_macaddr_reg(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     REG_SET_FIELD(EMAC_ADDR0HIGH_REG, EMAC_ADDRESS0_HI, (emac_config.macaddr[0] << 8) | (emac_config.macaddr[1]));
     REG_WRITE(EMAC_ADDR0LOW_REG, (emac_config.macaddr[2] << 24) |  (emac_config.macaddr[3] << 16) | (emac_config.macaddr[4] << 8) | (emac_config.macaddr[5]));
 }
 
 static void emac_check_phy_init(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     emac_config.emac_phy_check_init();
     if (emac_config.emac_phy_get_duplex_mode() == ETH_MODE_FULLDUPLEX) {
         REG_SET_BIT(EMAC_GMACCONFIG_REG, EMAC_EMACDUPLEX);
@@ -658,7 +658,7 @@ static void emac_check_phy_init(void)
 
 static void emac_process_link_updown(bool link_status)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     system_event_t evt;
     uint8_t i = 0;
 
@@ -686,7 +686,7 @@ static void emac_process_link_updown(bool link_status)
 
 static void emac_hw_init(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     //init chain
     emac_init_dma_chain();
 
@@ -697,7 +697,7 @@ static void emac_hw_init(void)
 
 esp_err_t esp_eth_tx(uint8_t *buf, uint16_t size)
 {
-    DEBUG("%s: buf=%p size=%d", __func__, buf, size);
+    DEBUG("%s: buf=%p size=%d\n", __func__, buf, size);
     esp_err_t ret = ESP_OK;
 
     if (emac_config.emac_status != EMAC_RUNTIME_START || emac_config.emac_status == EMAC_RUNTIME_NOT_INIT) {
@@ -731,13 +731,13 @@ _exit:
 
 static void emac_init_default_data(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     memset((uint8_t *)&emac_config, 0, sizeof(struct emac_config_data));
 }
 
 void emac_process_link_check(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     if (emac_config.emac_status != EMAC_RUNTIME_START ||
             emac_config.emac_status == EMAC_RUNTIME_NOT_INIT) {
         return;
@@ -756,13 +756,13 @@ void emac_process_link_check(void)
 
 void emac_link_check_func(void *pv_parameters)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     emac_post(SIG_EMAC_CHECK_LINK, 0);
 }
 
 static bool emac_link_check_timer_init(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     emac_timer = xTimerCreate("emac_timer", (2000 / portTICK_PERIOD_MS),
                               pdTRUE, (void *)rand(), emac_link_check_func);
     if (emac_timer == NULL) {
@@ -774,7 +774,7 @@ static bool emac_link_check_timer_init(void)
 
 static bool emac_link_check_timer_start(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     if (xTimerStart(emac_timer, portMAX_DELAY) != pdPASS) {
         return false;
     } else {
@@ -784,7 +784,7 @@ static bool emac_link_check_timer_start(void)
 
 static bool emac_link_check_timer_stop(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     if (xTimerStop(emac_timer, portMAX_DELAY) != pdPASS) {
         return false;
     } else {
@@ -794,7 +794,7 @@ static bool emac_link_check_timer_stop(void)
 
 static bool emac_link_check_timer_delete(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     xTimerDelete(emac_timer, portMAX_DELAY);
     emac_timer = NULL;
     return true;
@@ -802,7 +802,7 @@ static bool emac_link_check_timer_delete(void)
 
 static void emac_start(void *param)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     struct emac_post_cmd  *post_cmd = (struct emac_post_cmd *)param;
     struct emac_open_cmd *cmd = (struct emac_open_cmd *)(post_cmd->cmd);
 
@@ -850,7 +850,7 @@ static void emac_start(void *param)
 
 esp_err_t esp_eth_enable(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     struct emac_post_cmd post_cmd;
     struct emac_open_cmd open_cmd;
 
@@ -892,7 +892,7 @@ cleanup:
 
 static void emac_stop(void *param)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     struct emac_post_cmd  *post_cmd = (struct emac_post_cmd *)param;
     ESP_LOGI(TAG, "emac stop");
 
@@ -920,7 +920,7 @@ static void emac_stop(void *param)
 
 esp_err_t esp_eth_disable(void)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     struct emac_post_cmd post_cmd;
     struct emac_close_cmd close_cmd;
 
@@ -950,7 +950,7 @@ esp_err_t esp_eth_disable(void)
 
 static esp_err_t emac_ioctl(emac_sig_t sig, emac_par_t par)
 {
-    DEBUG("%s sig=%d par=%08x", __func__, sig, par);
+    DEBUG("%s sig=%d par=%08x\n", __func__, sig, par);
     esp_err_t ret = ESP_OK;
     struct emac_post_cmd  *post_cmd = (struct emac_post_cmd *)par;
     xTaskHandle task_hdl = xTaskGetCurrentTaskHandle();
@@ -998,7 +998,7 @@ void emac_task(void *pv)
             portENTER_CRITICAL(&g_emac_mux);
             emac_sig_cnt[e.sig]--;
             portEXIT_CRITICAL(&g_emac_mux);
-            DEBUG("%s sig=%d par=%08x", __func__, e.sig, e.par);
+            DEBUG("%s sig=%d par=%08x\n", __func__, e.sig, e.par);
             switch (e.sig) {
             case SIG_EMAC_RX_DONE:
                 emac_process_rx();
@@ -1028,7 +1028,7 @@ void emac_task(void *pv)
 
 esp_err_t IRAM_ATTR emac_post(emac_sig_t sig, emac_par_t par)
 {
-    DEBUG("%s sig=%d par=%08x", __func__, sig, par);
+    DEBUG("%s sig=%d par=%08x\n", __func__, sig, par);
     if (sig <= SIG_EMAC_RX_DONE) {
         if (emac_sig_cnt[sig]) {
             return ESP_OK;
@@ -1068,14 +1068,14 @@ esp_err_t IRAM_ATTR emac_post(emac_sig_t sig, emac_par_t par)
 
 esp_err_t esp_eth_init(eth_config_t *config)
 {
-     DEBUG("%s", __func__);
+     DEBUG("%s\n", __func__);
      esp_event_set_default_eth_handlers();
      return esp_eth_init_internal(config);
 }
 
 esp_err_t esp_eth_init_internal(eth_config_t *config)
 {
-    DEBUG("%s", __func__);
+    DEBUG("%s\n", __func__);
     esp_err_t ret = ESP_OK;
     if (emac_config.emac_status != EMAC_RUNTIME_NOT_INIT) {
         goto _exit;

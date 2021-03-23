@@ -11,7 +11,7 @@
  * @{
  *
  * @file
- * @brief       Auto initialization for HTS221 devices
+ * @brief       Auto initialization for INA3221 devices
  *
  * @author      Fabian Hüßler <fabian.huessler@ovgu.de>
  *

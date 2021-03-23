@@ -113,6 +113,19 @@ saul_reg_t *saul_reg_find_name(const char *name)
     return NULL;
 }
 
+saul_reg_t *saul_reg_find_type_and_name(uint8_t type, const char *name)
+{
+    saul_reg_t *tmp = saul_reg;
+
+    while (tmp) {
+        if (tmp->driver->type == type && strcmp(tmp->name, name) == 0) {
+            return tmp;
+        }
+        tmp = tmp->next;
+    }
+    return NULL;
+}
+
 int saul_reg_read(saul_reg_t *dev, phydat_t *res)
 {
     if (dev == NULL) {

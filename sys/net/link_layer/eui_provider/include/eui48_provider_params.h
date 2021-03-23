@@ -17,7 +17,9 @@
 #ifndef EUI48_PROVIDER_PARAMS_H
 #define EUI48_PROVIDER_PARAMS_H
 
-#include "board.h"
+#if __has_include("eui_provider_params.h")
+#include "eui_provider_params.h"
+#endif
 #include "net/eui_provider.h"
 
 #ifdef __cplusplus
@@ -36,13 +38,6 @@ extern "C" {
 #ifndef EUI48_PROVIDER_PARAMS
 #define EUI48_PROVIDER_NUMOF 0U
 #endif
-#endif
-
-/**
- * @brief Optional function argument to `netdev_get_eui48_cb_t`
- */
-#ifndef EUI48_PROVIDER_ARG
-#define EUI48_PROVIDER_ARG    NULL
 #endif
 
 /**
@@ -66,7 +61,6 @@ extern "C" {
 #ifndef EUI48_PROVIDER_PARAMS
 #define EUI48_PROVIDER_PARAMS     {                                \
                                  .provider = EUI48_PROVIDER_FUNC,  \
-                                 .arg      = EUI48_PROVIDER_ARG,   \
                                  .type     = EUI48_PROVIDER_TYPE,  \
                                  .index    = EUI48_PROVIDER_INDEX, \
                                 },

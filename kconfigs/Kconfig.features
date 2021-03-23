@@ -52,6 +52,12 @@ config HAS_CPU_CHECK_ADDRESS
     help
         Indicates that address validity check is supported.
 
+config HAS_DBGPIN
+    bool
+    help
+        Indicates that a platform provides the neccessary initialization hooks
+        for the dbgpin module.
+
 config HAS_EMULATOR_RENODE
     bool
     help
@@ -93,6 +99,11 @@ config HAS_PERIPH_CAN
     bool
     help
         Indicates that a CAN peripheral is present.
+
+config HAS_PERIPH_CORETIMER
+    bool
+    help
+        Indicates that the CLINT timer can be used as timer peripheral
 
 config HAS_PERIPH_CPUID
     bool
@@ -220,6 +231,12 @@ config HAS_PERIPH_PTP_TIMER
     help
         Indicates that the PTP clock can be used as timer.
 
+config HAS_PERIPH_PTP_TXRX_TIMESTAMPS
+    bool
+    help
+        Indicates that the PTP clock can provide exact time stamps of the
+        reception and transmission of frames.
+
 config HAS_PERIPH_PWM
     bool
     help
@@ -240,10 +257,20 @@ config HAS_PERIPH_RTT
     help
         Indicates that an RTT peripheral is present.
 
+config HAS_PERIPH_RTT_SET_COUNTER
+    bool
+    help
+        Indicates that the RTT peripheral implements rtt_set_counter().
+
 config HAS_PERIPH_SPI
     bool
     help
         Indicates that an SPI peripheral is present.
+
+config HAS_PERIPH_SPI_ON_QSPI
+    bool
+    help
+        Indicates that the QSPI peripheral can be used in SPI mode.
 
 config HAS_PERIPH_SPI_RECONFIGURE
     bool
@@ -315,6 +342,11 @@ config HAS_PICOLIBC
     bool
     help
         Indicates that the picolibc C library is available for the platform.
+
+config HAS_NEWLIB
+    bool
+    help
+        Indicates that the newlib C library is available for the platform.
 
 config HAS_PUF_SRAM
     bool

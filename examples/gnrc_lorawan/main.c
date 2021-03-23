@@ -34,8 +34,8 @@
 #include "net/gnrc/pktbuf.h"
 #include "net/gnrc/pktdump.h"
 #include "net/gnrc/netreg.h"
+#include "net/loramac.h"
 
-#define LORAWAN_PORT       (2U)
 #define LORAWAN_QUEUE_SIZE (4U)
 
 static void _usage(void)
@@ -46,7 +46,7 @@ static void _usage(void)
 int tx_cmd(int argc, char **argv)
 {
     gnrc_pktsnip_t *pkt;
-    uint8_t port = LORAWAN_PORT; /* Default: 2 */
+    uint8_t port = CONFIG_LORAMAC_DEFAULT_TX_PORT; /* Default: 2 */
     int interface;
 
     if (argc < 3) {
@@ -100,7 +100,7 @@ int main(void)
 {
     /* start the shell */
     puts("Initialization successful - starting the shell now");
-    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(LORAWAN_PORT,
+    gnrc_netreg_entry_t dump = GNRC_NETREG_ENTRY_INIT_PID(CONFIG_LORAMAC_DEFAULT_TX_PORT,
                                                           gnrc_pktdump_pid);
 
     gnrc_netreg_register(GNRC_NETTYPE_LORAWAN, &dump);

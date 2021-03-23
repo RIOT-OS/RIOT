@@ -11,7 +11,7 @@ config BOARD
 config BOARD_NUCLEO_F303ZE
     bool
     default y
-    select BOARD_COMMON_NUCLEO64
+    select BOARD_COMMON_NUCLEO144
     select CPU_MODEL_STM32F303ZE
 
     # Put defined MCU peripherals here (in alphabetical order)
@@ -25,8 +25,4 @@ config BOARD_NUCLEO_F303ZE
     # Put other features for this board (in alphabetical order)
     select HAS_RIOTBOOT
 
-    # Clock configuration
-    select BOARD_HAS_HSE
-    select BOARD_HAS_LSE
-
-source "$(RIOTBOARD)/common/nucleo64/Kconfig"
+source "$(RIOTBOARD)/common/nucleo144/Kconfig"

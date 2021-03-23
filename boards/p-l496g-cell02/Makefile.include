@@ -3,4 +3,7 @@ INCLUDES += -I$(RIOTBOARD)/common/stm32/include
 
 # this board uses openocd with st-link
 PROGRAMMER ?= openocd
-DEBUG_ADAPTER ?= stlink
+OPENOCD_DEBUG_ADAPTER ?= stlink
+
+# Only openocd programmer is supported
+PROGRAMMERS_SUPPORTED += openocd

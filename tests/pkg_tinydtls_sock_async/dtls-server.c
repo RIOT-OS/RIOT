@@ -25,9 +25,11 @@
 #include "net/sock/async/event.h"
 #include "net/sock/udp.h"
 #include "net/sock/dtls.h"
+#include "net/sock/util.h"
 #include "net/credman.h"
 #include "msg.h"
 #include "thread.h"
+#include "test_utils/expect.h"
 
 #include "tinydtls_common.h"
 #include "tinydtls_keys.h"
@@ -105,8 +107,10 @@ static void _dtls_handler(sock_dtls_t *sock, sock_async_flags_t type, void *arg)
         return;
     }
 
+    sock_dtls_session_t session = { 0 };
+
     if (type & SOCK_ASYNC_CONN_RECV) {
-        sock_dtls_session_t session = { 0 };
+        expect(!sock_dtls_get_event_session(sock, &session));
 
         puts("Session handshake received");
         if (sock_dtls_recv(sock, &session, _recv_buf, sizeof(_recv_buf),
@@ -117,13 +121,35 @@ static void _dtls_handler(sock_dtls_t *sock, sock_async_flags_t type, void *arg)
         puts("New client connected");
     }
     if (type & SOCK_ASYNC_CONN_FIN) {
-        puts("Session was destroyed by peer");
+        if (sock_dtls_get_event_session(sock, &session)) {
+            sock_udp_ep_t ep;
+            char addrstr[IPV6_ADDR_MAX_STR_LEN];
+            uint16_t port;
+
+            sock_dtls_session_get_udp_ep(&session, &ep);
+            sock_udp_ep_fmt(&ep, addrstr, &port);
+            printf("Session was destroyed by peer: [%s]:%u\n", addrstr, port);
+        } else {
+            puts("A session was destroyed by peer, but the corresponding " \
+                 "session could not be retrieved from socket");
+        }
     }
     if (type & SOCK_ASYNC_CONN_RDY) {
-        puts("Session became ready");
+        if (sock_dtls_get_event_session(sock, &session)) {
+            sock_udp_ep_t ep;
+            char addrstr[IPV6_ADDR_MAX_STR_LEN];
+            uint16_t port;
+
+            sock_dtls_session_get_udp_ep(&session, &ep);
+            sock_udp_ep_fmt(&ep, addrstr, &port);
+            printf("Session became ready: [%s]:%u\n", addrstr, port);
+        } else {
+            puts("A session became ready, but the corresponding session " \
+                 "could not be retrieved from the socket");
+        }
     }
     if (type & SOCK_ASYNC_MSG_RECV) {
-        sock_dtls_session_t session = { 0 };
+        expect(!sock_dtls_get_event_session(sock, &session));
         ssize_t res;
 
         res = sock_dtls_recv(sock, &session, _recv_buf, sizeof(_recv_buf), 0);

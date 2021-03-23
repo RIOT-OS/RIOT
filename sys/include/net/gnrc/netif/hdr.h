@@ -47,6 +47,19 @@ extern "C" {
 #define GNRC_NETIF_HDR_L2ADDR_PRINT_LEN (GNRC_NETIF_HDR_L2ADDR_MAX_LEN * 3)
 
 /**
+ * @brief   Special value to indicate that no RSSI value is present
+ *
+ * See @ref gnrc_netif_hdr_t::rssi
+ */
+#define GNRC_NETIF_HDR_NO_RSSI          (INT16_MIN)
+/**
+ * @brief   Special value to indicate that no LQI value is present
+ *
+ * See @ref gnrc_netif_hdr_t::lqi
+ */
+#define GNRC_NETIF_HDR_NO_LQI           (0)
+
+/**
  * @{
  * @name    Flags for the gnrc_netif_hdr_t
  */
@@ -114,8 +127,14 @@ typedef struct {
     uint8_t dst_l2addr_len;     /**< length of l2 destination address in byte */
     kernel_pid_t if_pid;        /**< PID of network interface */
     uint8_t flags;              /**< flags as defined above */
-    uint8_t lqi;                /**< lqi of received packet (optional) */
-    int16_t rssi;               /**< rssi of received packet in dBm (optional) */
+    /**
+     * @brief   LQI of received packet or @ref GNRC_NETIF_HDR_NO_LQI
+     */
+    uint8_t lqi;
+    /**
+     * @brief   RSSI of received packet or @ref GNRC_NETIF_HDR_NO_RSSI
+     */
+    int16_t rssi;
 #if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP) || defined(DOXYGEN)
     /**
      * @brief   Timestamp of reception in nanoseconds since epoch
@@ -149,8 +168,8 @@ static inline void gnrc_netif_hdr_init(gnrc_netif_hdr_t *hdr, uint8_t src_l2addr
     hdr->src_l2addr_len = src_l2addr_len;
     hdr->dst_l2addr_len = dst_l2addr_len;
     hdr->if_pid = KERNEL_PID_UNDEF;
-    hdr->rssi = 0;
-    hdr->lqi = 0;
+    hdr->rssi = GNRC_NETIF_HDR_NO_RSSI;
+    hdr->lqi = GNRC_NETIF_HDR_NO_LQI;
     hdr->flags = 0;
 }
 

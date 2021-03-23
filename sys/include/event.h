@@ -305,6 +305,8 @@ event_t *event_get(event_queue_t *queue);
  *          sources of latency) that is acceptable to the real-time event with
  *          the strictest requirements.
  *
+ * @pre     0 < @p n_queues (expect blowing `assert()` otherwise)
+ *
  * @param[in]   queues      Array of event queues to get event from
  * @param[in]   n_queues    Number of event queues passed in @p queues
  *

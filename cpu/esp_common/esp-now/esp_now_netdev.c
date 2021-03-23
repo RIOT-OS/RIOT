@@ -65,7 +65,7 @@
 static esp_now_netdev_t _esp_now_dev = { 0 };
 static const netdev_driver_t _esp_now_driver;
 
-static bool _esp_now_add_peer(const uint8_t* bssid, uint8_t channel, uint8_t* key)
+static bool _esp_now_add_peer(const uint8_t* bssid, uint8_t channel, const uint8_t* key)
 {
     if (esp_now_is_peer_exist(bssid)) {
         return false;
@@ -449,6 +449,7 @@ esp_now_netdev_t *netdev_esp_now_setup(void)
     DEBUG("%s: multicast node add %s\n", __func__, res ? "success" : "error");
 #endif /* ESP_NOW_UNICAST */
 
+    netdev_register(&dev->netdev, NETDEV_ESP_NOW, 0);
     return dev;
 }
 

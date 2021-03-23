@@ -65,6 +65,11 @@ typedef enum {
     GPIO_BOTH = IOCFG_EDGEDET_BOTH
 } gpio_flank_t;
 
+/**
+ * @brief   CPU specific GPIO pin generator macro
+ */
+#define GPIO_PIN(x, y)  (((x) & 0) | (y))
+
 /*
  * @brief   Invalid UART mode mask
  *
