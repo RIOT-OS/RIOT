@@ -467,7 +467,7 @@ void msg_queue_print(void)
     unsigned int i = msg_queue->read_count & msg_queue->mask;
 
     printf("Message queue of thread %" PRIkernel_pid "\n", thread->pid);
-    printf("    size: %u (avail: %d)\n", msg_queue->mask + 1,
+    printf("    size: %u (avail: %u)\n", msg_queue->mask + 1,
            cib_avail(msg_queue));
 
     for (; i != (msg_queue->write_count & msg_queue->mask);
