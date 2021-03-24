@@ -15,12 +15,10 @@
 
 #include "kernel_defines.h"
 
-#if IS_USED(MODULE_LWIP_DHCP_AUTO)
-#include "lwip/dhcp.h"
-#endif
 #include "lwip/tcpip.h"
 #include "lwip/netif/netdev.h"
 #include "lwip/netif.h"
+#include "lwip/netifapi.h"
 #include "netif/lowpan6.h"
 
 #ifdef MODULE_NETDEV_TAP
@@ -279,12 +277,17 @@ void lwip_bootstrap(void)
 #endif
     /* also allow for external interface definition */
     tcpip_init(NULL, NULL);
-#if IS_USED(MODULE_LWIP_DHCP_AUTO) && IS_USED(MODULE_NETDEV_TAP)
-    /* XXX: Hack to get DHCP with IPv4 with `netdev_tap`, as it does
-     * not emit a `NETDEV_EVENT_LINK_UP` event. Remove, once it does
-     * at an appropriate point.
-     * (see https://github.com/RIOT-OS/RIOT/pull/14150) */
-    dhcp_start(netif);
+#if IS_USED(MODULE_LWIP_DHCP_AUTO)
+    {
+        /* Start DHCP on all supported netifs. Interfaces that support
+         * link status events will reset DHCP retries when link comes up. */
+        struct netif *n = NULL;
+        NETIF_FOREACH(n) {
+            if (netif_is_flag_set(n, NETIF_FLAG_ETHERNET)) {
+                netifapi_dhcp_start(netif);
+            }
+        }
+    }
 #endif
 }
 
