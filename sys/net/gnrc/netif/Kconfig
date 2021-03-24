@@ -22,12 +22,12 @@ config GNRC_NETIF_MSG_QUEUE_SIZE_EXP
 
 config GNRC_NETIF_IPV6_ADDRS_NUMOF
     int "Maximum number of unicast and anycast addresses per interface"
-    default 2
+    default 3
     help
         If you change this, please make sure that
         @ref CONFIG_GNRC_NETIF_IPV6_GROUPS_NUMOF is also large enough to fit the
         addresses' solicited nodes multicast addresses.
-        Default: 2 (1 link-local + 1 global address).
+        Default: 3 (1 link-local + 2 global addresses).
 
 config GNRC_NETIF_DEFAULT_HL
     int "Default hop limit"
