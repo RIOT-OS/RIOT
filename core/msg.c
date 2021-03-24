@@ -107,7 +107,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
     DEBUG("msg_send() %s:%i: Sending from %" PRIkernel_pid " to %" PRIkernel_pid
           ". block=%i src->state=%i target->state=%i\n", RIOT_FILE_RELATIVE,
           __LINE__, thread_getpid(), target_pid,
-          block, me->status, target->status);
+          block, (int)me->status, (int)target->status);
 
     if (target->status != STATUS_RECEIVE_BLOCKED) {
         DEBUG(
@@ -127,7 +127,7 @@ static int _msg_send(msg_t *m, kernel_pid_t target_pid, bool block,
 
         if (!block) {
             DEBUG("msg_send: %" PRIkernel_pid ": Receiver not waiting, "
-                  "block=%u\n", me->pid, block);
+                  "block=%d\n", me->pid, block);
             irq_restore(state);
             return 0;
         }
@@ -467,7 +467,7 @@ void msg_queue_print(void)
     unsigned int i = msg_queue->read_count & msg_queue->mask;
 
     printf("Message queue of thread %" PRIkernel_pid "\n", thread->pid);
-    printf("    size: %u (avail: %d)\n", msg_queue->mask + 1,
+    printf("    size: %u (avail: %u)\n", msg_queue->mask + 1,
            cib_avail(msg_queue));
 
     for (; i != (msg_queue->write_count & msg_queue->mask);
