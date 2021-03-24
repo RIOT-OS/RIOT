@@ -9,6 +9,7 @@ RIOTBASE ?= $(CURDIR)/../..
 BOARD_BLACKLIST += mips-malta pic32-wifire pic32-clicker ruuvitag thingy52
 
 USEMODULE += dhcpv6_client_ia_pd
+USEMODULE += dhcpv6_client_ia_na
 USEMODULE += gnrc_dhcpv6_client
 USEMODULE += gnrc_ipv6_default
 USEMODULE += xtimer
