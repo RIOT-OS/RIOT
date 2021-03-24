@@ -34,6 +34,7 @@
 #define NET_NETIF_H
 
 #include <stdint.h>
+#include <string.h>
 
 #include "list.h"
 #include "net/netopt.h"
@@ -114,6 +115,19 @@ int netif_get_name(netif_t *netif, char *name);
 int16_t netif_get_id(const netif_t *netif);
 
 /**
+ * @brief   Gets interface by name, from a buffer
+ *
+ * @pre `name != NULL`
+ *
+ * @param[in] name          The name of an interface as an array of chars. Must not be `NULL`.
+ * @param[in] name_len      Number of characters in @p name.
+ *
+ * @return  Pointer to the interface that matches the name
+ * @retval  NULL if no interface is named @p name.
+ */
+netif_t *netif_get_by_name_buffer(const char *name, size_t name_len);
+
+/**
  * @brief   Gets interface by name
  *
  * @pre `name != NULL`
@@ -125,7 +139,10 @@ int16_t netif_get_id(const netif_t *netif);
  * @return  The interface on success.
  * @return  NULL if no interface is named @p name.
  */
-netif_t *netif_get_by_name(const char *name);
+static inline netif_t *netif_get_by_name(const char *name)
+{
+    return netif_get_by_name_buffer(name, strlen(name));
+}
 
 /**
  * @brief   Gets interface by a numeric identifier.

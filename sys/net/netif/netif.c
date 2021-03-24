@@ -56,16 +56,22 @@ __attribute__((weak)) int16_t netif_get_id(const netif_t *netif)
     return -1;
 }
 
-netif_t *netif_get_by_name(const char *name)
+netif_t *netif_get_by_name_buffer(const char *name, size_t name_len)
 {
     assert(name);
+
+    if (name_len > CONFIG_NETIF_NAMELENMAX) {
+        return NULL;
+    }
+
     list_node_t *node = netif_list.next;
 
     char tmp[CONFIG_NETIF_NAMELENMAX];
 
     while (node) {
        netif_get_name((netif_t *)node, tmp);
-       if (strncmp(name, tmp, CONFIG_NETIF_NAMELENMAX) == 0) {
+       size_t len = strlen(tmp);
+       if ((len == name_len) && (strncmp(name, tmp, name_len) == 0)) {
            return (netif_t *)node;
        }
        node = node->next;
