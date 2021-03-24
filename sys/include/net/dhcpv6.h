@@ -61,6 +61,9 @@ extern "C" {
  */
 #define DHCPV6_OPT_CID              (1U)    /**< client identifier option */
 #define DHCPV6_OPT_SID              (2U)    /**< server identifier option */
+#define DHCPV6_OPT_IA_NA            (3U)    /**< identity association for
+                                                 non-temporary addresses option */
+#define DHCPV6_OPT_IAADDR           (5U)    /**< IA address option */
 #define DHCPV6_OPT_ORO              (6U)    /**< option request option */
 #define DHCPV6_OPT_PREF             (7U)    /**< preference option */
 #define DHCPV6_OPT_ELAPSED_TIME     (8U)    /**< elapsed time option */
