@@ -58,6 +58,12 @@ extern "C" {
 #ifndef LSM303DLHC_PARAM_MAG_GAIN
 #define LSM303DLHC_PARAM_MAG_GAIN       (LSM303DLHC_MAG_GAIN_450_400_GAUSS)
 #endif
+#ifndef LSM303DLHC_PARAM_ACC_PIN_MODE
+#define LSM303DLHC_PARAM_ACC_PIN_MODE   GPIO_IN
+#endif
+#ifndef LSM303DLHC_PARAM_MAG_PIN_MODE
+#define LSM303DLHC_PARAM_MAG_PIN_MODE   GPIO_IN
+#endif
 
 #ifndef LSM303DLHC_PARAMS
 #define LSM303DLHC_PARAMS               { .i2c       = LSM303DLHC_PARAM_I2C,       \
@@ -68,7 +74,9 @@ extern "C" {
                                           .mag_addr  = LSM303DLHC_PARAM_MAG_ADDR,  \
                                           .mag_pin   = LSM303DLHC_PARAM_MAG_PIN,   \
                                           .mag_rate  = LSM303DLHC_PARAM_MAG_RATE,  \
-                                          .mag_gain  = LSM303DLHC_PARAM_MAG_GAIN }
+                                          .mag_gain  = LSM303DLHC_PARAM_MAG_GAIN,  \
+                                          .acc_pin_mode = LSM303DLHC_PARAM_ACC_PIN_MODE,  \
+                                          .mag_pin_mode = LSM303DLHC_PARAM_MAG_PIN_MODE }
 #endif
 #ifndef LSM303DLHC_SAUL_INFO
 #define LSM303DLHC_SAUL_INFO            { .name = "lsm303dlhc" }
