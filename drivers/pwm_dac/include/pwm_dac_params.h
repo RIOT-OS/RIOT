@@ -58,7 +58,7 @@ static const pwm_dac_params_t pwm_dac_params[] = {
     PWM_DAC_PARAMS
 };
 
-#define DAC_NUMOF           ARRAY_SIZE(pwm_dac_params)
+const size_t pwm_dac_numof = ARRAY_SIZE(pwm_dac_params);
 
 /** @} */
 
