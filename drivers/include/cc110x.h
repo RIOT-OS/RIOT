@@ -241,7 +241,8 @@ extern "C" {
 #endif
 
 /**
- * @defgroup drivers_cc110x_config CC1100/CC1100e/CC1101 Sub-GHz transceiver driver compile configuration
+ * @defgroup drivers_cc110x_config CC1100/CC1100e/CC1101 Sub-GHz transceiver driver
+ *                                 compile time configuration
  * @ingroup config_drivers_netdev
  * @{
  */
@@ -329,7 +330,6 @@ typedef enum {
 typedef struct {
     uint8_t data[8]; /**< Magic number to store in the configuration register */
 } cc110x_patable_t;
-
 
 /**
  * @brief   Configuration of the transceiver to use
