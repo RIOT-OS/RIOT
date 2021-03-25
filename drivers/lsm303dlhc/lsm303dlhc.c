@@ -34,6 +34,16 @@
 #define DEV_MAG_PIN     (dev->params.mag_pin)
 #define DEV_MAG_RATE    (dev->params.mag_rate)
 #define DEV_MAG_GAIN    (dev->params.mag_gain)
+#define DEV_ACC_PIN_MODE (dev->params.acc_pin_mode)
+#define DEV_MAG_PIN_MODE (dev->params.mag_pin_mode)
+
+static inline bool _pin_is_idle(gpio_t pin, gpio_mode_t mode) {
+    if (mode == GPIO_IN_PU) {
+        return gpio_read(pin) != 0;
+    } else {
+        return gpio_read(pin) == 0;
+    }
+}
 
 int lsm303dlhc_init(lsm303dlhc_t *dev, const lsm303dlhc_params_t *params)
 {
@@ -66,7 +76,7 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, const lsm303dlhc_params_t *params)
     res += i2c_write_reg(DEV_I2C, DEV_ACC_ADDR,
                          LSM303DLHC_REG_CTRL3_A, LSM303DLHC_CTRL3_A_I1_NONE, 0);
     /* configure acc data ready pin */
-    gpio_init(DEV_ACC_PIN, GPIO_IN);
+    gpio_init(DEV_ACC_PIN, DEV_ACC_PIN_MODE);
 
     /* configure magnetometer and temperature */
     /* enable temperature output and set sample rate */
@@ -81,7 +91,7 @@ int lsm303dlhc_init(lsm303dlhc_t *dev, const lsm303dlhc_params_t *params)
                          LSM303DLHC_REG_MR_M, LSM303DLHC_MAG_MODE_CONTINUOUS, 0);
     i2c_release(DEV_I2C);
     /* configure mag data ready pin */
-    gpio_init(DEV_MAG_PIN, GPIO_IN);
+    gpio_init(DEV_MAG_PIN, DEV_MAG_PIN_MODE);
     if (IS_ACTIVE(ENABLE_DEBUG) && res == 0) {
         DEBUG("[OK]\n");
     }
@@ -141,7 +151,7 @@ int lsm303dlhc_read_mag(const lsm303dlhc_t *dev, lsm303dlhc_3d_data_t *data)
     int res;
 
     DEBUG("lsm303dlhc: wait for mag values... ");
-    while (gpio_read(DEV_MAG_PIN) == 0){}
+    while (_pin_is_idle(DEV_MAG_PIN, DEV_MAG_PIN_MODE)){}
 
     DEBUG("read ... ");
 
