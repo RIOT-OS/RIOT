@@ -71,9 +71,9 @@ void isr_eth(void)
 
     if (IS_USED(MODULE_PERIPH_PTP_TIMER)) {
         if (ETH->MACSR & ETH_MACSR_TSTS) {
-            ptp_timer_cb();
             /* clear interrupt by reading PTPTSSR */
             (void)ETH->PTPTSSR;
+            ptp_timer_cb();
         }
     }
 
