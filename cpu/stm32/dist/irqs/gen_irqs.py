@@ -86,7 +86,8 @@ def irq_numof(cpu_fam, cpu_line):
         ):
             continue
         # Stop at the end of the IRQn_Type enum definition
-        if "IRQn_Type" in line:
+        if "IRQn_Type" in line \
+                and "#else" not in cmsis_content[line_idx + 1].decode():
             break
 
     # Ensure we are on a valid line, otherwise search in earlier lines
