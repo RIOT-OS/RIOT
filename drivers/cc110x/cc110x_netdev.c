@@ -121,36 +121,36 @@ static int identify_device(cc110x_t *dev)
     }
 
     switch (version) {
-        case 3:
-            DEBUG("[cc110x] Detected CC1100 transceiver\n");
-            /* RSSI offset is 78dBm @ 868MHz & 250kBaud.
-             * Depends on the symbol rate and base band and ranges from
-             * 74dBm to 79dBm.
-             */
-            dev->rssi_offset = 78;
-            return 0;
-        case 5:
-            DEBUG("[cc110x] Detected CC1100E transceiver\n");
-            /* RSSI offset is 79 dBm @ 250kbps & 250 kbps.
-             * Depends on base band and symbol rate and ranges from
-             * 75dBm to 79dBm
-             */
-            dev->rssi_offset = 79;
-            return 0;
-        case 4:
-        /* falls through */
-        case 14:
-        /* falls through */
-        case 20:
-            /* RSSI offset for the CC1101 is independent of symbol rate and
-             * base 74 dBm
-             */
-            dev->rssi_offset = 74;
-            DEBUG("[cc110x] Detected CC1101 transceiver\n");
-            return 0;
-        default:
-            DEBUG("[cc110x] Device not a CC110x transceiver\n");
-            return -1;
+    case 3:
+        DEBUG("[cc110x] Detected CC1100 transceiver\n");
+        /* RSSI offset is 78dBm @ 868MHz & 250kBaud.
+         * Depends on the symbol rate and base band and ranges from
+         * 74dBm to 79dBm.
+         */
+        dev->rssi_offset = 78;
+        return 0;
+    case 5:
+        DEBUG("[cc110x] Detected CC1100E transceiver\n");
+        /* RSSI offset is 79 dBm @ 250kbps & 250 kbps.
+         * Depends on base band and symbol rate and ranges from
+         * 75dBm to 79dBm
+         */
+        dev->rssi_offset = 79;
+        return 0;
+    case 4:
+    /* falls through */
+    case 14:
+    /* falls through */
+    case 20:
+        /* RSSI offset for the CC1101 is independent of symbol rate and
+         * base 74 dBm
+         */
+        dev->rssi_offset = 74;
+        DEBUG("[cc110x] Detected CC1101 transceiver\n");
+        return 0;
+    default:
+        DEBUG("[cc110x] Device not a CC110x transceiver\n");
+        return -1;
     }
 }
 
@@ -524,42 +524,73 @@ static int cc110x_get(netdev_t *netdev, netopt_t opt,
 
     (void)max_len;  /* only used in assert() */
     switch (opt) {
-        case NETOPT_DEVICE_TYPE:
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)val) = NETDEV_TYPE_CC110X;
-            return sizeof(uint16_t);
-        case NETOPT_PROTO:
-            assert(max_len == sizeof(gnrc_nettype_t));
-            *((gnrc_nettype_t *)val) = CC110X_DEFAULT_PROTOCOL;
-            return sizeof(gnrc_nettype_t);
-        case NETOPT_MAX_PDU_SIZE:
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)val) = CC110X_MAX_FRAME_SIZE - sizeof(cc1xxx_l2hdr_t);
-            return sizeof(uint16_t);
-        case NETOPT_ADDR_LEN:
-        /* falls through */
-        case NETOPT_SRC_LEN:
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)val) = CC1XXX_ADDR_SIZE;
-            return sizeof(uint16_t);
-        case NETOPT_ADDRESS:
-            assert(max_len >= CC1XXX_ADDR_SIZE);
-            *((uint8_t *)val) = dev->addr;
-            return CC1XXX_ADDR_SIZE;
-        case NETOPT_CHANNEL:
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)val) = dev->channel;
-            return sizeof(uint16_t);
-        case NETOPT_TX_POWER:
-            assert(max_len == sizeof(uint16_t));
-            *((uint16_t *)val) = dbm_from_tx_power[dev->tx_power];
-            return sizeof(uint16_t);
-        case NETOPT_PROMISCUOUSMODE:
-            assert(max_len == sizeof(netopt_enable_t));
-            return cc110x_get_promiscuous_mode(dev, val);
-        default:
-            return -ENOTSUP;
+    case NETOPT_DEVICE_TYPE:
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)val) = NETDEV_TYPE_CC110X;
+        return sizeof(uint16_t);
+    case NETOPT_PROTO:
+        assert(max_len == sizeof(gnrc_nettype_t));
+        *((gnrc_nettype_t *)val) = CC110X_DEFAULT_PROTOCOL;
+        return sizeof(gnrc_nettype_t);
+    case NETOPT_MAX_PDU_SIZE:
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)val) = CC110X_MAX_FRAME_SIZE - sizeof(cc1xxx_l2hdr_t);
+        return sizeof(uint16_t);
+    case NETOPT_ADDR_LEN:
+    /* falls through */
+    case NETOPT_SRC_LEN:
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)val) = CC1XXX_ADDR_SIZE;
+        return sizeof(uint16_t);
+    case NETOPT_ADDRESS:
+        assert(max_len >= CC1XXX_ADDR_SIZE);
+        *((uint8_t *)val) = dev->addr;
+        return CC1XXX_ADDR_SIZE;
+    case NETOPT_CHANNEL:
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)val) = dev->channel;
+        return sizeof(uint16_t);
+    case NETOPT_TX_POWER:
+        assert(max_len == sizeof(uint16_t));
+        *((uint16_t *)val) = dbm_from_tx_power[dev->tx_power];
+        return sizeof(uint16_t);
+    case NETOPT_PROMISCUOUSMODE:
+        assert(max_len == sizeof(netopt_enable_t));
+        return cc110x_get_promiscuous_mode(dev, val);
+    case NETOPT_STATE:
+        assert(max_len == sizeof(netopt_state_t));
+        {
+            netopt_state_t *state = val;
+            switch (dev->state) {
+            case CC110X_STATE_RECEIVING:
+            case CC110X_STATE_FRAME_READY:
+            case CC110X_STATE_RXFIFO_OVERFLOW:
+                *state = NETOPT_STATE_RX;
+                break;
+            case CC110X_STATE_IDLE:
+                *state = NETOPT_STATE_STANDBY;
+                break;
+            case CC110X_STATE_OFF:
+                *state = NETOPT_STATE_SLEEP;
+                break;
+            case CC110X_STATE_TX_MODE:
+            case CC110X_STATE_TX_COMPLETING:
+            case CC110X_STATE_TXFIFO_UNDERFLOW:
+                *state = NETOPT_STATE_TX;
+                break;
+            case CC110X_STATE_RX_MODE:
+                *state = NETOPT_STATE_IDLE;
+                break;
+            default:
+                *state = NETOPT_STATE_RESET;
+                break;
+            }
+        }
+        break;
+    default:
+        break;
     }
+    return -ENOTSUP;
 }
 
 /**
@@ -613,41 +644,56 @@ static int cc110x_set(netdev_t *netdev, netopt_t opt,
     cc110x_t *dev = (cc110x_t *)netdev;
 
     switch (opt) {
-        case NETOPT_ADDRESS:
-            assert(len == CC1XXX_ADDR_SIZE);
-            return cc110x_set_addr(dev, *((uint8_t *)val));
-        case NETOPT_CHANNEL:
-        {
-            assert(len == sizeof(uint16_t));
-            int retval;
-            uint16_t channel = *((uint16_t *)val);
-            if (channel >= CC110X_MAX_CHANNELS) {
-                return -EINVAL;
-            }
-            if ((retval = cc110x_set_channel(dev, (uint8_t)channel))) {
-                return retval;
+    case NETOPT_ADDRESS:
+        assert(len == CC1XXX_ADDR_SIZE);
+        return cc110x_set_addr(dev, *((uint8_t *)val));
+    case NETOPT_CHANNEL:
+    {
+        assert(len == sizeof(uint16_t));
+        int retval;
+        uint16_t channel = *((uint16_t *)val);
+        if (channel >= CC110X_MAX_CHANNELS) {
+            return -EINVAL;
+        }
+        if ((retval = cc110x_set_channel(dev, (uint8_t)channel))) {
+            return retval;
+        }
+    }
+        return sizeof(uint16_t);
+    case NETOPT_TX_POWER:
+    {
+        assert(len == sizeof(int16_t));
+        int16_t dbm = *((int16_t *)val);
+        cc110x_tx_power_t power = CC110X_TX_POWER_MINUS_30_DBM;
+        for ( ; power < CC110X_TX_POWER_PLUS_10_DBM; power++) {
+            if ((int16_t)tx_power_from_dbm[power] >= dbm) {
+                break;
             }
         }
-            return sizeof(uint16_t);
-        case NETOPT_TX_POWER:
-        {
-            assert(len == sizeof(int16_t));
-            int16_t dbm = *((int16_t *)val);
-            cc110x_tx_power_t power = CC110X_TX_POWER_MINUS_30_DBM;
-            for ( ; power < CC110X_TX_POWER_PLUS_10_DBM; power++) {
-                if ((int16_t)tx_power_from_dbm[power] >= dbm) {
-                    break;
-                }
-            }
-            if (cc110x_set_tx_power(dev, power)) {
-                return -EINVAL;
-            }
+        if (cc110x_set_tx_power(dev, power)) {
+            return -EINVAL;
         }
-            return sizeof(uint16_t);
-        case NETOPT_PROMISCUOUSMODE:
-            assert(len == sizeof(netopt_enable_t));
-            return cc110x_set_promiscuous_mode(dev, *((const netopt_enable_t *)val));
+    }
+        return sizeof(uint16_t);
+    case NETOPT_PROMISCUOUSMODE:
+        assert(len == sizeof(netopt_enable_t));
+        return cc110x_set_promiscuous_mode(dev, *((const netopt_enable_t *)val));
+    case NETOPT_STATE:
+        assert(len == sizeof(netopt_state_t));
+        switch (*((netopt_state_t *)val)) {
+        case NETOPT_STATE_RESET:
+        case NETOPT_STATE_IDLE:
+            cc110x_wakeup(dev);
+            return sizeof(netopt_state_t);
+        case NETOPT_STATE_OFF:
+        case NETOPT_STATE_SLEEP:
+            cc110x_sleep(dev);
+            return sizeof(netopt_state_t);
         default:
             return -ENOTSUP;
+        }
+        break;
+    default:
+        return -ENOTSUP;
     }
 }
