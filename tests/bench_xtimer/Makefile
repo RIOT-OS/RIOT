@@ -14,6 +14,7 @@ LOW_MEMORY_BOARDS += \
   arduino-nano-33-iot \
   atmega1284p \
   b-l072z-lrwan1 \
+  bastwan \
   blackpill \
   blackpill-128kib \
   bluepill \

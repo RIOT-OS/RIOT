@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano-33-iot \
     arduino-zero \
     b-l072z-lrwan1 \
+    bastwan \
     blackpill \
     blackpill-128kib \
     bluepill \

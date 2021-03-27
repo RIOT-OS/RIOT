@@ -1,0 +1,1 @@
+include $(RIOTMAKE)/boards/sam0.inc.mk

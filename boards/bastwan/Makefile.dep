@@ -1,0 +1,9 @@
+ifneq (,$(filter netdev_default,$(USEMODULE)))
+  USEMODULE += sx1276
+endif
+
+ifneq (,$(filter saul_default,$(USEMODULE)))
+  USEMODULE += saul_gpio
+endif
+
+include $(RIOTBOARD)/common/makefiles/stdio_cdc_acm.dep.mk
