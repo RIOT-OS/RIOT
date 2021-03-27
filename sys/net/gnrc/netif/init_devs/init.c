@@ -166,4 +166,9 @@ void gnrc_netif_init_devs(void)
         extern void auto_init_nrf802154(void);
         auto_init_nrf802154();
     }
+
+    if (IS_USED(MODULE_SX126X)) {
+        extern void auto_init_sx126x(void);
+        auto_init_sx126x();
+    }
 }
