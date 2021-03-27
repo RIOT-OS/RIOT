@@ -173,9 +173,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 #endif
         /* start of TX won't finish until no data in UDRn and transmit shift
            register is empty */
-        unsigned long state = irq_disable();
         avr8_uart_tx_set_pending(uart);
-        irq_restore(state);
         dev[uart]->DR = data[i];
     }
 }
