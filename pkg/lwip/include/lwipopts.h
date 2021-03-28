@@ -171,6 +171,15 @@ extern "C" {
 #define MEM_SIZE                (TCPIP_THREAD_STACKSIZE + 6144)
 #endif
 
+#ifdef DEVELHELP
+void sys_mark_tcpip_thread(void);
+#define LWIP_MARK_TCPIP_THREAD sys_mark_tcpip_thread
+
+bool sys_check_core_locked(void);
+#define LWIP_ASSERT_CORE_LOCKED() \
+    LWIP_ASSERT("Core lock held", sys_check_core_locked())
+#endif
+
 /** @} */
 
 #ifdef __cplusplus
