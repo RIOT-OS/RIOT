@@ -38,12 +38,10 @@
 #define ENABLE_DEBUG_VERBOSE    0
 #include "debug.h"
 
-#if IS_USED(MODULE_STM32_ETH_LINK_UP)
 #include "xtimer.h"
 #define STM32_ETH_LINK_UP_TIMEOUT_US    (1UL * US_PER_SEC)
 
 static xtimer_t _link_status_timer;
-#endif /* IS_USED(MODULE_STM32_ETH_LINK_UP)  */
 
 /* Set the value of the divider with the clock configured */
 #if !defined(CLOCK_CORECLOCK) || CLOCK_CORECLOCK < (20000000U)
@@ -108,10 +106,8 @@ static char rx_buffer[ETH_RX_DESCRIPTOR_COUNT][ETH_RX_BUFFER_SIZE];
 /* Netdev used in RIOT's API to upper layer */
 netdev_t *stm32_eth_netdev;
 
-#if IS_USED(MODULE_STM32_ETH_LINK_UP)
 /* Used for checking the link status */
 static uint8_t _link_state = LINK_STATE_DOWN;
-#endif /* IS_USED(MODULE_STM32_ETH_LINK_UP) */
 
 static void _debug_tx_descriptor_info(unsigned line)
 {
@@ -312,7 +308,6 @@ static int stm32_eth_get(netdev_t *dev, netopt_t opt,
     return res;
 }
 
-#if IS_USED(MODULE_STM32_ETH_LINK_UP)
 static void _timer_cb(void *arg)
 {
     netdev_t *dev = (netdev_t *)arg;
@@ -329,14 +324,12 @@ static void _timer_cb(void *arg)
 
     xtimer_set(&_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_US);
 }
-#endif /* IS_USED(MODULE_STM32_ETH_LINK_UP) */
 
 static bool _phy_can_negotiate(void)
 {
     return (_mii_reg_read(MII_BMSR) & MII_BMSR_HAS_AN);
 }
 
-#if IS_USED(MODULE_STM32_ETH_AUTO)
 static void _complete_auto_negotiation(void)
 {
     /* first, wait until auto-negotiation really has completed */
@@ -375,7 +368,6 @@ static void _complete_auto_negotiation(void)
           (maccr & ETH_MACCR_DM) ? "full" : "half");
     ETH->MACCR = maccr;
 }
-#endif /* IS_USED(MODULE_STM32_ETH_AUTO) */
 
 static void _setup_phy(void)
 {
@@ -416,11 +408,11 @@ static void _setup_phy(void)
 static int stm32_eth_init(netdev_t *netdev)
 {
     (void)netdev;
-#if IS_USED(MODULE_STM32_ETH_LINK_UP)
-    _link_status_timer.callback = _timer_cb;
-    _link_status_timer.arg = netdev;
-    xtimer_set(&_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_US);
-#endif
+    if (IS_USED(MODULE_STM32_ETH_LINK_UP)) {
+        _link_status_timer.callback = _timer_cb;
+        _link_status_timer.arg = netdev;
+        xtimer_set(&_link_status_timer, STM32_ETH_LINK_UP_TIMEOUT_US);
+    }
 
     /* The PTP clock is initialized prior to the netdevs and will have already
      * initialized the common stuff, if used.*/
@@ -690,26 +682,26 @@ void stm32_eth_isr_eth_wkup(void)
 
 static void stm32_eth_isr(netdev_t *netdev)
 {
-#if IS_USED(MODULE_STM32_ETH_LINK_UP)
-    switch (_link_state) {
-    case LINK_STATE_UP:
-        DEBUG("[stm32_eth] Link UP\n");
-        if (IS_USED(MODULE_STM32_ETH_AUTO)) {
-            /* Complete auto-negotiation of the link */
-            _complete_auto_negotiation();
+    if (IS_USED(MODULE_STM32_ETH_LINK_UP)) {
+        switch (_link_state) {
+        case LINK_STATE_UP:
+            DEBUG("[stm32_eth] Link UP\n");
+            if (IS_USED(MODULE_STM32_ETH_AUTO)) {
+                /* Complete auto-negotiation of the link */
+                _complete_auto_negotiation();
+            }
+            netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
+            _link_state = LINK_STATE_NOTIFIED_UP;
+            return;
+        case LINK_STATE_DOWN:
+            DEBUG("[stm32_eth] Link DOWN\n");
+            netdev->event_callback(netdev, NETDEV_EVENT_LINK_DOWN);
+            _link_state = LINK_STATE_NOTIFIED_DOWN;
+            return;
+        default:
+            break;
         }
-        netdev->event_callback(netdev, NETDEV_EVENT_LINK_UP);
-        _link_state = LINK_STATE_NOTIFIED_UP;
-        return;
-    case LINK_STATE_DOWN:
-        DEBUG("[stm32_eth] Link DOWN\n");
-        netdev->event_callback(netdev, NETDEV_EVENT_LINK_DOWN);
-        _link_state = LINK_STATE_NOTIFIED_DOWN;
-        return;
-    default:
-        break;
     }
-#endif
 
     netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
