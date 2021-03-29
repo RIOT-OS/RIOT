@@ -164,7 +164,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
          * DHCPv6 instead */
 
         /* TODO: How will this flag be used? */
-        netif->aac_mode |= GNRC_NETIF_AAC_DHCP;
+        netif->ipv6.aac_mode |= GNRC_NETIF_AAC_DHCP;
     }
 }
 
