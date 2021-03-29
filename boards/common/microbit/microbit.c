@@ -137,7 +137,7 @@ static const uint8_t pixmap[ROWS][COLS] = {
 /**
  * @brief   Timer dev
  */
-#define TIMER_DEV_NUM       (1)
+#define TIMER_DEV_NUM       (2)
 #else
 #error "Module only compatible with microbit and microbit-v2 boards."
 #endif
