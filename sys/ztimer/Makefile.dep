@@ -70,6 +70,10 @@ ifneq (,$(filter ztimer_periph_rtt,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
 
+ifneq (,$(filter ztimer_periph_ptp,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_ptp_timer
+endif
+
 ifneq (,$(filter ztimer_convert_frac,$(USEMODULE)))
   USEMODULE += frac
 endif
