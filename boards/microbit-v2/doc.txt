@@ -39,4 +39,8 @@ usually available on /dev/ttyACM0. Use the `term` target to access stdio:
 BOARD=microbit make term
 ```
 
+## Display
+
+The 5x5 LED matrix display can be driven using the @ref boards_common_microbit.
+
  */
