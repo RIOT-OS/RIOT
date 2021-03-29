@@ -61,10 +61,10 @@
 #endif /* !STM32_PTPSSIR */
 
 /**
- * @brief   Return the result of x / y, scientifically rounded
+ * @brief   Return the rounded result of x / y
  * @param   x       Number to divide
  * @param   y       @p x should be divided by this
- * @return  x/y, scientifically rounded
+ * @return  x/y, rounded to the nearest integer, using "round half up" rule
  * @pre     Both @p x and @p y are compile time constant integers and the
  *          expressions are evaluated without side-effects
  */
