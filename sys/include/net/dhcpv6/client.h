@@ -141,6 +141,8 @@ void dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len);
 /**
  * @brief   Configures the client to request non-temporary addresses for a network
  *          interface from a server
+ * @note    For WPAN meshes a DHCPv6 relay (which is not implemented in RIOT yet) is
+ *          required
  *
  * @param[in] netif     The interface to request non-temporaty addresses for.
  */
