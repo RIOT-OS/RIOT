@@ -76,7 +76,9 @@ static const timer_conf_t timer_config[] = {
  * @name    RTT configuration
  * @{
  */
+#ifndef RTT_FREQUENCY
 #define RTT_FREQUENCY       (1U)        /* 1Hz */
+#endif
 /** @} */
 
 /**
