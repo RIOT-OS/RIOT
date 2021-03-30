@@ -147,6 +147,10 @@ ifneq (,$(filter slipdev_%,$(USEMODULE)))
   USEMODULE += slipdev
 endif
 
+ifneq (,$(filter soft_spi_as_periph_spi,$(USEMODULE)))
+  USEMODULE += soft_spi
+endif
+
 ifneq (,$(filter sx127%,$(USEMODULE)))
   USEMODULE += sx127x
 endif

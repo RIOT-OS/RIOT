@@ -31,6 +31,9 @@
 #ifdef MODULE_PERIPH_INIT_SPI
 #include "periph/spi.h"
 #endif
+#ifdef MODULE_PERIPH_INIT_SOFT_SPI
+#include "soft_spi.h"
+#endif
 #ifdef MODULE_PERIPH_INIT_RTC
 #include "periph/rtc.h"
 #endif
@@ -65,6 +68,12 @@ void periph_init(void)
 #ifdef MODULE_PERIPH_INIT_SPI
     for (unsigned i = 0; i < SPI_NUMOF; i++) {
         spi_init(SPI_DEV(i));
+    }
+#endif
+
+#ifdef MODULE_PERIPH_INIT_SOFT_SPI
+    for (unsigned i = 0; i < SOFT_SPI_NUMOF; i++) {
+        soft_spi_init(SOFT_SPI_DEV(i));
     }
 #endif
 

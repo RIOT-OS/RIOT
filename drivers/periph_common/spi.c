@@ -25,7 +25,7 @@
 #include "cpu.h"
 #include "periph/spi.h"
 
-#ifdef SPI_NUMOF
+#if defined(SPI_NUMOF) && !defined(MODULE_SOFT_SPI_AS_PERIPH_SPI)
 
 #ifdef PERIPH_SPI_NEEDS_INIT_CS
 int spi_init_cs(spi_t bus, spi_cs_t cs)
