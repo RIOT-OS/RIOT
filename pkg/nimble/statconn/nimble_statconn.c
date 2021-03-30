@@ -27,6 +27,15 @@
 
 #include "host/ble_hs.h"
 
+#if NIMBLE_STATCONN_CONN_ITVL_MIN_MS != NIMBLE_STATCONN_CONN_ITVL_MAX_MS
+#include "random.h"
+
+/* sanity check on the conn interval range to catch configuration errors */
+#if NIMBLE_STATCONN_CONN_ITVL_MIN_MS > NIMBLE_STATCONN_CONN_ITVL_MAX_MS
+#error "nimble_statconn: CONN_ITVL_MIN_MS must be <= CONN_ITVL_MAX_MS"
+#endif
+#endif
+
 #define ENABLE_DEBUG    0
 #include "debug.h"
 
@@ -82,6 +91,17 @@ static void _activate(uint8_t role)
         ble_addr_t peer;
         peer.type = BLE_ADDR_RANDOM;
         bluetil_addr_swapped_cp(slot->addr, peer.val);
+        /* compute a random new random connection interval if configured */
+#if NIMBLE_STATCONN_CONN_ITVL_MIN_MS != NIMBLE_STATCONN_CONN_ITVL_MAX_MS
+        uint32_t itvl = random_uint32_range(NIMBLE_STATCONN_CONN_ITVL_MIN_MS,
+                                            NIMBLE_STATCONN_CONN_ITVL_MAX_MS);
+        _conn_params.itvl_min = BLE_GAP_CONN_ITVL_MS(itvl);
+#else
+        _conn_params.itvl_min = BLE_GAP_CONN_ITVL_MS(
+                                            NIMBLE_STATCONN_CONN_ITVL_MIN_MS);
+#endif
+        _conn_params.itvl_max = _conn_params.itvl_min;
+        /* try to (re)open the connection */
         nimble_netif_connect(&peer, &_conn_params, _conn_timeout);
     }
     else if (slot && (role == ROLE_S)) {
@@ -185,8 +205,6 @@ void nimble_statconn_init(void)
     /* set connection parameters */
     _conn_params.scan_itvl = BLE_GAP_SCAN_ITVL_MS(NIMBLE_STATCONN_CONN_WIN_MS);
     _conn_params.scan_window = _conn_params.scan_itvl;
-    _conn_params.itvl_min = BLE_GAP_CONN_ITVL_MS(NIMBLE_STATCONN_CONN_ITVL_MS);
-    _conn_params.itvl_max = _conn_params.itvl_min;
     _conn_params.latency = NIMBLE_STATCONN_CONN_LATENCY;
     _conn_params.supervision_timeout = BLE_GAP_SUPERVISION_TIMEOUT_MS(
                                                NIMBLE_STATCONN_CONN_SUPERTO_MS);
