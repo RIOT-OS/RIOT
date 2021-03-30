@@ -98,10 +98,15 @@ void __attribute__((weak)) avr8_clk_init(void)
         != (OSC_RC32KRDY_bm | OSC_RC32MRDY_bm)) {}
 
     /* Enable DFLL - defaults to calibrate against internal 32Khz clock */
-    DFLLRC32M.CTRL = DFLL_ENABLE_bm;
+    DFLLRC2M.CTRL = DFLL_ENABLE_bm;
 
     /* Enable DFLL - defaults to calibrate against internal 32Khz clock */
-    DFLLRC2M.CTRL = DFLL_ENABLE_bm;
+    DFLLRC32M.CTRL = DFLL_ENABLE_bm;
+
+    /* Some ATxmega need sync clocks after enable DFLL.  Otherwise clock may
+     * stay at 2MHz source when try enable.
+     */
+    while ((OSC.STATUS & OSC_RC32MRDY_bm) != OSC_RC32MRDY_bm) {}
 
     atxmega_set_prescaler(CPU_ATXMEGA_CLK_SCALE_INIT,
                           CPU_ATXMEGA_BUS_SCALE_INIT);
