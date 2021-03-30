@@ -17,9 +17,6 @@
 #include <sys/uio.h>
 #include <inttypes.h>
 
-#if MODULE_LWIP_DHCP_AUTO
-#include "lwip/dhcp.h"
-#endif
 #include "lwip/err.h"
 #include "lwip/ethip6.h"
 #include "lwip/netif.h"
@@ -297,10 +294,8 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
                 break;
             }
             case NETDEV_EVENT_LINK_UP: {
+                /* Will wake up DHCP state machine */
                 netifapi_netif_set_link_up(netif);
-#ifdef MODULE_LWIP_DHCP_AUTO
-                netifapi_dhcp_start(netif);
-#endif
                 break;
             }
             case NETDEV_EVENT_LINK_DOWN: {
