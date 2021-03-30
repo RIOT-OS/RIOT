@@ -18,11 +18,6 @@
  * @}
  */
 
-/*
- * Make some different functions visible between newlib and newlib-nano
- */
-#define _DEFAULT_SOURCE 1
-
 #include <stdio.h>
 #include "embUnit.h"
 

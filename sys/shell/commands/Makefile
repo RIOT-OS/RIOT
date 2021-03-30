@@ -65,7 +65,9 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
     SRC += sc_gnrc_rpl.c
 endif
 ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
-    SRC += sc_gnrc_6ctx.c
+  # Required for strtok_r in string.h, when building with -std=c99
+  CFLAGS += -D_DEFAULT_SOURCE=1
+  SRC += sc_gnrc_6ctx.c
 endif
 ifneq (,$(filter gnrc_sixlowpan_frag_stats,$(USEMODULE)))
   SRC += sc_gnrc_6lo_frag_stats.c

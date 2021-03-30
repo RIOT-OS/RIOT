@@ -2,6 +2,9 @@ include ../Makefile.tests_common
 
 USEMODULE += embunit
 
+# Make some different functions visible between newlib and newlib-nano
+CFLAGS += -D_DEFAULT_SOURCE=1
+
 include $(RIOTBASE)/Makefile.include
 
 # Compile time tests
