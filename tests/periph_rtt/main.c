@@ -93,8 +93,10 @@ int main(void)
     printf("Setting initial alarm to now + 5 s (%" PRIu32 ")\n", last);
     rtt_set_alarm(last, cb, 0);
 
-    if (rtt_get_alarm() != last) {
-        puts("Error: rtt_get_alarm() not working");
+    uint32_t tmp = rtt_get_alarm();
+    if (tmp != last) {
+        printf("Error: rtt_get_alarm() not working (expected %" PRIu32 " but got %" PRIu32 ")\n",
+               last, tmp);
         return 1;
     }
     else {
