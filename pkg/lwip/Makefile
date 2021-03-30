@@ -15,7 +15,7 @@ LWIP_MODULE_MAKEFILE = $(RIOTBASE)/Makefile.base
 
 CFLAGS += -Wno-address
 
-make_module = +"$(MAKE)" -C $(2) -f $(LWIP_MODULE_MAKEFILE) MODULE=$(1)
+make_module = +$(QQ)"$(MAKE)" -C $(2) -f $(LWIP_MODULE_MAKEFILE) MODULE=$(1)
 
 all: lwip
 

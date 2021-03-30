@@ -6,7 +6,7 @@ PKG_LICENSE  := MIT
 include $(RIOTBASE)/pkg/pkg.mk
 
 all: $(filter libfixmath-unittests,$(USEMODULE))
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/$(PKG_NAME) -f $(CURDIR)/Makefile.$(PKG_NAME)
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/$(PKG_NAME) -f $(CURDIR)/Makefile.$(PKG_NAME)
 
 libfixmath-unittests:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/unittests -f $(CURDIR)/Makefile.$(PKG_NAME)-unittests
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/unittests -f $(CURDIR)/Makefile.$(PKG_NAME)-unittests

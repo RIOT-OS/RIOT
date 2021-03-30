@@ -8,7 +8,7 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -DBLAKE2_NO_UNROLLING
 
 all: $(filter monocypher_optional,$(USEMODULE))
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
 
 monocypher_optional:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/optional -f $(RIOTBASE)/Makefile.base MODULE=$@
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/optional -f $(RIOTBASE)/Makefile.base MODULE=$@

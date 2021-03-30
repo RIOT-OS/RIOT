@@ -10,4 +10,4 @@ include $(RIOTBASE)/pkg/pkg.mk
 CFLAGS += -DKRML_NOUINT128 -Wno-unused-parameter
 
 all:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base

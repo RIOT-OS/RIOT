@@ -6,6 +6,6 @@ PKG_LICENSE=Apache2.0
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/uTensor/core -f $(CURDIR)/Makefile.$(PKG_NAME)
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/uTensor/util -f $(CURDIR)/Makefile.$(PKG_NAME).util
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/uTensor/ops -f $(CURDIR)/Makefile.$(PKG_NAME).ops
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/uTensor/core -f $(CURDIR)/Makefile.$(PKG_NAME)
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/uTensor/util -f $(CURDIR)/Makefile.$(PKG_NAME).util
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/uTensor/ops -f $(CURDIR)/Makefile.$(PKG_NAME).ops
