@@ -234,6 +234,12 @@ PSEUDOMODULES += pn532_spi
 # include variants of sdp3x drivers as pseudo modules
 PSEUDOMODULES += sdp3x_irq
 
+# include variants of SX126X drivers and LLCC68 driver as pseudo modules
+PSEUDOMODULES += sx1261
+PSEUDOMODULES += sx1262
+PSEUDOMODULES += sx1268
+PSEUDOMODULES += llcc68
+
 # include variants of SX127X drivers as pseudo modules
 PSEUDOMODULES += sx1272
 PSEUDOMODULES += sx1276
