@@ -32,62 +32,73 @@
 
 static mutex_t _mutex = MUTEX_INIT_LOCKED;
 
-#define MAX_OFFSET 2
 #define N 5
-#define INTERVAL 100LU
 
 static uint32_t _times[N];
+static int _count;
+#define CLOCKS { ZTIMER_MSEC, ZTIMER_USEC }
+static const char *_names[] = { "ZTIMER_MSEC", "ZTIMER_USEC" };
+static uint32_t _intervals[] = { 100, 10000 };
+static uint32_t _max_offsets[] = { 2, 100 };
 
 static int callback(void *arg)
 {
-    (void)arg;
-    static int count = 0;
+    _times[_count] = ztimer_now(arg);
 
-    _times[count] = ztimer_now(ZTIMER_MSEC);
-
-    count += 1;
+    _count += 1;
 
     /* enable this to test underflow behavior */
 #if 0
     if (count == 2) {
-        ztimer_spin(ZTIMER_MSEC, INTERVAL*2);
+        ztimer_spin(arg, INTERVAL * 2);
     }
 #endif
 
-    if (count == N) {
+    if (_count == N) {
         mutex_unlock(&_mutex);
     }
 
-    return (count == N);
+    return (_count == N);
 }
 
 int main(void)
 {
     ztimer_periodic_t t;
-
-    ztimer_periodic_init(ZTIMER_MSEC, &t, callback, NULL, INTERVAL);
-    uint32_t last = ztimer_now(ZTIMER_MSEC);
-
-    ztimer_periodic_start(&t);
-
-    if (!ztimer_is_set(ZTIMER_MSEC, &t.timer)) {
-        print_str("Test failed\n");
-        return 1;
-    }
-
-    /* wait for periodic to trigger N times */
-    mutex_lock(&_mutex);
-
+    ztimer_clock_t * const clocks[] = CLOCKS;
     int failed = 0;
 
-    for (unsigned i = 0; i < N; i++) {
-        uint32_t offset = labs((int32_t)(_times[i] - INTERVAL - last));
-        printf("i: %u time: %" PRIu32 " offset: %" PRIu32 "\n",
-               i, _times[i], offset);
-        if (offset > MAX_OFFSET) {
-            failed = 1;
+    for (size_t j = 0; j < ARRAY_SIZE(clocks); j++) {
+        printf("Testing clock: %s\n", _names[j]);
+        ztimer_clock_t *clock = clocks[j];
+        ztimer_periodic_init(clock, &t, callback, clock, _intervals[j]);
+
+        _count = 0;
+        ztimer_periodic_start(&t);
+        /* ztimer_periodic_start stores the value of ztimer_now() + period into t.last. We use that
+         * value instead of calling ztimer_now() again, as on slow boards the introduced offset can
+         * result in a failing test, despite the timeout actually being triggered close enough
+         * to the target. */
+        uint32_t last = t.last - _intervals[j];
+
+        if (!ztimer_is_set(clock, &t.timer)) {
+            print_str("Test failed\n");
+            return 1;
         }
-        last = _times[i];
+
+        /* wait for periodic to trigger N times */
+        mutex_lock(&_mutex);
+
+        for (unsigned i = 0; i < N; i++) {
+            uint32_t offset = labs((int32_t)(_times[i] - _intervals[j] - last));
+            printf("i: %u time: %" PRIu32 " offset: %" PRIu32 "\n",
+                   i, _times[i], offset);
+            if (offset > _max_offsets[j]) {
+                failed = 1;
+            }
+            last = _times[i];
+        }
+
+        ztimer_periodic_stop(&t);
     }
 
     if (!failed) {
