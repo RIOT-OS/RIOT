@@ -1,0 +1,24 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config CPU_FAM_WL
+    bool
+    select CPU_STM32
+    select CPU_CORE_CORTEX_M4
+    select HAS_CPU_STM32WL
+    select HAS_PERIPH_FLASHPAGE
+    select HAS_PERIPH_FLASHPAGE_PAGEWISE
+    select HAS_PERIPH_WDT
+    select HAS_BOOTLOADER_STM32
+
+config CPU_FAM
+    default "wl" if CPU_FAM_WL
+
+config HAS_CPU_STM32WL
+    bool
+    help
+        Indicates that the cpu being used belongs to the 'stm32wl' family.

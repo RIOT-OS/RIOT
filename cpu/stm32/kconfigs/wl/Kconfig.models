@@ -1,0 +1,74 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+# This file was auto-generated from ST ProductsList.xlsx sheet using the
+# script in cpu/stm32/dist/kconfig/gen_kconfig.py
+# See cpu/stm32/dist/kconfig/README.md for details
+
+# CPU models
+config CPU_MODEL_STM32WL54CC
+    bool
+    select CPU_LINE_STM32WL54XX
+
+config CPU_MODEL_STM32WL54JC
+    bool
+    select CPU_LINE_STM32WL54XX
+
+config CPU_MODEL_STM32WL55CC
+    bool
+    select CPU_LINE_STM32WL55XX
+
+config CPU_MODEL_STM32WL55JC
+    bool
+    select CPU_LINE_STM32WL55XX
+
+config CPU_MODEL_STM32WLE4CC
+    bool
+    select CPU_LINE_STM32WLE4XX
+
+config CPU_MODEL_STM32WLE4JC
+    bool
+    select CPU_LINE_STM32WLE4XX
+
+config CPU_MODEL_STM32WLE5C8
+    bool
+    select CPU_LINE_STM32WLE5XX
+
+config CPU_MODEL_STM32WLE5CB
+    bool
+    select CPU_LINE_STM32WLE5XX
+
+config CPU_MODEL_STM32WLE5CC
+    bool
+    select CPU_LINE_STM32WLE5XX
+
+config CPU_MODEL_STM32WLE5J8
+    bool
+    select CPU_LINE_STM32WLE5XX
+
+config CPU_MODEL_STM32WLE5JB
+    bool
+    select CPU_LINE_STM32WLE5XX
+
+config CPU_MODEL_STM32WLE5JC
+    bool
+    select CPU_LINE_STM32WLE5XX
+
+# Configure CPU model
+config CPU_MODEL
+    default "stm32wl54cc" if CPU_MODEL_STM32WL54CC
+    default "stm32wl54jc" if CPU_MODEL_STM32WL54JC
+    default "stm32wl55cc" if CPU_MODEL_STM32WL55CC
+    default "stm32wl55jc" if CPU_MODEL_STM32WL55JC
+    default "stm32wle4cc" if CPU_MODEL_STM32WLE4CC
+    default "stm32wle4jc" if CPU_MODEL_STM32WLE4JC
+    default "stm32wle5c8" if CPU_MODEL_STM32WLE5C8
+    default "stm32wle5cb" if CPU_MODEL_STM32WLE5CB
+    default "stm32wle5cc" if CPU_MODEL_STM32WLE5CC
+    default "stm32wle5j8" if CPU_MODEL_STM32WLE5J8
+    default "stm32wle5jb" if CPU_MODEL_STM32WLE5JB
+    default "stm32wle5jc" if CPU_MODEL_STM32WLE5JC
