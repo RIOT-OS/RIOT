@@ -5,7 +5,7 @@ endif
 #
 # enable second expansion of prerequisites.
 #
-# Doing that here enables it globally for all modules and the application.
+# Doing that here enables it globally for all modules
 #
 # See https://www.gnu.org/software/make/manual/html_node/Secondary-Expansion.html
 # for what it can be used for.

@@ -8,6 +8,15 @@ ifeq (,$(filter $(MATCH_MAKE_VERSION),$(MAKE_VERSION)))
       $(MATCH_MAKE_VERSION) or later.)
 endif
 
+#
+# enable second expansion of prerequisites.
+#
+# Doing that here enables it globally for all applications.
+#
+# See https://www.gnu.org/software/make/manual/html_node/Secondary-Expansion.html
+# for what it can be used for.
+.SECONDEXPANSION:
+
 # Will evaluate to the absolute path of the Makefile it's evaluated in.¹
 #
 # This variable MUST be immediately evaluated (tmp_var := $(LAST_MAKEFILEDIR))
