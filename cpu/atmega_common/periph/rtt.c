@@ -445,7 +445,7 @@ void rtt_poweroff(void)
 }
 
 #if RTT_BACKEND_SC
-ISR(SCNT_OVFL_vect)
+ISR(SCNT_OVFL_vect, ISR_NAKED)
 {
     avr8_enter_isr();
     /* Execute callback */
@@ -456,7 +456,7 @@ ISR(SCNT_OVFL_vect)
     avr8_exit_isr();
 }
 #else
-ISR(TIMER2_OVF_vect)
+ISR(TIMER2_OVF_vect, ISR_NAKED)
 {
     avr8_enter_isr();
 
@@ -484,9 +484,9 @@ ISR(TIMER2_OVF_vect)
 #endif
 
 #if RTT_BACKEND_SC
-ISR(SCNT_CMP2_vect)
+ISR(SCNT_CMP2_vect, ISR_NAKED)
 #else
-ISR(TIMER2_COMPA_vect)
+ISR(TIMER2_COMPA_vect, ISR_NAKED)
 #endif
 {
     avr8_enter_isr();

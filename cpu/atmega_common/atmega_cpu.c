@@ -95,7 +95,7 @@ ISR(BADISR_vect)
 }
 
 #if defined(CPU_ATMEGA128RFA1) || defined (CPU_ATMEGA256RFR2)
-ISR(BAT_LOW_vect, ISR_BLOCK)
+ISR(BAT_LOW_vect, ISR_NAKED)
 {
     avr8_enter_isr();
     DEBUG("BAT_LOW\n");

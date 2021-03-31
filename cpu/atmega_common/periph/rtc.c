@@ -32,7 +32,7 @@ static rtc_alarm_cb_t alarm_cb;
 static void *alarm_cb_arg;
 
 /* will be called every second */
-ISR(TIMER2_OVF_vect)
+ISR(TIMER2_OVF_vect, ISR_NAKED)
 {
     avr8_enter_isr();
 
