@@ -24,10 +24,48 @@ tests/driver_mq3 tests/driver_my9221 tests/driver_nvram_spi tests/mtd_flashpage
 tests/mtd_mapper tests/driver_o* tests/driver_p* tests/driver_q*
 tests/driver_r* tests/driver_s* tests/driver_t* tests/driver_u*
 tests/driver_v*"}
-: ${TEST_KCONFIG_native:="examples/hello-world tests/periph_* tests/sys_crypto
-tests/test_tools tests/congure_* tests/prng_* tests/xtimer_* tests/ztimer_*
-tests/driver_ws281x tests/posix_sleep tests/pkg_umorse tests/cb_mux* tests/eepreg
-tests/shell tests/struct_tm_utility"}
+: ${TEST_KCONFIG_native:="examples/hello-world
+tests/cb_mux*
+tests/congure_*
+tests/driver_ws281x
+tests/eepreg
+tests/periph_*
+tests/pkg_c25519
+tests/pkg_cayenne-lpp
+tests/pkg_cifra
+tests/pkg_cn-cbor
+tests/pkg_emlearn
+tests/pkg_hacl
+tests/pkg_heatshrink
+tests/pkg_jsmn
+tests/pkg_libb2
+tests/pkg_libcose
+tests/pkg_libfixmath
+tests/pkg_libhydrogen
+tests/pkg_lora-serialization
+tests/pkg_micro-ecc
+tests/pkg_minmea
+tests/pkg_monocypher
+tests/pkg_nanocbor
+tests/pkg_nanopb
+tests/pkg_qDSA
+tests/pkg_qcbor
+tests/pkg_relic
+tests/pkg_tiny-asn1
+tests/pkg_tinycbor
+tests/pkg_tinycrypt
+tests/pkg_tweetnacl
+tests/pkg_umorse
+tests/pkg_yxml
+tests/posix_sleep
+tests/prng_*
+tests/shell
+tests/struct_tm_utility
+tests/sys_crypto
+tests/test_tools
+tests/xtimer_*
+tests/ztimer_*
+"}
 
 : ${TEST_WITH_CONFIG_SUPPORTED:="examples/suit_update tests/driver_at86rf2xx_aes"}
 
