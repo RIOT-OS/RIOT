@@ -154,6 +154,9 @@ int rtc_get_time(struct tm *ttime)
     }
     _native_syscall_leave();
 
+    /* riot does not handle dst */
+    ttime->tm_isdst=0;
+
     return 0;
 }
 
