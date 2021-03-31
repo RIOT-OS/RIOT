@@ -7,6 +7,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega1284p \
     atmega256rfr2-xpro \
     atmega328p \
+    atmega328p-xplained-mini \
     avr-rss2 \
     blackpill \
     bluepill \

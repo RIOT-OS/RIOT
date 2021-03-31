@@ -5,6 +5,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega328p \
+    atmega328p-xplained-mini \
     cc2650stk \
     maple-mini \
     mbed_lpc1768 \

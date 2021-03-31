@@ -4,6 +4,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega328p \
+    atmega328p-xplained-mini \
     i-nucleo-lrwan1 \
     msb-430 \
     msb-430h \

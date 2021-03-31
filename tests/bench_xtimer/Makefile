@@ -80,6 +80,7 @@ SUPER_LOW_MEMORY_BOARDS += \
   arduino-nano \
   arduino-uno \
   atmega328p \
+  atmega328p-xplained-mini \
   nucleo-f031k6 \
   stm32f030f4-demo \
   #

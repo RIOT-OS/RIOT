@@ -6,6 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega1284p \
     atmega328p \
+    atmega328p-xplained-mini \
     bluepill-stm32f030c8 \
     derfmega128 \
     i-nucleo-lrwan1 \
