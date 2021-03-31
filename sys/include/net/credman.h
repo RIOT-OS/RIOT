@@ -230,7 +230,7 @@ int credman_load_public_key(const uint8_t *buf, size_t buf_len, ecdsa_public_key
 int credman_load_private_key(const uint8_t *buf, size_t buf_len, credman_credential_t *cred);
 
 /**
- * @brief Load an ECC rivate key from a buffer, as an `ECPrivateKey` sequence, according to RFC5915.
+ * @brief Load an ECC private key from a buffer, as an `ECPrivateKey` sequence, according to RFC5915.
  *        If the optional respective public key is present, it will be loaded as well. The key
  *        should be encoded in DER format.
  *
