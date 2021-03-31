@@ -1697,6 +1697,9 @@ static gnrc_pktsnip_t * _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool pus
 #if IS_USED(MODULE_GNRC_TX_SYNC)
         gnrc_pktbuf_release(tx_sync);
 #endif
+#if IS_USED(MODULE_GNRC_NETIF_PKTQ)
+        gnrc_pktbuf_release(pkt);
+#endif
         return _tx_succeeded(netif, res);
     }
     /* modern API, outgoing frame needs still to be released upon TX completion */
