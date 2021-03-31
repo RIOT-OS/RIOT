@@ -7,9 +7,11 @@
 
 config PACKAGE_DRIVER_BME680
     bool "BME680 sensor driver package"
+    depends on TEST_KCONFIG
     select MODULE_DRIVER_BME680_CONTRIB
 
 config MODULE_DRIVER_BME680_CONTRIB
     bool
+    depends on TEST_KCONFIG
     help
         RIOT integration code for the BME680 package.

@@ -1,0 +1,19 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig PACKAGE_TINYCBOR
+    bool "Tiny CBOR encode/decoder package"
+    depends on TEST_KCONFIG
+    depends on HAS_ARCH_32BIT
+    help
+        TinyCBOR is a CBOR encoder and decoder with a very small
+        footprint, optimized for very fast operation.
+
+config MODULE_TINYCBOR_FLOAT
+    bool "Float support for Tiny CBOR"
+    depends on TEST_KCONFIG
+    depends on PACKAGE_TINYCBOR
