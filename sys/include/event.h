@@ -106,6 +106,10 @@
 #include "thread_flags.h"
 #include "ptrtag.h"
 
+#if IS_USED(MODULE_ZTIMER)
+#include "ztimer.h"
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -333,7 +337,7 @@ static inline event_t *event_wait(event_queue_t *queue)
     return event_wait_multi(queue, 1);
 }
 
-#if defined(MODULE_XTIMER) || defined(DOXYGEN)
+#if IS_USED(MODULE_XTIMER) || defined(DOXYGEN)
 /**
  * @brief   Get next event from event queue, blocking until timeout expires
  *
@@ -355,6 +359,25 @@ event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout);
  * @return      NULL if timeout expired before an event was posted
  */
 event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout);
+#endif
+
+#if IS_USED(MODULE_ZTIMER) || defined(DOXYGEN)
+/**
+ * @brief   Get next event from event queue, blocking until timeout expires
+ *
+ * This function is the same as event_wait_timeout() with the difference that it
+ * uses ztimer instead of xtimer as timer backend.
+ *
+ * @param[in]   queue    queue to query for an event
+ * @param[in]   clock    ztimer clock to use
+ * @param[in]   timeout  maximum time to wait for an event, time unit depends
+ *                       on the used ztimer clock
+ *
+ * @return      pointer to next event if event was taken from the queue
+ * @return      NULL if timeout expired before an event was posted
+ */
+event_t *event_wait_timeout_ztimer(event_queue_t *queue,
+                                   ztimer_clock_t *clock, uint32_t timeout);
 #endif
 
 /**

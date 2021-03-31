@@ -29,7 +29,7 @@
 #include "clist.h"
 #include "thread.h"
 
-#ifdef MODULE_XTIMER
+#if IS_USED(MODULE_XTIMER)
 #include "xtimer.h"
 #endif
 
@@ -96,8 +96,8 @@ event_t *event_wait_multi(event_queue_t *queues, size_t n_queues)
     return result;
 }
 
-#ifdef MODULE_XTIMER
-static event_t *_wait_timeout(event_queue_t *queue, xtimer_t *timer)
+#if IS_USED(MODULE_XTIMER) || IS_USED(MODULE_ZTIMER)
+static event_t *_wait_timeout(event_queue_t *queue)
 {
     assert(queue);
     event_t *result;
@@ -106,10 +106,19 @@ static event_t *_wait_timeout(event_queue_t *queue, xtimer_t *timer)
     do {
         result = event_get(queue);
         if (result == NULL) {
-            flags = thread_flags_wait_any(THREAD_FLAG_EVENT | THREAD_FLAG_TIMEOUT);
+            flags = thread_flags_wait_any(THREAD_FLAG_EVENT |
+                                          THREAD_FLAG_TIMEOUT);
         }
     } while ((result == NULL) && (flags & THREAD_FLAG_EVENT));
 
+    return result;
+}
+#endif
+
+#if IS_USED(MODULE_XTIMER)
+static event_t *_wait_timeout_xtimer(event_queue_t *queue, xtimer_t *timer)
+{
+    event_t *result = _wait_timeout(queue);
     if (result) {
         xtimer_remove(timer);
     }
@@ -121,15 +130,34 @@ event_t *event_wait_timeout(event_queue_t *queue, uint32_t timeout)
 {
     xtimer_t timer;
 
+    thread_flags_clear(THREAD_FLAG_TIMEOUT);
     xtimer_set_timeout_flag(&timer, timeout);
-    return _wait_timeout(queue, &timer);
+    return _wait_timeout_xtimer(queue, &timer);
 }
 
 event_t *event_wait_timeout64(event_queue_t *queue, uint64_t timeout)
 {
     xtimer_t timer;
 
+    thread_flags_clear(THREAD_FLAG_TIMEOUT);
     xtimer_set_timeout_flag64(&timer, timeout);
-    return _wait_timeout(queue, &timer);
+    return _wait_timeout_xtimer(queue, &timer);
+}
+#endif
+
+#if IS_USED(MODULE_ZTIMER)
+event_t *event_wait_timeout_ztimer(event_queue_t *queue,
+                                   ztimer_clock_t *clock, uint32_t timeout)
+{
+    ztimer_t timer;
+    event_t *result;
+
+    thread_flags_clear(THREAD_FLAG_TIMEOUT);
+    ztimer_set_timeout_flag(clock, &timer, timeout);
+    result = _wait_timeout(queue);
+    if (result) {
+        ztimer_remove(clock, &timer);
+    }
+    return result;
 }
 #endif
