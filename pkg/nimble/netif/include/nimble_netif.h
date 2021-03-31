@@ -241,6 +241,21 @@ int nimble_netif_accept_stop(void);
 int nimble_netif_update(int handle,
                         const struct ble_gap_upd_params *conn_params);
 
+/**
+ * @brief   Get the currently used channel map for the given connection as
+ *          bitmap
+ *
+ * @param[in] handle        connection handle
+ * @param[out] map          used channel map, map[0] denotes channels 0 to 7,
+ *                          map[1] chan 8-15, ..., map[5] channels 33 to 36.
+ *                          **must** be able to hold 5 bytes.
+ *
+ * @return  NIMBLE_NETIF_OK on success
+ * @return  NIMBLE_NETIF_NOTCONN if handle dos not point to a connection
+ * @return  NIMBLE_NETIF_DEVERR if reading the channel map failed otherwise
+ */
+int nimble_netif_used_chanmap(int handle, uint8_t map[5]);
+
 #ifdef __cplusplus
 }
 #endif
