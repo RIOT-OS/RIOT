@@ -314,10 +314,8 @@ void timer_start(tim_t tim)
 }
 
 #ifdef TIMER_NUMOF
-static inline void _isr(tim_t tim, int channel)
+static inline void _tmr_isr(tim_t tim, int channel)
 {
-    avr8_enter_isr();
-
     DEBUG("timer %d _isr channel %d\n", tim, channel);
 
     if (is_oneshot(tim, channel)) {
@@ -327,207 +325,269 @@ static inline void _isr(tim_t tim, int channel)
     if (ctx[tim].cb) {
         ctx[tim].cb(ctx[tim].arg, channel);
     }
-
-    avr8_exit_isr();
 }
 #endif
 
 #ifdef TIMER_0_ISRA
-ISR(TIMER_0_ISRA, ISR_BLOCK)
+ISR(TIMER_0_ISRA, ISR_NAKED)
 {
-    _isr(0, 0);
+    avr8_enter_isr();
+    _tmr_isr(0, 0);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_0_ISRB
-ISR(TIMER_0_ISRB, ISR_BLOCK)
+ISR(TIMER_0_ISRB, ISR_NAKED)
 {
-    _isr(0, 1);
+    avr8_enter_isr();
+    _tmr_isr(0, 1);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_0_ISRC
-ISR(TIMER_0_ISRC, ISR_BLOCK)
+ISR(TIMER_0_ISRC, ISR_NAKED)
 {
-    _isr(0, 2);
+    avr8_enter_isr();
+    _tmr_isr(0, 2);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_0_ISRD
-ISR(TIMER_0_ISRD, ISR_BLOCK)
+ISR(TIMER_0_ISRD, ISR_NAKED)
 {
-    _isr(0, 3);
+    avr8_enter_isr();
+    _tmr_isr(0, 3);
+    avr8_exit_isr();
 }
 #endif /* TIMER_0 */
 
 #ifdef TIMER_1_ISRA
-ISR(TIMER_1_ISRA, ISR_BLOCK)
+ISR(TIMER_1_ISRA, ISR_NAKED)
 {
-    _isr(1, 0);
+    avr8_enter_isr();
+    _tmr_isr(1, 0);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_1_ISRB
-ISR(TIMER_1_ISRB, ISR_BLOCK)
+ISR(TIMER_1_ISRB, ISR_NAKED)
 {
-    _isr(1, 1);
+    avr8_enter_isr();
+    _tmr_isr(1, 1);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_1_ISRC
-ISR(TIMER_1_ISRC, ISR_BLOCK)
+ISR(TIMER_1_ISRC, ISR_NAKED)
 {
-    _isr(1, 2);
+    avr8_enter_isr();
+    _tmr_isr(1, 2);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_1_ISRD
-ISR(TIMER_1_ISRD, ISR_BLOCK)
+ISR(TIMER_1_ISRD, ISR_NAKED)
 {
-    _isr(1, 3);
+    avr8_enter_isr();
+    _tmr_isr(1, 3);
+    avr8_exit_isr();
 }
 #endif /* TIMER_1 */
 
 #ifdef TIMER_2_ISRA
-ISR(TIMER_2_ISRA, ISR_BLOCK)
+ISR(TIMER_2_ISRA, ISR_NAKED)
 {
-    _isr(2, 0);
+    avr8_enter_isr();
+    _tmr_isr(2, 0);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_2_ISRB
-ISR(TIMER_2_ISRB, ISR_BLOCK)
+ISR(TIMER_2_ISRB, ISR_NAKED)
 {
-    _isr(2, 1);
+    avr8_enter_isr();
+    _tmr_isr(2, 1);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_2_ISRC
-ISR(TIMER_2_ISRC, ISR_BLOCK)
+ISR(TIMER_2_ISRC, ISR_NAKED)
 {
-    _isr(2, 2);
+    avr8_enter_isr();
+    _tmr_isr(2, 2);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_2_ISRD
-ISR(TIMER_2_ISRD, ISR_BLOCK)
+ISR(TIMER_2_ISRD, ISR_NAKED)
 {
-    _isr(2, 3);
+    avr8_enter_isr();
+    _tmr_isr(2, 3);
+    avr8_exit_isr();
 }
 #endif /* TIMER_2 */
 
 #ifdef TIMER_3_ISRA
-ISR(TIMER_3_ISRA, ISR_BLOCK)
+ISR(TIMER_3_ISRA, ISR_NAKED)
 {
-    _isr(3, 0);
+    avr8_enter_isr();
+    _tmr_isr(3, 0);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_3_ISRB
-ISR(TIMER_3_ISRB, ISR_BLOCK)
+ISR(TIMER_3_ISRB, ISR_NAKED)
 {
-    _isr(3, 1);
+    avr8_enter_isr();
+    _tmr_isr(3, 1);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_3_ISRC
-ISR(TIMER_3_ISRC, ISR_BLOCK)
+ISR(TIMER_3_ISRC, ISR_NAKED)
 {
-    _isr(3, 2);
+    avr8_enter_isr();
+    _tmr_isr(3, 2);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_3_ISRD
-ISR(TIMER_3_ISRD, ISR_BLOCK)
+ISR(TIMER_3_ISRD, ISR_NAKED)
 {
-    _isr(3, 3);
+    avr8_enter_isr();
+    _tmr_isr(3, 3);
+    avr8_exit_isr();
 }
 #endif /* TIMER_3 */
 
 #ifdef TIMER_4_ISRA
-ISR(TIMER_4_ISRA, ISR_BLOCK)
+ISR(TIMER_4_ISRA, ISR_NAKED)
 {
-    _isr(4, 0);
+    avr8_enter_isr();
+    _tmr_isr(4, 0);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_4_ISRB
-ISR(TIMER_4_ISRB, ISR_BLOCK)
+ISR(TIMER_4_ISRB, ISR_NAKED)
 {
-    _isr(4, 1);
+    avr8_enter_isr();
+    _tmr_isr(4, 1);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_4_ISRC
-ISR(TIMER_4_ISRC, ISR_BLOCK)
+ISR(TIMER_4_ISRC, ISR_NAKED)
 {
-    _isr(4, 2);
+    avr8_enter_isr();
+    _tmr_isr(4, 2);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_4_ISRD
-ISR(TIMER_4_ISRD, ISR_BLOCK)
+ISR(TIMER_4_ISRD, ISR_NAKED)
 {
-    _isr(4, 3);
+    avr8_enter_isr();
+    _tmr_isr(4, 3);
+    avr8_exit_isr();
 }
 #endif /* TIMER_4 */
 
 #ifdef TIMER_5_ISRA
-ISR(TIMER_5_ISRA, ISR_BLOCK)
+ISR(TIMER_5_ISRA, ISR_NAKED)
 {
-    _isr(5, 0);
+    avr8_enter_isr();
+    _tmr_isr(5, 0);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_5_ISRB
-ISR(TIMER_5_ISRB, ISR_BLOCK)
+ISR(TIMER_5_ISRB, ISR_NAKED)
 {
-    _isr(5, 1);
+    avr8_enter_isr();
+    _tmr_isr(5, 1);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_5_ISRC
-ISR(TIMER_5_ISRC, ISR_BLOCK)
+ISR(TIMER_5_ISRC, ISR_NAKED)
 {
-    _isr(5, 2);
+    avr8_enter_isr();
+    _tmr_isr(5, 2);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_5_ISRD
-ISR(TIMER_5_ISRD, ISR_BLOCK)
+ISR(TIMER_5_ISRD, ISR_NAKED)
 {
-    _isr(5, 3);
+    avr8_enter_isr();
+    _tmr_isr(5, 3);
+    avr8_exit_isr();
 }
 #endif /* TIMER_5 */
 
 #ifdef TIMER_6_ISRA
-ISR(TIMER_6_ISRA, ISR_BLOCK)
+ISR(TIMER_6_ISRA, ISR_NAKED)
 {
-    _isr(6, 0);
+    avr8_enter_isr();
+    _tmr_isr(6, 0);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_6_ISRB
-ISR(TIMER_6_ISRB, ISR_BLOCK)
+ISR(TIMER_6_ISRB, ISR_NAKED)
 {
-    _isr(6, 1);
+    avr8_enter_isr();
+    _tmr_isr(6, 1);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_6_ISRC
-ISR(TIMER_6_ISRC, ISR_BLOCK)
+ISR(TIMER_6_ISRC, ISR_NAKED)
 {
-    _isr(6, 2);
+    avr8_enter_isr();
+    _tmr_isr(6, 2);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_6_ISRD
-ISR(TIMER_6_ISRD, ISR_BLOCK)
+ISR(TIMER_6_ISRD, ISR_NAKED)
 {
-    _isr(6, 3);
+    avr8_enter_isr();
+    _tmr_isr(6, 3);
+    avr8_exit_isr();
 }
 #endif /* TIMER_6 */
 
 #ifdef TIMER_7_ISRA
-ISR(TIMER_7_ISRA, ISR_BLOCK)
+ISR(TIMER_7_ISRA, ISR_NAKED)
 {
-    _isr(7, 0);
+    avr8_enter_isr();
+    _tmr_isr(7, 0);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_7_ISRB
-ISR(TIMER_7_ISRB, ISR_BLOCK)
+ISR(TIMER_7_ISRB, ISR_NAKED)
 {
-    _isr(7, 1);
+    avr8_enter_isr();
+    _tmr_isr(7, 1);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_7_ISRC
-ISR(TIMER_7_ISRC, ISR_BLOCK)
+ISR(TIMER_7_ISRC, ISR_NAKED)
 {
-    _isr(7, 2);
+    avr8_enter_isr();
+    _tmr_isr(7, 2);
+    avr8_exit_isr();
 }
 #endif
 #ifdef TIMER_7_ISRB
-ISR(TIMER_7_ISRD, ISR_BLOCK)
+ISR(TIMER_7_ISRD, ISR_NAKED)
 {
-    _isr(7, 3);
+    avr8_enter_isr();
+    _tmr_isr(7, 3);
+    avr8_exit_isr();
 }
 #endif /* TIMER_7 */
