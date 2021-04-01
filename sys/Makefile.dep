@@ -1,18 +1,13 @@
 ifneq (,$(filter arduino,$(USEMODULE)))
+  FEATURES_OPTIONAL += periph_adc
   FEATURES_OPTIONAL += periph_i2c
   FEATURES_OPTIONAL += periph_spi
-  FEATURES_REQUIRED += periph_uart
+  FEATURES_REQUIRED += arduino
   FEATURES_REQUIRED += cpp
+  FEATURES_REQUIRED += periph_gpio
+  FEATURES_REQUIRED += periph_uart
   SKETCH_MODULE ?= arduino_sketches
   USEMODULE += $(SKETCH_MODULE)
-endif
-
-
-ifneq (,$(filter arduino,$(USEMODULE)))
-  FEATURES_REQUIRED += arduino
-  FEATURES_OPTIONAL += arduino_pwm
-  FEATURES_OPTIONAL += periph_adc
-  FEATURES_REQUIRED += periph_gpio
   USEMODULE += fmt
   USEMODULE += xtimer
 endif
@@ -70,13 +65,6 @@ endif
 
 ifneq (,$(filter trace,$(USEMODULE)))
   USEMODULE += xtimer
-endif
-
-ifneq (,$(filter shell_commands,$(USEMODULE)))
-  ifneq (,$(filter dfplayer,$(USEMODULE)))
-    USEMODULE += auto_init_multimedia
-    USEMODULE += fmt
-  endif
 endif
 
 ifneq (,$(filter ssp,$(USEMODULE)))
@@ -598,14 +586,21 @@ ifneq (,$(filter isrpipe_read_timeout,$(USEMODULE)))
 endif
 
 ifneq (,$(filter shell_commands,$(USEMODULE)))
+  ifneq (,$(filter dfplayer,$(USEMODULE)))
+    USEMODULE += auto_init_multimedia
+    USEMODULE += fmt
+  endif
+
   ifneq (,$(filter fib,$(USEMODULE)))
     USEMODULE += posix_inet
   endif
+
   ifneq (,$(filter nimble_netif,$(USEMODULE)))
     USEMODULE += nimble_scanner
     USEMODULE += nimble_scanlist
     USEMODULE += fmt
   endif
+
   ifneq (,$(filter openwsn_%,$(USEMODULE)))
     USEMODULE += netif
     USEMODULE += ipv6_addr
