@@ -53,6 +53,19 @@ static void _native_rtc_cb(void *arg) {
     _native_rtc_alarm_callback = NULL;
 }
 
+/* RIOT does not expect DST or TZ information */
+static void _remove_struct_tm_extra( struct tm * t ){
+    struct tm tmp = {.tm_year = t->tm_year,
+                     .tm_mon = t->tm_mon,
+                     .tm_mday = t->tm_mday,
+                     .tm_hour = t->tm_hour,
+                     .tm_min = t->tm_min,
+                     .tm_sec = t->tm_sec,
+                     .tm_wday = t->tm_wday
+    };
+    *t = tmp;
+}
+
 void rtc_init(void)
 {
     DEBUG("rtc_init\n");
@@ -115,8 +128,14 @@ int rtc_set_time(struct tm *ttime)
         warnx("rtc_set_time: not powered on");
         return -1;
     }
+    /* ensure there is no accidental extra information */
+    struct tm itime = *ttime;
+    _remove_struct_tm_extra(&itime);
 
-    time_t tnew = mktime(ttime);
+    /* mktime() and localtime are only inverse functions if tm_isdst == -1 */
+    itime.tm_isdst = -1;
+    time_t tnew = mktime(&itime);
+
     if (tnew == -1) {
         warnx("rtc_set_time: out of time_t range");
         return -1;
@@ -154,8 +173,8 @@ int rtc_get_time(struct tm *ttime)
     }
     _native_syscall_leave();
 
-    /* riot does not handle dst */
-    ttime->tm_isdst=0;
+    /* RIOT does not handle DST or TZ information */
+    _remove_struct_tm_extra(ttime);
 
     return 0;
 }
@@ -174,7 +193,13 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     struct tm now;
     rtc_get_time(&now);
 
-    time_t tdiff_secs = mktime(time) - mktime(&now);
+    /* ensure there is no accidental extra information */
+    struct tm intime = *time;
+    _remove_struct_tm_extra(&intime);
+
+    /* tm_idst are ignored for these mktime calls since
+     * both times carry the same (00) timezone information */
+    time_t tdiff_secs = mktime(&intime) - mktime(&now);
 
     if (_native_rtc_alarm_callback) {
         xtimer_remove(&_native_rtc_timer);
