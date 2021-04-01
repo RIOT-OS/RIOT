@@ -36,7 +36,6 @@ endif
 
 ifneq (,$(filter wolfssl_tls13,$(USEMODULE)))
   USEMODULE += wolfcrypt_aes
-  USEMODULE += sock_tls
 endif
 
 ifneq (,$(filter wolfssl_dtls,$(USEMODULE)))
