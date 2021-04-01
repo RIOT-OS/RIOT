@@ -348,11 +348,14 @@ void isr_exti(void)
 
     uint32_t pending_isr = pending_rising_isr | pending_falling_isr;
 #else
-    /* only generate interrupts against lines which have their IMR set */
-    uint32_t pending_isr = (EXTI_REG_PR & EXTI_REG_IMR & EXTI_MASK);
+    /* read all pending interrupts wired to isr_exti */
+    uint32_t pending_isr = (EXTI_REG_PR & EXTI_MASK);
 
     /* clear by writing a 1 */
     EXTI_REG_PR = pending_isr;
+
+    /* only generate soft interrupts against lines which have their IMR set */
+    pending_isr &= EXTI_REG_IMR;
 #endif
 
     /* iterate over all set bits */
