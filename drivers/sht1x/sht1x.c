@@ -157,7 +157,6 @@ static const uint8_t crc_lookup_table[] = {
 /** @brief Lookuptable for d1 parameter depending on supply voltage */
 static const int16_t sht1x_d1[] = { -4010, -3980, -3970, -3960, -3940 };
 
-/*---------------------------------------------------------------------------*/
 static inline void clk_signal(const sht1x_dev_t *dev)
 {
     gpio_set(dev->clk);
@@ -166,7 +165,6 @@ static inline void clk_signal(const sht1x_dev_t *dev)
     xtimer_usleep(SHT1X_HALF_CLOCK);
 }
 
-/*---------------------------------------------------------------------------*/
 static int write_byte(const sht1x_dev_t *dev, uint8_t value)
 {
     int ack;
@@ -204,7 +202,6 @@ static int write_byte(const sht1x_dev_t *dev, uint8_t value)
     return ack;
 }
 
-/*---------------------------------------------------------------------------*/
 static int read_byte(const sht1x_dev_t *dev, uint8_t *dest, int ack)
 {
     uint8_t value = 0;
@@ -246,7 +243,6 @@ static int read_byte(const sht1x_dev_t *dev, uint8_t *dest, int ack)
     return 0;
 }
 
-/*---------------------------------------------------------------------------*/
 static int transmission_start(const sht1x_dev_t *dev)
 {
     /*       _____         ________
@@ -289,7 +285,6 @@ static int transmission_start(const sht1x_dev_t *dev)
     return 0;
 }
 
-/*---------------------------------------------------------------------------*/
 static int connection_reset(const sht1x_dev_t *dev)
 {
     /*       _____________________________________________________         ____
@@ -313,19 +308,13 @@ static int connection_reset(const sht1x_dev_t *dev)
     return transmission_start(dev);
 }
 
-/*---------------------------------------------------------------------------*/
 static inline uint8_t crc_initial_value(uint8_t status)
 {
     status &= 0x07;
 
-    return (
-        ((0x01 & status) << 7) |
-        ((0x02 & status) << 5) |
-        ((0x04 & status) << 3)
-        );
+    return (((0x01 & status) << 7) | ((0x02 & status) << 5) | ((0x04 & status) << 3));
 }
 
-/*---------------------------------------------------------------------------*/
 static inline uint8_t reverse_byte(uint8_t value)
 {
     uint8_t result = (value & 0x01) << 7;
@@ -341,7 +330,6 @@ static inline uint8_t reverse_byte(uint8_t value)
     return result;
 }
 
-/*---------------------------------------------------------------------------*/
 static int measure(const sht1x_dev_t *dev, uint16_t *value, uint8_t mode)
 {
     uint8_t data[2] = { 0, 0 };
@@ -416,14 +404,9 @@ static int measure(const sht1x_dev_t *dev, uint16_t *value, uint8_t mode)
     return 0;
 }
 
-/*---------------------------------------------------------------------------*/
 int sht1x_init(sht1x_dev_t *dev, const sht1x_params_t *params)
 {
-    if (
-        !dev ||
-        !params ||
-        (((uint8_t)params->vdd) >= ARRAY_SIZE(sht1x_d1))
-        ) {
+    if (!dev || !params || (((uint8_t)params->vdd) >= ARRAY_SIZE(sht1x_d1))) {
         return -EINVAL;
     }
 
@@ -440,7 +423,6 @@ int sht1x_init(sht1x_dev_t *dev, const sht1x_params_t *params)
     return sht1x_reset(dev);
 }
 
-/*---------------------------------------------------------------------------*/
 int16_t sht1x_temperature(const sht1x_dev_t *dev, uint16_t raw)
 {
     if (!dev || (dev->vdd >= ARRAY_SIZE(sht1x_d1))) {
@@ -452,7 +434,6 @@ int16_t sht1x_temperature(const sht1x_dev_t *dev, uint16_t raw)
     return d1 + d2 * ((int16_t)raw);
 }
 
-/*---------------------------------------------------------------------------*/
 int16_t sht1x_humidity(const sht1x_dev_t *dev, uint16_t raw, int16_t temp)
 {
     if (!dev) {
@@ -509,8 +490,6 @@ int16_t sht1x_humidity(const sht1x_dev_t *dev, uint16_t raw, int16_t temp)
     return (int16_t)(res / 100);
 }
 
-
-/*---------------------------------------------------------------------------*/
 int sht1x_read(const sht1x_dev_t *dev, int16_t *temp, int16_t *rel_hum)
 {
     uint16_t temp_raw;
@@ -518,11 +497,7 @@ int sht1x_read(const sht1x_dev_t *dev, int16_t *temp, int16_t *rel_hum)
     uint16_t hum_raw;
     int retval;
 
-    if (
-        !dev ||
-        (dev->vdd >= ARRAY_SIZE(sht1x_d1)) ||
-        (!temp && !rel_hum)
-        ) {
+    if (!dev || (dev->vdd >= ARRAY_SIZE(sht1x_d1)) || (!temp && !rel_hum)) {
         return -EINVAL;
     }
 
@@ -551,7 +526,6 @@ int sht1x_read(const sht1x_dev_t *dev, int16_t *temp, int16_t *rel_hum)
     return 0;
 }
 
-/*---------------------------------------------------------------------------*/
 int sht1x_configure(sht1x_dev_t *dev, sht1x_conf_t conf)
 {
     if (!dev) {
@@ -570,23 +544,23 @@ int sht1x_configure(sht1x_dev_t *dev, sht1x_conf_t conf)
         }
 
         switch (write_byte(dev, SHT1X_STATUS_REG_W)) {
-            case -EIO:
-                return -EIO;
-            case 0:
-                break;
-            default:
-            case 1:
-                return -EPROTO;
+        case -EIO:
+            return -EIO;
+        case 0:
+            break;
+        default:
+        case 1:
+            return -EPROTO;
         }
 
         switch (write_byte(dev, conf & SHT1X_CONF_MASK)) {
-            case -EIO:
-                return -EIO;
-            case 0:
-                break;
-            default:
-            case 1:
-                return -EPROTO;
+        case -EIO:
+            return -EIO;
+        case 0:
+            break;
+        default:
+        case 1:
+            return -EPROTO;
         }
 
         /* Read back uploaded configuration to verify that sensor applied it */
@@ -604,7 +578,6 @@ int sht1x_configure(sht1x_dev_t *dev, sht1x_conf_t conf)
     return 0;
 }
 
-/*---------------------------------------------------------------------------*/
 int sht1x_read_status(sht1x_dev_t *dev, uint8_t *status)
 {
     int retval;
@@ -619,13 +592,13 @@ int sht1x_read_status(sht1x_dev_t *dev, uint8_t *status)
     }
 
     switch (write_byte(dev, SHT1X_STATUS_REG_R)) {
-        case -EIO:
-            return -EIO;
-        case 0:
-            break;
-        default:
-        case 1:
-            return -EPROTO;
+    case -EIO:
+        return -EIO;
+    case 0:
+        break;
+    default:
+    case 1:
+        return -EPROTO;
     }
 
     retval = read_byte(dev, status, SHT1X_ACK);
@@ -633,27 +606,25 @@ int sht1x_read_status(sht1x_dev_t *dev, uint8_t *status)
         return retval;
     }
 
-    {
-        uint8_t crc;
-        uint8_t expected;
-        /* read checksum */
-        retval = read_byte(dev, &crc, SHT1X_NO_ACK);
-        if (retval != 0) {
-            return retval;
-        }
+    uint8_t crc;
+    uint8_t expected;
+    /* read checksum */
+    retval = read_byte(dev, &crc, SHT1X_NO_ACK);
+    if (retval != 0) {
+        return retval;
+    }
 
-        expected = crc_initial_value(*status);
-        expected = crc_lookup_table[expected ^ SHT1X_STATUS_REG_R];
-        expected = crc_lookup_table[expected ^ *status];
-        expected = reverse_byte(expected);
-        if (expected != crc) {
-            DEBUG("[sht1x] CRC expected: 0x%02x, got: 0x%02x\n"
-                  "        CRC0: 0x%02x, CMD: 0x%02x, data: {0x%02x}\n",
-                  (int)expected, (int)crc,
-                  (int)crc_initial_value(*status), SHT1X_STATUS_REG_R,
-                  (int)*status);
-            return -EBADMSG;
-        }
+    expected = crc_initial_value(*status);
+    expected = crc_lookup_table[expected ^ SHT1X_STATUS_REG_R];
+    expected = crc_lookup_table[expected ^ *status];
+    expected = reverse_byte(expected);
+    if (expected != crc) {
+        DEBUG("[sht1x] CRC expected: 0x%02x, got: 0x%02x\n"
+              "        CRC0: 0x%02x, CMD: 0x%02x, data: {0x%02x}\n",
+              (int)expected, (int)crc,
+              (int)crc_initial_value(*status), SHT1X_STATUS_REG_R,
+              (int)*status);
+        return -EBADMSG;
     }
 
     /* Extract config from status and store it after CRC check passed */
@@ -663,7 +634,6 @@ int sht1x_read_status(sht1x_dev_t *dev, uint8_t *status)
     return 0;
 }
 
-/*---------------------------------------------------------------------------*/
 int sht1x_reset(sht1x_dev_t *dev)
 {
     int retval;
@@ -678,13 +648,13 @@ int sht1x_reset(sht1x_dev_t *dev)
     }
 
     switch (write_byte(dev, SHT1X_RESET)) {
-        case -EIO:
-            return -EIO;
-        case 0:
-            break;
-        default:
-        case 1:
-            return -EPROTO;
+    case -EIO:
+        return -EIO;
+    case 0:
+        break;
+    default:
+    case 1:
+        return -EPROTO;
     }
 
     dev->conf = 0;
