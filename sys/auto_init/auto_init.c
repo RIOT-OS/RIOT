@@ -213,6 +213,12 @@ void auto_init(void)
         auto_init_sht1x();
     }
 
+    if (IS_USED(MODULE_AUTO_INIT_ACTUATORS_SENSORS)) {
+        LOG_DEBUG("Auto init sensors / actuators.\n");
+        extern void auto_init_actuators_sensors(void);
+        auto_init_actuators_sensors();
+    }
+
     if (IS_USED(MODULE_AUTO_INIT_SAUL)) {
         LOG_DEBUG("Auto init SAUL.\n");
         extern void saul_init_devs(void);

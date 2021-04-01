@@ -1,3 +1,7 @@
+ifneq (,$(filter auto_init_actuators_sensors,$(USEMODULE)))
+  DIRS += actuators_sensors
+endif
+
 ifneq (,$(filter gnrc_netif_init,$(USEMODULE)))
   DIRS += netif
 endif

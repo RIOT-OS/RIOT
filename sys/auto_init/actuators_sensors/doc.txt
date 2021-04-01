@@ -1,0 +1,32 @@
+/*
+ * Copyright (C) 2020 Otto-von-Guericke-Universität Magdeburg
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup sys_auto_init_actuators_sensors Actuator & Sensor Auto Initialisation
+ * @ingroup sys_auto_init
+ * @brief Auto initialisation of actuator and sensor drivers
+ *
+ * This module contains auto init functions for actuator and sensor drivers.
+ *
+ * # Architecture / Usage
+ * Each actuator/sensor driver "foo" capable of auto initialization must provide
+ * the (pseudo) module `auto_init_actuators_sensors_foo` that provides the
+ * auto initialization. The module `auto_init_actuators_sensors` provides the
+ * function `void auto_init_actuators_sensors(void)` that will call the auto
+ * initialisation hooks of the individual actuator and sensor drivers.
+ *
+ * Note that the auto initialization of each actuator and sensor driver must
+ * be individually enabled to allow the user maximum flexibility. However,
+ * the pseudo module `auto_init_sensors_actuators_default` will pull in the auto
+ * initialization hooks of all used actuator and sensor drivers.
+ *
+ * # SAUL Integration
+ * Each actuator driver and sensor driver auto-init hook must also register the
+ * SAUL endpoints (if present) if and only if the module `auto_init_saul` is
+ * used.
+ */

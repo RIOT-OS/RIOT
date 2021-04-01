@@ -7,7 +7,6 @@ ifneq (,$(filter arduino,$(USEMODULE)))
   USEMODULE += $(SKETCH_MODULE)
 endif
 
-
 ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_REQUIRED += arduino
   FEATURES_OPTIONAL += arduino_pwm
@@ -27,6 +26,14 @@ endif
 
 ifneq (,$(filter congure_test,$(USEMODULE)))
   USEMODULE += fmt
+endif
+
+ifneq (,$(filter auto_init_actuators_sensors_%,$(filter-out auto_init_actuators_sensors_default,$(USEMODULE))))
+  USEMODULE += auto_init_actuators_sensors
+endif
+
+ifneq (,$(filter auto_init_saul,$(USEMODULE)))
+  USEMODULE += auto_init_actuators_sensors_default
 endif
 
 ifneq (,$(filter eepreg,$(USEMODULE)))
