@@ -34,19 +34,19 @@ extern sht1x_dev_t sht1x_devs[SHT1X_NUM];
 static sht1x_dev_t *get_dev(int argc, char **argv)
 {
     switch (argc) {
-        case 1:
-            return &sht1x_devs[0];
-        case 2:
-        {
-            int pos = atoi(argv[1]);
-            if ((pos < 0) || (pos >= (int)SHT1X_NUM)) {
-                printf("No SHT10/SHT11/SHT15 device with number %i\n", pos);
-                return NULL;
-            }
-            return &sht1x_devs[pos];
+    case 1:
+        return &sht1x_devs[0];
+    case 2:
+    {
+        int pos = atoi(argv[1]);
+        if ((pos < 0) || (pos >= (int)SHT1X_NUM)) {
+            printf("No SHT10/SHT11/SHT15 device with number %i\n", pos);
+            return NULL;
         }
-        default:
-            break;
+        return &sht1x_devs[pos];
+    }
+    default:
+        break;
     }
 
     printf("Usage: %s [DEVICE_NUMBER]\n", argv[0]);
@@ -67,24 +67,24 @@ static int read_sensor(int16_t *temp, int16_t *hum, int argc, char **argv)
     }
 
     switch (sht1x_read(dev, temp, hum)) {
-        case 0:
-            break;
-        case -EIO:
-            error_msg("gpio_init() failed");
-            return -1;
-        case -EBADMSG:
-            error_msg("CRC checksum error");
-            return -1;
-        case -ECANCELED:
-            error_msg("Measurement timed out");
-            return -1;
-        case -EPROTO:
-            error_msg("Sensor did not acknowledge command");
-            return -1;
-        default:
-            /* Should never happen, but better safe the sorry */
-            error_msg("Unknown error");
-            return -1;
+    case 0:
+        break;
+    case -EIO:
+        error_msg("gpio_init() failed");
+        return -1;
+    case -EBADMSG:
+        error_msg("CRC checksum error");
+        return -1;
+    case -ECANCELED:
+        error_msg("Measurement timed out");
+        return -1;
+    case -EPROTO:
+        error_msg("Sensor did not acknowledge command");
+        return -1;
+    default:
+        /* Should never happen, but better safe the sorry */
+        error_msg("Unknown error");
+        return -1;
     }
 
     return 0;
@@ -209,118 +209,118 @@ int _sht_config_handler(int argc, char **argv)
         }
 
         switch (argv[i][1]) {
-            case 'd':
-                if (++i >= argc) {
-                    missing_argument(i - 1, argv);
-                    return -1;
-                }
-                dev_num = atoi(argv[i]);
-                if ((dev_num < 0) || (dev_num >= (int)SHT1X_NUM)) {
-                    printf("No SHT10/11/15 sensor with number %i\n", dev_num);
-                    return -1;
-                }
-                break;
-            case 't':
-                if (++i >= argc) {
-                    missing_argument(i - 1, argv);
-                    return -1;
-                }
-                temp_off = atoi(argv[i]);
+        case 'd':
+            if (++i >= argc) {
+                missing_argument(i - 1, argv);
+                return -1;
+            }
+            dev_num = atoi(argv[i]);
+            if ((dev_num < 0) || (dev_num >= (int)SHT1X_NUM)) {
+                printf("No SHT10/11/15 sensor with number %i\n", dev_num);
+                return -1;
+            }
+            break;
+        case 't':
+            if (++i >= argc) {
+                missing_argument(i - 1, argv);
+                return -1;
+            }
+            temp_off = atoi(argv[i]);
+            break;
+        case 'h':
+            if (++i >= argc) {
+                missing_argument(i - 1, argv);
+                return -1;
+            }
+            hum_off = atoi(argv[i]);
+            break;
+        case 'r':
+            if (++i >= argc) {
+                missing_argument(i - 1, argv);
+                return -1;
+            }
+            if ((!argv[i][0]) || (argv[i][1])) {
+                invalid_argument(i - 1, argv, "l, h");
+                return -1;
+            }
+            switch (argv[i][0]) {
+            case 'l':
+                set_conf |= SHT1X_CONF_LOW_RESOLUTION;
                 break;
             case 'h':
-                if (++i >= argc) {
-                    missing_argument(i - 1, argv);
-                    return -1;
-                }
-                hum_off = atoi(argv[i]);
-                break;
-            case 'r':
-                if (++i >= argc) {
-                    missing_argument(i - 1, argv);
-                    return -1;
-                }
-                if ((!argv[i][0]) || (argv[i][1])) {
-                    invalid_argument(i - 1, argv, "l, h");
-                    return -1;
-                }
-                switch (argv[i][0]) {
-                    case 'l':
-                        set_conf |= SHT1X_CONF_LOW_RESOLUTION;
-                        break;
-                    case 'h':
-                        unset_conf |= SHT1X_CONF_LOW_RESOLUTION;
-                        break;
-                    default:
-                        invalid_argument(i - 1, argv, "l, h");
-                        return -1;
-                }
-                break;
-            case 'c':
-                if (++i >= argc) {
-                    missing_argument(i - 1, argv);
-                    return -1;
-                }
-                if ((!argv[i][0]) || (argv[i][1])) {
-                    invalid_argument(i - 1, argv, "y, n");
-                    return -1;
-                }
-                switch (argv[i][0]) {
-                    case 'y':
-                        set_conf |= SHT1X_CONF_SKIP_CALIBRATION;
-                        break;
-                    case 'n':
-                        unset_conf |= SHT1X_CONF_SKIP_CALIBRATION;
-                        break;
-                    default:
-                        invalid_argument(i - 1, argv, "y, n");
-                        return -1;
-                }
-                break;
-            case 'H':
-                if (++i >= argc) {
-                    missing_argument(i - 1, argv);
-                    return -1;
-                }
-                if ((!argv[i][0]) || (argv[i][1])) {
-                    invalid_argument(i - 1, argv, "y, n");
-                    return -1;
-                }
-                switch (argv[i][0]) {
-                    case 'y':
-                        set_conf |= SHT1X_CONF_ENABLE_HEATER;
-                        break;
-                    case 'n':
-                        unset_conf |= SHT1X_CONF_ENABLE_HEATER;
-                        break;
-                    default:
-                        invalid_argument(i - 1, argv, "y, n");
-                        return -1;
-                }
-                break;
-            case 'C':
-                if (++i >= argc) {
-                    missing_argument(i - 1, argv);
-                    return -1;
-                }
-                if ((!argv[i][0]) || (argv[i][1])) {
-                    invalid_argument(i - 1, argv, "y, n");
-                    return -1;
-                }
-                switch (argv[i][0]) {
-                    case 'y':
-                        unset_conf |= SHT1X_CONF_SKIP_CRC;
-                        break;
-                    case 'n':
-                        set_conf |= SHT1X_CONF_SKIP_CRC;
-                        break;
-                    default:
-                        invalid_argument(i - 1, argv, "y, n");
-                        return -1;
-                }
+                unset_conf |= SHT1X_CONF_LOW_RESOLUTION;
                 break;
             default:
-                unknown_parameter(i, argv);
+                invalid_argument(i - 1, argv, "l, h");
                 return -1;
+            }
+            break;
+        case 'c':
+            if (++i >= argc) {
+                missing_argument(i - 1, argv);
+                return -1;
+            }
+            if ((!argv[i][0]) || (argv[i][1])) {
+                invalid_argument(i - 1, argv, "y, n");
+                return -1;
+            }
+            switch (argv[i][0]) {
+            case 'y':
+                set_conf |= SHT1X_CONF_SKIP_CALIBRATION;
+                break;
+            case 'n':
+                unset_conf |= SHT1X_CONF_SKIP_CALIBRATION;
+                break;
+            default:
+                invalid_argument(i - 1, argv, "y, n");
+                return -1;
+            }
+            break;
+        case 'H':
+            if (++i >= argc) {
+                missing_argument(i - 1, argv);
+                return -1;
+            }
+            if ((!argv[i][0]) || (argv[i][1])) {
+                invalid_argument(i - 1, argv, "y, n");
+                return -1;
+            }
+            switch (argv[i][0]) {
+            case 'y':
+                set_conf |= SHT1X_CONF_ENABLE_HEATER;
+                break;
+            case 'n':
+                unset_conf |= SHT1X_CONF_ENABLE_HEATER;
+                break;
+            default:
+                invalid_argument(i - 1, argv, "y, n");
+                return -1;
+            }
+            break;
+        case 'C':
+            if (++i >= argc) {
+                missing_argument(i - 1, argv);
+                return -1;
+            }
+            if ((!argv[i][0]) || (argv[i][1])) {
+                invalid_argument(i - 1, argv, "y, n");
+                return -1;
+            }
+            switch (argv[i][0]) {
+            case 'y':
+                unset_conf |= SHT1X_CONF_SKIP_CRC;
+                break;
+            case 'n':
+                set_conf |= SHT1X_CONF_SKIP_CRC;
+                break;
+            default:
+                invalid_argument(i - 1, argv, "y, n");
+                return -1;
+            }
+            break;
+        default:
+            unknown_parameter(i, argv);
+            return -1;
         }
     }
 
@@ -330,24 +330,24 @@ int _sht_config_handler(int argc, char **argv)
         new_conf &= ~(unset_conf);
         new_conf |= set_conf;
         switch (sht1x_configure(&sht1x_devs[dev_num], new_conf)) {
-            case 0:
-                break;
-            case -EIO:
-                error_msg("gpio_init() failed");
-                return -1;
-            case -EBADMSG:
-                error_msg("CRC checksum error");
-                return -1;
-            case -ECANCELED:
-                error_msg("Sensor did not apply configuration");
-                return -1;
-            case -EPROTO:
-                error_msg("Sensor did not acknowledge command");
-                return -1;
-            default:
-                /* Should never happen, but better safe the sorry */
-                error_msg("Unknown error");
-                return -1;
+        case 0:
+            break;
+        case -EIO:
+            error_msg("gpio_init() failed");
+            return -1;
+        case -EBADMSG:
+            error_msg("CRC checksum error");
+            return -1;
+        case -ECANCELED:
+            error_msg("Sensor did not apply configuration");
+            return -1;
+        case -EPROTO:
+            error_msg("Sensor did not acknowledge command");
+            return -1;
+        default:
+            /* Should never happen, but better safe the sorry */
+            error_msg("Unknown error");
+            return -1;
         }
     }
 
