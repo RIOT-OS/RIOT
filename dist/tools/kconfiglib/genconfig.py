@@ -33,6 +33,7 @@ import logging
 import os
 import sys
 
+from riot_kconfig import RiotKconfig
 import kconfiglib
 
 
@@ -386,7 +387,7 @@ with error.""")
     logging.basicConfig(format='[genconfig.py]:%(levelname)s-%(message)s',
                         level=log_level)
 
-    kconf = kconfiglib.Kconfig(args.kconfig_filename, warn_to_stderr=False)
+    kconf = RiotKconfig(args.kconfig_filename, warn_to_stderr=False)
     merge_configs(kconf, args.config_sources)
 
     # HACK: Force all symbols to be evaluated, to catch warnings generated
