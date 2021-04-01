@@ -44,6 +44,10 @@ config MODULE_ZTIMER_MSEC
     bool "Milliseconds"
     depends on MODULE_ZTIMER_PERIPH_TIMER || MODULE_ZTIMER_PERIPH_RTT
 
+config MODULE_ZTIMER_SEC
+    bool "Seconds"
+    depends on MODULE_ZTIMER_PERIPH_TIMER || MODULE_ZTIMER_PERIPH_RTT || MODULE_ZTIMER_PERIPH_RTC
+
 endmenu # Clocks
 
 
