@@ -11,6 +11,7 @@ doc/doxygen/*.db
 doc/doxygen/*.tmp
 # Built binaries
 *bin
+target/
 # Build directory
 /build
 # AFL findings
@@ -87,3 +88,10 @@ keys/
 
 # clangd language server
 .clangd/
+
+# Rust Cargo lock files
+#
+# These would be versioned in full applications, but for demos it's convenient
+# to ignore them. (Also, they'd change easily, causing visual clutter to
+# users).
+Cargo.lock
