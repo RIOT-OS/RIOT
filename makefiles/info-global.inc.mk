@@ -45,6 +45,7 @@ define board_unsatisfied_features
   undefine CPU_ARCH
   undefine CPU_CORE
   undefine CPU_FAM
+  undefine RUST_TARGET
 
   include $(RIOTBASE)/Makefile.features
   # always select provided architecture features

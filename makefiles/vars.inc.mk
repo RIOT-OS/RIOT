@@ -6,6 +6,7 @@ export QQ                    # as Q, but be more quiet
 export QUIET                 # The parameter to use whether to show verbose makefile commands or not.
 
 export OS                    # The operating system of the build host
+export OS_ARCH               # The build host's hardware architecture
 
 export APPLICATION           # The application, set in the Makefile which is run by the user.
 export APPLICATION_MODULE    # The application module name.

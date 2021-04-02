@@ -42,6 +42,11 @@ config HAS_BACKUP_RAM
     help
         Indicates that Backup RAM is supported.
 
+config HAS_RUST_TARGET
+    bool
+    help
+        Indicates that a Rust target definition ("triple") is known.
+
 config HAS_CPP
     bool
     help
