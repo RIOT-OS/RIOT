@@ -35,6 +35,9 @@
 static uint32_t _gmt_civil_to_timestamp(unsigned y, unsigned m, unsigned d,
                                         unsigned h, unsigned mi, unsigned s)
 {
+    /* struct tm counts months from 0 to 11 */
+    m += 1;
+
     if (m <= 2) {
         y -= 1;
         m += 12;
@@ -43,7 +46,7 @@ static uint32_t _gmt_civil_to_timestamp(unsigned y, unsigned m, unsigned d,
             719561) * 86400 + 3600 * h + 60 * mi + s;
 }
 
-void _timestamp_to_gmt_civil(struct tm *_tm, uint32_t epoch)
+static void _timestamp_to_gmt_civil(struct tm *_tm, uint32_t epoch)
 {
     uint32_t s = epoch % 86400;
 
@@ -71,6 +74,9 @@ void _timestamp_to_gmt_civil(struct tm *_tm, uint32_t epoch)
           .tm_hour = h, .tm_min = m, .tm_sec = s };
         *_tm = tmp;
     }
+
+    /* struct tm counts months starting from 0 */
+    _tm->tm_mon -= 1;
 }
 
 static void _ztimer_periph_rtc_callback(void *arg)
@@ -82,7 +88,7 @@ static uint32_t _ztimer_periph_rtc_now(ztimer_clock_t *clock)
 {
     (void)clock;
 
-    struct tm time;
+    struct tm time = { .tm_year = 0 };
 
     rtc_get_time(&time);
 
@@ -104,7 +110,7 @@ static void _ztimer_periph_rtc_set(ztimer_clock_t *clock, uint32_t val)
 
         target = now + val;
 
-        struct tm _tm;
+        struct tm _tm = { .tm_year = 0 };
         _timestamp_to_gmt_civil(&_tm, target);
 
         /* TODO: ensure this doesn't underflow */
