@@ -100,6 +100,22 @@ ifneq (,$(filter cmsis-dsp,$(USEPKG)))
   endif
 endif
 
+# Platform triples as used by Rust
+ifeq (${CPU_CORE},cortex-m4f)
+  CARGO_TARGET = thumbv7em-none-eabihf
+else ifeq (${CPU_CORE},cortex-m4)
+  CARGO_TARGET = thumbv7em-none-eabi
+else ifeq ($(CPU_CORE),cortex-m3)
+  CARGO_TARGET = thumbv7m-none-eabi
+else ifeq ($(CPU_CORE),cortex-m0plus)
+  CARGO_TARGET = thumbv6m-none-eabi
+else ifeq ($(CPU_CORE),cortex-m0)
+  CARGO_TARGET = thumbv6m-none-eabi
+else
+  # This is OK while Rust is not being used; if it is, the absece of a
+  # CARGO_TARGET will trigger a suitable error.
+endif
+
 # CPU depends on the cortex-m common module, so include it:
 include $(RIOTCPU)/cortexm_common/Makefile.include
 
