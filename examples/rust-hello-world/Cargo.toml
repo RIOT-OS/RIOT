@@ -1,0 +1,12 @@
+[package]
+name = "rust-hello-world"
+version = "0.1.0"
+authors = ["Christian Amsüss <chrysn@fsfe.org>"]
+edition = "2018"
+resolver = "2"
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+riot-wrappers = "0.7"
