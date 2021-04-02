@@ -216,6 +216,8 @@ ifeq (,$(TOOLCHAIN))
   override TOOLCHAIN := gnu
 endif
 
+include $(RIOTMAKE)/cargo-settings.inc.mk
+
 GLOBAL_GOALS += buildtest \
                 buildtest-indocker \
                 info-boards-features-blacklisted \
@@ -1032,6 +1034,8 @@ ifneq ($(_BASELIBS_VALUE_BEFORE_USAGE),$(BASELIBS))
 endif
 
 endif
+
+include $(RIOTMAKE)/cargo-targets.inc.mk
 
 # include RIOT_MAKEFILES_GLOBAL_POST configuration files
 # allows setting user specific system wide configuration parsed after the body
