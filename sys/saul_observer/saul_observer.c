@@ -9,7 +9,6 @@ static kernel_pid_t _pid = KERNEL_PID_UNDEF;
 static clist_node_t _event_queue;
 static mutex_t _event_queue_mtx = MUTEX_INIT_LOCKED;
 
-
 static inline saul_reg_t * _event_get(void)
 {
     saul_reg_t *dev;
@@ -39,7 +38,7 @@ static int _call_observer(clist_node_t *item, void *arg)
     saul_reg_t *dev = (saul_reg_t *) arg;
     observer->callback(dev, observer->arg);
 
-    /* keep on interating over the list */
+    /* keep on iterating over the list */
     return 0;
 }
 

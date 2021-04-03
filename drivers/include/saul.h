@@ -300,7 +300,7 @@ typedef int(*saul_write_t)(const void *dev, phydat_t *data);
  * @return  1 if the decive state has changed significantly
  * @return  0 if nothing has changed
  */
-typedef int(*saul_check_t)(void *dev);
+typedef int(*saul_check_t)(const void *dev);
 
 /**
  * @brief   Definition of the RIOT actuator/sensor interface

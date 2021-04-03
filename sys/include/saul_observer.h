@@ -48,7 +48,7 @@ typedef struct {
 } saul_observer_t;
 
 /**
- * @brief   Initilize the observer thread
+ * @brief   Initialize the observer thread
  */
 void saul_observer_init(void);
 
@@ -74,6 +74,29 @@ void saul_observer_add(saul_reg_t *dev, saul_observer_t *entry);
  * @param[in] entry     pointer to the observer handle
  */
 void saul_observer_rm(saul_reg_t *dev, saul_observer_t *entry);
+
+/**
+ * @brief   Start observing a SAUL device and sends a message on change
+ *
+ * The message's content.ptr contains the saul_reg_t.
+ *
+ * @param[in] dev       SAUL device to observe
+ * @param[in] entry     pointer to the observer handle
+ * @param[in] msg       pointer to the message
+ * @param[in] target    PID of the receiving thread
+ */
+void saul_observer_msg(saul_reg_t *dev, saul_observer_t *entry, msg_t *msg, kernel_pid_t target);
+
+/**
+ * @brief   Start observing a SAUL device and wakes up a thread on change
+ *
+ * The message's content.ptr contains the saul_reg_t.
+ *
+ * @param[in] dev       SAUL device to observe
+ * @param[in] entry     pointer to the observer handle
+ * @param[in] pid       PID of the thread that will be woken up
+ */
+void saul_observer_wakeup(saul_reg_t *dev, saul_observer_t *entry, kernel_pid_t pid);
 
 #ifdef __cplusplus
 }
