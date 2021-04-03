@@ -91,7 +91,7 @@
  * Please note that the layer 2 address by default is derived from the CPU ID.
  * Due to the birthday paradox with only 20 devices the probability of a
  * collision is already bigger than 50%. Thus, manual address assignment is
- * supported by defining `C110X_PARAM_L2ADDR`.
+ * supported by providing an implementation of @ref cc1xxx_eui_get.
  *
  *
  * Base Band, Data Rate, Channel Bandwidth and Channel Map Configuration
@@ -224,12 +224,6 @@ extern "C" {
  * @brief   Maximum number of channels supported by the driver
  */
 #define CC110X_MAX_CHANNELS             8
-
-/**
- * @brief   Special value to indicate that layer 2 address should be derived
- *          from the CPU-ID
- */
-#define CC110X_L2ADDR_AUTO              0x00
 
 /**
  * @brief   Default protocol for data that is coming in
@@ -470,11 +464,6 @@ typedef struct {
     spi_cs_t cs;                        /**< GPIO pin connected to chip select */
     gpio_t gdo0;                        /**< GPIO pin connected to GDO0 */
     gpio_t gdo2;                        /**< GPIO pin connected to GDO2 */
-    /**
-     * @brief Layer-2 address to use or `CC110X_L2ADDR_AUTO` to derive it from
-     *        the CPU ID
-     */
-    uint8_t l2addr;
 } cc110x_params_t;
 
 /**
