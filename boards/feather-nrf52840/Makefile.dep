@@ -1,11 +1,7 @@
-# Use stdio_cdc_acm unless another stdio_% is already used
-ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
-  USEMODULE += stdio_cdc_acm
-endif
-
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
 
 # include common nrf52 dependencies
+include $(RIOTBOARD)/common/nrf52/bootloader_nrfutil.dep.mk
 include $(RIOTBOARD)/common/nrf52/Makefile.dep
