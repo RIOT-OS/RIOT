@@ -217,7 +217,8 @@ static int _receive(gnrc_pktsnip_t *pkt)
         if (ip->type == GNRC_NETTYPE_IPV6 && tcb->address_family == AF_INET6) {
             /* If SYN is set, a connection is listening on that port ... */
             ipv6_addr_t *tmp_addr = NULL;
-            if (syn && tcb->local_port == dst && tcb->state == FSM_STATE_LISTEN) {
+            _gnrc_tcp_fsm_state_t state = _gnrc_tcp_fsm_get_state(tcb);
+            if (syn && tcb->local_port == dst && state == FSM_STATE_LISTEN) {
                 /* ... and local addr is unspec or pre configured */
                 tmp_addr = &((ipv6_hdr_t *)ip->data)->dst;
                 if (ipv6_addr_equal((ipv6_addr_t *) tcb->local_addr, (ipv6_addr_t *) tmp_addr) ||

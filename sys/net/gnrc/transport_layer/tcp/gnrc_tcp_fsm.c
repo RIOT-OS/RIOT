@@ -971,3 +971,13 @@ void _gnrc_tcp_fsm_set_mbox(gnrc_tcp_tcb_t *tcb, mbox_t *mbox)
     mutex_unlock(&(tcb->fsm_lock));
     TCP_DEBUG_LEAVE;
 }
+
+_gnrc_tcp_fsm_state_t _gnrc_tcp_fsm_get_state(gnrc_tcp_tcb_t *tcb)
+{
+    TCP_DEBUG_ENTER;
+    mutex_lock(&(tcb->fsm_lock));
+    _gnrc_tcp_fsm_state_t res = tcb->state;
+    mutex_unlock(&(tcb->fsm_lock));
+    TCP_DEBUG_LEAVE;
+    return res;
+}
