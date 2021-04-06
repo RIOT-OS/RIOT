@@ -24,7 +24,7 @@ usage() {
     echo "   -d, --delete:                 Delete all interface" >&2
     echo "   -l <iface>, --list <iface>:   If <iface> belongs to a bridge, list the bridge and" >&2
     echo "                                 all interfaces that belong to it. If <iface> does " >&2
-    echo"                                  not belong to a bridge, just print <iface>." >&2
+    echo "                                 not belong to a bridge, just print <iface>." >&2
     echo "   -a <address>[/<prefix_len>], --address <address>[/<prefix_len>]:" >&2
     echo "                                 Address to add to the created bridge. Can be used" >&2
     echo "                                 multiple times." >&2
