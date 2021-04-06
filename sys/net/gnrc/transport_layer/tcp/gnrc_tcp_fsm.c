@@ -41,7 +41,7 @@
 /**
  * @brief Helper macro for LL_SEARCH to compare TCBs
  */
-#define TCB_EQUAL(a,b)      ((a) != (b))
+#define TCB_EQUAL(a, b)      ((a) != (b))
 
 /**
  * @brief Checks if a given port number is currently used by a TCB as local_port.
@@ -77,7 +77,7 @@ static uint16_t _get_random_local_port(void)
         if (ret < 1024) {
             continue;
         }
-    } while(_is_local_port_in_use(ret));
+    } while (_is_local_port_in_use(ret));
     TCP_DEBUG_LEAVE;
     return ret;
 }
@@ -322,7 +322,7 @@ static int _fsm_call_recv(gnrc_tcp_tcb_t *tcb, void *buf, size_t len)
     /* Read data into 'buf' up to 'len' bytes from receive buffer */
     size_t rcvd = ringbuffer_get(&(tcb->rcv_buf), buf, len);
 
-    /* If receive buffer can store more than CONFIG_GNRC_TCP_MSS: open window to available buffer size */
+    /* If receive buffer can store more than CONFIG_GNRC_TCP_MSS: set window to free buffer size */
     if (ringbuffer_get_free(&tcb->rcv_buf) >= CONFIG_GNRC_TCP_MSS) {
         tcb->rcv_wnd = ringbuffer_get_free(&(tcb->rcv_buf));
 

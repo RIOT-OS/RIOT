@@ -44,7 +44,6 @@
 
 #define TCP_MSG_QUEUE_SIZE (1 << CONFIG_GNRC_TCP_MSG_QUEUE_SIZE_EXP)
 
-
 /**
  * @brief Central MBOX evtimer used by gnrc_tcp
  */
