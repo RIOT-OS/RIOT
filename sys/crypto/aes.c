@@ -45,7 +45,6 @@
  */
 static const cipher_interface_t aes_interface = {
     AES_BLOCK_SIZE,
-    AES_KEY_SIZE,
     aes_init,
     aes_encrypt,
     aes_decrypt
