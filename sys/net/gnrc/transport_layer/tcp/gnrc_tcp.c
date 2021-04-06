@@ -44,7 +44,6 @@
 
 #define TCP_MSG_QUEUE_SIZE (1 << CONFIG_GNRC_TCP_MSG_QUEUE_SIZE_EXP)
 
-
 /**
  * @brief Central MBOX evtimer used by gnrc_tcp
  */
@@ -100,12 +99,14 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
     msg_t msg_queue[TCP_MSG_QUEUE_SIZE];
     mbox_t mbox = MBOX_INIT(msg_queue, TCP_MSG_QUEUE_SIZE);
     int ret = 0;
+    _gnrc_tcp_fsm_state_t state = 0;
 
     /* Lock the TCB for this function call */
     mutex_lock(&(tcb->function_lock));
 
     /* TCB is already connected: Return -EISCONN */
-    if (tcb->state != FSM_STATE_CLOSED) {
+    state = _gnrc_tcp_fsm_get_state(tcb);
+    if (state != FSM_STATE_CLOSED) {
         mutex_unlock(&(tcb->function_lock));
         TCP_DEBUG_ERROR("-EISCONN: TCB already connected.");
         TCP_DEBUG_LEAVE;
@@ -177,8 +178,9 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
     }
 
     /* Wait until a connection was established or closed */
-    while (ret >= 0 && tcb->state != FSM_STATE_CLOSED && tcb->state != FSM_STATE_ESTABLISHED &&
-           tcb->state != FSM_STATE_CLOSE_WAIT) {
+    state = _gnrc_tcp_fsm_get_state(tcb);
+    while (ret >= 0 && state != FSM_STATE_CLOSED && state != FSM_STATE_ESTABLISHED &&
+           state != FSM_STATE_CLOSE_WAIT) {
         mbox_get(&mbox, &msg);
         switch (msg.type) {
             case MSG_TYPE_NOTIFY_USER:
@@ -187,7 +189,8 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
                 /* Setup a timeout to be able to revert back to LISTEN state, in case the
                  * send SYN+ACK we received upon entering SYN_RCVD is never acknowledged
                  * by the peer. */
-                if ((tcb->state == FSM_STATE_SYN_RCVD) && (tcb->status & STATUS_PASSIVE)) {
+                state = _gnrc_tcp_fsm_get_state(tcb);
+                if ((state == FSM_STATE_SYN_RCVD) && (tcb->status & STATUS_PASSIVE)) {
                     _unsched_mbox(&tcb->event_misc);
                     _sched_connection_timeout(&tcb->event_misc, &mbox);
                 }
@@ -214,12 +217,13 @@ static int _gnrc_tcp_open(gnrc_tcp_tcb_t *tcb, const gnrc_tcp_ep_t *remote,
             default:
                 TCP_DEBUG_ERROR("Received unexpected message.");
         }
+        state = _gnrc_tcp_fsm_get_state(tcb);
     }
 
     /* Cleanup */
     _gnrc_tcp_fsm_set_mbox(tcb, NULL);
     _unsched_mbox(&tcb->event_misc);
-    if (tcb->state == FSM_STATE_CLOSED && ret == 0) {
+    if (state == FSM_STATE_CLOSED && ret == 0) {
         TCP_DEBUG_ERROR("-ECONNREFUSED: Connection refused by peer.");
         ret = -ECONNREFUSED;
     }
@@ -498,12 +502,14 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
     uint32_t probe_timeout_duration_ms = 0;
     ssize_t ret = 0;
     bool probing_mode = false;
+    _gnrc_tcp_fsm_state_t state = 0;
 
     /* Lock the TCB for this function call */
     mutex_lock(&(tcb->function_lock));
 
     /* Check if connection is in a valid state */
-    if (tcb->state != FSM_STATE_ESTABLISHED && tcb->state != FSM_STATE_CLOSE_WAIT) {
+    state = _gnrc_tcp_fsm_get_state(tcb);
+    if (state != FSM_STATE_ESTABLISHED && state != FSM_STATE_CLOSE_WAIT) {
         mutex_unlock(&(tcb->function_lock));
         TCP_DEBUG_ERROR("-ENOTCONN: TCB is not connected.");
         TCP_DEBUG_LEAVE;
@@ -523,8 +529,10 @@ ssize_t gnrc_tcp_send(gnrc_tcp_tcb_t *tcb, const void *data, const size_t len,
 
     /* Loop until something was sent and acked */
     while (ret == 0 || tcb->pkt_retransmit != NULL) {
+        state = _gnrc_tcp_fsm_get_state(tcb);
+
         /* Check if the connections state is closed. If so, a reset was received */
-        if (tcb->state == FSM_STATE_CLOSED) {
+        if (state == FSM_STATE_CLOSED) {
             TCP_DEBUG_ERROR("-ECONNRESET: Connection was reset by peer.");
             ret = -ECONNRESET;
             break;
@@ -621,13 +629,15 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     mbox_t mbox = MBOX_INIT(msg_queue, TCP_MSG_QUEUE_SIZE);
     evtimer_mbox_event_t event_user_timeout;
     ssize_t ret = 0;
+    _gnrc_tcp_fsm_state_t state = 0;
 
     /* Lock the TCB for this function call */
     mutex_lock(&(tcb->function_lock));
 
     /* Check if connection is in a valid state */
-    if (tcb->state != FSM_STATE_ESTABLISHED && tcb->state != FSM_STATE_FIN_WAIT_1 &&
-        tcb->state != FSM_STATE_FIN_WAIT_2 && tcb->state != FSM_STATE_CLOSE_WAIT) {
+    state = _gnrc_tcp_fsm_get_state(tcb);
+    if (state != FSM_STATE_ESTABLISHED && state != FSM_STATE_FIN_WAIT_1 &&
+        state != FSM_STATE_FIN_WAIT_2 && state != FSM_STATE_CLOSE_WAIT) {
         mutex_unlock(&(tcb->function_lock));
         TCP_DEBUG_ERROR("-ENOTCONN: TCB is not connected.");
         TCP_DEBUG_LEAVE;
@@ -636,7 +646,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
 
     /* If FIN was received (CLOSE_WAIT), no further data can be received. */
     /* Copy received data into given buffer and return number of bytes. Can be zero. */
-    if (tcb->state == FSM_STATE_CLOSE_WAIT) {
+    if (state == FSM_STATE_CLOSE_WAIT) {
         ret = _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
         mutex_unlock(&(tcb->function_lock));
         TCP_DEBUG_LEAVE;
@@ -669,7 +679,8 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
     /* Processing loop */
     while (ret == 0) {
         /* Check if the connections state is closed. If so, a reset was received */
-        if (tcb->state == FSM_STATE_CLOSED) {
+        state = _gnrc_tcp_fsm_get_state(tcb);
+        if (state == FSM_STATE_CLOSED) {
             TCP_DEBUG_ERROR("-ECONNRESET: Connection was reset by peer.");
             ret = -ECONNRESET;
             break;
@@ -679,7 +690,7 @@ ssize_t gnrc_tcp_recv(gnrc_tcp_tcb_t *tcb, void *data, const size_t max_len,
         ret = _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_RECV, NULL, data, max_len);
 
         /* If FIN was received (CLOSE_WAIT), no further data can be received. Leave event loop */
-        if (tcb->state == FSM_STATE_CLOSE_WAIT) {
+        if (state == FSM_STATE_CLOSE_WAIT) {
             break;
         }
 
@@ -728,12 +739,14 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     msg_t msg;
     msg_t msg_queue[TCP_MSG_QUEUE_SIZE];
     mbox_t mbox = MBOX_INIT(msg_queue, TCP_MSG_QUEUE_SIZE);
+    _gnrc_tcp_fsm_state_t state = 0;
 
     /* Lock the TCB for this function call */
     mutex_lock(&(tcb->function_lock));
 
     /* Return if connection is closed */
-    if (tcb->state == FSM_STATE_CLOSED) {
+    state = _gnrc_tcp_fsm_get_state(tcb);
+    if (state == FSM_STATE_CLOSED) {
         mutex_unlock(&(tcb->function_lock));
         TCP_DEBUG_LEAVE;
         return;
@@ -749,7 +762,8 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
     _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_CLOSE, NULL, NULL, 0);
 
     /* Loop until the connection has been closed */
-    while (tcb->state != FSM_STATE_CLOSED) {
+    state = _gnrc_tcp_fsm_get_state(tcb);
+    while (state != FSM_STATE_CLOSED) {
         mbox_get(&mbox, &msg);
         switch (msg.type) {
             case MSG_TYPE_CONNECTION_TIMEOUT:
@@ -764,6 +778,7 @@ void gnrc_tcp_close(gnrc_tcp_tcb_t *tcb)
             default:
                 TCP_DEBUG_ERROR("Received unexpected message.");
         }
+        state = _gnrc_tcp_fsm_get_state(tcb);
     }
 
     /* Cleanup */
@@ -780,7 +795,7 @@ void gnrc_tcp_abort(gnrc_tcp_tcb_t *tcb)
 
     /* Lock the TCB for this function call */
     mutex_lock(&(tcb->function_lock));
-    if (tcb->state != FSM_STATE_CLOSED) {
+    if (_gnrc_tcp_fsm_get_state(tcb) != FSM_STATE_CLOSED) {
         /* Call FSM ABORT event */
         _gnrc_tcp_fsm(tcb, FSM_EVENT_CALL_ABORT, NULL, NULL, 0);
     }

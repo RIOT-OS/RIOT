@@ -88,6 +88,15 @@ int _gnrc_tcp_fsm(gnrc_tcp_tcb_t *tcb, _gnrc_tcp_fsm_event_t event,
  */
 void _gnrc_tcp_fsm_set_mbox(gnrc_tcp_tcb_t *tcb, mbox_t *mbox);
 
+/**
+ * @brief Get latest FSM state from given TCB.
+ *
+ * @param[in] tcb   TCB to get state from.
+ *
+ * @return   Current TCB state.
+ */
+_gnrc_tcp_fsm_state_t _gnrc_tcp_fsm_get_state(gnrc_tcp_tcb_t *tcb);
+
 #ifdef __cplusplus
 }
 #endif
