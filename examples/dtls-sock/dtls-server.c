@@ -20,6 +20,8 @@
 
 #include "net/sock/udp.h"
 #include "net/sock/dtls.h"
+#include "net/sock/dtls/creds.h"
+#include "net/sock/util.h"
 #include "net/credman.h"
 #include "msg.h"
 #include "thread.h"
@@ -31,7 +33,8 @@
 #define DTLS_DEFAULT_PORT (20220) /* DTLS default port */
 #endif
 
-#define SOCK_DTLS_SERVER_TAG (10)
+#define SOCK_DTLS_SERVER_TAG_0 (10)
+#define SOCK_DTLS_SERVER_TAG_1 (11)
 #define DTLS_STOP_SERVER_MSG 0x4001 /* Custom IPC type msg. */
 #define READER_QUEUE_SIZE (8U)
 
@@ -42,33 +45,73 @@ static kernel_pid_t _dtls_server_pid = KERNEL_PID_UNDEF;
 
 #ifdef CONFIG_DTLS_ECC
 static const ecdsa_public_key_t other_pubkeys[] = {
-    { .x = ecdsa_pub_key_x, .y = ecdsa_pub_key_y },
+    { .x = ecdsa_pub_key0_x, .y = ecdsa_pub_key0_y },
 };
 
-static const credman_credential_t credential = {
+static const credman_credential_t credential0 = {
     .type = CREDMAN_TYPE_ECDSA,
-    .tag = SOCK_DTLS_SERVER_TAG,
+    .tag = SOCK_DTLS_SERVER_TAG_0,
     .params = {
         .ecdsa = {
-            .private_key = ecdsa_priv_key,
+            .private_key = ecdsa_priv_key0,
             .public_key = {
-                .x = ecdsa_pub_key_x,
-                .y = ecdsa_pub_key_y,
+                .x = ecdsa_pub_key0_x,
+                .y = ecdsa_pub_key0_y,
             },
             .client_keys = (ecdsa_public_key_t *)other_pubkeys,
             .client_keys_size = ARRAY_SIZE(other_pubkeys),
         },
     },
 };
+
+static const ecdsa_public_key_t other_pubkeys1[] = {
+    { .x = ecdsa_pub_key1_x, .y = ecdsa_pub_key1_y },
+};
+
+static const credman_credential_t credential1 = {
+    .type = CREDMAN_TYPE_ECDSA,
+    .tag = SOCK_DTLS_SERVER_TAG_1,
+    .params = {
+        .ecdsa = {
+            .private_key = ecdsa_priv_key1,
+            .public_key = {
+                .x = ecdsa_pub_key1_x,
+                .y = ecdsa_pub_key1_y,
+            },
+            .client_keys = (ecdsa_public_key_t *)other_pubkeys1,
+            .client_keys_size = ARRAY_SIZE(other_pubkeys1),
+        }
+    },
+};
+
+static credman_tag_t _rpk_cb(sock_dtls_t *sock, sock_udp_ep_t *ep, credman_tag_t tags[],
+                             unsigned tags_len)
+{
+    (void) sock;
+    (void) ep;
+    (void) tags;
+    (void) tags_len;
+
+    char addrstr[IPV6_ADDR_MAX_STR_LEN];
+    uint16_t port;
+
+    sock_udp_ep_fmt(ep, addrstr, &port);
+    printf("From [%s]:%d\n", addrstr, port);
+
+    return SOCK_DTLS_SERVER_TAG_1;
+}
+
 #else /* #ifdef CONFIG_DTLS_PSK */
+static const uint8_t psk_id_0[] = PSK_DEFAULT_IDENTITY;
 static const uint8_t psk_key_0[] = PSK_DEFAULT_KEY;
 
-static const credman_credential_t credential = {
+static const credman_credential_t credential0 = {
     .type = CREDMAN_TYPE_PSK,
-    .tag = SOCK_DTLS_SERVER_TAG,
+    .tag = SOCK_DTLS_SERVER_TAG_0,
     .params = {
         .psk = {
             .key = { .s = psk_key_0, .len = sizeof(psk_key_0) - 1, },
+            .id = { .s = psk_id_0, .len = sizeof(psk_id_0) - 1, },
         },
     },
 };
@@ -93,19 +136,46 @@ void *dtls_server_wrapper(void *arg)
     local.port = DTLS_DEFAULT_PORT;
     sock_udp_create(&udp_sock, &local, NULL, 0);
 
-    res = sock_dtls_create(&sock, &udp_sock, SOCK_DTLS_SERVER_TAG,
+    res = credman_add(&credential0);
+    if (res < 0 && res != CREDMAN_EXIST) {
+        /* ignore duplicate credentials */
+        printf("Error cannot add credential to system: %d\n", (int)res);
+        return NULL;
+    }
+
+    res = sock_dtls_create(&sock, &udp_sock, SOCK_DTLS_SERVER_TAG_0,
                            SOCK_DTLS_1_2, SOCK_DTLS_SERVER);
     if (res < 0) {
         puts("Error creating DTLS sock");
         return NULL;
     }
 
-    res = credman_add(&credential);
+    /* set PSK Identity hint, this is optional and application-specific */
+#if IS_ACTIVE(CONFIG_DTLS_PSK)
+    if (sock_dtls_set_server_psk_id_hint(&sock, PSK_DEFAULT_HINT) < 0) {
+        puts("Error setting PSK Identity hint");
+        return NULL;
+    }
+#endif
+
+#if IS_ACTIVE(CONFIG_DTLS_ECC)
+    /* register a second RPK */
+    res = credman_add(&credential1);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
         printf("Error cannot add credential to system: %d\n", (int)res);
         return NULL;
     }
+
+    /* make the new credential available to the sock */
+    if (sock_dtls_add_credential(&sock, SOCK_DTLS_SERVER_TAG_1) < 0) {
+        printf("Error cannot add credential to the sock: %d\n", (int)res);
+        return NULL;
+    }
+
+    /* register a callback for RPK credential selection */
+    sock_dtls_set_rpk_cb(&sock, _rpk_cb);
+#endif
 
     while (active) {
         if ((msg_try_receive(&msg) == 1) &&

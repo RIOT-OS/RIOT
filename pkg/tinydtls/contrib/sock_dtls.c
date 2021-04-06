@@ -75,6 +75,19 @@ static dtls_handler_t _dtls_handler = {
 #endif /* CONFIG_DTLS_ECC */
 };
 
+#ifdef CONFIG_DTLS_ECC
+/**
+ * @brief Array of ECDSA keys to convert from credman credentials and send in
+ *        the callback.
+ */
+typedef struct ecdsa_key_assignment {
+    dtls_ecdsa_key_t key;
+    const session_t *session;
+} ecdsa_key_assignment_t;
+
+static ecdsa_key_assignment_t _ecdsa_keys[CONFIG_DTLS_CREDENTIALS_MAX];
+#endif
+
 static int _read(struct dtls_context_t *ctx, session_t *session, uint8_t *buf,
                  size_t len)
 {
@@ -135,6 +148,18 @@ static int _event(struct dtls_context_t *ctx, session_t *session,
     if (!level && (code != DTLS_EVENT_CONNECT)) {
         mbox_put(&sock->mbox, &msg);
     }
+
+#if IS_ACTIVE(CONFIG_DTLS_ECC)
+    if (code == DTLS_EVENT_CONNECTED) {
+        for (unsigned i = 0; i < ARRAY_SIZE(_ecdsa_keys); i++) {
+            if (_ecdsa_keys[i].session && dtls_session_equals(session, _ecdsa_keys[i].session)) {
+                _ecdsa_keys[i].session = NULL;
+                break;
+            }
+        }
+    }
+#endif
+
 #ifdef SOCK_HAS_ASYNC
     if (sock->async_cb != NULL) {
         switch (code) {
@@ -162,37 +187,103 @@ static int _get_psk_info(struct dtls_context_t *ctx, const session_t *session,
                          const unsigned char *desc, size_t desc_len,
                          unsigned char *result, size_t result_length)
 {
-    (void)ctx;
-    (void)desc;
-    (void)desc_len;
-    (void)session;
-    int ret;
-
-    sock_dtls_t *sock = dtls_get_app_data(ctx);
-
     credman_credential_t credential;
-    ret = credman_get(&credential, sock->tag, CREDMAN_TYPE_PSK);
-    if (ret < 0) {
-        DEBUG("sock_dtls: no matching PSK credential found\n");
-        return dtls_alert_fatal_create(DTLS_ALERT_DECRYPT_ERROR);
-    }
+    sock_udp_ep_t ep;
+    sock_dtls_t *sock = dtls_get_app_data(ctx);
 
     const void *c = NULL;
     size_t c_len = 0;
+
+    _session_to_ep(session, &ep);
+
     switch (type) {
     case DTLS_PSK_HINT:
         DEBUG("sock_dtls: psk hint request\n");
-        /* Ignored. See https://tools.ietf.org/html/rfc4279#section-5.2 */
-        return 0;
+        /* return a hint to the client if set */
+        c_len = strlen(sock->psk_hint);
+        if (c_len) {
+            c = sock->psk_hint;
+            break;
+        }
+        else {
+            DEBUG("sock_dtls: no hint provided\n");
+            return 0;
+        }
     case DTLS_PSK_IDENTITY:
         DEBUG("sock_dtls: psk id request\n");
-        c = credential.params.psk.id.s;
-        c_len = credential.params.psk.id.len;
+        /* if the application set a callback , try to select credential from there */
+        if (sock->client_psk_cb) {
+            DEBUG("sock_dtls: requesting the application\n");
+            credential.tag = sock->client_psk_cb(sock, &ep, sock->tags, sock->tags_len,
+                                                 (const char*)desc, desc_len);
+            if (credential.tag != CREDMAN_TAG_EMPTY) {
+                int ret = credman_get(&credential, credential.tag, CREDMAN_TYPE_PSK);
+                if (ret == CREDMAN_OK) {
+                    c = credential.params.psk.id.s;
+                    c_len = credential.params.psk.id.len;
+                    break;
+                }
+            }
+        }
+
+        /* if no callback set or no valid credential returned, try to find a valid registered one */
+        DEBUG("sock_dtls: trying to get first PSK credential\n");
+        credman_credential_t first = { .tag = CREDMAN_TAG_EMPTY };
+        for (unsigned i = 0; i < sock->tags_len && !c; i++) {
+            if (credman_get(&credential, sock->tags[i], CREDMAN_TYPE_PSK) == CREDMAN_OK) {
+                /* if no hint was provided, settle for the first valid credential */
+                if (!desc) {
+                    c = credential.params.psk.id.s;
+                    c_len = credential.params.psk.id.len;
+                    break;
+                }
+
+                /* save the first valid one in case we don't find the hint */
+                if (first.tag == CREDMAN_TAG_EMPTY) {
+                    memcpy(&first, &credential, sizeof(credman_credential_t));
+                }
+
+                if (desc_len == credential.params.psk.hint.len &&
+                    !strncmp(credential.params.psk.hint.s, (const char *)desc, desc_len)) {
+                    c = credential.params.psk.id.s;
+                    c_len = credential.params.psk.id.len;
+                }
+            }
+        }
+
+        /* if no credential so far, fallback to the first valid one, return alert otherwise */
+        if (!c) {
+            if (first.tag != CREDMAN_TAG_EMPTY) {
+                c = first.params.psk.id.s;
+                c_len = first.params.psk.id.len;
+            }
+            else {
+                DEBUG("sock_dtls: could not find a valid PSK credential\n");
+                return dtls_alert_fatal_create(DTLS_ALERT_INTERNAL_ERROR);
+            }
+        }
         break;
     case DTLS_PSK_KEY:
         DEBUG("sock_dtls: psk key request\n");
-        c = credential.params.psk.key.s;
-        c_len = credential.params.psk.key.len;
+
+        if (desc) {
+            DEBUG("sock_dtls: looking for key for ID: %.*s\n", (unsigned)desc_len, desc);
+            /* try to find matching ID among the registered credentials */
+            for (unsigned i = 0; i < sock->tags_len; i++) {
+                if (credman_get(&credential, sock->tags[i], CREDMAN_TYPE_PSK) == CREDMAN_OK) {
+                    DEBUG("sock_dtls: comparing to tag %d, with ID: %.*s\n", sock->tags[i],
+                          (unsigned)credential.params.psk.id.len,
+                          (char *)credential.params.psk.id.s);
+                    if (desc_len == credential.params.psk.id.len &&
+                        !memcmp(desc, credential.params.psk.id.s, desc_len)) {
+                        DEBUG("sock_dtls: found\n");
+                        c = credential.params.psk.key.s;
+                        c_len = credential.params.psk.key.len;
+                        break;
+                    }
+                }
+            }
+        }
         break;
     default:
         DEBUG("sock:dtls unsupported request type: %d\n", type);
@@ -217,22 +308,63 @@ static int _get_ecdsa_key(struct dtls_context_t *ctx, const session_t *session,
                           const dtls_ecdsa_key_t **result)
 {
     (void)session;
-    int ret;
+    int ret = CREDMAN_ERROR;
     sock_dtls_t *sock = (sock_dtls_t *)dtls_get_app_data(ctx);
+    sock_udp_ep_t ep;
+
+    _session_to_ep(session, &ep);
 
     credman_credential_t credential;
-    ret = credman_get(&credential, sock->tag, CREDMAN_TYPE_ECDSA);
-    if (ret < 0) {
-            DEBUG("sock_dtls: no matching ecdsa credential found\n");
-            return dtls_alert_fatal_create(DTLS_ALERT_INTERNAL_ERROR);
+    credential.tag = CREDMAN_TAG_EMPTY;
+    DEBUG("sock_dtls: get ECDSA key\n");
+
+    /* if the application set a callback , try to select credential from there */
+    if (sock->rpk_cb) {
+        DEBUG("sock_dtls: requesting the application\n");
+        credential.tag = sock->rpk_cb(sock, &ep, sock->tags, sock->tags_len);
+        if (credential.tag != CREDMAN_TAG_EMPTY) {
+            ret = credman_get(&credential, credential.tag, CREDMAN_TYPE_ECDSA);
+            if (ret != CREDMAN_OK) {
+                credential.tag = CREDMAN_TAG_EMPTY;
+            }
+        }
     }
 
-    static dtls_ecdsa_key_t key;
-    key.curve = DTLS_ECDH_CURVE_SECP256R1;
-    key.priv_key = credential.params.ecdsa.private_key;
-    key.pub_key_x = credential.params.ecdsa.public_key.x;
-    key.pub_key_y = credential.params.ecdsa.public_key.y;
-    *result = &key;
+    if (credential.tag == CREDMAN_TYPE_EMPTY) {
+        /* if could not get credential try to fetch the first valid credential */
+        for (unsigned i = 0; i < sock->tags_len; i++) {
+            ret = credman_get(&credential, sock->tags[i], CREDMAN_TYPE_ECDSA);
+            if (ret == CREDMAN_OK) {
+                break;
+            }
+        }
+
+        if (ret != CREDMAN_OK) {
+            DEBUG("sock_dtls: no valid credential registered\n");
+            return dtls_alert_fatal_create(DTLS_ALERT_INTERNAL_ERROR);
+        }
+    }
+
+    /* try to find a free ECDSA key assignment structure for the handshake. When unused, the session
+     * is not set. */
+    ecdsa_key_assignment_t *key = NULL;
+    for (unsigned i = 0; i < CONFIG_DTLS_CREDENTIALS_MAX; i++) {
+        if (!_ecdsa_keys[i].session) {
+            key = &_ecdsa_keys[i];
+        }
+    }
+    if (!key) {
+        DEBUG("sock_dtls: ECDSA keys are full\n");
+        return dtls_alert_fatal_create(DTLS_ALERT_INTERNAL_ERROR);
+    }
+
+    key->session = session;
+    key->key.curve = DTLS_ECDH_CURVE_SECP256R1;
+    key->key.priv_key = credential.params.ecdsa.private_key;
+    key->key.pub_key_x = credential.params.ecdsa.public_key.x;
+    key->key.pub_key_y = credential.params.ecdsa.public_key.y;
+
+    *result = &key->key;
     return 0;
 }
 
@@ -279,13 +411,26 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
 
     sock->udp_sock = udp_sock;
     sock->buffer.data = NULL;
+    sock->psk_hint[0] = '\0';
+    sock->client_psk_cb = NULL;
+    sock->rpk_cb = NULL;
 #ifdef SOCK_HAS_ASYNC
     sock->async_cb = NULL;
     sock->buf_ctx = NULL;
     memset(&sock->async_cb_session, 0, sizeof(sock->async_cb_session));
 #endif /* SOCK_HAS_ASYNC */
+
+    memset(sock->tags, CREDMAN_TAG_EMPTY, CONFIG_DTLS_CREDENTIALS_MAX * sizeof(credman_tag_t));
+
+    if (tag != CREDMAN_TAG_EMPTY) {
+        sock->tags_len = 1;
+        sock->tags[0] = tag;
+    }
+    else {
+        sock->tags_len = 0;
+    }
+
     sock->role = role;
-    sock->tag = tag;
     sock->dtls_ctx = dtls_new_context(sock);
     if (!sock->dtls_ctx) {
         DEBUG("sock_dtls: error getting DTLS context\n");
@@ -294,6 +439,76 @@ int sock_dtls_create(sock_dtls_t *sock, sock_udp_t *udp_sock,
     mbox_init(&sock->mbox, sock->mbox_queue, SOCK_DTLS_MBOX_SIZE);
     dtls_set_handler(sock->dtls_ctx, &_dtls_handler);
     return 0;
+}
+
+int sock_dtls_set_server_psk_id_hint(sock_dtls_t *sock, const char *hint)
+{
+    assert(sock);
+    if (strlen(hint) > CONFIG_DTLS_PSK_ID_HINT_MAX_SIZE) {
+        DEBUG("sock_dtls: could not set hint due to buffer size\n");
+        return -1;
+    }
+    strcpy(sock->psk_hint, hint);
+    return 0;
+}
+
+int sock_dtls_add_credential(sock_dtls_t *sock, credman_tag_t tag)
+{
+    assert(sock);
+    if (sock->tags_len < CONFIG_DTLS_CREDENTIALS_MAX) {
+        DEBUG("sock_dtls: credential added in position %d\n", sock->tags_len);
+        sock->tags[sock->tags_len] = tag;
+        sock->tags_len++;
+        return 0;
+    }
+    DEBUG("sock_dtls: could not add new credential\n");
+    return -1;
+}
+
+int sock_dtls_remove_credential(sock_dtls_t *sock, credman_tag_t tag)
+{
+    assert(sock);
+    int pos = -1;
+    for (unsigned i = 0; i < sock->tags_len; i++) {
+        if (sock->tags[i] == tag) {
+            pos = i;
+            DEBUG("sock_dtls: found credential to remove in position %i\n", pos);
+            break;
+        }
+    }
+
+    if (pos >= 0) {
+        sock->tags_len--;
+        for (; (unsigned)pos < sock->tags_len; pos++) {
+            sock->tags[pos] = sock->tags[pos + 1];
+        }
+        return 0;
+    }
+    else {
+        DEBUG("sock_dtls: could not find credential to remove\n");
+        return -1;
+    }
+}
+
+size_t sock_dtls_get_credentials(sock_dtls_t *sock, const credman_tag_t **out)
+{
+    assert(sock);
+    assert(out);
+
+    *out = sock->tags;
+    return sock->tags_len;
+}
+
+void sock_dtls_set_client_psk_cb(sock_dtls_t *sock, sock_dtls_client_psk_cb_t cb)
+{
+    assert(sock);
+    sock->client_psk_cb = cb;
+}
+
+void sock_dtls_set_rpk_cb(sock_dtls_t *sock, sock_dtls_rpk_cb_t cb)
+{
+    assert(sock);
+    sock->rpk_cb = cb;
 }
 
 sock_udp_t *sock_dtls_get_udp_sock(sock_dtls_t *sock)
