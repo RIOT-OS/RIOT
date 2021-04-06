@@ -55,9 +55,8 @@ $ FEATURES_REQUIRED+=riotboot USEMODULE+=usbus_dfu make -C examples/saul BOARD=p
 ```
 
 Note that when building and flashing a different slot (eg. `flash-slot1`),
-the DFU utility has to be explicitly prompted to upload it the other slot
-by adding a `DFU_ALT=1` argument.
-
+not only is the image built for that slot, but also dfu-util gets passed
+`--alt 1` (via the `DFU_ALT` build variable) to store it in the right place.
 # Entering DFU mode
 
 When RIOT applications are built with `USEMODULE+=usbus_dfu`,
