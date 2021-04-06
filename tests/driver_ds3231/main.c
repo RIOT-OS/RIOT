@@ -258,8 +258,74 @@ static int _cmd_test(int argc, char **argv)
         return 1;
     }
 
+    /* clear all existing alarm flag */
+    res = ds3231_clear_alarm_1_flag(&_dev);
+    if (res != 0) {
+        puts("error: unable to clear alarm flag");
+        return 1;
+    }
+
+    /* get time to set up next alarm*/
+    res = ds3231_get_time(&_dev, &time);
+    if (res != 0) {
+        puts("error: unable to read time");
+        return 1;
+    }
+
+    time.tm_sec += TEST_DELAY;
+    mktime(&time);
+
+    /* set alarm */
+    res = ds3231_set_alarm_1(&_dev, &time, DS3231_AL1_TRIG_H_M_S);
+    if (res != 0) {
+        puts("error: unable to program alarm");
+        return 1;
+    }
+
+#ifdef MODULE_DS3231_INT
+
+    /* wait for an alarm with GPIO interrupt */
+    res = ds3231_await_alarm(&_dev);
+    if (res < 0){
+        puts("error: unable to program GPIO interrupt or to clear alarm flag");
+    }
+
+    if (!(res & DS3231_FLAG_ALARM_1)){
+        puts("error: alarm was not triggered");
+    }
+
     puts("OK");
     return 0;
+
+#else
+
+    /* wait for the alarm to trigger */
+    xtimer_sleep(TEST_DELAY);
+
+    bool alarm;
+
+    /* check if alarm flag is on */
+    res = ds3231_get_alarm_1_flag(&_dev, &alarm);
+    if (res != 0) {
+        puts("error: unable to get alarm flag");
+        return 1;
+    }
+
+    if (alarm != true){
+        puts("error: alarm was not triggered");
+    }
+
+    /* clear alarm flag */
+    res = ds3231_clear_alarm_1_flag(&_dev);
+    if (res != 0) {
+        puts("error: unable to clear alarm flag");
+        return 1;
+    }
+
+    puts("OK");
+    return 0;
+
+#endif
 }
 
 static const shell_command_t shell_commands[] = {
@@ -279,7 +345,10 @@ int main(void)
     puts("DS3231 RTC test\n");
 
     /* initialize the device */
-    res = ds3231_init(&_dev, &ds3231_params[0]);
+    ds3231_params_t params= ds3231_params[0];
+    params.opt     = DS3231_OPT_BAT_ENABLE;
+    params.opt    |= DS3231_OPT_INTER_ENABLE;
+    res = ds3231_init(&_dev, &params);
     if (res != 0) {
         puts("error: unable to initialize DS3231 [I2C initialization error]");
         return 1;

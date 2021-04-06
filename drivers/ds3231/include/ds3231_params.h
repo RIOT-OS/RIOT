@@ -32,11 +32,20 @@ extern "C" {
 #ifndef DS3231_PARAM_OPT
 #define DS3231_PARAM_OPT        (DS3231_OPT_BAT_ENABLE)
 #endif
+#ifndef DS3231_PARAM_INT_PIN
+#define DS3231_PARAM_INT_PIN    (GPIO_UNDEF)
+#endif
 
 #ifndef DS3231_PARAMS
+#if IS_USED(MODULE_DS3231_INT)
 #define DS3231_PARAMS           { .bus = DS3231_PARAM_I2C, \
-                                  .opt = DS3231_PARAM_OPT, }
-#endif
+                                  .opt = DS3231_PARAM_OPT, \
+                                  .int_pin = DS3231_PARAM_INT_PIN}
+#else /* MODULE_DS3231_INT */
+#define DS3231_PARAMS           { .bus = DS3231_PARAM_I2C, \
+                                  .opt = DS3231_PARAM_OPT}
+#endif /* MODULE_DS3231_INT */
+#endif /* DS3231_PARAMS */
 /** @} */
 
 /**
