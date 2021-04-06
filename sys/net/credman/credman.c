@@ -30,6 +30,11 @@ static mutex_t _mutex = MUTEX_INIT;
 
 #if IS_USED(MODULE_CREDMAN_LOAD)
 #include "tiny-asn1.h"
+
+/* Context-specific tag in DER encoding
+ * (see section 8.1.2.2 of ITU-T X.690 https://www.itu.int/rec/T-REC-X.690-200811-S) */
+#define ASN1_CONTEXT_TAG(v)     (0xA0 | (v & 0x1F))
+
 /* ASN.1 representation of ecPublicKey - OID 1.2.840.10045.2.1
  * (see https://oidref.com/1.2.840.10045.2.1) */
 static const uint8_t ecPublicKey[] = { 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x02, 0x01 };
@@ -107,7 +112,7 @@ int credman_load_public_key(const uint8_t *buf, size_t buf_len, ecdsa_public_key
     assert(out);
 
     int obj_count = der_object_count((uint8_t *)buf, buf_len);
-    if (obj_count < 0) {
+    if (obj_count <= 0) {
         DEBUG("credman: could not calculate the number of elements within the key\n");
         return CREDMAN_INVALID;
     }
@@ -115,8 +120,9 @@ int credman_load_public_key(const uint8_t *buf, size_t buf_len, ecdsa_public_key
     asn1_tree objects[obj_count];
     asn1_tree pub_key;
 
-    if (der_decode((uint8_t *)buf, buf_len, &pub_key, objects, obj_count) < 0) {
-        DEBUG("credman: could not parse the key\n");
+    int32_t res = der_decode((uint8_t *)buf, buf_len, &pub_key, objects, obj_count);
+    if (res < 0) {
+        DEBUG("credman: could not parse the key (%d)\n", res);
         return CREDMAN_INVALID;
     }
 
@@ -162,7 +168,7 @@ int credman_load_private_key(const uint8_t *buf, size_t buf_len, credman_credent
     assert(cred);
 
     int obj_count = der_object_count((uint8_t *)buf, buf_len);
-    if (obj_count < 0) {
+    if (obj_count <= 0) {
         DEBUG("credman: could not calculate the number of elements within the key\n");
         return CREDMAN_INVALID;
     }
@@ -253,7 +259,7 @@ int credman_load_private_ecc_key(const uint8_t *buf, size_t buf_len, credman_cre
     assert(cred);
 
     int obj_count = der_object_count((uint8_t *)buf, buf_len);
-    if (obj_count < 0) {
+    if (obj_count <= 0) {
         DEBUG("credman: could not calculate the number of elements within the key\n");
         return CREDMAN_INVALID;
     }
@@ -298,7 +304,7 @@ int credman_load_private_ecc_key(const uint8_t *buf, size_t buf_len, credman_cre
     cred->params.ecdsa.private_key = node->data;
 
     /* try to find a publicKey by tag */
-    while (node && node->type != 0xA1) {
+    while (node && node->type != ASN1_CONTEXT_TAG(1)) {
         node = node->next;
     }
 
