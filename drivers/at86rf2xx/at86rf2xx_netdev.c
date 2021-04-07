@@ -151,31 +151,28 @@ static int _confirm_send(netdev_t *netdev, void *info)
 {
     (void)info;
     at86rf2xx_t *dev = (at86rf2xx_t *)netdev;
-    int ret;
+    uint8_t status = IS_ACTIVE(AT86RF2XX_BASIC_MODE)
+        ? AT86RF2XX_TRX_STATE__TRAC_SUCCESS
+        : at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE)
+          & AT86RF2XX_TRX_STATE_MASK__TRAC;
 
-    /* ISR sets this */
-    switch (dev->status) {
+    switch (status) {
         case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
         case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
-            ret = dev->tx_frame_len;
-            break;
+            return dev->tx_frame_len;
         case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
-            ret = -EBUSY;
-            break;
+            return -EBUSY;
         case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
-            ret = -ECOMM;
-            break;
+            return -ECOMM;
         case AT86RF2XX_TRX_STATE__TRAC_INVALID:
             /* Even though the reset value for register bits TRAC_STATUS
                is zero, the RX_AACK and TX_ARET procedures set the register
                bits to TRAC_STATUS = 7 (INVALID) when they are started. */
-            ret = -EAGAIN;
-            break;
+            return -EAGAIN;
         default:
-            DEBUG("[at86rf2xx] unknown status %u\n", dev->status);
-            ret = 0;
+            DEBUG("[at86rf2xx] unknown status %u\n", status);
+            return 0;
     }
-    return ret;
 }
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
@@ -703,47 +700,18 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 static void _isr_send_complete(at86rf2xx_t *dev)
 {
     netdev_t *netdev = &dev->netdev.netdev;
-    if (IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
-        dev->status = AT86RF2XX_TRX_STATE__TRAC_SUCCESS;
-        netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-        return;
-    }
-    /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
-#if AT86RF2XX_HAVE_RETRIES && defined(AT86RF2XX_REG__XAH_CTRL_2)
-    dev->tx_retries = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2);
-    dev->tx_retries &= AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK;
-    dev->tx_retries >>= AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
-#endif
-
     DEBUG("[at86rf2xx] EVT - TX_END\n");
-
+    if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
+        /* Only radios with the XAH_CTRL_2 register support frame retry reporting */
+#if AT86RF2XX_HAVE_RETRIES && defined(AT86RF2XX_REG__XAH_CTRL_2)
+        dev->tx_retries = at86rf2xx_reg_read(dev, AT86RF2XX_REG__XAH_CTRL_2);
+        dev->tx_retries &= AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_MASK;
+        dev->tx_retries >>= AT86RF2XX_XAH_CTRL_2__ARET_FRAME_RETRIES_OFFSET;
+#endif
+    }
     if (netdev->event_callback) {
-#if IS_USED(MODULE_OPENTHREAD)
-        switch(dev->status) {
-            case AT86RF2XX_TRX_STATE__TRAC_SUCCESS:
-                netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-                DEBUG("[at86rf2xx] TX SUCCESS\n");
-                break;
-            case AT86RF2XX_TRX_STATE__TRAC_SUCCESS_DATA_PENDING:
-                netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE_DATA_PENDING);
-                DEBUG("[at86rf2xx] TX SUCCESS DATA PENDING\n");
-                break;
-            case AT86RF2XX_TRX_STATE__TRAC_NO_ACK:
-                netdev->event_callback(netdev, NETDEV_EVENT_TX_NOACK);
-                DEBUG("[at86rf2xx] TX NO_ACK\n");
-                break;
-            case AT86RF2XX_TRX_STATE__TRAC_CHANNEL_ACCESS_FAILURE:
-                netdev->event_callback(netdev, NETDEV_EVENT_TX_MEDIUM_BUSY);
-                DEBUG("[at86rf2xx] TX_CHANNEL_ACCESS_FAILURE\n");
-                break;
-            default:
-                DEBUG("[at86rf2xx] Unhandled TRAC_STATUS: %d\n",
-                        trac_status >> 5);
-        }
-#else
         /* let _confirm_send() evaluate the transmission status */
         netdev->event_callback(netdev, NETDEV_EVENT_TX_COMPLETE);
-#endif
     }
 }
 
@@ -799,10 +767,6 @@ static void _isr(netdev_t *netdev)
     }
 
     if (irq_mask & AT86RF2XX_IRQ_STATUS_MASK__TRX_END) {
-        if (!IS_ACTIVE(AT86RF2XX_BASIC_MODE)) {
-            dev->status = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_STATE)
-                          & AT86RF2XX_TRX_STATE_MASK__TRAC;
-        }
         if ((state == AT86RF2XX_PHY_STATE_RX)
             || (state == AT86RF2XX_PHY_STATE_RX_BUSY)) {
             DEBUG("[at86rf2xx] EVT - RX_END\n");

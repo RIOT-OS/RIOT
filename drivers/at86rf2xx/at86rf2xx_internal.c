@@ -118,9 +118,9 @@ uint8_t at86rf2xx_get_status(const at86rf2xx_t *dev)
 
 bool at86rf2xx_is_busy(const at86rf2xx_t *dev)
 {
-    uint8_t s;
-    while ((s = at86rf2xx_get_status(dev)) == AT86RF2XX_STATE_IN_PROGRESS) {}
-    return s == AT86RF2XX_STATE_BUSY_RX         ||
+    uint8_t s = at86rf2xx_get_status(dev);
+    return s == AT86RF2XX_STATE_IN_PROGRESS     ||
+           s == AT86RF2XX_STATE_BUSY_RX         ||
            s == AT86RF2XX_STATE_BUSY_TX         ||
            s == AT86RF2XX_STATE_BUSY_RX_AACK    ||
            s == AT86RF2XX_STATE_BUSY_TX_ARET;
