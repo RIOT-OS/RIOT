@@ -347,7 +347,7 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
         if (buf_len > copylen) {
             /* there is still data in the buffer */
             sock->last_buf = buf;
-            sock->last_offset = copylen;
+            sock->last_offset += copylen;
         }
         else {
             sock->last_buf = NULL;
