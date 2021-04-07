@@ -72,6 +72,10 @@ extern "C" {
 #define BTN0_PIN            GPIO_PIN(PORT_Q, 2)
 #define BTN0_MODE           (GPIO_IN | GPIO_OPC_PU | GPIO_SLEW_RATE)
 #define BTN0_INT_FLANK      (GPIO_ISC_FALLING | GPIO_LVL_LOW)
+
+#define BTN1_PIN            GPIO_PIN(PORT_C, 2)
+#define BTN1_MODE           (GPIO_IN | GPIO_OPC_PU | GPIO_SLEW_RATE)
+#define BTN1_INT_FLANK      (GPIO_ISC_FALLING | GPIO_LVL_LOW)
 /** @} */
 
 /**
