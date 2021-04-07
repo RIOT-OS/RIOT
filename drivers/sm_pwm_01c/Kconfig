@@ -1,0 +1,60 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+menuconfig MODULE_SM_PWM_01C
+    bool "SM_PWM_01C Amphenol infrared dust sensor"
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    depends on TEST_KCONFIG
+    select MODULE_CHECKSUM
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_USEC
+    select MODULE_ZTIMER_PERIPH_TIMER
+
+config MODULE_SM_PWM_01C_MA
+    bool "Use a moving average for sensor values"
+    depends on MODULE_SM_PWM_01C
+    default y
+
+menuconfig KCONFIG_USEMODULE_SM_PWM_01C
+    bool "Configure SM_PWM_01C driver"
+    depends on USEMODULE_SM_PWM_01C
+    help
+        Configure the SM_PWM_01C driver using Kconfig.
+
+if KCONFIG_USEMODULE_SM_PWM_01C
+
+config SM_PWM_01C_WINDOW_TIME
+    int "Measuring Window length"
+    default 10000000
+    help
+        Length in time of the measuring window in microseconds,
+        recommended 5-30s.
+
+config SM_PWM_01C_SAMPLE_TIME
+    int "PWM occupancy sampling period"
+    default 100000
+    help
+        Time, expressed in microseconds, at witch LPO is occupancy is
+        sampled and converted into particle matter concentration
+
+if !USEMODULE_SM_PWM_01C_MA
+
+config SM_PWM_01C_EXP_WEIGHT
+    int "Weight of the exponential"
+    default 100000
+    help
+        Weight of the exponential average filter where:
+        SM_PWM_01C_EXP_WEIGHT = 1 / (1 - alpha).
+
+        Should be chosen wisely, it can be done my minimizing MSE
+        or other algorithms as Marquardt procedure.
+
+endif # USEMODULE_SM_PWM_01C_MA
+
+endif # KCONFIG_USEMODULE_SM_PWM_01C
