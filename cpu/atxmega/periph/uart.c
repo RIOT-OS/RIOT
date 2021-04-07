@@ -29,6 +29,7 @@
 
 #include "board.h"
 #include "cpu.h"
+#include "cpu_pm.h"
 #include "sched.h"
 #include "thread.h"
 #include "periph/uart.h"
@@ -257,6 +258,8 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     isr_ctx[uart].rx_cb = rx_cb;
     isr_ctx[uart].arg = arg;
 
+    pm_periph_enable(uart_config[uart].pwr);
+
     /* disable and reset UART */
     dev(uart)->CTRLA = 0;
     dev(uart)->CTRLB = 0;
@@ -315,14 +318,12 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
 
 void uart_poweron(uart_t uart)
 {
-    (void)uart;
-    /* not implemented (yet) */
+    pm_periph_enable(uart_config[uart].pwr);
 }
 
 void uart_poweroff(uart_t uart)
 {
-    (void)uart;
-    /* not implemented (yet) */
+    pm_periph_disable(uart_config[uart].pwr);
 }
 
 static inline void _rx_isr_handler(int num)

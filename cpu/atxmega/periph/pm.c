@@ -23,9 +23,40 @@
 
 #include "periph_conf.h"
 #include "periph/pm.h"
+#include "cpu_pm.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
+
+#define PWR_REG_BASE        ((uint16_t)&PR)
+#define PWR_REG_OFFSET      (0x01)
+
+/**
+ * @brief     Extract the device id of the given power reduction mask
+ */
+static inline uint8_t _device_mask(pwr_reduction_t pwr)
+{
+    return (pwr & 0xff);
+}
+
+/**
+ * @brief     Extract the register id of the given power reduction mask
+ */
+static inline uint8_t _register_id(pwr_reduction_t pwr)
+{
+    return (pwr >> 8) & 0xff;
+}
+
+/**
+ * @brief     Generate the register index of the given power reduction mask
+ */
+static inline uint8_t *_register_addr(pwr_reduction_t pwr)
+{
+    uint8_t id = _register_id(pwr);
+    uint16_t addr = PWR_REG_BASE + (id * PWR_REG_OFFSET);
+
+    return (uint8_t *)addr;
+}
 
 void pm_reboot(void)
 {
@@ -77,4 +108,31 @@ void pm_set(unsigned mode)
     sleep_cpu();
     sleep_disable();
     irq_restore(irq_state);
+}
+
+void pm_periph_enable(pwr_reduction_t pwr)
+{
+    uint8_t mask = _device_mask(pwr);
+    uint8_t *reg = _register_addr(pwr);
+
+    *reg &= ~mask;
+}
+
+void pm_periph_disable(pwr_reduction_t pwr)
+{
+    uint8_t mask = _device_mask(pwr);
+    uint8_t *reg = _register_addr(pwr);
+
+    *reg |= mask;
+}
+
+void pm_periph_power_off(void)
+{
+    uint8_t *reg = _register_addr(PWR_GENERAL_POWER);
+    uint8_t i;
+
+    /* Freeze all peripheral clocks */
+    for (i = 0; i <= 7; i++) {
+        reg[i] = 0xff;
+    }
 }

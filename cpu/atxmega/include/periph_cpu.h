@@ -69,6 +69,29 @@ enum {
 };
 
 /**
+ * @brief   Power Reduction Peripheral Mask
+ */
+typedef uint16_t pwr_reduction_t;
+
+/**
+ * @brief   Define a CPU specific Power Reduction index macro
+ */
+#define PWR_RED_REG(reg, dev) ((reg << 8) | dev)
+
+/**
+ * @brief   Define a CPU specific Power Reduction index macro
+ */
+enum {
+    PWR_GENERAL_POWER,
+    PWR_PORT_A,
+    PWR_PORT_B,
+    PWR_PORT_C,
+    PWR_PORT_D,
+    PWR_PORT_E,
+    PWR_PORT_F,
+};
+
+/**
  * @name    Power management configuration
  * @{
  */
@@ -190,6 +213,7 @@ typedef enum {
  */
 typedef struct {
     USART_t *dev;                   /**< pointer to the used UART device */
+    pwr_reduction_t pwr;            /**< Power Management */
     gpio_t rx_pin;                  /**< pin used for RX */
     gpio_t tx_pin;                  /**< pin used for TX */
 #ifdef MODULE_PERIPH_UART_HW_FC
@@ -235,6 +259,7 @@ typedef enum {
  */
 typedef struct {
     TC0_t *dev;                                 /**< Pointer to the used as Timer device */
+    pwr_reduction_t pwr;                        /**< Power Management */
     timer_type_t type;                          /**< Timer Type */
     cpu_int_lvl_t int_lvl[TIMER_CH_MAX_NUMOF];  /**< Interrupt channels level */
 } timer_conf_t;

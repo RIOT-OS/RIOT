@@ -24,6 +24,7 @@
 #include <assert.h>
 
 #include "cpu.h"
+#include "cpu_pm.h"
 #include "thread.h"
 
 #include "periph/timer.h"
@@ -111,6 +112,8 @@ int timer_init(tim_t tim, unsigned long freq, timer_cb_t cb, void *arg)
         DEBUG("timer.c: prescaling failed!\n");
         return -1;
     }
+
+    pm_periph_enable(timer_config[tim].pwr);
 
     dev = timer_config[tim].dev;
 
@@ -301,6 +304,7 @@ void timer_stop(tim_t tim)
     DEBUG("timer_stop\n");
     timer_config[tim].dev->CTRLA = 0;
     timer_config[tim].dev->CTRLFSET = TC_CMD_RESTART_gc;
+    pm_periph_disable(timer_config[tim].pwr);
 }
 
 void timer_start(tim_t tim)
@@ -310,6 +314,7 @@ void timer_start(tim_t tim)
     }
 
     DEBUG("timer_start\n");
+    pm_periph_enable(timer_config[tim].pwr);
     timer_config[tim].dev->CTRLA = ctx[tim].prescaler;
 }
 
