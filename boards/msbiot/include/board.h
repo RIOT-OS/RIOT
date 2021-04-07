@@ -41,7 +41,7 @@ extern "C" {
  * @name    Configure connected MPU-9150 device
  * @{
  */
-#define MPU9150_PARAM_COMP_ADDR   (0x0E)            /**< I2C address of the MPU9150 */
+#define MPU9X50_PARAM_COMP_ADDR   (0x0E)            /**< I2C address of the MPU9150 */
 /** @} */
 
 /**
