@@ -125,8 +125,8 @@ static void _add_entry_to_list(ztimer_clock_t *clock, ztimer_base_t *entry)
 #ifdef MODULE_PM_LAYERED
     /* First timer on the clock's linked list */
     if (list->next == NULL &&
-        clock->required_pm_mode != ZTIMER_CLOCK_NO_REQUIRED_PM_MODE) {
-        pm_block(clock->required_pm_mode);
+        clock->block_pm_mode != ZTIMER_CLOCK_NO_REQUIRED_PM_MODE) {
+        pm_block(clock->block_pm_mode);
     }
 #endif
 
@@ -260,8 +260,8 @@ static void _del_entry_from_list(ztimer_clock_t *clock, ztimer_base_t *entry)
 #ifdef MODULE_PM_LAYERED
     /* The last timer just got removed from the clock's linked list */
     if (clock->list.next == NULL &&
-        clock->required_pm_mode != ZTIMER_CLOCK_NO_REQUIRED_PM_MODE) {
-        pm_unblock(clock->required_pm_mode);
+        clock->block_pm_mode != ZTIMER_CLOCK_NO_REQUIRED_PM_MODE) {
+        pm_unblock(clock->block_pm_mode);
     }
 #endif
 }
@@ -276,8 +276,8 @@ static ztimer_t *_now_next(ztimer_clock_t *clock)
             /* The last timer just got removed from the clock's linked list */
             clock->last = NULL;
 #ifdef MODULE_PM_LAYERED
-            if (clock->required_pm_mode != ZTIMER_CLOCK_NO_REQUIRED_PM_MODE) {
-                pm_unblock(clock->required_pm_mode);
+            if (clock->block_pm_mode != ZTIMER_CLOCK_NO_REQUIRED_PM_MODE) {
+                pm_unblock(clock->block_pm_mode);
             }
 #endif
         }
