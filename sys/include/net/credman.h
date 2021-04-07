@@ -196,6 +196,8 @@ int credman_get_used_count(void);
  * @note To use this functionality include the module `credman_load`. Credman only supports ECDSA
  *       for now, so [RFC5480](https://tools.ietf.org/html/rfc5480) applies.
  *
+ * @experimental This API is considered experimental and will probably change without notice!
+ *
  * @see https://tools.ietf.org/html/rfc5280#section-4.1
  *
  * @param[in]  buf          Buffer holding the encoded public key
@@ -218,6 +220,8 @@ int credman_load_public_key(const uint8_t *buf, size_t buf_len, ecdsa_public_key
  * @note To use this functionality include the module `credman_load`. Credman only supports ECDSA
  *       for now.
  *
+ * @experimental This API is considered experimental and will probably change without notice!
+ *
  * @see https://tools.ietf.org/html/rfc5958#section-2
  *
  * @param[in]  buf          Buffer holding the encoded private key
@@ -237,6 +241,9 @@ int credman_load_private_key(const uint8_t *buf, size_t buf_len, credman_credent
  * @pre `buf != NULL && cred != NULL`
  *
  * @note To use this functionality include the module `credman_load`.
+ *
+ * @experimental This API is considered experimental and will probably change without notice!
+ *
  * @see https://tools.ietf.org/html/rfc5915#section-3
  *
  * @param[in]  buf          Buffer holding the encoded private key
