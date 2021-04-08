@@ -84,6 +84,43 @@ extern "C" {
 /** @} */
 
 /**
+ * @name USB SCSI Read format capacities descriptor type
+ *
+ * @see ( @ref msc_read_fmt_capa_pkt_t )
+ * @{
+ */
+#define SCSI_READ_FMT_CAPA_TYPE_RESERVED    0x00
+#define SCSI_READ_FMT_CAPA_TYPE_UNFORMATTED 0x01
+#define SCSI_READ_FMT_CAPA_TYPE_FORMATTED   0x02
+#define SCSI_READ_FMT_CAPA_TYPE_NO_MEDIA    0x03
+/** @} */
+
+/**
+ * @brief SCSI Request Sense error type
+ */
+#define SCSI_REQUEST_SENSE_ERROR              0x70
+
+/**
+ * @name USB SCSI Request Sense Sense Key type
+ *
+ * @{
+ */
+#define SCSI_SENSE_KEY_NO_SENSE             0x00
+#define SCSI_SENSE_KEY_RECOVERED_ERROR      0x01
+#define SCSI_SENSE_KEY_NOT_READY            0x02
+#define SCSI_SENSE_KEY_MEDIUM_ERROR         0x03
+#define SCSI_SENSE_KEY_HARDWARE_ERROR       0x04
+#define SCSI_SENSE_KEY_ILLEGAL_REQUEST      0x05
+#define SCSI_SENSE_KEY_UNIT_ATTENTION       0x06
+#define SCSI_SENSE_KEY_DATA_PROTECT         0x07
+#define SCSI_SENSE_KEY_BLANK_CHECK          0x08
+#define SCSI_SENSE_KEY_VENDOR_SPECIFIC      0x09
+#define SCSI_SENSE_KEY_ABORTED_COMMAND      0x0B
+#define SCSI_SENSE_KEY_VOLUME_OVERFLOW      0x0D
+#define SCSI_SENSE_KEY_MISCOMPARE           0x0E
+/** @} */
+
+/**
  * @brief Packet structure to answer (@ref SCSI_TEST_UNIT_READY) request
  *
  * @see Inquiry Command from SCSI Primary Command
@@ -144,6 +181,38 @@ typedef struct __attribute__((packed)) {
     uint8_t product_id[16];     /**< Byte 31..16 Product Identification */
     uint8_t product_rev[4];     /**< Byte 35..32 Product Revision */
 } msc_inquiry_pkt_t;
+
+
+/**
+ * @brief Packet structure to answer (@ref SCSI_READ_FORMAT_CAPACITIES) request
+ *
+ * @see   READ FORMAT CAPACITIES from SCSI Multimedia Commands – 2 (MMC-2)
+ *
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t reserved1[3];       /**< Byte 2..0 reserved */
+    uint8_t list_length;        /**< Byte 3 Capacity list length */
+    uint32_t blk_nb;            /**< Byte 7..4 Number of blocks */
+    uint8_t type;               /**< Byte 8 Descriptor type */
+    uint8_t blk_len[3];       /**< Byte 11..9 Block length */
+} msc_read_fmt_capa_pkt_t;
+
+/**
+ * @brief Packet structure to answer (@ref SCSI_REQUEST_SENSE) request
+ *
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t error_code;       /**< Byte 0 Error code */
+    uint8_t reserved1;        /**< Reserved */
+    uint8_t sense_key;        /**< Byte 2 Sense key */
+    uint8_t reserved2[4];     /**< Byte 6..3 Information */
+    uint8_t add_len;          /**< Byte 7 Additional sense length */
+    uint8_t reserved3[4];     /**< Byte 11..8 Vendor specific */
+    uint8_t asc;              /**< Byte 12 Additional Sense Code */
+    uint8_t ascq;             /**< Byte 13 Additional Sense Code Qualifier */
+    uint8_t fruc;             /**< Byte 14 Field Replaceable Unit Code */
+    uint16_t sk_spec;         /**< Byte 16..15 Sense Key Specific */
+} msc_request_sense_pkt_t;
 
 /**
  * @brief Packet structure to answer (@ref SCSI_READ_CAPACITY) request

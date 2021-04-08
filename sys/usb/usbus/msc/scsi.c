@@ -115,6 +115,28 @@ void _scsi_inquiry(usbus_handler_t *handler)
     return;
 }
 
+void _scsi_read_format_capacities(usbus_handler_t *handler)
+{
+    usbus_msc_device_t *msc = (usbus_msc_device_t*)handler;
+    msc_read_fmt_capa_pkt_t pkt;
+    uint32_t blk_nb = (mtd0->sector_count * mtd0->pages_per_sector);
+
+    /* Only support one list, size of the whole struct minus the 4 first bytes */
+    pkt.list_length = sizeof(msc_read_fmt_capa_pkt_t) - 4;
+    pkt.blk_nb = byteorder_swapl(blk_nb);
+    pkt.type = SCSI_READ_FMT_CAPA_TYPE_FORMATTED;
+    
+    /* Manage endianness, bytes 11..9 -> LSB..MSB */
+    pkt.blk_len[0] = (HOST_MINIMAL_PAGE_SIZE >> 16) && 0xFF;
+    pkt.blk_len[1] = (HOST_MINIMAL_PAGE_SIZE >> 8) && 0xFF;
+    pkt.blk_len[2] = HOST_MINIMAL_PAGE_SIZE && 0xFF;
+
+    /* copy into ep buffer */
+    memcpy(msc->ep_in->ep->buf, &pkt, sizeof(msc_read_fmt_capa_pkt_t));
+    usbdev_ep_ready(msc->ep_in->ep, sizeof(msc_read_fmt_capa_pkt_t));
+    msc->state = WAIT_FOR_TRANSFER;
+}
+
 void _scsi_read_capacity(usbus_handler_t *handler)
 {
     usbus_msc_device_t *msc = (usbus_msc_device_t*)handler;
@@ -134,6 +156,27 @@ void _scsi_read_capacity(usbus_handler_t *handler)
     /* copy into ep buffer */
     memcpy(msc->ep_in->ep->buf, &pkt, len);
     usbdev_ep_ready(msc->ep_in->ep, len);
+    msc->state = WAIT_FOR_TRANSFER;
+}
+
+void _scsi_request_sense(usbus_handler_t *handler)
+{
+    usbus_msc_device_t *msc = (usbus_msc_device_t*)handler;
+    msc_request_sense_pkt_t pkt;
+    size_t len = sizeof(pkt);
+    memset(&pkt, 0, len);
+
+    pkt.error_code = SCSI_REQUEST_SENSE_ERROR;
+    pkt.sense_key  = SCSI_SENSE_KEY_ILLEGAL_REQUEST;
+    /* Report the size of the struct minus the 7 first bytes */
+    pkt.add_len    = len - 7;
+    pkt.asc        = 0x30;
+    pkt.ascq       = 0x01;
+
+    /* copy into ep buffer */
+    memcpy(msc->ep_in->ep->buf, &pkt, len);
+    usbdev_ep_ready(msc->ep_in->ep, len);
+    /* Wait for the current pkt to transfer before sending CSW */
     msc->state = WAIT_FOR_TRANSFER;
 }
 
@@ -182,8 +225,8 @@ void scsi_process_cmd(usbus_t *usbus, usbus_handler_t *handler,
             _scsi_test_unit_ready(handler, cbw);
             break;
         case SCSI_REQUEST_SENSE:
-            DEBUG_PUTS("todo:SCSI_REQUEST_SENSE");
-            msc->state=GEN_CSW;
+            DEBUG_PUTS("SCSI_REQUEST_SENSE");
+            _scsi_request_sense(handler);
             break;
         case SCSI_FORMAT_UNIT:
             DEBUG_PUTS("TODO: SCSI_FORMAT_UNIT");
@@ -219,8 +262,8 @@ void scsi_process_cmd(usbus_t *usbus, usbus_handler_t *handler,
             msc->state=GEN_CSW;
             break;
         case SCSI_READ_FORMAT_CAPACITIES:
-            DEBUG_PUTS("TODO: SCSI_READ_FORMAT_CAPACITIES");
-            msc->state=GEN_CSW;
+            DEBUG_PUTS("SCSI_READ_FORMAT_CAPACITIES");
+            _scsi_read_format_capacities(handler);
             break;
         case SCSI_READ_CAPACITY:
             DEBUG_PUTS("SCSI_READ_CAPACITY");
