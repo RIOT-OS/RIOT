@@ -6,6 +6,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     atmega328p \
     atmega328p-xplained-mini \
     atxmega-a1u-xpro \
+    atxmega-a3bu-xplained \
     nucleo-f031k6 \
     nucleo-l011k4 \
     samd10-xmini \

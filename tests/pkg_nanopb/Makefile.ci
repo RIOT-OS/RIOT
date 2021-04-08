@@ -1,5 +1,6 @@
 BOARD_INSUFFICIENT_MEMORY := \
     atmega328p-xplained-mini \
     atxmega-a1u-xpro \
+    atxmega-a3bu-xplained \
     stm32f030f4-demo \
     #
