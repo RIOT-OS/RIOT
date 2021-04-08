@@ -424,6 +424,17 @@ int nrf24l01p_ng_set_state(nrf24l01p_ng_t *dev, nrf24l01p_ng_state_t state);
  */
 nrf24l01p_ng_state_t nrf24l01p_ng_get_state(const nrf24l01p_ng_t *dev);
 
+/**
+ * @brief   Retrieve a unique layer-2 address for an nrf24l01p_ng instance
+ *
+ * @note    This function has __attribute__((weak)) so you can override this, e.g.
+ *          to construct an address. By default @ref luid_get_lb is used.
+ *
+ * @param[in]   dev     The device descriptor of the transceiver
+ * @param[out]  eui     Destination to write the address to
+ */
+void nrf24l01p_ng_eui_get(const netdev_t *dev, uint8_t *eui);
+
 #if IS_USED(MODULE_NRF24L01P_NG_DIAGNOSTICS)
 /**
  * @brief Get state variable as a string

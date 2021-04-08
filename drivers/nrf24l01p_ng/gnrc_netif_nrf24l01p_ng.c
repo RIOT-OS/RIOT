@@ -22,6 +22,7 @@
 #include "debug.h"
 
 #include "net/gnrc.h"
+#include "luid.h"
 #include "gnrc_netif_nrf24l01p_ng.h"
 #include "nrf24l01p_ng.h"
 
@@ -233,4 +234,14 @@ int gnrc_netif_nrf24l01p_ng_create(gnrc_netif_t *netif, char *stack,
 {
     return gnrc_netif_create(netif, stack, stacksize, priority, name,
                              dev, &nrf24l01p_ng_netif_ops);
+}
+
+void __attribute__((weak)) nrf24l01p_ng_eui_get(const netdev_t *netdev, uint8_t *eui)
+{
+    (void)netdev;
+    do {
+        luid_get_lb(eui, NRF24L01P_NG_ADDR_WIDTH);
+    }
+    while (eui[NRF24L01P_NG_ADDR_WIDTH - 1] ==
+           ((uint8_t[])NRF24L01P_NG_BROADCAST_ADDR)[NRF24L01P_NG_ADDR_WIDTH - 1]);
 }
