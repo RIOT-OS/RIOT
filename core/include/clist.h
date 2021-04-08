@@ -33,6 +33,7 @@
  * clist_remove()       | O(n)    | remove and return node
  * clist_sort()         | O(NlogN)| sort list (stable)
  * clist_count()        | O(n)    | count the number of elements in a list
+ * clist_is_empty()     | O(1)    | returns true if the list contains no elements
  *
  * clist can be used as a traditional list, a queue (FIFO) and a stack (LIFO) using
  * fast O(1) operations.
@@ -87,6 +88,7 @@
 #ifndef CLIST_H
 #define CLIST_H
 
+#include <stdbool.h>
 #include <stddef.h>
 #include "list.h"
 
@@ -101,6 +103,20 @@ extern "C" {
  *
  */
 typedef list_node_t clist_node_t;
+
+/**
+ * @brief Checks if *list is empty
+ *
+ * @note Complexity: O(1)
+ *
+ * @param[in]   list        Pointer to clist
+ *
+ * @returns     true if list contains no elements, false otherwise
+ */
+static inline bool clist_is_empty(const clist_node_t *list)
+{
+    return list->next == NULL;
+}
 
 /**
  * @brief Appends *new_node* at the end of *list
