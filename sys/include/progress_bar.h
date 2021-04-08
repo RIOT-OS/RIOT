@@ -29,50 +29,50 @@ extern "C" {
 /**
  * @brief   Progress bar maximum characters length
  */
-#ifndef PROGRESS_BAR_LENGTH
-#define PROGRESS_BAR_LENGTH                     (25U)
+#ifndef CONFIG_PROGRESS_BAR_LENGTH
+#define CONFIG_PROGRESS_BAR_LENGTH                     (25U)
 #endif
 
 /**
  * @brief   Progress bar character
  */
-#ifndef PROGRESS_BAR_FULL_CHARACTER
-#define PROGRESS_BAR_FULL_CHARACTER             "█"
+#ifndef CONFIG_PROGRESS_BAR_FULL_CHARACTER
+#define CONFIG_PROGRESS_BAR_FULL_CHARACTER             "█"
 #endif
 
 /**
  * @brief   Progress bar empty character
  */
-#ifndef PROGRESS_BAR_EMPTY_CHARACTER
-#define PROGRESS_BAR_EMPTY_CHARACTER            " "
+#ifndef CONFIG_PROGRESS_BAR_EMPTY_CHARACTER
+#define CONFIG_PROGRESS_BAR_EMPTY_CHARACTER            " "
 #endif
 
 /**
  * @brief   Character displayed on the left of the progress bar
  */
-#ifndef PROGRESS_BAR_PREFIX_CHARACTER
-#define PROGRESS_BAR_PREFIX_CHARACTER           "|"
+#ifndef CONFIG_PROGRESS_BAR_PREFIX_CHARACTER
+#define CONFIG_PROGRESS_BAR_PREFIX_CHARACTER           "|"
 #endif
 
 /**
  * @brief   Character displayed on the left of the progress bar
  */
-#ifndef PROGRESS_BAR_SUFFIX_CHARACTER
-#define PROGRESS_BAR_SUFFIX_CHARACTER           "|"
+#ifndef CONFIG_PROGRESS_BAR_SUFFIX_CHARACTER
+#define CONFIG_PROGRESS_BAR_SUFFIX_CHARACTER           "|"
 #endif
 
 /**
  * @brief   Progress bar prefix max length
  */
-#ifndef PROGRESS_BAR_PREFIX_MAX_LENGTH
-#define PROGRESS_BAR_PREFIX_MAX_LENGTH          (32U)
+#ifndef CONFIG_PROGRESS_BAR_PREFIX_MAX_LENGTH
+#define CONFIG_PROGRESS_BAR_PREFIX_MAX_LENGTH          (32U)
 #endif
 
 /**
  * @brief   Progress bar suffix max length
  */
-#ifndef PROGRESS_BAR_SUFFIX_MAX_LENGTH
-#define PROGRESS_BAR_SUFFIX_MAX_LENGTH          (32U)
+#ifndef CONFIG_PROGRESS_BAR_SUFFIX_MAX_LENGTH
+#define CONFIG_PROGRESS_BAR_SUFFIX_MAX_LENGTH          (32U)
 #endif
 
 /**
@@ -82,9 +82,9 @@ typedef struct {
     /**  Current value of the progress bar. Must be between 0 and 100 (included) */
     uint8_t value;
     /** Prefix displayed on the left of the progress bar */
-    char prefix[PROGRESS_BAR_PREFIX_MAX_LENGTH];
+    char prefix[CONFIG_PROGRESS_BAR_PREFIX_MAX_LENGTH];
     /** Suffix displayed on the right of the progress bar */
-    char suffix[PROGRESS_BAR_SUFFIX_MAX_LENGTH];
+    char suffix[CONFIG_PROGRESS_BAR_SUFFIX_MAX_LENGTH];
 } progress_bar_t;
 
 /**
