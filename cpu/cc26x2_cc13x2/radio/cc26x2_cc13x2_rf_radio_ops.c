@@ -245,7 +245,9 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t max_size,
     else {
         if (info != NULL) {
             /* RSSI resides at the end of the PSDU */
-            info->rssi = psdu[pktlen];
+
+            printf("%i", (int)(int8_t)psdu[pktlen]);
+            info->rssi = ieee802154_dbm_to_rssi((int8_t)psdu[pktlen]);
             info->lqi = 0;
         }
         memcpy(buf, psdu, pktlen);
