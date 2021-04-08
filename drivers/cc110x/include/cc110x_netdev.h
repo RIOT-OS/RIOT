@@ -19,6 +19,8 @@
 #ifndef CC110X_NETDEV_H
 #define CC110X_NETDEV_H
 
+#include "net/netdev.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -130,6 +130,17 @@ typedef struct netdev_radio_rx_info cc1xxx_rx_info_t;
 int gnrc_netif_cc1xxx_create(gnrc_netif_t *netif, char *stack, int stacksize,
                              char priority, char *name, netdev_t *dev);
 
+/**
+ * @brief   Retrieve a unique layer-2 address for a cc1xxx instance
+ *
+ * @note    This function has __attribute__((weak)) so you can override this, e.g.
+ *          to construct an address. By default @ref luid_get is used.
+ *
+ * @param[in]   dev     The device descriptor of the transceiver
+ * @param[out]  eui     Destination to write the address to
+ */
+void cc1xxx_eui_get(const netdev_t *dev, uint8_t *eui);
+
 #ifdef __cplusplus
 }
 #endif
