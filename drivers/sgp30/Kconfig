@@ -1,0 +1,25 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_SGP30
+    bool "SGP30 Particulate Matter Sensor"
+    depends on HAS_PERIPH_I2C
+    depends on TEST_KCONFIG
+    select MODULE_CHECKSUM
+    select MODULE_PERIPH_I2C
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_PERIPH_TIMER
+    select MODULE_ZTIMER_USEC
+
+config MODULE_SGP30_STRICT
+    bool "Strict reading period"
+    depends on MODULE_SGP30
+    default y
+    help
+        If this module is enabled regular measurements will be performed
+        every second and no values will be returned before the 15s warmup
+        period, see the datasheet for more.
