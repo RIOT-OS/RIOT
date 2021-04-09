@@ -12,7 +12,7 @@ KB := 1024
 ROM_LEN_K := $(shell echo $(ROM_LEN) | sed 's/K//')
 RAM_LEN_K := $(shell echo $(RAM_LEN) | sed 's/K//')
 
-ifeq (stm32wb55rg,$(CPU_MODEL))
+ifneq (,$(filter w%,$(CPU_FAM)))
   # adjust RAM_LEN and ROM_LEN according to CPU2 RAM_LEN and ROM_LEN
   CPU2_RAM_LEN_K := $(shell echo $(CPU2_RAM_LEN) | sed 's/K//')
   RAM_LEN := $(shell echo $$(( ($(RAM_LEN_K) - $(CPU2_RAM_LEN_K) ) * $(KB) )))

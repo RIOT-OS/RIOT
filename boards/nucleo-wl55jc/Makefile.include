@@ -1,2 +1,18 @@
+# CPU2 defines a restricted memory region. This is not available for
+# CPU1 linking or general access, for now we define it by its default
+# value.
+# The value is descrbed in section 4.10.19 FLASH secure Flash start address
+# register (FLASH_SFR) in SFSA[6:0] register of reference manual.
+# 0x0003 F800 -> 254K -> 2K left for CPU2.
+CPU2_ROM_LEN = 2K
+
+# CPU2 can define restricted SRAM within SRAM2a and SRAM2b. These subregions
+# will generate busfaults if accessed by CPU1. For now we will assume that both
+# SRAM2a regions are completely dedicated to CPU2.
+# The value is described in section 4.10.20 FLASH secure SRAM start address and CPU2
+# reset vector register(FLASH_SRRVR) in SBRSA[4:0] of reference manual.
+# Section 4.6.4 CPU2 security (ESE) provides detailed information on the same.
+CPU2_RAM_LEN = 1K
+
 # load the common Makefile.include for Nucleo boards
 include $(RIOTBOARD)/common/nucleo64/Makefile.include

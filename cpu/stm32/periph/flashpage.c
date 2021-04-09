@@ -110,10 +110,12 @@ static void _erase_page(void *page_addr)
 #elif defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
       defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
       defined(CPU_FAM_STM32L5) || defined(CPU_FAM_STM32F2) || \
-      defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7)
+      defined(CPU_FAM_STM32F4) || defined(CPU_FAM_STM32F7) || \
+      defined(CPU_FAM_STM32WL)
     DEBUG("[flashpage] erase: setting the page address\n");
     uint8_t pn;
-#if (FLASHPAGE_NUMOF <= MAX_PAGES_PER_BANK) || defined(CPU_FAM_STM32WB)
+#if (FLASHPAGE_NUMOF <= MAX_PAGES_PER_BANK) || defined(CPU_FAM_STM32WB) || \
+    defined(CPU_FAM_STM32WL)
     pn = (uint8_t)flashpage_page(page_addr);
 #else
     uint16_t page = flashpage_page(page_addr);
@@ -188,7 +190,7 @@ void flashpage_erase(unsigned page)
     assert(page < (int)FLASHPAGE_NUMOF);
 
     /* ensure there is no attempt to write to CPU2 protected area */
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
     assert(page < (int)(FLASH->SFR & FLASH_SFR_SFSA));
 #endif
 
@@ -253,7 +255,7 @@ void flashpage_write(void *target_addr, const void *data, size_t len)
     defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
     defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
-    defined(CPU_FAM_STM32F7)
+    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32WL)
     /* set PG bit and program page to flash */
     CNTRL_REG |= FLASH_CR_PG;
 #endif
@@ -273,7 +275,7 @@ void flashpage_write(void *target_addr, const void *data, size_t len)
     defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
     defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
     defined(CPU_FAM_STM32F2) || defined(CPU_FAM_STM32F4) || \
-    defined(CPU_FAM_STM32F7)
+    defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32WL)
     CNTRL_REG &= ~(FLASH_CR_PG);
 #endif
     DEBUG("[flashpage_raw] write: done writing data\n");
