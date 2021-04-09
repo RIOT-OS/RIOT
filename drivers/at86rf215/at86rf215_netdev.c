@@ -199,6 +199,13 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     if (info != NULL) {
         netdev_ieee802154_rx_info_t *radio_info = info;
         radio_info->rssi = (int8_t) at86rf215_reg_read(dev, dev->RF->RG_EDV);
+#ifdef MODULE_AT86RF215_MR_OQPSK_MULTIRATE
+        if (dev->oqpsk_phr_default) {
+            radio_info->phydat = at86rf215_reg_read(dev, dev->BBC->RG_OQPSKPHRRX) | 0x80;
+        } else {
+            radio_info->phydat = 0;
+        }
+#endif
     }
 
     return pkt_len;
@@ -1086,6 +1093,12 @@ static void _isr(netdev_t *netdev)
                 at86rf215_FSK_prepare_tx(dev);
             }
 #endif /* MODULE_NETDEV_IEEE802154_MR_FSK */
+#ifdef MODULE_AT86RF215_MR_OQPSK_MULTIRATE
+            /* set TX mode for peer */
+            if (dev->oqpsk_phr) {
+                at86rf215_reg_write(dev, dev->BBC->RG_OQPSKPHRTX, dev->oqpsk_phr);
+            }
+#endif /* MODULE_NETDEV_IEEE802154_MR_OQPSK */
 
             /* automatically switch to RX when TX is done */
             _enable_tx2rx(dev);

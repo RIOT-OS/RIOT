@@ -210,19 +210,26 @@ static inline uint8_t _get_ack_psdu_duration_syms(uint8_t chips, uint8_t mode)
     return (Npsdu + Ns/2) / Ns + (Npsdu + 8 * Ns) / (16 * Ns);
 }
 
-static uint8_t _set_mode(at86rf215_t *dev, uint8_t mode)
+static uint8_t _set_mode(at86rf215_t *dev, uint8_t mode, bool rx_legacy)
 {
     mode = AT86RF215_MR_OQPSK_MODE(mode);
 
     /* TX with selected rate mode */
+#ifdef MODULE_AT86RF215_MR_OQPSK_MULTIRATE
+    /* highest bit is unused by radio - set it to indicate MR-O-QPSK is used */
+    dev->oqpsk_phr_default = mode | 0x80;
+#else
     at86rf215_reg_write(dev, dev->BBC->RG_OQPSKPHRTX, mode);
+#endif
 
     /* power save mode only works when not listening to legacy frames */
     /* listening to both uses ~1mA more that just listening to legacy */
     /* TODO: make this configurable */
     uint8_t rxm = RXM_MR_OQPSK;
 
-    if (dev->flags & AT86RF215_OPT_RPC) {
+    if (rx_legacy) {
+        rxm |= RXM_BOTH_OQPSK;
+    } else if (dev->flags & AT86RF215_OPT_RPC) {
         rxm |= OQPSKC2_RPC_MASK;                /* enable Reduced Power Consumption */
     }
 
@@ -285,11 +292,15 @@ static void _set_legacy(at86rf215_t *dev, bool high_rate)
     _set_chips(dev, chips);
 
     at86rf215_reg_write(dev, dev->BBC->RG_OQPSKPHRTX, AT86RF215_OQPSK_MODE_LEGACY);
-
     at86rf215_reg_write(dev, dev->BBC->RG_OQPSKC2,
                          RXM_LEGACY_OQPSK       /* receive mode, legacy O-QPSK */
                        | OQPSKC2_FCSTLEG_MASK   /* 16 bit frame checksum */
                        | OQPSKC2_ENPROP_MASK);  /* enable RX of proprietary modes */
+
+    /* disable MR-O-QPSK rate switching */
+#ifdef MODULE_AT86RF215_MR_OQPSK_MULTIRATE
+    dev->oqpsk_phr_default = 0;
+#endif
 }
 
 static inline void _set_ack_timeout_legacy(at86rf215_t *dev)
@@ -376,7 +387,7 @@ int at86rf215_configure_OQPSK(at86rf215_t *dev, uint8_t chips, uint8_t mode)
     /* disable radio */
     at86rf215_reg_write(dev, dev->BBC->RG_PC, 0);
 
-    _set_mode(dev, mode);
+    _set_mode(dev, mode, IS_USED(MODULE_AT86RF215_MR_OQPSK_MULTIRATE));
     _set_chips(dev, chips);
     _set_csma_backoff_period(dev, chips);
     _set_ack_timeout(dev, chips, mode);
@@ -441,7 +452,7 @@ int at86rf215_OQPSK_set_mode(at86rf215_t *dev, uint8_t mode)
         _set_chips(dev, BB_FCHIP2000);
     }
 
-    _set_mode(dev, mode);
+    _set_mode(dev, mode, IS_USED(MODULE_AT86RF215_MR_OQPSK_MULTIRATE));
     _set_csma_backoff_period(dev, chips);
     _set_ack_timeout(dev, chips, mode);
 

@@ -362,6 +362,10 @@ typedef struct at86rf215 {
 #ifdef MODULE_NETDEV_IEEE802154_MR_FSK
     uint8_t fsk_pl;                         /**< FSK Preamble Length */
 #endif
+#ifdef MODULE_AT86RF215_MR_OQPSK_MULTIRATE
+    uint8_t oqpsk_phr_default;              /**< O-QPSK Phy Rate */
+    uint8_t oqpsk_phr;
+#endif
     uint8_t csma_minbe;                     /**< CSMA minimum backoff exponent */
     uint8_t csma_maxbe;                     /**< CSMA maximum backoff exponent */
     int8_t  csma_ed;                        /**< CSMA energy detect threshold */

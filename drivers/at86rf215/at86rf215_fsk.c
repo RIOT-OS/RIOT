@@ -477,6 +477,11 @@ int at86rf215_configure_FSK(at86rf215_t *dev, uint8_t srate, uint8_t mod_idx, ui
 
     at86rf215_FSK_set_channel_spacing(dev, FSK_CHANNEL_SPACING_400K);
 
+    /* disable MR-O-QPSK rate switching */
+#ifdef MODULE_AT86RF215_MR_OQPSK_MULTIRATE
+    dev->oqpsk_phr_default = 0;
+#endif
+
     at86rf215_enable_radio(dev, BB_MRFSK);
 
     return 0;
