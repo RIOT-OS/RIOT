@@ -331,6 +331,23 @@ static void test_clist_count(void)
     }
 }
 
+static void test_clist_is_empty(void)
+{
+    TEST_ASSERT(clist_is_empty(&test_clist));
+
+    for (unsigned i = 1; i <= TEST_CLIST_LEN; i++) {
+        clist_rpush(&test_clist, &tests_clist_buf[i - 1]);
+        TEST_ASSERT(!clist_is_empty(&test_clist));
+    }
+    for (unsigned i = TEST_CLIST_LEN; i > 0; i--) {
+        clist_lpop(&test_clist);
+        /* when i == 1 at the beginning of the iteration, there's one element
+           left, which is then dropped in the line above.
+           So in all cases but that last one, the list is not empty. */
+        TEST_ASSERT(clist_is_empty(&test_clist) == (i == 1));
+    }
+}
+
 Test *tests_core_clist_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -349,6 +366,7 @@ Test *tests_core_clist_tests(void)
         new_TestFixture(test_clist_sort_empty),
         new_TestFixture(test_clist_sort),
         new_TestFixture(test_clist_count),
+        new_TestFixture(test_clist_is_empty),
     };
 
     EMB_UNIT_TESTCALLER(core_clist_tests, set_up, NULL,
