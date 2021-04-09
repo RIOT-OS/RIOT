@@ -279,6 +279,7 @@ typedef enum {
 struct netdev_radio_rx_info {
     int16_t rssi;       /**< RSSI of a received frame in dBm */
     uint8_t lqi;        /**< LQI of a received frame */
+    uint8_t phydat;     /**< Driver specific data */
 };
 
 /**
