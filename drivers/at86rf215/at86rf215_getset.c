@@ -107,6 +107,19 @@ void at86rf215_set_chan(at86rf215_t *dev, uint16_t channel)
 
     uint8_t old_state = at86rf215_get_rf_state(dev);
 
+    if (dev->netdev.page == 2 && dev->netdev.chan != channel) {
+        /* page 2 has different bands, so we need to configure it again
+         * for 868 MHz or 915 MHz depending on the selected channel, also clamp it
+         * in order to avoid using the channel 0 which is the default behaviour.
+         *
+         * Doing the configuration again will also set the channel to the current
+         * one. */
+        dev->netdev.chan = channel >= dev->chan_max ? dev->chan_max : channel;
+
+        at86rf215_configure_legacy_OQPSK(dev, at86rf215_OQPSK_get_mode_legacy(dev));
+        return;
+    }
+
     /* frequency has to be updated in TRXOFF or TXPREP (datatsheet: 6.3.2) */
     if (old_state == RF_STATE_RX) {
         at86rf215_rf_cmd(dev, CMD_RF_TXPREP);
@@ -445,4 +458,75 @@ void at86rf215_disable_batmon(at86rf215_t *dev)
 
     /* disable interrupt */
     at86rf215_reg_and(dev, dev->RF->RG_IRQM, ~RF_IRQ_BATLOW);
+}
+
+int at86rf215_set_page(at86rf215_t *dev, uint8_t page)
+{
+    if (!is_subGHz(dev) && page == 0) {
+        /* on page 0 at86rf215 only supports the range of channels
+         * 11-26, which is O-QPSK on 2.4 GHz band */
+        dev->netdev.page = 0;
+        dev->chan_min = IEEE802154_CHANNEL_MIN;
+        dev->chan_max = IEEE802154_CHANNEL_MAX;
+
+        at86rf215_configure_legacy_OQPSK(dev, at86rf215_OQPSK_get_mode_legacy(dev));
+    }
+    else if (is_subGHz(dev) && page == 2) {
+        /* page 2 is for sub-ghz O-QPSK, channel 0 is for 868 MHz and
+         * from 1 to 10 is for 915 MHz */
+        dev->netdev.page = 2;
+        dev->chan_min = 0;
+        dev->chan_min = 10;
+
+        at86rf215_configure_legacy_OQPSK(dev, at86rf215_OQPSK_get_mode_legacy(dev));
+    }
+    else if (page == 9) {
+        /* as we don't know the PHY we should use because the
+         * page doesn't specify that, lets use the user defined default  */
+        bool use_mr_oqpsk = IS_ACTIVE(AT86RF215_DEFAULT_MR_OQPSK) &&
+                            IS_USED(MODULE_NETDEV_IEEE802154_MR_OQPSK);
+        bool use_mr_ofdm = IS_ACTIVE(AT86RF215_DEFAULT_MR_OFDM) &&
+                           IS_USED(MODULE_NETDEV_IEEE802154_MR_OFDM);
+        bool use_mr_fsk = IS_ACTIVE(AT86RF215_DEFAULT_MR_FSK) &&
+                          IS_USED(MODULE_NETDEV_IEEE802154_MR_FSK);
+
+        /* either no default is set or no netdev_ieee802154_mr_xxxx
+         * module was specified, so return early */
+        if (!use_mr_oqpsk && !use_mr_ofdm && !use_mr_fsk) {
+            return -ENOTSUP;
+        }
+
+        dev->netdev.page = 9;
+
+        if (use_mr_oqpsk) {
+            /* TODO: only one channel for now on 868 MHz */
+            dev->chan_min = 0;
+            dev->chan_max = 0;
+
+            at86rf215_configure_OQPSK(dev, at86rf215_OQPSK_get_chips(dev),
+                                      at86rf215_OQPSK_get_mode(dev));
+        }
+        else if (use_mr_ofdm) {
+            at86rf215_configure_OFDM(dev, at86rf215_OFDM_get_option(dev),
+                                     at86rf215_OFDM_get_scheme(dev));
+        }
+        else if (use_mr_fsk) {
+            at86rf215_configure_FSK(dev, at86rf215_FSK_get_srate(dev),
+                                    at86rf215_FSK_get_mod_idx(dev),
+                                    at86rf215_FSK_get_mod_order(dev),
+                                    at86rf215_FSK_get_fec(dev));
+        }
+    }
+    else if (page == 10 && IS_USED(MODULE_NETDEV_IEEE802154_MR_FSK)) {
+        /* TODO: Generic FSK, add way to set generic FSK descriptors */
+        at86rf215_configure_FSK(dev, at86rf215_FSK_get_srate(dev),
+                                at86rf215_FSK_get_mod_idx(dev),
+                                at86rf215_FSK_get_mod_order(dev),
+                                at86rf215_FSK_get_fec(dev));
+    }
+    else {
+        return -ENOTSUP;
+    }
+
+    return 0;
 }
