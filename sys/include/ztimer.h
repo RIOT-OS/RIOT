@@ -32,9 +32,10 @@
  *
  * As ztimer can use arbitrarily configurable backends, a ztimer clock instance
  * can run at configurable frequencies. Throughout this documentation, one
- * clock step is called `tick`.  For the pre-defined clocks ZTIMER_USEC,
- * ZTIMER_MSEC and ZTIMER_SEC, one clock tick corresponds to one microsecond,
- * one millisecond or one second, respectively.
+ * clock step is called `tick`.  For the pre-defined clocks
+ * ZTIMER_NSEC, ZTIMER_USEC, ZTIMER_MSEC and ZTIMER_SEC, one clock tick
+ * corresponds to one nanosecond, microsecond, millisecond or second,
+ * respectively.
  *
  * ztimer_now() returns the current clock tick count as uint32_t.
  *
@@ -102,6 +103,7 @@
  * - @ref ztimer_periph_rtt_init "ztimer_periph_rtt" interface for periph_rtt
  * - @ref ztimer_periph_rtc_init "ztimer_periph_rtc" interface for periph_rtc
  * - @ref ztimer_periph_timer_init "ztimer_periph_timer" interface for periph_timer
+ * - @ref ztimer_periph_ptp_init "ztimer_periph_ptp" interface for periph_ptp
  *
  * Filter submodules:
  *
@@ -199,6 +201,9 @@
  *
  * For now, there are:
  *
+ * ZTIMER_NSEC: clock providing nanosecond ticks, always uses PTP
+ *              (ztimer_periph_ptp)
+ *
  * ZTIMER_USEC: clock providing microsecond ticks, always uses a basic timer
  *              (ztimer_periph_timer)
  *
@@ -234,7 +239,8 @@
  * 2. due to its implementation details, expect +-1 clock tick systemic
  *    inaccuracy for all clocks.
  *
- * 3. for the predefined clocks (ZTIMER_USEC, ZTIMER_MSEC, ZTIMER_SEC), tick
+ * 3. for the predefined clocks
+ *    (ZTIMER_NSEC, ZTIMER_USEC, ZTIMER_MSEC, ZTIMER_SEC), tick
  *    conversion might be applied using ztimer_convert_*, causing errors due to
  *    integer conversion and rounding. In particular, most RTT's closest match
  *    for milliseconds are 1024Hz, which will be converted using convert_frac to
@@ -621,6 +627,11 @@ static inline void ztimer_init_extend(ztimer_clock_t *clock)
 #endif /* MODULE_ZTIMER_EXTEND */
 
 /* default ztimer virtual devices */
+/**
+ * @brief   Default ztimer nanosecond clock
+ */
+extern ztimer_clock_t *const ZTIMER_NSEC;
+
 /**
  * @brief   Default ztimer microsecond clock
  */

@@ -136,6 +136,13 @@ extern "C" {
 #  endif
 #endif
 
+/**
+ * @brief   The minimum pm mode required for ZTIMER_PTP to run
+ */
+#ifndef CONFIG_ZTIMER_PTP_BLOCK_PM_MODE
+#  define CONFIG_ZTIMER_PTP_BLOCK_PM_MODE ZTIMER_CLOCK_NO_REQUIRED_PM_MODE
+#endif
+
 #ifdef __cplusplus
 }
 #endif

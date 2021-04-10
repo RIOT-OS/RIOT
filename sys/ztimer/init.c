@@ -46,6 +46,7 @@
 #include "ztimer/periph_timer.h"
 #include "ztimer/periph_rtt.h"
 #include "ztimer/periph_rtc.h"
+#include "ztimer/periph_ptp.h"
 #include "ztimer/config.h"
 
 #include "log.h"
@@ -83,10 +84,26 @@
 #  define ZTIMER_RTC_FREQ FREQ_1HZ
 #endif
 
+#if MODULE_ZTIMER_PERIPH_PTP
+#  define ZTIMER_PTP      _ztimer_periph_timer_ptp
+#  define ZTIMER_PTP_CLK  _ztimer_periph_timer_ptp
+#endif
+
 /* Step 1: select which periphery to use for the higher level ZTIMER_*SEC
  *         selected periphery is marked for initialisation (INIT_ZTIMER_<periph>
  *         prepare defines for ztimer initialization
  */
+
+/* ZTIMER_NSEC always uses ZTIMER_PTP (ztimer_periph_ptp),
+ * if it is available */
+#if MODULE_ZTIMER_NSEC
+#  if defined(ZTIMER_PTP)
+#    define ZTIMER_NSEC_PTP 1
+#    ifndef INIT_ZTIMER_PTP
+#      define INIT_ZTIMER_PTP 1
+#    endif
+#  endif
+#endif
 
 /* ZTIMER_USEC always uses the basic timer
  * basic timer is available on all boards */
@@ -159,7 +176,19 @@ static ztimer_periph_rtt_t ZTIMER_RTT;
 static ztimer_periph_rtc_t ZTIMER_RTC;
 #endif
 
+#if INIT_ZTIMER_PTP
+static ztimer_periph_ptp_t ZTIMER_PTP;
+#endif
+
 /* Step 3: setup constants for ztimers and memory for converters */
+
+#if MODULE_ZTIMER_NSEC
+#  ifdef ZTIMER_PTP
+ztimer_clock_t *const ZTIMER_NSEC = &ZTIMER_PTP_CLK;
+#  else
+#    error No suitable ZTIMER_NSEC config. PTP timer configuration missing?
+#  endif
+#endif
 
 #if MODULE_ZTIMER_USEC
 #  ifdef ZTIMER_TIMER
@@ -249,7 +278,31 @@ void ztimer_init(void)
 #  endif
 #endif
 
+#if INIT_ZTIMER_PTP
+    LOG_DEBUG("ztimer_init(): initializing PTP\n");
+    ztimer_periph_ptp_init(&ZTIMER_PTP);
+#  ifdef MODULE_PM_LAYERED
+    LOG_DEBUG("ztimer_init(): ZTIMER_PTP setting block_pm_mode to %i\n",
+              CONFIG_ZTIMER_PTP_BLOCK_PM_MODE);
+    ZTIMER_PTP_CLK.block_pm_mode = CONFIG_ZTIMER_PTP_BLOCK_PM_MODE;
+#  endif
+#endif
+
 /* Step 5: initialize ztimers requested */
+
+#if MODULE_ZTIMER_NSEC
+#  ifdef CONFIG_ZTIMER_NSEC_ADJUST_SET
+    LOG_DEBUG("ztimer_init(): ZTIMER_NSEC setting adjust_set value to %i\n",
+              CONFIG_ZTIMER_NSEC_ADJUST_SET);
+    ZTIMER_NSEC->adjust_set = CONFIG_ZTIMER_NSEC_ADJUST_SET;
+#  endif
+#  ifdef CONFIG_ZTIMER_NSEC_ADJUST_SLEEP
+    LOG_DEBUG("ztimer_init(): ZTIMER_NSEC setting adjust_sleep value to %i\n",
+              CONFIG_ZTIMER_NSEC_ADJUST_SLEEP);
+    ZTIMER_NSEC->adjust_sleep = CONFIG_ZTIMER_NSEC_ADJUST_SLEEP;
+#  endif
+#endif
+
 #if MODULE_ZTIMER_USEC
 #  if ZTIMER_TIMER_FREQ != FREQ_1MHZ
 #    if ZTIMER_TIMER_FREQ == FREQ_250KHZ

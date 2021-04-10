@@ -72,6 +72,11 @@ ifneq (,$(filter ztimer_convert_frac,$(USEMODULE)))
   USEMODULE += frac
 endif
 
+ifneq (,$(filter ztimer_nsec,$(USEMODULE)))
+  USEMODULE += ztimer
+  USEMODULE += ztimer_periph_ptp
+endif
+
 ifneq (,$(filter ztimer_usec,$(USEMODULE)))
   USEMODULE += ztimer
   USEMODULE += ztimer_periph_timer
