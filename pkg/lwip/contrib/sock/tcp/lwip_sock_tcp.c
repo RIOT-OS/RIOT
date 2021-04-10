@@ -353,7 +353,12 @@ ssize_t sock_tcp_read(sock_tcp_t *sock, void *data, size_t max_len,
             sock->last_buf = NULL;
             sock->last_offset = 0;
             pbuf_free(buf);
-            break;
+            /* Exit the loop only when there's no more data available in the
+             * connection. This allows to copy more data in a single read if
+             * available. */
+            if (!mbox_avail(&sock->base.conn->recvmbox.mbox)) {
+                break;
+            }
         }
     }
     if (offset > 0) {
