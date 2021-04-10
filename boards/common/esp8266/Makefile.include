@@ -1,3 +1,7 @@
 # configure the serial interface
 PORT_LINUX ?= /dev/ttyUSB0
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
+
+# Set RTS and DTR to 0 to release reset when RTS is connected to the reset pin
+# and DTR to GPIO0.
+PYTERMFLAGS += --set-rts 0 --set-dtr 0
