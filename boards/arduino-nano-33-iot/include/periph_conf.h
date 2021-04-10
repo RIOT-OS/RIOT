@@ -241,6 +241,18 @@ static const spi_conf_t spi_config[] = {
         .mosi_pad = SPI_PAD_MOSI_0_SCK_3,
         .gclk_src = SAM0_GCLK_MAIN,
     },
+    {
+        .dev = &SERCOM3->SPI,
+        .miso_pin = GPIO_PIN(PA, 19),
+        .mosi_pin = GPIO_PIN(PA, 16),
+        .clk_pin = GPIO_PIN(PA, 17),
+        .miso_mux = GPIO_MUX_D,
+        .mosi_mux = GPIO_MUX_D,
+        .clk_mux = GPIO_MUX_D,
+        .miso_pad = SPI_PAD_MISO_3,
+        .mosi_pad = SPI_PAD_MOSI_0_SCK_1,
+        .gclk_src = SAM0_GCLK_MAIN,
+    },
 };
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
