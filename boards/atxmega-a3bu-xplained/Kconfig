@@ -15,6 +15,7 @@ config BOARD_ATXMEGA_A3BU_XPLAINED
     select HAS_PERIPH_CPUID
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_I2C
     select HAS_PERIPH_NVM
     select HAS_PERIPH_PM
     select HAS_PERIPH_TIMER
