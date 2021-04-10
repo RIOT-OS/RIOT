@@ -12,6 +12,7 @@ config BOARD_ARDUINO_NANO_33_IOT
     default y
     select CPU_MODEL_SAMD21G18A
     select HAS_PERIPH_I2C
+    select HAS_PERIPH_PWM
     select HAS_PERIPH_RTC
     select HAS_PERIPH_RTT
     select HAS_PERIPH_SPI
