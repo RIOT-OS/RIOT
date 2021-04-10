@@ -168,15 +168,19 @@ void at86rf215_get_random(at86rf215_t *dev, void *data, size_t len)
 
 uint16_t at86rf215_chan_valid(at86rf215_t *dev, uint16_t chan)
 {
+    /* If channel is not valid it is set to the lowest channel available.
+     *
+     * This is explained on IEEE Std 802.15.4-2020, Section 10.1.3.1 General,
+     * also specified on the 2006 version */
     if (is_subGHz(dev)) {
         if (chan >= dev->num_chans) {
-            return dev->num_chans - 1;
+            return 0;
         }
     } else {
         if (chan < IEEE802154_CHANNEL_MIN) {
             return IEEE802154_CHANNEL_MIN;
         } else if (chan >= IEEE802154_CHANNEL_MIN + dev->num_chans) {
-            return IEEE802154_CHANNEL_MIN + dev->num_chans - 1;
+            return IEEE802154_CHANNEL_MIN;
         }
     }
 
