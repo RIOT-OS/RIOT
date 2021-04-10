@@ -264,6 +264,43 @@ typedef struct {
     cpu_int_lvl_t int_lvl[TIMER_CH_MAX_NUMOF];  /**< Interrupt channels level */
 } timer_conf_t;
 
+/**
+ * @name    Override I2C clock speed values
+ * @{
+ */
+#define HAVE_I2C_SPEED_T
+typedef enum {
+    I2C_SPEED_LOW       =   10000ul, /**< low speed mode:     ~10 kbit/s */
+    I2C_SPEED_NORMAL    =  100000ul, /**< normal mode:       ~100 kbit/s */
+    I2C_SPEED_FAST      =  400000ul, /**< fast mode:         ~400 kbit/s */
+    I2C_SPEED_FAST_PLUS = 1000000ul, /**< fast plus mode:   ~1000 kbit/s */
+    /* High speed is not supported without external hardware hacks */
+    I2C_SPEED_HIGH      = 3400000ul, /**< high speed mode:  ~3400 kbit/s */
+} i2c_speed_t;
+/** @} */
+
+/**
+ * @name   Use shared I2C functions
+ * @{
+ */
+#define PERIPH_I2C_NEED_READ_REG
+#define PERIPH_I2C_NEED_READ_REGS
+#define PERIPH_I2C_NEED_WRITE_REG
+#define PERIPH_I2C_NEED_WRITE_REGS
+/** @} */
+
+/**
+ * @brief   I2C configuration structure
+ */
+typedef struct {
+    TWI_t *dev;             /**< Pointer to hardware module registers */
+    pwr_reduction_t pwr;    /**< Power Management */
+    gpio_t sda_pin;         /**< SDA GPIO pin */
+    gpio_t scl_pin;         /**< SCL GPIO pin */
+    i2c_speed_t speed;      /**< Configured bus speed, actual speed may be lower but never higher */
+    cpu_int_lvl_t int_lvl;  /**< Serial Interrupt Level */
+} i2c_conf_t;
+
 #ifdef __cplusplus
 }
 #endif
