@@ -371,6 +371,25 @@ gnrc_netif_t *gnrc_netif_iter(const gnrc_netif_t *prev);
 gnrc_netif_t *gnrc_netif_get_by_pid(kernel_pid_t pid);
 
 /**
+ * @brief   Get network interface by netdev
+ *
+ * @param[in] dev   A netdev pointer of a network interface.
+ *
+ * @return  The network interface on success.
+ * @return  NULL, if no network interface for the netdev exists.
+ */
+static inline gnrc_netif_t *gnrc_netif_get_by_netdev(const netdev_t *dev)
+{
+    gnrc_netif_t *netif = NULL;
+    while ((netif = gnrc_netif_iter(netif))) {
+        if (netif->dev == dev) {
+            break;
+        }
+    }
+    return netif;
+}
+
+/**
  * @brief   Gets the (unicast on anycast) IPv6 address of an interface (if IPv6
  *          is supported)
  *
