@@ -9,11 +9,18 @@ BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
 
 ESPTOOL ?= $(RIOTTOOLS)/esptool/esptool.py
 
-# The ELFFILE is the base one used for flashing
-FLASHFILE ?= $(ELFFILE)
+# The ELFFILE is defined by default in $(RIOTBASE)/Makefile.include but only
+# after the $(PROGRAMMER).inc.mk file is included, so we need ELFFILE defined
+# earlier. This is used to create new make rules in this file (based on
+# FLASHFILE) and can't be deferred.
+ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
+FLASHFILE ?= $(ELFFILE).bin
 
-# Convert .elf to .bin before flashing
-FLASHDEPS += esp-image-convert
+# Convert .elf and .csv to .bin files at build time, but make them available for
+# tests at flash time. These can't be added to FLASHDEPS because they depend on
+# on ELFFILE and would trigger a rebuild with "flash-only".
+BUILD_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
+TEST_EXTRA_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
 
 # flasher configuration
 ifneq (,$(filter esp_qemu,$(USEMODULE)))
@@ -28,22 +35,30 @@ else
   FFLAGS += --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ)
   FFLAGS += $(BOOTLOADER_POS) $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN)
   FFLAGS += 0x8000 $(BINDIR)/partitions.bin
-  FFLAGS += 0x10000 $(FLASHFILE).bin
+  FFLAGS += 0x10000 $(FLASHFILE)
 endif
 
-.PHONY: esp-image-convert esp-qemu
-# prepare image to flash: convert .elf to .bin
-esp-image-convert:
+# This is the binary that ends up programmed in the flash.
+$(ELFFILE).bin: $(ELFFILE)
 	$(Q)$(ESPTOOL) --chip $(FLASH_CHIP) elf2image --flash_mode $(FLASH_MODE) \
 		--flash_size $(FLASH_SIZE)MB --flash_freq $(FLASH_FREQ) $(FLASH_OPTS) \
-		-o $(FLASHFILE).bin $(FLASHFILE)
+		-o $@ $<
+
+# Default partition table with no OTA. Can be replaced with a custom partition
+# table setting PARTITION_TABLE_CSV.
+PARTITION_TABLE_CSV ?= $(BINDIR)/partitions.csv
+
+$(BINDIR)/partitions.csv: $(FLASHFILE)
 	$(Q)printf "\n" > $(BINDIR)/partitions.csv
-	$(Q)printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $(BINDIR)/partitions.csv
-	$(Q)printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $(BINDIR)/partitions.csv
-	$(Q)printf "factory, app, factory, 0x10000, " >> $(BINDIR)/partitions.csv
-	$(Q)ls -l $(FLASHFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partitions.csv
-	$(Q)python3 $(RIOTTOOLS)/esptool/gen_esp32part.py --verify \
-		$(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
+	$(Q)printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $@
+	$(Q)printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $@
+	$(Q)printf "factory, app, factory, 0x10000, " >> $@
+	$(Q)ls -l $< | awk '{ print $$5 }' >> $@
+
+$(BINDIR)/partitions.bin: $(PARTITION_TABLE_CSV)
+	$(Q)python3 $(RIOTTOOLS)/esptool/gen_esp32part.py --verify $< $@
+
+.PHONY: esp-qemu
 
 esp-qemu:
 	$(Q)dd if=/dev/zero bs=1M count=$(FLASH_SIZE) | \
@@ -53,7 +68,7 @@ esp-qemu:
 		head -c $$((0x8000)) | \
 		cat - $(BINDIR)/partitions.bin tmp.bin | \
 		head -c $$((0x10000)) | \
-		cat - $(FLASHFILE).bin tmp.bin | \
+		cat - $(FLASHFILE) tmp.bin | \
 		head -c $(FLASH_SIZE)MB > $(BINDIR)/$(CPU)flash.bin && rm tmp.bin
 ifeq (esp32,$(CPU_FAM))
 	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin
