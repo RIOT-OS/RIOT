@@ -96,6 +96,7 @@ PSEUDOMODULES += netstats_neighbor_etx
 PSEUDOMODULES += netstats_neighbor_count
 PSEUDOMODULES += netstats_neighbor_rssi
 PSEUDOMODULES += netstats_neighbor_lqi
+PSEUDOMODULES += netstats_neighbor_phydat
 PSEUDOMODULES += netstats_neighbor_tx_time
 PSEUDOMODULES += netstats_ipv6
 PSEUDOMODULES += netstats_rpl

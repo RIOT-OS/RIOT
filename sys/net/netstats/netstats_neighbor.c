@@ -344,6 +344,15 @@ static void netstats_nb_incr_count_rx(netstats_nb_t *stats)
 #endif
 }
 
+static void netstats_nb_set_phydat(netstats_nb_t *stats, uint8_t phydat)
+{
+#ifdef MODULE_NETSTATS_NEIGHBOR_PHYDAT
+    stats->phydat = phydat;
+#else
+    (void)stats;
+#endif
+}
+
 netstats_nb_t *netstats_nb_update_tx(netif_t *dev, netstats_nb_result_t result,
                                      uint8_t transmissions)
 {
@@ -379,8 +388,8 @@ out:
     return stats;
 }
 
-netstats_nb_t *netstats_nb_update_rx(netif_t *dev, const uint8_t *l2_addr,
-                                     uint8_t l2_addr_len, uint8_t rssi, uint8_t lqi)
+netstats_nb_t *netstats_nb_update_rx(netif_t *dev, const uint8_t *l2_addr, uint8_t l2_addr_len,
+                                     uint8_t rssi, uint8_t lqi, uint8_t phydat)
 {
     _lock(dev);
 
@@ -391,6 +400,7 @@ netstats_nb_t *netstats_nb_update_rx(netif_t *dev, const uint8_t *l2_addr,
 
         netstats_nb_update_rssi(stats, rssi, fresh);
         netstats_nb_update_lqi(stats, lqi, fresh);
+        netstats_nb_set_phydat(stats, phydat);
         netstats_nb_incr_count_rx(stats);
 
         incr_freshness(stats);

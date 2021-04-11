@@ -167,11 +167,12 @@ netstats_nb_t *netstats_nb_update_tx(netif_t *netif, netstats_nb_result_t result
  * @param[in] l2_addr_len  length of the L2 address
  * @param[in] rssi         RSSI of the received transmission in abs([dBm])
  * @param[in] lqi          Link Quality Indication provided by the radio
+ * @param[in] phydat       Driver specific data (optional)
  *
  * @return pointer to the updated record
  */
-netstats_nb_t *netstats_nb_update_rx(netif_t *netif, const uint8_t *l2_addr,
-                                     uint8_t l2_addr_len, uint8_t rssi, uint8_t lqi);
+netstats_nb_t *netstats_nb_update_rx(netif_t *netif, const uint8_t *l2_addr, uint8_t l2_addr_len,
+                                     uint8_t rssi, uint8_t lqi, uint8_t phydat);
 
 /**
  * @brief Check if a record is fresh
