@@ -37,7 +37,7 @@ Table of contents:
 
 - Install aiocoap from the source
 
-      $ pip3 install --user aiocoap>=0.4.1
+      $ pip3 install --user aiocoap[linkheader]>=0.4.1
 
   See the [aiocoap installation instructions](https://aiocoap.readthedocs.io/en/latest/installation.html)
   for more details.

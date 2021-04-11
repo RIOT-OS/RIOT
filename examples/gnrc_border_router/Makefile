@@ -42,7 +42,7 @@ USEMODULE += ps
 #USEMODULE += sock_dns              # include DNS client
 #USEMODULE += gnrc_ipv6_nib_dns     # include RDNSS option handling
 
-# When using a WiFi uplink we should use DHCPv6
+# When using a regular network uplink we should use DHCPv6
 ifneq (,$(filter cdc-ecm wifi ethernet,$(UPLINK)))
   USE_DHCPV6 ?= 1
 else
