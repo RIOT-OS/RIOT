@@ -278,6 +278,26 @@ typedef void (*sched_callback_t)(kernel_pid_t active, kernel_pid_t next);
 void sched_register_cb(sched_callback_t callback);
 #endif /* MODULE_SCHED_CB */
 
+/**
+ * @brief   Advance a runqueue
+ *
+ *  Advances the runqueue of that priority by one step to the next thread in
+ *  that priority.
+ *  Next time that priority is scheduled the now first thread will get activated.
+ *  Calling this will not start the scheduler.
+ *
+ * @warning This API is not intended for out of tree users.
+ *          Breaking API changes will be done without notice and
+ *          without deprecation. Consider yourself warned!
+ *
+ * @param   prio      The priority of the runqueue to advance
+ *
+ */
+static inline void sched_runq_advance(uint8_t prio)
+{
+    clist_lpoprpush(&sched_runqueues[prio]);
+}
+
 #ifdef __cplusplus
 }
 #endif

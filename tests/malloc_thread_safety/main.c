@@ -81,12 +81,6 @@ void * t1_t2_realloc_func(void *arg)
     return NULL;
 }
 
-static void evil_schedule_hack_dont_do_this_at_home(uint8_t prio)
-{
-    extern clist_node_t sched_runqueues[SCHED_PRIO_LEVELS];
-    clist_lpoprpush(&sched_runqueues[prio]);
-}
-
 int main(void)
 {
     kernel_pid_t t1, t2;
@@ -128,7 +122,7 @@ int main(void)
             /* shuffle t1 and t2 in their run queue. This should eventually hit
              * during a call to malloc() or free() and disclose any missing
              * guards */
-            evil_schedule_hack_dont_do_this_at_home(THREAD_PRIORITY_MAIN + 1);
+            sched_runq_advance(THREAD_PRIORITY_MAIN + 1);
         }
 
         /* Don't keep threads spinning */
