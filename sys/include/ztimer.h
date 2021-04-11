@@ -266,18 +266,28 @@ typedef struct ztimer_base ztimer_base_t;
  */
 typedef struct ztimer_clock ztimer_clock_t;
 
+#if MODULE_ZTIMER_NOW64
+typedef uint64_t ztimer_timestamp_t;  /**< type for ztimer_timestamp_t for
+                                           for 64-bit timer */
+#else
+typedef uint32_t ztimer_timestamp_t;  /**< type for ztimer_timestamp_t for
+                                           for 32-bit timer */
+#endif
+
 /**
  * @brief   Minimum information for each timer
  */
 struct ztimer_base {
     ztimer_base_t *next;        /**< next timer in list */
-    uint32_t offset;            /**< offset from last timer in list */
+    ztimer_timestamp_t offset;  /**< offset from last timer in list */
 };
 
 #if MODULE_ZTIMER_NOW64
-typedef uint64_t ztimer_now_t;  /**< type for ztimer_now() result */
+typedef uint64_t ztimer_now_t;  /**< type for ztimer_now() result for
+                                     for 64-bit timer */
 #else
-typedef uint32_t ztimer_now_t;  /**< type for ztimer_now() result */
+typedef uint32_t ztimer_now_t;  /**< type for ztimer_now() result for
+                                     for 32-bit timer */
 #endif
 
 /**
@@ -300,18 +310,36 @@ typedef struct {
  * These functions used by ztimer core to interact with the underlying clock.
  */
 typedef struct {
-    /**
-     * @brief   Set a new timer target
-     * @param   clock       ztimer clock to set the new target
-     * @param   val         Relative target (e.g. fire at value `now() + val`)
-     */
-    void (*set)(ztimer_clock_t *clock, uint32_t val);
 
-    /**
-     * @brief   Get the current count of the timer
-     * @param   clock       ztimer clock to get the current time from
-     */
-    uint32_t (*now)(ztimer_clock_t *clock);
+    union {
+            /**
+             * @brief   Set a new timer target of a 32 bit timer
+             * @param   clock       ztimer clock to set the new target
+             * @param   val         Relative target (e.g. fire at value `now() + val`)
+             */
+        void (*set)(ztimer_clock_t *clock, uint32_t val);
+
+            /**
+             * @brief   Set a new timer target of a 64 bit timer
+             * @param   clock       ztimer clock to set the new target
+             * @param   val         Relative target (e.g. fire at value `now() + val`)
+             */
+        void (*set64)(ztimer_clock_t *clock, uint64_t val);
+    };
+
+    union {
+            /**
+             * @brief   Get the current count of a 32 bit timer
+             * @param   clock       ztimer clock to get the current time from
+             */
+        uint32_t (*now)(ztimer_clock_t *clock);
+
+            /**
+             * @brief   Get the current count of a 64 bit timer
+             * @param   clock       ztimer clock to get the current time from
+             */
+        uint64_t (*now64)(ztimer_clock_t *clock);
+    };
 
     /**
      * @brief   Cancel any set target
@@ -330,7 +358,7 @@ struct ztimer_clock {
     uint16_t adjust_set;            /**< will be subtracted on every set()  */
     uint16_t adjust_sleep;          /**< will be subtracted on every sleep(),
                                          in addition to adjust_set          */
-#if MODULE_ZTIMER_EXTEND || MODULE_ZTIMER_NOW64 || DOXYGEN
+#if MODULE_ZTIMER_EXTEND || DOXYGEN
     /* values used for checkpointed intervals and 32bit extension */
     uint32_t max_value;             /**< maximum relative timer value       */
     uint32_t lower_last;            /**< timer value at last now() call     */
@@ -360,7 +388,7 @@ void ztimer_handler(ztimer_clock_t *clock);
  * @param[in]   timer       timer entry to set
  * @param[in]   val         timer target (relative ticks from now)
  */
-void ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, uint32_t val);
+void ztimer_set(ztimer_clock_t *clock, ztimer_t *timer, ztimer_timestamp_t val);
 
 /**
  * @brief   Check if a timer is currently active
@@ -447,17 +475,17 @@ ztimer_now_t _ztimer_now_extend(ztimer_clock_t *clock);
 static inline ztimer_now_t ztimer_now(ztimer_clock_t *clock)
 {
 #if MODULE_ZTIMER_NOW64
-    if (1) {
+    return clock->ops->now64(clock);
 #elif MODULE_ZTIMER_EXTEND
     if (clock->max_value < UINT32_MAX) {
-#else
-    if (0) {
-#endif
         return _ztimer_now_extend(clock);
     }
     else {
         return clock->ops->now(clock);
     }
+#else
+    return clock->ops->now(clock);
+#endif
 }
 
 /**
