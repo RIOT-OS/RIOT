@@ -16,14 +16,12 @@ def testfunc(child):
         child.expect(r"sec=\d+ min=\d+ hour=\d+")
         child.expect(r"sec=\d+ min=\d+ hour=\d+")
         child.expect(r"now=\d+:\d+ -> every 2.0s: Hello World")
-    # 2nd check for periodic 5s test message, i.e., 5 output + 1 msg
+    # 2nd check for periodic 3s test message, i.e., 3 output + 1 msg
     for _ in range(3):
         child.expect(r"sec=\d+ min=\d+ hour=\d+")
         child.expect(r"sec=\d+ min=\d+ hour=\d+")
         child.expect(r"sec=\d+ min=\d+ hour=\d+")
-        child.expect(r"sec=\d+ min=\d+ hour=\d+")
-        child.expect(r"sec=\d+ min=\d+ hour=\d+")
-        child.expect(r"now=\d+:\d+ -> every 5.0s: This is a Test")
+        child.expect(r"now=\d+:\d+ -> every 3.0s: This is a Test")
 
 
 if __name__ == "__main__":

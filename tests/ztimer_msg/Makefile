@@ -8,4 +8,7 @@ USEMODULE += ztimer_usec
 # uncomment this to test using ztimer sec
 #USEMODULE += ztimer_sec
 
+# uncomment this to test using ztimer nsec on ptp
+#USEMODULE += ztimer_nsec
+
 include $(RIOTBASE)/Makefile.include

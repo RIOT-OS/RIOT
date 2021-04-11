@@ -37,6 +37,9 @@
 #elif MODULE_ZTIMER_MSEC
 #define ZTIMER ZTIMER_MSEC
 #define TICKS_PER_SEC MS_PER_SEC
+#elif MODULE_ZTIMER_NSEC
+#define ZTIMER ZTIMER_NSEC
+#define TICKS_PER_SEC NS_PER_SEC
 #else
 #define ZTIMER ZTIMER_USEC
 #define TICKS_PER_SEC US_PER_SEC
@@ -54,7 +57,7 @@ struct timer_msg {
 
 struct timer_msg msg_a = { .interval = (2 * TICKS_PER_SEC),
                            .text = "Hello World" };
-struct timer_msg msg_b = { .interval = (5 * TICKS_PER_SEC),
+struct timer_msg msg_b = { .interval = (3 * TICKS_PER_SEC),
                            .text = "This is a Test" };
 
 void *timer_thread(void *arg)
