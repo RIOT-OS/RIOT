@@ -1450,7 +1450,11 @@ static void _process_receive_stats(gnrc_netif_t *netdev, gnrc_pktsnip_t *pkt)
     hdr = netif->data;
     src = gnrc_netif_hdr_get_src_addr(hdr);
     src_len = hdr->src_l2addr_len;
-    netstats_nb_update_rx(&netdev->netif, src, src_len, hdr->rssi, hdr->lqi);
+#if IS_USED(MODULE_GNRC_NETIF_PHYDAT)
+    netstats_nb_update_rx(&netdev->netif, src, src_len, hdr->rssi, hdr->lqi, hdr->phydat);
+#else
+    netstats_nb_update_rx(&netdev->netif, src, src_len, hdr->rssi, hdr->lqi, 0);
+#endif
 }
 
 /**
