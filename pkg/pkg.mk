@@ -128,11 +128,24 @@ $(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_SOURCE_DIR)/.git
 	fi
 	echo $(PKG_VERSION) > $@
 
+ifeq ($(GIT_CACHE_DIR),$(wildcard $(GIT_CACHE_DIR)))
 $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
 	$(info [INFO] cloning $(PKG_NAME))
 	$(Q)rm -Rf $(PKG_SOURCE_DIR)
 	$(Q)mkdir -p $(PKG_SOURCE_DIR)
 	$(Q)$(GITCACHE) clone $(PKG_URL) $(PKG_VERSION) $(PKG_SOURCE_DIR)
+else
+$(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
+	$(info [INFO] cloning without cache $(PKG_NAME))
+	$(Q)rm -Rf $(PKG_SOURCE_DIR)
+	$(Q)mkdir -p $(PKG_SOURCE_DIR)
+	$(Q)git init -q $(PKG_SOURCE_DIR)
+	$(Q)$(GIT_IN_PKG) remote add origin $(PKG_URL)
+	$(Q)$(GIT_IN_PKG) config extensions.partialClone origin
+	$(Q)$(GIT_IN_PKG) config advice.detachedHead false
+	$(Q)$(GIT_IN_PKG) fetch --depth=1 -t --filter=blob:none origin $(PKG_VERSION)
+	$(Q)$(GIT_IN_PKG) checkout $(PKG_VERSION)
+endif
 
 ifeq ($(PKG_SOURCE_DIR),$(PKG_BUILD_DIR))
 # This is the case for packages that are built within their source directory
