@@ -32,6 +32,7 @@
 #include "thread.h"
 #include "thread_flags.h"
 #include "net/bluetil/ad.h"
+#include "xtimer.h"
 
 #include "nimble_l2cap_test_conf.h"
 
