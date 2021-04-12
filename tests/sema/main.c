@@ -25,7 +25,6 @@
 #include "msg.h"
 #include "sema.h"
 #include "thread.h"
-#include "xtimer.h"
 
 #define TEST_TIME_US 1000
 #define TEST_ITERATIONS 4
@@ -77,6 +76,11 @@ int main(void)
 
     if (sema_wait_timed(&test_sema, TEST_TIME_US) != -ETIMEDOUT) {
         printf("MAIN ERROR: sema_wait_timed()");
+        return 1;
+    }
+    if (sema_wait_timed_ztimer(&test_sema, ZTIMER_USEC, TEST_TIME_US)
+        != -ETIMEDOUT) {
+        printf("MAIN_ERROR: sema_wait_timed_ztimer()");
         return 1;
     }
 
