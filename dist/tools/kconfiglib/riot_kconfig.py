@@ -18,6 +18,16 @@ class RiotKconfig(Kconfig):
         for marker in doxygen_markers:
             node.help = node.help.replace(marker, "")
 
+    def write_autoconf(self, filename=None, header=None):
+        """ Override to convert - to _ when writing autoconf.h """
+        tmp_unique_defined_syms = self.unique_defined_syms.copy()
+        for sym in self.unique_defined_syms:
+            if not sym._write_to_conf:
+                continue
+            sym.name = sym.name.replace('-', '_')
+        super(RiotKconfig, self).write_autoconf(filename, header)
+        self.unique_defined_syms = tmp_unique_defined_syms
+
 
 def standard_riot_kconfig(description=None):
     """

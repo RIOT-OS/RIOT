@@ -17,7 +17,7 @@ choice RANDOM_IMPLEMENTATION
     bool "PRNG Implementation"
     depends on TEST_KCONFIG
     default MODULE_PRNG_HWRNG if HAS_PERIPH_HWRNG
-    default MODULE_PRNG_TINYM32
+    default MODULE_PRNG_TINYMT32
 
 config MODULE_PRNG_FORTUNA
     bool "Fortuna"
@@ -51,7 +51,7 @@ config MODULE_PRNG_SHA256PRNG
     select MODULE_PRNG_SHAXPRNG
     select MODULE_HASHES
 
-config MODULE_PRNG_TINYM32
+config MODULE_PRNG_TINYMT32
     bool "Tiny-MT 32"
     select MODULE_TINYMT32
 

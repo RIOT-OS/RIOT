@@ -1,0 +1,7 @@
+CONFIG_MODULE_EMBUNIT=y
+CONFIG_MODULE_RANDOM=y
+# Should be autoselecting the MODULE_PRNG_HWRNG if possible
+# Since the makefile cannot we have to override until end of migration
+# Remove when TEST_KCONFIG is complete
+CONFIG_MODULE_PRNG_TINYMT32=y
+CONFIG_PACKAGE_TWEETNACL=y

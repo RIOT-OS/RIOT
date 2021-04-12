@@ -203,6 +203,9 @@ info-files:
 info-modules:
 	@for i in $(sort $(USEMODULE)); do echo $$i; done
 
+info-packages:
+	@for i in $(sort $(USEPKG)); do echo $$i; done
+
 info-cpu:
 	@echo $(CPU)
 
