@@ -242,11 +242,14 @@ void gpio_irq_disable(gpio_t pin)
 
 void isr_exti(void)
 {
-    /* only generate interrupts against lines which have their IMR set */
-    uint32_t pending_isr = (EXTI->PR & EXTI->IMR & GPIO_ISR_CHAN_MASK);
+    /* read all pending interrupts wired to isr_exti */
+    uint32_t pending_isr = (EXTI->PR & GPIO_ISR_CHAN_MASK);
 
     /* clear by writing a 1 */
     EXTI->PR = pending_isr;
+
+    /* only generate soft interrupts against lines which have their IMR set */
+    pending_isr &= EXTI->IMR;
 
     /* iterate over all set bits */
     uint8_t pin = 0;
