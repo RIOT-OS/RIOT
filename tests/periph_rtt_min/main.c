@@ -44,6 +44,7 @@ void cb(void *arg)
 int main(void)
 {
     uint32_t value = 0;
+    uint32_t samples = 0;
     /* mutex starts out locked, and each time an rtt callback is successfully
        called it will be locked again for the next iteration */
     mutex_t lock = MUTEX_INIT_LOCKED;
@@ -69,10 +70,12 @@ int main(void)
         }
         printf(".");
         fflush(stdout);
+        samples++;
     }
     printf("\n");
 
-    printf("RTT_MIN_OFFSET for %s: %" PRIu32 "\n", RIOT_BOARD, value);
+    printf("RTT_MIN_OFFSET for %s over %" PRIu32 " samples: %" PRIu32 "\n",
+           RIOT_BOARD, samples, value);
 
     return 0;
 }
