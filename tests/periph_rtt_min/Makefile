@@ -23,5 +23,3 @@ else
   SAMPLES ?= 1024
 endif
 CFLAGS += -DSAMPLES=$(SAMPLES)
-
-$(call target-export-variables, test, SAMPLES)
