@@ -176,26 +176,32 @@ void send_pkt(otInstance *aInstance, netdev_t *dev, netdev_event_t event)
 {
     (void)dev;
 
-    /* Tell OpenThread transmission is done depending on the NETDEV event */
-    switch (event) {
-        case NETDEV_EVENT_TX_COMPLETE:
-            DEBUG("openthread: NETDEV_EVENT_TX_COMPLETE\n");
-            otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_NONE);
-            break;
-        case NETDEV_EVENT_TX_COMPLETE_DATA_PENDING:
-            DEBUG("openthread: NETDEV_EVENT_TX_COMPLETE_DATA_PENDING\n");
-            otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_NONE);
-            break;
-        case NETDEV_EVENT_TX_NOACK:
-            DEBUG("openthread: NETDEV_EVENT_TX_NOACK\n");
-            otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_NO_ACK);
-            break;
-        case NETDEV_EVENT_TX_MEDIUM_BUSY:
-            DEBUG("openthread: NETDEV_EVENT_TX_MEDIUM_BUSY\n");
-            otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_CHANNEL_ACCESS_FAILURE);
-            break;
-        default:
-            break;
+    int tx_status;
+    if (dev->driver->confirm_send) {
+        tx_status = dev->driver->confirm_send(dev, NULL);
+    }
+
+    /* Tell OpenThread transmission is done depending on the NETDEV event
+       or confirm_send() */
+    if ((dev->driver->confirm_send && tx_status > 0) ||
+        (event == NETDEV_EVENT_TX_COMPLETE)) {
+        DEBUG("openthread: NETDEV_EVENT_TX_COMPLETE\n");
+        otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_NONE);
+    }
+    else if ((dev->driver->confirm_send && tx_status > 0) ||
+             (event == NETDEV_EVENT_TX_COMPLETE_DATA_PENDING)) {
+        DEBUG("openthread: NETDEV_EVENT_TX_COMPLETE_DATA_PENDING\n");
+        otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_NONE);
+    }
+    else if ((dev->driver->confirm_send && tx_status == -ECOMM) ||
+             (event == NETDEV_EVENT_TX_NOACK)) {
+        DEBUG("openthread: NETDEV_EVENT_TX_NOACK\n");
+        otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_NO_ACK);
+    }
+    else if ((dev->driver->confirm_send && tx_status == -EBUSY) ||
+             (event == NETDEV_EVENT_TX_MEDIUM_BUSY)) {
+        DEBUG("openthread: NETDEV_EVENT_TX_MEDIUM_BUSY\n");
+        otPlatRadioTxDone(aInstance, &sTransmitFrame, NULL, OT_ERROR_CHANNEL_ACCESS_FAILURE);
     }
 }
 
