@@ -476,7 +476,7 @@ int at86rf215_set_page(at86rf215_t *dev, uint8_t page)
          * from 1 to 10 is for 915 MHz */
         dev->netdev.page = 2;
         dev->chan_min = 0;
-        dev->chan_min = 10;
+        dev->chan_max = 10;
 
         at86rf215_configure_legacy_OQPSK(dev, at86rf215_OQPSK_get_mode_legacy(dev));
     }
