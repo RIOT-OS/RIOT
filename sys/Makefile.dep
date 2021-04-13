@@ -142,7 +142,9 @@ endif
 
 ifneq (,$(filter trickle,$(USEMODULE)))
   USEMODULE += random
-  USEMODULE += xtimer
+  ifeq (,$(filter ztimer_msec,$(USEMODULE)))
+    USEMODULE += xtimer
+  endif
 endif
 
 ifneq (,$(filter eui_provider,$(USEMODULE)))
