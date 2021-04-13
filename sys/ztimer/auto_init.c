@@ -282,6 +282,11 @@ void ztimer_init(void)
 #if INIT_ZTIMER_PTP
     LOG_DEBUG("ztimer_init(): initalizing PTP\n");
     ztimer_periph_ptp_init(&ZTIMER_PTP);
+#  ifdef MODULE_PM_LAYERED
+     LOG_DEBUG("ztimer_init(): ZTIMER_PTP setting block_pm_mode to %i\n",
+               CONFIG_ZTIMER_PTP_BLOCK_PM_MODE);
+     ZTIMER_PTP.block_pm_mode = CONFIG_ZTIMER_PTP_BLOCK_PM_MODE;
+#  endif
 #endif
 
 /* Step 5: initialize ztimers requested */
