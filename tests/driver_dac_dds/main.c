@@ -127,6 +127,7 @@ static void _fill_sine_samples_8(uint8_t *buf, size_t len, uint16_t period)
     for (uint16_t i = 0; i < period; ++i) {
         x += step;
         buf[i] = isin(x) >> 5;
+        buf[i] += INT8_MAX + 1;
     }
 
     for (uint16_t i = period; i < len; i += period) {
@@ -145,6 +146,7 @@ static void _fill_sine_samples_16(uint8_t *buf, size_t len, uint16_t period)
         x += step;
 
         uint16_t y = isin(x);
+        y += INT16_MAX + 1;
         buf[i]   = y;
         buf[++i] = y >> 8;
     }
