@@ -206,6 +206,9 @@ PSEUDOMODULES += cc1100
 PSEUDOMODULES += cc1100e
 PSEUDOMODULES += cc1101
 
+# include variants of ds3231 drivers as pseudo modules
+PSEUDOMODULES += ds3231_int
+
 # interrupt variant of the HMC5883L driver
 PSEUDOMODULES += hmc5883l_int
 

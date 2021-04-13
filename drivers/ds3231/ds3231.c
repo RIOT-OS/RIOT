@@ -21,6 +21,7 @@
 #include <string.h>
 
 #include "bcd.h"
+#include "mutex.h"
 #include "ds3231.h"
 
 #define ENABLE_DEBUG        0
@@ -75,11 +76,11 @@
 #define CTRL_BBSQW          0x40
 #define CTRL_CONV           0x20
 #define CTRL_RS2            0x10
-#define CTRL_RS1            0x80
+#define CTRL_RS1            0x08
 #define CTRL_RS             (CTRL_RS2 | CTRL_RS1)
-#define CTRL_INTCN          0x40
-#define CTRL_A2IE           0x20
-#define CTRL_A1IE           0x10
+#define CTRL_INTCN          0x04
+#define CTRL_A2IE           0x02
+#define CTRL_A1IE           0x01
 #define CTRL_AIE            (CTRL_A2IE | CTRL_A1IE)
 
 /* status register bitmaps */
@@ -141,6 +142,13 @@ static int _clrset(const ds3231_t *dev, uint8_t reg,
     return 0;
 }
 
+#if IS_USED(MODULE_DS3231_INT)
+static void _unlock(void *m)
+{
+    mutex_unlock(m);
+}
+#endif
+
 int ds3231_init(ds3231_t *dev, const ds3231_params_t *params)
 {
     int res;
@@ -149,8 +157,13 @@ int ds3231_init(ds3231_t *dev, const ds3231_params_t *params)
     memset(dev, 0, sizeof(ds3231_t));
     dev->bus = params->bus;
 
+#if IS_USED(MODULE_DS3231_INT)
+    /* write interrupt pin configuration */
+    dev->int_pin = params->int_pin;
+#endif
+
     /* en or disable 32KHz output */
-    if (params->opt & DS2321_OPT_32KHZ_ENABLE) {
+    if (params->opt & DS3221_OPT_32KHZ_ENABLE) {
         res = _clrset(dev, REG_STATUS, 0, STAT_EN32KHZ, 1, 0);
     }
     else {
@@ -160,8 +173,8 @@ int ds3231_init(ds3231_t *dev, const ds3231_params_t *params)
         return -EIO;
     }
 
-    /* disable interrupts and configure backup battery */
-    uint8_t clr = (CTRL_A1IE | CTRL_A2IE);
+    /* Configure backup battery */
+    uint8_t clr = 0;
     uint8_t set = 0;
     /* if configured, start the oscillator */
     if (params->opt & DS3231_OPT_BAT_ENABLE) {
@@ -169,6 +182,14 @@ int ds3231_init(ds3231_t *dev, const ds3231_params_t *params)
     }
     else {
         set = CTRL_EOSC;
+    }
+
+    /* if configured, enable the interrupts (no SQW output) */
+    if (params->opt & DS3231_OPT_INTER_ENABLE) {
+        set |= CTRL_INTCN;
+    }
+    else {
+        clr |= CTRL_INTCN;
     }
 
     return _clrset(dev, REG_CTRL, clr, set, 0, 1);
@@ -234,6 +255,160 @@ int ds3231_set_time(const ds3231_t *dev, const struct tm *time)
     }
 
     return 0;
+}
+
+#if IS_USED(MODULE_DS3231_INT)
+int ds3231_await_alarm(ds3231_t *dev)
+{
+    mutex_t mutex = MUTEX_INIT_LOCKED;
+
+    assert(dev != NULL);
+    assert(gpio_is_valid(dev->int_pin));
+
+    if (gpio_init_int(dev->int_pin, GPIO_IN, GPIO_FALLING, _unlock, &mutex) < 0) {
+            return -EIO;
+    }
+
+    /* wait for alarm */
+    mutex_lock(&mutex);
+
+    gpio_irq_disable(dev->int_pin);
+
+    uint8_t status, tmp;
+    _read(dev, REG_STATUS, &status, 1, 1, 0);
+
+    /* clear interrupt flags */
+    tmp = status & ~(STAT_A1F | STAT_A2F);
+    if (_write(dev, REG_STATUS, &tmp, 1, 0, 1) < 0) {
+        return -EIO;
+    }
+
+    return status & (STAT_A1F | STAT_A2F);
+}
+#endif
+
+int ds3231_set_alarm_1(const ds3231_t *dev, struct tm *time,
+                       ds3231_alm_1_mode_t trigger)
+{
+    uint8_t raw[A1_REG_NUMOF];
+    uint8_t a1mx_mask[A1_REG_NUMOF];
+
+    /* A1M1, A1M2, A1M3 and A1M4 are set accordingly to the trigger type */
+    a1mx_mask[0] = (trigger & 0x01) << 7;
+    a1mx_mask[1] = (trigger & 0x02) << 6;
+    a1mx_mask[2] = (trigger & 0x04) << 5;
+    a1mx_mask[3] = (trigger & 0x08) << 4;
+
+    raw[0] = ((bcd_from_byte(time->tm_sec)  & (MASK_SEC10  | MASK_SEC))
+            | a1mx_mask[0]);
+    raw[1] = ((bcd_from_byte(time->tm_min)  & (MASK_MIN10  | MASK_MIN))
+            | a1mx_mask[1]);
+    /* note: we always set the hours in 24-hour format */
+    raw[2] = ((bcd_from_byte(time->tm_hour) & (MASK_H20H10 | MASK_HOUR))
+            | a1mx_mask[2]);
+    raw[3] = ((bcd_from_byte(time->tm_wday  + 1) & (MASK_DATE10 | MASK_DATE))
+            | a1mx_mask[3]);
+
+    /* write alarm configuration to device */
+    if (_write(dev, REG_A1_SEC, raw, A1_REG_NUMOF, 1, 1) < 0) {
+        return -EIO;
+    }
+
+    /* activate alarm 1 in case it was not */
+    if (_clrset(dev, REG_CTRL, 0, CTRL_A1IE, 1, 1) < 0){
+        return -EIO;
+    }
+
+    return 0;
+}
+
+int ds3231_set_alarm_2(const ds3231_t *dev, struct tm *time,
+                       ds3231_alm_2_mode_t trigger)
+{
+    uint8_t raw[A2_REG_NUMOF];
+    uint8_t a2mx_mask[A2_REG_NUMOF];
+
+    /*A2M2, A2M3 and A2M4 are set accordingly to the trigger type */
+    a2mx_mask[0] = (trigger & 0x01) << 7;
+    a2mx_mask[1] = (trigger & 0x02) << 6;
+    a2mx_mask[2] = (trigger & 0x04) << 5;
+
+    raw[0] = ((bcd_from_byte(time->tm_min)  & (MASK_MIN10  | MASK_MIN))
+            | a2mx_mask[0]);
+    /* note: we always set the hours in 24-hour format */
+    raw[1] = ((bcd_from_byte(time->tm_hour) & (MASK_H20H10 | MASK_HOUR))
+            | a2mx_mask[1]);
+    raw[2] = ((bcd_from_byte(time->tm_wday  + 1) & (MASK_DATE10 | MASK_DATE))
+            | a2mx_mask[2]);
+
+    /* write alarm configuration to device */
+    if (_write(dev, REG_A2_MIN, raw, A2_REG_NUMOF, 1, 1) < 0) {
+        return -EIO;
+    }
+
+    /* activate alarm 2 in case it was not */
+    if (_clrset(dev, REG_CTRL, 0, CTRL_A2IE, 1, 1) < 0){
+        return -EIO;
+    }
+
+    return 0;
+}
+
+int ds3231_toggle_alarm_1(const ds3231_t *dev, bool enable)
+{
+    if (enable){
+        return _clrset(dev, REG_CTRL, 0, CTRL_A1IE, 1, 1);
+    }
+    else{
+        return _clrset(dev, REG_CTRL, CTRL_A1IE, 0, 1, 1);
+    }
+}
+
+int ds3231_toggle_alarm_2(const ds3231_t *dev, bool enable)
+{
+    if (enable){
+        return _clrset(dev, REG_CTRL, 0, CTRL_A2IE, 1, 1);
+    }
+    else{
+        return _clrset(dev, REG_CTRL, CTRL_A2IE, 0, 1, 1);
+    }
+}
+
+int ds3231_clear_alarm_1_flag(const ds3231_t *dev)
+{
+    return _clrset(dev, REG_STATUS, STAT_A1F, 0, 1, 1);
+}
+
+int ds3231_clear_alarm_2_flag(const ds3231_t *dev)
+{
+    return _clrset(dev, REG_STATUS, STAT_A2F, 0, 1, 1);
+
+}
+
+int ds3231_get_alarm_1_flag(const ds3231_t *dev, bool *flag)
+{
+    uint8_t raw;
+    int res = _read(dev, REG_STATUS, &raw, 1, 1, 1);
+    if (res != 0) {
+        return -EIO;
+    }
+
+    *flag = (raw & STAT_A1F);
+
+    return res;
+}
+
+int ds3231_get_alarm_2_flag(const ds3231_t *dev, bool *flag)
+{
+    uint8_t raw;
+    int res = _read(dev, REG_STATUS, &raw, 1, 1, 1);
+    if (res != 0) {
+        return -EIO;
+    }
+
+    *flag = (raw & STAT_A2F) >> 1;
+
+    return res;
 }
 
 int ds3231_get_aging_offset(const ds3231_t *dev, int8_t *offset)
