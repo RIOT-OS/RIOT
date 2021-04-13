@@ -49,6 +49,18 @@ extern "C" {
 #define BTN0_MODE                   GPIO_IN
 #define BTN1_PIN                    GPIO_PIN(0, 23)
 #define BTN1_MODE                   GPIO_IN
+/* The Logo  */
+#define BTN2_PIN                    GPIO_PIN(1, 4)
+#define BTN2_MODE                   GPIO_IN
+/* Ring 0 */
+#define BTN3_PIN                    GPIO_PIN(0, 2)
+#define BTN3_MODE                   GPIO_IN
+/* Ring 1 */
+#define BTN4_PIN                    GPIO_PIN(0, 3)
+#define BTN4_MODE                   GPIO_IN
+/* Ring 2 */
+#define BTN5_PIN                    GPIO_PIN(0, 4)
+#define BTN5_MODE                   GPIO_IN
 /** @} */
 
 /**

@@ -43,4 +43,14 @@ BOARD=microbit make term
 
 The 5x5 LED matrix display can be driven using the @ref boards_common_microbit.
 
+## Button setup
+
+The Microbit logo and the rings are configured in resistive mode, and expressed
+as buttons by default when SAUL is enabled (through @ref saul_gpio_params_t).
+Note that to press them, you have to touch the GND pin at the same time, and
+may need to press hard if you have dry fingers.  See [the micro:bit documentation on touch]
+for more information. Capacitive mode is currently not supported.
+
+[the micro:bit documentation on touch]: https://support.microbit.org/support/solutions/articles/19000116318-touch-sensing-on-the-micro-bit
+
  */
