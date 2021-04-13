@@ -64,7 +64,7 @@ class MQTTSNServer(Automaton):
         super(MQTTSNServer, self).__init__(*args, **kwargs)
 
     def parse_args(self, spawn, bind_addr, topic_name, mode, pub_interval,
-                   qos_level=0,
+                   qos_level=0, retain=False,
                    data_len_start=1, data_len_end=1000, data_len_step=1,
                    bind_port=SERVER_PORT, family=socket.AF_INET,
                    type=socket.SOCK_DGRAM, proto=0, *args, **kwargs):
@@ -78,6 +78,7 @@ class MQTTSNServer(Automaton):
         self.data_len = data_len_start
         self.data_len_end = data_len_end
         self.data_len_step = data_len_step
+        self.retain = retain
         self.last_mid = random.randint(0, 0xffff)
         self.topics = []
         self.registered_topics = []
@@ -159,24 +160,28 @@ class MQTTSNServer(Automaton):
             # send deliberately broken length packets
             # (to small payload, len field < 256)
             self.last_packet = mqttsn.MQTTSN(len=128) / mqttsn.MQTTSNPublish(
-                qos=self._qos_flags, tid=tid, mid=mid, data="128"
+                qos=self._qos_flags, tid=tid, mid=mid, retain=self.retain,
+                data="128"
             )
             self.send(self.last_packet)
             # send deliberately broken length packets
             # (to small payload, len field >= 256)
             self.last_packet = mqttsn.MQTTSN(len=400) / mqttsn.MQTTSNPublish(
-                qos=self._qos_flags, tid=tid, mid=mid, data="400"
+                qos=self._qos_flags, tid=tid, mid=mid, retain=self.retain,
+                data="400"
             )
             self.send(self.last_packet)
             # send deliberately broken length packets (too large payload)
             self.last_packet = mqttsn.MQTTSN(len=10) / mqttsn.MQTTSNPublish(
-                qos=self._qos_flags, tid=tid, mid=mid, data="X" * 20
+                qos=self._qos_flags, tid=tid, mid=mid, retain=self.retain,
+                data="X" * 20
             )
             self.send(self.last_packet)
             return subscription, mid
         if self.data_len < self.data_len_end:
             self.last_packet = mqttsn.MQTTSN() / mqttsn.MQTTSNPublish(
-                qos=self._qos_flags, tid=tid, mid=mid, data="X" * self.data_len
+                qos=self._qos_flags, tid=tid, mid=mid, retain=self.retain,
+                data="X" * self.data_len
             )
             self.send(self.last_packet)
             return subscription, mid
@@ -465,6 +470,12 @@ def testfunc(child):
         {"qos_level": 1, "mode": "sub", "topic_name": "/test",
          "data_len_start": 0, "data_len_end": DATA_MAX_LEN,
          "data_len_step": 50},
+        {"qos_level": 0, "mode": "sub", "topic_name": "/test",
+         "data_len_start": 0, "data_len_end": DATA_MAX_LEN,
+         "data_len_step": 50, "retain": True},
+        {"qos_level": 1, "mode": "sub", "topic_name": "/test",
+         "data_len_start": 0, "data_len_end": DATA_MAX_LEN,
+         "data_len_step": 50, "retain": True},
         {"qos_level": 1, "mode": "sub",
          "topic_name": "/" + ("x" * (TOPIC_MAX_LEN - 1)),
          "data_len_start": 8, "data_len_end": 9},
