@@ -429,6 +429,13 @@ int main(void)
          "NOTE: make sure the values you use exist on your platform! The\n"
          "      behavior for not existing ports/pins is not defined!");
 
+#if IS_ACTIVE(MODULE_PERIPH_GPIO_TAMPER_WAKE)
+    uint8_t tamper = rtc_get_tamper_event();
+    if (tamper) {
+        printf("\nWoken by RTC tamper event: %x\n", tamper);
+    }
+#endif
+
     /* start the shell */
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);

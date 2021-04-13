@@ -281,6 +281,7 @@ void rtt_init(void)
 #if RTC_NUM_OF_TAMPERS
 
 static rtc_state_t tamper_cb;
+static uint32_t tampctr;
 
 /* check if pin is a RTC tamper pin */
 static int _rtc_pin(gpio_t pin)
@@ -294,20 +295,32 @@ static int _rtc_pin(gpio_t pin)
     return -1;
 }
 
+static void _set_tampctrl(uint32_t reg)
+{
+    _rtc_set_enabled(0);
+    RTC->MODE0.TAMPCTRL.reg = reg;
+    _rtc_set_enabled(1);
+}
+
 void rtc_tamper_init(void)
 {
-    if (IS_ACTIVE(MODULE_PERIPH_RTC) ||
-        IS_ACTIVE(MODULE_PERIPH_RTT) ||
-        _power_is_on()) {
-        return;
+    DEBUG("tamper init\n");
+
+    /* configure RTC clock only if it is not already configured */
+    if (!IS_ACTIVE(MODULE_PERIPH_RTC) &&
+        !IS_ACTIVE(MODULE_PERIPH_RTT)) {
+
+        if (!_power_is_on()) {
+            _rtt_clock_setup();
+            _poweron();
+        }
+
+        /* disable all interrupt sources */
+        RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_MASK;
     }
 
-    _rtt_clock_setup();
-    _poweron();
-
-    /* disable all interrupt sources */
-    RTC->MODE0.INTENCLR.reg = RTC_MODE0_INTENCLR_MASK;
-
+    /* disable old tamper events */
+    _set_tampctrl(0);
     NVIC_EnableIRQ(RTC_IRQn);
 }
 
@@ -319,19 +332,13 @@ int rtc_tamper_register(gpio_t pin, gpio_flank_t flank)
         return -1;
     }
 
-    /* TAMPCTRL is enable-protected */
-    _rtc_set_enabled(0);
-
-    RTC->MODE0.TAMPCTRL.reg |= RTC_TAMPCTRL_IN0ACT_WAKE << (2 * in);
+    tampctr |= RTC_TAMPCTRL_IN0ACT_WAKE << (2 * in);
 
     if (flank == GPIO_RISING) {
-        RTC->MODE0.TAMPCTRL.reg |= RTC_TAMPCTRL_TAMLVL0 << in;
+        tampctr |= RTC_TAMPCTRL_TAMLVL0 << in;
     } else if (flank == GPIO_FALLING) {
-        RTC->MODE0.TAMPCTRL.reg &= ~(RTC_TAMPCTRL_TAMLVL0 << in);
+        tampctr &= ~(RTC_TAMPCTRL_TAMLVL0 << in);
     }
-
-    /* enable the RTC again */
-    _rtc_set_enabled(1);
 
     return 0;
 }
@@ -341,7 +348,10 @@ void rtc_tamper_enable(void)
     DEBUG("enable tamper\n");
 
     /* clear tamper id */
-    RTC->MODE0.TAMPID.reg = 0xF;
+    RTC->MODE0.TAMPID.reg = 0x1F;
+
+    /* write TAMPCTRL register */
+    _set_tampctrl(tampctr);
 
     /* work around errata 2.17.4:
      * ignore the first tamper event on the rising edge */
@@ -374,6 +384,26 @@ void rtc_tamper_enable(void)
     DEBUG("tamper enabled\n");
 }
 
+uint8_t rtc_get_tamper_event(void)
+{
+    uint32_t ret = RTC->MODE0.TAMPID.reg;
+
+    /* clear tamper event */
+    RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_TAMPER;
+    RTC->MODE0.TAMPID.reg  = ret;
+
+    return ret & RTC_TAMPID_TAMPID_Msk;
+}
+
+uint8_t rtc_tamper_pin_mask(gpio_t pin)
+{
+    int idx = _rtc_pin(pin);
+    if (idx < 0) {
+        return 0;
+    }
+
+    return 1 << idx;
+}
 #endif /* RTC_NUM_OF_TAMPERS */
 
 void rtt_set_overflow_cb(rtt_cb_t cb, void *arg)
