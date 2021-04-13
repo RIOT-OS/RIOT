@@ -43,6 +43,30 @@ static const saul_gpio_params_t saul_gpio_params[] =
         .mode = BTN1_MODE,
         .flags = SAUL_GPIO_INVERTED,
     },
+    {
+        .name = "Touch Logo",
+        .pin  = BTN2_PIN,
+        .mode = BTN2_MODE,
+        .flags = SAUL_GPIO_INVERTED,
+    },
+    {
+        .name = "Ring 0",
+        .pin  = BTN3_PIN,
+        .mode = BTN3_MODE,
+        .flags = SAUL_GPIO_INVERTED,
+    },
+    {
+        .name = "Ring 1",
+        .pin  = BTN4_PIN,
+        .mode = BTN4_MODE,
+        .flags = SAUL_GPIO_INVERTED,
+    },
+    {
+        .name = "Ring 2",
+        .pin  = BTN5_PIN,
+        .mode = BTN5_MODE,
+        .flags = SAUL_GPIO_INVERTED,
+    },
 };
 
 #ifdef __cplusplus
