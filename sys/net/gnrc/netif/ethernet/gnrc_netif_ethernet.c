@@ -162,7 +162,10 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 #endif
     res = dev->driver->send(dev, &iolist);
 
-    gnrc_pktbuf_release(pkt);
+    if (!dev->driver->confirm_send) {
+        /* only for legacy drivers we need to release pkt here */
+        gnrc_pktbuf_release(pkt);
+    }
 
     return res;
 }
