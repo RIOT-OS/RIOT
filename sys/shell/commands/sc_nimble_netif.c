@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 #include "fmt.h"
-#include "xtimer.h"
+#include "ztimer.h"
 #include "nimble_riot.h"
 #include "nimble_netif.h"
 #include "nimble_netif_conn.h"
@@ -265,13 +265,13 @@ static void _do_scan(nimble_scanner_cb cb, unsigned duration)
     nimble_scanner_init(NULL, cb);
     nimble_scanlist_clear();
     nimble_scanner_start();
-    xtimer_usleep(duration);
+    ztimer_sleep(ZTIMER_MSEC, duration);
     nimble_scanner_stop();
 }
 
 static void _cmd_scan(unsigned duration)
 {
-    printf("scanning (for %ums) ...\n", (duration / 1000));
+    printf("scanning (for %ums) ...\n", duration);
     _do_scan(nimble_scanlist_update, duration);
     puts("done");
     nimble_scanlist_print();
@@ -419,7 +419,7 @@ int _nimble_netif_handler(int argc, char **argv)
             }
             duration = atoi(argv[2]);
         }
-        _cmd_scan(duration * 1000);
+        _cmd_scan(duration);
     }
     else if (memcmp(argv[1], "connect", 7) == 0) {
         if ((argc < 3) || _ishelp(argv[2])) {
