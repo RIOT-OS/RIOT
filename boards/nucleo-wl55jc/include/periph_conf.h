@@ -35,6 +35,7 @@
 
 #include "periph_cpu.h"
 #include "clk_conf.h"
+#include "cfg_rtt_default.h"
 #include "cfg_timer_tim2.h"
 
 #ifdef __cplusplus

@@ -79,7 +79,7 @@ register. */
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
 #define IMR_REG             IMR2
 #define EXTI_IMR_BIT        EXTI_IMR2_IM32
-#elif defined(CPU_FAM_STM32G0)
+#elif defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32WL)
 #define IMR_REG             IMR1
 #define EXTI_IMR_BIT        EXTI_IMR1_IM29
 #elif defined(CPU_FAM_STM32G4)
@@ -108,7 +108,9 @@ static void *to_arg;
 
 void rtt_init(void)
 {
+    /* Enable the low speed clock (LSE) */
     stmclk_enable_lfclk();
+
     /* power on the selected LPTIMER */
     rtt_poweron();
 
@@ -128,7 +130,7 @@ void rtt_init(void)
     EXTI->IMR_REG |= EXTI_IMR_BIT;
 #if !defined(CPU_FAM_STM32L4) && !defined(CPU_FAM_STM32L0) && \
     !defined(CPU_FAM_STM32WB) && !defined(CPU_FAM_STM32G4) && \
-    !defined(CPU_FAM_STM32G0)
+    !defined(CPU_FAM_STM32G0) && !defined(CPU_FAM_STM32WL)
     EXTI->FTSR_REG &= ~(EXTI_FTSR_BIT);
     EXTI->RTSR_REG |= EXTI_RTSR_BIT;
     EXTI->PR_REG = EXTI_PR_BIT;
@@ -239,7 +241,7 @@ void isr_lptim1(void)
     LPTIM1->ICR = (LPTIM_ICR_ARRMCF | LPTIM_ICR_CMPMCF);
 #if !defined(CPU_FAM_STM32L4) && !defined(CPU_FAM_STM32L0) && \
     !defined(CPU_FAM_STM32WB) && !defined(CPU_FAM_STM32G4) && \
-    !defined(CPU_FAM_STM32G0)
+    !defined(CPU_FAM_STM32G0) && !defined(CPU_FAM_STM32WL)
     EXTI->PR_REG = EXTI_PR_BIT; /* only clear the associated bit */
 #endif
 
