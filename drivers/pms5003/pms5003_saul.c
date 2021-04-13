@@ -31,9 +31,7 @@ static pms5003_data_t values;
 
 static void _get_data(pms5003_t *dev)
 {
-    if (ztimer_now(ZTIMER_USEC) - values.timestamp > PMS5003_MODE_ACTIVE_FAST_MIN_P) {
-        pms5003_read_measurement(dev, &values);
-    }
+    pms5003_read_measurement(dev, &values);
 }
 
 static int read_mc_pm_1(const void *_dev, phydat_t *data)
@@ -45,10 +43,10 @@ static int read_mc_pm_1(const void *_dev, phydat_t *data)
     data->scale = -6;
     uint32_t value;
     if (IS_ACTIVE(CONFIG_PMS5003_INDOOR_ENVIRONMENT)) {
-        value = values.pm.values.mc_pm_1;
+        value = values.values.mc_pm_1;
     }
     else {
-        value = values.pm.values.amc_pm_1;
+        value = values.values.amc_pm_1;
     }
     phydat_fit(data, (int32_t *)&value, 1);
     return 1;
@@ -63,10 +61,10 @@ static int read_mc_pm_2p5(const void *_dev, phydat_t *data)
     data->scale = -6;
     uint32_t value;
     if (IS_ACTIVE(CONFIG_PMS5003_INDOOR_ENVIRONMENT)) {
-        value = values.pm.values.mc_pm_2p5;
+        value = values.values.mc_pm_2p5;
     }
     else {
-        value = values.pm.values.amc_pm_2p5;
+        value = values.values.amc_pm_2p5;
     }
     phydat_fit(data, (int32_t *)&value, 1);
     return 1;
@@ -81,10 +79,10 @@ static int read_mc_pm_10(const void *_dev, phydat_t *data)
     data->scale = -6;
     uint32_t value;
     if (IS_ACTIVE(CONFIG_PMS5003_INDOOR_ENVIRONMENT)) {
-        value = values.pm.values.mc_pm_10;
+        value = values.values.mc_pm_10;
     }
     else {
-        value = values.pm.values.amc_pm_10;
+        value = values.values.amc_pm_10;
     }
     phydat_fit(data, (int32_t *)&value, 1);
     return 1;
@@ -97,7 +95,7 @@ static int read_nc_pm_1(const void *_dev, phydat_t *data)
     _get_data(dev);
     data->unit = UNIT_CPM3;
     data->scale = 4;
-    uint32_t value = values.pm.values.nc_pm_1;
+    uint32_t value = values.values.nc_pm_1;
 
     phydat_fit(data, (int32_t *)&value, 1);
     return 1;
@@ -110,7 +108,7 @@ static int read_nc_pm_2p5(const void *_dev, phydat_t *data)
     _get_data(dev);
     data->unit = UNIT_CPM3;
     data->scale = 4;
-    uint32_t value = values.pm.values.nc_pm_2p5;
+    uint32_t value = values.values.nc_pm_2p5;
 
     phydat_fit(data, (int32_t *)&value, 1);
     return 1;
@@ -123,7 +121,7 @@ static int read_nc_pm_10(const void *_dev, phydat_t *data)
     _get_data(dev);
     data->unit = UNIT_CPM3;
     data->scale = 4;
-    uint32_t value = values.pm.values.nc_pm_10;
+    uint32_t value = values.values.nc_pm_10;
 
     phydat_fit(data, (int32_t *)&value, 1);
     return 1;

@@ -35,29 +35,24 @@ extern "C" {
  * @{
  */
 #ifndef PMS5003_PARAM_UART_DEV
-#define PMS5003_PARAM_UART_DEV          UART_DEV(0)
-#endif
-#ifndef PMS5003_PARAM_UART_BAUDRATE
-#define PMS5003_PARAM_UART_BAUDRATE     9600
+#define PMS5003_PARAM_UART_DEV          (UART_DEV(0))
 #endif
 #ifndef PMS5003_PARAM_RESET_PIN_
-#define PMS5003_PARAM_RESET_PIN         GPIO_PIN(0, 6)
+#define PMS5003_PARAM_RESET_PIN         (GPIO_UNDEF)
 #endif
 /* SET in the datasheet */
 #ifndef PMS5003_PARAM_ENABLE_PIN
-#define PMS5003_PARAM_ENABLE_PIN        GPIO_PIN(0, 27)
+#define PMS5003_PARAM_ENABLE_PIN        (GPIO_UNDEF)
 #endif
 #ifndef PMS5003_SAUL_INFO
-#define PMS5003_SAUL_INFO      { .name = "pms5003" }
+#define PMS5003_SAUL_INFO               { .name = "pms5003" }
 #endif
 #ifndef PMS5003_PARAMS
 #define PMS5003_PARAMS         { .uart = PMS5003_PARAM_UART_DEV, \
-                                 .baudrate = PMS5003_PARAM_UART_BAUDRATE, \
                                  .reset_pin = PMS5003_PARAM_RESET_PIN, \
                                  .enable_pin = PMS5003_PARAM_ENABLE_PIN }
 #endif
 /**@}*/
-
 
 /**
  * @brief   Configuration struct
@@ -84,7 +79,6 @@ static const saul_reg_info_t pms5003_saul_info[] =
  * @brief   Number of saul info structs
  */
 #define PMS5003_INFO_NUM ARRAY_SIZE(pms5003_saul_info)
-
 
 #ifdef __cplusplus
 }

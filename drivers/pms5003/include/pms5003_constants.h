@@ -27,6 +27,10 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Symbol rate of the PMS5003 UART interface
+ */
+#define PMS5003_BAUDRATE            (9600)
+/**
  * @brief   PMS5003 uart command length
  *
  *          2 + 2 + 1 + 2 (start + length + cmd + check bytes)
