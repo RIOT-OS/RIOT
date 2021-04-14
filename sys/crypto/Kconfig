@@ -19,7 +19,7 @@ choice
         The common Crypto block ciphers API has multiple implementations. Choose
         one of the following.
 
-config MODULE_CRYPTO_AES
+config CRYPTO_AES
     bool "AES"
     select MODULE_CRYPTO
 
@@ -30,7 +30,17 @@ config MODULE_CRYPTO_3DES
 endchoice
 
 menu "Crypto AES options"
-depends on MODULE_CRYPTO_AES
+depends on CRYPTO_AES
+
+config MODULE_CRYPTO_AES_128
+    bool "AES-128"
+    default y
+
+config MODULE_CRYPTO_AES_192
+    bool "AES-192"
+
+config MODULE_CRYPTO_AES_256
+    bool "AES-256"
 
 config MODULE_CRYPTO_AES_PRECALCULATED
     bool "Pre-calculate T tables"

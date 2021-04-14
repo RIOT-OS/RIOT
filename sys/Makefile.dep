@@ -42,15 +42,19 @@ ifneq (,$(filter i2c_scan,$(USEMODULE)))
 endif
 
 ifneq (,$(filter prng_fortuna,$(USEMODULE)))
-  USEMODULE += crypto_aes
-endif
-
-ifneq (,$(filter crypto_aes_%,$(USEMODULE)))
-  USEMODULE += crypto_aes
+  USEMODULE += crypto_aes_128
 endif
 
 ifneq (,$(filter crypto_%,$(USEMODULE)))
   USEMODULE += crypto
+endif
+
+ifneq (,$(filter cipher_modes,$(USEMODULE)))
+  USEMODULE += crypto
+endif
+
+ifneq (,$(filter crypto,$(USEMODULE)))
+  DEFAULT_MODULE += crypto_aes_128
 endif
 
 ifneq (,$(filter sys_bus_%,$(USEMODULE)))
@@ -60,7 +64,7 @@ endif
 
 ifneq (,$(filter ieee802154_security,$(USEMODULE)))
   USEMODULE += crypto
-  USEMODULE += crypto_aes
+  USEMODULE += crypto_aes_128
   USEMODULE += cipher_modes
 endif
 

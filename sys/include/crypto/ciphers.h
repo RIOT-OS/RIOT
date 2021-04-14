@@ -23,6 +23,7 @@
 #define CRYPTO_CIPHERS_H
 
 #include <stdint.h>
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,8 +31,19 @@ extern "C" {
 
 /* Shared header file for all cipher algorithms */
 
-/** @brief the length of keys in bytes */
-#define CIPHERS_MAX_KEY_SIZE 20
+/** @brief the length of keys in bytes
+ *
+ * As of now AES is the only cipher which supports different key sizes.
+ * Here we optimize the CIPHERS_MAX_KEY_SIZE to always have the smallest possible
+ * value based on which AES key sizes are used.
+ */
+#if IS_USED(MODULE_CRYPTO_AES_256)
+    #define CIPHERS_MAX_KEY_SIZE 32
+#elif IS_USED(MODULE_CRYPTO_AES_192)
+    #define CIPHERS_MAX_KEY_SIZE 24
+#else
+    #define CIPHERS_MAX_KEY_SIZE 16
+#endif
 #define CIPHER_MAX_BLOCK_SIZE 16
 
 /**
@@ -43,7 +55,8 @@ extern "C" {
  */
 #if defined(MODULE_CRYPTO_3DES)
     #define CIPHER_MAX_CONTEXT_SIZE 24
-#elif defined(MODULE_CRYPTO_AES)
+#elif IS_USED(MODULE_CRYPTO_AES_256) || IS_USED(MODULE_CRYPTO_AES_192) || \
+      IS_USED(MODULE_CRYPTO_AES_128)
     #define CIPHER_MAX_CONTEXT_SIZE CIPHERS_MAX_KEY_SIZE
 #else
 /* 0 is not a possibility because 0-sized arrays are not allowed in ISO C */
@@ -56,7 +69,8 @@ extern "C" {
 #define CIPHER_ERR_INVALID_LENGTH     -4
 #define CIPHER_ERR_ENC_FAILED         -5
 #define CIPHER_ERR_DEC_FAILED         -6
-/** Is returned by the cipher_init functions, if the corresponding alogirithm has not been included in the build */
+/** Is returned by the cipher_init functions, if the corresponding algorithm
+ * has not been included in the build */
 #define CIPHER_ERR_BAD_CONTEXT_SIZE    0
 /**  Returned by cipher_init upon successful initialization of a cipher. */
 #define CIPHER_INIT_SUCCESS            1
@@ -65,7 +79,8 @@ extern "C" {
  * @brief   the context for cipher-operations
  */
 typedef struct {
-    uint8_t context[CIPHER_MAX_CONTEXT_SIZE];  /**< buffer for cipher operations */
+    uint8_t key_size;                           /**< key size used */
+    uint8_t context[CIPHER_MAX_CONTEXT_SIZE];   /**< buffer for cipher operations */
 } cipher_context_t;
 
 
@@ -96,8 +111,18 @@ typedef struct cipher_interface_st {
 
 typedef const cipher_interface_t *cipher_id_t;
 
+/**
+ * @brief AES_128 cipher id
+ *
+ * @deprecated Use @ref CIPHER_AES instead. Will be removed after 2021.07
+ * release.
+ */
 extern const cipher_id_t CIPHER_AES_128;
 
+/**
+ * @brief AES cipher id
+ */
+extern const cipher_id_t CIPHER_AES;
 
 /**
  * @brief basic struct for using block ciphers

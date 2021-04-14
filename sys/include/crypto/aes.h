@@ -13,6 +13,14 @@
  * @file
  * @brief       Headers for the implementation of the AES cipher-algorithm
  *
+ * The default key size is 128 bits. To use a different key size add
+ * USEMODULE += crypto_aes_192 and/or USEMODULE += crypto_aes_256 to
+ * your Makefile.
+ *
+ * If only one key size is needed and that key size is not 128 bits, the 128 bit
+ * key size can be disabled with DISABLE_MODULE += crypto_aes_128 as an
+ * optimization.
+ *
  * @author      Freie Universitaet Berlin, Computer Systems & Telematics
  * @author      Nicolai Schmittberger <nicolai.schmittberger@fu-berlin.de>
  * @author      Fabrice Bellard
@@ -46,20 +54,26 @@ typedef uint8_t u8;
 
 #define AES_MAXNR         14
 #define AES_BLOCK_SIZE    16
-#define AES_KEY_SIZE      16
+
+/**
+ * @name AES key sizes
+ * @{
+ */
+#define AES_KEY_SIZE_128    16
+#define AES_KEY_SIZE_192    24
+#define AES_KEY_SIZE_256    32
+/** @} */
 
 /**
  * @brief AES key
  * @see cipher_context_t
  */
-struct aes_key_st {
+typedef struct aes_key_st {
     /** @cond INTERNAL */
     uint32_t rd_key[4 * (AES_MAXNR + 1)];
     int rounds;
     /** @endcond */
-};
-
-typedef struct aes_key_st AES_KEY;
+} AES_KEY;
 
 /**
  * @brief the cipher_context_t-struct adapted for AES

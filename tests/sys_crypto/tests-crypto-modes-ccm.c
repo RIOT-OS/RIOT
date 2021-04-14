@@ -1105,7 +1105,7 @@ static void test_encrypt_op(const uint8_t *key, uint8_t key_len,
     TEST_ASSERT_MESSAGE(sizeof(data) >= output_expected_len,
                         "Output buffer too small");
 
-    err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
+    err = cipher_init(&cipher, CIPHER_AES, key, key_len);
     TEST_ASSERT_EQUAL_INT(1, err);
 
     len = cipher_encrypt_ccm(&cipher, adata, adata_len,
@@ -1133,7 +1133,7 @@ static void test_decrypt_op(const uint8_t *key, uint8_t key_len,
     TEST_ASSERT_MESSAGE(sizeof(data) >= output_expected_len,
                         "Output buffer too small");
 
-    err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
+    err = cipher_init(&cipher, CIPHER_AES, key, key_len);
     TEST_ASSERT_EQUAL_INT(1, err);
 
     len = cipher_decrypt_ccm(&cipher, adata, adata_len,
@@ -1271,7 +1271,7 @@ static int _test_ccm_len(func_ccm_t func, uint8_t len_encoding,
 
     uint8_t nonce_len = nonce_and_len_encoding_size - len_encoding;
 
-    cipher_init(&cipher, CIPHER_AES_128, key, 16);
+    cipher_init(&cipher, CIPHER_AES, key, 16);
 
     ret = func(&cipher, NULL, adata_len, mac_length, len_encoding,
                nonce, nonce_len, input, input_len, data);

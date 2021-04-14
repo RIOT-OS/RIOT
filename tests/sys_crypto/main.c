@@ -19,6 +19,9 @@ int main(void)
     TESTS_RUN(tests_crypto_aes_tests());
     TESTS_RUN(tests_crypto_cipher_tests());
     TESTS_RUN(tests_crypto_modes_ccm_tests());
+    TESTS_RUN(tests_crypto_modes_ccm_tests_128());
+    TESTS_RUN(tests_crypto_modes_ccm_tests_192());
+    TESTS_RUN(tests_crypto_modes_ccm_tests_256());
     TESTS_RUN(tests_crypto_modes_ocb_tests());
     TESTS_RUN(tests_crypto_modes_ecb_tests());
     TESTS_RUN(tests_crypto_modes_cbc_tests());
