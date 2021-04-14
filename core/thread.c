@@ -143,7 +143,7 @@ void thread_yield(void)
     thread_t *me = thread_get_active();
 
     if (me->status >= STATUS_ON_RUNQUEUE) {
-        clist_lpoprpush(&sched_runqueues[me->priority]);
+        sched_runq_advance(me->priority);
     }
     irq_restore(old_state);
 
