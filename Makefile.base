@@ -17,7 +17,8 @@ DIRS := $(sort $(abspath $(DIRS)))
 _MOD := $(shell basename $(CURDIR))
 MODULE ?= $(_MOD)
 
-.PHONY: all clean $(DIRS:%=ALL--%) $(DIRS:%=CLEAN--%) $(MODULE).module
+.PHONY: all clean $(DIRS:%=ALL--%) $(DIRS:%=CLEAN--%) $(MODULE).module \
+        compile-commands $(DIRS:%=COMPILE-COMMANDS--%)
 
 all: $(MODULE).module ..nothing
 
@@ -31,6 +32,9 @@ $(DIRS:%=ALL--%):
 
 $(DIRS:%=CLEAN--%):
 	$(QQ)"$(MAKE)" -C $(@:CLEAN--%=%) clean
+
+$(DIRS:%=COMPILE-COMMANDS--%):
+	$(QQ)"$(MAKE)" -C $(@:COMPILE-COMMANDS--%=%) compile-commands
 
 ## submodules
 ifeq (1, $(SUBMODULES))
@@ -69,6 +73,21 @@ ifneq (,$(SRCXX))
   endif
 endif
 
+compile-commands: | $(DIRS:%=COMPILE-COMMANDS--%)
+	$(file >$(BINDIR)/$(MODULE)/compile_cmds.txt,SRC: $(sort $(SRC) $(SRC_NO_LTO)))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,SRC_NO_LTO: $(sort $(SRC_NO_LTO)))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,SRCXX: $(sort $(SRCXX)))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,CURDIR: $(CURDIR))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,CFLAGS: $(CFLAGS))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,LTOFLAGS: $(LTOFLAGS))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,INCLUDES: $(INCLUDES))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,CXXFLAGS: $(CXXFLAGS))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,CXXINCLUDES: $(CXXINCLUDES))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,CC: $(CC))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,CXX: $(CXX))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,TARGET_ARCH: $(TARGET_ARCH))
+	$(file >>$(BINDIR)/$(MODULE)/compile_cmds.txt,TARGET_ARCH_LLVM: $(TARGET_ARCH_LLVM))
+
 # include makefile snippets for packages in $(USEPKG) that modify GENSRC:
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.gensrc)
 
@@ -89,7 +108,7 @@ include $(RIOTMAKE)/tools/fixdep.inc.mk
 $(BINDIR)/$(MODULE)/:
 	$(Q)mkdir -p $@
 
-$(MODULE).module $(OBJ): | $(BINDIR)/$(MODULE)/
+$(MODULE).module compile-commands $(OBJ): | $(BINDIR)/$(MODULE)/
 
 $(MODULE).module: $(OBJ) | $(DIRS:%=ALL--%)
 

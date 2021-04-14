@@ -644,6 +644,15 @@ $(APPLICATION_MODULE).module: pkg-build $(BUILDDEPS)
 	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk
 $(APPLICATION_MODULE).module: FORCE
 
+COMPILE_COMMANDS_PATH ?= $(RIOTBASE)/compile_commands.json
+COMPILE_COMMANDS_FLAGS ?= --clangd
+.PHONY: compile-commands
+compile-commands: $(BUILDDEPS)
+	$(Q)DIRS="$(DIRS)" APPLICATION_BLOBS="$(BLOBS)" \
+	  "$(MAKE)" -C $(APPDIR) -f $(RIOTMAKE)/application.inc.mk compile-commands
+	$(Q)$(RIOTTOOLS)/compile_commands/compile_commands.py $(COMPILE_COMMANDS_FLAGS) $(BINDIR) \
+	  > $(COMPILE_COMMANDS_PATH)
+
 # Other modules are built by application.inc.mk and packages building
 _SUBMAKE_LIBS = $(filter-out $(APPLICATION_MODULE).module $(APPDEPS), $(BASELIBS) $(ARCHIVES))
 $(_SUBMAKE_LIBS): $(APPLICATION_MODULE).module pkg-build
