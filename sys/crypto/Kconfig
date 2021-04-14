@@ -23,10 +23,6 @@ config CRYPTO_AES
     bool "AES"
     select MODULE_CRYPTO
 
-config MODULE_CRYPTO_3DES
-    bool "3DES (deprecated)"
-    select MODULE_CRYPTO
-
 endchoice
 
 menu "Crypto AES options"

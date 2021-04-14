@@ -20,7 +20,6 @@ PSEUDOMODULES += core_%
 PSEUDOMODULES += cortexm_fpu
 PSEUDOMODULES += cortexm_svc
 PSEUDOMODULES += cpu_check_address
-PSEUDOMODULES += crypto_%	# crypto_aes or crypto_3des
 PSEUDOMODULES += dbgpin
 PSEUDOMODULES += devfs_%
 PSEUDOMODULES += dhcpv6_%
