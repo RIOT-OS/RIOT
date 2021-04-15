@@ -89,4 +89,9 @@ endif
 
 ifneq (,$(filter ztimer_msec,$(USEMODULE)))
   USEMODULE += ztimer
+  ifneq (,$(filter periph_rtt,$(FEATURES_PROVIDED)))
+    USEMODULE += ztimer_periph_rtt
+  else
+    USEMODULE += ztimer_periph_timer
+  endif
 endif
