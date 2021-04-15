@@ -6,12 +6,6 @@ USEMODULE += iolist
 USEMODULE += ztimer_usec
 USEMODULE += ztimer_msec
 
-# If RTT feature is available use the RTT backend of ztimer
-FEATURES_OPTIONAL += periph_rtt
-ifneq (,$(filter periph_rtt,$(FEATURES_USED)))
-  USEMODULE += ztimer_periph_rtt
-endif
-
 USEMODULE += lora
 
 ifneq (,$(filter gnrc,$(USEMODULE)))
