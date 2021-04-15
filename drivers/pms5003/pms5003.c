@@ -104,7 +104,7 @@ static int _wait_for_resp(pms5003_t *dev)
     }
     /* unlock mutex, always needs unlocking, either failed to acquire above
        or succeeded and now needs unlocking */
-    mutex_unlock(&dev->internal.timeout);init
+    mutex_unlock(&dev->internal.timeout);
     return ret;
 }
 
