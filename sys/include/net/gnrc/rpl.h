@@ -152,7 +152,6 @@
 #include "net/gnrc/rpl/dodag.h"
 #include "net/gnrc/rpl/of_manager.h"
 #include "net/fib.h"
-#include "xtimer.h"
 #include "trickle.h"
 
 #ifdef MODULE_NETSTATS_RPL

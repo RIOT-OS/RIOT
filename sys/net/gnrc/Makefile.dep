@@ -99,7 +99,9 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
   USEMODULE += gnrc_ipv6_nib
   USEMODULE += trickle
-  USEMODULE += xtimer
+  ifeq (,$(filter ztimer_msec,$(USEMODULE)))
+    USEMODULE += xtimer
+  endif
   USEMODULE += evtimer
 endif
 
