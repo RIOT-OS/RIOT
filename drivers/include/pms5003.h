@@ -7,7 +7,7 @@
  */
 
 /**
- * @defgroup    drivers_pms5003 sensors
+ * @defgroup    drivers_pms5003 PMS5003 Particulate Matter Sensor
  * @ingroup     drivers_sensors
  * @ingroup     drivers_saul
  * @brief       Driver for the Plantower PMS5003 Particulate Matter Sensor
@@ -125,9 +125,9 @@ typedef enum {
     PMS5003_STATE_READ_REQUEST,             /**< Currently parsing a frame */
     PMS5003_STATE_MODE_ACTIVE_REQUEST,      /**< Parsed valid frame */
     PMS5003_STATE_MODE_PASSIVE_REQUEST,     /**< Parsed valid frame */
-    PMS5003_STATE_SLEEP_REQUEST,            /**< Parsed invalid frame */
-    PMS5003_STATE_SLEEP,                    /**< Parsed invalid frame */
-    PMS5003_STATE_WAKEUP_REQUEST,           /**< Parsed invalid frame */
+    PMS5003_STATE_SLEEP_REQUEST,            /**< Sleep command sent, waiting for ACK */
+    PMS5003_STATE_SLEEP,                    /**< Device is sleeping */
+    PMS5003_STATE_WAKEUP_REQUEST,           /**< Wakeup command sent, waiting PMS5003_WAKEUP_TIME */
 } pms5003_state_t;
 
 /**

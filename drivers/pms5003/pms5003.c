@@ -104,7 +104,7 @@ static int _wait_for_resp(pms5003_t *dev)
     }
     /* unlock mutex, always needs unlocking, either failed to acquire above
        or succeeded and now needs unlocking */
-    mutex_unlock(&dev->internal.timeout);
+    mutex_unlock(&dev->internal.timeout);init
     return ret;
 }
 
@@ -434,8 +434,6 @@ static void _read_data_cb(const pms5003_data_t *data, void *arg)
 
 int pms5003_read_measurement(pms5003_t *dev, pms5003_data_t *data)
 {
-    dev->state = PMS5003_STATE_READ_REQUEST;
-
     if (!dev) {
         return -ENODEV;
     }
@@ -443,6 +441,8 @@ int pms5003_read_measurement(pms5003_t *dev, pms5003_data_t *data)
     if (!data) {
         return -EINVAL;
     }
+
+    dev->state = PMS5003_STATE_READ_REQUEST;
 
     pms5003_read_data_t rdata = {
         .mutex = MUTEX_INIT_LOCKED,
