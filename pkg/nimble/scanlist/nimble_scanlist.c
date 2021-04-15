@@ -21,7 +21,7 @@
 #include <assert.h>
 #include <limits.h>
 
-#include "xtimer.h"
+#include "ztimer.h"
 #include "net/bluetil/ad.h"
 
 #include "nimble_scanlist.h"
@@ -72,7 +72,7 @@ void nimble_scanlist_update(uint8_t type, const ble_addr_t *addr, int8_t rssi,
     assert(addr);
     assert(len <= BLE_ADV_PDU_LEN);
 
-    uint32_t now = xtimer_now_usec();
+    uint32_t now = (uint32_t)ztimer_now(ZTIMER_USEC);
     nimble_scanlist_entry_t *e = _find(addr);
 
     if (!e) {
