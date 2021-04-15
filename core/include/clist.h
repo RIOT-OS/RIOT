@@ -34,6 +34,8 @@
  * clist_sort()         | O(NlogN)| sort list (stable)
  * clist_count()        | O(n)    | count the number of elements in a list
  * clist_is_empty()     | O(1)    | returns true if the list contains no elements
+ * clist_exactly_one()  | O(1)    | returns true if the list contains one element
+ * clist_more_than_one()| O(1)    | returns true if the list contains more than one element
  *
  * clist can be used as a traditional list, a queue (FIFO) and a stack (LIFO) using
  * fast O(1) operations.
@@ -388,8 +390,8 @@ typedef int (*clist_cmp_func_t)(clist_node_t *a, clist_node_t *b);
  *
  * @internal
  *
- * @param[in]   list    ptr to first element of list
- * @param[in]   cmp     comparison function
+ * @param[in]   list_head   ptr to the first element inside a clist
+ * @param[in]   cmp         comparison function
  *
  * @returns     ptr to *last* element in list
  */
@@ -447,7 +449,7 @@ static inline void clist_sort(clist_node_t *list, clist_cmp_func_t cmp)
 /**
  * @brief   Count the number of items in the given list
  *
- * @param[in]   list    ptr to the first element of the list
+ * @param[in]   list    ptr to the clist
  *
  * @return  the number of elements in the given list
  */
@@ -464,6 +466,34 @@ static inline size_t clist_count(clist_node_t *list)
     }
 
     return cnt;
+}
+
+/**
+ * @brief   Tells if a list has exactly one element
+ *
+ * @note    Complexity: O(1)
+ *
+ * @param[in]   list    Pointer to the clist
+ *
+ * @retval      true    If list has exactly one element
+ */
+static inline bool clist_exactly_one(clist_node_t *list)
+{
+    return !clist_is_empty(list) && (list->next == list->next->next);
+}
+
+/**
+ * @brief   Tells if a list has more than one element
+ *
+ * @note    Complexity: O(1)
+ *
+ * @param[in]   list    Pointer to the clist
+ *
+ * @retval      true    If list has more than one element
+ */
+static inline bool clist_more_than_one(clist_node_t *list)
+{
+    return !clist_is_empty(list) && (list->next != list->next->next);
 }
 
 #ifdef __cplusplus

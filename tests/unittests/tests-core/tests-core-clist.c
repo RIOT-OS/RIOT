@@ -348,6 +348,45 @@ static void test_clist_is_empty(void)
     }
 }
 
+static void test_clist_special_cardinality(void)
+{
+    unsigned i = 0;
+    TEST_ASSERT(clist_is_empty(&test_clist));
+    TEST_ASSERT(!clist_exactly_one(&test_clist));
+    TEST_ASSERT(!clist_more_than_one(&test_clist));
+
+    clist_rpush(&test_clist, &tests_clist_buf[i++]);
+
+    TEST_ASSERT(!clist_is_empty(&test_clist));
+    TEST_ASSERT(clist_exactly_one(&test_clist));
+    TEST_ASSERT(!clist_more_than_one(&test_clist));
+
+    while (i < TEST_CLIST_LEN) {
+        clist_rpush(&test_clist, &tests_clist_buf[i++]);
+
+        TEST_ASSERT(!clist_is_empty(&test_clist));
+        TEST_ASSERT(!clist_exactly_one(&test_clist));
+        TEST_ASSERT(clist_more_than_one(&test_clist));
+    }
+    do {
+        TEST_ASSERT(!clist_is_empty(&test_clist));
+        TEST_ASSERT(!clist_exactly_one(&test_clist));
+        TEST_ASSERT(clist_more_than_one(&test_clist));
+
+        clist_lpop(&test_clist);
+    } while (--i > 1);
+
+    TEST_ASSERT(!clist_is_empty(&test_clist));
+    TEST_ASSERT(clist_exactly_one(&test_clist));
+    TEST_ASSERT(!clist_more_than_one(&test_clist));
+
+    clist_lpop(&test_clist);
+
+    TEST_ASSERT(clist_is_empty(&test_clist));
+    TEST_ASSERT(!clist_exactly_one(&test_clist));
+    TEST_ASSERT(!clist_more_than_one(&test_clist));
+}
+
 Test *tests_core_clist_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -367,6 +406,7 @@ Test *tests_core_clist_tests(void)
         new_TestFixture(test_clist_sort),
         new_TestFixture(test_clist_count),
         new_TestFixture(test_clist_is_empty),
+        new_TestFixture(test_clist_special_cardinality),
     };
 
     EMB_UNIT_TESTCALLER(core_clist_tests, set_up, NULL,
