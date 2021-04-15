@@ -98,6 +98,18 @@ void saul_observer_msg(saul_reg_t *dev, saul_observer_t *entry, msg_t *msg, kern
  */
 void saul_observer_wakeup(saul_reg_t *dev, saul_observer_t *entry, kernel_pid_t pid);
 
+/**
+ * @brief   Start observing a SAUL device and sets a flag on change
+ *
+ * The message's content.ptr contains the saul_reg_t.
+ *
+ * @param[in] dev       SAUL device to observe
+ * @param[in] entry     pointer to the observer handle
+ * @param[in] pid       PID of the thread to work on
+ * @param[in] flag      the flag to set upon an event
+ */
+void saul_observer_set_flag(saul_reg_t *dev, saul_observer_t *entry, kernel_pid_t pid, thread_flags_t flag);
+
 #ifdef __cplusplus
 }
 #endif

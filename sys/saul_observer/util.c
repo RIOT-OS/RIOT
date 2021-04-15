@@ -2,6 +2,11 @@
 #include "msg.h"
 #include "thread.h"
 
+#if IS_ACTIVE(MODULE_CORE_THREAD_FLAGS)
+#include "bitarithm.h"
+#include "thread_flags.h"
+#endif
+
 #if IS_ACTIVE(MODULE_CORE_MSG)
 static void _callback_msg(saul_reg_t *dev, void *arg)
 {
@@ -38,3 +43,27 @@ void saul_observer_wakeup(saul_reg_t *dev, saul_observer_t *observer, kernel_pid
 
     saul_observer_add(dev, observer);
 }
+
+#if IS_ACTIVE(MODULE_CORE_THREAD_FLAGS)
+static void _callback_flag(saul_reg_t *dev, void *arg)
+{
+    (void) dev;
+    kernel_pid_t pid = (kernel_pid_t) (((intptr_t) arg) & 0xff);
+    thread_t *thread = thread_get(pid);
+    unsigned flag_no = (unsigned) (((intptr_t) arg) >> 8);
+    thread_flags_t flag = 0;
+    SETBIT(flag, flag_no);
+    thread_flags_set(thread, flag);
+}
+
+void saul_observer_set_flag(saul_reg_t *dev, saul_observer_t *observer, kernel_pid_t pid, thread_flags_t flag)
+{
+    assert(flag);
+    unsigned flag_no = bitarithm_lsb(flag);
+    observer->callback = _callback_flag;
+    /* Store thread PID and flag number in arg pointer */
+    observer->arg = (void *)((intptr_t)(pid + (flag_no << 8)));
+
+    saul_observer_add(dev, observer);
+}
+#endif
