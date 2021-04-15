@@ -24,7 +24,6 @@
 #include "net/gnrc/rpl/dodag.h"
 #include "utlist.h"
 #include "trickle.h"
-#include "xtimer.h"
 #ifdef MODULE_GNRC_RPL_P2P
 #include "net/gnrc/rpl/p2p.h"
 #include "net/gnrc/rpl/p2p_dodag.h"
@@ -284,7 +283,6 @@ int _gnrc_rpl_dodag_show(void)
 
     gnrc_rpl_dodag_t *dodag = NULL;
     char addr_str[IPV6_ADDR_MAX_STR_LEN];
-    uint64_t tc;
 
     for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
         if (gnrc_rpl_instances[i].state == 0) {
@@ -298,16 +296,13 @@ int _gnrc_rpl_dodag_show(void)
                 gnrc_rpl_instances[i].mop, gnrc_rpl_instances[i].of->ocp,
                 gnrc_rpl_instances[i].min_hop_rank_inc, gnrc_rpl_instances[i].max_rank_inc);
 
-        tc = xtimer_left_usec(&dodag->trickle.msg_timer);
-        tc = (int64_t) tc == 0 ? 0 : tc / US_PER_SEC;
-
         printf("\tdodag [%s | R: %d | OP: %s | PIO: %s | "
-               "TR(I=[%d,%d], k=%d, c=%d, TC=%" PRIu32 "s)]\n",
+               "TR(I=[%d,%d], k=%d, c=%d)]\n",
                ipv6_addr_to_str(addr_str, &dodag->dodag_id, sizeof(addr_str)),
                dodag->my_rank, (dodag->node_status == GNRC_RPL_LEAF_NODE ? "Leaf" : "Router"),
                ((dodag->dio_opts & GNRC_RPL_REQ_DIO_OPT_PREFIX_INFO) ? "on" : "off"),
                (1 << dodag->dio_min), dodag->dio_interval_doubl, dodag->trickle.k,
-               dodag->trickle.c, (uint32_t) (tc & 0xFFFFFFFF));
+               dodag->trickle.c);
 
 #ifdef MODULE_GNRC_RPL_P2P
         if (dodag->instance->mop == GNRC_RPL_P2P_MOP) {
