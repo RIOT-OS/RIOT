@@ -1,8 +1,6 @@
 PKG_NAME    = nimble
-# Temporary URL change until upstream adaption is merged (nimble:#970)
-PKG_URL     = https://github.com/haukepetersen/mynewt-nimble.git
-#PKG_URL     = https://github.com/apache/mynewt-nimble.git
-PKG_VERSION = 7a2bf2420a1a2bcd8bbb5bf8f5927882b3c499c0
+PKG_URL     = https://github.com/apache/mynewt-nimble.git
+PKG_VERSION = 940cc0b4a81295305ceead15928da24fe6e6f603
 PKG_LICENSE = Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
