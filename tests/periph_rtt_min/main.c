@@ -68,8 +68,7 @@ int main(void)
         if (offset > value) {
             value = offset;
         }
-        printf(".");
-        fflush(stdout);
+        printf("Sample %u\n", i);
         samples++;
     }
     printf("\n");
