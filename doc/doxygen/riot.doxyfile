@@ -774,6 +774,7 @@ INPUT                  = ../../doc.txt \
                          src/using-cpp.md \
                          src/advanced-build-system-tricks.md \
                          src/emulators.md \
+                         src/release-cycle.md \
                          src/changelog.md \
                          ../../LOSTANDFOUND.md
 
