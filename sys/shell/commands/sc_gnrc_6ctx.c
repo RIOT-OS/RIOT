@@ -24,9 +24,15 @@
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/sixlowpan/nd.h"
 #include "timex.h"
-#include "xtimer.h"
 
+#if IS_USED(MODULE_ZTIMER_MSEC)
+#include "ztimer.h"
+static ztimer_t del_timer[GNRC_SIXLOWPAN_CTX_SIZE];
+#else
+#include "xtimer.h"
 static xtimer_t del_timer[GNRC_SIXLOWPAN_CTX_SIZE];
+#endif
+
 void _del_cb(void *ptr)
 {
     gnrc_sixlowpan_ctx_t *ctx = ptr;
@@ -120,8 +126,13 @@ int _gnrc_6ctx_del(char *cmd_str, char *ctx_str)
             ctx->ltime = 0;
             del_timer[cid].callback = _del_cb;
             del_timer[cid].arg = ctx;
+#if IS_USED(MODULE_ZTIMER_MSEC)
+            ztimer_set(ZTIMER_MSEC, &del_timer[cid],
+                       SIXLOWPAN_ND_MIN_CTX_CHANGE_SEC_DELAY * MS_PER_SEC);
+#else
             xtimer_set(&del_timer[cid],
                        SIXLOWPAN_ND_MIN_CTX_CHANGE_SEC_DELAY * US_PER_SEC);
+#endif
         }
     }
     else {
