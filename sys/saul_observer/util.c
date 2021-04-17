@@ -1,10 +1,15 @@
 #include "saul_observer.h"
 #include "msg.h"
 #include "thread.h"
+#include "mutex.h"
 
 #if IS_ACTIVE(MODULE_CORE_THREAD_FLAGS)
 #include "bitarithm.h"
 #include "thread_flags.h"
+#endif
+
+#if IS_ACTIVE(MODULE_CORE_MSG_BUS)
+#include "msg_bus.h"
 #endif
 
 #if IS_ACTIVE(MODULE_CORE_MSG)
@@ -63,6 +68,38 @@ void saul_observer_set_flag(saul_reg_t *dev, saul_observer_t *observer, kernel_p
     observer->callback = _callback_flag;
     /* Store thread PID and flag number in arg pointer */
     observer->arg = (void *)((intptr_t)(pid + (flag_no << 8)));
+
+    saul_observer_add(dev, observer);
+}
+#endif
+
+static void _callback_mutex(saul_reg_t *dev, void *arg)
+{
+    (void) dev;
+    mutex_t *mutex = (mutex_t*) arg;
+    mutex_unlock(mutex);
+}
+
+void saul_observer_unlock_mutex(saul_reg_t *dev, saul_observer_t *observer, mutex_t *mutex)
+{
+    observer->callback = _callback_mutex;
+    observer->arg = (void *) mutex;
+
+    saul_observer_add(dev, observer);
+}
+
+#if IS_ACTIVE(MODULE_CORE_MSG_BUS)
+static void _callback_msg_bus(saul_reg_t *dev, void *arg)
+{
+    msg_bus_t *msg_bus = (msg_bus_t*) arg;
+    msg_t msg = {.content.ptr = (void*) dev};
+    msg_bus_post(msg_bus, dev->driver->type % 32, &msg);
+}
+
+void saul_observer_msg_bus_post(saul_reg_t *dev, saul_observer_t *observer, msg_bus_t *msg_bus)
+{
+    observer->callback = _callback_msg_bus;
+    observer->arg = (void *) msg_bus;
 
     saul_observer_add(dev, observer);
 }

@@ -110,6 +110,27 @@ void saul_observer_wakeup(saul_reg_t *dev, saul_observer_t *entry, kernel_pid_t 
  */
 void saul_observer_set_flag(saul_reg_t *dev, saul_observer_t *entry, kernel_pid_t pid, thread_flags_t flag);
 
+/**
+ * @brief   Start observing a SAUL device and unlocks a mutex on change
+ *
+ * @param[in] dev       SAUL device to observe
+ * @param[in] entry     pointer to the observer handle
+ * @param[in] mutex     mutex to be unlocks
+ */
+void saul_observer_unlock_mutex(saul_reg_t *dev, saul_observer_t *entry, mutex_t *mutex);
+
+/**
+ * @brief   Start observing a SAUL device sends a msg_t to a msg_but_t on change
+ *
+ * The message's content.ptr contains the saul_reg_t.
+ * The message type will be set to dev->driver->type % 32
+ *
+ * @param[in] dev       SAUL device to observe
+ * @param[in] entry     pointer to the observer handle
+ * @param[in] msg_bus   receiving msg_bus
+ */
+void saul_observer_msg_bus_post(saul_reg_t *dev, saul_observer_t *entry, msg_bus_t *msg_bus);
+
 #ifdef __cplusplus
 }
 #endif
