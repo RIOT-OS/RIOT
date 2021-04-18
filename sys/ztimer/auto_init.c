@@ -280,7 +280,7 @@ void ztimer_init(void)
 #endif
 
 #if INIT_ZTIMER_PTP
-    LOG_DEBUG("ztimer_init(): initalizing PTP\n");
+    LOG_DEBUG("ztimer_init(): initializing PTP\n");
     ztimer_periph_ptp_init(&ZTIMER_PTP);
 #  ifdef MODULE_PM_LAYERED
      LOG_DEBUG("ztimer_init(): ZTIMER_PTP setting block_pm_mode to %i\n",
