@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include "lvgl_riot_conf.h"
 
 /*====================
    Graphical settings
@@ -82,9 +83,6 @@ extern "C" {
 #define LV_DISP_SMALL_LIMIT  30
 #define LV_DISP_MEDIUM_LIMIT 50
 #define LV_DISP_LARGE_LIMIT  70
-
-/* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
-typedef int16_t lv_coord_t;
 
 /*=========================
    Memory manager settings
@@ -297,14 +295,6 @@ typedef void * lv_img_decoder_user_data_t;
 /*===================
  *  HAL settings
  *==================*/
-
-/* 1: use a custom tick source.
- * It removes the need to manually update the tick with `lv_tick_inc`) */
-#define LV_TICK_CUSTOM     1
-#if LV_TICK_CUSTOM == 1
-#define LV_TICK_CUSTOM_INCLUDE  "xtimer.h"       /*Header for the sys time function*/
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR (xtimer_now_usec() / US_PER_MS)     /*Expression evaluating to current systime in ms*/
-#endif   /*LV_TICK_CUSTOM*/
 
 typedef void * lv_disp_drv_user_data_t;             /*Type of user data in the display driver*/
 typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the input device driver*/
