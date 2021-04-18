@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 
+#include "kernel_defines.h"
 #include "ztimer.h"
 #include "mutex.h"
 
@@ -61,7 +62,9 @@ int main(void)
     ztimer_set(ZTIMER_SEC, &sec_tim, 1);
     ztimer_set(ZTIMER_MSEC, &msec_tim, 200);
     ztimer_set(ZTIMER_USEC, &usec_tim, 100 * US_PER_MS);
-    ztimer_set(ZTIMER_NSEC, &nsec_tim, 50 * NS_PER_US * US_PER_MS);
+    if (IS_USED(MODULE_ZTIMER_NSEC)) {
+        ztimer_set(ZTIMER_NSEC, &nsec_tim, 50 * NS_PER_US * US_PER_MS);
+    }
 
     printf("time %s:\t%" PRIu32 "\n", "Wait", (uint32_t)ztimer_now(ZTIMER_USEC));
 
@@ -70,12 +73,16 @@ int main(void)
     mutex_lock(&sec_lock.mut);
     mutex_lock(&msec_lock.mut);
     mutex_lock(&usec_lock.mut);
-    mutex_lock(&nsec_lock.mut);
+    if (IS_USED(MODULE_ZTIMER_NSEC)) {
+        mutex_lock(&nsec_lock.mut);
+    }
 
     printf("time %s:\t%" PRIu32 "\n", sec_lock.name, sec_lock.release_time);
     printf("time %s:\t%" PRIu32 "\n", msec_lock.name, msec_lock.release_time);
     printf("time %s:\t%" PRIu32 "\n", usec_lock.name, usec_lock.release_time);
-    printf("time %s:\t%" PRIu32 "\n", nsec_lock.name, nsec_lock.release_time);
+    if (IS_USED(MODULE_ZTIMER_NSEC)) {
+        printf("time %s:\t%" PRIu32 "\n", nsec_lock.name, nsec_lock.release_time);
+    }
 
     printf("SUCCESS!\n");
     return 0;
