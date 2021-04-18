@@ -26,7 +26,6 @@
 #include "log.h"
 
 #include "lvgl/lvgl.h"
-#include "lv_conf.h"
 #include "lvgl_riot.h"
 
 #include "screen_dev.h"
@@ -39,12 +38,12 @@
 #define LVGL_COLOR_BUF_SIZE         (LV_HOR_RES_MAX * 5)
 #endif
 
-#ifndef LVGL_INACTIVITY_PERIOD_MS
-#define LVGL_INACTIVITY_PERIOD_MS   (1 * MS_PER_SEC)    /* 1s */
+#ifndef CONFIG_LVGL_INACTIVITY_PERIOD_MS
+#define CONFIG_LVGL_INACTIVITY_PERIOD_MS   (5 * MS_PER_SEC)    /* 5s */
 #endif
 
-#ifndef LVGL_TASK_HANDLER_DELAY_US
-#define LVGL_TASK_HANDLER_DELAY_US  (5 * US_PER_MS)     /* 5ms */
+#ifndef CONFIG_LVGL_TASK_HANDLER_DELAY_US
+#define CONFIG_LVGL_TASK_HANDLER_DELAY_US  (5 * US_PER_MS)     /* 5ms */
 #endif
 
 #ifndef LVGL_THREAD_FLAG
@@ -65,9 +64,9 @@ static void *_task_thread(void *arg)
     (void)arg;
 
     while (1) {
-        /* Normal operation (no sleep) in < LVGL_INACTIVITY_PERIOD_MS msec
+        /* Normal operation (no sleep) in < CONFIG_LVGL_INACTIVITY_PERIOD_MS msec
            inactivity */
-        if (lv_disp_get_inactive_time(NULL) < LVGL_INACTIVITY_PERIOD_MS) {
+        if (lv_disp_get_inactive_time(NULL) < CONFIG_LVGL_INACTIVITY_PERIOD_MS) {
             lv_task_handler();
         }
         else {
@@ -78,7 +77,7 @@ static void *_task_thread(void *arg)
             lv_disp_trig_activity(NULL);
         }
 
-        xtimer_usleep(LVGL_TASK_HANDLER_DELAY_US);
+        xtimer_usleep(CONFIG_LVGL_TASK_HANDLER_DELAY_US);
     }
 
     return NULL;

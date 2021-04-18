@@ -8,27 +8,6 @@ ifneq (,$(filter lvgl_contrib,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lvgl/contrib
 endif
 
-# Configuration options
-# Graphical settings
-LVGL_COLOR_DEPTH        ?= 16
-LVGL_COLOR_16_SWAP      ?= 1
-
-# Memory settings
-LVGL_MEM_SIZE           ?= 5U*1024U
-
-# Engine settings
-LVGL_INACTIVITY_PERIOD_MS   ?= 5*MS_PER_SEC   # 5s
-LVGL_TASK_HANDLER_DELAY_US  ?= 5*US_PER_MS    # 5ms
-LVGL_TASK_THREAD_PRIO       ?= THREAD_PRIORITY_MAIN+1
-
-# Set the CFLAGS variable accordingly
-CFLAGS += -DLV_COLOR_DEPTH=$(LVGL_COLOR_DEPTH)
-CFLAGS += -DLV_COLOR_16_SWAP=$(LVGL_COLOR_16_SWAP)
-CFLAGS += -DLV_MEM_SIZE=$(LVGL_MEM_SIZE)
-CFLAGS += -DLVGL_INACTIVITY_PERIOD_MS=$(LVGL_INACTIVITY_PERIOD_MS)
-CFLAGS += -DLVGL_TASK_HANDLER_DELAY_US=$(LVGL_TASK_HANDLER_DELAY_US)
-CFLAGS += -DLVGL_TASK_THREAD_PRIO=$(LVGL_TASK_THREAD_PRIO)
-
 # lvgl module is not a concrete module, so declare it as a pseudomodule
 PSEUDOMODULES += lvgl
 
