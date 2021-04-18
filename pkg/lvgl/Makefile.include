@@ -8,6 +8,9 @@ ifneq (,$(filter lvgl_contrib,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lvgl/contrib
 endif
 
+# Configure the lvgl_riot_conf.h header for lvgl kconfig management
+CFLAGS += -DLV_CONF_KCONFIG_EXTERNAL_INCLUDE=\""lvgl_riot_conf.h"\"
+
 # lvgl module is not a concrete module, so declare it as a pseudomodule
 PSEUDOMODULES += lvgl
 

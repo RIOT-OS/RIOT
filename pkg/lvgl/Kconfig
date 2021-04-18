@@ -1,0 +1,30 @@
+# Copyright (c) 2021 Inria
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig KCONFIG_USEPKG_LVGL
+    bool "Configure LVGL"
+    depends on USEPKG_LVGL
+    help
+        Configure LVGL package via Kconfig.
+
+if KCONFIG_USEPKG_LVGL
+
+menu "LVGL RIOT configuration"
+
+    config LVGL_INACTIVITY_PERIOD_MS
+        int "Inactivity period before blocking the LVGL thread (in ms)"
+        default 5000
+
+    config LVGL_TASK_HANDLER_DELAY_US
+        int "Delay between calls to the lvgl task handler (in us)"
+        default 5000
+
+endmenu
+
+osource "$(RIOTBASE)/build/pkg/lvgl/Kconfig"
+
+endif
