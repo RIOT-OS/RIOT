@@ -13,9 +13,10 @@ FEATURES_PROVIDED += periph_gpio_ll_irq_level_triggered_low
 FEATURES_PROVIDED += periph_gpio_ll_irq_unmask
 FEATURES_PROVIDED += periph_pm
 FEATURES_PROVIDED += periph_rtc_ms
+FEATURES_PROVIDED += periph_rtt_overflow
 FEATURES_PROVIDED += periph_rtt_set_counter
 FEATURES_PROVIDED += periph_timer_periodic
-FEATURES_PROVIDED += periph_rtt_overflow
+FEATURES_PROVIDED += periph_timer_query_freqs
 FEATURES_PROVIDED += periph_wdt
 FEATURES_PROVIDED += puf_sram
 ifneq (atmega8, $(CPU_FAM))
