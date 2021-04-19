@@ -23,6 +23,7 @@
 #include <stdlib.h>
 
 #include "atomic_utils.h"
+#include "architecture.h"
 #include "clk.h"
 #include "periph/timer.h"
 #include "test_utils/expect.h"
@@ -35,14 +36,18 @@
 #error "TIMER_NUMOF not defined!"
 #endif
 
-#define MAX_CHANNELS        (10U)
+/* backward compatibility with legacy drivers */
+#if !defined(TIMER_CHANNEL_NUMOF) && !IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)
+#define TIMER_CHANNEL_NUMOF 10U
+#endif
+
 #define CHAN_OFFSET         (5000U)     /* fire every 5ms */
 #define COOKIE              (100U)      /* for checking if arg is passed */
 
 static uint8_t fired;
 static uint32_t sw_count;
-static uint32_t timeouts[MAX_CHANNELS];
-static unsigned args[MAX_CHANNELS];
+static uint32_t timeouts[TIMER_CHANNEL_NUMOF];
+static unsigned args[TIMER_CHANNEL_NUMOF];
 
 static void cb(void *arg, int chan)
 {
@@ -56,11 +61,19 @@ static void cb_not_to_be_executed(void *arg, int chan)
     (void)arg;
     (void)chan;
 
-    puts("Spurious timer fired");
-    expect(0);
+    fired = 1;
 }
 
-static int test_timer(unsigned num)
+static uword_t query_channel_numof(tim_t dev)
+{
+    if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+        return timer_query_channel_numof(dev);
+    }
+
+    return TIMER_CHANNEL_NUMOF;
+}
+
+static int test_timer(unsigned num, uint32_t speed)
 {
     int set = 0;
 
@@ -68,42 +81,54 @@ static int test_timer(unsigned num)
     atomic_store_u32(&sw_count, 0);
     atomic_store_u8(&fired, 0);
 
-    for (unsigned i = 0; i < MAX_CHANNELS; i++) {
+    for (unsigned i = 0; i < TIMER_CHANNEL_NUMOF; i++) {
         timeouts[i] = 0;
         args[i] = UINT_MAX;
     }
 
+    printf("  - Calling timer_init(%u, %" PRIu32 ")\n    ",
+               num, speed);
     /* initialize and halt timer */
-    if (timer_init(TIMER_DEV(num), TIMER_SPEED, cb, (void *)(COOKIE * num)) < 0) {
-        printf("TIMER_%u: ERROR on initialization - skipping\n\n", num);
+    if (timer_init(TIMER_DEV(num), speed, cb, (void *)(COOKIE * num)) != 0) {
+        printf("ERROR: timer_init() failed\n\n");
         return 0;
     }
     else {
-        printf("TIMER_%u: initialization successful\n", num);
+        printf("initialization successful\n");
     }
 
     timer_stop(TIMER_DEV(num));
-    printf("TIMER_%u: stopped\n", num);
+    printf("  - timer_stop(%u): stopped\n", num);
 
     /* set each available channel */
-    for (unsigned i = 0; i < MAX_CHANNELS; i++) {
+    for (unsigned i = 0; i < query_channel_numof(TIMER_DEV(num)); i++) {
         unsigned timeout = ((i + 1) * CHAN_OFFSET);
+        printf("  - timer_set(%u, %u, %u)\n    ", num, i, timeout);
         if (timer_set(TIMER_DEV(num), i, timeout) < 0) {
+            printf("ERROR: Couldn't set timeout %u for channel %u\n",
+                   timeout, i);
+            /* If the timer supports the periph_timer_query_freqs feature, we
+             * expect it to correctly report the number of supported channels
+             */
+            if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+                return 0;
+            }
             break;
         }
         else {
             ++set;
-            printf("TIMER_%u: set channel %u to %u\n", num, i, timeout);
+            printf("Successfully set timeout %u for channel %u\n",
+                   timeout, i);
         }
     }
 
     if (set == 0) {
-        printf("TIMER_%u: ERROR setting any channel\n\n", num);
+        printf("  ERROR setting timeout failed for *ALL* channels\n\n");
         return 0;
     }
 
     /* start the timer */
-    printf("TIMER_%u: starting\n", num);
+    printf("  - timer_start(%u)\n", num);
     timer_start(TIMER_DEV(num));
 
     /* wait for all channels to fire */
@@ -112,32 +137,40 @@ static int test_timer(unsigned num)
     } while (atomic_load_u8(&fired) != set);
 
     /* collect results */
+    printf("  - Results:\n");
     for (int i = 0; i < set; i++) {
         if (args[i] != ((COOKIE * num) + i)) {
-            printf("TIMER_%u: ERROR callback argument mismatch\n\n", num);
+            printf("    ERROR: Callback for channel %u on timer %u has incorrect argument\n",
+                   i, num);
             return 0;
         }
-        printf("TIMER_%u: channel %i fired at SW count %8u",
-               num, i, (unsigned)timeouts[i]);
+        printf("    - channel %i fired at SW count %8u",
+               i, (unsigned)timeouts[i]);
         if (i == 0) {
-            printf(" - init: %8" PRIu32 "\n", atomic_load_u32(&timeouts[i]));
+            printf("      - init: %8" PRIu32 "\n", atomic_load_u32(&timeouts[i]));
         }
         else {
-            printf(" - diff: %8" PRIu32 "\n",
+            printf("      - diff: %8" PRIu32 "\n",
                    atomic_load_u32(&timeouts[i]) - atomic_load_u32(&timeouts[i - 1]));
         }
     }
 
     /* test for spurious timer IRQs */
-    expect(0 == timer_init(TIMER_DEV(num), TIMER_SPEED, cb_not_to_be_executed, NULL));
+    printf("  - Validating no spurious IRQs are triggered:\n");
+    expect(0 == timer_init(TIMER_DEV(num), speed, cb_not_to_be_executed, NULL));
 
-    const unsigned duration = 2ULL * US_PER_MS * US_PER_SEC / TIMER_SPEED;
+    const unsigned duration = 2ULL * US_PER_MS * US_PER_SEC / speed;
     unsigned target = timer_read(TIMER_DEV(num)) + duration;
     expect(0 == timer_set_absolute(TIMER_DEV(num), 0, target));
     expect(0 == timer_clear(TIMER_DEV(num), 0));
+    atomic_store_u8(&fired, 0);
     while (timer_read(TIMER_DEV(num)) < target) {
         /* busy waiting for the timer to reach it timeout. Timer must not fire,
          * it was cleared */
+    }
+    if (atomic_load_u8(&fired)) {
+        printf("    ERROR: Spurious timer fired (1/2)\n");
+        return 0;
     }
 
     /* checking again to make sure that any IRQ pending bit that may just was
@@ -150,25 +183,88 @@ static int test_timer(unsigned num)
         /* busy waiting for the timer to reach it timeout. Timer must not fire,
          * it was cleared */
     }
+    if (atomic_load_u8(&fired)) {
+        printf("    ERROR: Spurious timer fired (2/2)\n");
+        return 0;
+    }
+
+    printf("    OK (no spurious IRQs)\n");
 
     return 1;
 }
 
+static uword_t query_freq_numof(tim_t dev)
+{
+    if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+        return timer_query_freqs_numof(dev);
+    }
+
+    return 1;
+}
+
+static uint32_t query_freq(tim_t dev, uword_t index)
+{
+    if (IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+        return timer_query_freqs(dev, index);
+    }
+
+    /* Fallback implementation when periph_timer_query_freqs is not
+     * implemented */
+    if (index) {
+        return 0;
+    }
+
+    return TIMER_SPEED;
+}
+
+static void print_supported_frequencies(tim_t dev)
+{
+    if (!IS_USED(MODULE_PERIPH_TIMER_QUERY_FREQS)) {
+        printf("  - feature periph_timer_query_freqs unsupported\n");
+        return;
+    }
+
+    uword_t end = query_freq_numof(dev);
+        printf("  - supported frequencies:\n");
+    for (uword_t i = 0; i < MIN(end, 3); i++) {
+        printf("    %u: %" PRIu32 "\n", (unsigned)i, timer_query_freqs(dev, i));
+    }
+
+    if (end > 3) {
+        printf("    ....\n"
+               "    %u: %" PRIu32 "\n",
+               (unsigned)(end - 1), timer_query_freqs(dev, end - 1));
+    }
+}
+
 int main(void)
 {
-    int res = 0;
-
     puts("\nTest for peripheral TIMERs\n");
 
     printf("Available timers: %i\n", TIMER_NUMOF);
 
+    int failed = 0;
     /* test all configured timers */
     for (unsigned i = 0; i < TIMER_NUMOF; i++) {
-        printf("\nTesting TIMER_%u:\n", i);
-        res += test_timer(i);
+        printf("\nTIMER %u\n"
+                 "=======\n\n", i);
+        print_supported_frequencies(TIMER_DEV(i));
+        uword_t end = query_freq_numof(TIMER_DEV(i));
+
+        /* Test only up to three frequencies and only the fastest once.
+         * (Some timers support really low frequencies and even when limiting
+         * to only three frequencies tested, the test will take ages to
+         * complete */
+        end = MIN(end, 3);
+        for (uword_t j = 0; j < end; j++) {
+            if (!test_timer(i, query_freq(TIMER_DEV(i), j))) {
+                failed = 1;
+            }
+        }
     }
+
     /* draw conclusion */
-    if (res == TIMER_NUMOF) {
+    if (!failed) {
         puts("\nTEST SUCCEEDED");
     }
     else {
