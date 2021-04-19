@@ -28,6 +28,7 @@
 
 #include "periph/rtc.h"
 #include "periph/rtt.h"
+#include "timex.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -40,6 +41,7 @@
 
 #define TICKS(x)        (    (x) * RTT_SECOND)
 #define SECONDS(x)      (_RTT(x) / RTT_SECOND)
+#define SUBSECONDS(x)   (_RTT(x) % RTT_SECOND)
 
 /* Place counter in .noinit section if no backup RAM is available.
    This means the date is undefined at cold boot, but will likely still
@@ -129,6 +131,22 @@ int rtc_set_time(struct tm *time)
 
     /* calculate next wake-up period */
     _update_alarm(now);
+
+    return 0;
+}
+
+int rtc_get_time_ms(struct tm *time, uint16_t *ms)
+{
+    uint32_t prev = rtc_now;
+
+    /* repeat calculation if an alarm triggered in between */
+    do {
+        uint32_t now = rtt_get_counter();
+        uint32_t tmp = _rtc_now(now);
+
+        rtc_localtime(tmp, time);
+        *ms = (SUBSECONDS(now) * MS_PER_SEC) / RTT_SECOND;
+    } while (prev != rtc_now);
 
     return 0;
 }
