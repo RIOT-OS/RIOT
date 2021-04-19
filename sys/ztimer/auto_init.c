@@ -285,7 +285,7 @@ void ztimer_init(void)
 #  ifdef MODULE_PM_LAYERED
      LOG_DEBUG("ztimer_init(): ZTIMER_PTP setting block_pm_mode to %i\n",
                CONFIG_ZTIMER_PTP_BLOCK_PM_MODE);
-     ZTIMER_PTP.block_pm_mode = CONFIG_ZTIMER_PTP_BLOCK_PM_MODE;
+     ZTIMER_PTP_CLK.block_pm_mode = CONFIG_ZTIMER_PTP_BLOCK_PM_MODE;
 #  endif
 #endif
 
