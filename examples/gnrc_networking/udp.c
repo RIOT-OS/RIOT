@@ -32,9 +32,9 @@
 #include "utlist.h"
 #include "xtimer.h"
 
-static gnrc_netreg_entry_t server = GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
-                                                               KERNEL_PID_UNDEF);
-
+static gnrc_netreg_entry_t server =
+                        GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
+                                                   KERNEL_PID_UNDEF);
 
 static void send(char *addr_str, char *port_str, char *data, unsigned int num,
                  unsigned int delay)
@@ -97,12 +97,14 @@ static void send(char *addr_str, char *port_str, char *data, unsigned int num,
             ip = gnrc_pkt_prepend(ip, netif_hdr);
         }
         /* send packet */
-        if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP, GNRC_NETREG_DEMUX_CTX_ALL, ip)) {
+        if (!gnrc_netapi_dispatch_send(GNRC_NETTYPE_UDP,
+                                       GNRC_NETREG_DEMUX_CTX_ALL, ip)) {
             puts("Error: unable to locate UDP thread");
             gnrc_pktbuf_release(ip);
             return;
         }
-        /* access to `payload` was implicitly given up with the send operation above
+        /* access to `payload` was implicitly given up with the send operation
+         * above
          * => use temporary variable for output */
         printf("Success: sent %u byte(s) to [%s]:%u\n", payload_size, addr_str,
                port);
@@ -157,8 +159,8 @@ int udp_cmd(int argc, char **argv)
         uint32_t num = 1;
         uint32_t delay = 1000000;
         if (argc < 5) {
-            printf("usage: %s send <addr> <port> <data> [<num> [<delay in us>]]\n",
-                   argv[0]);
+            printf("usage: %s send "
+                   "<addr> <port> <data> [<num> [<delay in us>]]\n", argv[0]);
             return 1;
         }
         if (argc > 5) {
