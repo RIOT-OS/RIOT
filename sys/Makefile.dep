@@ -331,7 +331,7 @@ ifneq (,$(filter saul_reg,$(USEMODULE)))
 endif
 
 ifneq (,$(filter saul_observer,$(USEMODULE)))
-  DEFAULT_MODULE += auto_init_saul_observer
+  USEMODULE += event_thread
   USEMODULE += saul_reg
   USEMODULE += saul
 endif

@@ -32,6 +32,7 @@
 #if IS_ACTIVE(MODULE_SAUL_OBSERVER)
 #include "mutex.h"
 #include "clist.h"
+#include "event.h"
 #endif
 
 #ifdef __cplusplus
@@ -39,11 +40,6 @@ extern "C" {
 #endif
 
 #if IS_ACTIVE(MODULE_SAUL_OBSERVER)
-/**
- * @brief   SAUL observer event handle
- */
-typedef clist_node_t saul_observer_event_t;
-
 /**
  * @brief   SAUL registry item observer list
  */
@@ -63,7 +59,7 @@ typedef struct saul_reg {
     saul_driver_t const *driver;    /**< the devices read callback */
 #if IS_ACTIVE(MODULE_SAUL_OBSERVER)
     saul_observer_list_t observers; /**< list for observers */
-    saul_observer_event_t event;    /**< handle for event queue */
+    event_t event;                  /**< handle for event queue */
 #endif
 } saul_reg_t;
 

@@ -34,10 +34,6 @@
 extern "C" {
 #endif
 
-// FIXME
-#define SAUL_OBSERVER_STACK_SIZE            (1024)
-#define SAUL_OBSERVER_PRIO                  (8)
-
 /**
  * @brief   SAUL observer handle
  */
@@ -46,11 +42,6 @@ typedef struct {
     void (*callback)(saul_reg_t *dev, void *arg);    /**< callback function pointer */
     void *arg;                                       /**< callback argument */
 } saul_observer_t;
-
-/**
- * @brief   Initialize the observer thread
- */
-void saul_observer_init(void);
 
 /**
  * @brief   Trigger change check of a SAUL device
