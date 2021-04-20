@@ -124,6 +124,9 @@ ifneq (,$(filter nimble_netif,$(USEMODULE)))
     CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_DATA_LEN_EXT=1
   endif
 endif
+ifneq (,$(filter nimble_rpble,$(USEMODULE)))
+  INCLUDES += -I$(RIOTPKG)/nimble/rpble/include
+endif
 ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
   INCLUDES += -I$(RIOTPKG)/nimble/scanlist/include
 endif

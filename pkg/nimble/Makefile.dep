@@ -67,6 +67,13 @@ ifneq (,$(filter nimble_autoconn,$(USEMODULE)))
   USEMODULE += bluetil_ad
 endif
 
+ifneq (,$(filter nimble_rpble,$(USEMODULE)))
+  USEMODULE += gnrc_rpl
+  USEMODULE += nimble_netif
+  USEMODULE += nimble_scanner
+  USEMODULE += bluetil_ad
+endif
+
 ifneq (,$(filter nimble_scanlist,$(USEMODULE)))
   USEMODULE += nimble_addr
   USEMODULE += bluetil_ad
