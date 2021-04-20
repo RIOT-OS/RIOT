@@ -54,7 +54,11 @@ jobs:
     steps:
     - name: Generate .riotgithubtoken
       run: |
-        echo '${{ secrets.RIOT_CI_ACCESS_TOKEN }}' > ~/.riotgithubtoken
+        if [ -z "${{ matrix.sudo }}" ]; then
+          echo '${{ secrets.RIOT_CI_ACCESS_TOKEN }}' > ~/.riotgithubtoken
+        else
+          sudo sh -c "echo '${{ secrets.RIOT_CI_ACCESS_TOKEN }}' > ~/.riotgithubtoken"
+        fi
     - name: Setup IoT-LAB credentials
       if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
       run: |
