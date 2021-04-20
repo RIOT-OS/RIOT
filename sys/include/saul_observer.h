@@ -33,6 +33,7 @@
 #include "thread.h"
 #include "msg_bus.h"
 #include "mutex.h"
+#include "thread_flags.h"
 
 #ifdef __cplusplus
 extern "C" {

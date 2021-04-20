@@ -1,9 +1,5 @@
 #include "saul_observer.h"
-
-#if IS_ACTIVE(MODULE_CORE_THREAD_FLAGS)
 #include "bitarithm.h"
-#include "thread_flags.h"
-#endif
 
 #if IS_ACTIVE(MODULE_CORE_MSG)
 static void _callback_msg(saul_reg_t *dev, void *arg)
