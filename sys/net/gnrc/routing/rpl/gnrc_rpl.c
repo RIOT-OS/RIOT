@@ -35,6 +35,7 @@
 #include "gnrc_rpl_internal/globals.h"
 
 #include "net/gnrc/rpl.h"
+#include "net/gnrc/rpl/rpble.h"
 #ifdef MODULE_GNRC_RPL_P2P
 #include "net/gnrc/rpl/p2p.h"
 #include "net/gnrc/rpl/p2p_dodag.h"
@@ -165,6 +166,7 @@ gnrc_rpl_instance_t *gnrc_rpl_root_init(uint8_t instance_id, const ipv6_addr_t *
     trickle_start(gnrc_rpl_pid, &dodag->trickle, GNRC_RPL_MSG_TYPE_TRICKLE_MSG,
                   (1 << dodag->dio_min), dodag->dio_interval_doubl,
                   dodag->dio_redun);
+    gnrc_rpl_rpble_update(dodag);
 
     return inst;
 }
