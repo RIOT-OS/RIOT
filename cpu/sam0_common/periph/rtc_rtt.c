@@ -432,6 +432,16 @@ int rtc_get_alarm(struct tm *time)
     time->tm_min = alarm.bit.MINUTE;
     time->tm_sec = alarm.bit.SECOND;
 
+#ifdef CPU_COMMON_SAMD21
+    /* When an alarm match occurs, the Alarm 0 Interrupt flag in the Interrupt
+     * Flag Status and Clear registers (INTFLAG.ALARMn0) is set on the next
+     * 0-to-1 transition of CLK_RTC_CNT. E.g. For a 1Hz clock counter, it means
+     * the Alarm 0 Interrupt flag is set with a delay of 1s after the occurrence
+     * of alarm match.
+     */
+    time->tm_sec++;
+#endif
+
     return 0;
 }
 
