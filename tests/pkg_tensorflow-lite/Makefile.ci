@@ -1,6 +1,9 @@
 BOARD_INSUFFICIENT_MEMORY := \
     airfy-beacon \
-    arduino-mkr% \
+    arduino-mkr1000 \
+    arduino-mkrfox1200 \
+    arduino-mkrwan1300 \
+    arduino-mkrzero \
     b-l072z-lrwan1 \
     blackpill \
     bluepill \
@@ -14,11 +17,19 @@ BOARD_INSUFFICIENT_MEMORY := \
     nrf51dk \
     nrf51dongle \
     nrf6310 \
-    nucleo-f0% \
+    nucleo-f030r8 \
+    nucleo-f031k6 \
+    nucleo-f042k6 \
+    nucleo-f070rb \
+    nucleo-f072rb \
+    nucleo-f091rc \
     nucleo-f302r8 \
     nucleo-f303k8 \
     nucleo-f334r8 \
-    nucleo-l0% \
+    nucleo-l011k4 \
+    nucleo-l031k6 \
+    nucleo-l053r8 \
+    nucleo-l073rz \
     phynode-kw41z \
     samd10-xmini \
     samd21-xpro \
@@ -30,7 +41,11 @@ BOARD_INSUFFICIENT_MEMORY := \
     samr34-xpro \
     sensebox_samd21 \
     slstk3400a \
-    sodaq-% \
+    sodaq-autonomo \
+    sodaq-explorer \
+    sodaq-one \
+    sodaq-sara-aff \
+    sodaq-sara-sff \
     stk3200 \
     stm32f030f4-demo \
     stm32f0discovery \
