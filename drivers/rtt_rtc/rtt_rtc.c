@@ -65,10 +65,12 @@ static inline uint32_t _rtc_now(uint32_t now)
 
 static inline void _set_alarm(uint32_t now, uint32_t next_alarm)
 {
+    uint32_t alarm = (now + next_alarm) & RTT_MAX_VALUE;
+
     if (IS_USED(MODULE_PERIPH_RTT_OVERFLOW)) {
-        rtt_set_alarm(now + next_alarm, alarm_cb, alarm_cb_arg);
+        rtt_set_alarm(alarm, alarm_cb, alarm_cb_arg);
     } else {
-        rtt_set_alarm(now + next_alarm, _rtt_cb, NULL);
+        rtt_set_alarm(alarm, _rtt_cb, NULL);
     }
 }
 
