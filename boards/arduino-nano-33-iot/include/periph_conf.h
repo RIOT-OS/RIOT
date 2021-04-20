@@ -140,6 +140,72 @@ static const uart_conf_t uart_config[] = {
 /** @} */
 
 /**
+ * @name PWM configuration
+ * @{
+ */
+#define PWM_0_EN            1
+#define PWM_1_EN            1
+
+#if PWM_0_EN
+/* PWM0 channels */
+static const pwm_conf_chan_t pwm_chan0_config[] = {
+    /* GPIO pin, MUX value, TCC channel */
+    { GPIO_PIN(PA, 4), GPIO_MUX_E, 0},
+    { GPIO_PIN(PA, 5), GPIO_MUX_E, 1},
+};
+#endif
+#if PWM_1_EN
+/* PWM1 channels */
+static const pwm_conf_chan_t pwm_chan1_config[] = {
+    /* GPIO pin, MUX value, TCC channel */
+    { GPIO_PIN(PA, 10), GPIO_MUX_E,  0 },
+    { GPIO_PIN(PA, 11), GPIO_MUX_E,  1 },
+};
+#endif
+
+/* PWM device configuration */
+static const pwm_conf_t pwm_config[] = {
+#if PWM_0_EN
+    {TCC_CONFIG(TCC0), pwm_chan0_config, ARRAY_SIZE(pwm_chan0_config), SAM0_GCLK_MAIN},
+#endif
+
+#if PWM_1_EN
+    {TCC_CONFIG(TCC1), pwm_chan1_config, ARRAY_SIZE(pwm_chan1_config), SAM0_GCLK_MAIN},
+#endif
+};
+
+/* number of devices that are actually defined */
+#define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
+/**
+ * @name ADC configuration
+ * @{
+ */
+
+/* ADC Default values */
+#define ADC_PRESCALER                       ADC_CTRLB_PRESCALER_DIV512
+
+#define ADC_NEG_INPUT                       ADC_INPUTCTRL_MUXNEG_GND
+#define ADC_GAIN_FACTOR_DEFAULT             ADC_INPUTCTRL_GAIN_1X
+#define ADC_REF_DEFAULT                     ADC_REFCTRL_REFSEL_INT1V
+
+static const adc_conf_chan_t adc_channels[] = {
+    /* port, pin, muxpos */
+    {GPIO_PIN(PA, 2), ADC_INPUTCTRL_MUXPOS_PIN0},    /* A0 */
+    {GPIO_PIN(PB, 2), ADC_INPUTCTRL_MUXPOS_PIN10},   /* A1 */
+    {GPIO_PIN(PA, 11), ADC_INPUTCTRL_MUXPOS_PIN19},  /* A2 */
+    {GPIO_PIN(PA, 10), ADC_INPUTCTRL_MUXPOS_PIN18},  /* A3 */
+    {GPIO_PIN(PB, 8), ADC_INPUTCTRL_MUXPOS_PIN2},    /* A4 */
+    {GPIO_PIN(PB, 9), ADC_INPUTCTRL_MUXPOS_PIN3},    /* A5 */
+    {GPIO_PIN(PA, 9), ADC_INPUTCTRL_MUXPOS_PIN17},   /* A6 */
+    {GPIO_PIN(PB, 3), ADC_INPUTCTRL_MUXPOS_PIN11},   /* A7 */
+};
+
+#define ADC_NUMOF                           ARRAY_SIZE(adc_channels)
+/** @} */
+
+/**
  * @name I2C configuration
  * @{
  */
@@ -172,6 +238,18 @@ static const spi_conf_t spi_config[] = {
         .clk_mux  = GPIO_MUX_D,
         .miso_pad = SPI_PAD_MISO_1,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_3,
+        .gclk_src = SAM0_GCLK_MAIN,
+    },
+    {
+        .dev = &SERCOM3->SPI,
+        .miso_pin = GPIO_PIN(PA, 19),
+        .mosi_pin = GPIO_PIN(PA, 16),
+        .clk_pin = GPIO_PIN(PA, 17),
+        .miso_mux = GPIO_MUX_D,
+        .mosi_mux = GPIO_MUX_D,
+        .clk_mux = GPIO_MUX_D,
+        .miso_pad = SPI_PAD_MISO_3,
+        .mosi_pad = SPI_PAD_MOSI_0_SCK_1,
         .gclk_src = SAM0_GCLK_MAIN,
     },
 };
