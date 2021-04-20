@@ -31,6 +31,8 @@
 #include "saul_reg.h"
 #include "msg.h"
 #include "thread.h"
+#include "msg_bus.h"
+#include "mutex.h"
 
 #ifdef __cplusplus
 extern "C" {

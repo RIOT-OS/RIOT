@@ -1,13 +1,8 @@
 #include "saul_observer.h"
-#include "mutex.h"
 
 #if IS_ACTIVE(MODULE_CORE_THREAD_FLAGS)
 #include "bitarithm.h"
 #include "thread_flags.h"
-#endif
-
-#if IS_ACTIVE(MODULE_CORE_MSG_BUS)
-#include "msg_bus.h"
 #endif
 
 #if IS_ACTIVE(MODULE_CORE_MSG)
