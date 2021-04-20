@@ -10,7 +10,7 @@ endif
 # is lost and will also cause the wrapper to hang waiting for user input.
 # As long as a similar functionality is not provided by the wrapper
 # then disable it for pyocd.
-PROGRAMMER_WRAPPER_BLACKLIST ?= pyocd
+PROGRAMMER_WRAPPER_BLACKLIST ?= pyocd jlink
 
 # Don't use the programmer wrapper for the CI (where speed and verbose output
 # are important)
