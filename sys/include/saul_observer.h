@@ -29,6 +29,8 @@
 #include "clist.h"
 #include "saul.h"
 #include "saul_reg.h"
+#include "msg.h"
+#include "thread.h"
 
 #ifdef __cplusplus
 extern "C" {

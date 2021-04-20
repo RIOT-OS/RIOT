@@ -1,6 +1,4 @@
 #include "saul_observer.h"
-#include "msg.h"
-#include "thread.h"
 #include "mutex.h"
 
 #if IS_ACTIVE(MODULE_CORE_THREAD_FLAGS)
