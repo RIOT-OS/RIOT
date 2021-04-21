@@ -30,6 +30,15 @@
 #define SI70XX_NUM    ARRAY_SIZE(si70xx_params)
 
 /**
+ * @brief   Define the number of SAUL registry entries
+ */
+#if SI70XX_HAS_HUMIDITY_SENSOR
+#define SI70XX_SAUL_ENTRIES_NUM 2
+#else
+#define SI70XX_SAUL_ENTRIES_NUM 1
+#endif
+
+/**
  * @brief   Allocation of memory for device descriptors
  */
 static si70xx_t si70xx_devs[SI70XX_NUM];
@@ -37,7 +46,7 @@ static si70xx_t si70xx_devs[SI70XX_NUM];
 /**
  * @brief   Memory for the SAUL registry entries
  */
-static saul_reg_t saul_entries[SI70XX_NUM * 2];
+static saul_reg_t saul_entries[SI70XX_NUM * SI70XX_SAUL_ENTRIES_NUM];
 
 /**
  * @brief   Define the number of saul info
@@ -56,6 +65,7 @@ void auto_init_si70xx(void)
 {
     assert(SI70XX_INFO_NUM == SI70XX_NUM);
 
+    unsigned entry = 0;
     for (unsigned i = 0; i < SI70XX_NUM; i++) {
         LOG_DEBUG("[auto_init_saul] initializing SI70xx #%u\n", i);
 
@@ -65,17 +75,17 @@ void auto_init_si70xx(void)
         }
 
         /* temperature */
-        saul_entries[i * 2].dev = &si70xx_devs[i];
-        saul_entries[i * 2].name = si70xx_saul_info[i].name;
-        saul_entries[i * 2].driver = &si70xx_temperature_saul_driver;
+        saul_entries[entry].dev = &si70xx_devs[i];
+        saul_entries[entry].name = si70xx_saul_info[i].name;
+        saul_entries[entry].driver = &si70xx_temperature_saul_driver;
+        saul_reg_add(&saul_entries[entry++]);
 
+#if SI70XX_HAS_HUMIDITY_SENSOR
         /* relative humidity */
-        saul_entries[(i * 2) + 1].dev = &si70xx_devs[i];
-        saul_entries[(i * 2) + 1].name = si70xx_saul_info[i].name;
-        saul_entries[(i * 2) + 1].driver = \
-                &si70xx_relative_humidity_saul_driver;
-
-        saul_reg_add(&saul_entries[i * 2]);
-        saul_reg_add(&saul_entries[(i * 2) + 1]);
+        saul_entries[entry].dev = &si70xx_devs[i];
+        saul_entries[entry].name = si70xx_saul_info[i].name;
+        saul_entries[entry].driver = &si70xx_relative_humidity_saul_driver;
+        saul_reg_add(&saul_entries[entry++]);
+#endif /* SI70XX_HAS_HUMIDITY_SENSOR */
     }
 }
