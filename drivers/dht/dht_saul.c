@@ -95,7 +95,7 @@ static int read_temp(const void *dev, phydat_t *res)
     res->unit = UNIT_TEMP_C;
     res->scale = -1;
 
-    return 1 | SAUL_FLAG_SCHEDULE_CHECK;
+    return 1 | SAUL_FLAG_QUEUE_EVENT;
 }
 
 static int read_hum(const void *dev, phydat_t *res)
@@ -107,7 +107,7 @@ static int read_hum(const void *dev, phydat_t *res)
     res->unit = UNIT_PERCENT;
     res->scale = -1;
 
-    return 1 | SAUL_FLAG_SCHEDULE_CHECK;
+    return 1 | SAUL_FLAG_QUEUE_EVENT;
 }
 
 const saul_driver_t dht_temp_saul_driver = {
