@@ -143,7 +143,7 @@ int saul_reg_read(saul_reg_t *dev, phydat_t *res)
     }
 
 #if IS_ACTIVE(MODULE_SAUL_OBSERVER)
-    if (rc & SAUL_FLAG_SCHEDULE_CHECK) {
+    if (rc & SAUL_FLAG_QUEUE_EVENT) {
         saul_observer_queue_event(dev);
     }
 #endif
@@ -165,7 +165,7 @@ int saul_reg_write(saul_reg_t *dev, phydat_t *data)
     }
 
 #if IS_ACTIVE(MODULE_SAUL_OBSERVER)
-    if (rc & SAUL_FLAG_SCHEDULE_CHECK) {
+    if (rc & SAUL_FLAG_QUEUE_EVENT) {
         saul_observer_queue_event(dev);
     }
 #endif

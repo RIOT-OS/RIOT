@@ -242,7 +242,7 @@ enum {
  * @brief   Flags allow SAUL driver implementations to make indications to saul_reg
  */
 enum {
-    SAUL_FLAG_SCHEDULE_CHECK = 0x0100 /**< A change has been detected during read/write */
+    SAUL_FLAG_QUEUE_EVENT   = 0x0100 /**< A change has been detected during read/write */
 };
 
 /**
