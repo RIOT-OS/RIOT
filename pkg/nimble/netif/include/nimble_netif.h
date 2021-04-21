@@ -103,6 +103,26 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Set to 1 to enforce connection interval spacing
+ *
+ * Enabling this option will enforce that every BLE connection a node maintains,
+ * independent of the nodes role, uses a different connection interval, with a
+ * minimum spacing between connection intervals as defined by
+ * NIMBLE_NETIF_CONN_ITVL_SPACING_MS.
+ */
+#ifndef NIMBLE_NETIF_FORCE_CONN_ITVL_SPACING
+#define NIMBLE_NETIF_FORCE_CONN_ITVL_SPACING    1
+#endif
+
+/**
+ * @brief   Minimum spacing of connection interval when using randomized
+ *          intervals, in multiples of 1.25ms
+ */
+#ifndef NIMBLE_NETIF_CONN_ITVL_SPACING_MS
+#define NIMBLE_NETIF_CONN_ITVL_SPACING_MS       2
+#endif
+
+/**
  * @brief   Return codes used by the NimBLE netif module
  */
 enum {
@@ -192,7 +212,7 @@ void nimble_netif_eventcb(nimble_netif_eventcb_t cb);
  * @return  NIMBLE_NETIF_NOMEM if no connection context memory is available
  */
 int nimble_netif_connect(const ble_addr_t *addr,
-                         const struct ble_gap_conn_params *conn_params,
+                         struct ble_gap_conn_params *conn_params,
                          uint32_t timeout);
 
 /**
