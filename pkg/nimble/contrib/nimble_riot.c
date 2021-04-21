@@ -168,6 +168,6 @@ void nimble_riot_init(void)
 
 #ifdef MODULE_NIMBLE_RPBLE
     res = nimble_rpble_init(&nimble_rpble_params);
-    assert(res == NIMBLE_RPBLE_OK);
+    assert(res == 0);
 #endif
 }
