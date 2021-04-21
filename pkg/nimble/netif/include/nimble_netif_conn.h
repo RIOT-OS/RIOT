@@ -23,6 +23,7 @@
 #define NIMBLE_NETIF_CONN_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "nimble_netif.h"
 
@@ -174,6 +175,57 @@ int nimble_netif_conn_start_adv(void);
  * @brief   Free the connection context with the given handle
  */
 void nimble_netif_conn_free(int handle, uint8_t *addr);
+
+/**
+ * @brief   Get the used connection interval for the given connection handle
+ *
+ * @param[in] handle        connection handle
+ *
+ * @return  used connection interval on success, multiples of 1.25ms
+ * @return  0 if unable to get connection interval
+ */
+uint16_t nimble_netif_conn_get_itvl(int handle);
+
+/**
+ * @brief   Check if the given connection interval is used, taking the minimal
+ *          spacing as defined by NIMBLE_NETIF_CONN_ITVL_SPACING into account
+ *
+ * @param[in] itvl          connection interval to check, multiples of 1.25ms
+ * @param[in] skip_handle   do not compare against connection interval for this
+ *                          handle, set to NIMBLE_NETIF_CONN_INVALID to check
+ *                          all
+ *
+ * @return  true if given interval is used
+ * @return  false if given interval is not used
+ */
+bool nimble_netif_conn_itvl_used(uint16_t itvl, int skip_handle);
+
+/**
+ * @brief   Check if connection interval used by the given connection is valid
+ *
+ * @param[in] handle        connection to verify
+ *
+ * @return  true if the connection interval of the given connection collides
+ *          with the connection interval of another BLE connection
+ * @return  false if the connection interval of the given connection is valid
+ */
+bool nimble_netif_conn_itvl_invalid(int handle);
+
+/**
+ * @brief   Generate a pseudorandom connection interval from the given range
+ *
+ * If the NIMBLE_NETIF_CONN_ITVL_SPACING option is enabled, this function
+ * ensures that the generated connection interval is spaced at least
+ * NIMBLE_NETIF_CONN_ITVL_SPACING from the connection interval of each open
+ * BLE connection.
+ *
+ * @param[in] min           minimum connection interval
+ * @param[in] max           maximum connection interval
+ *
+ * @return  generated connection interval on success, multiples of 1.25ms
+ * @return  0 if no valid connection interval could be generated
+ */
+uint16_t nimble_netif_conn_gen_itvl(uint16_t min, uint16_t max);
 
 /**
  * @brief   Find the connection context with a given GAP handle and return a
