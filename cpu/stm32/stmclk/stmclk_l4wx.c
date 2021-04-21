@@ -29,7 +29,7 @@
 #include "periph/gpio.h"
 
 /* map CMSIS defines not present in stm32wb55xx.h */
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
 #define RCC_PLLCFGR_PLLSRC_HSE      (RCC_PLLCFGR_PLLSRC_0 | RCC_PLLCFGR_PLLSRC_1)
 #define RCC_PLLCFGR_PLLSRC_HSI      (RCC_PLLCFGR_PLLSRC_1)
 #define RCC_PLLCFGR_PLLSRC_MSI      (RCC_PLLCFGR_PLLSRC_0)
@@ -67,7 +67,7 @@
 #endif
 #define PLL_N                       (CONFIG_CLOCK_PLL_N << RCC_PLLCFGR_PLLN_Pos)
 
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
 #if (CONFIG_CLOCK_PLL_R < 1 || CONFIG_CLOCK_PLL_R > 8)
 #error "PLL configuration: PLL R value is invalid"
 #else
@@ -87,7 +87,7 @@
 #endif
 #endif
 
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
 #if (CONFIG_CLOCK_PLL_Q < 1 || CONFIG_CLOCK_PLL_Q > 8)
 #error "PLL configuration: PLL Q value is invalid"
 #else
@@ -249,7 +249,7 @@
 #define CONFIG_CLOCK_MCO_PRE                    (1)
 #endif
 
-#ifdef CPU_FAM_STM32WB
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
 /* Define bitfields for MCO prescaler for compatibility with L4*/
 #define RCC_CFGR_MCOPRE_DIV1                    (0)
 #define RCC_CFGR_MCOPRE_DIV2                    (RCC_CFGR_MCOPRE_0)
@@ -273,7 +273,7 @@
 #endif
 
 /* Configure main and peripheral bus clock prescalers */
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32WL)
 #define CLOCK_AHB_DIV               (0)
 
 #if CONFIG_CLOCK_APB1_DIV == 1
@@ -330,9 +330,9 @@
 /* Configure 48MHz clock source */
 #define CLOCK_PLLQ                  ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_M) * CONFIG_CLOCK_PLL_N) / CONFIG_CLOCK_PLL_Q
 
-#if CLOCK_PLLQ == MHZ(48)
+#if CLOCK_PLLQ == MHZ(48) && !defined(CPU_FAM_STM32WL)
 #define CLOCK48MHZ_USE_PLLQ         1
-#elif CONFIG_CLOCK_MSI == MHZ(48)
+#elif CONFIG_CLOCK_MSI == MHZ(48) && !defined(CPU_FAM_STM32WL)
 #define CLOCK48MHZ_USE_MSI          1
 #else
 #define CLOCK48MHZ_USE_PLLQ         0
@@ -431,12 +431,20 @@
  * @name    Deduct the needed flash wait states from the core clock frequency
  * @{
  */
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WL)
+#if (CLOCK_AHB <= 16000000)     /* VCORE range 2 */
+#define FLASH_WAITSTATES        ((CLOCK_AHB - 1) / 6000000U)
+#elif (CLOCK_AHB <= 48000000)   /* VCORE range 1 */
+#define FLASH_WAITSTATES        ((CLOCK_AHB - 1) / 18000000U)
+#else
+#define FLASH_WAITSTATES        FLASH_ACR_LATENCY_2
+#endif /* CPU_FAM_STM32WL */
+#elif defined(CPU_FAM_STM32WB)
 #if (CLOCK_AHB <= 64000000)
 #define FLASH_WAITSTATES        ((CLOCK_AHB - 1) / 18000000U)
 #else
 #define FLASH_WAITSTATES        FLASH_ACR_LATENCY_3WS
-#endif
+#endif /* CPU_FAM_STM32WB */
 #else
 #define FLASH_WAITSTATES        ((CLOCK_AHB - 1) / 16000000U)
 #endif
@@ -485,6 +493,11 @@ void stmclk_init_sysclk(void)
         - Use HSE as PLL input clock
     */
     if (IS_ACTIVE(CLOCK_ENABLE_HSE)) {
+
+    /* Use VDDTCXO regulator */
+#if defined(CPU_FAM_STM32WL)
+        RCC->CR |= (RCC_CR_HSEBYPPWR);
+#endif
         RCC->CR |= (RCC_CR_HSEON);
         while (!(RCC->CR & RCC_CR_HSERDY)) {}
     }
@@ -593,6 +606,13 @@ void stmclk_init_sysclk(void)
         stmclk_dbp_unlock();
         RCC->BDCR |= RCC_BDCR_LSEON;
         while (!(RCC->BDCR & RCC_BDCR_LSERDY)) {}
+
+    /* Set LSE system clock enable bit. This is required if LSE is to be used by
+       USARTx, LPUARTx, LPTIMx, TIMx, RNG, system LSCO, MCO, MSI PLL mode */
+#if defined(CPU_FAM_STM32WL)
+        RCC->BDCR |= RCC_BDCR_LSESYSEN;
+        while (!(RCC->BDCR & RCC_BDCR_LSESYSRDY)) {}
+#endif
         stmclk_dbp_lock();
     }
 

@@ -18,8 +18,8 @@
  * @author      Alexandre Abadie <alexandre.abadie@inria.fr>
  */
 
-#ifndef CLK_L4L5WB_CFG_CLOCK_DEFAULT_H
-#define CLK_L4L5WB_CFG_CLOCK_DEFAULT_H
+#ifndef CLK_L4L5WX_CFG_CLOCK_DEFAULT_H
+#define CLK_L4L5WX_CFG_CLOCK_DEFAULT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -73,7 +73,13 @@ extern "C" {
 #endif
 #ifndef CONFIG_CLOCK_PLL_N
 #if IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CLOCK_HSE == MHZ(32))
+/* For STM32WL, VCO output frequency ((PLL input clock frequency / PLLM ) x PLLN )
+   must be between 96 and 344 MHz. PLLN can have values <=127 & >=6 */
+#if IS_ACTIVE(CPU_FAM_STM32WL)
+#define CONFIG_CLOCK_PLL_N              (12)
+#else
 #define CONFIG_CLOCK_PLL_N              (16)
+#endif /* CPU_FAM_STM32WL */
 #elif IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSI) || \
       (IS_ACTIVE(CONFIG_CLOCK_PLL_SRC_HSE) && (CLOCK_HSE == MHZ(16)))
 #define CONFIG_CLOCK_PLL_N              (32)
@@ -126,7 +132,9 @@ extern "C" {
         ((CLOCK_PLL_SRC / CONFIG_CLOCK_PLL_M) * CONFIG_CLOCK_PLL_N) / CONFIG_CLOCK_PLL_R
 
 /* Set max allowed sysclk */
-#if defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32WL)
+#define CLOCK_CORECLOCK_MAX             MHZ(48)
+#elif defined(CPU_FAM_STM32WB)
 #define CLOCK_CORECLOCK_MAX             MHZ(64)
 #elif defined(CPU_FAM_STM32L5)
 #define CLOCK_CORECLOCK_MAX             MHZ(110)
@@ -141,7 +149,9 @@ extern "C" {
 #endif
 
 #if CLOCK_CORECLOCK > CLOCK_CORECLOCK_MAX
-#if CLOCK_CORECLOCK_MAX == MHZ(64)
+#if CLOCK_CORECLOCK_MAX == MHZ(48)
+#error "SYSCLK cannot exceed 48MHz"
+#elif CLOCK_CORECLOCK_MAX == MHZ(64)
 #error "SYSCLK cannot exceed 64MHz"
 #elif CLOCK_CORECLOCK_MAX == MHZ(80)
 #error "SYSCLK cannot exceed 80MHz"
@@ -155,20 +165,20 @@ extern "C" {
 #endif /* CLOCK_CORECLOCK > CLOCK_CORECLOCK_MAX */
 #endif /* CONFIG_USE_CLOCK_PLL */
 
-#define CLOCK_AHB                       CLOCK_CORECLOCK /* HCLK, max: 64/80/120MHz */
+#define CLOCK_AHB                       CLOCK_CORECLOCK /* HCLK, max: 48/64/80/120MHz */
 
 #ifndef CONFIG_CLOCK_APB1_DIV
 #define CONFIG_CLOCK_APB1_DIV           (4)
 #endif
-#define CLOCK_APB1                      (CLOCK_AHB / CONFIG_CLOCK_APB1_DIV)     /* PCLK1, max: 64/80/120MHz */
+#define CLOCK_APB1                      (CLOCK_AHB / CONFIG_CLOCK_APB1_DIV)     /* PCLK1, max: 48/64/80/120MHz */
 #ifndef CONFIG_CLOCK_APB2_DIV
 #define CONFIG_CLOCK_APB2_DIV           (2)
 #endif
-#define CLOCK_APB2                      (CLOCK_AHB / CONFIG_CLOCK_APB2_DIV)     /* PCLK1, max: 64/80/120MHz */
+#define CLOCK_APB2                      (CLOCK_AHB / CONFIG_CLOCK_APB2_DIV)     /* PCLK1, max: 48/64/80/120MHz */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* CLK_L4L5WB_CFG_CLOCK_DEFAULT_H */
+#endif /* CLK_L4L5WX_CFG_CLOCK_DEFAULT_H */
 /** @} */

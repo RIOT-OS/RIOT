@@ -31,7 +31,8 @@ extern "C" {
     defined(CPU_FAM_STM32F7) || defined(CPU_FAM_STM32L0) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32L4) || \
     defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5)
+    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
+    defined(CPU_FAM_STM32WL)
 
 /**
  * @brief   Timing register settings
@@ -42,7 +43,7 @@ static const i2c_timing_param_t timing_params[] = {
 #if defined(CPU_FAM_STM32F0) || defined(CPU_FAM_STM32F7) || \
     defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32G0) || \
-    defined(CPU_FAM_STM32L5)
+    defined(CPU_FAM_STM32L5) || defined(CPI_FAM_STM32WL)
     [ I2C_SPEED_NORMAL ]    = {
         .presc  = 0xB,
         .scll   = 0x13,     /* t_SCLL   = 5.0us  */
