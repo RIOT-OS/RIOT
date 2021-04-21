@@ -30,6 +30,10 @@ extern "C" {
 #endif
 
 /**
+* @name    Clock configuration
+* @{
+*/
+/**
  * @brief   Defines the CPU frequency in MHz
  *
  * Possible values are 80 and 160 MHz.
@@ -37,6 +41,8 @@ extern "C" {
 #ifndef ESP8266_CPU_FREQUENCY
 #define ESP8266_CPU_FREQUENCY   (80)
 #endif
+#define CLOCK_CORECLOCK         (1000000UL * ESP8266_CPU_FREQUENCY)
+/** @} */
 
 /**
  * @name   Stack size configurations
