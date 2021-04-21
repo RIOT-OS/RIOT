@@ -33,6 +33,7 @@
 #include "soc_log.h"
 #include "sdk_conf.h"
 #include "xtensa/core-macros.h"
+#include "macros/units.h"
 
 #ifdef RIOT_VERSION
 /* These functions are declared in rom/gpio.h. However, due to conflichts with
@@ -40,8 +41,6 @@
 extern void gpio_pad_select_gpio(uint8_t gpio_num);
 extern void gpio_output_set_high(uint32_t set_mask, uint32_t clear_mask, uint32_t enable_mask, uint32_t disable_mask);
 #endif
-
-#define MHZ (1000000)
 
 /* Frequency of the 8M oscillator is 8.5MHz +/- 5%, at the default DCAP setting */
 #define RTC_FAST_CLK_FREQ_8M        8500000
@@ -398,7 +397,7 @@ static void rtc_clk_cpu_freq_to_xtal(void)
     REG_SET_FIELD(RTC_CNTL_CLK_CONF_REG, RTC_CNTL_SOC_CLK_SEL, RTC_CNTL_SOC_CLK_SEL_XTL);
     DPORT_REG_WRITE(DPORT_CPU_PER_CONF_REG, 0); // clear DPORT_CPUPERIOD_SEL
 
-    rtc_clk_apb_freq_update(xtal_freq * MHZ);
+    rtc_clk_apb_freq_update(MHZ(xtal_freq));
     s_cur_freq = RTC_CPU_FREQ_XTAL;
 }
 
@@ -434,7 +433,7 @@ static void rtc_clk_cpu_freq_to_pll(rtc_cpu_freq_t cpu_freq)
         freq = 240;
     }
     REG_SET_FIELD(RTC_CNTL_CLK_CONF_REG, RTC_CNTL_SOC_CLK_SEL, RTC_CNTL_SOC_CLK_SEL_PLL);
-    rtc_clk_apb_freq_update(80 * MHZ);
+    rtc_clk_apb_freq_update(MHZ(80));
     ets_update_cpu_frequency(freq);
     s_cur_freq = cpu_freq;
 }
@@ -473,7 +472,7 @@ void rtc_clk_cpu_freq_set(rtc_cpu_freq_t cpu_freq)
             RTC_CNTL_BB_I2C_FORCE_PD | RTC_CNTL_BBPLL_FORCE_PD |
             RTC_CNTL_BBPLL_I2C_FORCE_PD);
     s_cur_pll = RTC_PLL_NONE;
-    rtc_clk_apb_freq_update(xtal_freq * MHZ);
+    rtc_clk_apb_freq_update(MHZ(xtal_freq));
 
     /* is APLL under force power down? */
     uint32_t apll_fpd = REG_GET_FIELD(RTC_CNTL_ANA_CONF_REG, RTC_CNTL_PLLA_FORCE_PD);
@@ -488,7 +487,7 @@ void rtc_clk_cpu_freq_set(rtc_cpu_freq_t cpu_freq)
         /* set up divider to produce 2MHz from XTAL */
         REG_SET_FIELD(APB_CTRL_SYSCLK_CONF_REG, APB_CTRL_PRE_DIV_CNT, (xtal_freq / 2) - 1);
         ets_update_cpu_frequency(2);
-        rtc_clk_apb_freq_update(2 * MHZ);
+        rtc_clk_apb_freq_update(MHZ(2));
         /* lower the voltage */
         REG_SET_FIELD(RTC_CNTL_REG, RTC_CNTL_DIG_DBIAS_WAK, DIG_DBIAS_2M);
     } else {
@@ -512,7 +511,7 @@ void rtc_clk_cpu_freq_set(rtc_cpu_freq_t cpu_freq)
         }
         REG_SET_FIELD(RTC_CNTL_CLK_CONF_REG, RTC_CNTL_SOC_CLK_SEL, RTC_CNTL_SOC_CLK_SEL_PLL);
         rtc_clk_wait_for_slow_cycle();
-        rtc_clk_apb_freq_update(80 * MHZ);
+        rtc_clk_apb_freq_update(MHZ(80));
     }
     s_cur_freq = cpu_freq;
 }
@@ -557,15 +556,15 @@ uint32_t rtc_clk_cpu_freq_value(rtc_cpu_freq_t cpu_freq)
 {
     switch (cpu_freq) {
         case RTC_CPU_FREQ_XTAL:
-            return ((uint32_t) rtc_clk_xtal_freq_get()) * MHZ;
+            return ((uint32_t) MHZ(rtc_clk_xtal_freq_get()));
         case RTC_CPU_FREQ_2M:
-            return 2 * MHZ;
+            return MHZ(2);
         case RTC_CPU_FREQ_80M:
-            return 80 * MHZ;
+            return MHZ(80);
         case RTC_CPU_FREQ_160M:
-            return 160 * MHZ;
+            return MHZ(160);
         case RTC_CPU_FREQ_240M:
-            return 240 * MHZ;
+            return MHZ(240);
         default:
             assert(false && "invalid rtc_cpu_freq_t value");
             return 0;
@@ -638,7 +637,7 @@ static rtc_xtal_freq_t rtc_clk_xtal_freq_estimate(void)
      * (shifted by RTC_CLK_CAL_FRACT bits).
      * Xtal frequency will be (cal_val * 8M / 256) / 2^19
      */
-    uint32_t freq_mhz = (cal_val * RTC_FAST_CLK_FREQ_APPROX / MHZ / 256 ) >> RTC_CLK_CAL_FRACT;
+    uint32_t freq_mhz = (cal_val * RTC_FAST_CLK_FREQ_APPROX / MHZ(1) / 256 ) >> RTC_CLK_CAL_FRACT;
     /* Guess the XTAL type. For now, only 40 and 26MHz are supported.
      */
     switch (freq_mhz) {
@@ -669,8 +668,8 @@ uint32_t rtc_clk_apb_freq_get(void)
 {
     uint32_t freq_hz = reg_val_to_clk_val(READ_PERI_REG(RTC_APB_FREQ_REG)) << 12;
     // round to the nearest MHz
-    freq_hz += MHZ / 2;
-    uint32_t remainder = freq_hz % MHZ;
+    freq_hz += MHZ(1) / 2;
+    uint32_t remainder = freq_hz % MHZ(1);
     return freq_hz - remainder;
 }
 
@@ -737,13 +736,13 @@ void rtc_clk_init(rtc_clk_config_t cfg)
     }
     uart_tx_wait_idle(0);
     rtc_clk_xtal_freq_update(xtal_freq);
-    rtc_clk_apb_freq_update(xtal_freq * MHZ);
+    rtc_clk_apb_freq_update(MHZ(xtal_freq));
     /* Set CPU frequency */
     rtc_clk_cpu_freq_set(cfg.cpu_freq);
 
     /* Re-calculate the ccount to make time calculation correct. */
-    uint32_t freq_before = rtc_clk_cpu_freq_value(cpu_source_before) / MHZ;
-    uint32_t freq_after = rtc_clk_cpu_freq_value(cfg.cpu_freq) / MHZ;
+    uint32_t freq_before = rtc_clk_cpu_freq_value(cpu_source_before) / MHZ(1);
+    uint32_t freq_after = rtc_clk_cpu_freq_value(cfg.cpu_freq) / MHZ(1);
     XTHAL_SET_CCOUNT( XTHAL_GET_CCOUNT() * freq_after / freq_before );
 
     /* Slow & fast clocks setup */

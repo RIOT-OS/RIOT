@@ -24,11 +24,16 @@
 
 #include "cpu_conf_common.h"
 #include "xtensa_conf.h"
+#include "macros/units.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+* @name    Clock configuration
+* @{
+*/
 /**
  * @brief   Defines the CPU frequency in MHz
  *
@@ -37,6 +42,8 @@ extern "C" {
 #ifndef ESP8266_CPU_FREQUENCY
 #define ESP8266_CPU_FREQUENCY   (80)
 #endif
+#define CLOCK_CORECLOCK         (MHZ(ESP8266_CPU_FREQUENCY))
+/** @} */
 
 /**
  * @name   Stack size configurations

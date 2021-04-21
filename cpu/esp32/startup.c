@@ -24,6 +24,7 @@
 #include <string.h>
 #include <sys/reent.h>
 
+#include "macros/units.h"
 #include "board.h"
 #include "esp_attr.h"
 #include "exceptions.h"
@@ -69,7 +70,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#define MHZ 1000000UL
 #define STRINGIFY(s) STRINGIFY2(s)
 #define STRINGIFY2(s) #s
 
@@ -164,7 +164,7 @@ NORETURN void IRAM call_start_cpu0 (void)
 
     LOG_STARTUP("Current clocks in Hz: CPU=%d APB=%d XTAL=%d SLOW=%d\n",
                 rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()),
-                rtc_clk_apb_freq_get(), rtc_clk_xtal_freq_get()*MHZ,
+                rtc_clk_apb_freq_get(), MHZ(rtc_clk_xtal_freq_get()),
                 rtc_clk_slow_freq_get_hz());
 
     if (IS_ACTIVE(ENABLE_DEBUG)) {
@@ -253,7 +253,7 @@ static void IRAM system_clk_init (void)
                                                set to 2 MHz and handled later */
     }
 
-    uint32_t freq_before = rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()) / MHZ ;
+    uint32_t freq_before = rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()) / MHZ(1) ;
 
     if (freq_before != CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ) {
         /* set configured CPU frequency */
@@ -321,7 +321,7 @@ static NORETURN void IRAM system_init (void)
     /* print some infos */
     LOG_STARTUP("Used clocks in Hz: CPU=%d APB=%d XTAL=%d FAST=%d SLOW=%d\n",
                 rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()),
-                rtc_clk_apb_freq_get(), rtc_clk_xtal_freq_get()*MHZ,
+                rtc_clk_apb_freq_get(), MHZ(rtc_clk_xtal_freq_get()),
                 RTC_FAST_FREQ_8M_MHZ, rtc_clk_slow_freq_get_hz());
     LOG_STARTUP("XTAL calibration value: %d\n", esp_clk_slowclk_cal_get());
     LOG_STARTUP("Heap free: %u bytes\n", get_free_heap_size());

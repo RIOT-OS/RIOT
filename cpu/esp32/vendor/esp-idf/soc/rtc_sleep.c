@@ -25,8 +25,7 @@
 #include "soc/fe_reg.h"
 #include "soc/rtc.h"
 #include "rom/ets_sys.h"
-
-#define MHZ (1000000)
+#include "macros/units.h"
 
 /* Various delays to be programmed into power control state machines */
 #define RTC_CNTL_XTL_BUF_WAIT_SLP   2

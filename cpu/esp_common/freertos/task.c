@@ -22,6 +22,7 @@
 #include "syscalls.h"
 #include "thread.h"
 #include "xtimer.h"
+#include "macros/units.h"
 
 #ifdef MCU_ESP32
 #include "soc/soc.h"
@@ -29,8 +30,6 @@
 
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-
-#define MHZ 1000000
 
 #ifdef MCU_ESP8266
 #include "rom/ets_sys.h"
@@ -134,7 +133,7 @@ void vTaskDelay( const TickType_t xTicksToDelay )
 {
     DEBUG("%s xTicksToDelay=%d\n", __func__, xTicksToDelay);
 #if defined(MODULE_ESP_WIFI_ANY)
-    uint64_t us = xTicksToDelay * MHZ / xPortGetTickRateHz();
+    uint64_t us = MHZ(xTicksToDelay) / xPortGetTickRateHz();
     xtimer_usleep(us);
 #endif
 }

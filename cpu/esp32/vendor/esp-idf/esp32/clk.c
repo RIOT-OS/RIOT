@@ -44,14 +44,13 @@
 #include "soc/i2s_reg.h"
 #include "driver/periph_ctrl.h"
 #include "xtensa/core-macros.h"
+#include "macros/units.h"
 
 /* Number of cycles to wait from the 32k XTAL oscillator to consider it running.
  * Larger values increase startup delay. Smaller values may cause false positive
  * detection (i.e. oscillator runs for a few cycles and then stops).
  */
 #define SLOW_CLK_CAL_CYCLES     CONFIG_ESP32_RTC_CLK_CAL_CYCLES
-
-#define MHZ (1000000)
 
 void select_rtc_slow_clk(rtc_slow_freq_t slow_clk);
 
@@ -141,7 +140,7 @@ void esp_clk_init(void)
     // when switching APB frequency
     uart_tx_wait_idle(CONFIG_CONSOLE_UART_NUM);
 
-    uint32_t freq_before = rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()) / MHZ ;
+    uint32_t freq_before = rtc_clk_cpu_freq_value(rtc_clk_cpu_freq_get()) / MHZ(1) ;
 
     rtc_clk_cpu_freq_set(freq);
 
