@@ -137,7 +137,7 @@ static int _mrhof_cmp_fresh(netif_t *netif,
         return 1;
     }
 
-    if (p2_isfresh == false) {
+    if (!p2_isfresh) {
         /* p1 is acceptable and p2 not */
         return -1;
     }
