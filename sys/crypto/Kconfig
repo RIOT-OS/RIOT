@@ -5,28 +5,13 @@
 # directory for more details.
 #
 
-menu "Crypto"
-
-config MODULE_CRYPTO
-    bool "Common cryptographic functionalities"
+menuconfig MODULE_CRYPTO
+    bool "Crypto"
     depends on TEST_KCONFIG
 
-choice
-    bool "Crypto block ciphers API implementation"
-    optional
-    depends on TEST_KCONFIG
-    help
-        The common Crypto block ciphers API has multiple implementations. Choose
-        one of the following.
-
-config CRYPTO_AES
-    bool "AES"
-    select MODULE_CRYPTO
-
-endchoice
+if MODULE_CRYPTO
 
 menu "Crypto AES options"
-depends on CRYPTO_AES
 
 config MODULE_CRYPTO_AES_128
     bool "AES-128"
@@ -50,4 +35,4 @@ endmenu # Crypto AES options
 
 rsource "modes/Kconfig"
 
-endmenu # Crypto
+endif # Crypto

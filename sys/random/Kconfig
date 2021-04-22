@@ -25,7 +25,7 @@ config MODULE_PRNG_FORTUNA
     select MODULE_XTIMER
     select MODULE_FORTUNA
     select MODULE_CRYPTO
-    depends on MODULE_CRYPTO_AES
+    select MODULE_CRYPTO_AES_128
 
 config MODULE_PRNG_HWRNG
     bool "Hardware RNG"
