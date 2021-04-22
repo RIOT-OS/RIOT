@@ -245,11 +245,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   Number of implemented Objective Functions
- */
-#define GNRC_RPL_IMPLEMENTED_OFS_NUMOF (2)
-
-/**
  * @brief   Default Objective Code Point (OF0)
  */
 #ifndef CONFIG_GNRC_RPL_DEFAULT_OCP
