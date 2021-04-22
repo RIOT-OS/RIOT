@@ -23,6 +23,7 @@
 #include "byteorder.h"
 #include "mutex.h"
 #include "timex.h"
+#include "xtimer.h"
 
 #include "lis2dh12.h"
 #include "lis2dh12_internal.h"
@@ -187,6 +188,9 @@ int lis2dh12_init(lis2dh12_t *dev, const lis2dh12_params_t *params)
     reg1.bit.Zen = 1;
 
     _write(dev, REG_CTRL_REG1, reg1.reg);
+
+    /* enable block data update */
+    _write(dev, REG_CTRL_REG4, 0x80);
 
     _release(dev);
 
@@ -579,6 +583,30 @@ int lis2dh12_clear_data(const lis2dh12_t *dev)
     return LIS2DH12_OK;
 }
 
+int lis2dh12_read_temperature(const lis2dh12_t *dev, int16_t *temp)
+{
+    uint8_t bytes[2];
+
+    _acquire(dev);
+
+    /* enable temperature sensor */
+    if (!_read(dev, REG_TEMP_CFG_REG)) {
+        uint8_t odr = _read(dev, REG_CTRL_REG1) >> 4;
+        _write(dev, REG_TEMP_CFG_REG, LIS2DH12_TEMP_CFG_REG_ENABLE);
+        if (IS_USED(MODULE_XTIMER)) {
+            xtimer_msleep(MS_PER_SEC / hz_per_dr[odr]);
+        }
+    }
+
+    _read_burst(dev, REG_OUT_TEMP_L, bytes, sizeof(bytes));
+    _release(dev);
+
+    *temp =  100 * (int8_t)bytes[1];
+    *temp += (100 * bytes[0]) >> 8;
+
+    return 0;
+}
+
 int lis2dh12_set_reference(const lis2dh12_t *dev, uint8_t reference)
 {
 
@@ -776,6 +804,11 @@ int lis2dh12_poweroff(const lis2dh12_t *dev)
 
     /* set datarate to zero */
     lis2dh12_set_datarate(dev, 0);
+
+    /* disable temperature sensor */
+    _acquire(dev);
+    _write(dev, REG_TEMP_CFG_REG, LIS2DH12_TEMP_CFG_REG_DISABLE);
+    _release(dev);
 
     return LIS2DH12_OK;
 }

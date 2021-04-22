@@ -34,6 +34,14 @@ enum {
 };
 
 /**
+ * @brief   STATUS_REG_TEMP definitions
+ */
+enum {
+    LIS2DH12_TEMP_CFG_REG_DISABLE = 0x00, /**< Temperature sensor disable */
+    LIS2DH12_TEMP_CFG_REG_ENABLE  = 0xC0, /**< Temperature sensor enable  */
+};
+
+/**
  * @brief   STATUS_REG definitions
  */
 enum {

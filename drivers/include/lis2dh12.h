@@ -244,8 +244,11 @@ typedef struct {
 
 /**
  * @brief   Export the SAUL interface for this driver
+ * @{
  */
 extern const saul_driver_t lis2dh12_saul_driver;
+extern const saul_driver_t lis2dh12_saul_temp_driver;
+/** @} */
 
 #if MODULE_LIS2DH12_INT || DOXYGEN
 /**
@@ -369,6 +372,21 @@ int lis2dh12_init(lis2dh12_t *dev, const lis2dh12_params_t *params);
  * @return  LIS2DH12_NOBUS on bus error
  */
 int lis2dh12_read(const lis2dh12_t *dev, lis2dh12_fifo_data_t *data);
+
+/**
+ * @brief   Read temperature data from the given device
+ *
+ * @note    The temperature sensor is not calibrated.
+ *          Temperature values are only relative to a device specific
+ *          reference.
+ *
+ * @param[in]  dev      device descriptor
+ * @param[out] temp     temperature data in centi-°C
+ *
+ * @return  LIS2DH12_OK on success
+ * @return  LIS2DH12_NOBUS on bus error
+ */
+int lis2dh12_read_temperature(const lis2dh12_t *dev, int16_t *temp);
 
 /**
  * @brief   Clear the LIS2DH12 memory, clears all sampled data
