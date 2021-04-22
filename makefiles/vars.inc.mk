@@ -109,6 +109,8 @@ export HEXFILE               # The 'intel hex' stripped result of the compilatio
 # PROGRAMMERS_SUPPORTED      # The list of programmers supported by a board
 # PROGRAMMER_QUIET           # Change verbosity of programmer output (only used with flash and reset targets).
                              # Default is 1, not verbose. Use 0 to get normal programmer output.
+# PROGRAMMER_TIMEOUT         # Make programmer fail when timeout is reached, default is 60s. Only used
+                             # when PROGRAMMER_QUIET=1.
 # USE_PROGRAMMER_WRAPPER_SCRIPT     # Use the programmer wrapper Python script. Default is 1 (0 if RIOT_CI_BUILD is set).
 
 
