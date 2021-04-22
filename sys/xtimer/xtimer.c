@@ -135,12 +135,12 @@ static void _setup_timer_msg(msg_t *m, xtimer_t *t)
 static int _msg_wait(msg_t *m, msg_t *tmsg, xtimer_t *t)
 {
     msg_receive(m);
+    xtimer_remove(t);
     if (m->type == MSG_XTIMER && m->content.ptr == tmsg) {
         /* we hit the timeout */
         return -1;
     }
     else {
-        xtimer_remove(t);
         return 1;
     }
 }
