@@ -281,6 +281,10 @@ static ztimer_t *_now_next(ztimer_clock_t *clock)
             }
 #endif
         }
+        else {
+            /* reset next pointer so ztimer_is_set() works */
+            entry->next = NULL;
+        }
         return (ztimer_t *)entry;
     }
     else {
