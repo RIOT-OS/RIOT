@@ -277,8 +277,8 @@ int nimble_autoconn_update(const nimble_autoconn_params_t *params,
     /* populate the connection parameters */
     _conn_params.scan_itvl = BLE_GAP_SCAN_ITVL_MS(params->scan_win);
     _conn_params.scan_window = _conn_params.scan_itvl;
-    _conn_params.itvl_min = BLE_GAP_CONN_ITVL_MS(params->conn_itvl);
-    _conn_params.itvl_max = _conn_params.itvl_min;
+    _conn_params.itvl_min = BLE_GAP_CONN_ITVL_MS(params->conn_itvl_min);
+    _conn_params.itvl_max = BLE_GAP_CONN_ITVL_MS(params->conn_itvl_max);
     _conn_params.latency = 0;
     _conn_params.supervision_timeout = BLE_GAP_SUPERVISION_TIMEOUT_MS(
                                                          params->conn_super_to);
