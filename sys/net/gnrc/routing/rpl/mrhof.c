@@ -132,7 +132,7 @@ static int _mrhof_cmp_fresh(netif_t *netif,
     }
 
     /* One of the two parents is not acceptable */
-    if (p1_isfresh == false) {
+    if (!p1_isfresh) {
         /* p2 is acceptable and p1 not */
         return 1;
     }
