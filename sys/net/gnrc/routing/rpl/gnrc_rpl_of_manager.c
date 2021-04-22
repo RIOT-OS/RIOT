@@ -26,34 +26,36 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-static gnrc_rpl_of_t *objective_functions[GNRC_RPL_IMPLEMENTED_OFS_NUMOF];
+static struct of_list {
+    struct of_list *next;
+    gnrc_rpl_of_t *of;
+} *of_list_head;
 
 void gnrc_rpl_of_manager_init(void)
 {
-    /* insert new objective functions here */
     if (IS_USED(MODULE_GNRC_RPL_OF0)) {
-        objective_functions[0] = gnrc_rpl_get_of0();
+        static struct of_list of0;
+        of0.of = gnrc_rpl_get_of0();
+        of0.next = of_list_head;
+        of_list_head = &of0;
     }
     if (IS_USED(MODULE_GNRC_RPL_MRHOF)) {
-        objective_functions[1] = gnrc_rpl_get_of_mrhof();
+        static struct of_list of_mrhof;
+        of_mrhof.of = gnrc_rpl_get_of_mrhof();
+        of_mrhof.next = of_list_head;
+        of_list_head = &of_mrhof;
     }
+
+    /* insert new objective functions here */
 }
 
 /* find implemented OF via objective code point */
 gnrc_rpl_of_t *gnrc_rpl_get_of_for_ocp(uint16_t ocp)
 {
-    for (uint16_t i = 0; i < GNRC_RPL_IMPLEMENTED_OFS_NUMOF; i++) {
-        if (objective_functions[i] == NULL) {
-            continue;
+    for (struct of_list *of = of_list_head; of; of = of->next) {
+        if (ocp == of->of->ocp) {
+            return of->of;
         }
-        else if (ocp == objective_functions[i]->ocp) {
-            return objective_functions[i];
-        }
-    }
-
-    /* fallback if something goes wrong */
-    if (IS_USED(MODULE_GNRC_RPL_OF0)) {
-        return gnrc_rpl_get_of0();
     }
 
     return NULL;
