@@ -332,6 +332,19 @@ static int shell_is2dh12_set_scale(int argc, char **argv)
     return 0;
 }
 
+static int shell_is2dh12_read_temp(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    int16_t temp;
+    lis2dh12_read_temperature(&dev, &temp);
+
+    printf("%d.%02d °C\n", temp / 100, temp % 100);
+
+    return 0;
+}
+
 static const shell_command_t shell_commands[] = {
     { "read", "Read acceleration data", shell_is2dh12_read },
     { "read_fifo", "Read acceleration data from fifo", shell_is2dh12_read_fifo },
@@ -341,6 +354,7 @@ static const shell_command_t shell_commands[] = {
     { "resolution", "Get/Set resolution", shell_is2dh12_set_resolution },
     { "rate", "Get/Set sampline rate", shell_is2dh12_set_rate },
     { "scale", "Get/Set measuring range", shell_is2dh12_set_scale },
+    { "temp", "Read temperature data", shell_is2dh12_read_temp },
     { NULL, NULL, NULL },
 };
 
