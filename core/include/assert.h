@@ -51,14 +51,6 @@ extern "C" {
 #endif
 
 /**
- * @brief   the string that is passed to panic in case of a failing assertion
- */
-extern const char assert_crash_message[];
-
-#ifdef NDEBUG
-#define assert(ignore)((void)0)
-#elif defined(DEBUG_ASSERT_VERBOSE)
-/**
  * @brief   Function to handle failed assertion
  *
  * @note    This function was introduced for memory size optimization
@@ -71,7 +63,37 @@ extern const char assert_crash_message[];
 NORETURN void _assert_failure(const char *file, unsigned line);
 
 /**
- * @brief    abort the program if assertion is false
+ * @brief   the string that is passed to panic in case of a failing assertion
+ */
+extern const char assert_crash_message[];
+
+/**
+ * @brief   Implementation of the `assert()` function.
+ *
+ * @warning This function is internal, use @ref assert instead
+ *
+ * @param   value   Value of the expression that is asserted
+ * @param   file    Source code file containing the assertion
+ * @param   line    Line number of the assertion
+ */
+static inline void _assert_impl(int value, const char *file, unsigned line) {
+    if (IS_ACTIVE(NDEBUG)) {
+        return;
+    }
+
+    if (!value) {
+        if (IS_ACTIVE(DEBUG_ASSERT_VERBOSE)) {
+            _assert_failure(file, line);
+        }
+        else {
+            core_panic(PANIC_ASSERT_FAIL, assert_crash_message);
+        }
+    }
+}
+
+#if !defined(NDEBUG) || DOXYGEN
+/**
+ * @brief   abort the program if assertion is false
  *
  * If the macro NDEBUG was defined at the moment <assert.h> was last included,
  * the macro assert() generates no code, and hence does nothing at all.
@@ -101,11 +123,9 @@ NORETURN void _assert_failure(const char *file, unsigned line);
  *
  * @see http://pubs.opengroup.org/onlinepubs/9699919799/functions/assert.html
  */
-#define assert(cond) ((cond) ? (void)0 :  _assert_failure(RIOT_FILE_RELATIVE, \
-                                                          __LINE__))
+#define assert(cond) _assert_impl(!!(cond), RIOT_FILE_RELATIVE, __LINE__)
 #else
-#define assert(cond) ((cond) ? (void)0 : core_panic(PANIC_ASSERT_FAIL, \
-                                                    assert_crash_message))
+#define assert(cond) (void)0
 #endif
 
 #if !defined __cplusplus
