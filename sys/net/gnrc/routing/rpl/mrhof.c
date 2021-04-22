@@ -78,8 +78,8 @@ static uint16_t _mrhof_get_path_cost(gnrc_rpl_parent_t *parent, netstats_nb_t *s
  */
 static bool _mrhof_is_acceptable(gnrc_rpl_parent_t *parent, netstats_nb_t *stats)
 {
-    return _link_metric(stats) < MRHOF_MAX_LINK_METRIC &&
-           _mrhof_get_path_cost(parent, stats) < MRHOF_MAX_PATH_COST;
+    return (_link_metric(stats) < MRHOF_MAX_LINK_METRIC) &&
+           (_mrhof_get_path_cost(parent, stats) < MRHOF_MAX_PATH_COST);
 }
 
 /**
