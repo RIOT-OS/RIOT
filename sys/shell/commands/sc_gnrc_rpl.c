@@ -236,6 +236,11 @@ int _stats(void)
 
 int _gnrc_rpl_dodag_show(void)
 {
+    if (gnrc_rpl_pid == KERNEL_PID_UNDEF) {
+        printf("RPL not initializied\n");
+        return 1;
+    }
+
     printf("instance table:\t");
     for (uint8_t i = 0; i < GNRC_RPL_INSTANCES_NUMOF; ++i) {
         if (gnrc_rpl_instances[i].state == 0) {
