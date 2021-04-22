@@ -307,20 +307,20 @@ static void _mlme_link_check_ans(gnrc_lorawan_t *mac, uint8_t *p)
 
 static void _mlme_link_adr_req(gnrc_lorawan_t *mac, uint8_t *p)
 {
-    mlme_link_adr_req_t mlme_link_adr_req;
-
-    mlme_link_adr_req.dr_txpwr = p[1];
-    mlme_link_adr_req.chmsk = (p[3] << 8 ) | p[2];
-    mlme_link_adr_req.redncy = p[4];
-
     DEBUG("gnrc_lorawan_mlme: LinkADRReq DataRate_TXPower : DR%u TX%u\n",
-           mlme_link_adr_req.dr_txpwr >> 4, mlme_link_adr_req.dr_txpwr & 0x0f);
-    DEBUG("gnrc_lorawan_mlme: LinkADRReq ChMask : %u\n",mlme_link_adr_req.chmsk);
-    DEBUG("gnrc_lorawan_mlme: LinkADRReq Redundancy : %u\n",mlme_link_adr_req.redncy);
+           p[1] >> 4, p[1] & 0x0f);
+    DEBUG("gnrc_lorawan_mlme: LinkADRReq ChMask : %u\n", (p[3] << 8 ) | p[2]);
+    DEBUG("gnrc_lorawan_mlme: LinkADRReq Redundancy : %u\n", p[4]);
 
+    mac->last_dr = p[1] >> 4;
+    mac->channel_mask = (p[3] << 8 ) | p[2];
+    // mac->mcps.redundancy = p[4];
+
+    /* Set `LinkADRAns` for next uplink */
     mac->mlme.pending_mlme_opts |=  GNRC_LORAWAN_MLME_OPTS_LINK_ADR_ANS;
-    mac->last_dr = mlme_link_adr_req.dr_txpwr >> 4;
+
     DEBUG("gnrc_lorawan_mlme: Lastdr : %u\n",mac->last_dr); // to be removed
+    DEBUG("gnrc_lorawan_mlme: Channel Mask : %u\n",mac->channel_mask); // to be removed
 }
 
 int _fopts_mlme_link_adr_ans(lorawan_buffer_t *buf)

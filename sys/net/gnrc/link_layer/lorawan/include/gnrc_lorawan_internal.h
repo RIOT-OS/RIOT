@@ -139,15 +139,6 @@ typedef struct {
 } mlme_link_req_confirm_t;
 
 /**
- * @brief MLME Link ADR request data sent by NS
- */
-typedef struct {
-    uint8_t dr_txpwr;       /**< DataRate_TXPower (in dB) */
-    uint16_t chmsk;         /**< Channel Mask*/
-    uint8_t redncy;         /**< Redundancy bit */
-} mlme_link_adr_req_t;
-
-/**
  * @brief MCPS data
  */
 typedef struct {
