@@ -20,7 +20,7 @@
 /**
  * AES CCM DVTP test vectors (SP 800-38C) for 256 bit keys.
  * https://csrc.nist.gov/projects/cryptographic-algorithm-validation-program/cavp-testing-block-cipher-modes
-*/
+ */
 
 static const size_t nonce_and_len_encoding_size = 15;
 

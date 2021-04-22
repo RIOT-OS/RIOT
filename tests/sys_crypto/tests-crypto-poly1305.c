@@ -14,6 +14,12 @@
 
 #include <string.h>
 
+/*
+ *  Poly1305 Message Authentication Code
+ *
+ *  https://tools.ietf.org/html/draft-nir-cfrg-chacha20-poly1305-06#appendix-A.3
+ */
+
 static const uint8_t key_1[32] = { 0 };
 static const uint8_t msg_1[64] = { 0 };
 static const uint8_t tag_1[16] = { 0 };
