@@ -138,7 +138,7 @@ jobs:
           TTN_DEV_ID="riot_lorawan_1" \
           TTN_DEV_ID_ABP="riot_lorawan_1_abp" \
           RIOTBASE=${RIOTBASE} \
-          $(which tox) -- ${TOX_ARGS} -m "${{ matrix.pytest_mark }}"
+          $(which tox) -e test -- ${TOX_ARGS} -m "${{ matrix.pytest_mark }}"
     - name: junit2html and XML deploy
       if: always()
       run: |
