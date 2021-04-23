@@ -1,0 +1,16 @@
+include ../Makefile.tests_common
+
+USEMODULE += senml_cbor
+USEMODULE += fmt
+USEMODULE += embunit
+
+CFLAGS += -DCONFIG_SENML_ATTR_SUM
+CFLAGS += -DCONFIG_SENML_ATTR_VERSION
+CFLAGS += -DCONFIG_SENML_ATTR_UPDATE_TIME
+
+CFLAGS += -DTHREAD_STACKSIZE_DEFAULT=1536
+
+# The following BOARDs redefine THREAD_STACKSIZE_DEFAULT
+BOARD_BLACKLIST += nucleo-l011k4 stk3200
+
+include $(RIOTBASE)/Makefile.include
