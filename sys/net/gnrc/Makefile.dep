@@ -1,0 +1,423 @@
+ifneq (,$(filter gcoap,$(USEMODULE)))
+   USEMODULE += gnrc_sock_async
+endif
+
+ifneq (,$(filter sock_async,$(USEMODULE)))
+  USEMODULE += gnrc_sock_async
+endif
+
+ifneq (,$(filter gnrc_mac,$(USEMODULE)))
+  USEMODULE += gnrc_priority_pktqueue
+  USEMODULE += csma_sender
+  USEMODULE += evtimer
+  ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+    USEMODULE += gnrc_netif_mac
+  endif
+endif
+
+ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_nettype_gomach
+  USEMODULE += random
+  USEMODULE += xtimer
+  USEMODULE += gnrc_mac
+  FEATURES_REQUIRED += periph_rtt
+endif
+
+ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
+  USEMODULE += xtimer
+  USEMODULE += random
+  USEMODULE += hashes
+  USEMODULE += crypto_aes
+  USEMODULE += netdev_layer
+  USEMODULE += gnrc_nettype_lorawan
+endif
+
+ifneq (,$(filter gnrc_netdev_default,$(USEMODULE)))
+  # enable default network devices on the platform
+  USEMODULE += netdev_default
+  USEMODULE += netdev
+  USEMODULE += gnrc_netif
+endif
+
+ifneq (,$(filter gnrc_dhcpv6_%, $(USEMODULE)))
+  USEMODULE += gnrc_dhcpv6
+endif
+
+ifneq (,$(filter gnrc_dhcpv6_client,$(USEMODULE)))
+  USEMODULE += dhcpv6_client
+  USEMODULE += gnrc_ipv6_nib
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_sock_udp
+endif
+
+ifneq (,$(filter gnrc_dhcpv6_client_6lbr,$(USEMODULE)))
+  USEMODULE += gnrc_dhcpv6_client
+endif
+
+ifneq (,$(filter gnrc_uhcpc,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_gnrc_uhcpc
+  USEMODULE += uhcpc
+  USEMODULE += gnrc_sock_udp
+  USEMODULE += fmt
+endif
+
+ifneq (,$(filter gnrc_%,$(filter-out gnrc_netapi gnrc_netreg gnrc_netif% gnrc_pkt%,$(USEMODULE))))
+  USEMODULE += gnrc
+endif
+
+ifneq (,$(filter gnrc_sock_%,$(USEMODULE)))
+  USEMODULE += gnrc_sock
+  ifneq (,$(filter sock_aux_timestamp,$(USEMODULE)))
+    USEMODULE += gnrc_netif_timestamp
+  endif
+endif
+
+ifneq (,$(filter gnrc_sock_async,$(USEMODULE)))
+  USEMODULE += gnrc_netapi_callbacks
+endif
+
+ifneq (,$(filter gnrc_sock_udp,$(USEMODULE)))
+  USEMODULE += gnrc_udp
+  USEMODULE += random     # to generate random ports
+endif
+
+ifneq (,$(filter gnrc_sock,$(USEMODULE)))
+  USEMODULE += gnrc_netapi_mbox
+  USEMODULE += sock
+endif
+
+ifneq (,$(filter gnrc_netapi_mbox,$(USEMODULE)))
+  USEMODULE += core_mbox
+endif
+
+ifneq (,$(filter gnrc_rpl_p2p,$(USEMODULE)))
+  USEMODULE += gnrc_rpl
+endif
+
+ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ipv6_nib
+  USEMODULE += trickle
+  USEMODULE += xtimer
+  USEMODULE += evtimer
+endif
+
+ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+  USEMODULE += netif
+  USEMODULE += l2util
+  USEMODULE += fmt
+  ifneq (,$(filter netdev_ieee802154_submac,$(USEMODULE)))
+    USEMODULE += gnrc_netif_pktq
+  endif
+  ifneq (,$(filter netdev_ieee802154,$(USEMODULE)))
+    USEMODULE += gnrc_netif_ieee802154
+  endif
+  ifneq (,$(filter netdev_eth,$(USEMODULE)))
+    USEMODULE += gnrc_netif_ethernet
+  endif
+  ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
+    USEMODULE += gnrc_netif_lorawan
+  endif
+endif
+
+ifneq (,$(filter gnrc_netif_bus,$(USEMODULE)))
+  USEMODULE += core_msg_bus
+endif
+
+ifneq (,$(filter gnrc_netif_events,$(USEMODULE)))
+  USEMODULE += core_thread_flags
+  USEMODULE += event
+endif
+
+ifneq (,$(filter ieee802154 nrfmin esp_now cc110x gnrc_sixloenc,$(USEMODULE)))
+  ifneq (,$(filter gnrc_ipv6, $(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan
+  endif
+  ifneq (,$(filter gnrc_ipv6_default, $(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_default
+  endif
+  ifneq (,$(filter gnrc_ipv6_router_default, $(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_router_default
+  endif
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_6ln
+  USEMODULE += gnrc_sixlowpan
+  ifeq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_frag
+  endif
+  USEMODULE += gnrc_sixlowpan_iphc
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_router_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_6lr
+  ifeq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_frag
+  endif
+  USEMODULE += gnrc_sixlowpan_iphc
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_border_router_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_6lbr
+  USEMODULE += gnrc_ipv6_router_default
+  ifeq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
+    USEMODULE += gnrc_sixlowpan_frag
+  endif
+  USEMODULE += gnrc_sixlowpan_iphc
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_frag_fb
+  USEMODULE += gnrc_sixlowpan_frag_rb
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_fb,$(USEMODULE)))
+  USEMODULE += core_msg
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_minfwd,$(USEMODULE)))
+  USEMODULE += gnrc_netif_pktq
+  USEMODULE += gnrc_sixlowpan_frag
+  USEMODULE += gnrc_sixlowpan_frag_hint
+  USEMODULE += gnrc_sixlowpan_frag_vrb
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_rb,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_frag_fb
+  USEMODULE += gnrc_sixlowpan_frag_vrb
+  USEMODULE += gnrc_sixlowpan_frag_rb
+  USEMODULE += evtimer
+  USEMODULE += xtimer
+  ifneq (,$(filter gnrc_tx_sync,$(USEMODULE)))
+    # TODO: Implement gnrc_tx_sync for gnrc_sixlowpand_frag_sfr
+    $(error module gnrc_tx_sync conflicts with gnrc_sixlowpand_frag_sfr)
+  endif
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_stats,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_sfr
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_vrb,$(USEMODULE)))
+  USEMODULE += xtimer
+  USEMODULE += gnrc_sixlowpan_frag_fb
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_iphc,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_sixlowpan
+  USEMODULE += gnrc_sixlowpan_ctx
+  USEMODULE += gnrc_sixlowpan_iphc_nhc
+endif
+
+ifneq (,$(filter gnrc_sixlowpan,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_gnrc_sixlowpan
+  USEMODULE += gnrc_nettype_sixlowpan
+  USEMODULE += sixlowpan
+  ifneq (,$(filter gnrc_netif,$(USEMODULE)))
+    USEMODULE += gnrc_netif_6lo
+  endif
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_ctx,$(USEMODULE)))
+  USEMODULE += ipv6_addr
+  ifeq (,$(filter ztimer_msec,$(USEMODULE)))
+    USEMODULE += xtimer
+  endif
+endif
+
+ifneq (,$(filter gnrc_ipv6_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_icmpv6
+endif
+
+ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_router
+  USEMODULE += gnrc_icmpv6
+endif
+
+ifneq (,$(filter gnrc_ndp,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ipv6_hdr
+  USEMODULE += gnrc_netif
+endif
+
+ifneq (,$(filter gnrc_icmpv6_echo,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ipv6_hdr
+  USEMODULE += gnrc_netif_hdr
+endif
+
+ifneq (,$(filter gnrc_icmpv6_error,$(USEMODULE)))
+  USEMODULE += gnrc_icmpv6
+  USEMODULE += gnrc_ipv6_hdr
+  USEMODULE += gnrc_netif_hdr
+endif
+
+ifneq (,$(filter gnrc_icmpv6,$(USEMODULE)))
+  USEMODULE += inet_csum
+  USEMODULE += ipv6_hdr
+  USEMODULE += gnrc_nettype_icmpv6
+  USEMODULE += gnrc_nettype_ipv6
+  USEMODULE += icmpv6
+endif
+
+ifneq (,$(filter gnrc_rpl_srh,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_ext_rh
+endif
+
+ifneq (,$(filter gnrc_ipv6_ext_frag,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_ext
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter gnrc_ipv6_ext_opt,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_ext
+endif
+
+ifneq (,$(filter gnrc_ipv6_ext_rh,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_ext
+endif
+
+ifneq (,$(filter gnrc_ipv6_ext,$(USEMODULE)))
+  USEMODULE += gnrc_nettype_ipv6
+  USEMODULE += gnrc_nettype_ipv6_ext
+endif
+
+ifneq (,$(filter gnrc_ipv6_whitelist,$(USEMODULE)))
+  USEMODULE += ipv6_addr
+endif
+
+ifneq (,$(filter gnrc_ipv6_blacklist,$(USEMODULE)))
+  USEMODULE += ipv6_addr
+endif
+
+ifneq (,$(filter gnrc_ipv6_router,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6
+  USEMODULE += gnrc_ipv6_nib_router
+endif
+
+ifneq (,$(filter gnrc_ipv6,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_gnrc_ipv6
+  USEMODULE += inet_csum
+  USEMODULE += ipv6_addr
+  USEMODULE += gnrc_ipv6_hdr
+  USEMODULE += gnrc_ipv6_nib
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_netif_ipv6
+  USEMODULE += gnrc_nettype_ipv6
+endif
+
+ifneq (,$(filter gnrc_ipv6_hdr,$(USEMODULE)))
+  USEMODULE += ipv6_hdr
+  USEMODULE += gnrc_pktbuf
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_6lbr,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_6lr
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_6lr,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_6ln
+  USEMODULE += gnrc_ipv6_nib_router
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_6ln,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib
+  USEMODULE += gnrc_sixlowpan_nd
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_dns,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib_router,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib
+endif
+
+ifneq (,$(filter gnrc_ipv6_nib,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_gnrc_ipv6_nib
+  USEMODULE += evtimer
+  USEMODULE += gnrc_ndp
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_netif_ipv6
+  USEMODULE += ipv6_addr
+  USEMODULE += random
+endif
+
+ifneq (,$(filter gnrc_udp,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_gnrc_udp
+  USEMODULE += gnrc_nettype_udp
+  USEMODULE += inet_csum
+  USEMODULE += udp
+endif
+
+ifneq (,$(filter gnrc_tcp,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_gnrc_tcp
+  USEMODULE += gnrc_nettype_tcp
+  USEMODULE += inet_csum
+  USEMODULE += random
+  USEMODULE += tcp
+  USEMODULE += evtimer_mbox
+endif
+
+ifneq (,$(filter gnrc_pktdump,$(USEMODULE)))
+  DEFAULT_MODULE += auto_init_gnrc_pktdump
+  USEMODULE += gnrc_pktbuf
+  USEMODULE += od
+endif
+
+ifneq (,$(filter gnrc,$(USEMODULE)))
+  USEMODULE += gnrc_netapi
+  USEMODULE += gnrc_netreg
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_netif_hdr
+  USEMODULE += gnrc_pktbuf
+  ifneq (,$(filter sock_async, $(USEMODULE)))
+    USEMODULE += gnrc_sock_async
+  endif
+  ifneq (,$(filter sock_ip, $(USEMODULE)))
+    USEMODULE += gnrc_sock_ip
+  endif
+  ifneq (,$(filter sock_udp, $(USEMODULE)))
+    USEMODULE += gnrc_sock_udp
+  endif
+endif
+
+ifneq (,$(filter gnrc_pktbuf, $(USEMODULE)))
+  ifeq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+    USEMODULE += gnrc_pktbuf_static
+  endif
+  ifeq (gnrc_pktbuf_cmd,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+    USEMODULE += gnrc_pktbuf_static
+  endif
+  DEFAULT_MODULE += auto_init_gnrc_pktbuf
+  USEMODULE += gnrc_pkt
+endif
+
+ifneq (,$(filter gnrc_pktbuf_%, $(USEMODULE)))
+  USEMODULE += gnrc_pktbuf # make MODULE_GNRC_PKTBUF macro available for all implementations
+endif
+
+ifneq (,$(filter gnrc_netif_%,$(USEMODULE)))
+  USEMODULE += gnrc_netif
+endif
+
+ifneq (,$(filter gnrc_netif_pktq,$(USEMODULE)))
+  USEMODULE += xtimer
+endif
+
+ifneq (,$(filter gnrc_lwmac,$(USEMODULE)))
+  USEMODULE += gnrc_netif
+  USEMODULE += gnrc_nettype_lwmac
+  USEMODULE += gnrc_mac
+  FEATURES_REQUIRED += periph_rtt
+endif
