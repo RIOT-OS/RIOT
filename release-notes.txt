@@ -24,7 +24,7 @@ The 2021.01 release includes:
  - IEEE 802.15.4 security initial implementation
  - 6LowPAN Minimal Forwarding and Selective Fragment Recovery initial
    implementation
- - Initial support for QN808x, SAMD10 STM32MP1 and STM32L5 CPUs
+ - Initial support for QN908x, SAMD10 STM32MP1 and STM32L5 CPUs
  - Initial support for Cortex-M33
  - A module for selecting entropy sources
  - Initial support for the Decawave Impulse Radio-Ultra Wideband (UWB Core)
