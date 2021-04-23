@@ -151,7 +151,7 @@ void isr_gmac(void)
     tsr = GMAC->TSR.reg;
     rsr = GMAC->RSR.reg;
 
-    if (rsr == GMAC_RSR_REC) {
+    if (rsr & GMAC_RSR_REC) {
         netdev_trigger_event_isr(_sam0_eth_dev.netdev);
     }
 
