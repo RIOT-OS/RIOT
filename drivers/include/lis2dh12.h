@@ -63,10 +63,10 @@ extern "C" {
  * @brief   Available scale values
  */
 typedef enum {
-    LIS2DH12_SCALE_2G  = 0x00,      /**< +- 2g */
-    LIS2DH12_SCALE_4G  = 0x10,      /**< +- 4g */
-    LIS2DH12_SCALE_8G  = 0x20,      /**< +- 8g */
-    LIS2DH12_SCALE_16G = 0x30,      /**< +- 16g */
+    LIS2DH12_SCALE_2G  = 0x0,       /**< +- 2g */
+    LIS2DH12_SCALE_4G  = 0x1,       /**< +- 4g */
+    LIS2DH12_SCALE_8G  = 0x2,       /**< +- 8g */
+    LIS2DH12_SCALE_16G = 0x3,       /**< +- 16g */
 } lis2dh12_scale_t;
 
 /**
@@ -177,7 +177,6 @@ typedef struct {
  */
 typedef struct {
     const lis2dh12_params_t *p;     /**< device configuration */
-    uint8_t comp;                   /**< scale compensation factor */
 } lis2dh12_t;
 
 /**
@@ -215,10 +214,13 @@ typedef struct {
 /**
  * @brief   LIS2DH12 FIFO data struct
  */
-typedef struct {
-    int16_t X_AXIS;    /**< X raw data in FIFO */
-    int16_t Y_AXIS;    /**< Y raw data in FIFO */
-    int16_t Z_AXIS;    /**< Z raw data in FIFO */
+typedef union {
+    struct {
+        int16_t x;                      /**< X data in mili-g */
+        int16_t y;                      /**< Y data in mili-g */
+        int16_t z;                      /**< Z data in mili-g */
+    } axis;                             /**< named axis access */
+    int16_t data[3];                    /**< x, y, z data in mili-g */
 } lis2dh12_fifo_data_t;
 
 /**
@@ -333,16 +335,6 @@ int lis2dh12_set_fifo(const lis2dh12_t *dev, const lis2dh12_fifo_t *config);
 int lis2dh12_restart_fifo(const lis2dh12_t *dev);
 
 /**
- * @brief   Read the FIFO source register
- *
- * @param[in] dev       device descriptor
- * @param[out] data     LIS2DH12_FIFO_SRC_REG_t content, allocate one byte
- *
- * @return  LIS2DH12_OK on success
- */
-int lis2dh12_read_fifo_src(const lis2dh12_t *dev, LIS2DH12_FIFO_SRC_REG_t *data);
-
-/**
  * @brief   This function will read a given number of data from FIFO
  *          reads amount of data that is available in FIFO
  *
@@ -371,12 +363,12 @@ int lis2dh12_init(lis2dh12_t *dev, const lis2dh12_params_t *params);
  * @brief   Read acceleration data from the given device
  *
  * @param[in]  dev      device descriptor
- * @param[out] data     acceleration data in mili-g, **MUST** hold 3 values
+ * @param[out] data     acceleration data in mili-g
  *
  * @return  LIS2DH12_OK on success
  * @return  LIS2DH12_NOBUS on bus error
  */
-int lis2dh12_read(const lis2dh12_t *dev, int16_t *data);
+int lis2dh12_read(const lis2dh12_t *dev, lis2dh12_fifo_data_t *data);
 
 /**
  * @brief   Clear the LIS2DH12 memory, clears all sampled data
@@ -388,7 +380,7 @@ int lis2dh12_read(const lis2dh12_t *dev, int16_t *data);
 int lis2dh12_clear_data(const lis2dh12_t *dev);
 
 /**
- * @brief   Change device scale value
+ * @brief   Change device measuring range
  *
  * @param[in] dev       device descriptor
  * @param[in] scale     change to given scale value
@@ -396,6 +388,15 @@ int lis2dh12_clear_data(const lis2dh12_t *dev);
  * @return  LIS2DH12_OK on success
  */
 int lis2dh12_set_scale(lis2dh12_t *dev, lis2dh12_scale_t scale);
+
+/**
+ * @brief   Get device measuring range
+ *
+ * @param[in] dev       device descriptor
+ *
+ * @return  Current device range
+ */
+lis2dh12_scale_t lis2dh12_get_scale(lis2dh12_t *dev);
 
 /**
  * @brief   Change device sampling rate
@@ -408,24 +409,13 @@ int lis2dh12_set_scale(lis2dh12_t *dev, lis2dh12_scale_t scale);
 int lis2dh12_set_datarate(const lis2dh12_t *dev, lis2dh12_rate_t rate);
 
 /**
- * @brief   Change device power mode
- *
- * @param[in] dev           device descriptor
- * @param[in] powermode     change to given power mode
- *
- * @return  LIS2DH12_OK on success
- */
-int lis2dh12_set_powermode(const lis2dh12_t *dev, lis2dh12_powermode_t powermode);
-
-/**
- * @brief   Configures the high pass filter
+ * @brief   Get device sampling rate in Hz
  *
  * @param[in] dev       device descriptor
- * @param[in] config    device high pass configuration
  *
- * @return  LIS2DH12_OK on success
+ * @return  current sampling rate in Hz
  */
-int lis2dh12_set_highpass(const lis2dh12_t *dev, const lis2dh12_highpass_t *config);
+uint16_t lis2dh12_get_datarate(const lis2dh12_t *dev);
 
 /**
  * @brief   Change device resolution
@@ -447,27 +437,30 @@ int lis2dh12_set_resolution(const lis2dh12_t *dev, lis2dh12_resolution_t resolut
 lis2dh12_resolution_t lis2dh12_get_resolution(const lis2dh12_t *dev);
 
 /**
- * @brief   Set click configuration
+ * @brief   Configures the high pass filter
  *
  * @param[in] dev       device descriptor
- * @param[in] config    device click configuration
+ * @param[in] config    device high pass configuration
  *
  * @return  LIS2DH12_OK on success
  */
-int lis2dh12_set_click(const lis2dh12_t *dev, const lis2dh12_click_t *config);
+int lis2dh12_set_highpass(const lis2dh12_t *dev, const lis2dh12_highpass_t *config);
 
 /**
- * @brief   Read click source register
+ * @brief   Set the reference value to control the high-pass reference.
+ *          In LIS2DH12_HP_MODE_REFERENCE the reference value is used to filter data
+ *          on all axis. Subtracts reference value from acceleration.
+ *          Note: LSB changes according to LIS2DH12_SCALE
  *
- * @param[in] dev       device descriptor
- * @param[out] data     LIS2DH12_CLICK_SRC_t content, allocate one byte
+ * @param[in] dev           device descriptor
+ * @param[in] reference     reference value [8 Bit]
  *
  * @return  LIS2DH12_OK on success
  */
-int lis2dh12_read_click_src(const lis2dh12_t *dev, LIS2DH12_CLICK_SRC_t *data);
+int lis2dh12_set_reference(const lis2dh12_t *dev, uint8_t reference);
 
 /**
- * @brief   Power on the given device and resets power mode and sampling rate
+ * @brief   Power on the given device and resets resolution and sampling rate
  *          to default values in the device descriptor parameters
  *
  * @param[in] dev       device descriptor

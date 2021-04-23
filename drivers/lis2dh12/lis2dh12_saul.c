@@ -23,7 +23,7 @@
 
 static int read_accelerometer(const void *dev, phydat_t *res)
 {
-    if (lis2dh12_read((const lis2dh12_t *)dev, res->val) != LIS2DH12_OK) {
+    if (lis2dh12_read(dev, (lis2dh12_fifo_data_t*)res->val) != LIS2DH12_OK) {
         return 0;
     }
     res->unit = UNIT_G;
