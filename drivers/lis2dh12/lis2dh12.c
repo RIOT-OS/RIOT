@@ -167,9 +167,6 @@ int lis2dh12_init(lis2dh12_t *dev, const lis2dh12_params_t *params)
 
     _release(dev);
 
-    /* set powermode */
-    lis2dh12_set_powermode(dev, dev->p->powermode);
-
     DEBUG("[lis2dh12] initialization successful\n");
     return LIS2DH12_OK;
 }
@@ -460,27 +457,27 @@ int lis2dh12_read_click_src(const lis2dh12_t *dev, LIS2DH12_CLICK_SRC_t *data) {
     return LIS2DH12_OK;
 }
 
-int lis2dh12_set_powermode(const lis2dh12_t *dev, lis2dh12_powermode_t powermode) {
-
+int lis2dh12_set_resolution(const lis2dh12_t *dev, lis2dh12_resolution_t resolution)
+{
     assert(dev);
 
-    LIS2DH12_CTRL_REG1_t reg1 = {0};
-    LIS2DH12_CTRL_REG4_t reg4 = {0};
+    LIS2DH12_CTRL_REG1_t reg1;
+    LIS2DH12_CTRL_REG4_t reg4;
 
     _acquire(dev);
     reg1.reg = _read(dev, REG_CTRL_REG1);
     reg4.reg = _read(dev, REG_CTRL_REG4);
 
     /* set power mode */
-    if (powermode == LIS2DH12_POWER_LOW) {
+    if (resolution == LIS2DH12_POWER_LOW) {
         reg1.bit.LPen = 1;
         reg4.bit.HR = 0;
     }
-    else if (powermode == LIS2DH12_POWER_HIGH) {
+    else if (resolution == LIS2DH12_POWER_HIGH) {
         reg1.bit.LPen = 0;
         reg4.bit.HR = 1;
     }
-    else if (powermode == LIS2DH12_POWER_NORMAL) {
+    else if (resolution == LIS2DH12_POWER_NORMAL) {
         reg1.bit.LPen = 0;
         reg4.bit.HR = 0;
     }
@@ -495,6 +492,29 @@ int lis2dh12_set_powermode(const lis2dh12_t *dev, lis2dh12_powermode_t powermode
     return LIS2DH12_OK;
 }
 
+lis2dh12_resolution_t lis2dh12_get_resolution(const lis2dh12_t *dev)
+{
+    assert(dev);
+
+    LIS2DH12_CTRL_REG1_t reg1;
+    LIS2DH12_CTRL_REG4_t reg4;
+
+    _acquire(dev);
+    reg1.reg = _read(dev, REG_CTRL_REG1);
+    reg4.reg = _read(dev, REG_CTRL_REG4);
+    _release(dev);
+
+    if (!reg1.bit.ODR) {
+        return LIS2DH12_POWER_DOWN;
+    }
+    if (reg1.bit.LPen) {
+        return LIS2DH12_POWER_LOW;
+    }
+    if (reg4.bit.HR) {
+        return LIS2DH12_POWER_HIGH;
+    }
+    return LIS2DH12_POWER_NORMAL;
+}
 int lis2dh12_set_datarate(const lis2dh12_t *dev, lis2dh12_rate_t rate) {
 
     assert(dev);
@@ -539,7 +559,7 @@ int lis2dh12_poweron(const lis2dh12_t *dev)
 
     /* set default param values */
     lis2dh12_set_datarate(dev, dev->p->rate);
-    lis2dh12_set_powermode(dev, dev->p->powermode);
+    lis2dh12_set_resolution(dev, dev->p->resolution);
 
     return LIS2DH12_OK;
 }

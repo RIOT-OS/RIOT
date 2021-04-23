@@ -74,28 +74,28 @@ typedef enum {
  *
  */
 typedef enum {
-    LIS2DH12_RATE_1HZ   = 0x1,      /**< sample with 1Hz @ all power modes */
-    LIS2DH12_RATE_10HZ  = 0x2,      /**< sample with 10Hz @ all power modes */
-    LIS2DH12_RATE_25HZ  = 0x3,      /**< sample with 25Hz @ all power modes */
-    LIS2DH12_RATE_50HZ  = 0x4,      /**< sample with 50Hz @ all power modes */
-    LIS2DH12_RATE_100HZ = 0x5,      /**< sample with 100Hz @ all power modes */
-    LIS2DH12_RATE_200HZ = 0x6,      /**< sample with 200Hz @ all power modes */
-    LIS2DH12_RATE_400HZ = 0x7,      /**< sample with 400Hz @ all power modes */
-    LIS2DH12_RATE_1620HZ = 0x8,     /**< sample with 1620HZ @ Low Power*/
+    LIS2DH12_RATE_1HZ   = 0x1,      /**< sample with 1Hz @ all resolutions */
+    LIS2DH12_RATE_10HZ  = 0x2,      /**< sample with 10Hz @ all resolutions */
+    LIS2DH12_RATE_25HZ  = 0x3,      /**< sample with 25Hz @ all resolutions */
+    LIS2DH12_RATE_50HZ  = 0x4,      /**< sample with 50Hz @ all resolutions */
+    LIS2DH12_RATE_100HZ = 0x5,      /**< sample with 100Hz @ all resolutions */
+    LIS2DH12_RATE_200HZ = 0x6,      /**< sample with 200Hz @ all resolutions */
+    LIS2DH12_RATE_400HZ = 0x7,      /**< sample with 400Hz @ all resolutions */
+    LIS2DH12_RATE_1620HZ = 0x8,     /**< sample with 1620HZ @ 8-bit */
     LIS2DH12_RATE_VERYHIGH = 0x9,   /**< sample with 1344Hz @ High resolution or \
-                                        5376Hz @ Low Power*/
+                                        5376Hz @ 8-bit */
 } lis2dh12_rate_t;
 
 /**
- * @brief   Available power modes
+ * @brief   Available resolutions
  *
  */
 typedef enum {
     LIS2DH12_POWER_DOWN   = 0,  /**< power down the device */
-    LIS2DH12_POWER_LOW    = 1,  /**< low power mode */
-    LIS2DH12_POWER_NORMAL = 2,  /**< normal mode */
-    LIS2DH12_POWER_HIGH   = 3,  /**< high resolution */
-} lis2dh12_powermode_t;
+    LIS2DH12_POWER_LOW    = 1,  /**< 8-bit  mode */
+    LIS2DH12_POWER_NORMAL = 2,  /**< 10-bit mode */
+    LIS2DH12_POWER_HIGH   = 3,  /**< 12-bit mode */
+} lis2dh12_resolution_t;
 
 /**
  * @brief   LIS2DH12 configuration parameters
@@ -114,7 +114,7 @@ typedef struct {
 #endif
     lis2dh12_scale_t scale;         /**< sampling sensitivity used */
     lis2dh12_rate_t rate;           /**< sampling rate used */
-    lis2dh12_powermode_t powermode; /**< power mode used*/
+    lis2dh12_resolution_t resolution; /**< resolution used */
 } lis2dh12_params_t;
 
 /**
@@ -387,27 +387,23 @@ int lis2dh12_set_powermode(const lis2dh12_t *dev, lis2dh12_powermode_t powermode
 int lis2dh12_set_highpass(const lis2dh12_t *dev, const lis2dh12_highpass_t *config);
 
 /**
- * @brief   Set the reference value to control the high-pass reference.
- *          In LIS2DH12_HP_MODE_REFERENCE the reference value is used to filter data
- *          on all axis. Subtracts reference value from acceleration.
- *          Note: LSB changes according to LIS2DH12_SCALE
+ * @brief   Change device resolution
  *
  * @param[in] dev           device descriptor
- * @param[in] reference     reference value [8 Bit]
+ * @param[in] resolution    change to given resolution
  *
  * @return  LIS2DH12_OK on success
  */
-int lis2dh12_set_reference(const lis2dh12_t *dev, uint8_t reference);
+int lis2dh12_set_resolution(const lis2dh12_t *dev, lis2dh12_resolution_t resolution);
 
 /**
- * @brief   Read the reference value
+ * @brief   Get device resolution
  *
- * @param[in] dev       device descriptor
- * @param[out] data     reference value read from device
+ * @param[in] dev           device descriptor
  *
- * @return  LIS2DH12_OK on success
+ * @return  Current device resolution settings
  */
-int lis2dh12_read_reference(const lis2dh12_t *dev, uint8_t *data);
+lis2dh12_resolution_t lis2dh12_get_resolution(const lis2dh12_t *dev);
 
 /**
  * @brief   Set click configuration
