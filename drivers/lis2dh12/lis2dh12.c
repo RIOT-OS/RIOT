@@ -14,10 +14,15 @@
  * @brief       LIS2DH12 accelerometer driver implementation
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
+ * @author      Jan Mohr <jan.mohr@ml-pa.com>
+ * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  * @}
  */
 
 #include "assert.h"
+#include "byteorder.h"
+#include "mutex.h"
+#include "timex.h"
 
 #include "lis2dh12.h"
 #include "lis2dh12_internal.h"
@@ -198,74 +203,258 @@ int lis2dh12_read(const lis2dh12_t *dev, int16_t *data)
     return LIS2DH12_OK;
 }
 
-#ifdef MODULE_LIS2DH12_INT
-int lis2dh12_set_int(const lis2dh12_t *dev, const lis2dh12_int_params_t *params, uint8_t int_line)
+static const uint16_t mg_per_bit[] = {
+    16, /* scale = 2g  */
+    32, /* scale = 4g  */
+    62, /* scale = 8g  */
+    186 /* scale = 16g */
+};
+
+static const uint16_t hz_per_dr[] = {
+    0,      /* power down */
+    1,      /* Hz */
+    10,     /* Hz */
+    25,     /* Hz */
+    50,     /* Hz */
+    100,    /* Hz */
+    200,    /* Hz */
+    400,    /* Hz */
+    1620,   /* Hz */
+    5376,   /* Hz */
+};
+
+void lis2dh12_cfg_threshold_event(const lis2dh12_t *dev,
+                                  uint32_t mg, uint32_t us,
+                                  uint8_t axis, uint8_t event, uint8_t line)
 {
-    assert (int_line == LIS2DH12_INT1 || int_line == LIS2DH12_INT2);
-    assert (dev && params);
-    assert (params->cb);
+    assert(line == LIS2DH12_INT1 || line == LIS2DH12_INT2);
+    assert(event == LIS2DH12_EVENT_1 || event == LIS2DH12_EVENT_2);
 
     _acquire(dev);
 
-    gpio_t pin = GPIO_UNDEF;
+    LIS2DH12_CTRL_REG2_t reg2;
+    reg2.reg = _read(dev, REG_CTRL_REG2);
+    uint8_t odr   = _read(dev, REG_CTRL_REG1) >> 4;
+    uint8_t scale = (_read(dev, REG_CTRL_REG4) >> 4) & 0x3;
+    uint8_t int_reg = 0;
 
-    switch (int_line){
-        /* first interrupt line (INT1) */
-        case LIS2DH12_INT1:
-            pin = dev->p->int1_pin;
-            assert (gpio_is_valid(pin));
+    /* read current interrupt configuration */
+    if (line == LIS2DH12_INT1) {
+        int_reg = _read(dev, REG_CTRL_REG3);
+    }
+    if (line == LIS2DH12_INT2) {
+        int_reg = _read(dev, REG_CTRL_REG6);
+    }
 
-            if (gpio_init_int(pin, GPIO_IN, GPIO_RISING, params->cb, params->arg)) {
-                return LIS2DH12_NOINT;
-            }
+    DEBUG("[%u] threshold: %lu mg\n", event, mg);
 
-            _write(dev, REG_CTRL_REG3, params->int_type);
-            _write(dev, REG_INT1_CFG, params->int_config);
-            _write(dev, REG_INT1_THS, params->int_threshold);
-            _write(dev, REG_INT1_DURATION, params->int_duration);
-            break;
-        /* second interrupt line (INT2) */
-        case LIS2DH12_INT2:
-            pin = dev->p->int2_pin;
-            assert (gpio_is_valid(pin));
+    /* read reference to set it to current data */
+    _read(dev, REG_REFERENCE);
 
-            if (gpio_init_int(pin, GPIO_IN, GPIO_RISING, params->cb, params->arg)) {
-                return LIS2DH12_NOINT;
-            }
+    /* configure interrupt */
+    switch (event) {
+    case LIS2DH12_EVENT_1:
+        /* apply high-pass to interrupt */
+        reg2.bit.HP_IA1 = 1;
+        int_reg |= LIS2DH12_INT_TYPE_IA1;
 
-            _write(dev, REG_CTRL_REG6, params->int_type);
-            _write(dev, REG_INT2_CFG, params->int_config);
-            _write(dev, REG_INT2_THS, params->int_threshold);
-            _write(dev, REG_INT2_DURATION, params->int_duration);
-            break;
+        /* clear INT flags */
+        _read(dev, REG_INT1_SRC);
+
+        _write(dev, REG_INT1_CFG, axis);
+        _write(dev, REG_INT1_THS, mg / mg_per_bit[scale]);
+        _write(dev, REG_INT1_DURATION, (us * hz_per_dr[odr]) / US_PER_SEC);
+        break;
+    case LIS2DH12_EVENT_2:
+        /* apply high-pass to interrupt */
+        reg2.bit.HP_IA2 = 1;
+        int_reg |= LIS2DH12_INT_TYPE_IA2;
+
+        /* clear INT flags */
+        _read(dev, REG_INT2_SRC);
+
+        _write(dev, REG_INT2_CFG, axis);
+        _write(dev, REG_INT2_THS, mg / mg_per_bit[scale]);
+        _write(dev, REG_INT2_DURATION, (us * hz_per_dr[odr]) / US_PER_SEC);
+        break;
+    }
+
+    /* configure high-pass */
+    _write(dev, REG_CTRL_REG2, reg2.reg);
+
+    /* write back configuration */
+    if (line == LIS2DH12_INT1) {
+        _write(dev, REG_CTRL_REG3, int_reg);
+    }
+    if (line == LIS2DH12_INT2) {
+        _write(dev, REG_CTRL_REG6, int_reg);
     }
 
     _release(dev);
-
-    return LIS2DH12_OK;
 }
 
-int lis2dh12_read_int_src(const lis2dh12_t *dev, uint8_t *data, uint8_t int_line)
+void lis2dh12_cfg_click_event(const lis2dh12_t *dev, uint32_t mg,
+                              uint32_t us_limit, uint32_t us_latency, uint32_t us_window,
+                              uint8_t click, uint8_t line)
 {
-    assert(dev && data);
-    assert(int_line == LIS2DH12_INT1 || int_line == LIS2DH12_INT2);
-
     _acquire(dev);
 
-    switch (int_line) {
-        /* first interrupt line (INT1) */
-        case LIS2DH12_INT1:
-            *data = _read(dev, REG_INT1_SRC);
-            break;
-        /* second interrupt line (INT2) */
-        case LIS2DH12_INT2:
-            *data = _read(dev, REG_INT2_SRC);
-            break;
+    uint8_t odr   = _read(dev, REG_CTRL_REG1) >> 4;
+    uint8_t scale = (_read(dev, REG_CTRL_REG4) >> 4) & 0x3;
+
+    DEBUG("click threshold: %lu mg\n", mg);
+
+    /* read reference to set it to current data */
+    _read(dev, REG_REFERENCE);
+
+    /* select click axis & mode */
+    _write(dev, REG_CLICK_CFG, click);
+
+    /* enable interrupt latching */
+    _write(dev, REG_CLICK_THS, (mg / mg_per_bit[scale]) | LIS2DH12_CLICK_THS_LIR);
+
+    /* set timing parameters */
+    _write(dev, REG_TIME_LIMIT,   (us_limit   * hz_per_dr[odr]) / US_PER_SEC);
+    _write(dev, REG_TIME_LATENCY, (us_latency * hz_per_dr[odr]) / US_PER_SEC);
+    _write(dev, REG_TIME_WINDOW,  (us_window  * hz_per_dr[odr]) / US_PER_SEC);
+
+    /* enable high-pass */
+    _write_or(dev, REG_CTRL_REG2, LIS2DH12_CTRL_REG2_HPCLICK);
+
+    /* clear INT flags */
+     _read(dev, REG_CLICK_SRC);
+
+    /* configure interrupt */
+    if (line == LIS2DH12_INT1) {
+        _write_or(dev, REG_CTRL_REG3, LIS2DH12_INT_TYPE_CLICK);
+    }
+    if (line == LIS2DH12_INT2) {
+        _write_or(dev, REG_CTRL_REG6, LIS2DH12_INT_TYPE_CLICK);
     }
 
     _release(dev);
+}
 
-    return LIS2DH12_OK;
+void lis2dh12_cfg_disable_event(const lis2dh12_t *dev, uint8_t event, uint8_t line)
+{
+    uint8_t reg = 0;
+
+    _release(dev);
+
+    /* read current interrupt configuration */
+    if (line == LIS2DH12_INT1) {
+        reg = _read(dev, REG_CTRL_REG3);
+    }
+    if (line == LIS2DH12_INT2) {
+        reg = _read(dev, REG_CTRL_REG6);
+    }
+
+    /* remove event */
+    if (event == LIS2DH12_EVENT_1) {
+        reg &= ~LIS2DH12_INT_TYPE_IA1;
+
+        /* clear INT flags */
+        _read(dev, REG_INT1_SRC);
+    }
+    if (event == LIS2DH12_EVENT_2) {
+        reg &= ~LIS2DH12_INT_TYPE_IA2;
+
+        /* clear INT flags */
+        _read(dev, REG_INT2_SRC);
+    }
+    if (event == LIS2DH12_EVENT_CLICK) {
+        reg &= ~LIS2DH12_INT_TYPE_CLICK;
+
+        /* clear INT flags */
+        _read(dev, REG_CLICK_SRC);
+    }
+
+    /* write back configuration */
+    if (line == LIS2DH12_INT1) {
+        _write(dev, REG_CTRL_REG3, reg);
+    }
+    if (line == LIS2DH12_INT2) {
+        _write(dev, REG_CTRL_REG6, reg);
+    }
+
+    _release(dev);
+}
+
+#ifdef MODULE_LIS2DH12_INT
+static void _cb(void *lock)
+{
+    mutex_unlock(lock);
+}
+
+static uint32_t _merge_int_flags(const lis2dh12_t *dev, uint8_t events)
+{
+    uint32_t int_src = 0;
+
+    /* merge interrupt flags (7 bit per event) into one word */
+    if (events & LIS2DH12_INT_TYPE_IA1) {
+        int_src |= _read(dev, REG_INT1_SRC);
+    }
+    if (events & LIS2DH12_INT_TYPE_IA2) {
+        int_src |= _read(dev, REG_INT2_SRC) << 8;
+    }
+    if (events & LIS2DH12_INT_TYPE_CLICK) {
+        int_src |= _read(dev, REG_CLICK_SRC) << 16;
+    }
+
+    DEBUG("int_src: %lx\n", int_src);
+
+    return int_src;
+}
+
+#define LIS2DH12_INT_SRC_ANY ((LIS2DH12_INT_SRC_IA <<  0) | \
+                              (LIS2DH12_INT_SRC_IA <<  8) | \
+                              (LIS2DH12_INT_SRC_IA << 16))
+
+int lis2dh12_wait_event(const lis2dh12_t *dev, uint8_t line, bool stale_events)
+{
+    uint32_t int_src;
+    uint8_t events = 0;
+    mutex_t lock = MUTEX_INIT_LOCKED;
+    gpio_t pin = line == LIS2DH12_INT2
+                       ? dev->p->int2_pin
+                       : dev->p->int1_pin;
+
+    _acquire(dev);
+
+    /* find out which events are configured */
+    if (line == LIS2DH12_INT1) {
+        events = _read(dev, REG_CTRL_REG3);
+    }
+    if (line == LIS2DH12_INT2) {
+        events = _read(dev, REG_CTRL_REG6);
+    }
+
+    /* check for stale interrupt */
+    int_src = _merge_int_flags(dev, events);
+
+    _release(dev);
+
+    /* return early if stale interrupt is present */
+    if (stale_events && (int_src & LIS2DH12_INT_SRC_ANY)) {
+        return int_src;
+    }
+
+    /* enable interrupt pin */
+    assert(gpio_is_valid(pin));
+    if (gpio_init_int(pin, GPIO_IN, GPIO_RISING, _cb, &lock)) {
+        return LIS2DH12_NOINT;
+    }
+
+    /* wait for interrupt */
+    mutex_lock(&lock);
+    gpio_irq_disable(pin);
+
+    /* read interrupt source */
+    _acquire(dev);
+    int_src = _merge_int_flags(dev, events);
+    _release(dev);
+
+    return int_src;
 }
 #endif /* MODULE_LIS2DH12_INT */
 
