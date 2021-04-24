@@ -62,8 +62,17 @@
 #include "esp/gpio_regs.h"
 #include "sdk/ets.h"
 
+/**
+ * @brief Clock stretching counter.
+ *
+ * Set to 0 to disable clock stretching. This will cause SCL to be always driven
+ * instead of open-drain, which allows using GPIO15 (normally pulled down to
+ * boot) to be used as SCL.
+ */
+#ifndef I2C_CLOCK_STRETCH
 /* max clock stretching counter (ca. 10 ms) */
 #define I2C_CLOCK_STRETCH 40000
+#endif /* I2C_CLOCK_STRETCH */
 
 /* following functions have to be declared as extern since it is not possible */
 /* to include user_interface.h due to conflicts with gpio_init */
@@ -213,9 +222,12 @@ void i2c_init(i2c_t dev)
      * - LOW : The GPIO is temporarily switched to GPIO_OD_PU mode. In this
      *         mode, the output value 0, which is written during
      *         initialization, actively drives the pin to low.
+     *
+     * When I2C_CLOCK_STRETCH is 0 (disabled), SCL is instead an always driven
+     * output GPIO with no pull-up.
      */
-    if (gpio_init(_i2c_bus[dev].scl, GPIO_IN_PU) ||
-        gpio_init(_i2c_bus[dev].sda, GPIO_IN_PU)) {
+    if (gpio_init(_i2c_bus[dev].scl, I2C_CLOCK_STRETCH ? GPIO_IN_PU : GPIO_OUT)
+        || gpio_init(_i2c_bus[dev].sda, GPIO_IN_PU)) {
         return;
     }
 #endif /* MCU_ESP32 */
@@ -435,11 +447,16 @@ static inline void _i2c_scl_high(_i2c_bus_t* bus)
     /* set SCL signal high (pin is in open-drain mode and pulled-up) */
     GPIO_SET(out_w1ts, out1_w1ts, bus->scl);
 #else /* MCU_ESP32 */
+#if I2C_CLOCK_STRETCH > 0
     /*
      * set SCL signal high (switch back to GPIO_IN_PU mode, that is the pin is
      * in open-drain mode and pulled-up to high)
      */
     GPIO.ENABLE_OUT_CLEAR = bus->scl_bit;
+#else /* I2C_CLOCK_STRETCH > 0 */
+    /* No clock stretching supported, always drive the SCL pin. */
+    GPIO.OUT_SET = bus->scl_bit;
+#endif /* I2C_CLOCK_STRETCH > 0 */
 #endif /* MCU_ESP32 */
 }
 
@@ -449,11 +466,16 @@ static inline void _i2c_scl_low(_i2c_bus_t* bus)
     /* set SCL signal low (actively driven to low) */
     GPIO_SET(out_w1tc, out1_w1tc, bus->scl);
 #else /* MCU_ESP32 */
+#if I2C_CLOCK_STRETCH > 0
     /*
      * set SCL signal low (switch temporarily to GPIO_OD_PU where the
      * written output value 0 drives the pin actively to low)
      */
     GPIO.ENABLE_OUT_SET = bus->scl_bit;
+#else /* I2C_CLOCK_STRETCH > 0 */
+    /* No clock stretching supported, always drive the SCL pin. */
+    GPIO.OUT_CLEAR = bus->scl_bit;
+#endif /* I2C_CLOCK_STRETCH > 0 */
 #endif /* MCU_ESP32 */
 }
 
