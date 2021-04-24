@@ -1559,7 +1559,6 @@ static gnrc_pktsnip_t * _tx_succeeded(gnrc_netif_t *netif, uint32_t bytes_send)
     return _send_queued_pkt(netif);
 }
 
-
 /**
  * @brief   Process any pending events and wait for IPC messages
  *
