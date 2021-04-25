@@ -440,6 +440,7 @@ int rtc_get_alarm(struct tm *time)
      * of alarm match.
      */
     time->tm_sec++;
+    rtc_tm_normalize(time);
 #endif
 
     return 0;
