@@ -36,13 +36,13 @@
 #include "esp/common_macros.h"
 #include "rom/ets_sys.h"
 #include "xtensa/xtensa_api.h"
+#include "gpio_arch.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
 #ifdef MCU_ESP32
 
-#include "gpio_arch.h"
 #include "driver/periph_ctrl.h"
 #include "soc/gpio_reg.h"
 #include "soc/gpio_sig_map.h"
@@ -56,6 +56,7 @@
 
 #else /* MCU_ESP32 */
 
+#include "esp/iomux_regs.h"
 #include "esp8266/uart_struct.h"
 
 #ifdef MODULE_ESP_QEMU
@@ -98,7 +99,9 @@ static struct uart_hw_t _uarts[] = {
         .signal_txd = U0TXD_OUT_IDX,
         .signal_rxd = U0RXD_IN_IDX,
         .int_src = ETS_UART0_INTR_SOURCE
+#endif /* MCU_ESP32 */
     },
+#if defined(UART1_TXD) || defined(MCU_ESP32)
     {
         .regs = &UART1,
         .used = false,
@@ -106,11 +109,15 @@ static struct uart_hw_t _uarts[] = {
         .data = UART_DATA_BITS_8,
         .stop = UART_STOP_BITS_1,
         .parity = UART_PARITY_NONE,
+#ifdef MCU_ESP32
         .mod = PERIPH_UART1_MODULE,
         .signal_txd = U1TXD_OUT_IDX,
         .signal_rxd = U1RXD_IN_IDX,
         .int_src = ETS_UART1_INTR_SOURCE
+#endif /* MCU_ESP32 */
     },
+#endif /* defined(UART1_TXD) || defined(MCU_ESP32) */
+#ifdef MCU_ESP32
     {
         .regs = &UART2,
         .used = false,
@@ -122,8 +129,8 @@ static struct uart_hw_t _uarts[] = {
         .signal_txd = U2TXD_OUT_IDX,
         .signal_rxd = U2RXD_IN_IDX,
         .int_src = ETS_UART2_INTR_SOURCE
-#endif /* MCU_ESP32 */
     },
+#endif /* MCU_ESP32 */
 };
 
 /* declaration of external functions */
@@ -146,7 +153,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     assert(uart < UART_NUMOF_MAX);
     assert(uart < UART_NUMOF);
 
-#ifdef MCU_ESP32
     /* UART1 and UART2 have configurable pins */
     if ((UART_NUMOF > 0 && uart == UART_DEV(1)) ||
         (UART_NUMOF > 1 && uart == UART_DEV(2))) {
@@ -160,8 +166,10 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         }
 
         /* try to initialize the pins as GPIOs first */
-        if (gpio_init(uart_config[uart].txd, GPIO_OUT) ||
-            gpio_init(uart_config[uart].rxd, GPIO_IN)) {
+        if ((uart_config[uart].txd != GPIO_UNDEF &&
+             gpio_init(uart_config[uart].txd, GPIO_OUT)) ||
+            (uart_config[uart].rxd != GPIO_UNDEF &&
+             gpio_init(uart_config[uart].rxd, GPIO_IN))) {
             return -1;
         }
 
@@ -169,6 +177,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         gpio_set_pin_usage(uart_config[uart].txd, _UART);
         gpio_set_pin_usage(uart_config[uart].rxd, _UART);
 
+#ifdef MCU_ESP32
         /* connect TxD pin to the TxD output signal through the GPIO matrix */
         GPIO.func_out_sel_cfg[uart_config[uart].txd].func_sel = _uarts[uart].signal_txd;
 
@@ -176,8 +185,21 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
         GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].sig_in_sel = 1;
         GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].sig_in_inv = 0;
         GPIO.func_in_sel_cfg[_uarts[uart].signal_rxd].func_sel = uart_config[uart].rxd;
-    }
+#else
+        if (uart_config[uart].txd != GPIO_UNDEF) {
+            uint8_t mux = _gpio_to_iomux[uart_config[uart].txd];
+            IOMUX.PIN[mux] = (IOMUX.PIN[mux] & ~IOMUX_PIN_FUNC_MASK) |
+                             IOMUX_FUNC(uart_config[uart].txd == GPIO2 ? 2 : 4);
+        }
+        if (uart_config[uart].rxd != GPIO_UNDEF) {
+            /* There's really only GPIO8 / FUNC(4) for this, but it is normally
+             * unusable because it is used by the internal flash. */
+            uint8_t mux = _gpio_to_iomux[uart_config[uart].rxd];
+            IOMUX.PIN[mux] = (IOMUX.PIN[mux] & ~IOMUX_PIN_FUNC_MASK) |
+                             IOMUX_FUNC(4);
+        }
 #endif
+    }
     _uarts[uart].baudrate = baudrate;
 
     /* register interrupt context */

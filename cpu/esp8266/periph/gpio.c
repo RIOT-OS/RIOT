@@ -52,9 +52,11 @@ gpio_pin_usage_t _gpio_pin_usage [GPIO_PIN_NUMOF] =
 {
    _GPIO,   /* gpio0 */
 
-   _UART,   /* gpio1  UART0 RxD */
-   _GPIO,   /* gpio2 */
-   _UART,   /* gpio3  UART0 TxD */
+   /* UART0 is initialized by the boot ROM, this only reflects our selection so
+    * other devices don't step on it. */
+   UART0_TXD == GPIO1 ? _UART : _GPIO,   /* gpio1 */
+   UART0_TXD == GPIO2 ? _UART : _GPIO,   /* gpio2 */
+   UART0_RXD == GPIO3 ? _UART : _GPIO,   /* gpio3 */
    _GPIO,   /* gpio4 */
    _GPIO,   /* gpio5 */
    _SPIF,   /* gpio6  SPI flash CLK */
