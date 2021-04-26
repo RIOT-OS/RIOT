@@ -1,7 +1,7 @@
 USEMODULE += msp430_common msp430_common_periph
 
 ifneq (,$(filter newlib,$(USEMODULE)))
-  USEMODULE += newlib_nano
+  DEFAULT_MODULE += newlib_nano
 endif
 
 # Make calls to malloc and friends thread-safe
