@@ -614,7 +614,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         case NETOPT_ADDRESS: {
             /* common address length for all pipes */
             assert(len == NRF24L01P_NG_ADDR_WIDTH);
-            int ret = nrf24l01p_ng_set_rx_address(dev, val, NRF24L01P_NG_P0);
+            int ret = nrf24l01p_ng_set_rx_address(dev, val, NRF24L01P_NG_P1);
             return ret ? ret : (int)len;
         } break;
         case NETOPT_CHANNEL: {
