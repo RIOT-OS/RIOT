@@ -270,6 +270,17 @@ void timer_start(tim_t tim)
     ctx[tim].dev->CRB = ctx[tim].mode;
 }
 
+uint32_t timer_query_freq(tim_t dev, uword_t index)
+{
+    (void)dev;
+
+    if (index >= ARRAY_SIZE(prescalers)) {
+        return 0;
+    }
+
+    return CLOCK_CORECLOCK >> prescalers[index];
+}
+
 #ifdef TIMER_NUMOF
 static inline void _isr(tim_t tim, int chan)
 {

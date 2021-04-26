@@ -1,20 +1,11 @@
 include ../Makefile.tests_common
 
-FEATURES_REQUIRED = periph_timer
+FEATURES_REQUIRED += periph_timer
+FEATURES_OPTIONAL += periph_timer_query_freq
 
 BOARDS_TIMER_500kHz := \
     atxmega-a1u-xpro \
     atxmega-a3bu-xplained \
-    #
-
-BOARDS_TIMER_250kHz := \
-    arduino-duemilanove \
-    arduino-leonardo \
-    arduino-mega2560 \
-    arduino-uno \
-    atmega256rfr2-xpro \
-    atmega328p \
-    atmega328p-xplained-mini \
     #
 
 BOARDS_TIMER_32kHz := \
@@ -42,13 +33,10 @@ BOARDS_TIMER_CLOCK_CORECLOCK := \
   openmote-cc2538 \
   remote-reva \
   remote-revb \
-  waspmote-pro \
   #
 
 ifneq (,$(filter $(BOARDS_TIMER_500kHz),$(BOARD)))
   TIMER_SPEED ?= 500000
-else ifneq (,$(filter $(BOARDS_TIMER_250kHz),$(BOARD)))
-  TIMER_SPEED ?= 250000
 else ifneq (,$(filter $(BOARDS_TIMER_32kHz),$(BOARD)))
   TIMER_SPEED ?= 32768
 else ifneq (,$(filter $(BOARDS_TIMER_CLOCK_CORECLOCK),$(BOARD)))

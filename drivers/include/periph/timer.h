@@ -36,6 +36,7 @@
 #include <limits.h>
 #include <stdint.h>
 
+#include "architecture.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
@@ -221,6 +222,30 @@ void timer_start(tim_t dev);
  * @param[in] dev           the timer to stop
  */
 void timer_stop(tim_t dev);
+
+/**
+ * @brief   Iterate over supported frequencies
+ *
+ * @param   dev     Timer to get the next supported frequency of
+ * @param   index   Index of the frequency to get
+ * @return          The @p index highest frequency supported by the timer
+ * @retval  0       @p index is too high
+ *
+ * @note    Add `FEATURES_REQUIRED += periph_timer_query_freq` to your `Makefile`.
+ *
+ * When called with a value of 0 for @p index, the highest supported frequency
+ * is returned. For a value 1 the second highest is returned, and so on. For
+ * values out of range, 0 is returned. A program hence can iterate over all
+ * supported frequencies using:
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~{.c}
+ * uint32_t freq:
+ * for (uword_t i; (freq = timer_query_freq(dev, i)); i++) {
+ *     work_with_frequency(freq);
+ * }
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ */
+uint32_t timer_query_freq(tim_t dev, uword_t index);
 
 #ifdef __cplusplus
 }
