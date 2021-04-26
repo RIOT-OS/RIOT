@@ -31,7 +31,6 @@
 #include "net/ieee802154/radio.h"
 
 static const ieee802154_radio_ops_t cc2538_rf_ops;
-static bool read_got_called = false;
 
 ieee802154_dev_t cc2538_rf_dev = {
     .driver = &cc2538_rf_ops,
