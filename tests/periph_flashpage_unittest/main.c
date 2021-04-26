@@ -26,7 +26,7 @@
 
 /* need to define these values before including the header */
 #ifndef FLASHPAGE_SIZE
-#define FLASHPAGE_SIZE      512
+#define FLASHPAGE_SIZE      256
 #endif
 #ifndef FLASHPAGE_NUMOF
 #define FLASHPAGE_NUMOF     128
