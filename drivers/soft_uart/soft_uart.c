@@ -13,7 +13,7 @@
  * @file
  * @brief       Software UART implementation
  *
- * @author      Benjamin Valentin <benjjamin.valentin@ml-pa.com>
+ * @author      Benjamin Valentin <benjamin.valentin@ml-pa.com>
  */
 
 #include <stdio.h>
