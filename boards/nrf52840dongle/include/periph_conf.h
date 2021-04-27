@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2019 Christian Amsüss <chrysn@fsfe.org>
+ *               2021 Freie Universität Berlin
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -14,6 +15,7 @@
  * @brief       Peripheral configuration for the nRF52840-Dongle
  *
  * @author      Christian Amsüss <chrysn@fsfe.org>
+ * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
  *
  */
 
@@ -93,6 +95,21 @@ static const spi_conf_t spi_config[] = {
 };
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
+/** @} */
+
+/**
+ * @name    I2C configuration
+ * @{
+ */
+static const i2c_conf_t i2c_config[] = {
+    {
+        .dev = NRF_TWIM1,
+        .scl = GPIO_PIN(0, 29),
+        .sda = GPIO_PIN(0, 31),
+        .speed = I2C_SPEED_NORMAL
+    }
+};
+#define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
 #ifdef __cplusplus

@@ -12,6 +12,7 @@ config BOARD_NRF52840DONGLE
     default y
     select BOARD_COMMON_NRF52
     select CPU_MODEL_NRF52840XXAA
+    select HAS_PERIPH_I2C
     select HAS_PERIPH_PWM
     select HAS_PERIPH_UART
     select HAS_PERIPH_SPI
