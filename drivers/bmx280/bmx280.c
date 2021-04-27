@@ -28,7 +28,6 @@
 #include "assert.h"
 #include "bmx280.h"
 #include "bmx280_internals.h"
-#include "xtimer.h"
 
 #define ENABLE_DEBUG        0
 #include "debug.h"

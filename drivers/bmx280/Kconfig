@@ -46,4 +46,3 @@ endchoice
 config MODULE_BMX280
     bool
     depends on TEST_KCONFIG
-    select MODULE_XTIMER
