@@ -20,7 +20,6 @@
  * @}
  */
 
-#include "luid.h"
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/gnrc.h"
@@ -32,32 +31,30 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-
-void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params)
+void cc2420_setup(cc2420_t * dev, const cc2420_params_t *params, uint8_t index)
 {
+    netdev_t *netdev = &dev->netdev.netdev;
+
     /* set pointer to the devices netdev functions */
-    dev->netdev.netdev.driver = &cc2420_driver;
+    netdev->driver = &cc2420_driver;
     /* pull in device configuration parameters */
     dev->params = *params;
     dev->state = CC2420_STATE_IDLE;
     /* reset device descriptor fields */
     dev->options = 0;
+
+    netdev_register(netdev, NETDEV_CC2420, index);
+    netdev_ieee802154_setup(&dev->netdev);
 }
 
 int cc2420_init(cc2420_t *dev)
 {
     uint16_t reg;
-    uint8_t addr[8];
 
     netdev_ieee802154_reset(&dev->netdev);
 
-    /* set default address, channel, PAN ID, and TX power */
-    luid_get(addr, sizeof(addr));
-    /* make sure we mark the address as non-multicast and not globally unique */
-    addr[0] &= ~(0x01);
-    addr[0] |= 0x02;
-    cc2420_set_addr_short(dev, &addr[6]);
-    cc2420_set_addr_long(dev, addr);
+    cc2420_set_addr_short(dev, dev->netdev.short_addr);
+    cc2420_set_addr_long(dev, dev->netdev.long_addr);
     cc2420_set_chan(dev, CC2420_CHAN_DEFAULT);
     cc2420_set_txpower(dev, CC2420_TXPOWER_DEFAULT);
 
@@ -91,7 +88,6 @@ int cc2420_init(cc2420_t *dev)
 
     return 0;
 }
-
 
 bool cc2420_cca(cc2420_t *dev)
 {
