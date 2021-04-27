@@ -67,7 +67,15 @@ static const uart_conf_t uart_config[] = {
  * @{
  */
 static const pwm_conf_t pwm_config[] = {
-    { NRF_PWM0, { GPIO_PIN(0, 6), GPIO_PIN(0, 8), GPIO_PIN(1, 9), GPIO_PIN(0, 12) } }
+    {
+        NRF_PWM0,
+        {
+            GPIO_PIN(0, 6),
+            GPIO_PIN(0, 8),
+            GPIO_PIN(1, 9),
+            GPIO_PIN(0, 12),
+        },
+    },
 };
 #define PWM_NUMOF           ARRAY_SIZE(pwm_config)
 /** @} */
