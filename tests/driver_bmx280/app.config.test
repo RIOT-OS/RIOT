@@ -2,3 +2,4 @@
 # application configuration. This is only needed during migration.
 CONFIG_MODULE_BME280_I2C=y
 CONFIG_MODULE_FMT=y
+CONFIG_MODULE_XTIMER=y
