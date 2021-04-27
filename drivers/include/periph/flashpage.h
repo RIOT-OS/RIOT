@@ -106,6 +106,30 @@ extern "C" {
 #endif
 
 /**
+ * @def     PERIPH_FLASHPAGE_NEEDS_FLASHPAGE_ADDR
+ *
+ * @brief   If non-uniform flash page sizes are required, defined to signal
+ *          that the peripheral does not implement a custom @ref flashpage_addr
+ *          function and instead relies on the generic helper function that
+ *          relies on @ref flashpage_size.
+ */
+#ifdef DOXYGEN
+#define PERIPH_FLASHPAGE_NEEDS_FLASHPAGE_ADDR
+#endif
+
+/**
+ * @def     PERIPH_FLASHPAGE_NEEDS_FLASHPAGE_PAGE
+ *
+ * @brief   If non-uniform flash page sizes are required, defined to signal
+ *          that the peripheral does not implement a custom @ref flashpage_page
+ *          function and instead relies on the generic helper function that
+ *          relies on @ref flashpage_size.
+ */
+#ifdef DOXYGEN
+#define PERIPH_FLASHPAGE_NEEDS_FLASHPAGE_PAGE
+#endif
+
+/**
  * @brief   Return values used in this interface
  */
 enum {
