@@ -24,7 +24,6 @@
 #include "cfg_clock_32_1.h"
 #include "cfg_rtt_default.h"
 #include "cfg_timer_default.h"
-#include "cfg_spi_default.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,6 +77,22 @@ static const pwm_conf_t pwm_config[] = {
     },
 };
 #define PWM_NUMOF           ARRAY_SIZE(pwm_config)
+/** @} */
+
+/**
+ * @name    SPI configuration
+ * @{
+ */
+static const spi_conf_t spi_config[] = {
+    {
+        .dev  = NRF_SPIM0,
+        .sclk = GPIO_PIN(0, 20),
+        .mosi = GPIO_PIN(0, 22),
+        .miso = GPIO_PIN(0, 24),
+    }
+};
+
+#define SPI_NUMOF           ARRAY_SIZE(spi_config)
 /** @} */
 
 #ifdef __cplusplus
