@@ -176,7 +176,7 @@ GENERATED_DIR_DEP := $(if $(CLEAN),,|) $(GENERATED_DIR)
 # Generates a .config file by merging multiple sources specified in
 # MERGE_SOURCES. This will also generate KCONFIG_OUT_DEP with the list of used
 # Kconfig files.
-$(KCONFIG_OUT_CONFIG): $(KCONFIG_EXTERNAL_CONFIGS)
+$(KCONFIG_OUT_CONFIG): $(KCONFIG_EXTERNAL_CONFIGS) | pkg-prepare
 $(KCONFIG_OUT_CONFIG): $(GENERATED_DEPENDENCIES_DEP) $(GENCONFIG) $(MERGE_SOURCES) $(GENERATED_DIR_DEP)
 	$(Q) $(GENCONFIG) \
 	  --config-out=$(KCONFIG_OUT_CONFIG) \
