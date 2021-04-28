@@ -42,7 +42,7 @@ class PackageManagerFactory(object):
         system = platform.system()
         if system == "Linux":
             system = cls._get_linux_distro()
-        if system in ["Debian", "Ubuntu"]:
+        if system in ["Debian", "Ubuntu", "Linux Mint"]:
             return Apt("Debian")
         if system in ["Arch Linux"]:
             return PacMan("Arch")
