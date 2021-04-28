@@ -31,12 +31,13 @@ class Programmer:
         }
         yield subprocess.Popen(shlex.split(self.cmd), **kwargs)
 
-    def spin(self, process):
+    def spin(self, process, timeout):
         """Print a spinning icon while programmer process is running."""
         print(
             "For full programmer output add PROGRAMMER_QUIET=0 or "
             "QUIET=0 to the make command line."
         )
+        start = time.time()
         while process.poll() is None:
             for index in range(len(SPIN)):
                 sys.stdout.write(
@@ -46,6 +47,11 @@ class Programmer:
                 )
                 sys.stdout.flush()
                 time.sleep(0.1)
+                # Kill the programmer process after timeout
+                if time.time() - start > int(timeout):
+                    process.terminate()
+                    process.kill()
+                    break
 
     def print_status(self, process, elapsed):
         """Print status of background programmer process."""
@@ -78,7 +84,7 @@ class Programmer:
                 if self.verbose:
                     proc.communicate()
                 else:
-                    self.spin(proc)
+                    self.spin(proc, self.timeout)
             except KeyboardInterrupt:
                 proc.terminate()
                 proc.kill()
@@ -104,6 +110,7 @@ def parser():
     parser.add_argument("--action", help="Programmer action")
     parser.add_argument("--cmd", help="Programmer command")
     parser.add_argument("--programmer", help="Programmer")
+    parser.add_argument("--timeout", help="Timeout")
     parser.add_argument(
         "--verbose", action='store_true', default=False, help="Verbose output"
     )
