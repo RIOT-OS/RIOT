@@ -5,7 +5,7 @@ ifeq (0,$(PROGRAMMER_QUIET))
   PROGRAMMER_VERBOSE_OPT ?= --verbose
 endif
 
-# Don't use the programmer wrapper
+# Don't use the programmer wrapper by default
 USE_PROGRAMMER_WRAPPER_SCRIPT ?= 0
 
 ifeq (1,$(USE_PROGRAMMER_WRAPPER_SCRIPT))
