@@ -5,6 +5,66 @@
 # directory for more details.
 #
 
+if TEST_KCONFIG
+
+menuconfig PACKAGE_LVGL
+    bool "LVGL package"
+    imply MODULE_AUTO_INIT_SCREEN
+    select MODULE_LVGL
+    select MODULE_LVGL_CORE
+    select MODULE_LVGL_DRAW
+    select MODULE_LVGL_FONT
+    select MODULE_LVGL_HAL
+    select MODULE_LVGL_MISC
+    select MODULE_LVGL_THEMES
+    select MODULE_LVGL_WIDGETS
+
+    # lvgl is not compatible with non 32bit platforms
+    # Building lv_misc triggers the error:
+    # "left shift count >= width of type [-Werror=shift-count-overflow]"
+    depends on !HAS_ARCH_8BIT
+    depends on !HAS_ARCH_16BIT
+
+if PACKAGE_LVGL
+
+config MODULE_LVGL_CONTRIB
+    bool "Contrib"
+    select MODULE_DISP_DEV
+    select MODULE_CORE_THREAD_FLAGS
+    select MODULE_XTIMER
+
+config MODULE_LVGL_CONTRIB_TOUCH
+    bool "Touch support"
+    select MODULE_TOUCH_DEV
+
+endif # PACKAGE_LVGL
+
+config MODULE_LVGL
+    bool
+
+config MODULE_LVGL_CORE
+    bool
+
+config MODULE_LVGL_DRAW
+    bool
+
+config MODULE_LVGL_FONT
+    bool
+
+config MODULE_LVGL_HAL
+    bool
+
+config MODULE_LVGL_MISC
+    bool
+
+config MODULE_LVGL_THEMES
+    bool
+
+config MODULE_LVGL_WIDGETS
+    bool
+
+endif # TEST_KCONFIG
+
 menuconfig KCONFIG_USEPKG_LVGL
     bool "Configure LVGL"
     depends on USEPKG_LVGL

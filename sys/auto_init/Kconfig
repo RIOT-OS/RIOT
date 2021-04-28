@@ -5,7 +5,7 @@
 # directory for more details.
 #
 
-config MODULE_AUTO_INIT
+menuconfig MODULE_AUTO_INIT
     bool "Auto-initialization system"
     default y
     depends on TEST_KCONFIG
@@ -14,4 +14,9 @@ config MODULE_AUTO_INIT
         drivers, or network interfaces) on start-up automatically. Disable if a
         more custom initialization is required. If unsure, say Y.
 
+if MODULE_AUTO_INIT
+
+rsource "screen/Kconfig"
 rsource "multimedia/Kconfig"
+
+endif # MODULE_AUTO_INIT
