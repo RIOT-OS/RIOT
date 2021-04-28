@@ -22,6 +22,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include "lvgl_riot_conf.h"
 
 /*====================
    Graphical settings
@@ -82,9 +83,6 @@ extern "C" {
 #define LV_DISP_SMALL_LIMIT  30
 #define LV_DISP_MEDIUM_LIMIT 50
 #define LV_DISP_LARGE_LIMIT  70
-
-/* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
-typedef int16_t lv_coord_t;
 
 /*=========================
    Memory manager settings
@@ -298,14 +296,6 @@ typedef void * lv_img_decoder_user_data_t;
  *  HAL settings
  *==================*/
 
-/* 1: use a custom tick source.
- * It removes the need to manually update the tick with `lv_tick_inc`) */
-#define LV_TICK_CUSTOM     1
-#if LV_TICK_CUSTOM == 1
-#define LV_TICK_CUSTOM_INCLUDE  "xtimer.h"       /*Header for the sys time function*/
-#define LV_TICK_CUSTOM_SYS_TIME_EXPR (xtimer_now_usec() / US_PER_MS)     /*Expression evaluating to current systime in ms*/
-#endif   /*LV_TICK_CUSTOM*/
-
 typedef void * lv_disp_drv_user_data_t;             /*Type of user data in the display driver*/
 typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the input device driver*/
 
@@ -382,8 +372,8 @@ typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the i
 
 /* Montserrat fonts with bpp = 4
  * https://fonts.google.com/specimen/Montserrat  */
-#define LV_FONT_MONTSERRAT_12    0
-#define LV_FONT_MONTSERRAT_14    1
+#define LV_FONT_MONTSERRAT_12    1
+#define LV_FONT_MONTSERRAT_14    0
 #define LV_FONT_MONTSERRAT_16    0
 #define LV_FONT_MONTSERRAT_18    0
 #define LV_FONT_MONTSERRAT_20    0
@@ -477,10 +467,10 @@ typedef void * lv_font_user_data_t;
 #define LV_THEME_DEFAULT_COLOR_PRIMARY      lv_color_hex(0x01a2b1)
 #define LV_THEME_DEFAULT_COLOR_SECONDARY    lv_color_hex(0x44d1b6)
 #define LV_THEME_DEFAULT_FLAG               LV_THEME_MATERIAL_FLAG_DARK
-#define LV_THEME_DEFAULT_FONT_SMALL         &lv_font_montserrat_14
-#define LV_THEME_DEFAULT_FONT_NORMAL        &lv_font_montserrat_14
-#define LV_THEME_DEFAULT_FONT_SUBTITLE      &lv_font_montserrat_14
-#define LV_THEME_DEFAULT_FONT_TITLE         &lv_font_montserrat_14
+#define LV_THEME_DEFAULT_FONT_SMALL         &lv_font_montserrat_12
+#define LV_THEME_DEFAULT_FONT_NORMAL        &lv_font_montserrat_12
+#define LV_THEME_DEFAULT_FONT_SUBTITLE      &lv_font_montserrat_12
+#define LV_THEME_DEFAULT_FONT_TITLE         &lv_font_montserrat_12
 
 /*=================
  *  Text settings

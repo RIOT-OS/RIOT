@@ -43,6 +43,8 @@ tests/pkg_libcose
 tests/pkg_libfixmath
 tests/pkg_libhydrogen
 tests/pkg_lora-serialization
+tests/pkg_lvgl
+tests/pkg_lvgl_touch
 tests/pkg_micro-ecc
 tests/pkg_minmea
 tests/pkg_monocypher
