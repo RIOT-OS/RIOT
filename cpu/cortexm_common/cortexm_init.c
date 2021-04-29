@@ -70,8 +70,6 @@ CORTEXM_STATIC_INLINE void cortexm_init_misc(void)
 
 void cortexm_init(void)
 {
-    cortexm_init_fpu();
-
     /* configure the vector table location to internal flash */
 #if defined(CPU_CORE_CORTEX_M3) || defined(CPU_CORE_CORTEX_M33) || \
     defined(CPU_CORE_CORTEX_M4) || defined(CPU_CORE_CORTEX_M4F) || \
