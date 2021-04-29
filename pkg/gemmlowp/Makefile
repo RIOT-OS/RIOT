@@ -1,6 +1,6 @@
 PKG_NAME=gemmlowp
 PKG_URL=https://github.com/google/gemmlowp
-PKG_VERSION=dc69acdf61d7a64260ae0eb9c17421fef0488c02
+PKG_VERSION=719139ce755a0f31cbf1c37f7f98adcc7fc9f425
 PKG_LICENSE=Apache2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
