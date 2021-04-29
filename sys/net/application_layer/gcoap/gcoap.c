@@ -196,7 +196,14 @@ static void _process_coap_pdu(sock_udp_t *sock, sock_udp_ep_t *remote,
     ssize_t res = coap_parse(&pdu, buf, len);
     if (res < 0) {
         DEBUG("gcoap: parse failure: %d\n", (int)res);
-        /* If a response, can't clear memo, but it will timeout later. */
+        /* If a response, can't clear memo, but it will timeout later.
+         *
+         * There are *some* error cases in which we could continue (eg. all
+         * sorts of "packet ends mid-options" in truncated cases, and maybe
+         * also when the maximum option count is exceeded to at least respond
+         * with Bad Request), but these would likely require incompatible
+         * changes to nanocoap.
+         */
         return;
     }
 
