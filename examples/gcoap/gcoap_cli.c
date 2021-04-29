@@ -122,7 +122,7 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
         printf("gcoap: timeout for msg ID %02u\n", coap_get_id(pdu));
         return;
     }
-    else if (memo->state == GCOAP_MEMO_ERR) {
+    else if (memo->state != GCOAP_MEMO_RESP) {
         printf("gcoap: error in response\n");
         return;
     }
