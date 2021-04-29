@@ -99,6 +99,8 @@ void reset_handler_default(void)
     uint32_t *dst;
     const uint32_t *src = &_etext;
 
+    cortexm_init_fpu();
+
 #ifdef MODULE_PUF_SRAM
     puf_sram_init((uint8_t *)&_srelocate, SEED_RAM_LEN);
 #endif
