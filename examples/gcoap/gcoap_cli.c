@@ -122,6 +122,13 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
         printf("gcoap: timeout for msg ID %02u\n", coap_get_id(pdu));
         return;
     }
+    else if (memo->state == GCOAP_MEMO_RESP_TRUNC) {
+        /* The right thing to do here would be to look into whether at least
+         * the options are complete, then to mentally trim the payload to the
+         * next block boundary and pretend it was sent as a Block2 of that
+         * size. */
+        printf("gcoap: warning, incomplete response; continuing with the truncated payload\n");
+    }
     else if (memo->state != GCOAP_MEMO_RESP) {
         printf("gcoap: error in response\n");
         return;
