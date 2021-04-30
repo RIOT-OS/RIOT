@@ -37,14 +37,26 @@ static char proxy_uri[64];
 static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
                             size_t maxlen, coap_link_encoder_ctx_t *context);
 static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
-                          const sock_udp_ep_t *remote);
-static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
-static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx);
+                          const sock_udp_ep_t *remote, const sock_udp_ep_t *local);
+static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+                              const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
+                              void *ctx);
+static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+                                   const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
+                                   void *ctx);
 
 /* CoAP resources. Must be sorted by path (ASCII order). */
 static const coap_resource_t _resources[] = {
-    { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler, NULL },
-    { "/riot/board", COAP_GET, _riot_board_handler, NULL },
+    { "/cli/stats",
+      COAP_GET | COAP_PUT,
+      (coap_handler_t)_stats_handler,
+      NULL
+    },
+    { "/riot/board",
+      COAP_GET,
+      (coap_handler_t)_riot_board_handler,
+      NULL
+    },
 };
 
 static const char *_link_params[] = {
@@ -91,9 +103,10 @@ static ssize_t _encode_link(const coap_resource_t *resource, char *buf,
  * Response callback.
  */
 static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
-                          const sock_udp_ep_t *remote)
+                          const sock_udp_ep_t *remote, const sock_udp_ep_t *local)
 {
     (void)remote;       /* not interested in the source currently */
+    (void)local;        /* not interested in the destination currently */
 
     if (memo->state == GCOAP_MEMO_TIMEOUT) {
         printf("gcoap: timeout for msg ID %02u\n", coap_get_id(pdu));
@@ -179,9 +192,13 @@ static void _resp_handler(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
  *      allows any two byte value for example purposes. Semantically, the only
  *      valid action is to set the value to 0.
  */
-static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len,
+                              const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
+                              void *ctx)
 {
     (void)ctx;
+    (void)remote;
+    (void)local;
 
     /* read coap method type in packet */
     unsigned method_flag = coap_method2flag(coap_get_code_detail(pdu));
@@ -213,9 +230,13 @@ static ssize_t _stats_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, void *c
     return 0;
 }
 
-static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len, void *ctx)
+static ssize_t _riot_board_handler(coap_pkt_t *pdu, uint8_t *buf, size_t len,
+                                   const sock_udp_ep_t *remote, const sock_udp_ep_t *local,
+                                   void *ctx)
 {
     (void)ctx;
+    (void)remote;
+    (void)local;
     gcoap_resp_init(pdu, buf, len, COAP_CODE_CONTENT);
     coap_opt_add_format(pdu, COAP_FORMAT_TEXT);
     size_t resp_len = coap_opt_finish(pdu, COAP_OPT_FINISH_PAYLOAD);
