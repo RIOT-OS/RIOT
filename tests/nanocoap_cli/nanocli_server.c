@@ -63,7 +63,7 @@ static int _nanocoap_server(sock_udp_ep_t *local, uint8_t *buf, size_t bufsize,
                 DEBUG("nanocoap: error parsing packet\n");
                 continue;
             }
-            if ((res = coap_handle_req(&pkt, buf, bufsize)) > 0) {
+            if ((res = coap_handle_req(&pkt, buf, bufsize, &remote, NULL)) > 0) {
                 res = sock_udp_send(&sock, buf, res, &remote);
             }
         }
