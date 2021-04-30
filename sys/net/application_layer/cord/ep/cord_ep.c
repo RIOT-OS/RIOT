@@ -82,8 +82,10 @@ static int _sync(void)
 }
 
 static void _on_register(const gcoap_request_memo_t *memo, coap_pkt_t* pdu,
-                         const sock_udp_ep_t *remote)
+                         const sock_udp_ep_t *remote, const sock_udp_ep_t *local)
 {
+    (void)local;
+
     thread_flags_t flag = FLAG_ERR;
 
     if ((memo->state == GCOAP_MEMO_RESP) &&
@@ -121,16 +123,18 @@ static void _on_update_remove(unsigned req_state, coap_pkt_t *pdu, uint8_t code)
 }
 
 static void _on_update(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
-                       const sock_udp_ep_t *remote)
+                       const sock_udp_ep_t *remote, const sock_udp_ep_t *local)
 {
     (void)remote;
+    (void)local;
     _on_update_remove(memo->state, pdu, COAP_CODE_CHANGED);
 }
 
 static void _on_remove(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
-                       const sock_udp_ep_t *remote)
+                       const sock_udp_ep_t *remote, const sock_udp_ep_t *local)
 {
     (void)remote;
+    (void)local;
     _on_update_remove(memo->state, pdu, COAP_CODE_DELETED);
 }
 
@@ -158,10 +162,11 @@ static int _update_remove(unsigned code, gcoap_resp_handler_t handle)
 }
 
 static void _on_discover(const gcoap_request_memo_t *memo, coap_pkt_t *pdu,
-                         const sock_udp_ep_t *remote)
+                         const sock_udp_ep_t *remote, const sock_udp_ep_t *local)
 {
     thread_flags_t flag = CORD_EP_NORD;
     (void)remote;
+    (void)local;
 
     if (memo->state == GCOAP_MEMO_RESP) {
         unsigned ct = coap_get_content_type(pdu);
