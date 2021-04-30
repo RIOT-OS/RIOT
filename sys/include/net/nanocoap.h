@@ -195,6 +195,13 @@ typedef struct {
 } coap_pkt_t;
 
 /**
+ * @brief This is a workaround until RIOT
+ *        gets an abstraction of CoAP endpoints
+ *        to support CoAP not only over UDP
+ */
+typedef void coap_ep_t;
+
+/**
  * @brief   Resource handler type
  *
  * Functions that implement this must be prepared to be called multiple times
@@ -208,7 +215,11 @@ typedef struct {
  * For POST, PATCH and other non-idempotent methods, this is an additional
  * requirement introduced by the contract of this type.
  */
-typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context);
+typedef ssize_t (*coap_handler_t)(coap_pkt_t *pkt,
+                                  uint8_t *buf, size_t len,
+                                  const coap_ep_t *remote,
+                                  const coap_ep_t *local,
+                                  void *context);
 
 /**
  * @brief   Method flag type
@@ -1551,11 +1562,14 @@ ssize_t coap_build_reply(coap_pkt_t *pkt, unsigned code,
  * @param[in]   pkt             pointer to (parsed) CoAP packet
  * @param[out]  resp_buf        buffer for response
  * @param[in]   resp_buf_len    size of response buffer
+ * @param[in]   remote          remote CoAP endpoint
+ * @param[in]   local           local CoAP endpoint, NULL if unsupported
  *
  * @returns     size of reply packet on success
  * @returns     <0 on error
  */
-ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len);
+ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len,
+                        const coap_ep_t *remote, const coap_ep_t *local);
 
 /**
  * @brief   Pass a coap request to a matching handler
@@ -1568,6 +1582,8 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
  * @param[in]   resp_buf_len    size of response buffer
  * @param[in]   resources       Array of coap endpoint resources
  * @param[in]   resources_numof length of the coap endpoint resources
+ * @param[in]   remote          remote CoAP endpoint
+ * @param[in]   local           local CoAP endpoint, NULL if unsupported
  *
  * @returns     size of the reply packet on success
  * @returns     <0 on error
@@ -1575,7 +1591,9 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
 ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
                           unsigned resp_buf_len,
                           const coap_resource_t *resources,
-                          size_t resources_numof);
+                          size_t resources_numof,
+                          const coap_ep_t *remote,
+                          const coap_ep_t *local);
 
 /**
  * @brief   Convert message code (request method) into a corresponding bit field
@@ -1709,8 +1727,10 @@ ssize_t coap_reply_simple(coap_pkt_t *pkt,
  * @brief   Reference to the default .well-known/core handler defined by the
  *          application
  */
-extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, \
+extern ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt,
                                                     uint8_t *buf, size_t len,
+                                                    const coap_ep_t *remote,
+                                                    const coap_ep_t *local,
                                                     void *context);
 /**@}*/
 

@@ -392,7 +392,8 @@ int coap_get_blockopt(coap_pkt_t *pkt, uint16_t option, uint32_t *blknum, unsign
     return (blkopt & 0x8) ? 1 : 0;
 }
 
-ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len)
+ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_len,
+                        const coap_ep_t *remote, const coap_ep_t *local)
 {
     if (coap_get_code_class(pkt) != COAP_REQ) {
         DEBUG("coap_handle_req(): not a request.\n");
@@ -403,13 +404,15 @@ ssize_t coap_handle_req(coap_pkt_t *pkt, uint8_t *resp_buf, unsigned resp_buf_le
         return coap_build_reply(pkt, COAP_CODE_EMPTY, resp_buf, resp_buf_len, 0);
     }
     return coap_tree_handler(pkt, resp_buf, resp_buf_len, coap_resources,
-                             coap_resources_numof);
+                             coap_resources_numof, remote, local);
 }
 
 ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
                           unsigned resp_buf_len,
                           const coap_resource_t *resources,
-                          size_t resources_numof)
+                          size_t resources_numof,
+                          const coap_ep_t *remote,
+                          const coap_ep_t *local)
 {
     coap_method_flags_t method_flag = coap_method2flag(coap_get_code_detail(pkt));
 
@@ -433,7 +436,8 @@ ssize_t coap_tree_handler(coap_pkt_t *pkt, uint8_t *resp_buf,
             break;
         }
         else {
-            return resource->handler(pkt, resp_buf, resp_buf_len, resource->context);
+            return resource->handler(pkt, resp_buf, resp_buf_len,
+                                     remote, local, resource->context);
         }
     }
 
@@ -1091,10 +1095,15 @@ size_t coap_blockwise_put_bytes(coap_block_slicer_t *slicer, uint8_t *bufpos,
     return str_len;
 }
 
-ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt, uint8_t *buf, \
-                                             size_t len, void *context)
+ssize_t coap_well_known_core_default_handler(coap_pkt_t *pkt,
+                                             uint8_t *buf, size_t len,
+                                             const coap_ep_t *remote,
+                                             const coap_ep_t *local,
+                                             void *context)
 {
     (void)context;
+    (void)remote;
+    (void)local;
     coap_block_slicer_t slicer;
     coap_block2_init(pkt, &slicer);
     uint8_t *payload = buf + coap_get_total_hdr_len(pkt);
