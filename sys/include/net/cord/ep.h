@@ -52,6 +52,26 @@ enum {
 };
 
 /**
+ * @brief   Events that can be signaled via the event callback function
+ */
+enum {
+    CORD_EP_REGISTERED    = 0x0001,
+    CORD_EP_DEREGISTERED  = 0x0002,
+    CORD_EP_UPDATE_OK     = 0x0004,
+    CORD_EP_UPDATE_FAILED = 0x0008,
+};
+
+/**
+ * @brief   Callback function signature for RD endpoint state synchronization
+ *
+ * The registered callback function is executed in the context of the dedicated
+ * standalone RD endpoint's thread.
+ *
+ * @param[in] t         type of event
+ */
+typedef void(*cord_ep_cb_t)(uint16_t event);
+
+/**
  * @brief   Discover the registration interface resource of a RD
  *
  * @param[in] remote    remote endpoint of the target RD
@@ -107,9 +127,24 @@ int cord_ep_update(void);
 int cord_ep_remove(void);
 
 /**
+ * @brief   Register a callback to be notified about RD endpoint state changes
+ *
+ * Only a single callback can be active at any point in time, so setting a new
+ * callback will override the existing one.
+ *
+ * @warning Do not register an event callback when using cord_ep_standalone. Use
+ *          cord_ep_standalone_event_cb() instead.
+ *
+ * @param[in] cb        callback to execute on RD endpoint state changes, may be
+ *                      NULL to disable notifications
+ */
+void cord_ep_event_cb(cord_ep_cb_t cb);
+
+/**
  * @brief   Dump the current RD connection status to STDIO (for debugging)
  */
 void cord_ep_dump_status(void);
+
 
 #ifdef __cplusplus
 }

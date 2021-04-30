@@ -26,28 +26,11 @@
 #ifndef NET_CORD_EP_STANDALONE_H
 #define NET_CORD_EP_STANDALONE_H
 
+#include "net/cord/ep.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/**
- * @brief   Possible types of events triggered by the cord_ep_standalone module
- */
-typedef enum {
-    CORD_EP_REGISTERED,
-    CORD_EP_DEREGISTERED,
-    CORD_EP_UPDATED,
-} cord_ep_standalone_event_t;
-
-/**
- * @brief   Callback function signature for RD endpoint state synchronization
- *
- * The registered callback function is executed in the context of the dedicated
- * standalone RD endpoint's thread.
- *
- * @param[in] t         type of event
- */
-typedef void(*cord_ep_standalone_cb_t)(cord_ep_standalone_event_t event);
 
 /**
  * @brief   Spawn a new thread that takes care of sending periodic updates to an
@@ -64,21 +47,10 @@ void cord_ep_standalone_run(void);
  * Only a single callback can be active at any point in time, so setting a new
  * callback will override the existing one.
  *
- * @pre                     @p cb != NULL
- *
- * @param[in] cb            callback to execute on RD endpoint state changes
+ * @param[in] cb        callback to execute on RD endpoint state changes, my be
+ *                      NULL to disable event notifications
  */
-void cord_ep_standalone_reg_cb(cord_ep_standalone_cb_t cb);
-
-/**
- * @brief   Signal the cord_ep thread about connection status change
- *
- * @note    This function should not be called by a user, but it is called from
- *          within the cord_ep implementation
- *
- * @param[in] connected     set to true if we are connected to a RD
- */
-void cord_ep_standalone_signal(bool connected);
+void cord_ep_standalone_event_cb(cord_ep_cb_t cb);
 
 #ifdef __cplusplus
 }
