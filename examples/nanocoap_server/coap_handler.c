@@ -21,9 +21,13 @@ static const uint8_t block2_intro[] = "This is RIOT (Version: ";
 static const uint8_t block2_board[] = " running on a ";
 static const uint8_t block2_mcu[] = " board with a ";
 
-static ssize_t _echo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _echo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+                             const coap_ep_t *remote, const coap_ep_t *local,
+                             void *context)
 {
     (void)context;
+    (void)remote;
+    (void)local;
     char uri[CONFIG_NANOCOAP_URI_MAX];
 
     if (coap_get_uri_path(pkt, (uint8_t *)uri) <= 0) {
@@ -36,16 +40,24 @@ static ssize_t _echo_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *co
                              (uint8_t *)sub_uri, sub_uri_len);
 }
 
-static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _riot_board_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+                                   const coap_ep_t *remote, const coap_ep_t *local,
+                                   void *context)
 {
     (void)context;
+    (void)remote;
+    (void)local;
     return coap_reply_simple(pkt, COAP_CODE_205, buf, len,
             COAP_FORMAT_TEXT, (uint8_t*)RIOT_BOARD, strlen(RIOT_BOARD));
 }
 
-static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+                                    const coap_ep_t *remote, const coap_ep_t *local,
+                                    void *context)
 {
     (void)context;
+    (void)remote;
+    (void)local;
     coap_block_slicer_t slicer;
     coap_block2_init(pkt, &slicer);
     uint8_t *payload = buf + coap_get_total_hdr_len(pkt);
@@ -77,10 +89,13 @@ static ssize_t _riot_block2_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, v
                                    buf, len, payload_len, &slicer);
 }
 
-static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, void *context)
+static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len,
+                                   const coap_ep_t *remote, const coap_ep_t *local,
+                                   void *context)
 {
-    (void) context;
-
+    (void)context;
+    (void)remote;
+    (void)local;
     ssize_t p = 0;
     char rsp[16];
     unsigned code = COAP_CODE_EMPTY;
@@ -114,9 +129,13 @@ static ssize_t _riot_value_handler(coap_pkt_t *pkt, uint8_t *buf, size_t len, vo
             COAP_FORMAT_TEXT, (uint8_t*)rsp, p);
 }
 
-ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len, void *context)
+ssize_t _sha256_handler(coap_pkt_t* pkt, uint8_t *buf, size_t len,
+                        const coap_ep_t *remote, const coap_ep_t *local,
+                        void *context)
 {
     (void)context;
+    (void)remote;
+    (void)local;
 
     /* using a shared sha256 context *will* break if two requests are handled
      * at the same time.  doing it anyways, as this is meant to showcase block1
