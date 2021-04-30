@@ -120,7 +120,7 @@ unsigned flashpage_page(void *addr)
 {
     unsigned page = 0;
 
-    for (uintptr_t pos = CPU_FLASH_BASE; addr >= pos; ++page) {
+    for (uintptr_t pos = CPU_FLASH_BASE; (uintptr_t)addr >= pos; ++page) {
         pos += flashpage_size(page);
     }
 

@@ -40,10 +40,18 @@
 
 /* When writing raw bytes on flash, data must be correctly aligned. */
 #define ALIGNMENT_ATTR __attribute__((aligned(FLASHPAGE_WRITE_BLOCK_ALIGNMENT)))
+
+/* We must not write chunks smaller than FLASHPAGE_WRITE_BLOCK_SIZE */
+#if FLASHPAGE_WRITE_BLOCK_SIZE > 64
+#define RAW_BUF_SIZE FLASHPAGE_WRITE_BLOCK_SIZE
+#else
+#define RAW_BUF_SIZE 64
+#endif
+
 /*
  * @brief   Allocate an aligned buffer for raw writings
  */
-static char raw_buf[64] ALIGNMENT_ATTR;
+static char raw_buf[RAW_BUF_SIZE] ALIGNMENT_ATTR;
 
 #ifdef MODULE_PERIPH_FLASHPAGE_PAGEWISE
 /**
@@ -373,6 +381,8 @@ static int cmd_test_last_raw(int argc, char **argv)
     (void) argc;
     (void) argv;
 
+    memset(raw_buf, 0, sizeof(raw_buf));
+
     /* try to align */
     memcpy(raw_buf, "test12344321tset", 16);
 #if defined(CPU_CC430) || defined(CPU_MSP430FXYZ)
@@ -382,7 +392,7 @@ static int cmd_test_last_raw(int argc, char **argv)
     /* erase the page first */
     flashpage_erase(TEST_LAST_AVAILABLE_PAGE);
 
-    flashpage_write(flashpage_addr(TEST_LAST_AVAILABLE_PAGE), raw_buf, strlen(raw_buf));
+    flashpage_write(flashpage_addr(TEST_LAST_AVAILABLE_PAGE), raw_buf, sizeof(raw_buf));
 
     /* verify that previous write_raw effectively wrote the desired data */
     if (memcmp(flashpage_addr(TEST_LAST_AVAILABLE_PAGE), raw_buf, strlen(raw_buf)) != 0) {

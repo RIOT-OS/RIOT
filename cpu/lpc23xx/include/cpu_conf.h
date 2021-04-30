@@ -143,6 +143,28 @@ extern "C" {
  */
 #define BACKUP_RAM_DATA __attribute__((section(".backup.data")))
 
+/**
+ * @brief   lpc23xx has non-uniform pages
+ */
+#define PERIPH_FLASHPAGE_CUSTOM_PAGESIZES
+
+/**
+ * @brief   FLASH base address
+ */
+#define CPU_FLASH_BASE          (0x0U)
+
+/**
+ * @brief   Flash page configuration
+ * @{
+ */
+#define PERIPH_FLASHPAGE_NEEDS_FLASHPAGE_ADDR
+#define PERIPH_FLASHPAGE_NEEDS_FLASHPAGE_PAGE
+
+#define FLASHPAGE_NUMOF                 (27)
+#define FLASHPAGE_WRITE_BLOCK_SIZE      (256)
+#define FLASHPAGE_WRITE_BLOCK_ALIGNMENT (256)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif
