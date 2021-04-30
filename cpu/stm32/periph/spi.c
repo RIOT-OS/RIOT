@@ -237,16 +237,16 @@ int spi_acquire(spi_t bus, spi_cs_t cs, spi_mode_t mode, spi_clk_t clk)
                   spi_config[bus].tx_dma_chan,
                   (uint32_t*)&(dev(bus)->DR),
                   DMA_MEM_TO_PERIPH,
-                  0,
-                  DMA_DATA_WIDTH_BYTE);
+                  DMA_DATA_WIDTH_BYTE,
+                  0);
 
         dma_acquire(spi_config[bus].rx_dma);
         dma_setup(spi_config[bus].rx_dma,
                   spi_config[bus].rx_dma_chan,
                   (uint32_t*)&(dev(bus)->DR),
                   DMA_PERIPH_TO_MEM,
-                  0,
-                  DMA_DATA_WIDTH_BYTE);
+                  DMA_DATA_WIDTH_BYTE,
+                  0);
     }
 #endif
     dev(bus)->CR1 = cr1_settings;
