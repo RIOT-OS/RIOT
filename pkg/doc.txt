@@ -2,6 +2,13 @@
  * @defgroup pkg   Packages
  * @{
  * @brief          External libraries and applications
+ * @details        What are packages?  RIOT packages:
+ *                 * pull a specific tested version most often from the (a) origin source
+ *                 * patch them to match the RIOT architecture
+ *                 * provide a specific tested configuration
+ *                   (such configuration may enable or disable features)
+ *                 * integrate the packages build process into the RIOT one
+ *                 * they have RIOT tests and/or examples to test/build them
  *
  * Using packages
  * ==============
