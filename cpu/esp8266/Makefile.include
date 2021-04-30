@@ -51,7 +51,7 @@ CFLAGS += -D__ESP_FILE__=__FILE__
 
 ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
   GDBSTUB_DIR ?= $(RIOTCPU)/$(CPU)/vendor/esp-gdbstub
-  CFLAGS += -DGDBSTUB_BREAK_ON_INIT=1)
+  CFLAGS += -DGDBSTUB_BREAK_ON_INIT=1
   INCLUDES += -I$(GDBSTUB_DIR)
 endif
 
