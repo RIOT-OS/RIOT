@@ -1,2 +1,2 @@
-xlrd
+openpyxl
 jinja2
