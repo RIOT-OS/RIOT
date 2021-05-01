@@ -8,6 +8,7 @@
 
 import os
 import argparse
+import datetime
 
 import xlrd
 from jinja2 import FileSystemLoader, Environment
@@ -110,6 +111,7 @@ def generate_kconfig(kconfig, context, overwrite, verbose):
     template_file = os.path.join("Kconfig.{}.j2".format(kconfig))
     env.globals.update(zip=zip)
     template = env.get_template(template_file)
+    context.update({"year": datetime.datetime.now().year})
     render = template.render(**context)
 
     kconfig_dir = os.path.join(STM32_KCONFIG_DIR, context["fam"])
