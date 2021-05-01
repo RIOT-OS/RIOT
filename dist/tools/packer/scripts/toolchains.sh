@@ -77,7 +77,7 @@ echo "export PATH=\$PATH:/opt/esp/esp-open-sdk/xtensa-lx106-elf/bin" >> /home/${
 echo "export ESP8266_SDK_DIR=/opt/esp/esp-open-sdk/sdk" >> /home/${SSH_USERNAME}/.bashrc
 echo "export ESP8266_NEWLIB_DIR=/opt/esp/newlib-xtensa" >> /home/${SSH_USERNAME}/.bashrc
 
-# Install complete ESP8266 toolchain in /opt/esp (139 MB after cleanup)
+# Install complete ESP8266 toolchain in /opt/esp (125 MB after cleanup)
 # remember https://github.com/RIOT-OS/RIOT/pull/10801 when updating
 # NOTE: We install the toolchain for the RTOS SDK in parallel in the first
 # step and remove the old version as soon as the RIOT port for the ESP8266
@@ -88,17 +88,6 @@ echo 'Installing ESP8266 toolchain' >&2 && \
     git clone https://github.com/gschorcht/xtensa-esp8266-elf && \
     cd xtensa-esp8266-elf && \
     git checkout -q 696257c2b43e2a107d3108b2c1ca6d5df3fb1a6f && \
-    rm -rf .git && \
-    cd /opt/esp && \
-    git clone https://github.com/gschorcht/RIOT-Xtensa-ESP8266-RTOS-SDK.git ESP8266_RTOS_SDK && \
-    cd ESP8266_RTOS_SDK/ && \
-    git checkout -q f074414c0705715a44b8e59d53b03d90b7630382 && \
-    rm -rf .git* docs examples make tools && \
-    cd components && \
-    rm -rf app_update aws_iot bootloader cjson coap espos esp-tls freertos \
-           jsmn libsodium log mdns mqtt newlib partition_table pthread \
-           smartconfig_ack spiffs ssl tcpip_adapter vfs && \
-    find . -name '*.[csS]' -exec rm {} \;
+    rm -rf .git
 
 echo "export PATH=\$PATH:/opt/esp/xtensa-esp8266-elf/bin" >> /home/${SSH_USERNAME}/.bashrc
-echo "export ESP8266_RTOS_SDK_DIR=/opt/esp/ESP8266_RTOS_SDK"  >> /home/${SSH_USERNAME}/.bashrc
