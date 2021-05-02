@@ -896,7 +896,7 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                         gnrc_netif_t *netif = gnrc_netif_get_by_pid(lease->parent.ia_id.info.netif);
 
                         if (&lease->addr != NULL &&
-                            !ipv6_addr_equal(&lease->addr, addr)) {
+                            ipv6_addr_equal(&lease->addr, addr)) {
                             /* A different address has been leased to the client */
                             gnrc_netif_ipv6_addr_remove(netif, &lease->addr);
                         }
