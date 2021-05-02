@@ -143,7 +143,7 @@ def testfunc(child):
     # and it is trying to talk to this server
     assert DHCP6OptServerId in pkt and DUID_LL in pkt[DHCP6OptServerId].duid
     assert pkt[DHCP6OptServerId].duid[DUID_LL].lladdr == srv_duid
-    # and is still asking for a prefix delegation
+    # and is still asking for a non-temporary address
     assert DHCP6OptIA_NA in pkt
 
     assert DHCP6OptMudUrl in pkt
