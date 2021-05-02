@@ -895,6 +895,12 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                         ipv6_addr_t *addr = &iaaddr->addr;
                         gnrc_netif_t *netif = gnrc_netif_get_by_pid(lease->parent.ia_id.info.netif);
 
+                        if (&lease->addr != NULL &&
+                            ipv6_addr_equal(&lease->addr, addr)) {
+                            /* A different address has been leased to the client */
+                            gnrc_netif_ipv6_addr_remove(netif, &lease->addr);
+                        }
+
                         lease->leased = 1U;
                         memcpy(&lease->addr, addr, sizeof(ipv6_addr_t));
                         DEBUG("DHCPv6 client: ADD IP ADDRESS %s\n",
@@ -918,8 +924,6 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                             lease->pref_until = pref;
                             lease->valid_until = valid;
                         }
-
-                        /* TODO: Use valid and preferred lifetimes for renewal events? */
                     }
                 }
                 break;
