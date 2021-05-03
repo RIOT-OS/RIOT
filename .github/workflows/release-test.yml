@@ -34,6 +34,9 @@ on:
         description: 'riot/riotbuild docker image version'
         required: true
         default: 'latest'
+      filter:
+        description: 'Pytest filter. Leave empty for all.'
+        required: false
 
 env:
   DOCKER_MAKE_ARGS: -j
@@ -116,6 +119,9 @@ jobs:
               grep -q "[0-9]\{4\}.[0-9]\{2\}-RC[0-9]\+"; then
           TOX_ARGS+="--non-RC "
         fi
+        if [ -n "${{ github.event.inputs.filter }}" ]; then
+          K="-k"
+        fi
 
         cd Release-Specs
         # definition in env does not work since $GITHUB_WORKSPACE seems not to
@@ -138,7 +144,8 @@ jobs:
           TTN_DEV_ID="riot_lorawan_1" \
           TTN_DEV_ID_ABP="riot_lorawan_1_abp" \
           RIOTBASE=${RIOTBASE} \
-          $(which tox) -e test -- ${TOX_ARGS} -m "${{ matrix.pytest_mark }}"
+          $(which tox) -e test -- ${TOX_ARGS} \
+            ${K} "${{ github.event.inputs.filter }}" -m "${{ matrix.pytest_mark }}"
     - name: junit2html and XML deploy
       if: always()
       run: |
