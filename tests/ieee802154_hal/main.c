@@ -20,9 +20,12 @@
 
 #include <assert.h>
 #include <stdio.h>
+<<<<<<< HEAD
 #include "fmt.h"
+=======
 #include <strings.h>
 
+>>>>>>> 3c5c3ba4af1be681225267ab54a99100599aa771
 #include "common.h"
 #include "errno.h"
 #include "event/thread.h"
@@ -578,6 +581,9 @@ static int rx_mode_cmd(int argc, char **argv)
     return 0;
 }
 
+<<<<<<< HEAD
+int _config_phy(uint8_t channel, int8_t tx_pow) {
+=======
 int config_phy(int argc, char **argv)
 {
     if (argc < 4) {
@@ -618,13 +624,19 @@ int config_phy(int argc, char **argv)
     uint8_t channel = atoi(argv[2]);
     int8_t tx_pow = atoi(argv[3]);
 
+>>>>>>> 3c5c3ba4af1be681225267ab54a99100599aa771
     if (channel < 11 || channel > 26) {
         puts("Wrong channel configuration (11 <= channel <= 26).");
         return 1;
     }
     _set_trx_state(IEEE802154_TRX_STATE_TRX_OFF, false);
     ieee802154_dev_t *dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
+<<<<<<< HEAD
+    puts("");
+    ieee802154_phy_conf_t conf = {.channel=channel, .page=0, .pow=tx_pow};
+=======
     ieee802154_phy_conf_t conf = {.phy_mode=phy_mode, .channel=channel, .page=0, .pow=tx_pow};
+>>>>>>> 3c5c3ba4af1be681225267ab54a99100599aa771
     if (ieee802154_radio_config_phy(dev, &conf) < 0) {
         puts("Channel or TX power settings not supported");
     }
