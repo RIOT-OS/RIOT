@@ -36,65 +36,6 @@ class ConfigPhyParser(ShellInteractionParser):
         else:
             res["replies"] = [reply]
 
-    def parse(self, cmd_output):
-        """
-        Parses output of GNRCIPv6NIB::nib_neigh_show()
-        >>> parser = GNRCICMPv6EchoParser()
-        >>> res = parser.parse(
-        ...     "12 bytes from fe80::385d:f965:106b:1114%6: "
-        ...         "icmp_seq=0 ttl=64 rssi=-34 dBm time=8.839 ms\\n"
-        ...     "12 bytes from fe80::385d:f965:106b:1114%6: "
-        ...         "icmp_seq=1 ttl=64 rssi=-34 dBm time=6.925 ms\\n"
-        ...     "12 bytes from fe80::385d:f965:106b:1114%6: "
-        ...         "icmp_seq=2 ttl=64 rssi=-34 dBm time=7.885 ms\\n"
-        ...     "--- fe80::385d:f965:106b:1114 PING statistics ---\\n"
-        ...     "3 packets transmitted, 3 packets received, 0% packet loss\\n"
-        ...     "round-trip min/avg/max = 6.925/7.883/8.839 ms\\n")
-        >>> sorted(res)
-        ['replies', 'rtts', 'stats']
-        >>> len(res["replies"])
-        3
-        >>> sorted(res["replies"][0])
-        ['rssi', 'rtt', 'seq', 'source', 'ttl']
-        >>> res["replies"][0]["source"]
-        'fe80::385d:f965:106b:1114%6'
-        >>> res["replies"][0]["seq"]
-        0
-        >>> res["replies"][0]["ttl"]
-        64
-        >>> res["replies"][0]["rssi"]
-        -34
-        >>> res["replies"][0]["rtt"]
-        8.839
-        >>> sorted(res["stats"])
-        ['packet_loss', 'rx', 'tx']
-        >>> res["stats"]["tx"]
-        3
-        >>> res["stats"]["rx"]
-        3
-        >>> res["stats"]["packet_loss"]
-        0
-        >>> sorted(res["rtts"])
-        ['avg', 'max', 'min']
-        >>> res["rtts"]["min"]
-        6.925
-        >>> res["rtts"]["avg"]
-        7.883
-        >>> res["rtts"]["max"]
-        8.839
-        """
-        res = {}
-        for line in cmd_output.splitlines():
-            m = self.c_change.match(line)
-            if m is not None:
-                self._add_reply(res, m.groupdict())
-                continue
-            m = self.c_stats.match(line)
-            if m is not None:
-                self._set_stats(res, m.groupdict())
-                continue
-        return res
-
 # ==== ShellInteractions ====
 
 class Config_phy(ShellInteraction):
