@@ -36,7 +36,9 @@
 
 #include "xtimer.h"
 
-#include "cond.h"
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
 
 #define SYMBOL_TIME (16U) /**< 16 us */
 
@@ -49,7 +51,7 @@ uint16_t confirm_counter = 0;
 uint16_t request_counter = 0;
 
 static inline void _set_trx_state(int state, bool verbose);
-static int send(uint8_t *dst, size_t dst_len, size_t len);
+//static int send(uint8_t *dst, size_t dst_len, size_t len);
 static int send_with_channel(uint8_t *dst, size_t dst_len);
 
 
@@ -64,11 +66,7 @@ static size_t size_last_packet;
 
 static xtimer_t timer_ack;
 static mutex_t lock;
-static mutex_t got_message_mutex;
 static bool send_reply;
-static bool enable_prints;
-static cond_t got_message_cond;
-static bool got_message;
 
 static const char *str_states[3]= {"TRX_OFF", "RX", "TX"};
 static ieee802154_rx_mode_t current_rx_mode;
@@ -79,15 +77,11 @@ static uint8_t seq;
 static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
 {
     if (buffer[0] & IEEE802154_FCF_TYPE_ACK && ((seq-1) == buffer[2])) {
-        if (enable_prints) {
-            printf("Received valid ACK with sqn %i\n", buffer[2]);
-        }
+            DEBUG_PRINT("Received valid ACK with sqn %i\n", buffer[2]);
         received_acks++;
     }
     else {
-        got_message = true;
-        cond_signal(&got_message_cond);
-        if (enable_prints) {
+        if (ENABLE_DEBUG) {
             size_last_packet = size;
             puts("Packet received:");
             for (unsigned i=0;i<size;i++) {
@@ -106,7 +100,7 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
             send_with_channel(out, IEEE802154_LONG_ADDRESS_LEN);
         }
     }
-    if (enable_prints) {
+    if (ENABLE_DEBUG) {
         puts("");
         printf("LQI: %i, RSSI: %i\n", (int) lqi, (int) rssi);
         puts("");
@@ -224,9 +218,7 @@ static void _tx_finish_handler(event_t *event)
 
     switch (tx_info.status) {
         case TX_STATUS_SUCCESS:
-            if (enable_prints) {
-                puts("Transmission succeeded");
-            }
+            DEBUG_PRINT("Transmission succeeded");
             send_packets++;
             break;
         case TX_STATUS_FRAME_PENDING:
@@ -313,7 +305,7 @@ static int _init(void)
 
 uint8_t payload[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ornare lacinia mi elementum interdum ligula.";
 
-static int send(uint8_t *dst, size_t dst_len,
+/** static int send(uint8_t *dst, size_t dst_len,
                 size_t len)
 {
     uint8_t flags;
@@ -332,10 +324,10 @@ static int send(uint8_t *dst, size_t dst_len,
     src_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
     dst_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
     uint8_t src_len = IEEE802154_LONG_ADDRESS_LEN;
-    void *src = &ext_addr;
+    void *src = &ext_addr; */
 
     /* fill MAC header, seq should be set by device */
-    if ((mhr_len = ieee802154_set_frame_hdr(mhr, src, src_len,
+  /*  if ((mhr_len = ieee802154_set_frame_hdr(mhr, src, src_len,
                                         dst, dst_len,
                                         src_pan, dst_pan,
                                         flags, seq++)) < 0) {
@@ -351,7 +343,7 @@ static int send(uint8_t *dst, size_t dst_len,
 
     _send(&iol_hdr);
     return 0;
-}
+} */
 
 static int send_with_channel(uint8_t *dst, size_t dst_len)
 {
@@ -633,7 +625,7 @@ int config_phy(int argc, char **argv)
     return 0;
 }
 
-int config_phy(int argc, char **argv)
+/*int config_phy(int argc, char **argv)
 {
     if (argc < 3) {
         puts("Usage: config_phy <channel> <tx_pow>");
@@ -646,7 +638,7 @@ int config_phy(int argc, char **argv)
     _config_phy(channel, tx_pow);
 
     return 0;
-}
+} */
 
 int txmode_cmd(int argc, char **argv)
 {
@@ -901,47 +893,6 @@ int txtspam(int argc, char **argv)
     return _spam(addr, res, len, num, time);
 }
 
-int test_channels(int argc, char **argv) {
-    if (argc != 3) {
-        puts("Usage: test_channels <long_addr> <1 for Sender, 1 for Receiver>");
-        return 1;
-    }
-
-    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
-    size_t res;
-    res = _parse_addr(addr, sizeof(addr), argv[1]);
-    if (res == 0) {
-        puts("Usage: test_channels <long_addr> <1 for Sender, 1 for Receiver>");
-        return 1;
-    };
-
-    size_t sender = atoi(argv[2]);
-    if (sender) {
-        puts("Testing as sender");
-    } else {
-        puts("Testing as receiver");
-    }
-    for (uint8_t i = 11; i <= 26; i++) {
-        if (sender) {
-            xtimer_msleep(100);
-            _config_phy(i, 0);
-            send(addr,res, 5);
-        }
-        if (!sender) {
-            _config_phy(i, 0);
-            mutex_lock(&got_message_mutex);
-            while (!got_message) {
-                cond_wait(&got_message_cond, &got_message_mutex);
-            }
-            got_message = false;
-            mutex_unlock(&got_message_mutex);
-        }
-    }
-
-    puts("Test finished");
-    return 0;
-}
-
 int toggle_reply(int argc, char **argv) {
     (void)argv[0];
     (void)argc;
@@ -954,19 +905,6 @@ int toggle_reply(int argc, char **argv) {
     }
     printf("Request: %d\n", request_counter);
     printf("Confirm: %d\n", confirm_counter);
-    return 0;
-}
-
-int toggle_enable_prints(int argc, char **argv) {
-    (void)argv[0];
-    (void)argc;
-    if (enable_prints) {
-        enable_prints = false;
-        puts("Printing is now disabled");
-    } else {
-        enable_prints = true;
-        puts("Printing is now enabled");
-    }
     return 0;
 }
 
@@ -1014,8 +952,6 @@ static const shell_command_t shell_commands[] = {
     { "caps", "Get a list of caps supported by the device", _caps_cmd },
     { "spam", "Sends many packets to the target", txtspam },
     { "reply", "Every packet that arrives is mirrored", toggle_reply },
-    { "enable_prints", "Enable printing", toggle_enable_prints },
-    { "test_channels", "It tries to transmit and receive on different channels", test_channels },
     { "check_last_packet", "Print last packet", check_last_packet },
     { NULL, NULL, NULL }
 };
@@ -1024,15 +960,10 @@ int main(void)
 {
     mutex_init(&lock);
     mutex_lock(&lock);
-    mutex_init(&got_message_mutex);
-    cond_init(&got_message_cond);
     _init();
-    enable_prints = true;
     current_channel = 26;
     /* start the shell */
     puts("Initialization successful - starting the shell now");
-    //xtimer_msleep(2000);
-    //puts(">");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
