@@ -25,7 +25,8 @@
 
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32F7) || \
     defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32G4) || \
-    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5)
+    defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
+    defined(CPU_FAM_STM32WL)
 #define REG_PWR_CR          CR1
 #define BIT_CR_DBP          PWR_CR1_DBP
 #else
@@ -70,6 +71,13 @@ void stmclk_enable_lfclk(void)
         stmclk_dbp_unlock();
         RCC->REG_LSE |= BIT_LSEON;
         while (!(RCC->REG_LSE & BIT_LSERDY)) {}
+
+    /* Set LSE system clock enable bit. This is required if LSE is to be used by
+       USARTx, LPUARTx, LPTIMx, TIMx, RNG, system LSCO, MCO, MSI PLL mode */
+#if defined(CPU_FAM_STM32WL)
+        RCC->BDCR |= RCC_BDCR_LSESYSEN;
+        while (!(RCC->BDCR & RCC_BDCR_LSESYSRDY)) {}
+#endif
         stmclk_dbp_lock();
     }
     else {

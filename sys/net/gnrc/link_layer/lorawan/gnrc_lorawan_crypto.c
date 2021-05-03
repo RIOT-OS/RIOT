@@ -67,7 +67,7 @@ void gnrc_lorawan_calculate_mic(const le_uint32_t *dev_addr, uint32_t fcnt,
 
     memcpy(&block.dev_addr, dev_addr, sizeof(le_uint32_t));
 
-    block.fcnt = byteorder_btoll(byteorder_htonl(fcnt));
+    block.fcnt = byteorder_htoll(fcnt);
 
     block.u32_pad = 0;
 
@@ -103,7 +103,7 @@ void gnrc_lorawan_encrypt_payload(iolist_t *iolist, const le_uint32_t *dev_addr,
     block->dir = dir & DIR_MASK;
 
     block->dev_addr = *dev_addr;
-    block->fcnt = byteorder_btoll(byteorder_htonl(fcnt));
+    block->fcnt = byteorder_htoll(fcnt);
 
     block->u32_pad = 0;
 

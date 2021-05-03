@@ -25,21 +25,31 @@ TARGET_ARCH_RISCV ?= \
     $(subst -gcc,,\
       $(notdir \
         $(word 1,\
-          $(foreach triple,$(_TRIPLES_TO_TEST),$(shell which $(triple)-gcc))))))
+          $(foreach triple,$(_TRIPLES_TO_TEST),$(shell which $(triple)-gcc 2> /dev/null))))))
 
 TARGET_ARCH ?= $(TARGET_ARCH_RISCV)
 
 # define build specific options
-CFLAGS_CPU   = -march=rv32imac -mabi=ilp32 -mcmodel=medlow -msmall-data-limit=8
-CFLAGS_LINK  = -nostartfiles -ffunction-sections -fdata-sections
+CFLAGS_CPU   = -march=rv32imac -mabi=ilp32
+ifeq ($(TOOLCHAIN),llvm)
+  # Always use riscv32-none-elf as target triple for clang, as some
+  # autodetected gcc target triples are incompatible with clang
+  TARGET_ARCH_LLVM := riscv32-none-elf
+else
+  CFLAGS_CPU += -mcmodel=medlow -msmall-data-limit=8
+  ifneq (,$(shell $(TARGET_ARCH)-gcc --help=target | grep '\-malign-data='))
+    CFLAGS_CPU += -malign-data=natural
+  endif
+endif
+CFLAGS_LINK  = -ffunction-sections -fdata-sections
 CFLAGS_DBG  ?= -g3
 CFLAGS_OPT  ?= -Os
 
-LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts
+LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ldscripts -L$(RIOTCPU)/riscv_common/ldscripts
 LINKER_SCRIPT ?= $(CPU_MODEL).ld
 LINKFLAGS += -T$(LINKER_SCRIPT)
 
 CFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT) $(CFLAGS_LINK)
 ASFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG)
 # export linker flags
-LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) -Wl,--gc-sections -static -lgcc
+LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_LINK) $(CFLAGS_DBG) $(CFLAGS_OPT) -nostartfiles -Wl,--gc-sections -static -lgcc

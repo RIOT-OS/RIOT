@@ -20,7 +20,6 @@
  */
 
 #include "board.h"
-#include "board_common.h"
 
 void board_init(void)
 {

@@ -27,12 +27,19 @@
 #include "stdio_base.h"
 #include "irq.h"
 #include "log.h"
+#ifdef MODULE_DBGPIN
+#include "dbgpin.h"
+#endif
 
 extern void board_init(void);
 
 __attribute__((constructor)) static void startup(void)
 {
     board_init();
+
+#ifdef MODULE_DBGPIN
+    dbgpin_init();
+#endif
 
 #ifdef MODULE_NEWLIB
     void _init(void);

@@ -9,6 +9,7 @@ config MODULE_CORTEXM_COMMON
     default y if CPU_CORE_CORTEX_M
     depends on TEST_KCONFIG
     select MODULE_PERIPH
+    select MODULE_MALLOC_THREAD_SAFE if TEST_KCONFIG
     help
         Common code for Cortex-M cores.
 
@@ -46,6 +47,8 @@ config CPU_CORE_CORTEX_M
     select HAS_CPU_CHECK_ADDRESS
     select HAS_SSP
     select HAS_CORTEXM_SVC
+    select HAS_NEWLIB
+    select HAS_DBGPIN
 
 ## Common CPU symbols
 config CPU_CORE

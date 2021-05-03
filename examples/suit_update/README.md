@@ -33,11 +33,11 @@ Table of contents:
 
 - Install python dependencies (only Python3.6 and later is supported):
 
-      $ pip3 install --user ed25519 pyasn1 cbor
+      $ pip3 install --user cbor2 cryptography
 
 - Install aiocoap from the source
 
-      $ pip3 install --user --upgrade "git+https://github.com/chrysn/aiocoap#egg=aiocoap[all]"
+      $ pip3 install --user aiocoap[linkheader]>=0.4.1
 
   See the [aiocoap installation instructions](https://aiocoap.readthedocs.io/en/latest/installation.html)
   for more details.
@@ -69,7 +69,7 @@ Table of contents:
 ### Ble
 [prerequisites-ble]: #Ble
 
-Make sure you fullfil the "Prerequisites" and "Preparing Linux" section in [README.ipv6-over-ble.md](../../pkg/nimble/README.ipv6-over-ble.md).
+Make sure you fulfill the "Prerequisites" and "Preparing Linux" section in [README.ipv6-over-ble.md](../../pkg/nimble/README.ipv6-over-ble.md).
 
 ## Setup
 [setup]: #Setup

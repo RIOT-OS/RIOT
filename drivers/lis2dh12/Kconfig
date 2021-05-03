@@ -1,0 +1,36 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menuconfig MODULE_LIS2DH12
+    bool "LIS2DH12 Accelerometer"
+    depends on TEST_KCONFIG
+
+if MODULE_LIS2DH12
+
+choice
+    bool "Device interface"
+
+config MODULE_LIS2DH12_I2C
+    bool "I2C"
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+
+config MODULE_LIS2DH12_SPI
+    bool "SPI"
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_SPI
+    select MODULE_PERIPH_SPI
+    select MODULE_PERIPH_GPIO
+
+endchoice # Device interface
+
+config MODULE_LIS2DH12_INT
+    bool "Interrupt lines support"
+    depends on HAS_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_GPIO_IRQ
+
+endif # MODULE_LIS2DH12

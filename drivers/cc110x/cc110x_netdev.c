@@ -24,7 +24,6 @@
 #include "assert.h"
 #include "iolist.h"
 #include "irq.h"
-#include "luid.h"
 #include "mutex.h"
 #include "net/eui64.h"
 #include "net/netdev.h"
@@ -310,13 +309,11 @@ static int cc110x_init(netdev_t *netdev)
         return -EIO;
     }
 
-    /* Setup the layer 2 address, but do not accept CC110X_L2ADDR_AUTO (which
+    /* Setup the layer 2 address, but do not accept CC1XXX_BCAST_ADDR (which
      * has the value 0x00 and is used for broadcast)
      */
-    dev->addr = dev->params.l2addr;
-    while (dev->addr == CC110X_L2ADDR_AUTO) {
-        luid_get(&dev->addr, 1);
-    }
+    cc1xxx_eui_get(&dev->netdev, &dev->addr);
+    assert(dev->addr != CC1XXX_BCAST_ADDR);
     cc110x_write(dev, CC110X_REG_ADDR, dev->addr);
 
     /* Setup interrupt on GDO0  */

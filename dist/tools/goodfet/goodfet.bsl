@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # Serial Bootstrap Loader software for the MSP430 embedded proccessor.
 #
 # (C) 2001-2003 Chris Liechti <cliechti@gmx.net>
@@ -13,12 +13,12 @@
 # Forked by Travis Goodspeed <travis at tnbelt.com> for use with the GoodFET
 # JTAG programmer.
 
-import sys, time, string, cStringIO, struct
+import sys, time, string, io, struct
 #sys.path.append("/usr/lib/tinyos")  #We no longer require TinyOS.
 import serial, os, glob
 
 #forked from TinyOS Telos version.
-VERSION = string.split("Revision: 1.39-goodfet-8 ")[1]
+VERSION = str.split("Revision: 1.39-goodfet-8 ")[1]
 
 DEBUG = 0                                       #disable debug messages by default
 
@@ -266,9 +266,8 @@ class LowLevel:
     def calcChecksum(self, data, length):
         """Calculates a checksum of "data"."""
         checksum = 0
-
-        for i in range(length/2):
-            checksum = checksum ^ (ord(data[i*2]) | (ord(data[i*2+1]) << 8))    #xor-ing
+        for i in range(int(length/2)):
+            checksum = checksum ^ (int(data[i*2]) | (int(data[i*2+1]) << 8))    #xor-ing
         return 0xffff & (checksum ^ 0xffff)         #inverting
 
     def __init__(self, aTimeout = None, aProlongFactor = None):
@@ -350,7 +349,7 @@ class LowLevel:
 
     def comRxFrame(self, rxNum):
         if DEBUG > 1: sys.stderr.write("* comRxFrame()\n")
-        rxFrame = chr(self.DATA_FRAME | rxNum)
+        rxFrame = int(self.DATA_FRAME | rxNum).to_bytes(1, 'little')
 
         if DEBUG > 2: sys.stderr.write("  comRxFrame() header...\n")
         rxFramedata = self.serialport.read(3)
@@ -358,8 +357,8 @@ class LowLevel:
         rxFrame = rxFrame + rxFramedata
 
         if DEBUG > 3: sys.stderr.write("  comRxFrame() check header...\n")
-        if rxFrame[1] == chr(0) and rxFrame[2] == rxFrame[3]:   #Add. header info. correct?
-            rxLengthCRC = ord(rxFrame[2]) + 2       #Add CRC-Bytes to length
+        if rxFrame[1] == 0 and rxFrame[2] == rxFrame[3]:   #Add. header info. correct?
+            rxLengthCRC = rxFrame[2] + 2       #Add CRC-Bytes to length
             if DEBUG > 2: sys.stderr.write("  comRxFrame() receiving data, size: %s\n" % rxLengthCRC)
 
             rxFramedata = self.serialport.read(rxLengthCRC)
@@ -368,9 +367,9 @@ class LowLevel:
             #Check received frame:
             if DEBUG > 3: sys.stderr.write("  comRxFrame() crc check\n")
             #rxLength+4: Length with header but w/o CRC:
-            checksum = self.calcChecksum(rxFrame, ord(rxFrame[2]) + 4)
-            if rxFrame[ord(rxFrame[2])+4] == chr(0xff & checksum) and \
-               rxFrame[ord(rxFrame[2])+5] == chr(0xff & (checksum >> 8)): #Checksum correct?
+            checksum = self.calcChecksum(rxFrame, rxFrame[2] + 4)
+            if rxFrame[rxFrame[2]+4] == 0xff & checksum and \
+               rxFrame[rxFrame[2]+5] == 0xff & (checksum >> 8): #Checksum correct?
                 #Frame received correctly (=> send next frame)
                 if DEBUG > 2: sys.stderr.write("* comRxFrame() OK\n")
                 return rxFrame
@@ -383,7 +382,7 @@ class LowLevel:
     def comTxHeader(self, txHeader):
         """send header"""
         if DEBUG > 1: sys.stderr.write("* txHeader()\n")
-        self.serialport.write(txHeader)
+        self.serialport.write(txHeader.encode())
 
     def comTxRx(self, cmd, dataOut, length):
         """Sends the command cmd with the data given in dataOut to the
@@ -397,7 +396,7 @@ class LowLevel:
         rxHeader    = 0
         rxNum       = 0
 
-        dataOut = list(dataOut)     #convert to a list for simpler data fill in
+        dataOut = bytearray(dataOut)     #convert to a list for simpler data fill in
         #Transmitting part ----------------------------------------
         #Prepare data for transmit
         if (length % 2) != 0:
@@ -407,14 +406,13 @@ class LowLevel:
             else:
                 dataOut.append(0)     #fill with zero
 
-        txFrame = "%c%c%c%c" % (self.DATA_FRAME | self.seqNo, cmd, len(dataOut), len(dataOut))
+        txFrame = bytearray([self.DATA_FRAME | self.seqNo, cmd, len(dataOut), len(dataOut)])
 
         self.reqNo = (self.seqNo + 1) % self.MAX_FRAME_COUNT
-
-        txFrame = txFrame + string.join(dataOut,'')
+        txFrame = txFrame + dataOut
         checksum = self.calcChecksum(txFrame, length + 4)
-        txFrame = txFrame + chr(checksum & 0xff)
-        txFrame = txFrame + chr((checksum >> 8) & 0xff)
+        txFrame = txFrame + bytearray([checksum & 0xff])
+        txFrame = txFrame + bytearray([(checksum >> 8) & 0xff])
 
         accessAddr = (0x0212 + (checksum^0xffff)) & 0xfffe  #0x0212: Address of wCHKSUM
         if self.BSLMemAccessWarning and accessAddr < self.BSL_CRITICAL_ADDR:
@@ -423,12 +421,10 @@ class LowLevel:
         self.serialport.flushInput()                #clear receiving queue
         #TODO: Check after each transmitted character,
         #TODO: if microcontroller did send a character (probably a NAK!).
-        for c in txFrame:
-            self.serialport.write(c)
-            if DEBUG > 3: sys.stderr.write("\ttx %02x" % ord(c))
-            #if self.serialport.inWaiting(): break  #abort when BSL replies, probably NAK
-        else:
-            if DEBUG > 1: sys.stderr.write( "  comTxRx() transmit OK\n")
+
+        self.serialport.write(txFrame)
+
+        if DEBUG > 1: sys.stderr.write( "  comTxRx() transmit OK\n")
 
         #Receiving part -------------------------------------------
         rxHeader, rxNum = self.comRxHeader()        #receive header
@@ -687,10 +683,9 @@ class LowLevel:
         while wait or loopcnt:
             loopcnt = loopcnt - 1                   #count down tries
             self.serialport.flushInput()            #clear input, in case a prog is running
-
-            self.serialport.write(chr(self.BSL_SYNC))   #Send synchronization byte
+            self.serialport.write([self.BSL_SYNC])   #Send synchronization byte
             c = self.serialport.read(1)             #read answer
-            if c == chr(self.DATA_ACK):             #ACk
+            if c == self.DATA_ACK.to_bytes(1, 'little'):             #ACk
                 if DEBUG > 1: sys.stderr.write("  bslSync() OK\n")
                 return                              #Sync. successful
             elif not c:                             #timeout
@@ -721,16 +716,17 @@ class LowLevel:
         Parameters return by boot loader are passed via blkin.
         """
         if DEBUG > 1: sys.stderr.write("* bslTxRx()\n")
-
+        if isinstance(blkout, str):
+                blkout = bytearray(blkout, encoding='utf-8')
         if cmd == self.BSL_TXBLK:
             #Align to even start address
             if (addr % 2) != 0:
                 addr = addr - 1                     #Decrement address and
-                blkout = chr(0xFF) + blkOut         #fill first byte of blkout with 0xFF
+                blkout = bytearray([0xFF]) + blkOut         #fill first byte of blkout with 0xFF
                 length = length + 1
             #Make sure that len is even
             if (length % 2) != 0:
-                blkout = blkout + chr(0xFF)         #Inc. len and fill last byte of blkout with 0xFF
+                blkout = blkout + bytearray([0xFF])         #Inc. len and fill last byte of blkout with 0xFF
                 length = length + 1
 
         elif cmd == self.BSL_RXBLK:
@@ -748,7 +744,9 @@ class LowLevel:
         #Add necessary information data to frame
         dataOut =  struct.pack("<HH", addr, length)
 
-        if blkout: #Copy data out of blkout into frame
+        if blkout is not None: #Copy data out of blkout into frame
+            if isinstance(blkout, str):
+                blkout = bytearray(blkout, encoding='utf-8')
             dataOut = dataOut + blkout
 
         self.bslSync(wait)                          #synchronize BSL
@@ -796,7 +794,7 @@ class Memory:
 
     def loadIHex(self, file):
         """load data from a (opened) file in Intel-HEX format"""
-        segmentdata = []
+        segmentdata = bytearray()
         currentAddr = 0
         startAddr   = 0
         lines = file.readlines()
@@ -810,24 +808,24 @@ class Memory:
             if type == 0x00:
                 if currentAddr != address:
                     if segmentdata:
-                        self.segments.append( Segment(startAddr, string.join(segmentdata,'')) )
+                        self.segments.append( Segment(startAddr, segmentdata) )
                     startAddr = currentAddr = address
-                    segmentdata = []
+                    segmentdata = bytearray()
                 for i in range(length):
-                    segmentdata.append( chr(int(l[9+2*i:11+2*i],16)) )
+                    segmentdata += int(l[9+2*i:11+2*i],16).to_bytes(1, 'little')
                 currentAddr = length + currentAddr
             elif type in (0x01, 0x02, 0x03, 0x04, 0x05):
                 pass
             else:
                 sys.stderr.write("Ignored unknown field (type 0x%02x) in ihex file.\n" % type)
         if segmentdata:
-            self.segments.append( Segment(startAddr, string.join(segmentdata,'')) )
+            self.segments.append( Segment(startAddr, segmentdata) )
 
     def loadTIText(self, file):
         """load data from a (opened) file in TI-Text format"""
         next        = 1
         startAddr   = 0
-        segmentdata = []
+        segmentdata = bytearray()
         #Convert data for MSP430, TXT-File is parsed line by line
         while next >= 1:
             #Read one line
@@ -838,14 +836,14 @@ class Memory:
             elif l[0] == '@':        #if @ => new address => send frame and set new addr.
                 #create a new segment
                 if segmentdata:
-                    self.segments.append( Segment(startAddr, string.join(segmentdata,'')) )
+                    self.segments.append( Segment(startAddr, segmentdata) )
                 startAddr = int(l[1:],16)
-                segmentdata = []
+                segmentdata = bytearray()
             else:
-                for i in string.split(l):
-                    segmentdata.append(chr(int(i,16)))
+                for i in str.split(l):
+                    segmentdata += (int(i,16).to_bytes(1, 'little'))
         if segmentdata:
-            self.segments.append( Segment(startAddr, string.join(segmentdata,'')) )
+            self.segments.append( Segment(startAddr, segmentdata) )
 
     def loadELF(self, file):
         """load data from a (opened) file in ELF object format.
@@ -873,7 +871,7 @@ class Memory:
 
     def getMemrange(self, fromadr, toadr):
         """get a range of bytes from the memory. unavailable values are filled with 0xff."""
-        res = ''
+        res = bytearray()
         toadr = toadr + 1   #python indxes are excluding end, so include it
         while fromadr < toadr:
             #print "fromto: %04x %04x" % (fromadr, toadr)
@@ -895,7 +893,7 @@ class Memory:
                     if len(res) >= toadr-fromadr:
                         break#return res
             else:
-                    res = res + chr(255)
+                    res = (255).to_bytes(1, 'little')
                     fromadr = fromadr + 1 #adjust start
                     #print "fill FF"
         #print "res: %r" % res
@@ -970,7 +968,7 @@ class BootStrapLoader(LowLevel):
                     continue
                 elif action & self.ACTION_ERASE_CHECK:
                     #Compare data in blkin with erase pattern
-                    if blkin[i] != chr(0xff):
+                    if blkin[i] != 0xff:
                         sys.stderr.write("Erase Check failed at 0x%04x (0x%02x)\n" % (addr+i, ord(blkin[i])))
                         sys.stderr.flush()
                         raise BSLException(self.ERR_ERASE_CHECK_FAILED) #Erase Check failed!
@@ -1038,11 +1036,11 @@ class BootStrapLoader(LowLevel):
             sys.stderr.write("Transmit default password ...\n")
             sys.stderr.flush()
             #Flash is completely erased, the contents of all Flash cells is 0xff
-            passwd = chr(0xff)*32
+            passwd = bytearray([0xff])*32
         else:
             #sanity check of password
             if len(passwd) != 32:
-                raise ValueError, "password has wrong length (%d)\n" % len(passwd)
+                raise ValueError("password has wrong length (%d)\n" % len(passwd))
             sys.stderr.write('Transmit password ...\n')
             sys.stderr.flush()
         #send the password
@@ -1092,7 +1090,7 @@ class BootStrapLoader(LowLevel):
 
 
         if self.cpu is None:                        #cpy type forced?
-            if deviceids.has_key(dev_id):
+            if dev_id in deviceids:
                 self.cpu = deviceids[dev_id]        #try to autodectect CPU type
 
                 if DEBUG:
@@ -1132,12 +1130,12 @@ class BootStrapLoader(LowLevel):
                 if DEBUG:
                     sys.stderr.write("Using built in BSL replacement for F4x devices\n")
                     sys.stderr.flush()
-                replacementBSL.loadTIText(cStringIO.StringIO(F4X_BSL))  #parse embedded BSL
+                replacementBSL.loadTIText(io.StringIO(F4X_BSL))  #parse embedded BSL
             else:
                 if DEBUG:
                     sys.stderr.write("Using built in BSL replacement for F1x devices\n")
                     sys.stderr.flush()
-                replacementBSL.loadTIText(cStringIO.StringIO(F1X_BSL))  #parse embedded BSL
+                replacementBSL.loadTIText(io.StringIO(F1X_BSL))  #parse embedded BSL
 
         #now download the new BSL, if allowed and needed (version lower than the
         #the replacement) or forced
@@ -1160,7 +1158,7 @@ class BootStrapLoader(LowLevel):
                 #Programming and verification is done in one pass.
                 #The patch file is only read and parsed once.
                 segments = Memory()                     #data to program
-                segments.loadTIText(cStringIO.StringIO(PATCH))  #parse embedded patch
+                segments.loadTIText(io.StringIO(PATCH))  #parse embedded patch
                 #program patch
                 self.programData(segments, self.ACTION_PROGRAM | self.ACTION_VERIFY)
                 self.patchLoaded = 1
@@ -1211,7 +1209,7 @@ class BootStrapLoader(LowLevel):
         if self.data is not None:
             self.programData(self.data, self.ACTION_ERASE_CHECK)
         else:
-            raise BSLException, "cannot do erase check against data with not knowing the actual data"
+            raise BSLException("cannot do erase check against data with not knowing the actual data")
 
     def actionProgram(self):
         """program data into flash memory."""
@@ -1222,7 +1220,7 @@ class BootStrapLoader(LowLevel):
             sys.stderr.write("%i bytes programmed.\n" % self.byteCtr)
             sys.stderr.flush()
         else:
-            raise BSLException, "programming without data not possible"
+            raise BSLException("programming without data not possible")
     def actionFromweb(self):
         """Grab GoodFET firmware from the web, then flash it."""
         # print "Grabbing %x firmware." % self.dev_id;
@@ -1240,13 +1238,13 @@ class BootStrapLoader(LowLevel):
         # sys.stderr.flush()
 
 
-        print """
+        print("""
 The --fromweb feature is temporarily disabled, pending a rewrite.
 Please grab a copy of the appropriate .hex from
 http://goodfet.sf.net/dist/ and flash it like so:
 
 goodfet.bsl -e -p foo.hex
-"""
+""")
 
 
     def actionVerify(self):
@@ -1256,7 +1254,7 @@ goodfet.bsl -e -p foo.hex
             sys.stderr.flush()
             self.programData(self.data, self.ACTION_VERIFY)
         else:
-            raise BSLException, "verify without data not possible"
+            raise BSLException("verify without data not possible")
 
     def actionReset(self):
         """perform a reset, start user programm"""
@@ -1296,11 +1294,11 @@ goodfet.bsl -e -p foo.hex
         try:
             baudconfigs = self.bauratetable[self.cpu]
         except KeyError:
-            raise ValueError, "unknown CPU type %s, can't switch baudrate" % self.cpu
+            raise ValueError("unknown CPU type %s, can't switch baudrate" % self.cpu)
         try:
             a,l = baudconfigs[baudrate]
         except KeyError:
-            raise ValueError, "baudrate not valid. valid values are %r" % baudconfigs.keys()
+            raise ValueError("baudrate not valid. valid values are %r" % list(baudconfigs.keys()))
 
         sys.stderr.write("Changing baudrate to %d ...\n" % baudrate)
         sys.stderr.flush()
@@ -1315,7 +1313,7 @@ goodfet.bsl -e -p foo.hex
         ans = self.bslTxRx(self.BSL_TXVERSION, 0) #Command: receive version info
         #the following values are in big endian style!!!
         family_type, bsl_version = struct.unpack(">H8xH4x", ans[:-2]) #cut away checksum and extract data
-        print "Device Type: 0x%04x\nBSL version: 0x%04x\n" % (family_type, bsl_version)
+        print("Device Type: 0x%04x\nBSL version: 0x%04x\n" % (family_type, bsl_version))
 
 
 def usage():
@@ -1440,12 +1438,12 @@ class curry:
             kw.update(kwargs)
         else:
             kw = kwargs or self.kwargs
-        return apply(self.fun, self.pending + args, kw)
+        return self.fun(*self.pending + args, **kw)
 
     def __repr__(self):
         #first try if it a function
         try:
-            return "curry(%s, %r, %r)" % (self.fun.func_name, self.pending, self.kwargs)
+            return "curry(%s, %r, %r)" % (self.fun.__name__, self.pending, self.kwargs)
         except AttributeError:
             #fallback for callable classes
             return "curry(%s, %r, %r)" % (self.fun, self.pending, self.kwargs)
@@ -1455,7 +1453,7 @@ def hexify(line, bytes, width=16):
         line,
         ('%02x '*len(bytes)) % tuple(bytes),
         '   '* (width-len(bytes)),
-        ('%c'*len(bytes)) % tuple(map(lambda x: (x>=32 and x<127) and x or ord('.'), bytes))
+        ('%c'*len(bytes)) % tuple([(x>=32 and x<127) and x or ord('.') for x in bytes])
         )
 
 #Main:
@@ -1764,7 +1762,7 @@ def main(itest=1):
         if filename == '-':                         #get data from stdin
             file = sys.stdin
         else:
-            file = open(filename, "rb")             #or from a file
+            file = open(filename, "r")    #or from a file
         if filetype == 0:                           #select load function
             bsl.data.loadIHex(file)                 #intel hex
         elif filetype == 1:
@@ -1806,7 +1804,7 @@ def main(itest=1):
             sys.stderr.write("TODO list:\n")
             for f in todo:
                 try:
-                    sys.stderr.write("   %s\n" % f.func_name)
+                    sys.stderr.write("   %s\n" % f.__name__)
                 except AttributeError:
                     sys.stderr.write("   %r\n" % f)
         for f in todo: f()                          #work through todo list
@@ -1819,7 +1817,7 @@ def main(itest=1):
         hex="";
         for c in data:
             hex+=("%02x "%ord(c));
-        print hex;
+        print(hex);
     if dumpinfo:
         bsl.txPasswd(); #default pass
         data=bsl.uploadData(0x1000,256);
@@ -1827,7 +1825,7 @@ def main(itest=1):
         for c in data:
             hex+=("%02x "%ord(c));
         hex+="\nq\n";
-        print hex;
+        print(hex);
 
     if goaddr is not None:                          #start user programm at specified address
         bsl.actionRun(goaddr)                       #load PC and execute
@@ -1845,7 +1843,7 @@ def main(itest=1):
         if hexoutput:                               #depending on output format
             m = 0
             while m < len(data):                    #print a hex display
-                print hexify(startaddr+m, map(ord,data[m:m+16]))
+                print(hexify(startaddr+m, list(map(ord,data[m:m+16]))))
                 m = m + 16
         else:
             sys.stdout.write(data)                  #binary output w/o newline!
@@ -1854,7 +1852,7 @@ def main(itest=1):
     if wait:                                        #wait at the end if desired
         sys.stderr.write("Press <ENTER> ...\n")     #display a prompt
         sys.stderr.flush()
-        raw_input()                                 #wait for newline
+        input()                                 #wait for newline
 
     bsl.comDone()           #Release serial communication port
 
@@ -1867,7 +1865,7 @@ if __name__ == '__main__':
         if DEBUG: raise     #show full trace in debug mode
         sys.stderr.write("user abort.\n")   #short messy in user mode
         sys.exit(1)         #set errorlevel for script usage
-    except Exception, msg:  #every Exception is caught and displayed
+    except Exception as msg:  #every Exception is caught and displayed
         if DEBUG: raise     #show full trace in debug mode
         #sys.stderr.write("\nAn error occoured:\n%s\n" % msg) #short messy in user mode
         #sys.exit(1)         #set errorlevel for script usage

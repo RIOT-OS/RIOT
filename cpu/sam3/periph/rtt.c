@@ -75,7 +75,8 @@ void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
 uint32_t rtt_get_alarm(void)
 {
     if (RTT->RTT_MR & RTT_MR_ALMIEN) {
-        return RTT->RTT_AR;
+        /* the alarm value is RTT_AR + 1, see rtt_set_alarm() */
+        return RTT->RTT_AR + 1;
     }
     return 0;
 }

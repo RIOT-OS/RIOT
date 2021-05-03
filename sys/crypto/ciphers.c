@@ -22,13 +22,8 @@
 int cipher_init(cipher_t *cipher, cipher_id_t cipher_id, const uint8_t *key,
                 uint8_t key_size)
 {
-    if (key_size > cipher_id->max_key_size) {
-        return CIPHER_ERR_INVALID_KEY_SIZE;
-    }
-
     cipher->interface = cipher_id;
     return cipher->interface->init(&cipher->context, key, key_size);
-
 }
 
 

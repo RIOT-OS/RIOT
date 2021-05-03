@@ -124,14 +124,29 @@
 #include "msg.h"
 #include "cpu_conf.h"
 #include "sched.h"
+#include "thread_config.h"
 
 #ifdef MODULE_CORE_THREAD_FLAGS
 #include "thread_flags.h"
 #endif
 
+#include "thread_arch.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief Macro definition to inline some of the platform specific
+ *        implementations
+ *
+ * Should be enabled when advantageous by CPU's in their thread_arch.h header
+ */
+#ifdef THREAD_API_INLINED
+#define THREAD_MAYBE_INLINE static inline __attribute__((always_inline))
+#else
+#define THREAD_MAYBE_INLINE
+#endif /* THREAD_API_INLINED */
 
 #if defined(DEVELHELP) && !defined(CONFIG_THREAD_NAMES)
 /**
@@ -196,113 +211,6 @@ struct _thread {
     thread_arch_t arch;             /**< architecture dependent part    */
 #endif
 };
-
-/**
- * @def THREAD_STACKSIZE_DEFAULT
- * @brief A reasonable default stack size that will suffice most smaller tasks
- *
- * @note This value must be defined by the CPU specific implementation, please
- *       take a look at @c cpu/$CPU/include/cpu_conf.h
- */
-#ifndef THREAD_STACKSIZE_DEFAULT
-#error THREAD_STACKSIZE_DEFAULT must be defined per CPU
-#endif
-#ifdef DOXYGEN
-#define THREAD_STACKSIZE_DEFAULT
-#endif
-
-/**
- * @def THREAD_STACKSIZE_IDLE
- * @brief Size of the idle task's stack in bytes
- *
- * @note This value must be defined by the CPU specific implementation, please
- *       take a look at @c cpu/$CPU/include/cpu_conf.h
- */
-#ifndef THREAD_STACKSIZE_IDLE
-#error THREAD_STACKSIZE_IDLE must be defined per CPU
-#endif
-#ifdef DOXYGEN
-#define THREAD_STACKSIZE_IDLE
-#endif
-
-/**
- * @def THREAD_EXTRA_STACKSIZE_PRINTF
- * @brief Size of the task's printf stack in bytes
- *
- * @note This value must be defined by the CPU specific implementation, please
- *       take a look at @c cpu/$CPU/include/cpu_conf.h
- */
-#ifndef THREAD_EXTRA_STACKSIZE_PRINTF
-#error THREAD_EXTRA_STACKSIZE_PRINTF must be defined per CPU
-#endif
-#ifdef DOXYGEN
-#define THREAD_EXTRA_STACKSIZE_PRINTF
-#endif
-
-/**
- * @def THREAD_STACKSIZE_MAIN
- * @brief Size of the main task's stack in bytes
- */
-#ifndef THREAD_STACKSIZE_MAIN
-#define THREAD_STACKSIZE_MAIN      (THREAD_STACKSIZE_DEFAULT + \
-                                    THREAD_EXTRA_STACKSIZE_PRINTF)
-#endif
-
-/**
- * @brief Large stack size
- */
-#ifndef THREAD_STACKSIZE_LARGE
-#define THREAD_STACKSIZE_LARGE (THREAD_STACKSIZE_MEDIUM * 2)
-#endif
-
-/**
- * @brief Medium stack size
- */
-#ifndef THREAD_STACKSIZE_MEDIUM
-#define THREAD_STACKSIZE_MEDIUM THREAD_STACKSIZE_DEFAULT
-#endif
-
-/**
- * @brief Small stack size
- */
-#ifndef THREAD_STACKSIZE_SMALL
-#define THREAD_STACKSIZE_SMALL (THREAD_STACKSIZE_MEDIUM / 2)
-#endif
-
-/**
- * @brief Tiny stack size
- */
-#ifndef THREAD_STACKSIZE_TINY
-#define THREAD_STACKSIZE_TINY (THREAD_STACKSIZE_MEDIUM / 4)
-#endif
-
-/**
- * @brief Minimum stack size
- */
-#ifndef THREAD_STACKSIZE_MINIMUM
-#define THREAD_STACKSIZE_MINIMUM  (sizeof(thread_t))
-#endif
-
-/**
- * @def THREAD_PRIORITY_MIN
- * @brief Least priority a thread can have
- */
-#define THREAD_PRIORITY_MIN            (SCHED_PRIO_LEVELS - 1)
-
-/**
- * @def THREAD_PRIORITY_IDLE
- * @brief Priority of the idle thread
- */
-#define THREAD_PRIORITY_IDLE           (THREAD_PRIORITY_MIN)
-
-/**
- * @def THREAD_PRIORITY_MAIN
- * @brief Priority of the main thread
- */
-#ifndef THREAD_PRIORITY_MAIN
-#define THREAD_PRIORITY_MAIN           (THREAD_PRIORITY_MIN - \
-                                        (SCHED_PRIO_LEVELS / 2))
-#endif
 
 /**
  * @name Optional flags for controlling a threads initial state
@@ -431,7 +339,7 @@ void thread_yield(void);
  *
  * @see     thread_yield()
  */
-void thread_yield_higher(void);
+THREAD_MAYBE_INLINE void thread_yield_higher(void);
 
 /**
  * @brief   Puts the current thread into zombie state.
@@ -594,7 +502,8 @@ static inline int thread_has_msg_queue(const volatile struct _thread *thread)
  * @param   thread   thread to work on
  * @returns status of thread
  */
-static inline thread_status_t thread_get_status(const thread_t *thread) {
+static inline thread_status_t thread_get_status(const thread_t *thread)
+{
     return thread->status;
 }
 
@@ -604,7 +513,8 @@ static inline thread_status_t thread_get_status(const thread_t *thread) {
  * @param   thread   thread to work on
  * @returns true if thread is active, false otherwise
  */
-static inline bool thread_is_active(const thread_t *thread) {
+static inline bool thread_is_active(const thread_t *thread)
+{
     return thread->status >= STATUS_ON_RUNQUEUE;
 }
 

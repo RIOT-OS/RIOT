@@ -35,6 +35,9 @@ RIOT is developed by an open community that anyone is welcome to join:
    [GitHub](https://github.com/RIOT-OS/RIOT). You can read about how to
    contribute [in our GitHub
    Wiki](https://github.com/RIOT-OS/RIOT/wiki/Contributing-to-RIOT).
+ - Sign-up to our [forum](https://forum.riot-os.org/) to ask for help using RIOT
+   or writing an application for RIOT, discuss kernel and network stack
+   development as well as hardware support, or to show-case your latest project.
  - [Subscribe](http://lists.riot-os.org/mailman/listinfo/users) to
    users@riot-os.org to ask for help using RIOT or writing an application for
    RIOT (or to just stay in the loop). An archive of this list [is available

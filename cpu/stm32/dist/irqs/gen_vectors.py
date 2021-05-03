@@ -75,6 +75,7 @@ def parse_cmsis(cpu_line):
             continue
         # start filling lines after interrupt Doxygen comment
         if "typedef enum" in line:
+            irq_lines = []  # Cleanup any previous content
             use_line = True
 
         # use a regexp to get the available IRQs

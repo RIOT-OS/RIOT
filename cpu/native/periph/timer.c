@@ -66,7 +66,7 @@ static struct itimerval itv;
 static unsigned long ts2ticks(struct timespec *tp)
 {
     /* TODO: check for overflow */
-    return(((unsigned long)tp->tv_sec * NATIVE_TIMER_SPEED) + (tp->tv_nsec / 1000));
+    return (((unsigned long)tp->tv_sec * NATIVE_TIMER_SPEED) + (tp->tv_nsec / 1000));
 }
 
 /**
@@ -105,7 +105,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg)
     return 0;
 }
 
-static void do_timer_set(unsigned int offset)
+static void do_timer_set(tim_t dev, unsigned int offset, bool periodic)
 {
     DEBUG("%s\n", __func__);
 
@@ -116,19 +116,17 @@ static void do_timer_set(unsigned int offset)
     memset(&itv, 0, sizeof(itv));
     itv.it_value.tv_sec = (offset / 1000000);
     itv.it_value.tv_usec = offset % 1000000;
-
-    DEBUG("timer_set(): setting %u.%06u\n", (unsigned)itv.it_value.tv_sec, (unsigned)itv.it_value.tv_usec);
-
-    _native_syscall_enter();
-    if (real_setitimer(ITIMER_REAL, &itv, NULL) == -1) {
-        err(EXIT_FAILURE, "timer_arm: setitimer");
+    if (periodic) {
+        itv.it_interval = itv.it_value;
     }
-    _native_syscall_leave();
+
+    DEBUG("timer_set(): setting %lu.%06lu\n", itv.it_value.tv_sec, itv.it_value.tv_usec);
+
+    timer_start(dev);
 }
 
 int timer_set(tim_t dev, int channel, unsigned int offset)
 {
-    (void)dev;
     DEBUG("%s\n", __func__);
 
     if (channel != 0) {
@@ -139,7 +137,7 @@ int timer_set(tim_t dev, int channel, unsigned int offset)
         offset = NATIVE_TIMER_MIN_RES;
     }
 
-    do_timer_set(offset);
+    do_timer_set(dev, offset, false);
 
     return 0;
 }
@@ -150,12 +148,24 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value)
     return timer_set(dev, channel, value - now);
 }
 
+int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags)
+{
+    (void)flags;
+
+    if (channel != 0) {
+        return -1;
+    }
+
+    do_timer_set(dev, value, true);
+
+    return 0;
+}
+
 int timer_clear(tim_t dev, int channel)
 {
-    (void)dev;
     (void)channel;
 
-    do_timer_set(0);
+    do_timer_set(dev, 0, false);
 
     return 0;
 }
@@ -164,12 +174,27 @@ void timer_start(tim_t dev)
 {
     (void)dev;
     DEBUG("%s\n", __func__);
+
+    _native_syscall_enter();
+    if (real_setitimer(ITIMER_REAL, &itv, NULL) == -1) {
+        err(EXIT_FAILURE, "timer_arm: setitimer");
+    }
+    _native_syscall_leave();
 }
 
 void timer_stop(tim_t dev)
 {
     (void)dev;
     DEBUG("%s\n", __func__);
+
+    _native_syscall_enter();
+    struct itimerval zero = {0};
+    if (real_setitimer(ITIMER_REAL, &zero, &itv) == -1) {
+        err(EXIT_FAILURE, "timer_arm: setitimer");
+    }
+    _native_syscall_leave();
+
+    DEBUG("time left: %lu.%06lu\n", itv.it_value.tv_sec, itv.it_value.tv_usec);
 }
 
 unsigned int timer_read(tim_t dev)

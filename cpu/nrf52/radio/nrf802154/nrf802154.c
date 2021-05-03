@@ -27,6 +27,7 @@
 
 #include "cpu.h"
 #include "mutex.h"
+#include "nrf_clock.h"
 
 #include "net/ieee802154.h"
 #include "periph/timer.h"
@@ -246,6 +247,11 @@ static int _init(netdev_t *dev)
     rxbuf[0] = 0;
     txbuf[0] = 0;
     _state = 0;
+
+    /* the radio need the external HF clock source to be enabled */
+    /* @todo    add proper handling to release the clock whenever the radio is
+     *          idle */
+    clock_hfxo_request();
 
     /* power on peripheral */
     NRF_RADIO->POWER = 1;

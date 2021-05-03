@@ -30,6 +30,7 @@
  * - Gateway discovery process not implemented
  * - Last will feature not implemented
  * - No support for QoS level 2
+ * - No support for QoS level -1
  * - No support for wildcard characters in topic names when subscribing
  * - Actual granted QoS level on subscription is ignored
  *
@@ -168,22 +169,6 @@ extern "C" {
 #define ASYMCUTE_HANDLER_STACKSIZE      (THREAD_STACKSIZE_DEFAULT)
 #endif
 
-#ifndef ASYMCUTE_LISTENER_PRIO
-/**
- * @brief   Default priority for an Asymcute listener thread
- *
- * @note    Must be of higher priority than @ref ASYMCUTE_HANDLER_PRIO
- */
-#define ASYMCUTE_LISTENER_PRIO          (THREAD_PRIORITY_MAIN - 3)
-#endif
-
-#ifndef ASYMCUTE_LISTENER_STACKSIZE
-/**
- * @brief   Default stack size for an Asymcute listener thread
- */
-#define ASYMCUTE_LISTENER_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
-#endif
-
 /**
  * @brief   Return values used by public Asymcute functions
  */
@@ -195,6 +180,7 @@ enum {
     ASYMCUTE_BUSY       = -4,       /**< error: context already in use */
     ASYMCUTE_REGERR     = -5,       /**< error: registration invalid */
     ASYMCUTE_SUBERR     = -6,       /**< error: subscription invalid */
+    ASYMCUTE_SENDERR    = -7,       /**< error: unable to sent packet */
 };
 
 /**
@@ -294,7 +280,6 @@ struct asymcute_req {
 struct asymcute_con {
     mutex_t lock;                       /**< synchronization lock */
     sock_udp_t sock;                    /**< socket used by a connections */
-    sock_udp_ep_t server_ep;            /**< the gateway's UDP endpoint */
     asymcute_req_t *pending;            /**< list holding pending requests */
     asymcute_sub_t *subscriptions;      /**< list holding active subscriptions */
     asymcute_evt_cb_t user_cb;          /**< event callback provided by user */
@@ -394,6 +379,34 @@ static inline bool asymcute_topic_is_reg(const asymcute_topic_t *topic)
 }
 
 /**
+ * @brief   Check if a given topic is a short topic
+ *
+ * @param[in] topic     topic to check
+ *
+ * @return  true if topic is a short topic
+ * @return  false if topic is not short topic
+ */
+static inline bool asymcute_topic_is_short(const asymcute_topic_t *topic)
+{
+    assert(topic);
+    return ((topic->flags & MQTTSN_TIT_SHORT) != 0);
+}
+
+/**
+ * @brief   Check if a given topic is a pre-defined topic
+ *
+ * @param[in] topic     topic to check
+ *
+ * @return  true if topic is pre-defined
+ * @return  false if topic is not pre-defined
+ */
+static inline bool asymcute_topic_is_predef(const asymcute_topic_t *topic)
+{
+    assert(topic);
+    return ((topic->flags & MQTTSN_TIT_PREDEF) != 0);
+}
+
+/**
  * @brief   Check if a given topic is initialized
  *
  * @param[in] topic     topic to check
@@ -443,25 +456,6 @@ int asymcute_topic_init(asymcute_topic_t *topic, const char *topic_name,
                         uint16_t topic_id);
 
 /**
- * @brief   Start a listener thread
- *
- * @note    Must have higher priority then the handler thread (defined by
- *          @ref ASYMCUTE_HANDLER_PRIO)
- *
- * @param[in] con       connection context to use for this connection
- * @param[in] stack     stack used to run the listener thread
- * @param[in] stacksize size of @p stack in bytes
- * @param[in] priority  priority of the listener thread created by this function
- * @param[in] callback  user callback for notification about connection related
- *                      events
- *
- * @return  ASYMCUTE_OK on success
- * @return  ASYMCUTE_BUSY if connection context is already in use
- */
-int asymcute_listener_run(asymcute_con_t *con, char *stack, size_t stacksize,
-                          char priority, asymcute_evt_cb_t callback);
-
-/**
  * @brief   Start the global Asymcute handler thread for processing timeouts and
  *          keep alive events
  *
@@ -488,16 +482,17 @@ bool asymcute_is_connected(const asymcute_con_t *con);
  * @param[in] cli_id    client ID to register with the gateway
  * @param[in] clean     set `true` to start a clean session
  * @param[in] will      last will (currently not implemented)
+ * @param[in] callback  user callback triggered on defined events
  *
  * @return  ASYMCUTE_OK if CONNECT message has been sent
  * @return  ASYMCUTE_NOTSUP if last will was given (temporary until implemented)
  * @return  ASYMCUTE_OVERFLOW if @p cli_id is larger than ASYMCUTE_ID_MAXLEN
- * @return  ASYMCUTE_GWERR if the connection is not in idle state
- * @return  ASYMCUTE_BUSY if the given request context is already in use
+ * @return  ASYMCUTE_GWERR if initializing the socket for the connection failed
+ * @return  ASYMCUTE_BUSY if the connection or the request context are in use
  */
 int asymcute_connect(asymcute_con_t *con, asymcute_req_t *req,
                      sock_udp_ep_t *server, const char *cli_id, bool clean,
-                     asymcute_will_t *will);
+                     asymcute_will_t *will, asymcute_evt_cb_t callback);
 
 /**
  * @brief   Close the given connection

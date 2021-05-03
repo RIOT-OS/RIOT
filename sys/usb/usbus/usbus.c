@@ -18,9 +18,12 @@
 
 #define USB_H_USER_IS_RIOT_INTERNAL
 
+#include "atomic_utils.h"
 #include "kernel_defines.h"
 #include "bitarithm.h"
 #include "event.h"
+#include "fmt.h"
+#include "luid.h"
 #include "thread.h"
 #include "thread_flags.h"
 #include "periph/usbdev.h"
@@ -121,6 +124,16 @@ uint16_t usbus_add_interface(usbus_t *usbus, usbus_interface_t *iface)
     return idx;
 }
 
+void usbus_add_interface_alt(usbus_interface_t *iface,
+                             usbus_interface_alt_t *alt)
+{
+    usbus_interface_alt_t **last = &iface->alts;
+    while (*last) {
+        last = &(*last)->next;
+    }
+    *last = alt;
+}
+
 void usbus_register_event_handler(usbus_t *usbus, usbus_handler_t *handler)
 {
     /* See note above for reasons against clist.h */
@@ -163,36 +176,26 @@ usbus_endpoint_t *usbus_add_endpoint(usbus_t *usbus, usbus_interface_t *iface,
     return ep;
 }
 
-static inline uint32_t _get_ep_bitflag(usbdev_ep_t *ep)
+static inline uint8_t _get_ep_bitnum(usbdev_ep_t *ep)
 {
     /* Endpoint activity bit flag, lower USBDEV_NUM_ENDPOINTS bits are
      * useb as OUT endpoint flags, upper bit are IN endpoints */
-    return 1 << ((ep->dir == USB_EP_DIR_IN ? USBDEV_NUM_ENDPOINTS
-                                           : 0x00) + ep->num);
+    return (ep->dir == USB_EP_DIR_IN ? USBDEV_NUM_ENDPOINTS
+                                     : 0x00) + ep->num;
 }
 
 static void _set_ep_event(usbus_t *usbus, usbdev_ep_t *ep)
 {
-    if (irq_is_in()) {
-        usbus->ep_events |= _get_ep_bitflag(ep);
-    }
-    else {
-        unsigned state = irq_disable();
-        usbus->ep_events |= _get_ep_bitflag(ep);
-        irq_restore(state);
-    }
+    atomic_bit_u32_t bitflag = atomic_bit_u32(&usbus->ep_events,
+                                              _get_ep_bitnum(ep));
+    atomic_set_bit_u32(bitflag);
 
     thread_flags_set(thread_get(usbus->pid), USBUS_THREAD_FLAG_USBDEV_EP);
 }
 
-static uint32_t _get_and_reset_ep_events(usbus_t *usbus)
+static inline uint32_t _get_and_reset_ep_events(usbus_t *usbus)
 {
-    unsigned state = irq_disable();
-    uint32_t res = usbus->ep_events;
-
-    usbus->ep_events = 0;
-    irq_restore(state);
-    return res;
+    return atomic_fetch_and_u32(&usbus->ep_events, 0);
 }
 
 static void _signal_handlers(usbus_t *usbus, uint16_t flag,
@@ -243,6 +246,18 @@ static void *_usbus_thread(void *args)
                                 CONFIG_USB_CONFIGURATION_STR);
     usbus_add_string_descriptor(usbus, &usbus->product, CONFIG_USB_PRODUCT_STR);
     usbus_add_string_descriptor(usbus, &usbus->manuf, CONFIG_USB_MANUF_STR);
+
+#ifdef CONFIG_USB_SERIAL_STR
+    usbus_add_string_descriptor(usbus, &usbus->serial, CONFIG_USB_SERIAL_STR);
+#else
+    static_assert(CONFIG_USB_SERIAL_BYTE_LENGTH <= UINT8_MAX/4,
+                  "USB serial byte length must be at most 63 due to protocol "
+                  "limitations");
+    uint8_t luid_buf[CONFIG_USB_SERIAL_BYTE_LENGTH];
+    luid_get(luid_buf, sizeof(luid_buf));
+    fmt_bytes_hex(usbus->serial_str, luid_buf, sizeof(luid_buf));
+    usbus_add_string_descriptor(usbus, &usbus->serial, usbus->serial_str);
+#endif
 
     usbus->state = USBUS_STATE_DISCONNECT;
 

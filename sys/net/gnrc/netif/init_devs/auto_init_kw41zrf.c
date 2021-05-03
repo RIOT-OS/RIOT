@@ -22,6 +22,7 @@
 #include "board.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netif/ieee802154.h"
+#include "include/init_devs.h"
 
 #ifdef MODULE_GNRC_LWMAC
 #include "net/gnrc/lwmac/lwmac.h"
@@ -37,7 +38,7 @@
  * @{
  */
 #ifndef KW41ZRF_NETIF_STACKSIZE
-#define KW41ZRF_NETIF_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+#define KW41ZRF_NETIF_STACKSIZE     (IEEE802154_STACKSIZE_DEFAULT)
 #endif
 #ifndef KW41ZRF_NETIF_PRIO
 #define KW41ZRF_NETIF_PRIO          (GNRC_NETIF_PRIO)

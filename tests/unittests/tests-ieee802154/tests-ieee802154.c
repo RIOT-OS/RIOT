@@ -23,11 +23,6 @@
 #include "unittests-constants.h"
 #include "tests-ieee802154.h"
 
-static inline le_uint16_t byteorder_htols(uint16_t v)
-{
-    return byteorder_btols(byteorder_htons(v));
-}
-
 static void test_ieee802154_set_frame_hdr_flags0(void)
 {
     const le_uint16_t src_pan = byteorder_htols(0);
@@ -49,10 +44,10 @@ static void test_ieee802154_set_frame_hdr_flags0_non_beacon_non_ack(void)
     const le_uint16_t src_pan = byteorder_htols(0);
     const le_uint16_t dst_pan = byteorder_htols(0);
     const uint8_t flags = IEEE802154_FCF_TYPE_DATA;
-    uint8_t res;
+    uint8_t res[2];
 
     TEST_ASSERT_EQUAL_INT(0,
-                          ieee802154_set_frame_hdr(&res, NULL, 0,
+                          ieee802154_set_frame_hdr(res, NULL, 0,
                                                    NULL, 0,
                                                    src_pan, dst_pan,
                                                    flags, TEST_UINT8));
@@ -1011,6 +1006,31 @@ static void test_ieee802154_get_iid_addr_len_8(void)
     TEST_ASSERT_EQUAL_INT(0, memcmp((const char *)exp, (char *) &iid, sizeof(iid)));
 }
 
+static void test_ieee802154_dbm_to_rssi(void)
+{
+    /* RF Power below -174 is represented with RSSI zero.
+     * RF power above 80 is represented with RSSI 254 */
+    const int16_t dbm[] = {0, -73, -180, 85};
+    const uint8_t expected[] = {174, 101, 0, 254};
+
+    TEST_ASSERT_EQUAL_INT(expected[0], ieee802154_dbm_to_rssi(dbm[0]));
+    TEST_ASSERT_EQUAL_INT(expected[1], ieee802154_dbm_to_rssi(dbm[1]));
+    TEST_ASSERT_EQUAL_INT(expected[2], ieee802154_dbm_to_rssi(dbm[2]));
+    TEST_ASSERT_EQUAL_INT(expected[3], ieee802154_dbm_to_rssi(dbm[3]));
+
+}
+
+static void test_ieee802154_rssi_to_dbm(void)
+{
+    const uint8_t rssi[] = {174, 101, 0, 254};
+    const int16_t expected[]= {0, -73, -174, 80};
+
+    TEST_ASSERT_EQUAL_INT(expected[0], ieee802154_rssi_to_dbm(rssi[0]));
+    TEST_ASSERT_EQUAL_INT(expected[1], ieee802154_rssi_to_dbm(rssi[1]));
+    TEST_ASSERT_EQUAL_INT(expected[2], ieee802154_rssi_to_dbm(rssi[2]));
+    TEST_ASSERT_EQUAL_INT(expected[3], ieee802154_rssi_to_dbm(rssi[3]));
+}
+
 Test *tests_ieee802154_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -1074,6 +1094,8 @@ Test *tests_ieee802154_tests(void)
         new_TestFixture(test_ieee802154_get_iid_addr_len_2),
         new_TestFixture(test_ieee802154_get_iid_addr_len_4),
         new_TestFixture(test_ieee802154_get_iid_addr_len_8),
+        new_TestFixture(test_ieee802154_rssi_to_dbm),
+        new_TestFixture(test_ieee802154_dbm_to_rssi),
     };
 
     EMB_UNIT_TESTCALLER(ieee802154_tests, NULL, NULL, fixtures);

@@ -26,6 +26,7 @@
 
 #include "byteorder.h"
 #include "net/eui64.h"
+#include "kernel_defines.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -120,6 +121,23 @@ extern "C" {
  */
 #define IEEE802154_RADIO_RSSI_OFFSET        (-174)
 
+#define IEEE802154_PHY_MR_FSK_PHR_LEN      (2)  /**< MR-FSK PHY header length */
+#define IEEE802154_PHY_MR_FSK_2FSK_SFD_LEN (2)  /**< MR-FSK SFD length on Filtered 2-FSK */
+
+/**
+ * For the MR-FSK PHY, the SFD value when PHR + PSDU are coded/uncoded and with
+ * phyMRFSKSFD = 0 or 1 respectively
+ *
+ * 802.15.4g, Table 131 (p. 51)
+ *
+ *  @{
+ */
+#define IEEE802154_PHY_MR_FSK_2FSK_CODED_SFD_0      (0x6F4E)
+#define IEEE802154_PHY_MR_FSK_2FSK_CODED_SFD_1      (0x632D)
+#define IEEE802154_PHY_MR_FSK_2FSK_UNCODED_SFD_0    (0x90E4)
+#define IEEE802154_PHY_MR_FSK_2FSK_UNCODED_SFD_1    (0x7A0E)
+/** @} */
+
 /**
  * For the SUN PHYs, the value is 1 ms expressed in symbol periods, rounded
  * up to the next integer number of symbol periods using the ceiling() function.
@@ -146,7 +164,7 @@ extern "C" {
 /**
  * @brief   802.15.4 PHY modes
  */
-enum {
+typedef enum {
     IEEE802154_PHY_DISABLED,        /**< PHY disabled, no mode selected */
     IEEE802154_PHY_BPSK,            /**< Binary Phase Shift Keying */
     IEEE802154_PHY_ASK,             /**< Amplitude-Shift Keying */
@@ -154,7 +172,7 @@ enum {
     IEEE802154_PHY_MR_OQPSK,        /**< Multi-Rate Offset Quadrature Phase-Shift Keying */
     IEEE802154_PHY_MR_OFDM,         /**< Multi-Rate Orthogonal Frequency-Division Multiplexing */
     IEEE802154_PHY_MR_FSK           /**< Multi-Rate Frequency Shift Keying */
-};
+} ieee802154_phy_mode_t;
 
 /**
  * @brief   802.15.4 forward error correction schemes
@@ -190,6 +208,28 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
  * @ingroup  config
  * @{
  */
+/**
+ * @brief IEEE802.15.4 default PHY mode
+ * @{
+ */
+#if IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_BPSK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_BPSK
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_ASK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_ASK
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_OQPSK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_OQPSK
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_MR_OQPSK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_MR_OQPSK
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_MR_OFDM)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_MR_OFDM
+#elif IS_ACTIVE(CONFIG_IEEE802154_DEFAULT_PHY_MR_FSK)
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_MR_FSK
+#endif
+
+#ifndef CONFIG_IEEE802154_DEFAULT_PHY_MODE
+#define CONFIG_IEEE802154_DEFAULT_PHY_MODE          IEEE802154_PHY_OQPSK
+#endif
+/** @} */
 /**
  * @brief IEEE802.15.4 default sub-GHZ channel
  */
@@ -420,6 +460,49 @@ static inline eui64_t *ieee802154_get_iid(eui64_t *eui64, const uint8_t *addr,
     }
 
     return eui64;
+}
+
+/**
+ * @brief Convert from RSSI scale to dBm.
+ *
+ * The RSSI calculation is based on the IEEE 802.15.4 2020 specification and
+ * it's represented as one octet of integer.
+ *
+ * RSSI equal to zero maps to -174 dBm and has the same scale as dBm (1 RSSI
+ * step == 1 dBm). Therefore an RSSI value of 254 maps to +80 dBm.
+ *
+ * @note RSSI == 255 is defined as reserved by the standard and ignored by this
+ * function.
+ *
+ * @param[in] rssi RF power in RSSI scale
+ *
+ * @return RF power in dBm scale
+ */
+static inline int16_t ieee802154_rssi_to_dbm(uint8_t rssi)
+{
+    return rssi + IEEE802154_RADIO_RSSI_OFFSET;
+}
+
+/**
+ * @brief Convert from dBm scale to RSSI.
+ *
+ * The RSSI calculation is based on the IEEE 802.15.4 2020 specification and
+ * it's represented as one octet of integer.
+ *
+ * RSSI equal to zero maps to -174 dBm and has the same scale as dBm (1 RSSI
+ * step == 1 dBm). Therefore an RSSI value of 254 maps to +80 dBm.
+ *
+ * @param[in] dbm RF power in dBm scale.
+ *
+ * @return RF power in RSSI scale.
+ */
+static inline uint8_t ieee802154_dbm_to_rssi(int16_t dbm)
+{
+    const int min = IEEE802154_RADIO_RSSI_OFFSET;
+    const int max = min + (UINT8_MAX - 1);
+
+    int val = dbm <= min ? min : (dbm >= max ? max : dbm);
+    return val - IEEE802154_RADIO_RSSI_OFFSET;
 }
 
 #ifdef __cplusplus

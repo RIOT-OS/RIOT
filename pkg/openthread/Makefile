@@ -1,6 +1,6 @@
 PKG_NAME=openthread
 PKG_URL=https://github.com/openthread/openthread.git
-PKG_VERSION=thread-reference-20180926
+PKG_VERSION=thread-reference-20191113
 PKG_LICENSE=BSD-3-Clause
 
 # OpenThread build system doesn't support (yet) out-of-source builds
@@ -28,6 +28,7 @@ CONFIG_FILE      = OPENTHREAD_PROJECT_CORE_CONFIG_FILE='\"platform_config.h\"'
 OPENTHREAD_COMMON_FLAGS = -fdata-sections -ffunction-sections -Os
 OPENTHREAD_COMMON_FLAGS += -Wno-implicit-fallthrough -Wno-unused-parameter
 OPENTHREAD_CXXFLAGS += -Wno-class-memaccess
+OPENTHREAD_CXXFLAGS += -DOPENTHREAD_TARGET_RIOT=1
 
 OT_LIB_DIR = $(PKG_BUILD_DIR)/output/lib
 MODULE_LIBS = mbedcrypto.a openthread-$(TD).a

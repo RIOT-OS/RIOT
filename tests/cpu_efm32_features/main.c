@@ -18,6 +18,8 @@
  * @}
  */
 
+#include <stdio.h>
+
 #include "periph/uart.h"
 
 #if EFM32_LEUART_ENABLED

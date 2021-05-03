@@ -51,7 +51,7 @@ CFLAGS += -D__ESP_FILE__=__FILE__
 
 ifneq (,$(filter esp_gdbstub,$(USEMODULE)))
   GDBSTUB_DIR ?= $(RIOTCPU)/$(CPU)/vendor/esp-gdbstub
-  CFLAGS += -DGDBSTUB_BREAK_ON_INIT=1)
+  CFLAGS += -DGDBSTUB_BREAK_ON_INIT=1
   INCLUDES += -I$(GDBSTUB_DIR)
 endif
 
@@ -61,9 +61,10 @@ endif
 
 ARCHIVES += -lgcc -lwpa -lcore -lnet80211 -lphy -lpp -lstdc++
 
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp8266.rom.ld
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp8266.riot-os.ld
-LINKFLAGS += -T$(RIOTCPU)/$(CPU)/ld/esp8266.peripherals.ld
+LINKFLAGS += -L$(RIOTCPU)/$(CPU)/ld
+LINKFLAGS += -Tesp8266.rom.ld
+LINKFLAGS += -Tesp8266.riot-os.ld
+LINKFLAGS += -Tesp8266.peripherals.ld
 
 LINKFLAGS += -Wl,-wrap=pp_attach
 LINKFLAGS += -Wl,-wrap=pm_attach

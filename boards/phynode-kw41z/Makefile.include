@@ -2,9 +2,7 @@
 PROGRAMMER ?= openocd
 
 # dap debug adapter is required for openocd
-ifeq (openocd,$(PROGRAMMER))
-  DEBUG_ADAPTER = dap
-endif
+OPENOCD_DEBUG_ADAPTER = dap
 
 # Enable direct write to FCF (required for setting FOPT byte).
 OPENOCD_PRE_FLASH_CMDS += "-c kinetis fcf_source write"

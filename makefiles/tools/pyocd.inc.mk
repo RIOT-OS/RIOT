@@ -3,7 +3,13 @@ DEBUGGER ?= $(RIOTBASE)/dist/tools/pyocd/pyocd.sh
 DEBUGSERVER ?= $(RIOTBASE)/dist/tools/pyocd/pyocd.sh
 RESET ?= $(RIOTBASE)/dist/tools/pyocd/pyocd.sh
 
-FLASH_TARGET_TYPE ?=
+# Warn about deprecated variables
+ifneq (,$(FLASH_TARGET_TYPE))
+  $(warning Warning! FLASH_TARGET_TYPE is deprecated use PYOCD_FLASH_TARGET_TYPE)
+  PYOCD_FLASH_TARGET_TYPE ?= $(FLASH_TARGET_TYPE)
+endif
+
+PYOCD_FLASH_TARGET_TYPE ?=
 FLASHFILE ?= $(HEXFILE)
 FFLAGS ?= flash $(FLASHFILE)
 DEBUGGER_FLAGS ?= debug $(ELFFILE)
@@ -12,9 +18,9 @@ RESET_FLAGS ?= reset
 
 PYOCD_TARGETS = debug% flash% reset
 
-# Export FLASH_TARGET_TYPE to required targets only if not empty
-ifneq (,$(FLASH_TARGET_TYPE))
-  $(call target-export-variables,$(PYOCD_TARGETS),FLASH_TARGET_TYPE)
+# Export PYOCD_FLASH_TARGET_TYPE to required targets only if not empty
+ifneq (,$(PYOCD_FLASH_TARGET_TYPE))
+  $(call target-export-variables,$(PYOCD_TARGETS),PYOCD_FLASH_TARGET_TYPE)
 endif
 
 # Add serial matching command, only if DEBUG_ADAPTER_ID was specified

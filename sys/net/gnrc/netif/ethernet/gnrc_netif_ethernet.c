@@ -21,6 +21,7 @@
 #include "net/ethernet/hdr.h"
 #include "net/gnrc.h"
 #include "net/gnrc/netif/ethernet.h"
+#include "net/netdev/eth.h"
 #ifdef MODULE_GNRC_IPV6
 #include "net/ipv6/hdr.h"
 #endif
@@ -169,8 +170,9 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 {
     netdev_t *dev = netif->dev;
-    int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
     gnrc_pktsnip_t *pkt = NULL;
+    netdev_eth_rx_info_t rx_info = { .flags = 0 };
+    int bytes_expected = dev->driver->recv(dev, NULL, 0, NULL);
 
     if (bytes_expected > 0) {
         pkt = gnrc_pktbuf_add(NULL, NULL,
@@ -186,7 +188,7 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             goto out;
         }
 
-        int nread = dev->driver->recv(dev, pkt->data, bytes_expected, NULL);
+        int nread = dev->driver->recv(dev, pkt->data, bytes_expected, &rx_info);
         if (nread <= 0) {
             DEBUG("gnrc_netif_ethernet: read error.\n");
             goto safe_out;
@@ -245,6 +247,9 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
         gnrc_netif_hdr_set_src_addr(netif_hdr->data, hdr->src, ETHERNET_ADDR_LEN);
         gnrc_netif_hdr_set_dst_addr(netif_hdr->data, hdr->dst, ETHERNET_ADDR_LEN);
         gnrc_netif_hdr_set_netif(netif_hdr->data, netif);
+        if (rx_info.flags & NETDEV_ETH_RX_INFO_FLAG_TIMESTAMP) {
+            gnrc_netif_hdr_set_timestamp(netif_hdr->data, rx_info.timestamp);
+        }
 
         gnrc_pktbuf_remove_snip(pkt, eth_hdr);
         pkt = gnrc_pkt_append(pkt, netif_hdr);

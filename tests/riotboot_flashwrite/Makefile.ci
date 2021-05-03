@@ -4,6 +4,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-mega2560 \
     arduino-uno \
     atmega328p \
+    atmega328p-xplained-mini \
     i-nucleo-lrwan1 \
     msb-430 \
     msb-430h \
@@ -17,6 +18,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l053r8 \
     saml10-xpro \
     saml11-xpro \
+    slstk3400a \
     stk3200 \
     stm32f0discovery \
     telosb \

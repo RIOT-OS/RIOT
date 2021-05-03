@@ -283,29 +283,15 @@ void *thread_isr_stack_start(void)
 
 void NORETURN cpu_switch_context_exit(void)
 {
-    /* enable IRQs to make sure the SVC interrupt is reachable */
+    /* enable IRQs to make sure the PENDSV interrupt is reachable */
     irq_enable();
-    /* trigger the SVC interrupt */
-    __asm__ volatile (
-        "svc    #1                            \n"
-        : /* no outputs */
-        : /* no inputs */
-        : /* no clobbers */
-    );
+
+    thread_yield_higher();
 
     UNREACHABLE();
 }
 
-void thread_yield_higher(void)
-{
-    /* trigger the PENDSV interrupt to run scheduler and schedule new thread if
-     * applicable */
-    SCB->ICSR = SCB_ICSR_PENDSVSET_Msk;
-    /* flush the pipeline. Otherwise we risk that subsequent instructions are
-     * executed before the IRQ has actually triggered */
-    __ISB();
-}
-
+#if CPU_CORE_CORTEXM_FULL_THUMB
 void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     __asm__ volatile (
     /* PendSV handler entry point */
@@ -316,26 +302,21 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
 
     /* skip context saving if sched_active_thread == NULL */
     "ldr    r1, =sched_active_thread  \n" /* r1 = &sched_active_thread  */
-#if CPU_CORE_CORTEXM_FULL_THUMB
-    "ldr    r12, [r1]                 \n" /* r12 = sched_active_thread   */
-#else
-    "ldr    r1, [r1]                  \n"
-    "mov    r12, r1                   \n" /* r12 = sched_active_thread   */
-#endif
-    "push   {lr}                      \n" /* push exception return code */
+    "push   {r4, lr}                  \n" /* push r4 and exception return code */
+    "ldr    r4, [r1]                  \n" /* r4 = sched_active_thread   */
 
     "cpsid  i                         \n" /* Disable IRQs during sched_run */
     "bl     sched_run                 \n" /* perform scheduling */
     "cpsie  i                         \n" /* Re-enable interrupts */
 
-#if CPU_CORE_CORTEXM_FULL_THUMB
-    "cmp    r0, r12                   \n" /* if r0 == 0: (no switch required) */
+    "cmp    r0, r4                    \n" /* if r0 == r1: (new thread == old
+                                               thread, no switch required) */
     "it     eq                        \n"
-    "popeq  {pc}                      \n" /* Pop exception to pc to return */
+    "popeq  {r4, pc}                  \n" /* Pop exception to pc to return */
 
-    "pop    {lr}                      \n" /* Pop exception from the exception stack */
+    "mov    r1, r4                    \n" /* save sched_active_thread in r1 */
+    "pop    {r4, lr}                  \n" /* Pop exception from the exception stack */
 
-    "mov    r1,r12                    \n" /* r1 = sched_active_thread */
     "cbz    r1, restore_context       \n" /* goto restore_context if r1 == 0 */
 
     "mrs    r2, psp                   \n" /* get stack pointer from user mode */
@@ -361,19 +342,45 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     "msr    psp, r0                   \n" /* restore user mode SP to PSP reg */
     "bx     lr                        \n" /* load exception return value to PC,
                                            * causes end of exception*/
+
+    /* return from exception mode to application mode */
+    /* {r0-r3,r12,LR,PC,xPSR,s0-s15,FPSCR} are restored automatically on exception return */
+     ".ltorg                           \n" /* literal pool needed to access
+                                            * sched_active_thread */
+     :
+     :
+     :
+    );
+}
 #else /* CPU_CORE_CORTEXM_FULL_THUMB */
+void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
+    __asm__ volatile (
+    /* PendSV handler entry point */
+    /* save context by pushing unsaved registers to the stack */
+    /* {r0-r3,r12,LR,PC,PSR} are saved automatically on exception entry */
+    ".thumb_func                      \n"
+    ".syntax unified                  \n"
+
+    /* skip context saving if sched_active_thread == NULL */
+    "ldr    r1, =sched_active_thread  \n" /* r1 = &sched_active_thread  */
+    "push   {r4,lr}                   \n" /* push r4 and exception return code */
+    "ldr    r4, [r1]                  \n" /* r4 = sched_active_thread */
+
+    "cpsid  i                         \n" /* Disable IRQs during sched_run */
+    "bl     sched_run                 \n" /* perform scheduling */
+    "cpsie  i                         \n" /* Re-enable interrupts */
 
     /* Cortex-M0, Cortex-M0+ and Cortex-M23 */
-    "cmp    r0, r12                   \n" /* if r0 == previous_thread: */
+    "cmp    r0, r4                    \n" /* if r0 == previous_thread: */
     "bne    cont_schedule             \n" /*   jump over pop if r0 != 0 */
-    "pop    {pc}                      \n" /*   Pop exception return to PC */
+    "pop    {r4,pc}                   \n" /*   Pop exception return to PC */
 
     "cont_schedule:                   \n" /* Otherwise continue the ctx switch */
 
-    "pop    {r2}                      \n" /* Pop LR from the exception stack */
+    "pop    {r1,r2}                   \n" /* Pop LR from the exception stack */
+                                          /* r1 contains r4 from the thread */
     "mov    lr, r2                    \n" /* Store LR in lr */
-    "mov    r1,r12                    \n" /* r1 = sched_active_thread */
-    "cmp    r1, #0                    \n" /* Test if r1 == NULL */
+    "cmp    r4, #0                    \n" /* Test if sched_active_thread == NULL */
     "mov    r12, sp                   \n" /* remember the exception SP in r12 */
     "beq    restore_context           \n" /* goto restore_context if r1 == NULL */
 
@@ -383,7 +390,8 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     /* Calculate the expected stack offset beforehand so that we don't have to
      * store the old SP from here on, saves a register we don't have */
     "subs   r0, #36                   \n" /* Move saved SP with 9 words */
-    "str    r0, [r1]                  \n" /* And store */
+    "str    r0, [r4]                  \n" /* And store */
+    "mov    r4, r1                    \n" /* restore r4 content */
 
     /* we can not push high registers directly, so we move R11-R8 into
      * R4-R0, as these are already saved */
@@ -414,7 +422,6 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
     "mov    sp, r12                   \n" /* and get the parked MSR SP back */
     "bx     r0                        \n" /* load exception return value to PC,
                                            * causes end of exception*/
-#endif
 
     /* return from exception mode to application mode */
     /* {r0-r3,r12,LR,PC,xPSR,s0-s15,FPSCR} are restored automatically on exception return */
@@ -425,6 +432,7 @@ void __attribute__((naked)) __attribute__((used)) isr_pendsv(void) {
      :
     );
 }
+#endif
 
 #ifdef MODULE_CORTEXM_SVC
 void __attribute__((naked)) __attribute__((used)) isr_svc(void)

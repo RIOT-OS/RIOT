@@ -35,6 +35,9 @@ endif
 ifneq (,$(filter gnrc_netif,$(USEMODULE)))
   SRC += sc_gnrc_netif.c
 endif
+ifneq (,$(filter netstats_neighbor,$(USEMODULE)))
+  SRC += sc_netstats_nb.c
+endif
 ifneq (,$(filter fib,$(USEMODULE)))
   SRC += sc_fib.c
 endif
@@ -90,6 +93,10 @@ ifneq (,$(filter openwsn,$(USEPKG)))
   SRC += sc_openwsn.c
 endif
 
+ifneq (,$(filter lwip_netif,$(USEMODULE)))
+  SRC += sc_lwip_netif.c
+endif
+
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   SRC += sc_rtc.c
 endif
@@ -114,7 +121,7 @@ ifneq (,$(filter nimble_statconn,$(USEMODULE)))
   SRC += sc_nimble_statconn.c
 endif
 
-ifneq (,$(filter suit_coap,$(USEMODULE)))
+ifneq (,$(filter suit_transport_coap,$(USEMODULE)))
   SRC += sc_suit.c
 endif
 

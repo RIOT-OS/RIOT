@@ -213,16 +213,11 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
             return opt_state(val, (dev->options & CC2420_OPT_PROMISCUOUS));
 
         case NETOPT_RX_START_IRQ:
-            return opt_state(val, (dev->options & CC2420_OPT_TELL_RX_START));
-
         case NETOPT_RX_END_IRQ:
-            return opt_state(val, (dev->options & CC2420_OPT_TELL_TX_END));
-
         case NETOPT_TX_START_IRQ:
-            return opt_state(val, (dev->options & CC2420_OPT_TELL_RX_START));
-
         case NETOPT_TX_END_IRQ:
-            return opt_state(val, (dev->options & CC2420_OPT_TELL_RX_END));
+            *((netopt_enable_t *)val) = NETOPT_ENABLE;
+            return sizeof(netopt_enable_t);
 
         default:
             return -ENOTSUP;
@@ -279,18 +274,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t val_len)
 
         case NETOPT_PROMISCUOUSMODE:
             return cc2420_set_option(dev, CC2420_OPT_PROMISCUOUS, to_bool(val));
-
-        case NETOPT_RX_START_IRQ:
-            return cc2420_set_option(dev, CC2420_OPT_TELL_RX_START, to_bool(val));
-
-        case NETOPT_RX_END_IRQ:
-            return cc2420_set_option(dev, CC2420_OPT_TELL_RX_END, to_bool(val));
-
-        case NETOPT_TX_START_IRQ:
-            return cc2420_set_option(dev, CC2420_OPT_TELL_TX_START, to_bool(val));
-
-        case NETOPT_TX_END_IRQ:
-            return cc2420_set_option(dev, CC2420_OPT_TELL_TX_END, to_bool(val));
 
         default:
             return ext;

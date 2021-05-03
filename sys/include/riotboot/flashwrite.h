@@ -206,7 +206,7 @@ int riotboot_flashwrite_flush(riotboot_flashwrite_t *state);
  * @returns     0 on success, <0 otherwise
  */
 int riotboot_flashwrite_finish_raw(riotboot_flashwrite_t *state,
-                               const uint8_t *bytes, size_t len);
+                                   const uint8_t *bytes, size_t len);
 
 /**
  * @brief   Finish a firmware update (riotboot version)
@@ -223,6 +223,32 @@ static inline int riotboot_flashwrite_finish(riotboot_flashwrite_t *state)
     return riotboot_flashwrite_finish_raw(state, (const uint8_t *)"RIOT",
                                           RIOTBOOT_FLASHWRITE_SKIPLEN);
 }
+
+/**
+ * @brief   Invalidate a slot header (riotboot version)
+ *
+ * This function invalidates the target slot.
+ *
+ * @note    If this function is called with only one valid slot,
+ *          the invalidation will fail in order to keep one valid
+ *          image to run after reboot
+ *
+ * @param[in]   slot       Target slot to invalidate
+ *
+ * @returns     0 on success, <0 otherwise
+ */
+int riotboot_flashwrite_invalidate(int slot);
+
+/**
+ * @brief   Invalidate the latest firmware version (riotboot version)
+ *
+ * This function invalidates the slot having the most recent firmware revision
+ *
+ * @note    This function requires two valid images to succeed
+ *
+ * @returns     0 on success, <0 otherwise
+ */
+int riotboot_flashwrite_invalidate_latest(void);
 
 /**
  * @brief       Get a slot's size

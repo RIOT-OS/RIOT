@@ -12,9 +12,12 @@ CURDIR=$(cd "$(dirname "$0")" && pwd)
 : "${WARNING:=1}"
 
 . "$RIOTBASE"/dist/tools/ci/changed_files.sh
-FILEREGEX='\.([CcHh]|[ch]pp)$'
-EXCLUDE='^(.+/vendor/)'
-FILES=$(FILEREGEX=${FILEREGEX} EXCLUDE=${EXCLUDE} changed_files)
+. "$RIOTBASE"/dist/tools/ci/github_annotate.sh
+# tests/pkg_utensor/models/deep_mlp_weight.hpp is an auto-generated file
+# with lots of commas so T009 takes very long. Since it is auto-generated, just
+# exclude it.
+EXCLUDE='^(.+/vendor/|dist/tools/coccinelle/include|dist/tools/fixdep/fixdep.c|dist/tools/lpc2k_pgm/src|tests/pkg_utensor/models)'
+FILES=$(changed_files)
 
 if [ -z "${FILES}" ]; then
     exit 0
@@ -27,10 +30,39 @@ fi
 
 VERA_CMD="vera++ --root $CURDIR --exclusions $CURDIR/exclude $_QUIET"
 
-if [ $WARNING -ne 0 ]; then
-    echo "$FILES" | $VERA_CMD --profile riot \
-        --parameters $CURDIR/profiles/riot_params.txt -w | sed 's/^/warning: /g'
+# sets
+# - LOG to tee output into for later parsing
+# - LOGFILE to parse GitHub annotations into
+github_annotate_setup
+
+RESULT=0    # remove if script should error
+
+echo "$FILES" | $VERA_CMD --profile riot \
+    --parameters $CURDIR/profiles/riot_params.txt -w 2>&1 | ${LOG}
+# Uncomment when the script should error
+# RESULT=${PIPESTATUS[0]}
+
+if github_annotate_is_on; then
+    _annotate() {
+        FILENAME=$(echo "${line}" | cut -d: -f1)
+        LINENUM=$(echo "${line}" | cut -d: -f2)
+        DETAILS=$(echo "${line}" | cut -d: -f3- |
+                  sed -e 's/^[ \t]*//' -e 's/[ \t]*$//')
+
+        # parse if warning (errors don't have a label)
+        if echo "$DETAILS" | grep -q "^warning: "; then
+            DETAILS=$(echo "$DETAILS" | sed 's/^warning: //')
+            github_annotate_warning "$FILENAME" "$LINENUM" "$DETAILS"
+        else
+            # errors might start with "error:" (but don't have to)
+            DETAILS=$(echo "$DETAILS" | sed 's/^error: //')
+            github_annotate_error "$FILENAME" "$LINENUM" "$DETAILS"
+        fi
+    }
+
+    github_annotate_parse_log_default _annotate
 fi
 
-echo "$FILES" | $VERA_CMD --profile riot_force \
-    --parameters $CURDIR/profiles/riot_force_params.txt -w
+github_annotate_teardown
+
+exit ${RESULT}

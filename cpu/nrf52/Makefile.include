@@ -1,7 +1,11 @@
 # Slot size is determined by "((total_flash_size - RIOTBOOT_LEN) / 2)".
 # If RIOTBOOT_LEN uses an uneven number of flashpages, the remainder of the
 # flash cannot be divided by two slots while staying FLASHPAGE_SIZE aligned.
-RIOTBOOT_LEN ?= 0x2000
+ifneq (,$(filter usbus_dfu,$(USEMODULE)))
+  RIOTBOOT_LEN ?= 0x4000
+else
+  RIOTBOOT_LEN ?= 0x2000
+endif
 
 # Export internal ROM alignment and slot sizes for bootloader support
 export MCUBOOT_IMAGE_ALIGN = 8

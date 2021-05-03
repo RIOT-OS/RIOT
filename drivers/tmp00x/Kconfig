@@ -1,9 +1,36 @@
 # Copyright (c) 2020 Freie Universitaet Berlin
+#               2021 HAW Hamburg
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
+if TEST_KCONFIG
+
+choice
+    bool "TMP006/TMP007 Infrared Thermopile sensors"
+    optional
+    depends on HAS_PERIPH_I2C
+
+config MODULE_TMP006
+    bool "TMP006"
+    select MODULE_TMP00X
+
+config MODULE_TMP007
+    bool "TMP007"
+    select MODULE_TMP00X
+
+endchoice
+
+config MODULE_TMP00X
+    bool
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+    select MODULE_XTIMER
+
+endif # TEST_KCONFIG
+
 menuconfig KCONFIG_USEMODULE_TMP00X
     bool "Configure TMP00X driver"
     depends on USEMODULE_TMP00X

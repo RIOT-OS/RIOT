@@ -1,6 +1,7 @@
 /*
  * Copyright (C) 2015 Freie Universität Berlin
  * Copyright (C) 2018 Hamburg University of Applied Sciences
+ * Copyright (C) 2020 Inria
  *
  * This file is subject to the terms and conditions of the GNU Lesser
  * General Public License v2.1. See the file LICENSE in the top level
@@ -15,9 +16,11 @@
  *
  * @author      Martine Lenders <mlenders@inf.fu-berlin.de>
  * @author      Peter Kietzmann <peter.kietzmann@haw-hamburg.de>
+ * @author      Francisco Molina <francois-xavier.molina@inria.fr>
  * @}
  */
 
+#include <errno.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -25,30 +28,61 @@
 
 #include "ztimer.h"
 #include "net/ipv6.h"
+#include "net/sock/udp.h"
+#ifdef SOCK_HAS_ASYNC
+#include "net/sock/async.h"
+#endif
+#include "od.h"
 
 #include "opendefs.h"
-#include "scheduler.h"
 #include "02a-MAClow/IEEE802154E.h"
 #include "03b-IPv6/icmpv6rpl.h"
-#include "04-TRAN/udp.h"
-#include "cross-layers/openqueue.h"
+
 #include "cross-layers/idmanager.h"
 #include "cross-layers/packetfunctions.h"
 
-extern udp_resource_desc_t uinject_vars;
 extern idmanager_vars_t idmanager_vars;
-extern openudp_vars_t openudp_vars;
 
-static uint16_t counter = 0;
+static sock_udp_t _sock_udp;
 
-OpenQueueEntry_t *pkt;
+void _sock_udp_handler(sock_udp_t *sock, sock_async_flags_t type, void *arg)
+{
+    if (type & SOCK_ASYNC_MSG_RECV) {
+        char buf[50];
+        sock_udp_ep_t remote;
+        int16_t res;
 
-void push_pkt_cb(void){
-    owerror_t ret = openudp_send(pkt);
-    if (ret == E_FAIL) {
-        puts("could not send");
-        openqueue_freePacketBuffer(pkt);
+        if ((res = sock_udp_recv(sock, buf, sizeof(buf), 0, &remote)) >= 0) {
+            printf("Received %i bytes on port %i\n", res, remote.port);
+            od_hex_dump(buf, res, OD_WIDTH_DEFAULT);
+        }
     }
+
+    if (type & SOCK_ASYNC_MSG_SENT) {
+        if (*((uint8_t *)arg) == E_FAIL) {
+            puts("Failed to Send");
+        }
+        else {
+            puts("Send Success");
+        }
+    }
+}
+
+void udp_cli_init(void)
+{
+    memset(&_sock_udp, 0, sizeof(sock_udp_t));
+    sock_udp_ep_t local;
+
+    local.family = AF_INET6;
+    local.netif = SOCK_ADDR_ANY_NETIF;
+    local.port = WKP_UDP_ECHO;
+
+    if (sock_udp_create(&_sock_udp, &local, NULL, 0) < 0) {
+        puts("Could not create socket");
+        return;
+    }
+
+    sock_udp_set_cb(&_sock_udp, _sock_udp_handler, NULL);
 }
 
 static int udp_send(char *addr_str, char *port_str, char *data,
@@ -59,7 +93,6 @@ static int udp_send(char *addr_str, char *port_str, char *data,
     ipv6_addr_t addr;
 
     data_len = strlen(data);
-    uint8_t asnArray[data_len];
 
     /* parse destination address */
     if (ipv6_addr_from_str(&addr, addr_str) == NULL) {
@@ -70,58 +103,45 @@ static int udp_send(char *addr_str, char *port_str, char *data,
     for (unsigned int i = 0; i < num; i++) {
 
         printf("Send %u byte over UDP to [%s]:%s\n",
-                (unsigned)data_len, addr_str, port_str);
+               (unsigned)data_len, addr_str, port_str);
 
         /* don't run if not in synch */
         if (ieee154e_isSynch() == FALSE) {
-            puts("Error: Node not in sync, exit");
+            puts("Error: node is not synchronized, exit");
             return 1;
         }
 
         /* don't run on dagroot */
         if (idmanager_getIsDAGroot()) {
-            puts("Error: Node is DAGROOT, exit");
+            puts("Error: node is DAGROOT, exit");
             return 1;
         }
 
         bool foundNeighbor = icmpv6rpl_getPreferredParentEui64(&parentNeighbor);
-        if (foundNeighbor==FALSE) {
-            puts("Error: No preferred parent EUI64, exit");
+        if (foundNeighbor == FALSE) {
+            puts("Error: no preferred parent EUI64, exit");
             return 1;
         }
 
-        /* get a free packet buffer */
-        pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);
-        if (pkt == NULL) {
-            puts("Error: could not create packet buffer, exit");
-            return 1;
+        sock_udp_ep_t remote;
+        remote.family = AF_INET6;
+        remote.netif = SOCK_ADDR_ANY_NETIF;
+        remote.port = atoi(port_str);
+        memcpy(&remote.addr.ipv6[0], &addr.u8[0], sizeof(addr.u8));
+
+        int res = sock_udp_send(&_sock_udp, data, data_len, &remote);
+        if (res == -EINVAL) {
+            puts("Error: EINVAL");
         }
-
-        pkt->owner = COMPONENT_UINJECT;
-        pkt->creator = COMPONENT_UINJECT;
-        pkt->l4_protocol = IANA_UDP;
-        pkt->l4_destination_port = atoi(port_str);
-        pkt->l4_sourcePortORicmpv6Type = uinject_vars.port;
-        pkt->l3_destinationAdd.type = ADDR_128B;
-        memcpy(&pkt->l3_destinationAdd.addr_128b[0], (void *)&addr, 16);
-        /* add payload */
-        packetfunctions_reserveHeader(&pkt, data_len);
-        memcpy(&pkt->payload[0], data, data_len);
-
-        packetfunctions_reserveHeader(&pkt, sizeof(uint16_t));
-        pkt->payload[1] = (uint8_t)((counter & 0xff00) >> 8);
-        pkt->payload[0] = (uint8_t)(counter & 0x00ff);
-        counter++;
-
-        packetfunctions_reserveHeader(&pkt, sizeof(asn_t));
-        ieee154e_getAsn(asnArray);
-        pkt->payload[0] = asnArray[0];
-        pkt->payload[1] = asnArray[1];
-        pkt->payload[2] = asnArray[2];
-        pkt->payload[3] = asnArray[3];
-        pkt->payload[4] = asnArray[4];
-
-        scheduler_push_task(push_pkt_cb, TASKPRIO_COAP);
+        else if (res == -EAFNOSUPPORT) {
+            puts("Error: EAFNOSUPPORT");
+        }
+        else if (res == -ENOMEM) {
+            puts("Error: ENOMEM");
+        }
+        else if (res == -ENOBUFS) {
+            puts("Error: ENOBUFS");
+        }
 
         ztimer_sleep(ZTIMER_USEC, delay);
     }
@@ -140,12 +160,13 @@ int udp_cmd(int argc, char **argv)
         uint32_t delay = 1000000LU;
         /* don't send as root */
         if (idmanager_vars.isDAGroot) {
-            puts("Error: Node is root, exit");
+            puts("Error: node is root, exit");
             return 1;
         }
         if (argc < 5) {
-            printf("usage: %s send <addr> <port> <hex data> [<num> [<delay in us>]]\n",
-                   argv[0]);
+            printf(
+                "Usage: %s send <addr> <port> <hex data> [<num> [<delay in us>]]\n",
+                argv[0]);
             return 1;
         }
         if (argc > 5) {
@@ -158,35 +179,33 @@ int udp_cmd(int argc, char **argv)
     }
     else if (strcmp(argv[1], "server") == 0) {
         if (argc < 3) {
-            printf("usage: %s server [start|list]\n", argv[0]);
+            printf("Usage: %s server [start|show]\n", argv[0]);
             return 1;
         }
         if (strcmp(argv[2], "start") == 0) {
             if (argc < 4) {
-                printf("usage %s server start <port>\n", argv[0]);
+                printf("Usage %s server start <port>\n", argv[0]);
                 return 1;
             }
             uint16_t port = atoi(argv[3]);
-            uinject_vars.port = port;
+            sock_udp_ep_t local;
+            sock_udp_get_local(&_sock_udp, &local);
+            local.port = port;
             printf("Set UDP server port to %" PRIu16 "\n", port);
             return 0;
         }
-        else if (strcmp(argv[2], "list") == 0) {
-            udp_resource_desc_t* resource = openudp_vars.resources;
-            printf("Open UDP Ports: ");
-            while (NULL != resource) {
-                printf("%i ", resource->port);
-                resource = resource->next;
-            }
-            puts("");
+        else if (strcmp(argv[2], "show") == 0) {
+            sock_udp_ep_t local;
+            sock_udp_get_local(&_sock_udp, &local);
+            printf("Udp port: %i\n", local.port);
         }
         else {
-            puts("error: invalid command");
+            puts("Error: invalid command");
             return 1;
         }
     }
     else {
-        puts("error: invalid command");
+        puts("Error: invalid command");
         return 1;
     }
 

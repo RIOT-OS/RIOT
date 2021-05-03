@@ -21,7 +21,7 @@
 #define BOARD_H
 
 #include "cpu.h"
-#include "at24mac.h"
+#include "mtd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,6 +34,7 @@ extern "C" {
 #define AT24MAC_PARAM_I2C_DEV   I2C_DEV(1)
 #define AT24MAC_PARAM_I2C_ADDR  (0x5E)
 #define AT24MAC_PARAM_TYPE      AT24MAC4XX
+#define AT24CXXX_PARAM_I2C      I2C_DEV(1)
 #define AT24CXXX_PARAM_ADDR     (0x56)
 /** @} */
 
@@ -42,22 +43,6 @@ extern "C" {
  * @{
  */
 #define ATCA_PARAM_I2C           I2C_DEV(1)
-/** @} */
-
-/**
- * @brief    AT24Mac provides a EUI-48
- */
-static inline int _at24mac_get_eui48(const void *arg, eui48_t *addr)
-{
-    return at24mac_get_eui48((uintptr_t)arg, addr);
-}
-
-/**
- * @name    EUI-48 sources on the board
- *          AT24Mac is present on the board
- * @{
- */
-#define EUI48_PROVIDER_FUNC   _at24mac_get_eui48
 /** @} */
 
 /**
@@ -81,6 +66,16 @@ static inline int _at24mac_get_eui48(const void *arg, eui48_t *addr)
 #define BTN0_PORT           PORT->Group[PB]
 #define BTN0_PIN            GPIO_PIN(PB, 31)
 #define BTN0_MODE           GPIO_IN_PU
+/** @} */
+
+/**
+ * @name MTD configuration
+ * @{
+ */
+extern mtd_dev_t *mtd0, *mtd1;
+#define MTD_0       mtd0
+#define MTD_1       mtd1
+#define MTD_NUMOF   2
 /** @} */
 
 /**

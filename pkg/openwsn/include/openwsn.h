@@ -34,6 +34,15 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Default NID for OpenWSN network
+ *
+ * @note Only one netif is currently possible in OpenWSN.
+ */
+#ifndef  CONFIG_OPENWSN_NETIF_ID
+#define  CONFIG_OPENWSN_NETIF_ID  (0x0001)
+#endif
+
+/**
  * @brief   Initializes OpenWSN thread
  *
  * @return  PID of OpenWSN thread

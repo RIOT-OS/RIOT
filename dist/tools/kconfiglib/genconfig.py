@@ -33,6 +33,7 @@ import logging
 import os
 import sys
 
+from riot_kconfig import RiotKconfig
 import kconfiglib
 
 
@@ -293,8 +294,10 @@ def get_sym_applying_range(sym):
         (low, high, cond) = rng
         # get the first active one
         if kconfiglib.expr_value(cond):
-            return (low.str_value, high.str_value,
-                    "(if {})".format(cond.name) if not cond.is_constant else "")
+            cond_str = ""
+            if cond is not sym.kconfig.y:
+                cond_str = "if {}".format(kconfiglib.expr_str(cond))
+            return (low.str_value, high.str_value, cond_str)
     return None
 
 
@@ -384,7 +387,7 @@ with error.""")
     logging.basicConfig(format='[genconfig.py]:%(levelname)s-%(message)s',
                         level=log_level)
 
-    kconf = kconfiglib.Kconfig(args.kconfig_filename, warn_to_stderr=False)
+    kconf = RiotKconfig(args.kconfig_filename, warn_to_stderr=False)
     merge_configs(kconf, args.config_sources)
 
     # HACK: Force all symbols to be evaluated, to catch warnings generated

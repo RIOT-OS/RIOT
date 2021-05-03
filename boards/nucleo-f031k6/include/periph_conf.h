@@ -21,7 +21,7 @@
 #define PERIPH_CONF_H
 
 #include "periph_cpu.h"
-#include "f0/cfg_clock_default.h"
+#include "clk_conf.h"
 #include "cfg_timer_tim2.h"
 
 #ifdef __cplusplus

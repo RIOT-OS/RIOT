@@ -130,7 +130,7 @@ extern "C"
 #define PCA9685_RESOLUTION      (1 << 12)
 
 /**
- * @brief   Internal PCA9685 oscilator frequency is 25 MHz
+ * @brief   Internal PCA9685 oscillator frequency is 25 MHz
  */
 #define PCA9685_OSC_FREQ        (25000000)
 

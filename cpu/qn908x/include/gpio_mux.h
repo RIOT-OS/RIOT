@@ -57,6 +57,16 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Return whether the given pin is a CSHW pin.
+ */
+#define GPIO_T_IS_HWCS(pin) (((pin) & 0xff00u) == 0x8000)
+
+/**
+ * @brief   Return the given CSHW number from the gpio_t pin.
+ */
+#define GPIO_T_HWCS(pin) ((pin) & 0x0003u)
+
+/**
  * @brief Configure the pin mux to the given function.
  *
  * The meaning of the function value will depend on the gpio pin.

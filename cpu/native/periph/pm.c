@@ -36,7 +36,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-void pm_set_lowest(void)
+static void _native_sleep(void)
 {
     _native_in_syscall++; /* no switching here */
     real_pause();
@@ -45,6 +45,20 @@ void pm_set_lowest(void)
     if (_native_sigpend > 0) {
         _native_in_syscall++;
         _native_syscall_leave();
+    }
+}
+
+#if !defined(MODULE_PM_LAYERED)
+void pm_set_lowest(void)
+{
+    _native_sleep();
+}
+#endif
+
+void pm_set(unsigned mode)
+{
+    if (mode == 0) {
+        _native_sleep();
     }
 }
 

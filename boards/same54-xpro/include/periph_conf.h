@@ -251,7 +251,25 @@ static const spi_conf_t spi_config[] = {
         .tx_trigger = SERCOM6_DMAC_ID_TX,
         .rx_trigger = SERCOM6_DMAC_ID_RX,
 #endif
-    }
+    },
+#ifdef MODULE_PERIPH_SPI_ON_QSPI
+    {    /* QSPI in SPI mode */
+        .dev      = QSPI,
+        .miso_pin = SAM0_QSPI_PIN_DATA_1,
+        .mosi_pin = SAM0_QSPI_PIN_DATA_0,
+        .clk_pin  = SAM0_QSPI_PIN_CLK,
+        .miso_mux = SAM0_QSPI_MUX,
+        .mosi_mux = SAM0_QSPI_MUX,
+        .clk_mux  = SAM0_QSPI_MUX,
+        .miso_pad = SPI_PAD_MISO_0,         /* unused */
+        .mosi_pad = SPI_PAD_MOSI_0_SCK_1,   /* unused */
+        .gclk_src = SAM0_GCLK_MAIN,         /* unused */
+#ifdef MODULE_PERIPH_DMA
+        .tx_trigger = QSPI_DMAC_ID_TX,
+        .rx_trigger = QSPI_DMAC_ID_RX,
+#endif
+    },
+#endif
 };
 
 #define SPI_NUMOF           ARRAY_SIZE(spi_config)
@@ -342,6 +360,28 @@ static const adc_conf_chan_t adc_channels[] = {
                             /* Internal reference only gives 1V */
 #define DAC_VREF            DAC_CTRLB_REFSEL_VREFPU
 /** @} */
+
+/**
+ * @name Ethernet peripheral configuration
+ * @{
+ */
+static const sam0_common_gmac_config_t sam_gmac_config[] = {
+    {
+        .dev = GMAC,
+        .refclk = GPIO_PIN(PA, 14),
+        .txen = GPIO_PIN(PA, 17),
+        .txd0 = GPIO_PIN(PA, 18),
+        .txd1 = GPIO_PIN(PA, 19),
+        .crsdv = GPIO_PIN(PC, 20),
+        .rxd0 = GPIO_PIN(PA, 13),
+        .rxd1 = GPIO_PIN(PA, 12),
+        .rxer = GPIO_PIN(PA, 15),
+        .mdc = GPIO_PIN(PC, 11),
+        .mdio = GPIO_PIN(PC, 12),
+        .rst_pin = GPIO_PIN(PC, 21),
+        .int_pin = GPIO_PIN(PD, 12),
+    }
+};
 
 #ifdef __cplusplus
 }

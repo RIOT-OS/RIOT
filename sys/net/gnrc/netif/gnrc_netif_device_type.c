@@ -116,6 +116,9 @@ void gnrc_netif_init_6ln(gnrc_netif_t *netif)
 #ifdef MODULE_ESP_NOW
         case NETDEV_TYPE_ESP_NOW:
 #endif
+#ifdef MODULE_NRF24L01P_NG
+        case NETDEV_TYPE_NRF24L01P_NG:
+#endif
         case NETDEV_TYPE_NRFMIN:
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
             netif->flags |= GNRC_NETIF_FLAGS_6LN;
@@ -136,10 +139,12 @@ void gnrc_netif_ipv6_init_mtu(gnrc_netif_t *netif)
     switch (netif->device_type) {
 #if defined(MODULE_NETDEV_IEEE802154) || defined(MODULE_NRFMIN) || \
     defined(MODULE_XBEE) || defined(MODULE_ESP_NOW) || \
-    defined(MODULE_GNRC_SIXLOENC) || defined(MODULE_CC110X)
+    defined(MODULE_GNRC_SIXLOENC) || defined(MODULE_CC110X) || \
+    defined(MODULE_NRF24L01P_NG)
         case NETDEV_TYPE_IEEE802154:
         case NETDEV_TYPE_NRFMIN:
         case NETDEV_TYPE_CC110X:
+        case NETDEV_TYPE_NRF24L01P_NG:
 #ifdef MODULE_GNRC_SIXLOWPAN_IPHC
             netif->flags |= GNRC_NETIF_FLAGS_6LO_HC;
 #endif

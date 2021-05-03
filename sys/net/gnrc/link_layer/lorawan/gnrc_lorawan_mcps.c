@@ -40,7 +40,7 @@ static int gnrc_lorawan_mic_is_valid(uint8_t *buf, size_t len, uint8_t *nwkskey)
 
     lorawan_hdr_t *lw_hdr = (lorawan_hdr_t *)buf;
 
-    uint32_t fcnt = byteorder_ntohs(byteorder_ltobs(lw_hdr->fcnt));
+    uint32_t fcnt = byteorder_ltohs(lw_hdr->fcnt);
     iolist_t iol =
     { .iol_base = buf, .iol_len = len - MIC_SIZE, .iol_next = NULL };
 
@@ -53,7 +53,7 @@ uint32_t gnrc_lorawan_fcnt_stol(uint32_t fcnt_down, uint16_t s_fcnt)
 {
     uint32_t u32_fcnt = (fcnt_down & _16_UPPER_BITMASK) | s_fcnt;
 
-    if (fcnt_down + LORAMAC_DEFAULT_MAX_FCNT_GAP >= _16_LOWER_BITMASK
+    if (fcnt_down + CONFIG_LORAMAC_DEFAULT_MAX_FCNT_GAP >= _16_LOWER_BITMASK
         && s_fcnt < (fcnt_down & _16_LOWER_BITMASK)) {
         u32_fcnt += _16_LOWER_BITMASK;
     }
@@ -95,7 +95,7 @@ int gnrc_lorawan_parse_dl(gnrc_lorawan_t *mac, uint8_t *buf, size_t len,
         gnrc_lorawan_fcnt_stol(mac->mcps.fcnt_down, _hdr->fcnt.u16);
 
     if (mac->mcps.fcnt_down > _fcnt || mac->mcps.fcnt_down +
-        LORAMAC_DEFAULT_MAX_FCNT_GAP < _fcnt) {
+        CONFIG_LORAMAC_DEFAULT_MAX_FCNT_GAP < _fcnt) {
         DEBUG("gnrc_lorawan: wrong frame counter\n");
         return -1;
     }
@@ -165,8 +165,8 @@ void gnrc_lorawan_mcps_process_downlink(gnrc_lorawan_t *mac, uint8_t *psdu,
             fopts = &_pkt.enc_payload;
         }
         gnrc_lorawan_encrypt_payload(&_pkt.enc_payload, &_pkt.hdr->addr,
-                                     byteorder_ntohs(byteorder_ltobs(
-                                                         _pkt.hdr->fcnt)), GNRC_LORAWAN_DIR_DOWNLINK,
+                                     byteorder_ltohs(_pkt.hdr->fcnt),
+                                     GNRC_LORAWAN_DIR_DOWNLINK,
                                      key);
     }
 
@@ -221,7 +221,7 @@ size_t gnrc_lorawan_build_hdr(uint8_t mtype, le_uint32_t *dev_addr,
     lorawan_hdr_set_ack(lw_hdr, ack);
     lorawan_hdr_set_frame_opts_len(lw_hdr, fopts_length);
 
-    lw_hdr->fcnt = byteorder_btols(byteorder_htons(fcnt));
+    lw_hdr->fcnt = byteorder_htols(fcnt);
 
     buf->index += sizeof(lorawan_hdr_t);
 
@@ -248,7 +248,7 @@ size_t gnrc_lorawan_build_uplink(gnrc_lorawan_t *mac, iolist_t *payload,
 
     lorawan_hdr_set_ack(lw_hdr, mac->mcps.ack_requested);
 
-    lw_hdr->fcnt = byteorder_btols(byteorder_htons(mac->mcps.fcnt));
+    lw_hdr->fcnt = byteorder_htols(mac->mcps.fcnt);
 
     buf.index += sizeof(lorawan_hdr_t);
 
@@ -415,7 +415,7 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
     mac->mcps.waiting_for_ack = waiting_for_ack;
     mac->mcps.ack_requested = false;
 
-    mac->mcps.nb_trials = LORAMAC_DEFAULT_RETX;
+    mac->mcps.nb_trials = CONFIG_LORAMAC_DEFAULT_RETX;
 
     mac->mcps.msdu = pkt;
     mac->last_dr = mcps_request->data.dr;

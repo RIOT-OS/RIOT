@@ -7,7 +7,7 @@
 
 menuconfig MODULE_SAUL
     bool "[S]ensor [A]ctuator [U]ber [L]ayer"
-    depends on MODULE_PHYDAT
+    select MODULE_PHYDAT
     depends on TEST_KCONFIG
     help
         SAUL is a generic actuator/sensor interface in RIOT. Its purpose is to

@@ -288,7 +288,7 @@
  lower the stack footprint.
 
   - `openwsn_cjoin`: this enabled the use of Constrained Join Protocol (CoJP)
-  - `openwsn_6lo_frag`: this enable 6LoWPAN fragmentation
+  - `openwsn_6lo_fragmentation`: this enable 6LoWPAN fragmentation
   - `openwsn_iee802154e_security`: enable link layer security
   - `openwsn_adaptive_msf`: allow the MSF algorithm to dynamically remove and
     allocate slots

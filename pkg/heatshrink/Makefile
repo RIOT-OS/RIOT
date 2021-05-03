@@ -6,4 +6,4 @@ PKG_LICENSE=ISC-License
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(CURDIR)/Makefile.heatshrink
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(CURDIR)/Makefile.heatshrink

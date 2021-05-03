@@ -4,7 +4,7 @@ include $(RIOTCPU)/efm32/efm32-features.mk
 CPU_CORE = $(EFM32_ARCHITECTURE)
 
 # families without MPU
-ifeq (,$(filter efm32zg, $(CPU_FAM)))
+ifeq (,$(filter efm32zg efm32hg, $(CPU_FAM)))
   FEATURES_PROVIDED += cortexm_mpu
 endif
 
@@ -13,6 +13,8 @@ FEATURES_PROVIDED += periph_cpuid
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_flashpage_pagewise
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
+FEATURES_PROVIDED += periph_rtt_set_counter
+FEATURES_PROVIDED += periph_rtt_overflow
 FEATURES_PROVIDED += periph_wdt
 
 FEATURES_CONFLICT += periph_rtc:periph_rtt

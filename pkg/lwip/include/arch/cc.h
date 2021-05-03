@@ -58,7 +58,7 @@ extern "C" {
 #define S32_F   PRId32
 #define X32_F   PRIx32
 
-#define SZT_F   "lu"
+#define SZT_F   PRIuPTR
 /** @} */
 
 /**

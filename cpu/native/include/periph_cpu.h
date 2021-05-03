@@ -32,6 +32,18 @@ extern "C" {
 #define CPUID_LEN           (4U)
 #endif
 
+/**
+ * @name    Power mode configuration
+ */
+#ifndef PM_NUM_MODES
+#define PM_NUM_MODES        (1U)
+#endif
+
+/**
+ * @brief   We provide our own pm_off() function for the native CPU
+ */
+#define PROVIDES_PM_LAYERED_OFF
+
 /* GPIO configuration only if the module is available (=Linux) */
 #if defined(MODULE_PERIPH_GPIO_LINUX) || defined(DOXYGEN)
 #include <linux/gpio.h>

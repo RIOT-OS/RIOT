@@ -66,6 +66,7 @@
  *              how to put / how to encode the IPv(4/6) address AND the port of
  *              a gateway in the GwAdd field of the GWINFO message
  * @todo        QOS level 2
+ * @todo        QOS level -1
  * @todo        put the node to sleep (send DISCONNECT with duration field set)
  * @todo        handle DISCONNECT messages initiated by the broker/gateway
  * @todo        support for pre-defined and short topic IDs

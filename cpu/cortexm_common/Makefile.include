@@ -70,8 +70,12 @@ else
 endif
 
 # Configure riotboot bootloader and slot lengths
-# 4KB are currently enough
-RIOTBOOT_LEN ?= 0x1000
+# 4KB are currently enough, set it to 16KB if USB-DFU is used
+ifneq (,$(filter usbus_dfu,$(USEMODULE)))
+  RIOTBOOT_LEN ?= 0x4000
+else
+  RIOTBOOT_LEN ?= 0x1000
+endif
 # Currently 2 slots are supported by default, equals in length
 NUM_SLOTS ?= 2
 # Take the whole flash minus RIOTBOOT_LEN and divide it by NUM_SLOTS
@@ -79,3 +83,6 @@ SLOT0_LEN ?= $(shell printf "0x%x" $$((($(ROM_LEN:%K=%*1024)-$(RIOTBOOT_LEN)) / 
 SLOT1_LEN ?= $(SLOT0_LEN)
 SLOT0_LEN := $(SLOT0_LEN)
 SLOT1_LEN := $(SLOT1_LEN)
+
+# JLink is able to flash any ARM CPUs
+PROGRAMMERS_SUPPORTED += jlink

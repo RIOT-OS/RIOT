@@ -28,7 +28,7 @@ SLOT_RIOT_BINS = $(SLOT0_RIOT_BIN) $(SLOT1_RIOT_BIN)
 # This results in the equivalent to "make flash-only" for
 # "make riotboot/flash-slot[01]".
 ifneq (1, $(RIOTBOOT_SKIP_COMPILE))
-$(BINDIR_APP)-%.elf: $(BASELIBS)
+$(BINDIR_APP)-%.elf: $(BASELIBS) $(ARCHIVES)
 	$(Q)$(_LINK) -o $@
 endif
 
@@ -76,11 +76,12 @@ riotboot: $(SLOT_RIOT_BINS)
 
 # riotboot bootloader compile target
 riotboot/flash-bootloader: riotboot/bootloader/flash
-riotboot/bootloader/%:
+riotboot/bootloader/%: $(BUILDDEPS) pkg-prepare
 	$(Q)/usr/bin/env -i \
 		QUIET=$(QUIET) PATH="$(PATH)"\
 		EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" BOARD=$(BOARD)\
-		DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID)\
+		DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID) \
+		PROGRAMMER=$(PROGRAMMER) PROGRAMMER_QUIET=$(PROGRAMMER_QUIET) \
 			$(MAKE) --no-print-directory -C $(RIOTBOOT_DIR) $*
 
 # Generate a binary file from the bootloader which fills all the
@@ -123,12 +124,14 @@ riotboot/flash-extended-slot0: $(RIOTBOOT_EXTENDED_BIN) $(FLASHDEPS)
 	$(flash-recipe)
 
 # Flashing rule for slot 0
+riotboot/flash-slot0: DFU_ALT=0
 riotboot/flash-slot0: export IMAGE_OFFSET=$(SLOT0_OFFSET)
 riotboot/flash-slot0: FLASHFILE=$(SLOT0_RIOT_BIN)
 riotboot/flash-slot0: $(SLOT0_RIOT_BIN) $(FLASHDEPS)
 	$(flash-recipe)
 
 # Flashing rule for slot 1
+riotboot/flash-slot1: DFU_ALT=1
 riotboot/flash-slot1: export IMAGE_OFFSET=$(SLOT1_OFFSET)
 riotboot/flash-slot1: FLASHFILE=$(SLOT1_RIOT_BIN)
 riotboot/flash-slot1: $(SLOT1_RIOT_BIN) $(FLASHDEPS)

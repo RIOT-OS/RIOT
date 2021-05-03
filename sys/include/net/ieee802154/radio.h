@@ -29,8 +29,10 @@ extern "C" {
 #include <stdbool.h>
 #include "iolist.h"
 #include "sys/uio.h"
+#include "bitarithm.h"
 #include "byteorder.h"
 #include "net/eui64.h"
+#include "net/ieee802154.h"
 
 extern uint16_t request_counter;
 extern uint16_t confirm_counter;
@@ -62,7 +64,7 @@ typedef enum {
      * @note it's implicit that a radio supports @ref
      * IEEE802154_CAP_AUTO_CSMA if this cap is available
      */
-    IEEE802154_CAP_FRAME_RETRANS,
+    IEEE802154_CAP_FRAME_RETRANS        = BIT0,
     /**
      * @brief the device supports Auto CSMA-CA
      *
@@ -72,7 +74,7 @@ typedef enum {
      * ieee802154_radio_ops::confirm_transmit. If it fails, the device reports
      * @ref TX_STATUS_MEDIUM_BUSY.
      */
-    IEEE802154_CAP_AUTO_CSMA,
+    IEEE802154_CAP_AUTO_CSMA            = BIT1,
     /**
      * @brief the device support ACK timeout interrupt
      *
@@ -84,44 +86,83 @@ typedef enum {
      *
      * The ACK frame is not indicated to the upper layer.
      */
-    IEEE802154_CAP_IRQ_ACK_TIMEOUT,
+    IEEE802154_CAP_IRQ_ACK_TIMEOUT      = BIT2,
     /**
      * @brief the device supports the IEEE802.15.4 2.4 GHz band
      *
      * It's assumed that @ref IEEE802154_CAP_IRQ_TX_DONE is present.
      */
-    IEEE802154_CAP_24_GHZ,
+    IEEE802154_CAP_24_GHZ               = BIT3,
     /**
      * @brief the device support the IEEE802.15.4 Sub GHz band
      */
-    IEEE802154_CAP_SUB_GHZ,
+    IEEE802154_CAP_SUB_GHZ              = BIT4,
+    /**
+     * @brief the device reports reception off frames with invalid CRC.
+     */
+    IEEE802154_CAP_IRQ_CRC_ERROR        = BIT5,
     /**
      * @brief the device reports when the transmission is done
      */
-    IEEE802154_CAP_IRQ_TX_DONE,
+    IEEE802154_CAP_IRQ_TX_DONE          = BIT6,
     /**
      * @brief the device reports the start of a frame (SFD) when received.
      */
-    IEEE802154_CAP_IRQ_RX_START,
+    IEEE802154_CAP_IRQ_RX_START         = BIT7,
     /**
      * @brief the device reports the start of a frame (SFD) was sent.
      */
-    IEEE802154_CAP_IRQ_TX_START,
+    IEEE802154_CAP_IRQ_TX_START         = BIT8,
     /**
      * @brief the device reports the end of the CCA procedure
      */
-    IEEE802154_CAP_IRQ_CCA_DONE,
+    IEEE802154_CAP_IRQ_CCA_DONE         = BIT9,
     /**
      * @brief the device provides the number of retransmissions
      *
      * It's assumed that @ref IEEE802154_CAP_FRAME_RETRANS is present.
      */
-    IEEE802154_CAP_FRAME_RETRANS_INFO,
+    IEEE802154_CAP_FRAME_RETRANS_INFO   = BIT10,
     /**
      * @brief the device retains all register values when off.
      */
-    IEEE802154_CAP_REG_RETENTION,
+    IEEE802154_CAP_REG_RETENTION        = BIT11,
+    /**
+     * @brief Binary Phase Shift Keying PHY mode
+     */
+    IEEE802154_CAP_PHY_BPSK             = BIT12,
+    /**
+     * @brief Amplitude-Shift Keying PHY mode
+     */
+    IEEE802154_CAP_PHY_ASK              = BIT13,
+    /**
+     * @brief Offset Quadrature Phase-Shift Keying
+     */
+    IEEE802154_CAP_PHY_OQPSK            = BIT14,
+    /**
+     * @brief Multi-Rate Offset Quadrature Phase-Shift Keying PHY mode
+     */
+    IEEE802154_CAP_PHY_MR_OQPSK         = BIT15,
+    /**
+     * @brief Multi-Rate Orthogonal Frequency-Division Multiplexing PHY mode
+     */
+    IEEE802154_CAP_PHY_MR_OFDM          = BIT16,
+    /**
+     * @brief Multi-Rate Frequency Shift Keying PHY mode
+     */
+    IEEE802154_CAP_PHY_MR_FSK           = BIT17,
 } ieee802154_rf_caps_t;
+
+/**
+ * @brief Bit-mask for PHY modes capabilities.
+ */
+#define IEEE802154_RF_CAPS_PHY_MASK \
+    (IEEE802154_CAP_PHY_BPSK        \
+    | IEEE802154_CAP_PHY_ASK        \
+    | IEEE802154_CAP_PHY_OQPSK      \
+    | IEEE802154_CAP_PHY_MR_OQPSK   \
+    | IEEE802154_CAP_PHY_MR_OFDM    \
+    | IEEE802154_CAP_PHY_MR_FSK)    \
 
 /**
  * @brief Transmission status
@@ -192,6 +233,18 @@ typedef enum {
      * This event is present if radio has @ref IEEE802154_CAP_IRQ_RX_START cap.
      */
     IEEE802154_RADIO_INDICATION_RX_START,
+
+    /**
+     * @brief the transceiver received a frame with an invalid crc.
+     *
+     * The transceiver might not stay in @ref IEEE802154_TRX_STATE_RX_ON
+     * after receiving an invalid CRC. Therefore the upper layer must
+     * set the transceiver state (@ref ieee802154_radio_ops::request_set_trx_state).
+     * e.g.: @ref IEEE802154_TRX_STATE_TRX_OFF or @ref IEEE802154_TRX_STATE_TX_ON
+     * to stop listening or @ref IEEE802154_TRX_STATE_RX_ON to keep
+     * listening.
+     */
+    IEEE802154_RADIO_INDICATION_CRC_ERROR,
 
     /**
      * @brief the transceiver sent out a valid SFD
@@ -360,15 +413,24 @@ typedef enum {
  * @brief Holder of the PHY configuration
  */
 typedef struct {
-    uint16_t channel;   /**< IEEE802.15.4 channel number */
-    uint8_t page;       /**< IEEE802.15.4 channel page */
-    int8_t pow;         /**< TX power in dBm */
+    ieee802154_phy_mode_t phy_mode; /**< IEEE802.15.4 PHY mode */
+    uint16_t channel;               /**< IEEE802.15.4 channel number */
+    uint8_t page;                   /**< IEEE802.15.4 channel page */
+    int8_t pow;                     /**< TX power in dBm */
 } ieee802154_phy_conf_t;
 
 /**
  * @brief Radio ops struct declaration
  */
 struct ieee802154_radio_ops {
+    /**
+     * @brief Radio device capabilities
+     *
+     * This field contains bitflags of supported capabilities
+     * (@ref ieee802154_rf_caps_t) by the device.
+     */
+    const uint32_t caps;
+
     /**
      * @brief Write a frame into the framebuffer.
      *
@@ -588,17 +650,6 @@ struct ieee802154_radio_ops {
      * @return negative errno on error
      */
     int (*confirm_cca)(ieee802154_dev_t *dev);
-
-    /**
-     * @brief Get a cap from the radio
-     *
-     * @param[in] dev IEEE802.15.4 device descriptor
-     * @param cap cap to be checked
-     *
-     * @return true if the radio supports the cap
-     * @return false otherwise
-     */
-    bool (*get_cap)(ieee802154_dev_t *dev, ieee802154_rf_caps_t cap);
 
     /**
      * @brief Set the threshold for the Energy Detection (first mode of CCA)
@@ -985,8 +1036,8 @@ static inline int ieee802154_radio_confirm_cca(ieee802154_dev_t *dev)
 /**
  * @brief Check if the device supports ACK timeout
  *
- * Internally this function calls ieee802154_radio_ops::get_cap with @ref
- * IEEE802154_CAP_IRQ_ACK_TIMEOUT.
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_IRQ_ACK_TIMEOUT.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -995,14 +1046,14 @@ static inline int ieee802154_radio_confirm_cca(ieee802154_dev_t *dev)
  */
 static inline bool ieee802154_radio_has_irq_ack_timeout(ieee802154_dev_t *dev)
 {
-    return dev->driver->get_cap(dev, IEEE802154_CAP_IRQ_ACK_TIMEOUT);
+    return (dev->driver->caps & IEEE802154_CAP_IRQ_ACK_TIMEOUT);
 }
 
 /**
  * @brief Check if the device supports frame retransmissions (with CSMA-CA).
  *
- * Internally this function calls ieee802154_radio_ops::get_cap with @ref
- * IEEE802154_CAP_FRAME_RETRANS.
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_FRAME_RETRANS.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1011,14 +1062,14 @@ static inline bool ieee802154_radio_has_irq_ack_timeout(ieee802154_dev_t *dev)
  */
 static inline bool ieee802154_radio_has_frame_retrans(ieee802154_dev_t *dev)
 {
-    return dev->driver->get_cap(dev, IEEE802154_CAP_FRAME_RETRANS);
+    return (dev->driver->caps & IEEE802154_CAP_FRAME_RETRANS);
 }
 
 /**
  * @brief Check if the device supports Auto CSMA-CA for transmissions.
  *
- * Internally this function calls ieee802154_radio_ops::get_cap with @ref
- * IEEE802154_CAP_AUTO_CSMA.
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_AUTO_CSMA.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1027,14 +1078,14 @@ static inline bool ieee802154_radio_has_frame_retrans(ieee802154_dev_t *dev)
  */
 static inline bool ieee802154_radio_has_auto_csma(ieee802154_dev_t *dev)
 {
-    return dev->driver->get_cap(dev, IEEE802154_CAP_AUTO_CSMA);
+    return (dev->driver->caps & IEEE802154_CAP_AUTO_CSMA);
 }
 
 /**
  * @brief Check if the device supports the IEEE802.15.4 Sub-GHz band
  *
- * Internally this function calls ieee802154_radio_ops::get_cap with @ref
- * IEEE802154_CAP_SUB_GHZ.
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_SUB_GHZ.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1043,14 +1094,14 @@ static inline bool ieee802154_radio_has_auto_csma(ieee802154_dev_t *dev)
  */
 static inline bool ieee802154_radio_has_sub_ghz(ieee802154_dev_t *dev)
 {
-    return dev->driver->get_cap(dev, IEEE802154_CAP_SUB_GHZ);
+    return (dev->driver->caps & IEEE802154_CAP_SUB_GHZ);
 }
 
 /**
  * @brief Check if the device supports the IEEE802.15.4 2.4 GHz band
  *
- * Internally this function calls ieee802154_radio_ops::get_cap with @ref
- * IEEE802154_CAP_24_GHZ.
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_24_GHZ.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1059,14 +1110,14 @@ static inline bool ieee802154_radio_has_sub_ghz(ieee802154_dev_t *dev)
  */
 static inline bool ieee802154_radio_has_24_ghz(ieee802154_dev_t *dev)
 {
-    return dev->driver->get_cap(dev, IEEE802154_CAP_24_GHZ);
+    return (dev->driver->caps & IEEE802154_CAP_24_GHZ);
 }
 
 /**
  * @brief Check if the device supports TX done interrupt
  *
- * Internally this function calls ieee802154_radio_ops::get_cap with @ref
- * IEEE802154_CAP_IRQ_TX_DONE.
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_IRQ_TX_DONE.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1075,14 +1126,14 @@ static inline bool ieee802154_radio_has_24_ghz(ieee802154_dev_t *dev)
  */
 static inline bool ieee802154_radio_has_irq_tx_done(ieee802154_dev_t *dev)
 {
-    return dev->driver->get_cap(dev, IEEE802154_CAP_IRQ_TX_DONE);
+    return (dev->driver->caps & IEEE802154_CAP_IRQ_TX_DONE);
 }
 
 /**
  * @brief Check if the device supports RX start interrupt
  *
- * Internally this function calls ieee802154_radio_ops::get_cap with @ref
- * IEEE802154_CAP_IRQ_RX_START.
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_IRQ_RX_START.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1091,14 +1142,14 @@ static inline bool ieee802154_radio_has_irq_tx_done(ieee802154_dev_t *dev)
  */
 static inline bool ieee802154_radio_has_irq_rx_start(ieee802154_dev_t *dev)
 {
-    return dev->driver->get_cap(dev, IEEE802154_CAP_IRQ_RX_START);
+    return (dev->driver->caps & IEEE802154_CAP_IRQ_RX_START);
 }
 
 /**
  * @brief Check if the device supports TX start interrupt
  *
- * Internally this function calls ieee802154_radio_ops::get_cap with @ref
- * IEEE802154_CAP_IRQ_TX_START.
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_IRQ_TX_START.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1107,13 +1158,13 @@ static inline bool ieee802154_radio_has_irq_rx_start(ieee802154_dev_t *dev)
  */
 static inline bool ieee802154_radio_has_irq_tx_start(ieee802154_dev_t *dev)
 {
-    return dev->driver->get_cap(dev, IEEE802154_CAP_IRQ_TX_START);
+    return (dev->driver->caps & IEEE802154_CAP_IRQ_TX_START);
 }
 
 /**
  * @brief Check if the device supports CCA done interrupt
  *
- * Internally this function calls ieee802154_radio_ops::get_cap with @ref
+ * Internally this function reads ieee802154_radio_ops::caps with @ref
  * IEEE802154_CAP_IRQ_CCA_DONE.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
@@ -1123,15 +1174,15 @@ static inline bool ieee802154_radio_has_irq_tx_start(ieee802154_dev_t *dev)
  */
 static inline bool ieee802154_radio_has_irq_cca_done(ieee802154_dev_t *dev)
 {
-    return dev->driver->get_cap(dev, IEEE802154_CAP_IRQ_CCA_DONE);
+    return (dev->driver->caps & IEEE802154_CAP_IRQ_CCA_DONE);
 }
 
 /**
  * @brief Check if the device reports the number of retransmissions of the last
  * TX procedure.
  *
- * Internally this function calls ieee802154_radio_ops::get_cap with @ref
- * IEEE802154_CAP_FRAME_RETRANS_INFO.
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_FRAME_RETRANS_INFO.
  *
  * @param[in] dev IEEE802.15.4 device descriptor
  *
@@ -1141,7 +1192,118 @@ static inline bool ieee802154_radio_has_irq_cca_done(ieee802154_dev_t *dev)
 static inline bool ieee802154_radio_has_frame_retrans_info(
     ieee802154_dev_t *dev)
 {
-    return dev->driver->get_cap(dev, IEEE802154_CAP_FRAME_RETRANS_INFO);
+    return (dev->driver->caps & IEEE802154_CAP_FRAME_RETRANS_INFO);
+}
+
+/**
+ * @brief Check if the device supports the BPSK PHY mode.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_PHY_BPSK.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_phy_bpsk(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_PHY_BPSK);
+}
+
+/**
+ * @brief Check if the device supports the ASK PHY mode.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_PHY_ASK.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_phy_ask(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_PHY_ASK);
+}
+
+/**
+ * @brief Check if the device supports the O-QPSK PHY mode.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_PHY_OQPSK.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_phy_oqpsk(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_PHY_OQPSK);
+}
+
+/**
+ * @brief Check if the device supports the MR-O-QPSK PHY mode.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_PHY_MR_OQPSK.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_phy_mr_oqpsk(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_PHY_MR_OQPSK);
+}
+
+/**
+ * @brief Check if the device supports the MR-OFDM PHY mode.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_PHY_MR_OFDM.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_phy_mr_ofdm(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_PHY_MR_OFDM);
+}
+
+/**
+ * @brief Check if the device supports the MR-FSK PHY mode.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and checks for
+ * @ref IEEE802154_CAP_PHY_MR_FSK.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return true if the device has support
+ * @return false otherwise
+ */
+static inline bool ieee802154_radio_has_phy_mr_fsk(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_CAP_PHY_MR_FSK);
+}
+
+/**
+ * @brief Get supported PHY modes of the device.
+ *
+ * Internally this function reads ieee802154_radio_ops::caps and returns only
+ * the bits from  @ref IEEE802154_RF_CAPS_PHY_MASK.
+ *
+ * @param[in] dev IEEE802.15.4 device descriptor
+ *
+ * @return PHY modes bit mask.
+ */
+static inline uint32_t ieee802154_radio_get_phy_modes(ieee802154_dev_t *dev)
+{
+    return (dev->driver->caps & IEEE802154_RF_CAPS_PHY_MASK);
 }
 
 /**
@@ -1156,6 +1318,75 @@ static inline int ieee802154_radio_set_rx_mode(ieee802154_dev_t *dev,
                                                ieee802154_rx_mode_t mode)
 {
     return dev->driver->set_rx_mode(dev, mode);
+}
+
+/**
+ * @brief Convert a @ref ieee802154_phy_mode_t to a @ref ieee802154_rf_caps_t
+ * value.
+ *
+ * @param[in] phy_mode PHY mode
+ *
+ * @return Equivalent capability given the PHY mode.
+ * @return 0 on invalid values
+ * @return 0 when @ref IEEE802154_PHY_DISABLED is given as the parameter.
+ */
+static inline uint32_t ieee802154_phy_mode_to_cap(
+    ieee802154_phy_mode_t phy_mode)
+{
+    switch (phy_mode) {
+        case IEEE802154_PHY_BPSK:
+            return IEEE802154_CAP_PHY_BPSK;
+        case IEEE802154_PHY_ASK:
+            return IEEE802154_CAP_PHY_ASK;
+        case IEEE802154_PHY_OQPSK:
+            return IEEE802154_CAP_PHY_OQPSK;
+        case IEEE802154_PHY_MR_OQPSK:
+            return IEEE802154_CAP_PHY_MR_OQPSK;
+        case IEEE802154_PHY_MR_OFDM:
+            return IEEE802154_CAP_PHY_MR_OFDM;
+        case IEEE802154_PHY_MR_FSK:
+            return IEEE802154_CAP_PHY_MR_FSK;
+
+        case IEEE802154_PHY_DISABLED:
+        default:
+            break;
+    }
+
+    return 0;
+}
+
+/**
+ * @brief Convert a @ref ieee802154_rf_caps_t to a @ref ieee802154_phy_mode_t
+ * value.
+ *
+ * @note The @p parameter must be one of the PHY capabilities.
+ *
+ * @param[in] cap The IEEE 802.15.4 capability.
+ *
+ * @return Equivalent phy mode given the capability.
+ * @return 0 on invalid values
+ */
+static inline ieee802154_phy_mode_t ieee802154_cap_to_phy_mode(uint32_t cap)
+{
+    switch (cap) {
+        case IEEE802154_CAP_PHY_BPSK:
+            return IEEE802154_PHY_BPSK;
+        case IEEE802154_CAP_PHY_ASK:
+            return IEEE802154_PHY_ASK;
+        case IEEE802154_CAP_PHY_OQPSK:
+            return IEEE802154_PHY_OQPSK;
+        case IEEE802154_CAP_PHY_MR_OQPSK:
+            return IEEE802154_PHY_MR_OQPSK;
+        case IEEE802154_PHY_MR_OFDM:
+            return IEEE802154_PHY_MR_OFDM;
+        case IEEE802154_CAP_PHY_MR_FSK:
+            return IEEE802154_PHY_MR_FSK;
+
+        default:
+            break;
+    }
+
+    return IEEE802154_PHY_DISABLED;
 }
 
 #ifdef __cplusplus

@@ -1,9 +1,36 @@
 # Copyright (c) 2020 Freie Universitaet Berlin
+#               2021 HAW Hamburg
 #
 # This file is subject to the terms and conditions of the GNU Lesser
 # General Public License v2.1. See the file LICENSE in the top level
 # directory for more details.
 #
+
+if TEST_KCONFIG && HAS_PERIPH_GPIO && HAS_PERIPH_GPIO_IRQ
+
+menu "PN532 NFC reader"
+
+config MODULE_PN532_I2C
+    bool "PN532 with I2C support"
+    depends on HAS_PERIPH_I2C
+    select MODULE_PERIPH_I2C
+    select MODULE_PN532
+
+config MODULE_PN532_SPI
+    bool "PN532 with SPI support"
+    depends on HAS_PERIPH_SPI
+    select MODULE_PERIPH_SPI
+    select MODULE_PN532
+
+config MODULE_PN532
+    bool
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+
+endmenu # PN532 NFC reader
+
+endif # TEST_KCONFIG && HAS_PERIPH_GPIO && HAS_PERIPH_GPIO_IRQ
+
 menuconfig KCONFIG_USEMODULE_PN532
     bool "Configure PN532 driver"
     depends on USEMODULE_PN532

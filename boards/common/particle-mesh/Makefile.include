@@ -2,12 +2,10 @@
 BOARD_NRFANTENNA_DEFAULT ?= BUILTIN
 CFLAGS += -DBOARD_NRFANTENNA_DEFAULT=BOARD_NRFANTENNA_$(BOARD_NRFANTENNA_DEFAULT)
 
-# set default port depending on operating system
-PORT_LINUX ?= /dev/ttyUSB0
-PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.SLAB_USBtoUART*)))
-
 # add the common header files to the include path
 INCLUDES += -I$(RIOTBOARD)/common/particle-mesh/include
+
+PROGRAMMERS_SUPPORTED += dfu-util pyocd
 
 ifeq (1,$(PARTICLE_MONOFIRMWARE))
   CFLAGS += -DPARTICLE_MONOFIRMWARE
@@ -21,19 +19,19 @@ ifeq (1,$(PARTICLE_MONOFIRMWARE))
   # then again nothing can be done in that case anyway, and the preflash
   # routines fall through without erring.
   include $(RIOTMAKE)/tools/usb_board_reset.mk
+
+  # Only dfu-util is supported in this case
+  PROGRAMMERS_SUPPORTED = dfu-util
 else
   # This board uses a DAP-Link programmer
   # Flashing support is provided through pyocd (default) and openocd.
   # For openocd, a version built against the development branch and containing
   # the support for nrf52 cpu is required.
   PROGRAMMER ?= pyocd
-  ifeq (pyocd,$(PROGRAMMER))
-    # The board is not recognized automatically by pyocd, so the CPU target
-    # option is passed explicitly
-    FLASH_TARGET_TYPE ?= -t nrf52840
-  else ifeq (openocd,$(PROGRAMMER))
-    DEBUG_ADAPTER ?= dap
-  endif
+  # The board is not recognized automatically by pyocd, so the CPU target
+  # option is passed explicitly
+  PYOCD_FLASH_TARGET_TYPE ?= -t nrf52840
+  OPENOCD_DEBUG_ADAPTER ?= dap
 endif
 
 MONOFIRMWARETOOL = ${RIOTBOARD}/common/particle-mesh/monofirmware-tool.py

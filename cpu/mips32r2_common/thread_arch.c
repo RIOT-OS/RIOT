@@ -141,18 +141,6 @@ void cpu_switch_context_exit(void)
     UNREACHABLE();
 }
 
-void thread_yield_higher(void)
-{
-    /*
-     * throw a syscall exception to get into exception level
-     * we context switch at exception level.
-     *
-     * Note syscall 1 is reserved for UHI see:
-     * http://wiki.prplfoundation.org/w/images/4/42/UHI_Reference_Manual.pdf
-     */
-    __asm volatile ("syscall 2");
-}
-
 struct linkctx* exctx_find(reg_t id, struct gpctx *gp)
 {
     struct linkctx **ctx = (struct linkctx **)&gp->link;

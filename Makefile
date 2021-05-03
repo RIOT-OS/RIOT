@@ -38,7 +38,9 @@ welcome:
 	@echo ""
 	@echo "Please see our Quick Start Guide at:"
 	@echo "    https://doc.riot-os.org/getting-started.html"
-	@echo "Or ask questions on our mailing list:"
+	@echo "You can ask questions on our forum:"
+	@echo "    https://forum.riot-os.org"
+	@echo "Or discuss with other users on the mailing list:"
 	@echo "    users@riot-os.org (http://lists.riot-os.org/mailman/listinfo/users)"
 
 print-versions:

@@ -37,6 +37,7 @@ int main(void)
     CALL(od_hex_dump(long_str, sizeof(long_str), 4));
     CALL(od_hex_dump(long_str, sizeof(long_str), 3));
     CALL(od_hex_dump(long_str, sizeof(long_str), 8));
+    CALL(od_hex_dump_ext(long_str, sizeof(long_str), 8, 0x100));
 
     return 0;
 }

@@ -79,12 +79,6 @@ uint32_t rtt_get_counter(void)
     return DEV->COUNTER;
 }
 
-void rtt_set_counter(uint32_t counter)
-{
-    (void) counter;
-    /* not supported by the nRF5x */
-}
-
 void rtt_set_alarm(uint32_t alarm, rtt_cb_t cb, void *arg)
 {
     alarm_cb = cb;

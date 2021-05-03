@@ -11,24 +11,4 @@ else ifeq ($(CPU_MODEL), fe310_g002)
   ROM_LEN ?= 0x0006a120
 endif
 
-# All variables must be defined in the CPU configuration when using the common
-# `ldscripts/fe310.ld`
-ifneq (,$(ROM_START_ADDR)$(RAM_START_ADDR)$(ROM_LEN)$(RAM_LEN))
-  $(if $(ROM_START_ADDR),,$(error ROM_START_ADDR is not defined))
-  $(if $(RAM_START_ADDR),,$(error RAM_START_ADDR is not defined))
-  $(if $(ROM_LEN),,$(error ROM_LEN is not defined))
-  $(if $(RAM_LEN),,$(error RAM_LEN is not defined))
-  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_start_addr=$(ROM_START_ADDR)
-  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_start_addr=$(RAM_START_ADDR)
-  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_rom_length=$(ROM_LEN)
-  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_ram_length=$(RAM_LEN)
-endif
-
-ifneq (,$(ITIM_START_ADDR))
-  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_itim_start_addr=$(ITIM_START_ADDR)
-  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_itim_length=$(ITIM_LEN)
-endif
-
-LINKER_SCRIPT ?= fe310.ld
-
-include $(RIOTMAKE)/arch/riscv.inc.mk
+include $(RIOTCPU)/riscv_common/Makefile.include

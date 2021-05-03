@@ -45,6 +45,12 @@ void netdev_ieee802154_reset(netdev_ieee802154_t *dev)
     /* Initialize PAN ID and call netdev::set to propagate it */
     dev->pan = CONFIG_IEEE802154_DEFAULT_PANID;
     dev->netdev.driver->set(&dev->netdev, NETOPT_NID, &dev->pan, sizeof(dev->pan));
+
+#if IS_USED(MODULE_IEEE802154_SECURITY)
+    ieee802154_sec_init(&dev->sec_ctx);
+    const netopt_enable_t e = NETOPT_ENABLE;
+    netdev_ieee802154_set(dev, NETOPT_ENCRYPTION, &e, sizeof(e));
+#endif
 }
 
 static inline uint16_t _get_ieee802154_pdu(netdev_ieee802154_t *dev)
@@ -115,6 +121,18 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
             *((uint16_t *)value) = (uint16_t)dev->chan;
             res = sizeof(dev->chan);
             break;
+#if IS_USED(MODULE_IEEE802154_SECURITY)
+        case NETOPT_ENCRYPTION:
+            assert(max_len == sizeof(netopt_enable_t));
+            if (dev->flags & NETDEV_IEEE802154_SECURITY_EN) {
+                *((netopt_enable_t *)value) = NETOPT_ENABLE;
+            }
+            else {
+                *((netopt_enable_t *)value) = NETOPT_DISABLE;
+            }
+            res = sizeof(netopt_enable_t);
+            break;
+#endif /* IS_USED(MODULE_IEEE802154_SECURITY) */
         case NETOPT_ACK_REQ:
             assert(max_len == sizeof(netopt_enable_t));
             if (dev->flags & NETDEV_IEEE802154_ACK_REQ) {
@@ -159,6 +177,9 @@ int netdev_ieee802154_get(netdev_ieee802154_t *dev, netopt_t opt, void *value,
 
             *((uint16_t *)value) = (_get_ieee802154_pdu(dev)
                                     - IEEE802154_MAX_HDR_LEN)
+#if IS_USED(MODULE_IEEE802154_SECURITY)
+                                    -IEEE802154_MAX_AUX_HDR_LEN
+#endif /* IS_USED(MODULE_IEEE802154_SECURITY) */
                                     - IEEE802154_FCS_LEN;
             res = sizeof(uint16_t);
             break;
@@ -219,6 +240,28 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
             dev->pan = *((uint16_t *)value);
             res = sizeof(dev->pan);
             break;
+#if IS_USED(MODULE_IEEE802154_SECURITY)
+        case NETOPT_ENCRYPTION:
+            assert(len == sizeof(netopt_enable_t));
+            if ((*(bool *)value)) {
+                dev->flags |= NETDEV_IEEE802154_SECURITY_EN;
+            }
+            else {
+                dev->flags &= ~NETDEV_IEEE802154_SECURITY_EN;
+            }
+            res = sizeof(netopt_enable_t);
+            break;
+        case NETOPT_ENCRYPTION_KEY:
+            assert(len >= IEEE802154_SEC_KEY_LENGTH);
+            if (memcmp(dev->sec_ctx.cipher.context.context, value, len)) {
+                /* If the key changes, the frame conter can be reset to 0*/
+                dev->sec_ctx.frame_counter = 0;
+            }
+            memcpy(dev->sec_ctx.cipher.context.context, value,
+                   IEEE802154_SEC_KEY_LENGTH);
+            res = IEEE802154_SEC_KEY_LENGTH;
+            break;
+#endif /* IS_USED(MODULE_IEEE802154_SECURITY) */
         case NETOPT_ACK_REQ:
             if ((*(bool *)value)) {
                 dev->flags |= NETDEV_IEEE802154_ACK_REQ;
@@ -283,5 +326,4 @@ int netdev_ieee802154_dst_filter(netdev_ieee802154_t *dev, const uint8_t *mhr)
 
     return 1;
 }
-
 /** @} */

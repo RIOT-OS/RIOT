@@ -7,12 +7,17 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-uno \
     atmega1284p \
     atmega328p \
+    atmega328p-xplained-mini \
+    atxmega-a1u-xpro \
+    atxmega-a3bu-xplained \
     b-l072z-lrwan1 \
     blackpill \
     blackpill-128kib \
     bluepill \
     bluepill-128kib \
+    bluepill-stm32f030c8 \
     calliope-mini \
+    cc1350-launchpad \
     cc2650-launchpad \
     cc2650stk \
     derfmega128 \
@@ -46,8 +51,10 @@ BOARD_INSUFFICIENT_MEMORY := \
     nucleo-l073rz \
     olimexino-stm32 \
     opencm904 \
+    samd10-xmini \
     saml10-xpro \
     saml11-xpro \
+    slstk3400a \
     spark-core \
     stk3200 \
     stm32f030f4-demo \
@@ -58,4 +65,5 @@ BOARD_INSUFFICIENT_MEMORY := \
     waspmote-pro \
     yunjia-nrf51822 \
     z1 \
+    zigduino \
     #

@@ -185,7 +185,28 @@ static const eth_conf_t eth_config = {
 };
 
 #define ETH_DMA_ISR        isr_dma2_stream0
+/** @} */
 
+/**
+ * @name   ADC configuration
+ *
+ * Note that we do not configure all ADC channels,
+ * and not in the STM32F767ZI order.  Instead, we
+ * just define 6 ADC channels, for the Nucleo
+ * Arduino header pins A0-A5
+ *
+ * @{
+ */
+static const adc_conf_t adc_config[] = {
+        {GPIO_PIN(PORT_A, 3), 0, 0},
+        {GPIO_PIN(PORT_C, 0), 0, 1},
+        {GPIO_PIN(PORT_C, 3), 0, 4},
+        {GPIO_PIN(PORT_F, 3), 0, 8},
+        {GPIO_PIN(PORT_F, 5), 0, 11},
+        {GPIO_PIN(PORT_F, 10), 0, 10},
+};
+
+#define ADC_NUMOF           ARRAY_SIZE(adc_config)
 /** @} */
 
 #ifdef __cplusplus

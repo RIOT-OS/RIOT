@@ -16,3 +16,9 @@ config BOARD_F4VI1
     # Put defined MCU peripherals here (in alphabetical order)
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
+
+    # Clock configuration
+    select BOARD_HAS_HSE
+    select BOARD_HAS_LSE
+
+source "$(RIOTBOARD)/common/stm32/Kconfig"

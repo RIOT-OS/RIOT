@@ -75,13 +75,13 @@ void sys_sem_free(sys_sem_t *sem)
 
 void sys_sem_signal(sys_sem_t *sem)
 {
-    LWIP_ASSERT("invalid semaphor", sys_sem_valid(sem));
+    LWIP_ASSERT("invalid semaphore", sys_sem_valid(sem));
     sema_post((sema_t *)sem);
 }
 
 u32_t sys_arch_sem_wait(sys_sem_t *sem, u32_t count)
 {
-    LWIP_ASSERT("invalid semaphor", sys_sem_valid(sem));
+    LWIP_ASSERT("invalid semaphore", sys_sem_valid(sem));
     if (count != 0) {
         uint64_t stop, start;
         start = xtimer_now_usec64();

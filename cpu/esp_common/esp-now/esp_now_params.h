@@ -103,10 +103,10 @@
  */
 typedef struct
 {
-    uint8_t* key;         /**< key of type uint8_t [16] or NULL (no encryption) */
-    uint32_t scan_period; /**< Period at which the node scans for other nodes */
-    char*    softap_pass; /**< Passphrase used for the SoftAP interface */
-    uint8_t  channel;     /**< Channel used for ESP-NOW nodes */
+    const uint8_t* key;      /**< key of type uint8_t [16] or NULL (no encryption) */
+    uint32_t scan_period;    /**< Period at which the node scans for other nodes */
+    const char* softap_pass; /**< Passphrase used for the SoftAP interface */
+    uint8_t channel;         /**< Channel used for ESP-NOW nodes */
 
 } esp_now_params_t;
 

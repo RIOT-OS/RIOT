@@ -44,19 +44,19 @@ void progress_bar_print(char *prefix, char *suffix, uint8_t value)
         printf("%s", prefix);
     }
 
-    printf(PROGRESS_BAR_PREFIX_CHARACTER);
+    printf(CONFIG_PROGRESS_BAR_PREFIX_CHARACTER);
 
     /* Fully reprint the progress bar */
-    for (unsigned i = 0; i < PROGRESS_BAR_LENGTH; ++i) {
-        if (100 * i < (uint16_t)(value * PROGRESS_BAR_LENGTH)) {
-            printf(PROGRESS_BAR_FULL_CHARACTER);
+    for (unsigned i = 0; i < CONFIG_PROGRESS_BAR_LENGTH; ++i) {
+        if (100 * i < (uint16_t)(value * CONFIG_PROGRESS_BAR_LENGTH)) {
+            printf(CONFIG_PROGRESS_BAR_FULL_CHARACTER);
         }
         else {
-            printf(PROGRESS_BAR_EMPTY_CHARACTER);
+            printf(CONFIG_PROGRESS_BAR_EMPTY_CHARACTER);
         }
     }
 
-    printf(PROGRESS_BAR_SUFFIX_CHARACTER);
+    printf(CONFIG_PROGRESS_BAR_SUFFIX_CHARACTER);
 
     /* Display progress bar suffix if any */
     if (suffix) {

@@ -25,14 +25,9 @@
 
 #include "irq.h"
 #include "mutex.h"
+#include "rmutex.h"
 #include "thread.h"
 #include "ztimer.h"
-
-typedef struct {
-    mutex_t *mutex;
-    thread_t *thread;
-    int timeout;
-} mutex_thread_t;
 
 static void _callback_unlock_mutex(void *arg)
 {
@@ -162,4 +157,43 @@ void ztimer_set_wakeup(ztimer_clock_t *clock, ztimer_t *timer, uint32_t offset,
     timer->arg = (void *)((intptr_t)pid);
 
     ztimer_set(clock, timer, offset);
+}
+
+static void timeout_cb(void *arg)
+{
+    mutex_cancel(arg);
+}
+
+int ztimer_mutex_lock_timeout(ztimer_clock_t *clock, mutex_t *mutex,
+                              uint32_t timeout)
+{
+    if (mutex_trylock(mutex)) {
+        return 0;
+    }
+
+    mutex_cancel_t mc = mutex_cancel_init(mutex);
+    ztimer_t t = { .callback = timeout_cb, .arg = &mc };
+
+    ztimer_set(clock, &t, timeout);
+    if (mutex_lock_cancelable(&mc)) {
+        return -ECANCELED;
+    }
+
+    ztimer_remove(clock, &t);
+    return 0;
+}
+
+int ztimer_rmutex_lock_timeout(ztimer_clock_t *clock, rmutex_t *rmutex,
+                               uint32_t timeout)
+{
+    if (rmutex_trylock(rmutex)) {
+        return 0;
+    }
+    if (ztimer_mutex_lock_timeout(clock, &rmutex->mutex, timeout) == 0) {
+        atomic_store_explicit(&rmutex->owner,
+                              thread_getpid(), memory_order_relaxed);
+        rmutex->refcount++;
+        return 0;
+    }
+    return -ECANCELED;
 }

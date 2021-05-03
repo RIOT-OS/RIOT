@@ -135,8 +135,8 @@ DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
     uint32_t sector_size = fatfs_mtd_devs[pdrv]->page_size
                          * fatfs_mtd_devs[pdrv]->pages_per_sector;
 
-    res = mtd_write_page(fatfs_mtd_devs[pdrv], buff,
-                         sector, 0, count * sector_size);
+    res = mtd_write_page_raw(fatfs_mtd_devs[pdrv], buff,
+                             sector, 0, count * sector_size);
 
     if (res != 0) {
         return RES_ERROR;

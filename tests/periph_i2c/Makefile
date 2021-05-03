@@ -5,6 +5,8 @@ FEATURES_REQUIRED = periph_i2c
 FEATURES_OPTIONAL = periph_i2c_reconfigure
 
 USEMODULE += shell
+USEMODULE += shell_commands
+USEMODULE += i2c_scan
 USEMODULE += xtimer
 
 # avoid running Kconfig by default

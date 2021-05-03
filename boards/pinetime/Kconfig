@@ -14,5 +14,6 @@ config BOARD_PINETIME
     select CPU_MODEL_NRF52832XXAA
     select HAS_PERIPH_I2C
     select HAS_PERIPH_SPI
+    select HAS_VDD_LC_FILTER_REG1
 
 source "$(RIOTBOARD)/common/nrf52/Kconfig"

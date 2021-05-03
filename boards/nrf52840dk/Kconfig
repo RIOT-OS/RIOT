@@ -14,5 +14,6 @@ config BOARD_NRF52840DK
     select CPU_MODEL_NRF52840XXAA
     select HAS_PERIPH_PWM
     select HAS_PERIPH_USBDEV
+    select HAS_VDD_LC_FILTER_REG0
 
 source "$(RIOTBOARD)/common/nrf52xxxdk/Kconfig"

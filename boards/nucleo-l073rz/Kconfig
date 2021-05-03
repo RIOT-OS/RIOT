@@ -32,7 +32,4 @@ config BOARD_NUCLEO_L073RZ
     # introduced after Jun 8, 2017 - v0.10.0-1-20170607-2132-dev.
     select HAS_RIOTBOOT
 
-    # Clock configuration
-    select BOARD_HAS_LSE
-
 source "$(RIOTBOARD)/common/nucleo64/Kconfig"

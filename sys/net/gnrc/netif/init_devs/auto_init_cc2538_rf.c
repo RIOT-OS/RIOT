@@ -19,6 +19,7 @@
 
 #include "log.h"
 #include "net/gnrc/netif/ieee802154.h"
+#include "include/init_devs.h"
 
 #include "cc2538_rf.h"
 
@@ -26,7 +27,7 @@
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define CC2538_MAC_STACKSIZE       (THREAD_STACKSIZE_DEFAULT)
+#define CC2538_MAC_STACKSIZE       (IEEE802154_STACKSIZE_DEFAULT)
 #ifndef CC2538_MAC_PRIO
 #define CC2538_MAC_PRIO            (GNRC_NETIF_PRIO)
 #endif

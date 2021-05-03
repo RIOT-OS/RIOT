@@ -5,3 +5,6 @@ CPU_MODEL = stm32f415rg
 # Put defined MCU peripherals here (in alphabetical order)
 FEATURES_PROVIDED += periph_timer
 FEATURES_PROVIDED += periph_uart
+
+# f4vi1 provides a custom default Kconfig clock configuration
+KCONFIG_ADD_CONFIG += $(RIOTBOARD)/f4vi1/clock.config

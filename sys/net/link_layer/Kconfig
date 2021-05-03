@@ -7,3 +7,4 @@
 rsource "csma_sender/Kconfig"
 rsource "ieee802154/Kconfig"
 rsource "l2filter/Kconfig"
+rsource "Kconfig.lorawan"

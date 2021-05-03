@@ -105,6 +105,7 @@ SECTIONS
     *(.sdata2.*)
     *(.gnu.linkonce.s2.*)
     *(.jcr)
+    KEEP (*(SORT(.xfa.*)))
     _data_end = ABSOLUTE(.);
   } >dram0_0_seg :dram0_0_phdr
 
@@ -139,6 +140,7 @@ SECTIONS
     KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
     KEEP (*(SORT(.dtors.*)))
     KEEP (*(.dtors))
+    KEEP (*(SORT(.roxfa.*)))
     /*  C++ exception handlers table:  */
     __XT_EXCEPTION_DESCS__ = ABSOLUTE(.);
     *(.xt_except_desc)

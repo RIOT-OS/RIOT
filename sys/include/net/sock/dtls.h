@@ -30,15 +30,26 @@
  * - Server operation
  *   1. Create UDP sock @ref sock_udp_create()
  *   2. Create DTLS sock @ref sock_dtls_create() using role
- *      @ref SOCK_DTLS_SERVER
- *   3. Start listening with @ref sock_dtls_recv()
+ *      @ref SOCK_DTLS_SERVER.
+ *   3. Optionally:
+ *          - when using PSK ciphersuites, set a hint @ref sock_dtls_set_server_psk_id_hint()
+ *          - add extra credentials @ref sock_dtls_add_credential()
+ *          - when using ECC ciphersuites, set a callback for credential selection
+ *            @ref sock_dtls_set_rpk_cb()
+ *   4. Start listening with @ref sock_dtls_recv()
  * - Client operation
  *   1. Create UDP sock @ref sock_udp_create()
  *   2. Create DTLS sock @ref sock_dtls_create() using role
  *      @ref SOCK_DTLS_CLIENT
- *   3. Start handshake session to server @ref sock_dtls_session_init()
- *   4. Handle incoming handshake packets with @ref sock_dtls_recv()
- *   4. Send packet to server @ref sock_dtls_send()
+ *   3. Optionally:
+ *          - add extra credentials @ref sock_dtls_add_credential()
+ *          - when using PSK ciphersuites, set a callback for hint reception and credential
+ *            selection @ref sock_dtls_set_client_psk_cb()
+ *          - when using ECC ciphersuites, set a callback for credential selection
+ *            @ref sock_dtls_set_rpk_cb()
+ *   4. Start handshake session to server @ref sock_dtls_session_init()
+ *   5. Handle incoming handshake packets with @ref sock_dtls_recv()
+ *   6. Send packet to server @ref sock_dtls_send()
  *
  * ## Makefile Includes
  *
@@ -156,10 +167,10 @@
  * [type](@ref credman_credential_t::type).
  *
  * Next, we must assign a [tag](@ref credman_tag_t) for the credential. Tags
- * are unsigned integer value that is used to identify which DTLS sock has
- * access to which credential. Each DTLS sock will also be assigned a tag.
+ * are unsigned integer values used to identify which DTLS sock has
+ * access to which credentials. Each DTLS sock will also be assigned a list of tags.
  * As a result, a sock can only use credentials that have the same tag as
- * its assigned tag.
+ * the ones in the list.
  *
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.c}
  * if (credman_add(&psk_credential) < 0) {
@@ -468,6 +479,34 @@
  * return 0;
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
+ * ### Multi-credential handling
+ *
+ * Each sock needs at least one credential tag to operate. `sock_dtls_create` allows to optionally
+ * assign an initial credential. Extra credentials can be added and removed using
+ * @ref sock_dtls_add_credential and @ref sock_dtls_remove_credential respectively (found in
+ * `net/sock/dtls/creds.h`).
+ *
+ * #### Pre-shared Keys Cipher Suites
+ * In the case of PSK, a server can optionally indicate a hint to help the client to decide which
+ * PSK Identity to use, using @ref sock_dtls_set_server_psk_id_hint
+ * (see https://tools.ietf.org/html/rfc4279#section-5.2). The client application can
+ * decide which credential to use based on the sent hint and/or the session information, by
+ * registering a callback with @ref sock_dtls_set_client_psk_cb. If no callback is registered, or
+ * fails to chose a tag (i.e. it returns @ref CREDMAN_TAG_EMPTY), the credential is chosen as
+ * follows: if a hint is sent by the server, all credentials registered to the sock are checked for
+ * a matching @ref psk_params_t::hint "hint". A credential is selected on matching hint. If no
+ * credential matches the hint or no hint is provided, the first PSK credential registered in the
+ * sock is used.
+ *
+ * #### Elliptic Curve Cryptography Cipher Suites
+ * When using ECC both client and server applications can register a callback to decide which of
+ * the registered credentials should be used, based on the session information. This is done using
+ * @ref sock_dtls_set_rpk_cb.
+ *
+ * In both cases, if no callbacks are registered, the sock implementation will try to find a
+ * registered credential in the Sock's credential list, that matches the needed type. The first
+ * one that matches is used.
+ *
  * @{
  *
  * @file
@@ -613,7 +652,9 @@ void sock_dtls_init(void);
  * @param[in] udp_sock  Existing UDP sock initialized with
  *                      @ref sock_udp_create() to be used underneath.
  * @param[in] tag       Credential tag of @p sock. The sock will only use
- *                      credentials with the same tag given here.
+ *                      credentials with the tags registered to it
+ *                      (see @ref sock_dtls_add_credential). Set to @ref CREDMAN_TAG_EMPTY to
+ *                      create a sock with an empty tag list.
  * @param[in] version   [DTLS version](@ref sock_dtls_prot_version) to use.
  * @param[in] role      [Role](@ref sock_dtls_role) of the endpoint.
  *
@@ -663,6 +704,31 @@ int sock_dtls_session_init(sock_dtls_t *sock, const sock_udp_ep_t *ep,
  * @param[in] remote    Remote session to destroy
  */
 void sock_dtls_session_destroy(sock_dtls_t *sock, sock_dtls_session_t *remote);
+
+/**
+ * @brief Get the remote UDP endpoint from a session.
+ *
+ * @pre `(session != NULL) && (ep != NULL)`
+ *
+ * @param[in]  session   DTLS session
+ * @param[out] ep        UDP endpoint
+ */
+void sock_dtls_session_get_udp_ep(const sock_dtls_session_t *session,
+                                  sock_udp_ep_t *ep);
+
+/**
+ * @brief Set the remote UDP endpoint from a session.
+ *
+ * @pre `(session != NULL) && (ep != NULL)`
+ *
+ * @param[in]   session   DTLS session
+ * @param[in]   ep        UDP endpoint
+ *
+ * @note Function should only be needed when doing a blocking handshake with
+ *       @ref sock_dtls_send() to set the remote UDP endpoint.
+ */
+void sock_dtls_session_set_udp_ep(sock_dtls_session_t *session,
+                                  const sock_udp_ep_t *ep);
 
 /**
  * @brief Receive handshake messages and application data from remote peer.
@@ -882,6 +948,14 @@ ssize_t sock_dtls_send_aux(sock_dtls_t *sock, sock_dtls_session_t *remote,
  * @note    When blocking, we will need an extra thread to call
  *          @ref sock_dtls_recv() function to handle the incoming handshake
  *          messages.
+ *          An example for a blocking handshake is:
+ *              1. Create an empty @ref sock_dtls_session_t object.
+ *              2. Set the UDP endpoint of the peer you want to connect to in the
+ *                 session object with @ref sock_dtls_session_set_udp_ep().
+ *              3. Call @ref sock_dtls_send() with a timeout greater than 0.
+ *                 The send function blocks until the handshake completes or the
+ *                 timeout expires. If the handshake was successful the data has
+ *                 been sent.
  *
  * @return The number of bytes sent on success
  * @return  -ENOTCONN, if `timeout == 0` and no existing session exists with
@@ -917,50 +991,6 @@ static inline ssize_t sock_dtls_send(sock_dtls_t *sock,
  * @param sock          DTLS sock to close
  */
 void sock_dtls_close(sock_dtls_t *sock);
-
-/**
- * @brief Creates a new DTLS session
- *
- *  Initiates a handshake with a DTLS server at @p ep and wait until it
- * completes or timed out.
- *
- * @deprecated Will not be available after the 2020.10 release.
- *             Please use @ref sock_dtls_session_init() and
- *             @ref sock_dtls_recv() instead.
- *
- * @param[in]  sock     DLTS sock to use
- * @param[in]  ep       Remote endpoint of the session
- * @param[out] remote   The created session, cannot be NULL
- * @param[in]  timeout  Timeout to wait for handshake to finish.
- *                      Returns immediately if 0.
- *                      May be SOCK_NO_TIMEOUT to wait indefinitely until
- *                      handshake complete.
- *
- * @return  0 on success
- * @return  -ENOMEM, if no memory to allocate for new peer
- * @return  -EADDRNOTAVAIL, if the local endpoint of @p sock is not set.
- * @return  -EINVAL, if @p remote is invalid or @p sock is not properly
- *          initialized (or closed while sock_udp_recv() blocks).
- */
-static inline int sock_dtls_session_create(sock_dtls_t *sock,
-                                           const sock_udp_ep_t *ep,
-                                           sock_dtls_session_t *remote,
-                                           unsigned timeout)
-{
-    int res;
-    uint8_t buf[DTLS_HANDSHAKE_BUFSIZE];
-
-    assert(sock);
-    assert(remote);
-
-    res = sock_dtls_session_init(sock, ep, remote);
-    if (res <= 0) {
-        return res;
-    }
-
-    res = sock_dtls_recv(sock, remote, buf, sizeof(buf), timeout);
-    return res == -SOCK_DTLS_HANDSHAKE ? 0 : res;
-}
 
 #include "sock_dtls_types.h"
 

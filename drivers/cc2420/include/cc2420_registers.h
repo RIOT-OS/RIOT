@@ -31,17 +31,8 @@ extern "C" {
  */
 #define CC2420_OPT_AUTOACK          (0x0001)    /**< auto ACKs active */
 #define CC2420_OPT_CSMA             (0x0002)    /**< CSMA active */
-#define CC2420_OPT_PROMISCUOUS      (0x0004)    /**< promiscuous mode
-                                                 *   active */
+#define CC2420_OPT_PROMISCUOUS      (0x0004)    /**< promiscuous mode active */
 #define CC2420_OPT_PRELOADING       (0x0008)    /**< preloading enabled */
-#define CC2420_OPT_TELL_TX_START    (0x0010)    /**< notify MAC layer on TX
-                                                 *   start */
-#define CC2420_OPT_TELL_TX_END      (0x0020)    /**< notify MAC layer on TX
-                                                 *   finished */
-#define CC2420_OPT_TELL_RX_START    (0x0040)    /**< notify MAC layer on RX
-                                                 *   start */
-#define CC2420_OPT_TELL_RX_END      (0x0080)    /**< notify MAC layer on RX
-                                                 *   finished */
 /** @} */
 
 /**
@@ -49,11 +40,11 @@ extern "C" {
  * @{
  */
 enum {
-    CC2420_GOTO_PD,       /**< power down */
+    CC2420_GOTO_PD,         /**< power down */
     CC2420_GOTO_IDLE,       /**< idle */
-    CC2420_GOTO_RX,       /**< receive state */
+    CC2420_GOTO_RX,         /**< receive state */
     CC2420_GOTO_TXON,       /**< transmit packet without CCA */
-    CC2420_GOTO_TXONCCA        /**< transmit packet using CCA */
+    CC2420_GOTO_TXONCCA     /**< transmit packet using CCA */
 };
 
 /**

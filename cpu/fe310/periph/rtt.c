@@ -30,9 +30,8 @@
 #include "periph_conf.h"
 #include "periph/rtt.h"
 #include "plic.h"
-#include "vendor/encoding.h"
+#include "vendor/riscv_csr.h"
 #include "vendor/platform.h"
-#include "vendor/plic_driver.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -57,7 +56,7 @@ static rtt_state_t rtt_callback;
 
 void rtt_isr(int num)
 {
-    (void) num;
+    (void)num;
 
     /* Clear intr */
     AON_REG(AON_RTCCMP) = RTT_MAX_VALUE;
@@ -135,11 +134,11 @@ void rtt_set_counter(uint32_t counter)
      */
     /* Use ifdef to avoid out of bound shift when RTT_SCALE == 0 */
 #if RTT_CLOCK_FREQUENCY == RTT_FREQUENCY
-        AON_REG(AON_RTCLO) = counter;
-        AON_REG(AON_RTCHI) = 0;
+    AON_REG(AON_RTCLO) = counter;
+    AON_REG(AON_RTCHI) = 0;
 #else
-        AON_REG(AON_RTCLO) = counter << RTT_SCALE;
-        AON_REG(AON_RTCHI) = counter >> (32 - RTT_SCALE);
+    AON_REG(AON_RTCLO) = counter << RTT_SCALE;
+    AON_REG(AON_RTCHI) = counter >> (32 - RTT_SCALE);
 #endif
 }
 

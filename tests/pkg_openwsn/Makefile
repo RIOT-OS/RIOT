@@ -34,16 +34,19 @@ BOARD_WHITELIST = \
 # OpenWSN Modules
 USEPKG += openwsn
 USEMODULE += openwsn_openstack
+USEMODULE += sock_udp
+# This example uses async
+USEMODULE += sock_async
 
 # Optional OpenWSN Modules
 ## Enable Constrained Join Protocol (CoJP)
 USEMODULE += openwsn_cjoin
 ## Enable 6lowpan fragmentation
-USEMODULE += openwsn_6lo_frag
+USEMODULE += openwsn_6lo_fragmentation
 ## Enable link layer security
 # USEMODULE += openwsn_iee802154e_security
 ## Enable MSF dynamic slot allocation
-#  USEMODULE += openwsn_adaptive_msf
+# USEMODULE += openwsn_adaptive_msf
 
 ## Optional Module, but required for root nodes
 # USEMODULE += openwsn_serial
@@ -75,11 +78,11 @@ endif
 # export OPENWSN_LOG_LEVEL ?= LOG_ERROR
 
 ## Test application Modules
-USEMODULE += ipv6_addr
 USEMODULE += ps
 USEMODULE += od_string
 USEMODULE += shell
 USEMODULE += shell_commands
+
 # ztimer is used instead of xtimer because it's a dependency of some
 # OpenWSN modules.
 USEMODULE += ztimer_usec

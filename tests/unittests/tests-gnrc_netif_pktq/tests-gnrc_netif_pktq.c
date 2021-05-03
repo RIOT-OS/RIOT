@@ -32,6 +32,11 @@ static void test_pktq_get__empty(void)
     TEST_ASSERT_NULL(gnrc_netif_pktq_get(&_netif));
 }
 
+static void test_pktq_usage__empty(void)
+{
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_pktq_usage());
+}
+
 static void test_pktq_put__full(void)
 {
     gnrc_pktsnip_t pkt;
@@ -40,6 +45,8 @@ static void test_pktq_put__full(void)
         TEST_ASSERT_EQUAL_INT(0, gnrc_netif_pktq_put(&_netif, &pkt));
     }
     TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_pktq_put(&_netif, &pkt));
+    TEST_ASSERT_EQUAL_INT(CONFIG_GNRC_NETIF_PKTQ_POOL_SIZE,
+                          gnrc_netif_pktq_usage());
 }
 
 static void test_pktq_put_get1(void)
@@ -47,8 +54,10 @@ static void test_pktq_put_get1(void)
     gnrc_pktsnip_t pkt_in, *pkt_out;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif_pktq_put(&_netif, &pkt_in));
+    TEST_ASSERT_EQUAL_INT(1, gnrc_netif_pktq_usage());
     TEST_ASSERT_NOT_NULL((pkt_out = gnrc_netif_pktq_get(&_netif)));
     TEST_ASSERT(&pkt_in == pkt_out);
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_pktq_usage());
 }
 
 static void test_pktq_put_get3(void)
@@ -58,12 +67,14 @@ static void test_pktq_put_get3(void)
     for (unsigned i = 0; i < 3; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_netif_pktq_put(&_netif, &pkt_in[i]));
     }
+    TEST_ASSERT_EQUAL_INT(3, gnrc_netif_pktq_usage());
     for (unsigned i = 0; i < 3; i++) {
         gnrc_pktsnip_t *pkt_out;
 
         TEST_ASSERT_NOT_NULL((pkt_out = gnrc_netif_pktq_get(&_netif)));
         TEST_ASSERT(&pkt_in[i] == pkt_out);
     }
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_pktq_usage());
 }
 
 static void test_pktq_push_back__full(void)
@@ -74,6 +85,8 @@ static void test_pktq_push_back__full(void)
         TEST_ASSERT_EQUAL_INT(0, gnrc_netif_pktq_put(&_netif, &pkt));
     }
     TEST_ASSERT_EQUAL_INT(-1, gnrc_netif_pktq_push_back(&_netif, &pkt));
+    TEST_ASSERT_EQUAL_INT(CONFIG_GNRC_NETIF_PKTQ_POOL_SIZE,
+                          gnrc_netif_pktq_usage());
 }
 
 static void test_pktq_push_back_get1(void)
@@ -81,8 +94,10 @@ static void test_pktq_push_back_get1(void)
     gnrc_pktsnip_t pkt_in, *pkt_out;
 
     TEST_ASSERT_EQUAL_INT(0, gnrc_netif_pktq_push_back(&_netif, &pkt_in));
+    TEST_ASSERT_EQUAL_INT(1, gnrc_netif_pktq_usage());
     TEST_ASSERT_NOT_NULL((pkt_out = gnrc_netif_pktq_get(&_netif)));
     TEST_ASSERT(&pkt_in == pkt_out);
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_pktq_usage());
 }
 
 static void test_pktq_push_back_get3(void)
@@ -92,12 +107,14 @@ static void test_pktq_push_back_get3(void)
     for (unsigned i = 0; i < 3; i++) {
         TEST_ASSERT_EQUAL_INT(0, gnrc_netif_pktq_push_back(&_netif, &pkt_in[i]));
     }
+    TEST_ASSERT_EQUAL_INT(3, gnrc_netif_pktq_usage());
     for (unsigned i = 0; i < 3; i++) {
         gnrc_pktsnip_t *pkt_out;
 
         TEST_ASSERT_NOT_NULL((pkt_out = gnrc_netif_pktq_get(&_netif)));
         TEST_ASSERT(&pkt_in[3 - i - 1] == pkt_out);
     }
+    TEST_ASSERT_EQUAL_INT(0, gnrc_netif_pktq_usage());
 }
 
 static void test_pktq_empty(void)
@@ -119,6 +136,7 @@ static Test *test_gnrc_netif_pktq(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_pktq_get__empty),
+        new_TestFixture(test_pktq_usage__empty),
         new_TestFixture(test_pktq_put__full),
         new_TestFixture(test_pktq_put_get1),
         new_TestFixture(test_pktq_put_get3),

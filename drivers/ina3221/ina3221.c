@@ -193,7 +193,7 @@ int _ina3221_get_config(const ina3221_t *dev, uint16_t *cfg)
     return INA3221_OK;
 }
 
-int _ina3221_set_enable_channel(ina3221_t *dev, ina3221_enable_ch_t ech)
+int _ina3221_set_enable_channel(ina3221_t *dev, uint16_t ech)
 {
     uint16_t cfg;
     int status = _read_reg(dev, INA3221_REG_CONFIGURATION, &cfg);
@@ -211,7 +211,7 @@ int _ina3221_set_enable_channel(ina3221_t *dev, ina3221_enable_ch_t ech)
     return INA3221_OK;
 }
 
-int _ina3221_get_enable_channel(const ina3221_t *dev, ina3221_enable_ch_t *ech)
+int _ina3221_get_enable_channel(const ina3221_t *dev, uint16_t *ech)
 {
     *ech = dev->params.config & INA3221_ENABLE_CH_MASK;
     return ((*ech & INA3221_ENABLE_CH1) ? 1 : 0) +
@@ -320,7 +320,7 @@ int ina3221_get_mode(const ina3221_t *dev, ina3221_mode_t *mode)
 }
 
 int _ina3221_set_enable_sum_channel(const ina3221_t *dev,
-                                    ina3221_enable_sum_ch_t esch)
+                                    uint16_t esch)
 {
     uint16_t mask_en;
     int status = _read_reg(dev, INA3221_REG_MASK_ENABLE, &mask_en);
@@ -338,7 +338,7 @@ int _ina3221_set_enable_sum_channel(const ina3221_t *dev,
 }
 
 int _ina3221_get_enable_sum_channel(const ina3221_t *dev,
-                                    ina3221_enable_sum_ch_t *esch)
+                                    uint16_t *esch)
 {
     uint16_t mask_en;
     int status = _read_reg(dev, INA3221_REG_MASK_ENABLE, &mask_en);

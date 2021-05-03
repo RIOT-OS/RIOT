@@ -50,6 +50,7 @@ enum {
     MQTTSN_QOS_MASK   = 0x60,       /**< QoS level mask */
     MQTTSN_QOS_2      = 0x40,       /**< QoS level 2 */
     MQTTSN_QOS_1      = 0x20,       /**< QoS level 1 */
+    MQTTSN_QOS_NEG1   = 0x60,       /**< QoS level -1 (negative 1) */
     MQTTSN_QOS_0      = 0x00,       /**< QoS level 0 */
     MQTTSN_RETAIN     = 0x10,       /**< retain flag */
     MQTTSN_WILL       = 0x08,       /**< will flag, used during CONNECT */

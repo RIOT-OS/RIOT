@@ -33,6 +33,14 @@ extern "C" {
 #endif
 
 /**
+ * @brief   Select fastest bitarithm_lsb implementation
+ * @{
+ */
+#define BITARITHM_LSB_BUILTIN
+#define BITARITHM_HAS_CLZ
+/** @} */
+
+/**
  * @brief   Print the last instruction's address
  *
  * @todo:   Not supported

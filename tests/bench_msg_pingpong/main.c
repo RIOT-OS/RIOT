@@ -18,6 +18,7 @@
  * @}
  */
 
+#include <stdatomic.h>
 #include <stdio.h>
 #include "macros/units.h"
 #include "thread.h"
@@ -25,26 +26,23 @@
 #include "msg.h"
 #include "xtimer.h"
 
-#ifndef TEST_DURATION
-#define TEST_DURATION       (1000000U)
+#ifndef TEST_DURATION_US
+#define TEST_DURATION_US    (1000000U)
 #endif
 
-volatile unsigned _flag = 0;
 static char _stack[THREAD_STACKSIZE_MAIN];
 
-static void _timer_callback(void*arg)
+static void _timer_callback(void *flag)
 {
-    (void)arg;
-
-    _flag = 1;
+    atomic_flag_clear(flag);
 }
 
 static void *_second_thread(void *arg)
 {
     (void)arg;
-    msg_t test;
 
-    while(1) {
+    while (1) {
+        msg_t test;
         msg_receive(&test);
     }
 
@@ -53,7 +51,7 @@ static void *_second_thread(void *arg)
 
 int main(void)
 {
-    printf("main starting\n");
+    puts("main starting");
 
     kernel_pid_t other = thread_create(_stack,
                                        sizeof(_stack),
@@ -63,15 +61,19 @@ int main(void)
                                        NULL,
                                        "second_thread");
 
-    xtimer_t timer;
-    timer.callback = _timer_callback;
-
-    msg_t test;
-
+    atomic_flag flag = ATOMIC_FLAG_INIT;
     uint32_t n = 0;
 
-    xtimer_set(&timer, TEST_DURATION);
-    while(!_flag) {
+    xtimer_t timer = {
+        .callback = _timer_callback,
+        .arg = &flag,
+    };
+
+    atomic_flag_test_and_set(&flag);
+    xtimer_set(&timer, TEST_DURATION_US);
+
+    while (atomic_flag_test_and_set(&flag)) {
+        msg_t test;
         msg_send(&test, other);
         n++;
     }
@@ -79,7 +81,7 @@ int main(void)
     printf("{ \"result\" : %"PRIu32, n);
 #ifdef CLOCK_CORECLOCK
     printf(", \"ticks\" : %"PRIu32,
-           (uint32_t)((TEST_DURATION/US_PER_MS) * (CLOCK_CORECLOCK/KHZ(1)))/n);
+           (uint32_t)((TEST_DURATION_US/US_PER_MS) * (CLOCK_CORECLOCK/KHZ(1)))/n);
 #endif
     puts(" }");
 

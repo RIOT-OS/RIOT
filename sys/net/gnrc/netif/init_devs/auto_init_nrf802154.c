@@ -21,13 +21,14 @@
 #include "board.h"
 #include "nrf802154.h"
 #include "net/gnrc/netif/ieee802154.h"
+#include "include/init_devs.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
 #ifndef NRF802154_MAC_STACKSIZE
-#define NRF802154_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+#define NRF802154_MAC_STACKSIZE     (IEEE802154_STACKSIZE_DEFAULT)
 #endif
 #ifndef NRF802154_MAC_PRIO
 #define NRF802154_MAC_PRIO          (GNRC_NETIF_PRIO)

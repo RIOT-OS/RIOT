@@ -22,4 +22,4 @@ DIR_loramac_region = mac/region
 all: $(LORAMAC_MODULES)
 
 loramac_%:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/$(DIR_$@) -f $(CURDIR)/Makefile.$@
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src/$(DIR_$@) -f $(CURDIR)/Makefile.$@

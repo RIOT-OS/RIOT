@@ -22,6 +22,7 @@
 
 #include "cpu.h"
 #include "board.h"
+#include "bitarithm.h"
 #include "periph/gpio.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
@@ -40,6 +41,7 @@
  * @brief   Number of available external interrupt lines
  */
 #define GPIO_ISR_CHAN_NUMOF             (16U)
+#define GPIO_ISR_CHAN_MASK              (0xFFFF)
 
 /**
  * @brief   Allocate memory for one callback and argument per EXTI channel
@@ -241,12 +243,16 @@ void gpio_irq_disable(gpio_t pin)
 void isr_exti(void)
 {
     /* only generate interrupts against lines which have their IMR set */
-    uint32_t pending_isr = (EXTI->PR & EXTI->IMR);
-    for (unsigned i = 0; i < GPIO_ISR_CHAN_NUMOF; i++) {
-        if (pending_isr & (1 << i)) {
-            EXTI->PR = (1 << i);        /* clear by writing a 1 */
-            exti_ctx[i].cb(exti_ctx[i].arg);
-        }
+    uint32_t pending_isr = (EXTI->PR & EXTI->IMR & GPIO_ISR_CHAN_MASK);
+
+    /* clear by writing a 1 */
+    EXTI->PR = pending_isr;
+
+    /* iterate over all set bits */
+    uint8_t pin = 0;
+    while (pending_isr) {
+        pending_isr = bitarithm_test_and_clear(pending_isr, &pin);
+        exti_ctx[pin].cb(exti_ctx[pin].arg);
     }
     cortexm_isr_end();
 }

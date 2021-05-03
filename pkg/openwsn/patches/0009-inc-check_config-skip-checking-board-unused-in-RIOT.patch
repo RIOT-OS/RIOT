@@ -1,14 +1,14 @@
-From cee779033fb652a7e39a1cc03ef4b7a80e6b6f86 Mon Sep 17 00:00:00 2001
+From 02e03cdd5e136d7907feb317eb8d4ccee9c472a3 Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Fri, 24 Jul 2020 15:42:05 +0200
-Subject: [PATCH 9/9] inc/check_config: skip checking board, unused in RIOT
+Subject: [PATCH 09/11] inc/check_config: skip checking board, unused in RIOT
 
 ---
  inc/check_config.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/inc/check_config.h b/inc/check_config.h
-index f50b9e7c..68aea646 100644
+index d2f4c967..a1c03d03 100644
 --- a/inc/check_config.h
 +++ b/inc/check_config.h
 @@ -17,7 +17,7 @@

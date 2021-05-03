@@ -536,6 +536,25 @@ static void test_rbuf_add__overlap_rhs(void)
     _check_pktbuf(NULL);
 }
 
+static void test_rbuf_get_by_dg(void)
+{
+    const gnrc_sixlowpan_frag_rb_t *entry;
+
+    TEST_ASSERT_NULL(
+        gnrc_sixlowpan_frag_rb_get_by_datagram(&_test_netif_hdr.hdr, TEST_TAG)
+    );
+    /* add a fragment */
+    _rbuf_create_first_fragment();
+    TEST_ASSERT_NOT_NULL(
+        gnrc_sixlowpan_frag_rb_get_by_datagram(&_test_netif_hdr.hdr, TEST_TAG)
+    );
+    /* get entry to release entry->pkt it in `_check_pktbuf()` */
+    entry = _first_non_empty_rbuf();
+    /* entry is however not properly removed yet */
+    TEST_ASSERT_NOT_NULL(entry);
+    _check_pktbuf(entry);
+}
+
 static void test_rbuf_exists(void)
 {
     const gnrc_sixlowpan_frag_rb_t *entry;
@@ -631,6 +650,7 @@ static void run_unittests(void)
         new_TestFixture(test_rbuf_add__too_big_fragment),
         new_TestFixture(test_rbuf_add__overlap_lhs),
         new_TestFixture(test_rbuf_add__overlap_rhs),
+        new_TestFixture(test_rbuf_get_by_dg),
         new_TestFixture(test_rbuf_exists),
         new_TestFixture(test_rbuf_rm_by_dg),
         new_TestFixture(test_rbuf_rm),

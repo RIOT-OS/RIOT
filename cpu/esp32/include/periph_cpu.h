@@ -498,7 +498,7 @@ typedef struct {
 
 
 /**
- * @name   Timer configuration depenend on which implementation is used
+ * @name   Timer configuration depending on which implementation is used
  *
  * Timers are MCU built-in feature and not board-specific. They are therefore
  * configured here.

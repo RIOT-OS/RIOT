@@ -191,6 +191,26 @@ char *l2util_addr_to_str(const uint8_t *addr, size_t addr_len, char *out);
  */
 size_t l2util_addr_from_str(const char *str, uint8_t *out);
 
+/**
+ * @brief   Checks if two l2 addresses are equal.
+ *
+ * @param[in] addr_a        First hardware address.
+ * @param[in] addr_a_len    Length of first hardware address.
+ * @param[in] addr_b        Second hardware address.
+ * @param[in] addr_b_len    Length of second hardware address.
+ *
+ * @return  true if the addresses match, false if not.
+ */
+static inline bool l2util_addr_equal(const uint8_t *addr_a, uint8_t addr_a_len,
+                                     const uint8_t *addr_b, uint8_t addr_b_len)
+{
+    if (addr_a_len != addr_b_len) {
+        return false;
+    }
+
+    return memcmp(addr_a, addr_b, addr_a_len) == 0;
+}
+
 #ifdef __cplusplus
 }
 #endif

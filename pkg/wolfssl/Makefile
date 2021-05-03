@@ -5,13 +5,19 @@ PKG_LICENSE=GPLv2
 
 include $(RIOTBASE)/pkg/pkg.mk
 
+# some variable seem uninitialized to gcc with -Og but are not
+# https://gcc.gnu.org/bugzilla/buglist.cgi?quicksearch=may%20be%20used%20uninitialized
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=42145
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=90710#c1
+CFLAGS += -Wno-maybe-uninitialized
+
 .PHONY: wolfcrypt%
 
 all: $(filter wolfcrypt wolfcrypt-test wolfcrypt-benchmark,$(USEMODULE))
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(CURDIR)/Makefile.wolfssl
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(CURDIR)/Makefile.wolfssl
 
 wolfcrypt:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfcrypt/src -f $(CURDIR)/Makefile.wolfcrypt
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfcrypt/src -f $(CURDIR)/Makefile.wolfcrypt
 
 wolfcrypt-%:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfcrypt/$* -f $(CURDIR)/Makefile.wolfcrypt-$*
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/wolfcrypt/$* -f $(CURDIR)/Makefile.wolfcrypt-$*

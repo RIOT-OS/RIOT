@@ -73,20 +73,22 @@ typedef struct {
  * @brief   BlockCipher-Interface for the Cipher-Algorithms
  */
 typedef struct cipher_interface_st {
-    /** Blocksize of this cipher */
+    /** @brief Blocksize of this cipher */
     uint8_t block_size;
 
-    /** Maximum key size for this cipher */
-    uint8_t max_key_size;
-
-    /** the init function */
+    /**
+     * @brief the init function.
+     *
+     * This function is responsible for checking that the given key_size is
+     * valid for the chosen cipher.
+     */
     int (*init)(cipher_context_t *ctx, const uint8_t *key, uint8_t key_size);
 
-    /** the encrypt function */
+    /** @brief the encrypt function */
     int (*encrypt)(const cipher_context_t *ctx, const uint8_t *plain_block,
                    uint8_t *cipher_block);
 
-    /** the decrypt function */
+    /** @brief the decrypt function */
     int (*decrypt)(const cipher_context_t *ctx, const uint8_t *cipher_block,
                    uint8_t *plain_block);
 } cipher_interface_t;

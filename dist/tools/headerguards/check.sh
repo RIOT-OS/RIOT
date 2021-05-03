@@ -11,6 +11,7 @@ cd $RIOTBASE
 
 : "${RIOTTOOLS:=${RIOTBASE}/dist/tools}"
 . "${RIOTTOOLS}"/ci/changed_files.sh
+. "${RIOTTOOLS}"/ci/github_annotate.sh
 
 EXIT_CODE=0
 
@@ -22,12 +23,74 @@ filter() {
     fi
 }
 
-_headercheck() {
-    OUT="$(${RIOTTOOLS}/headerguards/headerguards.py ${FILES} | filter)"
+_annotate_diff() {
+    if [ -n "$1" -a -n "$2" -a -n "$3" ]; then
+        IFS="${OLD_IFS}" github_annotate_error "$1" "$2" "Wrong header guard format:\n\n$3"
+    fi
+}
 
+_headercheck() {
+    OUT=$(${RIOTTOOLS}/headerguards/headerguards.py ${FILES} 2>&1 | filter)
     if [ -n "$OUT" ]; then
         EXIT_CODE=1
-        echo "$OUT"
+        if github_annotate_is_on; then
+            DIFF=""
+            DIFFFILE=""
+            DIFFLINE=""
+            echo "$OUT" | {
+                # see https://stackoverflow.com/a/30064493/11921757 for why we
+                # use a sub shell here
+                OLD_IFS="$IFS"      # store old separator to later restore it
+                IFS=''  # keep leading and trailing spaces
+                while read -r line; do
+                    # file has no or broken header guard
+                    if echo "$line" | grep -q '^.*: no / broken header guard$'; then
+                        # this output comes outside of a diff, so reset diff parser
+                        _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
+                        DIFF=""
+                        DIFFFILE=""
+                        DIFFLINE=""
+                        # annotate broken header guard
+                        FILE=$(echo "$line" | cut -d: -f1 | xargs echo)
+                        MESSAGE=$(echo "$line" | cut -d: -f2 | xargs echo)
+                        github_annotate_error "$FILE" 0 "$MESSAGE"
+                    # parse beginning of new diff
+                    elif echo "$line" | grep -q '^--- .\+$'; then
+                        _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
+                        DIFF="$line"
+                        DIFFFILE=$(echo "$line" | sed 's/^--- \(.\+\)$/\1/g')
+                        DIFFLINE=""
+                    # we are in a diff currently
+                    elif [ -n "$DIFF" ]; then
+                        # grep first line number of diff
+                        if echo "$line" | \
+                           grep -q "@@ -[0-9]\+\(,[0-9]\+\)\? +[0-9]\+\(,[0-9]\+\)\? @@"
+                           then
+                           # treat hunk as new diff so it is at the corresponding line
+                           if [ -n "${DIFFLINE}" ]; then
+                               _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
+                               DIFF="--- $DIFFFILE\n+++ $DIFFFILE"
+                           fi
+                           DIFFLINE="$(echo "$line" | sed 's/@@ -\([0-9]\+\).*$/\1/')"
+                           # Parse
+                           # @@ -<DIFFLINE>,<DIFFOFFSET> ...
+                           DIFFOFFSET="$(echo "$line" |
+                               sed 's/@@ -[0-9]\+\(,\([0-9]\)\+\)\?.*$/\2/')"
+                           if [ -n "$DIFFOFFSET" ]; then
+                               # if there is a DIFFOFFSET, add it to
+                               # DIFFLINE. DIFFLINE starts at 1, so we
+                               # need to subtract 1 to not overshoot.
+                               DIFFLINE=$(( DIFFLINE + DIFFOFFSET - 1 ))
+                           fi
+                        fi
+                        DIFF="$DIFF\n$(echo "${line}"| sed 's/\\/\\\\/g' )"
+                    fi
+                done
+                _annotate_diff "$DIFFFILE" "$DIFFLINE" "$DIFF"
+            }
+        else
+            echo "$OUT"
+        fi
     fi
 }
 
@@ -37,10 +100,14 @@ if [ -z "${FILES}" ]; then
     exit
 fi
 
+github_annotate_setup
+
 : ${QUIET:=0}
 
 if [ -z "$*" ]; then
     _headercheck
 fi
+
+github_annotate_teardown
 
 exit $EXIT_CODE

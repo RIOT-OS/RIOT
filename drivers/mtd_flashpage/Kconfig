@@ -1,0 +1,17 @@
+# Copyright (c) 2020 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_MTD_FLASHPAGE
+    bool "MTD interface for Flashpage"
+    depends on HAS_PERIPH_FLASHPAGE
+    depends on HAS_PERIPH_FLASHPAGE_PAGEWISE
+    depends on TEST_KCONFIG
+    select MODULE_PERIPH_FLASHPAGE
+    select MODULE_PERIPH_FLASHPAGE_PAGEWISE
+    select MODULE_MTD
+    help
+        Driver for internal flash devices implementing flashpage interface.

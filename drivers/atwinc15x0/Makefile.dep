@@ -1,4 +1,3 @@
-USEMODULE += luid
 USEMODULE += netdev_eth
 USEMODULE += xtimer
 USEPKG += driver_atwinc15x0

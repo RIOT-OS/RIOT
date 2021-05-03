@@ -10,7 +10,6 @@ config BOARD
 config BOARD_E180_ZG120B_TB
     bool
     default y
-    select BOARD_COMMON_SILABS
     select CPU_MODEL_EFR32MG1B232F256GM32
     select HAS_PERIPH_ADC
     select HAS_PERIPH_RTC

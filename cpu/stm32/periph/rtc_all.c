@@ -304,10 +304,10 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
     /* normalize input */
     rtc_tm_normalize(time);
 
-    rtc_unlock();
-
     /* disable existing alarm (if enabled) */
     rtc_clear_alarm();
+
+    rtc_unlock();
 
     /* save callback and argument */
     isr_ctx.cb = cb;
@@ -345,11 +345,15 @@ int rtc_get_alarm(struct tm *time)
 
 void rtc_clear_alarm(void)
 {
+    rtc_unlock();
+
     RTC->CR &= ~(RTC_CR_ALRAE | RTC_CR_ALRAIE);
     while (!(RTC_REG_ISR & RTC_ISR_ALRAWF)) {}
 
     isr_ctx.cb = NULL;
     isr_ctx.arg = NULL;
+
+    rtc_lock();
 }
 
 void rtc_poweron(void)

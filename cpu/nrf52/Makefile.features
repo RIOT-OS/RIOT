@@ -6,10 +6,13 @@ endif
 CPU_FAM  = nrf52
 
 # The 802.15.4 radio is not available on all SoCs
-ifneq (,$(filter nrf52811xxaa nrf52820xxaa rf52833xxaa nrf52840xxaa,$(CPU_MODEL)))
+ifneq (,$(filter nrf52811xxaa nrf52820xxaa nrf52833xxaa nrf52840xxaa,$(CPU_MODEL)))
   FEATURES_PROVIDED += radio_nrf802154
 endif
 
+ifeq (,$(filter nrf52832%,$(CPU_MODEL)))
+  FEATURES_PROVIDED += periph_uart_nonblocking
+endif
 # The ADC does not depend on any board configuration, so always available
 FEATURES_PROVIDED += periph_adc
 
@@ -19,5 +22,7 @@ FEATURES_PROVIDED += ble_nimble_netif
 
 # all nrf52 have an MPU
 FEATURES_PROVIDED += cortexm_mpu
+
+FEATURES_PROVIDED += periph_i2c_reconfigure
 
 include $(RIOTCPU)/nrf5x_common/Makefile.features

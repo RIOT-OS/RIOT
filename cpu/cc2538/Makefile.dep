@@ -1,11 +1,17 @@
 ifneq (,$(filter cc2538_rf,$(USEMODULE)))
-  USEMODULE += netdev_ieee802154
+  ifneq (,$(filter cc2538_rf_netdev_legacy,$(USEMODULE)))
+    USEMODULE += netdev_ieee802154
+  else ifneq (,$(filter netdev,$(USEMODULE)))
+    USEMODULE += netdev_ieee802154_submac
+  endif
 endif
 
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   USEMODULE += rtt_rtc
 endif
 
-USEMODULE += pm_layered
+ifneq (,$(filter periph_uart_nonblocking,$(USEMODULE)))
+  USEMODULE += tsrb
+endif
 
 include $(RIOTCPU)/cortexm_common/Makefile.dep

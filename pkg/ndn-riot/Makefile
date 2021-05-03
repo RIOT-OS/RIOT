@@ -6,4 +6,4 @@ PKG_LICENSE=LGPLv2.1
 include $(RIOTBASE)/pkg/pkg.mk
 
 all:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)

@@ -122,7 +122,7 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     }
 
     uint16_t count = UINT16_MAX;
-    while (atmega_is_uart_tx_pending() && count--) {}
+    while (avr8_is_uart_tx_pending() && count--) {}
 
     /* register interrupt context */
     isr_ctx[uart].rx_cb = rx_cb;
@@ -174,7 +174,7 @@ void uart_write(uart_t uart, const uint8_t *data, size_t len)
         /* start of TX won't finish until no data in UDRn and transmit shift
            register is empty */
         unsigned long state = irq_disable();
-        atmega_state |= ATMEGA_STATE_FLAG_UART_TX(uart);
+        avr8_state |= AVR8_STATE_FLAG_UART_TX(uart);
         irq_restore(state);
         dev[uart]->DR = data[i];
     }
@@ -194,22 +194,22 @@ void uart_poweroff(uart_t uart)
 
 static inline void _rx_isr_handler(int num)
 {
-    atmega_enter_isr();
+    avr8_enter_isr();
 
     isr_ctx[num].rx_cb(isr_ctx[num].arg, dev[num]->DR);
 
-    atmega_exit_isr();
+    avr8_exit_isr();
 }
 
 static inline void _tx_isr_handler(int num)
 {
-    atmega_enter_isr();
+    avr8_enter_isr();
 
     /* entire frame in the Transmit Shift Register has been shifted out and
        there are no new data currently present in the transmit buffer */
-    atmega_state &= ~ATMEGA_STATE_FLAG_UART_TX(num);
+    avr8_state &= ~AVR8_STATE_FLAG_UART_TX(num);
 
-    atmega_exit_isr();
+    avr8_exit_isr();
 }
 
 

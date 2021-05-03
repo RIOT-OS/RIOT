@@ -24,6 +24,7 @@
 #include "cpu.h"
 #include "mutex.h"
 #include "assert.h"
+#include "nrf_clock.h"
 
 #include "periph_conf.h"
 #include "periph/cpuid.h"
@@ -400,6 +401,11 @@ static int nrfmin_init(netdev_t *dev)
     for (unsigned i = 0; i < CPUID_LEN; i++) {
         my_addr ^= cpuid[i] << (8 * (i & 0x01));
     }
+
+    /* the radio need the external HF clock source to be enabled */
+    /* @todo    add proper handling to release the clock whenever the radio is
+     *          idle */
+    clock_hfxo_request();
 
     /* power on the NRFs radio */
     NRF_RADIO->POWER = 1;

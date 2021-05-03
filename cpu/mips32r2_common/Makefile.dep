@@ -1,7 +1,7 @@
 USEMODULE += mips32r2_common
 USEMODULE += mips32r2_common_periph
-USEMODULE += newlib
 
+FEATURES_REQUIRED += newlib
 # mips32 needs periph_timer for its gettimeofday() implementation
 FEATURES_REQUIRED += periph_timer
 
@@ -9,3 +9,6 @@ FEATURES_REQUIRED += periph_timer
 ifeq (,$(filter newlib_syscalls_mips_uhi,$(USEMODULE)))
   USEMODULE += newlib_syscalls_default
 endif
+
+# Make calls to malloc and friends thread-safe
+USEMODULE += malloc_thread_safe

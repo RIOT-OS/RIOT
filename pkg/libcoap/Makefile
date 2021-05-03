@@ -13,4 +13,4 @@ ifeq (llvm,$(TOOLCHAIN))
 endif
 
 all:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)

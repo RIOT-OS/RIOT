@@ -50,6 +50,7 @@
 #if defined(CPU_FAM_NRF52) || defined(CPU_FAM_NRF51)
 #include "nrf_clock.h"
 #endif
+#include "controller/ble_ll.h"
 
 static char _stack_controller[NIMBLE_CONTROLLER_STACKSIZE];
 #endif
@@ -81,6 +82,15 @@ static void *_host_thread(void *arg)
                   THREAD_CREATE_STACKTEST,
                   (thread_task_func_t)nimble_port_ll_task_func, NULL,
                   "nimble_ctrl");
+
+    /* XXX: seeding of the used PRNG is done when this function is called the
+     *      first time. However, this could potentially be in interrupt context,
+     *      leading to an malloc call in that context, breaking with the used
+     *      thread safe malloc wrapper in RIOT. So we better do this seeding in
+     *      a deterministic fashion right here.
+     *      -> this fix is temporary until a proper fix is merged to NimBLE
+     *         upstream */
+    ble_ll_rand();
 #endif
 
     nimble_port_run();

@@ -42,7 +42,7 @@ static void test_rtc_compat(void)
         .tm_year = 84,
         .tm_wday = 0,
         .tm_yday = 0,
-        .tm_isdst=1
+        .tm_isdst = -1,
     };
 
     struct tm t2 = t1;
@@ -63,7 +63,7 @@ static void test_rtc_sec_wrap(void)
         .tm_year = 100,
         .tm_wday =   0,
         .tm_yday =   0,
-        .tm_isdst=   1
+        .tm_isdst=  -1,
     };
 
     struct tm t2 = t1;

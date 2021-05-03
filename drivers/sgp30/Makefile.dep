@@ -1,0 +1,6 @@
+USEMODULE += checksum
+USEMODULE += ztimer_usec
+
+FEATURES_REQUIRED += periph_i2c
+
+DEFAULT_MODULE += sgp30_strict

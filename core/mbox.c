@@ -36,6 +36,7 @@ static void _wake_waiter(thread_t *thread, unsigned irqstate)
           "%" PRIkernel_pid ".\n", thread_getpid(), thread->pid);
 
     uint16_t process_priority = thread->priority;
+
     irq_restore(irqstate);
     sched_switch(process_priority);
 }
@@ -46,6 +47,7 @@ static void _wait(list_node_t *wait_list, unsigned irqstate)
           thread_getpid());
 
     thread_t *me = thread_get_active();
+
     sched_set_status(me, STATUS_MBOX_BLOCKED);
     thread_add_to_list(wait_list, me);
     irq_restore(irqstate);

@@ -1,3 +1,4 @@
+USEMODULE += lvgl
 USEMODULE += lvgl_core
 USEMODULE += lvgl_draw
 USEMODULE += lvgl_font
@@ -15,6 +16,8 @@ endif
 ifneq (,$(filter lvgl_contrib_touch,$(USEMODULE)))
   USEMODULE += touch_dev
 endif
+
+DEFAULT_MODULE += auto_init_screen
 
 # lvgl is not compatible with non 32bit platforms
 # Building lv_misc triggers the error:

@@ -26,6 +26,10 @@
 #include "thread.h"
 #include "xtimer.h"
 
+/**
+ * When core_idle_thread is not active, the KERNEL_PID_UNDEF is used to track
+ * the idle time
+ */
 schedstat_t sched_pidlist[KERNEL_PID_LAST + 1];
 
 void sched_statistics_cb(kernel_pid_t active_thread, kernel_pid_t next_thread)
@@ -33,13 +37,13 @@ void sched_statistics_cb(kernel_pid_t active_thread, kernel_pid_t next_thread)
     uint32_t now = xtimer_now().ticks32;
 
     /* Update active thread stats */
-    if (active_thread != KERNEL_PID_UNDEF) {
+    if (!IS_USED(MODULE_CORE_IDLE_THREAD) || active_thread != KERNEL_PID_UNDEF) {
         schedstat_t *active_stat = &sched_pidlist[active_thread];
         active_stat->runtime_ticks += now - active_stat->laststart;
     }
 
     /* Update next_thread stats */
-    if (next_thread != KERNEL_PID_UNDEF) {
+    if (!IS_USED(MODULE_CORE_IDLE_THREAD) || next_thread != KERNEL_PID_UNDEF) {
         schedstat_t *next_stat = &sched_pidlist[next_thread];
         next_stat->laststart = now;
         next_stat->schedules++;

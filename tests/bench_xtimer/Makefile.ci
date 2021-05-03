@@ -3,8 +3,15 @@ BOARD_INSUFFICIENT_MEMORY := \
     arduino-nano \
     arduino-uno \
     atmega328p \
+    atmega328p-xplained-mini \
+    atxmega-a1u-xpro \
+    atxmega-a3bu-xplained \
+    bluepill-stm32f030c8 \
     im880b \
     nucleo-l011k4 \
     olimexino-stm32 \
+    samd10-xmini \
+    slstk3400a \
     stk3200 \
+    zigduino \
     #

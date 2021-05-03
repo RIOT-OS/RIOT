@@ -120,6 +120,7 @@ struct ieee802154_submac {
     uint8_t csma_retries;               /**< maximum number of CSMA-CA retries */
     int8_t tx_pow;                      /**< Transmission power (in dBm) */
     ieee802154_submac_state_t state;    /**< State of the SubMAC */
+    ieee802154_phy_mode_t phy_mode;     /**< IEEE 802.15.4 PHY mode */
 };
 
 /**
@@ -223,6 +224,19 @@ static inline int ieee802154_set_panid(ieee802154_submac_t *submac,
     }
 
     return res;
+}
+
+/**
+ * @brief Get IEEE 802.15.4 PHY mode
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return PHY mode.
+ */
+static inline ieee802154_phy_mode_t ieee802154_get_phy_mode(
+    ieee802154_submac_t *submac)
+{
+    return submac->phy_mode;
 }
 
 /**
@@ -378,6 +392,13 @@ void ieee802154_submac_ack_timeout_fired(ieee802154_submac_t *submac);
  * @param[in] submac pointer to the SubMAC descriptor
  */
 void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac);
+
+/**
+ * @brief Indicate the SubMAC that a frame with invalid CRC was received.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ */
+void ieee802154_submac_crc_error_cb(ieee802154_submac_t *submac);
 
 /**
  * @brief Indicate the SubMAC that the device finished the transmission procedure.

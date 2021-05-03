@@ -1,7 +1,7 @@
-From fcd845f91417c7da0af266229f9997a2e3f08596 Mon Sep 17 00:00:00 2001
+From af647820a330eae463fdf073908dc6f79014481d Mon Sep 17 00:00:00 2001
 From: Benjamin Valentin <benpicco@googlemail.com>
-Date: Tue, 10 Nov 2020 18:30:07 +0100
-Subject: [PATCH] remove ffconf.h
+Date: Sun, 31 Jan 2021 20:00:17 +0100
+Subject: [PATCH 1/2] remove ffconf.h
 
 ---
  source/ffconf.h | 298 ------------------------------------------------
@@ -10,7 +10,7 @@ Subject: [PATCH] remove ffconf.h
 
 diff --git a/source/ffconf.h b/source/ffconf.h
 deleted file mode 100644
-index 5dbe48b..0000000
+index 632736b..0000000
 --- a/source/ffconf.h
 +++ /dev/null
 @@ -1,298 +0,0 @@
@@ -18,7 +18,7 @@ index 5dbe48b..0000000
 -/  FatFs Functional Configurations
 -/---------------------------------------------------------------------------*/
 -
--#define FFCONF_DEF	86606	/* Revision ID */
+-#define FFCONF_DEF	80196	/* Revision ID */
 -
 -/*---------------------------------------------------------------------------/
 -/ Function Configurations
@@ -221,8 +221,8 @@ index 5dbe48b..0000000
 -/  To enable the 64-bit LBA, also exFAT needs to be enabled. (FF_FS_EXFAT == 1) */
 -
 -
--#define FF_MIN_GPT		0x100000000
--/* Minimum number of sectors to switch GPT format to create partition in f_mkfs and
+-#define FF_MIN_GPT		0x10000000
+-/* Minimum number of sectors to switch GPT as partitioning format in f_mkfs and
 -/  f_fdisk function. 0x100000000 max. This option has no effect when FF_LBA64 == 0. */
 -
 -
@@ -253,7 +253,7 @@ index 5dbe48b..0000000
 -#define FF_FS_NORTC		0
 -#define FF_NORTC_MON	1
 -#define FF_NORTC_MDAY	1
--#define FF_NORTC_YEAR	2019
+-#define FF_NORTC_YEAR	2020
 -/* The option FF_FS_NORTC switches timestamp functiton. If the system does not have
 -/  any RTC function or valid timestamp is not needed, set FF_FS_NORTC = 1 to disable
 -/  the timestamp function. Every object modified by FatFs will have a fixed timestamp
@@ -313,5 +313,5 @@ index 5dbe48b..0000000
 -
 -/*--- End of configuration options ---*/
 -- 
-2.25.1
+2.27.0
 

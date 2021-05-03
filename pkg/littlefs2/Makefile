@@ -1,7 +1,7 @@
 PKG_NAME=littlefs2
 PKG_URL=https://github.com/ARMmbed/littlefs.git
-# v2.2.1
-PKG_VERSION=4c9146ea539f72749d6cc3ea076372a81b12cb11
+# v2.4
+PKG_VERSION=1863dc7883d82bd6ca79faa164b65341064d1c16
 PKG_LICENSE=Apache-2.0
 
 include $(RIOTBASE)/pkg/pkg.mk
@@ -17,4 +17,4 @@ ifneq ($(DEVELHELP),1)
 endif
 
 all:
-	"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR) -f $(RIOTBASE)/Makefile.base

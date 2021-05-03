@@ -23,8 +23,6 @@
 #ifndef CLK_F2F4F7_CFG_CLOCK_DEFAULT_120_H
 #define CLK_F2F4F7_CFG_CLOCK_DEFAULT_120_H
 
-#include "f2f4f7/cfg_clock_common.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,14 +62,12 @@ extern "C" {
 #endif
 /** @} */
 
-#ifdef __cplusplus
-}
-#endif
-
-#include "f2f4f7/cfg_clock_values.h"
-
 #if CLOCK_CORECLOCK > MHZ(120)
 #error "SYSCLK cannot exceed 120MHz"
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* CLK_F2F4F7_CFG_CLOCK_DEFAULT_120_H */

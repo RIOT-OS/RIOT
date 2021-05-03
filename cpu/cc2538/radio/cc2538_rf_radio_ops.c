@@ -93,6 +93,13 @@ static int _request_transmit(ieee802154_dev_t *dev)
 
     if (cc2538_csma_ca_retries < 0) {
         RFCORE_SFR_RFST = ISTXON;
+        /* The CPU Ctrl mask is used here to indicate whether the radio is being
+         * controlled by the CPU or the CSP Strobe Processor.
+         * We set this to 1 in order to indicate that the CSP is not used and
+         * thus, that the @ref ieee802154_radio_ops::confirm_transmit should
+         * return 0 immediately after the TXDONE event
+         */
+        RFCORE_XREG_CSPCTRL |= CC2538_CSP_MCU_CTRL_MASK;
     }
     else {
         cc2538_cca = false;
@@ -185,10 +192,15 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
 
             /* The number of dB above maximum sensitivity detected for the
              * received packet */
-            info->rssi = -CC2538_RSSI_OFFSET + rssi_val + IEEE802154_RADIO_RSSI_OFFSET;
+            /* Make sure there is no overflow even if no signal with such
+               low sensitivity should be detected */
+            const int hw_rssi_min = IEEE802154_RADIO_RSSI_OFFSET -
+                                    CC2538_RSSI_OFFSET;
+            int8_t hw_rssi = rssi_val > hw_rssi_min ?
+                (CC2538_RSSI_OFFSET + rssi_val) : IEEE802154_RADIO_RSSI_OFFSET;
+            info->rssi = hw_rssi - IEEE802154_RADIO_RSSI_OFFSET;
 
             corr_val = rfcore_read_byte() & CC2538_CORR_VAL_MASK;
-
             if (corr_val < CC2538_CORR_VAL_MIN) {
                 corr_val = CC2538_CORR_VAL_MIN;
             }
@@ -354,8 +366,10 @@ void cc2538_irq_handler(void)
             cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_INDICATION_RX_DONE);
         }
         else {
+            /* Disable RX while the frame has not been processed */
+            RFCORE_XREG_RXMASKCLR = 0xFF;
             /* CRC failed; discard packet */
-            RFCORE_SFR_RFST = ISFLUSHRX;
+            cc2538_rf_dev.cb(&cc2538_rf_dev, IEEE802154_RADIO_INDICATION_CRC_ERROR);
         }
     }
 
@@ -390,22 +404,6 @@ static int _off(ieee802154_dev_t *dev)
 {
     (void) dev;
     return -ENOTSUP;
-}
-
-static bool _get_cap(ieee802154_dev_t *dev, ieee802154_rf_caps_t cap)
-{
-    (void) dev;
-    switch (cap) {
-        case IEEE802154_CAP_24_GHZ:
-        case IEEE802154_CAP_IRQ_TX_DONE:
-        case IEEE802154_CAP_IRQ_CCA_DONE:
-        case IEEE802154_CAP_IRQ_RX_START:
-        case IEEE802154_CAP_IRQ_TX_START:
-        case IEEE802154_CAP_AUTO_CSMA:
-            return true;
-        default:
-            return false;
-    }
 }
 
 static int _set_hw_addr_filter(ieee802154_dev_t *dev, const network_uint16_t *short_addr,
@@ -527,6 +525,15 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
 }
 
 static const ieee802154_radio_ops_t cc2538_rf_ops = {
+    .caps = IEEE802154_CAP_24_GHZ
+          | IEEE802154_CAP_AUTO_CSMA
+          | IEEE802154_CAP_IRQ_CRC_ERROR
+          | IEEE802154_CAP_IRQ_TX_DONE
+          | IEEE802154_CAP_IRQ_CCA_DONE
+          | IEEE802154_CAP_IRQ_RX_START
+          | IEEE802154_CAP_IRQ_TX_START
+          | IEEE802154_CAP_PHY_OQPSK,
+
     .write = _write,
     .read = _read,
     .request_transmit = _request_transmit,
@@ -539,7 +546,6 @@ static const ieee802154_radio_ops_t cc2538_rf_ops = {
     .confirm_set_trx_state = _confirm_set_trx_state,
     .request_cca = _request_cca,
     .confirm_cca = _confirm_cca,
-    .get_cap = _get_cap,
     .set_cca_threshold = _set_cca_threshold,
     .set_cca_mode = _set_cca_mode,
     .config_phy = _config_phy,

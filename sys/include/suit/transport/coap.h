@@ -122,6 +122,13 @@ typedef enum {
 } coap_blksize_t;
 
 /**
+ * @brief Coap block-wise-transfer size used for SUIT
+ */
+#ifndef CONFIG_SUIT_COAP_BLOCKSIZE
+#define CONFIG_SUIT_COAP_BLOCKSIZE  COAP_BLOCKSIZE_64
+#endif
+
+/**
  * @brief    Performs a blockwise coap get request to the specified url.
  *
  * This function will fetch the content of the specified resource path via

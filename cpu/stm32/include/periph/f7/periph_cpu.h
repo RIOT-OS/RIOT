@@ -32,6 +32,20 @@ extern "C" {
  */
 #define STM32_BOOTLOADER_ADDR   (0x1FF00000)
 
+/**
+ * @brief   Override the ADC resolution configuration
+ * @{
+ */
+#define HAVE_ADC_RES_T
+typedef enum {
+    ADC_RES_6BIT  = 0x03000000,     /**< ADC resolution: 6 bit */
+    ADC_RES_8BIT  = 0x02000000,     /**< ADC resolution: 8 bit */
+    ADC_RES_10BIT = 0x01000000,     /**< ADC resolution: 10 bit */
+    ADC_RES_12BIT = 0x00000000,     /**< ADC resolution: 12 bit */
+    ADC_RES_14BIT = 1,              /**< ADC resolution: 14 bit (not supported) */
+    ADC_RES_16BIT = 2               /**< ADC resolution: 16 bit (not supported)*/
+} adc_res_t;
+/** @} */
 #endif /* ndef DOXYGEN */
 
 #ifdef __cplusplus

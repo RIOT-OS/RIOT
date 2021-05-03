@@ -1,0 +1,23 @@
+include ../../features_check.inc.mk
+
+FEATURES_VARS := \
+  FEATURES_CONFLICTING \
+  FEATURES_USED \
+  FEATURES_USED_BLACKLISTED \
+  FEATURES_MISSING \
+  #
+
+define _expected =
+  ifneq ($$(EXPECTED_$1),$$($1))
+    $$(info EXPECTED_$1 = $$(EXPECTED_$1))
+    $$(info $1 = $$($1))
+    $$(error $1 incorrectly resolved)
+  endif
+endef
+
+$(foreach var,$(FEATURES_VARS),$(eval $(call _expected,$(var))))
+
+
+.PHONY: all
+all:
+	@echo Success

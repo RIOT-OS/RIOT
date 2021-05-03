@@ -205,6 +205,13 @@ static size_t _fmt_descriptors_iface_alts(usbus_t *usbus,
         len += sizeof(usb_descriptor_interface_t);
         usb_iface.alternate_setting = alts++;
         usb_iface.num_endpoints = _num_endpoints_alt(alt);
+        if (alt->descr) {
+            usb_iface.idx = alt->descr->idx;
+        } else {
+            /* If there is no string descriptor for a given alt interface
+               set the index to 0 to advertise it */
+            usb_iface.idx = 0;
+        }
         usbus_control_slicer_put_bytes(usbus, (uint8_t *)&usb_iface,
                                        sizeof(usb_descriptor_interface_t));
         len += _fmt_descriptors_post(usbus, alt->descr_gen);
@@ -281,6 +288,7 @@ size_t usbus_fmt_descriptor_dev(usbus_t *usbus)
     desc.product_id = CONFIG_USB_PID;
     desc.manufacturer_idx = usbus->manuf.idx;
     desc.product_idx = usbus->product.idx;
+    desc.serial_idx = usbus->serial.idx;
     /* USBUS supports only a single config at the moment */
     desc.num_configurations = 1;
     usbus_control_slicer_put_bytes(usbus, (uint8_t *)&desc,

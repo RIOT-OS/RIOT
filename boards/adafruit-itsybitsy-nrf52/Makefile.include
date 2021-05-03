@@ -28,3 +28,4 @@ endif
 	$(FLASHER) dfu genpkg --dev-type 0x0052 --sd-req 0x00B6 --application $< $@
 
 include $(RIOTBOARD)/common/nrf52/Makefile.include
+PROGRAMMERS_SUPPORTED += nrfutil

@@ -17,7 +17,7 @@ Low Energy and IEEE 802.15.4 support via the nRF52840 MCU.
 ### Flash the board
 
 See the **Flashing** section in @ref boards_common_nrf52. The easiest way is to
-use an external Segger J-Link Progammer connected to the [SWD Connector].
+use an external Segger J-Link Programmer connected to the [SWD Connector].
 
 [SWD Connector]: https://learn.adafruit.com/introducing-the-adafruit-nrf52840-feather/pinouts#swd-connector-3-12
 

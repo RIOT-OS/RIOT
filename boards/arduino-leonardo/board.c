@@ -20,7 +20,6 @@
 
 #include "board.h"
 #include "cpu.h"
-#include "irq.h"
 #include "periph/gpio.h"
 
 #ifndef CPU_ATMEGA_CLK_SCALE_INIT
@@ -35,8 +34,7 @@ void board_init(void)
     PRR1 |= 1<<PRUSB;
 
     atmega_set_prescaler(CPU_ATMEGA_CLK_SCALE_INIT);
-    atmega_stdio_init();
+    avr8_stdio_init();
     cpu_init();
     led_init();
-    irq_enable();
 }

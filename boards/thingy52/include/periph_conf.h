@@ -62,11 +62,6 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
-/**
- * @brief Enable the internal DC/DC converter
- */
-#define NRF5X_ENABLE_DCDC
-
 #ifdef __cplusplus
 }
 #endif

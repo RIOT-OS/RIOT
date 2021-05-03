@@ -1,11 +1,8 @@
 # define the default flash-tool
 PROGRAMMER ?= cc2538-bsl
 
-# For backward compatibility
-ifneq (,$(PORT_BSL))
-  $(warning Warning! PORT_BSL is deprecated use PROG_DEV)
-  PROG_DEV ?= $(PORT_BSL)
-endif
+# cc2538-bsl programmer is supported
+PROGRAMMERS_SUPPORTED += cc2538-bsl
 
 ifeq ($(PROGRAMMER),cc2538-bsl)
   PROG_BAUD ?= 460800

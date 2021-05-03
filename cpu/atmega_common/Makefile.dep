@@ -1,16 +1,8 @@
-# avr libc needs some RIOT-specific support code
-USEMODULE += avr_libc_extra
-
 # tell the build system to build the atmega common files
 USEMODULE += atmega_common
 
 # peripheral drivers are linked into the final binary
 USEMODULE += atmega_common_periph
-
-# the atmel port uses stdio_uart by default
-ifeq (,$(filter stdio_% slipdev_stdio,$(USEMODULE)))
-  USEMODULE += stdio_uart
-endif
 
 # expand atmega_pcint module
 ifneq (,$(filter atmega_pcint,$(USEMODULE)))
@@ -37,7 +29,4 @@ ifneq (,$(filter atmega_pcint3,$(USEMODULE)))
   FEATURES_REQUIRED += atmega_pcint3
 endif
 
-# static C++ constructors need guards for thread safe initialization
-ifneq (,$(filter cpp,$(FEATURES_USED)))
-  USEMODULE += cxx_ctor_guards
-endif
+include $(RIOTCPU)/avr8_common/Makefile.dep

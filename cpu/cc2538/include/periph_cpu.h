@@ -214,6 +214,13 @@ typedef enum {
 /** @} */
 
 /**
+ * @brief   Size of the UART TX buffer for non-blocking mode.
+ */
+#ifndef UART_TXBUF_SIZE
+#define UART_TXBUF_SIZE    (64)
+#endif
+
+/**
  * @name   Override SPI mode settings
  * @{
  */

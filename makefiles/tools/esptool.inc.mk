@@ -9,37 +9,24 @@ BOOTLOADER_BIN = bootloader$(BOOTLOADER_COLOR)$(BOOTLOADER_INFO).bin
 
 ESPTOOL ?= $(RIOTTOOLS)/esptool/esptool.py
 
-# The ELFFILE is the base one used for flashing
-FLASHFILE ?= $(ELFFILE)
+# The ELFFILE is defined by default in $(RIOTBASE)/Makefile.include but only
+# after the $(PROGRAMMER).inc.mk file is included, so we need ELFFILE defined
+# earlier. This is used to create new make rules in this file (based on
+# FLASHFILE) and can't be deferred.
+ELFFILE ?= $(BINDIR)/$(APPLICATION).elf
+FLASHFILE ?= $(ELFFILE).bin
 
-# configure preflasher to convert .elf to .bin before flashing
-PREFLASHER = $(ESPTOOL)
-PREFFLAGS  = --chip $(FLASH_CHIP) elf2image
-PREFFLAGS += --flash_mode $(FLASH_MODE) --flash_size $(FLASH_SIZE)MB
-PREFFLAGS += --flash_freq $(FLASH_FREQ) $(FLASH_OPTS)
-PREFFLAGS += -o $(FLASHFILE).bin $(FLASHFILE);
-PREFFLAGS += printf "\n" > $(BINDIR)/partitions.csv;
-PREFFLAGS += printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $(BINDIR)/partitions.csv;
-PREFFLAGS += printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $(BINDIR)/partitions.csv;
-PREFFLAGS += printf "factory, app, factory, 0x10000, " >> $(BINDIR)/partitions.csv;
-PREFFLAGS += ls -l $(FLASHFILE).bin | awk '{ print $$5 }' >> $(BINDIR)/partitions.csv;
-
-PREFFLAGS += python3 $(RIOTTOOLS)/esptool/gen_esp32part.py
-PREFFLAGS += --verify $(BINDIR)/partitions.csv $(BINDIR)/partitions.bin
-FLASHDEPS += preflash
+# Convert .elf and .csv to .bin files at build time, but make them available for
+# tests at flash time. These can't be added to FLASHDEPS because they depend on
+# on ELFFILE and would trigger a rebuild with "flash-only".
+BUILD_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
+TEST_EXTRA_FILES += $(FLASHFILE) $(BINDIR)/partitions.bin
 
 # flasher configuration
 ifneq (,$(filter esp_qemu,$(USEMODULE)))
-  FLASHER = dd
-  FFLAGS += if=/dev/zero bs=1M count=$(FLASH_SIZE) |
-  FFLAGS += tr "\\000" "\\377" > tmp.bin && cat tmp.bin |
-  FFLAGS += head -c $$(($(BOOTLOADER_POS))) |
-  FFLAGS += cat - $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN) tmp.bin |
-  FFLAGS += head -c $$((0x8000)) |
-  FFLAGS += cat - $(BINDIR)/partitions.bin tmp.bin |
-  FFLAGS += head -c $$((0x10000)) |
-  FFLAGS += cat - $(FLASHFILE).bin tmp.bin |
-  FFLAGS += head -c $(FLASH_SIZE)MB > $(BINDIR)/$(CPU)flash.bin && rm tmp.bin;
+  FLASHER =
+  FFLAGS =
+  FLASHDEPS += esp-qemu
 else
   PROGRAMMER_SPEED ?= 460800
   FLASHER = $(ESPTOOL)
@@ -48,7 +35,44 @@ else
   FFLAGS += --flash_mode $(FLASH_MODE) --flash_freq $(FLASH_FREQ)
   FFLAGS += $(BOOTLOADER_POS) $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN)
   FFLAGS += 0x8000 $(BINDIR)/partitions.bin
-  FFLAGS += 0x10000 $(FLASHFILE).bin
+  FFLAGS += 0x10000 $(FLASHFILE)
+endif
+
+# This is the binary that ends up programmed in the flash.
+$(ELFFILE).bin: $(ELFFILE)
+	$(Q)$(ESPTOOL) --chip $(FLASH_CHIP) elf2image --flash_mode $(FLASH_MODE) \
+		--flash_size $(FLASH_SIZE)MB --flash_freq $(FLASH_FREQ) $(FLASH_OPTS) \
+		-o $@ $<
+
+# Default partition table with no OTA. Can be replaced with a custom partition
+# table setting PARTITION_TABLE_CSV.
+PARTITION_TABLE_CSV ?= $(BINDIR)/partitions.csv
+
+$(BINDIR)/partitions.csv: $(FLASHFILE)
+	$(Q)printf "\n" > $(BINDIR)/partitions.csv
+	$(Q)printf "nvs, data, nvs, 0x9000, 0x6000\n" >> $@
+	$(Q)printf "phy_init, data, phy, 0xf000, 0x1000\n" >> $@
+	$(Q)printf "factory, app, factory, 0x10000, " >> $@
+	$(Q)ls -l $< | awk '{ print $$5 }' >> $@
+
+$(BINDIR)/partitions.bin: $(PARTITION_TABLE_CSV)
+	$(Q)python3 $(RIOTTOOLS)/esptool/gen_esp32part.py --verify $< $@
+
+.PHONY: esp-qemu
+
+esp-qemu:
+	$(Q)dd if=/dev/zero bs=1M count=$(FLASH_SIZE) | \
+	  tr "\\000" "\\377" > tmp.bin && cat tmp.bin | \
+		head -c $$(($(BOOTLOADER_POS))) | \
+		cat - $(RIOTCPU)/$(CPU)/bin/$(BOOTLOADER_BIN) tmp.bin | \
+		head -c $$((0x8000)) | \
+		cat - $(BINDIR)/partitions.bin tmp.bin | \
+		head -c $$((0x10000)) | \
+		cat - $(FLASHFILE) tmp.bin | \
+		head -c $(FLASH_SIZE)MB > $(BINDIR)/$(CPU)flash.bin && rm tmp.bin
+ifeq (esp32,$(CPU_FAM))
+	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x3ff90000_0x00010000.bin $(BINDIR)/rom1.bin
+	$(Q)cp $(RIOTCPU)/$(CPU)/bin/rom_0x40000000_0x000c2000.bin $(BINDIR)/rom.bin
 endif
 
 # reset tool configuration

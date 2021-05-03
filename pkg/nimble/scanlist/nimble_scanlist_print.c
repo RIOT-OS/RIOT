@@ -19,6 +19,7 @@
  * @}
  */
 
+#include <stdio.h>
 #include <assert.h>
 
 #include "net/bluetil/ad.h"

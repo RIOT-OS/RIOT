@@ -121,6 +121,27 @@ typedef be_uint32_t network_uint32_t;
 typedef be_uint64_t network_uint64_t;
 
 /**
+ * @brief          Convert from little endian to host byte order, 16 bit.
+ * @param[in]      v   The integer in little endian.
+ * @returns        `v` converted to host byte order.
+ */
+static inline uint16_t byteorder_ltohs(le_uint16_t v);
+
+/**
+ * @brief          Convert from little endian to host byte order, 32 bit.
+ * @param[in]      v   The integer in little endian.
+ * @returns        `v` converted to host byte order.
+ */
+static inline uint32_t byteorder_ltohl(le_uint32_t v);
+
+/**
+ * @brief          Convert from little endian to host byte order, 64 bit.
+ * @param[in]      v   The integer in little endian.
+ * @returns        `v` converted to host byte order.
+ */
+static inline uint64_t byteorder_ltohll(le_uint64_t v);
+
+/**
  * @brief          Convert from little endian to big endian, 16 bit.
  * @param[in]      v   The integer in little endian.
  * @returns        `v` converted to big endian.
@@ -161,6 +182,27 @@ static inline le_uint32_t byteorder_btoll(be_uint32_t v);
  * @returns        `v` converted to little endian.
  */
 static inline le_uint64_t byteorder_btolll(be_uint64_t v);
+
+/**
+ * @brief          Convert from host byte order to little endian, 16 bit.
+ * @param[in]      v   The integer in host byte order.
+ * @returns        `v` converted to little endian.
+ */
+static inline le_uint16_t byteorder_htols(uint16_t v);
+
+/**
+ * @brief          Convert from host byte order to little endian, 32 bit.
+ * @param[in]      v   The integer in host byte order.
+ * @returns        `v` converted to little endian.
+ */
+static inline le_uint32_t byteorder_htoll(uint32_t v);
+
+/**
+ * @brief          Convert from host byte order to little endian, 64 bit.
+ * @param[in]      v   The integer in host byte order.
+ * @returns        `v` converted to little endian.
+ */
+static inline le_uint64_t byteorder_htolll(uint64_t v);
 
 /**
  * @brief          Convert from host byte order to network byte order, 16 bit.
@@ -381,6 +423,32 @@ static inline uint64_t byteorder_swapll(uint64_t v)
     return __builtin_bswap64(v);
 }
 
+/**
+ * @brief Swaps the byteorder according to the endianness (host -> le)
+ */
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#   define _byteorder_swap_le(V, T) (V)
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#   define _byteorder_swap_le(V, T) (byteorder_swap ## T((V)))
+#else
+#   error "Byte order is neither little nor big!"
+#endif
+
+static inline uint16_t byteorder_ltohs(le_uint16_t v)
+{
+    return _byteorder_swap_le(v.u16, s);
+}
+
+static inline uint32_t byteorder_ltohl(le_uint32_t v)
+{
+    return _byteorder_swap_le(v.u32, l);
+}
+
+static inline uint64_t byteorder_ltohll(le_uint64_t v)
+{
+    return _byteorder_swap_le(v.u64, ll);
+}
+
 static inline be_uint16_t byteorder_ltobs(le_uint16_t v)
 {
     be_uint16_t result = { byteorder_swaps(v.u16) };
@@ -423,8 +491,29 @@ static inline le_uint64_t byteorder_btolll(be_uint64_t v)
     return result;
 }
 
+static inline le_uint16_t byteorder_htols(uint16_t v)
+{
+    le_uint16_t result = { _byteorder_swap_le(v, s) };
+
+    return result;
+}
+
+static inline le_uint32_t byteorder_htoll(uint32_t v)
+{
+    le_uint32_t result = { _byteorder_swap_le(v, l) };
+
+    return result;
+}
+
+static inline le_uint64_t byteorder_htolll(uint64_t v)
+{
+    le_uint64_t result = { _byteorder_swap_le(v, ll) };
+
+    return result;
+}
+
 /**
- * @brief Swaps the byteorder according to the endianness
+ * @brief Swaps the byteorder according to the endianness (host -> BE)
  */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #   define _byteorder_swap(V, T) (byteorder_swap ## T((V)))

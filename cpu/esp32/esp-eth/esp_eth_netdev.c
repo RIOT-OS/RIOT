@@ -100,10 +100,15 @@ static esp_err_t IRAM_ATTR _eth_input_callback(void *buffer, uint16_t len, void 
 
     mutex_lock(&_esp_eth_dev.dev_lock);
 
-    memcpy(_esp_eth_dev.rx_buf, buffer, len);
-    _esp_eth_dev.rx_len = len;
-    _esp_eth_dev.event = SYSTEM_EVENT_ETH_RX_DONE;
-    netdev_trigger_event_isr(&_esp_eth_dev.netdev);
+    /* Don't overwrite other events, drop packet instead.
+     * Keep the latest received packet if previous has not been read. */
+    if (_esp_eth_dev.event == SYSTEM_EVENT_MAX ||
+        _esp_eth_dev.event == SYSTEM_EVENT_ETH_RX_DONE) {
+        memcpy(_esp_eth_dev.rx_buf, buffer, len);
+        _esp_eth_dev.rx_len = len;
+        _esp_eth_dev.event = SYSTEM_EVENT_ETH_RX_DONE;
+        netdev_trigger_event_isr(&_esp_eth_dev.netdev);
+    }
 
     mutex_unlock(&_esp_eth_dev.dev_lock);
 

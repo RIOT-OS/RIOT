@@ -58,6 +58,11 @@ extern "C" {
 /** @} */
 
 /**
+ * @brief   nRF51 only has one GPIO block
+ */
+#define GPIO_COUNT              (1U)
+
+/**
  * @brief   Due to RAM restrictions, we need to limit the default GNRC packet
  *          buffer size on these CPUs
  * @{

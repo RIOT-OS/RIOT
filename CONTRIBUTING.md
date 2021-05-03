@@ -10,12 +10,14 @@ of this document using the following links:
 * [Writing Documentation][writing-documentation]
 * [Working with Git][working with git]
 
-If you have questions, please send an email to <users@riot-os.org> or
-<devel@riot-os.org> mailing list or chat on `#riot-os` on [IRC] or [Matrix].
+If you have questions, please write a post over at our [forum], send an email to
+<users@riot-os.org> or <devel@riot-os.org> mailing list or chat on `#riot-os` on
+[IRC] or [Matrix].
 
 As a reminder, all contributors are expected to follow our
 [Code of Conduct](CODE_OF_CONDUCT.md).
 
+[forum]: https://forum.riot-os.org
 [IRC]: http://webchat.freenode.net?channels=riot-os
 [Matrix]: https://matrix.to/#/#riot-os:matrix.org
 

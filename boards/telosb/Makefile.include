@@ -7,3 +7,5 @@ BAUD ?= 9600
 # flash tool configuration
 PROGRAMMER ?= goodfet
 GOODFET_FLAGS ?= --telosb
+
+PROGRAMMERS_SUPPORTED += goodfet

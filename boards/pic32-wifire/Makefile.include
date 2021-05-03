@@ -2,6 +2,7 @@ PORT_LINUX ?= /dev/ttyUSB0
 
 # use pic32prog by default to program this board
 PROGRAMMER ?= pic32prog
+PROGRAMMERS_SUPPORTED += pic32prog jlink
 
 ifeq ($(PROGRAMMER),pic32prog)
   # pic32prog

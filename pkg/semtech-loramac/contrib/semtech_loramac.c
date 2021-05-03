@@ -29,19 +29,20 @@
 
 #include "msg.h"
 #include "mutex.h"
+#include "kernel_defines.h"
 
 #include "net/netdev.h"
 #include "net/netdev/lora.h"
 #include "net/loramac.h"
 
-#include "sx127x.h"
-#include "sx127x_params.h"
-#include "sx127x_netdev.h"
-
 #include "semtech_loramac.h"
 #include "LoRaMac.h"
 #include "LoRaMacTest.h"
 #include "region/Region.h"
+
+#if IS_USED(MODULE_SX127X)
+#include "sx127x.h"
+#endif
 
 #ifdef MODULE_PERIPH_EEPROM
 #include "periph/eeprom.h"
@@ -50,17 +51,19 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#define LORAMAC_RX_BUFFER_SIZE                      (256U)
 #define SEMTECH_LORAMAC_MSG_QUEUE                   (4U)
 #define SEMTECH_LORAMAC_LORAMAC_STACKSIZE           (THREAD_STACKSIZE_DEFAULT)
 static msg_t _semtech_loramac_msg_queue[SEMTECH_LORAMAC_MSG_QUEUE];
 static char _semtech_loramac_stack[SEMTECH_LORAMAC_LORAMAC_STACKSIZE];
 kernel_pid_t semtech_loramac_pid;
 
-sx127x_t sx127x;
 RadioEvents_t semtech_loramac_radio_events;
 LoRaMacPrimitives_t semtech_loramac_primitives;
 LoRaMacCallback_t semtech_loramac_callbacks;
 extern LoRaMacParams_t LoRaMacParams;
+
+netdev_t *loramac_netdev_ptr = 0;
 
 typedef struct {
     uint8_t *payload;
@@ -202,8 +205,6 @@ static size_t _write_uint32(size_t pos, uint32_t value)
     array[3] = (uint8_t)(value);
     return eeprom_write(pos, array, sizeof(uint32_t));
 }
-
-
 
 static inline void _set_join_state(semtech_loramac_t *mac, bool joined)
 {
@@ -375,15 +376,15 @@ void _init_loramac(semtech_loramac_t *mac,
 #endif
     mutex_unlock(&mac->lock);
 
-    semtech_loramac_set_dr(mac, LORAMAC_DEFAULT_DR);
-    semtech_loramac_set_adr(mac, LORAMAC_DEFAULT_ADR);
+    semtech_loramac_set_dr(mac, CONFIG_LORAMAC_DEFAULT_DR);
+    semtech_loramac_set_adr(mac, IS_ACTIVE(CONFIG_LORAMAC_DEFAULT_ADR));
     semtech_loramac_set_public_network(mac, LORAMAC_DEFAULT_PUBLIC_NETWORK);
-    semtech_loramac_set_class(mac, LORAMAC_DEFAULT_DEVICE_CLASS);
-    semtech_loramac_set_tx_port(mac, LORAMAC_DEFAULT_TX_PORT);
-    semtech_loramac_set_tx_mode(mac, LORAMAC_DEFAULT_TX_MODE);
+    semtech_loramac_set_class(mac, CONFIG_LORAMAC_DEFAULT_DEVICE_CLASS);
+    semtech_loramac_set_tx_port(mac, CONFIG_LORAMAC_DEFAULT_TX_PORT);
+    semtech_loramac_set_tx_mode(mac, CONFIG_LORAMAC_DEFAULT_TX_MODE);
     semtech_loramac_set_system_max_rx_error(mac,
-                                            LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR);
-    semtech_loramac_set_min_rx_symbols(mac, LORAMAC_DEFAULT_MIN_RX_SYMBOLS);
+                                            CONFIG_LORAMAC_DEFAULT_SYSTEM_MAX_RX_ERROR);
+    semtech_loramac_set_min_rx_symbols(mac, CONFIG_LORAMAC_DEFAULT_MIN_RX_SYMBOLS);
 #ifdef MODULE_PERIPH_EEPROM
     _read_loramac_config(mac);
 #endif
@@ -450,7 +451,7 @@ static void _join_abp(semtech_loramac_t *mac)
 {
     DEBUG("[semtech-loramac] starting ABP join\n");
 
-    semtech_loramac_set_netid(mac, LORAMAC_DEFAULT_NETID);
+    semtech_loramac_set_netid(mac, CONFIG_LORAMAC_DEFAULT_NETID);
 
     mutex_lock(&mac->lock);
     MibRequestConfirm_t mibReq;
@@ -521,11 +522,13 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
             break;
 
         case NETDEV_EVENT_TX_COMPLETE:
-            sx127x_set_sleep((sx127x_t *)dev);
+        {
+            netopt_state_t sleep_state = NETOPT_STATE_SLEEP;
+            dev->driver->set(dev, NETOPT_STATE, &sleep_state, sizeof(netopt_state_t));
             semtech_loramac_radio_events.TxDone();
             DEBUG("[semtech-loramac] Transmission completed\n");
             break;
-
+        }
         case NETDEV_EVENT_TX_TIMEOUT:
             msg.type = MSG_TYPE_TX_TIMEOUT;
             if (msg_send(&msg, semtech_loramac_pid) <= 0) {
@@ -542,7 +545,7 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
             int len;
             len = dev->driver->recv(dev, NULL, 0, 0);
             if (len > 0) {
-                uint8_t radio_payload[SX127X_RX_BUFFER_SIZE];
+                uint8_t radio_payload[LORAMAC_RX_BUFFER_SIZE];
                 dev->driver->recv(dev, radio_payload, len, &packet_info);
                 semtech_loramac_radio_events.RxDone(radio_payload,
                                                     len, packet_info.rssi,
@@ -562,6 +565,7 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
             semtech_loramac_radio_events.RxError();
             break;
 
+#if IS_USED(MODULE_SX127X)
         case NETDEV_EVENT_FHSS_CHANGE_CHANNEL:
             DEBUG("[semtech-loramac] FHSS channel change\n");
             if(semtech_loramac_radio_events.FhssChangeChannel) {
@@ -577,6 +581,7 @@ static void _semtech_loramac_event_cb(netdev_t *dev, netdev_event_t event)
                             (sx127x_t *)dev)->_internal.is_last_cad_success);
             }
             break;
+#endif
 
         default:
             DEBUG("[semtech-loramac] unexpected netdev event received: %d\n",
@@ -830,9 +835,8 @@ void *_semtech_loramac_event_loop(void *arg)
 
 int semtech_loramac_init(semtech_loramac_t *mac)
 {
-    sx127x_setup(&sx127x, &sx127x_params[0], 0);
-    sx127x.netdev.driver = &sx127x_driver;
-    sx127x.netdev.event_callback = _semtech_loramac_event_cb;
+    loramac_netdev_ptr = mac->netdev;
+    mac->netdev->event_callback = _semtech_loramac_event_cb;
 
     semtech_loramac_pid = thread_create(_semtech_loramac_stack,
                                         sizeof(_semtech_loramac_stack),

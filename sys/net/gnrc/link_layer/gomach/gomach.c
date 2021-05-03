@@ -71,7 +71,7 @@ static const gnrc_netif_ops_t gomach_ops = {
 };
 
 int gnrc_netif_gomach_create(gnrc_netif_t *netif, char *stack, int stacksize,
-                             char priority, char *name, netdev_t *dev)
+                             char priority, const char *name, netdev_t *dev)
 {
     return gnrc_netif_create(netif, stack, stacksize, priority, name, dev,
                              &gomach_ops);
@@ -149,12 +149,16 @@ static void gomach_reinit_radio(gnrc_netif_t *netif)
                                 sizeof(netif->l2addr));
     }
 
-    /* Enable RX-start and TX-started and TX-END interrupts. */
-    netopt_enable_t enable = NETOPT_ENABLE;
-    netif->dev->driver->set(netif->dev, NETOPT_RX_START_IRQ, &enable, sizeof(enable));
-    netif->dev->driver->set(netif->dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
-    netif->dev->driver->set(netif->dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
-
+    /* Check if RX-start and TX-started and TX-END interrupts are supported */
+    if (IS_ACTIVE(DEVELHELP)) {
+        netopt_enable_t enable;
+        netif->dev->driver->get(netif->dev, NETOPT_RX_START_IRQ, &enable, sizeof(enable));
+        assert(enable == NETOPT_ENABLE);
+        netif->dev->driver->get(netif->dev, NETOPT_RX_END_IRQ, &enable, sizeof(enable));
+        assert(enable == NETOPT_ENABLE);
+        netif->dev->driver->get(netif->dev, NETOPT_TX_END_IRQ, &enable, sizeof(enable));
+        assert(enable == NETOPT_ENABLE);
+    }
 }
 
 static void _gomach_rtt_cb(void *arg)

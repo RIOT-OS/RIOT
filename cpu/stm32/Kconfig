@@ -12,6 +12,7 @@ config CPU_STM32
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_TIMER_PERIODIC
+    select HAS_PERIPH_RTT_OVERFLOW
     select HAS_PERIPH_UART_MODECFG
     select HAS_PERIPH_UART_NONBLOCKING
 
@@ -29,10 +30,6 @@ config HAS_BOOTLOADER_STM32
     bool
     help
         Indicates that the stm32 bootloader is being used.
-
-config ERROR_MODULES_CONFLICT
-    default "On STM32, the RTC and RTT map to the same hardware peripheral." if MODULE_PERIPH_RTC && MODULE_PERIPH_RTT
-    depends on CPU_STM32
 
 orsource "kconfigs/Kconfig.clk"
 orsource "kconfigs/*/Kconfig"

@@ -6,10 +6,11 @@
 #
 # Author: Juan Carrano <j.carrano@fu-berlin.de>
 
-import os
 import sys
 import base64
 from functools import partial
+
+from testrunner import run
 
 MAX_LINE = 128
 
@@ -25,10 +26,10 @@ def test(vectors, child):
         assert idx == 0
         return idx
 
-    def _safe_sendline(l):
-        assert len(l) < MAX_LINE
+    def _safe_sendline(line):
+        assert len(line) < MAX_LINE
         _safe_expect_exact('{ready}')
-        child.sendline(l)
+        child.sendline(line)
 
     for passwd, salt, iters, key in vectors:
         _safe_sendline(passwd)
@@ -40,6 +41,4 @@ def test(vectors, child):
 
 
 def main(vectors):
-    sys.path.append(os.path.join(os.environ['RIOTTOOLS'], 'testrunner'))
-    from testrunner import run
     sys.exit(run(partial(test, vectors)))

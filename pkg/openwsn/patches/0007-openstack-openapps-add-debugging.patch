@@ -1,7 +1,7 @@
-From ede0403eb8774674e2194d30f573fa31b07b9d8a Mon Sep 17 00:00:00 2001
+From cce2ccd31b931d1b739e05e124af709e56359a59 Mon Sep 17 00:00:00 2001
 From: Francisco Molina <femolina@uc.cl>
 Date: Fri, 27 Mar 2020 10:18:16 +0100
-Subject: [PATCH 7/9] openstack/openapps: add debugging
+Subject: [PATCH 07/11] openstack/openapps: add debugging
 
 Debugging info that can be also be obtained through ifconfig in
 tests/openwsn.
@@ -86,7 +86,7 @@ index 1e040dee..6431cbf7 100644
      outcome = coap_send(
              pkt,
 diff --git a/openstack/02a-MAClow/IEEE802154E.c b/openstack/02a-MAClow/IEEE802154E.c
-index 76e7ee56..83de4296 100644
+index 8e51a7e8..e8e3eb90 100644
 --- a/openstack/02a-MAClow/IEEE802154E.c
 +++ b/openstack/02a-MAClow/IEEE802154E.c
 @@ -19,6 +19,8 @@

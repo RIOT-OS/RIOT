@@ -1,0 +1,49 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+if TEST_KCONFIG
+
+choice
+    bool "Semtech SX1272 and SX1276 radios driver"
+    optional
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    depends on HAS_PERIPH_SPI
+    depends on HAS_PERIPH_TIMER
+    help
+        Only LoRa long range modem is supported at the moment.
+
+config MODULE_SX1272
+    bool "SX1272"
+    select MODULE_SX127X
+
+config MODULE_SX1276
+    bool "SX1276"
+    select MODULE_SX127X
+
+endchoice
+
+config MODULE_SX127X
+    bool
+    depends on HAS_PERIPH_GPIO
+    depends on HAS_PERIPH_GPIO_IRQ
+    depends on HAS_PERIPH_SPI
+
+    select MODULE_IOLIST
+    select MODULE_LORA
+    select MODULE_PERIPH_GPIO
+    select MODULE_PERIPH_GPIO_IRQ
+    select MODULE_PERIPH_SPI_GPIO_MODE if HAS_PERIPH_SPI_GPIO_MODE
+    select MODULE_PERIPH_SPI
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_PERIPH_TIMER
+    select MODULE_ZTIMER_USEC
+    select MODULE_ZTIMER_MSEC
+
+    imply MODULE_ZTIMER_PERIPH_RTT
+
+endif # TEST_KCONFIG

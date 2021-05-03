@@ -19,13 +19,13 @@
 
 #include <assert.h>
 
+#include "kernel_defines.h"
 #include "thread.h"
 
 #include "xtimer.h"
 #include "log.h"
 
 #include "lvgl/lvgl.h"
-#include "lv_conf.h"
 #include "lvgl_riot.h"
 
 #include "screen_dev.h"
@@ -38,12 +38,12 @@
 #define LVGL_COLOR_BUF_SIZE         (LV_HOR_RES_MAX * 5)
 #endif
 
-#ifndef LVGL_INACTIVITY_PERIOD_MS
-#define LVGL_INACTIVITY_PERIOD_MS   (1 * MS_PER_SEC)    /* 1s */
+#ifndef CONFIG_LVGL_INACTIVITY_PERIOD_MS
+#define CONFIG_LVGL_INACTIVITY_PERIOD_MS   (5 * MS_PER_SEC)    /* 5s */
 #endif
 
-#ifndef LVGL_TASK_HANDLER_DELAY_US
-#define LVGL_TASK_HANDLER_DELAY_US  (5 * US_PER_MS)     /* 5ms */
+#ifndef CONFIG_LVGL_TASK_HANDLER_DELAY_US
+#define CONFIG_LVGL_TASK_HANDLER_DELAY_US  (5 * US_PER_MS)     /* 5ms */
 #endif
 
 #ifndef LVGL_THREAD_FLAG
@@ -64,9 +64,9 @@ static void *_task_thread(void *arg)
     (void)arg;
 
     while (1) {
-        /* Normal operation (no sleep) in < LVGL_INACTIVITY_PERIOD_MS msec
+        /* Normal operation (no sleep) in < CONFIG_LVGL_INACTIVITY_PERIOD_MS msec
            inactivity */
-        if (lv_disp_get_inactive_time(NULL) < LVGL_INACTIVITY_PERIOD_MS) {
+        if (lv_disp_get_inactive_time(NULL) < CONFIG_LVGL_INACTIVITY_PERIOD_MS) {
             lv_task_handler();
         }
         else {
@@ -77,7 +77,7 @@ static void *_task_thread(void *arg)
             lv_disp_trig_activity(NULL);
         }
 
-        xtimer_usleep(LVGL_TASK_HANDLER_DELAY_US);
+        xtimer_usleep(CONFIG_LVGL_TASK_HANDLER_DELAY_US);
     }
 
     return NULL;
@@ -97,7 +97,7 @@ static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *col
     lv_disp_flush_ready(drv);
 }
 
-#ifdef MODULE_TOUCH_DEV
+#if IS_USED(MODULE_TOUCH_DEV)
 /* adapted from https://github.com/lvgl/lvgl/tree/v6.1.2#add-littlevgl-to-your-project */
 static bool _touch_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data)
 {
@@ -145,16 +145,21 @@ void lvgl_init(screen_dev_t *screen_dev)
     lv_disp_drv_register(&disp_drv);
     lv_disp_buf_init(&disp_buf, buf, NULL, LVGL_COLOR_BUF_SIZE);
 
-#ifdef MODULE_TOUCH_DEV
-    assert(screen_dev->touch);
-    lv_indev_drv_t indev_drv;
-    lv_indev_drv_init(&indev_drv);
-    indev_drv.type = LV_INDEV_TYPE_POINTER;
-    indev_drv.read_cb = _touch_read;
-    lv_indev_drv_register(&indev_drv);
+#if IS_USED(MODULE_TOUCH_DEV)
+    if (screen_dev->touch) {
+        lv_indev_drv_t indev_drv;
+        lv_indev_drv_init(&indev_drv);
+        indev_drv.type = LV_INDEV_TYPE_POINTER;
+        indev_drv.read_cb = _touch_read;
+        lv_indev_drv_register(&indev_drv);
+    }
 #endif
 
     lv_task_handler();
+}
+
+void lvgl_start(void)
+{
     _task_thread_pid = thread_create(_task_thread_stack, sizeof(_task_thread_stack),
                                      LVGL_TASK_THREAD_PRIO, THREAD_CREATE_STACKTEST,
                                      _task_thread, NULL, "_task_thread");

@@ -3,13 +3,20 @@
 @ingroup         boards
 @brief           Texas Instruments SimpleLink(TM) CC1312 Wireless MCU LaunchPad(TM) Kit
 
-## Overview
+## <a name="cc1312_launchpad_toc"> Table of Contents </a> &nbsp;[[TOC]](#cc1312_launchpad_toc)
+
+1. [Overview](#cc1312_launchpad_overview)
+2. [Hardware](#cc1312_launchpad_hardware)
+3. [Board pinout](#cc1312_launchpad_pinout)
+4. [Flashing the Device](#cc1312_launchpad_flashing)
+
+## <a name="cc1312_launchpad_overview"> Overview </a> &nbsp;[[TOC]](#cc1312_launchpad_toc)
 
 The [LAUNCHXL-CC1312R1](http://www.ti.com/tool/LAUNCHXL-CC1312R1) is a Texas
 Instrument's development kit for the CC1312R1 SoC MCU which combines a
 Cortex-M4F microcontroller alongside a dedicated Cortex-M0 to control radio.
 
-## Hardware
+## <a name="cc1312_launchpad_hardware"> Hardware </a> &nbsp;[[TOC]](#cc1312_launchpad_toc)
 
 ![LAUNCHXL-CC1312R1](http://www.ti.com/diagrams/launchxl-cc1312r1_cc1312r1-top-prof1.jpg)
 
@@ -30,93 +37,34 @@ Cortex-M4F microcontroller alongside a dedicated Cortex-M0 to control radio.
 | Datasheet         | [Datasheet](http://www.ti.com/lit/ds/symlink/cc1312r.pdf) (pdf file) |
 | Reference Manual  | [Reference Manual](http://www.ti.com/lit/ug/swcu185d/swcu185d.pdf) |
 
-## Board pinout
+## <a name="cc1312_launchpad_pinout"> Board pinout </a> &nbsp;[[TOC]](#cc1312_launchpad_toc)
 
-The [CC1312R Quick Start Guide](http://www.ti.com/lit/ml/swru535c/swru535c.pdf)
+The [LAUNXHL-CC1312R Quick Start Guide](http://www.ti.com/lit/ml/swru535c/swru535c.pdf)
 provides the default pinout for the board.
 
-## Flashing and Debugging
+## <a name="cc1312_launchpad_flashing"> Flashing the Device </a> &nbsp;[[TOC]](#cc1312_launchpad_toc)
 
-The LAUNCHXL-CC1312R1 comes with an XDS110 on-board debug probe that provides
-programming, flashing and debugging capabilities.
-
-### Using TI tools
-
-#### Installing CCS and Uniflash
-
-The TI's Code Composer Studio provides the necessary tools to use the debug
-features of the XDS110; Uniflash provides flashing tools. Both programs can
-be found here:
-
-- [Code Composer Studio (CCS) Integrated Development Environment (IDE)](http://www.ti.com/tool/CCSTUDIO).
-- [Uniflash Standalone Flash Tool for TI Microcontrollers (MCU), Sitara Processors & SimpleLink devices](http://www.ti.com/tool/UNIFLASH).
-
-Before using the XDS110 with the latest CCS/Uniflash versions the firmware for
-it needs to be updated. Texas Instruments has a guide to correctly update it
-[here](http://software-dl.ti.com/ccs/esd/documents/xdsdebugprobes/emu_xds110.html#updating-the-xds110-firmware).
-
-#### Setting up the environment
-
-In order to make use of the programming and debugging capabilities of the XDS110
-some environment variable needs to be set:
+Flashing RIOT is quite straight forward. The board comes with an XDS110 on-board
+debug probe that provides programming, flashing and debugging capabilities
+through the USB Micro-USB connector. Once either TI Uniflash or OpenOCD are
+installed just connect the board using the Micro-USB port to your computer and
+type:
 
 ```
-export CCS_PATH=<path to ti install folder>/ti/ccs930
-export UNIFLASH_PATH<path to ti install folder>/ti/uniflash_5.2.0
+make flash BOARD=cc1312-launchpad
 ```
 
-That assumes you have CCS 9.3.0 (for the path name) and Uniflash 5.2.0, adjust
-accordingly.
-
-After that you can flash using the RIOT `make flash` command on your application
-or to debug you first start the debug server:
-
-```
-make debug-server
-```
-
-And then on another terminal you can run:
-
-```
-make debug
-```
-
-It will open GDB and connect to the debug server automatically.
-
-#### Reset
-
-The LAUNCHXL-CC1312R1 provides a reset button but it can also be reset from
-a computer using the `make reset` command.
-
-### Using OpenOCD
-
-To use OpenOCD with the XDS110 you need to use the an special version of
-OpenOCD made by TI (upstream version is not _yet_ compatible). You can
-clone and compile it from source:
-
-```
-# Clone into the openocd-ti folder
-git clone https://git.ti.com/cgit/sdo-emu/openocd openocd-ti
-
-# Change directory to the openocd source code
-cd openocd-ti/openocd
-
-# Configure, build, install
-./configure
-make
-sudo make install
-```
-
-#### Setting up the environment
-
-Now that we have the TI version of OpenOCD we need to export the `PROGRAMMER`
-environment variable, this is to enable OpenOCD instead of Uniflash.
+To use OpenOCD instead of uniflash we need to set the `PROGRAMMER` environment
+variable, this is to enable OpenOCD instead of Uniflash.
 
 ```
 export PROGRAMMER=openocd
 ```
 
-Now we can just do `make debug-server` and then `make debug`, this all using
-OpenOCD.
+Now we can just do `make flash` and `make debug`, this all using OpenOCD.
+
+For detailed information about CC1312 MCUs as well as configuring, compiling
+RIOT and installation of flashing tools for CC1312 boards,
+see \ref cc26xx_cc13xx_riot.
 
 */

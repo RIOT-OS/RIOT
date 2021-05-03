@@ -21,14 +21,14 @@
 
 #include "board.h"
 #include "led.h"
+#include "ztimer.h"
 #include "periph_conf.h"
-#include "xtimer.h"
-#define UMORSE_MSLEEP(m)    xtimer_msleep(m)
 
 #include "umorse.h"
 #include "print.h"
 
-#define CODE_LEN	(64U)
+#define UMORSE_MSLEEP(m)        ztimer_sleep(ZTIMER_MSEC, m);
+#define CODE_LEN                (64U)
 
 void blink_dit(void *args, uint8_t flags)
 {

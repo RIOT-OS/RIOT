@@ -1,5 +1,5 @@
 # external programmer required
-DEBUG_ADAPTER ?= jlink
+OPENOCD_DEBUG_ADAPTER ?= jlink
 
 INCLUDES += -I$(RIOTBOARD)/common/e104-bt50xxa-tb/include
 

@@ -1,0 +1,38 @@
+export CPU_ATXMEGA 1
+
+# CPU ROM/RAM
+ifneq (,$(findstring atxmega8,$(CPU_MODEL)))
+  RAM_LEN = 1K
+  ROM_LEN = 8K
+endif
+ifneq (,$(findstring atxmega16,$(CPU_MODEL)))
+  RAM_LEN = 2K
+  ROM_LEN = 16K
+endif
+ifneq (,$(findstring atxmega32,$(CPU_MODEL)))
+  RAM_LEN = 4K
+  ROM_LEN = 32K
+endif
+ifneq (,$(findstring atxmega64,$(CPU_MODEL)))
+  RAM_LEN ?= 4K
+  ROM_LEN = 64K
+endif
+#ifneq (,$(findstring atxmega128,$(CPU_MODEL)))
+  RAM_LEN ?= 8K
+  ROM_LEN = 128K
+#endif
+ifneq (,$(findstring atxmega192,$(CPU_MODEL)))
+  RAM_LEN = 16K
+  ROM_LEN = 192K
+endif
+ifneq (,$(findstring atxmega256,$(CPU_MODEL)))
+  RAM_LEN = 16K
+  ROM_LEN = 256K
+endif
+ifneq (,$(findstring atxmega384,$(CPU_MODEL)))
+  RAM_LEN = 32K
+  ROM_LEN = 384K
+endif
+
+# CPU depends on the avr8 common module, so include it
+include $(RIOTCPU)/avr8_common/Makefile.include

@@ -757,6 +757,7 @@ INPUT                  = ../../doc.txt \
                          ../../core \
                          ../../cpu \
                          ../../boards \
+                         ../../bootloaders \
                          ../../drivers \
                          ../../pkg \
                          ../../sys \
@@ -772,6 +773,7 @@ INPUT                  = ../../doc.txt \
                          src/kconfig/kconfig.md \
                          src/using-cpp.md \
                          src/advanced-build-system-tricks.md \
+                         src/emulators.md \
                          src/changelog.md \
                          ../../LOSTANDFOUND.md
 

@@ -4,6 +4,5 @@ PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 BAUD        ?= 9600
 
 ARDUINO_NANO_BOOTLOADER ?= atmegaboot
-BOOTLOADER ?= $(ARDUINO_NANO_BOOTLOADER)
 
 include $(RIOTBOARD)/common/arduino-atmega/Makefile.include

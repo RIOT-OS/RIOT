@@ -80,6 +80,7 @@ void ztimer_periph_timer_init(ztimer_periph_timer_t *clock, tim_t dev,
     clock->super.ops = &_ztimer_periph_timer_ops;
     clock->super.max_value = max_val;
     int ret = timer_init(dev, freq, _ztimer_periph_timer_callback, clock);
+
     (void)ret;
     assert(ret == 0);
     ztimer_init_extend(&clock->super);

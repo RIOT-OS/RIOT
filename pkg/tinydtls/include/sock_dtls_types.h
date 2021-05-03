@@ -22,6 +22,7 @@
 #include "dtls.h"
 #include "net/sock/udp.h"
 #include "net/credman.h"
+#include "net/sock/dtls/creds.h"
 #ifdef SOCK_HAS_ASYNC
 #include "net/sock/async/types.h"
 #endif
@@ -52,6 +53,7 @@ struct sock_dtls {
      */
     sock_dtls_cb_t async_cb;
     void *async_cb_arg;                     /**< asynchronous callback arg */
+    session_t async_cb_session;             /**< asynchronous callback session */
 #if defined(SOCK_HAS_ASYNC_CTX) || defined(DOXYGEN)
     /**
      * @brief   Asynchronous event context
@@ -73,17 +75,18 @@ struct sock_dtls {
         size_t datalen;                     /**< data length */
         session_t *session;                 /**< Session information */
     } buffer;
-    credman_tag_t tag;                      /**< Credential tag of a registered
-                                                (D)TLS credential */
+    char psk_hint[CONFIG_DTLS_PSK_ID_HINT_MAX_SIZE]; /**< PSK Identity hint */
+    credman_tag_t tags[CONFIG_DTLS_CREDENTIALS_MAX]; /**< Tags of the available credentials */
+    unsigned tags_len;                      /**< Number of tags in the list 'tags' */
     dtls_peer_type role;                    /**< DTLS role of the socket */
+    sock_dtls_client_psk_cb_t client_psk_cb;/**< Callback to determine PSK credential for session */
+    sock_dtls_rpk_cb_t rpk_cb;              /**< Callback to determine RPK credential for session */
 };
 
 /**
  * @brief Information about remote client connected to the server
  */
 struct sock_dtls_session {
-    sock_udp_ep_t   ep;              /**< Remote endpoint the session
-                                         is connected to */
     session_t       dtls_session;    /**< TinyDTLS session */
 };
 

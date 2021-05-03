@@ -1,4 +1,6 @@
 XDEBUGGER = XDS110
 
+OPENOCD_CONFIG ?= $(BOARDDIR)/dist/openocd.cfg
+
 # configure the flash tool
-PROGRAMMER ?= uniflash
+include $(RIOTBOARD)/common/cc26xx_cc13xx/Makefile.include

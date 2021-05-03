@@ -443,7 +443,7 @@ config BOARD_SAMR21_XPRO
 
 ## Summary of reserved Kconfig prefixes
 The following symbol prefixes have been assigned particular semantics and are
-reserved for the cases described bellow:
+reserved for the cases described below:
 
 <!-- Keep the table in alphabetical order -->
 | Prefix | Description |

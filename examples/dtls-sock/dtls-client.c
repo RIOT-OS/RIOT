@@ -18,10 +18,14 @@
 
 #include <stdio.h>
 
+#include "kernel_defines.h"
+
 #include "net/sock/udp.h"
 #include "net/sock/dtls.h"
+#include "net/sock/dtls/creds.h"
 #include "net/ipv6/addr.h"
 #include "net/credman.h"
+#include "net/sock/util.h"
 
 #include "tinydtls_keys.h"
 
@@ -29,36 +33,41 @@
 #define DTLS_DEFAULT_PORT 20220 /* DTLS default port */
 #endif
 
-#define SOCK_DTLS_CLIENT_TAG (2)
+#define SOCK_DTLS_CLIENT_TAG_0 (2)
+#define SOCK_DTLS_CLIENT_TAG_1 (3)
 
 #ifdef CONFIG_DTLS_ECC
-static const ecdsa_public_key_t other_pubkeys[] = {
-    { .x = ecdsa_pub_key_x, .y = ecdsa_pub_key_y },
+static const ecdsa_public_key_t other_pubkeys0[] = {
+    { .x = ecdsa_pub_key0_x, .y = ecdsa_pub_key0_y },
 };
 
-static const credman_credential_t credential = {
+static const credman_credential_t credential0 = {
     .type = CREDMAN_TYPE_ECDSA,
-    .tag = SOCK_DTLS_CLIENT_TAG,
+    .tag = SOCK_DTLS_CLIENT_TAG_0,
     .params = {
         .ecdsa = {
-            .private_key = ecdsa_priv_key,
+            .private_key = ecdsa_priv_key0,
             .public_key = {
-                .x = ecdsa_pub_key_x,
-                .y = ecdsa_pub_key_y,
+                .x = ecdsa_pub_key0_x,
+                .y = ecdsa_pub_key0_y,
             },
-            .client_keys = (ecdsa_public_key_t *)other_pubkeys,
-            .client_keys_size = ARRAY_SIZE(other_pubkeys),
+            .client_keys = (ecdsa_public_key_t *)other_pubkeys0,
+            .client_keys_size = ARRAY_SIZE(other_pubkeys0),
         }
     },
 };
 
 #else /* ifdef CONFIG_DTLS_PSK */
-static const uint8_t psk_id_0[] = PSK_DEFAULT_IDENTITY;
-static const uint8_t psk_key_0[] = PSK_DEFAULT_KEY;
+static const uint8_t psk_id_0[] = PSK_WRONG_IDENTITY;
+static const uint8_t psk_key_0[] = PSK_WRONG_KEY;
 
-static const credman_credential_t credential = {
+static const uint8_t psk_id_1[] = PSK_DEFAULT_IDENTITY;
+static const uint8_t psk_key_1[] = PSK_DEFAULT_KEY;
+static const char psk_id_1_hint[] = PSK_DEFAULT_HINT;
+
+static const credman_credential_t credential0 = {
     .type = CREDMAN_TYPE_PSK,
-    .tag = SOCK_DTLS_CLIENT_TAG,
+    .tag = SOCK_DTLS_CLIENT_TAG_0,
     .params = {
         .psk = {
             .key = { .s = psk_key_0, .len = sizeof(psk_key_0) - 1, },
@@ -66,6 +75,39 @@ static const credman_credential_t credential = {
         }
     },
 };
+
+static const credman_credential_t credential1 = {
+    .type = CREDMAN_TYPE_PSK,
+    .tag = SOCK_DTLS_CLIENT_TAG_1,
+    .params = {
+        .psk = {
+            .key = { .s = psk_key_1, .len = sizeof(psk_key_1) - 1, },
+            .id = { .s = psk_id_1, .len = sizeof(psk_id_1) - 1, },
+            .hint = { .s = psk_id_1_hint, .len = sizeof(psk_id_1_hint) - 1, },
+        }
+    },
+};
+
+static credman_tag_t _client_psk_cb(sock_dtls_t *sock, sock_udp_ep_t *ep, credman_tag_t tags[],
+                                    unsigned tags_len, const char *hint, size_t hint_len)
+{
+    (void) sock;
+    (void) tags;
+    (void) tags_len;
+
+    /* this callback is here just to show the functionality, it only prints the received hint */
+    char addrstr[IPV6_ADDR_MAX_STR_LEN];
+    uint16_t port;
+
+    sock_udp_ep_fmt(ep, addrstr, &port);
+    printf("From [%s]:%d\n", addrstr, port);
+
+    if (hint && hint_len) {
+        printf("Client got hint: %.*s\n", (unsigned)hint_len, hint);
+    }
+
+    return CREDMAN_TAG_EMPTY;
+}
 #endif
 
 static int client_send(char *addr_str, char *data, size_t datalen)
@@ -108,20 +150,38 @@ static int client_send(char *addr_str, char *data, size_t datalen)
         return -1;
     }
 
-    if (sock_dtls_create(&dtls_sock, &udp_sock,
-                         SOCK_DTLS_CLIENT_TAG,
+    res = credman_add(&credential0);
+    if (res < 0 && res != CREDMAN_EXIST) {
+        /* ignore duplicate credentials */
+        printf("Error cannot add credential to system: %d\n", (int)res);
+        return -1;
+    }
+
+    if (sock_dtls_create(&dtls_sock, &udp_sock, SOCK_DTLS_CLIENT_TAG_0,
                          SOCK_DTLS_1_2, SOCK_DTLS_CLIENT) < 0) {
         puts("Error creating DTLS sock");
         sock_udp_close(&udp_sock);
         return -1;
     }
 
-    res = credman_add(&credential);
+#if IS_ACTIVE(CONFIG_DTLS_PSK)
+    /* register a second PSK credential */
+    res = credman_add(&credential1);
     if (res < 0 && res != CREDMAN_EXIST) {
         /* ignore duplicate credentials */
         printf("Error cannot add credential to system: %d\n", (int)res);
         return -1;
     }
+
+    /* make the new credential available to the sock */
+    if (sock_dtls_add_credential(&dtls_sock, SOCK_DTLS_CLIENT_TAG_1) < 0) {
+        printf("Error cannot add credential to the sock: %d\n", (int)res);
+        return -1;
+    }
+
+    /* register a callback for PSK credential selection */
+    sock_dtls_set_client_psk_cb(&dtls_sock, _client_psk_cb);
+#endif
 
     res = sock_dtls_session_init(&dtls_sock, &remote, &session);
     if (res <= 0) {

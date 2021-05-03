@@ -1,6 +1,7 @@
 include ../Makefile.tests_common
 
 LWIP_IPV4 ?= 0
+AUX_LOCAL ?= 1
 
 ifneq (0, $(LWIP_IPV4))
   USEMODULE += ipv4_addr
@@ -15,6 +16,10 @@ endif
 ifneq (0, $(LWIP_IPV6))
   USEMODULE += ipv6_addr
   USEMODULE += lwip_ipv6_autoconfig
+endif
+
+ifeq (1, $(AUX_LOCAL))
+  USEMODULE += sock_aux_local
 endif
 
 USEMODULE += inet_csum

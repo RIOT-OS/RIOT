@@ -30,8 +30,9 @@ ST Nucleo-64 can be used with mbed LoRa shields: there's one based on
 [the sx1276 radio](https://os.mbed.com/components/SX1276MB1xAS/) and one based
 on the [the sx1272 radio](https://os.mbed.com/components/SX1272MB2xAS/).
 
-Finally, to join a LoRaWAN network using OTAA activation, edit the application
-`Makefile` and set your device information:
+Finally, to join a LoRaWAN network using OTAA activation, use `make menuconfig`
+inside the application and edit the configuration or edit the application
+`Makefile` :
 
     DEVEUI ?= 0000000000000000
     APPEUI ?= 0000000000000000

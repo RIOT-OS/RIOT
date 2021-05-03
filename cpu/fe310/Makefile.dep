@@ -1,17 +1,21 @@
-ifneq (,$(filter picolibc,$(FEATURES_USED)))
-  USEMODULE += picolibc
-else
+
+FEATURES_REQUIRED_ANY += newlib|picolibc
+ifneq (,$(filter newlib,$(USEMODULE)))
   USEMODULE += newlib_nano
-  USEMODULE += newlib_syscalls_fe310
+  USEMODULE += newlib_syscalls_default
 endif
 
-USEMODULE += sifive_drivers_fe310
-
 USEMODULE += periph
-USEMODULE += periph_pm
+USEMODULE += sifive_drivers_fe310
 
 FEATURES_REQUIRED += periph_plic
 
 ifneq (,$(filter periph_rtc,$(USEMODULE)))
   FEATURES_REQUIRED += periph_rtt
 endif
+
+ifneq (,$(filter periph_timer,$(USEMODULE)))
+  FEATURES_REQUIRED += periph_coretimer
+endif
+
+include $(RIOTCPU)/riscv_common/Makefile.dep

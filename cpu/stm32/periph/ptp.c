@@ -29,7 +29,8 @@
 #include "periph_cpu.h"
 #include "timex.h"
 
-#define ENABLE_DEBUG        (0)
+#define ENABLE_DEBUG    0
+#define DEBUG_VERBOSE   0
 #include "debug.h"
 
 /* Workaround for typos in vendor files; drop when fixed upstream */
@@ -60,10 +61,10 @@
 #endif /* !STM32_PTPSSIR */
 
 /**
- * @brief   Return the result of x / y, scientifically rounded
+ * @brief   Return the rounded result of x / y
  * @param   x       Number to divide
  * @param   y       @p x should be divided by this
- * @return  x/y, scientifically rounded
+ * @return  x/y, rounded to the nearest integer, using "round half up" rule
  * @pre     Both @p x and @p y are compile time constant integers and the
  *          expressions are evaluated without side-effects
  */
@@ -114,11 +115,11 @@ void ptp_init(void)
           ptptsar, ptpssir);
 }
 
-void ptp_clock_adjust_speed(int16_t correction)
+void ptp_clock_adjust_speed(int32_t correction)
 {
     uint64_t offset = ptptsar;
     offset *= correction;
-    offset >>= 16;
+    offset >>= 32;
     uint32_t adjusted_ptptsar = ptptsar + (uint32_t)offset;
     /* Value to add onto the 32 bit accumulator register (which causes the
      * value in ETH->PTPSSIR to be added onto the subsection register on
@@ -198,7 +199,7 @@ void ptp_timer_clear(void)
 void ptp_timer_set_absolute(const ptp_timestamp_t *target)
 {
     assert(target);
-    DEBUG("[periph_ptp] Set timer: %" PRIu32 ".%" PRIu32 "\n",
+    DEBUG("[periph_ptp] Set timer: %" PRIu32 ".%09" PRIu32 "\n",
           (uint32_t)target->seconds, target->nanoseconds);
     unsigned state = irq_disable();
     /* Mask PTP timer IRQ first, so that an interrupt is not triggered
@@ -212,7 +213,9 @@ void ptp_timer_set_absolute(const ptp_timestamp_t *target)
     /* Unmask the time stamp trigger interrupt */
     ETH->MACIMR &= ~ETH_MACIMR_TSTIM;
     irq_restore(state);
-    DEBUG("PTPTSCR: 0x%08x, MACIMR: 0x%08x, MACSR: 0x%08x\n",
-          (unsigned)ETH->PTPTSCR, (unsigned)ETH->MACIMR, (unsigned)ETH->MACSR);
+    if (IS_ACTIVE(DEBUG_VERBOSE)) {
+        DEBUG("PTPTSCR: 0x%08x, MACIMR: 0x%08x, MACSR: 0x%08x\n",
+              (unsigned)ETH->PTPTSCR, (unsigned)ETH->MACIMR, (unsigned)ETH->MACSR);
+    }
 }
 #endif /* IS_USED(MODULE_PTP_TIMER) */

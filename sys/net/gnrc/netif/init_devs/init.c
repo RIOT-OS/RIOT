@@ -99,6 +99,11 @@ void gnrc_netif_init_devs(void)
         auto_init_dose();
     }
 
+    if (IS_USED(MODULE_SAM0_ETH)) {
+        extern void auto_init_sam0_eth(void);
+        auto_init_sam0_eth();
+    }
+
     if (IS_USED(MODULE_SLIPDEV)) {
         extern void auto_init_slipdev(void);
         auto_init_slipdev();
@@ -138,7 +143,10 @@ void gnrc_netif_init_devs(void)
         extern void auto_init_socket_zep(void);
         auto_init_socket_zep();
     }
-
+    if (IS_USED(MODULE_NRF24L01P_NG)) {
+        extern void auto_init_nrf24l01p_ng(void);
+        auto_init_nrf24l01p_ng();
+    }
     if (IS_USED(MODULE_NRFMIN)) {
         extern void gnrc_nrfmin_init(void);
         gnrc_nrfmin_init();
@@ -157,5 +165,10 @@ void gnrc_netif_init_devs(void)
     if (IS_USED(MODULE_NRF802154)) {
         extern void auto_init_nrf802154(void);
         auto_init_nrf802154();
+    }
+
+    if (IS_USED(MODULE_SX126X) && !IS_USED(MODULE_SEMTECH_LORAMAC)) {
+        extern void auto_init_sx126x(void);
+        auto_init_sx126x();
     }
 }

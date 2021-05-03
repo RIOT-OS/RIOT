@@ -281,6 +281,7 @@ void __atomic_load_c(size_t size, const void *src, void *dest, int memorder)
 {
     (void)memorder;
     unsigned int mask = irq_disable();
+
     memcpy(dest, src, size);
     irq_restore(mask);
 }
@@ -297,6 +298,7 @@ void __atomic_store_c(size_t size, void *dest, const void *src, int memorder)
 {
     (void)memorder;
     unsigned int mask = irq_disable();
+
     memcpy(dest, src, size);
     irq_restore(mask);
 }
@@ -315,6 +317,7 @@ void __atomic_exchange_c(size_t size, void *ptr, void *val, void *ret,
 {
     (void)memorder;
     unsigned int mask = irq_disable();
+
     memcpy(ret, ptr, size);
     memcpy(ptr, val, size);
     irq_restore(mask);
@@ -361,6 +364,7 @@ bool __atomic_compare_exchange_c(size_t len, void *ptr, void *expected,
     (void)failure_memorder;
     unsigned int mask = irq_disable();
     bool ret;
+
     if (memcmp(ptr, expected, len) == 0) {
         memcpy(ptr, desired, len);
         ret = true;

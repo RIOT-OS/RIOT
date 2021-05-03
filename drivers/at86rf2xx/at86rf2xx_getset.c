@@ -221,7 +221,7 @@ uint16_t at86rf2xx_get_pan(const at86rf2xx_t *dev)
 
 void at86rf2xx_set_pan(at86rf2xx_t *dev, uint16_t pan)
 {
-    le_uint16_t le_pan = byteorder_btols(byteorder_htons(pan));
+    le_uint16_t le_pan = byteorder_htols(pan);
 
     DEBUG("pan0: %u, pan1: %u\n", le_pan.u8[0], le_pan.u8[1]);
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__PAN_ID_0, le_pan.u8[0]);
@@ -445,14 +445,6 @@ void at86rf2xx_set_option(at86rf2xx_t *dev, uint16_t option, bool state)
             tmp = (state) ? (tmp & ~AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK)
                           : (tmp |  AT86RF2XX_CSMA_SEED_1__AACK_DIS_ACK);
             at86rf2xx_reg_write(dev, AT86RF2XX_REG__CSMA_SEED_1, tmp);
-            break;
-        case AT86RF2XX_OPT_TELL_RX_START:
-            DEBUG("[at86rf2xx] opt: %s SFD IRQ\n",
-                  (state ? "enable" : "disable"));
-            tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__IRQ_MASK);
-            tmp = (state) ? (tmp |  AT86RF2XX_IRQ_STATUS_MASK__RX_START)
-                          : (tmp & ~AT86RF2XX_IRQ_STATUS_MASK__RX_START);
-            at86rf2xx_reg_write(dev, AT86RF2XX_REG__IRQ_MASK, tmp);
             break;
         case AT86RF2XX_OPT_ACK_PENDING:
             DEBUG("[at86rf2xx] opt: enabling pending ACKs\n");

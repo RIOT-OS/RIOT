@@ -68,7 +68,7 @@ static inline void atomic_store_u32(volatile uint32_t *dest, uint32_t val)
 
 #endif /* __clang__ */
 
-#if CPU_HAS_BITBAND
+#if CPU_HAS_SRAM_BITBAND
 #define HAS_ATOMIC_BIT
 
 typedef volatile uint32_t *atomic_bit_u8_t;

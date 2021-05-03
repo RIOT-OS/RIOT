@@ -1,3 +1,11 @@
 ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += saul_gpio
 endif
+
+ifneq (,$(filter disp_dev,$(USEMODULE)))
+  USEMODULE += ili9341
+endif
+
+ifneq (,$(filter touch_dev,$(USEMODULE)))
+  USEMODULE += stmpe811
+endif

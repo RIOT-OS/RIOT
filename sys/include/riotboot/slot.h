@@ -115,15 +115,15 @@ void riotboot_slot_dump_addrs(void);
  */
 static inline size_t riotboot_slot_size(unsigned slot)
 {
-    switch(slot) {
-        case 0:
-            return SLOT0_LEN;
-#if NUM_SLOTS==2
-        case 1:
-            return SLOT1_LEN;
+    switch (slot) {
+    case 0:
+        return SLOT0_LEN;
+#if NUM_SLOTS == 2
+    case 1:
+        return SLOT1_LEN;
 #endif
-        default:
-            return 0;
+    default:
+        return 0;
     }
 }
 
@@ -135,7 +135,7 @@ extern const unsigned riotboot_slot_numof;
 /**
  * @brief   Storage for header pointers of the configured slots
  */
-extern const riotboot_hdr_t * const riotboot_slots[];
+extern const riotboot_hdr_t *const riotboot_slots[];
 
 #ifdef __cplusplus
 }

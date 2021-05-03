@@ -60,7 +60,11 @@ extern "C" {
 /**
  * @brief   The nRF52 family of CPUs provides a fixed number of 9 ADC lines
  */
+#ifdef SAADC_CH_PSELP_PSELP_VDDHDIV5
+#define ADC_NUMOF           (10U)
+#else
 #define ADC_NUMOF           (9U)
+#endif
 
 /**
  * @brief   SPI temporary buffer size for storing const data in RAM before
@@ -83,6 +87,9 @@ enum {
     NRF52_AIN6 = 6,         /**< Analog Input 6 */
     NRF52_AIN7 = 7,         /**< Analog Input 7 */
     NRF52_VDD  = 8,         /**< VDD, not useful if VDD is reference... */
+#ifdef SAADC_CH_PSELP_PSELP_VDDHDIV5
+    NRF52_VDDHDIV5 = 9,     /**< VDDH divided by 5 */
+#endif
 };
 
 #ifndef DOXYGEN
@@ -135,6 +142,14 @@ typedef struct {
  */
 #define PERIPH_I2C_NEED_READ_REG
 #define PERIPH_I2C_NEED_WRITE_REG
+/** @} */
+
+/**
+ * @name    Define macros for sda and scl pin to be able to reinitialize them
+ * @{
+ */
+#define i2c_pin_sda(dev) i2c_config[dev].sda
+#define i2c_pin_scl(dev) i2c_config[dev].scl
 /** @} */
 
 /**
@@ -200,6 +215,13 @@ typedef struct {
 #endif
     uint8_t irqn;           /**< IRQ channel */
 } uart_conf_t;
+#endif
+
+/**
+ * @brief   Size of the UART TX buffer for non-blocking mode.
+ */
+#ifndef UART_TXBUF_SIZE
+#define UART_TXBUF_SIZE    (64)
 #endif
 
 /**

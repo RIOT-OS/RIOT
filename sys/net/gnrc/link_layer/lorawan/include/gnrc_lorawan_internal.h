@@ -185,6 +185,7 @@ typedef struct {
     uint8_t *nwkskey;                               /**< pointer to Network SKey buffer */
     uint8_t *appskey;                               /**< pointer to Application SKey buffer */
     uint32_t channel[GNRC_LORAWAN_MAX_CHANNELS];    /**< channel array */
+    uint16_t channel_mask;                          /**< channel mask */
     uint32_t toa;                                   /**< Time on Air of the last transmission */
     int busy;                                       /**< MAC busy  */
     int shutdown_req;                               /**< MAC Shutdown request */

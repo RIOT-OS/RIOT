@@ -351,8 +351,15 @@ int emcute_pub(emcute_topic_t *topic, const void *data, size_t len,
     tbuf[pos++] = flags;
     byteorder_htobebufs(&tbuf[pos], topic->id);
     pos += 2;
-    byteorder_htobebufs(&tbuf[pos], id_next);
-    waitonid = id_next++;
+    /* set generated MessageId for QOS 1 and 2, else set it to 0 */
+    if (((flags & MQTTSN_QOS_MASK) == MQTTSN_QOS_1) ||
+        ((flags & MQTTSN_QOS_MASK) == MQTTSN_QOS_2)) {
+        byteorder_htobebufs(&tbuf[pos], id_next);
+        waitonid = id_next++;
+    }
+    else {
+        memset(&tbuf[pos], 0, 2);
+    }
     pos += 2;
     memcpy(&tbuf[pos], data, len);
 

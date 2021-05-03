@@ -59,6 +59,37 @@ static void test_nanocoap__hdr(void)
 }
 
 /*
+ * Validates encoded message ID byte order and put/get URI & Query option.
+ */
+static void test_nanocoap__hdr_2(void)
+{
+    uint8_t buf[_BUF_SIZE];
+    uint16_t msgid = 0xABCD;
+    char path[] = "/test/abcd/efgh?foo=bar&baz=blub";
+    unsigned char path_tmp[64] = {0};
+    unsigned char query_tmp[64] = {0};
+
+    uint8_t *pktpos = &buf[0];
+    uint16_t lastonum = 0;
+    pktpos += coap_build_hdr((coap_hdr_t *)pktpos, COAP_TYPE_CON, NULL, 0,
+                             COAP_METHOD_GET, msgid);
+    pktpos += coap_opt_put_uri_pathquery(pktpos, &lastonum, path);
+
+    coap_pkt_t pkt;
+    coap_parse(&pkt, &buf[0], pktpos - &buf[0]);
+
+    TEST_ASSERT_EQUAL_INT(msgid, coap_get_id(&pkt));
+
+    int res = coap_get_uri_path(&pkt, path_tmp);
+    TEST_ASSERT_EQUAL_INT(sizeof("/test/abcd/efgh"), res);
+    TEST_ASSERT_EQUAL_STRING("/test/abcd/efgh", (char *)path_tmp);
+
+    res = coap_get_uri_query(&pkt, query_tmp);
+    TEST_ASSERT_EQUAL_INT(sizeof("&foo=bar&baz=blub"), res);
+    TEST_ASSERT_EQUAL_STRING("&foo=bar&baz=blub", (char *)query_tmp);
+}
+
+/*
  * Client GET request with simple path. Test request generation.
  * Request /time resource from libcoap example
  */
@@ -840,6 +871,7 @@ Test *tests_nanocoap_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_nanocoap__hdr),
+        new_TestFixture(test_nanocoap__hdr_2),
         new_TestFixture(test_nanocoap__get_req),
         new_TestFixture(test_nanocoap__put_req),
         new_TestFixture(test_nanocoap__get_multi_path),

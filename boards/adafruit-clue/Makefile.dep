@@ -6,5 +6,9 @@ ifneq (,$(filter saul_default,$(USEMODULE)))
   USEMODULE += sht3x
 endif
 
+ifneq (,$(filter disp_dev,$(USEMODULE)))
+  USEMODULE += ili9341
+endif
+
 include $(RIOTBOARD)/common/nrf52/bootloader_nrfutil.dep.mk
 include $(RIOTBOARD)/common/nrf52/Makefile.dep

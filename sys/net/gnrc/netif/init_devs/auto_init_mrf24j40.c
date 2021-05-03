@@ -21,6 +21,7 @@
 #include "board.h"
 #include "net/gnrc/netif/ieee802154.h"
 #include "net/gnrc.h"
+#include "include/init_devs.h"
 
 #include "mrf24j40.h"
 #include "mrf24j40_params.h"
@@ -29,7 +30,7 @@
  * @brief   Define stack parameters for the MAC layer thread
  * @{
  */
-#define MRF24J40_MAC_STACKSIZE     (THREAD_STACKSIZE_DEFAULT)
+#define MRF24J40_MAC_STACKSIZE     (IEEE802154_STACKSIZE_DEFAULT)
 #ifndef MRF24J40_MAC_PRIO
 #define MRF24J40_MAC_PRIO          (GNRC_NETIF_PRIO)
 #endif

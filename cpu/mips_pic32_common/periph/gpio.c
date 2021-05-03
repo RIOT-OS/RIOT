@@ -21,6 +21,7 @@
 
 #include "cpu.h"
 #include "eic.h"
+#include "bitarithm.h"
 #include "periph/gpio.h"
 #include "periph_conf.h"
 
@@ -88,14 +89,13 @@ static gpio_isr_ctx_t isr_ctx[PORT_NUMOF][GPIO_NUMOF];
 static void isr_handler(uint32_t port_addr)
 {
     uint32_t cnstat = CNSTATx(_port(port_addr));
+    uint32_t port = PORTx(_port(port_addr));
 
     cnstat &= (1 << GPIO_NUMOF) - 1;
+    uint8_t pin = 0;
     while (cnstat) {
-        /* we want the position of the first one bit, so N_bits - (N_zeros + 1) */
-        int pin = 32 - __builtin_clz(cnstat) - 1;
-        uint32_t port = PORTx(_port(port_addr));
+        cnstat = bitarithm_test_and_clear(cnstat, &pin);
 
-        cnstat &= ~(1 << pin);
         if (isr_flank[_port_num(port_addr)][pin] == GPIO_BOTH
         || (isr_flank[_port_num(port_addr)][pin] == GPIO_RISING && (port & (1U << pin)))
         || (isr_flank[_port_num(port_addr)][pin] == GPIO_FALLING && !(port & (1U << pin))))
@@ -132,12 +132,12 @@ static void cn_isr(void)
 #elif defined(CPU_FAM_PIC32MZ)
 static void isr_handler(uint32_t port_addr)
 {
-    while (CNFx(_port(port_addr))) {
-        /* we want the position of the first one bit, so N_bits - (N_zeros + 1) */
-        int pin = 32 - __builtin_clz(CNFx(_port(port_addr))) - 1;
-
+    uint8_t pin = 0;
+    unsigned state = CNFx(_port(port_addr));
+    CNFx(_port(port_addr)) = 0;
+    while (state) {
+        state = bitarithm_test_and_clear(state, &pin);
         isr_ctx[_port_num(port_addr)][pin].cb(isr_ctx[_port_num(port_addr)][pin].arg);
-        CNFx(_port(port_addr)) &= ~(1U << pin);
     }
 }
 

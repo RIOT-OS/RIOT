@@ -28,12 +28,15 @@
 static const saul_driver_t s0_dri = { NULL, NULL, SAUL_ACT_SERVO };
 static const saul_driver_t s1_dri = { NULL, NULL, SAUL_SENSE_TEMP };
 static const saul_driver_t s2_dri = { NULL, NULL, SAUL_SENSE_LIGHT };
-static const saul_driver_t s3_dri = { NULL, NULL, SAUL_ACT_LED_RGB };
+static const saul_driver_t s3a_dri = { NULL, NULL, SAUL_ACT_LED_RGB };
+static const saul_driver_t s3b_dri = { NULL, NULL, SAUL_ACT_SWITCH };
 
 static saul_reg_t s0 = { NULL, NULL, "S0", &s0_dri };
 static saul_reg_t s1 = { NULL, NULL, "S1", &s1_dri };
 static saul_reg_t s2 = { NULL, NULL, "S2", &s2_dri };
-static saul_reg_t s3 = { NULL, NULL, "S3", &s3_dri };
+/* both registrations use the same name intentionally */
+static saul_reg_t s3a = { NULL, NULL, "S3", &s3a_dri };
+static saul_reg_t s3b = { NULL, NULL, "S3", &s3b_dri };
 
 
 static int count(void)
@@ -91,15 +94,21 @@ static void test_reg_add(void)
     TEST_ASSERT_EQUAL_STRING("S0", saul_reg->name);
     TEST_ASSERT_EQUAL_STRING("S2", last()->name);
 
-    res = saul_reg_add(&s3);
+    res = saul_reg_add(&s3a);
     TEST_ASSERT_EQUAL_INT(0, res);
     TEST_ASSERT_EQUAL_INT(count(), 4);
     TEST_ASSERT_EQUAL_STRING("S0", saul_reg->name);
     TEST_ASSERT_EQUAL_STRING("S3", last()->name);
 
+    res = saul_reg_add(&s3b);
+    TEST_ASSERT_EQUAL_INT(0, res);
+    TEST_ASSERT_EQUAL_INT(count(), 5);
+    TEST_ASSERT_EQUAL_STRING("S0", saul_reg->name);
+    TEST_ASSERT_EQUAL_STRING("S3", last()->name);
+
     res = saul_reg_add(NULL);
     TEST_ASSERT_EQUAL_INT(-ENODEV, res);
-    TEST_ASSERT_EQUAL_INT(count(), 4);
+    TEST_ASSERT_EQUAL_INT(count(), 5);
 }
 
 static void test_reg_find_nth(void)
@@ -144,15 +153,35 @@ static void test_reg_find_name(void)
     TEST_ASSERT_NULL(dev);
 }
 
+static void test_reg_find_type_and_name(void)
+{
+    saul_reg_t *dev = saul_reg_find_type_and_name(SAUL_ACT_LED_RGB, "S3");
+    TEST_ASSERT_NOT_NULL(dev);
+    TEST_ASSERT_EQUAL_INT(SAUL_ACT_LED_RGB, dev->driver->type);
+
+    dev = saul_reg_find_type_and_name(SAUL_ACT_SWITCH, "S3");
+    TEST_ASSERT_NOT_NULL(dev);
+    TEST_ASSERT_EQUAL_INT(SAUL_ACT_SWITCH, dev->driver->type);
+
+    dev = saul_reg_find_type_and_name(SAUL_SENSE_TEMP, "S3");
+    TEST_ASSERT_NULL(dev);
+}
+
 static void test_reg_rm(void)
 {
     int res;
 
+    TEST_ASSERT_EQUAL_INT(5, count());
+    TEST_ASSERT_EQUAL_STRING("S0", saul_reg->name);
+    TEST_ASSERT_EQUAL_STRING("S3", last()->name);
+
+    res = saul_reg_rm(&s3b);
+    TEST_ASSERT_EQUAL_INT(0, res);
     TEST_ASSERT_EQUAL_INT(4, count());
     TEST_ASSERT_EQUAL_STRING("S0", saul_reg->name);
     TEST_ASSERT_EQUAL_STRING("S3", last()->name);
 
-    res = saul_reg_rm(&s3);
+    res = saul_reg_rm(&s3a);
     TEST_ASSERT_EQUAL_INT(0, res);
     TEST_ASSERT_EQUAL_INT(3, count());
     TEST_ASSERT_EQUAL_STRING("S0", saul_reg->name);
@@ -192,6 +221,7 @@ Test *tests_saul_reg_tests(void)
         new_TestFixture(test_reg_find_nth),
         new_TestFixture(test_reg_find_type),
         new_TestFixture(test_reg_find_name),
+        new_TestFixture(test_reg_find_type_and_name),
         new_TestFixture(test_reg_rm)
     };
 

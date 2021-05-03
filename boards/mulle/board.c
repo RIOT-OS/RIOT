@@ -175,9 +175,7 @@ static int mulle_nvram_init(void)
     }
 
     /* Register DevFS node */
-    devfs_register(&mulle_nvram_devfs);
-
-    return 0;
+    return devfs_register(&mulle_nvram_devfs);
 }
 
 static void increase_boot_count(void)
@@ -200,7 +198,7 @@ int mulle_nor_init(void)
 
     if (res >= 0) {
         /* Register DevFS node */
-        devfs_register(&mulle_nor_devfs);
+        res = devfs_register(&mulle_nor_devfs);
     }
 
     return res;

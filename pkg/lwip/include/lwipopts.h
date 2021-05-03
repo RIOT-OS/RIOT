@@ -56,6 +56,12 @@ extern "C" {
 #define LWIP_ETHERNET           0
 #endif /* MODULE_LWIP_ETHERNET */
 
+#ifdef MODULE_LWIP_NETIF
+#define LWIP_NETIF_API          1
+#else  /* MODULE_LWIP_NETIF */
+#define LWIP_NETIF_API          0
+#endif /* MODULE_LWIP_NETIF */
+
 #ifdef MODULE_LWIP_IGMP
 #define LWIP_IGMP               1
 #else  /* MODULE_LWIP_IGMP */
@@ -128,10 +134,17 @@ extern "C" {
 #define LWIP_UDPLITE            0
 #endif /* MODULE_LWIP_UDPLITE */
 
-#if defined(MODULE_LWIP_SOCK)
+#if IS_USED(MODULE_LWIP_SOCK)
 #define LWIP_NETCONN            1
+#if IS_USED(MODULE_SOCK_AUX_LOCAL)
+#define LWIP_NETBUF_RECVINFO    1
+#endif /* MODULE_SOCK_AUX_LOCAL */
 #else
 #define LWIP_NETCONN            0
+#endif /* MODULE_LWIP_SOCK */
+
+#ifdef MODULE_SHELL_COMMANDS
+#define LWIP_DEBUG              1
 #endif
 
 #ifndef TCP_LISTEN_BACKLOG

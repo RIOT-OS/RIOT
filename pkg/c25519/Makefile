@@ -17,7 +17,7 @@ endif
 prepare: $(PKG_SOURCE_DIR)/
 
 all: $(PKG_SOURCE_DIR)/
-	"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/src -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
 
 $(PKG_SOURCE_DIR)/: $(PKGDIRBASE)/$(PKG_NAME)-$(PKG_VERSION).$(PKG_EXT)
 	test "$(PKG_SHA512)  $(PKG_ZIPFILE)" =  "$$(sha512sum "${PKG_ZIPFILE}")"

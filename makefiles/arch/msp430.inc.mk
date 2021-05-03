@@ -15,6 +15,8 @@ ASFLAGS += $(CFLAGS_CPU) --defsym $(CPU_MODEL)=1 $(CFLAGS_DBG)
 
 LINKFLAGS += $(CFLAGS_CPU) $(CFLAGS_DBG) $(CFLAGS_OPT)
 LINKFLAGS += -Wl,--gc-sections -Wl,-L$(MSP430_SUPPORT_FILES)/include
+LINKFLAGS += -T $(MSP430_SUPPORT_FILES)/include/$(CPU_MODEL).ld
+LINKFLAGS += $(RIOTCPU)/msp430_common/ldscripts/xfa.ld
 
 OPTIONAL_CFLAGS_BLACKLIST += -fdiagnostics-color
 OPTIONAL_CFLAGS_BLACKLIST += -Wformat-overflow
