@@ -10,9 +10,8 @@ of this document using the following links:
 * [Writing Documentation][writing-documentation]
 * [Working with Git][working with git]
 
-If you have questions, please write a post over at our [forum], send an email to
-<users@riot-os.org> or <devel@riot-os.org> mailing list or chat on `#riot-os` on
-[IRC] or [Matrix].
+If you have questions, please write a post over at our [forum] or chat on
+`#riot-os` on [IRC] or [Matrix].
 
 As a reminder, all contributors are expected to follow our
 [Code of Conduct](CODE_OF_CONDUCT.md).
@@ -191,8 +190,8 @@ into the source repository.
   preoccupied with other PRs. If it happens that your PR receives no review for
   a long time, don't hesitate to gently solicit a review by commenting or
   by explicitly mentioning a maintainer that you know is knowledgeable in the
-  area of the PR. You can also advertise the PR on devel@riot-os.org mailing
-  list and ask for a review there.
+  area of the PR. You can also advertise the PR on the [forum] and ask for a
+  review there.
 
 * Try to answer reviews as quickly as possible to speed up the review process
   and avoid stalled PRs.
