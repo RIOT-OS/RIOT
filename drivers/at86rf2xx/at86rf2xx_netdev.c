@@ -629,23 +629,6 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             break;
 
 #endif /* MODULE_NETDEV_IEEE802154_OQPSK */
-
-#if IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
-    IS_USED(MODULE_IEEE802154_SECURITY)
-        case NETOPT_ENCRYPTION_KEY:
-            assert(len >= IEEE802154_SEC_KEY_LENGTH);
-            at86rf2xx_aes_key_write_encrypt(dev, val);
-            if (memcmp(dev->netdev.sec_ctx.cipher.context.context, val, len)) {
-                /* If the key changes, the frame conter can be reset to 0*/
-                dev->netdev.sec_ctx.frame_counter = 0;
-            }
-            memcpy(dev->netdev.sec_ctx.cipher.context.context, val,
-                   IEEE802154_SEC_KEY_LENGTH);
-            res = IEEE802154_SEC_KEY_LENGTH;
-            break;
-#endif /* IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
-          IS_USED(MODULE_IEEE802154_SECURITY) */
-
         default:
             break;
     }
