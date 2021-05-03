@@ -78,10 +78,13 @@ static void free_memory(struct node *head)
 {
     struct node *old_head;
 
+    uint32_t freed = 0;
+
     while (head) {
         if (head->ptr) {
             if (total > CHUNK_SIZE) {
                 total -= CHUNK_SIZE;
+                freed++;
             }
             printf("Free %"PRIu32" Bytes at 0x%p, total %"PRIu32"\n",
                    (uint32_t)CHUNK_SIZE, head->ptr, total);
@@ -100,6 +103,8 @@ static void free_memory(struct node *head)
 
         total -= sizeof(struct node);
     }
+
+    printf("Free count: %"PRIu32"\n", freed);
 }
 
 int main(void)
