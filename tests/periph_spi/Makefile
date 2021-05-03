@@ -1,4 +1,5 @@
-BOARD ?= samr21-xpro
+BOARD ?= bluepill-128kib
+PORT = /dev/ttyUSB0
 include ../Makefile.tests_common
 
 LOW_MEMORY_BOARDS := samd10-xmini

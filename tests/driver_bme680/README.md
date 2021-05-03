@@ -3,8 +3,6 @@
 ## About
 
 This is a test application for the BME680 driver.
-This driver depends on the Bosch Sensortech
-[BME680 driver](https://github.com/BoschSensortec/BME680_driver).
 
 ## Usage
 
@@ -15,14 +13,6 @@ the following every 5 seconds:
 * Humidity
 * Pressure
 * Resistance value (depending on VOC gas)
-
-The driver can use either fixed-point or floating-point arithmetic for all
-conversions. By default fixed-point arithmetic is used. To use floating-point
-arithmetic, the `bme680_fp` module has to be enabled. This can be done in the
-test application by setting the environment variable `ENABLE_FP`:
-```
-ENABLE_FP=1 make BOARD=... -C tests/driver_bme680
-```
 
 ## Interface
 
