@@ -18,7 +18,6 @@ config BOARD_NUCLEO_F303K8
     select HAS_PERIPH_ADC
     select HAS_PERIPH_DMA
     select HAS_PERIPH_PWM
-    select HAS_PERIPH_RTC
     select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_UART
