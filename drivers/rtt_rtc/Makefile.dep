@@ -1,4 +1,5 @@
 # Unit tests will use a mock implementation
 ifeq (,$(UNIT_TESTS))
   FEATURES_REQUIRED += periph_rtt
+  FEATURES_OPTIONAL += periph_rtt_overflow
 endif
