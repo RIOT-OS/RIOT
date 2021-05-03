@@ -86,10 +86,6 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
     }
     else {
         got_message = true;
-        //check if packet is for me (test)
-        //lock;
-        //post an event;
-        //unlock;
         cond_signal(&got_message_cond);
         if (enable_prints) {
             size_last_packet = size;
@@ -107,7 +103,6 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
                 out[j] = buffer[i];
                 j++;
             }
-            //send(out, IEEE802154_LONG_ADDRESS_LEN, size - 21);
             send_with_channel(out, IEEE802154_LONG_ADDRESS_LEN);
         }
     }
@@ -991,12 +986,7 @@ int check_last_packet(int argc, char **argv) {
     if (memcmp(addr, receive_addr, IEEE802154_LONG_ADDRESS_LEN) != 0) {
         result = false;
     }
-  /*  char string[IEEE802154_LONG_ADDRESS_LEN * 2 + 1];
-    memset(string, 0, sizeof(string));
-    fmt_bytes_hex (string, addr, 8);
-    printf("%s", string);
-    fmt_bytes_hex (string, receive_addr, 8);
-    printf("%s", string); */
+
     if (channel != buffer[21]) {
         puts("Fail channel match");
         result = false;
