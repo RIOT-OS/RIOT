@@ -102,6 +102,28 @@ int rtc_get_time(struct tm *time)
     return 0;
 }
 
+int rtc_get_time_ms(struct tm *time, uint16_t *ms)
+{
+    uint8_t cnt_before, cnt_after;
+
+    /* loop in case of overflow */
+    do {
+        cnt_before = TCNT2;
+
+        /* prevent compiler from reordering memory access to tm_now,
+         * including moving it out of the loop
+         */
+        __asm__ volatile ("" : : : "memory");
+        *time = tm_now;
+
+        cnt_after  = TCNT2;
+    } while (cnt_before > cnt_after);
+
+    *ms = (cnt_after * 1000UL) >> 8;
+
+    return 0;
+}
+
 int rtc_get_alarm(struct tm *time)
 {
     *time = tm_alarm;
