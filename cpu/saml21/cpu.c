@@ -244,11 +244,23 @@ void cpu_init(void)
     while (GCLK->CTRLA.reg & GCLK_CTRLA_SWRST) {}
     while (GCLK->SYNCBUSY.reg & GCLK_SYNCBUSY_SWRST) {}
 
+#if (CLOCK_CORECLOCK > 12000000U)
     PM->PLCFG.reg = PM_PLCFG_PLSEL_PL2;
     while (!PM->INTFLAG.bit.PLRDY) {}
+#endif
 
-    /* set OSC16M to 16MHz */
-    OSCCTRL->OSC16MCTRL.bit.FSEL = 3;
+    /* set OSC16M according to CLOCK_CORECLOCK */
+#if (CLOCK_CORECLOCK == 48000000U) || (CLOCK_CORECLOCK == 16000000U)
+    OSCCTRL->OSC16MCTRL.bit.FSEL = OSCCTRL_OSC16MCTRL_FSEL_16_Val;
+#elif (CLOCK_CORECLOCK == 12000000U)
+    OSCCTRL->OSC16MCTRL.bit.FSEL = OSCCTRL_OSC16MCTRL_FSEL_12_Val;
+#elif (CLOCK_CORECLOCK == 8000000U)
+    OSCCTRL->OSC16MCTRL.bit.FSEL = OSCCTRL_OSC16MCTRL_FSEL_8_Val;
+#elif (CLOCK_CORECLOCK == 4000000U)
+    OSCCTRL->OSC16MCTRL.bit.FSEL = OSCCTRL_OSC16MCTRL_FSEL_4_Val;
+#else
+#error "Please select a valid CPU frequency"
+#endif
     OSCCTRL->OSC16MCTRL.bit.ONDEMAND = 1;
     OSCCTRL->OSC16MCTRL.bit.RUNSTDBY = 0;
 
@@ -264,12 +276,10 @@ void cpu_init(void)
     _dfll_setup();
 
     /* Setup GCLK generators */
-#if (CLOCK_CORECLOCK == 16000000U)
-    _gclk_setup(SAM0_GCLK_MAIN, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
-#elif (CLOCK_CORECLOCK == 48000000U)
+#if USE_DFLL
     _gclk_setup(SAM0_GCLK_MAIN, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_DFLL48M);
 #else
-#error "Please select a valid CPU frequency"
+    _gclk_setup(SAM0_GCLK_MAIN, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
 #endif
 
     /* Ensure APB Backup domain clock is within the 6MHZ limit, BUPDIV value
