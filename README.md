@@ -85,7 +85,7 @@ For specific toolchain installation, follow instructions in the
 [getting started](https://doc.riot-os.org/getting-started.html) page.
 * The RIOT API itself can be built from the code using doxygen. The latest
   version of the documentation is uploaded daily to
-  [riot-os.org/api](https://riot-os.org/api).
+  [doc.riot-os.org](https://doc.riot-os.org).
 
 ## FORUM
 Do you have a question, want to discuss a new feature, or just want to present
