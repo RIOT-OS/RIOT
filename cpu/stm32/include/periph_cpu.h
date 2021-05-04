@@ -966,6 +966,15 @@ void dma_start(dma_t dma);
 uint16_t dma_suspend(dma_t dma);
 
 /**
+ * @brief   Gets the number of bytes that have yet to be transferred
+ *
+ * @param[in] dma    logical DMA stream
+ *
+ * @return the remaining number of bytes to transfer.
+ */
+uint16_t dma_left(dma_t dma);
+
+/**
  * @brief   Resume a suspended DMA transfer on a stream
  *
  * @param[in] dma         logical DMA stream

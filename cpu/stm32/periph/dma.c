@@ -472,6 +472,14 @@ uint16_t dma_suspend(dma_t dma)
 
 }
 
+uint16_t dma_left(dma_t dma)
+{
+    assert(dma < DMA_NUMOF);
+
+    STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
+    return stream->NDTR_REG;
+}
+
 void dma_resume(dma_t dma, uint16_t remaining)
 {
     assert(dma < DMA_NUMOF);
