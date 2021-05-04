@@ -1039,6 +1039,15 @@ void dma_setup(dma_t dma, int chan, void *periph_addr, dma_mode_t mode,
  */
 void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
 
+/**
+ * @brief   Sets the callback which is executed after a DMA transfer is completed.
+ *
+ * @param[in]   dma         Logical DMA stream
+ * @param[in]   callback    Callback to execute during the Transfer Complete interrupt
+ * @param[in]   arg         Argument to pass to the callback
+ */
+void dma_transfer_complete(dma_t dma, void (*callback)(void*, dma_t), void* arg);
+
 #endif /* MODULE_PERIPH_DMA */
 
 #ifdef MODULE_PERIPH_CAN

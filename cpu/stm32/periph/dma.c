@@ -88,6 +88,8 @@ struct dma_ctx {
     STM32_DMA_Stream_Type *stream;
     mutex_t conf_lock;
     mutex_t sync_lock;
+    void (*callback)(void*, dma_t);
+    void *callback_arg;
     uint16_t len;
 };
 
@@ -445,6 +447,13 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
     return 0;
 }
 
+void dma_transfer_complete(dma_t dma, void (*callback)(void*, dma_t), void *arg)
+{
+    struct dma_ctx *ctx = &dma_ctx[dma];
+    ctx->callback = callback;
+    ctx->callback_arg = arg;
+}
+
 void dma_start(dma_t dma)
 {
     STM32_DMA_Stream_Type *stream = dma_ctx[dma].stream;
@@ -512,7 +521,11 @@ void dma_isr_handler(dma_t dma)
 {
     dma_clear_all_flags(dma);
 
-    mutex_unlock(&dma_ctx[dma].sync_lock);
+    struct dma_ctx *ctx = &dma_ctx[dma];
+    mutex_unlock(&ctx->sync_lock);
+
+    if (ctx->callback)
+        ctx->callback(ctx->callback_arg, dma);
 
     cortexm_isr_end();
 }
