@@ -27,7 +27,7 @@ static int _get_device_type(netdev_t *dev, void *value, size_t max_len)
     return sizeof(uint16_t);
 }
 
-static int _get_max_packet_size(netdev_t *dev, void *value, size_t max_len)
+static int _get_max_pdu_size(netdev_t *dev, void *value, size_t max_len)
 {
     (void)dev;
     assert(max_len == sizeof(uint16_t));
@@ -79,8 +79,8 @@ void netdev_test_ieee802154_setup(netdev_test_ieee802154_t *netdev, void *state,
     mutex_unlock(&netdev->netdev.mutex);
     netdev_test_set_get_cb(&netdev->netdev, NETOPT_DEVICE_TYPE,
                            _get_device_type);
-    netdev_test_set_get_cb(&netdev->netdev, NETOPT_MAX_PACKET_SIZE,
-                           _get_max_packet_size);
+    netdev_test_set_get_cb(&netdev->netdev, NETOPT_MAX_PDU_SIZE,
+                           _get_max_pdu_size);
     netdev_test_set_get_cb(&netdev->netdev, NETOPT_SRC_LEN, _get_src_len);
     netdev_test_set_get_cb(&netdev->netdev, NETOPT_ADDRESS_LONG,
                            _get_address_long);
