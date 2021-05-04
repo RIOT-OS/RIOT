@@ -108,7 +108,7 @@ gnrc_pktsnip_t * gnrc_tx_sync_split(gnrc_pktsnip_t *pkt);
 static inline void gnrc_tx_complete(gnrc_pktsnip_t *pkt)
 {
     assert(IS_USED(MODULE_GNRC_TX_SYNC) && (pkt->type == GNRC_NETTYPE_TX_SYNC));
-    gnrc_tx_sync_t *sync = pkt->data;
+    gnrc_tx_sync_t *sync = (gnrc_tx_sync_t*)pkt->data;
     mutex_unlock(&sync->signal);
 }
 
