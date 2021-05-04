@@ -4,7 +4,7 @@ USEMODULE += arm7_common_periph
 FEATURES_REQUIRED_ANY += newlib|picolibc
 ifneq (,$(filter newlib,$(USEMODULE)))
   # use the nano-specs of Newlib when available
-  USEMODULE += newlib_nano
+  DEFAULT_MODULE += newlib_nano
 endif
 
 # Make calls to malloc and friends thread-safe
