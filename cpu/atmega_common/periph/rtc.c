@@ -38,7 +38,7 @@ ISR(TIMER2_OVF_vect)
 
     isr_flag = !isr_flag;
 
-    if (++tm_now.tm_sec > 60) {
+    if (++tm_now.tm_sec > 59) {
         rtc_tm_normalize(&tm_now);
     }
 
