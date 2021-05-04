@@ -60,7 +60,7 @@ define board_unsatisfied_features
   else
     # add default modules
     include $(RIOTMAKE)/defaultmodules.inc.mk
-    USEMODULE += $(filter-out $(DISABLE_MODULE),$(DEFAULT_MODULE))
+    USEMODULE += $$(filter-out $$(DISABLE_MODULE),$$(DEFAULT_MODULE))
 
     include $(RIOTMAKE)/dependency_resolution.inc.mk
 
