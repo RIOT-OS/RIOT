@@ -73,18 +73,18 @@ static void test_device_type(void)
 }
 
 /**
- * @brief   Tests if `NETOPT_MAX_PACKET_SIZE` returns as documented
+ * @brief   Tests if `NETOPT_MAX_PDU_SIZE` returns as documented
  */
-static void test_max_packet_size(void)
+static void test_max_pdu_size(void)
 {
     netdev_t *dev = (netdev_t *)&_netdev_test;
     int res = 0;
-    uint16_t max_packet_size = 0;
+    uint16_t max_pdu_size = 0;
 
-    res = dev->driver->get(dev, NETOPT_MAX_PACKET_SIZE, &max_packet_size,
-                           sizeof(max_packet_size));
+    res = dev->driver->get(dev, NETOPT_MAX_PDU_SIZE, &max_pdu_size,
+                           sizeof(max_pdu_size));
     TEST_ASSERT_EQUAL_INT(sizeof(uint16_t), res);
-    TEST_ASSERT_EQUAL_INT(102U, max_packet_size);
+    TEST_ASSERT_EQUAL_INT(102U, max_pdu_size);
 }
 
 /**
@@ -150,7 +150,7 @@ static Test *tests_setup(void) {
 static Test *tests_callbacks(void) {
     EMB_UNIT_TESTFIXTURES(fixtures) {
         new_TestFixture(test_device_type),
-        new_TestFixture(test_max_packet_size),
+        new_TestFixture(test_max_pdu_size),
         new_TestFixture(test_src_len),
         new_TestFixture(test_address_long),
         new_TestFixture(test_proto),
