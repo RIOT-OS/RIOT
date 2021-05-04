@@ -74,7 +74,7 @@ void netdev_test_ieee802154_setup(netdev_test_ieee802154_t *netdev, void *state,
         memcpy(&netdev->eui64, eui64, sizeof(netdev->eui64));
     }
     else {
-        netdev_eui64_get((netdev_t *)netdev, &netdev->eui64);
+        netdev_eui64_get(&netdev->netdev.netdev.netdev, &netdev->eui64);
     }
     mutex_unlock(&netdev->netdev.mutex);
     netdev_test_set_get_cb(&netdev->netdev, NETOPT_DEVICE_TYPE,
