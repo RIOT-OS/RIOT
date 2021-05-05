@@ -27,7 +27,6 @@
 static struct tm tm_now __attribute__((section(".noinit")));
 static struct tm tm_alarm __attribute__((section(".noinit")));
 
-static bool isr_flag;
 static rtc_alarm_cb_t alarm_cb;
 static void *alarm_cb_arg;
 
@@ -36,9 +35,7 @@ ISR(TIMER2_OVF_vect)
 {
     avr8_enter_isr();
 
-    isr_flag = !isr_flag;
-
-    if (++tm_now.tm_sec > 60) {
+    if (++tm_now.tm_sec > 59) {
         rtc_tm_normalize(&tm_now);
     }
 
@@ -89,15 +86,19 @@ int rtc_set_time(struct tm *time)
 
 int rtc_get_time(struct tm *time)
 {
-    bool tmp = isr_flag;
+    uint8_t before;
 
-    *time = tm_now;
+    /* loop in case of overflow */
+    do {
+        before = TCNT2;
 
-    /* check if interrupt happened while
-       reading the time struct */
-    if (isr_flag != tmp) {
+        /* prevent compiler from reordering memory access to tm_now,
+         * including moving it out of the loop
+         */
+        __asm__ volatile ("" : : : "memory");
+
         *time = tm_now;
-    }
+    } while (before > TCNT2);
 
     return 0;
 }
