@@ -48,7 +48,7 @@ static const tc32_conf_t timer_config[] = {
         .mclk = &MCLK->APBCMASK.reg,
         .mclk_mask = MCLK_APBCMASK_TC0 | MCLK_APBCMASK_TC1,
         .gclk_id = TC0_GCLK_ID,
-        .gclk_src = SAM0_GCLK_8MHZ,
+        .gclk_src = SAM0_GCLK_TIMER,
         .flags = TC_CTRLA_MODE_COUNT32,
     }
 };
