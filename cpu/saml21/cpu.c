@@ -265,6 +265,7 @@ void cpu_init(void)
 #else
 #error "Please select a valid CPU frequency"
 #endif
+
     OSCCTRL->OSC16MCTRL.bit.ONDEMAND = 1;
     OSCCTRL->OSC16MCTRL.bit.RUNSTDBY = 0;
 
@@ -281,10 +282,11 @@ void cpu_init(void)
 
     /* Setup GCLK generators */
 #if USE_DFLL
-    _gclk_setup(SAM0_GCLK_MAIN, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_DFLL48M);
+#define GCLK_GENCTRL_SRC_MAIN GCLK_GENCTRL_SRC_DFLL48M
 #else
-    _gclk_setup(SAM0_GCLK_MAIN, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M);
+#define GCLK_GENCTRL_SRC_MAIN GCLK_GENCTRL_SRC_OSC16M
 #endif
+    _gclk_setup(SAM0_GCLK_MAIN, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_MAIN);
 
     /* Ensure APB Backup domain clock is within the 6MHZ limit, BUPDIV value
        must be a power of 2 and between 1(2^0) and 128(2^7) */
@@ -296,7 +298,7 @@ void cpu_init(void)
         }
     }
     /* clock used by timers */
-    _gclk_setup(SAM0_GCLK_TIMER, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M
+    _gclk_setup(SAM0_GCLK_TIMER, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_MAIN
                 | GCLK_GENCTRL_DIV(CLOCK_CORECLOCK/sam0_gclk_freq(SAM0_GCLK_TIMER)));
 
 #ifdef MODULE_PERIPH_PM
