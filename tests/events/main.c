@@ -23,11 +23,16 @@
 #include <stdio.h>
 
 #include "test_utils/expect.h"
+#include "timex.h"
 #include "thread.h"
 #include "event.h"
 #include "event/timeout.h"
 #include "event/callback.h"
+#if IS_USED(MODULE_ZTIMER)
+#include "ztimer.h"
+#else
 #include "xtimer.h"
+#endif
 
 #define STACKSIZE               THREAD_STACKSIZE_DEFAULT
 #define PRIO                    (THREAD_PRIORITY_MAIN - 1)
@@ -83,7 +88,11 @@ static void timed_callback(void *arg)
     order++;
     expect(order == 6);
     expect(arg == event_callback.arg);
+#if IS_USED(MODULE_ZTIMER)
+    uint32_t now = ztimer_now(ZTIMER_USEC);
+#else
     uint32_t now = xtimer_now_usec();
+#endif
     expect((now - before >= 100000LU));
     printf("triggered timed callback with arg 0x%08x after %" PRIu32 "us\n", (unsigned)arg, now - before);
     puts("[SUCCESS]");
@@ -177,7 +186,11 @@ int main(void)
 
     puts("posting timed callback with timeout 1sec");
     event_timeout_init(&event_timeout, &queue, (event_t *)&event_callback);
+#if IS_USED(MODULE_ZTIMER)
+    before = ztimer_now(ZTIMER_USEC);
+#else
     before = xtimer_now_usec();
+#endif
     event_timeout_set(&event_timeout, (1 * US_PER_SEC));
 
     event_timeout_t event_timeout_canceled;
