@@ -450,8 +450,10 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
 void dma_set_transfer_complete_cb(dma_t dma, void (*callback)(void*, dma_t), void *arg)
 {
     struct dma_ctx *ctx = &dma_ctx[dma];
+    unsigned int state = irq_disable();
     ctx->callback = callback;
     ctx->callback_arg = arg;
+    irq_restore(state);
 }
 
 void dma_start(dma_t dma)
