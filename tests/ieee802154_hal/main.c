@@ -36,7 +36,7 @@
 
 #include "xtimer.h"
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 #include "debug.h"
 
 
@@ -742,12 +742,15 @@ static int send(uint8_t *dst, size_t dst_len, size_t num, size_t time)
         _send(&iol_hdr);
         xtimer_msleep(time);
     }
-    puts("-------Summary of the test-------");
-    printf("Send Packets: %d\n", send_packets);
-    printf("Acknowledged Packets: %d\n", received_acks);
-    printf("Percentage: %d\n", (received_acks * 100)/num);
-    printf("Received Packets: %d\n", received_packets);
-    puts("---------------------------------");
+    if (ENABLE_DEBUG)
+    {
+        puts("-------Summary of the test-------");
+        printf("Send Packets: %d\n", send_packets);
+        printf("Acknowledged Packets: %d\n", received_acks);
+        printf("Percentage: %d\n", (received_acks * 100)/num);
+        printf("Received Packets: %d\n", received_packets);
+        puts("---------------------------------");
+    }
     return 0;
 }
 
