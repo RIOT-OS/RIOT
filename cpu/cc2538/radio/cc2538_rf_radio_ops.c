@@ -218,8 +218,6 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
         res = 0;
     }
 
-
-    read_got_called = true;
     return res;
 }
 
@@ -318,7 +316,6 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
             RFCORE_XREG_RFIRQM0 |= RXPKTDONE;
             RFCORE_SFR_RFST = ISFLUSHRX;
             RFCORE_SFR_RFST = ISRXON;
-            read_got_called = false;
             break;
     }
 
