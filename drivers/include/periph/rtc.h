@@ -91,6 +91,19 @@ int rtc_set_time(struct tm *time);
 int rtc_get_time(struct tm *time);
 
 /**
+ * @brief Get current RTC time with sub-second component.
+ *        Requires the `periph_rtc_ms` feature.
+ *
+ * @param[out] time         Pointer to the struct to write the time to.
+ * @param[out] ms           Pointer to a variable to hold the microsecond
+ *                          component of the current RTC time.
+ *
+ * @return  0 for success
+ * @return -1 an error occurred
+ */
+int rtc_get_time_ms(struct tm *time, uint16_t *ms);
+
+/**
  * @brief Set an alarm for RTC to the specified value.
  *
  * @note Any already set alarm will be overwritten.

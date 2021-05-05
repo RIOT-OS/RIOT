@@ -28,6 +28,7 @@
 #include "periph/rtc.h"
 #include "VIC.h"
 #include "lpc23xx.h"
+#include "timex.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
@@ -110,6 +111,22 @@ int rtc_get_time(struct tm *localt)
     return 0;
 }
 
+int rtc_get_time_ms(struct tm *time, uint16_t *ms)
+{
+    uint16_t ccr_before, ccr_after;
+
+    /* loop in case of overflow */
+    do {
+        ccr_before = RTC_CCR >> 1;
+        rtc_get_time(time);
+        ccr_after = RTC_CCR >> 1;
+    } while (ccr_before > ccr_after);
+
+    /* CCR is 15-bit counter, increments second with each overflow */
+    *ms = (ccr_after * MS_PER_SEC) >> 15;
+
+    return 0;
+}
 
 int rtc_set_alarm(struct tm *localt, rtc_alarm_cb_t cb, void *arg)
 {

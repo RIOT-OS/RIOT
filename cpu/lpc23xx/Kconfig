@@ -15,6 +15,7 @@ config CPU_FAM_LPC23XX
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
     select HAS_PERIPH_TIMER_PERIODIC
+    select HAS_PERIPH_RTC_MS
 
 ## CPU Models
 config CPU_MODEL_LPC2387

@@ -47,6 +47,18 @@ static void print_time(const char *label, const struct tm *time)
             time->tm_sec);
 }
 
+static void print_time_ms(const char *label, const struct tm *time, uint16_t ms)
+{
+    printf("%s  %04d-%02d-%02d %02d:%02d:%02d.%03d\n", label,
+            time->tm_year + TM_YEAR_OFFSET,
+            time->tm_mon + 1,
+            time->tm_mday,
+            time->tm_hour,
+            time->tm_min,
+            time->tm_sec,
+            ms);
+}
+
 static void inc_secs(struct tm *time, unsigned val)
 {
     time->tm_sec += val;
@@ -81,8 +93,14 @@ int main(void)
     rtc_set_time(&time);
 
     /* read RTC to confirm value */
-    rtc_get_time(&time);
-    print_time("Clock value is now ", &time);
+    if (IS_USED(MODULE_PERIPH_RTC_MS)) {
+        uint16_t ms;
+        rtc_get_time_ms(&time, &ms);
+        print_time_ms("Clock value is now ", &time, ms);
+    } else {
+        rtc_get_time(&time);
+        print_time("Clock value is now ", &time);
+    }
 
     /* set initial alarm */
     inc_secs(&time, PERIOD);
@@ -95,17 +113,32 @@ int main(void)
 
     /* clear alarm */
     rtc_clear_alarm();
-    rtc_get_time(&time);
-    print_time("  Alarm cleared at ", &time);
+    if (IS_USED(MODULE_PERIPH_RTC_MS)) {
+        uint16_t ms;
+        rtc_get_time_ms(&time, &ms);
+        print_time_ms("  Alarm cleared at ", &time, ms);
+    } else {
+        rtc_get_time(&time);
+        print_time("  Alarm cleared at ", &time);
+    }
 
     /* verify alarm has been cleared */
     xtimer_sleep(PERIOD);
-    rtc_get_time(&time);
+
+    const char *message;
     if (mutex_trylock(&rtc_mtx)) {
-        print_time("   Error: Alarm at ", &time);
+        message = "   Error: Alarm at ";
+    } else {
+        message = "       No alarm at ";
     }
-    else {
-        print_time("       No alarm at ", &time);
+
+    if (IS_USED(MODULE_PERIPH_RTC_MS)) {
+        uint16_t ms;
+        rtc_get_time_ms(&time, &ms);
+        print_time_ms(message, &time, ms);
+    } else {
+        rtc_get_time(&time);
+        print_time(message, &time);
     }
 
     /* set alarm */
