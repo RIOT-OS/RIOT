@@ -7,19 +7,20 @@
  */
 
 /**
- * @defgroup    drivers_ili9341 ILI9341 display driver
+ * @defgroup    drivers_st7735
+ *  ST7735 display driver
  * @ingroup     drivers_display
  *
- * @brief       Driver for the ILI9341 display
+ * @brief       Driver for the ST7735 display
  *
  * @{
  *
  * @file
- * @brief       Driver for ili941 display
+ * @brief       Driver for st7735 display
  *
  * @author      Koen Zandberg <koen@bergzand.net>
  *
- * The ILI9341 is a generic display driver for small RGB displays. The driver
+ * The ST7735 is a generic display driver for small RGB displays. The driver
  * implemented here operates over SPI to communicate with the device.
  *
  * The device requires colors to be send in big endian RGB-565 format. The
@@ -30,8 +31,8 @@
  */
 
 
-#ifndef ILI9341_H
-#define ILI9341_H
+#ifndef ST7735_H
+#define ST7735_H
 
 #include "lcd.h"
 
@@ -44,58 +45,81 @@ extern "C" {
 #endif
 
 /**
- * @defgroup drivers_ili9341_config     ILI9341 display driver compile configuration
+ * @defgroup drivers_st7735
+ * _config     ST7735 display driver compile configuration
  * @ingroup config_drivers_display
  * @{
  */
 /**
- * @brief ILI9341 gvdd level.
+ * @brief ST7735 gvdd level.
  *
  * Default GVDD voltage of 4.8V. GVDD is reference level for the VCOM level and
  * the grayscale voltage level. GVDD should be ≦ (AVDD - 0.5) V .
  */
-#ifndef CONFIG_ILI9341_GVDD
-#define CONFIG_ILI9341_GVDD             4800
+#ifndef CONFIG_ST7735_GVDD
+#define CONFIG_ST7735_GVDD             4800
 #endif
 
 /**
- * @brief ILI9341 VCOMH voltage level.
+ * @brief ST7735 VCOMH voltage level.
  *
  * Default VCOMH voltage of 4.25V. VCOMH represents the high level of VCOM AC
  * voltage. VCOM levels needs to be adjusted to match the capacitance and
  * performance specifications of the TFT panel to maximize contrast and minimize
  * flickering.
  */
-#ifndef CONFIG_ILI9341_VCOMH
-#define CONFIG_ILI9341_VCOMH            4250
+#ifndef CONFIG_ST7735_VCOMH
+#define CONFIG_ST7735_VCOMH            4250
 #endif
 
 /**
- * @brief ILI9341 VCOML voltage level.
+ * @brief ST7735 VCOML voltage level.
  *
  * Default VCOML voltage of -2V. VCOML represents the low level of VCOM AC
  * voltage. VCOM levels needs to be adjusted to match the capacitance and
  * performance specifications of the TFT panel to maximize contrast and minimize
  * flickering
  */
-#ifndef CONFIG_ILI9341_VCOML
-#define CONFIG_ILI9341_VCOML            -2000
+#ifndef CONFIG_ST7735_VCOML
+#define CONFIG_ST7735_VCOML            -2000
 #endif
 
 /**
- * @brief   Device descriptor for a ili9341
+ * @brief ST7735 VCOML voltage level.
+ *
+ * Default VCOML voltage of -2V. VCOML represents the low level of VCOM AC
+ * voltage. VCOM levels needs to be adjusted to match the capacitance and
+ * performance specifications of the TFT panel to maximize contrast and minimize
+ * flickering
+ */
+#ifndef CONFIG_ST7735_VCOML
+#define CONFIG_ST7735_VCOML            -2000
+#endif
+
+/**
+ * @brief   Device descriptor for a st7735
+ *
  */
 typedef struct {
     lcd_t dev;                    /**< Pointer to the common lcd device */
-} ili9341_t;
+} st7735_t;
+
+/**
+ * @brief   Device initialization parameters
+ */
+typedef struct {
+    lcd_params_t params;            /**< LCD struct params */
+    uint8_t offset_x;             /**< LCD offset to apply on x axis. */
+    uint8_t offset_y;             /**< LCD offset to apply on y axis. */
+} st7735_params_t;
 
 /**
  * @brief   LCD device operations table
  */
-extern const lcd_desc_t lcd_ili9341_driver;
+extern const lcd_desc_t lcd_st7735_driver;
 
 #ifdef __cplusplus
 }
 #endif
-#endif /* ILI9341_H */
+#endif /* ST7735_H */
 /** @} */

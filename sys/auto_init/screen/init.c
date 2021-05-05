@@ -25,9 +25,9 @@ void auto_init_screen(void)
 {
     if (IS_USED(MODULE_DISP_DEV)) {
         DEBUG("auto_init_screen: init display drivers\n");
-        if (IS_USED(MODULE_ILI9341)) {
-            extern void auto_init_ili9341(void);
-            auto_init_ili9341();
+        if (IS_USED(MODULE_LCD)) {
+            extern void auto_init_lcd(void);
+            auto_init_lcd();
         }
     }
 

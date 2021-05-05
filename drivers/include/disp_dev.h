@@ -136,6 +136,16 @@ int disp_dev_reg_add(disp_dev_reg_t *dev);
 disp_dev_reg_t *disp_dev_reg_find_screen(uint8_t screen_id);
 
 /**
+ * @brief   Find a displat device by its position in the registry
+ *
+ * @param[in] pos       position to look up
+ *
+ * @return              pointer to the display device in the registry
+ * @return              NULL if there's no match
+ */
+disp_dev_reg_t *disp_dev_reg_find_nth(int pos);
+
+/**
  * @brief   Map an area to display on the device
  *
  * @param[in] dev   Pointer to the display device

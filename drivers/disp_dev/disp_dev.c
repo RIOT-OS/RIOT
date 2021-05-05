@@ -61,6 +61,16 @@ disp_dev_reg_t *disp_dev_reg_find_screen(uint8_t screen_id)
     return tmp;
 }
 
+disp_dev_reg_t *disp_dev_reg_find_nth(int pos)
+{
+    disp_dev_reg_t *tmp = disp_dev_reg;
+
+    for (int i = 0; (i < pos) && tmp; i++) {
+        tmp = tmp->next;
+    }
+    return tmp;
+}
+
 void disp_dev_map(const disp_dev_t *dev,
                   uint16_t x1, uint16_t x2, uint16_t y1, uint16_t y2,
                   const uint16_t *color)

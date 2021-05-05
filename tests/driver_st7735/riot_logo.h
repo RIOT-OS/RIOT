@@ -1,0 +1,1 @@
+../../tests/driver_ili9341/riot_logo.h

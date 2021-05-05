@@ -58,6 +58,9 @@ extern "C" {
 #ifndef ILI9341_PARAM_NUM_LINES
 #define ILI9341_PARAM_NUM_LINES    320U
 #endif
+#ifndef ILI9341_PARAM_RGB_CHANNELS
+#define ILI9341_PARAM_RGB_CHANNELS   240U
+#endif
 
 #ifndef ILI9341_PARAMS
 #define ILI9341_PARAMS              { .spi = ILI9341_PARAM_SPI, \
@@ -69,6 +72,7 @@ extern "C" {
                                       .rgb = ILI9341_PARAM_RGB, \
                                       .inverted = ILI9341_PARAM_INVERTED, \
                                       .lines = ILI9341_PARAM_NUM_LINES, \
+                                      .rgb_channels = ILI9341_PARAM_RGB_CHANNELS, \
                                     }
 #endif
 /**@}*/
@@ -76,7 +80,7 @@ extern "C" {
 /**
  * @brief   Configure ILI9341
  */
-static const ili9341_params_t ili9341_params[] =
+static const lcd_params_t ili9341_params[] =
 {
     ILI9341_PARAMS,
 };
@@ -95,6 +99,13 @@ static const uint8_t ili9341_screen_ids[] =
 {
     ILI9341_PARAM_SCREEN_IDS,
 };
+
+/**
+ * @brief   Define the number of configured displays
+ */
+#define ILI9341_NUMOF           ARRAY_SIZE(ili9341_params)
+#define ILI9341_SCREEN_NUMOF    ARRAY_SIZE(ili9341_screen_ids)
+
 
 #ifdef __cplusplus
 }

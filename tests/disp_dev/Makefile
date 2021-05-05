@@ -6,4 +6,9 @@ DISABLE_MODULE += test_utils_interactive_sync
 USEMODULE += ili9341
 USEMODULE += disp_dev
 
+# Check if being configured via Kconfig
+ifndef CONFIG_KCONFIG_USEMODULE_LCD
+CFLAGS += -DCONFIG_LCD_LE_MODE
+endif
+
 include $(RIOTBASE)/Makefile.include
