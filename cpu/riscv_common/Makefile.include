@@ -21,6 +21,13 @@ ifneq (,$(ITIM_START_ADDR))
   LINKFLAGS += $(LINKFLAGPREFIX)--defsym=_itim_length=$(ITIM_LEN)
 endif
 
+# Increase stack size of ISR stack if DEVELHELP is enabled. This is
+# needed because handle_trap() uses printf on the ISR stack and printf
+# usage results in a stack overflow with the default stack size.
+ifeq (1,$(DEVELHELP))
+  LINKFLAGS += $(LINKFLAGPREFIX)--defsym=__stack_size=512
+endif
+
 LINKER_SCRIPT ?= riscv.ld
 
 include $(RIOTMAKE)/arch/riscv.inc.mk
