@@ -276,9 +276,13 @@ void* IRAM_ATTR __wrap__realloc_r(struct _reent *r, void* ptr, size_t size)
 
 void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t count, size_t size)
 {
-    void *result = heap_caps_malloc_default(count * size);
+    size_t size_total;
+    if (__builtin_mul_overflow(count, size, &size_total)) {
+        return NULL;
+    }
+    void *result = heap_caps_malloc_default(size_total);
     if (result) {
-        bzero(result, count * size);
+        bzero(result, size_total);
     }
     return result;
 }
