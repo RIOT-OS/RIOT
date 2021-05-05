@@ -277,7 +277,7 @@ static void test_encrypt_op(uint8_t *key, uint8_t key_len,
     TEST_ASSERT_MESSAGE(sizeof(data) >= output_expected_len,
                         "Output buffer too small");
 
-    err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
+    err = cipher_init(&cipher, CIPHER_AES, key, key_len);
     TEST_ASSERT_EQUAL_INT(1, err);
 
     len = cipher_encrypt_ocb(&cipher, adata, adata_len,
@@ -327,7 +327,7 @@ static void test_decrypt_op(uint8_t *key, uint8_t key_len,
     TEST_ASSERT_MESSAGE(sizeof(data) >= output_expected_len,
                         "Output buffer too small");
 
-    err = cipher_init(&cipher, CIPHER_AES_128, key, key_len);
+    err = cipher_init(&cipher, CIPHER_AES, key, key_len);
     TEST_ASSERT_EQUAL_INT(1, err);
 
     len = cipher_decrypt_ocb(&cipher, adata, adata_len,
@@ -412,7 +412,7 @@ static void test_crypto_modes_ocb_bad_parameter_values(void)
     uint8_t key[16], auth_data[1], nonce[16], input[16], output[32];
     cipher_t cipher;
 
-    cipher_init(&cipher, CIPHER_AES_128, key, 16);
+    cipher_init(&cipher, CIPHER_AES, key, 16);
     /* tag length must be positive */
     int rv = cipher_encrypt_ocb(&cipher, auth_data, sizeof(auth_data), 0, nonce,
                                 15, input, sizeof(input), output);

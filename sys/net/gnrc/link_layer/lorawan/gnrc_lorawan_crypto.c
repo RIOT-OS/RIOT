@@ -95,7 +95,7 @@ void gnrc_lorawan_encrypt_payload(iolist_t *iolist, const le_uint32_t *dev_addr,
 
     lorawan_block_t *block = (lorawan_block_t *)a_block;
 
-    cipher_init(&AesContext, CIPHER_AES_128, appskey, LORAMAC_APPKEY_LEN);
+    cipher_init(&AesContext, CIPHER_AES, appskey, LORAMAC_APPKEY_LEN);
 
     block->fb = CRYPT_B0_START;
 
@@ -127,7 +127,7 @@ void gnrc_lorawan_encrypt_payload(iolist_t *iolist, const le_uint32_t *dev_addr,
 void gnrc_lorawan_decrypt_join_accept(const uint8_t *key, uint8_t *pkt,
                                       int has_clist, uint8_t *out)
 {
-    cipher_init(&AesContext, CIPHER_AES_128, key, LORAMAC_APPKEY_LEN);
+    cipher_init(&AesContext, CIPHER_AES, key, LORAMAC_APPKEY_LEN);
     cipher_encrypt(&AesContext, pkt, out);
 
     if (has_clist) {
@@ -145,7 +145,7 @@ void gnrc_lorawan_generate_session_keys(const uint8_t *app_nonce,
 
     memset(buf, 0, sizeof(buf));
 
-    cipher_init(&AesContext, CIPHER_AES_128, appkey, LORAMAC_APPSKEY_LEN);
+    cipher_init(&AesContext, CIPHER_AES, appkey, LORAMAC_APPSKEY_LEN);
 
     /* net_id comes right after app_nonce */
     memcpy(buf + 1, app_nonce,

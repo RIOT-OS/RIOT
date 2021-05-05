@@ -403,7 +403,7 @@ void ieee802154_sec_init(ieee802154_sec_context_t *ctx)
     ctx->frame_counter = 0;
     uint8_t key[] = IEEE802154_SEC_DEFAULT_KEY;
     assert(CIPHER_MAX_CONTEXT_SIZE >= IEEE802154_SEC_KEY_LENGTH);
-    cipher_init(&ctx->cipher, CIPHER_AES_128, key, IEEE802154_SEC_KEY_LENGTH);
+    cipher_init(&ctx->cipher, CIPHER_AES, key, IEEE802154_SEC_KEY_LENGTH);
 }
 
 int ieee802154_sec_encrypt_frame(ieee802154_sec_context_t *ctx,

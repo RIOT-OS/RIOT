@@ -38,7 +38,7 @@ owerror_t cryptoengine_aes_ccms_enc(uint8_t *a, uint8_t len_a, uint8_t *m,
     int ret, len;
     uint8_t tmp_buff[MAX_MESSAGE_LEN + CCM_MAC_MAX_LEN];
 
-    ret = cipher_init(&cipher, CIPHER_AES_128, key, CCM_BLOCK_SIZE);
+    ret = cipher_init(&cipher, CIPHER_AES, key, CCM_BLOCK_SIZE);
 
     if (ret != 1) {
         return E_FAIL;
@@ -64,7 +64,7 @@ owerror_t cryptoengine_aes_ccms_dec(uint8_t *a, uint8_t len_a, uint8_t *m,
     int ret, len;
     uint8_t tmp_buff[MAX_MESSAGE_LEN];
 
-    ret = cipher_init(&cipher, CIPHER_AES_128, key, CCM_BLOCK_SIZE);
+    ret = cipher_init(&cipher, CIPHER_AES, key, CCM_BLOCK_SIZE);
 
     if (ret != 1) {
         return E_FAIL;
@@ -88,7 +88,7 @@ owerror_t cryptoengine_aes_ecb_enc(uint8_t *buffer, uint8_t *key)
     cipher_t cipher;
     int ret, len;
 
-    ret = cipher_init(&cipher, CIPHER_AES_128, key, CCM_BLOCK_SIZE);
+    ret = cipher_init(&cipher, CIPHER_AES, key, CCM_BLOCK_SIZE);
 
     if (ret != 1) {
         return E_FAIL;

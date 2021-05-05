@@ -16,12 +16,11 @@
  * @section ciphers Ciphers
  *
  * RIOT supports the following block ciphers:
- *  * AES-128
- *  * 3DES (deprecated)
+ *  * AES-128, AES-192, AES-256
  *  * NULL
  *
- * You can use them directly by adding `crypto_aes` or `crypto_3des` to your
- * USEMODULE-List.
+ * You can use them directly by adding `crypto_aes_128`, `crypto_aes_192` or
+ * `crypto_aes_256` to your USEMODULE-List.
  * While you can use the ciphers functions directly, you should resort to
  * the generic API for block ciphers whenever possible.
  *
@@ -37,7 +36,7 @@
  *          plain_text[AES_BLOCK_SIZE] = {0},
  *          cipher_text[AES_BLOCK_SIZE] = {0};
  *
- *  if (cipher_init(&cipher, CIPHER_AES_128, key, AES_KEY_SIZE) < 0)
+ *  if (cipher_init(&cipher, CIPHER_AES, key, AES_KEY_SIZE) < 0)
  *      printf("Cipher init failed!\n");
  *
  *  if (cipher_encrypt(&cipher, plain_text, cipher_text) < 0)

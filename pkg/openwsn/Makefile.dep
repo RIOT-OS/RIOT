@@ -44,7 +44,6 @@ ifneq (,$(filter openwsn_coap,$(USEMODULE)))
 endif
 
 ifneq (,$(filter openwsn_crypto,$(USEMODULE)))
-  USEMODULE += crypto_3des
   USEMODULE += cipher_modes
 endif
 

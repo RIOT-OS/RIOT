@@ -1,6 +1,6 @@
 USEMODULE += random
 USEMODULE += hashes
-USEMODULE += crypto_aes
+USEMODULE += crypto_aes_128
 
 USEMODULE += semtech_loramac_contrib
 USEMODULE += semtech_loramac_mac
