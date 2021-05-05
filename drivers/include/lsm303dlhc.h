@@ -115,6 +115,8 @@ typedef struct {
     gpio_t mag_pin;                         /**< magnetometer EXTI pin */
     lsm303dlhc_mag_sample_rate_t mag_rate;  /**< magnetometer sample rate */
     lsm303dlhc_mag_gain_t mag_gain;         /**< magnetometer gain */
+    gpio_mode_t acc_pin_mode;               /**< accelerometer EXTI pin mode; setting this to GPIO_IN_PU inverts pin semantics */
+    gpio_mode_t mag_pin_mode;               /**< magnetometer EXTI pin mode; setting this to GPIO_IN_PU inverts pin semantics*/
 } lsm303dlhc_params_t;
 
 /**
