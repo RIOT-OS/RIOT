@@ -330,12 +330,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_CHANNEL_PAGE:
             assert(max_len >= sizeof(uint16_t));
-            if (at86rf215_get_phy_mode(dev) != IEEE802154_PHY_OQPSK) {
-                return -ENOTSUP;
-            }
-
             ((uint8_t *)val)[1] = 0;
-            ((uint8_t *)val)[0] = is_subGHz(dev) ? 2 : 0;
+            ((uint8_t *)val)[0] = dev->netdev.page;
             return sizeof(uint16_t);
 
         case NETOPT_AUTOCCA:
@@ -393,8 +389,13 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
         case NETOPT_IEEE802154_PHY:
             assert(max_len >= sizeof(int8_t));
-            *((int8_t *)val) = at86rf215_get_phy_mode(dev);
-            res = max_len;
+            if (dev->netdev.page == 9) {
+                *((int8_t *)val) = at86rf215_get_phy_mode(dev);
+                res = max_len;
+            }
+            else {
+                return -EINVAL;
+            }
             break;
 #ifdef MODULE_NETDEV_IEEE802154_MR_FSK
         case NETOPT_MR_FSK_MODULATION_INDEX:
@@ -534,6 +535,16 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
             res = sizeof(netopt_enable_t);
             break;
 
+        case NETOPT_CHANNEL_PAGE:
+            assert(len == sizeof(uint16_t));
+            if (at86rf215_set_page(dev, ((const uint8_t *)val)[1]) < 0) {
+                res = -ENOTSUP;
+            }
+            else {
+                res = sizeof(uint16_t);
+            }
+            break;
+
         case NETOPT_AUTOCCA:
             at86rf215_set_option(dev, AT86RF215_OPT_CCATX,
                                  ((const bool *)val)[0]);
@@ -606,13 +617,14 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 
         case NETOPT_IEEE802154_PHY:
             assert(len <= sizeof(uint8_t));
-            switch (*(uint8_t *)val) {
-#ifdef MODULE_NETDEV_IEEE802154_OQPSK
-            case IEEE802154_PHY_OQPSK:
-                at86rf215_configure_legacy_OQPSK(dev, at86rf215_OQPSK_get_mode_legacy(dev));
-                res = sizeof(uint8_t);
+            /* only SUN PHYs can be changed, others are changed using
+             * the channel page */
+            if (dev->netdev.page != 9) {
+                res = -EINVAL;
                 break;
-#endif /* MODULE_NETDEV_IEEE802154_OQPSK */
+            }
+
+            switch (*(uint8_t *)val) {
 #ifdef MODULE_NETDEV_IEEE802154_MR_OQPSK
             case IEEE802154_PHY_MR_OQPSK:
                 at86rf215_configure_OQPSK(dev,
@@ -1120,7 +1132,8 @@ static void _isr(netdev_t *netdev)
     /* This should never happen */
     if (++iter > 3) {
         puts("AT86RF215: stuck in ISR");
-        printf("\tnum_channels: %d\n", dev->num_chans);
+        printf("\tchan_min: %d\n", dev->chan_min);
+        printf("\tchan_max: %d\n", dev->chan_max);
         printf("\tHW: %s\n", at86rf215_hw_state2a(at86rf215_get_rf_state(dev)));
         printf("\tSW: %s\n", at86rf215_sw_state2a(dev->state));
         printf("\trf_irq_mask: %x\n", rf_irq_mask);

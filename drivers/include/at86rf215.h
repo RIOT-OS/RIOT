@@ -351,7 +351,8 @@ typedef struct at86rf215 {
     uint32_t ack_timeout_usec;              /**< time to wait before retransmission in µs */
     uint32_t csma_backoff_period;           /**< CSMA Backoff period */
     uint16_t flags;                         /**< Device specific flags */
-    uint16_t num_chans;                     /**< Number of legal channel at current modulation */
+    uint16_t chan_min;                      /**< Minimum channel supported in current page */
+    uint16_t chan_max;                      /**< Maximum channel supported in current page */
     uint16_t tx_frame_len;                  /**< length of the current TX frame */
     uint8_t timeout;                        /**< indicates which timeout was reached */
     uint8_t state;                          /**< current state of the radio */
@@ -677,6 +678,14 @@ int at86rf215_enable_batmon(at86rf215_t *dev, unsigned voltage);
  * @param[in] dev           device to configure
  */
 void at86rf215_disable_batmon(at86rf215_t *dev);
+
+/**
+ * @brief   Set the channel page to use.
+ *
+ * @param[in] dev           device to configure
+ * @param[in] page          channel page to set
+ */
+int at86rf215_set_page(at86rf215_t *dev, uint8_t page);
 
 #ifdef __cplusplus
 }
