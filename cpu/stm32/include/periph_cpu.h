@@ -1046,7 +1046,7 @@ void dma_prepare(dma_t dma, void *mem, size_t len, bool incr_mem);
  * @param[in]   callback    Callback to execute during the Transfer Complete interrupt
  * @param[in]   arg         Argument to pass to the callback
  */
-void dma_transfer_complete(dma_t dma, void (*callback)(void*, dma_t), void* arg);
+void dma_set_transfer_complete_cb(dma_t dma, void (*callback)(void*, dma_t), void* arg);
 
 #endif /* MODULE_PERIPH_DMA */
 

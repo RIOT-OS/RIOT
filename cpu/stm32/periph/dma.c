@@ -447,7 +447,7 @@ int dma_configure(dma_t dma, int chan, const volatile void *src, volatile void *
     return 0;
 }
 
-void dma_transfer_complete(dma_t dma, void (*callback)(void*, dma_t), void *arg)
+void dma_set_transfer_complete_cb(dma_t dma, void (*callback)(void*, dma_t), void *arg)
 {
     struct dma_ctx *ctx = &dma_ctx[dma];
     ctx->callback = callback;
