@@ -99,8 +99,12 @@ uint32_t sam0_gclk_freq(uint8_t id)
     switch (id) {
     case SAM0_GCLK_MAIN:
         return CLOCK_CORECLOCK;
-    case SAM0_GCLK_8MHZ:
+    case SAM0_GCLK_TIMER:
+#if (CLOCK_CORECLOCK == 48000000U) || (CLOCK_CORECLOCK == 16000000U) || (CLOCK_CORECLOCK == 8000000U)
         return 8000000;
+#else
+        return 4000000;
+#endif
     case SAM0_GCLK_32KHZ:
         return 32768;
     case SAM0_GCLK_48MHZ:
@@ -292,8 +296,8 @@ void cpu_init(void)
         }
     }
     /* clock used by timers */
-    _gclk_setup(SAM0_GCLK_8MHZ, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M
-                | GCLK_GENCTRL_DIV(2));
+    _gclk_setup(SAM0_GCLK_TIMER, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_OSC16M
+                | GCLK_GENCTRL_DIV(CLOCK_CORECLOCK/sam0_gclk_freq(SAM0_GCLK_TIMER)));
 
 #ifdef MODULE_PERIPH_PM
     PM->CTRLA.reg = PM_CTRLA_MASK & (~PM_CTRLA_IORET);
