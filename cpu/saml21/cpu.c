@@ -37,8 +37,10 @@
 
 #if (CLOCK_CORECLOCK == 48000000U) || defined (MODULE_PERIPH_USBDEV)
 #define USE_DFLL        (1)
+#define GCLK_GENCTRL_SRC_MAIN GCLK_GENCTRL_SRC_DFLL48M
 #else
 #define USE_DFLL        (0)
+#define GCLK_GENCTRL_SRC_MAIN GCLK_GENCTRL_SRC_OSC16M
 #endif
 
 static void _gclk_setup(int gclk, uint32_t reg)
@@ -281,11 +283,6 @@ void cpu_init(void)
     _dfll_setup();
 
     /* Setup GCLK generators */
-#if USE_DFLL
-#define GCLK_GENCTRL_SRC_MAIN GCLK_GENCTRL_SRC_DFLL48M
-#else
-#define GCLK_GENCTRL_SRC_MAIN GCLK_GENCTRL_SRC_OSC16M
-#endif
     _gclk_setup(SAM0_GCLK_MAIN, GCLK_GENCTRL_GENEN | GCLK_GENCTRL_SRC_MAIN);
 
     /* Ensure APB Backup domain clock is within the 6MHZ limit, BUPDIV value
