@@ -186,6 +186,18 @@ static bool _on_link(const ipv6_addr_t *dst, unsigned *iface)
     return ipv6_addr_is_link_local(dst);
 }
 
+static gnrc_netif_t *_acquire_new_iface(unsigned iface)
+{
+    gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
+    /* release NIB, in case other thread calls a NIB function while we wait for
+     * the netif */
+    _nib_release();
+    gnrc_netif_acquire(netif);
+    /* re-acquire NIB */
+    _nib_acquire();
+    return netif;
+}
+
 int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                                       gnrc_netif_t *netif, gnrc_pktsnip_t *pkt,
                                       gnrc_ipv6_nib_nc_t *nce)
@@ -208,10 +220,9 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                   ipv6_addr_to_str(addr_str, dst, sizeof(addr_str)));
             /* on-link prefixes return their interface */
             if (!ipv6_addr_is_link_local(dst) && (iface != 0)) {
-                /* release preassumed interface */
+                /* release pre-assumed netif */
                 gnrc_netif_release(netif);
-                netif = gnrc_netif_get_by_pid(iface);
-                gnrc_netif_acquire(netif);
+                netif = _acquire_new_iface(iface);
             }
             if ((netif == NULL) ||
                 !_resolve_addr(dst, netif, pkt, nce, node)) {
@@ -259,13 +270,12 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                 }
             }
             if ((netif != NULL) && (netif->pid != (int)route.iface)) {
-                /* drop pre-assumed netif */
+                /* release pre-assumed netif */
                 gnrc_netif_release(netif);
             }
             if ((netif == NULL) || (netif->pid != (int)route.iface)) {
                 /* get actual netif */
-                netif = gnrc_netif_get_by_pid(route.iface);
-                gnrc_netif_acquire(netif);
+                netif = _acquire_new_iface(route.iface);
             }
             node = _nib_onl_get(&route.next_hop,
                                 (netif != NULL) ? netif->pid : 0);
