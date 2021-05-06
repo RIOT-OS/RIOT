@@ -443,7 +443,7 @@ static void *_event_loop(void *args)
                 break;
             case GNRC_SIXLOWPAN_FRAG_SFR_INTER_FRAG_GAP_MSG:
                 DEBUG("6lo sfr: sending next scheduled frame\n");
-                gnrc_sixlowpan_frag_sfr_inter_frame_gap();
+                gnrc_sixlowpan_frag_sfr_inter_frame_gap(msg.content.ptr);
                 break;
 #endif
 
