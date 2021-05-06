@@ -21,3 +21,13 @@ LINKFLAGS += -L$(ESP8266_SDK_BUILD_DIR)
 
 # esp8266_sdk doesn't generate any .a
 PSEUDOMODULES += esp8266_sdk
+
+# Bootloader module built from the SDK.
+DIRS += $(RIOTBASE)/pkg/esp8266_sdk/bootloader
+PSEUDOMODULES += esp8266_bootloader
+
+ifneq (,$(filter esp8266_bootloader,$(USEMODULE)))
+# Bootloader file used by esptool.inc.mk
+BOOTLOADER_BIN ?= $(BINDIR)/esp8266_bootloader/bootloader.bin
+TEST_EXTRA_FILES += $(BOOTLOADER_BIN)
+endif
