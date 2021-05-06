@@ -85,6 +85,12 @@ LINKFLAGS += -L$(ESP_SDK_DIR)/components/$(CPU)
 LINKFLAGS += -L$(ESP_SDK_DIR)/components/$(CPU)/lib
 LINKFLAGS += -nostdlib -Wl,-gc-sections -Wl,-static
 
+ifeq (,$(filter esp_idf_heap,$(USEMODULE)))
+  # use the wrapper functions for calloc to add correct overflow detection missing
+  # in the newlib's version.
+  LINKFLAGS += -Wl,-wrap=calloc
+endif
+
 # LINKFLAGS += -Wl,--verbose
 # LINKFLAGS += -Wl,--print-gc-sections
 
