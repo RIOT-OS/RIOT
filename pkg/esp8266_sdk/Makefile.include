@@ -1,3 +1,5 @@
+PSEUDOMODULES += esp8266_sdk
+
 # Directory with the SDK source checkout. Some modules in the cpu/esp8266 use
 # internal parts of the SDK and for that they need access to the
 # ESP8266_RTOS_SDK_DIR path.
@@ -19,5 +21,13 @@ INCLUDES += -I$(ESP8266_SDK_BUILD_DIR)
 # Modified binary libraries are built here in the Makefile.
 LINKFLAGS += -L$(ESP8266_SDK_BUILD_DIR)
 
-# esp8266_sdk doesn't generate any .a
-PSEUDOMODULES += esp8266_sdk
+# Bootloader module built from the SDK.
+DIRS += $(RIOTBASE)/pkg/esp8266_sdk/bootloader
+PSEUDOMODULES += esp_bootloader
+
+ifneq (,$(filter esp_bootloader,$(USEMODULE)))
+  # Bootloader file used by esptool.inc.mk
+  BOOTLOADER_BIN ?= $(BINDIR)/esp_bootloader/bootloader.bin
+endif
+
+$(BOOTLOADER_BIN):
