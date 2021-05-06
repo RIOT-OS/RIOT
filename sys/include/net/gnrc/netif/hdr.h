@@ -153,6 +153,9 @@ typedef struct {
      */
     uint64_t timestamp;
 #endif /* MODULE_GNRC_NETIF_TIMESTAMP */
+#if IS_USED(MODULE_GNRC_NETIF_PHYDAT) || defined(DOXYGEN)
+    uint8_t phydat;             /**< driver specific data */
+#endif
 } gnrc_netif_hdr_t;
 
 /**

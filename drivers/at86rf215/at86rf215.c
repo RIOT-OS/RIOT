@@ -21,6 +21,8 @@
 #include "byteorder.h"
 #include "net/ieee802154.h"
 #include "net/gnrc.h"
+#include "net/netstats.h"
+#include "net/netstats/neighbor.h"
 #include "unaligned.h"
 #include "at86rf215_internal.h"
 #include "at86rf215_netdev.h"
@@ -290,12 +292,56 @@ int at86rf215_tx_prepare(at86rf215_t *dev)
     return 0;
 }
 
+static void _mr_oqpsk_set_mode(at86rf215_t *dev, const uint8_t *data)
+{
+#ifdef MODULE_AT86RF215_MR_OQPSK_MULTIRATE
+    uint8_t addr[8];
+    le_uint16_t pan;
+    int addr_len;
+    netstats_nb_t stats;
+    gnrc_netif_t *netif;
+
+    if (dev->oqpsk_phr_default == 0) {
+        return;
+    }
+
+    addr_len = ieee802154_get_dst(data, addr, &pan);
+    netif = gnrc_netif_get_by_netdev(&dev->netdev.netdev);
+
+    assert(netif);
+
+    /* set default rate for TX */
+    dev->oqpsk_phr = dev->oqpsk_phr_default;
+
+    /* destination is broadcast */
+    if (addr_len == 2 && addr[0] == 0xFF && addr[1] == 0xFF) {
+        return;
+    }
+
+    /* look up TX rate for neighbor */
+    if (netstats_nb_get(&netif->netif, addr, addr_len, &stats) && stats.phydat) {
+        DEBUG("at86rf215: neighbor found, rate: %x\n", stats.phydat);
+        dev->oqpsk_phr = stats.phydat;
+    } else {
+        DEBUG("at86rf215: neighbor unknown\n");
+    }
+#else
+    (void)dev;
+    (void)data;
+#endif
+}
+
 size_t at86rf215_tx_load(at86rf215_t *dev, const uint8_t *data,
                          size_t len, size_t offset)
 {
-    /* set bit if ACK was requested and retransmission is enabled */
-    if (offset == 0 && (data[0] & IEEE802154_FCF_ACK_REQ) && dev->retries_max) {
-        dev->flags |= AT86RF215_OPT_ACK_REQUESTED;
+    if (offset == 0) {
+        /* set bit if ACK was requested and retransmission is enabled */
+        if ((data[0] & IEEE802154_FCF_ACK_REQ) && dev->retries_max) {
+            dev->flags |= AT86RF215_OPT_ACK_REQUESTED;
+        }
+
+        /* set TX rate based on destination address */
+        _mr_oqpsk_set_mode(dev, data);
     }
 
     at86rf215_reg_write_bytes(dev, dev->BBC->RG_FBTXS + offset, data, len);

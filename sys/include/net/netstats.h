@@ -95,6 +95,9 @@ typedef struct {
 #if IS_USED(MODULE_NETSTATS_NEIGHBOR_LQI) || DOXYGEN
     uint8_t  lqi;           /**< Average LQI of received frames */
 #endif
+#if IS_USED(MODULE_NETSTATS_NEIGHBOR_PHYDAT) || DOXYGEN
+    uint8_t phydat;         /**< Driver specific data */
+#endif
 } netstats_nb_t;
 
 /**
