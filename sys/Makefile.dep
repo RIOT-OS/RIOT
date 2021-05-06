@@ -29,6 +29,14 @@ ifneq (,$(filter congure_test,$(USEMODULE)))
   USEMODULE += fmt
 endif
 
+ifneq (,$(filter congure_reno,$(USEMODULE)))
+  USEMODULE += congure_reno_methods
+endif
+
+ifneq (,$(filter congure_reno_methods,$(USEMODULE)))
+  USEMODULE += seq
+endif
+
 ifneq (,$(filter eepreg,$(USEMODULE)))
   FEATURES_REQUIRED += periph_eeprom
 endif
