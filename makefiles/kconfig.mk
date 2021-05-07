@@ -143,8 +143,8 @@ $(KCONFIG_GENERATED_DEPENDENCIES): FORCE | $(GENERATED_DIR)
 	      printf "config %s\n\tbool\n\tdefault y\n", toupper($$0)}' \
 	  | $(LAZYSPONGE) $(LAZYSPONGE_FLAGS) $@
 
-# All directories in EXTERNAL_MODULES_DIR which have a Kconfig file
-EXTERNAL_MODULE_KCONFIGS ?= $(sort $(foreach dir,$(EXTERNAL_MODULE_DIRS),\
+# All directories in EXTERNAL_MODULES_PATHS which have a Kconfig file
+EXTERNAL_MODULE_KCONFIGS ?= $(sort $(foreach dir,$(EXTERNAL_MODULE_PATHS),\
                               $(wildcard $(dir)/Kconfig)))
 # Build a Kconfig file that source all external modules configuration
 # files. Every EXTERNAL_MODULE_DIRS with a Kconfig file is written to

@@ -2,6 +2,10 @@
 # until no new modules, pkgs, or features are pull in order to catch all
 # transient dependencies
 
+# Locate used modules in $(EXTERNAL_MODULE_DIRS).
+EXTERNAL_MODULE_PATHS := $(sort $(foreach dir,$(EXTERNAL_MODULE_DIRS),\
+  $(foreach mod,$(USEMODULE),$(dir $(wildcard $(dir)/$(mod)/Makefile)))))
+
 # Back up current state to detect changes
 OLD_STATE := $(USEMODULE) $(USEPKG) $(FEATURES_USED)
 

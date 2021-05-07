@@ -41,22 +41,23 @@ include $(RIOT_MAKEFILES_GLOBAL_PRE)
 -include Makefile.local
 
 # set undefined variables
-RIOTBASE            ?= $(_riotbase)
-RIOTCPU             ?= $(RIOTBASE)/cpu
+RIOTBASE                        ?= $(_riotbase)
+RIOTCPU                         ?= $(RIOTBASE)/cpu
 # Deprecated to set RIOTBOARD, use EXTERNAL_BOARD_DIRS
-RIOTBOARD           ?= $(RIOTBASE)/boards
-EXTERNAL_BOARD_DIRS ?=
-RIOTMAKE            ?= $(RIOTBASE)/makefiles
-RIOTPKG             ?= $(RIOTBASE)/pkg
-RIOTTOOLS           ?= $(RIOTBASE)/dist/tools
-RIOTPROJECT         ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
-BUILD_DIR           ?= $(RIOTBASE)/build
-APPDIR              ?= $(CURDIR)
-BINDIRBASE          ?= $(APPDIR)/bin
-BINDIR              ?= $(BINDIRBASE)/$(BOARD)
-PKGDIRBASE          ?= $(RIOTBASE)/build/pkg
-DLCACHE             ?= $(RIOTTOOLS)/dlcache/dlcache.sh
-DLCACHE_DIR         ?= $(RIOTBASE)/.dlcache
+RIOTBOARD                       ?= $(RIOTBASE)/boards
+EXTERNAL_BOARD_DIRS             ?=
+RIOTMAKE                        ?= $(RIOTBASE)/makefiles
+RIOTPKG                         ?= $(RIOTBASE)/pkg
+RIOTTOOLS                       ?= $(RIOTBASE)/dist/tools
+RIOTPROJECT                     ?= $(shell git rev-parse --show-toplevel 2>/dev/null || pwd)
+BUILD_DIR                       ?= $(RIOTBASE)/build
+APPDIR                          ?= $(CURDIR)
+BINDIRBASE                      ?= $(APPDIR)/bin
+BINDIR                          ?= $(BINDIRBASE)/$(BOARD)
+PKGDIRBASE                      ?= $(RIOTBASE)/build/pkg
+DLCACHE                         ?= $(RIOTTOOLS)/dlcache/dlcache.sh
+DLCACHE_DIR                     ?= $(RIOTBASE)/.dlcache
+WARNING_EXTERNAL_MODULE_DIRS    ?= 1
 
 # include CI info such as BOARD_INSUFFICIENT_MEMORY, if existing
 -include Makefile.ci
@@ -82,16 +83,19 @@ __OVERRIDE_DIRECTORY_VARIABLES := $(__DIRECTORY_VARIABLES)
 # Use absolute paths in recursive "make" even if overridden on command line.
 MAKEOVERRIDES += $(foreach v,$(__OVERRIDE_DIRECTORY_VARIABLES),$(v)=$($(v)))
 
-# Setting EXTERNAL_BOARD_DIRS as command line argument is too messy to handle:
-# Even when every path in EXTERNAL_BOARD_DIRS is turned into an absolute path
-# using override, sub-makes will still get the original value. Using
-# MAKEOVERRIDES has issues with spaces in the values, which are used as
-# separator in EXTERNAL_BOARD_DIRS. So we just enforce setting the value
+# Setting EXTERNAL_BOARD_DIRS and EXTERNAL_MODULE_DIRS as command line argument
+# is too messy to handle: Even when every path in EXTERNAL_BOARD_DIRS is turned
+# into an absolute path using override, sub-makes will still get the original
+# value. Using MAKEOVERRIDES has issues with spaces in the values, which are
+# used as separator in EXTERNAL_BOARD_DIRS. So we just enforce setting the value
 # either in a Makefile, or as environment variable.
-ifeq ($(origin EXTERNAL_BOARD_DIRS),command line)
+ifeq ($(INSIDE_DOCKER),0)
   # In Docker absolute paths are always given, so only fail when not in docker
-  ifeq ($(INSIDE_DOCKER),0)
+  ifeq ($(origin EXTERNAL_BOARD_DIRS),command line)
     $(error EXTERNAL_BOARD_DIRS must be passed as environment variable, and not as command line argument)
+  endif
+  ifeq ($(origin EXTERNAL_MODULE_DIRS),command line)
+    $(error EXTERNAL_MODULE_DIRS must be passed as environment variable, and not as command line argument)
   endif
 endif
 
@@ -102,15 +106,27 @@ ifneq ($(abspath $(RIOTBASE)/boards),$(abspath $(RIOTBOARD)))
   __DIRECTORY_VARIABLES += RIOTBOARD
 endif
 
-ifneq (,$(BOARDSDIR))
-  # Only warn users, not the CI.
-  ifneq ($(RIOT_CI_BUILD),1)
-    # Do not warn when set from sub-make
-    ifeq ($(MAKELEVEL),0)
+# Only warn users, not the CI.
+ifneq ($(RIOT_CI_BUILD),1)
+  # Do not warn when set from sub-make
+  ifeq ($(MAKELEVEL),0)
+    ifneq (,$(BOARDSDIR))
       $(warning Using BOARDSDIR is deprecated use EXTERNAL_BOARD_DIRS instead)
       $(info EXTERNAL_BOARD_DIRS can contain multiple folders separated by space)
     endif
+
+    # API change warning for EXTERNAL_MODULE_DIRS, remove by 2021.10
+    ifneq (,$(EXTERNAL_MODULE_DIRS))
+      ifeq (1,$(WARNING_EXTERNAL_MODULE_DIRS))
+        $(info Warning! EXTERNAL_MODULE_DIRS is a search folder since 2021.07-branch, see \
+               https://doc.riot-os.org/creating-modules.html#modules-outside-of-riotbase)
+      endif
+    endif
   endif
+endif
+
+# Needed for backward compatibility:
+ifneq (,$(BOARDSDIR))
   EXTERNAL_BOARD_DIRS += $(BOARDSDIR)
 endif
 
@@ -129,6 +145,9 @@ override PKGDIRBASE             := $(abspath $(PKGDIRBASE))
 override DLCACHE_DIR            := $(abspath $(DLCACHE_DIR))
 EXTERNAL_BOARD_DIRS             := $(foreach dir,\
                                              $(EXTERNAL_BOARD_DIRS),\
+                                             $(abspath $(dir)))
+EXTERNAL_MODULE_DIRS            := $(foreach dir,\
+                                             $(EXTERNAL_MODULE_DIRS),\
                                              $(abspath $(dir)))
 
 # Ensure that all directories are set and don't contain spaces.
@@ -511,7 +530,7 @@ include $(RIOTBASE)/sys/Makefile.include
 -include $(USEPKG:%=$(RIOTPKG)/%/Makefile.include)
 
 # include external modules configuration
--include $(EXTERNAL_MODULE_DIRS:%=%/Makefile.include)
+-include $(EXTERNAL_MODULE_PATHS:%=%/Makefile.include)
 
 # Deduplicate includes without sorting them
 # see https://stackoverflow.com/questions/16144115/makefile-remove-duplicate-words-without-sorting
@@ -600,7 +619,8 @@ endif
 # We assume $(LINK) to be gcc-like. Use `LINKFLAGPREFIX :=` for ld-like linker options.
 LINKFLAGPREFIX ?= -Wl,
 
-DIRS += $(EXTERNAL_MODULE_DIRS)
+# Also build external modules
+DIRS += $(EXTERNAL_MODULE_PATHS)
 
 # Define dependencies required for building (headers, downloading source files,)
 BUILDDEPS += $(RIOTBUILD_CONFIG_HEADER_C)

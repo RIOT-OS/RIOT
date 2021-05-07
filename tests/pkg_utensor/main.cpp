@@ -23,7 +23,7 @@
 
 #include "blob/digit.h"         //contains a sample taken from the MNIST test set
 
-#include "models/deep_mlp.hpp"  //generated model file
+#include "deep_mlp.hpp"         //generated model file
 #include "tensor.hpp"           //useful tensor classes
 
 int main()
