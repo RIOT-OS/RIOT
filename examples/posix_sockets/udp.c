@@ -38,6 +38,7 @@
 #include "net/netif.h"         /* for resolving ipv6 scope */
 #endif /* SOCK_HAS_IPV6 */
 
+#include "msg.h"
 #include "thread.h"
 
 #define SERVER_MSG_QUEUE_SIZE   (8)
