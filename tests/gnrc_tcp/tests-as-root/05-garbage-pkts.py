@@ -33,11 +33,13 @@ def testfunc(func):
         # Setup RIOT Node wait for incoming connections from host system
         child.sendline('gnrc_tcp_tcb_init')
         child.expect_exact('gnrc_tcp_tcb_init: argc=1, argv[0] = gnrc_tcp_tcb_init')
-        child.sendline('gnrc_tcp_open_passive [::]:{}'.format(port))
-        child.expect(r'gnrc_tcp_open_passive: argc=2, '
-                     r'argv\[0\] = gnrc_tcp_open_passive, '
+        child.sendline('gnrc_tcp_listen [::]:{}'.format(port))
+        child.expect(r'gnrc_tcp_listen: argc=2, '
+                     r'argv\[0\] = gnrc_tcp_listen, '
                      r'argv\[1\] = \[::\]:(\d+)\r\n')
         assert int(child.match.group(1)) == port
+
+        child.sendline('gnrc_tcp_accept 15000')
 
         try:
             print("- {} ".format(func.__name__), end="")
@@ -53,6 +55,7 @@ def testfunc(func):
                     raise e
         finally:
             child.sendline('gnrc_tcp_close')
+            child.sendline('gnrc_tcp_stop_listen')
 
     return runner
 
@@ -65,7 +68,7 @@ def test_short_payload(child, src_if, src_ll, dst_if, dst_l2, dst_ll, dst_port):
         addr_info = socket.getaddrinfo(dst_ll + '%' + src_if, dst_port,
                                        type=socket.SOCK_STREAM)
         sock.connect(addr_info[0][-1])
-        child.expect_exact('gnrc_tcp_open_passive: returns 0')
+        child.expect_exact('gnrc_tcp_accept: returns 0')
         child.sendline('gnrc_tcp_recv 1000000 1')
         child.expect_exact('gnrc_tcp_recv: argc=3, '
                            'argv[0] = gnrc_tcp_recv, '
@@ -90,7 +93,7 @@ def test_short_header(child, src_if, src_ll, dst_if, dst_l2, dst_ll, dst_port):
         addr_info = socket.getaddrinfo(dst_ll + '%' + src_if, dst_port,
                                        type=socket.SOCK_STREAM)
         sock.connect(addr_info[0][-1])
-        child.expect_exact('gnrc_tcp_open_passive: returns 0')
+        child.expect_exact('gnrc_tcp_accept: returns 0')
     verify_pktbuf_empty(child)
 
 
@@ -122,7 +125,7 @@ def test_send_ack_instead_of_syn(child, src_if, src_ll,
         addr_info = socket.getaddrinfo(dst_ll + '%' + src_if, dst_port,
                                        type=socket.SOCK_STREAM)
         sock.connect(addr_info[0][-1])
-        child.expect_exact('gnrc_tcp_open_passive: returns 0')
+        child.expect_exact('gnrc_tcp_accept: returns 0')
     verify_pktbuf_empty(child)
 
 
@@ -140,7 +143,7 @@ def test_option_parsing_term(child, src_if, src_ll,
         addr_info = socket.getaddrinfo(dst_ll + '%' + src_if, dst_port,
                                        type=socket.SOCK_STREAM)
         sock.connect(addr_info[0][-1])
-        child.expect_exact('gnrc_tcp_open_passive: returns 0')
+        child.expect_exact('gnrc_tcp_accept: returns 0')
     verify_pktbuf_empty(child)
 
 

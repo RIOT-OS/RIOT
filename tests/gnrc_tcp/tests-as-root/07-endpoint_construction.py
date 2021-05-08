@@ -132,13 +132,18 @@ def main(child):
              if type(getattr(script, t)).__name__ == "function"
              and t.startswith("test_")]
 
+    res = 0
+
     for test in tests:
         try:
             test(child)
             print('- {} SUCCESS'.format(test.__name__))
 
         except Exception:
+            res = -1
             print('- {} FAILED'.format(test.__name__))
+
+    return res
 
 
 if __name__ == '__main__':

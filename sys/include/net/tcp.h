@@ -32,8 +32,8 @@ extern "C" {
  * @brief TCP offset value boundaries.
  * @{
  */
-#define TCP_HDR_OFFSET_MIN (0x05)
-#define TCP_HDR_OFFSET_MAX (0x0F)
+#define TCP_HDR_OFFSET_MIN (0x05) /**< Header offset minimum value */
+#define TCP_HDR_OFFSET_MAX (0x0F) /**< Header offset maximum value */
 /** @} */
 
 /**
@@ -49,7 +49,7 @@ extern "C" {
  * @brief TCP option "length"-field values.
  * @{
  */
-#define TCP_OPTION_LENGTH_MIN (2U)    /**< Minimum amount of bytes needed for an option with a length field */
+#define TCP_OPTION_LENGTH_MIN (2U)    /**< Minimum option field size in bytes */
 #define TCP_OPTION_LENGTH_MSS (0x04)  /**< MSS Option Size always 4 */
 /** @} */
 

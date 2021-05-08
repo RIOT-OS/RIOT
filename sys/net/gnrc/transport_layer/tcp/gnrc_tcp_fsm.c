@@ -111,8 +111,8 @@ static int _clear_retransmit(gnrc_tcp_tcb_t *tcb)
 static int _restart_timewait_timer(gnrc_tcp_tcb_t *tcb)
 {
     TCP_DEBUG_ENTER;
-    _gnrc_tcp_eventloop_unsched(&tcb->event_retransmit);
-    _gnrc_tcp_eventloop_sched(&tcb->event_retransmit, 2 * CONFIG_GNRC_TCP_MSL_MS,
+    _gnrc_tcp_eventloop_unsched(&tcb->event_timeout);
+    _gnrc_tcp_eventloop_sched(&tcb->event_timeout, 2 * CONFIG_GNRC_TCP_MSL_MS,
                               MSG_TYPE_TIMEWAIT, tcb);
     TCP_DEBUG_LEAVE;
     return 0;
@@ -139,17 +139,32 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, _gnrc_tcp_fsm_state_t state)
             /* Clear retransmit queue */
             _clear_retransmit(tcb);
 
-            /* Remove connection from active connections */
-            mutex_lock(&list->lock);
-            LL_DELETE(list->head, tcb);
-            mutex_unlock(&list->lock);
+            /* Close connection if not listenng */
+            if (!(tcb->status & STATUS_LISTENING))
+            {
+                /* Remove connection from active connections */
+                mutex_lock(&list->lock);
+                LL_DELETE(list->head, tcb);
+                mutex_unlock(&list->lock);
 
-            /* Free potentially allocated receive buffer */
-            _gnrc_tcp_rcvbuf_release_buffer(tcb);
+                /* Free potentially allocated receive buffer */
+                _gnrc_tcp_rcvbuf_release_buffer(tcb);
+                TCP_DEBUG_INFO("Connection closed");
+            }
+            /* Re-open connection as listenng */
+            else
+            {
+                TCP_DEBUG_INFO("Connection reopend");
+                state = FSM_STATE_LISTEN;
+                _transition_to(tcb, state);
+            }
             tcb->status |= STATUS_NOTIFY_USER;
             break;
 
         case FSM_STATE_LISTEN:
+            /* Clear Accepted Status */
+            tcb->status &= ~(STATUS_ACCEPTED);
+
             /* Clear address info */
 #ifdef MODULE_GNRC_IPV6
             if (tcb->address_family == AF_INET6) {
@@ -196,8 +211,20 @@ static int _transition_to(gnrc_tcp_tcb_t *tcb, _gnrc_tcp_fsm_state_t state)
             break;
 
         case FSM_STATE_SYN_RCVD:
+            /* Setup timeout for listening TCBs */
+            if (tcb->status & STATUS_LISTENING) {
+                _gnrc_tcp_eventloop_sched(&tcb->event_timeout,
+                                          CONFIG_GNRC_TCP_CONNECTION_TIMEOUT_DURATION_MS,
+                                          MSG_TYPE_CONNECTION_TIMEOUT, tcb);
+            }
+            break;
+
         case FSM_STATE_ESTABLISHED:
         case FSM_STATE_CLOSE_WAIT:
+            /* Stop timeout for listening TCBs */
+            if (tcb->status & STATUS_LISTENING) {
+                _gnrc_tcp_eventloop_unsched(&tcb->event_timeout);
+            }
             tcb->status |= STATUS_NOTIFY_USER;
             break;
 
@@ -236,7 +263,7 @@ static int _fsm_call_open(gnrc_tcp_tcb_t *tcb)
 
     tcb->rcv_wnd = CONFIG_GNRC_TCP_DEFAULT_WINDOW;
 
-    if (tcb->status & STATUS_PASSIVE) {
+    if (tcb->status & STATUS_LISTENING) {
         /* Passive open, T: CLOSED -> LISTEN */
         _transition_to(tcb, FSM_STATE_LISTEN);
     }
@@ -629,7 +656,7 @@ static int _fsm_rcvd_pkt(gnrc_tcp_tcb_t *tcb, gnrc_pktsnip_t *in_pkt)
         /* 2) Check RST: If RST is set ... */
         if (ctl & MSK_RST) {
             /* .. and state is SYN_RCVD and the connection is passive: SYN_RCVD -> LISTEN */
-            if (tcb->state == FSM_STATE_SYN_RCVD && (tcb->status & STATUS_PASSIVE)) {
+            if (tcb->state == FSM_STATE_SYN_RCVD && (tcb->status & STATUS_LISTENING)) {
                 _transition_to(tcb, FSM_STATE_LISTEN);
             }
             else {

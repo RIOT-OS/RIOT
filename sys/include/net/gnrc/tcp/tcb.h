@@ -68,6 +68,7 @@ typedef struct _transmission_control_block {
     int32_t rto;           /**< Retransmission timeout duration */
     uint8_t retries;       /**< Number of retransmissions */
     evtimer_msg_event_t event_retransmit; /**< Retransmission event */
+    evtimer_msg_event_t event_timeout;    /**< Timeout event */
     evtimer_mbox_event_t event_misc;      /**< General purpose event */
     gnrc_pktsnip_t *pkt_retransmit;       /**< Pointer to packet in "retransmit queue" */
     mbox_t *mbox;            /**< TCB mbox for synchronization */
@@ -77,6 +78,20 @@ typedef struct _transmission_control_block {
     mutex_t function_lock;   /**< Mutex for function call synchronization */
     struct _transmission_control_block *next;   /**< Pointer next TCB */
 } gnrc_tcp_tcb_t;
+
+/**
+ * @brief Transmission control block queue.
+ */
+typedef struct _transmission_control_block_queue {
+    mutex_t lock;         /**< Mutex for access synchronization */
+    gnrc_tcp_tcb_t *tcbs; /**< Pointer to TCB sequence */
+    size_t tcbs_len;      /**< Number of TCBs behind member tcbs */
+} gnrc_tcp_tcb_queue_t;
+
+/**
+ * @brief Static initializer for type gnrc_tcp_tcb_queue_t
+ */
+#define GNRC_TCP_TCB_QUEUE_INIT   { MUTEX_INIT, NULL, 0 }
 
 #ifdef __cplusplus
 }
