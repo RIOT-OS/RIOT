@@ -115,8 +115,8 @@
 /sys/event/                                 @kaspar030
 /sys/evtimer/                               @kaspar030
 /sys/fmt/                                   @kaspar030
-/sys/net/application_layer/gcoap/           @haukepetersen @kb2ma
-/sys/net/application_layer/nanocoap/        @kaspar030 @haukepetersen @kb2ma
+/sys/net/application_layer/gcoap/           @haukepetersen @kb2ma @chrysn
+/sys/net/application_layer/nanocoap/        @kaspar030 @haukepetersen @kb2ma @chrysn
 /sys/include/net/sock*                      @maribu
 /sys/net/netif/                             @miri64 @jia200x
 /sys/net/gnrc/network_layer/                @miri64
