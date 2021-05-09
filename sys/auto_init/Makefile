@@ -26,6 +26,10 @@ ifneq (,$(filter auto_init_security,$(USEMODULE)))
   DIRS += security
 endif
 
+ifneq (,$(filter auto_init_storage,$(USEMODULE)))
+  DIRS += storage
+endif
+
 ifneq (,$(filter auto_init_screen,$(USEMODULE)))
   DIRS += screen
 endif

@@ -84,6 +84,10 @@ ifneq (,$(filter base64url,$(USEMODULE)))
   USEMODULE += base64
 endif
 
+ifneq (,$(filter auto_init_storage_%,$(USEMODULE)))
+  USEMODULE += auto_init_storage
+endif
+
 ifneq (,$(filter auto_init_saul,$(USEMODULE)))
   USEMODULE += saul_init_devs
 endif

@@ -129,6 +129,11 @@ void auto_init(void)
         extern void gcoap_init(void);
         gcoap_init();
     }
+    if (IS_USED(MODULE_AUTO_INIT_STORAGE)) {
+        LOG_DEBUG("Auto init storage.\n");
+        extern void auto_init_storage(void);
+        auto_init_storage();
+    }
     if (IS_USED(MODULE_DEVFS)) {
         LOG_DEBUG("Mounting /dev.\n");
         extern void auto_init_devfs(void);
