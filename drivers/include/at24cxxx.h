@@ -209,6 +209,31 @@ int at24cxxx_enable_write_protect(const at24cxxx_t *dev);
  */
 int at24cxxx_disable_write_protect(const at24cxxx_t *dev);
 
+#if IS_USED(MODULE_AUTO_INIT_STORAGE_AT24CXXX) || defined(DOXYGEN)
+/**
+ * @brief   Signed type to store a unique ID for each auto-initialized
+ *          at24cxxx device
+ */
+typedef int8_t at24cxxx_id_t;
+/**
+ * @brief   Maximum ID of an at24cxxx device
+ */
+#define AT24CXXX_ID_MAX \
+    ((((1LL << (sizeof(at24cxxx_id_t) * 8 - 2)) - 1) << 1) + 1)
+/**
+ * @brief   Get a pointer to all auto-initialized at24cxxx devices
+ *
+ * @return  Pointer to an array of all auto-initilized at24cxxx devices
+ */
+at24cxxx_t *at24cxxx_devs(void);
+/**
+ * @brief   Get the number of auto-initialized at24cxxx devices
+ *
+ * @return  Number of auto-initialized at24cxxx devices
+ */
+at24cxxx_id_t at24cxxx_numof(void);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
