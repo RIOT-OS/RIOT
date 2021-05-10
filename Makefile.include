@@ -46,6 +46,8 @@ RIOTCPU                         ?= $(RIOTBASE)/cpu
 # Deprecated to set RIOTBOARD, use EXTERNAL_BOARD_DIRS
 RIOTBOARD                       ?= $(RIOTBASE)/boards
 EXTERNAL_BOARD_DIRS             ?=
+MODULE_DIRS                     := $(RIOTBASE)/drivers
+MODULE_DIRS                     += $(RIOTBASE)/sys
 RIOTMAKE                        ?= $(RIOTBASE)/makefiles
 RIOTPKG                         ?= $(RIOTBASE)/pkg
 RIOTTOOLS                       ?= $(RIOTBASE)/dist/tools
@@ -149,6 +151,7 @@ EXTERNAL_BOARD_DIRS             := $(foreach dir,\
 EXTERNAL_MODULE_DIRS            := $(foreach dir,\
                                              $(EXTERNAL_MODULE_DIRS),\
                                              $(abspath $(dir)))
+MODULE_DIRS                     := $(foreach dir,$(MODULE_DIRS),$(abspath $(dir)))
 
 # Ensure that all directories are set and don't contain spaces.
 ifneq (, $(filter-out 1, $(foreach v,$(__DIRECTORY_VARIABLES),$(words $($(v))))))
@@ -415,6 +418,9 @@ else
 
   # process dependencies
   include $(RIOTMAKE)/dependency_resolution.inc.mk
+
+  # auto-locate modules
+  include $(RIOTMAKE)/locate_modules.inc.mk
 endif
 
 # Include Board and CPU configuration
@@ -619,8 +625,8 @@ endif
 # We assume $(LINK) to be gcc-like. Use `LINKFLAGPREFIX :=` for ld-like linker options.
 LINKFLAGPREFIX ?= -Wl,
 
-# Also build external modules
-DIRS += $(EXTERNAL_MODULE_PATHS)
+# Also build automatically located modules
+DIRS += $(EXTERNAL_MODULE_PATHS) $(MODULE_PATHS)
 
 # Define dependencies required for building (headers, downloading source files,)
 BUILDDEPS += $(RIOTBUILD_CONFIG_HEADER_C)

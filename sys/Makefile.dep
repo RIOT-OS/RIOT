@@ -698,6 +698,7 @@ ifneq (,$(filter xtimer,$(USEMODULE)))
     endif
   else
   # ztimer_xtimer_compat is used, all of *xtimer's API will be mapped on ztimer.*
+  NO_AUTOLOCATE += xtimer
   endif
 endif
 
