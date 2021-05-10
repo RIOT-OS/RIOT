@@ -1,0 +1,11 @@
+config APPLICATION
+    bool
+    default y
+    imply MODULE_AUTO_INIT_SCREEN if BOARD_HAS_DISPLAY
+    imply MODULE_DISP_DEV if BOARD_HAS_DISPLAY
+    depends on TEST_KCONFIG
+
+config BOARD_HAS_DISPLAY
+    bool
+    default y
+    depends on BOARD_PINETIME || BOARD_ADAFRUIT_CLUE || BOARD_STM32F429I_DISC1 || BOARD_STM32F429I_DISCO
