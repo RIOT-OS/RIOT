@@ -22,6 +22,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "qrcodegen.h"
 
 #ifdef MODULE_DISP_DEV
@@ -34,6 +35,11 @@
 
 static uint8_t qr0[qrcodegen_BUFFER_LEN_FOR_VERSION(2)];
 static uint8_t buffer[qrcodegen_BUFFER_LEN_FOR_VERSION(2)];
+
+#ifdef MODULE_DISP_DEV
+#define DISPLAY_BUFFER_MAX_SIZE (320)
+static uint16_t display_buffer[DISPLAY_BUFFER_MAX_SIZE] = { 0 };
+#endif
 
 int main(void)
 {
@@ -56,30 +62,32 @@ int main(void)
     }
     disp_dev_backlight_on();
 
-    uint16_t white = UINT16_MAX;
-    uint16_t black = 0;
-    for (uint16_t y = 0; y < disp_dev_height(disp_dev->dev); y++) {
-        for (uint16_t x = 0; x <  disp_dev_width(disp_dev->dev); x++) {
-            disp_dev_map(disp_dev->dev, x, x, y, y, &black);
-        }
-    }
-
+    /* Compute scaling factor and height/width offsets */
     const uint8_t scale = disp_dev_height(disp_dev->dev) / size;
     const uint8_t w_offset = (disp_dev_width(disp_dev->dev) - (size * scale)) / 2;
     const uint8_t h_offset = (disp_dev_height(disp_dev->dev) - (size * scale)) / 2;
+
+    /* Clear the screen */
+    for (uint16_t y = 0; y < disp_dev_height(disp_dev->dev); y ++) {
+        disp_dev_map(disp_dev->dev, 0, disp_dev_width(disp_dev->dev) - 1, y, y, display_buffer);
+    }
+
+    /* Prepare a subset of the display buffer for white tiles */
+    for (int w = 0; w < scale; w++) {
+        for (int h = 0; h < scale; h++) {
+            display_buffer[w + h * scale] = UINT16_MAX;
+        }
+    }
 #endif
 
     for (int y = 0; y < size; y++) {
         for (int x = 0; x < size; x++) {
 #ifdef MODULE_DISP_DEV
-            for (int w = x * scale; w < (x + 1) * scale; w++) {
-                for (int h = y * scale; h < (y + 1) * scale; h++) {
-                    if (qrcodegen_getModule(qr0, x, y)) {
-                        disp_dev_map(disp_dev->dev,
-                                     w + w_offset, w + w_offset, h + h_offset, h + h_offset,
-                                     &white);
-                    }
-                }
+            if (qrcodegen_getModule(qr0, x, y)) {
+                disp_dev_map(disp_dev->dev,
+                             w_offset + (x * scale), w_offset + ((x + 1)* scale) - 1,
+                             h_offset + (y * scale), h_offset + ((y + 1)* scale) - 1,
+                             display_buffer);
             }
 #endif
             printf("%s", qrcodegen_getModule(qr0, x, y) ? "██" : "  ");
