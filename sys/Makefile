@@ -165,7 +165,7 @@ ifneq (,$(filter suit%,$(USEMODULE)))
   DIRS += suit
 endif
 ifneq (,$(filter sys_bus,$(USEMODULE)))
-  DIRS += bus
+  DIRS += sys_bus
 endif
 ifneq (,$(filter tcp,$(USEMODULE)))
   DIRS += net/transport_layer/tcp
