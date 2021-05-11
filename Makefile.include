@@ -406,6 +406,8 @@ ifeq (1,$(TEST_KCONFIG))
   USEMODULE := $(KCONFIG_MODULES)
   KCONFIG_PACKAGES := $(call lowercase,$(patsubst CONFIG_PACKAGE_%,%,$(filter CONFIG_PACKAGE_%,$(.VARIABLES))))
   USEPKG := $(KCONFIG_PACKAGES)
+  # auto-locate modules
+  include $(RIOTMAKE)/locate_modules.inc.mk
 else
   # check if required features are provided and update $(FEATURES_USED)
   include $(RIOTMAKE)/features_check.inc.mk
@@ -419,9 +421,6 @@ else
   # process dependencies
   include $(RIOTMAKE)/dependency_resolution.inc.mk
 endif
-
-# auto-locate modules
-include $(RIOTMAKE)/locate_modules.inc.mk
 
 # Include Board and CPU configuration
 INCLUDES += $(addprefix -I,$(wildcard $(BOARDDIR)/include))

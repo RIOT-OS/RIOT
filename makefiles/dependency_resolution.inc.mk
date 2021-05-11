@@ -2,6 +2,9 @@
 # until no new modules, pkgs, or features are pull in order to catch all
 # transient dependencies
 
+# auto-locate modules
+include $(RIOTMAKE)/locate_modules.inc.mk
+
 # Back up current state to detect changes
 OLD_STATE := $(USEMODULE) $(USEPKG) $(FEATURES_USED)
 
