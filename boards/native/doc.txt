@@ -12,7 +12,9 @@
 # Hardware
 - CPU: Host CPU
 - RAM: Host RAM
-- Flash: Host file system
+- Flash:
+    - for program execution: Host file system
+    - for the @ref drivers_periph_flashpage : emulated in RAM
 - Network: Tap Interface
 - UART: Runtime configurable - `/dev/tty*` are supported
 - Timers: Host timer
