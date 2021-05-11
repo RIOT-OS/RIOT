@@ -301,6 +301,84 @@ extern "C" {
 #ifndef CONFIG_GNRC_SIXLOWPAN_SFR_DG_RETRIES
 #define CONFIG_GNRC_SIXLOWPAN_SFR_DG_RETRIES            0U
 #endif
+
+/**
+ * @brief   The denominator for the factor for when to mark ECN on `netif` input
+ *          queue state
+ *
+ * When `gnrc_sixlowpan_frag_sfr_ecn_if_in` is compiled in, nodes will set
+ * the ECN bit of an RFRAG header when the input queue of the outgoing `netif`
+ * is filled by
+ * @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_DEN
+ */
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_NUM
+#define CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_NUM         1U
+#endif
+
+/**
+ * @brief   The denominator for the factor for when to mark ECN on `netif` input
+ *          queue state
+ *
+ * When `gnrc_sixlowpan_frag_sfr_ecn_if_in` is compiled in, nodes will set the
+ * ECN bit of an RFRAG header when the input queue of the outgoing `netif` is
+ * filled by
+ * @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_DEN
+ */
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_DEN
+#define CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_IN_DEN         2U
+#endif
+
+/**
+ * @brief   The denominator for the factor for when to mark ECN on `netif`
+ *          output queue state
+ *
+ * When `gnrc_sixlowpan_frag_sfr_ecn_if_out` is compiled in, nodes will set
+ * the ECN bit of an RFRAG header when the output queue of the outgoing `netif`
+ * is filled by
+ * @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_DEN
+ */
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_NUM
+#define CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_NUM        1U
+#endif
+
+/**
+ * @brief   The denominator for the factor for when to mark ECN on `netif`
+ *          output queue state
+ *
+ * When `gnrc_sixlowpan_frag_sfr_ecn_if_out` is compiled in, nodes will set the
+ * ECN bit of an RFRAG header when the output queue of the outgoing `netif` is
+ * filled by
+ * @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_DEN
+ */
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_DEN
+#define CONFIG_GNRC_SIXLOWPAN_SFR_ECN_IF_OUT_DEN        2U
+#endif
+
+/**
+ * @brief   The numerator for the factor for when to mark ECN on frame queue
+ *          state
+ *
+ * When `gnrc_sixlowpan_frag_sfr_ecn_fqueue` is compiled in, nodes will set the
+ * ECN bit of an RFRAG header when the input queue of the outgoing `netif` is
+ * filled by
+ * @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
+ */
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM
+#define CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM        1U
+#endif
+
+/**
+ * @brief   The denominator for the factor for when to mark ECN on frame queue
+ *          state
+ *
+ * When `gnrc_sixlowpan_frag_sfr_ecn_fqueue` is compiled in, nodes will set the
+ * ECN bit of an RFRAG header when the input queue of the outgoing `netif` is
+ * filled by
+ * @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_NUM / @ref CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
+ */
+#ifndef CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN
+#define CONFIG_GNRC_SIXLOWPAN_SFR_ECN_FQUEUE_DEN        2U
+#endif
 /** @} */
 
 /**

@@ -433,20 +433,43 @@ static int _msg_receive(msg_t *m, int block)
     DEBUG("This should have never been reached!\n");
 }
 
-int msg_avail(void)
+static int _msg_avail(thread_t *thread)
 {
     DEBUG("msg_available: %" PRIkernel_pid ": msg_available.\n",
-          thread_getpid());
-
-    thread_t *me = thread_get_active();
+          thread->pid);
 
     int queue_index = -1;
 
-    if (thread_has_msg_queue(me)) {
-        queue_index = cib_avail(&(me->msg_queue));
+    if (thread_has_msg_queue(thread)) {
+        queue_index = cib_avail(&(thread->msg_queue));
     }
 
     return queue_index;
+}
+
+int msg_avail_thread(kernel_pid_t pid)
+{
+    return _msg_avail(thread_get(pid));
+}
+
+int msg_avail(void)
+{
+    return _msg_avail(thread_get_active());
+}
+
+int msg_queue_capacity(kernel_pid_t pid)
+{
+    DEBUG("msg_queue_capacity: %" PRIkernel_pid ": msg_queue_capacity.\n",
+          pid);
+
+    thread_t *thread = thread_get(pid);
+    int queue_cap = -1;
+
+    if (thread_has_msg_queue(thread)) {
+        queue_cap = cib_size(&(thread->msg_queue));
+    }
+
+    return queue_cap;
 }
 
 void msg_init_queue(msg_t *array, int num)
