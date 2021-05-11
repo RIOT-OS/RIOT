@@ -52,6 +52,7 @@ tests/pkg_nanocbor
 tests/pkg_nanopb
 tests/pkg_qDSA
 tests/pkg_qcbor
+tests/pkg_qr-code-generator
 tests/pkg_relic
 tests/pkg_tiny-asn1
 tests/pkg_tinycbor
