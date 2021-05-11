@@ -23,6 +23,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "test_utils/expect.h"
+
 #include "qrcodegen.h"
 
 #ifdef MODULE_DISP_DEV
@@ -33,8 +35,11 @@
 #define MESSAGE_TO_ENCODE   "unknown"
 #endif
 
-static uint8_t qr0[qrcodegen_BUFFER_LEN_FOR_VERSION(2)];
-static uint8_t buffer[qrcodegen_BUFFER_LEN_FOR_VERSION(2)];
+/* Compute buffer sizes based on the message to encode len to avoid a
+ * failed assertion in qrcodegen */
+#define ENCODER_VERSION     (sizeof(MESSAGE_TO_ENCODE) >> 3)
+static uint8_t qr0[qrcodegen_BUFFER_LEN_FOR_VERSION(ENCODER_VERSION)];
+static uint8_t buffer[qrcodegen_BUFFER_LEN_FOR_VERSION(ENCODER_VERSION)];
 
 #ifdef MODULE_DISP_DEV
 #define DISPLAY_BUFFER_MAX_SIZE (320)
@@ -43,6 +48,8 @@ static uint16_t display_buffer[DISPLAY_BUFFER_MAX_SIZE] = { 0 };
 
 int main(void)
 {
+    expect(ENCODER_VERSION <= qrcodegen_VERSION_MAX);
+
     if (!qrcodegen_encodeText(MESSAGE_TO_ENCODE,
                               buffer, qr0, qrcodegen_Ecc_MEDIUM,
                               qrcodegen_VERSION_MIN, qrcodegen_VERSION_MAX,
