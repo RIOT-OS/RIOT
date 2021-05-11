@@ -418,10 +418,10 @@ else
 
   # process dependencies
   include $(RIOTMAKE)/dependency_resolution.inc.mk
-
-  # auto-locate modules
-  include $(RIOTMAKE)/locate_modules.inc.mk
 endif
+
+# auto-locate modules
+include $(RIOTMAKE)/locate_modules.inc.mk
 
 # Include Board and CPU configuration
 INCLUDES += $(addprefix -I,$(wildcard $(BOARDDIR)/include))
