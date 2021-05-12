@@ -33,3 +33,7 @@ endif
 USEMODULE += xtimer
 USEMODULE += ieee802154
 USEMODULE += netdev_ieee802154
+
+ifneq (,$(filter gnrc_netif_timestamp,$(USEMODULE)))
+  USEMODULE += at86rf215_timestamp
+endif

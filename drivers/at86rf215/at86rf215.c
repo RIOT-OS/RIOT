@@ -150,6 +150,10 @@ if (!IS_ACTIVE(CONFIG_AT86RF215_USE_CLOCK_OUTPUT)){
         reg |= AMCS_AACK_MASK;
     }
 
+    if (IS_USED(MODULE_AT86RF215_TIMESTAMP)) {
+        at86rf215_reg_write(dev, dev->BBC->RG_CNTC,
+                                 CNTC_EN_MASK | CNTC_CAPRXS_MASK);
+    }
     at86rf215_reg_write(dev, dev->BBC->RG_AMCS, reg);
 
     if (CONFIG_AT86RF215_DEFAULT_PHY_MODE == IEEE802154_PHY_OQPSK) {
