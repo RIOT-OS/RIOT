@@ -24,6 +24,8 @@
 #include <string.h>
 #include <inttypes.h>
 
+#include "test_utils/expect.h"
+
 #ifndef CHUNK_SIZE
 #ifdef BOARD_NATIVE
 #define CHUNK_SIZE          (1024 * 1024U)
@@ -110,6 +112,17 @@ static void free_memory(struct node *head)
 int main(void)
 {
     uint32_t allocations = 0;
+
+    /* modern compilers warn about nonsense calls to calloc, but this is exactly what we want to
+     * test */
+#pragma GCC diagnostic push
+#if !defined(__clang__) && (__GNUC__ > 6)
+#pragma GCC diagnostic ignored "-Walloc-size-larger-than="
+#endif
+    /* test if an overflow is correctly detected by calloc(): the size below overflows by 1 byte */
+    /* cppcheck-suppress leakReturnValNotUsed (should return NULL, so nothing to free anyway) */
+    expect(NULL == calloc(SIZE_MAX / 16 + 1, 16));
+#pragma GCC diagnostic pop
 
     printf("CHUNK_SIZE: %"PRIu32"\n", (uint32_t)CHUNK_SIZE);
     printf("NUMBER_OF_TESTS: %d\n", NUMBER_OF_TESTS);

@@ -289,6 +289,25 @@ void* IRAM_ATTR __wrap__calloc_r(struct _reent *r, size_t count, size_t size)
 
 #else /* MODULE_ESP_IDF_HEAP */
 
+void *__wrap_calloc(size_t nmemb, size_t size)
+{
+    /* The xtensa support has not yet upstreamed to newlib. Hence, the fixed
+     * calloc implementation of newlib >= 4.0.0 is not available to the ESP
+     * platform. We fix this by implementing calloc on top of malloc ourselves */
+    size_t total_size;
+    if (__builtin_mul_overflow(nmemb, size, &total_size)) {
+        return NULL;
+    }
+
+    void *res = malloc(total_size);
+
+    if (res) {
+        memset(res, 0, total_size);
+    }
+
+    return res;
+}
+
 /* for compatibility with ESP-IDF heap functions */
 
 void* _heap_caps_malloc(size_t size, uint32_t caps, const char *file, size_t line)
