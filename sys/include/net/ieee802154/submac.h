@@ -495,6 +495,84 @@ static inline bool ieee802154_submac_state_is_idle(ieee802154_submac_t *submac)
 }
 
 /**
+ * @brief   Get the symbol duration for the current PHY configuration.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return symbol duration in microseconds.
+ */
+static inline uint16_t ieee802154_get_symbol_duration(const ieee802154_submac_t *submac)
+{
+    /* Rule applies to (62.5 ksymbol/s):
+     * - page 0, channels 11-26 on 2.4 GHz O-QPSK PHY,
+     * - page 2, channels 1-10 on 915 MHz O-QPSK PHY */
+    if ((submac->channel_page == 0 && submac->channel_num >= 11 && submac->channel_num <= 26) ||
+        (submac->channel_page == 2 && submac->channel_num >= 1 && submac->channel_num <= 10)) {
+        return 16; /* 62.5 ksymbol/s */
+    }
+    /* - page 0, channel 0,  on 868 MHz BPSK PHY */
+    else if (submac->channel_page == 0 && submac->channel_num == 0) {
+        return 50; /* 20 ksymbol/s */
+    }
+    else if (submac->channel_page == 0 && submac->channel_num >= 1 && submac->channel_num <= 10) {
+        return 25; /* 40 ksymbol/s */
+    }
+    /* Rules applies to (25 ksymbol/s):
+     * - page 2, channel 0 on 868 MHz O-QPSK PHY */
+    else if (submac->channel_page == 2 && submac->channel_num == 0) {
+        return 40; /* 25 ksymbol/s */
+    }
+
+    /* same as 62.5 ksymbol/s in case this list isn't updated */
+    return 16;
+}
+
+/**
+ * @brief   Get the _aTurnaroundTime_ PHY constant value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return constant value in microseconds.
+ */
+static inline uint32_t ieee802154_get_turnaround_time(const ieee802154_submac_t *submac)
+{
+    /* SUN, TVWS, Generic SUN FSK, LECIM. XXX: Add RS-GFSK PHY to this condition.
+     * And another block for MSK PHY */
+    if (submac->channel_page == 9 || submac->channel_page == 10 ||
+        submac->channel_page == 12) {
+        return IEEE802154G_ATURNAROUNDTIME_US;
+    }
+
+    return IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS * ieee802154_get_symbol_duration(submac);
+}
+
+/**
+ * @brief   Get the _aCcaTime_ PHY constant value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return constant value in microseconds.
+ */
+static inline uint32_t ieee802154_get_cca_time(const ieee802154_submac_t *submac)
+{
+    /* XXX: SUN O-QPSK aCcaTime */
+    return IEEE802154_CCA_DURATION_IN_SYMBOLS * ieee802154_get_symbol_duration(submac);
+}
+
+/**
+ * @brief   Get the _aUnitBackoffPeriod_ MAC constant value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return constant value in microseconds.
+ */
+static inline uint32_t ieee802154_get_unit_backoff_period(const ieee802154_submac_t *submac)
+{
+    /* XXX: for SUN PHY 920 MHz bands use phyCcaDuration */
+    return submac->unit_backoff_period;
+}
+
+/**
  * @brief Init the IEEE 802.15.4 SubMAC
  *
  * The SubMAC state machine starts in RX state.
