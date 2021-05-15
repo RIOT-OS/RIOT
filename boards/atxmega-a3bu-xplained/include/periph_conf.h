@@ -129,6 +129,24 @@ static const i2c_conf_t i2c_config[] = {
 #define I2C_NUMOF           ARRAY_SIZE(i2c_config)
 /** @} */
 
+/**
+ * @name    SPI configuration
+ * @{
+ */
+static const spi_conf_t spi_config[] = {
+    {
+        .dev            = &SPIC,
+        .pwr            = PWR_RED_REG(PWR_PORT_C, PR_SPI_bm),
+        .sck_pin        = GPIO_PIN(PORT_C, 7),
+        .miso_pin       = GPIO_PIN(PORT_C, 6),
+        .mosi_pin       = GPIO_PIN(PORT_C, 5),
+        .ss_pin         = GPIO_PIN(PORT_C, 4),
+    },
+};
+
+#define SPI_NUMOF         ARRAY_SIZE(spi_config)
+/** @} */
+
 #ifdef __cplusplus
 }
 #endif

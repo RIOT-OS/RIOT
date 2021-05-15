@@ -88,7 +88,6 @@ extern "C" {
  *
  * @{
  */
-
 #define XTIMER_DEV          TIMER_DEV(0)
 #define XTIMER_CHAN         (0)
 #define XTIMER_WIDTH        (16)
