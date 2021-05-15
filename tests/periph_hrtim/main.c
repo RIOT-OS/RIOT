@@ -13,7 +13,7 @@
  * @file
  * @brief       Test for low-level HRTIM drivers
  *
- * @author      Hugues Larrive <hugues.larrive@laas.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */

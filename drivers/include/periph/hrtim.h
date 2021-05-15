@@ -15,7 +15,7 @@
  * @file
  * @brief       Low-level HRTIM peripheral driver interface definitions
  *
- * @author      Hugues Larrive <hugues.larrive@laas.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  */
 
 #ifndef PERIPH_HRTIM_H

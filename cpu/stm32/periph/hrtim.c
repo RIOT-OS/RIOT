@@ -14,7 +14,7 @@
  * @file
  * @brief       Low-level HRTIM driver implementation
  *
- * @author      Hugues Larrive <hugues.larrive@laas.fr>
+ * @author      Hugues Larrive <hugues.larrive@pm.me>
  *
  * @}
  */
