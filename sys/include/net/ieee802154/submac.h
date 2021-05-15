@@ -121,6 +121,7 @@ struct ieee802154_submac {
     int8_t tx_pow;                      /**< Transmission power (in dBm) */
     ieee802154_submac_state_t state;    /**< State of the SubMAC */
     ieee802154_phy_mode_t phy_mode;     /**< IEEE 802.15.4 PHY mode */
+    uint16_t symbol_duration;           /**< Symbol duration in micro-seconds */
 };
 
 /**
@@ -340,6 +341,64 @@ static inline int ieee802154_read_frame(ieee802154_submac_t *submac, void *buf,
                                         size_t len, ieee802154_rx_info_t *info)
 {
     return ieee802154_radio_read(submac->dev, buf, len, info);
+}
+
+/**
+ * @brief   Get the symbol duration for the current PHY configuration.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return symbol duration in microseconds.
+ */
+static inline uint16_t ieee802154_get_symbol_duration(const ieee802154_submac_t *submac)
+{
+    return submac->symbol_duration;
+}
+
+/**
+ * @brief   Get the _aTurnaroundTime_ PHY constant value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return constant value in microseconds.
+ */
+static inline uint32_t ieee802154_get_turnaround_time(const ieee802154_submac_t *submac)
+{
+    /* SUN, TVWS, Generic SUN FSK, LECIM. XXX: Add RS-GFSK PHY to this condition.
+     * And another block for MSK PHY */
+    if (submac->channel_page == 9 || submac->channel_page == 10 ||
+        submac->channel_page == 12) {
+        return IEEE802154G_ATURNAROUNDTIME_US;
+    }
+
+    return IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS * submac->symbol_duration;
+}
+
+/**
+ * @brief   Get the _aCcaTime_ PHY constant value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return constant value in microseconds.
+ */
+static inline uint32_t ieee802154_get_cca_time(const ieee802154_submac_t *submac)
+{
+    /* XXX: SUN O-QPSK aCcaTime */
+    return IEEE802154_CCA_DURATION_IN_SYMBOLS * submac->symbol_duration;
+}
+
+/**
+ * @brief   Get the _aUnitBackoffPeriod_ MAC constant value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return constant value in microseconds.
+ */
+static inline uint32_t ieee802154_get_unit_backoff_period(const ieee802154_submac_t *submac)
+{
+    /* XXX: for SUN PHY 920 MHz bands use phyCcaDuration */
+    return ieee802154_get_turnaround_time(submac)
+         + ieee802154_get_cca_time(submac);
 }
 
 /**

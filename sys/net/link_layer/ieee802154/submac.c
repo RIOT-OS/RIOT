@@ -29,6 +29,33 @@
 
 static void _handle_tx_no_ack(ieee802154_submac_t *submac);
 
+static inline bool _is_on_channel_range(ieee802154_submac_t *submac,
+                                        uint8_t page, uint16_t start,
+                                        uint16_t end)
+{
+    return submac->channel_page == page && submac->channel_num >= start &&
+           submac->channel_num <= end;
+}
+
+static uint32_t _symbol_duration(ieee802154_submac_t *submac)
+{
+    /* Rule applies to (62.5 ksymbol/s):
+     * - page 0, channels 11-26 on 2.4 GHz O-QPSK PHY,
+     * - page 2, channels 1-10 on 915 MHz O-QPSK PHY */
+    if (_is_on_channel_range(submac, 0, 11, 26) ||
+        _is_on_channel_range(submac, 2, 1, 10)) {
+        return 16; /* 62.5 ksymbol/s */
+    }
+    /* Rules applies to (25 ksymbol/s):
+     * - page 2, channel 0 on 868 MHz O-QPSK PHY */
+    else if (_is_on_channel_range(submac, 2, 0, 0)) {
+        return 40; /* 25 ksymbol/s */
+    }
+
+    /* same as 62.5 ksymbol/s in case this list isn't updated */
+    return 16;
+}
+
 static void _tx_end(ieee802154_submac_t *submac, int status,
                     ieee802154_tx_info_t *info)
 {
@@ -56,7 +83,7 @@ static int _perform_csma_ca(ieee802154_submac_t *submac)
         ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_TX_ON);
         /* delay for an adequate random backoff period */
         uint32_t bp = (random_uint32() & submac->backoff_mask) *
-                      CSMA_SENDER_BACKOFF_PERIOD_UNIT_MS;
+                      ieee802154_get_unit_backoff_period(submac);
 
         xtimer_usleep(bp);
 
@@ -360,6 +387,9 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
         submac->phy_mode = ieee802154_cap_to_phy_mode(1 << bit);
     }
 
+    /* Update symbol duration using current PHY configuration */
+    submac->symbol_duration = _symbol_duration(submac);
+
     /* If the radio is still not in TRX_OFF state, spin */
     while (ieee802154_radio_confirm_on(dev) == -EAGAIN) {}
 
@@ -411,6 +441,7 @@ int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
         submac->channel_num = channel_num;
         submac->channel_page = channel_page;
         submac->tx_pow = tx_pow;
+        submac->symbol_duration = _symbol_duration(submac);
     }
     while (ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {}
 
