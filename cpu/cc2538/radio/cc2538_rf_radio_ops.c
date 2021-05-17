@@ -287,8 +287,6 @@ static int _confirm_set_trx_state(ieee802154_dev_t *dev)
     if (RFCORE->XREG_FSMSTAT0bits.FSM_FFCTRL_STATE == FSM_STATE_RX_CALIBRATION) {
         return -EAGAIN;
     }
-    confirm_counter++;
-    assert(request_counter == confirm_counter);
     return 0;
 }
 
@@ -319,8 +317,6 @@ static int _request_set_trx_state(ieee802154_dev_t *dev, ieee802154_trx_state_t 
             break;
     }
 
-    assert(request_counter == confirm_counter);
-    request_counter++;
     return 0;
 }
 
