@@ -52,8 +52,7 @@ uint16_t confirm_counter = 0;
 uint16_t request_counter = 0;
 
 static inline void _set_trx_state(int state, bool verbose);
-static int _spam(uint8_t *dst, size_t dst_len, size_t num, size_t time);
-
+static int send(uint8_t *dst, size_t dst_len, size_t num, size_t time);
 
 static uint16_t received_acks;
 static uint16_t send_packets;
@@ -97,7 +96,7 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
                 out[j] = buffer[i];
                 j++;
             }
-            _spam(out, IEEE802154_LONG_ADDRESS_LEN, 1, 0);
+            send(out, IEEE802154_LONG_ADDRESS_LEN, 1, 0);
         }
     }
     if (ENABLE_DEBUG) {
