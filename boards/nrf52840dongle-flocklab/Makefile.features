@@ -1,0 +1,17 @@
+CPU_MODEL = nrf52840xxaa
+
+# Put defined MCU peripherals here (in alphabetical order)
+FEATURES_PROVIDED += periph_pwm
+FEATURES_PROVIDED += periph_uart
+FEATURES_PROVIDED += periph_usbdev
+FEATURES_PROVIDED += vdd_lc_filter_reg0
+FEATURES_PROVIDED += vdd_lc_filter_reg1
+
+# Various other features (if any)
+FEATURES_PROVIDED += highlevel_stdio
+
+# Need to build with a bootloader in order for the application to run
+# See: https://gitlab.ethz.ch/tec/public/flocklab/wiki/-/wikis/Man/FAQ#why-do-i-not-get-any-serial-output-on-the-platform-nrf5
+FEATURES_REQUIRED += riotboot
+
+include $(RIOTBOARD)/common/nrf52/Makefile.features

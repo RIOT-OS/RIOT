@@ -1,0 +1,30 @@
+/**
+@defgroup    boards_nrf52840dongle-flocklab nRF52840-Dongle
+@ingroup     boards
+@brief       Support for the nRF52840-Dongle
+
+### General information
+
+The nRF52840-Dongle is a bare USB-stick shaped device that houses barely
+anything than the nRF52840 itself, which offers BLE and 802.15.4 and USB
+connectivity.
+
+Unlike similar sticks (like the @ref boards_nrf52840-mdk), it features no
+dedicated programmer hardware but relies on direct USB communication with a
+built-in bootloader.
+
+The board features two LEDs (LD1: green, LD2: RGB), a user (SW1) and a
+reset button as well as 15 configurable external pins.
+
+### Links
+
+- [nRF52840 web page](https://www.nordicsemi.com/?sc_itemid=%7BCDCCA013-FE4C-4655-B20C-1557AB6568C9%7D)
+- [documentation and hardware description](https://infocenter.nordicsemi.com/topic/ug_nrf52840_dongle/UG/nrf52840_Dongle/intro.html?cp=3_0_5)
+- [FlockLab 2 GPIO configurations](https://gitlab.ethz.ch/tec/public/flocklab/wiki/-/wikis/Man/GpioAssignmentTargetAdapter)
+
+### Flash the board
+
+FlockLab manages flashing the board. It performs a full erase before writing the new image.
+This means that the image provided to FlockLab contains a bootloader.
+
+ */
