@@ -24,7 +24,6 @@
 #include "errno.h"
 #include <assert.h>
 
-#define CSMA_SENDER_BACKOFF_PERIOD_UNIT_MS  (320U)
 #define ACK_TIMEOUT_US                      (864U)
 
 static void _handle_tx_no_ack(ieee802154_submac_t *submac);
