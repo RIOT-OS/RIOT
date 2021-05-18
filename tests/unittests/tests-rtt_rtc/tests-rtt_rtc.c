@@ -17,6 +17,8 @@
 #include "embUnit.h"
 #include "periph/rtc.h"
 #include "periph/rtt.h"
+#include "timex.h"
+#include "rtt_rtc.h"
 
 void rtt_add_ticks(uint64_t ticks);
 
@@ -203,6 +205,29 @@ static void test_set_alarm_set_time(void)
     TEST_ASSERT_EQUAL_INT(2, alarm.tm_isdst);
 }
 
+static void test_rtt_rtc_settimeofday(void)
+{
+    uint32_t s = 10, sec;
+    uint32_t us = US_PER_SEC / 8, micro_sec;
+
+    rtt_rtc_settimeofday(s, us);
+    rtt_rtc_gettimeofday(&sec, &micro_sec);
+
+    TEST_ASSERT_EQUAL_INT(s, sec);
+    TEST_ASSERT_EQUAL_INT(us, micro_sec);
+
+    rtt_add_ticks(1LU * RTT_FREQUENCY);
+    s++;
+    rtt_rtc_gettimeofday(&sec, &micro_sec);
+    TEST_ASSERT_EQUAL_INT(s, sec);
+
+    rtt_add_ticks(RTT_FREQUENCY / 4);
+    us += US_PER_SEC / 4;
+    rtt_rtc_gettimeofday(&sec, &micro_sec);
+    TEST_ASSERT_EQUAL_INT(s, sec);
+    TEST_ASSERT_EQUAL_INT(us, micro_sec);
+}
+
 Test *tests_rtt_rtt_tests(void)
 {
     EMB_UNIT_TESTFIXTURES(fixtures) {
@@ -210,6 +235,7 @@ Test *tests_rtt_rtt_tests(void)
         new_TestFixture(test_set_alarm),
         new_TestFixture(test_set_alarm_short),
         new_TestFixture(test_set_alarm_set_time),
+        new_TestFixture(test_rtt_rtc_settimeofday),
     };
 
     EMB_UNIT_TESTCALLER(rtt_rtc_tests, NULL, NULL, fixtures);
