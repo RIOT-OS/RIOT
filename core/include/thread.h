@@ -121,7 +121,6 @@
 
 #include "clist.h"
 #include "cib.h"
-#include "msg.h"
 #include "cpu_conf.h"
 #include "sched.h"
 #include "thread_config.h"
@@ -162,6 +161,11 @@ extern "C" {
  * @brief Prototype for a thread entry function
  */
 typedef void *(*thread_task_func_t)(void *arg);
+
+/**
+ * @brief Forward declaration of msg_t
+ */
+typedef struct msg msg_t;
 
 /**
  * @brief @c thread_t holds thread's context data.
