@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     drivers_periph_rtc
+ * @ingroup     drivers_rtt_rtc
  * @{
  *
  * @file
@@ -29,6 +29,7 @@
 #include "periph/rtc.h"
 #include "periph/rtt.h"
 #include "timex.h"
+#include "rtt_rtc.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -203,4 +204,28 @@ void rtc_poweron(void)
 void rtc_poweroff(void)
 {
     rtt_poweroff();
+}
+
+void rtt_rtc_settimeofday(uint32_t s, uint32_t us)
+{
+    /* disable alarm to prevent race condition */
+    rtt_clear_alarm();
+    uint32_t now = ((uint64_t)us * RTT_SECOND) / US_PER_SEC;
+    rtc_now      = s;
+    rtt_set_counter(now);
+    /* calculate next wake-up period */
+    _update_alarm(0);
+}
+
+void rtt_rtc_gettimeofday(uint32_t *s, uint32_t *us)
+{
+    uint32_t now;
+    unsigned state = irq_disable();
+
+    now  = rtt_get_counter();
+    *s   = _rtc_now(now);
+    *us  = ((uint64_t)SUBSECONDS(now - last_alarm) * US_PER_SEC)
+         / RTT_SECOND;
+
+    irq_restore(state);
 }
