@@ -36,4 +36,12 @@ orsource "kconfigs/*/Kconfig"
 orsource "kconfigs/*/Kconfig.lines"
 orsource "kconfigs/*/Kconfig.models"
 
+if TEST_KCONFIG
+
+rsource "periph/Kconfig"
+rsource "stmclk/Kconfig"
+rsource "vectors/Kconfig"
+
+endif # TEST_KCONFIG
+
 source "$(RIOTCPU)/cortexm_common/Kconfig"
