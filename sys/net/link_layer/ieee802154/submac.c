@@ -761,8 +761,9 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
         submac->phy_mode = ieee802154_cap_to_phy_mode(1 << bit);
     }
 
-    /* Calculate aUnitBackoffPeriod value */
+    /* Calculate aUnitBackoffPeriod and macAckWaitDuration values */
     submac->unit_backoff_period = _calculate_unit_backoff_period(submac);
+    submac->ack_wait_duration = _calculate_ack_wait_duration(submac);
 
     /* If the radio is still not in TRX_OFF state, spin */
     while (ieee802154_radio_confirm_on(dev) == -EAGAIN) {}
@@ -931,5 +932,13 @@ static uint32_t _calculate_unit_backoff_period(ieee802154_submac_t *submac)
 
     /* same as 62.5 ksymbol/s in case this list isn't updated */
     return 16;
+}
+
+static uint32_t _calculate_ack_wait_duration(ieee802154_submac_t *submac)
+{
+    return ieee802154_get_unit_backoff_period(submac)
+         + ieee802154_get_turnaround_time(submac)
+         + ieee802154_get_shr_duration(submac)
+         + ieee802154_get_psdu_duration(submac, 6);
 }
 /** @} */
