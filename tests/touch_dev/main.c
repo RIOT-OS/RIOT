@@ -25,13 +25,10 @@
 
 #include "touch_dev.h"
 
+#if IS_USED(MODULE_STMPE811)
 #include "stmpe811.h"
-#include "stmpe811_params.h"
-#include "stmpe811_touch_dev.h"
-
 #include "test_utils/expect.h"
-
-static stmpe811_t stmpe811;
+#endif
 
 static void _touch_event_cb(void *arg)
 {
@@ -41,22 +38,29 @@ static void _touch_event_cb(void *arg)
 
 int main(void)
 {
-    stmpe811_init(&stmpe811, &stmpe811_params[0], _touch_event_cb, NULL);
+    /* Use the first screen */
+    touch_dev_reg_t *touch_dev = touch_dev_reg_find_screen(0);
+    if (!touch_dev) {
+        puts("No screen found!");
+        return -1;
+    }
 
-    touch_dev_t *dev = (touch_dev_t *)&stmpe811;
-    dev->driver = &stmpe811_touch_dev_driver;
+    touch_dev_set_touch_event_callback(touch_dev->dev, _touch_event_cb, NULL);
 
-    uint16_t xmax = touch_dev_width(dev);
-    uint16_t ymax = touch_dev_height(dev);
+#if IS_USED(MODULE_STMPE811)
+    uint16_t xmax = touch_dev_width(touch_dev->dev);
+    uint16_t ymax = touch_dev_height(touch_dev->dev);
 
-    expect(xmax == stmpe811.params.xmax);
-    expect(ymax == stmpe811.params.ymax);
+    stmpe811_t *stmpe811 = (stmpe811_t *)touch_dev->dev;
+    expect(xmax == stmpe811->params.xmax);
+    expect(ymax == stmpe811->params.ymax);
+#endif
 
-    uint8_t last_touches = touch_dev_touches(dev, NULL, 1);
+    uint8_t last_touches = touch_dev_touches(touch_dev->dev, NULL, 1);
 
     while (1) {
         touch_t touches[1];
-        uint8_t current_touches = touch_dev_touches(dev, touches, 1);
+        uint8_t current_touches = touch_dev_touches(touch_dev->dev, touches, 1);
 
         if (current_touches != last_touches) {
             if (current_touches == 0) {
