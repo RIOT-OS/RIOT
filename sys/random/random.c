@@ -26,13 +26,13 @@
 #include "random.h"
 #include "bitarithm.h"
 
-#ifdef MODULE_PUF_SRAM
+#ifdef MODULE_RANDOM_SEED_PUF_SRAM
 #include "puf_sram.h"
 #endif
-#ifdef MODULE_PERIPH_HWRNG
+#ifdef MODULE_RANDOM_SEED_HWRNG
 #include "periph/hwrng.h"
 #endif
-#ifdef MODULE_PERIPH_CPUID
+#ifdef MODULE_RANDOM_SEED_LUID
 #include "luid.h"
 #endif
 
@@ -42,19 +42,21 @@
 void auto_init_random(void)
 {
     uint32_t seed;
-#ifdef MODULE_PUF_SRAM
+#if IS_USED(MODULE_RANDOM_SEED_PUF_SRAM)
     /* TODO: hand state to application? */
     if (puf_sram_state) {
         LOG_WARNING("random: PUF SEED not fresh\n");
     }
     seed = puf_sram_seed;
-#elif defined (MODULE_PERIPH_HWRNG)
+#elif IS_USED(MODULE_RANDOM_SEED_HWRNG)
     hwrng_read(&seed, 4);
-#elif defined (MODULE_PERIPH_CPUID)
+#elif IS_USED(MODULE_RANDOM_SEED_LUID)
     luid_get(&seed, 4);
-#else
+#elif IS_USED(MODULE_RANDOM_SEED_FIXED)
     LOG_WARNING("random: NO SEED AVAILABLE!\n");
     seed = RANDOM_SEED_DEFAULT;
+#else
+    #error "No seed source selected for the random module"
 #endif
     DEBUG("random: using seed value %u\n", (unsigned)seed);
     random_init(seed);
