@@ -361,6 +361,8 @@ int constants(int argc, char **argv)
            ieee802154_get_cca_time(submac));
     printf("Unit backoff period: %"PRIu32" us\n",
            ieee802154_get_unit_backoff_period(submac));
+    printf("ACK wait duration: %"PRIu32" us\n",
+           ieee802154_get_ack_wait_duration(submac));
 
     return 0;
 }
@@ -368,7 +370,7 @@ int constants(int argc, char **argv)
 static const shell_command_t shell_commands[] = {
     { "print_addr", "Print IEEE802.15.4 addresses", print_addr },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
-    { "constants", "Print summary of IEEE 802.15.4 PHY/MAC constants", constants },
+    { "constants", "Print summary of IEEE 802.15.4 PHY/MAC constants and attributes", constants },
     { NULL, NULL, NULL }
 };
 

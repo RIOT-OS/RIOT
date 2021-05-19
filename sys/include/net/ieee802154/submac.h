@@ -356,6 +356,64 @@ static inline uint16_t ieee802154_get_symbol_duration(const ieee802154_submac_t 
 }
 
 /**
+ * @brief   Get the _phySHRDuration_ PHY constant value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return constant value in microseconds.
+ */
+static inline uint32_t ieee802154_get_shr_duration(const ieee802154_submac_t *submac)
+{
+    uint16_t sym_dur = submac->symbol_duration;
+
+    /* - page 0, channel 0 868 MHz BPSK PHY
+     * - page 0, channels 1-10 915 MHz BPSK PHY
+     * 32 symbols for preamble, 2 syms for SFD, between 868 and 915 MHz only
+     * the symbol rate changes */
+    if (submac->channel_page == 0 && submac->channel_num <= 10) {
+        return (32 + 2) * sym_dur;
+    }
+    /* - page 0, channels 11-26, 2.4 GHz O-QPSK PHY
+     * - page 2, channels 0-10, 868-915 MHz O-QPSK PHY
+     * 6 syms for preamble, 2 sym for SFD */
+    else if ((submac->channel_page == 0 && submac->channel_num >= 11 && submac->channel_num <= 26) ||
+             (submac->channel_page == 2 && submac->channel_num <= 10)) {
+        return (8 + 2) * sym_dur;
+    }
+
+    /* XXX: in case this list isn't updated, same as O-QPSK */
+    return (8 + 2) * sym_dur;
+}
+
+/**
+ * @brief   Calculate the PHY PSDU duration value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return PSDU duration in microseconds.
+ */
+static inline uint32_t ieee802154_get_psdu_duration(const ieee802154_submac_t *submac,
+                                                    uint16_t length)
+{
+    /* - page 0, channel 0 868 MHz BPSK PHY
+     * - page 0, channels 1-10 915 MHz BPSK PHY */
+    if (submac->channel_page == 0 && submac->channel_num <= 10) {
+        /* 1 bit = 1 symbol */
+        return (length * 8) * submac->symbol_duration;
+    }
+    /* - page 0, channels 11-26, 2.4 GHz O-QPSK PHY
+     * - page 2, channels 0-10, 868-915 MHz O-QPSK PHY */
+    else if ((submac->channel_page == 0 && submac->channel_num >= 11 && submac->channel_num <= 26) ||
+             (submac->channel_page == 2 && submac->channel_num <= 10)) {
+        /* 4 bit = 1 symbol */
+        return (length * 2) * submac->symbol_duration;
+    }
+
+    /* XXX: same as O-QPSK in case isn't updated */
+    return (length * 2) * submac->symbol_duration;
+}
+
+/**
  * @brief   Get the _aTurnaroundTime_ PHY constant value in microseconds.
  *
  * @param[in] submac pointer to the SubMAC descriptor
@@ -399,6 +457,21 @@ static inline uint32_t ieee802154_get_unit_backoff_period(const ieee802154_subma
     /* XXX: for SUN PHY 920 MHz bands use phyCcaDuration */
     return ieee802154_get_turnaround_time(submac)
          + ieee802154_get_cca_time(submac);
+}
+
+/**
+ * @brief   Get the _macAckWaitDuration_ MAC attribute value in microseconds.
+ *
+ * @param[in] submac pointer to the SubMAC descriptor
+ *
+ * @return attribute value in microseconds.
+ */
+static inline uint32_t ieee802154_get_ack_wait_duration(const ieee802154_submac_t *submac)
+{
+    return ieee802154_get_unit_backoff_period(submac)
+         + ieee802154_get_turnaround_time(submac)
+         + ieee802154_get_shr_duration(submac)
+         + ieee802154_get_psdu_duration(submac, 6);
 }
 
 /**

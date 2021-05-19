@@ -24,8 +24,6 @@
 #include "errno.h"
 #include <assert.h>
 
-#define ACK_TIMEOUT_US                      (864U)
-
 static void _handle_tx_no_ack(ieee802154_submac_t *submac);
 
 static uint32_t _symbol_duration(ieee802154_submac_t *submac)
@@ -244,7 +242,7 @@ static void _handle_tx_success(ieee802154_submac_t *submac,
         ieee802154_radio_set_rx_mode(dev, IEEE802154_RX_WAIT_FOR_ACK);
 
         /* Handle ACK reception */
-        ieee802154_submac_ack_timer_set(submac, ACK_TIMEOUT_US);
+        ieee802154_submac_ack_timer_set(submac, ieee802154_get_ack_wait_duration(submac));
     }
 }
 
