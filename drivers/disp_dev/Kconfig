@@ -8,3 +8,4 @@
 config MODULE_DISP_DEV
     bool "Display device generic API"
     depends on TEST_KCONFIG
+    imply MODULE_AUTO_INIT_SCREEN
