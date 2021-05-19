@@ -30,6 +30,9 @@
 #include "ili9341.h"
 #endif
 
+#define DISPLAY_BUFFER_MAX_SIZE (320)
+static uint16_t display_buffer[DISPLAY_BUFFER_MAX_SIZE] = { 0 };
+
 int main(void)
 {
     /* Use the first screen */
@@ -52,11 +55,8 @@ int main(void)
     expect(max_height == 240);
 #endif
 
-    uint16_t color = 0;
     for (uint16_t y = 0; y < max_height; ++y) {
-        for (uint16_t x = 0; x < max_width; ++x) {
-            disp_dev_map(disp_dev->dev, x, x, y, y, &color);
-        }
+        disp_dev_map(disp_dev->dev, 0, max_width - 1, y, y, display_buffer);
     }
 
     disp_dev_map(disp_dev->dev, 95, 222, 85, 153, (const uint16_t *)picture);
