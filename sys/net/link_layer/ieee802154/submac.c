@@ -28,26 +28,25 @@
 
 static void _handle_tx_no_ack(ieee802154_submac_t *submac);
 
-static inline bool _is_on_channel_range(ieee802154_submac_t *submac,
-                                        uint8_t page, uint16_t start,
-                                        uint16_t end)
-{
-    return submac->channel_page == page && submac->channel_num >= start &&
-           submac->channel_num <= end;
-}
-
 static uint32_t _symbol_duration(ieee802154_submac_t *submac)
 {
     /* Rule applies to (62.5 ksymbol/s):
      * - page 0, channels 11-26 on 2.4 GHz O-QPSK PHY,
      * - page 2, channels 1-10 on 915 MHz O-QPSK PHY */
-    if (_is_on_channel_range(submac, 0, 11, 26) ||
-        _is_on_channel_range(submac, 2, 1, 10)) {
+    if ((submac->channel_page == 0 && submac->channel_num >= 11 && submac->channel_num <= 26) ||
+        (submac->channel_page == 2 && submac->channel_num >= 1 && submac->channel_num <= 10)) {
         return 16; /* 62.5 ksymbol/s */
+    }
+    /* - page 0, channel 0,  on 868 MHz BPSK PHY */
+    else if (submac->channel_page == 0 && submac->channel_num == 0) {
+        return 50; /* 20 ksymbol/s */
+    }
+    else if (submac->channel_page == 0 && submac->channel_num >= 1 && submac->channel_num <= 10) {
+        return 25; /* 40 ksymbol/s */
     }
     /* Rules applies to (25 ksymbol/s):
      * - page 2, channel 0 on 868 MHz O-QPSK PHY */
-    else if (_is_on_channel_range(submac, 2, 0, 0)) {
+    else if (submac->channel_page == 2 && submac->channel_num == 0) {
         return 40; /* 25 ksymbol/s */
     }
 
