@@ -121,10 +121,10 @@ int main(void)
     /* Enable backlight */
     disp_dev_backlight_on();
 
-    lvgl_start();
-
     /* Create the system monitor widget */
     sysmon_create();
+
+    lvgl_run();
 
     return 0;
 }
