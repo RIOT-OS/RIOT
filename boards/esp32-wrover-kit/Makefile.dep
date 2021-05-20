@@ -1,1 +1,5 @@
+ifneq (,$(filter disp_dev,$(USEMODULE)))
+  USEMODULE += ili9341
+endif
+
 include $(RIOTBOARD)/common/esp32/Makefile.dep
