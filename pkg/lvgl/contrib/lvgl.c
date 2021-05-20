@@ -30,10 +30,6 @@
 
 #include "screen_dev.h"
 
-#ifndef LVGL_TASK_THREAD_PRIO
-#define LVGL_TASK_THREAD_PRIO       (THREAD_PRIORITY_MAIN + 1)
-#endif
-
 #ifndef LVGL_COLOR_BUF_SIZE
 #define LVGL_COLOR_BUF_SIZE         (LV_HOR_RES_MAX * 5)
 #endif
@@ -50,7 +46,6 @@
 #define LVGL_THREAD_FLAG            (1 << 7)
 #endif
 
-static char _task_thread_stack[THREAD_STACKSIZE_LARGE];
 static kernel_pid_t _task_thread_pid;
 
 static lv_disp_buf_t disp_buf;
@@ -58,30 +53,6 @@ static lv_color_t buf[LVGL_COLOR_BUF_SIZE];
 
 static screen_dev_t *_screen_dev = NULL;
 
-
-static void *_task_thread(void *arg)
-{
-    (void)arg;
-
-    while (1) {
-        /* Normal operation (no sleep) in < CONFIG_LVGL_INACTIVITY_PERIOD_MS msec
-           inactivity */
-        if (lv_disp_get_inactive_time(NULL) < CONFIG_LVGL_INACTIVITY_PERIOD_MS) {
-            lv_task_handler();
-        }
-        else {
-            /* Block after LVGL_ACTIVITY_PERIOD msec inactivity */
-            thread_flags_wait_one(LVGL_THREAD_FLAG);
-
-            /* trigger an activity so the task handler is called on the next loop */
-            lv_disp_trig_activity(NULL);
-        }
-
-        xtimer_usleep(CONFIG_LVGL_TASK_HANDLER_DELAY_US);
-    }
-
-    return NULL;
-}
 
 static void _disp_map(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_p)
 {
@@ -154,15 +125,30 @@ void lvgl_init(screen_dev_t *screen_dev)
         lv_indev_drv_register(&indev_drv);
     }
 #endif
-
-    lv_task_handler();
 }
 
-void lvgl_start(void)
+void lvgl_run(void)
 {
-    _task_thread_pid = thread_create(_task_thread_stack, sizeof(_task_thread_stack),
-                                     LVGL_TASK_THREAD_PRIO, THREAD_CREATE_STACKTEST,
-                                     _task_thread, NULL, "_task_thread");
+    _task_thread_pid = thread_getpid();
+
+    lv_task_handler();
+
+    while (1) {
+        /* Normal operation (no sleep) in < CONFIG_LVGL_INACTIVITY_PERIOD_MS msec
+           inactivity */
+        if (lv_disp_get_inactive_time(NULL) < CONFIG_LVGL_INACTIVITY_PERIOD_MS) {
+            lv_task_handler();
+        }
+        else {
+            /* Block after LVGL_ACTIVITY_PERIOD msec inactivity */
+            thread_flags_wait_one(LVGL_THREAD_FLAG);
+
+            /* trigger an activity so the task handler is called on the next loop */
+            lv_disp_trig_activity(NULL);
+        }
+
+        xtimer_usleep(CONFIG_LVGL_TASK_HANDLER_DELAY_US);
+    }
 }
 
 void lvgl_wakeup(void)
