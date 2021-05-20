@@ -1,0 +1,3 @@
+INCLUDES += -I$(PKGDIRBASE)/arduino_sdi_12/src
+
+CXXEXFLAGS += -std=c++11
