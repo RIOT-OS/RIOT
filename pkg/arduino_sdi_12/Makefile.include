@@ -1,0 +1,1 @@
+INCLUDES += -I$(PKGDIRBASE)/arduino_sdi_12/src

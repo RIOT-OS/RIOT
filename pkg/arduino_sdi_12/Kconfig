@@ -1,0 +1,4 @@
+config PACKAGE_ARDUINO_SDI_12
+    bool "Arduino SDI-12 package"
+    depends on TEST_KCONFIG
+    depends on PACKAGE_ARDUINO_API

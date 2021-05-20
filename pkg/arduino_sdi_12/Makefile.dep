@@ -1,0 +1,4 @@
+FEATURES_REQUIRED += periph_gpio_irq
+USEMODULE += atmega_pcint
+
+USEPKG += arduino_api
