@@ -44,8 +44,14 @@ ifeq (,$(IOTLAB_NODE))
   $(warning    Example: m3-380.grenoble.iot-lab.info or a8-1.grenoble.iot-lab.info)
   $(warning  * <type>-<number> when run from iot-lab frontend)
   $(warning    Example: m3-380 or a8-1)
-  $(warning  * 'auto' or 'auto-ssh' to try auto-detecting the node from your experiment
+  $(warning  * 'auto' to try auto-detecting the node from your experiment
   $(error)
+endif
+
+ifeq (auto-ssh,$(IOTLAB_NODE))
+  $(info $(COLOR_YELLOW)IOTLAB_NODE=auto-ssh is deprecated and will be removed after \
+         2010.07 is released, use IOTLAB_NODE=auto instead$(COLOR_RESET))
+  override IOTLAB_NODE := auto
 endif
 
 IOTLAB_AUTH ?= $(HOME)/.iotlabrc
@@ -57,7 +63,7 @@ IOTLAB_EXP_ID ?=
 # Specify experiment-id option if provided
 _IOTLAB_EXP_ID := $(if $(IOTLAB_EXP_ID),--id $(IOTLAB_EXP_ID))
 
-# Number of the node to take from the list in 'auto' and 'auto-ssh' mode
+# Number of the node to take from the list in 'auto' mode
 # Default to 1 so the first one
 IOTLAB_NODE_AUTO_NUM ?= 1
 
@@ -109,18 +115,18 @@ endif
 #    * Check correctly deployed nodes with 'deploymentresults == "0"'
 #    * Select nodes by architucture using the board-archi mapping
 #    * Nodes for current server in 'auto'
-ifneq (,$(filter auto auto-ssh,$(IOTLAB_NODE)))
+ifeq (auto,$(IOTLAB_NODE))
   ifeq (,$(IOTLAB_ARCHI))
     $(error Could not find 'archi' for $(BOARD), update mapping in $(lastword $(MAKEFILE_LIST)))
   endif
 
-  ifeq (auto,$(IOTLAB_NODE))
-    _NODES_DEPLOYED := $(filter %.$(shell hostname).iot-lab.info, $(_NODES_DEPLOYED))
+  ifneq (,$(IOT_LAB_FRONTEND_FQDN))
+    _NODES_DEPLOYED := $(filter %.$(IOT_LAB_FRONTEND_FQDN), $(_NODES_DEPLOYED))
   endif
   _NODES_FOR_BOARD = $(shell iotlab-experiment --jmespath="items[?archi=='$(IOTLAB_ARCHI)'].network_address" --format='" ".join' get $(_IOTLAB_EXP_ID) $(_NODES_LIST_OPTION))
 
   _IOTLAB_NODE := $(word $(IOTLAB_NODE_AUTO_NUM),$(filter $(_NODES_DEPLOYED),$(_NODES_FOR_BOARD)))
-  ifeq (auto,$(IOTLAB_NODE))
+  ifneq (,$(IOT_LAB_FRONTEND_FQDN))
     override IOTLAB_NODE := $(firstword $(subst ., ,$(_IOTLAB_NODE)))
   else
     override IOTLAB_NODE := $(_IOTLAB_NODE)
@@ -129,24 +135,14 @@ ifneq (,$(filter auto auto-ssh,$(IOTLAB_NODE)))
   ifeq (,$(IOTLAB_NODE))
     $(error Could not automatically find a node for BOARD=$(BOARD))
   endif
-  override IOTLAB_NODE := $(patsubst node-%,%,$(IOTLAB_NODE))
 endif
 
-
-# If the IOTLAB_NODE format is:
-# * 'type-num.iot.lab.info' assume it is run from your computer
-# * 'type-num' assume it is run from iot-lab frontend
-ifneq (,$(filter %.iot-lab.info, $(IOTLAB_NODE)))
-  _IOTLAB_ON_FRONTEND =
-else
-  _IOTLAB_ON_FRONTEND = 1
-endif
 # Work with node url without 'node-'
 override IOTLAB_NODE := $(patsubst node-%,%,$(IOTLAB_NODE))
 
-
 # Create node list and optionally frontend url
-ifeq (,$(_IOTLAB_ON_FRONTEND))
+ifeq (,$(IOT_LAB_FRONTEND_FQDN))
+  # Running from a local computer
   # m3-380.grenoble.iot-lab.info    -> grenoble,m3,380
   # a8-1.grenoble.iot-lab.info      -> grenoble,a8,1
   _NODELIST_SED := 's/\([^.]*\)-\([^.]*\).\([^.]*\).*/\3,\1,\2/'
@@ -156,6 +152,7 @@ ifeq (,$(_IOTLAB_ON_FRONTEND))
   _IOTLAB_SERVER := $(shell echo '$(IOTLAB_NODE)' | sed 's/[^.]*.//')
   _IOTLAB_AUTHORITY = $(IOTLAB_USER)@$(_IOTLAB_SERVER)
 else
+  # Running from an IoT-LAB frontend
   # m3-380    -> $(hostname),m3,380
   # a8-1      -> $(hostname),a8,1
   _NODELIST_SED := 's/\([^.]*\)-\([^.]*\)/$(shell hostname),\1,\2/'
@@ -164,7 +161,7 @@ endif
 
 
 # Display value of IOTLAB_NODE, useful to get the value calculated when using
-# IOTLAB_NODE=auto or auto-ssh
+# IOTLAB_NODE=auto
 .PHONY: info-iotlab-node
 info-iotlab-node:
 	@echo $(IOTLAB_NODE)
@@ -181,7 +178,7 @@ ifneq (iotlab-a8-m3,$(BOARD))
   FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) $(_NODES_FLASH_OPTION) $(FLASHFILE)
   RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) $(_IOTLAB_NODELIST) --reset
 
-  ifeq (,$(_IOTLAB_ON_FRONTEND))
+  ifeq (,$(IOT_LAB_FRONTEND_FQDN))
     TERMPROG  = ssh
     TERMFLAGS = -t $(_IOTLAB_AUTHORITY) 'socat - tcp:$(IOTLAB_NODE):20000'
   else
@@ -199,7 +196,7 @@ else
   RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) reset-m3 $(_IOTLAB_NODELIST)
 
   TERMPROG  = ssh
-  ifeq (,$(_IOTLAB_ON_FRONTEND))
+  ifeq (,$(IOT_LAB_FRONTEND_FQDN))
     # Proxy ssh through the iot-lab frontend
     TERMFLAGS = -oProxyCommand='ssh $(_IOTLAB_AUTHORITY) -W %h:%p'
   else
