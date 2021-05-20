@@ -111,9 +111,8 @@ void sysmon_create(void)
     info_label = lv_label_create(win, NULL);
     lv_label_set_recolor(info_label, true);
 
-    /* Refresh the chart and label manually at first */
+    /* Create the task used to refresh the chart and label */
     refr_task = lv_task_create(sysmon_task, REFR_TIME, LV_TASK_PRIO_LOW, NULL);
-    sysmon_task(NULL);
 }
 
 int main(void)
