@@ -33,9 +33,15 @@ extern "C" {
 void lvgl_init(screen_dev_t *screen_dev);
 
 /**
- * Start the lvgl task handler background thread
-*/
-void lvgl_start(void);
+ * @brief   Run the lvgl task handler
+ *
+ * In order to run the lvgl internal task handler in an endless loop, this
+ * function must be called manually either from the main thread or from a
+ * custom thread.
+ * In case of CONFIG_LVGL_INACTIVITY_PERIOD_MS ms of inactivity, the loop stops
+ * the thread running the lvgl task handler until @ref lvgl_wakeup is called.
+ */
+void lvgl_run(void);
 
 /**
  * @brief   Wakeup lvgl when inactive

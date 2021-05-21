@@ -57,7 +57,7 @@ int main(void)
     lv_obj_t * label = lv_label_create(btn, NULL);
     lv_label_set_text(label, "Click me");
 
-    lvgl_start();
+    lvgl_run();
 
     return 0;
 }
