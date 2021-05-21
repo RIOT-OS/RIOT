@@ -67,30 +67,32 @@ int lora_setup_cmd(int argc, char **argv)
     /* Check bandwidth value */
     int bw = atoi(argv[1]);
     uint8_t lora_bw;
+
     switch (bw) {
-        case 125:
-            puts("setup: setting 125KHz bandwidth");
-            lora_bw = LORA_BW_125_KHZ;
-            break;
+    case 125:
+        puts("setup: setting 125KHz bandwidth");
+        lora_bw = LORA_BW_125_KHZ;
+        break;
 
-        case 250:
-            puts("setup: setting 250KHz bandwidth");
-            lora_bw = LORA_BW_250_KHZ;
-            break;
+    case 250:
+        puts("setup: setting 250KHz bandwidth");
+        lora_bw = LORA_BW_250_KHZ;
+        break;
 
-        case 500:
-            puts("setup: setting 500KHz bandwidth");
-            lora_bw = LORA_BW_500_KHZ;
-            break;
+    case 500:
+        puts("setup: setting 500KHz bandwidth");
+        lora_bw = LORA_BW_500_KHZ;
+        break;
 
-        default:
-            puts("[Error] setup: invalid bandwidth value given, "
-                 "only 125, 250 or 500 allowed.");
-            return -1;
+    default:
+        puts("[Error] setup: invalid bandwidth value given, "
+             "only 125, 250 or 500 allowed.");
+        return -1;
     }
 
     /* Check spreading factor value */
     uint8_t lora_sf = atoi(argv[2]);
+
     if (lora_sf < 7 || lora_sf > 12) {
         puts("[Error] setup: invalid spreading factor value given");
         return -1;
@@ -98,6 +100,7 @@ int lora_setup_cmd(int argc, char **argv)
 
     /* Check coding rate value */
     int cr = atoi(argv[3]);
+
     if (cr < 5 || cr > 8) {
         puts("[Error ]setup: invalid coding rate value given");
         return -1;
@@ -106,6 +109,7 @@ int lora_setup_cmd(int argc, char **argv)
 
     /* Configure radio device */
     netdev_t *netdev = (netdev_t *)&sx127x;
+
     netdev->driver->set(netdev, NETOPT_BANDWIDTH,
                         &lora_bw, sizeof(lora_bw));
     netdev->driver->set(netdev, NETOPT_SPREADING_FACTOR,
@@ -125,6 +129,7 @@ int random_cmd(int argc, char **argv)
 
     netdev_t *netdev = (netdev_t *)&sx127x;
     uint32_t rand;
+
     netdev->driver->get(netdev, NETOPT_RANDOM, &rand, sizeof(rand));
     printf("random: number from sx127x: %u\n",
            (unsigned int)rand);
@@ -245,6 +250,7 @@ int send_cmd(int argc, char **argv)
     };
 
     netdev_t *netdev = (netdev_t *)&sx127x;
+
     if (netdev->driver->send(netdev, &iolist) == -ENOTSUP) {
         puts("Cannot send: radio is still transmitting");
     }
@@ -260,12 +266,15 @@ int listen_cmd(int argc, char **argv)
     netdev_t *netdev = (netdev_t *)&sx127x;
     /* Switch to continuous listen mode */
     const netopt_enable_t single = false;
+
     netdev->driver->set(netdev, NETOPT_SINGLE_RECEIVE, &single, sizeof(single));
     const uint32_t timeout = 0;
+
     netdev->driver->set(netdev, NETOPT_RX_TIMEOUT, &timeout, sizeof(timeout));
 
     /* Switch to RX state */
     netopt_state_t state = NETOPT_STATE_RX;
+
     netdev->driver->set(netdev, NETOPT_STATE, &state, sizeof(state));
 
     printf("Listen mode set\n");
@@ -282,6 +291,7 @@ int syncword_cmd(int argc, char **argv)
 
     netdev_t *netdev = (netdev_t *)&sx127x;
     uint8_t syncword;
+
     if (strstr(argv[1], "get") != NULL) {
         netdev->driver->get(netdev, NETOPT_SYNCWORD, &syncword,
                             sizeof(syncword));
@@ -315,6 +325,7 @@ int channel_cmd(int argc, char **argv)
 
     netdev_t *netdev = (netdev_t *)&sx127x;
     uint32_t chan;
+
     if (strstr(argv[1], "get") != NULL) {
         netdev->driver->get(netdev, NETOPT_CHANNEL_FREQUENCY, &chan,
                             sizeof(chan));
@@ -349,6 +360,7 @@ int rx_timeout_cmd(int argc, char **argv)
 
     netdev_t *netdev = (netdev_t *)&sx127x;
     uint16_t rx_timeout;
+
     if (strstr(argv[1], "set") != NULL) {
         if (argc < 3) {
             puts("usage: rx_timeout set <rx_timeout>");
@@ -372,15 +384,18 @@ int reset_cmd(int argc, char **argv)
     (void)argc;
     (void)argv;
     netdev_t *netdev = (netdev_t *)&sx127x;
+
     puts("resetting sx127x...");
     netopt_state_t state = NETOPT_STATE_RESET;
+
     netdev->driver->set(netdev, NETOPT_STATE, &state, sizeof(netopt_state_t));
     return 0;
 }
 
-static void _set_opt(netdev_t *netdev, netopt_t opt, bool val, char* str_help)
+static void _set_opt(netdev_t *netdev, netopt_t opt, bool val, char *str_help)
 {
     netopt_enable_t en = val ? NETOPT_ENABLE : NETOPT_DISABLE;
+
     netdev->driver->set(netdev, opt, &en, sizeof(en));
     printf("Successfully ");
     if (val) {
@@ -395,12 +410,14 @@ static void _set_opt(netdev_t *netdev, netopt_t opt, bool val, char* str_help)
 int crc_cmd(int argc, char **argv)
 {
     netdev_t *netdev = (netdev_t *)&sx127x;
+
     if (argc < 3 || strcmp(argv[1], "set") != 0) {
         printf("usage: %s set <1|0>\n", argv[0]);
         return 1;
     }
 
     int tmp = atoi(argv[2]);
+
     _set_opt(netdev, NETOPT_INTEGRITY_CHECK, tmp, "CRC check");
     return 0;
 }
@@ -408,12 +425,14 @@ int crc_cmd(int argc, char **argv)
 int implicit_cmd(int argc, char **argv)
 {
     netdev_t *netdev = (netdev_t *)&sx127x;
+
     if (argc < 3 || strcmp(argv[1], "set") != 0) {
         printf("usage: %s set <1|0>\n", argv[0]);
         return 1;
     }
 
     int tmp = atoi(argv[2]);
+
     _set_opt(netdev, NETOPT_FIXED_HEADER, tmp, "implicit header");
     return 0;
 }
@@ -421,12 +440,14 @@ int implicit_cmd(int argc, char **argv)
 int payload_cmd(int argc, char **argv)
 {
     netdev_t *netdev = (netdev_t *)&sx127x;
+
     if (argc < 3 || strcmp(argv[1], "set") != 0) {
         printf("usage: %s set <payload length>\n", argv[0]);
         return 1;
     }
 
     uint16_t tmp = atoi(argv[2]);
+
     netdev->driver->set(netdev, NETOPT_PDU_SIZE, &tmp, sizeof(tmp));
     printf("Successfully set payload to %i\n", tmp);
     return 0;
@@ -444,7 +465,7 @@ static const shell_command_t shell_commands[] = {
     { "register", "Get/Set value(s) of registers of sx127x", register_cmd },
     { "send",     "Send raw payload string",                 send_cmd },
     { "listen",   "Start raw payload listener",              listen_cmd },
-    { "reset",    "Reset the sx127x device",                 reset_cmd},
+    { "reset",    "Reset the sx127x device",                 reset_cmd },
     { NULL, NULL, NULL }
 };
 
@@ -464,35 +485,35 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         size_t len;
         netdev_lora_rx_info_t packet_info;
         switch (event) {
-            case NETDEV_EVENT_RX_STARTED:
-                puts("Data reception started");
-                break;
+        case NETDEV_EVENT_RX_STARTED:
+            puts("Data reception started");
+            break;
 
-            case NETDEV_EVENT_RX_COMPLETE:
-                len = dev->driver->recv(dev, NULL, 0, 0);
-                dev->driver->recv(dev, message, len, &packet_info);
-                printf(
-                    "{Payload: \"%s\" (%d bytes), RSSI: %i, SNR: %i, TOA: %" PRIu32 "}\n",
-                    message, (int)len,
-                    packet_info.rssi, (int)packet_info.snr,
-                    sx127x_get_time_on_air((const sx127x_t *)dev, len));
-                break;
+        case NETDEV_EVENT_RX_COMPLETE:
+            len = dev->driver->recv(dev, NULL, 0, 0);
+            dev->driver->recv(dev, message, len, &packet_info);
+            printf(
+                "{Payload: \"%s\" (%d bytes), RSSI: %i, SNR: %i, TOA: %" PRIu32 "}\n",
+                message, (int)len,
+                packet_info.rssi, (int)packet_info.snr,
+                sx127x_get_time_on_air((const sx127x_t *)dev, len));
+            break;
 
-            case NETDEV_EVENT_TX_COMPLETE:
-                sx127x_set_sleep(&sx127x);
-                puts("Transmission completed");
-                break;
+        case NETDEV_EVENT_TX_COMPLETE:
+            sx127x_set_sleep(&sx127x);
+            puts("Transmission completed");
+            break;
 
-            case NETDEV_EVENT_CAD_DONE:
-                break;
+        case NETDEV_EVENT_CAD_DONE:
+            break;
 
-            case NETDEV_EVENT_TX_TIMEOUT:
-                sx127x_set_sleep(&sx127x);
-                break;
+        case NETDEV_EVENT_TX_TIMEOUT:
+            sx127x_set_sleep(&sx127x);
+            break;
 
-            default:
-                printf("Unexpected netdev event received: %d\n", event);
-                break;
+        default:
+            printf("Unexpected netdev event received: %d\n", event);
+            break;
         }
     }
 }
@@ -502,6 +523,7 @@ void *_recv_thread(void *arg)
     (void)arg;
 
     static msg_t _msg_q[SX127X_LORA_MSG_QUEUE];
+
     msg_init_queue(_msg_q, SX127X_LORA_MSG_QUEUE);
 
     while (1) {
@@ -521,6 +543,7 @@ int main(void)
 {
     sx127x.params = sx127x_params[0];
     netdev_t *netdev = (netdev_t *)&sx127x;
+
     netdev->driver = &sx127x_driver;
 
     if (netdev->driver->init(netdev) < 0) {
@@ -542,6 +565,7 @@ int main(void)
     /* start the shell */
     puts("Initialization successful - starting the shell now");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
+
     shell_run(shell_commands, line_buf, SHELL_DEFAULT_BUFSIZE);
 
     return 0;

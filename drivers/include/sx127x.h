@@ -86,13 +86,13 @@ extern "C" {
 #define SX127X_RX_BUFFER_SIZE            (256)                  /**< RX buffer size */
 #define SX127X_RADIO_TX_POWER            (14U)                  /**< Radio power in dBm */
 
-#define SX127X_EVENT_HANDLER_STACK_SIZE  (2048U) /**< Stack size event handler */
-#define SX127X_IRQ_DIO0                  (1<<0)  /**< DIO0 IRQ */
-#define SX127X_IRQ_DIO1                  (1<<1)  /**< DIO1 IRQ */
-#define SX127X_IRQ_DIO2                  (1<<2)  /**< DIO2 IRQ */
-#define SX127X_IRQ_DIO3                  (1<<3)  /**< DIO3 IRQ */
-#define SX127X_IRQ_DIO4                  (1<<4)  /**< DIO4 IRQ */
-#define SX127X_IRQ_DIO5                  (1<<5)  /**< DIO5 IRQ */
+#define SX127X_EVENT_HANDLER_STACK_SIZE  (2048U)                /**< Stack size event handler */
+#define SX127X_IRQ_DIO0                  (1 << 0)               /**< DIO0 IRQ */
+#define SX127X_IRQ_DIO1                  (1 << 1)               /**< DIO1 IRQ */
+#define SX127X_IRQ_DIO2                  (1 << 2)               /**< DIO2 IRQ */
+#define SX127X_IRQ_DIO3                  (1 << 3)               /**< DIO3 IRQ */
+#define SX127X_IRQ_DIO4                  (1 << 4)               /**< DIO4 IRQ */
+#define SX127X_IRQ_DIO5                  (1 << 5)               /**< DIO5 IRQ */
 /** @} */
 
 /**
@@ -112,41 +112,41 @@ extern "C" {
  * @brief   SX127X initialization result.
  */
 enum {
-    SX127X_INIT_OK = 0,                /**< Initialization was successful */
-    SX127X_ERR_SPI,                    /**< Failed to initialize SPI bus or CS line */
-    SX127X_ERR_GPIOS,                  /**< Failed to initialize GPIOs */
-    SX127X_ERR_NODEV                   /**< No valid device version found */
+    SX127X_INIT_OK = 0,                 /**< Initialization was successful */
+    SX127X_ERR_SPI,                     /**< Failed to initialize SPI bus or CS line */
+    SX127X_ERR_GPIOS,                   /**< Failed to initialize GPIOs */
+    SX127X_ERR_NODEV                    /**< No valid device version found */
 };
 
 /**
  * @brief   Radio driver supported modems.
  */
 enum {
-    SX127X_MODEM_FSK = 0,              /**< FSK modem driver */
-    SX127X_MODEM_LORA,                 /**< LoRa modem driver */
+    SX127X_MODEM_FSK = 0,               /**< FSK modem driver */
+    SX127X_MODEM_LORA,                  /**< LoRa modem driver */
 };
 
 /**
  * @brief   Radio driver internal state machine states definition.
  */
 enum {
-    SX127X_RF_IDLE = 0,                /**< Idle state */
-    SX127X_RF_RX_RUNNING,              /**< Sending state */
-    SX127X_RF_TX_RUNNING,              /**< Receiving state */
-    SX127X_RF_CAD,                     /**< Channel activity detection state */
+    SX127X_RF_IDLE = 0,                 /**< Idle state */
+    SX127X_RF_RX_RUNNING,               /**< Sending state */
+    SX127X_RF_TX_RUNNING,               /**< Receiving state */
+    SX127X_RF_CAD,                      /**< Channel activity detection state */
 };
 
 /**
  * @brief   Event types.
  */
 enum {
-    SX127X_RX_DONE = 0,                /**< Receiving complete */
-    SX127X_TX_DONE,                    /**< Sending complete*/
-    SX127X_RX_TIMEOUT,                 /**< Receiving timeout */
-    SX127X_TX_TIMEOUT,                 /**< Sending timeout */
-    SX127X_RX_ERROR_CRC,               /**< Receiving CRC error */
-    SX127X_FHSS_CHANGE_CHANNEL,        /**< Channel change */
-    SX127X_CAD_DONE,                   /**< Channel activity detection complete */
+    SX127X_RX_DONE = 0,                 /**< Receiving complete */
+    SX127X_TX_DONE,                     /**< Sending complete*/
+    SX127X_RX_TIMEOUT,                  /**< Receiving timeout */
+    SX127X_TX_TIMEOUT,                  /**< Sending timeout */
+    SX127X_RX_ERROR_CRC,                /**< Receiving CRC error */
+    SX127X_FHSS_CHANGE_CHANNEL,         /**< Channel change */
+    SX127X_CAD_DONE,                    /**< Channel activity detection complete */
 };
 
 /**
@@ -157,8 +157,8 @@ enum {
  * The power amplifier mode depends on the module hardware configuration.
  */
 enum {
-    SX127X_PA_RFO = 0,                 /**< RFO HF or RFO LF */
-    SX127X_PA_BOOST,                   /**< Power amplifier boost (high power) */
+    SX127X_PA_RFO = 0,                  /**< RFO HF or RFO LF */
+    SX127X_PA_BOOST,                    /**< Power amplifier boost (high power) */
 };
 
 /**
@@ -177,25 +177,25 @@ enum {
  * @brief   LoRa configuration structure.
  */
 typedef struct {
-    uint16_t preamble_len;             /**< Length of preamble header */
-    int8_t power;                      /**< Signal power */
-    uint8_t bandwidth;                 /**< Signal bandwidth */
-    uint8_t datarate;                  /**< Spreading factor rate, e.g datarate */
-    uint8_t coderate;                  /**< Error coding rate */
-    uint8_t freq_hop_period;           /**< Frequency hop period */
-    uint8_t flags;                     /**< Boolean flags */
-    uint32_t rx_timeout;               /**< RX timeout in milliseconds */
-    uint32_t tx_timeout;               /**< TX timeout in milliseconds */
+    uint16_t preamble_len;              /**< Length of preamble header */
+    int8_t power;                       /**< Signal power */
+    uint8_t bandwidth;                  /**< Signal bandwidth */
+    uint8_t datarate;                   /**< Spreading factor rate, e.g datarate */
+    uint8_t coderate;                   /**< Error coding rate */
+    uint8_t freq_hop_period;            /**< Frequency hop period */
+    uint8_t flags;                      /**< Boolean flags */
+    uint32_t rx_timeout;                /**< RX timeout in milliseconds */
+    uint32_t tx_timeout;                /**< TX timeout in milliseconds */
 } sx127x_lora_settings_t;
 
 /**
  * @brief   Radio settings.
  */
 typedef struct {
-    uint32_t channel;                  /**< Radio channel */
-    uint8_t state;                     /**< Radio state */
-    uint8_t modem;                     /**< Driver model (FSK or LoRa) */
-    sx127x_lora_settings_t lora;       /**< LoRa settings */
+    uint32_t channel;                   /**< Radio channel */
+    uint8_t state;                      /**< Radio state */
+    uint8_t modem;                      /**< Driver model (FSK or LoRa) */
+    sx127x_lora_settings_t lora;        /**< LoRa settings */
 } sx127x_radio_settings_t;
 
 /**
@@ -203,30 +203,30 @@ typedef struct {
  */
 typedef struct {
     /* Data that will be passed to events handler in application */
-    ztimer_t tx_timeout_timer;         /**< TX operation timeout timer */
-    ztimer_t rx_timeout_timer;         /**< RX operation timeout timer */
-    uint32_t last_channel;             /**< Last channel in frequency hopping sequence */
-    bool is_last_cad_success;          /**< Sign of success of last CAD operation (activity detected) */
+    ztimer_t tx_timeout_timer;          /**< TX operation timeout timer */
+    ztimer_t rx_timeout_timer;          /**< RX operation timeout timer */
+    uint32_t last_channel;              /**< Last channel in frequency hopping sequence */
+    bool is_last_cad_success;           /**< Sign of success of last CAD operation (activity detected) */
 } sx127x_internal_t;
 
 /**
  * @brief   SX127X hardware and global parameters.
  */
 typedef struct {
-    spi_t spi;                         /**< SPI device */
-    gpio_t nss_pin;                    /**< SPI NSS pin */
-    gpio_t reset_pin;                  /**< Reset pin */
-    gpio_t dio0_pin;                   /**< Interrupt line DIO0 (Tx done) */
-    gpio_t dio1_pin;                   /**< Interrupt line DIO1 (Rx timeout) */
-    gpio_t dio2_pin;                   /**< Interrupt line DIO2 (FHSS channel change) */
-    gpio_t dio3_pin;                   /**< Interrupt line DIO3 (CAD done) */
-    gpio_t dio4_pin;                   /**< Interrupt line DIO4 (not used) */
-    gpio_t dio5_pin;                   /**< Interrupt line DIO5 (not used) */
+    spi_t spi;                          /**< SPI device */
+    gpio_t nss_pin;                     /**< SPI NSS pin */
+    gpio_t reset_pin;                   /**< Reset pin */
+    gpio_t dio0_pin;                    /**< Interrupt line DIO0 (Tx done) */
+    gpio_t dio1_pin;                    /**< Interrupt line DIO1 (Rx timeout) */
+    gpio_t dio2_pin;                    /**< Interrupt line DIO2 (FHSS channel change) */
+    gpio_t dio3_pin;                    /**< Interrupt line DIO3 (CAD done) */
+    gpio_t dio4_pin;                    /**< Interrupt line DIO4 (not used) */
+    gpio_t dio5_pin;                    /**< Interrupt line DIO5 (not used) */
 #if defined(SX127X_USE_TX_SWITCH) || defined(SX127X_USE_RX_SWITCH)
-    gpio_t rx_switch_pin;              /**< Rx antenna switch */
-    gpio_t tx_switch_pin;              /**< Tx antenna switch */
+    gpio_t rx_switch_pin;               /**< Rx antenna switch */
+    gpio_t tx_switch_pin;               /**< Tx antenna switch */
 #endif
-    uint8_t paselect;                  /**< Power amplifier mode (RFO or PABOOST) */
+    uint8_t paselect;                   /**< Power amplifier mode (RFO or PABOOST) */
 } sx127x_params_t;
 
 /**
@@ -239,11 +239,11 @@ typedef uint8_t sx127x_flags_t;
  * @extends netdev_t
  */
 typedef struct {
-    netdev_t netdev;                   /**< Netdev parent struct */
-    sx127x_radio_settings_t settings;  /**< Radio settings */
-    sx127x_params_t params;            /**< Device driver parameters */
-    sx127x_internal_t _internal;       /**< Internal sx127x data used within the driver */
-    sx127x_flags_t irq;                /**< Device IRQ flags */
+    netdev_t netdev;                    /**< Netdev parent struct */
+    sx127x_radio_settings_t settings;   /**< Radio settings */
+    sx127x_params_t params;             /**< Device driver parameters */
+    sx127x_internal_t _internal;        /**< Internal sx127x data used within the driver */
+    sx127x_flags_t irq;                 /**< Device IRQ flags */
 } sx127x_t;
 
 /**
