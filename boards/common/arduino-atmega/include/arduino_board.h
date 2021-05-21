@@ -170,6 +170,16 @@ static const arduino_pwm_t arduino_pwm_list[] = {
 #endif
 };
 
+/**
+ * @brief   Enables interrupts
+ */
+#define interrupts() sei()
+
+/**
+ * @brief   Disables interrupts
+ */
+#define noInterrupts() cli()
+
 #ifdef __cplusplus
 }
 #endif
