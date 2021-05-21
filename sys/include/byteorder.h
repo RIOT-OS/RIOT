@@ -19,6 +19,7 @@
 #ifndef BYTEORDER_H
 #define BYTEORDER_H
 
+#include <string.h>
 #include <stdint.h>
 #include "unaligned.h"
 
@@ -679,6 +680,93 @@ static inline void byteorder_htobebufll(uint8_t *buf, uint64_t val)
     /* big endian to big endian conversion is easy, but buffer might be
      * unaligned */
     memcpy(buf, &val, sizeof(val));
+#endif
+}
+
+static inline uint16_t byteorder_lebuftohs(const uint8_t *buf)
+{
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    /* little endian to little endian conversion is easy, but buffer might be
+     * unaligned */
+    return unaligned_get_u16(buf);
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    return (uint16_t)((buf[0] << 8) | (buf[1] << 0));
+#endif
+}
+
+static inline uint32_t byteorder_lebuftohl(const uint8_t *buf)
+{
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    /* little endian to little endian conversion is easy, but buffer might be
+     * unaligned */
+    return unaligned_get_u32(buf);
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    return (((uint32_t) buf[0] << 24)
+          | ((uint32_t) buf[1] << 16)
+          | ((uint32_t) buf[2] << 8)
+          | ((uint32_t) buf[3] << 0));
+#endif
+}
+
+static inline uint64_t byteorder_lebuftohll(const uint8_t *buf)
+{
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    /* little endian to little endian conversion is easy, but buffer might be
+     * unaligned */
+    return unaligned_get_u64(buf);
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    return (((uint64_t) buf[0] << 56)
+          | ((uint64_t) buf[1] << 48)
+          | ((uint64_t) buf[2] << 40)
+          | ((uint64_t) buf[3] << 32)
+          | ((uint64_t) buf[4] << 24)
+          | ((uint64_t) buf[5] << 16)
+          | ((uint64_t) buf[6] <<  8)
+          | ((uint64_t) buf[7] <<  0));
+#endif
+}
+
+static inline void byteorder_htolebufs(uint8_t *buf, uint16_t val)
+{
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    /* little endian to little endian conversion is easy, but buffer might be
+     * unaligned */
+    memcpy(buf, &val, sizeof(val));
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    buf[0] = (uint8_t)(val >> 8);
+    buf[1] = (uint8_t)(val >> 0);
+#endif
+}
+
+static inline void byteorder_htolebufl(uint8_t *buf, uint32_t val)
+{
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    /* little endian to little endian conversion is easy, but buffer might be
+     * unaligned */
+    memcpy(buf, &val, sizeof(val));
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    buf[0] = (uint8_t)(val >> 24);
+    buf[1] = (uint8_t)(val >> 16);
+    buf[2] = (uint8_t)(val >> 8);
+    buf[3] = (uint8_t)(val >> 0);
+#endif
+}
+
+static inline void byteorder_htolebufll(uint8_t *buf, uint64_t val)
+{
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+    /* little endian to little endian conversion is easy, but buffer might be
+     * unaligned */
+    memcpy(buf, &val, sizeof(val));
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    buf[0] = (uint8_t)(val >> 56);
+    buf[1] = (uint8_t)(val >> 48);
+    buf[2] = (uint8_t)(val >> 40);
+    buf[3] = (uint8_t)(val >> 32);
+    buf[4] = (uint8_t)(val >> 24);
+    buf[5] = (uint8_t)(val >> 16);
+    buf[6] = (uint8_t)(val >> 8);
+    buf[7] = (uint8_t)(val >> 0);
 #endif
 }
 
