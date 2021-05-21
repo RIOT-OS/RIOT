@@ -39,8 +39,6 @@ static int sig_to_der_format(uint8_t *r, uint8_t *s, uint8_t *sig,
 
 int fido2_ctap_crypto_init(void)
 {
-    int ret;
-
     hwrng_init();
 
     /**

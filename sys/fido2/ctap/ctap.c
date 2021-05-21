@@ -1092,7 +1092,6 @@ static bool rks_exist(ctap_cred_desc_alt_t *li, size_t len, uint8_t *rp_id,
 {
     uint8_t rp_id_hash[SHA256_DIGEST_LENGTH] = { 0 };
     uint8_t page[FLASHPAGE_SIZE] = { 0 };
-    uint16_t page_offset = 0, page_offset_into_page = 0;
     ctap_resident_key_t rk;
     int ret;
 
@@ -1112,8 +1111,8 @@ static bool rks_exist(ctap_cred_desc_alt_t *li, size_t len, uint8_t *rp_id,
     }
 
     for (uint16_t i = 0; i < g_state.rk_amount_stored; i++) {
-        page_offset = get_page_offset(i);
-        page_offset_into_page = get_offset_into_page(i);
+        uint16_t page_offset = get_page_offset(i);
+        uint16_t page_offset_into_page = get_offset_into_page(i);
 
         if (page_offset_into_page == 0) {
             fido2_ctap_mem_read(CTAP_RK_START_PAGE + page_offset, page);
@@ -1152,8 +1151,6 @@ static uint8_t find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
     uint8_t rp_id_hash[SHA256_DIGEST_LENGTH] = { 0 };
     uint8_t page[FLASHPAGE_SIZE] = { 0 };
     ctap_resident_key_t rk;
-    uint16_t page_offset = 0;
-    uint16_t page_offset_into_page = 0;
     int ret;
 
     sha256(rp_id, rp_id_len, rp_id_hash);
@@ -1175,8 +1172,8 @@ static uint8_t find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
         if (index >= rks_len) {
             break;
         }
-        page_offset = get_page_offset(i);
-        page_offset_into_page = get_offset_into_page(i);
+        uint16_t page_offset = get_page_offset(i);
+        uint16_t page_offset_into_page = get_offset_into_page(i);
 
         if (page_offset_into_page == 0) {
             fido2_ctap_mem_read(CTAP_RK_START_PAGE + page_offset, page);

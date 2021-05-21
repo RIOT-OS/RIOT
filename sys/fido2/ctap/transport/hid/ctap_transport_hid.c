@@ -260,7 +260,7 @@ static void pkt_worker(void)
     uint8_t cmd = g_ctap_buffer.cmd;
 
     if (cmd == CTAP_HID_COMMAND_INIT) {
-        cid = handle_init_packet(cid, bcnt, buf);
+        handle_init_packet(cid, bcnt, buf);
     }
     else {
         /* broadcast cid only allowed for CTAP_HID_COMMAND_INIT */
@@ -352,7 +352,6 @@ static void handle_cbor_packet(uint32_t cid, uint16_t bcnt, uint8_t cmd,
 {
     ctap_resp_t resp;
     uint8_t err;
-    uint8_t type = *payload;
     size_t size;
 
     if (bcnt == 0) {
@@ -401,7 +400,7 @@ void fido2_ctap_transport_hid_check_timeouts(void)
     uint64_t now = xtimer_now_usec64();
 
     for (uint8_t i = 0; i < CTAP_HID_CIDS_MAX; i++) {
-        /* transaction timed out because cont packets didnt arrive in time */
+        /* transaction timed out because cont packets didn't arrive in time */
         if (g_is_busy && g_cids[i].taken &&
             (now - g_cids[i].last_used) >= CTAP_HID_TRANSACTION_TIMEOUT &&
             g_ctap_buffer.cid == g_cids[i].cid && !g_ctap_buffer.is_locked) {

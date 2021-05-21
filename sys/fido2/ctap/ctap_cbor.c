@@ -545,6 +545,10 @@ int fido2_ctap_cbor_encode_key_agreement(CborEncoder *encoder,
 
     ret = encode_cose_key(&map, key);
 
+    if (ret != CTAP2_OK) {
+        return ret;
+    }
+
     ret = cbor_encoder_close_container(encoder, &map);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
@@ -1496,7 +1500,7 @@ static int parse_options(CborValue *it, ctap_options_t *options)
             options->up = b;
         }
         else {
-            /* ignore uknown options */
+            /* ignore unknown options */
             DEBUG("Ctap parse options, unknown uption: %s \n", key);
         }
 

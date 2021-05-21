@@ -30,11 +30,19 @@
 extern "C" {
 #endif
 
+/**
+ * @name CTAP supported transport prototocols
+ *
+ * @{
+ */
 #define CTAP_TRANSPORT_USB 0x1
 #define CTAP_TRANSPORT_NFC 0x2
 #define CTAP_TRANSPORT_BLE 0x3
-#define CTAP_TRANSPORT_UDP 0x4
+/** @} */
 
+/**
+ * @brief CTAP_TRANSPORT thread stack size
+ */
 #define CTAP_TRANSPORT_STACKSIZE 16000
 
 /**
