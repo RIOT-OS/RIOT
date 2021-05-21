@@ -23,6 +23,7 @@
 
 extern "C" {
 #include <stdint.h>
+#include "irq.h"
 #include "periph/gpio.h"
 #include "arduino_board.h"
 }
@@ -164,6 +165,22 @@ int analogRead(int pin);
  */
 void analogWrite(int pin, int value);
 #endif
+
+/**
+ * @brief   Enables interrupts
+ */
+static inline void interrupts(void)
+{
+    irq_enable();
+}
+
+/**
+ * @brief   Disables interrupts
+ */
+static inline void noInterrupts(void)
+{
+    irq_disable();
+}
 
 #endif /* ARDUINO_HPP */
 /** @} */
