@@ -28,12 +28,14 @@
 #include "mbox.h"
 #include "net/af.h"
 #include "net/gnrc.h"
+#include "net/gnrc/tcp.h"
 #include "net/gnrc/netreg.h"
 #ifdef SOCK_HAS_ASYNC
 #include "net/sock/async/types.h"
 #endif
 #include "net/sock/ip.h"
 #include "net/sock/udp.h"
+#include "net/sock/tcp.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -134,6 +136,22 @@ struct sock_udp {
     sock_udp_ep_t local;                   /**< local end-point */
     sock_udp_ep_t remote;                  /**< remote end-point */
     uint16_t flags;                        /**< option flags */
+};
+
+/**
+ * @brief   TCP sock type
+ * @internal
+ */
+struct sock_tcp {
+    gnrc_tcp_tcb_t tcb;                    /**< tcb */
+};
+
+/**
+ * @brief   TCP queue sock type
+ * @internal
+ */
+struct sock_tcp_queue {
+    gnrc_tcp_tcb_queue_t tcb_queue;         /**< tcb queue*/
 };
 
 #ifdef __cplusplus
