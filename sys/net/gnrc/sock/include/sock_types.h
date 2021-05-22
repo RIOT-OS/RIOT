@@ -28,12 +28,14 @@
 #include "mbox.h"
 #include "net/af.h"
 #include "net/gnrc.h"
+#include "net/gnrc/tcp.h"
 #include "net/gnrc/netreg.h"
 #ifdef SOCK_HAS_ASYNC
 #include "net/sock/async/types.h"
 #endif
 #include "net/sock/ip.h"
 #include "net/sock/udp.h"
+#include "net/sock/tcp.h"
 
 #ifdef __cplusplus
 extern "C" {
