@@ -1,5 +1,5 @@
 # Boards with a screen can use disp_dev
-ifneq (,$(filter stm32f429i-disc% pinetime adafruit-clue,$(BOARD)))
+ifneq (,$(filter stm32f429i-disc% pinetime adafruit-clue esp32-wrover-kit,$(BOARD)))
   USEMODULE += auto_init_screen
   USEMODULE += disp_dev
 endif
