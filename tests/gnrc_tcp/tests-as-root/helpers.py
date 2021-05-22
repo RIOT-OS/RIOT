@@ -181,6 +181,14 @@ class _RiotTcpNode:
         self._verify_pktbuf_empty()
         self.opened = False
 
+    def get_local(self):
+        self.child.sendline('gnrc_tcp_get_local')
+        self.child.expect_exact('gnrc_tcp_get_local: returns 0')
+
+    def get_remote(self):
+        self.child.sendline('gnrc_tcp_get_remote')
+        self.child.expect_exact('gnrc_tcp_get_remote: returns 0')
+
     def _get_interface(self):
         self.child.sendline('ifconfig')
         self.child.expect(r'Iface\s+(\d+)\s')
@@ -230,10 +238,11 @@ class _RiotTcpNode:
 
 
 class RiotTcpServer(_RiotTcpNode):
-    def __init__(self, child, listen_port):
+    def __init__(self, child, listen_port, listen_addr='::'):
         super().__init__(child)
         self.listening = False
         self.listen_port = str(listen_port)
+        self.listen_addr = str(listen_addr)
         self.tcb_init()
 
     def __enter__(self):
@@ -246,7 +255,9 @@ class RiotTcpServer(_RiotTcpNode):
             self.stop_listen()
 
     def listen(self):
-        self.child.sendline('gnrc_tcp_listen [::]:{}'.format(self.listen_port))
+        self.child.sendline('gnrc_tcp_listen [{}]:{}'.format(
+            self.listen_addr, self.listen_port)
+        )
         self.child.expect_exact('gnrc_tcp_listen: returns 0')
         self.listening = True
 
@@ -261,12 +272,17 @@ class RiotTcpServer(_RiotTcpNode):
         self._verify_pktbuf_empty()
         self.listening = False
 
+    def queue_get_local(self):
+        self.child.sendline('gnrc_tcp_queue_get_local')
+        self.child.expect_exact('gnrc_tcp_queue_get_local: returns 0')
+
 
 class RiotTcpClient(_RiotTcpNode):
-    def __init__(self, child, target):
+    def __init__(self, child, target, port=0):
         super().__init__(child)
         self.target_addr = target.address + '%' + self.interface
         self.target_port = str(target.listen_port)
+        self.port = port
         self.tcb_init()
 
     def __enter__(self):
@@ -279,7 +295,9 @@ class RiotTcpClient(_RiotTcpNode):
             self.close()
 
     def open(self):
-        self.child.sendline('gnrc_tcp_open [{}]:{} 0'.format(self.target_addr, self.target_port))
+        self.child.sendline('gnrc_tcp_open [{}]:{} {}'.format(
+            self.target_addr, self.target_port, self.port)
+        )
         self.child.expect_exact('gnrc_tcp_open: returns 0')
         self.opened = True
 
