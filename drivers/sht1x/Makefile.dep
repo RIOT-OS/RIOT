@@ -1,2 +1,5 @@
 FEATURES_REQUIRED += periph_gpio
 USEMODULE += xtimer
+ifneq (,$(filter auto_init_sensors_actuators_default,$(USEMODULE)))
+  USEMODULE += auto_init_actuators_sensors_sht1x
+endif

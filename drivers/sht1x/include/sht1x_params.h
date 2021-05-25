@@ -20,7 +20,7 @@
 #define SHT1X_PARAMS_H
 
 #include "board.h"
-#include "sht1x.h"
+#include "sht1x_types.h"
 #include "saul_reg.h"
 
 #ifdef __cplusplus
@@ -84,6 +84,11 @@ static const saul_reg_info_t sht1x_saul_info[] =
 {
     SHT1X_SAULINFO
 };
+
+/**
+ * @brief   Number of SHT1x devices
+ */
+#define SHT1X_NUMOF             (sizeof(sht1x_params) / sizeof(sht1x_params[0]))
 
 #ifdef __cplusplus
 }
