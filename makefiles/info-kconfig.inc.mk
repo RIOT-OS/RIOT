@@ -1,5 +1,15 @@
 .PHONY: info-kconfig-board-supported-% info-kconfig-boards-supported
 
+ifneq (1,$(TEST_KCONFIG))
+
+info-kconfig-boards-supported:
+	@echo "To run $@ please set TEST_KCONFIG=1"
+
+info-kconfig-board-supported-%:
+	@echo "To run $@ please set TEST_KCONFIG=1"
+
+else
+
 # This is the root Kconfig
 KCONFIG ?= $(RIOTBASE)/Kconfig
 
@@ -85,3 +95,5 @@ info-kconfig-board-supported-%:
 	  --kconfig-filename $(KCONFIG) $(if $(Q),,--debug )\
 	  --config-sources $($*_CONFIG_SOURCES) $(if $(Q),2> /dev/null) && \
 	  printf "%s " $* || true
+
+endif # TEST_KCONFIG

@@ -238,12 +238,9 @@ GLOBAL_GOALS += buildtest \
                 #
 
 ifneq (, $(filter $(GLOBAL_GOALS), $(MAKECMDGOALS)))
-  ifneq (, $(TEST_KCONFIG))
     include $(RIOTMAKE)/info-kconfig.inc.mk
-  else
     include $(RIOTMAKE)/buildtests.inc.mk
     include $(RIOTMAKE)/info-global.inc.mk
-  endif
 else
 
 all: link
