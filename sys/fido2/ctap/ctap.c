@@ -207,7 +207,6 @@ static void reset(void)
     g_state.rem_pin_att = CTAP_PIN_MAX_ATTS;
     g_state.pin_is_set = false;
     g_state.rk_amount_stored = 0;
-    g_state.sign_count = 0;
 
     g_rem_pin_att_boot = CTAP_PIN_MAX_ATTS_BOOT;
 
@@ -557,17 +556,9 @@ static int get_assertion(CborEncoder *encoder, size_t size, uint8_t *req_raw,
         return CTAP2_ERR_KEEPALIVE_CANCEL;
     }
 
-    /* use global sign counter because has_nonce == true => not a resident key */
-    if (rk->cred_desc.has_nonce) {
-        ret = make_auth_data_assert(req.rp_id, req.rp_id_len, &auth_data, uv,
-                                    up,
-                                    g_state.sign_count);
-    }
-    else {
-        ret = make_auth_data_assert(req.rp_id, req.rp_id_len, &auth_data, uv,
-                                    up,
-                                    rk->sign_count);
-    }
+    ret = make_auth_data_assert(req.rp_id, req.rp_id_len, &auth_data, uv,
+                                up,
+                                rk->sign_count);
 
     if (ret != CTAP2_OK) {
         return ret;
@@ -581,23 +572,18 @@ static int get_assertion(CborEncoder *encoder, size_t size, uint8_t *req_raw,
         return ret;
     }
 
-    /* use global sign_count if not resident key, per key sign count
-     * if resident key.
-     * webauthn specification (version 20190304) section 6.1.1
+    rk->sign_count++;
+
+    /**
+     * if has_nonce is false, the credential is a resident credential and
+     * therefore needs to be saved on the device.
      */
     if (!rk->cred_desc.has_nonce) {
-        rk->sign_count++;
         ret = save_rk(rk);
 
         if (ret != CTAP2_OK) {
             return ret;
         }
-    }
-
-    g_state.sign_count++;
-    ret = save_state(&g_state);
-    if (ret != CTAP2_OK) {
-        return ret;
     }
 
     /* start timer for get_next_assertion timeout */
@@ -632,17 +618,10 @@ static int get_next_assertion(CborEncoder *encoder)
     rk = &g_assert_state.rks[g_assert_state.cred_counter];
     g_assert_state.cred_counter++;
 
-    /* has_nonce == true => not a resident key */
-    if (rk->cred_desc.has_nonce) {
-        ret = make_auth_data_next_assert(rk->rp_id_hash, &auth_data,
-                                         g_assert_state.uv, g_assert_state.up,
-                                         g_state.sign_count);
-    }
-    else {
-        ret = make_auth_data_next_assert(rk->rp_id_hash, &auth_data,
-                                         g_assert_state.uv, g_assert_state.up,
-                                         rk->sign_count);
-    }
+
+    ret = make_auth_data_next_assert(rk->rp_id_hash, &auth_data,
+                                    g_assert_state.uv, g_assert_state.up,
+                                    rk->sign_count);
 
     if (ret != CTAP2_OK) {
         return ret;
@@ -660,23 +639,18 @@ static int get_next_assertion(CborEncoder *encoder)
     /* restart timer */
     g_assert_state.timer = xtimer_now_usec();
 
-    /* use global sign_count of not resident key, per key sign count
-     * if resident key.
-     * webauthn specification (version 20190304) section 6.1.1
+    rk->sign_count++;
+
+    /**
+     * if has_nonce is false, the credential is a resident credential and
+     * therefore needs to be saved on the device.
      */
     if (!rk->cred_desc.has_nonce) {
-        rk->sign_count++;
         ret = save_rk(rk);
 
         if (ret != CTAP2_OK) {
             return ret;
         }
-    }
-
-    g_state.sign_count++;
-    ret = save_state(&g_state);
-    if (ret != CTAP2_OK) {
-        return ret;
     }
 
     return CTAP2_OK;

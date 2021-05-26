@@ -174,16 +174,13 @@ extern "C" {
  * @brief Total size of AES CCM credential id
  *
  * Size of encrypted resident key = resident key - cred id
- *                                        - has_nonce - sign_count
+ *                                        - has_nonce
  */
 #define CTAP_CREDENTIAL_ID_ENC_SIZE (sizeof(struct ctap_resident_key) - \
                                      sizeof(((struct ctap_resident_key *)0)-> \
                                             cred_desc.cred_id) - \
                                      sizeof(((struct ctap_resident_key *)0)-> \
-                                            cred_desc.has_nonce) - \
-                                     sizeof(((struct ctap_resident_key *)0)-> \
-                                            sign_count))
-
+                                            cred_desc.has_nonce))
 /**
  * @brief Start page for storing resident keys
  */
@@ -550,8 +547,11 @@ struct __attribute__((packed)) ctap_resident_key {
     uint8_t user_id[CTAP_USER_ID_MAX_SIZE];     /**< id of user */
     uint8_t user_id_len;                        /**< length of the user id */
     uint8_t priv_key[CTAP_CRYPTO_KEY_SIZE];     /**< private key */
+    uint32_t sign_count;                        /**< signature counter.
+                                                See webauthn specification
+                                                (version 20190304) section 6.1.1
+                                                for details. */
     ctap_cred_desc_t cred_desc;                 /**< credential descriptor */
-    uint32_t sign_count;                        /**< sign count */
 };
 
 /**
@@ -560,7 +560,7 @@ struct __attribute__((packed)) ctap_resident_key {
  * Credential ID can either be 16 random bytes or the encrypted resident
  * key. (AES CCM cipher + mac + nonce used)
  */
-typedef struct __attribute__((packed)){
+typedef struct __attribute__((packed)) {
     uint8_t id[CTAP_CREDENTIAL_ID_ENC_SIZE];    /**< id */
     uint8_t mac[CCM_MAC_MAX_LEN];               /**< AES CCM MAC */
     uint8_t nonce[CTAP_AES_CCM_NONCE_SIZE];     /**< AES CCM nonce */
@@ -698,7 +698,6 @@ typedef struct {
     uint8_t pin_hash[SHA256_DIGEST_LENGTH / 2]; /**< LEFT(SHA-256(pin), 16) */
     ctap_config_t config;                       /**< configuration of authenticator */
     uint16_t rk_amount_stored;                  /**< total number of resident keys stored on device */
-    uint32_t sign_count;                        /**< global sign counter */
     uint8_t cred_key[CTAP_CRED_KEY_LEN];        /**< AES CCM encryption key for cred */
 } ctap_state_t;
 
