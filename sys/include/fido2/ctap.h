@@ -387,6 +387,7 @@ extern "C" {
 #ifdef CONFIG_FIDO2_CTAP_DEVICE_AAGUID
 #define CTAP_AAGUID CONFIG_FIDO2_CTAP_DEVICE_AAGUID
 #else
+/* randomly generated fallback value */
 #define CTAP_AAGUID "9c295865fa2c36b705a42320af9c8f16"
 #endif
 
@@ -723,7 +724,7 @@ int fido2_ctap_init(void);
 /**
  * @brief Handle CBOR encoded ctap request.
  *
- * @param[in] req               request
+ * @param[in] req_raw           raw request from host
  * @param[in] size              size of request in bytes
  * @param[in] resp              response struct
  * @param[in] should_cancel     callback to cancel transaction if CTAPHID_CANCEL was received.

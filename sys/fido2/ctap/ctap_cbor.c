@@ -759,52 +759,52 @@ int fido2_ctap_cbor_parse_get_assertion_req(ctap_get_assertion_req_t *req,
         }
 
         switch (key) {
-        case CTAP_GA_REQ_RP_ID:
-            DEBUG("ctap_cbor: parse rp_id \n");
-            req->rp_id_len = CTAP_DOMAIN_NAME_MAX_SIZE;
-            ret = parse_text_string(&map, (char *)req->rp_id,
-                                    (size_t *)&req->rp_id_len);
-            required_parsed++;
-            break;
-        case CTAP_GA_REQ_CLIENT_DATA_HASH:
-            DEBUG("ctap_cbor: parse client_data_hash \n");
-            len = SHA256_DIGEST_LENGTH;
-            ret =
-                parse_fixed_size_byte_array(&map, req->client_data_hash, &len);
-            required_parsed++;
-            break;
-        case CTAP_GA_REQ_ALLOW_LIST:
-            DEBUG("ctap_cbor: parse allow_list \n");
-            ret = parse_allow_list(&map, &req->allow_list,
-                                   (size_t *)&req->allow_list_len);
-            break;
-        case CTAP_GA_REQ_EXTENSIONS:
-            /* todo: implement once extensions are supported */
-            DEBUG("ctap_cbor: parse extensions \n");
-            break;
-        case CTAP_GA_REQ_OPTIONS:
-            DEBUG("ctap_cbor: parse options \n");
-            ret = parse_options(&map, &req->options);
-            break;
-        case CTAP_GA_REQ_PIN_AUTH:
-            DEBUG("ctap_cbor: parse pin_auth \n");
-            len = 16;
-            ret = parse_fixed_size_byte_array(&map, req->pin_auth, &len);
-            /* CTAP specification (version 20190130) section 5.5.8.1 */
-            if (ret == CTAP1_ERR_INVALID_LENGTH && len == 0) {
-                ret = CTAP2_OK;
-            }
-            req->pin_auth_len = len;
-            req->pin_auth_present = true;
-            break;
-        case CTAP_GA_REQ_PIN_PROTOCOL:
-            DEBUG("ctap_cbor: parse pin_protocol \n");
-            ret = parse_int(&map, &temp);
-            req->pin_protocol = (uint8_t)temp;
-            break;
-        default:
-            DEBUG("ctap_cbor: unknown GetAssertion key: %d \n", key);
-            break;
+            case CTAP_GA_REQ_RP_ID:
+                DEBUG("ctap_cbor: parse rp_id \n");
+                req->rp_id_len = CTAP_DOMAIN_NAME_MAX_SIZE;
+                ret = parse_text_string(&map, (char *)req->rp_id,
+                                        (size_t *)&req->rp_id_len);
+                required_parsed++;
+                break;
+            case CTAP_GA_REQ_CLIENT_DATA_HASH:
+                DEBUG("ctap_cbor: parse client_data_hash \n");
+                len = SHA256_DIGEST_LENGTH;
+                ret =
+                    parse_fixed_size_byte_array(&map, req->client_data_hash, &len);
+                required_parsed++;
+                break;
+            case CTAP_GA_REQ_ALLOW_LIST:
+                DEBUG("ctap_cbor: parse allow_list \n");
+                ret = parse_allow_list(&map, &req->allow_list,
+                                       (size_t *)&req->allow_list_len);
+                break;
+            case CTAP_GA_REQ_EXTENSIONS:
+                /* todo: implement once extensions are supported */
+                DEBUG("ctap_cbor: parse extensions \n");
+                break;
+            case CTAP_GA_REQ_OPTIONS:
+                DEBUG("ctap_cbor: parse options \n");
+                ret = parse_options(&map, &req->options);
+                break;
+            case CTAP_GA_REQ_PIN_AUTH:
+                DEBUG("ctap_cbor: parse pin_auth \n");
+                len = 16;
+                ret = parse_fixed_size_byte_array(&map, req->pin_auth, &len);
+                /* CTAP specification (version 20190130) section 5.5.8.1 */
+                if (ret == CTAP1_ERR_INVALID_LENGTH && len == 0) {
+                    ret = CTAP2_OK;
+                }
+                req->pin_auth_len = len;
+                req->pin_auth_present = true;
+                break;
+            case CTAP_GA_REQ_PIN_PROTOCOL:
+                DEBUG("ctap_cbor: parse pin_protocol \n");
+                ret = parse_int(&map, &temp);
+                req->pin_protocol = (uint8_t)temp;
+                break;
+            default:
+                DEBUG("ctap_cbor: unknown GetAssertion key: %d \n", key);
+                break;
         }
 
         if (ret != CTAP2_OK) {
@@ -878,44 +878,44 @@ int fido2_ctap_cbor_parse_client_pin_req(ctap_client_pin_req_t *req,
         }
 
         switch (key) {
-        case CTAP_CP_REQ_PIN_PROTOCOL:
-            DEBUG("ctap_cbor: parse pinProtocol \n");
-            ret = parse_int(&map, &temp);
-            req->pin_protocol = (uint8_t)temp;
-            required_parsed++;
-            break;
-        case CTAP_CP_REQ_SUB_COMMAND:
-            DEBUG("ctap_cbor: parse subCommand \n");
-            ret = parse_int(&map, &temp);
-            req->sub_command = (uint8_t)temp;
-            required_parsed++;
-            break;
-        case CTAP_CP_REQ_KEY_AGREEMENT:
-            DEBUG("ctap_cbor: parse keyAgreement \n");
-            ret = parse_cose_key(&map, &req->key_agreement);
-            req->key_agreement_present = true;
-            break;
-        case CTAP_CP_REQ_PIN_AUTH:
-            DEBUG("ctap_cbor: parse pinAuth \n");
-            len = sizeof(req->pin_auth);
-            ret = parse_fixed_size_byte_array(&map, req->pin_auth, &len);
-            req->pin_auth_present = true;
-            break;
-        case CTAP_CP_REQ_NEW_PIN_ENC:
-            DEBUG("ctap_cbor: parse newPinEnc \n");
-            len = sizeof(req->new_pin_enc);
-            ret = parse_byte_array(&map, req->new_pin_enc, &len);
-            req->new_pin_enc_size = len;
-            break;
-        case CTAP_CP_REQ_PIN_HASH_ENC:
-            DEBUG("ctap_cbor: parse pinHashEnc \n");
-            len = sizeof(req->pin_hash_enc);
-            ret = parse_fixed_size_byte_array(&map, req->pin_hash_enc, &len);
-            req->pin_hash_enc_present = true;
-            break;
-        default:
-            DEBUG("parse_client_pin unknown key: %d \n", key);
-            break;
+            case CTAP_CP_REQ_PIN_PROTOCOL:
+                DEBUG("ctap_cbor: parse pinProtocol \n");
+                ret = parse_int(&map, &temp);
+                req->pin_protocol = (uint8_t)temp;
+                required_parsed++;
+                break;
+            case CTAP_CP_REQ_SUB_COMMAND:
+                DEBUG("ctap_cbor: parse subCommand \n");
+                ret = parse_int(&map, &temp);
+                req->sub_command = (uint8_t)temp;
+                required_parsed++;
+                break;
+            case CTAP_CP_REQ_KEY_AGREEMENT:
+                DEBUG("ctap_cbor: parse keyAgreement \n");
+                ret = parse_cose_key(&map, &req->key_agreement);
+                req->key_agreement_present = true;
+                break;
+            case CTAP_CP_REQ_PIN_AUTH:
+                DEBUG("ctap_cbor: parse pinAuth \n");
+                len = sizeof(req->pin_auth);
+                ret = parse_fixed_size_byte_array(&map, req->pin_auth, &len);
+                req->pin_auth_present = true;
+                break;
+            case CTAP_CP_REQ_NEW_PIN_ENC:
+                DEBUG("ctap_cbor: parse newPinEnc \n");
+                len = sizeof(req->new_pin_enc);
+                ret = parse_byte_array(&map, req->new_pin_enc, &len);
+                req->new_pin_enc_size = len;
+                break;
+            case CTAP_CP_REQ_PIN_HASH_ENC:
+                DEBUG("ctap_cbor: parse pinHashEnc \n");
+                len = sizeof(req->pin_hash_enc);
+                ret = parse_fixed_size_byte_array(&map, req->pin_hash_enc, &len);
+                req->pin_hash_enc_present = true;
+                break;
+            default:
+                DEBUG("parse_client_pin unknown key: %d \n", key);
+                break;
         }
         if (ret != CTAP2_OK) {
             return ret;
@@ -987,60 +987,60 @@ int fido2_ctap_cbor_parse_make_credential_req(ctap_make_credential_req_t *req,
         }
 
         switch (key) {
-        case CTAP_MC_REQ_CLIENT_DATA_HASH:
-            DEBUG("ctap_cbor: parse clientDataHash \n");
-            len = SHA256_DIGEST_LENGTH;
-            ret =
-                parse_fixed_size_byte_array(&map, req->client_data_hash, &len);
-            required_parsed++;
-            break;
-        case CTAP_MC_REQ_RP:
-            DEBUG("ctap_cbor: parse rp \n");
-            ret = parse_rp(&map, &req->rp);
-            required_parsed++;
-            break;
-        case CTAP_MC_REQ_USER:
-            DEBUG("ctap_cbor: parse user \n");
-            ret = parse_user(&map, &req->user);
-            required_parsed++;
-            break;
-        case CTAP_MC_REQ_PUB_KEY_CRED_PARAMS:
-            DEBUG("ctap_cbor: parse key_cred params \n");
-            ret = parse_pub_key_cred_params(&map, req);
-            required_parsed++;
-            break;
-        case CTAP_MC_REQ_EXCLUDE_LIST:
-            DEBUG("ctap_cbor: parse excludeList \n");
-            ret = parse_exclude_list(&map, &req->exclude_list,
-                                     &req->exclude_list_len);
-            break;
-        case CTAP_MC_REQ_EXTENSIONS:
-            DEBUG("ctap_cbor: parse exclude_list \n");
-            ret = CTAP2_ERR_UNSUPPORTED_EXTENSION;
-            break;
-        case CTAP_MC_REQ_OPTIONS:
-            DEBUG("ctap_cbor: parse options \n");
-            ret = parse_options(&map, &req->options);
-            break;
-        case CTAP_MC_REQ_PIN_AUTH:
-            DEBUG("ctap_cbor: parse pin_auth \n");
-            len = 16;
-            ret = parse_fixed_size_byte_array(&map, req->pin_auth, &len);
-            /* CTAP specification (version 20190130) section 5.5.8.1 (pinAuth) */
-            if (ret == CTAP1_ERR_INVALID_LENGTH && len == 0) {
-                ret = CTAP2_OK;
-            }
-            req->pin_auth_len = len;
-            req->pin_auth_present = true;
-            break;
-        case CTAP_MC_REQ_PIN_PROTOCOL:
-            DEBUG("ctap_cbor: parse pin_protocol \n");
-            ret = parse_int(&map, &temp);
-            req->pin_protocol = (uint8_t)temp;
-            break;
-        default:
-            DEBUG("ctap_cbor: unknown MakeCredential key: %d \n", key);
-            break;
+            case CTAP_MC_REQ_CLIENT_DATA_HASH:
+                DEBUG("ctap_cbor: parse clientDataHash \n");
+                len = SHA256_DIGEST_LENGTH;
+                ret =
+                    parse_fixed_size_byte_array(&map, req->client_data_hash, &len);
+                required_parsed++;
+                break;
+            case CTAP_MC_REQ_RP:
+                DEBUG("ctap_cbor: parse rp \n");
+                ret = parse_rp(&map, &req->rp);
+                required_parsed++;
+                break;
+            case CTAP_MC_REQ_USER:
+                DEBUG("ctap_cbor: parse user \n");
+                ret = parse_user(&map, &req->user);
+                required_parsed++;
+                break;
+            case CTAP_MC_REQ_PUB_KEY_CRED_PARAMS:
+                DEBUG("ctap_cbor: parse key_cred params \n");
+                ret = parse_pub_key_cred_params(&map, req);
+                required_parsed++;
+                break;
+            case CTAP_MC_REQ_EXCLUDE_LIST:
+                DEBUG("ctap_cbor: parse excludeList \n");
+                ret = parse_exclude_list(&map, &req->exclude_list,
+                                         &req->exclude_list_len);
+                break;
+            case CTAP_MC_REQ_EXTENSIONS:
+                DEBUG("ctap_cbor: parse exclude_list \n");
+                ret = CTAP2_ERR_UNSUPPORTED_EXTENSION;
+                break;
+            case CTAP_MC_REQ_OPTIONS:
+                DEBUG("ctap_cbor: parse options \n");
+                ret = parse_options(&map, &req->options);
+                break;
+            case CTAP_MC_REQ_PIN_AUTH:
+                DEBUG("ctap_cbor: parse pin_auth \n");
+                len = 16;
+                ret = parse_fixed_size_byte_array(&map, req->pin_auth, &len);
+                /* CTAP specification (version 20190130) section 5.5.8.1 (pinAuth) */
+                if (ret == CTAP1_ERR_INVALID_LENGTH && len == 0) {
+                    ret = CTAP2_OK;
+                }
+                req->pin_auth_len = len;
+                req->pin_auth_present = true;
+                break;
+            case CTAP_MC_REQ_PIN_PROTOCOL:
+                DEBUG("ctap_cbor: parse pin_protocol \n");
+                ret = parse_int(&map, &temp);
+                req->pin_protocol = (uint8_t)temp;
+                break;
+            default:
+                DEBUG("ctap_cbor: unknown MakeCredential key: %d \n", key);
+                break;
         }
 
         if (ret != CTAP2_OK) {
@@ -1100,31 +1100,31 @@ static int parse_cose_key(CborValue *it, ctap_cose_key_t *cose_key)
         }
 
         switch (key) {
-        case CTAP_COSE_KEY_LABEL_KTY:
-            ret = parse_int(&map, &cose_key->kty);
-            required_parsed++;
-            break;
-        case CTAP_COSE_KEY_LABEL_ALG:
-            ret = parse_int(&map, &temp);
-            cose_key->alg_type = (int32_t)temp;
-            required_parsed++;
-            break;
-        case CTAP_COSE_KEY_LABEL_CRV:
-            ret = parse_int(&map, &cose_key->crv);
-            required_parsed++;
-            break;
-        case CTAP_COSE_KEY_LABEL_X:
-            len = sizeof(cose_key->pubkey.x);
-            ret = parse_fixed_size_byte_array(&map, cose_key->pubkey.x, &len);
-            required_parsed++;
-            break;
-        case CTAP_COSE_KEY_LABEL_Y:
-            len = sizeof(cose_key->pubkey.y);
-            ret = parse_fixed_size_byte_array(&map, cose_key->pubkey.y, &len);
-            required_parsed++;
-            break;
-        default:
-            DEBUG("Parse cose key unknown key: %d \n", key);
+            case CTAP_COSE_KEY_LABEL_KTY:
+                ret = parse_int(&map, &cose_key->kty);
+                required_parsed++;
+                break;
+            case CTAP_COSE_KEY_LABEL_ALG:
+                ret = parse_int(&map, &temp);
+                cose_key->alg_type = (int32_t)temp;
+                required_parsed++;
+                break;
+            case CTAP_COSE_KEY_LABEL_CRV:
+                ret = parse_int(&map, &cose_key->crv);
+                required_parsed++;
+                break;
+            case CTAP_COSE_KEY_LABEL_X:
+                len = sizeof(cose_key->pubkey.x);
+                ret = parse_fixed_size_byte_array(&map, cose_key->pubkey.x, &len);
+                required_parsed++;
+                break;
+            case CTAP_COSE_KEY_LABEL_Y:
+                len = sizeof(cose_key->pubkey.y);
+                ret = parse_fixed_size_byte_array(&map, cose_key->pubkey.y, &len);
+                required_parsed++;
+                break;
+            default:
+                DEBUG("Parse cose key unknown key: %d \n", key);
         }
 
         if (ret != CTAP2_OK) {

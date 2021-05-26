@@ -147,7 +147,10 @@ static bool rks_exist(ctap_cred_desc_alt_t *li, size_t len, uint8_t *rp_id,
 /**
  * @brief Decrypt credential that is stored by relying party
  *
- * Webauthn specification (version 20190304) section 4 (Credential ID)
+ * This function is only used when the credential is stored by the
+ * relying party in encrypted form.
+ * See Webauthn specification (version 20190304) section 4 (Credential ID)
+ * for more details.
  */
 static int ctap_decrypt_rk(ctap_resident_key_t *rk, ctap_cred_id_t *id);
 
@@ -185,7 +188,7 @@ int fido2_ctap_init(void)
         return -1;
     }
 
-    /* first startup up of the device */
+    /* first startup of the device */
     if (g_state.initialized != CTAP_INITIALIZED_MARKER) {
         reset();
     }
@@ -208,6 +211,10 @@ static void reset(void)
 
     g_rem_pin_att_boot = CTAP_PIN_MAX_ATTS_BOOT;
 
+    /**
+     * create a new AES_CCM key to encrypt a credential when it is not
+     * a resident credential.
+     */
     fido2_ctap_crypto_prng(g_state.cred_key, sizeof(g_state.cred_key));
 
     g_state.config.options |= CTAP_INFO_OPTIONS_FLAG_PLAT;
@@ -223,78 +230,78 @@ static void reset(void)
     save_state(&g_state);
 }
 
-size_t fido2_ctap_handle_request(uint8_t *req, size_t size, ctap_resp_t *resp,
+size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t size, ctap_resp_t *resp,
                                  bool (*should_cancel)(void))
 {
     CborEncoder encoder = { 0 };
-    uint8_t cmd = *req;
     uint8_t *buf = resp->data;
 
-    req++;
+    /* obtain CTAP method type from raw request */
+    uint8_t method = *req_raw;
+    req_raw++;
     size--;
 
     cbor_encoder_init(&encoder, buf, CTAP_MAX_MSG_SIZE, 0);
 
     /* handle common error case */
-    switch (cmd) {
-    case CTAP_MAKE_CREDENTIAL:
-    case CTAP_GET_ASSERTION:
-    case CTAP_GET_NEXT_ASSERTION: {
-        if (locked()) {
-            return CTAP2_ERR_PIN_BLOCKED;
-        }
+    switch (method) {
+        case CTAP_MAKE_CREDENTIAL:
+        case CTAP_GET_ASSERTION:
+        case CTAP_GET_NEXT_ASSERTION: {
+            if (locked()) {
+                return CTAP2_ERR_PIN_BLOCKED;
+            }
 
-        if (boot_locked()) {
-            return CTAP2_ERR_PIN_AUTH_BLOCKED;
+            if (boot_locked()) {
+                return CTAP2_ERR_PIN_AUTH_BLOCKED;
+            }
         }
     }
-    }
 
-    switch (cmd) {
-    case CTAP_GET_INFO:
-        DEBUG("fido2_ctap: get_info req \n");
-        resp->status = get_info(&encoder);
-        DEBUG("fido2_ctap: get_info resp: status: %u, size: %u \n",
-              resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
-        return cbor_encoder_get_buffer_size(&encoder, buf);
-        break;
-    case CTAP_MAKE_CREDENTIAL:
-        DEBUG("fido2_ctap: make_credential req \n");
-        resp->status = make_credential(&encoder, req, size, should_cancel);
-        DEBUG("fido2_ctap: make_credential resp: status: %u, size: %u \n",
-              resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
-        return cbor_encoder_get_buffer_size(&encoder, buf);
-        break;
-    case CTAP_GET_ASSERTION:
-        DEBUG("fido2_ctap: get_assertion req \n");
-        resp->status = get_assertion(&encoder, size, req, should_cancel);
-        DEBUG("fido2_ctap: get_assertion resp: status: %u, size: %u \n",
-              resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
-        return cbor_encoder_get_buffer_size(&encoder, buf);
-        break;
-    case CTAP_GET_NEXT_ASSERTION:
-        DEBUG("fido2_ctap: get_next_assertion req \n");
-        resp->status = get_next_assertion(&encoder);
-        DEBUG("fido2_ctap: get_next_assertion resp: status: %u, size: %u \n",
-              resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
-        return cbor_encoder_get_buffer_size(&encoder, buf);
-        break;
-    case CTAP_CLIENT_PIN:
-        DEBUG("fido2_ctap: client_pin req \n");
-        resp->status = client_pin(&encoder, size, req, should_cancel);
-        DEBUG("fido2_ctap: client_pin resp: status: %u, size: %u \n",
-              resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
-        return cbor_encoder_get_buffer_size(&encoder, buf);
-        break;
-    case CTAP_RESET:
-        DEBUG("fido2_ctap: reset req \n");
-        reset();
-        break;
-    default:
-        DEBUG("fido2_ctap: unknown req: %u \n", cmd);
-        resp->status = CTAP1_ERR_INVALID_COMMAND;
-        return 0;
-        break;
+    switch (method) {
+        case CTAP_GET_INFO:
+            DEBUG("fido2_ctap: get_info req \n");
+            resp->status = get_info(&encoder);
+            DEBUG("fido2_ctap: get_info resp: status: %u, size: %u \n",
+                  resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
+            return cbor_encoder_get_buffer_size(&encoder, buf);
+            break;
+        case CTAP_MAKE_CREDENTIAL:
+            DEBUG("fido2_ctap: make_credential req \n");
+            resp->status = make_credential(&encoder, req_raw, size, should_cancel);
+            DEBUG("fido2_ctap: make_credential resp: status: %u, size: %u \n",
+                  resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
+            return cbor_encoder_get_buffer_size(&encoder, buf);
+            break;
+        case CTAP_GET_ASSERTION:
+            DEBUG("fido2_ctap: get_assertion req \n");
+            resp->status = get_assertion(&encoder, size, req_raw, should_cancel);
+            DEBUG("fido2_ctap: get_assertion resp: status: %u, size: %u \n",
+                  resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
+            return cbor_encoder_get_buffer_size(&encoder, buf);
+            break;
+        case CTAP_GET_NEXT_ASSERTION:
+            DEBUG("fido2_ctap: get_next_assertion req \n");
+            resp->status = get_next_assertion(&encoder);
+            DEBUG("fido2_ctap: get_next_assertion resp: status: %u, size: %u \n",
+                  resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
+            return cbor_encoder_get_buffer_size(&encoder, buf);
+            break;
+        case CTAP_CLIENT_PIN:
+            DEBUG("fido2_ctap: client_pin req \n");
+            resp->status = client_pin(&encoder, size, req_raw, should_cancel);
+            DEBUG("fido2_ctap: client_pin resp: status: %u, size: %u \n",
+                  resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
+            return cbor_encoder_get_buffer_size(&encoder, buf);
+            break;
+        case CTAP_RESET:
+            DEBUG("fido2_ctap: reset req \n");
+            reset();
+            break;
+        default:
+            DEBUG("fido2_ctap: unknown req: %u \n", method);
+            resp->status = CTAP1_ERR_INVALID_COMMAND;
+            break;
     }
 
     return 0;
@@ -324,12 +331,19 @@ static uint8_t make_credential(CborEncoder *encoder, uint8_t *req_raw,
         return ret;
     }
 
+    /* true => authenticator is instructed to store credential on device */
+    rk = req.options.rk;
+
     if (req.exclude_list_len > 0) {
 
         if (req.exclude_list_len > CTAP_MAX_EXCLUDE_LIST_SIZE) {
             req.exclude_list_len = CTAP_MAX_EXCLUDE_LIST_SIZE;
         }
 
+        /**
+         * parse the CBOR encoded PublicKeyCredentialDescriptors of the
+         * exclude list sent by the host.
+         */
         for (uint8_t i = 0; i < req.exclude_list_len; i++) {
             ret = fido2_ctap_cbor_parse_cred_desc(&req.exclude_list,
                                                   &exclude_list[i]);
@@ -348,7 +362,12 @@ static uint8_t make_credential(CborEncoder *encoder, uint8_t *req_raw,
         }
     }
 
-    /* setting user presence (up) is not valid for this command */
+    /**
+     * The user presence (up) check is mandatory for the MakeCredential method.
+     * For the MakeCredential method the up key of the options dictionary,
+     * which is part of the MakeCredential request, is not defined.
+     * Therefore setting it is invalid for this method.
+    */
     if (req.options.up != -1) {
         return CTAP2_ERR_INVALID_OPTION;
     }
@@ -400,9 +419,6 @@ static uint8_t make_credential(CborEncoder *encoder, uint8_t *req_raw,
         up = true;
     }
 #endif
-
-    /* resident credential or not */
-    rk = req.options.rk;
 
     ret = make_auth_data_attest(&req, &auth_data, &k, uv, up, rk);
 
@@ -859,7 +875,7 @@ static int change_pin(ctap_client_pin_req_t *req, bool (*should_cancel)(void))
     hmac_sha256_update(&ctx, req->pin_hash_enc, sizeof(req->pin_hash_enc));
     hmac_sha256_final(&ctx, hmac);
 
-    if (memcmp(hmac, req->pin_auth, 16) != 0) {
+    if (memcmp(hmac, req->pin_auth, CTAP_PIN_AUTH_SZ) != 0) {
         DEBUG("fido2_ctap: pin hmac and pin_auth differ \n");
         return CTAP2_ERR_PIN_AUTH_INVALID;
     }
@@ -1070,7 +1086,7 @@ static int verify_pin_auth(uint8_t *auth, uint8_t *hash, size_t len)
 
     hmac_sha256(g_pin_token, sizeof(g_pin_token), hash, len, hmac);
 
-    if (memcmp(auth, hmac, 16) != 0) {
+    if (memcmp(auth, hmac, CTAP_PIN_AUTH_SZ) != 0) {
         return CTAP2_ERR_PIN_AUTH_INVALID;
     }
 
