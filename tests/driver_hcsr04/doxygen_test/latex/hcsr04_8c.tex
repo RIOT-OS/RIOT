@@ -1,0 +1,48 @@
+\hypertarget{hcsr04_8c}{}\section{/home/evripidis/\+Documents/diploma/\+R\+I\+O\+T/drivers/hcsr04/hcsr04.c File Reference}
+\label{hcsr04_8c}\index{/home/evripidis/\+Documents/diploma/\+R\+I\+O\+T/drivers/hcsr04/hcsr04.\+c@{/home/evripidis/\+Documents/diploma/\+R\+I\+O\+T/drivers/hcsr04/hcsr04.\+c}}
+
+
+Device driver implementation for the H\+C-\/\+S\+R04.  
+
+
+{\ttfamily \#include \char`\"{}hcsr04.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}hcsr04\+\_\+constants.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}hcsr04\+\_\+params.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}periph/gpio.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}xtimer.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$math.\+h$>$}\newline
+Include dependency graph for hcsr04.\+c\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{hcsr04_8c__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{hcsr04_8c_a2834f7c329f56bd4858c056ccb1f7dc6}\label{hcsr04_8c_a2834f7c329f56bd4858c056ccb1f7dc6}} 
+void {\bfseries hcsr04\+\_\+int\+\_\+callback} (void $\ast$arg)
+\item 
+int \hyperlink{group__drivers__hcsr04_gabcca3ead68bf012ae42e185e070cb764}{hcsr04\+\_\+init} (\hyperlink{structhcsr04__t}{hcsr04\+\_\+t} $\ast$dev, const \hyperlink{structhcsr04__params__t}{hcsr04\+\_\+params\+\_\+t} $\ast$params)
+\begin{DoxyCompactList}\small\item\em Initialize an H\+C-\/\+S\+R04 sensor. \end{DoxyCompactList}\item 
+void \hyperlink{group__drivers__hcsr04_gabbfe6e650342e8cc67cf9c9e81b29335}{hcsr04\+\_\+trigger} (\hyperlink{structhcsr04__t}{hcsr04\+\_\+t} $\ast$dev)
+\begin{DoxyCompactList}\small\item\em Starts a measurement by triggering the H\+C-\/\+S\+R04 device. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group__drivers__hcsr04_ga449b9d4dc30d3d87d9ee4d8936fb592d}{hcsr04\+\_\+read} (\hyperlink{structhcsr04__t}{hcsr04\+\_\+t} $\ast$dev)
+\begin{DoxyCompactList}\small\item\em Gets the last measurement reading. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group__drivers__hcsr04_ga3b2547facab2613e3113c2fd5d2bd6a8}{hcsr04\+\_\+temp\+\_\+to\+\_\+sound\+\_\+speed} (uint16\+\_\+t temperature)
+\begin{DoxyCompactList}\small\item\em Function that calculates the speed of sound. \end{DoxyCompactList}\item 
+void \hyperlink{group__drivers__hcsr04_gad5a6694b723bb25fc48e7a8750b8a77a}{hcsr04\+\_\+set\+\_\+temp} (\hyperlink{structhcsr04__t}{hcsr04\+\_\+t} $\ast$dev, uint16\+\_\+t new\+\_\+temp)
+\begin{DoxyCompactList}\small\item\em Function that sets the temperature. \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{group__drivers__hcsr04_gabef54fa09a72a7aa863aaa03b662125b}{hcsr04\+\_\+get\+\_\+distance} (\hyperlink{structhcsr04__t}{hcsr04\+\_\+t} $\ast$dev)
+\begin{DoxyCompactList}\small\item\em Function that measures the current distance. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Device driver implementation for the H\+C-\/\+S\+R04. 
+
+\begin{DoxyAuthor}{Author}
+Evripidis Chondromatidis \href{mailto:eurichon1996@gmail.com}{\tt eurichon1996@gmail.\+com} 
+\end{DoxyAuthor}

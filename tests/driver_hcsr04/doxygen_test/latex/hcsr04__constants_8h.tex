@@ -1,0 +1,68 @@
+\hypertarget{hcsr04__constants_8h}{}\section{/home/evripidis/\+Documents/diploma/\+R\+I\+O\+T/drivers/hcsr04/include/hcsr04\+\_\+constants.h File Reference}
+\label{hcsr04__constants_8h}\index{/home/evripidis/\+Documents/diploma/\+R\+I\+O\+T/drivers/hcsr04/include/hcsr04\+\_\+constants.\+h@{/home/evripidis/\+Documents/diploma/\+R\+I\+O\+T/drivers/hcsr04/include/hcsr04\+\_\+constants.\+h}}
+
+
+Internal addresses, registers and constants.  
+
+
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{hcsr04__constants_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{Indent}\textbf{ H\+C-\/\+S\+R04 connection error value}\par
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{hcsr04__constants_8h_a8152d1c4c747a366634d89a324bc7709}\label{hcsr04__constants_8h_a8152d1c4c747a366634d89a324bc7709}} 
+\#define \hyperlink{hcsr04__constants_8h_a8152d1c4c747a366634d89a324bc7709}{E\+C\+ON}~(2\+U)
+\begin{DoxyCompactList}\small\item\em Integer representing the error code. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ H\+C-\/\+S\+R04 trigger duration}\par
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{hcsr04__constants_8h_ade7e0a46b30c164eed780ea109c126ea}\label{hcsr04__constants_8h_ade7e0a46b30c164eed780ea109c126ea}} 
+\#define \hyperlink{hcsr04__constants_8h_ade7e0a46b30c164eed780ea109c126ea}{T\+R\+I\+G\+G\+E\+R\+\_\+\+T\+I\+ME}~(10\+U)
+\begin{DoxyCompactList}\small\item\em Duration time in us. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ Distance limit parameters for H\+C\+S\+R04 ultrasonic sensor}\par
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{hcsr04__constants_8h_a29227e726bd9572b55d4b92b7602c0ed}\label{hcsr04__constants_8h_a29227e726bd9572b55d4b92b7602c0ed}} 
+\#define \hyperlink{hcsr04__constants_8h_a29227e726bd9572b55d4b92b7602c0ed}{H\+C\+S\+R04\+\_\+\+M\+I\+N\+\_\+\+D\+I\+S\+T\+A\+N\+C\+E\+\_\+\+MM}~(30\+U)
+\begin{DoxyCompactList}\small\item\em Min distance possible in mm. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{hcsr04__constants_8h_a0c6e7ee1cc90105baac932c3c8b16a9e}\label{hcsr04__constants_8h_a0c6e7ee1cc90105baac932c3c8b16a9e}} 
+\#define \hyperlink{hcsr04__constants_8h_a0c6e7ee1cc90105baac932c3c8b16a9e}{H\+C\+S\+R04\+\_\+\+M\+A\+X\+\_\+\+D\+I\+S\+T\+A\+N\+C\+E\+\_\+\+MM}~(4000\+U)
+\begin{DoxyCompactList}\small\item\em Max distance possible in mm. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ Reference temperature}\par
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{hcsr04__constants_8h_a4eab5906642820d9ba6e57a2b16bafa7}\label{hcsr04__constants_8h_a4eab5906642820d9ba6e57a2b16bafa7}} 
+\#define \hyperlink{hcsr04__constants_8h_a4eab5906642820d9ba6e57a2b16bafa7}{R\+E\+F\+\_\+\+T\+E\+M\+P\+E\+R\+A\+T\+U\+RE}~(273.\+15\+F)
+\begin{DoxyCompactList}\small\item\em Temperature in m Kelvin. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ Speed of sound at the ref temperature for dry air}\par
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{hcsr04__constants_8h_aa6b74c1a92a788d74ef3cb8e741ac757}\label{hcsr04__constants_8h_aa6b74c1a92a788d74ef3cb8e741ac757}} 
+\#define \hyperlink{hcsr04__constants_8h_aa6b74c1a92a788d74ef3cb8e741ac757}{R\+E\+F\+\_\+\+S\+P\+E\+E\+D\+\_\+\+S\+O\+U\+ND}~(331.\+30\+F)
+\begin{DoxyCompactList}\small\item\em Speed of sound in m/ms. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}\textbf{ Temperature coefficient}\par
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{hcsr04__constants_8h_a9e315b301a687e2440cdf4050cfdceb7}\label{hcsr04__constants_8h_a9e315b301a687e2440cdf4050cfdceb7}} 
+\#define \hyperlink{hcsr04__constants_8h_a9e315b301a687e2440cdf4050cfdceb7}{C\+O\+E\+F\+F\+I\+C\+I\+E\+NT}~(\hyperlink{hcsr04__constants_8h_aa6b74c1a92a788d74ef3cb8e741ac757}{R\+E\+F\+\_\+\+S\+P\+E\+E\+D\+\_\+\+S\+O\+U\+ND} / sqrt(\hyperlink{hcsr04__constants_8h_a4eab5906642820d9ba6e57a2b16bafa7}{R\+E\+F\+\_\+\+T\+E\+M\+P\+E\+R\+A\+T\+U\+RE}))
+\begin{DoxyCompactList}\small\item\em Converts data to appropriate form. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+
+
+\subsection{Detailed Description}
+Internal addresses, registers and constants. 
+
+\begin{DoxyAuthor}{Author}
+Evripidis Chondromatidis \href{mailto:eurichon1996@gmail.com}{\tt eurichon1996@gmail.\+com} 
+\end{DoxyAuthor}

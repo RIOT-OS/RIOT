@@ -1,0 +1,9 @@
+var searchData=
+[
+  ['hcsr04_5fget_5fdistance',['hcsr04_get_distance',['../group__drivers__hcsr04.html#gabef54fa09a72a7aa863aaa03b662125b',1,'hcsr04_get_distance(hcsr04_t *dev):&#160;hcsr04.c'],['../group__drivers__hcsr04.html#gabef54fa09a72a7aa863aaa03b662125b',1,'hcsr04_get_distance(hcsr04_t *dev):&#160;hcsr04.c']]],
+  ['hcsr04_5finit',['hcsr04_init',['../group__drivers__hcsr04.html#gabcca3ead68bf012ae42e185e070cb764',1,'hcsr04_init(hcsr04_t *dev, const hcsr04_params_t *params):&#160;hcsr04.c'],['../group__drivers__hcsr04.html#gabcca3ead68bf012ae42e185e070cb764',1,'hcsr04_init(hcsr04_t *dev, const hcsr04_params_t *params):&#160;hcsr04.c']]],
+  ['hcsr04_5fread',['hcsr04_read',['../group__drivers__hcsr04.html#ga449b9d4dc30d3d87d9ee4d8936fb592d',1,'hcsr04_read(hcsr04_t *dev):&#160;hcsr04.c'],['../group__drivers__hcsr04.html#ga449b9d4dc30d3d87d9ee4d8936fb592d',1,'hcsr04_read(hcsr04_t *dev):&#160;hcsr04.c']]],
+  ['hcsr04_5fset_5ftemp',['hcsr04_set_temp',['../group__drivers__hcsr04.html#gad5a6694b723bb25fc48e7a8750b8a77a',1,'hcsr04_set_temp(hcsr04_t *dev, uint16_t new_temp):&#160;hcsr04.c'],['../group__drivers__hcsr04.html#gad5a6694b723bb25fc48e7a8750b8a77a',1,'hcsr04_set_temp(hcsr04_t *dev, uint16_t new_temp):&#160;hcsr04.c']]],
+  ['hcsr04_5ftemp_5fto_5fsound_5fspeed',['hcsr04_temp_to_sound_speed',['../group__drivers__hcsr04.html#ga3b2547facab2613e3113c2fd5d2bd6a8',1,'hcsr04_temp_to_sound_speed(uint16_t temperature):&#160;hcsr04.c'],['../group__drivers__hcsr04.html#ga3b2547facab2613e3113c2fd5d2bd6a8',1,'hcsr04_temp_to_sound_speed(uint16_t temp):&#160;hcsr04.c']]],
+  ['hcsr04_5ftrigger',['hcsr04_trigger',['../group__drivers__hcsr04.html#gabbfe6e650342e8cc67cf9c9e81b29335',1,'hcsr04_trigger(hcsr04_t *dev):&#160;hcsr04.c'],['../group__drivers__hcsr04.html#gabbfe6e650342e8cc67cf9c9e81b29335',1,'hcsr04_trigger(hcsr04_t *dev):&#160;hcsr04.c']]]
+];
