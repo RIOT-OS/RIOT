@@ -137,6 +137,23 @@ ifeq (auto,$(IOTLAB_NODE))
   endif
 endif
 
+# Handle IOTLAB_NODE specified with comma separated form
+# saclay,m3,1 => m3-1.saclay.iot-lab.info)
+IOTLAB_NODE_COMMA := $(subst $(comma), ,$(IOTLAB_NODE))
+ifneq ($(IOTLAB_NODE_COMMA),$(IOTLAB_NODE))
+  _IOTLAB_NODE_TYPE := $(word 2, $(IOTLAB_NODE_COMMA))
+  _IOTLAB_NODE_ID := $(firstword $(subst +, ,$(subst -, ,$(word 3, $(IOTLAB_NODE_COMMA)))))
+  _IOTLAB_SITE := $(word 1, $(IOTLAB_NODE_COMMA))
+  override IOTLAB_NODE := $(_IOTLAB_NODE_TYPE)-$(_IOTLAB_NODE_ID).$(_IOTLAB_SITE).iot-lab.info
+
+  # If launched from an IoT-LAB frontend, check that the frontends are matching
+  ifneq (,$(IOT_LAB_FRONTEND_FQDN))
+    ifneq ($(IOT_LAB_FRONTEND_FQDN),$(_IOTLAB_SITE).iot-lab.info)
+      $(error $(COLOR_RED)IoT-LAB Frontend doesn't match ($(IOT_LAB_FRONTEND_FQDN) != $(_IOTLAB_SITE).iot-lab.info)$(COLOR_RESET))
+    endif
+  endif
+endif
+
 # Work with node url without 'node-'
 override IOTLAB_NODE := $(patsubst node-%,%,$(IOTLAB_NODE))
 
