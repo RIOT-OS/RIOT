@@ -1,0 +1,121 @@
+/*
+ * Copyright (C) 2021 Silke Hofstra
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+#include "nanocbor/nanocbor.h"
+#include "saul_reg.h"
+#include "senml.h"
+#include "senml/cbor.h"
+#include "senml/phydat.h"
+#include "senml/saul.h"
+
+static inline void senml_encode_phydat_bool(nanocbor_encoder_t *enc,
+                                            const saul_reg_t *dev,
+                                            const phydat_t *data,
+                                            const uint8_t dim)
+{
+    senml_bool_value_t val = { .attr = { .name = dev->name } };
+
+    phydat_to_senml_bool(&val, data, dim);
+    senml_encode_bool_cbor(enc, &val);
+}
+
+static inline void senml_encode_phydat_time(nanocbor_encoder_t *enc,
+                                            const saul_reg_t *dev,
+                                            const phydat_t *data)
+{
+    senml_value_t val = { .attr = { .name = dev->name } };
+
+    phydat_time_to_senml(&val, data);
+    senml_encode_value_cbor(enc, &val);
+}
+
+static inline void senml_encode_phydat_date(nanocbor_encoder_t *enc,
+                                            const saul_reg_t *dev,
+                                            const phydat_t *data)
+{
+    senml_value_t val = { .attr = { .name = dev->name } };
+
+    phydat_date_to_senml(&val, data);
+    senml_encode_value_cbor(enc, &val);
+}
+
+static inline uint8_t senml_fix_unit(const saul_reg_t *dev, const uint8_t unit)
+{
+    // Fix the unit for relative humidity.
+    if (dev->driver->type == SAUL_SENSE_HUM &&
+        unit == SENML_UNIT_PERCENT) {
+        return SENML_UNIT_RELATIVE_HUMIDITY_PERCENT;
+    }
+    return unit;
+}
+
+static void senml_encode_phydat_float(nanocbor_encoder_t *enc,
+                                      const saul_reg_t *dev,
+                                      const phydat_t *data, const uint8_t dim)
+{
+    senml_value_t val = { .attr = { .name = dev->name } };
+
+    phydat_to_senml_float(&val, data, dim);
+    val.attr.unit = senml_fix_unit(dev, val.attr.unit);
+    senml_encode_value_cbor(enc, &val);
+}
+
+static void senml_encode_phydat_decimal(nanocbor_encoder_t *enc,
+                                        const saul_reg_t *dev,
+                                        const phydat_t *data, const uint8_t dim)
+{
+    senml_value_t val = { .attr = { .name = dev->name } };
+
+    phydat_to_senml_decimal(&val, data, dim);
+    val.attr.unit = senml_fix_unit(dev, val.attr.unit);
+    senml_encode_value_cbor(enc, &val);
+}
+
+size_t senml_saul_encode_cbor(uint8_t *buf, size_t len)
+{
+    phydat_t data;
+    nanocbor_encoder_t enc;
+    saul_reg_t *dev = saul_reg;
+
+    nanocbor_encoder_init(&enc, buf, len);
+    nanocbor_fmt_array_indefinite(&enc);
+
+    while (dev) {
+        int dim = saul_reg_read(dev, &data);
+        if (dim <= 0) {
+            return 0;
+        }
+
+        if (data.unit == UNIT_DATE) {
+            senml_encode_phydat_date(&enc, dev, &data);
+            continue;
+        }
+
+        if (data.unit == UNIT_TIME) {
+            senml_encode_phydat_time(&enc, dev, &data);
+            continue;
+        }
+
+        for (uint8_t i = 0; i < dim; i++) {
+            if (data.unit == UNIT_BOOL) {
+                senml_encode_phydat_bool(&enc, dev, &data, i);
+            }
+            else if (SENML_SAUL_USE_FLOATS) {
+                senml_encode_phydat_float(&enc, dev, &data, i);
+            }
+            else {
+                senml_encode_phydat_decimal(&enc, dev, &data, i);
+            }
+        }
+
+        dev = dev->next;
+    }
+
+    nanocbor_fmt_end_indefinite(&enc);
+    return nanocbor_encoded_len(&enc);
+}

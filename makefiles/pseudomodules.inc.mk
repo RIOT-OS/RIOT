@@ -125,6 +125,7 @@ PSEUDOMODULES += saul_pwm
 PSEUDOMODULES += scanf_float
 PSEUDOMODULES += sched_cb
 PSEUDOMODULES += semtech_loramac_rx
+PSEUDOMODULES += senml_%
 PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += slipdev_stdio
 PSEUDOMODULES += sock
