@@ -1,7 +1,6 @@
 config APPLICATION
     bool
     default y
-    imply MODULE_AUTO_INIT_SCREEN if BOARD_HAS_DISPLAY
     imply MODULE_DISP_DEV if BOARD_HAS_DISPLAY
     depends on TEST_KCONFIG
 

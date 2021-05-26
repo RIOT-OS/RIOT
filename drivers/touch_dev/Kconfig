@@ -8,5 +8,6 @@
 config MODULE_TOUCH_DEV
     bool "Touch device generic API"
     depends on TEST_KCONFIG
+    imply MODULE_AUTO_INIT_SCREEN
     help
         This API is experimental and in an early state - expect changes!
