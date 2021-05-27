@@ -31,7 +31,8 @@
  * you could use an IC such as the SN65HVD233.)
  *
  * Basically, UART TX and RX are connected to respective pins of the
- * transceiver. In addition, the RX pin can also be connected to the sense GPIO.
+ * transceiver. In addition, the RX pin can also be connected to the sense GPIO
+ * if the UART does not implement the `periph_uart_rxstart_irq` feature.
  * In this case, the bus allocation can be detected more precisely and
  * collisions are less likely.
  *
@@ -157,7 +158,9 @@ typedef struct {
     size_t recv_buf_ptr;                    /**< Index of the next empty octet of the recveive buffer */
     uart_t uart;                            /**< UART device to use */
     uint8_t uart_octet;                     /**< Last received octet */
+#if !defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
     gpio_t sense_pin;                       /**< GPIO to sense for start bits on the UART's rx line */
+#endif
     xtimer_t timeout;                       /**< Timeout timer ensuring always to get back to IDLE state */
     uint32_t timeout_base;                  /**< Base timeout in us */
 } dose_t;
@@ -167,7 +170,9 @@ typedef struct {
  */
 typedef struct {
     uart_t uart;                            /**< UART device to use */
+#if !defined(MODULE_PERIPH_UART_RXSTART_IRQ) || DOXYGEN
     gpio_t sense_pin;                       /**< GPIO to sense for start bits on the UART's rx line */
+#endif
     uint32_t baudrate;                      /**< Baudrate to UART device */
 } dose_params_t;
 
