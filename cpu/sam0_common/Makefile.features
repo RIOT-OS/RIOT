@@ -19,6 +19,7 @@ FEATURES_PROVIDED += periph_timer_periodic # implements timer_set_periodic()
 FEATURES_PROVIDED += periph_uart_modecfg
 FEATURES_PROVIDED += periph_uart_nonblocking
 FEATURES_PROVIDED += periph_uart_reconfigure
+FEATURES_PROVIDED += periph_uart_rxstart_irq
 FEATURES_PROVIDED += periph_wdt periph_wdt_cb periph_wdt_warning_period
 
 FEATURES_CONFLICT += periph_rtc:periph_rtt
