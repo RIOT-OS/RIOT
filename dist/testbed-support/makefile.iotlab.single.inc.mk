@@ -206,8 +206,8 @@ else
   FLASHER     = iotlab-ssh
   RESET       = iotlab-ssh
   _NODE_FMT   = --jmespath='keys(values(@)[0])[0]' --fmt='int'
-  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) flash-m3 $(_IOTLAB_NODELIST) $(FLASHFILE)
-  RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) reset-m3 $(_IOTLAB_NODELIST)
+  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) flash $(_IOTLAB_NODELIST) $(FLASHFILE)
+  RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) reset $(_IOTLAB_NODELIST)
 
   TERMPROG  = ssh
   ifeq (,$(IOT_LAB_FRONTEND_FQDN))
