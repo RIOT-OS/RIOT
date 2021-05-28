@@ -68,7 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     name: ${{ matrix.boards.riot }}
     env:
-      IOTLAB_NODE: auto-ssh
+      IOTLAB_NODE: auto
       BUILD_IN_DOCKER: 1
       # Force .bin files generation because these files are used to flash on IoT-LAB and
       # because compile_and_test_for_board forces RIOT_CI_BUILD which skip .bin
