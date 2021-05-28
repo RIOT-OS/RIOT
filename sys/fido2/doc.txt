@@ -13,10 +13,27 @@
  * FIDO2 is an authentication standard that seeks to solve the password problem
  * by enabling passwordless authentication. Instead of using passwords to
  * authenticate to web services, FIDO2 enables users to use common devices
- * (authenticators) to create cryptographic credentials
- * which are then used for authentication.
+ * (authenticators) to create cryptographic credentials which are then used
+ * for authentication. FIDO2 consists of the W3C Web Authentication
+ * specification (WebAuthn) and the Client to Authenticator Protocol (CTAP).
  *
- * FIDO2 consists of the W3C Web Authentication specification (WebAuthn)
- * and the Client to Authenticator Protocol (CTAP).
+ * This code implements the FIDO2 CTAP protocol.
+ *
+ * This is an experimental implementation not yet supporting all features of
+ * FIDO2 CTAP. In particular the missing features are:
+ *   * Backward compatibility with FIDO1
+ *   * Support of all attestation types. Currently only self attestation is
+ *     implemented. For more information about the available attestation
+ *     types refer to Webauthn specification (version 20190304) section 6.5.3.
+ *   * Support for NFC and BLE as underlying communication protocol
+ *
+ * The cryptographic credentials created to authenticate a user can either be
+ * stored on the authenticator (resident key) or stored by a relying party.
+ * If the credential is stored by a relying party the authenticator encrypts
+ * the credential before giving it to the relying party. This implementation
+ * stores resident credentials in flash memory using the flash page driver
+ * ( @ref drivers_periph_flashpage). The credentials, specifically the private
+ * keys, are currently stored unencrypted in flash memory.
+ * Non resident credentials are encrypted using AES-128 CCM.
  *
  */

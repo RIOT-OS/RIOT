@@ -139,8 +139,10 @@ extern "C" {
 
 /**
  * @brief Size of pin token
+ *
+ * Needs to be a multiple of 16 bytes (AES block length)
  */
-#define CTAP_PIN_TOKEN_SIZE 16
+#define CTAP_PIN_TOKEN_SZ 16
 
 /**
  * @brief Size of pin auth
