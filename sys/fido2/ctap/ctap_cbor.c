@@ -28,9 +28,9 @@ static int parse_pub_key_cred_params(CborValue *it,
                                      ctap_make_credential_req_t *req);
 static int parse_pub_key_cred_param(CborValue *it, uint8_t *cred_type,
                                     int32_t *alg_type);
-static int parse_allow_list(CborValue *it, CborValue *allow_list,
+static int parse_allow_list(CborValue *it, ctap_cred_desc_alt_t *allow_list,
                             size_t *allow_list_len);
-static int parse_exclude_list(CborValue *it, CborValue *exclude_list,
+static int parse_exclude_list(CborValue *it, ctap_cred_desc_alt_t *exclude_list,
                               size_t *exclude_list_len);
 static int parse_options(CborValue *it, ctap_options_t *options);
 static int parse_cose_key(CborValue *it, ctap_cose_key_t *cose_key);
@@ -775,7 +775,7 @@ int fido2_ctap_cbor_parse_get_assertion_req(ctap_get_assertion_req_t *req,
                 break;
             case CTAP_GA_REQ_ALLOW_LIST:
                 DEBUG("ctap_cbor: parse allow_list \n");
-                ret = parse_allow_list(&map, &req->allow_list,
+                ret = parse_allow_list(&map, req->allow_list,
                                        (size_t *)&req->allow_list_len);
                 break;
             case CTAP_GA_REQ_EXTENSIONS:
@@ -1011,7 +1011,7 @@ int fido2_ctap_cbor_parse_make_credential_req(ctap_make_credential_req_t *req,
                 break;
             case CTAP_MC_REQ_EXCLUDE_LIST:
                 DEBUG("ctap_cbor: parse excludeList \n");
-                ret = parse_exclude_list(&map, &req->exclude_list,
+                ret = parse_exclude_list(&map, req->exclude_list,
                                          &req->exclude_list_len);
                 break;
             case CTAP_MC_REQ_EXTENSIONS:
@@ -1513,17 +1513,18 @@ static int parse_options(CborValue *it, ctap_options_t *options)
     return CTAP2_OK;
 }
 
-static int parse_allow_list(CborValue *it, CborValue *allow_list,
+static int parse_allow_list(CborValue *it, ctap_cred_desc_alt_t *allow_list,
                             size_t *allow_list_len)
 {
     return parse_exclude_list(it, allow_list, allow_list_len);
 }
 
-static int parse_exclude_list(CborValue *it, CborValue *exclude_list,
+static int parse_exclude_list(CborValue *it, ctap_cred_desc_alt_t *exclude_list,
                               size_t *exclude_list_len)
 {
     int ret;
     int type;
+    CborValue arr;
 
     type = cbor_value_get_type(it);
     if (type != CborArrayType) {
@@ -1534,9 +1535,26 @@ static int parse_exclude_list(CborValue *it, CborValue *exclude_list,
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
-    ret = cbor_value_enter_container(it, exclude_list);
+
+    if (*exclude_list_len > CTAP_MAX_EXCLUDE_LIST_SIZE) {
+        *exclude_list_len = CTAP_MAX_EXCLUDE_LIST_SIZE;
+    }
+
+    ret = cbor_value_enter_container(it, &arr);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
+    }
+
+    for (uint8_t i = 0; i < *exclude_list_len; i++) {
+        /**
+         * parse the CBOR encoded PublicKeyCredentialDescriptors of the
+         * exclude list sent by the host.
+         */
+        ret = fido2_ctap_cbor_parse_cred_desc(&arr, exclude_list);
+
+        if (ret != CTAP2_OK) {
+            return ret;
+        }
     }
 
     return CTAP2_OK;

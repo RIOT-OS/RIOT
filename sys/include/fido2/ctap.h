@@ -440,11 +440,6 @@ extern "C" {
 /**
  * @brief Max size of allow list
  */
-#define CTAP_MAX_ALLOW_LIST_SIZE 0x10
-
-/**
- * @brief Max size of allow list
- */
 #define CTAP_MAX_EXCLUDE_LIST_SIZE 0x10
 
 /**
@@ -550,9 +545,9 @@ struct __attribute__((packed)) ctap_resident_key {
     uint8_t user_id_len;                        /**< length of the user id */
     uint8_t priv_key[CTAP_CRYPTO_KEY_SIZE];     /**< private key */
     uint32_t sign_count;                        /**< signature counter.
-                                                See webauthn specification
-                                                (version 20190304) section 6.1.1
-                                                for details. */
+                                                   See webauthn specification
+                                                   (version 20190304) section 6.1.1
+                                                   for details. */
     ctap_cred_desc_t cred_desc;                 /**< credential descriptor */
 };
 
@@ -582,34 +577,35 @@ struct ctap_cred_desc_alt {
  * @brief CTAP make credential request struct
  */
 typedef struct {
-    uint8_t client_data_hash[SHA256_DIGEST_LENGTH];     /**< SHA-256 hash of JSON serialized client data */
-    ctap_rp_ent_t rp;                                   /**< relying party */
-    ctap_user_ent_t user;                               /**< user */
-    ctap_options_t options;                             /**< parameters to influence authenticator operation */
-    CborValue exclude_list;                             /**< CBOR array holding exclude list */
-    size_t exclude_list_len;                            /**< length of CBOR exclude list array */
-    uint8_t pin_auth[CTAP_PIN_AUTH_SZ];                 /**< pin_auth if PIN is set */
-    size_t pin_auth_len;                                /**< pin_auth len */
-    bool pin_auth_present;                              /**< pin_auth present */
-    uint8_t pin_protocol;                               /**< PIN protocol version */
-    uint8_t cred_type;                                  /**< type of credential */
-    int32_t alg_type;                                   /**< cryptographic algorithm identifier */
+    uint8_t client_data_hash[SHA256_DIGEST_LENGTH];                 /**< SHA-256 hash of JSON serialized client data */
+    ctap_rp_ent_t rp;                                               /**< relying party */
+    ctap_user_ent_t user;                                           /**< user */
+    ctap_options_t options;                                         /**< parameters to influence authenticator operation */
+    ctap_cred_desc_alt_t exclude_list[CTAP_MAX_EXCLUDE_LIST_SIZE];  /**< exclude list */
+    size_t exclude_list_len;                                        /**< length of CBOR exclude list array */
+    uint8_t pin_auth[CTAP_PIN_AUTH_SZ];                             /**< pin_auth if PIN is set */
+    size_t pin_auth_len;                                            /**< pin_auth len */
+    bool pin_auth_present;                                          /**< pin_auth present */
+    uint8_t pin_protocol;                                           /**< PIN protocol version */
+    uint8_t cred_type;                                              /**< type of credential */
+    int32_t alg_type;                                               /**< cryptographic algorithm identifier */
+
 } ctap_make_credential_req_t;
 
 /**
  * @brief CTAP get assertion request struct
  */
 typedef struct {
-    uint8_t rp_id[CTAP_DOMAIN_NAME_MAX_SIZE + 1];       /**< Relying Party Identifier */
-    uint8_t rp_id_len;                                  /**< Actual Length of Relying Party Identifier */
-    uint8_t client_data_hash[SHA256_DIGEST_LENGTH];     /**< SHA-256 hash of JSON serialized client data */
-    ctap_options_t options;                             /**< parameters to influence authenticator operation */
-    CborValue allow_list;                               /**< cbor array holding allow list */
-    uint8_t allow_list_len;                             /**< length of CBOR allow list array */
-    uint8_t pin_auth[CTAP_PIN_AUTH_SZ];                 /**< pin_auth if PIN is set */
-    size_t pin_auth_len;                                /**< pin_auth length */
-    bool pin_auth_present;                              /**< indicate if pin_auth present */
-    uint8_t pin_protocol;                               /**< PIN protocol version */
+    uint8_t rp_id[CTAP_DOMAIN_NAME_MAX_SIZE + 1];                   /**< Relying Party Identifier */
+    uint8_t rp_id_len;                                              /**< Actual Length of Relying Party Identifier */
+    uint8_t client_data_hash[SHA256_DIGEST_LENGTH];                 /**< SHA-256 hash of JSON serialized client data */
+    ctap_options_t options;                                         /**< parameters to influence authenticator operation */
+    ctap_cred_desc_alt_t allow_list[CTAP_MAX_EXCLUDE_LIST_SIZE];    /**< allow list */
+    uint8_t allow_list_len;                                         /**< length of CBOR allow list array */
+    uint8_t pin_auth[CTAP_PIN_AUTH_SZ];                             /**< pin_auth if PIN is set */
+    size_t pin_auth_len;                                            /**< pin_auth length */
+    bool pin_auth_present;                                          /**< indicate if pin_auth present */
+    uint8_t pin_protocol;                                           /**< PIN protocol version */
 } ctap_get_assertion_req_t;
 
 /**
@@ -632,13 +628,13 @@ typedef struct {
  * @brief CTAP get_assertion state
  */
 typedef struct {
-    ctap_resident_key_t rks[CTAP_MAX_ALLOW_LIST_SIZE];  /**< eligible resident keys found */
-    uint8_t count;                                      /**< number of rks found  */
-    uint8_t cred_counter;                               /**< amount of creds sent to host */
-    uint32_t timer;                                     /**< time gap between get_next_assertion calls  */
-    bool uv;                                            /**< indicate if user verified */
-    bool up;                                            /**< indicate if user present */
-    uint8_t client_data_hash[SHA256_DIGEST_LENGTH];     /**< SHA-256 hash of JSON serialized client data */
+    ctap_resident_key_t rks[CTAP_MAX_EXCLUDE_LIST_SIZE];    /**< eligible resident keys found */
+    uint8_t count;                                          /**< number of rks found  */
+    uint8_t cred_counter;                                   /**< amount of creds sent to host */
+    uint32_t timer;                                         /**< time gap between get_next_assertion calls  */
+    bool uv;                                                /**< indicate if user verified */
+    bool up;                                                /**< indicate if user present */
+    uint8_t client_data_hash[SHA256_DIGEST_LENGTH];         /**< SHA-256 hash of JSON serialized client data */
 } ctap_get_assertion_state_t;
 
 /**
@@ -732,7 +728,7 @@ int fido2_ctap_init(void);
  *
  * @return size of CBOR encoded response data
  */
-size_t fido2_ctap_handle_request(uint8_t *req, size_t size, ctap_resp_t *resp,
+size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t size, ctap_resp_t *resp,
                                  bool (*should_cancel)(void));
 
 /**
@@ -750,9 +746,9 @@ size_t fido2_ctap_handle_request(uint8_t *req, size_t size, ctap_resp_t *resp,
  * @return CTAP status code
  */
 int fido2_ctap_get_sig(const uint8_t *auth_data, size_t auth_data_len,
-                              const uint8_t *client_data_hash,
-                              const ctap_resident_key_t *rk,
-                              uint8_t *sig, size_t *sig_len);
+                       const uint8_t *client_data_hash,
+                       const ctap_resident_key_t *rk,
+                       uint8_t *sig, size_t *sig_len);
 
 /**
  * @brief Check if requested algorithm is supported

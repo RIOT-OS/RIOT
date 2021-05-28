@@ -208,21 +208,27 @@ static int verify_pin_auth(uint8_t *auth, uint8_t *hash, size_t len);
 
 /**
  * @brief Check if authenticator is boot locked
+ *
+ * Authenticator needs to be rebooted in order to be used again.
  */
 static inline bool boot_locked(void);
 
 /**
  * @brief Check if authenticator is completely locked
+ *
+ * Authenticator needs to be reset, deleting all stored credentials, in order
+ * to be used again.
  */
 static inline bool locked(void);
 
 /**
- * @brief Get flashpage offset from @ref CTAP_RK_START_PAGE based on index i
+ * @brief Get flashpage number at offset i * @ref CTAP_PAD_RK_SZ from
+ *        @ref CTAP_RK_START_PAGE.
  */
-static inline uint16_t get_flashpage_offset(uint16_t i);
+static inline uint16_t get_flashpage_number(uint16_t i);
 
 /**
- * @brief Get offset into flashpage based on index i
+ * @brief Get offset into flashpage where flashpage = get_flashpage_number(i)
  */
 static inline uint16_t get_offset_into_flashpage(uint16_t i);
 
@@ -302,7 +308,7 @@ static void reset_state(void)
 
     fmt_hex_bytes(aaguid, CTAP_AAGUID);
 
-    memmove(g_state.config.aaguid, aaguid, sizeof(g_state.config.aaguid));
+    memcpy(g_state.config.aaguid, aaguid, sizeof(g_state.config.aaguid));
     write_state_to_flash(&g_state);
 }
 
@@ -314,6 +320,7 @@ size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t size, ctap_resp_t *res
 
     /* obtain CTAP method type from raw request */
     uint8_t method = *req_raw;
+
     req_raw++;
     size--;
 
@@ -321,63 +328,63 @@ size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t size, ctap_resp_t *res
 
     /* handle common error case */
     switch (method) {
-        case CTAP_MAKE_CREDENTIAL:
-        case CTAP_GET_ASSERTION:
-        case CTAP_GET_NEXT_ASSERTION: {
-            if (locked()) {
-                return CTAP2_ERR_PIN_BLOCKED;
-            }
-
-            if (boot_locked()) {
-                return CTAP2_ERR_PIN_AUTH_BLOCKED;
-            }
+    case CTAP_MAKE_CREDENTIAL:
+    case CTAP_GET_ASSERTION:
+    case CTAP_GET_NEXT_ASSERTION: {
+        if (locked()) {
+            return CTAP2_ERR_PIN_BLOCKED;
         }
+
+        if (boot_locked()) {
+            return CTAP2_ERR_PIN_AUTH_BLOCKED;
+        }
+    }
     }
 
     switch (method) {
-        case CTAP_GET_INFO:
-            DEBUG("fido2_ctap: get_info req \n");
-            resp->status = get_info(&encoder);
-            DEBUG("fido2_ctap: get_info resp: status: %u, size: %u \n",
-                  resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
-            return cbor_encoder_get_buffer_size(&encoder, buf);
-            break;
-        case CTAP_MAKE_CREDENTIAL:
-            DEBUG("fido2_ctap: make_credential req \n");
-            resp->status = make_credential(&encoder, req_raw, size, should_cancel);
-            DEBUG("fido2_ctap: make_credential resp: status: %u, size: %u \n",
-                  resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
-            return cbor_encoder_get_buffer_size(&encoder, buf);
-            break;
-        case CTAP_GET_ASSERTION:
-            DEBUG("fido2_ctap: get_assertion req \n");
-            resp->status = get_assertion(&encoder, size, req_raw, should_cancel);
-            DEBUG("fido2_ctap: get_assertion resp: status: %u, size: %u \n",
-                  resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
-            return cbor_encoder_get_buffer_size(&encoder, buf);
-            break;
-        case CTAP_GET_NEXT_ASSERTION:
-            DEBUG("fido2_ctap: get_next_assertion req \n");
-            resp->status = get_next_assertion(&encoder);
-            DEBUG("fido2_ctap: get_next_assertion resp: status: %u, size: %u \n",
-                  resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
-            return cbor_encoder_get_buffer_size(&encoder, buf);
-            break;
-        case CTAP_CLIENT_PIN:
-            DEBUG("fido2_ctap: client_pin req \n");
-            resp->status = client_pin(&encoder, size, req_raw, should_cancel);
-            DEBUG("fido2_ctap: client_pin resp: status: %u, size: %u \n",
-                  resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
-            return cbor_encoder_get_buffer_size(&encoder, buf);
-            break;
-        case CTAP_RESET:
-            DEBUG("fido2_ctap: reset req \n");
-            reset_state();
-            break;
-        default:
-            DEBUG("fido2_ctap: unknown req: %u \n", method);
-            resp->status = CTAP1_ERR_INVALID_COMMAND;
-            break;
+    case CTAP_GET_INFO:
+        DEBUG("fido2_ctap: get_info req \n");
+        resp->status = get_info(&encoder);
+        DEBUG("fido2_ctap: get_info resp: status: %u, size: %u \n",
+              resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
+        return cbor_encoder_get_buffer_size(&encoder, buf);
+        break;
+    case CTAP_MAKE_CREDENTIAL:
+        DEBUG("fido2_ctap: make_credential req \n");
+        resp->status = make_credential(&encoder, req_raw, size, should_cancel);
+        DEBUG("fido2_ctap: make_credential resp: status: %u, size: %u \n",
+              resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
+        return cbor_encoder_get_buffer_size(&encoder, buf);
+        break;
+    case CTAP_GET_ASSERTION:
+        DEBUG("fido2_ctap: get_assertion req \n");
+        resp->status = get_assertion(&encoder, size, req_raw, should_cancel);
+        DEBUG("fido2_ctap: get_assertion resp: status: %u, size: %u \n",
+              resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
+        return cbor_encoder_get_buffer_size(&encoder, buf);
+        break;
+    case CTAP_GET_NEXT_ASSERTION:
+        DEBUG("fido2_ctap: get_next_assertion req \n");
+        resp->status = get_next_assertion(&encoder);
+        DEBUG("fido2_ctap: get_next_assertion resp: status: %u, size: %u \n",
+              resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
+        return cbor_encoder_get_buffer_size(&encoder, buf);
+        break;
+    case CTAP_CLIENT_PIN:
+        DEBUG("fido2_ctap: client_pin req \n");
+        resp->status = client_pin(&encoder, size, req_raw, should_cancel);
+        DEBUG("fido2_ctap: client_pin resp: status: %u, size: %u \n",
+              resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
+        return cbor_encoder_get_buffer_size(&encoder, buf);
+        break;
+    case CTAP_RESET:
+        DEBUG("fido2_ctap: reset req \n");
+        reset_state();
+        break;
+    default:
+        DEBUG("fido2_ctap: unknown req: %u \n", method);
+        resp->status = CTAP1_ERR_INVALID_COMMAND;
+        break;
     }
 
     return 0;
@@ -394,7 +401,6 @@ static uint8_t make_credential(CborEncoder *encoder, uint8_t *req_raw,
     ctap_make_credential_req_t req = { 0 };
     ctap_auth_data_t auth_data = { 0 };
     ctap_resident_key_t k = { 0 };
-    ctap_cred_desc_alt_t exclude_list[CTAP_MAX_EXCLUDE_LIST_SIZE] = { 0 };
 
     /* set default values for options */
     req.options.rk = false;
@@ -411,38 +417,21 @@ static uint8_t make_credential(CborEncoder *encoder, uint8_t *req_raw,
     rk = req.options.rk;
 
     if (req.exclude_list_len > 0) {
-
-        if (req.exclude_list_len > CTAP_MAX_EXCLUDE_LIST_SIZE) {
-            req.exclude_list_len = CTAP_MAX_EXCLUDE_LIST_SIZE;
-        }
-
-        /**
-         * parse the CBOR encoded PublicKeyCredentialDescriptors of the
-         * exclude list sent by the host.
-         */
-        for (uint8_t i = 0; i < req.exclude_list_len; i++) {
-            ret = fido2_ctap_cbor_parse_cred_desc(&req.exclude_list,
-                                                  &exclude_list[i]);
-
-            if (ret != CTAP2_OK) {
-                return ret;
-            }
-        }
-
-        if (rks_exist(exclude_list, req.exclude_list_len, req.rp.id,
+        if (rks_exist(req.exclude_list, req.exclude_list_len, req.rp.id,
                       req.rp.id_len)) {
 #if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
             fido2_ctap_utils_user_presence_test();
 #endif
             return CTAP2_ERR_CREDENTIAL_EXCLUDED;
-        }    }
+        }
+    }
 
     /**
      * The user presence (up) check is mandatory for the MakeCredential method.
      * For the MakeCredential method the up key of the options dictionary,
      * which is part of the MakeCredential request, is not defined.
      * Therefore setting it is invalid for this method.
-    */
+     */
     if (req.options.up != -1) {
         return CTAP2_ERR_INVALID_OPTION;
     }
@@ -527,7 +516,6 @@ static int get_assertion(CborEncoder *encoder, size_t size, uint8_t *req_raw,
     bool up = false;
     ctap_get_assertion_req_t req = { 0 };
     ctap_auth_data_header_t auth_data = { 0 };
-    ctap_cred_desc_alt_t allow_list[CTAP_MAX_ALLOW_LIST_SIZE] = { 0 };
     ctap_resident_key_t *rk;
 
     memset(&g_assert_state, 0, sizeof(g_assert_state));
@@ -542,22 +530,10 @@ static int get_assertion(CborEncoder *encoder, size_t size, uint8_t *req_raw,
         return ret;
     }
 
-    if (req.allow_list_len > CTAP_MAX_ALLOW_LIST_SIZE) {
-        req.allow_list_len = CTAP_MAX_ALLOW_LIST_SIZE;
-    }
-
-    for (uint8_t i = 0; i < req.allow_list_len; i++) {
-        ret = fido2_ctap_cbor_parse_cred_desc(&req.allow_list, &allow_list[i]);
-
-        if (ret != CTAP2_OK) {
-            return ret;
-        }
-    }
-
     /* find eligble credentials */
     g_assert_state.count = find_matching_rks(g_assert_state.rks,
                                              sizeof(g_assert_state.rks),
-                                             allow_list,
+                                             req.allow_list,
                                              req.allow_list_len, req.rp_id,
                                              req.rp_id_len);
 
@@ -696,8 +672,8 @@ static int get_next_assertion(CborEncoder *encoder)
 
 
     ret = make_auth_data_next_assert(rk->rp_id_hash, &auth_data,
-                                    g_assert_state.uv, g_assert_state.up,
-                                    rk->sign_count);
+                                     g_assert_state.uv, g_assert_state.up,
+                                     rk->sign_count);
 
     if (ret != CTAP2_OK) {
         return ret;
@@ -775,25 +751,25 @@ static int client_pin(CborEncoder *encoder, size_t size, uint8_t *req_raw,
     }
 
     switch (req.sub_command) {
-        case CTAP_CP_REQ_SUB_COMMAND_GET_RETRIES:
-            ret = get_retries(encoder);
-            break;
-        case CTAP_CP_REQ_SUB_COMMAND_GET_KEY_AGREEMENT:
-            ret = get_key_agreement(encoder);
-            break;
-        case CTAP_CP_REQ_SUB_COMMAND_SET_PIN:
-            ret = set_pin(&req, should_cancel);
-            break;
-        case CTAP_CP_REQ_SUB_COMMAND_CHANGE_PIN:
-            ret = change_pin(&req, should_cancel);
-            break;
-        case CTAP_CP_REQ_SUB_COMMAND_GET_PIN_TOKEN:
-            ret = get_pin_token(encoder, &req, should_cancel);
-            break;
-        default:
-            ret = CTAP1_ERR_OTHER;
-            DEBUG("fido2_crap: clientpin - subcommand unknown %u \n",
-                  req.sub_command);
+    case CTAP_CP_REQ_SUB_COMMAND_GET_RETRIES:
+        ret = get_retries(encoder);
+        break;
+    case CTAP_CP_REQ_SUB_COMMAND_GET_KEY_AGREEMENT:
+        ret = get_key_agreement(encoder);
+        break;
+    case CTAP_CP_REQ_SUB_COMMAND_SET_PIN:
+        ret = set_pin(&req, should_cancel);
+        break;
+    case CTAP_CP_REQ_SUB_COMMAND_CHANGE_PIN:
+        ret = change_pin(&req, should_cancel);
+        break;
+    case CTAP_CP_REQ_SUB_COMMAND_GET_PIN_TOKEN:
+        ret = get_pin_token(encoder, &req, should_cancel);
+        break;
+    default:
+        ret = CTAP1_ERR_OTHER;
+        DEBUG("fido2_crap: clientpin - subcommand unknown %u \n",
+              req.sub_command);
     }
 
     return ret;
@@ -1104,20 +1080,23 @@ static inline bool boot_locked(void)
 
 static int decrement_pin_attempts(void)
 {
-    g_state.rem_pin_att--;
-    g_rem_pin_att_boot--;
+    if (g_state.rem_pin_att > 0) {
+        g_state.rem_pin_att--;
+    }
+
+    if (g_rem_pin_att_boot > 0) {
+        g_rem_pin_att_boot--;
+    }
 
     write_state_to_flash(&g_state);
 
-    if (g_state.rem_pin_att <= 0) {
+    if (locked()) {
         return CTAP2_ERR_PIN_BLOCKED;
     }
 
-    if (g_rem_pin_att_boot <= 0) {
+    if (boot_locked()) {
         return CTAP2_ERR_PIN_AUTH_BLOCKED;
     }
-
-    DEBUG("rem pin att boot: %d \n", g_rem_pin_att_boot);
 
     return CTAP2_OK;
 }
@@ -1143,7 +1122,7 @@ static int verify_pin_auth(uint8_t *auth, uint8_t *hash, size_t len)
     return CTAP2_OK;
 }
 
-static inline uint16_t get_flashpage_offset(uint16_t i)
+static inline uint16_t get_flashpage_number(uint16_t i)
 {
     return i / (FLASHPAGE_SIZE / CTAP_PAD_RK_SZ);
 }
@@ -1177,7 +1156,7 @@ static bool rks_exist(ctap_cred_desc_alt_t *li, size_t len, uint8_t *rp_id,
     }
 
     for (uint16_t i = 0; i < g_state.rk_amount_stored; i++) {
-        uint16_t page_offset = get_flashpage_offset(i);
+        uint16_t page_offset = get_flashpage_number(i);
         uint16_t page_offset_into_page = get_offset_into_flashpage(i);
 
         if (page_offset_into_page == 0) {
@@ -1238,7 +1217,7 @@ static uint8_t find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
         if (index >= rks_len) {
             break;
         }
-        uint16_t page_offset = get_flashpage_offset(i);
+        uint16_t page_offset = get_flashpage_number(i);
         uint16_t page_offset_into_page = get_offset_into_flashpage(i);
 
         if (page_offset_into_page == 0) {
@@ -1273,7 +1252,9 @@ static uint8_t find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
                 }
             }
             else {
-                /* no allow list so rp_id_hash match is enough */
+                /**
+                 * If there is no allow list we only compare rp_id_hash
+                 */
                 memmove(&rks[index], &rk, sizeof(rks[index]));
                 index++;
             }
@@ -1310,7 +1291,7 @@ static int save_rk(ctap_resident_key_t *rk)
 
     if (g_state.rk_amount_stored > 0) {
         for (uint16_t i = 0; i <= g_state.rk_amount_stored; i++) {
-            page_offset = get_flashpage_offset(i);
+            page_offset = get_flashpage_number(i);
             page_offset_into_page = get_offset_into_flashpage(i);
 
             if (i == g_state.rk_amount_stored) {
