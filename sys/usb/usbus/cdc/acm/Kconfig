@@ -43,4 +43,10 @@ config USBUS_CDC_ACM_BULK_EP_SIZE_64
 
 endchoice
 
+config USBUS_CDC_ACM_STDIO_BLOCKING
+    bool "USB CDC ACM blocking mode"
+    help
+        Configure if STDIO should block on input when pending bytes over
+        the USB connection cannot be immediately consumed.
+
 endif # KCONFIG_USEMODULE_USBUS_CDC_ACM
