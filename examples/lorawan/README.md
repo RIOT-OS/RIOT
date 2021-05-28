@@ -75,7 +75,7 @@ for that device.
 
 2. flash device, set appropriate keys and test
 
-    $ DEVEUI=<device eui> APPEUI=<application eui> APPKEY=<application key> IOTLAB_NODE=auto-ssh make -C examples/lorawan/ flash test
+    $ DEVEUI=<device eui> APPEUI=<application eui> APPKEY=<application key> IOTLAB_NODE=auto make -C examples/lorawan/ flash test
 
 3. stop the iotlab experiment:
 

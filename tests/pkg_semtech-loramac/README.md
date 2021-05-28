@@ -256,7 +256,7 @@ for ABP. The test assumes that both devices have the same Application EUI.
 
 2. flash device with the appropriate keys and test
 
-    $ DEVEUI=<...> APPEUI=<...> APPKEY=<...> DEVADDR=<...> NWKSKEY=<...> APPSKEY=<...> RX2_DR=<...> IOTLAB_NODE=auto-ssh make -C tests/pkg_semtech-loramac flash test
+    $ DEVEUI=<...> APPEUI=<...> APPKEY=<...> DEVADDR=<...> NWKSKEY=<...> APPSKEY=<...> RX2_DR=<...> IOTLAB_NODE=auto make -C tests/pkg_semtech-loramac flash test
 
 3. stop the iotlab experiment:
 
