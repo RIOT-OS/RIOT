@@ -55,6 +55,7 @@ int hcsr04_init(hcsr04_t *dev, const hcsr04_params_t *params)
 
     mutex_init(&dev->lock);
     dev->distance = 0;
+    dev->was_triggered = 0;
     dev->pre_trig_t_us = xtimer_now_usec();
     dev->pre_meas_t_us = xtimer_now_usec();
     hcsr04_set_temp(dev, params->temperature);
@@ -86,6 +87,7 @@ int hcsr04_trigger(hcsr04_t *dev)
         return -EFREQ;
     }
     
+    dev->was_triggered = 1;
     dev->pre_trig_t_us = now;
     gpio_set(dev->params.trigger_pin);
     xtimer_usleep(TRIGGER_TIME);
@@ -99,6 +101,13 @@ int hcsr04_trigger(hcsr04_t *dev)
 
 int hcsr04_read(hcsr04_t *dev, uint16_t *distance)
 {
+    if (!dev->was_triggered) {
+        *distance = 0;
+        return -ENTR;
+    }
+
+    dev->was_triggered = 0;
+
     // try to lock it again, should be released when it is unlocked or cause of timeout
     uint16_t min_response_time = hcsr04_get_max_response_time(dev);
     int status = xtimer_mutex_lock_timeout(&dev->lock, min_response_time);
@@ -159,7 +168,9 @@ void hcsr04_deinit(hcsr04_t *dev)
     dev->params.trigger_pin = 0;
     dev->params.echo_pin = 0;
 
+    mutex_unlock(&dev->lock);
     dev->distance = 0;
+    dev->was_triggered = 0;
     dev->sound_speed = 0;
     dev->pre_trig_t_us = 0;
     dev->pre_meas_t_us = 0;

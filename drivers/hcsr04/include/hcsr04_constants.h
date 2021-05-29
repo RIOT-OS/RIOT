@@ -31,7 +31,7 @@ extern "C" {
 /**
  * @brief   Integer representing error in reading frequency
  */
-#define EFREQ                                (12345U)
+#define EFREQ                               (12345U)
 
 /**
  * @name    HC-SR04 connection error value
@@ -42,6 +42,17 @@ extern "C" {
  * @brief   Integer representing error in hardware connection
  */
 #define ECON                                (1234U)
+
+/**
+ * @name    HC-SR04 no trigger error value
+ * @{
+ */
+
+/**
+ * @brief   Integer representing error when no trigger was called prior to a read
+ */
+#define ENTR                                (2341U)
+
 
 /**
  * @name    HC-SR04 trigger duration

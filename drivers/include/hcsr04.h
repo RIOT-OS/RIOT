@@ -51,6 +51,7 @@ typedef struct {
  */
 typedef struct {
     mutex_t lock;
+    uint8_t was_triggered;
     uint16_t distance;
     uint16_t sound_speed;
     uint32_t pre_trig_t_us;

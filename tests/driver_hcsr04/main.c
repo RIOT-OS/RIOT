@@ -31,6 +31,7 @@ int main(void)
         printf("Initialization failed with error code %d\n", retval);
         return retval;
     }
+
     puts("\n********** HC-SR04 initialized succesfully! **********\n"); 
 
     // ================ Test Temperature setup ================
@@ -52,7 +53,7 @@ int main(void)
     uint16_t distance = 0;
     timer = xtimer_now_usec();
     while ((xtimer_now_usec() - timer) < TEST_TIME) {
-        status = hcsr04_trigger(&dev);
+        //status = hcsr04_trigger(&dev);
         
         status = hcsr04_read(&dev, &distance);
         
