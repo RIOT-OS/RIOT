@@ -13,7 +13,8 @@
 #define TEST_CONVERTION_MACRO(x)                
 
 
-int main(void) {
+int main(void) 
+{
     puts("********** Test HC-SR04 RIOT driver! **********");
 
     // deactivate saul auto-initialization, due to conflict when both work at the same time
@@ -94,6 +95,3 @@ int main(void) {
 
     return 0;
 }
-
-
-

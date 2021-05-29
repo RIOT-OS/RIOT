@@ -1,6 +1,5 @@
 ifneq (,$(filter hcsr04,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_gpio
-  USEMODULE += periph_gpio_irq
+  FEATURES_REQUIRED += periph_gpio periph_gpio_irq
   USEMODULE += xtimer
 endif
 
