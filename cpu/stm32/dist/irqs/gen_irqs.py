@@ -58,7 +58,7 @@ def list_cpu_lines(cpu_fam):
         headers.remove("partition_stm32l5xx.h")
     headers.remove("stm32{}xx.h".format(cpu_fam))
     headers.remove("system_stm32{}xx.h".format(cpu_fam))
-    return [header.split(".")[0] for header in headers]
+    return sorted([header.split(".")[0] for header in headers])
 
 
 def irq_numof(cpu_fam, cpu_line):
