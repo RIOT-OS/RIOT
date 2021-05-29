@@ -9,7 +9,7 @@
 #include "hcsr04.h"
 
 
-#define TEST_TIME                               (3e6)
+#define TEST_TIME                               (5e6)
 #define TEST_CONVERTION_MACRO(x)                
 
 
@@ -18,7 +18,7 @@ int main(void)
     puts("********** Test HC-SR04 RIOT driver! **********");
 
     // deactivate saul auto-initialization, due to conflict when both work at the same time
-    saul_reg_rm(saul_reg_find_name(hcsr04_saul_info[0].name));
+    // saul_reg_rm(saul_reg_find_name(hcsr04_saul_info[0].name));
 
     int retval;
     hcsr04_t dev;
@@ -48,48 +48,55 @@ int main(void)
     // ================ Test Reading with trigger/read ================
     puts("\n********** Testing hcsr04 trigger/read **********\n");
     
-    uint16_t distance;
+    int status;
+    uint16_t distance = 0;
     timer = xtimer_now_usec();
     while ((xtimer_now_usec() - timer) < TEST_TIME) {
-        assert(hcsr04_trigger(&dev) == 0);
-        xtimer_msleep(30);
-        assert(hcsr04_read(&dev, &distance) == 0);
-        printf("Distance measure: %i mm\n", distance);
-        xtimer_msleep(170);
+        status = hcsr04_trigger(&dev);
+        
+        status = hcsr04_read(&dev, &distance);
+        
+        if (status < 0) {
+            printf("Error with status %i\n", status);
+        } else {
+            printf("Distance measure: %i mm\n", distance);
+        }
+        
+        xtimer_msleep(40);
     }
 
     // ================ Test Reading with get_distance ================
-    puts("\n********** Testing hcsr04 get_distance **********\n");
+    // puts("\n********** Testing hcsr04 get_distance **********\n");
     
-    timer = xtimer_now_usec();
-    while ((xtimer_now_usec() - timer) < TEST_TIME) {
-        assert(hcsr04_get_distance(&dev, &distance) == 0);
-        printf("Distance measure: %i mm\n", distance);
-        xtimer_msleep(170);
-    }
+    // timer = xtimer_now_usec();
+    // while ((xtimer_now_usec() - timer) < TEST_TIME) {
+    //     assert(hcsr04_get_distance(&dev, &distance) == 0);
+    //     printf("Distance measure: %i mm\n", distance);
+    //     xtimer_msleep(170);
+    // }
 
     // ================ Test reading with SAUL ================
-    puts("\n********** Testing hcsr04 saul read **********\n");
+    // puts("\n********** Testing hcsr04 saul read **********\n");
     
-    // settings up again saul registry
-    phydat_t res;
-    saul_reg_t hcsr04_saul_entry;
+    // // settings up again saul registry
+    // phydat_t res;
+    // saul_reg_t hcsr04_saul_entry;
 
-    extern const saul_driver_t hcsr04_distance_saul_driver;
+    // extern const saul_driver_t hcsr04_distance_saul_driver;
 
-    hcsr04_saul_entry.dev = &(dev);
-    hcsr04_saul_entry.name = hcsr04_saul_info[0].name;
-    hcsr04_saul_entry.driver = &hcsr04_distance_saul_driver;
+    // hcsr04_saul_entry.dev = &(dev);
+    // hcsr04_saul_entry.name = hcsr04_saul_info[0].name;
+    // hcsr04_saul_entry.driver = &hcsr04_distance_saul_driver;
 
-    saul_reg_add(&hcsr04_saul_entry);    
+    // saul_reg_add(&hcsr04_saul_entry);    
 
-    timer = xtimer_now_usec();
-    while ((xtimer_now_usec() - timer) < TEST_TIME) {
-        int dim = saul_reg_read(&hcsr04_saul_entry, &res);
-        phydat_dump(&res, dim);
-        printf("%i\n", dim);
-        xtimer_msleep(170);
-    }
+    // timer = xtimer_now_usec();
+    // while ((xtimer_now_usec() - timer) < TEST_TIME) {
+    //     int dim = saul_reg_read(&hcsr04_saul_entry, &res);
+    //     phydat_dump(&res, dim);
+    //     printf("%i\n", dim);
+    //     xtimer_msleep(170);
+    // }
 
     puts("\n********** HC-SR04 testing finished **********\n");
 

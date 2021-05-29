@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include "hcsr04_constants.h"
 #include "periph/gpio.h"
+#include "mutex.h"
 
 
 /* Add header includes here */
@@ -49,6 +50,7 @@ typedef struct {
  * @brief   Device descriptor of a HC-SR04 sensor
  */
 typedef struct {
+    mutex_t lock;
     uint16_t distance;
     uint16_t sound_speed;
     uint32_t pre_trig_t_us;
@@ -64,7 +66,6 @@ typedef struct {
  *
  * @return                  EINVAL of invalid parameters
  * @return                  EIO of hardware initialization failure
- * @return                  ECON if connection issue is detected
  * @return                  0 on success
  *
  * After called it checks the parameters, calculates the sound speed
@@ -72,6 +73,19 @@ typedef struct {
  * performs a check reading to see if the sensor's echo pin works
  */
 int hcsr04_init(hcsr04_t *dev, const hcsr04_params_t *params);
+
+/**
+ * @brief   Returns the max time required for the sound pulse to travel
+ *
+ * @param[inout] dev        Device descriptor of the driver
+ *
+ * @return                  Sound pulse time travel in micro seconds
+ *
+ * Using the current sound speed and the max read distance, it calculates
+ * the time required for the sound pulse to travel back and forth. This time 
+ * is effectively the minimum period between successive read cycles of the hcsr04. 
+ */
+uint32_t hcsr04_get_max_response_time(hcsr04_t *dev);
 
 /**
  * @brief   Starts a measurement by triggering the HC-SR04 device
