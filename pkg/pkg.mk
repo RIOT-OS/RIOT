@@ -113,7 +113,10 @@ $(PKG_PATCHED): $(PKG_PATCHED_PREREQUISITES)
 
 $(PKG_DOWNLOADED): $(MAKEFILE_LIST) | $(PKG_SOURCE_DIR)/.git
 	$(info [INFO] updating $(PKG_NAME) $(PKG_DOWNLOADED))
-	$(Q)$(GIT_IN_PKG) fetch $(GIT_QUIET) $(PKG_URL) $(PKG_VERSION)
+	$(Q)if ! $(GIT_IN_PKG) cat-file -e $(PKG_VERSION); then \
+		printf "[INFO] fetching new $(PKG_NAME) version "$(PKG_VERSION)"\n"; \
+		$(GIT_IN_PKG) fetch $(GIT_QUIET) "$(PKG_URL)" "$(PKG_VERSION)"; \
+	fi
 	echo $(PKG_VERSION) > $@
 
 $(PKG_SOURCE_DIR)/.git: | $(PKG_CUSTOM_PREPARED)
