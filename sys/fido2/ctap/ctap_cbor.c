@@ -17,32 +17,100 @@
 
 #include "xtimer.h"
 
+#include "fido2/ctap/ctap_cbor.h"
+
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#include "fido2/ctap/ctap_cbor.h"
-
+/**
+ * @brief Parse CBOR encoded PublicKeyCredentialRpEntity data structure into
+ *        @ref ctap_rp_ent_t struct
+ */
 static int parse_rp(CborValue *it, ctap_rp_ent_t *rp);
+
+/**
+ * @brief Parse CBOR encoded PublicKeyCredentialUserEntity data structure into
+ *        @ref ctap_user_ent_t struct
+ */
 static int parse_user(CborValue *it, ctap_user_ent_t *user);
-static int parse_pub_key_cred_params(CborValue *it,
-                                     ctap_make_credential_req_t *req);
-static int parse_pub_key_cred_param(CborValue *it, uint8_t *cred_type,
-                                    int32_t *alg_type);
-static int parse_allow_list(CborValue *it, ctap_cred_desc_alt_t *allow_list,
-                            size_t *allow_list_len);
+
+/**
+ * @brief Parse CBOR encoded sequence of PublicKeyCredentialDescriptors into
+ *        @ref ctap_cred_desc_alt_t struct
+ */
 static int parse_exclude_list(CborValue *it, ctap_cred_desc_alt_t *exclude_list,
                               size_t *exclude_list_len);
+
+/**
+ * @brief Parse CBOR encoded sequence of PublicKeyCredentialDescriptors into
+ *        @ref ctap_cred_desc_alt_t struct
+ */
+static int parse_allow_list(CborValue *it, ctap_cred_desc_alt_t *allow_list,
+                            size_t *allow_list_len);
+
+/**
+ * @brief Parse CBOR encoded sequence of PublicKeyCredentialType and cryptographic
+ *        algorithm type pairs and check if the combination is supported
+ */
+static int parse_pub_key_cred_params(CborValue *it,
+                                     ctap_make_credential_req_t *req);
+
+/**
+ * @brief Parse CBOR encoded PublicKeyCredentialType and cryptographic
+ *        algorithm type
+ */
+static int parse_pub_key_cred_param(CborValue *it, uint8_t *cred_type,
+                                    int32_t *alg_type);
+
+/**
+ * @brief Parse CBOR encoded map of authenticator options into @ref ctap_options_t
+ *        struct
+ */
 static int parse_options(CborValue *it, ctap_options_t *options);
-static int parse_cose_key(CborValue *it, ctap_cose_key_t *cose_key);
-static int encode_cose_key(CborEncoder *cose_key, const ctap_cose_key_t *key);
+
+/**
+ * @brief Parse public key in COSE_KEY format into ctap_public_key_cose_t struct
+ */
+static int parse_public_key_cose(CborValue *it, ctap_public_key_cose_t *cose_key);
+
+/**
+ * @brief Parse CBOR encoded fixed length array into dst
+ */
+static int parse_fixed_len_byte_array(CborValue *map, uint8_t *dst,
+                                      size_t *len);
+
+/**
+ * @brief Parse CBOR encoded unknown length array into dst
+ */
+static int parse_byte_array(CborValue *it, uint8_t *dst, size_t *len);
+
+/**
+ * @brief Parse CBOR encoded string into dst
+ */
+static int parse_text_string(CborValue *it, char *dst, size_t *len);
+
+/**
+ * @brief Parse CBOR encoded int into num
+ */
+static int parse_int(CborValue *it, int *num);
+
+/**
+ * @brief Encode public key into COSE_KEY format
+ *
+ * See https://tools.ietf.org/html/rfc8152#page-34 Section 13.1.1 for details.
+ */
+static int encode_public_key_cose(CborEncoder *cose_key, const ctap_public_key_cose_t *key);
+
+/**
+ * @brief Encode PublicKeyCredentialDescriptor into CBOR format
+ */
 static int encode_credential(CborEncoder *encoder, const void *cred_ptr,
                              bool rk);
+
+/**
+ * @brief Encode PublicKeyCredentialUserEntity into CBOR format
+ */
 static int encode_user_entity(CborEncoder *it, const ctap_resident_key_t *rk);
-static int parse_fixed_size_byte_array(CborValue *map, uint8_t *dst,
-                                       size_t *len);
-static int parse_byte_array(CborValue *it, uint8_t *dst, size_t *len);
-static int parse_text_string(CborValue *it, char *dst, size_t *len);
-static int parse_int(CborValue *it, int *num);
 
 int fido2_ctap_cbor_encode_info(CborEncoder *encoder, const ctap_info_t *info)
 {
@@ -53,7 +121,8 @@ int fido2_ctap_cbor_encode_info(CborEncoder *encoder, const ctap_info_t *info)
     CborEncoder array;
     CborEncoder array2;
 
-    ret = cbor_encoder_create_map(encoder, &map, 5);
+    /* CTAP_CBOR_INFO_MAP_SZ - 1 due to no extensions being supported atm */
+    ret = cbor_encoder_create_map(encoder, &map, CTAP_CBOR_INFO_MAP_SZ - 1);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -66,7 +135,7 @@ int fido2_ctap_cbor_encode_info(CborEncoder *encoder, const ctap_info_t *info)
     }
 
     /* encode versions */
-    ret = cbor_encode_uint(&map, CTAP_GET_INFO_RESP_VERSIONS);
+    ret = cbor_encode_uint(&map, CTAP_CBOR_GET_INFO_RESP_VERSIONS);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -75,13 +144,13 @@ int fido2_ctap_cbor_encode_info(CborEncoder *encoder, const ctap_info_t *info)
         return CTAP2_ERR_CBOR_PARSING;
     }
     if (info->versions & CTAP_VERSION_FLAG_FIDO) {
-        ret = cbor_encode_text_stringz(&array, CTAP_VERSION_STRING_FIDO);
+        ret = cbor_encode_text_stringz(&array, CTAP_CBOR_VERSION_STRING_FIDO);
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
     }
     if (info->versions & CTAP_VERSION_FLAG_FIDO_PRE) {
-        ret = cbor_encode_text_stringz(&array, CTAP_VERSION_STRING_FIDO_PRE);
+        ret = cbor_encode_text_stringz(&array, CTAP_CBOR_VERSION_STRING_FIDO_PRE);
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
@@ -95,7 +164,7 @@ int fido2_ctap_cbor_encode_info(CborEncoder *encoder, const ctap_info_t *info)
     /* todo: encode supported extensions once implemented */
 
     /* encode aaguid */
-    ret = cbor_encode_uint(&map, CTAP_GET_INFO_RESP_AAGUID);
+    ret = cbor_encode_uint(&map, CTAP_CBOR_GET_INFO_RESP_AAGUID);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -121,7 +190,7 @@ int fido2_ctap_cbor_encode_info(CborEncoder *encoder, const ctap_info_t *info)
 
     /* encode options */
     /* order of the items is important. needs to be canonical CBOR */
-    ret = cbor_encode_uint(&map, CTAP_GET_INFO_RESP_OPTIONS);
+    ret = cbor_encode_uint(&map, CTAP_CBOR_GET_INFO_RESP_OPTIONS);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -132,22 +201,24 @@ int fido2_ctap_cbor_encode_info(CborEncoder *encoder, const ctap_info_t *info)
 
     if (info->options & CTAP_INFO_OPTIONS_FLAG_RK) {
         ret =
-            cbor_encode_text_string(&map2, CTAP_GET_INFO_RESP_OPTIONS_ID_RK, 2);
+            cbor_encode_text_string(&map2, CTAP_GET_INFO_RESP_OPTIONS_ID_RK,
+                                    strlen(CTAP_GET_INFO_RESP_OPTIONS_ID_RK));
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
-        ret = cbor_encode_boolean(&map2, 1);
+        ret = cbor_encode_boolean(&map2, true);
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
     }
     if (info->options & CTAP_INFO_OPTIONS_FLAG_UP) {
         ret =
-            cbor_encode_text_string(&map2, CTAP_GET_INFO_RESP_OPTIONS_ID_UP, 2);
+            cbor_encode_text_string(&map2, CTAP_GET_INFO_RESP_OPTIONS_ID_UP,
+                                    strlen(CTAP_GET_INFO_RESP_OPTIONS_ID_UP));
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
-        ret = cbor_encode_boolean(&map2, 1);
+        ret = cbor_encode_boolean(&map2, true);
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
@@ -155,22 +226,23 @@ int fido2_ctap_cbor_encode_info(CborEncoder *encoder, const ctap_info_t *info)
     /* default for up is true so need to set false explicitly if not supported */
     else {
         ret =
-            cbor_encode_text_string(&map2, CTAP_GET_INFO_RESP_OPTIONS_ID_UP, 2);
+            cbor_encode_text_string(&map2, CTAP_GET_INFO_RESP_OPTIONS_ID_UP,
+                                    strlen(CTAP_GET_INFO_RESP_OPTIONS_ID_UP));
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
-        ret = cbor_encode_boolean(&map2, 0);
+        ret = cbor_encode_boolean(&map2, false);
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
     }
     if (info->options & CTAP_INFO_OPTIONS_FLAG_PLAT) {
         ret = cbor_encode_text_string(&map2, CTAP_GET_INFO_RESP_OPTIONS_ID_PLAT,
-                                      4);
+                                      strlen(CTAP_GET_INFO_RESP_OPTIONS_ID_PLAT));
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
-        ret = cbor_encode_boolean(&map2, 1);
+        ret = cbor_encode_boolean(&map2, true);
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
@@ -178,18 +250,18 @@ int fido2_ctap_cbor_encode_info(CborEncoder *encoder, const ctap_info_t *info)
     if (info->options & CTAP_INFO_OPTIONS_FLAG_CLIENT_PIN) {
         ret = cbor_encode_text_string(&map2,
                                       CTAP_GET_INFO_RESP_OPTIONS_ID_CLIENT_PIN,
-                                      9);
+                                      strlen(CTAP_GET_INFO_RESP_OPTIONS_ID_CLIENT_PIN));
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
         if (info->pin_is_set) {
-            ret = cbor_encode_boolean(&map2, 1);
+            ret = cbor_encode_boolean(&map2, true);
             if (ret != CborNoError) {
                 return CTAP2_ERR_CBOR_PARSING;
             }
         }
         else {
-            ret = cbor_encode_boolean(&map2, 0);
+            ret = cbor_encode_boolean(&map2, false);
             if (ret != CborNoError) {
                 return CTAP2_ERR_CBOR_PARSING;
             }
@@ -202,7 +274,7 @@ int fido2_ctap_cbor_encode_info(CborEncoder *encoder, const ctap_info_t *info)
     }
 
     /* encode maxMsgSize */
-    ret = cbor_encode_uint(&map, CTAP_GET_INFO_RESP_MAX_MSG_SIZE);
+    ret = cbor_encode_uint(&map, CTAP_CBOR_GET_INFO_RESP_MAX_MSG_SIZE);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -212,11 +284,11 @@ int fido2_ctap_cbor_encode_info(CborEncoder *encoder, const ctap_info_t *info)
     }
 
     /* encode pinProtocols */
-    ret = cbor_encode_uint(&map, CTAP_GET_INFO_RESP_PIN_PROTOCOLS);
+    ret = cbor_encode_uint(&map, CTAP_CBOR_GET_INFO_RESP_PIN_PROTOCOLS);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
-    ret = cbor_encoder_create_array(&map, &array2, 1);
+    ret = cbor_encoder_create_array(&map, &array2, CTAP_AMT_SUP_PIN_VER);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -267,13 +339,15 @@ int fido2_ctap_cbor_encode_assertion_object(CborEncoder *encoder,
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    ret = cbor_encode_int(&map, CTAP_GA_RESP_CREDENTIAL);
+    ret = cbor_encode_int(&map, CTAP_CBOR_GA_RESP_CREDENTIAL);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    /* encode credential */
-    /* if not a resident key, encrypt key and store it in credential id */
+    /**
+     * encode credential
+     * if not a resident key encrypt key and store it in credential id
+     */
     if (!is_resident) {
         ret = fido2_ctap_encrypt_rk(rk, rk->cred_desc.nonce,
                                     sizeof(rk->cred_desc.nonce), &id);
@@ -293,7 +367,7 @@ int fido2_ctap_cbor_encode_assertion_object(CborEncoder *encoder,
     }
 
     /* encode auth data */
-    ret = cbor_encode_int(&map, CTAP_GA_RESP_AUTH_DATA);
+    ret = cbor_encode_int(&map, CTAP_CBOR_GA_RESP_AUTH_DATA);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -313,7 +387,7 @@ int fido2_ctap_cbor_encode_assertion_object(CborEncoder *encoder,
     }
 
     /* encode signature */
-    ret = cbor_encode_int(&map, CTAP_GA_RESP_SIGNATURE);
+    ret = cbor_encode_int(&map, CTAP_CBOR_GA_RESP_SIGNATURE);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -324,7 +398,7 @@ int fido2_ctap_cbor_encode_assertion_object(CborEncoder *encoder,
 
     /* user_id mandatory if resident credential */
     if (is_resident) {
-        ret = cbor_encode_int(&map, CTAP_GA_RESP_USER);
+        ret = cbor_encode_int(&map, CTAP_CBOR_GA_RESP_USER);
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
@@ -336,7 +410,7 @@ int fido2_ctap_cbor_encode_assertion_object(CborEncoder *encoder,
 
     /* if more than 1 valid credential found, encode amount of eligible creds found */
     if (valid_cred_count > 1) {
-        ret = cbor_encode_int(&map, CTAP_GA_RESP_NUMBER_OF_CREDENTIALS);
+        ret = cbor_encode_int(&map, CTAP_CBOR_GA_RESP_NUMBER_OF_CREDENTIALS);
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
@@ -366,7 +440,7 @@ int fido2_ctap_cbor_encode_attestation_object(CborEncoder *encoder,
     uint8_t *cose_key_buf;
     uint8_t sig_buf[CTAP_CRYPTO_ES256_DER_MAX_SIZE];
     size_t sig_buf_len = sizeof(sig_buf);
-    uint8_t auth_data_buf[512] = { 0 };
+    uint8_t auth_data_buf[CTAP_CBOR_ATT_STMT_AUTH_DATA_SZ] = { 0 };
     const ctap_attested_cred_data_header_t *cred_header;
     CborEncoder map;
     CborEncoder cose_key;
@@ -380,17 +454,17 @@ int fido2_ctap_cbor_encode_attestation_object(CborEncoder *encoder,
                      sizeof(cred_header->cred_len_h) + \
                      sizeof(cred_header->cred_len_h);
 
-    ret = cbor_encoder_create_map(encoder, &map, 3);
+    ret = cbor_encoder_create_map(encoder, &map, CTAP_CBOR_ATTESTATION_MAP_SZ);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
     /* packed attestation format (webauthn specification (version 20190304) section 8.2) */
-    ret = cbor_encode_int(&map, CTAP_MC_RESP_FMT);
+    ret = cbor_encode_int(&map, CTAP_CBOR_MC_RESP_FMT);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
-    ret = cbor_encode_text_stringz(&map, "packed");
+    ret = cbor_encode_text_string(&map, CTAP_CBOR_STR_PACKED, strlen(CTAP_CBOR_STR_PACKED));
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -410,14 +484,14 @@ int fido2_ctap_cbor_encode_attestation_object(CborEncoder *encoder,
                       0);
 
     /* encode credential public key into COSE format */
-    ret = encode_cose_key(&cose_key, &auth_data->attested_cred_data.key);
+    ret = encode_public_key_cose(&cose_key, &auth_data->attested_cred_data.key);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
     offset += cbor_encoder_get_buffer_size(&cose_key, cose_key_buf);
 
     /* encode the authenticator data */
-    ret = cbor_encode_int(&map, CTAP_MC_RESP_AUTH_DATA);
+    ret = cbor_encode_int(&map, CTAP_CBOR_MC_RESP_AUTH_DATA);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -435,17 +509,17 @@ int fido2_ctap_cbor_encode_attestation_object(CborEncoder *encoder,
     }
 
     /* encode attestation statement */
-    ret = cbor_encode_int(&map, CTAP_MC_RESP_ATT_STMT);
+    ret = cbor_encode_int(&map, CTAP_CBOR_MC_RESP_ATT_STMT);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    ret = cbor_encoder_create_map(&map, &attest_stmt_map, 2);
+    ret = cbor_encoder_create_map(&map, &attest_stmt_map, CTAP_CBOR_ATTESTATION_STMT_MAP_SZ);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    ret = cbor_encode_text_stringz(&attest_stmt_map, "alg");
+    ret = cbor_encode_text_string(&attest_stmt_map, CTAP_CBOR_STR_ALG, strlen(CTAP_CBOR_STR_ALG));
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -454,7 +528,7 @@ int fido2_ctap_cbor_encode_attestation_object(CborEncoder *encoder,
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    ret = cbor_encode_text_stringz(&attest_stmt_map, "sig");
+    ret = cbor_encode_text_string(&attest_stmt_map, CTAP_CBOR_STR_SIG, strlen(CTAP_CBOR_STR_SIG));
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -484,12 +558,12 @@ static int encode_credential(CborEncoder *encoder, const void *cred_ptr,
     CborEncoder desc;
     int ret;
 
-    ret = cbor_encoder_create_map(encoder, &desc, 2);
+    ret = cbor_encoder_create_map(encoder, &desc, CTAP_CBOR_CRED_DESC_MAP_SZ);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    ret = cbor_encode_text_string(&desc, "id", 2);
+    ret = cbor_encode_text_string(&desc, CTAP_CBOR_STR_ID, strlen(CTAP_CBOR_STR_ID));
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -509,12 +583,13 @@ static int encode_credential(CborEncoder *encoder, const void *cred_ptr,
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    ret = cbor_encode_text_string(&desc, "type", 4);
+    ret = cbor_encode_text_string(&desc, CTAP_CBOR_STR_TYPE, strlen(CTAP_CBOR_STR_TYPE));
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    ret = cbor_encode_text_string(&desc, "public-key", 10);
+    ret =
+        cbor_encode_text_string(&desc, CTAP_CBOR_STR_PUBLIC_KEY, strlen(CTAP_CBOR_STR_PUBLIC_KEY));
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -528,22 +603,22 @@ static int encode_credential(CborEncoder *encoder, const void *cred_ptr,
 }
 
 int fido2_ctap_cbor_encode_key_agreement(CborEncoder *encoder,
-                                         const ctap_cose_key_t *key)
+                                         const ctap_public_key_cose_t *key)
 {
     int ret;
     CborEncoder map;
 
-    ret = cbor_encoder_create_map(encoder, &map, 1);
+    ret = cbor_encoder_create_map(encoder, &map, CTAP_CBOR_KEY_AGREEMENT_MAP_SZ);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    ret = cbor_encode_int(&map, CTAP_CP_RESP_KEY_AGREEMENT);
+    ret = cbor_encode_int(&map, CTAP_CBOR_CP_RESP_KEY_AGREEMENT);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    ret = encode_cose_key(&map, key);
+    ret = encode_public_key_cose(&map, key);
 
     if (ret != CTAP2_OK) {
         return ret;
@@ -562,12 +637,12 @@ int fido2_ctap_cbor_encode_retries(CborEncoder *encoder, uint8_t tries_left)
     int ret;
     CborEncoder map;
 
-    ret = cbor_encoder_create_map(encoder, &map, 1);
+    ret = cbor_encoder_create_map(encoder, &map, CTAP_CBOR_RETRIES_MAP_SZ);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    ret = cbor_encode_int(&map, CTAP_CP_RESP_RETRIES);
+    ret = cbor_encode_int(&map, CTAP_CBOR_CP_RETRIES_RESP);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -591,12 +666,12 @@ int fido2_ctap_cbor_encode_pin_token(CborEncoder *encoder, uint8_t *token,
     int ret;
     CborEncoder map;
 
-    ret = cbor_encoder_create_map(encoder, &map, 1);
+    ret = cbor_encoder_create_map(encoder, &map, CTAP_CBOR_PIN_TOKEN_MAP_SZ);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    ret = cbor_encode_int(&map, CTAP_CP_RESP_PIN_TOKEN);
+    ret = cbor_encode_int(&map, CTAP_CBOR_CP_PIN_TOKEN_RESP);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -620,12 +695,12 @@ static int encode_user_entity(CborEncoder *encoder,
     int ret;
     CborEncoder map;
 
-    ret = cbor_encoder_create_map(encoder, &map, 1);
+    ret = cbor_encoder_create_map(encoder, &map, CTAP_CBOR_USER_ENTITY_MAP_SZ);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    ret = cbor_encode_text_string(&map, "id", 2);
+    ret = cbor_encode_text_string(&map, CTAP_CBOR_STR_ID, strlen(CTAP_CBOR_STR_ID));
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -642,13 +717,12 @@ static int encode_user_entity(CborEncoder *encoder,
     return CTAP2_OK;
 }
 
-/* https://tools.ietf.org/html/rfc8152#page-34 Section 13.1.1 */
-static int encode_cose_key(CborEncoder *cose_key, const ctap_cose_key_t *key)
+static int encode_public_key_cose(CborEncoder *cose_key, const ctap_public_key_cose_t *key)
 {
     int ret;
     CborEncoder map;
 
-    ret = cbor_encoder_create_map(cose_key, &map, 5);
+    ret = cbor_encoder_create_map(cose_key, &map, CTAP_CBOR_COSE_KEY_MAP_SZ);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -712,7 +786,7 @@ int fido2_ctap_cbor_parse_get_assertion_req(ctap_get_assertion_req_t *req,
     uint8_t required_parsed = 0;
     int ret;
     int key;
-    int temp;
+    int tmp;
     size_t len;
     size_t map_len;
     CborParser parser;
@@ -759,52 +833,52 @@ int fido2_ctap_cbor_parse_get_assertion_req(ctap_get_assertion_req_t *req,
         }
 
         switch (key) {
-            case CTAP_GA_REQ_RP_ID:
-                DEBUG("ctap_cbor: parse rp_id \n");
-                req->rp_id_len = CTAP_DOMAIN_NAME_MAX_SIZE;
-                ret = parse_text_string(&map, (char *)req->rp_id,
-                                        (size_t *)&req->rp_id_len);
-                required_parsed++;
-                break;
-            case CTAP_GA_REQ_CLIENT_DATA_HASH:
-                DEBUG("ctap_cbor: parse client_data_hash \n");
-                len = SHA256_DIGEST_LENGTH;
-                ret =
-                    parse_fixed_size_byte_array(&map, req->client_data_hash, &len);
-                required_parsed++;
-                break;
-            case CTAP_GA_REQ_ALLOW_LIST:
-                DEBUG("ctap_cbor: parse allow_list \n");
-                ret = parse_allow_list(&map, req->allow_list,
-                                       (size_t *)&req->allow_list_len);
-                break;
-            case CTAP_GA_REQ_EXTENSIONS:
-                /* todo: implement once extensions are supported */
-                DEBUG("ctap_cbor: parse extensions \n");
-                break;
-            case CTAP_GA_REQ_OPTIONS:
-                DEBUG("ctap_cbor: parse options \n");
-                ret = parse_options(&map, &req->options);
-                break;
-            case CTAP_GA_REQ_PIN_AUTH:
-                DEBUG("ctap_cbor: parse pin_auth \n");
-                len = 16;
-                ret = parse_fixed_size_byte_array(&map, req->pin_auth, &len);
-                /* CTAP specification (version 20190130) section 5.5.8.1 */
-                if (ret == CTAP1_ERR_INVALID_LENGTH && len == 0) {
-                    ret = CTAP2_OK;
-                }
-                req->pin_auth_len = len;
-                req->pin_auth_present = true;
-                break;
-            case CTAP_GA_REQ_PIN_PROTOCOL:
-                DEBUG("ctap_cbor: parse pin_protocol \n");
-                ret = parse_int(&map, &temp);
-                req->pin_protocol = (uint8_t)temp;
-                break;
-            default:
-                DEBUG("ctap_cbor: unknown GetAssertion key: %d \n", key);
-                break;
+        case CTAP_CBOR_GA_REQ_RP_ID:
+            DEBUG("ctap_cbor: parse rp_id \n");
+            req->rp_id_len = CTAP_DOMAIN_NAME_MAX_SIZE;
+            ret = parse_text_string(&map, (char *)req->rp_id,
+                                    (size_t *)&req->rp_id_len);
+            required_parsed++;
+            break;
+        case CTAP_CBOR_GA_REQ_CLIENT_DATA_HASH:
+            DEBUG("ctap_cbor: parse client_data_hash \n");
+            len = SHA256_DIGEST_LENGTH;
+            ret =
+                parse_fixed_len_byte_array(&map, req->client_data_hash, &len);
+            required_parsed++;
+            break;
+        case CTAP_CBOR_GA_REQ_ALLOW_LIST:
+            DEBUG("ctap_cbor: parse allow_list \n");
+            ret = parse_allow_list(&map, req->allow_list,
+                                   (size_t *)&req->allow_list_len);
+            break;
+        case CTAP_CBOR_GA_REQ_EXTENSIONS:
+            /* todo: implement once extensions are supported */
+            DEBUG("ctap_cbor: parse extensions \n");
+            break;
+        case CTAP_CBOR_GA_REQ_OPTIONS:
+            DEBUG("ctap_cbor: parse options \n");
+            ret = parse_options(&map, &req->options);
+            break;
+        case CTAP_CBOR_GA_REQ_PIN_AUTH:
+            DEBUG("ctap_cbor: parse pin_auth \n");
+            len = 16;
+            ret = parse_fixed_len_byte_array(&map, req->pin_auth, &len);
+            /* CTAP specification (version 20190130) section 5.5.8.1 */
+            if (ret == CTAP1_ERR_INVALID_LENGTH && len == 0) {
+                ret = CTAP2_OK;
+            }
+            req->pin_auth_len = len;
+            req->pin_auth_present = true;
+            break;
+        case CTAP_CBOR_GA_REQ_PIN_PROTOCOL:
+            DEBUG("ctap_cbor: parse pin_protocol \n");
+            ret = parse_int(&map, &tmp);
+            req->pin_protocol = (uint8_t)tmp;
+            break;
+        default:
+            DEBUG("ctap_cbor: unknown GetAssertion key: %d \n", key);
+            break;
         }
 
         if (ret != CTAP2_OK) {
@@ -831,8 +905,8 @@ int fido2_ctap_cbor_parse_client_pin_req(ctap_client_pin_req_t *req,
     uint8_t required_parsed = 0;
     int ret;
     int key;
-    int type;
-    int temp;
+    int cbor_type;
+    int tmp;
     size_t map_len;
     size_t len;
     CborParser parser;
@@ -845,8 +919,8 @@ int fido2_ctap_cbor_parse_client_pin_req(ctap_client_pin_req_t *req,
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    type = cbor_value_get_type(&it);
-    if (type != CborMapType) {
+    cbor_type = cbor_value_get_type(&it);
+    if (cbor_type != CborMapType) {
         return CTAP2_ERR_CBOR_UNEXPECTED_TYPE;
     }
 
@@ -862,8 +936,8 @@ int fido2_ctap_cbor_parse_client_pin_req(ctap_client_pin_req_t *req,
 
     /* loop over CBOR ClientPIN map */
     for (size_t i = 0; i < map_len; i++) {
-        type = cbor_value_get_type(&map);
-        if (type != CborIntegerType) {
+        cbor_type = cbor_value_get_type(&map);
+        if (cbor_type != CborIntegerType) {
             return CTAP2_ERR_CBOR_UNEXPECTED_TYPE;
         }
 
@@ -878,44 +952,44 @@ int fido2_ctap_cbor_parse_client_pin_req(ctap_client_pin_req_t *req,
         }
 
         switch (key) {
-            case CTAP_CP_REQ_PIN_PROTOCOL:
-                DEBUG("ctap_cbor: parse pinProtocol \n");
-                ret = parse_int(&map, &temp);
-                req->pin_protocol = (uint8_t)temp;
-                required_parsed++;
-                break;
-            case CTAP_CP_REQ_SUB_COMMAND:
-                DEBUG("ctap_cbor: parse subCommand \n");
-                ret = parse_int(&map, &temp);
-                req->sub_command = (uint8_t)temp;
-                required_parsed++;
-                break;
-            case CTAP_CP_REQ_KEY_AGREEMENT:
-                DEBUG("ctap_cbor: parse keyAgreement \n");
-                ret = parse_cose_key(&map, &req->key_agreement);
-                req->key_agreement_present = true;
-                break;
-            case CTAP_CP_REQ_PIN_AUTH:
-                DEBUG("ctap_cbor: parse pinAuth \n");
-                len = sizeof(req->pin_auth);
-                ret = parse_fixed_size_byte_array(&map, req->pin_auth, &len);
-                req->pin_auth_present = true;
-                break;
-            case CTAP_CP_REQ_NEW_PIN_ENC:
-                DEBUG("ctap_cbor: parse newPinEnc \n");
-                len = sizeof(req->new_pin_enc);
-                ret = parse_byte_array(&map, req->new_pin_enc, &len);
-                req->new_pin_enc_size = len;
-                break;
-            case CTAP_CP_REQ_PIN_HASH_ENC:
-                DEBUG("ctap_cbor: parse pinHashEnc \n");
-                len = sizeof(req->pin_hash_enc);
-                ret = parse_fixed_size_byte_array(&map, req->pin_hash_enc, &len);
-                req->pin_hash_enc_present = true;
-                break;
-            default:
-                DEBUG("parse_client_pin unknown key: %d \n", key);
-                break;
+        case CTAP_CBOR_CP_REQ_PIN_PROTOCOL:
+            DEBUG("ctap_cbor: parse pinProtocol \n");
+            ret = parse_int(&map, &tmp);
+            req->pin_protocol = (uint8_t)tmp;
+            required_parsed++;
+            break;
+        case CTAP_CBOR_CP_REQ_SUB_COMMAND:
+            DEBUG("ctap_cbor: parse subCommand \n");
+            ret = parse_int(&map, &tmp);
+            req->sub_command = (uint8_t)tmp;
+            required_parsed++;
+            break;
+        case CTAP_CBOR_CP_REQ_KEY_AGREEMENT:
+            DEBUG("ctap_cbor: parse keyAgreement \n");
+            ret = parse_public_key_cose(&map, &req->key_agreement);
+            req->key_agreement_present = true;
+            break;
+        case CTAP_CBOR_CP_REQ_PIN_AUTH:
+            DEBUG("ctap_cbor: parse pinAuth \n");
+            len = sizeof(req->pin_auth);
+            ret = parse_fixed_len_byte_array(&map, req->pin_auth, &len);
+            req->pin_auth_present = true;
+            break;
+        case CTAP_CBOR_CP_REQ_NEW_PIN_ENC:
+            DEBUG("ctap_cbor: parse newPinEnc \n");
+            len = sizeof(req->new_pin_enc);
+            ret = parse_byte_array(&map, req->new_pin_enc, &len);
+            req->new_pin_enc_size = len;
+            break;
+        case CTAP_CBOR_CP_REQ_PIN_HASH_ENC:
+            DEBUG("ctap_cbor: parse pinHashEnc \n");
+            len = sizeof(req->pin_hash_enc);
+            ret = parse_fixed_len_byte_array(&map, req->pin_hash_enc, &len);
+            req->pin_hash_enc_present = true;
+            break;
+        default:
+            DEBUG("parse_client_pin unknown key: %d \n", key);
+            break;
         }
         if (ret != CTAP2_OK) {
             return ret;
@@ -941,7 +1015,7 @@ int fido2_ctap_cbor_parse_make_credential_req(ctap_make_credential_req_t *req,
     uint8_t required_parsed = 0;
     int ret;
     int key;
-    int temp;
+    int tmp;
     size_t len;
     size_t map_len;
     CborParser parser;
@@ -987,60 +1061,60 @@ int fido2_ctap_cbor_parse_make_credential_req(ctap_make_credential_req_t *req,
         }
 
         switch (key) {
-            case CTAP_MC_REQ_CLIENT_DATA_HASH:
-                DEBUG("ctap_cbor: parse clientDataHash \n");
-                len = SHA256_DIGEST_LENGTH;
-                ret =
-                    parse_fixed_size_byte_array(&map, req->client_data_hash, &len);
-                required_parsed++;
-                break;
-            case CTAP_MC_REQ_RP:
-                DEBUG("ctap_cbor: parse rp \n");
-                ret = parse_rp(&map, &req->rp);
-                required_parsed++;
-                break;
-            case CTAP_MC_REQ_USER:
-                DEBUG("ctap_cbor: parse user \n");
-                ret = parse_user(&map, &req->user);
-                required_parsed++;
-                break;
-            case CTAP_MC_REQ_PUB_KEY_CRED_PARAMS:
-                DEBUG("ctap_cbor: parse key_cred params \n");
-                ret = parse_pub_key_cred_params(&map, req);
-                required_parsed++;
-                break;
-            case CTAP_MC_REQ_EXCLUDE_LIST:
-                DEBUG("ctap_cbor: parse excludeList \n");
-                ret = parse_exclude_list(&map, req->exclude_list,
-                                         &req->exclude_list_len);
-                break;
-            case CTAP_MC_REQ_EXTENSIONS:
-                DEBUG("ctap_cbor: parse exclude_list \n");
-                ret = CTAP2_ERR_UNSUPPORTED_EXTENSION;
-                break;
-            case CTAP_MC_REQ_OPTIONS:
-                DEBUG("ctap_cbor: parse options \n");
-                ret = parse_options(&map, &req->options);
-                break;
-            case CTAP_MC_REQ_PIN_AUTH:
-                DEBUG("ctap_cbor: parse pin_auth \n");
-                len = 16;
-                ret = parse_fixed_size_byte_array(&map, req->pin_auth, &len);
-                /* CTAP specification (version 20190130) section 5.5.8.1 (pinAuth) */
-                if (ret == CTAP1_ERR_INVALID_LENGTH && len == 0) {
-                    ret = CTAP2_OK;
-                }
-                req->pin_auth_len = len;
-                req->pin_auth_present = true;
-                break;
-            case CTAP_MC_REQ_PIN_PROTOCOL:
-                DEBUG("ctap_cbor: parse pin_protocol \n");
-                ret = parse_int(&map, &temp);
-                req->pin_protocol = (uint8_t)temp;
-                break;
-            default:
-                DEBUG("ctap_cbor: unknown MakeCredential key: %d \n", key);
-                break;
+        case CTAP_CBOR_MC_REQ_CLIENT_DATA_HASH:
+            DEBUG("ctap_cbor: parse clientDataHash \n");
+            len = SHA256_DIGEST_LENGTH;
+            ret =
+                parse_fixed_len_byte_array(&map, req->client_data_hash, &len);
+            required_parsed++;
+            break;
+        case CTAP_CBOR_MC_REQ_RP:
+            DEBUG("ctap_cbor: parse rp \n");
+            ret = parse_rp(&map, &req->rp);
+            required_parsed++;
+            break;
+        case CTAP_CBOR_MC_REQ_USER:
+            DEBUG("ctap_cbor: parse user \n");
+            ret = parse_user(&map, &req->user);
+            required_parsed++;
+            break;
+        case CTAP_CBOR_MC_REQ_PUB_KEY_CRED_PARAMS:
+            DEBUG("ctap_cbor: parse key_cred params \n");
+            ret = parse_pub_key_cred_params(&map, req);
+            required_parsed++;
+            break;
+        case CTAP_CBOR_MC_REQ_EXCLUDE_LIST:
+            DEBUG("ctap_cbor: parse excludeList \n");
+            ret = parse_exclude_list(&map, req->exclude_list,
+                                     &req->exclude_list_len);
+            break;
+        case CTAP_CBOR_MC_REQ_EXTENSIONS:
+            DEBUG("ctap_cbor: parse exclude_list \n");
+            ret = CTAP2_ERR_UNSUPPORTED_EXTENSION;
+            break;
+        case CTAP_CBOR_MC_REQ_OPTIONS:
+            DEBUG("ctap_cbor: parse options \n");
+            ret = parse_options(&map, &req->options);
+            break;
+        case CTAP_CBOR_MC_REQ_PIN_AUTH:
+            DEBUG("ctap_cbor: parse pin_auth \n");
+            len = 16;
+            ret = parse_fixed_len_byte_array(&map, req->pin_auth, &len);
+            /* CTAP specification (version 20190130) section 5.5.8.1 (pinAuth) */
+            if (ret == CTAP1_ERR_INVALID_LENGTH && len == 0) {
+                ret = CTAP2_OK;
+            }
+            req->pin_auth_len = len;
+            req->pin_auth_present = true;
+            break;
+        case CTAP_CBOR_MC_REQ_PIN_PROTOCOL:
+            DEBUG("ctap_cbor: parse pin_protocol \n");
+            ret = parse_int(&map, &tmp);
+            req->pin_protocol = (uint8_t)tmp;
+            break;
+        default:
+            DEBUG("ctap_cbor: unknown MakeCredential key: %d \n", key);
+            break;
         }
 
         if (ret != CTAP2_OK) {
@@ -1060,12 +1134,12 @@ int fido2_ctap_cbor_parse_make_credential_req(ctap_make_credential_req_t *req,
     return CTAP2_OK;
 }
 
-static int parse_cose_key(CborValue *it, ctap_cose_key_t *cose_key)
+static int parse_public_key_cose(CborValue *it, ctap_public_key_cose_t *cose_key)
 {
     int ret;
     int type;
     int key;
-    int temp;
+    int tmp;
     size_t map_len;
     size_t len;
     uint8_t required_parsed = 0;
@@ -1100,31 +1174,31 @@ static int parse_cose_key(CborValue *it, ctap_cose_key_t *cose_key)
         }
 
         switch (key) {
-            case CTAP_COSE_KEY_LABEL_KTY:
-                ret = parse_int(&map, &cose_key->kty);
-                required_parsed++;
-                break;
-            case CTAP_COSE_KEY_LABEL_ALG:
-                ret = parse_int(&map, &temp);
-                cose_key->alg_type = (int32_t)temp;
-                required_parsed++;
-                break;
-            case CTAP_COSE_KEY_LABEL_CRV:
-                ret = parse_int(&map, &cose_key->crv);
-                required_parsed++;
-                break;
-            case CTAP_COSE_KEY_LABEL_X:
-                len = sizeof(cose_key->pubkey.x);
-                ret = parse_fixed_size_byte_array(&map, cose_key->pubkey.x, &len);
-                required_parsed++;
-                break;
-            case CTAP_COSE_KEY_LABEL_Y:
-                len = sizeof(cose_key->pubkey.y);
-                ret = parse_fixed_size_byte_array(&map, cose_key->pubkey.y, &len);
-                required_parsed++;
-                break;
-            default:
-                DEBUG("Parse cose key unknown key: %d \n", key);
+        case CTAP_COSE_KEY_LABEL_KTY:
+            ret = parse_int(&map, &cose_key->kty);
+            required_parsed++;
+            break;
+        case CTAP_COSE_KEY_LABEL_ALG:
+            ret = parse_int(&map, &tmp);
+            cose_key->alg_type = (int32_t)tmp;
+            required_parsed++;
+            break;
+        case CTAP_COSE_KEY_LABEL_CRV:
+            ret = parse_int(&map, &cose_key->crv);
+            required_parsed++;
+            break;
+        case CTAP_COSE_KEY_LABEL_X:
+            len = sizeof(cose_key->pubkey.x);
+            ret = parse_fixed_len_byte_array(&map, cose_key->pubkey.x, &len);
+            required_parsed++;
+            break;
+        case CTAP_COSE_KEY_LABEL_Y:
+            len = sizeof(cose_key->pubkey.y);
+            ret = parse_fixed_len_byte_array(&map, cose_key->pubkey.y, &len);
+            required_parsed++;
+            break;
+        default:
+            DEBUG("Parse cose key unknown key: %d \n", key);
         }
 
         if (ret != CTAP2_OK) {
@@ -1144,20 +1218,19 @@ static int parse_cose_key(CborValue *it, ctap_cose_key_t *cose_key)
     return CTAP2_OK;
 }
 
-/* parse PublicKeyCredentialRpEntity dictionary */
 static int parse_rp(CborValue *it, ctap_rp_ent_t *rp)
 {
     int ret;
-    int type;
+    int cbor_type;
     CborValue map;
     size_t map_len;
     size_t key_len;
     size_t len;
-    char key[8];
+    char key[CTAP_CBOR_MAP_MAX_KEY_LEN];
     uint8_t required_parsed = 0;
 
-    type = cbor_value_get_type(it);
-    if (type != CborMapType) {
+    cbor_type = cbor_value_get_type(it);
+    if (cbor_type != CborMapType) {
         return CTAP2_ERR_INVALID_CBOR_TYPE;
     }
 
@@ -1172,8 +1245,8 @@ static int parse_rp(CborValue *it, ctap_rp_ent_t *rp)
     }
 
     for (size_t i = 0; i < map_len; i++) {
-        type = cbor_value_get_type(&map);
-        if (type != CborTextStringType) {
+        cbor_type = cbor_value_get_type(&map);
+        if (cbor_type != CborTextStringType) {
             return CTAP2_ERR_INVALID_CBOR_TYPE;
         }
 
@@ -1183,19 +1256,19 @@ static int parse_rp(CborValue *it, ctap_rp_ent_t *rp)
             return CTAP2_ERR_LIMIT_EXCEEDED;
         }
 
-        key[sizeof(key) - 1] = 0;
+        key[sizeof(key) - 1] = '\0';
 
         ret = cbor_value_advance(&map);
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
 
-        type = cbor_value_get_type(&map);
-        if (type != CborTextStringType) {
+        cbor_type = cbor_value_get_type(&map);
+        if (cbor_type != CborTextStringType) {
             return CTAP2_ERR_INVALID_CBOR_TYPE;
         }
 
-        if (strcmp(key, "id") == 0) {
+        if (strcmp(key, CTAP_CBOR_STR_ID) == 0) {
             rp->id_len = CTAP_DOMAIN_NAME_MAX_SIZE;
             ret =
                 parse_text_string(&map, (char *)rp->id, (size_t *)&rp->id_len);
@@ -1205,14 +1278,14 @@ static int parse_rp(CborValue *it, ctap_rp_ent_t *rp)
 
             required_parsed++;
         }
-        else if (strcmp(key, "name") == 0) {
+        else if (strcmp(key, CTAP_CBOR_STR_NAME) == 0) {
             len = CTAP_RP_MAX_NAME_SIZE;
             ret = parse_text_string(&map, (char *)rp->name, &len);
             if (ret != CborNoError) {
                 return ret;
             }
         }
-        else if (strcmp(key, "icon") == 0) {
+        else if (strcmp(key, CTAP_CBOR_STR_ICON) == 0) {
             len = CTAP_DOMAIN_NAME_MAX_SIZE;
             ret = parse_text_string(&map, (char *)rp->icon, &len);
             if (ret != 0) {
@@ -1237,11 +1310,10 @@ static int parse_rp(CborValue *it, ctap_rp_ent_t *rp)
     return CTAP2_OK;
 }
 
-/* parse PublicKeyCredentialUserEntity dictionary */
 static int parse_user(CborValue *it, ctap_user_ent_t *user)
 {
     uint8_t id_parsed = 0;
-    char key[24];
+    char key[CTAP_CBOR_MAP_MAX_KEY_LEN];
     size_t key_len;
     size_t map_len;
     size_t len;
@@ -1276,14 +1348,14 @@ static int parse_user(CborValue *it, ctap_user_ent_t *user)
             return CTAP2_ERR_LIMIT_EXCEEDED;
         }
 
-        key[sizeof(key) - 1] = 0;
+        key[sizeof(key) - 1] = '\0';
 
         ret = cbor_value_advance(&map);
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
 
-        if (strcmp(key, "id") == 0) {
+        if (strncmp(key, CTAP_CBOR_STR_ID, strlen(CTAP_CBOR_STR_ID)) == 0) {
             user->id_len = CTAP_USER_ID_MAX_SIZE;
             ret = parse_byte_array(&map, user->id, (size_t *)&user->id_len);
             if (ret != CTAP2_OK) {
@@ -1292,21 +1364,21 @@ static int parse_user(CborValue *it, ctap_user_ent_t *user)
 
             id_parsed = 1;
         }
-        else if (strcmp(key, "name") == 0) {
+        else if (strncmp(key, CTAP_CBOR_STR_NAME, strlen(CTAP_CBOR_STR_NAME)) == 0) {
             len = CTAP_USER_MAX_NAME_SIZE;
             ret = parse_text_string(&map, (char *)user->name, &len);
             if (ret != CTAP2_OK) {
                 return ret;
             }
         }
-        else if (strcmp(key, "displayName") == 0) {
+        else if (strncmp(key, CTAP_CBOR_DISPLAY_NAME, strlen(CTAP_CBOR_DISPLAY_NAME)) == 0) {
             len = CTAP_USER_MAX_NAME_SIZE;
             ret = parse_text_string(&map, (char *)user->display_name, &len);
             if (ret != CTAP2_OK) {
                 return ret;
             }
         }
-        else if (strcmp(key, "icon") == 0) {
+        else if (strncmp(key, CTAP_CBOR_STR_ICON, strlen(CTAP_CBOR_STR_ICON)) == 0) {
             len = CTAP_DOMAIN_NAME_MAX_SIZE;
             ret = parse_text_string(&map, (char *)user->icon, &len);
             if (ret != CTAP2_OK) {
@@ -1331,7 +1403,6 @@ static int parse_user(CborValue *it, ctap_user_ent_t *user)
     return CTAP2_OK;
 }
 
-/* parse pubKeyCredParams array */
 static int parse_pub_key_cred_params(CborValue *it,
                                      ctap_make_credential_req_t *req)
 {
@@ -1380,49 +1451,48 @@ static int parse_pub_key_cred_params(CborValue *it,
     return CTAP2_ERR_UNSUPPORTED_ALGORITHM;
 }
 
-/* parse pubKeyCredParam dictionary */
 static int parse_pub_key_cred_param(CborValue *it, uint8_t *cred_type,
                                     int32_t *alg_type)
 {
     int ret;
-    int type;
-    char type_str[16];
+    int cbor_type;
+    char cred_type_str[CTAP_CBOR_MAX_CREDENTIAL_TYPE_LEN];
+    size_t cred_type_str_len = sizeof(cred_type_str);
     CborValue cred, alg;
-    size_t type_str_len = sizeof(type_str);
 
-    type = cbor_value_get_type(it);
-    if (type != CborMapType) {
+    cbor_type = cbor_value_get_type(it);
+    if (cbor_type != CborMapType) {
         return CTAP2_ERR_INVALID_CBOR_TYPE;
     }
 
-    ret = cbor_value_map_find_value(it, "type", &cred);
+    ret = cbor_value_map_find_value(it, CTAP_CBOR_STR_TYPE, &cred);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    type = cbor_value_get_type(&cred);
-    if (type != CborTextStringType) {
+    cbor_type = cbor_value_get_type(&cred);
+    if (cbor_type != CborTextStringType) {
         return CTAP2_ERR_MISSING_PARAMETER;
     }
 
-    ret = cbor_value_map_find_value(it, "alg", &alg);
+    ret = cbor_value_map_find_value(it, CTAP_CBOR_STR_ALG, &alg);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    type = cbor_value_get_type(&alg);
-    if (type != CborIntegerType) {
+    cbor_type = cbor_value_get_type(&alg);
+    if (cbor_type != CborIntegerType) {
         return CTAP2_ERR_MISSING_PARAMETER;
     }
 
-    ret = cbor_value_copy_text_string(&cred, type_str, &type_str_len, NULL);
+    ret = cbor_value_copy_text_string(&cred, cred_type_str, &cred_type_str_len, NULL);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
 
-    type_str[sizeof(type_str) - 1] = 0;
+    cred_type_str[sizeof(cred_type_str) - 1] = '\0';
 
-    if (strncmp(type_str, "public-key", 11) == 0) {
+    if (strncmp(cred_type_str, CTAP_CBOR_STR_PUBLIC_KEY, strlen(CTAP_CBOR_STR_PUBLIC_KEY)) == 0) {
         *cred_type = CTAP_PUB_KEY_CRED_PUB_KEY;
     }
     else {
@@ -1437,18 +1507,18 @@ static int parse_pub_key_cred_param(CborValue *it, uint8_t *cred_type,
     return 0;
 }
 
-/* parse options dictionary */
 static int parse_options(CborValue *it, ctap_options_t *options)
 {
     int ret;
-    int type;
-    char key[8];
-    size_t key_len = sizeof(key), map_len;
-    bool b;
+    int cbor_type;
+    char key[CTAP_CBOR_MAP_MAX_KEY_LEN];
+    size_t key_len = sizeof(key);
+    size_t map_len;
+    bool option_value;
     CborValue map;
 
-    type = cbor_value_get_type(it);
-    if (type != CborMapType) {
+    cbor_type = cbor_value_get_type(it);
+    if (cbor_type != CborMapType) {
         return CTAP2_ERR_INVALID_CBOR_TYPE;
     }
 
@@ -1463,8 +1533,8 @@ static int parse_options(CborValue *it, ctap_options_t *options)
     }
 
     for (size_t i = 0; i < map_len; i++) {
-        type = cbor_value_get_type(&map);
-        if (type != CborTextStringType) {
+        cbor_type = cbor_value_get_type(&map);
+        if (cbor_type != CborTextStringType) {
             return CTAP2_ERR_INVALID_CBOR_TYPE;
         }
 
@@ -1480,24 +1550,27 @@ static int parse_options(CborValue *it, ctap_options_t *options)
             return CTAP2_ERR_CBOR_PARSING;
         }
 
-        type = cbor_value_get_type(&map);
-        if (type != CborBooleanType) {
+        cbor_type = cbor_value_get_type(&map);
+        if (cbor_type != CborBooleanType) {
             return CTAP2_ERR_INVALID_CBOR_TYPE;
         }
 
-        ret = cbor_value_get_boolean(&map, &b);
+        /* get boolean value of options parameter */
+        ret = cbor_value_get_boolean(&map, &option_value);
         if (ret != CborNoError) {
             return CTAP2_ERR_CBOR_PARSING;
         }
 
-        if (strncmp(key, "rk", 2) == 0) {
-            options->rk = b;
+        if (strncmp(key, CTAP_CBOR_STR_RESIDENT_KEY, strlen(CTAP_CBOR_STR_RESIDENT_KEY)) == 0) {
+            options->rk = option_value;
         }
-        else if (strncmp(key, "uv", 2) == 0) {
-            options->uv = b;
+        else if (strncmp(key, CTAP_CBOR_STR_USER_VERIFIED,
+                         strlen(CTAP_CBOR_STR_USER_VERIFIED)) == 0) {
+            options->uv = option_value;
         }
-        else if (strncmp(key, "up", 2) == 0) {
-            options->up = b;
+        else if (strncmp(key, CTAP_CBOR_STR_USER_PRESENT,
+                         strlen(CTAP_CBOR_STR_USER_PRESENT)) == 0) {
+            options->up = option_value;
         }
         else {
             /* ignore unknown options */
@@ -1573,7 +1646,7 @@ int fido2_ctap_cbor_parse_cred_desc(CborValue *arr, ctap_cred_desc_alt_t *cred)
         return CTAP2_ERR_INVALID_CBOR_TYPE;
     }
 
-    ret = cbor_value_map_find_value(arr, "type", &val);
+    ret = cbor_value_map_find_value(arr, CTAP_CBOR_STR_TYPE, &val);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -1593,14 +1666,14 @@ int fido2_ctap_cbor_parse_cred_desc(CborValue *arr, ctap_cred_desc_alt_t *cred)
     }
     type_str[sizeof(type_str) - 1] = 0;
 
-    if (strncmp(type_str, "public-key", 11) == 0) {
+    if (strncmp(type_str, CTAP_CBOR_STR_PUBLIC_KEY, strlen(CTAP_CBOR_STR_PUBLIC_KEY)) == 0) {
         cred->cred_type = CTAP_PUB_KEY_CRED_PUB_KEY;
     }
     else {
         cred->cred_type = CTAP_PUB_KEY_CRED_UNKNOWN;
     }
 
-    ret = cbor_value_map_find_value(arr, "id", &val);
+    ret = cbor_value_map_find_value(arr, CTAP_CBOR_STR_ID, &val);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
     }
@@ -1629,7 +1702,7 @@ int fido2_ctap_cbor_parse_cred_desc(CborValue *arr, ctap_cred_desc_alt_t *cred)
     return CTAP2_OK;
 }
 
-static int parse_fixed_size_byte_array(CborValue *it, uint8_t *dst, size_t *len)
+static int parse_fixed_len_byte_array(CborValue *it, uint8_t *dst, size_t *len)
 {
     int ret;
     int type;

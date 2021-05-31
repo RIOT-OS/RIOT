@@ -138,6 +138,11 @@ extern "C" {
 #define CTAP_PIN_PROT_VER 1
 
 /**
+ * @brief Total number of supported PIN protocol versions
+ */
+#define CTAP_AMT_SUP_PIN_VER 1
+
+/**
  * @brief Size of pin token
  *
  * Needs to be a multiple of 16 bytes (AES block length)
@@ -231,15 +236,6 @@ extern "C" {
 #define CTAP_GET_NEXT_ASSERTION_TIMEOUT (30 * US_PER_SEC)
 
 /**
- * @name CTAP version strings
- * @{
- */
-#define CTAP_VERSION_STRING_FIDO_PRE "FIDO_2_1_PRE"
-#define CTAP_VERSION_STRING_FIDO     "FIDO_2_0"
-#define CTAP_VERSION_STRING_U2F_V2   "U2F_V2"
-/** @} */
-
-/**
  * @name CTAP version flags
  *
  * @{
@@ -276,84 +272,6 @@ extern "C" {
 /** @} */
 
 /**
- * @name CTAP get info response CBOR key values
- *
- * @{
- */
-#define CTAP_GET_INFO_RESP_VERSIONS         0x01
-#define CTAP_GET_INFO_RESP_EXTENSIONS       0x02
-#define CTAP_GET_INFO_RESP_AAGUID           0x03
-#define CTAP_GET_INFO_RESP_OPTIONS          0x04
-#define CTAP_GET_INFO_RESP_MAX_MSG_SIZE     0x05
-#define CTAP_GET_INFO_RESP_PIN_PROTOCOLS    0x06
-/** @} */
-
-/**
- * @name CTAP make credential request CBOR key values
- *
- * @{
- */
-#define CTAP_MC_REQ_CLIENT_DATA_HASH    0x01
-#define CTAP_MC_REQ_RP                  0x02
-#define CTAP_MC_REQ_USER                0x03
-#define CTAP_MC_REQ_PUB_KEY_CRED_PARAMS 0x04
-#define CTAP_MC_REQ_EXCLUDE_LIST        0x05
-#define CTAP_MC_REQ_EXTENSIONS          0x06
-#define CTAP_MC_REQ_OPTIONS             0x07
-#define CTAP_MC_REQ_PIN_AUTH            0x08
-#define CTAP_MC_REQ_PIN_PROTOCOL        0x09
-/** @} */
-
-/**
- * @name CTAP make credential response CBOR key values
- *
- * @{
- */
-#define CTAP_MC_RESP_FMT                0x01
-#define CTAP_MC_RESP_AUTH_DATA          0x02
-#define CTAP_MC_RESP_ATT_STMT           0x03
-/** @} */
-
-/**
- * @name CTAP get assertion request CBOR key values
- *
- * @{
- */
-#define CTAP_GA_REQ_RP_ID               0x01
-#define CTAP_GA_REQ_CLIENT_DATA_HASH    0x02
-#define CTAP_GA_REQ_ALLOW_LIST          0x03
-#define CTAP_GA_REQ_EXTENSIONS          0x04
-#define CTAP_GA_REQ_OPTIONS             0x05
-#define CTAP_GA_REQ_PIN_AUTH            0x06
-#define CTAP_GA_REQ_PIN_PROTOCOL        0x07
-/** @} */
-
-/**
- * @name CTAP get assertion response CBOR key values
- *
- * @{
- */
-#define CTAP_GA_RESP_CREDENTIAL             0x01
-#define CTAP_GA_RESP_AUTH_DATA              0x02
-#define CTAP_GA_RESP_SIGNATURE              0x03
-#define CTAP_GA_RESP_USER                   0x04
-#define CTAP_GA_RESP_NUMBER_OF_CREDENTIALS  0x05
-/** @} */
-
-/**
- * @name CTAP Client PIN request CBOR key values
- *
- * @{
- */
-#define CTAP_CP_REQ_PIN_PROTOCOL    0x01
-#define CTAP_CP_REQ_SUB_COMMAND     0x02
-#define CTAP_CP_REQ_KEY_AGREEMENT   0x03
-#define CTAP_CP_REQ_PIN_AUTH        0x04
-#define CTAP_CP_REQ_NEW_PIN_ENC     0x05
-#define CTAP_CP_REQ_PIN_HASH_ENC    0x06
-/** @} */
-
-/**
  * @name CTAP Client PIN request subcommand CBOR key values
  *
  * @{
@@ -363,16 +281,6 @@ extern "C" {
 #define CTAP_CP_REQ_SUB_COMMAND_SET_PIN             0x03
 #define CTAP_CP_REQ_SUB_COMMAND_CHANGE_PIN          0x04
 #define CTAP_CP_REQ_SUB_COMMAND_GET_PIN_TOKEN       0x05
-/** @} */
-
-/**
- * @name CTAP Client PIN resp CBOR key values
- *
- * @{
- */
-#define CTAP_CP_RESP_KEY_AGREEMENT  0x01
-#define CTAP_CP_RESP_PIN_TOKEN      0x02
-#define CTAP_CP_RESP_RETRIES        0x03
 /** @} */
 
 /**
@@ -516,7 +424,7 @@ typedef struct {
     int crv;                        /**< EC identifier */
     int32_t alg_type;               /**< COSEAlgorithmIdentifier */
     uint8_t cred_type;              /**< type of credential */
-} ctap_cose_key_t;
+} ctap_public_key_cose_t;
 
 /**
  * @brief CTAP credential description struct
@@ -614,7 +522,7 @@ typedef struct {
 typedef struct {
     uint8_t pin_protocol;                                       /**< PIN protocol version chosen by the client */
     uint8_t sub_command;                                        /**< authenticator Client PIN sub command */
-    ctap_cose_key_t key_agreement;                              /**< public key of platform_key_agreement_key*/
+    ctap_public_key_cose_t key_agreement;                       /**< public key of platform_key_agreement_key*/
     bool key_agreement_present;                                 /**< indicate if key_agreement present */
     uint8_t pin_auth[CTAP_PIN_AUTH_SZ];                         /**< first 16 bytes of HMAC-SHA-256 of encrypted contents  */
     bool pin_auth_present;                                      /**< indicate if pin_auth present */
@@ -654,7 +562,7 @@ typedef struct __attribute__((packed)){
  */
 typedef struct {
     ctap_attested_cred_data_header_t header;    /**< attested credential data header */
-    ctap_cose_key_t key;                        /**< cose key */
+    ctap_public_key_cose_t key;                 /**< cose key */
 } ctap_attested_cred_data_t;
 
 /**

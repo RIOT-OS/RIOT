@@ -782,7 +782,7 @@ static uint8_t get_retries(CborEncoder *encoder)
 
 static int get_key_agreement(CborEncoder *encoder)
 {
-    ctap_cose_key_t key = { 0 };
+    ctap_public_key_cose_t key = { 0 };
 
     fido2_ctap_crypto_get_key_agreement(&key.pubkey);
 
