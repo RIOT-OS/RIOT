@@ -50,7 +50,7 @@
 
 #   include "embUnit/TextUIRunner.h"
 
-#   define TESTS_START()   TextUIRunner_start()
+#   define TESTS_START()   TextUIRunner_startWithOutputter(OUTPUTTER)
 #   define TESTS_RUN(t)    TextUIRunner_runTest(t)
 #   define TESTS_END()     TextUIRunner_end()
 #else

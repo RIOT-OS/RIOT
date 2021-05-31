@@ -54,10 +54,24 @@ def check_unittests(child, timeout=TIMEOUT, nb_tests=None):
         to perform an exact match against that number.
     """
     if nb_tests is None:
-        child.expect(r'OK \((\d+) tests\)', timeout=timeout)
-        return int(child.match.group(1))
-    _tests = int(nb_tests)
-    child.expect_exact('OK ({} tests)'.format(_tests), timeout=timeout)
+        # need escape sequence so don't use raw string
+        res = child.expect(['OK(\033\\[21m)? \\((\\d+) tests\\)',
+                            r'<Tests>(\d+)</Tests>'], timeout=timeout)
+        if res == 0:
+            _tests = int(child.match.group(2))
+        else:
+            _tests = int(child.match.group(1))
+    else:
+        _tests = int(nb_tests)
+        # need escape sequence so don't use raw string
+        res = child.expect(['OK(\033\\[21m)? \\({} tests\\)'.format(_tests),
+                            r'<Tests>{}</Tests>'.format(_tests)],
+                           timeout=timeout)
+    if res == 1:
+        res = child.expect([r'<Failures>\d+</Failures>', '</Statistics>'],
+                           timeout=timeout)
+        if res == 0:
+            raise AssertionError("Unittests failed")
     return _tests
 
 

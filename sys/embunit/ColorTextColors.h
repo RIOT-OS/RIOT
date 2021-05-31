@@ -44,6 +44,7 @@ extern "C" {
 #define SBOLD       "\033[1m"
 #define SDEFAULT    "\033[21m"
 #define LINEFILL    "\033[K"
+#define ANSI_RESET  "\033[0m"
 
 /**
  * @}
