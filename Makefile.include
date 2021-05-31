@@ -275,6 +275,7 @@ else
 endif
 
 QUIET ?= 1
+QUIETER ?= 0
 
 ifeq ($(QUIET),1)
   Q=@
@@ -282,8 +283,6 @@ ifeq ($(QUIET),1)
 else
   Q=
 endif
-
-QQ=
 
 # Set this to 1 to enable code in RIOT that does safety checking
 # which is not needed in a production environment but helps in the
@@ -482,7 +481,13 @@ ifeq ($(RIOT_CI_BUILD),1)
         RIOTNOLINK:=1
     endif
     # be more quiet when building for CI
-    QQ:=@
+    QUIETER=1
+endif
+
+ifeq ($(QUIETER),1)
+  QQ=@
+else
+  QQ=
 endif
 
 # if you want to publish the board into the sources as an uppercase #define
