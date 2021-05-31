@@ -83,4 +83,15 @@ if KCONFIG_USEMODULE_IEEE802154
         int "IEEE802.15.4 default CSMA-CA maximum backoff exponent"
         default 5
 
+menuconfig KCONFIG_USEMODULE_IEEE802154_SECURITY
+    bool "Configure IEEE802.15.4 Security"
+    depends on USEMODULE_IEEE802154_SECURITY
+    help
+        Configure IEEE802.15.4 security module using Kconfig
+
+    config IEEE802154_SEC_DEFAULT_KEY
+        string "Default key to be used for encryption and decryption (>=16B)"
+        default "pizza_margherita"
+        depends on KCONFIG_USEMODULE_IEEE802154_SECURITY
+
 endif # KCONFIG_USEMODULE_IEEE802154
