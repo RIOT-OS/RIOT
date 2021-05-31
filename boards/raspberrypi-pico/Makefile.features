@@ -1,0 +1,4 @@
+CPU = cortex-m0plus
+CPU_MODEL = rp2040
+
+# Put defined MCU peripherals here (in alphabetical order)
