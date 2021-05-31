@@ -401,7 +401,8 @@ void ieee802154_sec_init(ieee802154_sec_context_t *ctx)
     memset(ctx->key_source, 0, sizeof(ctx->key_source));
     ctx->key_index = 0;
     ctx->frame_counter = 0;
-    uint8_t key[] = IEEE802154_SEC_DEFAULT_KEY;
+    uint8_t key[] = CONFIG_IEEE802154_SEC_DEFAULT_KEY;
+    assert(sizeof(key) >= IEEE802154_SEC_KEY_LENGTH);
     assert(CIPHER_MAX_CONTEXT_SIZE >= IEEE802154_SEC_KEY_LENGTH);
     cipher_init(&ctx->cipher, CIPHER_AES, key, IEEE802154_SEC_KEY_LENGTH);
 }

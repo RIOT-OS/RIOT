@@ -101,17 +101,14 @@ struct ieee802154_sec_dev {
     void *ctx;
 };
 
-#if !defined(IEEE802154_SEC_DEFAULT_KEY) || defined(DOXYGEN)
+#if !defined(CONFIG_IEEE802154_SEC_DEFAULT_KEY) || defined(DOXYGEN)
 /**
- * @brief   AES key that is used in the test vectors from the specification
+ * @brief   AES default key
  *
  * @note    Predefine it yourself,
  *          if you want another key to be set up on initialization
  */
-#define IEEE802154_SEC_DEFAULT_KEY              { 0xc0, 0xc1, 0xc2, 0xc3,   \
-                                                  0xc4, 0xc5, 0xc6, 0xc7,   \
-                                                  0xc8, 0xc9, 0xca, 0xcb,   \
-                                                  0xcc, 0xcd, 0xce, 0xcf }
+#define CONFIG_IEEE802154_SEC_DEFAULT_KEY       "pizza_margherita"
 #endif
 
 /**
