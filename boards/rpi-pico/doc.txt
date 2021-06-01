@@ -1,0 +1,142 @@
+/**
+@defgroup    boards_rpi_pico Raspberry Pi Pico
+@ingroup     boards
+@brief       Support for the RP2040 based Raspberry Pi Pico board
+
+## Overview
+
+The Raspberry Pi Pico is sold by the Raspberry Pi foundation for about 4 USD. It features the
+RP2040 MCU, a custom dual core ARM Cortex-M0+ MCU with relatively high CPU clock, plenty of RAM and
+some unique peripheral (the Programmable IO).
+
+## Hardware
+
+![Raspberry Pi Pico](https://www.raspberrypi.org/homepage-9df4b/static/rp2040@2x-d1b9dae9345ad2bd15a23c6a567edb5c.jpg)
+
+### MCU
+
+The Programmable IO (PIO) peripheral and the SSI/QSPI peripheral that supports execution from
+flash (XIP) are the most distinguishing features of the MCU. The latter is especially important,
+since the RP2040 contains no internal flash.
+
+| MCU        | RP2040                                                       |
+|:-----------|:------------------------------------------------------------ |
+| Family     | (2x) ARM Cortex-M0+                                          |
+| Vendor     | Raspberry Pi                                                 |
+| RAM        | 264 KiB                                                      |
+| Flash      | 2 MiB (up to 16 MiB)                                         |
+| Frequency  | up to 133 MHz                                                |
+| FPU        | no                                                           |
+| PIOs       | 8                                                            |
+| Timers     | 1 x 64-bit                                                   |
+| ADCs       | 1x 12-bit (4 channels + temperature sensor)                  |
+| UARTs      | 2                                                            |
+| SPIs       | 2                                                            |
+| I2Cs       | 2                                                            |
+| RTCs       | 1                                                            |
+| USBs       | 1 (USB 2.0)                                                  |
+| Watchdog   | 1                                                            |
+| SSI/QSPI   | 1 (connected to flash, with XIP support)                     |
+| Vcc        | 1.62V - 3.63V                                                |
+| Datasheet  | [Datasheet](https://www.raspberrypi.org/homepage-9df4b/static/rp2040@2x-d1b9dae9345ad2bd15a23c6a567edb5c.jpg) |
+
+### User Interface
+
+1 button (also used for boot selection) and 1 LED:
+
+| Device | PIN              |
+|:------ |:---------------- |
+| LED0   | 25               |
+| SW0    | QSPI_SS_N (*)    |
+
+(*) Since the switch is connected to the chip-select pin of the QSPI interface the flash chip RIOT
+is running from via XIP, the switch is difficult to read out from software. This is currently not
+supported.
+
+### Pinout
+
+![Pinout Diagram of RPi Pico](https://projects-static.raspberrypi.org/projects/getting-started-with-the-pico/f009ad94826c2f0cd7573a295897e76955301096/en/images/Pico-R3-Pinout.png)
+
+## Flashing the Board
+
+### Flashing the Board Using OpenOCD
+
+Currently (June 2021), only two methods for debugging via OpenOCD are supported:
+
+1. Using a bit-banging low-level adapter, e.g. via the GPIOs of a Raspberry Pi 4B
+2. Using a virtual CMSIS-DAP adapter provided by the second CPU core via
+   https://github.com/majbthrd/pico-debug
+
+Since option 2 requires no additional hardware, this is currently the default. However, you need to
+first "flash" the gimme-cache variant of [pico-debug](https://github.com/majbthrd/pico-debug)
+into RAM using the UF2 bootloader. For this, plug in the USB cable while holding down the BOOTSEL
+button of the Pico and copy the `pico-debug-gimmecache.uf2` from the
+[latest pico-debug release](https://github.com/majbthrd/pico-debug/releases) into the virtual FAT
+formatted drive the bootloader provides. Once this drive is unmounted again, this will result in
+the Raspberry Pi Pico showing up as CMSIS-DAP debugger. Afterwards run:
+
+```
+make BOARD=rpi-pico flash
+```
+
+***Beware:*** The `rpi-pico` virtual debugger is not persistent and needs to be "flashed" into RAM
+again after each cold boot.
+
+### Flashing the Board Using the Bootloader
+
+Connect the device to your Micro-USB cable while the button (labeled `BOOTSEL` on the silkscreen
+of the PCB) is pressed to enter the bootloader. Afterwards run:
+
+```
+make BOARD=rpi-pico PROGRAMMER=uf2conv flash
+```
+
+### Flashing the Board Using J-Link
+
+Connect the Board to an Segger J-Link debugger, e.g. the EDU mini debugger is relatively affordable,
+but limited to educational purposes. Afterwards run:
+
+```
+make BOARD=rpi-pico PROGRAMMER=jlink flash
+```
+
+## On-Chip Debugging
+
+There are currently (June 2021) few hardware options for debugging the Raspberry Pi Pico:
+
+1. Via J-Link using one of Seggers debuggers
+2. Via OpenOCD using a low-level bit-banging debugger (e.g. a Raspberry Pi 4B with the GPIOs
+   connected to the Raspberry Pi Pico via jump wires)
+3. Via a recently updated [Black Magic Probe](https://github.com/blacksphere/blackmagic)
+
+In addition, a software-only option is possible using
+[pico-debug](https://github.com/majbthrd/pico-debug). The default linker script reserved 16 KiB of
+RAM for this debugger, hence just "flash" the "gimme-cache" flavor into RAM using the UF2
+bootloader. Once this is done, debugging is as simple as running:
+
+```
+make BOARD=rpi-pico debug
+```
+
+***Beware:*** The `rpi-pico` virtual debugger is not persistent and needs to be "flashed" into RAM
+again after each cold boot. The initialization code of RIOT now seems to play well with the
+debugger, so it remains persistent on soft reboots. If you face issues with losing connection to
+the debugger on reboot, try `monitor reset init` in GDB to soft-reboot instead.
+
+## Known Issues / Problems
+
+### Early state Implementation
+
+Currently no support for the following peripherals is implemented:
+
+- Timers
+- ADC
+- SPI
+- I2C
+- USB
+- PIO
+- RTC
+- Watchdog
+- SMP support (multi CPU support is not implemented in RIOT)
+
+ */
