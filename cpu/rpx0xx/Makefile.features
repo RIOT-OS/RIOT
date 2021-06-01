@@ -1,0 +1,7 @@
+CPU_CORE    := cortex-m0plus
+CPU_FAM     := RPX0XX
+
+include $(RIOTCPU)/cortexm_common/Makefile.features
+
+FEATURES_PROVIDED += periph_gpio
+FEATURES_PROVIDED += periph_gpio_irq
