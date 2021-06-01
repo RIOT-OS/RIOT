@@ -45,7 +45,7 @@
   - dist/tools/kconfiglib/**/*
   - makefiles/kconfig.mk
   - kconfigs/*
-  - Kconfig
+  - **/Kconfig
 
 "Area: LoRa":
   - drivers/llcc68/**/*
