@@ -38,7 +38,11 @@
 #define EVENT_TIMEOUT_H
 
 #include "event.h"
+#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+#include "ztimer.h"
+#else
 #include "xtimer.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -48,13 +52,33 @@ extern "C" {
  * @brief   Timeout Event structure
  */
 typedef struct {
-    xtimer_t timer;         /**< xtimer object used for timeout */
+#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+    ztimer_t timer;         /**< ztimer object used for timeout */
+    ztimer_clock_t *clock;  /**< ztimer clock to use */
+#else
+    xtimer_t timer;         /**< ztimer object used for timeout */
+#endif
     event_queue_t *queue;   /**< event queue to post event to   */
     event_t *event;         /**< event to post after timeout    */
 } event_timeout_t;
 
+#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
 /**
  * @brief   Initialize timeout event object
+ *
+ * @param[in]   event_timeout   event_timeout object to initialize
+ * @param[in]   clock           the clock backend, eg: ZTIMER_USEC, ZTIMER_MSEC
+ * @param[in]   queue           queue that the timed-out event will be added to
+ * @param[in]   event           event to add to queue after timeout
+ */
+void event_timeout_ztimer_init(event_timeout_t *event_timeout, ztimer_clock_t* clock,
+                               event_queue_t *queue, event_t *event);
+#endif
+
+/**
+ * @brief   Initialize timeout event object
+ *
+ * @note    If ztimer is used the default time clock backend is ZTIMER_USEC
  *
  * @param[in]   event_timeout   event_timeout object to initialize
  * @param[in]   queue           queue that the timed-out event will be added to
@@ -67,13 +91,15 @@ void event_timeout_init(event_timeout_t *event_timeout, event_queue_t *queue,
  * @brief   Set a timeout
  *
  * This will make the event as configured in @p event_timeout be triggered
- * after @p timeout microseconds.
+ * after @p timeout microseconds (if using @ref xtimer) or the the @ref
+ * ztimer_clock_t ticks.
  *
  * @note: the used event_timeout struct must stay valid until after the timeout
  *        event has been processed!
  *
  * @param[in]   event_timeout   event_timout context object to use
- * @param[in]   timeout         timeout in microseconds
+ * @param[in]   timeout         timeout in microseconds ot the ztimer_clock_t
+ *                              ticks units
  */
 void event_timeout_set(event_timeout_t *event_timeout, uint32_t timeout);
 
