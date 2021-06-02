@@ -572,8 +572,14 @@ include $(RIOTMAKE)/modules.inc.mk
 .PHONY: FORCE
 
 ifneq (,$(IOTLAB_NODE))
-  # iot-lab serial and flasher
-  include $(RIOTBASE)/dist/testbed-support/makefile.iotlab.single.inc.mk
+  # iot-lab archi mapping
+  include $(RIOTBASE)/dist/testbed-support/makefile.iotlab.archi.inc.mk
+  ifneq (,$(IOTLAB_ARCHI))
+    # iot-lab serial and flasher
+    include $(RIOTBASE)/dist/testbed-support/makefile.iotlab.single.inc.mk
+  else
+    $(info $(COLOR_YELLOW)Board "$(BOARD)" incompatible with IOTLAB_NODE variable$(COLOR_RESET))
+  endif
 endif
 
 ELFFILE ?= $(BINDIR)/$(APPLICATION).elf

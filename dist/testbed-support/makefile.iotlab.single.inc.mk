@@ -57,6 +57,24 @@ endif
 IOTLAB_AUTH ?= $(HOME)/.iotlabrc
 IOTLAB_USER ?= $(shell cut -f1 -d: $(IOTLAB_AUTH))
 
+ifneq (0,$(shell command -v iotlab-experiment -h 2>&1 > /dev/null ; echo $$?))
+  $(info $(COLOR_RED)'iotlab-experiment' command is not available \
+	        please consider installing it from \
+	        https://pypi.python.org/pypi/iotlabcli$(COLOR_RESET))
+  $(error )
+endif
+
+ifeq (iotlab-a8-m3,$(BOARD))
+  ifneq (,$(filter flash% reset,$(MAKECMDGOALS)))
+    ifneq (0,$(shell command -v iotlab-ssh -h 2>&1 > /dev/null ; echo $$?))
+      $(info $(COLOR_RED)'iotlab-ssh' command is not available \
+	          please consider installing it from \
+	          https://pypi.python.org/pypi/iotlabsshcli$(COLOR_RESET))
+      $(error )
+    endif
+  endif
+endif
+
 # Optional Experiment id. Required when having multiple experiments
 IOTLAB_EXP_ID ?=
 
@@ -66,27 +84,6 @@ _IOTLAB_EXP_ID := $(if $(IOTLAB_EXP_ID),--id $(IOTLAB_EXP_ID))
 # Number of the node to take from the list in 'auto' mode
 # Default to 1 so the first one
 IOTLAB_NODE_AUTO_NUM ?= 1
-
-# board-archi mapping
-IOTLAB_ARCHI_arduino-zero   = arduino-zero:xbee
-IOTLAB_ARCHI_b-l072z-lrwan1 = st-lrwan1:sx1276
-IOTLAB_ARCHI_b-l475e-iot01a = st-iotnode:multi
-IOTLAB_ARCHI_dwm1001        = dwm1001:dw1000
-IOTLAB_ARCHI_firefly        = firefly:multi
-IOTLAB_ARCHI_frdm-kw41z     = frdm-kw41z:multi
-IOTLAB_ARCHI_iotlab-a8-m3   = a8:at86rf231
-IOTLAB_ARCHI_iotlab-m3      = m3:at86rf231
-IOTLAB_ARCHI_microbit       = microbit:ble
-IOTLAB_ARCHI_nrf51dk        = nrf51dk:ble
-IOTLAB_ARCHI_nrf52dk        = nrf52dk:ble
-IOTLAB_ARCHI_nrf52832-mdk   = nrf52832mdk:ble
-IOTLAB_ARCHI_nrf52840dk     = nrf52840dk:multi
-IOTLAB_ARCHI_nrf52840-mdk   = nrf52840mdk:multi
-IOTLAB_ARCHI_pba-d-01-kw2x  = phynode:kw2xrf
-IOTLAB_ARCHI_samr21-xpro    = samr21:at86rf233
-IOTLAB_ARCHI_samr30-xpro    = samr30:at86rf212b
-IOTLAB_ARCHI_zigduino       = zigduino:atmega128rfa1
-IOTLAB_ARCHI := $(IOTLAB_ARCHI_$(BOARD))
 
 # There are several deprecated and incompatible features used here that were
 # introduced between versions 2 and 3 of the IoT-LAB cli tools.
@@ -134,6 +131,23 @@ ifeq (auto,$(IOTLAB_NODE))
 
   ifeq (,$(IOTLAB_NODE))
     $(error Could not automatically find a node for BOARD=$(BOARD))
+  endif
+endif
+
+# Handle IOTLAB_NODE specified with comma separated form
+# saclay,m3,1 => m3-1.saclay.iot-lab.info)
+IOTLAB_NODE_COMMA := $(subst $(comma), ,$(IOTLAB_NODE))
+ifneq ($(IOTLAB_NODE_COMMA),$(IOTLAB_NODE))
+  _IOTLAB_NODE_TYPE := $(word 2, $(IOTLAB_NODE_COMMA))
+  _IOTLAB_NODE_ID := $(firstword $(subst +, ,$(subst -, ,$(word 3, $(IOTLAB_NODE_COMMA)))))
+  _IOTLAB_SITE := $(word 1, $(IOTLAB_NODE_COMMA))
+  override IOTLAB_NODE := $(_IOTLAB_NODE_TYPE)-$(_IOTLAB_NODE_ID).$(_IOTLAB_SITE).iot-lab.info
+
+  # If launched from an IoT-LAB frontend, check that the frontends are matching
+  ifneq (,$(IOT_LAB_FRONTEND_FQDN))
+    ifneq ($(IOT_LAB_FRONTEND_FQDN),$(_IOTLAB_SITE).iot-lab.info)
+      $(error $(COLOR_RED)IoT-LAB Frontend doesn't match ($(IOT_LAB_FRONTEND_FQDN) != $(_IOTLAB_SITE).iot-lab.info)$(COLOR_RESET))
+    endif
   endif
 endif
 
@@ -192,8 +206,8 @@ else
   FLASHER     = iotlab-ssh
   RESET       = iotlab-ssh
   _NODE_FMT   = --jmespath='keys(values(@)[0])[0]' --fmt='int'
-  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) flash-m3 $(_IOTLAB_NODELIST) $(FLASHFILE)
-  RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) reset-m3 $(_IOTLAB_NODELIST)
+  FFLAGS      = $(_NODE_FMT) $(_IOTLAB_EXP_ID) flash $(_IOTLAB_NODELIST) $(FLASHFILE)
+  RESET_FLAGS = $(_NODE_FMT) $(_IOTLAB_EXP_ID) reset $(_IOTLAB_NODELIST)
 
   TERMPROG  = ssh
   ifeq (,$(IOT_LAB_FRONTEND_FQDN))
