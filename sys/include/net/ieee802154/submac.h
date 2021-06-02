@@ -121,7 +121,7 @@ struct ieee802154_submac {
     int8_t tx_pow;                      /**< Transmission power (in dBm) */
     ieee802154_submac_state_t state;    /**< State of the SubMAC */
     ieee802154_phy_mode_t phy_mode;     /**< IEEE 802.15.4 PHY mode */
-    uint16_t symbol_duration;           /**< Symbol duration in micro-seconds */
+    uint32_t unit_backoff_period;       /**< aUnitBackoffPeriod PHY constant in microseconds */
 };
 
 /**
@@ -352,7 +352,28 @@ static inline int ieee802154_read_frame(ieee802154_submac_t *submac, void *buf,
  */
 static inline uint16_t ieee802154_get_symbol_duration(const ieee802154_submac_t *submac)
 {
-    return submac->symbol_duration;
+    /* Rule applies to (62.5 ksymbol/s):
+     * - page 0, channels 11-26 on 2.4 GHz O-QPSK PHY,
+     * - page 2, channels 1-10 on 915 MHz O-QPSK PHY */
+    if ((submac->channel_page == 0 && submac->channel_num >= 11 && submac->channel_num <= 26) ||
+        (submac->channel_page == 2 && submac->channel_num >= 1 && submac->channel_num <= 10)) {
+        return 16; /* 62.5 ksymbol/s */
+    }
+    /* - page 0, channel 0,  on 868 MHz BPSK PHY */
+    else if (submac->channel_page == 0 && submac->channel_num == 0) {
+        return 50; /* 20 ksymbol/s */
+    }
+    else if (submac->channel_page == 0 && submac->channel_num >= 1 && submac->channel_num <= 10) {
+        return 25; /* 40 ksymbol/s */
+    }
+    /* Rules applies to (25 ksymbol/s):
+     * - page 2, channel 0 on 868 MHz O-QPSK PHY */
+    else if (submac->channel_page == 2 && submac->channel_num == 0) {
+        return 40; /* 25 ksymbol/s */
+    }
+
+    /* same as 62.5 ksymbol/s in case this list isn't updated */
+    return 16;
 }
 
 /**
@@ -429,7 +450,7 @@ static inline uint32_t ieee802154_get_turnaround_time(const ieee802154_submac_t 
         return IEEE802154G_ATURNAROUNDTIME_US;
     }
 
-    return IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS * submac->symbol_duration;
+    return IEEE802154_ATURNAROUNDTIME_IN_SYMBOLS * ieee802154_get_symbol_duration(submac);
 }
 
 /**
@@ -442,7 +463,7 @@ static inline uint32_t ieee802154_get_turnaround_time(const ieee802154_submac_t 
 static inline uint32_t ieee802154_get_cca_time(const ieee802154_submac_t *submac)
 {
     /* XXX: SUN O-QPSK aCcaTime */
-    return IEEE802154_CCA_DURATION_IN_SYMBOLS * submac->symbol_duration;
+    return IEEE802154_CCA_DURATION_IN_SYMBOLS * ieee802154_get_symbol_duration(submac);
 }
 
 /**
@@ -455,8 +476,7 @@ static inline uint32_t ieee802154_get_cca_time(const ieee802154_submac_t *submac
 static inline uint32_t ieee802154_get_unit_backoff_period(const ieee802154_submac_t *submac)
 {
     /* XXX: for SUN PHY 920 MHz bands use phyCcaDuration */
-    return ieee802154_get_turnaround_time(submac)
-         + ieee802154_get_cca_time(submac);
+    return submac->unit_backoff_period;
 }
 
 /**
