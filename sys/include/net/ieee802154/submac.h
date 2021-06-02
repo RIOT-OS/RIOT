@@ -122,6 +122,7 @@ struct ieee802154_submac {
     ieee802154_submac_state_t state;    /**< State of the SubMAC */
     ieee802154_phy_mode_t phy_mode;     /**< IEEE 802.15.4 PHY mode */
     uint32_t unit_backoff_period;       /**< aUnitBackoffPeriod PHY constant in microseconds */
+    uint32_t ack_wait_duration;         /**< macAckWaitDuration MAC attributo in microseconds */
 };
 
 /**
@@ -385,7 +386,7 @@ static inline uint16_t ieee802154_get_symbol_duration(const ieee802154_submac_t 
  */
 static inline uint32_t ieee802154_get_shr_duration(const ieee802154_submac_t *submac)
 {
-    uint16_t sym_dur = submac->symbol_duration;
+    uint16_t sym_dur = ieee802154_get_symbol_duration(submac);
 
     /* - page 0, channel 0 868 MHz BPSK PHY
      * - page 0, channels 1-10 915 MHz BPSK PHY
@@ -416,22 +417,24 @@ static inline uint32_t ieee802154_get_shr_duration(const ieee802154_submac_t *su
 static inline uint32_t ieee802154_get_psdu_duration(const ieee802154_submac_t *submac,
                                                     uint16_t length)
 {
+    uint16_t sym_dur = ieee802154_get_symbol_duration(submac);
+
     /* - page 0, channel 0 868 MHz BPSK PHY
      * - page 0, channels 1-10 915 MHz BPSK PHY */
     if (submac->channel_page == 0 && submac->channel_num <= 10) {
         /* 1 bit = 1 symbol */
-        return (length * 8) * submac->symbol_duration;
+        return (length * 8) * sym_dur;
     }
     /* - page 0, channels 11-26, 2.4 GHz O-QPSK PHY
      * - page 2, channels 0-10, 868-915 MHz O-QPSK PHY */
     else if ((submac->channel_page == 0 && submac->channel_num >= 11 && submac->channel_num <= 26) ||
              (submac->channel_page == 2 && submac->channel_num <= 10)) {
         /* 4 bit = 1 symbol */
-        return (length * 2) * submac->symbol_duration;
+        return (length * 2) * sym_dur;
     }
 
     /* XXX: same as O-QPSK in case isn't updated */
-    return (length * 2) * submac->symbol_duration;
+    return (length * 2) * sym_dur;
 }
 
 /**
@@ -488,10 +491,7 @@ static inline uint32_t ieee802154_get_unit_backoff_period(const ieee802154_subma
  */
 static inline uint32_t ieee802154_get_ack_wait_duration(const ieee802154_submac_t *submac)
 {
-    return ieee802154_get_unit_backoff_period(submac)
-         + ieee802154_get_turnaround_time(submac)
-         + ieee802154_get_shr_duration(submac)
-         + ieee802154_get_psdu_duration(submac, 6);
+    return submac->ack_wait_duration;
 }
 
 /**
