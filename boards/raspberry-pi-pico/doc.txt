@@ -1,5 +1,5 @@
 /**
- * @defgroup    boards_raspberrypi-pico Raspberry Pi Pico
+ * @defgroup    boards_raspberry-pi-pico Raspberry Pi Pico
  * @ingroup     boards
  * @brief       Support for the Raspberry Pi Pico board.
  *

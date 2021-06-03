@@ -1,0 +1,4 @@
+CPU_CORE = cortex-m0plus
+CPU_FAM = rp2040
+
+include $(RIOTCPU)/cortexm_common/Makefile.features

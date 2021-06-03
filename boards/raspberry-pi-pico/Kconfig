@@ -5,9 +5,9 @@
 # directory for more details.
 
 config BOARD
-    default "raspberrypi-pico" if BOARD_RASPBERRYPI_PICO
+    default "raspberry-pi-pico" if BOARD_RASPBERRY_PI_PICO
 
-config BOARD_RASPBERRYPI_PICO
+config BOARD_RASPBERRY_PI_PICO
     bool
     default y
     select RP2040

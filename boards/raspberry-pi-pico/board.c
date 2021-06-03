@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     boards_raspberrypi-pico
+ * @ingroup     boards_raspberry-pi-pico
  * @{
  *
  * @file

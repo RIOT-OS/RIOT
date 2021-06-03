@@ -7,40 +7,43 @@
  */
 
 /**
- * @ingroup     boards_raspberrypi-pico
+ * @ingroup     boards_raspberry-pi-pico
  * @{
  *
  * @file
- * @brief       Board specific definitions for the Raspberry Pi Pico
+ * @brief       Configuration of CPU peripherals for Raspberry Pi Pico board
  *
  * @author      Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  */
 
-#ifndef BOARD_H
-#define BOARD_H
+#ifndef PERIPH_CONF_H
+#define PERIPH_CONF_H
+
+#include <stdint.h>
 
 #include "cpu.h"
-#include "periph_conf.h"
 #include "periph_cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Put here board specific definitions:
- - LEDs/buttons macros,
- - on-board drivers parameters
- - xtimer configuration
+/* put here the board peripherals definitions:
+- Available clocks
+- Timers
+- UARTs
+- PWMs
+- SPIs
+- I2C
+- ADC
+- RTC
+- RTT
+etc
  */
-
-/**
- * @brief   Initialize board specific hardware
- */
-void board_init(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* BOARD_H */
+#endif /* PERIPH_CONF_H */
 /** @} */

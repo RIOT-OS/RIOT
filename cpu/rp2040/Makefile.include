@@ -1,0 +1,6 @@
+INCLUDES += -I$(RIOTCPU)/cortexm_common/include
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/raspberry-pi-pico-sdk
+
+
+include $(RIOTMAKE)/arch/cortexm.inc.mk
+
