@@ -34,6 +34,14 @@ enum {
 };
 
 /**
+ * @brief   STATUS_REG_TEMP definitions
+ */
+enum {
+    LIS2DH12_TEMP_CFG_REG_DISABLE = 0x00, /**< Temperature sensor disable */
+    LIS2DH12_TEMP_CFG_REG_ENABLE  = 0xC0, /**< Temperature sensor enable  */
+};
+
+/**
  * @brief   STATUS_REG definitions
  */
 enum {
@@ -94,7 +102,35 @@ enum {
     LIS2DH12_INT_TYPE_I2_IA2       = 0x20, /**< IA2 on INT2 */
     LIS2DH12_INT_TYPE_I2_IA1       = 0x40, /**< IA1 on INT2 */
     LIS2DH12_INT_TYPE_I2_CLICK     = 0x80, /**< click interrupt on INT2 */
+
+    LIS2DH12_INT_TYPE_IA2          = 0x20, /**< Event 2 */
+    LIS2DH12_INT_TYPE_IA1          = 0x40, /**< Event 1 */
+    LIS2DH12_INT_TYPE_CLICK        = 0x80, /**< click interrupt */
 };
+
+/**
+ * @brief   Event slots
+ */
+enum {
+    LIS2DH12_EVENT_1               = 0x1, /**< first event slot */
+    LIS2DH12_EVENT_2               = 0x2, /**< second event slot */
+    LIS2DH12_EVENT_CLICK           = 0x3, /**< click event */
+};
+
+/**
+ * @brief   Extract interrupt flags for Event Slot 1
+ */
+#define LIS2DH12_INT_SRC_1(ret)     (((uint32_t)(ret) >>  0) & 0x7F)
+
+/**
+ * @brief   Extract interrupt flags for Event Slot 2
+ */
+#define LIS2DH12_INT_SRC_2(ret)     (((uint32_t)(ret) >>  8) & 0x7F)
+
+/**
+ * @brief   Extract interrupt flags for Click Event
+ */
+#define LIS2DH12_INT_SRC_CLICK(ret) (((uint32_t)(ret) >> 16) & 0x7F)
 
 /**
  * @brief   CLICK_SRC definitions
@@ -168,6 +204,13 @@ typedef union {
     } bit;              /**< Structure used for bit access */
     uint8_t reg;        /**< Type used for register access */
 } LIS2DH12_CTRL_REG1_t;
+
+#define LIS2DH12_CTRL_REG2_HP_IA1   (1 << 0)
+#define LIS2DH12_CTRL_REG2_HP_IA2   (1 << 1)
+#define LIS2DH12_CTRL_REG2_HPCLICK  (1 << 2)
+#define LIS2DH12_CTRL_REG2_FDS      (1 << 3)
+
+#define LIS2DH12_CLICK_THS_LIR      (0x80)
 
 /**
  * @brief   CTRL_REG2 definitions
