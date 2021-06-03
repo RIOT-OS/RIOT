@@ -197,6 +197,57 @@ static inline void bit_clear8(volatile uint8_t *ptr, uint8_t bit)
     *((volatile uint8_t *)bitband_addr(ptr, bit)) = 0;
 }
 
+/**
+ * @brief Checks if a single bit in the 32 bit word pointed to by @p ptr is set
+ *
+ * The effect is the same as for the following snippet:
+ *
+ * @code{c}
+ *   *ptr & (1 << bit);
+ * @endcode
+ *
+ * @param[in]  ptr pointer to target word
+ * @param[in]  bit bit number within the word
+ */
+static inline bool bit_check32(volatile uint32_t *ptr, uint8_t bit)
+{
+    return *((volatile uint32_t *)bitband_addr(ptr, bit));
+}
+
+/**
+ * @brief Checks if a single bit in the 16 bit word pointed to by @p ptr is set
+ *
+ * The effect is the same as for the following snippet:
+ *
+ * @code{c}
+ *   *ptr & (1 << bit);
+ * @endcode
+ *
+ * @param[in]  ptr pointer to target word
+ * @param[in]  bit bit number within the word
+ */
+static inline bool bit_check16(volatile uint16_t *ptr, uint8_t bit)
+{
+    return *((volatile uint16_t *)bitband_addr(ptr, bit));
+}
+
+/**
+ * @brief Checks if a single bit in the 8 bit byte pointed to by @p ptr is set
+ *
+ * The effect is the same as for the following snippet:
+ *
+ * @code{c}
+ *   *ptr & (1 << bit);
+ * @endcode
+ *
+ * @param[in]  ptr pointer to target byte
+ * @param[in]  bit bit number within the byte
+ */
+static inline bool bit_check8(volatile uint8_t *ptr, uint8_t bit)
+{
+    return *((volatile uint8_t *)bitband_addr(ptr, bit));
+}
+
 /** @} */
 
 #else /* CPU_HAS_BITBAND */
@@ -229,6 +280,21 @@ static inline void bit_clear16(volatile uint16_t *ptr, uint8_t bit)
 static inline void bit_clear8(volatile uint8_t *ptr, uint8_t bit)
 {
     *ptr &= ~(1 << (bit));
+}
+
+static inline bool bit_check32(volatile uint32_t *ptr, uint8_t bit)
+{
+    return *ptr & (1 << bit);
+}
+
+static inline bool bit_check16(volatile uint16_t *ptr, uint8_t bit)
+{
+    return *ptr & (1 << bit);
+}
+
+static inline bool bit_check8(volatile uint8_t *ptr, uint8_t bit)
+{
+    return *ptr & (1 << bit);
 }
 
 #endif /* CPU_HAS_BITBAND */
