@@ -1,6 +1,13 @@
 INCLUDES += -I$(RIOTCPU)/cortexm_common/include
-INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/raspberry-pi-pico-sdk
 
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2_common/boot_stage2/asminclude
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2_common/boot_stage2/include
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2_common/pico_platform/include
+
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2040/hardware_regs/include
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2040/hardware_structs/include
+
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/include
 
 include $(RIOTMAKE)/arch/cortexm.inc.mk
 

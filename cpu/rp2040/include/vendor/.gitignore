@@ -1,1 +1,4 @@
-rpi-pico-sdk/*
+*.S
+*.bin
+*.elf
+rpi-pico-sdk/
