@@ -91,13 +91,9 @@ static int flash_verify(int page, int offset, const void *data, size_t len)
 
 static void flash_write(int page, const void *data, size_t len)
 {
-    assert(page < (int)FLASHPAGE_NUMOF);
     uint32_t *page_addr = (uint32_t *)flashpage_addr(page);
 
-    /* erase given page */
-    NRF_NVMC->CONFIG = NVMC_CONFIG_WEN_Een;
-    NRF_NVMC->ERASEPAGE = (uint32_t)page_addr;
-    while (NRF_NVMC->READY == 0) {}
+    flashpage_erase(page);
 
     /* write data to page */
     if (data != NULL) {

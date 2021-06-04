@@ -31,19 +31,18 @@ extern "C" {
 #endif
 
 /**
- * @name CTAP supported transport prototocols
- *
- * @{
+ * @brief CTAP supported transport prototocols
  */
-#define CTAP_TRANSPORT_USB 0x1
-#define CTAP_TRANSPORT_NFC 0x2
-#define CTAP_TRANSPORT_BLE 0x3
-/** @} */
+typedef enum {
+    USB,
+    NFC,
+    BLE
+} ctap_transport_type_t;
 
 /**
  * @brief CTAP_TRANSPORT thread stack size
  */
-#define CTAP_TRANSPORT_STACKSIZE 16000
+#define CTAP_TRANSPORT_STACKSIZE 15000
 
 /**
  * @brief Initialize ctap_transport layer and fido2_ctap
@@ -51,28 +50,17 @@ extern "C" {
 void fido2_ctap_transport_init(void);
 
 /**
- * @brief Initialize needed RIOT transport layers
- *
- * @param[in] type              transport layer to initialize
- * @param[in] arg               optional arg
- * @param[in] size              size of optional arg
- *
- * @return CTAP status code
- */
-int fido2_ctap_transport_create(uint8_t type, void *arg, size_t size);
-
-/**
  * @brief Try timeout long to read data from specified transport layer
  *
  * @param[in] type              transport layer to read from
  * @param[in] buffer            buffer for data
  * @param[in] size              size of buffer
- * @param[in] timeout           timeout
+ * @param[in] timeout           timeout in microseconds
  *
  * @return CTAP status code
  */
-int fido2_ctap_transport_read_timeout(uint8_t type, void *buffer, size_t size,
-                                      uint32_t timeout);
+int fido2_ctap_transport_read_timeout(ctap_transport_type_t type, void *buffer,
+                                        size_t size, uint32_t timeout);
 
 /**
  * @brief Write to specified transport layer
@@ -83,7 +71,8 @@ int fido2_ctap_transport_read_timeout(uint8_t type, void *buffer, size_t size,
  *
  * @return CTAP status code
  */
-int fido2_ctap_transport_write(uint8_t type, const void *buffer, size_t size);
+int fido2_ctap_transport_write(ctap_transport_type_t type, const void *buffer,
+                                size_t size);
 
 #ifdef __cplusplus
 }

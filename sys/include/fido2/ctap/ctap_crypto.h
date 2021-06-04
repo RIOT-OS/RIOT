@@ -66,7 +66,7 @@ int fido2_ctap_crypto_init(void);
 /**
  * @brief Pseudorandom number generator
  *
- * Wrapper for hwrng_read
+ * Wrapper for random_bytes func of sys/random.c
  *
  * @param[in] buf   buffer to hold random bytes
  * @param[in] size  size of buffer
@@ -85,7 +85,7 @@ int fido2_ctap_crypto_reset_key_agreement(void);
  *
  * @param[in] key  public key buffer
  */
-void fido2_ctap_crypto_get_key_agreement(ctap_crypto_pub_key_t *key);
+void fido2_ctap_crypto_get_pub_key_agreement_key(ctap_crypto_pub_key_t *key);
 
 /**
  * @brief Generate cryptographic key pair

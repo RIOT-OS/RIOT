@@ -17,12 +17,9 @@
 
 #include <string.h>
 
-#ifdef CONFIG_CTAP_NATIVE
-#include <sys/time.h>
-#endif
-
 #include "xtimer.h"
 #include "cbor.h"
+#include "usb/usbus.h"
 
 #include "fido2/ctap.h"
 #include "fido2/ctap/transport/ctap_transport.h"
@@ -38,22 +35,22 @@
  * CTAP specification (version 20190130) section 8.1.8.2
  */
 static const uint8_t report_desc_ctap[] = {
-    0x06, 0xD0, 0xF1,   // HID_UsagePage ( FIDO_USAGE_PAGE ),
-    0x09, 0x01,         // HID_Usage ( FIDO_USAGE_CTAPHID ),
-    0xA1, 0x01,         // HID_Collection ( HID_Application ),
-    0x09, 0x20,         // HID_Usage ( FIDO_USAGE_DATA_IN ),
-    0x15, 0x00,         // HID_LogicalMin ( 0 ),
-    0x26, 0xFF, 0x00,   // HID_LogicalMaxS ( 0xff ),
-    0x75, 0x08,         // HID_ReportSize ( 8 ),
-    0x95, 0x40,         // HID_ReportCount ( HID_INPUT_REPORT_BYTES ),
-    0x81, 0x02,         // HID_Input ( HID_Data | HID_Absolute | HID_Variable ),
-    0x09, 0x21,         // HID_Usage ( FIDO_USAGE_DATA_OUT ),
-    0x15, 0x00,         // HID_LogicalMin ( 0 ),
-    0x26, 0xFF, 0x00,   // HID_LogicalMaxS ( 0xff ),
-    0x75, 0x08,         // HID_ReportSize ( 8 ),
-    0x95, 0x40,         // HID_ReportCount ( HID_OUTPUT_REPORT_BYTES ),
-    0x91, 0x02,         // HID_Output ( HID_Data | HID_Absolute | HID_Variable ),
-    0xC0,               // HID_EndCollection
+    0x06, 0xD0, 0xF1,   /**< HID_UsagePage ( FIDO_USAGE_PAGE ) */
+    0x09, 0x01,         /**< HID_Usage ( FIDO_USAGE_CTAPHID ) */
+    0xA1, 0x01,         /**< HID_Collection ( HID_Application ) */
+    0x09, 0x20,         /**< HID_Usage ( FIDO_USAGE_DATA_IN ) */
+    0x15, 0x00,         /**< HID_LogicalMin ( 0 ) */
+    0x26, 0xFF, 0x00,   /**< HID_LogicalMaxS ( 0xff ) */
+    0x75, 0x08,         /**< HID_ReportSize ( 8 ) */
+    0x95, 0x40,         /**< HID_ReportCount ( HID_INPUT_REPORT_BYTES ) */
+    0x81, 0x02,         /**< HID_Input ( HID_Data | HID_Absolute | HID_Variable ) */
+    0x09, 0x21,         /**< HID_Usage ( FIDO_USAGE_DATA_OUT ) */
+    0x15, 0x00,         /**< HID_LogicalMin ( 0 ) */
+    0x26, 0xFF, 0x00,   /**< HID_LogicalMaxS ( 0xff ) */
+    0x75, 0x08,         /**< HID_ReportSize ( 8 ) */
+    0x95, 0x40,         /**< HID_ReportCount ( HID_OUTPUT_REPORT_BYTES ) */
+    0x91, 0x02,         /**< HID_Output ( HID_Data | HID_Absolute | HID_Variable ) */
+    0xC0,               /**< HID_EndCollection */
 };
 
 /**
@@ -89,18 +86,70 @@ static void wink(uint32_t cid, uint8_t cmd);
 static void send_init_response(uint32_t cid_old, uint32_t cid_new,
                                const uint8_t *nonce);
 
-static void reset_ctap_buffer(void);
+/**
+ * @brief Clear the CTAP packet buffer
+ */
+static void clear_ctap_buffer(void);
+
+/**
+ * @brief Buffer packet belonging to currently processed transaction
+ */
 static uint8_t buffer_pkt(const ctap_hid_pkt_t *pkt);
+
+/**
+ * @brief Send error code to cid
+ */
 static void send_error_response(uint32_t cid, uint8_t err);
+
+/**
+ * @brief Refresh the last_used timestamp for this cid
+ */
 static int8_t refresh_cid(uint32_t cid);
+
+/**
+ * @brief Allocate a new logical channel
+ */
 static int8_t add_cid(uint32_t cid);
+
+/**
+ * @brief Delete logical channel
+ */
 static int8_t delete_cid(uint32_t cid);
+
+/**
+ * @brief Check if a logical channel with cid exists
+ */
 static bool cid_exists(uint32_t cid);
+
+/**
+ * @brief Return new available cid
+ */
 static inline uint32_t get_new_cid(void);
+
+/**
+ * @brief Parse packet length from pkt
+ */
 static inline uint16_t get_packet_len(const ctap_hid_pkt_t *pkt);
-static void pkt_worker(void);
+
+/**
+ * @brief Process CTAPHID transaction
+ */
+static void process_transaction(void);
+
+/**
+ * @brief Check if packet is an initialization packet
+ */
 static inline bool is_init_type_pkt(const ctap_hid_pkt_t *pkt);
+
 static inline bool should_cancel(void);
+
+/* usbus functionality */
+static char g_usb_stack[USBUS_STACKSIZE];
+static usbus_t g_usbus;
+size_t usb_hid_io_write(const void *buffer, size_t size);
+int usb_hid_io_read_timeout(void *buffer, size_t size, uint32_t timeout);
+void usb_hid_io_init(usbus_t *usbus, const uint8_t *report_desc,
+                     size_t report_desc_size);
 
 static bool g_is_busy = false;
 static ctap_hid_buffer_t g_ctap_buffer;
@@ -111,8 +160,13 @@ static uint32_t g_cid = 1;
 
 void fido2_ctap_transport_hid_create(void)
 {
-    fido2_ctap_transport_create(CTAP_TRANSPORT_USB, (void *)report_desc_ctap,
-                                sizeof(report_desc_ctap));
+    usbdev_t *usbdev = usbdev_get_ctx(0);
+
+    assert(usbdev);
+    usbus_init(&g_usbus, usbdev);
+    usb_hid_io_init(&g_usbus, report_desc_ctap, sizeof(report_desc_ctap));
+
+    usbus_create(g_usb_stack, USBUS_STACKSIZE, USBUS_PRIO, USBUS_TNAME, &g_usbus);
 }
 
 void fido2_ctap_transport_hid_handle_packet(void *pkt_raw, int size)
@@ -132,7 +186,7 @@ void fido2_ctap_transport_hid_handle_packet(void *pkt_raw, int size)
             if (is_init_type_pkt(pkt)) {
                 if (pkt->init.cmd == CTAP_HID_COMMAND_INIT) {
                     /* abort */
-                    reset_ctap_buffer();
+                    clear_ctap_buffer();
                     status = buffer_pkt(pkt);
                 }
                 else if (g_ctap_buffer.is_locked && pkt->init.cmd ==
@@ -170,13 +224,13 @@ void fido2_ctap_transport_hid_handle_packet(void *pkt_raw, int size)
     if (status == CTAP_HID_BUFFER_STATUS_ERROR) {
         send_error_response(cid, g_ctap_buffer.err);
         delete_cid(cid);
-        reset_ctap_buffer();
+        clear_ctap_buffer();
         g_is_busy = false;
     }
-    /* pkt->init.bcnt bytes have been received. Wakeup worker */
+    /* pkt->init.bcnt bytes have been received. Transaction can now be processed */
     else if (status == CTAP_HID_BUFFER_STATUS_DONE) {
         g_ctap_buffer.is_locked = 1;
-        pkt_worker();
+        process_transaction();
         g_is_busy = false;
     }
     else {
@@ -252,7 +306,7 @@ static uint8_t buffer_pkt(const ctap_hid_pkt_t *pkt)
            CTAP_HID_BUFFER_STATUS_DONE : CTAP_HID_BUFFER_STATUS_BUFFERING;
 }
 
-static void pkt_worker(void)
+static void process_transaction(void)
 {
     uint8_t *buf = (uint8_t *)&g_ctap_buffer.buffer;
     uint32_t cid = g_ctap_buffer.cid;
@@ -304,7 +358,7 @@ static void pkt_worker(void)
     }
 
     /* transaction done, cleanup */
-    reset_ctap_buffer();
+    clear_ctap_buffer();
 }
 
 static uint32_t handle_init_packet(uint32_t cid, uint16_t bcnt,
@@ -380,7 +434,7 @@ static inline bool is_init_type_pkt(const ctap_hid_pkt_t *pkt)
     return ((pkt->init.cmd & CTAP_HID_INIT_PACKET) == CTAP_HID_INIT_PACKET);
 }
 
-static void reset_ctap_buffer(void)
+static void clear_ctap_buffer(void)
 {
     memset(&g_ctap_buffer, 0, sizeof(g_ctap_buffer));
 }
@@ -407,7 +461,7 @@ void fido2_ctap_transport_hid_check_timeouts(void)
 
             send_error_response(g_cids[i].cid, CTAP_HID_ERR_MSG_TIMEOUT);
             delete_cid(g_cids[i].cid);
-            reset_ctap_buffer();
+            clear_ctap_buffer();
 
             g_is_busy = false;
         }
@@ -562,7 +616,7 @@ static void ctap_hid_write(uint8_t cmd, uint32_t cid, const void *_data, size_t 
     buf[offset++] = (len & 0xff) >> 0;
 
     if (data == NULL) {
-        fido2_ctap_transport_write(CTAP_TRANSPORT_USB, buf,
+        fido2_ctap_transport_write(USB, buf,
                                    CONFIG_USBUS_HID_INTERRUPT_EP_SIZE);
         return;
     }
@@ -588,7 +642,7 @@ static void ctap_hid_write(uint8_t cmd, uint32_t cid, const void *_data, size_t 
         bytes_written++;
 
         if (offset == CONFIG_USBUS_HID_INTERRUPT_EP_SIZE) {
-            fido2_ctap_transport_write(CTAP_TRANSPORT_USB, buf,
+            fido2_ctap_transport_write(USB, buf,
                                        CONFIG_USBUS_HID_INTERRUPT_EP_SIZE);
             offset = 0;
         }
@@ -596,7 +650,7 @@ static void ctap_hid_write(uint8_t cmd, uint32_t cid, const void *_data, size_t 
 
     if (offset > 0) {
         memset(buf + offset, 0, CONFIG_USBUS_HID_INTERRUPT_EP_SIZE - offset);
-        fido2_ctap_transport_write(CTAP_TRANSPORT_USB, buf,
+        fido2_ctap_transport_write(USB, buf,
                                    CONFIG_USBUS_HID_INTERRUPT_EP_SIZE);
     }
 }

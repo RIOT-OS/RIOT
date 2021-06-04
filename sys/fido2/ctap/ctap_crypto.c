@@ -20,12 +20,11 @@
 
 #include "debug.h"
 #include "assert.h"
+#include "random.h"
 
 #include "crypto/ciphers.h"
 #include "crypto/modes/ccm.h"
 #include "crypto/modes/cbc.h"
-
-#include "periph/hwrng.h"
 
 #include "uECC.h"
 
@@ -36,23 +35,24 @@
 static ctap_crypto_key_agreement_key_t g_ag_key;
 static int sig_to_der_format(uint8_t *r, uint8_t *s, uint8_t *sig,
                              size_t *sig_len);
+static int RNG(uint8_t *dest, size_t size);
 
 int fido2_ctap_crypto_init(void)
 {
-    hwrng_init();
 
+    uECC_set_rng(&RNG);
     /**
      * Generate authenticatorKeyAgreementKey.
+     *
      * Configuration operations upon power up CTAP specification
      * (version 20190130) section 5.5.2
      */
-    return fido2_ctap_crypto_gen_keypair(&g_ag_key.pub,
-                                         (uint8_t *)&g_ag_key.priv);
+    return fido2_ctap_crypto_reset_key_agreement();
 }
 
 void fido2_ctap_crypto_prng(uint8_t *buf, size_t size)
 {
-    hwrng_read(buf, size);
+    random_bytes(buf, size);
 }
 
 int fido2_ctap_crypto_reset_key_agreement(void)
@@ -61,7 +61,7 @@ int fido2_ctap_crypto_reset_key_agreement(void)
                                          (uint8_t *)&g_ag_key.priv);
 }
 
-void fido2_ctap_crypto_get_key_agreement(ctap_crypto_pub_key_t *key)
+void fido2_ctap_crypto_get_pub_key_agreement_key(ctap_crypto_pub_key_t *key)
 {
     memmove(key->x, g_ag_key.pub.x, CTAP_CRYPTO_KEY_SIZE);
     memmove(key->y, g_ag_key.pub.y, CTAP_CRYPTO_KEY_SIZE);
@@ -227,6 +227,12 @@ int fido2_ctap_crypto_get_sig(uint8_t *hash, size_t hash_size, uint8_t *sig,
     }
 
     return CTAP2_OK;
+}
+
+static int RNG(uint8_t *dest, size_t size)
+{
+    fido2_ctap_crypto_prng(dest, size);
+    return 1;
 }
 
 /* Encode signature in ASN.1 DER format */

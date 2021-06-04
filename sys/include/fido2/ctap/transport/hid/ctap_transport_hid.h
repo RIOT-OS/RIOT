@@ -23,7 +23,6 @@
 #define FIDO2_CTAP_TRANSPORT_HID_CTAP_TRANSPORT_HID_H
 
 #include <stdint.h>
-#include "timex.h"
 
 #include "usb/usbus/hid.h"
 
@@ -60,10 +59,13 @@ extern "C" {
 #define CTAP_HID_INIT_NONCE_SIZE 8
 
 /**
- * @brief CTAP_HID transaction timeout
- *
+ * @brief CTAP_HID transaction timeout in microseconds
  */
-#define CTAP_HID_TRANSACTION_TIMEOUT    (0.75 * US_PER_SEC)
+#ifdef CONFIG_FIDO2_CTAP_TRANSPORT_HID_TRANSACTION_TIMEOUT
+#define CTAP_HID_TRANSACTION_TIMEOUT (CONFIG_FIDO2_CTAP_TRANSPORT_HID_TRANSACTION_TIMEOUT * US_PER_MS)
+#else
+#define CTAP_HID_TRANSACTION_TIMEOUT (750 * US_PER_MS)
+#endif
 
 /**
  * @brief CTAP_HID max message payload size
@@ -226,7 +228,7 @@ typedef struct {
 } ctap_hid_buffer_t;
 
 /**
- * @brief Initialize USB, create needed threads
+ * @brief Initialize USB stack
  *
  */
 void fido2_ctap_transport_hid_create(void);

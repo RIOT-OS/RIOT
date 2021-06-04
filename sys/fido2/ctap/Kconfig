@@ -33,4 +33,6 @@ config FIDO2_CTAP_DISABLE_LED
     help
         When set, the authenticator will not use LED's .
 
+rsource "transport/Kconfig"
+
 endif # KCONFIG_FIDO2_CTAP

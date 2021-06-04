@@ -743,6 +743,7 @@ ifneq (,$(filter fido2_ctap,$(USEMODULE)))
 
   USEPKG += micro-ecc
 
+  USEMODULE += prng_sha256prng
   USEMODULE += cipher_modes
   USEMODULE += crypto_aes_256
   USEMODULE += hashes

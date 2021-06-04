@@ -681,7 +681,7 @@ int fido2_ctap_encrypt_rk(ctap_resident_key_t *rk, uint8_t *nonce,
                           size_t nonce_size, ctap_cred_id_t *id);
 
 /**
- * @brief Return if PIN has been set
+ * @brief Check if PIN has been set on authenticator
  *
  * @return true if it has been set, false if not
  */

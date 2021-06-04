@@ -784,7 +784,7 @@ static int get_key_agreement(CborEncoder *encoder)
 {
     ctap_public_key_cose_t key = { 0 };
 
-    fido2_ctap_crypto_get_key_agreement(&key.pubkey);
+    fido2_ctap_crypto_get_pub_key_agreement_key(&key.pubkey);
 
     key.alg_type = CTAP_COSE_ALG_ECDH_ES_HKDF_256;
     key.cred_type = CTAP_PUB_KEY_CRED_PUB_KEY;
