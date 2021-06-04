@@ -42,6 +42,6 @@ int main(void)
     }
 
     msg_queue_print();
-    printf("DONE");
+    puts("DONE");
     return 0;
 }
