@@ -56,11 +56,18 @@ static void _check_netdev_capabilities(netdev_t *dev);
 static void *_gnrc_netif_thread(void *args);
 static void _event_cb(netdev_t *dev, netdev_event_t event);
 
+typedef struct {
+    gnrc_netif_t *netif;
+    mutex_t init_done;
+    int result;
+} _netif_ctx_t;
+
 int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
                       char priority, const char *name, netdev_t *netdev,
                       const gnrc_netif_ops_t *ops)
 {
     int res;
+    _netif_ctx_t ctx;
 
     if (IS_ACTIVE(DEVELHELP) && gnrc_netif_highlander() && netif_iter(NULL)) {
         LOG_WARNING("gnrc_netif: gnrc_netif_highlander() returned true but "
@@ -81,11 +88,20 @@ int gnrc_netif_create(gnrc_netif_t *netif, char *stack, int stacksize,
     netstats_nb_init(&netif->netif);
 #endif
 
+    /* prepare thread context */
+    ctx.netif = netif;
+    mutex_init(&ctx.init_done);
+    mutex_lock(&ctx.init_done);
+
     res = thread_create(stack, stacksize, priority, THREAD_CREATE_STACKTEST,
-                        _gnrc_netif_thread, (void *)netif, name);
-    (void)res;
+                        _gnrc_netif_thread, &ctx, name);
     assert(res > 0);
-    return 0;
+    (void)res;
+
+    /* wait for result of driver init */
+    mutex_lock(&ctx.init_done);
+
+    return ctx.result;
 }
 
 bool gnrc_netif_dev_is_6lo(const gnrc_netif_t *netif)
@@ -1633,6 +1649,7 @@ static void _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt, bool push_back)
 
 static void *_gnrc_netif_thread(void *args)
 {
+    _netif_ctx_t *ctx = args;
     gnrc_netapi_opt_t *opt;
     gnrc_netif_t *netif;
     netdev_t *dev;
@@ -1641,7 +1658,7 @@ static void *_gnrc_netif_thread(void *args)
     msg_t msg_queue[GNRC_NETIF_MSG_QUEUE_SIZE];
 
     DEBUG("gnrc_netif: starting thread %i\n", thread_getpid());
-    netif = args;
+    netif = ctx->netif;
     gnrc_netif_acquire(netif);
     dev = netif->dev;
     netif->pid = thread_getpid();
@@ -1658,9 +1675,11 @@ static void *_gnrc_netif_thread(void *args)
     dev->event_callback = _event_cb;
     dev->context = netif;
     /* initialize low-level driver */
-    res = dev->driver->init(dev);
-    if (res < 0) {
-        LOG_ERROR("gnrc_netif: netdev init failed: %d\n", res);
+    ctx->result = dev->driver->init(dev);
+    /* signal that driver init is done */
+    mutex_unlock(&ctx->init_done);
+    if (ctx->result < 0) {
+        LOG_ERROR("gnrc_netif: netdev init failed: %d\n", ctx->result);
         return NULL;
     }
     netif_register(&netif->netif);
