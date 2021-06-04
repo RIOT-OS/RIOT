@@ -13,10 +13,11 @@ menuconfig PACKAGE_LVGL
     select MODULE_LVGL
     select MODULE_LVGL_CORE
     select MODULE_LVGL_DRAW
+    select MODULE_LVGL_DRAW_SW
+    select MODULE_LVGL_EXTRA
     select MODULE_LVGL_FONT
     select MODULE_LVGL_HAL
     select MODULE_LVGL_MISC
-    select MODULE_LVGL_THEMES
     select MODULE_LVGL_WIDGETS
 
     # lvgl is not compatible with non 32bit platforms
@@ -49,6 +50,12 @@ config MODULE_LVGL_CORE
 config MODULE_LVGL_DRAW
     bool
 
+config MODULE_LVGL_DRAW_SW
+    bool
+
+config MODULE_LVGL_EXTRA
+    bool
+
 config MODULE_LVGL_FONT
     bool
 
@@ -58,17 +65,132 @@ config MODULE_LVGL_HAL
 config MODULE_LVGL_MISC
     bool
 
-config MODULE_LVGL_THEMES
-    bool
-
 config MODULE_LVGL_WIDGETS
     bool
+
+config MODULE_LVGL_WIDGET_ARC
+    bool "Arc widget"
+
+config MODULE_LVGL_WIDGET_BAR
+    bool "Bar widget"
+
+config MODULE_LVGL_WIDGET_BTN
+    bool "Button widget"
+
+config MODULE_LVGL_WIDGET_BTNMATRIX
+    bool "Button matrix widget"
+
+config MODULE_LVGL_WIDGET_CANVAS
+    bool "Canvas widget"
+
+config MODULE_LVGL_WIDGET_CHECKBOX
+    bool "Checkbox widget"
+
+config MODULE_LVGL_WIDGET_DROPDOWN
+    bool "Dropdown widget"
+    select MODULE_LVGL_WIDGET_LABEL
+
+config MODULE_LVGL_WIDGET_IMG
+    bool "Image widget"
+    select MODULE_LVGL_WIDGET_LABEL
+
+config MODULE_LVGL_WIDGET_LABEL
+    bool "Label widget"
+
+config MODULE_LVGL_WIDGET_LINE
+    bool "Line widget"
+
+config MODULE_LVGL_WIDGET_ROLLER
+    bool "Roller widget"
+    select MODULE_LVGL_WIDGET_LABEL
+
+config MODULE_LVGL_WIDGET_SLIDER
+    bool "Slider widget"
+    select MODULE_LVGL_WIDGET_BAR
+
+config MODULE_LVGL_WIDGET_SWITCH
+    bool "Switch widget"
+
+config MODULE_LVGL_WIDGET_TEXTAREA
+    bool "Textarea widget"
+    select MODULE_LVGL_WIDGET_LABEL
+
+config MODULE_LVGL_WIDGET_TABLE
+    bool "Table widget"
+
+config MODULE_LVGL_EXTRA_LAYOUT_FLEX
+    bool "Flex extra layout"
+
+config MODULE_LVGL_EXTRA_LAYOUT_GRID
+    bool "Grid extra layout"
+
+config MODULE_LVGL_EXTRA_THEME_BASIC
+    bool "Extra theme basic"
+
+config MODULE_LVGL_EXTRA_THEME_DEFAULT
+    bool "Extra theme default"
+
+config MODULE_LVGL_EXTRA_THEME_DEFAULT_DARK
+    bool "Extra theme default in dark mode"
+
+config MODULE_LVGL_EXTRA_THEME_DEFAULT_GROW
+    bool "Extra theme default with button grow mode"
+
+config MODULE_LVGL_EXTRA_THEME_MONO
+    bool "Extra theme mono"
+
+config MODULE_LVGL_EXTRA_WIDGET_ANIMING
+    bool "Animing extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_CALENDAR
+    bool "Calendar extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_CHART
+    bool "Chart extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_COLORWHEEL
+    bool "Colorwheel extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_IMGBIN
+    bool "Imgbin extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_LED
+    bool "Led extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_LIST
+    bool "List extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_MENU
+    bool "Menu extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_METER
+    bool "Meter extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_MSGBOX
+    bool "Message box extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_SPINBOX
+    bool "Spinbox extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_SPINNER
+    bool "Spinner extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_TABVIEW
+    bool "Tabview extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_TILEVIEW
+    bool "Tileview extra widget"
+
+config MODULE_LVGL_EXTRA_WIDGET_WIN
+    bool "Window extra widget"
+    select MODULE_LVGL_WIDGET_BTN
+    select MODULE_LVGL_WIDGET_IMG
+    select MODULE_LVGL_WIDGET_LABEL
 
 endif # TEST_KCONFIG
 
 menuconfig KCONFIG_USEPKG_LVGL
     bool "Configure LVGL"
-    depends on USEPKG_LVGL
     help
         Configure LVGL package via Kconfig.
 
