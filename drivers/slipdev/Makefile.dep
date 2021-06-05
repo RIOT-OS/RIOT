@@ -1,4 +1,5 @@
 USEMODULE += tsrb
+USEMODULE += eui_provider
 FEATURES_REQUIRED += periph_uart
 
 ifneq (,$(filter slipdev_stdio,$(USEMODULE)))

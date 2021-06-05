@@ -128,6 +128,7 @@ PSEUDOMODULES += sched_cb
 PSEUDOMODULES += semtech_loramac_rx
 PSEUDOMODULES += shell_hooks
 PSEUDOMODULES += slipdev_stdio
+PSEUDOMODULES += slipdev_l2addr
 PSEUDOMODULES += sock
 PSEUDOMODULES += sock_async
 PSEUDOMODULES += sock_aux_local
