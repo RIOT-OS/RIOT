@@ -22,7 +22,7 @@
 #include "net/gnrc/ipv6/nib/ft.h"
 #include "net/gnrc/netif/internal.h"
 
-#include "net/gnrc/dhcpv6/client/6lbr.h"
+#include "net/gnrc/dhcpv6/client/simple_pd.h"
 
 #if IS_USED(MODULE_AUTO_INIT_DHCPV6_CLIENT)
 #error "Module `gnrc_dhcpv6_client_6lbr` is mutually exclusive to \
@@ -101,8 +101,13 @@ static void _configure_upstream_netif(gnrc_netif_t *upstream_netif)
 static void _configure_dhcpv6_client(void)
 {
     gnrc_netif_t *netif = NULL;
+    gnrc_netif_t *upstream = _find_upstream_netif();
     while ((netif = gnrc_netif_iter(netif))) {
-        if (gnrc_netif_is_6lo(netif)) {
+        if (IS_USED(MODULE_GNRC_DHCPV6_CLIENT_6LBR)
+            && !gnrc_netif_is_6lo(netif)) {
+            continue;
+        }
+        if (netif != upstream) {
             dhcpv6_client_req_ia_pd(netif->pid, 64U);
         }
     }
@@ -135,7 +140,7 @@ static void *_dhcpv6_cl_6lbr_thread(void *args)
     return NULL;
 }
 
-void gnrc_dhcpv6_client_6lbr_init(void)
+void gnrc_dhcpv6_client_simple_pd_init(void)
 {
     /* start DHCPv6 client thread to request prefix for WPAN */
     thread_create(_stack, DHCPV6_CLIENT_STACK_SIZE,

@@ -18,7 +18,7 @@
 #include "log.h"
 #include "net/arp.h"
 #include "net/dhcpv6.h"
-#include "net/gnrc/dhcpv6/client/6lbr.h"
+#include "net/gnrc/dhcpv6/client/simple_pd.h"
 #include "net/gnrc/ipv6/nib/pl.h"
 #include "net/gnrc/sixlowpan/ctx.h"
 #include "net/gnrc/netif.h"

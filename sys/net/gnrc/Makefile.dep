@@ -52,6 +52,10 @@ ifneq (,$(filter gnrc_dhcpv6_client,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_dhcpv6_client_6lbr,$(USEMODULE)))
+  USEMODULE += gnrc_dhcpv6_client_simple_pd
+endif
+
+ifneq (,$(filter gnrc_dhcpv6_client_simple_pd,$(USEMODULE)))
   USEMODULE += gnrc_dhcpv6_client
 endif
 

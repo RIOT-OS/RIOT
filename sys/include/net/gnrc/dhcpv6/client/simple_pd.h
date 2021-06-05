@@ -7,9 +7,10 @@
  */
 
 /**
- * @defgroup    net_dhcpv6_client_6lbr  DHCPv6 client for 6LoWPAN border routers
+ * @defgroup    net_dhcpv6_client_6lbr  DHCPv6 client for simple prefix
+ *              delegation
  * @ingroup     net_dhcpv6_client
- * @brief       DHCPv6 client bootstrapping for 6LoWPAN border routers
+ * @brief       DHCPv6 client bootstrapping for routers & 6LoWPAN border routers
  * @{
  *
  * @file
@@ -17,8 +18,8 @@
  *
  * @author  Martine S. Lenders <m.lenders@fu-berlin.de>
  */
-#ifndef NET_GNRC_DHCPV6_CLIENT_6LBR_H
-#define NET_GNRC_DHCPV6_CLIENT_6LBR_H
+#ifndef NET_GNRC_DHCPV6_CLIENT_SIMPLE_PD_H
+#define NET_GNRC_DHCPV6_CLIENT_SIMPLE_PD_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,15 +61,15 @@ extern "C" {
 #endif
 
 /**
- * @brief   Initializes the DHCPv6 client for 6LoWPAN border router
+ * @brief   Initializes the DHCPv6 client for simple prefix delegation
  *
  * @note    Called by `auto_init` when included
  */
-void gnrc_dhcpv6_client_6lbr_init(void);
+void gnrc_dhcpv6_client_simple_pd_init(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* NET_GNRC_DHCPV6_CLIENT_6LBR_H */
+#endif /* NET_GNRC_DHCPV6_CLIENT_SIMPLE_PD_H */
 /** @} */
