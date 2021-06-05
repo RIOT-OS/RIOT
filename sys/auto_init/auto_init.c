@@ -108,6 +108,11 @@ void auto_init(void)
         extern void lwip_bootstrap(void);
         lwip_bootstrap();
     }
+    if (IS_USED(MODULE_SOCK_DTLS)) {
+        LOG_DEBUG("Auto init sock_dtls.\n");
+        extern void sock_dtls_init(void);
+        sock_dtls_init();
+    }
     if (IS_USED(MODULE_OPENTHREAD)) {
         LOG_DEBUG("Bootstrapping openthread.\n");
         extern void openthread_bootstrap(void);
@@ -168,11 +173,6 @@ void auto_init(void)
         LOG_DEBUG("Auto init loramac.\n");
         extern void auto_init_loramac(void);
         auto_init_loramac();
-    }
-    if (IS_USED(MODULE_SOCK_DTLS)) {
-        LOG_DEBUG("Auto init sock_dtls.\n");
-        extern void sock_dtls_init(void);
-        sock_dtls_init();
     }
 
     /* initialize USB devices */
