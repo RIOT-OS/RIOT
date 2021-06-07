@@ -15,6 +15,7 @@ BOARD_WHITELIST :=  \
 					remote-pa \
 					remote-reva \
 					remote-revb \
+					samr21-xpro \
 					#
 
 DISABLE_MODULE += auto_init_at86rf2xx auto_init_nrf802154

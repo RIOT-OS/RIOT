@@ -56,7 +56,16 @@ static uint8_t seq;
 static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
 {
     if (buffer[0] & IEEE802154_FCF_TYPE_ACK && ((seq-1) == buffer[2])) {
-        printf("Received valid ACK with sqn %i\n", buffer[2]);
+        printf("Received valid ACK with sqn %i ", buffer[2]);
+        printf("%02x\n", buffer[0]);
+        printf("%02x\n", buffer[1]);
+        printf("%02x\n", buffer[2]);
+        if (buffer[0] & IEEE802154_FCF_FRAME_PEND) {
+            printf("and frame pending bit\n");
+        }
+        else {
+            printf("\n");
+        }
     }
     else {
         puts("Packet received:");
@@ -171,9 +180,10 @@ static void _tx_finish_handler(event_t *event)
     /* The TX_DONE event indicates it's safe to call the confirm counterpart */
     assert(ieee802154_radio_confirm_transmit(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), &tx_info) >= 0);
 
+    _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
+
     if (!ieee802154_radio_has_irq_ack_timeout(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID)) && !ieee802154_radio_has_frame_retrans(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
         /* This is just to show how the MAC layer would handle ACKs... */
-        _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
         xtimer_set(&timer_ack, ACK_TIMEOUT_TIME);
     }
 
@@ -239,7 +249,7 @@ static int _init(void)
     /* Since the device was already initialized, turn on the radio.
      * The transceiver state will be "TRX_OFF" */
     ieee802154_radio_request_on(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID));
-    while(ieee802154_radio_confirm_on(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID)) == -EAGAIN) {}
+    while(ieee802154_radio_confirm_on(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID)) == -EAGAIN) {puts("A");}
 
     current_rx_mode = IEEE802154_RX_AACK_ENABLED;
     ieee802154_radio_set_rx_mode(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), current_rx_mode);
@@ -376,8 +386,14 @@ int _cca(int argc, char **argv)
     (void) argc;
     (void) argv;
     ieee802154_radio_request_cca(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID));
-    mutex_lock(&lock);
-    int res = ieee802154_radio_confirm_cca(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID));
+    int res;
+    if (ieee802154_radio_has_irq_cca_done(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
+        mutex_lock(&lock);
+        res = ieee802154_radio_confirm_cca(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID));
+    }
+    else {
+        while((res = ieee802154_radio_confirm_cca(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) == -EAGAIN) {}
+    }
     assert(res >= 0);
 
     if (res > 0) {
