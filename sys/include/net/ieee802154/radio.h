@@ -343,7 +343,8 @@ struct ieee802154_dev {
     /**
      * @brief pointer to the context of the device
      */
-    void *ctx;
+    //void *ctx;
+    void *priv;
     /**
      * @brief the event callback of the device
      */

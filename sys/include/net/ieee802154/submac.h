@@ -104,9 +104,9 @@ typedef struct {
  * @brief IEEE 802.15.4 SubMAC descriptor
  */
 struct ieee802154_submac {
+    ieee802154_dev_t dev;              /**< pointer to the 802.15.4 HAL descriptor */
     eui64_t ext_addr;                   /**< IEEE 802.15.4 extended address */
     network_uint16_t short_addr;        /**< IEEE 802.15.4 short address */
-    ieee802154_dev_t *dev;              /**< pointer to the 802.15.4 HAL descriptor */
     const ieee802154_submac_cb_t *cb;   /**< pointer to the SubMAC callbacks */
     ieee802154_csma_be_t be;            /**< CSMA-CA backoff exponent params */
     bool wait_for_ack;                  /**< SubMAC is waiting for an ACK frame */
@@ -173,7 +173,7 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist);
 static inline int ieee802154_set_short_addr(ieee802154_submac_t *submac,
                                             const network_uint16_t *short_addr)
 {
-    int res = ieee802154_radio_set_hw_addr_filter(submac->dev, short_addr, NULL,
+    int res = ieee802154_radio_set_hw_addr_filter(&submac->dev, short_addr, NULL,
                                                   NULL);
 
     if (res >= 0) {
@@ -195,7 +195,7 @@ static inline int ieee802154_set_short_addr(ieee802154_submac_t *submac,
 static inline int ieee802154_set_ext_addr(ieee802154_submac_t *submac,
                                           const eui64_t *ext_addr)
 {
-    int res = ieee802154_radio_set_hw_addr_filter(submac->dev, NULL, ext_addr,
+    int res = ieee802154_radio_set_hw_addr_filter(&submac->dev, NULL, ext_addr,
                                                   NULL);
 
     if (res >= 0) {
@@ -216,7 +216,7 @@ static inline int ieee802154_set_ext_addr(ieee802154_submac_t *submac,
 static inline int ieee802154_set_panid(ieee802154_submac_t *submac,
                                        const uint16_t *panid)
 {
-    int res = ieee802154_radio_set_hw_addr_filter(submac->dev, NULL, NULL,
+    int res = ieee802154_radio_set_hw_addr_filter(&submac->dev, NULL, NULL,
                                                   panid);
 
     if (res >= 0) {
@@ -320,7 +320,7 @@ static inline int ieee802154_set_tx_power(ieee802154_submac_t *submac,
  */
 static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
 {
-    return ieee802154_radio_len(submac->dev);
+    return ieee802154_radio_len(&submac->dev);
 }
 
 /**
@@ -339,7 +339,7 @@ static inline int ieee802154_get_frame_length(ieee802154_submac_t *submac)
 static inline int ieee802154_read_frame(ieee802154_submac_t *submac, void *buf,
                                         size_t len, ieee802154_rx_info_t *info)
 {
-    return ieee802154_radio_read(submac->dev, buf, len, info);
+    return ieee802154_radio_read(&submac->dev, buf, len, info);
 }
 
 /**
