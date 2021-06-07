@@ -1,0 +1,35 @@
+' to generate SVG run plantuml -tsvg gnrc_ipv6_auto_subnets_simple.puml
+@startuml
+nwdiag {
+
+	network level1 {
+		address = "2001:db8::/60";
+
+		router_a [address = "2001:db8::<color:#8a8a8a>c8f4:13ff:fece:3f43", description = "1st level router"];
+		leaf_a   [address = "2001:db8::<color:#8a8a8a>804b:fcff:feb6:43fb", description = "1st level leaf node"];
+	}
+
+	network level2 {
+		address = "2001:db8:0:8::/61";
+
+		router_a [address = "2001:db8:0:8:<color:#8a8a8a>3c27:6dff:fe25:e95d"];
+		router_b [address = "2001:db8:0:8:<color:#8a8a8a>5075:35ff:fefa:30bc", description = "2nd level router"];
+	}
+
+	network level3 {
+		address = "2001:db8:0:c::/62";
+
+		router_b [address = "2001:db8:0:c:<color:#8a8a8a>2ca3:9eff:fea9:68f7"];
+		router_c [address = "2001:db8:0:c:<color:#8a8a8a>fc33:13ff:fe93:5ae4", description = "3rd level router"];
+		leaf_b1  [address = "2001:db8:0:c:<color:#8a8a8a>209e:deff:fea9:fd1b", description = "3rd level leaf node"];
+		leaf_b2  [address = "2001:db8:0:c:<color:#8a8a8a>5491:a2ff:fe98:61a2", description = "3rd level leaf node"];
+	}
+
+	network level4 {
+		address = "2001:db8:0:e::/63";
+
+		router_c [address = "2001:db8:0:e:<color:#8a8a8a>a8d9:e1ff:feab:d544"];
+		leaf_c   [address = "2001:db8:0:e:<color:#8a8a8a>1cf5:33ff:fe7c:c70c", description = "4th level leaf node"];
+	}
+}
+@enduml
