@@ -1,6 +1,6 @@
 # Used Devices
 - nRF52840-DK
-- olertia
+- Zolertia
 
 # Errors found
 

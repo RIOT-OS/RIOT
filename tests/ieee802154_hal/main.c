@@ -39,7 +39,6 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-
 #define SYMBOL_TIME (16U) /**< 16 us */
 
 #define ACK_TIMEOUT_TIME (40 * SYMBOL_TIME)
@@ -80,16 +79,13 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
         received_acks++;
     }
     else {
-        if (ENABLE_DEBUG) {
-            size_last_packet = size;
-            puts("Packet received:");
-            for (unsigned i=0;i<size;i++) {
-                printf("%02x ", buffer[i]);
-            }
+        size_last_packet = size;
+        DEBUG("Packet received:\n");
+        for (unsigned i=0;i<size;i++) {
+            DEBUG("%02x ", buffer[i]);
         }
         received_packets++;
         if (send_reply) {
-            puts("");
             uint8_t out[IEEE802154_LONG_ADDRESS_LEN];
             unsigned j = 0;
             for (unsigned i=20;i>12;i--) {
@@ -99,11 +95,7 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
             send(out, IEEE802154_LONG_ADDRESS_LEN, 1, 0);
         }
     }
-    if (ENABLE_DEBUG) {
-        puts("");
-        printf("LQI: %i, RSSI: %i\n", (int) lqi, (int) rssi);
-        puts("");
-    }
+    DEBUG("\nLQI: %i, RSSI: %i\n\n", (int) lqi, (int) rssi);
 }
 
 static int print_addr(int argc, char **argv)
@@ -115,7 +107,7 @@ static int print_addr(int argc, char **argv)
         printf("%02x", *_p++);
     }
     printf("\n");
-    printf("%d", current_channel);
+    printf("Channel: %d", current_channel);
     return 0;
 }
 
