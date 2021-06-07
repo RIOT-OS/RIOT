@@ -134,9 +134,9 @@ static void *_thread(void *args)
     event_queue_t event_queue;
     event_queue_init(&event_queue);
     dhcpv6_client_init(&event_queue, SOCK_ADDR_ANY_NETIF);
-    gnrc_netif_t *netif = NULL;
-    while ((netif = gnrc_netif_iter(netif))) {
-        dhcpv6_client_req_ia_na(netif->pid);
+    netif_t* netif = NULL;
+    while ((netif = netif_iter(netif))) {
+        dhcpv6_client_req_ia_na(netif_get_id(netif));
     }
     dhcpv6_client_start();
     event_loop(&event_queue);   /* never returns */
@@ -893,12 +893,12 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                         uint32_t valid = byteorder_ntohl(iaaddr->valid);
                         uint32_t pref = byteorder_ntohl(iaaddr->pref);
                         ipv6_addr_t *addr = &iaaddr->addr;
-                        gnrc_netif_t *netif = gnrc_netif_get_by_pid(lease->parent.ia_id.info.netif);
+                        netif_t *netif = netif_get_by_id(lease->parent.ia_id.info.netif);
 
                         if (&lease->addr != NULL &&
                             ipv6_addr_equal(&lease->addr, addr)) {
                             /* A different address has been leased to the client */
-                            gnrc_netif_ipv6_addr_remove(netif, &lease->addr);
+                            netif_set_opt(netif, NETOPT_IPV6_ADDR_REMOVE, 64 << 8, &lease->addr, sizeof(lease->addr));
                         }
 
                         lease->leased = 1U;
@@ -906,7 +906,7 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                         DEBUG("DHCPv6 client: ADD IP ADDRESS %s\n",
                             ipv6_addr_to_str(addr_str, addr, sizeof(addr_str)));
 
-                        if (gnrc_netif_ipv6_addr_add(netif, addr, 64U, 0) > 0) {
+                        if (netif_set_opt(netif, NETOPT_IPV6_ADDR, 64 << 8, addr, sizeof(*addr)) > 0) {
                             DEBUG("IP ADDRESS successfully added!\n");
                             /* update lifetime */
                             if (valid < UINT32_MAX) { /* UINT32_MAX means infinite lifetime */
