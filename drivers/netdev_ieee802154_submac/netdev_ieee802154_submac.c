@@ -291,8 +291,24 @@ static int _init(netdev_t *netdev)
         (netdev_ieee802154_submac_t *)netdev;
     ieee802154_submac_t *submac = &netdev_submac->submac;
     netdev_ieee802154_t *netdev_ieee802154 = (netdev_ieee802154_t *)netdev;
+    netdev_ieee802154_setup(netdev_ieee802154);
+
     ieee802154_submac_init(submac, (network_uint16_t*) netdev_ieee802154->short_addr, (eui64_t*) netdev_ieee802154->long_addr);
 
+    /* This function already sets the PAN ID to the default one */
+    netdev_ieee802154_reset(netdev_ieee802154);
+
+    uint16_t chan = CONFIG_IEEE802154_DEFAULT_CHANNEL;
+    int16_t tx_power = CONFIG_IEEE802154_DEFAULT_TXPOWER;
+    netopt_enable_t enable = NETOPT_ENABLE;
+
+    /* Initialise netdev_ieee802154_t struct */
+    netdev_ieee802154_set(netdev_ieee802154, NETOPT_CHANNEL,
+                          &chan, sizeof(chan));
+    netdev_ieee802154_set(netdev_ieee802154, NETOPT_ACK_REQ,
+                          &enable, sizeof(enable));
+
+    netdev_submac->dev.txpower = tx_power;
     return 0;
 }
 
@@ -313,25 +329,6 @@ int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac,
 
     netdev_submac->ack_timer.callback = _ack_timeout;
     netdev_submac->ack_timer.arg = netdev_submac;
-
-    netdev_ieee802154_t *netdev_ieee802154 = (netdev_ieee802154_t *)netdev;
-
-    /* This function already sets the PAN ID to the default one */
-    netdev_ieee802154_reset(netdev_ieee802154);
-
-    uint16_t chan = CONFIG_IEEE802154_DEFAULT_CHANNEL;
-    int16_t tx_power = CONFIG_IEEE802154_DEFAULT_TXPOWER;
-    netopt_enable_t enable = NETOPT_ENABLE;
-
-    netdev_ieee802154_setup(netdev_ieee802154);
-
-    /* Initialise netdev_ieee802154_t struct */
-    netdev_ieee802154_set(netdev_ieee802154, NETOPT_CHANNEL,
-                          &chan, sizeof(chan));
-    netdev_ieee802154_set(netdev_ieee802154, NETOPT_ACK_REQ,
-                          &enable, sizeof(enable));
-
-    netdev_submac->dev.txpower = tx_power;
 
     return 0;
 }
