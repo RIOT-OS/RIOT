@@ -15,6 +15,7 @@ BOARD_WHITELIST :=  \
 					remote-pa \
 					remote-reva \
 					remote-revb \
+					samr21-xpro \
 					#
 USEMODULE += od
 USEMODULE += shell
