@@ -382,6 +382,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
                                               CONFIG_IEEE802154_CCA_THRESH_DEFAULT) >= 0);
 
     ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_RX_ON);
+    while(ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {};
 
     return 0;
 }
