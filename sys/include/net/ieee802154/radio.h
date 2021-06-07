@@ -34,9 +34,6 @@ extern "C" {
 #include "net/eui64.h"
 #include "net/ieee802154.h"
 
-extern uint16_t request_counter;
-extern uint16_t confirm_counter;
-
 /**
  * @brief Forward declaration of the radio ops structure.
  */
