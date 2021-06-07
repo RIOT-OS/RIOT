@@ -71,6 +71,10 @@
 #include "nrf802154.h"
 #endif
 
+#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
+#include "net/netdev/ieee802154_submac.h"
+#endif
+
 #include "lwip.h"
 
 #define ENABLE_DEBUG    0
@@ -170,7 +174,7 @@ extern void stm32_eth_netdev_setup(netdev_t *netdev);
 #endif
 
 #ifdef MODULE_NRF802154
-static nrf802154_t nrf802154_dev;
+static netdev_ieee802154_submac_t nrf802154_netdev;
 #endif
 
 void lwip_bootstrap(void)
@@ -263,8 +267,12 @@ void lwip_bootstrap(void)
         return;
     }
 #elif defined(MODULE_NRF802154)
-    nrf802154_setup(&nrf802154_dev);
-    if (netif_add_noaddr(&netif[0], &nrf802154_dev.netdev.dev.netdev, lwip_netdev_init,
+    netdev_register(&nrf802154_netdev.dev.netdev, NETDEV_NRF802154, 0);
+    netdev_ieee802154_submac_init(&nrf802154_netdev);
+
+    nrf802154_hal_setup(&nrf802154_netdev.submac.dev);
+    nrf802154_init();
+    if (netif_add_noaddr(&netif[0], &nrf802154_netdev.dev.netdev, lwip_netdev_init,
                          tcpip_6lowpan_input) == NULL) {
         DEBUG("Could not add nrf802154 device\n");
         return;

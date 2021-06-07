@@ -30,9 +30,6 @@
 #include "kernel_defines.h"
 
 #include "net/ieee802154/radio.h"
-#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
-#include "net/netdev/ieee802154_submac.h"
-#endif
 
 #include "net/netopt.h"
 
@@ -285,16 +282,19 @@ enum {
 
 /**
  * @brief   Device descriptor for CC2538 transceiver
- *
- * @extends netdev_ieee802154_t if using legacy radio
- * @extends netdev_ieee802154_submac_t if using radio HAL
  */
 typedef struct {
-#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
-    netdev_ieee802154_submac_t netdev;   /**< netdev parent struct */
-#endif
     uint8_t state;                /**< current state of the radio */
 } cc2538_rf_t;
+
+/**
+ * @brief   Setup CC2538 in order to be used with the IEEE 802.15.4 Radio HAL
+ *
+ * @note    This functions MUST be called before @ref cc2538_init.
+ *
+ * @param[in] hal  pointer to the HAL descriptor associated to the device.
+ */
+void cc2538_rf_hal_setup(ieee802154_dev_t *hal);
 
 /**
  * @brief   IRQ handler for RF events
@@ -380,7 +380,7 @@ void cc2538_off(void);
 bool cc2538_on(void);
 
 /**
- * @brief   Setup a CC2538 radio device for use with netdev
+ * @brief   Setup a CC2538 radio device
  *
  * @param[out] dev          Device descriptor
  */

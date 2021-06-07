@@ -23,7 +23,6 @@
 #include "periph_conf.h"
 
 #include "cc2538_rf.h"
-#include "cc2538_rf_netdev.h"
 
 #define ENABLE_DEBUG    0
 #include "debug.h"
@@ -211,10 +210,5 @@ bool cc2538_on(void)
 void cc2538_setup(cc2538_rf_t *dev)
 {
     (void) dev;
-#if IS_USED(MODULE_NETDEV_IEEE802154_SUBMAC)
-    extern ieee802154_dev_t cc2538_rf_dev;
-    netdev_register(&dev->netdev.dev.netdev, NETDEV_CC2538, 0);
-    netdev_ieee802154_submac_init(&dev->netdev, &cc2538_rf_dev);
-#endif
     cc2538_init();
 }

@@ -22,7 +22,6 @@
 #include "cpu.h"
 #include "cc2538.h"
 #include "cc2538_rf.h"
-#include "cc2538_rf_netdev.h"
 #include "cc2538_rf_internal.h"
 
 #define ENABLE_DEBUG 0

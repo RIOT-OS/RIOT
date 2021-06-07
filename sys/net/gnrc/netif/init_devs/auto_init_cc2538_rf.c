@@ -22,6 +22,7 @@
 #include "include/init_devs.h"
 
 #include "cc2538_rf.h"
+#include "net/netdev/ieee802154_submac.h"
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
@@ -32,7 +33,7 @@
 #define CC2538_MAC_PRIO            (GNRC_NETIF_PRIO)
 #endif
 
-static cc2538_rf_t cc2538_rf_dev;
+static netdev_ieee802154_submac_t cc2538_rf_netdev;
 static char _cc2538_rf_stack[CC2538_MAC_STACKSIZE];
 static gnrc_netif_t _netif;
 
@@ -40,10 +41,14 @@ void auto_init_cc2538_rf(void)
 {
     LOG_DEBUG("[auto_init_netif] initializing cc2538 radio\n");
 
-    cc2538_setup(&cc2538_rf_dev);
+    netdev_register(&cc2538_rf_netdev.dev.netdev, NETDEV_CC2538, 0);
+    netdev_ieee802154_submac_init(&cc2538_rf_netdev);
+    cc2538_rf_hal_setup(&cc2538_rf_netdev.submac.dev);
+
+    cc2538_init();
     gnrc_netif_ieee802154_create(&_netif, _cc2538_rf_stack,
                                  CC2538_MAC_STACKSIZE,
                                  CC2538_MAC_PRIO, "cc2538_rf",
-                                 &cc2538_rf_dev.netdev.dev.netdev);
+                                 &cc2538_rf_netdev.dev.netdev);
 }
 /** @} */

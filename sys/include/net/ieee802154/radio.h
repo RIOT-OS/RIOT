@@ -431,9 +431,9 @@ struct ieee802154_dev {
      */
     const ieee802154_radio_ops_t *driver;
     /**
-     * @brief pointer to the context of the device
+     * @brief pointer to the private descriptor of the device
      */
-    void *ctx;
+    void *priv;
     /**
      * @brief the event callback of the device
      */

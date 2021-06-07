@@ -203,15 +203,43 @@ static void _event_cb(netdev_t *dev, netdev_event_t event)
         }
     }
 }
+
+struct _reg_container {
+    int count;
+};
+
+static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
+{
+    struct _reg_container *reg = opaque;
+    printf("Trying to register ");
+    switch(type) {
+        case IEEE802154_DEV_TYPE_CC2538_RF:
+            printf("cc2538_rf");
+            break;
+        case IEEE802154_DEV_TYPE_NRF802154:
+            printf("nrf52840");
+            break;
+    }
+
+    puts(".");
+    if (reg->count > 0) {
+        puts("For the moment this test only supports one radio");
+        return NULL;
+    }
+
+    puts("Success");
+    return &netdev_submac.submac.dev;
+}
+
 static int _init(void)
 {
-    ieee802154_hal_test_init_devs();
-
     netdev_t *dev = &netdev_submac.dev.netdev;
 
     dev->event_callback = _event_cb;
-    netdev_ieee802154_submac_init(&netdev_submac,
-                                  ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID));
+    struct _reg_container reg = {0};
+    netdev_ieee802154_submac_init(&netdev_submac);
+    ieee802154_hal_test_init_devs(_reg_callback, &reg);
+
     dev->driver->init(dev);
     return 0;
 }
