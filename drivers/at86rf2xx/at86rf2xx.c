@@ -113,6 +113,7 @@ static const ieee802154_radio_cipher_ops_t _at86rf2xx_cipher_ops = {
 #endif /* IS_USED(MODULE_AT86RF2XX_AES_SPI) && \
           IS_USED(MODULE_IEEE802154_SECURITY) */
 
+#if 0
 void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t index)
 {
     netdev_t *netdev = &dev->netdev.netdev;
@@ -137,8 +138,9 @@ void at86rf2xx_setup(at86rf2xx_t *dev, const at86rf2xx_params_t *params, uint8_t
     /* set device address */
     netdev_ieee802154_setup(&dev->netdev);
 }
+#endif
 
-static void at86rf2xx_disable_clock_output(at86rf2xx_t *dev)
+void at86rf2xx_disable_clock_output(at86rf2xx_t *dev)
 {
 #if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
     (void) dev;
@@ -151,7 +153,7 @@ static void at86rf2xx_disable_clock_output(at86rf2xx_t *dev)
 #endif
 }
 
-static void at86rf2xx_enable_smart_idle(at86rf2xx_t *dev)
+void at86rf2xx_enable_smart_idle(at86rf2xx_t *dev)
 {
 #if AT86RF2XX_SMART_IDLE_LISTENING
     uint8_t tmp = at86rf2xx_reg_read(dev, AT86RF2XX_REG__TRX_RPC);
@@ -167,6 +169,7 @@ static void at86rf2xx_enable_smart_idle(at86rf2xx_t *dev)
 #endif
 }
 
+#if 0
 void at86rf2xx_reset(at86rf2xx_t *dev)
 {
     netdev_ieee802154_reset(&dev->netdev);
@@ -245,6 +248,7 @@ void at86rf2xx_reset(at86rf2xx_t *dev)
 
     DEBUG("at86rf2xx_reset(): reset complete.\n");
 }
+#endif
 
 size_t at86rf2xx_send(at86rf2xx_t *dev, const uint8_t *data, size_t len)
 {
@@ -281,7 +285,7 @@ size_t at86rf2xx_tx_load(at86rf2xx_t *dev, const uint8_t *data,
 
 void at86rf2xx_tx_exec(at86rf2xx_t *dev)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    //netdev_t *netdev = (netdev_t *)dev;
 
 #if AT86RF2XX_HAVE_RETRIES
     dev->tx_retries = -1;
@@ -292,10 +296,12 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev)
     /* trigger sending of pre-loaded frame */
     at86rf2xx_reg_write(dev, AT86RF2XX_REG__TRX_STATE,
                         AT86RF2XX_TRX_STATE__TX_START);
+    /*
     if (netdev->event_callback &&
         (dev->flags & AT86RF2XX_OPT_TELL_TX_START)) {
         netdev->event_callback(netdev, NETDEV_EVENT_TX_STARTED);
     }
+    */
 }
 
 bool at86rf2xx_cca(at86rf2xx_t *dev)

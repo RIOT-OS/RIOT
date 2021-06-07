@@ -46,6 +46,7 @@
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
+#if 0
 static int _send(netdev_t *netdev, const iolist_t *iolist);
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info);
 static int _init(netdev_t *netdev);
@@ -836,6 +837,7 @@ static void _isr(netdev_t *netdev)
         }
     }
 }
+#endif
 
 #if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
 

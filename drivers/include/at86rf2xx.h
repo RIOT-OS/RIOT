@@ -34,8 +34,10 @@
 
 #include "board.h"
 #include "kernel_defines.h"
-#include "net/netdev.h"
-#include "net/netdev/ieee802154.h"
+//#include "net/netdev.h"
+//#include "net/netdev/ieee802154.h"
+#include "net/netdev/ieee802154_submac.h"
+#include "net/ieee802154/radio.h"
 #include "net/gnrc/nettype.h"
 
 /* we need no peripherals for memory mapped radios */
@@ -238,13 +240,18 @@ typedef struct at86rf2xx_params {
 } at86rf2xx_params_t;
 #endif
 
+#define ISR_PIN GPIO_PIN(PB, 2)
+#define TX_PIN GPIO_PIN(PB, 3)
+#define RX_PIN GPIO_PIN(PA, 14)
+#define STATE_PIN GPIO_PIN(PA, 15)
+
 /**
  * @brief   Device descriptor for AT86RF2XX radio devices
  *
  * @extends netdev_ieee802154_t
  */
 typedef struct {
-    netdev_ieee802154_t netdev;             /**< netdev parent struct */
+    //netdev_ieee802154_t netdev;             /**< netdev parent struct */
 #if defined(MODULE_AT86RFA1) || defined(MODULE_AT86RFR2)
     /* ATmega256rfr2 signals transceiver events with different interrupts
      * they have to be stored to mimic the same flow as external transceiver
@@ -257,6 +264,7 @@ typedef struct {
 #else
     /* device specific fields */
     at86rf2xx_params_t params;              /**< parameters for initialization */
+    bool pending_irq;
 #endif
     uint16_t flags;                         /**< Device specific flags */
     uint8_t state;                          /**< current state of the radio */
@@ -621,6 +629,13 @@ void at86rf2xx_tx_exec(at86rf2xx_t *dev);
  * @return                  false if channel is determined busy
  */
 bool at86rf2xx_cca(at86rf2xx_t *dev);
+
+int at86rf2xx_init(at86rf2xx_t *dev, const at86rf2xx_params_t *params, void *arg);
+void at86rf2xx_enable_smart_idle(at86rf2xx_t *dev);
+void at86rf2xx_disable_clock_output(at86rf2xx_t *dev);
+void at86rf2xx_task_handler(ieee802154_dev_t *dev);
+void at86rf2xx_irq_handler(void *arg);
+void at86rf2xx_init_hal(at86rf2xx_t *dev, ieee802154_dev_t *hal);
 
 #ifdef __cplusplus
 }

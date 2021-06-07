@@ -164,6 +164,7 @@ void at86rf2xx_hardware_reset(at86rf2xx_t *dev)
              && (dev->state != AT86RF2XX_STATE_P_ON));
 }
 
+#if 0
 void at86rf2xx_configure_phy(at86rf2xx_t *dev)
 {
     /* we must be in TRX_OFF before changing the PHY configuration */
@@ -219,6 +220,7 @@ void at86rf2xx_configure_phy(at86rf2xx_t *dev)
     /* Return to the state we had before reconfiguring */
     at86rf2xx_set_state(dev, prev_state);
 }
+#endif
 
 #if AT86RF2XX_RANDOM_NUMBER_GENERATOR
 void at86rf2xx_get_random(const at86rf2xx_t *dev, uint8_t *data, size_t len)
