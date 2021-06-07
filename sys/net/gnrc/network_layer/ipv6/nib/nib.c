@@ -168,6 +168,7 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
 static bool _on_link(const ipv6_addr_t *dst, unsigned *iface)
 {
     _nib_offl_entry_t *entry = NULL;
+    uint8_t best_pfx = 0;
 
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     if (*iface != 0) {
@@ -178,10 +179,14 @@ static bool _on_link(const ipv6_addr_t *dst, unsigned *iface)
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LN */
     while ((entry = _nib_offl_iter(entry))) {
         if ((entry->mode & _PL) && (entry->flags & _PFX_ON_LINK) &&
-            (ipv6_addr_match_prefix(dst, &entry->pfx) >= entry->pfx_len)) {
+            (ipv6_addr_match_prefix(dst, &entry->pfx) >= entry->pfx_len) &&
+            (entry->pfx_len > best_pfx)) {
             *iface = _nib_onl_get_if(entry->next_hop);
-            return true;
+            best_pfx = entry->pfx_len;
         }
+    }
+    if (best_pfx) {
+        return true;
     }
     return ipv6_addr_is_link_local(dst);
 }
