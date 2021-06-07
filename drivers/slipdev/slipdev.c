@@ -252,12 +252,14 @@ static const netdev_driver_t slip_driver = {
     .set = netdev_set_notsup,
 };
 
-void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params)
+void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index)
 {
     /* set device descriptor fields */
     dev->config = *params;
     dev->state = 0;
     dev->netdev.driver = &slip_driver;
+
+    netdev_register(&dev->netdev, NETDEV_SLIPDEV, index);
 }
 
 /** @} */
