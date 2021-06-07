@@ -371,7 +371,7 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     ieee802154_phy_conf_t conf =
     { .phy_mode = submac->phy_mode,
       .channel = CONFIG_IEEE802154_DEFAULT_CHANNEL,
-      .page = CONFIG_IEEE802154_DEFAULT_CHANNEL,
+      .page = CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE,
       .pow = CONFIG_IEEE802154_DEFAULT_TXPOWER };
 
     ieee802154_radio_config_phy(dev, &conf);
