@@ -41,7 +41,7 @@ ifneq (,$(filter stdio_uart_rx,$(USEMODULE)))
 endif
 
 ifneq (,$(filter stdio_uart,$(USEMODULE)))
-  FEATURES_REQUIRED += periph_uart
+  FEATURES_REQUIRED_ANY += periph_uart|periph_lpuart
 endif
 
 ifneq (,$(filter stdio_semihosting,$(USEMODULE)))
