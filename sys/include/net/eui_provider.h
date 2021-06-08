@@ -75,10 +75,13 @@
  * Recommendations
  * ===============
  *
- * While it is possible to match EUIs with any netdev in a first come, first serve
- * fashion (`NETDEV_ANY`, `NETDEV_INDEX_ANY`) it is recommended to fix the EUI
- * providers to a device and interface to avoid them being used for 'virtual'
- * interfaces.
+ * Do not use `NETDEV_ANY` as EUI device type. Otherwise if you have two
+ * interfaces both will match the same EUI.
+ *
+ * It is however possible to use `NETDEV_INDEX_ANY` if you have multiple
+ * interfaces of the same type and your EUI provider function takes the index
+ * into account (or returns error if the index is out of bounds with the
+ * available ids).
  *
  * Fixed addresses are only guaranteed if the network devices are also fixed.
  * E.g. if you usually have two netdevs and disable the first one at compile-time
@@ -132,7 +135,7 @@ typedef int (*netdev_get_eui64_cb_t)(uint8_t index, eui64_t *addr);
  */
 typedef struct {
     netdev_get_eui48_cb_t provider; /**< function to provide an EUI-48                  */
-    netdev_type_t type;             /**< device type to match or `NETDEV_ANY`           */
+    netdev_type_t type;             /**< device type to match                           */
     uint8_t index;                  /**< device index to match or `NETDEV_INDEX_ANY`    */
 } eui48_conf_t;
 
@@ -141,7 +144,7 @@ typedef struct {
  */
 typedef struct {
     netdev_get_eui64_cb_t provider; /**< function to provide an EUI-64                  */
-    netdev_type_t type;             /**< device type to match or `NETDEV_ANY`           */
+    netdev_type_t type;             /**< device type to match                           */
     uint8_t index;                  /**< device index to match or `NETDEV_INDEX_ANY`    */
 } eui64_conf_t;
 
