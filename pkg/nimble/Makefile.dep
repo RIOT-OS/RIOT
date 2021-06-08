@@ -26,8 +26,8 @@ endif
 # include host dependencies
 ifneq (,$(filter nimble_host,$(USEMODULE)))
   USEMODULE += nimble_host_util
-  USEMODULE += nimble_tinycrypt
   USEMODULE += nimble_host_store_ram
+  USEPKG += tinycrypt
 endif
 
 # nimble controller dependencies

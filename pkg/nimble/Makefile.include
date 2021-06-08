@@ -33,11 +33,6 @@ ifneq (,$(filter nimble_host_util,$(USEMODULE)))
   INCLUDES += $(NIMIBASE)/nimble/host/util/include
 endif
 
-# include tinycrypt headers
-ifneq (,$(filter nimble_controller,$(USEMODULE)))
-  INCLUDES += $(NIMIBASE)/ext/tinycrypt/include
-endif
-
 # include transport headers
 ifneq (,$(filter nimble_transport_ram,$(USEMODULE)))
   INCLUDES += $(NIMIBASE)/nimble/transport/ram/include
