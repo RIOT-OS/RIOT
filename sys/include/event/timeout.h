@@ -62,7 +62,7 @@ typedef struct {
     event_t *event;         /**< event to post after timeout    */
 } event_timeout_t;
 
-#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER)
+#if IS_USED(MODULE_EVENT_TIMEOUT_ZTIMER) || DOXYGEN
 /**
  * @brief   Initialize timeout event object
  *
@@ -71,7 +71,7 @@ typedef struct {
  * @param[in]   queue           queue that the timed-out event will be added to
  * @param[in]   event           event to add to queue after timeout
  */
-void event_timeout_ztimer_init(event_timeout_t *event_timeout, ztimer_clock_t* clock,
+void event_timeout_ztimer_init(event_timeout_t *event_timeout, ztimer_clock_t *clock,
                                event_queue_t *queue, event_t *event);
 #endif
 
