@@ -16,14 +16,12 @@
  *
  * Heavily based on the stm32f1 connectivity line clock initialization
  */
+#include "kernel_defines.h"
 #include "irq.h"
 #include "cpu.h"
 #include "periph_conf.h"
 
-/* TODO move to board periph_conf */
-#define CLOCK_HXTAL          1
-
-#define CLOCK_AHB_DIV        0          /* Max speed at 108 MHz */
+#define CLOCK_AHB_DIV                  /* Max speed at 108 MHz */
 #define CLOCK_APB1_DIV       (0x04 | 0) /* Max speed at 54 MHz */
 #define CLOCK_APB2_DIV       (0x0 | 0)  /* Max speed at 108 MHz */
 
@@ -32,7 +30,8 @@
 #define CLOCK_APB2_DIV_CONF  (CLOCK_APB2_DIV << RCU_CFG0_APB2PSC_Pos)
 
 #define PREDV0_CONF          1  /* Divide by 2 */
-#define PLL_MULT_FACTOR      26 /* Multiply by 26 */
+#define PLL_MULT_FACTOR      (CLOCK_CORECLOCK / \
+                                (CLOCK_HXTAL / (PREDV0_CONF + 1)) - 1)
 
 #define RCU_CFG0_SCS_IRC8    (0 << RCU_CFG0_SCS_Pos)
 #define RCU_CFG0_SCS_HXTAL   (1 << RCU_CFG0_SCS_Pos)
@@ -66,10 +65,10 @@ void gd32vf103_clock_init(void)
     /* disable all active clocks except IRC8 -> resets the clk configuration */
     RCU->CTL = (RCU_CTL_IRC8MEN_Msk);
 
-#if (CLOCK_HXTAL)
-    cpu_reg_enable_bits(&RCU->CTL, RCU_CTL_HXTALEN_Msk);
-    while (!(RCU->CTL & RCU_CTL_HXTALSTB_Msk)) {}
-#endif
+    if (IS_ACTIVE(CLOCK_HXTAL)) {
+        cpu_reg_enable_bits(&RCU->CTL, RCU_CTL_HXTALEN_Msk);
+        while (!(RCU->CTL & RCU_CTL_HXTALSTB_Msk)) {}
+    }
 
     RCU->CFG1 = (PREDV0_CONF);
 
@@ -85,8 +84,10 @@ void gd32vf103_clock_init(void)
     /* Switch clock input */
     RCU->CFG0 |= RCU_CFG0_SCS_PLL;
 
+    RCU->AHBEN &= ~RCU_AHBEN_FMCSPEN_Msk;
 
     while ((RCU->CFG0 & RCU_CFG0_SCSS_Msk) !=
            (RCU_CFG0_SCS_PLL << RCU_CFG0_SCSS_Pos)) {}
+    gd32v_disable_irc8();
     irq_restore(is);
 }
