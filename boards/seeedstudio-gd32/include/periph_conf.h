@@ -26,6 +26,11 @@
 extern "C" {
 #endif
 
+/* This board provides an high frequency oscillator */
+#ifndef CONFIG_BOARD_HAS_HXTAL
+#define CONFIG_BOARD_HAS_HXTAL        1
+#endif
+
 #define CLOCK_HXTAL         MHZ(8)             /**< HXTAL frequency */
 #define CLOCK_CORECLOCK     MHZ(104)           /**< CPU clock frequency in Hz */
 
