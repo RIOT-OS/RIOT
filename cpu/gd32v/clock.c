@@ -21,7 +21,7 @@
 #include "cpu.h"
 #include "periph_conf.h"
 
-#define CLOCK_AHB_DIV                  /* Max speed at 108 MHz */
+#define CLOCK_AHB_DIV        0          /* Max speed at 108 MHz */
 #define CLOCK_APB1_DIV       (0x04 | 0) /* Max speed at 54 MHz */
 #define CLOCK_APB2_DIV       (0x0 | 0)  /* Max speed at 108 MHz */
 
