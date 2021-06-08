@@ -21,6 +21,10 @@
 #include "cpu.h"
 #include "periph_conf.h"
 
+#define CLOCK_AHB            CLOCK_CORECLOCK /* Equal to the CPU clock */
+#define CLOCK_APB1           CLOCK_AHB/2     /* Half AHB clock */
+#define CLOCK_APB2           CLOCK_AHB       /* Equal to the AHB clock */
+
 #define CLOCK_AHB_DIV        0          /* Max speed at 108 MHz */
 #define CLOCK_APB1_DIV       (0x04 | 0) /* Max speed at 54 MHz */
 #define CLOCK_APB2_DIV       (0x0 | 0)  /* Max speed at 108 MHz */
@@ -36,6 +40,58 @@
 #define RCU_CFG0_SCS_IRC8    (0 << RCU_CFG0_SCS_Pos)
 #define RCU_CFG0_SCS_HXTAL   (1 << RCU_CFG0_SCS_Pos)
 #define RCU_CFG0_SCS_PLL     (2 << RCU_CFG0_SCS_Pos)
+
+#define ENABLE_DEBUG 0
+#include "debug.h"
+
+void periph_clk_en(bus_t bus, uint32_t mask)
+{
+    switch (bus) {
+    case AHB:
+        cpu_reg_enable_bits(&RCU->AHBEN, mask);
+        break;
+    case APB1:
+        cpu_reg_enable_bits(&RCU->APB1EN, mask);
+        break;
+    case APB2:
+        cpu_reg_enable_bits(&RCU->APB2EN, mask);
+        break;
+    default:
+        DEBUG("unsupported bus %d\n", (int)bus);
+        break;
+    }
+}
+
+void periph_clk_dis(bus_t bus, uint32_t mask)
+{
+    switch (bus) {
+    case AHB:
+        cpu_reg_disable_bits(&RCU->AHBEN, mask);
+        break;
+    case APB1:
+        cpu_reg_disable_bits(&RCU->APB1EN, mask);
+        break;
+    case APB2:
+        cpu_reg_disable_bits(&RCU->APB2EN, mask);
+        break;
+    default:
+        DEBUG("unsupported bus %d\n", (int)bus);
+        break;
+    }
+}
+
+uint32_t periph_apb_clk(bus_t bus)
+{
+    switch (bus) {
+    case AHB:
+        return CLOCK_AHB;
+    case APB1:
+        return CLOCK_APB1;
+    case APB2:
+        return CLOCK_APB2;
+    }
+    return 0;
+}
 
 void gd32v_enable_irc8(void)
 {
@@ -65,7 +121,7 @@ void gd32vf103_clock_init(void)
     /* disable all active clocks except IRC8 -> resets the clk configuration */
     RCU->CTL = (RCU_CTL_IRC8MEN_Msk);
 
-    if (IS_ACTIVE(CLOCK_HXTAL)) {
+    if (IS_ACTIVE(CONFIG_BOARD_HAS_HXTAL)) {
         cpu_reg_enable_bits(&RCU->CTL, RCU_CTL_HXTALEN_Msk);
         while (!(RCU->CTL & RCU_CTL_HXTALSTB_Msk)) {}
     }
