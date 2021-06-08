@@ -2,10 +2,5 @@
 PORT_LINUX ?= /dev/ttyUSB1
 PORT_DARWIN ?= $(firstword $(sort $(wildcard /dev/tty.usbmodem*)))
 
-# setup serial terminal
-include $(RIOTMAKE)/tools/serial.inc.mk
-
-#OPENOCD_CMD_RESET_RUN =-c _reset
-include $(RIOTMAKE)/tools/openocd.inc.mk
-
+PROGRAMMER ?= openocd
 OPENOCD_RESET_USE_CONNECT_ASSERT_SRST=1
