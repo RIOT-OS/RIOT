@@ -51,7 +51,8 @@ uint16_t confirm_counter = 0;
 uint16_t request_counter = 0;
 
 static inline void _set_trx_state(int state, bool verbose);
-static int send(uint8_t *dst, size_t dst_len, size_t num, size_t time);
+static int send(uint8_t *dst, size_t dst_len, iolist_t iol_data, size_t num, size_t time);
+iolist_t iol_data_spam(void);
 
 static uint16_t received_acks;
 static uint16_t send_packets;
@@ -92,7 +93,7 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
                 out[j] = buffer[i];
                 j++;
             }
-            send(out, IEEE802154_LONG_ADDRESS_LEN, 1, 0);
+            send(out, IEEE802154_LONG_ADDRESS_LEN, iol_data_spam(), 1, 0);
         }
     }
     DEBUG("\nLQI: %i, RSSI: %i\n\n", (int) lqi, (int) rssi);
@@ -107,7 +108,7 @@ static int print_addr(int argc, char **argv)
         printf("%02x", *_p++);
     }
     printf("\n");
-    printf("Channel: %d", current_channel);
+    printf("Channel: %d\n", current_channel);
     return 0;
 }
 
@@ -692,19 +693,15 @@ static int _caps_cmd(int argc, char **argv)
     return 0;
 }
 
-static int send(uint8_t *dst, size_t dst_len, size_t num, size_t time)
+uint8_t payload[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ornare lacinia mi elementum interdum ligula.";
+
+static int send(uint8_t *dst, size_t dst_len, iolist_t iol_data, size_t num, size_t time)
 {
     uint8_t flags;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
     int mhr_len;
-    uint8_t *channel_ptr = &current_channel;
 
     le_uint16_t src_pan, dst_pan;
-    iolist_t iol_data = {
-        .iol_base = channel_ptr,
-        .iol_len = sizeof(*channel_ptr),
-        .iol_next = NULL,
-    };
 
     flags = IEEE802154_FCF_TYPE_DATA;// | IEEE802154_FCF_ACK_REQ;
 
@@ -712,9 +709,11 @@ static int send(uint8_t *dst, size_t dst_len, size_t num, size_t time)
     dst_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
     uint8_t src_len = IEEE802154_LONG_ADDRESS_LEN;
     void *src = &ext_addr;
+
     received_acks = 0;
     received_packets = 0;
     send_packets = 0;
+
     for(size_t i = 0; i < num; i++) {
         /* fill MAC header, seq should be set by device */
         if ((mhr_len = ieee802154_set_frame_hdr(mhr, src, src_len,
@@ -733,8 +732,7 @@ static int send(uint8_t *dst, size_t dst_len, size_t num, size_t time)
         _send(&iol_hdr);
         xtimer_msleep(time);
     }
-    if (ENABLE_DEBUG)
-    {
+    if (ENABLE_DEBUG) {
         puts("-------Summary of the test-------");
         printf("Send Packets: %d\n", send_packets);
         printf("Acknowledged Packets: %d\n", received_acks);
@@ -749,23 +747,54 @@ int txtsnd(int argc, char **argv)
 {
     uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
     size_t res;
+    size_t len;
+
+    if (argc != 3) {
+        puts("Usage: txtsnd <long_addr> <len>");
+        return 1;
+    }
+    res = _parse_addr(addr, sizeof(addr), argv[1]);
+    if (res == 0) {
+        puts("Usage: txtsnd <long_addr> <len>");
+        return 1;
+    }
+    len = atoi(argv[2]);
+    iolist_t iol_data = {
+        .iol_base = payload,
+        .iol_len = len,
+        .iol_next = NULL,
+    };
+    return send(addr, res, iol_data, 1, 0);
+}
+
+iolist_t iol_data_spam(void) {
+    uint8_t *channel_ptr = &current_channel;
+    iolist_t iol_data = {
+        .iol_base = channel_ptr,
+        .iol_len = sizeof(*channel_ptr),
+        .iol_next = NULL,
+    };
+    return iol_data;
+}
+
+int txtspam(int argc, char **argv) {
+    uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
+    size_t res;
     size_t num;
     size_t time;
 
     if (argc != 4) {
-        puts("Usage: spam <long_addr> <number of packets> <time in ms between packets>");
+        puts("Usage: txtspam <long_addr> <number of packets> <time in ms between packets>");
         return 1;
     }
-
     res = _parse_addr(addr, sizeof(addr), argv[1]);
     if (res == 0) {
-        puts("Usage: spam <long_addr> <number of packets> <time in ms between packets>");
+        puts("Usage: txtspam <long_addr> <number of packets> <time in ms between packets>");
         return 1;
-    };
-
+    }
     num = atoi(argv[2]);
     time = atoi(argv[3]);
-    return send(addr, res, num, time);
+    return send(addr, res, iol_data_spam(), num, time);
 }
 
 int toggle_reply(int argc, char **argv) {
@@ -824,7 +853,8 @@ static const shell_command_t shell_commands[] = {
     { "rx_mode", "Enable/Disable AACK or set Frame Pending bit or set promiscuos mode", rx_mode_cmd },
     { "tx_mode", "Enable CSMA-CA, CCA or direct transmission", txmode_cmd },
     { "caps", "Get a list of caps supported by the device", _caps_cmd },
-    { "txtsnd", "Send one or more packets to the target with or without delay", txtsnd },
+    { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
+    { "txtspam", "Send multiple IEEE 802.15.4 packets", txtspam },
     { "reply", "Every packet that arrives is mirrored", toggle_reply },
     { "check_last_packet", "Checks if the last packet received meets the criteria", check_last_packet },
     { NULL, NULL, NULL }
