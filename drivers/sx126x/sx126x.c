@@ -211,22 +211,26 @@ int sx126x_init(sx126x_t *dev)
 
 uint32_t sx126x_get_channel(const sx126x_t *dev)
 {
+    DEBUG("[sx126x]: sx126x_get_radio_status \n");
     return dev->channel;
 }
 
 void sx126x_set_channel(sx126x_t *dev, uint32_t freq)
 {
+    DEBUG("[sx126x]: sx126x_set_channel %" PRIu32 "Hz \n", freq);
     dev->channel = freq;
     sx126x_set_rf_freq(dev, dev->channel);
 }
 
 uint8_t sx126x_get_bandwidth(const sx126x_t *dev)
 {
+    DEBUG("[sx126x]: sx126x_get_bandwidth \n");
     return dev->mod_params.bw - SX126X_LORA_BW_125;
 }
 
 void sx126x_set_bandwidth(sx126x_t *dev, uint8_t bandwidth)
 {
+    DEBUG("[sx126x]: sx126x_set_bandwidth %02x\n", bandwidth);
     dev->mod_params.bw = bandwidth + SX126X_LORA_BW_125;
     dev->mod_params.ldro = _compute_ldro(dev);
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
@@ -234,11 +238,13 @@ void sx126x_set_bandwidth(sx126x_t *dev, uint8_t bandwidth)
 
 uint8_t sx126x_get_spreading_factor(const sx126x_t *dev)
 {
+    DEBUG("[sx126x]: sx126x_get_spreading_factor \n");
     return dev->mod_params.sf;
 }
 
 void sx126x_set_spreading_factor(sx126x_t *dev, uint8_t sf)
 {
+    DEBUG("[sx126x]: sx126x_set_spreading_factor : %02x\n", sf);
     dev->mod_params.sf = (sx126x_lora_sf_t)sf;
     dev->mod_params.ldro = _compute_ldro(dev);
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
@@ -246,17 +252,20 @@ void sx126x_set_spreading_factor(sx126x_t *dev, uint8_t sf)
 
 uint8_t sx126x_get_coding_rate(const sx126x_t *dev)
 {
+    DEBUG("[sx126x]: sx126x_get_coding_rate \n");
     return dev->mod_params.cr;
 }
 
 void sx126x_set_coding_rate(sx126x_t *dev, uint8_t cr)
 {
+    DEBUG("[sx126x]: sx126x_set_coding_rate %01x\n", cr);
     dev->mod_params.cr = (sx126x_lora_cr_t)cr;
     sx126x_set_lora_mod_params(dev, &dev->mod_params);
 }
 
 uint8_t sx126x_get_lora_payload_length(const sx126x_t *dev)
 {
+    DEBUG("[sx126x]: sx126x_get_lora_payload_length \n");
     sx126x_rx_buffer_status_t rx_buffer_status;
 
     sx126x_get_rx_buffer_status(dev, &rx_buffer_status);
@@ -265,50 +274,59 @@ uint8_t sx126x_get_lora_payload_length(const sx126x_t *dev)
 
 void sx126x_set_lora_payload_length(sx126x_t *dev, uint8_t len)
 {
+    DEBUG("[sx126x]: sx126x_set_lora_payload_length %d\n", len);
     dev->pkt_params.pld_len_in_bytes = len;
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
 
 bool sx126x_get_lora_crc(const sx126x_t *dev)
 {
+    DEBUG("[sx126x]: sx126x_get_lora_crc \n");
     return dev->pkt_params.crc_is_on;
 }
 
 void sx126x_set_lora_crc(sx126x_t *dev, bool crc)
 {
+    DEBUG("[sx126x]: sx126x_set_lora_crc %d\n", crc);
     dev->pkt_params.crc_is_on = crc;
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
 
 bool sx126x_get_lora_implicit_header(const sx126x_t *dev)
 {
+    DEBUG("[sx126x]: sx126x_get_lora_implicit_header \n");
     return dev->pkt_params.header_type == SX126X_LORA_PKT_IMPLICIT;
 }
 
 void sx126x_set_lora_implicit_header(sx126x_t *dev, bool mode)
 {
+    DEBUG("[sx126x]: sx126x_set_lora_implicit_header %d\n", mode);
     dev->pkt_params.header_type = (mode ? SX126X_LORA_PKT_IMPLICIT : SX126X_LORA_PKT_EXPLICIT);
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
 
 uint16_t sx126x_get_lora_preamble_length(const sx126x_t *dev)
 {
+    DEBUG("[sx126x]: sx126x_get_lora_preamble_length \n");
     return dev->pkt_params.preamble_len_in_symb;
 }
 
 void sx126x_set_lora_preamble_length(sx126x_t *dev, uint16_t preamble)
 {
+    DEBUG("[sx126x]: sx126x_set_lora_preamble_length %" PRIu16 "\n", preamble);
     dev->pkt_params.preamble_len_in_symb = preamble;
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
 
 bool sx126x_get_lora_iq_invert(const sx126x_t *dev)
 {
+    DEBUG("[sx126x]: sx126x_get_lora_iq_invert \n");
     return dev->pkt_params.invert_iq_is_on;
 }
 
 void sx126x_set_lora_iq_invert(sx126x_t *dev, bool iq_invert)
 {
+    DEBUG("[sx126x]: sx126x_set_lora_iq_invert %d\n", iq_invert);
     dev->pkt_params.invert_iq_is_on = iq_invert;
     sx126x_set_lora_pkt_params(dev, &dev->pkt_params);
 }
