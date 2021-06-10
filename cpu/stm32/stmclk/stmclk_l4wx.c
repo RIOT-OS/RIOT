@@ -487,17 +487,18 @@ void stmclk_init_sysclk(void)
              ~100 kHz and the MSI clock to be based on MSISRANGE in RCC_CSR
              (instead of MSIRANGE in the RCC_CR) */
     RCC->CR = (RCC_CR_HSION);
-
+    /* Use VDDTCXO regulator, required by the radio and HSE */
+    if (IS_ACTIVE(CLOCK_ENABLE_HSE) || IS_USED(MODULE_SX126X_STM32WL)) {
+#ifdef RCC_CR_HSEBYPPWR
+        RCC->CR |= (RCC_CR_HSEBYPPWR);
+#endif
+    }
     /* Enable the HSE clock only when it's provided by the board and required:
         - Use HSE as system clock
         - Use HSE as PLL input clock
     */
     if (IS_ACTIVE(CLOCK_ENABLE_HSE)) {
 
-    /* Use VDDTCXO regulator */
-#if defined(CPU_FAM_STM32WL)
-        RCC->CR |= (RCC_CR_HSEBYPPWR);
-#endif
         RCC->CR |= (RCC_CR_HSEON);
         while (!(RCC->CR & RCC_CR_HSERDY)) {}
     }

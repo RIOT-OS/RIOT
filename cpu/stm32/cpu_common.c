@@ -172,6 +172,11 @@ void periph_clk_dis(bus_t bus, uint32_t mask)
 #endif
             break;
 #endif
+#if defined(CPU_FAM_STM32WL)
+        case APB3:
+            RCC->APB3ENR &= ~(mask);
+            break;
+#endif
 #if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || \
     defined(CPU_FAM_STM32G4) || defined(CPU_FAM_STM32L5) || \
     defined(CPU_FAM_STM32WL)
