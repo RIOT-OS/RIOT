@@ -26,11 +26,21 @@ CFLAGS += -DAPP_CID=$(APP_CID)
 # configure NimBLE
 USEPKG += nimble
 MSYS_CNT ?= 40
-CFLAGS += -DMYNEWT_VAL_BLE_L2CAP_COC_MAX_NUM=1
-CFLAGS += -DMYNEWT_VAL_BLE_L2CAP_COC_MPS=250
-CFLAGS += -DMYNEWT_VAL_BLE_MAX_CONNECTIONS=1
-CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_COUNT=$(MSYS_CNT)
-CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE=298
+# For this test we use the controllers link layer data length extension
 CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_DATA_LEN_EXT=1
+CFLAGS += -DMYNEWT_VAL_BLE_LL_MAX_PKT_SIZE=251
+# Enable L2CAP connection oriented channels, 1 is sufficient for this test
+CFLAGS += -DMYNEWT_VAL_BLE_MAX_CONNECTIONS=1
+CFLAGS += -DMYNEWT_VAL_BLE_L2CAP_COC_MAX_NUM=1
+# For maximum efficiency, we set the maximum L2CAP fragment size to the same
+# value as the maximum link layer packet size.
+# WARNING: this value MUST never be larger than MYNEWT_VAL_BLE_LL_MAX_PKT_SIZE
+CFLAGS += -DMYNEWT_VAL_BLE_L2CAP_COC_MPS=MYNEWT_VAL_BLE_LL_MAX_PKT_SIZE
+# To be able to handle large packets, we must increase the default packet buffer
+# used by NimBLE.
+# In order to store a full L2CAP fragment/link layer packet in a single block,
+# we need to cater for a 48 byte overhead per block.
+CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_COUNT=$(MSYS_CNT)
+CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE="(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)"
 
 INCLUDES += -I$(RIOTBASE)/tests/nimble_l2cap_server/include

@@ -93,15 +93,27 @@ ifneq (,$(filter nimble_netif,$(USEMODULE)))
 
   # configure NimBLE's internals
   NIMBLE_MAX_CONN ?= 3
-  CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE=264
   CFLAGS += -DMYNEWT_VAL_BLE_L2CAP_COC_MAX_NUM=$(NIMBLE_MAX_CONN)
   CFLAGS += -DMYNEWT_VAL_BLE_MAX_CONNECTIONS=$(NIMBLE_MAX_CONN)
-  # NimBLEs internal buffer need to hold one IPv6 MTU per connection
-  # for the internal MTU of 256 byte, we need 10 mbufs per connection...
+
+  # the maximum fragment size that we can receive. For maximum efficiency this
+  # should be equal to the maximum configured link layer packet size.
+  # WARNING: this value MUST never be larger than MYNEWT_VAL_BLE_LL_MAX_PKT_SIZE
+  CFLAGS += -DMYNEWT_VAL_BLE_L2CAP_COC_MPS=251
+
+  # in order to fit a 251 byte COC data segment into a single mbuf buffer, the
+  # used block size must be at least 297 byte (251 data + 48 overhead)
+  CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_SIZE="(MYNEWT_VAL_BLE_L2CAP_COC_MPS + 48)"
+
+  # in the worst case, NimBLEs internal buffer needs to hold two full IPv6 MTUs
+  # per connection (1 TX and 1 RX). But in practice this would be highly over-
+  # provisioned. Allocating 10 memory blocks per connection plus another 5
+  # for internal buffering has proven to be a generous default value.
   CFLAGS += -DMYNEWT_VAL_MSYS_1_BLOCK_COUNT=35
 
   # optimize the NimBLE controller for IP traffic
   ifneq (,$(filter nimble_controller,$(USEMODULE)))
+    CFLAGS += -DMYNEWT_VAL_BLE_LL_MAX_PKT_SIZE=251
     CFLAGS += -DMYNEWT_VAL_BLE_LL_CFG_FEAT_DATA_LEN_EXT=1
   endif
 endif
