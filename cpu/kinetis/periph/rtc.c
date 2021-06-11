@@ -20,47 +20,80 @@
  * @}
  */
 
+#include "bit.h"
 #include "cpu.h"
 #include "periph/rtc.h"
-#include "periph/rtt.h"
 #include "periph_conf.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-typedef struct {
-    rtc_alarm_cb_t cb;        /**< callback called from RTC interrupt */
-} rtc_state_t;
-
-static rtc_state_t rtc_callback;
-
-/**
- * @brief Wrapper function to call RTC callback from RTT interrupt
- *
- * @param[inout] arg    argument passed from the RTT interrupt
- */
-static void rtc_cb(void *arg);
+static rtc_alarm_cb_t rtc_callback = NULL;
+static rtc_alarm_cb_t rtc_arg;
 
 void rtc_init(void)
 {
-    rtt_init();
+    rtc_callback = NULL;
+
+   /* Enable module clock gate */
+    RTC_CLKEN();
+
+    /* At this point, the CPU core may be clocked by a clock derived from the
+     * RTC oscillator, avoid touching the oscillator enable bit (OSCE) in RTC_CR */
+
+    /* Enable user mode access */
+    bit_set32(&RTC->CR, RTC_CR_SUP_SHIFT);
+
+    /* Disable all RTC interrupts. */
+    RTC->IER = 0;
+
+    /* The RTC module is only reset on VBAT power on reset, we try to preserve
+     * the seconds counter between reboots */
+    if (RTC->SR & RTC_SR_TIF_MASK) {
+        /* Time Invalid Flag is set, clear TIF by writing TSR */
+
+        /* Stop counter to make TSR writable */
+        bit_clear32(&RTC->SR, RTC_SR_TCE_SHIFT);
+
+        RTC->TSR = 0;
+    }
+
+    /* Clear the alarm flag TAF by writing a new alarm target to TAR */
+    RTC->TAR = 0xffffffff;
+
+    /* Enable RTC interrupts */
+    NVIC_EnableIRQ(RTC_IRQn);
+
 }
 
 int rtc_set_time(struct tm *time)
 {
     uint32_t t = rtc_mktime(time);
 
-    rtt_set_counter(t);
+    /* Disable time counter before writing to the timestamp register */
+    bit_clear32(&RTC->SR, RTC_SR_TCE_SHIFT);
+    RTC->TPR = 0;
+    /* write TSR after TPR, as clearing TPR bit 14 will increment TSR */
+    RTC->TSR = t;
+    /* Enable when done */
+    bit_set32(&RTC->SR, RTC_SR_TCE_SHIFT);
 
     return 0;
 }
 
 int rtc_get_time(struct tm *time)
 {
-    uint32_t t = rtt_get_counter();
+    uint32_t t;
+    for (int i = 0; i < 3; i++) {
+        /* Read twice to make sure we get a stable reading */
+        t = RTC->TSR;
 
+        if (t == RTC->TSR) {
+            return t;
+        }
+    }
+    /* Fallback just return unstable reading */
     rtc_localtime(t, time);
-
     return 0;
 }
 
@@ -68,16 +101,30 @@ int rtc_set_alarm(struct tm *time, rtc_alarm_cb_t cb, void *arg)
 {
     uint32_t t = rtc_mktime(time);
 
-    rtc_callback.cb = cb;
+    /* The alarm is triggered when TSR matches TAR, and TSR increments. This
+     * seem counterintuitive as most users expect the alarm to trigger
+     * immediately when the counter becomes equal to the alarm time.
+     *
+     * Workaround: Set TAF to alarm - 1
+     */
 
-    rtt_set_alarm(t, rtc_cb, arg);
+    /* Disable Timer Alarm Interrupt */
+    bit_clear32(&RTC->IER, RTC_IER_TAIE_SHIFT);
+
+    RTC->TAR = t - 1;
+
+    rtc_callback = cb;
+    rtc_arg = arg;
+
+    /* Enable Timer Alarm Interrupt */
+    bit_set32(&RTC->IER, RTC_IER_TAIE_SHIFT);
 
     return 0;
 }
 
 int rtc_get_alarm(struct tm *time)
 {
-    uint32_t t = rtt_get_alarm();
+    uint32_t t =  RTC->TAR + 1;
 
     rtc_localtime(t, time);
 
@@ -86,23 +133,32 @@ int rtc_get_alarm(struct tm *time)
 
 void rtc_clear_alarm(void)
 {
-    rtt_clear_alarm();
-    rtc_callback.cb = NULL;
+    /* Disable Timer Alarm Interrupt */
+    bit_clear32(&RTC->IER, RTC_IER_TAIE_SHIFT);
+    rtc_callback = NULL;
 }
 
 void rtc_poweron(void)
 {
-    rtt_poweron();
+    /* Enable Time Counter */
+    bit_set32(&RTC->SR, RTC_SR_TCE_SHIFT);
 }
 
 void rtc_poweroff(void)
 {
-    rtt_poweroff();
+    /* Disable Time Counter */
+    bit_clear32(&RTC->SR, RTC_SR_TCE_SHIFT);
 }
 
-static void rtc_cb(void *arg)
+void isr_rtc(void)
 {
-    if (rtc_callback.cb != NULL) {
-        rtc_callback.cb(arg);
+    if (RTC->SR & RTC_SR_TAF_MASK) {
+        if (rtc_callback != NULL) {
+            /* Disable Timer Alarm Interrupt */
+            bit_clear32(&RTC->IER, RTC_IER_TAIE_SHIFT);
+            rtc_callback(rtc_arg);
+        }
     }
+
+    cortexm_isr_end();
 }

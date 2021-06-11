@@ -1,6 +1,3 @@
-ifneq (,$(filter periph_rtc,$(USEMODULE)))
-  USEMODULE += periph_rtt
-endif
 ifneq (,$(filter periph_i2c,$(USEMODULE)))
   USEMODULE += core_thread_flags
 endif
