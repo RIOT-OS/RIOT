@@ -26,11 +26,11 @@
 #include "periph/uart.h"
 #include "tsrb.h"
 #include "irq.h"
-#include "luid.h"
 
 #include "net/netdev.h"
 #include "net/netdev/eth.h"
 #include "net/eui64.h"
+#include "net/eui_provider.h"
 #include "net/ethernet.h"
 
 #ifdef USE_ETHOS_FOR_STDIO
@@ -56,8 +56,6 @@ static const uint8_t _esc_delim[] = {ETHOS_ESC_CHAR, (ETHOS_FRAME_DELIMITER ^ 0x
 void ethos_setup(ethos_t *dev, const ethos_params_t *params, uint8_t idx,
                  void *inbuf, size_t inbuf_size)
 {
-    (void)idx;
-
     dev->netdev.driver = &netdev_driver_ethos;
     dev->uart = params->uart;
     dev->state = WAIT_FRAMESTART;
@@ -69,7 +67,8 @@ void ethos_setup(ethos_t *dev, const ethos_params_t *params, uint8_t idx,
     tsrb_init(&dev->inbuf, inbuf, inbuf_size);
     mutex_init(&dev->out_mutex);
 
-    luid_get_eui48((eui48_t *) &dev->mac_addr);
+    netdev_register(&dev->netdev, NETDEV_ETHOS, idx);
+    netdev_eui48_get(&dev->netdev, (eui48_t *)&dev->mac_addr);
 
     uart_init(params->uart, params->baudrate, ethos_isr, (void*)dev);
 
