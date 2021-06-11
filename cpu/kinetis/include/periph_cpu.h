@@ -157,18 +157,6 @@ enum {
 #endif
 /** @} */
 
-#ifdef RTC
-/* All Kinetis CPUs have exactly one RTC hardware module, except for the KL02
- * family which don't have an RTC at all */
-/**
- * @name RTT and RTC configuration
- * @{
- */
-#define RTT_FREQUENCY                (1)
-#define RTT_MAX_VALUE                (0xffffffff)
-/** @} */
-#endif
-
 #ifndef DOXYGEN
 /**
  * @name    GPIO pin modes
@@ -499,6 +487,30 @@ enum {
 #define TIMER_LPTMR_DEV(x) (TIMER_DEV(PIT_NUMOF + (x)))
 #endif /* KINETIS_HAVE_LPTMR */
 /** @} */
+
+/**
+ * @name RTT configuration
+ * @{
+ */
+#define RTT_DEV             (TIMER_LPTMR_DEV(0))
+#define RTT_MAX_VALUE       (0x0000ffff)
+#define RTT_CLOCK_FREQUENCY (32768U)             /* in Hz */
+#define RTT_MAX_FREQUENCY   (32768U)             /* in Hz */
+#define RTT_MIN_FREQUENCY   (1U)                 /* in Hz */
+#ifndef RTT_FREQUENCY
+#define RTT_FREQUENCY       RTT_MAX_FREQUENCY
+#endif
+#if IS_USED(PERIPH_RTT)
+/* On kinetis periph_rtt is built on top on an LPTIMER so if used it
+   will conflict with xtimer, if a LPTIMER backend and RTT are needed
+   consider using ztimer */
+#define KINETIS_XTIMER_SOURCE_PIT   1
+#endif
+/* When setting a new compare value, the value must be at least 5 more
+   than the current sleep timer value. Otherwise, the timer compare
+   event may be lost. */
+/** @} */
+
 
 /**
  * @brief UART hardware module types

@@ -9,7 +9,7 @@ DISABLE_MODULE += periph_init_rtt
 include $(RIOTBASE)/Makefile.include
 
 # Put board specific dependencies here
-ifeq (stm32,$(CPU))
+ifneq (,$(filter stm32 kinetis,$(CPU)))
   ifneq (f1,$(CPU_FAM))
     # all stm32% but stm32f1 RTT are based on a 16 bit LPTIM, if using the default
     # 32768KHz configuration TICKS_TO_WAIT will overflow

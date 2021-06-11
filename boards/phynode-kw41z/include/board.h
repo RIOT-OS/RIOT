@@ -87,7 +87,7 @@ extern "C"
  * @name    xtimer configuration
  * @{
  */
-#if KINETIS_XTIMER_SOURCE_PIT
+#if IS_ACTIVE(KINETIS_XTIMER_SOURCE_PIT)
 /* PIT xtimer configuration */
 #define XTIMER_DEV                  (TIMER_PIT_DEV(0))
 #define XTIMER_CHAN                 (0)

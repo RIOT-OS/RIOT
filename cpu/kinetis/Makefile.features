@@ -14,8 +14,6 @@ endif
 
 FEATURES_PROVIDED += periph_gpio
 FEATURES_PROVIDED += periph_gpio_irq
-FEATURES_PROVIDED += periph_rtt_set_counter
-FEATURES_PROVIDED += periph_rtt_overflow
 
 # Parse parameters from CPU_MODEL using the kinetis-info.mk script in the same
 # directory as this Makefile.
