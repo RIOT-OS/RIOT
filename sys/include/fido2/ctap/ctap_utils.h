@@ -43,12 +43,12 @@ void fido2_ctap_utils_led_animation(void);
 int fido2_ctap_utils_user_presence_test(void);
 
 /**
- * @brief Compare fido2 credentials based on sign_count
+ * @brief Compare fido2 credentials based on creation time
  *
  * @param[in] k1    first resident key
  * @param[in] k2    second resident key
  *
- * @return <0 if b has a bigger sign_count, 0 if equal, >0 if a has a bigger
+ * @return <0 if k2 has a bigger sign_count, 0 if equal, >0 if k1 has a bigger
  *         sign_count
  */
 static inline int fido2_ctap_utils_cred_cmp(const void *k1, const void *k2)
@@ -56,7 +56,7 @@ static inline int fido2_ctap_utils_cred_cmp(const void *k1, const void *k2)
     ctap_resident_key_t *_k1 = (ctap_resident_key_t *)k1;
     ctap_resident_key_t *_k2 = (ctap_resident_key_t *)k2;
 
-    return _k1->sign_count - _k2->sign_count;
+    return _k2->creation_time - _k1->creation_time;
 }
 
 /**

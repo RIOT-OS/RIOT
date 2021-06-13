@@ -10,7 +10,7 @@
  * @ingroup tests
  * @{
  * @file
- * @brief       FIDO2 CTAP test application thats creates an authenticator
+ * @brief       FIDO2 CTAP test application that creates an authenticator
  *              which uses CTAPHID as underlying communcation protocol
  *
  * @author      Nils Ollrogge <nils-ollrogge@outlook.de>

@@ -221,8 +221,8 @@ extern "C" {
 /**
  * @brief Max amount of resident keys that can be stored
  */
-#define CTAP_MAX_RK (((FLASHPAGE_NUMOF - CTAP_RK_START_PAGE) *FLASHPAGE_SIZE) /  \
-                     CTAP_PAD_RK_SZ)
+#define CTAP_MAX_RK (((FLASHPAGE_NUMOF - CTAP_RK_START_PAGE) \
+                      * FLASHPAGE_SIZE) / CTAP_PAD_RK_SZ)
 
 /**
  * @brief Timeout for user presence test
@@ -456,6 +456,8 @@ struct __attribute__((packed)) ctap_resident_key {
                                                    See webauthn specification
                                                    (version 20190304) section 6.1.1
                                                    for details. */
+    uint64_t creation_time;                     /**< timestamp for when credential
+                                                     was created */
     ctap_cred_desc_t cred_desc;                 /**< credential descriptor */
 };
 
@@ -497,7 +499,6 @@ typedef struct {
     uint8_t pin_protocol;                                           /**< PIN protocol version */
     uint8_t cred_type;                                              /**< type of credential */
     int32_t alg_type;                                               /**< cryptographic algorithm identifier */
-
 } ctap_make_credential_req_t;
 
 /**

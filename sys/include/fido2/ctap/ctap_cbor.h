@@ -75,7 +75,7 @@ extern "C" {
 /**
  * @brief Attestation statement data buffer size
  */
-#define CTAP_CBOR_ATT_STMT_AUTH_DATA_SZ 0x12c
+#define CTAP_CBOR_ATT_STMT_AUTH_DATA_SZ 0x134
 
 /**
  * @brief Max length of string key in CBOR map

@@ -207,7 +207,7 @@ void fido2_ctap_transport_hid_handle_packet(void *pkt_raw, int size)
                 status = buffer_pkt(pkt);
             }
         }
-        /* transactions are atomic, deny all other cids if busy with one cid */
+        /* transactions are atomic. Deny all other cids if busy with one cid */
         else {
             send_error_response(cid, CTAP_HID_ERR_CHANNEL_BUSY);
         }
@@ -242,8 +242,18 @@ void fido2_ctap_transport_hid_handle_packet(void *pkt_raw, int size)
 static uint8_t buffer_pkt(const ctap_hid_pkt_t *pkt)
 {
     if (is_init_type_pkt(pkt)) {
-        /* received should_cancel for cid being buffered atm, should_cancel as
-           long as worker not awoken */
+        /**
+         * broadcast cid only allowed for CTAP_HID_COMMAND_INIT
+         */
+        if (pkt->cid == CTAP_HID_BROADCAST_CID &&
+            pkt->init.cmd != CTAP_HID_COMMAND_INIT) {
+            send_error_response(pkt->cid, CTAP_HID_ERR_INVALID_CHANNEL);
+        }
+
+        /**
+         * received CTAP_HID_COMMAND_CANCEL while buffering packet.
+         * Cancel request.
+         */
         if (pkt->init.cmd == CTAP_HID_COMMAND_CANCEL && !g_ctap_buffer.is_locked &&
             pkt->cid == g_ctap_buffer.cid) {
 
@@ -317,12 +327,8 @@ static void process_transaction(void)
         handle_init_packet(cid, bcnt, buf);
     }
     else {
-        /* broadcast cid only allowed for CTAP_HID_COMMAND_INIT */
-        if (cid == CTAP_HID_BROADCAST_CID || cid == 0) {
-            send_error_response(cid, CTAP_HID_ERR_INVALID_CHANNEL);
-        }
         /* readding deleted cid */
-        else if (!cid_exists(cid) && add_cid(cid) == -1) {
+        if (!cid_exists(cid) && add_cid(cid) == -1) {
             send_error_response(cid, CTAP_HID_ERR_CHANNEL_BUSY);
         }
         else {

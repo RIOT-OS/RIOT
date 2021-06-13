@@ -29,7 +29,7 @@
 #include "fido2/ctap/ctap_cbor.h"
 #include "fido2/ctap/ctap_mem.h"
 
-#define ENABLE_DEBUG    (0)
+#define ENABLE_DEBUG    (1)
 #include "debug.h"
 
 /*** main CTAP2 functions ***/
@@ -518,7 +518,7 @@ static int get_assertion(CborEncoder *encoder, size_t size, uint8_t *req_raw,
     ctap_auth_data_header_t auth_data = { 0 };
     ctap_resident_key_t *rk;
 
-    memset(&g_assert_state, 0, sizeof(g_assert_state));
+    memset(&g_assert_state, 0, sizeof(ctap_get_assertion_state_t));
 
     /* set default values for options */
     req.options.up = true;
@@ -532,7 +532,7 @@ static int get_assertion(CborEncoder *encoder, size_t size, uint8_t *req_raw,
 
     /* find eligble credentials */
     g_assert_state.count = find_matching_rks(g_assert_state.rks,
-                                             sizeof(g_assert_state.rks),
+                                             CTAP_MAX_EXCLUDE_LIST_SIZE,
                                              req.allow_list,
                                              req.allow_list_len, req.rp_id,
                                              req.rp_id_len);
@@ -598,10 +598,8 @@ static int get_assertion(CborEncoder *encoder, size_t size, uint8_t *req_raw,
     memmove(g_assert_state.client_data_hash, req.client_data_hash,
             sizeof(g_assert_state.client_data_hash));
 
-    /* most recent (based on sign count) eligble rk found */
-    rk = &g_assert_state.rks[0];
-
-    g_assert_state.cred_counter++;
+    /* most recently created eligble rk found */
+    rk = &g_assert_state.rks[g_assert_state.cred_counter++];
 
     /* last moment where transaction can be cancelled */
     if (should_cancel()) {
@@ -669,7 +667,6 @@ static int get_next_assertion(CborEncoder *encoder)
     /* next eligble rk */
     rk = &g_assert_state.rks[g_assert_state.cred_counter];
     g_assert_state.cred_counter++;
-
 
     ret = make_auth_data_next_assert(rk->rp_id_hash, &auth_data,
                                      g_assert_state.uv, g_assert_state.up,
@@ -1213,18 +1210,15 @@ static uint8_t find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
         }
     }
 
-    for (uint16_t i = 0; i < g_state.rk_amount_stored; i++) {
-        if (index >= rks_len) {
-            break;
-        }
-        uint16_t page_offset = get_flashpage_number(i);
-        uint16_t page_offset_into_page = get_offset_into_flashpage(i);
+    for (int i = 0; i < g_state.rk_amount_stored; i++) {
+        uint16_t page_num = get_flashpage_number(i);
+        uint16_t offset_into_page = get_offset_into_flashpage(i);
 
-        if (page_offset_into_page == 0) {
-            fido2_ctap_mem_read(CTAP_RK_START_PAGE + page_offset, page);
+        if (offset_into_page == 0) {
+            fido2_ctap_mem_read(CTAP_RK_START_PAGE + page_num, page);
         }
 
-        memmove(&rk, page + page_offset_into_page, sizeof(rk));
+        memcpy(&rk, page + offset_into_page, sizeof(ctap_resident_key_t));
 
         /* search for rk's matching rp_id_hash */
         if (memcmp(rk.rp_id_hash, rp_id_hash, SHA256_DIGEST_LENGTH) == 0) {
@@ -1233,7 +1227,7 @@ static uint8_t find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
                 for (size_t j = 0; j < allow_list_len; j++) {
                     if (memcmp(allow_list[j].cred_id.id, rk.cred_desc.cred_id,
                                sizeof(rk.cred_desc.cred_id)) == 0) {
-                        memmove(&rks[index], &rk, sizeof(rks[index]));
+                        memcpy(&rks[index], &rk, sizeof(ctap_resident_key_t));
                         index++;
                         break;
                     }
@@ -1255,14 +1249,21 @@ static uint8_t find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
                 /**
                  * If there is no allow list we only compare rp_id_hash
                  */
-                memmove(&rks[index], &rk, sizeof(rks[index]));
+                memcpy(&rks[index], &rk, sizeof(ctap_resident_key_t));
                 index++;
             }
         }
+
+        if (index >= rks_len) {
+            break;
+        }
     }
 
-    /* sort ascending order based on sign count */
-    if (g_state.rk_amount_stored > 0 && index > 0) {
+    /**
+     * Sort in descending order based on creation time. Credential with the
+     * most recent (highest) creation time will be first in list.
+     */
+    if (index > 0) {
         qsort(rks, index, sizeof(ctap_resident_key_t), fido2_ctap_utils_cred_cmp);
     }
 
@@ -1280,7 +1281,7 @@ static int save_rk(ctap_resident_key_t *rk)
 {
     bool equal = false;
     int ret;
-    uint16_t page_offset = 0, page_offset_into_page = 0;
+    uint16_t page_num = 0, offset_into_page = 0;
     uint8_t page[FLASHPAGE_SIZE] = { 0 };
     uint8_t buf[CTAP_PAD_RK_SZ] = { 0 };
     ctap_resident_key_t rk_temp = { 0 };
@@ -1291,19 +1292,19 @@ static int save_rk(ctap_resident_key_t *rk)
 
     if (g_state.rk_amount_stored > 0) {
         for (uint16_t i = 0; i <= g_state.rk_amount_stored; i++) {
-            page_offset = get_flashpage_number(i);
-            page_offset_into_page = get_offset_into_flashpage(i);
+            page_num = get_flashpage_number(i);
+            offset_into_page = get_offset_into_flashpage(i);
 
             if (i == g_state.rk_amount_stored) {
                 break;
             }
 
             /* beginning of a new page, read from flash */
-            if (page_offset_into_page == 0) {
-                fido2_ctap_mem_read(CTAP_RK_START_PAGE + page_offset, page);
+            if (offset_into_page == 0) {
+                fido2_ctap_mem_read(CTAP_RK_START_PAGE + page_num, page);
             }
 
-            memmove(&rk_temp, page + page_offset_into_page, sizeof(rk_temp));
+            memmove(&rk_temp, page + offset_into_page, sizeof(rk_temp));
 
             /* if equal overwrite */
             if (fido2_ctap_utils_ks_equal(&rk_temp, rk)) {
@@ -1316,8 +1317,8 @@ static int save_rk(ctap_resident_key_t *rk)
     memmove(buf, rk, sizeof(*rk));
 
     if (!equal) {
-        ret = fido2_ctap_mem_write_and_verify(CTAP_RK_START_PAGE + page_offset,
-                                              page_offset_into_page, buf,
+        ret = fido2_ctap_mem_write_and_verify(CTAP_RK_START_PAGE + page_num,
+                                              offset_into_page, buf,
                                               sizeof(buf));
 
         if (ret != FLASHPAGE_OK) {
@@ -1333,8 +1334,8 @@ static int save_rk(ctap_resident_key_t *rk)
     }
     else {
         /* update page by moving new rk value into page */
-        memmove(page + page_offset_into_page, buf, sizeof(buf));
-        ret = fido2_ctap_mem_write_and_verify(CTAP_RK_START_PAGE + page_offset,
+        memmove(page + offset_into_page, buf, sizeof(buf));
+        ret = fido2_ctap_mem_write_and_verify(CTAP_RK_START_PAGE + page_num,
                                               0, page, sizeof(page));
 
         if (ret != FLASHPAGE_OK) {
@@ -1431,6 +1432,7 @@ static int make_auth_data_attest(ctap_make_credential_req_t *req,
     /* init key */
     k->cred_desc.cred_type = req->cred_type;
     k->user_id_len = user->id_len;
+    k->creation_time = xtimer_now_usec64();
 
     memmove(k->user_id, user->id, user->id_len);
     memmove(k->rp_id_hash, auth_header->rp_id_hash, sizeof(k->rp_id_hash));

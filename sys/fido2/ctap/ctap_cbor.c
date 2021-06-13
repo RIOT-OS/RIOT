@@ -1623,7 +1623,7 @@ static int parse_exclude_list(CborValue *it, ctap_cred_desc_alt_t *exclude_list,
          * parse the CBOR encoded PublicKeyCredentialDescriptors of the
          * exclude list sent by the host.
          */
-        ret = fido2_ctap_cbor_parse_cred_desc(&arr, exclude_list);
+        ret = fido2_ctap_cbor_parse_cred_desc(&arr, &exclude_list[i]);
 
         if (ret != CTAP2_OK) {
             return ret;
@@ -1688,10 +1688,6 @@ int fido2_ctap_cbor_parse_cred_desc(CborValue *arr, ctap_cred_desc_alt_t *cred)
                                       NULL);
     if (ret != CborNoError) {
         return CTAP2_ERR_CBOR_PARSING;
-    }
-
-    if (buf_len < CTAP_CREDENTIAL_ID_SIZE) {
-        return CTAP1_ERR_INVALID_LENGTH;
     }
 
     ret = cbor_value_advance(arr);
