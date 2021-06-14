@@ -62,6 +62,10 @@ void mrf24j40_enable_auto_pa_lna(mrf24j40_t *dev)
                                                          MRF24J40_TESTMODE_TESTMODE2 |
                                                          MRF24J40_TESTMODE_TESTMODE1 |
                                                          MRF24J40_TESTMODE_TESTMODE0));
+
+    /* Reduce TX power to stay in ISM band */
+    /* With PA/LNA enabled, -6.3dB is necessary to stay in ISM band on channel 26 */
+    mrf24j40_set_txpower(dev, 6);
 }
 
 void mrf24j40_disable_auto_pa_lna(mrf24j40_t *dev)
@@ -80,6 +84,9 @@ void mrf24j40_disable_auto_pa_lna(mrf24j40_t *dev)
                                                      MRF24J40_GPIO_1 |
                                                      MRF24J40_GPIO_2 |
                                                      MRF24J40_GPIO_3));
+
+    /* Reset TX power */
+    mrf24j40_set_txpower(dev, 0);
 }
 
 void mrf24j40_enable_lna(mrf24j40_t *dev)
