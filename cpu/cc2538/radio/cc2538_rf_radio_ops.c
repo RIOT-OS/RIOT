@@ -217,6 +217,8 @@ static int _read(ieee802154_dev_t *dev, void *buf, size_t size, ieee802154_rx_in
     else {
         res = 0;
     }
+
+
     return res;
 }
 
