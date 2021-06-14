@@ -505,7 +505,7 @@ int config_phy(int argc, char **argv)
         puts("Channel or TX power settings not supported");
     }
     else {
-        printf("Success! Channel: %d was selected\n", channel);
+        puts("Success!");
         current_channel = channel;
     }
 
