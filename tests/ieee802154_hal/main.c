@@ -47,9 +47,6 @@
 
 #define CHANNEL_POSITION_IN_MESSAGE 21
 
-uint16_t confirm_counter = 0;
-uint16_t request_counter = 0;
-
 static inline void _set_trx_state(int state, bool verbose);
 static int send(uint8_t *dst, size_t dst_len, iolist_t iol_data, size_t num, size_t time);
 iolist_t iol_data_spam(void);
@@ -61,7 +58,6 @@ static uint16_t received_packets;
 static uint8_t current_channel;
 
 static uint8_t buffer[127];
-static size_t size_last_packet;
 
 static xtimer_t timer_ack;
 static mutex_t lock;
@@ -73,14 +69,13 @@ static eui64_t ext_addr;
 static network_uint16_t short_addr;
 static uint8_t seq;
 
-static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
+static void _handle_packet(size_t size, uint8_t lqi, int16_t rssi)
 {
     if (buffer[0] & IEEE802154_FCF_TYPE_ACK && ((seq-1) == buffer[2])) {
             DEBUG_PRINT("Received valid ACK with sqn %i\n", buffer[2]);
         received_acks++;
     }
     else {
-        size_last_packet = size;
         DEBUG("Packet received:\n");
         for (unsigned i=0;i<size;i++) {
             DEBUG("%02x ", buffer[i]);
@@ -88,11 +83,8 @@ static void _print_packet(size_t size, uint8_t lqi, int16_t rssi)
         received_packets++;
         if (send_reply) {
             uint8_t out[IEEE802154_LONG_ADDRESS_LEN];
-            unsigned j = 0;
-            for (unsigned i=20;i>12;i--) {
-                out[j] = buffer[i];
-                j++;
-            }
+            le_uint16_t tmp;
+            int src_len = ieee802154_get_src(buffer, out, &tmp);
             send(out, IEEE802154_LONG_ADDRESS_LEN, iol_data_spam(), 1, 0);
         }
     }
@@ -162,7 +154,7 @@ void _rx_done_handler(event_t *event)
     int size = ieee802154_radio_read(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), buffer, 127, &info);
     if (size > 0) {
         /* Print packet while we wait for the state transition */
-        _print_packet(size, info.lqi, info.rssi);
+        _handle_packet(size, info.lqi, info.rssi);
     }
 
     /* Go out of the HAL's FB Lock state after frame reception and trigger a
@@ -732,14 +724,14 @@ static int send(uint8_t *dst, size_t dst_len, iolist_t iol_data, size_t num, siz
         _send(&iol_hdr);
         xtimer_msleep(time);
     }
-    if (ENABLE_DEBUG) {
-        puts("-------Summary of the test-------");
-        printf("Send Packets: %d\n", send_packets);
-        printf("Acknowledged Packets: %d\n", received_acks);
-        printf("Percentage: %d\n", (received_acks * 100)/num);
-        printf("Received Packets: %d\n", received_packets);
-        puts("---------------------------------");
-    }
+
+    puts("-------Summary of the test-------");
+    printf("Send Packets: %d\n", send_packets);
+    printf("Acknowledged Packets: %d\n", received_acks);
+    printf("Percentage: %d\n", (received_acks * 100)/num);
+    printf("Received Packets: %d\n", received_packets);
+    puts("---------------------------------");
+
     return 0;
 }
 
@@ -807,8 +799,6 @@ int toggle_reply(int argc, char **argv) {
         send_reply = true;
         puts("Success: Packets are now mirrored");
     }
-    printf("Request: %d\n", request_counter);
-    printf("Confirm: %d\n", confirm_counter);
     return 0;
 }
 
@@ -865,7 +855,7 @@ int main(void)
     mutex_init(&lock);
     mutex_lock(&lock);
     _init();
-    current_channel = 26;
+    current_channel = CONFIG_IEEE802154_DEFAULT_CHANNEL;
     /* start the shell */
     puts("Initialization successful - starting the shell now");
     char line_buf[SHELL_DEFAULT_BUFSIZE];
