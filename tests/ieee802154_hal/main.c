@@ -48,8 +48,7 @@
 #define CHANNEL_POSITION_IN_MESSAGE 21
 
 static inline void _set_trx_state(int state, bool verbose);
-static int send(uint8_t *dst, size_t dst_len, iolist_t iol_data, size_t num, size_t time, bool request_ack);
-iolist_t iol_data_spam(void);
+static int send(uint8_t *dst, size_t dst_len, iolist_t *iol_data, size_t num, size_t time, bool request_ack);
 
 static uint16_t received_acks;
 static uint16_t send_packets;
@@ -70,6 +69,13 @@ static eui64_t ext_addr;
 static network_uint16_t short_addr;
 static uint8_t seq;
 
+static inline void _populate_iolist(iolist_t *iol, void *buf, size_t len, iolist_t *next)
+{
+    iol->iol_base = buf;
+    iol->iol_len = len;
+    iol->iol_next = next;
+}
+
 static void _handle_packet(size_t size, uint8_t lqi, int16_t rssi)
 {
     if (buffer[0] & IEEE802154_FCF_TYPE_ACK && ((seq-1) == buffer[2])) {
@@ -86,7 +92,9 @@ static void _handle_packet(size_t size, uint8_t lqi, int16_t rssi)
             uint8_t out[IEEE802154_LONG_ADDRESS_LEN];
             le_uint16_t tmp;
             int src_len = ieee802154_get_src(buffer, out, &tmp);
-            send(out, src_len, iol_data_spam(), 1, 0, request_ack);
+            iolist_t pkt;
+            _populate_iolist(&pkt, &current_channel, sizeof(current_channel), NULL);
+            send(out, src_len, &pkt, 1, 0, request_ack);
         }
     }
     DEBUG("\nLQI: %i, RSSI: %i\n\n", (int) lqi, (int) rssi);
@@ -688,7 +696,7 @@ static int _caps_cmd(int argc, char **argv)
 
 uint8_t payload[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ornare lacinia mi elementum interdum ligula.";
 
-static int send(uint8_t *dst, size_t dst_len, iolist_t iol_data, size_t num, size_t time, bool request_ack)
+static int send(uint8_t *dst, size_t dst_len, iolist_t *iol_data, size_t num, size_t time, bool request_ack)
 {
     uint8_t flags;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
@@ -721,18 +729,20 @@ static int send(uint8_t *dst, size_t dst_len, iolist_t iol_data, size_t num, siz
         }
 
         iolist_t iol_hdr = {
-            .iol_next = &iol_data,
+            .iol_next = iol_data,
             .iol_base = mhr,
             .iol_len = mhr_len,
         };
         _send(&iol_hdr);
         xtimer_msleep(time);
     }
-
+    ieee802154_dev_t *dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
     puts("-------Summary of the test-------");
     printf("Send Packets: %d\n", send_packets);
-    printf("Acknowledged Packets: %d\n", received_acks);
-    printf("Percentage: %d\n", (received_acks * 100)/num);
+    if (ieee802154_radio_has_frame_retrans(dev) || ieee802154_radio_has_irq_ack_timeout(dev)) {
+        printf("Acknowledged Packets: %d\n", received_acks);
+        printf("Percentage: %d\n", (received_acks * 100)/num);
+    }
     printf("Received Packets: %d\n", received_packets);
     puts("---------------------------------");
 
@@ -751,22 +761,10 @@ int txtsnd(int argc, char **argv)
     }
     len = atoi(argv[2]);
     request_ack = atoi(argv[3]);
-    iolist_t iol_data = {
-        .iol_base = payload,
-        .iol_len = len,
-        .iol_next = NULL,
-    };
-    return send(addr, res, iol_data, 1, 0, request_ack);
-}
 
-iolist_t iol_data_spam(void) {
-    uint8_t *channel_ptr = &current_channel;
-    iolist_t iol_data = {
-        .iol_base = channel_ptr,
-        .iol_len = sizeof(*channel_ptr),
-        .iol_next = NULL,
-    };
-    return iol_data;
+    iolist_t pkt;
+    _populate_iolist(&pkt, payload, len, NULL);
+    return send(addr, res, &pkt, 1, 0, request_ack);
 }
 
 int txtspam(int argc, char **argv) {
@@ -774,15 +772,21 @@ int txtspam(int argc, char **argv) {
     size_t res;
     size_t num;
     size_t time;
+    size_t len;
 
-    if (argc != 5 || !(res = _parse_addr(addr, sizeof(addr), argv[1]))) {
-        puts("Usage: txtspam <long_addr> <number of packets> <time in ms between packets> <request_ack>");
+    if (argc != 6 || !(res = _parse_addr(addr, sizeof(addr), argv[1]))) {
+        puts("Usage: txtspam <long_addr> <len> <number of packets> <time in ms between packets> <request_ack>");
         return 1;
     }
-    num = atoi(argv[2]);
-    time = atoi(argv[3]);
-    request_ack = atoi(argv[4]);
-    return send(addr, res, iol_data_spam(), num, time, request_ack);
+    len = atoi(argv[2]);
+    num = atoi(argv[3]);
+    time = atoi(argv[4]);
+    request_ack = atoi(argv[5]);
+    iolist_t payload_iotlist;
+    _populate_iolist(&payload_iotlist, payload, len, NULL);
+    iolist_t channel_iotlist;
+    _populate_iolist(&channel_iotlist, &current_channel, sizeof(current_channel), &payload_iotlist);
+    return send(addr, res, &channel_iotlist, num, time, request_ack);
 }
 
 int toggle_reply(int argc, char **argv) {
