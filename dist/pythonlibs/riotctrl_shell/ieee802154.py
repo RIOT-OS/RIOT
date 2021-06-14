@@ -20,8 +20,8 @@ class IEEE802154Phy(ShellInteraction):
         if str(channel) not in res:
             raise RuntimeError(res)
 
-    def ieee802154_print_addr(self, timeout=None, async_=False):
-        cmd = "print_addr" \
+    def ieee802154_print_phy(self, timeout=None, async_=False):
+        cmd = "print_phy" \
               .format()
 
         try:
@@ -83,9 +83,9 @@ class IEEE802154Phy(ShellInteraction):
         except Exception as e:
             print("Error:", e)
 
-    def ieee802154_txtspam(self, long_addr, number_of_packets, time_betweeen_packets, timeout=None, async_=False):
-        cmd = "txtspam {long_addr} {number_of_packets} {time_betweeen_packets}" \
-              .format(long_addr=long_addr, number_of_packets=number_of_packets, time_betweeen_packets=time_betweeen_packets)
+    def ieee802154_txtspam(self, long_addr, len, number_of_packets, time_betweeen_packets, timeout=None, async_=False):
+        cmd = "txtspam {long_addr} {len} {number_of_packets} {time_betweeen_packets}" \
+              .format(long_addr=long_addr, len=len, number_of_packets=number_of_packets, time_betweeen_packets=time_betweeen_packets)
 
         try:
             res = self.cmd(cmd, timeout=timeout, async_=async_)
