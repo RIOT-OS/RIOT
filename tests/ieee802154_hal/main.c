@@ -54,7 +54,6 @@ static uint16_t received_packets;
 static uint8_t current_channel;
 
 static uint8_t buffer[127];
-
 static xtimer_t timer_ack;
 static mutex_t lock;
 static bool send_reply;
@@ -97,7 +96,7 @@ static void _handle_packet(size_t size, uint8_t lqi, int16_t rssi)
     DEBUG("\nLQI: %i, RSSI: %i\n\n", (int) lqi, (int) rssi);
 }
 
-static int print_addr(int argc, char **argv)
+static int print_phy(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
@@ -832,7 +831,7 @@ int check_last_packet(int argc, char **argv) {
 
 static const shell_command_t shell_commands[] = {
     { "config_phy", "Set channel and TX power", config_phy},
-    { "print_addr", "Print IEEE802.15.4 addresses", print_addr},
+    { "get_phy", "Print IEEE802.15.4 PHY Information", print_phy},
     { "test_states", "Test state changes", _test_states },
     { "cca", "Perform CCA", _cca },
     { "config_cca", "Config CCA parameters", _config_cca_cmd },
