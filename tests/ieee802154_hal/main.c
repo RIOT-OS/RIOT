@@ -48,7 +48,7 @@
 #define CHANNEL_POSITION_IN_MESSAGE 21
 
 static inline void _set_trx_state(int state, bool verbose);
-static int send(uint8_t *dst, size_t dst_len, iolist_t iol_data, size_t num, size_t time);
+static int send(uint8_t *dst, size_t dst_len, iolist_t iol_data, size_t num, size_t time, bool request_ack);
 iolist_t iol_data_spam(void);
 
 static uint16_t received_acks;
@@ -62,6 +62,7 @@ static uint8_t buffer[127];
 static xtimer_t timer_ack;
 static mutex_t lock;
 static bool send_reply;
+static bool request_ack;
 
 static const char *str_states[3]= {"TRX_OFF", "RX", "TX"};
 static ieee802154_rx_mode_t current_rx_mode;
@@ -85,7 +86,7 @@ static void _handle_packet(size_t size, uint8_t lqi, int16_t rssi)
             uint8_t out[IEEE802154_LONG_ADDRESS_LEN];
             le_uint16_t tmp;
             int src_len = ieee802154_get_src(buffer, out, &tmp);
-            send(out, IEEE802154_LONG_ADDRESS_LEN, iol_data_spam(), 1, 0);
+            send(out, src_len, iol_data_spam(), 1, 0, request_ack);
         }
     }
     DEBUG("\nLQI: %i, RSSI: %i\n\n", (int) lqi, (int) rssi);
@@ -687,7 +688,7 @@ static int _caps_cmd(int argc, char **argv)
 
 uint8_t payload[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ornare lacinia mi elementum interdum ligula.";
 
-static int send(uint8_t *dst, size_t dst_len, iolist_t iol_data, size_t num, size_t time)
+static int send(uint8_t *dst, size_t dst_len, iolist_t iol_data, size_t num, size_t time, bool request_ack)
 {
     uint8_t flags;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
@@ -695,7 +696,10 @@ static int send(uint8_t *dst, size_t dst_len, iolist_t iol_data, size_t num, siz
 
     le_uint16_t src_pan, dst_pan;
 
-    flags = IEEE802154_FCF_TYPE_DATA;// | IEEE802154_FCF_ACK_REQ;
+    flags = IEEE802154_FCF_TYPE_DATA;
+    if (request_ack) {
+        flags |= IEEE802154_FCF_ACK_REQ;
+    }
 
     src_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
     dst_pan = byteorder_btols(byteorder_htons(CONFIG_IEEE802154_DEFAULT_PANID));
@@ -741,22 +745,18 @@ int txtsnd(int argc, char **argv)
     size_t res;
     size_t len;
 
-    if (argc != 3) {
-        puts("Usage: txtsnd <long_addr> <len>");
-        return 1;
-    }
-    res = _parse_addr(addr, sizeof(addr), argv[1]);
-    if (res == 0) {
-        puts("Usage: txtsnd <long_addr> <len>");
+    if (argc != 4 || !(res = _parse_addr(addr, sizeof(addr), argv[1]))) {
+        puts("Usage: txtsnd <long_addr> <len> <request_ack>");
         return 1;
     }
     len = atoi(argv[2]);
+    request_ack = atoi(argv[3]);
     iolist_t iol_data = {
         .iol_base = payload,
         .iol_len = len,
         .iol_next = NULL,
     };
-    return send(addr, res, iol_data, 1, 0);
+    return send(addr, res, iol_data, 1, 0, request_ack);
 }
 
 iolist_t iol_data_spam(void) {
@@ -775,18 +775,14 @@ int txtspam(int argc, char **argv) {
     size_t num;
     size_t time;
 
-    if (argc != 4) {
-        puts("Usage: txtspam <long_addr> <number of packets> <time in ms between packets>");
-        return 1;
-    }
-    res = _parse_addr(addr, sizeof(addr), argv[1]);
-    if (res == 0) {
-        puts("Usage: txtspam <long_addr> <number of packets> <time in ms between packets>");
+    if (argc != 5 || !(res = _parse_addr(addr, sizeof(addr), argv[1]))) {
+        puts("Usage: txtspam <long_addr> <number of packets> <time in ms between packets> <request_ack>");
         return 1;
     }
     num = atoi(argv[2]);
     time = atoi(argv[3]);
-    return send(addr, res, iol_data_spam(), num, time);
+    request_ack = atoi(argv[4]);
+    return send(addr, res, iol_data_spam(), num, time, request_ack);
 }
 
 int toggle_reply(int argc, char **argv) {
