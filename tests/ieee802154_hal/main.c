@@ -45,8 +45,6 @@
 
 #define RADIO_DEFAULT_ID (0U)
 
-#define CHANNEL_POSITION_IN_MESSAGE 21
-
 static inline void _set_trx_state(int state, bool verbose);
 static int send(uint8_t *dst, size_t dst_len, iolist_t *iol_data, size_t num, size_t time, bool request_ack);
 
@@ -818,8 +816,7 @@ int check_last_packet(int argc, char **argv) {
     if (memcmp(addr, receive_addr, IEEE802154_LONG_ADDRESS_LEN) != 0) {
         result = false;
     }
-
-    if (channel != buffer[CHANNEL_POSITION_IN_MESSAGE]) {
+    if (channel != buffer[ieee802154_get_frame_hdr_len(buffer)]) {
         puts("Fail channel match");
         result = false;
     }
