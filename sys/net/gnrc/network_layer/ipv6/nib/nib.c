@@ -228,6 +228,10 @@ int gnrc_ipv6_nib_get_next_hop_l2addr(const ipv6_addr_t *dst,
                 /* release pre-assumed netif */
                 gnrc_netif_release(netif);
                 netif = _acquire_new_iface(iface);
+                /* get node from proper interface */
+                if (netif != NULL) {
+                    node = _nib_onl_get(dst, netif->pid);
+                }
             }
             if ((netif == NULL) ||
                 !_resolve_addr(dst, netif, pkt, nce, node)) {
