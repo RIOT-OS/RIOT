@@ -75,7 +75,7 @@ static inline void _populate_iolist(iolist_t *iol, void *buf, size_t len, iolist
 static void _handle_packet(size_t size, uint8_t lqi, int16_t rssi)
 {
     if (buffer[0] & IEEE802154_FCF_TYPE_ACK && ((seq-1) == buffer[2])) {
-            DEBUG_PRINT("Received valid ACK with sqn %i\n", buffer[2]);
+            DEBUG("Received valid ACK with sqn %i\n", buffer[2]);
         received_acks++;
     }
     else {
@@ -207,17 +207,17 @@ static void _tx_finish_handler(event_t *event)
 
     switch (tx_info.status) {
         case TX_STATUS_SUCCESS:
-            DEBUG_PRINT("Transmission succeeded");
+            DEBUG("Transmission succeeded\n");
             send_packets++;
             break;
         case TX_STATUS_FRAME_PENDING:
-            puts("Transmission succeeded and there's pending data");
+            DEBUG("Transmission succeeded and there's pending data\n");
             break;
         case TX_STATUS_MEDIUM_BUSY:
-            puts("Medium busy");
+            DEBUG("Medium busy\n");
             break;
         case TX_STATUS_NO_ACK:
-            puts("No ACK");
+            DEBUG("No ACK\n");
             break;
     }
 
