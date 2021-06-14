@@ -20,7 +20,6 @@
 
 #include <assert.h>
 #include <stdio.h>
-#include "fmt.h"
 #include <strings.h>
 
 #include "common.h"
