@@ -17,6 +17,6 @@ USB_PID ?= $(USB_PID_TESTING)
 
 # this will start the tests
 fido2-test:
-	$(MAKE) -C $(RIOTBASE)/build/pkg/fido2_tests run
+	$(MAKE) -C $(RIOTBASE)/build/pkg/fido2_tests
 
 include $(RIOTBASE)/Makefile.include

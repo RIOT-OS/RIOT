@@ -11,7 +11,7 @@
  * @{
  * @file
  * @brief       FIDO2 CTAP test application that creates an authenticator
- *              which uses CTAPHID as underlying communcation protocol
+ *              which uses CTAPHID as underlying communication protocol
  *
  * @author      Nils Ollrogge <nils-ollrogge@outlook.de>
  * @}
