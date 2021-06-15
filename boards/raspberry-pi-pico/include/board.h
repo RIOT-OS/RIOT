@@ -33,6 +33,8 @@ extern "C" {
  - xtimer configuration
  */
 
+#define LED0_PIN GPIO_PIN(GPIO_BANK_USER, 25)
+
 /**
  * @brief   Initialize board specific hardware
  */
