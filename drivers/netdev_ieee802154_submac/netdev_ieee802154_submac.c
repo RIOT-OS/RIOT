@@ -304,7 +304,13 @@ static int _init(netdev_t *netdev)
     ieee802154_submac_t *submac = &netdev_submac->submac;
     netdev_ieee802154_setup(netdev_ieee802154);
 
-    ieee802154_submac_init(submac, (network_uint16_t*) netdev_ieee802154->short_addr, (eui64_t*) netdev_ieee802154->long_addr);
+    int res = ieee802154_submac_init(submac,
+                                     (network_uint16_t*) netdev_ieee802154->short_addr,
+                                     (eui64_t*) netdev_ieee802154->long_addr);
+
+    if (res < 0) {
+        return res;
+    }
 
     /* This function already sets the PAN ID to the default one */
     netdev_ieee802154_reset(netdev_ieee802154);
