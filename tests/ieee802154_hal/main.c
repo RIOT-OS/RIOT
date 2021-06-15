@@ -207,8 +207,11 @@ static event_t _tx_finish_ev = {
 
 static void _send(iolist_t *pkt)
 {
-    /* Request a state change to RX_ON */
-    ieee802154_radio_request_set_trx_state(&_radio[0], IEEE802154_TRX_STATE_TX_ON);
+    /* Request a state change to TX_ON */
+    if (ieee802154_radio_request_set_trx_state(&_radio[0], IEEE802154_TRX_STATE_TX_ON) < 0) {
+        puts("Couldn't send frame");
+        return;
+    }
 
     /* Write the packet to the radio */
     ieee802154_radio_write(&_radio[0], pkt);
@@ -260,6 +263,7 @@ static ieee802154_dev_t *_reg_callback(ieee802154_dev_type_t type, void *opaque)
 
 static int _init(void)
 {
+    int res;
     struct _reg_container reg = {0};
 
     ieee802154_hal_test_init_devs(_reg_callback, &reg);
@@ -274,32 +278,39 @@ static int _init(void)
 
     /* Since the device was already initialized, turn on the radio.
      * The transceiver state will be "TRX_OFF" */
-    ieee802154_radio_request_on(&_radio[0]);
+    res = ieee802154_radio_request_on(&_radio[0]);
+    assert(res >= 0);
     while(ieee802154_radio_confirm_on(&_radio[0]) == -EAGAIN) {}
 
     ieee802154_radio_set_frame_filter_mode(&_radio[0], IEEE802154_FILTER_ACCEPT);
 
     uint16_t panid = CONFIG_IEEE802154_DEFAULT_PANID;
+
     /* Set all IEEE addresses */
-    ieee802154_radio_config_addr_filter(&_radio[0],
+    res = ieee802154_radio_config_addr_filter(&_radio[0],
                                         IEEE802154_AF_SHORT_ADDR, &short_addr);
-    ieee802154_radio_config_addr_filter(&_radio[0],
+    assert(res >= 0);
+    res = ieee802154_radio_config_addr_filter(&_radio[0],
                                         IEEE802154_AF_EXT_ADDR, &ext_addr);
-    ieee802154_radio_config_addr_filter(&_radio[0],
+    assert(res >= 0);
+    res = ieee802154_radio_config_addr_filter(&_radio[0],
                                         IEEE802154_AF_PANID, &panid);
+    assert(res >= 0);
 
     /* Set PHY configuration */
     ieee802154_phy_conf_t conf = {.channel=CONFIG_IEEE802154_DEFAULT_CHANNEL, .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE, .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER};
 
-    ieee802154_radio_config_phy(&_radio[0], &conf);
+    res = ieee802154_radio_config_phy(&_radio[0], &conf);
+    assert(res >= 0);
 
     /* ieee802154_radio_set_cca_mode*/
-    ieee802154_radio_set_cca_mode(&_radio[0], IEEE802154_CCA_MODE_ED_THRESHOLD);
-    ieee802154_radio_set_cca_threshold(&_radio[0], CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
+    res = ieee802154_radio_set_cca_mode(&_radio[0], IEEE802154_CCA_MODE_ED_THRESHOLD);
+    assert(res >= 0);
+    res = ieee802154_radio_set_cca_threshold(&_radio[0], CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
+    assert(res >= 0);
 
     /* Set the transceiver state to RX_ON in order to receive packets */
     _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
-
     return 0;
 }
 
@@ -415,7 +426,9 @@ int _cca(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
-    ieee802154_radio_request_cca(&_radio[0]);
+    if (ieee802154_radio_request_cca(&_radio[0]) < 0) {
+        puts("Couldn't perform CCA");
+    }
     mutex_lock(&lock);
     int res = ieee802154_radio_confirm_cca(&_radio[0]);
     assert(res >= 0);
@@ -521,12 +534,12 @@ static int promisc(int argc, char **argv)
         puts("Disabled promiscuos mode");
     }
 
-    ieee802154_radio_set_frame_filter_mode(&_radio[0], conf);
-    return 0;
+    return ieee802154_radio_set_frame_filter_mode(&_radio[0], conf);
 }
 
 int config_phy(int argc, char **argv)
 {
+    int res = -EINVAL;
     if (argc < 4) {
         puts("Usage: config_phy <phy_mode> <channel> <tx_pow>");
         return 1;
@@ -577,16 +590,18 @@ int config_phy(int argc, char **argv)
     }
     else {
         puts("Success!");
+        res = 0;
     }
 
     _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
 
-    return 0;
+    return res;
 }
 
 int txmode_cmd(int argc, char **argv)
 {
     ieee802154_dev_t *dev = &_radio[0];
+    int res = -EINVAL;
 
     if (argc < 2) {
         printf("Usage: %s <csma_ca|cca|direct>\n", argv[0]);
@@ -611,13 +626,16 @@ int txmode_cmd(int argc, char **argv)
     }
     else {
         puts("Ok");
+        res = 0;
     }
-    return 0;
+    return res;
 }
 
 static int _config_cca_cmd(int argc, char **argv)
 {
     ieee802154_dev_t *dev = &_radio[0];
+    int res = -EINVAL;
+
     ieee802154_cca_mode_t mode;
 
     if (argc < 2) {
@@ -648,13 +666,13 @@ static int _config_cca_cmd(int argc, char **argv)
         int8_t thresh = atoi(argv[2]);
         if (ieee802154_radio_set_cca_threshold(dev, thresh) < 0) {
             puts("Error setting the threshold");
-            return 1;
         }
         else {
             printf("Set threshold to %i\n", thresh);
+            res = 0;
         }
     }
-    return 0;
+    return res;
 }
 
 static int _caps_cmd(int argc, char **argv)
