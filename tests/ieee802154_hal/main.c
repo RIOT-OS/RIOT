@@ -423,7 +423,14 @@ int _cca(int argc, char **argv)
 static inline void _set_trx_state(int state, bool verbose)
 {
     xtimer_ticks32_t a;
-    int res = ieee802154_radio_request_set_trx_state(&_radio[0], state);
+    int res;
+
+    /* Under certain conditions (internal house-keeping or sending ACK frames
+     * back) the radio could indicate it's busy. Therefore, busy loop until
+     * the radio doesn't report BUSY
+     */
+    while((res = ieee802154_radio_request_set_trx_state(&_radio[0], state)) == -EBUSY) {}
+
     if (verbose) {
         a = xtimer_now();
         if(res != 0) {
