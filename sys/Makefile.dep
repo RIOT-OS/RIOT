@@ -325,6 +325,13 @@ ifneq (,$(filter schedstatistics,$(USEMODULE)))
   USEMODULE += sched_cb
 endif
 
+ifneq (,$(filter sched_round_robin,$(USEMODULE)))
+  ifeq (,$(filter ztimer_usec,$(USEMODULE)))
+    USEMODULE += xtimer
+  endif
+  USEMODULE += sched_runq_callback
+endif
+
 ifneq (,$(filter saul_reg,$(USEMODULE)))
   USEMODULE += saul
 endif
