@@ -1,9 +1,9 @@
 ifneq (,$(filter cortex-m23 cortex-m0%,$(CPU_CORE)))
-  USEMODULE += qDSA_asm
+  USEMODULE += qdsa_asm
 endif
 
 ifneq (,$(filter arch_avr8,$(FEATURES_USED)))
-  USEMODULE += qDSA_asm
+  USEMODULE += qdsa_asm
 endif
 
 # qDsa is not 16 bit compatible

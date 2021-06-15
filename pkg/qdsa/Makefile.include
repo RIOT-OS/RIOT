@@ -10,7 +10,7 @@ endif
 
 export QDSA_IMPL
 
-INCLUDES += -I$(PKGDIRBASE)/qDSA/$(QDSA_IMPL)
+INCLUDES += -I$(PKGDIRBASE)/qdsa/$(QDSA_IMPL)
 
 ifeq (cortex-m0plus,$(CPU_CORE))
   # There are problems with the LLVM assembler and the Cortex-M0+ instruction

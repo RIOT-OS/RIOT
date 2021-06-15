@@ -1,5 +1,5 @@
 /**
- * @defgroup pkg_qDSA   qDSA
+ * @defgroup pkg_qdsa   qdsa
  * @ingroup  pkg
  * @ingroup  sys
  * @brief    Small and Secure Digital Signatures with Curve-based Diffie-Hellman Key Pairs
