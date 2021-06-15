@@ -106,9 +106,10 @@ void _crc_error_handler(event_t *event)
     (void) event;
     puts("Packet with invalid CRC received");
     ieee802154_dev_t* dev = &_radio[0];
-    /* switch back to RX_ON state */
-    ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_RX_ON);
-    while (ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {}
+    if (!ieee802154_radio_has_rx_continuous(dev)) {
+        /* switch back to RX_ON state */
+        _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
+    }
 }
 
 static event_t _crc_error_event = {
@@ -119,6 +120,7 @@ void _rx_done_handler(event_t *event)
 {
     (void) event;
     ieee802154_rx_info_t info;
+    ieee802154_dev_t* dev = &_radio[0];
 
     /* Read packet from internal framebuffer
      *
@@ -131,9 +133,10 @@ void _rx_done_handler(event_t *event)
         _print_packet(size, info.lqi, info.rssi);
     }
 
-    /* Go out of the HAL's FB Lock state after frame reception and trigger a
-     * state change */
-    _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
+    if (!ieee802154_radio_has_rx_continuous(dev)) {
+        /* switch back to RX_ON state */
+        _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
+    }
 }
 
 static event_t _rx_done_event = {
