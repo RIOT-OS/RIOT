@@ -18,9 +18,7 @@
  * @}
  */
 
-#include "cpu.h"
 #include "board.h"
-#include "periph/gpio.h"
 
 void board_init(void)
 {
