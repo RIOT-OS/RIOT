@@ -9,7 +9,6 @@ menuconfig MODULE_SM_PWM_01C
     depends on HAS_PERIPH_GPIO
     depends on HAS_PERIPH_GPIO_IRQ
     depends on TEST_KCONFIG
-    select MODULE_CHECKSUM
     select MODULE_PERIPH_GPIO
     select MODULE_PERIPH_GPIO_IRQ
     select MODULE_ZTIMER
