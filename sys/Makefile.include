@@ -133,10 +133,8 @@ ifneq (,$(filter test_utils_result_output,$(USEMODULE)))
   include $(RIOTBASE)/sys/test_utils/result_output/Makefile.include
 endif
 
-# Convert xtimer into a pseudo module if its API is already implemented by
-# ztimer's compatibility wrapper
-ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
-  PSEUDOMODULES += xtimer
+ifneq (,$(filter ztimer,$(USEMODULE)))
+  include $(RIOTBASE)/sys/ztimer/Makefile.include
 endif
 
 ifneq (,$(filter prng,$(USEMODULE)))
