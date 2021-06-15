@@ -76,7 +76,8 @@ riotboot: $(SLOT_RIOT_BINS)
 
 # riotboot bootloader compile target
 riotboot/flash-bootloader: riotboot/bootloader/flash
-riotboot/bootloader/%: $(BUILDDEPS) pkg-prepare
+# avoid circular dependency against clean
+riotboot/bootloader/%: $$(if $$(filter riotboot/bootloader/clean,$$@),,$$(BUILDDEPS) pkg-prepare)
 	$(Q)/usr/bin/env -i \
 		QUIET=$(QUIET) PATH="$(PATH)"\
 		EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" BOARD=$(BOARD)\
@@ -95,6 +96,7 @@ $(BOOTLOADER_BIN)/riotboot.extended.bin: $(BOOTLOADER_BIN)/riotboot.bin
 
 # Only call sub make if not already in riotboot
 ifneq ($(BOOTLOADER_BIN)/riotboot.bin,$(BINFILE))
+  clean: riotboot/bootloader/clean
   $(BOOTLOADER_BIN)/riotboot.bin: riotboot/bootloader/binfile
 endif
 
