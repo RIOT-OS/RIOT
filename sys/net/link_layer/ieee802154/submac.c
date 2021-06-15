@@ -29,13 +29,32 @@
 
 static void _handle_tx_no_ack(ieee802154_submac_t *submac);
 
+static inline void _req_set_trx_state_wait_busy(ieee802154_dev_t *dev,
+                                                ieee802154_trx_state_t state)
+{
+    int res;
+
+    /* Some radios will run some house keeping tasks on event suchs as RX_DONE
+     * (e.g sending ACK frames) or TX_DONE. In such case we need to wait until
+     * the radio is not busy.
+     */
+    do {
+        res = ieee802154_radio_request_set_trx_state(dev, state);
+    }
+    while (res == -EBUSY);
+    assert(res >= 0);
+}
+
 static void _tx_end(ieee802154_submac_t *submac, int status,
                     ieee802154_tx_info_t *info)
 {
     ieee802154_dev_t *dev = submac->dev;
 
-    ieee802154_radio_request_set_trx_state(dev, submac->state == IEEE802154_STATE_LISTEN ? IEEE802154_TRX_STATE_RX_ON : IEEE802154_TRX_STATE_TRX_OFF);
+    ieee802154_trx_state_t next_state = submac->state == IEEE802154_STATE_LISTEN
+                                        ? IEEE802154_TRX_STATE_RX_ON
+                                        : IEEE802154_TRX_STATE_TRX_OFF;
 
+    _req_set_trx_state_wait_busy(dev, next_state);
     submac->wait_for_ack = false;
     submac->tx = false;
     while (ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {}
@@ -53,7 +72,8 @@ static int _perform_csma_ca(ieee802154_submac_t *submac)
     ieee802154_dev_t *dev = submac->dev;
 
     if (submac->csma_retries_nb <= submac->csma_retries) {
-        ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_TX_ON);
+        _req_set_trx_state_wait_busy(dev, IEEE802154_TRX_STATE_TX_ON);
+
         /* delay for an adequate random backoff period */
         uint32_t bp = (random_uint32() & submac->backoff_mask) *
                       CSMA_SENDER_BACKOFF_PERIOD_UNIT_MS;
@@ -104,7 +124,7 @@ int ieee802154_csma_ca_transmit(ieee802154_submac_t *submac)
         ieee802154_radio_has_frame_retrans(dev)) {
 
         /* Make sure we are in TX_ON */
-        ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_TX_ON);
+        _req_set_trx_state_wait_busy(dev, IEEE802154_TRX_STATE_TX_ON);
         while (ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {}
 
         int res;
@@ -131,7 +151,9 @@ static void _perform_retrans(ieee802154_submac_t *submac)
 
     if (_has_retrans_left(submac)) {
         submac->retrans++;
-        ieee802154_csma_ca_transmit(submac);
+        int res = ieee802154_csma_ca_transmit(submac);
+        (void) res;
+        assert(res >= 0);
     }
     else {
         ieee802154_radio_set_frame_filter_mode(dev, IEEE802154_FILTER_ACCEPT);
@@ -150,8 +172,9 @@ void ieee802154_submac_ack_timeout_fired(ieee802154_submac_t *submac)
 void ieee802154_submac_crc_error_cb(ieee802154_submac_t *submac)
 {
     ieee802154_dev_t *dev = submac->dev;
+
     /* switch back to RX_ON state */
-    ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_RX_ON);
+    _req_set_trx_state_wait_busy(dev, IEEE802154_TRX_STATE_RX_ON);
     while (ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {}
 }
 
@@ -190,11 +213,7 @@ void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac)
          * transition here in order to release it */
         ieee802154_trx_state_t next_state = submac->state == IEEE802154_STATE_LISTEN ? IEEE802154_TRX_STATE_RX_ON : IEEE802154_TRX_STATE_TRX_OFF;
 
-        /* Some radios will run some house keeping tasks on RX_DONE (e.g
-         * sending ACK frames). In such case we need to wait until the radio is
-         * not busy
-         */
-        while (ieee802154_radio_request_set_trx_state(submac->dev, next_state) == -EBUSY);
+        _req_set_trx_state_wait_busy(submac->dev, next_state);
         while (ieee802154_radio_confirm_set_trx_state(submac->dev) == -EAGAIN) {}
     }
 }
@@ -228,7 +247,6 @@ static void _handle_tx_medium_busy(ieee802154_submac_t *submac)
 
     if (ieee802154_radio_has_frame_retrans(dev) ||
         ieee802154_radio_has_auto_csma(dev)) {
-        ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_RX_ON);
         _tx_end(submac, TX_STATUS_MEDIUM_BUSY, NULL);
     }
     else {
@@ -242,7 +260,6 @@ static void _handle_tx_no_ack(ieee802154_submac_t *submac)
     ieee802154_dev_t *dev = submac->dev;
 
     if (ieee802154_radio_has_frame_retrans(dev)) {
-        ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_RX_ON);
         _tx_end(submac, TX_STATUS_NO_ACK, NULL);
     }
     else {
@@ -300,8 +317,7 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist)
     submac->wait_for_ack = cnf;
     submac->retrans = 0;
 
-    ieee802154_csma_ca_transmit(submac);
-    return 0;
+    return ieee802154_csma_ca_transmit(submac);
 }
 
 int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *short_addr,
@@ -312,7 +328,10 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     submac->tx = false;
     submac->state = IEEE802154_STATE_LISTEN;
 
-    ieee802154_radio_request_on(dev);
+    int res;
+    if ((res = ieee802154_radio_request_on(dev)) < 0) {
+        return res;
+    }
 
     /* generate EUI-64 and short address */
     memcpy(&submac->ext_addr, ext_addr, sizeof(eui64_t));
@@ -375,13 +394,14 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
       .pow = submac->tx_pow };
 
     ieee802154_radio_config_phy(dev, &conf);
-    assert(ieee802154_radio_set_cca_threshold(dev,
-                                              CONFIG_IEEE802154_CCA_THRESH_DEFAULT) >= 0);
+    ieee802154_radio_set_cca_threshold(dev,
+                                       CONFIG_IEEE802154_CCA_THRESH_DEFAULT);
+    assert(res >= 0);
 
-    ieee802154_radio_request_set_trx_state(dev, IEEE802154_TRX_STATE_RX_ON);
-    while(ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {};
+    _req_set_trx_state_wait_busy(dev, IEEE802154_TRX_STATE_RX_ON);
+    while (ieee802154_radio_confirm_set_trx_state(dev) == -EAGAIN) {};
 
-    return 0;
+    return res;
 }
 
 int ieee802154_set_phy_conf(ieee802154_submac_t *submac, uint16_t channel_num,
