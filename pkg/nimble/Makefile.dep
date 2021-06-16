@@ -2,10 +2,6 @@
 USEMODULE += sema
 USEMODULE += event_callback
 USEMODULE += ztimer_msec
-# all nRF CPUs support hardware RTT, so we use it
-ifneq (,$(filter nrf5%,$(CPU_FAM)))
-  USEMODULE += ztimer_periph_rtt
-endif
 
 # Requires nimble feature
 FEATURES_REQUIRED += ble_nimble

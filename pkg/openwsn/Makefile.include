@@ -72,13 +72,5 @@ ifneq (,$(filter at86rf2xx,$(USEMODULE)))
   CFLAGS += -DAT86RF2XX_BASIC_MODE
 endif
 
-# We want the highest possible frequency set for periph_rtt, but not all
-# platforms can configure this value. use highest possible RTT_FREQUENCY
-# for platforms that allow it
-ifneq (,$(filter stm32 nrf52 sam%,$(CPU)))
-  RTT_FREQUENCY ?= RTT_MAX_FREQUENCY
-  CFLAGS += -DRTT_FREQUENCY=$(RTT_FREQUENCY)
-endif
-
 # LLVM ARM shows issues with missing definitions for stdatomic
 TOOLCHAINS_BLACKLIST += llvm

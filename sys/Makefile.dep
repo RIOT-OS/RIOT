@@ -269,9 +269,6 @@ endif
 
 ifneq (,$(filter posix_sleep,$(USEMODULE)))
   USEMODULE += ztimer_msec
-  ifneq (,$(filter periph_rtt,$(USEMODULE)))
-    USEMODULE += ztimer_periph_rtt
-  endif
   USEMODULE += ztimer_usec
   USEMODULE += posix_headers
 endif
@@ -539,9 +536,6 @@ ifneq (,$(filter skald,$(USEMODULE)))
   USEMODULE += nrfble
   USEMODULE += random
   USEMODULE += ztimer_msec
-   ifneq (,$(filter periph_rtt,$(USEMODULE)))
-    USEMODULE += ztimer_periph_rtt
-  endif
 endif
 
 ifneq (,$(filter bluetil_addr,$(USEMODULE)))
