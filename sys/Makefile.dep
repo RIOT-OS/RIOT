@@ -853,4 +853,8 @@ ifneq (,$(filter fido2_ctap,$(USEMODULE)))
   USEMODULE += fido2
 endif
 
+ifneq (,$(filter posix_netdb,$(USEMODULE)))
+  USEMODULE += sock_dns
+endif
+
 include $(RIOTBASE)/sys/test_utils/Makefile.dep
