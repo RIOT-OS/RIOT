@@ -124,14 +124,6 @@ static void _parse_host_and_port(char **host, char **port, char *default_port);
  */
 static netif_t *_get_interface(char *host);
 
-/**
- * @brief Sets a given interface to a given UDP endpoint
- *
- * @param[out] ep           UDP endpoint
- * @param[in]  netif        Network interface to assign
- */
-static void _set_interface(sock_udp_ep_t *ep, const netif_t *netif);
-
 void *lwm2m_connect_server(uint16_t sec_obj_inst_id, void *user_data)
 {
     lwm2m_client_data_t *client_data = (lwm2m_client_data_t *)user_data;
@@ -313,20 +305,6 @@ static void _parse_host_and_port(char **host, char **port, char *default_port)
     *port = _port;
 }
 
-static void _set_interface(sock_udp_ep_t *ep, const netif_t *netif)
-{
-    if (netif == NULL || ep == NULL) {
-        return;
-    }
-
-    /* currently there is no way to assign a network interface to a sock
-     * endpoint by means of a generic API, so we need to check */
-    if (IS_USED(MODULE_GNRC_NETIF)) {
-        const gnrc_netif_t *gnrc_netif = (gnrc_netif_t *)netif;
-        ep->netif = (uint16_t)gnrc_netif->pid;
-    }
-}
-
 static netif_t *_get_interface(char *host)
 {
     netif_t *netif = NULL;
@@ -411,7 +389,11 @@ static lwm2m_client_connection_t *_connection_create(int instance_id,
             goto free_out;
         }
         else {
-            _set_interface(&conn->remote, netif);
+            int16_t netif_id = netif_get_id(netif);
+            if (netif_id < 0) {
+                goto free_out;
+            }
+            conn->remote.netif = netif_id;
         }
     }
 
