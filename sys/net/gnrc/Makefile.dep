@@ -246,6 +246,7 @@ ifneq (,$(filter gnrc_ipv6_default,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_ipv6_router_default,$(USEMODULE)))
+  USEMODULE += gnrc_ipv6_nib_rio
   USEMODULE += gnrc_ipv6_router
   USEMODULE += gnrc_icmpv6
 endif
