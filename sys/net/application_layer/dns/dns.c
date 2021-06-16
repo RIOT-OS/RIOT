@@ -181,12 +181,25 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
         return -ENOSPC;
     }
 
-    sock_udp_t sock_dns;
+    ssize_t res = 0;
 
-    ssize_t res = sock_udp_create(&sock_dns, NULL, &sock_dns_server, 0);
-    if (res) {
-        goto out;
-    }
+    #ifdef MODULE_POSIX_SOCKETS
+        #if defined(MODULE_IPV6_ADDR)
+            ssize_t fd = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
+        #elif defined(MODULE_IPV4_ADDR)
+            ssize_t fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+        #endif
+
+        if (fd < 0) {
+            goto out;
+        }
+    #else
+        sock_udp_t sock_dns;
+        res = sock_udp_create(&sock_dns, NULL, &sock_dns_server, 0);
+        if (res) {
+            goto out;
+        }
+    #endif /* MODULE_POSIX_SOCKETS */
 
     uint16_t id = 0; /* random? */
     for (int i = 0; i < SOCK_DNS_RETRIES; i++) {
@@ -219,11 +232,38 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
             bufpos += _put_short(bufpos, htons(DNS_CLASS_IN));
         }
 
-        res = sock_udp_send(&sock_dns, buf, (bufpos-buf), NULL);
+        #ifdef MODULE_POSIX_SOCKETS
+            #if defined(MODULE_IPV6_ADDR)
+                struct sockaddr_in6 dst_addr = {0};
+                dst_addr.sin6_family = AF_INET6;
+                dst_addr.sin6_port = htons(sock_dns_server.port);
+                memcpy(&dst_addr.sin6_addr, sock_dns_server.addr.ipv6, sizeof(struct in6_addr));
+
+                socklen_t src_len = sizeof(struct sockaddr_in6);
+            #elif defined(MODULE_IPV4_ADDR)
+                struct sockaddr_in dst_addr = {0};
+                dst_addr.sin_family = AF_INET;
+                dst_addr.sin_port = htons(sock_dns_server.port);
+                memcpy(&dst_addr.sin_addr, sock_dns_server.addr.ipv4, sizeof(struct in_addr));
+
+                socklen_t src_len = sizeof(struct sockaddr_in);
+            #endif
+
+            res = sendto(fd, buf, (bufpos-buf), 0, (struct sockaddr *)&dst_addr, sizeof(dst_addr));
+        #else
+            res = sock_udp_send(&sock_dns, buf, (bufpos-buf), NULL);
+        #endif /* MODULE_POSIX_SOCKETS */
+
         if (res <= 0) {
             continue;
         }
-        res = sock_udp_recv(&sock_dns, dns_buf, sizeof(dns_buf), 1000000LU, NULL);
+
+        #ifdef MODULE_POSIX_SOCKETS
+            res = recvfrom(fd, dns_buf, sizeof(dns_buf), 0, (struct sockaddr *)&dst_addr, &src_len);
+        #else
+            res = sock_udp_recv(&sock_dns, dns_buf, sizeof(dns_buf), 1000000LU, NULL);
+        #endif /* MODULE_POSIX_SOCKETS */
+
         if (res > 0) {
             if (res > (int)DNS_MIN_REPLY_LEN) {
                 if ((res = _parse_dns_reply(dns_buf, res, addr_out,
@@ -238,6 +278,11 @@ int sock_dns_query(const char *domain_name, void *addr_out, int family)
     }
 
 out:
-    sock_udp_close(&sock_dns);
+    #ifdef MODULE_POSIX_SOCKETS
+        close(fd);
+    #else
+        sock_udp_close(&sock_dns);
+    #endif /* MODULE_POSIX_SOCKETS */
+
     return res;
 }
