@@ -76,12 +76,15 @@ riotboot: $(SLOT_RIOT_BINS)
 
 # riotboot bootloader compile target
 riotboot/flash-bootloader: riotboot/bootloader/flash
+# IOTLAB_NODE is passed so that FLASHFILE is also set in the recursive make call
+# when PROGRAMMER=iotlab
 # avoid circular dependency against clean
 riotboot/bootloader/%: $$(if $$(filter riotboot/bootloader/clean,$$@),,$$(BUILDDEPS) pkg-prepare)
 	$(Q)/usr/bin/env -i \
 		QUIET=$(QUIET) PATH="$(PATH)"\
 		EXTERNAL_BOARD_DIRS="$(EXTERNAL_BOARD_DIRS)" BOARD=$(BOARD)\
 		DEBUG_ADAPTER_ID=$(DEBUG_ADAPTER_ID) \
+		IOTLAB_NODE=$(IOTLAB_NODE) \
 		PROGRAMMER=$(PROGRAMMER) PROGRAMMER_QUIET=$(PROGRAMMER_QUIET) \
 			$(MAKE) --no-print-directory -C $(RIOTBOOT_DIR) $*
 
