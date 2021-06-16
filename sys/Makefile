@@ -158,6 +158,9 @@ endif
 ifneq (,$(filter posix_inet,$(USEMODULE)))
   DIRS += posix/inet
 endif
+ifneq (,$(filter posix_netdb,$(USEMODULE)))
+  DIRS += posix/netdb
+endif
 ifneq (,$(filter posix_select,$(USEMODULE)))
   DIRS += posix/select
 endif

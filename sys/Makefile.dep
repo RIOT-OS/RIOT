@@ -382,6 +382,11 @@ ifneq (,$(filter posix_sleep,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
 
+ifneq (,$(filter posix_netdb,$(USEMODULE)))
+  USEMODULE += posix_inet
+  USEMODULE += sock_dns
+endif
+
 ifneq (,$(filter posix_inet,$(USEMODULE)))
   USEMODULE += posix_headers
 endif
