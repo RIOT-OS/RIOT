@@ -22,7 +22,6 @@
 #include <string.h>
 
 #include "thread.h"
-#include "xtimer.h"
 #include "shell.h"
 #include "shell_commands.h"
 
