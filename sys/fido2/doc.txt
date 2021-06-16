@@ -26,6 +26,8 @@
  *     implemented. For more information about the available attestation
  *     types refer to Webauthn specification (version 20190304) section 6.5.3.
  *   * Support for NFC and BLE as underlying communication protocol
+ *   * Support for CTAP extensions. For more information about extensions refer
+ *     to CTAP specification (version 20190130) section 9.
  *
  * The cryptographic credentials created to authenticate a user can either be
  * stored on the authenticator (resident key) or stored by a relying party.

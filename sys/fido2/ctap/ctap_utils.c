@@ -23,10 +23,11 @@
 #include "fido2/ctap/ctap_utils.h"
 
 #if !IS_ACTIVE(CONFIG_FIDO2_CTAP_DISABLE_UP)
-#if CONFIG_CTAP_HID
-#include "fido2/ctap/transport/hid/ctap_transport_hid.h"
 #include "periph/gpio.h"
 #endif
+
+#ifdef MODULE_FIDO2_CTAP_HID
+#include "fido2/ctap/transport/hid/ctap_transport_hid.h"
 #endif
 
 #define ENABLE_DEBUG    (0)
@@ -41,7 +42,7 @@ int fido2_ctap_utils_user_presence_test(void)
 {
 #ifdef BTN0_PIN
     int ret;
-#if CONFIG_CTAP_HID
+#ifdef MODULE_FIDO2_CTAP_HID
     fido2_ctap_transport_hid_send_keepalive(CTAP_HID_STATUS_UPNEEDED);
 #endif
 

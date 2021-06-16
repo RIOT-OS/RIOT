@@ -16,17 +16,19 @@ The FIDO2 authenticator can be tested in two ways:
 1. Flash the device with `make flash`.
 2. Test the authenticator on a website like [Webauthn.io](https://webauthn.io/).
 
-Note: Due to limited support of CTAP2 in browsers as of now, make sure to use the
-      Chromium or Google Chrome browser when testing on [Webauthn.io](https://webauthn.io/).
-      When registering and authenticating on [Webauthn.io](https://webauthn.io/) you
-      will need to push button 1 on your device in order to show user presence.
+Note:
+* Due to limited support of CTAP2 in browsers as of now, make sure to use the
+  Chromium or Google Chrome browser when testing on [Webauthn.io](https://webauthn.io/).
+* When registering and authenticating on [Webauthn.io](https://webauthn.io/) you
+will need to push button 1 on your device in order to show user presence.
 
 ### Unit testing
 1. To make benchmarking faster, disable user presence tests by enabling the CFLAG:
-   CONFIG_FIDO2_CTAP_DISABLE_UP=1 in the Makefile.
+   `CONFIG_FIDO2_CTAP_DISABLE_UP=1` in the Makefile.
 2. Flash the device with `make flash`.
 3. Run the unit tests by running `make fido2-test`.
 
-Note: The unit tests will require you to reboot the authenticator multiple times.
-      Be patient before continuing as it takes a few seconds for the connection
-      between OS and authenticator to be reestablished.
+Note:
+* The tests require python 3.6+.
+* The unit tests will require you to reboot the authenticator multiple times. Be patient before continuing as it takes a few seconds for the connection
+  between OS and authenticator to be reestablished.

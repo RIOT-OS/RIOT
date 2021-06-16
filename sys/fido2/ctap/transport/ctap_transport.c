@@ -18,7 +18,7 @@
 #include "fido2/ctap/transport/ctap_transport.h"
 #include "fido2/ctap.h"
 
-#if CONFIG_CTAP_HID
+#ifdef MODULE_FIDO2_CTAP_HID
 #include "usb/usbus.h"
 #include "fido2/ctap/transport/hid/ctap_transport_hid.h"
 #endif
@@ -26,7 +26,7 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-#if CONFIG_CTAP_HID
+#ifdef MODULE_FIDO2_CTAP_HID
 size_t usb_hid_io_write(const void *buffer, size_t size);
 int usb_hid_io_read_timeout(void *buffer, size_t size, uint32_t timeout);
 #endif
@@ -49,14 +49,14 @@ static void *pkt_loop(void *arg)
         return NULL;
     }
 
-#if CONFIG_CTAP_HID
+#ifdef MODULE_FIDO2_CTAP_HID
     fido2_ctap_transport_hid_create();
 #endif
 
     DEBUG("fido2_ctap_transport: initialization done. Entering work loop \n");
 
     for (;;) {
-#if CONFIG_CTAP_HID
+#ifdef MODULE_FIDO2_CTAP_HID
         work_usb();
 #endif
     }

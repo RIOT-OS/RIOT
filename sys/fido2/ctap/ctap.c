@@ -29,7 +29,7 @@
 #include "fido2/ctap/ctap_cbor.h"
 #include "fido2/ctap/ctap_mem.h"
 
-#define ENABLE_DEBUG    (1)
+#define ENABLE_DEBUG    (0)
 #include "debug.h"
 
 /*** main CTAP2 functions ***/
@@ -222,13 +222,13 @@ static inline bool boot_locked(void);
 static inline bool locked(void);
 
 /**
- * @brief Get flashpage number at offset i * @ref CTAP_PAD_RK_SZ from
- *        @ref CTAP_RK_START_PAGE.
+ * @brief Get flashpage number of where the ith resident key is stored.
  */
-static inline uint16_t get_flashpage_number(uint16_t i);
+static inline uint16_t get_flashpage_number_of_rk(uint16_t i);
 
 /**
- * @brief Get offset into flashpage where flashpage = get_flashpage_number(i)
+ * @brief Get offset into flashpage where flashpage =
+ *        get_flashpage_number_of_rk(i)
  */
 static inline uint16_t get_offset_into_flashpage(uint16_t i);
 
@@ -1119,7 +1119,7 @@ static int verify_pin_auth(uint8_t *auth, uint8_t *hash, size_t len)
     return CTAP2_OK;
 }
 
-static inline uint16_t get_flashpage_number(uint16_t i)
+static inline uint16_t get_flashpage_number_of_rk(uint16_t i)
 {
     return i / (FLASHPAGE_SIZE / CTAP_PAD_RK_SZ);
 }
@@ -1153,7 +1153,7 @@ static bool rks_exist(ctap_cred_desc_alt_t *li, size_t len, uint8_t *rp_id,
     }
 
     for (uint16_t i = 0; i < g_state.rk_amount_stored; i++) {
-        uint16_t page_offset = get_flashpage_number(i);
+        uint16_t page_offset = get_flashpage_number_of_rk(i);
         uint16_t page_offset_into_page = get_offset_into_flashpage(i);
 
         if (page_offset_into_page == 0) {
@@ -1211,7 +1211,7 @@ static uint8_t find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
     }
 
     for (int i = 0; i < g_state.rk_amount_stored; i++) {
-        uint16_t page_num = get_flashpage_number(i);
+        uint16_t page_num = get_flashpage_number_of_rk(i);
         uint16_t offset_into_page = get_offset_into_flashpage(i);
 
         if (offset_into_page == 0) {
@@ -1292,7 +1292,7 @@ static int save_rk(ctap_resident_key_t *rk)
 
     if (g_state.rk_amount_stored > 0) {
         for (uint16_t i = 0; i <= g_state.rk_amount_stored; i++) {
-            page_num = get_flashpage_number(i);
+            page_num = get_flashpage_number_of_rk(i);
             offset_into_page = get_offset_into_flashpage(i);
 
             if (i == g_state.rk_amount_stored) {
