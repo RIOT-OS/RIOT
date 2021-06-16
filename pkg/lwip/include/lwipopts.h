@@ -148,6 +148,13 @@ extern "C" {
 
 #define LWIP_SOCKET             0
 
+#ifdef MODULE_LWIP_NETDB
+#define LWIP_NETDB                      1
+#define LWIP_DNS_API_DEFINE_ERRORS      1
+#define LWIP_DNS_API_DECLARE_H_ERRNO    1
+#define LWIP_DNS_API_DECLARE_STRUCTS    1
+#endif /* MODULE_LWIP_NETDB */
+
 #define LWIP_DONT_PROVIDE_BYTEORDER_FUNCTIONS
 #define MEMP_MEM_MALLOC         1
 #define NETIF_MAX_HWADDR_LEN    (GNRC_NETIF_HDR_L2ADDR_MAX_LEN)

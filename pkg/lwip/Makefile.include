@@ -9,6 +9,7 @@ PSEUDOMODULES += lwip_ethernet
 PSEUDOMODULES += lwip_igmp
 PSEUDOMODULES += lwip_ipv6_autoconfig
 PSEUDOMODULES += lwip_ipv6_mld
+PSEUDOMODULES += lwip_netdb
 PSEUDOMODULES += lwip_raw
 PSEUDOMODULES += lwip_sixlowpan
 PSEUDOMODULES += lwip_stats
@@ -28,6 +29,9 @@ ifneq (,$(filter lwip_contrib,$(USEMODULE)))
 endif
 ifneq (,$(filter lwip_netdev,$(USEMODULE)))
   DIRS += $(RIOTBASE)/pkg/lwip/contrib/netdev
+endif
+ifneq (,$(filter lwip_netdb,$(USEMODULE)))
+  CFLAGS += -DLWIP_NETDB
 endif
 ifneq (,$(filter lwip_sock,$(USEMODULE)))
   ifneq (,$(filter lwip_ipv6,$(USEMODULE)))
