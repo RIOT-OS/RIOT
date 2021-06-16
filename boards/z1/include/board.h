@@ -51,6 +51,14 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    ztimer configuration values
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_ADJUST_SET     (96)
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (97)
+/** @} */
+
+/**
  * @name    CPU core configuration
  * @{
  */
