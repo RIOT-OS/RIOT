@@ -26,6 +26,7 @@ static void cpu_clock_init(void);
 /**
  * @brief Configure the clock system
  */
+
 static void cpu_clock_init(void)
 {
 #if CLK_REF_XTAL
