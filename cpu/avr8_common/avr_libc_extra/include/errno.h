@@ -84,7 +84,7 @@ extern int errno;
 #define ECONNRESET      (15)    /**< Connection reset. */
 #define EDEADLK         (16)    /**< Resource deadlock would occur. */
 #define EDESTADDRREQ    (17)    /**< Destination address required. */
-#define EDOM            (18)    /**< Mathematics argument out of domain of function. */
+#define EMFILE          (18)    /**< File descriptor value too large. */
 #define EDQUOT          (19)    /**< Reserved. */
 #define EEXIST          (20)    /**< File exists. */
 #define EFAULT          (21)    /**< Bad address. */
@@ -99,8 +99,8 @@ extern int errno;
 #define EISCONN         (30)    /**< Socket is connected. */
 #define EISDIR          (31)    /**< Is a directory. */
 #define ELOOP           (32)    /**< Too many levels of symbolic links. */
-#define EMFILE          (33)    /**< File descriptor value too large. */
-#define EMLINK          (34)    /**< Too many links. */
+#define EDOM            (33)    /**< Mathematics argument out of domain of function. */
+#define ERANGE          (34)    /**< Result too large. */
 #define EMSGSIZE        (35)    /**< Message too large. */
 #define EMULTIHOP       (36)    /**< Reserved. */
 #define ENAMETOOLONG    (37)    /**< Filename too long. */
@@ -138,7 +138,7 @@ extern int errno;
 #define EPROTO          (69)    /**< Protocol error. */
 #define EPROTONOSUPPORT (70)    /**< Protocol not supported. */
 #define EPROTOTYPE      (71)    /**< Protocol wrong type for socket. */
-#define ERANGE          (72)    /**< Result too large. */
+#define EMLINK          (72)    /**< Too many links. */
 #define EROFS           (73)    /**< Read-only file system. */
 #define ESPIPE          (74)    /**< Invalid seek. */
 #define ESRCH           (75)    /**< No such process. */
