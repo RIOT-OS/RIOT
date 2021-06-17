@@ -15,7 +15,6 @@ Usage
 
 It's necessary to join the LoRaWAN network either via OTAA or ABP.
 All keys, addresses and EUIs are in network endian (big endian).
-The application listens to downlinks on Port 2 by default.
 Region need to be set in the Makefile.
 
 ## OTAA
@@ -73,10 +72,15 @@ CFLAGS += -DCONFIG_LORAMAC_DEV_ADDR_DEFAULT=\"FFFFFFFF\"
 
 ## Send data
 
-After join, send data using `send` command. E.g to send "Hello RIOT!" to port 2:
+After join, send data using `txtsnd` command:
+```
+txtsnd <if> <hex_port> <data>
+```
+
+E.g to send "Hello RIOT!" to LoRaWAN port 123 (hex 0x7B) via interface 3:
 
 ```
-send 3 "Hello RIOT!" 2
+txtsnd 3 7B "Hello RIOT!"
 ```
 
 ## Changing datarate of transmission
@@ -100,7 +104,7 @@ Send some data. The result of the Link Check request can be seen with
 
 ```
 ifconfig 3 link_check
-send 3 "Join the RIOT!"
+txtsnd 3 01 "Join the RIOT!"
 ```
 
 Check demodulation margin and number of gateways using `ifconfig`
@@ -124,18 +128,43 @@ E.g send confirmable messages:
 
 ```
 ifconfig 3 ack_req
-send 3 "My confirmable message"
+txtsnd 3 01 "My confirmable message"
 ```
 
 And unconfirmable messages:
 
 ```
 ifconfig 3 -ack_req
-send 3 "My unconfirmable message"
+txtsnd 3 01 "My unconfirmable message"
 ```
 
+## Receiving data
+
+Schedule a downlink for the LoRaWAN node in the Application Server. If using
+TTN, this can be done under `Applications > <APP> > Devices > <DEV> > Overview`
+and then check the `Downlink` section.
+
+After sending data, the LoRaWAN Network Server will reply with the downlink
+data. For simplicity, this application is configured to dump downlink data to
+[GNRC pktdump](https://doc.riot-os.org/pktdump_8h.html).
+
+E.g:
+```
+PKTDUMP: data received:
+~~ SNIP  0 - size:   2 byte, type: NETTYPE_UNDEF (0)
+00000000  AA  AA
+~~ SNIP  1 - size:   9 byte, type: NETTYPE_NETIF (-1)
+if_pid: 3  rssi: -32768  lqi: 0
+flags: 0x0
+src_l2addr: (nil)
+dst_l2addr: 01
+~~ PKT    -  2 snips, total size:  11 byte
+```
+
+This downlink was sent to port 1 (check `dst_l2addr` field)
+
 Current state and future plans
-============
+==============================
 
 The current GNRC LoRaWAN stack is still in an experimental state. It's still
 not compliant with the LoRaWAN specification because some features like duty

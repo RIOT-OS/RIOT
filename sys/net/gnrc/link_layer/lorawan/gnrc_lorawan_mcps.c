@@ -118,6 +118,11 @@ int gnrc_lorawan_parse_dl(gnrc_lorawan_t *mac, uint8_t *buf, size_t len,
             return -1;
         }
 
+        if (pkt->port > LORAMAC_PORT_MAX) {
+            DEBUG("gnrc_lorawan: packet with port > 223. Drop\n");
+            return -1;
+        }
+
         if (buf < p_mic) {
             pkt->enc_payload.iol_base = buf;
             pkt->enc_payload.iol_len = p_mic - buf;

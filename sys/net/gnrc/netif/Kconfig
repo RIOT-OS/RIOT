@@ -61,4 +61,17 @@ config GNRC_NETIF_PKTQ_TIMER_US
         Set to -1 to deactivate dequeing by timer. For this it has to be ensured
         that none of the notifications by the driver are missed!
 
+config GNRC_NETIF_LORAWAN_NETIF_HDR
+    bool "Encode LoRaWAN port in GNRC netif header"
+    depends on USEMODULE_GNRC_LORAWAN
+    help
+        When set, GNRC Netif will interpret
+        the destination address of the GNRC netif header as
+        the LoRaWAN port. For downlinks, a GNRC netif header
+        with the received port in destination field will be
+        included in the first snip. From Release 2021.10 all
+        GNRC LoRaWAN packets will include the GNRC Netif
+        header. Therefore this parameter will be removed
+
+
 endif # KCONFIG_USEMODULE_GNRC_NETIF
