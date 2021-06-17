@@ -145,8 +145,11 @@ typedef struct {
     uint32_t scan_win;
     /** opening a new connection is aborted after this time [in ms] */
     uint32_t conn_timeout;
-    /** connection interval used when opening a new connection [in ms] */
-    uint32_t conn_itvl;
+    /** connection interval used when opening a new connection, lower bound.
+     *  [in ms] */
+    uint32_t conn_itvl_min;
+    /** connection interval, upper bound [in ms] */
+    uint32_t conn_itvl_max;
     /** slave latency used for new connections [in ms] */
     uint16_t conn_latency;
     /** supervision timeout used for new connections [in ms] */

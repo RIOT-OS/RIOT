@@ -485,6 +485,11 @@ static int _on_gap_slave_evt(struct ble_gap_event *event, void *arg)
                 _notify(handle, NIMBLE_NETIF_ABORT_SLAVE, addr);
                 break;
             }
+            if ((NIMBLE_NETIF_CONN_ITVL_SPACING > 0) &&
+                nimble_netif_conn_itvl_invalid(handle)) {
+                nimble_netif_close(handle);
+                break;
+            }
             _on_gap_connected(conn, event->connect.conn_handle);
             assert(conn->state == NIMBLE_NETIF_ADV);
             conn->state = NIMBLE_NETIF_GAP_SLAVE;
@@ -537,11 +542,14 @@ void nimble_netif_eventcb(nimble_netif_eventcb_t cb)
 }
 
 int nimble_netif_connect(const ble_addr_t *addr,
-                         const struct ble_gap_conn_params *conn_params,
+                         struct ble_gap_conn_params *conn_params,
                          uint32_t timeout)
 {
     assert(addr);
     assert(_eventcb);
+
+    uint16_t itvl_min = 0;
+    uint16_t itvl_max = 0;
 
     /* the netif_conn module expects addresses in network byte order */
     uint8_t addrn[BLE_ADDR_LEN];
@@ -559,10 +567,30 @@ int nimble_netif_connect(const ble_addr_t *addr,
         return NIMBLE_NETIF_NOMEM;
     }
 
+    if ((conn_params != NULL)
+        && (conn_params->itvl_min != conn_params->itvl_max)) {
+        /* we need to save the min/max intervals in order to restore them
+         * later on */
+        itvl_min = conn_params->itvl_min;
+        itvl_max = conn_params->itvl_max;
+
+        uint16_t itvl = nimble_netif_conn_gen_itvl(itvl_min, itvl_max);
+        if (itvl == 0) {
+            return NIMBLE_NETIF_NOTFOUND;
+        }
+        conn_params->itvl_min = itvl;
+        conn_params->itvl_max = itvl;
+    }
+
     int res = ble_gap_connect(nimble_riot_own_addr_type, addr, timeout,
                               conn_params, _on_gap_master_evt, (void *)handle);
     assert(res == 0);
     (void)res;
+
+    if (itvl_min != itvl_max) {
+        conn_params->itvl_min = itvl_min;
+        conn_params->itvl_max = itvl_max;
+    }
 
     _notify(handle, NIMBLE_NETIF_INIT_MASTER, addrn);
 
