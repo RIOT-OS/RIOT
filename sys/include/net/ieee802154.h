@@ -302,6 +302,13 @@ extern const uint8_t ieee802154_addr_bcast[IEEE802154_ADDR_BCAST_LEN];
 #endif
 
 /**
+ * @brief Disable Auto ACK support
+ */
+#ifdef DOXYGEN
+#define CONFIG_IEEE802154_AUTO_ACK_DISABLE 0
+#endif
+
+/**
  * @brief   Initializes an IEEE 802.15.4 MAC frame header in @p buf.
  *
  * @pre Resulting header must fit in memory allocated at @p buf.

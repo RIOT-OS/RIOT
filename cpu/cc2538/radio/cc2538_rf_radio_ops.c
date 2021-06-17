@@ -352,7 +352,7 @@ void cc2538_irq_handler(void)
             /* Disable RX while the frame has not been processed */
             RFCORE_XREG_RXMASKCLR = 0xFF;
             /* If AUTOACK is enabled and the ACK request bit is set */
-            if (RFCORE->XREG_FRMCTRL0bits.AUTOACK &&
+            if (!IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE) &&
                 (rfcore_peek_rx_fifo(1) & IEEE802154_FCF_ACK_REQ)) {
                 /* The next SFD will be the ACK's, ignore it */
                 cc2538_sfd_listen = false;
@@ -400,31 +400,51 @@ static int _off(ieee802154_dev_t *dev)
     return -ENOTSUP;
 }
 
-static int _set_hw_addr_filter(ieee802154_dev_t *dev, const network_uint16_t *short_addr,
-                               const eui64_t *ext_addr, const uint16_t *pan_id)
+static int _config_addr_filter(ieee802154_dev_t *dev, ieee802154_af_cmd_t cmd, const void *value)
 {
     (void) dev;
-    if (short_addr) {
-        RFCORE_FFSM_SHORT_ADDR0 = short_addr->u8[1];
-        RFCORE_FFSM_SHORT_ADDR1 = short_addr->u8[0];
+    const network_uint16_t *short_addr = value;
+    const eui64_t *ext_addr = value;
+    const uint16_t *pan_id = value;
+    switch(cmd) {
+        case IEEE802154_AF_SHORT_ADDR:
+            RFCORE_FFSM_SHORT_ADDR0 = short_addr->u8[1];
+            RFCORE_FFSM_SHORT_ADDR1 = short_addr->u8[0];
+            break;
+        case IEEE802154_AF_EXT_ADDR:
+            RFCORE_FFSM_EXT_ADDR0 = ext_addr->uint8[7];
+            RFCORE_FFSM_EXT_ADDR1 = ext_addr->uint8[6];
+            RFCORE_FFSM_EXT_ADDR2 = ext_addr->uint8[5];
+            RFCORE_FFSM_EXT_ADDR3 = ext_addr->uint8[4];
+            RFCORE_FFSM_EXT_ADDR4 = ext_addr->uint8[3];
+            RFCORE_FFSM_EXT_ADDR5 = ext_addr->uint8[2];
+            RFCORE_FFSM_EXT_ADDR6 = ext_addr->uint8[1];
+            RFCORE_FFSM_EXT_ADDR7 = ext_addr->uint8[0];
+            break;
+        case IEEE802154_AF_PANID:
+            RFCORE_FFSM_PAN_ID0 = *pan_id;
+            RFCORE_FFSM_PAN_ID1 = (*pan_id) >> 8;
+            break;
+        case IEEE802154_AF_PAN_COORD:
+            return -ENOTSUP;
     }
 
-    if (ext_addr) {
-        RFCORE_FFSM_EXT_ADDR0 = ext_addr->uint8[7];
-        RFCORE_FFSM_EXT_ADDR1 = ext_addr->uint8[6];
-        RFCORE_FFSM_EXT_ADDR2 = ext_addr->uint8[5];
-        RFCORE_FFSM_EXT_ADDR3 = ext_addr->uint8[4];
-        RFCORE_FFSM_EXT_ADDR4 = ext_addr->uint8[3];
-        RFCORE_FFSM_EXT_ADDR5 = ext_addr->uint8[2];
-        RFCORE_FFSM_EXT_ADDR6 = ext_addr->uint8[1];
-        RFCORE_FFSM_EXT_ADDR7 = ext_addr->uint8[0];
-    }
+    return 0;
+}
 
-    if (pan_id) {
-        RFCORE_FFSM_PAN_ID0 = *pan_id;
-        RFCORE_FFSM_PAN_ID1 = (*pan_id) >> 8;
+static int _config_src_addr_match(ieee802154_dev_t *dev, ieee802154_src_match_t cmd, const void *value)
+{
+    (void) dev;
+    switch(cmd) {
+        case IEEE802154_SRC_MATCH_EN:
+            RFCORE_XREG_FRMCTRL1 &= ~CC2538_FRMCTRL1_PENDING_OR_MASK;
+            if (*((const bool*) value) == true) {
+                RFCORE_XREG_FRMCTRL1 |= CC2538_FRMCTRL1_PENDING_OR_MASK;
+            }
+            break;
+        default:
+            return -ENOTSUP;
     }
-
     return 0;
 }
 
@@ -468,43 +488,6 @@ static int _set_cca_mode(ieee802154_dev_t *dev, ieee802154_cca_mode_t mode)
     return 0;
 }
 
-static int _set_rx_mode(ieee802154_dev_t *dev, ieee802154_rx_mode_t mode)
-{
-    (void) dev;
-
-    bool promisc = false;
-    bool ack_filter = true;
-    switch (mode) {
-        case IEEE802154_RX_AACK_DISABLED:
-            RFCORE->XREG_FRMCTRL0bits.AUTOACK = 0;
-            break;
-        case IEEE802154_RX_AACK_ENABLED:
-            RFCORE->XREG_FRMCTRL0bits.AUTOACK = 1;
-            RFCORE_XREG_FRMCTRL1 &= ~CC2538_FRMCTRL1_PENDING_OR_MASK;
-            break;
-        case IEEE802154_RX_AACK_FRAME_PENDING:
-            RFCORE->XREG_FRMCTRL0bits.AUTOACK = 1;
-            RFCORE_XREG_FRMCTRL1 |= CC2538_FRMCTRL1_PENDING_OR_MASK;
-            break;
-        case IEEE802154_RX_PROMISC:
-            promisc = true;
-            break;
-        case IEEE802154_RX_WAIT_FOR_ACK:
-            ack_filter = false;
-            break;
-    }
-
-    if (ack_filter) {
-        RFCORE_XREG_FRMFILT1 &= ~CC2538_ACCEPT_FT_2_ACK;
-    }
-    else {
-        RFCORE_XREG_FRMFILT1 |= CC2538_ACCEPT_FT_2_ACK;
-    }
-
-    cc2538_set_monitor(promisc);
-    return 0;
-}
-
 static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *bd, int8_t retries)
 {
     (void) dev;
@@ -518,6 +501,34 @@ static int _set_csma_params(ieee802154_dev_t *dev, const ieee802154_csma_be_t *b
     return 0;
 }
 
+static int _set_frame_filter_mode(ieee802154_dev_t *dev, ieee802154_filter_mode_t mode)
+{
+    (void) dev;
+
+    uint8_t flags = 0;
+    bool promisc = false;
+    switch (mode) {
+        case IEEE802154_FILTER_ACCEPT:
+            flags =   CC2538_ACCEPT_FT_0_BEACON
+                    | CC2538_ACCEPT_FT_1_DATA
+                    | CC2538_ACCEPT_FT_3_CMD;
+            break;
+        case IEEE802154_FILTER_PROMISC:
+            promisc = true;
+            break;
+        case IEEE802154_FILTER_ACK_ONLY:
+            flags = CC2538_ACCEPT_FT_2_ACK;
+            break;
+        default:
+            return -ENOTSUP;
+    }
+
+    RFCORE_XREG_FRMFILT1 |= flags;
+    cc2538_set_monitor(promisc);
+
+    return 0;
+
+}
 static const ieee802154_radio_ops_t cc2538_rf_ops = {
     .caps = IEEE802154_CAP_24_GHZ
           | IEEE802154_CAP_AUTO_CSMA
@@ -543,7 +554,8 @@ static const ieee802154_radio_ops_t cc2538_rf_ops = {
     .set_cca_threshold = _set_cca_threshold,
     .set_cca_mode = _set_cca_mode,
     .config_phy = _config_phy,
-    .set_hw_addr_filter = _set_hw_addr_filter,
+    .config_addr_filter = _config_addr_filter,
+    .config_src_addr_match = _config_src_addr_match,
     .set_csma_params = _set_csma_params,
-    .set_rx_mode = _set_rx_mode,
+    .set_frame_filter_mode = _set_frame_filter_mode,
 };
