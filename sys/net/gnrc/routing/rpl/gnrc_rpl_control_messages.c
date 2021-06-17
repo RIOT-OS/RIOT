@@ -19,6 +19,11 @@
 #include <assert.h>
 #include <string.h>
 #include "kernel_defines.h"
+#if IS_USED(MODULE_ZTIMER_MSEC)
+#include "ztimer.h"
+#else
+#include "xtimer.h"
+#endif
 
 #include "net/af.h"
 #include "net/icmpv6.h"
@@ -322,7 +327,11 @@ gnrc_pktsnip_t *_dio_prefix_info_build(gnrc_pktsnip_t *pkt, gnrc_rpl_dodag_t *do
     prefix_info->prefix_len = 64;
     if (_get_pl_entry(dodag->iface, &dodag->dodag_id, prefix_info->prefix_len,
                       &ple)) {
+#if IS_USED(MODULE_ZTIMER_MSEC)
+        uint32_t now = (uint32_t)ztimer_now(ZTIMER_MSEC);
+#else
         uint32_t now = (xtimer_now_usec64() / US_PER_MS) & UINT32_MAX;
+#endif
         uint32_t valid_ltime = (ple.valid_until < UINT32_MAX) ?
                                (ple.valid_until - now) / MS_PER_SEC : UINT32_MAX;
         uint32_t pref_ltime = (ple.pref_until < UINT32_MAX) ?
