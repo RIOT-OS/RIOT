@@ -24,10 +24,10 @@ class TestCongUREBase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.ctrl = RIOTCtrl()
+        cls.ctrl.reset()
         cls.ctrl.start_term()
         if cls.DEBUG:
             cls.ctrl.term.logfile = sys.stdout
-        cls.ctrl.reset()
         cls.shell = ShellInteraction(cls.ctrl)
         cls.json_parser = RapidJSONShellInteractionParser()
         cls.json_parser.set_parser_args(
