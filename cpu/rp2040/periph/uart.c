@@ -35,6 +35,7 @@
  */
 int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
 {
+    // Release UART HW reset.
     (void)(uart);
     (void)(baudrate);
     (void)(rx_cb);

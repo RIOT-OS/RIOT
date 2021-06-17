@@ -9,12 +9,15 @@
 #include "hardware/regs/addressmap.h"
 #include "hardware/regs/io_bank0.h"
 #include "hardware/regs/xosc.h"
+#include "hardware/regs/resets.h"
 
 #include "hardware/structs/uart.h"
 #include "hardware/structs/clocks.h"
 #include "hardware/structs/iobank0.h"
 #include "hardware/structs/padsbank0.h"
 #include "hardware/structs/xosc.h"
+#include "hardware/structs/resets.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -22,9 +22,11 @@ INCLUDE cortexm_rom_offset.ld
 
 MEMORY
 {
-    ram       (w!rx) : ORIGIN = _ram_start_addr,               LENGTH = _ram_length
-    rom       (rx)   : ORIGIN = _rom_start_addr + _rom_offset, LENGTH = _fw_rom_length /* XIP flash code. */
-    rom_boot2 (rx)   : ORIGIN = _ram_start_addr + _ram_length - _rom_offset, LENGTH = _rom_offset /* Stage-2 bootloader is copied to RAM from flash and then executed. */
+    ram       (rwx) : ORIGIN = _ram_start_addr,               LENGTH = 264k
+    /*rom       (rx)   : ORIGIN = _rom_start_addr + _rom_offset, LENGTH = _fw_rom_length /* XIP flash code. */
+    /*rom_boot2 (rx)   : ORIGIN = _ram_start_addr + _ram_length - _rom_offset, LENGTH = _rom_offset /* Stage-2 bootloader is copied to RAM from flash and then executed. */
+    rom       (rx)   : ORIGIN = _rom_start_addr, LENGTH = 2048k /* XIP flash code. */
+    /*rom_boot2 (rx)   : ORIGIN = 0x20041f00, LENGTH = 256*/
 }
 
 SECTIONS
@@ -38,7 +40,7 @@ SECTIONS
         __boot2_start__ = .;
         KEEP (*(.boot2))
         __boot2_end__ = .;
-    } > rom_boot2
+    } > rom
 
     ASSERT(
         __boot2_end__ - __boot2_start__ == 256,

@@ -19,6 +19,8 @@
  * @}
  */
 
+#include <stdint.h>
+
 #include "periph_cpu.h"
 #include "periph_conf.h"
 #include "periph/gpio.h"
@@ -32,6 +34,23 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     if ((pin & 0xffffff00) != IO_BANK0_BASE) {
         return -1;
     }
+
+
+
+
+    resets_hw->reset &= ~RESETS_RESET_IO_BANK0_BITS;
+    resets_hw->reset &= ~RESETS_RESET_PADS_BANK0_BITS;
+
+    while (!(resets_hw->reset_done & RESETS_RESET_DONE_IO_BANK0_BITS)) {
+        ;
+    }
+
+    while (!(resets_hw->reset_done & RESETS_RESET_DONE_PADS_BANK0_BITS)) {
+        ;
+    }
+
+
+
 
     idx_pin = (pin & 0x000000ff);
 
