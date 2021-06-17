@@ -118,12 +118,6 @@ gnrc_pktsnip_t *_copy_and_handle_aro(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6
                                      const sixlowpan_nd_opt_ar_t *aro,
                                      const ndp_opt_t *sl2ao);
 
-/**
- * @brief   Sets the @ref GNRC_NETIF_FLAGS_IPV6_RTR_ADV flags of an interface
- *
- * @param[in] netif The interface.
- */
-void _set_rtr_adv(gnrc_netif_t *netif);
 #else   /* CONFIG_GNRC_IPV6_NIB_6LR || defined(DOXYGEN) */
 #define _rtr_sol_on_6lr(netif, icmpv6)  (false)
 #define _get_ar_state(nbr)              (_ADDR_REG_STATUS_IGNORE)
@@ -133,7 +127,6 @@ void _set_rtr_adv(gnrc_netif_t *netif);
  */
 #define _copy_and_handle_aro(netif, ipv6, icmpv6, aro, sl2ao) \
                                         (NULL)
-#define _set_rtr_adv(netif)             (void)netif
 #endif  /* CONFIG_GNRC_IPV6_NIB_6LR || defined(DOXYGEN) */
 
 #ifdef __cplusplus
