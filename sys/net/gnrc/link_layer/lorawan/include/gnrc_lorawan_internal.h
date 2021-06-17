@@ -24,8 +24,6 @@
 #include "net/lora.h"
 #include "net/lorawan/hdr.h"
 #include "net/gnrc/pktbuf.h"
-#include "xtimer.h"
-#include "msg.h"
 #include "net/netdev.h"
 #include "net/netdev/layer.h"
 #include "net/loramac.h"
@@ -35,8 +33,6 @@ extern "C" {
 #endif
 
 #define MSG_TYPE_TIMEOUT             (0x3457)           /**< Timeout message type */
-#define MSG_TYPE_MCPS_ACK_TIMEOUT    (0x3458)           /**< ACK timeout message type */
-#define MSG_TYPE_MLME_BACKOFF_EXPIRE (0x3459)           /**< Backoff timer expiration message type */
 
 #define MTYPE_MASK           0xE0                       /**< MHDR mtype mask */
 #define MTYPE_JOIN_REQUEST   0x0                        /**< Join Request type */
@@ -61,6 +57,7 @@ extern "C" {
 #define LORAWAN_STATE_RX_1 (1)                          /**< MAC state machine in RX1 */
 #define LORAWAN_STATE_RX_2 (2)                          /**< MAC state machine in RX2 */
 #define LORAWAN_STATE_TX (3)                            /**< MAC state machine in TX */
+#define LORAWAN_STATE_JOIN (4)                          /**< MAC state machine in Join */
 
 #define GNRC_LORAWAN_DIR_UPLINK (0U)                    /**< uplink frame direction */
 #define GNRC_LORAWAN_DIR_DOWNLINK (1U)                  /**< downlink frame direction */
@@ -163,8 +160,6 @@ typedef struct {
  * @brief MLME service access point descriptor
  */
 typedef struct {
-    xtimer_t backoff_timer; /**< timer used for backoff expiration */
-    msg_t backoff_msg;      /**< msg for backoff expiration */
     uint8_t activation;     /**< Activation mechanism of the MAC layer */
     int pending_mlme_opts;  /**< holds pending mlme opts */
     uint32_t nid;           /**< current Network ID */
@@ -176,8 +171,6 @@ typedef struct {
 /**
  * @brief GNRC LoRaWAN mac descriptor */
 typedef struct {
-    xtimer_t rx;                                    /**< RX timer */
-    msg_t msg;                                      /**< MAC layer message descriptor */
     gnrc_lorawan_mcps_t mcps;                       /**< MCPS descriptor */
     gnrc_lorawan_mlme_t mlme;                       /**< MLME descriptor */
     void *mlme_buf;                                 /**< pointer to MLME buffer */
@@ -420,11 +413,12 @@ uint8_t gnrc_lorawan_region_mac_payload_max(uint8_t datarate);
 /**
  * @brief MLME Backoff expiration tick
  *
- *        Should be called every hour in order to maintain the Time On Air budget.
+ *        Must be called once an hour (right after calling @ref
+ *        gnrc_lorawan_init) in order to maintain the Time On Air budget.
  *
  * @param[in] mac pointer to the MAC descriptor
  */
-void gnrc_lorawan_mlme_backoff_expire(gnrc_lorawan_t *mac);
+void gnrc_lorawan_mlme_backoff_expire_cb(gnrc_lorawan_t *mac);
 
 /**
  * @brief Process and dispatch a full LoRaWAN packet
@@ -486,6 +480,13 @@ static inline void gnrc_lorawan_mac_release(gnrc_lorawan_t *mac)
  * @param[in] rx2_dr datarate of RX2
  */
 void gnrc_lorawan_set_rx2_dr(gnrc_lorawan_t *mac, uint8_t rx2_dr);
+
+/**
+ * @brief Trigger the transmission of the Join Request packet.
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ */
+void gnrc_lorawan_trigger_join(gnrc_lorawan_t *mac);
 
 #ifdef __cplusplus
 }

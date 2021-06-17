@@ -335,12 +335,8 @@ static void _handle_retransmissions(gnrc_lorawan_t *mac)
 {
     if (mac->mcps.nb_trials-- == 0) {
         _end_of_tx(mac, MCPS_CONFIRMED, -ETIMEDOUT);
-    }
-    else {
-        mac->msg.type = MSG_TYPE_MCPS_ACK_TIMEOUT;
-        xtimer_set_msg(&mac->rx, 1000000 + random_uint32_range(0,
-                                                               2000000), &mac->msg,
-                       thread_getpid());
+    } else {
+        gnrc_lorawan_set_timer(mac, 1000000 + random_uint32_range(0, 2000000));
     }
 }
 

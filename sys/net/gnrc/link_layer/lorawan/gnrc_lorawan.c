@@ -27,15 +27,10 @@
 #include "net/lorawan/hdr.h"
 #include "net/loramac.h"
 #include "net/gnrc/lorawan/region.h"
+#include "timex.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
-
-/* This factor is used for converting "real" seconds into microcontroller
- * microseconds. This is done in order to correct timer drift.
- */
-#define _DRIFT_FACTOR (int)(US_PER_SEC * 100 / \
-                            (100 + (CONFIG_GNRC_LORAWAN_TIMER_DRIFT / 10.0)))
 
 #define GNRC_LORAWAN_DL_RX2_DR_MASK       (0x0F)    /**< DL Settings DR Offset mask */
 #define GNRC_LORAWAN_DL_RX2_DR_POS        (0)       /**< DL Settings DR Offset pos */
@@ -52,10 +47,9 @@ static inline void gnrc_lorawan_mlme_reset(gnrc_lorawan_t *mac)
 
 static inline void gnrc_lorawan_mlme_backoff_init(gnrc_lorawan_t *mac)
 {
-    mac->mlme.backoff_msg.type = MSG_TYPE_MLME_BACKOFF_EXPIRE;
     mac->mlme.backoff_state = 0;
 
-    gnrc_lorawan_mlme_backoff_expire(mac);
+    gnrc_lorawan_mlme_backoff_expire_cb(mac);
 }
 
 static inline void gnrc_lorawan_mcps_reset(gnrc_lorawan_t *mac)
@@ -151,19 +145,33 @@ void gnrc_lorawan_open_rx_window(gnrc_lorawan_t *mac)
 {
     netdev_t *dev = gnrc_lorawan_get_netdev(mac);
 
-    mac->msg.type = MSG_TYPE_TIMEOUT;
     /* Switch to RX state */
     if (mac->state == LORAWAN_STATE_RX_1) {
-        xtimer_set_msg(&mac->rx, _DRIFT_FACTOR, &mac->msg, thread_getpid());
+        gnrc_lorawan_set_timer(mac, US_PER_SEC);
     }
     netopt_state_t state = NETOPT_STATE_RX;
 
     dev->driver->set(dev, NETOPT_STATE, &state, sizeof(state));
 }
 
+void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac)
+{
+    switch(mac->state) {
+        case LORAWAN_STATE_RX_1:
+        case LORAWAN_STATE_RX_2:
+            gnrc_lorawan_open_rx_window(mac);
+            break;
+        case LORAWAN_STATE_JOIN:
+            gnrc_lorawan_trigger_join(mac);
+            break;
+        default:
+            gnrc_lorawan_event_ack_timeout(mac);
+            break;
+    }
+}
+
 void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac)
 {
-    mac->msg.type = MSG_TYPE_TIMEOUT;
     mac->state = LORAWAN_STATE_RX_1;
 
     int rx_1;
@@ -172,7 +180,7 @@ void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac)
     rx_1 = mac->mlme.activation == MLME_ACTIVATION_NONE ?
            CONFIG_LORAMAC_DEFAULT_JOIN_DELAY1 : mac->rx_delay;
 
-    xtimer_set_msg(&mac->rx, rx_1 * _DRIFT_FACTOR, &mac->msg, thread_getpid());
+    gnrc_lorawan_set_timer(mac, rx_1 * US_PER_SEC);
 
     uint8_t dr_offset = (mac->dl_settings & GNRC_LORAWAN_DL_DR_OFFSET_MASK) >>
                         GNRC_LORAWAN_DL_DR_OFFSET_POS;
@@ -239,7 +247,7 @@ void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *psdu,
         return;
     }
     mac->state = LORAWAN_STATE_IDLE;
-    xtimer_remove(&mac->rx);
+    gnrc_lorawan_remove_timer(mac);
 
     uint8_t mtype = (*psdu & MTYPE_MASK) >> 5;
 
