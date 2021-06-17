@@ -51,8 +51,11 @@ extern "C" {
 #ifndef NIMBLE_AUTOCONN_CONN_TIMEOUT_MS
 #define NIMBLE_AUTOCONN_CONN_TIMEOUT_MS     (3 * NIMBLE_AUTOCONN_SCAN_WIN_MS)
 #endif
-#ifndef NIMBLE_AUTOCONN_CONN_ITVL_MS
-#define NIMBLE_AUTOCONN_CONN_ITVL_MS        (75U)           /* 75ms */
+#ifndef NIMBLE_AUTOCONN_CONN_ITVL_MIN_MS
+#define NIMBLE_AUTOCONN_CONN_ITVL_MIN_MS    75U             /* 75ms */
+#endif
+#ifndef NIMBLE_AUTOCONN_CONN_ITVL_MAX_MS
+#define NIMBLE_AUTOCONN_CONN_ITVL_MAX_MS    75U             /* 75ms */
 #endif
 #ifndef NIMBLE_AUTOCONN_CONN_LATENCY
 #define NIMBLE_AUTOCONN_CONN_LATENCY        (0)
@@ -74,7 +77,8 @@ extern "C" {
       .scan_itvl     = NIMBLE_AUTOCONN_SCAN_ITVL_MS,     \
       .scan_win      = NIMBLE_AUTOCONN_SCAN_WIN_MS,      \
       .conn_timeout  = NIMBLE_AUTOCONN_CONN_TIMEOUT_MS,  \
-      .conn_itvl     = NIMBLE_AUTOCONN_CONN_ITVL_MS,     \
+      .conn_itvl_min = NIMBLE_AUTOCONN_CONN_ITVL_MIN_MS, \
+      .conn_itvl_max = NIMBLE_AUTOCONN_CONN_ITVL_MAX_MS, \
       .conn_latency  = NIMBLE_AUTOCONN_CONN_LATENCY,     \
       .conn_super_to = NIMBLE_AUTOCONN_CONN_SVTO_MS,     \
       .node_id       = NIMBLE_AUTOCONN_NODE_ID, }

@@ -86,6 +86,9 @@ nimble_autoconn:
 nimble_netif:
 	$(QQ)"$(MAKE)" -C $(TDIR)/netif/
 
+nimble_rpble:
+	$(QQ)"$(MAKE)" -C $(TDIR)/rpble/
+
 nimble_scanlist:
 	$(QQ)"$(MAKE)" -C $(TDIR)/scanlist
 

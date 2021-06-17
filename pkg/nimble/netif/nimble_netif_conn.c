@@ -21,6 +21,7 @@
 #include <assert.h>
 
 #include "nimble_netif_conn.h"
+#include "random.h"
 
 #define ENABLE_DEBUG            0
 #include "debug.h"
@@ -219,4 +220,74 @@ unsigned nimble_netif_conn_count(uint16_t filter)
     mutex_unlock(&_lock);
 
     return cnt;
+}
+
+uint16_t nimble_netif_conn_get_itvl(int handle)
+{
+    assert((handle >= 0) && (handle < CONN_CNT));
+    struct ble_gap_conn_desc desc;
+
+    if (!(_conn[handle].state & NIMBLE_NETIF_GAP_CONNECTED)) {
+        return 0;
+    }
+    int res = ble_gap_conn_find(_conn[handle].gaphandle, &desc);
+    if (res != 0) {
+        return 0;
+    }
+
+    return desc.conn_itvl;
+}
+
+int nimble_netif_conn_itvl_used(uint16_t itvl, int skip_handle)
+{
+    for (unsigned i = 0; i < CONN_CNT; i++) {
+        if (i != skip_handle) {
+            uint16_t conn_itvl = nimble_netif_conn_get_itvl(i);
+            if (conn_itvl != 0) {
+                uint16_t diff = (conn_itvl < itvl) ? itvl - conn_itvl
+                                                   : conn_itvl - itvl;
+                if (diff < NIMBLE_NETIF_CONN_ITVL_SPACING_MS) {
+                    return 1;
+                }
+            }
+        }
+    }
+
+    return 0;
+}
+
+int nimble_netif_conn_itvl_invalid(int handle)
+{
+    uint16_t to_check = nimble_netif_conn_get_itvl(handle);
+    if (to_check == 0) {
+        return 0;
+    }
+    return nimble_netif_conn_itvl_used(to_check, handle);
+}
+
+uint16_t nimble_netif_conn_gen_itvl(uint16_t min, uint16_t max)
+{
+    assert(min <= max);
+
+    uint16_t start = random_uint32_range(min, max);
+    if (IS_ACTIVE(NIMBLE_NETIF_FORCE_CONN_ITVL_SPACING)) {
+        for (uint16_t itvl = start;
+             itvl <= max;
+             itvl += NIMBLE_NETIF_CONN_ITVL_SPACING_MS) {
+            if (!nimble_netif_conn_itvl_used(itvl, NIMBLE_NETIF_CONN_INVALID)) {
+                return itvl;
+            }
+        }
+        for (uint16_t itvl = start - NIMBLE_NETIF_CONN_ITVL_SPACING_MS;
+             itvl >= min;
+             itvl -= NIMBLE_NETIF_CONN_ITVL_SPACING_MS) {
+            if (!nimble_netif_conn_itvl_used(itvl, NIMBLE_NETIF_CONN_INVALID)) {
+                return itvl;
+            }
+        }
+        return 0;
+    }
+    else {
+        return start;
+    }
 }

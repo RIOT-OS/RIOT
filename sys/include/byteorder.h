@@ -69,7 +69,6 @@ typedef union __attribute__((packed)) {
     le_uint16_t l16[4]; /**< little endian 16 bit representation */
     le_uint32_t l32[2]; /**< little endian 32 bit representation */
 } le_uint64_t;
-
 /**
  * @brief          A 16 bit integer in big endian aka network byte order.
  * @details        This is a wrapper around an uint16_t to catch missing conversions

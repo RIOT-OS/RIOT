@@ -34,6 +34,10 @@
 #include "net/gnrc/rpl/p2p_dodag.h"
 #endif
 
+#ifdef MODULE_NIMBLE_RPBLE
+#include "nimble_rpble.h"
+#endif
+
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
@@ -358,6 +362,17 @@ static gnrc_rpl_parent_t *_gnrc_rpl_find_preferred_parent(gnrc_rpl_dodag_t *doda
     dodag->my_rank = dodag->instance->of->calc_rank(dodag, 0);
     if (dodag->my_rank != old_rank) {
         trickle_reset_timer(&dodag->trickle);
+
+#ifdef MODULE_NIMBLE_RPBLE
+        nimble_rpble_ctx_t ctx;
+        memset(&ctx, 0, sizeof(ctx));
+        ctx.inst_id = dodag->instance->id;
+        memcpy(ctx.dodag_id, &dodag->dodag_id, 16);
+        ctx.version = dodag->version;
+        ctx.rank = dodag->my_rank;
+        ctx.role = dodag->node_status;
+        nimble_rpble_update(&ctx);
+#endif
     }
 
     LL_FOREACH_SAFE(dodag->parents, elt, tmp) {
