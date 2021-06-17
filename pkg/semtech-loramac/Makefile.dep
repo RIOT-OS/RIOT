@@ -9,7 +9,6 @@ USEMODULE += semtech_loramac_crypto
 USEMODULE += semtech_loramac_arch
 
 USEMODULE += ztimer_msec
-USEMODULE += ztimer_periph_rtt
 
 # The build fails on MSP430 because the toolchain doesn't provide
 # EXIT_SUCCESS/EXIT_FAILURE macros
