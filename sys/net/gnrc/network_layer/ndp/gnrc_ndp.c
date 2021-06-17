@@ -331,11 +331,16 @@ void gnrc_ndp_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
     gnrc_netif_acquire(netif);
     do {    /* XXX: hidden goto */
         int tgt_idx;
+        gnrc_netif_t *tgt_netif = gnrc_netif_get_by_ipv6_addr(tgt);
 
-        if ((tgt_idx = gnrc_netif_ipv6_addr_idx(netif, tgt)) < 0) {
+        if (tgt_netif == NULL) {
             DEBUG("ndp: tgt not assigned to interface. Abort sending\n");
             break;
         }
+
+        tgt_idx = gnrc_netif_ipv6_addr_idx(tgt_netif, tgt);
+        assert(tgt_idx >= 0);
+
         if (gnrc_netif_is_rtr(netif) && gnrc_netif_is_rtr_adv(netif)) {
             adv_flags |= NDP_NBR_ADV_FLAGS_R;
         }
@@ -368,7 +373,7 @@ void gnrc_ndp_nbr_adv_send(const ipv6_addr_t *tgt, gnrc_netif_t *netif,
         }
         /* TODO: also check if the node provides proxy services for tgt */
         if ((pkt != NULL) &&
-            (netif->ipv6.addrs_flags[tgt_idx] &
+            (tgt_netif->ipv6.addrs_flags[tgt_idx] &
              GNRC_NETIF_IPV6_ADDRS_FLAGS_ANYCAST)) {
             /* TL2A is not supplied and tgt is not anycast */
             adv_flags |= NDP_NBR_ADV_FLAGS_O;
