@@ -8,7 +8,7 @@ endif
 # might not be the most optimized for conversion guarantees that ztimer_periph_rtt
 # will have a capable backend.
 ifneq (,$(filter ztimer_periph_rtt,$(USEMODULE)))
-  ifneq (,$(filter stm32 nrf52 sam% kinetis efm32,$(CPU)))
+  ifneq (,$(filter stm32 nrf5% sam% kinetis efm32,$(CPU)))
     RTT_FREQUENCY ?= RTT_MAX_FREQUENCY
     CFLAGS += -DRTT_FREQUENCY=$(RTT_FREQUENCY)
   endif
