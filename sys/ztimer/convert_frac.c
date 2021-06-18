@@ -111,4 +111,7 @@ void ztimer_convert_frac_init(ztimer_convert_frac_t *self,
         self->round = freq_self / freq_lower;
         self->super.super.max_value = UINT32_MAX;
     }
+#ifdef MODULE_PM_LAYERED
+    self->super.super.block_pm_mode = ZTIMER_CLOCK_NO_REQUIRED_PM_MODE;
+#endif
 }
