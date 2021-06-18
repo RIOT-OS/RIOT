@@ -11,13 +11,12 @@ of this document using the following links:
 * [Working with Git][working with git]
 
 If you have questions, please write a post over at our [forum] or chat on
-`#riot-os` on [IRC] or [Matrix].
+`#riot-os:matrix.org` on [Matrix].
 
 As a reminder, all contributors are expected to follow our
 [Code of Conduct](CODE_OF_CONDUCT.md).
 
 [forum]: https://forum.riot-os.org
-[IRC]: http://webchat.freenode.net?channels=riot-os
 [Matrix]: https://matrix.to/#/#riot-os:matrix.org
 
 ## Getting Started
