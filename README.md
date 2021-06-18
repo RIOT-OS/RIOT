@@ -6,7 +6,6 @@
 [![Merge chance][merge-chance-badge]][merge-chance-link]
 [![Stack Overflow questions][stackoverflow-badge]][stackoverflow-link]
 [![Twitter][twitter-badge]][twitter-link]
-[![IRC][irc-badge]][irc-link]
 [![Matrix][matrix-badge]][matrix-link]
 
                           ZZZZZZ
@@ -143,8 +142,6 @@ https://www.riot-os.org
 
 [api-badge]: https://img.shields.io/badge/docs-API-informational.svg
 [api-link]: https://riot-os.org/api/
-[irc-badge]: https://img.shields.io/badge/chat-IRC-brightgreen.svg
-[irc-link]: https://webchat.freenode.net?channels=%23riot-os
 [license-badge]: https://img.shields.io/github/license/RIOT-OS/RIOT
 [license-link]: https://github.com/RIOT-OS/RIOT/blob/master/LICENSE
 [master-ci-badge]: https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/badge.svg
