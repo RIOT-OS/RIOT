@@ -736,15 +736,6 @@ static int send(uint8_t *dst, size_t dst_len, iolist_t *iol_data, size_t num, si
         xtimer_msleep(time);
     }
     ieee802154_dev_t *dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
-    puts("-------Summary of the test-------");
-    printf("Send Packets: %d\n", send_packets);
-    if (ieee802154_radio_has_frame_retrans(dev) || ieee802154_radio_has_irq_ack_timeout(dev)) {
-        printf("Acknowledged Packets: %d\n", received_acks);
-        printf("Percentage: %d\n", (received_acks * 100)/num);
-    }
-    printf("Received Packets: %d\n", received_packets);
-    puts("---------------------------------");
-
     return 0;
 }
 
@@ -768,7 +759,7 @@ int txtsnd(int argc, char **argv)
 
 int txtspam(int argc, char **argv) {
     uint8_t addr[IEEE802154_LONG_ADDRESS_LEN];
-    size_t res;
+    int res;
     size_t num;
     size_t time;
     size_t len;
@@ -785,7 +776,17 @@ int txtspam(int argc, char **argv) {
     _populate_iolist(&payload_iotlist, payload, len, NULL);
     iolist_t channel_iotlist;
     _populate_iolist(&channel_iotlist, &current_channel, sizeof(current_channel), &payload_iotlist);
-    return send(addr, res, &channel_iotlist, num, time, request_ack);
+    res = send(addr, res, &channel_iotlist, num, time, request_ack);
+    ieee802154_dev_t *dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
+    puts("-------Summary of the test-------");
+    printf("Send Packets: %d\n", send_packets);
+    if (!(ieee802154_radio_has_frame_retrans(dev)) || ieee802154_radio_has_irq_ack_timeout(dev)) {
+        printf("Acknowledged Packets: %d\n", received_acks);
+        printf("Percentage: %d\n", (received_acks * 100)/num);
+    }
+    printf("Received Packets: %d\n", received_packets);
+    puts("---------------------------------");
+    return res;
 }
 
 int reply_mode_cmd(int argc, char **argv) {
