@@ -46,7 +46,7 @@ static void kw41zrf_set_address(kw41zrf_t *dev)
 
 void kw41zrf_setup(kw41zrf_t *dev, uint8_t index)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    netdev_t *netdev = &dev->netdev.netdev;
 
     netdev->driver = &kw41zrf_driver;
 
