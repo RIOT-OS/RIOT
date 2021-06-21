@@ -86,6 +86,16 @@ static const arduino_pwm_t arduino_pwm_list[] = {
     { .pin = 9, .dev = PWM_DEV(1), .chan = 1 },
 };
 
+/**
+ * @brief   Enables interrupts
+ */
+#define interrupts() __enable_irq()
+
+/**
+ * @brief   Disables interrupts
+ */
+#define noInterrupts() __disable_irq()
+
 #ifdef __cplusplus
 }
 #endif
