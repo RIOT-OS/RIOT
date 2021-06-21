@@ -208,6 +208,9 @@ int netdev_ieee802154_set(netdev_ieee802154_t *dev, netopt_t opt, const void *va
  * this function is meant top be used by drivers that do not support address
  * filtering in hw
  *
+ * @deprecated  This function is currently deprecated and will be removed
+ * after Release 2022.01. Use @ref ieee802154_dst_filter instead.
+ *
  * @param[in] dev       network device descriptor
  * @param[in] mhr       mac header
  *
