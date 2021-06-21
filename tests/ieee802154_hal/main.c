@@ -785,15 +785,19 @@ int txtspam(int argc, char **argv) {
     return send(addr, res, &channel_iotlist, num, time, request_ack);
 }
 
-int toggle_reply(int argc, char **argv) {
-    (void)argv[0];
-    (void)argc;
-    if (send_reply) {
-        send_reply = false;
-        puts("Success: Packets are no longer mirrored");
-    } else {
+int reply_mode_cmd(int argc, char **argv) {
+    if (argc != 2) {
+        puts("Usage: reply <reply_mode>");
+        return 1;
+    }
+    uint8_t reply_mode = atoi(argv[1]);
+
+    if (reply_mode) {
         send_reply = true;
         puts("Success: Packets are now mirrored");
+    } else {
+        send_reply = false;
+        puts("Success: Packets are no longer mirrored");
     }
     return 0;
 }
@@ -840,7 +844,7 @@ static const shell_command_t shell_commands[] = {
     { "caps", "Get a list of caps supported by the device", _caps_cmd },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
     { "txtspam", "Send multiple IEEE 802.15.4 packets", txtspam },
-    { "reply", "Every packet that arrives is mirrored", toggle_reply },
+    { "reply", "Enable/Disable mirroring of each packet", reply_mode_cmd },
     { "check_last_packet", "Checks if the last packet received meets the criteria", check_last_packet },
     { NULL, NULL, NULL }
 };
