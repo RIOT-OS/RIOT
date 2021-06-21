@@ -15,7 +15,11 @@ menuconfig MODULE_ZTIMER
 
 if MODULE_ZTIMER
 
+config ZTIMER_CUSTOM_BACKEND_CONFIGURATION
+    bool "Override default backend selection"
+
 menu "Backends"
+    visible if ZTIMER_CUSTOM_BACKEND_CONFIGURATION
 
 config MODULE_ZTIMER_PERIPH_RTC
     bool "RTC peripheral"
@@ -26,7 +30,6 @@ config MODULE_ZTIMER_PERIPH_RTT
     bool "RTT peripheral"
     depends on HAS_PERIPH_RTT
     select MODULE_PERIPH_RTT
-    default y if !MODULE_ZTIMER_PERIPH_TIMER
 
 config MODULE_ZTIMER_PERIPH_PTP
     bool "PTP peripheral"
@@ -37,7 +40,6 @@ config MODULE_ZTIMER_PERIPH_TIMER
     bool "Timer peripheral"
     depends on HAS_PERIPH_TIMER
     select MODULE_PERIPH_TIMER
-    default y
 
 endmenu # Backends
 
@@ -45,18 +47,56 @@ menu "Clocks"
 
 config MODULE_ZTIMER_USEC
     bool "Microseconds"
-    depends on MODULE_ZTIMER_PERIPH_TIMER
+    select MODULE_ZTIMER_PERIPH_TIMER
 
 config MODULE_ZTIMER_MSEC
     bool "Milliseconds"
-    depends on MODULE_ZTIMER_PERIPH_TIMER || MODULE_ZTIMER_PERIPH_RTT
+
+choice
+    bool "Backend"
+    depends on MODULE_ZTIMER_MSEC
+    default ZTIMER_MSEC_BACKEND_RTT
+
+config ZTIMER_MSEC_BACKEND_TIMER
+    bool "Timer"
+    select MODULE_ZTIMER_PERIPH_TIMER
+
+config ZTIMER_MSEC_BACKEND_RTT
+    bool "RTT"
+    depends on HAS_PERIPH_RTT
+    select MODULE_ZTIMER_PERIPH_RTT
+
+endchoice
 
 config MODULE_ZTIMER_SEC
     bool "Seconds"
-    depends on MODULE_ZTIMER_PERIPH_TIMER || MODULE_ZTIMER_PERIPH_RTT || MODULE_ZTIMER_PERIPH_RTC
+
+choice
+    bool "Backend"
+    depends on MODULE_ZTIMER_SEC
+    default ZTIMER_SEC_BACKEND_RTC if !BOARD_NATIVE && \
+                                      !CPU_COMMON_SAM0 && \
+                                      !CPU_COMMON_EFM32 && \
+                                      !CPU_COMMON_STM32F1
+    default ZTIMER_SEC_BACKEND_RTT
+
+config ZTIMER_SEC_BACKEND_TIMER
+    bool "Timer"
+    select MODULE_ZTIMER_PERIPH_TIMER
+
+config ZTIMER_SEC_BACKEND_RTT
+    bool "RTT"
+    depends on HAS_PERIPH_RTT
+    select MODULE_ZTIMER_PERIPH_RTT
+
+config ZTIMER_SEC_BACKEND_RTC
+    bool "RTC"
+    depends on HAS_PERIPH_RTC
+    select MODULE_ZTIMER_PERIPH_RTC
+
+endchoice
 
 endmenu # Clocks
-
 
 menu "Frequency conversion"
 

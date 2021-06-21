@@ -199,6 +199,16 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
     if (info != NULL) {
         netdev_ieee802154_rx_info_t *radio_info = info;
         radio_info->rssi = (int8_t) at86rf215_reg_read(dev, dev->RF->RG_EDV);
+
+        if (IS_USED(MODULE_AT86RF215_TIMESTAMP)) {
+            uint32_t rx_timestamp;
+            at86rf215_reg_read_bytes(dev, dev->BBC->RG_CNT0, &rx_timestamp,
+                                    sizeof(rx_timestamp));
+
+            /* convert counter value to ns */
+            radio_info->timestamp = rx_timestamp * 1000ULL / 32;
+            radio_info->flags |= NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP;
+        }
     }
 
     return pkt_len;

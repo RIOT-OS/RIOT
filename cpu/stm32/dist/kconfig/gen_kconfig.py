@@ -8,8 +8,10 @@
 
 import os
 import argparse
+import datetime
+import warnings
 
-import xlrd
+from openpyxl import load_workbook
 from jinja2 import FileSystemLoader, Environment
 
 
@@ -18,22 +20,26 @@ RIOTBASE = os.getenv(
     "RIOTBASE", os.path.abspath(os.path.join(CURRENT_DIR, "../../../..")))
 STM32_KCONFIG_DIR = os.path.join(RIOTBASE, "cpu/stm32/kconfigs")
 STM32_VENDOR_DIR = os.path.join(RIOTBASE, "cpu/stm32/include/vendor/cmsis")
+MODEL_COLUMN = 1
 
 
 def parse_sheet(cpu_fam, sheets):
     """Parse the Excel sheet and return a dict."""
     models = []
     for sheet in sheets:
-        # Load the content of the xlsx sheet
-        work_book = xlrd.open_workbook(sheet)
-        sheet = work_book.sheet_by_name('ProductsList')
+        # filter warning raised by openpyxl
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            # Load the content of the xlsx sheet
+            sheet = load_workbook(filename=sheet, data_only=True).active
 
         # Extract models from sheet
-        for rownum in range(sheet.nrows):
-            row = sheet.row_values(rownum)
-            if not row[0].startswith("STM32"):
+        for idx, row in enumerate(sheet.rows):
+            # Row index starts at 1
+            model = str(sheet.cell(row=idx + 1, column=MODEL_COLUMN).value)
+            if not model.startswith("STM32"):
                 continue
-            models.append(row[0].replace("-", "_"))
+            models.append(model.replace("-", "_"))
     return sorted(models)
 
 
@@ -110,6 +116,7 @@ def generate_kconfig(kconfig, context, overwrite, verbose):
     template_file = os.path.join("Kconfig.{}.j2".format(kconfig))
     env.globals.update(zip=zip)
     template = env.get_template(template_file)
+    context.update({"year": datetime.datetime.now().year})
     render = template.render(**context)
 
     kconfig_dir = os.path.join(STM32_KCONFIG_DIR, context["fam"])

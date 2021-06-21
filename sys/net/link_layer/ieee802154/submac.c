@@ -76,7 +76,7 @@ static int _perform_csma_ca(ieee802154_submac_t *submac)
         submac->csma_retries_nb++;
     }
     else {
-        ieee802154_radio_set_rx_mode(dev, IEEE802154_RX_AACK_ENABLED);
+        ieee802154_radio_set_frame_filter_mode(dev, IEEE802154_FILTER_ACCEPT);
         _tx_end(submac, TX_STATUS_MEDIUM_BUSY, NULL);
     }
 
@@ -134,7 +134,7 @@ static void _perform_retrans(ieee802154_submac_t *submac)
         ieee802154_csma_ca_transmit(submac);
     }
     else {
-        ieee802154_radio_set_rx_mode(dev, IEEE802154_RX_AACK_ENABLED);
+        ieee802154_radio_set_frame_filter_mode(dev, IEEE802154_FILTER_ACCEPT);
         _tx_end(submac, TX_STATUS_NO_ACK, NULL);
     }
 }
@@ -169,8 +169,7 @@ void ieee802154_submac_rx_done_cb(ieee802154_submac_t *submac)
             ieee802154_tx_info_t tx_info;
             tx_info.retrans = submac->retrans;
             bool fp = (ack[0] & IEEE802154_FCF_FRAME_PEND);
-            ieee802154_radio_set_rx_mode(submac->dev,
-                                         IEEE802154_RX_AACK_ENABLED);
+            ieee802154_radio_set_frame_filter_mode(submac->dev, IEEE802154_FILTER_ACCEPT);
             _tx_end(submac, fp ? TX_STATUS_FRAME_PENDING : TX_STATUS_SUCCESS,
                     &tx_info);
         }
@@ -216,7 +215,7 @@ static void _handle_tx_success(ieee802154_submac_t *submac,
         _tx_end(submac, info->status, info);
     }
     else {
-        ieee802154_radio_set_rx_mode(dev, IEEE802154_RX_WAIT_FOR_ACK);
+        ieee802154_radio_set_frame_filter_mode(dev, IEEE802154_FILTER_ACK_ONLY);
 
         /* Handle ACK reception */
         ieee802154_submac_ack_timer_set(submac, ACK_TIMEOUT_US);
@@ -363,12 +362,10 @@ int ieee802154_submac_init(ieee802154_submac_t *submac, const network_uint16_t *
     /* If the radio is still not in TRX_OFF state, spin */
     while (ieee802154_radio_confirm_on(dev) == -EAGAIN) {}
 
-    /* Enable Auto ACK */
-    ieee802154_radio_set_rx_mode(dev, IEEE802154_RX_AACK_ENABLED);
-
     /* Configure address filter */
-    ieee802154_radio_set_hw_addr_filter(dev, &submac->short_addr,
-                                        &submac->ext_addr, &submac->panid);
+    ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_SHORT_ADDR, &submac->short_addr);
+    ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_EXT_ADDR, &submac->ext_addr);
+    ieee802154_radio_config_addr_filter(dev, IEEE802154_AF_PANID, &submac->panid);
 
     /* Configure PHY settings (mode, channel, TX power) */
     ieee802154_phy_conf_t conf =

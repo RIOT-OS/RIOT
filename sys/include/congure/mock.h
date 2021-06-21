@@ -33,7 +33,12 @@ extern "C" {
  * @extends congure_snd_t
  */
 typedef struct {
-    congure_snd_t super;        /**< see @ref congure_snd_t */
+    congure_snd_t super;            /**< see @ref congure_snd_t */
+    /**
+     * @brief   Optional methods called in addition to the tracking functions
+     *          of the mock driver
+     */
+    const congure_snd_driver_t *methods;
     /**
      * @brief   How often was the congure_snd_driver_t::init() method called?
      */
@@ -152,9 +157,12 @@ typedef struct {
 /**
  * @brief   Sets up the driver for CongURE mock object
  *
- * @param[in] c A CongURE mock object
+ * @param[in] c         A CongURE mock object
+ * @param[in] methods   Methods to call in addition to the tracking of the mock
+ *                      driver. May be NULL.
  */
-void congure_mock_snd_setup(congure_mock_snd_t *c);
+void congure_mock_snd_setup(congure_mock_snd_t *c,
+                            const congure_snd_driver_t *methods);
 
 #ifdef __cplusplus
 }

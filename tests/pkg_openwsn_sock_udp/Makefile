@@ -38,7 +38,7 @@ USEMODULE += sock_udp
 
 # Mock OpenWSN scheduler to handle the udp_transmit task.
 USEMODULE += openwsn_scheduler_mock
-EXTERNAL_MODULE_DIRS += $(CURDIR)/scheduler
+EXTERNAL_MODULE_DIRS += external_modules
 
 # Explicitly include ztimer to enable timeout
 USEMODULE += ztimer_usec

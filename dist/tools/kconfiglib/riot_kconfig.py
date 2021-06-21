@@ -18,7 +18,7 @@ class RiotKconfig(Kconfig):
         for marker in doxygen_markers:
             node.help = node.help.replace(marker, "")
 
-    def write_autoconf(self, filename=None, header=None):
+    def write_autoconf(self, filename=None, header="/* RIOT Configuration File */\n"):
         """ Override to convert - to _ when writing autoconf.h """
         tmp_unique_defined_syms = self.unique_defined_syms.copy()
         for sym in self.unique_defined_syms:

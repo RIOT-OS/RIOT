@@ -38,6 +38,9 @@ static inline int _at24mac_get_eui48(uint8_t index, eui48_t *addr)
  * @{
  */
 #define EUI48_PROVIDER_FUNC   _at24mac_get_eui48
+#ifndef EUI48_PROVIDER_TYPE
+#define EUI48_PROVIDER_TYPE   NETDEV_SAM0_ETH
+#endif
 /** @} */
 
 #ifdef __cplusplus

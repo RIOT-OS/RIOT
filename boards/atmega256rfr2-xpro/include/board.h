@@ -43,6 +43,14 @@ extern "C" {
 /** @} */
 
 /**
+ * @name    ztimer configuration values
+ * @{
+ */
+#define CONFIG_ZTIMER_USEC_ADJUST_SET     (128)
+#define CONFIG_ZTIMER_USEC_ADJUST_SLEEP   (128)
+/** @} */
+
+/**
  * @name    Macros for controlling the on-board LED
  * @{
  */

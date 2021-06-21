@@ -129,6 +129,11 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
             gnrc_netif_hdr_t *hdr = netif_snip->data;
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
+#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP)
+            if (rx_info.flags & NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP) {
+                gnrc_netif_hdr_set_timestamp(hdr, rx_info.timestamp);
+            }
+#endif
             gnrc_netif_hdr_set_netif(hdr, netif);
             pkt = gnrc_pkt_append(pkt, netif_snip);
         }
@@ -198,6 +203,11 @@ static gnrc_pktsnip_t *_recv(gnrc_netif_t *netif)
 #endif
             hdr->lqi = rx_info.lqi;
             hdr->rssi = rx_info.rssi;
+#if IS_USED(MODULE_GNRC_NETIF_TIMESTAMP)
+            if (rx_info.flags & NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP) {
+                gnrc_netif_hdr_set_timestamp(hdr, rx_info.timestamp);
+            }
+#endif
             gnrc_netif_hdr_set_netif(hdr, netif);
             dev->driver->get(dev, NETOPT_PROTO, &pkt->type, sizeof(pkt->type));
             if (IS_ACTIVE(ENABLE_DEBUG)) {
@@ -245,7 +255,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
     size_t src_len, dst_len;
     uint8_t mhr_len;
 #if IS_USED(MODULE_IEEE802154_SECURITY)
-    uint8_t mhr[IEEE802154_MAX_HDR_LEN + IEEE802154_MAX_AUX_HDR_LEN];
+    uint8_t mhr[IEEE802154_MAX_HDR_LEN + IEEE802154_SEC_MAX_AUX_HDR_LEN];
 #else
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
 #endif
@@ -336,7 +346,7 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)
 
         iolist_header.iol_next = (iolist_t *)pkt->next;
 
-        uint8_t mic[IEEE802154_MAC_SIZE];
+        uint8_t mic[IEEE802154_SEC_MAX_MAC_SIZE];
         uint8_t mic_size = 0;
 
         if (flags & NETDEV_IEEE802154_SECURITY_EN) {

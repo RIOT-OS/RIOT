@@ -30,7 +30,6 @@
  */
 #define LIS2DH12_NUM    ARRAY_SIZE(lis2dh12_params)
 
-
 /**
  * @brief   Number of defined SAUL registry info entries
  */
@@ -45,7 +44,7 @@ static lis2dh12_t lis2dh12_devs[LIS2DH12_NUM];
 /**
  * @brief   Memory for the SAUL registry entries
  */
-static saul_reg_t saul_entries[LIS2DH12_NUM];
+static saul_reg_t saul_entries[LIS2DH12_NUM * 2];
 
 void auto_init_lis2dh12(void)
 {
@@ -62,9 +61,14 @@ void auto_init_lis2dh12(void)
             continue;
         }
 
-        saul_entries[i].dev = &(lis2dh12_devs[i]);
-        saul_entries[i].name = lis2dh12_saul_info[i].name;
-        saul_entries[i].driver = &lis2dh12_saul_driver;
-        saul_reg_add(&(saul_entries[i]));
+        saul_entries[2 * i].dev = &lis2dh12_devs[i];
+        saul_entries[2 * i].name = lis2dh12_saul_info[i].name;
+        saul_entries[2 * i].driver = &lis2dh12_saul_driver;
+        saul_reg_add(&saul_entries[2 * i]);
+
+        saul_entries[2 * i + 1].dev = &lis2dh12_devs[i];
+        saul_entries[2 * i + 1].name = lis2dh12_saul_info[i].name;
+        saul_entries[2 * i + 1].driver = &lis2dh12_saul_temp_driver;
+        saul_reg_add(&saul_entries[2 * i + 1]);
     }
 }

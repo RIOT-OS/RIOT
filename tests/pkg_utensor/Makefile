@@ -7,7 +7,7 @@ BLOBS += digit
 
 # Include C++ model and training weights code as an external module
 USEMODULE += models
-EXTERNAL_MODULE_DIRS += $(CURDIR)/models
+EXTERNAL_MODULE_DIRS += external_modules
 
 include $(RIOTBASE)/Makefile.include
 

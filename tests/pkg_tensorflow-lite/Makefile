@@ -14,7 +14,7 @@ ifeq (mnist,$(EXAMPLE))
   # default for now
   DISABLE_MODULE += cortexm_fpu
   USEMODULE += $(EXAMPLE)
-  EXTERNAL_MODULE_DIRS += $(CURDIR)/$(EXAMPLE)
+  EXTERNAL_MODULE_DIRS += external_modules
 else
   # Use upstream example
   USEMODULE += tensorflow-lite-$(EXAMPLE)

@@ -1,0 +1,15 @@
+# Convert xtimer into a pseudo module if its API is already implemented by
+# ztimer's compatibility wrapper
+ifneq (,$(filter ztimer_xtimer_compat,$(USEMODULE)))
+  PSEUDOMODULES += xtimer
+endif
+
+# By defaul use highest possible RTT_FREQUENCY for platforms that allow it. This
+# might not be the most optimized for conversion guarantees that ztimer_periph_rtt
+# will have a capable backend.
+ifneq (,$(filter ztimer_periph_rtt,$(USEMODULE)))
+  ifneq (,$(filter stm32 nrf52 sam% kinetis efm32,$(CPU)))
+    RTT_FREQUENCY ?= RTT_MAX_FREQUENCY
+    CFLAGS += -DRTT_FREQUENCY=$(RTT_FREQUENCY)
+  endif
+endif

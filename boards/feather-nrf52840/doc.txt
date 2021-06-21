@@ -16,10 +16,31 @@ Low Energy and IEEE 802.15.4 support via the nRF52840 MCU.
 
 ### Flash the board
 
-See the **Flashing** section in @ref boards_common_nrf52. The easiest way is to
+The board is flashed using its on-board UF2 boot loader by default.
+The boot loader will present a mass storage device that has to be mounted to /media/MDK-DONGLE so
+`uf2conv.py` can find it. If you have an auto-mounter installed this will happen automatically.
+
+The rest of the process is automated in the usual `make flash` target.
+
+If RIOT is already running on the board, it will automatically reset the CPU and enter
+the bootloader.
+If some other firmware is running or RIOT crashed, you need to enter the bootloader
+manually by pressing the board's reset button while plugging the device into the
+
+Otherwise See the **Flashing** section in @ref boards_common_nrf52. The easiest way is to
 use an external Segger J-Link Programmer connected to the [SWD Connector].
 
 [SWD Connector]: https://learn.adafruit.com/introducing-the-adafruit-nrf52840-feather/pinouts#swd-connector-3-12
+
+#### Flashing the uf2 bootloader
+
+To flash the uf2 bootloader (if its no longer present on your BOARD) then with
+a jlink attached to your BOARD and `nrf52prog` installed:
+
+$ git clone git@github.com:adafruit/Adafruit_nRF52_Bootloader.git
+$ cd Adafruit_nRF52_Bootloader
+$ make BOARD=feather_nrf52840_express all
+$ make BOARD=feather_nrf52840_express flash
 
 ### Terminal
 To connect a terminal to the Feather, RIOT chooses Segger RTT per default.

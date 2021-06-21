@@ -10,7 +10,7 @@
 
 # include external modules dependencies
 # processed before RIOT ones to be evaluated before the 'default' rules.
--include $(EXTERNAL_MODULE_DIRS:%=%/Makefile.dep)
+-include $(EXTERNAL_MODULE_PATHS:%=%/Makefile.dep)
 
 # pull dependencies from sys and drivers
 include $(RIOTBASE)/sys/Makefile.dep

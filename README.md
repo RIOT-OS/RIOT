@@ -6,7 +6,6 @@
 [![Merge chance][merge-chance-badge]][merge-chance-link]
 [![Stack Overflow questions][stackoverflow-badge]][stackoverflow-link]
 [![Twitter][twitter-badge]][twitter-link]
-[![IRC][irc-badge]][irc-link]
 [![Matrix][matrix-badge]][matrix-link]
 
                           ZZZZZZ
@@ -75,6 +74,30 @@ but not limited to:
 * Sigfox
 * LoRaWAN
 
+## GETTING RIOT
+
+The most convenient way to get RIOT is to clone it via Git
+
+```console
+$ git clone https://github.com/RIOT-OS/RIOT
+```
+
+this will ensure that you get all the newest features and bug fixes with the
+caveat of an ever changing work environment.
+
+If you prefer things more stable, you can download the source code of one of our
+quarter annual releases [via Github][releases] as ZIP file or tarball. You can
+also checkout a release in a cloned Git repository using
+
+```console
+$ git pull --tags
+$ git checkout <YYYY.MM>
+```
+
+For more details on our release cycle, check our [documentation][release cycle].
+
+[releases]: https://github.com/RIOT-OS/RIOT/releases
+[release cycle]: https://doc.riot-os.org/release-cycle.html
 
 ## GETTING STARTED
 * You want to start the RIOT? Just follow our
@@ -85,7 +108,7 @@ For specific toolchain installation, follow instructions in the
 [getting started](https://doc.riot-os.org/getting-started.html) page.
 * The RIOT API itself can be built from the code using doxygen. The latest
   version of the documentation is uploaded daily to
-  [riot-os.org/api](https://riot-os.org/api).
+  [doc.riot-os.org](https://doc.riot-os.org).
 
 ## FORUM
 Do you have a question, want to discuss a new feature, or just want to present
@@ -100,8 +123,6 @@ To contribute something to RIOT, please refer to our
 [contributing document](CONTRIBUTING.md).
 
 ## MAILING LISTS
-* RIOT OS kernel developers list: [devel@riot-os.org](https://lists.riot-os.org/mailman/listinfo/devel)
-* RIOT OS users list: [users@riot-os.org](https://lists.riot-os.org/mailman/listinfo/users)
 * RIOT commits: [commits@riot-os.org](https://lists.riot-os.org/mailman/listinfo/commits)
 * Github notifications: [notifications@riot-os.org](https://lists.riot-os.org/mailman/listinfo/notifications)
 
@@ -121,8 +142,6 @@ https://www.riot-os.org
 
 [api-badge]: https://img.shields.io/badge/docs-API-informational.svg
 [api-link]: https://riot-os.org/api/
-[irc-badge]: https://img.shields.io/badge/chat-IRC-brightgreen.svg
-[irc-link]: https://webchat.freenode.net?channels=%23riot-os
 [license-badge]: https://img.shields.io/github/license/RIOT-OS/RIOT
 [license-link]: https://github.com/RIOT-OS/RIOT/blob/master/LICENSE
 [master-ci-badge]: https://ci.riot-os.org/RIOT-OS/RIOT/master/latest/badge.svg

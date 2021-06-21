@@ -460,23 +460,27 @@ void msg_init_queue(msg_t *array, int num)
 void msg_queue_print(void)
 {
     unsigned state = irq_disable();
-
     thread_t *thread = thread_get_active();
+
+    int msg_counter = msg_avail();
+
+    if (msg_counter <= -1) {
+        /* no msg queue */
+        printf("No message queue\n");
+        return;
+    }
     cib_t *msg_queue = &thread->msg_queue;
     msg_t *msg_array = thread->msg_array;
-    unsigned int i = msg_queue->read_count & msg_queue->mask;
+    int first_msg = cib_peek(msg_queue);
 
     printf("Message queue of thread %" PRIkernel_pid "\n", thread->pid);
-    printf("    size: %u (avail: %u)\n", msg_queue->mask + 1,
-           cib_avail(msg_queue));
+    printf("    size: %u (avail: %d)\n", msg_queue->mask + 1, msg_counter);
 
-    for (; i != (msg_queue->write_count & msg_queue->mask);
-         i = (i + 1) & msg_queue->mask) {
-        msg_t *m = &msg_array[i];
+    for (int i = 0; i < msg_counter; i++) {
+        msg_t *m = &msg_array[(first_msg + i) & msg_queue->mask];
         printf("    * %u: sender: %" PRIkernel_pid ", type: 0x%04" PRIu16
                ", content: %" PRIu32 " (%p)\n", i, m->sender_pid, m->type,
                m->content.value, m->content.ptr);
     }
-
     irq_restore(state);
 }

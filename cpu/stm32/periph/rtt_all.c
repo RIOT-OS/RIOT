@@ -15,7 +15,7 @@
  * @brief       RTT implementation using LPTIM1
  *
  * @author      Hauke Petersen <hauke.petersen@fu-berlin.de>
- *
+ * @author      Andres Diaz    <andres.diaz@andeselectronics.cl>
  * @}
  */
 
@@ -59,6 +59,14 @@
 #else
 #define CLOCK_SRC_CFG       (RCC_DCKCFGR2_LPTIM1SEL_0)
 #endif
+#elif defined(CPU_FAM_STM32L5)
+#define CLOCK_SRC_REG       RCC->CCIPR1
+#define CLOCK_SRC_MASK      RCC_CCIPR1_LPTIM1SEL
+#if IS_ACTIVE(CONFIG_BOARD_HAS_LSE)
+#define CLOCK_SRC_CFG       (RCC_CCIPR1_LPTIM1SEL_1 | RCC_CCIPR1_LPTIM1SEL_0)
+#else
+#define CLOCK_SRC_CFG       (RCC_CCIPR1_LPTIM1SEL_0)
+#endif
 #else
 #define CLOCK_SRC_REG       RCC->CCIPR
 #define CLOCK_SRC_MASK      RCC_CCIPR_LPTIM1SEL
@@ -76,7 +84,7 @@ register. */
 #define EXTI_IMR2_IM32      (1 << 0)
 #endif
 
-#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB)
+#if defined(CPU_FAM_STM32L4) || defined(CPU_FAM_STM32WB) || defined(CPU_FAM_STM32L5)
 #define IMR_REG             IMR2
 #define EXTI_IMR_BIT        EXTI_IMR2_IM32
 #elif defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32WL)
@@ -130,7 +138,8 @@ void rtt_init(void)
     EXTI->IMR_REG |= EXTI_IMR_BIT;
 #if !defined(CPU_FAM_STM32L4) && !defined(CPU_FAM_STM32L0) && \
     !defined(CPU_FAM_STM32WB) && !defined(CPU_FAM_STM32G4) && \
-    !defined(CPU_FAM_STM32G0) && !defined(CPU_FAM_STM32WL)
+    !defined(CPU_FAM_STM32G0) && !defined(CPU_FAM_STM32WL) && \
+    !defined(CPU_FAM_STM32L5)
     EXTI->FTSR_REG &= ~(EXTI_FTSR_BIT);
     EXTI->RTSR_REG |= EXTI_RTSR_BIT;
     EXTI->PR_REG = EXTI_PR_BIT;
@@ -241,7 +250,8 @@ void isr_lptim1(void)
     LPTIM1->ICR = (LPTIM_ICR_ARRMCF | LPTIM_ICR_CMPMCF);
 #if !defined(CPU_FAM_STM32L4) && !defined(CPU_FAM_STM32L0) && \
     !defined(CPU_FAM_STM32WB) && !defined(CPU_FAM_STM32G4) && \
-    !defined(CPU_FAM_STM32G0) && !defined(CPU_FAM_STM32WL)
+    !defined(CPU_FAM_STM32G0) && !defined(CPU_FAM_STM32WL) && \
+    !defined(CPU_FAM_STM32L5)
     EXTI->PR_REG = EXTI_PR_BIT; /* only clear the associated bit */
 #endif
 

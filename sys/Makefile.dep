@@ -9,7 +9,8 @@ ifneq (,$(filter arduino,$(USEMODULE)))
   SKETCH_MODULE ?= arduino_sketches
   USEMODULE += $(SKETCH_MODULE)
   USEMODULE += fmt
-  USEMODULE += xtimer
+  USEMODULE += ztimer_usec
+  USEMODULE += ztimer_msec
 endif
 
 ifneq (,$(filter arduino_pwm,$(FEATURES_USED)))
@@ -42,15 +43,19 @@ ifneq (,$(filter i2c_scan,$(USEMODULE)))
 endif
 
 ifneq (,$(filter prng_fortuna,$(USEMODULE)))
-  USEMODULE += crypto_aes
-endif
-
-ifneq (,$(filter crypto_aes_%,$(USEMODULE)))
-  USEMODULE += crypto_aes
+  USEMODULE += crypto_aes_128
 endif
 
 ifneq (,$(filter crypto_%,$(USEMODULE)))
   USEMODULE += crypto
+endif
+
+ifneq (,$(filter cipher_modes,$(USEMODULE)))
+  USEMODULE += crypto
+endif
+
+ifneq (,$(filter crypto,$(USEMODULE)))
+  DEFAULT_MODULE += crypto_aes_128
 endif
 
 ifneq (,$(filter sys_bus_%,$(USEMODULE)))
@@ -60,7 +65,7 @@ endif
 
 ifneq (,$(filter ieee802154_security,$(USEMODULE)))
   USEMODULE += crypto
-  USEMODULE += crypto_aes
+  USEMODULE += crypto_aes_128
   USEMODULE += cipher_modes
 endif
 
@@ -138,7 +143,9 @@ endif
 
 ifneq (,$(filter trickle,$(USEMODULE)))
   USEMODULE += random
-  USEMODULE += xtimer
+  ifeq (,$(filter ztimer_msec,$(USEMODULE)))
+    USEMODULE += xtimer
+  endif
 endif
 
 ifneq (,$(filter eui_provider,$(USEMODULE)))
@@ -263,9 +270,6 @@ endif
 
 ifneq (,$(filter posix_sleep,$(USEMODULE)))
   USEMODULE += ztimer_msec
-  ifneq (,$(filter periph_rtt,$(USEMODULE)))
-    USEMODULE += ztimer_periph_rtt
-  endif
   USEMODULE += ztimer_usec
   USEMODULE += posix_headers
 endif
@@ -470,8 +474,21 @@ ifneq (,$(filter event_thread_%,$(USEMODULE)))
   USEMODULE += event_thread
 endif
 
+ifneq (,$(filter event_timeout_ztimer,$(USEMODULE)))
+  USEMODULE += event_timeout
+endif
+
+ifneq (,$(filter event_periodic_timeout,$(USEMODULE)))
+  USEMODULE += event_timeout
+  USEMODULE += ztimer_periodic
+endif
+
 ifneq (,$(filter event_timeout,$(USEMODULE)))
-  USEMODULE += xtimer
+  ifneq (,$(filter event_timeout_ztimer,$(USEMODULE)))
+    USEMODULE += ztimer_usec
+  else
+    USEMODULE += xtimer
+  endif
 endif
 
 ifneq (,$(filter event,$(USEMODULE)))
@@ -520,9 +537,6 @@ ifneq (,$(filter skald,$(USEMODULE)))
   USEMODULE += nrfble
   USEMODULE += random
   USEMODULE += ztimer_msec
-   ifneq (,$(filter periph_rtt,$(USEMODULE)))
-    USEMODULE += ztimer_periph_rtt
-  endif
 endif
 
 ifneq (,$(filter bluetil_addr,$(USEMODULE)))

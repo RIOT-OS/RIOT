@@ -51,7 +51,7 @@ static const tc32_conf_t timer_config[] = {
         .mclk           = &MCLK->APBCMASK.reg,
         .mclk_mask      = MCLK_APBCMASK_TC0 | MCLK_APBCMASK_TC1,
         .gclk_id        = TC0_GCLK_ID,
-        .gclk_src       = SAM0_GCLK_8MHZ,
+        .gclk_src       = SAM0_GCLK_TIMER,
         .flags          = TC_CTRLA_MODE_COUNT32,
     }
 };
@@ -124,7 +124,7 @@ static const pwm_conf_t pwm_config[] = {
     { .tim  = TCC_CONFIG(TCC0),
       .chan = pwm_chan0_config,
       .chan_numof = ARRAY_SIZE(pwm_chan0_config),
-      .gclk_src = SAM0_GCLK_8MHZ,
+      .gclk_src = SAM0_GCLK_TIMER,
     },
 #endif
 };
@@ -222,7 +222,7 @@ static const adc_conf_chan_t adc_channels[] = {
  * @{
  */
                             /* Must not exceed 12 MHz */
-#define DAC_CLOCK           SAM0_GCLK_8MHZ
+#define DAC_CLOCK           SAM0_GCLK_TIMER
                             /* use Vcc as reference voltage */
 #define DAC_VREF            DAC_CTRLB_REFSEL_VDDANA
 /** @} */

@@ -44,7 +44,6 @@ ifneq (,$(filter openwsn_coap,$(USEMODULE)))
 endif
 
 ifneq (,$(filter openwsn_crypto,$(USEMODULE)))
-  USEMODULE += crypto_3des
   USEMODULE += cipher_modes
 endif
 
@@ -75,10 +74,6 @@ endif
 ifneq (,$(filter openwsn_sctimer_ztimer,$(USEMODULE)))
   USEMODULE += ztimer_usec
   USEMODULE += ztimer_msec
-  FEATURES_OPTIONAL += periph_rtt
-  ifneq (,$(filter periph_rtt,$(FEATURES_USED)))
-    USEMODULE += ztimer_periph_rtt
-  endif
 endif
 
 ifneq (,$(filter openwsn_sctimer_rtt,$(USEMODULE)))

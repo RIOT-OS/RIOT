@@ -4,5 +4,6 @@ FEATURES_PROVIDED += periph_dac
 FEATURES_PROVIDED += periph_flashpage
 FEATURES_PROVIDED += periph_gpio periph_gpio_irq
 FEATURES_PROVIDED += periph_timer_periodic
+FEATURES_PROVIDED += periph_rtc_ms
 
 include $(RIOTCPU)/arm7_common/Makefile.features

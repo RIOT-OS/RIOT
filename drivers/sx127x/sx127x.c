@@ -75,7 +75,8 @@ static void sx127x_on_dio3_isr(void *arg);
 
 void sx127x_setup(sx127x_t *dev, const sx127x_params_t *params, uint8_t index)
 {
-    netdev_t *netdev = (netdev_t*) dev;
+    netdev_t *netdev = (netdev_t *)dev;
+
     netdev->driver = &sx127x_driver;
     dev->params = *params;
     netdev_register(&dev->netdev, NETDEV_SX127X, index);
@@ -148,7 +149,7 @@ int sx127x_init(sx127x_t *dev)
 
         /* wait till device signals end of POR cycle */
         while ((gpio_read(dev->params.reset_pin) > 0) ==
-               SX127X_POR_ACTIVE_LOGIC_LEVEL ) {};
+               SX127X_POR_ACTIVE_LOGIC_LEVEL) {}
     }
 
     /* wait for the device to become ready */
@@ -182,7 +183,7 @@ void sx127x_init_radio_settings(sx127x_t *dev)
     sx127x_set_freq_hop(dev, IS_ACTIVE(CONFIG_LORA_FREQUENCY_HOPPING_DEFAULT) ? true : false);
     sx127x_set_hop_period(dev, CONFIG_LORA_FREQUENCY_HOPPING_PERIOD_DEFAULT);
     sx127x_set_fixed_header_len_mode(dev, IS_ACTIVE(CONFIG_LORA_FIXED_HEADER_LEN_MODE_DEFAULT) ?
-                                                    true : false);
+                                     true : false);
     sx127x_set_iq_invert(dev, IS_ACTIVE(CONFIG_LORA_IQ_INVERTED_DEFAULT) ? true : false);
     sx127x_set_payload_length(dev, CONFIG_LORA_PAYLOAD_LENGTH_DEFAULT);
     sx127x_set_preamble_length(dev, CONFIG_LORA_PREAMBLE_LENGTH_DEFAULT);
@@ -214,7 +215,7 @@ uint32_t sx127x_random(sx127x_t *dev)
         ztimer_sleep(ZTIMER_MSEC, 1);   /* wait one millisecond */
 
         /* Non-filtered RSSI value reading. Only takes the LSB value */
-        rnd |= ((uint32_t) sx127x_reg_read(dev, SX127X_REG_LR_RSSIWIDEBAND) & 0x01) << i;
+        rnd |= ((uint32_t)sx127x_reg_read(dev, SX127X_REG_LR_RSSIWIDEBAND) & 0x01) << i;
     }
 
     sx127x_set_sleep(dev);
@@ -238,22 +239,22 @@ static void sx127x_on_dio_isr(sx127x_t *dev, sx127x_flags_t flag)
 
 static void sx127x_on_dio0_isr(void *arg)
 {
-    sx127x_on_dio_isr((sx127x_t*) arg, SX127X_IRQ_DIO0);
+    sx127x_on_dio_isr((sx127x_t *)arg, SX127X_IRQ_DIO0);
 }
 
 static void sx127x_on_dio1_isr(void *arg)
 {
-    sx127x_on_dio_isr((sx127x_t*) arg, SX127X_IRQ_DIO1);
+    sx127x_on_dio_isr((sx127x_t *)arg, SX127X_IRQ_DIO1);
 }
 
 static void sx127x_on_dio2_isr(void *arg)
 {
-    sx127x_on_dio_isr((sx127x_t*) arg, SX127X_IRQ_DIO2);
+    sx127x_on_dio_isr((sx127x_t *)arg, SX127X_IRQ_DIO2);
 }
 
 static void sx127x_on_dio3_isr(void *arg)
 {
-    sx127x_on_dio_isr((sx127x_t*) arg, SX127X_IRQ_DIO3);
+    sx127x_on_dio_isr((sx127x_t *)arg, SX127X_IRQ_DIO3);
 }
 
 /* Internal event handlers */
@@ -315,14 +316,14 @@ static int _init_gpios(sx127x_t *dev)
 
 static void _on_tx_timeout(void *arg)
 {
-    netdev_t *dev = (netdev_t *) arg;
+    netdev_t *dev = (netdev_t *)arg;
 
     dev->event_callback(dev, NETDEV_EVENT_TX_TIMEOUT);
 }
 
 static void _on_rx_timeout(void *arg)
 {
-    netdev_t *dev = (netdev_t *) arg;
+    netdev_t *dev = (netdev_t *)arg;
 
     dev->event_callback(dev, NETDEV_EVENT_RX_TIMEOUT);
 }

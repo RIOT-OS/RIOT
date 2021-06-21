@@ -102,8 +102,6 @@ typedef struct {
 typedef struct {
     uart_t uart;            /**< UART device to use */
     uint32_t baudrate;      /**< baudrate to UART device */
-    uint8_t *buf;           /**< buffer for incoming packets */
-    size_t bufsize;         /**< size of ethos_params_t::buf */
 } ethos_params_t;
 
 /**
@@ -117,8 +115,13 @@ typedef struct {
  *
  * @param[out]  dev         handle of the device to initialize
  * @param[in]   params      parameters for device initialization
+ * @param[in]   index       Index of @p params in a global parameter struct array.
+ *                          If initialized manually, pass a unique identifier instead.
+ * @param[in]   inbuf       buffer to store a received frame in
+ * @param[in]   inbuf_size  size of the receive buffer
  */
-void ethos_setup(ethos_t *dev, const ethos_params_t *params);
+void ethos_setup(ethos_t *dev, const ethos_params_t *params, uint8_t index,
+                 void *inbuf, size_t inbuf_size);
 
 /**
  * @brief   Send frame over serial port using ethos' framing

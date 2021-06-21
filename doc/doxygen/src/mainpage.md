@@ -25,7 +25,7 @@ with  multithreading, IPC, system timers, mutexes etc.
 
 A good high-level overview can be found in the article
 [RIOT: An Open Source Operating System for Low-End Embedded Devices in
-the IoT](https://riot-os.org/docs/riot-ieeeiotjournal-2018.pdf)
+the IoT](https://www.riot-os.org/assets/pdfs/riot-ieeeiotjournal-2018.pdf)
 (IEEE Internet of Things Journal, December 2018).
 
 Contribute to RIOT                                        {#contribute-to-riot}
@@ -38,21 +38,13 @@ RIOT is developed by an open community that anyone is welcome to join:
  - Sign-up to our [forum](https://forum.riot-os.org/) to ask for help using RIOT
    or writing an application for RIOT, discuss kernel and network stack
    development as well as hardware support, or to show-case your latest project.
- - [Subscribe](http://lists.riot-os.org/mailman/listinfo/users) to
-   users@riot-os.org to ask for help using RIOT or writing an application for
-   RIOT (or to just stay in the loop). An archive of this list [is available
-   here](https://lists.riot-os.org/pipermail/users/).
- - [Subscribe](http://lists.riot-os.org/mailman/listinfo/devel) to
-   devel@riot-os.org to follow and discuss kernel and network stack
-   development, or hardware support. An archive of this list [is available
-   here](https://lists.riot-os.org/pipermail/devel/).
  - Follow us on [Twitter](https://twitter.com/RIOT_OS) for news from the RIOT
    community.
  - Regarding critical vulnerabilities we would appreciate if you give us a
    90-days head-start by reporting to security@riot-os.org, before making your
    information publicly available
- - Contact us on IRC for live support and discussions:
-   [irc.freenode.org \#riot-os](irc://irc.freenode.org/riot-os)
+ - Contact us on Matrix for live support and discussions:
+   [riot-os:matrix.org](https://matrix.to/#/#riot-os:matrix.org)
 
 
 The quickest start                                        {#the-quickest-start}

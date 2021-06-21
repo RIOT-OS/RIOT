@@ -5,5 +5,5 @@ PKG_LICENSE=BSD-3-Clause
 
 include $(RIOTBASE)/pkg/pkg.mk
 
-all:
-	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/lib/source/ -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)
+all: Makefile.tinycrypt
+	$(QQ)"$(MAKE)" -C $(PKG_SOURCE_DIR)/lib/source/ -f $(CURDIR)/Makefile.tinycrypt -f $(RIOTBASE)/Makefile.base MODULE=$(PKG_NAME)

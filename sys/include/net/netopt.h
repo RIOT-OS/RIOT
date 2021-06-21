@@ -640,6 +640,20 @@ typedef enum {
     /**
      * @brief   (uint8_t) LoRaWAN TX application port
      * - LoRaWAN: between 1 and 223 (included)
+     *
+     * @deprecated  This option is deprecated and will be removed in the
+     *              2022.01 Release.
+     *              The port is encoded now as a one byte
+     *              destination address in a @ref net_gnrc_netif_hdr snip
+     *              prepended in the packet.
+     *              The user must take care of prepending the required snip
+     *              during transmission. On reception, the
+     *              snip is prepended automatically by the stack and shall be
+     *              consumed by the user.
+     *              During the deprecation period it is required to
+     *              compile with @ref
+     *              CONFIG_GNRC_NETIF_LORAWAN_NETIF_HDR
+     *
      */
     NETOPT_LORAWAN_TX_PORT,
 

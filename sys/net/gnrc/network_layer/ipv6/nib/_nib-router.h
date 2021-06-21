@@ -46,8 +46,7 @@ static inline void _init_iface_router(gnrc_netif_t *netif)
     netif->ipv6.ra_sent = 0;
     netif->flags |= GNRC_NETIF_FLAGS_IPV6_FORWARDING;
 
-    if (!IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LR) ||
-        IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR)) {
+    if (IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_ADV_ROUTER)) {
         netif->flags |= GNRC_NETIF_FLAGS_IPV6_RTR_ADV;
     }
 

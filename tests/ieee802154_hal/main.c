@@ -60,7 +60,6 @@ static bool send_reply;
 static bool request_ack;
 
 static const char *str_states[3]= {"TRX_OFF", "RX", "TX"};
-static ieee802154_rx_mode_t current_rx_mode;
 static eui64_t ext_addr;
 static network_uint16_t short_addr;
 static uint8_t seq;
@@ -114,7 +113,7 @@ static void _ack_timeout(event_t *event)
     (void) event;
     ieee802154_dev_t *dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
 
-    ieee802154_radio_set_rx_mode(dev, current_rx_mode);
+    ieee802154_radio_set_frame_filter_mode(dev, IEEE802154_FILTER_ACCEPT);
 }
 
 static event_t _ack_timeout_ev = {
@@ -246,8 +245,8 @@ static void _send(iolist_t *pkt)
     while(ieee802154_radio_confirm_set_trx_state(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID)) == -EAGAIN);
 
     /* Trigger the transmit and wait for the mutex unlock (TX_DONE event) */
+    ieee802154_radio_set_frame_filter_mode(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), IEEE802154_FILTER_ACK_ONLY);
     ieee802154_radio_request_transmit(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID));
-    ieee802154_radio_set_rx_mode(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), IEEE802154_RX_WAIT_FOR_ACK);
     mutex_lock(&lock);
 
     event_post(EVENT_PRIO_HIGHEST, &_tx_finish_ev);
@@ -270,12 +269,16 @@ static int _init(void)
     ieee802154_radio_request_on(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID));
     while(ieee802154_radio_confirm_on(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID)) == -EAGAIN) {}
 
-    current_rx_mode = IEEE802154_RX_AACK_ENABLED;
-    ieee802154_radio_set_rx_mode(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), current_rx_mode);
+    ieee802154_radio_set_frame_filter_mode(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), IEEE802154_FILTER_ACCEPT);
 
     uint16_t panid = CONFIG_IEEE802154_DEFAULT_PANID;
     /* Set all IEEE addresses */
-    ieee802154_radio_set_hw_addr_filter(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), &short_addr, &ext_addr, &panid);
+    ieee802154_radio_config_addr_filter(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID),
+                                        IEEE802154_AF_SHORT_ADDR, &short_addr);
+    ieee802154_radio_config_addr_filter(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID),
+                                        IEEE802154_AF_EXT_ADDR, &ext_addr);
+    ieee802154_radio_config_addr_filter(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID),
+                                        IEEE802154_AF_PANID, &panid);
 
     /* Set PHY configuration */
     ieee802154_phy_conf_t conf = {.channel=CONFIG_IEEE802154_DEFAULT_CHANNEL, .page=CONFIG_IEEE802154_DEFAULT_SUBGHZ_PAGE, .pow=CONFIG_IEEE802154_DEFAULT_TXPOWER};
@@ -424,33 +427,24 @@ int _test_states(int argc, char **argv)
     return 0;
 }
 
-static int rx_mode_cmd(int argc, char **argv)
+static int promisc(int argc, char **argv)
 {
-    ieee802154_rx_mode_t conf;
+    ieee802154_filter_mode_t conf;
     if (argc < 2) {
-        printf("Usage: %s <on|off|pend|promisc>", argv[0]);
+        printf("Usage: %s <on|off>", argv[0]);
         return 1;
     }
 
-    if (strcmp(argv[1], "pend") == 0) {
-        conf = IEEE802154_RX_AACK_FRAME_PENDING;
-        puts("ACK enabled with Frame Pending");
-    }
-    else if (strcmp(argv[1], "off") == 0) {
-        conf = IEEE802154_RX_AACK_DISABLED;
-        puts("ACK disabled");
-    }
-    else if (strcmp(argv[1], "promisc") == 0) {
-        conf = IEEE802154_RX_PROMISC;
-        puts("Promiscuous mode enabled");
+    if (strcmp(argv[1], "on") == 0) {
+        conf = IEEE802154_FILTER_PROMISC;
+        puts("Enabled promiscuos mode");
     }
     else {
-        conf = IEEE802154_RX_AACK_ENABLED;
-        puts("ACK enabled");
+        conf = IEEE802154_FILTER_ACCEPT;
+        puts("Disabled promiscuos mode");
     }
 
-    current_rx_mode = conf;
-    ieee802154_radio_set_rx_mode(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), conf);
+    ieee802154_radio_set_frame_filter_mode(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), conf);
     return 0;
 }
 
@@ -839,7 +833,7 @@ static const shell_command_t shell_commands[] = {
     { "test_states", "Test state changes", _test_states },
     { "cca", "Perform CCA", _cca },
     { "config_cca", "Config CCA parameters", _config_cca_cmd },
-    { "rx_mode", "Enable/Disable AACK or set Frame Pending bit or set promiscuos mode", rx_mode_cmd },
+    { "promisc", "Set promiscuos mode", promisc },
     { "tx_mode", "Enable CSMA-CA, CCA or direct transmission", txmode_cmd },
     { "caps", "Get a list of caps supported by the device", _caps_cmd },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },

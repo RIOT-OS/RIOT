@@ -35,18 +35,6 @@ extern "C" {
  * @{
  */
 /**
- * @brief maximum timer drift in per mille
- *
- * @note this is only a workaround to compensate inaccurate timers.
- *
- * E.g a value of 1 means there's a positive drift of 0.1% (set timeout to
- * 1000 ms => triggers after 1001 ms)
- */
-#ifndef CONFIG_GNRC_LORAWAN_TIMER_DRIFT
-#define CONFIG_GNRC_LORAWAN_TIMER_DRIFT 10
-#endif
-
-/**
  * @brief the minimum symbols to detect a LoRa preamble
  */
 #ifndef CONFIG_GNRC_LORAWAN_MIN_SYMBOLS_TIMEOUT
@@ -189,6 +177,13 @@ void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac);
 void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac);
 
 /**
+ * @brief Indicate the MAC layer that the timer was fired
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ */
+void gnrc_lorawan_timeout_cb(gnrc_lorawan_t *mac);
+
+/**
  * @brief Init GNRC LoRaWAN
  *
  * @param[in] mac pointer to the MAC descriptor
@@ -295,6 +290,23 @@ netdev_t *gnrc_lorawan_get_netdev(gnrc_lorawan_t *mac);
  *         enable an undefined channel
  */
 int gnrc_lorawan_phy_set_channel_mask(gnrc_lorawan_t *mac, uint16_t channel_mask);
+
+/**
+ * @brief Set a timer with the given time
+ * @note Supposed to be implemented by the user of GNRC LoRaWAN
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ * @param us timeout microseconds
+ */
+void gnrc_lorawan_set_timer(gnrc_lorawan_t *mac, uint32_t us);
+
+/**
+ * @brief Remove the current timer
+ * @note Supposed to be implemented by the user of GNRC LoRaWAN
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ */
+void gnrc_lorawan_remove_timer(gnrc_lorawan_t *mac);
 
 #ifdef __cplusplus
 }

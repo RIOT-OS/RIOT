@@ -34,6 +34,9 @@ on:
         description: 'riot/riotbuild docker image version'
         required: true
         default: 'latest'
+      filter:
+        description: 'Pytest filter. Leave empty for all.'
+        required: false
 
 env:
   DOCKER_MAKE_ARGS: -j
@@ -116,6 +119,9 @@ jobs:
               grep -q "[0-9]\{4\}.[0-9]\{2\}-RC[0-9]\+"; then
           TOX_ARGS+="--non-RC "
         fi
+        if [ -n "${{ github.event.inputs.filter }}" ]; then
+          K="-k"
+        fi
 
         cd Release-Specs
         # definition in env does not work since $GITHUB_WORKSPACE seems not to
@@ -127,18 +133,19 @@ jobs:
           GITHUB_REPOSITORY=${GITHUB_REPOSITORY} \
           GITHUB_RUN_ID=${GITHUB_RUN_ID} \
           GITHUB_SERVER_URL=${GITHUB_SERVER_URL} \
-          LORAWAN_APP_KEY="${{ secrets.CI_TTN_APPKEY  }}" \
-          LORAWAN_NWK_SKEY="${{ secrets.CI_TTN_NWKSKEY_ABP  }}" \
-          LORAWAN_APP_SKEY="${{ secrets.CI_TTN_APPSKEY_ABP  }}" \
+          APPKEY="${{ secrets.CI_TTN_APPKEY  }}" \
+          NWKSKEY="${{ secrets.CI_TTN_NWKSKEY_ABP  }}" \
+          APPSKEY="${{ secrets.CI_TTN_APPSKEY_ABP  }}" \
           LORAWAN_DL_KEY="${{ secrets.CI_TTN_APPID_KEY  }}" \
-          LORAWAN_DEV_EUI="009E40529364FBE6" \
-          LORAWAN_APP_EUI="70B3D57ED003B26A" \
-          LORAWAN_DEV_ADDR="26011EB0" \
+          DEVEUI="009E40529364FBE6" \
+          APPEUI="70B3D57ED003B26A" \
+          DEVADDR="26011EB0" \
           TTN_APP_ID="11-lorawan" \
           TTN_DEV_ID="riot_lorawan_1" \
           TTN_DEV_ID_ABP="riot_lorawan_1_abp" \
           RIOTBASE=${RIOTBASE} \
-          $(which tox) -e test -- ${TOX_ARGS} -m "${{ matrix.pytest_mark }}"
+          $(which tox) -e test -- ${TOX_ARGS} \
+            ${K} "${{ github.event.inputs.filter }}" -m "${{ matrix.pytest_mark }}"
     - name: junit2html and XML deploy
       if: always()
       run: |

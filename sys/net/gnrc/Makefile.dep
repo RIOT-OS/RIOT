@@ -25,10 +25,10 @@ ifneq (,$(filter gnrc_gomach,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_lorawan,$(USEMODULE)))
-  USEMODULE += xtimer
+  USEMODULE += ztimer_msec
   USEMODULE += random
   USEMODULE += hashes
-  USEMODULE += crypto_aes
+  USEMODULE += crypto_aes_128
   USEMODULE += netdev_layer
   USEMODULE += gnrc_nettype_lorawan
 endif
@@ -52,6 +52,10 @@ ifneq (,$(filter gnrc_dhcpv6_client,$(USEMODULE)))
 endif
 
 ifneq (,$(filter gnrc_dhcpv6_client_6lbr,$(USEMODULE)))
+  USEMODULE += gnrc_dhcpv6_client_simple_pd
+endif
+
+ifneq (,$(filter gnrc_dhcpv6_client_simple_pd,$(USEMODULE)))
   USEMODULE += gnrc_dhcpv6_client
 endif
 
@@ -99,7 +103,9 @@ ifneq (,$(filter gnrc_rpl,$(USEMODULE)))
   USEMODULE += gnrc_icmpv6
   USEMODULE += gnrc_ipv6_nib
   USEMODULE += trickle
-  USEMODULE += xtimer
+  ifeq (,$(filter ztimer_msec,$(USEMODULE)))
+    USEMODULE += xtimer
+  endif
   USEMODULE += evtimer
 endif
 

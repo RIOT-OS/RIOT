@@ -173,8 +173,8 @@ int ieee802154_send(ieee802154_submac_t *submac, const iolist_t *iolist);
 static inline int ieee802154_set_short_addr(ieee802154_submac_t *submac,
                                             const network_uint16_t *short_addr)
 {
-    int res = ieee802154_radio_set_hw_addr_filter(submac->dev, short_addr, NULL,
-                                                  NULL);
+
+    int res = ieee802154_radio_config_addr_filter(submac->dev, IEEE802154_AF_SHORT_ADDR, short_addr);
 
     if (res >= 0) {
         memcpy(&submac->short_addr, short_addr, IEEE802154_SHORT_ADDRESS_LEN);
@@ -195,8 +195,7 @@ static inline int ieee802154_set_short_addr(ieee802154_submac_t *submac,
 static inline int ieee802154_set_ext_addr(ieee802154_submac_t *submac,
                                           const eui64_t *ext_addr)
 {
-    int res = ieee802154_radio_set_hw_addr_filter(submac->dev, NULL, ext_addr,
-                                                  NULL);
+    int res = ieee802154_radio_config_addr_filter(submac->dev, IEEE802154_AF_EXT_ADDR, ext_addr);
 
     if (res >= 0) {
         memcpy(&submac->ext_addr, ext_addr, IEEE802154_LONG_ADDRESS_LEN);
@@ -216,8 +215,7 @@ static inline int ieee802154_set_ext_addr(ieee802154_submac_t *submac,
 static inline int ieee802154_set_panid(ieee802154_submac_t *submac,
                                        const uint16_t *panid)
 {
-    int res = ieee802154_radio_set_hw_addr_filter(submac->dev, NULL, NULL,
-                                                  panid);
+    int res = ieee802154_radio_config_addr_filter(submac->dev, IEEE802154_AF_PANID, panid);
 
     if (res >= 0) {
         submac->panid = *panid;

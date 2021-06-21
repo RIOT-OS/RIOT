@@ -18,6 +18,7 @@ config BOARD_ATXMEGA_A3BU_XPLAINED
     select HAS_PERIPH_I2C
     select HAS_PERIPH_NVM
     select HAS_PERIPH_PM
+    select HAS_PERIPH_SPI
     select HAS_PERIPH_TIMER
     select HAS_PERIPH_TIMER_PERIODIC
     select HAS_PERIPH_UART

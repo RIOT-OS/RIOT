@@ -252,6 +252,11 @@ config HAS_PERIPH_RTC
     help
         Indicates that an RTC peripheral is present.
 
+config HAS_PERIPH_RTC_MS
+    bool
+    help
+        Indicates that the RTC peripheral can provide sub-second timestamps.
+
 config HAS_PERIPH_RTT
     bool
     help

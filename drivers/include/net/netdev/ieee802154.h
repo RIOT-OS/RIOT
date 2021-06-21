@@ -67,6 +67,13 @@ extern "C" {
  * @}
  */
 
+ /**
+ * @name    Flags for use in @ref netdev_ieee802154_rx_info::flags
+ * @{
+ */
+#define NETDEV_RX_IEEE802154_INFO_FLAG_TIMESTAMP       (0x01)  /**< Timestamp valid */
+/** @} */
+
 /**
  * @brief   Option parameter to be used with @ref NETOPT_CCA_MODE to set
  *          the mode of the clear channel assessment (CCA) defined
@@ -119,7 +126,7 @@ typedef struct {
     uint8_t page;                           /**< channel page */
     uint16_t flags;                         /**< flags as defined above */
     int16_t txpower;                        /**< tx power in dBm */
-#if IS_USED(MODULE_IEEE802154_SECURITY) || defined (Doxygen)
+#if IS_USED(MODULE_IEEE802154_SECURITY) || defined(DOXYGEN)
     ieee802154_sec_context_t sec_ctx;       /**< security context */
 #endif
     /** @} */
@@ -128,7 +135,15 @@ typedef struct {
 /**
  * @brief   Received packet status information for IEEE 802.15.4 radios
  */
-typedef struct netdev_radio_rx_info netdev_ieee802154_rx_info_t;
+typedef struct netdev_ieee802154_rx_info {
+    uint64_t timestamp;     /**< Timestamp value of a received frame in ns */
+    int16_t rssi;           /**< RSSI of a received frame in dBm */
+    uint8_t lqi;            /**< LQI of a received frame */
+    uint8_t flags;          /**< Flags e.g. used to mark other fields as valid */
+#if IS_USED(MODULE_SOCK_AUX_TIMESTAP)
+    uint64_t timestamp;     /**< Timestamp value of a received frame in ns */
+#endif
+} netdev_ieee802154_rx_info_t;
 
 /**
  * @brief   Reset function for ieee802154 common fields

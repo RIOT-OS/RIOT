@@ -80,6 +80,7 @@ BOARD_INSUFFICIENT_MEMORY := \
     samr30-xpro \
     samr34-xpro \
     seeeduino_arch-pro \
+    seeeduino_xiao \
     sensebox_samd21 \
     serpente \
     slstk3400a \

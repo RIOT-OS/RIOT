@@ -89,4 +89,22 @@ endif
 
 ifneq (,$(filter ztimer_msec,$(USEMODULE)))
   USEMODULE += ztimer
+  FEATURES_OPTIONAL += periph_rtt
+  # HACK: periph_rtt will get used only in the next iteration but an updated
+  # state for FEATURES_USED is needed here so include `features_check.inc.mk`
+  # here instead.
+  # An other option would be to check FEATURES_PROVIDED this would avoid the
+  # order of inclusion problem but it would no take into account possible conflicts
+  # and is also currently not allowed in the build system.
+  # An other alternative would be to delay to the next loop, but this produce a
+  # case where another loop is not executed and the conditional not evaluated
+  # If these kind of usecases pop up before Kconfig migration is completed
+  # then another alternative would be introduce a variable to require an extra
+  # loop independent of USEMODULE, FEATURES_REQUIRED and USEPKG
+  include $(RIOTMAKE)/features_check.inc.mk
+  ifneq (,$(filter periph_rtt,$(FEATURES_USED)))
+    USEMODULE += ztimer_periph_rtt
+  else
+    USEMODULE += ztimer_periph_timer
+  endif
 endif

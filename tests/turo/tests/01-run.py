@@ -21,10 +21,10 @@ class TestTuroBase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.ctrl = RIOTCtrl()
+        cls.ctrl.reset()
         cls.ctrl.start_term()
         if cls.DEBUG:
             cls.ctrl.term.logfile = sys.stdout
-        cls.ctrl.reset()
         cls.shell = ShellInteraction(cls.ctrl)
         cls.json_parser = RapidJSONShellInteractionParser()
         cls.logger = logging.getLogger(cls.__name__)

@@ -20,15 +20,18 @@
 #include "log.h"
 #include "debug.h"
 #include "ethos.h"
+#include "ethos_params.h"
 #include "periph/uart.h"
 #include "net/gnrc/netif/ethernet.h"
+
+#define ETHOS_NUM ARRAY_SIZE(ethos_params)
 
 /**
  * @brief global ethos object, used by stdio_uart
  */
-ethos_t ethos;
+ethos_t ethos[ETHOS_NUM];
 
-static gnrc_netif_t _netif;
+static gnrc_netif_t _netif[ETHOS_NUM];
 
 /**
  * @brief   Define stack parameters for the MAC layer thread
@@ -42,24 +45,21 @@ static gnrc_netif_t _netif;
 /**
  * @brief   Stacks for the MAC layer threads
  */
-static char _netdev_eth_stack[ETHOS_MAC_STACKSIZE];
+static char _netdev_eth_stack[ETHOS_NUM][ETHOS_MAC_STACKSIZE];
 
-static uint8_t _inbuf[2048];
+static uint8_t _inbuf[ETHOS_NUM][2048];
 
 void auto_init_ethos(void)
 {
-    LOG_DEBUG("[auto_init_netif] initializing ethos #0\n");
+    for (unsigned i = 0; i < ETHOS_NUM; ++i) {
+        LOG_DEBUG("[auto_init_netif] initializing ethos #%u\n", i);
 
-    /* setup netdev device */
-    ethos_params_t p;
-    p.uart      = ETHOS_UART;
-    p.baudrate  = ETHOS_BAUDRATE;
-    p.buf       = _inbuf;
-    p.bufsize   = sizeof(_inbuf);
-    ethos_setup(&ethos, &p);
+        /* setup netdev device */
+        ethos_setup(&ethos[i], &ethos_params[i], i, _inbuf[i], sizeof(_inbuf[i]));
 
-    /* initialize netdev<->gnrc adapter state */
-    gnrc_netif_ethernet_create(&_netif, _netdev_eth_stack, ETHOS_MAC_STACKSIZE,
-                               ETHOS_MAC_PRIO, "ethos", (netdev_t *)&ethos);
+        /* initialize netdev<->gnrc adapter state */
+        gnrc_netif_ethernet_create(&_netif[i], _netdev_eth_stack[i], ETHOS_MAC_STACKSIZE,
+                                   ETHOS_MAC_PRIO, "ethos", (netdev_t *)&ethos[i]);
+    }
 }
 /** @} */

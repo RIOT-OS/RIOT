@@ -341,15 +341,16 @@ void isr_exti(void)
 {
 #if defined(CPU_FAM_STM32G0) || defined(CPU_FAM_STM32L5) || \
     defined(CPU_FAM_STM32MP1)
-    /* only generate interrupts against lines which have their IMR set */
-    uint32_t pending_rising_isr = (EXTI->RPR1 & EXTI_REG_IMR & EXTI_MASK);
-    uint32_t pending_falling_isr = (EXTI->FPR1 & EXTI_REG_IMR & EXTI_MASK);
+    /* get all interrupts handled by this ISR */
+    uint32_t pending_rising_isr = (EXTI->RPR1 & EXTI_MASK);
+    uint32_t pending_falling_isr = (EXTI->FPR1 & EXTI_MASK);
 
     /* clear by writing a 1 */
     EXTI->RPR1 = pending_rising_isr;
     EXTI->FPR1 = pending_falling_isr;
 
-    uint32_t pending_isr = pending_rising_isr | pending_falling_isr;
+    /* only generate interrupts against lines which have their IMR set */
+    uint32_t pending_isr = (pending_rising_isr | pending_falling_isr) & EXTI_REG_IMR;
 #else
     /* read all pending interrupts wired to isr_exti */
     uint32_t pending_isr = (EXTI_REG_PR & EXTI_MASK);

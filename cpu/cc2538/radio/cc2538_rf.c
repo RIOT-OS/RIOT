@@ -174,6 +174,9 @@ void cc2538_init(void)
     /* setup mac timer */
     _cc2538_setup_mac_timer();
 
+    /* Enable Auto ACK */
+    RFCORE->XREG_FRMCTRL0bits.AUTOACK = !IS_ACTIVE(CONFIG_IEEE802154_AUTO_ACK_DISABLE);
+
     /* Flush the receive and transmit FIFOs */
     RFCORE_SFR_RFST = ISFLUSHTX;
     RFCORE_SFR_RFST = ISFLUSHRX;

@@ -1,0 +1,12 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+config MODULE_MTD_NATIVE
+    bool
+    default y if MODULE_MTD
+    depends on NATIVE_OS_LINUX
+    depends on TEST_KCONFIG

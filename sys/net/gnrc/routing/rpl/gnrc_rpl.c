@@ -26,6 +26,12 @@
 #include "mutex.h"
 #include "evtimer.h"
 #include "random.h"
+#if IS_USED(MODULE_ZTIMER_MSEC)
+#include "ztimer.h"
+#include "timex.h"
+#else
+#include "xtimer.h"
+#endif
 #include "gnrc_rpl_internal/globals.h"
 
 #include "net/gnrc/rpl.h"
@@ -41,8 +47,13 @@ static char _stack[GNRC_RPL_STACK_SIZE];
 kernel_pid_t gnrc_rpl_pid = KERNEL_PID_UNDEF;
 const ipv6_addr_t ipv6_addr_all_rpl_nodes = GNRC_RPL_ALL_NODES_ADDR;
 #ifdef MODULE_GNRC_RPL_P2P
+#if IS_USED(MODULE_ZTIMER_MSEC)
+static uint32_t _lt_time = GNRC_RPL_LIFETIME_UPDATE_STEP * MS_PER_SEC;
+static ztimer_t _lt_timer;
+#else
 static uint32_t _lt_time = GNRC_RPL_LIFETIME_UPDATE_STEP * US_PER_SEC;
 static xtimer_t _lt_timer;
+#endif
 static msg_t _lt_msg = { .type = GNRC_RPL_MSG_TYPE_LIFETIME_UPDATE };
 #endif
 static msg_t _msg_q[GNRC_RPL_MSG_QUEUE_SIZE];
@@ -96,7 +107,12 @@ kernel_pid_t gnrc_rpl_init(kernel_pid_t if_pid)
         gnrc_rpl_of_manager_init();
         evtimer_init_msg(&gnrc_rpl_evtimer);
 #ifdef MODULE_GNRC_RPL_P2P
+#if IS_USED(MODULE_ZTIMER_MSEC)
+        ztimer_set_msg(ZTIMER_MSEC, &_lt_timer, _lt_time,
+                       &_lt_msg, gnrc_rpl_pid);
+#else
         xtimer_set_msg(&_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
+#endif
 #endif
 
 #ifdef MODULE_NETSTATS_RPL
@@ -332,7 +348,11 @@ void _update_lifetime(void)
 {
     gnrc_rpl_p2p_update();
 
+#if IS_USED(MODULE_ZTIMER_MSEC)
+    ztimer_set_msg(ZTIMER_MSEC, &_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
+#else
     xtimer_set_msg(&_lt_timer, _lt_time, &_lt_msg, gnrc_rpl_pid);
+#endif
 }
 #endif
 

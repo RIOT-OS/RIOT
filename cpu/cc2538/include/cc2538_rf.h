@@ -107,7 +107,10 @@ extern "C" {
 #define CC2538_RSSI_OFFSET          (-73)  /**< Signal strength offset value */
 #define CC2538_RF_SENSITIVITY       (-97)  /**< dBm typical, normal conditions */
 
+#define CC2538_ACCEPT_FT_0_BEACON        (1 << 3) /**< enable or disable the BEACON filter */
+#define CC2538_ACCEPT_FT_1_DATA          (1 << 4) /**< enable or disable the DATA filter */
 #define CC2538_ACCEPT_FT_2_ACK           (1 << 5) /**< enable or disable the ACK filter */
+#define CC2538_ACCEPT_FT_3_CMD           (1 << 6) /**< enable or disable the CMD filter */
 #define CC2538_STATE_SFD_WAIT_RANGE_MIN  (0x03U)  /**< min range value of SFD wait state */
 #define CC2538_STATE_SFD_WAIT_RANGE_MAX  (0x06U)  /**< max range value of SFD wait state */
 #define CC2538_FRMCTRL1_PENDING_OR_MASK  (0x04)   /**< mask for enabling or disabling the

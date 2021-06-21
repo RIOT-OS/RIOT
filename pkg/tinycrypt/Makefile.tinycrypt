@@ -1,0 +1,1 @@
+SRC = $(filter-out ecc_platform_specific.c,$(wildcard *.c))

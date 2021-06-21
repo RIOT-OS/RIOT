@@ -108,6 +108,11 @@ void auto_init(void)
         extern void lwip_bootstrap(void);
         lwip_bootstrap();
     }
+    if (IS_USED(MODULE_SOCK_DTLS)) {
+        LOG_DEBUG("Auto init sock_dtls.\n");
+        extern void sock_dtls_init(void);
+        sock_dtls_init();
+    }
     if (IS_USED(MODULE_OPENTHREAD)) {
         LOG_DEBUG("Bootstrapping openthread.\n");
         extern void openthread_bootstrap(void);
@@ -168,11 +173,6 @@ void auto_init(void)
         LOG_DEBUG("Auto init loramac.\n");
         extern void auto_init_loramac(void);
         auto_init_loramac();
-    }
-    if (IS_USED(MODULE_SOCK_DTLS)) {
-        LOG_DEBUG("Auto init sock_dtls.\n");
-        extern void sock_dtls_init(void);
-        sock_dtls_init();
     }
 
     /* initialize USB devices */
@@ -257,10 +257,10 @@ void auto_init(void)
         dhcpv6_client_auto_init();
     }
 
-    if (IS_USED(MODULE_GNRC_DHCPV6_CLIENT_6LBR)) {
-        LOG_DEBUG("Auto init 6LoWPAN border router DHCPv6 client\n");
-        extern void gnrc_dhcpv6_client_6lbr_init(void);
-        gnrc_dhcpv6_client_6lbr_init();
+    if (IS_USED(MODULE_GNRC_DHCPV6_CLIENT_SIMPLE_PD)) {
+        LOG_DEBUG("Auto init DHCPv6 client for simple prefix delegation\n");
+        extern void gnrc_dhcpv6_client_simple_pd_init(void);
+        gnrc_dhcpv6_client_simple_pd_init();
     }
 
     if (IS_USED(MODULE_AUTO_INIT_MULTIMEDIA)) {

@@ -229,13 +229,13 @@ static const i2c_conf_t i2c_config[] = {
  */
 static const spi_conf_t spi_config[] = {
     {   /* Connected to NINA W102 */
-        .dev      = &SERCOM4->SPI,
+        .dev      = &SERCOM2->SPI,
         .miso_pin = GPIO_PIN(PA, 13),
         .mosi_pin = GPIO_PIN(PA, 12),
         .clk_pin  = GPIO_PIN(PA, 15),
-        .miso_mux = GPIO_MUX_D,
-        .mosi_mux = GPIO_MUX_D,
-        .clk_mux  = GPIO_MUX_D,
+        .miso_mux = GPIO_MUX_C,
+        .mosi_mux = GPIO_MUX_C,
+        .clk_mux  = GPIO_MUX_C,
         .miso_pad = SPI_PAD_MISO_1,
         .mosi_pad = SPI_PAD_MOSI_0_SCK_3,
         .gclk_src = SAM0_GCLK_MAIN,

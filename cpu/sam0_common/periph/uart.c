@@ -190,18 +190,6 @@ int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
     if (uart_config[uart].flags & UART_FLAG_RUN_STANDBY) {
         dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_RUNSTDBY;
     }
-#ifdef SERCOM_USART_CTRLA_RXINV
-    /* COM100-61: The TXINV and RXINV bits in the CTRLA register have inverted functionality. */
-    if (uart_config[uart].flags & UART_FLAG_TXINV) {
-        dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_RXINV;
-    }
-#endif
-#ifdef SERCOM_USART_CTRLA_TXINV
-    /* COM100-61: The TXINV and RXINV bits in the CTRLA register have inverted functionality. */
-    if (uart_config[uart].flags & UART_FLAG_RXINV) {
-        dev(uart)->CTRLA.reg |= SERCOM_USART_CTRLA_TXINV;
-    }
-#endif
 
     /* calculate and set baudrate */
     _set_baud(uart, baudrate);

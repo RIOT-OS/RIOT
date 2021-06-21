@@ -118,6 +118,11 @@ int gnrc_lorawan_parse_dl(gnrc_lorawan_t *mac, uint8_t *buf, size_t len,
             return -1;
         }
 
+        if (pkt->port > LORAMAC_PORT_MAX) {
+            DEBUG("gnrc_lorawan: packet with port > 223. Drop\n");
+            return -1;
+        }
+
         if (buf < p_mic) {
             pkt->enc_payload.iol_base = buf;
             pkt->enc_payload.iol_len = p_mic - buf;
@@ -335,12 +340,8 @@ static void _handle_retransmissions(gnrc_lorawan_t *mac)
 {
     if (mac->mcps.nb_trials-- == 0) {
         _end_of_tx(mac, MCPS_CONFIRMED, -ETIMEDOUT);
-    }
-    else {
-        mac->msg.type = MSG_TYPE_MCPS_ACK_TIMEOUT;
-        xtimer_set_msg(&mac->rx, 1000000 + random_uint32_range(0,
-                                                               2000000), &mac->msg,
-                       thread_getpid());
+    } else {
+        gnrc_lorawan_set_timer(mac, 1000000 + random_uint32_range(0, 2000000));
     }
 }
 

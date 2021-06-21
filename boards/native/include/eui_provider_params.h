@@ -30,7 +30,9 @@ extern "C" {
  * @{
  */
 #define EUI64_PROVIDER_FUNC   native_cli_get_eui64
-#define EUI64_PROVIDER_TYPE   NETDEV_ANY
+#ifndef EUI64_PROVIDER_TYPE
+#define EUI64_PROVIDER_TYPE   NETDEV_SOCKET_ZEP
+#endif
 #define EUI64_PROVIDER_INDEX  NETDEV_INDEX_ANY
 /** @} */
 
