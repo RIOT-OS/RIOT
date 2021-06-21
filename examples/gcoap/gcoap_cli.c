@@ -43,8 +43,8 @@ static ssize_t _riot_board_handler(coap_pkt_t* pdu, uint8_t *buf, size_t len, vo
 
 /* CoAP resources. Must be sorted by path (ASCII order). */
 static const coap_resource_t _resources[] = {
-    { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler, NULL },
-    { "/riot/board", COAP_GET, _riot_board_handler, NULL },
+    { "/cli/stats", COAP_GET | COAP_PUT, _stats_handler, 0, NULL },
+    { "/riot/board", COAP_GET, _riot_board_handler, COAP_SEPERATE_RESPONSE, NULL },
 };
 
 static const char *_link_params[] = {

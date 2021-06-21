@@ -224,6 +224,9 @@ typedef struct {
     const char *path;               /**< URI path of resource               */
     coap_method_flags_t methods;    /**< OR'ed methods this resource allows */
     coap_handler_t handler;         /**< ptr to resource handler            */
+#ifdef MODULE_GCOAP
+    uint8_t flags;                  /**< flags e.g. for seperate response   */
+#endif
     void *context;                  /**< ptr to user defined context data   */
 } coap_resource_t;
 
