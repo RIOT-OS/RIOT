@@ -1,8 +1,3 @@
 INCLUDES += -I$(PKGDIRBASE)/arduino_sdi_12/src
 
 CXXEXFLAGS += -std=c++11
-
-# FIXME This should be somewhere else, F_CPU depends on the CPU, and
-# should be equal to CLOCK_CORECLOCK. F_CPU was removed from RIOT in
-# https://github.com/RIOT-OS/RIOT/pull/4577 but it's used by Arduino.
-CXXEXFLAGS += -DF_CPU=16000000L
