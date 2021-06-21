@@ -235,8 +235,17 @@ static event_t _tx_finish_ev = {
 
 static void _send(iolist_t *pkt)
 {
-    /* Request a state change to RX_ON */
-    ieee802154_radio_request_set_trx_state(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), IEEE802154_TRX_STATE_TX_ON);
+    /* Request a state change to TX_ON */
+    int res;
+    do {
+        res = ieee802154_radio_request_set_trx_state(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), IEEE802154_TRX_STATE_TX_ON);
+    }
+    while(res == -EBUSY);
+
+    if (res < 0) {
+        puts("Couldn't send frame");
+        return;
+    }
 
     /* Write the packet to the radio */
     ieee802154_radio_write(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), pkt);
