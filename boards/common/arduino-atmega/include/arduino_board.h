@@ -170,6 +170,22 @@ static const arduino_pwm_t arduino_pwm_list[] = {
 #endif
 };
 
+/**
+ * @brief F_CPU defines the CPU frequency in Hz.
+ *
+ * This is used in AVR's libc delay.h and setbaud.h
+ *
+ * In RIOT delay() has a different implementation using ztimer, and F_CPU is
+ * already defined when using setbaud.h (see cpu/atmega_common/periph/uart.c)
+ *
+ * However Arduino libraries and sketches may expect F_CPU to be defined and
+ * fail otherwise (for example the Arduino SDI-12 package expects this, for AVR
+ * cpus). For this reason we define F_CPU here, if not already defined.
+ */
+#ifndef F_CPU
+#define F_CPU CLOCK_CORECLOCK
+#endif
+
 #ifdef __cplusplus
 }
 #endif
