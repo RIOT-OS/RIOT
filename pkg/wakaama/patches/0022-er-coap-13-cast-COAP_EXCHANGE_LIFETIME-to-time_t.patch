@@ -1,0 +1,25 @@
+From 92a5ae1f4289715546340ffcb31ac24e94a33efa Mon Sep 17 00:00:00 2001
+From: Leandro Lanzieri <leandro.lanzieri@haw-hamburg.de>
+Date: Thu, 25 Mar 2021 13:12:49 +0100
+Subject: [PATCH] er-coap-13: cast COAP_EXCHANGE_LIFETIME to time_t
+
+---
+ core/er-coap-13/er-coap-13.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/core/er-coap-13/er-coap-13.h b/core/er-coap-13/er-coap-13.h
+index 495f49e..21af2af 100644
+--- a/core/er-coap-13/er-coap-13.h
++++ b/core/er-coap-13/er-coap-13.h
+@@ -62,7 +62,7 @@
+ 
+ #define COAP_MAX_TRANSMIT_WAIT               ((COAP_RESPONSE_TIMEOUT * ( (1 << (COAP_MAX_RETRANSMIT + 1) ) - 1) * COAP_ACK_RANDOM_FACTOR))
+ #define COAP_MAX_TRANSMIT_SPAN               ((COAP_RESPONSE_TIMEOUT * ( (1 << COAP_MAX_RETRANSMIT) - 1) * COAP_ACK_RANDOM_FACTOR))
+-#define COAP_EXCHANGE_LIFETIME               (COAP_MAX_TRANSMIT_SPAN + (2 * COAP_MAX_LATENCY) + COAP_PROCESSING_DELAY)
++#define COAP_EXCHANGE_LIFETIME               (time_t)(COAP_MAX_TRANSMIT_SPAN + (2 * COAP_MAX_LATENCY) + COAP_PROCESSING_DELAY)
+ 
+ #define COAP_HEADER_LEN                      4 /* | version:0x03 type:0x0C tkl:0xF0 | code | mid:0x00FF | mid:0xFF00 | */
+ #define COAP_ETAG_LEN                        8 /* The maximum number of bytes for the ETag */
+-- 
+2.31.0
+

@@ -1,0 +1,29 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "Application configuration"
+
+config LWM2M_SERVER_URI
+    string "LwM2M Server URI to register/bootstrap with"
+    default "coap://[fd00:dead:beef::1]"
+    help
+        The host part of the URI MUST be a valid IPv6 address.
+
+config LWM2M_SERVER_SHORT_ID
+    int "Server Short ID"
+    default 1
+    range 1 65534
+
+config PSK_ID
+    string "PSK Identity"
+    default "Client_Identity"
+
+config PSK_KEY
+    string "PSK Key"
+    default "ThisIsRIOT!"
+
+endmenu # Application configuration

@@ -48,4 +48,10 @@ config DTLS_HANDSHAKE_MAX
     help
         The maximum number of concurrent DTLS handshakes.
 
+config DTLS_MAX_BUF
+    int "Maximum send buffer size"
+    default 128
+    help
+        The maximum buffer size for sending records.
+
 endif # KCONFIG_USEPKG_TINYDTLS

@@ -128,6 +128,19 @@ int16_t netif_get_id(const netif_t *netif);
 netif_t *netif_get_by_name(const char *name);
 
 /**
+ * @brief   Gets interface by name, from a buffer
+ *
+ * @pre `name != NULL`
+ *
+ * @param[in] name          The name of an interface as an array of chars. Must not be `NULL`.
+ * @param[in] name_len      Length of @p name.
+ *
+ * @return  Pointer to the interface that matches the name
+ * @retval  NULL if no interface is named @p name.
+ */
+netif_t *netif_get_by_name_buffer(const char *name, size_t name_len);
+
+/**
  * @brief   Gets interface by a numeric identifier.
  *
  * @param[in] id  A numeric identifier.

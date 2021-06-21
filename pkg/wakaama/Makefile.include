@@ -18,3 +18,4 @@ ifneq (,$(or $(CONFIG_LWM2M_WITH_LOGS),$(filter -DCONFIG_LWM2M_WITH_LOGS=1,$(CFL
 endif
 
 PSEUDOMODULES += wakaama
+PSEUDOMODULES += wakaama_client_dtls

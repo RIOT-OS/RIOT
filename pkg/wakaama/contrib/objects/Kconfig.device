@@ -1,0 +1,68 @@
+# Copyright (c) 2021 HAW Hamburg
+#
+# This file is subject to the terms and conditions of the GNU Lesser
+# General Public License v2.1. See the file LICENSE in the top level
+# directory for more details.
+#
+
+menu "Device"
+
+choice
+    bool "Device binding and queue mode"
+    default LWM2M_DEVICE_BINDING_U
+
+config LWM2M_DEVICE_BINDING_U
+    bool "UDP"
+
+config LWM2M_DEVICE_BINDING_UQ
+    bool "UDP with Queue mode"
+
+config LWM2M_DEVICE_BINDING_S
+    bool "SMS"
+
+config LWM2M_DEVICE_BINDING_SQ
+    bool "SMS with Queue mode"
+
+config LWM2M_DEVICE_BINDING_US
+    bool "UDP and SMS"
+
+config LWM2M_DEVICE_BINDING_UQS
+    bool "UDP with Queue mode and SMS"
+
+endchoice
+
+config LWM2M_DEVICE_NAME
+    string "Device name"
+    default "testRIOTDevice"
+    help
+        This is the device name used to register at the LwM2M server.
+
+config LWM2M_DEVICE_MANUFACTURER
+    string "Device manufacturer"
+    default "A RIOT maker"
+
+config LWM2M_DEVICE_MODEL
+    string "Device model"
+    default "$(BOARD)"
+
+config LWM2M_DEVICE_TYPE
+    string "Device type"
+    default "RIOT device"
+
+config LWM2M_DEVICE_SERIAL
+    string "Device serial number"
+    default "undefined"
+
+config LWM2M_DEVICE_FW_VERSION
+    string "Device firmware version"
+    default ""
+
+config LWM2M_DEVICE_HW_VERSION
+    string "Device hardware version"
+    default "$(BOARD)"
+
+config LWM2M_DEVICE_SW_VERSION
+    string "Device software version"
+    default ""
+
+endmenu # Device
