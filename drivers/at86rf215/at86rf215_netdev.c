@@ -86,7 +86,7 @@ static uint8_t _get_best_match(const uint8_t *array, uint8_t len, uint8_t val)
 /* executed in the GPIO ISR context */
 static void _irq_handler(void *arg)
 {
-    netdev_t *netdev = (netdev_t *) arg;
+    netdev_t *netdev = arg;
 
     netdev->event_callback(netdev, NETDEV_EVENT_ISR);
 }
@@ -103,7 +103,8 @@ static inline void _put_sibling_to_sleep(at86rf215_t *dev) {
 static int _init(netdev_t *netdev)
 {
     int res;
-    at86rf215_t *dev = (at86rf215_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    at86rf215_t *dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
 
     /* don't call HW init for both radios */
     if (is_subGHz(dev) || dev->sibling == NULL) {
@@ -139,7 +140,8 @@ static int _init(netdev_t *netdev)
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    at86rf215_t *dev = (at86rf215_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    at86rf215_t *dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
     size_t len = 0;
 
     if (at86rf215_tx_prepare(dev)) {
@@ -174,7 +176,8 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    at86rf215_t *dev = (at86rf215_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    at86rf215_t *dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
     int16_t pkt_len;
 
     /* get the size of the received packet */
@@ -265,7 +268,8 @@ static netopt_state_t _get_state(at86rf215_t *dev)
 
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
-    at86rf215_t *dev = (at86rf215_t *) netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    at86rf215_t *dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
 
     if (netdev == NULL) {
         return -ENODEV;
@@ -360,8 +364,9 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
     int res;
 
-    if (((res = netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt, val,
-                                      max_len)) >= 0) || (res != -ENOTSUP)) {
+    if (((res = netdev_ieee802154_get(container_of(netdev, netdev_ieee802154_t, netdev),
+                                      opt, val, max_len)) >= 0)
+        || (res != -ENOTSUP)) {
         return res;
     }
 
@@ -488,7 +493,8 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 {
-    at86rf215_t *dev = (at86rf215_t *) netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    at86rf215_t *dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
     int res = -ENOTSUP;
 
     if (dev == NULL) {
@@ -813,7 +819,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     }
 
     if (res == -ENOTSUP) {
-        res = netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt, val, len);
+        res = netdev_ieee802154_set(container_of(netdev, netdev_ieee802154_t, netdev),
+                                    opt, val, len);
     }
 
     return res;
@@ -832,7 +839,7 @@ static void _enable_tx2rx(at86rf215_t *dev)
 
 static void _tx_end(at86rf215_t *dev, netdev_event_t event)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    netdev_t *netdev = &dev->netdev.netdev;
 
     /* listen to non-ACK packets again */
     if (dev->flags & AT86RF215_OPT_ACK_REQUESTED) {
@@ -960,7 +967,7 @@ static inline void _clear_sibling_irq(at86rf215_t *dev) {
 
 static void _handle_edc(at86rf215_t *dev)
 {
-    netdev_t *netdev = (netdev_t *) dev;
+    netdev_t *netdev = &dev->netdev.netdev;
 
     /* In CCATX mode this function is only triggered if busy */
     if (!(dev->flags & AT86RF215_OPT_CCATX)) {
@@ -996,7 +1003,8 @@ static void _handle_edc(at86rf215_t *dev)
 /* executed in the radio thread */
 static void _isr(netdev_t *netdev)
 {
-    at86rf215_t *dev = (at86rf215_t *) netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    at86rf215_t *dev = container_of(netdev_ieee802154, at86rf215_t, netdev);
     uint8_t bb_irq_mask, rf_irq_mask;
     uint8_t bb_irqs_enabled = BB_IRQ_RXFE | BB_IRQ_TXFE;
 
@@ -1035,7 +1043,7 @@ static void _isr(netdev_t *netdev)
     /* If the interrupt pin is still high, there was an IRQ on the other radio */
     if (gpio_read(dev->params.int_pin)) {
         if (dev->sibling && dev->sibling->state != AT86RF215_STATE_OFF) {
-            netdev->event_callback((netdev_t *) dev->sibling, NETDEV_EVENT_ISR);
+            netdev->event_callback(&dev->sibling->netdev.netdev, NETDEV_EVENT_ISR);
         } else {
             _clear_sibling_irq(dev);
         }
