@@ -35,7 +35,7 @@ static int send(int iface, le_uint16_t dst_pan, uint8_t *dst_addr,
 int ifconfig_list(int idx)
 {
     int res;
-    netdev_ieee802154_t *dev = (netdev_ieee802154_t *)(&devs[idx]);
+    netdev_ieee802154_t *dev = &devs[idx].netdev;
 
     int (*get)(netdev_t *, netopt_t, void *, size_t) = dev->netdev.driver->get;
     netopt_enable_t enable_val;
@@ -47,21 +47,21 @@ int ifconfig_list(int idx)
     print_addr(dev->long_addr, IEEE802154_LONG_ADDRESS_LEN);
     printf(", PAN: 0x%04x", dev->pan);
 
-    res = get((netdev_t *)dev, NETOPT_ADDR_LEN, &u16_val, sizeof(u16_val));
+    res = get(&dev->netdev, NETOPT_ADDR_LEN, &u16_val, sizeof(u16_val));
     if (res < 0) {
         puts("(err)");
         return 1;
     }
     printf("\n           Address length: %u", (unsigned)u16_val);
 
-    res = get((netdev_t *)dev, NETOPT_SRC_LEN, &u16_val, sizeof(u16_val));
+    res = get(&dev->netdev, NETOPT_SRC_LEN, &u16_val, sizeof(u16_val));
     if (res < 0) {
         puts("(err)");
         return 1;
     }
     printf(", Source address length: %u", (unsigned)u16_val);
 
-    res = get((netdev_t *)dev, NETOPT_MAX_PDU_SIZE, &u16_val,
+    res = get(&dev->netdev, NETOPT_MAX_PDU_SIZE, &u16_val,
               sizeof(u16_val));
     if (res < 0) {
         puts("(err)");
@@ -70,20 +70,20 @@ int ifconfig_list(int idx)
     printf(", Max.Payload: %u", (unsigned)u16_val);
     printf("\n           Channel: %u", dev->chan);
 
-    res = get((netdev_t *)dev, NETOPT_CHANNEL_PAGE, &u16_val, sizeof(u16_val));
+    res = get(&dev->netdev, NETOPT_CHANNEL_PAGE, &u16_val, sizeof(u16_val));
     if (res < 0) {
         puts("(err)");
         return 1;
     }
     printf(", Ch.page: %u", (unsigned)u16_val);
 
-    res = get((netdev_t *)dev, NETOPT_TX_POWER, &u16_val, sizeof(u16_val));
+    res = get(&dev->netdev, NETOPT_TX_POWER, &u16_val, sizeof(u16_val));
     if (res < 0) {
         puts("(err)");
         return 1;
     }
     printf(", TXPower: %d dBm", (int)u16_val);
-    res = get((netdev_t *)dev, NETOPT_IS_WIRED, &u16_val, sizeof(u16_val));
+    res = get(&dev->netdev, NETOPT_IS_WIRED, &u16_val, sizeof(u16_val));
     if (res < 0) {
         puts(", wireless");
     }
@@ -92,27 +92,27 @@ int ifconfig_list(int idx)
     }
 
     printf("         ");
-    res = get((netdev_t *)dev, NETOPT_PRELOADING, &enable_val,
+    res = get(&dev->netdev, NETOPT_PRELOADING, &enable_val,
               sizeof(netopt_enable_t));
     if ((res > 0) && (enable_val == NETOPT_ENABLE)) {
         printf("  PRELOAD");
     }
-    res = get((netdev_t *)dev, NETOPT_AUTOACK, &enable_val,
+    res = get(&dev->netdev, NETOPT_AUTOACK, &enable_val,
               sizeof(netopt_enable_t));
     if ((res > 0) && (enable_val == NETOPT_ENABLE)) {
         printf("  AUTOACK");
     }
-    res = get((netdev_t *)dev, NETOPT_RAWMODE, &enable_val,
+    res = get(&dev->netdev, NETOPT_RAWMODE, &enable_val,
               sizeof(netopt_enable_t));
     if ((res > 0) && (enable_val == NETOPT_ENABLE)) {
         printf("  RAW");
     }
-    res = get((netdev_t *)dev, NETOPT_AUTOCCA, &enable_val,
+    res = get(&dev->netdev, NETOPT_AUTOCCA, &enable_val,
               sizeof(netopt_enable_t));
     if ((res > 0) && (enable_val == NETOPT_ENABLE)) {
         printf("  AUTOCCA");
     }
-    res = get((netdev_t *)dev, NETOPT_CSMA, &enable_val,
+    res = get(&dev->netdev, NETOPT_CSMA, &enable_val,
               sizeof(netopt_enable_t));
     if ((res > 0) && (enable_val == NETOPT_ENABLE)) {
         printf("  CSMA");
@@ -258,7 +258,7 @@ static int send(int iface, le_uint16_t dst_pan, uint8_t *dst, size_t dst_len,
         .iol_len = strlen(data)
     };
 
-    dev = (netdev_ieee802154_t *)&devs[iface];
+    dev = &devs[iface].netdev;
     flags = (uint8_t)(dev->flags & NETDEV_IEEE802154_SEND_MASK);
     flags |= IEEE802154_FCF_TYPE_DATA;
     src_pan = byteorder_btols(byteorder_htons(dev->pan));
@@ -288,7 +288,7 @@ static int send(int iface, le_uint16_t dst_pan, uint8_t *dst, size_t dst_len,
         .iol_len = (size_t)res
     };
 
-    res = dev->netdev.driver->send((netdev_t *)dev, &iol_hdr);
+    res = dev->netdev.driver->send(&dev->netdev, &iol_hdr);
     if (res < 0) {
         puts("txtsnd: Error on sending");
         return 1;
