@@ -54,7 +54,8 @@ static netopt_state_t _get_submac_state(ieee802154_submac_t *submac)
 
 static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
 {
-    netdev_ieee802154_submac_t *netdev_submac = (netdev_ieee802154_submac_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    netdev_ieee802154_submac_t *netdev_submac = container_of(netdev_ieee802154, netdev_ieee802154_submac_t, dev);
     ieee802154_submac_t *submac = &netdev_submac->submac;
 
     switch (opt) {
@@ -74,7 +75,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             break;
     }
 
-    return netdev_ieee802154_get((netdev_ieee802154_t *)netdev, opt,
+    return netdev_ieee802154_get(container_of(netdev, netdev_ieee802154_t, netdev), opt,
                                  value, max_len);
 }
 
@@ -95,8 +96,10 @@ static int _set_submac_state(ieee802154_submac_t *submac, netopt_state_t state)
 static int _set(netdev_t *netdev, netopt_t opt, const void *value,
                 size_t value_len)
 {
-    netdev_ieee802154_submac_t *netdev_submac =
-        (netdev_ieee802154_submac_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    netdev_ieee802154_submac_t *netdev_submac = container_of(netdev_ieee802154,
+                                                             netdev_ieee802154_submac_t,
+                                                             dev);
     ieee802154_submac_t *submac = &netdev_submac->submac;
 
     int res;
@@ -128,8 +131,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *value,
         break;
     }
 
-    return netdev_ieee802154_set((netdev_ieee802154_t *)netdev, opt,
-                                 value, value_len);
+    return netdev_ieee802154_set(container_of(netdev, netdev_ieee802154_t, netdev),
+                                 opt, value, value_len);
 }
 
 void ieee802154_submac_ack_timer_set(ieee802154_submac_t *submac, uint16_t us)
@@ -152,16 +155,21 @@ void ieee802154_submac_ack_timer_cancel(ieee802154_submac_t *submac)
 
 static int _send(netdev_t *netdev, const iolist_t *pkt)
 {
-    netdev_ieee802154_submac_t *netdev_submac =
-        (netdev_ieee802154_submac_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    netdev_ieee802154_submac_t *netdev_submac = container_of(netdev_ieee802154,
+                                                             netdev_ieee802154_submac_t,
+                                                             dev);
+    ieee802154_submac_t *submac = &netdev_submac->submac;
 
-    return ieee802154_send(&netdev_submac->submac, pkt);
+    return ieee802154_send(submac, pkt);
 }
 
 static void _isr(netdev_t *netdev)
 {
-    netdev_ieee802154_submac_t *netdev_submac =
-        (netdev_ieee802154_submac_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    netdev_ieee802154_submac_t *netdev_submac = container_of(netdev_ieee802154,
+                                                             netdev_ieee802154_submac_t,
+                                                             dev);
     ieee802154_submac_t *submac = &netdev_submac->submac;
 
     do {
@@ -190,8 +198,10 @@ static void _isr(netdev_t *netdev)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    netdev_ieee802154_submac_t *netdev_submac =
-        (netdev_ieee802154_submac_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    netdev_ieee802154_submac_t *netdev_submac = container_of(netdev_ieee802154,
+                                                             netdev_ieee802154_submac_t,
+                                                             dev);
     ieee802154_submac_t *submac = &netdev_submac->submac;
     ieee802154_rx_info_t rx_info;
 
@@ -221,7 +231,7 @@ static void submac_tx_done(ieee802154_submac_t *submac, int status,
     netdev_ieee802154_submac_t *netdev_submac = container_of(submac,
                                                              netdev_ieee802154_submac_t,
                                                              submac);
-    netdev_t *netdev = (netdev_t *)netdev_submac;
+    netdev_t *netdev = &netdev_submac->dev.netdev;
 
     if (info) {
         netdev_submac->retrans = info->retrans;
@@ -250,7 +260,7 @@ static void submac_rx_done(ieee802154_submac_t *submac)
     netdev_ieee802154_submac_t *netdev_submac = container_of(submac,
                                                              netdev_ieee802154_submac_t,
                                                              submac);
-    netdev_t *netdev = (netdev_t *)netdev_submac;
+    netdev_t *netdev = &netdev_submac->dev.netdev;
 
     netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
@@ -267,7 +277,7 @@ static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
     netdev_ieee802154_submac_t *netdev_submac = container_of(submac,
                                                              netdev_ieee802154_submac_t,
                                                              submac);
-    netdev_t *netdev = (netdev_t *)netdev_submac;
+    netdev_t *netdev = &netdev_submac->dev.netdev;
 
     switch (status) {
     case IEEE802154_RADIO_CONFIRM_TX_DONE:
@@ -287,10 +297,11 @@ static void _hal_radio_cb(ieee802154_dev_t *dev, ieee802154_trx_ev_t status)
 
 static int _init(netdev_t *netdev)
 {
-    netdev_ieee802154_submac_t *netdev_submac =
-        (netdev_ieee802154_submac_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    netdev_ieee802154_submac_t *netdev_submac = container_of(netdev_ieee802154,
+                                                             netdev_ieee802154_submac_t,
+                                                             dev);
     ieee802154_submac_t *submac = &netdev_submac->submac;
-    netdev_ieee802154_t *netdev_ieee802154 = (netdev_ieee802154_t *)netdev;
     ieee802154_submac_init(submac, (network_uint16_t*) netdev_ieee802154->short_addr, (eui64_t*) netdev_ieee802154->long_addr);
 
     return 0;
@@ -299,7 +310,7 @@ static int _init(netdev_t *netdev)
 int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac,
                                   ieee802154_dev_t *dev)
 {
-    netdev_t *netdev = (netdev_t *)netdev_submac;
+    netdev_t *netdev = &netdev_submac->dev.netdev;
 
     netdev->driver = &netdev_submac_driver;
     ieee802154_submac_t *submac = &netdev_submac->submac;
@@ -314,7 +325,7 @@ int netdev_ieee802154_submac_init(netdev_ieee802154_submac_t *netdev_submac,
     netdev_submac->ack_timer.callback = _ack_timeout;
     netdev_submac->ack_timer.arg = netdev_submac;
 
-    netdev_ieee802154_t *netdev_ieee802154 = (netdev_ieee802154_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = &netdev_submac->dev;
 
     /* This function already sets the PAN ID to the default one */
     netdev_ieee802154_reset(netdev_ieee802154);
