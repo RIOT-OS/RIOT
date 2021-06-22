@@ -1,3 +1,9 @@
 INCLUDES += -I$(PKGDIRBASE)/lua
 INCLUDES += -I$(RIOTPKG)/lua/include
 DIRS += $(RIOTPKG)/lua/contrib
+
+# prevents this error:
+# lundump.c:237:33: error: adding 'int' to a string does not append to the string [-Werror,-Wstring-plus-int]
+#  checkliteral(S, LUA_SIGNATURE + 1, "not a");  /* 1st char already checked */
+#                  ~~~~~~~~~~~~~~^~~
+CFLAGS += -Wno-string-plus-int
