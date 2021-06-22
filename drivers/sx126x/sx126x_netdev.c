@@ -39,7 +39,7 @@ const uint8_t sx126x_max_sf = LORA_SF12;
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    sx126x_t *dev = (sx126x_t *)netdev;
+    sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
 
     netopt_state_t state;
 
@@ -78,10 +78,10 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
     DEBUG("[sx126x] netdev: read received data.\n");
 
-    sx126x_t *dev = (sx126x_t *)netdev;
+    sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
     uint8_t size = 0;
 
-    netdev_lora_rx_info_t *packet_info = (netdev_lora_rx_info_t *)info;
+    netdev_lora_rx_info_t *packet_info = info;
 
     if (packet_info) {
         sx126x_pkt_status_lora_t pkt_status;
@@ -111,7 +111,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _init(netdev_t *netdev)
 {
-    sx126x_t *dev = (sx126x_t *)netdev;
+    sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
 
     /* Launch initialization of driver and device */
     DEBUG("[sx126x] netdev: initializing driver...\n");
@@ -126,7 +126,7 @@ static int _init(netdev_t *netdev)
 
 static void _isr(netdev_t *netdev)
 {
-    sx126x_t *dev = (sx126x_t *)netdev;
+    sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
 
     sx126x_irq_mask_t irq_mask;
 
@@ -205,7 +205,7 @@ static int _get_state(sx126x_t *dev, void *val)
 static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
 {
     (void)max_len; /* unused when compiled without debug, assert empty */
-    sx126x_t *dev = (sx126x_t *)netdev;
+    sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
 
     if (dev == NULL) {
         return -ENODEV;
@@ -316,7 +316,7 @@ static int _set_state(sx126x_t *dev, netopt_state_t state)
 static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
 {
     (void)len; /* unused when compiled without debug, assert empty */
-    sx126x_t *dev = (sx126x_t *)netdev;
+    sx126x_t *dev = container_of(netdev, sx126x_t, netdev);
     int res = -ENOTSUP;
 
     if (dev == NULL) {
