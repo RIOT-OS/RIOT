@@ -111,7 +111,7 @@ static void _init_interface(void)
                            _get_netdev_addr_long);
     gnrc_netif_ieee802154_create(&_netif,
             _netif_stack, THREAD_STACKSIZE_DEFAULT, GNRC_NETIF_PRIO,
-            "dummy_netif", (netdev_t *)&_ieee802154_dev);
+            "dummy_netif", &_ieee802154_dev.netdev.netdev);
     ipv6_addr_t addr = IPV6_ADDR_UNSPECIFIED;
 
     /* fd01::01 */

@@ -318,7 +318,12 @@ static void _set_up(void)
 
 static void _tear_down(void)
 {
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev, NULL);
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test, NULL);
     mutex_unlock(&_target_buf_barrier);
     /* wait in case mutex in _mock_netdev_send was already entered */
     mutex_lock(&_target_buf_barrier);
@@ -455,7 +460,12 @@ static void test_minfwd_forward__success__1st_frag_sixlo(void)
     TEST_ASSERT_NOT_NULL((frag = gnrc_pktbuf_mark(pkt, sizeof(sixlowpan_frag_t),
                                                   GNRC_NETTYPE_SIXLOWPAN)));
     LL_DELETE(pkt, frag);
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT_EQUAL_INT(0, gnrc_sixlowpan_frag_minfwd_forward(pkt,
                                                                 frag->data,
@@ -490,7 +500,12 @@ static void test_minfwd_forward__success__1st_frag_iphc(void)
     TEST_ASSERT_NOT_NULL((frag = gnrc_pktbuf_mark(pkt, sizeof(sixlowpan_frag_t),
                                                   GNRC_NETTYPE_SIXLOWPAN)));
     LL_DELETE(pkt, frag);
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT_EQUAL_INT(0, gnrc_sixlowpan_frag_minfwd_forward(pkt,
                                                                 frag->data,
@@ -530,7 +545,12 @@ static void test_minfwd_forward__success__nth_frag_incomplete(void)
                                                   sizeof(sixlowpan_frag_n_t),
                                                   GNRC_NETTYPE_SIXLOWPAN)));
     LL_DELETE(pkt, frag);
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT_EQUAL_INT(0, gnrc_sixlowpan_frag_minfwd_forward(pkt,
                                                                 frag->data,
@@ -572,7 +592,12 @@ static void test_minfwd_forward__success__nth_frag_complete(void)
     LL_DELETE(pkt, frag);
     /* simulate current_size only missing the created fragment */
     vrbe->super.current_size = _vrbe_base.datagram_size;
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT_EQUAL_INT(0, gnrc_sixlowpan_frag_minfwd_forward(pkt,
                                                                 frag->data,
@@ -613,7 +638,12 @@ static void test_minfwd_forward__ENOMEM__netif_hdr_build_fail(void)
                                                   GNRC_NETTYPE_SIXLOWPAN)));
     LL_DELETE(pkt, frag);
 
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT_EQUAL_INT(-ENOMEM, gnrc_sixlowpan_frag_minfwd_forward(pkt,
                                                                       frag->data,
@@ -637,7 +667,12 @@ static void test_minfwd_frag_iphc__success(void)
     fbuf->datagram_size = TEST_SEND_DATAGRAM_SIZE;
     fbuf->tag = TEST_SEND_DATAGRAM_TAG;
 
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT_EQUAL_INT(
             0, gnrc_sixlowpan_frag_minfwd_frag_iphc(pkt,
@@ -677,7 +712,12 @@ static void test_minfwd_frag_iphc__no_frag(void)
     fbuf->datagram_size = TEST_SEND_FRAG1_PAYLOAD_SIZE;
     fbuf->tag = TEST_SEND_DATAGRAM_TAG;
 
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT_EQUAL_INT(
             -1, gnrc_sixlowpan_frag_minfwd_frag_iphc(pkt,
@@ -716,7 +756,12 @@ static void test_minfwd_frag_iphc__ll_dst(void)
     fbuf->datagram_size = TEST_SEND_FRAG1_PAYLOAD_SIZE;
     fbuf->tag = TEST_SEND_DATAGRAM_TAG;
 
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT_EQUAL_INT(
             -1, gnrc_sixlowpan_frag_minfwd_frag_iphc(pkt,
@@ -744,7 +789,12 @@ static void test_sixlo_recv__1st_frag_uncomp(void)
         );
     /* configure route to destination of IP header in frag */
     TEST_ASSERT_EQUAL_INT(0, _set_route_and_nce(&_rem_gb, REM_GB_PFX_LEN));
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
                                                  GNRC_NETREG_DEMUX_CTX_ALL,
@@ -807,7 +857,12 @@ static void test_sixlo_recv__1st_frag_uncomp__after_nth_frag(void)
         );
     /* configure route to destination of IP header in frag */
     TEST_ASSERT_EQUAL_INT(0, _set_route_and_nce(&_rem_gb, REM_GB_PFX_LEN));
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
                                                  GNRC_NETREG_DEMUX_CTX_ALL,
@@ -856,7 +911,12 @@ static void test_sixlo_recv__1st_frag_comp(void)
         );
     /* configure route to destination of IP header in frag */
     TEST_ASSERT_EQUAL_INT(0, _set_route_and_nce(&_rem_gb, REM_GB_PFX_LEN));
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
                                                  GNRC_NETREG_DEMUX_CTX_ALL,
@@ -906,7 +966,12 @@ static void test_sixlo_recv__1st_frag_comp__only_iphc(void)
         );
     /* configure route to destination of IP header in frag */
     TEST_ASSERT_EQUAL_INT(0, _set_route_and_nce(&_rem_gb, REM_GB_PFX_LEN));
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
                                                  GNRC_NETREG_DEMUX_CTX_ALL,
@@ -946,7 +1011,12 @@ static void test_sixlo_recv__1st_frag_comp__only_iphc_no_nhc(void)
         );
     /* configure route to destination of IP header in frag */
     TEST_ASSERT_EQUAL_INT(0, _set_route_and_nce(&_rem_gb, REM_GB_PFX_LEN));
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
                                                  GNRC_NETREG_DEMUX_CTX_ALL,
@@ -1084,7 +1154,12 @@ static void test_sixlo_recv__1st_frag_comp__after_nth_frag(void)
         );
     /* configure route to destination of IP header in frag */
     TEST_ASSERT_EQUAL_INT(0, _set_route_and_nce(&_rem_gb, REM_GB_PFX_LEN));
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
                                                  GNRC_NETREG_DEMUX_CTX_ALL,
@@ -1135,7 +1210,12 @@ static void test_sixlo_recv__nth_frag(void)
                                                 _rem_l2, sizeof(_rem_l2)))
         );
     vrbe->super.arrival = xtimer_now_usec();
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
                                                  GNRC_NETREG_DEMUX_CTX_ALL,
@@ -1176,7 +1256,12 @@ static void test_sixlo_recv__nth_frag__datagram_complete(void)
     /* simulate current_size only missing the created fragment */
     vrbe->super.current_size = _vrbe_base.datagram_size - TEST_NTH_FRAG_SIZE;
     vrbe->super.arrival = xtimer_now_usec();
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
                                                  GNRC_NETREG_DEMUX_CTX_ALL,
@@ -1208,7 +1293,12 @@ static void test_sixlo_recv__nth_frag__no_vrbe(void)
     TEST_ASSERT_NOT_NULL(
             (frag = _create_recv_frag(_test_nth_frag, sizeof(_test_nth_frag)))
         );
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
                                                  GNRC_NETREG_DEMUX_CTX_ALL,
@@ -1244,7 +1334,12 @@ static void test_sixlo_recv__nth_frag__duplicate(void)
                                                 _rem_l2, sizeof(_rem_l2)))
         );
     vrbe->super.arrival = xtimer_now_usec();
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
                                                  GNRC_NETREG_DEMUX_CTX_ALL,
@@ -1294,7 +1389,12 @@ static void test_sixlo_recv__nth_frag__overlap(void)
                                                 _rem_l2, sizeof(_rem_l2)))
         );
     vrbe->super.arrival = xtimer_now_usec();
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT(0 < gnrc_netapi_dispatch_receive(GNRC_NETTYPE_SIXLOWPAN,
                                                  GNRC_NETREG_DEMUX_CTX_ALL,
@@ -1334,7 +1434,12 @@ static void test_sixlo_send(void)
 
     TEST_ASSERT_NOT_NULL((pkt = _create_send_datagram(false, true)));
 
-    netdev_test_set_send_cb((netdev_test_t *)_mock_netif->dev,
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(_mock_netif->dev,
+                                                          netdev_ieee802154_t,
+                                                          netdev);
+    netdev_test_t *netdev_test = container_of(netdev_ieee802154, netdev_test_t,
+                                              netdev);
+    netdev_test_set_send_cb(netdev_test,
                             _mock_netdev_send);
     TEST_ASSERT(0 < gnrc_netapi_dispatch_send(GNRC_NETTYPE_SIXLOWPAN,
                                               GNRC_NETREG_DEMUX_CTX_ALL,
