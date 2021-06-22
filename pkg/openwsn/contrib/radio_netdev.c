@@ -79,7 +79,7 @@ static void _set_addr(void)
 int openwsn_radio_init(void *radio_dev)
 {
     assert(radio_dev);
-    netdev_t *netdev = (netdev_t *)radio_dev;
+    netdev_t *netdev = radio_dev;
 
     LOG_DEBUG("[openwsn/radio]: initialize riot-adaptation\n");
     openwsn_radio.dev = netdev;
