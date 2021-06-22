@@ -21,6 +21,7 @@
 #include "log.h"
 #include "slipdev.h"
 #include "slipdev_internal.h"
+#include "net/eui_provider.h"
 
 /* XXX: BE CAREFUL ABOUT USING OUTPUT WITH MODULE_SLIPDEV_STDIO IN SENDING
  * FUNCTIONALITY! MIGHT CAUSE DEADLOCK!!!1!! */
@@ -231,6 +232,12 @@ static int _get(netdev_t *netdev, netopt_t opt, void *value, size_t max_len)
             assert(max_len == sizeof(uint16_t));
             *((uint16_t *)value) = NETDEV_TYPE_SLIP;
             return sizeof(uint16_t);
+#if IS_USED(MODULE_SLIPDEV_L2ADDR)
+        case NETOPT_ADDRESS_LONG:
+            assert(max_len == sizeof(eui64_t));
+            netdev_eui64_get(netdev, value);
+            return sizeof(eui64_t);
+#endif
         default:
             return -ENOTSUP;
     }
@@ -245,12 +252,14 @@ static const netdev_driver_t slip_driver = {
     .set = netdev_set_notsup,
 };
 
-void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params)
+void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index)
 {
     /* set device descriptor fields */
     dev->config = *params;
     dev->state = 0;
     dev->netdev.driver = &slip_driver;
+
+    netdev_register(&dev->netdev, NETDEV_SLIPDEV, index);
 }
 
 /** @} */
