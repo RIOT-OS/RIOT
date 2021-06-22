@@ -118,7 +118,7 @@ static void _end_of_frame(ethos_t *dev)
             if (dev->framesize) {
                 assert(dev->last_framesize == 0);
                 dev->last_framesize = dev->framesize;
-                netdev_trigger_event_isr((netdev_t*) dev);
+                netdev_trigger_event_isr(&dev->netdev);
 
             }
             break;
@@ -187,14 +187,12 @@ static void ethos_isr(void *arg, uint8_t c)
 
 static void _isr(netdev_t *netdev)
 {
-    ethos_t *dev = (ethos_t *) netdev;
-    dev->netdev.event_callback((netdev_t*) dev, NETDEV_EVENT_RX_COMPLETE);
+    netdev->event_callback(netdev, NETDEV_EVENT_RX_COMPLETE);
 }
 
 static int _init(netdev_t *encdev)
 {
-    ethos_t *dev = (ethos_t *) encdev;
-    (void)dev;
+    (void)encdev;
     return 0;
 }
 
