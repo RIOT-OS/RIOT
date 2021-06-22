@@ -180,11 +180,12 @@ static void IRAM_ATTR esp_now_scan_peers_timer_cb(void* arg)
 {
     DEBUG("%s\n", __func__);
 
-    esp_now_netdev_t* dev = (esp_now_netdev_t*)arg;
+    netdev_t *netdev = arg;
+    esp_now_netdev_t *dev = container_of(netdev, esp_now_netdev_t, netdev);
 
     if (dev->netdev.event_callback) {
         dev->scan_event++;
-        netdev_trigger_event_isr((netdev_t*)dev);
+        netdev_trigger_event_isr(&dev->netdev);
     }
 }
 
@@ -245,7 +246,7 @@ static IRAM_ATTR void esp_now_recv_cb(const uint8_t *mac, const uint8_t *data, i
      * `NETDEV_EVENT_ISR` first. We can call the receive function directly.
      */
     if (_esp_now_dev.netdev.event_callback) {
-        _esp_now_dev.netdev.event_callback((netdev_t*)&_esp_now_dev,
+        _esp_now_dev.netdev.event_callback(&_esp_now_dev.netdev,
                                            NETDEV_EVENT_RX_COMPLETE);
     }
 
@@ -499,7 +500,7 @@ static int _send(netdev_t *netdev, const iolist_t *iolist)
     CHECK_PARAM_RET(iolist != NULL && iolist->iol_len == ESP_NOW_ADDR_LEN, -EINVAL);
     CHECK_PARAM_RET(iolist->iol_next != NULL, -EINVAL);
 
-    esp_now_netdev_t *dev = (esp_now_netdev_t*)netdev;
+    esp_now_netdev_t *dev = container_of(netdev, esp_now_netdev_t, netdev);
 
     mutex_lock(&dev->dev_lock);
 
@@ -574,7 +575,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     CHECK_PARAM_RET(netdev != NULL, -ENODEV);
 
-    esp_now_netdev_t* dev = (esp_now_netdev_t*)netdev;
+    esp_now_netdev_t *dev = container_of(netdev, esp_now_netdev_t, netdev);
 
     /* we store source mac address and received data in `buf` */
     uint16_t size = dev->rx_len ? ESP_NOW_ADDR_LEN + dev->rx_len : 0;
@@ -624,7 +625,7 @@ static int _get(netdev_t *netdev, netopt_t opt, void *val, size_t max_len)
     CHECK_PARAM_RET(netdev != NULL, -ENODEV);
     CHECK_PARAM_RET(val != NULL, -EINVAL);
 
-    esp_now_netdev_t *dev = (esp_now_netdev_t*)netdev;
+    esp_now_netdev_t *dev = container_of(netdev, esp_now_netdev_t, netdev);
     int res = -ENOTSUP;
 
     switch (opt) {
@@ -682,7 +683,7 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t max_len)
     CHECK_PARAM_RET(netdev != NULL, -ENODEV);
     CHECK_PARAM_RET(val != NULL, -EINVAL);
 
-    esp_now_netdev_t *dev = (esp_now_netdev_t *) netdev;
+    esp_now_netdev_t *dev = container_of(netdev, esp_now_netdev_t, netdev);
     int res = -ENOTSUP;
 
     switch (opt) {
@@ -723,7 +724,7 @@ static void _isr(netdev_t *netdev)
 
     CHECK_PARAM(netdev != NULL);
 
-    esp_now_netdev_t *dev = (esp_now_netdev_t*)netdev;
+    esp_now_netdev_t *dev = container_of(netdev, esp_now_netdev_t, netdev);
 
     critical_enter();
 
