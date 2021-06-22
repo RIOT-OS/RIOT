@@ -69,7 +69,10 @@ extern void nucleo_wl55jc_sx126x_set_rf_mode(sx126x_t *dev, sx126x_rf_mode_t rf_
 #define LED2_TOGGLE         (LED0_PORT->ODR  ^= LED2_MASK)
 /** @} */
 
-/* nucleo-wl55jc always use LED0, as there is no dual use of its pin */
+/**
+ * @brief   Nucleo-wl55jc always use LED0, as there is no dual use of its pin
+ * @{
+ */
 #ifndef AUTO_INIT_LED0
 #define AUTO_INIT_LED0
 #endif
