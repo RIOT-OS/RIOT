@@ -10,6 +10,7 @@
 : ${TEST_KCONFIG_BOARDS_AVAILABLE:="
 native
 samr21-xpro
+nucleo-f103rb
 "}
 
 : ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="
