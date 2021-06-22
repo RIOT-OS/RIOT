@@ -881,6 +881,7 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
                             const ndp_nbr_sol_t *nbr_sol, size_t icmpv6_len)
 {
     size_t tmp_len = icmpv6_len - sizeof(ndp_nbr_sol_t);
+    gnrc_netif_t *tgt_netif;
     int tgt_idx;
     ndp_opt_t *opt;
 
@@ -906,13 +907,23 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
               ipv6_addr_to_str(addr_str, &ipv6->dst, sizeof(addr_str)));
         return;
     }
-    /* check if target is assigned only now in case the length was wrong */
-    tgt_idx = gnrc_netif_ipv6_addr_idx(netif, &nbr_sol->tgt);
+
+    /* check if the address belongs to this host */
+    tgt_netif = gnrc_netif_get_by_ipv6_addr(&nbr_sol->tgt);
+
+    if (tgt_netif != NULL) {
+        /* check if target is assigned only now in case the length was wrong */
+        tgt_idx = gnrc_netif_ipv6_addr_idx(tgt_netif, &nbr_sol->tgt);
+    } else {
+        tgt_idx = -1;
+    }
+
     if (tgt_idx < 0) {
         DEBUG("nib: Target address %s is not assigned to the local interface\n",
               ipv6_addr_to_str(addr_str, &nbr_sol->tgt, sizeof(addr_str)));
         return;
     }
+
     /* pre-check option length */
     FOREACH_OPT(nbr_sol, opt, tmp_len) {
         if (tmp_len > icmpv6_len) {
@@ -934,19 +945,16 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
     DEBUG("     - Destination address: %s\n",
           ipv6_addr_to_str(addr_str, &ipv6->dst, sizeof(addr_str)));
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC)
-    gnrc_netif_t *tgt_netif = gnrc_netif_get_by_ipv6_addr(&nbr_sol->tgt);
 
     if (tgt_netif != NULL) {
-        int idx;
-
         gnrc_netif_acquire(tgt_netif);
-        idx = gnrc_netif_ipv6_addr_idx(tgt_netif, &nbr_sol->tgt);
+        tgt_idx = gnrc_netif_ipv6_addr_idx(tgt_netif, &nbr_sol->tgt);
         /* if idx < 0:
          * nbr_sol->tgt was removed between getting tgt_netif by nbr_sol->tgt
          * and gnrc_netif_acquire(tgt_netif). This is like `tgt_netif` would
          * have been NULL in the first place so just continue as if it would
          * have. */
-        if ((idx >= 0) && gnrc_netif_ipv6_addr_dad_trans(tgt_netif, idx)) {
+        if ((tgt_idx >= 0) && gnrc_netif_ipv6_addr_dad_trans(tgt_netif, tgt_idx)) {
             if (!ipv6_addr_is_unspecified(&ipv6->src)) {
                 /* (see https://tools.ietf.org/html/rfc4862#section-5.4.3) */
                 DEBUG("nib: Neighbor is performing AR, but target address is "
@@ -956,7 +964,7 @@ static void _handle_nbr_sol(gnrc_netif_t *netif, const ipv6_hdr_t *ipv6,
             }
             /* cancel validation timer */
             evtimer_del(&_nib_evtimer,
-                        &tgt_netif->ipv6.addrs_timers[idx].event);
+                        &tgt_netif->ipv6.addrs_timers[tgt_idx].event);
             /* _remove_tentative_addr() context switches to `tgt_netif->pid` so
              * release `tgt_netif`. We are done here anyway. */
             gnrc_netif_release(tgt_netif);
