@@ -310,7 +310,7 @@ static int stm32_eth_get(netdev_t *dev, netopt_t opt,
 
 static void _timer_cb(void *arg)
 {
-    netdev_t *dev = (netdev_t *)arg;
+    netdev_t *dev = arg;
     uint8_t state = LINK_STATE_DOWN;
     if (_get_link_status()) {
         state = LINK_STATE_UP;
