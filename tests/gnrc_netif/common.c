@@ -27,8 +27,8 @@
 
 static netdev_test_t _devs[NETIF_NUMOF];
 
-netdev_t *ethernet_dev = (netdev_t *)&_devs[0];
-netdev_t *ieee802154_dev = (netdev_t *)&_devs[1];
+netdev_t *ethernet_dev = &_devs[DEV_ETHERNET].netdev.netdev;
+netdev_t *ieee802154_dev = &_devs[DEV_IEEE802154].netdev.netdev;
 netdev_t *devs[DEFAULT_DEVS_NUMOF];
 
 #define MSG_QUEUE_SIZE  (8)
@@ -116,7 +116,8 @@ static int _get_netdev_device_type(netdev_t *netdev, void *value, size_t max_len
     expect(max_len == sizeof(uint16_t));
     (void)max_len;
 
-    netdev_test_t *dev = (netdev_test_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    netdev_test_t *dev = container_of(netdev_ieee802154, netdev_test_t, netdev);
 
     if (dev->state == 0x0) {
         *((uint16_t *)value) = NETDEV_TYPE_ETHERNET;
@@ -143,7 +144,8 @@ static int _get_netdev_max_packet_size(netdev_t *netdev, void *value, size_t max
     expect(max_len == sizeof(uint16_t));
     (void)max_len;
 
-    netdev_test_t *dev = (netdev_test_t *)netdev;
+    netdev_ieee802154_t *netdev_ieee802154 = container_of(netdev, netdev_ieee802154_t, netdev);
+    netdev_test_t *dev = container_of(netdev_ieee802154, netdev_test_t, netdev);
 
     if (dev->state == 0x0) {
         *((uint16_t *)value) = ETHERNET_DATA_LEN;
@@ -161,26 +163,26 @@ static int _get_netdev_max_packet_size(netdev_t *netdev, void *value, size_t max
 void _tests_init(void)
 {
     msg_init_queue(_main_msg_queue, MSG_QUEUE_SIZE);
-    netdev_test_setup((netdev_test_t *)ethernet_dev, 0);
-    netdev_test_set_send_cb((netdev_test_t *)ethernet_dev, _dump_send_packet);
-    netdev_test_set_recv_cb((netdev_test_t *)ethernet_dev, _netdev_recv);
-    netdev_test_set_isr_cb((netdev_test_t *)ethernet_dev, _netdev_isr);
-    netdev_test_set_get_cb((netdev_test_t *)ethernet_dev, NETOPT_DEVICE_TYPE,
+    netdev_test_setup(&_devs[DEV_ETHERNET], 0);
+    netdev_test_set_send_cb(&_devs[DEV_ETHERNET], _dump_send_packet);
+    netdev_test_set_recv_cb(&_devs[DEV_ETHERNET], _netdev_recv);
+    netdev_test_set_isr_cb(&_devs[DEV_ETHERNET], _netdev_isr);
+    netdev_test_set_get_cb(&_devs[DEV_ETHERNET], NETOPT_DEVICE_TYPE,
                            _get_netdev_device_type);
-    netdev_test_set_get_cb((netdev_test_t *)ethernet_dev, NETOPT_MAX_PDU_SIZE,
+    netdev_test_set_get_cb(&_devs[DEV_ETHERNET], NETOPT_MAX_PDU_SIZE,
                            _get_netdev_max_packet_size);
-    netdev_test_setup((netdev_test_t *)ieee802154_dev, (void *)1);
-    netdev_test_set_send_cb((netdev_test_t *)ieee802154_dev, _dump_send_packet);
-    netdev_test_set_recv_cb((netdev_test_t *)ieee802154_dev, _netdev_recv);
-    netdev_test_set_isr_cb((netdev_test_t *)ieee802154_dev, _netdev_isr);
-    netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev, NETOPT_DEVICE_TYPE,
+    netdev_test_setup(&_devs[DEV_IEEE802154], (void *)1);
+    netdev_test_set_send_cb(&_devs[DEV_IEEE802154], _dump_send_packet);
+    netdev_test_set_recv_cb(&_devs[DEV_IEEE802154], _netdev_recv);
+    netdev_test_set_isr_cb(&_devs[DEV_IEEE802154], _netdev_isr);
+    netdev_test_set_get_cb(&_devs[DEV_IEEE802154], NETOPT_DEVICE_TYPE,
                            _get_netdev_device_type);
-    netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev, NETOPT_PROTO,
+    netdev_test_set_get_cb(&_devs[DEV_IEEE802154], NETOPT_PROTO,
                            _get_netdev_proto);
-    netdev_test_set_get_cb((netdev_test_t *)ieee802154_dev,
+    netdev_test_set_get_cb(&_devs[DEV_IEEE802154],
                            NETOPT_MAX_PDU_SIZE, _get_netdev_max_packet_size);
     for (intptr_t i = SPECIAL_DEVS; i < NETIF_NUMOF; i++) {
-        devs[i - SPECIAL_DEVS] = (netdev_t *)&_devs[i];
+        devs[i - SPECIAL_DEVS] = &_devs[i].netdev.netdev;
         netdev_test_setup(&_devs[i], (void *)i);
         netdev_test_set_get_cb(&_devs[i], NETOPT_DEVICE_TYPE,
                                _get_netdev_device_type);

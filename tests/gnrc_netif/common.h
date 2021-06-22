@@ -29,6 +29,8 @@ extern "C" {
 #define NETIF_NUMOF         (4)
 #define SPECIAL_DEVS        (2)
 #define DEFAULT_DEVS_NUMOF  (NETIF_NUMOF - SPECIAL_DEVS)
+#define DEV_ETHERNET   0
+#define DEV_IEEE802154 1
 
 #define GP1 (0x20U)
 #define GP2 (0x01U)
