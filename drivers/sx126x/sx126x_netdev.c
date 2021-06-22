@@ -108,7 +108,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
     sx126x_read_buffer(dev, rx_buffer_status.buffer_start_pointer, buf, size);
 
-    return 0;
+    return size;
 }
 
 static int _init(netdev_t *netdev)
