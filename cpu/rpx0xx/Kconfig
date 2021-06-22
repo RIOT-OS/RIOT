@@ -11,6 +11,8 @@ config CPU_FAM_RPX0XX
     select HAS_CPU_RPX0XX
     select HAS_PERIPH_GPIO
     select HAS_PERIPH_GPIO_IRQ
+    select HAS_PERIPH_UART_MODECFG
+    select HAS_PERIPH_UART_RECONFIGURE
 
 config CPU_FAM
     default "RPX0XX" if CPU_FAM_RPX0XX

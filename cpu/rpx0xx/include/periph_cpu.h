@@ -391,6 +391,16 @@ typedef struct {
 /** @} */
 
 /**
+ * @brief   Configuration details for an UART interface needed by the RPX0XX peripheral
+ */
+typedef struct {
+    UART0_Type *dev;    /**< Base address of the I/O registers of the device */
+    gpio_t rx_pin;      /**< GPIO pin to use for RX */
+    gpio_t tx_pin;      /**< GPIO pin to use for TX */
+    IRQn_Type irqn;     /**< IRQ number of the UART interface */
+} uart_conf_t;
+
+/**
  * @brief   Get the PAD control register for the given GPIO pin as word
  *
  * Note: Only perform 32-bit writes to I/O registers.
