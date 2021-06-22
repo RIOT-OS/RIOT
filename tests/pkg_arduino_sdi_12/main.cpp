@@ -21,7 +21,7 @@
 #include <SDI12.h>
 
 #ifndef SDI12_DATA_PIN
-#define SDI12_DATA_PIN 5
+#define SDI12_DATA_PIN 13
 #endif
 
 SDI12 sdi12(SDI12_DATA_PIN);
