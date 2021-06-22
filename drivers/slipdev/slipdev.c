@@ -67,7 +67,7 @@ static void _slip_rx_cb(void *arg, uint8_t byte)
 check_end:
     if (byte == SLIPDEV_END) {
         if (dev->state == SLIPDEV_STATE_NET) {
-            netdev_trigger_event_isr((netdev_t*) dev);
+            netdev_trigger_event_isr(&dev->netdev);
         }
         dev->state = SLIPDEV_STATE_NONE;
     }
