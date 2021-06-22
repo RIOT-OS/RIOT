@@ -3,6 +3,5 @@
 FLASHFILE = $(ELFFILE)
 
 # For Raspberry Pi Pico the ROM (Flash) is part of the board and not embedded in the rp2040 chip.
-#ROM_OFFSET = 0x100 # First 256 byte for stage2 bootloader.
 ROM_LEN = 0x200000 # 2MB.
 ROM_START_ADDR = 0x10000000 # Flash XIP address.

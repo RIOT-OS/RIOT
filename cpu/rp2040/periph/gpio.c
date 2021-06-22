@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 
+#include "assert.h"
 #include "periph_cpu.h"
 #include "periph_conf.h"
 #include "periph/gpio.h"
@@ -31,12 +32,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     uint32_t reg_ctrl;
     uint32_t reg_pad_ctrl;
 
-    if ((pin & 0xffffff00) != IO_BANK0_BASE) {
-        return -1;
-    }
-
-
-
+    assert(((pin >> 8) == GPIO_BANK_USER));
 
     resets_hw->reset &= ~RESETS_RESET_IO_BANK0_BITS;
     resets_hw->reset &= ~RESETS_RESET_PADS_BANK0_BITS;
@@ -49,10 +45,7 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
         ;
     }
 
-
-
-
-    idx_pin = (pin & 0x000000ff);
+    idx_pin = (pin & 0x00ff);
 
     reg_ctrl = iobank0_hw->io[idx_pin].ctrl;
     reg_pad_ctrl = padsbank0_hw->io[idx_pin];
@@ -97,11 +90,9 @@ void gpio_set(gpio_t pin)
     uint32_t idx_pin;
     uint32_t reg_ctrl;
 
-    if ((pin & 0xffffff00) != IO_BANK0_BASE) {
-        return;
-    }
+    assert(((pin >> 8) == GPIO_BANK_USER));
 
-    idx_pin = (pin & 0x000000ff);
+    idx_pin = (pin & 0x00ff);
 
     reg_ctrl = iobank0_hw->io[idx_pin].ctrl;
 
@@ -118,11 +109,9 @@ void gpio_clear(gpio_t pin)
     uint32_t idx_pin;
     uint32_t reg_ctrl;
 
-    if ((pin & 0xffffff00) != IO_BANK0_BASE) {
-        return;
-    }
+    assert(((pin >> 8) == GPIO_BANK_USER));
 
-    idx_pin = (pin & 0x000000ff);
+    idx_pin = (pin & 0x00ff);
 
     reg_ctrl = iobank0_hw->io[idx_pin].ctrl;
 

@@ -50,26 +50,28 @@ etc
 #define CLK_REF_XTAL (1)
 
 #define NUM_UART ((unsigned int) 2)
+#define NUM_TIMER ((unsigned int) 1) // One timer with four channels.
+#define NUM_TIMER_CHANNEL ((unsigned int) 4) // One timer with four channels.
 
 #define STDIO_UART_DEV (0)
 #define STDIO_UART_BAUDRATE (115200U)
 
 static const uart_conf_t uart_config[] = {
     {
-        .stop_bits = 1,
-        .data_bits = 8,
-        .parity = false,
         .dev = uart0_hw,
-        .rx_pin = GPIO_PIN(GPIO_BANK_USER, 2),
-        .tx_pin = GPIO_PIN(GPIO_BANK_USER, 3),
+        .parity = UART_PARITY_NONE,
+        .stop_bits = UART_STOP_BITS_1,
+        .data_bits = UART_DATA_BITS_8,
+        .rx_pin = GPIO_PIN(GPIO_BANK_USER, 1),
+        .tx_pin = GPIO_PIN(GPIO_BANK_USER, 0),
     },
     {
-        .stop_bits = 1,
-        .data_bits = 8,
-        .parity = false,
         .dev = uart1_hw,
-        .rx_pin = GPIO_PIN(GPIO_BANK_USER, 4),
-        .tx_pin = GPIO_PIN(GPIO_BANK_USER, 5),
+        .parity = UART_PARITY_NONE,
+        .stop_bits = UART_STOP_BITS_1,
+        .data_bits = UART_DATA_BITS_8,
+        .rx_pin = GPIO_PIN(GPIO_BANK_USER, 5),
+        .tx_pin = GPIO_PIN(GPIO_BANK_USER, 4),
     }
 };
 
