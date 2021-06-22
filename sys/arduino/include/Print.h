@@ -59,7 +59,7 @@ class Print
     }
 
     // default to zero, meaning "a single write may block"
-    // should be overriden by subclasses with buffering
+    // should be overridden by subclasses with buffering
     virtual int availableForWrite() { return 0; }
 
     size_t print(const __FlashStringHelper *);
