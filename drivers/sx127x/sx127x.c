@@ -75,7 +75,7 @@ static void sx127x_on_dio3_isr(void *arg);
 
 void sx127x_setup(sx127x_t *dev, const sx127x_params_t *params, uint8_t index)
 {
-    netdev_t *netdev = (netdev_t *)dev;
+    netdev_t *netdev = &dev->netdev;
 
     netdev->driver = &sx127x_driver;
     dev->params = *params;
@@ -234,27 +234,27 @@ void sx127x_isr(netdev_t *dev)
 static void sx127x_on_dio_isr(sx127x_t *dev, sx127x_flags_t flag)
 {
     dev->irq |= flag;
-    sx127x_isr((netdev_t *)dev);
+    sx127x_isr(&dev->netdev);
 }
 
 static void sx127x_on_dio0_isr(void *arg)
 {
-    sx127x_on_dio_isr((sx127x_t *)arg, SX127X_IRQ_DIO0);
+    sx127x_on_dio_isr(arg, SX127X_IRQ_DIO0);
 }
 
 static void sx127x_on_dio1_isr(void *arg)
 {
-    sx127x_on_dio_isr((sx127x_t *)arg, SX127X_IRQ_DIO1);
+    sx127x_on_dio_isr(arg, SX127X_IRQ_DIO1);
 }
 
 static void sx127x_on_dio2_isr(void *arg)
 {
-    sx127x_on_dio_isr((sx127x_t *)arg, SX127X_IRQ_DIO2);
+    sx127x_on_dio_isr(arg, SX127X_IRQ_DIO2);
 }
 
 static void sx127x_on_dio3_isr(void *arg)
 {
-    sx127x_on_dio_isr((sx127x_t *)arg, SX127X_IRQ_DIO3);
+    sx127x_on_dio_isr(arg, SX127X_IRQ_DIO3);
 }
 
 /* Internal event handlers */
@@ -316,14 +316,14 @@ static int _init_gpios(sx127x_t *dev)
 
 static void _on_tx_timeout(void *arg)
 {
-    netdev_t *dev = (netdev_t *)arg;
+    netdev_t *dev = arg;
 
     dev->event_callback(dev, NETDEV_EVENT_TX_TIMEOUT);
 }
 
 static void _on_rx_timeout(void *arg)
 {
-    netdev_t *dev = (netdev_t *)arg;
+    netdev_t *dev = arg;
 
     dev->event_callback(dev, NETDEV_EVENT_RX_TIMEOUT);
 }
