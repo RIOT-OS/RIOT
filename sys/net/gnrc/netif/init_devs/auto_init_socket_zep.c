@@ -50,7 +50,7 @@ void auto_init_socket_zep(void)
         gnrc_netif_ieee802154_create(&_netif[i], _socket_zep_stacks[i],
                                      SOCKET_ZEP_MAC_STACKSIZE,
                                      SOCKET_ZEP_MAC_PRIO, "socket_zep",
-                                     (netdev_t *)&_socket_zeps[i]);
+                                     &_socket_zeps[i].netdev.netdev);
     }
 }
 /** @} */

@@ -60,7 +60,7 @@ void auto_init_cc2420(void)
         cc2420_setup(&cc2420_devs[i], &cc2420_params[i], i);
         gnrc_netif_ieee802154_create(&_netif[i], _cc2420_stacks[i], CC2420_MAC_STACKSIZE,
                                      CC2420_MAC_PRIO, "cc2420",
-                                     (netdev_t *)&cc2420_devs[i]);
+                                     &cc2420_devs[i].netdev.netdev);
     }
 }
 /** @} */

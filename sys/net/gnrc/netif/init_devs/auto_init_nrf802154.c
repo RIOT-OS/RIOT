@@ -48,6 +48,6 @@ void auto_init_nrf802154(void)
     gnrc_netif_ieee802154_create(&_netif, _stack,
                                  NRF802154_MAC_STACKSIZE,
                                  NRF802154_MAC_PRIO, "nrf802154",
-                                 (netdev_t *)&nrf802154_dev);
+                                 &nrf802154_dev.netdev.dev.netdev);
 }
 /** @} */
