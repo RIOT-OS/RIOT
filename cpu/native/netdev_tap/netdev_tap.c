@@ -71,25 +71,25 @@ static int _recv(netdev_t *netdev, void *buf, size_t n, void *info);
 
 static inline void _get_mac_addr(netdev_t *netdev, uint8_t *dst)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     memcpy(dst, dev->addr, ETHERNET_ADDR_LEN);
 }
 
 static inline void _set_mac_addr(netdev_t *netdev, const uint8_t *src)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     memcpy(dev->addr, src, ETHERNET_ADDR_LEN);
 }
 
 static inline int _get_promiscuous(netdev_t *netdev)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     return dev->promiscuous;
 }
 
 static inline int _set_promiscuous(netdev_t *netdev, int value)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     dev->promiscuous = value;
     return value;
 }
@@ -206,7 +206,7 @@ static void _continue_reading(netdev_tap_t *dev)
 
 static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
     (void)info;
 
     if (!buf) {
@@ -275,7 +275,7 @@ static int _recv(netdev_t *netdev, void *buf, size_t len, void *info)
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
 
     struct iovec iov[iolist_count(iolist)];
 
@@ -299,7 +299,8 @@ void netdev_tap_setup(netdev_tap_t *dev, const netdev_tap_params_t *params) {
 static void _tap_isr(int fd, void *arg) {
     (void) fd;
 
-    netdev_t *netdev = (netdev_t *)arg;
+    netdev_tap_t *dev = arg;
+    netdev_t *netdev = &dev->netdev;
 
     if (netdev->event_callback) {
         netdev_trigger_event_isr(netdev);
@@ -313,7 +314,7 @@ static int _init(netdev_t *netdev)
 {
     DEBUG("%s:%s:%u\n", RIOT_FILE_RELATIVE, __func__, __LINE__);
 
-    netdev_tap_t *dev = (netdev_tap_t*)netdev;
+    netdev_tap_t *dev = container_of(netdev, netdev_tap_t, netdev);
 
     /* check device parametrs */
     if (dev == NULL) {
