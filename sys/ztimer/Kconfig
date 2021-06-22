@@ -77,7 +77,7 @@ choice
     default ZTIMER_SEC_BACKEND_RTC if !BOARD_NATIVE && \
                                       !CPU_COMMON_SAM0 && \
                                       !CPU_COMMON_EFM32 && \
-                                      !CPU_COMMON_STM32F1
+                                      !CPU_FAM_F1
     default ZTIMER_SEC_BACKEND_RTT
 
 config ZTIMER_SEC_BACKEND_TIMER
