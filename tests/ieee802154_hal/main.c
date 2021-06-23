@@ -253,11 +253,13 @@ static void _tx_finish_handler(event_t *event)
 
     (void) event;
     /* The TX_DONE event indicates it's safe to call the confirm counterpart */
-    assert(ieee802154_radio_confirm_transmit(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), &tx_info) >= 0);
+    int res = ieee802154_radio_confirm_transmit(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), &tx_info);
+    assert(res >= 0);
 
-    if (!ieee802154_radio_has_irq_ack_timeout(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID)) && !ieee802154_radio_has_frame_retrans(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
-        /* This is just to show how the MAC layer would handle ACKs... */
-        _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
+    _set_trx_state(IEEE802154_TRX_STATE_RX_ON, false);
+    if (ack_request
+        && !ieee802154_radio_has_irq_ack_timeout(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))
+        && !ieee802154_radio_has_frame_retrans(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID))) {
         xtimer_set(&timer_ack, ACK_TIMEOUT_TIME);
     }
 
@@ -294,7 +296,10 @@ static void _send(iolist_t *pkt)
     while(ieee802154_radio_confirm_set_trx_state(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID)) == -EAGAIN);
 
     /* Trigger the transmit and wait for the mutex unlock (TX_DONE event) */
-    ieee802154_radio_set_frame_filter_mode(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), IEEE802154_FILTER_ACK_ONLY);
+    if (ack_request) {
+        ieee802154_radio_set_frame_filter_mode(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), IEEE802154_FILTER_ACK_ONLY);
+    }
+
     ieee802154_radio_request_transmit(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID));
     mutex_lock(&lock);
 
