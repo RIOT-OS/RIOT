@@ -10,3 +10,6 @@ ifneq (,$(filter periph_can,$(USEMODULE)))
 endif
 
 TOOLCHAINS_SUPPORTED = gnu llvm afl
+
+# Platform triple as used by Rust
+CARGO_TARGET = i686-unknown-linux-gnu
