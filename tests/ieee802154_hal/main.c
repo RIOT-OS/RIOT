@@ -739,7 +739,6 @@ static int send(uint8_t *dst, size_t dst_len, iolist_t *iol_data, size_t num, si
         _send(&iol_hdr);
         xtimer_msleep(time);
     }
-    ieee802154_dev_t *dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
     return 0;
 }
 
