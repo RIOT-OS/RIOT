@@ -392,7 +392,11 @@ int _cca(int argc, char **argv)
 static inline void _set_trx_state(int state, bool verbose)
 {
     xtimer_ticks32_t a;
-    int res = ieee802154_radio_request_set_trx_state(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), state);
+    int res;
+    do {
+        res = ieee802154_radio_request_set_trx_state(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), state);
+    }
+    while (res == -EBUSY);
     if (verbose) {
         a = xtimer_now();
         if(res != 0) {
