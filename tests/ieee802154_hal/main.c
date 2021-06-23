@@ -45,19 +45,19 @@
 #define RADIO_DEFAULT_ID (0U)
 
 static inline void _set_trx_state(int state, bool verbose);
-static int send(uint8_t *dst, size_t dst_len, iolist_t *iol_data, size_t num, size_t time, bool request_ack);
+static int send(uint8_t *dst, size_t dst_len, iolist_t *iol_data, size_t num, size_t time);
 
 static uint16_t received_acks;
 static uint16_t send_packets;
 static uint16_t received_packets;
 
 static uint8_t current_channel;
+static bool ack_request = true;
 
 static uint8_t buffer[127];
 static xtimer_t timer_ack;
 static mutex_t lock;
 static bool send_reply;
-static bool request_ack;
 
 static const char *str_states[3]= {"TRX_OFF", "RX", "TX"};
 static eui64_t ext_addr;
@@ -89,7 +89,7 @@ static void _handle_packet_riotctrl(void)
             int src_len = ieee802154_get_src(buffer, out, &tmp);
             iolist_t pkt;
             _populate_iolist(&pkt, &current_channel, sizeof(current_channel), NULL);
-            send(out, src_len, &pkt, 1, 0, request_ack);
+            send(out, src_len, &pkt, 1, 0);
         }
     }
 }
@@ -735,7 +735,7 @@ static int _caps_cmd(int argc, char **argv)
 
 uint8_t payload[] = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam ornare lacinia mi elementum interdum ligula.";
 
-static int send(uint8_t *dst, size_t dst_len, iolist_t *iol_data, size_t num, size_t time, bool request_ack)
+static int send(uint8_t *dst, size_t dst_len, iolist_t *iol_data, size_t num, size_t time)
 {
     uint8_t flags;
     uint8_t mhr[IEEE802154_MAX_HDR_LEN];
@@ -744,7 +744,7 @@ static int send(uint8_t *dst, size_t dst_len, iolist_t *iol_data, size_t num, si
     le_uint16_t src_pan, dst_pan;
 
     flags = IEEE802154_FCF_TYPE_DATA;
-    if (request_ack) {
+    if (ack_request) {
         flags |= IEEE802154_FCF_ACK_REQ;
     }
 
@@ -784,16 +784,15 @@ int txtsnd(int argc, char **argv)
     size_t res;
     size_t len;
 
-    if (argc != 4 || !(res = _parse_addr(addr, sizeof(addr), argv[1]))) {
-        puts("Usage: txtsnd <long_addr> <len> <request_ack>");
+    if (argc != 3 || !(res = _parse_addr(addr, sizeof(addr), argv[1]))) {
+        puts("Usage: txtsnd <long_addr> <len>");
         return 1;
     }
     len = atoi(argv[2]);
-    request_ack = atoi(argv[3]);
 
     iolist_t pkt;
     _populate_iolist(&pkt, payload, len, NULL);
-    return send(addr, res, &pkt, 1, 0, request_ack);
+    return send(addr, res, &pkt, 1, 0);
 }
 
 int txtspam(int argc, char **argv) {
@@ -803,19 +802,19 @@ int txtspam(int argc, char **argv) {
     size_t time;
     size_t len;
 
-    if (argc != 6 || !(res = _parse_addr(addr, sizeof(addr), argv[1]))) {
-        puts("Usage: txtspam <long_addr> <len> <number of packets> <time in ms between packets> <request_ack>");
+    if (argc != 5 || !(res = _parse_addr(addr, sizeof(addr), argv[1]))) {
+        puts("Usage: txtspam <long_addr> <len> <number of packets> <time in ms between packets>");
         return 1;
     }
     len = atoi(argv[2]);
     num = atoi(argv[3]);
     time = atoi(argv[4]);
-    request_ack = atoi(argv[5]);
+
     iolist_t payload_iotlist;
     _populate_iolist(&payload_iotlist, payload, len, NULL);
     iolist_t channel_iotlist;
     _populate_iolist(&channel_iotlist, &current_channel, sizeof(current_channel), &payload_iotlist);
-    res = send(addr, res, &channel_iotlist, num, time, request_ack);
+    res = send(addr, res, &channel_iotlist, num, time);
     ieee802154_dev_t *dev = ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID);
     puts("-------Summary of the test-------");
     printf("Send Packets: %d\n", send_packets);
@@ -875,6 +874,25 @@ int check_last_packet(int argc, char **argv) {
     return 0;
 }
 
+int ack_req_cmd(int argc, char **argv)
+{
+    if (argc != 2) {
+        printf("Usage: %s <en|dis>\n", argv[0]);
+        return 1;
+    }
+
+    if (strcmp(argv[1], "en") == 0) {
+        ack_request = true;
+        puts("Successfully enabled ACK Request");
+    }
+    else
+    {
+        ack_request = false;
+        puts("Successfully disabled ACK Request");
+    }
+
+    return 0;
+}
 
 static const shell_command_t shell_commands[] = {
     { "config_phy", "Set channel and TX power", config_phy},
@@ -886,6 +904,7 @@ static const shell_command_t shell_commands[] = {
     { "tx_mode", "Enable CSMA-CA, CCA or direct transmission", txmode_cmd },
     { "caps", "Get a list of caps supported by the device", _caps_cmd },
     { "txtsnd", "Send IEEE 802.15.4 packet", txtsnd },
+    { "ack_req", "Enable or disabled ACK Request", ack_req_cmd },
     { NULL, NULL, NULL }
 };
 
@@ -896,6 +915,7 @@ static const shell_command_t shell_commands_riotctrl[] = {
     { "txtspam", "Send multiple IEEE 802.15.4 packets", txtspam },
     { "reply", "Enable/Disable mirroring of each packet", reply_mode_cmd },
     { "check_last_packet", "Checks if the last packet received meets the criteria", check_last_packet },
+    { "ack_req", "Enable or disabled ACK Request", ack_req_cmd },
     { NULL, NULL, NULL }
 };
 
