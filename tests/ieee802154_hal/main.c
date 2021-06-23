@@ -76,7 +76,7 @@ static inline bool _recv_valid_ack(void)
     return buffer[0] & IEEE802154_FCF_TYPE_ACK && ((seq-1) == buffer[2]);
 }
 
-static void _handle_packet_riotctrl(void)
+static void _handle_packet_riotctrl(size_t size)
 {
     if (_recv_valid_ack()) {
         received_acks++;
@@ -87,8 +87,11 @@ static void _handle_packet_riotctrl(void)
             uint8_t out[IEEE802154_LONG_ADDRESS_LEN];
             le_uint16_t tmp;
             int src_len = ieee802154_get_src(buffer, out, &tmp);
+            size_t mhr_len = ieee802154_get_frame_hdr_len(buffer);
+            assert(mhr_len > 0);
             iolist_t pkt;
-            _populate_iolist(&pkt, &current_channel, sizeof(current_channel), NULL);
+            /* Reply with echo */
+            _populate_iolist(&pkt, &buffer[mhr_len], size - mhr_len, NULL);
             send(out, src_len, &pkt, 1, 0);
         }
     }
@@ -174,7 +177,7 @@ void _rx_done_handler(event_t *event)
     int size = ieee802154_radio_read(ieee802154_hal_test_get_dev(RADIO_DEFAULT_ID), buffer, 127, &info);
     if (size > 0) {
         if (IS_ACTIVE(RIOTCTRL)) {
-            _handle_packet_riotctrl();
+            _handle_packet_riotctrl(size);
         }
         else {
             _handle_packet(size, info.lqi, info.rssi);
