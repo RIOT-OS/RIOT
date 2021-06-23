@@ -839,18 +839,19 @@ int txtspam(int argc, char **argv) {
 
 int reply_mode_cmd(int argc, char **argv) {
     if (argc != 2) {
-        puts("Usage: reply <reply_mode>");
+        printf("Usage: %s <on|off>", argv[0]);
         return 1;
     }
-    uint8_t reply_mode = atoi(argv[1]);
 
-    if (reply_mode) {
+    if (strcmp(argv[1], "on") == 0) {
         send_reply = true;
         puts("Success: Packets are now mirrored");
-    } else {
+    }
+    else {
         send_reply = false;
         puts("Success: Packets are no longer mirrored");
     }
+
     return 0;
 }
 
@@ -887,11 +888,11 @@ int check_last_packet(int argc, char **argv) {
 int ack_req_cmd(int argc, char **argv)
 {
     if (argc != 2) {
-        printf("Usage: %s <en|dis>\n", argv[0]);
+        printf("Usage: %s <on|off>\n", argv[0]);
         return 1;
     }
 
-    if (strcmp(argv[1], "en") == 0) {
+    if (strcmp(argv[1], "on") == 0) {
         ack_request = true;
         puts("Successfully enabled ACK Request");
     }
