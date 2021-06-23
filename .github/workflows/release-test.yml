@@ -77,6 +77,12 @@ jobs:
         IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
         ssh -oStrictHostKeyChecking=accept-new \
           ${IOTLAB_USER}@saclay.iot-lab.info exit
+    - name: Fetch host key from IoT-LAB lille site
+      if: ${{ matrix.pytest_mark == 'iotlab_creds' }}
+      run: |
+        IOTLAB_USER=$(cat ~/.iotlabrc | cut -f1 -d:)
+        ssh -oStrictHostKeyChecking=accept-new \
+          ${IOTLAB_USER}@lille.iot-lab.info exit
     - name: Checkout Release-Specs
       uses: actions/checkout@v2
       with:
