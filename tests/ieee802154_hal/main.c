@@ -108,11 +108,12 @@ static void _handle_packet(size_t size, uint8_t lqi, int16_t rssi)
     }
 }
 
-static int print_phy(int argc, char **argv)
+static int print_info(int argc, char **argv)
 {
     (void) argc;
     (void) argv;
     uint8_t *_p = (uint8_t*) &ext_addr;
+    printf("Address: ");
     for(int i=0;i<8;i++) {
         printf("%02x", *_p++);
     }
@@ -896,7 +897,7 @@ int ack_req_cmd(int argc, char **argv)
 
 static const shell_command_t shell_commands[] = {
     { "config_phy", "Set channel and TX power", config_phy},
-    { "get_phy", "Print IEEE802.15.4 PHY Information", print_phy},
+    { "get_info", "Print IEEE802.15.4 Information", print_info},
     { "test_states", "Test state changes", _test_states },
     { "cca", "Perform CCA", _cca },
     { "config_cca", "Config CCA parameters", _config_cca_cmd },
@@ -910,7 +911,7 @@ static const shell_command_t shell_commands[] = {
 
 static const shell_command_t shell_commands_riotctrl[] = {
     { "config_phy", "Set channel and TX power", config_phy},
-    { "get_phy", "Print IEEE802.15.4 PHY Information", print_phy},
+    { "get_info", "Print IEEE802.15.4 Information", print_info},
     { "test_states", "Test state changes", _test_states },
     { "txtspam", "Send multiple IEEE 802.15.4 packets", txtspam },
     { "reply", "Enable/Disable mirroring of each packet", reply_mode_cmd },
