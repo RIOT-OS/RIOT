@@ -135,7 +135,7 @@ jobs:
         ${{ matrix.sudo }} \
           BUILD_IN_DOCKER=1 \
           DOCKER_MAKE_ARGS=${DOCKER_MAKE_ARGS} \
-          DOCKER_ENV_VARS=USEMODULE \
+          DOCKER_ENV_VARS="USEMODULE QUIETER" \
           GITHUB_REPOSITORY=${GITHUB_REPOSITORY} \
           GITHUB_RUN_ID=${GITHUB_RUN_ID} \
           GITHUB_SERVER_URL=${GITHUB_SERVER_URL} \
