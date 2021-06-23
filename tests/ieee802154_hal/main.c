@@ -824,9 +824,10 @@ int txtspam(int argc, char **argv) {
     printf("Send Packets: %d\n", send_packets);
     if (!(ieee802154_radio_has_frame_retrans(dev)) || ieee802154_radio_has_irq_ack_timeout(dev)) {
         printf("Acknowledged Packets: %d\n", received_acks);
-        printf("Percentage: %d\n", (received_acks * 100)/num);
+        printf("    Percentage: %d%%\n", (received_acks * 100)/num);
     }
     printf("Received Packets: %d\n", received_packets);
+    printf("    Percentage: %d%%\n", (received_packets * 100)/num);
     puts("---------------------------------");
     return res;
 }
