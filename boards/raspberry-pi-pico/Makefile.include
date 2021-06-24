@@ -1,6 +1,11 @@
-# write here the flasher tool and stdio configurations
+PROGRAMMER ?= picotool
+PROGRAMMERS_SUPPORTED += picotool
 
-FLASHFILE = $(ELFFILE)
+ifeq (picotool,$(PROGRAMMER))
+	FLASHER = picotool
+	FLASHFILE ?= $(ELFFILE)
+	FFLAGS = load -v -x $(FLASHFILE)
+endif
 
 # For Raspberry Pi Pico the ROM (Flash) is part of the board and not embedded in the rp2040 chip.
 ROM_LEN = 0x200000 # 2MB.
