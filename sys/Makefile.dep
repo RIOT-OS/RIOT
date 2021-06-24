@@ -102,6 +102,9 @@ ifneq (,$(filter dhcpv6_client,$(USEMODULE)))
   USEMODULE += event
   USEMODULE += random
   USEMODULE += xtimer
+  ifneq (,$(filter sock_dns,$(USEMODULE)))
+    USEMODULE += dhcpv6_client_dns
+  endif
 endif
 
 ifneq (,$(filter fuzzing,$(USEMODULE)))

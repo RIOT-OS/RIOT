@@ -173,6 +173,19 @@ typedef struct __attribute__((packed)) {
 } dhcpv6_opt_status_t;
 
 /**
+ * @brief   DHCPv6 DNS recursive name server option
+ * @see [RFC 3646, section 3]
+ *      (https://datatracker.ietf.org/doc/html/rfc3646#section-3)
+ * @note    Only parsed with `dhcpv6_client_dns` module compiled in.
+ */
+typedef struct __attribute__((packed)) {
+    network_uint16_t type;          /**< @ref DHCPV6_OPT_DNS_RNS */
+    network_uint16_t len;           /**< length of dhcpv6_opt_status_t::dns_rns in byte */
+    ipv6_addr_t dns_rns[];          /**< addresses of DNS recursive name servers
+                                     *   in order of preference */
+} dhcpv6_opt_dns_rns_t;
+
+/**
  * @brief   DHCPv6 identity association for prefix delegation option (IA_PD)
  *          format
  * @see [RFC 8415, section 21.21]
@@ -223,6 +236,17 @@ typedef struct __attribute__((packed)) {
     network_uint16_t len;   /**< length of the mud_string in octets. */
     char mud_string[];       /**< MUD URL using the "https" scheme */
 } dhcpv6_opt_mud_url_t;
+
+/**
+ * @brief   Configures a DNS recursive name server provided by the server.
+ *
+ * @note    Only available with module `dhcpv6_client_dns`.
+ *
+ * @param[in] opt       A legal DNS recursive name option.
+ * @param[in] netif     Network interface the message carrying @p opt came in.
+ */
+void dhcpv6_client_dns_rns_conf(const dhcpv6_opt_dns_rns_t *opt,
+                                uint16_t netif);
 
 #ifdef __cplusplus
 }
