@@ -246,6 +246,10 @@ PSEUDOMODULES += sx1261
 PSEUDOMODULES += sx1262
 PSEUDOMODULES += sx1268
 PSEUDOMODULES += llcc68
+PSEUDOMODULES += sx126x_stm32wl
+
+# include RF switch implemented in the board for use with sx126x
+PSEUDOMODULES += sx126x_rf_switch
 
 # include variants of SX127X drivers as pseudo modules
 PSEUDOMODULES += sx1272
