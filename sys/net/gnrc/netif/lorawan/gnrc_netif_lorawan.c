@@ -311,12 +311,15 @@ static int _send(gnrc_netif_t *netif, gnrc_pktsnip_t *payload)
         dst = gnrc_netif_hdr_get_dst_addr(netif_hdr);
 
         assert(payload->type == GNRC_NETTYPE_NETIF);
-        head = payload->next;
         port = dst[0];
 
         if (netif_hdr->dst_l2addr_len != sizeof(port)) {
             goto end;
         }
+
+        /* Remove the netif hdr snip and point to the MSDU */
+        head = gnrc_pktbuf_remove_snip(payload, payload);
+
     }
     else {
         head = payload;
