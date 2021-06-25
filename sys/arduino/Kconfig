@@ -16,8 +16,10 @@ menuconfig MODULE_ARDUINO
     imply MODULE_PERIPH_SPI
     depends on HAS_ARDUINO
     depends on HAS_PERIPH_GPIO
+    depends on HAS_CPP
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
+    select MODULE_CPP
     select MODULE_ARDUINO_SKETCHES
     select MODULE_FMT
     select MODULE_ZTIMER

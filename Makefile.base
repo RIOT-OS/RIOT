@@ -67,9 +67,14 @@ ifeq ($(strip $(ASSMSRC))$(NO_AUTO_SRC),)
   ASSMSRC := $(wildcard *.S)
 endif
 
+
 ifneq (,$(SRCXX))
-  ifeq (,$(filter cpp,$(FEATURES_USED)))
-    $(error Found C++ source, but feature "cpp" is not used. Add "FEATURES_REQUIRED += cpp")
+  ifeq (,$(filter cpp,$(USEMODULE)))
+    ifneq (1,$(TEST_KCONFIG))
+      $(error Found C++ source, but feature "cpp" is not used. Add "FEATURES_REQUIRED += cpp")
+    else
+      $(error Found C++ source, but "cpp" module is not used. Enable the MODULE_CPP in Kconfig)
+    endif
   endif
 endif
 
