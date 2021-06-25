@@ -65,6 +65,7 @@ extern "C" {
 #define DHCPV6_OPT_PREF             (7U)    /**< preference option */
 #define DHCPV6_OPT_ELAPSED_TIME     (8U)    /**< elapsed time option */
 #define DHCPV6_OPT_STATUS           (13U)   /**< status code option */
+#define DHCPV6_OPT_DNS_RNS          (23U)   /**< DNS recursive name server option */
 #define DHCPV6_OPT_IA_PD            (25U)   /**< identity association for prefix
                                              *   delegation (IA_PD) option */
 #define DHCPV6_OPT_IAPFX            (26U)   /**< IA prefix option */

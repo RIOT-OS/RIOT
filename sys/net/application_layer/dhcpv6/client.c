@@ -636,6 +636,12 @@ static bool _parse_reply(uint8_t *rep, size_t len)
     for (dhcpv6_opt_t *opt = (dhcpv6_opt_t *)(&rep[sizeof(dhcpv6_msg_t)]);
          len > 0; len -= _opt_len(opt), opt = _opt_next(opt)) {
         switch (byteorder_ntohs(opt->type)) {
+#if IS_USED(MODULE_DHCPV6_CLIENT_DNS)
+            case DHCPV6_OPT_DNS_RNS:
+                dhcpv6_client_dns_rns_conf((dhcpv6_opt_dns_rns_t *)opt,
+                                           remote.netif);
+                break;
+#endif  /* IS_USED(MODULE_DHCPV6_CLIENT_DNS) */
             case DHCPV6_OPT_IA_PD:
                 for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX; i++) {
                     dhcpv6_opt_iapfx_t *iapfx = NULL;
