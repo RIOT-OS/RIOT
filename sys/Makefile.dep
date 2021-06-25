@@ -6,8 +6,7 @@ ifneq (,$(filter arduino,$(USEMODULE)))
   FEATURES_REQUIRED += cpp
   FEATURES_REQUIRED += periph_gpio
   FEATURES_REQUIRED += periph_uart
-  SKETCH_MODULE ?= arduino_sketches
-  USEMODULE += $(SKETCH_MODULE)
+  USEMODULE += arduino_sketches
   USEMODULE += fmt
   USEMODULE += ztimer_usec
   USEMODULE += ztimer_msec

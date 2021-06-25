@@ -1,6 +1,7 @@
 # Add Arduino sketches to the application as a module
 
 SKETCHES = $(wildcard $(APPDIR)/*.sketch)
+SKETCH_MODULE = arduino_sketches
 
 ifneq (,$(SKETCHES))
   # Define application sketches module, it will be generated into $(BINDIR)
