@@ -11,5 +11,7 @@ INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2_common/hardw
 INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2040/hardware_regs/include
 INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2040/hardware_structs/include
 
+CFLAGS_OPT = -O0
+
 include $(RIOTCPU)/cortexm_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk

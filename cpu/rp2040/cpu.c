@@ -21,58 +21,96 @@
 #include "periph_cpu.h"
 #include "periph_conf.h"
 
-static void cpu_clock_init(void);
+static uint32_t c;
 
+static void cpu_clock_init(void);
+static uint32_t fc_clk(uint32_t clk);
+
+static uint32_t fc_clk(uint32_t clk) {
+    /*
+    /// \tag::frequency_count_khz[]
+    uint32_t frequency_count_khz(uint src) {
+        fc_hw_t *fc = &clocks_hw->fc0;
+
+        // If frequency counter is running need to wait for it. It runs even if the source is NULL
+        while(fc->status & CLOCKS_FC0_STATUS_RUNNING_BITS) {
+            tight_loop_contents();
+        }
+
+        // Set reference freq
+        fc->ref_khz = clock_get_hz(clk_ref) / 1000;
+
+        // FIXME: Don't pick random interval. Use best interval
+        fc->interval = 10;
+
+        // No min or max
+        fc->min_khz = 0;
+        fc->max_khz = 0xffffffff;
+
+        // Set SRC which automatically starts the measurement
+        fc->src = src;
+
+        while(!(fc->status & CLOCKS_FC0_STATUS_DONE_BITS)) {
+            tight_loop_contents();
+        }
+
+        // Return the result
+        return fc->result >> CLOCKS_FC0_RESULT_KHZ_LSB;
+    }
+    /// \end::frequency_count_khz[]
+    */
+
+    while(clocks_hw->fc0.status & CLOCKS_FC0_STATUS_RUNNING_BITS) {}
+
+    clocks_hw->fc0.ref_khz = 12000;
+
+    clocks_hw->fc0.interval = 10;
+
+    clocks_hw->fc0.min_khz = 0;
+    clocks_hw->fc0.max_khz = 0xffffffff;
+
+    clocks_hw->fc0.src = (clk << CLOCKS_FC0_SRC_LSB);
+
+    while(!(clocks_hw->fc0.status & CLOCKS_FC0_STATUS_DONE_BITS)) {}
+
+    c = (clocks_hw->fc0.result >> CLOCKS_FC0_RESULT_KHZ_LSB);
+
+    return c;
+}
 /**
  * @brief Configure the clock system
  */
 
-static void cpu_clock_init(void)
-{
-#if CLK_REF_XTAL
-uint32_t reg_v;
+static void cpu_clock_init(void) {
+    #if CLK_REF_XTAL
+        assert(CLK_XTAL_FREQ <= 15000000);
 
-reg_v = xosc_hw->startup;
+        xosc_hw->startup = ((CLK_XTAL_FREQ / 10000) + 128) / 256;
 
-// Set startup delay.
-#if (CLK_XTAL_FREQ == 12000000)
-reg_v &= ~XOSC_STARTUP_DELAY_BITS;
-reg_v |= (47 << XOSC_STARTUP_DELAY_LSB);
-#endif
+        xosc_hw->ctrl |=
+            ((XOSC_CTRL_ENABLE_VALUE_ENABLE << XOSC_CTRL_ENABLE_LSB) | XOSC_CTRL_FREQ_RANGE_VALUE_1_15MHZ);
 
-reg_v &= ~XOSC_CTRL_FREQ_RANGE_BITS;
-reg_v |= (XOSC_CTRL_FREQ_RANGE_VALUE_1_15MHZ << XOSC_CTRL_FREQ_RANGE_LSB);
+        // Wait till the clock is stable.
+        while(!(xosc_hw->status & XOSC_STATUS_STABLE_BITS)) {}
 
-reg_v &= ~XOSC_CTRL_ENABLE_BITS;
-reg_v |= (XOSC_CTRL_ENABLE_VALUE_ENABLE << XOSC_CTRL_ENABLE_LSB);
+        // Set clk_ref source to XTAL.
+        clocks_hw->clk[clk_ref].ctrl |= CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC;
 
-xosc_hw->startup = reg_v;
+        clocks_hw->clk[clk_ref].div = (3 << CLOCKS_CLK_REF_DIV_INT_LSB);
 
-// Wait till the clock is stable.
-while(!(xosc_hw->status & XOSC_STATUS_STABLE_BITS)) {
-    ;
-}
+        // Wait till clock source is activated.
+        while (!(clocks_hw->clk[clk_ref].selected & (1 << CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC))) {}
 
-reg_v = clocks_hw->clk[clk_ref].ctrl;
+        clocks_hw->clk[clk_peri].ctrl |= CLOCKS_CLK_PERI_CTRL_ENABLE_BITS;
 
-// Set clk_ref source to XTAL.
-reg_v &= ~CLOCKS_CLK_REF_CTRL_SRC_BITS;
-reg_v |= (CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC << CLOCKS_CLK_REF_CTRL_SRC_LSB);
-
-clocks_hw->clk[clk_ref].ctrl = reg_v;
-
-// Wait till clock source is activated.
-while (!(clocks_hw->clk[clk_ref].selected & (1 << CLOCKS_CLK_REF_CTRL_SRC_VALUE_XOSC_CLKSRC))) {
-    ;
-}
-#endif
+        fc_clk(CLOCKS_FC0_SRC_VALUE_CLK_PERI);
+    #endif
 }
 
 /**
  * @brief Initialize the CPU, set IRQ priorities
  */
-void cpu_init(void)
-{
+void cpu_init(void) {
     /* initialize the Cortex-M core */
     cortexm_init();
 
