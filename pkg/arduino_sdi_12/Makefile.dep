@@ -1,1 +1,2 @@
 USEMODULE += arduino
+USEMODULE += arduino_vendor
