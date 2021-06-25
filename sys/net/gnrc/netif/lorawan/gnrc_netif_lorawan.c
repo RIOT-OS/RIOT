@@ -180,13 +180,13 @@ static void _rx_done(gnrc_lorawan_t *mac)
         DEBUG("_recv_lorawan: cannot allocate pktsnip.\n");
         /* Discard packet on netdev device */
         dev->driver->recv(dev, NULL, bytes_expected, NULL);
-        gnrc_lorawan_radio_rx_done_cb(mac, NULL, 0);
+        gnrc_lorawan_radio_rx_error_cb(mac);
         return;
     }
     nread = dev->driver->recv(dev, pkt->data, bytes_expected, &rx_info);
     if (nread <= 0) {
         gnrc_pktbuf_release(pkt);
-        gnrc_lorawan_radio_rx_done_cb(mac, NULL, 0);
+        gnrc_lorawan_radio_rx_error_cb(mac);
         return;
     }
 
