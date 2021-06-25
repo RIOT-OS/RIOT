@@ -24,5 +24,7 @@ endif
 
 CFLAGS += -DCPU_COMMON_SAMD21
 
+INCLUDES += -I$(RIOTBASE)/cpu/samd21/include/vendor
+
 include $(RIOTCPU)/sam0_common/Makefile.include
 include $(RIOTMAKE)/arch/cortexm.inc.mk
