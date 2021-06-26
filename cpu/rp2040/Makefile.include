@@ -1,15 +1,15 @@
 RAM_LEN = 0x42000 # 264kB
 RAM_START_ADDR = 0x20000000
 
-INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/include
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/pico-sdk-1.2.0/src/common/pico_base/include
 
-INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2_common/boot_stage2/asminclude
-INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2_common/boot_stage2/include
-INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2_common/pico_platform/include
-INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2_common/hardware_base/include
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/pico-sdk-1.2.0/src/rp2_common/boot_stage2/asminclude
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/pico-sdk-1.2.0/src/rp2_common/boot_stage2/include
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/pico-sdk-1.2.0/src/rp2_common/pico_platform/include
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/pico-sdk-1.2.0/src/rp2_common/hardware_base/include
 
-INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2040/hardware_regs/include
-INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/rpi-pico-sdk/src/rp2040/hardware_structs/include
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/pico-sdk-1.2.0/src/rp2040/hardware_regs/include
+INCLUDES += -I$(RIOTCPU)/rp2040/include/vendor/pico-sdk-1.2.0/src/rp2040/hardware_structs/include
 
 CFLAGS_OPT = -O0
 
