@@ -1,4 +1,0 @@
-*.S
-*.bin
-*.elf
-rpi-pico-sdk/
