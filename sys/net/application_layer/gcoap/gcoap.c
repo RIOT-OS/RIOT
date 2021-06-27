@@ -365,7 +365,7 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
             break;
     }
     
-    if (resource->flags & COAP_SEPERATE_RESPONSE) {
+    if (resource->flags & COAP_SEPARATE_RESPONSE) {
         coap_pkt_t pdu_sep;
         uint8_t buf_sep[CONFIG_GCOAP_PDU_BUF_SIZE] = { 0 };
         memcpy(buf_sep, buf, len);

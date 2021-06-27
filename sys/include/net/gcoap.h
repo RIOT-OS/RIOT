@@ -589,9 +589,9 @@ extern "C" {
 /** @} */
 
 /**
- * @brief Flag to send a seperate response for a resource in coap_resource_t::flags
+ * @brief Flag to send a separate response for a resource in coap_resource_t::flags
  */
-#define COAP_SEPERATE_RESPONSE      (1)
+#define COAP_SEPARATE_RESPONSE      (1)
 
 /**
  * @brief   Context information required to write a resource link
