@@ -99,6 +99,29 @@ static event_t request = { .handler = _request };
 static event_t renew = { .handler = _renew };
 static event_t rebind = { .handler = _rebind };
 
+/**
+ * @brief   Signal that we received a and processed valid configuration via DHCPv6
+ *
+ * @param[in] iface     Upstream network interface.
+ */
+__attribute__ ((weak))
+void dhcpv6_client_conf_done(unsigned iface)
+{
+    (void)iface;
+}
+
+/**
+ * @brief   Signal that an interface has been configured with a prefix obtained
+ *          via DHCPv6
+ *
+ * @param[in] iface     Interface that has been configured
+ */
+__attribute__ ((weak))
+void dhcpv6_client_conf_prefix_done(unsigned iface)
+{
+    (void)iface;
+}
+
 #ifdef MODULE_AUTO_INIT_DHCPV6_CLIENT
 static char _thread_stack[DHCPV6_CLIENT_STACK_SIZE];
 static void *_thread(void *args);
@@ -731,10 +754,12 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                                               &iapfx->pfx,
                                               iapfx->pfx_len);
                         if (iapfx->pfx_len > 0) {
+                            unsigned netif = lease->parent.ia_id.info.netif;
                             dhcpv6_client_conf_prefix(
-                                    lease->parent.ia_id.info.netif, &lease->pfx,
+                                    netif, &lease->pfx,
                                     lease->pfx_len, valid, pref
                                 );
+                            dhcpv6_client_conf_prefix_done(netif);
                         }
                     }
                 }
@@ -903,6 +928,8 @@ static void _request_renew_rebind(uint8_t type)
         if (!_parse_reply(recv_buf, res)) {
             /* try again */
             event_post(event_queue, &request);
+        } else {
+            dhcpv6_client_conf_done(local.netif);
         }
     }
     else if (type == DHCPV6_REBIND) {
