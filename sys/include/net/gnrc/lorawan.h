@@ -177,6 +177,17 @@ void gnrc_lorawan_radio_rx_timeout_cb(gnrc_lorawan_t *mac);
 void gnrc_lorawan_radio_tx_done_cb(gnrc_lorawan_t *mac);
 
 /**
+ * @brief Indicate the MAC layer reception of a frame went wrong.
+ *
+ * @param[in] mac pointer to the MAC descriptor
+ */
+static inline void gnrc_lorawan_radio_rx_error_cb(gnrc_lorawan_t *mac)
+{
+    /* The failed reception is seen by the MAC layer as an RX timeout */
+    gnrc_lorawan_radio_rx_timeout_cb(mac);
+}
+
+/**
  * @brief Indicate the MAC layer that the timer was fired
  *
  * @param[in] mac pointer to the MAC descriptor
@@ -226,8 +237,9 @@ void gnrc_lorawan_mcps_request(gnrc_lorawan_t *mac,
  *        To be called on radio RX done event.
  *
  * @param[in] mac pointer to the MAC descriptor
- * @param[in] data pointer to the psdu. Pass NULL if the packet was wrong (or
- * allocation failed)
+ * @param[in] data pointer to the psdu. Must not be NULL. Use
+ *            @ref gnrc_lorawan_radio_rx_error_cb instead if the reception was
+ *            not successful.
  * @param[in] size size of the PSDU
  */
 void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *data,

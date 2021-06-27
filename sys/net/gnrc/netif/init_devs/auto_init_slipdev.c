@@ -48,7 +48,7 @@ void auto_init_slipdev(void)
 
         LOG_DEBUG("[auto_init_netif] initializing slip #%u\n", i);
 
-        slipdev_setup(&slipdevs[i], p);
+        slipdev_setup(&slipdevs[i], p, i);
         gnrc_netif_raw_create(&_netif[i], _slipdev_stacks[i], SLIPDEV_STACKSIZE,
                               SLIPDEV_PRIO, "slipdev",
                               (netdev_t *)&slipdevs[i]);

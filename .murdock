@@ -7,65 +7,31 @@
 #: ${TEST_BOARDS_LLVM_COMPILE:="iotlab-m3 native nrf52dk mulle nucleo-f401re samr21-xpro slstk3402a"}
 : ${TEST_BOARDS_LLVM_COMPILE:=""}
 
-: ${TEST_KCONFIG_samr21_xpro:="examples/hello-world tests/periph_*
-tests/test_tools tests/congure_* tests/xtimer_* tests/ztimer_*
-tests/driver_ad7746 tests/driver_adcxx1c tests/driver_ads101x tests/driver_adt101x
-tests/driver_adt7310 tests/driver_adxl345 tests/driver_aip31068 tests/driver_apa102
-tests/driver_apds99xx tests/driver_apds99xx_full tests/driver_at tests/driver_at24cxxx
-tests/driver_at24mac tests/driver_at25xxx tests/driver_at30tse75x tests/driver_ata8520e
-tests/driver_b* tests/driver_ccs811 tests/driver_ccs811_full tests/driver_dcf77
-tests/driver_dfplayer tests/driver_dht tests/driver_ds18 tests/driver_ds75lx
-tests/driver_ds1307 tests/driver_ds3231 tests/driver_ds3234 tests/driver_dsp0401
-tests/driver_dynamixel tests/driver_edbg_eui tests/driver_f* tests/driver_g*
-tests/driver_h* tests/driver_i* tests/driver_j* tests/driver_l*
-tests/driver_mag3110 tests/driver_mhz19 tests/driver_mma7660
-tests/driver_motor_driver tests/driver_mpl3115a2 tests/driver_mpu9x50
-tests/driver_mq3 tests/driver_my9221 tests/driver_nvram_spi tests/mtd_flashpage
-tests/mtd_mapper tests/driver_o* tests/driver_p* tests/driver_q*
-tests/driver_r* tests/driver_s* tests/driver_t* tests/driver_u*
-tests/driver_v*"}
-: ${TEST_KCONFIG_native:="examples/hello-world
+: ${TEST_KCONFIG_BOARDS_AVAILABLE:="
+native
+samr21-xpro
+"}
+
+: ${TEST_KCONFIG_ENFORCE_APP_GROUPS:="
 tests/cb_mux*
 tests/congure_*
-tests/driver_ws281x
-tests/eepreg
+tests/driver_b*
+tests/driver_f*
+tests/driver_g*
+tests/driver_h*
+tests/driver_i*
+tests/driver_j*
+tests/driver_l*
+tests/driver_o*
+tests/driver_p*
+tests/driver_q*
+tests/driver_r*
+tests/driver_s*
+tests/driver_t*
+tests/driver_u*
+tests/driver_v*
 tests/periph_*
-tests/pkg_c25519
-tests/pkg_cayenne-lpp
-tests/pkg_cifra
-tests/pkg_cn-cbor
-tests/pkg_emlearn
-tests/pkg_hacl
-tests/pkg_heatshrink
-tests/pkg_jsmn
-tests/pkg_libb2
-tests/pkg_libcose
-tests/pkg_libfixmath
-tests/pkg_libhydrogen
-tests/pkg_lora-serialization
-tests/pkg_lvgl
-tests/pkg_lvgl_touch
-tests/pkg_micro-ecc
-tests/pkg_minmea
-tests/pkg_monocypher
-tests/pkg_nanocbor
-tests/pkg_nanopb
-tests/pkg_qdsa
-tests/pkg_qcbor
-tests/pkg_qr-code-generator
-tests/pkg_relic
-tests/pkg_tiny-asn1
-tests/pkg_tinycbor
-tests/pkg_tinycrypt
-tests/pkg_tweetnacl
-tests/pkg_umorse
-tests/pkg_yxml
-tests/posix_sleep
 tests/prng_*
-tests/shell
-tests/struct_tm_utility
-tests/sys_crypto
-tests/test_tools
 tests/xtimer_*
 tests/ztimer_*
 "}
@@ -102,13 +68,19 @@ RUN_TESTS=${RUN_TESTS:-${NIGHTLY}}
 DWQ_ENV="-E BOARDS -E APPS -E NIGHTLY -E RUN_TESTS -E ENABLE_TEST_CACHE
          -E TEST_HASH -E CI_PULL_LABELS"
 
-get_kconfig_test_apps() {
-    case "$1" in
-        "samr21-xpro") echo "${TEST_KCONFIG_samr21_xpro}" ;;
-    esac
-    case "$1" in
-        "native") echo "${TEST_KCONFIG_native}" ;;
-    esac
+get_supported_kconfig_board_app() {
+    local board=$1
+    local appdir=$2
+
+    if is_in_list "${board}" "${TEST_KCONFIG_BOARDS_AVAILABLE}"; then
+        if is_in_list "${appdir}" "${TEST_KCONFIG_ENFORCE_APP_GROUPS}"; then
+            return 0
+        fi
+        if [ -f "${appdir}/app.config.test" ]; then
+            return 0
+        fi
+    fi
+    return 1
 }
 
 check_label() {
@@ -317,23 +289,19 @@ compile() {
 
     should_check_kconfig_hash=0
 
-    for app in $(get_kconfig_test_apps "${board}")
-    do
-        if [ "${appdir}" = "${app}" ]; then
-            should_check_kconfig_hash=1
-            BOARD=${board} make -C${appdir} clean
-            CCACHE_BASEDIR="$(pwd)" BOARD=${board} TOOLCHAIN=${toolchain} RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
-                            make -C${appdir} all test-input-hash -j${JOBS:-4}
-            RES=$?
-            if [ $RES -eq 0 ]; then
-                kconfig_test_hash=$(test_hash_calc "${BINDIR}")
-            else
-                kconfig_test_hash=0
-                echo "An error occurred while compiling using Kconfig";
-            fi
-            break
+    if get_supported_kconfig_board_app "${board}" "${appdir}"; then
+        should_check_kconfig_hash=1
+        BOARD=${board} make -C${appdir} clean
+        CCACHE_BASEDIR="$(pwd)" BOARD=${board} TOOLCHAIN=${toolchain} RIOT_CI_BUILD=1 TEST_KCONFIG=1 \
+                        make -C${appdir} all test-input-hash -j${JOBS:-4}
+        RES=$?
+        if [ $RES -eq 0 ]; then
+            kconfig_test_hash=$(test_hash_calc "${BINDIR}")
+        else
+            kconfig_test_hash=0
+            echo "An error occurred while compiling using Kconfig";
         fi
-    done
+    fi
 
     # compile without Kconfig
     CCACHE_BASEDIR="$(pwd)" BOARD=$board TOOLCHAIN=$toolchain RIOT_CI_BUILD=1 \

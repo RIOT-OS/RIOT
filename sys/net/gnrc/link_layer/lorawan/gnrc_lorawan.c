@@ -242,10 +242,8 @@ void gnrc_lorawan_send_pkt(gnrc_lorawan_t *mac, iolist_t *psdu, uint8_t dr)
 void gnrc_lorawan_radio_rx_done_cb(gnrc_lorawan_t *mac, uint8_t *psdu,
                                    size_t size)
 {
+    assert(psdu);
     _sleep_radio(mac);
-    if (psdu == NULL) {
-        return;
-    }
     mac->state = LORAWAN_STATE_IDLE;
     gnrc_lorawan_remove_timer(mac);
 

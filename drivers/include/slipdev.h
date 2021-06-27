@@ -105,8 +105,10 @@ typedef struct {
  *
  * @param[in] dev       device descriptor
  * @param[in] params    parameters for device initialization
+ * @param[in] index     index of @p params in a global parameter struct array.
+ *                      If initialized manually, pass a unique identifier instead.
  */
-void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params);
+void slipdev_setup(slipdev_t *dev, const slipdev_params_t *params, uint8_t index);
 
 #ifdef __cplusplus
 }
