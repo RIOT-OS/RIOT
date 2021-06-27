@@ -871,6 +871,8 @@ static void _request_renew_rebind(uint8_t type)
         if (!_parse_reply(recv_buf, res)) {
             /* try again */
             event_post(event_queue, &request);
+        } else {
+            dhcpv6_client_conf_done(local.netif);
         }
     }
     else if (type == DHCPV6_REBIND) {

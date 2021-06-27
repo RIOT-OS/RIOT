@@ -163,6 +163,13 @@ void dhcpv6_client_conf_prefix(unsigned netif, const ipv6_addr_t *pfx,
                                uint32_t pref);
 
 /**
+ * @brief   Signal that we received a valid configuration via DHCPv6
+ *
+ * @param[in] iface     Upstream network interface.
+ */
+void dhcpv6_client_conf_done(unsigned iface);
+
+/**
  * @brief   Determines how long the prefix delegation lease is still valid.
  *
  * @param[in] netif     Network interface the prefix delegation was for.
