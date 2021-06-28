@@ -167,7 +167,7 @@ static void on_publish(size_t len, size_t pos)
 
     /* return error code in case we don't support/understand active flags. So
      * far we only understand QoS 1... */
-    if (rbuf[pos + 1] & ~(EMCUTE_QOS_1 | EMCUTE_TIT_SHORT)) {
+    if (rbuf[pos + 1] & ~(EMCUTE_QOS_1 | EMCUTE_TIT_SHORT | EMCUTE_RETAIN)) {
         buf[6] = REJ_NOTSUP;
         sock_udp_send(&sock, &buf, 7, &gateway);
         return;
