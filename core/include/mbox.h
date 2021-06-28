@@ -185,6 +185,17 @@ static inline size_t mbox_avail(mbox_t *mbox)
     return cib_avail(&mbox->cib);
 }
 
+/**
+ * @brief   Unset's the mbox, effectively deinitializing and invalidating it.
+ *
+ * @param[in] mbox  ptr to mailbox to operate on
+ */
+static inline void mbox_unset(mbox_t *mbox)
+{
+    mbox->msg_array = NULL;
+    mbox->cib.mask = 0;
+}
+
 #ifdef __cplusplus
 }
 #endif
