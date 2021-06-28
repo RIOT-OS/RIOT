@@ -1,4 +1,4 @@
-# `gnrc_dhcpv6_client_auto_init` test
+# `gnrc_dhcpv6_client_ia_na` test
 
 This test utilizes [scapy] to test the DHCPv6 client configuration for a
 device which uses auto initialization for requesting a non-temporary address
