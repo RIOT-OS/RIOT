@@ -62,8 +62,8 @@ extern "C" {
 /**
  * @brief   Maximum number of leases to be stored
  */
-#ifndef CONFIG_DHCPV6_CLIENT_LEASE_MAX
-#define CONFIG_DHCPV6_CLIENT_LEASE_MAX (1U)
+#ifndef CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX
+#define CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX (1U)
 #endif
 
 /**

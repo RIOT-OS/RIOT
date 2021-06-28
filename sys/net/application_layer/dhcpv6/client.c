@@ -83,7 +83,7 @@ static uint8_t send_buf[DHCPV6_CLIENT_SEND_BUFLEN];
 static uint8_t recv_buf[DHCPV6_CLIENT_BUFLEN];
 static uint8_t best_adv[DHCPV6_CLIENT_BUFLEN];
 static uint8_t duid[DHCPV6_CLIENT_DUID_LEN];
-static addr_lease_t addr_leases[CONFIG_DHCPV6_CLIENT_LEASE_MAX];
+static addr_lease_t addr_leases[CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX];
 static pfx_lease_t pfx_leases[CONFIG_DHCPV6_CLIENT_PFX_LEASE_MAX];
 static server_t server;
 static xtimer_t timer, rebind_timer;
@@ -191,7 +191,7 @@ void dhcpv6_client_req_ia_na(unsigned netif)
 {
     addr_lease_t *lease = NULL;
 
-    for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_LEASE_MAX; i++) {
+    for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX; i++) {
         if (addr_leases[i].parent.ia_id.id == 0) {
             lease = &addr_leases[i];
             lease->parent.ia_id.info.netif = netif;
@@ -349,7 +349,7 @@ static inline size_t _add_ia_na(uint8_t *buf, size_t len_max)
 {
     size_t msg_len = 0;
 
-    for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_LEASE_MAX; i++) {
+    for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX; i++) {
         uint32_t ia_id = addr_leases[i].parent.ia_id.id;
         if (ia_id != 0) {
             dhcpv6_opt_ia_na_t *ia_na = (dhcpv6_opt_ia_na_t *)(&buf[msg_len]);
@@ -639,7 +639,7 @@ static void _parse_advertise(uint8_t *adv, size_t len)
                 }
                 break;
             case DHCPV6_OPT_IA_NA:
-                for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_LEASE_MAX; i++) {
+                for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX; i++) {
                     dhcpv6_opt_ia_na_t *ia_na = (dhcpv6_opt_ia_na_t *)opt;
                     unsigned na_t1, na_t2;
                     uint32_t ia_id = byteorder_ntohl(ia_na->ia_id);
@@ -837,7 +837,7 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                 }
                 break;
             case DHCPV6_OPT_IA_NA:
-                for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_LEASE_MAX; i++) {
+                for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX; i++) {
                     dhcpv6_opt_iaaddr_t *iaaddr = NULL;
                     addr_lease_t *lease = &addr_leases[i];
                     ia_na = (dhcpv6_opt_ia_na_t *)opt;
@@ -1041,7 +1041,7 @@ static void _request_renew_rebind(uint8_t type)
                 }
             }
             /* calculate MRD from addr_leases */
-            for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_LEASE_MAX; i++) {
+            for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX; i++) {
                 const addr_lease_t *lease = &addr_leases[i];
                 uint32_t valid_until = lease->valid_until / MS_PER_SEC;
                 if (valid_until > mrd) {
