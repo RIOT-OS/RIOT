@@ -1,6 +1,6 @@
 PKG_NAME=relic
 PKG_URL=https://github.com/deus778/relic.git
-PKG_VERSION=0b0442a8218df8d309266923f2dd5b9ae3b318ce
+PKG_VERSION=9206ae50b667de160fcc385ba3dc2c920143ab0a
 PKG_LICENSE=LGPL-2.1
 
 PKG_CUSTOM_PREPARED = $(BINDIR)/pkg-build/$(PKG_NAME)/include
