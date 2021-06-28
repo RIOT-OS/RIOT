@@ -35,9 +35,6 @@
 
 #include "xtimer.h"
 
-#define ENABLE_DEBUG 0
-#include "debug.h"
-
 #define SYMBOL_TIME (16U) /**< 16 us */
 
 #define ACK_TIMEOUT_TIME (40 * SYMBOL_TIME)
@@ -231,13 +228,13 @@ static void _handle_tx_status(ieee802154_tx_info_t *tx_info)
             printf("Transmission succeeded\n");
             break;
         case TX_STATUS_FRAME_PENDING:
-            DEBUG("Transmission succeeded and there's pending data\n");
+            printf("Transmission succeeded and there's pending data\n");
             break;
         case TX_STATUS_MEDIUM_BUSY:
-            DEBUG("Medium busy\n");
+            printf("Medium busy\n");
             break;
         case TX_STATUS_NO_ACK:
-            DEBUG("No ACK\n");
+            printf("No ACK\n");
             break;
     }
 
