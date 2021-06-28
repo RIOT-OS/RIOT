@@ -46,6 +46,9 @@ void ztimer_convert_init(ztimer_convert_t *ztimer_convert,
             .arg = ztimer_convert,
         },
         .super.max_value = max_value,
+#  ifdef MODULE_PM_LAYERED
+        .super.block_pm_mode = ZTIMER_CLOCK_NO_REQUIRED_PM_MODE,
+#  endif
     };
 
     *ztimer_convert = tmp;
