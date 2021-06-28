@@ -920,6 +920,7 @@ static const shell_command_t shell_commands_riotctrl[] = {
     { "config_phy", "Set channel and TX power", config_phy},
     { "get_info", "Print IEEE802.15.4 Information", print_info},
     { "test_states", "Test state changes", _test_states },
+    { "tx_mode", "Enable CSMA-CA, CCA or direct transmission", txmode_cmd },
     { "txtspam", "Send multiple IEEE 802.15.4 packets", txtspam },
     { "reply", "Enable/Disable mirroring of each packet", reply_mode_cmd },
     { "check_last_packet", "Checks if the last packet received meets the criteria", check_last_packet },
