@@ -27,9 +27,9 @@ extern "C" {
  * @anchor  net_gnrc_netif_aac
  */
 enum {
-    GNRC_NETIF_AAC_NONE = 0,    /**< no configuration */
-    GNRC_NETIF_AAC_AUTO,        /**< Use some automatic bootstrapping (e.g. SLAAC with IPv6) */
-    GNRC_NETIF_AAC_DHCP,        /**< Use DHCP(v6) */
+    GNRC_NETIF_AAC_NONE = 0x00, /**< no configuration */
+    GNRC_NETIF_AAC_AUTO = 0x01, /**< Use some automatic bootstrapping (e.g. SLAAC with IPv6) */
+    GNRC_NETIF_AAC_DHCP = 0x02, /**< Use DHCP(v6) */
     /* extend if needed */
 };
 
@@ -82,7 +82,7 @@ enum {
 #define GNRC_NETIF_FLAGS_IPV6_ADV_RETRANS_TIMER    (0x00000040U)
 
 /**
- * @brief   If gnrc_netif_t::ipv6::aac_mode == GNRC_NETIF_AAC_DHCP then this
+ * @brief   If gnrc_netif_t::ipv6::aac_mode & GNRC_NETIF_AAC_DHCP then this
  *          flag indicates that other configuration information is available via
  *          DHCPv6 (e.g. DNS-related information)
  *

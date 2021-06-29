@@ -133,7 +133,7 @@ void gnrc_ipv6_nib_init_iface(gnrc_netif_t *netif)
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_SLAAC) || IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)
     /* TODO: set differently dependent on CONFIG_GNRC_IPV6_NIB_SLAAC if
      * alternatives exist */
-    netif->ipv6.aac_mode = GNRC_NETIF_AAC_AUTO;
+    netif->ipv6.aac_mode |= GNRC_NETIF_AAC_AUTO;
 #endif  /* CONFIG_GNRC_IPV6_NIB_SLAAC || CONFIG_GNRC_IPV6_NIB_6LN */
     _init_iface_router(netif);
     gnrc_netif_init_6ln(netif);
