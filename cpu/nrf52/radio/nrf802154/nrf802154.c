@@ -492,8 +492,10 @@ void isr_radio(void)
                 /* only process packet if event callback is set and CRC is valid */
                 if ((nrf802154_dev->netdev.event_callback) &&
                     (NRF_RADIO->CRCSTATUS == 1) &&
-                    (netdev_ieee802154_dst_filter(nrf802154_dev,
-                                                  &rxbuf[1]) == 0)) {
+                    (ieee802154_dst_filter(&rxbuf[1],
+                                           nrf802154_dev->pan,
+                                           (network_uint16_t*) nrf802154_dev->short_addr,
+                                           nrf802154_dev->long_addr) == 0)) {
                     _state |= RX_COMPLETE;
                 }
                 else {

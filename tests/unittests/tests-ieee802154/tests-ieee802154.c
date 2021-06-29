@@ -953,6 +953,128 @@ static void test_ieee802154_get_dst_dst8_pancomp(void)
     TEST_ASSERT_EQUAL_INT(exp_pan.u16, res_pan.u16);
 }
 
+static void test_ieee802154_dst_filter_pan_fail(void)
+{
+    const network_uint16_t exp_addr = byteorder_htons(TEST_UINT16);
+    const eui64_t long_addr = {.uint64.u64 = TEST_UINT64};
+    const le_uint16_t exp_pan = byteorder_htols(TEST_UINT16 + 1);
+    const uint8_t mhr[] = { 0,
+                            IEEE802154_FCF_DST_ADDR_SHORT,
+                            TEST_UINT8,
+                            exp_pan.u8[0], exp_pan.u8[1],
+                            exp_addr.u8[1], exp_addr.u8[0] };
+    TEST_ASSERT_EQUAL_INT(1, ieee802154_dst_filter(mhr,
+                                                   exp_pan.u16 + 1,
+                                                   exp_addr,
+                                                   &long_addr));
+}
+
+static void test_ieee802154_dst_filter_short_addr_fail(void)
+{
+    const network_uint16_t exp_addr = byteorder_htons(TEST_UINT16);
+    const eui64_t long_addr = {.uint64.u64 = TEST_UINT64};
+    const le_uint16_t exp_pan = byteorder_htols(TEST_UINT16 + 1);
+    const uint8_t mhr[] = { 0,
+                            IEEE802154_FCF_DST_ADDR_SHORT,
+                            TEST_UINT8,
+                            exp_pan.u8[0], exp_pan.u8[1],
+                            exp_addr.u8[1], exp_addr.u8[0] };
+    TEST_ASSERT_EQUAL_INT(1, ieee802154_dst_filter(mhr,
+                                                   exp_pan.u16,
+                                                   byteorder_htons(exp_addr.u16 + 1),
+                                                   &long_addr));
+}
+
+static void test_ieee802154_dst_filter_long_addr_fail(void)
+{
+    const network_uint16_t exp_addr = byteorder_htons(TEST_UINT16);
+    const eui64_t long_addr = {.uint64.u64 = TEST_UINT64};
+    const le_uint16_t exp_pan = byteorder_htols(TEST_UINT16 + 1);
+    const eui64_t long_addr_fail =  {.uint64.u64 = TEST_UINT64 + 1};
+    const uint8_t mhr[] = { IEEE802154_FCF_PAN_COMP,
+                            IEEE802154_FCF_DST_ADDR_LONG,
+                            TEST_UINT8,
+                            exp_pan.u8[0], exp_pan.u8[1],
+                            long_addr.uint8[7], long_addr.uint8[6],
+                            long_addr.uint8[5], long_addr.uint8[4],
+                            long_addr.uint8[3], long_addr.uint8[2],
+                            long_addr.uint8[1], long_addr.uint8[0] };
+    TEST_ASSERT_EQUAL_INT(1, ieee802154_dst_filter(mhr,
+                                                   exp_pan.u16,
+                                                   exp_addr,
+                                                   &long_addr_fail));
+}
+
+static void test_ieee802154_dst_filter_pan_short(void)
+{
+    const network_uint16_t exp_addr = byteorder_htons(TEST_UINT16);
+    const eui64_t long_addr = {.uint64.u64 = TEST_UINT64};
+    const le_uint16_t exp_pan = byteorder_htols(TEST_UINT16 + 1);
+    const uint8_t mhr[] = { 0,
+                            IEEE802154_FCF_DST_ADDR_SHORT,
+                            TEST_UINT8,
+                            exp_pan.u8[0], exp_pan.u8[1],
+                            exp_addr.u8[1], exp_addr.u8[0] };
+    TEST_ASSERT_EQUAL_INT(0, ieee802154_dst_filter(mhr,
+                                                   exp_pan.u16,
+                                                   exp_addr,
+                                                   &long_addr));
+}
+
+static void test_ieee802154_dst_filter_bcast_short(void)
+{
+    const network_uint16_t exp_addr = byteorder_htons(TEST_UINT16);
+    const eui64_t long_addr = {.uint64.u64 = TEST_UINT64};
+    const uint8_t pan_bcast[] = IEEE802154_PANID_BCAST;
+    const uint8_t mhr[] = { 0,
+                            IEEE802154_FCF_DST_ADDR_SHORT,
+                            TEST_UINT8,
+                            pan_bcast[0], pan_bcast[1],
+                            exp_addr.u8[1], exp_addr.u8[0] };
+    TEST_ASSERT_EQUAL_INT(0, ieee802154_dst_filter(mhr,
+                                                   TEST_UINT16,
+                                                   exp_addr,
+                                                   &long_addr));
+}
+
+static void test_ieee802154_dst_filter_pan_long(void)
+{
+    const network_uint16_t exp_addr = byteorder_htons(TEST_UINT16);
+    const eui64_t long_addr = {.uint64.u64 = TEST_UINT64};
+    const le_uint16_t exp_pan = byteorder_htols(TEST_UINT16 + 1);
+    const uint8_t mhr[] = { IEEE802154_FCF_PAN_COMP,
+                            IEEE802154_FCF_DST_ADDR_LONG,
+                            TEST_UINT8,
+                            exp_pan.u8[0], exp_pan.u8[1],
+                            long_addr.uint8[7], long_addr.uint8[6],
+                            long_addr.uint8[5], long_addr.uint8[4],
+                            long_addr.uint8[3], long_addr.uint8[2],
+                            long_addr.uint8[1], long_addr.uint8[0] };
+    TEST_ASSERT_EQUAL_INT(0, ieee802154_dst_filter(mhr,
+                                                   exp_pan.u16,
+                                                   exp_addr,
+                                                   &long_addr));
+}
+
+static void test_ieee802154_dst_filter_bcast_long(void)
+{
+    const network_uint16_t exp_addr = byteorder_htons(TEST_UINT16);
+    const eui64_t long_addr = {.uint64.u64 = TEST_UINT64};
+    const uint8_t pan_bcast[] = IEEE802154_PANID_BCAST;
+    const uint8_t mhr[] = { IEEE802154_FCF_PAN_COMP,
+                            IEEE802154_FCF_DST_ADDR_LONG,
+                            TEST_UINT8,
+                            pan_bcast[0], pan_bcast[1],
+                            long_addr.uint8[7], long_addr.uint8[6],
+                            long_addr.uint8[5], long_addr.uint8[4],
+                            long_addr.uint8[3], long_addr.uint8[2],
+                            long_addr.uint8[1], long_addr.uint8[0] };
+    TEST_ASSERT_EQUAL_INT(0, ieee802154_dst_filter(mhr,
+                                                   TEST_UINT16,
+                                                   exp_addr,
+                                                   &long_addr));
+}
+
 static void test_ieee802154_get_seq(void)
 {
     const uint8_t mhr[] = { 0x00, 0x00, TEST_UINT8 };
@@ -1088,6 +1210,13 @@ Test *tests_ieee802154_tests(void)
         new_TestFixture(test_ieee802154_get_dst_dst2_pancomp),
         new_TestFixture(test_ieee802154_get_dst_dst8),
         new_TestFixture(test_ieee802154_get_dst_dst8_pancomp),
+        new_TestFixture(test_ieee802154_dst_filter_pan_fail),
+        new_TestFixture(test_ieee802154_dst_filter_short_addr_fail),
+        new_TestFixture(test_ieee802154_dst_filter_long_addr_fail),
+        new_TestFixture(test_ieee802154_dst_filter_pan_short),
+        new_TestFixture(test_ieee802154_dst_filter_bcast_short),
+        new_TestFixture(test_ieee802154_dst_filter_pan_long),
+        new_TestFixture(test_ieee802154_dst_filter_bcast_long),
         new_TestFixture(test_ieee802154_get_seq),
         new_TestFixture(test_ieee802154_get_iid_addr_len_0),
         new_TestFixture(test_ieee802154_get_iid_addr_len_SIZE_MAX),
