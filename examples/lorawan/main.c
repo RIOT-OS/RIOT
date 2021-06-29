@@ -52,7 +52,12 @@ static kernel_pid_t sender_pid;
 static char sender_stack[THREAD_STACKSIZE_MAIN / 2];
 
 static semtech_loramac_t loramac;
+#if IS_USED(MODULE_SX127X)
 static sx127x_t sx127x;
+#endif
+#if IS_USED(MODULE_SX126X)
+static sx126x_t sx126x;
+#endif
 
 static const char *message = "This is RIOT!";
 
