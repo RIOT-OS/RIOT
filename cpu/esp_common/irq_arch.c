@@ -99,3 +99,14 @@ int IRAM irq_is_in(void)
     DEBUG("irq_interrupt_nesting = %d\n", irq_interrupt_nesting);
     return irq_interrupt_nesting;
 }
+
+/**
+ * @brief Test if IRQs are currently enabled
+ */
+int IRAM irq_is_enabled(void)
+{
+    uint32_t reg;
+
+    RSR(reg, 230);
+    return (reg & 0xf) == 0;
+}
