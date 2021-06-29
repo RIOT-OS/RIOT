@@ -33,6 +33,7 @@ PSEUDOMODULES += evtimer_mbox
 PSEUDOMODULES += evtimer_on_ztimer
 PSEUDOMODULES += fmt_%
 PSEUDOMODULES += gnrc_dhcpv6_%
+PSEUDOMODULES += gnrc_dhcpv6_client_ia_na
 PSEUDOMODULES += gnrc_dhcpv6_client_mud_url
 PSEUDOMODULES += gnrc_ipv6_default
 PSEUDOMODULES += gnrc_ipv6_ext_frag_stats
