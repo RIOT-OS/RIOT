@@ -101,9 +101,8 @@ extern "C" {
 #define GNRC_NETIF_IPV6_RTR_ADDR   (0)
 #endif
 
-
 /**
- * @brief   Number of global unicast addresses needed for a 
+ * @brief   Number of global unicast addresses needed for a
  *          @ref net_dhcpv6_client "DHCPv6 Client" using IA_NA
  *
  * @note    Used for calculation of @ref CONFIG_GNRC_NETIF_IPV6_ADDRS_NUMOF
