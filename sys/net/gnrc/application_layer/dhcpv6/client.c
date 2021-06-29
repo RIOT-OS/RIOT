@@ -184,7 +184,7 @@ void dhcpv6_client_conf_done(unsigned iface)
     gnrc_netif_t *netif = gnrc_netif_get_by_pid(iface);
 
     /* inform upstream network about the subnet(s) now managed by this router */
-    gnrc_ipv6_nib_change_rtr_adv_iface(netif, false);
+    gnrc_ipv6_nib_change_rtr_adv_rio_iface(netif, true);
 }
 
 uint32_t dhcpv6_client_prefix_valid_until(unsigned netif,
