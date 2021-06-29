@@ -419,7 +419,10 @@ ifneq (,$(filter random,$(USEMODULE)))
     USEMODULE += fortuna
     USEMODULE += hashes
     USEMODULE += crypto
-    USEMODULE += xtimer
+    ifneq (,$(filter fortuna_reseed,$(USEMODULE)))
+        USEMODULE += atomic_utils
+        USEMODULE += xtimer
+    endif
   endif
 
   ifneq (,$(filter prng_tinymt32,$(USEMODULE)))

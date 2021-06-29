@@ -70,6 +70,10 @@ config MODULE_LIBSTDCPP
     depends on HAS_CPP
     select MODULE_CPP
 
+config MODULE_ATOMIC_UTILS
+    bool "Atomic access utility functions"
+    depends on TEST_KCONFIG
+
 config MODULE_SYS
     bool
     default y
