@@ -260,6 +260,10 @@ ifneq (,$(filter shell_commands,$(USEMODULE)))
     USEMODULE += netutils
   endif
 
+  ifneq (,$(gnrc_udp_cmd,$(USEMODULE)))
+    USEMODULE += netutils
+  endif
+
   ifneq (,$(filter nimble_netif,$(USEMODULE)))
     USEMODULE += nimble_scanner
     USEMODULE += nimble_scanlist

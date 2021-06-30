@@ -7,7 +7,7 @@
  */
 
 /**
- * @ingroup     examples
+ * @ingroup     sys_shell_commands
  * @{
  *
  * @file
@@ -41,7 +41,7 @@ static gnrc_netreg_entry_t server =
                         GNRC_NETREG_ENTRY_INIT_PID(GNRC_NETREG_DEMUX_CTX_ALL,
                                                    KERNEL_PID_UNDEF);
 
-static void send(char *addr_str, char *port_str, char *data, unsigned int num,
+static void send(char *addr_str, const char *port_str, const void *data, size_t num,
                  unsigned int delay)
 {
     netif_t *netif;
@@ -149,7 +149,7 @@ static void stop_server(void)
     puts("Success: stopped UDP server");
 }
 
-int udp_cmd(int argc, char **argv)
+int _gnrc_udp_cmd(int argc, char **argv)
 {
     if (argc < 2) {
         printf("usage: %s [send|server]\n", argv[0]);

@@ -13,17 +13,14 @@ USEMODULE += gnrc_netdev_default
 USEMODULE += auto_init_gnrc_netif
 # Activate ICMPv6 error messages
 USEMODULE += gnrc_icmpv6_error
-# Specify the mandatory networking modules for IPv6 and UDP
+# Specify the mandatory networking module for a IPv6 routing node
 USEMODULE += gnrc_ipv6_router_default
-USEMODULE += gnrc_udp
 # Add a routing protocol
 USEMODULE += gnrc_rpl
 USEMODULE += auto_init_gnrc_rpl
-# This application dumps received packets to STDIO using the pktdump module
-USEMODULE += gnrc_pktdump
 # Additional networking modules that can be dropped if not needed
 USEMODULE += gnrc_icmpv6_echo
-USEMODULE += netutils
+USEMODULE += gnrc_udp_cmd
 # Add also the shell, some shell commands
 USEMODULE += shell
 USEMODULE += shell_commands

@@ -203,6 +203,10 @@ extern int _cryptoauth(int argc, char **argv);
 extern int _bootloader_handler(int argc, char **argv);
 #endif
 
+#ifdef MODULE_GNRC_UDP_CMD
+extern int _gnrc_udp_cmd(int argc, char **argv);
+#endif
+
 const shell_command_t _shell_command_list[] = {
     {"reboot", "Reboot the node", _reboot_handler},
     {"version", "Prints current RIOT_VERSION", _version_handler},
@@ -295,6 +299,9 @@ const shell_command_t _shell_command_list[] = {
 #endif
 #ifdef MODULE_GNRC_SIXLOWPAN_FRAG_STATS
     {"6lo_frag", "6LoWPAN fragment statistics", _gnrc_6lo_frag_stats },
+#endif
+#ifdef MODULE_GNRC_UDP_CMD
+    { "udp", "send data over UDP and listen on UDP ports", _gnrc_udp_cmd },
 #endif
 #ifdef MODULE_SAUL_REG
     {"saul", "interact with sensors and actuators using SAUL", _saul },
