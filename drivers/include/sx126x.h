@@ -77,7 +77,7 @@ typedef struct {
     sx126x_pkt_params_lora_t pkt_params;    /**< Lora packet parameters */
     sx126x_mod_params_lora_t mod_params;    /**< Lora modulation parameters */
     uint32_t channel;                       /**< Current channel frequency (in Hz) */
-    uint32_t rx_timeout;                    /**< RX timeout in ms */
+    uint8_t rx_timeout;                     /**< Rx Timeout in terms of symbols */
 } sx126x_t;
 
 /**
