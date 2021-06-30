@@ -243,7 +243,7 @@ typedef struct {
 #endif /* MODULE_GNRC_IPV6_NIB */
 
     /**
-     * @brief   IPv6 auto-address configuration mode
+     * @brief   IPv6 auto-address configuration mode flags
      *
      * @note    Only available with module @ref net_gnrc_ipv6 "gnrc_ipv6"
      */

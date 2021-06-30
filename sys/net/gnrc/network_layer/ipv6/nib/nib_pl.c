@@ -69,7 +69,7 @@ int gnrc_ipv6_nib_pl_set(unsigned iface,
         (ipv6_addr_match_prefix(&netif->ipv6.addrs[idx], pfx) >= pfx_len)) {
         dst->flags |= _PFX_ON_LINK;
     }
-    if (netif->ipv6.aac_mode == GNRC_NETIF_AAC_AUTO) {
+    if (netif->ipv6.aac_mode & GNRC_NETIF_AAC_AUTO) {
         dst->flags |= _PFX_SLAAC;
     }
 #if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LBR) && IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_MULTIHOP_P6C)

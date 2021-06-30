@@ -543,7 +543,7 @@ void gnrc_ndp_rtr_adv_send(gnrc_netif_t *netif, const ipv6_addr_t *src,
         if (!fin) {
             adv_ltime = netif->ipv6.rtr_ltime;
         }
-        if (netif->ipv6.aac_mode == GNRC_NETIF_AAC_DHCP) {
+        if (netif->ipv6.aac_mode & GNRC_NETIF_AAC_DHCP) {
             flags |= NDP_RTR_ADV_FLAGS_M;
             if (netif->flags & GNRC_NETIF_FLAGS_IPV6_ADV_O_FLAG) {
                 flags |= NDP_RTR_ADV_FLAGS_O;

@@ -163,7 +163,7 @@ void _remove_tentative_addr(gnrc_netif_t *netif, const ipv6_addr_t *addr)
          * not change hardware address to retry SLAAC => use purely
          * DHCPv6 instead */
         /* TODO: implement IA_NA for DHCPv6 */
-        /* then => tgt_netif->aac_mode = GNRC_NETIF_AAC_DHCP; */
+        /* then => tgt_netif->aac_mode |= GNRC_NETIF_AAC_DHCP; */
         DEBUG("nib: would set interface %i to DHCPv6, "
               "but is not implemented yet", netif->pid);
     }
