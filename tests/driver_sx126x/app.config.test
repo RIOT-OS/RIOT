@@ -1,7 +1,6 @@
 # this file enables modules defined in Kconfig. Do not use this file for
 # application configuration. This is only needed during migration.
-CONFIG_MODULE_SX126X=y
-CONFIG_PACKAGE_DRIVER_SX126X=y
+CONFIG_MODULE_SX1261=y
 
 CONFIG_MODULE_SHELL=y
 CONFIG_MODULE_SHELL_COMMANDS=y

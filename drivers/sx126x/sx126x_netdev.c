@@ -29,15 +29,13 @@
 
 #include "sx126x.h"
 #include "sx126x_netdev.h"
+#include "sx126x_internal.h"
 
 #define ENABLE_DEBUG 0
 #include "debug.h"
 
-#if IS_USED(MODULE_LLCC68)
-#define SX126X_MAX_SF       LORA_SF11
-#else
-#define SX126X_MAX_SF       LORA_SF12
-#endif
+const uint8_t llcc68_max_sf = LORA_SF11;
+const uint8_t sx126x_max_sf = LORA_SF12;
 
 static int _send(netdev_t *netdev, const iolist_t *iolist)
 {
@@ -357,7 +355,10 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
     case NETOPT_SPREADING_FACTOR:
         assert(len <= sizeof(uint8_t));
         uint8_t sf = *((const uint8_t *)val);
-        if ((sf < LORA_SF6) || (sf > SX126X_MAX_SF)) {
+        const uint8_t max_sf = sx126x_is_llcc68(dev)
+                               ? llcc68_max_sf
+                               : sx126x_max_sf;
+        if ((sf < LORA_SF6) || (sf > max_sf)) {
             res = -EINVAL;
             break;
         }
