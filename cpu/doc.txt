@@ -14,3 +14,9 @@
  * sharing the same architecture, the implementation is split into several CPU
  * specific parts and an architecture part (e.g. arm7_common and lpc23xx).
  */
+
+ /**
+ * @defgroup    config_cpu CPU Configurations
+ * @ingroup     config
+ * @brief       Compile time configurations for different kinds of CPU.
+ */
