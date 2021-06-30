@@ -21,6 +21,8 @@
 #ifndef SX126X_H
 #define SX126X_H
 
+#include <assert.h>
+
 #include "sx126x_driver.h"
 
 #include "net/netdev.h"
@@ -96,6 +98,23 @@ void sx126x_setup(sx126x_t *dev, const sx126x_params_t *params, uint8_t index);
  * @return                  0 on success
  */
 int sx126x_init(sx126x_t *dev);
+
+/**
+ * @brief   Converts symbol value to time in milliseconds.
+ *
+ * @param[in] dev                      Device descriptor of the driver
+ * @param[in] symbols                  Symbols
+ *
+ * @return Time for symbol(s) in milliseconds
+ */
+static inline int sx126x_symbol_to_msec(sx126x_t *dev, uint16_t symbols)
+{
+    assert(dev && (dev->mod_params.bw <= SX126X_LORA_BW_500) && \
+           (dev->mod_params.bw >= SX126X_LORA_BW_125));
+
+    /* Refer section 6.1.4 LoRa Time-on-Air in SX1268 datasheet */
+    return (symbols * (1 << (dev->mod_params.sf + 7 - dev->mod_params.bw)) / 1000);
+}
 
 /**
  * @brief   Gets the channel RF frequency.
