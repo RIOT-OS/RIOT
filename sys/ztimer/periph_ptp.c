@@ -34,16 +34,16 @@ void ptp_timer_cb(void)
     ztimer_handler(clock_timer);
 }
 
-static void _ztimer_periph_ptp_set(ztimer_clock_t *clock, uint32_t val)
+static void _ztimer_periph_ptp_set64(ztimer_clock_t *clock, uint64_t val)
 {
     (void)clock;
     ptp_timer_set_u64(val);
 }
 
-static uint32_t _ztimer_periph_ptp_now(ztimer_clock_t *clock)
+static uint64_t _ztimer_periph_ptp_now64(ztimer_clock_t *clock)
 {
     (void)clock;
-    return (uint32_t)ptp_clock_read_u64();
+    return ptp_clock_read_u64();
 }
 
 static void _ztimer_periph_ptp_cancel(ztimer_clock_t *clock)
@@ -53,16 +53,13 @@ static void _ztimer_periph_ptp_cancel(ztimer_clock_t *clock)
 }
 
 static const ztimer_ops_t _ztimer_periph_ptp_ops = {
-    .set = _ztimer_periph_ptp_set,
-    .now = _ztimer_periph_ptp_now,
+    .set64 = _ztimer_periph_ptp_set64,
+    .now64 = _ztimer_periph_ptp_now64,
     .cancel = _ztimer_periph_ptp_cancel,
 };
 
 void ztimer_periph_ptp_init(ztimer_periph_ptp_t *clock)
 {
     clock->ops = &_ztimer_periph_ptp_ops;
-    clock->max_value = UINT32_MAX;
     clock_timer = clock;
-
-    ztimer_init_extend(clock);
 }
