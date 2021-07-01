@@ -24,6 +24,26 @@
 extern "C" {
 #endif
 
+/**
+ * @brief   Default numerator of the ABE multiplier (0.8)
+ *
+ * @note Use with @ref sys_congure_abe
+ * @see [RFC 8511, section 3.1](https://tools.ietf.org/html/rfc8511#section-3.1)
+ */
+#ifndef CONFIG_CONGURE_ABE_MULTIPLIER_NUMERATOR_DEFAULT
+#define CONFIG_CONGURE_ABE_MULTIPLIER_NUMERATOR_DEFAULT     (4U)
+#endif
+
+/**
+ * @brief   Default denominator of the ABE multiplier (0.8)
+ *
+ * @note Use with @ref sys_congure_abe
+ * @see [RFC 8511, section 3.1](https://tools.ietf.org/html/rfc8511#section-3.1)
+ */
+#ifndef CONFIG_CONGURE_ABE_MULTIPLIER_DENOMINATOR_DEFAULT
+#define CONFIG_CONGURE_ABE_MULTIPLIER_DENOMINATOR_DEFAULT   (5U)
+#endif
+
 #ifdef __cplusplus
 }
 #endif
