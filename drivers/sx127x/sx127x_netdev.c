@@ -444,8 +444,8 @@ static int _set(netdev_t *netdev, netopt_t opt, const void *val, size_t len)
         return sizeof(netopt_enable_t);
 
     case NETOPT_RX_SYMBOL_TIMEOUT:
-        assert(len <= sizeof(uint16_t));
-        sx127x_set_symbol_timeout(dev, *((const uint16_t *)val));
+        assert(len <= sizeof(uint8_t));
+        sx127x_set_symbol_timeout(dev, *((const uint8_t *)val));
         return sizeof(uint16_t);
 
     case NETOPT_RX_TIMEOUT:
