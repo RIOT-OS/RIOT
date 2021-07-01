@@ -55,6 +55,35 @@ void fido2_ctap_crypto_prng(uint8_t *buf, size_t size)
     random_bytes(buf, size);
 }
 
+void *fido2_ctap_crypto_sha256(const void *data, size_t len,
+                               void *digest)
+{
+    return sha256(data, len, digest);
+}
+
+void fido2_ctap_crypto_hmac_sha256_init(hmac_context_t *ctx, const void *key,
+                                        size_t key_length)
+{
+    return hmac_sha256_init(ctx, key, key_length);
+}
+
+void fido2_ctap_crypto_hmac_sha256_update(hmac_context_t *ctx, const void *data, size_t len)
+{
+    return hmac_sha256_update(ctx, data, len);
+}
+
+void fido2_ctap_crypto_hmac_sha256_final(hmac_context_t *ctx, void *digest)
+{
+    return hmac_sha256_final(ctx, digest);
+}
+
+const void *fido2_ctap_crypto_hmac_sha256(const void *key,
+                                          size_t key_length, const void *data, size_t len,
+                                          void *digest)
+{
+    return hmac_sha256(key, key_length, data, len, digest);
+}
+
 int fido2_ctap_crypto_reset_key_agreement(void)
 {
     return fido2_ctap_crypto_gen_keypair(&g_ag_key.pub,

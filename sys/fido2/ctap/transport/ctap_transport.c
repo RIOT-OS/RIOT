@@ -35,7 +35,7 @@ static void create_usb(const void *report_desc, size_t len);
 static void work_usb(void);
 static void *pkt_loop(void *arg);
 
-static char g_stack[CTAP_TRANSPORT_STACKSIZE];
+static char g_stack[CTAP_STACKSIZE];
 static kernel_pid_t g_pid;
 
 static void *pkt_loop(void *arg)
@@ -88,7 +88,7 @@ void fido2_ctap_transport_init(void)
 }
 
 int fido2_ctap_transport_read_timeout(ctap_transport_type_t type, void *buffer,
-                                    size_t size, uint32_t timeout)
+                                      size_t size, uint32_t timeout)
 {
     switch (type) {
     case USB:

@@ -17,7 +17,7 @@
  * @{
  *
  * @file
- * @brief       FIDO2 CTAP2 defines, structures and function declarations
+ * @brief       FIDO2 CTAP defines, structures and function declarations
  *
  * @author      Nils Ollrogge <nils-ollrogge@outlook.de>
  */
@@ -30,7 +30,6 @@
 #include "mutex.h"
 #include "cbor.h"
 #include "assert.h"
-#include "hashes/sha256.h"
 #include "crypto/modes/ccm.h"
 
 #include "fido2/ctap/ctap_status.h"
@@ -48,7 +47,7 @@ extern "C" {
 #define CTAP_MAX_MSG_SIZE                   0x400
 
 /**
- * @name CTAP2 methods
+ * @name CTAP methods
  *
  * @{
  */
@@ -72,6 +71,15 @@ extern "C" {
 #define CTAP_AUTH_DATA_FLAG_AT     (1 << 6)     /**< attested credential data included */
 #define CTAP_AUTH_DATA_FLAG_ED     (1 << 7)     /**< extension data included */
 /** @} */
+
+/**
+ * @brief CTAP thread stack size
+ */
+#ifdef CONFIG_FIDO2_CTAP_STACK_SIZE
+#define CTAP_STACKSIZE CONFIG_FIDO2_CTAP_STACK_SIZE
+#else
+#define CTAP_STACKSIZE 15000
+#endif
 
 /**
  * @brief Max size of relying party name
@@ -586,29 +594,6 @@ typedef struct {
 } ctap_auth_data_t;
 
 /**
- * @brief CTAP authenticator config struct
- */
-typedef struct {
-    uint8_t options;                    /**< options */
-    uint8_t aaguid[CTAP_AAGUID_SIZE];   /**< AAGUID of device */
-} ctap_config_t;
-
-/**
- * @brief CTAP state struct
- *
- * state of authenticator. Stored in flash memory
- */
-typedef struct {
-    uint8_t initialized;                        /**< CTAP is initialized or not */
-    bool pin_is_set;                            /**< PIN is set or not */
-    int rem_pin_att;                            /**< remaining PIN tries */
-    uint8_t pin_hash[SHA256_DIGEST_LENGTH / 2]; /**< LEFT(SHA-256(pin), 16) */
-    ctap_config_t config;                       /**< configuration of authenticator */
-    uint16_t rk_amount_stored;                  /**< total number of resident keys stored on device */
-    uint8_t cred_key[CTAP_CRED_KEY_LEN];        /**< AES CCM encryption key for cred */
-} ctap_state_t;
-
-/**
  * @brief CTAP info struct
  */
 typedef struct {
@@ -631,13 +616,13 @@ int fido2_ctap_init(void);
  * @brief Handle CBOR encoded ctap request.
  *
  * @param[in] req_raw           raw request from host
- * @param[in] size              size of request in bytes
+ * @param[in] len               length of @p req_raw in bytes
  * @param[in] resp              response struct
  * @param[in] should_cancel     callback to cancel transaction if CTAPHID_CANCEL was received.
  *
  * @return size of CBOR encoded response data
  */
-size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t size, ctap_resp_t *resp,
+size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t len, ctap_resp_t *resp,
                                  bool (*should_cancel)(void));
 
 /**
@@ -646,13 +631,13 @@ size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t size, ctap_resp_t *res
  * Used for attestation and assertion statement
  *
  * @param[in] auth_data         authenticator data
- * @param[in] auth_data_len     length of authenticator data
+ * @param[in] auth_data_len     length of @p auth_data
  * @param[in] client_data_hash  hash of client data sent by relying party in request
  * @param[in] rk                resident key used to sign the data
  * @param[in] sig               signature buffer
- * @param[in] sig_len           length of signature buffer
+ * @param[in] sig_len           length of @p sig
  *
- * @return CTAP status code
+ * @return CTAP @ref ctap_status_codes_t
  */
 int fido2_ctap_get_sig(const uint8_t *auth_data, size_t auth_data_len,
                        const uint8_t *client_data_hash,
@@ -673,10 +658,10 @@ bool fido2_ctap_cred_params_supported(uint8_t cred_type, int32_t alg_type);
  *
  * @param[in] rk                type of credential
  * @param[in] nonce             CCM nonce
- * @param[in] nonce_size        size of nonce buffer
+ * @param[in] nonce_size        size of @p nonce
  * @param[in] id                credential id struct storing encrypted resident key
  *
- * @return CTAP status code
+ * @return CTAP @ref ctap_status_codes_t
  */
 int fido2_ctap_encrypt_rk(ctap_resident_key_t *rk, uint8_t *nonce,
                           size_t nonce_size, ctap_cred_id_t *id);

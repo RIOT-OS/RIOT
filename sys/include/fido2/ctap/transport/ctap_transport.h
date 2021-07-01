@@ -14,7 +14,7 @@
  * @{
  *
  * @file
- * @brief       CTAP2 transport layer defines and function declarations
+ * @brief       CTAP transport layer defines and function declarations
  *
  * @author      Nils Ollrogge <nils-ollrogge@outlook.de>
  */
@@ -40,11 +40,6 @@ typedef enum {
 } ctap_transport_type_t;
 
 /**
- * @brief CTAP_TRANSPORT thread stack size
- */
-#define CTAP_TRANSPORT_STACKSIZE 15000
-
-/**
  * @brief Initialize ctap_transport layer and fido2_ctap
  */
 void fido2_ctap_transport_init(void);
@@ -57,10 +52,10 @@ void fido2_ctap_transport_init(void);
  * @param[in] size              size of buffer
  * @param[in] timeout           timeout in microseconds
  *
- * @return CTAP status code
+ * @return @ref ctap_status_codes_t
  */
 int fido2_ctap_transport_read_timeout(ctap_transport_type_t type, void *buffer,
-                                        size_t size, uint32_t timeout);
+                                      size_t size, uint32_t timeout);
 
 /**
  * @brief Write to specified transport layer
@@ -69,10 +64,10 @@ int fido2_ctap_transport_read_timeout(ctap_transport_type_t type, void *buffer,
  * @param[in] buffer            data buffer
  * @param[in] size              size of buffer
  *
- * @return CTAP status code
+ * @return @ref ctap_status_codes_t
  */
 int fido2_ctap_transport_write(ctap_transport_type_t type, const void *buffer,
-                                size_t size);
+                               size_t size);
 
 #ifdef __cplusplus
 }

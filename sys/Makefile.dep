@@ -730,11 +730,9 @@ ifneq (,$(filter fido2_ctap_%,$(USEMODULE)))
 endif
 
 ifneq (,$(filter fido2_ctap,$(USEMODULE)))
-  ifneq (native, $(BOARD))
-    FEATURES_REQUIRED += periph_flashpage
-    FEATURES_REQUIRED += periph_gpio_irq
-    USEMODULE += periph_flashpage_pagewise
-  endif
+  FEATURES_REQUIRED += periph_flashpage
+  FEATURES_REQUIRED += periph_gpio_irq
+  USEMODULE += periph_flashpage_pagewise
 
   USEMODULE += xtimer
 

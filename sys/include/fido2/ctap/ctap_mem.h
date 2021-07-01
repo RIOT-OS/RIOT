@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief       Definition for CTAP2 flash memory helper functions
+ * @brief       Definition for CTAP flash memory helper functions
  *
  * @author      Nils Ollrogge <nils-ollrogge@outlook.de>
  */
@@ -38,7 +38,7 @@ extern "C" {
  * @param[in] data      data to write and compare against
  * @param[in] len       length of data
  *
- * @return CTAP status code
+ * @return @ref ctap_status_codes_t
  */
 int fido2_ctap_mem_write_and_verify(int page, int offset, const void *data, size_t len);
 

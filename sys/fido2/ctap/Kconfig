@@ -12,8 +12,12 @@ menuconfig MODULE_FIDO2_CTAP
 
 if MODULE_FIDO2_CTAP
 
+config FIDO2_CTAP_STACK_SIZE
+    int "CTAP thread stack size"
+    default 16000
+
 config FIDO2_CTAP_DEVICE_AAGUID
-    string "AAGUID of the CTAP2 authenticator"
+    string "AAGUID of the CTAP authenticator"
     default "9c295865fa2c36b705a42320af9c8f16"
     help
         The AAGUID is identifying the type of the authenticator (e.g manufacturer

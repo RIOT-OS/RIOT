@@ -24,6 +24,8 @@
 
 #include <stdint.h>
 
+#include "hashes/sha256.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -64,9 +66,7 @@ typedef struct {
 int fido2_ctap_crypto_init(void);
 
 /**
- * @brief Pseudorandom number generator
- *
- * Wrapper for random_bytes func of sys/random.c
+ * @brief Wrapper function for random_bytes function of sys/random.c
  *
  * @param[in] buf   buffer to hold random bytes
  * @param[in] size  size of buffer
@@ -74,9 +74,67 @@ int fido2_ctap_crypto_init(void);
 void fido2_ctap_crypto_prng(uint8_t *buf, size_t size);
 
 /**
+ * @brief Wrapper function for sha256 function of sys/hashes/sha256.c
+ *
+ * @param[in] data    pointer to the buffer to generate hash from
+ * @param[in] len     length of the buffer
+ * @param[out] digest optional pointer to an array for the result, length must
+ *                    be SHA256_DIGEST_LENGTH
+ *                    if digest == NULL, one static buffer is used
+ */
+void *fido2_ctap_crypto_sha256(const void *data, size_t len,
+                               void *digest);
+
+/**
+ * @brief Wrapper function for hmac_sha256_init function of sys/hashes/sha256.c
+ *
+ * @param[in] ctx hmac_context_t handle to use
+ * @param[in] key key used in the hmac-sha256 computation
+ * @param[in] key_length the size in bytes of the key
+ */
+void fido2_ctap_crypto_hmac_sha256_init(hmac_context_t *ctx, const void *key,
+                                        size_t key_length);
+
+/**
+ * @brief Wrapper function for hmac_sha256_update function of sys/hashes/sha256.c
+ *
+ * @param[in] ctx hmac_context_t handle to use
+ * @param[in] data pointer to the buffer to generate hash from
+ * @param[in] len length of the buffer
+ */
+void fido2_ctap_crypto_hmac_sha256_update(hmac_context_t *ctx, const void *data, size_t len);
+
+/**
+ * @brief Wrapper function for hmac_sha256_final function of sys/hashes/sha256.c
+ *
+ * @param[in] ctx hmac_context_t handle to use
+ * @param[out] digest the computed hmac-sha256,
+ *             length MUST be SHA256_DIGEST_LENGTH
+ *             if digest == NULL, a static buffer is used
+ */
+void fido2_ctap_crypto_hmac_sha256_final(hmac_context_t *ctx, void *digest);
+
+/**
+ * @brief Wrapper function for hmac_sha256 function of sys/hashes/sha256.c
+ *
+ * @param[in] key key used in the hmac-sha256 computation
+ * @param[in] key_length the size in bytes of the key
+ * @param[in] data pointer to the buffer to generate the hmac-sha256
+ * @param[in] len the length of the message in bytes
+ * @param[out] digest the computed hmac-sha256,
+ *             length MUST be SHA256_DIGEST_LENGTH
+ *             if digest == NULL, a static buffer is used
+ * @returns pointer to the resulting digest.
+ *          if result == NULL the pointer points to the static buffer
+ */
+const void *fido2_ctap_crypto_hmac_sha256(const void *key,
+                                          size_t key_length, const void *data, size_t len,
+                                          void *digest);
+
+/**
  * @brief Recreate key_agreement key pair
  *
- * @return CTAP status code
+ * @return @ref ctap_status_codes_t
  */
 int fido2_ctap_crypto_reset_key_agreement(void);
 
@@ -93,7 +151,7 @@ void fido2_ctap_crypto_get_pub_key_agreement_key(ctap_crypto_pub_key_t *key);
  * @param[in] pub_key   public key buffer
  * @param[in] priv_key  private key buffer
  *
- * @return CTAP status code
+ * @return @ref ctap_status_codes_t
  */
 int fido2_ctap_crypto_gen_keypair(ctap_crypto_pub_key_t *pub_key, uint8_t *priv_key);
 
@@ -104,7 +162,7 @@ int fido2_ctap_crypto_gen_keypair(ctap_crypto_pub_key_t *pub_key, uint8_t *priv_
  * @param[in] size   size of shared secret buffer
  * @param[in] key   public key of other party
  *
- * @return CTAP status code
+ * @return @ref ctap_status_codes_t
  */
 int fido2_ctap_crypto_ecdh(uint8_t *out, size_t size, ctap_crypto_pub_key_t *key);
 
@@ -118,7 +176,7 @@ int fido2_ctap_crypto_ecdh(uint8_t *out, size_t size, ctap_crypto_pub_key_t *key
  * @param[in] key               private key to use for signature
  * @param[in] key_size          size of key
  *
- * @return CTAP status code
+ * @return @ref ctap_status_codes_t
  */
 int fido2_ctap_crypto_get_sig(uint8_t *hash, size_t hash_len, uint8_t *sig,
                               size_t *sig_size, const uint8_t *key, size_t key_size);
@@ -133,9 +191,9 @@ int fido2_ctap_crypto_get_sig(uint8_t *hash, size_t hash_len, uint8_t *sig,
  * @param[in] key              symmetric key to use for encryption
  * @param[in] key_size         size of key
  *
- * @return CTAP status code
+ * @return @ref ctap_status_codes_t
  */
-int fido2_ctap_crypto_aes_enc(uint8_t * out, size_t *out_size, uint8_t * in,
+int fido2_ctap_crypto_aes_enc(uint8_t *out, size_t *out_size, uint8_t * in,
                               size_t in_size, const uint8_t * key, size_t key_size);
 
 /**
@@ -148,9 +206,9 @@ int fido2_ctap_crypto_aes_enc(uint8_t * out, size_t *out_size, uint8_t * in,
  * @param[in] key              symmetric key to use for decryption
  * @param[in] key_size         size of key
  *
- * @return CTAP status code
+ * @return @ref ctap_status_codes_t
  */
-int fido2_ctap_crypto_aes_dec(uint8_t * out, size_t *out_size, uint8_t * in,
+int fido2_ctap_crypto_aes_dec(uint8_t *out, size_t *out_size, uint8_t * in,
                               size_t in_size, const uint8_t * key, size_t key_size);
 
 /**
@@ -169,7 +227,7 @@ int fido2_ctap_crypto_aes_dec(uint8_t * out, size_t *out_size, uint8_t * in,
  * @param[in] key              symmetric key to use for encryption
  * @param[in] key_size         size of key
  *
- * @return CTAP status code
+ * @return @ref ctap_status_codes_t
  */
 int fido2_ctap_crypto_aes_ccm_enc(uint8_t *out, size_t out_size,
                                   const uint8_t *in, size_t in_size,
@@ -194,7 +252,7 @@ int fido2_ctap_crypto_aes_ccm_enc(uint8_t *out, size_t out_size,
  * @param[in] key              symmetric key to use for encryption
  * @param[in] key_size         size of key
  *
- * @return CTAP status code
+ * @return @ref ctap_status_codes_t
  */
 int fido2_ctap_crypto_aes_ccm_dec(uint8_t *out, size_t out_size,
                                   const uint8_t *in, size_t in_size,

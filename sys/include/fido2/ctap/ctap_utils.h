@@ -13,7 +13,7 @@
  * @{
  *
  * @file
- * @brief       Definition for CTAP2 utility functions
+ * @brief       Definition for CTAP utility functions
  *
  * @author      Nils Ollrogge <nils-ollrogge@outlook.de>
  */
@@ -38,7 +38,7 @@ void fido2_ctap_utils_led_animation(void);
  *
  * Successful if user clicks button in less than @ref CTAP_UP_TIMEOUT
  *
- * @return CTAP status code
+ * @return @ref ctap_status_codes_t
  */
 int fido2_ctap_utils_user_presence_test(void);
 

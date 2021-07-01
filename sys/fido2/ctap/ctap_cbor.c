@@ -22,17 +22,17 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
-/**
- * @brief Parse CBOR encoded PublicKeyCredentialRpEntity data structure into
- *        @ref ctap_rp_ent_t struct
- */
-static int parse_rp(CborValue *it, ctap_rp_ent_t *rp);
+typedef enum {
+    USER,
+    RP
+} entity_type_t;
 
 /**
- * @brief Parse CBOR encoded PublicKeyCredentialUserEntity data structure into
- *        @ref ctap_user_ent_t struct
+ * @brief Parse CBOR encoded PublicKeyCredentialRpEntity or PublicKeyCredentialUserEntity
+ *        data structure into @ref ctap_rp_ent_t or @ref ctap_user_ent_t struct
+ *        respectively.
  */
-static int parse_user(CborValue *it, ctap_user_ent_t *user);
+static int parse_entity(CborValue *it, void *entity, entity_type_t type);
 
 /**
  * @brief Parse CBOR encoded sequence of PublicKeyCredentialDescriptors into
@@ -891,7 +891,7 @@ int fido2_ctap_cbor_parse_get_assertion_req(ctap_get_assertion_req_t *req,
         }
     }
 
-    /* rp_id and client_data_hash are required */
+    /* rpId and clientDataHash are required */
     if (required_parsed != 2) {
         return CTAP2_ERR_MISSING_PARAMETER;
     }
@@ -1001,6 +1001,7 @@ int fido2_ctap_cbor_parse_client_pin_req(ctap_client_pin_req_t *req,
         }
     }
 
+    /* pinProtocol and subCommand are required */
     if (required_parsed != 2) {
         return CTAP2_ERR_MISSING_PARAMETER;
     }
@@ -1070,12 +1071,12 @@ int fido2_ctap_cbor_parse_make_credential_req(ctap_make_credential_req_t *req,
             break;
         case CTAP_CBOR_MC_REQ_RP:
             DEBUG("ctap_cbor: parse rp \n");
-            ret = parse_rp(&map, &req->rp);
+            ret = parse_entity(&map, &req->rp, RP);
             required_parsed++;
             break;
         case CTAP_CBOR_MC_REQ_USER:
             DEBUG("ctap_cbor: parse user \n");
-            ret = parse_user(&map, &req->user);
+            ret = parse_entity(&map, &req->user, USER);
             required_parsed++;
             break;
         case CTAP_CBOR_MC_REQ_PUB_KEY_CRED_PARAMS:
@@ -1127,6 +1128,7 @@ int fido2_ctap_cbor_parse_make_credential_req(ctap_make_credential_req_t *req,
         }
     }
 
+    /* clientDataHash, rp, user and pubKeyCredParams are required */
     if (required_parsed != 4) {
         return CTAP2_ERR_MISSING_PARAMETER;
     }
@@ -1218,15 +1220,16 @@ static int parse_public_key_cose(CborValue *it, ctap_public_key_cose_t *cose_key
     return CTAP2_OK;
 }
 
-static int parse_rp(CborValue *it, ctap_rp_ent_t *rp)
+static int parse_entity(CborValue *it, void *entity, entity_type_t type)
 {
     int ret;
     int cbor_type;
-    CborValue map;
     size_t map_len;
     size_t key_len;
     size_t len;
+    CborValue map;
     char key[CTAP_CBOR_MAP_MAX_KEY_LEN];
+
     uint8_t required_parsed = 0;
 
     cbor_type = cbor_value_get_type(it);
@@ -1263,130 +1266,74 @@ static int parse_rp(CborValue *it, ctap_rp_ent_t *rp)
             return CTAP2_ERR_CBOR_PARSING;
         }
 
-        cbor_type = cbor_value_get_type(&map);
-        if (cbor_type != CborTextStringType) {
-            return CTAP2_ERR_INVALID_CBOR_TYPE;
-        }
+        if (strncmp(key, CTAP_CBOR_STR_ID, strlen(CTAP_CBOR_STR_ID)) == 0) {
+            if (type == USER) {
+                ctap_user_ent_t *user = (ctap_user_ent_t *)entity;
 
-        if (strcmp(key, CTAP_CBOR_STR_ID) == 0) {
-            rp->id_len = CTAP_DOMAIN_NAME_MAX_SIZE;
-            ret =
-                parse_text_string(&map, (char *)rp->id, (size_t *)&rp->id_len);
-            if (ret != CborNoError) {
-                return ret;
+                user->id_len = CTAP_USER_ID_MAX_SIZE;
+                ret = parse_byte_array(&map, user->id, (size_t *)&user->id_len);
+            }
+            else {
+                ctap_rp_ent_t *rp = (ctap_rp_ent_t *)entity;
+
+                rp->id_len = CTAP_DOMAIN_NAME_MAX_SIZE;
+                ret = parse_text_string(&map, (char *)rp->id, (size_t *)&rp->id_len);
             }
 
+            if (ret != CTAP2_OK) {
+                return ret;
+            }
             required_parsed++;
         }
-        else if (strcmp(key, CTAP_CBOR_STR_NAME) == 0) {
-            len = CTAP_RP_MAX_NAME_SIZE;
-            ret = parse_text_string(&map, (char *)rp->name, &len);
-            if (ret != CborNoError) {
-                return ret;
-            }
-        }
-        else if (strcmp(key, CTAP_CBOR_STR_ICON) == 0) {
-            len = CTAP_DOMAIN_NAME_MAX_SIZE;
-            ret = parse_text_string(&map, (char *)rp->icon, &len);
-            if (ret != 0) {
-                return ret;
-            }
-        }
-        else {
-            DEBUG("CTAP_parse_rp: ignoring unknown key: %s \n", key);
-        }
-
-        ret = cbor_value_advance(&map);
-        if (ret != CborNoError) {
-            return CTAP2_ERR_CBOR_PARSING;
-        }
-    }
-
-    /* id is mandatory */
-    if (required_parsed != 1) {
-        return CTAP2_ERR_MISSING_PARAMETER;
-    }
-
-    return CTAP2_OK;
-}
-
-static int parse_user(CborValue *it, ctap_user_ent_t *user)
-{
-    uint8_t id_parsed = 0;
-    char key[CTAP_CBOR_MAP_MAX_KEY_LEN];
-    size_t key_len;
-    size_t map_len;
-    size_t len;
-    int type;
-    int ret;
-    CborValue map;
-
-    type = cbor_value_get_type(it);
-    if (type != CborMapType) {
-        return CTAP2_ERR_INVALID_CBOR_TYPE;
-    }
-
-    ret = cbor_value_enter_container(it, &map);
-    if (ret != CborNoError) {
-        return CTAP2_ERR_CBOR_PARSING;
-    }
-
-    ret = cbor_value_get_map_length(it, &map_len);
-    if (ret != CborNoError) {
-        return CTAP2_ERR_CBOR_PARSING;
-    }
-
-    for (size_t i = 0; i < map_len; i++) {
-        type = cbor_value_get_type(&map);
-        if (type != CborTextStringType) {
-            return CTAP2_ERR_INVALID_CBOR_TYPE;
-        }
-
-        key_len = sizeof(key);
-        ret = cbor_value_copy_text_string(&map, key, &key_len, NULL);
-        if (ret == CborErrorOutOfMemory) {
-            return CTAP2_ERR_LIMIT_EXCEEDED;
-        }
-
-        key[sizeof(key) - 1] = '\0';
-
-        ret = cbor_value_advance(&map);
-        if (ret != CborNoError) {
-            return CTAP2_ERR_CBOR_PARSING;
-        }
-
-        if (strncmp(key, CTAP_CBOR_STR_ID, strlen(CTAP_CBOR_STR_ID)) == 0) {
-            user->id_len = CTAP_USER_ID_MAX_SIZE;
-            ret = parse_byte_array(&map, user->id, (size_t *)&user->id_len);
-            if (ret != CTAP2_OK) {
-                return ret;
-            }
-
-            id_parsed = 1;
-        }
         else if (strncmp(key, CTAP_CBOR_STR_NAME, strlen(CTAP_CBOR_STR_NAME)) == 0) {
-            len = CTAP_USER_MAX_NAME_SIZE;
-            ret = parse_text_string(&map, (char *)user->name, &len);
-            if (ret != CTAP2_OK) {
-                return ret;
+            if (type == USER) {
+                ctap_user_ent_t *user = (ctap_user_ent_t *)entity;
+
+                len = CTAP_USER_MAX_NAME_SIZE;
+                ret = parse_text_string(&map, (char *)user->name, &len);
             }
-        }
-        else if (strncmp(key, CTAP_CBOR_DISPLAY_NAME, strlen(CTAP_CBOR_DISPLAY_NAME)) == 0) {
-            len = CTAP_USER_MAX_NAME_SIZE;
-            ret = parse_text_string(&map, (char *)user->display_name, &len);
+            else {
+                ctap_rp_ent_t *rp = (ctap_rp_ent_t *)entity;
+
+                len = CTAP_RP_MAX_NAME_SIZE;
+                ret = parse_text_string(&map, (char *)rp->name, &len);
+            }
+
             if (ret != CTAP2_OK) {
                 return ret;
             }
         }
         else if (strncmp(key, CTAP_CBOR_STR_ICON, strlen(CTAP_CBOR_STR_ICON)) == 0) {
             len = CTAP_DOMAIN_NAME_MAX_SIZE;
-            ret = parse_text_string(&map, (char *)user->icon, &len);
+
+            if (type == USER) {
+                ctap_user_ent_t *user = (ctap_user_ent_t *)entity;
+
+                ret = parse_text_string(&map, (char *)user->icon, &len);
+            }
+            else {
+                ctap_rp_ent_t *rp = (ctap_rp_ent_t *)entity;
+
+                ret = parse_text_string(&map, (char *)rp->icon, &len);
+            }
+
             if (ret != CTAP2_OK) {
                 return ret;
             }
         }
+        else if (strncmp(key, CTAP_CBOR_DISPLAY_NAME, strlen(CTAP_CBOR_DISPLAY_NAME)) == 0) {
+            if (type == USER) {
+                ctap_user_ent_t *user = (ctap_user_ent_t *)entity;
+
+                len = CTAP_USER_MAX_NAME_SIZE;
+                ret = parse_text_string(&map, (char *)user->display_name, &len);
+                if (ret != CTAP2_OK) {
+                    return ret;
+                }
+            }
+        }
         else {
-            DEBUG("CTAP_parse_rp: ignoring unknown key: %s \n", key);
+            DEBUG("parse entity: ignoring unknown key: %s \n", key);
         }
 
         ret = cbor_value_advance(&map);
@@ -1395,8 +1342,8 @@ static int parse_user(CborValue *it, ctap_user_ent_t *user)
         }
     }
 
-    /* user id is mandatory */
-    if (!id_parsed) {
+    /* userId / rpId is required */
+    if (required_parsed != 1) {
         return CTAP2_ERR_MISSING_PARAMETER;
     }
 

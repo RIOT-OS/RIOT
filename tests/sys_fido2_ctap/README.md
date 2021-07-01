@@ -17,7 +17,7 @@ The FIDO2 authenticator can be tested in two ways:
 2. Test the authenticator on a website like [Webauthn.io](https://webauthn.io/).
 
 Note:
-* Due to limited support of CTAP2 in browsers as of now, make sure to use the
+* Due to limited support of FIDO2 CTAP in browsers as of now, make sure to use the
   Chromium or Google Chrome browser when testing on [Webauthn.io](https://webauthn.io/).
 * When registering and authenticating on [Webauthn.io](https://webauthn.io/) you
 will need to push button 1 on your device in order to show user presence.

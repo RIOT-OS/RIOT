@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "errno.h"
 #include "fmt.h"
 #include "xtimer.h"
 #include "byteorder.h"
@@ -32,6 +33,29 @@
 #define ENABLE_DEBUG    (0)
 #include "debug.h"
 
+/**
+ * @brief CTAP authenticator config struct
+ */
+typedef struct {
+    uint8_t options;                    /**< options */
+    uint8_t aaguid[CTAP_AAGUID_SIZE];   /**< AAGUID of device */
+} ctap_config_t;
+
+/**
+ * @brief CTAP state struct
+ *
+ * state of authenticator. Stored in flash memory
+ */
+typedef struct {
+    uint8_t initialized;                        /**< CTAP is initialized or not */
+    bool pin_is_set;                            /**< PIN is set or not */
+    int rem_pin_att;                            /**< remaining PIN tries */
+    uint8_t pin_hash[SHA256_DIGEST_LENGTH / 2]; /**< LEFT(SHA-256(pin), 16) */
+    ctap_config_t config;                       /**< configuration of authenticator */
+    uint16_t rk_amount_stored;                  /**< total number of resident keys stored on device */
+    uint8_t cred_key[CTAP_CRED_KEY_LEN];        /**< AES CCM encryption key for cred */
+} ctap_state_t;
+
 /*** main CTAP2 functions ***/
 
 /**
@@ -40,14 +64,14 @@
  * CTAP specification (version 20190130) section 5.1
  */
 static uint8_t make_credential(CborEncoder *encoder, uint8_t *req_raw,
-                               size_t size,
+                               size_t len,
                                bool (*should_cancel)(void));
 /**
  * @brief GetAssertion method
  *
  * CTAP specification (version 20190130) section 5.2
  */
-static int get_assertion(CborEncoder *encoder, size_t size, uint8_t *req_raw,
+static int get_assertion(CborEncoder *encoder, uint8_t *req_raw, size_t len,
                          bool (*should_cancel)(void));
 
 /**
@@ -63,6 +87,13 @@ static int get_next_assertion(CborEncoder *encoder);
  * CTAP specification (version 20190130) section 5.4
  */
 static uint8_t get_info(CborEncoder *encoder);
+
+/**
+ * @brief Reset method
+ *
+ * CTAP specification (version 20190130) section 5.6
+ */
+static void reset(void);
 
 /**
  * @brief ClientPIN method
@@ -175,11 +206,6 @@ static int write_state_to_flash(const ctap_state_t *state);
 static void read_state_from_flash(ctap_state_t *state);
 
 /**
- * @brief Reset state of authenticator and write updated state to flash
- */
-static void reset_state(void);
-
-/**
  * @brief Check if PIN protocol version is supported
  */
 static inline bool pin_protocol_supported(uint8_t version);
@@ -224,13 +250,13 @@ static inline bool locked(void);
 /**
  * @brief Get flashpage number of where the ith resident key is stored.
  */
-static inline uint16_t get_flashpage_number_of_rk(uint16_t i);
+static inline uint16_t get_flashpage_number_of_rk(uint16_t rk_idx);
 
 /**
  * @brief Get offset into flashpage where flashpage =
  *        get_flashpage_number_of_rk(i)
  */
-static inline uint16_t get_offset_into_flashpage(uint16_t i);
+static inline uint16_t get_offset_of_rk_into_flashpage(uint16_t rk_idx);
 
 /**
  * @brief State of authenticator
@@ -268,12 +294,12 @@ int fido2_ctap_init(void)
 
     if (ret != CTAP2_OK) {
         DEBUG("fido2_ctap: initialization failed \n");
-        return -1;
+        return -EPROTO;
     }
 
     /* first startup of the device */
     if (g_state.initialized != CTAP_INITIALIZED_MARKER) {
-        reset_state();
+        reset();
     }
 
     /* initialize pin_token */
@@ -284,7 +310,7 @@ int fido2_ctap_init(void)
     return 0;
 }
 
-static void reset_state(void)
+static void reset(void)
 {
     g_state.initialized = CTAP_INITIALIZED_MARKER;
     g_state.rem_pin_att = CTAP_PIN_MAX_ATTS;
@@ -312,7 +338,7 @@ static void reset_state(void)
     write_state_to_flash(&g_state);
 }
 
-size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t size, ctap_resp_t *resp,
+size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t len, ctap_resp_t *resp,
                                  bool (*should_cancel)(void))
 {
     CborEncoder encoder = { 0 };
@@ -322,7 +348,7 @@ size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t size, ctap_resp_t *res
     uint8_t method = *req_raw;
 
     req_raw++;
-    size--;
+    len--;
 
     cbor_encoder_init(&encoder, buf, CTAP_MAX_MSG_SIZE, 0);
 
@@ -351,14 +377,14 @@ size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t size, ctap_resp_t *res
         break;
     case CTAP_MAKE_CREDENTIAL:
         DEBUG("fido2_ctap: make_credential req \n");
-        resp->status = make_credential(&encoder, req_raw, size, should_cancel);
+        resp->status = make_credential(&encoder, req_raw, len, should_cancel);
         DEBUG("fido2_ctap: make_credential resp: status: %u, size: %u \n",
               resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
         return cbor_encoder_get_buffer_size(&encoder, buf);
         break;
     case CTAP_GET_ASSERTION:
         DEBUG("fido2_ctap: get_assertion req \n");
-        resp->status = get_assertion(&encoder, size, req_raw, should_cancel);
+        resp->status = get_assertion(&encoder, req_raw, len, should_cancel);
         DEBUG("fido2_ctap: get_assertion resp: status: %u, size: %u \n",
               resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
         return cbor_encoder_get_buffer_size(&encoder, buf);
@@ -372,14 +398,14 @@ size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t size, ctap_resp_t *res
         break;
     case CTAP_CLIENT_PIN:
         DEBUG("fido2_ctap: client_pin req \n");
-        resp->status = client_pin(&encoder, size, req_raw, should_cancel);
+        resp->status = client_pin(&encoder, len, req_raw, should_cancel);
         DEBUG("fido2_ctap: client_pin resp: status: %u, size: %u \n",
               resp->status, cbor_encoder_get_buffer_size(&encoder, buf));
         return cbor_encoder_get_buffer_size(&encoder, buf);
         break;
     case CTAP_RESET:
         DEBUG("fido2_ctap: reset req \n");
-        reset_state();
+        reset();
         break;
     default:
         DEBUG("fido2_ctap: unknown req: %u \n", method);
@@ -391,7 +417,7 @@ size_t fido2_ctap_handle_request(uint8_t *req_raw, size_t size, ctap_resp_t *res
 }
 
 static uint8_t make_credential(CborEncoder *encoder, uint8_t *req_raw,
-                               size_t size,
+                               size_t len,
                                bool (*should_cancel)(void))
 {
     int ret;
@@ -407,7 +433,7 @@ static uint8_t make_credential(CborEncoder *encoder, uint8_t *req_raw,
     req.options.uv = false;
     req.options.up = -1;
 
-    ret = fido2_ctap_cbor_parse_make_credential_req(&req, req_raw, size);
+    ret = fido2_ctap_cbor_parse_make_credential_req(&req, req_raw, len);
 
     if (ret != CTAP2_OK) {
         return ret;
@@ -508,7 +534,7 @@ static uint8_t make_credential(CborEncoder *encoder, uint8_t *req_raw,
     return CTAP2_OK;
 }
 
-static int get_assertion(CborEncoder *encoder, size_t size, uint8_t *req_raw,
+static int get_assertion(CborEncoder *encoder, uint8_t *req_raw, size_t len,
                          bool (*should_cancel)(void))
 {
     int ret;
@@ -524,7 +550,7 @@ static int get_assertion(CborEncoder *encoder, size_t size, uint8_t *req_raw,
     req.options.up = true;
     req.options.uv = false;
 
-    ret = fido2_ctap_cbor_parse_get_assertion_req(&req, req_raw, size);
+    ret = fido2_ctap_cbor_parse_get_assertion_req(&req, req_raw, len);
 
     if (ret != CTAP2_OK) {
         return ret;
@@ -821,10 +847,10 @@ static int set_pin(ctap_client_pin_req_t *req, bool (*should_cancel)(void))
     }
 
     /* sha256 of shared secret ((abG).x) to obtain shared key */
-    sha256(shared_secret, sizeof(shared_secret), shared_key);
+    fido2_ctap_crypto_sha256(shared_secret, sizeof(shared_secret), shared_key);
 
-    hmac_sha256(shared_key, sizeof(shared_key), req->new_pin_enc,
-                req->new_pin_enc_size, hmac);
+    fido2_ctap_crypto_hmac_sha256(shared_key, sizeof(shared_key), req->new_pin_enc,
+                                  req->new_pin_enc_size, hmac);
 
     if (memcmp(hmac, req->pin_auth, CTAP_PIN_AUTH_SZ) != 0) {
         DEBUG("fido2_ctap: set pin - hmac and pin_auth differ \n");
@@ -891,12 +917,12 @@ static int change_pin(ctap_client_pin_req_t *req, bool (*should_cancel)(void))
     }
 
     /* sha256 of shared secret ((abG).x) to obtain shared key */
-    sha256(shared_secret, sizeof(shared_secret), shared_key);
+    fido2_ctap_crypto_sha256(shared_secret, sizeof(shared_secret), shared_key);
 
-    hmac_sha256_init(&ctx, shared_key, sizeof(shared_key));
-    hmac_sha256_update(&ctx, req->new_pin_enc, req->new_pin_enc_size);
-    hmac_sha256_update(&ctx, req->pin_hash_enc, sizeof(req->pin_hash_enc));
-    hmac_sha256_final(&ctx, hmac);
+    fido2_ctap_crypto_hmac_sha256_init(&ctx, shared_key, sizeof(shared_key));
+    fido2_ctap_crypto_hmac_sha256_update(&ctx, req->new_pin_enc, req->new_pin_enc_size);
+    fido2_ctap_crypto_hmac_sha256_update(&ctx, req->pin_hash_enc, sizeof(req->pin_hash_enc));
+    fido2_ctap_crypto_hmac_sha256_final(&ctx, hmac);
 
     /* verify pinAuth by comparing first 16 bytes of HMAC-SHA-256*/
     if (memcmp(hmac, req->pin_auth, CTAP_PIN_AUTH_SZ) != 0) {
@@ -989,7 +1015,7 @@ static int get_pin_token(CborEncoder *encoder, ctap_client_pin_req_t *req,
     }
 
     /* sha256 of shared secret ((abG).x) to obtain shared key */
-    sha256(shared_secret, sizeof(shared_secret), shared_key);
+    fido2_ctap_crypto_sha256(shared_secret, sizeof(shared_secret), shared_key);
 
     sz = sizeof(pin_hash_dec);
     ret = fido2_ctap_crypto_aes_dec(pin_hash_dec, &sz, req->pin_hash_enc,
@@ -1035,7 +1061,7 @@ static int save_pin(uint8_t *pin, size_t len)
     uint8_t buf[SHA256_DIGEST_LENGTH] = { 0 };
 
     /* store LEFT(SHA-256(newPin), 16) */
-    sha256(pin, len, buf);
+    fido2_ctap_crypto_sha256(pin, len, buf);
     memmove(g_state.pin_hash, buf, sizeof(g_state.pin_hash));
     g_state.pin_is_set = true;
 
@@ -1110,7 +1136,7 @@ static int verify_pin_auth(uint8_t *auth, uint8_t *hash, size_t len)
 {
     uint8_t hmac[SHA256_DIGEST_LENGTH] = { 0 };
 
-    hmac_sha256(g_pin_token, sizeof(g_pin_token), hash, len, hmac);
+    fido2_ctap_crypto_hmac_sha256(g_pin_token, sizeof(g_pin_token), hash, len, hmac);
 
     if (memcmp(auth, hmac, CTAP_PIN_AUTH_SZ) != 0) {
         return CTAP2_ERR_PIN_AUTH_INVALID;
@@ -1119,14 +1145,14 @@ static int verify_pin_auth(uint8_t *auth, uint8_t *hash, size_t len)
     return CTAP2_OK;
 }
 
-static inline uint16_t get_flashpage_number_of_rk(uint16_t i)
+static inline uint16_t get_flashpage_number_of_rk(uint16_t rk_idx)
 {
-    return i / (FLASHPAGE_SIZE / CTAP_PAD_RK_SZ);
+    return rk_idx / (FLASHPAGE_SIZE / CTAP_PAD_RK_SZ);
 }
 
-static inline uint16_t get_offset_into_flashpage(uint16_t i)
+static inline uint16_t get_offset_of_rk_into_flashpage(uint16_t rk_idx)
 {
-    return CTAP_PAD_RK_SZ * (i % (FLASHPAGE_SIZE / CTAP_PAD_RK_SZ));
+    return CTAP_PAD_RK_SZ * (rk_idx % (FLASHPAGE_SIZE / CTAP_PAD_RK_SZ));
 }
 
 static bool rks_exist(ctap_cred_desc_alt_t *li, size_t len, uint8_t *rp_id,
@@ -1137,7 +1163,7 @@ static bool rks_exist(ctap_cred_desc_alt_t *li, size_t len, uint8_t *rp_id,
     ctap_resident_key_t rk;
     int ret;
 
-    sha256(rp_id, rp_id_len, rp_id_hash);
+    fido2_ctap_crypto_sha256(rp_id, rp_id_len, rp_id_hash);
 
     /* no rks stored, try decrypt only */
     if (g_state.rk_amount_stored == 0) {
@@ -1154,7 +1180,7 @@ static bool rks_exist(ctap_cred_desc_alt_t *li, size_t len, uint8_t *rp_id,
 
     for (uint16_t i = 0; i < g_state.rk_amount_stored; i++) {
         uint16_t page_offset = get_flashpage_number_of_rk(i);
-        uint16_t page_offset_into_page = get_offset_into_flashpage(i);
+        uint16_t page_offset_into_page = get_offset_of_rk_into_flashpage(i);
 
         if (page_offset_into_page == 0) {
             fido2_ctap_mem_read(CTAP_RK_START_PAGE + page_offset, page);
@@ -1195,7 +1221,7 @@ static uint8_t find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
     ctap_resident_key_t rk;
     int ret;
 
-    sha256(rp_id, rp_id_len, rp_id_hash);
+    fido2_ctap_crypto_sha256(rp_id, rp_id_len, rp_id_hash);
 
     /* no rks stored, try decrypt only */
     if (g_state.rk_amount_stored == 0) {
@@ -1212,7 +1238,7 @@ static uint8_t find_matching_rks(ctap_resident_key_t *rks, size_t rks_len,
 
     for (int i = 0; i < g_state.rk_amount_stored; i++) {
         uint16_t page_num = get_flashpage_number_of_rk(i);
-        uint16_t offset_into_page = get_offset_into_flashpage(i);
+        uint16_t offset_into_page = get_offset_of_rk_into_flashpage(i);
 
         if (offset_into_page == 0) {
             fido2_ctap_mem_read(CTAP_RK_START_PAGE + page_num, page);
@@ -1293,7 +1319,7 @@ static int save_rk(ctap_resident_key_t *rk)
     if (g_state.rk_amount_stored > 0) {
         for (uint16_t i = 0; i <= g_state.rk_amount_stored; i++) {
             page_num = get_flashpage_number_of_rk(i);
-            offset_into_page = get_offset_into_flashpage(i);
+            offset_into_page = get_offset_of_rk_into_flashpage(i);
 
             if (i == g_state.rk_amount_stored) {
                 break;
@@ -1350,7 +1376,7 @@ static int make_auth_data_assert(uint8_t *rp_id, size_t rp_id_len,
                                  ctap_auth_data_header_t *auth_data, bool uv,
                                  bool up, uint32_t sign_count)
 {
-    sha256(rp_id, rp_id_len, auth_data->rp_id_hash);
+    fido2_ctap_crypto_sha256(rp_id, rp_id_len, auth_data->rp_id_hash);
 
     auth_data->sign_count = htonl(sign_count);
 
@@ -1401,7 +1427,7 @@ static int make_auth_data_attest(ctap_make_credential_req_t *req,
     memset(k, 0, sizeof(*k));
     memset(auth_data, 0, sizeof(*auth_data));
 
-    sha256(rp->id, rp->id_len, auth_header->rp_id_hash);
+    fido2_ctap_crypto_sha256(rp->id, rp->id_len, auth_header->rp_id_hash);
 
     /* set flag indicating that attested credential data included */
     auth_header->flags |= CTAP_AUTH_DATA_FLAG_AT;

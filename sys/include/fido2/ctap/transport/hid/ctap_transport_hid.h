@@ -62,7 +62,8 @@ extern "C" {
  * @brief CTAP_HID transaction timeout in microseconds
  */
 #ifdef CONFIG_FIDO2_CTAP_TRANSPORT_HID_TRANSACTION_TIMEOUT
-#define CTAP_HID_TRANSACTION_TIMEOUT (CONFIG_FIDO2_CTAP_TRANSPORT_HID_TRANSACTION_TIMEOUT * US_PER_MS)
+#define CTAP_HID_TRANSACTION_TIMEOUT (CONFIG_FIDO2_CTAP_TRANSPORT_HID_TRANSACTION_TIMEOUT * \
+                                      US_PER_MS)
 #else
 #define CTAP_HID_TRANSACTION_TIMEOUT (750 * US_PER_MS)
 #endif
@@ -253,6 +254,12 @@ void fido2_ctap_transport_hid_send_keepalive(uint8_t status);
 /**
  * @brief Check logical channels for timeouts
  *
+ * This function is used to prevent one channel from locking the authenticator.
+ * E.g. if a device starts a transaction that does not fit in one packet and
+ * sends a CTAPHID initialization packet but not continuation packet the
+ * authenticator will keep waiting. This function will prevent this by
+ * cancelling a transaction if it takes longer than
+ * @ref CTAP_HID_TRANSACTION_TIMEOUT
  */
 void fido2_ctap_transport_hid_check_timeouts(void);
 
