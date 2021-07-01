@@ -736,3 +736,13 @@ int nimble_netif_used_chanmap(int handle, uint8_t map[5])
 
     return 0;
 }
+
+int nimble_netif_l2cap_ping(int handle, ble_l2cap_ping_fn cb,
+                            const void *data, uint16_t data_len)
+{
+    nimble_netif_conn_t *conn = nimble_netif_conn_get(handle);
+    if (conn == NULL) {
+        return -1;
+    }
+    return ble_l2cap_ping(conn->gaphandle, cb, data, data_len);
+}
