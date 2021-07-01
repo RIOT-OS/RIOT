@@ -241,6 +241,44 @@ static void _cmd_adv(const char *name)
     }
 }
 
+static void _cmd_adv_direct(const char *addr_str)
+{
+    int res;
+    (void)res;
+    uint8_t addrn[BLE_ADDR_LEN];
+    ble_addr_t addr;
+    const struct ble_gap_adv_params _adv_params = {
+        .conn_mode = BLE_GAP_CONN_MODE_DIR,
+        .disc_mode = BLE_GAP_DISC_MODE_GEN,
+        .itvl_min = BLE_GAP_ADV_FAST_INTERVAL2_MIN,
+        .itvl_max = BLE_GAP_ADV_FAST_INTERVAL2_MAX,
+    };
+
+    /* make sure no advertising is in progress */
+    if (nimble_netif_conn_is_adv()) {
+        puts("err: advertising already in progress");
+        return;
+    }
+
+    /* parse and convert address -> RIOT uses big endian notation, NimBLE
+     * expects little endian... */
+    if (bluetil_addr_from_str(addrn, addr_str) == NULL) {
+        puts("err: unable to parse BLE address");
+        return;
+    }
+    addr.type = nimble_riot_own_addr_type;
+    bluetil_addr_swapped_cp(addrn, addr.val);
+
+    /* start advertising directed advertising with the given BLE address */
+    res = nimble_netif_accept_direct(&addr, BLE_HS_FOREVER, &_adv_params);
+    if (res != NIMBLE_NETIF_OK) {
+        printf("err: unable to start directed advertising (%i)\n", res);
+    }
+    else {
+        puts("success: started to send directed advertisements");
+    }
+}
+
 static void _cmd_adv_stop(void)
 {
     int res = nimble_netif_accept_stop();
@@ -395,11 +433,21 @@ int _nimble_netif_handler(int argc, char **argv)
         char *name = NULL;
         if (argc > 2) {
             if (_ishelp(argv[2])) {
-                printf("usage: %s adv [help|stop|<name>]\n", argv[0]);
+                printf("usage: %s adv [help|stop|direct <addr>|<name>]\n",
+                       argv[0]);
                 return 0;
             }
             if (memcmp(argv[2], "stop", 4) == 0) {
                 _cmd_adv_stop();
+                return 0;
+            }
+            if (memcmp(argv[2], "direct", 6) == 0) {
+                puts("DBG: direct adv");
+                if (argc < 4) {
+                    printf("error, no BLE address given\n");
+                    return 0;
+                }
+                _cmd_adv_direct(argv[3]);
                 return 0;
             }
             name = argv[2];
