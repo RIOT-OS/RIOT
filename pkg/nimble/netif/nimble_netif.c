@@ -531,6 +531,11 @@ static int _on_gap_slave_evt(struct ble_gap_event *event, void *arg)
         case BLE_GAP_EVENT_CONN_UPDATE_REQ:
             /* nothing to do here */
             break;
+        case BLE_GAP_EVENT_ADV_COMPLETE: {
+            uint8_t addr[BLE_ADDR_LEN];
+            nimble_netif_conn_free(handle, addr);
+            _notify(handle, NIMBLE_NETIF_ACCEPT_STOP, addr);
+        }
         default:
             break;
     }
@@ -634,10 +639,10 @@ int nimble_netif_close(int handle)
     return NIMBLE_NETIF_OK;
 }
 
-int nimble_netif_accept(const uint8_t *ad, size_t ad_len,
-                        const struct ble_gap_adv_params *adv_params)
+static int _accept(const uint8_t *ad, size_t ad_len, const ble_addr_t *addr,
+                   uint32_t timeout,
+                   const struct ble_gap_adv_params *adv_params)
 {
-    assert(ad);
     assert(adv_params);
 
     int handle;
@@ -651,16 +656,38 @@ int nimble_netif_accept(const uint8_t *ad, size_t ad_len,
     }
 
     /* set advertisement data */
-    res = ble_gap_adv_set_data(ad, (int)ad_len);
-    assert(res == 0);
+    if (ad != NULL) {
+        res = ble_gap_adv_set_data(ad, (int)ad_len);
+        assert(res == 0);
+    }
+    /* remember address if applicable */
+    if (addr) {
+        nimble_netif_conn_t *conn = nimble_netif_conn_get(handle);
+        bluetil_addr_swapped_cp(addr->val, conn->addr);
+    }
+
     /* remember context and start advertising */
-    res = ble_gap_adv_start(nimble_riot_own_addr_type, NULL, BLE_HS_FOREVER,
+    res = ble_gap_adv_start(nimble_riot_own_addr_type, addr, timeout,
                             adv_params, _on_gap_slave_evt, (void *)handle);
     assert(res == 0);
 
     _notify(handle, NIMBLE_NETIF_ACCEPTING, _netif.l2addr);
 
     return NIMBLE_NETIF_OK;
+}
+
+int nimble_netif_accept(const uint8_t *ad, size_t ad_len,
+                        const struct ble_gap_adv_params *adv_params)
+{
+    assert(ad != NULL);
+    assert(ad_len > 0);
+    return _accept(ad, ad_len, NULL, BLE_HS_FOREVER, adv_params);
+}
+
+int nimble_netif_accept_direct(const ble_addr_t *addr, uint32_t timeout,
+                              const struct ble_gap_adv_params *adv_params)
+{
+    return _accept(NULL, 0, addr, timeout, adv_params);
 }
 
 int nimble_netif_accept_stop(void)
