@@ -45,7 +45,7 @@ static int write(const void *dev, phydat_t *state)
     int value = (state->val[0] ? !inverted : inverted);
 
     gpio_write(p->pin, value);
-    return 1;
+    return 1 | SAUL_FLAG_QUEUE_EVENT;
 }
 
 const saul_driver_t gpio_out_saul_driver = {
