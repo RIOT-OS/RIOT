@@ -109,6 +109,7 @@ extern "C" {
 #define COAP_FETCH              (0x10)
 #define COAP_PATCH              (0x20)
 #define COAP_IPATCH             (0x40)
+#define COAP_SEPARATE_RESPONSE  (0x80)
 #define COAP_MATCH_SUBTREE      (0x8000) /**< Path is considered as a prefix
                                               when matching */
 /** @} */
@@ -224,9 +225,6 @@ typedef struct {
     const char *path;               /**< URI path of resource               */
     coap_method_flags_t methods;    /**< OR'ed methods this resource allows */
     coap_handler_t handler;         /**< ptr to resource handler            */
-#ifdef MODULE_GCOAP
-    uint8_t flags;                  /**< flags e.g. for separate response   */
-#endif
     void *context;                  /**< ptr to user defined context data   */
 } coap_resource_t;
 

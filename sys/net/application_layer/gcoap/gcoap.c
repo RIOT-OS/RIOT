@@ -69,7 +69,7 @@ static int _request_matcher_default(gcoap_listener_t *listener,
 
 /* Internal variables */
 const coap_resource_t _default_resources[] = {
-    { "/.well-known/core", COAP_GET, _well_known_core_handler, 0, NULL },
+    { "/.well-known/core", COAP_GET, _well_known_core_handler, NULL },
 };
 
 static gcoap_listener_t _default_listener = {
@@ -364,23 +364,20 @@ static size_t _handle_req(coap_pkt_t *pdu, uint8_t *buf, size_t len,
             return gcoap_response(pdu, buf, len, COAP_CODE_INTERNAL_SERVER_ERROR);
             break;
     }
-    
-    if (resource->flags & COAP_SEPARATE_RESPONSE) {
-        coap_pkt_t pdu_sep;
-        uint8_t buf_sep[CONFIG_GCOAP_PDU_BUF_SIZE] = { 0 };
-        memcpy(buf_sep, buf, len);
-        ssize_t res = coap_parse(&pdu_sep, buf_sep, len);
-        if (res < 0) {
-            DEBUG("gcoap: parse failure: %d\n", (int)res);
-            /* If a response, can't clear memo, but it will timeout later. */
-            return -1;
-        }
 
-        coap_hdr_set_type(pdu_sep.hdr, COAP_TYPE_ACK);
-        coap_hdr_set_code(pdu_sep.hdr, COAP_CODE_EMPTY);
-        pdu_sep.hdr->ver_t_tkl &= 0xf0;
+    if ((coap_get_type(pdu) == COAP_TYPE_CON) && 
+        (resource->methods & COAP_SEPARATE_RESPONSE)) {
+        /* prepare empty ack message */
+        uint8_t buf_sep[GCOAP_HEADER_MAXLEN] = { 0 };        
+        memcpy(buf_sep, buf, GCOAP_HEADER_MAXLEN);
+        coap_hdr_t *hdr = (coap_hdr_t *)buf_sep;
 
-        ssize_t bytes = sock_udp_send(&_sock_udp, buf_sep, sizeof(pdu_sep.hdr), remote);
+        coap_hdr_set_type(hdr, COAP_TYPE_ACK);
+        coap_hdr_set_code(hdr, COAP_CODE_EMPTY);
+        hdr->ver_t_tkl &= 0xf0;
+
+        ssize_t bytes = sock_udp_send(&_sock_udp, buf_sep, 
+                                    sizeof(hdr), remote);
         if (bytes <= 0) {
             DEBUG("gcoap: send response failed: %d\n", (int)bytes);
         }
