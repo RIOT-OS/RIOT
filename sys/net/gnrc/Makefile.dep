@@ -208,6 +208,18 @@ ifneq (,$(filter gnrc_sixlowpan_frag_sfr,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure_%,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_sfr_congure
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure_reno,$(USEMODULE)))
+  USEMODULE += congure_reno
+endif
+
+ifneq (,$(filter gnrc_sixlowpan_frag_sfr_congure,$(USEMODULE)))
+  USEMODULE += gnrc_sixlowpan_frag_sfr
+endif
+
 ifneq (,$(filter gnrc_sixlowpan_frag_sfr_stats,$(USEMODULE)))
   USEMODULE += gnrc_sixlowpan_frag_sfr
 endif
