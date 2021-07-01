@@ -23,6 +23,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "cpu.h"
 #include "riotboot/slot.h"
