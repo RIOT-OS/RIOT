@@ -148,7 +148,7 @@ int saul_reg_read(saul_reg_t *dev, phydat_t *res)
     }
 #endif
 
-    return rc &= SAUL_RET_DIM_MASK;
+    return rc & SAUL_RET_DIM_MASK;
 }
 
 int saul_reg_write(saul_reg_t *dev, phydat_t *data)
@@ -170,5 +170,5 @@ int saul_reg_write(saul_reg_t *dev, phydat_t *data)
     }
 #endif
 
-    return rc &= SAUL_RET_DIM_MASK;
+    return rc & SAUL_RET_DIM_MASK;
 }
