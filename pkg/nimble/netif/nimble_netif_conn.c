@@ -222,51 +222,29 @@ unsigned nimble_netif_conn_count(uint16_t filter)
     return cnt;
 }
 
-uint16_t nimble_netif_conn_get_itvl(int handle)
+uint16_t nimble_netif_conn_get_itvl_ms(int handle)
 {
-    assert((handle >= 0) && (handle < CONN_CNT));
-    struct ble_gap_conn_desc desc;
-
-    if (!(_conn[handle].state & NIMBLE_NETIF_GAP_CONNECTED)) {
-        return 0;
-    }
-    int res = ble_gap_conn_find(_conn[handle].gaphandle, &desc);
-    if (res != 0) {
+    if ((handle == 0) || (handle >= CONN_CNT)) {
         return 0;
     }
 
-    return desc.conn_itvl;
+    return ((_conn[handle].itvl * BLE_HCI_CONN_ITVL) / 1000);
 }
 
 bool nimble_netif_conn_itvl_used(uint16_t itvl, int skip_handle)
 {
-    for (unsigned i = 0; i < CONN_CNT; i++) {
-        if (i != skip_handle) {
-            uint16_t conn_itvl = nimble_netif_conn_get_itvl(i);
-            if (conn_itvl != 0) {
-                uint16_t diff = (conn_itvl < itvl) ? itvl - conn_itvl
-                                                   : conn_itvl - itvl;
-                if (diff < NIMBLE_NETIF_CONN_ITVL_SPACING) {
-                    return true;
-                }
+    for (int handle = 0; handle < CONN_CNT; handle++) {
+        if ((handle != skip_handle) && (_conn[handle].itvl != 0)) {
+            uint16_t diff = (_conn[handle].itvl < itvl)
+                                                    ? itvl - _conn[handle].itvl
+                                                    : _conn[handle].itvl - itvl;
+            if (diff < NIMBLE_NETIF_CONN_ITVL_SPACING) {
+                return true;
             }
         }
     }
 
     return false;
-}
-
-bool nimble_netif_conn_itvl_invalid(int handle)
-{
-    if (NIMBLE_NETIF_CONN_ITVL_SPACING == 0) {
-        return false;
-    }
-
-    uint16_t to_check = nimble_netif_conn_get_itvl(handle);
-    if (to_check == 0) {
-        return false;
-    }
-    return nimble_netif_conn_itvl_used(to_check, handle);
 }
 
 uint16_t nimble_netif_conn_gen_itvl(uint16_t min, uint16_t max)

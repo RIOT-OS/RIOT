@@ -42,6 +42,7 @@ extern "C" {
 typedef struct {
     struct ble_l2cap_chan *coc;     /**< l2cap context as exposed by NimBLE */
     uint16_t gaphandle;             /**< GAP handle exposed by NimBLE */
+    uint16_t itvl;                  /**< currently used connection interval */
     uint16_t state;                 /**< the current state of the context */
     uint8_t addr[BLE_ADDR_LEN];     /**< BLE address of connected peer
                                          (in network byte order) */
@@ -181,10 +182,10 @@ void nimble_netif_conn_free(int handle, uint8_t *addr);
  *
  * @param[in] handle        connection handle
  *
- * @return  used connection interval on success, multiples of 1.25ms
+ * @return  used connection interval in milliseconds on success
  * @return  0 if unable to get connection interval
  */
-uint16_t nimble_netif_conn_get_itvl(int handle);
+uint16_t nimble_netif_conn_get_itvl_ms(int handle);
 
 /**
  * @brief   Check if the given connection interval is used, taking the minimal
@@ -199,17 +200,6 @@ uint16_t nimble_netif_conn_get_itvl(int handle);
  * @return  false if given interval is not used
  */
 bool nimble_netif_conn_itvl_used(uint16_t itvl, int skip_handle);
-
-/**
- * @brief   Check if connection interval used by the given connection is valid
- *
- * @param[in] handle        connection to verify
- *
- * @return  true if the connection interval of the given connection collides
- *          with the connection interval of another BLE connection
- * @return  false if the connection interval of the given connection is valid
- */
-bool nimble_netif_conn_itvl_invalid(int handle);
 
 /**
  * @brief   Generate a pseudorandom connection interval from the given range
