@@ -31,8 +31,6 @@
 
 #include "_dhcpv6.h"
 
-static char addr_str[IPV6_ADDR_MAX_STR_LEN];
-
 /**
  * @brief   Representation of a generic lease
  */
@@ -189,6 +187,10 @@ void dhcpv6_client_req_ia_pd(unsigned netif, unsigned pfx_len)
 
 void dhcpv6_client_req_ia_na(unsigned netif)
 {
+    if (!IS_USED(MODULE_GNRC_DHCPV6_CLIENT_IA_NA)) {
+        return;
+    }
+
     addr_lease_t *lease = NULL;
 
     for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX; i++) {
@@ -335,6 +337,10 @@ static inline size_t _compose_ia_pd_opt(dhcpv6_opt_ia_pd_t *ia_pd,
 static inline size_t _compose_ia_na_opt(dhcpv6_opt_ia_na_t *ia_na,
                                         uint32_t ia_id, uint16_t opts_len)
 {
+    if (!IS_USED(MODULE_GNRC_DHCPV6_CLIENT_IA_NA)) {
+        return 0;
+    }
+
     uint16_t len = 12U + opts_len;
 
     ia_na->type = byteorder_htons(DHCPV6_OPT_IA_NA);
@@ -347,6 +353,10 @@ static inline size_t _compose_ia_na_opt(dhcpv6_opt_ia_na_t *ia_na,
 
 static inline size_t _add_ia_na(uint8_t *buf, size_t len_max)
 {
+    if (!IS_USED(MODULE_GNRC_DHCPV6_CLIENT_IA_NA)) {
+        return 0;
+    }
+
     size_t msg_len = 0;
 
     for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX; i++) {
@@ -638,6 +648,7 @@ static void _parse_advertise(uint8_t *adv, size_t len)
                     }
                 }
                 break;
+#if IS_USED(MODULE_GNRC_DHCPV6_CLIENT_IA_NA)
             case DHCPV6_OPT_IA_NA:
                 for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX; i++) {
                     dhcpv6_opt_ia_na_t *ia_na = (dhcpv6_opt_ia_na_t *)opt;
@@ -682,6 +693,7 @@ static void _parse_advertise(uint8_t *adv, size_t len)
                     }
                 }
                 break;
+#endif /* IS_USED(MODULE_GNRC_DHCPV6_CLIENT_IA_NA) */
             case DHCPV6_OPT_SMR:
                 smr = (dhcpv6_opt_smr_t *)opt;
                 break;
@@ -836,6 +848,7 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                     }
                 }
                 break;
+#if IS_USED(MODULE_GNRC_DHCPV6_CLIENT_IA_NA)
             case DHCPV6_OPT_IA_NA:
                 for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX; i++) {
                     dhcpv6_opt_iaaddr_t *iaaddr = NULL;
@@ -894,6 +907,7 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                         uint32_t pref = byteorder_ntohl(iaaddr->pref);
                         ipv6_addr_t *addr = &iaaddr->addr;
                         netif_t *netif = netif_get_by_id(lease->parent.ia_id.info.netif);
+                        char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
                         if (&lease->addr != NULL &&
                             ipv6_addr_equal(&lease->addr, addr)) {
@@ -927,6 +941,7 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                     }
                 }
                 break;
+#endif /* IS_USED(MODULE_GNRC_DHCPV6_CLIENT_IA_NA) */
             default:
                 break;
         }
@@ -1040,12 +1055,14 @@ static void _request_renew_rebind(uint8_t type)
                     mrd = valid_until;
                 }
             }
-            /* calculate MRD from addr_leases */
-            for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX; i++) {
-                const addr_lease_t *lease = &addr_leases[i];
-                uint32_t valid_until = lease->valid_until / MS_PER_SEC;
-                if (valid_until > mrd) {
-                    mrd = valid_until;
+            if (IS_USED(MODULE_GNRC_DHCPV6_CLIENT_IA_NA)) {
+                /* calculate MRD from addr_leases */
+                for (unsigned i = 0; i < CONFIG_DHCPV6_CLIENT_ADDR_LEASE_MAX; i++) {
+                    const addr_lease_t *lease = &addr_leases[i];
+                    uint32_t valid_until = lease->valid_until / MS_PER_SEC;
+                    if (valid_until > mrd) {
+                        mrd = valid_until;
+                    }
                 }
             }
             if (mrd > 0) {
