@@ -401,6 +401,29 @@ typedef struct {
 } uart_conf_t;
 
 /**
+ * @brief   Prevent shared timer functions from being used
+ */
+#define PERIPH_TIMER_PROVIDES_SET
+
+/**
+ * @brief   Configuration type of a timer channel
+ */
+typedef struct {
+    IRQn_Type irqn;                 /**< timer channel interrupt number */
+} timer_channel_conf_t;
+
+/**
+ * @brief   Configuration type of a timer device @ref timer_conf_t::dev,
+ *          having @ref timer_conf_t::ch_numof number of channels,
+ *          each one modeled as @ref timer_channel_conf_t
+ */
+typedef struct {
+    TIMER_Type *dev;                /**< pointer to timer base address */
+    const timer_channel_conf_t *ch; /**< pointer to timer channel configuration */
+    uint8_t ch_numof;               /**< number of timer channels */
+} timer_conf_t;
+
+/**
  * @brief   Get the PAD control register for the given GPIO pin as word
  *
  * Note: Only perform 32-bit writes to I/O registers.
