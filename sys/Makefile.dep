@@ -110,6 +110,16 @@ ifneq (,$(filter dhcpv6_client,$(USEMODULE)))
   endif
 endif
 
+ifneq (,$(filter dhcpv6_relay,$(USEMODULE)))
+  USEMODULE += event
+  USEMODULE += sock_async_event
+  USEMODULE += sock_udp
+endif
+
+ifneq (,$(filter auto_init_dhcpv6_relay,$(USEMODULE)))
+  USEMODULE += dhcpv6_relay
+endif
+
 ifneq (,$(filter dns_%,$(USEMODULE)))
   USEMODULE += dns
 endif
