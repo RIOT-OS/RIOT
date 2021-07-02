@@ -12,4 +12,5 @@ config BOARD_COMMON_NUCLEO32
     # Clock configuration
     select BOARD_HAS_LSE if (CPU_FAM_L0 || CPU_FAM_L4) && !BOARD_NUCLEO_L011K4
 
+source "$(RIOTBOARD)/common/nucleo/Kconfig"
 source "$(RIOTBOARD)/common/stm32/Kconfig"

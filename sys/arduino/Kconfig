@@ -5,14 +5,26 @@
 # directory for more details.
 #
 
+config MODULE_ARDUINO_SKETCHES
+    bool
+
 menuconfig MODULE_ARDUINO
     bool "Arduino support"
     imply MODULE_ARDUINO_PWM
     imply MODULE_PERIPH_ADC
+    imply MODULE_PERIPH_I2C
+    imply MODULE_PERIPH_SPI
     depends on HAS_ARDUINO
     depends on HAS_PERIPH_GPIO
+    depends on HAS_CPP
     depends on TEST_KCONFIG
     select MODULE_PERIPH_GPIO
+    select MODULE_CPP
+    select MODULE_ARDUINO_SKETCHES
+    select MODULE_FMT
+    select MODULE_ZTIMER
+    select MODULE_ZTIMER_MSEC
+    select MODULE_ZTIMER_USEC
 
 config MODULE_ARDUINO_PWM
     bool "PWM support for Arduino"

@@ -58,6 +58,18 @@ rsource "usb/Kconfig"
 rsource "xtimer/Kconfig"
 rsource "ztimer/Kconfig"
 
+config MODULE_CPP
+    bool "Use CPP compiler"
+    depends on TEST_KCONFIG
+    depends on HAS_CPP
+
+config MODULE_LIBSTDCPP
+    bool "Use the CPP standard library"
+    depends on TEST_KCONFIG
+    depends on HAS_LIBSTDCPP
+    depends on HAS_CPP
+    select MODULE_CPP
+
 config MODULE_SYS
     bool
     default y

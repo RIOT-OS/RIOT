@@ -104,7 +104,13 @@ FEATURES_OPTIONAL += no_idle_thread
 
 ifneq (,$(filter libstdcpp,$(FEATURES_USED)))
   # Also use C++ if libstdc++ is used
-  FEATURES_REQUIRED += cpp
+  USEMODULE += cpp
+  USEMODULE += libstdcpp
+endif
+
+ifneq (,$(filter cpp,$(FEATURES_USED)))
+  # Also use C++ if libstdc++ is used
+  USEMODULE += cpp
 endif
 
 ifneq (,$(filter test_utils_interactive_sync,$(USEMODULE)))
