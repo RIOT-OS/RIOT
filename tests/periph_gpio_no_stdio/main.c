@@ -23,58 +23,6 @@
 #include "periph/gpio.h"
 #include "test_utils/expect.h"
 
-#ifndef PIN_IN
-#define PIN_IN          GPIO_PIN(0, 0)
-#endif
-
-#ifndef PIN_IN_PU
-#define PIN_IN_PU       GPIO_PIN(0, 1)
-#endif
-
-#ifndef PIN_IN_PD
-#define PIN_IN_PD       GPIO_PIN(0, 2)
-#endif
-
-#ifndef PIN_IRQ_MODE
-#define PIN_IRQ_MODE    GPIO_IN_PU
-#endif
-
-#ifndef PIN_IRQ_RISING
-#define PIN_IRQ_RISING  GPIO_PIN(0, 3)
-#endif
-
-#ifndef PIN_IRQ_FALLING
-#define PIN_IRQ_FALLING GPIO_PIN(0, 4)
-#endif
-
-#ifndef PIN_IRQ_BOTH
-#define PIN_IRQ_BOTH    GPIO_PIN(0, 5)
-#endif
-
-#ifndef PIN_OUT_1
-#define PIN_OUT_1       GPIO_PIN(0, 6)
-#endif
-
-#ifndef PIN_OUT_2
-#define PIN_OUT_2       GPIO_PIN(0, 7)
-#endif
-
-#ifndef PIN_OUT_3
-#define PIN_OUT_3       GPIO_PIN(0, 8)
-#endif
-
-#ifndef PIN_OUT_4
-#define PIN_OUT_4       GPIO_PIN(0, 9)
-#endif
-
-#ifndef PIN_OUT_5
-#define PIN_OUT_5       GPIO_PIN(0, 10)
-#endif
-
-#ifndef PIN_OUT_6
-#define PIN_OUT_6       GPIO_PIN(0, 11)
-#endif
-
 static gpio_t pin_in = PIN_IN;
 static gpio_t pin_in_pu = PIN_IN_PU;
 static gpio_t pin_in_pd = PIN_IN_PD;
@@ -96,12 +44,18 @@ static void _cb(void *arg)
 
 int main(void)
 {
-    expect(0 == gpio_init(pin_out_1, GPIO_OUT));
-    expect(0 == gpio_init(pin_out_2, GPIO_OUT));
-    expect(0 == gpio_init(pin_out_3, GPIO_OUT));
     expect(0 == gpio_init(pin_in, GPIO_IN));
-    expect(0 == gpio_init(pin_in_pu, GPIO_IN_PU));
-    expect(0 == gpio_init(pin_in_pd, GPIO_IN_PD));
+    expect(0 == gpio_init(pin_out_1, GPIO_OUT));
+
+    if (!IS_ACTIVE(NO_PULL_UP)) {
+        expect(0 == gpio_init(pin_in_pu, GPIO_IN_PU));
+        expect(0 == gpio_init(pin_out_2, GPIO_OUT));
+    }
+
+    if (!IS_ACTIVE(NO_PULL_DOWN)) {
+        expect(0 == gpio_init(pin_in_pd, GPIO_IN_PD));
+        expect(0 == gpio_init(pin_out_3, GPIO_OUT));
+    }
 
     if (IS_USED(MODULE_PERIPH_GPIO_IRQ)) {
         expect(0 == gpio_init(pin_out_4, GPIO_OUT));
@@ -114,8 +68,12 @@ int main(void)
 
     while (1) {
         gpio_write(pin_out_1, gpio_read(pin_in));
-        gpio_write(pin_out_2, gpio_read(pin_in_pu));
-        gpio_write(pin_out_3, gpio_read(pin_in_pd));
+        if (!IS_ACTIVE(NO_PULL_UP)) {
+            gpio_write(pin_out_2, gpio_read(pin_in_pu));
+        }
+        if (!IS_ACTIVE(NO_PULL_DOWN)) {
+            gpio_write(pin_out_3, gpio_read(pin_in_pd));
+        }
     }
 
     return 0;
