@@ -7,36 +7,30 @@
  */
 
 /**
- * @ingroup     boards_raspberry-pi-pico
+ * @ingroup boards_raspberry-pi-pico
  * @{
  *
  * @file
- * @brief       Board specific definitions for the Raspberry Pi Pico
+ * @brief Board specific definitions of Raspberry Pi Pico
  *
- * @author      Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
+ * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  */
 
 #ifndef BOARD_H
 #define BOARD_H
 
 #include "cpu.h"
-#include "periph_conf.h"
 #include "periph_cpu.h"
+#include "periph_conf.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/* Put here board specific definitions:
- - LEDs/buttons macros,
- - on-board drivers parameters
- - xtimer configuration
- */
-
 #define LED0_PIN GPIO_PIN(GPIO_BANK_USER, 25)
 
 /**
- * @brief   Initialize board specific hardware
+ * @brief Initialise board specific hardware
  */
 void board_init(void);
 

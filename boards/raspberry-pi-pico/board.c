@@ -7,21 +7,19 @@
  */
 
 /**
- * @ingroup     boards_raspberry-pi-pico
+ * @ingroup boards_raspberry-pi-pico
  * @{
  *
  * @file
- * @brief       Board specific implementations for the Raspberry Pi Pico board
+ * @brief Board specific implementations of Raspberry Pi Pico
  *
- * @author      Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
+ * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
  * @}
  */
 
 #include "board.h"
 
-void board_init(void)
-{
-    /* initialize the CPU */
+void board_init(void) {
     cpu_init();
 }
