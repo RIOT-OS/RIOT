@@ -7,14 +7,14 @@
  */
 
 /**
- * @ingroup     cpu_rp2040
- * @ingroup     drivers_periph_gpio
+ * @ingroup cpu_rp2040
+ * @ingroup drivers_periph_gpio
  * @{
  *
  * @file
- * @brief       CPU specific low-level GPIO driver implementation for rp2040
+ * @brief CPU specific low-level GPIO driver implementation for RP2040
  *
- * @author      Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
+ * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  *
  * @}
  */
@@ -26,26 +26,21 @@
 #include "periph_conf.h"
 #include "periph/gpio.h"
 
-int gpio_init(gpio_t pin, gpio_mode_t mode)
-{
+int gpio_init(gpio_t pin, gpio_mode_t mode) {
     uint32_t idx_pin;
     uint32_t reg_ctrl;
     uint32_t reg_pad_ctrl;
 
-    assert(((pin >> 8) == GPIO_BANK_USER));
+    assert(((pin >> 16) == GPIO_BANK_USER));
 
     resets_hw->reset &= ~RESETS_RESET_IO_BANK0_BITS;
     resets_hw->reset &= ~RESETS_RESET_PADS_BANK0_BITS;
 
-    while (!(resets_hw->reset_done & RESETS_RESET_DONE_IO_BANK0_BITS)) {
-        ;
-    }
+    while (!(resets_hw->reset_done & RESETS_RESET_DONE_IO_BANK0_BITS)) {}
 
-    while (!(resets_hw->reset_done & RESETS_RESET_DONE_PADS_BANK0_BITS)) {
-        ;
-    }
+    while (!(resets_hw->reset_done & RESETS_RESET_DONE_PADS_BANK0_BITS)) {}
 
-    idx_pin = (pin & 0x00ff);
+    idx_pin = (pin & 0x0000ffff);
 
     reg_ctrl = iobank0_hw->io[idx_pin].ctrl;
     reg_pad_ctrl = padsbank0_hw->io[idx_pin];
@@ -79,20 +74,13 @@ int gpio_init(gpio_t pin, gpio_mode_t mode)
     return 0;
 }
 
-/*
-int gpio_read(gpio_t pin)
-{
-    return 0;
-}*/
-
-void gpio_set(gpio_t pin)
-{
+void gpio_set(gpio_t pin) {
     uint32_t idx_pin;
     uint32_t reg_ctrl;
 
-    assert(((pin >> 8) == GPIO_BANK_USER));
+    assert(((pin >> 16) == GPIO_BANK_USER));
 
-    idx_pin = (pin & 0x00ff);
+    idx_pin = (pin & 0x0000ffff);
 
     reg_ctrl = iobank0_hw->io[idx_pin].ctrl;
 
@@ -104,14 +92,13 @@ void gpio_set(gpio_t pin)
     }
 }
 
-void gpio_clear(gpio_t pin)
-{
+void gpio_clear(gpio_t pin) {
     uint32_t idx_pin;
     uint32_t reg_ctrl;
 
-    assert(((pin >> 8) == GPIO_BANK_USER));
+    assert(((pin >> 16) == GPIO_BANK_USER));
 
-    idx_pin = (pin & 0x00ff);
+    idx_pin = (pin & 0x0000ffff);
 
     reg_ctrl = iobank0_hw->io[idx_pin].ctrl;
 
@@ -122,15 +109,3 @@ void gpio_clear(gpio_t pin)
         iobank0_hw->io[idx_pin].ctrl = reg_ctrl;
     }
 }
-
-/*
-void gpio_toggle(gpio_t dev)
-{
-
-}*/
-
-/*
-void gpio_write(gpio_t dev, int value)
-{
-
-}*/

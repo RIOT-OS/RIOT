@@ -24,9 +24,9 @@ extern uart_inst_t * const uart1;
 #define uart_default uart0
 
 typedef enum {
-    UART_PARITY_NONE,
+    UART_PARIY_NONE = 0,
+    UART_PARITY_ODD,
     UART_PARITY_EVEN,
-    UART_PARITY_ODD
 } uart_parity_t;
 
 // ----------------------------------------------------------------------------

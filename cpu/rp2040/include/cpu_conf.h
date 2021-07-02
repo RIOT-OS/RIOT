@@ -1,26 +1,47 @@
+/*
+ * Copyright (C) 2021 Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
+ *
+ * This file is subject to the terms and conditions of the GNU Lesser
+ * General Public License v2.1. See the file LICENSE in the top level
+ * directory for more details.
+ */
+
+/**
+ * @defgroup cpu_rp2040 Raspberry Pi RP2040 MCU
+ * @ingroup cpu
+ * @brief Raspberry Pi RP2040 MCU
+ * @{
+ *
+ * @file
+ * @brief RP2040 specific CPU configuration
+ *
+ * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
+ *
+ */
+
 #ifndef CPU_CONF_H
 #define CPU_CONF_H
 
-#define __CM0PLUS_REV          1         /*!< Core revision r0p1 */
-#define __MPU_PRESENT          0         /*!< MPU present or not */
-#define __NVIC_PRIO_BITS       2         /*!< Number of bits used for Priority Levels */
-#define __VTOR_PRESENT         1         /*!< VTOR present or not */
-#define __Vendor_SysTickConfig 0         /*!< Set to 1 if different SysTick Config is used */
+#define __CM0PLUS_REV (1U) /*!< Core revision r0p1 */
+#define __MPU_PRESENT (0U) /*!< MPU present or not */
+#define __NVIC_PRIO_BITS (2U) /*!< Number of bits used for Priority Levels */
+#define __VTOR_PRESENT (1U) /*!< VTOR present or not */
+#define __Vendor_SysTickConfig (0U) /*!< Set to 1 if different SysTick Config is used */
 
 #define __CHECK_DEVICE_DEFINES
 
-#define CPU_DEFAULT_IRQ_PRIO            (1U)
-#define CPU_IRQ_NUMOF                   (26U)
+#define CPU_DEFAULT_IRQ_PRIO (1U)
+#define CPU_IRQ_NUMOF (26U)
 
 typedef enum {
-/* =  ARM Cortex-M0 Specific Interrupt Numbers  = */
+/* ARM Cortex-M0 Specific Interrupt Numbers */
   Reset_IRQn = -15, /*!< -15  Reset Vector, invoked on Power up and warm reset */
   NonMaskableInt_IRQn = -14, /*!< -14  Non maskable Interrupt, cannot be stopped or preempted */
   HardFault_IRQn = -13, /*!< -13  Hard Fault, all classes of Fault */
   SVCall_IRQn =  -5, /*!< -5 System Service Call via SVC instruction */
   PendSV_IRQn =  -2, /*!< -2 Pendable request for system service */
   SysTick_IRQn =  -1, /*!< -1 System Tick Timer */
-/* =  rp2040 Specific Interrupt Numbers  = */
+/* RP2040 Specific Interrupt Numbers */
   TIMER_0_IRQn = 0, /*!< 0  TIMER_0_IRQn */
   TIMER_1_IRQn = 1, /*!< 1  TIMER_1_IRQn */
   TIMER_2_IRQn = 2, /*!< 2  TIMER_2_IRQn */
