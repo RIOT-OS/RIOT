@@ -7,13 +7,13 @@
  */
 
 /**
- * @ingroup     boards_raspberry-pi-pico
+ * @ingroup boards_raspberry-pi-pico
  * @{
  *
  * @file
- * @brief       Configuration of CPU peripherals for Raspberry Pi Pico board
+ * @brief Configuration of CPU peripherals of Raspberry Pi Pico
  *
- * @author      Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
+ * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  */
 
 #ifndef PERIPH_CONF_H
@@ -28,32 +28,13 @@
 extern "C" {
 #endif
 
-/* put here the board peripherals definitions:
-- Available clocks
-- Timers
-- UARTs
-- PWMs
-- SPIs
-- I2C
-- ADC
-- RTC
-- RTT
-etc
- */
+#define CLK_XTAL_HZ (12000000UL)
 
-#define CLK_XTAL_FREQ (12000000) // 12MHz.
+#define NUM_UART (2U)
+#define NUM_TIMER (1U)
+#define NUM_TIMER_CHANNEL (4U)
 
-/*
- * 0 = Do not use external crystal oscillator for clk_ref.
- * 1 = Use external crystal oscillator for clk_ref.
- */
-#define CLK_REF_XTAL (1)
-
-#define NUM_UART ((unsigned int) 2)
-#define NUM_TIMER ((unsigned int) 1) // One timer with four channels.
-#define NUM_TIMER_CHANNEL ((unsigned int) 4) // One timer with four channels.
-
-#define STDIO_UART_DEV (0)
+#define STDIO_UART_DEV (UART_DEV(0))
 #define STDIO_UART_BAUDRATE (115200U)
 
 static const uart_conf_t uart_config[] = {
