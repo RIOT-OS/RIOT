@@ -262,8 +262,14 @@ int i2c_read_bytes(i2c_t dev, uint16_t addr,
         return ret;
     }
     /* Ensure all bytes has been read */
-    while ((bus(dev)->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk)
-           != BUSSTATE_IDLE) {}
+    if (flags & I2C_NOSTOP) {
+        while ((bus(dev)->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk)
+                != BUSSTATE_OWNER) {}
+    }
+    else {
+        while ((bus(dev)->STATUS.reg & SERCOM_I2CM_STATUS_BUSSTATE_Msk)
+                != BUSSTATE_IDLE) {}
+    }
     /* return number of bytes sent */
     return 0;
 }
