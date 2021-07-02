@@ -27,129 +27,126 @@
 #include "periph/uart.h"
 #include "periph/gpio.h"
 
-/**
- * @brief UART device configurations
- */
 static uart_isr_ctx_t uart_isr_ctx[NUM_UART];
 
-/**
- * Configuring the UART console
- */
-int uart_init(uart_t uart, uint32_t baudrate, uart_rx_cb_t rx_cb, void *arg)
-{
-    uint32_t rx_idx_pin;
-    uint32_t tx_idx_pin;
+int uart_init(
+    uart_t uart,
+    uint32_t baudrate,
+    uart_rx_cb_t rx_cb,
+    void *arg
+) {
+    uint32_t rx_pin;
+    uint32_t tx_pin;
 
-    (void)(baudrate);
-    (void)(rx_cb);
-    (void)(arg);
-    (void)(uart_isr_ctx[0]);
+    uint32_t baudrate_i;
+    uint32_t baudrate_f;
+    uint32_t baudrate_div;
 
-    // Release UART HW reset.
+    if (uart == UART_DEV(0)) {
+        resets_hw->reset |= RESETS_RESET_UART0_BITS;
 
+        resets_hw->reset &= ~(RESETS_RESET_UART0_BITS);
 
-    switch(uart) {
-        case 0:
-        {
-            resets_hw->reset |= RESETS_RESET_UART0_BITS;
+        while (!(resets_hw->reset_done & RESETS_RESET_DONE_UART0_BITS)) {}
+    }
+    else if (uart == UART_DEV(1)) {
+        resets_hw->reset |= RESETS_RESET_UART1_BITS;
 
-            resets_hw->reset &= ~RESETS_RESET_UART0_BITS;
+        resets_hw->reset &= ~(RESETS_RESET_UART1_BITS);
 
-            while (!(resets_hw->reset_done & RESETS_RESET_DONE_UART0_BITS)) {}
-
-            break;
-        }
-
-        case 1:
-        {
-            resets_hw->reset |= RESETS_RESET_UART1_BITS;
-
-            resets_hw->reset &= ~RESETS_RESET_UART1_BITS;
-
-            while (!(resets_hw->reset_done & RESETS_RESET_DONE_UART1_BITS)) {}
-
-            break;
-        }
-
-        default:
-            return UART_NODEV;
+        while (!(resets_hw->reset_done & RESETS_RESET_DONE_UART1_BITS)) {}
+    }
+    else {
+        return UART_NODEV;
     }
 
-    resets_hw->reset &= ~RESETS_RESET_IO_BANK0_BITS;
-    resets_hw->reset &= ~RESETS_RESET_PADS_BANK0_BITS;
+    if (rx_cb) {
+        uart_isr_ctx[uart].arg = arg;
+        uart_isr_ctx[uart].rx_cb = rx_cb;
+    }
 
+    resets_hw->reset |= RESETS_RESET_IO_BANK0_BITS;
+    resets_hw->reset &= ~(RESETS_RESET_IO_BANK0_BITS);
     while (!(resets_hw->reset_done & RESETS_RESET_DONE_IO_BANK0_BITS)) {}
+
+    resets_hw->reset |= RESETS_RESET_PADS_BANK0_BITS;
+    resets_hw->reset &= ~(RESETS_RESET_PADS_BANK0_BITS);
     while (!(resets_hw->reset_done & RESETS_RESET_DONE_PADS_BANK0_BITS)) {}
 
-    rx_idx_pin = (uart_config[0].rx_pin & 0x00ff);
-    tx_idx_pin = (uart_config[0].tx_pin & 0x00ff);
+    rx_pin = (uart_config[uart].rx_pin & 0x0000ffff);
+    tx_pin = (uart_config[uart].tx_pin & 0x0000ffff);
 
-    iobank0_hw->io[rx_idx_pin].ctrl |=
+    padsbank0_hw->io[rx_pin] &= ~(PADS_BANK0_GPIO0_OD_BITS);
+    padsbank0_hw->io[rx_pin] |= PADS_BANK0_GPIO0_IE_LSB;
+    padsbank0_hw->io[tx_pin] &= ~(PADS_BANK0_GPIO0_OD_BITS);
+    padsbank0_hw->io[tx_pin] |= PADS_BANK0_GPIO0_IE_LSB;
+
+    iobank0_hw->io[rx_pin].ctrl =
         (IO_BANK0_GPIO1_CTRL_FUNCSEL_VALUE_UART0_RX << IO_BANK0_GPIO1_CTRL_FUNCSEL_LSB);
-    iobank0_hw->io[tx_idx_pin].ctrl |=
+    iobank0_hw->io[tx_pin].ctrl =
         (IO_BANK0_GPIO0_CTRL_FUNCSEL_VALUE_UART0_TX << IO_BANK0_GPIO0_CTRL_FUNCSEL_LSB);
 
-    /*padsbank0_hw->io[rx_idx_pin] |= (1 << PADS_BANK0_GPIO1_OD_LSB);
-    padsbank0_hw->io[rx_idx_pin] |= (1 << PADS_BANK0_GPIO1_IE_LSB);
+    // Baudrate calculation.
+    baudrate_div = ((8 * get_clk_khz(CLOCKS_FC0_SRC_VALUE_CLK_PERI) * 1000) / baudrate);
+    baudrate_i = (baudrate_div >> 7);
 
-    padsbank0_hw->io[tx_idx_pin] &= ~(1 << PADS_BANK0_GPIO0_OD_LSB);
-    padsbank0_hw->io[tx_idx_pin] &= ~(1 << PADS_BANK0_GPIO0_IE_LSB);*/
+    if (baudrate_i == 0) {
+        baudrate_i = 1;
+        baudrate_f = 0;
+    } else if (baudrate_i >= 65535) {
+        baudrate_i = 65535;
+        baudrate_f = 0;
+    }  else {
+        baudrate_f = ((baudrate_div & 0x7f) + 1) / 2;
+    }
 
+    uart_config[uart].dev->ibrd = baudrate_i;
+    uart_config[uart].dev->fbrd = baudrate_f;
 
-    /*
-        uint32_t baud_rate_div = (8 * clock_get_hz(clk_peri) / baudrate);
-        uint32_t baud_ibrd = baud_rate_div >> 7;
-        uint32_t baud_fbrd = ((baud_rate_div & 0x7f) + 1) / 2;
+    uart_config[uart].dev->lcr_h |=
+        ((uart_config[uart].data_bits - 5) << UART_UARTLCR_H_WLEN_LSB);
+    
+    if(uart_config[uart].stop_bits == UART_STOP_BITS_1) {
+        uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_STP2_BITS);
+    }
+    else if (uart_config[uart].stop_bits == UART_STOP_BITS_2) {
+        uart_config[uart].dev->lcr_h |= UART_UARTLCR_H_STP2_BITS;
+    }
 
-        if (baud_ibrd == 0) {
-            baud_ibrd = 1;
-            baud_fbrd = 0;
-        } else if (baud_ibrd >= 65535) {
-            baud_ibrd = 65535;
-            baud_fbrd = 0;
-        }
+    if(uart_config[uart].parity == UART_PARITY_NONE) {
+        uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_PEN_BITS);
+    }
+    else if (uart_config[uart].parity == UART_PARITY_ODD) {
+        uart_config[uart].dev->lcr_h |= UART_UARTLCR_H_PEN_BITS;
+        uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_EPS_BITS);
+    }
+    else if (uart_config[uart].parity == UART_PARITY_EVEN) {
+        uart_config[uart].dev->lcr_h |= UART_UARTLCR_H_PEN_BITS;
+        uart_config[uart].dev->lcr_h |= UART_UARTLCR_H_EPS_BITS;
+    }
 
-        // Load PL011's baud divisor registers
-        uart_get_hw(uart)->ibrd = baud_ibrd;
-        uart_get_hw(uart)->fbrd = baud_fbrd;
+    // Disable FIFO. Operate in character mode.
+    uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_FEN_BITS);
 
-        // PL011 needs a (dummy) line control register write to latch in the
-        // divisors. We don't want to actually change LCR contents here.
-        hw_set_bits(&uart_get_hw(uart)->lcr_h, 0);
-    */
-
-    uart_config[uart].dev->ibrd = 78;
-    uart_config[uart].dev->fbrd = 8;
-
-    uart_config[uart].dev->lcr_h |= (3 << UART_UARTLCR_H_WLEN_LSB);
-    uart_config[uart].dev->lcr_h &= ~(UART_UARTLCR_H_PEN_BITS);
-
-    uart_config[uart].dev->cr |= (UART_UARTCR_TXE_BITS | UART_UARTCR_UARTEN_BITS);
+    uart_config[uart].dev->cr |= UART_UARTCR_UARTEN_BITS;
 
     return UART_OK;
 }
 
 void uart_write(uart_t uart, const uint8_t *data, size_t len)
 {
-    (void)(uart);
-    (void)(data);
+    size_t wrote = 0;
 
-    //uint32_t i = 0;
-    size_t _len = len;
+    while(wrote != len) {
+        uart_config[uart].dev->dr = *data;
 
-    while(_len != 0) {
-        uart0_hw->dr = 'X';
+        while((uart_config[uart].dev->fr & UART_UARTFR_BUSY_BITS)) {}
 
-        while((uart0_hw->fr & UART_UARTFR_BUSY_BITS)) {}
+        data++;
 
-        //i++;
-        _len--;
+        wrote++;
     }
 }
-
-/**
- * The UART interrupt handler.
- */
 
 void isr_uart(int dev) {
     (void)(dev);
