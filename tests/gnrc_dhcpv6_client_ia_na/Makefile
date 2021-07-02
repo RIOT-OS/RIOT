@@ -8,6 +8,7 @@ USEMODULE += gnrc_dhcpv6_client
 USEMODULE += gnrc_ipv6_default
 USEMODULE += auto_init_dhcpv6_client
 USEMODULE += gnrc_dhcpv6_client_mud_url
+USEMODULE += gnrc_dhcpv6_client_ia_na
 USEMODULE += gnrc_netdev_default
 USEMODULE += gnrc_pktdump
 USEMODULE += ps
