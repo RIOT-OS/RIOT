@@ -47,9 +47,15 @@ extern "C" {
 #define DHCPV6_SOLICIT              (1U)    /**< SOLICIT */
 #define DHCPV6_ADVERTISE            (2U)    /**< ADVERTISE */
 #define DHCPV6_REQUEST              (3U)    /**< REQUEST */
+#define DHCPV6_CONFIRM              (4U)    /**< CONFIRM */
 #define DHCPV6_RENEW                (5U)    /**< RENEW */
 #define DHCPV6_REBIND               (6U)    /**< REBIND */
 #define DHCPV6_REPLY                (7U)    /**< REPLY */
+#define DHCPV6_RELEASE              (8U)    /**< RELEASE */
+#define DHCPV6_DECLINE              (9U)    /**< DECLINE */
+#define DHCPV6_INFO_REQUEST         (11U)   /**< INFORMATION-REQUEST */
+#define DHCPV6_RELAY_FORW           (12U)   /**< RELAY-FORW */
+#define DHCPV6_RELAY_REPL           (13U)   /**< RELAY-REPL */
 /** @ } */
 
 /**
@@ -64,7 +70,9 @@ extern "C" {
 #define DHCPV6_OPT_ORO              (6U)    /**< option request option */
 #define DHCPV6_OPT_PREF             (7U)    /**< preference option */
 #define DHCPV6_OPT_ELAPSED_TIME     (8U)    /**< elapsed time option */
+#define DHCPV6_OPT_RELAY_MSG        (9U)    /**< relay message option */
 #define DHCPV6_OPT_STATUS           (13U)   /**< status code option */
+#define DHCPV6_OPT_IID              (18U)   /**< interface-id option */
 #define DHCPV6_OPT_DNS_RNS          (23U)   /**< DNS recursive name server option */
 #define DHCPV6_OPT_IA_PD            (25U)   /**< identity association for prefix
                                              *   delegation (IA_PD) option */

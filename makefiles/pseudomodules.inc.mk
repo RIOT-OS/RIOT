@@ -25,6 +25,7 @@ PSEUDOMODULES += dbgpin
 PSEUDOMODULES += devfs_%
 PSEUDOMODULES += dhcpv6_%
 PSEUDOMODULES += dhcpv6_client_dns
+PSEUDOMODULES += dhcpv6_relay
 PSEUDOMODULES += ecc_%
 PSEUDOMODULES += event_%
 PSEUDOMODULES += event_timeout_ztimer

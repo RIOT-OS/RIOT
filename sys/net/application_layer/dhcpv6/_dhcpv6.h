@@ -84,6 +84,26 @@ typedef struct __attribute__((packed)) {
     uint8_t type;   /**< message type (see [DHCPv6 messeg types ](@ref net_dhcp6_msg_types)) */
     uint8_t tid[3]; /**< transaction ID */
 } dhcpv6_msg_t;
+
+/**
+ * @brief   Relay Agents/Server message format
+ * @see [RFC 8415, section 9]
+ *      (https://tools.ietf.org/html/rfc8415#section-9)
+ */
+typedef struct __attribute__((packed)) {
+    uint8_t type;       /**< message type (see [DHCPv6 messeg types ](@ref net_dhcp6_msg_types)) */
+    uint8_t hop_count;  /**< number of relays that have already relayed the message */
+    /**
+     * @brief   optional address to identify the link on which the client is
+     *          located.
+     */
+    ipv6_addr_t link_address;
+    /**
+     * @brief   The address of the client or relay agent from which the message
+     *          to be relayed was received.
+     */
+    ipv6_addr_t peer_address;
+} dhcpv6_relay_msg_t;
 /** @} */
 
 /**
@@ -161,6 +181,17 @@ typedef struct __attribute__((packed)) {
 } dhcpv6_opt_elapsed_time_t;
 
 /**
+ * @brief   DHCPv6 relay message option
+ * @see [RFC 8415, section 21.10]
+ *      (https://tools.ietf.org/html/rfc8415#section-21.10)
+ */
+typedef struct __attribute__((packed)) {
+    network_uint16_t type;          /**< @ref DHCPV6_OPT_RELAY_MSG */
+    network_uint16_t len;           /**< length of dhcpv6_opt_iid_t::msg in byte */
+    uint16_t msg[];                 /**< the relayed message */
+} dhcpv6_opt_relay_msg_t;
+
+/**
  * @brief   DHCPv6 status code option format
  * @see [RFC 8415, section 21.13]
  *      (https://tools.ietf.org/html/rfc8415#section-21.13)
@@ -171,6 +202,17 @@ typedef struct __attribute__((packed)) {
     network_uint16_t code;          /**< [status code](@ref net_dhcp6_status_codes) */
     char msg[];                     /**< UTF-8 encoded text string (not 0-terminated!) */
 } dhcpv6_opt_status_t;
+
+/**
+ * @brief   DHCPv6 interface-id option
+ * @see [RFC 8415, section 21.18]
+ *      (https://tools.ietf.org/html/rfc8415#section-21.18)
+ */
+typedef struct __attribute__((packed)) {
+    network_uint16_t type;          /**< @ref DHCPV6_OPT_IID */
+    network_uint16_t len;           /**< length of dhcpv6_opt_iid_t::iid in byte */
+    uint8_t iid[];                  /**< opaque interface identifier */
+} dhcpv6_opt_iid_t;
 
 /**
  * @brief   DHCPv6 DNS recursive name server option
