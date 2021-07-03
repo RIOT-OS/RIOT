@@ -15,6 +15,9 @@ def testfunc(child):
     child.expect(r"inet6 addr:\sfe80:[0-9a-f:]+\s+scope: link")
     child.expect(r"Iface\s+\d+")
     child.expect(r"inet6 addr:\s+fe80:[0-9a-f:]+\s+scope: link")
+    child.expect(r"inet6 addr:\s+(?P<ia_na_addr>[0-9a-f:]+)\s+scope: global")
+    ia_na_addr = child.match.group("ia_na_addr")
+    assert ia_na_addr.startswith("2001:db8:1::")
     child.expect(r"inet6 addr:\s+(?P<global_addr>[0-9a-f:]+)\s+scope: global")
     global_addr = child.match.group("global_addr")
     child.expect(r"(?P<global_pfx>[0-9a-f:]+)/64\s+dev #\d\s+"
