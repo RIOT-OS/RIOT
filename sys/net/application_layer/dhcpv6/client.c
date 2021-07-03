@@ -910,7 +910,7 @@ static bool _parse_reply(uint8_t *rep, size_t len)
                         char addr_str[IPV6_ADDR_MAX_STR_LEN];
 
                         if (&lease->addr != NULL &&
-                            ipv6_addr_equal(&lease->addr, addr)) {
+                            !ipv6_addr_equal(&lease->addr, addr)) {
                             /* A different address has been leased to the client */
                             netif_set_opt(netif, NETOPT_IPV6_ADDR_REMOVE, 64 << 8, &lease->addr, sizeof(lease->addr));
                         }
