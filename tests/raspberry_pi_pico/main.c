@@ -22,27 +22,22 @@
 #include "periph/gpio.h"
 #include "periph/timer.h"
 
-uint32_t i = 0;
-
 void tcb(void *arg, int channel) {
     (void)(arg);
     (void)(channel);
 
-    //printf("tcb(), CH=%d\n", channel);
-
-    if(i%2) {
-        gpio_set(LED0_PIN);
+    //gpio_toggle(LED0_PIN);
+    if (gpio_read(LED0_PIN)) {
+        gpio_write(LED0_PIN, 0);
     }
     else {
-        gpio_clear(LED0_PIN);
+        gpio_write(LED0_PIN, 1);
     }
-
-    i++;
 }
 
 int main(void) {
     timer_init(TIMER_DEV(0), 0, tcb, NULL);
-    timer_set(TIMER_DEV(0), 0, 1000000);
+    timer_set(TIMER_DEV(0), 0, 50000);
 
     printf(
         "\n[+] Initialising board LED on GPIO = %ld\n",
@@ -73,8 +68,6 @@ int main(void) {
     gpio_set(LED0_PIN);
 
     while(1) {}
-    //__WFI();
-    //__asm__ __volatile__("wfe");
 
     return 0;
 }
