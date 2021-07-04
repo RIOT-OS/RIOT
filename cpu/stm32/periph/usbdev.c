@@ -30,6 +30,7 @@
 #include "periph/pm.h"
 #include "periph/gpio.h"
 #include "periph/usbdev.h"
+#include "pm_layered.h"
 #include "usbdev_stm32.h"
 
 /**
@@ -921,7 +922,6 @@ static int _usbdev_ep_ready(usbdev_ep_t *ep, size_t len)
         if (!(_in_regs(conf, ep->num)->DIEPCTL & USB_OTG_DIEPCTL_USBAEP)) {
             return -1;
         }
-
 
         if (_uses_dma(conf)) {
             _in_regs(conf, ep->num)->DIEPDMA = (uint32_t)ep->buf;
