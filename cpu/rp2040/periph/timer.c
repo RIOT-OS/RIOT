@@ -25,7 +25,7 @@
 #include "periph_conf.h"
 #include "periph/timer.h"
 
-static timer_isr_ctx_t timer_isr_ctx[NUM_TIMER];
+static timer_isr_ctx_t timer_isr_ctx[TIMER_NUMOF];
 
 static timer_conf_t timer_config[] = {
     {
@@ -98,7 +98,7 @@ static void timer_arm_channel(bool arm, int channel) {
 }
 
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg) {
-    assert(dev < NUM_TIMER);
+    assert(dev < TIMER_NUMOF);
 
     (void)freq; /* Cannot adjust Frequency */
 
@@ -146,7 +146,7 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg) {
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout) {
-    assert(dev < NUM_TIMER);
+    assert(dev < TIMER_NUMOF);
 
     timer_arm_channel(false, channel);
 
@@ -167,7 +167,7 @@ int timer_set(tim_t dev, int channel, unsigned int timeout) {
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
-    assert(dev < NUM_TIMER);
+    assert(dev < TIMER_NUMOF);
 
     timer_arm_channel(false, channel);
 
@@ -189,7 +189,7 @@ int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
 }
 
 int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags) {
-    assert(dev < NUM_TIMER);
+    assert(dev < TIMER_NUMOF);
 
     (void)flags;
 
@@ -216,7 +216,7 @@ int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags
 }
 
 int timer_clear(tim_t dev, int channel) {
-    assert(dev < NUM_TIMER);
+    assert(dev < TIMER_NUMOF);
 
     // Disarm channel.
     timer_arm_channel(false, channel);
@@ -234,13 +234,13 @@ int timer_clear(tim_t dev, int channel) {
 }
 
 unsigned int timer_read(tim_t dev) {
-    assert(dev < NUM_TIMER);
+    assert(dev < TIMER_NUMOF);
 
     return timer_hw->timelr;
 }
 
 void timer_start(tim_t dev) {
-    assert(dev < NUM_TIMER);
+    assert(dev < TIMER_NUMOF);
 
     if (timer_config[0].is_running == true) {
         return;
@@ -252,7 +252,7 @@ void timer_start(tim_t dev) {
 }
 
 void timer_stop(tim_t dev) {
-    assert(dev < NUM_TIMER);
+    assert(dev < TIMER_NUMOF);
 
     if(timer_config[0].is_running == false) {
         return;
