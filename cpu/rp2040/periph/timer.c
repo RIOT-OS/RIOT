@@ -11,10 +11,11 @@
  * @ingroup drivers_periph_timer
  * @{
  *
- * @file
+ * @file timer.c
  * @brief CPU specific low-level timer driver implementation for RP2040
  *
  * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
+ *
  * @}
  */
 
@@ -32,75 +33,63 @@ static timer_conf_t timer_config[] = {
         .is_running = false,
         .channel = {
             {
-                .is_relative = false,
-                .is_absolute = false,
-                .is_periodic = false,
+                .period_us = 0,
             },
             {
-                .is_relative = false,
-                .is_absolute = false,
-                .is_periodic = false,
+                .period_us = 0,
             },
             {
-                .is_relative = false,
-                .is_absolute = false,
-                .is_periodic = false,
+                .period_us = 0,
             },
             {
-                .is_relative = false,
-                .is_absolute = false,
-                .is_periodic = false,
+                .period_us = 0,
             }
         }
     }
 };
 
-static void timer_pause(bool pause);
+static uint32_t read_time(void);
+static void isr_timer(int index);
 static void timer_reset_counter(void);
-static void handle_reset_on_match(void);
-static void timer_arm_channel(bool arm, int channel);
 
-static void timer_reset_counter(void) {
-    timer_pause(true);
+static uint32_t read_time(void) {
+    uint32_t l;
+    uint32_t h __attribute__((unused));
 
-    timer_hw->timelw = 0;
-    timer_hw->timehw = 0;
+    l = timer_hw->timelr;
+    h = timer_hw->timehr;
 
-    timer_pause(false);
+    return l;
 }
 
-static void handle_reset_on_match(void) {
+static void isr_timer(int index) {
+    timer_hw->intr |= (1 << index);
+
+    timer_isr_ctx[index].cb(timer_isr_ctx[index].arg, index);
+
     #ifdef TIM_FLAG_RESET_ON_MATCH
         #if TIM_FLAG_RESET_ON_MATCH
             timer_reset_counter();
         #endif
     #endif
-}
 
-static void timer_pause(bool pause) {
-    if(pause) {
-        timer_hw->pause |= (TIMER_PAUSE_BITS << TIMER_PAUSE_LSB);
-    }
-    else {
-        timer_hw->pause &= ~(TIMER_PAUSE_BITS << TIMER_PAUSE_LSB);
+    if (timer_config[index].channel[index].period_us > 0) {
+        timer_hw->alarm[index] =
+            read_time() + timer_config[index].channel[index].period_us;
     }
 }
 
-static void timer_arm_channel(bool arm, int channel) {
-    if(arm) {
-        timer_hw->armed &= ~(0x1 << channel);
-        timer_hw->inte |= (1 << channel);
-    }
-    else {
-        timer_hw->armed |= (0x1 << channel);
-        timer_hw->inte &= ~(1 << channel);
-    }
+static void timer_reset_counter(void) {
+    timer_hw->timelw = 0;
+    timer_hw->timehw = 0;
 }
 
 int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg) {
-    assert(dev < TIMER_NUMOF);
+    (void)freq;
 
-    (void)freq; /* Cannot adjust Frequency */
+    if (dev >= TIMER_NUMOF) {
+        return -1;
+    }
 
     io_rw_32 *ppb_nvic_iser =
         (io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET);
@@ -108,36 +97,24 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg) {
     io_rw_32 *ppb_nvic_icpr =
         (io_rw_32*)(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET);
 
-    // Release reset of timer hardware.
+    // Reset of timer hardware.
     resets_hw->reset |= RESETS_RESET_TIMER_BITS;
     resets_hw->reset &= ~RESETS_RESET_TIMER_BITS;
 
     while (!(resets_hw->reset_done & RESETS_RESET_DONE_TIMER_BITS)) {}
 
-    // Enable timer CPU interrupts.
+    // Enable timer CPU interrupts, clear any pending interrupts before enabling.
+    *ppb_nvic_icpr |= (1 << 0);
+    *ppb_nvic_icpr |= (1 << 1);
+    *ppb_nvic_icpr |= (1 << 2);
+    *ppb_nvic_icpr |= (1 << 3);
+
     *ppb_nvic_iser |= (1 << 0);
     *ppb_nvic_iser |= (1 << 1);
     *ppb_nvic_iser |= (1 << 2);
     *ppb_nvic_iser |= (1 << 3);
 
-    *ppb_nvic_icpr |= (1 << 0);
-    *ppb_nvic_icpr |= (1 << 1);
-    *ppb_nvic_icpr |= (1 << 2);
-    *ppb_nvic_icpr |= (1 << 3);
-    /*
-    void irq_set_mask_enabled(uint32_t mask, bool enabled) {
-        if (enabled) {
-            // Clear pending before enable
-            // (if IRQ is actually asserted, it will immediately re-pend)
-            *((io_rw_32 *) (PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)) = mask;
-            *((io_rw_32 *) (PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)) = mask;
-        } else {
-            *((io_rw_32 *) (PPB_BASE + M0PLUS_NVIC_ICER_OFFSET)) = mask;
-        }
-    }
-    */
-
-    timer_config[0].is_running = true;
+    timer_config[dev].is_running = true;
 
     timer_isr_ctx[dev].cb = cb;
     timer_isr_ctx[dev].arg = arg;
@@ -146,56 +123,37 @@ int timer_init(tim_t dev, uint32_t freq, timer_cb_t cb, void *arg) {
 }
 
 int timer_set(tim_t dev, int channel, unsigned int timeout) {
-    assert(dev < TIMER_NUMOF);
+    if (dev >= TIMER_NUMOF) {
+        return -1;
+    }
 
-    timer_arm_channel(false, channel);
-
-    timer_pause(true);
-
-    timer_config[0].channel[channel].is_relative = true;
-    timer_config[0].channel[channel].is_absolute = false;
-    timer_config[0].channel[channel].is_periodic = false;
-
-    timer_hw->alarm[channel] = timer_hw->timelr + timeout;
-
+    timer_config[dev].channel[channel].period_us = 0;
+    timer_hw->alarm[channel] = read_time() + timeout;
     timer_hw->inte |= (1 << channel);
-
-    timer_arm_channel(true, channel);
-    timer_pause(false);
 
     return 0;
 }
 
 int timer_set_absolute(tim_t dev, int channel, unsigned int value) {
-    assert(dev < TIMER_NUMOF);
+    if (dev >= TIMER_NUMOF) {
+        return -1;
+    }
 
-    timer_arm_channel(false, channel);
-
-    timer_pause(true);
-
-    timer_config[0].channel[channel].is_relative = false;
-    timer_config[0].channel[channel].is_absolute = true;
-    timer_config[0].channel[channel].is_periodic = false;
+    timer_config[0].channel[channel].period_us = 0;
 
     timer_reset_counter();
 
     timer_hw->alarm[channel] = value;
 
-    timer_arm_channel(true, channel);
-
-    timer_pause(false);
-
     return 0;
 }
 
 int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags) {
-    assert(dev < TIMER_NUMOF);
-
     (void)flags;
 
-    timer_arm_channel(false, channel);
-
-    timer_pause(true);
+    if (dev >= TIMER_NUMOF) {
+        return -1;
+    }
 
     #ifdef TIM_FLAG_RESET_ON_SET
         #if TIM_FLAG_RESET_ON_SET
@@ -203,122 +161,83 @@ int timer_set_periodic(tim_t dev, int channel, unsigned int value, uint8_t flags
         #endif
     #endif
 
-    timer_config[0].channel[channel].is_relative = false;
-    timer_config[0].channel[channel].is_absolute = true;
-    timer_config[0].channel[channel].is_periodic = true;
+    timer_config[dev].channel[channel].period_us = value;
 
     timer_hw->alarm[channel] = value;
-
-    timer_arm_channel(true, channel);
-    timer_pause(false);
 
     return 0;
 }
 
 int timer_clear(tim_t dev, int channel) {
-    assert(dev < TIMER_NUMOF);
-
-    // Disarm channel.
-    timer_arm_channel(false, channel);
+    if (dev >= TIMER_NUMOF) {
+        return -1;
+    }
 
     timer_hw->alarm[channel] = 0;
 
-    timer_config[0].channel[channel].is_relative = false;
-    timer_config[0].channel[channel].is_absolute = false;
-    timer_config[0].channel[channel].is_periodic = false;
+    timer_config[dev].channel[channel].period_us = 0;
 
-    // Disarm channel.
-    timer_arm_channel(false, channel);
+    timer_hw->inte &= ~(1 << channel);
 
     return 0;
 }
 
 unsigned int timer_read(tim_t dev) {
-    assert(dev < TIMER_NUMOF);
+    if (dev >= TIMER_NUMOF) {
+        return -1;
+    }
 
-    return timer_hw->timelr;
+    return (unsigned int) read_time();
 }
 
 void timer_start(tim_t dev) {
     assert(dev < TIMER_NUMOF);
 
-    if (timer_config[0].is_running == true) {
+    if (timer_config[dev].is_running == true) {
         return;
     }
 
-    timer_pause(false);
+    resets_hw->reset &= ~(RESETS_RESET_TIMER_BITS);
 
-    timer_config[0].is_running = true;
+    while (!(resets_hw->reset_done & RESETS_RESET_DONE_TIMER_BITS)) {}
+
+    timer_config[dev].is_running = true;
 }
 
 void timer_stop(tim_t dev) {
     assert(dev < TIMER_NUMOF);
 
-    if(timer_config[0].is_running == false) {
+    if (timer_config[dev].is_running == false) {
         return;
     }
 
-    timer_pause(true);
+    resets_hw->reset |= RESETS_RESET_TIMER_BITS;
 
-    timer_config[0].is_running = false;
+    timer_config[dev].is_running = false;
 }
 
-/**
- * The Timer interrupt handlers.
- */
+// The interrupt handlers.
 
 void isr_timer_0(void) {
-    timer_hw->intr |= (1 << 0);
-
-    printf("isr_timer_0()\n");
-
-    handle_reset_on_match();
-
-    timer_isr_ctx[0].cb(timer_isr_ctx[0].arg, 0);
-
-    //if (timer_config[0].channel[0].is_periodic) {
-        //timer_arm_channel(true, 0);
-    //}
-
-    timer_hw->alarm[0] = timer_hw->timelr + 1000000;
+    isr_timer(0);
 
     cortexm_isr_end();
 }
 
 void isr_timer_1(void) {
-    timer_hw->intr |= (1 << 1);
-
-    printf("isr_timer_1()\n");
-
-    handle_reset_on_match();
-
-    timer_isr_ctx[0].cb(timer_isr_ctx[0].arg, 1);
-
-    //if (timer_config[0].channel[0].is_periodic) {
-        //timer_arm_channel(true, 0);
-    //}
-
-    timer_hw->alarm[1] = timer_hw->timelr + 1000000;
+    isr_timer(1);
 
     cortexm_isr_end();
 }
 
 void isr_timer_2(void) {
-    timer_isr_ctx[0].cb(timer_isr_ctx[0].arg, 2);
-
-    if (timer_config[0].channel[2].is_periodic) {
-        timer_arm_channel(true, 2);
-    }
+    isr_timer(2);
 
     cortexm_isr_end();
 }
 
 void isr_timer_3(void) {
-    timer_isr_ctx[0].cb(timer_isr_ctx[0].arg, 3);
-
-    if (timer_config[0].channel[3].is_periodic) {
-        timer_arm_channel(true, 3);
-    }
+    isr_timer(3);
 
     cortexm_isr_end();
 }

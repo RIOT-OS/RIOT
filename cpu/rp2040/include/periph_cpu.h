@@ -10,8 +10,8 @@
  * @ingroup cpu_rp2040
  * @{
  *
- * @file
- * @brief RP2040 specific definitions for handling peripherals
+ * @file periph_cpu.h
+ * @brief CPU definitions for handling peripherals
  *
  * @author Ishraq Ibne Ashraf <ishraq.i.ashraf@gmail.com>
  */
@@ -51,56 +51,43 @@ extern "C" {
 #define PERIPH_TIMER_PROVIDES_SET
 
 /**
- * @brief Overwrite the default gpio_t type definition
- * @{
+ * @brief GPIO configuration options
  */
 #define HAVE_GPIO_T
 typedef uint32_t gpio_t;
-/** @} */
 
 #define GPIO_PIN(x, y) ((gpio_t)((x << 16) | y))
 
-/**
- * @brief Available GPIO ports
- */
 enum {
-    GPIO_BANK_USER = 0, /**< GPIO User Bank */
-    GPIO_BANK_QSPI = 1, /**< QSPI Bank */
+    GPIO_BANK_USER = 0,
+    GPIO_BANK_QSPI = 1,
 };
-
-/**
- * @brief Definition of possible parity modes
- */
-#define HAVE_UART_PARITY_T
-typedef enum {
-   UART_PARITY_ODD, /**< odd parity */
-   UART_PARITY_EVEN, /**< even parity */
-   UART_PARITY_NONE, /**< no parity */
-} uart_parity_t;
-
-/**
- * @brief Definition of possible data bits lengths in a UART frame
- */
-#define HAVE_UART_DATA_BITS_T
-typedef enum {
-    UART_DATA_BITS_5 = 5, /**< 5 data bits */
-    UART_DATA_BITS_6, /**< 6 data bits */
-    UART_DATA_BITS_7, /**< 7 data bits */
-    UART_DATA_BITS_8, /**< 8 data bits */
-} uart_data_bits_t;
-
-/**
- * @brief Definition of possible stop bits lengths in a UART frame
- */
-#define HAVE_UART_STOP_BITS_T
-typedef enum {
-   UART_STOP_BITS_1 = 0, /**< 1 stop bit */
-   UART_STOP_BITS_2, /**< 2 stop bits */
-} uart_stop_bits_t;
 
 /**
  * @brief UART configuration options
  */
+#define HAVE_UART_PARITY_T
+typedef enum {
+
+   UART_PARITY_ODD,
+   UART_PARITY_EVEN,
+   UART_PARITY_NONE,
+} uart_parity_t;
+
+#define HAVE_UART_DATA_BITS_T
+typedef enum {
+    UART_DATA_BITS_5 = 5,
+    UART_DATA_BITS_6,
+    UART_DATA_BITS_7,
+    UART_DATA_BITS_8,
+} uart_data_bits_t;
+
+#define HAVE_UART_STOP_BITS_T
+typedef enum {
+   UART_STOP_BITS_1 = 0,
+   UART_STOP_BITS_2,
+} uart_stop_bits_t;
+
 typedef struct {
     gpio_t tx_pin;
     gpio_t rx_pin;
@@ -114,9 +101,7 @@ typedef struct {
  * @brief Timer configuration options
  */
 typedef struct {
-    bool is_relative;
-    bool is_absolute;
-    bool is_periodic;
+    uint32_t period_us;
 } timer_channel_conf_t;
 
 typedef struct {
